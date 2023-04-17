@@ -13,8 +13,41 @@
 #include <QUndoCommand>
 #include <QTableWidget>
 
+class AtlasFrame;
 class SpriteTableView;
 class ProjectItemData;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class SpriteUndoCmd_AddFrames : public QUndoCommand
+{
+	ProjectItemData &				m_SpriteItemRef;
+	int								m_iStateIndex;
+
+	QList<AtlasFrame *>				m_FrameList;
+
+public:
+	SpriteUndoCmd_AddFrames(ProjectItemData &spriteItemRef, int iStateIndex, QList<AtlasFrame *> frameList, QUndoCommand *pParent = nullptr);
+	virtual ~SpriteUndoCmd_AddFrames();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class SpriteUndoCmd_RemoveFrames : public QUndoCommand
+{
+	ProjectItemData &			m_SpriteItemRef;
+	int							m_iStateIndex;
+
+	QList<AtlasFrame *>			m_FrameList;
+
+public:
+	SpriteUndoCmd_RemoveFrames(ProjectItemData &spriteItemRef, int iStateIndex, QList<AtlasFrame *> frameList, QUndoCommand *pParent = nullptr);
+	virtual ~SpriteUndoCmd_RemoveFrames();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class SpriteUndoCmd_OrderFrame : public QUndoCommand

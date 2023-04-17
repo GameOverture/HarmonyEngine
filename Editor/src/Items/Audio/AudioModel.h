@@ -28,8 +28,8 @@ public:
 
 	QJsonArray GenPlayListArray() const;
 	
-	virtual QVariant OnLinkAsset(AssetItemData *pAsset) override;
-	virtual void OnUnlinkAsset(AssetItemData *pAsset) override;
+	int Cmd_AddAudioAsset(AudioAsset *pAsset);
+	void Cmd_RemoveAudioAsset(AudioAsset *pAsset);
 };
 
 class AudioModel : public IModel
@@ -37,6 +37,10 @@ class AudioModel : public IModel
 public:
 	AudioModel(ProjectItemData &itemRef, FileDataPair &itemFileDataRef);
 	virtual ~AudioModel();
+
+	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from this constructor and from UndoCmd's
+	int Cmd_AddAudioAssets(int iStateIndex, QList<AudioAsset *> assetList);
+	void Cmd_RemoveAudioAssets(int iStateIndex, QList<AudioAsset *> assetList);
 
 	AudioPlayListModel &GetPlayListModel(uint uiStateIndex);
 	PropertiesTreeModel &GetPropertiesModel(uint uiStateIndex);

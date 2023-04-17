@@ -134,16 +134,22 @@ void AudioWidget::on_actionAddAudio_triggered()
 	QList<TreeModelItemData *> selectedFiltersList;
 	m_ItemRef.GetProject().GetAudioWidget()->GetSelected(selectedAssetsList, selectedFiltersList);
 
-	QUndoCommand *pCmd = new UndoCmd_LinkStateAssets("Add Audio", m_ItemRef, GetCurStateIndex(), selectedAssetsList);
+	QList<AudioAsset *> audioList;
+	for(AssetItemData *pAsset : selectedAssetsList)
+		audioList.push_back(static_cast<AudioAsset *>(pAsset));
+
+	QUndoCommand *pCmd = new AudioUndoCmd_AddAssets(m_ItemRef, GetCurStateIndex(), audioList);
 	GetItem().GetUndoStack()->push(pCmd);
 }
 
 void AudioWidget::on_actionRemoveAudio_triggered()
 {
-	QList<AssetItemData *> removeList;
-	removeList.append(static_cast<AudioPlayListModel *>(ui->playListTableView->model())->GetAudioAssetAt(ui->playListTableView->currentIndex().row())->GetAudioAsset());
+	AudioPlayListModel *pPlayListModel = static_cast<AudioPlayListModel *>(ui->playListTableView->model());
 
-	QUndoCommand *pCmd = new UndoCmd_UnlinkStateAssets("Remove Frame", m_ItemRef, GetCurStateIndex(), removeList);
+	QList<AudioAsset *> removeList;
+	removeList.append(pPlayListModel->GetAudioAssetAt(ui->playListTableView->currentIndex().row())->GetAudioAsset());
+
+	QUndoCommand *pCmd = new AudioUndoCmd_RemoveAssets(m_ItemRef, GetCurStateIndex(), removeList);
 	GetItem().GetUndoStack()->push(pCmd);
 }
 

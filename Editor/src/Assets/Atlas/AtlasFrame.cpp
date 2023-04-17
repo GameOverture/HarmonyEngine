@@ -121,8 +121,15 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize f
 		// Update the corresponding .atlas file
 		if(m_eTYPE == ITEM_Spine)
 		{
-			for(auto iter = m_DependencySet.begin(); iter != m_DependencySet.end(); ++iter) // There should only be '1' dependency
-				static_cast<SpineModel *>((*iter)->GetModel())->RewriteAtlasFile(this, fullAtlasSize);
+			QList<TreeModelItemData *> dependantList = GetDependants();
+			for(auto iter = dependantList.begin(); iter != dependantList.end(); ++iter) // There should only be '1' dependency
+			{
+				if((*iter)->IsProjectItem() == false)
+					continue;
+
+				ProjectItemData *pProjItem = static_cast<ProjectItemData *>(*iter);
+				static_cast<SpineModel *>(pProjItem->GetModel())->RewriteAtlasFile(this, fullAtlasSize);
+			}
 		}
 	}
 	else

@@ -34,9 +34,6 @@ public:
 	
 	QString GetName() const;
 	void SetName(QString sNewName);
-	
-	virtual QVariant OnLinkAsset(AssetItemData *pAsset) = 0;
-	virtual void OnUnlinkAsset(AssetItemData *pAsset) = 0;
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class IModel : public QAbstractListModel
@@ -89,9 +86,6 @@ public:
 	QString SetStateName(int iStateIndex, QString sNewName);
 	void MoveStateBack(int iStateIndex);
 	void MoveStateForward(int iStateIndex);
-
-	QVariant AddAsset(int m_iStateIndex, AssetItemData *pAsset);
-	void RemoveAsset(int iStateIndex, AssetItemData *pAsset);
 
 	FileDataPair PopState(uint32 uiIndex);
 	

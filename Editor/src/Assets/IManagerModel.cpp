@@ -181,7 +181,7 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, H
 
 	QList<AssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, eType, correspondingParentList, correspondingUuidList);
 	for(int i = 0; i < returnList.size(); ++i)
-		InsertTreeItem(returnList[i], GetItem(FindIndex<TreeModelItemData *>(correspondingParentList[i], 0)));
+		InsertTreeItem(m_ProjectRef, returnList[i], GetItem(FindIndex<TreeModelItemData *>(correspondingParentList[i], 0)));
 
 	FlushRepack();
 
@@ -194,12 +194,12 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 	// First loop through and check to see if any links are present, and abort if dependencies are found
 	for(int i = 0; i < assetsList.count(); ++i)
 	{
-		QSet<ProjectItemData *> sLinks = assetsList[i]->GetDependencies();
-		if(sLinks.empty() == false)
+		QList<TreeModelItemData *> dependantList = assetsList[i]->GetDependants();// GetDependencies();
+		if(dependantList.empty() == false)
 		{
 			QString sMessage = "'" % assetsList[i]->GetName() % "' asset cannot be deleted because it is in use by the following items: \n\n";
-			for(QSet<ProjectItemData *>::iterator LinksIter = sLinks.begin(); LinksIter != sLinks.end(); ++LinksIter)
-				sMessage.append(HyGlobal::ItemName((*LinksIter)->GetType(), true) % "/" % (*LinksIter)->GetName(true) % "\n");
+			for(QList<TreeModelItemData *>::iterator dependantIter = dependantList.begin(); dependantIter != dependantList.end(); ++dependantIter)
+				sMessage.append(HyGlobal::ItemName((*dependantIter)->GetType(), false) % " - " % (*dependantIter)->GetText() % "\n");
 
 			HyGuiLog(sMessage, LOGTYPE_Warning);
 			return;
@@ -254,12 +254,15 @@ bool IManagerModel::CanReplaceAssets(QList<AssetItemData *> assetsList, QList<Pr
 	affectedItemListOut.clear();
 	for(int i = 0; i < assetsList.count(); ++i)
 	{
-		QSet<ProjectItemData *> sLinks = assetsList[i]->GetDependencies();
+		QList<TreeModelItemData *> sLinks = assetsList[i]->GetDependants();// GetDependencies();
 		if(sLinks.empty() == false)
 		{
-			for(QSet<ProjectItemData *>::iterator linksIter = sLinks.begin(); linksIter != sLinks.end(); ++linksIter)
+			for(QList<TreeModelItemData *>::iterator linksIter = sLinks.begin(); linksIter != sLinks.end(); ++linksIter)
 			{
-				ProjectItemData *pLinkedItem = *linksIter;
+				if((*linksIter)->IsProjectItem() == false)
+					continue;
+
+				ProjectItemData *pLinkedItem = static_cast<ProjectItemData *>(*linksIter);
 				affectedItemListOut.append(pLinkedItem);
 
 				// Abort if any of these linked items are currently opened & unsaved
@@ -465,7 +468,7 @@ TreeModelItemData *IManagerModel::ReturnFilter(QString sFilterPath, bool bCreate
 					return nullptr;
 
 				// Still more filters to dig thru, so this means we're at a filter. Add the prefix TreeModelItemData here and continue traversing down the tree
-				InsertTreeItem(new TreeModelItemData(ITEM_Filter, QUuid(), sPathSplitList[i]), pCurTreeItem);
+				InsertTreeItem(m_ProjectRef, new TreeModelItemData(ITEM_Filter, QUuid(), sPathSplitList[i]), pCurTreeItem);
 				pCurTreeItem = pCurTreeItem->GetChild(pCurTreeItem->GetNumChildren() - 1);
 			}
 		}
@@ -479,6 +482,8 @@ TreeModelItemData *IManagerModel::ReturnFilter(QString sFilterPath, bool bCreate
 
 bool IManagerModel::RemoveLookup(AssetItemData *pAsset)
 {
+	m_ProjectRef.RemoveItemDataLookup(pAsset->GetUuid());
+
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
 	{
 		if(pAsset->GetBankId() == m_BanksModel.GetBank(i)->GetId())
@@ -487,8 +492,6 @@ bool IManagerModel::RemoveLookup(AssetItemData *pAsset)
 			break;
 		}
 	}
-
-	m_AssetUuidMap.remove(pAsset->GetUuid());
 
 	auto iter = m_AssetChecksumMap.find(pAsset->GetChecksum());
 	if(iter == m_AssetChecksumMap.end())
@@ -502,15 +505,6 @@ bool IManagerModel::RemoveLookup(AssetItemData *pAsset)
 	}
 
 	return false;
-}
-
-AssetItemData *IManagerModel::FindById(QUuid uuid)
-{
-	auto iter = m_AssetUuidMap.find(uuid);
-	if(iter == m_AssetUuidMap.end())
-		return nullptr;
-	else
-		return iter.value();
 }
 
 QList<AssetItemData *> IManagerModel::FindByChecksum(quint32 uiChecksum)
@@ -527,55 +521,55 @@ bool IManagerModel::DoesAssetExist(quint32 uiChecksum)
 	return m_AssetChecksumMap.contains(uiChecksum);
 }
 
-QList<AssetItemData *> IManagerModel::RequestAssetsByUuid(ProjectItemData *pItem, QList<QUuid> requestList)
-{
-	if(requestList.empty())
-		return QList<AssetItemData *>();
-
-	QList<AssetItemData *> assetsRequestList;
-	for(int i = 0; i < requestList.size(); ++i)
-	{
-		AssetItemData *pFoundAsset = FindById(requestList[i]);
-		if(pFoundAsset == nullptr)
-		{
-			// TODO: Support a "Yes to all" dialog functionality here. Also note that the request list will not == the return list
-			HyGuiLog("Cannot find asset with UUID: " % requestList[i].toString() % "\nIt may have been removed, or is invalid in its asset manager.", LOGTYPE_Warning);
-		}
-		else
-		{
-			assetsRequestList.append(pFoundAsset);
-		}
-	}
-
-	return RequestAssets(pItem, assetsRequestList);
-}
-
-QList<AssetItemData *> IManagerModel::RequestAssets(ProjectItemData *pItem, QList<AssetItemData *> requestList)
-{
-	if(requestList.empty())
-		return requestList;
-
-	QList<AssetItemData *> returnList;
-	for(int i = 0; i < requestList.size(); ++i)
-	{
-		requestList[i]->InsertDependency(pItem);
-		returnList.append(requestList[i]);
-	}
-
-	return returnList;
-}
-
-void IManagerModel::RelinquishAssets(ProjectItemData *pItem, QList<AssetItemData *> relinquishList)
-{
-	for(int i = 0; i < relinquishList.size(); ++i)
-		relinquishList[i]->RemoveDependency(pItem);
-}
+//QList<AssetItemData *> IManagerModel::RequestAssetsByUuid(ProjectItemData *pItem, QList<QUuid> requestList)
+//{
+//	if(requestList.empty())
+//		return QList<AssetItemData *>();
+//
+//	QList<AssetItemData *> assetsRequestList;
+//	for(int i = 0; i < requestList.size(); ++i)
+//	{
+//		AssetItemData *pFoundAsset = static_cast<AssetItemData *>(FindItemData(requestList[i]));
+//		if(pFoundAsset == nullptr)
+//		{
+//			// TODO: Support a "Yes to all" dialog functionality here. Also note that the request list will not == the return list
+//			HyGuiLog("Cannot find asset with UUID: " % requestList[i].toString() % "\nIt may have been removed, or is invalid in its asset manager.", LOGTYPE_Warning);
+//		}
+//		else
+//		{
+//			assetsRequestList.append(pFoundAsset);
+//		}
+//	}
+//
+//	return RequestAssets(pItem, assetsRequestList);
+//}
+//
+//QList<AssetItemData *> IManagerModel::RequestAssets(ProjectItemData *pItem, QList<AssetItemData *> requestList)
+//{
+//	if(requestList.empty())
+//		return requestList;
+//
+//	QList<AssetItemData *> returnList;
+//	for(int i = 0; i < requestList.size(); ++i)
+//	{
+//		requestList[i]->InsertDependency(pItem);
+//		returnList.append(requestList[i]);
+//	}
+//
+//	return returnList;
+//}
+//
+//void IManagerModel::RelinquishAssets(ProjectItemData *pItem, QList<AssetItemData *> relinquishList)
+//{
+//	for(int i = 0; i < relinquishList.size(); ++i)
+//		relinquishList[i]->RemoveDependency(pItem);
+//}
 
 TreeModelItemData *IManagerModel::CreateNewFilter(QString sName, TreeModelItemData *pParent)
 {
 	TreeModelItem *pTreeParent = pParent ? GetItem(FindIndex<TreeModelItemData *>(pParent, 0)) : nullptr;
 	TreeModelItemData *pNewFilterData = new TreeModelItemData(ITEM_Filter, QUuid(), sName);
-	if(InsertTreeItem(pNewFilterData, pTreeParent))
+	if(InsertTreeItem(m_ProjectRef, pNewFilterData, pTreeParent))
 	{
 		SaveMeta();
 		return pNewFilterData;
@@ -924,7 +918,7 @@ void IManagerModel::SaveRuntime()
 			}
 			else
 			{
-				pItemData = FindById(assetObj["assetUUID"].toString());
+				pItemData = m_ProjectRef.FindItemData(assetObj["assetUUID"].toString());
 				if(pItemData == nullptr)
 				{
 					HyGuiLog("IManagerModel::dropMimeData - could not find by UUID: " % assetObj["assetUUID"].toString(), LOGTYPE_Warning);
@@ -959,6 +953,8 @@ void IManagerModel::SaveRuntime()
 
 void IManagerModel::RegisterAsset(AssetItemData *pAsset)
 {
+	m_ProjectRef.AddItemDataLookup(pAsset);
+
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
 	{
 		if(pAsset->GetBankId() == m_BanksModel.GetBank(i)->GetId())
@@ -967,8 +963,6 @@ void IManagerModel::RegisterAsset(AssetItemData *pAsset)
 			break;
 		}
 	}
-
-	m_AssetUuidMap[pAsset->GetUuid()] = pAsset;
 
 	uint32 uiChecksum = pAsset->GetChecksum();
 	if(m_AssetChecksumMap.contains(uiChecksum))
@@ -1047,7 +1041,7 @@ AssetItemData *IManagerModel::CreateAssetTreeItem(QString sPrefix, QString sName
 			if(bFound == false)
 			{
 				// Still more filters to dig thru, so this means we're at a filter. Add the prefix TreeModelItemData here and continue traversing down the tree
-				InsertTreeItem(new TreeModelItemData(ITEM_Filter, QUuid(), sPathSplitList[i]), pCurTreeItem);
+				InsertTreeItem(m_ProjectRef, new TreeModelItemData(ITEM_Filter, QUuid(), sPathSplitList[i]), pCurTreeItem);
 				pCurTreeItem = pCurTreeItem->GetChild(pCurTreeItem->GetNumChildren() - 1);
 			}
 		}
@@ -1056,7 +1050,7 @@ AssetItemData *IManagerModel::CreateAssetTreeItem(QString sPrefix, QString sName
 	AssetItemData *pNewItemData = OnAllocateAssetData(metaObj);
 	RegisterAsset(pNewItemData);
 
-	InsertTreeItem(pNewItemData, pCurTreeItem);
+	InsertTreeItem(m_ProjectRef, pNewItemData, pCurTreeItem);
 	return pNewItemData;
 }
 

@@ -402,7 +402,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(ProjectItemData *pProjIt
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pProjItem->GetName(false));
 
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), ShouldForwardDeclare(pProjItem), sCodeName, pProjItem->GetType(), ENTTYPE_Item, pProjItem->GetUuid(), QUuid::createUuid());
-	InsertTreeItem(pNewItem, GetRootTreeItem(), iRow);
+	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
 
 	return pNewItem;
 }
@@ -413,7 +413,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(AssetItemData *pAssetIte
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pAssetItem->GetName());
 
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), false, sCodeName, pAssetItem->GetManagerAssetType() == ASSET_Atlas ? ITEM_AtlasImage : ITEM_Audio, ENTTYPE_Item, QUuid(), QUuid::createUuid());
-	InsertTreeItem(pNewItem, GetRootTreeItem(), iRow);
+	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
 
 	return pNewItem;
 }
@@ -437,7 +437,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewItem(QJsonObject initObj, bool
 
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), ShouldForwardDeclare(initObj), initObj, bIsArrayItem);
 	iRow = (iRow < 0 || (bIsArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
-	InsertTreeItem(pNewItem, pParentTreeItem, iRow);
+	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 
 	return pNewItem;
 }
@@ -456,7 +456,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewShape(EditorShape eShape, QStr
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), false, sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_Shape, ENTTYPE_Item, QUuid(), QUuid::createUuid());
 	pNewItem->GetPropertiesModel().SetPropertyValue("Shape", "Type", HyGlobal::ShapeName(eShape));
 	pNewItem->GetPropertiesModel().SetPropertyValue("Shape", "Data", sData);
-	InsertTreeItem(pNewItem, pParentTreeItem, iRow);
+	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 
 	return pNewItem;
 }
@@ -477,7 +477,7 @@ bool EntityTreeModel::Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow)
 		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, pItem->GetCodeName(), pItem->GetType(), iRow);
 
 	iRow = (iRow < 0 || (pItem->GetEntType() == ENTTYPE_ArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
-	return InsertTreeItem(pItem, pParentTreeItem, iRow);
+	return InsertTreeItem(m_ModelRef.GetItem().GetProject(), pItem, pParentTreeItem, iRow);
 }
 
 int32 EntityTreeModel::Cmd_PopChild(EntityTreeItemData *pItem)
@@ -526,7 +526,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 		return ITreeModel::data(indexRef, iRole);
 
 	EntityTreeItemData *pItem = pTreeItem->data(0).value<EntityTreeItemData *>();
-	ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(pItem->GetItemUuid());
+	ProjectItemData *pProjItem = static_cast<ProjectItemData *>(m_ModelRef.GetItem().GetProject().FindItemData(pItem->GetItemUuid()));
 
 	switch(iRole)
 	{

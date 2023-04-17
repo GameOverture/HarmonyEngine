@@ -26,7 +26,8 @@ protected:
 	bool											m_bIsProjectItem;
 
 	// Dependant References - Keeps track of what relies on 'this' ItemData
-	QMap<TreeModelItemData *, int>					m_DependencyMap;
+	QMap<TreeModelItemData *, int>					m_DependantMap;
+	QMap<TreeModelItemData *, int>					m_DependeeMap;
 
 public:
 	TreeModelItemData();
@@ -41,9 +42,15 @@ public:
 
 	bool IsProjectItem() const;
 
-	QList<TreeModelItemData *> GetAffectedDependants();
+	QList<TreeModelItemData *> GetDependants();
 	void AddDependantRef(TreeModelItemData *pDependant);
 	void SubtractDependantRef(TreeModelItemData *pDependant);
+	
+	void RelinquishDependees(); // Inform all dependees of 'this' that they no longer need to consider it a dependant
+
+private:
+	void AddDependeeRef(TreeModelItemData *pDependee);
+	void SubtractDependeeRef(TreeModelItemData *pDependee);
 };
 Q_DECLARE_METATYPE(TreeModelItemData *)
 Q_DECLARE_METATYPE(const TreeModelItemData *)

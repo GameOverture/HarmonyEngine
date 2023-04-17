@@ -40,15 +40,6 @@ void PrefabStateData::Refresh()
 {
 }
 
-/*virtual*/ QVariant PrefabStateData::OnLinkAsset(AssetItemData *pAsset) /*override*/
-{
-	return 0;
-}
-
-/*virtual*/ void PrefabStateData::OnUnlinkAsset(AssetItemData *pAsset) /*override*/
-{
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 PrefabModel::PrefabModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :

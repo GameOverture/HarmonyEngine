@@ -12,6 +12,7 @@
 
 #include <QUndoCommand>
 
+class AudioAsset;
 class ProjectItemData;
 class ExplorerItemData;
 
@@ -20,6 +21,40 @@ enum AudioCmd
 	AUDIOCMD_OrderAudio = 0,
 	AUDIOCMD_RemoveWavs,
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class AudioUndoCmd_AddAssets : public QUndoCommand
+{
+	ProjectItemData &				m_AudioItemRef;
+	int								m_iStateIndex;
+
+	QList<AudioAsset *>				m_AudioList;
+
+public:
+	AudioUndoCmd_AddAssets(ProjectItemData &audioItemRef, int iStateIndex, QList<AudioAsset *> audioList, QUndoCommand *pParent = nullptr);
+	virtual ~AudioUndoCmd_AddAssets();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class AudioUndoCmd_RemoveAssets : public QUndoCommand
+{
+	ProjectItemData &			m_AudioItemRef;
+	int							m_iStateIndex;
+
+	QList<AudioAsset *>			m_AudioList;
+
+public:
+	AudioUndoCmd_RemoveAssets(ProjectItemData &audioItemRef, int iStateIndex, QList<AudioAsset *> audioList, QUndoCommand *pParent = nullptr);
+	virtual ~AudioUndoCmd_RemoveAssets();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class AudioUndoCmd : public QUndoCommand
 {

@@ -35,9 +35,6 @@ class EntityStateData : public IStateData
 public:
 	EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~EntityStateData();
-
-	virtual QVariant OnLinkAsset(AssetItemData *pAsset) override;
-	virtual void OnUnlinkAsset(AssetItemData *pAsset) override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityModel : public IModel

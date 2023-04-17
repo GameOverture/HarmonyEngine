@@ -12,10 +12,10 @@
 #include "EntityModel.h"
 #include "MainWindow.h"
 
-EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent) :
+EntityDrawItem::EntityDrawItem(Project &projectRef, HyGuiItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent) :
 	m_eGuiType(eGuiType),
 	m_Uuid(uuid),
-	m_ItemUuid(itemUuid),
+	m_ProjItemUuid(itemUuid),
 	m_pChild(nullptr),
 	m_Transform(pParent),
 	m_ShapeCtrl()
@@ -40,7 +40,7 @@ EntityDrawItem::EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUui
 	}
 	if(m_pChild)
 	{
-		RefreshOverrideData();
+		RefreshOverrideData(projectRef);
 		m_pChild->Load();
 	}
 
@@ -62,9 +62,9 @@ const QUuid &EntityDrawItem::GetThisUuid() const
 	return m_Uuid;
 }
 
-const QUuid &EntityDrawItem::GetItemUuid() const
+const QUuid &EntityDrawItem::GetProjItemUuid() const
 {
-	return m_ItemUuid;
+	return m_ProjItemUuid;
 }
 
 IHyLoadable2d *EntityDrawItem::GetHyNode()
@@ -192,11 +192,17 @@ void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
 	GetShapeCtrl().RefreshOutline(pCamera);
 }
 
-void EntityDrawItem::RefreshOverrideData()
+void EntityDrawItem::RefreshOverrideData(Project &projectRef)
 {
-	ProjectItemData *pItemData = MainWindow::GetExplorerModel().FindByUuid(m_ItemUuid);
+	ProjectItemData *pProjItemData = static_cast<ProjectItemData *>(projectRef.FindItemData(m_ProjItemUuid));
+	if(pProjItemData == nullptr)
+	{
+		HyGuiLog("EntityDrawItem::RefreshOverrideData - could not find item data for: " % m_ProjItemUuid.toString(), LOGTYPE_Error);
+		return;
+	}
+
 	FileDataPair fileDataPair;
-	pItemData->GetSavedFileData(fileDataPair);
+	pProjItemData->GetSavedFileData(fileDataPair);
 
 	if(m_eGuiType == ITEM_Entity)
 	{

@@ -37,7 +37,6 @@ protected:
 
 	quint32											m_uiNextBankId;
 
-	QMap<QUuid, AssetItemData *>					m_AssetUuidMap;
 	QMap<quint32, QList<AssetItemData *> >			m_AssetChecksumMap;
 
 	QMap<BankData *, QSet<AssetItemData *>>			m_RepackAffectedAssetsMap;
@@ -81,15 +80,14 @@ public:
 	TreeModelItemData *ReturnFilter(QString sFilterPath, bool bCreateNonExistingFilter = true);
 
 	bool RemoveLookup(AssetItemData *pAsset); // Returns true if no remaining duplicates exist
-	AssetItemData *FindById(QUuid uuid);
 	QList<AssetItemData *> FindByChecksum(quint32 uiChecksum);
 	bool DoesAssetExist(quint32 uiChecksum);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// [ASSET-ITEM] DEPENDENCIES LINK FUNCTIONS
-	QList<AssetItemData *> RequestAssetsByUuid(ProjectItemData *pItem, QList<QUuid> requestList);
-	QList<AssetItemData *> RequestAssets(ProjectItemData *pItem, QList<AssetItemData *> requestList);
-	void RelinquishAssets(ProjectItemData *pItem, QList<AssetItemData *> relinquishList);
+	//// [ASSET-ITEM] DEPENDENCIES LINK FUNCTIONS
+	//QList<AssetItemData *> RequestAssetsByUuid(ProjectItemData *pItem, QList<QUuid> requestList);
+	//QList<AssetItemData *> RequestAssets(ProjectItemData *pItem, QList<AssetItemData *> requestList);
+	//void RelinquishAssets(ProjectItemData *pItem, QList<AssetItemData *> relinquishList);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	TreeModelItemData *CreateNewFilter(QString sName, TreeModelItemData *pParent);

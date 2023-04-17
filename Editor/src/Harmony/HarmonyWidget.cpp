@@ -13,9 +13,12 @@
 #include "ProjectItemMimeData.h"
 #include "EntityModel.h"
 #include "EntityUndoCmds.h"
+#include "AudioManagerModel.h"
 #include "MainWindow.h"
 #include "AssetMimeData.h"
 #include "GlobalUndoCmds.h"
+#include "SpriteUndoCmds.h"
+#include "AudioUndoCmd.h"
 
 #include <QDragEnterEvent>
 
@@ -222,20 +225,20 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	case ITEM_Audio: {
 		const AssetMimeData *pMimeData = static_cast<const AssetMimeData *>(pEvent->mimeData());
 		QJsonArray assetsArray = pMimeData->GetAssetsArray(ASSET_Audio);
-		QList<AssetItemData *> assetsList;
+		QList<AudioAsset *> assetsList;
 		for(int i = 0; i < assetsArray.size(); ++i)
 		{
 			QJsonObject assetObj = assetsArray[i].toObject();
 
-			AssetItemData *pFoundAsset = m_pProject->GetAtlasModel().FindById(assetObj["assetUUID"].toString());
+			TreeModelItemData *pFoundAsset = m_pProject->FindItemData(assetObj["assetUUID"].toString());
 			if(pFoundAsset)
-				assetsList.push_back(pFoundAsset);
+				assetsList.push_back(static_cast<AudioAsset *>(pFoundAsset));
 		}
 		
 		if(assetsList.isEmpty() == false)
 		{
 			int iStateIndex = pCurOpenTabItem->GetWidget()->GetCurStateIndex();
-			QUndoCommand *pCmd = new UndoCmd_LinkStateAssets("Add Audio", *pCurOpenTabItem, iStateIndex, assetsList);
+			QUndoCommand *pCmd = new AudioUndoCmd_AddAssets(*pCurOpenTabItem, iStateIndex, assetsList);
 			pCurOpenTabItem->GetUndoStack()->push(pCmd);
 		}
 		break; }
@@ -243,20 +246,20 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	case ITEM_Sprite: {
 		const AssetMimeData *pMimeData = static_cast<const AssetMimeData *>(pEvent->mimeData());
 		QJsonArray assetsArray = pMimeData->GetAssetsArray(ASSET_Atlas);
-		QList<AssetItemData *> assetsList;
+		QList<AtlasFrame *> frameList;
 		for(int i = 0; i < assetsArray.size(); ++i)
 		{
 			QJsonObject assetObj = assetsArray[i].toObject();
 
-			AssetItemData *pFoundAsset = m_pProject->GetAtlasModel().FindById(assetObj["assetUUID"].toString());
+			TreeModelItemData *pFoundAsset = m_pProject->FindItemData(assetObj["assetUUID"].toString());
 			if(pFoundAsset)
-				assetsList.push_back(pFoundAsset);
+				frameList.push_back(static_cast<AtlasFrame *>(pFoundAsset));
 		}
 		
-		if(assetsList.isEmpty() == false)
+		if(frameList.isEmpty() == false)
 		{
 			int iStateIndex = pCurOpenTabItem->GetWidget()->GetCurStateIndex();
-			QUndoCommand *pCmd = new UndoCmd_LinkStateAssets("Add Frames", *pCurOpenTabItem, iStateIndex, assetsList);
+			QUndoCommand *pCmd = new SpriteUndoCmd_AddFrames(*pCurOpenTabItem, iStateIndex, frameList);
 			pCurOpenTabItem->GetUndoStack()->push(pCmd);
 		}
 		break; }
@@ -279,13 +282,13 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 					QString sItemPath = itemObj["name"].toString();
 					QUuid itemUuid(itemObj["UUID"].toString());
 
-					ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(itemUuid);
+					TreeModelItemData *pProjItem = m_pProject->GetProject().FindItemData(itemUuid);
 
 					EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetTreeModel();
 					if(entityTreeModelRef.IsItemValid(pProjItem, true) == false)
 						continue;
 
-					validItemList.push_back(pProjItem);
+					validItemList.push_back(static_cast<ProjectItemData *>(pProjItem));
 				}
 				else
 					HyGuiLog("Item " % itemObj["itemName"].toString() % " is not apart of the entity's project and cannot be added.", LOGTYPE_Info);

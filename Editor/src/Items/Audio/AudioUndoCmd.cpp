@@ -12,6 +12,59 @@
 #include "AudioModel.h"
 #include "AudioWidget.h"
 
+AudioUndoCmd_AddAssets::AudioUndoCmd_AddAssets(ProjectItemData &audioItemRef, int iStateIndex, QList<AudioAsset *> audioList, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_AudioItemRef(audioItemRef),
+	m_iStateIndex(iStateIndex),
+	m_AudioList(audioList)
+{
+	setText("Add " % QString::number(m_AudioList.size()) % " Audio Samples to State " % QString::number(iStateIndex));
+}
+
+/*virtual*/ AudioUndoCmd_AddAssets::~AudioUndoCmd_AddAssets()
+{
+}
+
+/*virtual*/ void AudioUndoCmd_AddAssets::redo() /*override*/
+{
+	QVariant focusSubState = static_cast<AudioModel *>(m_AudioItemRef.GetModel())->Cmd_AddAudioAssets(m_iStateIndex, m_AudioList);
+	m_AudioItemRef.FocusWidgetState(m_iStateIndex, focusSubState);
+}
+
+/*virtual*/ void AudioUndoCmd_AddAssets::undo() /*override*/
+{
+	static_cast<AudioModel *>(m_AudioItemRef.GetModel())->Cmd_RemoveAudioAssets(m_iStateIndex, m_AudioList);
+	m_AudioItemRef.FocusWidgetState(m_iStateIndex, -1);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+AudioUndoCmd_RemoveAssets::AudioUndoCmd_RemoveAssets(ProjectItemData &audioItemRef, int iStateIndex, QList<AudioAsset *> audioList, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_AudioItemRef(audioItemRef),
+	m_iStateIndex(iStateIndex),
+	m_AudioList(audioList)
+{
+}
+
+/*virtual*/ AudioUndoCmd_RemoveAssets::~AudioUndoCmd_RemoveAssets()
+{
+}
+
+/*virtual*/ void AudioUndoCmd_RemoveAssets::redo() /*override*/
+{
+	static_cast<AudioModel *>(m_AudioItemRef.GetModel())->Cmd_RemoveAudioAssets(m_iStateIndex, m_AudioList);
+	m_AudioItemRef.FocusWidgetState(m_iStateIndex, -1);
+}
+
+/*virtual*/ void AudioUndoCmd_RemoveAssets::undo() /*override*/
+{
+	QVariant focusSubState = static_cast<AudioModel *>(m_AudioItemRef.GetModel())->Cmd_AddAudioAssets(m_iStateIndex, m_AudioList);
+	m_AudioItemRef.FocusWidgetState(m_iStateIndex, focusSubState);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 AudioUndoCmd::AudioUndoCmd(AudioCmd eCMD, ProjectItemData &audioItemRef, QList<QVariant> parameterList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_eCMD(eCMD),

@@ -24,11 +24,11 @@ AudioStateData::AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair s
 	for(int i = 0; i < metaAssetArray.size(); ++i)
 		uuidRequestList.append(QUuid(metaAssetArray[i].toString()));
 
-	QList<AssetItemData *> requestedAtlasFramesList = m_ModelRef.GetItem().GetProject().GetAudioModel().RequestAssetsByUuid(&m_ModelRef.GetItem(), uuidRequestList);
-	for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
-		OnLinkAsset(requestedAtlasFramesList[i]);
+	QList<TreeModelItemData *> dependeeList = m_ModelRef.GetItem().GetProject().IncrementDependencies(&m_ModelRef.GetItem(), uuidRequestList);
+	for(int i = 0; i < dependeeList.size(); ++i)
+		Cmd_AddAudioAsset(static_cast<AudioAsset *>(dependeeList[i]));
 
-	if(dataPlayListArray.size() != requestedAtlasFramesList.size())
+	if(dataPlayListArray.size() != dependeeList.size())
 		HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
 
 	// NOTE: This 'sPlayListModeList' order must be preserved as it is saved as an index
@@ -77,21 +77,15 @@ QJsonArray AudioStateData::GenPlayListArray() const
 	return m_PlayListModel.GenPlayListArray();
 }
 
-/*virtual*/ QVariant AudioStateData::OnLinkAsset(AssetItemData *pAsset) /*override*/
+int AudioStateData::Cmd_AddAudioAsset(AudioAsset *pAsset)
 {
-	if(pAsset->GetType() != ITEM_Audio)
-		HyGuiLog("AudioStateData::OnLinkAsset linked non Audio asset", LOGTYPE_Error);
-
 	// Returns the index the frame was inserted to
-	return m_PlayListModel.Add(static_cast<AudioAsset *>(pAsset));
+	return m_PlayListModel.Add(pAsset);
 }
 
-/*virtual*/ void AudioStateData::OnUnlinkAsset(AssetItemData *pAsset) /*override*/
+void AudioStateData::Cmd_RemoveAudioAsset(AudioAsset *pAsset)
 {
-	if(pAsset->GetType() != ITEM_Audio)
-		HyGuiLog("AudioStateData::OnUnlinkAsset unlinked non Audio asset", LOGTYPE_Error);
-
-	m_PlayListModel.Remove(static_cast<AudioAsset *>(pAsset));
+	m_PlayListModel.Remove(pAsset);
 }
 
 AudioModel::AudioModel(ProjectItemData &itemRef, FileDataPair &itemFileDataRef) :
@@ -102,6 +96,36 @@ AudioModel::AudioModel(ProjectItemData &itemRef, FileDataPair &itemFileDataRef) 
 
 AudioModel::~AudioModel()
 {
+}
+
+int AudioModel::Cmd_AddAudioAssets(int iStateIndex, QList<AudioAsset *> audioAssetList)
+{
+	int iRow = 0;
+
+	QList<TreeModelItemData *> depList;
+	for(AudioAsset *pAudio : audioAssetList)
+	{
+		depList.push_back(pAudio);
+		iRow = static_cast<AudioStateData *>(m_StateList[iStateIndex])->Cmd_AddAudioAsset(pAudio);
+	}
+
+	depList = m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, depList);
+	if(depList.size() != audioAssetList.size())
+		HyGuiLog("AudioModel::Cmd_AddFrames - IncrementDependencies didn't process the entire frame list", LOGTYPE_Error);
+
+	return iRow;
+}
+
+void AudioModel::Cmd_RemoveAudioAssets(int iStateIndex, QList<AudioAsset *> audioAssetList)
+{
+	QList<TreeModelItemData *> depList;
+	for(AudioAsset *pAudio : audioAssetList)
+	{
+		depList.push_back(pAudio);
+		static_cast<AudioStateData *>(m_StateList[iStateIndex])->Cmd_RemoveAudioAsset(pAudio);
+	}
+
+	m_ItemRef.GetProject().DecrementDependencies(&m_ItemRef, depList);
 }
 
 AudioPlayListModel &AudioModel::GetPlayListModel(uint uiStateIndex)

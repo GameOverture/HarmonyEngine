@@ -65,7 +65,8 @@ class Project : public ExplorerItemData
 
 	FileDataPair										m_ProjectFileData;
 
-	QMap<QUuid, QSet<QUuid>>							m_ItemLinksMap; // Key = item in question, Value = other items that reference 'Key'
+	QMap<QUuid, TreeModelItemData *>					m_ItemDataUuidMap;	// Lookup map to help find tree item data pointers
+	//QMap<QUuid, QSet<QUuid>>							m_ItemLinksMap; // Key = item in question, Value = other items that reference 'Key'
 
 	bool												m_bHasError;
 	bool												m_bExplorerModelLoaded;
@@ -134,10 +135,17 @@ public:
 
 	void SaveUserData() const;
 
-	// Dependency links between items
-	void RegisterItems(QUuid uuidItemOwner, QList<QUuid> requestList);
-	void RelinquishItems(QUuid uuidItemOwner, QList<QUuid> relinquishList);
-	QList<ProjectItemData *> GetItemLinks(ProjectItemData *pItem);
+	void AddItemDataLookup(TreeModelItemData *pItemData);
+	void RemoveItemDataLookup(const QUuid &uuid);
+	TreeModelItemData *FindItemData(const QUuid &uuid);
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// TreeModelItemData DEPENDENCIES LINK FUNCTIONS
+	QList<TreeModelItemData *> IncrementDependencies(TreeModelItemData *pItemDepender, QList<QUuid> dependeeList);
+	QList<TreeModelItemData *> IncrementDependencies(TreeModelItemData *pItemDepender, QList<TreeModelItemData *> dependeeItemDataList);
+	void DecrementDependencies(TreeModelItemData *pItemDepender, QList<QUuid> dependeeList);
+	void DecrementDependencies(TreeModelItemData *pItemDepender, QList<TreeModelItemData *> dependeeItemDataList);
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// These tab functions are only called from MainWindow
 	void OpenTab(ProjectItemData *pItem);

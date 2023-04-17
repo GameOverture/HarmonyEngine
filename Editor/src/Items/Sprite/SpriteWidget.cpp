@@ -291,16 +291,20 @@ void SpriteWidget::on_actionImportFrames_triggered()
 	QList<AssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
 	m_ItemRef.GetProject().GetAtlasWidget()->GetSelected(selectedAssetsList, selectedFiltersList);
 
-	QUndoCommand *pCmd = new UndoCmd_LinkStateAssets("Add Frames", m_ItemRef, GetCurStateIndex(), selectedAssetsList);
+	QList<AtlasFrame *> frameList;
+	for(AssetItemData *pAsset : selectedAssetsList)
+		frameList.push_back(static_cast<AtlasFrame *>(pAsset));
+
+	QUndoCommand *pCmd = new SpriteUndoCmd_AddFrames(m_ItemRef, GetCurStateIndex(), frameList);
 	GetItem().GetUndoStack()->push(pCmd);
 }
 
 void SpriteWidget::on_actionRemoveFrames_triggered()
 {
-	QList<AssetItemData *> removeList;
+	QList<AtlasFrame *> removeList;
 	removeList.append(static_cast<SpriteFramesModel *>(ui->framesView->model())->GetFrameAt(ui->framesView->currentIndex().row())->m_pFrame);
 
-	QUndoCommand *pCmd = new UndoCmd_UnlinkStateAssets("Remove Frame", m_ItemRef, GetCurStateIndex(), removeList);
+	QUndoCommand *pCmd = new SpriteUndoCmd_RemoveFrames(m_ItemRef, GetCurStateIndex(), removeList);
 	GetItem().GetUndoStack()->push(pCmd);
 }
 

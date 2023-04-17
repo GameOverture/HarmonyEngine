@@ -21,8 +21,6 @@ class ExplorerModel : public ITreeModel
 {
 	Q_OBJECT
 
-	QMap<QUuid, ProjectItemData *>		m_ItemUuidMap;
-
 public:
 	ExplorerModel();
 	virtual ~ExplorerModel();
@@ -39,13 +37,11 @@ public:
 
 	bool PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const QModelIndex &indexRef);
 
-	ProjectItemData *FindByUuid(QUuid uuid) const;
-
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// [ITEM-ITEM] DEPENDENCIES LINK FUNCTIONS
-	QList<ProjectItemData *> RequestItemsByUuid(ProjectItemData *pItemOwner, QList<QUuid> requestList);
-	QList<ProjectItemData *> RequestItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> requestList);
-	void RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> relinquishList);
+	//QList<ProjectItemData *> RequestItemsByUuid(ProjectItemData *pItemOwner, QList<QUuid> requestList);
+	//QList<ProjectItemData *> RequestItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> requestList);
+	//void RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> relinquishList);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;

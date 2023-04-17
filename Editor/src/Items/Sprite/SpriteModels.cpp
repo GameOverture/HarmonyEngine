@@ -286,9 +286,9 @@ SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, FileDataPair
 	for(int i = 0; i < metaFrameArray.size(); ++i)
 		uuidRequestList.append(QUuid(metaFrameArray[i].toString()));
 
-	QList<AssetItemData *> requestedAtlasFramesList = m_ModelRef.GetItem().GetProject().GetAtlasModel().RequestAssetsByUuid(&m_ModelRef.GetItem(), uuidRequestList);
+	QList<TreeModelItemData *> requestedAtlasFramesList = m_ModelRef.GetItem().GetProject().IncrementDependencies(&m_ModelRef.GetItem(), uuidRequestList);
 	for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
-		OnLinkAsset(requestedAtlasFramesList[i]);
+		Cmd_AddFrame(static_cast<AtlasFrame *>(requestedAtlasFramesList[i]));
 
 	if(dataFrameArray.size() != requestedAtlasFramesList.size())
 		HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
@@ -372,21 +372,15 @@ QList<AssetItemData *> SpriteStateData::GetAtlasFrames() const
 	return atlasList;
 }
 
-/*virtual*/ QVariant SpriteStateData::OnLinkAsset(AssetItemData *pAsset)
+int SpriteStateData::Cmd_AddFrame(AtlasFrame *pFrame)
 {
-	if(pAsset->GetType() != ITEM_AtlasImage)
-		HyGuiLog("SpriteStateData::OnLinkAsset linked non AtlasFrame assets", LOGTYPE_Error);
-
 	// Returns the index the frame was inserted to
-	return m_pFramesModel->Add(static_cast<AtlasFrame *>(pAsset));
+	return m_pFramesModel->Add(pFrame);
 }
 
-/*virtual*/ void SpriteStateData::OnUnlinkAsset(AssetItemData *pAsset) /*override*/
+void SpriteStateData::Cmd_RemoveFrame(AtlasFrame *pFrame)
 {
-	if(pAsset->GetType() != ITEM_AtlasImage)
-		HyGuiLog("SpriteStateData::OnUnlinkAsset unlinked non AtlasFrame assets", LOGTYPE_Error);
-
-	m_pFramesModel->Remove(static_cast<AtlasFrame *>(pAsset));
+	m_pFramesModel->Remove(pFrame);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -399,6 +393,35 @@ SpriteModel::SpriteModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 
 /*virtual*/ SpriteModel::~SpriteModel()
 {
+}
+
+int SpriteModel::Cmd_AddFrames(int iStateIndex, QList<AtlasFrame *> frameList)
+{
+	QList<TreeModelItemData *> assetList;
+	for(AtlasFrame *pFrame : frameList)
+		assetList.push_back(pFrame);
+
+	assetList = m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, assetList);
+	if(assetList.size() != frameList.size())
+		HyGuiLog("SpriteModel::Cmd_AddFrames - IncrementDependencies didn't process the entire frame list", LOGTYPE_Error);
+
+	int iRow = 0;
+	for(AtlasFrame *pFrame : frameList)
+		iRow = static_cast<SpriteStateData *>(m_StateList[iStateIndex])->Cmd_AddFrame(pFrame);
+
+	return iRow;
+}
+
+void SpriteModel::Cmd_RemoveFrames(int iStateIndex, QList<AtlasFrame *> frameList)
+{
+	QList<TreeModelItemData *> assetList;
+	for(AtlasFrame *pFrame : frameList)
+	{
+		assetList.push_back(pFrame);
+		static_cast<SpriteStateData *>(m_StateList[iStateIndex])->Cmd_RemoveFrame(pFrame);
+	}
+
+	m_ItemRef.GetProject().DecrementDependencies(&m_ItemRef, assetList);
 }
 
 /*virtual*/ void SpriteModel::InsertItemSpecificData(FileDataPair &itemFileDataOut) /*override*/

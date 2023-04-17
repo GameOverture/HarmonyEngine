@@ -24,13 +24,6 @@ EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair
 /*virtual*/ EntityStateData::~EntityStateData()
 {
 }
-/*virtual*/ QVariant EntityStateData::OnLinkAsset(AssetItemData *pAsset) /*override*/
-{
-	return 0;
-}
-/*virtual*/ void EntityStateData::OnUnlinkAsset(AssetItemData *pAsset) /*override*/
-{
-}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -109,7 +102,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemDat
 		registerList.push_back(pItem->GetUuid());
 	}
 
-	m_ItemRef.GetProject().RegisterItems(GetUuid(), registerList);
+	m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, registerList);
 	
 	return treeNodeList;
 }
@@ -129,7 +122,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewAssets(QList<AssetItemData *>
 		registerList.push_back(pAssetItem->GetUuid());
 	}
 
-	m_ItemRef.GetProject().RegisterItems(GetUuid(), registerList);
+	m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, registerList);
 
 	return treeNodeList;
 }
@@ -140,7 +133,7 @@ EntityTreeItemData *EntityModel::Cmd_AddNewItem(QJsonObject initObj, bool bIsArr
 
 	QUuid uuidToRegister(initObj["itemUUID"].toString());
 	if(uuidToRegister.isNull() == false)
-		m_ItemRef.GetProject().RegisterItems(GetUuid(), QList<QUuid>() << uuidToRegister);
+		m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, QList<QUuid>() << uuidToRegister);
 
 	return pTreeItemData;
 }
@@ -214,7 +207,7 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 	if(iRow < 0)
 		return iRow;
 
-	m_ItemRef.GetProject().RelinquishItems(GetUuid(), QList<QUuid>() << pItem->GetItemUuid());
+	m_ItemRef.GetProject().DecrementDependencies(&m_ItemRef, QList<QUuid>() << pItem->GetItemUuid());
 
 	ClearShapeEdit();
 
@@ -226,7 +219,7 @@ bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
 	if(m_TreeModel.Cmd_ReaddChild(pNodeItem, iRow) == false)
 		return false;
 
-	m_ItemRef.GetProject().RegisterItems(GetUuid(), QList<QUuid>() << pNodeItem->GetItemUuid());
+	m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, QList<QUuid>() << pNodeItem->GetItemUuid());
 
 	return true;
 }

@@ -421,12 +421,12 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 		{
 			ProjectItemData *pProjItem = static_cast<ProjectItemData *>(selectedItems[i]);
 
-			auto itemOwners = pProjItem->GetProject().GetItemLinks(pProjItem);
-			if(itemOwners.empty() == false)
+			QList<TreeModelItemData *> dependantList = pProjItem->GetDependants();
+			if(dependantList.empty() == false)
 			{
 				QString sMessage = "'" % selectedItems[i]->GetName(true) % "' cannot be deleted because it is in use by the following items: \n\n";
-				for(auto itemOwner : itemOwners)
-					sMessage.append(HyGlobal::ItemName(itemOwner->GetType(), true) % "/" % itemOwner->GetName(true) % "\n");
+				for(auto pDependant : dependantList)
+					sMessage.append(HyGlobal::ItemName(pDependant->GetType(), false) % " - " % pDependant->GetText() % "\n");
 
 				HyGuiLog(sMessage, LOGTYPE_Warning);
 				return;

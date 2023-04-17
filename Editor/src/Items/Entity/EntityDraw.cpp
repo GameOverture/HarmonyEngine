@@ -293,7 +293,7 @@ void EntityDraw::ClearShapeEdit()
 		if(pItemWidget == nullptr)
 		{
 			QUuid itemUuid(childObj["itemUUID"].toString());
-			pItemWidget = new EntityDrawItem(eType, uuid, itemUuid, this);
+			pItemWidget = new EntityDrawItem(m_pProjItem->GetProject(), eType, uuid, itemUuid, this);
 		}
 		else
 			staleItemList.removeOne(pItemWidget);

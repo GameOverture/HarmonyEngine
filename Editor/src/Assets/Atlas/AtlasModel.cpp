@@ -89,13 +89,10 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QIm
 	AtlasFrame *pFrame = ImportImage(sName, newImage, m_BanksModel.GetBank(uiBankIndex)->GetId(), eType, QUuid::createUuid());
 
 	// This retrieves the newly created AtlasFrame and links it to its ProjectItemData
-	QList<QUuid> idList;
-	idList.append(pFrame->GetUuid());
-	QList<AssetItemData *> returnList = RequestAssetsByUuid(pItem, idList);
-
+	QList<TreeModelItemData *> returnList = pItem->GetProject().IncrementDependencies(pItem, QList<QUuid>() << pFrame->GetUuid());
 	if(returnList.empty() == false)
 	{
-		AddAssetsToRepack(m_BanksModel.GetBank(uiBankIndex), returnList[0]);
+		AddAssetsToRepack(m_BanksModel.GetBank(uiBankIndex), static_cast<AtlasFrame *>(returnList[0]));
 		return static_cast<AtlasFrame *>(returnList[0]);
 	}
 

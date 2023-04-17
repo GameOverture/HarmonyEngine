@@ -16,13 +16,14 @@
 #include <QAbstractItemModel>
 
 class TreeModelItemData;
+class Project;
 
 class ITreeModel : public QAbstractItemModel
 {
 	Q_OBJECT
 
 protected:
-	TreeModelItem *		m_pRootItem;	// Not visible in the tree view. Used internally.
+	TreeModelItem *							m_pRootItem;		// Not visible in the tree view. Used internally.
 
 public:
 	ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject *pParent = nullptr);
@@ -51,7 +52,7 @@ public:
 		return QModelIndex();
 	}
 
-	bool InsertTreeItem(TreeModelItemData *pNewItemData, TreeModelItem *pParentTreeItem, int iRow = -1);
+	bool InsertTreeItem(Project &projectRef, TreeModelItemData *pNewItemData, TreeModelItem *pParentTreeItem, int iRow = -1);
 	QList<TreeModelItemData *> GetItemsRecursively(const QModelIndex &indexRef) const;
 	QModelIndexList GetAllIndices() const;
 

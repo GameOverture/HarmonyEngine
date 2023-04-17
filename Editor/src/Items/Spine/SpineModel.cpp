@@ -38,15 +38,6 @@ const QMap<QString, double> &SpineStateData::GetCrossFadeMap() const
 	return m_CrossFadeMap;
 }
 
-/*virtual*/ QVariant SpineStateData::OnLinkAsset(AssetItemData *pAsset) /*override*/
-{
-	return 0;
-}
-
-/*virtual*/ void SpineStateData::OnUnlinkAsset(AssetItemData *pAsset) /*override*/
-{
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
@@ -161,12 +152,12 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 			QList<QUuid> uuidRequestList;
 			uuidRequestList.append(QUuid(atlasMetaObj["assetUUID"].toString()));
-			QList<AssetItemData *> pRequestedList = m_ItemRef.GetProject().GetAtlasModel().RequestAssetsByUuid(&m_ItemRef, uuidRequestList);
+			QList<TreeModelItemData *> dependList = m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, uuidRequestList);
 			
-			if(pRequestedList.size() == 1)
+			if(dependList.size() == 1)
 			{
 				SpineSubAtlas subAtlas;
-				subAtlas.m_pAtlasFrame = static_cast<AtlasFrame *>(pRequestedList[0]);
+				subAtlas.m_pAtlasFrame = static_cast<AtlasFrame *>(dependList[0]);
 				subAtlas.m_ImageFileInfo.setFile(metaDir.absoluteFilePath(atlasMetaObj["textureFileName"].toString()));
 				m_SubAtlasList.push_back(subAtlas);
 			}

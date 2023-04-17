@@ -17,7 +17,7 @@ class EntityDrawItem
 {
 	HyGuiItemType							m_eGuiType;
 	QUuid									m_Uuid;
-	QUuid									m_ItemUuid;
+	QUuid									m_ProjItemUuid;
 
 	IHyLoadable2d *							m_pChild;
 
@@ -25,12 +25,12 @@ class EntityDrawItem
 	ShapeCtrl								m_ShapeCtrl;
 
 public:
-	EntityDrawItem(HyGuiItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent);
+	EntityDrawItem(Project &projectRef, HyGuiItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent);
 	virtual ~EntityDrawItem();
 
 	HyGuiItemType GetGuiType() const;
 	const QUuid &GetThisUuid() const;
-	const QUuid &GetItemUuid() const;
+	const QUuid &GetProjItemUuid() const;
 
 	IHyLoadable2d *GetHyNode();
 	ShapeCtrl &GetShapeCtrl();
@@ -40,7 +40,7 @@ public:
 
 	void RefreshJson(QJsonObject childObj, HyCamera2d *pCamera);
 	void RefreshTransform(HyCamera2d *pCamera);
-	void RefreshOverrideData();
+	void RefreshOverrideData(Project &projectRef);
 
 	void ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut);
 

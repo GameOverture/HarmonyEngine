@@ -66,30 +66,74 @@ bool TreeModelItemData::IsProjectItem() const
 	return m_bIsProjectItem;
 }
 
-QList<TreeModelItemData *> TreeModelItemData::GetAffectedDependants()
+QList<TreeModelItemData *> TreeModelItemData::GetDependants()
 {
-	return m_DependencyMap.keys();
+	return m_DependantMap.keys();
 }
 
 void TreeModelItemData::AddDependantRef(TreeModelItemData *pDependant)
 {
-	if(m_DependencyMap.contains(pDependant))
-		m_DependencyMap[pDependant]++;
+	if(pDependant == nullptr)
+		return;
+	pDependant->AddDependeeRef(this);
+
+	if(m_DependantMap.contains(pDependant))
+		m_DependantMap[pDependant]++;
 	else
-		m_DependencyMap.insert(pDependant, 1);
+		m_DependantMap.insert(pDependant, 1);
 }
 
 void TreeModelItemData::SubtractDependantRef(TreeModelItemData *pDependant)
 {
-	if(m_DependencyMap.contains(pDependant) == false)
+	if(pDependant == nullptr)
+		return;
+	pDependant->SubtractDependeeRef(this);
+
+	if(m_DependantMap.contains(pDependant) == false)
 	{
-		HyGuiLog("TreeModelItemData::SubtractDependantRef invoked and not found in dependency map", LOGTYPE_Error);
+		HyGuiLog("TreeModelItemData::SubtractDependantRef invoked and not found in m_DependantMap", LOGTYPE_Error);
 		return;
 	}
 
-	m_DependencyMap[pDependant]--;
-	if(m_DependencyMap[pDependant] == 0)
-		m_DependencyMap.remove(pDependant);
+	m_DependantMap[pDependant]--;
+	if(m_DependantMap[pDependant] == 0)
+		m_DependantMap.remove(pDependant);
+}
+
+void TreeModelItemData::RelinquishDependees()
+{
+	while(m_DependeeMap.empty() == false)
+	{
+		TreeModelItemData *pKey = m_DependeeMap.lastKey();
+		int iValue = m_DependeeMap.last();
+		
+		for(int i = 0; i < iValue; ++i)
+			pKey->SubtractDependantRef(this);
+	}
+
+	if(m_DependeeMap.empty() == false)
+		HyGuiLog("TreeModelItemData::RelinquishDependees did not deplete", LOGTYPE_Error);
+}
+
+void TreeModelItemData::AddDependeeRef(TreeModelItemData *pDependee)
+{
+	if(m_DependeeMap.contains(pDependee))
+		m_DependeeMap[pDependee]++;
+	else
+		m_DependeeMap.insert(pDependee, 1);
+}
+
+void TreeModelItemData::SubtractDependeeRef(TreeModelItemData *pDependee)
+{
+	if(m_DependeeMap.contains(pDependee) == false)
+	{
+		HyGuiLog("TreeModelItemData::SubtractDependeeRef invoked and not found in m_DependeeMap", LOGTYPE_Error);
+		return;
+	}
+
+	m_DependeeMap[pDependee]--;
+	if(m_DependeeMap[pDependee] == 0)
+		m_DependeeMap.remove(pDependee);
 }
 
 QDataStream &operator<<(QDataStream &out, TreeModelItemData *const &rhs)

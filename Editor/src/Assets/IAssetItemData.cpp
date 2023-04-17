@@ -57,20 +57,20 @@ QString AssetItemData::GetName() const
 	return m_sName;
 }
 
-QSet<ProjectItemData *> AssetItemData::GetDependencies()
-{
-	return m_DependencySet;
-}
-
-void AssetItemData::InsertDependency(ProjectItemData *pProjItem)
-{
-	m_DependencySet.insert(pProjItem);
-}
-
-void AssetItemData::RemoveDependency(ProjectItemData *pProjItem)
-{
-	m_DependencySet.remove(pProjItem);
-}
+//QSet<ProjectItemData *> AssetItemData::GetDependencies()
+//{
+//	return m_DependencySet;
+//}
+//
+//void AssetItemData::InsertDependency(ProjectItemData *pProjItem)
+//{
+//	m_DependencySet.insert(pProjItem);
+//}
+//
+//void AssetItemData::RemoveDependency(ProjectItemData *pProjItem)
+//{
+//	m_DependencySet.remove(pProjItem);
+//}
 
 /*virtual*/ QString AssetItemData::ConstructMetaFileName() const
 {

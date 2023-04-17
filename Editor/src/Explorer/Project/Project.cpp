@@ -543,7 +543,7 @@ bool Project::PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRe
 	{
 		QJsonObject assetObj = assetArrayRef[i].toObject();
 
-		if(pManager->FindById(assetObj["assetUUID"].toString()) == nullptr)
+		if(FindItemData(assetObj["assetUUID"].toString()) == nullptr)
 		{
 			QFileInfo assetFileInfo(assetObj["uri"].toString());
 
@@ -553,7 +553,7 @@ bool Project::PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRe
 
 			importAssetList.push_back(sFilePath);
 			correspondingParentList.push_back(pManager->ReturnFilter(assetObj["filter"].toString()));
-			correspondingUuidList.push_back(assetObj["assetUUID"].toString());
+			correspondingUuidList.push_back(QUuid::createUuid());// assetObj["assetUUID"].toString()); Create new UUID for imported asset, so it doesn't conflict with its old project
 		}
 	}
 
@@ -923,51 +923,65 @@ void Project::SaveUserData() const
 	settings.endGroup();
 }
 
-void Project::RegisterItems(QUuid uuidItemOwner, QList<QUuid> requestList)
+void Project::AddItemDataLookup(TreeModelItemData *pItemData)
 {
-	for(QUuid uuid : requestList)
-	{
-		if(m_ItemLinksMap.contains(uuid) == false)
-			m_ItemLinksMap[uuid] = QSet<QUuid>();
-		
-		m_ItemLinksMap[uuid].insert(uuidItemOwner);
-	}
+	m_ItemDataUuidMap[pItemData->GetUuid()] = pItemData;
 }
 
-void Project::RelinquishItems(QUuid uuidItemOwner, QList<QUuid> relinquishList)
+void Project::RemoveItemDataLookup(const QUuid &uuid)
 {
-	for(QUuid uuid : relinquishList)
+	m_ItemDataUuidMap.remove(uuid);
+}
+
+TreeModelItemData *Project::FindItemData(const QUuid &uuid)
+{
+	auto iter = m_ItemDataUuidMap.find(uuid);
+	if(iter == m_ItemDataUuidMap.end())
+		return nullptr;
+
+	return iter.value();
+}
+
+QList<TreeModelItemData *> Project::IncrementDependencies(TreeModelItemData *pItemDepender, QList<QUuid> dependeeList)
+{
+	QList<TreeModelItemData *> dependeeItemDataList;
+	for(auto uuid : dependeeList)
+		dependeeItemDataList.push_back(FindItemData(uuid));
+
+	return IncrementDependencies(pItemDepender, dependeeItemDataList);
+}
+
+QList<TreeModelItemData *> Project::IncrementDependencies(TreeModelItemData *pItemDepender, QList<TreeModelItemData *> dependeeItemDataList)
+{
+	if(dependeeItemDataList.empty())
+		return dependeeItemDataList;
+
+	QList<TreeModelItemData *> returnList;
+	for(int i = 0; i < dependeeItemDataList.size(); ++i)
 	{
-		if(m_ItemLinksMap.contains(uuid) == false)
+		if(dependeeItemDataList[i] == nullptr)
 			continue;
 
-		m_ItemLinksMap[uuid].remove(uuidItemOwner);
-	}
-}
-
-QList<ProjectItemData *> Project::GetItemLinks(ProjectItemData *pItem)
-{
-	QList<ProjectItemData *> returnList;
-
-	if(m_bExplorerModelLoaded == false)
-	{
-		HyGuiLog("Project::GetItemLinks was invoked before this project's explorer model was loaded", LOGTYPE_Error);
-		return returnList;
-	}
-
-	QUuid itemUuid = pItem->GetUuid();
-	if(m_ItemLinksMap.contains(itemUuid) == false)
-		return returnList;
-
-	QList<QUuid> itemLinksList = m_ItemLinksMap[itemUuid].values();
-	for(QUuid uuid : itemLinksList)
-	{
-		ProjectItemData *pProjItemData = MainWindow::GetExplorerModel().FindByUuid(uuid);
-		if(pProjItemData)
-			returnList.append(pProjItemData);
+		dependeeItemDataList[i]->AddDependantRef(pItemDepender);
+		returnList.append(dependeeItemDataList[i]);
 	}
 
 	return returnList;
+}
+
+void Project::DecrementDependencies(TreeModelItemData *pItemDepender, QList<QUuid> dependeeList)
+{
+	QList<TreeModelItemData *> dependeeItemDataList;
+	for(auto uuid : dependeeList)
+		dependeeItemDataList.push_back(FindItemData(uuid));
+
+	DecrementDependencies(pItemDepender, dependeeItemDataList);
+}
+
+void Project::DecrementDependencies(TreeModelItemData *pItemDepender, QList<TreeModelItemData *> dependeeItemDataList)
+{
+	for(int i = 0; i < dependeeItemDataList.size(); ++i)
+		dependeeItemDataList[i]->SubtractDependantRef(pItemDepender);
 }
 
 void Project::OpenTab(ProjectItemData *pItem)

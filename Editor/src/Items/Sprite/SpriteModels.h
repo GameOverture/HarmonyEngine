@@ -95,8 +95,8 @@ public:
 
 	QList<AssetItemData *> GetAtlasFrames() const;
 	
-	virtual QVariant OnLinkAsset(AssetItemData *pAsset) override;
-	virtual void OnUnlinkAsset(AssetItemData *pAsset) override;
+	int Cmd_AddFrame(AtlasFrame *pFrame);
+	void Cmd_RemoveFrame(AtlasFrame *pFrame);
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class SpriteModel : public IModel
@@ -106,6 +106,10 @@ class SpriteModel : public IModel
 public:
 	SpriteModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~SpriteModel();
+
+	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from this constructor and from UndoCmd's
+	int Cmd_AddFrames(int iStateIndex, QList<AtlasFrame *> frameList);
+	void Cmd_RemoveFrames(int iStateIndex, QList<AtlasFrame *> frameList);
 	
 	virtual bool OnPrepSave() override { return true; }
 	virtual void InsertItemSpecificData(FileDataPair &itemFileDataOut) override;

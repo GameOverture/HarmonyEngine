@@ -78,7 +78,7 @@ Project *ExplorerModel::AddProject(const QString sNewProjectFilePath)
 		return nullptr;
 	}
 
-	InsertTreeItem(pNewProject, m_pRootItem);
+	InsertTreeItem(*pNewProject, pNewProject, m_pRootItem);
 	pNewProject->LoadExplorerModel();
 
 	return pNewProject;
@@ -131,7 +131,7 @@ ExplorerItemData *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemT
 			if(bFound == false)
 			{
 				// Still more directories to dig thru, so this means we're at a prefix. Add the prefix ExplorerItemData here and continue traversing down the tree
-				InsertTreeItem(new ExplorerItemData(*pProj, ITEM_Prefix, QUuid(), sPathSplitList[i]), pCurTreeItem);
+				InsertTreeItem(*pProj, new ExplorerItemData(*pProj, ITEM_Prefix, QUuid(), sPathSplitList[i]), pCurTreeItem);
 				pCurTreeItem = pCurTreeItem->GetChild(pCurTreeItem->GetNumChildren() - 1);
 			}
 		}
@@ -143,10 +143,10 @@ ExplorerItemData *ExplorerModel::AddItem(Project *pProj, HyGuiItemType eNewItemT
 	else
 	{
 		pNewItem = new ProjectItemData(*pProj, eNewItemType, sName, initItemFileData, bIsPendingSave);
-		m_ItemUuidMap[static_cast<ProjectItemData *>(pNewItem)->GetUuid()] = static_cast<ProjectItemData *>(pNewItem);
+		//m_ItemUuidMap[static_cast<ProjectItemData *>(pNewItem)->GetUuid()] = static_cast<ProjectItemData *>(pNewItem);
 	}
 
-	InsertTreeItem(pNewItem, pCurTreeItem);
+	InsertTreeItem(*pProj, pNewItem, pCurTreeItem);
 	return pNewItem;
 }
 
@@ -290,6 +290,7 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 
 		FileDataPair initFileItemData;
 		initFileItemData.m_Meta = pasteObj["metaObj"].toObject();
+		initFileItemData.m_Meta.insert("UUID", QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces)); // Create new UUID for imported item, so it doesn't conflict with its old project
 		initFileItemData.m_Data = pasteObj["dataObj"].toObject();
 		ProjectItemData *pImportedProjItem = static_cast<ProjectItemData *>(AddItem(pDestProject,
 																			ePasteItemType,
@@ -303,54 +304,6 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 	}
 
 	return true;
-}
-
-ProjectItemData *ExplorerModel::FindByUuid(QUuid uuid) const
-{
-	auto iter = m_ItemUuidMap.find(uuid);
-	if(iter == m_ItemUuidMap.end())
-		return nullptr;
-
-	return *iter;
-}
-
-QList<ProjectItemData *> ExplorerModel::RequestItemsByUuid(ProjectItemData *pItemOwner, QList<QUuid> requestList)
-{
-	QList<ProjectItemData *> itemRequestList;
-	for(auto uuid : requestList)
-	{
-		ProjectItemData *pFoundItem = FindByUuid(uuid);
-		if(pFoundItem == nullptr || &pFoundItem->GetProject() != &pItemOwner->GetProject())
-			continue;
-
-		itemRequestList.push_back(pFoundItem);
-	}
-
-	return RequestItems(pItemOwner, itemRequestList);
-}
-
-QList<ProjectItemData *> ExplorerModel::RequestItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> requestList)
-{
-	if(requestList.empty())
-		return requestList;
-
-	QList<ProjectItemData *> returnList;
-	for(int i = 0; i < requestList.size(); ++i)
-	{
-		if(requestList[i] == nullptr || &requestList[i]->GetProject() != &pItemOwner->GetProject())
-			continue;
-
-		requestList[i]->InsertDependency(pItemOwner);
-		returnList.append(requestList[i]);
-	}
-
-	return returnList;
-}
-
-void ExplorerModel::RelinquishItems(ProjectItemData *pItemOwner, QList<ProjectItemData *> relinquishList)
-{
-	for(int i = 0; i < relinquishList.size(); ++i)
-		relinquishList[i]->RemoveDependency(pItemOwner);
 }
 
 /*virtual*/ QVariant ExplorerModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const /*override*/

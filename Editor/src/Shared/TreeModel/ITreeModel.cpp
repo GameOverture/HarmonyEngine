@@ -11,6 +11,7 @@
 #include "ITreeModel.h"
 #include "TreeModelItem.h"
 #include "TreeModelItemData.h"
+#include "Project.h"
 
 ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject *pParent /*= nullptr*/) :
 	QAbstractItemModel(pParent)
@@ -35,8 +36,11 @@ ITreeModel::ITreeModel(int iNumColumns, const QStringList &sHeaderList, QObject 
 	delete m_pRootItem;
 }
 
-bool ITreeModel::InsertTreeItem(TreeModelItemData *pNewItemData, TreeModelItem *pParentTreeItem, int iRow /*= -1*/)
+bool ITreeModel::InsertTreeItem(Project &projectRef, TreeModelItemData *pNewItemData, TreeModelItem *pParentTreeItem, int iRow /*= -1*/)
 {
+	if(pNewItemData->GetUuid().isNull() == false)
+		projectRef.AddItemDataLookup(pNewItemData);
+
 	QModelIndex parentIndex;
 	if(pParentTreeItem)
 	{

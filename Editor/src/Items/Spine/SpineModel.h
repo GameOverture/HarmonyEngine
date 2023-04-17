@@ -22,9 +22,6 @@ public:
 	virtual ~SpineStateData();
 
 	const QMap<QString, double> &GetCrossFadeMap() const;
-
-	virtual QVariant OnLinkAsset(AssetItemData *pAsset) override;
-	virtual void OnUnlinkAsset(AssetItemData *pAsset) override;
 };
 ////////////////////////////////////////////////////////////////////////////////////////
 struct SpineSubAtlas

@@ -11,8 +11,64 @@
 #include "SpriteUndoCmds.h"
 #include "SpriteTableView.h"
 #include "SpriteModels.h"
+#include "Project.h"
+#include "AtlasModel.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+SpriteUndoCmd_AddFrames::SpriteUndoCmd_AddFrames(ProjectItemData &spriteItemRef, int iStateIndex, QList<AtlasFrame *> frameList, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_SpriteItemRef(spriteItemRef),
+	m_iStateIndex(iStateIndex),
+	m_FrameList(frameList)
+{
+	setText("Add " % QString::number(m_FrameList.size()) % " Frames to State " % QString::number(iStateIndex));
+}
+
+/*virtual*/ SpriteUndoCmd_AddFrames::~SpriteUndoCmd_AddFrames()
+{
+}
+
+/*virtual*/ void SpriteUndoCmd_AddFrames::redo() /*override*/
+{
+	QVariant focusSubState = static_cast<SpriteModel *>(m_SpriteItemRef.GetModel())->Cmd_AddFrames(m_iStateIndex, m_FrameList);
+	m_SpriteItemRef.FocusWidgetState(m_iStateIndex, focusSubState);
+}
+
+/*virtual*/ void SpriteUndoCmd_AddFrames::undo() /*override*/
+{
+	static_cast<SpriteModel *>(m_SpriteItemRef.GetModel())->Cmd_RemoveFrames(m_iStateIndex, m_FrameList);
+	m_SpriteItemRef.FocusWidgetState(m_iStateIndex, -1);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+SpriteUndoCmd_RemoveFrames::SpriteUndoCmd_RemoveFrames(ProjectItemData &spriteItemRef, int iStateIndex, QList<AtlasFrame *> frameList, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_SpriteItemRef(spriteItemRef),
+	m_iStateIndex(iStateIndex),
+	m_FrameList(frameList)
+{
+	setText("Remove " % QString::number(m_FrameList.size()) % " Frames from State " % QString::number(iStateIndex));
+}
+
+/*virtual*/ SpriteUndoCmd_RemoveFrames::~SpriteUndoCmd_RemoveFrames()
+{ }
+
+/*virtual*/ void SpriteUndoCmd_RemoveFrames::redo() /*override*/
+{
+	static_cast<SpriteModel *>(m_SpriteItemRef.GetModel())->Cmd_RemoveFrames(m_iStateIndex, m_FrameList);
+	m_SpriteItemRef.FocusWidgetState(m_iStateIndex, -1);
+}
+
+/*virtual*/ void SpriteUndoCmd_RemoveFrames::undo() /*override*/
+{
+	QVariant focusSubState = static_cast<SpriteModel *>(m_SpriteItemRef.GetModel())->Cmd_AddFrames(m_iStateIndex, m_FrameList);
+	m_SpriteItemRef.FocusWidgetState(m_iStateIndex, focusSubState);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 SpriteUndoCmd_OrderFrame::SpriteUndoCmd_OrderFrame(SpriteTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent /*= 0*/) :
 	QUndoCommand(pParent),
 	m_pSpriteTableView(pSpriteTableView),

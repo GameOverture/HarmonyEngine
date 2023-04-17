@@ -133,20 +133,20 @@ QUndoStack *ProjectItemData::GetUndoStack()
 	return m_pUndoStack;
 }
 
-QSet<ProjectItemData *> ProjectItemData::GetDependencies()
-{
-	return m_DependencySet;
-}
-
-void ProjectItemData::InsertDependency(ProjectItemData *pProjItem)
-{
-	m_DependencySet.insert(pProjItem);
-}
-
-void ProjectItemData::RemoveDependency(ProjectItemData *pProjItem)
-{
-	m_DependencySet.remove(pProjItem);
-}
+//QSet<ProjectItemData *> ProjectItemData::GetDependencies()
+//{
+//	return m_DependencySet;
+//}
+//
+//void ProjectItemData::InsertDependency(ProjectItemData *pProjItem)
+//{
+//	m_DependencySet.insert(pProjItem);
+//}
+//
+//void ProjectItemData::RemoveDependency(ProjectItemData *pProjItem)
+//{
+//	m_DependencySet.remove(pProjItem);
+//}
 
 void ProjectItemData::GiveMenuActions(QMenu *pMenu)
 {
@@ -356,8 +356,14 @@ void ProjectItemData::FocusWidgetState(int iStateIndex, QVariant subState)
 
 	// Unlinks all dependencies
 	//m_pModel->RelinquishAllFrames();
-	GetProject().GetAtlasModel().RelinquishAssets(this, m_pModel->GetAssets(ASSET_Atlas));
-	GetProject().GetAudioModel().RelinquishAssets(this, m_pModel->GetAssets(ASSET_Audio));
+
+	// TOMORROW HERE: figure out GetAssets() -> use dependee's from m_pModel's ProjItem?
+
+	// Just call this? - Also call RelinqusihDependees() whenever other ItemData gets deleted/removed
+	RelinquishDependees();
+	//MainWindow::GetExplorerModel().DecrementDependencies(...);
+	//GetProject().GetAtlasModel().DecrementDependencies(this, m_pModel->GetAssets(ASSET_Atlas));// RelinquishAssets(this, m_pModel->GetAssets(ASSET_Atlas));
+	//GetProject().GetAudioModel().DecrementDependencies(this, m_pModel->GetAssets(ASSET_Audio));//RelinquishAssets(this, m_pModel->GetAssets(ASSET_Audio));
 
 	ExplorerItemData::DeleteFromProject();
 }
