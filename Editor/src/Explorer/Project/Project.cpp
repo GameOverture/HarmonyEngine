@@ -262,6 +262,16 @@ void Project::LoadExplorerModel()
 		}
 	}
 
+	// LoadModel on each project item now needs to be invoked after all the project items have been created,
+	// so that any dependency will be able found by Project::FindItemData()
+	QModelIndexList indexList = MainWindow::GetExplorerModel().GetAllIndices();
+	for(QModelIndex index : indexList)
+	{
+		TreeModelItemData *pItemData = MainWindow::GetExplorerModel().data(index, Qt::UserRole).value<TreeModelItemData *>();
+		if(pItemData->IsProjectItem())
+			static_cast<ProjectItemData *>(pItemData)->LoadModel();
+	}
+
 	//if(bSystemFontFound == false)
 	//{
 	//	QDir projGenDataDir(MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "data/");

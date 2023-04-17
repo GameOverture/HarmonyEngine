@@ -63,13 +63,6 @@ ProjectItemData::ProjectItemData(Project &projRef,
 	m_pActionRedo->setShortcutContext(Qt::ApplicationShortcut);
 	m_pActionRedo->setObjectName("Redo");
 
-	LoadModel();
-
-	// "newImport" indicates to LoadModel() that this item is brand new and should setup its meta/data accordingly
-	// It should now be removed so reloading this item doesn't try to reimport itself
-	if(m_ItemFileData.m_Meta.contains("newImport"))
-		m_ItemFileData.m_Meta.remove("newImport");
-
 	connect(m_pUndoStack, SIGNAL(cleanChanged(bool)), this, SLOT(on_undoStack_cleanChanged(bool)));
 	connect(m_pUndoStack, SIGNAL(indexChanged(int)), this, SLOT(on_undoStack_indexChanged(int)));
 }
@@ -111,6 +104,11 @@ void ProjectItemData::LoadModel()
 		HyGuiLog("Unimplemented item LoadModel(): " % QString::number(m_eTYPE), LOGTYPE_Error);
 		break;
 	}
+
+	// "newImport" indicates to the Model's ctor that this item is brand new and should setup its meta/data accordingly
+	// It should now be removed so reloading this item doesn't try to reimport itself
+	if(m_ItemFileData.m_Meta.contains("newImport"))
+		m_ItemFileData.m_Meta.remove("newImport");
 }
 
 IModel *ProjectItemData::GetModel()
@@ -132,21 +130,6 @@ QUndoStack *ProjectItemData::GetUndoStack()
 {
 	return m_pUndoStack;
 }
-
-//QSet<ProjectItemData *> ProjectItemData::GetDependencies()
-//{
-//	return m_DependencySet;
-//}
-//
-//void ProjectItemData::InsertDependency(ProjectItemData *pProjItem)
-//{
-//	m_DependencySet.insert(pProjItem);
-//}
-//
-//void ProjectItemData::RemoveDependency(ProjectItemData *pProjItem)
-//{
-//	m_DependencySet.remove(pProjItem);
-//}
 
 void ProjectItemData::GiveMenuActions(QMenu *pMenu)
 {
