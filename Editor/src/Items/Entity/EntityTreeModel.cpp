@@ -398,54 +398,22 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 
 EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow /*= -1*/)
 {
-	TreeModelItem *pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
-	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
-	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
-	if(insertRow(iRow, parentIndex) == false)
-	{
-		HyGuiLog("EntityTreeModel::InsertNewChild() - insertRow failed", LOGTYPE_Error);
-		return nullptr;
-	}
-
 	// Generate a unique code name for this new item
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pProjItem->GetName(false));
-	
-	// Allocate and store the new item in the tree model
+
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), ShouldForwardDeclare(pProjItem), sCodeName, pProjItem->GetType(), ENTTYPE_Item, pProjItem->GetUuid(), QUuid::createUuid());
-	QVariant v;
-	v.setValue<EntityTreeItemData *>(pNewItem);
-	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
-	{
-		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
-			HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
-	}
+	InsertTreeItem(pNewItem, GetRootTreeItem(), iRow);
 
 	return pNewItem;
 }
 
 EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(AssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow /*= -1*/)
 {
-	TreeModelItem *pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
-	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
-	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
-	if(insertRow(iRow, parentIndex) == false)
-	{
-		HyGuiLog("EntityTreeModel::InsertNewChild(asset) - insertRow failed", LOGTYPE_Error);
-		return nullptr;
-	}
-
 	// Generate a unique code name for this new item
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pAssetItem->GetName());
 
-	// Allocate and store the new item in the tree model
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), false, sCodeName, pAssetItem->GetManagerAssetType() == ASSET_Atlas ? ITEM_AtlasImage : ITEM_Audio, ENTTYPE_Item, QUuid(), QUuid::createUuid());
-	QVariant v;
-	v.setValue<EntityTreeItemData *>(pNewItem);
-	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
-	{
-		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
-			HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
-	}
+	InsertTreeItem(pNewItem, GetRootTreeItem(), iRow);
 
 	return pNewItem;
 }
@@ -459,103 +427,57 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewItem(QJsonObject initObj, bool
 
 	TreeModelItem *pParentTreeItem = nullptr;
 	if(eGuiType != ITEM_Shape)
-		pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
+		pParentTreeItem = GetRootTreeItem();
 	else
-		pParentTreeItem = GetItem(index(1, 0, QModelIndex()));
+		pParentTreeItem = GetBvFolderTreeItem();
 
 	bool bFoundArrayFolder = false;
 	if(bIsArrayItem)
 		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, sCodeName, eGuiType, iRow);
 
-	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
-	iRow = (iRow == -1 || (bIsArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
-	if(insertRow(iRow, parentIndex) == false)
-	{
-		HyGuiLog("EntityTreeModel::Cmd_InsertNewChild() - insertRow failed", LOGTYPE_Error);
-		return nullptr;
-	}
-
-	// Allocate and store the new item in the tree model
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), ShouldForwardDeclare(initObj), initObj, bIsArrayItem);
-	QVariant v;
-	v.setValue<EntityTreeItemData *>(pNewItem);
-	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
-	{
-		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
-			HyGuiLog("ExplorerModel::Cmd_InsertNewChild() - setData failed", LOGTYPE_Error);
-	}
+	iRow = (iRow < 0 || (bIsArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
+	InsertTreeItem(pNewItem, pParentTreeItem, iRow);
 
 	return pNewItem;
 }
 
 EntityTreeItemData *EntityTreeModel::Cmd_InsertNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, QString sCodeNamePrefix, int iRow /*= -1*/)
 {
-	TreeModelItem *pParentTreeItem = nullptr;
-	if(bIsPrimitive)
-		pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
-	else
-		pParentTreeItem = GetItem(index(1, 0, QModelIndex()));
-
-	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
-	iRow = (iRow == -1 ? pParentTreeItem->GetNumChildren() : iRow);
-	if(insertRow(iRow, parentIndex) == false)
-	{
-		HyGuiLog("EntityTreeModel::Cmd_InsertNewShape() - insertRow failed", LOGTYPE_Error);
-		return nullptr;
-	}
-
 	// Generate a unique code name for this new item
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + (bIsPrimitive ? "Prim" : "") + HyGlobal::ShapeName(eShape).simplified().remove(' '));
 
-	// Allocate and store the new item in the tree model
+	TreeModelItem *pParentTreeItem = nullptr;
+	if(bIsPrimitive)
+		pParentTreeItem = GetRootTreeItem();
+	else
+		pParentTreeItem = GetBvFolderTreeItem();
+
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef.GetItem(), false, sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_Shape, ENTTYPE_Item, QUuid(), QUuid::createUuid());
 	pNewItem->GetPropertiesModel().SetPropertyValue("Shape", "Type", HyGlobal::ShapeName(eShape));
 	pNewItem->GetPropertiesModel().SetPropertyValue("Shape", "Data", sData);
-
-	QVariant v;
-	v.setValue<EntityTreeItemData *>(pNewItem);
-	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
-	{
-		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
-			HyGuiLog("ExplorerModel::Cmd_InsertNewShape() - setData failed", LOGTYPE_Error);
-	}
+	InsertTreeItem(pNewItem, pParentTreeItem, iRow);
 
 	return pNewItem;
 }
 
 bool EntityTreeModel::Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow)
 {
+	// Generate a unique code name for this new item
+	//QString sCodeName = GenerateCodeName(pItem->GetCodeName());
+
 	TreeModelItem *pParentTreeItem = nullptr;
-	
 	if(pItem->GetType() != ITEM_Shape)
-		pParentTreeItem = GetItem(index(0, 0, QModelIndex()));
+		pParentTreeItem = GetRootTreeItem();
 	else
-		pParentTreeItem = GetItem(index(1, 0, QModelIndex()));
+		pParentTreeItem = GetBvFolderTreeItem();
 
 	bool bFoundArrayFolder = false;
 	if(pItem->GetEntType() == ENTTYPE_ArrayItem)
 		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, pItem->GetCodeName(), pItem->GetType(), iRow);
 
-	QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItem->data(0).value<EntityTreeItemData *>(), 0);
-	iRow = (iRow == -1 || (pItem->GetEntType() == ENTTYPE_ArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
-	if(insertRow(iRow, parentIndex) == false)
-	{
-		HyGuiLog("EntityTreeModel::Cmd_ReaddChild() - insertRow failed", LOGTYPE_Error);
-		return false;
-	}
-
-	// Generate a unique code name for this new item
-	QString sCodeName = GenerateCodeName(pItem->GetCodeName());
-
-	QVariant v;
-	v.setValue<EntityTreeItemData *>(pItem);
-	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
-	{
-		if(setData(index(iRow, iCol, parentIndex), v, Qt::UserRole) == false)
-			HyGuiLog("ExplorerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
-	}
-
-	return true;
+	iRow = (iRow < 0 || (pItem->GetEntType() == ENTTYPE_ArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
+	return InsertTreeItem(pItem, pParentTreeItem, iRow);
 }
 
 int32 EntityTreeModel::Cmd_PopChild(EntityTreeItemData *pItem)
