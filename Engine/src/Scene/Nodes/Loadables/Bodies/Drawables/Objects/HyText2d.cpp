@@ -45,8 +45,6 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 		if(m_pGlyphInfos[i].vOffset.y < ptBotLeft.y)
 			ptBotLeft.y = m_pGlyphInfos[i].vOffset.y;
 	}
-	ptBotLeft.x *= std::fabs(scale.X());
-	ptBotLeft.y *= std::fabs(scale.Y());
 
 	float fHalfWidth = GetWidth(0.5f);
 	float fHalfHeight = GetHeight(0.5f);
