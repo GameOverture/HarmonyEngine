@@ -41,7 +41,7 @@ protected:
 	bool						m_bIsVem;
 
 public:
-	ShapeCtrl();
+	ShapeCtrl(HyEntity2d *pParent);
 	ShapeCtrl(const ShapeCtrl &copyRef);
 	virtual ~ShapeCtrl();
 

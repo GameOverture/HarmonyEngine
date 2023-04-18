@@ -66,7 +66,6 @@ class Project : public ExplorerItemData
 	FileDataPair										m_ProjectFileData;
 
 	QMap<QUuid, TreeModelItemData *>					m_ItemDataUuidMap;	// Lookup map to help find tree item data pointers
-	//QMap<QUuid, QSet<QUuid>>							m_ItemLinksMap; // Key = item in question, Value = other items that reference 'Key'
 
 	bool												m_bHasError;
 	bool												m_bExplorerModelLoaded;

@@ -363,7 +363,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 		{
 			HyColor color = HyColor::White;
 
-			ShapeCtrl shapeCtrl;
+			ShapeCtrl shapeCtrl(nullptr);
 			shapeCtrl.Setup(HyGlobal::GetShapeFromString(m_AffectedItemDataList[i]->GetPropertiesModel().FindPropertyValue("Shape", "Type").toString()), color, 0.0f, 1.0f);
 			shapeCtrl.Deserialize(m_AffectedItemDataList[i]->GetPropertiesModel().FindPropertyValue("Shape", "Data").toString(), nullptr);
 			shapeCtrl.TransformSelf(m_NewTransformList[i]);

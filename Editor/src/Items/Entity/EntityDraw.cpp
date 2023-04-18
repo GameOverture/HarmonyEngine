@@ -18,7 +18,7 @@
 
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),
-	m_DragShape(),
+	m_DragShape(this),
 	m_MultiTransform(this),
 	m_fMultiTransformStartRot(0.0f),
 	m_pCurHoverItem(nullptr),

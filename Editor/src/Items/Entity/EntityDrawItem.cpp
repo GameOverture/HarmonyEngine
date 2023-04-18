@@ -18,13 +18,13 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, HyGuiItemType eGuiType, QUui
 	m_ProjItemUuid(itemUuid),
 	m_pChild(nullptr),
 	m_Transform(pParent),
-	m_ShapeCtrl()
+	m_ShapeCtrl(pParent)
 {
 	switch(m_eGuiType)
 	{
 	case ITEM_Shape:
 	case ITEM_Primitive:
-		m_pChild = nullptr; // When either shape or primitive 'm_pChild' is provided via the m_ShapeCtrl
+		m_pChild = nullptr;		// When either shape or primitive 'm_pChild' is provided via the m_ShapeCtrl
 		break;
 
 	case ITEM_Audio:			m_pChild = new HyAudio2d("", HY_GUI_DATAOVERRIDE, pParent); break;
@@ -32,10 +32,13 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, HyGuiItemType eGuiType, QUui
 	case ITEM_Spine:			m_pChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 	case ITEM_Sprite:			m_pChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 
-	case ITEM_AtlasImage:		//m_pChild = new HyTexturedQuad2d();
 	case ITEM_Entity:
+		m_pChild = new HyEntity2d(pParent);
+		break;
+
+	case ITEM_AtlasImage:		//m_pChild = new HyTexturedQuad2d(); break;
 	default:
-		HyLogError("EntityDraw::OnApplyJsonData - unhandled child node type");
+		HyGuiLog("EntityDrawItem ctor - unhandled child node type", LOGTYPE_Error);
 		break;
 	}
 	if(m_pChild)

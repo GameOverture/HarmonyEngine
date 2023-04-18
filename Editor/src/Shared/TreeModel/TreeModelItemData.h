@@ -25,9 +25,9 @@ protected:
 	QString											m_sName;
 	bool											m_bIsProjectItem;
 
-	// Dependant References - Keeps track of what relies on 'this' ItemData
-	QMap<TreeModelItemData *, int>					m_DependantMap;
-	QMap<TreeModelItemData *, int>					m_DependeeMap;
+	// Dependant References : int = count
+	QMap<TreeModelItemData *, int>					m_DependantMap;		// What ItemDatas rely on 'this'
+	QMap<TreeModelItemData *, int>					m_DependeeMap;		// What ItemDatas 'this' relies on
 
 public:
 	TreeModelItemData();

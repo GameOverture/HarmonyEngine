@@ -111,7 +111,7 @@ void TreeModelItemData::RelinquishDependees()
 			pKey->SubtractDependantRef(this);
 	}
 
-	if(m_DependeeMap.empty() == false)
+	if(m_DependantMap.empty() == false)
 		HyGuiLog("TreeModelItemData::RelinquishDependees did not deplete", LOGTYPE_Error);
 }
 

@@ -1013,10 +1013,7 @@ void MainWindow::NewItem(HyGuiItemType eItem)
 
 		if(pNewItem->IsProjectItem())
 		{
-			//// New items that are considered "imported" should be saved immediately since they have direct references into an asset manager
-			//if(pDlg->GetImportFile().isEmpty() == false)
-			//	static_cast<ProjectItemData *>(pNewItem)->Save(true);
-
+			static_cast<ProjectItemData *>(pNewItem)->LoadModel();
 			MainWindow::OpenItem(static_cast<ProjectItemData *>(pNewItem));
 		}
 	}

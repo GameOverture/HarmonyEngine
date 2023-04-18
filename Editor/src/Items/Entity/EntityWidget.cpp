@@ -76,7 +76,6 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 
 	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
 	ui->nodeTree->setModel(&pEntityModel->GetTreeModel());
-	pEntityModel->RegisterWidgets(*ui->cmbEntityType);
 
 	ui->nodeTree->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->nodeTree, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(OnContextMenu(const QPoint &)));
