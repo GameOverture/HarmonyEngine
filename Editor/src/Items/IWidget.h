@@ -12,6 +12,7 @@
 
 #include <QWidget>
 #include <QMenu>
+#include <QVBoxLayout>
 
 namespace Ui {
 class IWidget;
@@ -32,6 +33,9 @@ public:
 	~IWidget();
 
 	ProjectItemData &GetItem();
+
+	QVBoxLayout *GetAboveStatesLayout();
+	QVBoxLayout *GetBelowStatesLayout();
 
 	int GetCurStateIndex();
 	IStateData *GetCurStateData();

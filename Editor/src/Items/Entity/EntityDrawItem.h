@@ -46,6 +46,9 @@ public:
 
 	void ShowTransformCtrl(bool bShowGrabPoints);
 	void HideTransformCtrl();
+
+protected:
+	void SubEntityRefreshOverrideData(QJsonObject metaObj);
 };
 
 #endif // ENTITYDRAWITEM_H

@@ -34,7 +34,7 @@ class SpriteWidget : public IWidget
 
 public:
 	explicit SpriteWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
-	~SpriteWidget();
+	virtual ~SpriteWidget();
 	
 	virtual void OnGiveMenuActions(QMenu *pMenu) override;
 	virtual void OnUpdateActions() override;

@@ -23,7 +23,8 @@ TextWidget::TextWidget(ProjectItemData &itemRef, QWidget *parent) :
 
 	// Remove and re-add the main layout that holds everything. This makes the Qt Designer (.ui) files work with the base class 'IWidget'. Otherwise it jumbles them together.
 	layout()->removeItem(ui.verticalLayout_3);
-	layout()->addItem(ui.verticalLayout_3);
+	GetBelowStatesLayout()->addItem(ui.verticalLayout_3);
+	GetAboveStatesLayout()->addWidget(ui.grpGlyphs);
 
 	ui.btnAddFill->setDefaultAction(ui.actionAddFill);
 	ui.btnAddSDF->setDefaultAction(ui.actionAddSDF);

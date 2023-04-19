@@ -33,7 +33,7 @@ SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 
 	// Remove and re-add the main layout that holds everything. This makes the Qt Designer (.ui) files work with the base class 'IWidget'. Otherwise it jumbles them together.
 	layout()->removeItem(ui->verticalLayout);
-	layout()->addItem(ui->verticalLayout);
+	GetBelowStatesLayout()->addItem(ui->verticalLayout);
 	
 	ui->btnAddFrames->setDefaultAction(ui->actionImportFrames);
 	ui->btnRemoveFrame->setDefaultAction(ui->actionRemoveFrames);
@@ -50,7 +50,7 @@ SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 			this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
 }
 
-SpriteWidget::~SpriteWidget()
+/*virtual*/ SpriteWidget::~SpriteWidget()
 {
 	delete ui;
 }

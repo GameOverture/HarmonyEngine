@@ -33,7 +33,7 @@ AudioWidget::AudioWidget(ProjectItemData &itemRef, QWidget *pParent) :
 
 	// Remove and re-add the main layout that holds everything. This makes the Qt Designer (.ui) files work with the base class 'IWidget'. Otherwise it jumbles them together.
 	layout()->removeItem(ui->verticalLayout);
-	layout()->addItem(ui->verticalLayout);
+	GetBelowStatesLayout()->addItem(ui->verticalLayout);
 
 	ui->btnAddAudio->setDefaultAction(ui->actionAddAudio);
 	ui->btnRemoveAudio->setDefaultAction(ui->actionRemoveAudio);

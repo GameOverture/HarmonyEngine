@@ -59,6 +59,26 @@ ProjectItemData &IWidget::GetItem()
 	return m_ItemRef;
 }
 
+QVBoxLayout *IWidget::GetAboveStatesLayout()
+{
+	return uiWidget->lytAboveStates;
+}
+
+QVBoxLayout *IWidget::GetBelowStatesLayout()
+{
+	return uiWidget->lytBelowStates;
+}
+
+int IWidget::GetCurStateIndex()
+{
+	return uiWidget->cmbStates->currentIndex();
+}
+
+IStateData *IWidget::GetCurStateData()
+{
+	return m_ItemRef.GetModel()->GetStateData(uiWidget->cmbStates->currentIndex());
+}
+
 void IWidget::UpdateActions()
 {
 	uiWidget->actionRemoveState->setEnabled(uiWidget->cmbStates->count() > 1);
@@ -85,16 +105,6 @@ void IWidget::FocusState(int iStateIndex, QVariant subState)
 void IWidget::ShowStates(bool bShow)
 {
 	uiWidget->grpStates->setVisible(bShow);
-}
-
-int IWidget::GetCurStateIndex()
-{
-	return uiWidget->cmbStates->currentIndex();
-}
-
-IStateData *IWidget::GetCurStateData()
-{
-	return m_ItemRef.GetModel()->GetStateData(uiWidget->cmbStates->currentIndex());
 }
 
 void IWidget::OnCurrentIndexChanged(int index)

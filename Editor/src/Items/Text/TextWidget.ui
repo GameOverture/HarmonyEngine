@@ -6,14 +6,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>246</width>
-    <height>490</height>
+    <width>329</width>
+    <height>570</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>TextWidget</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="grpGlyphs">
+     <property name="title">
+      <string>Glyphs/Characters</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="PropertiesTreeView" name="glyphsTreeView">
+        <attribute name="headerVisible">
+         <bool>false</bool>
+        </attribute>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
@@ -212,22 +228,6 @@
            </widget>
           </item>
          </layout>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="groupBox_3">
-       <property name="title">
-        <string>Glyphs/Characters</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <item>
-         <widget class="PropertiesTreeView" name="glyphsTreeView">
-          <attribute name="headerVisible">
-           <bool>false</bool>
-          </attribute>
-         </widget>
         </item>
        </layout>
       </widget>

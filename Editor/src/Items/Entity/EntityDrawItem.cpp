@@ -32,9 +32,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, HyGuiItemType eGuiType, QUui
 	case ITEM_Spine:			m_pChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 	case ITEM_Sprite:			m_pChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 
-	case ITEM_Entity:
-		m_pChild = new HyEntity2d(pParent);
-		break;
+	case ITEM_Entity:			m_pChild = new HyEntity2d(pParent); break;
 
 	case ITEM_AtlasImage:		//m_pChild = new HyTexturedQuad2d(); break;
 	default:
@@ -208,10 +206,7 @@ void EntityDrawItem::RefreshOverrideData(Project &projectRef)
 	pProjItemData->GetSavedFileData(fileDataPair);
 
 	if(m_eGuiType == ITEM_Entity)
-	{
-		fileDataPair.m_Meta;
-		HyGuiLog("Entity RefreshOverrideData() not implemented!", LOGTYPE_Error);
-	}
+		SubEntityRefreshOverrideData(fileDataPair.m_Meta);
 	else
 	{
 		QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
@@ -276,4 +271,10 @@ void EntityDrawItem::ShowTransformCtrl(bool bShowGrabPoints)
 void EntityDrawItem::HideTransformCtrl()
 {
 	m_Transform.Hide();
+}
+
+void EntityDrawItem::SubEntityRefreshOverrideData(QJsonObject metaObj)
+{
+	HyEntity2d *pEntity = static_cast<HyEntity2d *>(m_pChild);
+	HyLogError("EntityItemDraw::SubEntityRefreshOverrideData - not implemented");
 }

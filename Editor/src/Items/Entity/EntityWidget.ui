@@ -331,7 +331,7 @@
         <font>
          <weight>75</weight>
          <bold>true</bold>
-         <underline>true</underline>
+         <underline>false</underline>
         </font>
        </property>
        <property name="text">
