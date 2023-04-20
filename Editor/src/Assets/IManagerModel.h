@@ -83,13 +83,6 @@ public:
 	QList<AssetItemData *> FindByChecksum(quint32 uiChecksum);
 	bool DoesAssetExist(quint32 uiChecksum);
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//// [ASSET-ITEM] DEPENDENCIES LINK FUNCTIONS
-	//QList<AssetItemData *> RequestAssetsByUuid(ProjectItemData *pItem, QList<QUuid> requestList);
-	//QList<AssetItemData *> RequestAssets(ProjectItemData *pItem, QList<AssetItemData *> requestList);
-	//void RelinquishAssets(ProjectItemData *pItem, QList<AssetItemData *> relinquishList);
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	TreeModelItemData *CreateNewFilter(QString sName, TreeModelItemData *pParent);
 
 	void CreateNewBank(QString sName);

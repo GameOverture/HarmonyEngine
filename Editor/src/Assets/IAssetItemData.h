@@ -29,7 +29,6 @@ protected:
 	quint32								m_uiBankId;
 	QString								m_sMetaFileExt; // includes period
 
-	//QSet<ProjectItemData *>				m_DependencySet;
 	uint								m_uiErrors;
 
 public:
@@ -44,10 +43,6 @@ public:
 
 	QString GetFilter() const;
 	QString GetName() const;
-
-	//QSet<ProjectItemData *> GetDependencies();
-	//void InsertDependency(ProjectItemData *pProjItem);
-	//void RemoveDependency(ProjectItemData *pProjItem);
 
 	virtual QString ConstructMetaFileName() const;
 	QString GetMetaFileExt() const;

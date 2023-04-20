@@ -521,50 +521,6 @@ bool IManagerModel::DoesAssetExist(quint32 uiChecksum)
 	return m_AssetChecksumMap.contains(uiChecksum);
 }
 
-//QList<AssetItemData *> IManagerModel::RequestAssetsByUuid(ProjectItemData *pItem, QList<QUuid> requestList)
-//{
-//	if(requestList.empty())
-//		return QList<AssetItemData *>();
-//
-//	QList<AssetItemData *> assetsRequestList;
-//	for(int i = 0; i < requestList.size(); ++i)
-//	{
-//		AssetItemData *pFoundAsset = static_cast<AssetItemData *>(FindItemData(requestList[i]));
-//		if(pFoundAsset == nullptr)
-//		{
-//			// TODO: Support a "Yes to all" dialog functionality here. Also note that the request list will not == the return list
-//			HyGuiLog("Cannot find asset with UUID: " % requestList[i].toString() % "\nIt may have been removed, or is invalid in its asset manager.", LOGTYPE_Warning);
-//		}
-//		else
-//		{
-//			assetsRequestList.append(pFoundAsset);
-//		}
-//	}
-//
-//	return RequestAssets(pItem, assetsRequestList);
-//}
-//
-//QList<AssetItemData *> IManagerModel::RequestAssets(ProjectItemData *pItem, QList<AssetItemData *> requestList)
-//{
-//	if(requestList.empty())
-//		return requestList;
-//
-//	QList<AssetItemData *> returnList;
-//	for(int i = 0; i < requestList.size(); ++i)
-//	{
-//		requestList[i]->InsertDependency(pItem);
-//		returnList.append(requestList[i]);
-//	}
-//
-//	return returnList;
-//}
-//
-//void IManagerModel::RelinquishAssets(ProjectItemData *pItem, QList<AssetItemData *> relinquishList)
-//{
-//	for(int i = 0; i < relinquishList.size(); ++i)
-//		relinquishList[i]->RemoveDependency(pItem);
-//}
-
 TreeModelItemData *IManagerModel::CreateNewFilter(QString sName, TreeModelItemData *pParent)
 {
 	TreeModelItem *pTreeParent = pParent ? GetItem(FindIndex<TreeModelItemData *>(pParent, 0)) : nullptr;

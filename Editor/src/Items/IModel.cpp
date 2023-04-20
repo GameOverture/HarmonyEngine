@@ -120,16 +120,6 @@ void IModel::MoveStateForward(int iStateIndex)
 	dataChanged(createIndex(iStateIndex, 0), createIndex(iStateIndex, 0), roleList);
 }
 
-//QVariant IModel::AddAsset(int iStateIndex, AssetItemData *pAsset)
-//{
-//	return m_StateList[iStateIndex]->OnLinkAsset(pAsset);
-//}
-//
-//void IModel::RemoveAsset(int iStateIndex, AssetItemData *pAsset)
-//{
-//	m_StateList[iStateIndex]->OnUnlinkAsset(pAsset);
-//}
-
 FileDataPair IModel::PopState(uint32 uiIndex)
 {
 	FileDataPair retObj = GetStateFileData(uiIndex);
