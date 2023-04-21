@@ -33,16 +33,16 @@ class EntityTreeItemData : public TreeModelItemData
 {
 	Q_OBJECT
 
+	ProjectItemData &									m_EntityItemDataRef;
 	EntityItemType										m_eEntType;
 	bool												m_bIsForwardDeclared;
 	QUuid												m_ItemUuid;
 
-	PropertiesTreeModel									m_PropertiesTreeModel;
 	bool												m_bIsSelected;
 
 public:
 	EntityTreeItemData(ProjectItemData &entityItemDataRef, bool bIsForwardDeclared, QString sCodeName, HyGuiItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis);
-	EntityTreeItemData(ProjectItemData &entityItemDataRef, bool bIsForwardDeclared, QJsonObject initObj, bool bIsArrayItem);
+	EntityTreeItemData(ProjectItemData &entityItemDataRef, bool bIsForwardDeclared, QJsonObject descObj, QJsonArray propArray, bool bIsArrayItem);
 	virtual ~EntityTreeItemData();
 
 	EntityItemType GetEntType() const;
@@ -50,15 +50,13 @@ public:
 	const QUuid &GetThisUuid() const;
 	const QUuid &GetItemUuid() const;
 	bool IsForwardDeclared() const;
-	PropertiesTreeModel &GetPropertiesModel();
+
+	PropertiesTreeModel &GetPropertiesModel(int iStateIndex);
 
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);
 
-	void InsertJsonInfo(QJsonObject &childObjRef);
-
-protected:
-	void InitalizePropertiesTree();
+	void InsertJsonInfo_Desc(QJsonObject &childObjRef);
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityTreeModel : public ITreeModel
@@ -93,7 +91,7 @@ public:
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 	EntityTreeItemData *Cmd_InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewChild(AssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
-	EntityTreeItemData *Cmd_InsertNewItem(QJsonObject initObj, bool bIsArrayItem, int iRow = -1);
+	EntityTreeItemData *Cmd_InsertNewItem(QJsonObject descObj, QJsonArray propArray, bool bIsArrayItem, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, QString sCodeNamePrefix, int iRow = -1);
 	bool Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow);
 	int32 Cmd_PopChild(EntityTreeItemData *pItem);

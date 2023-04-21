@@ -55,7 +55,7 @@ public:
 
 		assert(metaStateArray.size() == dataStateArray.size());
 
-		// If item's init value is defined, parse and initialize with it, otherwise make default empty sprite
+		// If item's 'itemFileDataRef' value is defined, parse and initialize with it, otherwise make default empty item
 		if(metaStateArray.empty() == false)
 		{
 			for(int i = 0; i < metaStateArray.size(); ++i)
@@ -102,7 +102,6 @@ public:
 	
 		return iIndex;
 	}
-	
 	template<typename STATEDATA>
 	void InsertState(int iStateIndex, FileDataPair stateFileData)
 	{

@@ -65,12 +65,12 @@ public:
 class EntityUndoCmd_PasteItems : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
-	QJsonArray						m_PastedItemArray;
+	QJsonObject						m_PasteMimeObject;
 	QList<EntityTreeItemData *>		m_PastedItemList;
 	EntityTreeItemData *			m_pArrayFolder;
 
 public:
-	EntityUndoCmd_PasteItems(ProjectItemData &entityItemRef, QJsonArray pastedItemArray, EntityTreeItemData *pArrayFolder, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_PasteItems(ProjectItemData &entityItemRef, QJsonObject pasteMimeObject, EntityTreeItemData *pArrayFolder, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_PasteItems();
 
 	virtual void redo() override;
@@ -120,12 +120,14 @@ public:
 class EntityUndoCmd_Transform : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
+	int								m_iStateIndex;
 	QList<EntityTreeItemData *>		m_AffectedItemDataList;
 	QList<glm::mat4>				m_NewTransformList;
 	QList<glm::mat4>				m_OldTransformList;
+	QString							m_sOldShapeData;
 
 public:
-	EntityUndoCmd_Transform(ProjectItemData &entityItemRef, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_Transform(ProjectItemData &entityItemRef, int iStateIndex, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_Transform();
 
 	virtual void redo() override;
@@ -138,13 +140,14 @@ public:
 class EntityUndoCmd_ShapeData : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
+	int								m_iStateIndex;
 	EntityTreeItemData *			m_pShapeItemData;
 	ShapeCtrl::VemAction			m_eVemAction;
 	QString							m_sNewData;
 	QString							m_sPrevData;
 
 public:
-	EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, ShapeCtrl::VemAction eVemAction, QString sNewData, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, int iStateIndex, EntityTreeItemData *pShapeItemData, ShapeCtrl::VemAction eVemAction, QString sNewData, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_ShapeData();
 
 	virtual void redo() override;

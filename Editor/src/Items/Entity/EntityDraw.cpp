@@ -61,8 +61,14 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				if(m_pCurVertexEditItem->GetShapeCtrl().TransformVemVerts(ShapeCtrl::VEMACTION_RemoveSelected, glm::vec2(), glm::vec2(), m_pCamera) == false)
 					return;
 
+				int iStateIndex = 0;
+				if(m_pProjItem->GetWidget() == nullptr)
+					HyGuiLog("EntityDraw::OnKeyPressEvent - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
+				else
+					iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
+
 				EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(m_pCurVertexEditItem->GetThisUuid());
-				QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, pTreeItemData, ShapeCtrl::VEMACTION_RemoveSelected, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
+				QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, iStateIndex, pTreeItemData, ShapeCtrl::VEMACTION_RemoveSelected, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
 				m_pProjItem->GetUndoStack()->push(pCmd);
 			}
 		}
@@ -859,8 +865,14 @@ void EntityDraw::DoMouseRelease_Transform()
 		treeItemDataList.push_back(pTreeItemData);
 	}
 
+	int iStateIndex = 0;
+	if(m_pProjItem->GetWidget() == nullptr)
+		HyGuiLog("EntityDraw::DoMouseRelease_Transform - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
+	else
+		iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
+
 	// Transferring the children in 'm_ActiveTransform' back into *this will be done automatically in OnApplyJsonMeta()
-	QUndoCommand *pCmd = new EntityUndoCmd_Transform(*m_pProjItem, treeItemDataList, newTransformList, m_PrevTransformList);
+	QUndoCommand *pCmd = new EntityUndoCmd_Transform(*m_pProjItem, iStateIndex, treeItemDataList, newTransformList, m_PrevTransformList);
 	m_pProjItem->GetUndoStack()->push(pCmd);
 
 	// Reset 'm_ActiveTransform' to prep for the next transform
@@ -1000,7 +1012,13 @@ void EntityDraw::DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 		{
 			EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(m_pCurVertexEditItem->GetThisUuid());
 
-			QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, pTreeItemData, m_eCurVemAction, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
+			int iStateIndex = 0;
+			if(m_pProjItem->GetWidget() == nullptr)
+				HyGuiLog("EntityDraw::DoMouseRelease_ShapeEdit - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
+			else
+				iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
+
+			QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, iStateIndex, pTreeItemData, m_eCurVemAction, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
 			m_pProjItem->GetUndoStack()->push(pCmd);
 		}
 

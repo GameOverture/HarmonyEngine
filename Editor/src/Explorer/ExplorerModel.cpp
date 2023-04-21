@@ -238,11 +238,13 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 		if(pasteObj["isPrefix"].toBool())
 			continue;
 		
-		for(int iAssetCount = 0; iAssetCount < NUMASSETTYPES; ++iAssetCount)
+		for(int iAssetType = 0; iAssetType < NUMASSETTYPES; ++iAssetType)
 		{
-			QJsonArray assetArray = pasteObj[HyGlobal::AssetName(static_cast<AssetType>(iAssetCount))].toArray();
-			if(pDestProject->PasteAssets(ePasteItemType, assetArray, static_cast<AssetType>(iAssetCount)) == false)
-				HyGuiLog("Paste failed to import assets of type: " % QString::number(iAssetCount), LOGTYPE_Error);
+			AssetType eAssetType = static_cast<AssetType>(iAssetType);
+
+			QJsonArray assetArray = pasteObj[HyGlobal::AssetName(eAssetType)].toArray();
+			if(pDestProject->PasteAssets(ePasteItemType, assetArray, eAssetType) == false)
+				HyGuiLog("Paste failed to import assets of type: " % HyGlobal::AssetName(eAssetType), LOGTYPE_Error);
 		}
 		
 		// Import any missing fonts (.ttf)
@@ -298,6 +300,7 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 																			sName,
 																			initFileItemData,
 																			false));
+		pImportedProjItem->LoadModel();
 		
 		if(pImportedProjItem->Save(true) == false)
 			return false;

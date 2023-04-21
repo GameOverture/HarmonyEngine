@@ -29,7 +29,7 @@ AudioStateData::AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair s
 		Cmd_AddAudioAsset(static_cast<AudioAsset *>(dependeeList[i]));
 
 	if(dataPlayListArray.size() != dependeeList.size())
-		HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
+		HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored audio assets", LOGTYPE_Error);
 
 	// NOTE: This 'sPlayListModeList' order must be preserved as it is saved as an index
 	QStringList sPlayListModeList;

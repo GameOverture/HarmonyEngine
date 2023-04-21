@@ -155,12 +155,12 @@ EntityUndoCmd_PopItems::EntityUndoCmd_PopItems(ProjectItemData &entityItemRef, Q
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_PasteItems::EntityUndoCmd_PasteItems(ProjectItemData &entityItemRef, QJsonArray pastedItemArray, EntityTreeItemData *pArrayFolder, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_PasteItems::EntityUndoCmd_PasteItems(ProjectItemData &entityItemRef, QJsonObject pasteMimeObject, EntityTreeItemData *pArrayFolder, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
-	m_PastedItemArray(pastedItemArray),
+	m_PasteMimeObject(pasteMimeObject),
 	m_pArrayFolder(pArrayFolder)
 {
-	setText("Pasted " % QString::number(m_PastedItemArray.size()) % " items");
+	setText("Pasted " % QString::number(m_PasteMimeObject["itemArray"].toArray().size()) % " items");
 }
 
 /*virtual*/ EntityUndoCmd_PasteItems::~EntityUndoCmd_PasteItems()
@@ -169,40 +169,18 @@ EntityUndoCmd_PasteItems::EntityUndoCmd_PasteItems(ProjectItemData &entityItemRe
 
 /*virtual*/ void EntityUndoCmd_PasteItems::redo() /*override*/
 {
-	QList<QUuid> pastedItemUuidList;
-
 	if(m_PastedItemList.empty())
-	{
-		for(int i = 0; i < m_PastedItemArray.size(); ++i)
-		{
-			QJsonObject itemObj = m_PastedItemArray[i].toObject();
-
-			bool bIsArrayItem = false;
-			if(m_pArrayFolder)
-			{
-				HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(itemObj["itemType"].toString());
-				if(eGuiType != m_pArrayFolder->GetType())
-				{
-					HyGuiLog("EntityUndoCmd_PasteItems::redo - pasted array item (" % itemObj["codeName"].toString() % ") " % itemObj["itemType"].toString() % " did match array type", LOGTYPE_Error);
-					continue;
-				}
-
-				itemObj["codeName"] = m_pArrayFolder->GetCodeName();
-				bIsArrayItem = true;
-			}
-
-			EntityTreeItemData *pPastedTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewItem(itemObj, bIsArrayItem, -1);
-			m_PastedItemList.push_back(pPastedTreeItemData);
-
-			pastedItemUuidList << pPastedTreeItemData->GetThisUuid();
-		}
-	}
+		m_PastedItemList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewPasteItems(m_PasteMimeObject, m_pArrayFolder);
 	else
 	{
 		for(EntityTreeItemData *pItem : m_PastedItemList)
-			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(pItem, -1);
+			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(pItem, -1); // NOTE: If readding back into an array, the ArrayFolder will exist because this UndoCmd cannot create a new array
 	}
 
+	// Select the pasted items
+	QList<QUuid> pastedItemUuidList;
+	for(EntityTreeItemData *pItem : m_PastedItemList)
+		pastedItemUuidList << pItem->GetThisUuid();
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
 		pWidget->RequestSelectedItems(pastedItemUuidList);
@@ -323,8 +301,9 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef, int iStateIndex, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
+	m_iStateIndex(iStateIndex),
 	m_AffectedItemDataList(affectedItemDataList),
 	m_NewTransformList(newTransformList),
 	m_OldTransformList(oldTransformList)
@@ -350,25 +329,25 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	QList<QUuid> affectedItemUuidList;
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
-		glm::decompose(m_NewTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
-		double dRotation = glm::degrees(glm::atan(m_NewTransformList[i][0][1], m_NewTransformList[i][0][0]));
-
 		if(m_AffectedItemDataList[i]->GetType() != ITEM_Shape)
 		{
-			m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
-			m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Rotation", dRotation);
-			m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+			glm::decompose(m_NewTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
+			double dRotation = glm::degrees(glm::atan(m_NewTransformList[i][0][1], m_NewTransformList[i][0][0]));
+
+			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
+			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Rotation", dRotation);
+			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
 		}
 		else
 		{
-			HyColor color = HyColor::White;
-
 			ShapeCtrl shapeCtrl(nullptr);
-			shapeCtrl.Setup(HyGlobal::GetShapeFromString(m_AffectedItemDataList[i]->GetPropertiesModel().FindPropertyValue("Shape", "Type").toString()), color, 0.0f, 1.0f);
-			shapeCtrl.Deserialize(m_AffectedItemDataList[i]->GetPropertiesModel().FindPropertyValue("Shape", "Data").toString(), nullptr);
+			shapeCtrl.Setup(HyGlobal::GetShapeFromString(m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).FindPropertyValue("Shape", "Type").toString()), HyColor::White, 0.0f, 1.0f);
+
+			m_sOldShapeData = m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).FindPropertyValue("Shape", "Data").toString();
+			shapeCtrl.Deserialize(m_sOldShapeData, nullptr);
 			shapeCtrl.TransformSelf(m_NewTransformList[i]);
 			
-			m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Shape", "Data", shapeCtrl.Serialize());
+			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Shape", "Data", shapeCtrl.Serialize());
 		}
 
 		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
@@ -377,6 +356,8 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
 		pWidget->RequestSelectedItems(affectedItemUuidList);
+
+	m_EntityItemRef.FocusWidgetState(m_iStateIndex, -1);
 }
 
 /*virtual*/ void EntityUndoCmd_Transform::undo() /*override*/
@@ -389,12 +370,17 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	QList<QUuid> affectedItemUuidList;
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
-		glm::decompose(m_OldTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
+		if(m_AffectedItemDataList[i]->GetType() != ITEM_Shape)
+		{
+			glm::decompose(m_OldTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
 
-		double dRotation = glm::degrees(glm::atan(m_OldTransformList[i][0][1], m_OldTransformList[i][0][0]));
-		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
-		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Rotation", dRotation);
-		m_AffectedItemDataList[i]->GetPropertiesModel().SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+			double dRotation = glm::degrees(glm::atan(m_OldTransformList[i][0][1], m_OldTransformList[i][0][0]));
+			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
+			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Rotation", dRotation);
+			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+		}
+		else
+			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Shape", "Data", m_sOldShapeData);
 
 		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
 	}
@@ -402,16 +388,19 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
 		pWidget->RequestSelectedItems(affectedItemUuidList);
+
+	m_EntityItemRef.FocusWidgetState(m_iStateIndex, -1);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, ShapeCtrl::VemAction eVemAction, QString sNewData, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, int iStateIndex, EntityTreeItemData *pShapeItemData, ShapeCtrl::VemAction eVemAction, QString sNewData, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
+	m_iStateIndex(iStateIndex),
 	m_pShapeItemData(pShapeItemData),
 	m_eVemAction(eVemAction),
 	m_sNewData(sNewData),
-	m_sPrevData(m_pShapeItemData->GetPropertiesModel().FindPropertyValue("Shape", "Data").toString())
+	m_sPrevData(m_pShapeItemData->GetPropertiesModel(iStateIndex).FindPropertyValue("Shape", "Data").toString())
 {
 	switch(m_eVemAction)
 	{
@@ -447,7 +436,7 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef,
 
 /*virtual*/ void EntityUndoCmd_ShapeData::redo() /*override*/
 {
-	m_pShapeItemData->GetPropertiesModel().SetPropertyValue("Shape", "Data", m_sNewData);
+	m_pShapeItemData->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Shape", "Data", m_sNewData);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
@@ -460,7 +449,7 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef,
 
 /*virtual*/ void EntityUndoCmd_ShapeData::undo() /*override*/
 {
-	m_pShapeItemData->GetPropertiesModel().SetPropertyValue("Shape", "Data", m_sPrevData);
+	m_pShapeItemData->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Shape", "Data", m_sPrevData);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
@@ -491,14 +480,24 @@ EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityIt
 
 /*virtual*/ void EntityUndoCmd_ConvertShape::redo() /*override*/
 {
-	EditorShape eShape = HyGlobal::GetShapeFromString(m_pPrevShapeItemData->GetPropertiesModel().FindPropertyValue("Shape", "Type").toString());
-	QString sData = m_pPrevShapeItemData->GetPropertiesModel().FindPropertyValue("Shape", "Data").toString();
-	bool bConvertingToPrimitive = m_pPrevShapeItemData->GetType() == ITEM_Shape;
-
 	m_iPoppedIndex = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pPrevShapeItemData);
 
 	if(m_pNewShapeItemData == nullptr)
+	{
+		EditorShape eShape = HyGlobal::GetShapeFromString(m_pPrevShapeItemData->GetPropertiesModel(0).FindPropertyValue("Shape", "Type").toString());
+		QString sData = m_pPrevShapeItemData->GetPropertiesModel(0).FindPropertyValue("Shape", "Data").toString();
+		bool bConvertingToPrimitive = m_pPrevShapeItemData->GetType() == ITEM_Shape;
+
 		m_pNewShapeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewShape(eShape, sData, bConvertingToPrimitive, -1);
+		for(int iStateIndex = 0; iStateIndex < m_EntityItemRef.GetModel()->GetNumStates(); ++iStateIndex)
+		{
+			QString sPrevShapeType = m_pPrevShapeItemData->GetPropertiesModel(iStateIndex).FindPropertyValue("Shape", "Type").toString();
+			QString sPrevShapeData = m_pPrevShapeItemData->GetPropertiesModel(iStateIndex).FindPropertyValue("Shape", "Data").toString();
+
+			m_pNewShapeItemData->GetPropertiesModel(iStateIndex).SetPropertyValue("Shape", "Type", sPrevShapeType);
+			m_pNewShapeItemData->GetPropertiesModel(iStateIndex).SetPropertyValue("Shape", "Data", sPrevShapeData);
+		}
+	}
 	else
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pNewShapeItemData, -1);
 

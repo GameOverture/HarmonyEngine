@@ -96,7 +96,7 @@ bool EntityDrawItem::IsMouseInBounds()
 	return HyEngine::Input().GetWorldMousePos(ptWorldMousePos) && boundingShape.TestPoint(transformMtx, ptWorldMousePos);
 }
 
-// NOTE: This matches how EntityTreeItemData::InitalizePropertiesTree initializes the 'm_PropertiesTreeModel'
+// NOTE: This matches how EntityStateData::InitalizePropertyModel initializes the 'PropertiesTreeModel'
 //		 Updates here should reflect to the function above
 void EntityDrawItem::RefreshJson(QJsonObject childObj, HyCamera2d *pCamera)
 {
