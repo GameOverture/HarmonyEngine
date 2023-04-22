@@ -511,7 +511,10 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 	{
 		QModelIndex curIndex = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapToSource(ui->treeView->selectionModel()->currentIndex());
 		if(curIndex.isValid())
-			GetExplorerModel()->PasteItemSrc(static_cast<const ProjectItemMimeData *>(pMimeData), curIndex);
+		{
+			if(GetExplorerModel()->PasteItemSrc(static_cast<const ProjectItemMimeData *>(pMimeData), curIndex) == false)
+				HyGuiLog("ExplorerModel::PasteItemSrc returned false", LOGTYPE_Error);
+		}
 	}
 }
 

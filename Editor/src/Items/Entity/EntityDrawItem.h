@@ -38,7 +38,7 @@ public:
 
 	bool IsMouseInBounds();
 
-	void RefreshJson(QJsonObject childObj, HyCamera2d *pCamera);
+	void RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCamera2d *pCamera);
 	void RefreshTransform(HyCamera2d *pCamera);
 	void RefreshOverrideData(Project &projectRef);
 

@@ -98,23 +98,23 @@ bool EntityDrawItem::IsMouseInBounds()
 
 // NOTE: This matches how EntityStateData::InitalizePropertyModel initializes the 'PropertiesTreeModel'
 //		 Updates here should reflect to the function above
-void EntityDrawItem::RefreshJson(QJsonObject childObj, HyCamera2d *pCamera)
+void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCamera2d *pCamera)
 {
 	if(m_eGuiType == ITEM_Prefix) // aka Shapes folder
 		return;
 
 	IHyLoadable2d *pHyNode = GetHyNode();
-	bool bIsSelected = childObj["isSelected"].toBool();
+	bool bIsSelected = descObj["isSelected"].toBool();
 
 	// Parse all and only the potential categories of the 'm_eGuiType' type, and set the values to 'pHyNode'
 	HyColor colorTint = ENTCOLOR_Shape;
 	if(m_eGuiType != ITEM_Shape)
 	{
-		QJsonObject commonObj = childObj["Common"].toObject();
+		QJsonObject commonObj = propObj["Common"].toObject();
 		pHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
 		pHyNode->SetTag(commonObj["User Tag"].toVariant().toLongLong());
 
-		QJsonObject transformObj = childObj["Transformation"].toObject();
+		QJsonObject transformObj = propObj["Transformation"].toObject();
 		QJsonArray posArray = transformObj["Position"].toArray();
 		pHyNode->pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
 		pHyNode->rot.Set(transformObj["Rotation"].toDouble());
@@ -123,7 +123,7 @@ void EntityDrawItem::RefreshJson(QJsonObject childObj, HyCamera2d *pCamera)
 
 		if(m_eGuiType != ITEM_Audio && (pHyNode->GetInternalFlags() & IHyNode::NODETYPE_IsBody) != 0)
 		{
-			QJsonObject bodyObj = childObj["Body"].toObject();
+			QJsonObject bodyObj = propObj["Body"].toObject();
 			pHyNode->SetVisible(bodyObj["Visible"].toBool());
 
 			QJsonArray colorArray = bodyObj["Color Tint"].toArray();
@@ -145,13 +145,13 @@ void EntityDrawItem::RefreshJson(QJsonObject childObj, HyCamera2d *pCamera)
 		break;
 
 	case ITEM_Primitive: {
-		QJsonObject primitiveObj = childObj["Primitive"].toObject();
+		QJsonObject primitiveObj = propObj["Primitive"].toObject();
 		static_cast<HyPrimitive2d *>(pHyNode)->SetWireframe(primitiveObj["Wireframe"].toBool());
 		static_cast<HyPrimitive2d *>(pHyNode)->SetLineThickness(primitiveObj["Line Thickness"].toDouble());
 		}
 		[[fallthrough]];
 	case ITEM_Shape: {
-		QJsonObject shapeObj = childObj["Shape"].toObject();
+		QJsonObject shapeObj = propObj["Shape"].toObject();
 		EditorShape eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
 		float fBvAlpha = (m_eGuiType == ITEM_Shape) ? 0.0f : 1.0f;
 		float fOutlineAlpha = (m_eGuiType == ITEM_Shape || bIsSelected) ? 1.0f : 0.0f;
@@ -166,13 +166,13 @@ void EntityDrawItem::RefreshJson(QJsonObject childObj, HyCamera2d *pCamera)
 	//	break;
 
 	case ITEM_Text: {
-		QJsonObject textObj = childObj["Text"].toObject();
+		QJsonObject textObj = propObj["Text"].toObject();
 		static_cast<HyText2d *>(pHyNode)->SetState(textObj["State"].toInt());
 		static_cast<HyText2d *>(pHyNode)->SetText(textObj["Text"].toString().toStdString());
 		break; }
 
 	case ITEM_Sprite: {
-		QJsonObject spriteObj = childObj["Sprite"].toObject();
+		QJsonObject spriteObj = propObj["Sprite"].toObject();
 		static_cast<HySprite2d *>(pHyNode)->SetState(spriteObj["State"].toInt());
 		static_cast<HySprite2d *>(pHyNode)->SetFrame(spriteObj["Frame"].toInt());
 		break; }

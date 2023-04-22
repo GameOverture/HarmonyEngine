@@ -254,38 +254,59 @@ void EntityDraw::ClearShapeEdit()
 
 	QJsonArray childArray = itemMetaObj["childList"].toArray();
 	QJsonArray shapeArray = itemMetaObj["shapeList"].toArray();
+	
+	QJsonObject stateObj = itemMetaObj["stateArray"].toArray()[m_pProjItem->GetWidget()->GetCurStateIndex()].toObject();
+	QJsonArray propChildArray = stateObj["propChildList"].toArray();
+	QJsonArray propShapeArray = stateObj["propShapeList"].toArray();
 
 	// Pull out all the valid json objects that represent items in the entity
-	QList<QJsonObject> itemObjectList;
+	QList<QJsonObject> descObjList;
+	QList<QJsonObject> propObjList;
 	for(int32 i = 0; i < childArray.size(); ++i)
 	{
 		if(childArray[i].isObject())
-			itemObjectList.push_back(childArray[i].toObject());
+		{
+			descObjList.push_back(childArray[i].toObject());
+			propObjList.push_back(propChildArray[i].toObject());
+		}
 		else if(childArray[i].isArray())
 		{
 			QJsonArray arrayFolder = childArray[i].toArray();
+			QJsonArray arrayPropFolder = propChildArray[i].toArray();
 			for(int32 j = 0; j < arrayFolder.size(); ++j)
-				itemObjectList.push_back(arrayFolder[j].toObject());
+			{
+				descObjList.push_back(arrayFolder[j].toObject());
+				propObjList.push_back(arrayPropFolder[j].toObject());
+			}
 		}
 	}
 	for(int32 i = 0; i < shapeArray.size(); ++i)
 	{
 		if(shapeArray[i].isObject())
-			itemObjectList.push_back(shapeArray[i].toObject());
+		{
+			descObjList.push_back(shapeArray[i].toObject());
+			propObjList.push_back(propShapeArray[i].toObject());
+		}
 		else if(shapeArray[i].isArray())
 		{
 			QJsonArray arrayFolder = shapeArray[i].toArray();
+			QJsonArray arrayPropFolder = propShapeArray[i].toArray();
 			for(int32 j = 0; j < arrayFolder.size(); ++j)
-				itemObjectList.push_back(arrayFolder[j].toObject());
+			{
+				descObjList.push_back(arrayFolder[j].toObject());
+				propObjList.push_back(arrayPropFolder[j].toObject());
+			}
 		}
 	}
+	if(descObjList.size() != propObjList.size())
+		HyGuiLog("EntityDraw::OnApplyJsonMeta() - descObjList.size() != propObjList.size()", LOGTYPE_Error);
 
-	for(int32 i = 0; i < itemObjectList.size(); ++i)
+	for(int32 i = 0; i < descObjList.size(); ++i)
 	{
-		QJsonObject childObj = itemObjectList[i];
-		HyGuiItemType eType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
-		QUuid uuid(childObj["Common"].toObject()["UUID"].toString());
-		bool bSelected = childObj["isSelected"].toBool();
+		QJsonObject descObj = descObjList[i];
+		HyGuiItemType eType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
+		QUuid uuid(descObj["UUID"].toString());
+		bool bSelected = descObj["isSelected"].toBool();
 
 		EntityDrawItem *pItemWidget = nullptr;
 		for(EntityDrawItem *pStaleItem : staleItemList)
@@ -298,7 +319,7 @@ void EntityDraw::ClearShapeEdit()
 		}
 		if(pItemWidget == nullptr)
 		{
-			QUuid itemUuid(childObj["itemUUID"].toString());
+			QUuid itemUuid(descObj["itemUUID"].toString());
 			pItemWidget = new EntityDrawItem(m_pProjItem->GetProject(), eType, uuid, itemUuid, this);
 		}
 		else
@@ -312,7 +333,7 @@ void EntityDraw::ClearShapeEdit()
 		else
 			pItemWidget->HideTransformCtrl();
 
-		pItemWidget->RefreshJson(childObj, m_pCamera);
+		pItemWidget->RefreshJson(descObj, propObjList[i], m_pCamera);
 	}
 	
 	// Delete all the remaining stale items

@@ -301,9 +301,8 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 																			initFileItemData,
 																			false));
 		pImportedProjItem->LoadModel();
-		
 		if(pImportedProjItem->Save(true) == false)
-			return false;
+			HyGuiLog("Paste failed to save item: " % sItemPath, LOGTYPE_Error);
 	}
 
 	return true;

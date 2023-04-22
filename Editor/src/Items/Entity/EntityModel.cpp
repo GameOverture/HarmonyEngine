@@ -186,7 +186,7 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 		propChildArrayList.push_back(stateObj["propChildList"].toArray());
 		propShapeArrayList.push_back(stateObj["propShapeList"].toArray());
 	}
-	if(propChildArrayList.size() != GetNumStates() || propShapeArrayList.size() != GetNumStates())
+	if(stateArray.size() != 0 && (propChildArrayList.size() != GetNumStates() || propShapeArrayList.size() != GetNumStates()))
 		HyGuiLog("EntityModel::EntityModel - invalid number of states when parsing properties", LOGTYPE_Error);
 	
 	std::function<void(const QJsonArray &, const QList<QJsonArray> &)> fpPopulateNodeTreeItems = 
@@ -604,7 +604,10 @@ void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDat
 			++i;
 		}
 	}
-	fileDataPairOut.m_Meta.insert("childList", childArray);
+	if(iStateIndex == -1)
+		fileDataPairOut.m_Meta.insert("childList", childArray);
+	else
+		fileDataPairOut.m_Meta.insert("propChildList", childArray);
 
 	QJsonArray shapeArray;
 	sCurrentArrayCodeName = "";
@@ -641,5 +644,8 @@ void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDat
 			++i;
 		}
 	}
-	fileDataPairOut.m_Meta.insert("shapeList", shapeArray);
+	if(iStateIndex == -1)
+		fileDataPairOut.m_Meta.insert("shapeList", shapeArray);
+	else
+		fileDataPairOut.m_Meta.insert("propShapeList", shapeArray);
 }
