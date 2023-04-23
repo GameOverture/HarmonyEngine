@@ -84,7 +84,7 @@ void DlgImportTileSheet::on_buttonBox_accepted()
 		correspondingUuidList.append(QUuid::createUuid());
 	}
 
-	m_ProjectRef.GetAtlasModel().ImportNewAssets(sImageImportList, uiBankId, ITEM_AtlasImage, correspondingParentList, correspondingUuidList);
+	m_ProjectRef.GetAtlasModel().ImportNewAssets(sImageImportList, uiBankId, ITEM_AtlasFrame, correspondingParentList, correspondingUuidList);
 }
 
 void DlgImportTileSheet::on_btnImageBrowse_clicked()

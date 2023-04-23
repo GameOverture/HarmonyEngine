@@ -324,12 +324,22 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(ProjectItemData *pProjIt
 	return pNewItem;
 }
 
-EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(AssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow /*= -1*/)
+EntityTreeItemData *EntityTreeModel::Cmd_InsertNewAsset(AssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow /*= -1*/)
 {
 	// Generate a unique code name for this new item
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pAssetItem->GetName());
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, pAssetItem->GetManagerAssetType() == ASSET_Atlas ? ITEM_AtlasImage : ITEM_Audio, ENTTYPE_Item, QUuid(), QUuid::createUuid());
+	HyGuiItemType eItemType = ITEM_Unknown;
+	switch(pAssetItem->GetManagerAssetType())
+	{
+	case ASSET_Atlas: eItemType = ITEM_AtlasFrame; break;
+	case ASSET_Audio: eItemType = ITEM_SoundClip; break;
+	default:
+		HyGuiLog("EntityTreeModel::Cmd_InsertNewAsset - tried to add an unhandled asset manager type: " % QString::number(pAssetItem->GetManagerAssetType()), LOGTYPE_Error);
+		break;
+	}
+
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, eItemType, ENTTYPE_Item, QUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
 
 	return pNewItem;

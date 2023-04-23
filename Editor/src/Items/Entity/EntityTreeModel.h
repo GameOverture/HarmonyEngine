@@ -90,7 +90,7 @@ public:
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 	EntityTreeItemData *Cmd_InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
-	EntityTreeItemData *Cmd_InsertNewChild(AssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_InsertNewAsset(AssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewItem(QJsonObject descObj, QJsonArray propArray, bool bIsArrayItem, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, QString sCodeNamePrefix, int iRow = -1);
 	bool Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow);

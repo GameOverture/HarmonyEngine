@@ -283,7 +283,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewAssets(QList<AssetItemData *>
 	QList<QUuid> registerList;
 	for(auto *pAssetItem : assetItemList)
 	{
-		EntityTreeItemData *pAddedItem = m_TreeModel.Cmd_InsertNewChild(pAssetItem, "m_", iRow);
+		EntityTreeItemData *pAddedItem = m_TreeModel.Cmd_InsertNewAsset(pAssetItem, "m_", iRow);
 		if(pAddedItem)
 			treeNodeList.push_back(pAddedItem);
 		else

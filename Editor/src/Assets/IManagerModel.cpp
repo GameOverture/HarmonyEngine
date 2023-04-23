@@ -174,8 +174,8 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, H
 		switch(m_eASSET_TYPE)
 		{
 		case ASSET_Source:	eType = ITEM_Source;		break;
-		case ASSET_Atlas:	eType = ITEM_AtlasImage;	break;
-		case ASSET_Audio:	eType = ITEM_Audio;			break;
+		case ASSET_Atlas:	eType = ITEM_AtlasFrame;	break;
+		case ASSET_Audio:	eType = ITEM_SoundClip;		break;
 		}
 	}
 

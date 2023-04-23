@@ -34,7 +34,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, HyGuiItemType eGuiType, QUui
 
 	case ITEM_Entity:			m_pChild = new HyEntity2d(pParent); break;
 
-	case ITEM_AtlasImage:		//m_pChild = new HyTexturedQuad2d(); break;
+	case ITEM_AtlasFrame:		//m_pChild = new HyTexturedQuad2d(); break;
 	default:
 		HyGuiLog("EntityDrawItem ctor - unhandled child node type", LOGTYPE_Error);
 		break;
@@ -231,9 +231,10 @@ void EntityDrawItem::RefreshOverrideData(Project &projectRef)
 
 		case ITEM_Primitive:
 		case ITEM_Audio:
-		case ITEM_AtlasImage:
+		case ITEM_AtlasFrame:
+		case ITEM_SoundClip:
 		default:
-			HyLogError("EntityDraw::ItemWidget::RefreshOverrideData - unhandled child node type");
+			HyLogError("EntityDraw::ItemWidget::RefreshOverrideData - unhandled gui item type");
 			break;
 		}
 	}
@@ -245,7 +246,7 @@ void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &tr
 	switch(GetGuiType())
 	{
 	case ITEM_Shape:
-	case ITEM_AtlasImage:
+	case ITEM_AtlasFrame:
 	case ITEM_Primitive:
 	case ITEM_Text:
 	case ITEM_Spine:

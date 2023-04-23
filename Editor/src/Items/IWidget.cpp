@@ -125,6 +125,7 @@ void IWidget::OnAddStateTriggered()
 		pCmd = new UndoCmd_AddState<TextStateData>("Add Text State", m_ItemRef);
 		break;
 	case ITEM_Entity:
+		// TODO: Ask to copy from other state or create OnDuplicateStateTriggered())
 		pCmd = new UndoCmd_AddState<EntityStateData>("Add Entity State", m_ItemRef);
 		break;
 	case ITEM_Prefab:

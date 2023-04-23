@@ -530,7 +530,7 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiB
 	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.sizeInBytes());
 
 	QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
-	if(eType == ITEM_AtlasImage) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
+	if(eType == ITEM_AtlasFrame) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
 		rAlphaCrop = ImagePacker::crop(newImage);
 
 	HyTextureInfo info(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0);

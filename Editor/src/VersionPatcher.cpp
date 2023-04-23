@@ -564,7 +564,7 @@
 			iAtlasItemType = ITEM_Filter;
 			break;
 		case ATLASITEM_Image:
-			iAtlasItemType =ITEM_AtlasImage;
+			iAtlasItemType = ITEM_AtlasFrame;
 			break;
 		case ATLASITEM_Font:
 			iAtlasItemType =ITEM_Text;

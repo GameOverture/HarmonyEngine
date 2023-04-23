@@ -94,16 +94,16 @@ void DlgNewProject::on_buttonBox_accepted()
 	// DATA
 	buildDir.mkdir(ui->wgtDataDir->GetRelPath());
 	buildDir.cd(ui->wgtDataDir->GetRelPath());
-	buildDir.mkdir(HyGlobal::ItemName(ITEM_AtlasImage, true));
-	buildDir.mkdir(HyGlobal::ItemName(ITEM_Audio, true));
+	buildDir.mkdir(HyGlobal::AssetName(ASSET_Atlas));
+	buildDir.mkdir(HyGlobal::AssetName(ASSET_Audio));
 
 	// META-DATA
 	buildDir.setPath(GetProjDirPath());
 	buildDir.mkdir(ui->wgtMetaDir->GetRelPath());
 	buildDir.cd(ui->wgtMetaDir->GetRelPath());
-	buildDir.mkdir(HyGlobal::ItemName(ITEM_Source, true));
-	buildDir.mkdir(HyGlobal::ItemName(ITEM_AtlasImage, true));
-	buildDir.mkdir(HyGlobal::ItemName(ITEM_Audio, true));
+	buildDir.mkdir(HyGlobal::AssetName(ASSET_Source));
+	buildDir.mkdir(HyGlobal::AssetName(ASSET_Atlas));
+	buildDir.mkdir(HyGlobal::AssetName(ASSET_Audio));
 
 	// SOURCE
 	buildDir.setPath(GetProjDirPath());

@@ -41,7 +41,8 @@
 	sm_sItemNames[ITEM_Project] = "Project";
 	sm_sItemNames[ITEM_Prefix] = "Prefix";
 	sm_sItemNames[ITEM_Filter] = "Filter";
-	sm_sItemNames[ITEM_AtlasImage] = "Atlas";
+	sm_sItemNames[ITEM_AtlasFrame] = "AtlasFrame";
+	sm_sItemNames[ITEM_SoundClip] = "SoundClip";
 	sm_sItemNames[ITEM_Primitive] = "Primitive";
 	sm_sItemNames[ITEM_Audio] = "Audio";
 	sm_sItemNames[ITEM_Particles] = "Particles";
@@ -59,7 +60,8 @@
 	sm_sItemNamesPlural[ITEM_Project] = "Projects";
 	sm_sItemNamesPlural[ITEM_Prefix] = "Prefixes";
 	sm_sItemNamesPlural[ITEM_Filter] = "Filters";
-	sm_sItemNamesPlural[ITEM_AtlasImage] = "Atlases";
+	sm_sItemNamesPlural[ITEM_AtlasFrame] = "AtlasFrames";
+	sm_sItemNamesPlural[ITEM_SoundClip] = "SoundClips";
 	sm_sItemNamesPlural[ITEM_Primitive] = "Primitives";
 	sm_sItemNamesPlural[ITEM_Audio] = "Audio";
 	sm_sItemNamesPlural[ITEM_Particles] = "Particles";
@@ -109,7 +111,8 @@
 	sm_ItemColors[ITEM_Project] = QColor(9, 215, 33);
 	sm_ItemColors[ITEM_Prefix] = QColor(228, 212, 128);
 	sm_ItemColors[ITEM_Filter] = QColor(228, 212, 128);
-	sm_ItemColors[ITEM_AtlasImage] = QColor(45, 131, 176);
+	sm_ItemColors[ITEM_AtlasFrame] = QColor(45, 131, 176);
+	sm_ItemColors[ITEM_SoundClip] = QColor(203, 233, 131);
 	sm_ItemColors[ITEM_Primitive] = QColor(101, 233, 235);
 	sm_ItemColors[ITEM_Audio] = QColor(203, 233, 131);
 	sm_ItemColors[ITEM_Particles] = QColor(218, 0, 0);
@@ -166,7 +169,8 @@
 	list.append(ITEM_Project);
 	list.append(ITEM_Prefix);
 	list.append(ITEM_Filter);
-	list.append(ITEM_AtlasImage);
+	list.append(ITEM_AtlasFrame);
+	list.append(ITEM_SoundClip);
 	list.append(ITEM_Primitive);
 	list.append(ITEM_Audio);
 	list.append(ITEM_Particles);
@@ -267,11 +271,11 @@
 	case ASSET_Source:
 		return sm_ItemIcons[ITEM_Source][eSubIcon];
 	case ASSET_Atlas:
-		return sm_ItemIcons[ITEM_AtlasImage][eSubIcon];
+		return sm_ItemIcons[ITEM_AtlasFrame][eSubIcon];
 	case ASSET_Prefabs:
 		return sm_ItemIcons[ITEM_Prefab][eSubIcon];
 	case ASSET_Audio:
-		return sm_ItemIcons[ITEM_Audio][eSubIcon];
+		return sm_ItemIcons[ITEM_SoundClip][eSubIcon];
 
 	case ASSET_Unknown:
 	default:
