@@ -62,7 +62,7 @@ public:
 
 	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from this constructor and from UndoCmd's
 	QList<EntityTreeItemData *> Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow);
-	QList<EntityTreeItemData *> Cmd_AddNewAssets(QList<AssetItemData *> assetItemList, int iRow);
+	QList<EntityTreeItemData *> Cmd_AddNewAssets(QList<IAssetItemData *> assetItemList, int iRow);
 	EntityTreeItemData *Cmd_AddNewItem(QJsonObject descObj, QJsonArray propsArray, bool bIsArrayItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
 	EntityTreeItemData *Cmd_AddNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, int iRow);
 	QList<EntityTreeItemData *> Cmd_AddNewPasteItems(QJsonObject mimeObject, EntityTreeItemData *pArrayFolder);
@@ -84,7 +84,6 @@ public:
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
-	virtual QList<AssetItemData *> GetAssets(AssetManagerType eAssetType) const override;
 
 	void InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDataPairOut) const; // Pass -1 when saving the 'global' common data
 };

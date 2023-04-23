@@ -324,7 +324,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(ProjectItemData *pProjIt
 	return pNewItem;
 }
 
-EntityTreeItemData *EntityTreeModel::Cmd_InsertNewAsset(AssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow /*= -1*/)
+EntityTreeItemData *EntityTreeModel::Cmd_InsertNewAsset(IAssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow /*= -1*/)
 {
 	// Generate a unique code name for this new item
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pAssetItem->GetName());

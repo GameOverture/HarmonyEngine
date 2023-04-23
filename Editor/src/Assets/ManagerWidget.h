@@ -21,7 +21,7 @@ class ManagerWidget;
 }
 
 class IManagerModel;
-class AssetItemData;
+class IAssetItemData;
 class TreeModelItemData;
 
 class ManagerProxyModel : public QSortFilterProxyModel
@@ -70,7 +70,7 @@ public:
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// NOTE: ExplorerWidget::GetSelected is a synonymous function - all fixes/enhancements should be copied over until refactored into a base class
-	TreeModelItemData *GetSelected(QList<AssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut);
+	TreeModelItemData *GetSelected(QList<IAssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut);
 
 protected:
 	virtual void enterEvent(QEvent *pEvent) override;

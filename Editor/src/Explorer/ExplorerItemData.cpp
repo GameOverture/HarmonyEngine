@@ -69,6 +69,8 @@ void ExplorerItemData::Rename(QString sNewPrefix, QString sNewName)
 
 /*virtual*/ void ExplorerItemData::DeleteFromProject()
 {
+	RelinquishDependees();
+
 	if(m_pProject == nullptr)
 		return;
 

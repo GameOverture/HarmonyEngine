@@ -24,6 +24,7 @@ protected:
 	const QUuid										m_UUID;
 	QString											m_sName;
 	bool											m_bIsProjectItem;
+	bool											m_bIsAssetItem;
 
 	// Dependant References : int = count
 	QMap<TreeModelItemData *, int>					m_DependantMap;		// What ItemDatas rely on 'this'
@@ -41,11 +42,12 @@ public:
 	QIcon GetIcon(SubIcon eSubIcon) const;
 
 	bool IsProjectItem() const;
+	bool IsAssetItem() const;
 
-	QList<TreeModelItemData *> GetDependants();
+	QList<TreeModelItemData *> GetDependants() const;
+	QList<TreeModelItemData *> GetDependees() const;
 	void AddDependantRef(TreeModelItemData *pDependant);
 	void SubtractDependantRef(TreeModelItemData *pDependant);
-	
 	void RelinquishDependees(); // Inform all dependees of 'this' that they no longer need to consider it a dependant
 
 private:

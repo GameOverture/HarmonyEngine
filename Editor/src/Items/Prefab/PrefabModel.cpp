@@ -332,12 +332,6 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 {
 }
 
-/*virtual*/ QList<AssetItemData *> PrefabModel::GetAssets(AssetManagerType eAssetType) const /*override*/
-{
-	// TODO: PrefabModel::GetAssets
-	return QList<AssetItemData *>();
-}
-
 //void PrefabModel::AppendGltfValueProperty(QString sCategoryName, QString sPropertyName, const tinygltf::Value &valueRef, QString sToolTip)
 //{
 //	switch(valueRef.Type())

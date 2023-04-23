@@ -14,7 +14,7 @@
 
 #include <QMimeData>
 
-class AssetItemData;
+class IAssetItemData;
 class TreeModelItemData;
 
 class IMimeData : public QMimeData

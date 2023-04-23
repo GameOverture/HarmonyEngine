@@ -16,7 +16,7 @@
 
 #include <QMessageBox>
 
-DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<AssetItemData *> assetList, QWidget *parent) :
+DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAssetItemData *> assetList, QWidget *parent) :
 	QDialog(parent),
 	m_SelectedAssets(assetList),
 	ui(new Ui::DlgAssetProperties)
@@ -220,7 +220,7 @@ DlgAssetProperties::~DlgAssetProperties()
 	delete ui;
 }
 
-QList<AssetItemData *> DlgAssetProperties::GetChangedAssets()
+QList<IAssetItemData *> DlgAssetProperties::GetChangedAssets()
 {
 	return m_ChangedAssets;
 }

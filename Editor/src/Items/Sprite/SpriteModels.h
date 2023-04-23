@@ -93,7 +93,7 @@ public:
 
 	//void GetStateFileData(FileDataPair &stateFileDataOut);
 
-	QList<AssetItemData *> GetAtlasFrames() const;
+	QList<IAssetItemData *> GetAtlasFrames() const;
 	
 	int Cmd_AddFrame(AtlasFrame *pFrame);
 	void Cmd_RemoveFrame(AtlasFrame *pFrame);
@@ -114,7 +114,6 @@ public:
 	virtual bool OnPrepSave() override { return true; }
 	virtual void InsertItemSpecificData(FileDataPair &itemFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
-	virtual QList<AssetItemData *> GetAssets(AssetManagerType eAssetType) const override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

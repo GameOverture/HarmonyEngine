@@ -18,7 +18,7 @@
 #include <QJsonObject>
 #include <QDataStream>
 
-class SourceFile : public AssetItemData
+class SourceFile : public IAssetItemData
 {
 	Q_OBJECT
 

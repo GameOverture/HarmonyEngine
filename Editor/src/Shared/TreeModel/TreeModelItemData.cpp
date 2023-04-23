@@ -19,7 +19,8 @@
 TreeModelItemData::TreeModelItemData() :
 	m_eTYPE(ITEM_Unknown),
 	m_UUID(), // Invalid zeroed out UUID
-	m_bIsProjectItem(false)
+	m_bIsProjectItem(false),
+	m_bIsAssetItem(false)
 {
 	// I think a default ctor is required for QObject to work?
 	HyGuiLog("Invalid TreeModelItemData ctor used", LOGTYPE_Error);
@@ -29,7 +30,8 @@ TreeModelItemData::TreeModelItemData(ItemType eType, const QUuid &uuid, const QS
 	m_eTYPE(eType),
 	m_UUID(uuid),
 	m_sName(sText),
-	m_bIsProjectItem(false)
+	m_bIsProjectItem(false),
+	m_bIsAssetItem(false)
 { }
 
 /*virtual*/ TreeModelItemData::~TreeModelItemData()
@@ -66,9 +68,19 @@ bool TreeModelItemData::IsProjectItem() const
 	return m_bIsProjectItem;
 }
 
-QList<TreeModelItemData *> TreeModelItemData::GetDependants()
+bool TreeModelItemData::IsAssetItem() const
+{
+	return m_bIsAssetItem;
+}
+
+QList<TreeModelItemData *> TreeModelItemData::GetDependants() const
 {
 	return m_DependantMap.keys();
+}
+
+QList<TreeModelItemData *> TreeModelItemData::GetDependees() const
+{
+	return m_DependeeMap.keys();
 }
 
 void TreeModelItemData::AddDependantRef(TreeModelItemData *pDependant)

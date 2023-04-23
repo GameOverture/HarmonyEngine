@@ -221,16 +221,3 @@ void TextModel::SetRuntimeAtlasDirty()
 	QJsonArray layersArray = static_cast<TextStateData *>(m_StateList[uiIndex])->GetLayersModel().GetLayersArray();
 	stateFileDataOut.m_Data.insert("layers", layersArray);
 }
-
-/*virtual*/ QList<AssetItemData *> TextModel::GetAssets(AssetManagerType eAssetType) const /*override*/
-{
-	QList<AssetItemData *> retAtlasFrameList;
-
-	if(eAssetType == ASSETMAN_Atlases)
-	{
-		if(m_pAtlasFrame)
-			retAtlasFrameList.push_back(m_pAtlasFrame);
-	}
-
-	return retAtlasFrameList;
-}

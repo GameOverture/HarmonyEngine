@@ -82,7 +82,7 @@ void IManagerModel::Init()
 		for(int i = 0; i < assetsArray.size(); ++i)
 		{
 			QJsonObject assetObj = assetsArray[i].toObject();
-			AssetItemData *pAssetData = CreateAssetTreeItem(assetObj["filter"].toString(), assetObj["name"].toString(), assetObj);
+			IAssetItemData *pAssetData = CreateAssetTreeItem(assetObj["filter"].toString(), assetObj["name"].toString(), assetObj);
 
 			// Check to see if the actual meta asset exists on disk
 			QString sFilePath = m_MetaDir.absoluteFilePath(pAssetData->ConstructMetaFileName());
@@ -151,7 +151,7 @@ void IManagerModel::SetBankSettings(uint uiBankIndex, QJsonObject newSettingsObj
 	m_BanksModel.GetBank(uiBankIndex)->m_MetaObj = newSettingsObj;
 }
 
-QList<AssetItemData *> IManagerModel::GetBankAssets(uint uiBankIndex)
+QList<IAssetItemData *> IManagerModel::GetBankAssets(uint uiBankIndex)
 {
 	return m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
 }
@@ -179,7 +179,7 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, I
 		}
 	}
 
-	QList<AssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, eType, correspondingParentList, correspondingUuidList);
+	QList<IAssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, eType, correspondingParentList, correspondingUuidList);
 	for(int i = 0; i < returnList.size(); ++i)
 		InsertTreeItem(m_ProjectRef, returnList[i], GetItem(FindIndex<TreeModelItemData *>(correspondingParentList[i], 0)));
 
@@ -189,7 +189,7 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, I
 	return true;
 }
 
-void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeModelItemData *> filtersList)
+void IManagerModel::RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeModelItemData *> filtersList)
 {
 	// First loop through and check to see if any links are present, and abort if dependencies are found
 	for(int i = 0; i < assetsList.count(); ++i)
@@ -229,7 +229,7 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 	{
 		sRemovedFilterPaths.push_back(assetsList[i]->GetFilter());
 
-		QModelIndex index = FindIndex<AssetItemData *>(assetsList[i], 0);
+		QModelIndex index = FindIndex<IAssetItemData *>(assetsList[i], 0);
 		if(removeRow(index.row(), index.parent()) == false)
 			HyGuiLog("IManagerModel::removeRow returned false on: " % assetsList[i]->GetName(), LOGTYPE_Error);
 	}
@@ -247,7 +247,7 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 	SaveMeta();
 }
 
-bool IManagerModel::CanReplaceAssets(QList<AssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const
+bool IManagerModel::CanReplaceAssets(QList<IAssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const
 {
 	ProjectTabBar *pTabBar = m_ProjectRef.GetTabBar();
 
@@ -288,7 +288,7 @@ bool IManagerModel::CanReplaceAssets(QList<AssetItemData *> assetsList, QList<Pr
 	return true;
 }
 
-void IManagerModel::ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithNewAssets)
+void IManagerModel::ReplaceAssets(QList<IAssetItemData *> assetsList, bool bWithNewAssets)
 {
 	if(CanReplaceAssets(assetsList, m_RepackAffectedItemList) == false)
 		return;
@@ -338,7 +338,7 @@ void IManagerModel::Rename(TreeModelItemData *pItem, QString sNewName)
 	SaveMeta();
 }
 
-bool IManagerModel::TransferAssets(QList<AssetItemData *> assetsList, uint uiNewBankId)
+bool IManagerModel::TransferAssets(QList<IAssetItemData *> assetsList, uint uiNewBankId)
 {
 	// Remove any assets that are already in the specified bank
 	for(int i = 0; i < assetsList.size();)
@@ -358,18 +358,18 @@ bool IManagerModel::TransferAssets(QList<AssetItemData *> assetsList, uint uiNew
 void IManagerModel::AddAssetsToRepack(BankData *pBankData)
 {
 	if(m_RepackAffectedAssetsMap.find(pBankData) == m_RepackAffectedAssetsMap.end())
-		m_RepackAffectedAssetsMap.insert(pBankData, QSet<AssetItemData *>(pBankData->m_AssetList.begin(), pBankData->m_AssetList.end()));
+		m_RepackAffectedAssetsMap.insert(pBankData, QSet<IAssetItemData *>(pBankData->m_AssetList.begin(), pBankData->m_AssetList.end()));
 }
 
-void IManagerModel::AddAssetsToRepack(BankData *pBankData, AssetItemData *pAsset)
+void IManagerModel::AddAssetsToRepack(BankData *pBankData, IAssetItemData *pAsset)
 {
 	if(m_RepackAffectedAssetsMap.find(pBankData) == m_RepackAffectedAssetsMap.end())
-		m_RepackAffectedAssetsMap.insert(pBankData, QSet<AssetItemData *>());
+		m_RepackAffectedAssetsMap.insert(pBankData, QSet<IAssetItemData *>());
 	
 	m_RepackAffectedAssetsMap[pBankData].insert(pAsset);
 }
 
-void IManagerModel::AddAssetsToRepack(BankData *pBankData, QSet<AssetItemData *> &assetsSet)
+void IManagerModel::AddAssetsToRepack(BankData *pBankData, QSet<IAssetItemData *> &assetsSet)
 {
 	if(m_RepackAffectedAssetsMap.find(pBankData) == m_RepackAffectedAssetsMap.end())
 		m_RepackAffectedAssetsMap.insert(pBankData, assetsSet);
@@ -480,7 +480,7 @@ TreeModelItemData *IManagerModel::ReturnFilter(QString sFilterPath, bool bCreate
 	return nullptr;
 }
 
-bool IManagerModel::RemoveLookup(AssetItemData *pAsset)
+bool IManagerModel::RemoveLookup(IAssetItemData *pAsset)
 {
 	m_ProjectRef.RemoveItemDataLookup(pAsset->GetUuid());
 
@@ -507,11 +507,11 @@ bool IManagerModel::RemoveLookup(AssetItemData *pAsset)
 	return false;
 }
 
-QList<AssetItemData *> IManagerModel::FindByChecksum(quint32 uiChecksum)
+QList<IAssetItemData *> IManagerModel::FindByChecksum(quint32 uiChecksum)
 {
 	auto iter = m_AssetChecksumMap.find(uiChecksum);
 	if(iter == m_AssetChecksumMap.end())
-		return QList<AssetItemData *>();
+		return QList<IAssetItemData *>();
 	else
 		return iter.value();
 }
@@ -614,7 +614,7 @@ void IManagerModel::SaveMeta()
 	{
 		banksArray.append(m_BanksModel.GetBank(i)->m_MetaObj);
 
-		QList<AssetItemData *> &assetListRef = m_BanksModel.GetBank(i)->m_AssetList;
+		QList<IAssetItemData *> &assetListRef = m_BanksModel.GetBank(i)->m_AssetList;
 		for(int j = 0; j < assetListRef.size(); ++j)
 		{
 			QJsonObject assetObj;
@@ -701,7 +701,7 @@ void IManagerModel::SaveRuntime()
 		else
 		{
 			if(pItemData->GetType() != ITEM_Filter)
-				return QVariant(static_cast<AssetItemData *>(pItemData)->GetPropertyInfo());// "Bank: " % QString::number(GetBankIndexFromBankId(static_cast<AssetItemData *>(pItemData)->GetBankId())));
+				return QVariant(static_cast<IAssetItemData *>(pItemData)->GetPropertyInfo());// "Bank: " % QString::number(GetBankIndexFromBankId(static_cast<AssetItemData *>(pItemData)->GetBankId())));
 			else
 			{
 				QList<TreeModelItemData *> itemsInFilterList = GetItemsRecursively(indexRef);
@@ -713,10 +713,10 @@ void IManagerModel::SaveRuntime()
 					{
 						if(bBankIdDetermined == false)
 						{
-							uiBankId = static_cast<AssetItemData *>(pItem)->GetBankId();
+							uiBankId = static_cast<IAssetItemData *>(pItem)->GetBankId();
 							bBankIdDetermined = true;
 						}
-						else if(uiBankId != static_cast<AssetItemData *>(pItem)->GetBankId())
+						else if(uiBankId != static_cast<IAssetItemData *>(pItem)->GetBankId())
 							return QVariant("Mixed");
 					}
 				}
@@ -733,7 +733,7 @@ void IManagerModel::SaveRuntime()
 		{
 			if(pItemData->GetType() != ITEM_Filter)
 			{
-				AssetItemData *pAsset = static_cast<AssetItemData *>(pItemData);
+				IAssetItemData *pAsset = static_cast<IAssetItemData *>(pItemData);
 
 				if(pAsset->GetErrors() != 0)
 					return QVariant(pItemData->GetIcon(SUBICON_Warning));
@@ -747,7 +747,7 @@ void IManagerModel::SaveRuntime()
 	case Qt::ToolTipRole:		// The data displayed in the item's tooltip. (QString)
 		if(pItemData->GetType() != ITEM_Filter)
 		{
-			AssetItemData *pAsset = static_cast<AssetItemData *>(pItemData);
+			IAssetItemData *pAsset = static_cast<IAssetItemData *>(pItemData);
 			if(pAsset->GetErrors() != 0)
 				return QVariant(HyGlobal::GetGuiFrameErrors(pAsset->GetErrors()));
 
@@ -907,7 +907,7 @@ void IManagerModel::SaveRuntime()
 	return true;
 }
 
-void IManagerModel::RegisterAsset(AssetItemData *pAsset)
+void IManagerModel::RegisterAsset(IAssetItemData *pAsset)
 {
 	m_ProjectRef.AddItemDataLookup(pAsset);
 
@@ -928,21 +928,23 @@ void IManagerModel::RegisterAsset(AssetItemData *pAsset)
 	}
 	else
 	{
-		QList<AssetItemData *> newFrameList;
+		QList<IAssetItemData *> newFrameList;
 		newFrameList.append(pAsset);
 		m_AssetChecksumMap[uiChecksum] = newFrameList;
 	}
 }
 
-void IManagerModel::DeleteAsset(AssetItemData *pAsset)
+void IManagerModel::DeleteAsset(IAssetItemData *pAsset)
 {
+	pAsset->RelinquishDependees();
+
 	if(RemoveLookup(pAsset))
 		pAsset->DeleteMetaFile();
 
 	delete pAsset;
 }
 
-void IManagerModel::MoveAsset(AssetItemData *pAsset, quint32 uiNewBankId)
+void IManagerModel::MoveAsset(IAssetItemData *pAsset, quint32 uiNewBankId)
 {
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
 	{
@@ -974,7 +976,7 @@ void IManagerModel::StartRepackThread(QString sLoadMessage, IRepackThread *pRepa
 	pRepackThread->start();
 }
 
-AssetItemData *IManagerModel::CreateAssetTreeItem(QString sPrefix, QString sName, QJsonObject metaObj)
+IAssetItemData *IManagerModel::CreateAssetTreeItem(QString sPrefix, QString sName, QJsonObject metaObj)
 {
 	TreeModelItem *pCurTreeItem = m_pRootItem;
 	if(sPrefix.isEmpty() == false)
@@ -1003,7 +1005,7 @@ AssetItemData *IManagerModel::CreateAssetTreeItem(QString sPrefix, QString sName
 		}
 	}
 
-	AssetItemData *pNewItemData = OnAllocateAssetData(metaObj);
+	IAssetItemData *pNewItemData = OnAllocateAssetData(metaObj);
 	RegisterAsset(pNewItemData);
 
 	InsertTreeItem(m_ProjectRef, pNewItemData, pCurTreeItem);

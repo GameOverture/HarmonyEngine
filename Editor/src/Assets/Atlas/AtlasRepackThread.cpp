@@ -17,13 +17,13 @@
 #include <QImageWriter>
 #include <QProcess>
 
-AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<AssetItemData *>> &affectedAssetsMapRef, QDir metaDir) :
+AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &affectedAssetsMapRef, QDir metaDir) :
 	IRepackThread(affectedAssetsMapRef, metaDir)
 {
 	for(auto iter = m_AffectedAssetsMapRef.begin(); iter != m_AffectedAssetsMapRef.end(); ++iter)
 	{
 		BankData *pBankData = iter.key();
-		QSet<AssetItemData *> &affectedAssetsSet = iter.value();
+		QSet<IAssetItemData *> &affectedAssetsSet = iter.value();
 
 		m_RepackBankList.push_back(RepackBank());
 		RepackBank &curBankRef = m_RepackBankList.back();
@@ -31,7 +31,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<AssetItemData *>> &af
 		curBankRef.m_pBankData = pBankData;
 
 		// Organize all affected frames into buckets (HyTextureInfo's bucket ID)
-		QList<AssetItemData *>affectedFramesList = affectedAssetsSet.values();
+		QList<IAssetItemData *>affectedFramesList = affectedAssetsSet.values();
 		for(int i = 0; i < affectedFramesList.size(); ++i)
 		{
 			AtlasFrame *pAtlasFrame = static_cast<AtlasFrame *>(affectedFramesList[i]);
@@ -138,7 +138,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<AssetItemData *>> &af
 							if(iExistingTextureIndex == iNextAvailableFoundIndex)
 							{
 								// Texture found, start migrating its frames
-								QList<AssetItemData *> &atlasGrpFrameListRef = pBankData->m_AssetList;
+								QList<IAssetItemData *> &atlasGrpFrameListRef = pBankData->m_AssetList;
 								for(int j = 0; j < atlasGrpFrameListRef.size(); ++j)
 								{
 									AtlasFrame *pFrame = static_cast<AtlasFrame *>(atlasGrpFrameListRef[j]);

@@ -288,11 +288,11 @@ void SpriteWidget::on_actionAlignCenterHorizontal_triggered()
 
 void SpriteWidget::on_actionImportFrames_triggered()
 {
-	QList<AssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
+	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
 	m_ItemRef.GetProject().GetAtlasWidget()->GetSelected(selectedAssetsList, selectedFiltersList);
 
 	QList<AtlasFrame *> frameList;
-	for(AssetItemData *pAsset : selectedAssetsList)
+	for(IAssetItemData *pAsset : selectedAssetsList)
 		frameList.push_back(static_cast<AtlasFrame *>(pAsset));
 
 	QUndoCommand *pCmd = new SpriteUndoCmd_AddFrames(m_ItemRef, GetCurStateIndex(), frameList);

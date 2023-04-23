@@ -66,7 +66,7 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_AddAssets::EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef, QList<AssetItemData *> assetItemList, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_AddAssets::EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef, QList<IAssetItemData *> assetItemList, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_AssetList(assetItemList)
 {
@@ -79,7 +79,7 @@ EntityUndoCmd_AddAssets::EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef,
 
 /*virtual*/ void EntityUndoCmd_AddAssets::redo() /*override*/
 {
-	QList<AssetItemData *> assetItemList;
+	QList<IAssetItemData *> assetItemList;
 	for(auto *pAssetItem : m_AssetList)
 	{
 		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pAssetItem, true))

@@ -74,7 +74,7 @@ QJsonArray IMimeData::MakeAssetJsonArray(Project &projRef, QList<TreeModelItemDa
 		}
 		else
 		{
-			AssetItemData *pAssetItem = static_cast<AssetItemData *>(assetList[i]);
+			IAssetItemData *pAssetItem = static_cast<IAssetItemData *>(assetList[i]);
 
 			assetObj.insert("isFilter", false);
 			assetObj.insert("project", pAssetItem->GetProject().GetAbsPath().toLower());

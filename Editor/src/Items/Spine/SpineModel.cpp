@@ -366,22 +366,6 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 #endif
 }
 
-/*virtual*/ QList<AssetItemData *> SpineModel::GetAssets(AssetManagerType eAssetType) const /*override*/
-{
-	QList<AssetItemData *> retAtlasFrameList;
-
-	if(eAssetType == ASSETMAN_Atlases)
-	{
-		for(auto &subAtlas : m_SubAtlasList)
-		{
-			if(subAtlas.m_pAtlasFrame)
-				retAtlasFrameList.push_back(subAtlas.m_pAtlasFrame);
-		}
-	}
-
-	return retAtlasFrameList;
-}
-
 bool SpineModel::IsUsingTempFiles() const
 {
 	return m_bUsingTempFiles;

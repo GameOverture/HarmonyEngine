@@ -18,7 +18,7 @@
 #include <QJsonObject>
 #include <QDataStream>
 
-class AtlasFrame : public AssetItemData
+class AtlasFrame : public IAssetItemData
 {
 	Q_OBJECT
 

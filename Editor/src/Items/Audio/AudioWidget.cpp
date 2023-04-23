@@ -130,12 +130,12 @@ void AudioWidget::on_playListTableView_selectionChanged(const QItemSelection &ne
 
 void AudioWidget::on_actionAddAudio_triggered()
 {
-	QList<AssetItemData *> selectedAssetsList;
+	QList<IAssetItemData *> selectedAssetsList;
 	QList<TreeModelItemData *> selectedFiltersList;
 	m_ItemRef.GetProject().GetAudioWidget()->GetSelected(selectedAssetsList, selectedFiltersList);
 
 	QList<AudioAsset *> audioList;
-	for(AssetItemData *pAsset : selectedAssetsList)
+	for(IAssetItemData *pAsset : selectedAssetsList)
 		audioList.push_back(static_cast<AudioAsset *>(pAsset));
 
 	QUndoCommand *pCmd = new AudioUndoCmd_AddAssets(m_ItemRef, GetCurStateIndex(), audioList);

@@ -50,13 +50,6 @@ enum ItemType
 	// Project items
 	ITEM_Project,
 	ITEM_Prefix,
-	ITEM_Filter,
-	// Asset items
-	ITEM_AtlasFrame,
-	ITEM_SoundClip,
-	ITEM_Source,
-	ITEM_Header,
-	// Component items
 	ITEM_Primitive,
 	ITEM_Audio,
 	ITEM_Particles,
@@ -66,6 +59,12 @@ enum ItemType
 	ITEM_Prefab,
 	ITEM_Entity,
 	ITEM_Entity3d,
+	// Asset items
+	ITEM_Filter,
+	ITEM_AtlasFrame,
+	ITEM_SoundClip,
+	ITEM_Source,
+	ITEM_Header,
 	// Entity items
 	ITEM_BoundingVolume,
 	ITEM_Physics,

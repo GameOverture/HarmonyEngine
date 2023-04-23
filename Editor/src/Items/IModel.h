@@ -16,7 +16,7 @@
 #include <QStringListModel>
 
 class IModel;
-class AssetItemData;
+class IAssetItemData;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class IStateData
@@ -88,6 +88,8 @@ public:
 	void MoveStateForward(int iStateIndex);
 
 	FileDataPair PopState(uint32 uiIndex);
+
+	QList<IAssetItemData *> GetAssetDependencies(AssetManagerType eAssetType) const;
 	
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -117,11 +119,9 @@ public:
 	}
 
 	virtual void OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) { }
-
 	virtual bool OnPrepSave() = 0;	// Prepares item for saving, and returns if valid
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) = 0;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const = 0;
-	virtual QList<AssetItemData *> GetAssets(AssetManagerType eAssetType) const = 0;
 };
 
 #endif // IMODEL_H

@@ -19,7 +19,7 @@
 class IManagerModel;
 class Project;
 
-class AssetItemData : public TreeModelItemData
+class IAssetItemData : public TreeModelItemData
 {
 	Q_OBJECT
 
@@ -32,7 +32,7 @@ protected:
 	uint								m_uiErrors;
 
 public:
-	AssetItemData(IManagerModel &modelRef, ItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors);
+	IAssetItemData(IManagerModel &modelRef, ItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors);
 
 	AssetManagerType GetManagerAssetType() const;
 	quint32 GetChecksum();

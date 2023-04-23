@@ -11,7 +11,7 @@
 #include "IAssetItemData.h"
 #include "IManagerModel.h"
 
-AssetItemData::AssetItemData(IManagerModel &modelRef, ItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors) :
+IAssetItemData::IAssetItemData(IManagerModel &modelRef, ItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors) :
 	TreeModelItemData(eType, uuid, sName),
 	m_ModelRef(modelRef),
 	m_uiChecksum(uiChecksum),
@@ -19,45 +19,46 @@ AssetItemData::AssetItemData(IManagerModel &modelRef, ItemType eType, QUuid uuid
 	m_sMetaFileExt(sMetaFileExt),
 	m_uiErrors(uiErrors) // '0' when there is no error
 {
+	m_bIsAssetItem = true;
 }
 
-AssetManagerType AssetItemData::GetManagerAssetType() const
+AssetManagerType IAssetItemData::GetManagerAssetType() const
 {
 	return m_ModelRef.GetAssetType();
 }
 
-quint32 AssetItemData::GetChecksum()
+quint32 IAssetItemData::GetChecksum()
 {
 	return m_uiChecksum;
 }
 
-quint32 AssetItemData::GetBankId()
+quint32 IAssetItemData::GetBankId()
 {
 	return m_uiBankId;
 }
 
-void AssetItemData::SetBankId(quint32 uiNewBankId)
+void IAssetItemData::SetBankId(quint32 uiNewBankId)
 {
 	m_uiBankId = uiNewBankId;
 }
 
-Project &AssetItemData::GetProject()
+Project &IAssetItemData::GetProject()
 {
 	return m_ModelRef.GetProjOwner();
 }
 
-QString AssetItemData::GetFilter() const
+QString IAssetItemData::GetFilter() const
 {
-	AssetItemData *pAssetData = const_cast<AssetItemData *>(this);
+	IAssetItemData *pAssetData = const_cast<IAssetItemData *>(this);
 	return m_ModelRef.AssembleFilter(pAssetData, false);
 }
 
-QString AssetItemData::GetName() const
+QString IAssetItemData::GetName() const
 {
 	return m_sName;
 }
 
-/*virtual*/ QString AssetItemData::ConstructMetaFileName() const
+/*virtual*/ QString IAssetItemData::ConstructMetaFileName() const
 {
 	QString sMetaName;
 	sMetaName = sMetaName.asprintf("%010u", m_uiChecksum);
@@ -66,17 +67,17 @@ QString AssetItemData::GetName() const
 	return sMetaName;
 }
 
-QString AssetItemData::GetMetaFileExt() const
+QString IAssetItemData::GetMetaFileExt() const
 {
 	return m_sMetaFileExt;
 }
 
-QString AssetItemData::GetAbsMetaFilePath() const
+QString IAssetItemData::GetAbsMetaFilePath() const
 {
 	return m_ModelRef.GetMetaDir().absoluteFilePath(ConstructMetaFileName());
 }
 
-bool AssetItemData::DeleteMetaFile()
+bool IAssetItemData::DeleteMetaFile()
 {
 	QFile imageFile(GetAbsMetaFilePath());
 	if(imageFile.remove() == false)
@@ -85,7 +86,7 @@ bool AssetItemData::DeleteMetaFile()
 	return true;
 }
 
-void AssetItemData::SetError(AssetErrorType eError)
+void IAssetItemData::SetError(AssetErrorType eError)
 {
 	if(eError == ASSETERROR_CannotFindMetaFile)
 		HyGuiLog(m_sName % " - Cannot find meta file", LOGTYPE_Error);
@@ -95,19 +96,19 @@ void AssetItemData::SetError(AssetErrorType eError)
 	//UpdateTreeItemIconAndToolTip();
 }
 
-void AssetItemData::ClearError(AssetErrorType eError)
+void IAssetItemData::ClearError(AssetErrorType eError)
 {
 	m_uiErrors &= ~(1 << eError);
 
 	//UpdateTreeItemIconAndToolTip();
 }
 
-uint AssetItemData::GetErrors()
+uint IAssetItemData::GetErrors()
 {
 	return m_uiErrors;
 }
 
-void AssetItemData::GetJsonObj(QJsonObject &assetObj)
+void IAssetItemData::GetJsonObj(QJsonObject &assetObj)
 {
 	assetObj = QJsonObject();
 	assetObj.insert("assetUUID", GetUuid().toString(QUuid::WithoutBraces));

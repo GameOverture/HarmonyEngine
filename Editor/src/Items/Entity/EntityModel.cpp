@@ -277,7 +277,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemDat
 	return treeNodeList;
 }
 
-QList<EntityTreeItemData *> EntityModel::Cmd_AddNewAssets(QList<AssetItemData *> assetItemList, int iRow)
+QList<EntityTreeItemData *> EntityModel::Cmd_AddNewAssets(QList<IAssetItemData *> assetItemList, int iRow)
 {
 	QList<EntityTreeItemData *> treeNodeList;
 	QList<QUuid> registerList;
@@ -555,12 +555,6 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 /*virtual*/ void EntityModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
 {
 	InsertChildAndShapeList(uiIndex, stateFileDataOut);
-}
-
-/*virtual*/ QList<AssetItemData *> EntityModel::GetAssets(AssetManagerType eAssetType) const /*override*/
-{
-	// TODO: EntityModel::GetAssets
-	return QList<AssetItemData *>();
 }
 
 void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDataPairOut) const

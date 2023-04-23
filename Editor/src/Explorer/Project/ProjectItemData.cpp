@@ -336,18 +336,6 @@ void ProjectItemData::FocusWidgetState(int iStateIndex, QVariant subState)
 /*virtual*/ void ProjectItemData::DeleteFromProject() /*override*/
 {
 	m_pUndoStack->setClean();
-
-	// Unlinks all dependencies
-	//m_pModel->RelinquishAllFrames();
-
-	// TOMORROW HERE: figure out GetAssets() -> use dependee's from m_pModel's ProjItem?
-
-	// Just call this? - Also call RelinqusihDependees() whenever other ItemData gets deleted/removed
-	RelinquishDependees();
-	//MainWindow::GetExplorerModel().DecrementDependencies(...);
-	//GetProject().GetAtlasModel().DecrementDependencies(this, m_pModel->GetAssets(ASSET_Atlas));// RelinquishAssets(this, m_pModel->GetAssets(ASSET_Atlas));
-	//GetProject().GetAudioModel().DecrementDependencies(this, m_pModel->GetAssets(ASSET_Audio));//RelinquishAssets(this, m_pModel->GetAssets(ASSET_Audio));
-
 	ExplorerItemData::DeleteFromProject();
 }
 

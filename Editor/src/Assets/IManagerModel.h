@@ -37,9 +37,9 @@ protected:
 
 	quint32											m_uiNextBankId;
 
-	QMap<quint32, QList<AssetItemData *> >			m_AssetChecksumMap;
+	QMap<quint32, QList<IAssetItemData *> >			m_AssetChecksumMap;
 
-	QMap<BankData *, QSet<AssetItemData *>>			m_RepackAffectedAssetsMap;
+	QMap<BankData *, QSet<IAssetItemData *>>			m_RepackAffectedAssetsMap;
 	QList<ProjectItemData *>						m_RepackAffectedItemList; // Keep track of any linked/referenced items as they will need to be re-saved after asset repacking
 
 public:
@@ -60,27 +60,27 @@ public:
 	QString GetBankName(uint uiBankIndex);
 	QJsonObject GetBankSettings(uint uiBankIndex);
 	void SetBankSettings(uint uiBankIndex, QJsonObject newSettingsObj);
-	QList<AssetItemData *> GetBankAssets(uint uiBankIndex);
+	QList<IAssetItemData *> GetBankAssets(uint uiBankIndex);
 
 	void GenerateAssetsDlg(const QModelIndex &indexDestination);
 	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
-	void RemoveItems(QList<AssetItemData *> assetsList, QList<TreeModelItemData *> filtersList);
-	bool CanReplaceAssets(QList<AssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const;
-	void ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithNewAssets);
+	void RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeModelItemData *> filtersList);
+	bool CanReplaceAssets(QList<IAssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const;
+	void ReplaceAssets(QList<IAssetItemData *> assetsList, bool bWithNewAssets);
 	void Rename(TreeModelItemData *pItem, QString sNewName);
-	bool TransferAssets(QList<AssetItemData *> assetsList, uint uiNewBankId);
+	bool TransferAssets(QList<IAssetItemData *> assetsList, uint uiNewBankId);
 
 	void AddAssetsToRepack(BankData *pBankData);
-	void AddAssetsToRepack(BankData *pBankData, AssetItemData *pAsset);
-	void AddAssetsToRepack(BankData *pBankData, QSet<AssetItemData *> &assetsSet);
+	void AddAssetsToRepack(BankData *pBankData, IAssetItemData *pAsset);
+	void AddAssetsToRepack(BankData *pBankData, QSet<IAssetItemData *> &assetsSet);
 	void FlushRepack();
 
 	QString AssembleFilter(TreeModelItemData *pAsset, bool bIncludeSelfIfFilter) const;
 	TreeModelItemData *FindTreeItemFilter(TreeModelItemData *pItem) const;
 	TreeModelItemData *ReturnFilter(QString sFilterPath, bool bCreateNonExistingFilter = true);
 
-	bool RemoveLookup(AssetItemData *pAsset); // Returns true if no remaining duplicates exist
-	QList<AssetItemData *> FindByChecksum(quint32 uiChecksum);
+	bool RemoveLookup(IAssetItemData *pAsset); // Returns true if no remaining duplicates exist
+	QList<IAssetItemData *> FindByChecksum(quint32 uiChecksum);
 	bool DoesAssetExist(quint32 uiChecksum);
 
 	TreeModelItemData *CreateNewFilter(QString sName, TreeModelItemData *pParent);
@@ -108,23 +108,23 @@ public:
 	virtual QStringList GetSupportedFileExtList() const = 0;
 
 protected:
-	void RegisterAsset(AssetItemData *pAsset);
-	void DeleteAsset(AssetItemData *pAsset);
-	void MoveAsset(AssetItemData *pAsset, quint32 uiNewBankId);
+	void RegisterAsset(IAssetItemData *pAsset);
+	void DeleteAsset(IAssetItemData *pAsset);
+	void MoveAsset(IAssetItemData *pAsset, quint32 uiNewBankId);
 
 	void StartRepackThread(QString sLoadMessage, IRepackThread *pRepackThread);
 
 	virtual void OnInit() = 0;
 	virtual void OnCreateNewBank(QJsonObject &newBankMetaBankRef) = 0;
 
-	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
+	virtual IAssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 
 	virtual void OnGenerateAssetsDlg(const QModelIndex &indexDestination) = 0;
-	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset
-	virtual bool OnRemoveAssets(QStringList sPreviousFilterPaths, QList<AssetItemData *> assetList) = 0; // Must call DeleteAsset() on each asset
-	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) = 0;
-	virtual bool OnUpdateAssets(QList<AssetItemData *> assetList) = 0;
-	virtual bool OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) = 0; // Must call MoveAsset() on each asset
+	virtual QList<IAssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset
+	virtual bool OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) = 0; // Must call DeleteAsset() on each asset
+	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) = 0;
+	virtual bool OnUpdateAssets(QList<IAssetItemData *> assetList) = 0;
+	virtual bool OnMoveAssets(QList<IAssetItemData *> assetsList, quint32 uiNewBankId) = 0; // Must call MoveAsset() on each asset
 
 	virtual void OnFlushRepack() = 0;
 
@@ -132,7 +132,7 @@ protected:
 	virtual QJsonObject GetSaveJson() = 0;
 
 private:
-	AssetItemData *CreateAssetTreeItem(QString sPrefix, QString sName, QJsonObject metaObj);
+	IAssetItemData *CreateAssetTreeItem(QString sPrefix, QString sName, QJsonObject metaObj);
 
 protected Q_SLOTS:
 	void OnLoadUpdate(QString sMsg, int iPercComplete);

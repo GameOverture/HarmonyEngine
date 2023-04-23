@@ -130,7 +130,7 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 
 /*virtual*/ bool AudioManagerModel::OnBankSettingsDlg(uint uiBankIndex) /*override*/
 {
-	QList<AssetItemData *> assetList = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
+	QList<IAssetItemData *> assetList = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
 	bool bBankHasAssets = assetList.size() > 0;
 	bool bAccepted = true;
 	
@@ -208,7 +208,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 {
 }
 
-/*virtual*/ AssetItemData *AudioManagerModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
+/*virtual*/ IAssetItemData *AudioManagerModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
 	WaveHeader wavHeader(metaObj["wavHeader"].toObject());
 	AudioAsset *pNewFrame = new AudioAsset(*this,
@@ -233,9 +233,9 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 {
 }
 
-/*virtual*/ QList<AssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
+/*virtual*/ QList<IAssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
 {
-	QList<AssetItemData *> returnList;
+	QList<IAssetItemData *> returnList;
 	QList<WaveHeader> headerList;
 
 	// Error check all the imported assets before adding them, and cancel entire import if any fail
@@ -259,8 +259,8 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	// Repack asset bank with newly imported audio
 	if(returnList.empty() == false)
 	{
-		QSet<AssetItemData *> returnListAsSet(returnList.begin(), returnList.end());
-		QSet<AssetItemData *> newSet;
+		QSet<IAssetItemData *> returnListAsSet(returnList.begin(), returnList.end());
+		QSet<IAssetItemData *> newSet;
 		for(auto pItem : returnListAsSet)
 			newSet.insert(pItem);
 
@@ -270,7 +270,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	return returnList;
 }
 
-/*virtual*/ bool AudioManagerModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<AssetItemData *> assetList) /*override*/
+/*virtual*/ bool AudioManagerModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/
 {
 	QSet<BankData *> affectedBankSet;
 	for(int i = 0; i < assetList.count(); ++i)
@@ -285,7 +285,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	return true;
 }
 
-/*virtual*/ bool AudioManagerModel::OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) /*override*/
+/*virtual*/ bool AudioManagerModel::OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) /*override*/
 {
 	QList<WaveHeader> headerList;
 
@@ -297,7 +297,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 			return false;
 	}
 
-	QMap<uint, QSet<AssetItemData *>> affectedMap;
+	QMap<uint, QSet<IAssetItemData *>> affectedMap;
 	for(int i = 0; i < assetList.count(); ++i)
 	{
 		AudioAsset *pAudio = static_cast<AudioAsset *>(assetList[i]);
@@ -339,7 +339,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	return true;
 }
 
-/*virtual*/ bool AudioManagerModel::OnUpdateAssets(QList<AssetItemData *> assetList) /*override*/
+/*virtual*/ bool AudioManagerModel::OnUpdateAssets(QList<IAssetItemData *> assetList) /*override*/
 {
 	for(int i = 0; i < assetList.count(); ++i)
 		AddAssetsToRepack(m_BanksModel.GetBank(GetBankIndexFromBankId(assetList[i]->GetBankId())), assetList[i]);
@@ -347,10 +347,10 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	return true;
 }
 
-/*virtual*/ bool AudioManagerModel::OnMoveAssets(QList<AssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
+/*virtual*/ bool AudioManagerModel::OnMoveAssets(QList<IAssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
 {
 	QList<uint> affectedBankIndexList;			// old
-	QSet<AssetItemData *> assetsGoingToNewBankSet;	// new
+	QSet<IAssetItemData *> assetsGoingToNewBankSet;	// new
 
 	for(int i = 0; i < assetsList.count(); ++i)
 	{
@@ -363,13 +363,13 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 		MoveAsset(assetsList[i], uiNewBankId);
 	}
 
-	QList<QPair<BankData *, QSet<AssetItemData *>>> affectedAudioList;
+	QList<QPair<BankData *, QSet<IAssetItemData *>>> affectedAudioList;
 	for(int i = 0; i < affectedBankIndexList.count(); ++i)
 	{
-		QPair<BankData *, QSet<AssetItemData *>> bankPair(m_BanksModel.GetBank(affectedBankIndexList[i]), QSet<AssetItemData *>());
+		QPair<BankData *, QSet<IAssetItemData *>> bankPair(m_BanksModel.GetBank(affectedBankIndexList[i]), QSet<IAssetItemData *>());
 		affectedAudioList.append(bankPair);
 	}
-	QPair<BankData *, QSet<AssetItemData *>> bankPair(m_BanksModel.GetBank(uiNewBankId), assetsGoingToNewBankSet);
+	QPair<BankData *, QSet<IAssetItemData *>> bankPair(m_BanksModel.GetBank(uiNewBankId), assetsGoingToNewBankSet);
 	affectedAudioList.append(bankPair);
 
 	for(auto repack : affectedAudioList)
@@ -398,7 +398,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 		bankObj.insert("bankId", static_cast<qint64>(m_BanksModel.GetBank(i)->GetId()));
 
 		QJsonArray assetsArray;
-		QList<AssetItemData *> &bankAssetListRef = m_BanksModel.GetBank(i)->m_AssetList;
+		QList<IAssetItemData *> &bankAssetListRef = m_BanksModel.GetBank(i)->m_AssetList;
 		for(int i = 0; i < bankAssetListRef.size(); ++i)
 		{
 			QJsonObject assetObj;

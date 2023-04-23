@@ -25,14 +25,14 @@ class DlgAssetProperties : public QDialog
 {
 	Q_OBJECT
 
-	QList<AssetItemData *>		m_SelectedAssets;
-	QList<AssetItemData *>		m_ChangedAssets; // Order is preserved from 'm_SelectedAssets'
+	QList<IAssetItemData *>		m_SelectedAssets;
+	QList<IAssetItemData *>		m_ChangedAssets; // Order is preserved from 'm_SelectedAssets'
 
 public:
-	explicit DlgAssetProperties(IManagerModel *pManagerModel, QList<AssetItemData *> assetList, QWidget *parent = 0);
+	explicit DlgAssetProperties(IManagerModel *pManagerModel, QList<IAssetItemData *> assetList, QWidget *parent = 0);
 	~DlgAssetProperties();
 
-	QList<AssetItemData *> GetChangedAssets();
+	QList<IAssetItemData *> GetChangedAssets();
 	void ApplyChanges();
 
 private Q_SLOTS:

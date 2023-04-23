@@ -363,9 +363,9 @@ SpriteFramesModel *SpriteStateData::GetFramesModel()
 //	stateObjOut.insert("reverse", m_pChkMapper_Reverse->IsChecked());
 //}
 
-QList<AssetItemData *> SpriteStateData::GetAtlasFrames() const
+QList<IAssetItemData *> SpriteStateData::GetAtlasFrames() const
 {
-	QList<AssetItemData *> atlasList;
+	QList<IAssetItemData *> atlasList;
 	for(int i = 0; i < m_pFramesModel->rowCount(); ++i)
 		atlasList.push_back(m_pFramesModel->GetFrameAt(i)->m_pFrame);
 
@@ -433,7 +433,7 @@ void SpriteModel::Cmd_RemoveFrames(int iStateIndex, QList<AtlasFrame *> frameLis
 	SpriteStateData *pState = static_cast<SpriteStateData *>(m_StateList[uiIndex]);
 	QJsonArray frameIdsArray;
 
-	QList<AssetItemData *> frameList = pState->GetAtlasFrames();
+	QList<IAssetItemData *> frameList = pState->GetAtlasFrames();
 	for(int i = 0; i < frameList.size(); ++i)
 		frameIdsArray.append(frameList[i]->GetUuid().toString(QUuid::WithoutBraces));
 	stateFileDataOut.m_Meta.insert("assetUUIDs", frameIdsArray);
@@ -446,20 +446,4 @@ void SpriteModel::Cmd_RemoveFrames(int iStateIndex, QList<AtlasFrame *> frameLis
 	QJsonArray framesArray = pState->GetFramesModel()->GetFramesInfo(fTotalDuration);
 	stateFileDataOut.m_Data.insert("frames", framesArray);
 	stateFileDataOut.m_Data.insert("duration", fTotalDuration);
-}
-
-/*virtual*/ QList<AssetItemData *> SpriteModel::GetAssets(AssetManagerType eAssetType) const /*override*/
-{
-	QList<AssetItemData *> retAtlasFrameList;
-
-	if(eAssetType == ASSETMAN_Atlases)
-	{
-		for(int i = 0; i < m_StateList.size(); ++i)
-		{
-			QList<AssetItemData *> atlasFrameList = static_cast<SpriteStateData *>(m_StateList[i])->GetAtlasFrames();
-			retAtlasFrameList += atlasFrameList;
-		}
-	}
-
-	return retAtlasFrameList;
 }

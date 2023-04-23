@@ -17,7 +17,7 @@ SourceFile::SourceFile(IManagerModel &modelRef,
 					   quint32 uiChecksum,
 					   QString fileName,
 					   uint uiErrors) :
-	AssetItemData(modelRef,
+	IAssetItemData(modelRef,
 		QFileInfo(fileName).suffix().compare("cpp", Qt::CaseInsensitive) == 0 ? ITEM_Source : ITEM_Header,
 		uuid, uiChecksum, 0, fileName, QFileInfo(fileName).suffix(), uiErrors)
 {

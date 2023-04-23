@@ -135,6 +135,66 @@ FileDataPair IModel::PopState(uint32 uiIndex)
 	return retObj;
 }
 
+QList<IAssetItemData *> IModel::GetAssetDependencies(AssetManagerType eAssetType) const
+{
+	QList<IAssetItemData *> returnList;
+	
+	QList<TreeModelItemData *> dependeeList = m_ItemRef.GetDependees();
+	for(TreeModelItemData *pDependee : dependeeList)
+	{
+		if(pDependee->IsAssetItem() && static_cast<IAssetItemData *>(pDependee)->GetManagerAssetType() == eAssetType)
+			returnList.push_back(static_cast<IAssetItemData *>(pDependee));
+	}
+
+	return returnList;
+
+
+	//// Sprite
+	//QList<AssetItemData *> retAtlasFrameList;
+	//if(eAssetType == ASSETMAN_Atlases)
+	//{
+	//	for(int i = 0; i < m_StateList.size(); ++i)
+	//	{
+	//		QList<AssetItemData *> atlasFrameList = static_cast<SpriteStateData *>(m_StateList[i])->GetAtlasFrames();
+	//		retAtlasFrameList += atlasFrameList;
+	//	}
+	//}
+	//return retAtlasFrameList;
+
+	//// Text
+	//QList<AssetItemData *> retAtlasFrameList;
+	//if(eAssetType == ASSETMAN_Atlases)
+	//{
+	//	if(m_pAtlasFrame)
+	//		retAtlasFrameList.push_back(m_pAtlasFrame);
+	//}
+	//return retAtlasFrameList;
+
+	//// Spine
+	//QList<AssetItemData *> retAtlasFrameList;
+	//if(eAssetType == ASSETMAN_Atlases)
+	//{
+	//	for(auto &subAtlas : m_SubAtlasList)
+	//	{
+	//		if(subAtlas.m_pAtlasFrame)
+	//			retAtlasFrameList.push_back(subAtlas.m_pAtlasFrame);
+	//	}
+	//}
+	//return retAtlasFrameList;
+
+	//// Audio
+	//if(eAssetType != ASSETMAN_Audio)
+	//	return QList<AssetItemData *>();
+	//QList<AssetItemData *> returnList;
+	//for(auto pState : m_StateList)
+	//{
+	//	for(int i = 0; i < static_cast<AudioStateData *>(pState)->GetPlayListModel().rowCount(); ++i)
+	//		returnList << static_cast<AudioStateData *>(pState)->GetPlayListModel().GetAudioAssetAt(i)->GetAudioAsset();
+	//}
+
+	//return returnList;
+}
+
 /*virtual*/ int IModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/
 {
 	return m_StateList.size();

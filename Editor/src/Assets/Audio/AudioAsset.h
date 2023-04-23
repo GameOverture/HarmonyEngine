@@ -59,7 +59,7 @@ struct WaveHeader
 	}
 };
 
-class AudioAsset : public AssetItemData
+class AudioAsset : public IAssetItemData
 {
 	Q_OBJECT
 

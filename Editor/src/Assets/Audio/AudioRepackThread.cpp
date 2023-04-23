@@ -12,7 +12,7 @@
 
 #include <vorbis/vorbisenc.h>
 
-AudioRepackThread::AudioRepackThread(QMap<BankData *, QSet<AssetItemData *>> &affectedAssetsMapRef, QDir metaDir) :
+AudioRepackThread::AudioRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &affectedAssetsMapRef, QDir metaDir) :
 	IRepackThread(affectedAssetsMapRef, metaDir)
 {
 }
@@ -26,7 +26,7 @@ AudioRepackThread::AudioRepackThread(QMap<BankData *, QSet<AssetItemData *>> &af
 	for(auto iter = m_AffectedAssetsMapRef.begin(); iter != m_AffectedAssetsMapRef.end(); ++iter)
 	{
 		BankData *pBank = iter.key();
-		QSet<AssetItemData *> affectedSet(iter.value());
+		QSet<IAssetItemData *> affectedSet(iter.value());
 
 		// First remove any stale audio files that are missing in 'pBank->m_AssetList'
 		QDir runtimeBankDir(pBank->m_sAbsPath);

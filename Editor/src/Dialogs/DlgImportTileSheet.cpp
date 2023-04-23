@@ -68,7 +68,7 @@ void DlgImportTileSheet::on_buttonBox_accepted()
 
 	quint32 uiBankId = m_ProjectRef.GetAtlasWidget() ? m_ProjectRef.GetAtlasWidget()->GetSelectedBankId() : 0;
 
-	QList<AssetItemData *> selectedAssetsList;
+	QList<IAssetItemData *> selectedAssetsList;
 	QList<TreeModelItemData *> selectedFiltersList;
 	TreeModelItemData *pFirstSelected = nullptr;
 	if(m_ProjectRef.GetAtlasWidget())

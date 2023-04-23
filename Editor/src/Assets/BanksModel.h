@@ -20,7 +20,7 @@ struct BankData
 {
 	QString									m_sAbsPath;
 	QJsonObject								m_MetaObj;
-	QList<AssetItemData *>					m_AssetList;
+	QList<IAssetItemData *>					m_AssetList;
 
 	BankData(QString sAbsDataDirPath, QJsonObject settingsObj) :
 		m_sAbsPath(sAbsDataDirPath),

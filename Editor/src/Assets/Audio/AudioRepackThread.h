@@ -18,7 +18,7 @@ class AudioRepackThread : public IRepackThread
 	Q_OBJECT
 
 public:
-	AudioRepackThread(QMap<BankData *, QSet<AssetItemData *>> &affectedAssetsMapRef, QDir metaDir);
+	AudioRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &affectedAssetsMapRef, QDir metaDir);
 	virtual ~AudioRepackThread();
 
 	virtual void OnRun() override;

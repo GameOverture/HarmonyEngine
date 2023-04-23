@@ -43,7 +43,7 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 			for(int iAssetCount = 0; iAssetCount < NUM_ASSETMANTYPES; ++iAssetCount)
 			{
 				QList<TreeModelItemData *> treeModelList;
-				QList<AssetItemData *> assetsItemList = pProjectItem->GetModel()->GetAssets(static_cast<AssetManagerType>(iAssetCount));
+				QList<IAssetItemData *> assetsItemList = pProjectItem->GetModel()->GetAssetDependencies(static_cast<AssetManagerType>(iAssetCount));
 				for(auto *pItem : assetsItemList)
 					treeModelList.push_back(pItem);
 

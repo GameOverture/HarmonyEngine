@@ -43,7 +43,7 @@ class AtlasRepackThread : public IRepackThread
 	QList<RepackBank>					m_RepackBankList;
 
 public:
-	AtlasRepackThread(QMap<BankData *, QSet<AssetItemData *>> &affectedAssetsMapRef, QDir metaDir);
+	AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &affectedAssetsMapRef, QDir metaDir);
 	virtual ~AtlasRepackThread();
 
 	virtual void OnRun() override;

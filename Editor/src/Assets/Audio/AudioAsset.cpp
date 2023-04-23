@@ -26,7 +26,7 @@ AudioAsset::AudioAsset(IManagerModel &modelRef,
 					   bool bCompressed,
 					   double dVbrQuality,
 					   uint uiErrors) :
-	AssetItemData(modelRef, eType, uuid, uiChecksum, uiBankId, sName, ".wav", uiErrors),
+	IAssetItemData(modelRef, eType, uuid, uiChecksum, uiBankId, sName, ".wav", uiErrors),
 	m_WaveHeader(wavHeaderRef),
 	m_iGroupId(iGroupId),
 	m_bIsStreaming(bIsStreaming),

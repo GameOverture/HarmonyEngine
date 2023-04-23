@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "IRepackThread.h"
 
-IRepackThread::IRepackThread(QMap<BankData *, QSet<AssetItemData *>> &affectedAssetsMapRef, QDir metaDir) :
+IRepackThread::IRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &affectedAssetsMapRef, QDir metaDir) :
 	m_AffectedAssetsMapRef(affectedAssetsMapRef),
 	m_MetaDir(metaDir)
 {

@@ -154,7 +154,7 @@ PropertiesTreeModel &AudioModel::GetPropertiesModel(uint uiStateIndex)
 	PropertiesTreeModel &propertiesModelRef = pState->GetPropertiesModel();
 
 	// META ////////////////////////////////////////////////////////////////////////
-	QList<AssetItemData *> assetList;
+	QList<IAssetItemData *> assetList;
 	for(int i = 0; i < playListModelRef.rowCount(); ++i)
 		assetList << playListModelRef.GetAudioAssetAt(i)->GetAudioAsset();
 	QJsonArray assetUuidArray;
@@ -176,19 +176,4 @@ PropertiesTreeModel &AudioModel::GetPropertiesModel(uint uiStateIndex)
 		stateFileDataOut.m_Data.insert("maxDist", propertiesModelRef.FindPropertyValue("Positional", "Max Distance").toInt());
 	else
 		stateFileDataOut.m_Data.insert("maxDist", 0);
-}
-
-/*virtual*/ QList<AssetItemData *> AudioModel::GetAssets(AssetManagerType eAssetType) const /*override*/
-{
-	if(eAssetType != ASSETMAN_Audio)
-		return QList<AssetItemData *>();
-
-	QList<AssetItemData *> returnList;
-	for(auto pState : m_StateList)
-	{
-		for(int i = 0; i < static_cast<AudioStateData *>(pState)->GetPlayListModel().rowCount(); ++i)
-			returnList << static_cast<AudioStateData *>(pState)->GetPlayListModel().GetAudioAssetAt(i)->GetAudioAsset();
-	}
-
-	return returnList;
 }

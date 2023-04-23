@@ -40,11 +40,6 @@
 {
 	sm_sItemNames[ITEM_Project] = "Project";
 	sm_sItemNames[ITEM_Prefix] = "Prefix";
-	sm_sItemNames[ITEM_Filter] = "Filter";
-	sm_sItemNames[ITEM_AtlasFrame] = "AtlasFrame";
-	sm_sItemNames[ITEM_SoundClip] = "SoundClip";
-	sm_sItemNames[ITEM_Source] = "Source";
-	sm_sItemNames[ITEM_Header] = "Header";
 	sm_sItemNames[ITEM_Primitive] = "Primitive";
 	sm_sItemNames[ITEM_Audio] = "Audio";
 	sm_sItemNames[ITEM_Particles] = "Particles";
@@ -54,16 +49,16 @@
 	sm_sItemNames[ITEM_Prefab] = "Prefab";
 	sm_sItemNames[ITEM_Entity] = "Entity";
 	sm_sItemNames[ITEM_Entity3d] = "Entity3d";
+	sm_sItemNames[ITEM_Filter] = "Filter";
+	sm_sItemNames[ITEM_AtlasFrame] = "AtlasFrame";
+	sm_sItemNames[ITEM_SoundClip] = "SoundClip";
+	sm_sItemNames[ITEM_Source] = "Source";
+	sm_sItemNames[ITEM_Header] = "Header";
 	sm_sItemNames[ITEM_BoundingVolume] = "BoundingVolume";
 	sm_sItemNames[ITEM_Physics] = "Physics";
 
 	sm_sItemNamesPlural[ITEM_Project] = "Projects";
 	sm_sItemNamesPlural[ITEM_Prefix] = "Prefixes";
-	sm_sItemNamesPlural[ITEM_Filter] = "Filters";
-	sm_sItemNamesPlural[ITEM_AtlasFrame] = "AtlasFrames";
-	sm_sItemNamesPlural[ITEM_SoundClip] = "SoundClips";
-	sm_sItemNamesPlural[ITEM_Source] = "Source";
-	sm_sItemNamesPlural[ITEM_Header] = "Headers";
 	sm_sItemNamesPlural[ITEM_Primitive] = "Primitives";
 	sm_sItemNamesPlural[ITEM_Audio] = "Audio";
 	sm_sItemNamesPlural[ITEM_Particles] = "Particles";
@@ -73,6 +68,11 @@
     sm_sItemNamesPlural[ITEM_Prefab] = "Prefabs";
 	sm_sItemNamesPlural[ITEM_Entity] = "Entities";
 	sm_sItemNamesPlural[ITEM_Entity3d] = "Entities3d";
+	sm_sItemNamesPlural[ITEM_Filter] = "Filters";
+	sm_sItemNamesPlural[ITEM_AtlasFrame] = "AtlasFrames";
+	sm_sItemNamesPlural[ITEM_SoundClip] = "SoundClips";
+	sm_sItemNamesPlural[ITEM_Source] = "Source";
+	sm_sItemNamesPlural[ITEM_Header] = "Headers";
 	sm_sItemNamesPlural[ITEM_BoundingVolume] = "BoundingVolumes";
 	sm_sItemNamesPlural[ITEM_Physics] = "Physics";
 
@@ -110,11 +110,6 @@
 
 	sm_ItemColors[ITEM_Project] = QColor(9, 215, 33);
 	sm_ItemColors[ITEM_Prefix] = QColor(228, 212, 128);
-	sm_ItemColors[ITEM_Filter] = QColor(228, 212, 128);
-	sm_ItemColors[ITEM_AtlasFrame] = QColor(45, 131, 176);
-	sm_ItemColors[ITEM_SoundClip] = QColor(203, 233, 131);
-	sm_ItemColors[ITEM_Source] = QColor(225, 151, 97);
-	sm_ItemColors[ITEM_Header] = QColor(225, 151, 97);
 	sm_ItemColors[ITEM_Primitive] = QColor(101, 233, 235);
 	sm_ItemColors[ITEM_Audio] = QColor(203, 233, 131);
 	sm_ItemColors[ITEM_Particles] = QColor(218, 0, 0);
@@ -124,6 +119,11 @@
 	sm_ItemColors[ITEM_Prefab] = QColor(203, 233, 131);
 	sm_ItemColors[ITEM_Entity] = QColor(128, 128, 128);
 	sm_ItemColors[ITEM_Entity3d] = QColor(128, 128, 128);
+	sm_ItemColors[ITEM_Filter] = QColor(228, 212, 128);
+	sm_ItemColors[ITEM_AtlasFrame] = QColor(45, 131, 176);
+	sm_ItemColors[ITEM_SoundClip] = QColor(203, 233, 131);
+	sm_ItemColors[ITEM_Source] = QColor(225, 151, 97);
+	sm_ItemColors[ITEM_Header] = QColor(225, 151, 97);
 	sm_ItemColors[ITEM_BoundingVolume] = QColor(234, 232, 58);
 	sm_ItemColors[ITEM_Physics] = QColor(201, 58, 203);
 
@@ -168,11 +168,6 @@
 
 	list.append(ITEM_Project);
 	list.append(ITEM_Prefix);
-	list.append(ITEM_Filter);
-	list.append(ITEM_AtlasFrame);
-	list.append(ITEM_SoundClip);
-	list.append(ITEM_Source);
-	list.append(ITEM_Header);
 	list.append(ITEM_Primitive);
 	list.append(ITEM_Audio);
 	list.append(ITEM_Particles);
@@ -182,6 +177,11 @@
 	list.append(ITEM_Prefab);
 	list.append(ITEM_Entity);
 	list.append(ITEM_Entity3d);
+	list.append(ITEM_Filter);
+	list.append(ITEM_AtlasFrame);
+	list.append(ITEM_SoundClip);
+	list.append(ITEM_Source);
+	list.append(ITEM_Header);
 	list.append(ITEM_BoundingVolume);
 	list.append(ITEM_Physics);
 
