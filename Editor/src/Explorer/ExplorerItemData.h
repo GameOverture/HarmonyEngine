@@ -24,7 +24,7 @@ class ExplorerItemData : public TreeModelItemData
 protected:
 	Project *				m_pProject;
 	
-	ExplorerItemData(Project &projectRef, HyGuiItemType eType, const QUuid &uuid, const QString sName);
+	ExplorerItemData(Project &projectRef, ItemType eType, const QUuid &uuid, const QString sName);
 public:
 	virtual ~ExplorerItemData();
 

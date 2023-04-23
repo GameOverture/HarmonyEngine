@@ -332,7 +332,7 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 {
 }
 
-/*virtual*/ QList<AssetItemData *> PrefabModel::GetAssets(AssetType eAssetType) const /*override*/
+/*virtual*/ QList<AssetItemData *> PrefabModel::GetAssets(AssetManagerType eAssetType) const /*override*/
 {
 	// TODO: PrefabModel::GetAssets
 	return QList<AssetItemData *>();

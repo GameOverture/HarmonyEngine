@@ -27,7 +27,7 @@ public:
 	explicit AuxAssetInspector(QWidget *parent = 0);
 	virtual ~AuxAssetInspector();
 
-	void SetSelected(AssetType eAssetType, QList<AssetItemData *> selectedAssetsList);
+	void SetSelected(AssetManagerType eAssetType, QList<AssetItemData *> selectedAssetsList);
 
 private:
 	Ui::AuxAssetInspector *ui;

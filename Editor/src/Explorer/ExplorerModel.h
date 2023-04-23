@@ -27,10 +27,10 @@ public:
 
 	QStringList GetOpenProjectPaths();
 	QStringList GetPrefixList(Project *pProject);
-	ExplorerItemData *FindItemByItemPath(Project *pProject, QString sPath, HyGuiItemType eType);
+	ExplorerItemData *FindItemByItemPath(Project *pProject, QString sPath, ItemType eType);
 
 	Project *AddProject(const QString sNewProjectFilePath);
-	ExplorerItemData *AddItem(Project *pProj, HyGuiItemType eNewItemType, const QString sPrefix, const QString sName, FileDataPair initItemFileData, bool bIsPendingSave);
+	ExplorerItemData *AddItem(Project *pProj, ItemType eNewItemType, const QString sPrefix, const QString sName, FileDataPair initItemFileData, bool bIsPendingSave);
 	bool RemoveItem(ExplorerItemData *pItem);
 
 	QString AssemblePrefix(ExplorerItemData *pItem) const;
@@ -51,7 +51,7 @@ public:
 private:
 	TreeModelItem *FindProjectTreeItem(Project *pProject);
 	TreeModelItem *FindPrefixTreeItem(const QModelIndex &indexRef) const;
-	QModelIndex FindIndexByItemPath(Project *pProject, QString sPath, HyGuiItemType eType);
+	QModelIndex FindIndexByItemPath(Project *pProject, QString sPath, ItemType eType);
 };
 
 #endif // EXPLORERMODEL_H

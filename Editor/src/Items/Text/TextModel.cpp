@@ -222,11 +222,11 @@ void TextModel::SetRuntimeAtlasDirty()
 	stateFileDataOut.m_Data.insert("layers", layersArray);
 }
 
-/*virtual*/ QList<AssetItemData *> TextModel::GetAssets(AssetType eAssetType) const /*override*/
+/*virtual*/ QList<AssetItemData *> TextModel::GetAssets(AssetManagerType eAssetType) const /*override*/
 {
 	QList<AssetItemData *> retAtlasFrameList;
 
-	if(eAssetType == ASSET_Atlas)
+	if(eAssetType == ASSETMAN_Atlases)
 	{
 		if(m_pAtlasFrame)
 			retAtlasFrameList.push_back(m_pAtlasFrame);

@@ -40,15 +40,15 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 			itemObj.insert("UUID", pProjectItem->GetUuid().toString(QUuid::WithoutBraces));
 
 			// ASSETS FROM MANAGERS
-			for(int iAssetCount = 0; iAssetCount < NUMASSETTYPES; ++iAssetCount)
+			for(int iAssetCount = 0; iAssetCount < NUM_ASSETMANTYPES; ++iAssetCount)
 			{
 				QList<TreeModelItemData *> treeModelList;
-				QList<AssetItemData *> assetsItemList = pProjectItem->GetModel()->GetAssets(static_cast<AssetType>(iAssetCount));
+				QList<AssetItemData *> assetsItemList = pProjectItem->GetModel()->GetAssets(static_cast<AssetManagerType>(iAssetCount));
 				for(auto *pItem : assetsItemList)
 					treeModelList.push_back(pItem);
 
-				QJsonArray assetArray = MakeAssetJsonArray(pProjectItem->GetProject(), treeModelList, static_cast<AssetType>(iAssetCount));
-				itemObj.insert(HyGlobal::AssetName(static_cast<AssetType>(iAssetCount)), assetArray);
+				QJsonArray assetArray = MakeAssetJsonArray(pProjectItem->GetProject(), treeModelList, static_cast<AssetManagerType>(iAssetCount));
+				itemObj.insert(HyGlobal::AssetName(static_cast<AssetManagerType>(iAssetCount)), assetArray);
 			}
 
 			// FONT INFO

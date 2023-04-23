@@ -36,7 +36,7 @@ class AtlasFrame : public AssetItemData
 
 public:
 	AtlasFrame(IManagerModel &modelRef,
-			   HyGuiItemType eType,
+			   ItemType eType,
 			   QUuid uuid,
 			   quint32 uiChecksum,
 			   quint32 uiBankId,

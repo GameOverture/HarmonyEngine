@@ -200,7 +200,7 @@ void EntityDraw::ActivateVemOnNextJsonMeta()
 void EntityDraw::SetShapeEditVertex()
 {
 	if(m_SelectedItemList.count() != 1 ||
-	  (m_SelectedItemList[0]->GetGuiType() != ITEM_Primitive && m_SelectedItemList[0]->GetGuiType() != ITEM_Shape))
+	  (m_SelectedItemList[0]->GetGuiType() != ITEM_Primitive && m_SelectedItemList[0]->GetGuiType() != ITEM_BoundingVolume))
 	{
 		HyGuiLog("EntityDraw::SetShapeEditVertex() invoked when selection is invalid", LOGTYPE_Error);
 		return;
@@ -304,7 +304,7 @@ void EntityDraw::ClearShapeEdit()
 	for(int32 i = 0; i < descObjList.size(); ++i)
 	{
 		QJsonObject descObj = descObjList[i];
-		HyGuiItemType eType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
+		ItemType eType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
 		QUuid uuid(descObj["UUID"].toString());
 		bool bSelected = descObj["isSelected"].toBool();
 
@@ -867,7 +867,7 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 	// This updates the preview of a shape (its 'outline') when being transformed
 	for(EntityDrawItem *pSelectedItem : m_SelectedItemList)
 	{
-		if(pSelectedItem->GetGuiType() == ITEM_Shape)
+		if(pSelectedItem->GetGuiType() == ITEM_BoundingVolume)
 			pSelectedItem->GetShapeCtrl().Setup(pSelectedItem->GetShapeCtrl().GetShapeType(), ENTCOLOR_Shape, 0.7f, 0.0f);
 	}
 

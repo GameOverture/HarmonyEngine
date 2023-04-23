@@ -13,7 +13,7 @@
 #include "_Dependencies/scriptum/imagepacker.h"
 
 AudioAsset::AudioAsset(IManagerModel &modelRef,
-					   HyGuiItemType eType,
+					   ItemType eType,
 					   QUuid uuid,
 					   quint32 uiChecksum,
 					   quint32 uiBankId,

@@ -37,7 +37,7 @@
 #include <QJsonArray>
 
 ProjectItemData::ProjectItemData(Project &projRef,
-						 HyGuiItemType eType,
+						 ItemType eType,
 						 const QString sName,
 						 const FileDataPair &initItemFileDataRef,
 						 bool bIsPendingSave) :

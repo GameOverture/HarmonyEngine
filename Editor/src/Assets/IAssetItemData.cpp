@@ -11,7 +11,7 @@
 #include "IAssetItemData.h"
 #include "IManagerModel.h"
 
-AssetItemData::AssetItemData(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors) :
+AssetItemData::AssetItemData(IManagerModel &modelRef, ItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors) :
 	TreeModelItemData(eType, uuid, sName),
 	m_ModelRef(modelRef),
 	m_uiChecksum(uiChecksum),
@@ -21,7 +21,7 @@ AssetItemData::AssetItemData(IManagerModel &modelRef, HyGuiItemType eType, QUuid
 {
 }
 
-AssetType AssetItemData::GetManagerAssetType() const
+AssetManagerType AssetItemData::GetManagerAssetType() const
 {
 	return m_ModelRef.GetAssetType();
 }

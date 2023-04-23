@@ -74,7 +74,7 @@ int AudioGroupsModel::GetIndex(quint32 uiId) const
 }
 
 AudioManagerModel::AudioManagerModel(Project &projRef) :
-	IManagerModel(projRef, ASSET_Audio),
+	IManagerModel(projRef, ASSETMAN_Audio),
 	m_uiNextGroupId(2) // Defaults are SFX:0, Music:1
 {
 	m_DesiredRawFormat.setChannelCount(2);
@@ -233,7 +233,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 {
 }
 
-/*virtual*/ QList<AssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
+/*virtual*/ QList<AssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
 {
 	QList<AssetItemData *> returnList;
 	QList<WaveHeader> headerList;
@@ -443,7 +443,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	SaveRuntime();
 }
 
-AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, HyGuiItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef)
+AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, ItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef)
 {
 	QFile file(sFilePath);
 	if(!file.open(QIODevice::ReadOnly))

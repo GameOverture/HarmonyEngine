@@ -82,7 +82,7 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 	propertiesTreeModelRef.AppendCategory("Common", HyGlobal::ItemColor(ITEM_Prefix));
 	propertiesTreeModelRef.AppendProperty("Common", "UUID", PROPERTIESTYPE_LineEdit, pItemData->GetThisUuid().toString(QUuid::WithoutBraces), "The universally unique identifier of the Project Item this node represents", true);
 
-	if(pItemData->GetType() != ITEM_Shape)
+	if(pItemData->GetType() != ITEM_BoundingVolume)
 	{
 		propertiesTreeModelRef.AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused");
 		propertiesTreeModelRef.AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", false, -iRANGE, iRANGE, 1);
@@ -128,7 +128,7 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 		propertiesTreeModelRef.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
 		break;
 
-	case ITEM_Shape:
+	case ITEM_BoundingVolume:
 		propertiesTreeModelRef.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc");
 		propertiesTreeModelRef.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
 		propertiesTreeModelRef.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
@@ -352,7 +352,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewPasteItems(QJsonObject mimeOb
 		bool bIsArrayItem = false;
 		if(pArrayFolder)
 		{
-			HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
+			ItemType eGuiType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
 			if(eGuiType != pArrayFolder->GetType())
 			{
 				HyGuiLog("EntityUndoCmd_PasteItems::redo - pasted array item (" % descObj["codeName"].toString() % ") " % descObj["itemType"].toString() % " did match array type", LOGTYPE_Error);
@@ -557,7 +557,7 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 	InsertChildAndShapeList(uiIndex, stateFileDataOut);
 }
 
-/*virtual*/ QList<AssetItemData *> EntityModel::GetAssets(AssetType eAssetType) const /*override*/
+/*virtual*/ QList<AssetItemData *> EntityModel::GetAssets(AssetManagerType eAssetType) const /*override*/
 {
 	// TODO: EntityModel::GetAssets
 	return QList<AssetItemData *>();

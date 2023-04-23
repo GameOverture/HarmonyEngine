@@ -80,7 +80,7 @@ void AudioAssetsWidget::SetupForFMOD()
 		NUM_FMODSTEPS
 	};
 
-	QDir dataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::AssetName(ASSET_Audio));
+	QDir dataDir(m_pProjOwner->GetAssetsAbsPath() + HyGlobal::AssetName(ASSETMAN_Audio));
 	QFile guidFile(dataDir.filePath("GUIDs.txt"));
 
 	QTcpSocket socket(this);

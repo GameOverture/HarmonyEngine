@@ -182,7 +182,7 @@ EntityWidget::~EntityWidget()
 		bool bAllArrayItems = true;
 
 		QModelIndex parentIndex = selectedIndices.at(0).parent();
-		HyGuiItemType eType = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>()->GetType();
+		ItemType eType = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>()->GetType();
 		for(const QModelIndex &index : selectedIndices)
 		{
 			if(index.parent() != parentIndex)
@@ -200,12 +200,12 @@ EntityWidget::~EntityWidget()
 		ui->actionOrderChildrenUp->setEnabled(bSelectedHaveSameParent);
 		ui->actionOrderChildrenDown->setEnabled(bSelectedHaveSameParent);
 
-		if(bRootOrBvFolder == false && selectedIndices.size() == 1 && (eType == ITEM_Primitive || eType == ITEM_Shape))
+		if(bRootOrBvFolder == false && selectedIndices.size() == 1 && (eType == ITEM_Primitive || eType == ITEM_BoundingVolume))
 		{
 			ui->actionConvertShape->setEnabled(true);
 			if(eType == ITEM_Primitive)
 			{
-				ui->actionConvertShape->setIcon(HyGlobal::ItemIcon(ITEM_Shape, SUBICON_None));
+				ui->actionConvertShape->setIcon(HyGlobal::ItemIcon(ITEM_BoundingVolume, SUBICON_None));
 				ui->actionConvertShape->setText("Convert Shape to Bounding Volume");
 			}
 			else
@@ -281,7 +281,7 @@ EntityWidget::~EntityWidget()
 			PropertiesTreeModel &propModelRef = pEntTreeItemData->GetPropertiesModel(GetCurStateIndex());
 			ui->propertyTree->setModel(&propModelRef);
 
-			bEnableVemMode = (pEntTreeItemData->GetType() == ITEM_Primitive || pEntTreeItemData->GetType() == ITEM_Shape);
+			bEnableVemMode = (pEntTreeItemData->GetType() == ITEM_Primitive || pEntTreeItemData->GetType() == ITEM_BoundingVolume);
 		}
 		else
 		{
@@ -701,7 +701,7 @@ void EntityWidget::on_actionConvertShape_triggered()
 		return;
 	}
 	EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(selectedIndexList[0], Qt::UserRole).value<EntityTreeItemData *>();
-	if(pCurItemData->GetType() != ITEM_Primitive && pCurItemData->GetType() != ITEM_Shape)
+	if(pCurItemData->GetType() != ITEM_Primitive && pCurItemData->GetType() != ITEM_BoundingVolume)
 	{
 		HyGuiLog("EntityWidget::on_actionConvertShape_triggered was invoked with improper selection type", LOGTYPE_Error);
 		return;

@@ -63,13 +63,13 @@
 	}
 	
 	// ATLAS
-	QDir metaAtlasDir(sMetaAbsPath + HyGlobal::AssetName(ASSET_Atlas));
+	QDir metaAtlasDir(sMetaAbsPath + HyGlobal::AssetName(ASSETMAN_Atlases));
 	if(metaAtlasDir.exists() == false)
 	{
 		HyGuiLog("Meta atlas directory is missing, recreating", LOGTYPE_Info);
 		metaAtlasDir.mkpath(metaAtlasDir.absolutePath());
 	}
-	QDir dataAtlasDir(sDataAbsPath + HyGlobal::AssetName(ASSET_Atlas));
+	QDir dataAtlasDir(sDataAbsPath + HyGlobal::AssetName(ASSETMAN_Atlases));
 	if(dataAtlasDir.exists() == false)
 	{
 		HyGuiLog("Data atlas directory is missing, recreating", LOGTYPE_Info);
@@ -77,13 +77,13 @@
 	}
 
 	// AUDIO
-	QDir metaAudioDir(sMetaAbsPath + HyGlobal::AssetName(ASSET_Audio));
+	QDir metaAudioDir(sMetaAbsPath + HyGlobal::AssetName(ASSETMAN_Audio));
 	if(metaAudioDir.exists() == false)
 	{
 		HyGuiLog("Meta audio directory is missing, recreating", LOGTYPE_Info);
 		metaAudioDir.mkpath(metaAudioDir.absolutePath());
 	}
-	QDir dataAudioDir(sDataAbsPath + HyGlobal::AssetName(ASSET_Audio));
+	QDir dataAudioDir(sDataAbsPath + HyGlobal::AssetName(ASSETMAN_Audio));
 	if(dataAudioDir.exists() == false)
 	{
 		HyGuiLog("Data audio directory is missing, recreating", LOGTYPE_Info);
@@ -93,11 +93,11 @@
 	// Assemble correct/proper file names
 	QString sMetaItemsPath = metaDir.absoluteFilePath(QString(HYGUIPATH_ItemsFileName) % HYGUIPATH_MetaExt);
 	QString sDataItemsPath = dataDir.absoluteFilePath(QString(HYGUIPATH_ItemsFileName) % HYGUIPATH_DataExt);
-	QString sMetaSourcePath = metaSourceDir.absoluteFilePath(HyGlobal::AssetName(ASSET_Source) % HYGUIPATH_MetaExt);
-	QString sMetaAtlasesPath = metaAtlasDir.absoluteFilePath(HyGlobal::AssetName(ASSET_Atlas) % HYGUIPATH_MetaExt);
-	QString sDataAtlasesPath = dataAtlasDir.absoluteFilePath(HyGlobal::AssetName(ASSET_Atlas) % HYGUIPATH_DataExt);
-	QString sMetaAudioPath = metaAudioDir.absoluteFilePath(HyGlobal::AssetName(ASSET_Audio) % HYGUIPATH_MetaExt);
-	QString sDataAudioPath = dataAudioDir.absoluteFilePath(HyGlobal::AssetName(ASSET_Audio) % HYGUIPATH_DataExt);
+	QString sMetaSourcePath = metaSourceDir.absoluteFilePath(HyGlobal::AssetName(ASSETMAN_Source) % HYGUIPATH_MetaExt);
+	QString sMetaAtlasesPath = metaAtlasDir.absoluteFilePath(HyGlobal::AssetName(ASSETMAN_Atlases) % HYGUIPATH_MetaExt);
+	QString sDataAtlasesPath = dataAtlasDir.absoluteFilePath(HyGlobal::AssetName(ASSETMAN_Atlases) % HYGUIPATH_DataExt);
+	QString sMetaAudioPath = metaAudioDir.absoluteFilePath(HyGlobal::AssetName(ASSETMAN_Audio) % HYGUIPATH_MetaExt);
+	QString sDataAudioPath = dataAudioDir.absoluteFilePath(HyGlobal::AssetName(ASSETMAN_Audio) % HYGUIPATH_DataExt);
 
 	// Get files' versions and acquire each QJsonDocument to be sent into the patching functions
 	QJsonDocument metaItemsDoc;
@@ -579,7 +579,7 @@
 			HyGuiLog("HyGlobal::GetItemFromAtlasItem() could not find the proper item", LOGTYPE_Error);
 		}
 		frameObj.remove("type");
-		frameObj.insert("itemType", HyGlobal::ItemName(static_cast<HyGuiItemType>(iAtlasItemType), false));
+		frameObj.insert("itemType", HyGlobal::ItemName(static_cast<ItemType>(iAtlasItemType), false));
 
 		framesArray.replace(i, frameObj);
 	}
@@ -806,7 +806,7 @@
 
 	// Copy source code into new <meta>/Source location
 	QDir oldSrcDir(pProj->GetDirPath() + projObj["SourcePath"].toString());
-	QDir newSrcDir(pProj->GetDirPath() + projObj["MetaDataPath"].toString() + HyGlobal::AssetName(ASSET_Source));
+	QDir newSrcDir(pProj->GetDirPath() + projObj["MetaDataPath"].toString() + HyGlobal::AssetName(ASSETMAN_Source));
 	newSrcDir.mkpath(".");
 
 	QStringList sFoundSourceFileAppendList;
@@ -841,7 +841,7 @@
 	projObj.remove("MetaDataPath");
 	projObj.insert("MetaPath", sMetaPath);
 
-	QString sSourcePath = sMetaPath + HyGlobal::AssetName(ASSET_Source) + "/";
+	QString sSourcePath = sMetaPath + HyGlobal::AssetName(ASSETMAN_Source) + "/";
 	projObj.insert("SourcePath", sSourcePath); // Re-add back 'SourcePath' from version 6 since that is needed to be separated from meta (to make clones/skins etc easier)
 
 	projDocRef.setObject(projObj);

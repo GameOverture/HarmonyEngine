@@ -25,7 +25,7 @@ TreeModelItemData::TreeModelItemData() :
 	HyGuiLog("Invalid TreeModelItemData ctor used", LOGTYPE_Error);
 }
 
-TreeModelItemData::TreeModelItemData(HyGuiItemType eType, const QUuid &uuid, const QString sText) :
+TreeModelItemData::TreeModelItemData(ItemType eType, const QUuid &uuid, const QString sText) :
 	m_eTYPE(eType),
 	m_UUID(uuid),
 	m_sName(sText),
@@ -36,7 +36,7 @@ TreeModelItemData::TreeModelItemData(HyGuiItemType eType, const QUuid &uuid, con
 {
 }
 
-HyGuiItemType TreeModelItemData::GetType() const
+ItemType TreeModelItemData::GetType() const
 {
 	return m_eTYPE;
 }

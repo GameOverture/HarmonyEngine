@@ -41,7 +41,7 @@ class EntityTreeItemData : public TreeModelItemData
 	bool												m_bIsSelected;
 
 public:
-	EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, HyGuiItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis);
+	EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis);
 	EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QJsonObject descObj, QJsonArray propArray, bool bIsArrayItem);
 	virtual ~EntityTreeItemData();
 
@@ -107,7 +107,7 @@ protected:
 	bool ShouldForwardDeclare(ProjectItemData *pProjItem);
 	bool ShouldForwardDeclare(const QJsonObject &initObj);
 
-	bool FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, HyGuiItemType eItemType, int iRowToCreateAt); // 'pParentTreeItemOut' must point to either Root or BvFolder, it will be reassigned to the ArrayFolder that is either found (return true), or newly created (return false)
+	bool FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, ItemType eItemType, int iRowToCreateAt); // 'pParentTreeItemOut' must point to either Root or BvFolder, it will be reassigned to the ArrayFolder that is either found (return true), or newly created (return false)
 };
 
 #endif // ENTITYTREEMODEL_H

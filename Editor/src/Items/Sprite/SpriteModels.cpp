@@ -448,11 +448,11 @@ void SpriteModel::Cmd_RemoveFrames(int iStateIndex, QList<AtlasFrame *> frameLis
 	stateFileDataOut.m_Data.insert("duration", fTotalDuration);
 }
 
-/*virtual*/ QList<AssetItemData *> SpriteModel::GetAssets(AssetType eAssetType) const /*override*/
+/*virtual*/ QList<AssetItemData *> SpriteModel::GetAssets(AssetManagerType eAssetType) const /*override*/
 {
 	QList<AssetItemData *> retAtlasFrameList;
 
-	if(eAssetType == ASSET_Atlas)
+	if(eAssetType == ASSETMAN_Atlases)
 	{
 		for(int i = 0; i < m_StateList.size(); ++i)
 		{

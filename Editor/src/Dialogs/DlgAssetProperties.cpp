@@ -82,7 +82,7 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<Asset
 
 	switch(pManagerModel->GetAssetType())
 	{
-	case ASSET_Atlas: {
+	case ASSETMAN_Atlases: {
 		// Texture Format ///////////////////////////////////////////////////////////////////////////////////////////
 		HyTextureInfo texInfo = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetTextureInfo();
 		bool bIsDiffOptions = false;
@@ -144,7 +144,7 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<Asset
 		ui->cmbTextureFiltering->setCurrentIndex(eFiltering == HYTEXFILTER_Unknown ? 0 : eFiltering);
 		break; }
 
-	case ASSET_Audio:
+	case ASSETMAN_Audio:
 		// Audio Group ////////////////////////////////////////////////////////////////////////////////////////////
 		int32 iGroupId = static_cast<AudioAsset *>(m_SelectedAssets[0])->GetGroupId();
 		bool bCheckable = false;
@@ -229,7 +229,7 @@ void DlgAssetProperties::ApplyChanges()
 {
 	switch(ui->stackedAssetType->currentIndex())
 	{
-	case ASSET_Atlas: {
+	case ASSETMAN_Atlases: {
 		uint8 uiParam1 = 0, uiParam2 = 0;
 		HyTextureFormat eFormat = GetSelectedAtlasFormat(uiParam1, uiParam2);
 		HyTextureFiltering eFiltering = GetSelectedAtlasFiltering();
@@ -247,7 +247,7 @@ void DlgAssetProperties::ApplyChanges()
 		}
 		break; }
 
-	case ASSET_Audio:
+	case ASSETMAN_Audio:
 		for(auto pAsset : m_ChangedAssets)
 		{
 			AudioAsset *pAudio = static_cast<AudioAsset *>(pAsset);
@@ -370,7 +370,7 @@ void DlgAssetProperties::Refresh()
 {
 	switch(ui->stackedAssetType->currentIndex())
 	{
-	case ASSET_Atlas: {
+	case ASSETMAN_Atlases: {
 		uint8 uiParam1 = 0, uiParam2 = 0;
 		HyTextureFormat eFormat = GetSelectedAtlasFormat(uiParam1, uiParam2);
 		if(eFormat == HYTEXTURE_Unknown)
@@ -382,7 +382,7 @@ void DlgAssetProperties::Refresh()
 		}
 		break; }
 
-	case ASSET_Audio:
+	case ASSETMAN_Audio:
 		ui->sbVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
 		ui->lblVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
 		break;
@@ -395,7 +395,7 @@ bool DlgAssetProperties::DetermineChangedAssets()
 
 	switch(ui->stackedAssetType->currentIndex())
 	{
-	case ASSET_Atlas: {
+	case ASSETMAN_Atlases: {
 		uint8 uiParam1 = 0, uiParam2 = 0;
 		HyTextureFormat eFormat = GetSelectedAtlasFormat(uiParam1, uiParam2);
 		HyTextureFiltering eFiltering = GetSelectedAtlasFiltering();
@@ -415,7 +415,7 @@ bool DlgAssetProperties::DetermineChangedAssets()
 		}
 		break; }
 
-	case ASSET_Audio:
+	case ASSETMAN_Audio:
 		for(auto pAsset : m_SelectedAssets)
 		{
 			AudioAsset *pAudio = static_cast<AudioAsset *>(pAsset);

@@ -15,14 +15,14 @@
 
 class AssetMimeData : public IMimeData
 {
-	uint32				m_AssetCounts[NUMASSETTYPES];
+	uint32				m_AssetCounts[NUM_ASSETMANTYPES];
 
 public:
-	AssetMimeData(Project &projRef, QList<TreeModelItemData *> &assetListRef, AssetType eAssetType);
+	AssetMimeData(Project &projRef, QList<TreeModelItemData *> &assetListRef, AssetManagerType eAssetType);
 	virtual ~AssetMimeData();
 
-	uint32 GetNumAssetsOfType(AssetType eAssetType) const;
-	QJsonArray GetAssetsArray(AssetType eAssetType) const;
+	uint32 GetNumAssetsOfType(AssetManagerType eAssetType) const;
+	QJsonArray GetAssetsArray(AssetManagerType eAssetType) const;
 };
 
 #endif // AssetMimeData_H

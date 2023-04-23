@@ -18,7 +18,7 @@
 #include <QPushButton>
 #include <QFileDialog>
 
-DlgNewItem::DlgNewItem(Project *pItemProject, HyGuiItemType eItem, QString sDefaultPrefix, QWidget *parent) :
+DlgNewItem::DlgNewItem(Project *pItemProject, ItemType eItem, QString sDefaultPrefix, QWidget *parent) :
 	QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
 	ui(new Ui::DlgNewItem),
 	m_pItemProject(pItemProject),

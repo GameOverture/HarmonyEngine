@@ -121,7 +121,7 @@ public:
 	virtual bool OnPrepSave() = 0;	// Prepares item for saving, and returns if valid
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) = 0;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const = 0;
-	virtual QList<AssetItemData *> GetAssets(AssetType eAssetType) const = 0;
+	virtual QList<AssetItemData *> GetAssets(AssetManagerType eAssetType) const = 0;
 };
 
 #endif // IMODEL_H

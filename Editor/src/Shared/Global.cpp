@@ -14,18 +14,18 @@
 
 #include <QProcess>
 
-/*static*/ QString HyGlobal::sm_sItemNames[NUMTYPES];
-/*static*/ QString HyGlobal::sm_sItemNamesPlural[NUMTYPES];
-/*static*/ QString HyGlobal::sm_AssetNames[NUMASSETTYPES];
+/*static*/ QString HyGlobal::sm_sItemNames[NUM_ITEMTYPES];
+/*static*/ QString HyGlobal::sm_sItemNamesPlural[NUM_ITEMTYPES];
+/*static*/ QString HyGlobal::sm_AssetNames[NUM_ASSETMANTYPES];
 /*static*/ QString HyGlobal::sm_ShapeNames[NUM_SHAPES];
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
 
-/*static*/ QIcon HyGlobal::sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
-/*static*/ QColor HyGlobal::sm_ItemColors[NUMTYPES];
+/*static*/ QIcon HyGlobal::sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
+/*static*/ QColor HyGlobal::sm_ItemColors[NUM_ITEMTYPES];
 
 /*static*/ QString HyGlobal::sm_MimeTypes[NUM_MIMETYPES];
 
-/*static*/ QString HyGlobal::sm_Themes[NUMTHEMES];
+/*static*/ QString HyGlobal::sm_Themes[NUM_THEMES];
 
 /*static*/ QRegExpValidator *HyGlobal::sm_pCodeNameValidator = nullptr;
 /*static*/ QRegExpValidator *HyGlobal::sm_pFreeFormValidator = nullptr;
@@ -43,18 +43,18 @@
 	sm_sItemNames[ITEM_Filter] = "Filter";
 	sm_sItemNames[ITEM_AtlasFrame] = "AtlasFrame";
 	sm_sItemNames[ITEM_SoundClip] = "SoundClip";
+	sm_sItemNames[ITEM_Source] = "Source";
+	sm_sItemNames[ITEM_Header] = "Header";
 	sm_sItemNames[ITEM_Primitive] = "Primitive";
 	sm_sItemNames[ITEM_Audio] = "Audio";
 	sm_sItemNames[ITEM_Particles] = "Particles";
 	sm_sItemNames[ITEM_Text] = "Text";
 	sm_sItemNames[ITEM_Spine] = "Spine";
 	sm_sItemNames[ITEM_Sprite] = "Sprite";
-	sm_sItemNames[ITEM_Source] = "Source";
-	sm_sItemNames[ITEM_Header] = "Header";
+	sm_sItemNames[ITEM_Prefab] = "Prefab";
 	sm_sItemNames[ITEM_Entity] = "Entity";
-    sm_sItemNames[ITEM_Prefab] = "Prefab";
-	sm_sItemNames[ITEM_Entity3d] = "Not Used";
-	sm_sItemNames[ITEM_Shape] = "Shape";
+	sm_sItemNames[ITEM_Entity3d] = "Entity3d";
+	sm_sItemNames[ITEM_BoundingVolume] = "BoundingVolume";
 	sm_sItemNames[ITEM_Physics] = "Physics";
 
 	sm_sItemNamesPlural[ITEM_Project] = "Projects";
@@ -62,24 +62,24 @@
 	sm_sItemNamesPlural[ITEM_Filter] = "Filters";
 	sm_sItemNamesPlural[ITEM_AtlasFrame] = "AtlasFrames";
 	sm_sItemNamesPlural[ITEM_SoundClip] = "SoundClips";
+	sm_sItemNamesPlural[ITEM_Source] = "Source";
+	sm_sItemNamesPlural[ITEM_Header] = "Headers";
 	sm_sItemNamesPlural[ITEM_Primitive] = "Primitives";
 	sm_sItemNamesPlural[ITEM_Audio] = "Audio";
 	sm_sItemNamesPlural[ITEM_Particles] = "Particles";
 	sm_sItemNamesPlural[ITEM_Text] = "Texts";
 	sm_sItemNamesPlural[ITEM_Spine] = "Spine";
 	sm_sItemNamesPlural[ITEM_Sprite] = "Sprites";
-	sm_sItemNamesPlural[ITEM_Source] = "Source";
-	sm_sItemNamesPlural[ITEM_Header] = "Headers";
-	sm_sItemNamesPlural[ITEM_Entity] = "Entities";
     sm_sItemNamesPlural[ITEM_Prefab] = "Prefabs";
-	sm_sItemNamesPlural[ITEM_Entity3d] = "Not Used";
-	sm_sItemNamesPlural[ITEM_Shape] = "Shapes";
+	sm_sItemNamesPlural[ITEM_Entity] = "Entities";
+	sm_sItemNamesPlural[ITEM_Entity3d] = "Entities3d";
+	sm_sItemNamesPlural[ITEM_BoundingVolume] = "BoundingVolumes";
 	sm_sItemNamesPlural[ITEM_Physics] = "Physics";
 
-	sm_AssetNames[ASSET_Source] = "Source";
-	sm_AssetNames[ASSET_Atlas] = "Atlases";
-	sm_AssetNames[ASSET_Prefabs] = "Prefabs";
-	sm_AssetNames[ASSET_Audio] = "Audio";
+	sm_AssetNames[ASSETMAN_Source] = "Source";
+	sm_AssetNames[ASSETMAN_Atlases] = "Atlases";
+	sm_AssetNames[ASSETMAN_Prefabs] = "Prefabs";
+	sm_AssetNames[ASSETMAN_Audio] = "Audio";
 
 	sm_ShapeNames[SHAPE_None] = "None";
 	sm_ShapeNames[SHAPE_Box] = "Box";
@@ -99,7 +99,7 @@
 	sm_sSubIconNames[SUBICON_Warning] = "-Warning";
 	sm_sSubIconNames[SUBICON_Activated] = "-Pending";
 
-	for(int i = 0; i < NUMTYPES; ++i)
+	for(int i = 0; i < NUM_ITEMTYPES; ++i)
 	{
 		for(int j = 0; j < NUM_SUBICONS; ++j)
 		{
@@ -113,18 +113,18 @@
 	sm_ItemColors[ITEM_Filter] = QColor(228, 212, 128);
 	sm_ItemColors[ITEM_AtlasFrame] = QColor(45, 131, 176);
 	sm_ItemColors[ITEM_SoundClip] = QColor(203, 233, 131);
+	sm_ItemColors[ITEM_Source] = QColor(225, 151, 97);
+	sm_ItemColors[ITEM_Header] = QColor(225, 151, 97);
 	sm_ItemColors[ITEM_Primitive] = QColor(101, 233, 235);
 	sm_ItemColors[ITEM_Audio] = QColor(203, 233, 131);
 	sm_ItemColors[ITEM_Particles] = QColor(218, 0, 0);
 	sm_ItemColors[ITEM_Text] = QColor(179, 179, 179);
 	sm_ItemColors[ITEM_Spine] = QColor(209, 159, 223);
 	sm_ItemColors[ITEM_Sprite] = QColor(129, 166, 225);
-	sm_ItemColors[ITEM_Source] = QColor(225, 151, 97);
-	sm_ItemColors[ITEM_Header] = QColor(225, 151, 97);
+	sm_ItemColors[ITEM_Prefab] = QColor(203, 233, 131);
 	sm_ItemColors[ITEM_Entity] = QColor(128, 128, 128);
-    sm_ItemColors[ITEM_Prefab] = QColor(203, 233, 131);
 	sm_ItemColors[ITEM_Entity3d] = QColor(128, 128, 128);
-	sm_ItemColors[ITEM_Shape] = QColor(234, 232, 58);
+	sm_ItemColors[ITEM_BoundingVolume] = QColor(234, 232, 58);
 	sm_ItemColors[ITEM_Physics] = QColor(201, 58, 203);
 
 	sm_MimeTypes[MIMETYPE_ProjectItems] = "application/x-hyprojitems";
@@ -147,9 +147,9 @@
 	sm_ErrorStrings[ASSETERROR_CouldNotPack] = "Could not pack this frame in atlas";
 }
 
-/*static*/ QList<HyGuiItemType> HyGlobal::GetProjItemTypeList()
+/*static*/ QList<ItemType> HyGlobal::GetProjItemTypeList()
 {
-	QList<HyGuiItemType> list;
+	QList<ItemType> list;
 	list.append(ITEM_Audio);
 	list.append(ITEM_Particles);
 	list.append(ITEM_Text);
@@ -162,30 +162,30 @@
 	return list;
 }
 
-/*static*/ QList<HyGuiItemType> HyGlobal::GetTypeList()
+/*static*/ QList<ItemType> HyGlobal::GetTypeList()
 {
-	QList<HyGuiItemType> list;
+	QList<ItemType> list;
 
 	list.append(ITEM_Project);
 	list.append(ITEM_Prefix);
 	list.append(ITEM_Filter);
 	list.append(ITEM_AtlasFrame);
 	list.append(ITEM_SoundClip);
+	list.append(ITEM_Source);
+	list.append(ITEM_Header);
 	list.append(ITEM_Primitive);
 	list.append(ITEM_Audio);
 	list.append(ITEM_Particles);
 	list.append(ITEM_Text);
 	list.append(ITEM_Spine);
 	list.append(ITEM_Sprite);
-	list.append(ITEM_Source);
-	list.append(ITEM_Header);
-	list.append(ITEM_Entity);
 	list.append(ITEM_Prefab);
+	list.append(ITEM_Entity);
 	list.append(ITEM_Entity3d);
-	list.append(ITEM_Shape);
+	list.append(ITEM_BoundingVolume);
 	list.append(ITEM_Physics);
 
-	if(list.size() != NUMTYPES)
+	if(list.size() != NUM_ITEMTYPES)
 		HyGuiLog("HyGlobal::GetTypeList missing a type!", LOGTYPE_Error);
 
 	return list;
@@ -210,7 +210,7 @@
 
 /*static*/ QStringList HyGlobal::GetTypeNameList()
 {
-	QList<HyGuiItemType> dirList = GetTypeList();
+	QList<ItemType> dirList = GetTypeList();
 
 	QStringList list;
 	for(int i = 0; i < dirList.size(); ++i)
@@ -219,7 +219,7 @@
 	return list;
 }
 
-/*static*/ HyGuiItemType HyGlobal::GetTypeFromString(QString sType)
+/*static*/ ItemType HyGlobal::GetTypeFromString(QString sType)
 {
 	QStringList sTypeList = GetTypeNameList();
 	for(int i = 0; i < sTypeList.size(); ++i)
@@ -253,7 +253,7 @@
 	return SHAPE_None;
 }
 
-/*static*/ const QString HyGlobal::ItemExt(HyGuiItemType eItem)
+/*static*/ const QString HyGlobal::ItemExt(ItemType eItem)
 {
 	switch(eItem)
 	{
@@ -264,20 +264,20 @@
 	return "";
 }
 
-/*static*/ const QIcon HyGlobal::AssetIcon(AssetType eAsset, SubIcon eSubIcon)
+/*static*/ const QIcon HyGlobal::AssetIcon(AssetManagerType eAsset, SubIcon eSubIcon)
 {
 	switch(eAsset)
 	{
-	case ASSET_Source:
+	case ASSETMAN_Source:
 		return sm_ItemIcons[ITEM_Source][eSubIcon];
-	case ASSET_Atlas:
+	case ASSETMAN_Atlases:
 		return sm_ItemIcons[ITEM_AtlasFrame][eSubIcon];
-	case ASSET_Prefabs:
+	case ASSETMAN_Prefabs:
 		return sm_ItemIcons[ITEM_Prefab][eSubIcon];
-	case ASSET_Audio:
+	case ASSETMAN_Audio:
 		return sm_ItemIcons[ITEM_SoundClip][eSubIcon];
 
-	case ASSET_Unknown:
+	case ASSETMAN_Unknown:
 	default:
 		return QIcon();
 	}

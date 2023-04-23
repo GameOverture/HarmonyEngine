@@ -44,7 +44,7 @@ class ProjectItemData : public ExplorerItemData
 	IWidget *				m_pWidget;
 	IDraw *					m_pDraw;
 	
-	ProjectItemData(Project &projRef, HyGuiItemType eType, const QString sName, const FileDataPair &initItemFileDataRef, bool bIsPendingSave);
+	ProjectItemData(Project &projRef, ItemType eType, const QString sName, const FileDataPair &initItemFileDataRef, bool bIsPendingSave);
 public:
 	virtual ~ProjectItemData();
 

@@ -178,9 +178,9 @@ PropertiesTreeModel &AudioModel::GetPropertiesModel(uint uiStateIndex)
 		stateFileDataOut.m_Data.insert("maxDist", 0);
 }
 
-/*virtual*/ QList<AssetItemData *> AudioModel::GetAssets(AssetType eAssetType) const /*override*/
+/*virtual*/ QList<AssetItemData *> AudioModel::GetAssets(AssetManagerType eAssetType) const /*override*/
 {
-	if(eAssetType != ASSET_Audio)
+	if(eAssetType != ASSETMAN_Audio)
 		return QList<AssetItemData *>();
 
 	QList<AssetItemData *> returnList;

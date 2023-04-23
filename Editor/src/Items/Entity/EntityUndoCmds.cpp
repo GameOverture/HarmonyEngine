@@ -255,7 +255,7 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 			pDestinationParent = entTreeModelRef.GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
 		else
 		{
-			if(m_SelectedItemDataList[i]->GetType() == ITEM_Shape)
+			if(m_SelectedItemDataList[i]->GetType() == ITEM_BoundingVolume)
 				pDestinationParent = entTreeModelRef.GetBvFolderTreeItemData();
 			else
 				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
@@ -283,7 +283,7 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 			pDestinationParent = entTreeModelRef.GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
 		else
 		{
-			if(m_SelectedItemDataList[i]->GetType() == ITEM_Shape)
+			if(m_SelectedItemDataList[i]->GetType() == ITEM_BoundingVolume)
 				pDestinationParent = entTreeModelRef.GetBvFolderTreeItemData();
 			else
 				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
@@ -329,7 +329,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	QList<QUuid> affectedItemUuidList;
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
-		if(m_AffectedItemDataList[i]->GetType() != ITEM_Shape)
+		if(m_AffectedItemDataList[i]->GetType() != ITEM_BoundingVolume)
 		{
 			glm::decompose(m_NewTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
 			double dRotation = glm::degrees(glm::atan(m_NewTransformList[i][0][1], m_NewTransformList[i][0][0]));
@@ -370,7 +370,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	QList<QUuid> affectedItemUuidList;
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
-		if(m_AffectedItemDataList[i]->GetType() != ITEM_Shape)
+		if(m_AffectedItemDataList[i]->GetType() != ITEM_BoundingVolume)
 		{
 			glm::decompose(m_OldTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
 
@@ -468,7 +468,7 @@ EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityIt
 	m_pPrevShapeItemData(pShapeItemData),
 	m_iPoppedIndex(-1)
 {
-	if(m_pPrevShapeItemData->GetType() == ITEM_Shape)
+	if(m_pPrevShapeItemData->GetType() == ITEM_BoundingVolume)
 		setText("Convert shape to Primitive");
 	else
 		setText("Convert shape to Bounding Volume");
@@ -486,7 +486,7 @@ EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityIt
 	{
 		EditorShape eShape = HyGlobal::GetShapeFromString(m_pPrevShapeItemData->GetPropertiesModel(0).FindPropertyValue("Shape", "Type").toString());
 		QString sData = m_pPrevShapeItemData->GetPropertiesModel(0).FindPropertyValue("Shape", "Data").toString();
-		bool bConvertingToPrimitive = m_pPrevShapeItemData->GetType() == ITEM_Shape;
+		bool bConvertingToPrimitive = m_pPrevShapeItemData->GetType() == ITEM_BoundingVolume;
 
 		m_pNewShapeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewShape(eShape, sData, bConvertingToPrimitive, -1);
 		for(int iStateIndex = 0; iStateIndex < m_EntityItemRef.GetModel()->GetNumStates(); ++iStateIndex)

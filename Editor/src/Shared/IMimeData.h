@@ -35,7 +35,7 @@ public:
 protected:
 	virtual QVariant retrieveData(const QString &sMimeType, QVariant::Type type) const override;
 
-	QJsonArray MakeAssetJsonArray(Project &projRef, QList<TreeModelItemData *> assetList, AssetType eAssetType);
+	QJsonArray MakeAssetJsonArray(Project &projRef, QList<TreeModelItemData *> assetList, AssetManagerType eAssetType);
 };
 
 #endif // IMIMEDATA_H

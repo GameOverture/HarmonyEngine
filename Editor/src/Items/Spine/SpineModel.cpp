@@ -366,11 +366,11 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 #endif
 }
 
-/*virtual*/ QList<AssetItemData *> SpineModel::GetAssets(AssetType eAssetType) const /*override*/
+/*virtual*/ QList<AssetItemData *> SpineModel::GetAssets(AssetManagerType eAssetType) const /*override*/
 {
 	QList<AssetItemData *> retAtlasFrameList;
 
-	if(eAssetType == ASSET_Atlas)
+	if(eAssetType == ASSETMAN_Atlases)
 	{
 		for(auto &subAtlas : m_SubAtlasList)
 		{

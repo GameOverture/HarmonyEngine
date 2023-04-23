@@ -28,7 +28,7 @@ protected:
 	BanksModel										m_BanksModel;
 
 	Project &										m_ProjectRef;
-	const AssetType									m_eASSET_TYPE;
+	const AssetManagerType									m_eASSET_TYPE;
 
 	bool											m_bIsSingleBank;
 
@@ -43,12 +43,12 @@ protected:
 	QList<ProjectItemData *>						m_RepackAffectedItemList; // Keep track of any linked/referenced items as they will need to be re-saved after asset repacking
 
 public:
-	IManagerModel(Project &projRef, AssetType eAssetType);
+	IManagerModel(Project &projRef, AssetManagerType eAssetType);
 	virtual ~IManagerModel();
 
 	void Init();	// Init() exists because we need to construct using virtual functions (or after derived ctor initialization)
 
-	AssetType GetAssetType() const;
+	AssetManagerType GetAssetType() const;
 	Project &GetProjOwner() const;
 	QAbstractListModel *GetBanksModel();
 	bool IsSingleBank() const;
@@ -63,7 +63,7 @@ public:
 	QList<AssetItemData *> GetBankAssets(uint uiBankIndex);
 
 	void GenerateAssetsDlg(const QModelIndex &indexDestination);
-	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
+	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
 	void RemoveItems(QList<AssetItemData *> assetsList, QList<TreeModelItemData *> filtersList);
 	bool CanReplaceAssets(QList<AssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const;
 	void ReplaceAssets(QList<AssetItemData *> assetsList, bool bWithNewAssets);
@@ -120,7 +120,7 @@ protected:
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 
 	virtual void OnGenerateAssetsDlg(const QModelIndex &indexDestination) = 0;
-	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset
+	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QStringList sPreviousFilterPaths, QList<AssetItemData *> assetList) = 0; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) = 0;
 	virtual bool OnUpdateAssets(QList<AssetItemData *> assetList) = 0;

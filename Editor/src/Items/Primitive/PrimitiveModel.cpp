@@ -27,7 +27,7 @@ PrimitiveModel::~PrimitiveModel()
 {
 }
 
-/*virtual*/ QList<AssetItemData *> PrimitiveModel::GetAssets(AssetType eAssetType) const /*override*/
+/*virtual*/ QList<AssetItemData *> PrimitiveModel::GetAssets(AssetManagerType eAssetType) const /*override*/
 {
 	return QList<AssetItemData *>();
 }

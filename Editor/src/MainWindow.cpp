@@ -160,7 +160,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 
 		bool bThemeFound = false;
 		QString sTheme = m_Settings.value("theme").toString();
-		for(int i = 0; i < NUMTHEMES; ++i)
+		for(int i = 0; i < NUM_THEMES; ++i)
 		{
 			if(sTheme == HyGlobal::ThemeString(static_cast<Theme>(i)))
 			{
@@ -295,16 +295,16 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		int iAssetManagerTabIndex = settings.value("TabIndex").toInt();
 		ui->tabWidgetAssetManager->setCurrentIndex(iAssetManagerTabIndex);
 
-		QStringList expandedSourceList = settings.value(HyGlobal::AssetName(ASSET_Source)).toStringList();
+		QStringList expandedSourceList = settings.value(HyGlobal::AssetName(ASSETMAN_Source)).toStringList();
 		pProject->GetSourceWidget()->RestoreExpandedState(expandedSourceList);
 
-		QStringList expandedAtlasList = settings.value(HyGlobal::AssetName(ASSET_Atlas)).toStringList();
+		QStringList expandedAtlasList = settings.value(HyGlobal::AssetName(ASSETMAN_Atlases)).toStringList();
 		pProject->GetAtlasWidget()->RestoreExpandedState(expandedAtlasList);
 
 		//QStringList expandedPrefabList = settings.value(HyGlobal::AssetName(ASSET_Prefabs)).toStringList();
 		//pProject->GetGltfWidget()->RestoreExpandedState(expandedPrefabList);
 
-		QStringList expandedAudioList = settings.value(HyGlobal::AssetName(ASSET_Audio)).toStringList();
+		QStringList expandedAudioList = settings.value(HyGlobal::AssetName(ASSETMAN_Audio)).toStringList();
 		pProject->GetAudioWidget()->RestoreExpandedState(expandedAudioList);
 
 		ui->actionShowGridBackground->setChecked(settings.value("ShowGridBackground", true).toBool());
@@ -971,7 +971,7 @@ void MainWindow::on_actionActivateProject_triggered()
 		OpenItem(Harmony::GetProject()->GetCurrentOpenItem());
 }
 
-void MainWindow::NewItem(HyGuiItemType eItem)
+void MainWindow::NewItem(ItemType eItem)
 {
 	QList<ProjectItemData *> selectedItemsOut; QList<ExplorerItemData *> selectedPrefixesOut;
 	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected(selectedItemsOut, selectedPrefixesOut);

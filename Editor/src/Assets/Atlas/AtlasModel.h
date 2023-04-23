@@ -31,7 +31,7 @@ public:
 	bool IsImageValid(int iWidth, int iHeight, quint32 uiBankId);
 	bool IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings);
 
-	AtlasFrame *GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, HyGuiItemType eType);
+	AtlasFrame *GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, ItemType eType);
 	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage);
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
@@ -44,7 +44,7 @@ protected:
 	virtual AssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
 
 	virtual void OnGenerateAssetsDlg(const QModelIndex &indexDestination) override;
-	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) override; // Must call RegisterAsset() on each asset
+	virtual QList<AssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) override; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QStringList sPreviousFilterPaths, QList<AssetItemData *> assetList) override; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<AssetItemData *> assetList) override;
 	virtual bool OnUpdateAssets(QList<AssetItemData *> assetList) override;
@@ -58,7 +58,7 @@ protected:
 	void AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSet);
 
 private:
-	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiBankIndex, HyGuiItemType eType, QUuid uuid);
+	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiBankIndex, ItemType eType, QUuid uuid);
 };
 
 #endif // ATLASMODEL_H

@@ -98,7 +98,7 @@ public:
 	QString GetBuildRelPath() const;
 	QString GetUserAbsPath() const;
 
-	IManagerModel *GetManagerModel(AssetType eManagerType);
+	IManagerModel *GetManagerModel(AssetManagerType eManagerType);
 
 	SourceModel &GetSourceModel();
 	ManagerWidget *GetSourceWidget();
@@ -107,7 +107,7 @@ public:
 	AudioManagerModel &GetAudioModel();
 	ManagerWidget *GetAudioWidget();
 
-	bool PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRef, AssetType eAssetType);
+	bool PasteAssets(ItemType ePasteItemType, QJsonArray &assetArrayRef, AssetManagerType eAssetType);
 
 	//void SetAudioModel(QJsonObject audioObj);
 
@@ -123,14 +123,14 @@ public:
 	void ShowGridOrigin(bool bShow);
 	void ShowGridOverlay(bool bShow);
 
-	void SaveItemData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
-	void DeleteItemData(HyGuiItemType eType, QString sPath, bool bWriteToDisk);
+	void SaveItemData(ItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
+	void DeleteItemData(ItemType eType, QString sPath, bool bWriteToDisk);
 	void DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk);
 
-	QString RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath);
+	QString RenameItem(ItemType eType, QString sOldPath, QString sNewPath);
 	QString RenamePrefix(QString sOldPath, QString sNewPath);
 
-	bool DoesItemExist(HyGuiItemType eType, QString sPath) const;
+	bool DoesItemExist(ItemType eType, QString sPath) const;
 
 	void SaveUserData() const;
 
@@ -174,8 +174,8 @@ private:
 	void WriteMetaData();
 
 	bool LoadDataObj(QString sFilePath, QJsonObject &dataObjRef);	// Return 'true' if the data obj should save to disk
-	void DeleteItemInDataObj(HyGuiItemType eType, QString sPath, QJsonObject &dataObjRef);
-	void RenameItemInDataObj(HyGuiItemType eType, QString sOldPath, QString sNewPath, QJsonObject &dataObjRef);
+	void DeleteItemInDataObj(ItemType eType, QString sPath, QJsonObject &dataObjRef);
+	void RenameItemInDataObj(ItemType eType, QString sOldPath, QString sNewPath, QJsonObject &dataObjRef);
 	void RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObject &dataObjRef);
 
 	void RefreshNamesOnTabs();

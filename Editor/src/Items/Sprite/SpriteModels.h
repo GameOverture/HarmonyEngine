@@ -114,7 +114,7 @@ public:
 	virtual bool OnPrepSave() override { return true; }
 	virtual void InsertItemSpecificData(FileDataPair &itemFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
-	virtual QList<AssetItemData *> GetAssets(AssetType eAssetType) const override;
+	virtual QList<AssetItemData *> GetAssets(AssetManagerType eAssetType) const override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

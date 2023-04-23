@@ -52,7 +52,7 @@ MimeType IMimeData::GetMimeType() const
 	return QVariant();
 }
 
-QJsonArray IMimeData::MakeAssetJsonArray(Project &projRef, QList<TreeModelItemData *> assetList, AssetType eAssetType)
+QJsonArray IMimeData::MakeAssetJsonArray(Project &projRef, QList<TreeModelItemData *> assetList, AssetManagerType eAssetType)
 {
 	QJsonArray assetArray;
 	for(int i = 0; i < assetList.size(); ++i)

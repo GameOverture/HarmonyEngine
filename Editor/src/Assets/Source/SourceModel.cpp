@@ -22,7 +22,7 @@
 #include <QTextCodec>
 
 SourceModel::SourceModel(Project &projRef) :
-	IManagerModel(projRef, ASSET_Source)
+	IManagerModel(projRef, ASSETMAN_Source)
 {
 	m_bIsSingleBank = true;
 	m_MetaDir.setPath(m_ProjectRef.GetSourceAbsPath());
@@ -357,7 +357,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	delete pDlg;
 }
 
-/*virtual*/ QList<AssetItemData *> SourceModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
+/*virtual*/ QList<AssetItemData *> SourceModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
 {
 	QList<AssetItemData *> returnList;
 

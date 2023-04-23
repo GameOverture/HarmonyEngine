@@ -207,11 +207,11 @@ void Project::LoadExplorerModel()
 		}
 
 		// Determine which enum type of 'HyGuiItemType' - if not found in HyGlobal::GetProjItemTypeList skip it
-		HyGuiItemType eItemType = ITEM_Unknown;
-		QList<HyGuiItemType> typeList = HyGlobal::GetProjItemTypeList();
+		ItemType eItemType = ITEM_Unknown;
+		QList<ItemType> typeList = HyGlobal::GetProjItemTypeList();
 		for(int j = 0; j < typeList.size(); ++j)
 		{
-			HyGuiItemType eTmpType = typeList[j];
+			ItemType eTmpType = typeList[j];
 			if(sItemTypeList[i] == HyGlobal::ItemName(eTmpType, true))
 			{
 				eItemType = eTmpType;
@@ -465,17 +465,17 @@ QString Project::GetUserAbsPath() const
 	return settingsDir.absoluteFilePath(GetName(false) % HYGUIPATH_UserExt);
 }
 
-IManagerModel *Project::GetManagerModel(AssetType eManagerType)
+IManagerModel *Project::GetManagerModel(AssetManagerType eManagerType)
 {
 	switch(eManagerType)
 	{
-	case ASSET_Source:
+	case ASSETMAN_Source:
 		return m_pSourceModel;
 
-	case ASSET_Atlas:
+	case ASSETMAN_Atlases:
 		return m_pAtlasModel;
 
-	case ASSET_Audio:
+	case ASSETMAN_Audio:
 		return m_pAudioModel;
 
 	default:
@@ -514,28 +514,28 @@ ManagerWidget *Project::GetAudioWidget()
 	return m_pAudioWidget;
 }
 
-bool Project::PasteAssets(HyGuiItemType ePasteItemType, QJsonArray &assetArrayRef, AssetType eAssetType)
+bool Project::PasteAssets(ItemType ePasteItemType, QJsonArray &assetArrayRef, AssetManagerType eAssetType)
 {
 	if(assetArrayRef.count() == 0)
 		return true;
 
 	IManagerModel *pManager = nullptr;
 	quint32 uiBankId = 0;
-	HyGuiItemType eImportedAssetType = ITEM_Unknown;
+	ItemType eImportedAssetType = ITEM_Unknown;
 	switch(eAssetType)
 	{
-	case ASSET_Source:
+	case ASSETMAN_Source:
 		pManager = m_pSourceModel;
 		uiBankId = 0;
 		eImportedAssetType = ITEM_Source;
 		break;
-	case ASSET_Atlas:
+	case ASSETMAN_Atlases:
 		pManager = m_pAtlasModel;
 		uiBankId = m_pAtlasWidget ? m_pAtlasWidget->GetSelectedBankId() : 0;
 		if(ePasteItemType == ITEM_Sprite)
 			eImportedAssetType = ITEM_AtlasFrame;
 		break;
-	case ASSET_Audio:
+	case ASSETMAN_Audio:
 		pManager = m_pAudioModel;
 		uiBankId = m_pAudioWidget ? m_pAudioWidget->GetSelectedBankId() : 0;
 		eImportedAssetType = ITEM_SoundClip;
@@ -668,7 +668,7 @@ void Project::ShowGridOverlay(bool bShow)
 	m_pDraw->EnableGridOverlay(bShow);
 }
 
-void Project::SaveItemData(HyGuiItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk)
+void Project::SaveItemData(ItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk)
 {
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);
 	if(m_ProjectFileData.m_Data.contains(sItemTypeName) == false) {
@@ -694,7 +694,7 @@ void Project::SaveItemData(HyGuiItemType eType, QString sPath, const FileDataPai
 	}
 }
 
-void Project::DeleteItemData(HyGuiItemType eType, QString sPath, bool bWriteToDisk)
+void Project::DeleteItemData(ItemType eType, QString sPath, bool bWriteToDisk)
 {
 	DeleteItemInDataObj(eType, sPath, m_ProjectFileData.m_Meta);
 	DeleteItemInDataObj(eType, sPath, m_ProjectFileData.m_Data);
@@ -740,7 +740,7 @@ bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
 
 	// Ensure save object has all the valid types in map
 	bool bTypeNotFound = false;
-	QList<HyGuiItemType> typeList = HyGlobal::GetProjItemTypeList();
+	QList<ItemType> typeList = HyGlobal::GetProjItemTypeList();
 	for(int i = 0; i < typeList.size(); ++i)
 	{
 		QString sTypeName = HyGlobal::ItemName(typeList[i], true);
@@ -754,7 +754,7 @@ bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
 	return dataFile.exists() == false || bTypeNotFound;
 }
 
-void Project::DeleteItemInDataObj(HyGuiItemType eType, QString sPath, QJsonObject &dataObjRef)
+void Project::DeleteItemInDataObj(ItemType eType, QString sPath, QJsonObject &dataObjRef)
 {
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);
 	if(dataObjRef.contains(sItemTypeName) == false)
@@ -774,10 +774,10 @@ void Project::DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk)
 {
 	bool bItemsDeleted = false;
 
-	QList<HyGuiItemType> typeList = HyGlobal::GetProjItemTypeList();
+	QList<ItemType> typeList = HyGlobal::GetProjItemTypeList();
 	for(auto itemTypeIter = m_ProjectFileData.m_Data.begin(); itemTypeIter != m_ProjectFileData.m_Data.end(); ++itemTypeIter)
 	{
-		HyGuiItemType eType = ITEM_Unknown;
+		ItemType eType = ITEM_Unknown;
 		for(int i = 0; i < typeList.size(); ++i)
 		{
 			if(itemTypeIter.key() == HyGlobal::ItemName(typeList[i], true))
@@ -811,7 +811,7 @@ void Project::DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk)
 	}
 }
 
-QString Project::RenameItem(HyGuiItemType eType, QString sOldPath, QString sNewPath)
+QString Project::RenameItem(ItemType eType, QString sOldPath, QString sNewPath)
 {
 	if(eType == ITEM_Prefix)
 	{
@@ -899,7 +899,7 @@ QString Project::RenamePrefix(QString sOldPath, QString sNewPath)
 	return sNewPath.section('/', -1);
 }
 
-bool Project::DoesItemExist(HyGuiItemType eType, QString sPath) const
+bool Project::DoesItemExist(ItemType eType, QString sPath) const
 {
 	QJsonObject subDirObj = m_ProjectFileData.m_Data;
 	for(auto objsInSubDirIter = subDirObj.begin(); objsInSubDirIter != subDirObj.end(); ++objsInSubDirIter)
@@ -920,10 +920,10 @@ void Project::SaveUserData() const
 	{
 		settings.setValue("TabIndex", MainWindow::GetAssetManagerTabIndex());
 
-		settings.setValue(HyGlobal::AssetName(ASSET_Source), m_pSourceWidget->GetExpandedFilters());
-		settings.setValue(HyGlobal::AssetName(ASSET_Atlas), m_pAtlasWidget->GetExpandedFilters());
+		settings.setValue(HyGlobal::AssetName(ASSETMAN_Source), m_pSourceWidget->GetExpandedFilters());
+		settings.setValue(HyGlobal::AssetName(ASSETMAN_Atlases), m_pAtlasWidget->GetExpandedFilters());
 		//settings.setValue(HyGlobal::AssetName(ASSET_Prefabs), m_pGltfWidget->GetExpandedFilters());
-		settings.setValue(HyGlobal::AssetName(ASSET_Audio), m_pAudioWidget->GetExpandedFilters());
+		settings.setValue(HyGlobal::AssetName(ASSETMAN_Audio), m_pAudioWidget->GetExpandedFilters());
 
 		bool bShowGridBackground, bShowGridOrigin, bShowGridOverlay;
 		MainWindow::GetGridStatus(bShowGridBackground, bShowGridOrigin, bShowGridOverlay);
@@ -1180,7 +1180,7 @@ void Project::OnCloseTab(int iIndex)
 	MainWindow::CloseItem(pItem);
 }
 
-void Project::RenameItemInDataObj(HyGuiItemType eType, QString sOldPath, QString sNewPath, QJsonObject &dataObjRef)
+void Project::RenameItemInDataObj(ItemType eType, QString sOldPath, QString sNewPath, QJsonObject &dataObjRef)
 {
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);
 	QJsonObject subDirObj = dataObjRef[sItemTypeName].toObject();
@@ -1200,13 +1200,13 @@ void Project::RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObj
 	if(sNewPath.endsWith('/', Qt::CaseInsensitive) == false)
 		sNewPath += '/';
 
-	QList<HyGuiItemType> typeList = HyGlobal::GetProjItemTypeList();
+	QList<ItemType> typeList = HyGlobal::GetProjItemTypeList();
 	for(auto itemTypeIter = dataObjRef.begin(); itemTypeIter != dataObjRef.end(); ++itemTypeIter)
 	{
 		if(itemTypeIter.key().compare("$fileVersion") == 0)
 			continue;
 
-		HyGuiItemType eType = ITEM_Unknown;
+		ItemType eType = ITEM_Unknown;
 		for(int i = 0; i < typeList.size(); ++i)
 		{
 			if(itemTypeIter.key() == HyGlobal::ItemName(typeList[i], true))

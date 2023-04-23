@@ -16,7 +16,7 @@
 
 #include <QVariant>
 
-EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, HyGuiItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis) :
+EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis) :
 	TreeModelItemData(eItemType, uuidOfThis, sCodeName),
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(eEntType),
@@ -190,7 +190,7 @@ EntityTreeItemData *EntityTreeModel::GetArrayFolderTreeItemData(EntityTreeItemDa
 		return nullptr;
 	}
 
-	TreeModelItem *pParentFolderItem = (pArrayItem->GetType() == ITEM_Shape) ? GetBvFolderTreeItem() : GetRootTreeItem();
+	TreeModelItem *pParentFolderItem = (pArrayItem->GetType() == ITEM_BoundingVolume) ? GetBvFolderTreeItem() : GetRootTreeItem();
 	for(int i = 0; i < pParentFolderItem->GetNumChildren(); ++i)
 	{
 		EntityTreeItemData *pSubItem = pParentFolderItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
@@ -329,11 +329,11 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewAsset(AssetItemData *pAssetIte
 	// Generate a unique code name for this new item
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pAssetItem->GetName());
 
-	HyGuiItemType eItemType = ITEM_Unknown;
+	ItemType eItemType = ITEM_Unknown;
 	switch(pAssetItem->GetManagerAssetType())
 	{
-	case ASSET_Atlas: eItemType = ITEM_AtlasFrame; break;
-	case ASSET_Audio: eItemType = ITEM_SoundClip; break;
+	case ASSETMAN_Atlases: eItemType = ITEM_AtlasFrame; break;
+	case ASSETMAN_Audio: eItemType = ITEM_SoundClip; break;
 	default:
 		HyGuiLog("EntityTreeModel::Cmd_InsertNewAsset - tried to add an unhandled asset manager type: " % QString::number(pAssetItem->GetManagerAssetType()), LOGTYPE_Error);
 		break;
@@ -347,13 +347,13 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewAsset(AssetItemData *pAssetIte
 
 EntityTreeItemData *EntityTreeModel::Cmd_InsertNewItem(QJsonObject descObj, QJsonArray propArray, bool bIsArrayItem, int iRow /*= -1*/)
 {
-	HyGuiItemType eGuiType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
+	ItemType eGuiType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
 	QString sCodeName = descObj["codeName"].toString();
 	if(bIsArrayItem == false)
 		sCodeName = GenerateCodeName(sCodeName);
 
 	TreeModelItem *pParentTreeItem = nullptr;
-	if(eGuiType != ITEM_Shape)
+	if(eGuiType != ITEM_BoundingVolume)
 		pParentTreeItem = GetRootTreeItem();
 	else
 		pParentTreeItem = GetBvFolderTreeItem();
@@ -380,7 +380,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewShape(EditorShape eShape, QStr
 	else
 		pParentTreeItem = GetBvFolderTreeItem();
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_Shape, ENTTYPE_Item, QUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_BoundingVolume, ENTTYPE_Item, QUuid(), QUuid::createUuid());
 	for(int iStateIndex = 0; iStateIndex < m_ModelRef.GetNumStates(); ++iStateIndex)
 	{
 		pNewItem->GetPropertiesModel(iStateIndex).SetPropertyValue("Shape", "Type", HyGlobal::ShapeName(eShape));
@@ -398,7 +398,7 @@ bool EntityTreeModel::Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow)
 	//QString sCodeName = GenerateCodeName(pItem->GetCodeName());
 
 	TreeModelItem *pParentTreeItem = nullptr;
-	if(pItem->GetType() != ITEM_Shape)
+	if(pItem->GetType() != ITEM_BoundingVolume)
 		pParentTreeItem = GetRootTreeItem();
 	else
 		pParentTreeItem = GetBvFolderTreeItem();
@@ -492,7 +492,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 			if(pItem->GetEntType() == ENTTYPE_ArrayFolder)
 				return HyGlobal::ItemIcon(pItem->GetType(), SUBICON_Open);
 
-			if(pItem->GetType() == ITEM_Primitive || pItem->GetType() == ITEM_Shape)
+			if(pItem->GetType() == ITEM_Primitive || pItem->GetType() == ITEM_BoundingVolume)
 			{
 				QIcon icon;
 				QString sIconUrl = ":/icons16x16/shapes/" % QString(pItem->GetType() == ITEM_Primitive ? "primitive_" : "shapes_");
@@ -634,7 +634,7 @@ bool EntityTreeModel::ShouldForwardDeclare(const QJsonObject &initObj)
 	return false;
 }
 
-bool EntityTreeModel::FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, HyGuiItemType eItemType, int iRowToCreateAt)
+bool EntityTreeModel::FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, ItemType eItemType, int iRowToCreateAt)
 {
 	bool bFoundArrayFolder = false;
 

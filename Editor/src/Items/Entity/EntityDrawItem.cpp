@@ -12,7 +12,7 @@
 #include "EntityModel.h"
 #include "MainWindow.h"
 
-EntityDrawItem::EntityDrawItem(Project &projectRef, HyGuiItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent) :
+EntityDrawItem::EntityDrawItem(Project &projectRef, ItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent) :
 	m_eGuiType(eGuiType),
 	m_Uuid(uuid),
 	m_ProjItemUuid(itemUuid),
@@ -22,7 +22,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, HyGuiItemType eGuiType, QUui
 {
 	switch(m_eGuiType)
 	{
-	case ITEM_Shape:
+	case ITEM_BoundingVolume:
 	case ITEM_Primitive:
 		m_pChild = nullptr;		// When either shape or primitive 'm_pChild' is provided via the m_ShapeCtrl
 		break;
@@ -53,7 +53,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, HyGuiItemType eGuiType, QUui
 	delete m_pChild;
 }
 
-HyGuiItemType EntityDrawItem::GetGuiType() const
+ItemType EntityDrawItem::GetGuiType() const
 {
 	return m_eGuiType;
 }
@@ -70,7 +70,7 @@ const QUuid &EntityDrawItem::GetProjItemUuid() const
 
 IHyLoadable2d *EntityDrawItem::GetHyNode()
 {
-	if(m_eGuiType == ITEM_Primitive || m_eGuiType == ITEM_Shape)
+	if(m_eGuiType == ITEM_Primitive || m_eGuiType == ITEM_BoundingVolume)
 		return &m_ShapeCtrl.GetPrimitive();
 
 	return m_pChild;
@@ -108,7 +108,7 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 
 	// Parse all and only the potential categories of the 'm_eGuiType' type, and set the values to 'pHyNode'
 	HyColor colorTint = ENTCOLOR_Shape;
-	if(m_eGuiType != ITEM_Shape)
+	if(m_eGuiType != ITEM_BoundingVolume)
 	{
 		QJsonObject commonObj = propObj["Common"].toObject();
 		pHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
@@ -150,11 +150,11 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 		static_cast<HyPrimitive2d *>(pHyNode)->SetLineThickness(primitiveObj["Line Thickness"].toDouble());
 		}
 		[[fallthrough]];
-	case ITEM_Shape: {
+	case ITEM_BoundingVolume: {
 		QJsonObject shapeObj = propObj["Shape"].toObject();
 		EditorShape eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
-		float fBvAlpha = (m_eGuiType == ITEM_Shape) ? 0.0f : 1.0f;
-		float fOutlineAlpha = (m_eGuiType == ITEM_Shape || bIsSelected) ? 1.0f : 0.0f;
+		float fBvAlpha = (m_eGuiType == ITEM_BoundingVolume) ? 0.0f : 1.0f;
+		float fOutlineAlpha = (m_eGuiType == ITEM_BoundingVolume || bIsSelected) ? 1.0f : 0.0f;
 
 		GetShapeCtrl().Setup(eShape, colorTint, fBvAlpha, fOutlineAlpha);
 		GetShapeCtrl().Deserialize(shapeObj["Data"].toString(), pCamera);
@@ -245,7 +245,7 @@ void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &tr
 	transformMtxOut = glm::identity<glm::mat4>();
 	switch(GetGuiType())
 	{
-	case ITEM_Shape:
+	case ITEM_BoundingVolume:
 	case ITEM_AtlasFrame:
 	case ITEM_Primitive:
 	case ITEM_Text:

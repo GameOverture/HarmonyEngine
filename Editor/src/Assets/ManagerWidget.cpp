@@ -57,7 +57,7 @@ void ManagerProxyModel::FilterByBankIndex(int iBankIndex)
 	if(pLeftItem->GetType() != ITEM_Filter && pRightItem->GetType() == ITEM_Filter)
 		return false;
 
-	if(static_cast<IManagerModel *>(sourceModel())->GetAssetType() != ASSET_Source)
+	if(static_cast<IManagerModel *>(sourceModel())->GetAssetType() != ASSETMAN_Source)
 	{
 		if(pLeftItem->GetType() != pRightItem->GetType())
 			return pLeftItem->GetType() < pRightItem->GetType();
@@ -202,7 +202,7 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	ui->btnReplaceAssets->setDefaultAction(ui->actionReplaceAssets);
 
 	// Only Source Asset Manager is capable of generating new assets
-	if(m_pModel->GetAssetType() != ASSET_Source)
+	if(m_pModel->GetAssetType() != ASSETMAN_Source)
 		ui->btnGenerateAsset->hide();
 	else
 	{
@@ -414,14 +414,14 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 	QModelIndex index = ui->assetTree->indexAt(pos);
 	if(index.isValid() == false || selectedAssetsList.empty())
 	{
-		if(m_pModel->GetAssetType() == ASSET_Source)
+		if(m_pModel->GetAssetType() == ASSETMAN_Source)
 		{
 			contextMenu.addAction(ui->actionGenerateAsset);
 			contextMenu.addSeparator();
 		}
 		contextMenu.addAction(ui->actionImportAssets);
 		contextMenu.addAction(ui->actionImportDirectory);
-		if(m_pModel->GetAssetType() == ASSET_Atlas)
+		if(m_pModel->GetAssetType() == ASSETMAN_Atlases)
 			contextMenu.addAction(ui->actionImportTileSheet);
 
 		contextMenu.addAction(ui->actionAddFilter);
@@ -431,7 +431,7 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 			contextMenu.addAction(ui->actionRename);
 		}
 	}
-	else if(m_pModel->GetAssetType() == ASSET_Source)
+	else if(m_pModel->GetAssetType() == ASSETMAN_Source)
 	{
 		contextMenu.addAction(ui->actionGenerateAsset);
 		contextMenu.addSeparator();
@@ -471,7 +471,7 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 		contextMenu.addSeparator();
 		contextMenu.addAction(ui->actionImportAssets);
 		contextMenu.addAction(ui->actionImportDirectory);
-		if(m_pModel->GetAssetType() == ASSET_Atlas)
+		if(m_pModel->GetAssetType() == ASSETMAN_Atlases)
 			contextMenu.addAction(ui->actionImportTileSheet);
 		contextMenu.addAction(ui->actionAddFilter);
 
@@ -564,7 +564,7 @@ void ManagerWidget::on_actionRename_triggered()
 	TreeModelItemData *pItemToBeRenamed = GetSelected(selectedAssetsList, selectedFiltersList);
 
 	DlgInputName *pDlg = nullptr;
-	if(m_pModel->GetAssetType() == ASSET_Source)
+	if(m_pModel->GetAssetType() == ASSETMAN_Source)
 		pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText(), HyGlobal::FileNameValidator(), nullptr, nullptr);
 	else
 		pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText(), HyGlobal::FreeFormValidator(), nullptr, nullptr);

@@ -149,7 +149,7 @@ private Q_SLOTS:
 private:
 	Ui::MainWindow *ui;
 
-	void NewItem(HyGuiItemType eItem);
+	void NewItem(ItemType eItem);
 	void RefreshBuildMenu();
 	void SaveSettings();
 	void SelectTheme(Theme eTheme);

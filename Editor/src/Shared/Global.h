@@ -43,42 +43,46 @@ class Project;
 #define DISPLAYORDER_TransformCtrl 9999999
 //#define HYGUI_UseBinaryMetaFiles
 
-enum HyGuiItemType
+enum ItemType
 {
 	ITEM_Unknown = -1,
 
+	// Project items
 	ITEM_Project,
 	ITEM_Prefix,
 	ITEM_Filter,
+	// Asset items
 	ITEM_AtlasFrame,
 	ITEM_SoundClip,
+	ITEM_Source,
+	ITEM_Header,
+	// Component items
 	ITEM_Primitive,
 	ITEM_Audio,
 	ITEM_Particles,
 	ITEM_Text,
 	ITEM_Spine,
 	ITEM_Sprite,
-	ITEM_Source,
-	ITEM_Header,
-	ITEM_Entity,
 	ITEM_Prefab,
-	ITEM_Entity3d,			// TO BE REPLACED
-	ITEM_Shape,
+	ITEM_Entity,
+	ITEM_Entity3d,
+	// Entity items
+	ITEM_BoundingVolume,
 	ITEM_Physics,
 
-	NUMTYPES
+	NUM_ITEMTYPES
 };
 
-enum AssetType
+enum AssetManagerType
 {
-	ASSET_Unknown = -1,
+	ASSETMAN_Unknown = -1,
 
-	ASSET_Source = 0,
-	ASSET_Atlas,
-	ASSET_Prefabs,
-	ASSET_Audio,
+	ASSETMAN_Source = 0,
+	ASSETMAN_Atlases,
+	ASSETMAN_Prefabs,
+	ASSETMAN_Audio,
 
-	NUMASSETTYPES
+	NUM_ASSETMANTYPES
 };
 
 enum AssetErrorType
@@ -156,7 +160,7 @@ enum Theme
 	THEME_Lappy486,
 	THEME_Compe,
 
-	NUMTHEMES
+	NUM_THEMES
 };
 
 //#define HYTREEWIDGETITEM_IsFilter				"HyTreeFilter"
@@ -200,18 +204,18 @@ struct FileDataPair
 
 class HyGlobal
 {
-	static QString														sm_sItemNames[NUMTYPES];
-	static QString														sm_sItemNamesPlural[NUMTYPES];
-	static QString														sm_AssetNames[NUMASSETTYPES];
+	static QString														sm_sItemNames[NUM_ITEMTYPES];
+	static QString														sm_sItemNamesPlural[NUM_ITEMTYPES];
+	static QString														sm_AssetNames[NUM_ASSETMANTYPES];
 	static QString														sm_ShapeNames[NUM_SHAPES];
 	static QString														sm_sSubIconNames[NUM_SUBICONS];
 
-	static QIcon														sm_ItemIcons[NUMTYPES][NUM_SUBICONS];
-	static QColor														sm_ItemColors[NUMTYPES];
+	static QIcon														sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
+	static QColor														sm_ItemColors[NUM_ITEMTYPES];
 
 	static QString														sm_MimeTypes[NUM_MIMETYPES];
 
-	static QString														sm_Themes[NUMTHEMES];
+	static QString														sm_Themes[NUM_THEMES];
 
 	static QRegExpValidator *											sm_pCodeNameValidator;
 	static QRegExpValidator *											sm_pFreeFormValidator;
@@ -225,21 +229,21 @@ class HyGlobal
 public:
 	static void Initialize();
 
-	static QList<HyGuiItemType> GetProjItemTypeList();
-	static QList<HyGuiItemType> GetTypeList();
+	static QList<ItemType> GetProjItemTypeList();
+	static QList<ItemType> GetTypeList();
 	static QList<EditorShape> GetShapeList();
 	static QStringList GetTypeNameList();
-	static HyGuiItemType GetTypeFromString(QString sType);
+	static ItemType GetTypeFromString(QString sType);
 	static QStringList GetShapeNameList();
 	static EditorShape GetShapeFromString(QString sShape);
 
-	static const QString ItemName(HyGuiItemType eItem, bool bPlural)	{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
-	static const QString AssetName(AssetType eAsset)					{ return sm_AssetNames[eAsset]; }
+	static const QString ItemName(ItemType eItem, bool bPlural)	{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
+	static const QString AssetName(AssetManagerType eAsset)					{ return sm_AssetNames[eAsset]; }
 	static const QString ShapeName(EditorShape eShape)					{ return sm_ShapeNames[eShape]; }
-	static const QString ItemExt(HyGuiItemType eItem);
-	static const QIcon ItemIcon(HyGuiItemType eItm, SubIcon eSubIcon)	{ return sm_ItemIcons[eItm][eSubIcon]; }
-	static const QIcon AssetIcon(AssetType eAsset, SubIcon eSubIcon);
-	static const QColor ItemColor(HyGuiItemType eItem)					{ return sm_ItemColors[eItem]; }
+	static const QString ItemExt(ItemType eItem);
+	static const QIcon ItemIcon(ItemType eItm, SubIcon eSubIcon)	{ return sm_ItemIcons[eItm][eSubIcon]; }
+	static const QIcon AssetIcon(AssetManagerType eAsset, SubIcon eSubIcon);
+	static const QColor ItemColor(ItemType eItem)					{ return sm_ItemColors[eItem]; }
 	static const QString MimeTypeString(MimeType eMimeType)				{ return sm_MimeTypes[eMimeType]; }
 	static const QString ThemeString(Theme eTheme)						{ return sm_Themes[eTheme]; }
 

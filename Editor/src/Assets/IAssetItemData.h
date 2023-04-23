@@ -32,9 +32,9 @@ protected:
 	uint								m_uiErrors;
 
 public:
-	AssetItemData(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors);
+	AssetItemData(IManagerModel &modelRef, ItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, QString sMetaFileExt, uint uiErrors);
 
-	AssetType GetManagerAssetType() const;
+	AssetManagerType GetManagerAssetType() const;
 	quint32 GetChecksum();
 	quint32 GetBankId();
 	void SetBankId(quint32 uiNewBankId);

@@ -15,7 +15,7 @@
 // NOTE: this class does not keep its state when removed, it is deleted (should not be passed to UndoCmd's)
 class EntityDrawItem
 {
-	HyGuiItemType							m_eGuiType;
+	ItemType								m_eGuiType;
 	QUuid									m_Uuid;
 	QUuid									m_ProjItemUuid;
 
@@ -25,10 +25,10 @@ class EntityDrawItem
 	ShapeCtrl								m_ShapeCtrl;
 
 public:
-	EntityDrawItem(Project &projectRef, HyGuiItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent);
+	EntityDrawItem(Project &projectRef, ItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent);
 	virtual ~EntityDrawItem();
 
-	HyGuiItemType GetGuiType() const;
+	ItemType GetGuiType() const;
 	const QUuid &GetThisUuid() const;
 	const QUuid &GetProjItemUuid() const;
 

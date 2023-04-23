@@ -20,7 +20,7 @@ class TreeModelItemData : public QObject
 	Q_OBJECT
 
 protected:
-	const HyGuiItemType								m_eTYPE;
+	const ItemType									m_eTYPE;
 	const QUuid										m_UUID;
 	QString											m_sName;
 	bool											m_bIsProjectItem;
@@ -31,10 +31,10 @@ protected:
 
 public:
 	TreeModelItemData();
-	TreeModelItemData(HyGuiItemType eType, const QUuid &uuid, const QString sText);
+	TreeModelItemData(ItemType eType, const QUuid &uuid, const QString sText);
 	virtual ~TreeModelItemData();
 
-	HyGuiItemType GetType() const;
+	ItemType GetType() const;
 	const QUuid &GetUuid() const;
 	QString GetText() const;
 	void SetText(QString sText);

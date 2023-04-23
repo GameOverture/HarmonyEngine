@@ -15,23 +15,23 @@
 #include "AtlasFrame.h"
 #include "IManagerModel.h"
 
-AssetMimeData::AssetMimeData(Project &projRef, QList<TreeModelItemData *> &assetListRef, AssetType eAssetType) :
+AssetMimeData::AssetMimeData(Project &projRef, QList<TreeModelItemData *> &assetListRef, AssetManagerType eAssetType) :
 	IMimeData(MIMETYPE_AssetItems)
 {
-	for(uint32 i = 0; i < NUMASSETTYPES; ++i)
+	for(uint32 i = 0; i < NUM_ASSETMANTYPES; ++i)
 		m_AssetCounts[i] = 0;
 
 	QJsonObject rootAssetObj;
-	for(int iAssetCount = 0; iAssetCount < NUMASSETTYPES; ++iAssetCount)
+	for(int iAssetCount = 0; iAssetCount < NUM_ASSETMANTYPES; ++iAssetCount)
 	{
 		QJsonArray assetArray;
-		if(eAssetType == static_cast<AssetType>(iAssetCount))
+		if(eAssetType == static_cast<AssetManagerType>(iAssetCount))
 		{
-			assetArray = MakeAssetJsonArray(projRef, assetListRef, static_cast<AssetType>(iAssetCount));
-			m_AssetCounts[static_cast<AssetType>(iAssetCount)] = assetArray.size();
+			assetArray = MakeAssetJsonArray(projRef, assetListRef, static_cast<AssetManagerType>(iAssetCount));
+			m_AssetCounts[static_cast<AssetManagerType>(iAssetCount)] = assetArray.size();
 		}
 		
-		rootAssetObj.insert(HyGlobal::AssetName(static_cast<AssetType>(iAssetCount)), assetArray);
+		rootAssetObj.insert(HyGlobal::AssetName(static_cast<AssetManagerType>(iAssetCount)), assetArray);
 	}
 
 	// Serialize the asset info into json source
@@ -42,12 +42,12 @@ AssetMimeData::AssetMimeData(Project &projRef, QList<TreeModelItemData *> &asset
 /*virtual*/ AssetMimeData::~AssetMimeData()
 { }
 
-uint32 AssetMimeData::GetNumAssetsOfType(AssetType eAssetType) const
+uint32 AssetMimeData::GetNumAssetsOfType(AssetManagerType eAssetType) const
 {
 	return m_AssetCounts[eAssetType];
 }
 
-QJsonArray AssetMimeData::GetAssetsArray(AssetType eAssetType) const
+QJsonArray AssetMimeData::GetAssetsArray(AssetManagerType eAssetType) const
 {
 	QJsonDocument doc = QJsonDocument::fromJson(m_Data);
 	QJsonObject rootAssetObj = doc.object();

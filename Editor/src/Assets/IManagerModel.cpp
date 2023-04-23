@@ -21,7 +21,7 @@
 #include <QFileDialog>
 #include <QMimeData>
 
-IManagerModel::IManagerModel(Project &projRef, AssetType eAssetType) :
+IManagerModel::IManagerModel(Project &projRef, AssetManagerType eAssetType) :
 	ITreeModel(2, QStringList(), nullptr),
 	m_ProjectRef(projRef),
 	m_eASSET_TYPE(eAssetType),
@@ -74,7 +74,7 @@ void IManagerModel::Init()
 			QString sName = HyGlobal::MakeFileNameFromCounter(bankArray[i].toObject()["bankId"].toInt());
 			BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(sName), bankArray[i].toObject());
 
-			if(m_eASSET_TYPE == ASSET_Atlas || m_eASSET_TYPE == ASSET_Audio)
+			if(m_eASSET_TYPE == ASSETMAN_Atlases || m_eASSET_TYPE == ASSETMAN_Audio)
 				m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(pNewBank->GetId()));
 		}
 
@@ -101,7 +101,7 @@ void IManagerModel::Init()
 	OnInit();
 }
 
-AssetType IManagerModel::GetAssetType() const
+AssetManagerType IManagerModel::GetAssetType() const
 {
 	return m_eASSET_TYPE;
 }
@@ -161,7 +161,7 @@ void IManagerModel::GenerateAssetsDlg(const QModelIndex &indexDestination)
 	OnGenerateAssetsDlg(indexDestination);
 }
 
-bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList)
+bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList)
 {
 	if(correspondingParentList.size() != sImportList.size())
 	{
@@ -173,9 +173,9 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, H
 	{
 		switch(m_eASSET_TYPE)
 		{
-		case ASSET_Source:	eType = ITEM_Source;		break;
-		case ASSET_Atlas:	eType = ITEM_AtlasFrame;	break;
-		case ASSET_Audio:	eType = ITEM_SoundClip;		break;
+		case ASSETMAN_Source:	eType = ITEM_Source;		break;
+		case ASSETMAN_Atlases:	eType = ITEM_AtlasFrame;	break;
+		case ASSETMAN_Audio:	eType = ITEM_SoundClip;		break;
 		}
 	}
 
@@ -212,7 +212,7 @@ void IManagerModel::RemoveItems(QList<AssetItemData *> assetsList, QList<TreeMod
 		QString sItemDesc;
 		if(assetsList.size() > 1)
 		{
-			if(m_eASSET_TYPE == ASSET_Source)
+			if(m_eASSET_TYPE == ASSETMAN_Source)
 				sItemDesc = QString::number(assetsList.size()) % " files";
 			else
 				sItemDesc = QString::number(assetsList.size()) % " assets";
@@ -383,10 +383,10 @@ void IManagerModel::FlushRepack()
 
 	switch(m_eASSET_TYPE)
 	{
-	case ASSET_Atlas:
+	case ASSETMAN_Atlases:
 		StartRepackThread("Repacking Atlases", new AtlasRepackThread(m_RepackAffectedAssetsMap /**m_BanksModel.GetBank(uiBankIndex), affectedFramesList*/, m_MetaDir));
 		break;
-	case ASSET_Audio:
+	case ASSETMAN_Audio:
 		StartRepackThread("Repacking Audio", new AudioRepackThread(m_RepackAffectedAssetsMap, m_MetaDir));
 		break;
 	}
@@ -544,7 +544,7 @@ void IManagerModel::CreateNewBank(QString sName)
 
 	BankData *pNewBank = m_BanksModel.AppendBank(m_DataDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(m_uiNextBankId)), bankObj);
 	
-	if(m_eASSET_TYPE == ASSET_Atlas || m_eASSET_TYPE == ASSET_Audio)
+	if(m_eASSET_TYPE == ASSETMAN_Atlases || m_eASSET_TYPE == ASSETMAN_Audio)
 		m_DataDir.mkdir(HyGlobal::MakeFileNameFromCounter(pNewBank->GetId()));
 
 	m_uiNextBankId++;
@@ -566,7 +566,7 @@ void IManagerModel::RemoveBank(quint32 uiBankId)
 			if(m_BanksModel.GetBank(i)->m_AssetList.empty())
 			{
 				//OnDeleteBank(*m_BanksModel.GetBank(i));
-				if(m_eASSET_TYPE == ASSET_Atlas)
+				if(m_eASSET_TYPE == ASSETMAN_Atlases)
 					m_DataDir.rmdir(HyGlobal::MakeFileNameFromCounter(m_BanksModel.GetBank(i)->GetId()));
 
 				m_BanksModel.RemoveBank(i);
@@ -737,7 +737,7 @@ void IManagerModel::SaveRuntime()
 
 				if(pAsset->GetErrors() != 0)
 					return QVariant(pItemData->GetIcon(SUBICON_Warning));
-				else if(m_eASSET_TYPE == ASSET_Atlas)
+				else if(m_eASSET_TYPE == ASSETMAN_Atlases)
 					return QVariant(static_cast<AtlasFrame *>(pAsset)->GetThumbnail());
 			}
 			return QVariant(pItemData->GetIcon(SUBICON_None));
@@ -792,10 +792,10 @@ void IManagerModel::SaveRuntime()
 
 	switch(m_eASSET_TYPE)
 	{
-	case ASSET_Atlas:
+	case ASSETMAN_Atlases:
 		sMimeTypeList << "image/png";
 		break;
-	case ASSET_Audio:
+	case ASSETMAN_Audio:
 		sMimeTypeList << "audio/wav";
 		break;
 	}

@@ -21,7 +21,7 @@
 #include <QMimeData>
 
 AtlasModel::AtlasModel(Project &projRef) :
-	IManagerModel(projRef, ASSET_Atlas)
+	IManagerModel(projRef, ASSETMAN_Atlases)
 {
 
 }
@@ -80,7 +80,7 @@ bool AtlasModel::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasS
 	return true;
 }
 
-AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiBankIndex, HyGuiItemType eType)
+AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiBankIndex, ItemType eType)
 {
 	if(IsImageValid(newImage, m_BanksModel.GetBank(uiBankIndex)->GetId()) == false)
 		return nullptr;
@@ -248,7 +248,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 {
 }
 
-/*virtual*/ QList<AssetItemData *> AtlasModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, HyGuiItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
+/*virtual*/ QList<AssetItemData *> AtlasModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
 {
 	QList<AssetItemData *> returnList;
 
@@ -523,7 +523,7 @@ void AtlasModel::AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSe
 	}
 }
 
-AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiBankId, HyGuiItemType eType, QUuid uuid)
+AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiBankId, ItemType eType, QUuid uuid)
 {
 	QFileInfo fileInfo(sName);
 

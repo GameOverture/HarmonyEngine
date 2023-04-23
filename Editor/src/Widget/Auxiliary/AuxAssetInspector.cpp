@@ -22,7 +22,7 @@ AuxAssetInspector::AuxAssetInspector(QWidget *parent) :
 	delete ui;
 }
 
-void AuxAssetInspector::SetSelected(AssetType eAssetType, QList<AssetItemData *> selectedAssetsList)
+void AuxAssetInspector::SetSelected(AssetManagerType eAssetType, QList<AssetItemData *> selectedAssetsList)
 {
 	//selectedAssetsList
 }

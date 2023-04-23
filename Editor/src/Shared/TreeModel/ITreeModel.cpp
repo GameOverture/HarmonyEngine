@@ -305,7 +305,7 @@ TreeModelItem *ITreeModel::GetItem(const QModelIndex &indexRef) const
 	return m_pRootItem;
 }
 
-void ITreeModel::RemoveRedundantItems(HyGuiItemType eFolderType, QList<TreeModelItemData *> &itemListOut) const
+void ITreeModel::RemoveRedundantItems(ItemType eFolderType, QList<TreeModelItemData *> &itemListOut) const
 {
 	QList<TreeModelItemData *> folderList;
 	for(auto item : itemListOut)

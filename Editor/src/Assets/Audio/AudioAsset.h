@@ -73,7 +73,7 @@ class AudioAsset : public AssetItemData
 	int32			m_iInstanceLimit;
 
 public:
-	AudioAsset(IManagerModel &modelRef, HyGuiItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, int32 iGroupId, bool bIsStreaming, bool bExportMono, int32 iInstanceLimit, bool bCompressed, double dVbrQuality, uint uiErrors);
+	AudioAsset(IManagerModel &modelRef, ItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, int32 iGroupId, bool bIsStreaming, bool bExportMono, int32 iInstanceLimit, bool bCompressed, double dVbrQuality, uint uiErrors);
 	~AudioAsset();
 
 	int32 GetGroupId() const;
