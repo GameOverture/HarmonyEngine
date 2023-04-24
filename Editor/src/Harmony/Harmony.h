@@ -42,7 +42,7 @@ public:
 	static HarmonyWidget *GetWidget(Project *pProject);
 
 private Q_SLOTS:
-	void HarmonyWidgetReady(HarmonyWidget *pWidget);
+	void OnHarmonyWidgetReady(HarmonyWidget *pWidget);
 };
 
 #endif // HARMONY_H

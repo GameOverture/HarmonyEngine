@@ -52,17 +52,15 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 
 /*virtual*/ void AtlasRepackThread::OnRun() /*override*/
 {
+	// First go over and run the packer, to determine how many textures will be loaded
+	int iLoadedBlocks = 0;
+	int iTotalBlocks = 0;
 	for(int32 iBankCnt = 0; iBankCnt < m_RepackBankList.size(); ++iBankCnt)
 	{
 		BankData *pBankData = m_RepackBankList[iBankCnt].m_pBankData;
 		QMap<uint32, RepackBank::PackerBucket *> &bucketMapRef = m_RepackBankList[iBankCnt].m_BucketMap;
 
-		QDir runtimeBankDir(pBankData->m_sAbsPath);
-
-		// Keep track of the last texture index to be used in next Repack (because it likely has room remaining)
-		QList<int> unfilledTextureIndexList;
-
-		// Run image packer on each bucket's m_FramesList, and insert/rename textures to have sequential index name
+		// Run image packer on each bucket's m_FramesList
 		for(auto iter = bucketMapRef.begin(); iter != bucketMapRef.end(); ++iter)
 		{
 			iter.value()->m_Packer.clear();
@@ -82,9 +80,24 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 
 			iter.value()->m_Packer.pack(pBankData->m_MetaObj["cmbHeuristic"].toInt(), fullAtlasSize.width(), fullAtlasSize.height());
 
+			iTotalBlocks += iter.value()->m_Packer.bins.size();
+		}
+	}
+
+	for(int32 iBankCnt = 0; iBankCnt < m_RepackBankList.size(); ++iBankCnt)
+	{
+		BankData *pBankData = m_RepackBankList[iBankCnt].m_pBankData;
+		QMap<uint32, RepackBank::PackerBucket *> &bucketMapRef = m_RepackBankList[iBankCnt].m_BucketMap;
+		QSize fullAtlasSize(pBankData->m_MetaObj["maxWidth"].toInt(), pBankData->m_MetaObj["maxHeight"].toInt());
+
+		// Go through the packer's bins and ensure textures have a sequential index name
+		QDir runtimeBankDir(pBankData->m_sAbsPath);
+		QList<int> unfilledTextureIndexList; // Keep track of the last texture index to be used in next Repack (because it likely has room remaining)
+		for(auto iter = bucketMapRef.begin(); iter != bucketMapRef.end(); ++iter)
+		{
 			int iNumNewTextures = iter.value()->m_Packer.bins.size();
 
-			// Grab 'existingTexturesInfoList' after deleting obsolete textures
+			// Grab 'existingTexturesInfoList' - This is after AtlasModel::OnFlushRepack() has deleted the obsolete textures
 			QFileInfoList existingTexturesInfoList = runtimeBankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 
 			// Using our stock of newly generated textures, fill in any gaps in the texture array.
@@ -95,11 +108,6 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 			int iCurrentIndex = 0;
 			for(; iCurrentIndex < iTotalNumTextures; ++iCurrentIndex)
 			{
-				// TODO: Fix this calculation since we use buckets now
-				float fPercComplete = (static_cast<float>(iCurrentIndex) / static_cast<float>(iTotalNumTextures));
-				fPercComplete *= 100.0f;
-				Q_EMIT LoadUpdate("Constructing Atlases", static_cast<int>(fPercComplete));
-
 				bool bFound = false;
 				for(int i = 0; i < existingTexturesInfoList.size(); ++i)
 				{
@@ -117,6 +125,9 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 				{
 					ConstructAtlasTexture(pBankData, iter.value()->m_Packer, HyTextureInfo(iter.key()), iNumNewTexturesUsed, iCurrentIndex);
 					iNumNewTexturesUsed++;
+
+					iLoadedBlocks++;
+					Q_EMIT LoadUpdate(iLoadedBlocks, iTotalBlocks);
 
 					// Store off the last packed texture to indicate it is "unfilled"
 					if(iNumNewTexturesUsed == iNumNewTextures)

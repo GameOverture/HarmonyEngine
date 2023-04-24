@@ -20,6 +20,8 @@ class ProjectItemMimeData : public IMimeData
 public:
 	ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef);
 	virtual ~ProjectItemMimeData();
+
+	static void RegenUuids(Project *pDestProject, QByteArray &jsonDataOut);
 };
 
 #endif // ProjectItemMimeData_H

@@ -433,16 +433,6 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	return atlasInfoObj;
 }
 
-/*slot*/ void AudioManagerModel::OnLoadUpdate(QString sMsg, int iPercComplete)
-{
-	MainWindow::SetLoading(sMsg, iPercComplete);
-}
-
-/*slot*/ void AudioManagerModel::OnRepackFinished()
-{
-	SaveRuntime();
-}
-
 AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, ItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef)
 {
 	QFile file(sFilePath);

@@ -197,9 +197,14 @@ void IManagerModel::RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeMo
 		QList<TreeModelItemData *> dependantList = assetsList[i]->GetDependants();// GetDependencies();
 		if(dependantList.empty() == false)
 		{
-			QString sMessage = "'" % assetsList[i]->GetName() % "' asset cannot be deleted because it is in use by the following items: \n\n";
-			for(QList<TreeModelItemData *>::iterator dependantIter = dependantList.begin(); dependantIter != dependantList.end(); ++dependantIter)
-				sMessage.append(HyGlobal::ItemName((*dependantIter)->GetType(), false) % " - " % (*dependantIter)->GetText() % "\n");
+			QString sMessage = "'" % assetsList[i]->GetFilter() % "/" % assetsList[i]->GetName() % "' cannot be deleted because it is in use by the following items: \n\n";
+			for(TreeModelItemData *pItemData : dependantList)
+			{
+				if(pItemData->IsProjectItem())
+					sMessage.append(HyGlobal::ItemName(pItemData->GetType(), false) % " - " % static_cast<ProjectItemData *>(pItemData)->GetName(true) % "\n");
+				else
+					sMessage.append(HyGlobal::ItemName(pItemData->GetType(), false) % " - " % pItemData->GetText() % "\n");
+			}
 
 			HyGuiLog(sMessage, LOGTYPE_Warning);
 			return;
@@ -244,7 +249,7 @@ void IManagerModel::RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeMo
 	OnRemoveAssets(sRemovedFilterPaths, assetsList);
 	FlushRepack();
 
-	SaveMeta();
+	//SaveMeta();
 }
 
 bool IManagerModel::CanReplaceAssets(QList<IAssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const
@@ -254,35 +259,33 @@ bool IManagerModel::CanReplaceAssets(QList<IAssetItemData *> assetsList, QList<P
 	affectedItemListOut.clear();
 	for(int i = 0; i < assetsList.count(); ++i)
 	{
-		QList<TreeModelItemData *> sLinks = assetsList[i]->GetDependants();// GetDependencies();
-		if(sLinks.empty() == false)
+		QList<TreeModelItemData *> assetDependantList = assetsList[i]->GetDependants();
+		for(TreeModelItemData *pItemData : assetDependantList)
 		{
-			for(QList<TreeModelItemData *>::iterator linksIter = sLinks.begin(); linksIter != sLinks.end(); ++linksIter)
+			if(pItemData->IsProjectItem() == false)
+				continue;
+
+			ProjectItemData *pLinkedItem = static_cast<ProjectItemData *>(pItemData);
+			affectedItemListOut.append(pLinkedItem);
+
+			// Abort if any of these linked items are currently opened & unsaved
+			for(int iTabBarIndex = 0; iTabBarIndex < pTabBar->count(); ++iTabBarIndex)
 			{
-				if((*linksIter)->IsProjectItem() == false)
-					continue;
+				QVariant v = pTabBar->tabData(iTabBarIndex);
+				ProjectItemData *pOpenItem = v.value<ProjectItemData *>();
 
-				ProjectItemData *pLinkedItem = static_cast<ProjectItemData *>(*linksIter);
-				affectedItemListOut.append(pLinkedItem);
-
-				// Abort if any of these linked items are currently opened & unsaved
-				for(int iTabBarIndex = 0; iTabBarIndex < pTabBar->count(); ++iTabBarIndex)
+				if(pLinkedItem == pOpenItem && pTabBar->tabText(iTabBarIndex).contains('*', Qt::CaseInsensitive))
 				{
-					QVariant v = pTabBar->tabData(iTabBarIndex);
-					ProjectItemData *pOpenItem = v.value<ProjectItemData *>();
-
-					if(pLinkedItem == pOpenItem && pTabBar->tabText(iTabBarIndex).contains('*', Qt::CaseInsensitive))
-					{
-						QString sMessage = "'" % assetsList[i]->GetName() % "' asset cannot be replaced because an item that references it is currently opened and unsaved:\n" % pOpenItem->GetName(true);
-						HyGuiLog(sMessage, LOGTYPE_Warning);
+					QString sMessage = "'" % assetsList[i]->GetName() % "' asset cannot be replaced because an item that references it is currently opened and unsaved:\n" % pOpenItem->GetName(true);
+					HyGuiLog(sMessage, LOGTYPE_Warning);
 						
-						affectedItemListOut.clear();
+					affectedItemListOut.clear();
 						
-						return false;
-					}
+					return false;
 				}
 			}
 		}
+		
 	}
 
 	return true;
@@ -384,7 +387,7 @@ void IManagerModel::FlushRepack()
 	switch(m_eASSET_TYPE)
 	{
 	case ASSETMAN_Atlases:
-		StartRepackThread("Repacking Atlases", new AtlasRepackThread(m_RepackAffectedAssetsMap /**m_BanksModel.GetBank(uiBankIndex), affectedFramesList*/, m_MetaDir));
+		StartRepackThread("Repacking Atlases", new AtlasRepackThread(m_RepackAffectedAssetsMap, m_MetaDir));
 		break;
 	case ASSETMAN_Audio:
 		StartRepackThread("Repacking Audio", new AudioRepackThread(m_RepackAffectedAssetsMap, m_MetaDir));
@@ -672,8 +675,6 @@ void IManagerModel::SaveRuntime()
 
 		runtimeFile.close();
 	}
-
-	Harmony::Reload(&m_ProjectRef);
 }
 
 /*virtual*/ QVariant IManagerModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const /*override*/
@@ -972,7 +973,7 @@ void IManagerModel::StartRepackThread(QString sLoadMessage, IRepackThread *pRepa
 	connect(pRepackThread, &IRepackThread::LoadUpdate, this, &IManagerModel::OnLoadUpdate);
 	connect(pRepackThread, &IRepackThread::RepackIsFinished, this, &IManagerModel::OnRepackFinished);
 
-	MainWindow::SetLoading(sLoadMessage, 0);
+	MainWindow::SetLoading(GetLoadingType(), 0, 0);
 	pRepackThread->start();
 }
 
@@ -1012,22 +1013,42 @@ IAssetItemData *IManagerModel::CreateAssetTreeItem(QString sPrefix, QString sNam
 	return pNewItemData;
 }
 
-/*slot*/ void IManagerModel::OnLoadUpdate(QString sMsg, int iPercComplete)
+LoadingType IManagerModel::GetLoadingType() const
 {
-	MainWindow::SetLoading(sMsg, iPercComplete);
+	switch(m_eASSET_TYPE)
+	{
+	case ASSETMAN_Atlases:	return LOADINGTYPE_AtlasManager;
+	case ASSETMAN_Audio:	return LOADINGTYPE_AudioManager;
+
+	default:
+		HyGuiLog("IManagerModel::OnLoadUpdate - unhandled asset type: " % QString::number(m_eASSET_TYPE), LOGTYPE_Error);
+	}
+
+	return LOADINGTYPE_Unknown;
+}
+
+/*slot*/ void IManagerModel::OnLoadUpdate(int iBlocksLoaded, int iTotalBlocks)
+{
+	MainWindow::SetLoading(GetLoadingType(), iBlocksLoaded, iTotalBlocks);
 }
 
 /*slot*/ void IManagerModel::OnRepackFinished()
 {
+	// Set 'LOADINGTYPE_ReloadHarmony' to be loading so that the user can't do anything else until Harmony is reloaded
+	MainWindow::SetLoading(LOADINGTYPE_ReloadHarmony, 0, 0);
+
 	m_RepackAffectedAssetsMap.clear();
+	MainWindow::ClearLoading(GetLoadingType());
 
-	// Re-save all affected items that had a replaced asset
-	for(int i = 0; i < m_RepackAffectedItemList.size(); ++i)
-	{
-		if(m_RepackAffectedItemList[i]->Save(i == (m_RepackAffectedItemList.size() - 1)) == false)
-			HyGuiLog(m_RepackAffectedItemList[i]->GetName(true) % " failed to save after replacing assets", LOGTYPE_Error);
-	}
+	m_ProjectRef.AddDirtyItems(this, m_RepackAffectedItemList);
 	m_RepackAffectedItemList.clear();
-
-	SaveRuntime();
+	
+	if(MainWindow::GetCurrentLoading().size() == 1)
+	{
+		// Only LOADINGTYPE_ReloadHarmony remains, can now proceed with:
+		// - saving the affected items
+		// - saving the runtime manifests
+		// - reloading Harmony
+		m_ProjectRef.ReloadHarmony();
+	}
 }

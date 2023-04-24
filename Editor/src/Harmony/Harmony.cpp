@@ -53,7 +53,7 @@ Harmony::Harmony(MainWindow &mainWindowRef) :
 
 	if(pProject != nullptr)
 	{
-		connect(sm_pInstance->m_pWidget, &HarmonyWidget::HarmonyWidgetReady, sm_pInstance, &Harmony::HarmonyWidgetReady);
+		connect(sm_pInstance->m_pWidget, &HarmonyWidget::HarmonyWidgetReady, sm_pInstance, &Harmony::OnHarmonyWidgetReady);
 		sm_pInstance->m_MainWindowRef.SetStatus("Loading new Harmony instance", 0);
 	}
 	else
@@ -62,11 +62,11 @@ Harmony::Harmony(MainWindow &mainWindowRef) :
 
 /*static*/ void Harmony::Reload(Project *pProject)
 {
-	if(sm_pInstance->m_pWidget->IsProject(pProject) == false)
-	{
-		MainWindow::ClearLoading();
-		return;
-	}
+	//if(sm_pInstance->m_pWidget->IsProject(pProject) == false)
+	//{
+	//	//MainWindow::ClearLoading();
+	//	return;
+	//}
 
 	SetProject(nullptr);
 	SetProject(pProject);
@@ -89,11 +89,10 @@ Harmony::Harmony(MainWindow &mainWindowRef) :
 	return sm_pInstance->m_pWidget;
 }
 
-/*slot*/ void Harmony::HarmonyWidgetReady(HarmonyWidget *pWidget)
+/*slot*/ void Harmony::OnHarmonyWidgetReady(HarmonyWidget *pWidget)
 {
 	m_pWidget->GetProject()->HarmonyInitialize();
 
 	m_MainWindowRef.SetCurrentProject(m_pWidget->GetProject());
-	m_MainWindowRef.ClearStatus();
-	m_MainWindowRef.ClearLoading();
+	m_MainWindowRef.ClearLoading(LOADINGTYPE_ReloadHarmony);
 }

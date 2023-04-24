@@ -77,6 +77,9 @@ ProjectItemData::~ProjectItemData()
 
 void ProjectItemData::LoadModel()
 {
+	if(m_pModel)
+		return;
+
 	switch(m_eTYPE)
 	{
 	case ITEM_Sprite:
@@ -213,6 +216,7 @@ void ProjectItemData::DiscardChanges()
 	WidgetUnload();
 
 	delete m_pModel;
+	m_pModel = nullptr;
 	LoadModel();
 }
 

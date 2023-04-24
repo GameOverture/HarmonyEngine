@@ -182,7 +182,6 @@ MainWindow::MainWindow(QWidget *pParent) :
 	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetAssets));
 	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetExplorer));
 	m_LoadingSpinnerList.append(new WaitingSpinnerWidget(ui->dockWidgetProperties));
-
 	for(int i = 0; i < m_LoadingSpinnerList.size(); ++i)
 	{
 		WaitingSpinnerWidget *pLoadingSpinner = m_LoadingSpinnerList[i];
@@ -198,12 +197,8 @@ MainWindow::MainWindow(QWidget *pParent) :
 		pLoadingSpinner->setColor(QColor(25, 255, 25));
 	}
 
-	//m_LoadingMsg.setText("Ready");
-	m_LoadingBar.setRange(0, 100);
 	m_LoadingBar.reset();
-	statusBar()->addWidget(&m_LoadingMsg);
-	statusBar()->addWidget(&m_LoadingBar);
-	m_LoadingBar.setVisible(false);
+	m_LoadingBar.setFormat("%v/%m (%p%)");
 
 	//QPixmap *pPixmap = new QPixmap(":/icons16x16/smiley-sad.gif");
 	//QLabel *pSvnStatusIcon = new QLabel;
@@ -319,40 +314,21 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	RefreshBuildMenu();
 }
 
-/*static*/ void MainWindow::SetLoading(QString sMsg, int iPercentComplete)
+/*static*/ QList<LoadingType> MainWindow::GetCurrentLoading()
 {
-	sm_pInstance->statusBar()->clearMessage();
-
-	sm_pInstance->m_LoadingMsg.setText(sMsg);
-
-	if(iPercentComplete >= 0)
-	{
-		sm_pInstance->m_LoadingBar.setVisible(true);
-		sm_pInstance->m_LoadingBar.setValue(iPercentComplete);
-	}
-	else
-		sm_pInstance->m_LoadingBar.setVisible(false);
-
-	for(int i = 0; i < sm_pInstance->m_LoadingSpinnerList.size(); ++i)
-	{
-		if(sm_pInstance->m_LoadingSpinnerList[i]->isSpinning() == false)
-			sm_pInstance->m_LoadingSpinnerList[i]->start();
-	}
-
-	sm_pInstance->ui->mainToolBar->setEnabled(false);
-	sm_pInstance->ui->menuBar->setEnabled(false);
+	return sm_pInstance->m_LoadingMap.keys();
 }
 
-/*static*/ void MainWindow::ClearLoading()
+/*static*/ void MainWindow::SetLoading(LoadingType eLoadingType, int iLoadedBlocks, int iTotalBlocks)
 {
-	sm_pInstance->statusBar()->showMessage("Loading Complete", 2000);
-	sm_pInstance->m_LoadingBar.setVisible(false);
+	sm_pInstance->m_LoadingMap[eLoadingType] = QPair<int, int>(iLoadedBlocks, iTotalBlocks);
+	sm_pInstance->RefreshLoading();
+}
 
-	for(int i = 0; i < sm_pInstance->m_LoadingSpinnerList.size(); ++i)
-		sm_pInstance->m_LoadingSpinnerList[i]->stop();
-
-	sm_pInstance->ui->mainToolBar->setEnabled(true);
-	sm_pInstance->ui->menuBar->setEnabled(true);
+/*static*/ void MainWindow::ClearLoading(LoadingType eLoadingType)
+{
+	sm_pInstance->m_LoadingMap.remove(eLoadingType);
+	sm_pInstance->RefreshLoading();
 }
 
 /*static*/ QString MainWindow::EngineSrcLocation()
@@ -519,6 +495,66 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	Harmony::SetProject(nullptr);
 
 	QMainWindow::closeEvent(pEvent);
+}
+
+void MainWindow::RefreshLoading()
+{
+	if(sm_pInstance->m_LoadingMap.empty() == false)
+	{
+		int iSumOfLoadedBlocks = 0;
+		int iSumOfTotalBlocks = 0;
+		for(LoadingType eCurLoadingType : sm_pInstance->m_LoadingMap.keys())
+		{
+			QPair<int, int> &curPair = sm_pInstance->m_LoadingMap[eCurLoadingType];
+			iSumOfLoadedBlocks += curPair.first;
+			iSumOfTotalBlocks += curPair.second;
+		}
+
+		if(sm_pInstance->m_LoadingMap.size() > 1)
+			sm_pInstance->m_LoadingMsg.setText("Multi-Processing");
+		else
+		{
+			switch(sm_pInstance->m_LoadingMap.firstKey())
+			{
+			case LOADINGTYPE_AtlasManager:	sm_pInstance->m_LoadingMsg.setText(iSumOfTotalBlocks == 0 ? "Repacking Atlases" : "Constructing Atlas Textures"); break;
+			case LOADINGTYPE_AudioManager:	sm_pInstance->m_LoadingMsg.setText("Constructing Audio Banks"); break;
+			case LOADINGTYPE_ReloadHarmony:	sm_pInstance->m_LoadingMsg.setText("Reloading Harmony"); break;
+
+			default:
+				HyGuiLog("MainWindow::SetLoading() - Unhandled LoadingType: " % QString::number(sm_pInstance->m_LoadingMap.firstKey()), LOGTYPE_Error);
+				break;
+			}
+		}
+
+		sm_pInstance->m_LoadingBar.setRange(0, iSumOfTotalBlocks);
+		sm_pInstance->m_LoadingBar.setValue(iSumOfLoadedBlocks);
+		
+		// Start spinners and disable UI
+		sm_pInstance->statusBar()->addWidget(&m_LoadingMsg);
+		sm_pInstance->statusBar()->addWidget(&m_LoadingBar);
+		m_LoadingMsg.show();
+		m_LoadingBar.show();
+		for(int i = 0; i < sm_pInstance->m_LoadingSpinnerList.size(); ++i)
+		{
+			if(sm_pInstance->m_LoadingSpinnerList[i]->isSpinning() == false)
+				sm_pInstance->m_LoadingSpinnerList[i]->start();
+		}
+		sm_pInstance->ui->mainToolBar->setEnabled(false);
+		sm_pInstance->ui->menuBar->setEnabled(false);
+	}
+	else // Loading Complete
+	{
+		sm_pInstance->statusBar()->showMessage("Loading Complete", 2000);
+
+		// Stop spinners and enable UI
+		sm_pInstance->statusBar()->removeWidget(&m_LoadingMsg);
+		sm_pInstance->statusBar()->removeWidget(&m_LoadingBar);
+		for(int i = 0; i < sm_pInstance->m_LoadingSpinnerList.size(); ++i)
+			sm_pInstance->m_LoadingSpinnerList[i]->stop();
+
+		sm_pInstance->ui->mainToolBar->setEnabled(true);
+		sm_pInstance->ui->menuBar->setEnabled(true);
+	}
 }
 
 void MainWindow::OnCtrlTab()

@@ -65,7 +65,10 @@ class Project : public ExplorerItemData
 
 	FileDataPair										m_ProjectFileData;
 
-	QMap<QUuid, TreeModelItemData *>					m_ItemDataUuidMap;	// Lookup map to help find tree item data pointers
+	QMap<QUuid, TreeModelItemData *>					m_ItemDataUuidMap;		// Lookup map to help find tree item data pointers
+
+	QSet<IManagerModel *>								m_DirtyManagerSet;		// Dirty managers that need to SaveRuntime() during ReloadHarmony()
+	QSet<ProjectItemData *>								m_DirtyProjItemSet;		// Dirty items that need to be resaved during ReloadHarmony()
 
 	bool												m_bHasError;
 	bool												m_bExplorerModelLoaded;
@@ -107,7 +110,10 @@ public:
 	AudioManagerModel &GetAudioModel();
 	ManagerWidget *GetAudioWidget();
 
-	bool PasteAssets(ItemType ePasteItemType, QJsonArray &assetArrayRef, AssetManagerType eAssetType);
+	void AddDirtyItems(IManagerModel *pDirtyManager, QList<ProjectItemData *> dirtyProjItemList);
+	void ReloadHarmony();
+
+	bool PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType);
 
 	//void SetAudioModel(QJsonObject audioObj);
 

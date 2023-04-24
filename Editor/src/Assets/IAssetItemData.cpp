@@ -22,7 +22,7 @@ IAssetItemData::IAssetItemData(IManagerModel &modelRef, ItemType eType, QUuid uu
 	m_bIsAssetItem = true;
 }
 
-AssetManagerType IAssetItemData::GetManagerAssetType() const
+AssetManagerType IAssetItemData::GetAssetManagerType() const
 {
 	return m_ModelRef.GetAssetType();
 }

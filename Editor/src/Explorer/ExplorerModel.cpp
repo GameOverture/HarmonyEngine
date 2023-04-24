@@ -195,9 +195,14 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 	// Destination is known, get project information
 	Project *pDestProject = &pDestItem->GetProject();
 
+	QByteArray jsonData = pProjMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems));
+	ProjectItemMimeData::RegenUuids(pDestProject, jsonData); // If pasting from another project, it will modify 'jsonData' and regenerate all UUIDs
+
 	// Parse 'pProjMimeData' for paste information
-	QJsonDocument pasteDoc = QJsonDocument::fromJson(pProjMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)));
+	QJsonDocument pasteDoc = QJsonDocument::fromJson(jsonData);
 	QJsonArray pasteArray = pasteDoc.array();
+	QJsonArray assetManagerImportList[NUM_ASSETMANTYPES];
+
 	for(int iPasteIndex = 0; iPasteIndex < pasteArray.size(); ++iPasteIndex)
 	{
 		QJsonObject pasteObj = pasteArray[iPasteIndex].toObject();
@@ -237,15 +242,6 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 		// TODO: if it's a prefix, grab all the items within it and import them?
 		if(pasteObj["isPrefix"].toBool())
 			continue;
-		
-		for(int iAssetType = 0; iAssetType < NUM_ASSETMANTYPES; ++iAssetType)
-		{
-			AssetManagerType eAssetType = static_cast<AssetManagerType>(iAssetType);
-
-			QJsonArray assetArray = pasteObj[HyGlobal::AssetName(eAssetType)].toArray();
-			if(pDestProject->PasteAssets(ePasteItemType, assetArray, eAssetType) == false)
-				HyGuiLog("Paste failed to import assets of type: " % HyGlobal::AssetName(eAssetType), LOGTYPE_Error);
-		}
 		
 		// Import any missing fonts (.ttf)
 		if(pasteObj.contains("fonts"))
@@ -292,7 +288,6 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 
 		FileDataPair initFileItemData;
 		initFileItemData.m_Meta = pasteObj["metaObj"].toObject();
-		initFileItemData.m_Meta.insert("UUID", QUuid::createUuid().toString(QUuid::StringFormat::WithoutBraces)); // Create new UUID for imported item, so it doesn't conflict with its old project
 		initFileItemData.m_Data = pasteObj["dataObj"].toObject();
 		ProjectItemData *pImportedProjItem = static_cast<ProjectItemData *>(AddItem(pDestProject,
 																			ePasteItemType,
@@ -300,9 +295,26 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 																			sName,
 																			initFileItemData,
 																			false));
-		pImportedProjItem->LoadModel();
-		if(pImportedProjItem->Save(true) == false)
-			HyGuiLog("Paste failed to save item: " % sItemPath, LOGTYPE_Error);
+		pDestProject->AddDirtyItems(nullptr, QList<ProjectItemData *>() << pImportedProjItem);
+		
+		for(int iAssetType = 0; iAssetType < NUM_ASSETMANTYPES; ++iAssetType)
+		{
+			QJsonArray assetArray = pasteObj[HyGlobal::AssetName(static_cast<AssetManagerType>(iAssetType))].toArray();
+			for(int i = 0; i < assetArray.size(); ++i)
+			{
+				QJsonObject assetObj = assetArray[i].toObject();
+				assetManagerImportList[iAssetType].append(assetObj);
+			}
+		}
+	}
+
+	// Finally import any assets that were part of the paste item - Once packing has finished 'pImportedProjItem' will be saved in the OnRepackFinished() callback
+	for(int iAssetType = 0; iAssetType < NUM_ASSETMANTYPES; ++iAssetType)
+	{
+		AssetManagerType eAssetType = static_cast<AssetManagerType>(iAssetType);
+
+		if(pDestProject->PasteAssets(assetManagerImportList[eAssetType], eAssetType) == false)
+			HyGuiLog("Paste failed to import assets of type: " % HyGlobal::AssetName(eAssetType), LOGTYPE_Error);
 	}
 
 	return true;

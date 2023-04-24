@@ -330,12 +330,12 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewAsset(IAssetItemData *pAssetIt
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pAssetItem->GetName());
 
 	ItemType eItemType = ITEM_Unknown;
-	switch(pAssetItem->GetManagerAssetType())
+	switch(pAssetItem->GetAssetManagerType())
 	{
 	case ASSETMAN_Atlases: eItemType = ITEM_AtlasFrame; break;
 	case ASSETMAN_Audio: eItemType = ITEM_SoundClip; break;
 	default:
-		HyGuiLog("EntityTreeModel::Cmd_InsertNewAsset - tried to add an unhandled asset manager type: " % QString::number(pAssetItem->GetManagerAssetType()), LOGTYPE_Error);
+		HyGuiLog("EntityTreeModel::Cmd_InsertNewAsset - tried to add an unhandled asset manager type: " % QString::number(pAssetItem->GetAssetManagerType()), LOGTYPE_Error);
 		break;
 	}
 

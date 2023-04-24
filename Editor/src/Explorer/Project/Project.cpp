@@ -514,7 +514,35 @@ ManagerWidget *Project::GetAudioWidget()
 	return m_pAudioWidget;
 }
 
-bool Project::PasteAssets(ItemType ePasteItemType, QJsonArray &assetArrayRef, AssetManagerType eAssetType)
+void Project::AddDirtyItems(IManagerModel *pDirtyManager, QList<ProjectItemData *> dirtyProjItemList)
+{
+	if(pDirtyManager)
+		m_DirtyManagerSet.insert(pDirtyManager);
+
+	m_DirtyProjItemSet.unite(QSet<ProjectItemData *>(dirtyProjItemList.begin(), dirtyProjItemList.end()));
+}
+
+void Project::ReloadHarmony()
+{
+	QList<ProjectItemData *> dirtyItemList = m_DirtyProjItemSet.values();
+	for(int i = 0; i < dirtyItemList.size(); ++i)
+	{
+		bool bWriteToDisk = (i == (dirtyItemList.size() - 1));
+
+		dirtyItemList[i]->LoadModel();
+		if(dirtyItemList[i]->Save(bWriteToDisk) == false)
+			HyGuiLog(dirtyItemList[i]->GetName(true) % " failed to save during Project::ReloadHarmony", LOGTYPE_Error);
+	}
+	m_DirtyProjItemSet.clear();
+
+	QList<IManagerModel *> dirtyManagerList = m_DirtyManagerSet.values();
+	for(int i = 0; i < dirtyManagerList.size(); ++i)
+		dirtyManagerList[i]->SaveRuntime();
+
+	Harmony::Reload(this);
+}
+
+bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType)
 {
 	if(assetArrayRef.count() == 0)
 		return true;
@@ -532,7 +560,7 @@ bool Project::PasteAssets(ItemType ePasteItemType, QJsonArray &assetArrayRef, As
 	case ASSETMAN_Atlases:
 		pManager = m_pAtlasModel;
 		uiBankId = m_pAtlasWidget ? m_pAtlasWidget->GetSelectedBankId() : 0;
-		if(ePasteItemType == ITEM_Sprite)
+		//if(ePasteItemType == ITEM_Sprite)
 			eImportedAssetType = ITEM_AtlasFrame;
 		break;
 	case ASSETMAN_Audio:
@@ -568,7 +596,7 @@ bool Project::PasteAssets(ItemType ePasteItemType, QJsonArray &assetArrayRef, As
 
 			importAssetList.push_back(sFilePath);
 			correspondingParentList.push_back(pManager->ReturnFilter(assetObj["filter"].toString()));
-			correspondingUuidList.push_back(QUuid::createUuid());// assetObj["assetUUID"].toString()); Create new UUID for imported asset, so it doesn't conflict with its old project
+			correspondingUuidList.push_back(QUuid(assetObj["assetUUID"].toString())); // The UUID has already been re-created for this imported asset if moving to another project (so it doesn't conflict with its old project)
 		}
 	}
 

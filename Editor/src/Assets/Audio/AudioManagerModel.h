@@ -78,10 +78,6 @@ protected:
 	virtual void OnSaveMeta(QJsonObject &metaObjRef) override;
 	virtual QJsonObject GetSaveJson() override;
 
-private Q_SLOTS:
-	void OnLoadUpdate(QString sMsg, int iPercComplete);
-	void OnRepackFinished();
-
 private:
 	AudioAsset *ImportSound(QString sFilePath, quint32 uiBankIndex, ItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef);
 };

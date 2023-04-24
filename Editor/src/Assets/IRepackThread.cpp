@@ -22,6 +22,6 @@ IRepackThread::IRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &affectedA
 
 /*virtual*/ void IRepackThread::run() /*override*/
 {
-	OnRun();
+	OnRun(); // Should emit LoadUpdate() throughout OnRun
 	Q_EMIT RepackIsFinished();
 }

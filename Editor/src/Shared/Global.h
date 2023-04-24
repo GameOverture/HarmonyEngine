@@ -38,7 +38,7 @@ class Project;
 #define HyEditorToolName "Harmony Editor Tool"
 #define HyGuiInternalCharIndicator '+'
 
-#define HYGUI_FILE_VERSION 11
+#define HYGUI_FILE_VERSION 12
 
 #define DISPLAYORDER_TransformCtrl 9999999
 //#define HYGUI_UseBinaryMetaFiles
@@ -92,27 +92,20 @@ enum AssetErrorType
 	NUM_ASSETERRORS
 };
 
-enum MdiArea
-{
-	MDI_MainWindow      = 1 << 0,
-	MDI_Explorer        = 1 << 1,
-	MDI_AtlasManager    = 1 << 2,
-	MDI_AudioManager    = 1 << 3,
-	MDI_ItemProperties  = 1 << 4,
-	MDI_Output          = 1 << 5,
-
-	NUM_MDI             = 6,
-	MDI_Managers        = (MDI_AtlasManager | MDI_AudioManager),
-	MDI_All             = (MDI_MainWindow | MDI_Explorer | MDI_AtlasManager | MDI_AudioManager | MDI_ItemProperties | MDI_Output),
-
-	MDILOAD_Renderer    = MDI_MainWindow//(MDI_Explorer | MDI_Managers | MDI_ItemProperties)
-};
-
 enum AuxTab
 {
 	AUXTAB_Output = 0,
 	AUXTAB_AssetInspector,
 	AUXTAB_ToolBox
+};
+
+enum LoadingType
+{
+	LOADINGTYPE_Unknown = -1,
+
+	LOADINGTYPE_AtlasManager = 0,
+	LOADINGTYPE_AudioManager,
+	LOADINGTYPE_ReloadHarmony
 };
 
 enum MimeType

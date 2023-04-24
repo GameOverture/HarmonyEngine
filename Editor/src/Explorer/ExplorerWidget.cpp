@@ -425,8 +425,13 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 			if(dependantList.empty() == false)
 			{
 				QString sMessage = "'" % selectedItems[i]->GetName(true) % "' cannot be deleted because it is in use by the following items: \n\n";
-				for(auto pDependant : dependantList)
-					sMessage.append(HyGlobal::ItemName(pDependant->GetType(), false) % " - " % pDependant->GetText() % "\n");
+				for(TreeModelItemData *pDependant : dependantList)
+				{
+					if(pDependant->IsProjectItem())
+						sMessage.append(HyGlobal::ItemName(pDependant->GetType(), false) % " - " % static_cast<ProjectItemData *>(pDependant)->GetName(true) % "\n");
+					else
+						sMessage.append(HyGlobal::ItemName(pDependant->GetType(), false) % " - " % pDependant->GetText() % "\n");
+				}
 
 				HyGuiLog(sMessage, LOGTYPE_Warning);
 				return;

@@ -125,20 +125,6 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	return true;
 }
 
-//void AtlasModel::RepackAll(uint uiBankIndex)
-//{
-//	int iNumTotalTextures = GetNumTextures(uiBankIndex);
-//	
-//	QSet<int> textureIndexSet;
-//	for(int i = 0; i < iNumTotalTextures; ++i)
-//		textureIndexSet.insert(i);
-//
-//	if(textureIndexSet.empty() == false)
-//		Repack(uiBankIndex, textureIndexSet, QSet<AtlasFrame *>());
-//	else
-//		SaveRuntime();
-//}
-
 /*virtual*/ QString AtlasModel::OnBankInfo(uint uiBankIndex) /*override*/
 {
 	QString sInfo = "Num Textures: " % QString::number(GetNumTextures(uiBankIndex)) % " | " %

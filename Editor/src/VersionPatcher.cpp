@@ -198,8 +198,12 @@
 			Patch_10to11(metaSourceDoc);
 			[[fallthrough]];
 		case 11:
+			HyGuiLog("Patching project files: version 11 -> 12", LOGTYPE_Info);
+			Patch_11to12(metaAtlasDoc, metaAudioDoc);
+			[[fallthrough]];
+		case 12:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 11, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 12, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -1036,6 +1040,39 @@
 	}
 	metaSourceObj.insert("banks", banksArray);
 	metaSourceDocRef.setObject(metaSourceObj);
+}
+
+/*static*/ void VersionPatcher::Patch_11to12(QJsonDocument &metaAtlasDocRef, QJsonDocument &metaAudioDocRef)
+{
+	// META-ATLAS : Change asset/itemType from "Atlas" -> "AtlasFrame"
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
+	QJsonArray atlasAssetsArray = metaAtlasObj["assets"].toArray();
+	for(int iAssetIndex = 0; iAssetIndex < atlasAssetsArray.size(); ++iAssetIndex)
+	{
+		QJsonObject assetObj = atlasAssetsArray.at(iAssetIndex).toObject();
+		QString sItemType = assetObj["itemType"].toString();
+		if(sItemType == "Atlas")
+			assetObj.insert("itemType", "AtlasFrame");
+
+		atlasAssetsArray.replace(iAssetIndex, assetObj);
+	}
+	metaAtlasObj.insert("assets", atlasAssetsArray);
+	metaAtlasDocRef.setObject(metaAtlasObj);
+
+	// META-AUDIO : Change asset/itemType from "Audio" -> "SoundClip"
+	QJsonObject metaAudioObj = metaAudioDocRef.object();
+	QJsonArray audioAssetsArray = metaAudioObj["assets"].toArray();
+	for(int iAssetIndex = 0; iAssetIndex < audioAssetsArray.size(); ++iAssetIndex)
+	{
+		QJsonObject assetObj = audioAssetsArray.at(iAssetIndex).toObject();
+		QString sItemType = assetObj["itemType"].toString();
+		if(sItemType == "Audio")
+			assetObj.insert("itemType", "SoundClip");
+
+		audioAssetsArray.replace(iAssetIndex, assetObj);
+	}
+	metaAudioObj.insert("assets", audioAssetsArray);
+	metaAudioDocRef.setObject(metaAudioObj);
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)

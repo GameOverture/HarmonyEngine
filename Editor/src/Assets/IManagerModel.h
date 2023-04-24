@@ -39,7 +39,7 @@ protected:
 
 	QMap<quint32, QList<IAssetItemData *> >			m_AssetChecksumMap;
 
-	QMap<BankData *, QSet<IAssetItemData *>>			m_RepackAffectedAssetsMap;
+	QMap<BankData *, QSet<IAssetItemData *>>		m_RepackAffectedAssetsMap;
 	QList<ProjectItemData *>						m_RepackAffectedItemList; // Keep track of any linked/referenced items as they will need to be re-saved after asset repacking
 
 public:
@@ -92,7 +92,7 @@ public:
 	quint32 GetBankIdFromBankIndex(uint uiBankIndex) const;
 
 	void SaveMeta();
-	void SaveRuntime(); // Saves meta, outputs runtime assets, and reloads Harmony in the editor
+	void SaveRuntime(); // Saves meta, outputs runtime manifest
 
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
@@ -133,9 +133,10 @@ protected:
 
 private:
 	IAssetItemData *CreateAssetTreeItem(QString sPrefix, QString sName, QJsonObject metaObj);
+	LoadingType GetLoadingType() const;
 
 protected Q_SLOTS:
-	void OnLoadUpdate(QString sMsg, int iPercComplete);
+	void OnLoadUpdate(int iBlocksLoaded, int iTotalBlocks);
 	void OnRepackFinished();
 };
 

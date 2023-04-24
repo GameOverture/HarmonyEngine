@@ -142,7 +142,7 @@ QList<IAssetItemData *> IModel::GetAssetDependencies(AssetManagerType eAssetType
 	QList<TreeModelItemData *> dependeeList = m_ItemRef.GetDependees();
 	for(TreeModelItemData *pDependee : dependeeList)
 	{
-		if(pDependee->IsAssetItem() && static_cast<IAssetItemData *>(pDependee)->GetManagerAssetType() == eAssetType)
+		if(pDependee->IsAssetItem() && static_cast<IAssetItemData *>(pDependee)->GetAssetManagerType() == eAssetType)
 			returnList.push_back(static_cast<IAssetItemData *>(pDependee));
 	}
 

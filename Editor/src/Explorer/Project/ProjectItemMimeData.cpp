@@ -14,10 +14,14 @@
 #include "IModel.h"
 #include "AtlasFrame.h"
 #include "TextModel.h"
+#include "IManagerModel.h"
 
 ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef) :
 	IMimeData(MIMETYPE_ProjectItems)
 {
+	// TODO: Find projItem dependencies for each item and add them to the rootArray
+
+
 	QJsonArray rootArray; // An array of ProjectItems
 	for(int i = 0; i < itemListRef.size(); ++i)
 	{
@@ -74,3 +78,50 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 
 /*virtual*/ ProjectItemMimeData::~ProjectItemMimeData()
 { }
+
+/*static*/ void ProjectItemMimeData::RegenUuids(Project *pDestProject, QByteArray &jsonDataOut)
+{
+	QMap<QString, QString> uuidReplacementMap;
+
+	QJsonDocument mimeDoc = QJsonDocument::fromJson(jsonDataOut);
+	QJsonArray rootArray = mimeDoc.array();
+
+	for(int i = 0; i < rootArray.size(); ++i)
+	{
+		QJsonObject itemObj = rootArray[i].toObject();
+
+		if(itemObj["project"].toString().toLower() == pDestProject->GetAbsPath().toLower())
+			continue;
+
+		if(itemObj["isPrefix"].toBool() == false)
+			uuidReplacementMap.insert(itemObj["UUID"].toString(), QUuid::createUuid().toString(QUuid::WithoutBraces));
+
+		for(int iAssetCount = 0; iAssetCount < NUM_ASSETMANTYPES; ++iAssetCount)
+		{
+			AssetManagerType eAssetManType = static_cast<AssetManagerType>(iAssetCount);
+
+			QJsonArray assetArray = itemObj[HyGlobal::AssetName(eAssetManType)].toArray();
+			for(int i = 0; i < assetArray.size(); ++i)
+			{
+				QJsonObject assetObj = assetArray[i].toObject();
+				if(assetObj["isFilter"].toBool() == false)
+				{
+					QList<IAssetItemData *> existingAssetList = pDestProject->GetManagerModel(eAssetManType)->FindByChecksum(assetObj["checksum"].toVariant().toLongLong());
+					
+					if(existingAssetList.empty()) // Create a new uuid
+						uuidReplacementMap.insert(assetObj["assetUUID"].toString(), QUuid::createUuid().toString(QUuid::WithoutBraces));
+					else // Use the existing asset's uuid
+						uuidReplacementMap.insert(assetObj["assetUUID"].toString(), existingAssetList[0]->GetUuid().toString(QUuid::WithoutBraces));
+				}
+			}
+		}
+	}
+
+	// Now that we have a map of old uuids to new uuids, replace them in the 'jsonDataOut'
+	for(auto iter = uuidReplacementMap.begin(); iter != uuidReplacementMap.end(); ++iter)
+	{
+		QString sOldUuid = iter.key();
+		QString sNewUuid = iter.value();
+		jsonDataOut.replace(sOldUuid.toUtf8(), sNewUuid.toUtf8());
+	}
+}

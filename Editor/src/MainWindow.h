@@ -35,28 +35,29 @@ class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 
-	static MainWindow *				sm_pInstance;
+		static MainWindow *sm_pInstance;
 
-	ExplorerModel					m_ExplorerModel;
+	ExplorerModel						m_ExplorerModel;
 
-	Harmony							m_Harmony;
-	Theme							m_eTheme;
+	Harmony								m_Harmony;
+	Theme								m_eTheme;
 
-	QSettings						m_Settings;
+	QSettings							m_Settings;
 
-	QString							m_sEnginePath;
-	QString							m_sDefaultProjectLocation;
+	QString								m_sEnginePath;
+	QString								m_sDefaultProjectLocation;
 
-	QList<WaitingSpinnerWidget *>	m_LoadingSpinnerList;
-	QLabel							m_LoadingMsg;
-	QProgressBar					m_LoadingBar;
+	QList<WaitingSpinnerWidget *>		m_LoadingSpinnerList;
+	QMap<LoadingType, QPair<int, int>>	m_LoadingMap;
+	QLabel								m_LoadingMsg;
+	QProgressBar						m_LoadingBar;
 
-	QLabel 							m_StatusBarMouseIcon;
-	QLabel 							m_StatusBarMouse;
-	QLabel 							m_StatusBarSizeIcon;
-	QLabel							m_StatusBarSize;
-	QLabel 							m_StatusBarZoomIcon;
-	QLabel							m_StatusBarZoom;
+	QLabel 								m_StatusBarMouseIcon;
+	QLabel 								m_StatusBarMouse;
+	QLabel 								m_StatusBarSizeIcon;
+	QLabel								m_StatusBarSize;
+	QLabel 								m_StatusBarZoomIcon;
+	QLabel								m_StatusBarZoom;
 
 public:
 	explicit MainWindow(QWidget *pParent = 0);
@@ -67,8 +68,9 @@ public:
 	void SetHarmonyWidget(HarmonyWidget *pWidget);
 	void SetCurrentProject(Project *pProject);
 
-	static void SetLoading(QString sMsg, int iPercentComplete);
-	static void ClearLoading();
+	static QList<LoadingType> GetCurrentLoading();
+	static void SetLoading(LoadingType eLoadingType, int iLoadedBlocks, int iTotalBlocks);
+	static void ClearLoading(LoadingType eLoadingType);
 
 	static QString EngineSrcLocation();
 
@@ -95,6 +97,8 @@ public:
 
 protected:
 	virtual void closeEvent(QCloseEvent *pEvent) override;
+
+	void RefreshLoading();
 
 private Q_SLOTS:
 	void OnCtrlTab();
