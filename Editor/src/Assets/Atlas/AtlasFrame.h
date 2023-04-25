@@ -67,6 +67,7 @@ public:
 
 	QIcon &GetThumbnail();
 
+	void ClearTextureIndex();
 	void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize fullAtlasSize);
 	void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);
 

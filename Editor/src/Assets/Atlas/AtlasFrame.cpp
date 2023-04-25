@@ -107,6 +107,11 @@ QIcon &AtlasFrame::GetThumbnail()
 	return m_Thumbnail;
 }
 
+void AtlasFrame::ClearTextureIndex()
+{
+	m_iTextureIndex = -1;
+}
+
 void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize fullAtlasSize)
 {
 	m_iTextureIndex = iTextureIndex;

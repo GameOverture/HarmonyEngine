@@ -378,6 +378,8 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 		affectedTextureIndexMap[GetBankIndexFromBankId(pFrame->GetBankId())].insert(pFrame->GetTextureIndex());
 		framesGoingToNewAtlasGrpSet.insert(pFrame);
 
+		pFrame->ClearTextureIndex(); // These frames moved to a new bank and do not have a texture index anymore
+
 		MoveAsset(pFrame, uiNewBankId);
 	}
 
@@ -396,12 +398,20 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 
 /*virtual*/ void AtlasModel::OnFlushRepack() /*override*/
 {
-	// Always repack the unfilled textures to ensure it gets filled as much as it can
-	QSet<int> repackTexIndicesSet;
+	// Ensure 'm_RepackAffectedAssetsMap' contains the BankData *'s that 'm_RepackTexIndicesMap' contains
+	for(auto iter = m_RepackTexIndicesMap.begin(); iter != m_RepackTexIndicesMap.end(); ++iter)
+	{
+		BankData *pBank = iter.key();
+		if(m_RepackAffectedAssetsMap.contains(pBank) == false)
+			m_RepackAffectedAssetsMap[pBank] = QSet<IAssetItemData *>();
+	}
 
+	QSet<int> repackTexIndicesSet;
 	for(auto iter = m_RepackAffectedAssetsMap.begin(); iter != m_RepackAffectedAssetsMap.end(); ++iter)
 	{
 		BankData *pBank = iter.key();
+
+		// Always repack the unfilled textures to ensure it gets filled as much as it can
 		QJsonArray unfilledTextureIndicesArray = pBank->m_MetaObj["unfilledIndices"].toArray();
 		for(auto unfilledTextureIndex : unfilledTextureIndicesArray)
 			repackTexIndicesSet.insert(unfilledTextureIndex.toInt());
@@ -413,17 +423,38 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 		AddTexturesToRepack(pBank, repackTexIndicesSet);
 
 		// Delete all affected textures. The following AtlasRepackThread will regenerate all the remaining/modified assets
-		QList<int> textureIndexList = repackTexIndicesSet.values();
-
 		if(m_RepackTexIndicesMap.contains(pBank))
-			textureIndexList.append(m_RepackTexIndicesMap[pBank].values());
+			repackTexIndicesSet.unite(m_RepackTexIndicesMap[pBank]);
+
+		QList<int> textureIndexList = repackTexIndicesSet.values();
 
 		QDir runtimeBankDir(pBank->m_sAbsPath);
 		for(int i = 0; i < textureIndexList.size(); ++i)
 		{
-			QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".png"));
-			QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".dds"));
-			QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".astc"));
+			QFile pngFile(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".png"));
+			if(pngFile.exists())
+			{
+				if(!pngFile.remove())
+					HyGuiLog("Failed to delete PNG atlas texture '" % pngFile.fileName() % "':" % pngFile.errorString(), LOGTYPE_Error);
+			}
+			else
+			{
+				QFile ddsFile(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".dds"));
+				if(ddsFile.exists())
+				{
+					if(!ddsFile.remove())
+						HyGuiLog("Failed to delete DDS atlas texture '" % ddsFile.fileName() % "':" % ddsFile.errorString(), LOGTYPE_Error);
+				}
+				else
+				{
+					QFile astcFile(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".astc"));
+					if(astcFile.exists())
+					{
+						if(!astcFile.remove())
+							HyGuiLog("Failed to delete ASTC atlas texture '" % astcFile.fileName() % "':" % astcFile.errorString(), LOGTYPE_Error);
+					}
+				}
+			}
 		}
 	}
 
