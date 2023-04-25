@@ -131,7 +131,7 @@ EntityWidget::~EntityWidget()
 
 	// Query what items are selected in the Explorer Widget
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
-	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes);
+	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes, true);
 	bool bEnableAddNodeBtn = false;
 	
 	for(auto pItem : selectedItems)
@@ -496,7 +496,7 @@ void EntityWidget::OnCollapsedNode(const QModelIndex &indexRef)
 void EntityWidget::on_actionAddChildren_triggered()
 {
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
-	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes);
+	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes, true);
 	if(selectedItems.empty())
 	{
 		HyGuiLog("Currently selected item(s) in Explorer is/are not a ProjectItemData. Cannot add node(s) to entity.", LOGTYPE_Error);

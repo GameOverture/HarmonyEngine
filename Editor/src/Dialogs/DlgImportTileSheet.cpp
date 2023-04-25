@@ -68,11 +68,9 @@ void DlgImportTileSheet::on_buttonBox_accepted()
 
 	quint32 uiBankId = m_ProjectRef.GetAtlasWidget() ? m_ProjectRef.GetAtlasWidget()->GetSelectedBankId() : 0;
 
-	QList<IAssetItemData *> selectedAssetsList;
-	QList<TreeModelItemData *> selectedFiltersList;
 	TreeModelItemData *pFirstSelected = nullptr;
 	if(m_ProjectRef.GetAtlasWidget())
-		pFirstSelected = m_ProjectRef.GetAtlasWidget()->GetSelected(selectedAssetsList, selectedFiltersList);
+		pFirstSelected = m_ProjectRef.GetAtlasWidget()->GetSelected();
 
 	TreeModelItemData *pParent = m_ProjectRef.GetAtlasModel().FindTreeItemFilter(pFirstSelected);
 

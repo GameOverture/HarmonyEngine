@@ -103,6 +103,22 @@ QModelIndexList ITreeModel::GetAllIndices() const
 	return returnList;
 }
 
+int ITreeModel::CalculateDepth(TreeModelItemData *pItemData) const
+{
+	QModelIndex index = FindIndex<TreeModelItemData *>(pItemData, 0);
+	if(index.isValid() == false)
+		return -1;
+
+	int iDepth = 0;
+	while(index.parent().isValid())
+	{
+		index = index.parent();
+		iDepth++;
+	}
+
+	return iDepth;
+}
+
 void ITreeModel::MoveTreeItem(TreeModelItemData *pSourceItemData, TreeModelItemData *pDestinationParent, int32 iDestRow)
 {
 	QModelIndex sourceIndex = FindIndex<TreeModelItemData *>(pSourceItemData, 0);

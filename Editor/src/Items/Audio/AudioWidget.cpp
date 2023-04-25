@@ -132,7 +132,7 @@ void AudioWidget::on_actionAddAudio_triggered()
 {
 	QList<IAssetItemData *> selectedAssetsList;
 	QList<TreeModelItemData *> selectedFiltersList;
-	m_ItemRef.GetProject().GetAudioWidget()->GetSelected(selectedAssetsList, selectedFiltersList);
+	m_ItemRef.GetProject().GetAudioWidget()->GetSelected(selectedAssetsList, selectedFiltersList, true);
 
 	QList<AudioAsset *> audioList;
 	for(IAssetItemData *pAsset : selectedAssetsList)

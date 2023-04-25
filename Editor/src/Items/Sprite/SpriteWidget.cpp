@@ -289,7 +289,7 @@ void SpriteWidget::on_actionAlignCenterHorizontal_triggered()
 void SpriteWidget::on_actionImportFrames_triggered()
 {
 	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-	m_ItemRef.GetProject().GetAtlasWidget()->GetSelected(selectedAssetsList, selectedFiltersList);
+	m_ItemRef.GetProject().GetAtlasWidget()->GetSelected(selectedAssetsList, selectedFiltersList, true);
 
 	QList<AtlasFrame *> frameList;
 	for(IAssetItemData *pAsset : selectedAssetsList)

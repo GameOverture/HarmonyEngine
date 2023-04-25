@@ -56,6 +56,8 @@ public:
 	QList<TreeModelItemData *> GetItemsRecursively(const QModelIndex &indexRef) const;
 	QModelIndexList GetAllIndices() const;
 
+	int CalculateDepth(TreeModelItemData *pItemData) const;
+
 	void MoveTreeItem(TreeModelItemData *pSourceItemData, TreeModelItemData *pDestinationParent, int32 iDestRow);
 
 	virtual QVariant headerData(int iSection, Qt::Orientation orientation, int iRole = Qt::DisplayRole) const override;

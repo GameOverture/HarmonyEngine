@@ -62,7 +62,8 @@ public:
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// NOTE: ManagerWidget::GetSelected is a synonymous function - all fixes/enhancements should be copied over until refactored into a base class
-	ExplorerItemData *GetSelected(QList<ProjectItemData *> &selectedItemsOut, QList<ExplorerItemData *> &selectedPrefixesOut);
+	ExplorerItemData *GetSelected();
+	void GetSelected(QList<ProjectItemData *> &selectedItemsOut, QList<ExplorerItemData *> &selectedPrefixesOut, bool bSortAlphabetically);
 
 private:
 	Ui::ExplorerWidget *ui;

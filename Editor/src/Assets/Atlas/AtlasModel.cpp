@@ -259,6 +259,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	}
 
 	// Passed error check: proceed with import
+	// TODO: ImportImage is slow! Consider adding a progress bar for this
 	for(int i = 0; i < sImportAssetList.size(); ++i)
 		returnList.append(ImportImage(QFileInfo(sImportAssetList[i]).baseName(), *newImageList[i], uiBankId, eType, correspondingUuidList[i]));
 
@@ -413,6 +414,10 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 
 		// Delete all affected textures. The following AtlasRepackThread will regenerate all the remaining/modified assets
 		QList<int> textureIndexList = repackTexIndicesSet.values();
+
+		if(m_RepackTexIndicesMap.contains(pBank))
+			textureIndexList.append(m_RepackTexIndicesMap[pBank].values());
+
 		QDir runtimeBankDir(pBank->m_sAbsPath);
 		for(int i = 0; i < textureIndexList.size(); ++i)
 		{
@@ -421,6 +426,8 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 			QFile::remove(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(textureIndexList[i]) % ".astc"));
 		}
 	}
+
+	m_RepackTexIndicesMap.clear();
 }
 
 /*virtual*/ void AtlasModel::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
@@ -491,6 +498,8 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 
 void AtlasModel::AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSet)
 {
+	m_RepackTexIndicesMap[pBankData].unite(texIndicesSet);
+
 	QList<int> repackTexIndicesList = texIndicesSet.values();
 
 	// Make sure all the affected frames within 'repackTexIndicesList' are added to 'AddAssetsToRepack'

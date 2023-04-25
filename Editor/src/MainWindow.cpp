@@ -633,8 +633,7 @@ void MainWindow::on_actionOpenProject_triggered()
 void MainWindow::on_actionCloseProject_triggered()
 {
 	Project *pProj = nullptr;
-	QList<ProjectItemData *> selectedItemsOut; QList<ExplorerItemData *> selectedPrefixesOut;
-	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected(selectedItemsOut, selectedPrefixesOut);
+	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected();
 	if(pFirstSelected == nullptr)
 		pProj = Harmony::GetProject();
 	else
@@ -653,8 +652,7 @@ void MainWindow::on_actionCloseProject_triggered()
 void MainWindow::on_actionProjectSettings_triggered()
 {
 	Project *pProj = nullptr;
-	QList<ProjectItemData *> selectedItemsOut; QList<ExplorerItemData *> selectedPrefixesOut;
-	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected(selectedItemsOut, selectedPrefixesOut);
+	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected();
 	if(pFirstSelected == nullptr)
 		pProj = Harmony::GetProject();
 	else
@@ -671,8 +669,7 @@ void MainWindow::on_actionProjectSettings_triggered()
 void MainWindow::on_actionOpenFolderExplorer_triggered()
 {
 	Project *pProj = nullptr;
-	QList<ProjectItemData *> selectedItemsOut; QList<ExplorerItemData *> selectedPrefixesOut;
-	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected(selectedItemsOut, selectedPrefixesOut);
+	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected();
 	if(pFirstSelected != nullptr)
 		pProj = &pFirstSelected->GetProject();
 
@@ -983,8 +980,7 @@ void MainWindow::on_actionTheme_Compe_triggered()
 
 void MainWindow::on_actionActivateProject_triggered()
 {
-	QList<ProjectItemData *> selectedItemsOut; QList<ExplorerItemData *> selectedPrefixesOut;
-	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected(selectedItemsOut, selectedPrefixesOut);
+	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected();
 
 	if(Harmony::GetProject() &&
 	   Harmony::GetProject() != &pFirstSelected->GetProject() &&
@@ -1009,8 +1005,7 @@ void MainWindow::on_actionActivateProject_triggered()
 
 void MainWindow::NewItem(ItemType eItem)
 {
-	QList<ProjectItemData *> selectedItemsOut; QList<ExplorerItemData *> selectedPrefixesOut;
-	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected(selectedItemsOut, selectedPrefixesOut);
+	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected();
 	if(pFirstSelected == nullptr)
 	{
 		HyGuiLog("Nothing selected (no project) to add item to.", LOGTYPE_Error);

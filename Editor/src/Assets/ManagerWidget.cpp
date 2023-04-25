@@ -322,14 +322,17 @@ void ManagerWidget::RestoreExpandedState(QStringList expandedFilterList)
 }
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// NOTE: ExplorerWidget::GetSelected is a synonymous function - all fixes/enhancements should be copied over until refactored into a base class
-TreeModelItemData *ManagerWidget::GetSelected(QList<IAssetItemData *> &selectedAssetsOut, QList<TreeModelItemData *> &selectedFiltersOut)
+// NOTE: ExplorerWidget::GetSelected are synonymous functions - all fixes/enhancements should be copied over until refactored into a base class
+TreeModelItemData *ManagerWidget::GetSelected()
 {
 	TreeModelItemData *pFirstItemSelected = nullptr;
 	QModelIndex curIndex = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapToSource(ui->assetTree->selectionModel()->currentIndex());
 	if(curIndex.isValid())
 		pFirstItemSelected = static_cast<ManagerProxyModel *>(ui->assetTree->model())->sourceModel()->data(curIndex, Qt::UserRole).value<TreeModelItemData *>();
-
+	return pFirstItemSelected;
+}
+void ManagerWidget::GetSelected(QList<IAssetItemData *> &selectedAssetsOut, QList<TreeModelItemData *> &selectedFiltersOut, bool bSortAlphabetically)
+{
 	selectedAssetsOut.clear();
 	selectedFiltersOut.clear();
 	QItemSelection selectedItems = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapSelectionToSource(ui->assetTree->selectionModel()->selection());
@@ -367,15 +370,26 @@ TreeModelItemData *ManagerWidget::GetSelected(QList<IAssetItemData *> &selectedA
 		}
 	}
 
-	// The items within 'selectedAssetsOut' and 'selectedFiltersOut' are not sorted. Sort them alphabetically by name here
-	std::sort(selectedAssetsOut.begin(), selectedAssetsOut.end(), [](IAssetItemData *pA, IAssetItemData *pB) {
-		return QString::localeAwareCompare(pA->GetName(), pB->GetName()) < 0;
-		});
-	std::sort(selectedFiltersOut.begin(), selectedFiltersOut.end(), [](TreeModelItemData *pA, TreeModelItemData *pB) {
-		return QString::localeAwareCompare(pA->GetText(), pB->GetText()) < 0;
-		});
-
-	return pFirstItemSelected;
+	// The items within 'selectedAssetsOut' and 'selectedFiltersOut' are not sorted. Sort them either by row depth or alphabetically
+	if(bSortAlphabetically)
+	{
+		std::sort(selectedAssetsOut.begin(), selectedAssetsOut.end(), [](IAssetItemData *pA, IAssetItemData *pB) {
+			return QString::localeAwareCompare(pA->GetName(), pB->GetName()) < 0;
+			});
+		std::sort(selectedFiltersOut.begin(), selectedFiltersOut.end(), [](TreeModelItemData *pA, TreeModelItemData *pB) {
+			return QString::localeAwareCompare(pA->GetText(), pB->GetText()) < 0;
+			});
+	}
+	else // Sort by row depth
+	{
+		// Sort 'selectedItemsOut' by row depth so that we can process the deepest items first
+		std::sort(selectedAssetsOut.begin(), selectedAssetsOut.end(), [&](TreeModelItemData *pA, TreeModelItemData *pB) {
+			return m_pModel->CalculateDepth(pA) > m_pModel->CalculateDepth(pB);
+			});
+		std::sort(selectedFiltersOut.begin(), selectedFiltersOut.end(), [&](TreeModelItemData *pA, TreeModelItemData *pB) {
+			return m_pModel->CalculateDepth(pA) > m_pModel->CalculateDepth(pB);
+			});
+	}
 }
 
 /*virtual*/ void ManagerWidget::enterEvent(QEvent *pEvent) /*override*/
@@ -409,7 +423,7 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 	QMenu bankMenu;
 
 	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-	GetSelected(selectedAssetsList, selectedFiltersList);
+	GetSelected(selectedAssetsList, selectedFiltersList, true);
 
 	QModelIndex index = ui->assetTree->indexAt(pos);
 	if(index.isValid() == false || selectedAssetsList.empty())
@@ -506,7 +520,7 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 void ManagerWidget::on_actionAssetSettings_triggered()
 {
 	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-	GetSelected(selectedAssetsList, selectedFiltersList);
+	GetSelected(selectedAssetsList, selectedFiltersList, true);
 
 	if(selectedAssetsList.empty())
 		return;
@@ -526,7 +540,7 @@ void ManagerWidget::on_actionAssetSettings_triggered()
 void ManagerWidget::on_actionDeleteAssets_triggered()
 {
 	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-	GetSelected(selectedAssetsList, selectedFiltersList);
+	GetSelected(selectedAssetsList, selectedFiltersList, false); // False sorts by depth, so we delete from bottom up
 
 	m_pModel->RemoveItems(selectedAssetsList, selectedFiltersList);
 }
@@ -534,7 +548,7 @@ void ManagerWidget::on_actionDeleteAssets_triggered()
 void ManagerWidget::on_actionReplaceAssets_triggered()
 {
 	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-	GetSelected(selectedAssetsList, selectedFiltersList);
+	GetSelected(selectedAssetsList, selectedFiltersList, true);
 
 	if(selectedFiltersList.empty() == false)
 	{
@@ -548,7 +562,7 @@ void ManagerWidget::on_actionReplaceAssets_triggered()
 void ManagerWidget::on_assetTree_clicked()
 {
 	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-	GetSelected(selectedAssetsList, selectedFiltersList);
+	GetSelected(selectedAssetsList, selectedFiltersList, true);
 
 	static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_AssetInspector))->SetSelected(m_pModel->GetAssetType(), selectedAssetsList);
 
@@ -560,8 +574,7 @@ void ManagerWidget::on_assetTree_clicked()
 
 void ManagerWidget::on_actionRename_triggered()
 {
-	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-	TreeModelItemData *pItemToBeRenamed = GetSelected(selectedAssetsList, selectedFiltersList);
+	TreeModelItemData *pItemToBeRenamed = GetSelected();
 
 	DlgInputName *pDlg = nullptr;
 	if(m_pModel->GetAssetType() == ASSETMAN_Source)
@@ -621,7 +634,7 @@ void ManagerWidget::on_actionBankTransfer_triggered(QAction *pAction)
 	quint32 uiNewBankId = static_cast<quint32>(pAction->data().toInt());    // Which bank ID we're transferring to
 
 	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-	GetSelected(selectedAssetsList, selectedFiltersList);
+	GetSelected(selectedAssetsList, selectedFiltersList, true);
 
 	m_pModel->TransferAssets(selectedAssetsList, uiNewBankId);
 }
@@ -651,8 +664,7 @@ void ManagerWidget::on_actionImportAssets_triggered()
 
 	QStringList sImportList = dlg.selectedFiles();
 
-	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-	TreeModelItemData *pFirstSelected = GetSelected(selectedAssetsList, selectedFiltersList);
+	TreeModelItemData *pFirstSelected = GetSelected();
 
 	TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected);
 
@@ -683,8 +695,7 @@ void ManagerWidget::on_actionImportDirectory_triggered()
 	if(dlg.exec() == QDialog::Rejected)
 		return;
 
-	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-	TreeModelItemData *pFirstSelected = GetSelected(selectedAssetsList, selectedFiltersList);
+	TreeModelItemData *pFirstSelected = GetSelected();
 
 	// The 'pImportParent' will be the root point for all new AtlasTreeItem insertions (both filters and images)
 	TreeModelItemData *pImportParent = m_pModel->FindTreeItemFilter(pFirstSelected);
@@ -749,8 +760,7 @@ void ManagerWidget::on_actionAddFilter_triggered()
 	{
 		TreeModelItemData *pNewFilter = nullptr;
 
-		QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-		TreeModelItemData *pFirstSelected = GetSelected(selectedAssetsList, selectedFiltersList);
+		TreeModelItemData *pFirstSelected = GetSelected();
 
 		TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected);
 		pNewFilter = m_pModel->CreateNewFilter(pDlg->GetName(), pParent);

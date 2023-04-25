@@ -173,13 +173,16 @@ ExplorerModel *ExplorerWidget::GetExplorerModel()
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // NOTE: ManagerWidget::GetSelected is a synonymous function - all fixes/enhancements should be copied over until refactored into a base class
-ExplorerItemData *ExplorerWidget::GetSelected(QList<ProjectItemData *> &selectedItemsOut, QList<ExplorerItemData *> &selectedPrefixesOut)
+ExplorerItemData *ExplorerWidget::GetSelected()
 {
 	ExplorerItemData *pFirstItemSelected = nullptr;
 	QModelIndex curIndex = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapToSource(ui->treeView->selectionModel()->currentIndex());
 	if(curIndex.isValid())
 		pFirstItemSelected = GetExplorerModel()->data(curIndex, Qt::UserRole).value<ExplorerItemData *>();
-
+	return pFirstItemSelected;
+}
+void ExplorerWidget::GetSelected(QList<ProjectItemData *> &selectedItemsOut, QList<ExplorerItemData *> &selectedPrefixesOut, bool bSortAlphabetically)
+{
 	selectedItemsOut.clear();
 	selectedPrefixesOut.clear();
 	QItemSelection selectedItems = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapSelectionToSource(ui->treeView->selectionModel()->selection());
@@ -208,21 +211,33 @@ ExplorerItemData *ExplorerWidget::GetSelected(QList<ProjectItemData *> &selected
 			selectedItemsOut.append(static_cast<ProjectItemData *>(itemList[i]));
 	}
 
-	// The items within 'selectedItemsOut' and 'selectedPrefixesOut' are not sorted. Sort them alphabetically by name here
-	std::sort(selectedItemsOut.begin(), selectedItemsOut.end(), [](ProjectItemData *pA, ProjectItemData *pB) {
-		return QString::localeAwareCompare(pA->GetName(true), pB->GetName(true)) < 0;
-		});
-	std::sort(selectedPrefixesOut.begin(), selectedPrefixesOut.end(), [](ExplorerItemData *pA, ExplorerItemData *pB) {
-		return QString::localeAwareCompare(pA->GetName(true), pB->GetName(true)) < 0;
-		});
-
-	return pFirstItemSelected;
+	// The items within 'selectedItemsOut' and 'selectedPrefixesOut' are not sorted. Sort them either by row depth or alphabetically
+	if(bSortAlphabetically)
+	{
+		std::sort(selectedItemsOut.begin(), selectedItemsOut.end(), [](ProjectItemData *pA, ProjectItemData *pB) {
+			return QString::localeAwareCompare(pA->GetName(true), pB->GetName(true)) < 0;
+			});
+		std::sort(selectedPrefixesOut.begin(), selectedPrefixesOut.end(), [](ExplorerItemData *pA, ExplorerItemData *pB) {
+			return QString::localeAwareCompare(pA->GetName(true), pB->GetName(true)) < 0;
+			});
+	}
+	else // Sort by row depth
+	{
+		// Sort 'selectedItemsOut' by row depth so that we can process the deepest items first
+		std::sort(selectedItemsOut.begin(), selectedItemsOut.end(), [&](TreeModelItemData *pA, TreeModelItemData *pB) {
+			return GetExplorerModel()->CalculateDepth(pA) > GetExplorerModel()->CalculateDepth(pB);
+			});
+		std::sort(selectedPrefixesOut.begin(), selectedPrefixesOut.end(), [&](TreeModelItemData *pA, TreeModelItemData *pB) {
+			return GetExplorerModel()->CalculateDepth(pA) > GetExplorerModel()->CalculateDepth(pB);
+			});
+	}
 }
 
 void ExplorerWidget::OnContextMenu(const QPoint &pos)
 {
+	ExplorerItemData *pContextExplorerItem = GetSelected();
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
-	ExplorerItemData *pContextExplorerItem = GetSelected(selectedItems, selectedPrefixes);
+	GetSelected(selectedItems, selectedPrefixes, true);
 	
 	QMenu contextMenu;
 	if(pContextExplorerItem == nullptr)
@@ -389,8 +404,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 
 void ExplorerWidget::on_actionRename_triggered()
 {
-	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
-	ExplorerItemData *pFirstSelected = GetSelected(selectedItems, selectedPrefixes);
+	ExplorerItemData *pFirstSelected = GetSelected();
 	if(pFirstSelected == nullptr)
 	{
 		HyGuiLog("on_actionRename_triggered() was invoked on a nullptr ExplorerItemData *", LOGTYPE_Error);
@@ -407,7 +421,7 @@ void ExplorerWidget::on_actionRename_triggered()
 void ExplorerWidget::on_actionDeleteItem_triggered()
 {
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
-	GetSelected(selectedItems, selectedPrefixes);
+	GetSelected(selectedItems, selectedPrefixes, false); // False so it's sorted by depth when deleting
 	if(selectedItems.size() + selectedPrefixes.size() == 0)
 	{
 		HyGuiLog("on_actionDeleteItem_triggered() was invoked on nothing selected", LOGTYPE_Error);
@@ -444,18 +458,18 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 		sDeleteMsg += HyGlobal::ItemName(selectedItems[0]->GetType(), false) % ":\n" % selectedItems[0]->GetName(true) % "?";
 	else if(selectedItems.size() == 0)
 	{
-		sDeleteMsg += QString("Prefix") % (selectedPrefixes.size() > 1 ? "es" : "") % ":\n";
+		sDeleteMsg += QString("Prefix") % (selectedPrefixes.size() > 1 ? "es" : "") % ":\n\n";
 		for(int i = 0; i < selectedPrefixes.size(); ++i)
 			sDeleteMsg += selectedPrefixes[i]->GetName(true) % "\n";
 	}
 	else
 	{
-		sDeleteMsg += "following items:\n";
+		sDeleteMsg += "following items:\n\n";
 		for(int i = 0; i < selectedItems.size(); ++i)
 			sDeleteMsg += selectedItems[i]->GetName(true) % "\n";
 	}
 	
-	sDeleteMsg +="\n\nThis action cannot be undone.";
+	//sDeleteMsg +="\n\nThis action cannot be undone.";
 	if(QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Confirm delete", sDeleteMsg, QMessageBox::Yes, QMessageBox::No))
 	{
 		for(int i = 0; i < selectedItems.size(); ++i)
@@ -475,7 +489,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 void ExplorerWidget::on_actionCopyItem_triggered()
 {
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
-	GetSelected(selectedItems, selectedPrefixes);
+	GetSelected(selectedItems, selectedPrefixes, true);
 
 	if(selectedItems.empty())
 	{
@@ -526,7 +540,7 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 void ExplorerWidget::on_actionOpen_triggered()
 {
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
-	GetSelected(selectedItems, selectedPrefixes);
+	GetSelected(selectedItems, selectedPrefixes, false);
 	if(selectedItems.size() == 0)
 	{
 		HyGuiLog("on_actionOpen_triggered() was invoked on no item selected", LOGTYPE_Error);

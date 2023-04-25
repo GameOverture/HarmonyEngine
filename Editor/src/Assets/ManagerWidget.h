@@ -69,8 +69,9 @@ public:
 	void RestoreExpandedState(QStringList expandedFilterList);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// NOTE: ExplorerWidget::GetSelected is a synonymous function - all fixes/enhancements should be copied over until refactored into a base class
-	TreeModelItemData *GetSelected(QList<IAssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut);
+	// NOTE: ExplorerWidget::GetSelected are synonymous functions - all fixes/enhancements should be copied over until refactored into a base class
+	TreeModelItemData *GetSelected();
+	void GetSelected(QList<IAssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut, bool bSortAlphabetically);
 
 protected:
 	virtual void enterEvent(QEvent *pEvent) override;
