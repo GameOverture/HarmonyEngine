@@ -21,6 +21,8 @@
 #include "AudioUndoCmd.h"
 
 #include <QDragEnterEvent>
+#include <QGuiApplication>
+#include <QWindow>
 
 bool HarmonyWidget::sm_bHarmonyLoaded = false;
 
@@ -129,8 +131,10 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 /*virtual*/ void HarmonyWidget::resizeGL(int w, int h) /*override*/
 {
+	qreal fDevicePixelRatio = QGuiApplication::topLevelWindows().at(0)->devicePixelRatio();
+
 	if(m_pProject)
-		m_pProject->SetRenderSize(w, h);
+		m_pProject->SetRenderSize(w * fDevicePixelRatio, h * fDevicePixelRatio);
 }
 
 /*virtual*/ void HarmonyWidget::enterEvent(QEvent *pEvent) /*override*/
