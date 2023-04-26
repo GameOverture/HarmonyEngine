@@ -32,7 +32,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, ItemType eGuiType, QUuid uui
 	case ITEM_Spine:			m_pChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 	case ITEM_Sprite:			m_pChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, pParent); break;
 
-	case ITEM_Entity:			m_pChild = new HyEntity2d(pParent); break;
+	case ITEM_Entity:			m_pChild = new SubEntity(pParent); break;
 
 	case ITEM_AtlasFrame:		//m_pChild = new HyTexturedQuad2d(); break;
 	default:
@@ -206,7 +206,11 @@ void EntityDrawItem::RefreshOverrideData(Project &projectRef)
 	pProjItemData->GetSavedFileData(fileDataPair);
 
 	if(m_eGuiType == ITEM_Entity)
-		SubEntityRefreshOverrideData(fileDataPair.m_Meta);
+	{
+		SubEntity *pSubEntity = static_cast<SubEntity *>(m_pChild);
+		// TODO: Finish this 
+		pSubEntity->Assemble(projectRef, fileDataPair.m_Meta["childList"].toArray(), QJsonArray());
+	}
 	else
 	{
 		QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
@@ -274,8 +278,71 @@ void EntityDrawItem::HideTransformCtrl()
 	m_Transform.Hide();
 }
 
-void EntityDrawItem::SubEntityRefreshOverrideData(QJsonObject metaObj)
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+SubEntity::SubEntity(HyEntity2d *pParent) :
+	HyEntity2d(pParent)
 {
-	HyEntity2d *pEntity = static_cast<HyEntity2d *>(m_pChild);
-	HyLogError("EntityItemDraw::SubEntityRefreshOverrideData - not implemented");
+}
+
+/*virtual*/ SubEntity::~SubEntity()
+{
+	for(int i = 0; i < m_ChildPtrList.size(); ++i)
+		delete m_ChildPtrList[i];
+}
+
+void SubEntity::Assemble(Project &projectRef, QJsonArray descListArray, QJsonArray propListArray)
+{
+	if(descListArray.size() != propListArray.size())
+	{
+		HyGuiLog("SubEntity::Assemble - descListArray and propListArray are not the same size", LOGTYPE_Error);
+		return;
+	}
+
+	for(int i = 0; i < descListArray.size(); ++i)
+	{
+		QJsonObject childObj = descListArray[i].toObject();
+		ItemType eItemType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
+
+		switch(eItemType)
+		{
+		case ITEM_Primitive:	m_ChildPtrList.append(new HyPrimitive2d(this)); break;
+		case ITEM_Audio:		m_ChildPtrList.append(new HyAudio2d("", HY_GUI_DATAOVERRIDE, this)); break;
+		case ITEM_Particles:	HyGuiLog("SubEntity::Assemble - Particles not implemented", LOGTYPE_Error); break;
+		case ITEM_Text:			m_ChildPtrList.append(new HyText2d("", HY_GUI_DATAOVERRIDE, this)); break;
+		case ITEM_Spine:		m_ChildPtrList.append(new HySpine2d("", HY_GUI_DATAOVERRIDE, this)); break;
+		case ITEM_Sprite:		m_ChildPtrList.append(new HySprite2d("", HY_GUI_DATAOVERRIDE, this)); break;
+		case ITEM_Prefab:		HyGuiLog("SubEntity::Assemble - Prefab not implemented", LOGTYPE_Error); break;
+		case ITEM_Entity:		m_ChildPtrList.append(new SubEntity(this)); break;
+
+		default:
+			HyGuiLog("SubEntity::Assemble - unhandled child node type", LOGTYPE_Error);
+			break;
+		}
+
+		QUuid uuid = QUuid(childObj["itemUUID"].toString());
+		TreeModelItemData *pItemData = projectRef.FindItemData(uuid);
+		if(pItemData->IsProjectItem() == false)
+		{
+			HyGuiLog("SubEntity::Assemble - child item '" % pItemData->GetText() % "' is not a project item", LOGTYPE_Error);
+			continue;
+		}
+		ProjectItemData *pProjItemData = static_cast<ProjectItemData *>(pItemData);
+
+		FileDataPair fileDataPair;
+		pProjItemData->GetSavedFileData(fileDataPair);
+
+		if(eItemType == ITEM_Entity)
+			static_cast<SubEntity *>(m_ChildPtrList.back())->Assemble(projectRef, fileDataPair.m_Meta["childList"].toArray(), QJsonArray());
+		else
+		{
+			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+			HyJsonDoc itemDataDoc;
+			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+				HyGuiLog("IDraw::ApplyJsonData failed to parse", LOGTYPE_Error);
+
+			HyJsonObj itemDataObj = itemDataDoc.GetObject();
+			static_cast<IHyDrawable2d *>(m_ChildPtrList.back())->GuiOverrideData<HySpriteData>(itemDataObj);
+		}
+	}
 }
