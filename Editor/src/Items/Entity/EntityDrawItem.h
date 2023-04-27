@@ -46,9 +46,19 @@ public:
 
 	void ShowTransformCtrl(bool bShowGrabPoints);
 	void HideTransformCtrl();
+};
 
-protected:
-	void SubEntityRefreshOverrideData(QJsonObject metaObj);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class SubEntity : public HyEntity2d
+{
+	QList<IHyLoadable2d *>					m_ChildPtrList;
+
+public:
+	SubEntity(HyEntity2d *pParent);
+	virtual ~SubEntity();
+
+	void Assemble(Project &projectRef, QJsonArray descListArray, QJsonArray propListArray);
 };
 
 #endif // ENTITYDRAWITEM_H

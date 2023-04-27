@@ -499,7 +499,7 @@ void EntityWidget::on_actionAddChildren_triggered()
 	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes, true);
 	if(selectedItems.empty())
 	{
-		HyGuiLog("Currently selected item(s) in Explorer is/are not a ProjectItemData. Cannot add node(s) to entity.", LOGTYPE_Error);
+		HyGuiLog("Currently selected item(s) in Explorer is/are not a ProjectItemData. Cannot add to entity.", LOGTYPE_Error);
 		return;
 	}
 
