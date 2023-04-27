@@ -18,34 +18,37 @@
 SpriteDraw::SpriteDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef)
 {
-	m_Sprite.Init("", "+GuiPreview", this);
+	m_pSprite = new HySprite2d("", "+GuiPreview", this);
+	m_pSwapSprite = new HySprite2d("", "+GuiPreview", this);
 }
 
 /*virtual*/ SpriteDraw::~SpriteDraw()
 {
+	delete m_pSprite;
+	delete m_pSwapSprite;
 }
 
 void SpriteDraw::PlayAnim(quint32 uiFrameIndex)
 {
-	if(m_Sprite.IsAnimReverse())
-		m_Sprite.SetAnimCtrl(HYANIMCTRL_Reverse);
+	if(m_pSprite->IsAnimReverse())
+		m_pSprite->SetAnimCtrl(HYANIMCTRL_Reverse);
 	else
-		m_Sprite.SetAnimCtrl(HYANIMCTRL_DontReverse);
+		m_pSprite->SetAnimCtrl(HYANIMCTRL_DontReverse);
 
-	m_Sprite.SetAnimCtrl(HYANIMCTRL_Reset);
-	m_Sprite.SetAnimCtrl(HYANIMCTRL_Play);
-	m_Sprite.SetFrame(uiFrameIndex);
+	m_pSprite->SetAnimCtrl(HYANIMCTRL_Reset);
+	m_pSprite->SetAnimCtrl(HYANIMCTRL_Play);
+	m_pSprite->SetFrame(uiFrameIndex);
 }
 
 void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 {
-	m_Sprite.SetState(uiStateIndex);
-	m_Sprite.SetFrame(uiFrameIndex);
+	m_pSprite->SetState(uiStateIndex);
+	m_pSprite->SetFrame(uiFrameIndex);
 }
 
 /*virtual*/ void SpriteDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
 {
-	if(m_Sprite.IsAnimPaused())
+	if(m_pSprite->IsAnimPaused())
 	{
 		if(pEvent->key() == Qt::Key_Left)
 			m_vTranslateAmt.setX(m_vTranslateAmt.x() - 1);
@@ -108,34 +111,37 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnApplyJsonData(HyJsonDoc &itemDataDocRef) /*override*/
 {
-	if(m_Sprite.AcquireData() != nullptr)
+	if(m_pSwapSprite->AcquireData() != nullptr)
 	{
 		// Clear whatever anim ctrl was set since it will only set the proper attributes from GuiOverrideData, leaving stale flags behind
-		for(uint32 i = 0; i < m_Sprite.GetNumStates(); ++i)
+		for(uint32 i = 0; i < m_pSwapSprite->GetNumStates(); ++i)
 		{
-			m_Sprite.SetAnimCtrl(HYANIMCTRL_DontLoop, i);
-			m_Sprite.SetAnimCtrl(HYANIMCTRL_DontBounce, i);
-			m_Sprite.SetAnimCtrl(HYANIMCTRL_DontReverse, i);
-			m_Sprite.SetAnimCtrl(HYANIMCTRL_Play, i);
+			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_DontLoop, i);
+			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_DontBounce, i);
+			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_DontReverse, i);
+			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_Play, i);
 		}
 	}
 
 #undef GetObject
 	HyJsonObj itemDataObj = itemDataDocRef.GetObject();
 
-	m_Sprite.GuiOverrideData<HySpriteData>(itemDataObj);
-	m_Sprite.SetAnimCtrl(HYANIMCTRL_Reset);
+	m_pSwapSprite->GuiOverrideData<HySpriteData>(itemDataObj);
+	m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_Reset);
 	
 	SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
-	m_Sprite.SetAnimPause(pWidget->IsPlayingAnim() == false);
+	m_pSwapSprite->SetAnimPause(pWidget->IsPlayingAnim() == false);
+	m_pSwapSprite->Load();
 
-	m_Sprite.Load();
+	m_pSprite->Unload();
+	HySprite2d *pTmpSwap = m_pSprite;
+	m_pSprite = m_pSwapSprite;
+	m_pSwapSprite = pTmpSwap;
 }
 
 /*virtual*/ void SpriteDraw::OnShow() /*override*/
 {
 	SetVisible(true);
-	m_Sprite.SetVisible(true);
 }
 
 /*virtual*/ void SpriteDraw::OnHide() /*override*/
@@ -153,15 +159,15 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 	if(pWidget == nullptr)
 		return;
 	
-	m_Sprite.SetAnimPause(pWidget->IsPlayingAnim() == false);
+	m_pSprite->SetAnimPause(pWidget->IsPlayingAnim() == false);
 
-	m_Sprite.pos.Set(m_vTranslateAmt.x(), m_vTranslateAmt.y());
+	m_pSprite->pos.Set(m_vTranslateAmt.x(), m_vTranslateAmt.y());
 
 	// NOTE: Data in sprite may be invalid/null because of GUI usage
-	if(m_Sprite.AcquireData() == nullptr)
+	if(m_pSprite->AcquireData() == nullptr)
 		return;
 	
-	if(m_Sprite.IsAnimPaused())
+	if(m_pSprite->IsAnimPaused())
 	{
 		int iStateIndex, iFrameIndex;
 		pWidget->GetSpriteInfo(iStateIndex, iFrameIndex);
@@ -172,16 +178,16 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 		if(iFrameIndex < 0)
 			iFrameIndex = 0;
 
-		m_Sprite.SetState(static_cast<uint32>(iStateIndex));
-		m_Sprite.SetFrame(static_cast<uint32>(iFrameIndex));
+		m_pSprite->SetState(static_cast<uint32>(iStateIndex));
+		m_pSprite->SetFrame(static_cast<uint32>(iFrameIndex));
 	}
 	else
 	{
-		pWidget->SetSelectedFrame(m_Sprite.GetFrame());
+		pWidget->SetSelectedFrame(m_pSprite->GetFrame());
 
-		if(m_Sprite.IsAnimFinished())
+		if(m_pSprite->IsAnimFinished())
 			pWidget->StopPlayingAnim();
 	}
 
-	UpdateDrawStatus(QString("[") % QString::number(m_Sprite.GetFrameWidth()) % " " % QString::number(m_Sprite.GetFrameHeight()) % "]");
+	UpdateDrawStatus(QString("[") % QString::number(m_pSprite->GetFrameWidth()) % " " % QString::number(m_pSprite->GetFrameHeight()) % "]");
 }

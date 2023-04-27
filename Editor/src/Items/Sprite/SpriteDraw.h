@@ -15,7 +15,8 @@
 
 class SpriteDraw : public IDraw
 {
-	HySprite2d				m_Sprite;
+	HySprite2d *			m_pSprite;		// The currently displayed sprite
+	HySprite2d *			m_pSwapSprite;	// SwapSprite exists because we need to call Unload() before GuiOverrideData<>() incase 'required atlas indices' will change, but we don't want HyAssets to unload & reload the sprite's textures that are unaffected
 
 	QPoint					m_vTranslateAmt;
 
