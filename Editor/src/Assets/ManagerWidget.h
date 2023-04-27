@@ -46,6 +46,7 @@ public:
 	ManagerTreeView(QWidget *pParent = nullptr);
 
 protected:
+	virtual void mousePressEvent(QMouseEvent *event) override;
 	virtual void startDrag(Qt::DropActions supportedActions) override;
 };
 
@@ -54,6 +55,9 @@ class ManagerWidget : public QWidget
 	Q_OBJECT
 
 	IManagerModel *				m_pModel;
+	
+	TreeModelItemData *			m_pContextMenuSelection;
+	bool						m_bUseContextMenuSelection;
 
 public:
 	explicit ManagerWidget(QWidget *pParent = nullptr);
@@ -87,7 +91,7 @@ private Q_SLOTS:
 
 	void on_actionReplaceAssets_triggered();
 
-	void on_assetTree_clicked();
+	void on_assetTree_pressed(const QModelIndex &index);
 
 	void on_actionRename_triggered();
 

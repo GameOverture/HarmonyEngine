@@ -28,6 +28,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDrag>
+#include <QMouseEvent>
 
 ManagerProxyModel::ManagerProxyModel(QObject *pParent /*= nullptr*/) :
 	QSortFilterProxyModel(pParent),
@@ -115,6 +116,21 @@ ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 	QTreeView(pParent)
 { }
 
+/*virtual*/ void ManagerTreeView::mousePressEvent(QMouseEvent *event) /*override*/
+{
+	QModelIndex index = indexAt(event->pos());
+	// Handle the mouse press event here
+	// Note: the index may be invalid if the mouse was pressed in an empty area
+	if(index.isValid() == false)
+	{
+		selectionModel()->clear();
+		selectionModel()->clearSelection();
+		selectionModel()->clearCurrentIndex();
+	}
+	else
+		QTreeView::mousePressEvent(event);
+}
+
 /*virtual*/ void ManagerTreeView::startDrag(Qt::DropActions supportedActions) /*override*/
 {
 	QModelIndexList indexes = selectedIndexes();
@@ -132,17 +148,14 @@ ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 	pDrag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
 
 	Qt::DropAction eDropAction = pDrag->exec(supportedActions);
-	//if(eDropAction != Qt::MoveAction)
-	//{
-	//	supportedActions &= ~Qt::MoveAction;
-	//	eDropAction = pDrag->exec(supportedActions);
-	//}
 }
 
 ManagerWidget::ManagerWidget(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::ManagerWidget),
-	m_pModel(nullptr)
+	m_pModel(nullptr),
+	m_pContextMenuSelection(nullptr),
+	m_bUseContextMenuSelection(false)
 {
 	ui->setupUi(this);
 
@@ -153,7 +166,9 @@ ManagerWidget::ManagerWidget(QWidget *pParent /*= nullptr*/) :
 ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::ManagerWidget),
-	m_pModel(pModel)
+	m_pModel(pModel),
+	m_pContextMenuSelection(nullptr),
+	m_bUseContextMenuSelection(false)
 {
 	ui->setupUi(this);
 
@@ -183,7 +198,7 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	ui->actionGenerateAsset->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_New));
 	ui->actionImportAssets->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_None));
 	ui->actionImportDirectory->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_Open));
-	ui->actionDeleteAssets->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_Delete));
+	//ui->actionDeleteAssets->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_Delete)); // Uses standard delete icon
 	ui->actionAssetSettings->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_Settings));
 
 	ui->actionDeleteAssets->setEnabled(false);
@@ -326,9 +341,11 @@ void ManagerWidget::RestoreExpandedState(QStringList expandedFilterList)
 TreeModelItemData *ManagerWidget::GetSelected()
 {
 	TreeModelItemData *pFirstItemSelected = nullptr;
-	QModelIndex curIndex = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapToSource(ui->assetTree->selectionModel()->currentIndex());
-	if(curIndex.isValid())
-		pFirstItemSelected = static_cast<ManagerProxyModel *>(ui->assetTree->model())->sourceModel()->data(curIndex, Qt::UserRole).value<TreeModelItemData *>();
+	QModelIndex curIndex = ui->assetTree->selectionModel()->currentIndex();
+
+	QModelIndex mappedIndex = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapToSource(curIndex);
+	if(mappedIndex.isValid())
+		pFirstItemSelected = static_cast<ManagerProxyModel *>(ui->assetTree->model())->sourceModel()->data(mappedIndex, Qt::UserRole).value<TreeModelItemData *>();
 	return pFirstItemSelected;
 }
 void ManagerWidget::GetSelected(QList<IAssetItemData *> &selectedAssetsOut, QList<TreeModelItemData *> &selectedFiltersOut, bool bSortAlphabetically)
@@ -422,6 +439,9 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 	QMenu contextMenu;
 	QMenu bankMenu;
 
+	m_pContextMenuSelection = GetSelected();
+	m_bUseContextMenuSelection = true;
+
 	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
 	GetSelected(selectedAssetsList, selectedFiltersList, true);
 
@@ -443,7 +463,13 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 		{
 			contextMenu.addSeparator();
 			contextMenu.addAction(ui->actionRename);
+			contextMenu.addSeparator();
+			contextMenu.addAction(ui->actionDeleteAssets);
 		}
+
+		ui->assetTree->selectionModel()->clear();
+		ui->assetTree->selectionModel()->clearSelection();
+		ui->assetTree->selectionModel()->clearCurrentIndex();
 	}
 	else if(m_pModel->GetAssetType() == ASSETMAN_Source)
 	{
@@ -559,7 +585,7 @@ void ManagerWidget::on_actionReplaceAssets_triggered()
 	m_pModel->ReplaceAssets(selectedAssetsList, true);
 }
 
-void ManagerWidget::on_assetTree_clicked()
+void ManagerWidget::on_assetTree_pressed(const QModelIndex &index)
 {
 	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
 	GetSelected(selectedAssetsList, selectedFiltersList, true);
@@ -568,7 +594,7 @@ void ManagerWidget::on_assetTree_clicked()
 
 	int iNumSelected = selectedAssetsList.count();
 	ui->actionRename->setEnabled(iNumSelected == 1 || selectedFiltersList.empty() == false);
-	ui->actionDeleteAssets->setEnabled(iNumSelected != 0);
+	ui->actionDeleteAssets->setEnabled(iNumSelected != 0 || selectedFiltersList.empty() == false);
 	ui->actionReplaceAssets->setEnabled(iNumSelected != 0);
 }
 
@@ -664,7 +690,14 @@ void ManagerWidget::on_actionImportAssets_triggered()
 
 	QStringList sImportList = dlg.selectedFiles();
 
-	TreeModelItemData *pFirstSelected = GetSelected();
+	TreeModelItemData *pFirstSelected = nullptr;
+	if(m_bUseContextMenuSelection)
+	{
+		pFirstSelected = m_pContextMenuSelection;
+		m_bUseContextMenuSelection = false;
+	}
+	else
+		pFirstSelected = GetSelected();
 
 	TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected);
 
@@ -695,7 +728,14 @@ void ManagerWidget::on_actionImportDirectory_triggered()
 	if(dlg.exec() == QDialog::Rejected)
 		return;
 
-	TreeModelItemData *pFirstSelected = GetSelected();
+	TreeModelItemData *pFirstSelected = nullptr;
+	if(m_bUseContextMenuSelection)
+	{
+		pFirstSelected = m_pContextMenuSelection;
+		m_bUseContextMenuSelection = false;
+	}
+	else
+		pFirstSelected = GetSelected();
 
 	// The 'pImportParent' will be the root point for all new AtlasTreeItem insertions (both filters and images)
 	TreeModelItemData *pImportParent = m_pModel->FindTreeItemFilter(pFirstSelected);
@@ -760,7 +800,14 @@ void ManagerWidget::on_actionAddFilter_triggered()
 	{
 		TreeModelItemData *pNewFilter = nullptr;
 
-		TreeModelItemData *pFirstSelected = GetSelected();
+		TreeModelItemData *pFirstSelected = nullptr;
+		if(m_bUseContextMenuSelection)
+		{
+			pFirstSelected = m_pContextMenuSelection;
+			m_bUseContextMenuSelection = false;
+		}
+		else
+			pFirstSelected = GetSelected();
 
 		TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected);
 		pNewFilter = m_pModel->CreateNewFilter(pDlg->GetName(), pParent);

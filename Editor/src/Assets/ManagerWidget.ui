@@ -240,13 +240,13 @@
   <action name="actionDeleteAssets">
    <property name="icon">
     <iconset resource="../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/items/Atlas-Delete.png</normaloff>:/icons16x16/items/Atlas-Delete.png</iconset>
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
     <string>Delete</string>
    </property>
    <property name="toolTip">
-    <string>Removes the selected asset(s). All affected banks will be regenerated.</string>
+    <string>Removes the selected item(s). All affected banks will be regenerated.</string>
    </property>
   </action>
   <action name="actionReplaceAssets">
@@ -311,7 +311,7 @@
   </action>
   <action name="actionImportAssets">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset>
      <normaloff>:/icons16x16/items/Atlas-New.png</normaloff>:/icons16x16/items/Atlas-New.png</iconset>
    </property>
    <property name="text">
@@ -323,7 +323,7 @@
   </action>
   <action name="actionImportDirectory">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset>
      <normaloff>:/icons16x16/items/Atlas-Open.png</normaloff>:/icons16x16/items/Atlas-Open.png</iconset>
    </property>
    <property name="text">
@@ -347,7 +347,7 @@
   </action>
   <action name="actionAssetSettings">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset>
      <normaloff>:/icons16x16/items/Atlas-Settings.png</normaloff>:/icons16x16/items/Atlas-Settings.png</iconset>
    </property>
    <property name="text">
@@ -359,7 +359,7 @@
   </action>
   <action name="actionGenerateAsset">
    <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
+    <iconset>
      <normaloff>:/icons16x16/items/Atlas-New.png</normaloff>:/icons16x16/items/Atlas-New.png</iconset>
    </property>
    <property name="text">

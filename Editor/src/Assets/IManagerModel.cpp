@@ -771,7 +771,7 @@ void IManagerModel::SaveRuntime()
 	TreeModelItemData *pItem = GetItem(indexRef)->data(0).value<TreeModelItemData *>();
 
 	if(indexRef.isValid() == false || pItem == nullptr)
-		return QAbstractItemModel::flags(indexRef);
+		return QAbstractItemModel::flags(indexRef) | Qt::ItemIsDropEnabled;
 
 	return QAbstractItemModel::flags(indexRef) | Qt::ItemIsDropEnabled | Qt::ItemIsDragEnabled;
 }
