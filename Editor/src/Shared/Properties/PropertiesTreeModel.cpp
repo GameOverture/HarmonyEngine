@@ -601,16 +601,15 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 		sRetStr += propDefRef.delegateBuilder.toStringList()[treeItemValue.toInt()];
 		break;
 	case PROPERTIESTYPE_StatesComboBox: {
-		sRetStr += treeItemValue.toString();
-		//ProjectItemData *pProjItem = MainWindow::GetExplorerModel().FindByUuid(QUuid(propDefRef.delegateBuilder.toString()));
-		//if(pProjItem)
-		//{
-		//	QComboBox tmpComboBox(nullptr);
-		//	tmpComboBox.setModel(pProjItem->GetModel());
-		//	sRetStr += tmpComboBox.itemText(treeItemValue.toInt());
-		//}
-		//else
-		//	HyGuiLog("PROPERTIESTYPE_StatesComboBox could not find UUID", LOGTYPE_Error);
+		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(m_OwnerRef.GetProject().FindItemData(propDefRef.delegateBuilder.toUuid()));
+		if(pProjItem)
+		{
+			QComboBox tmpComboBox(nullptr);
+			tmpComboBox.setModel(pProjItem->GetModel());
+			sRetStr += tmpComboBox.itemText(treeItemValue.toInt());
+		}
+		else
+			HyGuiLog("Project::FindItemData could not find UUID", LOGTYPE_Error);
 		break; }
 	case PROPERTIESTYPE_Color: {
 		QRect rect = treeItemValue.toRect();

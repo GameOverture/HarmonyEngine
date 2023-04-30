@@ -15,6 +15,7 @@
 #include "IModel.h"
 #include "SpriteModels.h"
 #include "PropertiesUndoCmd.h"
+#include "Project.h"
 #include "DlgColorPicker.h"
 
 #include <QPainter>
@@ -193,14 +194,16 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			static_cast<QComboBox *>(pReturnWidget)->setCurrentIndex(propDefRef.defaultData.toInt());
 		break;
 
-	case PROPERTIESTYPE_StatesComboBox:
+	case PROPERTIESTYPE_StatesComboBox: {
 		pReturnWidget = new QComboBox(pParent);
 
-		if(propDefRef.delegateBuilder.isValid())
-			static_cast<QComboBox *>(pReturnWidget)->setModel(propDefRef.delegateBuilder.value<ProjectItemData *>()->GetModel());
+		PropertiesTreeModel *pModel = static_cast<PropertiesTreeModel *>(m_pTableView->model());
+		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pModel->GetOwner().GetProject().FindItemData(propDefRef.delegateBuilder.toUuid()));
+		if(pProjItem)
+			static_cast<QComboBox *>(pReturnWidget)->setModel(pProjItem->GetModel());
 		if(propDefRef.defaultData.isValid())
 			static_cast<QComboBox *>(pReturnWidget)->setCurrentIndex(propDefRef.defaultData.toInt());
-		break;
+		break; }
 
 	case PROPERTIESTYPE_Slider:
 		pReturnWidget = new QSlider(pParent);

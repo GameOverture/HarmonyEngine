@@ -35,7 +35,7 @@ enum PropertiesType
 	PROPERTIESTYPE_LineEdit,
 	PROPERTIESTYPE_ComboBoxInt,		// delegateBuilder [QStringList] = QComboBox's selection list
 	PROPERTIESTYPE_ComboBoxString,	// delegateBuilder [QStringList] = QComboBox's selection list
-	PROPERTIESTYPE_StatesComboBox,	// delegateBuilder [ProjectItemData *] = A pointer to the ProjectItemData that owns this property
+	PROPERTIESTYPE_StatesComboBox,	// delegateBuilder [QUuid] = The ProjectItemData's UUID that contains the states
 	PROPERTIESTYPE_Slider,
 	PROPERTIESTYPE_Color,
 	PROPERTIESTYPE_SpriteFrames

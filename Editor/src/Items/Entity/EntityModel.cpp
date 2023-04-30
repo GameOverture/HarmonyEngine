@@ -84,7 +84,7 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 
 	if(pItemData->GetType() != ITEM_BoundingVolume)
 	{
-		propertiesTreeModelRef.AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(pItemData->GetType(), false) % "'s state to be displayed");
+		propertiesTreeModelRef.AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(pItemData->GetType(), false) % "'s state to be displayed", false, QVariant(), QVariant(), QVariant(), QString(), QString(), pItemData->GetItemUuid());
 		propertiesTreeModelRef.AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused");
 		propertiesTreeModelRef.AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", false, -iRANGE, iRANGE, 1);
 
