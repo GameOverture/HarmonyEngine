@@ -281,7 +281,7 @@ EntityWidget::~EntityWidget()
 			PropertiesTreeModel &propModelRef = pEntTreeItemData->GetPropertiesModel(GetCurStateIndex());
 			ui->propertyTree->setModel(&propModelRef);
 
-			bEnableVemMode = (pEntTreeItemData->GetType() == ITEM_Primitive || pEntTreeItemData->GetType() == ITEM_BoundingVolume);
+			bEnableVemMode = (pEntTreeItemData->GetType() == ITEM_Primitive || pEntTreeItemData->GetType() == ITEM_BoundingVolume || pEntTreeItemData->GetType() == ITEM_Text);
 		}
 		else
 		{

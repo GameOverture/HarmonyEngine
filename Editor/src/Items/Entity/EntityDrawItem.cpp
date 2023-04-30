@@ -20,28 +20,59 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, ItemType eGuiType, QUuid uui
 	m_Transform(pParent),
 	m_ShapeCtrl(pParent)
 {
-	switch(m_eGuiType)
+	if(m_eGuiType != ITEM_BoundingVolume && m_eGuiType != ITEM_Primitive)
 	{
-	case ITEM_BoundingVolume:
-	case ITEM_Primitive:
-		m_pChild = nullptr;		// When either shape or primitive 'm_pChild' is provided via the m_ShapeCtrl
-		break;
+		ProjectItemData *pProjItemData = static_cast<ProjectItemData *>(projectRef.FindItemData(m_ProjItemUuid));
+		if(pProjItemData == nullptr)
+		{
+			HyGuiLog("EntityDrawItem::RefreshOverrideData - could not find item data for: " % m_ProjItemUuid.toString(), LOGTYPE_Error);
+			return;
+		}
 
-	case ITEM_Audio:			m_pChild = new HyAudio2d("", HY_GUI_DATAOVERRIDE, pParent); break;
-	case ITEM_Text:				m_pChild = new HyText2d("", HY_GUI_DATAOVERRIDE, pParent); break;
-	case ITEM_Spine:			m_pChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, pParent); break;
-	case ITEM_Sprite:			m_pChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, pParent); break;
+		FileDataPair fileDataPair;
+		pProjItemData->GetSavedFileData(fileDataPair);
 
-	case ITEM_Entity:			m_pChild = new SubEntity(pParent); break;
+		if(m_eGuiType == ITEM_Entity)
+		{
+			m_pChild = new SubEntity(pParent);
+			SubEntity *pSubEntity = static_cast<SubEntity *>(m_pChild);
+			pSubEntity->Assemble(projectRef, fileDataPair.m_Meta["childList"].toArray(), QJsonArray());
+		}
+		else
+		{
+			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+			HyJsonDoc itemDataDoc;
+			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+				HyGuiLog("EntityDraw::ItemWidget::RefreshOverrideData failed to parse its file data", LOGTYPE_Error);
 
-	case ITEM_AtlasFrame:		//m_pChild = new HyTexturedQuad2d(); break;
-	default:
-		HyGuiLog("EntityDrawItem ctor - unhandled child node type", LOGTYPE_Error);
-		break;
-	}
-	if(m_pChild)
-	{
-		RefreshOverrideData(projectRef);
+#undef GetObject
+			switch(m_eGuiType)
+			{
+			case ITEM_Text:
+				m_pChild = new HyText2d("", HY_GUI_DATAOVERRIDE, pParent);
+				static_cast<HyText2d *>(m_pChild)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject(), false); // The 'false' here has it so HyTextData loads the atlas as it would normally
+				break;
+
+			case ITEM_Spine:
+				m_pChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, pParent);
+				static_cast<HySpine2d *>(m_pChild)->GuiOverrideData<HySpineData>(itemDataDoc.GetObject());
+				break;
+
+			case ITEM_Sprite:
+				m_pChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, pParent);
+				static_cast<HySprite2d *>(m_pChild)->GuiOverrideData<HySpriteData>(itemDataDoc.GetObject());
+				break;
+
+			case ITEM_Primitive:
+			case ITEM_Audio:
+			case ITEM_AtlasFrame:
+			case ITEM_SoundClip:
+			default:
+				HyLogError("EntityDrawItem ctor - unhandled gui item type");
+				break;
+			}
+		}
+
 		m_pChild->Load();
 	}
 
@@ -111,6 +142,9 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 	if(m_eGuiType != ITEM_BoundingVolume)
 	{
 		QJsonObject commonObj = propObj["Common"].toObject();
+
+		pHyNode->SetState(commonObj["State"].toInt());
+
 		pHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
 		pHyNode->SetTag(commonObj["User Tag"].toVariant().toLongLong());
 
@@ -166,15 +200,61 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 	//	break;
 
 	case ITEM_Text: {
+		HyText2d *pTextNode = static_cast<HyText2d *>(pHyNode);
+
 		QJsonObject textObj = propObj["Text"].toObject();
-		static_cast<HyText2d *>(pHyNode)->SetState(textObj["State"].toInt());
-		static_cast<HyText2d *>(pHyNode)->SetText(textObj["Text"].toString().toStdString());
+
+		// Apply all text properties before the style, so the ShapeCtrl can properly calculate itself within ShapeCtrl::SetAsText()
+		pTextNode->SetText(textObj["Text"].toString().toStdString());
+		pTextNode->SetTextAlignment(HyGlobal::GetAlignmentFromString(textObj["Alignment"].toString()));
+		pTextNode->SetMonospacedDigits(textObj["Monospaced Digits"].toBool());
+		pTextNode->SetTextIndent(textObj["Text Indent"].toInt());
+		
+		// Apply the style and call ShapeCtrl::SetAsText()
+		TextStyle eTextStyle = HyGlobal::GetTextStyleFromString(textObj["Style"].toString());
+		if(eTextStyle == TEXTSTYLE_Line)
+		{
+			if(pTextNode->IsLine() == false)
+				pTextNode->SetAsLine();
+		}
+		else if(eTextStyle == TEXTSTYLE_Vertical)
+		{
+			if(pTextNode->IsVertical() == false)
+				pTextNode->SetAsVertical();
+		}
+		else
+		{
+			glm::vec2 vStyleSize;
+			QJsonArray styleDimensionsArray = textObj["Style Dimensions"].toArray();
+			if(styleDimensionsArray.size() == 2)
+				HySetVec(vStyleSize, styleDimensionsArray[0].toDouble(), styleDimensionsArray[1].toDouble());
+			else
+				HyGuiLog("Invalid 'Style Dimensions' array size", LOGTYPE_Error);
+
+			if(eTextStyle == TEXTSTYLE_Column)
+			{
+				if(pTextNode->IsColumn() == false || vStyleSize.x != pTextNode->GetTextBoxDimensions().x)
+					pTextNode->SetAsColumn(vStyleSize.x, false);
+			}
+			else // TEXTSTYLE_ScaleBox or TEXTSTYLE_ScaleBoxTopAlign
+			{
+				if(pTextNode->IsScaleBox() == false ||
+					vStyleSize.x != pTextNode->GetTextBoxDimensions().x ||
+					vStyleSize.y != pTextNode->GetTextBoxDimensions().y ||
+					(eTextStyle == TEXTSTYLE_ScaleBox) != pTextNode->IsScaleBoxCenterVertically())
+				{
+					pTextNode->SetAsScaleBox(vStyleSize.x, vStyleSize.y, eTextStyle == TEXTSTYLE_ScaleBox);
+				}
+			}
+		}
+		GetShapeCtrl().SetAsText(pTextNode, bIsSelected, pCamera);
 		break; }
 
 	case ITEM_Sprite: {
 		QJsonObject spriteObj = propObj["Sprite"].toObject();
-		static_cast<HySprite2d *>(pHyNode)->SetState(spriteObj["State"].toInt());
 		static_cast<HySprite2d *>(pHyNode)->SetFrame(spriteObj["Frame"].toInt());
+		static_cast<HySprite2d *>(pHyNode)->SetAnimRate(spriteObj["Anim Rate"].toDouble());
+		static_cast<HySprite2d *>(pHyNode)->SetAnimPause(spriteObj["Anim Paused"].toBool());
 		break; }
 
 	default:
@@ -190,58 +270,7 @@ void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
 	ExtractTransform(boundingShape, mtxShapeTransform);
 
 	m_Transform.WrapTo(boundingShape, mtxShapeTransform, pCamera);
-	GetShapeCtrl().RefreshOutline(pCamera);
-}
-
-void EntityDrawItem::RefreshOverrideData(Project &projectRef)
-{
-	ProjectItemData *pProjItemData = static_cast<ProjectItemData *>(projectRef.FindItemData(m_ProjItemUuid));
-	if(pProjItemData == nullptr)
-	{
-		HyGuiLog("EntityDrawItem::RefreshOverrideData - could not find item data for: " % m_ProjItemUuid.toString(), LOGTYPE_Error);
-		return;
-	}
-
-	FileDataPair fileDataPair;
-	pProjItemData->GetSavedFileData(fileDataPair);
-
-	if(m_eGuiType == ITEM_Entity)
-	{
-		SubEntity *pSubEntity = static_cast<SubEntity *>(m_pChild);
-		// TODO: Finish this 
-		pSubEntity->Assemble(projectRef, fileDataPair.m_Meta["childList"].toArray(), QJsonArray());
-	}
-	else
-	{
-		QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
-		HyJsonDoc itemDataDoc;
-		if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-			HyGuiLog("EntityDraw::ItemWidget::RefreshOverrideData failed to parse its file data", LOGTYPE_Error);
-
-#undef GetObject
-		switch(m_eGuiType)
-		{
-		case ITEM_Text:
-			static_cast<HyText2d *>(m_pChild)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject(), false); // The 'false' here has it so HyTextData loads the atlas as it would normally
-			break;
-
-		case ITEM_Spine:
-			static_cast<HySpine2d *>(m_pChild)->GuiOverrideData<HySpineData>(itemDataDoc.GetObject());
-			break;
-
-		case ITEM_Sprite:
-			static_cast<HySprite2d *>(m_pChild)->GuiOverrideData<HySpriteData>(itemDataDoc.GetObject());
-			break;
-
-		case ITEM_Primitive:
-		case ITEM_Audio:
-		case ITEM_AtlasFrame:
-		case ITEM_SoundClip:
-		default:
-			HyLogError("EntityDraw::ItemWidget::RefreshOverrideData - unhandled gui item type");
-			break;
-		}
-	}
+	GetShapeCtrl().DeserializeOutline(pCamera);
 }
 
 void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)

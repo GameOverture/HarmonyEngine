@@ -40,7 +40,6 @@ public:
 
 	void RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCamera2d *pCamera);
 	void RefreshTransform(HyCamera2d *pCamera);
-	void RefreshOverrideData(Project &projectRef);
 
 	void ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut);
 

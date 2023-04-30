@@ -200,7 +200,7 @@ void EntityDraw::ActivateVemOnNextJsonMeta()
 void EntityDraw::SetShapeEditVertex()
 {
 	if(m_SelectedItemList.count() != 1 ||
-	  (m_SelectedItemList[0]->GetGuiType() != ITEM_Primitive && m_SelectedItemList[0]->GetGuiType() != ITEM_BoundingVolume))
+	  (m_SelectedItemList[0]->GetGuiType() != ITEM_Primitive && m_SelectedItemList[0]->GetGuiType() != ITEM_BoundingVolume && m_SelectedItemList[0]->GetGuiType() != ITEM_Text))
 	{
 		HyGuiLog("EntityDraw::SetShapeEditVertex() invoked when selection is invalid", LOGTYPE_Error);
 		return;
@@ -238,6 +238,10 @@ void EntityDraw::ClearShapeEdit()
 
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*virtual*/ void EntityDraw::OnApplyJsonMeta(QJsonObject &itemMetaObj) /*override*/
 {
@@ -301,6 +305,7 @@ void EntityDraw::ClearShapeEdit()
 	if(descObjList.size() != propObjList.size())
 		HyGuiLog("EntityDraw::OnApplyJsonMeta() - descObjList.size() != propObjList.size()", LOGTYPE_Error);
 
+	// Process all the objects in descObjList
 	for(int32 i = 0; i < descObjList.size(); ++i)
 	{
 		QJsonObject descObj = descObjList[i];
@@ -308,32 +313,32 @@ void EntityDraw::ClearShapeEdit()
 		QUuid uuid(descObj["UUID"].toString());
 		bool bSelected = descObj["isSelected"].toBool();
 
-		EntityDrawItem *pItemWidget = nullptr;
+		EntityDrawItem *pDrawItem = nullptr;
 		for(EntityDrawItem *pStaleItem : staleItemList)
 		{
 			if(pStaleItem->GetGuiType() == eType && pStaleItem->GetThisUuid() == uuid)
 			{
-				pItemWidget = pStaleItem;
+				pDrawItem = pStaleItem;
 				break;
 			}
 		}
-		if(pItemWidget == nullptr)
+		if(pDrawItem == nullptr)
 		{
 			QUuid itemUuid(descObj["itemUUID"].toString());
-			pItemWidget = new EntityDrawItem(m_pProjItem->GetProject(), eType, uuid, itemUuid, this);
+			pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), eType, uuid, itemUuid, this);
 		}
 		else
-			staleItemList.removeOne(pItemWidget);
+			staleItemList.removeOne(pDrawItem);
 
-		m_ItemList.push_back(pItemWidget);
-		ChildAppend(*pItemWidget->GetHyNode());
+		m_ItemList.push_back(pDrawItem);
+		ChildAppend(*pDrawItem->GetHyNode());
 
 		if(bSelected)
-			m_SelectedItemList.push_back(pItemWidget);
+			m_SelectedItemList.push_back(pDrawItem);
 		else
-			pItemWidget->HideTransformCtrl();
+			pDrawItem->HideTransformCtrl();
 
-		pItemWidget->RefreshJson(descObj, propObjList[i], m_pCamera);
+		pDrawItem->RefreshJson(descObj, propObjList[i], m_pCamera);
 	}
 	
 	// Delete all the remaining stale items
@@ -366,6 +371,10 @@ void EntityDraw::ClearShapeEdit()
 
 	RefreshTransforms();
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*virtual*/ void EntityDraw::OnShow() /*override*/
 {

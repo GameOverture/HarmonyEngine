@@ -47,8 +47,8 @@ void ShapeCtrl::Setup(EditorShape eShape, HyColor color, float fBvAlpha, float f
 		m_BoundingVolume.SetAsNothing();
 		m_Outline.SetAsNothing();
 	}
-	else if(m_eShape != SHAPE_None && m_eShape != eShape)
-		ConvertTo(eShape);
+	//else if(m_eShape != SHAPE_None && m_eShape != eShape)
+	//	ConvertTo(eShape);
 
 	m_eShape = eShape;
 
@@ -186,6 +186,57 @@ void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDrag
 	}
 }
 
+void ShapeCtrl::SetAsText(HyText2d *pTextNode, bool bShowOutline, HyCamera2d *pCamera)
+{
+	HyColor color = HyColor::Red;
+	float fOutlineAlpha = bShowOutline ? 1.0f : 0.0f;
+
+	// SetAsLine
+	if(pTextNode->IsLine())
+	{
+		Setup(SHAPE_LineSegment, color, 0.0f, fOutlineAlpha);
+		switch(pTextNode->GetTextAlignment())
+		{
+		case HYALIGN_Left:
+		case HYALIGN_Justify:
+			m_BoundingVolume.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(pTextNode->GetWidth(), 0.0f));
+			break;
+
+		case HYALIGN_Center:
+			m_BoundingVolume.SetAsLineSegment(glm::vec2(pTextNode->GetWidth(-0.5f), 0.0f), glm::vec2(pTextNode->GetWidth(0.5f), 0.0f));
+			break;
+
+		case HYALIGN_Right:
+			m_BoundingVolume.SetAsLineSegment(glm::vec2(-pTextNode->GetWidth(), 0.0f), glm::vec2(0.0f, 0.0f));
+			break;
+		}
+	}
+	else if(pTextNode->IsScaleBox())
+	{
+		Setup(SHAPE_Box, color, 0.0f, fOutlineAlpha);
+		m_BoundingVolume.SetAsBox(pTextNode->GetTextBoxDimensions().x, pTextNode->GetTextBoxDimensions().y);
+	}
+	else if(pTextNode->IsColumn())
+	{
+		Setup(SHAPE_Box, color, 0.0f, fOutlineAlpha);
+		glm::vec2 ptCenter(pTextNode->GetTextBoxDimensions().x * 0.5f, pTextNode->GetHeight() * -0.5f);
+		m_BoundingVolume.SetAsBox(pTextNode->GetTextBoxDimensions().x * 0.5f, pTextNode->GetHeight() * 0.5f, ptCenter, 0.0f);
+	}
+	else if(pTextNode->IsVertical())
+	{
+		Setup(SHAPE_LineSegment, color, 0.0f, fOutlineAlpha);
+		m_BoundingVolume.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, -pTextNode->GetHeight()));
+	}
+	else
+		HyError("ShapeCtrl::SetAsText - Unknown HyText2d text attributes");
+
+	const glm::mat4 &mtxSceneRef = pTextNode->GetSceneTransform(0.0f);
+	TransformSelf(mtxSceneRef);
+
+	// Update m_Outline
+	Deserialize(Serialize(), pCamera); // NOTE: Not a performant way update m_Outline - This will work by eventually invoking DeserializeOutline()
+}
+
 QString ShapeCtrl::Serialize()
 {
 	HyShape2d shape;
@@ -293,10 +344,10 @@ void ShapeCtrl::Deserialize(QString sData, HyCamera2d *pCamera)
 		break; }
 	}
 
-	RefreshOutline(pCamera);
+	DeserializeOutline(pCamera);
 }
 
-// NOTE: Does not update m_Outline, requires a RefreshOutline()
+// NOTE: Does not update m_Outline, requires a DeserializeOutline()
 void ShapeCtrl::TransformSelf(glm::mat4 mtxTransform)
 {
 	HyShape2d shape;
@@ -305,7 +356,7 @@ void ShapeCtrl::TransformSelf(glm::mat4 mtxTransform)
 	m_BoundingVolume.SetAsShape(shape);
 }
 
-void ShapeCtrl::RefreshOutline(HyCamera2d *pCamera)
+void ShapeCtrl::DeserializeOutline(HyCamera2d *pCamera)
 {
 	if(m_DeserializedFloatList.empty() || pCamera == nullptr)
 		return;
@@ -512,7 +563,7 @@ bool ShapeCtrl::TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::
 	glm::vec2 vTranslate = ptDragPos - ptStartPos;
 
 	// Apply the transform based on the action
-	RefreshOutline(pCamera);
+	DeserializeOutline(pCamera);
 	switch(eAction)
 	{
 	case VEMACTION_Translate:
@@ -840,7 +891,7 @@ void ShapeCtrl::SetVertexGrabPointListSize(uint32 uiNumGrabPoints)
 	}
 }
 
-void ShapeCtrl::ConvertTo(EditorShape eShape)
-{
-	HyGuiLog("ShapeCtrl::ConvertTo - Not implemented", LOGTYPE_Error);
-}
+//void ShapeCtrl::ConvertTo(EditorShape eShape)
+//{
+//	HyGuiLog("ShapeCtrl::ConvertTo - Not implemented", LOGTYPE_Error);
+//}

@@ -453,15 +453,39 @@ const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::GetTextBoxDimensions() const
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+bool IHyText<NODETYPE, ENTTYPE>::IsLine() const
+{
+	return (m_uiTextAttributes & (TEXTATTRIB_IsColumn | TEXTATTRIB_IsScaleBox | TEXTATTRIB_IsVertical)) == 0;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHyText<NODETYPE, ENTTYPE>::IsColumn() const
+{
+	return m_uiTextAttributes & TEXTATTRIB_IsColumn;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 bool IHyText<NODETYPE, ENTTYPE>::IsScaleBox() const
 {
 	return m_uiTextAttributes & TEXTATTRIB_IsScaleBox;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+bool IHyText<NODETYPE, ENTTYPE>::IsScaleBoxCenterVertically() const
+{
+	return m_uiTextAttributes & TEXTATTRIB_ScaleBoxCenterVertically;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHyText<NODETYPE, ENTTYPE>::IsVertical() const
+{
+	return m_uiTextAttributes & TEXTATTRIB_IsVertical;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsLine()
 {
-	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_IsScaleBox | TEXTATTRIB_IsVertical);
+	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_ColumnSplitWordsToFit | TEXTATTRIB_IsScaleBox | TEXTATTRIB_ScaleBoxCenterVertically | TEXTATTRIB_IsVertical);
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
@@ -471,7 +495,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsLine()
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit /*= false*/)
 {
-	m_uiTextAttributes &= ~(TEXTATTRIB_IsScaleBox | TEXTATTRIB_IsVertical);
+	m_uiTextAttributes &= ~(TEXTATTRIB_IsScaleBox | TEXTATTRIB_ScaleBoxCenterVertically | TEXTATTRIB_IsVertical);
 	m_uiTextAttributes |= TEXTATTRIB_IsColumn;
 
 	if(bSplitWordsToFit)
@@ -488,7 +512,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
 {
-	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_IsVertical);
+	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_ColumnSplitWordsToFit | TEXTATTRIB_IsVertical);
 	m_uiTextAttributes |= TEXTATTRIB_IsScaleBox;
 
 	if(bCenterVertically)
@@ -505,7 +529,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsScaleBox(float fWidth, float fHeight, bool
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsVertical()
 {
-	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_IsScaleBox);
+	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_ColumnSplitWordsToFit | TEXTATTRIB_IsScaleBox | TEXTATTRIB_ScaleBoxCenterVertically);
 	m_uiTextAttributes |= TEXTATTRIB_IsVertical;
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;

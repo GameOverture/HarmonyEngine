@@ -51,13 +51,14 @@ public:
 	HyPrimitive2d &GetPrimitive();
 
 	void SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
+	void SetAsText(HyText2d *pTextNode, bool bShowOutline, HyCamera2d *pCamera);
 
 	QString Serialize();
 	void Deserialize(QString sData, HyCamera2d *pCamera);
 
-	void TransformSelf(glm::mat4 mtxTransform); // NOTE: Does not update m_Outline, requires a RefreshOutline()
+	void TransformSelf(glm::mat4 mtxTransform); // NOTE: Does not update m_Outline, requires a DeserializeOutline()
 
-	void RefreshOutline(HyCamera2d *pCamera);
+	void DeserializeOutline(HyCamera2d *pCamera);
 
 	bool IsVemEnabled() const;
 	void EnableVertexEditMode();
@@ -70,7 +71,7 @@ public:
 
 protected:
 	void SetVertexGrabPointListSize(uint32 uiNumGrabPoints);
-	void ConvertTo(EditorShape eShape);
+	//void ConvertTo(EditorShape eShape);
 };
 
 #endif // SHAPECTRL_H

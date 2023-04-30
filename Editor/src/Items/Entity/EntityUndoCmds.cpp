@@ -327,6 +327,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	glm::vec4 vPerspective;
 
 	QList<QUuid> affectedItemUuidList;
+	m_sOldShapeDataList.clear();
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
 		if(m_AffectedItemDataList[i]->GetType() != ITEM_BoundingVolume)
@@ -337,14 +338,16 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
 			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Rotation", dRotation);
 			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+
+			m_sOldShapeDataList.push_back(QString());
 		}
 		else
 		{
 			ShapeCtrl shapeCtrl(nullptr);
 			shapeCtrl.Setup(HyGlobal::GetShapeFromString(m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).FindPropertyValue("Shape", "Type").toString()), HyColor::White, 0.0f, 1.0f);
 
-			m_sOldShapeData = m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).FindPropertyValue("Shape", "Data").toString();
-			shapeCtrl.Deserialize(m_sOldShapeData, nullptr);
+			m_sOldShapeDataList.push_back(m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).FindPropertyValue("Shape", "Data").toString());
+			shapeCtrl.Deserialize(m_sOldShapeDataList.last(), nullptr);
 			shapeCtrl.TransformSelf(m_NewTransformList[i]);
 			
 			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Shape", "Data", shapeCtrl.Serialize());
@@ -380,7 +383,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
 		}
 		else
-			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Shape", "Data", m_sOldShapeData);
+			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Shape", "Data", m_sOldShapeDataList[i]);
 
 		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
 	}

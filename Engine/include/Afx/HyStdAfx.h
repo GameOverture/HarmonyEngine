@@ -129,10 +129,14 @@ enum HyAnimCtrl
 
 enum HyAlignment
 {
+	HYALIGN_Unknown = -1,
+
 	HYALIGN_Left = 0,
 	HYALIGN_Center,
 	HYALIGN_Right,
-	HYALIGN_Justify
+	HYALIGN_Justify,
+
+	HYNUM_ALIGNMENTS
 };
 
 enum HyPlayListMode

@@ -14,7 +14,7 @@
 #include "Scene/AnimFloats/HyAnimVec3.h"
 #include "Utilities/HyMath.h"
 
-#ifdef HY_DEBUG
+#if defined(HY_DEBUG) && !defined(HY_PLATFORM_GUI)
 	#define HY_USE_TEXT_DEBUG_BOXES
 #endif
 
@@ -131,7 +131,11 @@ public:
 
 	const glm::vec2 &GetTextBoxDimensions() const;
 
+	bool IsLine() const;
+	bool IsColumn() const;
 	bool IsScaleBox() const;
+	bool IsScaleBoxCenterVertically() const;
+	bool IsVertical() const;
 
 	void SetAsLine();
 	void SetAsColumn(float fWidth, bool bSplitWordsToFit = false);

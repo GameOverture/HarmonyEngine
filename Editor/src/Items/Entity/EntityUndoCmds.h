@@ -124,7 +124,7 @@ class EntityUndoCmd_Transform : public QUndoCommand
 	QList<EntityTreeItemData *>		m_AffectedItemDataList;
 	QList<glm::mat4>				m_NewTransformList;
 	QList<glm::mat4>				m_OldTransformList;
-	QString							m_sOldShapeData;
+	QStringList						m_sOldShapeDataList;
 
 public:
 	EntityUndoCmd_Transform(ProjectItemData &entityItemRef, int iStateIndex, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent = nullptr);

@@ -84,6 +84,7 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 
 	if(pItemData->GetType() != ITEM_BoundingVolume)
 	{
+		propertiesTreeModelRef.AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(pItemData->GetType(), false) % "'s state to be displayed");
 		propertiesTreeModelRef.AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused");
 		propertiesTreeModelRef.AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", false, -iRANGE, iRANGE, 1);
 
@@ -149,14 +150,19 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 
 	case ITEM_Text:
 		propertiesTreeModelRef.AppendCategory("Text", pItemData->GetItemUuid().toString(QUuid::WithoutBraces));
-		propertiesTreeModelRef.AppendProperty("Text", "State", PROPERTIESTYPE_StatesComboBox, 0, "The text state to be displayed");
 		propertiesTreeModelRef.AppendProperty("Text", "Text", PROPERTIESTYPE_LineEdit, "Text123", "What UTF-8 string to be displayed", false);
-		break;
+		propertiesTreeModelRef.AppendProperty("Text", "Style", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTextStyleNameList()[TEXTSTYLE_Line], "The style of how the text is shown", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTextStyleNameList());
+		propertiesTreeModelRef.AppendProperty("Text", "Style Dimensions", PROPERTIESTYPE_vec2, QPointF(200.0f, 50.0f), "Text box size used when required by the style (like ScaleBox or Column)", false, 0.0f, fRANGE, 1.0f);
+		propertiesTreeModelRef.AppendProperty("Text", "Alignment", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAlignmentNameList()[HYALIGN_Left], "The alignment of the text", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAlignmentNameList());
+		propertiesTreeModelRef.AppendProperty("Text", "Monospaced Digits", PROPERTIESTYPE_bool, false, "Check to use monospaced digits, which ensures all digits use the same width", false);
+		propertiesTreeModelRef.AppendProperty("Text", "Text Indent", PROPERTIESTYPE_int, 0, "The number of pixels to indent the text", false, 0, iRANGE, 1);
+		break; 
 
 	case ITEM_Sprite:
 		propertiesTreeModelRef.AppendCategory("Sprite", pItemData->GetItemUuid().toString(QUuid::WithoutBraces));
-		propertiesTreeModelRef.AppendProperty("Sprite", "State", PROPERTIESTYPE_StatesComboBox, 0, "The sprite state to be displayed");
 		propertiesTreeModelRef.AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on");
+		propertiesTreeModelRef.AppendProperty("Sprite", "Anim Rate", PROPERTIESTYPE_double, 1.0, "The animation rate modifier", false, 0.0, fRANGE, 0.1);
+		propertiesTreeModelRef.AppendProperty("Sprite", "Anim Paused", PROPERTIESTYPE_bool, false, "The current state's animation starts paused");
 		break;
 
 	default:

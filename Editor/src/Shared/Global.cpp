@@ -19,6 +19,8 @@
 /*static*/ QString HyGlobal::sm_AssetNames[NUM_ASSETMANTYPES];
 /*static*/ QString HyGlobal::sm_ShapeNames[NUM_SHAPES];
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
+/*static*/ QStringList HyGlobal::sm_sTextStyleList;
+/*static*/ QStringList HyGlobal::sm_sAlignmentList;
 
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
 /*static*/ QColor HyGlobal::sm_ItemColors[NUM_ITEMTYPES];
@@ -107,6 +109,9 @@
 			sm_ItemIcons[i][j].addFile(sUrl);
 		}
 	}
+
+	sm_sTextStyleList << "Line" << "Column" << "Scale Box" << "Scale Box (top align)" << "Vertical";
+	sm_sAlignmentList << "Left" << "Center" << "Right" << "Justify";
 
 	sm_ItemColors[ITEM_Project] = QColor(9, 215, 33);
 	sm_ItemColors[ITEM_Prefix] = QColor(228, 212, 128);
@@ -251,6 +256,40 @@
 	}
 
 	return SHAPE_None;
+}
+
+
+/*static*/ QStringList HyGlobal::GetTextStyleNameList()
+{
+	return sm_sTextStyleList;
+}
+
+/*static*/ TextStyle HyGlobal::GetTextStyleFromString(QString sTextStyle)
+{
+	for(int i = 0; i < NUM_TEXTSTYLES; ++i)
+	{
+		if(sTextStyle.compare(sm_sTextStyleList[i], Qt::CaseInsensitive) == 0)
+			return static_cast<TextStyle>(i);
+	}
+
+	return TEXTSTYLE_Unknown;
+}
+
+
+/*static*/ QStringList HyGlobal::GetAlignmentNameList()
+{
+	return sm_sAlignmentList;
+}
+
+/*static*/ HyAlignment HyGlobal::GetAlignmentFromString(QString sAlignment)
+{
+	for(int i = 0; i < HYNUM_ALIGNMENTS; ++i)
+	{
+		if(sAlignment.compare(sm_sAlignmentList[i], Qt::CaseInsensitive) == 0)
+			return static_cast<HyAlignment>(i);
+	}
+
+	return HYALIGN_Unknown;
 }
 
 /*static*/ const QString HyGlobal::ItemExt(ItemType eItem)

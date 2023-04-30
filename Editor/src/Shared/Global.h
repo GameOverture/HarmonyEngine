@@ -130,6 +130,19 @@ enum EditorShape
 	NUM_SHAPES
 };
 
+enum TextStyle
+{
+	TEXTSTYLE_Unknown = -1,
+
+	TEXTSTYLE_Line,
+	TEXTSTYLE_Column,
+	TEXTSTYLE_ScaleBox,
+	TEXTSTYLE_ScaleBoxTopAlign,
+	TEXTSTYLE_Vertical,
+
+	NUM_TEXTSTYLES
+};
+
 enum SubIcon
 {
 	SUBICON_None = 0,
@@ -201,6 +214,8 @@ class HyGlobal
 	static QString														sm_AssetNames[NUM_ASSETMANTYPES];
 	static QString														sm_ShapeNames[NUM_SHAPES];
 	static QString														sm_sSubIconNames[NUM_SUBICONS];
+	static QStringList													sm_sTextStyleList;
+	static QStringList													sm_sAlignmentList;
 
 	static QIcon														sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
 	static QColor														sm_ItemColors[NUM_ITEMTYPES];
@@ -228,6 +243,10 @@ public:
 	static ItemType GetTypeFromString(QString sType);
 	static QStringList GetShapeNameList();
 	static EditorShape GetShapeFromString(QString sShape);
+	static QStringList GetTextStyleNameList();
+	static TextStyle GetTextStyleFromString(QString sTextStyle);
+	static QStringList GetAlignmentNameList();
+	static HyAlignment GetAlignmentFromString(QString sAlignment);
 
 	static const QString ItemName(ItemType eItem, bool bPlural)	{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
 	static const QString AssetName(AssetManagerType eAsset)					{ return sm_AssetNames[eAsset]; }
