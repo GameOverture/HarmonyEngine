@@ -38,7 +38,7 @@ enum PropertiesType
 	PROPERTIESTYPE_StatesComboBox,	// delegateBuilder [QUuid] = The ProjectItemData's UUID that contains the states
 	PROPERTIESTYPE_Slider,
 	PROPERTIESTYPE_Color,
-	PROPERTIESTYPE_SpriteFrames
+	PROPERTIESTYPE_SpriteFrames,	// delegateBuilder [QUuid] = The ProjectItemData's UUID that contains the sprite frames
 };
 
 struct PropertiesDef

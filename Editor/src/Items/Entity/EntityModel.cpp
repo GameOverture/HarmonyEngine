@@ -160,7 +160,7 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 
 	case ITEM_Sprite:
 		propertiesTreeModelRef.AppendCategory("Sprite", pItemData->GetItemUuid().toString(QUuid::WithoutBraces));
-		propertiesTreeModelRef.AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on");
+		propertiesTreeModelRef.AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on", false, QVariant(), QVariant(), QVariant(), QString(), QString(), pItemData->GetItemUuid());
 		propertiesTreeModelRef.AppendProperty("Sprite", "Anim Rate", PROPERTIESTYPE_double, 1.0, "The animation rate modifier", false, 0.0, fRANGE, 0.1);
 		propertiesTreeModelRef.AppendProperty("Sprite", "Anim Paused", PROPERTIESTYPE_bool, false, "The current state's animation starts paused");
 		break;

@@ -206,7 +206,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break; }
 
 	case PROPERTIESTYPE_Slider:
-		pReturnWidget = new QSlider(pParent);
+		pReturnWidget = new QSlider(Qt::Horizontal, pParent);
 
 		if(propDefRef.defaultData.isValid())
 			static_cast<QSlider *>(pReturnWidget)->setValue(propDefRef.defaultData.toInt());
@@ -240,21 +240,21 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		}
 		break; }
 
-	case PROPERTIESTYPE_SpriteFrames:
-		pReturnWidget = new QSlider(pParent);
+	case PROPERTIESTYPE_SpriteFrames: {
+		pReturnWidget = new QSlider(Qt::Horizontal, pParent);
+		static_cast<QSlider *>(pReturnWidget)->setSingleStep(1);
 
-		if(propDefRef.delegateBuilder.isValid())
+		PropertiesTreeModel *pModel = static_cast<PropertiesTreeModel *>(m_pTableView->model());
+		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pModel->GetOwner().GetProject().FindItemData(propDefRef.delegateBuilder.toUuid()));
+		if(pProjItem)
 		{
-			//SpriteModel *pModel = static_cast<SpriteModel *>(propDefRef.delegateBuilder.value<ProjectItemData *>()->GetModel());
+			int iCurrentState = pModel->FindPropertyValue("Common", "State").toInt();
 			static_cast<QSlider *>(pReturnWidget)->setMinimum(0);
-
-			// TODO: FIX ME
-			//static_cast<QSlider *>(pReturnWidget)->setMaximum(pModel->GetStateData(x)->GetFramesModel().rowCount());
-			static_cast<QSlider *>(pReturnWidget)->setSingleStep(1);
+			static_cast<QSlider *>(pReturnWidget)->setMaximum(static_cast<SpriteStateData *>(pProjItem->GetModel()->GetStateData(iCurrentState))->GetFramesModel()->rowCount());
 		}
 		if(propDefRef.defaultData.isValid())
 			static_cast<QSlider *>(pReturnWidget)->setValue(propDefRef.defaultData.toInt());
-		break;
+		break; }
 
 	default:
 		HyGuiLog("PropertiesDelegate::createEditor not implemented for type: " % QString::number(propDefRef.eType), LOGTYPE_Error);
@@ -299,6 +299,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		static_cast<QComboBox *>(pEditor)->setCurrentIndex(propValue.toInt());
 		break;
 	case PROPERTIESTYPE_Slider:
+	case PROPERTIESTYPE_SpriteFrames:
 		static_cast<QSlider *>(pEditor)->setValue(propValue.toInt());
 		break;
 
@@ -344,6 +345,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		newValue = QVariant(static_cast<QComboBox *>(pEditor)->currentIndex());
 		break;
 	case PROPERTIESTYPE_Slider:
+	case PROPERTIESTYPE_SpriteFrames:
 		newValue = QVariant(static_cast<QSlider *>(pEditor)->value());
 		break;
 	case PROPERTIESTYPE_Color: // Handled in DlgColorPicker
