@@ -16,12 +16,13 @@
 
 #include <QVariant>
 
-EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis) :
+EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, quint32 uiAssetChecksum, QUuid uuidOfItem, QUuid uuidOfThis) :
 	TreeModelItemData(eItemType, uuidOfThis, sCodeName),
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(eEntType),
 	m_bIsForwardDeclared(bIsForwardDeclared),
 	m_ItemUuid(uuidOfItem),
+	m_uiAssetChecksum(uiAssetChecksum),
 	m_bIsSelected(false)
 {
 	if(m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_ArrayItem)
@@ -40,6 +41,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	m_eEntType(bIsArrayItem ? ENTTYPE_ArrayItem : ENTTYPE_Item),
 	m_bIsForwardDeclared(bIsForwardDeclared),
 	m_ItemUuid(descObj["itemUUID"].toString()),
+	m_uiAssetChecksum(static_cast<quint32>(descObj["assetChecksum"].toVariant().toLongLong())),
 	m_bIsSelected(descObj["isSelected"].toBool())
 {
 	if(propArray.size() != m_EntityModelRef.GetNumStates())
@@ -107,6 +109,7 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 	childObjRef.insert("UUID", GetUuid().toString(QUuid::WithoutBraces));
 	childObjRef.insert("itemUUID", m_ItemUuid.toString(QUuid::WithoutBraces));
 	childObjRef.insert("isSelected", m_bIsSelected);
+	childObjRef.insert("assetChecksum", QJsonValue(static_cast<qint64>(m_uiAssetChecksum)));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,7 +124,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		HyGuiLog("EntityTreeModel::EntityTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
-	EntityTreeItemData *pThisEntityItem = new EntityTreeItemData(m_ModelRef, false, sEntityCodeName, ITEM_Entity, ENTTYPE_Root, uuidOfEntity, uuidOfEntity);
+	EntityTreeItemData *pThisEntityItem = new EntityTreeItemData(m_ModelRef, false, sEntityCodeName, ITEM_Entity, ENTTYPE_Root, 0, uuidOfEntity, uuidOfEntity);
 	QVariant v;
 	v.setValue<EntityTreeItemData *>(pThisEntityItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
@@ -136,7 +139,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		HyGuiLog("EntityTreeModel::EntityTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
-	EntityTreeItemData *pShapeFolderItem = new EntityTreeItemData(m_ModelRef, false, "Bounding Volumes", ITEM_Prefix, ENTTYPE_BvFolder, QUuid(), QUuid());
+	EntityTreeItemData *pShapeFolderItem = new EntityTreeItemData(m_ModelRef, false, "Bounding Volumes", ITEM_Prefix, ENTTYPE_BvFolder, 0, QUuid(), QUuid());
 	QVariant shapeData;
 	shapeData.setValue<EntityTreeItemData *>(pShapeFolderItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
@@ -303,7 +306,7 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 		return false;
 	}
 
-	if(HyGlobal::GetProjItemTypeList().contains(pItem->GetType()) == false)
+	if(HyGlobal::GetProjItemTypeList().contains(pItem->GetType()) == false && pItem->GetType() != ITEM_AtlasFrame)
 	{
 		if(bShowDialogsOnFail)
 			HyGuiLog(pItem->GetText() % " is not a valid child type: " % QString::number(pItem->GetType()), LOGTYPE_Error);
@@ -318,7 +321,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewChild(ProjectItemData *pProjIt
 	// Generate a unique code name for this new item
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pProjItem->GetName(false));
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ShouldForwardDeclare(pProjItem), sCodeName, pProjItem->GetType(), ENTTYPE_Item, pProjItem->GetUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ShouldForwardDeclare(pProjItem), sCodeName, pProjItem->GetType(), ENTTYPE_Item, 0, pProjItem->GetUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
 
 	return pNewItem;
@@ -339,7 +342,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewAsset(IAssetItemData *pAssetIt
 		break;
 	}
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, eItemType, ENTTYPE_Item, QUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, eItemType, ENTTYPE_Item, pAssetItem->GetChecksum(), QUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
 
 	return pNewItem;
@@ -380,7 +383,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewShape(EditorShape eShape, QStr
 	else
 		pParentTreeItem = GetBvFolderTreeItem();
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_BoundingVolume, ENTTYPE_Item, QUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_BoundingVolume, ENTTYPE_Item, 0, QUuid(), QUuid::createUuid());
 	for(int iStateIndex = 0; iStateIndex < m_ModelRef.GetNumStates(); ++iStateIndex)
 	{
 		pNewItem->GetPropertiesModel(iStateIndex).SetPropertyValue("Shape", "Type", HyGlobal::ShapeName(eShape));
@@ -661,7 +664,7 @@ bool EntityTreeModel::FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut
 			return nullptr;
 		}
 		// Allocate and store the new array folder item in the tree model
-		EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, eItemType, ENTTYPE_ArrayFolder, QUuid(), QUuid());
+		EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, eItemType, ENTTYPE_ArrayFolder, 0, QUuid(), QUuid());
 		QVariant v;
 		v.setValue<EntityTreeItemData *>(pNewItem);
 		for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)

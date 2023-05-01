@@ -96,16 +96,17 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break;
 
 	case PROPERTIESTYPE_int:
+	case PROPERTIESTYPE_int64:
 		pReturnWidget = new QSpinBox(pParent);
 
 		if(propDefRef.defaultData.isValid())
-			static_cast<QSpinBox *>(pReturnWidget)->setValue(propDefRef.defaultData.toInt());
+			static_cast<QSpinBox *>(pReturnWidget)->setValue(propDefRef.defaultData.toLongLong());
 		if(propDefRef.minRange.isValid())
-			static_cast<QSpinBox *>(pReturnWidget)->setMinimum(propDefRef.minRange.toInt());
+			static_cast<QSpinBox *>(pReturnWidget)->setMinimum(propDefRef.minRange.toLongLong());
 		if(propDefRef.maxRange.isValid())
-			static_cast<QSpinBox *>(pReturnWidget)->setMaximum(propDefRef.maxRange.toInt());
+			static_cast<QSpinBox *>(pReturnWidget)->setMaximum(propDefRef.maxRange.toLongLong());
 		if(propDefRef.stepAmt.isValid())
-			static_cast<QSpinBox *>(pReturnWidget)->setSingleStep(propDefRef.stepAmt.toInt());
+			static_cast<QSpinBox *>(pReturnWidget)->setSingleStep(propDefRef.stepAmt.toLongLong());
 		if(propDefRef.sPrefix.isEmpty() == false)
 			static_cast<QSpinBox *>(pReturnWidget)->setPrefix(propDefRef.sPrefix);
 		if(propDefRef.sSuffix.isEmpty() == false)
@@ -275,7 +276,8 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		// Handled natively within tree model's CheckStateRole
 		break;
 	case PROPERTIESTYPE_int:
-		static_cast<QSpinBox *>(pEditor)->setValue(propValue.toInt());
+	case PROPERTIESTYPE_int64:
+		static_cast<QSpinBox *>(pEditor)->setValue(propValue.toLongLong());
 		break;
 	case PROPERTIESTYPE_double:
 		static_cast<QDoubleSpinBox *>(pEditor)->setValue(propValue.toDouble());
@@ -321,6 +323,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	case PROPERTIESTYPE_bool:
 		break;
 	case PROPERTIESTYPE_int:
+	case PROPERTIESTYPE_int64:
 		newValue = QVariant(static_cast<QSpinBox *>(pEditor)->value());
 		break;
 	case PROPERTIESTYPE_double:

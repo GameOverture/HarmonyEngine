@@ -117,7 +117,7 @@ HyAssets::~HyAssets()
 		delete iter->second;
 	m_GltfMap.clear();
 
-	for(auto iter = m_HotLoadTextureMap.begin(); iter != m_HotLoadTextureMap.end(); ++iter)
+	for(auto iter = m_TextureQuadMap.begin(); iter != m_TextureQuadMap.end(); ++iter)
 		delete iter->second;
 
 	for(auto iter = m_HotLoadAudioMap.begin(); iter != m_HotLoadAudioMap.end(); ++iter)
@@ -191,11 +191,11 @@ HyFileAtlas *HyAssets::GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut
 	return nullptr;
 }
 
-HyFileAtlas *HyAssets::GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup)
+HyFileAtlas *HyAssets::GetAtlasUsingBankId(uint32 uiAtlasBankId, uint32 uiIndexInBank)
 {
 	for(uint32 i = 0; i < m_FilesMap[HYFILE_Atlas].m_uiNumFiles; ++i)
 	{
-		if(static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetBankId() == uiAtlasGrpId && static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetIndexInGroup() == uiIndexInGroup)
+		if(static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetBankId() == uiAtlasBankId && static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetIndexInBank() == uiIndexInBank)
 			return &static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i];
 	}
 
@@ -237,6 +237,7 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 		else
 			pDataOut = m_AudioFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
+
 	case HYTYPE_Sprite:
 		pDataOut = m_SpriteFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
@@ -251,15 +252,18 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 		break;
 	
 	case HYTYPE_TexturedQuad:
-		if(pLoadable->GetName() != HYASSETS_Hotload)
+		if(pLoadable->GetPrefix().empty()) // If Prefix is empty, then Name contains the 'checksum' as a string, otherwise it's "N/A" or path to an image for hotload and HyTexturedQuadData isn't used
 		{
-			std::pair<uint32, uint32> key(std::stoi(pLoadable->GetPrefix()), std::stoi(pLoadable->GetName()));
-			if(m_HotLoadTextureMap.find(key) == m_HotLoadTextureMap.end())
+			HyRectangle<float> uvRect;
+			HyFileAtlas *pAtlas = GetAtlas(std::stoi(pLoadable->GetName()), uvRect);
+			uint32 uiKey = pAtlas->GetManifestIndex();
+
+			if(m_TextureQuadMap.find(uiKey) == m_TextureQuadMap.end())
 			{
-				HyTexturedQuadData *pNewQuadData = HY_NEW HyTexturedQuadData(key.first, key.second, *this);
-				m_HotLoadTextureMap[key] = pNewQuadData;
+				HyTexturedQuadData *pNewQuadData = HY_NEW HyTexturedQuadData(pAtlas);
+				m_TextureQuadMap[uiKey] = pNewQuadData;
 			}
-			pDataOut = m_HotLoadTextureMap[key];
+			pDataOut = m_TextureQuadMap[uiKey];
 		}
 		break;
 

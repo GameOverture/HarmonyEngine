@@ -325,7 +325,8 @@ void EntityDraw::ClearShapeEdit()
 		if(pDrawItem == nullptr)
 		{
 			QUuid itemUuid(descObj["itemUUID"].toString());
-			pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), eType, uuid, itemUuid, this);
+			quint32 uiAssetChecksum = static_cast<quint32>(descObj["assetChecksum"].toVariant().toLongLong());
+			pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), eType, uiAssetChecksum, uuid, itemUuid, this);
 		}
 		else
 			staleItemList.removeOne(pDrawItem);

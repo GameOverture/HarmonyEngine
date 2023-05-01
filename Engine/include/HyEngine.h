@@ -104,14 +104,15 @@ public:
 	static uint32 NumWindows();
 	static HyWindow &Window(uint32 uiWindowIndex = 0);
 	static HyInput &Input();
+	static HyRendererInterop &Renderer();
 	static HyAudioCore &Audio();
 	static void LoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut);
 	static HyDiagnostics &Diagnostics();
 	static HyShaderHandle DefaultShaderHandle(HyType eType);
 	static std::string DateTime();
 	static std::string DataDir();
-	static HyTextureHandle HotLoadTexture(std::string sFilePath, HyTextureFiltering eFiltering, int32 &iWidthOut, int32 &iHeightOut);
-	static void HotUnloadTexture(HyTextureHandle hTexHandle);
+	//static HyTextureHandle HotLoadTexture(std::string sFilePath, HyTextureFiltering eFiltering, int32 &iWidthOut, int32 &iHeightOut);
+	//static void HotUnloadTexture(HyTextureHandle hTexHandle);
 	static HyAudioHandle HotLoadAudio(std::string sFilePath, bool bIsStreaming = false, int32 iInstanceLimit = 0);
 	static void HotUnloadAudio(HyAudioHandle hAudioHandle);
 };

@@ -17,12 +17,12 @@
 
 HyFileAtlas::HyFileAtlas(std::string sFileName,
 				 uint32 uiBankId,
-				 uint32 uiIndexInGroup,
+				 uint32 uiIndexInBank,
 				 uint32 uiManifestIndex,
 				 HyJsonObj textureObj) :
 	IHyFile(sFileName, HYFILE_Atlas, uiManifestIndex),
 	m_uiBANK_ID(uiBankId),
-	m_uiINDEX_IN_GROUP(uiIndexInGroup),
+	m_uiINDEX_IN_BANK(uiIndexInBank),
 	m_uiWIDTH(textureObj["width"].GetUint()),
 	m_uiHEIGHT(textureObj["height"].GetUint()),
 	m_TextureInfo(textureObj["textureInfo"].GetUint()),
@@ -58,9 +58,9 @@ uint32 HyFileAtlas::GetBankId() const
 	return m_uiBANK_ID;
 } 
 
-uint32 HyFileAtlas::GetIndexInGroup() const
+uint32 HyFileAtlas::GetIndexInBank() const
 {
-	return m_uiINDEX_IN_GROUP;
+	return m_uiINDEX_IN_BANK;
 }
 
 uint32 HyFileAtlas::GetWidth() const

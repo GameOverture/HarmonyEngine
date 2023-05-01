@@ -14,9 +14,9 @@
 #include "Utilities/HyJson.h"
 
 HyTextureInfo::HyTextureInfo() :
-	m_uiFiltering(HYTEXFILTER_Unknown),
-	m_uiFormat(HYTEXFILTER_Unknown),
-	m_uiFormatParam1(0),
+	m_uiFiltering(HYTEXFILTER_BILINEAR),
+	m_uiFormat(HYTEXTURE_Uncompressed),
+	m_uiFormatParam1(4),
 	m_uiFormatParam2(0)
 { }
 

@@ -37,11 +37,12 @@ class EntityTreeItemData : public TreeModelItemData
 	EntityItemType										m_eEntType;
 	bool												m_bIsForwardDeclared;
 	QUuid												m_ItemUuid;
+	quint32												m_uiAssetChecksum;
 
 	bool												m_bIsSelected;
 
 public:
-	EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfItem, QUuid uuidOfThis);
+	EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, quint32 uiAssetChecksum, QUuid uuidOfItem, QUuid uuidOfThis);
 	EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QJsonObject descObj, QJsonArray propArray, bool bIsArrayItem);
 	virtual ~EntityTreeItemData();
 

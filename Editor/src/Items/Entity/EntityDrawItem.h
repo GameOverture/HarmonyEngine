@@ -25,7 +25,7 @@ class EntityDrawItem
 	ShapeCtrl								m_ShapeCtrl;
 
 public:
-	EntityDrawItem(Project &projectRef, ItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent);
+	EntityDrawItem(Project &projectRef, ItemType eGuiType, quint32 uiAssetChecksum, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent);
 	virtual ~EntityDrawItem();
 
 	ItemType GetGuiType() const;

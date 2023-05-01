@@ -11,45 +11,45 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Assets/Nodes/HyTexturedQuadData.h"
+#include "Utilities/HyIO.h"
+#include "HyEngine.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_TexturedQuad, "", "", pParent),
-	m_bIsRaw(false),
-	m_uiAtlasGroupId(uiAtlasGrpId),
-	m_uiAtlasIndexInGroup(uiIndexInGroup),
-	m_uiRawTextureWidth(0),
-	m_uiRawTextureHeight(0),
-	m_SrcRect(0.0f, 1.0f, 1.0f, 0.0f)
+#include "vendor/SOIL2/src/SOIL2/SOIL2.h"
+
+HyTexturedQuad2d::HyTexturedQuad2d(HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_TexturedQuad, "N/A", "", pParent),
+	m_iFullTextureWidth(0),
+	m_iFullTextureHeight(0),
+	m_hTextureHandle(HY_UNUSED_HANDLE)
 {
-	m_sPrefix = std::to_string(uiAtlasGrpId);
-	m_sName = std::to_string(uiIndexInGroup);
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
-HyTexturedQuad2d::HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_TexturedQuad, "", HYASSETS_Hotload, pParent),
-	m_bIsRaw(true),
-	m_uiAtlasGroupId(0),
-	m_uiAtlasIndexInGroup(0),
-	m_uiRawTextureWidth(uiTextureWidth),
-	m_uiRawTextureHeight(uiTextureHeight),
-	m_SrcRect(0.0f, 1.0f, 1.0f, 0.0f)
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_TexturedQuad, "", std::to_string(uiAtlasFrameChecksum), pParent),
+	m_iFullTextureWidth(0),
+	m_iFullTextureHeight(0),
+	m_hTextureHandle(HY_UNUSED_HANDLE)
 {
-	m_sName = HYASSETS_Hotload;
-
 	m_ShaderUniforms.SetNumTexUnits(1);
-	m_ShaderUniforms.SetTexHandle(0, hTextureHandle);
+}
+
+HyTexturedQuad2d::HyTexturedQuad2d(std::string sFilePath, HyTextureInfo useTextureInfo, HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_TexturedQuad, HyIO::CleanPath(sFilePath.c_str(), nullptr, true), std::to_string(useTextureInfo.GetBucketId()), pParent),
+	m_iFullTextureWidth(0),
+	m_iFullTextureHeight(0),
+	m_hTextureHandle(HY_UNUSED_HANDLE)
+{
+	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(const HyTexturedQuad2d &copyRef) :
 	IHyDrawable2d(copyRef),
-	m_bIsRaw(copyRef.m_bIsRaw),
-	m_uiAtlasGroupId(copyRef.m_uiAtlasGroupId),
-	m_uiAtlasIndexInGroup(copyRef.m_uiAtlasIndexInGroup),
-	m_uiRawTextureWidth(copyRef.m_uiRawTextureWidth),
-	m_uiRawTextureHeight(copyRef.m_uiRawTextureHeight),
-	m_SrcRect(copyRef.m_SrcRect)
+	m_iFullTextureWidth(copyRef.m_iFullTextureWidth),
+	m_iFullTextureHeight(copyRef.m_iFullTextureHeight),
+	m_hTextureHandle(copyRef.m_hTextureHandle)
 {
+	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
 HyTexturedQuad2d::~HyTexturedQuad2d()
@@ -60,76 +60,130 @@ const HyTexturedQuad2d &HyTexturedQuad2d::operator=(const HyTexturedQuad2d &rhs)
 {
 	IHyDrawable2d::operator=(rhs);
 
-	m_bIsRaw = rhs.m_bIsRaw;
-	m_uiAtlasGroupId = rhs.m_uiAtlasGroupId;
-	m_uiAtlasIndexInGroup = rhs.m_uiAtlasIndexInGroup;
-	m_uiRawTextureWidth = rhs.m_uiRawTextureWidth;
-	m_uiRawTextureHeight = rhs.m_uiRawTextureHeight;
-	m_SrcRect = rhs.m_SrcRect;
+	m_iFullTextureWidth = rhs.m_iFullTextureWidth;
+	m_iFullTextureHeight = rhs.m_iFullTextureHeight;
+	m_UvRect = rhs.m_UvRect;
+	m_hTextureHandle = rhs.m_hTextureHandle;
 
 	return *this;
 }
 
+void HyTexturedQuad2d::Init(uint32 uiAtlasFrameChecksum, HyEntity2d *pParent)
+{
+	IHyLoadable2d::Init("", std::to_string(uiAtlasFrameChecksum), pParent);
+}
+
+void HyTexturedQuad2d::Init(std::string sFilePath, HyTextureInfo useTextureInfo, HyEntity2d *pParent)
+{
+	IHyLoadable2d::Init(HyIO::CleanPath(sFilePath.c_str(), nullptr, true), std::to_string(useTextureInfo.GetBucketId()), pParent);
+}
+
+void HyTexturedQuad2d::Uninit()
+{
+	Unload();
+	IHyLoadable2d::Init("N/A", "", m_pParent);
+}
+
+bool HyTexturedQuad2d::IsHotloading() const
+{
+	return m_sPrefix.empty() == false;
+}
+
 /*virtual*/ void HyTexturedQuad2d::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
 {
-	if(m_SrcRect.Width() <= HyShape2d::FloatSlop || m_SrcRect.Height() <= HyShape2d::FloatSlop)
+	if(GetWidth() == 0 || GetHeight() == 0)
+	{
+		shapeOut.SetAsNothing();
 		return;
+	}
 
-	shapeOut.SetAsBox(m_SrcRect.Width(), m_SrcRect.Height());
+	shapeOut.SetAsBox(static_cast<float>(GetWidth()), static_cast<float>(GetHeight()));
 }
 
-void HyTexturedQuad2d::SetTextureSource(int iX, int iY, int iWidth, int iHeight)
-{
-	float fX = static_cast<float>(iX);
-	float fY = static_cast<float>(iY);
-	float fWidth = static_cast<float>(iWidth);
-	float fHeight = static_cast<float>(iHeight);
-	float fTexWidth = m_bIsRaw ? m_uiRawTextureWidth : static_cast<float>(static_cast<const HyTexturedQuadData *>(AcquireData())->GetAtlas()->GetWidth());
-	float fTexHeight = m_bIsRaw ? m_uiRawTextureHeight : static_cast<float>(static_cast<const HyTexturedQuadData *>(AcquireData())->GetAtlas()->GetHeight());
+//void HyTexturedQuad2d::SetUvCoordinates(int iX, int iY, int iWidth, int iHeight)
+//{
+//	if(m_uiFullTextureWidth == 0 || m_uiFullTextureHeight == 0)
+//	{
+//		HyLogWarning("HyTexturedQuad2d::SetUvCoordinates() was called before the texture was loaded");
+//		return;
+//	}
+//
+//	float fX = static_cast<float>(iX);
+//	float fY = static_cast<float>(iY);
+//	float fWidth = static_cast<float>(iWidth);
+//	float fHeight = static_cast<float>(iHeight);
+//
+//	m_UvRect.left = fX / m_uiFullTextureWidth;
+//	m_UvRect.top = fY / m_uiFullTextureHeight;
+//	m_UvRect.right = (fX + fWidth) / m_uiFullTextureWidth;
+//	m_UvRect.bottom = (fY + fHeight) / m_uiFullTextureHeight;
+//}
 
-	m_SrcRect.left = fX / fTexWidth;
-	m_SrcRect.top = fY / fTexHeight;
-	m_SrcRect.right = (fX + fWidth) / fTexWidth;
-	m_SrcRect.bottom = (fY + fHeight) / fTexHeight;
+uint32 HyTexturedQuad2d::GetWidth() const
+{
+	return static_cast<uint32>(m_UvRect.Width() * GetEntireTextureWidth());
 }
 
-uint32 HyTexturedQuad2d::GetAtlasIndexInGroup()
+uint32 HyTexturedQuad2d::GetHeight() const
 {
-	return m_uiAtlasIndexInGroup;
+	return static_cast<uint32>(m_UvRect.Height() * GetEntireTextureHeight());
 }
 
-uint32 HyTexturedQuad2d::GetWidth()
+int32 HyTexturedQuad2d::GetEntireTextureWidth() const
 {
-	return static_cast<uint32>(m_SrcRect.Width() * GetEntireTextureWidth());
+	return m_iFullTextureWidth;
 }
 
-uint32 HyTexturedQuad2d::GetHeight()
+int32 HyTexturedQuad2d::GetEntireTextureHeight() const
 {
-	return static_cast<uint32>(m_SrcRect.Height() * GetEntireTextureHeight());
+	return m_iFullTextureHeight;
 }
 
-uint32 HyTexturedQuad2d::GetEntireTextureWidth()
+/*virtual*/ void HyTexturedQuad2d::OnDataAcquired() /*override*/
 {
-	if(m_bIsRaw)
-		return m_uiRawTextureWidth;
+	// NOTE: Data is only valid when the checksum ctor is used. Otherwise OnDataAcquired() isn't invoked and internal data is set when the texture is 'hotloaded' within Load()
+	const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(UncheckedGetData());
 
-	return static_cast<const HyTexturedQuadData *>(AcquireData())->GetAtlas()->GetWidth();
-}
+	m_iFullTextureWidth = pData->GetAtlas()->GetWidth();
+	m_iFullTextureHeight = pData->GetAtlas()->GetHeight();
+	pData->GetAtlas()->GetUvRect(std::stoi(GetName()), m_UvRect);
+	m_hTextureHandle = pData->GetAtlas()->GetTextureHandle();
 
-uint32 HyTexturedQuad2d::GetEntireTextureHeight()
-{
-	if(m_bIsRaw)
-		return m_uiRawTextureHeight;
-
-	return static_cast<const HyTexturedQuadData *>(AcquireData())->GetAtlas()->GetHeight();
+	m_ShaderUniforms.SetTexHandle(0, m_hTextureHandle);
 }
 
 /*virtual*/ void HyTexturedQuad2d::OnLoaded() /*override*/
 {
 	IHyDrawable2d::OnLoaded();
 
-	if(m_bIsRaw == false)
-		m_ShaderUniforms.SetTexHandle(0, static_cast<const HyTexturedQuadData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle());
+	if(IsHotloading()) // Do blocking load of texture
+	{
+		int iNum8bitClrChannels;
+		uint8 *pPixelData = SOIL_load_image(m_sPrefix.c_str(), &m_iFullTextureWidth, &m_iFullTextureHeight, &iNum8bitClrChannels, 4);
+		uint32 uiPixelDataSize = m_iFullTextureWidth * m_iFullTextureHeight * 4;
+
+		m_hTextureHandle = HyEngine::Renderer().AddTexture(
+			HyTextureInfo(std::stoi(m_sName)),
+			m_iFullTextureWidth,
+			m_iFullTextureHeight,
+			pPixelData,
+			uiPixelDataSize,
+			0);
+		SOIL_free_image_data(pPixelData);
+
+		m_ShaderUniforms.SetTexHandle(0, m_hTextureHandle);
+	}
+}
+
+/*virtual*/ void HyTexturedQuad2d::OnUnloaded() /*override*/
+{
+	IHyDrawable2d::OnUnloaded();
+
+	if(IsHotloading())
+	{
+		HyEngine::Renderer().DeleteTexture(m_hTextureHandle);
+		m_hTextureHandle = HY_UNUSED_HANDLE;
+	}
 }
 
 /*virtual*/ bool HyTexturedQuad2d::OnIsValidToRender() /*override*/
@@ -149,8 +203,7 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 {
 	const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(UncheckedGetData());
 
-	glm::vec2 vSize(m_SrcRect.Width() * (m_bIsRaw ? m_uiRawTextureWidth : pData->GetAtlas()->GetWidth()),
-					m_SrcRect.Height() * (m_bIsRaw ? m_uiRawTextureHeight : pData->GetAtlas()->GetHeight()));
+	glm::vec2 vSize(m_UvRect.Width() * m_iFullTextureWidth, m_UvRect.Height() * m_iFullTextureHeight);
 
 	vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
 
@@ -165,20 +218,20 @@ uint32 HyTexturedQuad2d::GetEntireTextureHeight()
 	vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
 
 	glm::vec2 vUV;
-	vUV.x = m_SrcRect.right;//1.0f;
-	vUV.y = m_SrcRect.top;//1.0f;
+	vUV.x = m_UvRect.right;//1.0f;
+	vUV.y = m_UvRect.top;//1.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 	
-	vUV.x = m_SrcRect.left;//0.0f;
-	vUV.y = m_SrcRect.top;//1.0f;
+	vUV.x = m_UvRect.left;//0.0f;
+	vUV.y = m_UvRect.top;//1.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 	
-	vUV.x = m_SrcRect.right;//1.0f;
-	vUV.y = m_SrcRect.bottom;//0.0f;
+	vUV.x = m_UvRect.right;//1.0f;
+	vUV.y = m_UvRect.bottom;//0.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 
-	vUV.x = m_SrcRect.left;//0.0f;
-	vUV.y = m_SrcRect.bottom;//0.0f;
+	vUV.x = m_UvRect.left;//0.0f;
+	vUV.y = m_UvRect.bottom;//0.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 
 	vertexBufferRef.AppendData2d(&GetSceneTransform(fExtrapolatePercent), sizeof(glm::mat4));

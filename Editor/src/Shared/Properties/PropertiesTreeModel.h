@@ -25,6 +25,7 @@ enum PropertiesType
 
 	PROPERTIESTYPE_bool,
 	PROPERTIESTYPE_int,
+	PROPERTIESTYPE_int64,
 	PROPERTIESTYPE_double,			// delegateBuilder [int] = QDoubleSpinBox's decimals value. Aka precision.
 	PROPERTIESTYPE_ivec2,
 	PROPERTIESTYPE_vec2,

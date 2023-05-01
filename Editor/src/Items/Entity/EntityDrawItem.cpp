@@ -12,7 +12,7 @@
 #include "EntityModel.h"
 #include "MainWindow.h"
 
-EntityDrawItem::EntityDrawItem(Project &projectRef, ItemType eGuiType, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent) :
+EntityDrawItem::EntityDrawItem(Project &projectRef, ItemType eGuiType, quint32 uiAssetChecksum, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent) :
 	m_eGuiType(eGuiType),
 	m_Uuid(uuid),
 	m_ProjItemUuid(itemUuid),
@@ -63,9 +63,12 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, ItemType eGuiType, QUuid uui
 				static_cast<HySprite2d *>(m_pChild)->GuiOverrideData<HySpriteData>(itemDataDoc.GetObject());
 				break;
 
+			case ITEM_AtlasFrame:
+				m_pChild = new HyTexturedQuad2d(uiAssetChecksum, pParent);
+				break;
+
 			case ITEM_Primitive:
 			case ITEM_Audio:
-			case ITEM_AtlasFrame:
 			case ITEM_SoundClip:
 			default:
 				HyLogError("EntityDrawItem ctor - unhandled gui item type");
@@ -195,9 +198,8 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 		// "Fixture" category doesn't need to be set
 		break; }
 
-	//case ITEM_AtlasImage:
-		//m_PropertiesTreeModel.AppendCategory("Textured Quad");
-	//	break;
+	case ITEM_AtlasFrame:
+		break;
 
 	case ITEM_Text: {
 		HyText2d *pTextNode = static_cast<HyText2d *>(pHyNode);

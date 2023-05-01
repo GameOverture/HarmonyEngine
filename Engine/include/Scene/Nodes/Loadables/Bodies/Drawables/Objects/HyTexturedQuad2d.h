@@ -16,41 +16,49 @@
 
 class HyTexturedQuad2d : public IHyDrawable2d
 {
-protected:
-	bool				m_bIsRaw;	// This is 'true' when using the raw ctor which by-passes the traditional loading and instead takes info directly from the gfx api
-	uint32				m_uiAtlasGroupId;
-	uint32				m_uiAtlasIndexInGroup;
-	uint32				m_uiRawTextureWidth;
-	uint32				m_uiRawTextureHeight;
-
-	HyRectangle<float>	m_SrcRect;
+	int32										m_iFullTextureWidth;
+	int32										m_iFullTextureHeight;
+	HyRectangle<float>							m_UvRect;
+	HyTextureHandle								m_hTextureHandle;
 
 public:
-	HyTexturedQuad2d(uint32 uiAtlasGrpId, uint32 uiIndexInGroup, HyEntity2d *pParent = nullptr);
-	HyTexturedQuad2d(HyTextureHandle hTextureHandle, uint32 uiTextureWidth, uint32 uiTextureHeight, HyEntity2d *pParent = nullptr);
+	HyTexturedQuad2d(HyEntity2d *pParent = nullptr);
+	HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, HyEntity2d *pParent = nullptr);
+	HyTexturedQuad2d(std::string sFilePath, HyTextureInfo useTextureInfo, HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(const HyTexturedQuad2d &copyRef);
 	virtual ~HyTexturedQuad2d();
 
 	const HyTexturedQuad2d &operator=(const HyTexturedQuad2d &rhs);
 
+	void Init(uint32 uiAtlasFrameChecksum, HyEntity2d *pParent);
+	void Init(std::string sFilePath, HyTextureInfo useTextureInfo, HyEntity2d *pParent);
+	void Uninit();
+
+	bool IsHotloading() const;
+
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 
-	void SetTextureSource(int iX, int iY, int iWidth, int iHeight);
+	//void SetUvCoordinates(int iX, int iY, int iWidth, int iHeight);
 
-	uint32 GetAtlasIndexInGroup();
-	uint32 GetWidth();
-	uint32 GetHeight();
+	uint32 GetWidth() const;
+	uint32 GetHeight() const;
 
-	uint32 GetEntireTextureWidth();
-	uint32 GetEntireTextureHeight();
+	int32 GetEntireTextureWidth() const;
+	int32 GetEntireTextureHeight() const;
 
 protected:
+	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;
+	virtual void OnUnloaded() override;
 
 	virtual bool OnIsValidToRender() override;
 
 	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
+
+private: // Hide inherited Init() and Uninit() functionality, since we overload them with different parameters
+	using IHyLoadable2d::Init;
+	using IHyLoadable2d::Uninit;
 };
 
 #endif /* HyTexturedQuad2d_h__ */

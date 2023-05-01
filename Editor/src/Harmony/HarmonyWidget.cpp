@@ -303,7 +303,69 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 		}
 		else // MIMETYPE_Assets
 		{
-			//QUndoCommand* pCmd = new EntityUndoCmd_AddAssets(*pCurOpenTabItem, validItemList);
+			//QList<IAssetItemData *> assetItemList;
+
+			//QByteArray sSrc = pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_AssetItems));
+			//QJsonDocument assetDoc = QJsonDocument::fromJson(sSrc);
+			//QJsonObject rootAssetObj = assetDoc.object();
+
+			//for(int i = 0; i < NUM_ASSETMANTYPES; ++i)
+			//{
+			//	QJsonArray assetArray = rootAssetObj[HyGlobal::AssetName(static_cast<AssetManagerType>(i))].toArray();
+			//	for(int iAssetIndex = 0; iAssetIndex < assetArray.size(); ++iAssetIndex)
+			//	{
+			//		QJsonObject assetObj = assetArray[iAssetIndex].toObject();
+
+			//		// If asset item is already in the destination project, just simply move it to new filter location
+			//		if(assetObj["project"].toString().toLower() == m_ProjectRef.GetAbsPath().toLower())
+			//		{
+			//			TreeModelItemData *pItemData = nullptr;
+
+			//			if(assetObj["isFilter"].toBool())
+			//			{
+			//				QString sFilterPath = assetObj["filter"].toString();
+			//				if(sFilterPath.isEmpty() == false)
+			//					sFilterPath += "/";
+			//				sFilterPath += assetObj["name"].toString();
+
+			//				pItemData = ReturnFilter(sFilterPath, false);
+			//				if(pItemData == nullptr)
+			//				{
+			//					HyGuiLog("IManagerModel::dropMimeData - ReturnFilter return nullptr with " % sFilterPath, LOGTYPE_Warning);
+			//					continue;
+			//				}
+			//			}
+			//			else
+			//			{
+			//				pItemData = m_ProjectRef.FindItemData(assetObj["assetUUID"].toString());
+			//				if(pItemData == nullptr)
+			//				{
+			//					HyGuiLog("IManagerModel::dropMimeData - could not find by UUID: " % assetObj["assetUUID"].toString(), LOGTYPE_Warning);
+			//					continue;
+			//				}
+			//			}
+			//		}
+			//	}
+			//}
+
+
+
+
+
+
+
+			//
+			//// Parse mime data source for project item array
+			//QJsonDocument doc = QJsonDocument::fromJson(pEvent->mimeData()->data(HyGlobal::MimeTypeString(MIMETYPE_AssetItems)));
+			//QJsonArray itemArray = doc.array();
+			//for(int iIndex = 0; iIndex < itemArray.size(); ++iIndex)
+			//{
+			//
+
+
+
+
+			//QUndoCommand* pCmd = new EntityUndoCmd_AddAssets(*pCurOpenTabItem, assetItemList);
 			//pCurOpenTabItem->GetUndoStack()->push(pCmd);
 		}
 		break; }

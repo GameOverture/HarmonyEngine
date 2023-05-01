@@ -73,6 +73,8 @@ public:
 	virtual uint32 GenerateVertexBuffer() override;
 	virtual uint8 *GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) override;
 
+	virtual void GetTextureSize(uint32 uiTextureHandle, uint32 &uiWidthOut, uint32 &uiHeightOut) override;
+
 private:
 	void CompileShader(HyShader *pShader, HyShaderType eType);
 	void RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera);

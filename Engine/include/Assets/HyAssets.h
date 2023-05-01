@@ -75,7 +75,7 @@ class HyAssets : public IHyThreadClass
 	Factory<HyTextData>											m_TextFactory;
 	Factory<HySpineData>										m_SpineFactory;
 	Factory<HyPrefabData>										m_PrefabFactory;
-	std::map<std::pair<uint32, uint32>, HyTexturedQuadData *>	m_HotLoadTextureMap;
+	std::map<uint32, HyTexturedQuadData *>						m_TextureQuadMap;	// Key is the manifest index
 	std::map<HyAudioHandle, HyAudioData *>						m_HotLoadAudioMap;
 
 	std::vector<IHyLoadable *>									m_QueuedInstList;
@@ -98,7 +98,7 @@ public:
 	IHyFile *GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum);
 
 	HyFileAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
-	HyFileAtlas *GetAtlasUsingGroupId(uint32 uiAtlasGrpId, uint32 uiIndexInGroup);
+	HyFileAtlas *GetAtlasUsingBankId(uint32 uiAtlasBankId, uint32 uiIndexInBank);
 	uint32 GetNumAtlases();
 	HyFilesManifest *GetLoadedAtlases();
 

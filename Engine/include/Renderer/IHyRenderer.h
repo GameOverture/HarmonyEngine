@@ -89,6 +89,8 @@ public:
 	virtual uint32 GenerateVertexBuffer() = 0;	// Returns the graphics API handle to a new vertex buffer in the form of a uint32
 	virtual uint8 *GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) = 0;
 
+	virtual void GetTextureSize(uint32 uiTextureHandle, uint32 &uiWidthOut, uint32 &uiHeightOut) = 0;
+
 	static HyShader *FindShader(HyShaderHandle hHandle);
 	static void AddShader(HyShader *pShader);
 	static void RemoveShader(HyShader *pShader);

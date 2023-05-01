@@ -28,7 +28,7 @@ protected:
 	BanksModel										m_BanksModel;
 
 	Project &										m_ProjectRef;
-	const AssetManagerType									m_eASSET_TYPE;
+	const AssetManagerType							m_eASSET_TYPE;
 
 	bool											m_bIsSingleBank;
 

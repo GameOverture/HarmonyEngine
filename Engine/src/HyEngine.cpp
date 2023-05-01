@@ -10,8 +10,6 @@
 #include "Afx/HyStdAfx.h"
 #include "HyEngine.h"
 
-#include "vendor/SOIL2/src/SOIL2/SOIL2.h"
-
 #include <stdio.h>
 
 HyEngine *HyEngine::sm_pInstance = nullptr;
@@ -280,6 +278,12 @@ void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
 	return sm_pInstance->m_Input;
 }
 
+/*static*/ HyRendererInterop &HyEngine::Renderer()
+{
+	HyAssert(sm_pInstance != nullptr, "HyEngine::Renderer() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Renderer;
+}
+
 /*static*/ HyAudioCore &HyEngine::Audio()
 {
 	HyAssert(sm_pInstance != nullptr, "HyEngine::Audio() was invoked before engine has been initialized.");
@@ -339,32 +343,18 @@ void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
 	return sAbsDataDir;
 }
 
-/*static*/ HyTextureHandle HyEngine::HotLoadTexture(std::string sFilePath, HyTextureFiltering eFiltering, int32 &iWidthOut, int32 &iHeightOut)
-{
-	HyAssert(sm_pInstance != nullptr, "HyEngine::HotLoadTexture() was invoked before engine has been initialized.");
+///*static*/ HyTextureHandle HyEngine::HotLoadTexture(std::string sFilePath, HyTextureFiltering eFiltering, int32 &iWidthOut, int32 &iHeightOut)
+//{
+//	HyAssert(sm_pInstance != nullptr, "HyEngine::HotLoadTexture() was invoked before engine has been initialized.");
+//
+//	
+//}
 
-	int iNum8bitClrChannels;
-	uint8 *pPixelData = SOIL_load_image(sFilePath.c_str(), &iWidthOut, &iHeightOut, &iNum8bitClrChannels, 4);
-	uint32 uiPixelDataSize = iWidthOut * iHeightOut * 4;
-
-	HyTextureHandle hNewTex = sm_pInstance->m_Renderer.AddTexture(
-		HyTextureInfo(eFiltering, HYTEXTURE_Uncompressed, 4, 0),
-		iWidthOut,
-		iHeightOut,
-		pPixelData,
-		uiPixelDataSize,
-		0);
-
-	SOIL_free_image_data(pPixelData);
-
-	return hNewTex;
-}
-
-/*static*/ void HyEngine::HotUnloadTexture(HyTextureHandle hTexHandle)
-{
-	HyAssert(sm_pInstance != nullptr, "HyEngine::HotUnloadTexture() was invoked before engine has been initialized.");
-	sm_pInstance->m_Renderer.DeleteTexture(hTexHandle);
-}
+///*static*/ void HyEngine::HotUnloadTexture(HyTextureHandle hTexHandle)
+//{
+//	HyAssert(sm_pInstance != nullptr, "HyEngine::HotUnloadTexture() was invoked before engine has been initialized.");
+//	
+//}
 
 /*static*/ HyAudioHandle HyEngine::HotLoadAudio(std::string sFilePath, bool bIsStreaming /*= false*/, int32 iInstanceLimit /*= 0*/)
 {

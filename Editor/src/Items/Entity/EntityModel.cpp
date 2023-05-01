@@ -144,9 +144,9 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 		propertiesTreeModelRef.AppendProperty("Fixture", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", false, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
 		break;
 
-		//case ITEM_AtlasImage:
-		//	m_PropertiesTreeModel.AppendCategory("Textured Quad");
-		//	break;
+	case ITEM_AtlasFrame:
+		// No texture quad specific properties
+		break;
 
 	case ITEM_Text:
 		propertiesTreeModelRef.AppendCategory("Text", pItemData->GetItemUuid().toString(QUuid::WithoutBraces));

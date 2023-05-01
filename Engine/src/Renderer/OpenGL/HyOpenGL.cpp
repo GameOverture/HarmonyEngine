@@ -882,6 +882,21 @@ HyOpenGL::~HyOpenGL(void)
 	return nullptr;
 }
 
+/*virtual*/ void HyOpenGL::GetTextureSize(uint32 uiTextureHandle, uint32 &uiWidthOut, uint32 &uiHeightOut) /*override*/
+{
+	glBindTexture(GL_TEXTURE_2D, uiTextureHandle);
+	HyErrorCheck_OpenGL("HyOpenGL:GetTextureSize", "glBindTexture");
+
+	GLint iWidth, iHeight;
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &iWidth);
+	HyErrorCheck_OpenGL("HyOpenGL:GetTextureSize", "glGetTexLevelParameteriv");
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &iHeight);
+	HyErrorCheck_OpenGL("HyOpenGL:GetTextureSize", "glGetTexLevelParameteriv");
+
+	uiWidthOut = static_cast<uint32>(iWidth);
+	uiHeightOut = static_cast<uint32>(iHeight);
+}
+
 void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 {
 	GLuint iShaderHandle = 0;

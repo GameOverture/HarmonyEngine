@@ -20,7 +20,7 @@ class HyAssets;
 class HyFileAtlas : public IHyFile
 {
 	const uint32							m_uiBANK_ID;
-	const uint32							m_uiINDEX_IN_GROUP;
+	const uint32							m_uiINDEX_IN_BANK;
 	const uint32							m_uiWIDTH;
 	const uint32							m_uiHEIGHT;
 
@@ -49,14 +49,14 @@ class HyFileAtlas : public IHyFile
 public:
 	HyFileAtlas(std::string sFileName,
 		uint32 uiBankId,
-		uint32 uiIndexInGroup,
+		uint32 uiIndexInBank,
 		uint32 uiManifestIndex,
 		HyJsonObj textureObj);
 
 	~HyFileAtlas();
 
 	uint32 GetBankId() const;
-	uint32 GetIndexInGroup() const;
+	uint32 GetIndexInBank() const;
 	
 	uint32 GetWidth() const;
 	uint32 GetHeight() const;

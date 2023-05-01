@@ -284,6 +284,9 @@ QJsonObject PropertiesTreeModel::SerializeJson()
 			case PROPERTIESTYPE_SpriteFrames:
 				categoryObj.insert(sPropName, propValue.toInt());
 				break;
+			case PROPERTIESTYPE_int64:
+				categoryObj.insert(sPropName, propValue.toLongLong());
+				break;
 			case PROPERTIESTYPE_double:
 				categoryObj.insert(sPropName, propValue.toDouble());
 				break;
@@ -355,6 +358,10 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 			case PROPERTIESTYPE_Slider:
 			case PROPERTIESTYPE_SpriteFrames:
 				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toInt());
+				break;
+
+			case PROPERTIESTYPE_int64:
+				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toVariant().toLongLong());
 				break;
 					
 			case PROPERTIESTYPE_double:
@@ -563,6 +570,9 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 	case PROPERTIESTYPE_Slider:
 	case PROPERTIESTYPE_SpriteFrames:
 		sRetStr += QString::number(treeItemValue.toInt());
+		break;
+	case PROPERTIESTYPE_int64:
+		sRetStr += QString::number(treeItemValue.toLongLong());
 		break;
 	case PROPERTIESTYPE_double:
 		sRetStr += QString::number(treeItemValue.toDouble());
