@@ -799,7 +799,7 @@ void HyAssets::FinalizeData(IHyFile *pData)
 			if(m_FilesMap[pData->GetLoadableType()].m_pLoadedManifest)
 			{
 				m_FilesMap[pData->GetLoadableType()].m_pLoadedManifest->Set(static_cast<HyFileAtlas *>(pData)->GetManifestIndex());
-				HyLogInfo(pData->AssetTypeName() << " [" << pData->GetManifestIndex() << "] loaded");
+				HyLogInfo(pData->AssetTypeName() << " loaded [" << pData->GetManifestIndex() << "] " << pData->GetAssetInfo());
 			}
 
 			// Check queued list upon every loaded piece of data that comes through
@@ -823,7 +823,7 @@ void HyAssets::FinalizeData(IHyFile *pData)
 			if((*iter) == pData)
 			{
 				pData->m_eLoadState = HYLOADSTATE_Queued;
-				HyLogInfo(pData->AssetTypeName() << " [" << pData->GetManifestIndex() << "] reloading");
+				HyLogInfo(pData->AssetTypeName() << " reloading [" << pData->GetManifestIndex() << "] " << pData->GetAssetInfo());
 
 				m_Load_Prepare.push(pData);
 
@@ -836,7 +836,7 @@ void HyAssets::FinalizeData(IHyFile *pData)
 		if(bFoundInReloadList == false)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Inactive;
-			HyLogInfo(pData->AssetTypeName() << " [" << pData->GetManifestIndex() << "] deleted");
+			HyLogInfo(pData->AssetTypeName() << " deleted [" << pData->GetManifestIndex() << "] " << pData->GetAssetInfo());
 		}
 	}
 }

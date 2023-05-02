@@ -69,6 +69,8 @@ public:
 	virtual void OnLoadThread() override;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 
+	virtual std::string GetAssetInfo() override;
+
 protected:
 	unsigned char *LoadAstc(std::string sAtlasFilePath, uint32 &uiPixelDataSizeOut);
 };

@@ -101,6 +101,8 @@ private Q_SLOTS:
 
 	void on_actionBankSettings_triggered();
 
+	void on_actionOpenBankExplorer_triggered();
+
 	void on_actionRemoveBank_triggered();
 
 	void on_actionBankTransfer_triggered(QAction *pAction);

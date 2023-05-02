@@ -59,6 +59,8 @@ public:
 	virtual std::string AssetTypeName() override;
 	virtual void OnLoadThread() override;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
+
+	virtual std::string GetAssetInfo() override;
 };
 
 #endif /* HyShader_h__ */

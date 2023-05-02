@@ -135,3 +135,10 @@ void HyShader::Finalize()
 
 	m_bIsFinalized = true;
 }
+
+/*virtual*/ std::string HyShader::GetAssetInfo() /*override*/
+{
+	std::stringstream ss;
+	ss << m_sFILE_NAME << ", Defaults From: " << m_eDEFAULTS_FROM;
+	return ss.str();
+}

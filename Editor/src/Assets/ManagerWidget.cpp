@@ -206,6 +206,7 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 
 	ui->btnAddBank->setDefaultAction(ui->actionAddBank);
 	ui->btnRemoveBank->setDefaultAction(ui->actionRemoveBank);
+	ui->btnOpenExplorer->setDefaultAction(ui->actionOpenBankExplorer);
 	ui->btnBankSettings->setDefaultAction(ui->actionBankSettings);
 
 	ui->btnGenerateAsset->setDefaultAction(ui->actionGenerateAsset);
@@ -645,6 +646,22 @@ void ManagerWidget::on_actionAddBank_triggered()
 void ManagerWidget::on_actionBankSettings_triggered()
 {
 	m_pModel->OnBankSettingsDlg(ui->cmbBanks->currentIndex());
+}
+
+void ManagerWidget::on_actionOpenBankExplorer_triggered()
+{
+	BankData *pBankData = static_cast<BanksModel *>(m_pModel->GetBanksModel())->GetBank(ui->cmbBanks->currentIndex());
+	if(pBankData)
+	{
+		QDir atlasDir(pBankData->m_sAbsPath);
+		QFileInfoList fileInfoList = atlasDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name);
+		if(fileInfoList.empty())
+			HyGlobal::OpenFileInExplorer(pBankData->m_sAbsPath);
+		else
+			HyGlobal::OpenFileInExplorer(fileInfoList[0].absoluteFilePath());
+	}
+	else
+		HyGuiLog("Bank does not exist", LOGTYPE_Error);
 }
 
 void ManagerWidget::on_actionRemoveBank_triggered()

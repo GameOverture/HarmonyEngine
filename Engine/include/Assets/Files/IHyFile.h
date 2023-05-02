@@ -48,6 +48,8 @@ public:
 	virtual std::string AssetTypeName() = 0;
 	virtual void OnLoadThread() = 0;
 	virtual void OnRenderThread(IHyRenderer &rendererRef) = 0;
+
+	virtual std::string GetAssetInfo() = 0;
 };
 
 #endif /* IHyFile_h__ */

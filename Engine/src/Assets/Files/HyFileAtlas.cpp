@@ -187,6 +187,13 @@ void HyFileAtlas::DeletePixelData()
 	m_Mutex_PixelData.unlock();
 }
 
+/*virtual*/ std::string HyFileAtlas::GetAssetInfo() /*override*/
+{
+	std::stringstream ss;
+	ss << "Bank " << m_uiBANK_ID << ", Index " << m_uiINDEX_IN_BANK;
+	return ss.str();
+}
+
 uint8 *HyFileAtlas::LoadAstc(std::string sAtlasFilePath, uint32 &uiPixelDataSizeOut)
 {
 	std::vector<uint8> astcData;

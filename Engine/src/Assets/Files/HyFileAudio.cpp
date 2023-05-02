@@ -69,3 +69,10 @@ HySoundBuffers *HyFileAudio::GetSound(uint32 uiChecksum)
 /*virtual*/ void HyFileAudio::OnRenderThread(IHyRenderer &rendererRef) /*override*/
 {
 }
+
+/*virtual*/ std::string HyFileAudio::GetAssetInfo() /*override*/
+{
+	std::stringstream ss;
+	ss << "Bank " << m_sFILE_NAME << ", NumSounds: " << m_SoundBuffers.size();
+	return ss.str();
+}
