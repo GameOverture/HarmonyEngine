@@ -11,6 +11,7 @@
 #define IHyConsole_h__
 
 #include <mutex>
+#include <iomanip>
 #include "Afx/HyStdAfx.h"
 
 class IHyConsole

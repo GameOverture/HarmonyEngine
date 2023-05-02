@@ -190,7 +190,7 @@ void HyFileAtlas::DeletePixelData()
 /*virtual*/ std::string HyFileAtlas::GetAssetInfo() /*override*/
 {
 	std::stringstream ss;
-	ss << "Bank " << m_uiBANK_ID << ", Index " << m_uiINDEX_IN_BANK;
+	ss << "Bank " << m_uiBANK_ID << ", Index " << m_uiINDEX_IN_BANK << " (" << HyAssets::GetTextureFormatName(m_TextureInfo.GetFormat()) << ")";
 	return ss.str();
 }
 
