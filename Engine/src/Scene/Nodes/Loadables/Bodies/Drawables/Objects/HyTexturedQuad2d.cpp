@@ -141,15 +141,14 @@ int32 HyTexturedQuad2d::GetEntireTextureHeight() const
 
 /*virtual*/ void HyTexturedQuad2d::OnDataAcquired() /*override*/
 {
-	// NOTE: Data is only valid when the checksum ctor is used. Otherwise OnDataAcquired() isn't invoked and internal data is set when the texture is 'hotloaded' within Load()
+	// NOTE: Data is only valid when the checksum ctor is used (checksum stored in the name as a string). Otherwise OnDataAcquired() isn't invoked and internal data is set when the texture is 'hotloaded' within Load()
 	const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(UncheckedGetData());
 
 	m_iFullTextureWidth = pData->GetAtlas()->GetWidth();
 	m_iFullTextureHeight = pData->GetAtlas()->GetHeight();
-	pData->GetAtlas()->GetUvRect(std::stoi(GetName()), m_UvRect);
-	m_hTextureHandle = pData->GetAtlas()->GetTextureHandle();
 
-	m_ShaderUniforms.SetTexHandle(0, m_hTextureHandle);
+	uint32 uiChecksum = static_cast<uint32>(std::stoll(GetName()));
+	pData->GetAtlas()->GetUvRect(uiChecksum, m_UvRect);
 }
 
 /*virtual*/ void HyTexturedQuad2d::OnLoaded() /*override*/
@@ -162,8 +161,9 @@ int32 HyTexturedQuad2d::GetEntireTextureHeight() const
 		uint8 *pPixelData = SOIL_load_image(m_sPrefix.c_str(), &m_iFullTextureWidth, &m_iFullTextureHeight, &iNum8bitClrChannels, 4);
 		uint32 uiPixelDataSize = m_iFullTextureWidth * m_iFullTextureHeight * 4;
 
+		uint32 uiBucketId = static_cast<uint32>(std::stoll(GetName()));
 		m_hTextureHandle = HyEngine::Renderer().AddTexture(
-			HyTextureInfo(std::stoi(m_sName)),
+			HyTextureInfo(uiBucketId),
 			m_iFullTextureWidth,
 			m_iFullTextureHeight,
 			pPixelData,
@@ -171,6 +171,11 @@ int32 HyTexturedQuad2d::GetEntireTextureHeight() const
 			0);
 		SOIL_free_image_data(pPixelData);
 
+		m_ShaderUniforms.SetTexHandle(0, m_hTextureHandle);
+	}
+	else
+	{
+		m_hTextureHandle = static_cast<const HyTexturedQuadData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle();
 		m_ShaderUniforms.SetTexHandle(0, m_hTextureHandle);
 	}
 }

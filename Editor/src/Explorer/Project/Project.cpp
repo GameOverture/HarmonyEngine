@@ -206,9 +206,9 @@ void Project::LoadExplorerModel()
 			continue;
 		}
 
-		// Determine which enum type of 'HyGuiItemType' - if not found in HyGlobal::GetProjItemTypeList skip it
+		// Determine which enum type of 'HyGuiItemType' - if not found in HyGlobal::GetItemTypeList_Project skip it
 		ItemType eItemType = ITEM_Unknown;
-		QList<ItemType> typeList = HyGlobal::GetProjItemTypeList();
+		QList<ItemType> typeList = HyGlobal::GetItemTypeList_Project();
 		for(int j = 0; j < typeList.size(); ++j)
 		{
 			ItemType eTmpType = typeList[j];
@@ -768,7 +768,7 @@ bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
 
 	// Ensure save object has all the valid types in map
 	bool bTypeNotFound = false;
-	QList<ItemType> typeList = HyGlobal::GetProjItemTypeList();
+	QList<ItemType> typeList = HyGlobal::GetItemTypeList_Project();
 	for(int i = 0; i < typeList.size(); ++i)
 	{
 		QString sTypeName = HyGlobal::ItemName(typeList[i], true);
@@ -802,7 +802,7 @@ void Project::DeletePrefixAndContents(QString sPrefix, bool bWriteToDisk)
 {
 	bool bItemsDeleted = false;
 
-	QList<ItemType> typeList = HyGlobal::GetProjItemTypeList();
+	QList<ItemType> typeList = HyGlobal::GetItemTypeList_Project();
 	for(auto itemTypeIter = m_ProjectFileData.m_Data.begin(); itemTypeIter != m_ProjectFileData.m_Data.end(); ++itemTypeIter)
 	{
 		ItemType eType = ITEM_Unknown;
@@ -1228,7 +1228,7 @@ void Project::RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObj
 	if(sNewPath.endsWith('/', Qt::CaseInsensitive) == false)
 		sNewPath += '/';
 
-	QList<ItemType> typeList = HyGlobal::GetProjItemTypeList();
+	QList<ItemType> typeList = HyGlobal::GetItemTypeList_Project();
 	for(auto itemTypeIter = dataObjRef.begin(); itemTypeIter != dataObjRef.end(); ++itemTypeIter)
 	{
 		if(itemTypeIter.key().compare("$fileVersion") == 0)

@@ -236,8 +236,9 @@ class HyGlobal
 public:
 	static void Initialize();
 
-	static QList<ItemType> GetProjItemTypeList();
-	static QList<ItemType> GetTypeList();
+	static QList<ItemType> GetItemTypeList();
+	static QList<ItemType> GetItemTypeList_Project();
+	static QList<ItemType> GetItemTypeList_Asset();
 	static QList<EditorShape> GetShapeList();
 	static QStringList GetTypeNameList();
 	static ItemType GetTypeFromString(QString sType);
@@ -248,13 +249,16 @@ public:
 	static QStringList GetAlignmentNameList();
 	static HyAlignment GetAlignmentFromString(QString sAlignment);
 
-	static const QString ItemName(ItemType eItem, bool bPlural)	{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
-	static const QString AssetName(AssetManagerType eAsset)					{ return sm_AssetNames[eAsset]; }
+	static bool IsItemType_Project(ItemType eType);
+	static bool IsItemType_Asset(ItemType eType);
+
+	static const QString ItemName(ItemType eItem, bool bPlural)			{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
+	static const QString AssetName(AssetManagerType eAsset)				{ return sm_AssetNames[eAsset]; }
 	static const QString ShapeName(EditorShape eShape)					{ return sm_ShapeNames[eShape]; }
 	static const QString ItemExt(ItemType eItem);
-	static const QIcon ItemIcon(ItemType eItm, SubIcon eSubIcon)	{ return sm_ItemIcons[eItm][eSubIcon]; }
+	static const QIcon ItemIcon(ItemType eItm, SubIcon eSubIcon)		{ return sm_ItemIcons[eItm][eSubIcon]; }
 	static const QIcon AssetIcon(AssetManagerType eAsset, SubIcon eSubIcon);
-	static const QColor ItemColor(ItemType eItem)					{ return sm_ItemColors[eItem]; }
+	static const QColor ItemColor(ItemType eItem)						{ return sm_ItemColors[eItem]; }
 	static const QString MimeTypeString(MimeType eMimeType)				{ return sm_MimeTypes[eMimeType]; }
 	static const QString ThemeString(Theme eTheme)						{ return sm_Themes[eTheme]; }
 

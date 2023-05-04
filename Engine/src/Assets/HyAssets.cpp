@@ -254,8 +254,9 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 	case HYTYPE_TexturedQuad:
 		if(pLoadable->GetPrefix().empty()) // If Prefix is empty, then Name contains the 'checksum' as a string, otherwise it's "N/A" or path to an image for hotload and HyTexturedQuadData isn't used
 		{
+			uint32 uiChecksum = static_cast<uint32>(std::stoll(pLoadable->GetName()));
 			HyRectangle<float> uvRect;
-			HyFileAtlas *pAtlas = GetAtlas(std::stoi(pLoadable->GetName()), uvRect);
+			HyFileAtlas *pAtlas = GetAtlas(uiChecksum, uvRect);
 			uint32 uiKey = pAtlas->GetManifestIndex();
 
 			if(m_TextureQuadMap.find(uiKey) == m_TextureQuadMap.end())

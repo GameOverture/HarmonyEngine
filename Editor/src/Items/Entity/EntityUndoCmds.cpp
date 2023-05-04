@@ -330,27 +330,34 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	m_sOldShapeDataList.clear();
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
+		PropertiesTreeModel *pPropTreeModel = m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex);
+		if(pPropTreeModel == nullptr)
+		{
+			HyGuiLog("EntityUndoCmd_Transform::redo() - PropertiesTreeModel is nullptr", LOGTYPE_Error);
+			continue;
+		}
+
 		if(m_AffectedItemDataList[i]->GetType() != ITEM_BoundingVolume)
 		{
 			glm::decompose(m_NewTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
 			double dRotation = glm::degrees(glm::atan(m_NewTransformList[i][0][1], m_NewTransformList[i][0][0]));
 
-			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
-			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Rotation", dRotation);
-			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+			pPropTreeModel->SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
+			pPropTreeModel->SetPropertyValue("Transformation", "Rotation", dRotation);
+			pPropTreeModel->SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
 
 			m_sOldShapeDataList.push_back(QString());
 		}
-		else
+		else // ITEM_BoundingVolume
 		{
 			ShapeCtrl shapeCtrl(nullptr);
-			shapeCtrl.Setup(HyGlobal::GetShapeFromString(m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).FindPropertyValue("Shape", "Type").toString()), HyColor::White, 0.0f, 1.0f);
+			shapeCtrl.Setup(HyGlobal::GetShapeFromString(pPropTreeModel->FindPropertyValue("Shape", "Type").toString()), HyColor::White, 0.0f, 1.0f);
 
-			m_sOldShapeDataList.push_back(m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).FindPropertyValue("Shape", "Data").toString());
+			m_sOldShapeDataList.push_back(pPropTreeModel->FindPropertyValue("Shape", "Data").toString());
 			shapeCtrl.Deserialize(m_sOldShapeDataList.last(), nullptr);
 			shapeCtrl.TransformSelf(m_NewTransformList[i]);
 			
-			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Shape", "Data", shapeCtrl.Serialize());
+			pPropTreeModel->SetPropertyValue("Shape", "Data", shapeCtrl.Serialize());
 		}
 
 		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
@@ -373,17 +380,24 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	QList<QUuid> affectedItemUuidList;
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
+		PropertiesTreeModel *pPropTreeModel = m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex);
+		if(pPropTreeModel == nullptr)
+		{
+			HyGuiLog("EntityUndoCmd_Transform::redo() - PropertiesTreeModel is nullptr", LOGTYPE_Error);
+			continue;
+		}
+
 		if(m_AffectedItemDataList[i]->GetType() != ITEM_BoundingVolume)
 		{
 			glm::decompose(m_OldTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
 
 			double dRotation = glm::degrees(glm::atan(m_OldTransformList[i][0][1], m_OldTransformList[i][0][0]));
-			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
-			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Rotation", dRotation);
-			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+			pPropTreeModel->SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
+			pPropTreeModel->SetPropertyValue("Transformation", "Rotation", dRotation);
+			pPropTreeModel->SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
 		}
 		else
-			m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Shape", "Data", m_sOldShapeDataList[i]);
+			pPropTreeModel->SetPropertyValue("Shape", "Data", m_sOldShapeDataList[i]);
 
 		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
 	}
@@ -403,7 +417,7 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef,
 	m_pShapeItemData(pShapeItemData),
 	m_eVemAction(eVemAction),
 	m_sNewData(sNewData),
-	m_sPrevData(m_pShapeItemData->GetPropertiesModel(iStateIndex).FindPropertyValue("Shape", "Data").toString())
+	m_sPrevData(m_pShapeItemData->GetPropertiesModel(iStateIndex)->FindPropertyValue("Shape", "Data").toString())
 {
 	switch(m_eVemAction)
 	{
@@ -439,7 +453,7 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef,
 
 /*virtual*/ void EntityUndoCmd_ShapeData::redo() /*override*/
 {
-	m_pShapeItemData->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Shape", "Data", m_sNewData);
+	m_pShapeItemData->GetPropertiesModel(m_iStateIndex)->SetPropertyValue("Shape", "Data", m_sNewData);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
@@ -452,7 +466,7 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef,
 
 /*virtual*/ void EntityUndoCmd_ShapeData::undo() /*override*/
 {
-	m_pShapeItemData->GetPropertiesModel(m_iStateIndex).SetPropertyValue("Shape", "Data", m_sPrevData);
+	m_pShapeItemData->GetPropertiesModel(m_iStateIndex)->SetPropertyValue("Shape", "Data", m_sPrevData);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
@@ -487,18 +501,18 @@ EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityIt
 
 	if(m_pNewShapeItemData == nullptr)
 	{
-		EditorShape eShape = HyGlobal::GetShapeFromString(m_pPrevShapeItemData->GetPropertiesModel(0).FindPropertyValue("Shape", "Type").toString());
-		QString sData = m_pPrevShapeItemData->GetPropertiesModel(0).FindPropertyValue("Shape", "Data").toString();
+		EditorShape eShape = HyGlobal::GetShapeFromString(m_pPrevShapeItemData->GetPropertiesModel(0)->FindPropertyValue("Shape", "Type").toString());
+		QString sData = m_pPrevShapeItemData->GetPropertiesModel(0)->FindPropertyValue("Shape", "Data").toString();
 		bool bConvertingToPrimitive = m_pPrevShapeItemData->GetType() == ITEM_BoundingVolume;
 
 		m_pNewShapeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewShape(eShape, sData, bConvertingToPrimitive, -1);
 		for(int iStateIndex = 0; iStateIndex < m_EntityItemRef.GetModel()->GetNumStates(); ++iStateIndex)
 		{
-			QString sPrevShapeType = m_pPrevShapeItemData->GetPropertiesModel(iStateIndex).FindPropertyValue("Shape", "Type").toString();
-			QString sPrevShapeData = m_pPrevShapeItemData->GetPropertiesModel(iStateIndex).FindPropertyValue("Shape", "Data").toString();
+			QString sPrevShapeType = m_pPrevShapeItemData->GetPropertiesModel(iStateIndex)->FindPropertyValue("Shape", "Type").toString();
+			QString sPrevShapeData = m_pPrevShapeItemData->GetPropertiesModel(iStateIndex)->FindPropertyValue("Shape", "Data").toString();
 
-			m_pNewShapeItemData->GetPropertiesModel(iStateIndex).SetPropertyValue("Shape", "Type", sPrevShapeType);
-			m_pNewShapeItemData->GetPropertiesModel(iStateIndex).SetPropertyValue("Shape", "Data", sPrevShapeData);
+			m_pNewShapeItemData->GetPropertiesModel(iStateIndex)->SetPropertyValue("Shape", "Type", sPrevShapeType);
+			m_pNewShapeItemData->GetPropertiesModel(iStateIndex)->SetPropertyValue("Shape", "Data", sPrevShapeData);
 		}
 	}
 	else

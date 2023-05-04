@@ -278,8 +278,8 @@ EntityWidget::~EntityWidget()
 			ui->lblSelectedItemText->setVisible(true);
 			ui->lblSelectedItemText->setText(pEntTreeItemData->GetCodeName() % " Properties");
 
-			PropertiesTreeModel &propModelRef = pEntTreeItemData->GetPropertiesModel(GetCurStateIndex());
-			ui->propertyTree->setModel(&propModelRef);
+			PropertiesTreeModel *pPropModelRef = pEntTreeItemData->GetPropertiesModel(GetCurStateIndex());
+			ui->propertyTree->setModel(pPropModelRef);
 
 			bEnableVemMode = (pEntTreeItemData->GetType() == ITEM_Primitive || pEntTreeItemData->GetType() == ITEM_BoundingVolume || pEntTreeItemData->GetType() == ITEM_Text);
 		}

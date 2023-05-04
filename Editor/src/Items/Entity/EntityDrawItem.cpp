@@ -12,27 +12,35 @@
 #include "EntityModel.h"
 #include "MainWindow.h"
 
-EntityDrawItem::EntityDrawItem(Project &projectRef, ItemType eGuiType, quint32 uiAssetChecksum, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent) :
-	m_eGuiType(eGuiType),
-	m_Uuid(uuid),
-	m_ProjItemUuid(itemUuid),
+EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, HyEntity2d *pParent) :
+	m_pEntityTreeItemData(pEntityTreeItemData),
 	m_pChild(nullptr),
 	m_Transform(pParent),
 	m_ShapeCtrl(pParent)
 {
-	if(m_eGuiType != ITEM_BoundingVolume && m_eGuiType != ITEM_Primitive)
+	if(m_pEntityTreeItemData->GetAssetChecksum() != 0)
 	{
-		ProjectItemData *pProjItemData = static_cast<ProjectItemData *>(projectRef.FindItemData(m_ProjItemUuid));
-		if(pProjItemData == nullptr)
+		if(m_pEntityTreeItemData->GetType() == ITEM_AtlasFrame)
+			m_pChild = new HyTexturedQuad2d(m_pEntityTreeItemData->GetAssetChecksum(), pParent);
+		else
+			HyGuiLog("EntityDrawItem ctor - asset item not handled: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
+	}
+	else if(HyGlobal::IsItemType_Project(m_pEntityTreeItemData->GetType()))
+	{
+		QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
+		TreeModelItemData *pReferencedItemData = static_cast<ProjectItemData *>(projectRef.FindItemData(referencedItemUuid));
+		if(pReferencedItemData == nullptr || pReferencedItemData->IsProjectItem() == false)
 		{
-			HyGuiLog("EntityDrawItem::RefreshOverrideData - could not find item data for: " % m_ProjItemUuid.toString(), LOGTYPE_Error);
+			HyGuiLog("EntityDrawItem ctor - could not find referenced item data UUID: " % referencedItemUuid.toString(), LOGTYPE_Error);
 			return;
 		}
+
+		ProjectItemData *pProjItemData = static_cast<ProjectItemData *>(pReferencedItemData);
 
 		FileDataPair fileDataPair;
 		pProjItemData->GetSavedFileData(fileDataPair);
 
-		if(m_eGuiType == ITEM_Entity)
+		if(m_pEntityTreeItemData->GetType() == ITEM_Entity)
 		{
 			m_pChild = new SubEntity(pParent);
 			SubEntity *pSubEntity = static_cast<SubEntity *>(m_pChild);
@@ -43,10 +51,10 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, ItemType eGuiType, quint32 u
 			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
 			HyJsonDoc itemDataDoc;
 			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-				HyGuiLog("EntityDraw::ItemWidget::RefreshOverrideData failed to parse its file data", LOGTYPE_Error);
+				HyGuiLog("EntityDrawItem ctor - failed to parse its file data", LOGTYPE_Error);
 
 #undef GetObject
-			switch(m_eGuiType)
+			switch(m_pEntityTreeItemData->GetType())
 			{
 			case ITEM_Text:
 				m_pChild = new HyText2d("", HY_GUI_DATAOVERRIDE, pParent);
@@ -63,10 +71,6 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, ItemType eGuiType, quint32 u
 				static_cast<HySprite2d *>(m_pChild)->GuiOverrideData<HySpriteData>(itemDataDoc.GetObject());
 				break;
 
-			case ITEM_AtlasFrame:
-				m_pChild = new HyTexturedQuad2d(uiAssetChecksum, pParent);
-				break;
-
 			case ITEM_Primitive:
 			case ITEM_Audio:
 			case ITEM_SoundClip:
@@ -75,9 +79,10 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, ItemType eGuiType, quint32 u
 				break;
 			}
 		}
-
-		m_pChild->Load();
 	}
+
+	if(m_pChild)
+		m_pChild->Load();
 
 	HideTransformCtrl();
 }
@@ -87,24 +92,14 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, ItemType eGuiType, quint32 u
 	delete m_pChild;
 }
 
-ItemType EntityDrawItem::GetGuiType() const
+EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 {
-	return m_eGuiType;
-}
-
-const QUuid &EntityDrawItem::GetThisUuid() const
-{
-	return m_Uuid;
-}
-
-const QUuid &EntityDrawItem::GetProjItemUuid() const
-{
-	return m_ProjItemUuid;
+	return m_pEntityTreeItemData;
 }
 
 IHyLoadable2d *EntityDrawItem::GetHyNode()
 {
-	if(m_eGuiType == ITEM_Primitive || m_eGuiType == ITEM_BoundingVolume)
+	if(m_pEntityTreeItemData->GetType() == ITEM_Primitive || m_pEntityTreeItemData->GetType() == ITEM_BoundingVolume)
 		return &m_ShapeCtrl.GetPrimitive();
 
 	return m_pChild;
@@ -134,15 +129,15 @@ bool EntityDrawItem::IsMouseInBounds()
 //		 Updates here should reflect to the function above
 void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCamera2d *pCamera)
 {
-	if(m_eGuiType == ITEM_Prefix) // aka Shapes folder
+	if(m_pEntityTreeItemData->GetType() == ITEM_Prefix) // aka Shapes folder
 		return;
 
 	IHyLoadable2d *pHyNode = GetHyNode();
 	bool bIsSelected = descObj["isSelected"].toBool();
 
-	// Parse all and only the potential categories of the 'm_eGuiType' type, and set the values to 'pHyNode'
+	// Parse all and only the potential categories of the 'm_pEntityTreeItemData->GetType()' type, and set the values to 'pHyNode'
 	HyColor colorTint = ENTCOLOR_Shape;
-	if(m_eGuiType != ITEM_BoundingVolume)
+	if(m_pEntityTreeItemData->GetType() != ITEM_BoundingVolume)
 	{
 		QJsonObject commonObj = propObj["Common"].toObject();
 
@@ -158,7 +153,7 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 		QJsonArray scaleArray = transformObj["Scale"].toArray();
 		pHyNode->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
 
-		if(m_eGuiType != ITEM_Audio && (pHyNode->GetInternalFlags() & IHyNode::NODETYPE_IsBody) != 0)
+		if(m_pEntityTreeItemData->GetType() != ITEM_Audio && (pHyNode->GetInternalFlags() & IHyNode::NODETYPE_IsBody) != 0)
 		{
 			QJsonObject bodyObj = propObj["Body"].toObject();
 			pHyNode->SetVisible(bodyObj["Visible"].toBool());
@@ -175,7 +170,7 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 		}
 	}
 
-	switch(m_eGuiType)
+	switch(m_pEntityTreeItemData->GetType())
 	{
 	case ITEM_Entity:
 		// "Physics" category doesn't need to be set
@@ -190,8 +185,8 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 	case ITEM_BoundingVolume: {
 		QJsonObject shapeObj = propObj["Shape"].toObject();
 		EditorShape eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
-		float fBvAlpha = (m_eGuiType == ITEM_BoundingVolume) ? 0.0f : 1.0f;
-		float fOutlineAlpha = (m_eGuiType == ITEM_BoundingVolume || bIsSelected) ? 1.0f : 0.0f;
+		float fBvAlpha = (m_pEntityTreeItemData->GetType() == ITEM_BoundingVolume) ? 0.0f : 1.0f;
+		float fOutlineAlpha = (m_pEntityTreeItemData->GetType() == ITEM_BoundingVolume || bIsSelected) ? 1.0f : 0.0f;
 
 		GetShapeCtrl().Setup(eShape, colorTint, fBvAlpha, fOutlineAlpha);
 		GetShapeCtrl().Deserialize(shapeObj["Data"].toString(), pCamera);
@@ -260,7 +255,7 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 		break; }
 
 	default:
-		HyGuiLog(QString("EntityDrawItem::RefreshJson - unsupported type: ") % QString::number(m_eGuiType), LOGTYPE_Error);
+		HyGuiLog(QString("EntityDrawItem::RefreshJson - unsupported type: ") % QString::number(m_pEntityTreeItemData->GetType()), LOGTYPE_Error);
 		break;
 	}
 }
@@ -278,7 +273,7 @@ void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
 void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)
 {
 	transformMtxOut = glm::identity<glm::mat4>();
-	switch(GetGuiType())
+	switch(m_pEntityTreeItemData->GetType())
 	{
 	case ITEM_BoundingVolume:
 	case ITEM_AtlasFrame:

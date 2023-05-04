@@ -12,12 +12,12 @@
 
 #include "IDraw.h"
 
+class EntityTreeItemData;
+
 // NOTE: this class does not keep its state when removed, it is deleted (should not be passed to UndoCmd's)
 class EntityDrawItem
 {
-	ItemType								m_eGuiType;
-	QUuid									m_Uuid;
-	QUuid									m_ProjItemUuid;
+	EntityTreeItemData *					m_pEntityTreeItemData;
 
 	IHyLoadable2d *							m_pChild;
 
@@ -25,12 +25,10 @@ class EntityDrawItem
 	ShapeCtrl								m_ShapeCtrl;
 
 public:
-	EntityDrawItem(Project &projectRef, ItemType eGuiType, quint32 uiAssetChecksum, QUuid uuid, QUuid itemUuid, HyEntity2d *pParent);
+	EntityDrawItem(Project &projectRef, EntityTreeItemData *pModelItemData, HyEntity2d *pParent);
 	virtual ~EntityDrawItem();
 
-	ItemType GetGuiType() const;
-	const QUuid &GetThisUuid() const;
-	const QUuid &GetProjItemUuid() const;
+	EntityTreeItemData *GetEntityTreeItemData() const;
 
 	IHyLoadable2d *GetHyNode();
 	ShapeCtrl &GetShapeCtrl();

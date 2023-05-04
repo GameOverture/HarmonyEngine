@@ -152,22 +152,7 @@
 	sm_ErrorStrings[ASSETERROR_CouldNotPack] = "Could not pack this frame in atlas";
 }
 
-/*static*/ QList<ItemType> HyGlobal::GetProjItemTypeList()
-{
-	QList<ItemType> list;
-	list.append(ITEM_Audio);
-	list.append(ITEM_Particles);
-	list.append(ITEM_Text);
-	list.append(ITEM_Spine);
-	list.append(ITEM_Sprite);
-	list.append(ITEM_Prefab);
-	list.append(ITEM_Entity);
-	list.append(ITEM_Entity3d);
-
-	return list;
-}
-
-/*static*/ QList<ItemType> HyGlobal::GetTypeList()
+/*static*/ QList<ItemType> HyGlobal::GetItemTypeList()
 {
 	QList<ItemType> list;
 
@@ -196,6 +181,32 @@
 	return list;
 }
 
+/*static*/ QList<ItemType> HyGlobal::GetItemTypeList_Project()
+{
+	QList<ItemType> list;
+	list.append(ITEM_Audio);
+	list.append(ITEM_Particles);
+	list.append(ITEM_Text);
+	list.append(ITEM_Spine);
+	list.append(ITEM_Sprite);
+	list.append(ITEM_Prefab);
+	list.append(ITEM_Entity);
+	list.append(ITEM_Entity3d);
+
+	return list;
+}
+
+/*static*/ QList<ItemType> HyGlobal::GetItemTypeList_Asset()
+{
+	QList<ItemType> list;
+	list.append(ITEM_AtlasFrame);
+	list.append(ITEM_SoundClip);
+	list.append(ITEM_Source);
+	list.append(ITEM_Header);
+
+	return list;
+}
+
 /*static*/ QList<EditorShape> HyGlobal::GetShapeList()
 {
 	QList<EditorShape> list;
@@ -215,7 +226,7 @@
 
 /*static*/ QStringList HyGlobal::GetTypeNameList()
 {
-	QList<ItemType> dirList = GetTypeList();
+	QList<ItemType> dirList = GetItemTypeList();
 
 	QStringList list;
 	for(int i = 0; i < dirList.size(); ++i)
@@ -230,7 +241,7 @@
 	for(int i = 0; i < sTypeList.size(); ++i)
 	{
 		if(sType.compare(sTypeList[i], Qt::CaseInsensitive) == 0)
-			return GetTypeList()[i];
+			return GetItemTypeList()[i];
 	}
 
 	return ITEM_Unknown;
@@ -290,6 +301,18 @@
 	}
 
 	return HYALIGN_Unknown;
+}
+
+/*static*/ bool HyGlobal::IsItemType_Project(ItemType eType)
+{
+	QList<ItemType> projItemList = GetItemTypeList_Project();
+	return projItemList.contains(eType);
+}
+
+/*static*/ bool HyGlobal::IsItemType_Asset(ItemType eType)
+{
+	QList<ItemType> assetItemList = GetItemTypeList_Asset();
+	return assetItemList.contains(eType);
 }
 
 /*static*/ const QString HyGlobal::ItemExt(ItemType eItem)

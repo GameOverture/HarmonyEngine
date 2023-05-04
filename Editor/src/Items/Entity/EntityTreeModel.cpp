@@ -16,15 +16,18 @@
 
 #include <QVariant>
 
-EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, quint32 uiAssetChecksum, QUuid uuidOfItem, QUuid uuidOfThis) :
+EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, quint32 uiAssetChecksum, QUuid uuidOfReferencedItem, QUuid uuidOfThis) :
 	TreeModelItemData(eItemType, uuidOfThis, sCodeName),
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(eEntType),
 	m_bIsForwardDeclared(bIsForwardDeclared),
-	m_ItemUuid(uuidOfItem),
+	m_ReferencedItemUuid(uuidOfReferencedItem),
 	m_uiAssetChecksum(uiAssetChecksum),
 	m_bIsSelected(false)
 {
+	m_bIsAssetItem = m_uiAssetChecksum != 0;
+	m_bIsProjectItem = HyGlobal::IsItemType_Project(m_eTYPE);
+
 	if(m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_ArrayItem)
 	{
 		for(int i = 0; i < m_EntityModelRef.GetNumStates(); ++i)
@@ -40,10 +43,13 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(bIsArrayItem ? ENTTYPE_ArrayItem : ENTTYPE_Item),
 	m_bIsForwardDeclared(bIsForwardDeclared),
-	m_ItemUuid(descObj["itemUUID"].toString()),
+	m_ReferencedItemUuid(descObj["itemUUID"].toString()),
 	m_uiAssetChecksum(static_cast<quint32>(descObj["assetChecksum"].toVariant().toLongLong())),
 	m_bIsSelected(descObj["isSelected"].toBool())
 {
+	m_bIsAssetItem = m_uiAssetChecksum != 0;
+	m_bIsProjectItem = HyGlobal::IsItemType_Project(m_eTYPE);
+
 	if(propArray.size() != m_EntityModelRef.GetNumStates())
 	{
 		HyGuiLog("EntityTreeItemData::EntityTreeItemData() - propArray size doesn't equal number of this entity states", LOGTYPE_Error);
@@ -66,6 +72,11 @@ EntityItemType EntityTreeItemData::GetEntType() const
 	return m_eEntType;
 }
 
+uint32 EntityTreeItemData::GetAssetChecksum() const
+{
+	return m_uiAssetChecksum;
+}
+
 QString EntityTreeItemData::GetCodeName() const
 {
 	return m_sName;
@@ -76,9 +87,9 @@ const QUuid &EntityTreeItemData::GetThisUuid() const
 	return GetUuid();
 }
 
-const QUuid &EntityTreeItemData::GetItemUuid() const
+const QUuid &EntityTreeItemData::GetReferencedItemUuid() const
 {
-	return m_ItemUuid;
+	return m_ReferencedItemUuid;
 }
 
 bool EntityTreeItemData::IsForwardDeclared() const
@@ -86,9 +97,12 @@ bool EntityTreeItemData::IsForwardDeclared() const
 	return m_bIsForwardDeclared;
 }
 
-PropertiesTreeModel &EntityTreeItemData::GetPropertiesModel(int iStateIndex)
+PropertiesTreeModel *EntityTreeItemData::GetPropertiesModel(int iStateIndex)
 {
-	return *static_cast<EntityStateData *>(m_EntityModelRef.GetStateData(iStateIndex))->GetPropertiesTreeModel(this);
+	if(m_eEntType == ENTTYPE_Root || m_eEntType == ENTTYPE_BvFolder || m_eEntType == ENTTYPE_ArrayFolder)
+		return nullptr;
+
+	return static_cast<EntityStateData *>(m_EntityModelRef.GetStateData(iStateIndex))->GetPropertiesTreeModel(this);
 }
 
 bool EntityTreeItemData::IsSelected() const
@@ -107,7 +121,7 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 	childObjRef.insert("codeName", GetCodeName());
 	childObjRef.insert("itemType", HyGlobal::ItemName(m_eTYPE, false));
 	childObjRef.insert("UUID", GetUuid().toString(QUuid::WithoutBraces));
-	childObjRef.insert("itemUUID", m_ItemUuid.toString(QUuid::WithoutBraces));
+	childObjRef.insert("itemUUID", m_ReferencedItemUuid.toString(QUuid::WithoutBraces));
 	childObjRef.insert("isSelected", m_bIsSelected);
 	childObjRef.insert("assetChecksum", QJsonValue(static_cast<qint64>(m_uiAssetChecksum)));
 }
@@ -306,7 +320,7 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 		return false;
 	}
 
-	if(HyGlobal::GetProjItemTypeList().contains(pItem->GetType()) == false && pItem->GetType() != ITEM_AtlasFrame)
+	if(HyGlobal::IsItemType_Project(pItem->GetType()) == false && pItem->GetType() != ITEM_AtlasFrame && pItem->GetType() != ITEM_SoundClip)
 	{
 		if(bShowDialogsOnFail)
 			HyGuiLog(pItem->GetText() % " is not a valid child type: " % QString::number(pItem->GetType()), LOGTYPE_Error);
@@ -341,8 +355,8 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewAsset(IAssetItemData *pAssetIt
 		HyGuiLog("EntityTreeModel::Cmd_InsertNewAsset - tried to add an unhandled asset manager type: " % QString::number(pAssetItem->GetAssetManagerType()), LOGTYPE_Error);
 		break;
 	}
-
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, eItemType, ENTTYPE_Item, pAssetItem->GetChecksum(), QUuid(), QUuid::createUuid());
+	QUuid assetUuid = pAssetItem->GetUuid();
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, eItemType, ENTTYPE_Item, pAssetItem->GetChecksum(), assetUuid, QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
 
 	return pNewItem;
@@ -386,8 +400,15 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewShape(EditorShape eShape, QStr
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_BoundingVolume, ENTTYPE_Item, 0, QUuid(), QUuid::createUuid());
 	for(int iStateIndex = 0; iStateIndex < m_ModelRef.GetNumStates(); ++iStateIndex)
 	{
-		pNewItem->GetPropertiesModel(iStateIndex).SetPropertyValue("Shape", "Type", HyGlobal::ShapeName(eShape));
-		pNewItem->GetPropertiesModel(iStateIndex).SetPropertyValue("Shape", "Data", sData);
+		PropertiesTreeModel *pPropTreeModel = pNewItem->GetPropertiesModel(iStateIndex);
+		if(pPropTreeModel == nullptr)
+		{
+			HyGuiLog("EntityTreeModel::Cmd_InsertNewShape - Failed to get properties model for state: " % QString::number(iStateIndex), LOGTYPE_Error);
+			continue;
+		}
+
+		pPropTreeModel->SetPropertyValue("Shape", "Type", HyGlobal::ShapeName(eShape));
+		pPropTreeModel->SetPropertyValue("Shape", "Data", sData);
 	}
 
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
@@ -460,7 +481,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 		return ITreeModel::data(indexRef, iRole);
 
 	EntityTreeItemData *pItem = pTreeItem->data(0).value<EntityTreeItemData *>();
-	ProjectItemData *pProjItem = static_cast<ProjectItemData *>(m_ModelRef.GetItem().GetProject().FindItemData(pItem->GetItemUuid()));
+	TreeModelItemData *pReferencedItemData = m_ModelRef.GetItem().GetProject().FindItemData(pItem->GetReferencedItemUuid());
 
 	switch(iRole)
 	{
@@ -478,19 +499,33 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 		}
 		else // COLUMN_ItemPath
 		{
-			if(pProjItem)
-				return pProjItem->GetName(true);
-			else
-				return QVariant();
+			if(pReferencedItemData)
+			{
+				if(pReferencedItemData->IsProjectItem())
+					return static_cast<ProjectItemData *>(pReferencedItemData)->GetName(true);
+				else if(pReferencedItemData->IsAssetItem())
+					return static_cast<IAssetItemData *>(pReferencedItemData)->GetPropertyInfo();
+			}
+			
+			return QVariant();
 		}
 
 	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
 		if(indexRef.column() == COLUMN_CodeName)
 		{
-			if(pProjItem && pProjItem->IsExistencePendingSave())
-				return QVariant(pItem->GetIcon(SUBICON_New));
-			else if(pProjItem && pProjItem->IsSaveClean() == false)
-				return QVariant(pItem->GetIcon(SUBICON_Dirty));
+			if(pReferencedItemData)
+			{
+				if(pReferencedItemData->IsProjectItem())
+				{
+					ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pReferencedItemData);
+					if(pProjItem->IsExistencePendingSave())
+						return QVariant(pItem->GetIcon(SUBICON_New));
+					else if(pProjItem->IsSaveClean() == false)
+						return QVariant(pItem->GetIcon(SUBICON_Dirty));
+				}
+				else
+					return QVariant(pReferencedItemData->GetIcon(SUBICON_None));
+			}
 
 			if(pItem->GetEntType() == ENTTYPE_ArrayFolder)
 				return HyGlobal::ItemIcon(pItem->GetType(), SUBICON_Open);
@@ -504,7 +539,14 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 				if(m_ModelRef.GetItem().GetWidget())
 					iStateIndex = m_ModelRef.GetItem().GetWidget()->GetCurStateIndex();
 				
-				switch(HyGlobal::GetShapeFromString(pItem->GetPropertiesModel(iStateIndex).FindPropertyValue("Shape", "Type").toString()))
+				PropertiesTreeModel *pPropTreeModel = pItem->GetPropertiesModel(iStateIndex);
+				if(pPropTreeModel == nullptr)
+				{
+					HyGuiLog("EntityTreeModel::data() - Shape item PropertiesTreeModel is nullptr", LOGTYPE_Error);
+					return QVariant();
+				}
+
+				switch(HyGlobal::GetShapeFromString(pPropTreeModel->FindPropertyValue("Shape", "Type").toString()))
 				{
 				default:
 				case SHAPE_None:
@@ -658,6 +700,7 @@ bool EntityTreeModel::FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut
 		QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItemOut->data(0).value<EntityTreeItemData *>(), 0);
 		int iArrayFolderRow = (iRowToCreateAt == -1 ? pParentTreeItemOut->GetNumChildren() : iRowToCreateAt);
 
+		iArrayFolderRow = HyMath::Min(pParentTreeItemOut->GetNumChildren() - 1, iArrayFolderRow);
 		if(insertRow(iArrayFolderRow, parentIndex) == false)
 		{
 			HyGuiLog("EntityTreeModel::Cmd_InsertNewChild() - ArrayFolder insertRow failed", LOGTYPE_Error);
