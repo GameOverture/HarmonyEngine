@@ -126,6 +126,14 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	{
 		if(m_pHyEngine->Update() == false)
 			HyGuiLog("Harmony Gfx requested exit program.", LOGTYPE_Info);
+
+		// Harmony streaming load progress
+		uint32 uiNumQueued, uiTotal;
+		HyEngine::LoadingStatus(uiNumQueued, uiTotal);
+		if(uiNumQueued > 0)
+			MainWindow::SetLoading(LOADINGTYPE_HarmonyStreaming, uiTotal - uiNumQueued, uiTotal);
+		else if(MainWindow::GetCurrentLoading().contains(LOADINGTYPE_HarmonyStreaming))
+			MainWindow::ClearLoading(LOADINGTYPE_HarmonyStreaming);
 	}
 }
 

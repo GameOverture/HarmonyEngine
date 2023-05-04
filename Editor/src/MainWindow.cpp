@@ -510,15 +510,18 @@ void MainWindow::RefreshLoading()
 			iSumOfTotalBlocks += curPair.second;
 		}
 
+		bool bLockUI = true;
+
 		if(sm_pInstance->m_LoadingMap.size() > 1)
 			sm_pInstance->m_LoadingMsg.setText("Multi-Processing");
 		else
 		{
 			switch(sm_pInstance->m_LoadingMap.firstKey())
 			{
-			case LOADINGTYPE_AtlasManager:	sm_pInstance->m_LoadingMsg.setText(iSumOfTotalBlocks == 0 ? "Repacking Atlases" : "Constructing Atlas Textures"); break;
-			case LOADINGTYPE_AudioManager:	sm_pInstance->m_LoadingMsg.setText("Constructing Audio Banks"); break;
-			case LOADINGTYPE_ReloadHarmony:	sm_pInstance->m_LoadingMsg.setText("Reloading Harmony"); break;
+			case LOADINGTYPE_AtlasManager:		sm_pInstance->m_LoadingMsg.setText(iSumOfTotalBlocks == 0 ? "Repacking Atlases" : "Constructing Atlas Textures"); break;
+			case LOADINGTYPE_AudioManager:		sm_pInstance->m_LoadingMsg.setText("Constructing Audio Banks"); break;
+			case LOADINGTYPE_ReloadHarmony:		sm_pInstance->m_LoadingMsg.setText("Reloading Harmony"); break;
+			case LOADINGTYPE_HarmonyStreaming:	sm_pInstance->m_LoadingMsg.setText("Harmony Streaming"); bLockUI = false; break;
 
 			default:
 				HyGuiLog("MainWindow::SetLoading() - Unhandled LoadingType: " % QString::number(sm_pInstance->m_LoadingMap.firstKey()), LOGTYPE_Error);
@@ -529,18 +532,22 @@ void MainWindow::RefreshLoading()
 		sm_pInstance->m_LoadingBar.setRange(0, iSumOfTotalBlocks);
 		sm_pInstance->m_LoadingBar.setValue(iSumOfLoadedBlocks);
 		
-		// Start spinners and disable UI
 		sm_pInstance->statusBar()->addWidget(&m_LoadingMsg);
 		sm_pInstance->statusBar()->addWidget(&m_LoadingBar);
 		m_LoadingMsg.show();
 		m_LoadingBar.show();
-		for(int i = 0; i < sm_pInstance->m_LoadingSpinnerList.size(); ++i)
+
+		if(bLockUI)
 		{
-			if(sm_pInstance->m_LoadingSpinnerList[i]->isSpinning() == false)
-				sm_pInstance->m_LoadingSpinnerList[i]->start();
+			// Start spinners and disable UI
+			for(int i = 0; i < sm_pInstance->m_LoadingSpinnerList.size(); ++i)
+			{
+				if(sm_pInstance->m_LoadingSpinnerList[i]->isSpinning() == false)
+					sm_pInstance->m_LoadingSpinnerList[i]->start();
+			}
+			sm_pInstance->ui->mainToolBar->setEnabled(false);
+			sm_pInstance->ui->menuBar->setEnabled(false);
 		}
-		sm_pInstance->ui->mainToolBar->setEnabled(false);
-		sm_pInstance->ui->menuBar->setEnabled(false);
 	}
 	else // Loading Complete
 	{

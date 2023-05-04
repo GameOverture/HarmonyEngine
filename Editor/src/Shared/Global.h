@@ -105,7 +105,8 @@ enum LoadingType
 
 	LOADINGTYPE_AtlasManager = 0,
 	LOADINGTYPE_AudioManager,
-	LOADINGTYPE_ReloadHarmony
+	LOADINGTYPE_ReloadHarmony,
+	LOADINGTYPE_HarmonyStreaming
 };
 
 enum MimeType
