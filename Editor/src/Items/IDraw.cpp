@@ -213,6 +213,11 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 /*virtual*/ void IDraw::OnMouseMoveEvent(QMouseEvent *pEvent)
 {
+	if(MainWindow::GetCurrentLoading().empty() == false)
+		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::WaitCursor);
+	else if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() == Qt::WaitCursor)
+		Harmony::GetWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
+
 	QPointF ptCurMousePos = pEvent->localPos();
 
 	if(m_bIsCameraPanning)//0 != (pEvent->buttons() & Qt::MidButton))

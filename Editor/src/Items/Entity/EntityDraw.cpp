@@ -519,7 +519,8 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 	}
 	else // 'm_eDragState' is DRAGSTATE_None
 	{
-		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+		if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
+			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 		
 		m_pCurHoverItem = nullptr;
 		for(int32 i = m_ItemList.size() - 1; i >= 0; --i) // iterate backwards to prioritize selecting items with higher display order
