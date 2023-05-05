@@ -67,7 +67,7 @@ void EntityStateData::Cmd_RemoveItemDataProperties(EntityTreeItemData *pItemData
 	m_PropertiesMap.remove(pItemData);
 }
 
-// NOTE: These properties get set to the proper harmony node within EntityDrawItem::RefreshJson
+// NOTE: These properties get set to the proper harmony node within EntityDrawItem.cpp's ApplyProperties
 //		 Updates here should reflect to the function above
 void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, PropertiesTreeModel &propertiesTreeModelRef)
 {

@@ -207,6 +207,37 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	}
 }
 
+///*virtual*/ void HyEntity2d::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
+//{
+//	shapeOut.SetAsNothing();
+//
+//	b2AABB localAABB;
+//	HyMath::InvalidateAABB(localAABB);
+//	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+//	{
+//		if(0 == (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody) ||
+//			static_cast<IHyBody2d *>(m_ChildList[i])->IsLoadDataValid() == false)
+//		{
+//			continue;
+//		}
+//
+//		static_cast<IHyBody2d *>(m_ChildList[i])->CalcLocalBoundingShape(shapeOut);
+//		if(localAABB.IsValid() == false)
+//			shapeOut.ComputeAABB(localAABB, glm::identity<glm::mat4>());
+//		else
+//		{
+//			b2AABB tmpAABB;
+//			shapeOut.ComputeAABB(tmpAABB, glm::identity<glm::mat4>());
+//			localAABB.Combine(tmpAABB);
+//		}
+//	}
+//
+//	if(localAABB.IsValid())
+//		shapeOut.SetAsBox(localAABB.GetExtents().x, localAABB.GetExtents().y, glm::vec2(localAABB.GetCenter().x, localAABB.GetCenter().y), 0.0f);
+//	else
+//		shapeOut.SetAsNothing();
+//}
+
 /*virtual*/ const b2AABB &HyEntity2d::GetSceneAABB() /*override*/
 {
 	HyMath::InvalidateAABB(m_SceneAABB);

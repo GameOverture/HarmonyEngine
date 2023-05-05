@@ -18,33 +18,41 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 	m_Transform(pParent),
 	m_ShapeCtrl(pParent)
 {
-	if(m_pEntityTreeItemData->GetAssetChecksum() != 0)
+	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
+	TreeModelItemData *pReferencedItemData = static_cast<ProjectItemData *>(projectRef.FindItemData(referencedItemUuid));
+
+	if(m_pEntityTreeItemData->IsAssetItem())
 	{
 		if(m_pEntityTreeItemData->GetType() == ITEM_AtlasFrame)
-			m_pChild = new HyTexturedQuad2d(m_pEntityTreeItemData->GetAssetChecksum(), pParent);
+			m_pChild = new HyTexturedQuad2d(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum(), pParent);
 		else
 			HyGuiLog("EntityDrawItem ctor - asset item not handled: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 	}
 	else if(HyGlobal::IsItemType_Project(m_pEntityTreeItemData->GetType()))
 	{
-		QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
-		TreeModelItemData *pReferencedItemData = static_cast<ProjectItemData *>(projectRef.FindItemData(referencedItemUuid));
+		
+		
 		if(pReferencedItemData == nullptr || pReferencedItemData->IsProjectItem() == false)
 		{
 			HyGuiLog("EntityDrawItem ctor - could not find referenced item data UUID: " % referencedItemUuid.toString(), LOGTYPE_Error);
 			return;
 		}
 
-		ProjectItemData *pProjItemData = static_cast<ProjectItemData *>(pReferencedItemData);
+		ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pReferencedItemData);
 
 		FileDataPair fileDataPair;
-		pProjItemData->GetSavedFileData(fileDataPair);
+		pReferencedProjItemData->GetSavedFileData(fileDataPair);
 
 		if(m_pEntityTreeItemData->GetType() == ITEM_Entity)
 		{
-			m_pChild = new SubEntity(pParent);
-			SubEntity *pSubEntity = static_cast<SubEntity *>(m_pChild);
-			pSubEntity->Assemble(projectRef, fileDataPair.m_Meta["childList"].toArray(), QJsonArray());
+			QJsonArray descListArray = fileDataPair.m_Meta["childList"].toArray();
+			QJsonArray subEntStateArray = fileDataPair.m_Meta["stateArray"].toArray();
+
+			QList<QJsonArray> statePropArrayList;
+			for(int i = 0; i < subEntStateArray.size(); ++i)
+				statePropArrayList.append(subEntStateArray[i].toObject()["propChildList"].toArray());
+
+			m_pChild = new SubEntity(projectRef, descListArray, statePropArrayList, pParent);
 		}
 		else
 		{
@@ -75,7 +83,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 			case ITEM_Audio:
 			case ITEM_SoundClip:
 			default:
-				HyLogError("EntityDrawItem ctor - unhandled gui item type");
+				HyGuiLog("EntityDrawItem ctor - unhandled gui item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 				break;
 			}
 		}
@@ -125,24 +133,193 @@ bool EntityDrawItem::IsMouseInBounds()
 	return HyEngine::Input().GetWorldMousePos(ptWorldMousePos) && boundingShape.TestPoint(transformMtx, ptWorldMousePos);
 }
 
+void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
+{
+	HyShape2d boundingShape;
+	glm::mat4 mtxShapeTransform;
+	ExtractTransform(boundingShape, mtxShapeTransform);
+
+	m_Transform.WrapTo(boundingShape, mtxShapeTransform, pCamera);
+	GetShapeCtrl().DeserializeOutline(pCamera);
+}
+
+void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)
+{
+	transformMtxOut = glm::identity<glm::mat4>();
+	switch(m_pEntityTreeItemData->GetType())
+	{
+	case ITEM_BoundingVolume:
+	case ITEM_AtlasFrame:
+	case ITEM_Primitive:
+	case ITEM_Text:
+	case ITEM_Spine:
+	case ITEM_Sprite: {
+		IHyDrawable2d *pDrawable = static_cast<IHyDrawable2d *>(GetHyNode());
+		pDrawable->CalcLocalBoundingShape(boundingShapeOut);
+		transformMtxOut = GetHyNode()->GetSceneTransform(0.0f);
+		break; }
+
+	case ITEM_Entity: {
+		SubEntity *pSubEnt = static_cast<SubEntity *>(GetHyNode());
+		//pSubEnt->CalcLocalBoundingShape(boundingShapeOut);
+		break; }
+
+	case ITEM_Audio:
+	default:
+		HyGuiLog("EntityItemDraw::ExtractTransform - unhandled child node type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
+		break;
+	}
+}
+
+void EntityDrawItem::ShowTransformCtrl(bool bShowGrabPoints)
+{
+	m_Transform.Show(bShowGrabPoints);
+}
+
+void EntityDrawItem::HideTransformCtrl()
+{
+	m_Transform.Hide();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, const QList<QJsonArray> &statePropArrayList, HyEntity2d *pParent) :
+	HyEntity2d(pParent),
+	m_StatePropArrayList(statePropArrayList)
+{
+	for(int i = 0; i < descArray.size(); ++i)
+	{
+		QJsonObject childObj = descArray[i].toObject();
+
+		ItemType eItemType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
+		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+
+		switch(eItemType)
+		{
+		case ITEM_Primitive:
+			m_ChildPtrList.append(qMakePair(new HyPrimitive2d(this), eItemType));
+			break;
+
+		case ITEM_Audio: {
+			m_ChildPtrList.append(qMakePair(new HyAudio2d("", HY_GUI_DATAOVERRIDE, this), eItemType));
+
+			FileDataPair fileDataPair; static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+			HyJsonDoc itemDataDoc;
+			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+				HyGuiLog("SubEntity ctor failed to parse " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
+
+			static_cast<IHyDrawable2d *>(m_ChildPtrList.back().first)->GuiOverrideData<HyAudioData>(itemDataDoc.GetObject());
+			break; }
+
+		case ITEM_Particles:
+			HyGuiLog("SubEntity ctor - Particles not implemented", LOGTYPE_Error);
+			break;
+
+		case ITEM_Text: {
+			m_ChildPtrList.append(qMakePair(new HyText2d("", HY_GUI_DATAOVERRIDE, this), eItemType));
+
+			FileDataPair fileDataPair; static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+			HyJsonDoc itemDataDoc;
+			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+				HyGuiLog("SubEntity ctor failed to parse " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
+
+			static_cast<IHyDrawable2d *>(m_ChildPtrList.back().first)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject());
+			break; }
+
+		case ITEM_Spine: {
+			m_ChildPtrList.append(qMakePair(new HySpine2d("", HY_GUI_DATAOVERRIDE, this), eItemType));
+
+			FileDataPair fileDataPair; static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+			HyJsonDoc itemDataDoc;
+			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+				HyGuiLog("SubEntity ctor failed to parse " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
+
+			static_cast<IHyDrawable2d *>(m_ChildPtrList.back().first)->GuiOverrideData<HySpineData>(itemDataDoc.GetObject());
+			break; }
+
+		case ITEM_Sprite: {
+			m_ChildPtrList.append(qMakePair(new HySprite2d("", HY_GUI_DATAOVERRIDE, this), eItemType));
+
+			FileDataPair fileDataPair; static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+			HyJsonDoc itemDataDoc;
+			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+				HyGuiLog("SubEntity ctor failed to parse " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
+
+			static_cast<IHyDrawable2d *>(m_ChildPtrList.back().first)->GuiOverrideData<HySpriteData>(itemDataDoc.GetObject());
+			break; }
+
+		case ITEM_Prefab:
+			HyGuiLog("SubEntity ctor - Prefab not implemented", LOGTYPE_Error);
+			break;
+
+		case ITEM_Entity: {
+			FileDataPair fileDataPair; static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+			QJsonArray stateArray = fileDataPair.m_Meta["stateArray"].toArray();
+
+			QList<QJsonArray> subStatePropArrayList;
+			for(int iStateIndex = 0; iStateIndex < stateArray.size(); ++iStateIndex)
+				subStatePropArrayList.push_back(stateArray[iStateIndex].toObject()["propChildList"].toArray());
+
+			m_ChildPtrList.append(qMakePair(new SubEntity(projectRef, fileDataPair.m_Meta["childList"].toArray(), subStatePropArrayList, this), eItemType));
+			break; }
+
+		case ITEM_AtlasFrame:
+			//uint32 uiAtlasFrameChecksum = static_cast<uint32>(childObj["assetChecksum"].toVariant().toLongLong());
+			m_ChildPtrList.append(qMakePair(new HyTexturedQuad2d(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum(), this), eItemType));
+			break;
+
+		default:
+			HyGuiLog("SubEntity ctor - unhandled child node type: " % HyGlobal::ItemName(eItemType, false), LOGTYPE_Error);
+			break;
+		}
+	}
+
+	SetState(0);
+}
+
+/*virtual*/ SubEntity::~SubEntity()
+{
+	for(int i = 0; i < m_ChildPtrList.size(); ++i)
+		delete m_ChildPtrList[i].first;
+}
+
+/*virtual*/ bool SubEntity::SetState(uint32 uiStateIndex) /*override*/
+{
+	HyEntity2d::SetState(uiStateIndex);
+
+	QJsonArray propArray = m_StatePropArrayList[uiStateIndex];
+	if(m_ChildPtrList.size() != propArray.size())
+	{
+		HyGuiLog("SubEntity::SetState - m_ChildPtrList and m_StatePropArrayList[" % QString::number(uiStateIndex) % "] are not the same size", LOGTYPE_Error);
+		return false;
+	}
+
+	for(int i = 0; i < m_ChildPtrList.size(); ++i)
+		ApplyProperties(m_ChildPtrList[i].first, nullptr, m_ChildPtrList[i].second, false, propArray[i].toObject(), nullptr);
+
+	return true;
+}
+
 // NOTE: This matches how EntityStateData::InitalizePropertyModel initializes the 'PropertiesTreeModel'
 //		 Updates here should reflect to the function above
-void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCamera2d *pCamera)
+void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propObj, HyCamera2d *pCamera)
 {
-	if(m_pEntityTreeItemData->GetType() == ITEM_Prefix) // aka Shapes folder
+	if(eItemType == ITEM_Prefix) // aka Shapes folder
 		return;
 
-	IHyLoadable2d *pHyNode = GetHyNode();
-	bool bIsSelected = descObj["isSelected"].toBool();
-
-	// Parse all and only the potential categories of the 'm_pEntityTreeItemData->GetType()' type, and set the values to 'pHyNode'
+	// Parse all and only the potential categories of the 'eItemType' type, and set the values to 'pHyNode'
 	HyColor colorTint = ENTCOLOR_Shape;
-	if(m_pEntityTreeItemData->GetType() != ITEM_BoundingVolume)
+	if(eItemType != ITEM_BoundingVolume)
 	{
 		QJsonObject commonObj = propObj["Common"].toObject();
+		// "Common", "UUID" is read-only
 
-		pHyNode->SetState(commonObj["State"].toInt());
-
+		if(HyGlobal::IsItemType_Asset(eItemType) == false)
+			pHyNode->SetState(commonObj["State"].toInt());
 		pHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
 		pHyNode->SetTag(commonObj["User Tag"].toVariant().toLongLong());
 
@@ -153,7 +330,7 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 		QJsonArray scaleArray = transformObj["Scale"].toArray();
 		pHyNode->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
 
-		if(m_pEntityTreeItemData->GetType() != ITEM_Audio && (pHyNode->GetInternalFlags() & IHyNode::NODETYPE_IsBody) != 0)
+		if(eItemType != ITEM_Audio && (pHyNode->GetInternalFlags() & IHyNode::NODETYPE_IsBody) != 0)
 		{
 			QJsonObject bodyObj = propObj["Body"].toObject();
 			pHyNode->SetVisible(bodyObj["Visible"].toBool());
@@ -170,7 +347,7 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 		}
 	}
 
-	switch(m_pEntityTreeItemData->GetType())
+	switch(eItemType)
 	{
 	case ITEM_Entity:
 		// "Physics" category doesn't need to be set
@@ -180,16 +357,19 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 		QJsonObject primitiveObj = propObj["Primitive"].toObject();
 		static_cast<HyPrimitive2d *>(pHyNode)->SetWireframe(primitiveObj["Wireframe"].toBool());
 		static_cast<HyPrimitive2d *>(pHyNode)->SetLineThickness(primitiveObj["Line Thickness"].toDouble());
-		}
-		[[fallthrough]];
+	}
+	[[fallthrough]];
 	case ITEM_BoundingVolume: {
 		QJsonObject shapeObj = propObj["Shape"].toObject();
 		EditorShape eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
-		float fBvAlpha = (m_pEntityTreeItemData->GetType() == ITEM_BoundingVolume) ? 0.0f : 1.0f;
-		float fOutlineAlpha = (m_pEntityTreeItemData->GetType() == ITEM_BoundingVolume || bIsSelected) ? 1.0f : 0.0f;
+		float fBvAlpha = (eItemType == ITEM_BoundingVolume) ? 0.0f : 1.0f;
+		float fOutlineAlpha = (eItemType == ITEM_BoundingVolume || bIsSelected) ? 1.0f : 0.0f;
 
-		GetShapeCtrl().Setup(eShape, colorTint, fBvAlpha, fOutlineAlpha);
-		GetShapeCtrl().Deserialize(shapeObj["Data"].toString(), pCamera);
+		if(pShapeCtrl)
+		{
+			pShapeCtrl->Setup(eShape, colorTint, fBvAlpha, fOutlineAlpha);
+			pShapeCtrl->Deserialize(shapeObj["Data"].toString(), pCamera);
+		}
 		// "Fixture" category doesn't need to be set
 		break; }
 
@@ -206,7 +386,7 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 		pTextNode->SetTextAlignment(HyGlobal::GetAlignmentFromString(textObj["Alignment"].toString()));
 		pTextNode->SetMonospacedDigits(textObj["Monospaced Digits"].toBool());
 		pTextNode->SetTextIndent(textObj["Text Indent"].toInt());
-		
+
 		// Apply the style and call ShapeCtrl::SetAsText()
 		TextStyle eTextStyle = HyGlobal::GetTextStyleFromString(textObj["Style"].toString());
 		if(eTextStyle == TEXTSTYLE_Line)
@@ -244,7 +424,8 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 				}
 			}
 		}
-		GetShapeCtrl().SetAsText(pTextNode, bIsSelected, pCamera);
+		if(pShapeCtrl)
+			pShapeCtrl->SetAsText(pTextNode, bIsSelected, pCamera);
 		break; }
 
 	case ITEM_Sprite: {
@@ -255,120 +436,7 @@ void EntityDrawItem::RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCam
 		break; }
 
 	default:
-		HyGuiLog(QString("EntityDrawItem::RefreshJson - unsupported type: ") % QString::number(m_pEntityTreeItemData->GetType()), LOGTYPE_Error);
+		HyGuiLog(QString("EntityDrawItem::RefreshJson - unsupported type: ") % HyGlobal::ItemName(eItemType, false), LOGTYPE_Error);
 		break;
-	}
-}
-
-void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
-{
-	HyShape2d boundingShape;
-	glm::mat4 mtxShapeTransform;
-	ExtractTransform(boundingShape, mtxShapeTransform);
-
-	m_Transform.WrapTo(boundingShape, mtxShapeTransform, pCamera);
-	GetShapeCtrl().DeserializeOutline(pCamera);
-}
-
-void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)
-{
-	transformMtxOut = glm::identity<glm::mat4>();
-	switch(m_pEntityTreeItemData->GetType())
-	{
-	case ITEM_BoundingVolume:
-	case ITEM_AtlasFrame:
-	case ITEM_Primitive:
-	case ITEM_Text:
-	case ITEM_Spine:
-	case ITEM_Sprite: {
-		IHyDrawable2d *pDrawable = static_cast<IHyDrawable2d *>(GetHyNode());
-		pDrawable->CalcLocalBoundingShape(boundingShapeOut);
-		transformMtxOut = GetHyNode()->GetSceneTransform(0.0f);
-		break; }
-
-	case ITEM_Audio:
-	case ITEM_Entity:
-	default:
-		HyLogError("EntityItemDraw::ExtractTransform - unhandled child node type");
-		break;
-	}
-}
-
-void EntityDrawItem::ShowTransformCtrl(bool bShowGrabPoints)
-{
-	m_Transform.Show(bShowGrabPoints);
-}
-
-void EntityDrawItem::HideTransformCtrl()
-{
-	m_Transform.Hide();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-SubEntity::SubEntity(HyEntity2d *pParent) :
-	HyEntity2d(pParent)
-{
-}
-
-/*virtual*/ SubEntity::~SubEntity()
-{
-	for(int i = 0; i < m_ChildPtrList.size(); ++i)
-		delete m_ChildPtrList[i];
-}
-
-void SubEntity::Assemble(Project &projectRef, QJsonArray descListArray, QJsonArray propListArray)
-{
-	if(descListArray.size() != propListArray.size())
-	{
-		HyGuiLog("SubEntity::Assemble - descListArray and propListArray are not the same size", LOGTYPE_Error);
-		return;
-	}
-
-	for(int i = 0; i < descListArray.size(); ++i)
-	{
-		QJsonObject childObj = descListArray[i].toObject();
-		ItemType eItemType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
-
-		switch(eItemType)
-		{
-		case ITEM_Primitive:	m_ChildPtrList.append(new HyPrimitive2d(this)); break;
-		case ITEM_Audio:		m_ChildPtrList.append(new HyAudio2d("", HY_GUI_DATAOVERRIDE, this)); break;
-		case ITEM_Particles:	HyGuiLog("SubEntity::Assemble - Particles not implemented", LOGTYPE_Error); break;
-		case ITEM_Text:			m_ChildPtrList.append(new HyText2d("", HY_GUI_DATAOVERRIDE, this)); break;
-		case ITEM_Spine:		m_ChildPtrList.append(new HySpine2d("", HY_GUI_DATAOVERRIDE, this)); break;
-		case ITEM_Sprite:		m_ChildPtrList.append(new HySprite2d("", HY_GUI_DATAOVERRIDE, this)); break;
-		case ITEM_Prefab:		HyGuiLog("SubEntity::Assemble - Prefab not implemented", LOGTYPE_Error); break;
-		case ITEM_Entity:		m_ChildPtrList.append(new SubEntity(this)); break;
-
-		default:
-			HyGuiLog("SubEntity::Assemble - unhandled child node type", LOGTYPE_Error);
-			break;
-		}
-
-		QUuid uuid = QUuid(childObj["itemUUID"].toString());
-		TreeModelItemData *pItemData = projectRef.FindItemData(uuid);
-		if(pItemData->IsProjectItem() == false)
-		{
-			HyGuiLog("SubEntity::Assemble - child item '" % pItemData->GetText() % "' is not a project item", LOGTYPE_Error);
-			continue;
-		}
-		ProjectItemData *pProjItemData = static_cast<ProjectItemData *>(pItemData);
-
-		FileDataPair fileDataPair;
-		pProjItemData->GetSavedFileData(fileDataPair);
-
-		if(eItemType == ITEM_Entity)
-			static_cast<SubEntity *>(m_ChildPtrList.back())->Assemble(projectRef, fileDataPair.m_Meta["childList"].toArray(), QJsonArray());
-		else
-		{
-			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
-			HyJsonDoc itemDataDoc;
-			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-				HyGuiLog("IDraw::ApplyJsonData failed to parse", LOGTYPE_Error);
-
-			HyJsonObj itemDataObj = itemDataDoc.GetObject();
-			static_cast<IHyDrawable2d *>(m_ChildPtrList.back())->GuiOverrideData<HySpriteData>(itemDataObj);
-		}
 	}
 }

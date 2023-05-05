@@ -72,7 +72,12 @@ IHyDrawable2d &IHyDrawable2d::operator=(IHyDrawable2d &&donor) noexcept
 	if(IsDirty(DIRTY_SceneAABB))
 	{
 		HyMath::InvalidateAABB(m_SceneAABB);
-		OnCalcSceneAABB(); // This will update 'm_SceneAABB'
+
+		// Sets 'm_SceneAABB' to a scene transformed, conforming AABB around the visible portion of *this
+		HyShape2d shape;
+		CalcLocalBoundingShape(shape);
+		if(shape.IsValidShape())
+			shape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
 
 		ClearDirty(DIRTY_SceneAABB);
 	}
@@ -103,14 +108,6 @@ IHyDrawable2d &IHyDrawable2d::operator=(IHyDrawable2d &&donor) noexcept
 /*virtual*/ void IHyDrawable2d::OnUnloaded() /*override*/
 {
 	sm_pScene->RemoveNode_Loaded(this);
-}
-
-void IHyDrawable2d::OnCalcSceneAABB()
-{
-	HyShape2d shape;
-	CalcLocalBoundingShape(shape);
-	if(shape.IsValidShape())
-		shape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
 }
 
 /*virtual*/ IHyNode &IHyDrawable2d::_DrawableGetNodeRef() /*override final*/

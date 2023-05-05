@@ -122,6 +122,7 @@ private:
 private: // Hide inherited functionality that doesn't exist for primitives
 	using IHyLoadable::GetState;
 	using IHyLoadable::SetState;
+	using IHyLoadable::GetNumStates;
 	using IHyLoadable::GetName;
 	using IHyLoadable::GetPrefix;
 	using IHyLoadable2d::Init;

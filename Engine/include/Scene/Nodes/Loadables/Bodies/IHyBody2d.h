@@ -60,6 +60,7 @@ public:
 	virtual void SetDisplayOrder(int32 iOrderValue);
 	virtual void ResetDisplayOrder();
 
+	//virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) = 0;
 	virtual const b2AABB &GetSceneAABB() = 0;
 	float GetSceneHeight();
 	float GetSceneWidth();

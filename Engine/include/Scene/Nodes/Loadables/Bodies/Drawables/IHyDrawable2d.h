@@ -17,6 +17,7 @@
 #include "Assets/Nodes/HySpriteData.h"
 #include "Assets/Nodes/HyTextData.h"
 #include "Assets/Nodes/HySpineData.h"
+#include "Assets/Nodes/HyAudioData.h"
 
 class IHyDrawable2d : public IHyBody2d, public IHyDrawable
 {
@@ -44,9 +45,6 @@ protected:
 
 	virtual void OnLoaded() override;
 	virtual void OnUnloaded() override;
-
-	// Sets 'm_SceneAABB' to a scene transformed, conforming AABB around the visible portion of *this (used for frustum culling)
-	void OnCalcSceneAABB();
 
 	virtual bool OnIsValidToRender() = 0;
 

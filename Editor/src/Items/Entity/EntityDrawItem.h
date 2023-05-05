@@ -36,7 +36,6 @@ public:
 
 	bool IsMouseInBounds();
 
-	void RefreshJson(QJsonObject descObj, QJsonObject propObj, HyCamera2d *pCamera);
 	void RefreshTransform(HyCamera2d *pCamera);
 
 	void ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut);
@@ -49,13 +48,16 @@ public:
 
 class SubEntity : public HyEntity2d
 {
-	QList<IHyLoadable2d *>					m_ChildPtrList;
+	QList<QPair<IHyLoadable2d *, ItemType>>	m_ChildPtrList;
+	QList<QJsonArray>						m_StatePropArrayList;
 
 public:
-	SubEntity(HyEntity2d *pParent);
+	SubEntity(Project &projectRef, const QJsonArray &descArray, const QList<QJsonArray> &statePropArrayList, HyEntity2d *pParent);
 	virtual ~SubEntity();
 
-	void Assemble(Project &projectRef, QJsonArray descListArray, QJsonArray propListArray);
+	virtual bool SetState(uint32 uiStateIndex) override;
 };
+
+void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propObj, HyCamera2d *pCamera);
 
 #endif // ENTITYDRAWITEM_H

@@ -341,7 +341,7 @@ void EntityDraw::ClearShapeEdit()
 		else
 			pDrawItem->HideTransformCtrl();
 
-		pDrawItem->RefreshJson(descObj, propObjList[i], m_pCamera);
+		ApplyProperties(pDrawItem->GetHyNode(), &pDrawItem->GetShapeCtrl(), pDrawItem->GetEntityTreeItemData()->GetType(), descObj["isSelected"].toBool(), propObjList[i], m_pCamera);
 	}
 	
 	// Delete all the remaining stale items

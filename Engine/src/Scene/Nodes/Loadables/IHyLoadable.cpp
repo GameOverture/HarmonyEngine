@@ -118,16 +118,9 @@ uint32 IHyLoadable::GetState() const
 
 /*virtual*/ bool IHyLoadable::SetState(uint32 uiStateIndex)
 {
-	if(AcquireData() == nullptr || uiStateIndex >= UncheckedGetData()->GetNumStates())
+	if(AcquireData() != nullptr && uiStateIndex >= UncheckedGetData()->GetNumStates())
 	{
-		if(UncheckedGetData() == nullptr)
-		{
-			HyLogDebug("SetState() invoked on null data");
-			m_uiState = uiStateIndex;
-		}
-		else if(uiStateIndex >= UncheckedGetData()->GetNumStates())
-			HyLogWarning(m_sPrefix << "/" << m_sName << " wants to set state index of '" << uiStateIndex << "' when total number of states is '" << UncheckedGetData()->GetNumStates() << "'");
-
+		HyLogWarning(m_sPrefix << "/" << m_sName << " wants to set state index of '" << uiStateIndex << "' when total number of states is '" << UncheckedGetData()->GetNumStates() << "'");
 		return false;
 	}
 
@@ -137,8 +130,9 @@ uint32 IHyLoadable::GetState() const
 
 uint32 IHyLoadable::GetNumStates()
 {
-	if(AcquireData() == nullptr) {
-		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::AnimGetNumStates invoked on null data");
+	if(AcquireData() == nullptr)
+	{
+		HyLogDebug("IHyLoadable::GetNumStates invoked on null data");
 		return 0;
 	}
 	

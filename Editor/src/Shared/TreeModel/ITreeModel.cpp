@@ -210,7 +210,7 @@ void ITreeModel::MoveTreeItem(TreeModelItemData *pSourceItemData, TreeModelItemD
 {
 	if(indexRef.isValid() == false || iRole != Qt::UserRole)
 	{
-		HyLogError("Default ITreeModel::setData() was invoked with invalid index or role. Other role types should be implemented in derived classes");
+		HyGuiLog("Default ITreeModel::setData() was invoked with invalid index or role. Other role types should be implemented in derived classes", LOGTYPE_Error);
 		return false;
 	}
 
@@ -298,7 +298,7 @@ void ITreeModel::MoveTreeItem(TreeModelItemData *pSourceItemData, TreeModelItemD
 
 	if(role != Qt::UserRole)
 	{
-		HyLogError("Default ITreeModel::data() was invoked with invalid role. Other role types should be implemented in derived classes");
+		HyGuiLog("Default ITreeModel::data() was invoked with invalid role. Other role types should be implemented in derived classes", LOGTYPE_Error);
 		return QVariant();
 	}
 
