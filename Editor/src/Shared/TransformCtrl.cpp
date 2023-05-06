@@ -102,7 +102,7 @@ TransformCtrl::TransformCtrl(HyEntity2d *pParent) :
 		delete m_GrabPoints[i];
 }
 
-void TransformCtrl::WrapTo(HyShape2d boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera)
+void TransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera)
 {
 	if(boundingShape.IsValidShape() == false)
 		return;

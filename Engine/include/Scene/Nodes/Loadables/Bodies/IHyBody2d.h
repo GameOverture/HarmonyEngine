@@ -32,6 +32,8 @@ protected:
 
 	int32							m_iDisplayOrder;		// Higher values are displayed front-most
 
+	//HyShape2d						m_LocalBoundingVolume;	// A conforming shape around *this that assumes an identity matrix for its transform.
+
 	b2AABB							m_SceneAABB;			// Don't directly use, acquiring using GetSceneAABB()
 															// Derived versions of this function will properly update 'm_SceneAABB' before returning
 
@@ -60,7 +62,7 @@ public:
 	virtual void SetDisplayOrder(int32 iOrderValue);
 	virtual void ResetDisplayOrder();
 
-	//virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) = 0;
+	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) = 0;
 	virtual const b2AABB &GetSceneAABB() = 0;
 	float GetSceneHeight();
 	float GetSceneWidth();

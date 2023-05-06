@@ -873,6 +873,11 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 
 		break; }
 
+	case Qt::ArrowCursor:
+	case Qt::WaitCursor:
+		m_eDragState = DRAGSTATE_None;
+		break;
+
 	default:
 		HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
 	}

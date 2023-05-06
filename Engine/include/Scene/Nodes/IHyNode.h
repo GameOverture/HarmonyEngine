@@ -44,7 +44,7 @@ public:
 	{
 		DIRTY_FromUpdater			= 1 << 10,
 		DIRTY_SceneAABB				= 1 << 11,
-		DIRTY_Collision				= 1 << 12,
+		DIRTY_Collision				= 1 << 12,	// Not used - TODO: Repurpose this to mark a flag when the local BV is changed, and cache a HyShape in IHyBody
 		DIRTY_Transform				= 1 << 13,
 		DIRTY_Size					= 1 << 14,
 		DIRTY_Color					= 1 << 15,

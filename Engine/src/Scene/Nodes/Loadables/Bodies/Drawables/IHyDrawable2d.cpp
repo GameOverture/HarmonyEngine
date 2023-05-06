@@ -56,17 +56,6 @@ IHyDrawable2d &IHyDrawable2d::operator=(IHyDrawable2d &&donor) noexcept
 	return *this;
 }
 
-//const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
-//{
-//	if(IsDirty(DIRTY_BoundingVolume) || m_LocalBoundingVolume.IsValidShape() == false)
-//	{
-//		OnCalcBoundingVolume();
-//		ClearDirty(DIRTY_BoundingVolume);
-//	}
-//
-//	return m_LocalBoundingVolume;
-//}
-
 /*virtual*/ const b2AABB &IHyDrawable2d::GetSceneAABB() /*override*/
 {
 	if(IsDirty(DIRTY_SceneAABB))

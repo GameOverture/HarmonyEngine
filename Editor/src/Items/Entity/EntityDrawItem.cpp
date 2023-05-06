@@ -153,15 +153,11 @@ void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &tr
 	case ITEM_Primitive:
 	case ITEM_Text:
 	case ITEM_Spine:
-	case ITEM_Sprite: {
-		IHyDrawable2d *pDrawable = static_cast<IHyDrawable2d *>(GetHyNode());
-		pDrawable->CalcLocalBoundingShape(boundingShapeOut);
-		transformMtxOut = GetHyNode()->GetSceneTransform(0.0f);
-		break; }
-
+	case ITEM_Sprite:
 	case ITEM_Entity: {
-		SubEntity *pSubEnt = static_cast<SubEntity *>(GetHyNode());
-		//pSubEnt->CalcLocalBoundingShape(boundingShapeOut);
+		IHyBody2d *pHyBody = static_cast<IHyBody2d *>(GetHyNode());
+		pHyBody->CalcLocalBoundingShape(boundingShapeOut);
+		transformMtxOut = GetHyNode()->GetSceneTransform(0.0f);
 		break; }
 
 	case ITEM_Audio:

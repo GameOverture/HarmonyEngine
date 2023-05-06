@@ -76,7 +76,7 @@ public:
 	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
 	virtual void ResetDisplayOrder() override;
 
-	//virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
+	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 	virtual const b2AABB &GetSceneAABB() override;
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

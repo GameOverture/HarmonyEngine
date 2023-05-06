@@ -23,9 +23,6 @@ class IHyDrawable2d : public IHyBody2d, public IHyDrawable
 {
 	friend class HyScene;
 
-protected:
-	//HyShape2d				m_LocalBoundingVolume; // A conforming shape around *this that assumes an identity matrix for its transform.
-
 public:
 	IHyDrawable2d(HyType eInstType, std::string sPrefix, std::string sName, HyEntity2d *pParent);
 	IHyDrawable2d(const IHyDrawable2d &copyRef);
@@ -35,7 +32,6 @@ public:
 	IHyDrawable2d &operator=(const IHyDrawable2d &rhs);
 	IHyDrawable2d &operator=(IHyDrawable2d &&donor) noexcept;
 
-	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) = 0;
 	virtual const b2AABB &GetSceneAABB() override;
 
 	virtual bool IsValidToRender() override final;

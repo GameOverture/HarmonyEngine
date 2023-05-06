@@ -196,6 +196,17 @@ int32 IHyBody2d::GetDisplayOrder() const
 	}
 }
 
+//const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
+//{
+//	if(IsDirty(DIRTY_BoundingVolume) || m_LocalBoundingVolume.IsValidShape() == false)
+//	{
+//		OnCalcBoundingVolume();
+//		ClearDirty(DIRTY_BoundingVolume);
+//	}
+//
+//	return m_LocalBoundingVolume;
+//}
+
 float IHyBody2d::GetSceneHeight()
 {
 	const b2AABB &aabbRef = GetSceneAABB();
