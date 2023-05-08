@@ -64,8 +64,8 @@ if(Qt5_DIR)
 		src/Assets/Atlas/AtlasModel.h
 		src/Assets/Atlas/AtlasRepackThread.cpp
 		src/Assets/Atlas/AtlasRepackThread.h
-		src/Assets/Audio/AudioAsset.cpp
-		src/Assets/Audio/AudioAsset.h
+		src/Assets/Audio/SoundClip.cpp
+		src/Assets/Audio/SoundClip.h
 		src/Assets/Audio/AudioAssetsWidget.cpp
 		src/Assets/Audio/AudioAssetsWidget.h
 		src/Assets/Audio/AudioAssetsWidget.ui

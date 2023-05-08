@@ -1,5 +1,5 @@
 /**************************************************************************
- *	AudioAsset.h
+ *	SoundClip.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2020 Jason Knobler
@@ -7,8 +7,8 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef AudioAsset_H
-#define AudioAsset_H
+#ifndef SoundClip_H
+#define SoundClip_H
 
 #include "IAssetItemData.h"
 #include "ProjectItemData.h"
@@ -59,7 +59,7 @@ struct WaveHeader
 	}
 };
 
-class AudioAsset : public IAssetItemData
+class SoundClip : public IAssetItemData
 {
 	Q_OBJECT
 
@@ -73,8 +73,8 @@ class AudioAsset : public IAssetItemData
 	int32			m_iInstanceLimit;
 
 public:
-	AudioAsset(IManagerModel &modelRef, ItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, int32 iGroupId, bool bIsStreaming, bool bExportMono, int32 iInstanceLimit, bool bCompressed, double dVbrQuality, uint uiErrors);
-	~AudioAsset();
+	SoundClip(IManagerModel &modelRef, ItemType eType, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, int32 iGroupId, bool bIsStreaming, bool bExportMono, int32 iInstanceLimit, bool bCompressed, double dVbrQuality, uint uiErrors);
+	~SoundClip();
 
 	int32 GetGroupId() const;
 	bool IsStreaming() const;
@@ -97,4 +97,4 @@ public:
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
 };
 
-#endif // AudioAsset_H
+#endif // SoundClip_H

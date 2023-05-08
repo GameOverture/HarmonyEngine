@@ -1,5 +1,5 @@
 /**************************************************************************
- *	AudioAsset.cpp
+ *	SoundClip.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2020 Jason Knobler
@@ -8,11 +8,11 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "AudioAsset.h"
+#include "SoundClip.h"
 #include "IManagerModel.h"
 #include "_Dependencies/scriptum/imagepacker.h"
 
-AudioAsset::AudioAsset(IManagerModel &modelRef,
+SoundClip::SoundClip(IManagerModel &modelRef,
 					   ItemType eType,
 					   QUuid uuid,
 					   quint32 uiChecksum,
@@ -37,71 +37,71 @@ AudioAsset::AudioAsset(IManagerModel &modelRef,
 {
 }
 
-AudioAsset::~AudioAsset()
+SoundClip::~SoundClip()
 {
 }
 
-int32 AudioAsset::GetGroupId() const
+int32 SoundClip::GetGroupId() const
 {
 	return m_iGroupId;
 }
 
-bool AudioAsset::IsStreaming() const
+bool SoundClip::IsStreaming() const
 {
 	return m_bIsStreaming;
 }
 
-bool AudioAsset::IsExportMono() const
+bool SoundClip::IsExportMono() const
 {
 	return m_bExportMono;
 }
 
-int32 AudioAsset::GetInstanceLimit() const
+int32 SoundClip::GetInstanceLimit() const
 {
 	return m_iInstanceLimit;
 }
 
-bool AudioAsset::IsCompressed() const
+bool SoundClip::IsCompressed() const
 {
 	return m_bCompressed;
 }
 
-double AudioAsset::GetVbrQuality() const
+double SoundClip::GetVbrQuality() const
 {
 	return m_dVbrQuality;
 }
 
-void AudioAsset::SetGroupId(int32 iGroupId)
+void SoundClip::SetGroupId(int32 iGroupId)
 {
 	m_iGroupId = iGroupId;
 }
 
-void AudioAsset::SetIsStreaming(bool bIsStreaming)
+void SoundClip::SetIsStreaming(bool bIsStreaming)
 {
 	m_bIsStreaming = bIsStreaming;
 }
 
-void AudioAsset::SetIsExportMono(bool bIsExportMono)
+void SoundClip::SetIsExportMono(bool bIsExportMono)
 {
 	m_bExportMono = bIsExportMono;
 }
 
-void AudioAsset::SetInstanceLimit(int32 iInstanceLimit)
+void SoundClip::SetInstanceLimit(int32 iInstanceLimit)
 {
 	m_iInstanceLimit = iInstanceLimit;
 }
 
-void AudioAsset::SetIsCompressed(bool bIsCompressed)
+void SoundClip::SetIsCompressed(bool bIsCompressed)
 {
 	m_bCompressed = bIsCompressed;
 }
 
-void AudioAsset::SetVbrQuality(double dVbrQuality)
+void SoundClip::SetVbrQuality(double dVbrQuality)
 {
 	m_dVbrQuality = dVbrQuality;
 }
 
-QString AudioAsset::ConstructDataFileName(bool bWithExt) const
+QString SoundClip::ConstructDataFileName(bool bWithExt) const
 {
 	QString sDataName;
 	sDataName = sDataName.asprintf("%010u", m_uiChecksum);
@@ -117,14 +117,14 @@ QString AudioAsset::ConstructDataFileName(bool bWithExt) const
 	return sDataName;
 }
 
-void AudioAsset::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader &wavHeaderRef)
+void SoundClip::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader &wavHeaderRef)
 {
 	m_sName = sName;
 	m_uiChecksum = uiChecksum;
 	m_WaveHeader = wavHeaderRef;
 }
 
-/*virtual*/ QString AudioAsset::GetPropertyInfo() /*override*/
+/*virtual*/ QString SoundClip::GetPropertyInfo() /*override*/
 {
 	QString sInfo;
 	sInfo = "Grp: " % QString::number(m_iGroupId);
@@ -156,7 +156,7 @@ void AudioAsset::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader
 	return sInfo;
 }
 
-/*virtual*/ void AudioAsset::InsertUniqueJson(QJsonObject &frameObj) /*override*/
+/*virtual*/ void SoundClip::InsertUniqueJson(QJsonObject &frameObj) /*override*/
 {
 	QJsonObject wavHeaderObj;
 	wavHeaderObj.insert("chunkSize", QJsonValue(static_cast<qint64>(m_WaveHeader.ChunkSize)));

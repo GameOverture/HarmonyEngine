@@ -30,8 +30,8 @@ public:
 
 	QJsonArray GenPlayListArray() const;
 	
-	int Cmd_AddAudioAsset(AudioAsset *pAsset);
-	void Cmd_RemoveAudioAsset(AudioAsset *pAsset);
+	int Cmd_AddAudioAsset(SoundClip *pAsset);
+	void Cmd_RemoveAudioAsset(SoundClip *pAsset);
 };
 
 class AudioModel : public IModel
@@ -41,8 +41,8 @@ public:
 	virtual ~AudioModel();
 
 	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from this constructor and from UndoCmd's
-	int Cmd_AddAudioAssets(int iStateIndex, QList<AudioAsset *> assetList);
-	void Cmd_RemoveAudioAssets(int iStateIndex, QList<AudioAsset *> assetList);
+	int Cmd_AddAudioAssets(int iStateIndex, QList<SoundClip *> assetList);
+	void Cmd_RemoveAudioAssets(int iStateIndex, QList<SoundClip *> assetList);
 
 	AudioPlayListModel &GetPlayListModel(uint uiStateIndex);
 	PropertiesTreeModel &GetPropertiesModel(uint uiStateIndex);

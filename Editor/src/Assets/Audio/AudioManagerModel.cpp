@@ -211,7 +211,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 /*virtual*/ IAssetItemData *AudioManagerModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
 	WaveHeader wavHeader(metaObj["wavHeader"].toObject());
-	AudioAsset *pNewFrame = new AudioAsset(*this,
+	SoundClip *pNewFrame = new SoundClip(*this,
 										   HyGlobal::GetTypeFromString(metaObj["itemType"].toString()),
 										   QUuid(metaObj["assetUUID"].toString()),
 										   JSONOBJ_TOINT(metaObj, "checksum"),
@@ -251,7 +251,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	for(int i = 0; i < sImportAssetList.size(); ++i)
 	{
 		// ImportSound calls RegisterAsset() on valid imports
-		AudioAsset *pNewAsset = ImportSound(sImportAssetList[i], uiBankId, eType, correspondingUuidList[i], headerList[i]);
+		SoundClip *pNewAsset = ImportSound(sImportAssetList[i], uiBankId, eType, correspondingUuidList[i], headerList[i]);
 		if(pNewAsset)
 			returnList.append(pNewAsset);
 	}
@@ -300,7 +300,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	QMap<uint, QSet<IAssetItemData *>> affectedMap;
 	for(int i = 0; i < assetList.count(); ++i)
 	{
-		AudioAsset *pAudio = static_cast<AudioAsset *>(assetList[i]);
+		SoundClip *pAudio = static_cast<SoundClip *>(assetList[i]);
 		HyGuiLog("Replacing: " % pAudio->GetName() % " -> " % sImportAssetList[i], LOGTYPE_Info);
 
 		// Audio asset's checksum will change, so it needs to be removed and readded to the manager's registry
@@ -403,10 +403,10 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 		{
 			QJsonObject assetObj;
 			assetObj.insert("checksum", QJsonValue(static_cast<qint64>(bankAssetListRef[i]->GetChecksum())));
-			assetObj.insert("fileName", static_cast<AudioAsset *>(bankAssetListRef[i])->ConstructDataFileName(true));
-			assetObj.insert("groupId", static_cast<AudioAsset *>(bankAssetListRef[i])->GetGroupId());
-			assetObj.insert("isStreaming", static_cast<AudioAsset *>(bankAssetListRef[i])->IsStreaming());
-			assetObj.insert("instanceLimit", static_cast<AudioAsset *>(bankAssetListRef[i])->GetInstanceLimit());
+			assetObj.insert("fileName", static_cast<SoundClip *>(bankAssetListRef[i])->ConstructDataFileName(true));
+			assetObj.insert("groupId", static_cast<SoundClip *>(bankAssetListRef[i])->GetGroupId());
+			assetObj.insert("isStreaming", static_cast<SoundClip *>(bankAssetListRef[i])->IsStreaming());
+			assetObj.insert("instanceLimit", static_cast<SoundClip *>(bankAssetListRef[i])->GetInstanceLimit());
 
 			assetsArray.append(assetObj);
 		}
@@ -433,7 +433,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	return atlasInfoObj;
 }
 
-AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, ItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef)
+SoundClip *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, ItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef)
 {
 	QFile file(sFilePath);
 	if(!file.open(QIODevice::ReadOnly))
@@ -448,7 +448,7 @@ AudioAsset *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, 
 	quint32 uiChecksum = HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(pBinaryData.constData()), pBinaryData.size());
 	QFileInfo fileInfo(sFilePath);
 	
-	AudioAsset *pNewAsset = new AudioAsset(*this, eType, uuid, uiChecksum, uiBankId, fileInfo.baseName(), wavHeaderRef, GetGroupIdFromGroupIndex(0), false, wavHeaderRef.NumOfChan == 1, 0, false, 1.0f, 0);
+	SoundClip *pNewAsset = new SoundClip(*this, eType, uuid, uiChecksum, uiBankId, fileInfo.baseName(), wavHeaderRef, GetGroupIdFromGroupIndex(0), false, wavHeaderRef.NumOfChan == 1, 0, false, 1.0f, 0);
 
 	if(QFile::copy(sFilePath, m_MetaDir.absoluteFilePath(pNewAsset->ConstructMetaFileName())) == false)
 	{

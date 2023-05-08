@@ -11,7 +11,7 @@
 #include "DlgAssetProperties.h"
 #include "ui_DlgAssetProperties.h"
 #include "AtlasFrame.h"
-#include "AudioAsset.h"
+#include "SoundClip.h"
 #include "AudioManagerModel.h"
 
 #include <QMessageBox>
@@ -146,11 +146,11 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 
 	case ASSETMAN_Audio:
 		// Audio Group ////////////////////////////////////////////////////////////////////////////////////////////
-		int32 iGroupId = static_cast<AudioAsset *>(m_SelectedAssets[0])->GetGroupId();
+		int32 iGroupId = static_cast<SoundClip *>(m_SelectedAssets[0])->GetGroupId();
 		bool bCheckable = false;
 		for(auto asset : m_SelectedAssets)
 		{
-			if(static_cast<AudioAsset *>(asset)->GetGroupId() != iGroupId)
+			if(static_cast<SoundClip *>(asset)->GetGroupId() != iGroupId)
 			{
 				bCheckable = true;
 				break;
@@ -159,11 +159,11 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 		ui->audioGroup->Init(&static_cast<AudioManagerModel *>(pManagerModel)->GetGroupsModel(), iGroupId, bCheckable);
 
 		// Is Streaming ///////////////////////////////////////////////////////////////////////////////////////////
-		eCheckState = static_cast<AudioAsset *>(m_SelectedAssets[0])->IsStreaming() ? Qt::Checked : Qt::Unchecked;
+		eCheckState = static_cast<SoundClip *>(m_SelectedAssets[0])->IsStreaming() ? Qt::Checked : Qt::Unchecked;
 		for(auto asset : m_SelectedAssets)
 		{
-			if((eCheckState == Qt::Unchecked && static_cast<AudioAsset *>(asset)->IsStreaming()) ||
-			   (eCheckState == Qt::Checked && static_cast<AudioAsset *>(asset)->IsStreaming() == false))
+			if((eCheckState == Qt::Unchecked && static_cast<SoundClip *>(asset)->IsStreaming()) ||
+			   (eCheckState == Qt::Checked && static_cast<SoundClip *>(asset)->IsStreaming() == false))
 			{
 				eCheckState = Qt::PartiallyChecked;
 				break;
@@ -172,11 +172,11 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 		ui->chkIsStreaming->setCheckState(eCheckState);
 
 		// Export As Mono ///////////////////////////////////////////////////////////////////////////////////////////
-		eCheckState = static_cast<AudioAsset *>(m_SelectedAssets[0])->IsExportMono() ? Qt::Checked : Qt::Unchecked;
+		eCheckState = static_cast<SoundClip *>(m_SelectedAssets[0])->IsExportMono() ? Qt::Checked : Qt::Unchecked;
 		for(auto asset : m_SelectedAssets)
 		{
-			if((eCheckState == Qt::Unchecked && static_cast<AudioAsset *>(asset)->IsExportMono()) ||
-			   (eCheckState == Qt::Checked && static_cast<AudioAsset *>(asset)->IsExportMono() == false))
+			if((eCheckState == Qt::Unchecked && static_cast<SoundClip *>(asset)->IsExportMono()) ||
+			   (eCheckState == Qt::Checked && static_cast<SoundClip *>(asset)->IsExportMono() == false))
 			{
 				eCheckState = Qt::PartiallyChecked;
 				break;
@@ -185,11 +185,11 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 		ui->chkExportAsMono->setCheckState(eCheckState);
 
 		// Is Compressed ///////////////////////////////////////////////////////////////////////////////////////////
-		eCheckState = static_cast<AudioAsset *>(m_SelectedAssets[0])->IsCompressed() ? Qt::Checked : Qt::Unchecked;
+		eCheckState = static_cast<SoundClip *>(m_SelectedAssets[0])->IsCompressed() ? Qt::Checked : Qt::Unchecked;
 		for(auto asset : m_SelectedAssets)
 		{
-			if((eCheckState == Qt::Unchecked && static_cast<AudioAsset *>(asset)->IsCompressed()) ||
-			   (eCheckState == Qt::Checked && static_cast<AudioAsset *>(asset)->IsCompressed() == false))
+			if((eCheckState == Qt::Unchecked && static_cast<SoundClip *>(asset)->IsCompressed()) ||
+			   (eCheckState == Qt::Checked && static_cast<SoundClip *>(asset)->IsCompressed() == false))
 			{
 				eCheckState = Qt::PartiallyChecked;
 				break;
@@ -198,10 +198,10 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 		ui->chkIsCompressed->setCheckState(eCheckState);
 
 		// Use Instance Limit ///////////////////////////////////////////////////////////////////////////////////////////
-		int iInstLimit = static_cast<AudioAsset *>(m_SelectedAssets[0])->GetInstanceLimit();
+		int iInstLimit = static_cast<SoundClip *>(m_SelectedAssets[0])->GetInstanceLimit();
 		for(auto asset : m_SelectedAssets)
 		{
-			if(static_cast<AudioAsset *>(asset)->GetInstanceLimit() != iInstLimit)
+			if(static_cast<SoundClip *>(asset)->GetInstanceLimit() != iInstLimit)
 			{
 				ui->grpMaxInstances->setCheckable(true);
 				ui->grpMaxInstances->setChecked(false);
@@ -250,7 +250,7 @@ void DlgAssetProperties::ApplyChanges()
 	case ASSETMAN_Audio:
 		for(auto pAsset : m_ChangedAssets)
 		{
-			AudioAsset *pAudio = static_cast<AudioAsset *>(pAsset);
+			SoundClip *pAudio = static_cast<SoundClip *>(pAsset);
 
 			if(ui->audioGroup->IsValid() && ui->audioGroup->GetCurrentId() != pAudio->GetGroupId())
 				pAudio->SetGroupId(ui->audioGroup->GetCurrentId());
@@ -418,7 +418,7 @@ bool DlgAssetProperties::DetermineChangedAssets()
 	case ASSETMAN_Audio:
 		for(auto pAsset : m_SelectedAssets)
 		{
-			AudioAsset *pAudio = static_cast<AudioAsset *>(pAsset);
+			SoundClip *pAudio = static_cast<SoundClip *>(pAsset);
 
 			if(ui->audioGroup->IsValid() && pAudio->GetGroupId() != ui->audioGroup->GetCurrentId())
 			{

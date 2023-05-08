@@ -11,7 +11,7 @@
 #define AudioManagerModel_H
 
 #include "IManagerModel.h"
-#include "AudioAsset.h"
+#include "SoundClip.h"
 
 #include <QAudioFormat>
 #include <QSoundEffect>
@@ -79,7 +79,7 @@ protected:
 	virtual QJsonObject GetSaveJson() override;
 
 private:
-	AudioAsset *ImportSound(QString sFilePath, quint32 uiBankIndex, ItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef);
+	SoundClip *ImportSound(QString sFilePath, quint32 uiBankIndex, ItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef);
 };
 
 #endif // AudioManagerModel_H

@@ -12,7 +12,7 @@
 
 #include <QUndoCommand>
 
-class AudioAsset;
+class SoundClip;
 class ProjectItemData;
 class ExplorerItemData;
 
@@ -28,10 +28,10 @@ class AudioUndoCmd_AddAssets : public QUndoCommand
 	ProjectItemData &				m_AudioItemRef;
 	int								m_iStateIndex;
 
-	QList<AudioAsset *>				m_AudioList;
+	QList<SoundClip *>				m_AudioList;
 
 public:
-	AudioUndoCmd_AddAssets(ProjectItemData &audioItemRef, int iStateIndex, QList<AudioAsset *> audioList, QUndoCommand *pParent = nullptr);
+	AudioUndoCmd_AddAssets(ProjectItemData &audioItemRef, int iStateIndex, QList<SoundClip *> audioList, QUndoCommand *pParent = nullptr);
 	virtual ~AudioUndoCmd_AddAssets();
 
 	virtual void redo() override;
@@ -44,10 +44,10 @@ class AudioUndoCmd_RemoveAssets : public QUndoCommand
 	ProjectItemData &			m_AudioItemRef;
 	int							m_iStateIndex;
 
-	QList<AudioAsset *>			m_AudioList;
+	QList<SoundClip *>			m_AudioList;
 
 public:
-	AudioUndoCmd_RemoveAssets(ProjectItemData &audioItemRef, int iStateIndex, QList<AudioAsset *> audioList, QUndoCommand *pParent = nullptr);
+	AudioUndoCmd_RemoveAssets(ProjectItemData &audioItemRef, int iStateIndex, QList<SoundClip *> audioList, QUndoCommand *pParent = nullptr);
 	virtual ~AudioUndoCmd_RemoveAssets();
 
 	virtual void redo() override;

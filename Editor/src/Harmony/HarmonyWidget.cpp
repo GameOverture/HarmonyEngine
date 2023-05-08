@@ -237,14 +237,14 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 	case ITEM_Audio: {
 		const AssetMimeData *pMimeData = static_cast<const AssetMimeData *>(pEvent->mimeData());
 		QJsonArray assetsArray = pMimeData->GetAssetsArray(ASSETMAN_Audio);
-		QList<AudioAsset *> assetsList;
+		QList<SoundClip *> assetsList;
 		for(int i = 0; i < assetsArray.size(); ++i)
 		{
 			QJsonObject assetObj = assetsArray[i].toObject();
 
 			TreeModelItemData *pFoundAsset = m_pProject->FindItemData(assetObj["assetUUID"].toString());
 			if(pFoundAsset)
-				assetsList.push_back(static_cast<AudioAsset *>(pFoundAsset));
+				assetsList.push_back(static_cast<SoundClip *>(pFoundAsset));
 		}
 		
 		if(assetsList.isEmpty() == false)

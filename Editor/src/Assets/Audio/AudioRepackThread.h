@@ -11,7 +11,7 @@
 #define AUDIOREPACKTHREAD_H
 
 #include "IRepackThread.h"
-#include "AudioAsset.h"
+#include "SoundClip.h"
 
 class AudioRepackThread : public IRepackThread
 {
@@ -24,8 +24,8 @@ public:
 	virtual void OnRun() override;
 
 private:
-	bool PackToWav(AudioAsset *pAudio, QDir runtimeBankDir);
-	bool PackToOgg(AudioAsset *pAudio, QDir runtimeBankDir);
+	bool PackToWav(SoundClip *pAudio, QDir runtimeBankDir);
+	bool PackToOgg(SoundClip *pAudio, QDir runtimeBankDir);
 };
 
 #endif // AUDIOREPACKTHREAD_H

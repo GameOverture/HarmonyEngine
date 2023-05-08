@@ -22,7 +22,7 @@ AudioPlayListModel::AudioPlayListModel(QObject *parent) :
 }
 
 // Returns the index the audio asset was inserted to
-int AudioPlayListModel::Add(AudioAsset *pAsset)
+int AudioPlayListModel::Add(SoundClip *pAsset)
 {
 	AudioPlayListItem *pFrameToInsert = nullptr;
 
@@ -49,7 +49,7 @@ int AudioPlayListModel::Add(AudioAsset *pAsset)
 	return iInsertIndex;
 }
 
-void AudioPlayListModel::Remove(AudioAsset *pAsset)
+void AudioPlayListModel::Remove(SoundClip *pAsset)
 {
 	for(int i = 0; i < m_PlayList.count(); ++i)
 	{

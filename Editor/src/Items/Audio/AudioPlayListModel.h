@@ -11,23 +11,23 @@
 #define AUDIOPLAYLISTMODEL_H
 
 #include "IModel.h"
-#include "AudioAsset.h"
+#include "SoundClip.h"
 
 #include <QObject>
 #include <QJsonArray>
 
 class AudioPlayListItem
 {
-	AudioAsset *			m_pAudioAsset;
+	SoundClip *			m_pAudioAsset;
 	uint					m_uiWeight;
 	
 public:
-	AudioPlayListItem(AudioAsset *pAsset, uint uiWeight = 10) :
+	AudioPlayListItem(SoundClip *pAsset, uint uiWeight = 10) :
 		m_pAudioAsset(pAsset),
 		m_uiWeight(uiWeight)
 	{ }
 
-	AudioAsset *GetAudioAsset()		{ return m_pAudioAsset; }
+	SoundClip *GetAudioAsset()		{ return m_pAudioAsset; }
 	uint GetWeight() const			{ return m_uiWeight; }
 	void SetWeight(uint uiWeight)	{ m_uiWeight = uiWeight; }
 };
@@ -53,8 +53,8 @@ public:
 	AudioPlayListModel(QObject *pParent);
 	virtual ~AudioPlayListModel();
 
-	int Add(AudioAsset *pAsset);						// Returns the index the audio asset was inserted to
-	void Remove(AudioAsset *pAsset);
+	int Add(SoundClip *pAsset);						// Returns the index the audio asset was inserted to
+	void Remove(SoundClip *pAsset);
 	void MoveRowUp(int iIndex);
 	void MoveRowDown(int iIndex);
 	void SetWeight(int iIndex, uint uiWeight);			// iIndex of -1 will apply to all

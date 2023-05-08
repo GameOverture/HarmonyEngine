@@ -36,7 +36,7 @@ AudioRepackThread::AudioRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 			bool bFound = false;
 			for(auto audio : pBank->m_AssetList)
 			{
-				if(fileInfo.baseName().compare(static_cast<AudioAsset *>(audio)->ConstructDataFileName(false), Qt::CaseInsensitive) == 0)
+				if(fileInfo.baseName().compare(static_cast<SoundClip *>(audio)->ConstructDataFileName(false), Qt::CaseInsensitive) == 0)
 				{
 					// If this asset is in affected set, delete it as it will be repacked
 					for(auto affected : affectedSet)
@@ -60,7 +60,7 @@ AudioRepackThread::AudioRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 		// Repack all audio in affectedSet
 		for(auto audio : affectedSet)
 		{
-			AudioAsset *pAudioAsset = static_cast<AudioAsset *>(audio);
+			SoundClip *pAudioAsset = static_cast<SoundClip *>(audio);
 
 			if(pAudioAsset->IsCompressed())
 				PackToOgg(pAudioAsset, runtimeBankDir);
@@ -70,14 +70,14 @@ AudioRepackThread::AudioRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 	}
 }
 
-bool AudioRepackThread::PackToWav(AudioAsset *pAudio, QDir runtimeBankDir)
+bool AudioRepackThread::PackToWav(SoundClip *pAudio, QDir runtimeBankDir)
 {
 	// TODO: convert WAV to target format
 	return QFile::copy(m_MetaDir.absoluteFilePath(pAudio->ConstructMetaFileName()),
 					   runtimeBankDir.absoluteFilePath(pAudio->ConstructDataFileName(true)));
 }
 
-bool AudioRepackThread::PackToOgg(AudioAsset *pAudio, QDir runtimeBankDir)
+bool AudioRepackThread::PackToOgg(SoundClip *pAudio, QDir runtimeBankDir)
 {
 	QString sWavFilePath = m_MetaDir.absoluteFilePath(pAudio->ConstructMetaFileName());
 	QFile wavFile(sWavFilePath);

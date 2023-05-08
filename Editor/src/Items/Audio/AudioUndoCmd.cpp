@@ -12,7 +12,7 @@
 #include "AudioModel.h"
 #include "AudioWidget.h"
 
-AudioUndoCmd_AddAssets::AudioUndoCmd_AddAssets(ProjectItemData &audioItemRef, int iStateIndex, QList<AudioAsset *> audioList, QUndoCommand *pParent /*= nullptr*/) :
+AudioUndoCmd_AddAssets::AudioUndoCmd_AddAssets(ProjectItemData &audioItemRef, int iStateIndex, QList<SoundClip *> audioList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_AudioItemRef(audioItemRef),
 	m_iStateIndex(iStateIndex),
@@ -39,7 +39,7 @@ AudioUndoCmd_AddAssets::AudioUndoCmd_AddAssets(ProjectItemData &audioItemRef, in
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AudioUndoCmd_RemoveAssets::AudioUndoCmd_RemoveAssets(ProjectItemData &audioItemRef, int iStateIndex, QList<AudioAsset *> audioList, QUndoCommand *pParent /*= nullptr*/) :
+AudioUndoCmd_RemoveAssets::AudioUndoCmd_RemoveAssets(ProjectItemData &audioItemRef, int iStateIndex, QList<SoundClip *> audioList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_AudioItemRef(audioItemRef),
 	m_iStateIndex(iStateIndex),

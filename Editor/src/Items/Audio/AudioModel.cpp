@@ -26,7 +26,7 @@ AudioStateData::AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair s
 
 	QList<TreeModelItemData *> dependeeList = m_ModelRef.GetItem().GetProject().IncrementDependencies(&m_ModelRef.GetItem(), uuidRequestList);
 	for(int i = 0; i < dependeeList.size(); ++i)
-		Cmd_AddAudioAsset(static_cast<AudioAsset *>(dependeeList[i]));
+		Cmd_AddAudioAsset(static_cast<SoundClip *>(dependeeList[i]));
 
 	if(dataPlayListArray.size() != dependeeList.size())
 		HyGuiLog("AudioStateData::AudioStateData() failed to acquire all the stored audio assets", LOGTYPE_Error);
@@ -82,13 +82,13 @@ QJsonArray AudioStateData::GenPlayListArray() const
 	return m_PlayListModel.GenPlayListArray();
 }
 
-int AudioStateData::Cmd_AddAudioAsset(AudioAsset *pAsset)
+int AudioStateData::Cmd_AddAudioAsset(SoundClip *pAsset)
 {
 	// Returns the index the frame was inserted to
 	return m_PlayListModel.Add(pAsset);
 }
 
-void AudioStateData::Cmd_RemoveAudioAsset(AudioAsset *pAsset)
+void AudioStateData::Cmd_RemoveAudioAsset(SoundClip *pAsset)
 {
 	m_PlayListModel.Remove(pAsset);
 }
@@ -103,12 +103,12 @@ AudioModel::~AudioModel()
 {
 }
 
-int AudioModel::Cmd_AddAudioAssets(int iStateIndex, QList<AudioAsset *> audioAssetList)
+int AudioModel::Cmd_AddAudioAssets(int iStateIndex, QList<SoundClip *> audioAssetList)
 {
 	int iRow = 0;
 
 	QList<TreeModelItemData *> depList;
-	for(AudioAsset *pAudio : audioAssetList)
+	for(SoundClip *pAudio : audioAssetList)
 	{
 		depList.push_back(pAudio);
 		iRow = static_cast<AudioStateData *>(m_StateList[iStateIndex])->Cmd_AddAudioAsset(pAudio);
@@ -121,10 +121,10 @@ int AudioModel::Cmd_AddAudioAssets(int iStateIndex, QList<AudioAsset *> audioAss
 	return iRow;
 }
 
-void AudioModel::Cmd_RemoveAudioAssets(int iStateIndex, QList<AudioAsset *> audioAssetList)
+void AudioModel::Cmd_RemoveAudioAssets(int iStateIndex, QList<SoundClip *> audioAssetList)
 {
 	QList<TreeModelItemData *> depList;
-	for(AudioAsset *pAudio : audioAssetList)
+	for(SoundClip *pAudio : audioAssetList)
 	{
 		depList.push_back(pAudio);
 		static_cast<AudioStateData *>(m_StateList[iStateIndex])->Cmd_RemoveAudioAsset(pAudio);
