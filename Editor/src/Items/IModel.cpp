@@ -122,6 +122,8 @@ void IModel::MoveStateForward(int iStateIndex)
 
 FileDataPair IModel::PopState(uint32 uiIndex)
 {
+	OnPopState(uiIndex);
+
 	FileDataPair retObj = GetStateFileData(uiIndex);
 
 	beginRemoveRows(QModelIndex(), uiIndex, uiIndex);

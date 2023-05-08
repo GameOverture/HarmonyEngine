@@ -101,6 +101,14 @@ void AudioPlayListModel::SetWeight(int iIndex, uint uiWeight)
 	}
 }
 
+QList<TreeModelItemData *> AudioPlayListModel::GetSoundClips() const
+{
+	QList<TreeModelItemData *> soundClipList;
+	for(int i = 0; i < m_PlayList.count(); ++i)
+		soundClipList.append(m_PlayList[i]->GetAudioAsset());
+	return soundClipList;
+}
+
 QJsonArray AudioPlayListModel::GenPlayListArray() const
 {
 	QJsonArray playListArray;
@@ -116,7 +124,7 @@ QJsonArray AudioPlayListModel::GenPlayListArray() const
 	return playListArray;
 }
 
-AudioPlayListItem *AudioPlayListModel::GetAudioAssetAt(int iIndex)
+AudioPlayListItem *AudioPlayListModel::GetPlayListItemAt(int iIndex)
 {
 	if(iIndex < 0)
 		return nullptr;
@@ -126,7 +134,7 @@ AudioPlayListItem *AudioPlayListModel::GetAudioAssetAt(int iIndex)
 
 /*virtual*/ int AudioPlayListModel::rowCount(const QModelIndex & /*parent*/) const
 {
-   return m_PlayList.count();
+	return m_PlayList.count();
 }
 
 /*virtual*/ int AudioPlayListModel::columnCount(const QModelIndex & /*parent*/) const

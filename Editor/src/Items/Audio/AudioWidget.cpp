@@ -147,7 +147,7 @@ void AudioWidget::on_actionRemoveAudio_triggered()
 	AudioPlayListModel *pPlayListModel = static_cast<AudioPlayListModel *>(ui->playListTableView->model());
 
 	QList<AudioAsset *> removeList;
-	removeList.append(pPlayListModel->GetAudioAssetAt(ui->playListTableView->currentIndex().row())->GetAudioAsset());
+	removeList.append(pPlayListModel->GetPlayListItemAt(ui->playListTableView->currentIndex().row())->GetAudioAsset());
 
 	QUndoCommand *pCmd = new AudioUndoCmd_RemoveAssets(m_ItemRef, GetCurStateIndex(), removeList);
 	GetItem().GetUndoStack()->push(pCmd);

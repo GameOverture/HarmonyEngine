@@ -26,7 +26,6 @@
 #include "PrefabDraw.h"
 #include "EntityWidget.h"
 #include "EntityDraw.h"
-#include "PrimitiveModel.h"
 #include "AudioModel.h"
 #include "AudioWidget.h"
 #include "AudioDraw.h"
@@ -96,9 +95,6 @@ void ProjectItemData::LoadModel()
 		break;
 	case ITEM_Prefab:
 		m_pModel = new PrefabModel(*this, m_ItemFileData);
-		break;
-	case ITEM_Primitive:
-		m_pModel = new PrimitiveModel(*this, m_ItemFileData);
 		break;
 	case ITEM_Audio:
 		m_pModel = new AudioModel(*this, m_ItemFileData);

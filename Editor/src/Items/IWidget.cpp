@@ -36,6 +36,7 @@ IWidget::IWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 	uiWidget->cmbStates->blockSignals(false);
 
 	uiWidget->btnAddState->setDefaultAction(uiWidget->actionAddState);
+	uiWidget->btnDuplicateState->setDefaultAction(uiWidget->actionDuplicateState);
 	uiWidget->btnRemoveState->setDefaultAction(uiWidget->actionRemoveState);
 	uiWidget->btnRenameState->setDefaultAction(uiWidget->actionRenameState);
 	uiWidget->btnOrderStateBack->setDefaultAction(uiWidget->actionOrderStateBackwards);
@@ -43,6 +44,7 @@ IWidget::IWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 
 	connect(uiWidget->cmbStates, SIGNAL(currentIndexChanged(int)), this, SLOT(OnCurrentIndexChanged(int)));
 	connect(uiWidget->actionAddState, &QAction::triggered, this, &IWidget::OnAddStateTriggered);
+	connect(uiWidget->actionDuplicateState, &QAction::triggered, this, &IWidget::OnDuplicateStateTriggered);
 	connect(uiWidget->actionRemoveState, &QAction::triggered, this, &IWidget::OnRemoveStateTriggered);
 	connect(uiWidget->actionRenameState, &QAction::triggered, this, &IWidget::OnRenameStateTriggered);
 	connect(uiWidget->actionOrderStateBackwards, &QAction::triggered, this, &IWidget::OnOrderStateBackwardsTriggered);
@@ -114,33 +116,12 @@ void IWidget::OnCurrentIndexChanged(int index)
 
 void IWidget::OnAddStateTriggered()
 {
-	QUndoCommand *pCmd = nullptr;
+	AppendState(-1);
+}
 
-	switch(m_ItemRef.GetType())
-	{
-	case ITEM_Sprite:
-		pCmd = new UndoCmd_AddState<SpriteStateData>("Add Sprite State", m_ItemRef);
-		break;
-	case ITEM_Text:
-		pCmd = new UndoCmd_AddState<TextStateData>("Add Text State", m_ItemRef);
-		break;
-	case ITEM_Entity:
-		// TODO: Ask to copy from other state or create OnDuplicateStateTriggered())
-		pCmd = new UndoCmd_AddState<EntityStateData>("Add Entity State", m_ItemRef);
-		break;
-	case ITEM_Prefab:
-		pCmd = new UndoCmd_AddState<PrefabStateData>("Add Prefab State", m_ItemRef);
-		break;
-	case ITEM_Audio:
-		pCmd = new UndoCmd_AddState<AudioStateData>("Add Audio State", m_ItemRef);
-		break;
-	default:
-		HyGuiLog("Unimplemented item on_actionAddState_triggered(): " % QString::number(m_ItemRef.GetType()), LOGTYPE_Error);
-		break;
-	}
-
-	if(pCmd)
-		m_ItemRef.GetUndoStack()->push(pCmd);
+void IWidget::OnDuplicateStateTriggered()
+{
+	AppendState(uiWidget->cmbStates->currentIndex());
 }
 
 void IWidget::OnRemoveStateTriggered()
@@ -194,4 +175,37 @@ void IWidget::OnOrderStateForwardsTriggered()
 {
 	QUndoCommand *pCmd = new UndoCmd_MoveStateForward("Shift State Index ->", m_ItemRef, uiWidget->cmbStates->currentIndex());
 	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void IWidget::AppendState(int iCopyFromState)
+{
+	QUndoCommand *pCmd = nullptr;
+
+	QString sText = iCopyFromState >= 0 ? "Duplicate " : "Add ";
+	sText += HyGlobal::ItemName(m_ItemRef.GetType(), false) % " State";
+
+	switch(m_ItemRef.GetType())
+	{
+	case ITEM_Sprite:
+		pCmd = new UndoCmd_AddState<SpriteStateData>(sText, m_ItemRef, iCopyFromState);
+		break;
+	case ITEM_Text:
+		pCmd = new UndoCmd_AddState<TextStateData>(sText, m_ItemRef, iCopyFromState);
+		break;
+	case ITEM_Entity:
+		pCmd = new UndoCmd_AddState<EntityStateData>(sText, m_ItemRef, iCopyFromState);
+		break;
+	case ITEM_Prefab:
+		pCmd = new UndoCmd_AddState<PrefabStateData>(sText, m_ItemRef, iCopyFromState);
+		break;
+	case ITEM_Audio:
+		pCmd = new UndoCmd_AddState<AudioStateData>(sText, m_ItemRef, iCopyFromState);
+		break;
+	default:
+		HyGuiLog("Unimplemented item IWidget::AppendState(): " % QString::number(m_ItemRef.GetType()), LOGTYPE_Error);
+		break;
+	}
+
+	if(pCmd)
+		m_ItemRef.GetUndoStack()->push(pCmd);
 }

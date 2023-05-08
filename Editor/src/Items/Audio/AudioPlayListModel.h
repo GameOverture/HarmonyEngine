@@ -59,8 +59,9 @@ public:
 	void MoveRowDown(int iIndex);
 	void SetWeight(int iIndex, uint uiWeight);			// iIndex of -1 will apply to all
 
+	QList<TreeModelItemData *> GetSoundClips() const;
 	QJsonArray GenPlayListArray() const;
-	AudioPlayListItem *GetAudioAssetAt(int iIndex);
+	AudioPlayListItem *GetPlayListItemAt(int iIndex);
 
 	virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;

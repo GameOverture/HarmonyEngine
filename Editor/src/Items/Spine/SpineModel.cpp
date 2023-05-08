@@ -201,6 +201,10 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 {
 }
 
+/*virtual*/ void SpineModel::OnPopState(int iPoppedStateIndex) /*override*/
+{
+}
+
 /*virtual*/ bool SpineModel::OnPrepSave() /*override*/
 {
 	if(m_bUsingTempFiles)

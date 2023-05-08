@@ -101,6 +101,10 @@ void TextModel::SetRuntimeAtlasDirty()
 	m_bGenerateRuntimeAtlas = true;
 }
 
+/*virtual*/ void TextModel::OnPopState(int iPoppedStateIndex) /*override*/
+{
+}
+
 /*virtual*/ bool TextModel::OnPrepSave() /*override*/
 {
 	if(m_bGenerateRuntimeAtlas == false)

@@ -62,6 +62,7 @@ public:
 
 	void SetRuntimeAtlasDirty();
 
+	virtual void OnPopState(int iPoppedStateIndex) override;
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;

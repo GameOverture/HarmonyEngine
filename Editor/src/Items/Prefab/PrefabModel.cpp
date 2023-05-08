@@ -319,6 +319,10 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 //	CopyNodesWithMeshes( node.mChildren[a], parent, transform);
 //}
 
+/*virtual*/ void PrefabModel::OnPopState(int iPoppedStateIndex) /*override*/
+{
+}
+
 /*virtual*/ void PrefabModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
 	//QJsonArray prefabArray;

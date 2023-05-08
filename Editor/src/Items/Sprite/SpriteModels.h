@@ -111,6 +111,7 @@ public:
 	int Cmd_AddFrames(int iStateIndex, QList<AtlasFrame *> frameList);
 	void Cmd_RemoveFrames(int iStateIndex, QList<AtlasFrame *> frameList);
 	
+	virtual void OnPopState(int iPoppedStateIndex) override;
 	virtual bool OnPrepSave() override { return true; }
 	virtual void InsertItemSpecificData(FileDataPair &itemFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;

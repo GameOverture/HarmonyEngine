@@ -53,6 +53,8 @@ private Q_SLOTS:
 
 	void OnAddStateTriggered();
 
+	void OnDuplicateStateTriggered();
+
 	void OnRemoveStateTriggered();
 
 	void OnRenameStateTriggered();
@@ -63,6 +65,8 @@ private Q_SLOTS:
 
 private:
 	Ui::IWidget *uiWidget;
+
+	void AppendState(int iCopyFromState);
 };
 
 #endif // IWIDGET_H

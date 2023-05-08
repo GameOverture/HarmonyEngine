@@ -72,6 +72,11 @@ PropertiesTreeModel &AudioStateData::GetPropertiesModel()
 	return m_PropertiesModel;
 }
 
+QList<TreeModelItemData *> AudioStateData::GetSoundClips() const
+{
+	return m_PlayListModel.GetSoundClips();
+}
+
 QJsonArray AudioStateData::GenPlayListArray() const
 {
 	return m_PlayListModel.GenPlayListArray();
@@ -138,6 +143,12 @@ PropertiesTreeModel &AudioModel::GetPropertiesModel(uint uiStateIndex)
 	return static_cast<AudioStateData *>(m_StateList[uiStateIndex])->GetPropertiesModel();
 }
 
+/*virtual*/ void AudioModel::OnPopState(int iPoppedStateIndex) /*override*/
+{
+	AudioStateData *pState = static_cast<AudioStateData *>(m_StateList[iPoppedStateIndex]);
+	m_ItemRef.GetProject().DecrementDependencies(&m_ItemRef, pState->GetSoundClips());
+}
+
 /*virtual*/ bool AudioModel::OnPrepSave() /*override*/
 {
 	return true;
@@ -156,7 +167,7 @@ PropertiesTreeModel &AudioModel::GetPropertiesModel(uint uiStateIndex)
 	// META ////////////////////////////////////////////////////////////////////////
 	QList<IAssetItemData *> assetList;
 	for(int i = 0; i < playListModelRef.rowCount(); ++i)
-		assetList << playListModelRef.GetAudioAssetAt(i)->GetAudioAsset();
+		assetList << playListModelRef.GetPlayListItemAt(i)->GetAudioAsset();
 	QJsonArray assetUuidArray;
 	for(int i = 0; i < assetList.size(); ++i)
 		assetUuidArray.append(assetList[i]->GetUuid().toString(QUuid::WithoutBraces));

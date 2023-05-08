@@ -137,8 +137,6 @@ if(Qt5_DIR)
 		src/Items/Prefab/PrefabModel.h
 		src/Items/Prefab/PrefabWidget.h
 		src/Items/Prefab/PrefabWidget.ui
-		src/Items/Primitive/PrimitiveModel.cpp
-		src/Items/Primitive/PrimitiveModel.h
 		src/Items/Audio/AudioDraw.cpp
 		src/Items/Audio/AudioDraw.h
 		src/Items/Audio/AudioModel.cpp

@@ -544,6 +544,10 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 	EntityTreeItemData *pEntityTreeData = reinterpret_cast<EntityTreeItemData *>(propertiesModelRef.GetSubstate().toLongLong());
 }
 
+/*virtual*/ void EntityModel::OnPopState(int iPoppedStateIndex) /*override*/
+{
+}
+
 /*virtual*/ bool EntityModel::OnPrepSave() /*override*/
 {
 	// Save generated C++ class in a .h

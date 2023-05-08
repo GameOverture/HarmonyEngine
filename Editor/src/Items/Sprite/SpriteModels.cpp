@@ -424,6 +424,17 @@ void SpriteModel::Cmd_RemoveFrames(int iStateIndex, QList<AtlasFrame *> frameLis
 	m_ItemRef.GetProject().DecrementDependencies(&m_ItemRef, assetList);
 }
 
+/*virtual*/ void SpriteModel::OnPopState(int iPoppedStateIndex) /*override*/
+{
+	QList<IAssetItemData *> frameList = static_cast<SpriteStateData *>(m_StateList[iPoppedStateIndex])->GetAtlasFrames();
+
+	QList<TreeModelItemData *> convertedTypeList;
+	for(IAssetItemData *pFrame : frameList)
+		convertedTypeList.push_back(pFrame);
+
+	m_ItemRef.GetProject().DecrementDependencies(&m_ItemRef, convertedTypeList);
+}
+
 /*virtual*/ void SpriteModel::InsertItemSpecificData(FileDataPair &itemFileDataOut) /*override*/
 {
 }
