@@ -27,12 +27,12 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	m_bIsAssetItem = HyGlobal::IsItemType_Asset(m_eTYPE);
 	m_bIsProjectItem = HyGlobal::IsItemType_Project(m_eTYPE);
 
-	if(m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_ArrayItem)
+	if(m_eEntType == ENTTYPE_Root || m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_ArrayItem)
 	{
 		for(int i = 0; i < m_EntityModelRef.GetNumStates(); ++i)
 		{
 			EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityModelRef.GetStateData(i));
-			pStateData->Cmd_AddItemDataProperties(this, QJsonObject());
+			pStateData->InsertNewPropertiesModel(this, QJsonObject());
 		}
 	}
 }
@@ -57,7 +57,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	for(int i = 0; i < m_EntityModelRef.GetNumStates(); ++i)
 	{
 		EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityModelRef.GetStateData(i));
-		pStateData->Cmd_AddItemDataProperties(this, propArray[i].toObject());
+		pStateData->InsertNewPropertiesModel(this, propArray[i].toObject());
 	}
 }
 
@@ -92,7 +92,7 @@ bool EntityTreeItemData::IsForwardDeclared() const
 
 PropertiesTreeModel *EntityTreeItemData::GetPropertiesModel(int iStateIndex)
 {
-	if(m_eEntType == ENTTYPE_Root || m_eEntType == ENTTYPE_BvFolder || m_eEntType == ENTTYPE_ArrayFolder)
+	if(m_eEntType == ENTTYPE_BvFolder || m_eEntType == ENTTYPE_ArrayFolder)
 		return nullptr;
 
 	return static_cast<EntityStateData *>(m_EntityModelRef.GetStateData(iStateIndex))->GetPropertiesTreeModel(this);

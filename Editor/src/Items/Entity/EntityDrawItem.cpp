@@ -45,7 +45,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 
 		if(m_pEntityTreeItemData->GetType() == ITEM_Entity)
 		{
-			QJsonArray descListArray = fileDataPair.m_Meta["childList"].toArray();
+			QJsonArray descListArray = fileDataPair.m_Meta["descChildList"].toArray();
 			QJsonArray subEntStateArray = fileDataPair.m_Meta["stateArray"].toArray();
 
 			QList<QJsonArray> statePropArrayList;
@@ -260,7 +260,7 @@ SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, const QLi
 			for(int iStateIndex = 0; iStateIndex < stateArray.size(); ++iStateIndex)
 				subStatePropArrayList.push_back(stateArray[iStateIndex].toObject()["propChildList"].toArray());
 
-			m_ChildPtrList.append(qMakePair(new SubEntity(projectRef, fileDataPair.m_Meta["childList"].toArray(), subStatePropArrayList, this), eItemType));
+			m_ChildPtrList.append(qMakePair(new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), subStatePropArrayList, this), eItemType));
 			break; }
 
 		case ITEM_AtlasFrame:

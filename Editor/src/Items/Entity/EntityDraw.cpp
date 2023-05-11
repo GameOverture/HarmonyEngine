@@ -102,7 +102,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	if(m_bPanCameraKeyDown)
 		RefreshTransforms();
-	else
+	else if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
 		DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 }
 
@@ -110,9 +110,9 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDraw::OnMousePressEvent(pEvent);
 
-	if(m_bPanCameraKeyDown)
+	if(m_bPanCameraKeyDown) 
 		RefreshTransforms();
-	else if(pEvent->button() == Qt::LeftButton)
+	else if(pEvent->button() == Qt::LeftButton && Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
 	{
 		if(m_eShapeEditState != SHAPESTATE_None)
 			DoMousePress_ShapeEdit(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
@@ -130,7 +130,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	if(m_bPanCameraKeyDown)
 		IDraw::OnMouseReleaseEvent(pEvent);
-	else
+	else if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
 	{
 		IDraw::OnMouseReleaseEvent(pEvent);
 
@@ -259,26 +259,27 @@ void EntityDraw::ClearShapeEdit()
 	m_ItemList.clear();
 	m_SelectedItemList.clear();
 
-	QJsonArray childArray = itemMetaObj["childList"].toArray();
-	QJsonArray shapeArray = itemMetaObj["shapeList"].toArray();
+	QJsonArray descChildArray = itemMetaObj["descChildList"].toArray();
+	QJsonArray descShapeArray = itemMetaObj["descShapeList"].toArray();
 	
 	QJsonObject stateObj = itemMetaObj["stateArray"].toArray()[m_pProjItem->GetWidget()->GetCurStateIndex()].toObject();
+	// NOTE: "propRoot" within the stateObj doesn't have any data that'll change how the EntityDraw is shown, so it is skipped
 	QJsonArray propChildArray = stateObj["propChildList"].toArray();
 	QJsonArray propShapeArray = stateObj["propShapeList"].toArray();
 
 	// Pull out all the valid json objects that represent items in the entity
 	QList<QJsonObject> descObjList;
 	QList<QJsonObject> propObjList;
-	for(int32 i = 0; i < childArray.size(); ++i)
+	for(int32 i = 0; i < descChildArray.size(); ++i)
 	{
-		if(childArray[i].isObject())
+		if(descChildArray[i].isObject())
 		{
-			descObjList.push_back(childArray[i].toObject());
+			descObjList.push_back(descChildArray[i].toObject());
 			propObjList.push_back(propChildArray[i].toObject());
 		}
-		else if(childArray[i].isArray())
+		else if(descChildArray[i].isArray())
 		{
-			QJsonArray arrayFolder = childArray[i].toArray();
+			QJsonArray arrayFolder = descChildArray[i].toArray();
 			QJsonArray arrayPropFolder = propChildArray[i].toArray();
 			for(int32 j = 0; j < arrayFolder.size(); ++j)
 			{
@@ -287,16 +288,16 @@ void EntityDraw::ClearShapeEdit()
 			}
 		}
 	}
-	for(int32 i = 0; i < shapeArray.size(); ++i)
+	for(int32 i = 0; i < descShapeArray.size(); ++i)
 	{
-		if(shapeArray[i].isObject())
+		if(descShapeArray[i].isObject())
 		{
-			descObjList.push_back(shapeArray[i].toObject());
+			descObjList.push_back(descShapeArray[i].toObject());
 			propObjList.push_back(propShapeArray[i].toObject());
 		}
-		else if(shapeArray[i].isArray())
+		else if(descShapeArray[i].isArray())
 		{
-			QJsonArray arrayFolder = shapeArray[i].toArray();
+			QJsonArray arrayFolder = descShapeArray[i].toArray();
 			QJsonArray arrayPropFolder = propShapeArray[i].toArray();
 			for(int32 j = 0; j < arrayFolder.size(); ++j)
 			{

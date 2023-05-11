@@ -20,7 +20,59 @@
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData)
 {
-	// m_PropertiesMap will be filled in by the EntityModel::Cmd_AddItemDataProperties() function
+	//// NOTE: All entity tree items exist and have been created prior to this ctor being called
+	//EntityTreeModel &treeModelRef = static_cast<EntityModel &>(modelRef).GetTreeModel();
+
+	//// Handle 'root'
+	//QJsonObject propRootObj;
+	//if(stateFileData.m_Meta.contains("propRoot"))
+	//	propRootObj = stateFileData.m_Meta["propRoot"].toObject();
+	//InsertNewPropertiesModel(treeModelRef.GetRootTreeItemData(), propRootObj);
+
+	//// Get all the items (both child and shape) and then init their properties
+	//QList<EntityTreeItemData *> childList;
+	//QList<EntityTreeItemData *> shapeList;
+	//treeModelRef.GetTreeItemData(childList, shapeList);
+
+	//// Init child list
+	//QJsonArray propChildListArray;
+	//if(stateFileData.m_Meta.contains("propChildList"))
+	//{
+	//	propChildListArray = stateFileData.m_Meta["propChildList"].toArray();
+	//	if(propChildListArray.size() != childList.size())
+	//		HyGuiLog("EntityStateData::EntityStateData - propChildListArray.size() != childList.size()", LOGTYPE_Error);
+	//}
+	//else
+	//{
+	//	// Push empty objects into the array so that the array is the same size as the child list
+	//	for(int i = 0; i < childList.size(); ++i)
+	//		propChildListArray.push_back(QJsonObject());
+	//}
+	//for(int i = 0; i < childList.size(); ++i)
+	//{
+	//	QJsonObject propChildObj = propChildListArray[i].toObject();
+	//	InsertNewPropertiesModel(childList[i], propChildObj);
+	//}
+
+	//// Init shape list
+	//QJsonArray propShapeListArray;
+	//if(stateFileData.m_Meta.contains("propShapeList"))
+	//{
+	//	propShapeListArray = stateFileData.m_Meta["propShapeList"].toArray();
+	//	if(propShapeListArray.size() != shapeList.size())
+	//		HyGuiLog("EntityStateData::EntityStateData - propShapeListArray.size() != shapeList.size()", LOGTYPE_Error);
+	//}
+	//else
+	//{
+	//	// Push empty objects into the array so that the array is the same size as the shape list
+	//	for(int i = 0; i < shapeList.size(); ++i)
+	//		propShapeListArray.push_back(QJsonObject());
+	//}
+	//for(int i = 0; i < shapeList.size(); ++i)
+	//{
+	//	QJsonObject propShapeObj = propShapeListArray[i].toObject();
+	//	InsertNewPropertiesModel(shapeList[i], propShapeObj);
+	//}
 }
 
 /*virtual*/ EntityStateData::~EntityStateData()
@@ -28,6 +80,21 @@ EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair
 	QList<EntityTreeItemData *> keyList = m_PropertiesMap.keys();
 	for(EntityTreeItemData *pKey : keyList)
 		delete m_PropertiesMap[pKey];
+}
+
+void EntityStateData::InsertNewPropertiesModel(EntityTreeItemData *pItemData, QJsonObject propObj)
+{
+	if(m_PropertiesMap.contains(pItemData))
+	{
+		HyGuiLog("EntityStateData::InsertNewPropertiesModel - item already was added", LOGTYPE_Error);
+		return;
+	}
+
+	PropertiesTreeModel *pNewProperties = new PropertiesTreeModel(m_ModelRef.GetItem(), m_iINDEX, QVariant());
+	InitalizePropertyModel(pItemData, *pNewProperties);
+	pNewProperties->DeserializeJson(propObj);
+
+	m_PropertiesMap.insert(pItemData, pNewProperties);
 }
 
 PropertiesTreeModel *EntityStateData::GetPropertiesTreeModel(EntityTreeItemData *pItemData)
@@ -40,40 +107,10 @@ PropertiesTreeModel *EntityStateData::GetPropertiesTreeModel(EntityTreeItemData 
 	return m_PropertiesMap[pItemData];
 }
 
-void EntityStateData::Cmd_AddItemDataProperties(EntityTreeItemData *pItemData, QJsonObject propObj)
-{
-	if(m_PropertiesMap.contains(pItemData))
-	{
-		HyGuiLog("EntityStateData::Cmd_AddItemDataProperties - item already was added", LOGTYPE_Error);
-		return;
-	}
-
-	PropertiesTreeModel *pNewProperties = new PropertiesTreeModel(m_ModelRef.GetItem(), m_iINDEX, QVariant());
-	InitalizePropertyModel(pItemData, *pNewProperties);
-	pNewProperties->DeserializeJson(propObj);
-
-	m_PropertiesMap.insert(pItemData, pNewProperties);
-}
-
-void EntityStateData::Cmd_RemoveItemDataProperties(EntityTreeItemData *pItemData)
-{
-	if(m_PropertiesMap.contains(pItemData) == false)
-	{
-		HyGuiLog("EntityStateData::Cmd_RemoveItemDataProperties - pItemData was not found", LOGTYPE_Error);
-		return;
-	}
-
-	delete m_PropertiesMap[pItemData];
-	m_PropertiesMap.remove(pItemData);
-}
-
 // NOTE: These properties get set to the proper harmony node within EntityDrawItem.cpp's ApplyProperties
 //		 Updates here should reflect to the function above
-void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, PropertiesTreeModel &propertiesTreeModelRef)
+void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, PropertiesTreeModel &propertiesTreeModelRef) const
 {
-	if(pItemData->GetType() == ITEM_Prefix) // aka Shapes folder
-		return;
-
 	// Default ranges
 	const int iRANGE = 16777215;        // Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
 	const double fRANGE = 16777215.0f;
@@ -84,41 +121,48 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 
 	if(pItemData->GetType() != ITEM_BoundingVolume)
 	{
-		if(pItemData->IsAssetItem() == false)
+		if(pItemData->IsAssetItem() == false && pItemData->GetEntType() != ENTTYPE_Root)
 			propertiesTreeModelRef.AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(pItemData->GetType(), false) % "'s state to be displayed", false, QVariant(), QVariant(), QVariant(), QString(), QString(), pItemData->GetReferencedItemUuid());
-		propertiesTreeModelRef.AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused");
-		propertiesTreeModelRef.AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", false, -iRANGE, iRANGE, 1);
 
-		propertiesTreeModelRef.AppendCategory("Transformation", HyGlobal::ItemColor(ITEM_Project));
-		propertiesTreeModelRef.AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", false, -fRANGE, fRANGE, 1.0, "[", "]");
-		propertiesTreeModelRef.AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Scale is relative to parent node", false, -fRANGE, fRANGE, 0.01, "[", "]");
-		propertiesTreeModelRef.AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", false, 0.0, 360.0, 0.1, "", "°");
-
-		if(pItemData->GetType() != ITEM_Audio)
+		if(pItemData->GetEntType() != ENTTYPE_Root)
 		{
-			propertiesTreeModelRef.AppendCategory("Body", HyGlobal::ItemColor(ITEM_Prefix));
-			propertiesTreeModelRef.AppendProperty("Body", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated");
-			propertiesTreeModelRef.AppendProperty("Body", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 255), "A color to alpha blend this item with");
-			propertiesTreeModelRef.AppendProperty("Body", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", false, 0.0, 1.0, 0.05);
-			propertiesTreeModelRef.AppendProperty("Body", "Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", false, -iRANGE, iRANGE, 1);
+			propertiesTreeModelRef.AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused");
+			propertiesTreeModelRef.AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", false, -iRANGE, iRANGE, 1);
+
+			propertiesTreeModelRef.AppendCategory("Transformation", HyGlobal::ItemColor(ITEM_Project));
+			propertiesTreeModelRef.AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", false, -fRANGE, fRANGE, 1.0, "[", "]");
+			propertiesTreeModelRef.AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Scale is relative to parent node", false, -fRANGE, fRANGE, 0.01, "[", "]");
+			propertiesTreeModelRef.AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", false, 0.0, 360.0, 0.1, "", "°");
+		
+			if(pItemData->GetType() != ITEM_Audio)
+			{
+				propertiesTreeModelRef.AppendCategory("Body", HyGlobal::ItemColor(ITEM_Prefix));
+				propertiesTreeModelRef.AppendProperty("Body", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated");
+				propertiesTreeModelRef.AppendProperty("Body", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 255), "A color to alpha blend this item with");
+				propertiesTreeModelRef.AppendProperty("Body", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", false, 0.0, 1.0, 0.05);
+				propertiesTreeModelRef.AppendProperty("Body", "Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", false, -iRANGE, iRANGE, 1);
+			}
+		}
+		else // ENTTYPE_Root
+		{
+			propertiesTreeModelRef.AppendCategory("Physics", QVariant(), true, false, "Optionally create a physics component that can affect the transformation of this entity");
+			propertiesTreeModelRef.AppendProperty("Physics", "Start Activated", PROPERTIESTYPE_bool, Qt::Checked, "This entity will start its physics simulation upon creation");
+			propertiesTreeModelRef.AppendProperty("Physics", "Type", PROPERTIESTYPE_ComboBoxInt, 0, "A static body does not move. A kinematic body moves only by forces. A dynamic body moves by forces and collision (fully simulated)", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Static" << "Kinematic" << "Dynamic");
+			propertiesTreeModelRef.AppendProperty("Physics", "Fixed Rotation", PROPERTIESTYPE_bool, Qt::Unchecked, "Prevents this body from rotating if checked. Useful for characters");
+			propertiesTreeModelRef.AppendProperty("Physics", "Initially Awake", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to make body initially awake. Start sleeping otherwise");
+			propertiesTreeModelRef.AppendProperty("Physics", "Allow Sleep", PROPERTIESTYPE_bool, Qt::Checked, "Uncheck this if this body should never fall asleep. This increases CPU usage");
+			propertiesTreeModelRef.AppendProperty("Physics", "Gravity Scale", PROPERTIESTYPE_double, 1.0, "Adjusts the gravity on this single body. Negative values will reverse gravity. Increased gravity can decrease stability", false, -100.0, 100.0, 0.1);
+			propertiesTreeModelRef.AppendProperty("Physics", "Dynamic CCD", PROPERTIESTYPE_bool, Qt::Unchecked, "Continuous collision detection for other dynamic moving bodies. Note that all bodies are prevented from tunneling through kinematic and static bodies. This setting is only considered on dynamic bodies. You should use this flag sparingly since it increases processing time");
+			propertiesTreeModelRef.AppendProperty("Physics", "Linear Damping", PROPERTIESTYPE_double, 0.0, "Reduces the world linear velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1", false, 0.0, 100.0, 0.01);
+			propertiesTreeModelRef.AppendProperty("Physics", "Angular Damping", PROPERTIESTYPE_double, 0.01, "Reduces the world angular velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1", false, 0.0, 100.0, 0.01);
+			propertiesTreeModelRef.AppendProperty("Physics", "Linear Velocity", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Starting Linear velocity of the body's origin in scene coordinates", false, -fRANGE, fRANGE, 1.0, "[", "]");
+			propertiesTreeModelRef.AppendProperty("Physics", "Angular Velocity", PROPERTIESTYPE_double, 0.0, "Starting Angular velocity of the body", false, 0.0, 100.0, 0.01);
 		}
 	}
 
 	switch(pItemData->GetType())
 	{
 	case ITEM_Entity:
-		propertiesTreeModelRef.AppendCategory("Physics", QVariant(), true, false, "Optionally create a physics component that can affect the transformation of this entity");
-		propertiesTreeModelRef.AppendProperty("Physics", "Start Activated", PROPERTIESTYPE_bool, Qt::Checked, "This entity will start its physics simulation upon creation");
-		propertiesTreeModelRef.AppendProperty("Physics", "Type", PROPERTIESTYPE_ComboBoxInt, 0, "A static body does not move. A kinematic body moves only by forces. A dynamic body moves by forces and collision (fully simulated)", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Static" << "Kinematic" << "Dynamic");
-		propertiesTreeModelRef.AppendProperty("Physics", "Fixed Rotation", PROPERTIESTYPE_bool, Qt::Unchecked, "Prevents this body from rotating if checked. Useful for characters");
-		propertiesTreeModelRef.AppendProperty("Physics", "Initially Awake", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to make body initially awake. Start sleeping otherwise");
-		propertiesTreeModelRef.AppendProperty("Physics", "Allow Sleep", PROPERTIESTYPE_bool, Qt::Checked, "Uncheck this if this body should never fall asleep. This increases CPU usage");
-		propertiesTreeModelRef.AppendProperty("Physics", "Gravity Scale", PROPERTIESTYPE_double, 1.0, "Adjusts the gravity on this single body. Negative values will reverse gravity. Increased gravity can decrease stability", false, -100.0, 100.0, 0.1);
-		propertiesTreeModelRef.AppendProperty("Physics", "Dynamic CCD", PROPERTIESTYPE_bool, Qt::Unchecked, "Continuous collision detection for other dynamic moving bodies. Note that all bodies are prevented from tunneling through kinematic and static bodies. This setting is only considered on dynamic bodies. You should use this flag sparingly since it increases processing time");
-		propertiesTreeModelRef.AppendProperty("Physics", "Linear Damping", PROPERTIESTYPE_double, 0.0, "Reduces the world linear velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1", false, 0.0, 100.0, 0.01);
-		propertiesTreeModelRef.AppendProperty("Physics", "Angular Damping", PROPERTIESTYPE_double, 0.01, "Reduces the world angular velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1", false, 0.0, 100.0, 0.01);
-		propertiesTreeModelRef.AppendProperty("Physics", "Linear Velocity", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Starting Linear velocity of the body's origin in scene coordinates", false, -fRANGE, fRANGE, 1.0, "[", "]");
-		propertiesTreeModelRef.AppendProperty("Physics", "Angular Velocity", PROPERTIESTYPE_double, 0.0, "Starting Angular velocity of the body", false, 0.0, 100.0, 0.01);
 		break;
 
 	case ITEM_Primitive:
@@ -177,24 +221,40 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
-	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta["UUID"].toString(), this),
+	m_pTreeModel(nullptr),
 	m_bVertexEditMode(false)
 {
 	// First initialize the states so they exist before we try to add properties to them
 	InitStates<EntityStateData>(itemFileDataRef);
 
+	m_pTreeModel = new EntityTreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta["UUID"].toString(), this);
+
 	// Each element in QList<> represents a state's properties for all the children or shapes
+	QList<QJsonObject> propRootObjectList;
 	QList<QJsonArray> propChildArrayList;
 	QList<QJsonArray> propShapeArrayList;
 	QJsonArray stateArray = itemFileDataRef.m_Meta["stateArray"].toArray();
 	for(int i = 0; i < stateArray.size(); ++i)
 	{
 		QJsonObject stateObj = stateArray[i].toObject();
+		propRootObjectList.push_back(stateObj["propRoot"].toObject());
 		propChildArrayList.push_back(stateObj["propChildList"].toArray());
 		propShapeArrayList.push_back(stateObj["propShapeList"].toArray());
 	}
-	if(stateArray.size() != 0 && (propChildArrayList.size() != GetNumStates() || propShapeArrayList.size() != GetNumStates()))
+	if(stateArray.size() != 0 &&
+		(propChildArrayList.size() != GetNumStates() ||
+		propShapeArrayList.size() != GetNumStates() ||
+		propRootObjectList.size() != GetNumStates()))
+	{
 		HyGuiLog("EntityModel::EntityModel - invalid number of states when parsing properties", LOGTYPE_Error);
+	}
+
+	// Initialize root
+	for(int iStateIndex = 0; iStateIndex < GetNumStates(); ++iStateIndex)
+	{
+		QJsonObject propRootObj = propRootObjectList[iStateIndex];
+		m_pTreeModel->GetRootTreeItemData()->GetPropertiesModel(iStateIndex)->DeserializeJson(propRootObj);
+	}
 	
 	std::function<void(const QJsonArray &, const QList<QJsonArray> &)> fpPopulateNodeTreeItems = 
 		[&](const QJsonArray &itemListArray, const QList<QJsonArray> &propItemArrayList)
@@ -233,35 +293,18 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 		}
 	};
 	// Insert all the 'child' items into the nodeTree
-	fpPopulateNodeTreeItems(itemFileDataRef.m_Meta["childList"].toArray(), propChildArrayList);
-	fpPopulateNodeTreeItems(itemFileDataRef.m_Meta["shapeList"].toArray(), propShapeArrayList);
-	
-	//QJsonArray shapeListArray = itemFileDataRef.m_Meta["shapeList"].toArray();
-	//for(int i = 0; i < shapeListArray.size(); ++i)
-	//{
-	//	if(shapeListArray[i].isObject())
-	//	{
-	//		QJsonObject shapeObj = shapeListArray[i].toObject();
-	//		Cmd_AddNewItem(shapeObj, false, i);
-	//	}
-	//	else if(shapeListArray[i].isArray())
-	//	{
-	//		QJsonArray shapeArray = shapeListArray[i].toArray();
-	//		for(int j = 0; j < shapeArray.size(); ++j)
-	//			Cmd_AddNewItem(shapeArray[j].toObject(), true, j == 0 ? i : j);
-	//	}
-	//	else
-	//		HyGuiLog("EntityModel::EntityModel invalid shapeList", LOGTYPE_Error);
-	//}
+	fpPopulateNodeTreeItems(itemFileDataRef.m_Meta["descChildList"].toArray(), propChildArrayList);
+	fpPopulateNodeTreeItems(itemFileDataRef.m_Meta["descShapeList"].toArray(), propShapeArrayList);
 }
 
 /*virtual*/ EntityModel::~EntityModel()
 {
+	delete m_pTreeModel;
 }
 
 EntityTreeModel &EntityModel::GetTreeModel()
 {
-	return m_TreeModel;
+	return *m_pTreeModel;
 }
 
 QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow)
@@ -270,7 +313,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemDat
 	QList<QUuid> registerList;
 	for(auto *pItem : projItemList)
 	{
-		EntityTreeItemData *pAddedItem = m_TreeModel.Cmd_InsertNewChild(pItem, "m_", iRow);
+		EntityTreeItemData *pAddedItem = m_pTreeModel->Cmd_InsertNewChild(pItem, "m_", iRow);
 		if(pAddedItem)
 			treeNodeList.push_back(pAddedItem);
 		else
@@ -290,7 +333,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewAssets(QList<IAssetItemData *
 	QList<QUuid> registerList;
 	for(auto *pAssetItem : assetItemList)
 	{
-		EntityTreeItemData *pAddedItem = m_TreeModel.Cmd_InsertNewAsset(pAssetItem, "m_", iRow);
+		EntityTreeItemData *pAddedItem = m_pTreeModel->Cmd_InsertNewAsset(pAssetItem, "m_", iRow);
 		if(pAddedItem)
 			treeNodeList.push_back(pAddedItem);
 		else
@@ -306,7 +349,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewAssets(QList<IAssetItemData *
 
 EntityTreeItemData *EntityModel::Cmd_AddNewItem(QJsonObject descObj, QJsonArray propsArray, bool bIsArrayItem, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewItem(descObj, propsArray, bIsArrayItem, iRow);
+	EntityTreeItemData *pTreeItemData = m_pTreeModel->Cmd_InsertNewItem(descObj, propsArray, bIsArrayItem, iRow);
 
 	QUuid uuidToRegister(descObj["itemUUID"].toString());
 	if(uuidToRegister.isNull() == false)
@@ -317,7 +360,7 @@ EntityTreeItemData *EntityModel::Cmd_AddNewItem(QJsonObject descObj, QJsonArray 
 
 EntityTreeItemData *EntityModel::Cmd_AddNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_InsertNewShape(eShape, sData, bIsPrimitive, "m_", iRow);
+	EntityTreeItemData *pTreeItemData = m_pTreeModel->Cmd_InsertNewShape(eShape, sData, bIsPrimitive, "m_", iRow);
 	
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
 	if(pWidget)
@@ -440,7 +483,7 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 
 	m_ItemRef.GetProject().DecrementDependencies(&m_ItemRef, QList<QUuid>() << pItem->GetReferencedItemUuid());
 
-	int32 iRow = m_TreeModel.Cmd_PopChild(pItem);
+	int32 iRow = m_pTreeModel->Cmd_PopChild(pItem);
 	if(iRow < 0)
 		return iRow;
 
@@ -451,7 +494,7 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 
 bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
 {
-	if(m_TreeModel.Cmd_ReaddChild(pNodeItem, iRow) == false)
+	if(m_pTreeModel->Cmd_ReaddChild(pNodeItem, iRow) == false)
 		return false;
 
 	m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, QList<QUuid>() << pNodeItem->GetReferencedItemUuid());
@@ -465,18 +508,18 @@ void EntityModel::Cmd_RenameItem(EntityTreeItemData *pItemData, QString sNewName
 	{
 		pItemData->SetText(sNewName);
 
-		QList<TreeModelItemData *> arrayChildrenList = m_TreeModel.GetItemsRecursively(m_TreeModel.FindIndex<EntityTreeItemData *>(pItemData, 0));
+		QList<TreeModelItemData *> arrayChildrenList = m_pTreeModel->GetItemsRecursively(m_pTreeModel->FindIndex<EntityTreeItemData *>(pItemData, 0));
 		for(TreeModelItemData *pItemData : arrayChildrenList)
 			pItemData->SetText(sNewName);
 	}
 	else if(pItemData->GetEntType() == ENTTYPE_ArrayItem)
 	{
-		QModelIndex arrayFolderIndex = m_TreeModel.parent(m_TreeModel.FindIndex<EntityTreeItemData *>(pItemData, 0));
-		EntityTreeItemData *pArrayFolderItemData = m_TreeModel.data(arrayFolderIndex, Qt::UserRole).value<EntityTreeItemData *>();
+		QModelIndex arrayFolderIndex = m_pTreeModel->parent(m_pTreeModel->FindIndex<EntityTreeItemData *>(pItemData, 0));
+		EntityTreeItemData *pArrayFolderItemData = m_pTreeModel->data(arrayFolderIndex, Qt::UserRole).value<EntityTreeItemData *>();
 
 		pArrayFolderItemData->SetText(sNewName);
 
-		QList<TreeModelItemData *> arrayChildrenList = m_TreeModel.GetItemsRecursively(arrayFolderIndex);
+		QList<TreeModelItemData *> arrayChildrenList = m_pTreeModel->GetItemsRecursively(arrayFolderIndex);
 		for(TreeModelItemData *pItemData : arrayChildrenList)
 			pItemData->SetText(sNewName);
 	}
@@ -536,7 +579,7 @@ void EntityModel::ClearShapeEdit()
 
 QString EntityModel::GenerateCodeName(QString sDesiredName) const
 {
-	return m_TreeModel.GenerateCodeName(sDesiredName);
+	return m_pTreeModel->GenerateCodeName(sDesiredName);
 }
 
 /*virtual*/ void EntityModel::OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) /*override*/
@@ -558,7 +601,7 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 
 /*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
-	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetRootTreeItemData()->GetCodeName());
+	itemSpecificFileDataOut.m_Meta.insert("codeName", m_pTreeModel->GetRootTreeItemData()->GetCodeName());
 	
 	InsertChildAndShapeList(-1, itemSpecificFileDataOut);
 }
@@ -572,7 +615,13 @@ void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDat
 {
 	QList<EntityTreeItemData *> childList;
 	QList<EntityTreeItemData *> shapeList;
-	m_TreeModel.GetTreeItemData(childList, shapeList);
+	m_pTreeModel->GetTreeItemData(childList, shapeList);
+
+	if(iStateIndex >= 0)
+	{
+		QJsonObject propRootObject = m_pTreeModel->GetRootTreeItemData()->GetPropertiesModel(iStateIndex)->SerializeJson();
+		fileDataPairOut.m_Meta.insert("propRoot", propRootObject);
+	}
 
 	QJsonArray childArray;
 	QString sCurrentArrayCodeName = "";
@@ -610,7 +659,7 @@ void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDat
 		}
 	}
 	if(iStateIndex == -1)
-		fileDataPairOut.m_Meta.insert("childList", childArray);
+		fileDataPairOut.m_Meta.insert("descChildList", childArray);
 	else
 		fileDataPairOut.m_Meta.insert("propChildList", childArray);
 
@@ -650,7 +699,7 @@ void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDat
 		}
 	}
 	if(iStateIndex == -1)
-		fileDataPairOut.m_Meta.insert("shapeList", shapeArray);
+		fileDataPairOut.m_Meta.insert("descShapeList", shapeArray);
 	else
 		fileDataPairOut.m_Meta.insert("propShapeList", shapeArray);
 }

@@ -117,6 +117,7 @@ public:
 	void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
 
 	bool IsCategoryEnabled(QString sCategoryName);
+	void SetCategoryEnabled(QString sCategoryName, bool bEnable);
 
 	bool AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
 	bool AppendProperty(QString sCategoryName,

@@ -142,6 +142,27 @@ bool PropertiesTreeModel::IsCategoryEnabled(QString sCategoryName)
 	return false;
 }
 
+void PropertiesTreeModel::SetCategoryEnabled(QString sCategoryName, bool bEnable)
+{
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		{
+			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+			const PropertiesDef &categoryPropDefRef = m_PropertyDefMap[pCategoryTreeItem];
+			if(categoryPropDefRef.eType == PROPERTIESTYPE_CategoryChecked)
+			{
+				if(setData(createIndex(pCategoryTreeItem->GetIndex(), COLUMN_Value, pCategoryTreeItem), bEnable ? Qt::Checked : Qt::Unchecked, Qt::UserRole) == false)
+					HyGuiLog("PropertiesTreeModel::SetCategoryEnabled() - setData failed", LOGTYPE_Error);
+			}
+			else
+				HyGuiLog("PropertiesTreeModel::SetCategoryEnabled() - Category is not a PROPERTIESTYPE_CategoryChecked", LOGTYPE_Error);
+			
+			break;
+		}
+	}
+}
+
 bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
 {
 	// All category names must be unique
@@ -262,6 +283,11 @@ QJsonObject PropertiesTreeModel::SerializeJson()
 		TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
 
 		QJsonObject categoryObj;
+
+		// If this category is checkable, then we need to store the checked state (as a boolean) to "<name>_checked"
+		if(m_PropertyDefMap[pCategoryTreeItem].eType == PROPERTIESTYPE_CategoryChecked)
+			categoryObj.insert(pCategoryTreeItem->data(COLUMN_Name).toString() % "_checked", pCategoryTreeItem->data(COLUMN_Value).toInt() == Qt::Checked);
+		
 		for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
 		{
 			TreeModelItem *pPropertyItem = pCategoryTreeItem->GetChild(j);
@@ -333,6 +359,9 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 		QJsonObject categoryObj = propertiesObj[sCategory].toObject();
 
 		QStringList sPropertyList = categoryObj.keys();
+		if(sPropertyList.contains(sCategory % "_checked"))
+			SetCategoryEnabled(sCategory, categoryObj[sCategory % "_checked"].toBool());
+
 		for(const QString &sProperty : sPropertyList)
 		{
 			const PropertiesDef propDef = FindPropertyDefinition(sCategory, sProperty);

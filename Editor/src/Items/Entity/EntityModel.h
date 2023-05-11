@@ -38,20 +38,17 @@ public:
 	EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~EntityStateData();
 
+	void InsertNewPropertiesModel(EntityTreeItemData *pItemData, QJsonObject propObj);
 	PropertiesTreeModel *GetPropertiesTreeModel(EntityTreeItemData *pItemData);
 
-	void Cmd_AddItemDataProperties(EntityTreeItemData *pItemData, QJsonObject propObj);
-	void Cmd_RemoveItemDataProperties(EntityTreeItemData *pItemData);
-
-	void InitalizePropertyModel(EntityTreeItemData *pItemData, PropertiesTreeModel &propertiesTreeModelRef);
+	void InitalizePropertyModel(EntityTreeItemData *pItemData, PropertiesTreeModel &propertiesTreeModelRef) const;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityModel : public IModel
 {
 	Q_OBJECT
 
-	EntityTreeModel										m_TreeModel;
-
+	EntityTreeModel *									m_pTreeModel;
 	bool												m_bVertexEditMode;
 
 public:
