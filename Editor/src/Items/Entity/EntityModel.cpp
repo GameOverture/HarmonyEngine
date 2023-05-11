@@ -20,59 +20,42 @@
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData)
 {
-	//// NOTE: All entity tree items exist and have been created prior to this ctor being called
-	//EntityTreeModel &treeModelRef = static_cast<EntityModel &>(modelRef).GetTreeModel();
+	EntityTreeModel *pTreeModelRef = static_cast<EntityModel &>(modelRef).GetTreeModel();
+	if(pTreeModelRef == nullptr)
+		return; // When 'pTreeModelRef' is nullptr, this ctor is being called from EntityModel::InitStates<>() which means the tree items haven't been created yet. The tree items are later created within the EntityModel's ctor
 
-	//// Handle 'root'
-	//QJsonObject propRootObj;
-	//if(stateFileData.m_Meta.contains("propRoot"))
-	//	propRootObj = stateFileData.m_Meta["propRoot"].toObject();
-	//InsertNewPropertiesModel(treeModelRef.GetRootTreeItemData(), propRootObj);
+	// NOTE: If we get here, 'stateFileData' will contain valid data (since it was just copied from an existing state) and all entity tree items exist and have been created prior
+	
+	// Get all the items (both child and shape) and then init their properties
+	QList<EntityTreeItemData *> childList;
+	QList<EntityTreeItemData *> shapeList;
+	pTreeModelRef->GetTreeItemData(childList, shapeList);
 
-	//// Get all the items (both child and shape) and then init their properties
-	//QList<EntityTreeItemData *> childList;
-	//QList<EntityTreeItemData *> shapeList;
-	//treeModelRef.GetTreeItemData(childList, shapeList);
+	// Init 'root'
+	QJsonObject propRootObj;
+	if(stateFileData.m_Meta.contains("propRoot"))
+		propRootObj = stateFileData.m_Meta["propRoot"].toObject();
+	InsertNewPropertiesModel(pTreeModelRef->GetRootTreeItemData(), propRootObj);
 
-	//// Init child list
-	//QJsonArray propChildListArray;
-	//if(stateFileData.m_Meta.contains("propChildList"))
-	//{
-	//	propChildListArray = stateFileData.m_Meta["propChildList"].toArray();
-	//	if(propChildListArray.size() != childList.size())
-	//		HyGuiLog("EntityStateData::EntityStateData - propChildListArray.size() != childList.size()", LOGTYPE_Error);
-	//}
-	//else
-	//{
-	//	// Push empty objects into the array so that the array is the same size as the child list
-	//	for(int i = 0; i < childList.size(); ++i)
-	//		propChildListArray.push_back(QJsonObject());
-	//}
-	//for(int i = 0; i < childList.size(); ++i)
-	//{
-	//	QJsonObject propChildObj = propChildListArray[i].toObject();
-	//	InsertNewPropertiesModel(childList[i], propChildObj);
-	//}
+	// Init 'child list'
+	QJsonArray propChildListArray = stateFileData.m_Meta["propChildList"].toArray();
+	if(propChildListArray.size() != childList.size())
+		HyGuiLog("EntityStateData::EntityStateData - stateFileData.m_Meta didn't have valid \"propChildList\"", LOGTYPE_Error);
+	for(int i = 0; i < childList.size(); ++i)
+	{
+		QJsonObject propChildObj = propChildListArray[i].toObject();
+		InsertNewPropertiesModel(childList[i], propChildObj);
+	}
 
-	//// Init shape list
-	//QJsonArray propShapeListArray;
-	//if(stateFileData.m_Meta.contains("propShapeList"))
-	//{
-	//	propShapeListArray = stateFileData.m_Meta["propShapeList"].toArray();
-	//	if(propShapeListArray.size() != shapeList.size())
-	//		HyGuiLog("EntityStateData::EntityStateData - propShapeListArray.size() != shapeList.size()", LOGTYPE_Error);
-	//}
-	//else
-	//{
-	//	// Push empty objects into the array so that the array is the same size as the shape list
-	//	for(int i = 0; i < shapeList.size(); ++i)
-	//		propShapeListArray.push_back(QJsonObject());
-	//}
-	//for(int i = 0; i < shapeList.size(); ++i)
-	//{
-	//	QJsonObject propShapeObj = propShapeListArray[i].toObject();
-	//	InsertNewPropertiesModel(shapeList[i], propShapeObj);
-	//}
+	// Init 'shape list'
+	QJsonArray propShapeListArray = stateFileData.m_Meta["propShapeList"].toArray();
+	if(propShapeListArray.size() != shapeList.size())
+		HyGuiLog("EntityStateData::EntityStateData - stateFileData.m_Meta didn't have valid \"propShapeList\"", LOGTYPE_Error);
+	for(int i = 0; i < shapeList.size(); ++i)
+	{
+		QJsonObject propShapeObj = propShapeListArray[i].toObject();
+		InsertNewPropertiesModel(shapeList[i], propShapeObj);
+	}
 }
 
 /*virtual*/ EntityStateData::~EntityStateData()
@@ -302,9 +285,9 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	delete m_pTreeModel;
 }
 
-EntityTreeModel &EntityModel::GetTreeModel()
+EntityTreeModel *EntityModel::GetTreeModel()
 {
-	return *m_pTreeModel;
+	return m_pTreeModel;
 }
 
 QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow)

@@ -74,7 +74,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->nodeTree->setDragDropMode(QAbstractItemView::InternalMove);
 
 	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
-	ui->nodeTree->setModel(&pEntityModel->GetTreeModel());
+	ui->nodeTree->setModel(pEntityModel->GetTreeModel());
 
 	ui->nodeTree->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->nodeTree, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(OnContextMenu(const QPoint &)));
@@ -85,7 +85,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 
 	// Initialize what items are selected in the model
 	QList<EntityTreeItemData *> childList, shapeList;
-	pEntityModel->GetTreeModel().GetTreeItemData(childList, shapeList);
+	pEntityModel->GetTreeModel()->GetTreeItemData(childList, shapeList);
 	childList += shapeList;
 	QList<EntityTreeItemData *> selectedItemsList;
 	for(EntityTreeItemData *pItem : childList)
@@ -312,7 +312,10 @@ EntityWidget::~EntityWidget()
 
 /*virtual*/ void EntityWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
 {
-	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
+	// Note: this causes ApplyJsonData() to be invoked twice when UndoCmd's are executed, but it's needed here for when the user switches between states
+	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntDraw)
+		pEntDraw->ApplyJsonData();
 }
 
 QModelIndexList EntityWidget::GetSelectedItems()
@@ -331,8 +334,8 @@ QModelIndexList EntityWidget::GetSelectedItems()
 // Will clear and select only what 'uuidList' contains
 void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList)
 {
-	EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
-	QModelIndexList indexList = entityTreeModelRef.GetAllIndices();
+	EntityTreeModel *pEntityTreeModel = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
+	QModelIndexList indexList = pEntityTreeModel->GetAllIndices();
 
 	QItemSelection *pItemSelection = new QItemSelection();
 	for(QUuid uuid : uuidList)

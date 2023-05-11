@@ -68,7 +68,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 					iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
 
 				QUuid thisUuid = m_pCurVertexEditItem->GetEntityTreeItemData()->GetThisUuid();
-				EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(thisUuid);
+				EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel()->FindTreeItemData(thisUuid);
 				QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, iStateIndex, pTreeItemData, ShapeCtrl::VEMACTION_RemoveSelected, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
 				m_pProjItem->GetUndoStack()->push(pCmd);
 			}
@@ -328,7 +328,7 @@ void EntityDraw::ClearShapeEdit()
 		}
 		if(pDrawItem == nullptr)
 		{
-			EntityTreeItemData *pEntityTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(uuid);
+			EntityTreeItemData *pEntityTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel()->FindTreeItemData(uuid);
 			pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), pEntityTreeItemData, this);
 		}
 		else
@@ -901,7 +901,7 @@ void EntityDraw::DoMouseRelease_Transform()
 	{
 		newTransformList.push_back(pDrawItem->GetHyNode()->GetSceneTransform(0.0f));
 
-		EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pDrawItem->GetEntityTreeItemData()->GetThisUuid());
+		EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel()->FindTreeItemData(pDrawItem->GetEntityTreeItemData()->GetThisUuid());
 		treeItemDataList.push_back(pTreeItemData);
 	}
 
@@ -1050,7 +1050,7 @@ void EntityDraw::DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 		}
 		else if(m_eDragState == DRAGSTATE_Transforming || (m_eDragState == DRAGSTATE_Pending && m_eCurVemAction == ShapeCtrl::VEMACTION_Add))
 		{
-			EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(m_pCurVertexEditItem->GetEntityTreeItemData()->GetThisUuid());
+			EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel()->FindTreeItemData(m_pCurVertexEditItem->GetEntityTreeItemData()->GetThisUuid());
 
 			int iStateIndex = 0;
 			if(m_pProjItem->GetWidget() == nullptr)
