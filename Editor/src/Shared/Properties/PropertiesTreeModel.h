@@ -108,6 +108,7 @@ public:
 	ProjectItemData &GetOwner();
 	int GetStateIndex() const;
 	const QVariant &GetSubstate() const;
+
 	const PropertiesDef GetPropertyDefinition(const QModelIndex &indexRef) const;
 	const PropertiesDef FindPropertyDefinition(QString sCategoryName, QString sPropertyName) const;
 	QString GetPropertyName(const QModelIndex &indexRef) const;
@@ -137,6 +138,8 @@ public:
 
 	QJsonObject SerializeJson();
 	void DeserializeJson(const QJsonObject &propertiesObj);
+
+	void ForEachProperty(std::function<void(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)> fpForEach, bool bIncludeDefaultValues);
 
 	virtual bool setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole = Qt::EditRole) override;
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;

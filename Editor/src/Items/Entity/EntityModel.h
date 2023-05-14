@@ -39,7 +39,7 @@ public:
 	virtual ~EntityStateData();
 
 	void InsertNewPropertiesModel(EntityTreeItemData *pItemData, QJsonObject propObj);
-	PropertiesTreeModel *GetPropertiesTreeModel(EntityTreeItemData *pItemData);
+	PropertiesTreeModel *GetPropertiesTreeModel(EntityTreeItemData *pItemData) const;
 
 	void InitalizePropertyModel(EntityTreeItemData *pItemData, PropertiesTreeModel &propertiesTreeModelRef) const;
 };
@@ -75,6 +75,11 @@ public:
 	void ClearShapeEdit();
 
 	QString GenerateCodeName(QString sDesiredName) const;
+
+	QString GenerateSrc_MemberVariables() const;
+	QString GenerateSrc_MemberInitializerList() const;
+	QString GenerateSrc_Ctor() const;
+	QString GenerateSrc_SetStates() const;
 
 	virtual void OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) override;
 

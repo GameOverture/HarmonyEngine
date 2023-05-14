@@ -3,21 +3,26 @@
 **
 ** WARNING! All changes made in this file will be lost when resaving the entity!
 ********************************************************************************/
-#ifndef %HY_CLASS%_h__
-#define %HY_CLASS%_h__
+#ifndef %HY_FILENAME%_h__
+#define %HY_FILENAME%_h__
 
 #include "pch.h"
 
+namespace %HY_NAMESPACE% {
+
 class %HY_CLASS%%HY_BASECLASSDECL%
 {
+protected:
+%HY_MEMBERVARIABLES%
+	
 public:
 	%HY_CLASS%(%HY_CLASSCTORSIG%);
 	virtual ~%HY_CLASS%();
 	
-	%HY_CLASSFUNCSPUBLIC%
-
-protected:
-	%HY_CLASSFUNCS%
+	virtual bool SetState(uint32 uiStateIndex) override;
+	virtual uint32 GetNumStates() override;
 };
 
-#endif // %HY_CLASS%_h__
+} // '%HY_NAMESPACE%' namespace
+
+#endif // %HY_FILENAME%_h__

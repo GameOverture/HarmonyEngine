@@ -13,6 +13,7 @@
 #include "SourceSettingsDlg.h"
 #include "SourceGenFileDlg.h"
 #include "Project.h"
+#include "EntityModel.h"
 #include "MainWindow.h"
 
 #include <QJsonDocument>
@@ -22,7 +23,8 @@
 #include <QTextCodec>
 
 SourceModel::SourceModel(Project &projRef) :
-	IManagerModel(projRef, ASSETMAN_Source)
+	IManagerModel(projRef, ASSETMAN_Source),
+	m_pEntityFolderItem(nullptr)
 {
 	m_bIsSingleBank = true;
 	m_MetaDir.setPath(m_ProjectRef.GetSourceAbsPath());
@@ -31,7 +33,30 @@ SourceModel::SourceModel(Project &projRef) :
 
 /*virtual*/ SourceModel::~SourceModel()
 {
+}
 
+bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
+{
+	QString sClassName = entityModelRef.GetItem().GetName(false);
+
+	if(m_pEntityFolderItem == nullptr)
+	{
+		m_pEntityFolderItem = new TreeModelItemData(ITEM_Filter, QUuid(), HySrcEntityNamespace);
+		InsertTreeItem(m_ProjectRef, m_pEntityFolderItem, nullptr);
+	}
+	QModelIndex entityFolderIndex = FindIndex<TreeModelItemData *>(m_pEntityFolderItem, 0);
+
+	QStringList sImportList;
+	sImportList << GenerateSrcFile(TEMPLATE_EntityH, entityFolderIndex, sClassName, sClassName, "HyEntity2d", true, &entityModelRef);
+	sImportList << GenerateSrcFile(TEMPLATE_EntityCpp, entityFolderIndex, sClassName, sClassName, "HyEntity2d", true, &entityModelRef);
+
+	QList<TreeModelItemData *> correspondingParentList;
+	correspondingParentList << m_pEntityFolderItem << m_pEntityFolderItem;
+
+	QList<QUuid> correspondingUuidList;
+	correspondingUuidList << QUuid::createUuid() << QUuid::createUuid();
+
+	return ImportNewAssets(sImportList, 0, ITEM_Source, correspondingParentList, correspondingUuidList);
 }
 
 /*virtual*/ QString SourceModel::OnBankInfo(uint uiBankIndex) /*override*/
@@ -78,7 +103,7 @@ quint32 SourceModel::ComputeFileChecksum(QString sFilterPath, QString sFileName)
 	return HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(sCleanPath.data()), sCleanPath.size());
 }
 
-QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex destIndex, QString sClassName, QString sFileName, QString sBaseClass, bool bEntityBaseClass)
+QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex destIndex, QString sClassName, QString sFileName, QString sBaseClass, bool bEntityBaseClass, EntityModel *pEntityModel)
 {
 	QString sTemplateFilePath = MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "src/";
 	switch(eTemplate)
@@ -89,7 +114,8 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 	case TEMPLATE_MainClassH:	sTemplateFilePath += "MainClass.h";		break;
 	case TEMPLATE_ClassCpp:		sTemplateFilePath += "Class.cpp";		break;
 	case TEMPLATE_ClassH:		sTemplateFilePath += "Class.h";			break;
-	case TEMPLATE_Entity:		sTemplateFilePath += "Entity.h";		break;
+	case TEMPLATE_EntityCpp:	sTemplateFilePath += "Entity.cpp";		break;
+	case TEMPLATE_EntityH:		sTemplateFilePath += "Entity.h";		break;
 	}
 
 	QFile file(sTemplateFilePath);
@@ -106,8 +132,8 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 	sContents.remove('\r');
 
 	// Replace template variables
+	sContents.replace("%HY_FILENAME%", sFileName);
 	sContents.replace("%HY_CLASS%", sClassName);
-	sContents.replace("%HY_TITLE%", m_ProjectRef.GetTitle());
 	sContents.replace("%HY_PROJECTNAME%", m_ProjectRef.GetName());
 
 	QString sBaseClassDecl;
@@ -119,20 +145,46 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 		sBaseClassDecl = " : public " + sBaseClass;
 		if(bEntityBaseClass)
 		{
-			if(eTemplate == TEMPLATE_ClassH)
+			switch(eTemplate)
 			{
+			case TEMPLATE_Main:
+				sContents.replace("%HY_TITLE%", m_ProjectRef.GetTitle());
+				break;
+
+			case TEMPLATE_ClassH:
 				sClassCtorSignature = "HyEntity2d *pParent = nullptr";
 				sClassFuncs = "virtual void OnUpdate() override;";
-			}
-			else if(eTemplate == TEMPLATE_ClassCpp)
-			{
+				break;
+
+			case TEMPLATE_ClassCpp:
 				sClassCtorSignature = "HyEntity2d *pParent /*= nullptr*/";
 				sMemberInitializerList = " :\n\tHyEntity2d(pParent)";
 				sClassFuncs = "/*virtual*/ void " + sClassName + "::OnUpdate() /*override*/\n{\n}";
+				break;
+
+			case TEMPLATE_EntityH:
+				if(pEntityModel == nullptr)
+					HyGuiLog("SourceModel::GenerateSrcFile() is TEMPLATE_EntityH and was passed a nullptr 'pEntityModel'", LOGTYPE_Error);
+				sClassCtorSignature = "HyEntity2d *pParent = nullptr";
+				sContents.replace("%HY_MEMBERVARIABLES%", pEntityModel->GenerateSrc_MemberVariables());
+				break;
+
+			case TEMPLATE_EntityCpp:
+				if(pEntityModel == nullptr)
+					HyGuiLog("SourceModel::GenerateSrcFile() is TEMPLATE_EntityCpp and was passed a nullptr 'pEntityModel'", LOGTYPE_Error);
+				sClassCtorSignature = "HyEntity2d(HyEntity2d *pParent /*= nullptr*/)";
+				sMemberInitializerList = pEntityModel->GenerateSrc_MemberInitializerList();
+				sContents.replace("%HY_CTORIMPL%", pEntityModel->GenerateSrc_Ctor());
+				sContents.replace("%HY_SETSTATESIMPL%", pEntityModel->GenerateSrc_SetStates());
+				sContents.replace("%HY_NUMSTATES%", QString::number(pEntityModel->GetNumStates()));
+				break;
 			}
 		}
 	}
+
+	sContents.replace("%HY_NAMESPACE%", HySrcEntityNamespace);
 	sContents.replace("%HY_BASECLASSDECL%", sBaseClassDecl);
+	sContents.replace("%HY_BASECLASS%", sBaseClass);
 	sContents.replace("%HY_CLASSCTORSIG%", sClassCtorSignature);
 	sContents.replace("%HY_CLASSMEMBERINITIALIZERLIST%", sMemberInitializerList);
 	sContents.replace("%HY_CLASSFUNCS%", sClassFuncs);
@@ -147,7 +199,10 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 	if(dir.mkpath(QFileInfo(file).absolutePath()) == false)
 		HyGuiLog("SourceModel::GenerateSrcFile - QDir::mkpath failed", LOGTYPE_Error);
 
-	if(!file.open(QFile::WriteOnly | QFile::Text))
+	QIODevice::OpenMode eOpenMode = QFile::WriteOnly | QFile::Text;
+	if(pEntityModel == nullptr)
+		eOpenMode |= QFile::NewOnly;
+	if(!file.open(eOpenMode))
 	{
 		HyGuiLog("Error writing to " % file.fileName() % " when generating source: " % file.errorString(), LOGTYPE_Error);
 		return QString();
@@ -278,19 +333,19 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 		// If nothing exists, generate a brand new project
 		if(sImportList.empty())
 		{
-			sImportList << GenerateSrcFile(TEMPLATE_Main, QModelIndex(), m_ProjectRef.GetName(), "main", QString(), false);
+			sImportList << GenerateSrcFile(TEMPLATE_Main, QModelIndex(), m_ProjectRef.GetName(), "main", QString(), false, nullptr);
 			correspondingParentList << nullptr;
 			correspondingUuidList << QUuid::createUuid();
 
-			sImportList << GenerateSrcFile(TEMPLATE_Pch, QModelIndex(), m_ProjectRef.GetName(), "pch", QString(), false);
+			sImportList << GenerateSrcFile(TEMPLATE_Pch, QModelIndex(), m_ProjectRef.GetName(), "pch", QString(), false, nullptr);
 			correspondingParentList << nullptr;
 			correspondingUuidList << QUuid::createUuid();
 
-			sImportList << GenerateSrcFile(TEMPLATE_MainClassCpp, QModelIndex(), m_ProjectRef.GetName(), m_ProjectRef.GetName(), QString(), false);
+			sImportList << GenerateSrcFile(TEMPLATE_MainClassCpp, QModelIndex(), m_ProjectRef.GetName(), m_ProjectRef.GetName(), QString(), false, nullptr);
 			correspondingParentList << nullptr;
 			correspondingUuidList << QUuid::createUuid();
 
-			sImportList << GenerateSrcFile(TEMPLATE_MainClassH, QModelIndex(), m_ProjectRef.GetName(), m_ProjectRef.GetName(), QString(), false);
+			sImportList << GenerateSrcFile(TEMPLATE_MainClassH, QModelIndex(), m_ProjectRef.GetName(), m_ProjectRef.GetName(), QString(), false, nullptr);
 			correspondingParentList << nullptr;
 			correspondingUuidList << QUuid::createUuid();
 		}
@@ -338,11 +393,11 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 
 		TreeModelItemData *pParentLocation = FindTreeItemFilter(data(indexDestination, Qt::UserRole).value<TreeModelItemData *>());
 
-		sImportList << GenerateSrcFile(TEMPLATE_ClassCpp, indexDestination, pDlg->GetCodeClassName(), pDlg->GetCppFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass());
+		sImportList << GenerateSrcFile(TEMPLATE_ClassCpp, indexDestination, pDlg->GetCodeClassName(), pDlg->GetCppFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass(), nullptr);
 		correspondingParentList << pParentLocation;
 		correspondingUuidList << QUuid::createUuid();
 
-		sImportList << GenerateSrcFile(TEMPLATE_ClassH, indexDestination, pDlg->GetCodeClassName(), pDlg->GetHeaderFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass());
+		sImportList << GenerateSrcFile(TEMPLATE_ClassH, indexDestination, pDlg->GetCodeClassName(), pDlg->GetHeaderFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass(), nullptr);
 		correspondingParentList << pParentLocation;
 		correspondingUuidList << QUuid::createUuid();
 		

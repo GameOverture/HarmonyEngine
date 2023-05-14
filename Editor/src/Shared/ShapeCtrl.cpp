@@ -874,6 +874,50 @@ void ShapeCtrl::ClearVertexEditMode()
 	m_bIsVem = false;
 }
 
+/*static*/ QString ShapeCtrl::DeserializeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QString sData, QString sNewLine)
+{
+	QString sSrc;
+
+	QStringList sFloatList = sData.split(',', Qt::SkipEmptyParts);
+	switch(eShapeType)
+	{
+	case SHAPE_None:
+		break;
+
+	case SHAPE_Polygon:
+	case SHAPE_Box: {
+		QString sNestedNewLine = sNewLine + "\t";
+		sSrc = "{" + sNestedNewLine;
+		sSrc += "std::vector<glm::vec2> vertList;" + sNestedNewLine;
+		for(int i = 0; i < sFloatList.size(); i += 2)
+			sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNestedNewLine;
+		sSrc += sCodeName + "SetAsPolygon(vertList);" + sNewLine;
+		sSrc += "}" + sNewLine;
+		break; }
+
+	case SHAPE_Circle:
+		sSrc += sCodeName + "SetAsCircle(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), " + sFloatList[2] + "f);" + sNewLine;
+		break;
+
+	case SHAPE_LineSegment:
+		sSrc += sCodeName + "SetAsLineSegment(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f));" + sNewLine;
+		break;
+
+	case SHAPE_LineChain:
+	case SHAPE_LineLoop: {
+		QString sNestedNewLine = sNewLine + "\t";
+		sSrc = "{" + sNestedNewLine;
+		sSrc += "std::vector<glm::vec2> vertList;" + sNestedNewLine;
+		for(int i = 0; i < sFloatList.size(); i += 2)
+			sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNestedNewLine;
+		sSrc += sCodeName + "SetAsLineChain(vertList);" + sNewLine;
+		sSrc += "}" + sNewLine;
+		break; }
+	}
+
+	return sSrc;
+}
+
 void ShapeCtrl::SetVertexGrabPointListSize(uint32 uiNumGrabPoints)
 {
 	while(static_cast<uint32>(m_VertexGrabPointList.size()) > uiNumGrabPoints)

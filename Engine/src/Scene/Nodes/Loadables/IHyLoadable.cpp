@@ -128,7 +128,7 @@ uint32 IHyLoadable::GetState() const
 	return true;
 }
 
-uint32 IHyLoadable::GetNumStates()
+/*virtual*/ uint32 IHyLoadable::GetNumStates()
 {
 	if(AcquireData() == nullptr)
 	{

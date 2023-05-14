@@ -37,6 +37,8 @@ class HyShape2d
 	HyEntity2d *								m_pParent;
 
 	b2Shape *									m_pShape;
+
+	bool 										m_bIsFixtureAllowed;
 	b2FixtureDef *								m_pInit;
 	b2Fixture *									m_pFixture;
 	bool										m_bFixtureDirty;
@@ -104,10 +106,12 @@ public:
 	bool SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
 
 	// Applies when attached to a physics body
+	bool IsFixtureAllowed() const;
+	void SetFixtureAllowed(bool bIsFixtureAllowed);	// The parent entity will ignore/remove this shape if 'bIsFixtureAllowed' == false
 	void Setup(const b2FixtureDef &fixtureDefRef);
 	float GetDensity() const;
 	void SetDensity(float fDensity); // Usually in kg / m ^ 2.
-	void SetDensityInKg(float fWeightKg); // Sets the density using the "weight" of currently set shape. Returns if valid/successful
+	void SetDensityInKg(float fWeightKg); // Sets the density using the "weight" of currently set shape
 	float GetFriction() const;
 	void SetFriction(float fFriction);
 	float GetRestitution() const;

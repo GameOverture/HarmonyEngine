@@ -16,6 +16,7 @@
 #include "EntityWidget.h"
 #include "EntityItemMimeData.h"
 #include "IAssetItemData.h"
+#include "SourceModel.h"
 
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData)
@@ -80,7 +81,7 @@ void EntityStateData::InsertNewPropertiesModel(EntityTreeItemData *pItemData, QJ
 	m_PropertiesMap.insert(pItemData, pNewProperties);
 }
 
-PropertiesTreeModel *EntityStateData::GetPropertiesTreeModel(EntityTreeItemData *pItemData)
+PropertiesTreeModel *EntityStateData::GetPropertiesTreeModel(EntityTreeItemData *pItemData) const
 {
 	if(m_PropertiesMap.contains(pItemData) == false)
 	{
@@ -90,8 +91,8 @@ PropertiesTreeModel *EntityStateData::GetPropertiesTreeModel(EntityTreeItemData 
 	return m_PropertiesMap[pItemData];
 }
 
-// NOTE: These properties get set to the proper harmony node within EntityDrawItem.cpp's ApplyProperties
-//		 Updates here should reflect to the function above
+// NOTE: The following functions share logic that handle all the item specific properties: EntityStateData::InitalizePropertyModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp - ApplyProperties
+//		 Updates here should reflect to the functions above
 void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, PropertiesTreeModel &propertiesTreeModelRef) const
 {
 	// Default ranges
@@ -123,13 +124,13 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 				propertiesTreeModelRef.AppendProperty("Body", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated");
 				propertiesTreeModelRef.AppendProperty("Body", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 255), "A color to alpha blend this item with");
 				propertiesTreeModelRef.AppendProperty("Body", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", false, 0.0, 1.0, 0.05);
-				propertiesTreeModelRef.AppendProperty("Body", "Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", false, -iRANGE, iRANGE, 1);
+				//propertiesTreeModelRef.AppendProperty("Body", "Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", false, -iRANGE, iRANGE, 1);
 			}
 		}
 		else // ENTTYPE_Root
 		{
 			propertiesTreeModelRef.AppendCategory("Physics", QVariant(), true, false, "Optionally create a physics component that can affect the transformation of this entity");
-			propertiesTreeModelRef.AppendProperty("Physics", "Start Activated", PROPERTIESTYPE_bool, Qt::Checked, "This entity will start its physics simulation upon creation");
+			propertiesTreeModelRef.AppendProperty("Physics", "Start Activated", PROPERTIESTYPE_bool, Qt::Checked, "This entity will start its physics simulation upon setting this state");
 			propertiesTreeModelRef.AppendProperty("Physics", "Type", PROPERTIESTYPE_ComboBoxInt, 0, "A static body does not move. A kinematic body moves only by forces. A dynamic body moves by forces and collision (fully simulated)", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Static" << "Kinematic" << "Dynamic");
 			propertiesTreeModelRef.AppendProperty("Physics", "Fixed Rotation", PROPERTIESTYPE_bool, Qt::Unchecked, "Prevents this body from rotating if checked. Useful for characters");
 			propertiesTreeModelRef.AppendProperty("Physics", "Initially Awake", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to make body initially awake. Start sleeping otherwise");
@@ -565,6 +566,144 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 	return m_pTreeModel->GenerateCodeName(sDesiredName);
 }
 
+QString EntityModel::GenerateSrc_MemberVariables() const
+{
+	QString sSrc;
+
+	QList<EntityTreeItemData *> itemList, shapeList;
+	m_pTreeModel->GetTreeItemData(itemList, shapeList);
+	itemList.append(shapeList);
+	EntityTreeItemData *pCurArray = nullptr;
+	for(EntityTreeItemData *pItem : itemList)
+	{
+		if(pCurArray)
+		{
+			if(pCurArray->GetCodeName() == pItem->GetCodeName())
+				continue;
+			pCurArray = nullptr;
+		}
+
+		sSrc += "\t" + pItem->GetHyNodeTypeName() + " " + pItem->GetCodeName();
+		if(pItem->GetEntType() != ENTTYPE_ArrayItem)
+			sSrc = ";\n";
+		else
+		{
+			sSrc += "\t[" + QString::number(m_pTreeModel->GetArrayFolderTreeItem(pItem)->GetNumChildren()) + "];\n";
+			pCurArray = pItem;
+		}
+	}
+
+	return sSrc;
+}
+
+QString EntityModel::GenerateSrc_MemberInitializerList() const
+{
+	QString sSrc = " :\n\tHyEntity2d(pParent)";
+
+	QList<EntityTreeItemData *> itemList, shapeList;
+	m_pTreeModel->GetTreeItemData(itemList, shapeList);
+	itemList.append(shapeList);
+	EntityTreeItemData *pCurArray = nullptr;
+	for(EntityTreeItemData *pItem : itemList)
+	{
+		if(pCurArray)
+		{
+			if(pCurArray->GetCodeName() != pItem->GetCodeName())
+			{
+				sSrc += "},\n\t" + pItem->GetCodeName();
+				pCurArray = nullptr;
+			}
+		}
+		else
+			sSrc += ",\n\t" + pItem->GetCodeName();
+
+		TreeModelItemData *pReferencedItemData = GetItem().GetProject().FindItemData(pItem->GetReferencedItemUuid());
+		QString sInitialization;
+		switch(pItem->GetType())
+		{
+		case ITEM_Primitive:
+		case ITEM_BoundingVolume:
+			sInitialization = "(this)";
+			break;
+
+		case ITEM_Audio:
+		case ITEM_Text:
+		case ITEM_Spine:
+		case ITEM_Sprite:
+			if(pReferencedItemData == nullptr || pReferencedItemData->IsProjectItem() == false)
+				HyGuiLog("EntityModel::GenerateSrc_MemberInitializerList() - Could not find referenced project item for: " % pItem->GetCodeName(), LOGTYPE_Error);
+			else
+			{
+				QString sPrefix = static_cast<ProjectItemData *>(pReferencedItemData)->GetPrefix();
+				QString sName = static_cast<ProjectItemData *>(pReferencedItemData)->GetName(false);
+				sInitialization = "(" + sPrefix + ", " + sName + ", this)";
+			}
+			break;
+
+		case ITEM_Entity:
+			break;
+
+		case ITEM_AtlasFrame:
+			if(pReferencedItemData == nullptr || pReferencedItemData->IsAssetItem() == false)
+			{
+				HyGuiLog("EntityModel::GenerateSrc_MemberInitializerList() - Could not find referenced asset item for: " % pItem->GetCodeName(), LOGTYPE_Error);
+				break;
+			}
+			sInitialization = "(" + QString::number(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum()) + ", this)";
+			break;
+
+		default:
+			HyGuiLog("EntityModel::GenerateSrc_MemberInitializerList() - Unhandled item type: " % HyGlobal::ItemName(pItem->GetType(), false), LOGTYPE_Error);
+			break;
+		}
+		
+		if(pItem->GetEntType() != ENTTYPE_ArrayItem)
+			sSrc += sInitialization;
+		else
+		{
+			if(pCurArray == nullptr)
+				sSrc += "{";
+			else
+				sSrc += ", ";
+
+			sSrc += pItem->GetHyNodeTypeName() + sInitialization;
+			pCurArray = pItem;
+		}
+	}
+
+	if(pCurArray)
+		sSrc += "}";
+
+	return sSrc;
+}
+
+QString EntityModel::GenerateSrc_Ctor() const
+{
+	return "SetState(0);";
+}
+
+QString EntityModel::GenerateSrc_SetStates() const
+{
+	QString sSrc = "switch(uiStateIndex)\n\t{\n\t";
+
+	QList<EntityTreeItemData *> itemList, shapeList;
+	m_pTreeModel->GetTreeItemData(itemList, shapeList);
+	itemList.append(shapeList);
+	itemList.prepend(m_pTreeModel->GetRootTreeItemData());
+
+	for(int i = 0; i < GetNumStates(); ++i)
+	{
+		sSrc += "case " + QString::number(i) + ": {\n\t\t";
+
+		for(EntityTreeItemData *pItem : itemList)
+			sSrc += pItem->GenerateStateSrc(i, "\n\t\t");
+
+		sSrc += "break; }\n\t";
+	}
+
+	return sSrc;
+}
+
 /*virtual*/ void EntityModel::OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) /*override*/
 {
 	EntityTreeItemData *pEntityTreeData = reinterpret_cast<EntityTreeItemData *>(propertiesModelRef.GetSubstate().toLongLong());
@@ -577,9 +716,8 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 /*virtual*/ bool EntityModel::OnPrepSave() /*override*/
 {
 	// Save generated C++ class in a .h
-	//m_ItemRef.GetProject().GetSourceAbsPath()
-
-	return true;
+	SourceModel &sourceModelRef = m_ItemRef.GetProject().GetSourceModel();
+	return sourceModelRef.GenerateEntitySrcFiles(*this);
 }
 
 /*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/

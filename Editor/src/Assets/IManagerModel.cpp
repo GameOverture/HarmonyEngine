@@ -741,6 +741,11 @@ void IManagerModel::SaveRuntime()
 				else if(m_eASSET_TYPE == ASSETMAN_Atlases)
 					return QVariant(static_cast<AtlasFrame *>(pAsset)->GetThumbnail());
 			}
+
+			// Special case: The source code's entity folder
+			if(m_eASSET_TYPE == ASSETMAN_Source && pItemData->GetText() == HySrcEntityNamespace)
+				return QVariant(QIcon(":/icons16x16/entity-folder.png"));
+
 			return QVariant(pItemData->GetIcon(SUBICON_None));
 		}
 		return QVariant();

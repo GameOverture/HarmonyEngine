@@ -35,7 +35,10 @@ class EntityTreeItemData : public TreeModelItemData
 
 	EntityModel &										m_EntityModelRef;
 	EntityItemType										m_eEntType;
+
+	QString												m_sPromotedEntityType;
 	bool												m_bIsForwardDeclared;
+
 	QUuid												m_ReferencedItemUuid;
 
 	bool												m_bIsSelected;
@@ -49,6 +52,7 @@ public:
 	QString GetCodeName() const;
 	const QUuid &GetThisUuid() const;
 	const QUuid &GetReferencedItemUuid() const;
+	QString GetHyNodeTypeName() const;
 	bool IsForwardDeclared() const;
 
 	PropertiesTreeModel *GetPropertiesModel(int iStateIndex);
@@ -57,6 +61,8 @@ public:
 	void SetSelected(bool bIsSelected);
 
 	void InsertJsonInfo_Desc(QJsonObject &childObjRef);
+
+	QString GenerateStateSrc(uint32 uiStateIndex, QString sNewLine);
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityTreeModel : public ITreeModel
@@ -83,6 +89,7 @@ public:
 	TreeModelItem *GetBvFolderTreeItem() const;
 	EntityTreeItemData *GetBvFolderTreeItemData() const;
 
+	TreeModelItem *GetArrayFolderTreeItem(EntityTreeItemData *pArrayItem) const;
 	EntityTreeItemData *GetArrayFolderTreeItemData(EntityTreeItemData *pArrayItem) const;
 
 	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &shapeListOut) const;

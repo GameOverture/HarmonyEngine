@@ -46,7 +46,7 @@ public:
 
 	uint32 GetState() const;
 	virtual bool SetState(uint32 uiStateIndex);
-	uint32 GetNumStates();
+	virtual uint32 GetNumStates();
 
 	const IHyNodeData *AcquireData();
 

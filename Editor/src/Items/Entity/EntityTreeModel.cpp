@@ -41,6 +41,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	TreeModelItemData(HyGlobal::GetTypeFromString(descObj["itemType"].toString()), descObj["UUID"].toString(), descObj["codeName"].toString()),
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(bIsArrayItem ? ENTTYPE_ArrayItem : ENTTYPE_Item),
+	m_sPromotedEntityType(descObj["promotedEntityType"].toString()),
 	m_bIsForwardDeclared(bIsForwardDeclared),
 	m_ReferencedItemUuid(descObj["itemUUID"].toString()),
 	m_bIsSelected(descObj["isSelected"].toBool())
@@ -85,6 +86,35 @@ const QUuid &EntityTreeItemData::GetReferencedItemUuid() const
 	return m_ReferencedItemUuid;
 }
 
+QString EntityTreeItemData::GetHyNodeTypeName() const
+{
+	switch(m_eTYPE)
+	{
+	case ITEM_Primitive:		return "HyPrimitive2d";
+	case ITEM_Audio:			return "HyAudio2d";
+	case ITEM_Text:				return "HyText2d";
+	case ITEM_Spine:			return "HySpine2d";
+	case ITEM_Sprite:			return "HySprite2d";
+	case ITEM_AtlasFrame:		return "HyTexturedQuad2d";
+	case ITEM_BoundingVolume:	return "HyShape2d";
+	
+	case ITEM_Entity:
+		if(m_sPromotedEntityType.isEmpty() == false)
+			return m_sPromotedEntityType;
+		else
+			return "HyEntity2d";
+
+	case ITEM_SoundClip:
+	case ITEM_Prefab:
+	case ITEM_Particles:
+	default:
+		HyGuiLog("EntityTreeItemData::GetHyNodeTypeName() - Unhandled item type: " % HyGlobal::ItemName(m_eTYPE, false), LOGTYPE_Error);
+		break;
+	}
+
+	return QString();
+}
+
 bool EntityTreeItemData::IsForwardDeclared() const
 {
 	return m_bIsForwardDeclared;
@@ -114,8 +144,127 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 	childObjRef.insert("codeName", GetCodeName());
 	childObjRef.insert("itemType", HyGlobal::ItemName(m_eTYPE, false));
 	childObjRef.insert("UUID", GetUuid().toString(QUuid::WithoutBraces));
+	childObjRef.insert("promotedEntityType", m_sPromotedEntityType);
 	childObjRef.insert("itemUUID", m_ReferencedItemUuid.toString(QUuid::WithoutBraces));
 	childObjRef.insert("isSelected", m_bIsSelected);
+}
+
+// NOTE: The following functions share logic that handle all the item specific properties: EntityStateData::InitalizePropertyModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp - ApplyProperties
+//		 Updates here should reflect to the functions above
+QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLine)
+{
+	PropertiesTreeModel *pPropertiesModel = GetPropertiesModel(uiStateIndex);
+	if(pPropertiesModel == nullptr)
+	{
+		HyGuiLog("EntityTreeItemData::GenerateStateSrc() - pPropertiesModel is nullptr", LOGTYPE_Error);
+		return QString();
+	}
+
+	QString sCodeName;
+	if(m_eEntType != ENTTYPE_Root)
+	{
+		if(IsForwardDeclared())
+			sCodeName = GetCodeName() + "->";
+		else
+			sCodeName = GetCodeName() + ".";
+	}
+	
+	QString sSrc;
+	
+	std::function<void(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)> fpForEach = [&](QString sCategoryName, QString sPropertyName, const QVariant &valueRef)
+	{
+		if(sCategoryName == "Common")
+		{
+			if(sPropertyName == "State")
+				sSrc += sCodeName + "SetState(" + QString::number(valueRef.toInt()) + ");" + sNewLine;
+			else if(sPropertyName == "Update During Paused")
+				sSrc += sCodeName + "SetPauseUpdate(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
+			else if(sPropertyName == "User Tag")
+			{
+				sSrc += "#ifdef HY_ENABLE_USER_TAGS" + sNewLine;
+				sSrc += sCodeName + "SetTag(" + QString::number(valueRef.toLongLong()) + ");" + sNewLine;
+				sSrc += "#endif" + sNewLine;
+			}
+		}
+		else if(sCategoryName == "Transformation")
+		{
+			if(sPropertyName == "Position")
+				sSrc += sCodeName + "pos.Set(" + QString::number(valueRef.toPointF().x()) + "f, " + QString::number(valueRef.toPointF().y()) + "f);" + sNewLine;
+			else if(sPropertyName == "Scale")
+				sSrc += sCodeName + "scale.Set(" + QString::number(valueRef.toPointF().x()) + "f, " + QString::number(valueRef.toPointF().y()) + "f);" + sNewLine;
+			else if(sPropertyName == "Rotation")
+				sSrc += sCodeName + "rot.Set(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+		}
+		else if(sCategoryName == "Body")
+		{
+			if(sPropertyName == "Visible")
+				sSrc += sCodeName + "SetVisible(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
+			else if(sPropertyName == "Color Tint")
+				sSrc += sCodeName + "SetTint(HyColor(" + QString::number(valueRef.toRect().left()) + ", " + QString::number(valueRef.toRect().top()) + ", " + QString::number(valueRef.toRect().width()) + ", " + QString::number(valueRef.toRect().height()) + "));" + sNewLine;
+			else if(sPropertyName == "Alpha")
+				sSrc += sCodeName + "alpha.Set(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+			//else if(sPropertyName == "Display Order")
+		}
+		else if(sCategoryName == "Physics") // NOTE: This is only from the 'root' node (aka *this entity)
+		{
+			if(sPropertyName == "Physics_checked") // NOTE: We can rely on *_checked to be the first property in the category
+			{
+				sSrc += "bool bActivatePhysics = false;" + sNewLine;
+
+				if(valueRef.toBool() == false)
+					sSrc += "physics.Deactivate();" + sNewLine;
+				else
+					sSrc += "b2BodyDef bodyDef;" + sNewLine; // NOTE: if "Physics_checked" is enabled, physics.Activate() should be invoked at the end of SetState() so that all the physics properties and fixtures are set before activating
+			}
+			else if(sPropertyName == "Start Activated")
+				sSrc += "bActivatePhysics = " + (valueRef.toBool() ? QString("true;") : QString("false;")) + sNewLine;
+			else if(sPropertyName == "Type")
+				sSrc += "bodyDef.type = static_cast<b2BodyType>(" + QString::number(valueRef.toInt()) + ");" + sNewLine;
+			else if(sPropertyName == "Fixed Rotation")
+				sSrc += "bodyDef.fixedRotation = " + (valueRef.toBool() ? QString("true;") : QString("false;")) + sNewLine;
+			else if(sPropertyName == "Initially Awake")
+				sSrc += "bodyDef.awake = " + (valueRef.toBool() ? QString("true;") : QString("false;")) + sNewLine;
+			else if(sPropertyName == "Allow Sleep")
+				sSrc += "bodyDef.allowSleep = " + (valueRef.toBool() ? QString("true;") : QString("false;")) + sNewLine;
+			else if(sPropertyName == "Gravity Scale")
+				sSrc += "bodyDef.gravityScale = " + QString::number(valueRef.toDouble()) + "f;" + sNewLine;
+			else if(sPropertyName == "Dynamic CCD")
+				sSrc += "bodyDef.bullet = " + (valueRef.toBool() ? QString("true;") : QString("false;")) + sNewLine;
+			else if(sPropertyName == "Linear Damping")
+				sSrc += "bodyDef.linearDamping = " + QString::number(valueRef.toDouble()) + "f;" + sNewLine;
+			else if(sPropertyName == "Angular Damping")
+				sSrc += "bodyDef.angularDamping = " + QString::number(valueRef.toDouble()) + "f;" + sNewLine;
+			else if(sPropertyName == "Linear Velocity")
+				sSrc += "bodyDef.linearVelocity.Set(" + QString::number(valueRef.toPointF().x()) + "f, " + QString::number(valueRef.toPointF().y()) + "f);" + sNewLine;
+			else if(sPropertyName == "Angular Velocity")
+				sSrc += "bodyDef.angularVelocity = " + QString::number(valueRef.toDouble()) + "f;" + sNewLine;
+		}
+		else if(sCategoryName == "Primitive")
+		{
+			if(sPropertyName == "Wireframe")
+				sSrc += sCodeName + "SetWireframe(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
+			else if(sPropertyName == "Line Thickness")
+				sSrc += sCodeName + "SetLineThickness(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+		}
+		else if(sCategoryName == "Shape")
+		{
+			//if(sPropertyName == "Data")
+			//	sSrc += ShapeCtrl::DeserializeAsRuntimeCode(sCodeName, eShapeType, valueRef.toString(), sNewLine);
+		}
+		else if(sCategoryName == "Fixture")
+		{
+			if(sPropertyName == "Fixture_checked") // NOTE: We can rely on *_checked to be the first property in the category
+				sSrc += sCodeName + "SetFixtureAllowed(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
+			else if(sPropertyName == "Density")
+				sSrc += sCodeName + "SetDensity(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+			else if(sPropertyName == "Friction")
+				sSrc += sCodeName + "SetFriction(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+		}
+	};
+	
+	pPropertiesModel->ForEachProperty(fpForEach, true);
+
+	return sSrc;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,6 +338,26 @@ EntityTreeItemData *EntityTreeModel::GetBvFolderTreeItemData() const
 		return nullptr;
 
 	return m_pRootItem->GetChild(1)->data(0).value<EntityTreeItemData *>();
+}
+
+TreeModelItem *EntityTreeModel::GetArrayFolderTreeItem(EntityTreeItemData *pArrayItem) const
+{
+	if(pArrayItem->GetEntType() != ENTTYPE_ArrayItem)
+	{
+		HyGuiLog("EntityTreeModel::GetArrayFolderTreeItem was passed a non-array item", LOGTYPE_Error);
+		return nullptr;
+	}
+
+	TreeModelItem *pParentFolderItem = (pArrayItem->GetType() == ITEM_BoundingVolume) ? GetBvFolderTreeItem() : GetRootTreeItem();
+	for(int i = 0; i < pParentFolderItem->GetNumChildren(); ++i)
+	{
+		EntityTreeItemData *pSubItem = pParentFolderItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		if(pArrayItem->GetCodeName() == pSubItem->GetCodeName() && pSubItem->GetEntType() == ENTTYPE_ArrayFolder)
+			return pParentFolderItem->GetChild(i);
+	}
+
+	HyGuiLog("EntityTreeModel::GetArrayFolderTreeItem array folder was not found", LOGTYPE_Error);
+	return nullptr;
 }
 
 EntityTreeItemData *EntityTreeModel::GetArrayFolderTreeItemData(EntityTreeItemData *pArrayItem) const

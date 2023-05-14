@@ -20,6 +20,7 @@ HyShape2d::HyShape2d(HyEntity2d *pParent /*= nullptr*/) :
 	m_eType(HYSHAPE_Nothing),
 	m_pParent(nullptr),
 	m_pShape(nullptr),
+	m_bIsFixtureAllowed(true),
 	m_pInit(nullptr),
 	m_pFixture(nullptr),
 	m_bFixtureDirty(false)
@@ -32,6 +33,7 @@ HyShape2d::HyShape2d(const HyShape2d &copyRef) :
 	m_eType(HYSHAPE_Nothing),
 	m_pParent(nullptr),
 	m_pShape(nullptr),
+	m_bIsFixtureAllowed(true),
 	m_pInit(nullptr),
 	m_pFixture(nullptr),
 	m_bFixtureDirty(false)
@@ -446,6 +448,17 @@ bool HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &p
 //m_pInit->m_FixtureDef.isSensor = bIsSensor;
 //m_pInit->m_FixtureDef.filter = filter;
 //m_pInit->m_FixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(&m_NodeRef);
+
+bool HyShape2d::IsFixtureAllowed() const
+{
+	return m_bIsFixtureAllowed;
+}
+
+void HyShape2d::SetFixtureAllowed(bool bIsFixtureAllowed)
+{
+	m_bIsFixtureAllowed = bIsFixtureAllowed;
+	ShapeChanged();
+}
 
 void HyShape2d::Setup(const b2FixtureDef &fixtureDefRef)
 {

@@ -14,25 +14,19 @@
 
 #include "AtlasFrame.h"
 
+class EntityModel;
+
 class SourceModel : public IManagerModel
 {
 	Q_OBJECT
 
-	enum TemplateFileType
-	{
-		TEMPLATE_Main = 0,
-		TEMPLATE_Pch,
-		TEMPLATE_MainClassCpp,
-		TEMPLATE_MainClassH,
-		TEMPLATE_ClassCpp,
-		TEMPLATE_ClassH,
-
-		TEMPLATE_Entity
-	};
+	TreeModelItemData *			m_pEntityFolderItem;
 
 public:
 	SourceModel(Project &projRef);
 	virtual ~SourceModel();
+
+	bool GenerateEntitySrcFiles(EntityModel &entityModelRef);
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
@@ -40,7 +34,7 @@ public:
 
 protected:
 	quint32 ComputeFileChecksum(QString sFilterPath, QString sFileName) const;
-	QString GenerateSrcFile(TemplateFileType eTemplate, QModelIndex destIndex, QString sClassName, QString sFileName, QString sBaseClass, bool bEntityBaseClass);
+	QString GenerateSrcFile(TemplateFileType eTemplate, QModelIndex destIndex, QString sClassName, QString sFileName, QString sBaseClass, bool bEntityBaseClass, EntityModel *pEntityModel);
 	void GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint32> &checksumListOut) const;
 	QString CleanEmscriptenCcall(QString sUserValue) const;
 

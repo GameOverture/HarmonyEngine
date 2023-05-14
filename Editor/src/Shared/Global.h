@@ -38,6 +38,8 @@ class Project;
 #define HyEditorToolName "Harmony Editor Tool"
 #define HyGuiInternalCharIndicator '+'
 
+#define HySrcEntityNamespace "hy"
+
 #define HYGUI_FILE_VERSION 12
 
 #define DISPLAYORDER_TransformCtrl 9999999
@@ -157,6 +159,19 @@ enum SubIcon
 	SUBICON_Activated,
 
 	NUM_SUBICONS
+};
+
+enum TemplateFileType
+{
+	TEMPLATE_Main = 0,
+	TEMPLATE_Pch,
+	TEMPLATE_MainClassCpp,
+	TEMPLATE_MainClassH,
+	TEMPLATE_ClassCpp,
+	TEMPLATE_ClassH,
+
+	TEMPLATE_EntityCpp,
+	TEMPLATE_EntityH
 };
 
 enum Theme

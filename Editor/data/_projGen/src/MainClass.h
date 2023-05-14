@@ -1,5 +1,5 @@
-#ifndef %HY_CLASS%_h__
-#define %HY_CLASS%_h__
+#ifndef %HY_FILENAME%_h__
+#define %HY_FILENAME%_h__
 
 #include "pch.h"
 
@@ -19,4 +19,4 @@ public:
 	virtual bool OnUpdate() override;
 };
 
-#endif // %HY_CLASS%_h__
+#endif // %HY_FILENAME%_h__

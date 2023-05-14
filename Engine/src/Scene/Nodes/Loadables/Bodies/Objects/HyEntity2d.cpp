@@ -727,7 +727,7 @@ void HyEntity2d::SyncPhysicsFixtures()
 		HyShape2d *pShape = m_ShapeList[i];
 		if(pShape->IsFixtureDirty())
 		{
-			if(pShape->IsValidShape())
+			if(pShape->IsValidShape() && pShape->IsFixtureAllowed())
 				pShape->CreateFixture(physics.m_pBody);
 			else
 				pShape->DestroyFixture();

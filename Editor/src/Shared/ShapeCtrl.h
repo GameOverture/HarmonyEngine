@@ -69,6 +69,9 @@ public:
 	void UnselectAllVemVerts();
 	void ClearVertexEditMode();
 
+	// 'sCodeName' has the dereference operator appended to its name (aka '->' or '.')
+	static QString DeserializeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QString sData, QString sNewLine);
+
 protected:
 	void SetVertexGrabPointListSize(uint32 uiNumGrabPoints);
 	//void ConvertTo(EditorShape eShape);
