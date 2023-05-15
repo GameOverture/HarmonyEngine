@@ -177,6 +177,13 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 		// No texture quad specific properties
 		break;
 
+	case ITEM_Sprite:
+		propertiesTreeModelRef.AppendCategory("Sprite", pItemData->GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		propertiesTreeModelRef.AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on", false, QVariant(), QVariant(), QVariant(), QString(), QString(), pItemData->GetReferencedItemUuid());
+		propertiesTreeModelRef.AppendProperty("Sprite", "Anim Rate", PROPERTIESTYPE_double, 1.0, "The animation rate modifier", false, 0.0, fRANGE, 0.1);
+		propertiesTreeModelRef.AppendProperty("Sprite", "Anim Paused", PROPERTIESTYPE_bool, false, "The current state's animation starts paused");
+		break;
+
 	case ITEM_Text:
 		propertiesTreeModelRef.AppendCategory("Text", pItemData->GetReferencedItemUuid().toString(QUuid::WithoutBraces));
 		propertiesTreeModelRef.AppendProperty("Text", "Text", PROPERTIESTYPE_LineEdit, "Text123", "What UTF-8 string to be displayed", false);
@@ -185,13 +192,6 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 		propertiesTreeModelRef.AppendProperty("Text", "Alignment", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAlignmentNameList()[HYALIGN_Left], "The alignment of the text", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAlignmentNameList());
 		propertiesTreeModelRef.AppendProperty("Text", "Monospaced Digits", PROPERTIESTYPE_bool, false, "Check to use monospaced digits, which ensures all digits use the same width", false);
 		propertiesTreeModelRef.AppendProperty("Text", "Text Indent", PROPERTIESTYPE_int, 0, "The number of pixels to indent the text", false, 0, iRANGE, 1);
-		break; 
-
-	case ITEM_Sprite:
-		propertiesTreeModelRef.AppendCategory("Sprite", pItemData->GetReferencedItemUuid().toString(QUuid::WithoutBraces));
-		propertiesTreeModelRef.AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on", false, QVariant(), QVariant(), QVariant(), QString(), QString(), pItemData->GetReferencedItemUuid());
-		propertiesTreeModelRef.AppendProperty("Sprite", "Anim Rate", PROPERTIESTYPE_double, 1.0, "The animation rate modifier", false, 0.0, fRANGE, 0.1);
-		propertiesTreeModelRef.AppendProperty("Sprite", "Anim Paused", PROPERTIESTYPE_bool, false, "The current state's animation starts paused");
 		break;
 
 	default:
@@ -585,7 +585,7 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 
 		sSrc += "\t" + pItem->GetHyNodeTypeName() + " " + pItem->GetCodeName();
 		if(pItem->GetEntType() != ENTTYPE_ArrayItem)
-			sSrc = ";\n";
+			sSrc += ";\n";
 		else
 		{
 			sSrc += "\t[" + QString::number(m_pTreeModel->GetArrayFolderTreeItem(pItem)->GetNumChildren()) + "];\n";

@@ -170,6 +170,7 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 	}
 	
 	QString sSrc;
+	bool bActivatePhysics = false;
 	
 	std::function<void(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)> fpForEach = [&](QString sCategoryName, QString sPropertyName, const QVariant &valueRef)
 	{
@@ -209,15 +210,11 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 		{
 			if(sPropertyName == "Physics_checked") // NOTE: We can rely on *_checked to be the first property in the category
 			{
-				sSrc += "bool bActivatePhysics = false;" + sNewLine;
-
 				if(valueRef.toBool() == false)
 					sSrc += "physics.Deactivate();" + sNewLine;
-				else
-					sSrc += "b2BodyDef bodyDef;" + sNewLine; // NOTE: if "Physics_checked" is enabled, physics.Activate() should be invoked at the end of SetState() so that all the physics properties and fixtures are set before activating
 			}
 			else if(sPropertyName == "Start Activated")
-				sSrc += "bActivatePhysics = " + (valueRef.toBool() ? QString("true;") : QString("false;")) + sNewLine;
+				bActivatePhysics = valueRef.toBool();
 			else if(sPropertyName == "Type")
 				sSrc += "bodyDef.type = static_cast<b2BodyType>(" + QString::number(valueRef.toInt()) + ");" + sNewLine;
 			else if(sPropertyName == "Fixed Rotation")
@@ -248,8 +245,11 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 		}
 		else if(sCategoryName == "Shape")
 		{
-			//if(sPropertyName == "Data")
-			//	sSrc += ShapeCtrl::DeserializeAsRuntimeCode(sCodeName, eShapeType, valueRef.toString(), sNewLine);
+			if(sPropertyName == "Data")
+			{
+				EditorShape eShapeType = HyGlobal::GetShapeFromString(pPropertiesModel->FindPropertyValue("Shape", "Type").toString());
+				sSrc += ShapeCtrl::DeserializeAsRuntimeCode(sCodeName, eShapeType, valueRef.toString(), sNewLine);
+			}
 		}
 		else if(sCategoryName == "Fixture")
 		{
@@ -259,10 +259,50 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 				sSrc += sCodeName + "SetDensity(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
 			else if(sPropertyName == "Friction")
 				sSrc += sCodeName + "SetFriction(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+			else if(sPropertyName == "Restitution")
+				sSrc += sCodeName + "SetRestitution(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+			else if(sPropertyName == "Restitution Threshold")
+				sSrc += sCodeName + "SetRestitutionThreshold(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+			else if(sPropertyName == "Sensor")
+				sSrc += sCodeName + "SetSensor(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
+			else if(sPropertyName == "Filter: Category Mask")
+				sSrc += "{ b2Filter tmpFilter; tmpFilter.categoryBits = " + QString::number(valueRef.toInt()) + "; tmpFilter.maskBits = " + sCodeName + "GetFilter().maskBits; tmpFilter.groupIndex = " + sCodeName + "GetFilter().groupIndex; " + sCodeName + "SetFilter(tmpFilter); }" + sNewLine;
+			else if(sPropertyName == "Filter: Collision Mask")
+				sSrc += "{ b2Filter tmpFilter; tmpFilter.maskBits = " + QString::number(valueRef.toInt()) + "; tmpFilter.categoryBits = " + sCodeName + "GetFilter().categoryBits; tmpFilter.groupIndex = " + sCodeName + "GetFilter().groupIndex; " + sCodeName + "SetFilter(tmpFilter); }" + sNewLine;
+			else if(sPropertyName == "Filter: Group Override")
+				sSrc += "{ b2Filter tmpFilter; tmpFilter.groupIndex = " + QString::number(valueRef.toInt()) + "; tmpFilter.categoryBits = " + sCodeName + "GetFilter().categoryBits; tmpFilter.maskBits = " + sCodeName + "GetFilter().maskBits; " + sCodeName + "SetFilter(tmpFilter); }" + sNewLine;
+		}
+		else if(sCategoryName == "Sprite")
+		{
+			if(sPropertyName == "Frame")
+				sSrc += sCodeName + "SetFrame(" + QString::number(valueRef.toInt()) + ");" + sNewLine;
+			else if(sPropertyName == "Anim Rate")
+				sSrc += sCodeName + "SetAnimRate(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+			else if(sPropertyName == "Anim Paused")
+				sSrc += sCodeName + "SetAnimPaused(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
+		}
+		else if(sCategoryName == "Text")
+		{
+			if(sPropertyName == "Text")
+				sSrc += sCodeName + "SetText(" + valueRef.toString() + ");" + sNewLine;
+			else if(sPropertyName == "Style")
+			{
+				QPointF vStyleDimensions = pPropertiesModel->FindPropertyValue("Text", "Style Dimensions").toPointF();
+				switch(HyGlobal::GetTextStyleFromString(valueRef.toString()))
+				{
+				case TEXTSTYLE_Line:				sSrc += sCodeName + "SetAsLine();" + sNewLine; break;
+				case TEXTSTYLE_Column:				sSrc += sCodeName + "SetAsColumn(" + QString::number(vStyleDimensions.x()) + ");" + sNewLine; break;
+				case TEXTSTYLE_ScaleBox:			sSrc += sCodeName + "SetAsScaleBox(" + QString::number(vStyleDimensions.x()) + ", " + QString::number(vStyleDimensions.y()) + ", true);" + sNewLine; break;
+				case TEXTSTYLE_ScaleBoxTopAlign:	sSrc += sCodeName + "SetAsScaleBox(" + QString::number(vStyleDimensions.x()) + ", " + QString::number(vStyleDimensions.y()) + ", false);" + sNewLine; break;
+				case TEXTSTYLE_Vertical:			sSrc += sCodeName + "SetAsVertical();" + sNewLine; break;
+				}
+			}
 		}
 	};
-	
 	pPropertiesModel->ForEachProperty(fpForEach, true);
+
+	if(bActivatePhysics)
+		sSrc += "physics.Activate();" + sNewLine;
 
 	return sSrc;
 }
