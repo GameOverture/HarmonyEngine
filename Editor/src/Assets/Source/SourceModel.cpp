@@ -414,8 +414,6 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 
 /*virtual*/ QList<IAssetItemData *> SourceModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
 {
-	QList<IAssetItemData *> returnList;
-
 	// Error check all the imported assets before adding them, and cancel entire import if any fail
 	for(int i = 0; i < sImportAssetList.size(); ++i)
 	{
@@ -423,7 +421,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 		if(fileInfo.exists() == false)
 		{
 			HyGuiLog("Could not find imported file: " % sImportAssetList[i], LOGTYPE_Warning);
-			return returnList;
+			return QList<IAssetItemData *>();
 		}
 		
 		quint32 uiChecksum = ComputeFileChecksum(AssembleFilter(correspondingParentList[i], true), fileInfo.fileName());
@@ -431,11 +429,12 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 		if(srcFilesInFilter.isEmpty() == false)
 		{
 			HyGuiLog("A file with the name: " % fileInfo.fileName() % "\nalready exists in this location.", LOGTYPE_Warning);
-			return returnList;
+			return QList<IAssetItemData *>();
 		}
 	}
 	
 	// Passed error check: proceed with import
+	QList<IAssetItemData *> returnList;
 	for(int i = 0; i < sImportAssetList.size(); ++i)
 	{
 		QFileInfo origFileInfo(sImportAssetList[i]);

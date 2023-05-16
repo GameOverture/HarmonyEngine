@@ -634,9 +634,12 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 				HyGuiLog("EntityModel::GenerateSrc_MemberInitializerList() - Could not find referenced project item for: " % pItem->GetCodeName(), LOGTYPE_Error);
 			else
 			{
-				QString sPrefix = static_cast<ProjectItemData *>(pReferencedItemData)->GetPrefix();
-				QString sName = static_cast<ProjectItemData *>(pReferencedItemData)->GetName(false);
-				sInitialization = "(" + sPrefix + ", " + sName + ", this)";
+				QString sItemPath = static_cast<ProjectItemData *>(pReferencedItemData)->GetName(true);
+				int iLastIndex = sItemPath.lastIndexOf('/');
+				QString sPrefix = sItemPath.left(iLastIndex);
+				QString sName = sItemPath.mid(iLastIndex + 1);
+
+				sInitialization = "(\"" + sPrefix + "\", \"" + sName + "\", this)";
 			}
 			break;
 
@@ -693,13 +696,17 @@ QString EntityModel::GenerateSrc_SetStates() const
 
 	for(int i = 0; i < GetNumStates(); ++i)
 	{
-		sSrc += "case " + QString::number(i) + ": {\n\t\t";
+		sSrc += "case " + QString::number(i) + ":\n\t\t";
 
 		for(EntityTreeItemData *pItem : itemList)
+		{
 			sSrc += pItem->GenerateStateSrc(i, "\n\t\t");
+			sSrc += "\n\t\t";
+		}
 
-		sSrc += "break; }\n\t";
+		sSrc += "break;\n\n\t";
 	}
+	sSrc += "default:\n\t\tbreak;\n\t}";
 
 	return sSrc;
 }

@@ -216,25 +216,25 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 			else if(sPropertyName == "Start Activated")
 				bActivatePhysics = valueRef.toBool();
 			else if(sPropertyName == "Type")
-				sSrc += "bodyDef.type = static_cast<b2BodyType>(" + QString::number(valueRef.toInt()) + ");" + sNewLine;
+				sSrc += "physics.SetType(static_cast<HyBodyType>(" + QString::number(valueRef.toInt()) + "));" + sNewLine;
 			else if(sPropertyName == "Fixed Rotation")
-				sSrc += "bodyDef.fixedRotation = " + (valueRef.toBool() ? QString("true;") : QString("false;")) + sNewLine;
+				sSrc += "physics.SetFixedRotation(" + (valueRef.toBool() ? QString("true);") : QString("false);")) + sNewLine;
 			else if(sPropertyName == "Initially Awake")
-				sSrc += "bodyDef.awake = " + (valueRef.toBool() ? QString("true;") : QString("false;")) + sNewLine;
+				sSrc += "physics.SetAwake(" + (valueRef.toBool() ? QString("true);") : QString("false);")) + sNewLine;
 			else if(sPropertyName == "Allow Sleep")
-				sSrc += "bodyDef.allowSleep = " + (valueRef.toBool() ? QString("true;") : QString("false;")) + sNewLine;
+				sSrc += "physics.SetSleepingAllowed(" + (valueRef.toBool() ? QString("true);") : QString("false);")) + sNewLine;
 			else if(sPropertyName == "Gravity Scale")
-				sSrc += "bodyDef.gravityScale = " + QString::number(valueRef.toDouble()) + "f;" + sNewLine;
+				sSrc += "physics.SetGravityScale(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
 			else if(sPropertyName == "Dynamic CCD")
-				sSrc += "bodyDef.bullet = " + (valueRef.toBool() ? QString("true;") : QString("false;")) + sNewLine;
+				sSrc += "physics.SetCcd(" + (valueRef.toBool() ? QString("true);") : QString("false);")) + sNewLine;
 			else if(sPropertyName == "Linear Damping")
-				sSrc += "bodyDef.linearDamping = " + QString::number(valueRef.toDouble()) + "f;" + sNewLine;
+				sSrc += "physics.SetLinearDamping(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
 			else if(sPropertyName == "Angular Damping")
-				sSrc += "bodyDef.angularDamping = " + QString::number(valueRef.toDouble()) + "f;" + sNewLine;
+				sSrc += "physics.SetAngularDamping(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
 			else if(sPropertyName == "Linear Velocity")
-				sSrc += "bodyDef.linearVelocity.Set(" + QString::number(valueRef.toPointF().x()) + "f, " + QString::number(valueRef.toPointF().y()) + "f);" + sNewLine;
+				sSrc += "physics.SetVel(" + QString::number(valueRef.toPointF().x()) + "f, " + QString::number(valueRef.toPointF().y()) + "f);" + sNewLine;
 			else if(sPropertyName == "Angular Velocity")
-				sSrc += "bodyDef.angularVelocity = " + QString::number(valueRef.toDouble()) + "f;" + sNewLine;
+				sSrc += "physics.SetAngVel(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
 		}
 		else if(sCategoryName == "Primitive")
 		{
@@ -266,11 +266,12 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 			else if(sPropertyName == "Sensor")
 				sSrc += sCodeName + "SetSensor(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
 			else if(sPropertyName == "Filter: Category Mask")
-				sSrc += "{ b2Filter tmpFilter; tmpFilter.categoryBits = " + QString::number(valueRef.toInt()) + "; tmpFilter.maskBits = " + sCodeName + "GetFilter().maskBits; tmpFilter.groupIndex = " + sCodeName + "GetFilter().groupIndex; " + sCodeName + "SetFilter(tmpFilter); }" + sNewLine;
-			else if(sPropertyName == "Filter: Collision Mask")
-				sSrc += "{ b2Filter tmpFilter; tmpFilter.maskBits = " + QString::number(valueRef.toInt()) + "; tmpFilter.categoryBits = " + sCodeName + "GetFilter().categoryBits; tmpFilter.groupIndex = " + sCodeName + "GetFilter().groupIndex; " + sCodeName + "SetFilter(tmpFilter); }" + sNewLine;
-			else if(sPropertyName == "Filter: Group Override")
-				sSrc += "{ b2Filter tmpFilter; tmpFilter.groupIndex = " + QString::number(valueRef.toInt()) + "; tmpFilter.categoryBits = " + sCodeName + "GetFilter().categoryBits; tmpFilter.maskBits = " + sCodeName + "GetFilter().maskBits; " + sCodeName + "SetFilter(tmpFilter); }" + sNewLine;
+			{
+				uint16 iCategory = static_cast<uint16>(valueRef.toInt());
+				uint16 iMask = static_cast<uint16>(pPropertiesModel->FindPropertyValue("Fixture", "Filter: Collision Mask").toInt());
+				uint16 iGroup = static_cast<uint16>(pPropertiesModel->FindPropertyValue("Fixture", "Filter: Group Override").toInt());
+				sSrc += sCodeName + "SetFilter([](){ b2Filter filter = { " + QString::number(iCategory) + ", " + QString::number(iMask) + ", " + QString::number(iGroup) + " }; return filter; }());" + sNewLine;
+			}
 		}
 		else if(sCategoryName == "Sprite")
 		{
