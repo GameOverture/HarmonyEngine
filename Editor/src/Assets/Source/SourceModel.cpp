@@ -39,22 +39,35 @@ bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 {
 	QString sClassName = entityModelRef.GetItem().GetName(false);
 
+	// Create the Entity folder if it doesn't exist
 	if(m_pEntityFolderItem == nullptr)
 	{
 		m_pEntityFolderItem = new TreeModelItemData(ITEM_Filter, QUuid(), HySrcEntityNamespace);
 		InsertTreeItem(m_ProjectRef, m_pEntityFolderItem, nullptr);
 	}
-	QModelIndex entityFolderIndex = FindIndex<TreeModelItemData *>(m_pEntityFolderItem, 0);
 
+	// Generate the cpp and h file of the entity (it will overwrite the entity files if they already exist)
+	QModelIndex entityFolderIndex = FindIndex<TreeModelItemData *>(m_pEntityFolderItem, 0);
 	QStringList sImportList;
-	sImportList << GenerateSrcFile(TEMPLATE_EntityH, entityFolderIndex, sClassName, sClassName, "HyEntity2d", true, &entityModelRef);
-	sImportList << GenerateSrcFile(TEMPLATE_EntityCpp, entityFolderIndex, sClassName, sClassName, "HyEntity2d", true, &entityModelRef);
+
+	QString sHeaderFile = GenerateSrcFile(TEMPLATE_EntityH, entityFolderIndex, sClassName, sClassName, "HyEntity2d", true, &entityModelRef);
+	if(false == DoesAssetExist(ComputeFileChecksum(AssembleFilter(m_pEntityFolderItem, true), QFileInfo(sHeaderFile).fileName())))
+		sImportList << sHeaderFile;
+
+	QString sSrcFile = GenerateSrcFile(TEMPLATE_EntityCpp, entityFolderIndex, sClassName, sClassName, "HyEntity2d", true, &entityModelRef);
+	if(false == DoesAssetExist(ComputeFileChecksum(AssembleFilter(m_pEntityFolderItem, true), QFileInfo(sSrcFile).fileName())))
+		sImportList << sSrcFile;
+
+	if(sImportList.empty())
+		return true;
 
 	QList<TreeModelItemData *> correspondingParentList;
-	correspondingParentList << m_pEntityFolderItem << m_pEntityFolderItem;
-
 	QList<QUuid> correspondingUuidList;
-	correspondingUuidList << QUuid::createUuid() << QUuid::createUuid();
+	for(int i = 0; i < sImportList.size(); ++i)
+	{
+		correspondingParentList << m_pEntityFolderItem;
+		correspondingUuidList << QUuid::createUuid();
+	}
 
 	return ImportNewAssets(sImportList, 0, ITEM_Source, correspondingParentList, correspondingUuidList);
 }
@@ -172,7 +185,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 			case TEMPLATE_EntityCpp:
 				if(pEntityModel == nullptr)
 					HyGuiLog("SourceModel::GenerateSrcFile() is TEMPLATE_EntityCpp and was passed a nullptr 'pEntityModel'", LOGTYPE_Error);
-				sClassCtorSignature = "HyEntity2d(HyEntity2d *pParent /*= nullptr*/)";
+				sClassCtorSignature = "HyEntity2d *pParent /*= nullptr*/";
 				sMemberInitializerList = pEntityModel->GenerateSrc_MemberInitializerList();
 				sContents.replace("%HY_CTORIMPL%", pEntityModel->GenerateSrc_Ctor());
 				sContents.replace("%HY_SETSTATESIMPL%", pEntityModel->GenerateSrc_SetStates());

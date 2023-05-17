@@ -43,6 +43,7 @@ public:
 	void FocusState(int iStateIndex, QVariant subState);
 
 	void ShowStates(bool bShow);
+	void SetAddStateBtnEnabled(bool bEnabled);
 
 	virtual void OnGiveMenuActions(QMenu *pMenu) = 0;
 	virtual void OnUpdateActions() = 0;

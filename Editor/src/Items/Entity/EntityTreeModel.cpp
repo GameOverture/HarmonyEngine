@@ -151,7 +151,7 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 
 // NOTE: The following functions share logic that handle all the item specific properties: EntityStateData::InitalizePropertyModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp - ApplyProperties
 //		 Updates here should reflect to the functions above
-QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLine)
+QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLine, bool &bActivatePhysicsOut, uint32 &uiMaxVertListSizeOut)
 {
 	PropertiesTreeModel *pPropertiesModel = GetPropertiesModel(uiStateIndex);
 	if(pPropertiesModel == nullptr)
@@ -170,7 +170,6 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 	}
 	
 	QString sSrc;
-	bool bActivatePhysics = false;
 	
 	std::function<void(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)> fpForEach = [&](QString sCategoryName, QString sPropertyName, const QVariant &valueRef)
 	{
@@ -190,20 +189,20 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 		else if(sCategoryName == "Transformation")
 		{
 			if(sPropertyName == "Position")
-				sSrc += sCodeName + "pos.Set(" + QString::number(valueRef.toPointF().x()) + "f, " + QString::number(valueRef.toPointF().y()) + "f);" + sNewLine;
+				sSrc += sCodeName + "pos.Set(" + QString::number(valueRef.toPointF().x(), 'f') + "f, " + QString::number(valueRef.toPointF().y(), 'f') + "f);" + sNewLine;
 			else if(sPropertyName == "Scale")
-				sSrc += sCodeName + "scale.Set(" + QString::number(valueRef.toPointF().x()) + "f, " + QString::number(valueRef.toPointF().y()) + "f);" + sNewLine;
+				sSrc += sCodeName + "scale.Set(" + QString::number(valueRef.toPointF().x(), 'f') + "f, " + QString::number(valueRef.toPointF().y(), 'f') + "f);" + sNewLine;
 			else if(sPropertyName == "Rotation")
-				sSrc += sCodeName + "rot.Set(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+				sSrc += sCodeName + "rot.Set(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
 		}
 		else if(sCategoryName == "Body")
 		{
 			if(sPropertyName == "Visible")
 				sSrc += sCodeName + "SetVisible(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
 			else if(sPropertyName == "Color Tint")
-				sSrc += sCodeName + "SetTint(HyColor(" + QString::number(valueRef.toRect().left()) + ", " + QString::number(valueRef.toRect().top()) + ", " + QString::number(valueRef.toRect().width()) + ", " + QString::number(valueRef.toRect().height()) + "));" + sNewLine;
+				sSrc += sCodeName + "SetTint(HyColor(" + QString::number(valueRef.toRect().left()) + ", " + QString::number(valueRef.toRect().top()) + ", " + QString::number(valueRef.toRect().width()) + "));" + sNewLine;
 			else if(sPropertyName == "Alpha")
-				sSrc += sCodeName + "alpha.Set(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+				sSrc += sCodeName + "alpha.Set(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
 			//else if(sPropertyName == "Display Order")
 		}
 		else if(sCategoryName == "Physics") // NOTE: This is only from the 'root' node (aka *this entity)
@@ -214,7 +213,7 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 					sSrc += "physics.Deactivate();" + sNewLine;
 			}
 			else if(sPropertyName == "Start Activated")
-				bActivatePhysics = valueRef.toBool();
+				bActivatePhysicsOut = valueRef.toBool();
 			else if(sPropertyName == "Type")
 				sSrc += "physics.SetType(static_cast<HyBodyType>(" + QString::number(valueRef.toInt()) + "));" + sNewLine;
 			else if(sPropertyName == "Fixed Rotation")
@@ -224,31 +223,31 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 			else if(sPropertyName == "Allow Sleep")
 				sSrc += "physics.SetSleepingAllowed(" + (valueRef.toBool() ? QString("true);") : QString("false);")) + sNewLine;
 			else if(sPropertyName == "Gravity Scale")
-				sSrc += "physics.SetGravityScale(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+				sSrc += "physics.SetGravityScale(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
 			else if(sPropertyName == "Dynamic CCD")
 				sSrc += "physics.SetCcd(" + (valueRef.toBool() ? QString("true);") : QString("false);")) + sNewLine;
 			else if(sPropertyName == "Linear Damping")
-				sSrc += "physics.SetLinearDamping(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+				sSrc += "physics.SetLinearDamping(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
 			else if(sPropertyName == "Angular Damping")
-				sSrc += "physics.SetAngularDamping(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+				sSrc += "physics.SetAngularDamping(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
 			else if(sPropertyName == "Linear Velocity")
-				sSrc += "physics.SetVel(" + QString::number(valueRef.toPointF().x()) + "f, " + QString::number(valueRef.toPointF().y()) + "f);" + sNewLine;
+				sSrc += "physics.SetVel(" + QString::number(valueRef.toPointF().x(), 'f') + "f, " + QString::number(valueRef.toPointF().y(), 'f') + "f);" + sNewLine;
 			else if(sPropertyName == "Angular Velocity")
-				sSrc += "physics.SetAngVel(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+				sSrc += "physics.SetAngVel(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
 		}
 		else if(sCategoryName == "Primitive")
 		{
 			if(sPropertyName == "Wireframe")
 				sSrc += sCodeName + "SetWireframe(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
 			else if(sPropertyName == "Line Thickness")
-				sSrc += sCodeName + "SetLineThickness(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+				sSrc += sCodeName + "SetLineThickness(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
 		}
 		else if(sCategoryName == "Shape")
 		{
 			if(sPropertyName == "Data")
 			{
 				EditorShape eShapeType = HyGlobal::GetShapeFromString(pPropertiesModel->FindPropertyValue("Shape", "Type").toString());
-				sSrc += ShapeCtrl::DeserializeAsRuntimeCode(sCodeName, eShapeType, valueRef.toString(), sNewLine);
+				sSrc += ShapeCtrl::DeserializeAsRuntimeCode(sCodeName, eShapeType, valueRef.toString(), sNewLine, uiMaxVertListSizeOut);
 			}
 		}
 		else if(sCategoryName == "Fixture")
@@ -256,13 +255,13 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 			if(sPropertyName == "Fixture_checked") // NOTE: We can rely on *_checked to be the first property in the category
 				sSrc += sCodeName + "SetFixtureAllowed(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
 			else if(sPropertyName == "Density")
-				sSrc += sCodeName + "SetDensity(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+				sSrc += sCodeName + "SetDensity(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
 			else if(sPropertyName == "Friction")
-				sSrc += sCodeName + "SetFriction(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+				sSrc += sCodeName + "SetFriction(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
 			else if(sPropertyName == "Restitution")
-				sSrc += sCodeName + "SetRestitution(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+				sSrc += sCodeName + "SetRestitution(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
 			else if(sPropertyName == "Restitution Threshold")
-				sSrc += sCodeName + "SetRestitutionThreshold(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+				sSrc += sCodeName + "SetRestitutionThreshold(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
 			else if(sPropertyName == "Sensor")
 				sSrc += sCodeName + "SetSensor(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
 			else if(sPropertyName == "Filter: Category Mask")
@@ -270,7 +269,7 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 				uint16 iCategory = static_cast<uint16>(valueRef.toInt());
 				uint16 iMask = static_cast<uint16>(pPropertiesModel->FindPropertyValue("Fixture", "Filter: Collision Mask").toInt());
 				uint16 iGroup = static_cast<uint16>(pPropertiesModel->FindPropertyValue("Fixture", "Filter: Group Override").toInt());
-				sSrc += sCodeName + "SetFilter([](){ b2Filter filter = { " + QString::number(iCategory) + ", " + QString::number(iMask) + ", " + QString::number(iGroup) + " }; return filter; }());" + sNewLine;
+				sSrc += sCodeName + "SetFilter([](){ b2Filter filter; filter.categoryBits = " + QString::number(iCategory) + "; filter.maskBits = " + QString::number(iMask) + "; filter.groupIndex = " + QString::number(iGroup) + "; return filter; }());" + sNewLine;
 			}
 		}
 		else if(sCategoryName == "Sprite")
@@ -278,32 +277,64 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 			if(sPropertyName == "Frame")
 				sSrc += sCodeName + "SetFrame(" + QString::number(valueRef.toInt()) + ");" + sNewLine;
 			else if(sPropertyName == "Anim Rate")
-				sSrc += sCodeName + "SetAnimRate(" + QString::number(valueRef.toDouble()) + "f);" + sNewLine;
+				sSrc += sCodeName + "SetAnimRate(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
 			else if(sPropertyName == "Anim Paused")
-				sSrc += sCodeName + "SetAnimPaused(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
+				sSrc += sCodeName + "SetAnimPause(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
 		}
 		else if(sCategoryName == "Text")
 		{
 			if(sPropertyName == "Text")
-				sSrc += sCodeName + "SetText(" + valueRef.toString() + ");" + sNewLine;
+				sSrc += sCodeName + "SetText(\"" + valueRef.toString() + "\");" + sNewLine;
 			else if(sPropertyName == "Style")
 			{
 				QPointF vStyleDimensions = pPropertiesModel->FindPropertyValue("Text", "Style Dimensions").toPointF();
 				switch(HyGlobal::GetTextStyleFromString(valueRef.toString()))
 				{
 				case TEXTSTYLE_Line:				sSrc += sCodeName + "SetAsLine();" + sNewLine; break;
-				case TEXTSTYLE_Column:				sSrc += sCodeName + "SetAsColumn(" + QString::number(vStyleDimensions.x()) + ");" + sNewLine; break;
-				case TEXTSTYLE_ScaleBox:			sSrc += sCodeName + "SetAsScaleBox(" + QString::number(vStyleDimensions.x()) + ", " + QString::number(vStyleDimensions.y()) + ", true);" + sNewLine; break;
-				case TEXTSTYLE_ScaleBoxTopAlign:	sSrc += sCodeName + "SetAsScaleBox(" + QString::number(vStyleDimensions.x()) + ", " + QString::number(vStyleDimensions.y()) + ", false);" + sNewLine; break;
+				case TEXTSTYLE_Column:				sSrc += sCodeName + "SetAsColumn(" + QString::number(vStyleDimensions.x(), 'f') + "f);" + sNewLine; break;
+				case TEXTSTYLE_ScaleBox:			sSrc += sCodeName + "SetAsScaleBox(" + QString::number(vStyleDimensions.x(), 'f') + "f, " + QString::number(vStyleDimensions.y(), 'f') + "f, true);" + sNewLine; break;
+				case TEXTSTYLE_ScaleBoxTopAlign:	sSrc += sCodeName + "SetAsScaleBox(" + QString::number(vStyleDimensions.x(), 'f') + "f, " + QString::number(vStyleDimensions.y(), 'f') + "f, false);" + sNewLine; break;
 				case TEXTSTYLE_Vertical:			sSrc += sCodeName + "SetAsVertical();" + sNewLine; break;
 				}
 			}
 		}
 	};
-	pPropertiesModel->ForEachProperty(fpForEach, true);
 
-	if(bActivatePhysics)
-		sSrc += "physics.Activate();" + sNewLine;
+	// 'Foreach' property
+	for(int i = 0; i < pPropertiesModel->GetNumCategories(); ++i)
+	{
+		QString sCategoryName = pPropertiesModel->GetCategoryName(i);
+
+		if(pPropertiesModel->IsCategoryCheckable(i))
+		{
+			// Logic elsewhere relies on _checked being the first property in the category
+			bool bIsChecked = pPropertiesModel->IsCategoryEnabled(sCategoryName);
+			fpForEach(sCategoryName, sCategoryName % "_checked", bIsChecked);
+
+			if(bIsChecked == false)
+				continue;
+		}
+
+		for(int j = 0; j < pPropertiesModel->GetNumProperties(i); ++j)
+		{
+			QString sPropertyName = pPropertiesModel->GetPropertyName(i, j);
+
+			// Only invoke 'fpForEach' if the value is different from the default value in every state's properties
+			bool bIsDefault = true;
+			for(int iStateIndex = 0; iStateIndex < m_EntityModelRef.GetNumStates(); ++iStateIndex)
+			{
+				PropertiesTreeModel *pTestPropertiesModel = GetPropertiesModel(iStateIndex);
+				if(pTestPropertiesModel->IsPropertyDefaultValue(i, j) == false)
+				{
+					bIsDefault = false;
+					break;
+				}
+			}
+
+			if(bIsDefault == false)
+				fpForEach(sCategoryName, sPropertyName, pPropertiesModel->GetPropertyValue(i, j));
+		}
+	}
 
 	return sSrc;
 }

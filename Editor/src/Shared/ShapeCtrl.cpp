@@ -874,26 +874,29 @@ void ShapeCtrl::ClearVertexEditMode()
 	m_bIsVem = false;
 }
 
-/*static*/ QString ShapeCtrl::DeserializeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QString sData, QString sNewLine)
+/*static*/ QString ShapeCtrl::DeserializeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QString sData, QString sNewLine, uint32 &uiMaxVertListSizeOut)
 {
 	QString sSrc;
 
 	QStringList sFloatList = sData.split(',', Qt::SkipEmptyParts);
+	for(int i = 0; i < sFloatList.size(); ++i)
+		sFloatList[i] = QString::number(sFloatList[i].toDouble(), 'f'); // Ensure we have a decimal point
+
 	switch(eShapeType)
 	{
 	case SHAPE_None:
+		sSrc += sCodeName + "SetAsNothing();" + sNewLine;
 		break;
 
 	case SHAPE_Polygon:
-	case SHAPE_Box: {
-		QString sNestedNewLine = sNewLine + "\t";
-		sSrc = "{" + sNestedNewLine;
-		sSrc += "std::vector<glm::vec2> vertList;" + sNestedNewLine;
+	case SHAPE_Box:
+		sSrc += "vertList.clear();" + sNewLine;
 		for(int i = 0; i < sFloatList.size(); i += 2)
-			sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNestedNewLine;
+			sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
 		sSrc += sCodeName + "SetAsPolygon(vertList);" + sNewLine;
-		sSrc += "}" + sNewLine;
-		break; }
+
+		uiMaxVertListSizeOut = HyMath::Max(uiMaxVertListSizeOut, (uint32)sFloatList.size() / 2);
+		break;
 
 	case SHAPE_Circle:
 		sSrc += sCodeName + "SetAsCircle(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), " + sFloatList[2] + "f);" + sNewLine;
@@ -904,15 +907,14 @@ void ShapeCtrl::ClearVertexEditMode()
 		break;
 
 	case SHAPE_LineChain:
-	case SHAPE_LineLoop: {
-		QString sNestedNewLine = sNewLine + "\t";
-		sSrc = "{" + sNestedNewLine;
-		sSrc += "std::vector<glm::vec2> vertList;" + sNestedNewLine;
+	case SHAPE_LineLoop:
+		sSrc += "vertList.clear();" + sNewLine;
 		for(int i = 0; i < sFloatList.size(); i += 2)
-			sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNestedNewLine;
+			sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
 		sSrc += sCodeName + "SetAsLineChain(vertList);" + sNewLine;
-		sSrc += "}" + sNewLine;
-		break; }
+
+		uiMaxVertListSizeOut = HyMath::Max(uiMaxVertListSizeOut, (uint32)sFloatList.size() / 2);
+		break;
 	}
 
 	return sSrc;

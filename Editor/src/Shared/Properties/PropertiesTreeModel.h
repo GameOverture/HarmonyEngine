@@ -111,14 +111,22 @@ public:
 
 	const PropertiesDef GetPropertyDefinition(const QModelIndex &indexRef) const;
 	const PropertiesDef FindPropertyDefinition(QString sCategoryName, QString sPropertyName) const;
-	QString GetPropertyName(const QModelIndex &indexRef) const;
+	
 
 	QVariant GetPropertyValue(const QModelIndex &indexRef) const;
+	QVariant GetPropertyValue(int iCategoryIndex, int iPropertyIndex) const;
+	bool IsPropertyDefaultValue(int iCategoryIndex, int iPropertyIndex) const;
 	QVariant FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
 	void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
 
 	bool IsCategoryEnabled(QString sCategoryName);
 	void SetCategoryEnabled(QString sCategoryName, bool bEnable);
+	int GetNumCategories() const;
+	QString GetCategoryName(int iCategoryIndex) const;
+	bool IsCategoryCheckable(int iCategoryIndex) const;
+	int GetNumProperties(int iCategoryIndex) const;
+	QString GetPropertyName(const QModelIndex &indexRef) const;
+	QString GetPropertyName(int iCategoryIndex, int iPropertyIndex) const;
 
 	bool AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
 	bool AppendProperty(QString sCategoryName,
@@ -138,8 +146,6 @@ public:
 
 	QJsonObject SerializeJson();
 	void DeserializeJson(const QJsonObject &propertiesObj);
-
-	void ForEachProperty(std::function<void(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)> fpForEach, bool bIncludeDefaultValues);
 
 	virtual bool setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole = Qt::EditRole) override;
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;

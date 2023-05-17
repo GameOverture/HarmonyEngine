@@ -125,6 +125,8 @@ EntityWidget::~EntityWidget()
 {
 	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
 
+	SetAddStateBtnEnabled(false);
+
 	// Root and BvFolder should always be expanded
 	ui->nodeTree->expand(pTreeModel->FindIndex<EntityTreeItemData *>(pTreeModel->GetRootTreeItemData(), 0));
 	ui->nodeTree->expand(pTreeModel->FindIndex<EntityTreeItemData *>(pTreeModel->GetBvFolderTreeItemData(), 0));

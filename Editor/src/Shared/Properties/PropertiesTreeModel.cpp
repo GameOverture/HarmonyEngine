@@ -69,16 +69,24 @@ const PropertiesDef PropertiesTreeModel::FindPropertyDefinition(QString sCategor
 	return PropertiesDef();
 }
 
-QString PropertiesTreeModel::GetPropertyName(const QModelIndex &indexRef) const
-{
-	TreeModelItem *pTreeItem = GetItem(indexRef);
-	return pTreeItem->data(COLUMN_Name).toString();
-}
-
 QVariant PropertiesTreeModel::GetPropertyValue(const QModelIndex &indexRef) const
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
 	return pTreeItem->data(COLUMN_Value);
+}
+
+QVariant PropertiesTreeModel::GetPropertyValue(int iCategoryIndex, int iPropertyIndex) const
+{
+	TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(iCategoryIndex);
+	TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(iPropertyIndex);
+	return pPropertyTreeItem->data(COLUMN_Value);
+}
+
+bool PropertiesTreeModel::IsPropertyDefaultValue(int iCategoryIndex, int iPropertyIndex) const
+{
+	TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(iCategoryIndex);
+	TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(iPropertyIndex);
+	return pPropertyTreeItem->data(COLUMN_Value) == m_PropertyDefMap[pPropertyTreeItem].defaultData;
 }
 
 QVariant PropertiesTreeModel::FindPropertyValue(QString sCategoryName, QString sPropertyName) const
@@ -161,6 +169,38 @@ void PropertiesTreeModel::SetCategoryEnabled(QString sCategoryName, bool bEnable
 			break;
 		}
 	}
+}
+
+int PropertiesTreeModel::GetNumCategories() const
+{
+	return m_pRootItem->GetNumChildren();
+}
+
+QString PropertiesTreeModel::GetCategoryName(int iCategoryIndex) const
+{
+	return m_pRootItem->GetChild(iCategoryIndex)->data(COLUMN_Name).toString();
+}
+
+bool PropertiesTreeModel::IsCategoryCheckable(int iCategoryIndex) const
+{
+	const PropertiesDef &categoryPropDefRef = m_PropertyDefMap[m_pRootItem->GetChild(iCategoryIndex)];
+	return categoryPropDefRef.eType == PROPERTIESTYPE_CategoryChecked;
+}
+
+int PropertiesTreeModel::GetNumProperties(int iCategoryIndex) const
+{
+	return m_pRootItem->GetChild(iCategoryIndex)->GetNumChildren();
+}
+
+QString PropertiesTreeModel::GetPropertyName(const QModelIndex &indexRef) const
+{
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	return pTreeItem->data(COLUMN_Name).toString();
+}
+
+QString PropertiesTreeModel::GetPropertyName(int iCategoryIndex, int iPropertyIndex) const
+{
+	return m_pRootItem->GetChild(iCategoryIndex)->GetChild(iPropertyIndex)->data(COLUMN_Name).toString();
 }
 
 bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
@@ -442,33 +482,6 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 				HyGuiLog("Unhandled PropertiesTreeModel::DeserializeJson property", LOGTYPE_Error);
 				break;
 			}
-		}
-	}
-}
-
-void PropertiesTreeModel::ForEachProperty(std::function<void(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)> fpForEach, bool bIncludeDefaultValues)
-{
-	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
-	{
-		TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
-		QString sCategoryName = pCategoryTreeItem->data(COLUMN_Name).toString();
-
-		if(m_PropertyDefMap[pCategoryTreeItem].eType == PROPERTIESTYPE_CategoryChecked)
-		{
-			// Logic elsewhere relies on _checked being the first property in the category
-			fpForEach(sCategoryName, sCategoryName % "_checked", pCategoryTreeItem->data(COLUMN_Value));
-
-			if(pCategoryTreeItem->data(COLUMN_Value).toBool() == false)
-				continue;
-		}
-
-		for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
-		{
-			TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(j);
-			QString sPropertyName = pPropertyTreeItem->data(COLUMN_Name).toString();
-
-			if(bIncludeDefaultValues || m_PropertyDefMap[pPropertyTreeItem].defaultData != pPropertyTreeItem->data(COLUMN_Value))
-				fpForEach(sCategoryName, sPropertyName, pPropertyTreeItem->data(COLUMN_Value));
 		}
 	}
 }

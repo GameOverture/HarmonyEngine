@@ -70,7 +70,7 @@ public:
 	void ClearVertexEditMode();
 
 	// 'sCodeName' has the dereference operator appended to its name (aka '->' or '.')
-	static QString DeserializeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QString sData, QString sNewLine);
+	static QString DeserializeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QString sData, QString sNewLine, uint32 &uiMaxVertListSizeOut);
 
 protected:
 	void SetVertexGrabPointListSize(uint32 uiNumGrabPoints);

@@ -109,6 +109,11 @@ void IWidget::ShowStates(bool bShow)
 	uiWidget->grpStates->setVisible(bShow);
 }
 
+void IWidget::SetAddStateBtnEnabled(bool bEnabled)
+{
+	uiWidget->actionAddState->setEnabled(bEnabled);
+}
+
 void IWidget::OnCurrentIndexChanged(int index)
 {
 	FocusState(index, -1);

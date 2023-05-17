@@ -40,21 +40,27 @@ EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair
 
 	// Init 'child list'
 	QJsonArray propChildListArray = stateFileData.m_Meta["propChildList"].toArray();
-	if(propChildListArray.size() != childList.size())
-		HyGuiLog("EntityStateData::EntityStateData - stateFileData.m_Meta didn't have valid \"propChildList\"", LOGTYPE_Error);
+	//if(propChildListArray.size() != childList.size())
+	//	HyGuiLog("EntityStateData::EntityStateData - stateFileData.m_Meta didn't have valid \"propChildList\"", LOGTYPE_Error);
 	for(int i = 0; i < childList.size(); ++i)
 	{
-		QJsonObject propChildObj = propChildListArray[i].toObject();
+		QJsonObject propChildObj;
+		if(propChildListArray.size() > i)
+			propChildObj = propChildListArray[i].toObject();
+
 		InsertNewPropertiesModel(childList[i], propChildObj);
 	}
 
 	// Init 'shape list'
 	QJsonArray propShapeListArray = stateFileData.m_Meta["propShapeList"].toArray();
-	if(propShapeListArray.size() != shapeList.size())
-		HyGuiLog("EntityStateData::EntityStateData - stateFileData.m_Meta didn't have valid \"propShapeList\"", LOGTYPE_Error);
+	//if(propShapeListArray.size() != shapeList.size())
+	//	HyGuiLog("EntityStateData::EntityStateData - stateFileData.m_Meta didn't have valid \"propShapeList\"", LOGTYPE_Error);
 	for(int i = 0; i < shapeList.size(); ++i)
 	{
-		QJsonObject propShapeObj = propShapeListArray[i].toObject();
+		QJsonObject propShapeObj;
+		if(propShapeListArray.size() > i)
+			propShapeObj = propShapeListArray[i].toObject();
+
 		InsertNewPropertiesModel(shapeList[i], propShapeObj);
 	}
 }
@@ -122,7 +128,7 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 			{
 				propertiesTreeModelRef.AppendCategory("Body", HyGlobal::ItemColor(ITEM_Prefix));
 				propertiesTreeModelRef.AppendProperty("Body", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated");
-				propertiesTreeModelRef.AppendProperty("Body", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 255), "A color to alpha blend this item with");
+				propertiesTreeModelRef.AppendProperty("Body", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this item with");
 				propertiesTreeModelRef.AppendProperty("Body", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", false, 0.0, 1.0, 0.05);
 				//propertiesTreeModelRef.AppendProperty("Body", "Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", false, -iRANGE, iRANGE, 1);
 			}
@@ -694,19 +700,29 @@ QString EntityModel::GenerateSrc_SetStates() const
 	itemList.append(shapeList);
 	itemList.prepend(m_pTreeModel->GetRootTreeItemData());
 
+	bool bActivatePhysics = false;
+	uint32 uiMaxVertListSize = 0;
+
 	for(int i = 0; i < GetNumStates(); ++i)
 	{
 		sSrc += "case " + QString::number(i) + ":\n\t\t";
 
 		for(EntityTreeItemData *pItem : itemList)
 		{
-			sSrc += pItem->GenerateStateSrc(i, "\n\t\t");
+			sSrc += pItem->GenerateStateSrc(i, "\n\t\t", bActivatePhysics, uiMaxVertListSize);
 			sSrc += "\n\t\t";
 		}
 
+		if(bActivatePhysics)
+			sSrc += "physics.Activate();\n\n\t";
+
 		sSrc += "break;\n\n\t";
 	}
-	sSrc += "default:\n\t\tbreak;\n\t}";
+	sSrc += "default:\n\t\tHyLogWarning(\"" + QString(HySrcEntityNamespace) + "::" + GetItem().GetName(false) + "::SetState() was passed an invalid state: \" << uiStateIndex);\n\t\treturn false;\n\t}";
+	sSrc += "\n\n\treturn true;";
+
+	if(uiMaxVertListSize > 0)
+		sSrc.prepend("std::vector<glm::vec2> vertList;\n\tvertList.reserve(" + QString::number(uiMaxVertListSize) + ");\n\t");
 
 	return sSrc;
 }

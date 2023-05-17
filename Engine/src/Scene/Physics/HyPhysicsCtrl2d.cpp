@@ -285,14 +285,19 @@ float HyPhysicsCtrl2d::GetVelY() const
 
 void HyPhysicsCtrl2d::SetVel(const glm::vec2 &vVelocity)
 {
+	SetVel(vVelocity.x, vVelocity.y);
+}
+
+void HyPhysicsCtrl2d::SetVel(float fVelocityX, float fVelocityY)
+{
 	if(m_pBody)
-		m_pBody->SetLinearVelocity(b2Vec2(vVelocity.x, vVelocity.y));
+		m_pBody->SetLinearVelocity(b2Vec2(fVelocityX, fVelocityY));
 	else if(m_pInit)
-		m_pInit->linearVelocity = b2Vec2(vVelocity.x, vVelocity.y);
+		m_pInit->linearVelocity = b2Vec2(fVelocityX, fVelocityY);
 	else
 	{
 		b2BodyDef def;
-		def.linearVelocity = b2Vec2(vVelocity.x, vVelocity.y);
+		def.linearVelocity = b2Vec2(fVelocityX, fVelocityY);
 		Setup(def);
 	}
 }

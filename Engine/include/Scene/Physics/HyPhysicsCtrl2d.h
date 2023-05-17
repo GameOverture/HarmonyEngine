@@ -62,6 +62,7 @@ public:
 	float GetVelX() const;									// Retrieve the X linear velocity of this body's center of mass in m/s
 	float GetVelY() const;									// Retrieve the Y linear velocity of this body's center of mass in m/s
 	void SetVel(const glm::vec2 &vVelocity);				// Set the linear velocity of this body's center of mass in m/s
+	void SetVel(float fVelocityX, float fVelocityY);		// Set the linear velocity of this body's center of mass in m/s
 	void SetVelX(float fVelocityX);							// Set the X linear velocity of this body's center of mass in m/s
 	void SetVelY(float fVelocityY);							// Set the Y linear velocity of this body's center of mass in m/s
 
