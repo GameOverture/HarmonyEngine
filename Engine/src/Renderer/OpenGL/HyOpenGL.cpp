@@ -604,6 +604,7 @@ HyOpenGL::~HyOpenGL(void)
 		}
 		break;
 
+#ifndef HY_PLATFORM_BROWSER
 	case HYTEXTURE_DXT:
 		bIsPixelDataCompressed = true;
 		// Param1: num channels
@@ -679,6 +680,7 @@ HyOpenGL::~HyOpenGL(void)
 			eInternalFormat = GL_COMPRESSED_RGBA_ASTC_6x6_KHR;
 		}
 		break;
+#endif
 		
 	default:
 		HyLogError("Unknown TextureFormat used for 'eDesiredFormat'");
@@ -884,6 +886,7 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::GetTextureSize(uint32 uiTextureHandle, uint32 &uiWidthOut, uint32 &uiHeightOut) /*override*/
 {
+#ifndef HY_PLATFORM_BROWSER
 	glBindTexture(GL_TEXTURE_2D, uiTextureHandle);
 	HyErrorCheck_OpenGL("HyOpenGL:GetTextureSize", "glBindTexture");
 
@@ -895,6 +898,11 @@ HyOpenGL::~HyOpenGL(void)
 
 	uiWidthOut = static_cast<uint32>(iWidth);
 	uiHeightOut = static_cast<uint32>(iHeight);
+#else
+	uiWidthOut = 0;
+	uiHeightOut = 0;
+	HyLogWarning("HyOpenGL::GetTextureSize() - Not implemented for WebGL");
+#endif
 }
 
 void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
