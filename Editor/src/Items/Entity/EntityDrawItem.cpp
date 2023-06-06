@@ -19,7 +19,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 	m_ShapeCtrl(pParent)
 {
 	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
-	TreeModelItemData *pReferencedItemData = static_cast<ProjectItemData *>(projectRef.FindItemData(referencedItemUuid));
+	TreeModelItemData *pReferencedItemData = projectRef.FindItemData(referencedItemUuid);
 
 	if(m_pEntityTreeItemData->IsAssetItem())
 	{

@@ -7,6 +7,7 @@
 #define %HY_FILENAME%_h__
 
 #include "pch.h"
+%HY_INCLUDES%
 
 namespace %HY_NAMESPACE% {
 

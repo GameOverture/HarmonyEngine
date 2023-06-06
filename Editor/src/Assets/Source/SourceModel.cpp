@@ -178,6 +178,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 			case TEMPLATE_EntityH:
 				if(pEntityModel == nullptr)
 					HyGuiLog("SourceModel::GenerateSrcFile() is TEMPLATE_EntityH and was passed a nullptr 'pEntityModel'", LOGTYPE_Error);
+				sContents.replace("%HY_INCLUDES%", pEntityModel->GenerateSrc_FileIncludes());
 				sClassCtorSignature = "HyEntity2d *pParent = nullptr";
 				sContents.replace("%HY_MEMBERVARIABLES%", pEntityModel->GenerateSrc_MemberVariables());
 				break;

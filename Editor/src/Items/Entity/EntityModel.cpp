@@ -572,6 +572,28 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 	return m_pTreeModel->GenerateCodeName(sDesiredName);
 }
 
+QString EntityModel::GenerateSrc_FileIncludes() const
+{
+	QString sSrc;
+
+	QList<EntityTreeItemData *> itemList, shapeList;
+	m_pTreeModel->GetTreeItemData(itemList, shapeList);
+	for(EntityTreeItemData *pItem : itemList)
+	{
+		if(pItem->GetType() != ITEM_Entity)
+			continue;
+
+		QUuid referencedItemUuid = pItem->GetReferencedItemUuid();
+		ProjectItemData *pReferencedItemData = static_cast<ProjectItemData *>(GetItem().GetProject().FindItemData(referencedItemUuid));
+		if(pReferencedItemData == nullptr)
+			HyGuiLog("Could not find referenced item data from Sub-Entity's UUID: " + referencedItemUuid.toString(), LOGTYPE_Error);
+		sSrc += "#include \"" + pReferencedItemData->GetName(false);
+		sSrc += ".h\"\n";
+	}
+
+	return sSrc;
+}
+
 QString EntityModel::GenerateSrc_MemberVariables() const
 {
 	QString sSrc;
@@ -589,7 +611,18 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 			pCurArray = nullptr;
 		}
 
-		sSrc += "\t" + pItem->GetHyNodeTypeName() + " " + pItem->GetCodeName();
+		sSrc += "\t";
+		if(pItem->GetType() == ITEM_Entity)
+		{
+			QUuid referencedItemUuid = pItem->GetReferencedItemUuid();
+			ProjectItemData *pReferencedItemData = static_cast<ProjectItemData *>(GetItem().GetProject().FindItemData(referencedItemUuid));
+			if(pReferencedItemData == nullptr)
+				HyGuiLog("Could not find referenced item data from Sub-Entity's UUID: " + referencedItemUuid.toString(), LOGTYPE_Error);
+			sSrc += pReferencedItemData->GetName(false);
+		}
+		else
+			sSrc += pItem->GetHyNodeTypeName();
+		sSrc += " " + pItem->GetCodeName();
 		if(pItem->GetEntType() != ENTTYPE_ArrayItem)
 			sSrc += ";\n";
 		else
@@ -629,6 +662,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 		{
 		case ITEM_Primitive:
 		case ITEM_BoundingVolume:
+		case ITEM_Entity:
 			sInitialization = "(this)";
 			break;
 
@@ -647,9 +681,6 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 
 				sInitialization = "(\"" + sPrefix + "\", \"" + sName + "\", this)";
 			}
-			break;
-
-		case ITEM_Entity:
 			break;
 
 		case ITEM_AtlasFrame:

@@ -76,6 +76,7 @@ public:
 
 	QString GenerateCodeName(QString sDesiredName) const;
 
+	QString GenerateSrc_FileIncludes() const;
 	QString GenerateSrc_MemberVariables() const;
 	QString GenerateSrc_MemberInitializerList() const;
 	QString GenerateSrc_Ctor() const;
