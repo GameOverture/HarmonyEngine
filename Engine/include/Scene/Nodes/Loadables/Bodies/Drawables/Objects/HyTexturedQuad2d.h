@@ -23,14 +23,14 @@ class HyTexturedQuad2d : public IHyDrawable2d
 
 public:
 	HyTexturedQuad2d(HyEntity2d *pParent = nullptr);
-	HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, HyEntity2d *pParent = nullptr);
+	HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(std::string sFilePath, HyTextureInfo useTextureInfo, HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(const HyTexturedQuad2d &copyRef);
 	virtual ~HyTexturedQuad2d();
 
 	const HyTexturedQuad2d &operator=(const HyTexturedQuad2d &rhs);
 
-	void Init(uint32 uiAtlasFrameChecksum, HyEntity2d *pParent);
+	void Init(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent);
 	void Init(std::string sFilePath, HyTextureInfo useTextureInfo, HyEntity2d *pParent);
 	void Uninit();
 

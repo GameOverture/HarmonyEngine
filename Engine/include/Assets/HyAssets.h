@@ -97,8 +97,8 @@ public:
 	IHyFile *GetFile(HyFileType eFileType, uint32 uiManifestIndex);
 	IHyFile *GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum);
 
-	HyFileAtlas *GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut);
-	HyFileAtlas *GetAtlasUsingBankId(uint32 uiAtlasBankId, uint32 uiIndexInBank);
+	HyFileAtlas *GetAtlas(uint32 uiChecksum, uint32 uiAtlasBankId, HyRectangle<float> &UVRectOut);
+	//HyFileAtlas *GetAtlasUsingBankId(uint32 uiAtlasBankId, uint32 uiIndexInBank);
 	uint32 GetNumAtlases();
 	HyFilesManifest *GetLoadedAtlases();
 

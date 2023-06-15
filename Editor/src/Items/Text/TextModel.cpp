@@ -200,8 +200,9 @@ void TextModel::SetRuntimeAtlasDirty()
 	
 	itemSpecificFileDataOut.m_Meta["availableGlyphs"] = availableGlyphsObj;
 
+	itemSpecificFileDataOut.m_Data.insert("bankId", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetBankId())));
 	itemSpecificFileDataOut.m_Data.insert("checksum", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetChecksum())));
-	itemSpecificFileDataOut.m_Meta.insert("assetUUID", m_pAtlasFrame == nullptr ? 0 : m_pAtlasFrame->GetUuid().toString());
+	itemSpecificFileDataOut.m_Meta.insert("assetUUID", m_pAtlasFrame == nullptr ? 0 : m_pAtlasFrame->GetUuid().toString(QUuid::WithoutBraces));
 
 	//uint uiAtlasPixelDataSizeOut;
 	//unsigned char *pPixelData = m_FontManager.GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);

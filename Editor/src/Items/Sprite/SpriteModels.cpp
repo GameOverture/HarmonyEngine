@@ -143,6 +143,7 @@ QJsonArray SpriteFramesModel::GetFramesInfo(float &fTotalDurationRef)
 		QJsonObject frameObj;
 		fTotalDurationRef += m_FramesList[i]->m_fDuration;
 
+		frameObj.insert("bankId", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetBankId())));
 		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetChecksum())));
 		frameObj.insert("duration", m_FramesList[i]->m_fDuration);
 		frameObj.insert("offsetX", m_FramesList[i]->m_vOffset.x() + m_FramesList[i]->m_pFrame->GetCrop().left());

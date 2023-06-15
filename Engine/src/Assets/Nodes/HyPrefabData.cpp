@@ -18,8 +18,10 @@ HyPrefabData::HyPrefabData(const std::string &sPath, HyJsonObj itemDataObj, HyAs
 	m_UvRectList.reserve(prefabArray.Size());
 	for(uint32 i = 0; i < prefabArray.Size(); ++i)
 	{
+		HyError("HyPrefabData::HyPrefabData - Determine bank ID");
+		int32 iBankId = 0;
 		m_UvRectList.emplace_back();
-		m_UvRectList[i].first = assetsRef.GetAtlas(prefabArray[i].GetUint(), m_UvRectList[i].second);
+		m_UvRectList[i].first = assetsRef.GetAtlas(prefabArray[i].GetUint(), iBankId, m_UvRectList[i].second);
 		m_RequiredAtlases.Set(m_UvRectList[i].first->GetManifestIndex());
 	}
 

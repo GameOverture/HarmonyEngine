@@ -202,8 +202,12 @@
 			Patch_11to12(metaAtlasDoc, metaAudioDoc);
 			[[fallthrough]];
 		case 12:
+			HyGuiLog("Patching project files: version 12 -> 13", LOGTYPE_Info);
+			Patch_12to13(metaItemsDoc, dataItemsDoc, metaAtlasDoc);
+			[[fallthrough]];
+		case 13:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 12, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 13, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -1073,6 +1077,82 @@
 	}
 	metaAudioObj.insert("assets", audioAssetsArray);
 	metaAudioDocRef.setObject(metaAudioObj);
+}
+
+/*static*/ void VersionPatcher::Patch_12to13(const QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, const QJsonDocument &metaAtlasDocRef) // Adding 'bankId' wherever only a checksum was used
+{
+	// Acquire data that will be referenced to determine the bankId
+	const QJsonObject metaAtlasObj = metaAtlasDocRef.object();
+	const QJsonArray metaAssetsArray = metaAtlasObj["assets"].toArray();
+	const QJsonObject metaItemsObj = metaItemsDocRef.object();
+	const QJsonObject metaSpriteListObj = metaItemsObj["Sprites"].toObject();
+	const QJsonObject metaTextListObj = metaItemsObj["Texts"].toObject();
+	std::function<int(const QUuid &)> fpFindBankId = [&metaAssetsArray](const QUuid &assetUuid) -> int
+	{
+		for(int iAssetIndex = 0; iAssetIndex < metaAssetsArray.size(); ++iAssetIndex)
+		{
+			// Find the asset with this UUID, and write its bankId to the dataFrameObj
+			QJsonObject metaAssetObj = metaAssetsArray[iAssetIndex].toObject();
+			QUuid testUuid(metaAssetObj["assetUUID"].toString());
+			if(testUuid == assetUuid)
+				return metaAssetObj["bankId"].toInt();
+		}
+		HyGuiLog("VersionPatcher::Patch_12to13 - Failed to find asset with UUID: " % assetUuid.toString(), LOGTYPE_Error);
+		return 0;
+	};
+
+	// Update Texts ------
+	QJsonObject dataItemsObj = dataItemsDocRef.object();
+	QJsonObject dataTextsListObj = dataItemsObj["Texts"].toObject();
+	QStringList sTextKeysList = dataTextsListObj.keys();
+	for(int iKeyIndex = 0; iKeyIndex < sTextKeysList.size(); ++iKeyIndex)
+	{
+		QJsonObject dataTextObj = dataTextsListObj[sTextKeysList.at(iKeyIndex)].toObject();
+		const QJsonObject metaTextObj = metaTextListObj[sTextKeysList.at(iKeyIndex)].toObject();
+		const QUuid metaAssetUuid = QUuid(metaTextObj["assetUUID"].toString());
+
+		dataTextObj.insert("bankId", fpFindBankId(metaAssetUuid));
+		dataTextsListObj[sTextKeysList.at(iKeyIndex)] = dataTextObj;
+	}
+	dataItemsObj.insert("Texts", dataTextsListObj);
+
+	// Update Sprites ------
+	QJsonObject dataSpriteListObj = dataItemsObj["Sprites"].toObject();
+	QStringList sSpriteKeysList = dataSpriteListObj.keys();
+	for(int iKeyIndex = 0; iKeyIndex < sSpriteKeysList.size(); ++iKeyIndex)
+	{
+		QJsonObject dataSpriteObj = dataSpriteListObj[sSpriteKeysList.at(iKeyIndex)].toObject();
+		const QJsonObject metaSpriteObj = metaSpriteListObj[sSpriteKeysList.at(iKeyIndex)].toObject();
+
+		// Do each state
+		QJsonArray dataSpriteStateArray = dataSpriteObj["stateArray"].toArray();
+		const QJsonArray metaSpriteStateArray = metaSpriteObj["stateArray"].toArray();
+		for(int iStateIndex = 0; iStateIndex < dataSpriteStateArray.size(); ++iStateIndex)
+		{
+			QJsonObject dataStateObj = dataSpriteStateArray[iStateIndex].toObject();
+			const QJsonObject metaStateObj = metaSpriteStateArray[iStateIndex].toObject();
+
+			QJsonArray dataFramesArray = dataStateObj["frames"].toArray();
+			const QJsonArray metaAssetUuidArray = metaStateObj["assetUUIDs"].toArray();
+
+			for(int iFrameIndex = 0; iFrameIndex < dataFramesArray.size(); ++iFrameIndex)
+			{
+				QJsonObject dataFrameObj = dataFramesArray[iFrameIndex].toObject();
+				QUuid metaAssetUuid(metaAssetUuidArray[iFrameIndex].toString());
+
+				dataFrameObj.insert("bankId", fpFindBankId(metaAssetUuid));
+				dataFramesArray.replace(iFrameIndex, dataFrameObj);
+			}
+			dataStateObj.insert("frames", dataFramesArray);
+			dataSpriteStateArray.replace(iStateIndex, dataStateObj);
+		}
+		dataSpriteObj.insert("stateArray", dataSpriteStateArray);
+		dataSpriteListObj.insert(sSpriteKeysList.at(iKeyIndex), dataSpriteObj);
+	}
+	dataItemsObj.insert("Sprites", dataSpriteListObj);
+
+	// Write out the new dataItemsObj, which contains updated "sprites" and "texts" objects
+	dataItemsDocRef.setObject(dataItemsObj);
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)

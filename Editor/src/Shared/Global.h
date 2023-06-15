@@ -40,7 +40,7 @@ class Project;
 
 #define HySrcEntityNamespace "hy"
 
-#define HYGUI_FILE_VERSION 12
+#define HYGUI_FILE_VERSION 13
 
 #define DISPLAYORDER_TransformCtrl 9999999
 //#define HYGUI_UseBinaryMetaFiles

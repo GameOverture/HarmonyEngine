@@ -25,8 +25,8 @@ HyTexturedQuad2d::HyTexturedQuad2d(HyEntity2d *pParent /*= nullptr*/) :
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
-HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_TexturedQuad, "", std::to_string(uiAtlasFrameChecksum), pParent),
+HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_TexturedQuad, "", std::to_string(uiAtlasFrameChecksum) + ":" + std::to_string(uiBankId), pParent),
 	m_iFullTextureWidth(0),
 	m_iFullTextureHeight(0),
 	m_hTextureHandle(HY_UNUSED_HANDLE)
@@ -68,9 +68,9 @@ const HyTexturedQuad2d &HyTexturedQuad2d::operator=(const HyTexturedQuad2d &rhs)
 	return *this;
 }
 
-void HyTexturedQuad2d::Init(uint32 uiAtlasFrameChecksum, HyEntity2d *pParent)
+void HyTexturedQuad2d::Init(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent)
 {
-	IHyLoadable2d::Init("", std::to_string(uiAtlasFrameChecksum), pParent);
+	IHyLoadable2d::Init("", std::to_string(uiAtlasFrameChecksum) + ":" + std::to_string(uiBankId), pParent);
 }
 
 void HyTexturedQuad2d::Init(std::string sFilePath, HyTextureInfo useTextureInfo, HyEntity2d *pParent)

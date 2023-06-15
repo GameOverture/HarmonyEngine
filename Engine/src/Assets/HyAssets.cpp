@@ -180,27 +180,27 @@ IHyFile *HyAssets::GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum
 	return nullptr;
 }
 
-HyFileAtlas *HyAssets::GetAtlas(uint32 uiChecksum, HyRectangle<float> &UVRectOut)
+HyFileAtlas *HyAssets::GetAtlas(uint32 uiChecksum, uint32 uiAtlasBankId, HyRectangle<float> &UVRectOut)
 {
 	for(uint32 i = 0; i < m_FilesMap[HYFILE_Atlas].m_uiNumFiles; ++i)
 	{
-		if(static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetUvRect(uiChecksum, UVRectOut))
+		if(static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetBankId() == uiAtlasBankId && static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetUvRect(uiChecksum, UVRectOut))
 			return &static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i];
 	}
 
 	return nullptr;
 }
 
-HyFileAtlas *HyAssets::GetAtlasUsingBankId(uint32 uiAtlasBankId, uint32 uiIndexInBank)
-{
-	for(uint32 i = 0; i < m_FilesMap[HYFILE_Atlas].m_uiNumFiles; ++i)
-	{
-		if(static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetBankId() == uiAtlasBankId && static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetIndexInBank() == uiIndexInBank)
-			return &static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i];
-	}
-
-	return nullptr;
-}
+//HyFileAtlas *HyAssets::GetAtlasUsingBankId(uint32 uiAtlasBankId, uint32 uiIndexInBank)
+//{
+//	for(uint32 i = 0; i < m_FilesMap[HYFILE_Atlas].m_uiNumFiles; ++i)
+//	{
+//		if(static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetBankId() == uiAtlasBankId && static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetIndexInBank() == uiIndexInBank)
+//			return &static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i];
+//	}
+//
+//	return nullptr;
+//}
 
 uint32 HyAssets::GetNumAtlases()
 {
@@ -254,9 +254,13 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 	case HYTYPE_TexturedQuad:
 		if(pLoadable->GetPrefix().empty()) // If Prefix is empty, then Name contains the 'checksum' as a string, otherwise it's "N/A" or path to an image for hotload and HyTexturedQuadData isn't used
 		{
-			uint32 uiChecksum = static_cast<uint32>(std::stoll(pLoadable->GetName()));
+			std::string sChecksum = pLoadable->GetName().substr(0, pLoadable->GetName().find(':'));
+			std::string sBankId = pLoadable->GetName().substr(pLoadable->GetName().find(':'));
+			uint32 uiChecksum = static_cast<uint32>(std::stoll(sChecksum));
+			uint32 uiBankId = static_cast<uint32>(std::stoll(sBankId));
+
 			HyRectangle<float> uvRect;
-			HyFileAtlas *pAtlas = GetAtlas(uiChecksum, uvRect);
+			HyFileAtlas *pAtlas = GetAtlas(uiChecksum, uiBankId, uvRect);
 			uint32 uiKey = pAtlas->GetManifestIndex();
 
 			if(m_TextureQuadMap.find(uiKey) == m_TextureQuadMap.end())

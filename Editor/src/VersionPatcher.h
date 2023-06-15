@@ -20,6 +20,7 @@ private:
 	static void Patch_9to10(QJsonDocument &metaAudioDocRef, QJsonDocument &dataAudioDocRef);
 	static void Patch_10to11(QJsonDocument &metaSourceDocRef);
 	static void Patch_11to12(QJsonDocument &metaAtlasDocRef, QJsonDocument &metaAudioDocRef);
+	static void Patch_12to13(const QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, const QJsonDocument &metaAtlasDocRef); // Adding 'bankId' wherever only a checksum was used
 
 	static void RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta);
 };
