@@ -252,7 +252,7 @@ void IManagerModel::RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeMo
 	//SaveMeta();
 }
 
-bool IManagerModel::CanReplaceAssets(QList<IAssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const
+bool IManagerModel::GetAffectedItems(QList<IAssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const
 {
 	ProjectTabBar *pTabBar = m_ProjectRef.GetTabBar();
 
@@ -293,7 +293,7 @@ bool IManagerModel::CanReplaceAssets(QList<IAssetItemData *> assetsList, QList<P
 
 void IManagerModel::ReplaceAssets(QList<IAssetItemData *> assetsList, bool bWithNewAssets)
 {
-	if(CanReplaceAssets(assetsList, m_RepackAffectedItemList) == false)
+	if(GetAffectedItems(assetsList, m_RepackAffectedItemList) == false)
 		return;
 
 	if(bWithNewAssets)
@@ -351,6 +351,9 @@ bool IManagerModel::TransferAssets(QList<IAssetItemData *> assetsList, uint uiNe
 		else
 			++i;
 	}
+
+	if(GetAffectedItems(assetsList, m_RepackAffectedItemList) == false)
+		return false;
 
 	bool bTransferSucceeded = OnMoveAssets(assetsList, uiNewBankId);
 	FlushRepack();

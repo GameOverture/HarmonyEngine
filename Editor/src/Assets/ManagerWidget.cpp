@@ -556,7 +556,7 @@ void ManagerWidget::on_actionAssetSettings_triggered()
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		QList<ProjectItemData *> tmpUnusedList;
-		if(m_pModel->CanReplaceAssets(dlg.GetChangedAssets(), tmpUnusedList))
+		if(m_pModel->GetAffectedItems(dlg.GetChangedAssets(), tmpUnusedList))
 		{
 			dlg.ApplyChanges();
 			m_pModel->ReplaceAssets(dlg.GetChangedAssets(), false);

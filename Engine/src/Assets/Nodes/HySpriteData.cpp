@@ -95,7 +95,7 @@ HySpriteData::AnimState::AnimState(bool bLoop,
 		{
 			HyJsonObj frameObj = frameArray[i].GetObject();
 
-			pAtlas = assetsRef.GetAtlas(frameObj["checksum"].GetUint(), rUVRect);
+			pAtlas = assetsRef.GetAtlas(frameObj["checksum"].GetUint(), frameObj["bankId"].GetUint(), rUVRect);
 			requiredAtlasIndicesRef.Set(pAtlas->GetManifestIndex());
 
 			HySetVec(vOffset, frameObj["offsetX"].GetInt(), frameObj["offsetY"].GetInt());
