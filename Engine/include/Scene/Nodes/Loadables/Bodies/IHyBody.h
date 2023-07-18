@@ -63,6 +63,10 @@ public:
 	virtual void UseCameraCoordinates();
 	virtual void UseWindowCoordinates(int32 iWindowIndex = 0);
 
+	// Synonym for UseCameraCoordinates() & UseWindowCoordinates()
+	void SetCameraCoordinates();
+	void SetWindowCoordinates(int32 iWindowIndex = 0);
+
 protected:
 	// Internal Entity propagation function overrides
 	virtual void _SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding);

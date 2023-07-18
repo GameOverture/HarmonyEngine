@@ -73,10 +73,7 @@ void HyProgressBar::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
 			static_cast<HyPrimitive2d*>(m_pBar)->SetAsBox(vTotalFillArea.x, vTotalFillArea.y);
 		}
 		else
-		{
-			m_Panel.pos.Offset(iBarOffsetX, iBarOffsetY);
-			pos.Offset(iBarOffsetX, iBarOffsetY);
-		}
+			m_pBar->pos.Offset(iBarOffsetX, iBarOffsetY);
 	 }
 
 	AdjustProgress();
@@ -85,8 +82,6 @@ void HyProgressBar::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
 void HyProgressBar::Reset()
 {
 	m_iMinimum = m_iMaximum = m_iValue = 0;
-	//m_pBar->scale.SetX(0.0f);
-
 	AdjustProgress();
 }
 

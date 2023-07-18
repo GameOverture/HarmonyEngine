@@ -236,6 +236,16 @@ int32 IHyBody::GetCoordinateSystem() const
 	_VisableGetNodeRef().m_uiFlags |= IHyNode::EXPLICIT_CoordinateSystem;
 }
 
+void IHyBody::SetCameraCoordinates()
+{
+	UseCameraCoordinates();
+}
+
+void IHyBody::SetWindowCoordinates(int32 iWindowIndex /*= 0*/)
+{
+	UseWindowCoordinates(iWindowIndex);
+}
+
 /*virtual*/ void IHyBody::_SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding)
 {
 	if(bIsOverriding)
