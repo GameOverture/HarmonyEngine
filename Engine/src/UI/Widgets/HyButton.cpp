@@ -216,7 +216,17 @@ void HyButton::SetBtnState(HyButtonState eOldState)
 	HyButtonState eCurState = GetBtnState();
 	if(eOldState != eCurState)
 	{
-		m_Panel.SetSpriteState(eCurState);
+		if(m_Panel.IsSprite())
+		{
+			uint32 uiNumStates = m_Panel.GetSprite().GetNumStates();
+			if(eCurState < uiNumStates)
+				m_Panel.SetSpriteState(eCurState);
+			else if(IsHighlighted() && uiNumStates > HYBUTTONSTATE_Highlighted)
+				m_Panel.SetSpriteState(HYBUTTONSTATE_Highlighted);
+			else
+				m_Panel.SetSpriteState(HYBUTTONSTATE_Idle);
+		}
+
 		OnBtnStateChange(eCurState);
 	}
 }
