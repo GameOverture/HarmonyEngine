@@ -255,7 +255,7 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 		if(pLoadable->GetPrefix().empty()) // If Prefix is empty, then Name contains the 'checksum' as a string, otherwise it's "N/A" or path to an image for hotload and HyTexturedQuadData isn't used
 		{
 			std::string sChecksum = pLoadable->GetName().substr(0, pLoadable->GetName().find(':'));
-			std::string sBankId = pLoadable->GetName().substr(pLoadable->GetName().find(':'));
+			std::string sBankId = pLoadable->GetName().substr(pLoadable->GetName().find(':')+1);
 			uint32 uiChecksum = static_cast<uint32>(std::stoll(sChecksum));
 			uint32 uiBankId = static_cast<uint32>(std::stoll(sBankId));
 

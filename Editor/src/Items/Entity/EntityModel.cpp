@@ -23,7 +23,10 @@ EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair
 {
 	EntityTreeModel *pTreeModelRef = static_cast<EntityModel &>(modelRef).GetTreeModel();
 	if(pTreeModelRef == nullptr)
-		return; // When 'pTreeModelRef' is nullptr, this ctor is being called from EntityModel::InitStates<>() which means the tree items haven't been created yet. The tree items are later created within the EntityModel's ctor
+	{
+		HyGuiLog("EntityStateData::EntityStateData - pTreeModelRef was nullptr", LOGTYPE_Error); // When 'pTreeModelRef' is nullptr, this ctor is being called from EntityModel::InitStates<>() which means the tree items haven't been created yet. The tree items are later created within the EntityModel's ctor
+		return;
+	}
 
 	// NOTE: If we get here, 'stateFileData' will contain valid data (since it was just copied from an existing state) and all entity tree items exist and have been created prior
 	
@@ -215,26 +218,25 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	m_bVertexEditMode(false)
 {
 	// First initialize the states so they exist before we try to add properties to them
-	InitStates<EntityStateData>(itemFileDataRef);
-
 	m_pTreeModel = new EntityTreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta["UUID"].toString(), this);
+	InitStates<EntityStateData>(itemFileDataRef);
 
 	// Each element in QList<> represents a state's properties for all the children or shapes
 	QList<QJsonObject> propRootObjectList;
 	QList<QJsonArray> propChildArrayList;
 	QList<QJsonArray> propShapeArrayList;
-	QJsonArray stateArray = itemFileDataRef.m_Meta["stateArray"].toArray();
-	for(int i = 0; i < stateArray.size(); ++i)
+	//QJsonArray stateArray = itemFileDataRef.m_Meta["stateArray"].toArray();
+	for(int i = 0; i < m_StateList.size()/*stateArray.size()*/; ++i)
 	{
-		QJsonObject stateObj = stateArray[i].toObject();
+		QJsonObject stateObj = GetStateFileData(i).m_Meta;
 		propRootObjectList.push_back(stateObj["propRoot"].toObject());
 		propChildArrayList.push_back(stateObj["propChildList"].toArray());
 		propShapeArrayList.push_back(stateObj["propShapeList"].toArray());
 	}
-	if(stateArray.size() != 0 &&
-		(propChildArrayList.size() != GetNumStates() ||
+	if(GetNumStates() == 0 ||
+		propChildArrayList.size() != GetNumStates() ||
 		propShapeArrayList.size() != GetNumStates() ||
-		propRootObjectList.size() != GetNumStates()))
+		propRootObjectList.size() != GetNumStates())
 	{
 		HyGuiLog("EntityModel::EntityModel - invalid number of states when parsing properties", LOGTYPE_Error);
 	}
