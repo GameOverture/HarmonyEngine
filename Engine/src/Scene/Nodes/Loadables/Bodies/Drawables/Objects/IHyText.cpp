@@ -327,9 +327,7 @@ void IHyText<NODETYPE, ENTTYPE>::TweenLayerColor(uint32 uiStateIndex, uint32 uiL
 {
 	m_uiTextAttributes |= TEXTATTRIB_IsTweeningLayerColor;
 
-	if(m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData)
-		delete m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData;
-	
+	delete m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData;
 	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData = HY_NEW StateColors::LayerColor::TweenLayerColorData(m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topClr, m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botClr, topColor, botColor, fDuration, fpTween);
 }
 
@@ -348,11 +346,8 @@ bool IHyText<NODETYPE, ENTTYPE>::IsTweeningLayerColor(uint32 uiStateIndex, uint3
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::StopTweeningLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex)
 {
-	if(m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData)
-	{
-		delete m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData;
-		m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData = nullptr;
-	}
+	delete m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData;
+	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData = nullptr;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
