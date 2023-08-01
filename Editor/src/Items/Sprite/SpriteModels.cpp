@@ -75,7 +75,7 @@ void SpriteFramesModel::MoveRowUp(int iIndex)
 
 void SpriteFramesModel::MoveRowDown(int iIndex)
 {
-	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt is retarded
+	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt logic deems it so
 		return;
 
 	m_FramesList.swapItemsAt(iIndex, iIndex + 1);

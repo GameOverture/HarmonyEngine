@@ -55,6 +55,8 @@ public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
+	void InitEntityNodeTreeItems(const FileDataPair &itemFileData);
+
 	EntityTreeModel *GetTreeModel();
 
 	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from this constructor and from UndoCmd's
@@ -89,7 +91,7 @@ public:
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
 
-	void InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDataPairOut) const; // Pass -1 when saving the 'global' common data
+	void InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDataPairOut) const; // Pass -1 for 'iStateIndex' when saving the common "desc" data
 };
 
 #endif // ENTITYMODEL_H

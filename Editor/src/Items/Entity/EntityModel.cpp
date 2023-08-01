@@ -221,14 +221,25 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	m_pTreeModel = new EntityTreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta["UUID"].toString(), this);
 	InitStates<EntityStateData>(itemFileDataRef);
 
+	if(itemFileDataRef.m_Meta.contains("stateArray") && itemFileDataRef.m_Meta["stateArray"].toArray().size() > 0)
+		InitEntityNodeTreeItems(itemFileDataRef);
+}
+
+/*virtual*/ EntityModel::~EntityModel()
+{
+	delete m_pTreeModel;
+}
+
+void EntityModel::InitEntityNodeTreeItems(const FileDataPair &itemFileData)
+{
 	// Each element in QList<> represents a state's properties for all the children or shapes
 	QList<QJsonObject> propRootObjectList;
 	QList<QJsonArray> propChildArrayList;
 	QList<QJsonArray> propShapeArrayList;
-	//QJsonArray stateArray = itemFileDataRef.m_Meta["stateArray"].toArray();
-	for(int i = 0; i < m_StateList.size()/*stateArray.size()*/; ++i)
+	QJsonArray stateArray = itemFileData.m_Meta["stateArray"].toArray();
+	for(int i = 0; i < /*m_StateList.size()*/stateArray.size(); ++i)
 	{
-		QJsonObject stateObj = GetStateFileData(i).m_Meta;
+		QJsonObject stateObj = stateArray[i].toObject();
 		propRootObjectList.push_back(stateObj["propRoot"].toObject());
 		propChildArrayList.push_back(stateObj["propChildList"].toArray());
 		propShapeArrayList.push_back(stateObj["propShapeList"].toArray());
@@ -247,8 +258,8 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 		QJsonObject propRootObj = propRootObjectList[iStateIndex];
 		m_pTreeModel->GetRootTreeItemData()->GetPropertiesModel(iStateIndex)->DeserializeJson(propRootObj);
 	}
-	
-	std::function<void(const QJsonArray &, const QList<QJsonArray> &)> fpPopulateNodeTreeItems = 
+
+	std::function<void(const QJsonArray &, const QList<QJsonArray> &)> fpPopulateNodeTreeItems =
 		[&](const QJsonArray &itemListArray, const QList<QJsonArray> &propItemArrayList)
 	{
 		for(int i = 0; i < itemListArray.size(); ++i)
@@ -285,13 +296,8 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 		}
 	};
 	// Insert all the 'child' items into the nodeTree
-	fpPopulateNodeTreeItems(itemFileDataRef.m_Meta["descChildList"].toArray(), propChildArrayList);
-	fpPopulateNodeTreeItems(itemFileDataRef.m_Meta["descShapeList"].toArray(), propShapeArrayList);
-}
-
-/*virtual*/ EntityModel::~EntityModel()
-{
-	delete m_pTreeModel;
+	fpPopulateNodeTreeItems(itemFileData.m_Meta["descChildList"].toArray(), propChildArrayList);
+	fpPopulateNodeTreeItems(itemFileData.m_Meta["descShapeList"].toArray(), propShapeArrayList);
 }
 
 EntityTreeModel *EntityModel::GetTreeModel()
@@ -691,7 +697,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 				HyGuiLog("EntityModel::GenerateSrc_MemberInitializerList() - Could not find referenced asset item for: " % pItem->GetCodeName(), LOGTYPE_Error);
 				break;
 			}
-			sInitialization = "(" + QString::number(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum()) + ", this)";
+			sInitialization = "(" + QString::number(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum()) + ", " + QString::number(static_cast<IAssetItemData *>(pReferencedItemData)->GetBankId()) + ", this)";
 			break;
 
 		default:
@@ -788,6 +794,7 @@ QString EntityModel::GenerateSrc_SetStates() const
 	InsertChildAndShapeList(uiIndex, stateFileDataOut);
 }
 
+// Pass -1 for 'iStateIndex' when saving the common "desc" data
 void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDataPairOut) const
 {
 	QList<EntityTreeItemData *> childList;
@@ -802,7 +809,7 @@ void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDat
 
 	QJsonArray childArray;
 	QString sCurrentArrayCodeName = "";
-	for(int i = 0; i < childList.size(); )
+	for(int i = 0; i < childList.size(); ) // 'i' is incremented inside the loop
 	{
 		if(childList[i]->GetEntType() == ENTTYPE_ArrayItem && sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) != 0)
 		{
