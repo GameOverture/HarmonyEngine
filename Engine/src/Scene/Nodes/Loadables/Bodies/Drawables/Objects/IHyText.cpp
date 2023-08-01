@@ -14,6 +14,7 @@
 #include "Assets/Nodes/HyTextData.h"
 #include "Utilities/HyMath.h"
 #include "Diagnostics/Console/IHyConsole.h"
+#include "HyEngine.h"
 
 template<typename NODETYPE, typename ENTTYPE>
 IHyText<NODETYPE, ENTTYPE>::IHyText(std::string sPrefix, std::string sName, ENTTYPE *pParent) :
@@ -316,8 +317,42 @@ void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiStateIndex, uint32 uiLay
 		return;
 	}
 
+	StopTweeningLayerColor(uiStateIndex, uiLayerIndex);
 	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topClr = topColor;
 	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botClr = botColor;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHyText<NODETYPE, ENTTYPE>::TweenLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor, float fDuration, HyTweenFunc fpTween /*= HyTween::Linear*/)
+{
+	m_uiTextAttributes |= TEXTATTRIB_IsTweeningLayerColor;
+
+	if(m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData)
+		delete m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData;
+	
+	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData = HY_NEW StateColors::LayerColor::TweenLayerColorData(m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topClr, m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botClr, topColor, botColor, fDuration, fpTween);
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHyText<NODETYPE, ENTTYPE>::IsTweeningLayerColor()
+{
+	return (m_uiTextAttributes & TEXTATTRIB_IsTweeningLayerColor) != 0;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHyText<NODETYPE, ENTTYPE>::IsTweeningLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex)
+{
+	return m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData != nullptr;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHyText<NODETYPE, ENTTYPE>::StopTweeningLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex)
+{
+	if(m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData)
+	{
+		delete m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData;
+		m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData = nullptr;
+	}
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -606,6 +641,62 @@ template<typename NODETYPE, typename ENTTYPE>
 		this->m_ShaderUniforms.SetTexHandle(0, pTextData->GetAtlas()->GetTextureHandle());
 
 	MarkAsDirty();
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+/*virtual*/ void IHyText<NODETYPE, ENTTYPE>::OnLoadedUpdate() /*override*/
+{
+	CalculateGlyphInfos();
+
+	if(m_uiTextAttributes & TEXTATTRIB_IsTweeningLayerColor)
+	{
+		bool bContinueTweening = false;
+		for(uint32 i = 0; i < m_StateColors.size(); ++i)
+		{
+			for(uint32 j = 0; j < m_StateColors[i]->m_LayerColors.size(); ++j)
+			{
+				if(m_StateColors[i]->m_LayerColors[j]->m_pActiveTweenData)
+				{
+					StateColors::LayerColor::TweenLayerColorData *pTweenData = m_StateColors[i]->m_LayerColors[j]->m_pActiveTweenData;
+
+					pTweenData->m_fElapsedTime = HyMath::Clamp(pTweenData->m_fElapsedTime + HyEngine::DeltaTime(), 0.0f, pTweenData->m_fDuration);
+					if(pTweenData->m_fElapsedTime == pTweenData->m_fDuration)
+					{
+						m_StateColors[i]->m_LayerColors[j]->topClr = pTweenData->m_TopTargetClr;
+						m_StateColors[i]->m_LayerColors[j]->botClr = pTweenData->m_BotTargetClr;
+
+						delete m_StateColors[i]->m_LayerColors[j]->m_pActiveTweenData;
+						m_StateColors[i]->m_LayerColors[j]->m_pActiveTweenData = nullptr;
+					}
+					else
+					{
+						float fProgress = pTweenData->m_fpActiveTweenFunc(pTweenData->m_fElapsedTime / pTweenData->m_fDuration);
+
+						glm::vec4 startClr(pTweenData->m_TopStartClr.GetRedF(), pTweenData->m_TopStartClr.GetGreenF(), pTweenData->m_TopStartClr.GetBlueF(), pTweenData->m_TopStartClr.GetAlphaF());
+						glm::vec4 targetClr(pTweenData->m_TopTargetClr.GetRedF(), pTweenData->m_TopTargetClr.GetGreenF(), pTweenData->m_TopTargetClr.GetBlueF(), pTweenData->m_TopTargetClr.GetAlphaF());
+						float fRed = startClr.r + (targetClr.r - startClr.r) * fProgress;
+						float fGreen = startClr.g + (targetClr.g - startClr.g) * fProgress;
+						float fBlue = startClr.b + (targetClr.b - startClr.b) * fProgress;
+						float fAlpha = startClr.a + (targetClr.a - startClr.a) * fProgress;
+						m_StateColors[i]->m_LayerColors[j]->topClr = HyColor(fRed, fGreen, fBlue, fAlpha);
+
+						HySetVec(startClr, pTweenData->m_BotStartClr.GetRedF(), pTweenData->m_BotStartClr.GetGreenF(), pTweenData->m_BotStartClr.GetBlueF(), pTweenData->m_BotStartClr.GetAlphaF());
+						HySetVec(targetClr, pTweenData->m_BotTargetClr.GetRedF(), pTweenData->m_BotTargetClr.GetGreenF(), pTweenData->m_BotTargetClr.GetBlueF(), pTweenData->m_BotTargetClr.GetAlphaF());
+						fRed = startClr.r + (targetClr.r - startClr.r) * fProgress;
+						fGreen = startClr.g + (targetClr.g - startClr.g) * fProgress;
+						fBlue = startClr.b + (targetClr.b - startClr.b) * fProgress;
+						fAlpha = startClr.a + (targetClr.a - startClr.a) * fProgress;
+						m_StateColors[i]->m_LayerColors[j]->botClr = HyColor(fRed, fGreen, fBlue, fAlpha);
+
+						bContinueTweening = true;
+					}
+				}
+			}
+		}
+
+		if(bContinueTweening == false)
+			m_uiTextAttributes &= ~TEXTATTRIB_IsTweeningLayerColor;
+	}
 }
 
 template<typename NODETYPE, typename ENTTYPE>

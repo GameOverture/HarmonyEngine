@@ -94,6 +94,8 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 
 /*virtual*/ void HyText2d::OnLoadedUpdate() /*override*/
 {
+	IHyText<IHyDrawable2d, HyEntity2d>::OnLoadedUpdate();
+
 #ifdef HY_USE_TEXT_DEBUG_BOXES
 	const glm::mat4 &mtxSceneRef = GetSceneTransform(0.0f);
 	glm::vec3 vScale(1.0f);
@@ -110,8 +112,6 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	m_DebugBox.SetDisplayOrder(GetDisplayOrder()+1);
 	m_DebugBox.SetVisible(IsValidToRender());
 #endif
-
-	CalculateGlyphInfos();
 }
 
 /*virtual*/ void HyText2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/

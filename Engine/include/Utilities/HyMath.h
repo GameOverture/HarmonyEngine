@@ -266,20 +266,14 @@ public:
 		m_uiG(0x00),
 		m_uiB(0x00)
 	{ }
-	//HyColor(uint8 uiRed, uint8 uiGreen, uint8 uiBlue, uint8 uiAlpha = 0xFF) :
-	//	m_uiA(uiAlpha),
-	//	m_uiR(uiRed),
-	//	m_uiG(uiGreen),
-	//	m_uiB(uiBlue)
-	//{ }
 	HyColor(int32 iRed, int32 iGreen, int32 iBlue, int32 iAlpha = 0xFF) :
 		m_uiA(iAlpha & 0xFF),
 		m_uiR(iRed & 0xFF),
 		m_uiG(iGreen & 0xFF),
 		m_uiB(iBlue & 0xFF)
 	{ }
-	HyColor(uint32 uiColor) :
-		m_uiA(0xFF),//(uiColor >> 24) & 0xFF), // Safety measure to not accidentally consider 0x0 as opaque black
+	HyColor(uint32 uiColor) : // 24-bit color, does not initialize alpha channel
+		m_uiA(0xFF),
 		m_uiR((uiColor >> 16) & 0xFF),
 		m_uiG((uiColor >> 8) & 0xFF),
 		m_uiB(uiColor & 0xFF)
@@ -293,7 +287,7 @@ public:
 
 	bool operator==(const HyColor &rhs)
 	{
-		return m_uiA == rhs.m_uiA && m_uiR == rhs.m_uiR && m_uiG == rhs.m_uiG && m_uiB == rhs.m_uiB;
+		return m_uiR == rhs.m_uiR && m_uiG == rhs.m_uiG && m_uiB == rhs.m_uiB && m_uiA == rhs.m_uiA;
 	}
 
 	bool operator!=(const HyColor &rhs)
