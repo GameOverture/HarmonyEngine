@@ -52,10 +52,10 @@ public:
 
 	// Procedural transformation functions
 	bool IsAnimating() const;
-	void Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc = HyTween::Linear, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
-	void TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTweenFunc = HyTween::Linear, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
+	void Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
+	void TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTweenFunc = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
 
-	void Proc(float fSeconds, std::function<float(float)> fpProcFunc, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
+	void Proc(float fSeconds, std::function<float(float)> fpProcFunc, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
 
 	void Updater(std::function<float(float)> fpUpdaterFunc);
 

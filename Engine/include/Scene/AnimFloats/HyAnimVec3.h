@@ -57,11 +57,11 @@ public:
 	void Offset(const glm::ivec3 &srcVec);
 	void Offset(const HyAnimVec3 &srcVec);
 
-	void Tween(float fX, float fY, float fZ, float fSeconds, HyTweenFunc fpEase = HyTween::Linear, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
-	void TweenOffset(float fOffsetX, float fOffsetY, float fOffsetZ, float fSeconds, HyTweenFunc fpEase = HyTween::Linear, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
+	void Tween(float fX, float fY, float fZ, float fSeconds, HyTweenFunc fpEase = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
+	void TweenOffset(float fOffsetX, float fOffsetY, float fOffsetZ, float fSeconds, HyTweenFunc fpEase = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
 
-	void Bezier(const glm::vec3 &pt1, const glm::vec3 &pt2, const glm::vec3 &pt3, float fSeconds, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
-	void Bezier(const glm::vec3 &pt1, const glm::vec3 &pt2, const glm::vec3 &pt3, const glm::vec3 &pt4, float fSeconds, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
+	void Bezier(const glm::vec3 &pt1, const glm::vec3 &pt2, const glm::vec3 &pt3, float fSeconds, HyTweenFunc fpTween = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
+	void Bezier(const glm::vec3 &pt1, const glm::vec3 &pt2, const glm::vec3 &pt3, const glm::vec3 &pt4, float fSeconds, HyTweenFunc fpTween = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
 
 	void Displace(float fX, float fY, float fZ);
 	void Displace(const glm::vec3 &srcVec);

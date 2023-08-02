@@ -76,7 +76,7 @@ bool HyAnimFloat::IsAnimating() const
 	return m_bAddedToOwnerUpdate;
 }
 
-void HyAnimFloat::Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc /*= HyTween::Linear*/, HyAnimFinishedCallback fpFinishedCallback /*= NullFinishedCallback*/)
+void HyAnimFloat::Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= NullFinishedCallback*/)
 {
 	if(fSeconds <= 0.0f)
 	{
@@ -89,14 +89,14 @@ void HyAnimFloat::Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc /*= H
 	m_fTarget = fTo;
 	m_fDuration = fSeconds;
 	m_fpAnimFunc = fpTweenFunc;
-	m_fElapsedTime = 0.0f;
+	m_fElapsedTime = fabs(fDeferStart) * -1.0f;
 	m_fpBehaviorUpdate = &HyAnimFloat::_Tween;
 	m_fpAnimFinishedFunc = fpFinishedCallback;
 
 	m_OwnerRef.InsertActiveAnimFloat(this);
 }
 
-void HyAnimFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTweenFunc /*= HyTween::Linear*/, HyAnimFinishedCallback fpFinishedCallback /*= NullFinishedCallback*/)
+void HyAnimFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTweenFunc /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= NullFinishedCallback*/)
 {
 	if(fSeconds <= 0.0f)
 	{
@@ -109,14 +109,14 @@ void HyAnimFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTw
 	m_fTarget = m_fValueRef + fOffsetAmt;
 	m_fDuration = fSeconds;
 	m_fpAnimFunc = fpTweenFunc;
-	m_fElapsedTime = 0.0f;
+	m_fElapsedTime = fabs(fDeferStart) * -1.0f;
 	m_fpBehaviorUpdate = &HyAnimFloat::_Tween;
 	m_fpAnimFinishedFunc = fpFinishedCallback;
 
 	m_OwnerRef.InsertActiveAnimFloat(this);
 }
 
-void HyAnimFloat::Proc(float fSeconds, std::function<float(float)> fpProcFunc, HyAnimFinishedCallback fpFinishedCallback /*= NullFinishedCallback*/)
+void HyAnimFloat::Proc(float fSeconds, std::function<float(float)> fpProcFunc, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= NullFinishedCallback*/)
 {
 	// Even if duration is instant, we still need to invoke the proc func once. Do so safely by ensuring m_fDuration isn't 0.0
 	if(fSeconds <= 0.0f)
@@ -129,7 +129,7 @@ void HyAnimFloat::Proc(float fSeconds, std::function<float(float)> fpProcFunc, H
 	{
 		// Standard initialization
 		m_fDuration = fSeconds;
-		m_fElapsedTime = 0.0f;
+		m_fElapsedTime = fabs(fDeferStart) * -1.0f;
 	}
 	m_fpAnimFunc = fpProcFunc;
 	m_fpBehaviorUpdate = &HyAnimFloat::_Proc;
@@ -189,7 +189,7 @@ float HyAnimFloat::Extrapolate(float fExtrapolatePercent) const
 		return Get();
 	
 	uint32 uiDirtyFlags = 0;
-	float fElapsedTime = m_fElapsedTime;
+	float fElapsedTime = HyMath::Max(m_fElapsedTime, 0.0f);
 	float fExtrapolatedValue = m_fValueRef;
 	(this->*m_fpBehaviorUpdate)(HyEngine::DeltaTime() * fExtrapolatePercent, fElapsedTime, fExtrapolatedValue, uiDirtyFlags);
 
@@ -333,6 +333,12 @@ bool HyAnimFloat::UpdateFloat()
 {
 	if(m_fpBehaviorUpdate == nullptr)
 		return true;
+
+	if(m_fElapsedTime < 0.0f) // Handle deferred start
+	{
+		m_fElapsedTime = HyMath::Min(m_fElapsedTime + HyEngine::DeltaTime(), 0.0f);
+		return false;
+	}
 
 	uint32 uiDirtyFlags = 0;
 	if((this->*m_fpBehaviorUpdate)(HyEngine::DeltaTime(), m_fElapsedTime, m_fValueRef, uiDirtyFlags))

@@ -60,13 +60,13 @@ protected:
 				float					m_fElapsedTime;
 				HyTweenFunc				m_fpActiveTweenFunc;
 
-				TweenLayerColorData(HyColor topStartColor, HyColor botStartColor, HyColor topTargetColor, HyColor botTargetColor, float fDuration, HyTweenFunc fpTween) :
+				TweenLayerColorData(HyColor topStartColor, HyColor botStartColor, HyColor topTargetColor, HyColor botTargetColor, float fDuration, HyTweenFunc fpTween, float fDeferStart) :
 					m_TopStartClr(topStartColor),
 					m_BotStartClr(botStartColor),
 					m_TopTargetClr(topTargetColor),
 					m_BotTargetClr(botTargetColor),
 					m_fDuration(fDuration),
-					m_fElapsedTime(0.0f),
+					m_fElapsedTime(fabs(fDeferStart) * -1.0f),
 					m_fpActiveTweenFunc(fpTween)
 				{ }
 			};
@@ -136,7 +136,7 @@ public:
 
 	std::pair<HyColor, HyColor> GetLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex);
 	void SetLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor);
-	void TweenLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor, float fDuration, HyTweenFunc fpTween = HyTween::Linear);
+	void TweenLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor, float fDuration, HyTweenFunc fpTween = HyTween::Linear, float fDeferStart = 0.0f);
 	bool IsTweeningLayerColor(); // If any layer is tweening
 	bool IsTweeningLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex);
 	void StopTweeningLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex);

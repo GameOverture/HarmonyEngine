@@ -171,24 +171,24 @@ void HyAnimVec2::Offset(const HyAnimVec2 &srcVec)
 	m_AnimFloatList[1].Offset(srcVec[1]);
 }
 
-void HyAnimVec2::Tween(int32 iX, int32 iY, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullTweenCallback*/)
+void HyAnimVec2::Tween(int32 iX, int32 iY, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullTweenCallback*/)
 {
-	Tween(static_cast<float>(iX), static_cast<float>(iY), fSeconds, fpTween, fpFinishedCallback);
+	Tween(static_cast<float>(iX), static_cast<float>(iY), fSeconds, fpTween, fDeferStart, fpFinishedCallback);
 }
 
-void HyAnimVec2::Tween(float fX, float fY, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullTweenCallback*/)
+void HyAnimVec2::Tween(float fX, float fY, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullTweenCallback*/)
 {
-	m_AnimFloatList[0].Tween(fX, fSeconds, fpTween, fpFinishedCallback);
-	m_AnimFloatList[1].Tween(fY, fSeconds, fpTween);
+	m_AnimFloatList[0].Tween(fX, fSeconds, fpTween, fDeferStart, fpFinishedCallback);
+	m_AnimFloatList[1].Tween(fY, fSeconds, fpTween, fDeferStart);
 }
 
-void HyAnimVec2::TweenOffset(float fOffsetX, float fOffsetY, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullTweenCallback*/)
+void HyAnimVec2::TweenOffset(float fOffsetX, float fOffsetY, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullTweenCallback*/)
 {
-	m_AnimFloatList[0].TweenOffset(fOffsetX, fSeconds, fpTween, fpFinishedCallback);
-	m_AnimFloatList[1].TweenOffset(fOffsetY, fSeconds, fpTween);
+	m_AnimFloatList[0].TweenOffset(fOffsetX, fSeconds, fpTween, fDeferStart, fpFinishedCallback);
+	m_AnimFloatList[1].TweenOffset(fOffsetY, fSeconds, fpTween, fDeferStart);
 }
 
-void HyAnimVec2::Bezier(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &pt3, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, HyAnimFinishedCallback fpFinishedCallback /* = HyAnimFloat::NullTweenCallback */)
+void HyAnimVec2::Bezier(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &pt3, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /* = HyAnimFloat::NullTweenCallback */)
 {
 	// Quadratic Bezier
 	m_AnimFloatList[0].Proc(fSeconds, [=](float fRatio)
@@ -196,16 +196,16 @@ void HyAnimVec2::Bezier(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::v
 			fRatio = fpTween(fRatio);
 			auto p = ((1-fRatio) * (1-fRatio)) * pt1 + 2 * (1-fRatio) * fRatio * pt2 + fRatio * fRatio * pt3;
 			return p.x;
-		}, fpFinishedCallback);
+		}, fDeferStart, fpFinishedCallback);
 	m_AnimFloatList[1].Proc(fSeconds, [=](float fRatio)
 		{
 			fRatio = fpTween(fRatio);
 			auto p = ((1-fRatio) * (1-fRatio)) * pt1 + 2 * (1-fRatio) * fRatio * pt2 + fRatio * fRatio * pt3;
 			return p.y;
-		});
+		}, fDeferStart);
 }
 
-void HyAnimVec2::Bezier(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &pt3, const glm::vec2 &pt4, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullTweenCallback*/)
+void HyAnimVec2::Bezier(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &pt3, const glm::vec2 &pt4, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullTweenCallback*/)
 {
 	// Cubic Bezier
 	m_AnimFloatList[0].Proc(fSeconds, [=](float fRatio)
@@ -213,13 +213,13 @@ void HyAnimVec2::Bezier(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::v
 			fRatio = fpTween(fRatio);
 			auto p = ((1-fRatio) * (1-fRatio) * (1-fRatio)) * pt1 + 3 * fRatio * ((1-fRatio) * (1-fRatio)) * pt2 + 3 * (fRatio * fRatio) * (1-fRatio) * pt3 + (fRatio * fRatio * fRatio) * pt4;
 			return p.x;
-		}, fpFinishedCallback);
+		}, fDeferStart, fpFinishedCallback);
 	m_AnimFloatList[1].Proc(fSeconds, [=](float fRatio)
 		{
 			fRatio = fpTween(fRatio);
 			auto p = ((1-fRatio) * (1-fRatio) * (1-fRatio)) * pt1 + 3 * fRatio * ((1-fRatio) * (1-fRatio)) * pt2 + 3 * (fRatio * fRatio) * (1-fRatio) * pt3 + (fRatio * fRatio * fRatio) * pt4;
 			return p.y;
-		});
+		}, fDeferStart);
 }
 
 void HyAnimVec2::Displace(float fX, float fY)
