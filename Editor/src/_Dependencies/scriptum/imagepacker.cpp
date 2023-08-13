@@ -176,7 +176,7 @@ void ImagePacker::pack(int heur, int w, int h)
     {
         // Don't crop atlases since we require them to be of specified dimensions /JJK
         //
-        //CropLastImage(heur, w, h, false);
+        CropLastImage(heur, w, h, false);
     }
 
     if(merge)

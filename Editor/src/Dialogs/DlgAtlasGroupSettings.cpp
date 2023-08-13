@@ -41,6 +41,8 @@ DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
 
 bool DlgAtlasGroupSettings::IsSettingsDirty()
 {
+	if(ui->chkForceRegenBank->isChecked())
+		return true;
 	if(ui->cmbSortOrder->currentIndex() != m_InitialPackerSettingsObj["cmbSortOrder"].toInt())
 		return true;
 	if(ui->sbFrameMarginTop->value() != m_InitialPackerSettingsObj["sbFrameMarginTop"].toInt())

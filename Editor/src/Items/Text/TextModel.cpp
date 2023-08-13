@@ -130,7 +130,7 @@ void TextModel::SetRuntimeAtlasDirty()
 		uiAtlasBankIndex = m_ItemRef.GetProject().GetAtlasModel().GetBankIndexFromBankId(m_pAtlasFrame->GetBankId());
 
 	// Ensure newly generated font sub-atlas will fit in atlas bank dimensions
-	QSize atlasDimensions = m_ItemRef.GetProject().GetAtlasModel().GetAtlasDimensions(uiAtlasBankIndex);
+	QSize atlasDimensions = m_ItemRef.GetProject().GetAtlasModel().GetMaxAtlasDimensions(uiAtlasBankIndex);
 	quint32 uiNewAtlasBankId = m_ItemRef.GetProject().GetAtlasModel().GetBankIdFromBankIndex(uiAtlasBankIndex);
 	if(m_ItemRef.GetProject().GetAtlasModel().IsImageValid(fontAtlasImage, uiNewAtlasBankId) == false)
 	{

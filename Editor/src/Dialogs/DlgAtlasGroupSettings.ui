@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>270</width>
-    <height>308</height>
+    <height>331</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -497,6 +497,13 @@
        </layout>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chkForceRegenBank">
+     <property name="text">
+      <string>Force Regenerate Bank</string>
+     </property>
     </widget>
    </item>
    <item>

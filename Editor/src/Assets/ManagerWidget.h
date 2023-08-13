@@ -66,6 +66,8 @@ public:
 
 	IManagerModel &GetModel();
 	quint32 GetSelectedBankId();
+	int GetSelectedBankIndex();
+	void SetSelectedBankIndex(int iBankIndex);
 
 	void RefreshInfo();
 

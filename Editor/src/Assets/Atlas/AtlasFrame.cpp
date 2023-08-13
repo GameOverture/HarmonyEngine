@@ -112,7 +112,7 @@ void AtlasFrame::ClearTextureIndex()
 	m_iTextureIndex = -1;
 }
 
-void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize fullAtlasSize)
+void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize textureSize)
 {
 	m_iTextureIndex = iTextureIndex;
 	m_iPosX = iX;
@@ -133,7 +133,7 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize f
 					continue;
 
 				ProjectItemData *pProjItem = static_cast<ProjectItemData *>(*iter);
-				static_cast<SpineModel *>(pProjItem->GetModel())->RewriteAtlasFile(this, fullAtlasSize);
+				static_cast<SpineModel *>(pProjItem->GetModel())->RewriteAtlasFile(this, textureSize);
 			}
 		}
 	}

@@ -18,7 +18,7 @@ class AtlasModel : public IManagerModel
 {
 	Q_OBJECT
 
-	QMap<BankData *, QSet<int>>			m_RepackTexIndicesMap; // This exists to keep track of affected texture indices. When deleting a large number of frames where they encompass the entire texture, the repack will delete the frames before clearing out the affected textures. This caused those textures to be left behind
+	QMap<BankData *, QSet<int>>			m_RepackTexIndicesMap;	// This exists to keep track of affected texture indices. When deleting a large number of frames where they encompass the entire texture, the repack will delete the frames before clearing out the affected textures. This caused those textures to be left behind
 
 public:
 	AtlasModel(Project &projRef);
@@ -27,7 +27,8 @@ public:
 	QFileInfoList GetExistingTextureInfoList(uint uiBankIndex);
 
 	int GetNumTextures(uint uiBankIndex);
-	QSize GetAtlasDimensions(uint uiBankIndex);
+	QSize GetMaxAtlasDimensions(uint uiBankIndex);
+	QSize GetTextureSize(uint uiBankIndex, int iTextureIndex); // May be smaller (when trimmed) than the max atlas dimensions
 
 	bool IsImageValid(QImage &image, quint32 uiBankId);
 	bool IsImageValid(int iWidth, int iHeight, quint32 uiBankId);

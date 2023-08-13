@@ -25,11 +25,9 @@ class AtlasRepackThread : public IRepackThread
 		struct PackerBucket
 		{
 			ImagePacker					m_Packer;
-
-			//QSet<int>					m_TextureIndexSet;
 			QList<AtlasFrame *>			m_FramesList;
 		};
-		QMap<uint32, PackerBucket *>	m_BucketMap;
+		QMap<uint32, PackerBucket *>	m_BucketMap;	// Within each bank, there can be multiple buckets of textures. Each bucket has a unique 'texInfo' uint32 (specifying the file type, texture filtering, etc)
 
 		RepackBank() :
 			m_pBankData(nullptr)
@@ -51,7 +49,7 @@ public:
 	//void RepackBank(BankData *pBankData, 
 
 private:
-	void ConstructAtlasTexture(BankData *pBankData, ImagePacker &imagePackerRef, HyTextureInfo texInfo, int iPackerBinIndex, int iActualTextureIndex);
+	QSize ConstructAtlasTexture(BankData *pBankData, ImagePacker &imagePackerRef, HyTextureInfo texInfo, int iPackerBinIndex, int iActualTextureIndex);
 	void SetPackerSettings(BankData *pBankData, ImagePacker &imagePackerRef);
 };
 

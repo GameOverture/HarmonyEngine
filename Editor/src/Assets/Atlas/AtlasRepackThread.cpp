@@ -40,7 +40,6 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 			if(curBankRef.m_BucketMap.contains(uiKey) == false)
 				curBankRef.m_BucketMap.insert(uiKey, new RepackBank::PackerBucket());
 
-			//curBankRef.m_BucketMap[uiKey]->m_TextureIndexSet.insert(pAtlasFrame->GetTextureIndex());
 			curBankRef.m_BucketMap[uiKey]->m_FramesList.append(pAtlasFrame);
 		}
 	}
@@ -52,9 +51,11 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 
 /*virtual*/ void AtlasRepackThread::OnRun() /*override*/
 {
-	// First go over and run the packer, to determine how many textures will be loaded
+	// These 'blocks' are just used to update the progress bar
 	int iLoadedBlocks = 0;
 	int iTotalBlocks = 0;
+
+	// First go over and run the packer, to determine how many textures will be loaded
 	for(int32 iBankCnt = 0; iBankCnt < m_RepackBankList.size(); ++iBankCnt)
 	{
 		BankData *pBankData = m_RepackBankList[iBankCnt].m_pBankData;
@@ -92,21 +93,21 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 
 		// Go through the packer's bins and ensure textures have a sequential index name
 		QDir runtimeBankDir(pBankData->m_sAbsPath);
-		QList<int> unfilledTextureIndexList; // Keep track of the last texture index to be used in next Repack (because it likely has room remaining)
+		QList<int> unfilledTextureIndexList; // Keep track of texture indexes that aren't full size, to be used in next Repack (because it has more room remaining)
 		for(auto iter = bucketMapRef.begin(); iter != bucketMapRef.end(); ++iter)
 		{
-			int iNumNewTextures = iter.value()->m_Packer.bins.size();
+			const int iNUM_NEW_TEXTURES = iter.value()->m_Packer.bins.size();
 
 			// Grab 'existingTexturesInfoList' - This is after AtlasModel::OnFlushRepack() has deleted the obsolete textures
 			QFileInfoList existingTexturesInfoList = runtimeBankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 
 			// Using our stock of newly generated textures, fill in any gaps in the texture array.
 			// If there aren't enough new textures then shift textures (and their frames) to fill any remaining gaps in the indices.
-			int iTotalNumTextures = iNumNewTextures + existingTexturesInfoList.size();
+			const int iTOTAL_NUM_TEXTURES = iNUM_NEW_TEXTURES + existingTexturesInfoList.size();
 
 			int iNumNewTexturesUsed = 0;
 			int iCurrentIndex = 0;
-			for(; iCurrentIndex < iTotalNumTextures; ++iCurrentIndex)
+			for(; iCurrentIndex < iTOTAL_NUM_TEXTURES; ++iCurrentIndex)
 			{
 				bool bFound = false;
 				for(int i = 0; i < existingTexturesInfoList.size(); ++i)
@@ -117,21 +118,34 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 						break;
 					}
 				}
-
 				if(bFound)
 					continue;
 
-				if(iNumNewTexturesUsed < iNumNewTextures)
+				if(iNumNewTexturesUsed < iNUM_NEW_TEXTURES)
 				{
-					ConstructAtlasTexture(pBankData, iter.value()->m_Packer, HyTextureInfo(iter.key()), iNumNewTexturesUsed, iCurrentIndex);
+					QSize textureSize = ConstructAtlasTexture(pBankData, iter.value()->m_Packer, HyTextureInfo(iter.key()), iNumNewTexturesUsed, iCurrentIndex);
 					iNumNewTexturesUsed++;
 
 					iLoadedBlocks++;
 					Q_EMIT LoadUpdate(iLoadedBlocks, iTotalBlocks);
 
-					// Store off the last packed texture to indicate it is "unfilled"
-					if(iNumNewTexturesUsed == iNumNewTextures)
+					// If texture size isn't 'fullAtlasSize' then indicate it as "unfilled"
+					if(textureSize != fullAtlasSize)
 						unfilledTextureIndexList.append(iCurrentIndex);
+
+					// Update the textureSizes array in the meta file
+					QJsonArray textureSizesArray = pBankData->m_MetaObj["textureSizes"].toArray();
+					while(textureSizesArray.size() <= iCurrentIndex)
+					{
+						QJsonArray tmpArray;
+						tmpArray.append(-1); tmpArray.append(-1);
+						textureSizesArray.append(tmpArray);
+					}
+					QJsonArray newTexSizeArray;
+					newTexSizeArray.append(textureSize.width());
+					newTexSizeArray.append(textureSize.height());
+					textureSizesArray[iCurrentIndex] = newTexSizeArray;
+					pBankData->m_MetaObj["textureSizes"] = textureSizesArray;
 				}
 				else
 				{
@@ -148,17 +162,26 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 
 							if(iExistingTextureIndex == iNextAvailableFoundIndex)
 							{
+								// Get the existing texture's size
+								QJsonArray textureSizesArray = pBankData->m_MetaObj["textureSizes"].toArray();
+								QJsonArray existingTexSizeArray = textureSizesArray[iExistingTextureIndex].toArray();
+								QSize textureSize(existingTexSizeArray[0].toInt(), existingTexSizeArray[1].toInt());
+								
 								// Texture found, start migrating its frames
 								QList<IAssetItemData *> &atlasGrpFrameListRef = pBankData->m_AssetList;
 								for(int j = 0; j < atlasGrpFrameListRef.size(); ++j)
 								{
 									AtlasFrame *pFrame = static_cast<AtlasFrame *>(atlasGrpFrameListRef[j]);
 									if(pFrame->GetTextureIndex() == iExistingTextureIndex)
-										pFrame->UpdateInfoFromPacker(iCurrentIndex, pFrame->GetX(), pFrame->GetY(), fullAtlasSize);
+										pFrame->UpdateInfoFromPacker(iCurrentIndex, pFrame->GetX(), pFrame->GetY(), textureSize);
 								}
 
 								// Rename the texture file to be the new index
 								QFile::rename(existingTexturesInfoList[i].absoluteFilePath(), runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iCurrentIndex) % "." % existingTexturesInfoList[i].completeSuffix()));
+
+								// Update the textureSizes array in the meta file
+								textureSizesArray[iCurrentIndex] = existingTexSizeArray;
+								pBankData->m_MetaObj["textureSizes"] = textureSizesArray;
 
 								// Regrab 'existingTexturesInfoList' after renaming a texture
 								existingTexturesInfoList = runtimeBankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
@@ -180,7 +203,8 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 					AtlasFrame *pFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.id);
 					AtlasFrame *pDupFrame = reinterpret_cast<AtlasFrame *>(imgInfoRef.duplicateId);
 
-					pFrame->UpdateInfoFromPacker(pDupFrame->GetTextureIndex(), pDupFrame->GetX(), pDupFrame->GetY(), fullAtlasSize);
+					QSize textureSize(iter.value()->m_Packer.bins[imgInfoRef.textureId]);
+					pFrame->UpdateInfoFromPacker(pDupFrame->GetTextureIndex(), pDupFrame->GetX(), pDupFrame->GetY(), textureSize);
 				}
 			}
 		}
@@ -193,16 +217,11 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 	}
 }
 
-void AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, ImagePacker &imagePackerRef, HyTextureInfo texInfo, int iPackerBinIndex, int iActualTextureIndex)
+QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, ImagePacker &imagePackerRef, HyTextureInfo texInfo, int iPackerBinIndex, int iActualTextureIndex)
 {
-	if(pBankData->m_MetaObj["maxWidth"].toInt() != imagePackerRef.bins[iPackerBinIndex].width() ||
-	   pBankData->m_MetaObj["maxHeight"].toInt() != imagePackerRef.bins[iPackerBinIndex].height())
-	{
-		HyGuiLog("WidgetAtlasGroup::ConstructAtlasTexture() Mismatching texture dimensions", LOGTYPE_Error);
-	}
-	QSize fullAtlasSize(pBankData->m_MetaObj["maxWidth"].toInt(), pBankData->m_MetaObj["maxHeight"].toInt());
+	QSize textureSize(imagePackerRef.bins[iPackerBinIndex]);
 
-	QImage newTexture(fullAtlasSize.width(), fullAtlasSize.height(), QImage::Format_ARGB32);
+	QImage newTexture(textureSize.width(), textureSize.height(), QImage::Format_ARGB32);
 	newTexture.fill(Qt::transparent);
 
 	QPainter p(&newTexture);
@@ -216,7 +235,7 @@ void AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, ImagePacker &
 
 		if(imgInfoRef.pos.x() == 999999) // This is scriptum image packer's magic number to indicate an invalid image...
 		{
-			pFrame->UpdateInfoFromPacker(-1, -1, -1, fullAtlasSize);
+			pFrame->UpdateInfoFromPacker(-1, -1, -1, QSize(-1, -1));
 			bValidToDraw = false;
 		}
 		else
@@ -234,7 +253,7 @@ void AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, ImagePacker &
 		pFrame->UpdateInfoFromPacker(iActualTextureIndex,
 									 imgInfoRef.pos.x() + imagePackerRef.border.l,
 									 imgInfoRef.pos.y() + imagePackerRef.border.t,
-									 fullAtlasSize);
+									 textureSize);
 
 		QImage imgFrame(imgInfoRef.path);
 
@@ -366,6 +385,8 @@ void AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, ImagePacker &
 		HyGuiLog("AtlasModel::ConstructAtlasTexture tried to create an unsupported texture type: " % QString::number(texInfo.GetFormat()), LOGTYPE_Error);
 		break;
 	}
+
+	return textureSize;
 }
 
 void AtlasRepackThread::SetPackerSettings(BankData *pBankData, ImagePacker &imagePackerRef)
@@ -377,7 +398,7 @@ void AtlasRepackThread::SetPackerSettings(BankData *pBankData, ImagePacker &imag
 	imagePackerRef.border.b = pBankData->m_MetaObj["sbFrameMarginBottom"].toInt();
 	imagePackerRef.extrude = 1;
 	imagePackerRef.merge = true;
-	imagePackerRef.square = true;
+	imagePackerRef.square = false;
 	imagePackerRef.autosize = true;
 	imagePackerRef.minFillRate = 80;
 	imagePackerRef.mergeBF = false;

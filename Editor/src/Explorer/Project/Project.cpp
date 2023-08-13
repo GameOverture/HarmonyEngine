@@ -950,8 +950,9 @@ void Project::SaveUserData() const
 
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Source), m_pSourceWidget->GetExpandedFilters());
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Atlases), m_pAtlasWidget->GetExpandedFilters());
-		//settings.setValue(HyGlobal::AssetName(ASSET_Prefabs), m_pGltfWidget->GetExpandedFilters());
+		settings.setValue(HyGlobal::AssetName(ASSETMAN_Atlases) + "BankIndex", m_pAtlasWidget->GetSelectedBankIndex());
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Audio), m_pAudioWidget->GetExpandedFilters());
+		settings.setValue(HyGlobal::AssetName(ASSETMAN_Audio) + "BankIndex", m_pAudioWidget->GetSelectedBankIndex());
 
 		bool bShowGridBackground, bShowGridOrigin, bShowGridOverlay;
 		MainWindow::GetGridStatus(bShowGridBackground, bShowGridOrigin, bShowGridOverlay);

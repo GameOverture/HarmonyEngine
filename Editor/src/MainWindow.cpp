@@ -293,12 +293,13 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		QStringList expandedSourceList = settings.value(HyGlobal::AssetName(ASSETMAN_Source)).toStringList();
 		pProject->GetSourceWidget()->RestoreExpandedState(expandedSourceList);
 
+		int iAtlasBankIndex = settings.value(HyGlobal::AssetName(ASSETMAN_Atlases) + "BankIndex").toInt();
+		pProject->GetAtlasWidget()->SetSelectedBankIndex(iAtlasBankIndex);
 		QStringList expandedAtlasList = settings.value(HyGlobal::AssetName(ASSETMAN_Atlases)).toStringList();
 		pProject->GetAtlasWidget()->RestoreExpandedState(expandedAtlasList);
 
-		//QStringList expandedPrefabList = settings.value(HyGlobal::AssetName(ASSET_Prefabs)).toStringList();
-		//pProject->GetGltfWidget()->RestoreExpandedState(expandedPrefabList);
-
+		int iAudioBankIndex = settings.value(HyGlobal::AssetName(ASSETMAN_Audio) + "BankIndex").toInt();
+		pProject->GetAudioWidget()->SetSelectedBankIndex(iAudioBankIndex);
 		QStringList expandedAudioList = settings.value(HyGlobal::AssetName(ASSETMAN_Audio)).toStringList();
 		pProject->GetAudioWidget()->RestoreExpandedState(expandedAudioList);
 

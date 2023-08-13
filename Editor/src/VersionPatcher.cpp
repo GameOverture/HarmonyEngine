@@ -206,8 +206,12 @@
 			Patch_12to13(metaItemsDoc, dataItemsDoc, metaAtlasDoc);
 			[[fallthrough]];
 		case 13:
+			HyGuiLog("Patching project files: version 13 -> 14", LOGTYPE_Info);
+			Patch_13to14(metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
+		case 14:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 13, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 14, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -1153,6 +1157,50 @@
 
 	// Write out the new dataItemsObj, which contains updated "sprites" and "texts" objects
 	dataItemsDocRef.setObject(dataItemsObj);
+}
+
+/*static*/ void VersionPatcher::Patch_13to14(QJsonDocument &metaAtlasDocRef, const QJsonDocument &dataAtlasDocRef)
+{
+	const QJsonObject dataAtlasObj = dataAtlasDocRef.object();
+	const QJsonArray dataBanksArray = dataAtlasObj["banks"].toArray();
+
+	// META-ATLAS : Add 'textureSizes' array to each meta atlas bank
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
+	QJsonArray metaBanksArray = metaAtlasObj["banks"].toArray();
+	for(int iMetaBankIndex = 0; iMetaBankIndex < metaBanksArray.size(); ++iMetaBankIndex)
+	{
+		QJsonObject metaBankObj = metaBanksArray[iMetaBankIndex].toObject();
+
+		// Find corresponding 'data' bank
+		for(int iDataBankIndex = 0; iDataBankIndex < dataBanksArray.size(); ++iDataBankIndex)
+		{
+			const QJsonObject dataBankObj = dataBanksArray[iDataBankIndex].toObject();
+			if(dataBankObj["bankId"].toInt() == metaBankObj["bankId"].toInt())
+			{
+				const QJsonArray dataTextureArray = dataBankObj["textures"].toArray();
+
+				QJsonArray textureSizesArray;
+				for(int iTextureIndex = 0; iTextureIndex < dataTextureArray.size(); ++iTextureIndex)
+				{
+					const QJsonObject dataTextureObj = dataTextureArray[iTextureIndex].toObject();
+					const QSize textureSize = QSize(dataTextureObj["width"].toInt(), dataTextureObj["height"].toInt());
+
+					QJsonArray texSizeArray;
+					texSizeArray.append(QJsonValue(textureSize.width()));
+					texSizeArray.append(QJsonValue(textureSize.height()));
+
+					textureSizesArray.append(texSizeArray);
+				}
+			
+				metaBankObj.insert("textureSizes", textureSizesArray);
+				break;
+			}
+		}
+
+		metaBanksArray[iMetaBankIndex] = metaBankObj;
+	}
+	metaAtlasObj.insert("banks", metaBanksArray);
+	metaAtlasDocRef.setObject(metaAtlasObj);
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)

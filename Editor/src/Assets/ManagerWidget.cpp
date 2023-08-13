@@ -268,6 +268,16 @@ quint32 ManagerWidget::GetSelectedBankId()
 	return m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex());
 }
 
+int ManagerWidget::GetSelectedBankIndex()
+{
+	return ui->cmbBanks->currentIndex();
+}
+
+void ManagerWidget::SetSelectedBankIndex(int iBankIndex)
+{
+	ui->cmbBanks->setCurrentIndex(iBankIndex);
+}
+
 void ManagerWidget::RefreshInfo()
 {
 	bool bShowAllBanks = ui->chkShowAllBanks->isChecked();

@@ -42,12 +42,20 @@ int AtlasModel::GetNumTextures(uint uiBankIndex)
 	return GetExistingTextureInfoList(uiBankIndex).size();
 }
 
-QSize AtlasModel::GetAtlasDimensions(uint uiBankIndex)
+QSize AtlasModel::GetMaxAtlasDimensions(uint uiBankIndex)
 {
 	int iWidth = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["maxWidth"].toInt();
 	int iHeight = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["maxHeight"].toInt();
 	
 	return QSize(iWidth, iHeight);
+}
+
+QSize AtlasModel::GetTextureSize(uint uiBankIndex, int iTextureIndex)
+{
+	QJsonArray textureSizesArray = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["textureSizes"].toArray();
+	QJsonArray texSizeArray = textureSizesArray[iTextureIndex].toArray();
+
+	return QSize(texSizeArray[0].toInt(), texSizeArray[1].toInt());
 }
 
 bool AtlasModel::IsImageValid(QImage &image, quint32 uiBankId)
@@ -128,7 +136,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 /*virtual*/ QString AtlasModel::OnBankInfo(uint uiBankIndex) /*override*/
 {
 	QString sInfo = "Num Textures: " % QString::number(GetNumTextures(uiBankIndex)) % " | " %
-		"(" % QString::number(GetAtlasDimensions(uiBankIndex).width()) % "x" % QString::number(GetAtlasDimensions(uiBankIndex).height()) % ")";
+		"(" % QString::number(GetMaxAtlasDimensions(uiBankIndex).width()) % "x" % QString::number(GetMaxAtlasDimensions(uiBankIndex).height()) % ")";
 
 	return sInfo;
 }
@@ -210,8 +218,6 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	QRect rAlphaCrop(QPoint(metaObj["cropLeft"].toInt(), metaObj["cropTop"].toInt()),
 					 QPoint(metaObj["cropRight"].toInt(), metaObj["cropBottom"].toInt()));
 
-	
-
 	AtlasFrame *pNewFrame = new AtlasFrame(*this,
 										   HyGlobal::GetTypeFromString(metaObj["itemType"].toString()),
 										   QUuid(metaObj["assetUUID"].toString()),
@@ -247,7 +253,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 		QImage *pNewImage = new QImage(fileInfo.absoluteFilePath());
 		newImageList.push_back(pNewImage);
 
-		QSize atlasDimensions = GetAtlasDimensions(GetBankIndexFromBankId(uiBankId));
+		QSize atlasDimensions = GetMaxAtlasDimensions(GetBankIndexFromBankId(uiBankId));
 		if(IsImageValid(*pNewImage, uiBankId) == false)
 		{
 			HyGuiLog("Importing image " % fileInfo.fileName() % " will not fit in atlas bank '" % QString::number(uiBankId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
@@ -300,7 +306,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 		// Ensure all new replacement images will fit on the specified atlas
 		QFileInfo fileInfo(sImportAssetList[i]);
 		QImage *pNewImage = new QImage(fileInfo.absoluteFilePath());
-		QSize atlasDimensions = GetAtlasDimensions(GetBankIndexFromBankId(assetList[i]->GetBankId()));
+		QSize atlasDimensions = GetMaxAtlasDimensions(GetBankIndexFromBankId(assetList[i]->GetBankId()));
 		if(IsImageValid(*pNewImage, assetList[i]->GetBankId()) == false)
 		{
 			HyGuiLog("Replacement image " % fileInfo.fileName() % " will not fit in atlas group '" % QString::number(assetList[i]->GetBankId()) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
@@ -358,7 +364,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 		if(pFrame->GetBankId() == uiNewBankId)
 			continue;
 
-		QSize atlasDimensions = GetAtlasDimensions(GetBankIndexFromBankId(uiNewBankId));
+		QSize atlasDimensions = GetMaxAtlasDimensions(GetBankIndexFromBankId(uiNewBankId));
 		if(IsImageValid(pFrame->GetSize().width(), pFrame->GetSize().height(), uiNewBankId) == false)
 		{
 			HyGuiLog("Cannot transfer image " % pFrame->GetName() % " because it will not fit in atlas group '" % QString::number(uiNewBankId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
@@ -506,8 +512,10 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 		for(int j = 0; j < assetArrayList.size(); ++j)
 		{
 			QJsonObject textureObj;
-			textureObj.insert("width", m_BanksModel.GetBank(i)->m_MetaObj["maxWidth"].toInt());
-			textureObj.insert("height", m_BanksModel.GetBank(i)->m_MetaObj["maxHeight"].toInt());
+
+			QSize textureSize = GetTextureSize(i, j);
+			textureObj.insert("width", textureSize.width());
+			textureObj.insert("height", textureSize.height());
 
 			textureObj.insert("textureInfo", QJsonValue(static_cast<qint64>(textureInfoList[j].GetBucketId())));
 			textureObj.insert("assets", assetArrayList[j]);
