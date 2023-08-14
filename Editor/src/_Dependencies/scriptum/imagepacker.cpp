@@ -172,10 +172,8 @@ void ImagePacker::pack(int heur, int w, int h)
 
     unsigned areaBuf = AddImgesToBins(heur, w, h);
 
-    if(areaBuf && !missingImages)
+    if(m_bCropUnusedSpace && areaBuf && !missingImages)
     {
-        // Don't crop atlases since we require them to be of specified dimensions /JJK
-        //
         CropLastImage(heur, w, h, false);
     }
 
@@ -323,7 +321,6 @@ int ImagePacker::FillBin(int heur, int w, int h, int binIndex)
     mrn.r = QRect(0, 0, w, h);
     rects.F << mrn;
     rects.heuristic = heur;
-    rects.leftToRight = ltr;
     rects.w = w;
     rects.h = h;
     rects.rotation = rotate;
@@ -394,7 +391,7 @@ void ImagePacker::CropLastImage(int heur, int w, int h, bool wh)
     bins.removeLast();
     ClearBin(bins.count());
 
-    if(square)
+    if(m_bSquareTextures)
     {
         w /= 2;
         h /= 2;
@@ -422,7 +419,7 @@ void ImagePacker::CropLastImage(int heur, int w, int h, bool wh)
         bins = last_bins;
         area = last_area;
         missingImages = 0;
-        if(square)
+        if(m_bSquareTextures)
         {
             w *= 2;
             h *= 2;
@@ -439,7 +436,7 @@ void ImagePacker::CropLastImage(int heur, int w, int h, bool wh)
             }
             wh = !wh;
         }
-        if(autosize)
+        if(m_bAggressiveResize)
         {
             float rate = GetFillRate();
             if((rate < (static_cast<float>(minFillRate) / 100.f)) &&
@@ -471,7 +468,7 @@ void ImagePacker::DivideLastImage(int heur, int w, int h, bool wh)
     bins.removeLast();
     ClearBin(bins.count());
 
-    if(square)
+    if(m_bSquareTextures)
     {
         w /= 2;
         h /= 2;

@@ -208,9 +208,13 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	newMetaBankObjRef.insert("sbFrameMarginLeft", 0);
 	newMetaBankObjRef.insert("sbFrameMarginRight", 1);
 	newMetaBankObjRef.insert("sbFrameMarginBottom", 1);
-	newMetaBankObjRef.insert("maxWidth", 2048);
-	newMetaBankObjRef.insert("maxHeight", 2048);
+	newMetaBankObjRef.insert("maxWidth", 4096);
+	newMetaBankObjRef.insert("maxHeight", 4096);
 	newMetaBankObjRef.insert("cmbHeuristic", 1);
+	newMetaBankObjRef.insert("squareTexturesOnly", false);
+	newMetaBankObjRef.insert("cropUnusedSpace", true);
+	newMetaBankObjRef.insert("aggressiveResizing", false);
+	newMetaBankObjRef.insert("minimumFillRate", 80);
 }
 
 /*virtual*/ IAssetItemData *AtlasModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/

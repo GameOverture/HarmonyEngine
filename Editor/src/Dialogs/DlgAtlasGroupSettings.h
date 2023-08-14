@@ -33,6 +33,9 @@ public:
 	void ApplyCurrentSettingsToObj(QJsonObject &settingsObjOut);
 
 private Q_SLOTS:
+	void on_chkSquareTexturesOnly_clicked();
+	void on_sbTextureWidth_valueChanged(int iNewValue);
+
 	void on_btnTexSize128_clicked();
 	void on_btnTexSize256_clicked();
 	void on_btnTexSize512_clicked();
@@ -41,6 +44,9 @@ private Q_SLOTS:
 	void on_btnTexSize4096_clicked();
 	void on_btnTexSize8192_clicked();
 	void on_btnTexSize16384_clicked();
+	void on_btnMatchTextureWidthHeight_clicked();
+
+	void on_chkAggressiveResize_clicked();
 	
 	virtual void done(int r);
 

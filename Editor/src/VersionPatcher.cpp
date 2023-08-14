@@ -1164,7 +1164,7 @@
 	const QJsonObject dataAtlasObj = dataAtlasDocRef.object();
 	const QJsonArray dataBanksArray = dataAtlasObj["banks"].toArray();
 
-	// META-ATLAS : Add 'textureSizes' array to each meta atlas bank
+	// META-ATLAS : // Add 'textureSizes' array to each meta atlas bank. Also add 'cropUnusedSpace', 'squareTexturesOnly', 'aggressiveResizing', and 'minimumFillRate' packing settings
 	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
 	QJsonArray metaBanksArray = metaAtlasObj["banks"].toArray();
 	for(int iMetaBankIndex = 0; iMetaBankIndex < metaBanksArray.size(); ++iMetaBankIndex)
@@ -1193,6 +1193,10 @@
 				}
 			
 				metaBankObj.insert("textureSizes", textureSizesArray);
+				metaBankObj.insert("squareTexturesOnly", false);
+				metaBankObj.insert("cropUnusedSpace", true);
+				metaBankObj.insert("aggressiveResizing", false);
+				metaBankObj.insert("minimumFillRate", 80);
 				break;
 			}
 		}

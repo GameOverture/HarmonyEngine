@@ -75,7 +75,7 @@ class ImagePacker : public QObject
         quint64 area, neededArea;
         int missingImages;
         int mergedImages;
-        bool ltr, merge, square, autosize, mergeBF;
+        bool m_bCropUnusedSpace, merge, m_bSquareTextures, m_bAggressiveResize;
         int cropThreshold;
         border_t border;
         int extrude;

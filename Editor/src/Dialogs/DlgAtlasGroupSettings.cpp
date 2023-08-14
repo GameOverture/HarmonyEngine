@@ -32,6 +32,14 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObjec
 	ui->sbTextureWidth->setValue(m_InitialPackerSettingsObj["maxWidth"].toInt());
 	ui->sbTextureHeight->setValue(m_InitialPackerSettingsObj["maxHeight"].toInt());
 	ui->cmbHeuristic->setCurrentIndex(m_InitialPackerSettingsObj["cmbHeuristic"].toInt());
+
+	ui->chkSquareTexturesOnly->setChecked(m_InitialPackerSettingsObj["squareTexturesOnly"].toBool());
+	ui->grpCropUnusedSpace->setChecked(m_InitialPackerSettingsObj["cropUnusedSpace"].toBool());
+	ui->chkAggressiveResize->setChecked(m_InitialPackerSettingsObj["aggressiveResizing"].toBool());
+	ui->sbResizingThreshold->setValue(m_InitialPackerSettingsObj["minimumFillRate"].toInt());
+	
+	on_chkSquareTexturesOnly_clicked();
+	on_chkAggressiveResize_clicked();
 }
 
 DlgAtlasGroupSettings::~DlgAtlasGroupSettings()
@@ -59,6 +67,20 @@ bool DlgAtlasGroupSettings::IsSettingsDirty()
 		return true;
 	if(ui->cmbHeuristic->currentIndex() != m_InitialPackerSettingsObj["cmbHeuristic"].toInt())
 		return true;
+	if(ui->chkSquareTexturesOnly->isChecked() != m_InitialPackerSettingsObj["squareTexturesOnly"].toBool())
+		return true;
+	if(ui->grpCropUnusedSpace->isChecked() != m_InitialPackerSettingsObj["cropUnusedSpace"].toBool())
+		return true;
+	if(ui->grpCropUnusedSpace->isChecked())
+	{
+		if(ui->chkAggressiveResize->isChecked() != m_InitialPackerSettingsObj["aggressiveResizing"].toBool())
+			return true;
+		if(ui->chkAggressiveResize->isChecked() &&
+			ui->sbResizingThreshold->value() != m_InitialPackerSettingsObj["minimumFillRate"].toInt())
+		{
+			return true;
+		}
+	}
 
 	return false;
 }
@@ -74,11 +96,33 @@ void DlgAtlasGroupSettings::ApplyCurrentSettingsToObj(QJsonObject &settingsObjOu
 	settingsObjOut.insert("maxWidth", ui->sbTextureWidth->value());
 	settingsObjOut.insert("maxHeight", ui->sbTextureHeight->value());
 	settingsObjOut.insert("cmbHeuristic", ui->cmbHeuristic->currentIndex());
+	settingsObjOut.insert("squareTexturesOnly", ui->chkSquareTexturesOnly->isChecked());
+	settingsObjOut.insert("cropUnusedSpace", ui->grpCropUnusedSpace->isChecked());
+	settingsObjOut.insert("aggressiveResizing", ui->chkAggressiveResize->isChecked());
+	settingsObjOut.insert("minimumFillRate", ui->sbResizingThreshold->value());
+}
+
+void DlgAtlasGroupSettings::on_chkSquareTexturesOnly_clicked()
+{
+	if(ui->chkSquareTexturesOnly->isChecked())
+	{
+		ui->sbTextureHeight->setValue(ui->sbTextureWidth->value());
+		ui->sbTextureHeight->setEnabled(false);
+	}
+	else
+		ui->sbTextureHeight->setEnabled(true);
+}
+
+void DlgAtlasGroupSettings::on_sbTextureWidth_valueChanged(int iNewValue)
+{
+	if(ui->chkSquareTexturesOnly->isChecked())
+		ui->sbTextureHeight->setValue(iNewValue);
 }
 
 void DlgAtlasGroupSettings::on_btnTexSize128_clicked()
 {
-
+	ui->sbTextureWidth->setValue(128);
+	ui->sbTextureHeight->setValue(128);
 }
 
 void DlgAtlasGroupSettings::on_btnTexSize256_clicked()
@@ -121,6 +165,17 @@ void DlgAtlasGroupSettings::on_btnTexSize16384_clicked()
 {
 	ui->sbTextureWidth->setValue(16384);
 	ui->sbTextureHeight->setValue(16384);
+}
+
+void DlgAtlasGroupSettings::on_btnMatchTextureWidthHeight_clicked()
+{
+	ui->sbTextureHeight->setValue(ui->sbTextureWidth->value());
+}
+
+void DlgAtlasGroupSettings::on_chkAggressiveResize_clicked()
+{
+	ui->sbResizingThreshold->setEnabled(ui->chkAggressiveResize->isChecked());
+	ui->lblResizingThreshold->setEnabled(ui->chkAggressiveResize->isChecked());
 }
 
 /*virtual*/ void DlgAtlasGroupSettings::done(int r)

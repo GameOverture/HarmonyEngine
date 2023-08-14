@@ -397,10 +397,10 @@ void AtlasRepackThread::SetPackerSettings(BankData *pBankData, ImagePacker &imag
 	imagePackerRef.border.r = pBankData->m_MetaObj["sbFrameMarginRight"].toInt();
 	imagePackerRef.border.b = pBankData->m_MetaObj["sbFrameMarginBottom"].toInt();
 	imagePackerRef.extrude = 1;
+	imagePackerRef.m_bSquareTextures = pBankData->m_MetaObj["squareTexturesOnly"].toBool();
+	imagePackerRef.m_bCropUnusedSpace = pBankData->m_MetaObj["cropUnusedSpace"].toBool();
 	imagePackerRef.merge = true;
-	imagePackerRef.square = false;
-	imagePackerRef.autosize = true;
-	imagePackerRef.minFillRate = 80;
-	imagePackerRef.mergeBF = false;
+	imagePackerRef.m_bAggressiveResize = pBankData->m_MetaObj["aggressiveResizing"].toBool();
+	imagePackerRef.minFillRate = pBankData->m_MetaObj["minimumFillRate"].toInt(); // Default is 80
 	imagePackerRef.rotate = ImagePacker::NEVER;
 }

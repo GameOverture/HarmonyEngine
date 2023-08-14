@@ -21,7 +21,7 @@ private:
 	static void Patch_10to11(QJsonDocument &metaSourceDocRef);
 	static void Patch_11to12(QJsonDocument &metaAtlasDocRef, QJsonDocument &metaAudioDocRef);
 	static void Patch_12to13(const QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, const QJsonDocument &metaAtlasDocRef); // Adding 'bankId' wherever only a checksum was used
-	static void Patch_13to14(QJsonDocument &metaAtlasDocRef, const QJsonDocument &dataAtlasDocRef); // Adding 'textureSizes' array to each meta atlas bank
+	static void Patch_13to14(QJsonDocument &metaAtlasDocRef, const QJsonDocument &dataAtlasDocRef); // Adding 'textureSizes' array to each meta atlas bank. Also adding 'cropUnusedSpace', 'squareTexturesOnly', 'aggressiveResizing', and 'minimumFillRate' packing settings
 
 	static void RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta);
 };
