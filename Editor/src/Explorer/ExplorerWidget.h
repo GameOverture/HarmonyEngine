@@ -31,11 +31,30 @@ class Project;
 class ExplorerItemData;
 class ProjectItemData;
 
+enum ExplorerItemFilterFlags
+{
+	ITEMFILTER_Sprite	= 1 << 0,
+	ITEMFILTER_Text		= 1 << 1,
+	ITEMFILTER_Spine	= 1 << 2,
+	ITEMFILTER_Audio	= 1 << 3,
+	ITEMFILTER_Entity	= 1 << 4,
+
+	ITEMFILTER_All = (ITEMFILTER_Sprite | ITEMFILTER_Text | ITEMFILTER_Spine | ITEMFILTER_Audio | ITEMFILTER_Entity)
+};
+
 class ExplorerProxyModel : public QSortFilterProxyModel
 {
+	uint32				m_uiFilterFlags;
+
 public:
 	ExplorerProxyModel(QObject *pParent = nullptr);
 	virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+	virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+
+	void FilterByType(uint32 uiFilterFlags);
+
+protected:
+	bool IsTypeFiltered(ItemType eType) const;
 };
 
 class ExplorerTreeView : public QTreeView
@@ -53,6 +72,8 @@ class ExplorerWidget : public QWidget
 {
 	Q_OBJECT
 
+	QActionGroup		m_FilterActionGroup;
+
 public:
 	explicit ExplorerWidget(QWidget *pParent = 0);
 	~ExplorerWidget();
@@ -67,9 +88,21 @@ public:
 
 private:
 	Ui::ExplorerWidget *ui;
+
+	void OnFilterUpdate();
 	
 private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);
+
+	void on_actionFilterAll_triggered();
+	void on_actionFilterSprite_triggered();
+	void on_actionFilterText_triggered();
+	void on_actionFilterSpine_triggered();
+	void on_actionFilterAudio_triggered();
+	void on_actionFilterEntity_triggered();
+
+	void on_txtSearch_textChanged(const QString &text);
+
 	void on_treeView_doubleClicked(QModelIndex index);
 	void on_treeView_clicked(QModelIndex index);
 

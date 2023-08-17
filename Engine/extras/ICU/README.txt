@@ -1,5 +1,5 @@
-Please see the ICU License before integrating into your applications.
-http://en.esotericsoftware.com/spine-runtimes-license
+ICU is released under a nonrestrictive open source license
+https://www.unicode.org/copyright.html#License
 
 1. Navigate to the offical packaged version of the ICU4C source code - USE AT LEAST VERSION 69
    http://site.icu-project.org/download

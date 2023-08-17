@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>204</width>
-    <height>252</height>
+    <width>552</width>
+    <height>357</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,6 +26,162 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Show All</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnFilterAll">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Filter</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnFilterSprite">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnFilterText">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnFilterSpine">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnFilterAudio">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnFilterEntity">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblActiveFilter">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Show Only </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="lblSearchIcon">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../../data/HyEditor.qrc">:/icons16x16/search.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblSearchText">
+       <property name="text">
+        <string>Search</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txtSearch"/>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="ExplorerTreeView" name="treeView">
      <property name="expandsOnDoubleClick">
@@ -91,6 +247,96 @@
    </property>
    <property name="toolTip">
     <string>Open the selected item</string>
+   </property>
+  </action>
+  <action name="actionFilterAll">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Project.png</normaloff>:/icons16x16/items/Project.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show All Items</string>
+   </property>
+   <property name="toolTip">
+    <string>Displays all project items</string>
+   </property>
+  </action>
+  <action name="actionFilterSprite">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Sprite.png</normaloff>:/icons16x16/items/Sprite.png</iconset>
+   </property>
+   <property name="text">
+    <string>Filter Sprites</string>
+   </property>
+   <property name="toolTip">
+    <string>Show only Sprite project items</string>
+   </property>
+  </action>
+  <action name="actionFilterText">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Text.png</normaloff>:/icons16x16/items/Text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Filter Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Show only Text project items</string>
+   </property>
+  </action>
+  <action name="actionFilterSpine">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Spine.png</normaloff>:/icons16x16/items/Spine.png</iconset>
+   </property>
+   <property name="text">
+    <string>Filter Spine</string>
+   </property>
+   <property name="toolTip">
+    <string>Show only Spine project items</string>
+   </property>
+  </action>
+  <action name="actionFilterAudio">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Audio.png</normaloff>:/icons16x16/items/Audio.png</iconset>
+   </property>
+   <property name="text">
+    <string>Filter Audio</string>
+   </property>
+   <property name="toolTip">
+    <string>Show only Audio project items</string>
+   </property>
+  </action>
+  <action name="actionFilterEntity">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Entity.png</normaloff>:/icons16x16/items/Entity.png</iconset>
+   </property>
+   <property name="text">
+    <string>Filter Entities</string>
+   </property>
+   <property name="toolTip">
+    <string>Show only Entity project items</string>
    </property>
   </action>
  </widget>

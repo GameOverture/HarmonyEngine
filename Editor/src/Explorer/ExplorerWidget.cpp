@@ -25,7 +25,8 @@
 #include <QDrag>
 
 ExplorerProxyModel::ExplorerProxyModel(QObject *pParent /*= nullptr*/) :
-	QSortFilterProxyModel(pParent)
+	QSortFilterProxyModel(pParent),
+	m_uiFilterFlags(ITEMFILTER_All)
 { }
 
 /*virtual*/ bool ExplorerProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const /*override*/
@@ -49,12 +50,84 @@ ExplorerProxyModel::ExplorerProxyModel(QObject *pParent /*= nullptr*/) :
 	return QString::localeAwareCompare(pLeftItem->GetName(false), pRightItem->GetName(false)) < 0;
 }
 
-///*virtual*/ void DataExplorerLoadThread::run() /*override*/
-//{
-//    /* ... here is the expensive or blocking operation ... */
-//    Project *pNewItemProject = new Project(nullptr, m_sPath);
-//    Q_EMIT LoadFinished(pNewItemProject);
-//}
+/*virtual*/ bool ExplorerProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const /*override*/
+{
+	QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
+	ExplorerItemData *pItemData = sourceModel()->data(index, Qt::UserRole).value<ExplorerItemData *>();
+
+	if(pItemData)
+	{
+		if(pItemData->GetType() == ITEM_Project)
+			return true;
+
+		QRegExp searchFilter = filterRegExp();
+		if(pItemData->GetType() == ITEM_Prefix)
+		{
+			QList<TreeModelItemData *> itemsInFilterList = static_cast<ExplorerModel *>(sourceModel())->GetItemsRecursively(index);
+			if(itemsInFilterList.size() == 1)
+				return (m_uiFilterFlags == ITEMFILTER_All);
+
+			for(auto pItem : itemsInFilterList)
+			{
+				if(pItem->GetType() != ITEM_Prefix)
+				{
+					if(IsTypeFiltered(pItem->GetType()) &&
+						(searchFilter.isValid() == false || pItem->GetText().contains(searchFilter)))
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		else if(IsTypeFiltered(pItemData->GetType()) == false ||
+			(searchFilter.isValid() && pItemData->GetText().contains(searchFilter) == false))
+		{
+			return false;
+		}
+		else
+			return true;
+	}
+
+	return false;
+}
+
+void ExplorerProxyModel::FilterByType(uint32 uiFilterFlags)
+{
+	m_uiFilterFlags = uiFilterFlags;
+	invalidateFilter();
+}
+
+bool ExplorerProxyModel::IsTypeFiltered(ItemType eType) const
+{
+	switch(eType)
+	{
+	case ITEM_Project:
+	case ITEM_Prefix:
+		return true;
+	
+	case ITEM_Audio:
+		return (m_uiFilterFlags & ITEMFILTER_Audio) != 0;
+
+	case ITEM_Text:
+		return (m_uiFilterFlags & ITEMFILTER_Text) != 0;
+
+	case ITEM_Spine:
+		return (m_uiFilterFlags & ITEMFILTER_Spine) != 0;
+
+	case ITEM_Sprite:
+		return (m_uiFilterFlags & ITEMFILTER_Sprite) != 0;
+
+	case ITEM_Entity:
+		return (m_uiFilterFlags & ITEMFILTER_Entity) != 0;
+
+	default:
+		HyGuiLog("ExplorerProxyModel::IsTypeFiltered() encountered an unknown ItemType", LOGTYPE_Error);
+		break;
+	}
+
+	return false;
+}
 
 ExplorerTreeView::ExplorerTreeView(QWidget *pParent /*= nullptr*/) :
 	QTreeView(pParent)
@@ -117,7 +190,8 @@ ExplorerTreeView::ExplorerTreeView(QWidget *pParent /*= nullptr*/) :
 
 ExplorerWidget::ExplorerWidget(QWidget *pParent) :
 	QWidget(pParent),
-	ui(new Ui::ExplorerWidget)
+	ui(new Ui::ExplorerWidget),
+	m_FilterActionGroup(this)
 {
 	ui->setupUi(this);
 	setAcceptDrops(true);
@@ -134,6 +208,24 @@ ExplorerWidget::ExplorerWidget(QWidget *pParent) :
 
 	ui->actionCopyItem->setEnabled(false);
 	ui->actionPasteItem->setEnabled(false);
+
+	ui->btnFilterAll->setDefaultAction(ui->actionFilterAll);
+	ui->btnFilterSprite->setDefaultAction(ui->actionFilterSprite);
+	ui->btnFilterText->setDefaultAction(ui->actionFilterText);
+	ui->btnFilterSpine->setDefaultAction(ui->actionFilterSpine);
+	ui->btnFilterAudio->setDefaultAction(ui->actionFilterAudio);
+	ui->btnFilterEntity->setDefaultAction(ui->actionFilterEntity);
+
+	m_FilterActionGroup.addAction(ui->actionFilterAll);
+	m_FilterActionGroup.addAction(ui->actionFilterSprite);
+	m_FilterActionGroup.addAction(ui->actionFilterText);
+	m_FilterActionGroup.addAction(ui->actionFilterSpine);
+	m_FilterActionGroup.addAction(ui->actionFilterAudio);
+	m_FilterActionGroup.addAction(ui->actionFilterEntity);
+
+	// TODO: Load from settings
+	ui->actionFilterAll->setChecked(true);
+	ui->lblActiveFilter->setVisible(false);
 }
 
 ExplorerWidget::~ExplorerWidget()
@@ -233,6 +325,48 @@ void ExplorerWidget::GetSelected(QList<ProjectItemData *> &selectedItemsOut, QLi
 	}
 }
 
+void ExplorerWidget::OnFilterUpdate()
+{
+	uint32 uiFilter = 0;
+	if(ui->btnFilterAll->isChecked())
+	{
+		ui->lblActiveFilter->setVisible(false);
+		uiFilter |= ITEMFILTER_All;
+	}
+	else if(ui->btnFilterAudio->isChecked())
+	{
+		ui->lblActiveFilter->setVisible(true);
+		ui->lblActiveFilter->setText("Show Only " + HyGlobal::ItemName(ITEM_Audio, true));
+		uiFilter |= ITEMFILTER_Audio;
+	}
+	else if(ui->btnFilterEntity->isChecked())
+	{
+		ui->lblActiveFilter->setVisible(true);
+		ui->lblActiveFilter->setText("Show Only " + HyGlobal::ItemName(ITEM_Entity, true));
+		uiFilter |= ITEMFILTER_Entity;
+	}
+	else if(ui->btnFilterSpine->isChecked())
+	{
+		ui->lblActiveFilter->setVisible(true);
+		ui->lblActiveFilter->setText("Show Only " + HyGlobal::ItemName(ITEM_Spine, true));
+		uiFilter |= ITEMFILTER_Spine;
+	}
+	else if(ui->btnFilterSprite->isChecked())
+	{
+		ui->lblActiveFilter->setVisible(true);
+		ui->lblActiveFilter->setText("Show Only " + HyGlobal::ItemName(ITEM_Sprite, true));
+		uiFilter |= ITEMFILTER_Sprite;
+	}
+	else if(ui->btnFilterText->isChecked())
+	{
+		ui->lblActiveFilter->setVisible(true);
+		ui->lblActiveFilter->setText("Show Only " + HyGlobal::ItemName(ITEM_Text, true));
+		uiFilter |= ITEMFILTER_Text;
+	}
+
+	static_cast<ExplorerProxyModel *>(ui->treeView->model())->FilterByType(uiFilter);
+}
+
 void ExplorerWidget::OnContextMenu(const QPoint &pos)
 {
 	ExplorerItemData *pContextExplorerItem = GetSelected();
@@ -323,6 +457,41 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 	}
 	
 	contextMenu.exec(ui->treeView->mapToGlobal(pos));
+}
+
+void ExplorerWidget::on_actionFilterAll_triggered()
+{
+	OnFilterUpdate();
+}
+
+void ExplorerWidget::on_actionFilterSprite_triggered()
+{
+	OnFilterUpdate();
+}
+
+void ExplorerWidget::on_actionFilterText_triggered()
+{
+	OnFilterUpdate();
+}
+
+void ExplorerWidget::on_actionFilterSpine_triggered()
+{
+	OnFilterUpdate();
+}
+
+void ExplorerWidget::on_actionFilterAudio_triggered()
+{
+	OnFilterUpdate();
+}
+
+void ExplorerWidget::on_actionFilterEntity_triggered()
+{
+	OnFilterUpdate();
+}
+
+void ExplorerWidget::on_txtSearch_textChanged(const QString &text)
+{
+	static_cast<ExplorerProxyModel *>(ui->treeView->model())->setFilterWildcard(text);
 }
 
 void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
