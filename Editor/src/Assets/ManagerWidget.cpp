@@ -484,6 +484,7 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 	}
 	else if(m_pModel->GetAssetType() == ASSETMAN_Source)
 	{
+		contextMenu.addAction(ui->actionOpenAssetExplorer);
 		contextMenu.addAction(ui->actionGenerateAsset);
 		contextMenu.addSeparator();
 		contextMenu.addAction(ui->actionImportAssets);
@@ -495,7 +496,7 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 	}
 	else
 	{
-		contextMenu.addAction(ui->actionAssetSettings);
+		contextMenu.addAction(ui->actionOpenAssetExplorer);
 
 		if(m_pModel->GetNumBanks() > 1)
 		{
@@ -545,6 +546,9 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 			contextMenu.addAction(ui->actionReplaceAssets);
 		}
 		contextMenu.addAction(ui->actionRename);
+
+		contextMenu.addSeparator();
+		contextMenu.addAction(ui->actionAssetSettings);
 	}
 
 	contextMenu.exec(globalPos);
@@ -572,6 +576,21 @@ void ManagerWidget::on_actionAssetSettings_triggered()
 			m_pModel->ReplaceAssets(dlg.GetChangedAssets(), false);
 		}
 	}
+}
+
+void ManagerWidget::on_actionOpenAssetExplorer_triggered()
+{
+	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
+	GetSelected(selectedAssetsList, selectedFiltersList, true);
+
+	if(selectedAssetsList.empty())
+		return;
+
+	IAssetItemData *pAsset = selectedAssetsList[0];
+	if(pAsset)
+		HyGlobal::OpenFileInExplorer(pAsset->GetAbsMetaFilePath());
+	else
+		HyGuiLog("Asset does not exist", LOGTYPE_Error);
 }
 
 void ManagerWidget::on_actionDeleteAssets_triggered()

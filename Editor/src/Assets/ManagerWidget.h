@@ -89,6 +89,8 @@ private Q_SLOTS:
 
 	void on_actionAssetSettings_triggered();
 
+	void on_actionOpenAssetExplorer_triggered();
+
 	void on_actionDeleteAssets_triggered();
 
 	void on_actionReplaceAssets_triggered();
