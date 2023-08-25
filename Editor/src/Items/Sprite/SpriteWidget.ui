@@ -118,7 +118,7 @@
           <item>
            <widget class="QLabel" name="label_3">
             <property name="text">
-             <string>Update FPS:</string>
+             <string>Animation Frame Rate:</string>
             </property>
            </widget>
           </item>
