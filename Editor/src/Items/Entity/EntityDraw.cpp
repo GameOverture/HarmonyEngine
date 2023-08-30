@@ -76,6 +76,26 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		if(pEvent->key() == Qt::Key_Control || pEvent->key() == Qt::Key_Shift)
 			DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 	}
+
+	if(pEvent->key() == Qt::Key_Left ||
+		pEvent->key() == Qt::Key_Right ||
+		pEvent->key() == Qt::Key_Up ||
+		pEvent->key() == Qt::Key_Down)
+	{
+		BeginTransform(false);
+
+		if(pEvent->key() == Qt::Key_Left)
+			m_vNudgeTranslate.setX(m_vNudgeTranslate.x() - 1);
+		if(pEvent->key() == Qt::Key_Right)
+			m_vNudgeTranslate.setX(m_vNudgeTranslate.x() + 1);
+		if(pEvent->key() == Qt::Key_Up)
+			m_vNudgeTranslate.setY(m_vNudgeTranslate.y() + 1);
+		if(pEvent->key() == Qt::Key_Down)
+			m_vNudgeTranslate.setY(m_vNudgeTranslate.y() - 1);
+
+		m_ActiveTransform.pos.Set(m_vNudgeTranslate.x(), m_vNudgeTranslate.y());
+		RefreshTransforms();
+	}
 }
 
 /*virtual*/ void EntityDraw::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/
@@ -88,6 +108,17 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	{
 		if(pEvent->key() == Qt::Key_Control || pEvent->key() == Qt::Key_Shift)
 			DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+	}
+
+	if(pEvent->isAutoRepeat() == false &&
+		(pEvent->key() == Qt::Key_Left ||
+		pEvent->key() == Qt::Key_Right ||
+		pEvent->key() == Qt::Key_Up ||
+		pEvent->key() == Qt::Key_Down))
+	{
+		// We can reuse 'DoMouseRelease_Transform' to submit the nudging transform (via undo/redo cmd), while also resetting/cleaning up the state
+		DoMouseRelease_Transform();
+		m_eDragState = DRAGSTATE_None;
 	}
 }
 
@@ -144,7 +175,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			{
 				DoMouseRelease_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 			}
-			else // DRAGSTATE_Transforming
+			else // DRAGSTATE_Transforming or DRAGSTATE_Nudging
 				DoMouseRelease_Transform();
 		}
 	}
@@ -166,7 +197,7 @@ void EntityDraw::RefreshTransforms()
 		}
 		else
 		{
-			if(m_eDragState == DRAGSTATE_Transforming)
+			if(m_eDragState == DRAGSTATE_Transforming || m_eDragState == DRAGSTATE_Nudging)
 			{
 				glm::vec2 ptCenterPivot;
 				m_MultiTransform.GetCentroid(ptCenterPivot);
@@ -492,7 +523,7 @@ void EntityDraw::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 		{
 			DoMouseMove_Select(bCtrlMod, bShiftMod);
 		}
-		else // DRAGSTATE_Transforming
+		else if(m_eDragState == DRAGSTATE_Transforming)
 			DoMouseMove_Transform(bCtrlMod, bShiftMod);
 	}
 	else
@@ -516,7 +547,7 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 		glm::vec2 ptCurMousePos;
 		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
 		if(glm::distance(m_ptDragStart, ptCurMousePos) >= 2.0f)
-			BeginTransform();
+			BeginTransform(true);
 	}
 	else // 'm_eDragState' is DRAGSTATE_None
 	{
@@ -563,7 +594,7 @@ void EntityDraw::DoMousePress_Select(bool bCtrlMod, bool bShiftMod)
 		HyGuiLog("EntityDraw::DoMousePress - GetWorldMousePos failed", LOGTYPE_Error);
 
 	if(m_eCurHoverGrabPoint != TransformCtrl::GRAB_None)
-		BeginTransform();
+		BeginTransform(true);
 	else
 	{
 		// Check if the click position (m_ptDragStart) is over an item
@@ -657,9 +688,9 @@ void EntityDraw::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
-void EntityDraw::BeginTransform()
+void EntityDraw::BeginTransform(bool bWithMouse)
 {
-	if(m_eDragState == DRAGSTATE_Transforming)
+	if(m_eDragState == DRAGSTATE_Transforming || m_eDragState == DRAGSTATE_Nudging)
 		return;
 
 	TransformCtrl *pCurTransform = nullptr;
@@ -695,13 +726,19 @@ void EntityDraw::BeginTransform()
 		m_PrevTransformList.push_back(pDrawItem->GetHyNode()->GetSceneTransform(0.0f));
 	}
 
-	// The mouse cursor must be set when transforming - it is used to determine the type of transform
-	// If it isn't set, then it must be translating (it isn't from GetGrabPointCursorShape())
-	if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() == Qt::ArrowCursor)
-		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::SizeAllCursor);
-
 	m_fMultiTransformStartRot = m_MultiTransform.rot.Get();
-	m_eDragState = DRAGSTATE_Transforming;
+
+	if(bWithMouse)
+	{
+		// The mouse cursor must be set when transforming - it is used to determine the type of transform
+		// If it isn't set, then it must be translating (it isn't from GetGrabPointCursorShape())
+		if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() == Qt::ArrowCursor)
+			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::SizeAllCursor);
+
+		m_eDragState = DRAGSTATE_Transforming;
+	}
+	else
+		m_eDragState = DRAGSTATE_Nudging;
 }
 
 void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
@@ -915,6 +952,9 @@ void EntityDraw::DoMouseRelease_Transform()
 	QUndoCommand *pCmd = new EntityUndoCmd_Transform(*m_pProjItem, iStateIndex, treeItemDataList, newTransformList, m_PrevTransformList);
 	m_pProjItem->GetUndoStack()->push(pCmd);
 
+	m_vNudgeTranslate.setX(0);
+	m_vNudgeTranslate.setY(0);
+
 	// Reset 'm_ActiveTransform' to prep for the next transform
 	m_ActiveTransform.pos.Set(0.0f, 0.0f);
 	m_ActiveTransform.rot.Set(0.0f);
@@ -1074,5 +1114,5 @@ void EntityDraw::DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 		return;
 
 	if(pThis->m_eShapeEditState == SHAPESTATE_None && pThis->m_eDragState == DRAGSTATE_Pending)
-		pThis->BeginTransform();
+		pThis->BeginTransform(true);
 }

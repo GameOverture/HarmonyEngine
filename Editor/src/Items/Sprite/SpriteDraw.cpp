@@ -71,12 +71,6 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 		pEvent->key() == Qt::Key_Up ||
 		pEvent->key() == Qt::Key_Down))
 	{
-		if(pEvent->key() == Qt::Key_Left)
-			HyGuiLog("left released", LOGTYPE_Normal);
-
-		if(pEvent->key() == Qt::Key_Up)
-			HyGuiLog("up released", LOGTYPE_Normal);
-
 		// Submit the pending transform to the model and reset it
 		if(m_pProjItem->GetWidget())
 			static_cast<SpriteWidget *>(m_pProjItem->GetWidget())->ApplyTransform(m_vTranslateAmt);
@@ -84,7 +78,6 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 		m_vTranslateAmt.setX(0);
 		m_vTranslateAmt.setY(0);
 	}
-
 
 	IDraw::OnKeyReleaseEvent(pEvent);
 }

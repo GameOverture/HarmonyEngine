@@ -15,6 +15,11 @@
 #include "EntityModel.h"
 #include "EntityDrawItem.h"
 
+// LOGIC FLOW NOTES:
+// 1) Input is handled with the standard OnKey*Event and OnMouse*Event() functions, then are delegated out to respective DoMouse*_*() functions
+// 2) ShapeEditShape takes precedence over DragState
+// 3) DragState/Transform also handles nudging with arrow keys
+
 class EntityDraw : public IDraw
 {
 	QList<EntityDrawItem *>					m_ItemList;
@@ -30,20 +35,22 @@ class EntityDraw : public IDraw
 	EntityDrawItem *						m_pCurHoverItem;
 	TransformCtrl::GrabPointType			m_eCurHoverGrabPoint;
 
-	// Mouse press/dragging
+	// Mouse press/dragging (and arrow key nudging)
 	HyTimer									m_PressTimer;
-	bool									m_bSelectionHandled;
+	bool									m_bSelectionHandled; // During mouse release, this bool can signify if selection was already handled by previous logic (or if selection is not necessary)
 	enum DragState
 	{
 		DRAGSTATE_None = 0,
 		DRAGSTATE_Marquee,					// When clicking outside any items' bounds
 		DRAGSTATE_Pending,					// Using 'm_PressTimer' (or mouse movement) to determine if selection or drag will occur
-		DRAGSTATE_Transforming				// Dragging confirmed, and transforming is occurring
+		DRAGSTATE_Transforming,				// Dragging confirmed, and transforming is occurring
+		DRAGSTATE_Nudging					// Using arrow keys to nudge selected items
 	};
 	DragState								m_eDragState;
 	glm::vec2								m_ptDragStart;
 	glm::vec2								m_ptDragCenter;
 	glm::vec2								m_vDragStartSize;
+	QPoint									m_vNudgeTranslate;	// Used for nudging selected items with arrow keys
 
 	enum ShapeEditState
 	{
@@ -103,7 +110,7 @@ protected:
 	void DoMousePress_Select(bool bCtrlMod, bool bShiftMod);
 	void DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod);
 
-	void BeginTransform();
+	void BeginTransform(bool bWithMouse);
 
 	void DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod);
 	void DoMouseRelease_Transform();
