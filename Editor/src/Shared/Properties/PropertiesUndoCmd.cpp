@@ -14,10 +14,21 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 	QUndoCommand(pParent),
 	m_pModel(pModel),
 	m_ModelIndex(index),
-	m_NewData(newData),
-	m_OldData(pModel->GetPropertyValue(index))
+	m_NewData(newData)
 {
-	setText(pModel->GetPropertyName(index));
+	QString sText = pModel->GetPropertyName(m_ModelIndex);
+	if(m_ModelIndex.column() == PROPERTIESCOLUMN_Name)
+	{
+		m_OldData = static_cast<bool>(pModel->GetPropertyDefinition(m_ModelIndex).eAccessType == PROPERTIESACCESS_ToggleOn);
+		sText += " Checked";
+	}
+	else
+	{
+		m_OldData = pModel->GetPropertyValue(m_ModelIndex);
+		sText += " Value Changed";
+	}
+
+	setText(sText);
 }
 
 /*virtual*/ PropertiesUndoCmd::~PropertiesUndoCmd()
@@ -25,9 +36,9 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 
 /*virtual*/ void PropertiesUndoCmd::redo() /*override*/
 {
-	if(m_pModel->GetPropertyDefinition(m_ModelIndex).eType == PROPERTIESTYPE_CategoryChecked)
+	if(m_ModelIndex.column() == PROPERTIESCOLUMN_Name)
 	{
-		m_pModel->setData(m_pModel->index(m_ModelIndex.row(), 1/*COLUMN_Value*/, m_ModelIndex.parent()), m_NewData, Qt::UserRole);
+		m_pModel->SetToggle(m_ModelIndex, m_NewData.toBool());
 		m_pModel->RefreshCategory(m_ModelIndex);
 	}
 	else
@@ -44,9 +55,9 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 
 /*virtual*/ void PropertiesUndoCmd::undo() /*override*/
 {
-	if(m_pModel->GetPropertyDefinition(m_ModelIndex).eType == PROPERTIESTYPE_CategoryChecked)
+	if(m_ModelIndex.column() == PROPERTIESCOLUMN_Name)
 	{
-		m_pModel->setData(m_pModel->index(m_ModelIndex.row(), 1/*COLUMN_Value*/, m_ModelIndex.parent()), m_OldData, Qt::UserRole);
+		m_pModel->SetToggle(m_ModelIndex, m_OldData.toBool());
 		m_pModel->RefreshCategory(m_ModelIndex);
 	}
 	else

@@ -15,13 +15,18 @@
 #include "ProjectItemData.h"
 #include "Shared/TreeModel/ITreeModel.h"
 
+enum PropertiesColumn
+{
+	PROPERTIESCOLUMN_Name = 0,
+	PROPERTIESCOLUMN_Value = 1
+};
+
 enum PropertiesType
 {
 	PROPERTIESTYPE_Unknown = -1,
 
 	PROPERTIESTYPE_Root = 0,
 	PROPERTIESTYPE_Category,
-	PROPERTIESTYPE_CategoryChecked,
 
 	PROPERTIESTYPE_bool,
 	PROPERTIESTYPE_int,
@@ -42,10 +47,18 @@ enum PropertiesType
 	PROPERTIESTYPE_SpriteFrames,	// delegateBuilder [QUuid] = The ProjectItemData's UUID that contains the sprite frames
 };
 
+enum PropertiesAccessType
+{
+	PROPERTIESACCESS_ReadOnly = 0,
+	PROPERTIESACCESS_Mutable,
+	PROPERTIESACCESS_ToggleOn,
+	PROPERTIESACCESS_ToggleOff
+};
+
 struct PropertiesDef
 {
 	PropertiesType							eType;
-	bool									bReadOnly;
+	PropertiesAccessType					eAccessType;
 
 	QString									sToolTip;
 
@@ -60,11 +73,11 @@ struct PropertiesDef
 
 	PropertiesDef() : 
 		eType(PROPERTIESTYPE_Unknown),
-		bReadOnly(false)
+		eAccessType(PROPERTIESACCESS_Mutable)
 	{ }
-	PropertiesDef(PropertiesType type, bool readOnly, QString toolTip, QVariant defaultData_, QVariant minRange_, QVariant maxRange_, QVariant stepAmt_, QString prefix, QString suffix, QVariant delegateBuilder_) :
+	PropertiesDef(PropertiesType type, PropertiesAccessType accessType, QString toolTip, QVariant defaultData_, QVariant minRange_, QVariant maxRange_, QVariant stepAmt_, QString prefix, QString suffix, QVariant delegateBuilder_) :
 		eType(type),
-		bReadOnly(readOnly),
+		eAccessType(accessType),
 		sToolTip(toolTip),
 		defaultData(defaultData_),
 		minRange(minRange_),
@@ -76,7 +89,10 @@ struct PropertiesDef
 	{ }
 
 	bool IsCategory() const {
-		return eType == PROPERTIESTYPE_Category || eType == PROPERTIESTYPE_CategoryChecked;
+		return eType == PROPERTIESTYPE_Category;
+	}
+	bool IsTogglable() const {
+		return eAccessType == PROPERTIESACCESS_ToggleOn || eAccessType == PROPERTIESACCESS_ToggleOff;
 	}
 
 	QColor GetColor() const {
@@ -96,11 +112,6 @@ class PropertiesTreeModel : public ITreeModel
 
 	QMap<TreeModelItem *, PropertiesDef>		m_PropertyDefMap;
 
-	enum {
-		COLUMN_Name = 0,
-		COLUMN_Value = 1
-	};
-
 public:
 	explicit PropertiesTreeModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QObject *pParent = nullptr);
 	virtual ~PropertiesTreeModel();
@@ -112,6 +123,7 @@ public:
 	const PropertiesDef GetPropertyDefinition(const QModelIndex &indexRef) const;
 	const PropertiesDef FindPropertyDefinition(QString sCategoryName, QString sPropertyName) const;
 	
+	void SetToggle(const QModelIndex &indexRef, bool bToggleOn);
 
 	QVariant GetPropertyValue(const QModelIndex &indexRef) const;
 	QVariant GetPropertyValue(int iCategoryIndex, int iPropertyIndex) const;
@@ -120,7 +132,7 @@ public:
 	void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
 
 	bool IsCategoryEnabled(QString sCategoryName);
-	void SetCategoryEnabled(QString sCategoryName, bool bEnable);
+	bool IsCategoryEnabled(int iCategoryIndex);
 	int GetNumCategories() const;
 	QString GetCategoryName(int iCategoryIndex) const;
 	bool IsCategoryCheckable(int iCategoryIndex) const;
@@ -134,7 +146,7 @@ public:
 						PropertiesType eType,
 						QVariant defaultData = QVariant(),
 						QString sToolTip = QString(),
-						bool bReadOnly = false,
+						PropertiesAccessType eAccessType = PROPERTIESACCESS_Mutable,
 						QVariant minRange = QVariant(),
 						QVariant maxRange = QVariant(),
 						QVariant stepAmt = QVariant(),
@@ -149,6 +161,7 @@ public:
 
 	virtual bool setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole = Qt::EditRole) override;
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
+	
 	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
 
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;

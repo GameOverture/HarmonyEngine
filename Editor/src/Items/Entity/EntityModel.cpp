@@ -110,46 +110,46 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 	const double dRANGE = 16777215.0;
 
 	propertiesTreeModelRef.AppendCategory("Common", HyGlobal::ItemColor(ITEM_Prefix));
-	propertiesTreeModelRef.AppendProperty("Common", "UUID", PROPERTIESTYPE_LineEdit, pItemData->GetThisUuid().toString(QUuid::WithoutBraces), "The universally unique identifier of the Project Item this node represents", true);
+	propertiesTreeModelRef.AppendProperty("Common", "UUID", PROPERTIESTYPE_LineEdit, pItemData->GetThisUuid().toString(QUuid::WithoutBraces), "The universally unique identifier of the Project Item this node represents", PROPERTIESACCESS_ReadOnly);
 
 	if(pItemData->GetType() != ITEM_BoundingVolume)
 	{
 		if(pItemData->IsAssetItem() == false && pItemData->GetEntType() != ENTTYPE_Root)
-			propertiesTreeModelRef.AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(pItemData->GetType(), false) % "'s state to be displayed", false, QVariant(), QVariant(), QVariant(), QString(), QString(), pItemData->GetReferencedItemUuid());
+			propertiesTreeModelRef.AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(pItemData->GetType(), false) % "'s state to be displayed", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), QString(), QString(), pItemData->GetReferencedItemUuid());
 
 		if(pItemData->GetEntType() != ENTTYPE_Root)
 		{
-			propertiesTreeModelRef.AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused");
-			propertiesTreeModelRef.AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", false, -iRANGE, iRANGE, 1);
+			propertiesTreeModelRef.AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused", PROPERTIESACCESS_ToggleOff);
+			propertiesTreeModelRef.AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", PROPERTIESACCESS_ToggleOff, -iRANGE, iRANGE, 1);
 
 			propertiesTreeModelRef.AppendCategory("Transformation", HyGlobal::ItemColor(ITEM_Project));
-			propertiesTreeModelRef.AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", false, -fRANGE, fRANGE, 1.0, "[", "]");
-			propertiesTreeModelRef.AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Scale is relative to parent node", false, -fRANGE, fRANGE, 0.01, "[", "]");
-			propertiesTreeModelRef.AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", false, 0.0, 360.0, 0.1, "", "°");
+			propertiesTreeModelRef.AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", PROPERTIESACCESS_ToggleOff, -fRANGE, fRANGE, 1.0, "[", "]");
+			propertiesTreeModelRef.AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Scale is relative to parent node", PROPERTIESACCESS_ToggleOff, -fRANGE, fRANGE, 0.01, "[", "]");
+			propertiesTreeModelRef.AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", PROPERTIESACCESS_ToggleOff, 0.0, 360.0, 0.1, "", "°");
 		
 			if(pItemData->GetType() != ITEM_Audio)
 			{
 				propertiesTreeModelRef.AppendCategory("Body", HyGlobal::ItemColor(ITEM_Prefix));
-				propertiesTreeModelRef.AppendProperty("Body", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated");
-				propertiesTreeModelRef.AppendProperty("Body", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this item with");
-				propertiesTreeModelRef.AppendProperty("Body", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", false, 0.0, 1.0, 0.05);
-				//propertiesTreeModelRef.AppendProperty("Body", "Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", false, -iRANGE, iRANGE, 1);
+				propertiesTreeModelRef.AppendProperty("Body", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated", PROPERTIESACCESS_ToggleOff);
+				propertiesTreeModelRef.AppendProperty("Body", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this item with", PROPERTIESACCESS_ToggleOff);
+				propertiesTreeModelRef.AppendProperty("Body", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", PROPERTIESACCESS_ToggleOff, 0.0, 1.0, 0.05);
+				propertiesTreeModelRef.AppendProperty("Body", "Override Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", PROPERTIESACCESS_ToggleOff, -iRANGE, iRANGE, 1);
 			}
 		}
 		else // ENTTYPE_Root
 		{
 			propertiesTreeModelRef.AppendCategory("Physics", QVariant(), true, false, "Optionally create a physics component that can affect the transformation of this entity");
-			propertiesTreeModelRef.AppendProperty("Physics", "Start Activated", PROPERTIESTYPE_bool, Qt::Checked, "This entity will start its physics simulation upon setting this state");
-			propertiesTreeModelRef.AppendProperty("Physics", "Type", PROPERTIESTYPE_ComboBoxInt, 0, "A static body does not move. A kinematic body moves only by forces. A dynamic body moves by forces and collision (fully simulated)", false, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Static" << "Kinematic" << "Dynamic");
-			propertiesTreeModelRef.AppendProperty("Physics", "Fixed Rotation", PROPERTIESTYPE_bool, Qt::Unchecked, "Prevents this body from rotating if checked. Useful for characters");
-			propertiesTreeModelRef.AppendProperty("Physics", "Initially Awake", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to make body initially awake. Start sleeping otherwise");
-			propertiesTreeModelRef.AppendProperty("Physics", "Allow Sleep", PROPERTIESTYPE_bool, Qt::Checked, "Uncheck this if this body should never fall asleep. This increases CPU usage");
-			propertiesTreeModelRef.AppendProperty("Physics", "Gravity Scale", PROPERTIESTYPE_double, 1.0, "Adjusts the gravity on this single body. Negative values will reverse gravity. Increased gravity can decrease stability", false, -100.0, 100.0, 0.1);
-			propertiesTreeModelRef.AppendProperty("Physics", "Dynamic CCD", PROPERTIESTYPE_bool, Qt::Unchecked, "Continuous collision detection for other dynamic moving bodies. Note that all bodies are prevented from tunneling through kinematic and static bodies. This setting is only considered on dynamic bodies. You should use this flag sparingly since it increases processing time");
-			propertiesTreeModelRef.AppendProperty("Physics", "Linear Damping", PROPERTIESTYPE_double, 0.0, "Reduces the world linear velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1", false, 0.0, 100.0, 0.01);
-			propertiesTreeModelRef.AppendProperty("Physics", "Angular Damping", PROPERTIESTYPE_double, 0.01, "Reduces the world angular velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1", false, 0.0, 100.0, 0.01);
-			propertiesTreeModelRef.AppendProperty("Physics", "Linear Velocity", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Starting Linear velocity of the body's origin in scene coordinates", false, -fRANGE, fRANGE, 1.0, "[", "]");
-			propertiesTreeModelRef.AppendProperty("Physics", "Angular Velocity", PROPERTIESTYPE_double, 0.0, "Starting Angular velocity of the body", false, 0.0, 100.0, 0.01);
+			propertiesTreeModelRef.AppendProperty("Physics", "Activate", PROPERTIESTYPE_bool, Qt::Checked, "This entity will begin its physics simulation", PROPERTIESACCESS_ToggleOff);
+			propertiesTreeModelRef.AppendProperty("Physics", "Type", PROPERTIESTYPE_ComboBoxInt, 0, "A static body does not move. A kinematic body moves only by forces. A dynamic body moves by forces and collision (fully simulated)", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Static" << "Kinematic" << "Dynamic");
+			propertiesTreeModelRef.AppendProperty("Physics", "Fixed Rotation", PROPERTIESTYPE_bool, Qt::Unchecked, "Prevents this body from rotating if checked. Useful for characters", PROPERTIESACCESS_ToggleOff);
+			propertiesTreeModelRef.AppendProperty("Physics", "Initially Awake", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to make body initially awake. Start sleeping otherwise", PROPERTIESACCESS_ToggleOff);
+			propertiesTreeModelRef.AppendProperty("Physics", "Allow Sleep", PROPERTIESTYPE_bool, Qt::Checked, "Uncheck this if this body should never fall asleep. This increases CPU usage", PROPERTIESACCESS_ToggleOff);
+			propertiesTreeModelRef.AppendProperty("Physics", "Gravity Scale", PROPERTIESTYPE_double, 1.0, "Adjusts the gravity on this single body. Negative values will reverse gravity. Increased gravity can decrease stability", PROPERTIESACCESS_ToggleOff, -100.0, 100.0, 0.1);
+			propertiesTreeModelRef.AppendProperty("Physics", "Dynamic CCD", PROPERTIESTYPE_bool, Qt::Unchecked, "Continuous collision detection for other dynamic moving bodies. Note that all bodies are prevented from tunneling through kinematic and static bodies. This setting is only considered on dynamic bodies. You should use this flag sparingly since it increases processing time", PROPERTIESACCESS_ToggleOff);
+			propertiesTreeModelRef.AppendProperty("Physics", "Linear Damping", PROPERTIESTYPE_double, 0.0, "Reduces the world linear velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1", PROPERTIESACCESS_ToggleOff, 0.0, 100.0, 0.01);
+			propertiesTreeModelRef.AppendProperty("Physics", "Angular Damping", PROPERTIESTYPE_double, 0.01, "Reduces the world angular velocity over time. 0 means no damping. Normally you will use a damping value between 0 and 0.1", PROPERTIESACCESS_ToggleOff, 0.0, 100.0, 0.01);
+			propertiesTreeModelRef.AppendProperty("Physics", "Linear Velocity", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Starting Linear velocity of the body's origin in scene coordinates", PROPERTIESACCESS_ToggleOff, -fRANGE, fRANGE, 1.0, "[", "]");
+			propertiesTreeModelRef.AppendProperty("Physics", "Angular Velocity", PROPERTIESTYPE_double, 0.0, "Starting Angular velocity of the body", PROPERTIESACCESS_ToggleOff, 0.0, 100.0, 0.01);
 		}
 	}
 
@@ -160,26 +160,26 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 
 	case ITEM_Primitive:
 		propertiesTreeModelRef.AppendCategory("Primitive", QVariant(), false, false, "A visible shape that can be drawn to the screen");
-		propertiesTreeModelRef.AppendProperty("Primitive", "Wireframe", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to render only the wireframe of the shape type");
-		propertiesTreeModelRef.AppendProperty("Primitive", "Line Thickness", PROPERTIESTYPE_double, 1.0, "When applicable, how thick to render lines", false, 1.0, 100.0, 1.0);
+		propertiesTreeModelRef.AppendProperty("Primitive", "Wireframe", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to render only the wireframe of the shape type", PROPERTIESACCESS_ToggleOff);
+		propertiesTreeModelRef.AppendProperty("Primitive", "Line Thickness", PROPERTIESTYPE_double, 1.0, "When applicable, how thick to render lines", PROPERTIESACCESS_ToggleOff, 1.0, 100.0, 1.0);
 		propertiesTreeModelRef.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc");
-		propertiesTreeModelRef.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
-		propertiesTreeModelRef.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
+		propertiesTreeModelRef.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
+		propertiesTreeModelRef.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", PROPERTIESACCESS_ToggleOff);
 		break;
 
 	case ITEM_BoundingVolume:
 		propertiesTreeModelRef.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc");
-		propertiesTreeModelRef.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
-		propertiesTreeModelRef.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", true);
+		propertiesTreeModelRef.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
+		propertiesTreeModelRef.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", PROPERTIESACCESS_ReadOnly);
 		propertiesTreeModelRef.AppendCategory("Fixture", QVariant(), true, true, "Become a fixture used in physics simulations and collision");
-		propertiesTreeModelRef.AppendProperty("Fixture", "Density", PROPERTIESTYPE_double, 0.0, "Usually in kg / m^2. A shape should have a non-zero density when the entity's physics is dynamic", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
-		propertiesTreeModelRef.AppendProperty("Fixture", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
-		propertiesTreeModelRef.AppendProperty("Fixture", "Restitution", PROPERTIESTYPE_double, 0.0, "The restitution (elasticity) usually in the range [0,1]", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
-		propertiesTreeModelRef.AppendProperty("Fixture", "Restitution Threshold", PROPERTIESTYPE_double, 1.0, "Restitution velocity threshold, usually in m/s. Collisions above this speed have restitution applied (will bounce)", false, 0.0, fRANGE, 0.001, QString(), QString(), 5);
-		propertiesTreeModelRef.AppendProperty("Fixture", "Sensor", PROPERTIESTYPE_bool, Qt::Unchecked, "A sensor shape collects contact information but never generates a collision response");
-		propertiesTreeModelRef.AppendProperty("Fixture", "Filter: Category Mask", PROPERTIESTYPE_int, 0x0001, "The collision category bits for this shape. Normally you would just set one bit", false, 0, 0xFFFF, 1, QString(), QString(), QVariant());
-		propertiesTreeModelRef.AppendProperty("Fixture", "Filter: Collision Mask", PROPERTIESTYPE_int, 0xFFFF, "The collision mask bits. This states the categories that this shape would accept for collision", false, 0, 0xFFFF, 1, QString(), QString(), QVariant());
-		propertiesTreeModelRef.AppendProperty("Fixture", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", false, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
+		propertiesTreeModelRef.AppendProperty("Fixture", "Density", PROPERTIESTYPE_double, 0.0, "Usually in kg / m^2. A shape should have a non-zero density when the entity's physics is dynamic", PROPERTIESACCESS_ToggleOff, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		propertiesTreeModelRef.AppendProperty("Fixture", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", PROPERTIESACCESS_ToggleOff, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		propertiesTreeModelRef.AppendProperty("Fixture", "Restitution", PROPERTIESTYPE_double, 0.0, "The restitution (elasticity) usually in the range [0,1]", PROPERTIESACCESS_ToggleOff, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		propertiesTreeModelRef.AppendProperty("Fixture", "Restitution Threshold", PROPERTIESTYPE_double, 1.0, "Restitution velocity threshold, usually in m/s. Collisions above this speed have restitution applied (will bounce)", PROPERTIESACCESS_ToggleOff, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		propertiesTreeModelRef.AppendProperty("Fixture", "Sensor", PROPERTIESTYPE_bool, Qt::Unchecked, "A sensor shape collects contact information but never generates a collision response", PROPERTIESACCESS_ToggleOff);
+		propertiesTreeModelRef.AppendProperty("Fixture", "Filter: Category Mask", PROPERTIESTYPE_int, 0x0001, "The collision category bits for this shape. Normally you would just set one bit", PROPERTIESACCESS_ToggleOff, 0, 0xFFFF, 1, QString(), QString(), QVariant());
+		propertiesTreeModelRef.AppendProperty("Fixture", "Filter: Collision Mask", PROPERTIESTYPE_int, 0xFFFF, "The collision mask bits. This states the categories that this shape would accept for collision", PROPERTIESACCESS_ToggleOff, 0, 0xFFFF, 1, QString(), QString(), QVariant());
+		propertiesTreeModelRef.AppendProperty("Fixture", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", PROPERTIESACCESS_ToggleOff, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
 		break;
 
 	case ITEM_AtlasFrame:
@@ -188,19 +188,19 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 
 	case ITEM_Sprite:
 		propertiesTreeModelRef.AppendCategory("Sprite", pItemData->GetReferencedItemUuid().toString(QUuid::WithoutBraces));
-		propertiesTreeModelRef.AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on", false, QVariant(), QVariant(), QVariant(), QString(), QString(), pItemData->GetReferencedItemUuid());
-		propertiesTreeModelRef.AppendProperty("Sprite", "Anim Rate", PROPERTIESTYPE_double, 1.0, "The animation rate modifier", false, 0.0, fRANGE, 0.1);
-		propertiesTreeModelRef.AppendProperty("Sprite", "Anim Paused", PROPERTIESTYPE_bool, false, "The current state's animation starts paused");
+		propertiesTreeModelRef.AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), QString(), QString(), pItemData->GetReferencedItemUuid());
+		propertiesTreeModelRef.AppendProperty("Sprite", "Anim Rate", PROPERTIESTYPE_double, 1.0, "The animation rate modifier", PROPERTIESACCESS_ToggleOff, 0.0, fRANGE, 0.1);
+		propertiesTreeModelRef.AppendProperty("Sprite", "Anim Paused", PROPERTIESTYPE_bool, false, "The current state's animation starts paused", PROPERTIESACCESS_ToggleOff);
 		break;
 
 	case ITEM_Text:
 		propertiesTreeModelRef.AppendCategory("Text", pItemData->GetReferencedItemUuid().toString(QUuid::WithoutBraces));
-		propertiesTreeModelRef.AppendProperty("Text", "Text", PROPERTIESTYPE_LineEdit, "Text123", "What UTF-8 string to be displayed", false);
-		propertiesTreeModelRef.AppendProperty("Text", "Style", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTextStyleNameList()[TEXTSTYLE_Line], "The style of how the text is shown", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTextStyleNameList());
-		propertiesTreeModelRef.AppendProperty("Text", "Style Dimensions", PROPERTIESTYPE_vec2, QPointF(200.0f, 50.0f), "Text box size used when required by the style (like ScaleBox or Column)", false, 0.0f, fRANGE, 1.0f);
-		propertiesTreeModelRef.AppendProperty("Text", "Alignment", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAlignmentNameList()[HYALIGN_Left], "The alignment of the text", false, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAlignmentNameList());
-		propertiesTreeModelRef.AppendProperty("Text", "Monospaced Digits", PROPERTIESTYPE_bool, false, "Check to use monospaced digits, which ensures all digits use the same width", false);
-		propertiesTreeModelRef.AppendProperty("Text", "Text Indent", PROPERTIESTYPE_int, 0, "The number of pixels to indent the text", false, 0, iRANGE, 1);
+		propertiesTreeModelRef.AppendProperty("Text", "Text", PROPERTIESTYPE_LineEdit, "Text123", "What UTF-8 string to be displayed", PROPERTIESACCESS_ToggleOff);
+		propertiesTreeModelRef.AppendProperty("Text", "Style", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTextStyleNameList()[TEXTSTYLE_Line], "The style of how the text is shown", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTextStyleNameList());
+		propertiesTreeModelRef.AppendProperty("Text", "Style Dimensions", PROPERTIESTYPE_vec2, QPointF(200.0f, 50.0f), "Text box size used when required by the style (like ScaleBox or Column)", PROPERTIESACCESS_ToggleOff, 0.0f, fRANGE, 1.0f);
+		propertiesTreeModelRef.AppendProperty("Text", "Alignment", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAlignmentNameList()[HYALIGN_Left], "The alignment of the text", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAlignmentNameList());
+		propertiesTreeModelRef.AppendProperty("Text", "Monospaced Digits", PROPERTIESTYPE_bool, false, "Check to use monospaced digits, which ensures all digits use the same width", PROPERTIESACCESS_ToggleOff);
+		propertiesTreeModelRef.AppendProperty("Text", "Text Indent", PROPERTIESTYPE_int, 0, "The number of pixels to indent the text", PROPERTIESACCESS_ToggleOff, 0, iRANGE, 1);
 		break;
 
 	default:

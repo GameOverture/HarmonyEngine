@@ -52,12 +52,12 @@ const PropertiesDef PropertiesTreeModel::FindPropertyDefinition(QString sCategor
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
 		{
 			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
 			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
 			{
-				if(0 == pCategoryTreeItem->GetChild(j)->data(COLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+				if(0 == pCategoryTreeItem->GetChild(j)->data(PROPERTIESCOLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
 				{
 					TreeModelItem *pPropertyItem = pCategoryTreeItem->GetChild(j);
 					return m_PropertyDefMap[pPropertyItem];
@@ -69,37 +69,43 @@ const PropertiesDef PropertiesTreeModel::FindPropertyDefinition(QString sCategor
 	return PropertiesDef();
 }
 
+void PropertiesTreeModel::SetToggle(const QModelIndex &indexRef, bool bToggleOn)
+{
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	m_PropertyDefMap[pTreeItem].eAccessType = bToggleOn ? PROPERTIESACCESS_ToggleOn : PROPERTIESACCESS_ToggleOff;
+}
+
 QVariant PropertiesTreeModel::GetPropertyValue(const QModelIndex &indexRef) const
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
-	return pTreeItem->data(COLUMN_Value);
+	return pTreeItem->data(PROPERTIESCOLUMN_Value);
 }
 
 QVariant PropertiesTreeModel::GetPropertyValue(int iCategoryIndex, int iPropertyIndex) const
 {
 	TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(iCategoryIndex);
 	TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(iPropertyIndex);
-	return pPropertyTreeItem->data(COLUMN_Value);
+	return pPropertyTreeItem->data(PROPERTIESCOLUMN_Value);
 }
 
 bool PropertiesTreeModel::IsPropertyDefaultValue(int iCategoryIndex, int iPropertyIndex) const
 {
 	TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(iCategoryIndex);
 	TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(iPropertyIndex);
-	return pPropertyTreeItem->data(COLUMN_Value) == m_PropertyDefMap[pPropertyTreeItem].defaultData;
+	return pPropertyTreeItem->data(PROPERTIESCOLUMN_Value) == m_PropertyDefMap[pPropertyTreeItem].defaultData;
 }
 
 QVariant PropertiesTreeModel::FindPropertyValue(QString sCategoryName, QString sPropertyName) const
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
 		{
 			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
 			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
 			{
-				if(0 == pCategoryTreeItem->GetChild(j)->data(COLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
-					return pCategoryTreeItem->GetChild(j)->data(COLUMN_Value);
+				if(0 == pCategoryTreeItem->GetChild(j)->data(PROPERTIESCOLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+					return pCategoryTreeItem->GetChild(j)->data(PROPERTIESCOLUMN_Value);
 			}
 		}
 	}
@@ -111,15 +117,20 @@ void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPrope
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
 		{
 			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
 			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
 			{
-				if(0 == pCategoryTreeItem->GetChild(j)->data(COLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+				TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(j);
+
+				if(0 == pPropertyTreeItem->data(PROPERTIESCOLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
 				{
-					if(setData(createIndex(pCategoryTreeItem->GetChild(j)->GetIndex(), COLUMN_Value, pCategoryTreeItem->GetChild(j)), valueRef, Qt::UserRole) == false)
+					if(setData(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Value, pPropertyTreeItem), valueRef, Qt::UserRole) == false)
 						HyGuiLog("PropertiesTreeModel::SetPropertyValue() - setData failed", LOGTYPE_Error);
+
+					if(m_PropertyDefMap[pPropertyTreeItem].eAccessType == PROPERTIESACCESS_ToggleOff)
+						m_PropertyDefMap[pPropertyTreeItem].eAccessType = PROPERTIESACCESS_ToggleOn;
 
 					return;
 				}
@@ -132,43 +143,29 @@ bool PropertiesTreeModel::IsCategoryEnabled(QString sCategoryName)
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
 		{
 			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
 			const PropertiesDef &categoryPropDefRef = m_PropertyDefMap[pCategoryTreeItem];
 
-			if(categoryPropDefRef.eType == PROPERTIESTYPE_Category ||
-			   (categoryPropDefRef.eType == PROPERTIESTYPE_CategoryChecked && pCategoryTreeItem->data(COLUMN_Value).toInt() == Qt::Checked))
-			{
-				return true;
-			}
+			if(categoryPropDefRef.eType == PROPERTIESTYPE_Category && categoryPropDefRef.eAccessType == PROPERTIESACCESS_ToggleOff)
+				return false;
 			
-			return false;
+			return true;
 		}
 	}
 
 	return false;
 }
 
-void PropertiesTreeModel::SetCategoryEnabled(QString sCategoryName, bool bEnable)
+bool PropertiesTreeModel::IsCategoryEnabled(int iCategoryIndex)
 {
-	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
-	{
-		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
-		{
-			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
-			const PropertiesDef &categoryPropDefRef = m_PropertyDefMap[pCategoryTreeItem];
-			if(categoryPropDefRef.eType == PROPERTIESTYPE_CategoryChecked)
-			{
-				if(setData(createIndex(pCategoryTreeItem->GetIndex(), COLUMN_Value, pCategoryTreeItem), bEnable ? Qt::Checked : Qt::Unchecked, Qt::UserRole) == false)
-					HyGuiLog("PropertiesTreeModel::SetCategoryEnabled() - setData failed", LOGTYPE_Error);
-			}
-			else
-				HyGuiLog("PropertiesTreeModel::SetCategoryEnabled() - Category is not a PROPERTIESTYPE_CategoryChecked", LOGTYPE_Error);
-			
-			break;
-		}
-	}
+	TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(iCategoryIndex);
+	const PropertiesDef &categoryPropDefRef = m_PropertyDefMap[pCategoryTreeItem];
+	if(categoryPropDefRef.eType != PROPERTIESTYPE_Category || categoryPropDefRef.eAccessType == PROPERTIESACCESS_ToggleOff)
+		return false;
+	
+	return true;
 }
 
 int PropertiesTreeModel::GetNumCategories() const
@@ -178,13 +175,13 @@ int PropertiesTreeModel::GetNumCategories() const
 
 QString PropertiesTreeModel::GetCategoryName(int iCategoryIndex) const
 {
-	return m_pRootItem->GetChild(iCategoryIndex)->data(COLUMN_Name).toString();
+	return m_pRootItem->GetChild(iCategoryIndex)->data(PROPERTIESCOLUMN_Name).toString();
 }
 
 bool PropertiesTreeModel::IsCategoryCheckable(int iCategoryIndex) const
 {
 	const PropertiesDef &categoryPropDefRef = m_PropertyDefMap[m_pRootItem->GetChild(iCategoryIndex)];
-	return categoryPropDefRef.eType == PROPERTIESTYPE_CategoryChecked;
+	return categoryPropDefRef.eAccessType == PROPERTIESACCESS_ToggleOn || categoryPropDefRef.eAccessType == PROPERTIESACCESS_ToggleOff;
 }
 
 int PropertiesTreeModel::GetNumProperties(int iCategoryIndex) const
@@ -195,12 +192,12 @@ int PropertiesTreeModel::GetNumProperties(int iCategoryIndex) const
 QString PropertiesTreeModel::GetPropertyName(const QModelIndex &indexRef) const
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
-	return pTreeItem->data(COLUMN_Name).toString();
+	return pTreeItem->data(PROPERTIESCOLUMN_Name).toString();
 }
 
 QString PropertiesTreeModel::GetPropertyName(int iCategoryIndex, int iPropertyIndex) const
 {
-	return m_pRootItem->GetChild(iCategoryIndex)->GetChild(iPropertyIndex)->data(COLUMN_Name).toString();
+	return m_pRootItem->GetChild(iCategoryIndex)->GetChild(iPropertyIndex)->data(PROPERTIESCOLUMN_Name).toString();
 }
 
 bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
@@ -208,7 +205,7 @@ bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonD
 	// All category names must be unique
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
 			return false;
 	}
 
@@ -222,19 +219,22 @@ bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonD
 
 	// Set data in the property's name column
 	TreeModelItem *pNewlyAddedTreeItem = m_pRootItem->GetChild(m_pRootItem->GetNumChildren() - 1);
-	if(setData(index(pNewlyAddedTreeItem->GetIndex(), COLUMN_Name, rootParentIndex), QVariant(sCategoryName), Qt::UserRole) == false)
+	if(setData(index(pNewlyAddedTreeItem->GetIndex(), PROPERTIESCOLUMN_Name, rootParentIndex), QVariant(sCategoryName), Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendCategory() - setData failed", LOGTYPE_Error);
 
-	// Set data in the property's value column
-	if(setData(index(pNewlyAddedTreeItem->GetIndex(), COLUMN_Value, rootParentIndex), QVariant(bStartChecked ? Qt::Checked : Qt::Unchecked), Qt::UserRole) == false)
-		HyGuiLog("PropertiesTreeModel::AppendCategory() - setData failed", LOGTYPE_Error);
+	//// Set data in the property's value column
+	//if(setData(index(pNewlyAddedTreeItem->GetIndex(), PROPERTIESCOLUMN_Value, rootParentIndex), QVariant(bStartChecked ? Qt::Checked : Qt::Unchecked), Qt::UserRole) == false)
+	//	HyGuiLog("PropertiesTreeModel::AppendCategory() - setData failed", LOGTYPE_Error);
 
 	// Link this property definition to the proper TreeModelItem using 'm_PropertyDefMap'
 	PropertiesDef def;
-	def.eType = bCheckable ? PROPERTIESTYPE_CategoryChecked : PROPERTIESTYPE_Category;
-	def.bReadOnly = !bCheckable;
+	def.eType = PROPERTIESTYPE_Category;
 	def.delegateBuilder = commonDelegateBuilder;
 	def.sToolTip = sToolTip;
+	if(bCheckable == false)
+		def.eAccessType = PROPERTIESACCESS_ReadOnly;
+	else
+		def.eAccessType = bStartChecked ? PROPERTIESACCESS_ToggleOn : PROPERTIESACCESS_ToggleOff;
 
 	m_PropertyDefMap[pNewlyAddedTreeItem] = def;
 
@@ -246,7 +246,7 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 										 PropertiesType eType,
 										 QVariant defaultData /*= QVariant()*/,
 										 QString sToolTip /*= QString()*/,
-										 bool bReadOnly /*= false*/,
+										 PropertiesAccessType eAccessType /*= PROPERTIESACCESS_Mutable*/,
 										 QVariant minRange /*= QVariant()*/,
 										 QVariant maxRange /*= QVariant()*/,
 										 QVariant stepAmt /*= QVariant()*/,
@@ -258,7 +258,7 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 	TreeModelItem *pCategoryTreeItem = nullptr;
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		if(0 == m_pRootItem->GetChild(i)->data(COLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
 		{
 			pCategoryTreeItem = m_pRootItem->GetChild(i);
 			break;
@@ -273,7 +273,7 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 	// Now ensure that no property with this name already exists
 	for(int i = 0; i < pCategoryTreeItem->GetNumChildren(); ++i)
 	{
-		if(0 == pCategoryTreeItem->GetChild(i)->data(COLUMN_Name).toString().compare(sName, Qt::CaseSensitive))
+		if(0 == pCategoryTreeItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sName, Qt::CaseSensitive))
 		{
 			HyGuiLog("PropertiesTreeModel::AppendProperty() - Property with the name: " % sName % " already exists", LOGTYPE_Error);
 			return false;
@@ -290,15 +290,15 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 
 	// Set data in the property's name column
 	TreeModelItem *pNewlyAddedTreeItem = pCategoryTreeItem->GetChild(pCategoryTreeItem->GetNumChildren() - 1);
-	if(setData(index(pNewlyAddedTreeItem->GetIndex(), COLUMN_Name, categoryParentIndex), QVariant(sName), Qt::UserRole) == false)
+	if(setData(index(pNewlyAddedTreeItem->GetIndex(), PROPERTIESCOLUMN_Name, categoryParentIndex), QVariant(sName), Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendProperty() - setData failed", LOGTYPE_Error);
 
 	// Set data in the property's value column
-	if(setData(index(pNewlyAddedTreeItem->GetIndex(), COLUMN_Value, categoryParentIndex), defaultData, Qt::UserRole) == false)
+	if(setData(index(pNewlyAddedTreeItem->GetIndex(), PROPERTIESCOLUMN_Value, categoryParentIndex), defaultData, Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendProperty() - setData failed", LOGTYPE_Error);
 
 	// Link this property definition to the proper TreeModelItem using 'm_PropertyDefMap'
-	PropertiesDef def(eType, bReadOnly, sToolTip, defaultData, minRange, maxRange, stepAmt, sPrefix, sSuffix, delegateBuilder);
+	PropertiesDef def(eType, eAccessType, sToolTip, defaultData, minRange, maxRange, stepAmt, sPrefix, sSuffix, delegateBuilder);
 	m_PropertyDefMap[pNewlyAddedTreeItem] = def;
 
 	return true;
@@ -309,8 +309,8 @@ void PropertiesTreeModel::RefreshCategory(const QModelIndex &indexRef)
 	TreeModelItem *pCategoryTreeItem = GetItem(indexRef);
 	if(pCategoryTreeItem->GetNumChildren() > 0)
 	{
-		dataChanged(createIndex(0, COLUMN_Name, pCategoryTreeItem->GetChild(0)),
-					createIndex(pCategoryTreeItem->GetNumChildren() - 1, COLUMN_Value, pCategoryTreeItem->GetChild(pCategoryTreeItem->GetNumChildren() - 1)));
+		dataChanged(createIndex(0, PROPERTIESCOLUMN_Name, pCategoryTreeItem->GetChild(0)),
+					createIndex(pCategoryTreeItem->GetNumChildren() - 1, PROPERTIESCOLUMN_Value, pCategoryTreeItem->GetChild(pCategoryTreeItem->GetNumChildren() - 1)));
 	}
 }
 
@@ -325,16 +325,20 @@ QJsonObject PropertiesTreeModel::SerializeJson()
 		QJsonObject categoryObj;
 
 		// If this category is checkable, then we need to store the checked state (as a boolean) to "<name>_checked"
-		if(m_PropertyDefMap[pCategoryTreeItem].eType == PROPERTIESTYPE_CategoryChecked)
-			categoryObj.insert(pCategoryTreeItem->data(COLUMN_Name).toString() % "_checked", pCategoryTreeItem->data(COLUMN_Value).toInt() == Qt::Checked);
+		if(IsCategoryCheckable(i))
+			categoryObj.insert(pCategoryTreeItem->data(PROPERTIESCOLUMN_Name).toString() % "_checked", IsCategoryEnabled(i)); //pCategoryTreeItem->data(PROPERTIESCOLUMN_Value).toInt() == Qt::Checked);
 		
 		for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
 		{
 			TreeModelItem *pPropertyItem = pCategoryTreeItem->GetChild(j);
-			QString sPropName = pPropertyItem->data(COLUMN_Name).toString();
-			QVariant propValue = pPropertyItem->data(COLUMN_Value);
+			QString sPropName = pPropertyItem->data(PROPERTIESCOLUMN_Name).toString();
+			QVariant propValue = pPropertyItem->data(PROPERTIESCOLUMN_Value);
 
 			const PropertiesDef &propDefRef = m_PropertyDefMap[pPropertyItem];
+
+			if(propDefRef.eAccessType == PROPERTIESACCESS_ToggleOff) // Properties that aren't found when deserializing are assumed to be 'PROPERTIESACCESS_ToggleOff' - when re-enabled they will be set to their default value
+				continue;
+
 			switch(propDefRef.eType)
 			{
 			case PROPERTIESTYPE_bool:
@@ -383,9 +387,8 @@ QJsonObject PropertiesTreeModel::SerializeJson()
 				HyGuiLog("Unhandled PropertiesTreeModel::SerializeJson property", LOGTYPE_Error);
 				break;
 			}
-			
 		}
-		propertiesObj.insert(pCategoryTreeItem->data(COLUMN_Name).toString(), categoryObj);
+		propertiesObj.insert(pCategoryTreeItem->data(PROPERTIESCOLUMN_Name).toString(), categoryObj);
 	}
 
 	return propertiesObj;
@@ -393,6 +396,19 @@ QJsonObject PropertiesTreeModel::SerializeJson()
 
 void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 {
+	// Properties that are "togglable" and aren't found when deserializing are assumed to be 'PROPERTIESACCESS_ToggleOff' - when re-enabled they will be set to their default value
+	// Initialize all "togglable" properties to 'PROPERTIESACCESS_ToggleOff'
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+		for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
+		{
+			TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(j);
+			if(m_PropertyDefMap[pPropertyTreeItem].eAccessType == PROPERTIESACCESS_ToggleOn || m_PropertyDefMap[pPropertyTreeItem].eAccessType == PROPERTIESACCESS_ToggleOff)
+				m_PropertyDefMap[pPropertyTreeItem].eAccessType = PROPERTIESACCESS_ToggleOff;
+		}
+	}
+
 	QStringList sCategoryList = propertiesObj.keys();
 	for(const QString &sCategory : sCategoryList)
 	{
@@ -400,7 +416,23 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 
 		QStringList sPropertyList = categoryObj.keys();
 		if(sPropertyList.contains(sCategory % "_checked"))
-			SetCategoryEnabled(sCategory, categoryObj[sCategory % "_checked"].toBool());
+		{
+			for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+			{
+				if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategory, Qt::CaseSensitive))
+				{
+					TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+					PropertiesDef &categoryPropDefRef = m_PropertyDefMap[pCategoryTreeItem];
+					if(categoryPropDefRef.eType != PROPERTIESTYPE_Category)
+						HyGuiLog("PropertiesTreeModel::DeserializeJson() - " % sCategory % " is not a category", LOGTYPE_Error);
+					else if(categoryPropDefRef.eAccessType != PROPERTIESACCESS_ToggleOn && categoryPropDefRef.eAccessType != PROPERTIESACCESS_ToggleOff)
+						HyGuiLog("PropertiesTreeModel::DeserializeJson() - " % sCategory % " is not 'togglable'", LOGTYPE_Error);
+
+					categoryPropDefRef.eAccessType = categoryObj[sCategory % "_checked"].toBool() ? PROPERTIESACCESS_ToggleOn : PROPERTIESACCESS_ToggleOff;
+					break;
+				}
+			}
+		}
 
 		for(const QString &sProperty : sPropertyList)
 		{
@@ -491,11 +523,28 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 	if(iRole == Qt::UserRole)
 		return ITreeModel::setData(indexRef, valueRef, iRole);
 
-	const QVariant &origValue = GetPropertyValue(indexRef);
-	if(origValue != valueRef)
+	// NOTE: There are three cases to handle here.
+	//       1) A normal setData() call that changes the data value in the PROPERTIESCOLUMN_Value When PROPERTIESACCESS_Toggle* is set here, handle it
+	//       2) A category that's checkable is changed, which changes the m_PropertyDefMap[]'s 'eAccessType'
+	//       3) Check/Uncheck a property that is 'togglable', which changes the m_PropertyDefMap[]'s 'eAccessType'
+	if(indexRef.column() == PROPERTIESCOLUMN_Name) // Indicates either case '2' or '3'
 	{
-		PropertiesUndoCmd *pUndoCmd = new PropertiesUndoCmd(this, indexRef, valueRef);
-		GetOwner().GetUndoStack()->push(pUndoCmd);
+		TreeModelItem *pTreeItem = GetItem(indexRef);
+		if((m_PropertyDefMap[pTreeItem].eAccessType == PROPERTIESACCESS_ToggleOn && valueRef == Qt::Unchecked) ||
+			(m_PropertyDefMap[pTreeItem].eAccessType == PROPERTIESACCESS_ToggleOff && valueRef == Qt::Checked))
+		{
+			PropertiesUndoCmd *pUndoCmd = new PropertiesUndoCmd(this, indexRef, static_cast<bool>(valueRef == Qt::Checked));
+			GetOwner().GetUndoStack()->push(pUndoCmd);
+		}
+	}
+	else // PROPERTIESCOLUMN_Value - indicating case '1'
+	{
+		const QVariant &origValue = GetPropertyValue(indexRef);
+		if(origValue != valueRef)
+		{
+			PropertiesUndoCmd *pUndoCmd = new PropertiesUndoCmd(this, indexRef, valueRef);
+			GetOwner().GetUndoStack()->push(pUndoCmd);
+		}
 	}
 
 	return false; // Return false because another setData() will be invoked via the UndoCmd, which actually changes the data
@@ -515,8 +564,8 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 	switch(iRole)
 	{
 	case Qt::DisplayRole:
-		if(indexRef.column() == COLUMN_Name)
-			return pTreeItem->data(COLUMN_Name);
+		if(indexRef.column() == PROPERTIESCOLUMN_Name)
+			return pTreeItem->data(PROPERTIESCOLUMN_Name);
 		else
 			return ConvertValueToString(pTreeItem);
 
@@ -531,16 +580,16 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 	case Qt::BackgroundRole:
 		if(propDefRef.IsCategory())
 			return QBrush(propDefRef.GetColor());
-		else if(indexRef.column() == COLUMN_Value && propDefRef.eType == PROPERTIESTYPE_Color)
-			return QBrush(QColor(pTreeItem->data(COLUMN_Value).toRect().left(), pTreeItem->data(COLUMN_Value).toRect().top(), pTreeItem->data(COLUMN_Value).toRect().width()));
+		else if(indexRef.column() == PROPERTIESCOLUMN_Value && propDefRef.eType == PROPERTIESTYPE_Color && propDefRef.eAccessType != PROPERTIESACCESS_ToggleOff)
+			return QBrush(QColor(pTreeItem->data(PROPERTIESCOLUMN_Value).toRect().left(), pTreeItem->data(PROPERTIESCOLUMN_Value).toRect().top(), pTreeItem->data(PROPERTIESCOLUMN_Value).toRect().width()));
 		//	return QBrush((0 == (pTreeItem->GetIndex() & 1)) ? propDefRef.GetColor() : propDefRef.GetColor().lighter());
 
 	case Qt::ForegroundRole:
 		if(propDefRef.IsCategory())
 			return QBrush(QColor::fromRgb(255, 255, 255));
-		else if(indexRef.column() == COLUMN_Value && propDefRef.eType == PROPERTIESTYPE_Color)
+		else if(indexRef.column() == PROPERTIESCOLUMN_Value && propDefRef.eType == PROPERTIESTYPE_Color && propDefRef.eAccessType != PROPERTIESACCESS_ToggleOff)
 		{
-			QColor clr(pTreeItem->data(COLUMN_Value).toRect().left(), pTreeItem->data(COLUMN_Value).toRect().top(), pTreeItem->data(COLUMN_Value).toRect().width());
+			QColor clr(pTreeItem->data(PROPERTIESCOLUMN_Value).toRect().left(), pTreeItem->data(PROPERTIESCOLUMN_Value).toRect().top(), pTreeItem->data(PROPERTIESCOLUMN_Value).toRect().width());
 			double a = 1 - (0.299 * clr.redF() + 0.587 * clr.greenF() + 0.114 * clr.blueF()) / 255;
 			if(a < 0.5)
 			{
@@ -563,11 +612,13 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 		}
 
 	case Qt::CheckStateRole:
-		if((indexRef.column() == 0 && propDefRef.eType == PROPERTIESTYPE_CategoryChecked) ||
-		   (indexRef.column() == 1 && propDefRef.eType == PROPERTIESTYPE_bool))
+		if(indexRef.column() == 0)
 		{
-			return pTreeItem->data(COLUMN_Value);
+			if(propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn || propDefRef.eAccessType == PROPERTIESACCESS_ToggleOff)
+				return propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn ? Qt::Checked : Qt::Unchecked;
 		}
+		else if(propDefRef.eType == PROPERTIESTYPE_bool)
+			return pTreeItem->data(PROPERTIESCOLUMN_Value);
 	}
 
 	return QVariant();
@@ -585,34 +636,40 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 
 	if(propDefRef.IsCategory())
 	{
-		if(propDefRef.bReadOnly == false)
+		if(propDefRef.eAccessType != PROPERTIESACCESS_ReadOnly)
 			returnFlags |= Qt::ItemIsEnabled;
 
-		if(propDefRef.eType == PROPERTIESTYPE_CategoryChecked && indexRef.column() == COLUMN_Name)
+		if(propDefRef.IsTogglable())
 			returnFlags |= Qt::ItemIsUserCheckable;
 	}
 	else
 	{
 		TreeModelItem *pCategoryTreeItem = pTreeItem->GetParent();
 		const PropertiesDef &categoryPropDefRef = m_PropertyDefMap[pCategoryTreeItem];
-
 		if(categoryPropDefRef.IsCategory() == false)
 			HyGuiLog("PropertiesTreeModel::flags() passed in index is not a category and its parent is not one either", LOGTYPE_Error);
 
-		if(categoryPropDefRef.eType == PROPERTIESTYPE_Category ||
-		   (categoryPropDefRef.eType == PROPERTIESTYPE_CategoryChecked && pCategoryTreeItem->data(COLUMN_Value).toInt() == Qt::Checked))
+		if(categoryPropDefRef.IsTogglable() == false ||
+		   (categoryPropDefRef.IsTogglable() && categoryPropDefRef.eAccessType == PROPERTIESACCESS_ToggleOn))
 		{
-			if(propDefRef.bReadOnly == false)
-				returnFlags |= Qt::ItemIsEnabled;
-		}
+			if(propDefRef.eAccessType != PROPERTIESACCESS_ReadOnly)
+			{
+				if(propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn || propDefRef.eAccessType == PROPERTIESACCESS_ToggleOff)
+				{
+					if(indexRef.column() == PROPERTIESCOLUMN_Name)
+						returnFlags |= (Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+					else // column is PROPERTIESCOLUMN_Value
+					{
+						if(propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn)
+							returnFlags |= (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+					}
+				}
+				else // PROPERTIESACCESS_Mutable
+					returnFlags |= (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
 
-		if(indexRef.column() == COLUMN_Value)
-		{
-			if(propDefRef.bReadOnly == false)
-				returnFlags |= (Qt::ItemIsSelectable | Qt::ItemIsEditable);
-
-			if(propDefRef.eType == PROPERTIESTYPE_bool)
-				returnFlags |= Qt::ItemIsUserCheckable;
+				if(propDefRef.eType == PROPERTIESTYPE_bool)
+					returnFlags |= Qt::ItemIsUserCheckable;
+			}
 		}
 	}
 
@@ -626,7 +683,10 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) const
 {
 	const PropertiesDef &propDefRef = m_PropertyDefMap[pTreeItem];
-	const QVariant &treeItemValue = pTreeItem->data(COLUMN_Value);
+	if(propDefRef.eAccessType == PROPERTIESACCESS_ToggleOff)
+		return "<NOT SET>";
+
+	const QVariant &treeItemValue = pTreeItem->data(PROPERTIESCOLUMN_Value);
 
 	QString sRetStr = propDefRef.sPrefix;
 
@@ -696,7 +756,6 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 		break; }
 	case PROPERTIESTYPE_Root:
 	case PROPERTIESTYPE_Category:
-	case PROPERTIESTYPE_CategoryChecked:
 		break;
 
 	default:
