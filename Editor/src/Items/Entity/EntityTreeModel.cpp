@@ -24,9 +24,6 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	m_ReferencedItemUuid(uuidOfReferencedItem),
 	m_bIsSelected(false)
 {
-	m_bIsAssetItem = HyGlobal::IsItemType_Asset(m_eTYPE);
-	m_bIsProjectItem = HyGlobal::IsItemType_Project(m_eTYPE);
-
 	if(m_eEntType == ENTTYPE_Root || m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_ArrayItem)
 	{
 		for(int i = 0; i < m_EntityModelRef.GetNumStates(); ++i)
@@ -46,9 +43,6 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	m_ReferencedItemUuid(descObj["itemUUID"].toString()),
 	m_bIsSelected(descObj["isSelected"].toBool())
 {
-	m_bIsAssetItem = HyGlobal::IsItemType_Asset(m_eTYPE);
-	m_bIsProjectItem = HyGlobal::IsItemType_Project(m_eTYPE);
-
 	if(propArray.size() != m_EntityModelRef.GetNumStates())
 	{
 		HyGuiLog("EntityTreeItemData::EntityTreeItemData() - propArray size doesn't equal number of this entity states", LOGTYPE_Error);

@@ -27,7 +27,7 @@ AtlasFrame::AtlasFrame(IManagerModel &modelRef,
 					   int iY,
 					   int iTextureIndex,
 					   uint uiErrors) :
-	IAssetItemData(modelRef, eType, uuid, uiChecksum, uiBankId, sName, ".png", uiErrors),
+	IAssetItemData(modelRef, /*eType*/ITEM_AtlasFrame, uuid, uiChecksum, uiBankId, sName, ".png", uiErrors),
 	m_iWidth(iW),
 	m_iHeight(iH),
 	m_rAlphaCrop(rAlphaCrop),
