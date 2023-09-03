@@ -19,7 +19,8 @@ IAssetItemData::IAssetItemData(IManagerModel &modelRef, ItemType eType, QUuid uu
 	m_sMetaFileExt(sMetaFileExt),
 	m_uiErrors(uiErrors) // '0' when there is no error
 {
-	m_bIsAssetItem = true;
+	if(HyGlobal::IsItemType_Asset(m_eTYPE) == false)
+		HyGuiLog("IAssetItemData::IAssetItemData() was passed a type that wasn't an 'asset'", LOGTYPE_Error);
 }
 
 AssetManagerType IAssetItemData::GetAssetManagerType() const

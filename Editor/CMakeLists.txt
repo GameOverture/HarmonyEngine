@@ -216,10 +216,12 @@ if(Qt5_DIR)
 		src/Shared/TransformCtrl.cpp
 		src/Shared/TransformCtrl.h
 		src/Shared/Properties/PropertiesTreeModel.cpp
-		src/Shared/Properties/PropertiesTreeView.cpp
-		src/Shared/Properties/PropertiesUndoCmd.cpp
 		src/Shared/Properties/PropertiesTreeModel.h
+		src/Shared/Properties/PropertiesTreeMultiModel.cpp
+		src/Shared/Properties/PropertiesTreeMultiModel.h
+		src/Shared/Properties/PropertiesTreeView.cpp
 		src/Shared/Properties/PropertiesTreeView.h
+		src/Shared/Properties/PropertiesUndoCmd.cpp
 		src/Shared/Properties/PropertiesUndoCmd.h
 		src/Shared/TreeModel/ITreeModel.cpp
 		src/Shared/TreeModel/TreeModelItem.cpp

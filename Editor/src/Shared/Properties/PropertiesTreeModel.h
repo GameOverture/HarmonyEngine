@@ -123,16 +123,16 @@ public:
 	const PropertiesDef GetPropertyDefinition(const QModelIndex &indexRef) const;
 	const PropertiesDef FindPropertyDefinition(QString sCategoryName, QString sPropertyName) const;
 	
-	void SetToggle(const QModelIndex &indexRef, bool bToggleOn);
+	virtual void SetToggle(const QModelIndex &indexRef, bool bToggleOn);
 
 	QVariant GetPropertyValue(const QModelIndex &indexRef) const;
 	QVariant GetPropertyValue(int iCategoryIndex, int iPropertyIndex) const;
 	bool IsPropertyDefaultValue(int iCategoryIndex, int iPropertyIndex) const;
 	QVariant FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
-	void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
+	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
 
-	bool IsCategoryEnabled(QString sCategoryName);
-	bool IsCategoryEnabled(int iCategoryIndex);
+	bool IsCategoryEnabled(QString sCategoryName) const;
+	bool IsCategoryEnabled(int iCategoryIndex) const;
 	int GetNumCategories() const;
 	QString GetCategoryName(int iCategoryIndex) const;
 	bool IsCategoryCheckable(int iCategoryIndex) const;

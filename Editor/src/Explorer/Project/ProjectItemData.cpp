@@ -47,7 +47,8 @@ ProjectItemData::ProjectItemData(Project &projRef,
 	m_pWidget(nullptr),
 	m_pDraw(nullptr)
 {
-	m_bIsProjectItem = true;
+	if(HyGlobal::IsItemType_Project(m_eTYPE) == false)
+		HyGuiLog("ProjectItemData::ProjectItemData() was passed a type that wasn't an 'Project Item'", LOGTYPE_Error);
 
 	m_pUndoStack = new QUndoStack(this);
 	m_pActionUndo = m_pUndoStack->createUndoAction(nullptr, "&Undo");

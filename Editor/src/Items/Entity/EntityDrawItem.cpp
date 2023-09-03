@@ -300,7 +300,7 @@ SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, const QLi
 	return true;
 }
 
-// NOTE: The following functions share logic that handle all the item specific properties: EntityStateData::InitalizePropertyModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp - ApplyProperties
+// NOTE: The following functions share logic that handle all the item specific properties: EntityTreeItemData::InitPropertiesModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp - ApplyProperties
 //		 Updates here should reflect to the functions above
 void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propObj, HyCamera2d *pCamera)
 {

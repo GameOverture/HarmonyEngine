@@ -69,7 +69,7 @@ const PropertiesDef PropertiesTreeModel::FindPropertyDefinition(QString sCategor
 	return PropertiesDef();
 }
 
-void PropertiesTreeModel::SetToggle(const QModelIndex &indexRef, bool bToggleOn)
+/*virtual*/ void PropertiesTreeModel::SetToggle(const QModelIndex &indexRef, bool bToggleOn)
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
 	m_PropertyDefMap[pTreeItem].eAccessType = bToggleOn ? PROPERTIESACCESS_ToggleOn : PROPERTIESACCESS_ToggleOff;
@@ -113,7 +113,7 @@ QVariant PropertiesTreeModel::FindPropertyValue(QString sCategoryName, QString s
 	return QVariant();
 }
 
-void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)
+/*virtual*/ void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
@@ -139,7 +139,7 @@ void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPrope
 	}
 }
 
-bool PropertiesTreeModel::IsCategoryEnabled(QString sCategoryName)
+bool PropertiesTreeModel::IsCategoryEnabled(QString sCategoryName) const
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
@@ -158,7 +158,7 @@ bool PropertiesTreeModel::IsCategoryEnabled(QString sCategoryName)
 	return false;
 }
 
-bool PropertiesTreeModel::IsCategoryEnabled(int iCategoryIndex)
+bool PropertiesTreeModel::IsCategoryEnabled(int iCategoryIndex) const
 {
 	TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(iCategoryIndex);
 	const PropertiesDef &categoryPropDefRef = m_PropertyDefMap[pCategoryTreeItem];
