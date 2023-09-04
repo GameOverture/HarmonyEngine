@@ -285,7 +285,7 @@
         <enum>QTabWidget::South</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tabOutputLog">
         <attribute name="title">
@@ -333,13 +333,13 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QWidget" name="assetInspector" native="true"/>
+          <widget class="AuxAssetInspector" name="assetInspector" native="true"/>
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tabToolBox">
+       <widget class="QWidget" name="tabDopeSheet">
         <attribute name="title">
-         <string>Tool Box</string>
+         <string>Entity Dope Sheet</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_7">
          <property name="spacing">
@@ -358,7 +358,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QWidget" name="toolBox" native="true"/>
+          <widget class="AuxDopeSheet" name="dopeSheet" native="true"/>
          </item>
         </layout>
        </widget>
@@ -872,6 +872,18 @@
    <class>ExplorerWidget</class>
    <extends>QWidget</extends>
    <header>ExplorerWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AuxAssetInspector</class>
+   <extends>QWidget</extends>
+   <header>AuxAssetInspector.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AuxDopeSheet</class>
+   <extends>QWidget</extends>
+   <header>AuxDopeSheet.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

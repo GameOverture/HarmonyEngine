@@ -15,6 +15,7 @@ AuxToolBox::AuxToolBox(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::AuxToolBox)
 {
+	ui->setupUi(this);
 }
 
 /*virtual*/ AuxToolBox::~AuxToolBox()

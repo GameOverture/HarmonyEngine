@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AuxDopeSheet</class>
+ <widget class="QWidget" name="AuxDopeSheet">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>739</width>
+    <height>195</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QToolButton" name="btnRewind">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnPreviousKeyFrame">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnPlayAnimations">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnNextKeyFrame">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnLastKeyFrame">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Frames Per Second</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="sbFramesPerSecond">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="value">
+        <number>60</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBox">
+       <property name="text">
+        <string>CheckBox</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGraphicsView" name="graphicsView"/>
+   </item>
+  </layout>
+  <action name="actionRewind">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/media-rewind.png</normaloff>:/icons16x16/media-rewind.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rewind</string>
+   </property>
+   <property name="toolTip">
+    <string>Jump to the start of the timeline</string>
+   </property>
+  </action>
+  <action name="actionPreviousKeyFrame">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-left.png</normaloff>:/icons16x16/generic-left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Previous Key Frame</string>
+   </property>
+   <property name="toolTip">
+    <string>Jump to previous key frame</string>
+   </property>
+  </action>
+  <action name="actionPlayAnimations">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/media-play.png</normaloff>:/icons16x16/media-play.png</iconset>
+   </property>
+   <property name="text">
+    <string>Play Animations</string>
+   </property>
+   <property name="toolTip">
+    <string>Play the animation</string>
+   </property>
+  </action>
+  <action name="actionNextKeyFrame">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-right.png</normaloff>:/icons16x16/generic-right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Next Key Frame</string>
+   </property>
+   <property name="toolTip">
+    <string>Jump to the next key frame</string>
+   </property>
+  </action>
+  <action name="actionLastKeyFrame">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/media-forward.png</normaloff>:/icons16x16/media-forward.png</iconset>
+   </property>
+   <property name="text">
+    <string>Last Key Frame</string>
+   </property>
+   <property name="toolTip">
+    <string>Jump to the last key frame</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../../../data/HyEditor.qrc"/>
+ </resources>
+ <connections/>
+</ui>

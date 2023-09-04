@@ -18,6 +18,7 @@
 
 #include <QObject>
 #include <QJsonArray>
+#include <QGraphicsScene>
 
 #define ENTCOLOR_TransformBv HyColor::Blue.Lighten()
 #define ENTCOLOR_Primitive HyColor::DarkMagenta
@@ -32,13 +33,9 @@
 
 class EntityStateData : public IStateData
 {
-	//int														m_iFramesPerSecond;
-	//struct KeyFrame
-	//{
-	//	QJsonObject											m_DescObj;
-	//	QJsonArray											m_PropsArray;
-	//};
-	//QMap<int, KeyFrame>
+	int														m_iFramesPerSecond;
+	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>		m_KeyFramesMap;
+
 	QMap<EntityTreeItemData *, PropertiesTreeModel *>		m_PropertiesMap;
 
 public:
@@ -47,8 +44,6 @@ public:
 
 	void InsertNewPropertiesModel(EntityTreeItemData *pItemData, QJsonObject propObj);
 	PropertiesTreeModel *GetPropertiesTreeModel(EntityTreeItemData *pItemData) const;
-
-	void InitalizePropertyModel(EntityTreeItemData *pItemData, PropertiesTreeModel &propertiesTreeModelRef) const;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityModel : public IModel
@@ -58,6 +53,8 @@ class EntityModel : public IModel
 	EntityTreeModel *									m_pTreeModel;
 	bool												m_bVertexEditMode;
 
+	QGraphicsScene										m_DopeSheetScene;
+
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
@@ -65,6 +62,7 @@ public:
 	void InitEntityNodeTreeItems(const FileDataPair &itemFileData);
 
 	EntityTreeModel *GetTreeModel();
+	QGraphicsScene *GetDopeSheetScene();
 
 	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from this constructor and from UndoCmd's
 	QList<EntityTreeItemData *> Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow);

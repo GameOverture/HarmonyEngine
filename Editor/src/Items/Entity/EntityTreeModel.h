@@ -36,6 +36,8 @@ class EntityTreeItemData : public TreeModelItemData
 	EntityModel &										m_EntityModelRef;
 	EntityItemType										m_eEntType;
 
+	PropertiesTreeModel									m_PropertiesModel;
+
 	QString												m_sPromotedEntityType;
 	bool												m_bIsForwardDeclared;
 
@@ -116,5 +118,7 @@ protected:
 
 	bool FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, ItemType eItemType, int iRowToCreateAt); // 'pParentTreeItemOut' must point to either Root or BvFolder, it will be reassigned to the ArrayFolder that is either found (return true), or newly created (return false)
 };
+
+void InitalizePropertyModel(EntityTreeItemData *pItemData, PropertiesTreeModel &propertiesTreeModelRef);
 
 #endif // ENTITYTREEMODEL_H

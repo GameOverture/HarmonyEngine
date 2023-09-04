@@ -229,12 +229,15 @@ if(Qt5_DIR)
 		src/Shared/TreeModel/ITreeModel.h
 		src/Shared/TreeModel/TreeModelItem.h
 		src/Shared/TreeModel/TreeModelItemData.h
-		src/Widget/Auxiliary/AuxOutputLog.cpp
-		src/Widget/Auxiliary/AuxOutputLog.h
-		src/Widget/Auxiliary/AuxOutputLog.ui
 		src/Widget/Auxiliary/AuxAssetInspector.cpp
 		src/Widget/Auxiliary/AuxAssetInspector.h
 		src/Widget/Auxiliary/AuxAssetInspector.ui
+		src/Widget/Auxiliary/AuxDopeSheet.cpp
+		src/Widget/Auxiliary/AuxDopeSheet.h
+		src/Widget/Auxiliary/AuxDopeSheet.ui
+		src/Widget/Auxiliary/AuxOutputLog.cpp
+		src/Widget/Auxiliary/AuxOutputLog.h
+		src/Widget/Auxiliary/AuxOutputLog.ui
 		src/Widget/Auxiliary/AuxToolBox.cpp
 		src/Widget/Auxiliary/AuxToolBox.h
 		src/Widget/Auxiliary/AuxToolBox.ui

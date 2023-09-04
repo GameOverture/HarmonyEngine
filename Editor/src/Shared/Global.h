@@ -98,7 +98,8 @@ enum AuxTab
 {
 	AUXTAB_Output = 0,
 	AUXTAB_AssetInspector,
-	AUXTAB_ToolBox
+	AUXTAB_DopeSheet,
+	//AUXTAB_ToolBox
 };
 
 enum LoadingType

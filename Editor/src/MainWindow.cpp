@@ -25,6 +25,7 @@
 #include "ManagerWidget.h"
 #include "SourceModel.h"
 #include "Themes.h"
+#include "EntityModel.h"
 
 #include <QFileDialog>
 #include <QShowEvent>
@@ -129,7 +130,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->dockWidgetProperties->setWidget(nullptr);
 	ui->dockWidgetProperties->hide();
 
-	ui->tabWidgetAux->setTabVisible(AUXTAB_ToolBox, false);
+	ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, false);
 
 	HyGuiLog("Recovering previously opened session...", LOGTYPE_Normal);
 	m_Settings.beginGroup("MainWindow");
@@ -363,6 +364,15 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	sm_pInstance->ui->dockWidgetProperties->setWindowTitle(sWindowTitle);
 	sm_pInstance->ui->dockWidgetProperties->setWidget(pItem->GetWidget());
 
+	if(pItem->GetType() == ITEM_Entity)
+	{
+		sm_pInstance->ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, true);
+		sm_pInstance->ui->tabWidgetAux->setCurrentIndex(AUXTAB_DopeSheet);
+		sm_pInstance->ui->dopeSheet->SetEntityModel(static_cast<EntityModel *>(pItem->GetModel()));
+	}
+	else
+		sm_pInstance->ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, false);
+
 	// Remove all the actions in the "Edit" menu, and replace it with the current item's actions
 	QList<QAction *> editActionList = sm_pInstance->ui->menu_Edit->actions();
 	for(int i = 0; i < editActionList.size(); ++i)
@@ -450,8 +460,10 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		return sm_pInstance->ui->outputLog;
 	case AUXTAB_AssetInspector:
 		return sm_pInstance->ui->assetInspector;
-	case AUXTAB_ToolBox:
-		return sm_pInstance->ui->toolBox;
+	case AUXTAB_DopeSheet:
+		return sm_pInstance->ui->dopeSheet;
+	//case AUXTAB_ToolBox:
+	//	return sm_pInstance->ui->toolBox;
 	}
 
 	return nullptr;
@@ -598,8 +610,8 @@ void MainWindow::on_tabWidgetAux_currentChanged(int iIndex)
 		ui->dockWidgetAuxiliary->setWindowTitle("Asset Inspector");
 		break;
 
-	case AUXTAB_ToolBox:
-		ui->dockWidgetAuxiliary->setWindowTitle("Tool Box");
+	case AUXTAB_DopeSheet:
+		ui->dockWidgetAuxiliary->setWindowTitle("Entity Dope Sheet");
 		break;
 	}
 }
