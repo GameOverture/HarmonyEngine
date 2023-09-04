@@ -32,6 +32,13 @@
 
 class EntityStateData : public IStateData
 {
+	//int														m_iFramesPerSecond;
+	//struct KeyFrame
+	//{
+	//	QJsonObject											m_DescObj;
+	//	QJsonArray											m_PropsArray;
+	//};
+	//QMap<int, KeyFrame>
 	QMap<EntityTreeItemData *, PropertiesTreeModel *>		m_PropertiesMap;
 
 public:

@@ -24,7 +24,7 @@ EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair
 	EntityTreeModel *pTreeModelRef = static_cast<EntityModel &>(modelRef).GetTreeModel();
 	if(pTreeModelRef == nullptr)
 	{
-		HyGuiLog("EntityStateData::EntityStateData - pTreeModelRef was nullptr", LOGTYPE_Error); // When 'pTreeModelRef' is nullptr, this ctor is being called from EntityModel::InitStates<>() which means the tree items haven't been created yet. The tree items are later created within the EntityModel's ctor
+		HyGuiLog("EntityStateData::EntityStateData - pTreeModelRef was nullptr", LOGTYPE_Error);
 		return;
 	}
 
@@ -163,13 +163,13 @@ void EntityStateData::InitalizePropertyModel(EntityTreeItemData *pItemData, Prop
 		propertiesTreeModelRef.AppendProperty("Primitive", "Wireframe", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to render only the wireframe of the shape type", PROPERTIESACCESS_ToggleOff);
 		propertiesTreeModelRef.AppendProperty("Primitive", "Line Thickness", PROPERTIESTYPE_double, 1.0, "When applicable, how thick to render lines", PROPERTIESACCESS_ToggleOff, 1.0, 100.0, 1.0);
 		propertiesTreeModelRef.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc");
-		propertiesTreeModelRef.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
-		propertiesTreeModelRef.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", PROPERTIESACCESS_ToggleOff);
+		propertiesTreeModelRef.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
+		propertiesTreeModelRef.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", PROPERTIESACCESS_ReadOnly);
 		break;
 
 	case ITEM_BoundingVolume:
 		propertiesTreeModelRef.AppendCategory("Shape", QVariant(), false, false, "Use shapes to establish collision, mouse input, hitbox, etc");
-		propertiesTreeModelRef.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
+		propertiesTreeModelRef.AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
 		propertiesTreeModelRef.AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", PROPERTIESACCESS_ReadOnly);
 		propertiesTreeModelRef.AppendCategory("Fixture", QVariant(), true, true, "Become a fixture used in physics simulations and collision");
 		propertiesTreeModelRef.AppendProperty("Fixture", "Density", PROPERTIESTYPE_double, 0.0, "Usually in kg / m^2. A shape should have a non-zero density when the entity's physics is dynamic", PROPERTIESACCESS_ToggleOff, 0.0, fRANGE, 0.001, QString(), QString(), 5);

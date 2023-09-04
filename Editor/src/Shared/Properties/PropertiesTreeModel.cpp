@@ -388,7 +388,8 @@ QJsonObject PropertiesTreeModel::SerializeJson()
 				break;
 			}
 		}
-		propertiesObj.insert(pCategoryTreeItem->data(PROPERTIESCOLUMN_Name).toString(), categoryObj);
+		if(categoryObj.size() > 0)
+			propertiesObj.insert(pCategoryTreeItem->data(PROPERTIESCOLUMN_Name).toString(), categoryObj);
 	}
 
 	return propertiesObj;

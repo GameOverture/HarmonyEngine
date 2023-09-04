@@ -308,38 +308,55 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 		return;
 
 	// Parse all and only the potential categories of the 'eItemType' type, and set the values to 'pHyNode'
-	HyColor colorTint = ENTCOLOR_Shape;
 	if(eItemType != ITEM_BoundingVolume)
 	{
-		QJsonObject commonObj = propObj["Common"].toObject();
-		// "Common", "UUID" is read-only
+		if(propObj.contains("Common"))
+		{
+			QJsonObject commonObj = propObj["Common"].toObject();
+			// "Common", "UUID" is read-only
 
-		if(HyGlobal::IsItemType_Asset(eItemType) == false)
-			pHyNode->SetState(commonObj["State"].toInt());
-		pHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
-		pHyNode->SetTag(commonObj["User Tag"].toVariant().toLongLong());
+			if(HyGlobal::IsItemType_Asset(eItemType) == false && commonObj.contains("State"))
+				pHyNode->SetState(commonObj["State"].toInt());
+			if(commonObj.contains("Update During Paused"))
+				pHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
+			if(commonObj.contains("User Tag"))
+				pHyNode->SetTag(commonObj["User Tag"].toVariant().toLongLong());
+		}
 
-		QJsonObject transformObj = propObj["Transformation"].toObject();
-		QJsonArray posArray = transformObj["Position"].toArray();
-		pHyNode->pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
-		pHyNode->rot.Set(transformObj["Rotation"].toDouble());
-		QJsonArray scaleArray = transformObj["Scale"].toArray();
-		pHyNode->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
+		if(propObj.contains("Transformation"))
+		{
+			QJsonObject transformObj = propObj["Transformation"].toObject();
+			if(transformObj.contains("Position"))
+			{
+				QJsonArray posArray = transformObj["Position"].toArray();
+				pHyNode->pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
+			}
+			if(transformObj.contains("Rotation"))
+				pHyNode->rot.Set(transformObj["Rotation"].toDouble());
+			if(transformObj.contains("Scale"))
+			{
+				QJsonArray scaleArray = transformObj["Scale"].toArray();
+				pHyNode->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
+			}
+		}
 
 		if(eItemType != ITEM_Audio && (pHyNode->GetInternalFlags() & IHyNode::NODETYPE_IsBody) != 0)
 		{
-			QJsonObject bodyObj = propObj["Body"].toObject();
-			pHyNode->SetVisible(bodyObj["Visible"].toBool());
-
-			QJsonArray colorArray = bodyObj["Color Tint"].toArray();
-			colorTint = HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt());
-			static_cast<IHyBody2d *>(pHyNode)->SetTint(colorTint);
-
-			static_cast<IHyBody2d *>(pHyNode)->alpha.Set(bodyObj["Alpha"].toDouble());
-
-			int iDisplayOrder = bodyObj["Display Order"].toInt();
-			if(iDisplayOrder != 0)
-				static_cast<IHyBody2d *>(pHyNode)->SetDisplayOrder(iDisplayOrder);
+			if(propObj.contains("Body"))
+			{
+				QJsonObject bodyObj = propObj["Body"].toObject();
+				if(bodyObj.contains("Visible"))
+					pHyNode->SetVisible(bodyObj["Visible"].toBool());
+				if(bodyObj.contains("Color Tint"))
+				{
+					QJsonArray colorArray = bodyObj["Color Tint"].toArray();
+					static_cast<IHyBody2d *>(pHyNode)->SetTint(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
+				}
+				if(bodyObj.contains("Alpha"))
+					static_cast<IHyBody2d *>(pHyNode)->alpha.Set(bodyObj["Alpha"].toDouble());
+				if(bodyObj.contains("Override Display Order"))
+					static_cast<IHyBody2d *>(pHyNode)->SetDisplayOrder(bodyObj["Override Display Order"].toInt());
+			}
 		}
 	}
 
@@ -350,9 +367,14 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 		break;
 
 	case ITEM_Primitive: {
-		QJsonObject primitiveObj = propObj["Primitive"].toObject();
-		static_cast<HyPrimitive2d *>(pHyNode)->SetWireframe(primitiveObj["Wireframe"].toBool());
-		static_cast<HyPrimitive2d *>(pHyNode)->SetLineThickness(primitiveObj["Line Thickness"].toDouble());
+		if(propObj.contains("Primitive"))
+		{
+			QJsonObject primitiveObj = propObj["Primitive"].toObject();
+			if(primitiveObj.contains("Wireframe"))
+				static_cast<HyPrimitive2d *>(pHyNode)->SetWireframe(primitiveObj["Wireframe"].toBool());
+			if(primitiveObj.contains("Line Thickness"))
+				static_cast<HyPrimitive2d *>(pHyNode)->SetLineThickness(primitiveObj["Line Thickness"].toDouble());
+		}
 	}
 	[[fallthrough]];
 	case ITEM_BoundingVolume: {
@@ -363,7 +385,7 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 
 		if(pShapeCtrl)
 		{
-			pShapeCtrl->Setup(eShape, colorTint, fBvAlpha, fOutlineAlpha);
+			pShapeCtrl->Setup(eShape, ENTCOLOR_Shape, fBvAlpha, fOutlineAlpha);
 			pShapeCtrl->Deserialize(shapeObj["Data"].toString(), pCamera);
 		}
 		// "Fixture" category doesn't need to be set
@@ -375,48 +397,61 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 	case ITEM_Text: {
 		HyText2d *pTextNode = static_cast<HyText2d *>(pHyNode);
 
-		QJsonObject textObj = propObj["Text"].toObject();
-
-		// Apply all text properties before the style, so the ShapeCtrl can properly calculate itself within ShapeCtrl::SetAsText()
-		pTextNode->SetText(textObj["Text"].toString().toStdString());
-		pTextNode->SetTextAlignment(HyGlobal::GetAlignmentFromString(textObj["Alignment"].toString()));
-		pTextNode->SetMonospacedDigits(textObj["Monospaced Digits"].toBool());
-		pTextNode->SetTextIndent(textObj["Text Indent"].toInt());
-
-		// Apply the style and call ShapeCtrl::SetAsText()
-		TextStyle eTextStyle = HyGlobal::GetTextStyleFromString(textObj["Style"].toString());
-		if(eTextStyle == TEXTSTYLE_Line)
+		if(propObj.contains("Text"))
 		{
-			if(pTextNode->IsLine() == false)
-				pTextNode->SetAsLine();
-		}
-		else if(eTextStyle == TEXTSTYLE_Vertical)
-		{
-			if(pTextNode->IsVertical() == false)
-				pTextNode->SetAsVertical();
-		}
-		else
-		{
-			glm::vec2 vStyleSize;
-			QJsonArray styleDimensionsArray = textObj["Style Dimensions"].toArray();
-			if(styleDimensionsArray.size() == 2)
-				HySetVec(vStyleSize, styleDimensionsArray[0].toDouble(), styleDimensionsArray[1].toDouble());
-			else
-				HyGuiLog("Invalid 'Style Dimensions' array size", LOGTYPE_Error);
+			QJsonObject textObj = propObj["Text"].toObject();
 
-			if(eTextStyle == TEXTSTYLE_Column)
+			// Apply all text properties before the style, so the ShapeCtrl can properly calculate itself within ShapeCtrl::SetAsText()
+			if(textObj.contains("Text"))
+				pTextNode->SetText(textObj["Text"].toString().toStdString());
+			if(textObj.contains("Alignment"))
+				pTextNode->SetTextAlignment(HyGlobal::GetAlignmentFromString(textObj["Alignment"].toString()));
+			if(textObj.contains("Monospaced Digits"))
+				pTextNode->SetMonospacedDigits(textObj["Monospaced Digits"].toBool());
+			if(textObj.contains("Text Indent"))
+				pTextNode->SetTextIndent(textObj["Text Indent"].toInt());
+
+			// Apply the style and call ShapeCtrl::SetAsText()
+			if(textObj.contains("Style"))
 			{
-				if(pTextNode->IsColumn() == false || vStyleSize.x != pTextNode->GetTextBoxDimensions().x)
-					pTextNode->SetAsColumn(vStyleSize.x, false);
-			}
-			else // TEXTSTYLE_ScaleBox or TEXTSTYLE_ScaleBoxTopAlign
-			{
-				if(pTextNode->IsScaleBox() == false ||
-					vStyleSize.x != pTextNode->GetTextBoxDimensions().x ||
-					vStyleSize.y != pTextNode->GetTextBoxDimensions().y ||
-					(eTextStyle == TEXTSTYLE_ScaleBox) != pTextNode->IsScaleBoxCenterVertically())
+				TextStyle eTextStyle = HyGlobal::GetTextStyleFromString(textObj["Style"].toString());
+				if(eTextStyle == TEXTSTYLE_Line)
 				{
-					pTextNode->SetAsScaleBox(vStyleSize.x, vStyleSize.y, eTextStyle == TEXTSTYLE_ScaleBox);
+					if(pTextNode->IsLine() == false)
+						pTextNode->SetAsLine();
+				}
+				else if(eTextStyle == TEXTSTYLE_Vertical)
+				{
+					if(pTextNode->IsVertical() == false)
+						pTextNode->SetAsVertical();
+				}
+				else
+				{
+					if(textObj.contains("Style Dimensions"))
+					{
+						glm::vec2 vStyleSize;
+						QJsonArray styleDimensionsArray = textObj["Style Dimensions"].toArray();
+						if(styleDimensionsArray.size() == 2)
+							HySetVec(vStyleSize, styleDimensionsArray[0].toDouble(), styleDimensionsArray[1].toDouble());
+						else
+							HyGuiLog("Invalid 'Style Dimensions' array size", LOGTYPE_Error);
+
+						if(eTextStyle == TEXTSTYLE_Column)
+						{
+							if(pTextNode->IsColumn() == false || vStyleSize.x != pTextNode->GetTextBoxDimensions().x)
+								pTextNode->SetAsColumn(vStyleSize.x, false);
+						}
+						else // TEXTSTYLE_ScaleBox or TEXTSTYLE_ScaleBoxTopAlign
+						{
+							if(pTextNode->IsScaleBox() == false ||
+								vStyleSize.x != pTextNode->GetTextBoxDimensions().x ||
+								vStyleSize.y != pTextNode->GetTextBoxDimensions().y ||
+								(eTextStyle == TEXTSTYLE_ScaleBox) != pTextNode->IsScaleBoxCenterVertically())
+							{
+								pTextNode->SetAsScaleBox(vStyleSize.x, vStyleSize.y, eTextStyle == TEXTSTYLE_ScaleBox);
+							}
+						}
+					}
 				}
 			}
 		}
@@ -425,10 +460,16 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 		break; }
 
 	case ITEM_Sprite: {
-		QJsonObject spriteObj = propObj["Sprite"].toObject();
-		static_cast<HySprite2d *>(pHyNode)->SetFrame(spriteObj["Frame"].toInt());
-		static_cast<HySprite2d *>(pHyNode)->SetAnimRate(spriteObj["Anim Rate"].toDouble());
-		static_cast<HySprite2d *>(pHyNode)->SetAnimPause(spriteObj["Anim Paused"].toBool());
+		if(propObj.contains("Sprite"))
+		{
+			QJsonObject spriteObj = propObj["Sprite"].toObject();
+			if(spriteObj.contains("Frame"))
+				static_cast<HySprite2d *>(pHyNode)->SetFrame(spriteObj["Frame"].toInt());
+			if(spriteObj.contains("Anim Rate"))
+				static_cast<HySprite2d *>(pHyNode)->SetAnimRate(spriteObj["Anim Rate"].toDouble());
+			if(spriteObj.contains("Anim Paused"))
+				static_cast<HySprite2d *>(pHyNode)->SetAnimPause(spriteObj["Anim Paused"].toBool());
+		}
 		break; }
 
 	default:
