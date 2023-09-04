@@ -133,7 +133,10 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 		if(uiNumQueued > 0)
 			MainWindow::SetLoading(LOADINGTYPE_HarmonyStreaming, uiTotal - uiNumQueued, uiTotal);
 		else if(MainWindow::GetCurrentLoading().contains(LOADINGTYPE_HarmonyStreaming))
+		{
 			MainWindow::ClearLoading(LOADINGTYPE_HarmonyStreaming);
+			RestoreCursorShape();
+		}
 	}
 }
 

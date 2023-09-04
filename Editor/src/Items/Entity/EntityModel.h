@@ -50,10 +50,10 @@ class EntityModel : public IModel
 {
 	Q_OBJECT
 
-	EntityTreeModel *									m_pTreeModel;
-	bool												m_bVertexEditMode;
+	EntityTreeModel *										m_pTreeModel;
+	bool													m_bVertexEditMode;
 
-	QGraphicsScene										m_DopeSheetScene;
+	QGraphicsScene											m_DopeSheetScene;
 
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
