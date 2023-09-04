@@ -341,9 +341,12 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 			glm::decompose(m_NewTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
 			double dRotation = glm::degrees(glm::atan(m_NewTransformList[i][0][1], m_NewTransformList[i][0][0]));
 
-			pPropTreeModel->SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
-			pPropTreeModel->SetPropertyValue("Transformation", "Rotation", dRotation);
-			pPropTreeModel->SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+			if(pPropTreeModel->FindPropertyValue("Transformation", "Position").toPointF() != QPointF(ptTranslation.x, ptTranslation.y))
+				pPropTreeModel->SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
+			if(pPropTreeModel->FindPropertyValue("Transformation", "Rotation").toDouble() != dRotation)
+				pPropTreeModel->SetPropertyValue("Transformation", "Rotation", dRotation);
+			if(pPropTreeModel->FindPropertyValue("Transformation", "Scale").toPointF() != QPointF(vScale.x, vScale.y))
+				pPropTreeModel->SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
 
 			m_sOldShapeDataList.push_back(QString());
 		}
