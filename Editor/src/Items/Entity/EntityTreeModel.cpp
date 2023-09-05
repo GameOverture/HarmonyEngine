@@ -25,21 +25,21 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	m_ReferencedItemUuid(uuidOfReferencedItem),
 	m_bIsSelected(false)
 {
-	// TODO: Remove below
 	if(m_eEntType == ENTTYPE_Root || m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_ArrayItem)
 	{
 		// TODO: Make InitalizePropertyModel apart of this class
 		InitalizePropertyModel(this, m_PropertiesModel);
 
-		for(int i = 0; i < m_EntityModelRef.GetNumStates(); ++i)
-		{
-			EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityModelRef.GetStateData(i));
-			pStateData->InsertNewPropertiesModel(this, QJsonObject());
-		}
+		//// TODO: Remove below
+		//for(int i = 0; i < m_EntityModelRef.GetNumStates(); ++i)
+		//{
+		//	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityModelRef.GetStateData(i));
+		//	pStateData->InsertNewPropertiesModel(this, QJsonObject());
+		//}
 	}
 }
 
-EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QJsonObject descObj, QJsonArray propArray, bool bIsArrayItem) :
+EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QJsonObject descObj, bool bIsArrayItem) :
 	TreeModelItemData(HyGlobal::GetTypeFromString(descObj["itemType"].toString()), descObj["UUID"].toString(), descObj["codeName"].toString()),
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(bIsArrayItem ? ENTTYPE_ArrayItem : ENTTYPE_Item),
@@ -52,18 +52,18 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	// TODO: Make InitalizePropertyModel apart of this class
 	InitalizePropertyModel(this, m_PropertiesModel);
 
-	// TODO: Remove below
-	if(propArray.size() != m_EntityModelRef.GetNumStates())
-	{
-		HyGuiLog("EntityTreeItemData::EntityTreeItemData() - propArray size doesn't equal number of this entity states", LOGTYPE_Error);
-		return;
-	}
+	//// TODO: Remove below
+	//if(propArray.size() != m_EntityModelRef.GetNumStates())
+	//{
+	//	HyGuiLog("EntityTreeItemData::EntityTreeItemData() - propArray size doesn't equal number of this entity states", LOGTYPE_Error);
+	//	return;
+	//}
 
-	for(int i = 0; i < m_EntityModelRef.GetNumStates(); ++i)
-	{
-		EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityModelRef.GetStateData(i));
-		pStateData->InsertNewPropertiesModel(this, propArray[i].toObject());
-	}
+	//for(int i = 0; i < m_EntityModelRef.GetNumStates(); ++i)
+	//{
+	//	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityModelRef.GetStateData(i));
+	//	pStateData->InsertNewPropertiesModel(this, propArray[i].toObject());
+	//}
 }
 
 /*virtual*/ EntityTreeItemData::~EntityTreeItemData()
@@ -124,12 +124,9 @@ bool EntityTreeItemData::IsForwardDeclared() const
 	return m_bIsForwardDeclared;
 }
 
-PropertiesTreeModel *EntityTreeItemData::GetPropertiesModel(int iStateIndex)
+PropertiesTreeModel &EntityTreeItemData::GetPropertiesModel()
 {
-	if(m_eEntType == ENTTYPE_BvFolder || m_eEntType == ENTTYPE_ArrayFolder)
-		return nullptr;
-
-	return static_cast<EntityStateData *>(m_EntityModelRef.GetStateData(iStateIndex))->GetPropertiesTreeModel(this);
+	return m_PropertiesModel;
 }
 
 bool EntityTreeItemData::IsSelected() const
@@ -348,7 +345,7 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName, QUuid uuidOfEntity, QObject *pParent /*= nullptr*/) :
+EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName, QJsonObject fileMetaObj, QObject *pParent /*= nullptr*/) :
 	ITreeModel(NUMCOLUMNS, QStringList(), pParent),
 	m_ModelRef(modelRef)
 {
@@ -358,7 +355,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		HyGuiLog("EntityTreeModel::EntityTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
-	EntityTreeItemData *pThisEntityItem = new EntityTreeItemData(m_ModelRef, false, sEntityCodeName, ITEM_Entity, ENTTYPE_Root, uuidOfEntity, uuidOfEntity);
+	EntityTreeItemData *pThisEntityItem = new EntityTreeItemData(m_ModelRef, false, sEntityCodeName, ITEM_Entity, ENTTYPE_Root, QUuid(fileMetaObj["UUID"].toString()), QUuid(fileMetaObj["UUID"].toString()));
 	QVariant v;
 	v.setValue<EntityTreeItemData *>(pThisEntityItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
@@ -381,6 +378,27 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		if(setData(index(1, iCol, QModelIndex()), shapeData, Qt::UserRole) == false)
 			HyGuiLog("EntityTreeModel::EntityTreeModel() - setData failed", LOGTYPE_Error);
 	}
+
+	// Insert all the 'children' and 'shape' items
+	std::function<void(const QJsonArray &)> fpPopulateNodeTreeItems = [&](const QJsonArray &itemListArray)
+	{
+		for(int i = 0; i < itemListArray.size(); ++i)
+		{
+			if(itemListArray[i].isObject())
+				m_ModelRef.Cmd_AddNewItem(itemListArray[i].toObject(), false, i);
+			else if(itemListArray[i].isArray())
+			{
+				QJsonArray subItemArray = itemListArray[i].toArray();
+				for(int j = 0; j < subItemArray.size(); ++j)
+					m_ModelRef.Cmd_AddNewItem(subItemArray[j].toObject(), true, j == 0 ? i : j);
+			}
+			else
+				HyGuiLog("EntityTreeModel::EntityTreeModel invalid JSON type", LOGTYPE_Error);
+		}
+	};
+	// Insert all the 'child' items into the nodeTree
+	fpPopulateNodeTreeItems(fileMetaObj["descChildList"].toArray());
+	fpPopulateNodeTreeItems(fileMetaObj["descShapeList"].toArray());
 }
 
 /*virtual*/ EntityTreeModel::~EntityTreeModel()
@@ -602,7 +620,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewAsset(IAssetItemData *pAssetIt
 	return pNewItem;
 }
 
-EntityTreeItemData *EntityTreeModel::Cmd_InsertNewItem(QJsonObject descObj, QJsonArray propArray, bool bIsArrayItem, int iRow /*= -1*/)
+EntityTreeItemData *EntityTreeModel::Cmd_InsertNewItem(QJsonObject descObj, bool bIsArrayItem, int iRow /*= -1*/)
 {
 	ItemType eGuiType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
 	QString sCodeName = descObj["codeName"].toString();
@@ -619,7 +637,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_InsertNewItem(QJsonObject descObj, QJso
 	if(bIsArrayItem)
 		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, sCodeName, eGuiType, iRow);
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ShouldForwardDeclare(descObj), descObj, propArray, bIsArrayItem);
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ShouldForwardDeclare(descObj), descObj, bIsArrayItem);
 	iRow = (iRow < 0 || (bIsArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 

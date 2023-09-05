@@ -93,12 +93,6 @@ void ProjectItemData::LoadModel()
 		break;
 	case ITEM_Entity:
 		m_pModel = new EntityModel(*this, m_ItemFileData);
-		if(m_ItemFileData.m_Meta.contains("stateArray") == false || m_ItemFileData.m_Meta["stateArray"].toArray().size() == 0)
-		{
-			FileDataPair tmpFileData;
-			GetLatestFileData(tmpFileData);
-			static_cast<EntityModel *>(m_pModel)->InitEntityNodeTreeItems(tmpFileData);
-		}
 		break;
 	case ITEM_Prefab:
 		m_pModel = new PrefabModel(*this, m_ItemFileData);

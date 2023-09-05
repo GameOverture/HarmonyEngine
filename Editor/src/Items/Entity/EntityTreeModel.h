@@ -47,7 +47,7 @@ class EntityTreeItemData : public TreeModelItemData
 
 public:
 	EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfReferencedItem, QUuid uuidOfThis);
-	EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QJsonObject descObj, QJsonArray propArray, bool bIsArrayItem);
+	EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QJsonObject descObj, bool bIsArrayItem);
 	virtual ~EntityTreeItemData();
 
 	EntityItemType GetEntType() const;
@@ -57,7 +57,7 @@ public:
 	QString GetHyNodeTypeName() const;
 	bool IsForwardDeclared() const;
 
-	PropertiesTreeModel *GetPropertiesModel(int iStateIndex);
+	PropertiesTreeModel &GetPropertiesModel();
 
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);
@@ -69,6 +69,8 @@ public:
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityTreeModel : public ITreeModel
 {
+	friend class EntityModel;
+
 	Q_OBJECT
 
 	EntityModel &										m_ModelRef;
@@ -82,7 +84,7 @@ class EntityTreeModel : public ITreeModel
 	};
 
 public:
-	explicit EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName, QUuid uuidOfEntity, QObject *pParent = nullptr);
+	explicit EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName, QJsonObject fileMetaObj, QObject *pParent = nullptr);
 	virtual ~EntityTreeModel();
 	
 	TreeModelItem *GetRootTreeItem() const;
@@ -98,13 +100,16 @@ public:
 	EntityTreeItemData *FindTreeItemData(QUuid uuid) const;
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
+
+private: // These functions should only be called by EntityModel's Cmd_ functions
 	EntityTreeItemData *Cmd_InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewAsset(IAssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
-	EntityTreeItemData *Cmd_InsertNewItem(QJsonObject descObj, QJsonArray propArray, bool bIsArrayItem, int iRow = -1);
+	EntityTreeItemData *Cmd_InsertNewItem(QJsonObject descObj, bool bIsArrayItem, int iRow = -1);
 	EntityTreeItemData *Cmd_InsertNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, QString sCodeNamePrefix, int iRow = -1);
 	bool Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow);
 	int32 Cmd_PopChild(EntityTreeItemData *pItem);
 
+public:
 	QVariant data(const QModelIndex &index, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 

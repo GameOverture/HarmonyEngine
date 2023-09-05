@@ -19,85 +19,165 @@
 #include "SourceModel.h"
 
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
-	IStateData(iStateIndex, modelRef, stateFileData)
+	IStateData(iStateIndex, modelRef, stateFileData),
+	m_iFramesPerSecond(stateFileData.m_Meta["framesPerSecond"].toInt())
 {
-	EntityTreeModel *pTreeModelRef = static_cast<EntityModel &>(modelRef).GetTreeModel();
-	if(pTreeModelRef == nullptr)
+	QJsonObject keyFramesObj = stateFileData.m_Meta["keyFrames"].toObject();
+	for(auto iter = keyFramesObj.begin(); iter != keyFramesObj.end(); ++iter)
 	{
-		HyGuiLog("EntityStateData::EntityStateData - pTreeModelRef was nullptr", LOGTYPE_Error);
-		return;
+		EntityTreeItemData *pItemData = static_cast<EntityModel &>(m_ModelRef).GetTreeModel()->FindTreeItemData(QUuid(iter.key()));
+		if(pItemData == nullptr)
+		{
+			HyGuiLog("EntityStateData::EntityStateData - item " % iter.key() % " was not found", LOGTYPE_Error);
+			continue;
+		}
+
+		QJsonArray keyFramesArray = iter.value().toArray();
+		for(int i = 0; i < keyFramesArray.size(); ++i)
+			m_KeyFramesMap[pItemData][keyFramesArray[i].toObject()["frame"].toInt()] = keyFramesArray[i].toObject()["prop"].toObject();
 	}
 
-	// NOTE: If we get here, 'stateFileData' will contain valid data (since it was just copied from an existing state) and all entity tree items exist and have been created prior
-	
-	// Get all the items (both child and shape) and then init their properties
-	QList<EntityTreeItemData *> childList;
-	QList<EntityTreeItemData *> shapeList;
-	pTreeModelRef->GetTreeItemData(childList, shapeList);
+	//EntityTreeModel *pTreeModelRef = static_cast<EntityModel &>(modelRef).GetTreeModel();
+	//if(pTreeModelRef == nullptr)
+	//{
+	//	HyGuiLog("EntityStateData::EntityStateData - pTreeModelRef was nullptr", LOGTYPE_Error);
+	//	return;
+	//}
 
-	// Init 'root'
-	QJsonObject propRootObj;
-	if(stateFileData.m_Meta.contains("propRoot"))
-		propRootObj = stateFileData.m_Meta["propRoot"].toObject();
-	InsertNewPropertiesModel(pTreeModelRef->GetRootTreeItemData(), propRootObj);
+	//// NOTE: If we get here, 'stateFileData' will contain valid data (since it was just copied from an existing state) and all entity tree items exist and have been created prior
+	//
+	//// Get all the items (both child and shape) and then init their properties
+	//QList<EntityTreeItemData *> childList;
+	//QList<EntityTreeItemData *> shapeList;
+	//pTreeModelRef->GetTreeItemData(childList, shapeList);
 
-	// Init 'child list'
-	QJsonArray propChildListArray = stateFileData.m_Meta["propChildList"].toArray();
-	//if(propChildListArray.size() != childList.size())
-	//	HyGuiLog("EntityStateData::EntityStateData - stateFileData.m_Meta didn't have valid \"propChildList\"", LOGTYPE_Error);
-	for(int i = 0; i < childList.size(); ++i)
-	{
-		QJsonObject propChildObj;
-		if(propChildListArray.size() > i)
-			propChildObj = propChildListArray[i].toObject();
+	//// Init 'root'
+	//QJsonObject propRootObj;
+	//if(stateFileData.m_Meta.contains("propRoot"))
+	//	propRootObj = stateFileData.m_Meta["propRoot"].toObject();
+	//InsertNewPropertiesModel(pTreeModelRef->GetRootTreeItemData(), propRootObj);
 
-		InsertNewPropertiesModel(childList[i], propChildObj);
-	}
+	//// Init 'child list'
+	//QJsonArray propChildListArray = stateFileData.m_Meta["propChildList"].toArray();
+	////if(propChildListArray.size() != childList.size())
+	////	HyGuiLog("EntityStateData::EntityStateData - stateFileData.m_Meta didn't have valid \"propChildList\"", LOGTYPE_Error);
+	//for(int i = 0; i < childList.size(); ++i)
+	//{
+	//	QJsonObject propChildObj;
+	//	if(propChildListArray.size() > i)
+	//		propChildObj = propChildListArray[i].toObject();
 
-	// Init 'shape list'
-	QJsonArray propShapeListArray = stateFileData.m_Meta["propShapeList"].toArray();
-	//if(propShapeListArray.size() != shapeList.size())
-	//	HyGuiLog("EntityStateData::EntityStateData - stateFileData.m_Meta didn't have valid \"propShapeList\"", LOGTYPE_Error);
-	for(int i = 0; i < shapeList.size(); ++i)
-	{
-		QJsonObject propShapeObj;
-		if(propShapeListArray.size() > i)
-			propShapeObj = propShapeListArray[i].toObject();
+	//	InsertNewPropertiesModel(childList[i], propChildObj);
+	//}
 
-		InsertNewPropertiesModel(shapeList[i], propShapeObj);
-	}
+	//// Init 'shape list'
+	//QJsonArray propShapeListArray = stateFileData.m_Meta["propShapeList"].toArray();
+	////if(propShapeListArray.size() != shapeList.size())
+	////	HyGuiLog("EntityStateData::EntityStateData - stateFileData.m_Meta didn't have valid \"propShapeList\"", LOGTYPE_Error);
+	//for(int i = 0; i < shapeList.size(); ++i)
+	//{
+	//	QJsonObject propShapeObj;
+	//	if(propShapeListArray.size() > i)
+	//		propShapeObj = propShapeListArray[i].toObject();
+
+	//	InsertNewPropertiesModel(shapeList[i], propShapeObj);
+	//}
 }
 
 /*virtual*/ EntityStateData::~EntityStateData()
 {
-	QList<EntityTreeItemData *> keyList = m_PropertiesMap.keys();
-	for(EntityTreeItemData *pKey : keyList)
-		delete m_PropertiesMap[pKey];
+	//QList<EntityTreeItemData *> keyList = m_PropertiesMap.keys();
+	//for(EntityTreeItemData *pKey : keyList)
+	//	delete m_PropertiesMap[pKey];
 }
 
-void EntityStateData::InsertNewPropertiesModel(EntityTreeItemData *pItemData, QJsonObject propObj)
+int EntityStateData::GetFramesPerSecond() const
 {
-	if(m_PropertiesMap.contains(pItemData))
-	{
-		HyGuiLog("EntityStateData::InsertNewPropertiesModel - item already was added", LOGTYPE_Error);
-		return;
-	}
-
-	PropertiesTreeModel *pNewProperties = new PropertiesTreeModel(m_ModelRef.GetItem(), m_iINDEX, QVariant());
-	InitalizePropertyModel(pItemData, *pNewProperties);
-	pNewProperties->DeserializeJson(propObj);
-
-	m_PropertiesMap.insert(pItemData, pNewProperties);
+	return m_iFramesPerSecond;
 }
 
-PropertiesTreeModel *EntityStateData::GetPropertiesTreeModel(EntityTreeItemData *pItemData) const
+//void EntityStateData::InsertNewPropertiesModel(EntityTreeItemData *pItemData, QJsonObject propObj)
+//{
+//	if(m_PropertiesMap.contains(pItemData))
+//	{
+//		HyGuiLog("EntityStateData::InsertNewPropertiesModel - item already was added", LOGTYPE_Error);
+//		return;
+//	}
+//
+//	PropertiesTreeModel *pNewProperties = new PropertiesTreeModel(m_ModelRef.GetItem(), m_iINDEX, QVariant());
+//	InitalizePropertyModel(pItemData, *pNewProperties);
+//	pNewProperties->DeserializeJson(propObj);
+//
+//	m_PropertiesMap.insert(pItemData, pNewProperties);
+//}
+
+QJsonArray EntityStateData::SerializeKeyFrames(EntityTreeItemData *pItemData) const
 {
-	if(m_PropertiesMap.contains(pItemData) == false)
+	if(m_KeyFramesMap.contains(pItemData) == false)
+		return QJsonArray();
+
+	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
+
+	QJsonArray serializedKeyFramesArray;
+	for(QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.begin(); iter != itemKeyFrameMapRef.end(); ++iter)
 	{
-		HyGuiLog("EntityStateData::GetPropertiesTreeModel - pItemData was not found", LOGTYPE_Error);
-		return nullptr;
+		QJsonObject serializedKeyFramesObj;
+		serializedKeyFramesObj["frame"] = iter.key();
+		serializedKeyFramesObj["props"] = iter.value();
+		serializedKeyFramesArray.append(serializedKeyFramesObj);
 	}
-	return m_PropertiesMap[pItemData];
+
+	return serializedKeyFramesArray;
+}
+
+QJsonObject EntityStateData::ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData, int iFrameIndex) const
+{
+	if(m_KeyFramesMap.contains(pItemData) == false)
+		return QJsonObject();
+
+	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
+
+	// Get the closest key frame that is less than or equal to 'iFrameIndex'
+	QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.find(iFrameIndex);
+	if(iter == itemKeyFrameMapRef.end())
+	{
+		iter = itemKeyFrameMapRef.lowerBound(iFrameIndex);
+		if(iter != itemKeyFrameMapRef.begin())
+			iter--;
+	}
+
+	// TODO: Need to extrapolate any tweens that are currently active
+
+
+
+	// Starting with this key frame and going backwards in time, combine any properties from key frames that haven't been set yet
+	// This creates an 'extrapolatedPropObj' that contains all the properties that have been set from the beginning of the timeline, up to 'iFrameIndex'
+	QJsonObject extrapolatedPropObj = iter.value();
+	while(iter != itemKeyFrameMapRef.begin())
+	{
+		iter--;
+		QJsonObject curKeyFrameObj = iter.value();
+		for(QString sCategoryName : curKeyFrameObj.keys())
+		{
+			if(extrapolatedPropObj.contains(sCategoryName) == false)
+				extrapolatedPropObj.insert(sCategoryName, curKeyFrameObj[sCategoryName]);
+			else
+			{
+				QJsonObject extrapolatedCategoryObj = extrapolatedPropObj[sCategoryName].toObject();
+				QJsonObject curCategoryObj = curKeyFrameObj[sCategoryName].toObject();
+
+				for(QString sPropName : curCategoryObj.keys())
+				{
+					if(extrapolatedCategoryObj.contains(sPropName) == false)
+						extrapolatedCategoryObj.insert(sPropName, curCategoryObj[sPropName]);
+				}
+
+				extrapolatedPropObj.insert(sCategoryName, extrapolatedCategoryObj);
+			}
+		}
+	}
+
+	return extrapolatedPropObj;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,87 +191,37 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 {
 	m_DopeSheetScene.setBackgroundBrush(Qt::blue);
 
-	// First initialize the states so they exist before we try to add properties to them
-	m_pTreeModel = new EntityTreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta["UUID"].toString(), this);
-	InitStates<EntityStateData>(itemFileDataRef);
+	m_pTreeModel = new EntityTreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this);
+	//// Each element in QList<> represents a state's properties for all the children or shapes
+	//QList<QJsonObject> propRootObjectList;
+	//QList<QJsonArray> propChildArrayList;
+	//QList<QJsonArray> propShapeArrayList;
+	//QJsonArray stateArray = itemFileData.m_Meta["stateArray"].toArray();
+	//for(int i = 0; i < /*m_StateList.size()*/stateArray.size(); ++i)
+	//{
+	//	QJsonObject stateObj = stateArray[i].toObject();
+	//	propRootObjectList.push_back(stateObj["propRoot"].toObject());
+	//	propChildArrayList.push_back(stateObj["propChildList"].toArray());
+	//	propShapeArrayList.push_back(stateObj["propShapeList"].toArray());
+	//}
+	//if(GetNumStates() == 0 ||
+	//	propChildArrayList.size() != GetNumStates() ||
+	//	propShapeArrayList.size() != GetNumStates() ||
+	//	propRootObjectList.size() != GetNumStates())
+	//{
+	//	HyGuiLog("EntityModel::EntityModel - invalid number of states when parsing properties", LOGTYPE_Error);
+	//}
 
-	if(itemFileDataRef.m_Meta.contains("stateArray") && itemFileDataRef.m_Meta["stateArray"].toArray().size() > 0)
-		InitEntityNodeTreeItems(itemFileDataRef);
+	// NOTE: Root and BvFolder items are already created in the constructor of EntityTreeModel
+	
+
+	// The EntityTreeModel was initialized first so that all the EntityTreeItemData's exist. InitStates will look them up using their UUID when initializing its Key Frames map
+	InitStates<EntityStateData>(itemFileDataRef);
 }
 
 /*virtual*/ EntityModel::~EntityModel()
 {
 	delete m_pTreeModel;
-}
-
-void EntityModel::InitEntityNodeTreeItems(const FileDataPair &itemFileData)
-{
-	// Each element in QList<> represents a state's properties for all the children or shapes
-	QList<QJsonObject> propRootObjectList;
-	QList<QJsonArray> propChildArrayList;
-	QList<QJsonArray> propShapeArrayList;
-	QJsonArray stateArray = itemFileData.m_Meta["stateArray"].toArray();
-	for(int i = 0; i < /*m_StateList.size()*/stateArray.size(); ++i)
-	{
-		QJsonObject stateObj = stateArray[i].toObject();
-		propRootObjectList.push_back(stateObj["propRoot"].toObject());
-		propChildArrayList.push_back(stateObj["propChildList"].toArray());
-		propShapeArrayList.push_back(stateObj["propShapeList"].toArray());
-	}
-	if(GetNumStates() == 0 ||
-		propChildArrayList.size() != GetNumStates() ||
-		propShapeArrayList.size() != GetNumStates() ||
-		propRootObjectList.size() != GetNumStates())
-	{
-		HyGuiLog("EntityModel::EntityModel - invalid number of states when parsing properties", LOGTYPE_Error);
-	}
-
-	// Initialize root
-	for(int iStateIndex = 0; iStateIndex < GetNumStates(); ++iStateIndex)
-	{
-		QJsonObject propRootObj = propRootObjectList[iStateIndex];
-		m_pTreeModel->GetRootTreeItemData()->GetPropertiesModel(iStateIndex)->DeserializeJson(propRootObj);
-	}
-
-	std::function<void(const QJsonArray &, const QList<QJsonArray> &)> fpPopulateNodeTreeItems =
-		[&](const QJsonArray &itemListArray, const QList<QJsonArray> &propItemArrayList)
-	{
-		for(int i = 0; i < itemListArray.size(); ++i)
-		{
-			if(itemListArray[i].isObject())
-			{
-				QJsonObject descObj = itemListArray[i].toObject();
-
-				QJsonArray propsArray;
-				for(int iStateIndex = 0; iStateIndex < GetNumStates(); ++iStateIndex)
-					propsArray.push_back(propItemArrayList[iStateIndex][i].toObject());
-
-				Cmd_AddNewItem(descObj, propsArray, false, i);
-			}
-			else if(itemListArray[i].isArray())
-			{
-				QJsonArray subItemArray = itemListArray[i].toArray();
-				for(int j = 0; j < subItemArray.size(); ++j)
-				{
-					QJsonObject descObj = subItemArray[j].toObject();
-
-					QJsonArray propsArray;
-					for(int iStateIndex = 0; iStateIndex < GetNumStates(); ++iStateIndex)
-					{
-						QJsonArray subPropItemArray = propItemArrayList[iStateIndex][i].toArray();
-						propsArray.push_back(subPropItemArray[j].toObject());
-					}
-
-					Cmd_AddNewItem(descObj, propsArray, true, j == 0 ? i : j);
-				}
-			}
-			else
-				HyGuiLog("EntityModel::EntityModel invalid childlist", LOGTYPE_Error);
-		}
-	};
-	// Insert all the 'child' items into the nodeTree
-	fpPopulateNodeTreeItems(itemFileData.m_Meta["descChildList"].toArray(), propChildArrayList);
-	fpPopulateNodeTreeItems(itemFileData.m_Meta["descShapeList"].toArray(), propShapeArrayList);
 }
 
 EntityTreeModel *EntityModel::GetTreeModel()
@@ -244,9 +274,9 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewAssets(QList<IAssetItemData *
 	return treeNodeList;
 }
 
-EntityTreeItemData *EntityModel::Cmd_AddNewItem(QJsonObject descObj, QJsonArray propsArray, bool bIsArrayItem, int iRow)
+EntityTreeItemData *EntityModel::Cmd_AddNewItem(QJsonObject descObj, bool bIsArrayItem, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_pTreeModel->Cmd_InsertNewItem(descObj, propsArray, bIsArrayItem, iRow);
+	EntityTreeItemData *pTreeItemData = m_pTreeModel->Cmd_InsertNewItem(descObj, bIsArrayItem, iRow);
 
 	QUuid uuidToRegister(descObj["itemUUID"].toString());
 	if(uuidToRegister.isNull() == false)
@@ -685,26 +715,9 @@ QString EntityModel::GenerateSrc_SetStates() const
 {
 	itemSpecificFileDataOut.m_Meta.insert("codeName", m_pTreeModel->GetRootTreeItemData()->GetCodeName());
 	
-	InsertChildAndShapeList(-1, itemSpecificFileDataOut);
-}
-
-/*virtual*/ void EntityModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
-{
-	InsertChildAndShapeList(uiIndex, stateFileDataOut);
-}
-
-// Pass -1 for 'iStateIndex' when saving the common "desc" data
-void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDataPairOut) const
-{
 	QList<EntityTreeItemData *> childList;
 	QList<EntityTreeItemData *> shapeList;
 	m_pTreeModel->GetTreeItemData(childList, shapeList);
-
-	if(iStateIndex >= 0)
-	{
-		QJsonObject propRootObject = m_pTreeModel->GetRootTreeItemData()->GetPropertiesModel(iStateIndex)->SerializeJson();
-		fileDataPairOut.m_Meta.insert("propRoot", propRootObject);
-	}
 
 	QJsonArray childArray;
 	QString sCurrentArrayCodeName = "";
@@ -717,10 +730,7 @@ void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDat
 			do
 			{
 				QJsonObject arrayItemObj;
-				if(iStateIndex == -1)
-					childList[i]->InsertJsonInfo_Desc(arrayItemObj);
-				else
-					arrayItemObj = static_cast<EntityStateData *>(m_StateList[iStateIndex])->GetPropertiesTreeModel(childList[i])->SerializeJson();
+				childList[i]->InsertJsonInfo_Desc(arrayItemObj);
 
 				packedArray.append(arrayItemObj);
 				++i;
@@ -732,19 +742,13 @@ void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDat
 		else
 		{
 			QJsonObject childObj;
-			if(iStateIndex == -1)
-				childList[i]->InsertJsonInfo_Desc(childObj);
-			else
-				childObj = static_cast<EntityStateData *>(m_StateList[iStateIndex])->GetPropertiesTreeModel(childList[i])->SerializeJson();
-
+			childList[i]->InsertJsonInfo_Desc(childObj);
+			
 			childArray.append(childObj);
 			++i;
 		}
 	}
-	if(iStateIndex == -1)
-		fileDataPairOut.m_Meta.insert("descChildList", childArray);
-	else
-		fileDataPairOut.m_Meta.insert("propChildList", childArray);
+	itemSpecificFileDataOut.m_Meta.insert("descChildList", childArray);
 
 	QJsonArray shapeArray;
 	sCurrentArrayCodeName = "";
@@ -757,11 +761,8 @@ void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDat
 			do
 			{
 				QJsonObject arrayItemObj;
-				if(iStateIndex == -1)
-					shapeList[i]->InsertJsonInfo_Desc(arrayItemObj);
-				else
-					arrayItemObj = static_cast<EntityStateData *>(m_StateList[iStateIndex])->GetPropertiesTreeModel(shapeList[i])->SerializeJson();
-
+				shapeList[i]->InsertJsonInfo_Desc(arrayItemObj);
+				
 				packedArray.append(arrayItemObj);
 				++i;
 
@@ -772,17 +773,37 @@ void EntityModel::InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDat
 		else
 		{
 			QJsonObject shapeObj;
-			if(iStateIndex == -1)
-				shapeList[i]->InsertJsonInfo_Desc(shapeObj);
-			else
-				shapeObj = static_cast<EntityStateData *>(m_StateList[iStateIndex])->GetPropertiesTreeModel(shapeList[i])->SerializeJson();
-
+			shapeList[i]->InsertJsonInfo_Desc(shapeObj);
+			
 			shapeArray.append(shapeObj);
 			++i;
 		}
 	}
-	if(iStateIndex == -1)
-		fileDataPairOut.m_Meta.insert("descShapeList", shapeArray);
-	else
-		fileDataPairOut.m_Meta.insert("propShapeList", shapeArray);
+	itemSpecificFileDataOut.m_Meta.insert("descShapeList", shapeArray);
+}
+
+/*virtual*/ void EntityModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
+{
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_StateList[uiIndex]);
+
+	stateFileDataOut.m_Meta.insert("framesPerSecond", pStateData->GetFramesPerSecond());
+
+	// Combine all items (root, children, and shapes) into a single list 'itemList'
+	QList<EntityTreeItemData *> itemList, shapeList;
+	m_pTreeModel->GetTreeItemData(itemList, shapeList);
+	itemList.append(shapeList);
+	itemList.prepend(m_pTreeModel->GetRootTreeItemData());
+
+	// Serialize all key frames for each item that has them
+	QJsonObject stateKeyFramesObj;
+	for(EntityTreeItemData *pItem : itemList)
+	{
+		QJsonArray keyFramesArray = pStateData->SerializeKeyFrames(pItem);
+		if(keyFramesArray.empty())
+			continue;
+		
+		QString sUuid = pItem->GetThisUuid().toString(QUuid::StringFormat::WithoutBraces);
+		stateKeyFramesObj.insert(sUuid, keyFramesArray);
+	}
+	stateFileDataOut.m_Meta.insert("keyFrames", stateKeyFramesObj);
 }

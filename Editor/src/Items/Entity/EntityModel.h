@@ -36,14 +36,14 @@ class EntityStateData : public IStateData
 	int														m_iFramesPerSecond;
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>		m_KeyFramesMap;
 
-	QMap<EntityTreeItemData *, PropertiesTreeModel *>		m_PropertiesMap;
-
 public:
 	EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~EntityStateData();
 
-	void InsertNewPropertiesModel(EntityTreeItemData *pItemData, QJsonObject propObj);
-	PropertiesTreeModel *GetPropertiesTreeModel(EntityTreeItemData *pItemData) const;
+	int GetFramesPerSecond() const;
+
+	QJsonArray SerializeKeyFrames(EntityTreeItemData *pItemData) const;
+	QJsonObject ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData, int iFrameIndex) const;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityModel : public IModel
@@ -59,15 +59,13 @@ public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
-	void InitEntityNodeTreeItems(const FileDataPair &itemFileData);
-
 	EntityTreeModel *GetTreeModel();
 	QGraphicsScene *GetDopeSheetScene();
 
 	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from this constructor and from UndoCmd's
 	QList<EntityTreeItemData *> Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow);
 	QList<EntityTreeItemData *> Cmd_AddNewAssets(QList<IAssetItemData *> assetItemList, int iRow);
-	EntityTreeItemData *Cmd_AddNewItem(QJsonObject descObj, QJsonArray propsArray, bool bIsArrayItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
+	EntityTreeItemData *Cmd_AddNewItem(QJsonObject descObj, bool bIsArrayItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
 	EntityTreeItemData *Cmd_AddNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, int iRow);
 	QList<EntityTreeItemData *> Cmd_AddNewPasteItems(QJsonObject mimeObject, EntityTreeItemData *pArrayFolder);
 	QList<EntityTreeItemData *> Cmd_CreateNewArray(QList<EntityTreeItemData *> itemDataList, QString sArrayName, int iArrayFolderRow); // It is assumed that the items within 'itemDataList' have been removed/popped prior
@@ -95,8 +93,6 @@ public:
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
-
-	void InsertChildAndShapeList(int iStateIndex, FileDataPair &fileDataPairOut) const; // Pass -1 for 'iStateIndex' when saving the common "desc" data
 };
 
 #endif // ENTITYMODEL_H
