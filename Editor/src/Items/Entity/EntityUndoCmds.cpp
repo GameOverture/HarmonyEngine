@@ -40,7 +40,7 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 	}
 
 	if(m_NodeList.empty())
-		m_NodeList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewChildren(itemList, -1);
+		m_NodeList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewChildren(itemList, -1);
 	else
 	{
 		for(EntityTreeItemData *pItem : m_NodeList)
@@ -87,7 +87,7 @@ EntityUndoCmd_AddAssets::EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef,
 	}
 
 	if(m_NodeList.empty())
-		m_NodeList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewAssets(assetItemList, -1);
+		m_NodeList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewAssets(assetItemList, -1);
 	else
 	{
 		for(EntityTreeItemData *pItem : m_NodeList)
@@ -212,7 +212,11 @@ EntityUndoCmd_AddNewShape::EntityUndoCmd_AddNewShape(ProjectItemData &entityItem
 /*virtual*/ void EntityUndoCmd_AddNewShape::redo() /*override*/
 {
 	if(m_pShapeTreeItemData == nullptr)
-		m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewShape(m_eShape, m_sData, m_bIsPrimitive, m_iIndex);
+	{
+		int iStateIndex = m_EntityItemRef.GetWidget()->GetCurStateIndex();
+		int iFrameIndex = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
+		m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewShape(iStateIndex, iFrameIndex, m_eShape, m_sData, m_bIsPrimitive, m_iIndex);
+	}
 	else
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pShapeTreeItemData, m_iIndex);
 }
@@ -300,9 +304,10 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef, int iStateIndex, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_iStateIndex(iStateIndex),
+	m_iFrameIndex(iFrameIndex),
 	m_AffectedItemDataList(affectedItemDataList),
 	m_NewTransformList(newTransformList),
 	m_OldTransformList(oldTransformList)
@@ -325,41 +330,38 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	glm::vec3 vSkew;
 	glm::vec4 vPerspective;
 
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
 	QList<QUuid> affectedItemUuidList;
 	m_sOldShapeDataList.clear();
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
-		PropertiesTreeModel *pPropTreeModel = m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex);
-		if(pPropTreeModel == nullptr)
-		{
-			HyGuiLog("EntityUndoCmd_Transform::redo() - PropertiesTreeModel is nullptr", LOGTYPE_Error);
-			continue;
-		}
-
 		if(m_AffectedItemDataList[i]->GetType() != ITEM_BoundingVolume)
 		{
 			glm::decompose(m_NewTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
 			double dRotation = glm::degrees(glm::atan(m_NewTransformList[i][0][1], m_NewTransformList[i][0][0]));
 
-			if(pPropTreeModel->FindPropertyValue("Transformation", "Position").toPointF() != QPointF(ptTranslation.x, ptTranslation.y))
-				pPropTreeModel->SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
-			if(pPropTreeModel->FindPropertyValue("Transformation", "Rotation").toDouble() != dRotation)
-				pPropTreeModel->SetPropertyValue("Transformation", "Rotation", dRotation);
-			if(pPropTreeModel->FindPropertyValue("Transformation", "Scale").toPointF() != QPointF(vScale.x, vScale.y))
-				pPropTreeModel->SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+			QVariant tmpVariant = QPointF(ptTranslation.x, ptTranslation.y);
+			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+
+			tmpVariant = dRotation;
+			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_double, tmpVariant));
+
+			tmpVariant = QPointF(vScale.x, vScale.y);
+			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
 
 			m_sOldShapeDataList.push_back(QString());
 		}
 		else // ITEM_BoundingVolume
 		{
+			QString sShapeData = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_LineEdit, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data")).toString();
+			m_sOldShapeDataList.push_back(sShapeData);
+			
 			ShapeCtrl shapeCtrl(nullptr);
-			shapeCtrl.Setup(HyGlobal::GetShapeFromString(pPropTreeModel->FindPropertyValue("Shape", "Type").toString()), HyColor::White, 0.0f, 1.0f);
-
-			m_sOldShapeDataList.push_back(pPropTreeModel->FindPropertyValue("Shape", "Data").toString());
+			shapeCtrl.Setup(HyGlobal::GetShapeFromString(sShapeData), HyColor::White, 0.0f, 1.0f);
 			shapeCtrl.Deserialize(m_sOldShapeDataList.last(), nullptr);
 			shapeCtrl.TransformSelf(m_NewTransformList[i]);
 			
-			pPropTreeModel->SetPropertyValue("Shape", "Data", shapeCtrl.Serialize());
+			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", shapeCtrl.Serialize());
 		}
 
 		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
@@ -379,27 +381,30 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	glm::vec3 ptTranslation;
 	glm::vec3 vSkew;
 	glm::vec4 vPerspective;
+
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
 	QList<QUuid> affectedItemUuidList;
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
-		PropertiesTreeModel *pPropTreeModel = m_AffectedItemDataList[i]->GetPropertiesModel(m_iStateIndex);
-		if(pPropTreeModel == nullptr)
-		{
-			HyGuiLog("EntityUndoCmd_Transform::redo() - PropertiesTreeModel is nullptr", LOGTYPE_Error);
-			continue;
-		}
-
 		if(m_AffectedItemDataList[i]->GetType() != ITEM_BoundingVolume)
 		{
 			glm::decompose(m_OldTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
-
 			double dRotation = glm::degrees(glm::atan(m_OldTransformList[i][0][1], m_OldTransformList[i][0][0]));
-			pPropTreeModel->SetPropertyValue("Transformation", "Position", QPointF(ptTranslation.x, ptTranslation.y));
-			pPropTreeModel->SetPropertyValue("Transformation", "Rotation", dRotation);
-			pPropTreeModel->SetPropertyValue("Transformation", "Scale", QPointF(vScale.x, vScale.y));
+
+			QVariant tmpVariant = QPointF(ptTranslation.x, ptTranslation.y);
+			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+
+			tmpVariant = dRotation;
+			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_double, tmpVariant));
+
+			tmpVariant = QPointF(vScale.x, vScale.y);
+			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+
+			m_sOldShapeDataList.push_back(QString());
+
 		}
 		else
-			pPropTreeModel->SetPropertyValue("Shape", "Data", m_sOldShapeDataList[i]);
+			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", m_sOldShapeDataList[i]);
 
 		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
 	}
@@ -413,14 +418,17 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, int iStateIndex, EntityTreeItemData *pShapeItemData, ShapeCtrl::VemAction eVemAction, QString sNewData, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pShapeItemData, ShapeCtrl::VemAction eVemAction, QString sNewData, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_iStateIndex(iStateIndex),
+	m_iFrameIndex(iFrameIndex),
 	m_pShapeItemData(pShapeItemData),
 	m_eVemAction(eVemAction),
-	m_sNewData(sNewData),
-	m_sPrevData(m_pShapeItemData->GetPropertiesModel(iStateIndex)->FindPropertyValue("Shape", "Data").toString())
+	m_sNewData(sNewData)
 {
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
+	m_sPrevData = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_LineEdit, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data")).toString();
+
 	switch(m_eVemAction)
 	{
 	case ShapeCtrl::VEMACTION_Translate:
@@ -455,7 +463,8 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef,
 
 /*virtual*/ void EntityUndoCmd_ShapeData::redo() /*override*/
 {
-	m_pShapeItemData->GetPropertiesModel(m_iStateIndex)->SetPropertyValue("Shape", "Data", m_sNewData);
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data", m_sNewData);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
@@ -468,7 +477,8 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef,
 
 /*virtual*/ void EntityUndoCmd_ShapeData::undo() /*override*/
 {
-	m_pShapeItemData->GetPropertiesModel(m_iStateIndex)->SetPropertyValue("Shape", "Data", m_sPrevData);
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data", m_sPrevData);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
@@ -503,19 +513,10 @@ EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityIt
 
 	if(m_pNewShapeItemData == nullptr)
 	{
-		EditorShape eShape = HyGlobal::GetShapeFromString(m_pPrevShapeItemData->GetPropertiesModel(0)->FindPropertyValue("Shape", "Type").toString());
-		QString sData = m_pPrevShapeItemData->GetPropertiesModel(0)->FindPropertyValue("Shape", "Data").toString();
-		bool bConvertingToPrimitive = m_pPrevShapeItemData->GetType() == ITEM_BoundingVolume;
-
-		m_pNewShapeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddNewShape(eShape, sData, bConvertingToPrimitive, -1);
-		for(int iStateIndex = 0; iStateIndex < m_EntityItemRef.GetModel()->GetNumStates(); ++iStateIndex)
-		{
-			QString sPrevShapeType = m_pPrevShapeItemData->GetPropertiesModel(iStateIndex)->FindPropertyValue("Shape", "Type").toString();
-			QString sPrevShapeData = m_pPrevShapeItemData->GetPropertiesModel(iStateIndex)->FindPropertyValue("Shape", "Data").toString();
-
-			m_pNewShapeItemData->GetPropertiesModel(iStateIndex)->SetPropertyValue("Shape", "Type", sPrevShapeType);
-			m_pNewShapeItemData->GetPropertiesModel(iStateIndex)->SetPropertyValue("Shape", "Data", sPrevShapeData);
-		}
+		QJsonObject descObj;
+		m_pPrevShapeItemData->InsertJsonInfo_Desc(descObj);
+		descObj["Type"] = m_pPrevShapeItemData->GetType() == ITEM_BoundingVolume ? HyGlobal::ItemName(ITEM_Primitive, false) : HyGlobal::ItemName(ITEM_BoundingVolume, false);
+		m_pNewShapeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingItem(descObj, m_pPrevShapeItemData->GetEntType() == ENTTYPE_ArrayItem, -1);
 	}
 	else
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pNewShapeItemData, -1);
@@ -523,10 +524,6 @@ EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityIt
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
 		pWidget->RequestSelectedItems(QList<QUuid>() << m_pNewShapeItemData->GetThisUuid());
-
-	//EntityDraw *pDraw = static_cast<EntityDraw *>(m_EntityItemRef.GetDraw());
-	//if(pDraw)
-	//	pDraw->ActivateVemOnNextJsonMeta();
 }
 
 /*virtual*/ void EntityUndoCmd_ConvertShape::undo() /*override*/
@@ -537,10 +534,6 @@ EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityIt
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
 		pWidget->RequestSelectedItems(QList<QUuid>() << m_pPrevShapeItemData->GetThisUuid());
-
-	//EntityDraw *pDraw = static_cast<EntityDraw *>(m_EntityItemRef.GetDraw());
-	//if(pDraw)
-	//	pDraw->ActivateVemOnNextJsonMeta();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

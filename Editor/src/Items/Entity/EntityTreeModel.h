@@ -57,7 +57,7 @@ public:
 	QString GetHyNodeTypeName() const;
 	bool IsForwardDeclared() const;
 
-	PropertiesTreeModel &GetPropertiesModel();
+	//PropertiesTreeModel &GetPropertiesModel();
 
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);
@@ -102,10 +102,10 @@ public:
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 
 private: // These functions should only be called by EntityModel's Cmd_ functions
-	EntityTreeItemData *Cmd_InsertNewChild(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
-	EntityTreeItemData *Cmd_InsertNewAsset(IAssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
-	EntityTreeItemData *Cmd_InsertNewItem(QJsonObject descObj, bool bIsArrayItem, int iRow = -1);
-	EntityTreeItemData *Cmd_InsertNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocAssetTreeItem(IAssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocExistingTreeItem(QJsonObject descObj, bool bIsArrayItem, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocShapeTreeItem(EditorShape eShape, QString sData, bool bIsPrimitive, QString sCodeNamePrefix, int iRow = -1);
 	bool Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow);
 	int32 Cmd_PopChild(EntityTreeItemData *pItem);
 

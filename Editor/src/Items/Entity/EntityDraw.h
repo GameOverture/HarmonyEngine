@@ -68,6 +68,7 @@ class EntityDraw : public IDraw
 	QList<glm::mat4>						m_PrevTransformList;
 
 	bool									m_bActivateVemOnNextJsonMeta;
+	bool									m_bPlayingPreview;
 
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);

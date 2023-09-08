@@ -12,7 +12,7 @@
 
 #include <QWidget>
 
-class EntityModel;
+class EntityStateData;
 
 namespace Ui {
 class AuxDopeSheet;
@@ -22,13 +22,11 @@ class AuxDopeSheet : public QWidget
 {
 	Q_OBJECT
 
-	EntityModel *			m_pEntityModel;
-
 public:
 	explicit AuxDopeSheet(QWidget *pParent = nullptr);
 	/*virtual*/ ~AuxDopeSheet();
 
-	void SetEntityModel(EntityModel *pEntModel);
+	void SetEntityStateModel(EntityStateData *pEntStateData);
 
 private:
 	Ui::AuxDopeSheet *ui;

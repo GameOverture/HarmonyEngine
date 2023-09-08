@@ -20,7 +20,7 @@ EntityItemMimeData::EntityItemMimeData(ProjectItemData &entityRef, QList<EntityT
 	rootEntityObj.insert("project", entityRef.GetProject().GetAbsPath().toLower());
 	rootEntityObj.insert("entityUuid", entityRef.GetUuid().toString(QUuid::WithoutBraces));
 
-	QJsonArray itemArray; // An array of objects, that each contain an descObj and propArray. Each index in 'itemArray' corresponds to the item in 'itemListRef'
+	QJsonArray itemArray; // An array of objects, that each contain an descObj and stateKeyFramesArray. Each index in 'itemArray' corresponds to the item in 'itemListRef'
 	for(int i = 0; i < itemListRef.size(); ++i)
 	{
 		QJsonObject itemObj;
@@ -29,15 +29,18 @@ EntityItemMimeData::EntityItemMimeData(ProjectItemData &entityRef, QList<EntityT
 		itemListRef[i]->InsertJsonInfo_Desc(descObj);
 		itemObj.insert("descObj", descObj);
 
-		QJsonArray propArray;
+		QJsonArray stateKeyFramesArray;
 		for(int iStateIndex = 0; iStateIndex < entityRef.GetModel()->GetNumStates(); ++iStateIndex)
 		{
 			EntityStateData *pStateData = static_cast<EntityStateData *>(entityRef.GetModel()->GetStateData(iStateIndex));
-			QJsonObject propObj = pStateData->GetPropertiesTreeModel(itemListRef[i])->SerializeJson();
+			QJsonObject stateObj;
+			stateObj.insert("name", pStateData->GetName());
+			stateObj.insert("framesPerSecond", pStateData->GetDopeSheetScene().GetFramesPerSecond());
+			stateObj.insert("keyFrames", pStateData->GetDopeSheetScene().SerializeAllKeyFrames(itemListRef[i]));// GetPropertiesTreeModel(itemListRef[i])->SerializeJson();
 
-			propArray.append(propObj);
+			stateKeyFramesArray.append(stateObj);
 		}
-		itemObj.insert("propArray", propArray);
+		itemObj.insert("stateKeyFramesArray", stateKeyFramesArray);
 		
 		itemArray.append(itemObj);
 	}

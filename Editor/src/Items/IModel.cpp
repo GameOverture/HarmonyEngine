@@ -26,6 +26,11 @@ int IStateData::GetIndex() const
 	return m_iINDEX;
 }
 
+IModel &IStateData::GetModel() const
+{
+	return m_ModelRef;
+}
+
 QString IStateData::GetName() const
 {
 	return m_sName;

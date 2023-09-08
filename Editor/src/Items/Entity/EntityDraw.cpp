@@ -28,7 +28,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_eShapeEditState(SHAPESTATE_None),
 	m_pCurVertexEditItem(nullptr),
 	m_eCurVemAction(ShapeCtrl::VEMACTION_None),
-	m_bActivateVemOnNextJsonMeta(false)
+	m_bActivateVemOnNextJsonMeta(false),
+	m_bPlayingPreview(false)
 {
 	m_MultiTransform.Hide();
 	m_PressTimer.SetExpiredCallback(OnMousePressTimer, this);
@@ -50,7 +51,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDraw::OnKeyPressEvent(pEvent);
 	
-	if(m_bPanCameraKeyDown)
+	if(m_bPanCameraKeyDown || m_bPlayingPreview)
 		RefreshTransforms();
 	else
 	{
@@ -62,14 +63,18 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 					return;
 
 				int iStateIndex = 0;
+				int iFrameIndex = 0;
 				if(m_pProjItem->GetWidget() == nullptr)
 					HyGuiLog("EntityDraw::OnKeyPressEvent - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
 				else
+				{
 					iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
+					iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
+				}
 
 				QUuid thisUuid = m_pCurVertexEditItem->GetEntityTreeItemData()->GetThisUuid();
 				EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel()->FindTreeItemData(thisUuid);
-				QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, iStateIndex, pTreeItemData, ShapeCtrl::VEMACTION_RemoveSelected, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
+				QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, ShapeCtrl::VEMACTION_RemoveSelected, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
 				m_pProjItem->GetUndoStack()->push(pCmd);
 			}
 		}
@@ -102,7 +107,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDraw::OnKeyReleaseEvent(pEvent);
 	
-	if(m_bPanCameraKeyDown)
+	if(m_bPanCameraKeyDown || m_bPlayingPreview)
 		RefreshTransforms();
 	else
 	{
@@ -110,7 +115,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 	}
 
-	if(pEvent->isAutoRepeat() == false &&
+	if(m_bPlayingPreview == false &&
+		pEvent->isAutoRepeat() == false &&
 		(pEvent->key() == Qt::Key_Left ||
 		pEvent->key() == Qt::Key_Right ||
 		pEvent->key() == Qt::Key_Up ||
@@ -131,7 +137,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDraw::OnMouseMoveEvent(pEvent);
 
-	if(m_bPanCameraKeyDown)
+	if(m_bPanCameraKeyDown || m_bPlayingPreview)
 		RefreshTransforms();
 	else if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
 		DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
@@ -141,7 +147,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDraw::OnMousePressEvent(pEvent);
 
-	if(m_bPanCameraKeyDown) 
+	if(m_bPanCameraKeyDown || m_bPlayingPreview)
 		RefreshTransforms();
 	else if(pEvent->button() == Qt::LeftButton && Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
 	{
@@ -159,7 +165,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 /*virtual*/ void EntityDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
 {
-	if(m_bPanCameraKeyDown)
+	if(m_bPanCameraKeyDown || m_bPlayingPreview)
 		IDraw::OnMouseReleaseEvent(pEvent);
 	else if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
 	{
@@ -295,7 +301,7 @@ void EntityDraw::ClearShapeEdit()
 	
 	QJsonObject stateObj = itemMetaObj["stateArray"].toArray()[m_pProjItem->GetWidget()->GetCurStateIndex()].toObject();
 	// NOTE: "propRoot" within the stateObj doesn't have any data that'll change how the EntityDraw is shown, so it is skipped
-	QJsonArray propChildArray = stateObj["propChildList"].toArray();
+	QJsonArray propChildArray = stateObj["propChildList"].toArray();asdf
 	QJsonArray propShapeArray = stateObj["propShapeList"].toArray();
 
 	// Pull out all the valid json objects that represent items in the entity
@@ -943,13 +949,17 @@ void EntityDraw::DoMouseRelease_Transform()
 	}
 
 	int iStateIndex = 0;
+	int iFrameIndex = 0;
 	if(m_pProjItem->GetWidget() == nullptr)
 		HyGuiLog("EntityDraw::DoMouseRelease_Transform - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
 	else
+	{
 		iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
+		iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
+	}
 
 	// Transferring the children in 'm_ActiveTransform' back into *this will be done automatically in OnApplyJsonMeta()
-	QUndoCommand *pCmd = new EntityUndoCmd_Transform(*m_pProjItem, iStateIndex, treeItemDataList, newTransformList, m_PrevTransformList);
+	QUndoCommand *pCmd = new EntityUndoCmd_Transform(*m_pProjItem, iStateIndex, iFrameIndex, treeItemDataList, newTransformList, m_PrevTransformList);
 	m_pProjItem->GetUndoStack()->push(pCmd);
 
 	m_vNudgeTranslate.setX(0);
@@ -1093,12 +1103,16 @@ void EntityDraw::DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 			EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel()->FindTreeItemData(m_pCurVertexEditItem->GetEntityTreeItemData()->GetThisUuid());
 
 			int iStateIndex = 0;
+			int iFrameIndex = 0;
 			if(m_pProjItem->GetWidget() == nullptr)
 				HyGuiLog("EntityDraw::DoMouseRelease_ShapeEdit - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
 			else
+			{
 				iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
+				iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
+			}
 
-			QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, iStateIndex, pTreeItemData, m_eCurVemAction, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
+			QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(*m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, m_eCurVemAction, m_pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
 			m_pProjItem->GetUndoStack()->push(pCmd);
 		}
 

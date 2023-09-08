@@ -115,6 +115,10 @@ if(Qt5_DIR)
 		src/Items/Text/SubWidgets/TextFontManager.h
 		src/Items/Text/SubWidgets/TextLayersModel.h
 		src/Items/Text/SubWidgets/TextLayersWidget.h
+		src/Items/Entity/EntityDopeSheetScene.cpp
+		src/Items/Entity/EntityDopeSheetScene.h
+		src/Items/Entity/EntityDopeSheetView.cpp
+		src/Items/Entity/EntityDopeSheetView.h
 		src/Items/Entity/EntityDraw.cpp
 		src/Items/Entity/EntityDraw.h
 		src/Items/Entity/EntityDrawItem.cpp

@@ -320,9 +320,9 @@ void ProjectItemData::BlockAllWidgetSignals(bool bBlock)
 		(*iter)->blockSignals(bBlock);
 }
 
-void ProjectItemData::PropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty)
+void ProjectItemData::PropertyModified(PropertiesTreeModel &propertiesModelRef, const QModelIndex &indexRef)
 {
-	m_pModel->OnPropertyModified(propertiesModelRef, sCategory, sProperty);
+	m_pModel->OnPropertyModified(propertiesModelRef, indexRef);
 }
 
 void ProjectItemData::FocusWidgetState(int iStateIndex, QVariant subState)

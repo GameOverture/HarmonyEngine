@@ -14,6 +14,7 @@
 #include "ProjectItemData.h"
 #include "GlobalWidgetMappers.h"
 #include "EntityTreeModel.h"
+#include "EntityDopeSheetScene.h"
 #include "ProjectItemMimeData.h"
 
 #include <QObject>
@@ -33,17 +34,13 @@
 
 class EntityStateData : public IStateData
 {
-	int														m_iFramesPerSecond;
-	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>		m_KeyFramesMap;
+	EntityDopeSheetScene									m_DopeSheetScene;	// This stores the framesPerSecond and property key frames for this state
 
 public:
 	EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData);
 	virtual ~EntityStateData();
 
-	int GetFramesPerSecond() const;
-
-	QJsonArray SerializeKeyFrames(EntityTreeItemData *pItemData) const;
-	QJsonObject ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData, int iFrameIndex) const;
+	EntityDopeSheetScene &GetDopeSheetScene();
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityModel : public IModel
@@ -53,26 +50,22 @@ class EntityModel : public IModel
 	EntityTreeModel *										m_pTreeModel;
 	bool													m_bVertexEditMode;
 
-	QGraphicsScene											m_DopeSheetScene;
-
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
 	EntityTreeModel *GetTreeModel();
-	QGraphicsScene *GetDopeSheetScene();
 
-	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from this constructor and from UndoCmd's
-	QList<EntityTreeItemData *> Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow);
-	QList<EntityTreeItemData *> Cmd_AddNewAssets(QList<IAssetItemData *> assetItemList, int iRow);
-	EntityTreeItemData *Cmd_AddNewItem(QJsonObject descObj, bool bIsArrayItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
-	EntityTreeItemData *Cmd_AddNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, int iRow);
+	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from UndoCmd's
+	QList<EntityTreeItemData *> Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow);
+	QList<EntityTreeItemData *> Cmd_CreateNewAssets(QList<IAssetItemData *> assetItemList, int iRow);
+	EntityTreeItemData *Cmd_AddExistingItem(QJsonObject descObj, bool bIsArrayItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
+	EntityTreeItemData *Cmd_CreateNewShape(int iStateIndex, int iFrameIndex, EditorShape eShape, QString sData, bool bIsPrimitive, int iRow);
 	QList<EntityTreeItemData *> Cmd_AddNewPasteItems(QJsonObject mimeObject, EntityTreeItemData *pArrayFolder);
 	QList<EntityTreeItemData *> Cmd_CreateNewArray(QList<EntityTreeItemData *> itemDataList, QString sArrayName, int iArrayFolderRow); // It is assumed that the items within 'itemDataList' have been removed/popped prior
 	void Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList);
 	int32 Cmd_RemoveTreeItem(EntityTreeItemData *pItem);
 	bool Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow);
-
 	void Cmd_RenameItem(EntityTreeItemData *pItemData, QString sNewName);
 
 	void SetShapeEditDrag(EditorShape eShapeType, bool bAsPrimitive);
@@ -87,7 +80,7 @@ public:
 	QString GenerateSrc_Ctor() const;
 	QString GenerateSrc_SetStates() const;
 
-	virtual void OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) override;
+	virtual void OnPropertyModified(PropertiesTreeModel &propertiesModelRef, const QModelIndex &indexRef) override;
 
 	virtual void OnPopState(int iPoppedStateIndex) override;
 	virtual bool OnPrepSave() override;

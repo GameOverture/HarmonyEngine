@@ -368,7 +368,6 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	{
 		sm_pInstance->ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, true);
 		sm_pInstance->ui->tabWidgetAux->setCurrentIndex(AUXTAB_DopeSheet);
-		sm_pInstance->ui->dopeSheet->SetEntityModel(static_cast<EntityModel *>(pItem->GetModel()));
 	}
 	else
 		sm_pInstance->ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, false);

@@ -18,6 +18,7 @@
 #include "DlgInputName.h"
 #include "DlgInputNumber.h"
 #include "MainWindow.h"
+#include "AuxDopeSheet.h"
 
 #include <QClipboard>
 
@@ -318,6 +319,9 @@ EntityWidget::~EntityWidget()
 	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 	if(pEntDraw)
 		pEntDraw->ApplyJsonData();
+
+	AuxDopeSheet *pAuxDopeSheet = static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet));
+	pAuxDopeSheet->SetEntityStateModel(static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(iStateIndex)));
 }
 
 QModelIndexList EntityWidget::GetSelectedItems()
@@ -856,6 +860,32 @@ void EntityWidget::on_actionPasteEntityItems_triggered()
 				HyGuiLog("Pasted entity item " % descObj["codeName"].toString() % " has a mismatching type of " % descObj["itemType"].toString() % " and cannot be inserted into the array.", LOGTYPE_Warning);
 				return;
 			}
+		}
+	}
+
+	// Determine if the pasted item can merge its key frames data into the current entity's states
+	QJsonArray itemArray = pastedObject["itemArray"].toArray();
+	for(int i = 0; i < itemArray.size(); ++i)
+	{
+		QJsonObject itemObj = itemArray[i].toObject();
+		QJsonArray stateKeyFramesArray = itemObj["stateKeyFramesArray"].toArray();
+		
+		bool bIsStatesMatch = true;
+		if(m_ItemRef.GetModel()->GetNumStates() != stateKeyFramesArray.size())
+			bIsStatesMatch = false;
+		for(int iStateIndex = 0; iStateIndex < m_ItemRef.GetModel()->GetNumStates(); ++iStateIndex)
+		{
+			EntityStateData *pStateData = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(iStateIndex));
+			if(pStateData->GetName() != stateKeyFramesArray[iStateIndex].toObject()["name"].toString())
+				bIsStatesMatch = false;
+			else if(pStateData->GetDopeSheetScene().GetFramesPerSecond() != stateKeyFramesArray[iStateIndex].toObject()["framesPerSecond"].toInt())
+				bIsStatesMatch = false;
+		}
+		if(bIsStatesMatch == false)
+		{
+			QJsonObject descObj = itemObj["descObj"].toObject();
+			HyGuiLog("Pasted item (" % descObj["codeName"].toString() % ") " % descObj["itemType"].toString() % " has mismatching state data from the current entity. Aborting paste\n\nTODO: Impelement state merging/quantizing", LOGTYPE_Warning);
+			return;
 		}
 	}
 

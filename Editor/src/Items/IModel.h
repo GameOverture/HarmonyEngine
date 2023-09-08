@@ -31,6 +31,7 @@ public:
 	virtual ~IStateData();
 
 	int GetIndex() const;
+	IModel &GetModel() const;
 	
 	QString GetName() const;
 	void SetName(QString sNewName);
@@ -118,7 +119,7 @@ public:
 		dataChanged(createIndex(0, 0), createIndex(m_StateList.size() - 1, 0), roleList);
 	}
 
-	virtual void OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) { }
+	virtual void OnPropertyModified(PropertiesTreeModel &propertiesModelRef, const QModelIndex &indexRef) { }
 	virtual void OnPopState(int iPoppedStateIndex) = 0;
 	virtual bool OnPrepSave() = 0;	// Prepares item for saving, and returns if valid
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) = 0;

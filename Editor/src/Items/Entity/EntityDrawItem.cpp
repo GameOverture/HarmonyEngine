@@ -50,7 +50,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 
 			QList<QJsonArray> statePropArrayList;
 			for(int i = 0; i < subEntStateArray.size(); ++i)
-				statePropArrayList.append(subEntStateArray[i].toObject()["propChildList"].toArray());
+				statePropArrayList.append(subEntStateArray[i].toObject()["propChildList"].toArray()); asdf
 
 			m_pChild = new SubEntity(projectRef, descListArray, statePropArrayList, pParent);
 		}
@@ -258,7 +258,7 @@ SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, const QLi
 
 			QList<QJsonArray> subStatePropArrayList;
 			for(int iStateIndex = 0; iStateIndex < stateArray.size(); ++iStateIndex)
-				subStatePropArrayList.push_back(stateArray[iStateIndex].toObject()["propChildList"].toArray());
+				subStatePropArrayList.push_back(stateArray[iStateIndex].toObject()["propChildList"].toArray()); asdf
 
 			m_ChildPtrList.append(qMakePair(new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), subStatePropArrayList, this), eItemType));
 			break; }
@@ -313,7 +313,6 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 		if(propObj.contains("Common"))
 		{
 			QJsonObject commonObj = propObj["Common"].toObject();
-			// "Common", "UUID" is read-only
 
 			if(HyGlobal::IsItemType_Asset(eItemType) == false && commonObj.contains("State"))
 				pHyNode->SetState(commonObj["State"].toInt());

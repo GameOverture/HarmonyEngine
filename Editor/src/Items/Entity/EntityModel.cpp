@@ -20,80 +20,17 @@
 
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData),
-	m_iFramesPerSecond(stateFileData.m_Meta["framesPerSecond"].toInt())
+	m_DopeSheetScene(this, stateFileData.m_Meta)
 {
-	QJsonObject keyFramesObj = stateFileData.m_Meta["keyFrames"].toObject();
-	for(auto iter = keyFramesObj.begin(); iter != keyFramesObj.end(); ++iter)
-	{
-		EntityTreeItemData *pItemData = static_cast<EntityModel &>(m_ModelRef).GetTreeModel()->FindTreeItemData(QUuid(iter.key()));
-		if(pItemData == nullptr)
-		{
-			HyGuiLog("EntityStateData::EntityStateData - item " % iter.key() % " was not found", LOGTYPE_Error);
-			continue;
-		}
-
-		QJsonArray keyFramesArray = iter.value().toArray();
-		for(int i = 0; i < keyFramesArray.size(); ++i)
-			m_KeyFramesMap[pItemData][keyFramesArray[i].toObject()["frame"].toInt()] = keyFramesArray[i].toObject()["prop"].toObject();
-	}
-
-	//EntityTreeModel *pTreeModelRef = static_cast<EntityModel &>(modelRef).GetTreeModel();
-	//if(pTreeModelRef == nullptr)
-	//{
-	//	HyGuiLog("EntityStateData::EntityStateData - pTreeModelRef was nullptr", LOGTYPE_Error);
-	//	return;
-	//}
-
-	//// NOTE: If we get here, 'stateFileData' will contain valid data (since it was just copied from an existing state) and all entity tree items exist and have been created prior
-	//
-	//// Get all the items (both child and shape) and then init their properties
-	//QList<EntityTreeItemData *> childList;
-	//QList<EntityTreeItemData *> shapeList;
-	//pTreeModelRef->GetTreeItemData(childList, shapeList);
-
-	//// Init 'root'
-	//QJsonObject propRootObj;
-	//if(stateFileData.m_Meta.contains("propRoot"))
-	//	propRootObj = stateFileData.m_Meta["propRoot"].toObject();
-	//InsertNewPropertiesModel(pTreeModelRef->GetRootTreeItemData(), propRootObj);
-
-	//// Init 'child list'
-	//QJsonArray propChildListArray = stateFileData.m_Meta["propChildList"].toArray();
-	////if(propChildListArray.size() != childList.size())
-	////	HyGuiLog("EntityStateData::EntityStateData - stateFileData.m_Meta didn't have valid \"propChildList\"", LOGTYPE_Error);
-	//for(int i = 0; i < childList.size(); ++i)
-	//{
-	//	QJsonObject propChildObj;
-	//	if(propChildListArray.size() > i)
-	//		propChildObj = propChildListArray[i].toObject();
-
-	//	InsertNewPropertiesModel(childList[i], propChildObj);
-	//}
-
-	//// Init 'shape list'
-	//QJsonArray propShapeListArray = stateFileData.m_Meta["propShapeList"].toArray();
-	////if(propShapeListArray.size() != shapeList.size())
-	////	HyGuiLog("EntityStateData::EntityStateData - stateFileData.m_Meta didn't have valid \"propShapeList\"", LOGTYPE_Error);
-	//for(int i = 0; i < shapeList.size(); ++i)
-	//{
-	//	QJsonObject propShapeObj;
-	//	if(propShapeListArray.size() > i)
-	//		propShapeObj = propShapeListArray[i].toObject();
-
-	//	InsertNewPropertiesModel(shapeList[i], propShapeObj);
-	//}
 }
 
 /*virtual*/ EntityStateData::~EntityStateData()
 {
-	//QList<EntityTreeItemData *> keyList = m_PropertiesMap.keys();
-	//for(EntityTreeItemData *pKey : keyList)
-	//	delete m_PropertiesMap[pKey];
 }
 
-int EntityStateData::GetFramesPerSecond() const
+EntityDopeSheetScene &EntityStateData::GetDopeSheetScene()
 {
-	return m_iFramesPerSecond;
+	return m_DopeSheetScene;
 }
 
 //void EntityStateData::InsertNewPropertiesModel(EntityTreeItemData *pItemData, QJsonObject propObj)
@@ -111,109 +48,15 @@ int EntityStateData::GetFramesPerSecond() const
 //	m_PropertiesMap.insert(pItemData, pNewProperties);
 //}
 
-QJsonArray EntityStateData::SerializeKeyFrames(EntityTreeItemData *pItemData) const
-{
-	if(m_KeyFramesMap.contains(pItemData) == false)
-		return QJsonArray();
-
-	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
-
-	QJsonArray serializedKeyFramesArray;
-	for(QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.begin(); iter != itemKeyFrameMapRef.end(); ++iter)
-	{
-		QJsonObject serializedKeyFramesObj;
-		serializedKeyFramesObj["frame"] = iter.key();
-		serializedKeyFramesObj["props"] = iter.value();
-		serializedKeyFramesArray.append(serializedKeyFramesObj);
-	}
-
-	return serializedKeyFramesArray;
-}
-
-QJsonObject EntityStateData::ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData, int iFrameIndex) const
-{
-	if(m_KeyFramesMap.contains(pItemData) == false)
-		return QJsonObject();
-
-	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
-
-	// Get the closest key frame that is less than or equal to 'iFrameIndex'
-	QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.find(iFrameIndex);
-	if(iter == itemKeyFrameMapRef.end())
-	{
-		iter = itemKeyFrameMapRef.lowerBound(iFrameIndex);
-		if(iter != itemKeyFrameMapRef.begin())
-			iter--;
-	}
-
-	// TODO: Need to extrapolate any tweens that are currently active
-
-
-
-	// Starting with this key frame and going backwards in time, combine any properties from key frames that haven't been set yet
-	// This creates an 'extrapolatedPropObj' that contains all the properties that have been set from the beginning of the timeline, up to 'iFrameIndex'
-	QJsonObject extrapolatedPropObj = iter.value();
-	while(iter != itemKeyFrameMapRef.begin())
-	{
-		iter--;
-		QJsonObject curKeyFrameObj = iter.value();
-		for(QString sCategoryName : curKeyFrameObj.keys())
-		{
-			if(extrapolatedPropObj.contains(sCategoryName) == false)
-				extrapolatedPropObj.insert(sCategoryName, curKeyFrameObj[sCategoryName]);
-			else
-			{
-				QJsonObject extrapolatedCategoryObj = extrapolatedPropObj[sCategoryName].toObject();
-				QJsonObject curCategoryObj = curKeyFrameObj[sCategoryName].toObject();
-
-				for(QString sPropName : curCategoryObj.keys())
-				{
-					if(extrapolatedCategoryObj.contains(sPropName) == false)
-						extrapolatedCategoryObj.insert(sPropName, curCategoryObj[sPropName]);
-				}
-
-				extrapolatedPropObj.insert(sCategoryName, extrapolatedCategoryObj);
-			}
-		}
-	}
-
-	return extrapolatedPropObj;
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
 	m_pTreeModel(nullptr),
-	m_bVertexEditMode(false),
-	m_DopeSheetScene(this)
+	m_bVertexEditMode(false)
 {
-	m_DopeSheetScene.setBackgroundBrush(Qt::blue);
-
-	m_pTreeModel = new EntityTreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this);
-	//// Each element in QList<> represents a state's properties for all the children or shapes
-	//QList<QJsonObject> propRootObjectList;
-	//QList<QJsonArray> propChildArrayList;
-	//QList<QJsonArray> propShapeArrayList;
-	//QJsonArray stateArray = itemFileData.m_Meta["stateArray"].toArray();
-	//for(int i = 0; i < /*m_StateList.size()*/stateArray.size(); ++i)
-	//{
-	//	QJsonObject stateObj = stateArray[i].toObject();
-	//	propRootObjectList.push_back(stateObj["propRoot"].toObject());
-	//	propChildArrayList.push_back(stateObj["propChildList"].toArray());
-	//	propShapeArrayList.push_back(stateObj["propShapeList"].toArray());
-	//}
-	//if(GetNumStates() == 0 ||
-	//	propChildArrayList.size() != GetNumStates() ||
-	//	propShapeArrayList.size() != GetNumStates() ||
-	//	propRootObjectList.size() != GetNumStates())
-	//{
-	//	HyGuiLog("EntityModel::EntityModel - invalid number of states when parsing properties", LOGTYPE_Error);
-	//}
-
-	// NOTE: Root and BvFolder items are already created in the constructor of EntityTreeModel
-	
+	m_pTreeModel = new EntityTreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this);	
 
 	// The EntityTreeModel was initialized first so that all the EntityTreeItemData's exist. InitStates will look them up using their UUID when initializing its Key Frames map
 	InitStates<EntityStateData>(itemFileDataRef);
@@ -229,22 +72,17 @@ EntityTreeModel *EntityModel::GetTreeModel()
 	return m_pTreeModel;
 }
 
-QGraphicsScene *EntityModel::GetDopeSheetScene()
-{
-	return &m_DopeSheetScene;
-}
-
-QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemData *> projItemList, int iRow)
+QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow)
 {
 	QList<EntityTreeItemData *> treeNodeList;
 	QList<QUuid> registerList;
 	for(auto *pItem : projItemList)
 	{
-		EntityTreeItemData *pAddedItem = m_pTreeModel->Cmd_InsertNewChild(pItem, "m_", iRow);
+		EntityTreeItemData *pAddedItem = m_pTreeModel->Cmd_AllocChildTreeItem(pItem, "m_", iRow);
 		if(pAddedItem)
 			treeNodeList.push_back(pAddedItem);
 		else
-			HyGuiLog("EntityModel::Cmd_AddNewChildren could not insert a child: " % pItem->GetName(true), LOGTYPE_Error);
+			HyGuiLog("EntityModel::Cmd_CreateNewChildren could not insert a child: " % pItem->GetName(true), LOGTYPE_Error);
 
 		registerList.push_back(pItem->GetUuid());
 	}
@@ -254,17 +92,17 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewChildren(QList<ProjectItemDat
 	return treeNodeList;
 }
 
-QList<EntityTreeItemData *> EntityModel::Cmd_AddNewAssets(QList<IAssetItemData *> assetItemList, int iRow)
+QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewAssets(QList<IAssetItemData *> assetItemList, int iRow)
 {
 	QList<EntityTreeItemData *> treeNodeList;
 	QList<QUuid> registerList;
 	for(auto *pAssetItem : assetItemList)
 	{
-		EntityTreeItemData *pAddedItem = m_pTreeModel->Cmd_InsertNewAsset(pAssetItem, "m_", iRow);
+		EntityTreeItemData *pAddedItem = m_pTreeModel->Cmd_AllocAssetTreeItem(pAssetItem, "m_", iRow);
 		if(pAddedItem)
 			treeNodeList.push_back(pAddedItem);
 		else
-			HyGuiLog("EntityModel::Cmd_AddNewChildren could not insert an asset child: " % pAssetItem->GetName(), LOGTYPE_Error);
+			HyGuiLog("EntityModel::Cmd_CreateNewAssets could not insert an asset child: " % pAssetItem->GetName(), LOGTYPE_Error);
 
 		registerList.push_back(pAssetItem->GetUuid());
 	}
@@ -274,9 +112,9 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewAssets(QList<IAssetItemData *
 	return treeNodeList;
 }
 
-EntityTreeItemData *EntityModel::Cmd_AddNewItem(QJsonObject descObj, bool bIsArrayItem, int iRow)
+EntityTreeItemData *EntityModel::Cmd_AddExistingItem(QJsonObject descObj, bool bIsArrayItem, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_pTreeModel->Cmd_InsertNewItem(descObj, bIsArrayItem, iRow);
+	EntityTreeItemData *pTreeItemData = m_pTreeModel->Cmd_AllocExistingTreeItem(descObj, bIsArrayItem, iRow);
 
 	QUuid uuidToRegister(descObj["itemUUID"].toString());
 	if(uuidToRegister.isNull() == false)
@@ -285,9 +123,11 @@ EntityTreeItemData *EntityModel::Cmd_AddNewItem(QJsonObject descObj, bool bIsArr
 	return pTreeItemData;
 }
 
-EntityTreeItemData *EntityModel::Cmd_AddNewShape(EditorShape eShape, QString sData, bool bIsPrimitive, int iRow)
+EntityTreeItemData *EntityModel::Cmd_CreateNewShape(int iStateIndex, int iFrameIndex, EditorShape eShape, QString sData, bool bIsPrimitive, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_pTreeModel->Cmd_InsertNewShape(eShape, sData, bIsPrimitive, "m_", iRow);
+	EntityTreeItemData *pTreeItemData = m_pTreeModel->Cmd_AllocShapeTreeItem(eShape, sData, bIsPrimitive, "m_", iRow);
+	static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(eShape)));
+	static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Data", QJsonValue(sData));
 	
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
 	if(pWidget)
@@ -310,21 +150,10 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewPasteItems(QJsonObject mimeOb
 		QJsonObject itemObj = itemArray[i].toObject();
 
 		QJsonObject descObj = itemObj["descObj"].toObject();
-		QJsonArray propArray = itemObj["propArray"].toArray();
 
 		QUuid newUuid = QUuid::createUuid();
 		descObj.insert("UUID", newUuid.toString(QUuid::StringFormat::WithoutBraces));
 		descObj.insert("isSelected", false);
-		
-		for(int j = 0; j < propArray.size(); ++j)
-		{
-			QJsonObject propObj = propArray[j].toObject();
-			QJsonObject commonObj = propObj["Common"].toObject();
-			commonObj.insert("UUID", newUuid.toString(QUuid::StringFormat::WithoutBraces));
-			propObj.insert("Common", commonObj); // Reinsert "Common" with new UUID
-
-			propArray[j] = propObj;
-		}
 
 		bool bIsArrayItem = false;
 		if(pArrayFolder)
@@ -340,8 +169,28 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewPasteItems(QJsonObject mimeOb
 			bIsArrayItem = true;
 		}
 
-		EntityTreeItemData *pPastedTreeItemData = Cmd_AddNewItem(descObj, propArray, bIsArrayItem, -1);
+		// NOTE: Error checking the pasted item's states to match current entity should have already been done in EntityWidget::on_actionPasteEntityItems_triggered
+		EntityTreeItemData *pPastedTreeItemData = Cmd_AddExistingItem(descObj, bIsArrayItem, -1);
 		pastedItemList.push_back(pPastedTreeItemData);
+
+		// Merge the pasted key frame data into the states for the new item
+		QJsonArray stateKeyFramesArray = itemObj["stateKeyFramesArray"].toArray();
+		for(int iStateIndex = 0; iStateIndex < GetNumStates(); ++iStateIndex)
+		{
+			if(stateKeyFramesArray.size() <= iStateIndex)
+				break;
+
+			EntityStateData *pStateData = static_cast<EntityStateData *>(GetStateData(iStateIndex));
+
+			QJsonObject stateKeyFramesObj = stateKeyFramesArray[iStateIndex].toObject();
+			QJsonArray keyFramesArray = stateKeyFramesObj["keyFrames"].toArray();
+
+			for(int iKeyFrameIndex = 0; iKeyFrameIndex < keyFramesArray.size(); ++iKeyFrameIndex)
+			{
+				QJsonObject keyFrameObj = keyFramesArray[iKeyFrameIndex].toObject();
+				pStateData->GetDopeSheetScene().SetKeyFrameProperties(pPastedTreeItemData, keyFrameObj["frame"].toInt(), keyFrameObj["props"].toObject());
+			}
+		}
 	}
 
 	return pastedItemList;
@@ -360,32 +209,39 @@ QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewArray(QList<EntityTreeItem
 	QJsonObject mimeObject = jsonDocument.object();
 	QJsonArray itemArray = mimeObject["itemArray"].toArray();
 
-	// Parse info from 'itemArray' and invoke Cmd_AddNewItem on each item
+	// Parse info from 'itemArray' and invoke Cmd_AddExistingItem on each item
 	QList<EntityTreeItemData *> newItemDataList;
 	for(int i = 0; i < itemArray.size(); ++i)
 	{
 		QJsonObject itemObj = itemArray[i].toObject();
 
 		QJsonObject descObj = itemObj["descObj"].toObject();
-		QJsonArray propArray = itemObj["propArray"].toArray();
+		QJsonArray stateKeyFramesArray = itemObj["stateKeyFramesArray"].toArray();
 
 		QUuid newUuid = QUuid::createUuid();
 		descObj.insert("UUID", newUuid.toString(QUuid::StringFormat::WithoutBraces));
 		descObj.insert("codeName", sArrayName);
 		descObj.insert("isSelected", false);
 
-		for(int j = 0; j < propArray.size(); ++j)
-		{
-			QJsonObject propObj = propArray[j].toObject();
-			QJsonObject commonObj = propObj["Common"].toObject();
-			commonObj.insert("UUID", newUuid.toString(QUuid::StringFormat::WithoutBraces));
-			propObj.insert("Common", commonObj); // Reinsert "Common" with new UUID
-
-			propArray[j] = propObj;
-		}
-
-		EntityTreeItemData *pDuplicateItem = Cmd_AddNewItem(descObj, propArray, true, i == 0 ? iArrayFolderRow : -1);
+		EntityTreeItemData *pDuplicateItem = Cmd_AddExistingItem(descObj, true, i == 0 ? iArrayFolderRow : -1);
 		newItemDataList.push_back(pDuplicateItem);
+
+		// Copy all its property/key frames into the newly created item
+		for(int j = 0; j < stateKeyFramesArray.size(); ++j)
+		{
+			EntityStateData *pStateData = static_cast<EntityStateData *>(m_StateList[j]);
+
+			QJsonObject stateKeyFramesObj = stateKeyFramesArray[j].toObject();
+			if(pStateData->GetName() != stateKeyFramesObj["name"].toString() || pStateData->GetDopeSheetScene().GetFramesPerSecond() != stateKeyFramesObj["framesPerSecond"].toInt())
+				HyGuiLog("EntityModel::Cmd_CreateNewArray - states mismatch", LOGTYPE_Error);
+			
+			QJsonArray keyFramesArray = stateKeyFramesObj["keyFrames"].toArray();
+			for(int iKeyFrameIndex = 0; iKeyFrameIndex < keyFramesArray.size(); ++iKeyFrameIndex)
+			{
+				QJsonObject keyFrameObj = keyFramesArray[iKeyFrameIndex].toObject();
+				pStateData->GetDopeSheetScene().SetKeyFrameProperties(pDuplicateItem, keyFrameObj["frame"].toInt(), keyFrameObj["props"].toObject());
+			}
+		}
 	}
 
 	return newItemDataList;
@@ -695,9 +551,23 @@ QString EntityModel::GenerateSrc_SetStates() const
 	return sSrc;
 }
 
-/*virtual*/ void EntityModel::OnPropertyModified(PropertiesTreeModel &propertiesModelRef, QString sCategory, QString sProperty) /*override*/
+/*virtual*/ void EntityModel::OnPropertyModified(PropertiesTreeModel &propertiesModelRef, const QModelIndex &indexRef) /*override*/
 {
-	EntityTreeItemData *pEntityTreeData = reinterpret_cast<EntityTreeItemData *>(propertiesModelRef.GetSubstate().toLongLong());
+	EntityWidget *pEntWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
+	if(pEntWidget == nullptr)
+	{
+		HyGuiLog("EntityModel::OnPropertyModified() - EntityWidget was nullptr", LOGTYPE_Error);
+		return;
+	}
+	int iStateIndex = pEntWidget->GetCurStateIndex();
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_StateList[iStateIndex]);
+
+	int iFrameIndex = pStateData->GetDopeSheetScene().GetCurrentFrame();
+	QString sCategory = propertiesModelRef.GetCategoryName(indexRef);
+	QString sProperty = propertiesModelRef.GetPropertyName(indexRef);
+
+	EntityTreeItemData *pEntityTreeData = reinterpret_cast<EntityTreeItemData *>(propertiesModelRef.GetSubstate().toULongLong());
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(pEntityTreeData, iFrameIndex, sCategory, sProperty, propertiesModelRef.GetPropertyJsonValue(indexRef));
 }
 
 /*virtual*/ void EntityModel::OnPopState(int iPoppedStateIndex) /*override*/
@@ -786,7 +656,7 @@ QString EntityModel::GenerateSrc_SetStates() const
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_StateList[uiIndex]);
 
-	stateFileDataOut.m_Meta.insert("framesPerSecond", pStateData->GetFramesPerSecond());
+	stateFileDataOut.m_Meta.insert("framesPerSecond", pStateData->GetDopeSheetScene().GetFramesPerSecond());
 
 	// Combine all items (root, children, and shapes) into a single list 'itemList'
 	QList<EntityTreeItemData *> itemList, shapeList;
@@ -798,7 +668,7 @@ QString EntityModel::GenerateSrc_SetStates() const
 	QJsonObject stateKeyFramesObj;
 	for(EntityTreeItemData *pItem : itemList)
 	{
-		QJsonArray keyFramesArray = pStateData->SerializeKeyFrames(pItem);
+		QJsonArray keyFramesArray = pStateData->GetDopeSheetScene().SerializeAllKeyFrames(pItem);
 		if(keyFramesArray.empty())
 			continue;
 		

@@ -127,6 +127,8 @@ public:
 
 	QVariant GetPropertyValue(const QModelIndex &indexRef) const;
 	QVariant GetPropertyValue(int iCategoryIndex, int iPropertyIndex) const;
+	QJsonValue GetPropertyJsonValue(const QModelIndex &indexRef) const;
+	QJsonValue GetPropertyJsonValue(int iCategoryIndex, int iPropertyIndex) const;
 	bool IsPropertyDefaultValue(int iCategoryIndex, int iPropertyIndex) const;
 	QVariant FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
 	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
@@ -134,6 +136,7 @@ public:
 	bool IsCategoryEnabled(QString sCategoryName) const;
 	bool IsCategoryEnabled(int iCategoryIndex) const;
 	int GetNumCategories() const;
+	QString GetCategoryName(const QModelIndex &indexRef) const;
 	QString GetCategoryName(int iCategoryIndex) const;
 	bool IsCategoryCheckable(int iCategoryIndex) const;
 	int GetNumProperties(int iCategoryIndex) const;
@@ -166,7 +169,11 @@ public:
 
 	virtual void OnTreeModelItemRemoved(TreeModelItem *pTreeItem) override;
 
+	static QVariant ConvertJsonToVariant(PropertiesType ePropType, const QJsonValue &valueRef);
+	static QJsonValue ConvertVariantToJson(PropertiesType ePropType, const QVariant &valueRef);
+
 private:
+	QJsonValue ConvertValueToJson(TreeModelItem *pTreeItem) const;
 	QString ConvertValueToString(TreeModelItem *pTreeItem) const;
 };
 
