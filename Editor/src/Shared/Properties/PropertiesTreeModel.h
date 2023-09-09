@@ -162,6 +162,8 @@ public:
 	QJsonObject SerializeJson();
 	void DeserializeJson(const QJsonObject &propertiesObj);
 
+	void ResetValues(); // Sets all values to their default values
+
 	virtual bool setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole = Qt::EditRole) override;
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
 	

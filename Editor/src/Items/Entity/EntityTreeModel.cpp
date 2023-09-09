@@ -124,10 +124,10 @@ bool EntityTreeItemData::IsForwardDeclared() const
 	return m_bIsForwardDeclared;
 }
 
-//PropertiesTreeModel &EntityTreeItemData::GetPropertiesModel()
-//{
-//	return m_PropertiesModel;
-//}
+PropertiesTreeModel &EntityTreeItemData::GetPropertiesModel()
+{
+	return m_PropertiesModel;
+}
 
 bool EntityTreeItemData::IsSelected() const
 {
@@ -154,7 +154,10 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 //		 Updates here should reflect to the functions above
 QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLine, bool &bActivatePhysicsOut, uint32 &uiMaxVertListSizeOut)
 {
-	PropertiesTreeModel *pPropertiesModel = &GetPropertiesModel(/*uiStateIndex*/);
+	
+	return "";
+	// TODO: Rewrite this function
+	PropertiesTreeModel *pPropertiesModel = nullptr;// &GetPropertiesModel(/*uiStateIndex*/);
 	if(pPropertiesModel == nullptr)
 	{
 		HyGuiLog("EntityTreeItemData::GenerateStateSrc() - pPropertiesModel is nullptr", LOGTYPE_Error);

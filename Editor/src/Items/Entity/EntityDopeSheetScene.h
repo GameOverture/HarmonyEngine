@@ -35,7 +35,7 @@ public:
 	int GetCurrentFrame() const;
 
 	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const;
-	QJsonObject ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData, int iFrameIndex) const;
+	QJsonObject ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData) const;
 
 	QJsonValue GetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const;
 	void SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj);

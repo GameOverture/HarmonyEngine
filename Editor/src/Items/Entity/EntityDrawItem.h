@@ -49,15 +49,14 @@ public:
 class SubEntity : public HyEntity2d
 {
 	QList<QPair<IHyLoadable2d *, ItemType>>	m_ChildPtrList;
-	QList<QJsonArray>						m_StatePropArrayList;
 
 public:
-	SubEntity(Project &projectRef, const QJsonArray &descArray, const QList<QJsonArray> &statePropArrayList, HyEntity2d *pParent);
+	SubEntity(Project &projectRef, const QJsonArray &descArray, HyEntity2d *pParent);
 	virtual ~SubEntity();
 
-	virtual bool SetState(uint32 uiStateIndex) override;
+	void RefreshProperties(const QList<QJsonObject> &propsObjList);
 };
 
-void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propObj, HyCamera2d *pCamera);
+void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propsObj, HyCamera2d *pCamera);
 
 #endif // ENTITYDRAWITEM_H

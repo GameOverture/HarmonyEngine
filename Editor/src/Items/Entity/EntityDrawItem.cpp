@@ -30,8 +30,6 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 	}
 	else if(HyGlobal::IsItemType_Project(m_pEntityTreeItemData->GetType()))
 	{
-		
-		
 		if(pReferencedItemData == nullptr || pReferencedItemData->IsProjectItem() == false)
 		{
 			HyGuiLog("EntityDrawItem ctor - could not find referenced item data UUID: " % referencedItemUuid.toString(), LOGTYPE_Error);
@@ -44,16 +42,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 		pReferencedProjItemData->GetSavedFileData(fileDataPair);
 
 		if(m_pEntityTreeItemData->GetType() == ITEM_Entity)
-		{
-			QJsonArray descListArray = fileDataPair.m_Meta["descChildList"].toArray();
-			QJsonArray subEntStateArray = fileDataPair.m_Meta["stateArray"].toArray();
-
-			QList<QJsonArray> statePropArrayList;
-			for(int i = 0; i < subEntStateArray.size(); ++i)
-				statePropArrayList.append(subEntStateArray[i].toObject()["propChildList"].toArray()); asdf
-
-			m_pChild = new SubEntity(projectRef, descListArray, statePropArrayList, pParent);
-		}
+			m_pChild = new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), pParent);
 		else
 		{
 			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
@@ -179,9 +168,8 @@ void EntityDrawItem::HideTransformCtrl()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, const QList<QJsonArray> &statePropArrayList, HyEntity2d *pParent) :
-	HyEntity2d(pParent),
-	m_StatePropArrayList(statePropArrayList)
+SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, HyEntity2d *pParent) :
+	HyEntity2d(pParent)
 {
 	for(int i = 0; i < descArray.size(); ++i)
 	{
@@ -254,13 +242,7 @@ SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, const QLi
 
 		case ITEM_Entity: {
 			FileDataPair fileDataPair; static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-			QJsonArray stateArray = fileDataPair.m_Meta["stateArray"].toArray();
-
-			QList<QJsonArray> subStatePropArrayList;
-			for(int iStateIndex = 0; iStateIndex < stateArray.size(); ++iStateIndex)
-				subStatePropArrayList.push_back(stateArray[iStateIndex].toObject()["propChildList"].toArray()); asdf
-
-			m_ChildPtrList.append(qMakePair(new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), subStatePropArrayList, this), eItemType));
+			m_ChildPtrList.append(qMakePair(new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), this), eItemType));
 			break; }
 
 		case ITEM_AtlasFrame:
@@ -283,26 +265,15 @@ SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, const QLi
 		delete m_ChildPtrList[i].first;
 }
 
-/*virtual*/ bool SubEntity::SetState(uint32 uiStateIndex) /*override*/
+void SubEntity::RefreshProperties(const QList<QJsonObject> &propsObjList)
 {
-	HyEntity2d::SetState(uiStateIndex);
-
-	QJsonArray propArray = m_StatePropArrayList[uiStateIndex];
-	if(m_ChildPtrList.size() != propArray.size())
-	{
-		HyGuiLog("SubEntity::SetState - m_ChildPtrList and m_StatePropArrayList[" % QString::number(uiStateIndex) % "] are not the same size", LOGTYPE_Error);
-		return false;
-	}
-
 	for(int i = 0; i < m_ChildPtrList.size(); ++i)
-		ApplyProperties(m_ChildPtrList[i].first, nullptr, m_ChildPtrList[i].second, false, propArray[i].toObject(), nullptr);
-
-	return true;
+		ApplyProperties(m_ChildPtrList[i].first, nullptr, m_ChildPtrList[i].second, false, propsObjList[i], nullptr);
 }
 
 // NOTE: The following functions share logic that handle all the item specific properties: EntityTreeItemData::InitPropertiesModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp - ApplyProperties
 //		 Updates here should reflect to the functions above
-void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propObj, HyCamera2d *pCamera)
+void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propsObj, HyCamera2d *pCamera)
 {
 	if(eItemType == ITEM_Prefix) // aka Shapes folder
 		return;
@@ -310,9 +281,9 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 	// Parse all and only the potential categories of the 'eItemType' type, and set the values to 'pHyNode'
 	if(eItemType != ITEM_BoundingVolume)
 	{
-		if(propObj.contains("Common"))
+		if(propsObj.contains("Common"))
 		{
-			QJsonObject commonObj = propObj["Common"].toObject();
+			QJsonObject commonObj = propsObj["Common"].toObject();
 
 			if(HyGlobal::IsItemType_Asset(eItemType) == false && commonObj.contains("State"))
 				pHyNode->SetState(commonObj["State"].toInt());
@@ -322,9 +293,9 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 				pHyNode->SetTag(commonObj["User Tag"].toVariant().toLongLong());
 		}
 
-		if(propObj.contains("Transformation"))
+		if(propsObj.contains("Transformation"))
 		{
-			QJsonObject transformObj = propObj["Transformation"].toObject();
+			QJsonObject transformObj = propsObj["Transformation"].toObject();
 			if(transformObj.contains("Position"))
 			{
 				QJsonArray posArray = transformObj["Position"].toArray();
@@ -341,9 +312,9 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 
 		if(eItemType != ITEM_Audio && (pHyNode->GetInternalFlags() & IHyNode::NODETYPE_IsBody) != 0)
 		{
-			if(propObj.contains("Body"))
+			if(propsObj.contains("Body"))
 			{
-				QJsonObject bodyObj = propObj["Body"].toObject();
+				QJsonObject bodyObj = propsObj["Body"].toObject();
 				if(bodyObj.contains("Visible"))
 					pHyNode->SetVisible(bodyObj["Visible"].toBool());
 				if(bodyObj.contains("Color Tint"))
@@ -366,9 +337,9 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 		break;
 
 	case ITEM_Primitive: {
-		if(propObj.contains("Primitive"))
+		if(propsObj.contains("Primitive"))
 		{
-			QJsonObject primitiveObj = propObj["Primitive"].toObject();
+			QJsonObject primitiveObj = propsObj["Primitive"].toObject();
 			if(primitiveObj.contains("Wireframe"))
 				static_cast<HyPrimitive2d *>(pHyNode)->SetWireframe(primitiveObj["Wireframe"].toBool());
 			if(primitiveObj.contains("Line Thickness"))
@@ -377,7 +348,7 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 	}
 	[[fallthrough]];
 	case ITEM_BoundingVolume: {
-		QJsonObject shapeObj = propObj["Shape"].toObject();
+		QJsonObject shapeObj = propsObj["Shape"].toObject();
 		EditorShape eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
 		float fBvAlpha = (eItemType == ITEM_BoundingVolume) ? 0.0f : 1.0f;
 		float fOutlineAlpha = (eItemType == ITEM_BoundingVolume || bIsSelected) ? 1.0f : 0.0f;
@@ -396,9 +367,9 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 	case ITEM_Text: {
 		HyText2d *pTextNode = static_cast<HyText2d *>(pHyNode);
 
-		if(propObj.contains("Text"))
+		if(propsObj.contains("Text"))
 		{
-			QJsonObject textObj = propObj["Text"].toObject();
+			QJsonObject textObj = propsObj["Text"].toObject();
 
 			// Apply all text properties before the style, so the ShapeCtrl can properly calculate itself within ShapeCtrl::SetAsText()
 			if(textObj.contains("Text"))
@@ -459,9 +430,9 @@ void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eIt
 		break; }
 
 	case ITEM_Sprite: {
-		if(propObj.contains("Sprite"))
+		if(propsObj.contains("Sprite"))
 		{
-			QJsonObject spriteObj = propObj["Sprite"].toObject();
+			QJsonObject spriteObj = propsObj["Sprite"].toObject();
 			if(spriteObj.contains("Frame"))
 				static_cast<HySprite2d *>(pHyNode)->SetFrame(spriteObj["Frame"].toInt());
 			if(spriteObj.contains("Anim Rate"))

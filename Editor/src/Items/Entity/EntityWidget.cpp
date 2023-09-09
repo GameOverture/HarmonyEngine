@@ -281,8 +281,11 @@ EntityWidget::~EntityWidget()
 			ui->lblSelectedItemText->setVisible(true);
 			ui->lblSelectedItemText->setText(pEntTreeItemData->GetCodeName() % " Properties");
 
-			PropertiesTreeModel *pPropModelRef = pEntTreeItemData->GetPropertiesModel(GetCurStateIndex());
-			ui->propertyTree->setModel(pPropModelRef);
+			PropertiesTreeModel &propModelRef = pEntTreeItemData->GetPropertiesModel();
+			QJsonObject propsObj = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().ExtrapolateKeyFramesProperties(pEntTreeItemData);
+			propModelRef.ResetValues();
+			propModelRef.DeserializeJson(propsObj);
+			ui->propertyTree->setModel(&propModelRef);
 
 			bEnableVemMode = (pEntTreeItemData->GetType() == ITEM_Primitive || pEntTreeItemData->GetType() == ITEM_BoundingVolume || pEntTreeItemData->GetType() == ITEM_Text);
 		}

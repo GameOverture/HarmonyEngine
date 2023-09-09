@@ -381,7 +381,7 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 		for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
 		{
 			TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(j);
-			if(m_PropertyDefMap[pPropertyTreeItem].eAccessType == PROPERTIESACCESS_ToggleOn || m_PropertyDefMap[pPropertyTreeItem].eAccessType == PROPERTIESACCESS_ToggleOff)
+			if(m_PropertyDefMap[pPropertyTreeItem].eAccessType == PROPERTIESACCESS_ToggleOn)
 				m_PropertyDefMap[pPropertyTreeItem].eAccessType = PROPERTIESACCESS_ToggleOff;
 		}
 	}
@@ -491,6 +491,26 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 				HyGuiLog("Unhandled PropertiesTreeModel::DeserializeJson property", LOGTYPE_Error);
 				break;
 			}
+		}
+	}
+}
+
+
+void PropertiesTreeModel::ResetValues()
+{
+	// Set all values to their default values
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+		for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
+		{
+			TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(j);
+
+			if(setData(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Value, pPropertyTreeItem), m_PropertyDefMap[pPropertyTreeItem].defaultData, Qt::UserRole) == false)
+				HyGuiLog("PropertiesTreeModel::SetPropertyValue() - setData failed", LOGTYPE_Error);
+
+			if(m_PropertyDefMap[pPropertyTreeItem].eAccessType == PROPERTIESACCESS_ToggleOn)
+				m_PropertyDefMap[pPropertyTreeItem].eAccessType = PROPERTIESACCESS_ToggleOff;
 		}
 	}
 }

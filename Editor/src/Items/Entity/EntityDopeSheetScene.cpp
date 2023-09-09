@@ -73,18 +73,18 @@ QJsonArray EntityDopeSheetScene::SerializeAllKeyFrames(EntityTreeItemData *pItem
 	return serializedKeyFramesArray;
 }
 
-QJsonObject EntityDopeSheetScene::ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData, int iFrameIndex) const
+QJsonObject EntityDopeSheetScene::ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData) const
 {
 	if(m_KeyFramesMap.contains(pItemData) == false)
 		return QJsonObject();
 
 	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
 
-	// Get the closest key frame that is less than or equal to 'iFrameIndex'
-	QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.find(iFrameIndex);
+	// Get the closest key frame that is less than or equal to 'm_iCurrentFrame'
+	QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.find(m_iCurrentFrame);
 	if(iter == itemKeyFrameMapRef.end())
 	{
-		iter = itemKeyFrameMapRef.lowerBound(iFrameIndex);
+		iter = itemKeyFrameMapRef.lowerBound(m_iCurrentFrame);
 		if(iter != itemKeyFrameMapRef.begin())
 			iter--;
 	}

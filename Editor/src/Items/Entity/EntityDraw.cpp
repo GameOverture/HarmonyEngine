@@ -298,53 +298,31 @@ void EntityDraw::ClearShapeEdit()
 
 	QJsonArray descChildArray = itemMetaObj["descChildList"].toArray();
 	QJsonArray descShapeArray = itemMetaObj["descShapeList"].toArray();
-	
-	QJsonObject stateObj = itemMetaObj["stateArray"].toArray()[m_pProjItem->GetWidget()->GetCurStateIndex()].toObject();
-	// NOTE: "propRoot" within the stateObj doesn't have any data that'll change how the EntityDraw is shown, so it is skipped
-	QJsonArray propChildArray = stateObj["propChildList"].toArray();asdf
-	QJsonArray propShapeArray = stateObj["propShapeList"].toArray();
 
 	// Pull out all the valid json objects that represent items in the entity
 	QList<QJsonObject> descObjList;
-	QList<QJsonObject> propObjList;
 	for(int32 i = 0; i < descChildArray.size(); ++i)
 	{
 		if(descChildArray[i].isObject())
-		{
 			descObjList.push_back(descChildArray[i].toObject());
-			propObjList.push_back(propChildArray[i].toObject());
-		}
 		else if(descChildArray[i].isArray())
 		{
 			QJsonArray arrayFolder = descChildArray[i].toArray();
-			QJsonArray arrayPropFolder = propChildArray[i].toArray();
 			for(int32 j = 0; j < arrayFolder.size(); ++j)
-			{
 				descObjList.push_back(arrayFolder[j].toObject());
-				propObjList.push_back(arrayPropFolder[j].toObject());
-			}
 		}
 	}
 	for(int32 i = 0; i < descShapeArray.size(); ++i)
 	{
 		if(descShapeArray[i].isObject())
-		{
 			descObjList.push_back(descShapeArray[i].toObject());
-			propObjList.push_back(propShapeArray[i].toObject());
-		}
 		else if(descShapeArray[i].isArray())
 		{
 			QJsonArray arrayFolder = descShapeArray[i].toArray();
-			QJsonArray arrayPropFolder = propShapeArray[i].toArray();
 			for(int32 j = 0; j < arrayFolder.size(); ++j)
-			{
 				descObjList.push_back(arrayFolder[j].toObject());
-				propObjList.push_back(arrayPropFolder[j].toObject());
-			}
 		}
 	}
-	if(descObjList.size() != propObjList.size())
-		HyGuiLog("EntityDraw::OnApplyJsonMeta() - descObjList.size() != propObjList.size()", LOGTYPE_Error);
 
 	// Process all the objects in descObjList
 	for(int32 i = 0; i < descObjList.size(); ++i)
@@ -379,7 +357,8 @@ void EntityDraw::ClearShapeEdit()
 		else
 			pDrawItem->HideTransformCtrl();
 
-		ApplyProperties(pDrawItem->GetHyNode(), &pDrawItem->GetShapeCtrl(), pDrawItem->GetEntityTreeItemData()->GetType(), descObj["isSelected"].toBool(), propObjList[i], m_pCamera);
+		QJsonObject propsObj = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(m_pProjItem->GetWidget()->GetCurStateIndex()))->GetDopeSheetScene().ExtrapolateKeyFramesProperties(pDrawItem->GetEntityTreeItemData());
+		ApplyProperties(pDrawItem->GetHyNode(), &pDrawItem->GetShapeCtrl(), pDrawItem->GetEntityTreeItemData()->GetType(), descObj["isSelected"].toBool(), propsObj, m_pCamera);
 	}
 	
 	// Delete all the remaining stale items
