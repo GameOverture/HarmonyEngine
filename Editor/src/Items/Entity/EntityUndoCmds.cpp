@@ -35,7 +35,7 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 	QList<ProjectItemData *> itemList;
 	for(auto *pProjItem : m_ChildrenList)
 	{
-		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel()->IsItemValid(pProjItem, true))
+		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pProjItem, true))
 			itemList.push_back(pProjItem);
 	}
 
@@ -59,7 +59,7 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 {
 	for(auto *pNodeItem : m_NodeList)
 	{
-		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel()->IsItemValid(pNodeItem, true))
+		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pNodeItem, true))
 			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pNodeItem);
 	}
 }
@@ -82,7 +82,7 @@ EntityUndoCmd_AddAssets::EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef,
 	QList<IAssetItemData *> assetItemList;
 	for(auto *pAssetItem : m_AssetList)
 	{
-		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel()->IsItemValid(pAssetItem, true))
+		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pAssetItem, true))
 			assetItemList.push_back(pAssetItem);
 	}
 
@@ -106,7 +106,7 @@ EntityUndoCmd_AddAssets::EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef,
 {
 	for(auto *pNodeItem : m_NodeList)
 	{
-		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel()->IsItemValid(pNodeItem, true))
+		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pNodeItem, true))
 			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pNodeItem);
 	}
 }
@@ -248,23 +248,23 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 /*virtual*/ void EntityUndoCmd_OrderChildren::redo() /*override*/
 {
 	EntityModel *pModel = static_cast<EntityModel *>(m_EntityItemRef.GetModel());
-	EntityTreeModel *pEntTreeModel = pModel->GetTreeModel();
+	EntityTreeModel &entTreeModelRef = pModel->GetTreeModel();
 
 	//QList<QUuid> selectedItemUuidList;
 	for(int i = 0; i < m_SelectedItemDataList.size(); ++i)
 	{
 		TreeModelItemData *pDestinationParent = nullptr;
 		if(m_SelectedItemDataList[i]->GetEntType() == ENTTYPE_ArrayItem)
-			pDestinationParent = pEntTreeModel->GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
+			pDestinationParent = entTreeModelRef.GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
 		else
 		{
 			if(m_SelectedItemDataList[i]->GetType() == ITEM_BoundingVolume)
-				pDestinationParent = pEntTreeModel->GetBvFolderTreeItemData();
+				pDestinationParent = entTreeModelRef.GetBvFolderTreeItemData();
 			else
-				pDestinationParent = pEntTreeModel->GetRootTreeItemData();
+				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
 		}
 
-		pEntTreeModel->MoveTreeItem(m_SelectedItemDataList[i], pDestinationParent, m_NewItemIndexList[i]);
+		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], pDestinationParent, m_NewItemIndexList[i]);
 
 		//selectedItemUuidList << m_SelectedItemDataList[i]->GetThisUuid();
 	}
@@ -276,23 +276,23 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 
 /*virtual*/ void EntityUndoCmd_OrderChildren::undo() /*override*/
 {
-	EntityTreeModel *pEntTreeModel = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel();
+	EntityTreeModel &entTreeModelRef = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel();
 
 	//QList<QUuid> selectedItemUuidList;
 	for(int i = m_SelectedItemDataList.size() - 1; i >= 0; --i)
 	{
 		TreeModelItemData *pDestinationParent = nullptr;
 		if(m_SelectedItemDataList[i]->GetEntType() == ENTTYPE_ArrayItem)
-			pDestinationParent = pEntTreeModel->GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
+			pDestinationParent = entTreeModelRef.GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
 		else
 		{
 			if(m_SelectedItemDataList[i]->GetType() == ITEM_BoundingVolume)
-				pDestinationParent = pEntTreeModel->GetBvFolderTreeItemData();
+				pDestinationParent = entTreeModelRef.GetBvFolderTreeItemData();
 			else
-				pDestinationParent = pEntTreeModel->GetRootTreeItemData();
+				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
 		}
 
-		pEntTreeModel->MoveTreeItem(m_SelectedItemDataList[i], pDestinationParent, m_PrevItemIndexList[i]);
+		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], pDestinationParent, m_PrevItemIndexList[i]);
 
 		//selectedItemUuidList << m_SelectedItemDataList[i]->GetThisUuid();
 	}

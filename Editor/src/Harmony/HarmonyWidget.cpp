@@ -299,8 +299,8 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 
 					TreeModelItemData *pProjItem = m_pProject->GetProject().FindItemData(itemUuid);
 
-					EntityTreeModel *pEntityTreeModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetTreeModel();
-					if(pEntityTreeModel->IsItemValid(pProjItem, true) == false)
+					EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetTreeModel();
+					if(entityTreeModelRef.IsItemValid(pProjItem, true) == false)
 						continue;
 
 					validItemList.push_back(static_cast<ProjectItemData *>(pProjItem));
@@ -334,8 +334,8 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 					{
 						pAssetItemData = static_cast<IAssetItemData *>(m_pProject->FindItemData(QUuid(assetObj["assetUUID"].toString())));
 
-						EntityTreeModel *pEntityTreeModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetTreeModel();
-						if(pEntityTreeModel->IsItemValid(pAssetItemData, true))
+						EntityTreeModel &entityTreeModel = static_cast<EntityModel *>(pCurOpenTabItem->GetModel())->GetTreeModel();
+						if(entityTreeModel.IsItemValid(pAssetItemData, true))
 							assetItemList.push_back(pAssetItemData);
 					}
 				}

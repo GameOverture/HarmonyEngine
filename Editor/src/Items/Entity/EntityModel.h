@@ -47,14 +47,14 @@ class EntityModel : public IModel
 {
 	Q_OBJECT
 
-	EntityTreeModel *										m_pTreeModel;
+	EntityTreeModel											m_TreeModel;
 	bool													m_bVertexEditMode;
 
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
-	EntityTreeModel *GetTreeModel();
+	EntityTreeModel &GetTreeModel();
 
 	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from UndoCmd's
 	QList<EntityTreeItemData *> Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow);

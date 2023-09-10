@@ -75,7 +75,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->nodeTree->setDragDropMode(QAbstractItemView::InternalMove);
 
 	EntityModel *pEntityModel = static_cast<EntityModel *>(m_ItemRef.GetModel());
-	ui->nodeTree->setModel(pEntityModel->GetTreeModel());
+	ui->nodeTree->setModel(&pEntityModel->GetTreeModel());
 
 	ui->nodeTree->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->nodeTree, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(OnContextMenu(const QPoint &)));
@@ -86,7 +86,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 
 	// Initialize what items are selected in the model
 	QList<EntityTreeItemData *> childList, shapeList;
-	pEntityModel->GetTreeModel()->GetTreeItemData(childList, shapeList);
+	pEntityModel->GetTreeModel().GetTreeItemData(childList, shapeList);
 	childList += shapeList;
 	QList<EntityTreeItemData *> selectedItemsList;
 	for(EntityTreeItemData *pItem : childList)
@@ -343,8 +343,8 @@ QModelIndexList EntityWidget::GetSelectedItems()
 // Will clear and select only what 'uuidList' contains
 void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList)
 {
-	EntityTreeModel *pEntityTreeModel = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
-	QModelIndexList indexList = pEntityTreeModel->GetAllIndices();
+	EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
+	QModelIndexList indexList = entityTreeModelRef.GetAllIndices();
 
 	QItemSelection *pItemSelection = new QItemSelection();
 	for(QUuid uuid : uuidList)

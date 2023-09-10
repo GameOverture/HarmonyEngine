@@ -20,7 +20,7 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	QJsonObject keyFramesObj = metaFileObj["keyFrames"].toObject();
 	for(auto iter = keyFramesObj.begin(); iter != keyFramesObj.end(); ++iter)
 	{
-		EntityTreeItemData *pItemData = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetTreeModel()->FindTreeItemData(QUuid(iter.key()));
+		EntityTreeItemData *pItemData = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetTreeModel().FindTreeItemData(QUuid(iter.key()));
 		if(pItemData == nullptr)
 		{
 			HyGuiLog("EntityStateData::EntityStateData - item " % iter.key() % " was not found", LOGTYPE_Error);
