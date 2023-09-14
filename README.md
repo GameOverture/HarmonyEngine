@@ -51,7 +51,7 @@ The Harmony Engine consists of two main projects
 3. Run a pre-built Harmony Editor or compile it from source
 
 ### Compiling the Editor
-- Compiling the editor **requires Qt - Versions 5.15.0 and 6.5.0 have been tested**, open-source version
+- Compiling the editor **requires Qt - Only version 5.15.0 has been tested**, open-source version
 - When installing Qt6, under the selected Qt version, you must also select "Additional Libraries" -> Qt Multimedia
 - Using CMake, choose one of the two methods below:
 ```
