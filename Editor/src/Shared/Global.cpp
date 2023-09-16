@@ -626,6 +626,10 @@
 #endif
 }
 
+/*static*/ QColor HyGlobal::CovertHyColor(HyColor color)
+{
+	return QColor(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
+}
 
 QAction *FindAction(QList<QAction *> list, QString sName)
 {

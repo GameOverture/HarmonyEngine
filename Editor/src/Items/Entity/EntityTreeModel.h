@@ -36,7 +36,7 @@ class EntityTreeItemData : public TreeModelItemData
 	EntityModel &										m_EntityModelRef;
 	EntityItemType										m_eEntType;
 
-	PropertiesTreeModel									m_PropertiesModel;
+	PropertiesTreeModel *								m_pPropertiesModel;
 
 	QString												m_sPromotedEntityType;
 	bool												m_bIsForwardDeclared;

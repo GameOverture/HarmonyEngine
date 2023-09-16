@@ -746,7 +746,7 @@ void IManagerModel::SaveRuntime()
 			}
 
 			// Special case: The source code's entity folder
-			if(m_eASSET_TYPE == ASSETMAN_Source && pItemData->GetText() == HySrcEntityNamespace)
+			if(m_eASSET_TYPE == ASSETMAN_Source && pItemData->GetText() == HySrcEntityFilter)
 				return QVariant(QIcon(":/icons16x16/entity-folder.png"));
 
 			return QVariant(pItemData->GetIcon(SUBICON_None));

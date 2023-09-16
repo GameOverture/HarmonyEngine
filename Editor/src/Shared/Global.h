@@ -38,6 +38,7 @@ class Project;
 #define HyEditorToolName "Harmony Editor Tool"
 #define HyGuiInternalCharIndicator '+'
 
+#define HySrcEntityFilter "_hy_"
 #define HySrcEntityNamespace "hy"
 
 #define HYGUI_FILE_VERSION 14
@@ -311,6 +312,8 @@ public:
 	static void ModifyJsonObject(QJsonDocument &docRef, const QString &sPath, const QJsonValue &newValue);
 
 	static void OpenFileInExplorer(QString sFilePath);
+
+	static QColor CovertHyColor(HyColor color);
 };
 
 struct SortTreeWidgetsPredicate

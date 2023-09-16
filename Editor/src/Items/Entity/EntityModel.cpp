@@ -563,7 +563,7 @@ QString EntityModel::GenerateSrc_SetStates() const
 	QString sCategory = propertiesModelRef.GetCategoryName(indexRef);
 	QString sProperty = propertiesModelRef.GetPropertyName(indexRef);
 
-	EntityTreeItemData *pEntityTreeData = reinterpret_cast<EntityTreeItemData *>(propertiesModelRef.GetSubstate().toULongLong());
+	EntityTreeItemData *pEntityTreeData = propertiesModelRef.GetSubstate().value<EntityTreeItemData *>();
 	pStateData->GetDopeSheetScene().SetKeyFrameProperty(pEntityTreeData, iFrameIndex, sCategory, sProperty, propertiesModelRef.GetPropertyJsonValue(indexRef));
 }
 

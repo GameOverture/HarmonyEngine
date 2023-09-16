@@ -25,6 +25,9 @@ class EntityDopeSheetScene : public QGraphicsScene
 
 	int														m_iCurrentFrame;
 
+
+	QGraphicsRectItem *										m_pTimeLine;
+
 public:
 	EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj);
 	virtual ~EntityDopeSheetScene();
@@ -40,6 +43,10 @@ public:
 	QJsonValue GetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const;
 	void SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj);
 	void SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue);
+
+protected:
+	void UpdateTimeLine();
+	void UpdateSceneItems();
 };
 
 #endif // ENTITYDOPESHEETSCENE_H

@@ -20,15 +20,19 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	TreeModelItemData(eItemType, uuidOfThis, sCodeName),
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(eEntType),
-	m_PropertiesModel(entityModelRef.GetItem(), -1, reinterpret_cast<qulonglong>(this), this),
+	m_pPropertiesModel(nullptr),
 	m_bIsForwardDeclared(bIsForwardDeclared),
 	m_ReferencedItemUuid(uuidOfReferencedItem),
 	m_bIsSelected(false)
 {
+	QVariant ptrVariant;
+	ptrVariant.setValue<TreeModelItemData *>(this);
+	m_pPropertiesModel = new PropertiesTreeModel(entityModelRef.GetItem(), -1, ptrVariant, this);
+
 	if(m_eEntType == ENTTYPE_Root || m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_ArrayItem)
 	{
 		// TODO: Make InitalizePropertyModel apart of this class
-		InitalizePropertyModel(this, m_PropertiesModel);
+		InitalizePropertyModel(this, *m_pPropertiesModel);
 
 		//// TODO: Remove below
 		//for(int i = 0; i < m_EntityModelRef.GetNumStates(); ++i)
@@ -43,14 +47,18 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	TreeModelItemData(HyGlobal::GetTypeFromString(descObj["itemType"].toString()), descObj["UUID"].toString(), descObj["codeName"].toString()),
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(bIsArrayItem ? ENTTYPE_ArrayItem : ENTTYPE_Item),
-	m_PropertiesModel(entityModelRef.GetItem(), -1, QVariant(), this),
+	m_pPropertiesModel(nullptr),
 	m_sPromotedEntityType(descObj["promotedEntityType"].toString()),
 	m_bIsForwardDeclared(bIsForwardDeclared),
 	m_ReferencedItemUuid(descObj["itemUUID"].toString()),
 	m_bIsSelected(descObj["isSelected"].toBool())
 {
+	QVariant ptrVariant;
+	ptrVariant.setValue<TreeModelItemData *>(this);
+	m_pPropertiesModel = new PropertiesTreeModel(entityModelRef.GetItem(), -1, ptrVariant, this);
+
 	// TODO: Make InitalizePropertyModel apart of this class
-	InitalizePropertyModel(this, m_PropertiesModel);
+	InitalizePropertyModel(this, *m_pPropertiesModel);
 
 	//// TODO: Remove below
 	//if(propArray.size() != m_EntityModelRef.GetNumStates())
@@ -68,6 +76,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 
 /*virtual*/ EntityTreeItemData::~EntityTreeItemData()
 {
+	delete m_pPropertiesModel;
 }
 
 EntityItemType EntityTreeItemData::GetEntType() const
@@ -126,7 +135,7 @@ bool EntityTreeItemData::IsForwardDeclared() const
 
 PropertiesTreeModel &EntityTreeItemData::GetPropertiesModel()
 {
-	return m_PropertiesModel;
+	return *m_pPropertiesModel;
 }
 
 bool EntityTreeItemData::IsSelected() const

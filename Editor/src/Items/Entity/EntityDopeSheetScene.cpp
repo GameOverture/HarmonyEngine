@@ -15,7 +15,8 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	QGraphicsScene(),
 	m_pEntStateData(pStateData),
 	m_iFramesPerSecond(metaFileObj["framesPerSecond"].toInt()),
-	m_iCurrentFrame(0)
+	m_iCurrentFrame(0),
+	m_pTimeLine(nullptr)
 {
 	QJsonObject keyFramesObj = metaFileObj["keyFrames"].toObject();
 	for(auto iter = keyFramesObj.begin(); iter != keyFramesObj.end(); ++iter)
@@ -33,6 +34,9 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	}
 
 	setBackgroundBrush(Qt::blue);
+	setSceneRect(0, 0, 1000, 500);
+
+	UpdateSceneItems();
 }
 
 /*virtual*/ EntityDopeSheetScene::~EntityDopeSheetScene()
@@ -47,6 +51,8 @@ int EntityDopeSheetScene::GetFramesPerSecond() const
 void EntityDopeSheetScene::SetFramesPerSecond(int iFramesPerSecond)
 {
 	m_iFramesPerSecond = iFramesPerSecond;
+
+	UpdateSceneItems();
 }
 
 int EntityDopeSheetScene::GetCurrentFrame() const
@@ -163,6 +169,8 @@ void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, 
 	}
 
 	m_KeyFramesMap[pItemData][iFrameIndex] = curPropsObj;
+
+	UpdateSceneItems();
 }
 
 void EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue)
@@ -182,4 +190,20 @@ void EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, in
 	categoryObj.insert(sPropName, jsonValue);
 
 	keyFrameObjRef.insert(sCategoryName, categoryObj);
+
+	UpdateSceneItems();
+}
+
+void EntityDopeSheetScene::UpdateTimeLine()
+{
+}
+
+void EntityDopeSheetScene::UpdateSceneItems()
+{
+	QRectF rect = sceneRect();
+	if(m_pTimeLine == nullptr)
+	{
+		m_pTimeLine = addRect(0, 0, sceneRect().width(), 25.0f, QPen(Qt::NoPen), QBrush(HyGlobal::CovertHyColor(HyColor::WidgetPanel)));
+
+	}
 }

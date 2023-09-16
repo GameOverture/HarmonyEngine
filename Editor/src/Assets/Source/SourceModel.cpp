@@ -42,7 +42,7 @@ bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 	// Create the Entity folder if it doesn't exist
 	if(m_pEntityFolderItem == nullptr)
 	{
-		m_pEntityFolderItem = new TreeModelItemData(ITEM_Filter, QUuid(), HySrcEntityNamespace);
+		m_pEntityFolderItem = new TreeModelItemData(ITEM_Filter, QUuid(), HySrcEntityFilter);
 		InsertTreeItem(m_ProjectRef, m_pEntityFolderItem, nullptr);
 	}
 
@@ -499,6 +499,8 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 			continue;
 		}
 	}
+
+	SaveMeta();
 
 	return true;
 }
