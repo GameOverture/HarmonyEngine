@@ -48,7 +48,7 @@ EntityDopeSheetScene *EntityDopeSheetView::GetScene() const
 
 	int iNotchIndex = 0;
 	int iFrameIndex = 0;
-	float fCurZoom = 1.0f;// fZoom;
+	float fCurZoom = GetScene()->GetZoom();
 	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * fCurZoom;
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
@@ -56,30 +56,27 @@ EntityDopeSheetScene *EntityDopeSheetView::GetScene() const
 
 	int iHorzScrollAmt = horizontalScrollBar()->value();
 	qreal fPosX = fPOSX_DRAW_THRESHOLD - iHorzScrollAmt;
-	
-	//float fRemainingWidth = rect.width() - TIMELINE_LEFT_MARGIN;
-	while(fPosX < rect.x() + rect.width())// fRemainingWidth > 0.0f)
+	while(fPosX < rect.x() + rect.width())
 	{
 		if(fPosX >= fPOSX_DRAW_THRESHOLD)
 		{
-			//qreal fPosX = rect.x() + TIMELINE_NOTCH_START_XPOS + ((TIMELINE_NOTCH_WIDTH * fCurZoom) * iNotchIndex);
+			// Main Notch Line
 			pPainter->setPen(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
 			pPainter->drawLine(fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT, fPosX, rect.y() + TIMELINE_HEIGHT);
 
-			//QFont font = pPainter->font();
-			//font.setPixelSize(48);
-			//pPainter->setFont(font);
+			// Shadow Text
 			const float fTextWidth = pPainter->fontMetrics().width(QString::number(iFrameIndex));
 			QRectF textRect(fPosX - (fTextWidth * 0.5f) + 1.0f, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT - 20.0f + 1.0f, fTextWidth, 20.0f);
 			pPainter->setPen(HyGlobal::CovertHyColor(HyColor::Black));
 			pPainter->drawText(textRect, Qt::AlignHCenter, QString::number(iFrameIndex));
 
+			// Fill Text
 			textRect.translate(-1.0f, -1.0f);
 			pPainter->setPen(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
 			pPainter->drawText(textRect, Qt::AlignHCenter, QString::number(iFrameIndex));
-
 		}
 
+		// Sub Notch Lines
 		for(int i = 0; i < iNumSubLines; ++i)
 		{
 			fPosX += fSubLineSpacing;
@@ -89,6 +86,8 @@ EntityDopeSheetScene *EntityDopeSheetView::GetScene() const
 
 		iNotchIndex++;
 		iFrameIndex += (iNumSubLines + 1);
-		//fRemainingWidth -= TIMELINE_NOTCH_WIDTH * fCurZoom;
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+
 }

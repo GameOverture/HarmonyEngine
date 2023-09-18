@@ -19,7 +19,6 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	m_pEntStateData(pStateData),
 	m_iFramesPerSecond(metaFileObj["framesPerSecond"].toInt()),
 	m_iCurrentFrame(0),
-	m_ViewportSize(1000.0f, 500.0f),
 	m_fZoom(1.0f)
 {
 	QJsonObject keyFramesObj = metaFileObj["keyFrames"].toObject();
@@ -37,8 +36,7 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 			m_KeyFramesMap[pItemData][keyFramesArray[i].toObject()["frame"].toInt()] = keyFramesArray[i].toObject()["props"].toObject();
 	}
 
-	setBackgroundBrush(Qt::blue);
-	setSceneRect(0, 0, m_ViewportSize.width(), m_ViewportSize.height());
+	setBackgroundBrush(HyGlobal::CovertHyColor(HyColor::ContainerFrame));
 
 	UpdateSceneItems();
 }
@@ -62,6 +60,11 @@ void EntityDopeSheetScene::SetFramesPerSecond(int iFramesPerSecond)
 int EntityDopeSheetScene::GetCurrentFrame() const
 {
 	return m_iCurrentFrame;
+}
+
+float EntityDopeSheetScene::GetZoom() const
+{
+	return m_fZoom;
 }
 
 QJsonArray EntityDopeSheetScene::SerializeAllKeyFrames(EntityTreeItemData *pItemData) const

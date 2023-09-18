@@ -26,7 +26,6 @@ class EntityDopeSheetScene : public QGraphicsScene
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>		m_KeyFramesMap;
 
 	int														m_iCurrentFrame;
-	QSizeF													m_ViewportSize;
 	float													m_fZoom;
 
 public:
@@ -37,6 +36,7 @@ public:
 	void SetFramesPerSecond(int iFramesPerSecond);
 
 	int GetCurrentFrame() const;
+	float GetZoom() const;
 
 	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const;
 	QJsonObject ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData) const;
