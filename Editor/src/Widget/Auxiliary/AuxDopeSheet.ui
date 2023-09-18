@@ -109,7 +109,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QGraphicsView" name="graphicsView"/>
+    <widget class="EntityDopeSheetView" name="graphicsView"/>
    </item>
   </layout>
   <action name="actionRewind">
@@ -173,6 +173,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>EntityDopeSheetView</class>
+   <extends>QGraphicsView</extends>
+   <header>EntityDopeSheetView.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../data/HyEditor.qrc"/>
  </resources>

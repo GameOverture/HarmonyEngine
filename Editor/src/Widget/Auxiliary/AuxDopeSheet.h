@@ -24,13 +24,9 @@ class AuxDopeSheet : public QWidget
 
 public:
 	explicit AuxDopeSheet(QWidget *pParent = nullptr);
-	/*virtual*/ ~AuxDopeSheet();
+	virtual ~AuxDopeSheet();
 
 	void SetEntityStateModel(EntityStateData *pEntStateData);
-
-protected:
-	virtual void showEvent(QShowEvent *event) override;
-	virtual void resizeEvent(QResizeEvent *event) override;
 
 private:
 	Ui::AuxDopeSheet *ui;

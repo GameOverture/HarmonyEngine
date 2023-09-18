@@ -12,13 +12,20 @@
 
 #include <QGraphicsView>
 
+class EntityDopeSheetScene;
+
 class EntityDopeSheetView : public QGraphicsView
 {
 	int								m_iCurrentFrame;
 
 public:
-	EntityDopeSheetView();
+	EntityDopeSheetView(QWidget *pParent = nullptr);
 	virtual ~EntityDopeSheetView();
+
+	EntityDopeSheetScene *GetScene() const;
+
+protected:
+	virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
 };
 
 #endif // ENTITYDOPESHEETVIEW_H

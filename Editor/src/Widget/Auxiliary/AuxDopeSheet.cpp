@@ -34,23 +34,6 @@ AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 void AuxDopeSheet::SetEntityStateModel(EntityStateData *pEntStateData)
 {
 	ui->graphicsView->setScene(&pEntStateData->GetDopeSheetScene());
-	static_cast<EntityDopeSheetScene *>(ui->graphicsView->scene())->SetViewportSize(ui->graphicsView->size());
-}
-
-/*virtual*/ void AuxDopeSheet::showEvent(QShowEvent *event) /*override*/
-{
-	if(ui->graphicsView->scene() == nullptr)
-		return;
-
-	static_cast<EntityDopeSheetScene *>(ui->graphicsView->scene())->SetViewportSize(ui->graphicsView->size());
-}
-
-/*virtual*/ void AuxDopeSheet::resizeEvent(QResizeEvent *event) /*override*/
-{
-	if(ui->graphicsView->scene() == nullptr)
-		return;
-
-	static_cast<EntityDopeSheetScene *>(ui->graphicsView->scene())->SetViewportSize(ui->graphicsView->size());
 }
 
 void AuxDopeSheet::on_actionRewind_triggered()

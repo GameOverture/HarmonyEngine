@@ -18,6 +18,8 @@ class EntityTreeItemData;
 
 class EntityDopeSheetScene : public QGraphicsScene
 {
+	friend class EntityDopeSheetView;
+
 	EntityStateData *										m_pEntStateData;
 
 	int														m_iFramesPerSecond;
@@ -26,36 +28,6 @@ class EntityDopeSheetScene : public QGraphicsScene
 	int														m_iCurrentFrame;
 	QSizeF													m_ViewportSize;
 	float													m_fZoom;
-
-	// Graphic Items ////////////////////////////////////////////////////////////////////////
-	struct TimeLine
-	{
-		float												m_fCurWidth;
-		float												m_fCurZoom;
-
-		QGraphicsRectItem *									m_pRectBackground = nullptr; // TimeLine Root
-		QGraphicsLineItem *									m_pLineSeparator = nullptr;
-
-		struct Notch
-		{
-			QGraphicsLineItem *								m_pMainLine = nullptr; // Notch Root
-			QGraphicsSimpleTextItem *						m_pTextFrameShadow = nullptr;
-			QGraphicsSimpleTextItem *						m_pTextFrame = nullptr;
-			QGraphicsLineItem *								m_pSubLine[4] = { nullptr, nullptr, nullptr, nullptr };
-
-			Notch(QGraphicsItem *pParent);
-			~Notch();
-			void Update(float fPosX, float fSubLineSpacing, int iNumSubLines, QString sFrameText);
-			QGraphicsLineItem *Root() { return m_pMainLine; }
-		};
-		QList<Notch *>										m_NotchLineList;
-
-		TimeLine(QGraphicsScene *pGfxSceneRef);
-		~TimeLine();
-		void Update(QSizeF viewportSize, float fZoom);
-		QGraphicsRectItem *Root() { return m_pRectBackground; }
-	};
-	TimeLine												m_TimeLine;
 
 public:
 	EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj);
@@ -66,8 +38,6 @@ public:
 
 	int GetCurrentFrame() const;
 
-	void SetViewportSize(QSizeF size);
-
 	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const;
 	QJsonObject ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData) const;
 
@@ -76,7 +46,6 @@ public:
 	void SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue);
 
 protected:
-	void UpdateTimeLine();
 	void UpdateSceneItems();
 };
 

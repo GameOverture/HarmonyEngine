@@ -14,22 +14,13 @@
 #include <QGraphicsRectItem>
 
 
-#define TIMELINE_HEIGHT 38.0f
-#define TIMELINE_NOTCH_START_XPOS 250.0f
-#define TIMELINE_NOTCH_WIDTH 88.0f
-#define TIMELINE_NOTCH_MAINLINE_HEIGHT 15.0f
-#define TIMELINE_NOTCH_SUBLINES_HEIGHT 9.0f
-#define TIMELINE_NOTCH_SUBLINES_WIDTH 18.0f
-#define TIMELINE_NOTCH_TEXT_YPOS 10.0f
-
 EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj) :
 	QGraphicsScene(),
 	m_pEntStateData(pStateData),
 	m_iFramesPerSecond(metaFileObj["framesPerSecond"].toInt()),
 	m_iCurrentFrame(0),
 	m_ViewportSize(1000.0f, 500.0f),
-	m_fZoom(1.0f),
-	m_TimeLine(this)
+	m_fZoom(1.0f)
 {
 	QJsonObject keyFramesObj = metaFileObj["keyFrames"].toObject();
 	for(auto iter = keyFramesObj.begin(); iter != keyFramesObj.end(); ++iter)
@@ -71,18 +62,6 @@ void EntityDopeSheetScene::SetFramesPerSecond(int iFramesPerSecond)
 int EntityDopeSheetScene::GetCurrentFrame() const
 {
 	return m_iCurrentFrame;
-}
-
-void EntityDopeSheetScene::SetViewportSize(QSizeF size)
-{
-	if(m_ViewportSize == size)
-		return;
-
-	m_ViewportSize = size;
-	setSceneRect(0, 0, m_ViewportSize.width(), m_ViewportSize.height());
-	
-	// Update Scene Time line
-	m_TimeLine.Update(m_ViewportSize, m_fZoom);
 }
 
 QJsonArray EntityDopeSheetScene::SerializeAllKeyFrames(EntityTreeItemData *pItemData) const
@@ -217,106 +196,6 @@ void EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, in
 	keyFrameObjRef.insert(sCategoryName, categoryObj);
 
 	UpdateSceneItems();
-}
-
-EntityDopeSheetScene::TimeLine::TimeLine(QGraphicsScene *pGfxSceneRef) :
-	m_fCurWidth(0.0f),
-	m_fCurZoom(1.0f)
-{
-	m_pRectBackground = pGfxSceneRef->addRect(QRectF(), Qt::NoPen, HyGlobal::CovertHyColor(HyColor::ContainerPanel));
-	
-	QPen pen(Qt::SolidLine);
-	pen.setColor(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
-	m_pLineSeparator = pGfxSceneRef->addLine(QLineF(), pen);
-}
-
-EntityDopeSheetScene::TimeLine::~TimeLine()
-{
-}
-
-void EntityDopeSheetScene::TimeLine::Update(QSizeF viewportSize, float fZoom)
-{
-	if(m_fCurWidth == viewportSize.width() && m_fCurZoom == fZoom)
-		return;
-
-	m_fCurWidth = viewportSize.width();
-	m_fCurZoom = fZoom;
-
-	m_pRectBackground->setRect(0.0f, 0.0f, m_fCurWidth, TIMELINE_HEIGHT);
-	m_pLineSeparator->setLine(0, TIMELINE_HEIGHT, m_fCurWidth, TIMELINE_HEIGHT);
-
-	int iNotchIndex = 0;
-	int iFrameIndex = 0;
-	float fRemainingWidth = m_fCurWidth;
-	fRemainingWidth -= TIMELINE_NOTCH_START_XPOS;
-	while(fRemainingWidth > 0.0f)
-	{
-		while(iNotchIndex >= m_NotchLineList.size())
-			m_NotchLineList.push_back(new Notch(Root()));
-
-		float fPosX = TIMELINE_NOTCH_START_XPOS + ((TIMELINE_NOTCH_WIDTH * m_fCurZoom) * iNotchIndex);
-		float fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH;
-		int iNumSubLines = 4;
-		m_NotchLineList[iNotchIndex]->Update(fPosX, fSubLineSpacing, iNumSubLines, QString::number(iFrameIndex));
-		m_NotchLineList[iNotchIndex]->Root()->show();
-
-		iNotchIndex++;
-		iFrameIndex += (iNumSubLines + 1);
-		fRemainingWidth -= TIMELINE_NOTCH_WIDTH * m_fCurZoom;
-	}
-
-	for(; iNotchIndex < m_NotchLineList.size(); ++iNotchIndex)
-		m_NotchLineList[iNotchIndex]->Root()->hide();
-}
-
-EntityDopeSheetScene::TimeLine::Notch::Notch(QGraphicsItem *pParent)
-{
-	QPen pen(Qt::SolidLine);
-	pen.setColor(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
-
-	m_pMainLine = new QGraphicsLineItem(pParent);
-	m_pMainLine->setPen(pen);
-	m_pMainLine->setLine(0.0f, TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT, 0.0f, TIMELINE_HEIGHT);
-
-	m_pTextFrameShadow = new QGraphicsSimpleTextItem(m_pMainLine);
-	m_pTextFrameShadow->setBrush(HyGlobal::CovertHyColor(HyColor::Black));
-	m_pTextFrame = new QGraphicsSimpleTextItem(m_pMainLine);
-	m_pTextFrame->setBrush(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
-
-	for(int i = 0; i < 4; ++i)
-	{
-		m_pSubLine[i] = new QGraphicsLineItem(m_pMainLine);
-		m_pSubLine[i]->setPen(pen);
-		m_pSubLine[i]->setLine(0.0f, TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, 0.0f, TIMELINE_HEIGHT);
-	}
-}
-
-EntityDopeSheetScene::TimeLine::Notch::~Notch()
-{
-	for(int i = 0; i < 4; ++i)
-		delete m_pSubLine[i];
-	delete m_pTextFrame;
-	delete m_pTextFrameShadow;
-	delete m_pMainLine;
-}
-
-void EntityDopeSheetScene::TimeLine::Notch::Update(float fPosX, float fSubLineSpacing, int iNumSubLines, QString sFrameText)
-{
-	m_pMainLine->setPos(fPosX, 0.0f);
-	
-	m_pTextFrame->setText(sFrameText);
-	m_pTextFrame->setPos(m_pTextFrame->boundingRect().width() * -0.5f, TIMELINE_NOTCH_TEXT_YPOS);
-	m_pTextFrameShadow->setText(sFrameText);
-	m_pTextFrameShadow->setPos(m_pTextFrame->pos().x() + 1.0f, m_pTextFrame->pos().y() + 1.0f);
-	
-	for(int i = 0; i < 4; ++i)
-	{
-		m_pSubLine[i]->setPos(fSubLineSpacing * (i+1), 0.0f);
-		if(i < iNumSubLines)
-			m_pSubLine[i]->show();
-		else
-			m_pSubLine[i]->hide();
-	}
 }
 
 void EntityDopeSheetScene::UpdateSceneItems()
