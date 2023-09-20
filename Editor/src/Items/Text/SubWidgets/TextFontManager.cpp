@@ -156,15 +156,6 @@ QString TextFontManager::GetFontName(TextLayerHandle hLayer) const
 QString TextFontManager::GetFontPath(TextLayerHandle hLayer)
 {
 	return GetFontPathFromName(GetFontName(hLayer));
-	//int iFontIndex = GetFontIndex(hLayer);
-
-	//if(iFontIndex >= m_PreviewFontList.size())
-	//{
-	//	HyGuiLog("TextFontManager::GetFontPath failed because 'm_PreviewFontList' has not been generated", LOGTYPE_Error);
-	//	return QString();
-	//}
-
-	//return QString(m_PreviewFontList[iFontIndex]->GetTextureFont()->filename);
 }
 
 rendermode_t TextFontManager::GetRenderMode(TextLayerHandle hLayer) const
@@ -522,7 +513,7 @@ QString TextFontManager::GetFontPathFromName(QString sFontName)
 	}
 	if(sFontPath.isEmpty())
 	{
-		HyGuiLog("TextFontManager::CreatePreviewFont could not find font: " % sFontName, LOGTYPE_Error);
+		HyGuiLog("TextFontManager::GetFontPathFromName could not find font: " % sFontName, LOGTYPE_Error);
 		return "";
 	}
 

@@ -14,7 +14,7 @@
 #include "SpineModel.h"
 
 AtlasFrame::AtlasFrame(IManagerModel &modelRef,
-					   ItemType eType,
+					   bool bIsSubAtlas,
 					   QUuid uuid,
 					   quint32 uiChecksum,
 					   quint32 uiBankId,
@@ -27,7 +27,8 @@ AtlasFrame::AtlasFrame(IManagerModel &modelRef,
 					   int iY,
 					   int iTextureIndex,
 					   uint uiErrors) :
-	IAssetItemData(modelRef, /*eType*/ITEM_AtlasFrame, uuid, uiChecksum, uiBankId, sName, ".png", uiErrors),
+	IAssetItemData(modelRef, ITEM_AtlasFrame, uuid, uiChecksum, uiBankId, sName, ".png", uiErrors),
+	m_bIsSubAtlas(bIsSubAtlas),
 	m_iWidth(iW),
 	m_iHeight(iH),
 	m_rAlphaCrop(rAlphaCrop),
@@ -40,6 +41,11 @@ AtlasFrame::AtlasFrame(IManagerModel &modelRef,
 
 AtlasFrame::~AtlasFrame()
 {
+}
+
+bool AtlasFrame::IsSubAtlas() const
+{
+	return m_bIsSubAtlas;
 }
 
 QSize AtlasFrame::GetSize() const
@@ -141,15 +147,16 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize t
 		SetError(ASSETERROR_CouldNotPack);
 }
 
-void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir)
+void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, bool bIsSubAtlas, QDir metaDir)
 {
+	m_bIsSubAtlas = bIsSubAtlas;
 	m_sName = sName;
 
 	m_uiChecksum = uiChecksum;
 	m_iWidth = newImage.width();
 	m_iHeight = newImage.height();
 
-	if(m_eTYPE == ITEM_AtlasFrame)
+	if(m_bIsSubAtlas == false)
 		m_rAlphaCrop = ImagePacker::crop(newImage);
 	else // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
 		m_rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
@@ -169,6 +176,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 
 /*virtual*/ void AtlasFrame::InsertUniqueJson(QJsonObject &frameObj) /*override*/
 {
+	frameObj.insert("isSubAtlas", QJsonValue(m_bIsSubAtlas));
 	frameObj.insert("width", QJsonValue(GetSize().width()));
 	frameObj.insert("height", QJsonValue(GetSize().height()));
 	frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));

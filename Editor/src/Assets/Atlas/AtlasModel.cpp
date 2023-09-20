@@ -88,13 +88,13 @@ bool AtlasModel::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasS
 	return true;
 }
 
-AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiBankIndex, ItemType eType)
+AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiBankIndex, bool bIsSubAtlas)
 {
 	if(IsImageValid(newImage, m_BanksModel.GetBank(uiBankIndex)->GetId()) == false)
 		return nullptr;
 
 	// This will also create a meta image and register asset
-	AtlasFrame *pFrame = ImportImage(sName, newImage, m_BanksModel.GetBank(uiBankIndex)->GetId(), eType, QUuid::createUuid());
+	AtlasFrame *pFrame = ImportImage(sName, newImage, m_BanksModel.GetBank(uiBankIndex)->GetId(), bIsSubAtlas, QUuid::createUuid());
 
 	// This retrieves the newly created AtlasFrame and links it to its ProjectItemData
 	QList<TreeModelItemData *> returnList = pItem->GetProject().IncrementDependencies(pItem, QList<QUuid>() << pFrame->GetUuid());
@@ -107,7 +107,7 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QIm
 	return nullptr;
 }
 
-bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage)
+bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bIsSubAtlas)
 {
 	if(IsImageValid(newImage, pFrame->GetBankId()) == false)
 		return false;
@@ -122,7 +122,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 
 	// Determine the new checksum into the map
 	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.sizeInBytes());
-	pFrame->ReplaceImage(sName, uiChecksum, newImage, m_MetaDir);
+	pFrame->ReplaceImage(sName, uiChecksum, newImage, bIsSubAtlas, m_MetaDir);
 
 	// Re-enter the frame into the map
 	RegisterAsset(pFrame);
@@ -223,7 +223,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 					 QPoint(metaObj["cropRight"].toInt(), metaObj["cropBottom"].toInt()));
 
 	AtlasFrame *pNewFrame = new AtlasFrame(*this,
-										   HyGlobal::GetTypeFromString(metaObj["itemType"].toString()),
+										   metaObj["isSubAtlas"].toBool(false),
 										   QUuid(metaObj["assetUUID"].toString()),
 										   JSONOBJ_TOINT(metaObj, "checksum"),
 										   JSONOBJ_TOINT(metaObj, "bankId"),
@@ -271,7 +271,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	// Passed error check: proceed with import
 	// TODO: ImportImage is slow! Consider adding a progress bar for this
 	for(int i = 0; i < sImportAssetList.size(); ++i)
-		returnList.append(ImportImage(QFileInfo(sImportAssetList[i]).baseName(), *newImageList[i], uiBankId, eType, correspondingUuidList[i]));
+		returnList.append(ImportImage(QFileInfo(sImportAssetList[i]).baseName(), *newImageList[i], uiBankId, false, correspondingUuidList[i]));
 
 	if(returnList.empty() == false)
 	{
@@ -311,10 +311,22 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 		QFileInfo fileInfo(sImportAssetList[i]);
 		QImage *pNewImage = new QImage(fileInfo.absoluteFilePath());
 		QSize atlasDimensions = GetMaxAtlasDimensions(GetBankIndexFromBankId(assetList[i]->GetBankId()));
+
+		bool bPassesChecks = true;
 		if(IsImageValid(*pNewImage, assetList[i]->GetBankId()) == false)
 		{
 			HyGuiLog("Replacement image " % fileInfo.fileName() % " will not fit in atlas group '" % QString::number(assetList[i]->GetBankId()) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
+			bPassesChecks = false;
+		}
+		if(static_cast<AtlasFrame *>(assetList[i])->IsSubAtlas())
+		{
+			HyGuiLog("Replacing " % assetList[i]->GetName() % " is invalid because it is a sub-atlas for an existing item", LOGTYPE_Warning);
+			bPassesChecks = false;
+		}
 
+		if(bPassesChecks == false)
+		{
+			delete pNewImage;
 			for(int j = 0; j < newReplacementImageList.size(); ++j)
 				delete newReplacementImageList[j];
 
@@ -333,7 +345,7 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 		repackTexIndexMap[m_BanksModel.GetBank(GetBankIndexFromBankId(pFrame->GetBankId()))].insert(pFrame->GetTextureIndex());
 
 		QFileInfo fileInfo(sImportAssetList[i]);
-		ReplaceFrame(pFrame, fileInfo.baseName(), *newReplacementImageList[i]);
+		ReplaceFrame(pFrame, fileInfo.baseName(), *newReplacementImageList[i], false);
 	}
 	for(int j = 0; j < newReplacementImageList.size(); ++j)
 		delete newReplacementImageList[j];
@@ -561,31 +573,31 @@ void AtlasModel::AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSe
 	}
 }
 
-AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiBankId, ItemType eType, QUuid uuid)
+AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiBankId, bool bIsSubAtlas, QUuid uuid)
 {
 	QFileInfo fileInfo(sName);
 
 	quint32 uiChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.sizeInBytes());
 
 	QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
-	if(eType == ITEM_AtlasFrame) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
+	if(bIsSubAtlas == false) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
 		rAlphaCrop = ImagePacker::crop(newImage);
 
 	HyTextureInfo info(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0);
 	AtlasFrame *pNewAsset = new AtlasFrame(*this,
-		eType,
-		uuid,
-		uiChecksum,
-		uiBankId,
-		fileInfo.baseName(),
-		rAlphaCrop,
-		info,
-		newImage.width(),
-		newImage.height(),
-		-1,
-		-1,
-		-1,
-		0);
+											bIsSubAtlas,
+											uuid,
+											uiChecksum,
+											uiBankId,
+											fileInfo.baseName(),
+											rAlphaCrop,
+											info,
+											newImage.width(),
+											newImage.height(),
+											-1,
+											-1,
+											-1,
+											0);
 
 	newImage.save(m_MetaDir.absoluteFilePath(pNewAsset->ConstructMetaFileName()));
 	RegisterAsset(pNewAsset);

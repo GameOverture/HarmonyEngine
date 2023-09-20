@@ -22,6 +22,8 @@ class AtlasFrame : public IAssetItemData
 {
 	Q_OBJECT
 
+	bool								m_bIsSubAtlas;
+
 	int									m_iWidth;
 	int									m_iHeight;
 	QRect								m_rAlphaCrop;
@@ -36,7 +38,7 @@ class AtlasFrame : public IAssetItemData
 
 public:
 	AtlasFrame(IManagerModel &modelRef,
-			   ItemType eType,
+			   bool bIsSubAtlas,
 			   QUuid uuid,
 			   quint32 uiChecksum,
 			   quint32 uiBankId,
@@ -47,6 +49,8 @@ public:
 			   int iTextureIndex,
 			   uint uiErrors);
 	~AtlasFrame();
+
+	bool IsSubAtlas() const;
 
 	QSize GetSize() const;
 	QRect GetCrop() const;
@@ -69,7 +73,7 @@ public:
 
 	void ClearTextureIndex();
 	void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize textureSize);
-	void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, QDir metaDir);
+	void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, bool bIsSubAtlas, QDir metaDir);
 
 	virtual QString GetPropertyInfo() override;
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;

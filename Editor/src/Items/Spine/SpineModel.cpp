@@ -297,14 +297,14 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 			// Keep track of sub-atlas replacements
 			if(subAtlas.m_pAtlasFrame)
 			{
-				if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(subAtlas.m_pAtlasFrame, subAtlas.m_pAtlasFrame->GetName(), subAtlasImage) == false)
+				if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(subAtlas.m_pAtlasFrame, subAtlas.m_pAtlasFrame->GetName(), subAtlasImage, true) == false)
 				{
 					HyGuiLog("Cannot ReplaceFrame Spine sub-atlas for " % m_ItemRef.GetName(true), LOGTYPE_Error);
 					return false;
 				}
 			}
 			else
-				subAtlas.m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, subAtlas.m_ImageFileInfo.fileName(), subAtlasImage, uiSubAtlasBankId, ITEM_Spine);
+				subAtlas.m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, subAtlas.m_ImageFileInfo.fileName(), subAtlasImage, uiSubAtlasBankId, true);
 		}
 
 		m_ItemRef.GetProject().GetAtlasModel().FlushRepack();
