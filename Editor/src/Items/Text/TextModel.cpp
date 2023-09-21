@@ -204,9 +204,9 @@ void TextModel::SetRuntimeAtlasDirty()
 	itemSpecificFileDataOut.m_Data.insert("checksum", m_pAtlasFrame == nullptr ? 0 : QJsonValue(static_cast<qint64>(m_pAtlasFrame->GetChecksum())));
 	itemSpecificFileDataOut.m_Meta.insert("assetUUID", m_pAtlasFrame == nullptr ? 0 : m_pAtlasFrame->GetUuid().toString(QUuid::WithoutBraces));
 
-	//uint uiAtlasPixelDataSizeOut;
-	//unsigned char *pPixelData = m_FontManager.GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);
+	uint uiAtlasPixelDataSizeOut;
 	QSize atlasDimensionsOut;
+	unsigned char *pPixelData = m_FontManager.GetAtlasInfo(uiAtlasPixelDataSizeOut, atlasDimensionsOut);
 	itemSpecificFileDataOut.m_Data.insert("subAtlasWidth", m_pAtlasFrame == nullptr ? atlasDimensionsOut.width() : QJsonValue(m_pAtlasFrame->GetSize().width()));
 	itemSpecificFileDataOut.m_Data.insert("subAtlasHeight", m_pAtlasFrame == nullptr ? atlasDimensionsOut.height() : QJsonValue(m_pAtlasFrame->GetSize().height()));
 

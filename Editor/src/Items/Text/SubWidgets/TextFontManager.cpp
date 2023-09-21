@@ -550,29 +550,7 @@ int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMo
 
 	m_PreviewFontList.append(pNewPreviewFont);
 
-	int iFontIndex = m_PreviewFontList.size() - 1;
-	for(auto iter = m_LayerMap.begin(); iter != m_LayerMap.end(); ++iter)
-	{
-		if(iter.value()->m_iFontIndex == iFontIndex)
-		{
-			iter.value()->m_fLineHeight = pNewPreviewFont->GetTextureFont()->height;
-			iter.value()->m_fLineAscender = pNewPreviewFont->GetTextureFont()->ascender;
-			iter.value()->m_fLineDescender = pNewPreviewFont->GetTextureFont()->descender;
-
-			for(int j = 0; j < sGlyphList.count(); ++j)
-			{
-				// NOTE: Assumes LITTLE ENDIAN
-				QString sSingleChar = sGlyphList[j];
-				texture_glyph_t *pGlyph = texture_font_get_glyph(pNewPreviewFont->GetTextureFont(), sSingleChar.toUtf8().data());
-
-				// Only keep track of negative offset_x's
-				if(pGlyph->offset_x < 0 && iter.value()->m_fLeftSideNudgeAmt < abs(pGlyph->offset_x))
-					iter.value()->m_fLeftSideNudgeAmt = abs(pGlyph->offset_x);
-			}
-		}
-	}
-
-	return iFontIndex;
+	return m_PreviewFontList.size() - 1; // Font index
 }
 
 int TextFontManager::InitAtlas()
@@ -631,8 +609,11 @@ void TextFontManager::ClearAndEmbiggenAtlas()
 
 void TextFontManager::RegenFontArray()
 {
+	QString sGlyphList = GetAvailableTypefaceGlyphs();
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Cleanup unused fonts
+	// Cleanup unused fonts - Fonts not referenced by any layer will be removed.
+	//                        This is also a convenient spot to set/update the layer's misc info the referenced font (height, ascender, descender, etc)
 	int iFontIndex = 0;
 	for(auto iter = m_PreviewFontList.begin(); iter != m_PreviewFontList.end(); ++iFontIndex)
 	{
@@ -641,6 +622,21 @@ void TextFontManager::RegenFontArray()
 		{
 			if(iterLayer.value()->m_iFontIndex == iFontIndex)
 			{
+				iterLayer.value()->m_fLineHeight = m_PreviewFontList[iFontIndex]->GetTextureFont()->height;
+				iterLayer.value()->m_fLineAscender = m_PreviewFontList[iFontIndex]->GetTextureFont()->ascender;
+				iterLayer.value()->m_fLineDescender = m_PreviewFontList[iFontIndex]->GetTextureFont()->descender;
+
+				for(int j = 0; j < sGlyphList.count(); ++j)
+				{
+					// NOTE: Assumes LITTLE ENDIAN
+					QString sSingleChar = sGlyphList[j];
+					texture_glyph_t *pGlyph = texture_font_get_glyph(m_PreviewFontList[iFontIndex]->GetTextureFont(), sSingleChar.toUtf8().data());
+
+					// Only keep track of negative offset_x's
+					if(pGlyph->offset_x < 0 && iterLayer.value()->m_fLeftSideNudgeAmt < abs(pGlyph->offset_x))
+						iterLayer.value()->m_fLeftSideNudgeAmt = abs(pGlyph->offset_x);
+				}
+
 				bFontUsed = true;
 				break;
 			}
