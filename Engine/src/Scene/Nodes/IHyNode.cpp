@@ -36,13 +36,10 @@ IHyNode::IHyNode(const IHyNode &copyRef) :
 		SetPauseUpdate(true);
 
 	m_uiFlags = copyRef.m_uiFlags;
-
-	// MOVE TODO: Account for m_ActiveAnimFloatsList
 }
 
 IHyNode::IHyNode(IHyNode &&donor) noexcept :
-	m_uiFlags(0),
-	m_ActiveAnimFloatsList(std::move(donor.m_ActiveAnimFloatsList))
+	m_uiFlags(0)
 #ifdef HY_ENABLE_USER_TAGS
 	, m_iTag(std::move(donor.m_iTag))
 #endif
@@ -86,8 +83,6 @@ IHyNode &IHyNode::operator=(const IHyNode &rhs)
 
 IHyNode &IHyNode::operator=(IHyNode &&donor)
 {
-	m_ActiveAnimFloatsList = std::move(donor.m_ActiveAnimFloatsList);
-
 	if(donor.IsRegistered())
 	{
 		donor.SetRegistered(false);
@@ -186,13 +181,39 @@ bool IHyNode::IsRegistered() const
 	// Update any currently active AnimFloat associated with this transform, and remove any of them that are finished.
 	for(std::vector<HyAnimFloat *>::iterator iter = m_ActiveAnimFloatsList.begin(); iter != m_ActiveAnimFloatsList.end();)
 	{
+		// iter may be invalidated by the call to UpdateFloat() because the "AnimFinished" callback may add more AnimFloats to 'm_ActiveAnimFloatsList'
+		// Store a pointer to the current HyAnimFloat in order to reestablish the iterator after the call to UpdateFloat()
+		HyAnimFloat *pAnimFloat = *iter;
+
 		if((*iter)->UpdateFloat())
 		{
+			// Use 'pAnimFloat' to reestablish the iterator
+			for(int i = 0; i < m_ActiveAnimFloatsList.size(); ++i)
+			{
+				if(m_ActiveAnimFloatsList[i] == pAnimFloat)
+				{
+					iter = m_ActiveAnimFloatsList.begin() + i;
+					break;
+				}
+			}
+
 			(*iter)->m_bAddedToOwnerUpdate = false;
 			iter = m_ActiveAnimFloatsList.erase(iter);
 		}
 		else
+		{
+			// Use 'pAnimFloat' to reestablish the iterator
+			for(int i = 0; i < m_ActiveAnimFloatsList.size(); ++i)
+			{
+				if(m_ActiveAnimFloatsList[i] == pAnimFloat)
+				{
+					iter = m_ActiveAnimFloatsList.begin() + i;
+					break;
+				}
+			}
+
 			++iter;
+		}
 	}
 }
 
