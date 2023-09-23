@@ -33,7 +33,7 @@ AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 
 void AuxDopeSheet::SetEntityStateModel(EntityStateData *pEntStateData)
 {
-	ui->graphicsView->setScene(&pEntStateData->GetDopeSheetScene());
+	ui->graphicsView->SetScene(pEntStateData);
 }
 
 void AuxDopeSheet::on_actionRewind_triggered()

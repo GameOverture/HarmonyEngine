@@ -1013,7 +1013,11 @@ void Project::DecrementDependencies(TreeModelItemData *pItemDepender, QList<QUui
 {
 	QList<TreeModelItemData *> dependeeItemDataList;
 	for(auto uuid : dependeeList)
+	{
+		if(uuid.isNull())
+			continue;
 		dependeeItemDataList.push_back(FindItemData(uuid));
+	}
 
 	DecrementDependencies(pItemDepender, dependeeItemDataList);
 }

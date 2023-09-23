@@ -67,6 +67,11 @@ float EntityDopeSheetScene::GetZoom() const
 	return m_fZoom;
 }
 
+const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &EntityDopeSheetScene::GetKeyFramesMap() const
+{
+	return m_KeyFramesMap;
+}
+
 QJsonArray EntityDopeSheetScene::SerializeAllKeyFrames(EntityTreeItemData *pItemData) const
 {
 	if(m_KeyFramesMap.contains(pItemData) == false)

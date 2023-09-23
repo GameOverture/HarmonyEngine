@@ -10,21 +10,14 @@
 #include "Global.h"
 #include "EntityDopeSheetView.h"
 #include "EntityDopeSheetScene.h"
+#include "EntityModel.h"
 
 #include <QPainter>
 #include <QScrollBar>
 
-#define TIMELINE_HEIGHT 38.0f
-#define TIMELINE_LEFT_MARGIN 250.0f
-#define TIMELINE_NOTCH_WIDTH 88.0f
-#define TIMELINE_NOTCH_MAINLINE_HEIGHT 15.0f
-#define TIMELINE_NOTCH_SUBLINES_HEIGHT 9.0f
-#define TIMELINE_NOTCH_SUBLINES_WIDTH 18.0f
-#define TIMELINE_NOTCH_TEXT_YPOS 10.0f
-
 EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	QGraphicsView(pParent),
-	m_iCurrentFrame(0)
+	m_pStateData(nullptr)
 {
 }
 
@@ -35,6 +28,12 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 EntityDopeSheetScene *EntityDopeSheetView::GetScene() const
 {
 	return static_cast<EntityDopeSheetScene *>(scene());
+}
+
+void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
+{
+	m_pStateData = pStateData;
+	setScene(&m_pStateData->GetDopeSheetScene());
 }
 
 /*virtual*/ void EntityDopeSheetView::drawForeground(QPainter *pPainter, const QRectF &rect) /*override*/
@@ -89,5 +88,67 @@ EntityDopeSheetScene *EntityDopeSheetView::GetScene() const
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+	std::function<bool(EntityTreeItemData *, QPointF)> fpDrawEntityItem = [&](EntityTreeItemData *pEntItemData, QPointF ptDrawPos) -> bool
+	{
+		//const QUuid &uuidRef = pEntItemData->GetThisUuid();
+		if(GetScene()->GetKeyFramesMap().contains(pEntItemData) == false)
+			return false;
 
+		// Draw Entity Item Name
+		//pPainter->font().pixelSize()
+		QRectF textRect(ptDrawPos.x(), ptDrawPos.y() + 20.0f, TIMELINE_LEFT_MARGIN, ITEMS_HEIGHT);
+		pPainter->drawText(textRect, pEntItemData->GetCodeName());
+
+		// Draw divider line
+		pPainter->drawLine(rect.x(), ptDrawPos.y() + ITEMS_HEIGHT, rect.x() + rect.width(), ptDrawPos.y() + ITEMS_HEIGHT);
+
+		return true;
+
+		//const QMap<int, QJsonObject> &keyFrameMapRef = GetScene()->GetKeyFramesMap()[pEntItemData];
+
+		//for(int i = 0; i < keysList.size(); ++i)
+		//{
+		//	EntityTreeItemData *pKey = keysList[i];
+		//	if(pKey->GetThisUuid() != uuidRef)
+		//		continue;
+		//	//const QMap<int, QJsonObject> &frameMapRef = keyFrameMapRef[pKey];
+		//	//QList<int> frameList = frameMapRef.keys();
+		//	//for(int iFrame : frameList)
+		//	//{
+		//	//	if(iFrame < m_iCurrentFrame)
+		//	//		continue;
+		//	//	QJsonObject &frameObjRef = frameMapRef[iFrame];
+		//	//	QRectF frameRect;
+		//	//	frameRect.setX(fPOSX_DRAW_THRESHOLD + (iFrame * fSubLineSpacing));
+		//	//	frameRect.setY(rect.y() + TIMELINE_HEIGHT);
+		//	//	frameRect.setWidth(fSubLineSpacing);
+		//	//	frameRect.setHeight(100.0f);
+		//	//	pPainter->setPen(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
+		//	//	pPainter->setBrush(HyGlobal::CovertHyColor(HyColor::WidgetFill));
+		//	//	pPainter->drawRect(frameRect);
+		//	//	pPainter->setPen(HyGlobal::CovertHyColor(HyColor::Black));
+		//	//	pPainter->drawText(frameRect, Qt::AlignHCenter | Qt::AlignVCenter, QString::number(iFrame));
+		//	//}
+		//}
+	};
+
+	//const QUuid &rootUuidRef = ->GetThisUuid();
+	{
+		int iItemIndex = 0;
+		float fPosX = rect.x() + ITEMS_LEFT_MARGIN;
+		float fPosY = rect.y() + TIMELINE_HEIGHT + (iItemIndex * ITEMS_HEIGHT);
+
+		QList<EntityTreeItemData *> itemList, shapeList;
+		static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetTreeItemData(itemList, shapeList);
+		itemList += shapeList;
+		itemList.prepend(static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetRootTreeItemData());
+		for(EntityTreeItemData *pItem : itemList)
+		{
+			if(fpDrawEntityItem(pItem, QPointF(fPosX, fPosY)))
+			{
+				iItemIndex++;
+				fPosY += ITEMS_HEIGHT;
+			}
+		}
+	}
 }

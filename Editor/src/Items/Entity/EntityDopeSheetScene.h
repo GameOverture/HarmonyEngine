@@ -13,6 +13,17 @@
 #include <QGraphicsScene>
 #include <QJsonObject>
 
+#define TIMELINE_HEIGHT 38.0f
+#define TIMELINE_LEFT_MARGIN 250.0f
+#define TIMELINE_NOTCH_WIDTH 88.0f
+#define TIMELINE_NOTCH_MAINLINE_HEIGHT 15.0f
+#define TIMELINE_NOTCH_SUBLINES_HEIGHT 9.0f
+#define TIMELINE_NOTCH_SUBLINES_WIDTH 18.0f
+#define TIMELINE_NOTCH_TEXT_YPOS 10.0f
+
+#define ITEMS_LEFT_MARGIN 32.0f
+#define ITEMS_HEIGHT 32.0f
+
 class EntityStateData;
 class EntityTreeItemData;
 
@@ -37,6 +48,8 @@ public:
 
 	int GetCurrentFrame() const;
 	float GetZoom() const;
+
+	const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &GetKeyFramesMap() const;
 
 	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const;
 	QJsonObject ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData) const;
