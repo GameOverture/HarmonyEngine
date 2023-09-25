@@ -73,6 +73,16 @@ const PropertiesDef PropertiesTreeModel::FindPropertyDefinition(QString sCategor
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
 	m_PropertyDefMap[pTreeItem].eAccessType = bToggleOn ? PROPERTIESACCESS_ToggleOn : PROPERTIESACCESS_ToggleOff;
+
+	// Apply the dataChanged signal
+	if(pTreeItem->GetNumChildren() > 0)
+	{
+		// This is a category
+		dataChanged(createIndex(0, PROPERTIESCOLUMN_Name, pTreeItem->GetChild(0)),
+					createIndex(pTreeItem->GetNumChildren() - 1, PROPERTIESCOLUMN_Value, pTreeItem->GetChild(pTreeItem->GetNumChildren() - 1)));
+	}
+	else
+		dataChanged(indexRef, indexRef);
 }
 
 QVariant PropertiesTreeModel::GetPropertyValue(const QModelIndex &indexRef) const
@@ -328,16 +338,6 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 	m_PropertyDefMap[pNewlyAddedTreeItem] = def;
 
 	return true;
-}
-
-void PropertiesTreeModel::RefreshCategory(const QModelIndex &indexRef)
-{
-	TreeModelItem *pCategoryTreeItem = GetItem(indexRef);
-	if(pCategoryTreeItem->GetNumChildren() > 0)
-	{
-		dataChanged(createIndex(0, PROPERTIESCOLUMN_Name, pCategoryTreeItem->GetChild(0)),
-					createIndex(pCategoryTreeItem->GetNumChildren() - 1, PROPERTIESCOLUMN_Value, pCategoryTreeItem->GetChild(pCategoryTreeItem->GetNumChildren() - 1)));
-	}
 }
 
 QJsonObject PropertiesTreeModel::SerializeJson()
@@ -654,7 +654,7 @@ void PropertiesTreeModel::ResetValues()
 				if(propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn || propDefRef.eAccessType == PROPERTIESACCESS_ToggleOff)
 				{
 					if(indexRef.column() == PROPERTIESCOLUMN_Name)
-						returnFlags |= (Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+						returnFlags |= (Qt::ItemIsUserCheckable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
 					else // column is PROPERTIESCOLUMN_Value
 					{
 						if(propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn)

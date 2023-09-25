@@ -28,6 +28,9 @@ public:
 
 protected:
 	virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
+
+private:
+	void DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color = HyColor::WidgetFrame, HyColor shadowColor = HyColor::Black);
 };
 
 #endif // ENTITYDOPESHEETVIEW_H

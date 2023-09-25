@@ -148,6 +148,20 @@ void EntityTreeItemData::SetSelected(bool bIsSelected)
 	m_bIsSelected = bIsSelected;
 }
 
+int EntityTreeItemData::GetArrayIndex() const
+{
+	if(m_eEntType == ENTTYPE_ArrayItem)
+	{
+		QModelIndex thisIndex = m_EntityModelRef.GetTreeModel().FindIndex<EntityTreeItemData *>(const_cast<EntityTreeItemData *>(this), 0);
+		if(thisIndex.isValid())
+			return thisIndex.row();
+		else
+			HyGuiLog("EntityTreeItemData::GetArrayIndex() - Failed to find index of this array item", LOGTYPE_Error);
+	}
+	
+	return -1;
+}
+
 void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 {
 	// Common stuff

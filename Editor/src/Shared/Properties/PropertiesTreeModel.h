@@ -157,8 +157,6 @@ public:
 						QString sSuffix = QString(),
 						QVariant delegateBuilder = QVariant());
 
-	void RefreshCategory(const QModelIndex &indexRef);
-
 	QJsonObject SerializeJson();
 	void DeserializeJson(const QJsonObject &propertiesObj);
 

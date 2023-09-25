@@ -36,7 +36,7 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 			m_KeyFramesMap[pItemData][keyFramesArray[i].toObject()["frame"].toInt()] = keyFramesArray[i].toObject()["props"].toObject();
 	}
 
-	setBackgroundBrush(HyGlobal::CovertHyColor(HyColor::ContainerFrame));
+	setBackgroundBrush(HyGlobal::CovertHyColor(HyColor::WidgetPanel));
 
 	UpdateSceneItems();
 }
@@ -70,6 +70,37 @@ float EntityDopeSheetScene::GetZoom() const
 const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &EntityDopeSheetScene::GetKeyFramesMap() const
 {
 	return m_KeyFramesMap;
+}
+
+QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(EntityTreeItemData *pItemData) const
+{
+	QSet<QPair<QString, QString>> uniquePropertiesSet;
+
+	QList<QJsonObject> propsObjList = m_KeyFramesMap[pItemData].values();
+	for(QJsonObject propsObj : propsObjList)
+	{
+		QStringList sCategoryList = propsObj.keys();
+		for(QString sCategoryName : sCategoryList)
+		{
+			QJsonObject categoryObj = propsObj[sCategoryName].toObject();
+			QStringList sPropList = categoryObj.keys();
+			for(QString sPropName : sPropList)
+			{
+				QPair<QString, QString> newPair(sCategoryName, sPropName);
+				uniquePropertiesSet.insert(newPair);
+			}
+		}
+	}
+
+	QList<QPair<QString, QString>> uniquePropertiesList = uniquePropertiesSet.values();
+	std::sort(uniquePropertiesList.begin(), uniquePropertiesList.end(), [](const QPair<QString, QString> &a, const QPair<QString, QString> &b) -> bool
+	{
+		if(a.first == b.first)
+			return a.second < b.second;
+		return a.first < b.first;
+	});
+
+	return uniquePropertiesList;
 }
 
 QJsonArray EntityDopeSheetScene::SerializeAllKeyFrames(EntityTreeItemData *pItemData) const
@@ -206,7 +237,36 @@ void EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, in
 	UpdateSceneItems();
 }
 
+void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName)
+{
+	if(m_KeyFramesMap.contains(pItemData) == false || m_KeyFramesMap[pItemData].contains(iFrameIndex) == false)
+		return;
+
+	QJsonObject &keyFrameObjRef = m_KeyFramesMap[pItemData][iFrameIndex];
+	if(keyFrameObjRef.contains(sCategoryName) == false)
+		return;
+
+	QJsonObject categoryObj = keyFrameObjRef[sCategoryName].toObject();
+	categoryObj.remove(sPropName);
+
+	if(categoryObj.isEmpty())
+	{
+		keyFrameObjRef.remove(sCategoryName);
+		if(keyFrameObjRef.isEmpty())
+		{
+			m_KeyFramesMap[pItemData].remove(iFrameIndex);
+			if(m_KeyFramesMap[pItemData].isEmpty())
+				m_KeyFramesMap.remove(pItemData);
+		}
+	}
+	else
+		keyFrameObjRef.insert(sCategoryName, categoryObj);
+
+	UpdateSceneItems();
+}
+
 void EntityDopeSheetScene::UpdateSceneItems()
 {
-	QRectF rect = sceneRect();
+	//QRectF rect = sceneRect();
+	update();
 }

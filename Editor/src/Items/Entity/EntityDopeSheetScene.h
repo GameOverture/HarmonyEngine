@@ -22,7 +22,9 @@
 #define TIMELINE_NOTCH_TEXT_YPOS 10.0f
 
 #define ITEMS_LEFT_MARGIN 32.0f
-#define ITEMS_HEIGHT 32.0f
+#define ITEMS_LINE_HEIGHT 22.0f
+#define KEYFRAME_HEIGHT 20.0f
+#define KEYFRAME_WIDTH 5.0f
 
 class EntityStateData;
 class EntityTreeItemData;
@@ -51,12 +53,15 @@ public:
 
 	const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &GetKeyFramesMap() const;
 
+	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData) const; // This is mainly useful for rendering the dope sheet
+
 	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const;
 	QJsonObject ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData) const;
 
 	QJsonValue GetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const;
 	void SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj);
 	void SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue);
+	void RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName);
 
 protected:
 	void UpdateSceneItems();

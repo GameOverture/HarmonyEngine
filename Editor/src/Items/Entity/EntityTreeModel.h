@@ -62,6 +62,8 @@ public:
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);
 
+	int GetArrayIndex() const; // Returns -1 when not an array item
+
 	void InsertJsonInfo_Desc(QJsonObject &childObjRef);
 
 	QString GenerateStateSrc(uint32 uiStateIndex, QString sNewLine, bool &bActivatePhysicsOut, uint32 &uiMaxVertListSizeOut);

@@ -564,7 +564,11 @@ QString EntityModel::GenerateSrc_SetStates() const
 	QString sProperty = propertiesModelRef.GetPropertyName(indexRef);
 
 	EntityTreeItemData *pEntityTreeData = propertiesModelRef.GetSubstate().value<EntityTreeItemData *>();
-	pStateData->GetDopeSheetScene().SetKeyFrameProperty(pEntityTreeData, iFrameIndex, sCategory, sProperty, propertiesModelRef.GetPropertyJsonValue(indexRef));
+
+	if(propertiesModelRef.GetPropertyDefinition(indexRef).eAccessType == PROPERTIESACCESS_ToggleOff)
+		pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(pEntityTreeData, iFrameIndex, sCategory, sProperty);
+	else
+		pStateData->GetDopeSheetScene().SetKeyFrameProperty(pEntityTreeData, iFrameIndex, sCategory, sProperty, propertiesModelRef.GetPropertyJsonValue(indexRef));
 }
 
 /*virtual*/ void EntityModel::OnPopState(int iPoppedStateIndex) /*override*/

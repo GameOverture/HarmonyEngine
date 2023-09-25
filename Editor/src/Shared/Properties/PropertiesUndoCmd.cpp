@@ -37,10 +37,7 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 /*virtual*/ void PropertiesUndoCmd::redo() /*override*/
 {
 	if(m_ModelIndex.column() == PROPERTIESCOLUMN_Name)
-	{
 		m_pModel->SetToggle(m_ModelIndex, m_NewData.toBool());
-		m_pModel->RefreshCategory(m_ModelIndex);
-	}
 	else
 		m_pModel->setData(m_ModelIndex, m_NewData, Qt::UserRole);
 
@@ -53,10 +50,7 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 /*virtual*/ void PropertiesUndoCmd::undo() /*override*/
 {
 	if(m_ModelIndex.column() == PROPERTIESCOLUMN_Name)
-	{
 		m_pModel->SetToggle(m_ModelIndex, m_OldData.toBool());
-		m_pModel->RefreshCategory(m_ModelIndex);
-	}
 	else
 		m_pModel->setData(m_ModelIndex, m_OldData, Qt::UserRole);
 
