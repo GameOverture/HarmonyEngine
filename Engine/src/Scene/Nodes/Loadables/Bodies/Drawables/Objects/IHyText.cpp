@@ -542,6 +542,13 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
 {
+	if(fWidth <= 0.0f || fHeight <= 0.0f)
+	{
+		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::SetAsScaleBox() invoked with invalid dimensions: " << fWidth << ", " << fHeight);
+		fWidth = HyMath::Max(1.0f, fWidth);
+		fHeight = HyMath::Max(1.0f, fHeight);
+	}
+
 	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_ColumnSplitWordsToFit | TEXTATTRIB_IsVertical);
 	m_uiTextAttributes |= TEXTATTRIB_IsScaleBox;
 
