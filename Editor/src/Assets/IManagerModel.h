@@ -63,7 +63,7 @@ public:
 	QList<IAssetItemData *> GetBankAssets(uint uiBankIndex);
 
 	void GenerateAssetsDlg(const QModelIndex &indexDestination);
-	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
+	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
 	void RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeModelItemData *> filtersList);
 	bool GetAffectedItems(QList<IAssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const; // Returns false if any affected items are not saved and should not proceed with asset repack
 	void ReplaceAssets(QList<IAssetItemData *> assetsList, bool bWithNewAssets);
@@ -120,7 +120,7 @@ protected:
 	virtual IAssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 
 	virtual void OnGenerateAssetsDlg(const QModelIndex &indexDestination) = 0;
-	virtual QList<IAssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset
+	virtual QList<IAssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) = 0; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) = 0;
 	virtual bool OnUpdateAssets(QList<IAssetItemData *> assetList) = 0;
@@ -136,7 +136,8 @@ private:
 	LoadingType GetLoadingType() const;
 
 protected Q_SLOTS:
-	void OnLoadUpdate(int iBlocksLoaded, int iTotalBlocks);
+	void OnImportAssetsFinished(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList, QList<IAssetItemData *> importedAssetList);
+	void OnRepackUpdate(int iBlocksLoaded, int iTotalBlocks);
 	void OnRepackFinished();
 };
 

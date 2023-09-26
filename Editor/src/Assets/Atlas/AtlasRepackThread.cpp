@@ -127,7 +127,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 					iNumNewTexturesUsed++;
 
 					iLoadedBlocks++;
-					Q_EMIT LoadUpdate(iLoadedBlocks, iTotalBlocks);
+					Q_EMIT RepackUpdate(iLoadedBlocks, iTotalBlocks);
 
 					// If texture size isn't 'fullAtlasSize' then indicate it as "unfilled"
 					if(textureSize != fullAtlasSize)

@@ -212,7 +212,6 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 {
 	WaveHeader wavHeader(metaObj["wavHeader"].toObject());
 	SoundClip *pNewFrame = new SoundClip(*this,
-										   HyGlobal::GetTypeFromString(metaObj["itemType"].toString()),
 										   QUuid(metaObj["assetUUID"].toString()),
 										   JSONOBJ_TOINT(metaObj, "checksum"),
 										   JSONOBJ_TOINT(metaObj, "bankId"),
@@ -233,7 +232,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 {
 }
 
-/*virtual*/ QList<IAssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
+/*virtual*/ QList<IAssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
 {
 	QList<IAssetItemData *> returnList;
 	QList<WaveHeader> headerList;
@@ -251,7 +250,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	for(int i = 0; i < sImportAssetList.size(); ++i)
 	{
 		// ImportSound calls RegisterAsset() on valid imports
-		SoundClip *pNewAsset = ImportSound(sImportAssetList[i], uiBankId, eType, correspondingUuidList[i], headerList[i]);
+		SoundClip *pNewAsset = ImportSound(sImportAssetList[i], uiBankId, correspondingUuidList[i], headerList[i]);
 		if(pNewAsset)
 			returnList.append(pNewAsset);
 	}
@@ -433,7 +432,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	return atlasInfoObj;
 }
 
-SoundClip *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, ItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef)
+SoundClip *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, QUuid uuid, const WaveHeader &wavHeaderRef)
 {
 	QFile file(sFilePath);
 	if(!file.open(QIODevice::ReadOnly))
@@ -448,7 +447,7 @@ SoundClip *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, I
 	quint32 uiChecksum = HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(pBinaryData.constData()), pBinaryData.size());
 	QFileInfo fileInfo(sFilePath);
 	
-	SoundClip *pNewAsset = new SoundClip(*this, eType, uuid, uiChecksum, uiBankId, fileInfo.baseName(), wavHeaderRef, GetGroupIdFromGroupIndex(0), false, wavHeaderRef.NumOfChan == 1, 0, false, 1.0f, 0);
+	SoundClip *pNewAsset = new SoundClip(*this, uuid, uiChecksum, uiBankId, fileInfo.baseName(), wavHeaderRef, GetGroupIdFromGroupIndex(0), false, wavHeaderRef.NumOfChan == 1, 0, false, 1.0f, 0);
 
 	if(QFile::copy(sFilePath, m_MetaDir.absoluteFilePath(pNewAsset->ConstructMetaFileName())) == false)
 	{

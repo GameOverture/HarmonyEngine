@@ -67,7 +67,7 @@ protected:
 	virtual IAssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
 
 	virtual void OnGenerateAssetsDlg(const QModelIndex &indexDestination) override;
-	virtual QList<IAssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) override; // Must call RegisterAsset() on each asset
+	virtual QList<IAssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) override; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) override; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) override;
 	virtual bool OnUpdateAssets(QList<IAssetItemData *> assetList) override;
@@ -79,7 +79,7 @@ protected:
 	virtual QJsonObject GetSaveJson() override;
 
 private:
-	SoundClip *ImportSound(QString sFilePath, quint32 uiBankIndex, ItemType eType, QUuid uuid, const WaveHeader &wavHeaderRef);
+	SoundClip *ImportSound(QString sFilePath, quint32 uiBankIndex, QUuid uuid, const WaveHeader &wavHeaderRef);
 };
 
 #endif // AudioManagerModel_H

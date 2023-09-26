@@ -31,7 +31,7 @@ public:
 	virtual void OnRun() = 0;
 
 Q_SIGNALS:
-	void LoadUpdate(int iLoadedBlocks, int iTotalBlocks);
+	void RepackUpdate(int iLoadedBlocks, int iTotalBlocks);
 	void RepackIsFinished();
 };
 

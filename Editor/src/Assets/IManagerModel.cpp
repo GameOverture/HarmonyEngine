@@ -161,7 +161,7 @@ void IManagerModel::GenerateAssetsDlg(const QModelIndex &indexDestination)
 	OnGenerateAssetsDlg(indexDestination);
 }
 
-bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList)
+bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList)
 {
 	if(correspondingParentList.size() != sImportList.size())
 	{
@@ -169,17 +169,7 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, I
 		return false;
 	}
 
-	if(eType == ITEM_Unknown)
-	{
-		switch(m_eASSET_TYPE)
-		{
-		case ASSETMAN_Source:	eType = ITEM_Source;		break;
-		case ASSETMAN_Atlases:	eType = ITEM_AtlasFrame;	break;
-		case ASSETMAN_Audio:	eType = ITEM_SoundClip;		break;
-		}
-	}
-
-	QList<IAssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, eType, correspondingParentList, correspondingUuidList);
+	QList<IAssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, correspondingParentList, correspondingUuidList);
 	for(int i = 0; i < returnList.size(); ++i)
 		InsertTreeItem(m_ProjectRef, returnList[i], GetItem(FindIndex<TreeModelItemData *>(correspondingParentList[i], 0)));
 
@@ -978,7 +968,7 @@ void IManagerModel::MoveAsset(IAssetItemData *pAsset, quint32 uiNewBankId)
 void IManagerModel::StartRepackThread(QString sLoadMessage, IRepackThread *pRepackThread)
 {
 	connect(pRepackThread, &QThread::finished, pRepackThread, &QObject::deleteLater);
-	connect(pRepackThread, &IRepackThread::LoadUpdate, this, &IManagerModel::OnLoadUpdate);
+	connect(pRepackThread, &IRepackThread::RepackUpdate, this, &IManagerModel::OnRepackUpdate);
 	connect(pRepackThread, &IRepackThread::RepackIsFinished, this, &IManagerModel::OnRepackFinished);
 
 	MainWindow::SetLoading(GetLoadingType(), 0, 0);
@@ -1029,13 +1019,17 @@ LoadingType IManagerModel::GetLoadingType() const
 	case ASSETMAN_Audio:	return LOADINGTYPE_AudioManager;
 
 	default:
-		HyGuiLog("IManagerModel::OnLoadUpdate - unhandled asset type: " % QString::number(m_eASSET_TYPE), LOGTYPE_Error);
+		HyGuiLog("IManagerModel::OnRepackUpdate - unhandled asset type: " % QString::number(m_eASSET_TYPE), LOGTYPE_Error);
 	}
 
 	return LOADINGTYPE_Unknown;
 }
 
-/*slot*/ void IManagerModel::OnLoadUpdate(int iBlocksLoaded, int iTotalBlocks)
+/*slot*/ void IManagerModel::OnImportAssetsFinished(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList, QList<IAssetItemData *> importedAssetList)
+{
+}
+
+/*slot*/ void IManagerModel::OnRepackUpdate(int iBlocksLoaded, int iTotalBlocks)
 {
 	MainWindow::SetLoading(GetLoadingType(), iBlocksLoaded, iTotalBlocks);
 }

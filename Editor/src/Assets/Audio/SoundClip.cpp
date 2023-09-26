@@ -13,7 +13,6 @@
 #include "_Dependencies/scriptum/imagepacker.h"
 
 SoundClip::SoundClip(IManagerModel &modelRef,
-					   ItemType eType,
 					   QUuid uuid,
 					   quint32 uiChecksum,
 					   quint32 uiBankId,
@@ -26,7 +25,7 @@ SoundClip::SoundClip(IManagerModel &modelRef,
 					   bool bCompressed,
 					   double dVbrQuality,
 					   uint uiErrors) :
-	IAssetItemData(modelRef, eType, uuid, uiChecksum, uiBankId, sName, ".wav", uiErrors),
+	IAssetItemData(modelRef, ITEM_SoundClip, uuid, uiChecksum, uiBankId, sName, ".wav", uiErrors),
 	m_WaveHeader(wavHeaderRef),
 	m_iGroupId(iGroupId),
 	m_bIsStreaming(bIsStreaming),

@@ -549,24 +549,19 @@ bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType
 
 	IManagerModel *pManager = nullptr;
 	quint32 uiBankId = 0;
-	ItemType eImportedAssetType = ITEM_Unknown;
 	switch(eAssetType)
 	{
 	case ASSETMAN_Source:
 		pManager = m_pSourceModel;
 		uiBankId = 0;
-		eImportedAssetType = ITEM_Source;
 		break;
 	case ASSETMAN_Atlases:
 		pManager = m_pAtlasModel;
 		uiBankId = m_pAtlasWidget ? m_pAtlasWidget->GetSelectedBankId() : 0;
-		//if(ePasteItemType == ITEM_Sprite)
-			eImportedAssetType = ITEM_AtlasFrame;
 		break;
 	case ASSETMAN_Audio:
 		pManager = m_pAudioModel;
 		uiBankId = m_pAudioWidget ? m_pAudioWidget->GetSelectedBankId() : 0;
-		eImportedAssetType = ITEM_SoundClip;
 		break;
 	default:
 		HyGuiLog("Project::PasteAssets - Unknown eAssetType: " % QString::number(eAssetType), LOGTYPE_Error);
@@ -600,7 +595,7 @@ bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType
 		}
 	}
 
-	pManager->ImportNewAssets(importAssetList, uiBankId, eImportedAssetType, correspondingParentList, correspondingUuidList);
+	pManager->ImportNewAssets(importAssetList, uiBankId, correspondingParentList, correspondingUuidList);
 
 	return true;
 }

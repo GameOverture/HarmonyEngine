@@ -69,7 +69,7 @@ bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 		correspondingUuidList << QUuid::createUuid();
 	}
 
-	return ImportNewAssets(sImportList, 0, ITEM_Source, correspondingParentList, correspondingUuidList);
+	return ImportNewAssets(sImportList, 0, correspondingParentList, correspondingUuidList);
 }
 
 /*virtual*/ QString SourceModel::OnBankInfo(uint uiBankIndex) /*override*/
@@ -366,7 +366,6 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 		
 		ImportNewAssets(sImportList,
 						0,
-						ITEM_Source,
 						correspondingParentList,
 						correspondingUuidList);
 
@@ -417,7 +416,6 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 		
 		ImportNewAssets(sImportList,
 						0,
-						ITEM_Source,
 						correspondingParentList,
 						correspondingUuidList);
 
@@ -426,7 +424,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	delete pDlg;
 }
 
-/*virtual*/ QList<IAssetItemData *> SourceModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, ItemType eType, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
+/*virtual*/ QList<IAssetItemData *> SourceModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
 {
 	// Error check all the imported assets before adding them, and cancel entire import if any fail
 	for(int i = 0; i < sImportAssetList.size(); ++i)

@@ -757,7 +757,6 @@ void ManagerWidget::on_actionImportAssets_triggered()
 
 	m_pModel->ImportNewAssets(sImportList,
 							  m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()),
-							  ITEM_Unknown, // Uses default item type of manager
 							  correspondingParentList,
 							  correspondingUuidList);
 }
@@ -834,7 +833,6 @@ void ManagerWidget::on_actionImportDirectory_triggered()
 
 	m_pModel->ImportNewAssets(sImportList,
 							  m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()),
-							  ITEM_Unknown, // Uses default item type of manager
 							  correspondingParentList,
 							  correspondingUuidList);
 }
