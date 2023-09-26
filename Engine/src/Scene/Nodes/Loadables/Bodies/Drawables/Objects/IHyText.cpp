@@ -525,6 +525,12 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsLine()
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit /*= false*/)
 {
+	if(fWidth <= 0.0f)
+	{
+		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::SetAsColumn() invoked with invalid width: " << fWidth);
+		fWidth = HyMath::Max(1.0f, fWidth);
+	}
+
 	m_uiTextAttributes &= ~(TEXTATTRIB_IsScaleBox | TEXTATTRIB_ScaleBoxCenterVertically | TEXTATTRIB_IsVertical);
 	m_uiTextAttributes |= TEXTATTRIB_IsColumn;
 
@@ -533,7 +539,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit
 	else
 		m_uiTextAttributes &= ~TEXTATTRIB_ColumnSplitWordsToFit;
 
-	m_vBoxDimensions.x = HyMath::Max(1.0f, fWidth);
+	m_vBoxDimensions.x = fWidth;
 	m_vBoxDimensions.y = 0.0f;
 
 	MarkAsDirty();
