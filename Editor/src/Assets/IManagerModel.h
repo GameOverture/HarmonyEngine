@@ -39,6 +39,9 @@ protected:
 
 	QMap<quint32, QList<IAssetItemData *> >			m_AssetChecksumMap;
 
+	QList<IAssetItemData *>							m_ImportedAssetList;
+	QList<TreeModelItemData *>						m_ImportedCorrespondingParentList;
+
 	QMap<BankData *, QSet<IAssetItemData *>>		m_RepackAffectedAssetsMap;
 	QList<ProjectItemData *>						m_RepackAffectedItemList; // Keep track of any linked/referenced items as they will need to be re-saved after asset repacking
 
@@ -120,7 +123,6 @@ protected:
 	virtual IAssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 
 	virtual void OnGenerateAssetsDlg(const QModelIndex &indexDestination) = 0;
-	virtual QList<IAssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) = 0; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) = 0; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) = 0;
 	virtual bool OnUpdateAssets(QList<IAssetItemData *> assetList) = 0;
@@ -136,7 +138,9 @@ private:
 	LoadingType GetLoadingType() const;
 
 protected Q_SLOTS:
-	void OnImportAssetsFinished(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList, QList<IAssetItemData *> importedAssetList);
+	void OnImportAssetsUpdate(int iAssetsLoaded, int iTotalAssets);
+	void OnImportAssetsCanceled(QString sMsg);
+	void OnImportAssetsFinished();
 	void OnRepackUpdate(int iBlocksLoaded, int iTotalBlocks);
 	void OnRepackFinished();
 };

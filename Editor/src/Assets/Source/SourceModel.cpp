@@ -424,61 +424,6 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	delete pDlg;
 }
 
-/*virtual*/ QList<IAssetItemData *> SourceModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
-{
-	// Error check all the imported assets before adding them, and cancel entire import if any fail
-	for(int i = 0; i < sImportAssetList.size(); ++i)
-	{
-		QFileInfo fileInfo(sImportAssetList[i]);
-		if(fileInfo.exists() == false)
-		{
-			HyGuiLog("Could not find imported file: " % sImportAssetList[i], LOGTYPE_Warning);
-			return QList<IAssetItemData *>();
-		}
-		
-		quint32 uiChecksum = ComputeFileChecksum(AssembleFilter(correspondingParentList[i], true), fileInfo.fileName());
-		auto srcFilesInFilter = FindByChecksum(uiChecksum);
-		if(srcFilesInFilter.isEmpty() == false)
-		{
-			HyGuiLog("A file with the name: " % fileInfo.fileName() % "\nalready exists in this location.", LOGTYPE_Warning);
-			return QList<IAssetItemData *>();
-		}
-	}
-	
-	// Passed error check: proceed with import
-	QList<IAssetItemData *> returnList;
-	for(int i = 0; i < sImportAssetList.size(); ++i)
-	{
-		QFileInfo origFileInfo(sImportAssetList[i]);
-		QString sNewFilterPath = AssembleFilter(correspondingParentList[i], true);
-		QString sNewFileName = origFileInfo.fileName();
-
-		QString sNewFilePath;
-		if(sNewFilterPath.isEmpty())
-			sNewFilePath = sNewFileName;
-		else
-			sNewFilePath = sNewFilterPath + "/" + sNewFileName;
-		
-		// Copy file into source location
-		sNewFilePath = m_MetaDir.filePath(sNewFilePath);
-		if(origFileInfo.absoluteFilePath().compare(sNewFilePath, Qt::CaseInsensitive) != 0 && QFile::exists(sNewFilePath) == false)
-		{
-			if(QFile::copy(origFileInfo.absoluteFilePath(), sNewFilePath) == false)
-			{
-				HyGuiLog("QFile::copy failed: " % origFileInfo.absoluteFilePath() % " -> " % sNewFilePath, LOGTYPE_Error);
-				continue;
-			}
-		}
-
-		quint32 uiChecksum = ComputeFileChecksum(sNewFilterPath, sNewFileName);
-		SourceFile *pNewFile = new SourceFile(*this, correspondingUuidList[i], uiChecksum, sNewFileName, 0);
-		returnList.append(pNewFile);
-		RegisterAsset(pNewFile);
-	}
-
-	return returnList;
-}
-
 /*virtual*/ bool SourceModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/
 {
 	for(int i = 0; i < assetList.count(); ++i)

@@ -37,6 +37,8 @@ if(Qt5_DIR)
 		src/Assets/BanksModel.cpp
 		src/Assets/IAssetItemData.cpp
 		src/Assets/IAssetItemData.h
+		src/Assets/IImportThread.cpp
+		src/Assets/IImportThread.h
 		src/Assets/IManagerDraw.cpp
 		src/Assets/IManagerDraw.h
 		src/Assets/IManagerModel.cpp
@@ -53,6 +55,8 @@ if(Qt5_DIR)
 		src/Assets/Source/SourceGenFileDlg.cpp
 		src/Assets/Source/SourceGenFileDlg.h
 		src/Assets/Source/SourceGenFileDlg.ui
+		src/Assets/Source/SourceImportThread.cpp
+		src/Assets/Source/SourceImportThread.h
 		src/Assets/Source/SourceSettingsDlg.cpp
 		src/Assets/Source/SourceSettingsDlg.h
 		src/Assets/Source/SourceSettingsDlg.ui
@@ -60,19 +64,23 @@ if(Qt5_DIR)
 		src/Assets/Atlas/AtlasDraw.h
 		src/Assets/Atlas/AtlasFrame.cpp
 		src/Assets/Atlas/AtlasFrame.h
+		src/Assets/Atlas/AtlasImportThread.cpp
+		src/Assets/Atlas/AtlasImportThread.h
 		src/Assets/Atlas/AtlasModel.cpp
 		src/Assets/Atlas/AtlasModel.h
 		src/Assets/Atlas/AtlasRepackThread.cpp
 		src/Assets/Atlas/AtlasRepackThread.h
-		src/Assets/Audio/SoundClip.cpp
-		src/Assets/Audio/SoundClip.h
 		src/Assets/Audio/AudioAssetsWidget.cpp
 		src/Assets/Audio/AudioAssetsWidget.h
 		src/Assets/Audio/AudioAssetsWidget.ui
+		src/Assets/Audio/AudioImportThread.cpp
+		src/Assets/Audio/AudioImportThread.h
 		src/Assets/Audio/AudioManagerModel.cpp
 		src/Assets/Audio/AudioManagerModel.h
 		src/Assets/Audio/AudioRepackThread.cpp
 		src/Assets/Audio/AudioRepackThread.h
+		src/Assets/Audio/SoundClip.cpp
+		src/Assets/Audio/SoundClip.h
 		src/Items/IDraw.cpp
 		src/Items/IModel.cpp
 		src/Items/IWidget.cpp

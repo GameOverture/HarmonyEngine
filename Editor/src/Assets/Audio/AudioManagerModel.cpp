@@ -232,43 +232,6 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 {
 }
 
-/*virtual*/ QList<IAssetItemData *> AudioManagerModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
-{
-	QList<IAssetItemData *> returnList;
-	QList<WaveHeader> headerList;
-
-	// Error check all the imported assets before adding them, and cancel entire import if any fail
-	for(int i = 0; i < sImportAssetList.size(); ++i)
-	{
-		headerList.push_back(WaveHeader());
-		if(IsWaveValid(sImportAssetList[i], headerList.last()) == false)
-			return returnList;
-	}
-
-	// Passed error check: proceed with import
-	
-	for(int i = 0; i < sImportAssetList.size(); ++i)
-	{
-		// ImportSound calls RegisterAsset() on valid imports
-		SoundClip *pNewAsset = ImportSound(sImportAssetList[i], uiBankId, correspondingUuidList[i], headerList[i]);
-		if(pNewAsset)
-			returnList.append(pNewAsset);
-	}
-
-	// Repack asset bank with newly imported audio
-	if(returnList.empty() == false)
-	{
-		QSet<IAssetItemData *> returnListAsSet(returnList.begin(), returnList.end());
-		QSet<IAssetItemData *> newSet;
-		for(auto pItem : returnListAsSet)
-			newSet.insert(pItem);
-
-		AddAssetsToRepack(m_BanksModel.GetBank(GetBankIndexFromBankId(uiBankId)), newSet);
-	}
-
-	return returnList;
-}
-
 /*virtual*/ bool AudioManagerModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/
 {
 	QSet<BankData *> affectedBankSet;

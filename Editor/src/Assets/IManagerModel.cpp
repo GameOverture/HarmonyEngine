@@ -14,6 +14,9 @@
 #include "MainWindow.h"
 #include "ProjectItemData.h"
 #include "AssetMimeData.h"
+#include "AtlasImportThread.h"
+#include "AudioImportThread.h"
+#include "SourceImportThread.h"
 #include "AtlasRepackThread.h"
 #include "AudioRepackThread.h"
 
@@ -169,13 +172,38 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, Q
 		return false;
 	}
 
-	QList<IAssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, correspondingParentList, correspondingUuidList);
-	for(int i = 0; i < returnList.size(); ++i)
-		InsertTreeItem(m_ProjectRef, returnList[i], GetItem(FindIndex<TreeModelItemData *>(correspondingParentList[i], 0)));
+	m_ImportedCorrespondingParentList = correspondingParentList;
 
-	FlushRepack();
+	IImportThread *pImportThread = nullptr;
+	switch(m_eASSET_TYPE)
+	{
+		case ASSETMAN_Atlases:
+			pImportThread = new AtlasImportThread(*this, sImportList, uiBankId, correspondingParentList, correspondingUuidList);
+			break;
 
-	SaveMeta();
+		case ASSETMAN_Audio:
+			pImportThread = new AudioImportThread(*this, sImportList, uiBankId, correspondingParentList, correspondingUuidList);
+			break;
+
+		case ASSETMAN_Source:
+			pImportThread = new SourceImportThread(*this, sImportList, uiBankId, correspondingParentList, correspondingUuidList);
+			break;
+			//QList<IAssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, correspondingParentList, correspondingUuidList);
+			//OnImportAssetsFinished(returnList, correspondingParentList);
+			//return true;
+
+		default:
+			HyGuiLog("IManagerModel::ImportNewAssets() 'm_eASSET_TYPE' was unhandled", LOGTYPE_Error);
+			return false;
+	}
+
+	connect(pImportThread, &QThread::finished, pImportThread, &QObject::deleteLater);
+	connect(pImportThread, &IImportThread::ImportUpdate, this, &IManagerModel::OnImportAssetsUpdate);
+	connect(pImportThread, &IImportThread::ImportCanceled, this, &IManagerModel::OnImportAssetsCanceled);
+	connect(pImportThread, &IImportThread::ImportIsFinished, this, &IManagerModel::OnImportAssetsFinished);
+	MainWindow::SetLoading(LOADINGTYPE_ImportAssets, 0, 0);
+	pImportThread->start();
+	
 	return true;
 }
 
@@ -1025,8 +1053,32 @@ LoadingType IManagerModel::GetLoadingType() const
 	return LOADINGTYPE_Unknown;
 }
 
-/*slot*/ void IManagerModel::OnImportAssetsFinished(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList, QList<IAssetItemData *> importedAssetList)
+/*slot*/ void IManagerModel::OnImportAssetsUpdate(int iAssetsLoaded, int iTotalAssets)
 {
+	MainWindow::SetLoading(LOADINGTYPE_ImportAssets, iAssetsLoaded, iTotalAssets);
+}
+
+void IManagerModel::OnImportAssetsCanceled(QString sMsg)
+{
+	m_ImportedAssetList.clear();
+	m_ImportedCorrespondingParentList.clear();
+
+	MainWindow::ClearLoading(LOADINGTYPE_ImportAssets);
+	HyGuiLog(sMsg, LOGTYPE_Warning);
+}
+
+/*slot*/ void IManagerModel::OnImportAssetsFinished()
+{
+	for(int i = 0; i < m_ImportedAssetList.size(); ++i)
+		InsertTreeItem(m_ProjectRef, m_ImportedAssetList[i], GetItem(FindIndex<TreeModelItemData *>(m_ImportedCorrespondingParentList[i], 0)));
+
+	m_ImportedAssetList.clear();
+	m_ImportedCorrespondingParentList.clear();
+
+	FlushRepack();
+	SaveMeta();
+
+	MainWindow::ClearLoading(LOADINGTYPE_ImportAssets);
 }
 
 /*slot*/ void IManagerModel::OnRepackUpdate(int iBlocksLoaded, int iTotalBlocks)

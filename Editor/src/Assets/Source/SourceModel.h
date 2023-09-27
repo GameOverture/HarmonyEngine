@@ -20,6 +20,8 @@ class SourceModel : public IManagerModel
 {
 	Q_OBJECT
 
+	friend class SourceImportThread;
+
 	TreeModelItemData *			m_pEntityFolderItem;
 
 public:
@@ -43,7 +45,6 @@ protected:
 	virtual IAssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
 
 	virtual void OnGenerateAssetsDlg(const QModelIndex &indexDestination) override;
-	virtual QList<IAssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) override; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) override; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) override;
 	virtual bool OnUpdateAssets(QList<IAssetItemData *> assetList) override;

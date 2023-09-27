@@ -18,21 +18,23 @@ class AtlasModel : public IManagerModel
 {
 	Q_OBJECT
 
+	friend class AtlasImportThread;
+
 	QMap<BankData *, QSet<int>>			m_RepackTexIndicesMap;	// This exists to keep track of affected texture indices. When deleting a large number of frames where they encompass the entire texture, the repack will delete the frames before clearing out the affected textures. This caused those textures to be left behind
 
 public:
 	AtlasModel(Project &projRef);
 	virtual ~AtlasModel();
 
-	QFileInfoList GetExistingTextureInfoList(uint uiBankIndex);
+	QFileInfoList GetExistingTextureInfoList(uint uiBankIndex) const;
 
-	int GetNumTextures(uint uiBankIndex);
-	QSize GetMaxAtlasDimensions(uint uiBankIndex);
-	QSize GetTextureSize(uint uiBankIndex, int iTextureIndex); // May be smaller (when trimmed) than the max atlas dimensions
+	int GetNumTextures(uint uiBankIndex) const;
+	QSize GetMaxAtlasDimensions(uint uiBankIndex) const;
+	QSize GetTextureSize(uint uiBankIndex, int iTextureIndex) const; // May be smaller (when trimmed) than the max atlas dimensions
 
-	bool IsImageValid(QImage &image, quint32 uiBankId);
-	bool IsImageValid(int iWidth, int iHeight, quint32 uiBankId);
-	bool IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings);
+	bool IsImageValid(QImage &image, quint32 uiBankId) const;
+	bool IsImageValid(int iWidth, int iHeight, quint32 uiBankId) const;
+	bool IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings) const;
 
 	AtlasFrame *GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, bool bIsSubAtlas);
 	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bIsSubAtlas);
@@ -47,7 +49,6 @@ protected:
 	virtual IAssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
 
 	virtual void OnGenerateAssetsDlg(const QModelIndex &indexDestination) override;
-	virtual QList<IAssetItemData *> OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) override; // Must call RegisterAsset() on each asset
 	virtual bool OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) override; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) override;
 	virtual bool OnUpdateAssets(QList<IAssetItemData *> assetList) override;

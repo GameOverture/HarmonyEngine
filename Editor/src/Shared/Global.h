@@ -107,7 +107,8 @@ enum LoadingType
 {
 	LOADINGTYPE_Unknown = -1,
 
-	LOADINGTYPE_AtlasManager = 0,
+	LOADINGTYPE_ImportAssets = 0,
+	LOADINGTYPE_AtlasManager,
 	LOADINGTYPE_AudioManager,
 	LOADINGTYPE_ReloadHarmony,
 	LOADINGTYPE_HarmonyStreaming

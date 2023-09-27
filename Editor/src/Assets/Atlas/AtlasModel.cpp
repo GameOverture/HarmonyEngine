@@ -31,18 +31,18 @@ AtlasModel::AtlasModel(Project &projRef) :
 
 }
 
-QFileInfoList AtlasModel::GetExistingTextureInfoList(uint uiBankIndex)
+QFileInfoList AtlasModel::GetExistingTextureInfoList(uint uiBankIndex) const
 {
 	QDir bankDir(m_BanksModel.GetBank(uiBankIndex)->m_sAbsPath);
 	return bankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 }
 
-int AtlasModel::GetNumTextures(uint uiBankIndex)
+int AtlasModel::GetNumTextures(uint uiBankIndex) const
 {
 	return GetExistingTextureInfoList(uiBankIndex).size();
 }
 
-QSize AtlasModel::GetMaxAtlasDimensions(uint uiBankIndex)
+QSize AtlasModel::GetMaxAtlasDimensions(uint uiBankIndex) const
 {
 	int iWidth = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["maxWidth"].toInt();
 	int iHeight = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["maxHeight"].toInt();
@@ -50,7 +50,7 @@ QSize AtlasModel::GetMaxAtlasDimensions(uint uiBankIndex)
 	return QSize(iWidth, iHeight);
 }
 
-QSize AtlasModel::GetTextureSize(uint uiBankIndex, int iTextureIndex)
+QSize AtlasModel::GetTextureSize(uint uiBankIndex, int iTextureIndex) const
 {
 	QJsonArray textureSizesArray = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["textureSizes"].toArray();
 	QJsonArray texSizeArray = textureSizesArray[iTextureIndex].toArray();
@@ -58,18 +58,18 @@ QSize AtlasModel::GetTextureSize(uint uiBankIndex, int iTextureIndex)
 	return QSize(texSizeArray[0].toInt(), texSizeArray[1].toInt());
 }
 
-bool AtlasModel::IsImageValid(QImage &image, quint32 uiBankId)
+bool AtlasModel::IsImageValid(QImage &image, quint32 uiBankId) const
 {
 	return IsImageValid(image.width(), image.height(), uiBankId);
 }
 
-bool AtlasModel::IsImageValid(int iWidth, int iHeight, quint32 uiBankId)
+bool AtlasModel::IsImageValid(int iWidth, int iHeight, quint32 uiBankId) const
 {
 	uint uiBankIndex = GetBankIndexFromBankId(uiBankId);
 	return IsImageValid(iWidth, iHeight, m_BanksModel.GetBank(uiBankIndex)->m_MetaObj);
 }
 
-bool AtlasModel::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings)
+bool AtlasModel::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings) const
 {
 	int iMarginWidth =  atlasSettings["sbFrameMarginLeft"].toInt();
 	iMarginWidth +=     atlasSettings["sbFrameMarginRight"].toInt();
@@ -242,46 +242,6 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 
 /*virtual*/ void AtlasModel::OnGenerateAssetsDlg(const QModelIndex &indexDestination) /*override*/
 {
-}
-
-/*virtual*/ QList<IAssetItemData *> AtlasModel::OnImportAssets(QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) /*override*/
-{
-	QList<IAssetItemData *> returnList;
-
-	// Error check all the imported assets before adding them, and cancel entire import if any fail
-	QList<QImage *> newImageList;
-	for(int i = 0; i < sImportAssetList.size(); ++i)
-	{
-		QFileInfo fileInfo(sImportAssetList[i]);
-
-		QImage *pNewImage = new QImage(fileInfo.absoluteFilePath());
-		newImageList.push_back(pNewImage);
-
-		QSize atlasDimensions = GetMaxAtlasDimensions(GetBankIndexFromBankId(uiBankId));
-		if(IsImageValid(*pNewImage, uiBankId) == false)
-		{
-			HyGuiLog("Importing image " % fileInfo.fileName() % " will not fit in atlas bank '" % QString::number(uiBankId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % ")", LOGTYPE_Warning);
-			
-			for(auto image : newImageList)
-				delete image;
-			return returnList;
-		}
-	}
-
-	// Passed error check: proceed with import
-	// TODO: ImportImage is slow! Consider adding a progress bar for this
-	for(int i = 0; i < sImportAssetList.size(); ++i)
-		returnList.append(ImportImage(QFileInfo(sImportAssetList[i]).baseName(), *newImageList[i], uiBankId, false, correspondingUuidList[i]));
-
-	if(returnList.empty() == false)
-	{
-		QSet<IAssetItemData *> returnListAsSet(returnList.begin(), returnList.end());
-		AddAssetsToRepack(m_BanksModel.GetBank(GetBankIndexFromBankId(uiBankId)), returnListAsSet);
-	}
-
-	for(auto image : newImageList)
-		delete image;
-	return returnList;
 }
 
 /*virtual*/ bool AtlasModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/
