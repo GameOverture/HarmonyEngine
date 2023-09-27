@@ -142,6 +142,10 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 	return QStringList() << ".wav";
 }
 
+/*virtual*/ void AudioManagerModel::UpdateInspectorScene(const QList<IAssetItemData *> &selectedAssetsList) /*override*/
+{
+}
+
 int AudioManagerModel::GetGroupIndexFromGroupId(quint32 uiGroupId) const
 {
 	return m_AudioGroupsModel.GetIndex(uiGroupId);

@@ -31,7 +31,8 @@ IManagerModel::IManagerModel(Project &projRef, AssetManagerType eAssetType) :
 	m_bIsSingleBank(false),
 	m_MetaDir(m_ProjectRef.GetMetaAbsPath() + HyGlobal::AssetName(eAssetType)),
 	m_DataDir(m_ProjectRef.GetAssetsAbsPath() + HyGlobal::AssetName(eAssetType)),
-	m_uiNextBankId(99999) // Should be properly initialized with Init()
+	m_uiNextBankId(99999), // Should be properly initialized with Init()
+	m_InspectorScene(this)
 {
 }
 
@@ -932,6 +933,11 @@ void IManagerModel::SaveRuntime()
 		SaveMeta();
 
 	return true;
+}
+
+QGraphicsScene *IManagerModel::GetInspectorScene()
+{
+	return &m_InspectorScene;
 }
 
 void IManagerModel::RegisterAsset(IAssetItemData *pAsset)

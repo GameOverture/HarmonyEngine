@@ -34,6 +34,8 @@ public:
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 	virtual QStringList GetSupportedFileExtList() const override;
 
+	virtual void UpdateInspectorScene(const QList<IAssetItemData *> &selectedAssetsList) override;
+
 protected:
 	quint32 ComputeFileChecksum(QString sFilterPath, QString sFileName) const;
 	QString GenerateSrcFile(TemplateFileType eTemplate, QModelIndex destIndex, QString sClassName, QString sFileName, QString sBaseClass, bool bEntityBaseClass, EntityModel *pEntityModel);

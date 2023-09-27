@@ -17,6 +17,7 @@
 #include "IRepackThread.h"
 
 #include <QUuid>
+#include <QGraphicsScene>
 
 class IManagerDraw;
 
@@ -39,11 +40,13 @@ protected:
 
 	QMap<quint32, QList<IAssetItemData *> >			m_AssetChecksumMap;
 
-	QList<IAssetItemData *>							m_ImportedAssetList;
 	QList<TreeModelItemData *>						m_ImportedCorrespondingParentList;
+	QList<IAssetItemData *>							m_ImportedAssetList;
 
 	QMap<BankData *, QSet<IAssetItemData *>>		m_RepackAffectedAssetsMap;
 	QList<ProjectItemData *>						m_RepackAffectedItemList; // Keep track of any linked/referenced items as they will need to be re-saved after asset repacking
+
+	QGraphicsScene									m_InspectorScene; // This scene is applied to the Aux Asset Inspector. UpdateInspectorScene() is called by the ManagerWidget
 
 public:
 	IManagerModel(Project &projRef, AssetManagerType eAssetType);
@@ -109,6 +112,9 @@ public:
 	virtual QString OnBankInfo(uint uiBankIndex) = 0;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) = 0;
 	virtual QStringList GetSupportedFileExtList() const = 0;
+
+	QGraphicsScene *GetInspectorScene();
+	virtual void UpdateInspectorScene(const QList<IAssetItemData *> &selectedAssetsList) = 0;
 
 protected:
 	void RegisterAsset(IAssetItemData *pAsset);

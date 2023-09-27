@@ -21,7 +21,8 @@
 #include <QMimeData>
 
 AtlasModel::AtlasModel(Project &projRef) :
-	IManagerModel(projRef, ASSETMAN_Atlases)
+	IManagerModel(projRef, ASSETMAN_Atlases),
+	m_pCurInspectorAsset(nullptr)
 {
 
 }
@@ -191,6 +192,22 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 /*virtual*/ QStringList AtlasModel::GetSupportedFileExtList() const /*override*/
 {
 	return QStringList() << ".png";
+}
+
+/*virtual*/ void AtlasModel::UpdateInspectorScene(const QList<IAssetItemData *> &selectedAssetsList) /*override*/
+{
+	if(selectedAssetsList.empty())
+	{
+		m_InspectorScene.clear();
+		m_pCurInspectorAsset = nullptr;
+	}
+	else if(m_pCurInspectorAsset != selectedAssetsList[0])
+	{
+		m_InspectorScene.clear();
+		m_pCurInspectorAsset = selectedAssetsList[0];
+		//pNewPixmapItem->setPixmap(QPixmap(m_pCurInspectorAsset->GetAbsMetaFilePath()));
+		QGraphicsPixmapItem *pNewPixmapItem = m_InspectorScene.addPixmap(QPixmap(m_pCurInspectorAsset->GetAbsMetaFilePath()));
+	}
 }
 
 /*virtual*/ void AtlasModel::OnInit() /*override*/

@@ -12,6 +12,7 @@
 
 #include "Global.h"
 #include "IAssetItemData.h"
+#include "ManagerWidget.h"
 
 #include <QWidget>
 
@@ -27,7 +28,7 @@ public:
 	explicit AuxAssetInspector(QWidget *parent = 0);
 	virtual ~AuxAssetInspector();
 
-	void SetSelected(AssetManagerType eAssetType, QList<IAssetItemData *> selectedAssetsList);
+	void SetAssetManager(ManagerWidget *pManagerWidget);
 
 private:
 	Ui::AuxAssetInspector *ui;

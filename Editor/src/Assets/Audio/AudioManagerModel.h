@@ -59,6 +59,8 @@ public:
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 	virtual QStringList GetSupportedFileExtList() const override;
 
+	virtual void UpdateInspectorScene(const QList<IAssetItemData *> &selectedAssetsList) override;
+
 	int GetGroupIndexFromGroupId(quint32 uiGroupId) const;
 	quint32 GetGroupIdFromGroupIndex(uint uiGroupIndex) const;
 

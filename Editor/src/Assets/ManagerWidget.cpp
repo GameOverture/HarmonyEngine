@@ -29,6 +29,7 @@
 #include <QFileDialog>
 #include <QDrag>
 #include <QMouseEvent>
+#include <QGraphicsPixmapItem>
 
 ManagerProxyModel::ManagerProxyModel(QObject *pParent /*= nullptr*/) :
 	QSortFilterProxyModel(pParent),
@@ -558,6 +559,24 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 		delete actionAtlasGrpMoveList[i];
 }
 
+void ManagerWidget::on_assetTree_pressed(const QModelIndex &index)
+{
+	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
+	GetSelected(selectedAssetsList, selectedFiltersList, true);
+
+	int iNumSelected = selectedAssetsList.count();
+	ui->actionRename->setEnabled(iNumSelected == 1 || selectedFiltersList.empty() == false);
+	ui->actionDeleteAssets->setEnabled(iNumSelected != 0 || selectedFiltersList.empty() == false);
+	ui->actionReplaceAssets->setEnabled(iNumSelected != 0);
+
+	m_pModel->UpdateInspectorScene(selectedAssetsList);
+}
+
+void ManagerWidget::on_cmbBanks_currentIndexChanged(int index)
+{
+	RefreshInfo();
+}
+
 void ManagerWidget::on_actionAssetSettings_triggered()
 {
 	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
@@ -615,19 +634,6 @@ void ManagerWidget::on_actionReplaceAssets_triggered()
 	m_pModel->ReplaceAssets(selectedAssetsList, true);
 }
 
-void ManagerWidget::on_assetTree_pressed(const QModelIndex &index)
-{
-	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-	GetSelected(selectedAssetsList, selectedFiltersList, true);
-
-	static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_AssetInspector))->SetSelected(m_pModel->GetAssetType(), selectedAssetsList);
-
-	int iNumSelected = selectedAssetsList.count();
-	ui->actionRename->setEnabled(iNumSelected == 1 || selectedFiltersList.empty() == false);
-	ui->actionDeleteAssets->setEnabled(iNumSelected != 0 || selectedFiltersList.empty() == false);
-	ui->actionReplaceAssets->setEnabled(iNumSelected != 0);
-}
-
 void ManagerWidget::on_actionRename_triggered()
 {
 	TreeModelItemData *pItemToBeRenamed = GetSelected();
@@ -649,11 +655,6 @@ void ManagerWidget::on_actionRename_triggered()
 	}
 
 	delete pDlg;
-}
-
-void ManagerWidget::on_cmbBanks_currentIndexChanged(int index)
-{
-	RefreshInfo();
 }
 
 void ManagerWidget::on_actionAddBank_triggered()
@@ -860,6 +861,12 @@ void ManagerWidget::on_actionAddFilter_triggered()
 	delete pDlg;
 }
 
+void ManagerWidget::on_actionImportTileSheet_triggered()
+{
+	DlgImportTileSheet dlgImportTileSheet(*Harmony::GetProject(), this);
+	dlgImportTileSheet.exec();
+}
+
 void ManagerWidget::on_chkShowAllBanks_clicked()
 {
 	RefreshInfo();
@@ -879,10 +886,4 @@ void ManagerWidget::on_txtSearch_textChanged(const QString &text)
 	//			ui->assetTree->expand(srcIndex);
 	//	}
 	//}
-}
-
-void ManagerWidget::on_actionImportTileSheet_triggered()
-{
-	DlgImportTileSheet dlgImportTileSheet(*Harmony::GetProject(), this);
-	dlgImportTileSheet.exec();
 }

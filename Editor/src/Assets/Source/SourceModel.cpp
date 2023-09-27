@@ -104,6 +104,10 @@ bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 	return QStringList() << ".cpp" << ".h"; // TODO: Add shader file types eventually
 }
 
+/*virtual*/ void SourceModel::UpdateInspectorScene(const QList<IAssetItemData *> &selectedAssetsList) /*override*/
+{
+}
+
 quint32 SourceModel::ComputeFileChecksum(QString sFilterPath, QString sFileName) const
 {
 	QString sCombinedPath;

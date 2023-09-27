@@ -22,6 +22,8 @@ class AtlasModel : public IManagerModel
 
 	QMap<BankData *, QSet<int>>			m_RepackTexIndicesMap;	// This exists to keep track of affected texture indices. When deleting a large number of frames where they encompass the entire texture, the repack will delete the frames before clearing out the affected textures. This caused those textures to be left behind
 
+	IAssetItemData *					m_pCurInspectorAsset;
+
 public:
 	AtlasModel(Project &projRef);
 	virtual ~AtlasModel();
@@ -42,6 +44,8 @@ public:
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 	virtual QStringList GetSupportedFileExtList() const override;
+
+	virtual void UpdateInspectorScene(const QList<IAssetItemData *> &selectedAssetsList) override;
 
 protected:
 	virtual void OnInit() override;

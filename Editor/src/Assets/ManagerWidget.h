@@ -56,6 +56,7 @@ class ManagerWidget : public QWidget
 
 	IManagerModel *				m_pModel;
 	
+	// These two variables are used to keep track of the specific clicked item when the context menu is opened, instead of using GetSelected()
 	TreeModelItemData *			m_pContextMenuSelection;
 	bool						m_bUseContextMenuSelection;
 
@@ -87,43 +88,29 @@ protected:
 private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);
 
-	void on_actionAssetSettings_triggered();
-
-	void on_actionOpenAssetExplorer_triggered();
-
-	void on_actionDeleteAssets_triggered();
-
-	void on_actionReplaceAssets_triggered();
-
 	void on_assetTree_pressed(const QModelIndex &index);
-
-	void on_actionRename_triggered();
 
 	void on_cmbBanks_currentIndexChanged(int index);
 
+	void on_actionAssetSettings_triggered();
+	void on_actionOpenAssetExplorer_triggered();
+	void on_actionDeleteAssets_triggered();
+	void on_actionReplaceAssets_triggered();
+	void on_actionRename_triggered();
 	void on_actionAddBank_triggered();
-
 	void on_actionBankSettings_triggered();
-
 	void on_actionOpenBankExplorer_triggered();
-
 	void on_actionRemoveBank_triggered();
-
 	void on_actionBankTransfer_triggered(QAction *pAction);
-
 	void on_actionGenerateAsset_triggered();
-
 	void on_actionImportAssets_triggered();
-
 	void on_actionImportDirectory_triggered();
-
 	void on_actionAddFilter_triggered();
+	void on_actionImportTileSheet_triggered();
 
 	void on_chkShowAllBanks_clicked();
 
 	void on_txtSearch_textChanged(const QString &text);
-
-	void on_actionImportTileSheet_triggered();
 	
 private:
 	Ui::ManagerWidget *ui;

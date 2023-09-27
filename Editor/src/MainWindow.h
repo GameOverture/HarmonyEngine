@@ -35,7 +35,7 @@ class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 
-		static MainWindow *sm_pInstance;
+	static MainWindow *					sm_pInstance;
 
 	ExplorerModel						m_ExplorerModel;
 
@@ -105,6 +105,7 @@ private Q_SLOTS:
 	void OnProcessStdOut();
 	void OnProcessErrorOut();
 
+	void on_tabWidgetAssetManager_currentChanged(int iIndex);
 	void on_tabWidgetAux_currentChanged(int iIndex);
 
 	void on_actionNewProject_triggered();

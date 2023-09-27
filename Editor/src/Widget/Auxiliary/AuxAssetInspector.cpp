@@ -10,11 +10,13 @@
 #include "Global.h"
 #include "AuxAssetInspector.h"
 #include "ui_AuxAssetInspector.h"
+#include "IManagerModel.h"
 
 AuxAssetInspector::AuxAssetInspector(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::AuxAssetInspector)
 {
+	ui->setupUi(this);
 }
 
 /*virtual*/ AuxAssetInspector::~AuxAssetInspector()
@@ -22,7 +24,7 @@ AuxAssetInspector::AuxAssetInspector(QWidget *parent) :
 	delete ui;
 }
 
-void AuxAssetInspector::SetSelected(AssetManagerType eAssetType, QList<IAssetItemData *> selectedAssetsList)
+void AuxAssetInspector::SetAssetManager(ManagerWidget *pManagerWidget)
 {
-	//selectedAssetsList
+	ui->graphicsView->setScene(pManagerWidget->GetModel().GetInspectorScene());
 }

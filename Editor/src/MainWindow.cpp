@@ -598,6 +598,15 @@ void MainWindow::OnProcessErrorOut()
 	HyGuiLog(p->readAllStandardError(), LOGTYPE_Info);
 }
 
+void MainWindow::on_tabWidgetAssetManager_currentChanged(int iIndex)
+{
+	if(Harmony::GetProject() == nullptr)
+		return;
+
+	ManagerWidget *pManagerWidget = static_cast<ManagerWidget *>(sm_pInstance->ui->tabWidgetAssetManager->widget(iIndex));
+	ui->assetInspector->SetAssetManager(pManagerWidget);
+}
+
 void MainWindow::on_tabWidgetAux_currentChanged(int iIndex)
 {
 	switch(iIndex)

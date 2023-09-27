@@ -238,18 +238,8 @@
      <item>
       <widget class="QTabWidget" name="tabWidgetAssetManager">
        <property name="currentIndex">
-        <number>0</number>
+        <number>-1</number>
        </property>
-       <widget class="QWidget" name="tabAtlases">
-        <attribute name="title">
-         <string>Atlases</string>
-        </attribute>
-       </widget>
-       <widget class="QWidget" name="tabAudio">
-        <attribute name="title">
-         <string>Audio</string>
-        </attribute>
-       </widget>
       </widget>
      </item>
     </layout>
