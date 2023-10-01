@@ -19,6 +19,8 @@ class EntityDopeSheetView : public QGraphicsView
 {
 	EntityStateData *			m_pStateData;
 
+	bool						m_bTimeLineMouseDown;
+
 public:
 	EntityDopeSheetView(QWidget *pParent = nullptr);
 	virtual ~EntityDopeSheetView();
@@ -30,9 +32,15 @@ protected:
 	virtual void drawBackground(QPainter *painter, const QRectF &rect) override;
 	virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
 
+	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
+	virtual void mousePressEvent(QMouseEvent *pEvent) override;
+	virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;
+
 private:
 	void DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color = HyColor::WidgetFrame, HyColor shadowColor = HyColor::Black);
 	void DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY, HyColor color);
+
+	void OnMousePressTimeline(QPoint ptScreenPos);
 };
 
 #endif // ENTITYDOPESHEETVIEW_H

@@ -12,7 +12,50 @@
 #include "EntityModel.h"
 
 #include <QGraphicsRectItem>
+#include <QGraphicsSceneHoverEvent>
 
+GraphicsKeyFrameItem::GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent /*= nullptr*/) :
+	QGraphicsRectItem(x, y, width, height, parent)
+{
+	setBrush(HyGlobal::CovertHyColor(HyColor::LightGray));
+	setAcceptHoverEvents(true);
+}
+
+/*virtual*/ GraphicsKeyFrameItem::~GraphicsKeyFrameItem()
+{
+}
+
+/*virtual*/ void GraphicsKeyFrameItem::hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) /*override*/
+{
+	setPen(HyGlobal::CovertHyColor(HyColor::White));
+	scene()->update();
+}
+
+/*virtual*/ void GraphicsKeyFrameItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *pEvent) /*override*/
+{
+	setPen(HyGlobal::CovertHyColor(HyColor::Black));
+	scene()->update();
+}
+
+///*virtual*/ bool GraphicsKeyFrameItem::sceneEvent(QEvent *pEvent) /*override*/
+//{
+//	//HyGuiLog("GraphicsKeyFrameItem::sceneEvent: " % QString::number((int)pEvent->type()), LOGTYPE_Normal);
+//	if(pEvent->type() == QEvent::Type::GraphicsSceneHoverEnter)
+//	{
+//		setPen(HyGlobal::CovertHyColor(HyColor::White));
+//		scene()->update();
+//		hoverEnterEvent(QGraphics
+//		return true;
+//	}
+//	else if(pEvent->type() == QEvent::Type::GraphicsSceneHoverLeave)
+//	{
+//		
+//		scene()->update();
+//		return true;
+//	}
+//
+//	return QGraphicsRectItem::sceneEvent(pEvent);
+//}
 
 EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj) :
 	QGraphicsScene(),
@@ -39,9 +82,10 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	setBackgroundBrush(HyGlobal::CovertHyColor(HyColor::WidgetPanel));
 
 	// These lines allow QGraphicsView to align itself to the top-left corner of the scene
-	addLine(0.0, 0.0, 10.0, 0.0f);
-	addLine(0.0, 0.0, 0.0, 10.0f);
-	m_pCurrentFrameLine = addLine(0.0f, 0.0f, 0.0f, 10.0f); // This line will hide behind the timeline, but is placed in "scene space" so it will embiggen the sceneRect and QGraphicsViews' scrollbars
+	addLine(0.0, 0.0, 10.0, 0.0f)->setAcceptedMouseButtons(Qt::NoButton);
+	addLine(0.0, 0.0, 0.0, 10.0f)->setAcceptedMouseButtons(Qt::NoButton);
+	m_pCurrentFrameLine = addLine(0.0f, 0.0f, 0.0f, 10.0f); // This line will hide behind the timeline, but is placed in "scene space" so it will embiggen the sceneRect which sets QGraphicsViews' scrollbars accordingly
+	m_pCurrentFrameLine->setAcceptedMouseButtons(Qt::NoButton);
 
 	// Initialize all the key frame graphics items
 	for(auto itemKeyFrameMap : m_KeyFramesMap)
@@ -74,8 +118,9 @@ int EntityDopeSheetScene::GetCurrentFrame() const
 
 void EntityDopeSheetScene::SetCurrentFrame(int iFrame)
 {
-	m_iCurrentFrame = iFrame;
+	m_iCurrentFrame = HyMath::Max(iFrame, 0);
 	m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (m_iCurrentFrame * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
+	update();
 }
 
 float EntityDopeSheetScene::GetZoom() const
@@ -322,13 +367,13 @@ void EntityDopeSheetScene::RefreshGfxItems(int iFrameIndex)
 			auto gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, propPair.first % "/" % propPair.second);
 			if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
 			{
-				QGraphicsRectItem *pNewGfxRectItem = addRect(0, 0,
-													 KEYFRAME_WIDTH,
-													 KEYFRAME_HEIGHT,
-													 QPen(HyGlobal::CovertHyColor(HyColor::Black)),
-													 QBrush(HyGlobal::CovertHyColor(HyColor::White)));
+				GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
+				pNewGfxRectItem->setData(0, QVariant::fromValue(pCurItemData));
+				pNewGfxRectItem->setAcceptedMouseButtons(Qt::LeftButton);
 				pNewGfxRectItem->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
+				
 				m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
+				addItem(pNewGfxRectItem);
 			}
 			else
 				m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);

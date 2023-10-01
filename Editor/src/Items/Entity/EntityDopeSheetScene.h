@@ -11,6 +11,7 @@
 #define ENTITYDOPESHEETSCENE_H
 
 #include <QGraphicsScene>
+#include <QGraphicsRectItem>
 #include <QJsonObject>
 
 #define TIMELINE_HEIGHT 38.0f
@@ -32,21 +33,33 @@
 class EntityStateData;
 class EntityTreeItemData;
 
+class GraphicsKeyFrameItem : public QGraphicsRectItem
+{
+public:
+	GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent = nullptr);
+	virtual ~GraphicsKeyFrameItem();
+
+protected:
+	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) override;
+	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *pEvent) override;
+	//virtual bool sceneEvent(QEvent *pEvent) override;
+};
+
 class EntityDopeSheetScene : public QGraphicsScene
 {
 	friend class EntityDopeSheetView;
 
-	EntityStateData *															m_pEntStateData;
+	EntityStateData *																m_pEntStateData;
 
-	int																			m_iFramesPerSecond;
+	int																				m_iFramesPerSecond;
 
-	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>							m_KeyFramesMap;
-	QMap<std::tuple<EntityTreeItemData *, int, QString>, QGraphicsRectItem *>	m_KeyFramesGfxRectMap;
+	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;
+	QMap<std::tuple<EntityTreeItemData *, int, QString>, GraphicsKeyFrameItem *>	m_KeyFramesGfxRectMap;
 
-	int																			m_iCurrentFrame;
-	QGraphicsLineItem *															m_pCurrentFrameLine;
+	int																				m_iCurrentFrame;
+	QGraphicsLineItem *																m_pCurrentFrameLine;
 
-	float																		m_fZoom;
+	float																			m_fZoom;
 
 public:
 	EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj);

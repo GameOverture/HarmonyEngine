@@ -14,10 +14,13 @@
 
 #include <QPainter>
 #include <QScrollBar>
+#include <QGraphicsItem>
+#include <QMouseEvent>
 
 EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	QGraphicsView(pParent),
-	m_pStateData(nullptr)
+	m_pStateData(nullptr),
+	m_bTimeLineMouseDown(false)
 {
 	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 }
@@ -45,7 +48,7 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 	const qreal fPOSX_DRAW_THRESHOLD = rect.x() + TIMELINE_LEFT_MARGIN;
 	int iHorzScrollAmt = horizontalScrollBar()->value();
 	qreal fPosX = fPOSX_DRAW_THRESHOLD - iHorzScrollAmt;
-	fPosX += (GetScene()->GetCurrentFrame() * TIMELINE_NOTCH_SUBLINES_HEIGHT);
+	fPosX += (GetScene()->GetCurrentFrame() * TIMELINE_NOTCH_SUBLINES_WIDTH);
 
 	if(fPosX >= fPOSX_DRAW_THRESHOLD && fPosX < (rect.x() + rect.width()))
 	{
@@ -116,7 +119,6 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 	pPainter->setPen(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
 	pPainter->drawLine(rect.x(), rect.y() + TIMELINE_HEIGHT, rect.x() + rect.width(), rect.y() + TIMELINE_HEIGHT);
 
-	int iNotchIndex = 0;
 	int iFrameIndex = 0;
 	float fCurZoom = GetScene()->GetZoom();
 	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * fCurZoom;
@@ -168,6 +170,7 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 					DrawShadowText(pPainter, textRect, QString::number(iCurSubNotchFrame), HyColor::Cyan, HyColor::Black);
 
 					DrawCurrentFrameIndicator(pPainter, fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, HyColor::Cyan);
+					pPainter->setPen(HyGlobal::CovertHyColor(HyColor::Cyan));
 				}
 				else
 					pPainter->setPen(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
@@ -175,10 +178,35 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 				pPainter->drawLine(fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, fPosX, rect.y() + TIMELINE_HEIGHT);
 			}
 		}
-
-		iNotchIndex++;
+		
+		fPosX += fSubLineSpacing;
 		iFrameIndex += (iNumSubLines + 1);
 	}
+}
+
+/*virtual*/ void EntityDopeSheetView::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
+{
+	if(m_bTimeLineMouseDown)
+		OnMousePressTimeline(pEvent->pos());
+
+	QGraphicsView::mouseMoveEvent(pEvent);
+}
+
+/*virtual*/ void EntityDopeSheetView::mousePressEvent(QMouseEvent *pEvent) /*override*/
+{
+	if(pEvent->pos().x() > TIMELINE_LEFT_MARGIN && pEvent->pos().y() < TIMELINE_HEIGHT)
+	{
+		m_bTimeLineMouseDown = true;
+		OnMousePressTimeline(pEvent->pos());
+	}
+	
+	QGraphicsView::mousePressEvent(pEvent);
+}
+
+/*virtual*/ void EntityDopeSheetView::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/
+{
+	m_bTimeLineMouseDown = false;
+	QGraphicsView::mouseReleaseEvent(pEvent);
 }
 
 void EntityDopeSheetView::DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color /*= HyColor::WidgetFrame*/, HyColor shadowColor /*= HyColor::Black*/)
@@ -202,4 +230,16 @@ void EntityDopeSheetView::DrawCurrentFrameIndicator(QPainter *pPainter, qreal fP
 	points[1] = QPointF(fPosX - (TIMELINE_CURRENTFRAME_TRIANGLE_WIDTH * 0.5f), fPosY - TIMELINE_CURRENTFRAME_TRIANGLE_HEIGHT);
 	points[2] = QPointF(fPosX + (TIMELINE_CURRENTFRAME_TRIANGLE_WIDTH * 0.5f), fPosY - TIMELINE_CURRENTFRAME_TRIANGLE_HEIGHT);
 	pPainter->drawPolygon(points, 3);
+}
+
+void EntityDopeSheetView::OnMousePressTimeline(QPoint ptScreenPos)
+{
+	float fCurZoom = GetScene()->GetZoom();
+	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * fCurZoom;
+	int iNumSubLines = 4; // Either 0, 1, or 4
+
+	QPointF ptScenePos = mapToScene(ptScreenPos);
+
+	int iFrameIndex = ((ptScenePos.x() - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
+	GetScene()->SetCurrentFrame(iFrameIndex);
 }
