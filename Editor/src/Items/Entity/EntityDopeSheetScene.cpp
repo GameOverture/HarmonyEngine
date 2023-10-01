@@ -38,7 +38,16 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 
 	setBackgroundBrush(HyGlobal::CovertHyColor(HyColor::WidgetPanel));
 
-	UpdateSceneItems();
+	// These lines allow QGraphicsView to align itself to the top-left corner of the scene
+	addLine(0.0, 0.0, 10.0, 0.0f);
+	addLine(0.0, 0.0, 0.0, 10.0f);
+
+	// Initialize all the key frame graphics items
+	for(auto itemKeyFrameMap : m_KeyFramesMap)
+	{
+		for(int iFrameIndex : itemKeyFrameMap.keys())
+			RefreshGfxItems(iFrameIndex);
+	}
 }
 
 /*virtual*/ EntityDopeSheetScene::~EntityDopeSheetScene()
@@ -53,8 +62,6 @@ int EntityDopeSheetScene::GetFramesPerSecond() const
 void EntityDopeSheetScene::SetFramesPerSecond(int iFramesPerSecond)
 {
 	m_iFramesPerSecond = iFramesPerSecond;
-
-	UpdateSceneItems();
 }
 
 int EntityDopeSheetScene::GetCurrentFrame() const
@@ -200,6 +207,7 @@ void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, 
 		// Check if category exists
 		if(curPropsObj.contains(iterCategory.key()))
 		{
+			// Category already exists, take existing category ('curPropsObj') object and merge it with passed-in 'iterCategory'
 			QJsonObject curCategoryObj = curPropsObj[iterCategory.key()].toObject();
 			QJsonObject newCategoryObj = iterCategory.value().toObject();
 			for(auto iterProp = newCategoryObj.begin(); iterProp != newCategoryObj.end(); ++iterProp)
@@ -210,10 +218,9 @@ void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, 
 		else
 			curPropsObj.insert(iterCategory.key(), iterCategory.value());
 	}
-
 	m_KeyFramesMap[pItemData][iFrameIndex] = curPropsObj;
 
-	UpdateSceneItems();
+	RefreshGfxItems(iFrameIndex);
 }
 
 void EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue)
@@ -234,7 +241,7 @@ void EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, in
 
 	keyFrameObjRef.insert(sCategoryName, categoryObj);
 
-	UpdateSceneItems();
+	RefreshGfxItems(iFrameIndex);
 }
 
 void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName)
@@ -262,11 +269,66 @@ void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData,
 	else
 		keyFrameObjRef.insert(sCategoryName, categoryObj);
 
-	UpdateSceneItems();
+	// Remove the corresponding gfx rect for this property
+	auto gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, sCategoryName % "/" % sPropName);
+	if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey))
+	{
+		removeItem(m_KeyFramesGfxRectMap[gfxRectMapKey]);
+		m_KeyFramesGfxRectMap.remove(gfxRectMapKey);
+	}
+	RefreshGfxItems(iFrameIndex);
 }
 
-void EntityDopeSheetScene::UpdateSceneItems()
+void EntityDopeSheetScene::RefreshGfxItems(int iFrameIndex)
 {
-	//QRectF rect = sceneRect();
+	// Gather all the entity items (root, children, shapes) into one list 'itemList'
+	QList<EntityTreeItemData *> entireItemList, shapeList;
+	static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetTreeModel().GetTreeItemData(entireItemList, shapeList);
+	entireItemList += shapeList;
+	entireItemList.prepend(static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetTreeModel().GetRootTreeItemData());
+
+	qreal fPosY = TIMELINE_HEIGHT + 1.0f;
+	for(EntityTreeItemData *pCurItemData : entireItemList)
+	{
+		// Only draw the items that have key frames
+		if(m_KeyFramesMap.contains(pCurItemData) == false)
+			continue;
+
+		fPosY += ITEMS_LINE_HEIGHT; // Account for the item's name row
+
+		// 'uniquePropList' will contain every row of key frames for this item, even if they are not listed under 'iFrameIndex'
+		QList<QPair<QString, QString>> uniquePropList = GetUniquePropertiesList(pCurItemData);
+		QJsonObject propsObj = m_KeyFramesMap[pCurItemData][iFrameIndex];
+
+		// Iterate through 'uniquePropList' and draw a QGraphicsRectItem for each property found in 'propsObj'
+		// If it is not found, increment 'fPosY' by one row
+		for(auto &propPair : uniquePropList)
+		{
+			if(propsObj.contains(propPair.first) == false || propsObj[propPair.first].toObject().contains(propPair.second) == false)
+			{
+				fPosY += ITEMS_LINE_HEIGHT;
+				continue;
+			}
+
+			auto gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, propPair.first % "/" % propPair.second);
+			if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
+			{
+				QGraphicsRectItem *pNewGfxRectItem = addRect(0, 0,
+													 KEYFRAME_WIDTH,
+													 KEYFRAME_HEIGHT,
+													 QPen(HyGlobal::CovertHyColor(HyColor::Black)),
+													 QBrush(HyGlobal::CovertHyColor(HyColor::White)));
+				pNewGfxRectItem->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH), fPosY);
+				m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
+			}
+			else
+				m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH), fPosY);
+
+			fPosY += ITEMS_LINE_HEIGHT;
+		}
+
+		fPosY += 1.0f; // Account for the space between items
+	}
+
 	update();
 }

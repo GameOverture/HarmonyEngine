@@ -19,6 +19,7 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	QGraphicsView(pParent),
 	m_pStateData(nullptr)
 {
+	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 }
 
 /*virtual*/ EntityDopeSheetView::~EntityDopeSheetView()
@@ -38,6 +39,56 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 
 /*virtual*/ void EntityDopeSheetView::drawForeground(QPainter *pPainter, const QRectF &rect) /*override*/
 {
+	//////////////////////////////////////////////////////////////////////////
+	// LEFT SIDE ITEM LIST
+	//////////////////////////////////////////////////////////////////////////
+	qreal fPosY = rect.y() + TIMELINE_HEIGHT + 1.0f;
+	fPosY -= verticalScrollBar()->value();
+
+	// Gather all the entity items (root, children, shapes) into one list 'itemList'
+	QList<EntityTreeItemData *> itemList, shapeList;
+	static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetTreeItemData(itemList, shapeList);
+	itemList += shapeList;
+	itemList.prepend(static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetRootTreeItemData());
+
+	for(EntityTreeItemData *pEntItemData : itemList)
+	{
+		// Only draw the items that have key frames
+		if(GetScene()->GetKeyFramesMap().contains(pEntItemData) == false)
+			continue;
+
+		// Determine number of rows of key frames
+		int iNumRows = 1;
+		QList<QPair<QString, QString>> propList = GetScene()->GetUniquePropertiesList(pEntItemData);
+		iNumRows += propList.size();
+
+		// Background Rect
+		pPainter->setPen(Qt::NoPen);
+		pPainter->setBrush(HyGlobal::CovertHyColor(HyColor::ContainerPanel));
+		pPainter->drawRect(QRectF(rect.x(), fPosY, TIMELINE_LEFT_MARGIN, iNumRows * ITEMS_LINE_HEIGHT));
+
+		// Item Name
+		QString sCodeName;
+		if(pEntItemData->GetEntType() == ENTTYPE_ArrayItem)
+			sCodeName = pEntItemData->GetCodeName() % "[" % QString::number(pEntItemData->GetArrayIndex()) % "]";
+		else
+			sCodeName = pEntItemData->GetCodeName();
+		DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN, fPosY + 5.0f, TIMELINE_LEFT_MARGIN, ITEMS_LINE_HEIGHT), sCodeName);
+		fPosY += ITEMS_LINE_HEIGHT;
+
+		// Properties
+		for(QPair<QString, QString> &propPair : propList)
+		{
+			DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN + ITEMS_LEFT_MARGIN, fPosY + 5.0f, TIMELINE_LEFT_MARGIN - ITEMS_LEFT_MARGIN, ITEMS_LINE_HEIGHT), propPair.second);
+			fPosY += ITEMS_LINE_HEIGHT;
+		}
+
+		// Draw divider line
+		pPainter->setPen(HyGlobal::CovertHyColor(HyColor::Black));
+		pPainter->drawLine(rect.x(), fPosY, rect.x() + rect.width(), fPosY);
+		fPosY += 1.0f;
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	// TIMELINE
 	//////////////////////////////////////////////////////////////////////////
@@ -82,55 +133,6 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 
 		iNotchIndex++;
 		iFrameIndex += (iNumSubLines + 1);
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-	// LEFT SIDE ITEM LIST
-	//////////////////////////////////////////////////////////////////////////
-	qreal fPosY = rect.y() + TIMELINE_HEIGHT + 1.0f;
-
-	// Gather all the entity items (root, children, shapes) into one list 'itemList'
-	QList<EntityTreeItemData *> itemList, shapeList;
-	static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetTreeItemData(itemList, shapeList);
-	itemList += shapeList;
-	itemList.prepend(static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetRootTreeItemData());
-
-	for(EntityTreeItemData *pEntItemData : itemList)
-	{
-		// Only draw the items that have key frames
-		if(GetScene()->GetKeyFramesMap().contains(pEntItemData) == false)
-			continue;
-
-		// Determine number of rows of key frames
-		int iNumRows = 1;
-		QList<QPair<QString, QString>> propList = GetScene()->GetUniquePropertiesList(pEntItemData);
-		iNumRows += propList.size();
-
-		// Background Rect
-		pPainter->setPen(Qt::NoPen);
-		pPainter->setBrush(HyGlobal::CovertHyColor(HyColor::ContainerPanel));
-		pPainter->drawRect(QRectF(rect.x(), fPosY, TIMELINE_LEFT_MARGIN, iNumRows * ITEMS_LINE_HEIGHT));
-
-		// Item Name
-		QString sCodeName;
-		if(pEntItemData->GetEntType() == ENTTYPE_ArrayItem)
-			sCodeName = pEntItemData->GetCodeName() % "[" % QString::number(pEntItemData->GetArrayIndex()) % "]";
-		else
-			sCodeName = pEntItemData->GetCodeName();
-		DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN, fPosY + 5.0f, TIMELINE_LEFT_MARGIN, ITEMS_LINE_HEIGHT), sCodeName);
-		fPosY += ITEMS_LINE_HEIGHT;
-
-		// Properties
-		for(QPair<QString, QString> &propPair : propList)
-		{
-			DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN + ITEMS_LEFT_MARGIN, fPosY + 5.0f, TIMELINE_LEFT_MARGIN - ITEMS_LEFT_MARGIN, ITEMS_LINE_HEIGHT), propPair.second);
-			fPosY += ITEMS_LINE_HEIGHT;
-		}
-
-		// Draw divider line
-		pPainter->setPen(HyGlobal::CovertHyColor(HyColor::Black));
-		pPainter->drawLine(rect.x(), fPosY, rect.x() + rect.width(), fPosY);
-		fPosY += 1.0f;
 	}
 }
 

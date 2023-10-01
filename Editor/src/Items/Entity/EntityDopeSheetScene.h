@@ -33,13 +33,15 @@ class EntityDopeSheetScene : public QGraphicsScene
 {
 	friend class EntityDopeSheetView;
 
-	EntityStateData *										m_pEntStateData;
+	EntityStateData *															m_pEntStateData;
 
-	int														m_iFramesPerSecond;
-	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>		m_KeyFramesMap;
+	int																			m_iFramesPerSecond;
 
-	int														m_iCurrentFrame;
-	float													m_fZoom;
+	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>							m_KeyFramesMap;
+	QMap<std::tuple<EntityTreeItemData *, int, QString>, QGraphicsRectItem *>	m_KeyFramesGfxRectMap;
+
+	int																			m_iCurrentFrame;
+	float																		m_fZoom;
 
 public:
 	EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj);
@@ -53,6 +55,7 @@ public:
 
 	const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &GetKeyFramesMap() const;
 
+	// 'm_KeyFrameMap' must be fully updated before using this function
 	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData) const; // This is mainly useful for rendering the dope sheet
 
 	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const;
@@ -63,8 +66,11 @@ public:
 	void SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue);
 	void RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName);
 
-protected:
-	void UpdateSceneItems();
+private:
+	void RefreshGfxItems(int iFrameIndex);
+
+	// 'm_KeyFrameMap' must be fully updated before using this function
+	//QPointF GetKeyFramePos(EntityTreeItemData *pEntTreeItemData, int iFrameIndex, QString sCategory, QString sProperty) const;
 };
 
 #endif // ENTITYDOPESHEETSCENE_H
