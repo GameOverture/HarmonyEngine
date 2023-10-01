@@ -20,11 +20,14 @@
 #define TIMELINE_NOTCH_SUBLINES_HEIGHT 9.0f
 #define TIMELINE_NOTCH_SUBLINES_WIDTH 18.0f
 #define TIMELINE_NOTCH_TEXT_YPOS 10.0f
+#define TIMELINE_CURRENTFRAME_TRIANGLE_WIDTH 8.0f
+#define TIMELINE_CURRENTFRAME_TRIANGLE_HEIGHT 8.0f
 
+#define ITEMS_WIDTH (TIMELINE_LEFT_MARGIN - 5.0f)
 #define ITEMS_LEFT_MARGIN 32.0f
 #define ITEMS_LINE_HEIGHT 22.0f
-#define KEYFRAME_HEIGHT 20.0f
-#define KEYFRAME_WIDTH 5.0f
+#define KEYFRAME_HEIGHT 19.0f
+#define KEYFRAME_WIDTH 4.0f
 
 class EntityStateData;
 class EntityTreeItemData;
@@ -41,6 +44,8 @@ class EntityDopeSheetScene : public QGraphicsScene
 	QMap<std::tuple<EntityTreeItemData *, int, QString>, QGraphicsRectItem *>	m_KeyFramesGfxRectMap;
 
 	int																			m_iCurrentFrame;
+	QGraphicsLineItem *															m_pCurrentFrameLine;
+
 	float																		m_fZoom;
 
 public:
@@ -51,6 +56,7 @@ public:
 	void SetFramesPerSecond(int iFramesPerSecond);
 
 	int GetCurrentFrame() const;
+	void SetCurrentFrame(int iFrameIndex);
 	float GetZoom() const;
 
 	const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &GetKeyFramesMap() const;
@@ -68,9 +74,6 @@ public:
 
 private:
 	void RefreshGfxItems(int iFrameIndex);
-
-	// 'm_KeyFrameMap' must be fully updated before using this function
-	//QPointF GetKeyFramePos(EntityTreeItemData *pEntTreeItemData, int iFrameIndex, QString sCategory, QString sProperty) const;
 };
 
 #endif // ENTITYDOPESHEETSCENE_H

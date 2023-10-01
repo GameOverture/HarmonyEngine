@@ -27,10 +27,12 @@ public:
 	void SetScene(EntityStateData *pStateData);
 
 protected:
+	virtual void drawBackground(QPainter *painter, const QRectF &rect) override;
 	virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
 
 private:
 	void DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color = HyColor::WidgetFrame, HyColor shadowColor = HyColor::Black);
+	void DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY, HyColor color);
 };
 
 #endif // ENTITYDOPESHEETVIEW_H

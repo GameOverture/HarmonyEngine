@@ -37,6 +37,23 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 	setScene(&m_pStateData->GetDopeSheetScene());
 }
 
+/*virtual*/ void EntityDopeSheetView::drawBackground(QPainter *painter, const QRectF &rect) /*override*/
+{
+	//////////////////////////////////////////////////////////////////////////
+	// DRAW CURRENT FRAME INDICATOR
+	//////////////////////////////////////////////////////////////////////////
+	const qreal fPOSX_DRAW_THRESHOLD = rect.x() + TIMELINE_LEFT_MARGIN;
+	int iHorzScrollAmt = horizontalScrollBar()->value();
+	qreal fPosX = fPOSX_DRAW_THRESHOLD - iHorzScrollAmt;
+	fPosX += (GetScene()->GetCurrentFrame() * TIMELINE_NOTCH_SUBLINES_HEIGHT);
+
+	if(fPosX >= fPOSX_DRAW_THRESHOLD && fPosX < (rect.x() + rect.width()))
+	{
+		painter->setPen(HyGlobal::CovertHyColor(HyColor::Cyan));
+		painter->drawLine(fPosX, rect.y(), fPosX, rect.y() + rect.height());
+	}
+}
+
 /*virtual*/ void EntityDopeSheetView::drawForeground(QPainter *pPainter, const QRectF &rect) /*override*/
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -65,7 +82,7 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 		// Background Rect
 		pPainter->setPen(Qt::NoPen);
 		pPainter->setBrush(HyGlobal::CovertHyColor(HyColor::ContainerPanel));
-		pPainter->drawRect(QRectF(rect.x(), fPosY, TIMELINE_LEFT_MARGIN, iNumRows * ITEMS_LINE_HEIGHT));
+		pPainter->drawRect(QRectF(rect.x(), fPosY, ITEMS_WIDTH, iNumRows * ITEMS_LINE_HEIGHT));
 
 		// Item Name
 		QString sCodeName;
@@ -73,13 +90,13 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 			sCodeName = pEntItemData->GetCodeName() % "[" % QString::number(pEntItemData->GetArrayIndex()) % "]";
 		else
 			sCodeName = pEntItemData->GetCodeName();
-		DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN, fPosY + 5.0f, TIMELINE_LEFT_MARGIN, ITEMS_LINE_HEIGHT), sCodeName);
+		DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN, fPosY + 5.0f, ITEMS_WIDTH, ITEMS_LINE_HEIGHT), sCodeName);
 		fPosY += ITEMS_LINE_HEIGHT;
 
 		// Properties
 		for(QPair<QString, QString> &propPair : propList)
 		{
-			DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN + ITEMS_LEFT_MARGIN, fPosY + 5.0f, TIMELINE_LEFT_MARGIN - ITEMS_LEFT_MARGIN, ITEMS_LINE_HEIGHT), propPair.second);
+			DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN + ITEMS_LEFT_MARGIN, fPosY + 5.0f, ITEMS_WIDTH - ITEMS_LEFT_MARGIN, ITEMS_LINE_HEIGHT), propPair.second);
 			fPosY += ITEMS_LINE_HEIGHT;
 		}
 
@@ -111,24 +128,52 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 	qreal fPosX = fPOSX_DRAW_THRESHOLD - iHorzScrollAmt;
 	while(fPosX < rect.x() + rect.width())
 	{
+		// Main Notch Line
 		if(fPosX >= fPOSX_DRAW_THRESHOLD)
 		{
-			// Main Notch Line
-			pPainter->setPen(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
+			HyColor eColor = HyColor::WidgetFrame;
+
+			if(GetScene()->GetCurrentFrame() == iFrameIndex)
+			{
+				eColor = HyColor::Cyan;
+				
+				DrawCurrentFrameIndicator(pPainter, fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, eColor);
+				pPainter->setPen(HyGlobal::CovertHyColor(eColor));
+			}
+			else
+				pPainter->setPen(HyGlobal::CovertHyColor(eColor));
+			
 			pPainter->drawLine(fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT, fPosX, rect.y() + TIMELINE_HEIGHT);
 
 			// Main Notch Keyframe Text
 			const float fTextWidth = pPainter->fontMetrics().horizontalAdvance(QString::number(iFrameIndex));
 			QRectF textRect(fPosX - (fTextWidth * 0.5f), rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT - 20.0f, fTextWidth, 20.0f);
-			DrawShadowText(pPainter, textRect, QString::number(iFrameIndex));
+			DrawShadowText(pPainter, textRect, QString::number(iFrameIndex), eColor, HyColor::Black);
 		}
 
 		// Sub Notch Lines
+		pPainter->setPen(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
 		for(int i = 0; i < iNumSubLines; ++i)
 		{
 			fPosX += fSubLineSpacing;
 			if(fPosX >= fPOSX_DRAW_THRESHOLD)
+			{
+				int iCurSubNotchFrame = (iFrameIndex + 1) + i;
+				if(GetScene()->GetCurrentFrame() == iCurSubNotchFrame)
+				{
+					pPainter->setPen(HyGlobal::CovertHyColor(HyColor::Cyan));
+
+					const float fTextWidth = pPainter->fontMetrics().horizontalAdvance(QString::number(iCurSubNotchFrame));
+					QRectF textRect(fPosX - (fTextWidth * 0.5f), rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT - 20.0f, fTextWidth, 20.0f);
+					DrawShadowText(pPainter, textRect, QString::number(iCurSubNotchFrame), HyColor::Cyan, HyColor::Black);
+
+					DrawCurrentFrameIndicator(pPainter, fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, HyColor::Cyan);
+				}
+				else
+					pPainter->setPen(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
+
 				pPainter->drawLine(fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, fPosX, rect.y() + TIMELINE_HEIGHT);
+			}
 		}
 
 		iNotchIndex++;
@@ -144,4 +189,17 @@ void EntityDopeSheetView::DrawShadowText(QPainter *pPainter, QRectF textRect, co
 	textRect.translate(-1.0f, -1.0f);
 	pPainter->setPen(HyGlobal::CovertHyColor(color));
 	pPainter->drawText(textRect, sText);
+}
+
+void EntityDopeSheetView::DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY, HyColor color)
+{	
+	pPainter->setPen(HyGlobal::CovertHyColor(color.Darken()));
+	pPainter->setBrush(HyGlobal::CovertHyColor(color));
+
+	// Draw triangle pointing downward over the notch line using the below variables
+	QPointF points[3];
+	points[0] = QPointF(fPosX, fPosY);
+	points[1] = QPointF(fPosX - (TIMELINE_CURRENTFRAME_TRIANGLE_WIDTH * 0.5f), fPosY - TIMELINE_CURRENTFRAME_TRIANGLE_HEIGHT);
+	points[2] = QPointF(fPosX + (TIMELINE_CURRENTFRAME_TRIANGLE_WIDTH * 0.5f), fPosY - TIMELINE_CURRENTFRAME_TRIANGLE_HEIGHT);
+	pPainter->drawPolygon(points, 3);
 }

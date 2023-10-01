@@ -41,6 +41,7 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	// These lines allow QGraphicsView to align itself to the top-left corner of the scene
 	addLine(0.0, 0.0, 10.0, 0.0f);
 	addLine(0.0, 0.0, 0.0, 10.0f);
+	m_pCurrentFrameLine = addLine(0.0f, 0.0f, 0.0f, 10.0f); // This line will hide behind the timeline, but is placed in "scene space" so it will embiggen the sceneRect and QGraphicsViews' scrollbars
 
 	// Initialize all the key frame graphics items
 	for(auto itemKeyFrameMap : m_KeyFramesMap)
@@ -48,6 +49,8 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 		for(int iFrameIndex : itemKeyFrameMap.keys())
 			RefreshGfxItems(iFrameIndex);
 	}
+
+	SetCurrentFrame(0);
 }
 
 /*virtual*/ EntityDopeSheetScene::~EntityDopeSheetScene()
@@ -67,6 +70,12 @@ void EntityDopeSheetScene::SetFramesPerSecond(int iFramesPerSecond)
 int EntityDopeSheetScene::GetCurrentFrame() const
 {
 	return m_iCurrentFrame;
+}
+
+void EntityDopeSheetScene::SetCurrentFrame(int iFrame)
+{
+	m_iCurrentFrame = iFrame;
+	m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (m_iCurrentFrame * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
 }
 
 float EntityDopeSheetScene::GetZoom() const
@@ -318,11 +327,11 @@ void EntityDopeSheetScene::RefreshGfxItems(int iFrameIndex)
 													 KEYFRAME_HEIGHT,
 													 QPen(HyGlobal::CovertHyColor(HyColor::Black)),
 													 QBrush(HyGlobal::CovertHyColor(HyColor::White)));
-				pNewGfxRectItem->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH), fPosY);
+				pNewGfxRectItem->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
 				m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
 			}
 			else
-				m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH), fPosY);
+				m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
 
 			fPosY += ITEMS_LINE_HEIGHT;
 		}
