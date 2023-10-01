@@ -39,14 +39,21 @@ void HySetVec(glm::vec2 &vecOut, float fX, float fY)
 	vecOut.x = fX; vecOut.y = fY;
 }
 
-void HySetVec(glm::vec3 &vecOut, float fX, float fY, float fZ)
+void HySetVec(glm::vec2 &vecOut, const glm::vec2 &srcRef)
 {
-	vecOut.x = fX; vecOut.y = fY; vecOut.z = fZ;
+	vecOut = srcRef;
 }
 
-void HySetVec(glm::vec4 &vecOut, float fX, float fY, float fZ, float fW)
+void HySetVec(glm::vec2 &vecOut, const glm::vec3 &srcRef)
 {
-	vecOut.x = fX; vecOut.y = fY; vecOut.z = fZ; vecOut.w = fW;
+	vecOut.x = srcRef.x;
+	vecOut.y = srcRef.y;
+}
+
+void HySetVec(glm::vec2 &vecOut, const glm::vec4 &srcRef)
+{
+	vecOut.x = srcRef.x;
+	vecOut.y = srcRef.y;
 }
 
 void HySetVec(glm::ivec2 &vecOut, int32 iX, int32 iY)
@@ -54,9 +61,95 @@ void HySetVec(glm::ivec2 &vecOut, int32 iX, int32 iY)
 	vecOut.x = iX; vecOut.y = iY;
 }
 
+void HySetVec(glm::ivec2 &vecOut, const glm::ivec2 &srcRef)
+{
+	vecOut = srcRef;
+}
+
+void HySetVec(glm::ivec2 &vecOut, const glm::ivec3 &srcRef)
+{
+	vecOut.x = srcRef.x;
+	vecOut.y = srcRef.y;
+}
+
+void HySetVec(glm::ivec2 &vecOut, const glm::ivec4 &srcRef)
+{
+	vecOut.x = srcRef.x;
+	vecOut.y = srcRef.y;
+}
+
+void HySetVec(glm::vec3 &vecOut, float fX, float fY, float fZ)
+{
+	vecOut.x = fX; vecOut.y = fY; vecOut.z = fZ;
+}
+
+void HySetVec(glm::vec3 &vecOut, const glm::vec2 &srcRef)
+{
+	vecOut.x = srcRef.x;
+	vecOut.y = srcRef.y;
+	vecOut.z = 0.0f;
+}
+
+void HySetVec(glm::vec3 &vecOut, const glm::vec3 &srcRef)
+{
+	vecOut = srcRef;
+}
+
+void HySetVec(glm::vec3 &vecOut, const glm::vec4 &srcRef)
+{
+	vecOut.x = srcRef.x;
+	vecOut.y = srcRef.y;
+	vecOut.z = srcRef.z;
+}
+
 void HySetVec(glm::ivec3 &vecOut, int32 iX, int32 iY, int32 iZ)
 {
 	vecOut.x = iX; vecOut.y = iY; vecOut.z = iZ;
+}
+
+void HySetVec(glm::ivec3 &vecOut, const glm::ivec2 &srcRef)
+{
+	vecOut.x = srcRef.x;
+	vecOut.y = srcRef.y;
+	vecOut.z = 0;
+}
+
+void HySetVec(glm::ivec3 &vecOut, const glm::ivec3 &srcRef)
+{
+	vecOut = srcRef;
+}
+
+void HySetVec(glm::ivec3 &vecOut, const glm::ivec4 &srcRef)
+{
+	vecOut.x = srcRef.x;
+	vecOut.y = srcRef.y;
+	vecOut.z = srcRef.z;
+}
+
+void HySetVec(glm::vec4 &vecOut, float fX, float fY, float fZ, float fW)
+{
+	vecOut.x = fX; vecOut.y = fY; vecOut.z = fZ; vecOut.w = fW;
+}
+
+void HySetVec(glm::vec4 &vecOut, const glm::vec2 &srcRef)
+{
+	vecOut.x = srcRef.x;
+	vecOut.y = srcRef.y;
+	vecOut.z = 0.0f;
+	vecOut.w = 0.0f;
+}
+
+void HySetVec(glm::vec4 &vecOut, const glm::vec3 &srcRef)
+{
+	vecOut.x = srcRef.x;
+	vecOut.y = srcRef.y;
+	vecOut.z = srcRef.z;
+	vecOut.w = 0.0f;
+}
+
+void HySetVec(glm::vec4 &vecOut, const glm::vec4 &srcRef)
+{
+	vecOut = srcRef;
 }
 
 void HySetVec(glm::ivec4 &vecOut, int32 iX, int32 iY, int32 iZ, int32 iW)
@@ -64,104 +157,26 @@ void HySetVec(glm::ivec4 &vecOut, int32 iX, int32 iY, int32 iZ, int32 iW)
 	vecOut.x = iX; vecOut.y = iY; vecOut.z = iZ; vecOut.w = iW;
 }
 
-void HyCopyVec(glm::vec2 &destRef, const glm::vec2 &srcRef)
+void HySetVec(glm::ivec4 &vecOut, const glm::ivec2 &srcRef)
 {
-	destRef = srcRef;
+	vecOut.x = srcRef.x;
+	vecOut.y = srcRef.y;
+	vecOut.z = 0;
+	vecOut.w = 0;
 }
 
-void HyCopyVec(glm::vec3 &destRef, const glm::vec3 &srcRef)
+void HySetVec(glm::ivec4 &vecOut, const glm::ivec3 &srcRef)
 {
-	destRef = srcRef;
+	vecOut.x = srcRef.x;
+	vecOut.y = srcRef.y;
+	vecOut.z = srcRef.z;
+	vecOut.w = 0;
 }
 
-void HyCopyVec(glm::vec2 &destRef, const glm::vec3 &srcRef)
+void HySetVec(glm::ivec4 &vecOut, const glm::ivec4 &srcRef)
 {
-	destRef.x = srcRef.x;
-	destRef.y = srcRef.y;
+	vecOut = srcRef;
 }
-
-void HyCopyVec(glm::vec3 &destRef, const glm::vec2 &srcRef)
-{
-	destRef.x = srcRef.x;
-	destRef.y = srcRef.y;
-}
-
-void HyCopyVec(glm::vec4 &destRef, const glm::vec3 &srcRef)
-{
-	destRef.x = srcRef.x;
-	destRef.y = srcRef.y;
-	destRef.z = srcRef.z;
-}
-
-void HyCopyVec(glm::vec4 &destRef, const glm::vec2 &srcRef)
-{
-	destRef.x = srcRef.x;
-	destRef.y = srcRef.y;
-}
-
-//
-//float HyEase_Linear(float a, float b, float t)
-//{
-//	return ((b-a)*t)+a;
-//}
-//
-////--------------------------------------------------------------------------------------
-//// Accelerating from zero velocity
-////--------------------------------------------------------------------------------------
-//float HyEase_QuadraticIn(float fTime, float fStart, float fDist, float fDur)
-//{
-//	fTime /= fDur;
-//	return fDist * fTime * fTime + fStart;
-//}
-//
-////--------------------------------------------------------------------------------------
-//// Decelerating to zero velocity
-////--------------------------------------------------------------------------------------
-//float HyEase_QuadraticOut(float fTime, float fStart, float fDist, float fDur)
-//{
-//	fTime /= fDur;
-//	return -fDist * fTime*(fTime-2) + fStart;
-//}
-//
-////--------------------------------------------------------------------------------------
-//// Acceleration until halfway, then deceleration
-////--------------------------------------------------------------------------------------
-//float HyEase_QuadraticInOut(float fTime, float fStart, float fDist, float fDur)
-//{
-//	fTime /= fDur/2;
-//
-//	if (fTime < 1) 
-//		return fDist/2*fTime*fTime + fStart;
-//
-//	fTime--;
-//
-//	return -fDist/2 * (fTime*(fTime-2) - 1) + fStart;
-//}
-//
-//float HyEase_AngleLinear(float angleA, float angleB, int32 spin, float t)
-//{
-//	if(spin==0)
-//	{
-//		return angleA;
-//	}
-//	if(spin>0)
-//	{
-//		if((angleB-angleA)<0)
-//		{
-//			angleB+=360;
-//		}
-//	}
-//	else if(spin<0)
-//	{
-//		if((angleB-angleA)>0)
-//		{    
-//			angleB-=360;
-//		}
-//	}
-//
-//	return HyEase_Linear(angleA,angleB,t);
-//}
-
 
 glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNewWidth, int32 iNewHeight)
 {

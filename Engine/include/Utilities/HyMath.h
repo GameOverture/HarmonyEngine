@@ -28,50 +28,37 @@
 #define HYCOLOR_AYUV(a,y,u,v) HYCOLOR_ARGB(a,y,u,v)
 
 void HySetVec(glm::vec2 &vecOut, float fX, float fY);
-void HySetVec(glm::vec3 &vecOut, float fX, float fY, float fZ);
-void HySetVec(glm::vec4 &vecOut, float fX, float fY, float fZ, float fW);
+void HySetVec(glm::vec2 &vecOut, const glm::vec2 &srcRef);
+void HySetVec(glm::vec2 &vecOut, const glm::vec3 &srcRef);
+void HySetVec(glm::vec2 &vecOut, const glm::vec4 &srcRef);
 void HySetVec(glm::ivec2 &vecOut, int32 iX, int32 iY);
-void HySetVec(glm::ivec3 &vecOut, int32 iX, int32 iY, int32 iZ);
-void HySetVec(glm::ivec4 &vecOut, int32 iX, int32 iY, int32 iZ, int32 iW);
+void HySetVec(glm::ivec2 &vecOut, const glm::ivec2 &srcRef);
+void HySetVec(glm::ivec2 &vecOut, const glm::ivec3 &srcRef);
+void HySetVec(glm::ivec2 &vecOut, const glm::ivec4 &srcRef);
 
-void HyCopyVec(glm::vec2 &destRef, const glm::vec2 &srcRef);
-void HyCopyVec(glm::vec3 &destRef, const glm::vec3 &srcRef);
-void HyCopyVec(glm::vec2 &destRef, const glm::vec3 &srcRef);
-void HyCopyVec(glm::vec3 &destRef, const glm::vec2 &srcRef);
-void HyCopyVec(glm::vec4 &destRef, const glm::vec3 &srcRef);
-void HyCopyVec(glm::vec4 &destRef, const glm::vec2 &srcRef);
+void HySetVec(glm::vec3 &vecOut, float fX, float fY, float fZ);
+void HySetVec(glm::vec3 &vecOut, const glm::vec2 &srcRef);
+void HySetVec(glm::vec3 &vecOut, const glm::vec3 &srcRef);
+void HySetVec(glm::vec3 &vecOut, const glm::vec4 &srcRef);
+void HySetVec(glm::ivec3 &vecOut, int32 iX, int32 iY, int32 iZ);
+void HySetVec(glm::ivec3 &vecOut, const glm::ivec2 &srcRef);
+void HySetVec(glm::ivec3 &vecOut, const glm::ivec3 &srcRef);
+void HySetVec(glm::ivec3 &vecOut, const glm::ivec4 &srcRef);
+
+void HySetVec(glm::vec4 &vecOut, float fX, float fY, float fZ, float fW);
+void HySetVec(glm::vec4 &vecOut, const glm::vec2 &srcRef);
+void HySetVec(glm::vec4 &vecOut, const glm::vec3 &srcRef);
+void HySetVec(glm::vec4 &vecOut, const glm::vec4 &srcRef);
+void HySetVec(glm::ivec4 &vecOut, int32 iX, int32 iY, int32 iZ, int32 iW);
+void HySetVec(glm::ivec4 &vecOut, const glm::ivec2 &srcRef);
+void HySetVec(glm::ivec4 &vecOut, const glm::ivec3 &srcRef);
+void HySetVec(glm::ivec4 &vecOut, const glm::ivec4 &srcRef);
 
 template <typename T>
 bool HyCompareFloat(T lhs, T rhs)
 {
 	return trunc(1000. * lhs) == trunc(1000. * rhs);
 }
-
-//template <typename T>
-//T HyRound(T num)
-//{
-//	return (num - floor(num) >= 0.5) ? ceil(num) : floor(num);
-//}
-
-//float HyEase_Linear(float a, float b, float t);
-//
-////--------------------------------------------------------------------------------------
-//// Accelerating from zero velocity
-////--------------------------------------------------------------------------------------
-//float HyEase_QuadraticIn(float fTime, float fStart, float fDist, float fDur);
-//
-////--------------------------------------------------------------------------------------
-//// Decelerating to zero velocity
-////--------------------------------------------------------------------------------------
-//float HyEase_QuadraticOut(float fTime, float fStart, float fDist, float fDur);
-//
-////--------------------------------------------------------------------------------------
-//// Acceleration until halfway, then deceleration
-////--------------------------------------------------------------------------------------
-//float HyEase_QuadraticInOut(float fTime, float fStart, float fDist, float fDur);
-//
-//// 
-//float HyEase_AngleLinear(float angleA, float angleB, int32 spin, float t);
 
 template<typename T>
 struct HyRectangle

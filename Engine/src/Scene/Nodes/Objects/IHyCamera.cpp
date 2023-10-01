@@ -68,7 +68,7 @@ template<typename NODETYPE>
 void IHyCamera<NODETYPE>::CameraShake(float fRadius)
 {
 	if(IsCameraShake() == false)
-		HyCopyVec(m_ptCameraShakeCenter, NODETYPE::pos.Get());
+		HySetVec(m_ptCameraShakeCenter, NODETYPE::pos.Get());
 
 	fRadius = HyMath::Max(fRadius, 2.5f);
 
