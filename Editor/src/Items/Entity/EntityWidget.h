@@ -25,8 +25,8 @@ class EntityWidget : public IWidget
 {
 	Q_OBJECT
 
-	QActionGroup		m_AddShapeActionGroup;
-	QMenu				m_ContextMenu;
+	QActionGroup					m_AddShapeActionGroup;
+	QMenu							m_ContextMenu;
 
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
@@ -37,7 +37,10 @@ public:
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
 	QModelIndexList GetSelectedItems();
+	QList<EntityTreeItemData *> GetSelectedItemDataList();
 	void RequestSelectedItems(QList<QUuid> uuidList); // Will clear and select only what 'uuidList' contains
+
+	void SetExtrapolatedProperties(QList<EntityTreeItemData *> selectedItems);
 
 	void CheckShapeAddBtn(EditorShape eShapeType, bool bAsPrimitive);
 	void CheckVertexEditMode(bool bCheck);

@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "EntityDopeSheetScene.h"
 #include "EntityModel.h"
+#include "EntityWidget.h"
 
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneHoverEvent>
@@ -121,6 +122,13 @@ void EntityDopeSheetScene::SetCurrentFrame(int iFrame)
 	m_iCurrentFrame = HyMath::Max(iFrame, 0);
 	m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (m_iCurrentFrame * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
 	update();
+
+	IWidget *pWidget = m_pEntStateData->GetModel().GetItem().GetWidget();
+	if(pWidget)
+	{
+		EntityWidget *pEntityWidget = static_cast<EntityWidget *>(pWidget);
+		pEntityWidget->SetExtrapolatedProperties(pEntityWidget->GetSelectedItemDataList());
+	}
 }
 
 float EntityDopeSheetScene::GetZoom() const
