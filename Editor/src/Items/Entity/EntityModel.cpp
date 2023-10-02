@@ -56,7 +56,8 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this),
 	m_bVertexEditMode(false)
 {
-	// The EntityTreeModel was initialized first so that all the EntityTreeItemData's exist. InitStates will look them up using their UUID when initializing its Key Frames map
+	// The EntityTreeModel ('m_TreeModel') was initialized first so that all the EntityTreeItemData's exist.
+	// InitStates will look them up using their UUID when initializing its Key Frames map within the state's DopeSheetScene
 	InitStates<EntityStateData>(itemFileDataRef);
 }
 

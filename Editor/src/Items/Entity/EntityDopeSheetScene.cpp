@@ -372,7 +372,10 @@ void EntityDopeSheetScene::RefreshGfxItems(int iFrameIndex)
 				continue;
 			}
 
-			auto gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, propPair.first % "/" % propPair.second);
+			// IMPORTANT NOTE: std::make_tuple() crashes in Release if you try to construct the string directly in the function call
+			QString sPropString = propPair.first % "/" % propPair.second;
+			auto gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, sPropString);
+			
 			if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
 			{
 				GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
