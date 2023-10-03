@@ -279,6 +279,18 @@ void EntityDraw::ClearShapeEdit()
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
+void EntityDraw::SetExtrapolatedProperties(const QMap<EntityTreeItemData *, QJsonObject> &extrapolatedPropertiesMap)
+{
+	for(auto pItem : m_ItemList)
+	{
+		if(extrapolatedPropertiesMap.contains(pItem->GetEntityTreeItemData()))
+		{
+			QJsonObject propsObj = extrapolatedPropertiesMap[pItem->GetEntityTreeItemData()];
+			ApplyExtrapolatedProperties(pItem->GetHyNode(), &pItem->GetShapeCtrl(), pItem->GetEntityTreeItemData()->GetType(), pItem->GetEntityTreeItemData()->IsSelected(), propsObj, m_pCamera);
+		}
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -358,7 +370,7 @@ void EntityDraw::ClearShapeEdit()
 			pDrawItem->HideTransformCtrl();
 
 		QJsonObject propsObj = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(m_pProjItem->GetWidget()->GetCurStateIndex()))->GetDopeSheetScene().ExtrapolateKeyFramesProperties(pDrawItem->GetEntityTreeItemData());
-		ApplyProperties(pDrawItem->GetHyNode(), &pDrawItem->GetShapeCtrl(), pDrawItem->GetEntityTreeItemData()->GetType(), descObj["isSelected"].toBool(), propsObj, m_pCamera);
+		ApplyExtrapolatedProperties(pDrawItem->GetHyNode(), &pDrawItem->GetShapeCtrl(), pDrawItem->GetEntityTreeItemData()->GetType(), descObj["isSelected"].toBool(), propsObj, m_pCamera);
 	}
 	
 	// Delete all the remaining stale items

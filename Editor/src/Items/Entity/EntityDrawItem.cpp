@@ -167,7 +167,6 @@ void EntityDrawItem::HideTransformCtrl()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, HyEntity2d *pParent) :
 	HyEntity2d(pParent)
 {
@@ -258,22 +257,22 @@ SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, HyEntity2
 
 	SetState(0);
 }
-
 /*virtual*/ SubEntity::~SubEntity()
 {
 	for(int i = 0; i < m_ChildPtrList.size(); ++i)
 		delete m_ChildPtrList[i].first;
 }
-
 void SubEntity::RefreshProperties(const QList<QJsonObject> &propsObjList)
 {
 	for(int i = 0; i < m_ChildPtrList.size(); ++i)
-		ApplyProperties(m_ChildPtrList[i].first, nullptr, m_ChildPtrList[i].second, false, propsObjList[i], nullptr);
+		ApplyExtrapolatedProperties(m_ChildPtrList[i].first, nullptr, m_ChildPtrList[i].second, false, propsObjList[i], nullptr);
 }
+// SubEntity
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// NOTE: The following functions share logic that handle all the item specific properties: EntityTreeItemData::InitPropertiesModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp - ApplyProperties
+// NOTE: The following functions share logic that handle all the item specific properties: InitPropertiesModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp - ApplyExtrapolatedProperties
 //		 Updates here should reflect to the functions above
-void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propsObj, HyCamera2d *pCamera)
+void ApplyExtrapolatedProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propsObj, HyCamera2d *pCamera)
 {
 	if(eItemType == ITEM_Prefix) // aka Shapes folder
 		return;

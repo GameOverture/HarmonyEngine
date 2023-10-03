@@ -178,7 +178,7 @@ EntityWidget::~EntityWidget()
 		ui->propertyTree->setModel(nullptr);
 
 		bEnableVemMode = false;
-		SetExtrapolatedProperties(QList<EntityTreeItemData *>());
+		CalculateExtrapolatedProperties(QList<EntityTreeItemData *>());
 	}
 	else
 	{
@@ -200,7 +200,7 @@ EntityWidget::~EntityWidget()
 
 			EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
 
-			if(pEntItemData->GetEntType() == ENTTYPE_Item)
+			if(pEntItemData->GetEntType() == ENTTYPE_Item || pEntItemData->GetEntType() == ENTTYPE_ArrayItem)
 				selectedItemsDataList.push_back(pEntItemData);
 
 			if(pEntItemData->GetType() != eType)
@@ -283,7 +283,7 @@ EntityWidget::~EntityWidget()
 		m_ContextMenu.addSeparator();
 		m_ContextMenu.addAction(ui->actionRemoveItems);
 
-		SetExtrapolatedProperties(selectedItemsDataList);
+		CalculateExtrapolatedProperties(selectedItemsDataList);
 	}
 
 	if(bEnableVemMode)
@@ -358,7 +358,43 @@ void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList)
 	delete pItemSelection;
 }
 
-void EntityWidget::SetExtrapolatedProperties(QList<EntityTreeItemData *> selectedItems)
+void EntityWidget::SetExtrapolatedProperties(const QMap<EntityTreeItemData *, QJsonObject> &extrapolatedPropertiesMap)
+{
+	QList<EntityTreeItemData *> selectedItemList = GetSelectedItemDataList();
+	if(selectedItemList.size() == 1)
+	{
+		PropertiesTreeModel &propModelRef = selectedItemList[0]->GetPropertiesModel();
+		QJsonObject propsObj = extrapolatedPropertiesMap[selectedItemList[0]];
+		propModelRef.ResetValues();
+		propModelRef.DeserializeJson(propsObj);
+		ui->propertyTree->setModel(&propModelRef);
+
+		ui->lblSelectedItemIcon->setVisible(true);
+		ui->lblSelectedItemIcon->setPixmap(selectedItemList[0]->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
+		ui->lblSelectedItemText->setVisible(true);
+
+		EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
+		ui->lblSelectedItemText->setText(selectedItemList[0]->GetCodeName() % " Properties [Frame " % QString::number(entityDopeSheetSceneRef.GetCurrentFrame()) % "]");
+	}
+	else
+	{
+		// TODO: Support multiple selection
+		ui->propertyTree->setModel(nullptr);
+
+		ui->lblSelectedItemIcon->setVisible(false);
+		ui->lblSelectedItemText->setVisible(true);
+		if(selectedItemList.size() == 0)
+			ui->lblSelectedItemText->setText("No items selected");
+		else
+			ui->lblSelectedItemText->setText("Multiple items selected");
+	}
+
+	// Expand the top level nodes (the properties' categories)
+	ui->propertyTree->expandAll();
+	ui->propertyTree->resizeColumnToContents(0);
+}
+
+void EntityWidget::CalculateExtrapolatedProperties(QList<EntityTreeItemData *> selectedItems)
 {
 	if(selectedItems.size() == 1)
 	{

@@ -11,6 +11,7 @@
 #include "EntityDopeSheetScene.h"
 #include "EntityModel.h"
 #include "EntityWidget.h"
+#include "EntityDraw.h"
 
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneHoverEvent>
@@ -123,11 +124,21 @@ void EntityDopeSheetScene::SetCurrentFrame(int iFrame)
 	m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (m_iCurrentFrame * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
 	update();
 
+	QMap<EntityTreeItemData *, QJsonObject> extrapolatedPropertiesMap;
+	for(EntityTreeItemData *pItem : m_KeyFramesMap.keys())
+		extrapolatedPropertiesMap[pItem] = ExtrapolateKeyFramesProperties(pItem);
+
 	IWidget *pWidget = m_pEntStateData->GetModel().GetItem().GetWidget();
 	if(pWidget)
 	{
 		EntityWidget *pEntityWidget = static_cast<EntityWidget *>(pWidget);
-		pEntityWidget->SetExtrapolatedProperties(pEntityWidget->GetSelectedItemDataList());
+		pEntityWidget->SetExtrapolatedProperties(extrapolatedPropertiesMap);
+	}
+	IDraw *pDraw = m_pEntStateData->GetModel().GetItem().GetDraw();
+	if(pDraw)
+	{
+		EntityDraw *pEntityDraw = static_cast<EntityDraw *>(pDraw);
+		pEntityDraw->SetExtrapolatedProperties(extrapolatedPropertiesMap);
 	}
 }
 

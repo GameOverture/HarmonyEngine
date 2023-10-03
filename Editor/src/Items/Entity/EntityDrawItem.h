@@ -57,6 +57,6 @@ public:
 	void RefreshProperties(const QList<QJsonObject> &propsObjList);
 };
 
-void ApplyProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propsObj, HyCamera2d *pCamera);
+void ApplyExtrapolatedProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propsObj, HyCamera2d *pCamera);
 
 #endif // ENTITYDRAWITEM_H

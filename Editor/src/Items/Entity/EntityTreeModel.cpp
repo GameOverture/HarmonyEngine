@@ -173,7 +173,7 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 	childObjRef.insert("isSelected", m_bIsSelected);
 }
 
-// NOTE: The following functions share logic that handle all the item specific properties: EntityStateData::InitalizePropertyModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp - ApplyProperties
+// NOTE: The following functions share logic that handle all the item specific properties: InitalizePropertyModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp--ApplyExtrapolatedProperties
 //		 Updates here should reflect to the functions above
 QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLine, bool &bActivatePhysicsOut, uint32 &uiMaxVertListSizeOut)
 {
@@ -993,7 +993,7 @@ bool EntityTreeModel::FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut
 	return bFoundArrayFolder;
 }
 
-// NOTE: The following functions share logic that handle all the item specific properties: InitalizePropertyModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp - ApplyProperties
+// NOTE: The following functions share logic that handle all the item specific properties: InitalizePropertyModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp - ApplyExtrapolatedProperties
 //		 Updates here should reflect to the functions above
 void InitalizePropertyModel(EntityTreeItemData *pItemData, PropertiesTreeModel &propertiesTreeModelRef)
 {

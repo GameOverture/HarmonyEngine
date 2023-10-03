@@ -40,7 +40,8 @@ public:
 	QList<EntityTreeItemData *> GetSelectedItemDataList();
 	void RequestSelectedItems(QList<QUuid> uuidList); // Will clear and select only what 'uuidList' contains
 
-	void SetExtrapolatedProperties(QList<EntityTreeItemData *> selectedItems);
+	void SetExtrapolatedProperties(const QMap<EntityTreeItemData *, QJsonObject> &extrapolatedPropertiesMap);
+	void CalculateExtrapolatedProperties(QList<EntityTreeItemData *> selectedItems);
 
 	void CheckShapeAddBtn(EditorShape eShapeType, bool bAsPrimitive);
 	void CheckVertexEditMode(bool bCheck);
