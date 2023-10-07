@@ -46,55 +46,34 @@ public:
 
 	const IHySprite &operator=(const IHySprite &rhs);
 
-	//--------------------------------------------------------------------------------------
-	// Set how to playback the animation on the current (or specified) state/animation.
-	//--------------------------------------------------------------------------------------
-	void SetAnimCtrl(HyAnimCtrl eAnimCtrl);
-	void SetAnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiStateIndex);
+	void SetAnimCtrl(HyAnimCtrl eAnimCtrl);							// Set how to playback the animation on the current state
+	void SetAnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiStateIndex);	// Set how to playback the animation on the specified state
+
+	bool IsAnimLoop();
+	bool IsAnimLoop(uint32 uiStateIndex);
 
 	bool IsAnimReverse();
 	bool IsAnimReverse(uint32 uiStateIndex);
+
+	bool IsAnimBounce();
+	bool IsAnimBounce(uint32 uiStateIndex);
+	bool IsAnimInBouncePhase();							// True if the current anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
+	void SetAnimInBouncePhase(bool bSetBouncingFlag);	// If the current anim state is set to 'bounce', this will set or unset the bounce flag, affecting the remaining of animation's playback. False means the animation has not bounced yet and is "playing forward", True means the bounce has already occurred and is "playing in reverse"
+
+	bool IsAnimPaused();
+	void SetAnimPause(bool bPause);
 	
 	uint32 GetNumFrames();
 	uint32 GetFrame() const;
 	void SetFrame(uint32 uiFrameIndex);
 
-	//--------------------------------------------------------------------------------------
-	// Returns the time modifier (defaulted to 1.0f) that's applied the animation frame duration 
-	// set by the Editor Tool.
-	//--------------------------------------------------------------------------------------
-	float GetAnimRate() const;
+	float GetAnimRate() const;			// Returns the time modifier that scales each frame duration in the animation. The default value of '1.0f' will play the animation as presented in the Editor.
+	void SetAnimRate(float fPlayRate);	// Scales each frame duration by 'fPlayRate'. The default value of '1.0f' will play the animation as presented in the Editor. Negative 'fPlayRate' is invalid and is clamped to 0.0f, use SetAnimCtrl(HYANIMCTRL_Reverse) instead.
 
-	//--------------------------------------------------------------------------------------
-	// Modifies the time modifier that's applied the animation frame duration 
-	// set by the Editor Tool. Negative fPlayRate is invalid. 
-	//
-	// Note: This method will not unpause an sprite. It will just set its play rate for
-	//       when it is told to resume.
-	//--------------------------------------------------------------------------------------
-	void SetAnimRate(float fPlayRate);
-
-	//--------------------------------------------------------------------------------------
-	// Change the animation state of the sprite. The new state sets the current frame index
-	// to frame [0] or frame [last] if the animation ctrls specify to play in reverse.
-	//
-	// Note: This does not automatically begin playing the animation. If entity was instructed
-	//       to pause prior to SetState(), it will switch to inital frame and continue 
-	//       to pause.
-	//--------------------------------------------------------------------------------------
-
-	//--------------------------------------------------------------------------------------
-	// Returns a boolean value that represents whether this animation has finished playing.
-	// A looping animation never will return true.
-	//--------------------------------------------------------------------------------------
-	bool IsAnimFinished();
-
-	bool IsAnimPaused();
-
-	void SetAnimPause(bool bPause);
+	bool IsAnimFinished();				// Returns a boolean value that represents whether this animation has finished playing. A looping animation will not return true.
 
 	float GetAnimDuration();
-	void AdvanceAnim(float fDeltaTime);
+	void AdvanceAnim(float fDeltaTime);				// Must have valid data to use this function! - Advances the animation by fDeltaTime seconds using all the current anim attributes, ignoring whether it's paused or not. You are not required to call this function yourself.
 
 	float GetFrameWidth(float fPercent = 1.0f);		// Returns the ALPHA-CROPPED width of the current frame (ignores any scaling)
 	float GetFrameHeight(float fPercent = 1.0f);	// Returns the ALPHA-CROPPED height of the current frame (ignores any scaling)

@@ -75,17 +75,20 @@ void IHySprite<NODETYPE, ENTTYPE>::SetAnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiSt
 
 	switch(eAnimCtrl)
 	{
-	case HYANIMCTRL_Play:
-		m_bIsAnimPaused = false;
-		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_Finished;
-		break;
 	case HYANIMCTRL_Reset:
+	case HYANIMCTRL_ResetAndPlay:
+	case HYANIMCTRL_ResetAndPause:
 		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_IsBouncing;
 		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_Finished;
 		if(m_AnimCtrlAttribList[uiStateIndex] & ANIMCTRLATTRIB_Reverse && static_cast<const HySpriteData *>(this->AcquireData())->GetState(uiStateIndex).m_uiNUMFRAMES > 0)
 			SetFrame(static_cast<const HySpriteData *>(this->AcquireData())->GetState(uiStateIndex).m_uiNUMFRAMES - 1);
 		else
 			SetFrame(0);
+		
+		if(eAnimCtrl == HYANIMCTRL_ResetAndPlay)
+			m_bIsAnimPaused = false;
+		else if(eAnimCtrl == HYANIMCTRL_ResetAndPause)
+			m_bIsAnimPaused = true;
 		break;
 
 	case HYANIMCTRL_Reverse:
@@ -111,6 +114,22 @@ void IHySprite<NODETYPE, ENTTYPE>::SetAnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiSt
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+bool IHySprite<NODETYPE, ENTTYPE>::IsAnimLoop()
+{
+	return IsAnimLoop(this->m_uiState);
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHySprite<NODETYPE, ENTTYPE>::IsAnimLoop(uint32 uiStateIndex)
+{
+	if(this->AcquireData() == nullptr) {
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::IsAnimLoop invoked on null data");
+		return false;
+	}
+	return (m_AnimCtrlAttribList[uiStateIndex] & ANIMCTRLATTRIB_Loop) != 0;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 bool IHySprite<NODETYPE, ENTTYPE>::IsAnimReverse()
 {
 	return IsAnimReverse(this->m_uiState);
@@ -125,6 +144,62 @@ bool IHySprite<NODETYPE, ENTTYPE>::IsAnimReverse(uint32 uiStateIndex)
 	}
 
 	return (m_AnimCtrlAttribList[uiStateIndex] & ANIMCTRLATTRIB_Reverse) != 0;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHySprite<NODETYPE, ENTTYPE>::IsAnimBounce()
+{
+	return IsAnimBounce(this->m_uiState);
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHySprite<NODETYPE, ENTTYPE>::IsAnimBounce(uint32 uiStateIndex)
+{
+	if(this->AcquireData() == nullptr) {
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::IsAnimBounce invoked on null data");
+		return false;
+	}
+	return (m_AnimCtrlAttribList[uiStateIndex] & ANIMCTRLATTRIB_Bounce) != 0;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHySprite<NODETYPE, ENTTYPE>::IsAnimInBouncePhase()
+{
+	if(this->AcquireData() == nullptr) {
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::IsAnimInBouncePhase invoked on null data");
+		return false;
+	}
+
+	return (m_AnimCtrlAttribList[this->m_uiState] & ANIMCTRLATTRIB_IsBouncing) != 0;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHySprite<NODETYPE, ENTTYPE>::SetAnimInBouncePhase(bool bSetBouncingFlag)
+{
+	if(IsAnimBounce(this->m_uiState) == false)
+		return;
+
+	m_AnimCtrlAttribList[this->m_uiState] &= ~ANIMCTRLATTRIB_IsBouncing;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHySprite<NODETYPE, ENTTYPE>::IsAnimPaused()
+{
+	return m_bIsAnimPaused;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHySprite<NODETYPE, ENTTYPE>::SetAnimPause(bool bPause)
+{
+	if(m_bIsAnimPaused == bPause)
+		return;
+
+	m_bIsAnimPaused = bPause;
+
+	if(this->AcquireData() == nullptr)
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::SetAnimPause invoked on null data");
+	else if(m_bIsAnimPaused == false)
+		m_AnimCtrlAttribList[this->m_uiState] &= ~ANIMCTRLATTRIB_Finished;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -160,7 +235,6 @@ void IHySprite<NODETYPE, ENTTYPE>::SetFrame(uint32 uiFrameIndex)
 	}
 
 	m_fElapsedFrameTime = 0.0f;
-	m_AnimCtrlAttribList[this->m_uiState] &= ~ANIMCTRLATTRIB_IsBouncing;
 
 	if(m_uiCurFrame == uiFrameIndex)
 		return;
@@ -182,10 +256,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetAnimRate() const
 template<typename NODETYPE, typename ENTTYPE>
 void IHySprite<NODETYPE, ENTTYPE>::SetAnimRate(float fPlayRate)
 {
-	if(fPlayRate < 0.0f)
-		fPlayRate = 0.0f;
-
-	m_fAnimPlayRate = fPlayRate;
+	m_fAnimPlayRate = HyMath::Max(0.0f, fPlayRate);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -197,29 +268,6 @@ bool IHySprite<NODETYPE, ENTTYPE>::IsAnimFinished()
 	}
 
 	return (m_AnimCtrlAttribList[this->m_uiState] & ANIMCTRLATTRIB_Finished) != 0;
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-bool IHySprite<NODETYPE, ENTTYPE>::IsAnimPaused()
-{
-	return m_bIsAnimPaused;
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-void IHySprite<NODETYPE, ENTTYPE>::SetAnimPause(bool bPause)
-{
-	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::SetAnimPause invoked on null data");
-		return;
-	}
-
-	if(m_bIsAnimPaused == bPause)
-		return;
-
-	m_bIsAnimPaused = bPause;
-
-	if(m_bIsAnimPaused == false)
-		m_AnimCtrlAttribList[this->m_uiState] &= ~ANIMCTRLATTRIB_Finished;
 }
 
 template<typename NODETYPE, typename ENTTYPE>

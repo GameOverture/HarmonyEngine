@@ -175,7 +175,7 @@ bool IHyLoadable::IsLoaded() const
 	sm_pHyAssets->RemoveNodeData(this);
 }
 
-const IHyNodeData *IHyLoadable::UncheckedGetData()
+const IHyNodeData *IHyLoadable::UncheckedGetData() const
 {
 	return m_pData;
 }

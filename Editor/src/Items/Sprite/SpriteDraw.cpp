@@ -35,8 +35,7 @@ void SpriteDraw::PlayAnim(quint32 uiFrameIndex)
 	else
 		m_pSprite->SetAnimCtrl(HYANIMCTRL_DontReverse);
 
-	m_pSprite->SetAnimCtrl(HYANIMCTRL_Reset);
-	m_pSprite->SetAnimCtrl(HYANIMCTRL_Play);
+	m_pSprite->SetAnimCtrl(HYANIMCTRL_ResetAndPlay);
 	m_pSprite->SetFrame(uiFrameIndex);
 }
 
@@ -112,7 +111,6 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_DontLoop, i);
 			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_DontBounce, i);
 			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_DontReverse, i);
-			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_Play, i);
 		}
 	}
 

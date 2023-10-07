@@ -67,7 +67,7 @@ protected:
 	virtual void OnLoadedUpdate() { }				// Invoked once after OnLoaded(), then once every frame (guaranteed to only be invoked if this instance is loaded)
 	virtual void OnUnloaded() { }					// HyAssets invokes this instance's data has been erased
 
-	const IHyNodeData *UncheckedGetData();			// Used internally when it's guaranteed that data has already been acquired for this instance
+	const IHyNodeData *UncheckedGetData() const;	// Used internally when it's guaranteed that data has already been acquired for this instance
 
 private:
 	virtual HyType _LoadableGetType() = 0;

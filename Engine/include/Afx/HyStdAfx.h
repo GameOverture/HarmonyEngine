@@ -117,8 +117,9 @@ const std::vector<float> Hy_ZoomLevelList = { 0.0625f, 0.125f, 0.25f, 0.333333f,
 
 enum HyAnimCtrl
 {
-	HYANIMCTRL_Play = 0,
-	HYANIMCTRL_Reset,
+	HYANIMCTRL_Reset = 0,
+	HYANIMCTRL_ResetAndPlay,
+	HYANIMCTRL_ResetAndPause,
 	HYANIMCTRL_Reverse,
 	HYANIMCTRL_DontReverse,
 	HYANIMCTRL_Loop,
