@@ -13,6 +13,7 @@
 #include "IDraw.h"
 
 class EntityTreeItemData;
+class EntityDopeSheetScene;
 
 // NOTE: this class does not keep its state when removed, it is deleted (should not be passed to UndoCmd's)
 class EntityDrawItem
@@ -31,6 +32,8 @@ public:
 	EntityTreeItemData *GetEntityTreeItemData() const;
 
 	IHyLoadable2d *GetHyNode();
+	void SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneRef, HyCamera2d *pCamera);
+
 	ShapeCtrl &GetShapeCtrl();
 	TransformCtrl &GetTransformCtrl();
 
@@ -54,9 +57,6 @@ public:
 	SubEntity(Project &projectRef, const QJsonArray &descArray, HyEntity2d *pParent);
 	virtual ~SubEntity();
 
-	void RefreshProperties(const QList<QJsonObject> &propsObjList);
+	void RefreshProperties(const QList<QJsonObject> &propsObjList, float fElapsedTime);
 };
-
-void ApplyExtrapolatedProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propsObj, HyCamera2d *pCamera);
-
 #endif // ENTITYDRAWITEM_H

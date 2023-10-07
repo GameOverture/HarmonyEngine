@@ -11,6 +11,7 @@
 #include "EntityDrawItem.h"
 #include "EntityModel.h"
 #include "MainWindow.h"
+#include "EntityDopeSheetScene.h"
 
 EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, HyEntity2d *pParent) :
 	m_pEntityTreeItemData(pEntityTreeItemData),
@@ -100,6 +101,237 @@ IHyLoadable2d *EntityDrawItem::GetHyNode()
 		return &m_ShapeCtrl.GetPrimitive();
 
 	return m_pChild;
+}
+
+// NOTE: The listed 3 functions below share logic that process all item properties. Any updates should reflect to all of them
+//             - EntityTreeItemData::InitalizePropertyModel
+//             - EntityTreeItemData::GenerateStateSrc
+//             - EntityDrawItem::SetHyNode
+void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneRef, HyCamera2d *pCamera)
+{
+	ItemType eItemType = m_pEntityTreeItemData->GetType();
+	if(eItemType == ITEM_Prefix) // aka Shapes folder
+		return;
+
+	IHyLoadable2d *pThisHyNode = GetHyNode();
+
+	const float fFRAME_DURATION = 1.0f / entityDopeSheetSceneRef.GetFramesPerSecond();
+	const int iCURRENT_FRAME = entityDopeSheetSceneRef.GetCurrentFrame();
+	const QMap<int, QJsonObject> &keyFrameMapRef = entityDopeSheetSceneRef.GetKeyFramesMap()[m_pEntityTreeItemData];
+
+	// Sprite Special Case:
+	// To determine the sprite's animation frame that should be presented on 'iCURRENT_FRAME', whenever a property that might affect
+	// what frame the sprite's animation could be on, we extrapolate from when the property was set to 'iCURRENT_FRAME'.
+	QPair<int, int> iSpriteLastKnownStartFrame(0, 0); // First: Sprite's frame, Second: Entity's frame
+
+	//std::function<void(int, const QJsonObject &)> fpSpecCase_SpriteAnim = [&](int iFrame, const QJsonObject &propsObj)
+	//{
+
+	//};
+
+	for(int iFrame : keyFrameMapRef.keys())
+	{
+		if(iFrame > iCURRENT_FRAME)
+			break;
+
+		const QJsonObject &propsObj = keyFrameMapRef[iFrame];
+		// Parse all and only the potential categories of the 'eItemType' type, and set the values to 'pHyNode'
+		if(eItemType != ITEM_BoundingVolume)
+		{
+			if(propsObj.contains("Common"))
+			{
+				QJsonObject commonObj = propsObj["Common"].toObject();
+
+				if(HyGlobal::IsItemType_Asset(eItemType) == false && commonObj.contains("State"))
+					pThisHyNode->SetState(commonObj["State"].toInt());
+				if(commonObj.contains("Update During Paused"))
+					pThisHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
+				if(commonObj.contains("User Tag"))
+					pThisHyNode->SetTag(commonObj["User Tag"].toVariant().toLongLong());
+			}
+
+			if(propsObj.contains("Transformation"))
+			{
+				QJsonObject transformObj = propsObj["Transformation"].toObject();
+				if(transformObj.contains("Position"))
+				{
+					QJsonArray posArray = transformObj["Position"].toArray();
+					pThisHyNode->pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
+				}
+				if(transformObj.contains("Rotation"))
+					pThisHyNode->rot.Set(transformObj["Rotation"].toDouble());
+				if(transformObj.contains("Scale"))
+				{
+					QJsonArray scaleArray = transformObj["Scale"].toArray();
+					pThisHyNode->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
+				}
+			}
+
+			if(eItemType != ITEM_Audio && (pThisHyNode->GetInternalFlags() & IHyNode::NODETYPE_IsBody) != 0)
+			{
+				if(propsObj.contains("Body"))
+				{
+					QJsonObject bodyObj = propsObj["Body"].toObject();
+					if(bodyObj.contains("Visible"))
+						pThisHyNode->SetVisible(bodyObj["Visible"].toBool());
+					if(bodyObj.contains("Color Tint"))
+					{
+						QJsonArray colorArray = bodyObj["Color Tint"].toArray();
+						static_cast<IHyBody2d *>(pThisHyNode)->SetTint(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
+					}
+					if(bodyObj.contains("Alpha"))
+						static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(bodyObj["Alpha"].toDouble());
+					if(bodyObj.contains("Override Display Order"))
+						static_cast<IHyBody2d *>(pThisHyNode)->SetDisplayOrder(bodyObj["Override Display Order"].toInt());
+				}
+			}
+		}
+
+		switch(eItemType)
+		{
+		case ITEM_Entity:
+			// "Physics" category doesn't need to be set
+			break;
+
+		case ITEM_Primitive: {
+			if(propsObj.contains("Primitive"))
+			{
+				QJsonObject primitiveObj = propsObj["Primitive"].toObject();
+				if(primitiveObj.contains("Wireframe"))
+					static_cast<HyPrimitive2d *>(pThisHyNode)->SetWireframe(primitiveObj["Wireframe"].toBool());
+				if(primitiveObj.contains("Line Thickness"))
+					static_cast<HyPrimitive2d *>(pThisHyNode)->SetLineThickness(primitiveObj["Line Thickness"].toDouble());
+			}
+		}
+		[[fallthrough]];
+		case ITEM_BoundingVolume: {
+			if(propsObj.contains("Shape"))
+			{
+				QJsonObject shapeObj = propsObj["Shape"].toObject();
+				if(shapeObj.contains("Type") && shapeObj.contains("Data"))
+				{
+					EditorShape eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
+					float fBvAlpha = (eItemType == ITEM_BoundingVolume) ? 0.0f : 1.0f;
+					float fOutlineAlpha = (eItemType == ITEM_BoundingVolume || m_pEntityTreeItemData->IsSelected()) ? 1.0f : 0.0f;
+
+					m_ShapeCtrl.Setup(eShape, ENTCOLOR_Shape, fBvAlpha, fOutlineAlpha);
+					m_ShapeCtrl.Deserialize(shapeObj["Data"].toString(), pCamera);
+				}
+			}
+			
+			// "Fixture" category doesn't need to be set
+			break; }
+
+		case ITEM_AtlasFrame:
+			break;
+
+		case ITEM_Text: {
+			HyText2d *pTextNode = static_cast<HyText2d *>(pThisHyNode);
+
+			if(propsObj.contains("Text"))
+			{
+				QJsonObject textObj = propsObj["Text"].toObject();
+
+				// Apply all text properties before the style, so the ShapeCtrl can properly calculate itself within ShapeCtrl::SetAsText()
+				if(textObj.contains("Text"))
+					pTextNode->SetText(textObj["Text"].toString().toStdString());
+				if(textObj.contains("Alignment"))
+					pTextNode->SetTextAlignment(HyGlobal::GetAlignmentFromString(textObj["Alignment"].toString()));
+				if(textObj.contains("Monospaced Digits"))
+					pTextNode->SetMonospacedDigits(textObj["Monospaced Digits"].toBool());
+				if(textObj.contains("Text Indent"))
+					pTextNode->SetTextIndent(textObj["Text Indent"].toInt());
+
+				// Apply the style and call ShapeCtrl::SetAsText()
+				if(textObj.contains("Style"))
+				{
+					TextStyle eTextStyle = HyGlobal::GetTextStyleFromString(textObj["Style"].toString());
+					if(eTextStyle == TEXTSTYLE_Line)
+					{
+						if(pTextNode->IsLine() == false)
+							pTextNode->SetAsLine();
+					}
+					else if(eTextStyle == TEXTSTYLE_Vertical)
+					{
+						if(pTextNode->IsVertical() == false)
+							pTextNode->SetAsVertical();
+					}
+					else
+					{
+						if(textObj.contains("Style Dimensions"))
+						{
+							glm::vec2 vStyleSize;
+							QJsonArray styleDimensionsArray = textObj["Style Dimensions"].toArray();
+							if(styleDimensionsArray.size() == 2)
+								HySetVec(vStyleSize, styleDimensionsArray[0].toDouble(), styleDimensionsArray[1].toDouble());
+							else
+								HyGuiLog("Invalid 'Style Dimensions' array size", LOGTYPE_Error);
+
+							if(eTextStyle == TEXTSTYLE_Column)
+							{
+								if(pTextNode->IsColumn() == false || vStyleSize.x != pTextNode->GetTextBoxDimensions().x)
+									pTextNode->SetAsColumn(vStyleSize.x, false);
+							}
+							else // TEXTSTYLE_ScaleBox or TEXTSTYLE_ScaleBoxTopAlign
+							{
+								if(pTextNode->IsScaleBox() == false ||
+									vStyleSize.x != pTextNode->GetTextBoxDimensions().x ||
+									vStyleSize.y != pTextNode->GetTextBoxDimensions().y ||
+									(eTextStyle == TEXTSTYLE_ScaleBox) != pTextNode->IsScaleBoxCenterVertically())
+								{
+									pTextNode->SetAsScaleBox(vStyleSize.x, vStyleSize.y, eTextStyle == TEXTSTYLE_ScaleBox);
+								}
+							}
+						}
+					}
+				}
+			}
+			m_ShapeCtrl.SetAsText(pTextNode, m_pEntityTreeItemData->IsSelected(), pCamera);
+			break; }
+
+		case ITEM_Sprite:
+			// We always pause the animation because it is set manually by extrapolating what frame it should be, and don't want time passing to affect it.
+			static_cast<HySprite2d *>(pThisHyNode)->SetAnimPause(true);
+
+			// If the state was changed on this frame 'iFrame', it was already applied to pThisNode above in "Common", "State"
+			if(propsObj.contains("Sprite") || (propsObj.contains("Common") && propsObj["Common"].toObject().contains("State")))
+			{
+				if(propsObj.contains("Sprite"))
+				{
+					QJsonObject spriteObj = propsObj["Sprite"].toObject();
+					if(spriteObj.contains("Frame"))
+						static_cast<HySprite2d *>(pThisHyNode)->SetFrame(spriteObj["Frame"].toInt());
+					if(spriteObj.contains("Anim Rate"))
+						static_cast<HySprite2d *>(pThisHyNode)->SetAnimRate(spriteObj["Anim Rate"].toDouble());
+					if(spriteObj.contains("Anim Loop"))
+						static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Loop"].toBool() ? HYANIMCTRL_Loop : HYANIMCTRL_DontLoop);
+					if(spriteObj.contains("Anim Reverse"))
+						static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Reverse"].toBool() ? HYANIMCTRL_Reverse : HYANIMCTRL_DontReverse);
+					if(spriteObj.contains("Anim Bounce"))
+						static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Bounce"].toBool() ? HYANIMCTRL_Bounce : HYANIMCTRL_DontBounce);
+				}
+
+				// Set the sprite's frame to the last known frame, and let it "naturally" advance (based on above settings) to where it should be
+				// TODO: set bounce flag
+				static_cast<HySprite2d *>(pThisHyNode)->SetFrame(iSpriteLastKnownStartFrame.first);
+				static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFrame - iSpriteLastKnownStartFrame.second) * fFRAME_DURATION);
+
+				iSpriteLastKnownStartFrame.first = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
+				iSpriteLastKnownStartFrame.second = iFrame;
+			}
+			break;
+
+		default:
+			HyGuiLog(QString("EntityDrawItem::RefreshJson - unsupported type: ") % HyGlobal::ItemName(eItemType, false), LOGTYPE_Error);
+			break;
+		}
+	}
+
+	if(eItemType == ITEM_Sprite)
+	{
+		static_cast<HySprite2d *>(pThisHyNode)->SetFrame(iSpriteLastKnownStartFrame.first);
+		static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iCURRENT_FRAME - iSpriteLastKnownStartFrame.second) * fFRAME_DURATION);
+	}
 }
 
 ShapeCtrl &EntityDrawItem::GetShapeCtrl()
@@ -262,187 +494,10 @@ SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, HyEntity2
 	for(int i = 0; i < m_ChildPtrList.size(); ++i)
 		delete m_ChildPtrList[i].first;
 }
-void SubEntity::RefreshProperties(const QList<QJsonObject> &propsObjList)
+void SubEntity::RefreshProperties(const QList<QJsonObject> &propsObjList, float fElapsedTime)
 {
-	for(int i = 0; i < m_ChildPtrList.size(); ++i)
-		ApplyExtrapolatedProperties(m_ChildPtrList[i].first, nullptr, m_ChildPtrList[i].second, false, propsObjList[i], nullptr);
+	//for(int i = 0; i < m_ChildPtrList.size(); ++i)
+	//	ApplyExtrapolatedProperties(m_ChildPtrList[i].first, nullptr, m_ChildPtrList[i].second, false, propsObjList[i], fElapsedTime, nullptr);
 }
 // SubEntity
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// NOTE: The following functions share logic that handle all the item specific properties: InitPropertiesModel, EntityTreeItemData::GenerateStateSrc, EntityDrawItem.cpp - ApplyExtrapolatedProperties
-//		 Updates here should reflect to the functions above
-void ApplyExtrapolatedProperties(IHyLoadable2d *pHyNode, ShapeCtrl *pShapeCtrl, ItemType eItemType, bool bIsSelected, QJsonObject propsObj, HyCamera2d *pCamera)
-{
-	if(eItemType == ITEM_Prefix) // aka Shapes folder
-		return;
-
-	// Parse all and only the potential categories of the 'eItemType' type, and set the values to 'pHyNode'
-	if(eItemType != ITEM_BoundingVolume)
-	{
-		if(propsObj.contains("Common"))
-		{
-			QJsonObject commonObj = propsObj["Common"].toObject();
-
-			if(HyGlobal::IsItemType_Asset(eItemType) == false && commonObj.contains("State"))
-				pHyNode->SetState(commonObj["State"].toInt());
-			if(commonObj.contains("Update During Paused"))
-				pHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
-			if(commonObj.contains("User Tag"))
-				pHyNode->SetTag(commonObj["User Tag"].toVariant().toLongLong());
-		}
-
-		if(propsObj.contains("Transformation"))
-		{
-			QJsonObject transformObj = propsObj["Transformation"].toObject();
-			if(transformObj.contains("Position"))
-			{
-				QJsonArray posArray = transformObj["Position"].toArray();
-				pHyNode->pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
-			}
-			if(transformObj.contains("Rotation"))
-				pHyNode->rot.Set(transformObj["Rotation"].toDouble());
-			if(transformObj.contains("Scale"))
-			{
-				QJsonArray scaleArray = transformObj["Scale"].toArray();
-				pHyNode->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
-			}
-		}
-
-		if(eItemType != ITEM_Audio && (pHyNode->GetInternalFlags() & IHyNode::NODETYPE_IsBody) != 0)
-		{
-			if(propsObj.contains("Body"))
-			{
-				QJsonObject bodyObj = propsObj["Body"].toObject();
-				if(bodyObj.contains("Visible"))
-					pHyNode->SetVisible(bodyObj["Visible"].toBool());
-				if(bodyObj.contains("Color Tint"))
-				{
-					QJsonArray colorArray = bodyObj["Color Tint"].toArray();
-					static_cast<IHyBody2d *>(pHyNode)->SetTint(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
-				}
-				if(bodyObj.contains("Alpha"))
-					static_cast<IHyBody2d *>(pHyNode)->alpha.Set(bodyObj["Alpha"].toDouble());
-				if(bodyObj.contains("Override Display Order"))
-					static_cast<IHyBody2d *>(pHyNode)->SetDisplayOrder(bodyObj["Override Display Order"].toInt());
-			}
-		}
-	}
-
-	switch(eItemType)
-	{
-	case ITEM_Entity:
-		// "Physics" category doesn't need to be set
-		break;
-
-	case ITEM_Primitive: {
-		if(propsObj.contains("Primitive"))
-		{
-			QJsonObject primitiveObj = propsObj["Primitive"].toObject();
-			if(primitiveObj.contains("Wireframe"))
-				static_cast<HyPrimitive2d *>(pHyNode)->SetWireframe(primitiveObj["Wireframe"].toBool());
-			if(primitiveObj.contains("Line Thickness"))
-				static_cast<HyPrimitive2d *>(pHyNode)->SetLineThickness(primitiveObj["Line Thickness"].toDouble());
-		}
-	}
-	[[fallthrough]];
-	case ITEM_BoundingVolume: {
-		QJsonObject shapeObj = propsObj["Shape"].toObject();
-		EditorShape eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
-		float fBvAlpha = (eItemType == ITEM_BoundingVolume) ? 0.0f : 1.0f;
-		float fOutlineAlpha = (eItemType == ITEM_BoundingVolume || bIsSelected) ? 1.0f : 0.0f;
-
-		if(pShapeCtrl)
-		{
-			pShapeCtrl->Setup(eShape, ENTCOLOR_Shape, fBvAlpha, fOutlineAlpha);
-			pShapeCtrl->Deserialize(shapeObj["Data"].toString(), pCamera);
-		}
-		// "Fixture" category doesn't need to be set
-		break; }
-
-	case ITEM_AtlasFrame:
-		break;
-
-	case ITEM_Text: {
-		HyText2d *pTextNode = static_cast<HyText2d *>(pHyNode);
-
-		if(propsObj.contains("Text"))
-		{
-			QJsonObject textObj = propsObj["Text"].toObject();
-
-			// Apply all text properties before the style, so the ShapeCtrl can properly calculate itself within ShapeCtrl::SetAsText()
-			if(textObj.contains("Text"))
-				pTextNode->SetText(textObj["Text"].toString().toStdString());
-			if(textObj.contains("Alignment"))
-				pTextNode->SetTextAlignment(HyGlobal::GetAlignmentFromString(textObj["Alignment"].toString()));
-			if(textObj.contains("Monospaced Digits"))
-				pTextNode->SetMonospacedDigits(textObj["Monospaced Digits"].toBool());
-			if(textObj.contains("Text Indent"))
-				pTextNode->SetTextIndent(textObj["Text Indent"].toInt());
-
-			// Apply the style and call ShapeCtrl::SetAsText()
-			if(textObj.contains("Style"))
-			{
-				TextStyle eTextStyle = HyGlobal::GetTextStyleFromString(textObj["Style"].toString());
-				if(eTextStyle == TEXTSTYLE_Line)
-				{
-					if(pTextNode->IsLine() == false)
-						pTextNode->SetAsLine();
-				}
-				else if(eTextStyle == TEXTSTYLE_Vertical)
-				{
-					if(pTextNode->IsVertical() == false)
-						pTextNode->SetAsVertical();
-				}
-				else
-				{
-					if(textObj.contains("Style Dimensions"))
-					{
-						glm::vec2 vStyleSize;
-						QJsonArray styleDimensionsArray = textObj["Style Dimensions"].toArray();
-						if(styleDimensionsArray.size() == 2)
-							HySetVec(vStyleSize, styleDimensionsArray[0].toDouble(), styleDimensionsArray[1].toDouble());
-						else
-							HyGuiLog("Invalid 'Style Dimensions' array size", LOGTYPE_Error);
-
-						if(eTextStyle == TEXTSTYLE_Column)
-						{
-							if(pTextNode->IsColumn() == false || vStyleSize.x != pTextNode->GetTextBoxDimensions().x)
-								pTextNode->SetAsColumn(vStyleSize.x, false);
-						}
-						else // TEXTSTYLE_ScaleBox or TEXTSTYLE_ScaleBoxTopAlign
-						{
-							if(pTextNode->IsScaleBox() == false ||
-								vStyleSize.x != pTextNode->GetTextBoxDimensions().x ||
-								vStyleSize.y != pTextNode->GetTextBoxDimensions().y ||
-								(eTextStyle == TEXTSTYLE_ScaleBox) != pTextNode->IsScaleBoxCenterVertically())
-							{
-								pTextNode->SetAsScaleBox(vStyleSize.x, vStyleSize.y, eTextStyle == TEXTSTYLE_ScaleBox);
-							}
-						}
-					}
-				}
-			}
-		}
-		if(pShapeCtrl)
-			pShapeCtrl->SetAsText(pTextNode, bIsSelected, pCamera);
-		break; }
-
-	case ITEM_Sprite: {
-		if(propsObj.contains("Sprite"))
-		{
-			QJsonObject spriteObj = propsObj["Sprite"].toObject();
-			if(spriteObj.contains("Frame"))
-				static_cast<HySprite2d *>(pHyNode)->SetFrame(spriteObj["Frame"].toInt());
-			if(spriteObj.contains("Anim Rate"))
-				static_cast<HySprite2d *>(pHyNode)->SetAnimRate(spriteObj["Anim Rate"].toDouble());
-			if(spriteObj.contains("Anim Paused"))
-				static_cast<HySprite2d *>(pHyNode)->SetAnimPause(spriteObj["Anim Paused"].toBool());
-		}
-		break; }
-
-	default:
-		HyGuiLog(QString("EntityDrawItem::RefreshJson - unsupported type: ") % HyGlobal::ItemName(eItemType, false), LOGTYPE_Error);
-		break;
-	}
-}

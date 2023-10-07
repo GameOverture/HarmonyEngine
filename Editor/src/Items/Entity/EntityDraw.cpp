@@ -279,16 +279,14 @@ void EntityDraw::ClearShapeEdit()
 	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
-void EntityDraw::SetExtrapolatedProperties(const QMap<EntityTreeItemData *, QJsonObject> &extrapolatedPropertiesMap)
+void EntityDraw::SetExtrapolatedProperties()
 {
-	for(auto pItem : m_ItemList)
-	{
-		if(extrapolatedPropertiesMap.contains(pItem->GetEntityTreeItemData()))
-		{
-			QJsonObject propsObj = extrapolatedPropertiesMap[pItem->GetEntityTreeItemData()];
-			ApplyExtrapolatedProperties(pItem->GetHyNode(), &pItem->GetShapeCtrl(), pItem->GetEntityTreeItemData()->GetType(), pItem->GetEntityTreeItemData()->IsSelected(), propsObj, m_pCamera);
-		}
-	}
+	if(m_pProjItem->GetWidget() == nullptr)
+		HyGuiLog("EntityDraw::SetExtrapolatedProperties - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
+
+	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(m_pProjItem->GetWidget()->GetCurStateIndex()))->GetDopeSheetScene();
+	for(EntityDrawItem *pDrawItem : m_ItemList)
+		pDrawItem->SetHyNode(entityDopeSheetSceneRef, m_pCamera);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -368,15 +366,13 @@ void EntityDraw::SetExtrapolatedProperties(const QMap<EntityTreeItemData *, QJso
 			m_SelectedItemList.push_back(pDrawItem);
 		else
 			pDrawItem->HideTransformCtrl();
-
-		QJsonObject propsObj = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(m_pProjItem->GetWidget()->GetCurStateIndex()))->GetDopeSheetScene().ExtrapolateKeyFramesProperties(pDrawItem->GetEntityTreeItemData());
-		ApplyExtrapolatedProperties(pDrawItem->GetHyNode(), &pDrawItem->GetShapeCtrl(), pDrawItem->GetEntityTreeItemData()->GetType(), descObj["isSelected"].toBool(), propsObj, m_pCamera);
 	}
-	
 	// Delete all the remaining stale items
 	for(auto pStaleItem : staleItemList)
 		delete pStaleItem;
 	staleItemList.clear();
+
+	SetExtrapolatedProperties();
 
 	if(m_bActivateVemOnNextJsonMeta)
 	{

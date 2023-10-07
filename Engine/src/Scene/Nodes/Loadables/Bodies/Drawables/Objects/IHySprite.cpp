@@ -159,6 +159,9 @@ void IHySprite<NODETYPE, ENTTYPE>::SetFrame(uint32 uiFrameIndex)
 		return;
 	}
 
+	m_fElapsedFrameTime = 0.0f;
+	m_AnimCtrlAttribList[this->m_uiState] &= ~ANIMCTRLATTRIB_IsBouncing;
+
 	if(m_uiCurFrame == uiFrameIndex)
 		return;
 
@@ -214,7 +217,6 @@ void IHySprite<NODETYPE, ENTTYPE>::SetAnimPause(bool bPause)
 		return;
 
 	m_bIsAnimPaused = bPause;
-	m_fElapsedFrameTime = 0.0f;
 
 	if(m_bIsAnimPaused == false)
 		m_AnimCtrlAttribList[this->m_uiState] &= ~ANIMCTRLATTRIB_Finished;
@@ -231,6 +233,123 @@ float IHySprite<NODETYPE, ENTTYPE>::GetAnimDuration()
 	}
 
 	return static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_fDURATION;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHySprite<NODETYPE, ENTTYPE>::AdvanceAnim(float fDeltaTime)
+{
+	m_fElapsedFrameTime += fDeltaTime;
+
+	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[this->m_uiState];
+	while(m_fElapsedFrameTime >= frameRef.fDURATION && frameRef.fDURATION > 0.0f)
+	{
+		int32 iNumFrames = GetNumFrames();
+		int32 iNextFrameIndex = static_cast<int32>(m_uiCurFrame);
+		bool bInvokeCallback = false;
+
+		if((uiAnimCtrlRef & ANIMCTRLATTRIB_Reverse) == 0)
+		{
+			(uiAnimCtrlRef & ANIMCTRLATTRIB_IsBouncing) ? iNextFrameIndex-- : iNextFrameIndex++;
+
+			if(iNextFrameIndex < 0)
+			{
+				if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
+					bInvokeCallback = true;
+
+				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
+				{
+					uiAnimCtrlRef &= ~ANIMCTRLATTRIB_IsBouncing;
+					iNextFrameIndex = 1;
+				}
+				else
+				{
+					uiAnimCtrlRef |= ANIMCTRLATTRIB_Finished;
+					iNextFrameIndex = 0;
+				}
+			}
+			else if(iNextFrameIndex >= iNumFrames)
+			{
+				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Bounce)
+				{
+					uiAnimCtrlRef |= ANIMCTRLATTRIB_IsBouncing;
+					iNextFrameIndex = iNumFrames - 2;
+				}
+				else
+				{
+					if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
+						bInvokeCallback = true;
+
+					if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
+						iNextFrameIndex = 0;
+					else
+					{
+						uiAnimCtrlRef |= ANIMCTRLATTRIB_Finished;
+						iNextFrameIndex = iNumFrames - 1;
+					}
+				}
+			}
+		}
+		else // Playing in Reverse
+		{
+			(uiAnimCtrlRef & ANIMCTRLATTRIB_IsBouncing) ? iNextFrameIndex++ : iNextFrameIndex--;
+
+			if(iNextFrameIndex < 0)
+			{
+				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Bounce)
+				{
+					uiAnimCtrlRef |= ANIMCTRLATTRIB_IsBouncing;
+					iNextFrameIndex = 1;
+				}
+				else
+				{
+					if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
+						bInvokeCallback = true;
+
+					if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
+						iNextFrameIndex = iNumFrames - 1;
+					else
+					{
+						uiAnimCtrlRef |= ANIMCTRLATTRIB_Finished;
+						iNextFrameIndex = 0;
+					}
+				}
+			}
+			else if(iNextFrameIndex >= iNumFrames)
+			{
+				if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
+					bInvokeCallback = true;
+
+				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
+				{
+					uiAnimCtrlRef &= ~ANIMCTRLATTRIB_IsBouncing;
+					iNextFrameIndex = iNumFrames - 2;
+				}
+				else
+				{
+					uiAnimCtrlRef |= ANIMCTRLATTRIB_Finished;
+					iNextFrameIndex = iNumFrames - 1;
+				}
+			}
+		}
+
+		if(iNextFrameIndex < 0)
+			iNextFrameIndex = 0;
+
+		if(m_uiCurFrame != iNextFrameIndex)
+		{
+			m_uiCurFrame = iNextFrameIndex;
+			this->SetDirty(this->DIRTY_SceneAABB);
+		}
+
+		m_fElapsedFrameTime -= frameRef.fDURATION;
+
+		if(bInvokeCallback)
+			OnInvokeCallback(this->m_uiState);
+	}
+
+	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	this->m_ShaderUniforms.SetTexHandle(0, UpdatedFrameRef.GetGfxApiHandle());
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -424,118 +543,9 @@ template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ void IHySprite<NODETYPE, ENTTYPE>::OnLoadedUpdate() /*override*/
 {
 	if(m_bIsAnimPaused == false)
-		m_fElapsedFrameTime += HyEngine::DeltaTime() * m_fAnimPlayRate;
-
-	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
-	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[this->m_uiState];
-	while(m_fElapsedFrameTime >= frameRef.fDURATION && frameRef.fDURATION > 0.0f)
-	{
-		int32 iNumFrames = GetNumFrames();
-		int32 iNextFrameIndex = static_cast<int32>(m_uiCurFrame);
-		bool bInvokeCallback = false;
-
-		if((uiAnimCtrlRef & ANIMCTRLATTRIB_Reverse) == 0)
-		{
-			(uiAnimCtrlRef & ANIMCTRLATTRIB_IsBouncing) ? iNextFrameIndex-- : iNextFrameIndex++;
-
-			if(iNextFrameIndex < 0)
-			{
-				if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
-					bInvokeCallback = true;
-
-				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
-				{
-					uiAnimCtrlRef &= ~ANIMCTRLATTRIB_IsBouncing;
-					iNextFrameIndex = 1;
-				}
-				else
-				{
-					uiAnimCtrlRef |= ANIMCTRLATTRIB_Finished;
-					iNextFrameIndex = 0;
-				}
-			}
-			else if(iNextFrameIndex >= iNumFrames)
-			{
-				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Bounce)
-				{
-					uiAnimCtrlRef |= ANIMCTRLATTRIB_IsBouncing;
-					iNextFrameIndex = iNumFrames - 2;
-				}
-				else
-				{
-					if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
-						bInvokeCallback = true;
-
-					if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
-						iNextFrameIndex = 0;
-					else
-					{
-						uiAnimCtrlRef |= ANIMCTRLATTRIB_Finished;
-						iNextFrameIndex = iNumFrames - 1;
-					}
-				}
-			}
-		}
-		else // Playing in Reverse
-		{
-			(uiAnimCtrlRef & ANIMCTRLATTRIB_IsBouncing) ? iNextFrameIndex++ : iNextFrameIndex--;
-
-			if(iNextFrameIndex < 0)
-			{
-				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Bounce)
-				{
-					uiAnimCtrlRef |= ANIMCTRLATTRIB_IsBouncing;
-					iNextFrameIndex = 1;
-				}
-				else
-				{
-					if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
-						bInvokeCallback = true;
-
-					if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
-						iNextFrameIndex = iNumFrames - 1;
-					else
-					{
-						uiAnimCtrlRef |= ANIMCTRLATTRIB_Finished;
-						iNextFrameIndex = 0;
-					}
-				}
-			}
-			else if(iNextFrameIndex >= iNumFrames)
-			{
-				if((uiAnimCtrlRef & ANIMCTRLATTRIB_Finished) == 0)
-					bInvokeCallback = true;
-
-				if(uiAnimCtrlRef & ANIMCTRLATTRIB_Loop)
-				{
-					uiAnimCtrlRef &= ~ANIMCTRLATTRIB_IsBouncing;
-					iNextFrameIndex = iNumFrames - 2;
-				}
-				else
-				{
-					uiAnimCtrlRef |= ANIMCTRLATTRIB_Finished;
-					iNextFrameIndex = iNumFrames - 1;
-				}
-			}
-		}
-
-		if(iNextFrameIndex < 0)
-			iNextFrameIndex = 0;
-
-		if(m_uiCurFrame != iNextFrameIndex)
-		{
-			m_uiCurFrame = iNextFrameIndex;
-			this->SetDirty(this->DIRTY_SceneAABB);
-		}
-
-		m_fElapsedFrameTime -= frameRef.fDURATION;
-
-		if(bInvokeCallback)
-			OnInvokeCallback(this->m_uiState);
-	}
-
-	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
-	this->m_ShaderUniforms.SetTexHandle(0, UpdatedFrameRef.GetGfxApiHandle());
+		AdvanceAnim(HyEngine::DeltaTime() * m_fAnimPlayRate);
+	else
+		AdvanceAnim(0.0f);
 }
 
 template class IHySprite<IHyDrawable2d, HyEntity2d>;

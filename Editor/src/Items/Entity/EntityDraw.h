@@ -94,7 +94,7 @@ public:
 	void RequestClearShapeEdit();
 	void ClearShapeEdit();
 
-	void SetExtrapolatedProperties(const QMap<EntityTreeItemData *, QJsonObject> &extrapolatedPropertiesMap);
+	void SetExtrapolatedProperties();
 
 protected:
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;

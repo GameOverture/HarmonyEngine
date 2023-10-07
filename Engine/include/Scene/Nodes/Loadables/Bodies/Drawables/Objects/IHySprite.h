@@ -94,6 +94,7 @@ public:
 	void SetAnimPause(bool bPause);
 
 	float GetAnimDuration();
+	void AdvanceAnim(float fDeltaTime);
 
 	float GetFrameWidth(float fPercent = 1.0f);		// Returns the ALPHA-CROPPED width of the current frame (ignores any scaling)
 	float GetFrameHeight(float fPercent = 1.0f);	// Returns the ALPHA-CROPPED height of the current frame (ignores any scaling)

@@ -36,6 +36,8 @@ class EntityTreeItemData : public TreeModelItemData
 	EntityModel &										m_EntityModelRef;
 	EntityItemType										m_eEntType;
 
+	EntityDrawItem *									m_pDrawItem;
+
 	PropertiesTreeModel *								m_pPropertiesModel;
 
 	QString												m_sPromotedEntityType;
@@ -67,6 +69,9 @@ public:
 	void InsertJsonInfo_Desc(QJsonObject &childObjRef);
 
 	QString GenerateStateSrc(uint32 uiStateIndex, QString sNewLine, bool &bActivatePhysicsOut, uint32 &uiMaxVertListSizeOut);
+
+protected:
+	void InitalizePropertyModel();
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityTreeModel : public ITreeModel
@@ -125,7 +130,5 @@ protected:
 
 	bool FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, ItemType eItemType, int iRowToCreateAt); // 'pParentTreeItemOut' must point to either Root or BvFolder, it will be reassigned to the ArrayFolder that is either found (return true), or newly created (return false)
 };
-
-void InitalizePropertyModel(EntityTreeItemData *pItemData, PropertiesTreeModel &propertiesTreeModelRef);
 
 #endif // ENTITYTREEMODEL_H

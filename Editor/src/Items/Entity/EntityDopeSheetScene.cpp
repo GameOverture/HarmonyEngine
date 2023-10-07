@@ -66,6 +66,9 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	m_iCurrentFrame(0),
 	m_fZoom(1.0f)
 {
+	if(m_iFramesPerSecond == 0)
+		m_iFramesPerSecond = 60;
+
 	QJsonObject keyFramesObj = metaFileObj["keyFrames"].toObject();
 	for(auto iter = keyFramesObj.begin(); iter != keyFramesObj.end(); ++iter)
 	{
@@ -78,7 +81,13 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 
 		QJsonArray keyFramesArray = iter.value().toArray();
 		for(int i = 0; i < keyFramesArray.size(); ++i)
-			m_KeyFramesMap[pItemData][keyFramesArray[i].toObject()["frame"].toInt()] = keyFramesArray[i].toObject()["props"].toObject();
+		{
+			const QJsonObject &propsObj = keyFramesArray[i].toObject()["props"].toObject();
+			if(propsObj.isEmpty() == false)
+				m_KeyFramesMap[pItemData][keyFramesArray[i].toObject()["frame"].toInt()] = propsObj;
+			else
+				HyGuiLog("EntityStateData::EntityStateData - item " % iter.key() % " has an empty keyframe at frame " % QString::number(keyFramesArray[i].toObject()["frame"].toInt()), LOGTYPE_Info);
+		}
 	}
 
 	setBackgroundBrush(HyGlobal::CovertHyColor(HyColor::WidgetPanel));
@@ -124,22 +133,13 @@ void EntityDopeSheetScene::SetCurrentFrame(int iFrame)
 	m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (m_iCurrentFrame * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
 	update();
 
-	QMap<EntityTreeItemData *, QJsonObject> extrapolatedPropertiesMap;
-	for(EntityTreeItemData *pItem : m_KeyFramesMap.keys())
-		extrapolatedPropertiesMap[pItem] = ExtrapolateKeyFramesProperties(pItem);
-
 	IWidget *pWidget = m_pEntStateData->GetModel().GetItem().GetWidget();
 	if(pWidget)
-	{
-		EntityWidget *pEntityWidget = static_cast<EntityWidget *>(pWidget);
-		pEntityWidget->SetExtrapolatedProperties(extrapolatedPropertiesMap);
-	}
+		static_cast<EntityWidget *>(pWidget)->SetExtrapolatedProperties();
+
 	IDraw *pDraw = m_pEntStateData->GetModel().GetItem().GetDraw();
 	if(pDraw)
-	{
-		EntityDraw *pEntityDraw = static_cast<EntityDraw *>(pDraw);
-		pEntityDraw->SetExtrapolatedProperties(extrapolatedPropertiesMap);
-	}
+		static_cast<EntityDraw *>(pDraw)->SetExtrapolatedProperties();
 }
 
 float EntityDopeSheetScene::GetZoom() const
@@ -193,6 +193,9 @@ QJsonArray EntityDopeSheetScene::SerializeAllKeyFrames(EntityTreeItemData *pItem
 	QJsonArray serializedKeyFramesArray;
 	for(QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.begin(); iter != itemKeyFrameMapRef.end(); ++iter)
 	{
+		if(iter.value().isEmpty())
+			continue;
+
 		QJsonObject serializedKeyFramesObj;
 		serializedKeyFramesObj["frame"] = iter.key();
 		serializedKeyFramesObj["props"] = iter.value();
@@ -213,17 +216,16 @@ QJsonObject EntityDopeSheetScene::ExtrapolateKeyFramesProperties(EntityTreeItemD
 	QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.find(m_iCurrentFrame);
 	if(iter == itemKeyFrameMapRef.end())
 	{
+		// lowerBound() - Returns an iterator pointing to the first item with key 'm_iCurrentFrame' in the map.
+		//                If the map contains no item with key 'm_iCurrentFrame', the function returns an iterator
+		//                to the nearest item with a greater key.
 		iter = itemKeyFrameMapRef.lowerBound(m_iCurrentFrame);
 		if(iter != itemKeyFrameMapRef.begin())
-			iter--;
+			iter--; // Don't want an iterator with a greater key, so go back one
 	}
 
-	// TODO: Need to extrapolate any tweens that are currently active on this frame
-
-
-
-	// Starting with this key frame and going backwards in time, combine any properties from key frames that haven't been set yet
-	// This creates an 'extrapolatedPropObj' that contains all the properties that have been set from the beginning of the timeline, up to 'iFrameIndex'
+	// Starting with this key frame and going backwards in time, combine any properties from key frames that *haven't been set yet*
+	// This creates an 'extrapolatedPropObj' that contains all the properties that have been set from the beginning of the timeline, up to 'm_iCurrentFrame'
 	QJsonObject extrapolatedPropObj = iter.value();
 	while(iter != itemKeyFrameMapRef.begin())
 	{
@@ -274,6 +276,12 @@ void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, 
 {
 	QJsonObject curPropsObj = m_KeyFramesMap[pItemData][iFrameIndex];
 
+	if(curPropsObj.empty() && propsObj.empty())
+	{
+		m_KeyFramesMap[pItemData].remove(iFrameIndex);
+		return;
+	}
+
 	// Merge 'propsObj' into 'curPropsObj', overwrite any properties that are already set, but preserve any properties in that aren't
 	for(auto iterCategory = propsObj.begin(); iterCategory != propsObj.end(); ++iterCategory)
 	{
@@ -291,6 +299,10 @@ void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, 
 		else
 			curPropsObj.insert(iterCategory.key(), iterCategory.value());
 	}
+
+	if(curPropsObj.empty())
+		HyGuiLog("EntityDopeSheetScene::SetKeyFrameProperties() - curPropsObj is empty", LOGTYPE_Error);
+
 	m_KeyFramesMap[pItemData][iFrameIndex] = curPropsObj;
 
 	RefreshGfxItems(iFrameIndex);
@@ -323,6 +335,12 @@ void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData,
 		return;
 
 	QJsonObject &keyFrameObjRef = m_KeyFramesMap[pItemData][iFrameIndex];
+	if(keyFrameObjRef.empty())
+	{
+		m_KeyFramesMap[pItemData].remove(iFrameIndex);
+		return;
+	}
+
 	if(keyFrameObjRef.contains(sCategoryName) == false)
 		return;
 
