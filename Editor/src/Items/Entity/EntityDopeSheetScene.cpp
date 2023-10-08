@@ -205,6 +205,19 @@ QJsonArray EntityDopeSheetScene::SerializeAllKeyFrames(EntityTreeItemData *pItem
 	return serializedKeyFramesArray;
 }
 
+QJsonObject EntityDopeSheetScene::GetKeyFrameProperties(EntityTreeItemData *pItemData) const
+{
+	if(m_KeyFramesMap.contains(pItemData) == false)
+		return QJsonObject();
+
+	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
+	QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.find(m_iCurrentFrame);
+	if(iter == itemKeyFrameMapRef.end())
+		return QJsonObject();
+
+	return iter.value();
+}
+
 QJsonObject EntityDopeSheetScene::ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData) const
 {
 	if(m_KeyFramesMap.contains(pItemData) == false)

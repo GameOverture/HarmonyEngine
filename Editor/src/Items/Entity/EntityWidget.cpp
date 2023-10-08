@@ -368,7 +368,7 @@ void EntityWidget::SetExtrapolatedProperties()
 	{
 		PropertiesTreeModel &propModelRef = selectedItemsDataList[0]->GetPropertiesModel();
 		EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
-		QJsonObject propsObj = entityDopeSheetSceneRef.ExtrapolateKeyFramesProperties(selectedItemsDataList[0]);
+		QJsonObject propsObj = entityDopeSheetSceneRef.GetKeyFrameProperties(selectedItemsDataList[0]);
 		propModelRef.ResetValues();
 		propModelRef.DeserializeJson(propsObj);
 		ui->propertyTree->setModel(&propModelRef);

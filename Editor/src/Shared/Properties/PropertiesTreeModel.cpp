@@ -78,11 +78,11 @@ const PropertiesDef PropertiesTreeModel::FindPropertyDefinition(QString sCategor
 	if(pTreeItem->GetNumChildren() > 0)
 	{
 		// This is a category
-		dataChanged(createIndex(0, PROPERTIESCOLUMN_Name, pTreeItem->GetChild(0)),
-					createIndex(pTreeItem->GetNumChildren() - 1, PROPERTIESCOLUMN_Value, pTreeItem->GetChild(pTreeItem->GetNumChildren() - 1)));
+		Q_EMIT dataChanged(createIndex(0, PROPERTIESCOLUMN_Name, pTreeItem->GetChild(0)),
+						   createIndex(pTreeItem->GetNumChildren() - 1, PROPERTIESCOLUMN_Value, pTreeItem->GetChild(pTreeItem->GetNumChildren() - 1)));
 	}
 	else
-		dataChanged(indexRef, indexRef);
+		Q_EMIT dataChanged(indexRef, indexRef);
 }
 
 QVariant PropertiesTreeModel::GetPropertyValue(const QModelIndex &indexRef) const
@@ -614,7 +614,7 @@ void PropertiesTreeModel::ResetValues()
 			if(propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn || propDefRef.eAccessType == PROPERTIESACCESS_ToggleOff)
 				return propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn ? Qt::Checked : Qt::Unchecked;
 		}
-		else if(propDefRef.eType == PROPERTIESTYPE_bool)
+		else if(propDefRef.eType == PROPERTIESTYPE_bool && propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn)
 			return pTreeItem->data(PROPERTIESCOLUMN_Value);
 	}
 
@@ -658,14 +658,19 @@ void PropertiesTreeModel::ResetValues()
 					else // column is PROPERTIESCOLUMN_Value
 					{
 						if(propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn)
+						{
 							returnFlags |= (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
+							if(propDefRef.eType == PROPERTIESTYPE_bool)
+								returnFlags |= Qt::ItemIsUserCheckable;
+						}
 					}
 				}
 				else // PROPERTIESACCESS_Mutable
+				{
 					returnFlags |= (Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled);
-
-				if(propDefRef.eType == PROPERTIESTYPE_bool)
-					returnFlags |= Qt::ItemIsUserCheckable;
+					if(propDefRef.eType == PROPERTIESTYPE_bool)
+						returnFlags |= Qt::ItemIsUserCheckable;
+				}
 			}
 		}
 	}

@@ -78,6 +78,7 @@ public:
 	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData) const; // This is mainly useful for rendering the dope sheet
 
 	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const;
+	QJsonObject GetKeyFrameProperties(EntityTreeItemData *pItemData) const;
 	QJsonObject ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData) const;
 
 	QJsonValue GetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const;
