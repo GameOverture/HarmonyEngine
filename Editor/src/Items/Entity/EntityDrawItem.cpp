@@ -130,9 +130,10 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 	enum {
 		SPRITE_SpriteFrame = 0,
 		SPRITE_EntityFrame,
-		SPRITE_BouncePhase
+		SPRITE_BouncePhase,
+		SPRITE_Paused
 	};
-	std::tuple<int, int, bool> spriteLastKnownAnimInfo(-1, 0, false);
+	std::tuple<int, int, bool, bool> spriteLastKnownAnimInfo(-1, 0, false, false);
 
 	for(int iFrame : keyFrameMapRef.keys())
 	{
@@ -150,7 +151,7 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 				if(HyGlobal::IsItemType_Asset(eItemType) == false && commonObj.contains("State"))
 				{
 					if(pThisHyNode->SetState(commonObj["State"].toInt()) && eItemType == ITEM_Sprite)
-						spriteLastKnownAnimInfo = std::make_tuple(-1, iFrame, false);
+						spriteLastKnownAnimInfo = std::make_tuple(-1, iFrame, false, std::get<SPRITE_Paused>(spriteLastKnownAnimInfo));
 				}
 				if(commonObj.contains("Update During Paused"))
 					pThisHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
@@ -313,7 +314,8 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 					static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(std::get<SPRITE_BouncePhase>(spriteLastKnownAnimInfo));
 				}
 
-				static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFrame - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
+				if(std::get<SPRITE_Paused>(spriteLastKnownAnimInfo) == false)
+					static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFrame - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
 
 				// Update the last known anim info after AdvanceAnim()
 				std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo) = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
@@ -331,7 +333,10 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Reverse"].toBool() ? HYANIMCTRL_Reverse : HYANIMCTRL_DontReverse);
 				if(spriteObj.contains("Anim Bounce"))
 					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Bounce"].toBool() ? HYANIMCTRL_Bounce : HYANIMCTRL_DontBounce);
-				
+
+				// Store whether the animation is paused, so we don't AdvanceAnim()
+				if(spriteObj.contains("Anim Paused"))
+					std::get<SPRITE_Paused>(spriteLastKnownAnimInfo) = spriteObj["Anim Paused"].toBool();
 			}
 			break;
 
@@ -350,7 +355,9 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 			static_cast<HySprite2d *>(pThisHyNode)->SetFrame(std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo));
 			static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(std::get<SPRITE_BouncePhase>(spriteLastKnownAnimInfo));
 		}
-		static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iCURRENT_FRAME - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
+
+		if(std::get<SPRITE_Paused>(spriteLastKnownAnimInfo) == false)
+			static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iCURRENT_FRAME - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
 	}
 }
 
