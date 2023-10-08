@@ -289,7 +289,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetAnimDuration()
 template<typename NODETYPE, typename ENTTYPE>
 void IHySprite<NODETYPE, ENTTYPE>::AdvanceAnim(float fDeltaTime)
 {
-	m_fElapsedFrameTime += fDeltaTime;
+	m_fElapsedFrameTime += (fDeltaTime * m_fAnimPlayRate);
 
 	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[this->m_uiState];
@@ -594,9 +594,9 @@ template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ void IHySprite<NODETYPE, ENTTYPE>::OnLoadedUpdate() /*override*/
 {
 	if(m_bIsAnimPaused == false)
-		AdvanceAnim(HyEngine::DeltaTime() * m_fAnimPlayRate);
+		AdvanceAnim(HyEngine::DeltaTime());
 	else
-		AdvanceAnim(0.0f);
+		AdvanceAnim(0.0f); // AdvanceAnim() should still be called to update the shader uniform
 }
 
 template class IHySprite<IHyDrawable2d, HyEntity2d>;
