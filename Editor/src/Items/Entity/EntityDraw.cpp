@@ -287,6 +287,8 @@ void EntityDraw::SetExtrapolatedProperties()
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(m_pProjItem->GetWidget()->GetCurStateIndex()))->GetDopeSheetScene();
 	for(EntityDrawItem *pDrawItem : m_ItemList)
 		pDrawItem->SetHyNode(entityDopeSheetSceneRef, m_pCamera);
+
+	RefreshTransforms();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

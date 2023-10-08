@@ -120,14 +120,14 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 	const QMap<int, QJsonObject> &keyFrameMapRef = entityDopeSheetSceneRef.GetKeyFramesMap()[m_pEntityTreeItemData];
 
 	// Sprite Special Case:
-	// To determine the sprite's animation frame that should be presented on 'iCURRENT_FRAME', whenever a property that might affect
-	// what frame the sprite's animation could be on, we extrapolate from when the property was set to 'iCURRENT_FRAME'.
-	QPair<int, int> iSpriteLastKnownStartFrame(0, 0); // First: Sprite's frame, Second: Entity's frame
-
-	//std::function<void(int, const QJsonObject &)> fpSpecCase_SpriteAnim = [&](int iFrame, const QJsonObject &propsObj)
-	//{
-
-	//};
+	// To determine the sprite's animation frame that should be presented, whenever a property that might affect
+	// what frame the sprite's animation could be on, calculate 'spriteLastKnownAnimInfo' up to that point.
+	// Once all properties have been processed, extrapolate the remaining time up to the Entity's 'iCURRENT_FRAME'
+	//
+	// First: Sprite's frame (-1 indicates it hasn't been set, and should be HYANIMCTRL_Reset)
+	// Second: Entity's frame
+	// Third: A boolean whether animation is in the "bounce phase"
+	std::tuple<int, int, bool> spriteLastKnownAnimInfo(-1, 0, false);
 
 	for(int iFrame : keyFrameMapRef.keys())
 	{
@@ -312,12 +312,18 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 				}
 
 				// Set the sprite's frame to the last known frame, and let it "naturally" advance (based on above settings) to where it should be
-				// TODO: set bounce flag
-				static_cast<HySprite2d *>(pThisHyNode)->SetFrame(iSpriteLastKnownStartFrame.first);
-				static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFrame - iSpriteLastKnownStartFrame.second) * fFRAME_DURATION);
+				if(std::get<0>(spriteLastKnownAnimInfo) == -1)
+					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(HYANIMCTRL_Reset);
+				else
+				{
+					static_cast<HySprite2d *>(pThisHyNode)->SetFrame(std::get<0>(spriteLastKnownAnimInfo));
+					static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(std::get<2>(spriteLastKnownAnimInfo));
+				}
 
-				iSpriteLastKnownStartFrame.first = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
-				iSpriteLastKnownStartFrame.second = iFrame;
+				static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFrame - std::get<1>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
+				std::get<0>(spriteLastKnownAnimInfo) = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
+				std::get<1>(spriteLastKnownAnimInfo) = iFrame;
+				std::get<2>(spriteLastKnownAnimInfo) = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
 			}
 			break;
 
@@ -329,8 +335,14 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 
 	if(eItemType == ITEM_Sprite)
 	{
-		static_cast<HySprite2d *>(pThisHyNode)->SetFrame(iSpriteLastKnownStartFrame.first);
-		static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iCURRENT_FRAME - iSpriteLastKnownStartFrame.second) * fFRAME_DURATION);
+		if(std::get<0>(spriteLastKnownAnimInfo) == -1)
+			static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(HYANIMCTRL_Reset);
+		else
+		{
+			static_cast<HySprite2d *>(pThisHyNode)->SetFrame(std::get<0>(spriteLastKnownAnimInfo));
+			static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(std::get<2>(spriteLastKnownAnimInfo));
+		}
+		static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iCURRENT_FRAME - std::get<1>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
 	}
 }
 

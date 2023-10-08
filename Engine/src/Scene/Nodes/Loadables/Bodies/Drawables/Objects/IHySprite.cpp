@@ -179,7 +179,10 @@ void IHySprite<NODETYPE, ENTTYPE>::SetAnimInBouncePhase(bool bSetBouncingFlag)
 	if(IsAnimBounce(this->m_uiState) == false)
 		return;
 
-	m_AnimCtrlAttribList[this->m_uiState] &= ~ANIMCTRLATTRIB_IsBouncing;
+	if(bSetBouncingFlag)
+		m_AnimCtrlAttribList[this->m_uiState] |= ANIMCTRLATTRIB_IsBouncing;
+	else
+		m_AnimCtrlAttribList[this->m_uiState] &= ~ANIMCTRLATTRIB_IsBouncing;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
