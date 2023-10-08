@@ -127,6 +127,11 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 	// First: Sprite's frame (-1 indicates it hasn't been set, and should be HYANIMCTRL_Reset)
 	// Second: Entity's frame
 	// Third: A boolean whether animation is in the "bounce phase"
+	enum {
+		SPRITE_SpriteFrame = 0,
+		SPRITE_EntityFrame,
+		SPRITE_BouncePhase
+	};
 	std::tuple<int, int, bool> spriteLastKnownAnimInfo(-1, 0, false);
 
 	for(int iFrame : keyFrameMapRef.keys())
@@ -143,7 +148,10 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 				QJsonObject commonObj = propsObj["Common"].toObject();
 
 				if(HyGlobal::IsItemType_Asset(eItemType) == false && commonObj.contains("State"))
-					pThisHyNode->SetState(commonObj["State"].toInt());
+				{
+					if(pThisHyNode->SetState(commonObj["State"].toInt()) && eItemType == ITEM_Sprite)
+						spriteLastKnownAnimInfo = std::make_tuple(-1, iFrame, false);
+				}
 				if(commonObj.contains("Update During Paused"))
 					pThisHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
 				if(commonObj.contains("User Tag"))
@@ -294,36 +302,36 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 			static_cast<HySprite2d *>(pThisHyNode)->SetAnimPause(true);
 
 			// If the state was changed on this frame 'iFrame', it was already applied to pThisNode above in "Common", "State"
-			if(propsObj.contains("Sprite") || (propsObj.contains("Common") && propsObj["Common"].toObject().contains("State")))
+			if(propsObj.contains("Sprite"))
 			{
-				if(propsObj.contains("Sprite"))
-				{
-					QJsonObject spriteObj = propsObj["Sprite"].toObject();
-					if(spriteObj.contains("Frame"))
-						static_cast<HySprite2d *>(pThisHyNode)->SetFrame(spriteObj["Frame"].toInt());
-					if(spriteObj.contains("Anim Rate"))
-						static_cast<HySprite2d *>(pThisHyNode)->SetAnimRate(spriteObj["Anim Rate"].toDouble());
-					if(spriteObj.contains("Anim Loop"))
-						static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Loop"].toBool() ? HYANIMCTRL_Loop : HYANIMCTRL_DontLoop);
-					if(spriteObj.contains("Anim Reverse"))
-						static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Reverse"].toBool() ? HYANIMCTRL_Reverse : HYANIMCTRL_DontReverse);
-					if(spriteObj.contains("Anim Bounce"))
-						static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Bounce"].toBool() ? HYANIMCTRL_Bounce : HYANIMCTRL_DontBounce);
-				}
-
-				// Set the sprite's frame to the last known frame, and let it "naturally" advance (based on above settings) to where it should be
-				if(std::get<0>(spriteLastKnownAnimInfo) == -1)
+				// Set the sprite to the last known anim info, and let it "naturally" AdvanceAnim() to frame 'iFrame'
+				if(std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo) == -1)
 					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(HYANIMCTRL_Reset);
 				else
 				{
-					static_cast<HySprite2d *>(pThisHyNode)->SetFrame(std::get<0>(spriteLastKnownAnimInfo));
-					static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(std::get<2>(spriteLastKnownAnimInfo));
+					static_cast<HySprite2d *>(pThisHyNode)->SetFrame(std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo));
+					static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(std::get<SPRITE_BouncePhase>(spriteLastKnownAnimInfo));
 				}
 
-				static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFrame - std::get<1>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
-				std::get<0>(spriteLastKnownAnimInfo) = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
-				std::get<1>(spriteLastKnownAnimInfo) = iFrame;
-				std::get<2>(spriteLastKnownAnimInfo) = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
+				static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFrame - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
+
+				// Update the last known anim info after AdvanceAnim()
+				std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo) = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
+				std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo) = iFrame;
+				std::get<SPRITE_BouncePhase>(spriteLastKnownAnimInfo) = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
+
+				QJsonObject spriteObj = propsObj["Sprite"].toObject();
+				if(spriteObj.contains("Frame"))
+					static_cast<HySprite2d *>(pThisHyNode)->SetFrame(spriteObj["Frame"].toInt());
+				if(spriteObj.contains("Anim Rate"))
+					static_cast<HySprite2d *>(pThisHyNode)->SetAnimRate(spriteObj["Anim Rate"].toDouble());
+				if(spriteObj.contains("Anim Loop"))
+					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Loop"].toBool() ? HYANIMCTRL_Loop : HYANIMCTRL_DontLoop);
+				if(spriteObj.contains("Anim Reverse"))
+					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Reverse"].toBool() ? HYANIMCTRL_Reverse : HYANIMCTRL_DontReverse);
+				if(spriteObj.contains("Anim Bounce"))
+					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Bounce"].toBool() ? HYANIMCTRL_Bounce : HYANIMCTRL_DontBounce);
+				
 			}
 			break;
 
@@ -335,14 +343,14 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 
 	if(eItemType == ITEM_Sprite)
 	{
-		if(std::get<0>(spriteLastKnownAnimInfo) == -1)
+		if(std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo) == -1)
 			static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(HYANIMCTRL_Reset);
 		else
 		{
-			static_cast<HySprite2d *>(pThisHyNode)->SetFrame(std::get<0>(spriteLastKnownAnimInfo));
-			static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(std::get<2>(spriteLastKnownAnimInfo));
+			static_cast<HySprite2d *>(pThisHyNode)->SetFrame(std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo));
+			static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(std::get<SPRITE_BouncePhase>(spriteLastKnownAnimInfo));
 		}
-		static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iCURRENT_FRAME - std::get<1>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
+		static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iCURRENT_FRAME - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
 	}
 }
 
