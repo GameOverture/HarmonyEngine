@@ -86,6 +86,8 @@ public:
 	void SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue);
 	void RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName);
 
+	void RefreshAllGfxItems();
+
 private:
 	void RefreshGfxItems(int iFrameIndex);
 };

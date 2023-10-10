@@ -15,11 +15,13 @@
 
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneHoverEvent>
+#include <QPainter>
 
 GraphicsKeyFrameItem::GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent /*= nullptr*/) :
 	QGraphicsRectItem(x, y, width, height, parent)
 {
-	setBrush(HyGlobal::CovertHyColor(HyColor::LightGray));
+	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
+	setBrush(HyGlobal::ConvertHyColor(HyColor::LightGray));
 	setAcceptHoverEvents(true);
 }
 
@@ -29,13 +31,13 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal 
 
 /*virtual*/ void GraphicsKeyFrameItem::hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) /*override*/
 {
-	setPen(HyGlobal::CovertHyColor(HyColor::White));
+	setPen(HyGlobal::ConvertHyColor(HyColor::White));
 	scene()->update();
 }
 
 /*virtual*/ void GraphicsKeyFrameItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *pEvent) /*override*/
 {
-	setPen(HyGlobal::CovertHyColor(HyColor::Black));
+	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
 	scene()->update();
 }
 
@@ -90,7 +92,7 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 		}
 	}
 
-	setBackgroundBrush(HyGlobal::CovertHyColor(HyColor::WidgetPanel));
+	setBackgroundBrush(HyGlobal::ConvertHyColor(HyColor::WidgetPanel));
 
 	// These lines allow QGraphicsView to align itself to the top-left corner of the scene
 	addLine(0.0, 0.0, 10.0, 0.0f)->setAcceptedMouseButtons(Qt::NoButton);
@@ -98,12 +100,8 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	m_pCurrentFrameLine = addLine(0.0f, 0.0f, 0.0f, 10.0f); // This line will hide behind the timeline, but is placed in "scene space" so it will embiggen the sceneRect which sets QGraphicsViews' scrollbars accordingly
 	m_pCurrentFrameLine->setAcceptedMouseButtons(Qt::NoButton);
 
-	// Initialize all the key frame graphics items
-	for(auto itemKeyFrameMap : m_KeyFramesMap)
-	{
-		for(int iFrameIndex : itemKeyFrameMap.keys())
-			RefreshGfxItems(iFrameIndex);
-	}
+	RefreshAllGfxItems();
+	
 
 	SetCurrentFrame(0);
 }
@@ -318,7 +316,8 @@ void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, 
 
 	m_KeyFramesMap[pItemData][iFrameIndex] = curPropsObj;
 
-	RefreshGfxItems(iFrameIndex);
+	//RefreshGfxItems(iFrameIndex);
+	RefreshAllGfxItems();
 }
 
 void EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue)
@@ -339,7 +338,8 @@ void EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, in
 
 	keyFrameObjRef.insert(sCategoryName, categoryObj);
 
-	RefreshGfxItems(iFrameIndex);
+	//RefreshGfxItems(iFrameIndex);
+	RefreshAllGfxItems();
 }
 
 void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName)
@@ -380,10 +380,12 @@ void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData,
 		removeItem(m_KeyFramesGfxRectMap[gfxRectMapKey]);
 		m_KeyFramesGfxRectMap.remove(gfxRectMapKey);
 	}
-	RefreshGfxItems(iFrameIndex);
+
+	//RefreshGfxItems(iFrameIndex);
+	RefreshAllGfxItems();
 }
 
-void EntityDopeSheetScene::RefreshGfxItems(int iFrameIndex)
+void EntityDopeSheetScene::RefreshAllGfxItems()
 {
 	// Gather all the entity items (root, children, shapes) into one list 'itemList'
 	QList<EntityTreeItemData *> entireItemList, shapeList;
@@ -391,48 +393,65 @@ void EntityDopeSheetScene::RefreshGfxItems(int iFrameIndex)
 	entireItemList += shapeList;
 	entireItemList.prepend(static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetTreeModel().GetRootTreeItemData());
 
-	qreal fPosY = TIMELINE_HEIGHT + 1.0f;
+	qreal fPosY = TIMELINE_HEIGHT + 2.0f;
 	for(EntityTreeItemData *pCurItemData : entireItemList)
 	{
 		// Only draw the items that have key frames
 		if(m_KeyFramesMap.contains(pCurItemData) == false)
 			continue;
 
-		fPosY += ITEMS_LINE_HEIGHT; // Account for the item's name row
-
-		// 'uniquePropList' will contain every row of key frames for this item, even if they are not listed under 'iFrameIndex'
+		// 'uniquePropList' will contain every row of key frames for this item, across all frames
 		QList<QPair<QString, QString>> uniquePropList = GetUniquePropertiesList(pCurItemData);
-		QJsonObject propsObj = m_KeyFramesMap[pCurItemData][iFrameIndex];
 
-		// Iterate through 'uniquePropList' and draw a QGraphicsRectItem for each property found in 'propsObj'
-		// If it is not found, increment 'fPosY' by one row
-		for(auto &propPair : uniquePropList)
+		// - If NOT selected, draw all the key frames in one row (its name row)
+		// - If selected, skip the name row and then draw each property in its own row
+		if(pCurItemData->IsSelected())
+			fPosY += ITEMS_LINE_HEIGHT; // skip the name row
+
+		const QMap<int, QJsonObject> &keyFrameMapRef = m_KeyFramesMap[pCurItemData];
+		for(int iFrameIndex : keyFrameMapRef.keys())
 		{
-			if(propsObj.contains(propPair.first) == false || propsObj[propPair.first].toObject().contains(propPair.second) == false)
+			const float fITEM_START_POSY = fPosY;
+			QJsonObject propsObj = keyFrameMapRef[iFrameIndex];
+
+			// Iterate through 'uniquePropList' and draw a QGraphicsRectItem for each property found in 'propsObj'
+			for(auto &propPair : uniquePropList)
 			{
-				fPosY += ITEMS_LINE_HEIGHT;
-				continue;
+				if(propsObj.contains(propPair.first) == false || propsObj[propPair.first].toObject().contains(propPair.second) == false)
+				{
+					if(pCurItemData->IsSelected())
+						fPosY += ITEMS_LINE_HEIGHT;
+					continue;
+				}
+
+				// IMPORTANT NOTE: std::make_tuple() crashes in Release if you try to construct the string directly in the function call
+				QString sPropString = propPair.first % "/" % propPair.second;
+				auto gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, sPropString);
+
+				if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
+				{
+					GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
+					pNewGfxRectItem->setData(0, QVariant::fromValue(pCurItemData));
+					pNewGfxRectItem->setAcceptedMouseButtons(Qt::LeftButton);
+					pNewGfxRectItem->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
+
+					m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
+					addItem(pNewGfxRectItem);
+				}
+				else
+					m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
+
+				if(pCurItemData->IsSelected())
+					fPosY += ITEMS_LINE_HEIGHT;
 			}
 
-			// IMPORTANT NOTE: std::make_tuple() crashes in Release if you try to construct the string directly in the function call
-			QString sPropString = propPair.first % "/" % propPair.second;
-			auto gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, sPropString);
-			
-			if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
-			{
-				GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
-				pNewGfxRectItem->setData(0, QVariant::fromValue(pCurItemData));
-				pNewGfxRectItem->setAcceptedMouseButtons(Qt::LeftButton);
-				pNewGfxRectItem->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
-				
-				m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
-				addItem(pNewGfxRectItem);
-			}
-			else
-				m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
-
-			fPosY += ITEMS_LINE_HEIGHT;
+			fPosY = fITEM_START_POSY;
 		}
+
+		if(pCurItemData->IsSelected() == false)
+			fPosY += ITEMS_LINE_HEIGHT;
+		else
+			fPosY += uniquePropList.size() * ITEMS_LINE_HEIGHT;
 
 		fPosY += 1.0f; // Account for the space between items
 	}

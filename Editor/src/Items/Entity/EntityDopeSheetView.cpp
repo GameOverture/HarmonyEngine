@@ -11,6 +11,7 @@
 #include "EntityDopeSheetView.h"
 #include "EntityDopeSheetScene.h"
 #include "EntityModel.h"
+#include "EntityWidget.h"
 
 #include <QPainter>
 #include <QScrollBar>
@@ -20,7 +21,9 @@
 EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	QGraphicsView(pParent),
 	m_pStateData(nullptr),
-	m_bTimeLineMouseDown(false)
+	m_pMouseHoverItem(nullptr),
+	m_bTimeLineMouseDown(false),
+	m_bLeftSideDirty(false)
 {
 	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 }
@@ -52,13 +55,15 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 
 	if(fPosX >= fPOSX_DRAW_THRESHOLD && fPosX < (rect.x() + rect.width()))
 	{
-		painter->setPen(HyGlobal::CovertHyColor(HyColor::Cyan));
+		painter->setPen(HyGlobal::ConvertHyColor(HyColor::Cyan));
 		painter->drawLine(fPosX, rect.y(), fPosX, rect.y() + rect.height());
 	}
 }
 
 /*virtual*/ void EntityDopeSheetView::drawForeground(QPainter *pPainter, const QRectF &rect) /*override*/
 {
+	m_pMouseHoverItem = nullptr;
+
 	//////////////////////////////////////////////////////////////////////////
 	// LEFT SIDE ITEM LIST
 	//////////////////////////////////////////////////////////////////////////
@@ -77,14 +82,22 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 		if(GetScene()->GetKeyFramesMap().contains(pEntItemData) == false)
 			continue;
 
+		HyColor textColor = HyColor::WidgetFrame;
+
 		// Determine number of rows of key frames
 		int iNumRows = 1;
-		QList<QPair<QString, QString>> propList = GetScene()->GetUniquePropertiesList(pEntItemData);
-		iNumRows += propList.size();
+		QList<QPair<QString, QString>> propList;
+		if(pEntItemData->IsSelected())
+		{
+			textColor = HyColor::LightGray;
+
+			propList = GetScene()->GetUniquePropertiesList(pEntItemData);
+			iNumRows += propList.size();
+		}
 
 		// Background Rect
 		pPainter->setPen(Qt::NoPen);
-		pPainter->setBrush(HyGlobal::CovertHyColor(HyColor::ContainerPanel));
+		pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::ContainerPanel));
 		pPainter->drawRect(QRectF(rect.x(), fPosY, ITEMS_WIDTH, iNumRows * ITEMS_LINE_HEIGHT));
 
 		// Item Name
@@ -93,18 +106,38 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 			sCodeName = pEntItemData->GetCodeName() % "[" % QString::number(pEntItemData->GetArrayIndex()) % "]";
 		else
 			sCodeName = pEntItemData->GetCodeName();
-		DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN, fPosY + 5.0f, ITEMS_WIDTH, ITEMS_LINE_HEIGHT), sCodeName);
+
+		QFont bold(pPainter->font());
+		bold.setBold(pEntItemData->IsSelected());
+		pPainter->setFont(bold);
+
+		QRectF nameBoundingRect(rect.x() + ITEMS_LEFT_MARGIN, fPosY + 5.0f, pPainter->fontMetrics().horizontalAdvance(sCodeName), ITEMS_LINE_HEIGHT - 5.0f);
+		nameBoundingRect.setTopLeft(QPointF(rect.x() + ITEMS_LEFT_MARGIN, fPosY + 5.0f));
+		
+		if(nameBoundingRect.contains(m_MouseScenePos))
+		{
+			m_pMouseHoverItem = pEntItemData;
+			textColor = HyColor::White;
+		}
+
+		DrawShadowText(pPainter, nameBoundingRect, sCodeName, textColor);
 		fPosY += ITEMS_LINE_HEIGHT;
 
+		bold.setBold(false);
+		pPainter->setFont(bold);
+
 		// Properties
-		for(QPair<QString, QString> &propPair : propList)
+		if(pEntItemData->IsSelected())
 		{
-			DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN + ITEMS_LEFT_MARGIN, fPosY + 5.0f, ITEMS_WIDTH - ITEMS_LEFT_MARGIN, ITEMS_LINE_HEIGHT), propPair.second);
-			fPosY += ITEMS_LINE_HEIGHT;
+			for(QPair<QString, QString> &propPair : propList)
+			{
+				DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN + ITEMS_LEFT_MARGIN, fPosY + 5.0f, ITEMS_WIDTH - ITEMS_LEFT_MARGIN, ITEMS_LINE_HEIGHT), propPair.second);
+				fPosY += ITEMS_LINE_HEIGHT;
+			}
 		}
 
 		// Draw divider line
-		pPainter->setPen(HyGlobal::CovertHyColor(HyColor::Black));
+		pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::Black));
 		pPainter->drawLine(rect.x(), fPosY, rect.x() + rect.width(), fPosY);
 		fPosY += 1.0f;
 	}
@@ -113,10 +146,10 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 	// TIMELINE
 	//////////////////////////////////////////////////////////////////////////
 	pPainter->setPen(Qt::NoPen);
-	pPainter->setBrush(HyGlobal::CovertHyColor(HyColor::ContainerPanel));
+	pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::ContainerPanel));
 	pPainter->drawRect(QRectF(rect.x(), rect.y(), rect.width(), TIMELINE_HEIGHT));
 
-	pPainter->setPen(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
+	pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
 	pPainter->drawLine(rect.x(), rect.y() + TIMELINE_HEIGHT, rect.x() + rect.width(), rect.y() + TIMELINE_HEIGHT);
 
 	int iFrameIndex = 0;
@@ -140,10 +173,10 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 				eColor = HyColor::Cyan;
 				
 				DrawCurrentFrameIndicator(pPainter, fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, eColor);
-				pPainter->setPen(HyGlobal::CovertHyColor(eColor));
+				pPainter->setPen(HyGlobal::ConvertHyColor(eColor));
 			}
 			else
-				pPainter->setPen(HyGlobal::CovertHyColor(eColor));
+				pPainter->setPen(HyGlobal::ConvertHyColor(eColor));
 			
 			pPainter->drawLine(fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT, fPosX, rect.y() + TIMELINE_HEIGHT);
 
@@ -154,7 +187,7 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 		}
 
 		// Sub Notch Lines
-		pPainter->setPen(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
+		pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
 		for(int i = 0; i < iNumSubLines; ++i)
 		{
 			fPosX += fSubLineSpacing;
@@ -163,17 +196,17 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 				int iCurSubNotchFrame = (iFrameIndex + 1) + i;
 				if(GetScene()->GetCurrentFrame() == iCurSubNotchFrame)
 				{
-					pPainter->setPen(HyGlobal::CovertHyColor(HyColor::Cyan));
+					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::Cyan));
 
 					const float fTextWidth = pPainter->fontMetrics().horizontalAdvance(QString::number(iCurSubNotchFrame));
 					QRectF textRect(fPosX - (fTextWidth * 0.5f), rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT - 20.0f, fTextWidth, 20.0f);
 					DrawShadowText(pPainter, textRect, QString::number(iCurSubNotchFrame), HyColor::Cyan, HyColor::Black);
 
 					DrawCurrentFrameIndicator(pPainter, fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, HyColor::Cyan);
-					pPainter->setPen(HyGlobal::CovertHyColor(HyColor::Cyan));
+					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::Cyan));
 				}
 				else
-					pPainter->setPen(HyGlobal::CovertHyColor(HyColor::WidgetFrame));
+					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
 
 				pPainter->drawLine(fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, fPosX, rect.y() + TIMELINE_HEIGHT);
 			}
@@ -184,20 +217,55 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 	}
 }
 
+/*virtual*/ bool EntityDopeSheetView::event(QEvent *pEvent) /*override*/
+{
+	if(pEvent->type() == QEvent::HoverEnter || pEvent->type() == QEvent::HoverLeave)
+	{
+		m_MouseScenePos.setX(0.0f);
+		m_MouseScenePos.setY(0.0f);
+		update();
+	}
+
+	return QGraphicsView::event(pEvent);
+}
+
 /*virtual*/ void EntityDopeSheetView::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {
+	m_MouseScenePos = mapToScene(pEvent->pos());
+
 	if(m_bTimeLineMouseDown)
-		OnMousePressTimeline(pEvent->pos());
+		OnMousePressTimeline();
+
+	if(pEvent->pos().x() <= TIMELINE_LEFT_MARGIN)
+	{
+		m_bLeftSideDirty = true;
+		update();
+	}
+	else if(m_bLeftSideDirty)
+	{
+		m_bLeftSideDirty = false;
+		update();
+	}
 
 	QGraphicsView::mouseMoveEvent(pEvent);
 }
 
 /*virtual*/ void EntityDopeSheetView::mousePressEvent(QMouseEvent *pEvent) /*override*/
 {
+	if(m_pMouseHoverItem && pEvent->button() == Qt::LeftButton)
+	{
+		bool bShiftPressed = pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier);
+
+		QItemSelectionModel::SelectionFlags flags = bShiftPressed ? QItemSelectionModel::Toggle : QItemSelectionModel::ClearAndSelect;
+		static_cast<EntityWidget *>(m_pStateData->GetModel().GetItem().GetWidget())->RequestSelectedItemChange(m_pMouseHoverItem, flags);
+	}
+
 	if(pEvent->pos().x() > TIMELINE_LEFT_MARGIN && pEvent->pos().y() < TIMELINE_HEIGHT)
 	{
+		m_MouseScenePos = mapToScene(pEvent->pos());
+
 		m_bTimeLineMouseDown = true;
-		OnMousePressTimeline(pEvent->pos());
+		OnMousePressTimeline();
 	}
 	
 	QGraphicsView::mousePressEvent(pEvent);
@@ -212,17 +280,17 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 void EntityDopeSheetView::DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color /*= HyColor::WidgetFrame*/, HyColor shadowColor /*= HyColor::Black*/)
 {
 	textRect.translate(1.0f, 1.0f);
-	pPainter->setPen(HyGlobal::CovertHyColor(shadowColor));
+	pPainter->setPen(HyGlobal::ConvertHyColor(shadowColor));
 	pPainter->drawText(textRect, sText);
 	textRect.translate(-1.0f, -1.0f);
-	pPainter->setPen(HyGlobal::CovertHyColor(color));
+	pPainter->setPen(HyGlobal::ConvertHyColor(color));
 	pPainter->drawText(textRect, sText);
 }
 
 void EntityDopeSheetView::DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY, HyColor color)
 {	
-	pPainter->setPen(HyGlobal::CovertHyColor(color.Darken()));
-	pPainter->setBrush(HyGlobal::CovertHyColor(color));
+	pPainter->setPen(HyGlobal::ConvertHyColor(color.Darken()));
+	pPainter->setBrush(HyGlobal::ConvertHyColor(color));
 
 	// Draw triangle pointing downward over the notch line using the below variables
 	QPointF points[3];
@@ -232,14 +300,12 @@ void EntityDopeSheetView::DrawCurrentFrameIndicator(QPainter *pPainter, qreal fP
 	pPainter->drawPolygon(points, 3);
 }
 
-void EntityDopeSheetView::OnMousePressTimeline(QPoint ptScreenPos)
+void EntityDopeSheetView::OnMousePressTimeline()
 {
 	float fCurZoom = GetScene()->GetZoom();
 	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * fCurZoom;
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
-	QPointF ptScenePos = mapToScene(ptScreenPos);
-
-	int iFrameIndex = ((ptScenePos.x() - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
+	int iFrameIndex = ((m_MouseScenePos.x() - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
 	GetScene()->SetCurrentFrame(iFrameIndex);
 }

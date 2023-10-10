@@ -123,15 +123,11 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 	// To determine the sprite's animation frame that should be presented, whenever a property that might affect
 	// what frame the sprite's animation could be on, calculate 'spriteLastKnownAnimInfo' up to that point.
 	// Once all properties have been processed, extrapolate the remaining time up to the Entity's 'iCURRENT_FRAME'
-	//
-	// First: Sprite's frame (-1 indicates it hasn't been set, and should be HYANIMCTRL_Reset)
-	// Second: Entity's frame
-	// Third: A boolean whether animation is in the "bounce phase"
 	enum {
-		SPRITE_SpriteFrame = 0,
+		SPRITE_SpriteFrame = 0,	// Sprite's frame (-1 indicates it hasn't been set, and should be HYANIMCTRL_Reset)
 		SPRITE_EntityFrame,
-		SPRITE_BouncePhase,
-		SPRITE_Paused
+		SPRITE_BouncePhase,		// A boolean whether animation is in the "bounce phase"
+		SPRITE_Paused			// A boolean whether animation is paused
 	};
 	std::tuple<int, int, bool, bool> spriteLastKnownAnimInfo(-1, 0, false, false);
 

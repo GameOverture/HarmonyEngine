@@ -626,7 +626,7 @@
 #endif
 }
 
-/*static*/ QColor HyGlobal::CovertHyColor(HyColor color)
+/*static*/ QColor HyGlobal::ConvertHyColor(HyColor color)
 {
 	return QColor(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
 }

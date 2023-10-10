@@ -314,7 +314,7 @@ public:
 
 	static void OpenFileInExplorer(QString sFilePath);
 
-	static QColor CovertHyColor(HyColor color);
+	static QColor ConvertHyColor(HyColor color);
 };
 
 struct SortTreeWidgetsPredicate

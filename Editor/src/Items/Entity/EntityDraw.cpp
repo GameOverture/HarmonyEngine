@@ -313,17 +313,8 @@ void EntityDraw::SetExtrapolatedProperties()
 
 	// Pull out all the valid json objects that represent items in the entity
 	QList<QJsonObject> descObjList;
-	for(int32 i = 0; i < descChildArray.size(); ++i)
-	{
-		if(descChildArray[i].isObject())
-			descObjList.push_back(descChildArray[i].toObject());
-		else if(descChildArray[i].isArray())
-		{
-			QJsonArray arrayFolder = descChildArray[i].toArray();
-			for(int32 j = 0; j < arrayFolder.size(); ++j)
-				descObjList.push_back(arrayFolder[j].toObject());
-		}
-	}
+
+	// Add 'shape' items first because they usually encompass large portions of the entire entity, making child item selection more difficult
 	for(int32 i = 0; i < descShapeArray.size(); ++i)
 	{
 		if(descShapeArray[i].isObject())
@@ -336,7 +327,20 @@ void EntityDraw::SetExtrapolatedProperties()
 		}
 	}
 
-	// Process all the objects in descObjList
+	// Add children items next
+	for(int32 i = 0; i < descChildArray.size(); ++i)
+	{
+		if(descChildArray[i].isObject())
+			descObjList.push_back(descChildArray[i].toObject());
+		else if(descChildArray[i].isArray())
+		{
+			QJsonArray arrayFolder = descChildArray[i].toArray();
+			for(int32 j = 0; j < arrayFolder.size(); ++j)
+				descObjList.push_back(arrayFolder[j].toObject());
+		}
+	}
+
+	// Process all the items in 'descObjList'
 	for(int32 i = 0; i < descObjList.size(); ++i)
 	{
 		QJsonObject descObj = descObjList[i];

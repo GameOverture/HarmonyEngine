@@ -38,6 +38,7 @@ public:
 
 	QModelIndexList GetSelectedItems();
 	void RequestSelectedItems(QList<QUuid> uuidList); // Will clear and select only what 'uuidList' contains
+	void RequestSelectedItemChange(EntityTreeItemData *pTreeItemData, QItemSelectionModel::SelectionFlags flags);
 
 	void SetExtrapolatedProperties();
 

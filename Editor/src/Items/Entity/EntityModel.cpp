@@ -252,6 +252,8 @@ void EntityModel::Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList,
 	for(EntityTreeItemData *pTreeItem : deselectedList)
 		pTreeItem->SetSelected(false);
 
+	static_cast<EntityStateData *>(m_StateList[static_cast<EntityWidget *>(m_ItemRef.GetWidget())->GetCurStateIndex()])->GetDopeSheetScene().RefreshAllGfxItems();
+
 	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 	if(pEntDraw)
 		pEntDraw->ApplyJsonData();

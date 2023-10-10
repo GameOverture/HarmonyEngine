@@ -344,6 +344,19 @@ void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList)
 	delete pItemSelection;
 }
 
+void EntityWidget::RequestSelectedItemChange(EntityTreeItemData *pTreeItemData, QItemSelectionModel::SelectionFlags flags)
+{
+	EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
+	QModelIndex modelIndex = entityTreeModelRef.FindIndex<EntityTreeItemData *>(pTreeItemData, 0);
+
+	//QItemSelection *pItemSelection = new QItemSelection();
+	//pItemSelection->select(modelIndex, modelIndex);
+
+	ui->nodeTree->selectionModel()->select(modelIndex, flags);
+
+	//delete pItemSelection;
+}
+
 void EntityWidget::SetExtrapolatedProperties()
 {
 	QList<EntityTreeItemData *> selectedItemsDataList;
