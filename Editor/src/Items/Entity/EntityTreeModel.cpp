@@ -909,14 +909,10 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 				QString sIconUrl = ":/icons16x16/shapes/" % QString(pItem->GetType() == ITEM_Primitive ? "primitive_" : "shapes_");
 				
 				int iStateIndex = 0;
-				int iFrameIndex = 0;
 				if(m_ModelRef.GetItem().GetWidget())
-				{
 					iStateIndex = m_ModelRef.GetItem().GetWidget()->GetCurStateIndex();
-					iFrameIndex = static_cast<EntityStateData *>(m_ModelRef.GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
-				}
 
-				QString sShapeType = static_cast<EntityStateData *>(m_ModelRef.GetStateData(iStateIndex))->GetDopeSheetScene().GetKeyFrameProperty(pItem, iFrameIndex, "Shape", "Type").toString();
+				QString sShapeType = static_cast<EntityStateData *>(m_ModelRef.GetStateData(iStateIndex))->GetDopeSheetScene().ExtrapolateKeyFrameProperty(pItem, "Shape", "Type").toString();
 				switch(HyGlobal::GetShapeFromString(sShapeType))
 				{
 				default:

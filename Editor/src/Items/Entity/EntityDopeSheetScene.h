@@ -80,16 +80,14 @@ public:
 	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const;
 	QJsonObject GetKeyFrameProperties(EntityTreeItemData *pItemData) const;
 	QJsonObject ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData) const;
-
 	QJsonValue GetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const;
+	QJsonValue ExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, QString sCategoryName, QString sPropName) const;
+
 	void SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj);
 	bool SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue);
 	void RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName);
 
 	void RefreshAllGfxItems();
-
-private:
-	void RefreshGfxItems(int iFrameIndex);
 };
 
 #endif // ENTITYDOPESHEETSCENE_H

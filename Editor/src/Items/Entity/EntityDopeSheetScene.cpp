@@ -153,6 +153,8 @@ const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &EntityDopeSheetScene::
 QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(EntityTreeItemData *pItemData) const
 {
 	QSet<QPair<QString, QString>> uniquePropertiesSet;
+	if(m_KeyFramesMap.contains(pItemData) == false)
+		return QList<QPair<QString, QString>>();
 
 	QList<QJsonObject> propsObjList = m_KeyFramesMap[pItemData].values();
 	for(QJsonObject propsObj : propsObjList)
@@ -283,6 +285,43 @@ QJsonValue EntityDopeSheetScene::GetKeyFrameProperty(EntityTreeItemData *pItemDa
 	return itemKeyFrameMapRef[iFrameIndex]["sCategoryName"].toObject()[sPropName];
 }
 
+QJsonValue EntityDopeSheetScene::ExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, QString sCategoryName, QString sPropName) const
+{
+	if(m_KeyFramesMap.contains(pItemData) == false)
+		return QJsonValue();
+
+	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
+
+	// Get the closest key frame that is less than or equal to 'm_iCurrentFrame'
+	QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.find(m_iCurrentFrame);
+	if(iter == itemKeyFrameMapRef.end())
+	{
+		// lowerBound() - Returns an iterator pointing to the first item with key 'm_iCurrentFrame' in the map.
+		//                If the map contains no item with key 'm_iCurrentFrame', the function returns an iterator
+		//                to the nearest item with a greater key.
+		iter = itemKeyFrameMapRef.lowerBound(m_iCurrentFrame);
+		if(iter != itemKeyFrameMapRef.begin())
+			iter--; // Don't want an iterator with a greater key, so go back one
+	}
+
+	if(iter == itemKeyFrameMapRef.end())
+		return QJsonValue();
+
+	// Starting with this key frame and going backwards in time, search for the property 'sCategoryName/sPropName' and return the value
+	while(true)
+	{
+		QJsonObject curKeyFrameObj = iter.value();
+		if(curKeyFrameObj.contains(sCategoryName) && curKeyFrameObj[sCategoryName].toObject().contains(sPropName))
+			return curKeyFrameObj[sCategoryName].toObject()[sPropName];
+
+		if(iter == itemKeyFrameMapRef.begin())
+			break;
+		iter--;
+	}
+
+	return QJsonValue();
+}
+
 void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj)
 {
 	QJsonObject curPropsObj = m_KeyFramesMap[pItemData][iFrameIndex];
@@ -401,10 +440,6 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 	qreal fPosY = TIMELINE_HEIGHT + 2.0f;
 	for(EntityTreeItemData *pCurItemData : entireItemList)
 	{
-		// Only draw the items that have key frames
-		if(m_KeyFramesMap.contains(pCurItemData) == false)
-			continue;
-
 		// 'uniquePropList' will contain every row of key frames for this item, across all frames
 		QList<QPair<QString, QString>> uniquePropList = GetUniquePropertiesList(pCurItemData);
 
@@ -413,50 +448,53 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 		if(pCurItemData->IsSelected())
 			fPosY += ITEMS_LINE_HEIGHT; // skip the name row
 
-		const QMap<int, QJsonObject> &keyFrameMapRef = m_KeyFramesMap[pCurItemData];
-		for(int iFrameIndex : keyFrameMapRef.keys())
+		if(m_KeyFramesMap.contains(pCurItemData))
 		{
-			const float fITEM_START_POSY = fPosY;
-			QJsonObject propsObj = keyFrameMapRef[iFrameIndex];
-
-			// Iterate through 'uniquePropList' and draw a QGraphicsRectItem for each property found in 'propsObj'
-			for(auto &propPair : uniquePropList)
+			const QMap<int, QJsonObject> &keyFrameMapRef = m_KeyFramesMap[pCurItemData];
+			for(int iFrameIndex : keyFrameMapRef.keys())
 			{
-				if(propsObj.contains(propPair.first) == false || propsObj[propPair.first].toObject().contains(propPair.second) == false)
+				const float fITEM_START_POSY = fPosY;
+				QJsonObject propsObj = keyFrameMapRef[iFrameIndex];
+
+				// Iterate through 'uniquePropList' and draw a QGraphicsRectItem for each property found in 'propsObj'
+				for(auto &propPair : uniquePropList)
 				{
+					if(propsObj.contains(propPair.first) == false || propsObj[propPair.first].toObject().contains(propPair.second) == false)
+					{
+						if(pCurItemData->IsSelected())
+							fPosY += ITEMS_LINE_HEIGHT;
+						continue;
+					}
+
+					// IMPORTANT NOTE: std::make_tuple() crashes in Release if you try to construct the string directly in the function call
+					QString sPropString = propPair.first % "/" % propPair.second;
+					auto gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, sPropString);
+
+					if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
+					{
+						GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
+						pNewGfxRectItem->setData(0, QVariant::fromValue(pCurItemData));
+						pNewGfxRectItem->setAcceptedMouseButtons(Qt::LeftButton);
+						pNewGfxRectItem->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
+
+						m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
+						addItem(pNewGfxRectItem);
+					}
+					else
+						m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
+
 					if(pCurItemData->IsSelected())
 						fPosY += ITEMS_LINE_HEIGHT;
-					continue;
 				}
 
-				// IMPORTANT NOTE: std::make_tuple() crashes in Release if you try to construct the string directly in the function call
-				QString sPropString = propPair.first % "/" % propPair.second;
-				auto gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, sPropString);
-
-				if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
-				{
-					GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
-					pNewGfxRectItem->setData(0, QVariant::fromValue(pCurItemData));
-					pNewGfxRectItem->setAcceptedMouseButtons(Qt::LeftButton);
-					pNewGfxRectItem->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
-
-					m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
-					addItem(pNewGfxRectItem);
-				}
-				else
-					m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
-
-				if(pCurItemData->IsSelected())
-					fPosY += ITEMS_LINE_HEIGHT;
+				fPosY = fITEM_START_POSY;
 			}
-
-			fPosY = fITEM_START_POSY;
 		}
 
 		if(pCurItemData->IsSelected() == false)
-			fPosY += ITEMS_LINE_HEIGHT;
+			fPosY += ITEMS_LINE_HEIGHT; // Move past the name row
 		else
-			fPosY += uniquePropList.size() * ITEMS_LINE_HEIGHT;
+			fPosY += uniquePropList.size() * ITEMS_LINE_HEIGHT; // Already accounted for the name row, now move past the property rows
 
 		fPosY += 1.0f; // Account for the space between items
 	}

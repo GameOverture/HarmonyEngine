@@ -78,9 +78,9 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 
 	for(EntityTreeItemData *pEntItemData : itemList)
 	{
-		// Only draw the items that have key frames
-		if(GetScene()->GetKeyFramesMap().contains(pEntItemData) == false)
-			continue;
+		//// Only draw the items that have key frames
+		//if(GetScene()->GetKeyFramesMap().contains(pEntItemData) == false)
+		//	continue;
 
 		HyColor textColor = HyColor::WidgetFrame;
 
@@ -111,9 +111,7 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 		bold.setBold(pEntItemData->IsSelected());
 		pPainter->setFont(bold);
 
-		QRectF nameBoundingRect(rect.x() + ITEMS_LEFT_MARGIN, fPosY + 5.0f, pPainter->fontMetrics().horizontalAdvance(sCodeName), ITEMS_LINE_HEIGHT - 5.0f);
-		nameBoundingRect.setTopLeft(QPointF(rect.x() + ITEMS_LEFT_MARGIN, fPosY + 5.0f));
-		
+		QRectF nameBoundingRect(rect.x() + ITEMS_LEFT_MARGIN, fPosY + 4.0f, pPainter->fontMetrics().horizontalAdvance(sCodeName), ITEMS_LINE_HEIGHT - 5.0f);		
 		if(nameBoundingRect.contains(m_MouseScenePos))
 		{
 			m_pMouseHoverItem = pEntItemData;
@@ -121,6 +119,16 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 		}
 
 		DrawShadowText(pPainter, nameBoundingRect, sCodeName, textColor);
+
+		// Draw Item Icon
+		QModelIndex itemIndex = static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().FindIndex<EntityTreeItemData *>(pEntItemData, 0);
+		QVariant variantIcon = static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().data(itemIndex, Qt::DecorationRole);
+		if(variantIcon.isValid())
+		{
+			QSize iconSize(16, 16);
+			pPainter->drawPixmap(rect.x() + ITEMS_LEFT_MARGIN - iconSize.width() - 5.0f, fPosY + ((ITEMS_LINE_HEIGHT - iconSize.height()) / 2), variantIcon.value<QIcon>().pixmap(iconSize.width(), iconSize.height()));
+		}
+
 		fPosY += ITEMS_LINE_HEIGHT;
 
 		bold.setBold(false);
