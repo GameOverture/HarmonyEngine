@@ -198,6 +198,20 @@ public:
 		return round(value / multiple) * multiple;
 	}
 
+	// Round off decimal to nearest hundredth
+	template<typename TYPE>
+	static TYPE RoundToHundredth(TYPE value)
+	{
+		return round(value * 100) / 100;
+	}
+
+	// Round off decimal to nearest thousandth
+	template<typename TYPE>
+	static TYPE RoundToThousandth(TYPE value)
+	{
+		return round(value * 1000) / 1000;
+	}
+
 	static glm::vec2 RoundVec(const glm::vec2 &vectorOut)
 	{
 		return glm::vec2(round(vectorOut.x), round(vectorOut.y));

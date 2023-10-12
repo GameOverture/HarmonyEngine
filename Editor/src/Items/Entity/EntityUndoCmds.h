@@ -119,13 +119,14 @@ public:
 
 class EntityUndoCmd_Transform : public QUndoCommand
 {
-	ProjectItemData &				m_EntityItemRef;
-	int								m_iStateIndex;
-	int								m_iFrameIndex;
-	QList<EntityTreeItemData *>		m_AffectedItemDataList;
-	QList<glm::mat4>				m_NewTransformList;
-	QList<glm::mat4>				m_OldTransformList;
-	QStringList						m_sOldShapeDataList;
+	ProjectItemData &m_EntityItemRef;
+	int									m_iStateIndex;
+	int									m_iFrameIndex;
+	QList<EntityTreeItemData *>			m_AffectedItemDataList;
+	QList<glm::mat4>					m_NewTransformList;
+	QList<glm::mat4>					m_OldTransformList;
+	QList<std::tuple<bool, bool, bool>>	m_CreatedKeyFrameList; // First: Translation, Second: Rotation, Third: Scale
+	QStringList							m_sOldShapeDataList;
 
 public:
 	EntityUndoCmd_Transform(ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent = nullptr);

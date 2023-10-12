@@ -324,30 +324,55 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 
 /*virtual*/ void EntityUndoCmd_Transform::redo() /*override*/
 {
-	glm::vec3 vScale(1.0f);
 	glm::quat quatRot;
-	glm::vec3 ptTranslation;
 	glm::vec3 vSkew;
 	glm::vec4 vPerspective;
+
+	glm::vec3 ptNewTranslation;
+	glm::vec3 vNewScale(1.0f);
+	glm::vec3 ptOldTranslation;
+	glm::vec3 vOldScale(1.0f);
 
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
 	QList<QUuid> affectedItemUuidList;
 	m_sOldShapeDataList.clear();
+	m_CreatedKeyFrameList.clear();
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
 		if(m_AffectedItemDataList[i]->GetType() != ITEM_BoundingVolume)
 		{
-			glm::decompose(m_NewTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
-			double dRotation = glm::degrees(glm::atan(m_NewTransformList[i][0][1], m_NewTransformList[i][0][0]));
+			glm::decompose(m_NewTransformList[i], vNewScale, quatRot, ptNewTranslation, vSkew, vPerspective);
+			double dNewRotation = glm::degrees(glm::atan(m_NewTransformList[i][0][1], m_NewTransformList[i][0][0]));
+			glm::decompose(m_OldTransformList[i], vOldScale, quatRot, ptOldTranslation, vSkew, vPerspective);
+			double dOldRotation = glm::degrees(glm::atan(m_OldTransformList[i][0][1], m_OldTransformList[i][0][0]));
 
-			QVariant tmpVariant = QPointF(ptTranslation.x, ptTranslation.y);
-			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+			dOldRotation = HyMath::RoundToHundredth(dOldRotation);
+			dNewRotation = HyMath::RoundToHundredth(dNewRotation);
 
-			tmpVariant = dRotation;
-			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_double, tmpVariant));
+			HySetVec(vNewScale, HyMath::RoundToThousandth(vNewScale.x), HyMath::RoundToThousandth(vNewScale.y), HyMath::RoundToThousandth(vNewScale.z));
+			HySetVec(vOldScale, HyMath::RoundToThousandth(vOldScale.x), HyMath::RoundToThousandth(vOldScale.y), HyMath::RoundToThousandth(vOldScale.z));
 
-			tmpVariant = QPointF(vScale.x, vScale.y);
-			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+			bool bCreatedTranslationKeyFrame = false;
+			bool bCreatedRotationKeyFrame = false;
+			bool bCreatedScaleKeyFrame = false;
+
+			if(ptNewTranslation != ptOldTranslation)
+			{
+				QVariant tmpVariant = QPointF(ptNewTranslation.x, ptNewTranslation.y);
+				bCreatedTranslationKeyFrame = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+			}
+			if(dNewRotation != dOldRotation)
+			{
+				QVariant tmpVariant = dNewRotation;
+				bCreatedRotationKeyFrame = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_double, tmpVariant));
+			}
+			if(vNewScale != vOldScale)
+			{
+				QVariant tmpVariant = QPointF(vNewScale.x, vNewScale.y);
+				bCreatedScaleKeyFrame = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+			}
+
+			m_CreatedKeyFrameList.push_back(std::make_tuple(bCreatedTranslationKeyFrame, bCreatedRotationKeyFrame, bCreatedScaleKeyFrame));
 
 			m_sOldShapeDataList.push_back(QString());
 		}
@@ -376,11 +401,14 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 
 /*virtual*/ void EntityUndoCmd_Transform::undo() /*override*/
 {
-	glm::vec3 vScale(1.0f);
 	glm::quat quatRot;
-	glm::vec3 ptTranslation;
 	glm::vec3 vSkew;
 	glm::vec4 vPerspective;
+	
+	glm::vec3 ptNewTranslation;
+	glm::vec3 vNewScale(1.0f);
+	glm::vec3 ptOldTranslation;
+	glm::vec3 vOldScale(1.0f);
 
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
 	QList<QUuid> affectedItemUuidList;
@@ -388,20 +416,49 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	{
 		if(m_AffectedItemDataList[i]->GetType() != ITEM_BoundingVolume)
 		{
-			glm::decompose(m_OldTransformList[i], vScale, quatRot, ptTranslation, vSkew, vPerspective);
-			double dRotation = glm::degrees(glm::atan(m_OldTransformList[i][0][1], m_OldTransformList[i][0][0]));
+			glm::decompose(m_OldTransformList[i], vOldScale, quatRot, ptOldTranslation, vSkew, vPerspective);
+			double dOldRotation = glm::degrees(glm::atan(m_OldTransformList[i][0][1], m_OldTransformList[i][0][0]));
+			glm::decompose(m_NewTransformList[i], vNewScale, quatRot, ptNewTranslation, vSkew, vPerspective);
+			double dNewRotation = glm::degrees(glm::atan(m_NewTransformList[i][0][1], m_NewTransformList[i][0][0]));
 
-			QVariant tmpVariant = QPointF(ptTranslation.x, ptTranslation.y);
-			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+			dOldRotation = HyMath::RoundToHundredth(dOldRotation);
+			dNewRotation = HyMath::RoundToHundredth(dNewRotation);
 
-			tmpVariant = dRotation;
-			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_double, tmpVariant));
+			HySetVec(vNewScale, HyMath::RoundToThousandth(vNewScale.x), HyMath::RoundToThousandth(vNewScale.y), HyMath::RoundToThousandth(vNewScale.z));
+			HySetVec(vOldScale, HyMath::RoundToThousandth(vOldScale.x), HyMath::RoundToThousandth(vOldScale.y), HyMath::RoundToThousandth(vOldScale.z));
 
-			tmpVariant = QPointF(vScale.x, vScale.y);
-			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+			if(ptOldTranslation != ptNewTranslation)
+			{
+				if(std::get<0>(m_CreatedKeyFrameList[i]))
+					pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position");
+				else
+				{
+					QVariant tmpVariant = QPointF(ptOldTranslation.x, ptOldTranslation.y);
+					pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+				}
+			}
+			if(dOldRotation != dNewRotation)
+			{
+				if(std::get<1>(m_CreatedKeyFrameList[i]))
+					pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation");
+				else
+				{
+					QVariant tmpVariant = dOldRotation;
+					pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_double, tmpVariant));
+				}
+			}
+			if(vOldScale != vNewScale)
+			{
+				if(std::get<2>(m_CreatedKeyFrameList[i]))
+					pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale");
+				else
+				{
+					QVariant tmpVariant = QPointF(vOldScale.x, vOldScale.y);
+					pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+				}
+			}
 
 			m_sOldShapeDataList.push_back(QString());
-
 		}
 		else
 			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", m_sOldShapeDataList[i]);

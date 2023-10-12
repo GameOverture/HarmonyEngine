@@ -316,12 +316,13 @@ void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, 
 
 	m_KeyFramesMap[pItemData][iFrameIndex] = curPropsObj;
 
-	//RefreshGfxItems(iFrameIndex);
 	RefreshAllGfxItems();
 }
 
-void EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue)
+bool EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue)
 {
+	bool bIsNewKeyFrame = false;
+
 	if(m_KeyFramesMap.contains(pItemData) == false)
 		m_KeyFramesMap.insert(pItemData, QMap<int, QJsonObject>());
 
@@ -331,15 +332,20 @@ void EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, in
 
 	QJsonObject &keyFrameObjRef = itemKeyFrameMapRef[iFrameIndex];
 	if(keyFrameObjRef.contains(sCategoryName) == false)
+	{
 		keyFrameObjRef.insert(sCategoryName, QJsonObject());
+		bIsNewKeyFrame = true;
+	}
+	else if(keyFrameObjRef[sCategoryName].toObject().contains(sPropName) == false)
+		bIsNewKeyFrame = true;
 
 	QJsonObject categoryObj = keyFrameObjRef[sCategoryName].toObject();
 	categoryObj.insert(sPropName, jsonValue);
 
 	keyFrameObjRef.insert(sCategoryName, categoryObj);
 
-	//RefreshGfxItems(iFrameIndex);
 	RefreshAllGfxItems();
+	return bIsNewKeyFrame;
 }
 
 void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName)
@@ -381,7 +387,6 @@ void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData,
 		m_KeyFramesGfxRectMap.remove(gfxRectMapKey);
 	}
 
-	//RefreshGfxItems(iFrameIndex);
 	RefreshAllGfxItems();
 }
 
