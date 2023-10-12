@@ -17,7 +17,7 @@
 #ifdef HY_USE_SPINE
 // TODO: Properly implement this for Harmony
 spine::SpineExtension *spine::getDefaultExtension() {
-	return new spine::DefaultSpineExtension();
+	return HY_NEW spine::DefaultSpineExtension();
 }
 
 HySpineTextureLoader::HySpineTextureLoader(std::vector<HySpineAtlas> &subAtlasListRef) :

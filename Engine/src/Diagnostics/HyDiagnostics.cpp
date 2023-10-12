@@ -110,6 +110,8 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 
 HyDiagnostics::~HyDiagnostics()
 {
+	delete m_pProfiler;
+
 	m_SceneRef.SetPhysicsDrawClass(nullptr);
 	delete m_pBox2dDraw;
 }
