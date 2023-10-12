@@ -24,6 +24,11 @@ HyScrollBar::PageControl::PageControl(HyOrientation eOrientation, uint32 uiLengt
 	SetMetrics(eOrientation, uiLength, uiDiameter, 1.0f);
 }
 
+/*virtual*/ HyScrollBar::PageControl::~PageControl()
+{
+
+}
+
 uint32 HyScrollBar::PageControl::GetDiameter() const
 {
 	return m_uiDiameter;
@@ -162,6 +167,11 @@ HyScrollBar::Button::Button(HyOrientation eOrientation, bool bPositive, uint32 u
 	SetMetrics(eOrientation, bPositive, uiDiameter);
 }
 
+/*virtual*/ HyScrollBar::Button::~Button()
+{
+
+}
+
 void HyScrollBar::Button::SetColor(HyColor color)
 {
 	m_Panel.SetTint(color);
@@ -234,6 +244,11 @@ HyScrollBar::HyScrollBar(HyOrientation eOrientation, uint32 uiDiameter, HyEntity
 	m_PosBtn.SetAsEnabled(true);
 	m_NegBtn.SetButtonClickedCallback(OnArrowBtnPressed, this);
 	m_NegBtn.SetAsEnabled(true);
+}
+
+/*virtual*/ HyScrollBar::~HyScrollBar()
+{
+
 }
 
 HyOrientation HyScrollBar::GetOrientation() const

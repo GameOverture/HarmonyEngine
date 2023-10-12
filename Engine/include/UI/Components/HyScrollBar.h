@@ -30,6 +30,7 @@ class HyScrollBar : public HyEntity2d
 
 	public:
 		PageControl(HyOrientation eOrientation, uint32 uiLength, uint32 uiDiameter, HyEntity2d *pParent);
+		virtual ~PageControl();
 
 		uint32 GetDiameter() const;
 		void SetDiameter(uint32 uiDiameter);
@@ -50,6 +51,7 @@ class HyScrollBar : public HyEntity2d
 
 	public:
 		Button(HyOrientation eOrientation, bool bPositive, uint32 uiDiameter, HyEntity2d *pParent);
+		virtual ~Button();
 
 		void SetColor(HyColor color);
 		void SetMetrics(HyOrientation eOrientation, bool bPositive, uint32 uiDiameter);
@@ -75,6 +77,7 @@ class HyScrollBar : public HyEntity2d
 
 public:
 	HyScrollBar(HyOrientation eOrientation, uint32 uiDiameter, HyEntity2d *pParent);
+	virtual ~HyScrollBar();
 
 	HyOrientation GetOrientation() const;
 
