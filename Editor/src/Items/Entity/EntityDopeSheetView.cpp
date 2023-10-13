@@ -40,7 +40,10 @@ EntityDopeSheetScene *EntityDopeSheetView::GetScene() const
 void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 {
 	m_pStateData = pStateData;
-	setScene(&m_pStateData->GetDopeSheetScene());
+	if(m_pStateData == nullptr)
+		setScene(nullptr);
+	else
+		setScene(&m_pStateData->GetDopeSheetScene());
 }
 
 /*virtual*/ void EntityDopeSheetView::drawBackground(QPainter *painter, const QRectF &rect) /*override*/

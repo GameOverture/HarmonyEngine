@@ -285,6 +285,27 @@ void EntityDraw::SetExtrapolatedProperties()
 		HyGuiLog("EntityDraw::SetExtrapolatedProperties - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
 
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(m_pProjItem->GetWidget()->GetCurStateIndex()))->GetDopeSheetScene();
+
+	// Set the extrapolated properties for the root item (aka this entity)
+	QJsonObject rootPropObj = entityDopeSheetSceneRef.ExtrapolateKeyFramesProperties(static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().GetRootTreeItemData());
+	if(rootPropObj.contains("Transformation"))
+	{
+		QJsonObject transformObj = rootPropObj["Transformation"].toObject();
+		if(transformObj.contains("Position"))
+		{
+			QJsonArray posArray = transformObj["Position"].toArray();
+			pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
+		}
+		if(transformObj.contains("Rotation"))
+			rot.Set(transformObj["Rotation"].toDouble());
+		if(transformObj.contains("Scale"))
+		{
+			QJsonArray scaleArray = transformObj["Scale"].toArray();
+			scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
+		}
+	}
+
+	// Use SetHyNode() to set the extrapolated properties for all the children
 	for(EntityDrawItem *pDrawItem : m_ItemList)
 		pDrawItem->SetHyNode(entityDopeSheetSceneRef, m_pCamera);
 

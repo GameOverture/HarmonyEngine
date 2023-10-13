@@ -65,6 +65,8 @@ public:
 	EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj);
 	virtual ~EntityDopeSheetScene();
 
+	EntityStateData *GetStateData() const;
+
 	int GetFramesPerSecond() const;
 	void SetFramesPerSecond(int iFramesPerSecond);
 

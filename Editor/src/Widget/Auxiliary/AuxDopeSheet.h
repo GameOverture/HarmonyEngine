@@ -26,6 +26,7 @@ public:
 	explicit AuxDopeSheet(QWidget *pParent = nullptr);
 	virtual ~AuxDopeSheet();
 
+	EntityStateData *GetEntityStateModel() const;
 	void SetEntityStateModel(EntityStateData *pEntStateData);
 
 private:

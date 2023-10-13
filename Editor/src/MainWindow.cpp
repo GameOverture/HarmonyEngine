@@ -368,6 +368,10 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	{
 		sm_pInstance->ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, true);
 		sm_pInstance->ui->tabWidgetAux->setCurrentIndex(AUXTAB_DopeSheet);
+		int iStateIndex = 0;
+		if(pItem->GetWidget())
+			iStateIndex = pItem->GetWidget()->GetCurStateIndex();
+		sm_pInstance->ui->dopeSheet->SetEntityStateModel(static_cast<EntityStateData *>(pItem->GetModel()->GetStateData(iStateIndex)));
 	}
 	else
 		sm_pInstance->ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, false);
@@ -418,6 +422,12 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		sm_pInstance->ui->menu_Edit->clear();
 
 		pItem->BlockAllWidgetSignals(false);
+	}
+
+	if(pItem == &sm_pInstance->ui->dopeSheet->GetEntityStateModel()->GetModel().GetItem())
+	{
+		sm_pInstance->ui->dopeSheet->SetEntityStateModel(nullptr);
+		sm_pInstance->ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, false);
 	}
 
 	Harmony::GetProject()->CloseTab(pItem);

@@ -364,7 +364,7 @@ void EntityWidget::SetExtrapolatedProperties()
 	for(const QModelIndex &index : selectedIndexList)
 	{
 		EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
-		if(pEntItemData->GetEntType() == ENTTYPE_Item || pEntItemData->GetEntType() == ENTTYPE_ArrayItem)
+		if(pEntItemData->GetEntType() == ENTTYPE_Root || pEntItemData->GetEntType() == ENTTYPE_Item || pEntItemData->GetEntType() == ENTTYPE_ArrayItem)
 			selectedItemsDataList.push_back(pEntItemData);
 	}
 

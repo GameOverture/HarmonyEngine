@@ -31,6 +31,11 @@ AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 	delete ui;
 }
 
+EntityStateData *AuxDopeSheet::GetEntityStateModel() const
+{
+	return ui->graphicsView->GetScene()->GetStateData();
+}
+
 void AuxDopeSheet::SetEntityStateModel(EntityStateData *pEntStateData)
 {
 	ui->graphicsView->SetScene(pEntStateData);

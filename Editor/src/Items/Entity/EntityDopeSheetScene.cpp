@@ -110,6 +110,11 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 {
 }
 
+EntityStateData *EntityDopeSheetScene::GetStateData() const
+{
+	return m_pEntStateData;
+}
+
 int EntityDopeSheetScene::GetFramesPerSecond() const
 {
 	return m_iFramesPerSecond;

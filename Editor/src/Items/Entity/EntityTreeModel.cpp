@@ -374,27 +374,25 @@ void EntityTreeItemData::InitalizePropertyModel()
 			m_pPropertiesModel->AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(GetType(), false) % "'s state to be displayed", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 		}
 
-		if(GetEntType() != ENTTYPE_Root)
+		m_pPropertiesModel->AppendCategory("Common", HyGlobal::ItemColor(ITEM_Prefix)); // Will just return 'false' if "Common" category already exists
+		m_pPropertiesModel->AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused", PROPERTIESACCESS_ToggleOff);
+		m_pPropertiesModel->AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", PROPERTIESACCESS_ToggleOff, -iRANGE, iRANGE, 1);
+
+		m_pPropertiesModel->AppendCategory("Transformation", HyGlobal::ItemColor(ITEM_Project));
+		m_pPropertiesModel->AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", PROPERTIESACCESS_ToggleOff, -fRANGE, fRANGE, 1.0, "[", "]");
+		m_pPropertiesModel->AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Scale is relative to parent node", PROPERTIESACCESS_ToggleOff, -fRANGE, fRANGE, 0.01, "[", "]");
+		m_pPropertiesModel->AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", PROPERTIESACCESS_ToggleOff, 0.0, 360.0, 0.1, "", "°");
+
+		if(GetType() != ITEM_Audio)
 		{
-			m_pPropertiesModel->AppendCategory("Common", HyGlobal::ItemColor(ITEM_Prefix)); // Will just return 'false' if "Common" category already exists
-			m_pPropertiesModel->AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused", PROPERTIESACCESS_ToggleOff);
-			m_pPropertiesModel->AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", PROPERTIESACCESS_ToggleOff, -iRANGE, iRANGE, 1);
-
-			m_pPropertiesModel->AppendCategory("Transformation", HyGlobal::ItemColor(ITEM_Project));
-			m_pPropertiesModel->AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", PROPERTIESACCESS_ToggleOff, -fRANGE, fRANGE, 1.0, "[", "]");
-			m_pPropertiesModel->AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Scale is relative to parent node", PROPERTIESACCESS_ToggleOff, -fRANGE, fRANGE, 0.01, "[", "]");
-			m_pPropertiesModel->AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", PROPERTIESACCESS_ToggleOff, 0.0, 360.0, 0.1, "", "°");
-
-			if(GetType() != ITEM_Audio)
-			{
-				m_pPropertiesModel->AppendCategory("Body", HyGlobal::ItemColor(ITEM_Prefix));
-				m_pPropertiesModel->AppendProperty("Body", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated", PROPERTIESACCESS_ToggleOff);
-				m_pPropertiesModel->AppendProperty("Body", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this item with", PROPERTIESACCESS_ToggleOff);
-				m_pPropertiesModel->AppendProperty("Body", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", PROPERTIESACCESS_ToggleOff, 0.0, 1.0, 0.05);
-				m_pPropertiesModel->AppendProperty("Body", "Override Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", PROPERTIESACCESS_ToggleOff, -iRANGE, iRANGE, 1);
-			}
+			m_pPropertiesModel->AppendCategory("Body", HyGlobal::ItemColor(ITEM_Prefix));
+			m_pPropertiesModel->AppendProperty("Body", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated", PROPERTIESACCESS_ToggleOff);
+			m_pPropertiesModel->AppendProperty("Body", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this item with", PROPERTIESACCESS_ToggleOff);
+			m_pPropertiesModel->AppendProperty("Body", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", PROPERTIESACCESS_ToggleOff, 0.0, 1.0, 0.05);
+			m_pPropertiesModel->AppendProperty("Body", "Override Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", PROPERTIESACCESS_ToggleOff, -iRANGE, iRANGE, 1);
 		}
-		else // ENTTYPE_Root
+		
+		if(GetEntType() == ENTTYPE_Root)
 		{
 			m_pPropertiesModel->AppendCategory("Physics", QVariant(), true, false, "Optionally create a physics component that can affect the transformation of this entity");
 			m_pPropertiesModel->AppendProperty("Physics", "Activate", PROPERTIESTYPE_bool, Qt::Checked, "This entity will begin its physics simulation", PROPERTIESACCESS_ToggleOff);
@@ -414,6 +412,8 @@ void EntityTreeItemData::InitalizePropertyModel()
 	switch(GetType())
 	{
 	case ITEM_Entity:
+		m_pPropertiesModel->AppendCategory("Entity", QVariant(), false, false, "A visible shape that can be drawn to the screen");
+		m_pPropertiesModel->AppendProperty("Entity", "Mouse Input", PROPERTIESTYPE_bool, Qt::Unchecked, "Mouse hover and button inputs over this bounding volume or specified shapes", PROPERTIESACCESS_ToggleOff);
 		break;
 
 	case ITEM_Primitive:
@@ -650,6 +650,10 @@ void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut,
 
 EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
 {
+	EntityTreeItemData *pRootItemData = GetRootTreeItemData();
+	if(pRootItemData && pRootItemData->GetUuid() == uuid)
+		return pRootItemData;
+
 	TreeModelItem *pThisEntity = GetRootTreeItem();
 	for(int i = 0; i < pThisEntity->GetNumChildren(); ++i)
 	{
