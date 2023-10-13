@@ -33,6 +33,7 @@ enum HySoundCue
 	HYSOUNDCUE_Pause,
 	HYSOUNDCUE_Unpause,
 	HYSOUNDCUE_Attributes,
+	HYSOUNDCUE_DeleteInstance,
 
 	NUM_HYSOUNDCUE
 };

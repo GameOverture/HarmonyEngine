@@ -63,6 +63,7 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(const IHyAudio &copyRef) :
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ IHyAudio<NODETYPE, ENTTYPE>::~IHyAudio(void)
 {
+	IHyNode::sm_pScene->ProcessAudioCue(this, HYSOUNDCUE_DeleteInstance);
 }
 
 template<typename NODETYPE, typename ENTTYPE>

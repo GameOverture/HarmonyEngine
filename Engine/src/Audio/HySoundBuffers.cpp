@@ -67,6 +67,7 @@ bool HySoundBuffers::Load()
 	}
 #endif
 
+	// TODO: Specify in Editor whether a sound supports pitching, and use 'MA_SOUND_FLAG_NO_PITCH' if not
 	ma_uint32 uiFlags = m_bIS_STREAMING ? MA_SOUND_FLAG_STREAM : 0;
 	ma_sound_group *pGroup = m_CoreRef.GetGroup(GetGroupId());
 

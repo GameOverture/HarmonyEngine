@@ -385,6 +385,20 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 		ManipSound(m_PlayMap[hHandle]);
 		break; }
 
+	case HYSOUNDCUE_DeleteInstance: {
+		HyAudioNodeHandle hHandle = HY_UNUSED_HANDLE;
+		if(pNode->Is2D())
+			hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
+		else
+			hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
+
+		if(m_PlayMap.find(hHandle) != m_PlayMap.end())
+		{
+			StopSound(m_PlayMap[hHandle]);
+			m_PlayMap.erase(hHandle);
+		}
+		break; }
+
 	default:
 		HyLogError("Unknown sound cue type");
 		break;
@@ -460,7 +474,7 @@ void HyAudioCore::PauseSound(PlayInfo &playInfoRef)
 
 void HyAudioCore::UnpauseSound(PlayInfo &playInfoRef)
 {
-	ma_result eResult = ma_sound_start(playInfoRef.m_pSound); // When a sound is ma_sound_stop()'ed, it is not rewound to the start
+	ma_result eResult = ma_sound_start(playInfoRef.m_pSound); // When a sound is ma_sound_start()'ed, it is played from its current position
 	if(eResult != MA_SUCCESS)
 		HyLogError("ma_sound_start failed: " << eResult);
 }

@@ -39,7 +39,7 @@ class IHyAudio : public NODETYPE
 		AudioStateAttribs(HyPlayListMode ePlayList, bool bAllowRepeats, uint8 uiPriority, uint8 uiLoops, uint16 uiMaxDist)
 		{
 			m_ePlayListMode = ePlayList;
-			m_bAllowRepeats = bAllowRepeats;
+			m_bAllowRepeats = bAllowRepeats ? 1 : 0;
 			m_uiPriority = uiPriority;
 			m_uiLoops = uiLoops;
 			m_uiMaxDistance = uiMaxDist;
