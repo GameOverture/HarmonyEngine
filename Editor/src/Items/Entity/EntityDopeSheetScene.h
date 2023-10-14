@@ -42,11 +42,14 @@ public:
 protected:
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) override;
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *pEvent) override;
-	//virtual bool sceneEvent(QEvent *pEvent) override;
+	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *pEvent) override;
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent *pEvent) override;
+	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *pEvent) override;
 };
 
 class EntityDopeSheetScene : public QGraphicsScene
 {
+	friend class GraphicsKeyFrameItem;
 	friend class EntityDopeSheetView;
 
 	EntityStateData *																m_pEntStateData;
@@ -60,6 +63,15 @@ class EntityDopeSheetScene : public QGraphicsScene
 	QGraphicsLineItem *																m_pCurrentFrameLine;
 
 	float																			m_fZoom;
+	
+	enum DragState
+	{
+		DRAGSTATE_None,
+		DRAGSTATE_InitialPress,
+		DRAGSTATE_Dragging,
+	};
+	DragState																		m_eDragState;
+	QPointF																			m_DragStartPos; // In View Coordinates
 
 public:
 	EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj);
@@ -90,6 +102,14 @@ public:
 	void RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName);
 
 	void RefreshAllGfxItems();
+
+private:
+	// These functions should only be called by 'GraphicsKeyFrameItem' and the 'EntityDopeSheetView'
+	DragState GetDragState() const;
+	void SetDragState(DragState eDragState);
+
+	void OnDragMove(QMouseEvent *pEvent);
+	void OnDragFinished(QMouseEvent *pEvent);
 };
 
 #endif // ENTITYDOPESHEETSCENE_H

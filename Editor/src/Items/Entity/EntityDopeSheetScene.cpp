@@ -23,6 +23,7 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal 
 	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
 	setBrush(HyGlobal::ConvertHyColor(HyColor::LightGray));
 	setAcceptHoverEvents(true);
+	setFlags(QGraphicsItem::ItemIsSelectable); // Can't use 'QGraphicsItem::ItemIsMovable' because key frames are only allowed to move horizontally and snapped to frames
 }
 
 /*virtual*/ GraphicsKeyFrameItem::~GraphicsKeyFrameItem()
@@ -39,6 +40,40 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal 
 {
 	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
 	scene()->update();
+}
+
+/*virtual*/ void GraphicsKeyFrameItem::mouseMoveEvent(QGraphicsSceneMouseEvent *pEvent) /*override*/
+{
+}
+
+/*virtual*/ void GraphicsKeyFrameItem::mousePressEvent(QGraphicsSceneMouseEvent *pEvent) /*override*/
+{
+	static_cast<EntityDopeSheetScene *>(scene())->SetDragState(EntityDopeSheetScene::DRAGSTATE_InitialPress);
+	static_cast<EntityDopeSheetScene *>(scene())->m_DragStartPos = pEvent->pos();
+}
+
+/*virtual*/ void GraphicsKeyFrameItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *pEvent) /*override*/
+{
+	// First handle if it's a single click (not a drag)
+	if(static_cast<EntityDopeSheetScene *>(scene())->GetDragState() == EntityDopeSheetScene::DRAGSTATE_InitialPress)
+	{
+		static_cast<EntityDopeSheetScene *>(scene())->SetDragState(EntityDopeSheetScene::DRAGSTATE_None);
+
+		if(pEvent->button() == Qt::MouseButton::LeftButton)
+		{
+			if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
+				setSelected(!isSelected());
+			else
+			{
+				scene()->clearSelection();
+				setSelected(true);
+			}
+		}
+	}
+	else
+	{
+
+	}
 }
 
 ///*virtual*/ bool GraphicsKeyFrameItem::sceneEvent(QEvent *pEvent) /*override*/
@@ -66,7 +101,9 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	m_pEntStateData(pStateData),
 	m_iFramesPerSecond(metaFileObj["framesPerSecond"].toInt()),
 	m_iCurrentFrame(0),
-	m_fZoom(1.0f)
+	m_fZoom(1.0f),
+	m_eDragState(DRAGSTATE_None),
+	m_DragStartPos(0.0f, 0.0f)
 {
 	if(m_iFramesPerSecond == 0)
 		m_iFramesPerSecond = 60;
@@ -101,8 +138,6 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	m_pCurrentFrameLine->setAcceptedMouseButtons(Qt::NoButton);
 
 	RefreshAllGfxItems();
-	
-
 	SetCurrentFrame(0);
 }
 
@@ -505,4 +540,22 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 	}
 
 	update();
+}
+
+EntityDopeSheetScene::DragState EntityDopeSheetScene::GetDragState() const
+{
+	return m_eDragState;
+}
+
+void EntityDopeSheetScene::SetDragState(DragState eDragState)
+{
+	m_eDragState = eDragState;
+}
+
+void EntityDopeSheetScene::OnDragMove(QMouseEvent *pEvent)
+{
+}
+
+void EntityDopeSheetScene::OnDragFinished(QMouseEvent *pEvent)
+{
 }
