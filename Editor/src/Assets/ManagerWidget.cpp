@@ -169,7 +169,10 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	ui(new Ui::ManagerWidget),
 	m_pModel(pModel),
 	m_pContextMenuSelection(nullptr),
-	m_bUseContextMenuSelection(false)
+	m_bUseContextMenuSelection(false),
+	m_pBuildLabel(nullptr),
+	m_pNewBuildBtn(nullptr),
+	m_pBuildSettingsBtn(nullptr)
 {
 	ui->setupUi(this);
 
@@ -223,6 +226,18 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 		ui->btnGenerateAsset->hide();
 	else
 	{
+		// Programmatically add a tool button that opens build settings
+		m_pBuildLabel = new QLabel("Build Settings:", this);
+		m_pNewBuildBtn = new QToolButton(this);
+		m_pBuildSettingsBtn = new QToolButton(this);
+
+		QHBoxLayout *pSettingsLayout = new QHBoxLayout();
+		pSettingsLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+		pSettingsLayout->addWidget(m_pBuildLabel);
+		pSettingsLayout->addWidget(m_pNewBuildBtn);
+		pSettingsLayout->addWidget(m_pBuildSettingsBtn);
+		ui->verticalLayout->insertLayout(0, pSettingsLayout);
+		
 		// Change text and tool tips of Source Manager to make more sense
 		ui->actionGenerateAsset->setText("Add New File(s)");
 		ui->actionGenerateAsset->setToolTip("Add new files to this project. Such as a class, header, or source");
@@ -346,6 +361,16 @@ void ManagerWidget::RestoreExpandedState(QStringList expandedFilterList)
 		QModelIndex proxyIndex = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapFromSource(srcIndex);
 		ui->assetTree->setExpanded(proxyIndex, bIsExpanded);
 	}
+}
+
+void ManagerWidget::SetSettingsAction(QString sBuildLabel, QAction *pNewBuildAction, QAction *pBuildSettingsAction)
+{
+	if(m_pBuildLabel)
+		m_pBuildLabel->setText(sBuildLabel);
+	if(m_pNewBuildBtn)
+		m_pNewBuildBtn->setDefaultAction(pNewBuildAction);
+	if(m_pBuildSettingsBtn)
+		m_pBuildSettingsBtn->setDefaultAction(pBuildSettingsAction);
 }
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

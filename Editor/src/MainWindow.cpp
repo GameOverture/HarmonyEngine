@@ -351,7 +351,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 	if(Harmony::GetProject() != &pItem->GetProject())
 	{
-		HyGuiLog("Cannot open " % HyGlobal::ItemName(pItem->GetType(), false) % " '" % pItem->GetName(true) % "' because its current project is not activated.", LOGTYPE_Normal);
+		HyGuiLog("Cannot open " % HyGlobal::ItemName(pItem->GetType(), false) % " '" % pItem->GetName(true) % "' because its current project is not activated.", LOGTYPE_Warning);
 		return;
 	}
 
@@ -614,7 +614,8 @@ void MainWindow::on_tabWidgetAssetManager_currentChanged(int iIndex)
 		return;
 
 	ManagerWidget *pManagerWidget = static_cast<ManagerWidget *>(sm_pInstance->ui->tabWidgetAssetManager->widget(iIndex));
-	ui->assetInspector->SetAssetManager(pManagerWidget);
+	if(pManagerWidget)
+		ui->assetInspector->SetAssetManager(pManagerWidget);
 }
 
 void MainWindow::on_tabWidgetAux_currentChanged(int iIndex)
@@ -1144,6 +1145,8 @@ void MainWindow::RefreshBuildMenu()
 			pBuildsMenu->addAction(pActionOpenIde);
 		}
 	}
+
+	pProject->GetSourceWidget()->SetSettingsAction(pProject->GetTitle() % " Build Settings:", ui->actionNewBuild, ui->actionBuildSettings);
 
 	//ui->menu_Build->addSeparator();
 	//ui->menu_Build->addAction(ui->actionNewPackage);

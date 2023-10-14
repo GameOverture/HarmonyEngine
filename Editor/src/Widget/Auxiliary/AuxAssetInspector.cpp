@@ -26,5 +26,6 @@ AuxAssetInspector::AuxAssetInspector(QWidget *parent) :
 
 void AuxAssetInspector::SetAssetManager(ManagerWidget *pManagerWidget)
 {
-	ui->graphicsView->setScene(pManagerWidget->GetModel().GetInspectorScene());
+	if(pManagerWidget)
+		ui->graphicsView->setScene(pManagerWidget->GetModel().GetInspectorScene());
 }

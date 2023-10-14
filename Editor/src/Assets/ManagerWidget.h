@@ -15,6 +15,7 @@
 #include <QSortFilterProxyModel>
 #include <QWidget>
 #include <QMenu>
+#include <QLabel>
 
 namespace Ui {
 class ManagerWidget;
@@ -60,6 +61,11 @@ class ManagerWidget : public QWidget
 	TreeModelItemData *			m_pContextMenuSelection;
 	bool						m_bUseContextMenuSelection;
 
+	// Only used with Source Manager
+	QLabel *					m_pBuildLabel;
+	QToolButton *				m_pNewBuildBtn;
+	QToolButton *				m_pBuildSettingsBtn;
+
 public:
 	explicit ManagerWidget(QWidget *pParent = nullptr);
 	explicit ManagerWidget(IManagerModel *pModel, QWidget *pParent = nullptr);
@@ -74,6 +80,8 @@ public:
 
 	QStringList GetExpandedFilters();
 	void RestoreExpandedState(QStringList expandedFilterList);
+
+	void SetSettingsAction(QString sBuildLabel, QAction *pNewBuildAction, QAction *pBuildSettingsAction);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// NOTE: ExplorerWidget::GetSelected are synonymous functions - all fixes/enhancements should be copied over until refactored into a base class
