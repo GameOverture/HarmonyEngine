@@ -36,6 +36,7 @@ class EntityDopeSheetView : public QGraphicsView
 	};
 	DragState					m_eDragState;
 	QPointF						m_ptDragStart; // In View Coordinates
+	int							m_iDragFrame;
 
 public:
 	EntityDopeSheetView(QWidget *pParent = nullptr);
@@ -60,8 +61,7 @@ private:
 	void DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color = HyColor::WidgetFrame, HyColor shadowColor = HyColor::Black);
 	void DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY, HyColor color);
 
-	void OnMousePressTimeline();
-	void OnDragMove(QMouseEvent *pEvent);
+	int GetNearestFrame(qreal fScenePosX) const;
 };
 
 #endif // ENTITYDOPESHEETVIEW_H

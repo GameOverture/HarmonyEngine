@@ -74,11 +74,43 @@ float EntityDopeSheetView::GetZoom() const
 
 /*virtual*/ void EntityDopeSheetView::drawForeground(QPainter *pPainter, const QRectF &rect) /*override*/
 {
-	m_pMouseHoverItem = nullptr;
+	//////////////////////////////////////////////////////////////////////////
+	// DRAW CURRENT DRAGGING ITEMS PREVIEW
+	//////////////////////////////////////////////////////////////////////////
+	if(m_eDragState == DRAGSTATE_Dragging)
+	{
+		int iFrameOffset = m_iDragFrame - GetNearestFrame(m_ptDragStart.x());
+		qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * m_fZoom;
+
+		QList<QGraphicsItem *> itemList = items();
+		GraphicsKeyFrameItem *pKeyFrameItem = nullptr; // Just need one item to get the pen and brush
+		QVector<QRectF> rectList;
+		for(QGraphicsItem *pItem : itemList)
+		{
+			if(pItem->isSelected())
+			{
+				QRectF rect = pItem->sceneBoundingRect();
+				rect.translate(fSubLineSpacing * iFrameOffset, 0.0f);
+
+				rectList.push_back(rect);
+				pKeyFrameItem = static_cast<GraphicsKeyFrameItem *>(pItem);
+			}
+		}
+
+		pPainter->setPen(pKeyFrameItem->pen());
+		QBrush brush = pKeyFrameItem->brush();
+		QColor color = brush.color();
+		color.setAlphaF(0.5f);
+		brush.setColor(color);
+		pPainter->setBrush(brush);
+
+		pPainter->drawRects(rectList);
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	// LEFT SIDE ITEM LIST
 	//////////////////////////////////////////////////////////////////////////
+	m_pMouseHoverItem = nullptr;
 	qreal fPosY = rect.y() + TIMELINE_HEIGHT + 1.0f;
 	fPosY -= verticalScrollBar()->value();
 
@@ -254,14 +286,14 @@ float EntityDopeSheetView::GetZoom() const
 
 	if(m_bTimeLineMouseDown)
 	{
-		OnMousePressTimeline();
+		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
 		pEvent->accept();
 	}
 	else
 	{
 		if(DRAGSTATE_Dragging == m_eDragState)
 		{
-			OnDragMove(pEvent);
+			m_iDragFrame = GetNearestFrame(m_MouseScenePos.x());
 			update();
 		}
 		else if(pEvent->pos().x() <= TIMELINE_LEFT_MARGIN)
@@ -280,7 +312,7 @@ float EntityDopeSheetView::GetZoom() const
 			if(dragDelta.manhattanLength() >= 3)
 			{
 				m_eDragState = DRAGSTATE_Dragging;
-				OnDragMove(pEvent);
+				m_iDragFrame = GetNearestFrame(m_MouseScenePos.x());
 			}
 			update();
 		}
@@ -313,7 +345,7 @@ float EntityDopeSheetView::GetZoom() const
 		m_MouseScenePos = mapToScene(pEvent->pos());
 
 		m_bTimeLineMouseDown = true;
-		OnMousePressTimeline();
+		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
 		pEvent->accept();
 	}
 	else if(pEvent->pos().y() > TIMELINE_HEIGHT)
@@ -339,7 +371,7 @@ float EntityDopeSheetView::GetZoom() const
 	if(DRAGSTATE_Dragging == m_eDragState)
 		static_cast<EntityDopeSheetScene *>(scene())->NudgeSelectedKeyFrames(0);
 	else if(rubberBandRect().isNull() && pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f)
-		OnMousePressTimeline();
+		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
 
 	m_eDragState = DRAGSTATE_None;
 
@@ -370,23 +402,10 @@ void EntityDopeSheetView::DrawCurrentFrameIndicator(QPainter *pPainter, qreal fP
 	pPainter->drawPolygon(points, 3);
 }
 
-void EntityDopeSheetView::OnMousePressTimeline()
+int EntityDopeSheetView::GetNearestFrame(qreal fScenePosX) const
 {
 	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * m_fZoom;
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
-	int iFrameIndex = ((m_MouseScenePos.x() - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
-	GetScene()->SetCurrentFrame(iFrameIndex);
-}
-
-void EntityDopeSheetView::OnDragMove(QMouseEvent *pEvent)
-{
-	QList<QGraphicsItem *> itemList = items();
-	for(QGraphicsItem *pItem : itemList)
-	{
-		if(pItem->isSelected())
-		{
-
-		}
-	}
+	return ((fScenePosX - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
 }
