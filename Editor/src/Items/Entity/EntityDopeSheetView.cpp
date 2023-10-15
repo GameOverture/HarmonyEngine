@@ -23,7 +23,10 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	m_pStateData(nullptr),
 	m_pMouseHoverItem(nullptr),
 	m_bTimeLineMouseDown(false),
-	m_bLeftSideDirty(false)
+	m_bLeftSideDirty(false),
+	m_fZoom(1.0f),
+	m_eDragState(DRAGSTATE_None),
+	m_ptDragStart(0.0f, 0.0f)
 {
 	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	setDragMode(QGraphicsView::RubberBandDrag);
@@ -45,6 +48,11 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 		setScene(nullptr);
 	else
 		setScene(&m_pStateData->GetDopeSheetScene());
+}
+
+float EntityDopeSheetView::GetZoom() const
+{
+	return m_fZoom;
 }
 
 /*virtual*/ void EntityDopeSheetView::drawBackground(QPainter *painter, const QRectF &rect) /*override*/
@@ -165,8 +173,7 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 	pPainter->drawLine(rect.x(), rect.y() + TIMELINE_HEIGHT, rect.x() + rect.width(), rect.y() + TIMELINE_HEIGHT);
 
 	int iFrameIndex = 0;
-	float fCurZoom = GetScene()->GetZoom();
-	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * fCurZoom;
+	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * m_fZoom;
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
 	const qreal fPOSX_DRAW_THRESHOLD = rect.x() + TIMELINE_LEFT_MARGIN;
@@ -252,9 +259,9 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 	}
 	else
 	{
-		if(EntityDopeSheetScene::DRAGSTATE_Dragging == static_cast<EntityDopeSheetScene *>(scene())->GetDragState())
+		if(DRAGSTATE_Dragging == m_eDragState)
 		{
-			static_cast<EntityDopeSheetScene *>(scene())->OnDragMove(pEvent);
+			OnDragMove(pEvent);
 			update();
 		}
 		else if(pEvent->pos().x() <= TIMELINE_LEFT_MARGIN)
@@ -267,13 +274,13 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 			m_bLeftSideDirty = false;
 			update();
 		}
-		else if(EntityDopeSheetScene::DRAGSTATE_InitialPress == static_cast<EntityDopeSheetScene *>(scene())->GetDragState())
+		else if(DRAGSTATE_InitialPress == m_eDragState)
 		{
-			QPointF dragDelta = pEvent->pos() - static_cast<EntityDopeSheetScene *>(scene())->m_DragStartPos;
+			QPointF dragDelta = pEvent->pos() - m_ptDragStart;
 			if(dragDelta.manhattanLength() >= 3)
 			{
-				static_cast<EntityDopeSheetScene *>(scene())->SetDragState(EntityDopeSheetScene::DRAGSTATE_Dragging);
-				static_cast<EntityDopeSheetScene *>(scene())->OnDragMove(pEvent);
+				m_eDragState = DRAGSTATE_Dragging;
+				OnDragMove(pEvent);
 			}
 			update();
 		}
@@ -287,7 +294,13 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 
 /*virtual*/ void EntityDopeSheetView::mousePressEvent(QMouseEvent *pEvent) /*override*/
 {
-	if(m_pMouseHoverItem && pEvent->button() == Qt::LeftButton)
+	if(pEvent->button() != Qt::LeftButton)
+	{
+		QGraphicsView::mousePressEvent(pEvent);
+		return;
+	}
+
+	if(m_pMouseHoverItem)
 	{
 		bool bShiftPressed = pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier);
 
@@ -303,8 +316,18 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 		OnMousePressTimeline();
 		pEvent->accept();
 	}
-	else // Use 'else' here because we don't want default selection behavior when clicking on the 'time line' or an 'item name'
+	else if(pEvent->pos().y() > TIMELINE_HEIGHT)
+	{	
+		QGraphicsItem *pItemUnderMouse = itemAt(pEvent->pos());
+		if(pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f && pItemUnderMouse)
+		{
+			m_eDragState = DRAGSTATE_InitialPress;
+			m_ptDragStart = pEvent->pos();
+		}
+
+		// Only want default selection behavior when NOT clicking in the 'time line' or an 'item name' column
 		QGraphicsView::mousePressEvent(pEvent);
+	}
 
 	update();
 }
@@ -313,10 +336,12 @@ void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
 {
 	m_bTimeLineMouseDown = false;
 
-	if(EntityDopeSheetScene::DRAGSTATE_Dragging == static_cast<EntityDopeSheetScene *>(scene())->GetDragState())
-		static_cast<EntityDopeSheetScene *>(scene())->OnDragFinished(pEvent);
+	if(DRAGSTATE_Dragging == m_eDragState)
+		static_cast<EntityDopeSheetScene *>(scene())->NudgeSelectedKeyFrames(0);
 	else if(rubberBandRect().isNull() && pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f)
 		OnMousePressTimeline();
+
+	m_eDragState = DRAGSTATE_None;
 
 	update();
 	QGraphicsView::mouseReleaseEvent(pEvent);
@@ -347,10 +372,21 @@ void EntityDopeSheetView::DrawCurrentFrameIndicator(QPainter *pPainter, qreal fP
 
 void EntityDopeSheetView::OnMousePressTimeline()
 {
-	float fCurZoom = GetScene()->GetZoom();
-	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * fCurZoom;
+	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * m_fZoom;
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
 	int iFrameIndex = ((m_MouseScenePos.x() - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
 	GetScene()->SetCurrentFrame(iFrameIndex);
+}
+
+void EntityDopeSheetView::OnDragMove(QMouseEvent *pEvent)
+{
+	QList<QGraphicsItem *> itemList = items();
+	for(QGraphicsItem *pItem : itemList)
+	{
+		if(pItem->isSelected())
+		{
+
+		}
+	}
 }

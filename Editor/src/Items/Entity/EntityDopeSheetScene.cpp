@@ -30,6 +30,21 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal 
 {
 }
 
+/*virtual*/ QVariant GraphicsKeyFrameItem::itemChange(GraphicsItemChange eChange, const QVariant &value) /*override*/
+{
+	switch(eChange)
+	{
+	case QGraphicsItem::ItemSelectedHasChanged:
+		if(value.toBool())
+			setCursor(Qt::SizeHorCursor);
+		else
+			unsetCursor();
+		break;
+	}
+
+	return QGraphicsRectItem::itemChange(eChange, value);
+}
+
 /*virtual*/ void GraphicsKeyFrameItem::hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) /*override*/
 {
 	setPen(HyGlobal::ConvertHyColor(HyColor::White));
@@ -42,39 +57,30 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal 
 	scene()->update();
 }
 
-/*virtual*/ void GraphicsKeyFrameItem::mouseMoveEvent(QGraphicsSceneMouseEvent *pEvent) /*override*/
-{
-}
+///*virtual*/ void GraphicsKeyFrameItem::mouseMoveEvent(QGraphicsSceneMouseEvent *pEvent) /*override*/
+//{
+//}
 
-/*virtual*/ void GraphicsKeyFrameItem::mousePressEvent(QGraphicsSceneMouseEvent *pEvent) /*override*/
-{
-	static_cast<EntityDopeSheetScene *>(scene())->SetDragState(EntityDopeSheetScene::DRAGSTATE_InitialPress);
-	static_cast<EntityDopeSheetScene *>(scene())->m_DragStartPos = pEvent->pos();
-}
+///*virtual*/ void GraphicsKeyFrameItem::mousePressEvent(QGraphicsSceneMouseEvent *pEvent) /*override*/
+//{
+//	
+//}
 
-/*virtual*/ void GraphicsKeyFrameItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *pEvent) /*override*/
-{
-	// First handle if it's a single click (not a drag)
-	if(static_cast<EntityDopeSheetScene *>(scene())->GetDragState() == EntityDopeSheetScene::DRAGSTATE_InitialPress)
-	{
-		static_cast<EntityDopeSheetScene *>(scene())->SetDragState(EntityDopeSheetScene::DRAGSTATE_None);
-
-		if(pEvent->button() == Qt::MouseButton::LeftButton)
-		{
-			if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
-				setSelected(!isSelected());
-			else
-			{
-				scene()->clearSelection();
-				setSelected(true);
-			}
-		}
-	}
-	else
-	{
-
-	}
-}
+///*virtual*/ void GraphicsKeyFrameItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *pEvent) /*override*/
+//{
+//	if(pEvent->button() == Qt::MouseButton::LeftButton)
+//	{
+//		if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
+//		{
+//			setSelected(!isSelected());
+//		}
+//		else
+//		{
+//			scene()->clearSelection();
+//			setSelected(true);
+//		}
+//	}
+//}
 
 ///*virtual*/ bool GraphicsKeyFrameItem::sceneEvent(QEvent *pEvent) /*override*/
 //{
@@ -100,10 +106,7 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	QGraphicsScene(),
 	m_pEntStateData(pStateData),
 	m_iFramesPerSecond(metaFileObj["framesPerSecond"].toInt()),
-	m_iCurrentFrame(0),
-	m_fZoom(1.0f),
-	m_eDragState(DRAGSTATE_None),
-	m_DragStartPos(0.0f, 0.0f)
+	m_iCurrentFrame(0)
 {
 	if(m_iFramesPerSecond == 0)
 		m_iFramesPerSecond = 60;
@@ -178,11 +181,6 @@ void EntityDopeSheetScene::SetCurrentFrame(int iFrame)
 	IDraw *pDraw = m_pEntStateData->GetModel().GetItem().GetDraw();
 	if(pDraw)
 		static_cast<EntityDraw *>(pDraw)->SetExtrapolatedProperties();
-}
-
-float EntityDopeSheetScene::GetZoom() const
-{
-	return m_fZoom;
 }
 
 const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &EntityDopeSheetScene::GetKeyFramesMap() const
@@ -469,6 +467,10 @@ void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData,
 	RefreshAllGfxItems();
 }
 
+void EntityDopeSheetScene::NudgeSelectedKeyFrames(int iFrameOffset)
+{
+}
+
 void EntityDopeSheetScene::RefreshAllGfxItems()
 {
 	// Gather all the entity items (root, children, shapes) into one list 'itemList'
@@ -542,20 +544,20 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 	update();
 }
 
-EntityDopeSheetScene::DragState EntityDopeSheetScene::GetDragState() const
-{
-	return m_eDragState;
-}
-
-void EntityDopeSheetScene::SetDragState(DragState eDragState)
-{
-	m_eDragState = eDragState;
-}
-
-void EntityDopeSheetScene::OnDragMove(QMouseEvent *pEvent)
-{
-}
-
-void EntityDopeSheetScene::OnDragFinished(QMouseEvent *pEvent)
-{
-}
+//EntityDopeSheetScene::DragState EntityDopeSheetScene::GetDragState() const
+//{
+//	return m_eDragState;
+//}
+//
+//void EntityDopeSheetScene::SetDragState(DragState eDragState)
+//{
+//	m_eDragState = eDragState;
+//}
+//
+//void EntityDopeSheetScene::OnDragMove(QMouseEvent *pEvent)
+//{
+//}
+//
+//void EntityDopeSheetScene::OnDragFinished(QMouseEvent *pEvent)
+//{
+//}

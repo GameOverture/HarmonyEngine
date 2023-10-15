@@ -26,12 +26,25 @@ class EntityDopeSheetView : public QGraphicsView
 	bool						m_bTimeLineMouseDown;
 	bool						m_bLeftSideDirty;
 
+	float						m_fZoom;
+
+	enum DragState
+	{
+		DRAGSTATE_None,
+		DRAGSTATE_InitialPress,
+		DRAGSTATE_Dragging,
+	};
+	DragState					m_eDragState;
+	QPointF						m_ptDragStart; // In View Coordinates
+
 public:
 	EntityDopeSheetView(QWidget *pParent = nullptr);
 	virtual ~EntityDopeSheetView();
 
 	EntityDopeSheetScene *GetScene() const;
 	void SetScene(EntityStateData *pStateData);
+
+	float GetZoom() const;
 
 protected:
 	virtual void drawBackground(QPainter *painter, const QRectF &rect) override;
@@ -48,6 +61,7 @@ private:
 	void DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY, HyColor color);
 
 	void OnMousePressTimeline();
+	void OnDragMove(QMouseEvent *pEvent);
 };
 
 #endif // ENTITYDOPESHEETVIEW_H
