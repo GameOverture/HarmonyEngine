@@ -303,10 +303,7 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 			newPlayInfo.m_uiLoops = static_cast<HyAudio3d *>(pNode)->GetLoops();
 		}
 
-		m_OneShotList.push_back(newPlayInfo);
-
-		StartSound(m_OneShotList.back());
-		
+		StartSound(newPlayInfo);
 		break; }
 
 	case HYSOUNDCUE_Start: {

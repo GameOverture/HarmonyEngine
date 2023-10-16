@@ -71,7 +71,6 @@ class HyAudioCore
 		ma_sound *									m_pSound = nullptr;
 	};
 	std::unordered_map<HyAudioNodeHandle, PlayInfo>	m_PlayMap;
-	std::vector<PlayInfo>							m_OneShotList;
 
 #ifdef HY_USE_SDL2_AUDIO
 	SDL_AudioDeviceID								m_SdlDeviceId;
