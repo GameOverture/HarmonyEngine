@@ -41,7 +41,7 @@ public:
 	ma_sound *GetFreshBuffer();
 
 private:
-	void AllocateBuffer();
+	void InitSoundBuffer(ma_sound *pSound, ma_uint32 uiAdditionalFlags);
 };
 
 #endif /* HySoundAsset_h__ */

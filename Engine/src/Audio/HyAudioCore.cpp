@@ -333,9 +333,8 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 			pPlayInfo->m_uiLoops = static_cast<HyAudio3d *>(pNode)->GetLoops();
 		}
 
-		StartSound(*pPlayInfo);
-		//if(StartSound(*pPlayInfo) == false)
-		//	m_PlayMap.erase(hHandle);
+		if(StartSound(*pPlayInfo) == false)
+			m_PlayMap.erase(hHandle);
 		break; }
 
 	case HYSOUNDCUE_Stop:

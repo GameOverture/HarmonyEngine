@@ -11,6 +11,9 @@
 #include "Audio/HySoundAsset.h"
 #include "Audio/HyAudioCore.h"
 
+// TODO: Specify in Editor whether a sound supports pitching, and use 'MA_SOUND_FLAG_NO_PITCH' if not
+// TODO: 'MA_SOUND_FLAG_NO_SPATIALIZATION' is set post-initialization with 'ma_sound_set_spatialization_enabled'
+
 HySoundAsset::HySoundAsset(HyAudioCore &coreRef, std::string sFilePath, int32 iCategoryId, bool bIsStreaming, int32 iInstanceLimit) :
 	m_CoreRef(coreRef),
 	m_sFILE_PATH(sFilePath),
@@ -32,7 +35,6 @@ HySoundAsset::HySoundAsset(HyAudioCore &coreRef, std::string sFilePath, int32 iC
 HySoundAsset::~HySoundAsset()
 {
 	//Unload();
-
 	for(int i = 0; i < m_SoundBufferList.size(); ++i)
 		delete m_SoundBufferList[i];
 }
@@ -67,25 +69,24 @@ bool HySoundAsset::Load()
 	}
 #endif
 
-	// TODO: Specify in Editor whether a sound supports pitching, and use 'MA_SOUND_FLAG_NO_PITCH' if not
-	ma_uint32 uiFlags = m_bIS_STREAMING ? MA_SOUND_FLAG_STREAM : 0;
-	ma_sound_group *pGroup = m_CoreRef.GetCategory(GetCategoryId());
+	// Constructor guarantees at least one buffer exists, load it with 'ma_sound_init_from_file'
+	HyAssert(m_SoundBufferList.size() >= 1, "HySoundAsset::Load() - Constructor needs to allocate at least 1 buffer");
 
-	for(uint32 i = 0; i < static_cast<uint32>(m_SoundBufferList.size()); ++i)
+	ma_result eResult = ma_sound_init_from_file(m_CoreRef.GetEngine(),
+		m_sFILE_PATH.c_str(),
+		m_bIS_STREAMING ? MA_SOUND_FLAG_STREAM : 0,
+		m_CoreRef.GetCategory(GetCategoryId()),
+		nullptr,
+		m_SoundBufferList[0]);
+	if(eResult != MA_SUCCESS)
 	{
-		ma_result eResult = ma_sound_init_from_file(m_CoreRef.GetEngine(),
-			m_sFILE_PATH.c_str(),
-			uiFlags,
-			pGroup,
-			nullptr,
-			m_SoundBufferList[i]);
-
-		if(eResult != MA_SUCCESS)
-		{
-			HyLogError("Load() - ma_sound_init_from_file failed: " << eResult);
-			return false;  // Failed to load sound.
-		}
+		HyLogError("Load() - ma_sound_init_from_file failed: " << eResult);
+		return false;  // Failed to load sound.
 	}
+
+	// Initialize the rest of the buffers with InitSoundBuffer(), which optimially copies from the first buffer if able to
+	for(uint32 i = 1; i < static_cast<uint32>(m_SoundBufferList.size()); ++i)
+		InitSoundBuffer(m_SoundBufferList[i], 0);
 	
 	return true;
 }
@@ -109,24 +110,37 @@ ma_sound *HySoundAsset::GetFreshBuffer()
 		if(m_iINSTANCE_LIMIT == 0) // Allows dynamic resizing
 		{
 			m_SoundBufferList.push_back(HY_NEW ma_sound());
-
-			ma_uint32 uiFlags = m_bIS_STREAMING ? MA_SOUND_FLAG_STREAM : 0;
-			uiFlags |= MA_SOUND_FLAG_ASYNC;
-
-			ma_sound_group *pGroup = m_CoreRef.GetCategory(GetCategoryId());
-
-			// Cannot use 'ma_sound_init_copy' because it doesn't support 'MA_SOUND_FLAG_STREAM'
-			ma_result eResult = ma_sound_init_from_file(m_CoreRef.GetEngine(),
-				m_sFILE_PATH.c_str(),
-				uiFlags,
-				pGroup,
-				nullptr,
-				m_SoundBufferList.back());
-
-			if(eResult != MA_SUCCESS)
-				HyLogError("AppendBuffer() - ma_sound_init_from_file failed: " << eResult);
+			InitSoundBuffer(m_SoundBufferList.back(), MA_SOUND_FLAG_ASYNC);
 		}
 		else
 			return nullptr; // No available buffer
+	}
+}
+
+void HySoundAsset::InitSoundBuffer(ma_sound *pSound, ma_uint32 uiAdditionalFlags)
+{
+	if(m_bIS_STREAMING)
+	{
+		// Cannot use 'ma_sound_init_copy' because it doesn't support 'MA_SOUND_FLAG_STREAM'
+		ma_result eResult = ma_sound_init_from_file(m_CoreRef.GetEngine(),
+			m_sFILE_PATH.c_str(),
+			MA_SOUND_FLAG_STREAM | uiAdditionalFlags,
+			m_CoreRef.GetCategory(GetCategoryId()),
+			nullptr,
+			pSound);
+
+		if(eResult != MA_SUCCESS)
+			HyLogError("HySoundAsset::GetFreshBuffer() - ma_sound_init_from_file failed: " << eResult);
+	}
+	else
+	{
+		ma_result eResult = ma_sound_init_copy(m_CoreRef.GetEngine(),
+			m_SoundBufferList[0],
+			uiAdditionalFlags,
+			m_CoreRef.GetCategory(GetCategoryId()),
+			pSound);
+
+		if(eResult != MA_SUCCESS)
+			HyLogError("HySoundAsset::GetFreshBuffer() - ma_sound_init_copy failed: " << eResult);
 	}
 }
