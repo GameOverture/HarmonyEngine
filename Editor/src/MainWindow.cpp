@@ -627,7 +627,7 @@ void MainWindow::on_tabWidgetAux_currentChanged(int iIndex)
 		break;
 
 	case AUXTAB_AssetInspector:
-		ui->dockWidgetAuxiliary->setWindowTitle("Asset Inspector");
+		ui->dockWidgetAuxiliary->setWindowTitle("Asset Preview");
 		break;
 
 	case AUXTAB_DopeSheet:

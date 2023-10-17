@@ -1,5 +1,5 @@
 /**************************************************************************
- *	WgtAudioGroup.h
+ *	WgtAudioCategory.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2022 Jason Knobler
@@ -7,26 +7,26 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef WGTAUDIOGROUP_H
-#define WGTAUDIOGROUP_H
+#ifndef WGTAUDIOCATEGORY_H
+#define WGTAUDIOCATEGORY_H
 
 #include <QWidget>
 
-class AudioGroupsModel;
+class AudioCategoriesModel;
 
 namespace Ui {
-class WgtAudioGroup;
+class WgtAudioCategory;
 }
 
-class WgtAudioGroup : public QWidget
+class WgtAudioCategory : public QWidget
 {
 	Q_OBJECT
 	
 public:
-	explicit WgtAudioGroup(QWidget *parent = 0);
-	~WgtAudioGroup();
+	explicit WgtAudioCategory(QWidget *parent = 0);
+	~WgtAudioCategory();
 
-	void Init(AudioGroupsModel *pModel, quint32 uiId, bool bIncludeCheckBox);
+	void Init(AudioCategoriesModel *pModel, quint32 uiId, bool bIncludeCheckBox);
 
 	bool IsValid() const;
 	quint32 GetCurrentId() const;
@@ -37,7 +37,7 @@ private Q_SLOTS:
 	void on_btnRemoveGroup_clicked();
 
 private:
-	Ui::WgtAudioGroup *ui;
+	Ui::WgtAudioCategory *ui;
 };
 
-#endif // WIDGETCOLOR_H
+#endif // WGTAUDIOCATEGORY_H

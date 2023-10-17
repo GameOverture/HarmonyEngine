@@ -142,7 +142,7 @@ enum HyAlignment
 
 enum HyPlayListMode
 {
-	// NOTE: Order matters, mode is saved as int
+	// NOTE: Order matters, mode is serialized as int
 	HYPLAYLIST_Shuffle = 0,
 	HYPLAYLIST_Weighted,
 	HYPLAYLIST_SequentialLocal,

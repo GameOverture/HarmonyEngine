@@ -20,17 +20,17 @@ HyFileAudio::HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, HyAudioC
 		HyJsonObj assetObj = assetsArray[i].GetObject();
 		std::string sSoundFilePath = m_sFILE_NAME + "/";
 		sSoundFilePath += assetObj["fileName"].GetString();
-		HySoundBuffers *pNewBuffer = HY_NEW HySoundBuffers(coreRef, sSoundFilePath, assetObj["groupId"].GetInt(), assetObj["isStreaming"].GetBool(), assetObj["instanceLimit"].GetInt());
+		HySoundAsset *pNewSndAsset = HY_NEW HySoundAsset(coreRef, sSoundFilePath, assetObj["groupId"].GetInt(), assetObj["isStreaming"].GetBool(), assetObj["instanceLimit"].GetInt());
 
-		m_SoundBuffers.push_back(pNewBuffer);
-		m_ChecksumMap[assetObj["checksum"].GetUint()] = pNewBuffer;
+		m_SoundAssetsList.push_back(pNewSndAsset);
+		m_ChecksumMap[assetObj["checksum"].GetUint()] = pNewSndAsset;
 	}
 }
 
 HyFileAudio::~HyFileAudio()
 {
-	for(uint32 i = 0; i < static_cast<uint32>(m_SoundBuffers.size()); ++i)
-		delete m_SoundBuffers[i];
+	for(uint32 i = 0; i < static_cast<uint32>(m_SoundAssetsList.size()); ++i)
+		delete m_SoundAssetsList[i];
 }
 
 bool HyFileAudio::ContainsAsset(uint32 uiAssetChecksum)
@@ -38,7 +38,7 @@ bool HyFileAudio::ContainsAsset(uint32 uiAssetChecksum)
 	return m_ChecksumMap.find(uiAssetChecksum) != m_ChecksumMap.end();
 }
 
-HySoundBuffers *HyFileAudio::GetSound(uint32 uiChecksum)
+HySoundAsset *HyFileAudio::GetSoundAsset(uint32 uiChecksum)
 {
 	auto iter = m_ChecksumMap.find(uiChecksum);
 	if(iter == m_ChecksumMap.end())
@@ -56,13 +56,13 @@ HySoundBuffers *HyFileAudio::GetSound(uint32 uiChecksum)
 {
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		for(uint32 i = 0; i < static_cast<uint32>(m_SoundBuffers.size()); ++i)
-			m_SoundBuffers[i]->Load();
+		for(uint32 i = 0; i < static_cast<uint32>(m_SoundAssetsList.size()); ++i)
+			m_SoundAssetsList[i]->Load();
 	}
 	else
 	{
-		for(uint32 i = 0; i < static_cast<uint32>(m_SoundBuffers.size()); ++i)
-			m_SoundBuffers[i]->Unload();
+		for(uint32 i = 0; i < static_cast<uint32>(m_SoundAssetsList.size()); ++i)
+			m_SoundAssetsList[i]->Unload();
 	}
 }
 
@@ -73,6 +73,6 @@ HySoundBuffers *HyFileAudio::GetSound(uint32 uiChecksum)
 /*virtual*/ std::string HyFileAudio::GetAssetInfo() /*override*/
 {
 	std::stringstream ss;
-	ss << "Bank " << m_sFILE_NAME << ", NumSounds: " << m_SoundBuffers.size();
+	ss << "Bank " << m_sFILE_NAME << ", NumSounds: " << m_SoundAssetsList.size();
 	return ss.str();
 }

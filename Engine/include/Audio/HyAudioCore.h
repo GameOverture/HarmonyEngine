@@ -45,20 +45,20 @@ class HyAudioCore
 
 	HyInput &										m_InputRef;
 
-	struct SoundGroup
+	struct SoundCategory
 	{
 		const std::string							m_sNAME;
 		const int32									m_iID;
 		ma_sound_group								m_Group;
 
-		SoundGroup(std::string sName, int32 iId) :
+		SoundCategory(std::string sName, int32 iId) :
 			m_sNAME(sName),
 			m_iID(iId)
 		{ }
 	};
-	std::vector<SoundGroup *>						m_GroupList;
+	std::vector<SoundCategory *>					m_CategoryList;
 	std::vector<HyFileAudio *>						m_BankList;
-	std::map<HyAudioHandle, HySoundBuffers *>		m_HotLoadMap;
+	std::map<HyAudioHandle, HySoundAsset *>			m_HotLoadMap;
 	uint32											m_uiHotLoadCount;
 
 	struct PlayInfo
@@ -68,7 +68,7 @@ class HyAudioCore
 		uint32										m_uiSoundChecksum = 0;
 		uint8										m_uiLoops = 0;
 
-		ma_sound *									m_pSound = nullptr;
+		HySoundBuff *								m_pSoundBuffer = nullptr;
 	};
 	std::unordered_map<HyAudioNodeHandle, PlayInfo>	m_PlayMap;
 
@@ -79,7 +79,7 @@ class HyAudioCore
 	ma_engine *										m_pEngine;
 
 	// Used in browser environments to queue up loads (and other settings) until user input occurs. Once input occurs we can initialize the audio device (then load all the sounds that are queued up)
-	std::vector<HySoundBuffers *>					m_DeferredLoadingList;
+	std::vector<HySoundAsset *>						m_DeferredLoadingList;
 	float											m_fDeferredGlobalVolume;
 
 public:
@@ -93,11 +93,11 @@ public:
 	const char *GetAudioDriver();
 
 	ma_engine *GetEngine();
-	ma_sound_group *GetGroup(int32 iId);
+	ma_sound_group *GetCategory(int32 iId);
 
 	void SetGlobalVolume(float fVolume);
 
-	void DeferLoading(HySoundBuffers *pBuffer);
+	void DeferLoading(HySoundAsset *pBuffer);
 
 	HyAudioHandle HotLoad(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit);
 	void HotUnload(HyAudioHandle hAudioHandle);
@@ -106,11 +106,11 @@ protected:
 	void Update();
 
 	void AddBank(HyFileAudio *pBankFile);
-	void AddGroup(std::string sName, int32 iId);
-	void GroupInit(SoundGroup *pSndGrp);
+	void AddCategory(std::string sName, int32 iId);
+	void CategoryInit(SoundCategory *pSndCategory);
 	void ProcessCue(IHyNode *pNode, HySoundCue eCueType);
 
-	void StartSound(PlayInfo &playInfoRef);
+	bool StartSound(PlayInfo &playInfoRef); // Returns false if there are no buffers available (instance limit)
 	void StopSound(PlayInfo &playInfoRef);
 	void PauseSound(PlayInfo &playInfoRef);
 	void UnpauseSound(PlayInfo &playInfoRef);

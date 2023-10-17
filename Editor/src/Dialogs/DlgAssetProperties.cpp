@@ -145,18 +145,18 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 		break; }
 
 	case ASSETMAN_Audio:
-		// Audio Group ////////////////////////////////////////////////////////////////////////////////////////////
-		int32 iGroupId = static_cast<SoundClip *>(m_SelectedAssets[0])->GetGroupId();
+		// Audio Category /////////////////////////////////////////////////////////////////////////////////////////
+		int32 iCategoryId = static_cast<SoundClip *>(m_SelectedAssets[0])->GetCategoryId();
 		bool bCheckable = false;
 		for(auto asset : m_SelectedAssets)
 		{
-			if(static_cast<SoundClip *>(asset)->GetGroupId() != iGroupId)
+			if(static_cast<SoundClip *>(asset)->GetCategoryId() != iCategoryId)
 			{
 				bCheckable = true;
 				break;
 			}
 		}
-		ui->audioGroup->Init(&static_cast<AudioManagerModel *>(pManagerModel)->GetGroupsModel(), iGroupId, bCheckable);
+		ui->audioCategory->Init(&static_cast<AudioManagerModel *>(pManagerModel)->GetCategoriesModel(), iCategoryId, bCheckable);
 
 		// Is Streaming ///////////////////////////////////////////////////////////////////////////////////////////
 		eCheckState = static_cast<SoundClip *>(m_SelectedAssets[0])->IsStreaming() ? Qt::Checked : Qt::Unchecked;
@@ -198,17 +198,21 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 		ui->chkIsCompressed->setCheckState(eCheckState);
 
 		// Use Instance Limit ///////////////////////////////////////////////////////////////////////////////////////////
-		int iInstLimit = static_cast<SoundClip *>(m_SelectedAssets[0])->GetInstanceLimit();
+		int iInstLimit = static_cast<SoundClip *>(m_SelectedAssets[0])->GetInstanceLimit(); // 0 == no limit; -1 == different settings among assets
 		for(auto asset : m_SelectedAssets)
 		{
 			if(static_cast<SoundClip *>(asset)->GetInstanceLimit() != iInstLimit)
 			{
-				ui->grpMaxInstances->setCheckable(true);
-				ui->grpMaxInstances->setChecked(false);
+				iInstLimit = -1;
 				break;
 			}
 		}
-		ui->sbInstanceLimit->setValue(iInstLimit);
+
+		ui->grpMaxInstances->setChecked(iInstLimit == 0 ? false : true);
+		if(iInstLimit == -1 || iInstLimit == 0)
+			ui->sbInstanceLimit->clear();
+		else
+			ui->sbInstanceLimit->setValue(iInstLimit);
 		break;
 	} // switch(eManagerType)
 
@@ -252,8 +256,8 @@ void DlgAssetProperties::ApplyChanges()
 		{
 			SoundClip *pAudio = static_cast<SoundClip *>(pAsset);
 
-			if(ui->audioGroup->IsValid() && ui->audioGroup->GetCurrentId() != pAudio->GetGroupId())
-				pAudio->SetGroupId(ui->audioGroup->GetCurrentId());
+			if(ui->audioCategory->IsValid() && ui->audioCategory->GetCurrentId() != pAudio->GetCategoryId())
+				pAudio->SetCategoryId(ui->audioCategory->GetCurrentId());
 
 			if(ui->chkIsStreaming->checkState() != Qt::PartiallyChecked)
 				pAudio->SetIsStreaming(ui->chkIsStreaming->checkState() == Qt::Checked);
@@ -268,8 +272,16 @@ void DlgAssetProperties::ApplyChanges()
 					pAudio->SetVbrQuality(ui->sbVbrQuality->value());
 			}
 
-			if(ui->grpMaxInstances->isCheckable() == false || ui->grpMaxInstances->isChecked())
-				pAudio->SetInstanceLimit(ui->sbInstanceLimit->value());
+			// TODO: Add instance action
+			if(ui->sbInstanceLimit->text().isEmpty() == false)
+			{
+				if(ui->grpMaxInstances->isChecked())
+					pAudio->SetInstanceLimit(ui->sbInstanceLimit->value());
+				else
+					pAudio->SetInstanceLimit(0);
+			}
+			else
+				pAudio->SetInstanceLimit(0);
 		}
 		break;
 	}
@@ -420,7 +432,7 @@ bool DlgAssetProperties::DetermineChangedAssets()
 		{
 			SoundClip *pAudio = static_cast<SoundClip *>(pAsset);
 
-			if(ui->audioGroup->IsValid() && pAudio->GetGroupId() != ui->audioGroup->GetCurrentId())
+			if(ui->audioCategory->IsValid() && pAudio->GetCategoryId() != ui->audioCategory->GetCurrentId())
 			{
 				m_ChangedAssets.append(pAsset);
 				continue;
@@ -448,13 +460,15 @@ bool DlgAssetProperties::DetermineChangedAssets()
 				continue;
 			}
 
-			if(ui->grpMaxInstances->isCheckable() == false || ui->grpMaxInstances->isChecked())
+			if(ui->grpMaxInstances->isChecked() == false && pAudio->GetInstanceLimit() != 0)
 			{
-				if(pAudio->GetInstanceLimit() != ui->sbInstanceLimit->value())
-				{
-					m_ChangedAssets.append(pAsset);
-					continue;
-				}
+				m_ChangedAssets.append(pAsset);
+				continue;
+			}
+			else if(ui->grpMaxInstances->isChecked() && ui->sbInstanceLimit->value() != pAudio->GetInstanceLimit())
+			{
+				m_ChangedAssets.append(pAsset);
+				continue;
 			}
 		}
 		break;

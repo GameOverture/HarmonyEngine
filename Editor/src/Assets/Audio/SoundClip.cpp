@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "SoundClip.h"
-#include "IManagerModel.h"
+#include "AudioManagerModel.h"
 #include "_Dependencies/scriptum/imagepacker.h"
 
 SoundClip::SoundClip(IManagerModel &modelRef,
@@ -27,7 +27,7 @@ SoundClip::SoundClip(IManagerModel &modelRef,
 					   uint uiErrors) :
 	IAssetItemData(modelRef, ITEM_SoundClip, uuid, uiChecksum, uiBankId, sName, ".wav", uiErrors),
 	m_WaveHeader(wavHeaderRef),
-	m_iGroupId(iGroupId),
+	m_iCategoryId(iGroupId),
 	m_bIsStreaming(bIsStreaming),
 	m_bExportMono(bExportMono),
 	m_iInstanceLimit(iInstanceLimit),
@@ -40,9 +40,9 @@ SoundClip::~SoundClip()
 {
 }
 
-int32 SoundClip::GetGroupId() const
+int32 SoundClip::GetCategoryId() const
 {
-	return m_iGroupId;
+	return m_iCategoryId;
 }
 
 bool SoundClip::IsStreaming() const
@@ -70,9 +70,9 @@ double SoundClip::GetVbrQuality() const
 	return m_dVbrQuality;
 }
 
-void SoundClip::SetGroupId(int32 iGroupId)
+void SoundClip::SetCategoryId(int32 iCategoryId)
 {
-	m_iGroupId = iGroupId;
+	m_iCategoryId = iCategoryId;
 }
 
 void SoundClip::SetIsStreaming(bool bIsStreaming)
@@ -126,7 +126,7 @@ void SoundClip::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader 
 /*virtual*/ QString SoundClip::GetPropertyInfo() /*override*/
 {
 	QString sInfo;
-	sInfo = "Grp: " % QString::number(m_iGroupId);
+	sInfo = static_cast<AudioManagerModel &>(m_ModelRef).GetCategoryName(m_iCategoryId);
 	if(m_bIsStreaming)
 	{
 		if(sInfo.isEmpty() == false)
@@ -168,7 +168,7 @@ void SoundClip::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader 
 	wavHeaderObj.insert("dataSize", QJsonValue(static_cast<qint64>(m_WaveHeader.Subchunk2Size)));
 
 	frameObj.insert("wavHeader", wavHeaderObj);
-	frameObj.insert("groupId", m_iGroupId);
+	frameObj.insert("groupId", m_iCategoryId); // TODO: File Patcher - Rename Group -> Category
 	frameObj.insert("isStreaming", m_bIsStreaming);
 	frameObj.insert("isExportMono", m_bExportMono);
 	frameObj.insert("instanceLimit", m_iInstanceLimit);

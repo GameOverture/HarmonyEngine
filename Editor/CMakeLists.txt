@@ -253,9 +253,9 @@ if(Qt5_DIR)
 		src/Widget/Auxiliary/AuxToolBox.cpp
 		src/Widget/Auxiliary/AuxToolBox.h
 		src/Widget/Auxiliary/AuxToolBox.ui
-		src/Widget/WgtAudioGroup.cpp
-		src/Widget/WgtAudioGroup.h
-		src/Widget/WgtAudioGroup.ui
+		src/Widget/WgtAudioCategory.cpp
+		src/Widget/WgtAudioCategory.h
+		src/Widget/WgtAudioCategory.ui
 		src/Widget/WgtMakeRelDir.cpp
 		src/Widget/WgtMakeRelDir.h
 		src/Widget/WgtMakeRelDir.ui

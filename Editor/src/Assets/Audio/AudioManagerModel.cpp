@@ -19,63 +19,63 @@
 #include <QAudioDeviceInfo>
 #include <QMimeData>
 
-AudioGroupsModel::AudioGroupsModel()
+AudioCategoriesModel::AudioCategoriesModel()
 {
 }
 
-/*virtual*/ AudioGroupsModel::~AudioGroupsModel()
+/*virtual*/ AudioCategoriesModel::~AudioCategoriesModel()
 {
 }
 
-void AudioGroupsModel::AddGroup(QString sName, quint32 uiId)
+void AudioCategoriesModel::AddCategory(QString sName, quint32 uiId)
 {
-	m_GroupList.push_back(QPair<QString, quint32>(sName, uiId));
+	m_CategoryList.push_back(QPair<QString, quint32>(sName, uiId));
 }
 
-QString AudioGroupsModel::GetName(uint uiIndex) const
+QString AudioCategoriesModel::GetName(uint uiIndex) const
 {
-	return m_GroupList[uiIndex].first;
+	return m_CategoryList[uiIndex].first;
 }
 
-quint32 AudioGroupsModel::GetId(uint uiIndex) const
+quint32 AudioCategoriesModel::GetId(uint uiIndex) const
 {
-	return m_GroupList[uiIndex].second;
+	return m_CategoryList[uiIndex].second;
 }
 
-int AudioGroupsModel::GetIndex(quint32 uiId) const
+int AudioCategoriesModel::GetIndex(quint32 uiId) const
 {
-	for(int i = 0; i < m_GroupList.size(); ++i)
+	for(int i = 0; i < m_CategoryList.size(); ++i)
 	{
-		if(uiId == m_GroupList[i].second)
+		if(uiId == m_CategoryList[i].second)
 			return i;
 	}
 	return -1;
 }
 
-/*virtual*/ int AudioGroupsModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
+/*virtual*/ int AudioCategoriesModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
-	return m_GroupList.size();
+	return m_CategoryList.size();
 }
 
-/*virtual*/ QVariant AudioGroupsModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant AudioCategoriesModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
 {
 	if(role == Qt::TextAlignmentRole)
 		return Qt::AlignLeft;
 
 	if(role == Qt::DisplayRole || role == Qt::EditRole)
-		return QString::number(index.row()) % " - " % m_GroupList[index.row()].first;
+		return QString::number(index.row()) % " - " % m_CategoryList[index.row()].first;
 
 	return QVariant();
 }
 
-/*virtual*/ QVariant AudioGroupsModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
+/*virtual*/ QVariant AudioCategoriesModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
 {
 	return QVariant();
 }
 
 AudioManagerModel::AudioManagerModel(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Audio),
-	m_uiNextGroupId(2) // Defaults are SFX:0, Music:1
+	m_uiNextCategoryId(2) // Defaults are SFX:0, Music:1
 {
 	m_DesiredRawFormat.setChannelCount(2);
 	m_DesiredRawFormat.setCodec("audio/wav"); // also consider "audio/x-raw" or "audio/pcm"
@@ -88,9 +88,9 @@ AudioManagerModel::AudioManagerModel(Project &projRef) :
 {
 }
 
-AudioGroupsModel &AudioManagerModel::GetGroupsModel()
+AudioCategoriesModel &AudioManagerModel::GetCategoriesModel()
 {
-	return m_AudioGroupsModel;
+	return m_AudioCategoriesModel;
 }
 
 bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
@@ -146,14 +146,19 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 {
 }
 
-int AudioManagerModel::GetGroupIndexFromGroupId(quint32 uiGroupId) const
+int AudioManagerModel::GetCategoryIndexFromCategoryId(quint32 uiCategoryId) const
 {
-	return m_AudioGroupsModel.GetIndex(uiGroupId);
+	return m_AudioCategoriesModel.GetIndex(uiCategoryId);
 }
 
-quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
+quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiCategoryIndex) const
 {
-	return m_AudioGroupsModel.GetId(uiGroupIndex);
+	return m_AudioCategoriesModel.GetId(uiCategoryIndex);
+}
+
+QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
+{
+	return m_AudioCategoriesModel.GetName(m_AudioCategoriesModel.GetIndex(uiCategoryId));
 }
 
 /*virtual*/ void AudioManagerModel::OnInit() /*override*/
@@ -163,7 +168,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	if(runtimeFile.exists() == false)
 		SaveRuntime();
 
-	// Initialize audio groups
+	// Initialize audio categories
 	if(runtimeFile.exists() == false)
 		HyGuiLog("audio runtime file doesn't exist!", LOGTYPE_Error);
 	if(!runtimeFile.open(QIODevice::ReadOnly))
@@ -173,20 +178,21 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	runtimeFile.close();
 
 	QJsonObject runtimeObj = runtimeDoc.object();
-	QJsonArray groupArray = runtimeObj["groups"].toArray();
+	QJsonArray groupArray = runtimeObj["groups"].toArray(); // TODO: File Patcher - Rename Group -> Category
 	if(groupArray.empty())
 	{
-		// Add default groups
-		m_AudioGroupsModel.AddGroup("SFX", 0);
-		m_AudioGroupsModel.AddGroup("Music", 1);
+		// Add default categories
+		m_AudioCategoriesModel.AddCategory("SFX", 0);
+		m_AudioCategoriesModel.AddCategory("Music", 1);
 	}
 	else
 	{
-		// Parse saved groups
+		// Parse saved categories
 		for(int i = 0; i < groupArray.size(); ++i)
 		{
 			QJsonObject groupObj = groupArray[i].toObject();
-			m_AudioGroupsModel.AddGroup(groupObj["groupName"].toString(), groupObj["groupId"].toInt());
+			// TODO: File Patcher - Rename Group -> Category
+			m_AudioCategoriesModel.AddCategory(groupObj["groupName"].toString(), groupObj["groupId"].toInt());
 		}
 	}
 
@@ -205,7 +211,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	settingsFile.close();
 
 	QJsonObject settingsObj = settingsDoc.object();
-	m_uiNextGroupId = JSONOBJ_TOINT(settingsObj, "nextGroupId");
+	m_uiNextCategoryId = JSONOBJ_TOINT(settingsObj, "nextGroupId"); // TODO: File Patcher - Rename Group -> Category
 }
 
 /*virtual*/ void AudioManagerModel::OnCreateNewBank(QJsonObject &newMetaBankObjRef) /*override*/
@@ -221,7 +227,7 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 										   JSONOBJ_TOINT(metaObj, "bankId"),
 										   metaObj["name"].toString(),
 										   wavHeader,
-										   metaObj["groupId"].toInt(),
+										   metaObj["groupId"].toInt(), // TODO: File Patcher - Rename Group -> Category
 										   metaObj["isStreaming"].toBool(),
 										   metaObj["isExportMono"].toBool(),
 										   metaObj["instanceLimit"].toInt(),
@@ -351,7 +357,8 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 
 /*virtual*/ void AudioManagerModel::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
 {
-	metaObjRef.insert("nextGroupId", static_cast<qint64>(m_uiNextGroupId));
+	// TODO: File Patcher - Rename Group -> Category
+	metaObjRef.insert("nextGroupId", static_cast<qint64>(m_uiNextCategoryId));
 }
 
 /*virtual*/ QJsonObject AudioManagerModel::GetSaveJson() /*override*/
@@ -370,7 +377,8 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 			QJsonObject assetObj;
 			assetObj.insert("checksum", QJsonValue(static_cast<qint64>(bankAssetListRef[i]->GetChecksum())));
 			assetObj.insert("fileName", static_cast<SoundClip *>(bankAssetListRef[i])->ConstructDataFileName(true));
-			assetObj.insert("groupId", static_cast<SoundClip *>(bankAssetListRef[i])->GetGroupId());
+			// TODO: File Patcher - Rename Group -> Category
+			assetObj.insert("groupId", static_cast<SoundClip *>(bankAssetListRef[i])->GetCategoryId());
 			assetObj.insert("isStreaming", static_cast<SoundClip *>(bankAssetListRef[i])->IsStreaming());
 			assetObj.insert("instanceLimit", static_cast<SoundClip *>(bankAssetListRef[i])->GetInstanceLimit());
 
@@ -382,11 +390,12 @@ quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiGroupIndex) const
 	}
 
 	QJsonArray groupArray;
-	for(int i = 0; i < m_AudioGroupsModel.rowCount(); ++i)
+	for(int i = 0; i < m_AudioCategoriesModel.rowCount(); ++i)
 	{
 		QJsonObject groupObj;
-		groupObj.insert("groupName", m_AudioGroupsModel.GetName(i));
-		groupObj.insert("groupId", static_cast<qint64>(m_AudioGroupsModel.GetId(i)));
+		// TODO: File Patcher - Rename Group -> Category
+		groupObj.insert("groupName", m_AudioCategoriesModel.GetName(i));
+		groupObj.insert("groupId", static_cast<qint64>(m_AudioCategoriesModel.GetId(i)));
 
 		groupArray.append(groupObj);
 	}

@@ -16,17 +16,17 @@
 #include <QAudioFormat>
 #include <QSoundEffect>
 
-class AudioGroupsModel : public QAbstractListModel
+class AudioCategoriesModel : public QAbstractListModel
 {
 	Q_OBJECT
 
-	QList<QPair<QString, quint32>>			m_GroupList;			// QPair<Name, ID>
+	QList<QPair<QString, quint32>>			m_CategoryList;			// QPair<Name, ID>
 
 public:
-	AudioGroupsModel();
-	virtual ~AudioGroupsModel();
+	AudioCategoriesModel();
+	virtual ~AudioCategoriesModel();
 
-	void AddGroup(QString sName, quint32 uiId);
+	void AddCategory(QString sName, quint32 uiId);
 
 	QString GetName(uint uiIndex) const;
 	quint32 GetId(uint uiIndex) const;
@@ -44,14 +44,14 @@ class AudioManagerModel : public IManagerModel
 	friend class AudioImportThread;
 
 	QAudioFormat							m_DesiredRawFormat;
-	AudioGroupsModel						m_AudioGroupsModel;
-	quint32									m_uiNextGroupId;
+	AudioCategoriesModel					m_AudioCategoriesModel;
+	quint32									m_uiNextCategoryId;
 
 public:
 	AudioManagerModel(Project &projRef);
 	virtual ~AudioManagerModel();
 
-	AudioGroupsModel &GetGroupsModel();
+	AudioCategoriesModel &GetCategoriesModel();
 
 	bool IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut);
 	
@@ -61,8 +61,9 @@ public:
 
 	virtual void UpdateInspectorScene(const QList<IAssetItemData *> &selectedAssetsList) override;
 
-	int GetGroupIndexFromGroupId(quint32 uiGroupId) const;
-	quint32 GetGroupIdFromGroupIndex(uint uiGroupIndex) const;
+	int GetCategoryIndexFromCategoryId(quint32 uiCategoryId) const;
+	quint32 GetGroupIdFromGroupIndex(uint uiCategoryIndex) const;
+	QString GetCategoryName(quint32 uiCategoryId) const;
 
 protected:
 	virtual void OnInit() override;

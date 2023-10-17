@@ -309,13 +309,18 @@ void ManagerWidget::RefreshInfo()
 	else
 	{
 		ui->cmbBanks->setEnabled(true);
-		uint uiBankIndex = ui->cmbBanks->currentIndex();
+		int iBankIndex = ui->cmbBanks->currentIndex();
+		if(iBankIndex < 0)
+		{
+			HyGuiLog("ManagerWidget::RefreshInfo() - No bank selected", LOGTYPE_Error);
+			iBankIndex = 0;
+		}
 
-		ui->lblBankInfo->setText(m_pModel->OnBankInfo(uiBankIndex));
-		ui->actionRemoveBank->setEnabled(uiBankIndex != 0);
+		ui->lblBankInfo->setText(m_pModel->OnBankInfo(iBankIndex));
+		ui->actionRemoveBank->setEnabled(iBankIndex != 0);
 		ui->actionBankSettings->setEnabled(true);
 
-		static_cast<ManagerProxyModel *>(ui->assetTree->model())->FilterByBankIndex(uiBankIndex);
+		static_cast<ManagerProxyModel *>(ui->assetTree->model())->FilterByBankIndex(iBankIndex);
 	}
 }
 

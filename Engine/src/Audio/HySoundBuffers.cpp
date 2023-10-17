@@ -11,53 +11,53 @@
 #include "Audio/HySoundBuffers.h"
 #include "Audio/HyAudioCore.h"
 
-HySoundBuffers::HySoundBuffers(HyAudioCore &coreRef, std::string sFilePath, int32 iGroupId, bool bIsStreaming, int32 iInstanceLimit) :
+HySoundAsset::HySoundAsset(HyAudioCore &coreRef, std::string sFilePath, int32 iCategoryId, bool bIsStreaming, int32 iInstanceLimit) :
 	m_CoreRef(coreRef),
 	m_sFILE_PATH(sFilePath),
-	m_iGROUP_ID(iGroupId),
+	m_iCATEGORY_ID(iCategoryId),
 	m_bIS_STREAMING(bIsStreaming),
 	m_iINSTANCE_LIMIT(iInstanceLimit)
 {
 	HyAssert(m_iINSTANCE_LIMIT >= 0, "Invalid instance limit in HySoundBuffers");
 	if(m_iINSTANCE_LIMIT == 0)
-		m_SoundList.push_back(HY_NEW ma_sound());
+		m_SoundBufferList.emplace_back();
 	else
 	{
-		m_SoundList.resize(m_iINSTANCE_LIMIT);
-		for(int i = 0; i < m_SoundList.size(); ++i)
-			m_SoundList[i] = HY_NEW ma_sound();
+		m_SoundBufferList.resize(m_iINSTANCE_LIMIT);
+		//for(int i = 0; i < m_SoundBufferList.size(); ++i)
+		//	m_SoundBufferList[i] = HY_NEW ma_sound();
 	}
 }
 
-HySoundBuffers::~HySoundBuffers()
+HySoundAsset::~HySoundAsset()
 {
 	//Unload();
 
-	for(int i = 0; i < m_SoundList.size(); ++i)
-		delete m_SoundList[i];
+	//for(int i = 0; i < m_SoundList.size(); ++i)
+	//	delete m_SoundList[i];
 }
 
-std::string HySoundBuffers::GetFilePath() const
+std::string HySoundAsset::GetFilePath() const
 {
 	return m_sFILE_PATH;
 }
 
-int32 HySoundBuffers::GetGroupId() const
+int32 HySoundAsset::GetCategoryId() const
 {
-	return m_iGROUP_ID;
+	return m_iCATEGORY_ID;
 }
 
-bool HySoundBuffers::IsStreaming() const
+bool HySoundAsset::IsStreaming() const
 {
 	return m_bIS_STREAMING;
 }
 
-int32 HySoundBuffers::GetInstanceLimit() const
+int32 HySoundAsset::GetInstanceLimit() const
 {
 	return m_iINSTANCE_LIMIT;
 }
 
-bool HySoundBuffers::Load()
+bool HySoundAsset::Load()
 {
 #ifdef HY_PLATFORM_BROWSER
 	if(m_CoreRef.GetEngine() == nullptr)
@@ -69,16 +69,16 @@ bool HySoundBuffers::Load()
 
 	// TODO: Specify in Editor whether a sound supports pitching, and use 'MA_SOUND_FLAG_NO_PITCH' if not
 	ma_uint32 uiFlags = m_bIS_STREAMING ? MA_SOUND_FLAG_STREAM : 0;
-	ma_sound_group *pGroup = m_CoreRef.GetGroup(GetGroupId());
+	ma_sound_group *pGroup = m_CoreRef.GetCategory(GetCategoryId());
 
-	for(uint32 i = 0; i < static_cast<uint32>(m_SoundList.size()); ++i)
+	for(uint32 i = 0; i < static_cast<uint32>(m_SoundBufferList.size()); ++i)
 	{
 		ma_result eResult = ma_sound_init_from_file(m_CoreRef.GetEngine(),
 			m_sFILE_PATH.c_str(),
 			uiFlags,
 			pGroup,
 			nullptr,
-			m_SoundList[i]);
+			m_SoundBufferList[i].m_pSound);
 
 		if(eResult != MA_SUCCESS)
 		{
@@ -90,51 +90,46 @@ bool HySoundBuffers::Load()
 	return true;
 }
 
-void HySoundBuffers::Unload()
+void HySoundAsset::Unload()
 {
-	for(uint32 i = 0; i < static_cast<uint32>(m_SoundList.size()); ++i)
-		ma_sound_uninit(m_SoundList[i]);
-}
-
-ma_sound *HySoundBuffers::GetFreshBuffer()
-{
-	while(true)
+	for(uint32 i = 0; i < static_cast<uint32>(m_SoundBufferList.size()); ++i)
 	{
-		for(int32 i = 0; i < static_cast<int32>(m_SoundList.size()); ++i)
-		{
-			if(ma_sound_is_playing(m_SoundList[i]) == false)
-				return m_SoundList[i];
-		}
-
-		if(m_iINSTANCE_LIMIT == 0) // Allows dynamic resizing
-			AppendBuffer();
-		else
-			return nullptr; // No available buffer
+		ma_sound_uninit(m_SoundBufferList[i].m_pSound);
+		m_SoundBufferList[i].m_bInUse = false;
 	}
 }
 
-void HySoundBuffers::AppendBuffer()
+HySoundBuff *HySoundAsset::GetFreshBuffer()
 {
-	m_SoundList.push_back(HY_NEW ma_sound());
+	while(true)
+	{
+		for(int32 i = 0; i < static_cast<int32>(m_SoundBufferList.size()); ++i)
+		{
+			if(m_SoundBufferList[i].m_bInUse == false)
+				return &m_SoundBufferList[i];
+		}
 
-	ma_uint32 uiFlags = m_bIS_STREAMING ? MA_SOUND_FLAG_STREAM : 0;
-	uiFlags |= MA_SOUND_FLAG_ASYNC;
+		if(m_iINSTANCE_LIMIT == 0) // Allows dynamic resizing
+		{
+			m_SoundBufferList.emplace_back();
 
-	ma_sound_group *pGroup = m_CoreRef.GetGroup(GetGroupId());
+			ma_uint32 uiFlags = m_bIS_STREAMING ? MA_SOUND_FLAG_STREAM : 0;
+			uiFlags |= MA_SOUND_FLAG_ASYNC;
 
-	//ma_result eResult = ma_sound_init_copy(m_CoreRef.GetEngine(),
-	//	&m_SoundList[0],
-	//	uiFlags,
-	//	pGroup,
-	//	&m_SoundList[m_SoundList.size() - 1]);
+			ma_sound_group *pGroup = m_CoreRef.GetCategory(GetCategoryId());
 
-	ma_result eResult = ma_sound_init_from_file(m_CoreRef.GetEngine(),
-		m_sFILE_PATH.c_str(),
-		uiFlags,
-		pGroup,
-		nullptr,
-		m_SoundList.back());
+			// Cannot use 'ma_sound_init_copy' because it doesn't support 'MA_SOUND_FLAG_STREAM'
+			ma_result eResult = ma_sound_init_from_file(m_CoreRef.GetEngine(),
+				m_sFILE_PATH.c_str(),
+				uiFlags,
+				pGroup,
+				nullptr,
+				m_SoundBufferList.back().m_pSound);
 
-	if(eResult != MA_SUCCESS)
-		HyLogError("AppendBuffer() - ma_sound_init_from_file failed: " << eResult);
+			if(eResult != MA_SUCCESS)
+				HyLogError("AppendBuffer() - ma_sound_init_from_file failed: " << eResult);
+		}
+		else
+			return nullptr; // No available buffer
+	}
 }

@@ -65,24 +65,24 @@ class SoundClip : public IAssetItemData
 
 	WaveHeader		m_WaveHeader;
 
-	int32			m_iGroupId;
+	int32			m_iCategoryId;
 	bool			m_bIsStreaming;
 	bool			m_bExportMono;
 	bool			m_bCompressed;
 	double			m_dVbrQuality;
-	int32			m_iInstanceLimit;
+	int32			m_iInstanceLimit; // 0 == no limit
 
 public:
 	SoundClip(IManagerModel &modelRef, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, int32 iGroupId, bool bIsStreaming, bool bExportMono, int32 iInstanceLimit, bool bCompressed, double dVbrQuality, uint uiErrors);
 	~SoundClip();
 
-	int32 GetGroupId() const;
+	int32 GetCategoryId() const;
 	bool IsStreaming() const;
 	bool IsExportMono() const;
 	int32 GetInstanceLimit() const;
 	bool IsCompressed() const;
 	double GetVbrQuality() const;
-	void SetGroupId(int32 iGroupId);
+	void SetCategoryId(int32 iCategoryId);
 	void SetIsStreaming(bool bIsStreaming);
 	void SetIsExportMono(bool bIsExportMono);
 	void SetInstanceLimit(int32 iInstanceLimit);

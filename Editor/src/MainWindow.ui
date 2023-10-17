@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>671</width>
+    <width>668</width>
     <height>560</height>
    </rect>
   </property>
@@ -55,7 +55,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>671</width>
+     <width>668</width>
      <height>21</height>
     </rect>
    </property>
@@ -275,7 +275,7 @@
         <enum>QTabWidget::South</enum>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tabOutputLog">
         <attribute name="title">
@@ -304,7 +304,7 @@
        </widget>
        <widget class="QWidget" name="tabPreview">
         <attribute name="title">
-         <string>Preview</string>
+         <string>Asset Preview</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <property name="spacing">

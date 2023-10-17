@@ -36,8 +36,8 @@ HyAudioCore::HyAudioCore(HyInput &inputRef) :
 
 /*virtual*/ HyAudioCore::~HyAudioCore(void)
 {
-	for(auto *pGrp : m_GroupList)
-		delete pGrp;
+	for(auto *pCategory : m_CategoryList)
+		delete pCategory;
 
 	ma_engine_uninit(m_pEngine);
 	delete m_pEngine;
@@ -152,12 +152,12 @@ ma_engine *HyAudioCore::GetEngine()
 	return m_pEngine;
 }
 
-ma_sound_group *HyAudioCore::GetGroup(int32 iId)
+ma_sound_group *HyAudioCore::GetCategory(int32 iId)
 {
-	for(auto *pGrp : m_GroupList)
+	for(auto *pCategory : m_CategoryList)
 	{
-		if(pGrp->m_iID == iId)
-			return &pGrp->m_Group;
+		if(pCategory->m_iID == iId)
+			return &pCategory->m_Group;
 	}
 
 	return nullptr;
@@ -177,7 +177,7 @@ void HyAudioCore::SetGlobalVolume(float fVolume)
 }
 
 #ifdef HY_PLATFORM_BROWSER
-void HyAudioCore::DeferLoading(HySoundBuffers *pBuffer)
+void HyAudioCore::DeferLoading(HySoundAsset *pBuffer)
 {
 	m_DeferredLoadingList.push_back(pBuffer);
 }
@@ -185,11 +185,11 @@ void HyAudioCore::DeferLoading(HySoundBuffers *pBuffer)
 
 HyAudioHandle HyAudioCore::HotLoad(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit)
 {
-	HySoundBuffers *pNewSndBuffer = HY_NEW HySoundBuffers(*this, sFilePath, 0, bIsStreaming, iInstanceLimit);
-	pNewSndBuffer->Load();
+	HySoundAsset *pNewSndAsset = HY_NEW HySoundAsset(*this, sFilePath, 0, bIsStreaming, iInstanceLimit);
+	pNewSndAsset->Load();
 	
 	m_uiHotLoadCount++;
-	m_HotLoadMap.insert({ static_cast<HyAudioHandle>(m_uiHotLoadCount), pNewSndBuffer });
+	m_HotLoadMap.insert({ static_cast<HyAudioHandle>(m_uiHotLoadCount), pNewSndAsset });
 	
 	return static_cast<HyAudioHandle>(m_uiHotLoadCount);
 }
@@ -228,12 +228,12 @@ void HyAudioCore::Update()
 	for(auto iter = m_PlayMap.begin(); iter != m_PlayMap.end(); )
 	{
 		PlayInfo &playInfoRef = iter->second;
-		if(ma_sound_at_end(playInfoRef.m_pSound))
+		if(ma_sound_at_end(playInfoRef.m_pSoundBuffer->m_pSound))
 		{
 			if(playInfoRef.m_uiLoops > 0)
 			{
-				ma_sound_seek_to_pcm_frame(playInfoRef.m_pSound, 0); // Rewind sound to beginning
-				ma_result eResult = ma_sound_start(playInfoRef.m_pSound);
+				//ma_sound_seek_to_pcm_frame(playInfoRef.m_pSound, 0); // Rewind sound to beginning
+				ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer->m_pSound);
 				if(eResult != MA_SUCCESS)
 				{
 					HyLogError("ma_sound_seek_to_pcm_frame failed: " << eResult);
@@ -245,6 +245,7 @@ void HyAudioCore::Update()
 			}
 			else
 			{
+				playInfoRef.m_pSoundBuffer->m_bInUse = false;
 				iter = m_PlayMap.erase(iter);
 				continue;
 			}
@@ -259,18 +260,18 @@ void HyAudioCore::AddBank(HyFileAudio *pBankFile)
 	m_BankList.push_back(pBankFile);
 }
 
-void HyAudioCore::AddGroup(std::string sName, int32 iId)
+void HyAudioCore::AddCategory(std::string sName, int32 iId)
 {
-	SoundGroup *pSndGrp = HY_NEW SoundGroup(sName, iId);
-	m_GroupList.push_back(pSndGrp);
+	SoundCategory *pSndCategory = HY_NEW SoundCategory(sName, iId);
+	m_CategoryList.push_back(pSndCategory);
 	
 	if(m_pEngine)
-		GroupInit(pSndGrp);
+		CategoryInit(pSndCategory);
 }
 
-void HyAudioCore::GroupInit(SoundGroup *pSndGrp)
+void HyAudioCore::CategoryInit(SoundCategory *pSndCategory)
 {
-	ma_result eResult = ma_sound_group_init(m_pEngine, 0, nullptr, &pSndGrp->m_Group);
+	ma_result eResult = ma_sound_group_init(m_pEngine, 0, nullptr, &pSndCategory->m_Group);
 	if(eResult != MA_SUCCESS)
 		HyLogError("HyAudioCore::AddGroup failed: " << eResult);
 }
@@ -308,9 +309,10 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 
 	case HYSOUNDCUE_Start: {
 		PlayInfo *pPlayInfo = nullptr;
+		HyAudioNodeHandle hHandle = HY_UNUSED_HANDLE;
 		if(pNode->Is2D())
 		{
-			HyAudioNodeHandle hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
+			hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
 			if(m_PlayMap.count(hHandle) == 0)
 				m_PlayMap[hHandle] = PlayInfo();
 			pPlayInfo = &m_PlayMap[hHandle];
@@ -322,7 +324,7 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 		}
 		else
 		{
-			HyAudioNodeHandle hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
+			hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
 			if(m_PlayMap.count(hHandle) == 0)
 				m_PlayMap[hHandle] = PlayInfo();
 			pPlayInfo = &m_PlayMap[hHandle];
@@ -333,7 +335,8 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 			pPlayInfo->m_uiLoops = static_cast<HyAudio3d *>(pNode)->GetLoops();
 		}
 
-		StartSound(*pPlayInfo);
+		if(StartSound(*pPlayInfo) == false)
+			m_PlayMap.erase(hHandle);
 		break; }
 
 	case HYSOUNDCUE_Stop:
@@ -391,7 +394,7 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 
 		if(m_PlayMap.find(hHandle) != m_PlayMap.end())
 		{
-			StopSound(m_PlayMap[hHandle]);
+			m_PlayMap[hHandle].m_pSoundBuffer->m_bInUse = false;
 			m_PlayMap.erase(hHandle);
 		}
 		break; }
@@ -402,13 +405,13 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 	}
 }
 
-void HyAudioCore::StartSound(PlayInfo &playInfoRef)
+bool HyAudioCore::StartSound(PlayInfo &playInfoRef)
 {
 	// Determine the sound buffer
-	HySoundBuffers *pBuffer = nullptr;
+	HySoundAsset *pBuffer = nullptr;
 	for(auto *pBank : m_BankList)
 	{
-		pBuffer = static_cast<HySoundBuffers *>(pBank->GetSound(playInfoRef.m_uiSoundChecksum));
+		pBuffer = static_cast<HySoundAsset *>(pBank->GetSoundAsset(playInfoRef.m_uiSoundChecksum));
 		if(pBuffer)
 			break;
 	}
@@ -427,34 +430,38 @@ void HyAudioCore::StartSound(PlayInfo &playInfoRef)
 		if(pBuffer == nullptr)
 		{
 			HyLogWarning("HyAudioCore::StartPlay() Could not find audio: " << playInfoRef.m_uiSoundChecksum);
-			return;
+			return false;
 		}
 	}
 
-	playInfoRef.m_pSound = pBuffer->GetFreshBuffer();
-	if(playInfoRef.m_pSound)
+	playInfoRef.m_pSoundBuffer = pBuffer->GetFreshBuffer();
+	if(playInfoRef.m_pSoundBuffer)
 	{
-		ma_result eResult = ma_sound_start(playInfoRef.m_pSound);
+		playInfoRef.m_pSoundBuffer->m_bInUse = true;
+
+		ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer->m_pSound);
 		if(eResult != MA_SUCCESS)
 			HyLogError("ma_sound_start failed: " << eResult);
+
+		return true;
 	}
 	else
 	{
-		HyLogWarning("No available audio instance for: " << pBuffer->GetFilePath());
-		return;
+		HyLog("No available audio instance for: " << pBuffer->GetFilePath());
+		return false;
 	}
 }
 
 void HyAudioCore::StopSound(PlayInfo &playInfoRef)
 {
-	ma_result eResult = ma_sound_stop(playInfoRef.m_pSound);
+	ma_result eResult = ma_sound_stop(playInfoRef.m_pSoundBuffer->m_pSound);
 	if(eResult != MA_SUCCESS)
 	{
 		HyLogError("ma_sound_stop failed: " << eResult);
 		return;
 	}
 
-	eResult = ma_sound_seek_to_pcm_frame(playInfoRef.m_pSound, 0); // Rewind sound to beginning
+	eResult = ma_sound_seek_to_pcm_frame(playInfoRef.m_pSoundBuffer->m_pSound, 0); // Rewind sound to beginning
 	if(eResult != MA_SUCCESS)
 	{
 		HyLogError("ma_sound_seek_to_pcm_frame failed: " << eResult);
@@ -464,22 +471,22 @@ void HyAudioCore::StopSound(PlayInfo &playInfoRef)
 
 void HyAudioCore::PauseSound(PlayInfo &playInfoRef)
 {
-	ma_result eResult = ma_sound_stop(playInfoRef.m_pSound); // When a sound is ma_sound_stop()'ed, it is not rewound to the start
+	ma_result eResult = ma_sound_stop(playInfoRef.m_pSoundBuffer->m_pSound); // When a sound is ma_sound_stop()'ed, it is not rewound to the start
 	if(eResult != MA_SUCCESS)
 		HyLogError("ma_sound_stop failed: " << eResult);
 }
 
 void HyAudioCore::UnpauseSound(PlayInfo &playInfoRef)
 {
-	ma_result eResult = ma_sound_start(playInfoRef.m_pSound); // When a sound is ma_sound_start()'ed, it is played from its current position
+	ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer->m_pSound); // When a sound is ma_sound_start()'ed, it is played from its current position
 	if(eResult != MA_SUCCESS)
 		HyLogError("ma_sound_start failed: " << eResult);
 }
 
 void HyAudioCore::ManipSound(PlayInfo &playInfoRef)
 {
-	ma_sound_set_volume(playInfoRef.m_pSound, playInfoRef.m_fVolume);
-	ma_sound_set_pitch(playInfoRef.m_pSound, playInfoRef.m_fPitch);
+	ma_sound_set_volume(playInfoRef.m_pSoundBuffer->m_pSound, playInfoRef.m_fVolume);
+	ma_sound_set_pitch(playInfoRef.m_pSoundBuffer->m_pSound, playInfoRef.m_fPitch);
 }
 
 /*static*/ void HyAudioCore::DataCallback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount)

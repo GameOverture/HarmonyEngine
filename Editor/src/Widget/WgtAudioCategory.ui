@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WgtAudioGroup</class>
- <widget class="QWidget" name="WgtAudioGroup">
+ <class>WgtAudioCategory</class>
+ <widget class="QWidget" name="WgtAudioCategory">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>294</width>
-    <height>80</height>
+    <height>81</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,7 +29,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Audio Group</string>
+      <string>Audio Category</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
