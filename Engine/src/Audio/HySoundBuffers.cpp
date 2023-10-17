@@ -20,12 +20,18 @@ HySoundAsset::HySoundAsset(HyAudioCore &coreRef, std::string sFilePath, int32 iC
 {
 	HyAssert(m_iINSTANCE_LIMIT >= 0, "Invalid instance limit in HySoundBuffers");
 	if(m_iINSTANCE_LIMIT == 0)
-		m_SoundBufferList.emplace_back();
+	{
+		m_SoundBufferList.push_back(HY_NEW ma_sound());
+		//m_SoundBufferInUseList.push_back(false);
+	}
 	else
 	{
 		m_SoundBufferList.resize(m_iINSTANCE_LIMIT);
-		//for(int i = 0; i < m_SoundBufferList.size(); ++i)
-		//	m_SoundBufferList[i] = HY_NEW ma_sound();
+		for(int i = 0; i < m_SoundBufferList.size(); ++i)
+		{
+			m_SoundBufferList[i] = HY_NEW ma_sound();
+			//m_SoundBufferInUseList.push_back(false);
+		}
 	}
 }
 
@@ -33,8 +39,8 @@ HySoundAsset::~HySoundAsset()
 {
 	//Unload();
 
-	//for(int i = 0; i < m_SoundList.size(); ++i)
-	//	delete m_SoundList[i];
+	for(int i = 0; i < m_SoundBufferList.size(); ++i)
+		delete m_SoundBufferList[i];
 }
 
 std::string HySoundAsset::GetFilePath() const
@@ -78,7 +84,7 @@ bool HySoundAsset::Load()
 			uiFlags,
 			pGroup,
 			nullptr,
-			m_SoundBufferList[i].m_pSound);
+			m_SoundBufferList[i]);
 
 		if(eResult != MA_SUCCESS)
 		{
@@ -94,24 +100,30 @@ void HySoundAsset::Unload()
 {
 	for(uint32 i = 0; i < static_cast<uint32>(m_SoundBufferList.size()); ++i)
 	{
-		ma_sound_uninit(m_SoundBufferList[i].m_pSound);
-		m_SoundBufferList[i].m_bInUse = false;
+		ma_sound_uninit(m_SoundBufferList[i]);
+		//m_SoundBufferInUseList[i] = false;
 	}
 }
 
-HySoundBuff *HySoundAsset::GetFreshBuffer()
+ma_sound *HySoundAsset::GetFreshBuffer()
 {
 	while(true)
 	{
 		for(int32 i = 0; i < static_cast<int32>(m_SoundBufferList.size()); ++i)
 		{
-			if(m_SoundBufferList[i].m_bInUse == false)
-				return &m_SoundBufferList[i];
+			if(ma_sound_is_playing(m_SoundBufferList[i]) == false)
+				return m_SoundBufferList[i];
+
+			//if(m_SoundBufferInUseList[i] == false)
+			//{
+			//	m_SoundBufferInUseList[i] = true;
+			//	return m_SoundBufferList[i];
+			//}
 		}
 
 		if(m_iINSTANCE_LIMIT == 0) // Allows dynamic resizing
 		{
-			m_SoundBufferList.emplace_back();
+			m_SoundBufferList.push_back(HY_NEW ma_sound());
 
 			ma_uint32 uiFlags = m_bIS_STREAMING ? MA_SOUND_FLAG_STREAM : 0;
 			uiFlags |= MA_SOUND_FLAG_ASYNC;
@@ -124,7 +136,7 @@ HySoundBuff *HySoundAsset::GetFreshBuffer()
 				uiFlags,
 				pGroup,
 				nullptr,
-				m_SoundBufferList.back().m_pSound);
+				m_SoundBufferList.back());
 
 			if(eResult != MA_SUCCESS)
 				HyLogError("AppendBuffer() - ma_sound_init_from_file failed: " << eResult);

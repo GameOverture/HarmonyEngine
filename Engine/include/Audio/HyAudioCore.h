@@ -68,7 +68,7 @@ class HyAudioCore
 		uint32										m_uiSoundChecksum = 0;
 		uint8										m_uiLoops = 0;
 
-		HySoundBuff *								m_pSoundBuffer = nullptr;
+		ma_sound *									m_pSoundBuffer = nullptr;
 	};
 	std::unordered_map<HyAudioNodeHandle, PlayInfo>	m_PlayMap;
 

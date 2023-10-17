@@ -228,12 +228,12 @@ void HyAudioCore::Update()
 	for(auto iter = m_PlayMap.begin(); iter != m_PlayMap.end(); )
 	{
 		PlayInfo &playInfoRef = iter->second;
-		if(ma_sound_at_end(playInfoRef.m_pSoundBuffer->m_pSound))
+		if(ma_sound_at_end(playInfoRef.m_pSoundBuffer))
 		{
 			if(playInfoRef.m_uiLoops > 0)
 			{
 				//ma_sound_seek_to_pcm_frame(playInfoRef.m_pSound, 0); // Rewind sound to beginning
-				ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer->m_pSound);
+				ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer);
 				if(eResult != MA_SUCCESS)
 				{
 					HyLogError("ma_sound_seek_to_pcm_frame failed: " << eResult);
@@ -245,7 +245,6 @@ void HyAudioCore::Update()
 			}
 			else
 			{
-				playInfoRef.m_pSoundBuffer->m_bInUse = false;
 				iter = m_PlayMap.erase(iter);
 				continue;
 			}
@@ -335,8 +334,9 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 			pPlayInfo->m_uiLoops = static_cast<HyAudio3d *>(pNode)->GetLoops();
 		}
 
-		if(StartSound(*pPlayInfo) == false)
-			m_PlayMap.erase(hHandle);
+		StartSound(*pPlayInfo);
+		//if(StartSound(*pPlayInfo) == false)
+		//	m_PlayMap.erase(hHandle);
 		break; }
 
 	case HYSOUNDCUE_Stop:
@@ -394,7 +394,8 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 
 		if(m_PlayMap.find(hHandle) != m_PlayMap.end())
 		{
-			m_PlayMap[hHandle].m_pSoundBuffer->m_bInUse = false;
+			StopSound(m_PlayMap[hHandle]);
+			//m_PlayMap[hHandle].m_pSoundBuffer->m_bInUse = false;
 			m_PlayMap.erase(hHandle);
 		}
 		break; }
@@ -437,9 +438,9 @@ bool HyAudioCore::StartSound(PlayInfo &playInfoRef)
 	playInfoRef.m_pSoundBuffer = pBuffer->GetFreshBuffer();
 	if(playInfoRef.m_pSoundBuffer)
 	{
-		playInfoRef.m_pSoundBuffer->m_bInUse = true;
+		//playInfoRef.m_pSoundBuffer->m_bInUse = true;
 
-		ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer->m_pSound);
+		ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer);
 		if(eResult != MA_SUCCESS)
 			HyLogError("ma_sound_start failed: " << eResult);
 
@@ -454,14 +455,14 @@ bool HyAudioCore::StartSound(PlayInfo &playInfoRef)
 
 void HyAudioCore::StopSound(PlayInfo &playInfoRef)
 {
-	ma_result eResult = ma_sound_stop(playInfoRef.m_pSoundBuffer->m_pSound);
+	ma_result eResult = ma_sound_stop(playInfoRef.m_pSoundBuffer);
 	if(eResult != MA_SUCCESS)
 	{
 		HyLogError("ma_sound_stop failed: " << eResult);
 		return;
 	}
 
-	eResult = ma_sound_seek_to_pcm_frame(playInfoRef.m_pSoundBuffer->m_pSound, 0); // Rewind sound to beginning
+	eResult = ma_sound_seek_to_pcm_frame(playInfoRef.m_pSoundBuffer, 0); // Rewind sound to beginning
 	if(eResult != MA_SUCCESS)
 	{
 		HyLogError("ma_sound_seek_to_pcm_frame failed: " << eResult);
@@ -471,22 +472,22 @@ void HyAudioCore::StopSound(PlayInfo &playInfoRef)
 
 void HyAudioCore::PauseSound(PlayInfo &playInfoRef)
 {
-	ma_result eResult = ma_sound_stop(playInfoRef.m_pSoundBuffer->m_pSound); // When a sound is ma_sound_stop()'ed, it is not rewound to the start
+	ma_result eResult = ma_sound_stop(playInfoRef.m_pSoundBuffer); // When a sound is ma_sound_stop()'ed, it is not rewound to the start
 	if(eResult != MA_SUCCESS)
 		HyLogError("ma_sound_stop failed: " << eResult);
 }
 
 void HyAudioCore::UnpauseSound(PlayInfo &playInfoRef)
 {
-	ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer->m_pSound); // When a sound is ma_sound_start()'ed, it is played from its current position
+	ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer); // When a sound is ma_sound_start()'ed, it is played from its current position
 	if(eResult != MA_SUCCESS)
 		HyLogError("ma_sound_start failed: " << eResult);
 }
 
 void HyAudioCore::ManipSound(PlayInfo &playInfoRef)
 {
-	ma_sound_set_volume(playInfoRef.m_pSoundBuffer->m_pSound, playInfoRef.m_fVolume);
-	ma_sound_set_pitch(playInfoRef.m_pSoundBuffer->m_pSound, playInfoRef.m_fPitch);
+	ma_sound_set_volume(playInfoRef.m_pSoundBuffer, playInfoRef.m_fVolume);
+	ma_sound_set_pitch(playInfoRef.m_pSoundBuffer, playInfoRef.m_fPitch);
 }
 
 /*static*/ void HyAudioCore::DataCallback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount)
