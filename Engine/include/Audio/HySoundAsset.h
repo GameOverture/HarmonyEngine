@@ -38,7 +38,7 @@ public:
 	bool Load();
 	void Unload();
 
-	ma_sound *GetFreshBuffer();
+	ma_sound *GetIdleBuffer();
 
 private:
 	void InitSoundBuffer(ma_sound *pSound, ma_uint32 uiAdditionalFlags);

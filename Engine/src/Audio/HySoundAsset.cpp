@@ -97,24 +97,24 @@ void HySoundAsset::Unload()
 		ma_sound_uninit(m_SoundBufferList[i]);
 }
 
-ma_sound *HySoundAsset::GetFreshBuffer()
+ma_sound *HySoundAsset::GetIdleBuffer()
 {
-	while(true)
+	for(int32 i = 0; i < static_cast<int32>(m_SoundBufferList.size()); ++i)
 	{
-		for(int32 i = 0; i < static_cast<int32>(m_SoundBufferList.size()); ++i)
-		{
-			if(ma_sound_is_playing(m_SoundBufferList[i]) == false)
-				return m_SoundBufferList[i];
-		}
-
-		if(m_iINSTANCE_LIMIT == 0) // Allows dynamic resizing
-		{
-			m_SoundBufferList.push_back(HY_NEW ma_sound());
-			InitSoundBuffer(m_SoundBufferList.back(), MA_SOUND_FLAG_ASYNC);
-		}
-		else
-			return nullptr; // No available buffer
+		if(ma_sound_is_playing(m_SoundBufferList[i]) == false)
+			return m_SoundBufferList[i];
 	}
+
+	if(m_iINSTANCE_LIMIT == 0) // Allows dynamic resizing
+	{
+		m_SoundBufferList.push_back(HY_NEW ma_sound());
+		InitSoundBuffer(m_SoundBufferList.back(), MA_SOUND_FLAG_ASYNC);
+		HyLog("Sound Buffer Increase (" << m_sFILE_PATH << "): " << m_SoundBufferList.size());
+
+		return m_SoundBufferList.back();
+	}
+	
+	return nullptr; // No available buffer
 }
 
 void HySoundAsset::InitSoundBuffer(ma_sound *pSound, ma_uint32 uiAdditionalFlags)

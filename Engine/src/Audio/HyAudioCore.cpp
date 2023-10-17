@@ -230,7 +230,7 @@ void HyAudioCore::Update()
 		PlayInfo &playInfoRef = iter->second;
 		if(ma_sound_at_end(playInfoRef.m_pSoundBuffer))
 		{
-			if(playInfoRef.m_uiLoops > 0)
+			if(playInfoRef.m_uiLoopsRemaining > 0)
 			{
 				ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer); // Will implicitly restart the sound
 				if(eResult != MA_SUCCESS)
@@ -239,8 +239,8 @@ void HyAudioCore::Update()
 					return;
 				}
 
-				if(playInfoRef.m_uiLoops != HYAUDIO_InfiniteLoops)
-					playInfoRef.m_uiLoops--;
+				if(playInfoRef.m_uiLoopsRemaining != HYAUDIO_InfiniteLoops)
+					playInfoRef.m_uiLoopsRemaining--;
 			}
 			else
 			{
@@ -276,38 +276,62 @@ void HyAudioCore::CategoryInit(SoundCategory *pSndCategory)
 
 void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 {
+	HyAudioNodeHandle hHandle = HY_UNUSED_HANDLE;
+
 	switch(eCueType)
 	{
 	case HYSOUNDCUE_PlayOneShotDefault:
 	case HYSOUNDCUE_PlayOneShot: {
-		PlayInfo newPlayInfo;
+		float fVolume = 1.0f;
+		float fPitch = 0.0f;
+		uint32 uiSoundChecksum = 0;
+		PlayInfo tempPlayInfo;
 		if(pNode->Is2D())
 		{
 			if(eCueType == HYSOUNDCUE_PlayOneShot)
 			{
-				newPlayInfo.m_fVolume = static_cast<HyAudio2d *>(pNode)->volume.Get();
-				newPlayInfo.m_fPitch = static_cast<HyAudio2d *>(pNode)->pitch.Get();
+				fVolume = static_cast<HyAudio2d *>(pNode)->volume.Get();
+				fPitch = static_cast<HyAudio2d *>(pNode)->pitch.Get();
 			}
-			newPlayInfo.m_uiSoundChecksum = static_cast<HyAudio2d *>(pNode)->PullNextSound();
-			newPlayInfo.m_uiLoops = static_cast<HyAudio2d *>(pNode)->GetLoops();
+			uiSoundChecksum = static_cast<HyAudio2d *>(pNode)->PullNextSound();
 		}
 		else
 		{
 			if(eCueType == HYSOUNDCUE_PlayOneShot)
 			{
-				newPlayInfo.m_fVolume = static_cast<HyAudio3d *>(pNode)->volume.Get();
-				newPlayInfo.m_fPitch = static_cast<HyAudio3d *>(pNode)->pitch.Get();
+				fVolume = static_cast<HyAudio3d *>(pNode)->volume.Get();
+				fPitch = static_cast<HyAudio3d *>(pNode)->pitch.Get();
 			}
-			newPlayInfo.m_uiSoundChecksum = static_cast<HyAudio3d *>(pNode)->PullNextSound();
-			newPlayInfo.m_uiLoops = static_cast<HyAudio3d *>(pNode)->GetLoops();
+			uiSoundChecksum = static_cast<HyAudio3d *>(pNode)->PullNextSound();
 		}
 
-		StartSound(newPlayInfo);
+		tempPlayInfo.m_pSoundBuffer = FindIdleBuffer(uiSoundChecksum);
+		if(tempPlayInfo.m_pSoundBuffer)
+		{
+			ma_sound_set_volume(tempPlayInfo.m_pSoundBuffer, fVolume);
+			ma_sound_set_pitch(tempPlayInfo.m_pSoundBuffer, fPitch);
+			ma_sound_seek_to_pcm_frame(tempPlayInfo.m_pSoundBuffer, 0); // Rewind to beginning
+
+			ma_result eResult = ma_sound_start(tempPlayInfo.m_pSoundBuffer);
+			if(eResult != MA_SUCCESS)
+				HyLogError("ma_sound_start failed: " << eResult);
+		}
+
 		break; }
 
+	case HYSOUNDCUE_Unpause:
+		if(pNode->Is2D())
+			hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
+		else
+			hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
+		if(m_PlayMap.count(hHandle) == 0 || m_PlayMap[hHandle].m_pSoundBuffer != nullptr)
+			break;
+		[[fallthrough]];
 	case HYSOUNDCUE_Start: {
+		float fVolume = 1.0f;
+		float fPitch = 0.0f;
+		uint32 uiSoundChecksum = 0;
 		PlayInfo *pPlayInfo = nullptr;
-		HyAudioNodeHandle hHandle = HY_UNUSED_HANDLE;
 		if(pNode->Is2D())
 		{
 			hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
@@ -315,10 +339,10 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 				m_PlayMap[hHandle] = PlayInfo();
 			pPlayInfo = &m_PlayMap[hHandle];
 
-			pPlayInfo->m_fVolume = static_cast<HyAudio2d *>(pNode)->volume.Get();
-			pPlayInfo->m_fPitch = static_cast<HyAudio2d *>(pNode)->pitch.Get();
-			pPlayInfo->m_uiSoundChecksum = static_cast<HyAudio2d *>(pNode)->PullNextSound();
-			pPlayInfo->m_uiLoops = static_cast<HyAudio2d *>(pNode)->GetLoops();
+			fVolume = static_cast<HyAudio2d *>(pNode)->volume.Get();
+			fPitch = static_cast<HyAudio2d *>(pNode)->pitch.Get();
+			uiSoundChecksum = static_cast<HyAudio2d *>(pNode)->PullNextSound();
+			pPlayInfo->m_uiLoopsRemaining = static_cast<HyAudio2d *>(pNode)->GetLoops();
 		}
 		else
 		{
@@ -327,38 +351,77 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 				m_PlayMap[hHandle] = PlayInfo();
 			pPlayInfo = &m_PlayMap[hHandle];
 
-			pPlayInfo->m_fVolume = static_cast<HyAudio3d *>(pNode)->volume.Get();
-			pPlayInfo->m_fPitch = static_cast<HyAudio3d *>(pNode)->pitch.Get();
-			pPlayInfo->m_uiSoundChecksum = static_cast<HyAudio3d *>(pNode)->PullNextSound();
-			pPlayInfo->m_uiLoops = static_cast<HyAudio3d *>(pNode)->GetLoops();
+			fVolume = static_cast<HyAudio3d *>(pNode)->volume.Get();
+			fPitch = static_cast<HyAudio3d *>(pNode)->pitch.Get();
+			uiSoundChecksum = static_cast<HyAudio3d *>(pNode)->PullNextSound();
+			pPlayInfo->m_uiLoopsRemaining = static_cast<HyAudio3d *>(pNode)->GetLoops();
 		}
 
-		if(StartSound(*pPlayInfo) == false)
+		if(pPlayInfo->m_pSoundBuffer == nullptr)
+			pPlayInfo->m_pSoundBuffer = FindIdleBuffer(uiSoundChecksum);
+
+		if(pPlayInfo->m_pSoundBuffer)
+		{
+			ma_sound_set_volume(pPlayInfo->m_pSoundBuffer, fVolume);
+			ma_sound_set_pitch(pPlayInfo->m_pSoundBuffer, fPitch);
+
+			if(eCueType == HYSOUNDCUE_Start)
+				ma_sound_seek_to_pcm_frame(pPlayInfo->m_pSoundBuffer, 0); // Rewind to beginning
+			else // HYSOUNDCUE_Unpause
+				ma_sound_seek_to_pcm_frame(pPlayInfo->m_pSoundBuffer, pPlayInfo->m_uiPauseFrame);
+
+			ma_result eResult = ma_sound_start(pPlayInfo->m_pSoundBuffer);
+			if(eResult != MA_SUCCESS)
+				HyLogError("ma_sound_start failed: " << eResult);
+		}
+		else
 			m_PlayMap.erase(hHandle);
 		break; }
 
+	case HYSOUNDCUE_DeleteInstance:
 	case HYSOUNDCUE_Stop:
-	case HYSOUNDCUE_Pause:
-	case HYSOUNDCUE_Unpause: {
-		HyAudioNodeHandle hHandle = HY_UNUSED_HANDLE;
 		if(pNode->Is2D())
 			hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
 		else
 			hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
-		
 		if(m_PlayMap.count(hHandle) == 0)
 			break;
-		
-		if(eCueType == HYSOUNDCUE_Stop)
-			StopSound(m_PlayMap[hHandle]);
-		else if(eCueType == HYSOUNDCUE_Pause)
-			PauseSound(m_PlayMap[hHandle]);
-		else if(eCueType == HYSOUNDCUE_Unpause)
-			UnpauseSound(m_PlayMap[hHandle]);
-		break; }
+
+		if(m_PlayMap[hHandle].m_pSoundBuffer) // Might be null if a Pause() was invoked prior
+		{
+			ma_result eResult = ma_sound_stop(m_PlayMap[hHandle].m_pSoundBuffer);
+			if(eResult != MA_SUCCESS)
+				HyLogError("ma_sound_stop failed: " << eResult);
+		}
+
+		m_PlayMap.erase(hHandle);
+		break;
+
+	case HYSOUNDCUE_Pause:
+		if(pNode->Is2D())
+			hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
+		else
+			hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
+		if(m_PlayMap.count(hHandle) == 0)
+			break;
+
+		if(m_PlayMap[hHandle].m_pSoundBuffer) // Might be null if sequencial Pause()'s are called
+		{
+			// When a sound is ma_sound_stop()'ed, it is NOT rewound to the start
+			ma_result eResult = ma_sound_stop(m_PlayMap[hHandle].m_pSoundBuffer);
+			if(eResult != MA_SUCCESS)
+				HyLogError("ma_sound_stop failed: " << eResult);
+
+			// Store the current 'm_PlayMap[hHandle].m_uiPauseFrame'
+			eResult = ma_sound_get_cursor_in_pcm_frames(m_PlayMap[hHandle].m_pSoundBuffer, &m_PlayMap[hHandle].m_uiPauseFrame);
+			if(eResult != MA_SUCCESS)
+				HyLogError("ma_sound_get_cursor_in_pcm_frames failed: " << eResult);
+
+			m_PlayMap[hHandle].m_pSoundBuffer = nullptr; // This sound buffer is free to be used elsewhere since it's not playing anymore
+		}
+		break;
 
 	case HYSOUNDCUE_Attributes: {
-		HyAudioNodeHandle hHandle = HY_UNUSED_HANDLE;
 		float fVolume = 1.0f;
 		float fPitch = 0.0f;
 		if(pNode->Is2D())
@@ -373,29 +436,11 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 			fVolume = static_cast<HyAudio3d *>(pNode)->volume.Get();
 			fPitch = static_cast<HyAudio3d *>(pNode)->pitch.Get();
 		}
-
-		if(m_PlayMap.count(hHandle) == 0)
+		if(m_PlayMap.count(hHandle) == 0 || m_PlayMap[hHandle].m_pSoundBuffer == nullptr)
 			break;
 
-		m_PlayMap[hHandle].m_fVolume = fVolume;
-		m_PlayMap[hHandle].m_fPitch = fPitch;
-
-		ManipSound(m_PlayMap[hHandle]);
-		break; }
-
-	case HYSOUNDCUE_DeleteInstance: {
-		HyAudioNodeHandle hHandle = HY_UNUSED_HANDLE;
-		if(pNode->Is2D())
-			hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
-		else
-			hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
-
-		if(m_PlayMap.find(hHandle) != m_PlayMap.end())
-		{
-			StopSound(m_PlayMap[hHandle]);
-			//m_PlayMap[hHandle].m_pSoundBuffer->m_bInUse = false;
-			m_PlayMap.erase(hHandle);
-		}
+		ma_sound_set_volume(m_PlayMap[hHandle].m_pSoundBuffer, fVolume);
+		ma_sound_set_pitch(m_PlayMap[hHandle].m_pSoundBuffer, fPitch);
 		break; }
 
 	default:
@@ -404,13 +449,13 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 	}
 }
 
-bool HyAudioCore::StartSound(PlayInfo &playInfoRef)
+ma_sound *HyAudioCore::FindIdleBuffer(uint32 uiChecksum)
 {
 	// Determine the sound buffer
 	HySoundAsset *pBuffer = nullptr;
 	for(auto *pBank : m_BankList)
 	{
-		pBuffer = static_cast<HySoundAsset *>(pBank->GetSoundAsset(playInfoRef.m_uiSoundChecksum));
+		pBuffer = static_cast<HySoundAsset *>(pBank->GetSoundAsset(uiChecksum));
 		if(pBuffer)
 			break;
 	}
@@ -420,7 +465,7 @@ bool HyAudioCore::StartSound(PlayInfo &playInfoRef)
 		for(auto &hotLoad : m_HotLoadMap)
 		{
 			// When looking through hotloads, the checksum is assigned to the same value as its HyAudioHandle
-			if(hotLoad.first == playInfoRef.m_uiSoundChecksum)
+			if(hotLoad.first == uiChecksum)
 			{
 				pBuffer = hotLoad.second;
 				break;
@@ -428,62 +473,12 @@ bool HyAudioCore::StartSound(PlayInfo &playInfoRef)
 		}
 		if(pBuffer == nullptr)
 		{
-			HyLogWarning("HyAudioCore::StartPlay() Could not find audio: " << playInfoRef.m_uiSoundChecksum);
-			return false;
+			HyLogWarning("HyAudioCore::StartPlay() Could not find audio: " << uiChecksum);
+			return nullptr;
 		}
 	}
 
-	playInfoRef.m_pSoundBuffer = pBuffer->GetFreshBuffer();
-	if(playInfoRef.m_pSoundBuffer)
-	{
-		ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer);
-		if(eResult != MA_SUCCESS)
-			HyLogError("ma_sound_start failed: " << eResult);
-
-		return true;
-	}
-	else
-	{
-		HyLogDebug("No available audio buffer instance for: " << pBuffer->GetFilePath());
-		return false;
-	}
-}
-
-void HyAudioCore::StopSound(PlayInfo &playInfoRef)
-{
-	ma_result eResult = ma_sound_stop(playInfoRef.m_pSoundBuffer);
-	if(eResult != MA_SUCCESS)
-	{
-		HyLogError("ma_sound_stop failed: " << eResult);
-		return;
-	}
-
-	eResult = ma_sound_seek_to_pcm_frame(playInfoRef.m_pSoundBuffer, 0); // Rewind sound to beginning
-	if(eResult != MA_SUCCESS)
-	{
-		HyLogError("ma_sound_seek_to_pcm_frame failed: " << eResult);
-		return;
-	}
-}
-
-void HyAudioCore::PauseSound(PlayInfo &playInfoRef)
-{
-	ma_result eResult = ma_sound_stop(playInfoRef.m_pSoundBuffer); // When a sound is ma_sound_stop()'ed, it is not rewound to the start
-	if(eResult != MA_SUCCESS)
-		HyLogError("ma_sound_stop failed: " << eResult);
-}
-
-void HyAudioCore::UnpauseSound(PlayInfo &playInfoRef)
-{
-	ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer); // When a sound is ma_sound_start()'ed, it is played from its current position
-	if(eResult != MA_SUCCESS)
-		HyLogError("ma_sound_start failed: " << eResult);
-}
-
-void HyAudioCore::ManipSound(PlayInfo &playInfoRef)
-{
-	ma_sound_set_volume(playInfoRef.m_pSoundBuffer, playInfoRef.m_fVolume);
-	ma_sound_set_pitch(playInfoRef.m_pSoundBuffer, playInfoRef.m_fPitch);
+	return pBuffer->GetIdleBuffer();
 }
 
 /*static*/ void HyAudioCore::DataCallback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount)

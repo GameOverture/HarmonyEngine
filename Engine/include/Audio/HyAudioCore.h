@@ -61,13 +61,11 @@ class HyAudioCore
 	std::map<HyAudioHandle, HySoundAsset *>			m_HotLoadMap;
 	uint32											m_uiHotLoadCount;
 
+	// Track what is currently playing, or paused
 	struct PlayInfo
 	{
-		float										m_fVolume = 1.0f;
-		float										m_fPitch = 1.0f;
-		uint32										m_uiSoundChecksum = 0;
-		uint8										m_uiLoops = 0;
-
+		uint8										m_uiLoopsRemaining = 0;
+		ma_uint64									m_uiPauseFrame = 0;
 		ma_sound *									m_pSoundBuffer = nullptr;
 	};
 	std::unordered_map<HyAudioNodeHandle, PlayInfo>	m_PlayMap;
@@ -110,11 +108,7 @@ protected:
 	void CategoryInit(SoundCategory *pSndCategory);
 	void ProcessCue(IHyNode *pNode, HySoundCue eCueType);
 
-	bool StartSound(PlayInfo &playInfoRef); // Returns false if there are no buffers available (instance limit)
-	void StopSound(PlayInfo &playInfoRef);
-	void PauseSound(PlayInfo &playInfoRef);
-	void UnpauseSound(PlayInfo &playInfoRef);
-	void ManipSound(PlayInfo &playInfoRef);
+	ma_sound *FindIdleBuffer(uint32 uiChecksum); // Returns 'nullptr' if there are no buffers available (instance limit) or can't find via checksum
 
 	static void DataCallback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount);
 
