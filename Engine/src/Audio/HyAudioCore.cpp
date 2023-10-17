@@ -232,11 +232,10 @@ void HyAudioCore::Update()
 		{
 			if(playInfoRef.m_uiLoops > 0)
 			{
-				//ma_sound_seek_to_pcm_frame(playInfoRef.m_pSound, 0); // Rewind sound to beginning
-				ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer);
+				ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer); // Will implicitly restart the sound
 				if(eResult != MA_SUCCESS)
 				{
-					HyLogError("ma_sound_seek_to_pcm_frame failed: " << eResult);
+					HyLogError("ma_sound_start failed: " << eResult);
 					return;
 				}
 
@@ -312,7 +311,7 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 		if(pNode->Is2D())
 		{
 			hHandle = static_cast<HyAudio2d *>(pNode)->GetHandle();
-			if(m_PlayMap.count(hHandle) == 0)
+			if(m_PlayMap.find(hHandle) == m_PlayMap.end())
 				m_PlayMap[hHandle] = PlayInfo();
 			pPlayInfo = &m_PlayMap[hHandle];
 
@@ -324,7 +323,7 @@ void HyAudioCore::ProcessCue(IHyNode *pNode, HySoundCue eCueType)
 		else
 		{
 			hHandle = static_cast<HyAudio3d *>(pNode)->GetHandle();
-			if(m_PlayMap.count(hHandle) == 0)
+			if(m_PlayMap.find(hHandle) == m_PlayMap.end())
 				m_PlayMap[hHandle] = PlayInfo();
 			pPlayInfo = &m_PlayMap[hHandle];
 
@@ -438,8 +437,6 @@ bool HyAudioCore::StartSound(PlayInfo &playInfoRef)
 	playInfoRef.m_pSoundBuffer = pBuffer->GetFreshBuffer();
 	if(playInfoRef.m_pSoundBuffer)
 	{
-		//playInfoRef.m_pSoundBuffer->m_bInUse = true;
-
 		ma_result eResult = ma_sound_start(playInfoRef.m_pSoundBuffer);
 		if(eResult != MA_SUCCESS)
 			HyLogError("ma_sound_start failed: " << eResult);
@@ -448,7 +445,7 @@ bool HyAudioCore::StartSound(PlayInfo &playInfoRef)
 	}
 	else
 	{
-		HyLog("No available audio instance for: " << pBuffer->GetFilePath());
+		HyLogDebug("No available audio buffer instance for: " << pBuffer->GetFilePath());
 		return false;
 	}
 }

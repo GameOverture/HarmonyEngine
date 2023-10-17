@@ -82,7 +82,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Assets/Nodes/HyTexturedQuadData.cpp
 	src/Assets/Nodes/IHyNodeData.cpp
 	src/Audio/HyAudioCore.cpp
-	src/Audio/HySoundBuffers.cpp
+	src/Audio/HySoundAsset.cpp
 	src/Diagnostics/HyDiagnostics.cpp
 	src/Diagnostics/HyProfiler.cpp
 	src/Diagnostics/Console/IHyConsole.cpp
@@ -210,7 +210,7 @@ set(HYENGINE_HEADER_FILES
 	include/Assets/Nodes/HyTexturedQuadData.h
 	include/Assets/Nodes/IHyNodeData.h
 	include/Audio/HyAudioCore.h
-	include/Audio/HySoundBuffers.h
+	include/Audio/HySoundAsset.h
 	include/Diagnostics/HyDiagnostics.h
 	include/Diagnostics/HyProfiler.h
 	include/Diagnostics/Console/IHyConsole.h

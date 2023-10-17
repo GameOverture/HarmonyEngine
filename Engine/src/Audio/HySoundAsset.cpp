@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HySoundBuffers.cpp
+*	HySoundAsset.cpp
 *	
 *	Harmony Engine
 *	Copyright (c) 2022 Jason Knobler
@@ -8,7 +8,7 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyInteropAfx.h"
-#include "Audio/HySoundBuffers.h"
+#include "Audio/HySoundAsset.h"
 #include "Audio/HyAudioCore.h"
 
 HySoundAsset::HySoundAsset(HyAudioCore &coreRef, std::string sFilePath, int32 iCategoryId, bool bIsStreaming, int32 iInstanceLimit) :
@@ -20,18 +20,12 @@ HySoundAsset::HySoundAsset(HyAudioCore &coreRef, std::string sFilePath, int32 iC
 {
 	HyAssert(m_iINSTANCE_LIMIT >= 0, "Invalid instance limit in HySoundBuffers");
 	if(m_iINSTANCE_LIMIT == 0)
-	{
 		m_SoundBufferList.push_back(HY_NEW ma_sound());
-		//m_SoundBufferInUseList.push_back(false);
-	}
 	else
 	{
 		m_SoundBufferList.resize(m_iINSTANCE_LIMIT);
 		for(int i = 0; i < m_SoundBufferList.size(); ++i)
-		{
 			m_SoundBufferList[i] = HY_NEW ma_sound();
-			//m_SoundBufferInUseList.push_back(false);
-		}
 	}
 }
 
@@ -99,10 +93,7 @@ bool HySoundAsset::Load()
 void HySoundAsset::Unload()
 {
 	for(uint32 i = 0; i < static_cast<uint32>(m_SoundBufferList.size()); ++i)
-	{
 		ma_sound_uninit(m_SoundBufferList[i]);
-		//m_SoundBufferInUseList[i] = false;
-	}
 }
 
 ma_sound *HySoundAsset::GetFreshBuffer()
@@ -113,12 +104,6 @@ ma_sound *HySoundAsset::GetFreshBuffer()
 		{
 			if(ma_sound_is_playing(m_SoundBufferList[i]) == false)
 				return m_SoundBufferList[i];
-
-			//if(m_SoundBufferInUseList[i] == false)
-			//{
-			//	m_SoundBufferInUseList[i] = true;
-			//	return m_SoundBufferList[i];
-			//}
 		}
 
 		if(m_iINSTANCE_LIMIT == 0) // Allows dynamic resizing

@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HySoundBuffers.h
+*	HySoundAsset.h
 *	
 *	Harmony Engine
 *	Copyright (c) 2022 Jason Knobler
@@ -7,8 +7,8 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HySoundBuffers_h__
-#define HySoundBuffers_h__
+#ifndef HySoundAsset_h__
+#define HySoundAsset_h__
 
 #include "Afx/HyStdAfx.h"
 #include "vendor/miniaudio/miniaudio.h"
@@ -44,4 +44,4 @@ private:
 	void AllocateBuffer();
 };
 
-#endif /* HySoundBuffers_h__ */
+#endif /* HySoundAsset_h__ */
