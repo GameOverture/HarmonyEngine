@@ -33,6 +33,9 @@ AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 
 EntityStateData *AuxDopeSheet::GetEntityStateModel() const
 {
+	if(ui->graphicsView->GetScene() == nullptr)
+		return nullptr;
+
 	return ui->graphicsView->GetScene()->GetStateData();
 }
 

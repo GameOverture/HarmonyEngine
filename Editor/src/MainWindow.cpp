@@ -424,7 +424,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		pItem->BlockAllWidgetSignals(false);
 	}
 
-	if(pItem == &sm_pInstance->ui->dopeSheet->GetEntityStateModel()->GetModel().GetItem())
+	if(sm_pInstance->ui->dopeSheet->GetEntityStateModel() == nullptr || pItem == &sm_pInstance->ui->dopeSheet->GetEntityStateModel()->GetModel().GetItem())
 	{
 		sm_pInstance->ui->dopeSheet->SetEntityStateModel(nullptr);
 		sm_pInstance->ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, false);
