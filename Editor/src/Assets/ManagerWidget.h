@@ -86,7 +86,7 @@ public:
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// NOTE: ExplorerWidget::GetSelected are synonymous functions - all fixes/enhancements should be copied over until refactored into a base class
 	TreeModelItemData *GetSelected();
-	void GetSelected(QList<IAssetItemData *> &selectedItemsOut, QList<TreeModelItemData *> &selectedPrefixesOut, bool bSortAlphabetically);
+	void GetSelected(QList<IAssetItemData *> &selectedAssetsOut, QList<TreeModelItemData *> &selectedFiltersOut, bool bSortAlphabetically);
 
 protected:
 	virtual void enterEvent(QEvent *pEvent) override;

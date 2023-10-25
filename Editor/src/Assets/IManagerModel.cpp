@@ -12,6 +12,7 @@
 #include "Project.h"
 #include "Harmony.h"
 #include "MainWindow.h"
+#include "ManagerWidget.h"
 #include "ProjectItemData.h"
 #include "AssetMimeData.h"
 #include "AtlasImportThread.h"
@@ -833,17 +834,38 @@ void IManagerModel::SaveRuntime()
 
 /*virtual*/ QMimeData *IManagerModel::mimeData(const QModelIndexList &indexes) const /*override*/
 {
-	QList<TreeModelItemData *> assetList;
-	for(const auto &index : indexes)
+	//QList<TreeModelItemData *> assetList;
+	//for(const auto &index : indexes)
+	//{
+	//	if(index.column() != 0)
+	//		continue;
+
+	//	assetList.push_back(data(index, Qt::UserRole).value<TreeModelItemData *>());
+	//}
+	ManagerWidget *pManagerWidget = nullptr;
+	switch(m_eASSET_TYPE)
 	{
-		if(index.column() != 0)
-			continue;
-
-		assetList.push_back(data(index, Qt::UserRole).value<TreeModelItemData *>());
+	case ASSETMAN_Source:
+		pManagerWidget = m_ProjectRef.GetSourceWidget();
+		break;
+	case ASSETMAN_Atlases:
+		pManagerWidget = m_ProjectRef.GetAtlasWidget();
+		break;
+	case ASSETMAN_Audio:
+		pManagerWidget = m_ProjectRef.GetAudioWidget();
+		break;
+	default:
+		HyGuiLog("IManagerModel::mimeData() - Unknown asset type", LOGTYPE_Error);
+		break;
 	}
+	
+	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
+	pManagerWidget->GetSelected(selectedAssetsList, selectedFiltersList, true);
 
-	//RemoveRedundantItems(ITEM_Filter, itemList);
-	QMimeData *pNewMimeData = new AssetMimeData(GetProjOwner(), assetList, m_eASSET_TYPE);
+	for(TreeModelItemData *pItem : selectedAssetsList)
+		selectedFiltersList.append(pItem);
+
+	QMimeData *pNewMimeData = new AssetMimeData(GetProjOwner(), selectedFiltersList, m_eASSET_TYPE);
 	return pNewMimeData;
 }
 
