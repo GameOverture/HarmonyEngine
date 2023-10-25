@@ -120,7 +120,9 @@ ExplorerItemData *ExplorerModel::AddItem(Project *pProj, ItemType eNewItemType, 
 			bool bFound = false;
 			for(int j = 0; j < pCurTreeItem->GetNumChildren(); ++j)
 			{
-				if(QString::compare(sPathSplitList[i], pCurTreeItem->GetChild(j)->data(0).value<ExplorerItemData *>()->GetName(false), Qt::CaseInsensitive) == 0)
+				ExplorerItemData *pChildItem = pCurTreeItem->GetChild(j)->data(0).value<ExplorerItemData *>();
+				if(QString::compare(sPathSplitList[i], pChildItem->GetName(false), Qt::CaseInsensitive) == 0 &&
+					pChildItem->GetType() == ITEM_Prefix)
 				{
 					pCurTreeItem = pCurTreeItem->GetChild(j);
 					bFound = true;
