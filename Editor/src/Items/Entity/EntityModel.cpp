@@ -124,8 +124,8 @@ EntityTreeItemData *EntityModel::Cmd_AddExistingItem(QJsonObject descObj, bool b
 EntityTreeItemData *EntityModel::Cmd_CreateNewShape(int iStateIndex, int iFrameIndex, EditorShape eShape, QString sData, bool bIsPrimitive, int iRow)
 {
 	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocShapeTreeItem(eShape, sData, bIsPrimitive, "m_", iRow);
-	static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(eShape)));
-	static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Data", QJsonValue(sData));
+	static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(eShape)), false);
+	static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Data", QJsonValue(sData), true);
 	
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
 	if(pWidget)
@@ -569,9 +569,9 @@ QString EntityModel::GenerateSrc_SetStates() const
 	EntityTreeItemData *pEntityTreeData = propertiesModelRef.GetSubstate().value<EntityTreeItemData *>();
 
 	if(propertiesModelRef.GetPropertyDefinition(indexRef).eAccessType == PROPERTIESACCESS_ToggleOff)
-		pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(pEntityTreeData, iFrameIndex, sCategory, sProperty);
+		pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(pEntityTreeData, iFrameIndex, sCategory, sProperty, true);
 	else
-		pStateData->GetDopeSheetScene().SetKeyFrameProperty(pEntityTreeData, iFrameIndex, sCategory, sProperty, propertiesModelRef.GetPropertyJsonValue(indexRef));
+		pStateData->GetDopeSheetScene().SetKeyFrameProperty(pEntityTreeData, iFrameIndex, sCategory, sProperty, propertiesModelRef.GetPropertyJsonValue(indexRef), true);
 }
 
 /*virtual*/ void EntityModel::OnPopState(int iPoppedStateIndex) /*override*/

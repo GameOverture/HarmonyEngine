@@ -231,4 +231,22 @@ public:
 	virtual void undo() override;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_NudgeSelectedKeyFrames : public QUndoCommand
+{
+	EntityDopeSheetScene &			m_DopeSheetSceneRef;
+	int								m_iFrameOffset;
+
+	QMap<KeyFrameKey, QJsonValue>	m_SelectedDataMap;		// Stored as the original/old data, before 'nudge' takes place
+	QMap<KeyFrameKey, QJsonValue>	m_OverwrittenDataMap;	// Old data that will be overwritten by the 'nudge' operation
+
+public:
+	EntityUndoCmd_NudgeSelectedKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameOffset, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_NudgeSelectedKeyFrames();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
 #endif // ENTITYUNDOCMDS_H

@@ -12,6 +12,7 @@
 #include "EntityDopeSheetScene.h"
 #include "EntityModel.h"
 #include "EntityWidget.h"
+#include "EntityUndoCmds.h"
 
 #include <QPainter>
 #include <QScrollBar>
@@ -369,7 +370,10 @@ float EntityDopeSheetView::GetZoom() const
 	m_bTimeLineMouseDown = false;
 
 	if(DRAGSTATE_Dragging == m_eDragState)
-		static_cast<EntityDopeSheetScene *>(scene())->NudgeSelectedKeyFrames(0);
+	{
+		EntityUndoCmd_NudgeSelectedKeyFrames *pCmd = new EntityUndoCmd_NudgeSelectedKeyFrames(m_pStateData->GetDopeSheetScene(), GetNearestFrame(m_MouseScenePos.x()) - GetNearestFrame(m_ptDragStart.x()));
+		m_pStateData->GetModel().GetItem().GetUndoStack()->push(pCmd);
+	}
 	else if(rubberBandRect().isNull() && pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f)
 		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
 

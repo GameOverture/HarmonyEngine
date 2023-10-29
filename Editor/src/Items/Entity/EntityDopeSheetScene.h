@@ -33,19 +33,28 @@
 class EntityStateData;
 class EntityTreeItemData;
 
+typedef std::tuple<EntityTreeItemData *, int, QString> KeyFrameKey;
+
 class GraphicsKeyFrameItem : public QGraphicsRectItem
 {
 public:
+	enum DataKey
+	{
+		DATAKEY_TreeItemData = 0,
+		DATAKEY_FrameIndex,
+		DATAKEY_CategoryPropString	// Category + "/" + Property
+	};
+
 	GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent = nullptr);
 	virtual ~GraphicsKeyFrameItem();
+
+	KeyFrameKey GetKey() const;
+	void SetKey(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryProp);
 
 protected:
 	virtual QVariant itemChange(GraphicsItemChange eChange, const QVariant &value) override;
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) override;
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *pEvent) override;
-	//virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *pEvent) override;
-	//virtual void mousePressEvent(QGraphicsSceneMouseEvent *pEvent) override;
-	//virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *pEvent) override;
 };
 
 class EntityDopeSheetScene : public QGraphicsScene
@@ -55,7 +64,7 @@ class EntityDopeSheetScene : public QGraphicsScene
 	int																				m_iFramesPerSecond;
 
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;
-	QMap<std::tuple<EntityTreeItemData *, int, QString>, GraphicsKeyFrameItem *>	m_KeyFramesGfxRectMap;
+	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_KeyFramesGfxRectMap;
 
 	int																				m_iCurrentFrame;
 	QGraphicsLineItem *																m_pCurrentFrameLine;
@@ -84,10 +93,10 @@ public:
 	QJsonValue ExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, QString sCategoryName, QString sPropName) const;
 
 	void SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj);
-	bool SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue);
-	void RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName);
+	bool SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue, bool bRefreshGfxItems);
+	void RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, bool bRefreshGfxItems);
 
-	void NudgeSelectedKeyFrames(int iFrameOffset);
+	void NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems);
 
 	void RefreshAllGfxItems();
 };

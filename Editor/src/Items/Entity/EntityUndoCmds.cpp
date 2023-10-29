@@ -359,17 +359,17 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 			if(ptNewTranslation != ptOldTranslation)
 			{
 				QVariant tmpVariant = QPointF(ptNewTranslation.x, ptNewTranslation.y);
-				bCreatedTranslationKeyFrame = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+				bCreatedTranslationKeyFrame = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant), false);
 			}
 			if(dNewRotation != dOldRotation)
 			{
 				QVariant tmpVariant = dNewRotation;
-				bCreatedRotationKeyFrame = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_double, tmpVariant));
+				bCreatedRotationKeyFrame = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_double, tmpVariant), false);
 			}
 			if(vNewScale != vOldScale)
 			{
 				QVariant tmpVariant = QPointF(vNewScale.x, vNewScale.y);
-				bCreatedScaleKeyFrame = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+				bCreatedScaleKeyFrame = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant), false);
 			}
 
 			m_CreatedKeyFrameList.push_back(std::make_tuple(bCreatedTranslationKeyFrame, bCreatedRotationKeyFrame, bCreatedScaleKeyFrame));
@@ -386,11 +386,13 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 			shapeCtrl.Deserialize(m_sOldShapeDataList.last(), nullptr);
 			shapeCtrl.TransformSelf(m_NewTransformList[i]);
 			
-			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", shapeCtrl.Serialize());
+			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", shapeCtrl.Serialize(), false);
 		}
 
 		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
 	}
+
+	pStateData->GetDopeSheetScene().RefreshAllGfxItems();
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
@@ -430,41 +432,43 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 			if(ptOldTranslation != ptNewTranslation)
 			{
 				if(std::get<0>(m_CreatedKeyFrameList[i]))
-					pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position");
+					pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", false);
 				else
 				{
 					QVariant tmpVariant = QPointF(ptOldTranslation.x, ptOldTranslation.y);
-					pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+					pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant), false);
 				}
 			}
 			if(dOldRotation != dNewRotation)
 			{
 				if(std::get<1>(m_CreatedKeyFrameList[i]))
-					pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation");
+					pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", false);
 				else
 				{
 					QVariant tmpVariant = dOldRotation;
-					pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_double, tmpVariant));
+					pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_double, tmpVariant), false);
 				}
 			}
 			if(vOldScale != vNewScale)
 			{
 				if(std::get<2>(m_CreatedKeyFrameList[i]))
-					pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale");
+					pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", false);
 				else
 				{
 					QVariant tmpVariant = QPointF(vOldScale.x, vOldScale.y);
-					pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant));
+					pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant), false);
 				}
 			}
 
 			m_sOldShapeDataList.push_back(QString());
 		}
 		else
-			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", m_sOldShapeDataList[i]);
+			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", m_sOldShapeDataList[i], false);
 
 		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
 	}
+
+	pStateData->GetDopeSheetScene().RefreshAllGfxItems();
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
@@ -521,7 +525,7 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef,
 /*virtual*/ void EntityUndoCmd_ShapeData::redo() /*override*/
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
-	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data", m_sNewData);
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data", m_sNewData, true);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
@@ -535,7 +539,7 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef,
 /*virtual*/ void EntityUndoCmd_ShapeData::undo() /*override*/
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
-	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data", m_sPrevData);
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data", m_sPrevData, true);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
@@ -738,4 +742,113 @@ EntityUndoCmd_PackToArray::EntityUndoCmd_PackToArray(ProjectItemData &entityItem
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
 		pWidget->RequestSelectedItems(readdedItemUuidList);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameOffset, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_iFrameOffset(iFrameOffset)
+{
+	QList<QGraphicsItem *> selectedItemsList = m_DopeSheetSceneRef.selectedItems();
+	for(QGraphicsItem *pGfxItem : selectedItemsList)
+	{
+		GraphicsKeyFrameItem *pGfxKeyFrameItem = static_cast<GraphicsKeyFrameItem *>(pGfxItem);
+		std::tuple<EntityTreeItemData *, int, QString> tupleKey = pGfxKeyFrameItem->GetKey();
+		QString sCategory = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[0];
+		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
+		
+		// Keep track of the affected original data
+		m_SelectedDataMap[tupleKey] = m_DopeSheetSceneRef.GetKeyFrameProperty(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+																			  std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+																			  sCategory,
+																			  sProperty);
+		
+		// Check if this keyframe will overwrite an existing keyframe
+		tupleKey = std::make_tuple(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+								   HyMath::Max(0, std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey) + m_iFrameOffset),
+								   std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey));
+		if(m_OverwrittenDataMap.contains(tupleKey))
+		{
+			// Keep track of the original data that will be overwritten by the above 'm_SelectedDataMap' nudging on top of this keyframe
+			m_OverwrittenDataMap[tupleKey] = m_DopeSheetSceneRef.GetKeyFrameProperty(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+																					 std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+																					 sCategory,
+																					 sProperty);
+		}
+	}
+}
+
+/*virtual*/ EntityUndoCmd_NudgeSelectedKeyFrames::~EntityUndoCmd_NudgeSelectedKeyFrames()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_NudgeSelectedKeyFrames::redo() /*override*/
+{
+	// First sort the contents of 'm_SelectedDataMap' by frame index, ordered based on the direction of the nudge
+	QList<KeyFrameKey> sortedKeyList = m_SelectedDataMap.keys();
+	std::sort(sortedKeyList.begin(), sortedKeyList.end(), [this](const KeyFrameKey &lhs, const KeyFrameKey &rhs) -> bool
+	{
+		return (m_iFrameOffset > 0) ? (std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(lhs) < std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(rhs)) :
+									  (std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(lhs) > std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(rhs));
+	});
+
+	// Now nudge the keyframes
+	for(KeyFrameKey tupleKey : sortedKeyList)
+	{
+		QString sCategory = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[0];
+		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
+
+		m_DopeSheetSceneRef.NudgeKeyFrameProperty(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+												  std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+												  sCategory,
+												  sProperty,
+												  m_iFrameOffset,
+												  false);
+	}
+	
+	m_DopeSheetSceneRef.RefreshAllGfxItems();
+}
+
+/*virtual*/ void EntityUndoCmd_NudgeSelectedKeyFrames::undo() /*override*/
+{
+	// First remove the keyframes that were nudged
+	for(KeyFrameKey tupleKey : m_SelectedDataMap.keys())
+	{
+		QString sCategory = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[0];
+		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
+		m_DopeSheetSceneRef.RemoveKeyFrameProperty(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+												   HyMath::Max(0, std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey) + m_iFrameOffset),
+												   sCategory,
+												   sProperty,
+												   false);
+	}
+
+	// Then restore the original data
+	for(KeyFrameKey tupleKey : m_SelectedDataMap.keys())
+	{
+		QString sCategory = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[0];
+		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
+		m_DopeSheetSceneRef.SetKeyFrameProperty(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+												std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+												sCategory,
+												sProperty,
+												m_SelectedDataMap[tupleKey],
+												false);
+	}
+	// As well as the data that was overwritten
+	for(KeyFrameKey tupleKey : m_OverwrittenDataMap.keys())
+	{
+		QString sCategory = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[0];
+		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
+		m_DopeSheetSceneRef.SetKeyFrameProperty(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+												std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+												sCategory,
+												sProperty,
+												m_OverwrittenDataMap[tupleKey],
+												false);
+	}
+
+	m_DopeSheetSceneRef.RefreshAllGfxItems();
 }

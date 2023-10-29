@@ -30,6 +30,20 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal 
 {
 }
 
+KeyFrameKey GraphicsKeyFrameItem::GetKey() const
+{
+	return std::make_tuple(data(DATAKEY_TreeItemData).value<EntityTreeItemData *>(),
+						   data(DATAKEY_FrameIndex).toInt(),
+						   data(DATAKEY_CategoryPropString).toString());
+}
+
+void GraphicsKeyFrameItem::SetKey(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryProp)
+{
+	setData(DATAKEY_TreeItemData, QVariant::fromValue(pItemData));
+	setData(DATAKEY_FrameIndex, iFrameIndex);
+	setData(DATAKEY_CategoryPropString, sCategoryProp);
+}
+
 /*virtual*/ QVariant GraphicsKeyFrameItem::itemChange(GraphicsItemChange eChange, const QVariant &value) /*override*/
 {
 	switch(eChange)
@@ -57,50 +71,7 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal 
 	scene()->update();
 }
 
-///*virtual*/ void GraphicsKeyFrameItem::mouseMoveEvent(QGraphicsSceneMouseEvent *pEvent) /*override*/
-//{
-//}
-
-///*virtual*/ void GraphicsKeyFrameItem::mousePressEvent(QGraphicsSceneMouseEvent *pEvent) /*override*/
-//{
-//	
-//}
-
-///*virtual*/ void GraphicsKeyFrameItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *pEvent) /*override*/
-//{
-//	if(pEvent->button() == Qt::MouseButton::LeftButton)
-//	{
-//		if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
-//		{
-//			setSelected(!isSelected());
-//		}
-//		else
-//		{
-//			scene()->clearSelection();
-//			setSelected(true);
-//		}
-//	}
-//}
-
-///*virtual*/ bool GraphicsKeyFrameItem::sceneEvent(QEvent *pEvent) /*override*/
-//{
-//	//HyGuiLog("GraphicsKeyFrameItem::sceneEvent: " % QString::number((int)pEvent->type()), LOGTYPE_Normal);
-//	if(pEvent->type() == QEvent::Type::GraphicsSceneHoverEnter)
-//	{
-//		setPen(HyGlobal::CovertHyColor(HyColor::White));
-//		scene()->update();
-//		hoverEnterEvent(QGraphics
-//		return true;
-//	}
-//	else if(pEvent->type() == QEvent::Type::GraphicsSceneHoverLeave)
-//	{
-//		
-//		scene()->update();
-//		return true;
-//	}
-//
-//	return QGraphicsRectItem::sceneEvent(pEvent);
-//}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj) :
 	QGraphicsScene(),
@@ -314,13 +285,13 @@ QJsonValue EntityDopeSheetScene::GetKeyFrameProperty(EntityTreeItemData *pItemDa
 	if(itemKeyFrameMapRef.contains(iFrameIndex) == false)
 		return QJsonValue();
 
-	if(itemKeyFrameMapRef[iFrameIndex].contains("sCategoryName") == false)
+	if(itemKeyFrameMapRef[iFrameIndex].contains(sCategoryName) == false)
 		return QJsonValue();
 
-	if(itemKeyFrameMapRef[iFrameIndex]["sCategoryName"].toObject().contains(sPropName) == false)
+	if(itemKeyFrameMapRef[iFrameIndex][sCategoryName].toObject().contains(sPropName) == false)
 		return QJsonValue();
 
-	return itemKeyFrameMapRef[iFrameIndex]["sCategoryName"].toObject()[sPropName];
+	return itemKeyFrameMapRef[iFrameIndex][sCategoryName].toObject()[sPropName];
 }
 
 QJsonValue EntityDopeSheetScene::ExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, QString sCategoryName, QString sPropName) const
@@ -396,7 +367,7 @@ void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, 
 	RefreshAllGfxItems();
 }
 
-bool EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue)
+bool EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue, bool bRefreshGfxItems)
 {
 	bool bIsNewKeyFrame = false;
 
@@ -421,11 +392,13 @@ bool EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, in
 
 	keyFrameObjRef.insert(sCategoryName, categoryObj);
 
-	RefreshAllGfxItems();
+	if(bRefreshGfxItems)
+		RefreshAllGfxItems();
+
 	return bIsNewKeyFrame;
 }
 
-void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName)
+void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, bool bRefreshGfxItems)
 {
 	if(m_KeyFramesMap.contains(pItemData) == false || m_KeyFramesMap[pItemData].contains(iFrameIndex) == false)
 		return;
@@ -464,11 +437,15 @@ void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData,
 		m_KeyFramesGfxRectMap.remove(gfxRectMapKey);
 	}
 
-	RefreshAllGfxItems();
+	if(bRefreshGfxItems)
+		RefreshAllGfxItems();
 }
 
-void EntityDopeSheetScene::NudgeSelectedKeyFrames(int iFrameOffset)
+void EntityDopeSheetScene::NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems)
 {
+	QJsonValue propValue = GetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, sPropName);
+	RemoveKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, sPropName, false);
+	SetKeyFrameProperty(pItemData, HyMath::Max(0, iFrameIndex + iNudgeAmount), sCategoryName, sPropName, propValue, bRefreshGfxItems);
 }
 
 void EntityDopeSheetScene::RefreshAllGfxItems()
@@ -515,7 +492,7 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 					if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
 					{
 						GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
-						pNewGfxRectItem->setData(0, QVariant::fromValue(pCurItemData));
+						pNewGfxRectItem->SetKey(pCurItemData, iFrameIndex, sPropString);
 						pNewGfxRectItem->setAcceptedMouseButtons(Qt::LeftButton);
 						pNewGfxRectItem->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
 
@@ -543,21 +520,3 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 
 	update();
 }
-
-//EntityDopeSheetScene::DragState EntityDopeSheetScene::GetDragState() const
-//{
-//	return m_eDragState;
-//}
-//
-//void EntityDopeSheetScene::SetDragState(DragState eDragState)
-//{
-//	m_eDragState = eDragState;
-//}
-//
-//void EntityDopeSheetScene::OnDragMove(QMouseEvent *pEvent)
-//{
-//}
-//
-//void EntityDopeSheetScene::OnDragFinished(QMouseEvent *pEvent)
-//{
-//}
