@@ -56,6 +56,69 @@ float EntityDopeSheetView::GetZoom() const
 	return m_fZoom;
 }
 
+/*virtual*/ void EntityDopeSheetView::contextMenuEvent(QContextMenuEvent *pEvent) /*override*/
+{
+	if(m_pStateData == nullptr || pEvent->pos().y() <= TIMELINE_HEIGHT + 1)
+		return;
+
+	QPointF ptScenePos = mapToScene(pEvent->pos());
+
+	qreal fPosY = TIMELINE_HEIGHT + 1.0f;
+
+	EntityTreeItemData *pRightClickItem = nullptr;
+	QPair<QString, QString> rightClickProp;
+	QList<EntityTreeItemData *> itemList = GetItems();
+	for(EntityTreeItemData *pEntItemData : itemList)
+	{
+		fPosY += ITEMS_LINE_HEIGHT;
+		if(ptScenePos.y() < fPosY)
+		{
+			pRightClickItem = pEntItemData;
+			break;
+		}
+
+		if(pEntItemData->IsSelected())
+		{
+			QList<QPair<QString, QString>> propList;
+			propList = GetScene()->GetUniquePropertiesList(pEntItemData);
+
+			for(QPair<QString, QString> &propPair : propList)
+			{
+				fPosY += ITEMS_LINE_HEIGHT;
+				if(ptScenePos.y() < fPosY)
+				{
+					pRightClickItem = pEntItemData;
+					rightClickProp = propPair;
+					break;
+				}
+			}
+		}
+		if(pRightClickItem)
+			break;
+	}
+
+	if(pRightClickItem)
+	{
+		int iFrame = GetNearestFrame(ptScenePos.x());
+
+		QMenu menu;
+		menu.addAction("Add Key Frame", this, SLOT(OnAddKeyFrame()));
+		menu.addAction("Remove Key Frame", this, SLOT(OnRemoveKeyFrame()));
+		menu.addSeparator();
+		menu.addAction("Add Property", this, SLOT(OnAddProperty()));
+		menu.addAction("Remove Property", this, SLOT(OnRemoveProperty()));
+		menu.addSeparator();
+		menu.addAction("Copy", this, SLOT(OnCopy()));
+		menu.addAction("Paste", this, SLOT(OnPaste()));
+		menu.addSeparator();
+		menu.addAction("Select All", this, SLOT(OnSelectAll()));
+		menu.addAction("Deselect All", this, SLOT(OnDeselectAll()));
+		menu.addSeparator();
+		menu.addAction("Delete", this, SLOT(OnDelete()));
+		menu.exec(pEvent->globalPos());
+	}
+}
+
 /*virtual*/ void EntityDopeSheetView::drawBackground(QPainter *painter, const QRectF &rect) /*override*/
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -115,18 +178,9 @@ float EntityDopeSheetView::GetZoom() const
 	qreal fPosY = rect.y() + TIMELINE_HEIGHT + 1.0f;
 	fPosY -= verticalScrollBar()->value();
 
-	// Gather all the entity items (root, children, shapes) into one list 'itemList'
-	QList<EntityTreeItemData *> itemList, shapeList;
-	static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetTreeItemData(itemList, shapeList);
-	itemList += shapeList;
-	itemList.prepend(static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetRootTreeItemData());
-
+	QList<EntityTreeItemData *> itemList = GetItems();
 	for(EntityTreeItemData *pEntItemData : itemList)
 	{
-		//// Only draw the items that have key frames
-		//if(GetScene()->GetKeyFramesMap().contains(pEntItemData) == false)
-		//	continue;
-
 		HyColor textColor = HyColor::WidgetFrame;
 
 		// Determine number of rows of key frames
@@ -404,6 +458,17 @@ void EntityDopeSheetView::DrawCurrentFrameIndicator(QPainter *pPainter, qreal fP
 	points[1] = QPointF(fPosX - (TIMELINE_CURRENTFRAME_TRIANGLE_WIDTH * 0.5f), fPosY - TIMELINE_CURRENTFRAME_TRIANGLE_HEIGHT);
 	points[2] = QPointF(fPosX + (TIMELINE_CURRENTFRAME_TRIANGLE_WIDTH * 0.5f), fPosY - TIMELINE_CURRENTFRAME_TRIANGLE_HEIGHT);
 	pPainter->drawPolygon(points, 3);
+}
+
+QList<EntityTreeItemData *> EntityDopeSheetView::GetItems() const
+{
+	// Gather all the entity items (root, children, shapes) into one list 'itemList'
+	QList<EntityTreeItemData *> itemList, shapeList;
+	static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetTreeItemData(itemList, shapeList);
+	itemList += shapeList;
+	itemList.prepend(static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetRootTreeItemData());
+
+	return itemList;
 }
 
 int EntityDopeSheetView::GetNearestFrame(qreal fScenePosX) const

@@ -48,6 +48,8 @@ public:
 	float GetZoom() const;
 
 protected:
+	virtual void contextMenuEvent(QContextMenuEvent *pEvent) override;
+
 	virtual void drawBackground(QPainter *painter, const QRectF &rect) override;
 	virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
 
@@ -60,6 +62,8 @@ protected:
 private:
 	void DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color = HyColor::WidgetFrame, HyColor shadowColor = HyColor::Black);
 	void DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY, HyColor color);
+
+	QList<EntityTreeItemData *> GetItems() const;
 
 	int GetNearestFrame(qreal fScenePosX) const;
 };
