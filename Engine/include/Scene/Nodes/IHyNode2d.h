@@ -29,9 +29,9 @@ protected:
 public:
 	HyAnimVec2						pos;
 	HyAnimFloat						rot;
-	HyAnimVec2						rot_pivot;
+	HyAnimVec2						rot_pivot;			// TODO: Consider making this just a vec2
 	HyAnimVec2						scale;
-	HyAnimVec2						scale_pivot;
+	HyAnimVec2						scale_pivot;		// TODO: Consider making this just a vec2
 
 public:
 	IHyNode2d(HyType eNodeType, HyEntity2d *pParent);

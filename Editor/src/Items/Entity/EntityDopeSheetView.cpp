@@ -27,8 +27,18 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	m_bLeftSideDirty(false),
 	m_fZoom(1.0f),
 	m_eDragState(DRAGSTATE_None),
-	m_ptDragStart(0.0f, 0.0f)
+	m_ptDragStart(0.0f, 0.0f),
+	m_pContextClickItem(nullptr),
+	m_ActionTweenPos(QIcon(":/icons16x16/tween-translate.png"), "Tween Position"),
+	m_ActionTweenRot(QIcon(":/icons16x16/tween-rotate.png"), "Tween Rotation"),
+	m_ActionTweenScale(QIcon(":/icons16x16/tween-scale.png"), "Tween Scale"),
+	m_ActionTweenAlpha(QIcon(":/icons16x16/tween-alpha.png"), "Tween Alpha")
 {
+	connect(&m_ActionTweenPos, &QAction::triggered, this, &EntityDopeSheetView::OnTweenPosition);
+	connect(&m_ActionTweenRot, &QAction::triggered, this, &EntityDopeSheetView::OnTweenRotation);
+	connect(&m_ActionTweenScale, &QAction::triggered, this, &EntityDopeSheetView::OnTweenScale);
+	connect(&m_ActionTweenAlpha, &QAction::triggered, this, &EntityDopeSheetView::OnTweenAlpha);
+
 	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	setDragMode(QGraphicsView::RubberBandDrag);
 }
@@ -61,19 +71,20 @@ float EntityDopeSheetView::GetZoom() const
 	if(m_pStateData == nullptr || pEvent->pos().y() <= TIMELINE_HEIGHT + 1)
 		return;
 
+	m_pContextClickItem = nullptr;
+	QPair<QString, QString> contextProp = QPair<QString, QString>("", "");
+
 	QPointF ptScenePos = mapToScene(pEvent->pos());
 
 	qreal fPosY = TIMELINE_HEIGHT + 1.0f;
 
-	EntityTreeItemData *pRightClickItem = nullptr;
-	QPair<QString, QString> rightClickProp;
 	QList<EntityTreeItemData *> itemList = GetItems();
 	for(EntityTreeItemData *pEntItemData : itemList)
 	{
 		fPosY += ITEMS_LINE_HEIGHT;
 		if(ptScenePos.y() < fPosY)
 		{
-			pRightClickItem = pEntItemData;
+			m_pContextClickItem = pEntItemData;
 			break;
 		}
 
@@ -87,34 +98,56 @@ float EntityDopeSheetView::GetZoom() const
 				fPosY += ITEMS_LINE_HEIGHT;
 				if(ptScenePos.y() < fPosY)
 				{
-					pRightClickItem = pEntItemData;
-					rightClickProp = propPair;
+					m_pContextClickItem = pEntItemData;
+					contextProp = propPair;
 					break;
 				}
 			}
 		}
-		if(pRightClickItem)
+		if(m_pContextClickItem)
 			break;
 	}
 
-	if(pRightClickItem)
+	if(m_pContextClickItem)
 	{
 		int iFrame = GetNearestFrame(ptScenePos.x());
 
+		int iNumSelected = scene()->selectedItems().size();
+
 		QMenu menu;
-		menu.addAction("Add Key Frame", this, SLOT(OnAddKeyFrame()));
-		menu.addAction("Remove Key Frame", this, SLOT(OnRemoveKeyFrame()));
+		// Determine the main tween action based on 'rightClickProp', then insert the tween menu containing all valid tweens for this item
+		if(contextProp.first == "Transformation")
+		{
+			if(contextProp.second == "Position")
+				menu.addAction(&m_ActionTweenPos);
+			else if(contextProp.second == "Rotation")
+				menu.addAction(&m_ActionTweenRot);
+			else if(contextProp.second == "Scale")
+				menu.addAction(&m_ActionTweenScale);
+		}
+		else if(contextProp.first == "Body")
+		{
+			if(contextProp.second == "Alpha")
+				menu.addAction(&m_ActionTweenAlpha);
+		}
+		QMenu tweenMenu("Add Tween");
+		tweenMenu.addAction(&m_ActionTweenPos);
+		tweenMenu.addAction(&m_ActionTweenRot);
+		tweenMenu.addAction(&m_ActionTweenScale);
+		tweenMenu.addAction(&m_ActionTweenAlpha);
+
+		menu.addMenu(&tweenMenu);
 		menu.addSeparator();
-		menu.addAction("Add Property", this, SLOT(OnAddProperty()));
-		menu.addAction("Remove Property", this, SLOT(OnRemoveProperty()));
+		menu.addAction(QIcon(":/icons16x16/edit-copy.png"), "Copy");// , this, &EntityDopeSheetView::OnCopy);
+		menu.addAction(QIcon(":/icons16x16/edit-paste.png"), "Paste");//, this, &EntityDopeSheetView::OnPaste);
 		menu.addSeparator();
-		menu.addAction("Copy", this, SLOT(OnCopy()));
-		menu.addAction("Paste", this, SLOT(OnPaste()));
-		menu.addSeparator();
-		menu.addAction("Select All", this, SLOT(OnSelectAll()));
-		menu.addAction("Deselect All", this, SLOT(OnDeselectAll()));
-		menu.addSeparator();
-		menu.addAction("Delete", this, SLOT(OnDelete()));
+		menu.addAction("Select All '" % m_pContextClickItem->GetCodeName() % "' Key Frames", this, &EntityDopeSheetView::OnSelectAllItemKeyFrames);
+		if(iNumSelected >= 1)
+		{
+			menu.addAction("Deselect Key Frames", this, &EntityDopeSheetView::OnDeselectItemKeyFrames);
+			menu.addSeparator();
+			menu.addAction(QIcon(":/icons16x16/edit-delete.png"), "Delete '" % QString::number(iNumSelected) % "' Selected Key Frames", this, &EntityDopeSheetView::OnDeleteKeyFrames);
+		}
 		menu.exec(pEvent->globalPos());
 	}
 }
@@ -477,4 +510,39 @@ int EntityDopeSheetView::GetNearestFrame(qreal fScenePosX) const
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
 	return ((fScenePosX - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
+}
+
+void EntityDopeSheetView::OnTweenPosition()
+{
+	int i = 0;
+	i++;
+}
+
+void EntityDopeSheetView::OnTweenRotation()
+{
+}
+
+void EntityDopeSheetView::OnTweenScale()
+{
+}
+
+void EntityDopeSheetView::OnTweenAlpha()
+{
+}
+
+void EntityDopeSheetView::OnSelectAllItemKeyFrames()
+{
+	if(scene() == nullptr)
+		return;
+
+	static_cast<EntityDopeSheetScene *>(scene())->SelectAllItemKeyFrames(m_pContextClickItem);
+}
+
+void EntityDopeSheetView::OnDeselectItemKeyFrames()
+{
+	scene()->clearSelection();
+}
+
+void EntityDopeSheetView::OnDeleteKeyFrames()
+{
 }

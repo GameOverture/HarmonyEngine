@@ -448,6 +448,31 @@ void EntityDopeSheetScene::NudgeKeyFrameProperty(EntityTreeItemData *pItemData, 
 	SetKeyFrameProperty(pItemData, HyMath::Max(0, iFrameIndex + iNudgeAmount), sCategoryName, sPropName, propValue, bRefreshGfxItems);
 }
 
+void EntityDopeSheetScene::SelectAllItemKeyFrames(EntityTreeItemData *pItemData)
+{
+	clearSelection();
+
+	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
+	for(QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.begin(); iter != itemKeyFrameMapRef.end(); ++iter)
+	{
+		int iFrameIndex = iter.key();
+		QJsonObject propsObj = iter.value();
+
+		QStringList sCategoryList = propsObj.keys();
+		for(QString sCategoryName : sCategoryList)
+		{
+			QJsonObject categoryObj = propsObj[sCategoryName].toObject();
+			QStringList sPropList = categoryObj.keys();
+			for(QString sPropName : sPropList)
+			{
+				auto gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, sCategoryName % "/" % sPropName);
+				if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey))
+					m_KeyFramesGfxRectMap[gfxRectMapKey]->setSelected(true);
+			}
+		}
+	}
+}
+
 void EntityDopeSheetScene::RefreshAllGfxItems()
 {
 	// Gather all the entity items (root, children, shapes) into one list 'itemList'
@@ -519,4 +544,12 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 	}
 
 	update();
+}
+
+/*virtual*/ void EntityDopeSheetScene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent) /*override*/
+{
+	if(pMouseEvent->buttons() & Qt::RightButton)
+		pMouseEvent->accept(); // Eat right click to avoid deselecting items
+	else
+		QGraphicsScene::mousePressEvent(pMouseEvent);
 }

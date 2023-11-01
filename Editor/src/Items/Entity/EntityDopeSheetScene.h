@@ -98,7 +98,12 @@ public:
 
 	void NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems);
 
+	void SelectAllItemKeyFrames(EntityTreeItemData *pItemData);
+
 	void RefreshAllGfxItems();
+
+protected:
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent) override;
 };
 
 #endif // ENTITYDOPESHEETSCENE_H

@@ -246,5 +246,9 @@
         <file>icons16x16/items/AtlasFrame-Pending.png</file>
         <file>icons16x16/items/AtlasFrame-Settings.png</file>
         <file>icons16x16/items/AtlasFrame-Warning.png</file>
+        <file>icons16x16/tween-alpha.png</file>
+        <file>icons16x16/tween-rotate.png</file>
+        <file>icons16x16/tween-scale.png</file>
+        <file>icons16x16/tween-translate.png</file>
     </qresource>
 </RCC>
