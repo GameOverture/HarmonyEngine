@@ -131,6 +131,13 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 	};
 	std::tuple<int, int, bool, bool> spriteLastKnownAnimInfo(-1, 0, false, false);
 
+	// Tween Special Case:
+	// To determine the tween's current value, store the info that kicked it off, and extrapolate the based on Entity's 'iCURRENT_FRAME'
+	TweenInfo<glm::vec2> tweenPos;
+	TweenInfo<float> tweenRot;
+	TweenInfo<glm::vec2> tweenScale;
+	TweenInfo<float> tweenAlpha;
+
 	for(int iFrame : keyFrameMapRef.keys())
 	{
 		if(iFrame > iCURRENT_FRAME)
@@ -162,13 +169,18 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 				{
 					QJsonArray posArray = transformObj["Position"].toArray();
 					pThisHyNode->pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
+					tweenPos.Clear();
 				}
 				if(transformObj.contains("Rotation"))
+				{
 					pThisHyNode->rot.Set(transformObj["Rotation"].toDouble());
+					tweenRot.Clear();
+				}
 				if(transformObj.contains("Scale"))
 				{
 					QJsonArray scaleArray = transformObj["Scale"].toArray();
 					pThisHyNode->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
+					tweenScale.Clear();
 				}
 			}
 
@@ -185,10 +197,66 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 						static_cast<IHyBody2d *>(pThisHyNode)->SetTint(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
 					}
 					if(bodyObj.contains("Alpha"))
+					{
 						static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(bodyObj["Alpha"].toDouble());
+						tweenAlpha.Clear();
+					}
 					if(bodyObj.contains("Override Display Order"))
 						static_cast<IHyBody2d *>(pThisHyNode)->SetDisplayOrder(bodyObj["Override Display Order"].toInt());
 				}
+			}
+
+			// Parse Position, Rotation, Scale, and Alpha above
+			// 
+			// Then parse their respective tweens
+			if(propsObj.contains("Tween Position"))
+			{
+				QJsonObject tweenPosObj = propsObj["Tween Position"].toObject();
+
+				tweenPos.m_iStartFrame = iFrame;
+				tweenPos.m_Start = pThisHyNode->pos.Get();
+				QJsonArray destinationArray = tweenPosObj["Destination"].toArray();
+				tweenPos.m_Destination.x = destinationArray[0].toDouble();
+				tweenPos.m_Destination.y = destinationArray[1].toDouble();
+				tweenPos.m_fDuration = tweenPosObj["Duration"].toDouble();
+				tweenPos.m_eTweenType = HyGlobal::GetTweenFromString(tweenPosObj["Tween Type"].toString());
+			}
+			if(propsObj.contains("Tween Rotation"))
+			{
+				QJsonObject tweenRotObj = propsObj["Tween Rotation"].toObject();
+
+				tweenRot.m_iStartFrame = iFrame;
+				tweenRot.m_Start = pThisHyNode->rot.Get();
+				tweenRot.m_Destination = tweenRotObj["Destination"].toDouble();
+				tweenRot.m_fDuration = tweenRotObj["Duration"].toDouble();
+				tweenRot.m_eTweenType = HyGlobal::GetTweenFromString(tweenRotObj["Tween Type"].toString());
+			}
+			if(propsObj.contains("Tween Scale"))
+			{
+				QJsonObject tweenScaleObj = propsObj["Tween Scale"].toObject();
+
+				tweenScale.m_iStartFrame = iFrame;
+				tweenScale.m_Start = pThisHyNode->scale.Get();
+				QJsonArray destinationArray = tweenScaleObj["Destination"].toArray();
+				tweenScale.m_Destination.x = destinationArray[0].toDouble();
+				tweenScale.m_Destination.y = destinationArray[1].toDouble();
+				tweenScale.m_fDuration = tweenScaleObj["Duration"].toDouble();
+				tweenScale.m_eTweenType = HyGlobal::GetTweenFromString(tweenScaleObj["Tween Type"].toString());
+			}
+			if(propsObj.contains("Tween Alpha"))
+			{
+				QJsonObject tweenAlphaObj = propsObj["Tween Alpha"].toObject();
+
+				tweenAlpha.m_iStartFrame = iFrame;
+				tweenAlpha.m_Start = static_cast<IHyBody2d *>(pThisHyNode)->alpha.Get();
+				tweenAlpha.m_Destination = tweenAlphaObj["Destination"].toDouble();
+				tweenAlpha.m_fDuration = tweenAlphaObj["Duration"].toDouble();
+				tweenAlpha.m_eTweenType = HyGlobal::GetTweenFromString(tweenAlphaObj["Tween Type"].toString());
+			}
+			// Apply any active tweens
+			if(tweenPos.m_iStartFrame != -1)
+			{
+				int iDestination;
 			}
 		}
 

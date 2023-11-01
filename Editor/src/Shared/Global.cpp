@@ -18,6 +18,7 @@
 /*static*/ QString HyGlobal::sm_sItemNamesPlural[NUM_ITEMTYPES];
 /*static*/ QString HyGlobal::sm_AssetNames[NUM_ASSETMANTYPES];
 /*static*/ QString HyGlobal::sm_ShapeNames[NUM_SHAPES];
+/*static*/ QString HyGlobal::sm_TweenNames[NUM_TWEENS];
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
 /*static*/ QStringList HyGlobal::sm_sTextStyleList;
 /*static*/ QStringList HyGlobal::sm_sAlignmentList;
@@ -90,6 +91,35 @@
 	sm_ShapeNames[SHAPE_LineSegment] = "Line Segment";
 	sm_ShapeNames[SHAPE_LineChain] = "Line Chain";
 	sm_ShapeNames[SHAPE_LineLoop] = "Line Loop";
+
+	sm_TweenNames[TWEEN_Linear] = "Linear";
+	sm_TweenNames[TWEEN_QuadIn] = "QuadIn";
+	sm_TweenNames[TWEEN_QuadOut] = "QuadOut";
+	sm_TweenNames[TWEEN_QuadInOut] = "QuadInOut";
+	sm_TweenNames[TWEEN_CubeIn] = "CubeIn";
+	sm_TweenNames[TWEEN_CubeOut] = "CubeOut";
+	sm_TweenNames[TWEEN_CubeInOut] = "CubeInOut";
+	sm_TweenNames[TWEEN_QuartIn] = "QuartIn";
+	sm_TweenNames[TWEEN_QuartOut] = "QuartOut";
+	sm_TweenNames[TWEEN_QuartInOut] = "QuartInOut";
+	sm_TweenNames[TWEEN_QuintIn] = "QuintIn";
+	sm_TweenNames[TWEEN_QuintOut] = "QuintOut";
+	sm_TweenNames[TWEEN_QuintInOut] = "QuintInOut";
+	sm_TweenNames[TWEEN_SineIn] = "SineIn";
+	sm_TweenNames[TWEEN_SineOut] = "SineOut";
+	sm_TweenNames[TWEEN_SineInOut] = "SineInOut";
+	sm_TweenNames[TWEEN_BounceIn] = "BounceIn";
+	sm_TweenNames[TWEEN_BounceOut] = "BounceOut";
+	sm_TweenNames[TWEEN_BounceInOut] = "BounceInOut";
+	sm_TweenNames[TWEEN_CircIn] = "CircIn";
+	sm_TweenNames[TWEEN_CircOut] = "CircOut";
+	sm_TweenNames[TWEEN_CircInOut] = "CircInOut";
+	sm_TweenNames[TWEEN_ExpoIn] = "ExpoIn";
+	sm_TweenNames[TWEEN_ExpoOut] = "ExpoOut";
+	sm_TweenNames[TWEEN_ExpoInOut] = "ExpoInOut";
+	sm_TweenNames[TWEEN_BackIn] = "BackIn";
+	sm_TweenNames[TWEEN_BackOut] = "BackOut";
+	sm_TweenNames[TWEEN_BackInOut] = "BackInOut";
 
 	sm_sSubIconNames[SUBICON_None] = "";
 	sm_sSubIconNames[SUBICON_New] = "-New";
@@ -224,6 +254,44 @@
 	return list;
 }
 
+/*static*/ QList<TweenType> HyGlobal::GetTweenList()
+{
+	QList<TweenType> list;
+	list.append(TWEEN_Linear);
+	list.append(TWEEN_QuadIn);
+	list.append(TWEEN_QuadOut);
+	list.append(TWEEN_QuadInOut);
+	list.append(TWEEN_CubeIn);
+	list.append(TWEEN_CubeOut);
+	list.append(TWEEN_CubeInOut);
+	list.append(TWEEN_QuartIn);
+	list.append(TWEEN_QuartOut);
+	list.append(TWEEN_QuartInOut);
+	list.append(TWEEN_QuintIn);
+	list.append(TWEEN_QuintOut);
+	list.append(TWEEN_QuintInOut);
+	list.append(TWEEN_SineIn);
+	list.append(TWEEN_SineOut);
+	list.append(TWEEN_SineInOut);
+	list.append(TWEEN_BounceIn);
+	list.append(TWEEN_BounceOut);
+	list.append(TWEEN_BounceInOut);
+	list.append(TWEEN_CircIn);
+	list.append(TWEEN_CircOut);
+	list.append(TWEEN_CircInOut);
+	list.append(TWEEN_ExpoIn);
+	list.append(TWEEN_ExpoOut);
+	list.append(TWEEN_ExpoInOut);
+	list.append(TWEEN_BackIn);
+	list.append(TWEEN_BackOut);
+	list.append(TWEEN_BackInOut);
+
+	if(list.size() != NUM_TWEENS)
+		HyGuiLog("HyGlobal::GetTweenList missing a type!", LOGTYPE_Error);
+
+	return list;
+}
+
 /*static*/ QStringList HyGlobal::GetTypeNameList()
 {
 	QList<ItemType> dirList = GetItemTypeList();
@@ -269,6 +337,27 @@
 	return SHAPE_None;
 }
 
+/*static*/ QStringList HyGlobal::GetTweenNameList()
+{
+	QList<TweenType> tweenList = GetTweenList();
+
+	QStringList list;
+	for(int i = 0; i < tweenList.size(); ++i)
+		list.append(TweenName(tweenList[i]));
+
+	return list;
+}
+
+/*static*/ TweenType HyGlobal::GetTweenFromString(QString sTween)
+{
+	for(int i = 0; i < NUM_TWEENS; ++i)
+	{
+		if(sTween.compare(TweenName(static_cast<TweenType>(i)), Qt::CaseInsensitive) == 0)
+			return static_cast<TweenType>(i);
+	}
+
+	return TWEEN_Unknown;
+}
 
 /*static*/ QStringList HyGlobal::GetTextStyleNameList()
 {

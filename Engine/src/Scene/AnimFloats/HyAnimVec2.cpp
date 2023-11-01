@@ -62,6 +62,11 @@ float HyAnimVec2::X(int32 iNewValue)
 	return m_AnimFloatList[0].Get();
 }
 
+float HyAnimVec2::GetX() const
+{
+	return m_AnimFloatList[0].Get();
+}
+
 void HyAnimVec2::SetX(float fNewValue)
 {
 	m_AnimFloatList[0] = fNewValue;
@@ -90,6 +95,11 @@ float HyAnimVec2::Y(int32 iNewValue)
 {
 	m_AnimFloatList[0].StopAnim();
 	m_AnimFloatList[1] = static_cast<float>(iNewValue);
+	return m_AnimFloatList[1].Get();
+}
+
+float HyAnimVec2::GetY() const
+{
 	return m_AnimFloatList[1].Get();
 }
 

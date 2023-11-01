@@ -136,6 +136,42 @@ enum EditorShape
 	NUM_SHAPES
 };
 
+enum TweenType
+{
+	TWEEN_Unknown = -1,
+
+	TWEEN_Linear = 0,
+	TWEEN_QuadIn,
+	TWEEN_QuadOut,
+	TWEEN_QuadInOut,
+	TWEEN_CubeIn,
+	TWEEN_CubeOut,
+	TWEEN_CubeInOut,
+	TWEEN_QuartIn,
+	TWEEN_QuartOut,
+	TWEEN_QuartInOut,
+	TWEEN_QuintIn,
+	TWEEN_QuintOut,
+	TWEEN_QuintInOut,
+	TWEEN_SineIn,
+	TWEEN_SineOut,
+	TWEEN_SineInOut,
+	TWEEN_BounceIn,
+	TWEEN_BounceOut,
+	TWEEN_BounceInOut,
+	TWEEN_CircIn,
+	TWEEN_CircOut,
+	TWEEN_CircInOut,
+	TWEEN_ExpoIn,
+	TWEEN_ExpoOut,
+	TWEEN_ExpoInOut,
+	TWEEN_BackIn,
+	TWEEN_BackOut,
+	TWEEN_BackInOut,
+
+	NUM_TWEENS
+};
+
 enum TextStyle
 {
 	TEXTSTYLE_Unknown = -1,
@@ -232,6 +268,7 @@ class HyGlobal
 	static QString														sm_sItemNamesPlural[NUM_ITEMTYPES];
 	static QString														sm_AssetNames[NUM_ASSETMANTYPES];
 	static QString														sm_ShapeNames[NUM_SHAPES];
+	static QString														sm_TweenNames[NUM_TWEENS];
 	static QString														sm_sSubIconNames[NUM_SUBICONS];
 	static QStringList													sm_sTextStyleList;
 	static QStringList													sm_sAlignmentList;
@@ -259,10 +296,13 @@ public:
 	static QList<ItemType> GetItemTypeList_Project();
 	static QList<ItemType> GetItemTypeList_Asset();
 	static QList<EditorShape> GetShapeList();
+	static QList<TweenType> GetTweenList();
 	static QStringList GetTypeNameList();
 	static ItemType GetTypeFromString(QString sType);
 	static QStringList GetShapeNameList();
 	static EditorShape GetShapeFromString(QString sShape);
+	static QStringList GetTweenNameList();
+	static TweenType GetTweenFromString(QString sTween);
 	static QStringList GetTextStyleNameList();
 	static TextStyle GetTextStyleFromString(QString sTextStyle);
 	static QStringList GetAlignmentNameList();
@@ -274,6 +314,7 @@ public:
 	static const QString ItemName(ItemType eItem, bool bPlural)			{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
 	static const QString AssetName(AssetManagerType eAsset)				{ return sm_AssetNames[eAsset]; }
 	static const QString ShapeName(EditorShape eShape)					{ return sm_ShapeNames[eShape]; }
+	static const QString TweenName(TweenType eTween)					{ return sm_TweenNames[eTween]; }
 	static const QString ItemExt(ItemType eItem);
 	static const QIcon ItemIcon(ItemType eItm, SubIcon eSubIcon)		{ return sm_ItemIcons[eItm][eSubIcon]; }
 	static const QIcon AssetIcon(AssetManagerType eAsset, SubIcon eSubIcon);

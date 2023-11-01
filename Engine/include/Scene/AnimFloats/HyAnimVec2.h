@@ -31,12 +31,14 @@ public:
 	float X() const;
 	float X(float fNewValue);
 	float X(int32 iNewValue);
+	float GetX() const;
 	void SetX(float fNewValue);
 	void SetX(int32 iNewValue);
 
 	float Y() const;
 	float Y(float fNewValue);
 	float Y(int32 iNewValue);
+	float GetY() const;
 	void SetY(float fNewValue);
 	void SetY(int32 iNewValue);
 

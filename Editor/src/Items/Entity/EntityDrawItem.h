@@ -25,6 +25,27 @@ class EntityDrawItem
 	TransformCtrl							m_Transform;
 	ShapeCtrl								m_ShapeCtrl;
 
+	template<typename TYPE>
+	struct TweenInfo
+	{
+		int m_iStartFrame;
+		TYPE m_Start;
+		TYPE m_Destination;
+		float m_fDuration;
+		TweenType m_eTweenType;
+
+		TweenInfo() {
+			Clear();
+		}
+
+		void Clear()
+		{
+			m_iStartFrame = -1;
+			m_fDuration = 0.0f;
+			m_eTweenType = TWEEN_Unknown;
+		}
+	};
+
 public:
 	EntityDrawItem(Project &projectRef, EntityTreeItemData *pModelItemData, HyEntity2d *pParent);
 	virtual ~EntityDrawItem();
