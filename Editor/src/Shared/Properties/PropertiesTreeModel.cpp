@@ -69,6 +69,37 @@ const PropertiesDef PropertiesTreeModel::FindPropertyDefinition(QString sCategor
 	return PropertiesDef();
 }
 
+void PropertiesTreeModel::SetToggle(QString sCategoryName, bool bToggleOn)
+{
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		{
+			SetToggle(createIndex(i, PROPERTIESCOLUMN_Name, m_pRootItem->GetChild(i)), bToggleOn);
+			return;
+		}
+	}
+}
+
+void PropertiesTreeModel::SetToggle(QString sCategoryName, QString sPropertyName, bool bToggleOn)
+{
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		{
+			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
+			{
+				if(0 == pCategoryTreeItem->GetChild(j)->data(PROPERTIESCOLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+				{
+					SetToggle(createIndex(j, PROPERTIESCOLUMN_Name, pCategoryTreeItem->GetChild(j)), bToggleOn);
+					return;
+				}
+			}
+		}
+	}
+}
+
 /*virtual*/ void PropertiesTreeModel::SetToggle(const QModelIndex &indexRef, bool bToggleOn)
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
@@ -214,6 +245,11 @@ QString PropertiesTreeModel::GetCategoryName(int iCategoryIndex) const
 	return m_pRootItem->GetChild(iCategoryIndex)->data(PROPERTIESCOLUMN_Name).toString();
 }
 
+QModelIndex PropertiesTreeModel::GetCategoryModelIndex(int iCategoryIndex) const
+{
+	return index(iCategoryIndex, PROPERTIESCOLUMN_Name);
+}
+
 bool PropertiesTreeModel::IsCategoryCheckable(int iCategoryIndex) const
 {
 	const PropertiesDef &categoryPropDefRef = m_PropertyDefMap[m_pRootItem->GetChild(iCategoryIndex)];
@@ -236,7 +272,7 @@ QString PropertiesTreeModel::GetPropertyName(int iCategoryIndex, int iPropertyIn
 	return m_pRootItem->GetChild(iCategoryIndex)->GetChild(iPropertyIndex)->data(PROPERTIESCOLUMN_Name).toString();
 }
 
-bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, bool bStartChecked /*= false*/, QString sToolTip /*= ""*/)
+bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, QString sToolTip /*= ""*/)
 {
 	// All category names must be unique
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
@@ -269,8 +305,8 @@ bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonD
 	def.sToolTip = sToolTip;
 	if(bCheckable == false)
 		def.eAccessType = PROPERTIESACCESS_ReadOnly;
-	else
-		def.eAccessType = bStartChecked ? PROPERTIESACCESS_ToggleOn : PROPERTIESACCESS_ToggleOff;
+	else // If it's checkable, then it is defaulted to unchecked
+		def.eAccessType = PROPERTIESACCESS_ToggleOff;
 
 	m_PropertyDefMap[pNewlyAddedTreeItem] = def;
 
@@ -332,6 +368,10 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 	// Set data in the property's value column
 	if(setData(index(pNewlyAddedTreeItem->GetIndex(), PROPERTIESCOLUMN_Value, categoryParentIndex), defaultData, Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendProperty() - setData failed", LOGTYPE_Error);
+
+	// If it's checkable, then it is always defaulted to unchecked
+	if(eAccessType == PROPERTIESACCESS_ToggleOn)
+		eAccessType = PROPERTIESACCESS_ToggleOff;
 
 	// Link this property definition to the proper TreeModelItem using 'm_PropertyDefMap'
 	PropertiesDef def(eType, eAccessType, sToolTip, defaultData, minRange, maxRange, stepAmt, sPrefix, sSuffix, delegateBuilder);
@@ -502,6 +542,10 @@ void PropertiesTreeModel::ResetValues()
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
 		TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+
+		if(m_PropertyDefMap[pCategoryTreeItem].eAccessType == PROPERTIESACCESS_ToggleOn)
+			m_PropertyDefMap[pCategoryTreeItem].eAccessType = PROPERTIESACCESS_ToggleOff;
+
 		for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
 		{
 			TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(j);

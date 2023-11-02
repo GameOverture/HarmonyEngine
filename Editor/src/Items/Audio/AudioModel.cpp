@@ -50,12 +50,18 @@ AudioStateData::AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair s
 	m_PropertiesModel.AppendProperty("Mixing", "Priority", PROPERTIESTYPE_int, stateFileData.m_Data["priority"].toInt(0), "Audio assets with higher priority will take presidence over others when channels are maxed out", PROPERTIESACCESS_Mutable, -iRANGE, iRANGE, 1);
 
 	int iLoops = stateFileData.m_Data["loops"].toInt(0);
-	m_PropertiesModel.AppendCategory("Looping", QVariant(), true, iLoops != 0, "The audio asset will play for loops+1 number of times, until stopped");
+	m_PropertiesModel.AppendCategory("Looping", QVariant(), true, "The audio asset will play for loops+1 number of times, until stopped");
 	m_PropertiesModel.AppendProperty("Looping", "Num Loops", PROPERTIESTYPE_int, iLoops != 0 ? iLoops : -1, "Number of loops, -1 is infinite loops. Passing one here plays the audio asset twice (1 loop)", PROPERTIESACCESS_Mutable, -1);
 
 	int iDist = stateFileData.m_Data["maxDist"].toInt(0);
-	m_PropertiesModel.AppendCategory("Positional", QVariant(), true, iDist != 0, "Emulates a simple 3D audio effect based on the item's position relative to the listening camera");
+	m_PropertiesModel.AppendCategory("Positional", QVariant(), true, "Emulates a simple 3D audio effect based on the item's position relative to the listening camera");
 	m_PropertiesModel.AppendProperty("Positional", "Max Distance", PROPERTIESTYPE_int, iDist != 0 ? iDist : 1, "The distance (and beyond) at which the audio asset will be played at its quietest", PROPERTIESACCESS_Mutable, 0, iRANGE, 1);
+
+	if(iLoops != 0)
+		m_PropertiesModel.SetToggle("Looping", true);
+
+	if(iDist != 0)
+		m_PropertiesModel.SetToggle("Positional", true);
 }
 
 /*virtual*/ AudioStateData::~AudioStateData()

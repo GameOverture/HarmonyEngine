@@ -123,6 +123,8 @@ public:
 	const PropertiesDef GetPropertyDefinition(const QModelIndex &indexRef) const;
 	const PropertiesDef FindPropertyDefinition(QString sCategoryName, QString sPropertyName) const;
 	
+	void SetToggle(QString sCategoryName, bool bToggleOn);
+	void SetToggle(QString sCategoryName, QString sPropertyName, bool bToggleOn);
 	virtual void SetToggle(const QModelIndex &indexRef, bool bToggleOn);
 
 	QVariant GetPropertyValue(const QModelIndex &indexRef) const;
@@ -138,12 +140,13 @@ public:
 	int GetNumCategories() const;
 	QString GetCategoryName(const QModelIndex &indexRef) const;
 	QString GetCategoryName(int iCategoryIndex) const;
+	QModelIndex GetCategoryModelIndex(int iCategoryIndex) const;
 	bool IsCategoryCheckable(int iCategoryIndex) const;
 	int GetNumProperties(int iCategoryIndex) const;
 	QString GetPropertyName(const QModelIndex &indexRef) const;
 	QString GetPropertyName(int iCategoryIndex, int iPropertyIndex) const;
 
-	bool AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, bool bStartChecked = false, QString sToolTip = "");
+	bool AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, QString sToolTip = "");
 	bool AppendProperty(QString sCategoryName,
 						QString sName,
 						PropertiesType eType,

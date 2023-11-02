@@ -359,6 +359,47 @@
 	return TWEEN_Unknown;
 }
 
+/*static*/ HyTweenFunc HyGlobal::GetTweenFunc(TweenType eTween)
+{
+	switch(eTween)
+	{
+	case TWEEN_Linear:		return HyTween::Linear;
+	case TWEEN_QuadIn:		return HyTween::QuadIn;
+	case TWEEN_QuadOut:		return HyTween::QuadOut;
+	case TWEEN_QuadInOut:	return HyTween::QuadInOut;
+	case TWEEN_CubeIn:		return HyTween::CubeIn;
+	case TWEEN_CubeOut:		return HyTween::CubeOut;
+	case TWEEN_CubeInOut:	return HyTween::CubeInOut;
+	case TWEEN_QuartIn:		return HyTween::QuartIn;
+	case TWEEN_QuartOut:	return HyTween::QuartOut;
+	case TWEEN_QuartInOut:	return HyTween::QuartInOut;
+	case TWEEN_QuintIn:		return HyTween::QuintIn;
+	case TWEEN_QuintOut:	return HyTween::QuintOut;
+	case TWEEN_QuintInOut:	return HyTween::QuintInOut;
+	case TWEEN_SineIn:		return HyTween::SineIn;
+	case TWEEN_SineOut:		return HyTween::SineOut;
+	case TWEEN_SineInOut:	return HyTween::SineInOut;
+	case TWEEN_BounceIn:	return HyTween::BounceIn;
+	case TWEEN_BounceOut:	return HyTween::BounceOut;
+	case TWEEN_BounceInOut:	return HyTween::BounceInOut;
+	case TWEEN_CircIn:		return HyTween::CircIn;
+	case TWEEN_CircOut:		return HyTween::CircOut;
+	case TWEEN_CircInOut:	return HyTween::CircInOut;
+	case TWEEN_ExpoIn:		return HyTween::ExpoIn;
+	case TWEEN_ExpoOut:		return HyTween::ExpoOut;
+	case TWEEN_ExpoInOut:	return HyTween::ExpoInOut;
+	case TWEEN_BackIn:		return HyTween::BackIn;
+	case TWEEN_BackOut:		return HyTween::BackOut;
+	case TWEEN_BackInOut:	return HyTween::BackInOut;
+
+	default:
+		HyGuiLog("HyGlobal::GetTweenFunc missing a type!", LOGTYPE_Error);
+		break;
+	}
+
+	return nullptr;
+}
+
 /*static*/ QStringList HyGlobal::GetTextStyleNameList()
 {
 	return sm_sTextStyleList;

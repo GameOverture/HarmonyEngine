@@ -399,8 +399,7 @@ void EntityWidget::SetExtrapolatedProperties()
 		ui->lblSelectedItemText->setVisible(true);
 		ui->lblSelectedItemText->setText("Multiple items selected");
 	}
-	// Expand the top level nodes (the properties' categories)
-	ui->propertyTree->expandAll();
+	
 	ui->propertyTree->resizeColumnToContents(0);
 }
 

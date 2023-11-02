@@ -303,6 +303,7 @@ public:
 	static EditorShape GetShapeFromString(QString sShape);
 	static QStringList GetTweenNameList();
 	static TweenType GetTweenFromString(QString sTween);
+	static HyTweenFunc GetTweenFunc(TweenType eTween);
 	static QStringList GetTextStyleNameList();
 	static TextStyle GetTextStyleFromString(QString sTextStyle);
 	static QStringList GetAlignmentNameList();

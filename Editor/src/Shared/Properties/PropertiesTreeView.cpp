@@ -50,9 +50,17 @@ PropertiesTreeView::~PropertiesTreeView()
 /*virtual*/ void PropertiesTreeView::setModel(QAbstractItemModel *pModel) /*override*/
 {
 	QTreeView::setModel(pModel);
-	setItemDelegate(new PropertiesDelegate(this, this));
+	setItemDelegate(new PropertiesDelegate(this, this)); // TODO: delete old delegate (store pointer as member variable)
 
-	expandAll();
+	PropertiesTreeModel *pPropModel = static_cast<PropertiesTreeModel *>(model());
+	const int iNUM_CATEGORIES = pPropModel->GetNumCategories();
+	for(int i = 0; i < iNUM_CATEGORIES; ++i)
+	{
+		if(pPropModel->IsCategoryEnabled(i))
+			expand(pPropModel->GetCategoryModelIndex(i));
+		else
+			collapse(pPropModel->GetCategoryModelIndex(i));
+	}
 }
 
 /*virtual*/ void PropertiesTreeView::paintEvent(QPaintEvent *pEvent) /*override*/
