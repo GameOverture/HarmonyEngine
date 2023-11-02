@@ -53,6 +53,9 @@ PropertiesTreeView::~PropertiesTreeView()
 	setItemDelegate(new PropertiesDelegate(this, this)); // TODO: delete old delegate (store pointer as member variable)
 
 	PropertiesTreeModel *pPropModel = static_cast<PropertiesTreeModel *>(model());
+	if(pPropModel == nullptr)
+		return;
+
 	const int iNUM_CATEGORIES = pPropModel->GetNumCategories();
 	for(int i = 0; i < iNUM_CATEGORIES; ++i)
 	{
