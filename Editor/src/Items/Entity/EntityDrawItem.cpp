@@ -253,41 +253,6 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 				tweenAlpha.m_fDuration = tweenAlphaObj["Duration"].toDouble();
 				tweenAlpha.m_eTweenType = HyGlobal::GetTweenFromString(tweenAlphaObj["Tween Type"].toString());
 			}
-			// Apply any active tweens
-			if(tweenPos.m_iStartFrame != -1)
-			{
-				float fElapsedTime = (iFrame - tweenPos.m_iStartFrame) * fFRAME_DURATION;
-				fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenPos.m_fDuration);
-				HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenPos.m_eTweenType);
-				float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
-				pThisHyNode->pos.SetX(tweenPos.m_Start.x + (tweenPos.m_Destination.x - tweenPos.m_Start.x) * fRatio);
-				pThisHyNode->pos.SetY(tweenPos.m_Start.y + (tweenPos.m_Destination.y - tweenPos.m_Start.y) * fRatio);
-			}
-			if(tweenRot.m_iStartFrame != -1)
-			{
-				float fElapsedTime = (iFrame - tweenRot.m_iStartFrame) * fFRAME_DURATION;
-				fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenRot.m_fDuration);
-				HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenRot.m_eTweenType);
-				float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
-				pThisHyNode->rot.Set(tweenRot.m_Start + (tweenRot.m_Destination - tweenRot.m_Start) * fRatio);
-			}
-			if(tweenScale.m_iStartFrame != -1)
-			{
-				float fElapsedTime = (iFrame - tweenScale.m_iStartFrame) * fFRAME_DURATION;
-				fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenScale.m_fDuration);
-				HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenScale.m_eTweenType);
-				float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
-				pThisHyNode->scale.SetX(tweenScale.m_Start.x + (tweenScale.m_Destination.x - tweenScale.m_Start.x) * fRatio);
-				pThisHyNode->scale.SetY(tweenScale.m_Start.y + (tweenScale.m_Destination.y - tweenScale.m_Start.y) * fRatio);
-			}
-			if(tweenAlpha.m_iStartFrame != -1)
-			{
-				float fElapsedTime = (iFrame - tweenAlpha.m_iStartFrame) * fFRAME_DURATION;
-				fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenAlpha.m_fDuration);
-				HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenAlpha.m_eTweenType);
-				float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
-				static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(tweenAlpha.m_Start + (tweenAlpha.m_Destination - tweenAlpha.m_Start) * fRatio);
-			}
 		}
 
 		switch(eItemType)
@@ -452,6 +417,42 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 
 		if(std::get<SPRITE_Paused>(spriteLastKnownAnimInfo) == false)
 			static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iCURRENT_FRAME - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
+	}
+
+	// Apply any active tweens
+	if(tweenPos.m_iStartFrame != -1)
+	{
+		float fElapsedTime = (iCURRENT_FRAME - tweenPos.m_iStartFrame) * fFRAME_DURATION;
+		fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenPos.m_fDuration);
+		HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenPos.m_eTweenType);
+		float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
+		pThisHyNode->pos.SetX(tweenPos.m_Start.x + (tweenPos.m_Destination.x - tweenPos.m_Start.x) * fRatio);
+		pThisHyNode->pos.SetY(tweenPos.m_Start.y + (tweenPos.m_Destination.y - tweenPos.m_Start.y) * fRatio);
+	}
+	if(tweenRot.m_iStartFrame != -1)
+	{
+		float fElapsedTime = (iCURRENT_FRAME - tweenRot.m_iStartFrame) * fFRAME_DURATION;
+		fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenRot.m_fDuration);
+		HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenRot.m_eTweenType);
+		float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
+		pThisHyNode->rot.Set(tweenRot.m_Start + (tweenRot.m_Destination - tweenRot.m_Start) * fRatio);
+	}
+	if(tweenScale.m_iStartFrame != -1)
+	{
+		float fElapsedTime = (iCURRENT_FRAME - tweenScale.m_iStartFrame) * fFRAME_DURATION;
+		fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenScale.m_fDuration);
+		HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenScale.m_eTweenType);
+		float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
+		pThisHyNode->scale.SetX(tweenScale.m_Start.x + (tweenScale.m_Destination.x - tweenScale.m_Start.x) * fRatio);
+		pThisHyNode->scale.SetY(tweenScale.m_Start.y + (tweenScale.m_Destination.y - tweenScale.m_Start.y) * fRatio);
+	}
+	if(tweenAlpha.m_iStartFrame != -1)
+	{
+		float fElapsedTime = (iCURRENT_FRAME - tweenAlpha.m_iStartFrame) * fFRAME_DURATION;
+		fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenAlpha.m_fDuration);
+		HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenAlpha.m_eTweenType);
+		float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
+		static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(tweenAlpha.m_Start + (tweenAlpha.m_Destination - tweenAlpha.m_Start) * fRatio);
 	}
 }
 
