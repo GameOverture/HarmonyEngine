@@ -167,6 +167,24 @@ QVariant PropertiesTreeModel::FindPropertyValue(QString sCategoryName, QString s
 	return QVariant();
 }
 
+QJsonValue PropertiesTreeModel::FindPropertyJsonValue(QString sCategoryName, QString sPropertyName) const
+{
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		{
+			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
+			{
+				if(0 == pCategoryTreeItem->GetChild(j)->data(PROPERTIESCOLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+					return ConvertValueToJson(pCategoryTreeItem->GetChild(j));
+			}
+		}
+	}
+
+	return QJsonValue();
+}
+
 /*virtual*/ void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
@@ -184,13 +202,19 @@ QVariant PropertiesTreeModel::FindPropertyValue(QString sCategoryName, QString s
 						HyGuiLog("PropertiesTreeModel::SetPropertyValue() - setData failed", LOGTYPE_Error);
 
 					if(m_PropertyDefMap[pPropertyTreeItem].eAccessType == PROPERTIESACCESS_ToggleOff)
-						m_PropertyDefMap[pPropertyTreeItem].eAccessType = PROPERTIESACCESS_ToggleOn;
+						SetToggle(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Name, pPropertyTreeItem), true);
 
 					return;
 				}
 			}
 		}
 	}
+}
+
+bool PropertiesTreeModel::IsCategory(const QModelIndex &indexRef) const
+{
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	return m_PropertyDefMap[pTreeItem].eType == PROPERTIESTYPE_Category;
 }
 
 bool PropertiesTreeModel::IsCategoryEnabled(QString sCategoryName) const
@@ -386,14 +410,11 @@ QJsonObject PropertiesTreeModel::SerializeJson()
 
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
-		TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
-
-		QJsonObject categoryObj;
-
-		// If this category is checkable, then we need to store the checked state (as a boolean) to "<name>_checked"
-		if(IsCategoryCheckable(i))
-			categoryObj.insert(pCategoryTreeItem->data(PROPERTIESCOLUMN_Name).toString() % "_checked", IsCategoryEnabled(i)); //pCategoryTreeItem->data(PROPERTIESCOLUMN_Value).toInt() == Qt::Checked);
+		if(IsCategoryEnabled(i) == false)
+			continue;
 		
+		TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+		QJsonObject categoryObj;
 		for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
 		{
 			TreeModelItem *pPropertyItem = pCategoryTreeItem->GetChild(j);
@@ -429,28 +450,17 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 	QStringList sCategoryList = propertiesObj.keys();
 	for(const QString &sCategory : sCategoryList)
 	{
-		QJsonObject categoryObj = propertiesObj[sCategory].toObject();
-
-		QStringList sPropertyList = categoryObj.keys();
-		if(sPropertyList.contains(sCategory % "_checked"))
+		for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 		{
-			for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+			if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategory, Qt::CaseSensitive))
 			{
-				if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategory, Qt::CaseSensitive))
-				{
-					TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
-					PropertiesDef &categoryPropDefRef = m_PropertyDefMap[pCategoryTreeItem];
-					if(categoryPropDefRef.eType != PROPERTIESTYPE_Category)
-						HyGuiLog("PropertiesTreeModel::DeserializeJson() - " % sCategory % " is not a category", LOGTYPE_Error);
-					else if(categoryPropDefRef.eAccessType != PROPERTIESACCESS_ToggleOn && categoryPropDefRef.eAccessType != PROPERTIESACCESS_ToggleOff)
-						HyGuiLog("PropertiesTreeModel::DeserializeJson() - " % sCategory % " is not 'togglable'", LOGTYPE_Error);
-
-					categoryPropDefRef.eAccessType = categoryObj[sCategory % "_checked"].toBool() ? PROPERTIESACCESS_ToggleOn : PROPERTIESACCESS_ToggleOff;
-					break;
-				}
+				if(m_PropertyDefMap[m_pRootItem->GetChild(i)].eAccessType == PROPERTIESACCESS_ToggleOff)
+					SetToggle(sCategory, true);
 			}
 		}
 
+		QJsonObject categoryObj = propertiesObj[sCategory].toObject();
+		QStringList sPropertyList = categoryObj.keys();
 		for(const QString &sProperty : sPropertyList)
 		{
 			const PropertiesDef propDef = FindPropertyDefinition(sCategory, sProperty);
@@ -574,7 +584,7 @@ void PropertiesTreeModel::ResetValues()
 		if((m_PropertyDefMap[pTreeItem].eAccessType == PROPERTIESACCESS_ToggleOn && valueRef == Qt::Unchecked) ||
 			(m_PropertyDefMap[pTreeItem].eAccessType == PROPERTIESACCESS_ToggleOff && valueRef == Qt::Checked))
 		{
-			PropertiesUndoCmd *pUndoCmd = new PropertiesUndoCmd(this, indexRef, static_cast<bool>(valueRef == Qt::Checked));
+			PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, static_cast<bool>(valueRef == Qt::Checked));
 			GetOwner().GetUndoStack()->push(pUndoCmd);
 		}
 	}
@@ -583,7 +593,7 @@ void PropertiesTreeModel::ResetValues()
 		const QVariant &origValue = GetPropertyValue(indexRef);
 		if(origValue != valueRef)
 		{
-			PropertiesUndoCmd *pUndoCmd = new PropertiesUndoCmd(this, indexRef, valueRef);
+			PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
 			GetOwner().GetUndoStack()->push(pUndoCmd);
 		}
 	}
@@ -681,7 +691,7 @@ void PropertiesTreeModel::ResetValues()
 			returnFlags |= Qt::ItemIsEnabled;
 
 		if(propDefRef.IsTogglable())
-			returnFlags |= Qt::ItemIsUserCheckable;
+			returnFlags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
 	}
 	else
 	{
@@ -842,6 +852,11 @@ void PropertiesTreeModel::ResetValues()
 	}
 
 	return QJsonValue();
+}
+
+/*virtual*/ PropertiesUndoCmd *PropertiesTreeModel::AllocateUndoCmd(const QModelIndex &index, const QVariant &newData)
+{
+	return new PropertiesUndoCmd(this, index, newData);
 }
 
 QJsonValue PropertiesTreeModel::ConvertValueToJson(TreeModelItem *pTreeItem) const

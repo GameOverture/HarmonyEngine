@@ -14,7 +14,8 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 	QUndoCommand(pParent),
 	m_pModel(pModel),
 	m_ModelIndex(index),
-	m_NewData(newData)
+	m_NewData(newData),
+	m_bDoFocusWidgetState(true)
 {
 	QString sText = pModel->GetPropertyName(m_ModelIndex);
 	if(m_ModelIndex.column() == PROPERTIESCOLUMN_Name)
@@ -41,10 +42,11 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 	else
 		m_pModel->setData(m_ModelIndex, m_NewData, Qt::UserRole);
 
-	if(m_pModel->GetPropertyDefinition(m_ModelIndex).IsCategory() == false)
-		m_pModel->GetOwner().PropertyModified(*m_pModel, m_ModelIndex);
+	//if(m_pModel->GetPropertyDefinition(m_ModelIndex).IsCategory() == false)
+	//	m_pModel->GetOwner().PropertyModified(*m_pModel, m_ModelIndex);
 
-	m_pModel->GetOwner().FocusWidgetState(m_pModel->GetStateIndex(), m_pModel->GetSubstate());
+	if(m_bDoFocusWidgetState)
+		m_pModel->GetOwner().FocusWidgetState(m_pModel->GetStateIndex(), m_pModel->GetSubstate());
 }
 
 /*virtual*/ void PropertiesUndoCmd::undo() /*override*/
@@ -54,8 +56,9 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 	else
 		m_pModel->setData(m_ModelIndex, m_OldData, Qt::UserRole);
 
-	if(m_pModel->GetPropertyDefinition(m_ModelIndex).IsCategory() == false)
-		m_pModel->GetOwner().PropertyModified(*m_pModel, m_ModelIndex);
+	//if(m_pModel->GetPropertyDefinition(m_ModelIndex).IsCategory() == false)
+	//	m_pModel->GetOwner().PropertyModified(*m_pModel, m_ModelIndex);
 	
-	m_pModel->GetOwner().FocusWidgetState(m_pModel->GetStateIndex(), m_pModel->GetSubstate());
+	if(m_bDoFocusWidgetState)
+		m_pModel->GetOwner().FocusWidgetState(m_pModel->GetStateIndex(), m_pModel->GetSubstate());
 }

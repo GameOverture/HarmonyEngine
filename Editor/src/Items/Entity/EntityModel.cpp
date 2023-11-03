@@ -551,29 +551,6 @@ QString EntityModel::GenerateSrc_SetStates() const
 	return sSrc;
 }
 
-/*virtual*/ void EntityModel::OnPropertyModified(PropertiesTreeModel &propertiesModelRef, const QModelIndex &indexRef) /*override*/
-{
-	EntityWidget *pEntWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
-	if(pEntWidget == nullptr)
-	{
-		HyGuiLog("EntityModel::OnPropertyModified() - EntityWidget was nullptr", LOGTYPE_Error);
-		return;
-	}
-	int iStateIndex = pEntWidget->GetCurStateIndex();
-	EntityStateData *pStateData = static_cast<EntityStateData *>(m_StateList[iStateIndex]);
-
-	int iFrameIndex = pStateData->GetDopeSheetScene().GetCurrentFrame();
-	QString sCategory = propertiesModelRef.GetCategoryName(indexRef);
-	QString sProperty = propertiesModelRef.GetPropertyName(indexRef);
-
-	EntityTreeItemData *pEntityTreeData = propertiesModelRef.GetSubstate().value<EntityTreeItemData *>();
-
-	if(propertiesModelRef.GetPropertyDefinition(indexRef).eAccessType == PROPERTIESACCESS_ToggleOff)
-		pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(pEntityTreeData, iFrameIndex, sCategory, sProperty, true);
-	else
-		pStateData->GetDopeSheetScene().SetKeyFrameProperty(pEntityTreeData, iFrameIndex, sCategory, sProperty, propertiesModelRef.GetPropertyJsonValue(indexRef), true);
-}
-
 /*virtual*/ void EntityModel::OnPopState(int iPoppedStateIndex) /*override*/
 {
 }

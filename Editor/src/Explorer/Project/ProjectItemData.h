@@ -67,7 +67,6 @@ public:
 	
 	void BlockAllWidgetSignals(bool bBlock);
 
-	void PropertyModified(PropertiesTreeModel &propertiesModelRef, const QModelIndex &indexRef);
 	void FocusWidgetState(int iStateIndex, QVariant subState);
 	
 	virtual void DeleteFromProject() override;

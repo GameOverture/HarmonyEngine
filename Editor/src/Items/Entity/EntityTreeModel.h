@@ -20,6 +20,16 @@
 
 class EntityModel;
 
+class PropertiesUndoCmd;
+class EntityPropertiesTreeModel : public PropertiesTreeModel
+{
+public:
+	explicit EntityPropertiesTreeModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QObject *pParent = nullptr);
+	virtual ~EntityPropertiesTreeModel();
+
+	virtual PropertiesUndoCmd *AllocateUndoCmd(const QModelIndex &index, const QVariant &newData) override;
+};
+
 enum EntityItemType
 {
 	ENTTYPE_Root,
@@ -28,7 +38,6 @@ enum EntityItemType
 	ENTTYPE_ArrayFolder,
 	ENTTYPE_ArrayItem,
 };
-
 class EntityTreeItemData : public TreeModelItemData
 {
 	Q_OBJECT
@@ -38,7 +47,7 @@ class EntityTreeItemData : public TreeModelItemData
 
 	EntityDrawItem *									m_pDrawItem;
 
-	PropertiesTreeModel *								m_pPropertiesModel;
+	EntityPropertiesTreeModel *							m_pPropertiesModel;
 
 	QString												m_sPromotedEntityType;
 	bool												m_bIsForwardDeclared;

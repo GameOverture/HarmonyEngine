@@ -15,6 +15,8 @@
 #include "ProjectItemData.h"
 #include "Shared/TreeModel/ITreeModel.h"
 
+class PropertiesUndoCmd;
+
 enum PropertiesColumn
 {
 	PROPERTIESCOLUMN_Name = 0,
@@ -133,8 +135,10 @@ public:
 	QJsonValue GetPropertyJsonValue(int iCategoryIndex, int iPropertyIndex) const;
 	bool IsPropertyDefaultValue(int iCategoryIndex, int iPropertyIndex) const;
 	QVariant FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
+	QJsonValue FindPropertyJsonValue(QString sCategoryName, QString sPropertyName) const;
 	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
 
+	bool IsCategory(const QModelIndex &indexRef) const;
 	bool IsCategoryEnabled(QString sCategoryName) const;
 	bool IsCategoryEnabled(int iCategoryIndex) const;
 	int GetNumCategories() const;
@@ -174,6 +178,8 @@ public:
 
 	static QVariant ConvertJsonToVariant(PropertiesType ePropType, const QJsonValue &valueRef);
 	static QJsonValue ConvertVariantToJson(PropertiesType ePropType, const QVariant &valueRef);
+
+	virtual PropertiesUndoCmd *AllocateUndoCmd(const QModelIndex &index, const QVariant &newData);
 
 private:
 	QJsonValue ConvertValueToJson(TreeModelItem *pTreeItem) const;

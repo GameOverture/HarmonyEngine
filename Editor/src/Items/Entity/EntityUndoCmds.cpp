@@ -852,3 +852,90 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 
 	m_DopeSheetSceneRef.RefreshAllGfxItems();
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_PropertyModified::EntityUndoCmd_PropertyModified(PropertiesTreeModel *pModel, const QModelIndex &index, const QVariant &newData, QUndoCommand *pParent /*= nullptr*/) :
+	PropertiesUndoCmd(pModel, index, newData, pParent),
+	m_iStateIndex(-1),
+	m_iFrameIndex(-1)
+{
+	// Don't want base class (PropertiesUndoCmd) to invoke FocusWidgetState() before we set our models
+	m_bDoFocusWidgetState = false;
+
+	if(m_pModel->GetOwner().GetWidget() == nullptr)
+	{
+		HyGuiLog("EntityUndoCmd_PropertyModified - EntityWidget was nullptr", LOGTYPE_Error);
+		return;
+	}
+	
+	EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_pModel->GetOwner().GetWidget()->GetCurStateData())->GetDopeSheetScene();
+	EntityTreeItemData *pEntityTreeData = m_pModel->GetSubstate().value<EntityTreeItemData *>();
+
+	m_iStateIndex = m_pModel->GetOwner().GetWidget()->GetCurStateIndex();
+	m_iFrameIndex = dopeSheetSceneRef.GetCurrentFrame();
+}
+
+/*virtual*/ EntityUndoCmd_PropertyModified::~EntityUndoCmd_PropertyModified()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_PropertyModified::redo() /*override*/
+{
+	// PropertiesUndoCmd::redo() will set m_pModel to the appropriate value, which can be queried with m_ModelIndex
+	PropertiesUndoCmd::redo();
+	UpdateEntityModel(m_ModelIndex.column() == PROPERTIESCOLUMN_Name && m_NewData.toBool() == false);
+}
+
+/*virtual*/ void EntityUndoCmd_PropertyModified::undo() /*override*/
+{
+	// PropertiesUndoCmd::undo() will set m_pModel to the appropriate value, which can be queried with m_ModelIndex
+	PropertiesUndoCmd::undo();
+	UpdateEntityModel(m_ModelIndex.column() == PROPERTIESCOLUMN_Name && m_NewData.toBool());
+}
+
+void EntityUndoCmd_PropertyModified::UpdateEntityModel(bool bRemoveProperties)
+{
+	// Set/Remove Key Frame Property in DopeSheetScene
+	EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_pModel->GetOwner().GetModel()->GetStateData(m_iStateIndex))->GetDopeSheetScene();
+	EntityTreeItemData *pEntityTreeData = m_pModel->GetSubstate().value<EntityTreeItemData *>();
+
+	if(m_pModel->IsCategory(m_ModelIndex))
+	{
+		// Special Case: Tween Categories, when enabled need to write all its properties at once, since they are 'PROPERTIESACCESS_Mutable' (aka not toggle)
+		QString sCategory = m_pModel->GetCategoryName(m_ModelIndex);
+		if(sCategory.startsWith("Tween "))
+		{
+			if(bRemoveProperties)//m_pModel->IsCategoryEnabled(sCategory))
+			{
+				dopeSheetSceneRef.RemoveKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, "Destination", false);
+				dopeSheetSceneRef.RemoveKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, "Duration", false);
+				dopeSheetSceneRef.RemoveKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, "Tween Type", true);
+			}
+			else
+			{
+				QJsonObject propertiesObj;
+
+				QJsonObject tweenObj;
+				tweenObj.insert("Destination", m_pModel->FindPropertyJsonValue(sCategory, "Destination"));
+				tweenObj.insert("Duration", m_pModel->FindPropertyJsonValue(sCategory, "Duration"));
+				tweenObj.insert("Tween Type", m_pModel->FindPropertyJsonValue(sCategory, "Tween Type"));
+				propertiesObj.insert(sCategory, tweenObj);
+
+				dopeSheetSceneRef.SetKeyFrameProperties(pEntityTreeData, m_iFrameIndex, propertiesObj);
+			}
+		}
+	}
+	else // Modifying a property
+	{
+		QString sCategory = m_pModel->GetCategoryName(m_ModelIndex);
+		QString sProperty = m_pModel->GetPropertyName(m_ModelIndex);
+
+		if(bRemoveProperties)// m_pModel->GetPropertyDefinition(m_ModelIndex).eAccessType == PROPERTIESACCESS_ToggleOff)
+			dopeSheetSceneRef.RemoveKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, sProperty, true);
+		else
+			dopeSheetSceneRef.SetKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, sProperty, m_pModel->GetPropertyJsonValue(m_ModelIndex), true);
+	}
+
+	m_pModel->GetOwner().FocusWidgetState(m_iStateIndex, m_pModel->GetSubstate());
+}

@@ -15,11 +15,13 @@
 
 class PropertiesUndoCmd : public QUndoCommand
 {
+protected:
 	PropertiesTreeModel *	m_pModel;
 	QModelIndex				m_ModelIndex;
 
 	QVariant				m_NewData;
 	QVariant				m_OldData;
+	bool					m_bDoFocusWidgetState;
 
 public:
 	PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIndex &index, const QVariant &newData, QUndoCommand *pParent = nullptr);

@@ -72,7 +72,7 @@ PropertiesTreeMultiModel::PropertiesTreeMultiModel(ProjectItemData &ownerRef, in
 	//	if((m_PropertyDefMap[pTreeItem].eAccessType == PROPERTIESACCESS_ToggleOn && valueRef == Qt::Unchecked) ||
 	//		(m_PropertyDefMap[pTreeItem].eAccessType == PROPERTIESACCESS_ToggleOff && valueRef == Qt::Checked))
 	//	{
-	//		PropertiesUndoCmd *pUndoCmd = new PropertiesUndoCmd(this, indexRef, static_cast<bool>(valueRef == Qt::Checked));
+	//		PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(this, indexRef, static_cast<bool>(valueRef == Qt::Checked));
 	//		GetOwner().GetUndoStack()->push(pUndoCmd);
 	//	}
 	//}
@@ -81,7 +81,7 @@ PropertiesTreeMultiModel::PropertiesTreeMultiModel(ProjectItemData &ownerRef, in
 	//	const QVariant &origValue = GetPropertyValue(indexRef);
 	//	if(origValue != valueRef)
 	//	{
-	//		PropertiesUndoCmd *pUndoCmd = new PropertiesUndoCmd(this, indexRef, valueRef);
+	//		PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(this, indexRef, valueRef);
 	//		GetOwner().GetUndoStack()->push(pUndoCmd);
 	//	}
 	//}

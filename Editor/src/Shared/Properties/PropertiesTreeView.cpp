@@ -246,7 +246,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			const QVariant &origValue = pPropertiesTreeModel->GetPropertyValue(index);
 			if(origValue != newValue)
 			{
-				QUndoCommand *pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, newValue);
+				QUndoCommand *pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
 				pPropertiesTreeModel->GetOwner().GetUndoStack()->push(pUndoCmd);
 			}
 		}
@@ -371,7 +371,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	const QVariant &origValue = pPropertiesTreeModel->GetPropertyValue(index);
 	if(origValue != newValue)
 	{
-		pUndoCmd = new PropertiesUndoCmd(pPropertiesTreeModel, index, newValue);
+		pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
 		pPropertiesTreeModel->GetOwner().GetUndoStack()->push(pUndoCmd);
 	}
 }

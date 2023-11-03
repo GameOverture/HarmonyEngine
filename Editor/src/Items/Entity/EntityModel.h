@@ -80,8 +80,6 @@ public:
 	QString GenerateSrc_Ctor() const;
 	QString GenerateSrc_SetStates() const;
 
-	virtual void OnPropertyModified(PropertiesTreeModel &propertiesModelRef, const QModelIndex &indexRef) override;
-
 	virtual void OnPopState(int iPoppedStateIndex) override;
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;

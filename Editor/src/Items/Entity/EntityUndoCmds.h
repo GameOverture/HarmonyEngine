@@ -11,6 +11,7 @@
 #define ENTITYUNDOCMDS_H
 
 #include "EntityModel.h"
+#include "PropertiesUndoCmd.h"
 
 #include <QUndoCommand>
 
@@ -247,6 +248,24 @@ public:
 
 	virtual void redo() override;
 	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_PropertyModified : public PropertiesUndoCmd
+{
+	int								m_iStateIndex;
+	int								m_iFrameIndex;
+
+public:
+	EntityUndoCmd_PropertyModified(PropertiesTreeModel *pModel, const QModelIndex &index, const QVariant &newData, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_PropertyModified();
+
+	virtual void redo() override;
+	virtual void undo() override;
+
+protected:
+	void UpdateEntityModel(bool bRemoveProperties);
 };
 
 #endif // ENTITYUNDOCMDS_H

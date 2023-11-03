@@ -13,8 +13,22 @@
 #include "Project.h"
 #include "ExplorerModel.h"
 #include "MainWindow.h"
+#include "EntityUndoCmds.h"
 
 #include <QVariant>
+
+EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
+	PropertiesTreeModel(ownerRef, iStateIndex, subState, pParent)
+{
+}
+
+/*virtual*/ EntityPropertiesTreeModel::~EntityPropertiesTreeModel()
+{ }
+
+/*virtual*/ PropertiesUndoCmd *EntityPropertiesTreeModel::AllocateUndoCmd(const QModelIndex &index, const QVariant &newData) /*override*/
+{
+	return new EntityUndoCmd_PropertyModified(this, index, newData);
+}
 
 EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfReferencedItem, QUuid uuidOfThis) :
 	TreeModelItemData(eItemType, uuidOfThis, sCodeName),
@@ -28,7 +42,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 {
 	QVariant ptrVariant;
 	ptrVariant.setValue<TreeModelItemData *>(this);
-	m_pPropertiesModel = new PropertiesTreeModel(entityModelRef.GetItem(), -1, ptrVariant, this);
+	m_pPropertiesModel = new EntityPropertiesTreeModel(entityModelRef.GetItem(), -1, ptrVariant, this);
 
 	if(m_eEntType == ENTTYPE_Root || m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_ArrayItem)
 		InitalizePropertyModel();
@@ -47,7 +61,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 {
 	QVariant ptrVariant;
 	ptrVariant.setValue<TreeModelItemData *>(this);
-	m_pPropertiesModel = new PropertiesTreeModel(entityModelRef.GetItem(), -1, ptrVariant, this);
+	m_pPropertiesModel = new EntityPropertiesTreeModel(entityModelRef.GetItem(), -1, ptrVariant, this);
 
 	InitalizePropertyModel();
 }
@@ -215,6 +229,8 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 		}
 		else if(sCategoryName == "Physics") // NOTE: This is only from the 'root' node (aka *this entity)
 		{
+			// TODO: _checked doesn't exist anymore. The category will simply just be present or not
+
 			if(sPropertyName == "Physics_checked") // NOTE: We can rely on *_checked to be the first property in the category
 			{
 				if(valueRef.toBool() == false)
@@ -260,6 +276,8 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 		}
 		else if(sCategoryName == "Fixture")
 		{
+			// TODO: _checked doesn't exist anymore. The category will simply just be present or not
+
 			if(sPropertyName == "Fixture_checked") // NOTE: We can rely on *_checked to be the first property in the category
 				sSrc += sCodeName + "SetFixtureAllowed(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
 			else if(sPropertyName == "Density")
@@ -321,6 +339,8 @@ QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLi
 
 		if(pPropertiesModel->IsCategoryCheckable(i))
 		{
+			// TODO: _checked doesn't exist anymore. The category will simply just be present or not
+			
 			// Logic elsewhere relies on _checked being the first property in the category
 			bool bIsChecked = pPropertiesModel->IsCategoryEnabled(sCategoryName);
 			fpForEach(sCategoryName, sCategoryName % "_checked", bIsChecked);
@@ -383,7 +403,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendCategory("Transformation", HyGlobal::ItemColor(ITEM_Project));
 		m_pPropertiesModel->AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", PROPERTIESACCESS_ToggleOff, -fRANGE, fRANGE, 1.0, "[", "]");
 		m_pPropertiesModel->AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Scale is relative to parent node", PROPERTIESACCESS_ToggleOff, -fRANGE, fRANGE, 0.01, "[", "]");
-		m_pPropertiesModel->AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", PROPERTIESACCESS_ToggleOff, 0.0, 360.0, 0.1, "", "°");
+		m_pPropertiesModel->AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", PROPERTIESACCESS_ToggleOff, -360.0, 360.0, 0.1, "", "°");
 
 		if(bIsBody)
 		{
@@ -475,7 +495,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	if(GetType() != ITEM_BoundingVolume)
 	{
 		m_pPropertiesModel->AppendCategory("Tween Position", QVariant(), true, "Start a positional tween from the currently selected frame");
-		m_pPropertiesModel->AppendProperty("Tween Position", "Destination", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "The target destination for the tween to reach", PROPERTIESACCESS_Mutable);
+		m_pPropertiesModel->AppendProperty("Tween Position", "Destination", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "The target destination for the tween to reach", PROPERTIESACCESS_Mutable, -fRANGE, fRANGE, 1.0, "[", "]");
 		m_pPropertiesModel->AppendProperty("Tween Position", "Duration", PROPERTIESTYPE_double, QPointF(0.0f, 0.0f), "How long it will take to reach the target destination for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
 		m_pPropertiesModel->AppendProperty("Tween Position", "Tween Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::TweenName(TWEEN_Linear), "The type of tween to use", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTweenNameList());
 
@@ -485,7 +505,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Tween Rotation", "Tween Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::TweenName(TWEEN_Linear), "The type of tween to use", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTweenNameList());
 
 		m_pPropertiesModel->AppendCategory("Tween Scale", QVariant(), true, "Start a scaling tween from the currently selected frame");
-		m_pPropertiesModel->AppendProperty("Tween Scale", "Destination", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "The target scale for the tween to reach", PROPERTIESACCESS_Mutable);
+		m_pPropertiesModel->AppendProperty("Tween Scale", "Destination", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "The target scale for the tween to reach", PROPERTIESACCESS_Mutable, -fRANGE, fRANGE, 0.01, "[", "]");
 		m_pPropertiesModel->AppendProperty("Tween Scale", "Duration", PROPERTIESTYPE_double, QPointF(0.0f, 0.0f), "How long it will take to reach the target scale for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
 		m_pPropertiesModel->AppendProperty("Tween Scale", "Tween Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::TweenName(TWEEN_Linear), "The type of tween to use", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTweenNameList());
 
