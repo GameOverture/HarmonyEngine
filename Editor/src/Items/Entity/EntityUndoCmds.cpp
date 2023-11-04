@@ -15,6 +15,8 @@
 #include "IAssetItemData.h"
 #include "MainWindow.h"
 
+#include <QJsonValue>
+
 EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_EntityItemRef(entityItemRef),
@@ -874,6 +876,25 @@ EntityUndoCmd_PropertyModified::EntityUndoCmd_PropertyModified(PropertiesTreeMod
 
 	m_iStateIndex = m_pModel->GetOwner().GetWidget()->GetCurStateIndex();
 	m_iFrameIndex = dopeSheetSceneRef.GetCurrentFrame();
+
+	// If unchecking this item, remember its value for when undo() is invoked
+	if(m_ModelIndex.column() == PROPERTIESCOLUMN_Name && m_NewData.toBool() == false)
+	{
+		QString sCategory = m_pModel->GetCategoryName(m_ModelIndex);
+		if(m_pModel->IsCategory(m_ModelIndex))
+		{
+			if(sCategory.startsWith("Tween "))
+			{
+				m_OldTweenDestination = m_pModel->FindPropertyJsonValue(sCategory, "Destination");
+				m_OldTweenDuration = m_pModel->FindPropertyJsonValue(sCategory, "Duration");
+				m_OldTweenType = m_pModel->FindPropertyJsonValue(sCategory, "Tween Type");
+			}
+			else
+				HyGuiLog("EntityUndoCmd_PropertyModified - Unhandled logic: Need generic container of old values", LOGTYPE_Error);
+		}
+		else
+			m_OldPropertyValue = m_pModel->GetPropertyJsonValue(m_ModelIndex);
+	}
 }
 
 /*virtual*/ EntityUndoCmd_PropertyModified::~EntityUndoCmd_PropertyModified()
@@ -884,21 +905,31 @@ EntityUndoCmd_PropertyModified::EntityUndoCmd_PropertyModified(PropertiesTreeMod
 {
 	// PropertiesUndoCmd::redo() will set m_pModel to the appropriate value, which can be queried with m_ModelIndex
 	PropertiesUndoCmd::redo();
-	UpdateEntityModel(m_ModelIndex.column() == PROPERTIESCOLUMN_Name && m_NewData.toBool() == false);
+	UpdateEntityModel(true);
+
+	m_pModel->GetOwner().FocusWidgetState(m_iStateIndex, m_pModel->GetSubstate());
 }
 
 /*virtual*/ void EntityUndoCmd_PropertyModified::undo() /*override*/
 {
 	// PropertiesUndoCmd::undo() will set m_pModel to the appropriate value, which can be queried with m_ModelIndex
 	PropertiesUndoCmd::undo();
-	UpdateEntityModel(m_ModelIndex.column() == PROPERTIESCOLUMN_Name && m_NewData.toBool());
+	UpdateEntityModel(false);
+
+	m_pModel->GetOwner().FocusWidgetState(m_iStateIndex, m_pModel->GetSubstate());
 }
 
-void EntityUndoCmd_PropertyModified::UpdateEntityModel(bool bRemoveProperties)
+void EntityUndoCmd_PropertyModified::UpdateEntityModel(bool bIsRedo)
 {
 	// Set/Remove Key Frame Property in DopeSheetScene
 	EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_pModel->GetOwner().GetModel()->GetStateData(m_iStateIndex))->GetDopeSheetScene();
 	EntityTreeItemData *pEntityTreeData = m_pModel->GetSubstate().value<EntityTreeItemData *>();
+
+	bool bRemoveProperties;
+	if(bIsRedo)
+		bRemoveProperties = (m_ModelIndex.column() == PROPERTIESCOLUMN_Name && m_NewData.toBool() == false);
+	else
+		bRemoveProperties = (m_ModelIndex.column() == PROPERTIESCOLUMN_Name && m_NewData.toBool());
 
 	if(m_pModel->IsCategory(m_ModelIndex))
 	{
@@ -906,7 +937,7 @@ void EntityUndoCmd_PropertyModified::UpdateEntityModel(bool bRemoveProperties)
 		QString sCategory = m_pModel->GetCategoryName(m_ModelIndex);
 		if(sCategory.startsWith("Tween "))
 		{
-			if(bRemoveProperties)//m_pModel->IsCategoryEnabled(sCategory))
+			if(bRemoveProperties)
 			{
 				dopeSheetSceneRef.RemoveKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, "Destination", false);
 				dopeSheetSceneRef.RemoveKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, "Duration", false);
@@ -917,9 +948,18 @@ void EntityUndoCmd_PropertyModified::UpdateEntityModel(bool bRemoveProperties)
 				QJsonObject propertiesObj;
 
 				QJsonObject tweenObj;
-				tweenObj.insert("Destination", m_pModel->FindPropertyJsonValue(sCategory, "Destination"));
-				tweenObj.insert("Duration", m_pModel->FindPropertyJsonValue(sCategory, "Duration"));
-				tweenObj.insert("Tween Type", m_pModel->FindPropertyJsonValue(sCategory, "Tween Type"));
+				if(m_OldTweenDestination.isUndefined() == false && m_OldTweenDestination.isNull() == false)
+				{
+					tweenObj.insert("Destination", m_OldTweenDestination);
+					tweenObj.insert("Duration", m_OldTweenDuration);
+					tweenObj.insert("Tween Type", m_OldTweenType);
+				}
+				else
+				{
+					tweenObj.insert("Destination", m_pModel->FindPropertyJsonValue(sCategory, "Destination"));
+					tweenObj.insert("Duration", m_pModel->FindPropertyJsonValue(sCategory, "Duration"));
+					tweenObj.insert("Tween Type", m_pModel->FindPropertyJsonValue(sCategory, "Tween Type"));
+				}
 				propertiesObj.insert(sCategory, tweenObj);
 
 				dopeSheetSceneRef.SetKeyFrameProperties(pEntityTreeData, m_iFrameIndex, propertiesObj);
@@ -931,11 +971,14 @@ void EntityUndoCmd_PropertyModified::UpdateEntityModel(bool bRemoveProperties)
 		QString sCategory = m_pModel->GetCategoryName(m_ModelIndex);
 		QString sProperty = m_pModel->GetPropertyName(m_ModelIndex);
 
-		if(bRemoveProperties)// m_pModel->GetPropertyDefinition(m_ModelIndex).eAccessType == PROPERTIESACCESS_ToggleOff)
+		if(bRemoveProperties)
 			dopeSheetSceneRef.RemoveKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, sProperty, true);
 		else
-			dopeSheetSceneRef.SetKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, sProperty, m_pModel->GetPropertyJsonValue(m_ModelIndex), true);
+		{
+			if(bIsRedo == false && m_OldPropertyValue.isUndefined() == false && m_OldPropertyValue.isNull() == false)
+				dopeSheetSceneRef.SetKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, sProperty, m_OldPropertyValue, true);
+			else
+				dopeSheetSceneRef.SetKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, sProperty, m_pModel->GetPropertyJsonValue(m_ModelIndex), true);
+		}
 	}
-
-	m_pModel->GetOwner().FocusWidgetState(m_iStateIndex, m_pModel->GetSubstate());
 }
