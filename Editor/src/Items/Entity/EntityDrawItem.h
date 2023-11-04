@@ -25,12 +25,11 @@ class EntityDrawItem
 	TransformCtrl							m_Transform;
 	ShapeCtrl								m_ShapeCtrl;
 
-	template<typename TYPE>
 	struct TweenInfo
 	{
 		int m_iStartFrame;
-		TYPE m_Start;
-		TYPE m_Destination;
+		QVariant m_Start;
+		QVariant m_Destination;
 		float m_fDuration;
 		TweenType m_eTweenType;
 
@@ -41,6 +40,8 @@ class EntityDrawItem
 		void Clear()
 		{
 			m_iStartFrame = -1;
+			m_Start.clear();
+			m_Destination.clear();
 			m_fDuration = 0.0f;
 			m_eTweenType = TWEEN_Unknown;
 		}

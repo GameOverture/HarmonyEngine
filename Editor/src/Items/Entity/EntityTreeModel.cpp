@@ -125,7 +125,7 @@ bool EntityTreeItemData::IsForwardDeclared() const
 	return m_bIsForwardDeclared;
 }
 
-PropertiesTreeModel &EntityTreeItemData::GetPropertiesModel()
+EntityPropertiesTreeModel &EntityTreeItemData::GetPropertiesModel()
 {
 	return *m_pPropertiesModel;
 }
@@ -491,7 +491,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 	}
 
-	// TWEENS
+	// TWEENS - Make sure these Category names match HyGlobal's sm_TweenPropNames
 	if(GetType() != ITEM_BoundingVolume)
 	{
 		m_pPropertiesModel->AppendCategory("Tween Position", QVariant(), true, "Start a positional tween from the currently selected frame");

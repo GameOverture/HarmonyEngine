@@ -28,16 +28,14 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	m_fZoom(1.0f),
 	m_eDragState(DRAGSTATE_None),
 	m_ptDragStart(0.0f, 0.0f),
-	m_pContextClickItem(nullptr),
-	m_ActionTweenPos(QIcon(":/icons16x16/tween-translate.png"), "Tween Position"),
-	m_ActionTweenRot(QIcon(":/icons16x16/tween-rotate.png"), "Tween Rotation"),
-	m_ActionTweenScale(QIcon(":/icons16x16/tween-scale.png"), "Tween Scale"),
-	m_ActionTweenAlpha(QIcon(":/icons16x16/tween-alpha.png"), "Tween Alpha")
+	m_pContextClickItem(nullptr)
 {
-	connect(&m_ActionTweenPos, &QAction::triggered, this, &EntityDopeSheetView::OnTweenPosition);
-	connect(&m_ActionTweenRot, &QAction::triggered, this, &EntityDopeSheetView::OnTweenRotation);
-	connect(&m_ActionTweenScale, &QAction::triggered, this, &EntityDopeSheetView::OnTweenScale);
-	connect(&m_ActionTweenAlpha, &QAction::triggered, this, &EntityDopeSheetView::OnTweenAlpha);
+	for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
+	{
+		TweenProperty eTweenProp = static_cast<TweenProperty>(iTweenProp);
+		m_ActionTweenList.push_back(new QAction(HyGlobal::TweenPropIcon(eTweenProp), "Tween " % HyGlobal::TweenPropName(eTweenProp)));
+		connect(m_ActionTweenList[iTweenProp], &QAction::triggered, this, &EntityDopeSheetView::OnTweenAction);
+	}
 
 	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	setDragMode(QGraphicsView::RubberBandDrag);
@@ -45,6 +43,8 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 
 /*virtual*/ EntityDopeSheetView::~EntityDopeSheetView()
 {
+	for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
+		delete m_ActionTweenList[iTweenProp];
 }
 
 EntityDopeSheetScene *EntityDopeSheetView::GetScene() const
@@ -115,29 +115,29 @@ float EntityDopeSheetView::GetZoom() const
 		int iNumSelected = scene()->selectedItems().size();
 
 		QMenu menu;
-		// Determine the main tween action based on 'rightClickProp', then insert the tween menu containing all valid tweens for this item
-		if(contextProp.first == "Transformation")
-		{
-			if(contextProp.second == "Position")
-				menu.addAction(&m_ActionTweenPos);
-			else if(contextProp.second == "Rotation")
-				menu.addAction(&m_ActionTweenRot);
-			else if(contextProp.second == "Scale")
-				menu.addAction(&m_ActionTweenScale);
-		}
-		else if(contextProp.first == "Body")
-		{
-			if(contextProp.second == "Alpha")
-				menu.addAction(&m_ActionTweenAlpha);
-		}
-		QMenu tweenMenu("Add Tween");
-		tweenMenu.addAction(&m_ActionTweenPos);
-		tweenMenu.addAction(&m_ActionTweenRot);
-		tweenMenu.addAction(&m_ActionTweenScale);
-		tweenMenu.addAction(&m_ActionTweenAlpha);
+		//// Determine the main tween action based on 'rightClickProp', then insert the tween menu containing all valid tweens for this item
+		//if(contextProp.first == "Transformation")
+		//{
+		//	if(contextProp.second == "Position")
+		//		menu.addAction(&m_ActionTweenPos);
+		//	else if(contextProp.second == "Rotation")
+		//		menu.addAction(&m_ActionTweenRot);
+		//	else if(contextProp.second == "Scale")
+		//		menu.addAction(&m_ActionTweenScale);
+		//}
+		//else if(contextProp.first == "Body")
+		//{
+		//	if(contextProp.second == "Alpha")
+		//		menu.addAction(&m_ActionTweenAlpha);
+		//}
+		//QMenu tweenMenu("Add Tween");
+		//tweenMenu.addAction(&m_ActionTweenPos);
+		//tweenMenu.addAction(&m_ActionTweenRot);
+		//tweenMenu.addAction(&m_ActionTweenScale);
+		//tweenMenu.addAction(&m_ActionTweenAlpha);
 
-		menu.addMenu(&tweenMenu);
-		menu.addSeparator();
+		//menu.addMenu(&tweenMenu);
+		//menu.addSeparator();
 		menu.addAction(QIcon(":/icons16x16/edit-copy.png"), "Copy");// , this, &EntityDopeSheetView::OnCopy);
 		menu.addAction(QIcon(":/icons16x16/edit-paste.png"), "Paste");//, this, &EntityDopeSheetView::OnPaste);
 		menu.addSeparator();
@@ -512,22 +512,10 @@ int EntityDopeSheetView::GetNearestFrame(qreal fScenePosX) const
 	return ((fScenePosX - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
 }
 
-void EntityDopeSheetView::OnTweenPosition()
+void EntityDopeSheetView::OnTweenAction()
 {
 	int i = 0;
 	i++;
-}
-
-void EntityDopeSheetView::OnTweenRotation()
-{
-}
-
-void EntityDopeSheetView::OnTweenScale()
-{
-}
-
-void EntityDopeSheetView::OnTweenAlpha()
-{
 }
 
 void EntityDopeSheetView::OnSelectAllItemKeyFrames()

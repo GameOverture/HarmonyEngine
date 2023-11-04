@@ -40,15 +40,7 @@ class EntityDopeSheetView : public QGraphicsView
 
 	// Tween Key Frame Actions
 	EntityTreeItemData *		m_pContextClickItem;
-	QAction						m_ActionTweenPos;
-	QAction						m_ActionTweenRot;
-	QAction						m_ActionTweenScale;
-	QAction						m_ActionTweenAlpha;
-	QAction						m_ActionTweenTopColor;
-	QAction						m_ActionTweenBotColor;
-	QAction						m_ActionTweenTextLayerColor;
-	QAction						m_ActionTweenVolume;
-	QAction						m_ActionTweenPitch;
+	QList<QAction *>			m_ActionTweenList;
 
 public:
 	EntityDopeSheetView(QWidget *pParent = nullptr);
@@ -80,11 +72,8 @@ private:
 	int GetNearestFrame(qreal fScenePosX) const;
 
 private Q_SLOTS:
-	void OnTweenPosition();
-	void OnTweenRotation();
-	void OnTweenScale();
-	void OnTweenAlpha();
-
+	void OnTweenAction();
+	
 	void OnSelectAllItemKeyFrames();
 	void OnDeselectItemKeyFrames();
 	void OnDeleteKeyFrames();

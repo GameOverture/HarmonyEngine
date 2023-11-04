@@ -68,7 +68,7 @@ public:
 	QString GetHyNodeTypeName() const;
 	bool IsForwardDeclared() const;
 
-	PropertiesTreeModel &GetPropertiesModel();
+	EntityPropertiesTreeModel &GetPropertiesModel();
 
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);

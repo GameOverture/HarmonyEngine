@@ -37,6 +37,8 @@ typedef std::tuple<EntityTreeItemData *, int, QString> KeyFrameKey;
 
 class GraphicsKeyFrameItem : public QGraphicsRectItem
 {
+	bool				m_bIsTweenKeyFrame;
+
 public:
 	enum DataKey
 	{
@@ -45,11 +47,11 @@ public:
 		DATAKEY_CategoryPropString	// Category + "/" + Property
 	};
 
-	GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent = nullptr);
+	GraphicsKeyFrameItem(KeyFrameKey tupleKey, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent = nullptr);
 	virtual ~GraphicsKeyFrameItem();
 
 	KeyFrameKey GetKey() const;
-	void SetKey(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryProp);
+	bool IsTweenKeyFrame() const;
 
 protected:
 	virtual QVariant itemChange(GraphicsItemChange eChange, const QVariant &value) override;

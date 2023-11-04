@@ -133,10 +133,7 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 
 	// Tween Special Case:
 	// To determine the tween's current value, store the info that kicked it off, and extrapolate the based on Entity's 'iCURRENT_FRAME'
-	TweenInfo<glm::vec2> tweenPos;
-	TweenInfo<float> tweenRot;
-	TweenInfo<glm::vec2> tweenScale;
-	TweenInfo<float> tweenAlpha;
+	TweenInfo tweenInfo[NUM_TWEENPROPS];// = { PROPERTIESTYPE_vec2, PROPERTIESTYPE_double, PROPERTIESTYPE_vec2, PROPERTIESTYPE_double };
 
 	for(int iFrame : keyFrameMapRef.keys())
 	{
@@ -169,18 +166,18 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 				{
 					QJsonArray posArray = transformObj["Position"].toArray();
 					pThisHyNode->pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
-					tweenPos.Clear();
+					tweenInfo[TWEENPROP_Position].Clear();
 				}
 				if(transformObj.contains("Rotation"))
 				{
 					pThisHyNode->rot.Set(transformObj["Rotation"].toDouble());
-					tweenRot.Clear();
+					tweenInfo[TWEENPROP_Rotation].Clear();
 				}
 				if(transformObj.contains("Scale"))
 				{
 					QJsonArray scaleArray = transformObj["Scale"].toArray();
 					pThisHyNode->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
-					tweenScale.Clear();
+					tweenInfo[TWEENPROP_Scale].Clear();
 				}
 			}
 
@@ -199,60 +196,100 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 					if(bodyObj.contains("Alpha"))
 					{
 						static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(bodyObj["Alpha"].toDouble());
-						tweenAlpha.Clear();
+						tweenInfo[TWEENPROP_Alpha].Clear();
 					}
 					if(bodyObj.contains("Override Display Order"))
 						static_cast<IHyBody2d *>(pThisHyNode)->SetDisplayOrder(bodyObj["Override Display Order"].toInt());
 				}
 			}
 
-			// Parse Position, Rotation, Scale, and Alpha above
-			// 
-			// Then parse their respective tweens
-			if(propsObj.contains("Tween Position"))
+			// Ensure all tweens' respective properties have been parsed above
+			// Then parse and store the start of any tween this frame
+			for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
 			{
-				QJsonObject tweenPosObj = propsObj["Tween Position"].toObject();
+				TweenProperty eTweenProp = static_cast<TweenProperty>(iTweenProp);
+				QString sCategory = "Tween " % HyGlobal::TweenPropName(eTweenProp);
+				if(propsObj.contains(sCategory))
+				{
+					QJsonObject tweenObj = propsObj[sCategory].toObject();
 
-				tweenPos.m_iStartFrame = iFrame;
-				tweenPos.m_Start = pThisHyNode->pos.Get();
-				QJsonArray destinationArray = tweenPosObj["Destination"].toArray();
-				tweenPos.m_Destination.x = destinationArray[0].toDouble();
-				tweenPos.m_Destination.y = destinationArray[1].toDouble();
-				tweenPos.m_fDuration = tweenPosObj["Duration"].toDouble();
-				tweenPos.m_eTweenType = HyGlobal::GetTweenFromString(tweenPosObj["Tween Type"].toString());
-			}
-			if(propsObj.contains("Tween Rotation"))
-			{
-				QJsonObject tweenRotObj = propsObj["Tween Rotation"].toObject();
+					tweenInfo[iTweenProp].m_iStartFrame = iFrame;
+					tweenInfo[iTweenProp].m_fDuration = tweenObj["Duration"].toDouble();
+					tweenInfo[iTweenProp].m_eTweenType = HyGlobal::GetTweenFromString(tweenObj["Tween Type"].toString());
+					switch(iTweenProp)
+					{
+					case TWEENPROP_Position: {
+						tweenInfo[iTweenProp].m_Start.setValue(QPointF(pThisHyNode->pos.GetX(), pThisHyNode->pos.GetY()));
+						QJsonArray destinationArray = tweenObj["Destination"].toArray();
+						tweenInfo[iTweenProp].m_Destination.setValue(QPointF(destinationArray[0].toDouble(), destinationArray[1].toDouble()));
+						break; }
 
-				tweenRot.m_iStartFrame = iFrame;
-				tweenRot.m_Start = pThisHyNode->rot.Get();
-				tweenRot.m_Destination = tweenRotObj["Destination"].toDouble();
-				tweenRot.m_fDuration = tweenRotObj["Duration"].toDouble();
-				tweenRot.m_eTweenType = HyGlobal::GetTweenFromString(tweenRotObj["Tween Type"].toString());
-			}
-			if(propsObj.contains("Tween Scale"))
-			{
-				QJsonObject tweenScaleObj = propsObj["Tween Scale"].toObject();
+					case TWEENPROP_Rotation:
+						tweenInfo[iTweenProp].m_Start = pThisHyNode->rot.Get();
+						tweenInfo[iTweenProp].m_Destination = tweenObj["Destination"].toDouble();
+						break;
 
-				tweenScale.m_iStartFrame = iFrame;
-				tweenScale.m_Start = pThisHyNode->scale.Get();
-				QJsonArray destinationArray = tweenScaleObj["Destination"].toArray();
-				tweenScale.m_Destination.x = destinationArray[0].toDouble();
-				tweenScale.m_Destination.y = destinationArray[1].toDouble();
-				tweenScale.m_fDuration = tweenScaleObj["Duration"].toDouble();
-				tweenScale.m_eTweenType = HyGlobal::GetTweenFromString(tweenScaleObj["Tween Type"].toString());
-			}
-			if(propsObj.contains("Tween Alpha"))
-			{
-				QJsonObject tweenAlphaObj = propsObj["Tween Alpha"].toObject();
+					case TWEENPROP_Scale: {
+						tweenInfo[iTweenProp].m_Start.setValue(QPointF(pThisHyNode->scale.GetX(), pThisHyNode->scale.GetY()));
+						QJsonArray destinationArray = tweenObj["Destination"].toArray();
+						tweenInfo[iTweenProp].m_Destination.setValue(QPointF(destinationArray[0].toDouble(), destinationArray[1].toDouble()));
+						break; }
 
-				tweenAlpha.m_iStartFrame = iFrame;
-				tweenAlpha.m_Start = static_cast<IHyBody2d *>(pThisHyNode)->alpha.Get();
-				tweenAlpha.m_Destination = tweenAlphaObj["Destination"].toDouble();
-				tweenAlpha.m_fDuration = tweenAlphaObj["Duration"].toDouble();
-				tweenAlpha.m_eTweenType = HyGlobal::GetTweenFromString(tweenAlphaObj["Tween Type"].toString());
+					case TWEENPROP_Alpha:
+						tweenInfo[iTweenProp].m_Start = static_cast<IHyBody2d *>(pThisHyNode)->alpha.Get();
+						tweenInfo[iTweenProp].m_Destination = tweenObj["Destination"].toDouble();
+						break;
+
+					default:
+						HyGuiLog("EntityDrawItem::SetHyNode() - Unhandled tween property", LOGTYPE_Error);
+						break;
+					}
+				}
 			}
+			//if(propsObj.contains("Tween Position"))
+			//{
+			//	QJsonObject tweenPosObj = propsObj["Tween Position"].toObject();
+
+			//	tweenInfo[TWEENPROP_Position].m_iStartFrame = iFrame;
+			//	tweenInfo[TWEENPROP_Position].m_Start = pThisHyNode->pos.Get();
+			//	QJsonArray destinationArray = tweenPosObj["Destination"].toArray();
+			//	tweenInfo[TWEENPROP_Position].m_Destination.x = destinationArray[0].toDouble();
+			//	tweenInfo[TWEENPROP_Position].m_Destination.y = destinationArray[1].toDouble();
+			//	tweenInfo[TWEENPROP_Position].m_fDuration = tweenPosObj["Duration"].toDouble();
+			//	tweenInfo[TWEENPROP_Position].m_eTweenType = HyGlobal::GetTweenFromString(tweenPosObj["Tween Type"].toString());
+			//}
+			//if(propsObj.contains("Tween Rotation"))
+			//{
+			//	QJsonObject tweenRotObj = propsObj["Tween Rotation"].toObject();
+
+			//	tweenInfo[TWEENPROP_Rotation].m_iStartFrame = iFrame;
+			//	tweenInfo[TWEENPROP_Rotation].m_Start = pThisHyNode->rot.Get();
+			//	tweenInfo[TWEENPROP_Rotation].m_Destination = tweenRotObj["Destination"].toDouble();
+			//	tweenInfo[TWEENPROP_Rotation].m_fDuration = tweenRotObj["Duration"].toDouble();
+			//	tweenInfo[TWEENPROP_Rotation].m_eTweenType = HyGlobal::GetTweenFromString(tweenRotObj["Tween Type"].toString());
+			//}
+			//if(propsObj.contains("Tween Scale"))
+			//{
+			//	QJsonObject tweenScaleObj = propsObj["Tween Scale"].toObject();
+
+			//	tweenScale.m_iStartFrame = iFrame;
+			//	tweenScale.m_Start = pThisHyNode->scale.Get();
+			//	QJsonArray destinationArray = tweenScaleObj["Destination"].toArray();
+			//	tweenScale.m_Destination.x = destinationArray[0].toDouble();
+			//	tweenScale.m_Destination.y = destinationArray[1].toDouble();
+			//	tweenScale.m_fDuration = tweenScaleObj["Duration"].toDouble();
+			//	tweenScale.m_eTweenType = HyGlobal::GetTweenFromString(tweenScaleObj["Tween Type"].toString());
+			//}
+			//if(propsObj.contains("Tween Alpha"))
+			//{
+			//	QJsonObject tweenAlphaObj = propsObj["Tween Alpha"].toObject();
+
+			//	tweenAlpha.m_iStartFrame = iFrame;
+			//	tweenAlpha.m_Start = static_cast<IHyBody2d *>(pThisHyNode)->alpha.Get();
+			//	tweenAlpha.m_Destination = tweenAlphaObj["Destination"].toDouble();
+			//	tweenAlpha.m_fDuration = tweenAlphaObj["Duration"].toDouble();
+			//	tweenAlpha.m_eTweenType = HyGlobal::GetTweenFromString(tweenAlphaObj["Tween Type"].toString());
+			//}
 		}
 
 		switch(eItemType)
@@ -420,40 +457,76 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 	}
 
 	// Apply any active tweens
-	if(tweenPos.m_iStartFrame != -1)
+	for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
 	{
-		float fElapsedTime = (iCURRENT_FRAME - tweenPos.m_iStartFrame) * fFRAME_DURATION;
-		fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenPos.m_fDuration);
-		HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenPos.m_eTweenType);
-		float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
-		pThisHyNode->pos.SetX(tweenPos.m_Start.x + (tweenPos.m_Destination.x - tweenPos.m_Start.x) * fRatio);
-		pThisHyNode->pos.SetY(tweenPos.m_Start.y + (tweenPos.m_Destination.y - tweenPos.m_Start.y) * fRatio);
+		if(tweenInfo[iTweenProp].m_iStartFrame != -1)
+		{
+			float fElapsedTime = (iCURRENT_FRAME - tweenInfo[iTweenProp].m_iStartFrame) * fFRAME_DURATION;
+			fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenInfo[iTweenProp].m_fDuration);
+			HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenInfo[iTweenProp].m_eTweenType);
+			float fRatio = (tweenInfo[iTweenProp].m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenInfo[iTweenProp].m_fDuration) : 1.0f;
+			
+			switch(iTweenProp)
+			{
+			case TWEENPROP_Position:
+				pThisHyNode->pos.SetX(static_cast<float>(tweenInfo[iTweenProp].m_Start.toPointF().x() + (tweenInfo[iTweenProp].m_Destination.toPointF().x() - tweenInfo[iTweenProp].m_Start.toPointF().x()) * fRatio));
+				pThisHyNode->pos.SetY(static_cast<float>(tweenInfo[iTweenProp].m_Start.toPointF().y() + (tweenInfo[iTweenProp].m_Destination.toPointF().y() - tweenInfo[iTweenProp].m_Start.toPointF().y()) * fRatio));
+				break;
+			
+			case TWEENPROP_Rotation:
+				pThisHyNode->rot.Set(tweenInfo[iTweenProp].m_Start.toDouble() + (tweenInfo[iTweenProp].m_Destination.toDouble() - tweenInfo[iTweenProp].m_Start.toDouble()) * fRatio);
+				break;
+			
+			case TWEENPROP_Scale:
+				pThisHyNode->scale.SetX(static_cast<float>(tweenInfo[iTweenProp].m_Start.toPointF().x() + (tweenInfo[iTweenProp].m_Destination.toPointF().x() - tweenInfo[iTweenProp].m_Start.toPointF().x()) * fRatio));
+				pThisHyNode->scale.SetY(static_cast<float>(tweenInfo[iTweenProp].m_Start.toPointF().y() + (tweenInfo[iTweenProp].m_Destination.toPointF().y() - tweenInfo[iTweenProp].m_Start.toPointF().y()) * fRatio));
+				break;
+			
+			case TWEENPROP_Alpha:
+				static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(tweenInfo[iTweenProp].m_Start.toDouble() + (tweenInfo[iTweenProp].m_Destination.toDouble() - tweenInfo[iTweenProp].m_Start.toDouble()) * fRatio);
+				break;
+
+			default:
+				HyGuiLog("EntityDrawItem::SetHyNode() - Unhandled tween property (applying active tween)", LOGTYPE_Error);
+				break;
+			}
+		}
 	}
-	if(tweenRot.m_iStartFrame != -1)
-	{
-		float fElapsedTime = (iCURRENT_FRAME - tweenRot.m_iStartFrame) * fFRAME_DURATION;
-		fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenRot.m_fDuration);
-		HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenRot.m_eTweenType);
-		float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
-		pThisHyNode->rot.Set(tweenRot.m_Start + (tweenRot.m_Destination - tweenRot.m_Start) * fRatio);
-	}
-	if(tweenScale.m_iStartFrame != -1)
-	{
-		float fElapsedTime = (iCURRENT_FRAME - tweenScale.m_iStartFrame) * fFRAME_DURATION;
-		fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenScale.m_fDuration);
-		HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenScale.m_eTweenType);
-		float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
-		pThisHyNode->scale.SetX(tweenScale.m_Start.x + (tweenScale.m_Destination.x - tweenScale.m_Start.x) * fRatio);
-		pThisHyNode->scale.SetY(tweenScale.m_Start.y + (tweenScale.m_Destination.y - tweenScale.m_Start.y) * fRatio);
-	}
-	if(tweenAlpha.m_iStartFrame != -1)
-	{
-		float fElapsedTime = (iCURRENT_FRAME - tweenAlpha.m_iStartFrame) * fFRAME_DURATION;
-		fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenAlpha.m_fDuration);
-		HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenAlpha.m_eTweenType);
-		float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
-		static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(tweenAlpha.m_Start + (tweenAlpha.m_Destination - tweenAlpha.m_Start) * fRatio);
-	}
+
+	//if(tweenPos.m_iStartFrame != -1)
+	//{
+	//	float fElapsedTime = (iCURRENT_FRAME - tweenPos.m_iStartFrame) * fFRAME_DURATION;
+	//	fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenPos.m_fDuration);
+	//	HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenPos.m_eTweenType);
+	//	float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
+	//	pThisHyNode->pos.SetX(tweenPos.m_Start.x + (tweenPos.m_Destination.x - tweenPos.m_Start.x) * fRatio);
+	//	pThisHyNode->pos.SetY(tweenPos.m_Start.y + (tweenPos.m_Destination.y - tweenPos.m_Start.y) * fRatio);
+	//}
+	//if(tweenRot.m_iStartFrame != -1)
+	//{
+	//	float fElapsedTime = (iCURRENT_FRAME - tweenRot.m_iStartFrame) * fFRAME_DURATION;
+	//	fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenRot.m_fDuration);
+	//	HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenRot.m_eTweenType);
+	//	float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
+	//	pThisHyNode->rot.Set(tweenRot.m_Start + (tweenRot.m_Destination - tweenRot.m_Start) * fRatio);
+	//}
+	//if(tweenScale.m_iStartFrame != -1)
+	//{
+	//	float fElapsedTime = (iCURRENT_FRAME - tweenScale.m_iStartFrame) * fFRAME_DURATION;
+	//	fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenScale.m_fDuration);
+	//	HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenScale.m_eTweenType);
+	//	float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
+	//	pThisHyNode->scale.SetX(tweenScale.m_Start.x + (tweenScale.m_Destination.x - tweenScale.m_Start.x) * fRatio);
+	//	pThisHyNode->scale.SetY(tweenScale.m_Start.y + (tweenScale.m_Destination.y - tweenScale.m_Start.y) * fRatio);
+	//}
+	//if(tweenAlpha.m_iStartFrame != -1)
+	//{
+	//	float fElapsedTime = (iCURRENT_FRAME - tweenAlpha.m_iStartFrame) * fFRAME_DURATION;
+	//	fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenAlpha.m_fDuration);
+	//	HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenAlpha.m_eTweenType);
+	//	float fRatio = (tweenPos.m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenPos.m_fDuration) : 1.0f;
+	//	static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(tweenAlpha.m_Start + (tweenAlpha.m_Destination - tweenAlpha.m_Start) * fRatio);
+	//}
 }
 
 ShapeCtrl &EntityDrawItem::GetShapeCtrl()

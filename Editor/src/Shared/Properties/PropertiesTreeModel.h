@@ -129,6 +129,9 @@ public:
 	void SetToggle(QString sCategoryName, QString sPropertyName, bool bToggleOn);
 	virtual void SetToggle(const QModelIndex &indexRef, bool bToggleOn);
 
+	int GetNumProperties(int iCategoryIndex) const;
+	QString GetPropertyName(const QModelIndex &indexRef) const;
+	QString GetPropertyName(int iCategoryIndex, int iPropertyIndex) const;
 	QVariant GetPropertyValue(const QModelIndex &indexRef) const;
 	QVariant GetPropertyValue(int iCategoryIndex, int iPropertyIndex) const;
 	QJsonValue GetPropertyJsonValue(const QModelIndex &indexRef) const;
@@ -136,6 +139,7 @@ public:
 	bool IsPropertyDefaultValue(int iCategoryIndex, int iPropertyIndex) const;
 	QVariant FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
 	QJsonValue FindPropertyJsonValue(QString sCategoryName, QString sPropertyName) const;
+	QModelIndex FindPropertyModelIndex(QString sCategoryName, QString sPropertyName) const;
 	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
 
 	bool IsCategory(const QModelIndex &indexRef) const;
@@ -146,9 +150,6 @@ public:
 	QString GetCategoryName(int iCategoryIndex) const;
 	QModelIndex GetCategoryModelIndex(int iCategoryIndex) const;
 	bool IsCategoryCheckable(int iCategoryIndex) const;
-	int GetNumProperties(int iCategoryIndex) const;
-	QString GetPropertyName(const QModelIndex &indexRef) const;
-	QString GetPropertyName(int iCategoryIndex, int iPropertyIndex) const;
 
 	bool AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, QString sToolTip = "");
 	bool AppendProperty(QString sCategoryName,

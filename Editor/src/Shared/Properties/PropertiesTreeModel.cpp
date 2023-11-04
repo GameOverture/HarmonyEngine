@@ -116,6 +116,22 @@ void PropertiesTreeModel::SetToggle(QString sCategoryName, QString sPropertyName
 		Q_EMIT dataChanged(indexRef, indexRef);
 }
 
+int PropertiesTreeModel::GetNumProperties(int iCategoryIndex) const
+{
+	return m_pRootItem->GetChild(iCategoryIndex)->GetNumChildren();
+}
+
+QString PropertiesTreeModel::GetPropertyName(const QModelIndex &indexRef) const
+{
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	return pTreeItem->data(PROPERTIESCOLUMN_Name).toString();
+}
+
+QString PropertiesTreeModel::GetPropertyName(int iCategoryIndex, int iPropertyIndex) const
+{
+	return m_pRootItem->GetChild(iCategoryIndex)->GetChild(iPropertyIndex)->data(PROPERTIESCOLUMN_Name).toString();
+}
+
 QVariant PropertiesTreeModel::GetPropertyValue(const QModelIndex &indexRef) const
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
@@ -183,6 +199,24 @@ QJsonValue PropertiesTreeModel::FindPropertyJsonValue(QString sCategoryName, QSt
 	}
 
 	return QJsonValue();
+}
+
+QModelIndex PropertiesTreeModel::FindPropertyModelIndex(QString sCategoryName, QString sPropertyName) const
+{
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		{
+			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
+			{
+				if(0 == pCategoryTreeItem->GetChild(j)->data(PROPERTIESCOLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+					return index(j, PROPERTIESCOLUMN_Name, index(i, PROPERTIESCOLUMN_Name));
+			}
+		}
+	}
+
+	return QModelIndex();
 }
 
 /*virtual*/ void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)
@@ -278,22 +312,6 @@ bool PropertiesTreeModel::IsCategoryCheckable(int iCategoryIndex) const
 {
 	const PropertiesDef &categoryPropDefRef = m_PropertyDefMap[m_pRootItem->GetChild(iCategoryIndex)];
 	return categoryPropDefRef.eAccessType == PROPERTIESACCESS_ToggleOn || categoryPropDefRef.eAccessType == PROPERTIESACCESS_ToggleOff;
-}
-
-int PropertiesTreeModel::GetNumProperties(int iCategoryIndex) const
-{
-	return m_pRootItem->GetChild(iCategoryIndex)->GetNumChildren();
-}
-
-QString PropertiesTreeModel::GetPropertyName(const QModelIndex &indexRef) const
-{
-	TreeModelItem *pTreeItem = GetItem(indexRef);
-	return pTreeItem->data(PROPERTIESCOLUMN_Name).toString();
-}
-
-QString PropertiesTreeModel::GetPropertyName(int iCategoryIndex, int iPropertyIndex) const
-{
-	return m_pRootItem->GetChild(iCategoryIndex)->GetChild(iPropertyIndex)->data(PROPERTIESCOLUMN_Name).toString();
 }
 
 bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, QString sToolTip /*= ""*/)

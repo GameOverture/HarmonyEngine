@@ -17,12 +17,25 @@
 #include <QGraphicsSceneHoverEvent>
 #include <QPainter>
 
-GraphicsKeyFrameItem::GraphicsKeyFrameItem(qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent /*= nullptr*/) :
-	QGraphicsRectItem(x, y, width, height, parent)
+GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent /*= nullptr*/) :
+	QGraphicsRectItem(x, y, width, height, parent),
+	m_bIsTweenKeyFrame(false)
 {
+	setData(DATAKEY_TreeItemData, QVariant::fromValue(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey)));
+	setData(DATAKEY_FrameIndex, std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey));
+	setData(DATAKEY_CategoryPropString, std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey));
+
+	QString sPropString = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey);
+	if(sPropString.split('/')[0].startsWith("Tween "))
+	{
+		setRect(x + KEYFRAME_WIDTH + 1.0f, y, width, height);
+		m_bIsTweenKeyFrame = true;
+	}
+
 	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
-	setBrush(HyGlobal::ConvertHyColor(HyColor::LightGray));
+	setBrush(HyGlobal::ConvertHyColor(m_bIsTweenKeyFrame ? HyColor::Green : HyColor::LightGray));
 	setAcceptHoverEvents(true);
+	setAcceptedMouseButtons(Qt::LeftButton);
 	setFlags(QGraphicsItem::ItemIsSelectable); // Can't use 'QGraphicsItem::ItemIsMovable' because key frames are only allowed to move horizontally and snapped to frames
 }
 
@@ -37,11 +50,9 @@ KeyFrameKey GraphicsKeyFrameItem::GetKey() const
 						   data(DATAKEY_CategoryPropString).toString());
 }
 
-void GraphicsKeyFrameItem::SetKey(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryProp)
+bool GraphicsKeyFrameItem::IsTweenKeyFrame() const
 {
-	setData(DATAKEY_TreeItemData, QVariant::fromValue(pItemData));
-	setData(DATAKEY_FrameIndex, iFrameIndex);
-	setData(DATAKEY_CategoryPropString, sCategoryProp);
+	return m_bIsTweenKeyFrame;
 }
 
 /*virtual*/ QVariant GraphicsKeyFrameItem::itemChange(GraphicsItemChange eChange, const QVariant &value) /*override*/
@@ -171,22 +182,41 @@ QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(Ent
 		QStringList sCategoryList = propsObj.keys();
 		for(QString sCategoryName : sCategoryList)
 		{
-			QJsonObject categoryObj = propsObj[sCategoryName].toObject();
-			QStringList sPropList = categoryObj.keys();
-			for(QString sPropName : sPropList)
+
+			//// If this category is a tween, skip over all the properties and "insert" a single QPair<> to represent it
+			//if(sCategoryName.startsWith("Tween "))
+			//{
+			//	QString sTween = sCategoryName.mid(6);
+			//	QString sCategory;
+			//	// Match the tween category to its corresponding property
+			//	if(s
+			//	uniquePropertiesSet.insert(QPair<QString, QString>(
+			//}
+			//else
 			{
-				QPair<QString, QString> newPair(sCategoryName, sPropName);
-				uniquePropertiesSet.insert(newPair);
+				QJsonObject categoryObj = propsObj[sCategoryName].toObject();
+				QStringList sPropList = categoryObj.keys();
+				for(QString sPropName : sPropList)
+				{
+					QPair<QString, QString> newPair(sCategoryName, sPropName);
+					uniquePropertiesSet.insert(newPair);
+				}
 			}
 		}
 	}
 
 	QList<QPair<QString, QString>> uniquePropertiesList = uniquePropertiesSet.values();
-	std::sort(uniquePropertiesList.begin(), uniquePropertiesList.end(), [](const QPair<QString, QString> &a, const QPair<QString, QString> &b) -> bool
+
+	// Sort 'uniquePropertiesList' to match how it is laid out in the Property Tree View
+	EntityPropertiesTreeModel &propertiesModelRef = pItemData->GetPropertiesModel();
+	std::sort(uniquePropertiesList.begin(), uniquePropertiesList.end(), [&](const QPair<QString, QString> &a, const QPair<QString, QString> &b) -> bool
 	{
-		if(a.first == b.first)
-			return a.second < b.second;
-		return a.first < b.first;
+		QModelIndex indexA = propertiesModelRef.FindPropertyModelIndex(a.first, a.second);
+		QModelIndex indexB = propertiesModelRef.FindPropertyModelIndex(b.first, b.second);
+
+		if(indexA.parent().row() == indexB.parent().row())
+			return indexA.row() < indexA.row();
+		return indexA.parent().row() < indexB.parent().row();
 	});
 
 	return uniquePropertiesList;
@@ -514,18 +544,17 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 					QString sPropString = propPair.first % "/" % propPair.second;
 					auto gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, sPropString);
 
+					qreal fPosX = TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f;
 					if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
 					{
-						GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
-						pNewGfxRectItem->SetKey(pCurItemData, iFrameIndex, sPropString);
-						pNewGfxRectItem->setAcceptedMouseButtons(Qt::LeftButton);
-						pNewGfxRectItem->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
+						GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(gfxRectMapKey, 0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
+						pNewGfxRectItem->setPos(fPosX, fPosY);
 
 						m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
 						addItem(pNewGfxRectItem);
 					}
 					else
-						m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f, fPosY);
+						m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(fPosX, fPosY);
 
 					if(pCurItemData->IsSelected())
 						fPosY += ITEMS_LINE_HEIGHT;

@@ -19,11 +19,13 @@
 /*static*/ QString HyGlobal::sm_AssetNames[NUM_ASSETMANTYPES];
 /*static*/ QString HyGlobal::sm_ShapeNames[NUM_SHAPES];
 /*static*/ QString HyGlobal::sm_TweenNames[NUM_TWEENS];
+/*static*/ QString HyGlobal::sm_TweenPropNames[NUM_TWEENPROPS];
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
 /*static*/ QStringList HyGlobal::sm_sTextStyleList;
 /*static*/ QStringList HyGlobal::sm_sAlignmentList;
 
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
+/*static*/ QIcon HyGlobal::sm_TweenPropIcons[NUM_TWEENPROPS];
 /*static*/ QColor HyGlobal::sm_ItemColors[NUM_ITEMTYPES];
 
 /*static*/ QString HyGlobal::sm_MimeTypes[NUM_MIMETYPES];
@@ -121,6 +123,11 @@
 	sm_TweenNames[TWEEN_BackOut] = "BackOut";
 	sm_TweenNames[TWEEN_BackInOut] = "BackInOut";
 
+	sm_TweenPropNames[TWEENPROP_Position] = "Position";
+	sm_TweenPropNames[TWEENPROP_Rotation] = "Rotation";
+	sm_TweenPropNames[TWEENPROP_Scale] = "Scale";
+	sm_TweenPropNames[TWEENPROP_Alpha] = "Alpha";
+
 	sm_sSubIconNames[SUBICON_None] = "";
 	sm_sSubIconNames[SUBICON_New] = "-New";
 	sm_sSubIconNames[SUBICON_Open] = "-Open";
@@ -138,6 +145,12 @@
 			QString sUrl = ":/icons16x16/items/" % sm_sItemNames[i] % sm_sSubIconNames[j] % ".png";
 			sm_ItemIcons[i][j].addFile(sUrl);
 		}
+	}
+
+	for(int i = 0; i < NUM_TWEENPROPS; ++i)
+	{
+		QString sUrl = ":/icons16x16/tween-" % sm_TweenPropNames[i] % ".png";
+		sm_TweenPropIcons[i].addFile(sUrl);
 	}
 
 	sm_sTextStyleList << "Line" << "Column" << "Scale Box" << "Scale Box (top align)" << "Vertical";
@@ -292,6 +305,20 @@
 	return list;
 }
 
+/*static*/ QList<TweenProperty> HyGlobal::GetTweenPropList()
+{
+	QList<TweenProperty> list;
+	list.append(TWEENPROP_Position);
+	list.append(TWEENPROP_Rotation);
+	list.append(TWEENPROP_Scale);
+	list.append(TWEENPROP_Alpha);
+	
+	if(list.size() != NUM_TWEENPROPS)
+		HyGuiLog("HyGlobal::GetTweenPropList missing a type!", LOGTYPE_Error);
+
+	return list;
+}
+
 /*static*/ QStringList HyGlobal::GetTypeNameList()
 {
 	QList<ItemType> dirList = GetItemTypeList();
@@ -398,6 +425,17 @@
 	}
 
 	return nullptr;
+}
+
+/*static*/ QStringList HyGlobal::GetTweenPropNameList()
+{
+	QList<TweenProperty> tweenPropList = GetTweenPropList();
+
+	QStringList list;
+	for(int i = 0; i < tweenPropList.size(); ++i)
+		list.append(TweenPropName(tweenPropList[i]));
+
+	return list;
 }
 
 /*static*/ QStringList HyGlobal::GetTextStyleNameList()
