@@ -754,30 +754,48 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 	m_iFrameOffset(iFrameOffset)
 {
 	QList<QGraphicsItem *> selectedItemsList = m_DopeSheetSceneRef.selectedItems();
-	for(QGraphicsItem *pGfxItem : selectedItemsList)
+	for(QGraphicsItem *pSelectedGfxItem : selectedItemsList)
 	{
-		GraphicsKeyFrameItem *pGfxKeyFrameItem = static_cast<GraphicsKeyFrameItem *>(pGfxItem);
-		std::tuple<EntityTreeItemData *, int, QString> tupleKey = pGfxKeyFrameItem->GetKey();
+		GraphicsKeyFrameItem *pSelectedGfxKeyFrameItem = static_cast<GraphicsKeyFrameItem *>(pSelectedGfxItem);
+		std::tuple<EntityTreeItemData *, int, QString> tupleKey = pSelectedGfxKeyFrameItem->GetKey();
 		QString sCategory = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[0];
 		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
 		
-		// Keep track of the affected original data
-		m_SelectedDataMap[tupleKey] = m_DopeSheetSceneRef.GetKeyFrameProperty(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
-																			  std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
-																			  sCategory,
-																			  sProperty);
+		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sProperty); // If Tween key frame found, this will be the 'TweenProperty'
+
+		// Store the original/old key frame data, before 'nudge' takes place
+		if(pSelectedGfxKeyFrameItem->IsTweenKeyFrame() == false)
+		{
+			m_Prop_SelectedDataMap[tupleKey] = m_DopeSheetSceneRef.GetKeyFrameProperty(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+																					   std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+																					   sCategory,
+																					   sProperty);
+		}
+		else
+		{
+			m_Tween_SelectedDataMap[tupleKey] = m_DopeSheetSceneRef.GetTweenJsonValues(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+																					   std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+																					   eTweenProp);
+		}
 		
-		// Check if this keyframe will overwrite an existing keyframe
+		// Update 'tupleKey' to what it will be after the 'nudge' operation
 		tupleKey = std::make_tuple(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
 								   HyMath::Max(0, std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey) + m_iFrameOffset),
 								   std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey));
-		if(m_OverwrittenDataMap.contains(tupleKey))
+
+		// Check if this key frame will be overwritten by the 'nudge' operation
+		if(m_DopeSheetSceneRef.ContainsKeyFrameProperty(tupleKey))
 		{
-			// Keep track of the original data that will be overwritten by the above 'm_SelectedDataMap' nudging on top of this keyframe
-			m_OverwrittenDataMap[tupleKey] = m_DopeSheetSceneRef.GetKeyFrameProperty(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
-																					 std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
-																					 sCategory,
-																					 sProperty);
+			m_Prop_OverwrittenDataMap[tupleKey] = m_DopeSheetSceneRef.GetKeyFrameProperty(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+																						  std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+																						  sCategory,
+																						  sProperty);
+		}
+		if(m_DopeSheetSceneRef.ContainsKeyFrameTween(tupleKey))
+		{
+			m_Tween_OverwrittenDataMap[tupleKey] = m_DopeSheetSceneRef.GetTweenJsonValues(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+																						   std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+																						   eTweenProp);
 		}
 	}
 }
@@ -788,15 +806,18 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 
 /*virtual*/ void EntityUndoCmd_NudgeSelectedKeyFrames::redo() /*override*/
 {
-	// First sort the contents of 'm_SelectedDataMap' by frame index, ordered based on the direction of the nudge
-	QList<KeyFrameKey> sortedKeyList = m_SelectedDataMap.keys();
-	std::sort(sortedKeyList.begin(), sortedKeyList.end(), [this](const KeyFrameKey &lhs, const KeyFrameKey &rhs) -> bool
+	// First sort the contents of 'm_Prop_SelectedDataMap' by frame index, ordered based on the direction of the nudge
+	std::function<bool(const KeyFrameKey &, const KeyFrameKey &)> fpSortPredicate = 
+	[this](const KeyFrameKey &lhs, const KeyFrameKey &rhs) -> bool
 	{
-		return (m_iFrameOffset > 0) ? (std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(lhs) < std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(rhs)) :
-									  (std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(lhs) > std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(rhs));
-	});
+		return (m_iFrameOffset > 0) ?
+			   (std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(lhs) < std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(rhs)) :
+			   (std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(lhs) > std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(rhs));
+	};
 
-	// Now nudge the keyframes
+	// Sort and nudge the 'property' key frames
+	QList<KeyFrameKey> sortedKeyList = m_Prop_SelectedDataMap.keys();
+	std::sort(sortedKeyList.begin(), sortedKeyList.end(), fpSortPredicate);
 	for(KeyFrameKey tupleKey : sortedKeyList)
 	{
 		QString sCategory = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[0];
@@ -809,14 +830,30 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 												  m_iFrameOffset,
 												  false);
 	}
+
+	// Sort and nudge the 'tween' key frames
+	sortedKeyList = m_Tween_SelectedDataMap.keys();
+	std::sort(sortedKeyList.begin(), sortedKeyList.end(), fpSortPredicate);
+	for(KeyFrameKey tupleKey : sortedKeyList)
+	{
+		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
+		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sProperty);
+
+		m_DopeSheetSceneRef.NudgeKeyFrameTween(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+											   std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+											   eTweenProp,
+											   m_iFrameOffset,
+											   false);
+	}
 	
 	m_DopeSheetSceneRef.RefreshAllGfxItems();
 }
 
 /*virtual*/ void EntityUndoCmd_NudgeSelectedKeyFrames::undo() /*override*/
 {
-	// First remove the keyframes that were nudged
-	for(KeyFrameKey tupleKey : m_SelectedDataMap.keys())
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// First remove the key frames that were nudged
+	for(KeyFrameKey tupleKey : m_Prop_SelectedDataMap.keys())
 	{
 		QString sCategory = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[0];
 		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
@@ -826,21 +863,20 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 												   sProperty,
 												   false);
 	}
-
-	// Then restore the original data
-	for(KeyFrameKey tupleKey : m_SelectedDataMap.keys())
+	for(KeyFrameKey tupleKey : m_Tween_SelectedDataMap.keys())
 	{
-		QString sCategory = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[0];
 		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
-		m_DopeSheetSceneRef.SetKeyFrameProperty(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
-												std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
-												sCategory,
-												sProperty,
-												m_SelectedDataMap[tupleKey],
+		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sProperty);
+
+		m_DopeSheetSceneRef.RemoveKeyFrameTween(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+												HyMath::Max(0, std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey) + m_iFrameOffset),
+												eTweenProp,
 												false);
 	}
-	// As well as the data that was overwritten
-	for(KeyFrameKey tupleKey : m_OverwrittenDataMap.keys())
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Then restore the original data
+	for(KeyFrameKey tupleKey : m_Prop_SelectedDataMap.keys())
 	{
 		QString sCategory = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[0];
 		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
@@ -848,8 +884,43 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 												std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
 												sCategory,
 												sProperty,
-												m_OverwrittenDataMap[tupleKey],
+												m_Prop_SelectedDataMap[tupleKey],
 												false);
+	}
+	for(KeyFrameKey tupleKey : m_Tween_SelectedDataMap.keys())
+	{
+		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
+		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sProperty);
+
+		m_DopeSheetSceneRef.SetKeyFrameTween(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+											 std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+											 eTweenProp,
+											 m_Tween_SelectedDataMap[tupleKey],
+											 false);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// As well as the data that was overwritten
+	for(KeyFrameKey tupleKey : m_Prop_OverwrittenDataMap.keys())
+	{
+		QString sCategory = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[0];
+		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
+		m_DopeSheetSceneRef.SetKeyFrameProperty(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+												std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+												sCategory,
+												sProperty,
+												m_Prop_OverwrittenDataMap[tupleKey],
+												false);
+	}
+	for(KeyFrameKey tupleKey : m_Tween_OverwrittenDataMap.keys())
+	{
+		QString sProperty = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey).split('/')[1];
+		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sProperty);
+		m_DopeSheetSceneRef.SetKeyFrameTween(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey),
+											 std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey),
+											 eTweenProp,
+											 m_Tween_OverwrittenDataMap[tupleKey],
+											 false);
 	}
 
 	m_DopeSheetSceneRef.RefreshAllGfxItems();
@@ -885,9 +956,8 @@ EntityUndoCmd_PropertyModified::EntityUndoCmd_PropertyModified(PropertiesTreeMod
 		{
 			if(sCategory.startsWith("Tween "))
 			{
-				m_OldTweenDestination = m_pModel->FindPropertyJsonValue(sCategory, "Destination");
-				m_OldTweenDuration = m_pModel->FindPropertyJsonValue(sCategory, "Duration");
-				m_OldTweenType = m_pModel->FindPropertyJsonValue(sCategory, "Tween Type");
+				TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sCategory.mid(6));
+				m_OldTweenData = dopeSheetSceneRef.GetTweenJsonValues(pEntityTreeData, m_iFrameIndex, eTweenProp);
 			}
 			else
 				HyGuiLog("EntityUndoCmd_PropertyModified - Unhandled logic: Need generic container of old values", LOGTYPE_Error);
@@ -937,32 +1007,22 @@ void EntityUndoCmd_PropertyModified::UpdateEntityModel(bool bIsRedo)
 		QString sCategory = m_pModel->GetCategoryName(m_ModelIndex);
 		if(sCategory.startsWith("Tween "))
 		{
+			TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sCategory.mid(6));
 			if(bRemoveProperties)
 			{
-				dopeSheetSceneRef.RemoveKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, "Destination", false);
-				dopeSheetSceneRef.RemoveKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, "Duration", false);
-				dopeSheetSceneRef.RemoveKeyFrameProperty(pEntityTreeData, m_iFrameIndex, sCategory, "Tween Type", true);
+				dopeSheetSceneRef.RemoveKeyFrameTween(pEntityTreeData, m_iFrameIndex, eTweenProp, true);
 			}
 			else
 			{
-				QJsonObject propertiesObj;
-
-				QJsonObject tweenObj;
-				if(m_OldTweenDestination.isUndefined() == false && m_OldTweenDestination.isNull() == false)
+				if(std::get<0>(m_OldTweenData).isUndefined() || std::get<0>(m_OldTweenData).isNull())
 				{
-					tweenObj.insert("Destination", m_OldTweenDestination);
-					tweenObj.insert("Duration", m_OldTweenDuration);
-					tweenObj.insert("Tween Type", m_OldTweenType);
+					QJsonValue destinationValue = m_pModel->FindPropertyJsonValue(sCategory, "Destination");
+					QJsonValue durationValue = m_pModel->FindPropertyJsonValue(sCategory, "Duration");
+					QJsonValue tweenTypeValue = m_pModel->FindPropertyJsonValue(sCategory, "Tween Type");
+					dopeSheetSceneRef.SetKeyFrameTween(pEntityTreeData, m_iFrameIndex, eTweenProp, std::make_tuple(destinationValue, durationValue, tweenTypeValue), true);
 				}
 				else
-				{
-					tweenObj.insert("Destination", m_pModel->FindPropertyJsonValue(sCategory, "Destination"));
-					tweenObj.insert("Duration", m_pModel->FindPropertyJsonValue(sCategory, "Duration"));
-					tweenObj.insert("Tween Type", m_pModel->FindPropertyJsonValue(sCategory, "Tween Type"));
-				}
-				propertiesObj.insert(sCategory, tweenObj);
-
-				dopeSheetSceneRef.SetKeyFrameProperties(pEntityTreeData, m_iFrameIndex, propertiesObj);
+					dopeSheetSceneRef.SetKeyFrameTween(pEntityTreeData, m_iFrameIndex, eTweenProp, m_OldTweenData, true);
 			}
 		}
 	}

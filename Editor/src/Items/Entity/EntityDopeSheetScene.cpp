@@ -163,6 +163,16 @@ const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &EntityDopeSheetScene::
 	return m_KeyFramesMap;
 }
 
+bool EntityDopeSheetScene::ContainsKeyFrameProperty(KeyFrameKey tupleKey)
+{
+	return m_KeyFramesGfxRectMap.contains(tupleKey);
+}
+
+bool EntityDopeSheetScene::ContainsKeyFrameTween(KeyFrameKey tupleKey)
+{
+	return m_TweenGfxRectMap.contains(tupleKey);
+}
+
 QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(EntityTreeItemData *pItemData) const
 {
 	QSet<QPair<QString, QString>> uniquePropertiesSet;
@@ -478,11 +488,49 @@ void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData,
 		RefreshAllGfxItems();
 }
 
+void EntityDopeSheetScene::RemoveKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, bool bRefreshGfxItems)
+{
+	QString sCategoryName = "Tween " % HyGlobal::TweenPropName(eTweenProp);
+
+	RemoveKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Destination", false);
+	RemoveKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Duration", false);
+	RemoveKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type", bRefreshGfxItems);
+}
+
+TweenJsonValues EntityDopeSheetScene::GetTweenJsonValues(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp) const
+{
+	QString sCategoryName = "Tween " % HyGlobal::TweenPropName(eTweenProp);
+
+	QJsonValue destinationValue = GetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Destination");
+	QJsonValue durationValue = GetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Duration");
+	QJsonValue tweenTypeValue = GetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type");
+
+	return std::make_tuple(destinationValue, durationValue, tweenTypeValue);
+}
+
+void EntityDopeSheetScene::SetKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, TweenJsonValues tweenValues, bool bRefreshGfxItems)
+{
+	QString sCategoryName = "Tween " % HyGlobal::TweenPropName(eTweenProp);
+
+	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Destination", std::get<0>(tweenValues), bRefreshGfxItems);
+	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Duration", std::get<1>(tweenValues), bRefreshGfxItems);
+	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type", std::get<2>(tweenValues), bRefreshGfxItems);
+}
+
 void EntityDopeSheetScene::NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems)
 {
 	QJsonValue propValue = GetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, sPropName);
 	RemoveKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, sPropName, false);
 	SetKeyFrameProperty(pItemData, HyMath::Max(0, iFrameIndex + iNudgeAmount), sCategoryName, sPropName, propValue, bRefreshGfxItems);
+}
+
+void EntityDopeSheetScene::NudgeKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, int iNudgeAmount, bool bRefreshGfxItems)
+{
+	QString sCategoryName = "Tween " % HyGlobal::TweenPropName(eTweenProp);
+
+	NudgeKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Destination", iNudgeAmount, bRefreshGfxItems);
+	NudgeKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Duration", iNudgeAmount, bRefreshGfxItems);
+	NudgeKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type", iNudgeAmount, bRefreshGfxItems);
 }
 
 void EntityDopeSheetScene::SelectAllItemKeyFrames(EntityTreeItemData *pItemData)

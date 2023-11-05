@@ -34,6 +34,7 @@ class EntityStateData;
 class EntityTreeItemData;
 
 typedef std::tuple<EntityTreeItemData *, int, QString> KeyFrameKey;
+typedef std::tuple<QJsonValue, QJsonValue, QJsonValue> TweenJsonValues;
 
 class GraphicsKeyFrameItem : public QGraphicsRectItem
 {
@@ -87,6 +88,9 @@ public:
 
 	const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &GetKeyFramesMap() const;
 
+	bool ContainsKeyFrameProperty(KeyFrameKey tupleKey);
+	bool ContainsKeyFrameTween(KeyFrameKey tupleKey);
+
 	// 'm_KeyFrameMap' must be fully updated before using this function
 	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData) const; // This is mainly useful for rendering the dope sheet
 
@@ -99,8 +103,13 @@ public:
 	void SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj);
 	bool SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue, bool bRefreshGfxItems);
 	void RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, bool bRefreshGfxItems);
+	void RemoveKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, bool bRefreshGfxItems);
+
+	TweenJsonValues GetTweenJsonValues(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp) const;
+	void SetKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, TweenJsonValues tweenValues, bool bRefreshGfxItems);
 
 	void NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems);
+	void NudgeKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, int iNudgeAmount, bool bRefreshGfxItems);
 
 	void SelectAllItemKeyFrames(EntityTreeItemData *pItemData);
 

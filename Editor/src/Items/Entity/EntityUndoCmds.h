@@ -236,11 +236,16 @@ public:
 
 class EntityUndoCmd_NudgeSelectedKeyFrames : public QUndoCommand
 {
-	EntityDopeSheetScene &			m_DopeSheetSceneRef;
-	int								m_iFrameOffset;
+	EntityDopeSheetScene &					m_DopeSheetSceneRef;
+	int										m_iFrameOffset;
 
-	QMap<KeyFrameKey, QJsonValue>	m_SelectedDataMap;		// Stored as the original/old data, before 'nudge' takes place
-	QMap<KeyFrameKey, QJsonValue>	m_OverwrittenDataMap;	// Old data that will be overwritten by the 'nudge' operation
+	// Store the original/old key frame data, before 'nudge' takes place
+	QMap<KeyFrameKey, QJsonValue>			m_Prop_SelectedDataMap;
+	QMap<KeyFrameKey, TweenJsonValues>		m_Tween_SelectedDataMap;
+
+	// Old key frame data that will be overwritten by the 'nudge' operation
+	QMap<KeyFrameKey, QJsonValue>			m_Prop_OverwrittenDataMap;
+	QMap<KeyFrameKey, TweenJsonValues>		m_Tween_OverwrittenDataMap;
 
 public:
 	EntityUndoCmd_NudgeSelectedKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameOffset, QUndoCommand *pParent = nullptr);
@@ -259,9 +264,7 @@ class EntityUndoCmd_PropertyModified : public PropertiesUndoCmd
 
 	// Only used if this UndoCmd is unchecking the toggle of this item - used to restore the old value(s) when undo() invoked
 	QJsonValue						m_OldPropertyValue;
-	QJsonValue						m_OldTweenDestination;
-	QJsonValue						m_OldTweenDuration;
-	QJsonValue						m_OldTweenType;
+	TweenJsonValues					m_OldTweenData;
 
 public:
 	EntityUndoCmd_PropertyModified(PropertiesTreeModel *pModel, const QModelIndex &index, const QVariant &newData, QUndoCommand *pParent = nullptr);
