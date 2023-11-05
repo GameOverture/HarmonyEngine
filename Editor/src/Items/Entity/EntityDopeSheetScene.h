@@ -47,7 +47,7 @@ public:
 		DATAKEY_CategoryPropString	// Category + "/" + Property
 	};
 
-	GraphicsKeyFrameItem(KeyFrameKey tupleKey, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent = nullptr);
+	GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKeyFrame, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent = nullptr);
 	virtual ~GraphicsKeyFrameItem();
 
 	KeyFrameKey GetKey() const;
@@ -66,7 +66,9 @@ class EntityDopeSheetScene : public QGraphicsScene
 	int																				m_iFramesPerSecond;
 
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;
+
 	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_KeyFramesGfxRectMap;
+	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_TweenGfxRectMap;
 
 	int																				m_iCurrentFrame;
 	QGraphicsLineItem *																m_pCurrentFrameLine;

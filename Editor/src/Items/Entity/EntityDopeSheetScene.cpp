@@ -17,20 +17,13 @@
 #include <QGraphicsSceneHoverEvent>
 #include <QPainter>
 
-GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent /*= nullptr*/) :
+GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKeyFrame, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent /*= nullptr*/) :
 	QGraphicsRectItem(x, y, width, height, parent),
-	m_bIsTweenKeyFrame(false)
+	m_bIsTweenKeyFrame(bIsTweenKeyFrame)
 {
 	setData(DATAKEY_TreeItemData, QVariant::fromValue(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey)));
 	setData(DATAKEY_FrameIndex, std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey));
 	setData(DATAKEY_CategoryPropString, std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey));
-
-	QString sPropString = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey);
-	if(sPropString.split('/')[0].startsWith("Tween "))
-	{
-		setRect(x + KEYFRAME_WIDTH + 1.0f, y, width, height);
-		m_bIsTweenKeyFrame = true;
-	}
 
 	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
 	setBrush(HyGlobal::ConvertHyColor(m_bIsTweenKeyFrame ? HyColor::Green : HyColor::LightGray));
@@ -182,17 +175,15 @@ QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(Ent
 		QStringList sCategoryList = propsObj.keys();
 		for(QString sCategoryName : sCategoryList)
 		{
-
-			//// If this category is a tween, skip over all the properties and "insert" a single QPair<> to represent it
-			//if(sCategoryName.startsWith("Tween "))
-			//{
-			//	QString sTween = sCategoryName.mid(6);
-			//	QString sCategory;
-			//	// Match the tween category to its corresponding property
-			//	if(s
-			//	uniquePropertiesSet.insert(QPair<QString, QString>(
-			//}
-			//else
+			// If this category is a tween, skip over all the properties and "insert" a single QPair<> to represent it
+			if(sCategoryName.startsWith("Tween "))
+			{
+				// Match the tween category to its corresponding property
+				QString sTween = sCategoryName.mid(6);
+				TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sTween);
+				uniquePropertiesSet.insert(HyGlobal::GetTweenCategoryProperty(eTweenProp));
+			}
+			else
 			{
 				QJsonObject categoryObj = propsObj[sCategoryName].toObject();
 				QStringList sPropList = categoryObj.keys();
@@ -460,11 +451,27 @@ void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData,
 		keyFrameObjRef.insert(sCategoryName, categoryObj);
 
 	// Remove the corresponding gfx rect for this property
-	auto gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, sCategoryName % "/" % sPropName);
+	KeyFrameKey gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, sCategoryName % "/" % sPropName);
 	if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey))
 	{
 		removeItem(m_KeyFramesGfxRectMap[gfxRectMapKey]);
+		delete m_KeyFramesGfxRectMap[gfxRectMapKey];
 		m_KeyFramesGfxRectMap.remove(gfxRectMapKey);
+	}
+
+	// Tweens
+	if(sCategoryName.startsWith("Tween "))
+	{
+		QString sTweenName = sCategoryName.mid(6);
+		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sTweenName);
+		QPair<QString, QString> tweenPair = HyGlobal::GetTweenCategoryProperty(eTweenProp);
+		gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, tweenPair.first % "/" % tweenPair.second);
+		if(m_TweenGfxRectMap.contains(gfxRectMapKey))
+		{
+			removeItem(m_TweenGfxRectMap[gfxRectMapKey]);
+			delete m_TweenGfxRectMap[gfxRectMapKey];
+			m_TweenGfxRectMap.remove(gfxRectMapKey);
+		}
 	}
 
 	if(bRefreshGfxItems)
@@ -495,9 +502,11 @@ void EntityDopeSheetScene::SelectAllItemKeyFrames(EntityTreeItemData *pItemData)
 			QStringList sPropList = categoryObj.keys();
 			for(QString sPropName : sPropList)
 			{
-				auto gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, sCategoryName % "/" % sPropName);
+				KeyFrameKey gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, sCategoryName % "/" % sPropName);
 				if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey))
 					m_KeyFramesGfxRectMap[gfxRectMapKey]->setSelected(true);
+				if(m_TweenGfxRectMap.contains(gfxRectMapKey))
+					m_TweenGfxRectMap[gfxRectMapKey]->setSelected(true);
 			}
 		}
 	}
@@ -524,6 +533,7 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 
 		if(m_KeyFramesMap.contains(pCurItemData))
 		{
+			QList<TweenProperty> tweenPropList = HyGlobal::GetTweenPropList();
 			const QMap<int, QJsonObject> &keyFrameMapRef = m_KeyFramesMap[pCurItemData];
 			for(int iFrameIndex : keyFrameMapRef.keys())
 			{
@@ -533,7 +543,14 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 				// Iterate through 'uniquePropList' and draw a QGraphicsRectItem for each property found in 'propsObj'
 				for(auto &propPair : uniquePropList)
 				{
-					if(propsObj.contains(propPair.first) == false || propsObj[propPair.first].toObject().contains(propPair.second) == false)
+					bool bPropKeyFrame = propsObj.contains(propPair.first) && propsObj[propPair.first].toObject().contains(propPair.second);
+					
+					bool bTweenKeyFrame = std::any_of(tweenPropList.begin(), tweenPropList.end(), [&](TweenProperty eTweenProp) {
+						QPair<QString, QString> tweenPair = HyGlobal::GetTweenCategoryProperty(eTweenProp);
+						return (propPair == tweenPair && propsObj.contains("Tween " % HyGlobal::TweenPropName(eTweenProp)));
+					});
+
+					if(bPropKeyFrame == false && bTweenKeyFrame == false)
 					{
 						if(pCurItemData->IsSelected())
 							fPosY += ITEMS_LINE_HEIGHT;
@@ -542,19 +559,38 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 
 					// IMPORTANT NOTE: std::make_tuple() crashes in Release if you try to construct the string directly in the function call
 					QString sPropString = propPair.first % "/" % propPair.second;
-					auto gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, sPropString);
+					KeyFrameKey gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, sPropString);
 
 					qreal fPosX = TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f;
-					if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
+					
+					// Add or update the GraphicsKeyFrameItem's
+					if(bPropKeyFrame)
 					{
-						GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(gfxRectMapKey, 0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
-						pNewGfxRectItem->setPos(fPosX, fPosY);
+						if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
+						{
+							GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(gfxRectMapKey, false, 0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
+							pNewGfxRectItem->setPos(fPosX, fPosY);
 
-						m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
-						addItem(pNewGfxRectItem);
+							m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
+							addItem(pNewGfxRectItem);
+						}
+						else
+							m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(fPosX, fPosY);
 					}
-					else
-						m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(fPosX, fPosY);
+					if(bTweenKeyFrame)
+					{
+						if(m_TweenGfxRectMap.contains(gfxRectMapKey) == false)
+						{
+							fPosX += (bPropKeyFrame ? (KEYFRAME_WIDTH + 1.0f) : 0.0f);
+							GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(gfxRectMapKey, true, 0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
+							pNewGfxRectItem->setPos(fPosX, fPosY);
+
+							m_TweenGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
+							addItem(pNewGfxRectItem);
+						}
+						else
+							m_TweenGfxRectMap[gfxRectMapKey]->setPos(fPosX + (bPropKeyFrame ? (KEYFRAME_WIDTH + 1.0f) : 0.0f), fPosY);
+					}
 
 					if(pCurItemData->IsSelected())
 						fPosY += ITEMS_LINE_HEIGHT;

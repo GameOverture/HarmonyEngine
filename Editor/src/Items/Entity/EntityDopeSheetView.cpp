@@ -194,14 +194,17 @@ float EntityDopeSheetView::GetZoom() const
 			}
 		}
 
-		pPainter->setPen(pKeyFrameItem->pen());
-		QBrush brush = pKeyFrameItem->brush();
-		QColor color = brush.color();
-		color.setAlphaF(0.5f);
-		brush.setColor(color);
-		pPainter->setBrush(brush);
+		if(pKeyFrameItem)
+		{
+			pPainter->setPen(pKeyFrameItem->pen());
+			QBrush brush = pKeyFrameItem->brush();
+			QColor color = brush.color();
+			color.setAlphaF(0.5f);
+			brush.setColor(color);
+			pPainter->setBrush(brush);
 
-		pPainter->drawRects(rectList);
+			pPainter->drawRects(rectList);
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////////

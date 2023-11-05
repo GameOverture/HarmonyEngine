@@ -174,6 +174,8 @@ enum TweenType
 
 enum TweenProperty
 {
+	TWEENPROP_Unknown = -1,
+
 	TWEENPROP_Position = 0,
 	TWEENPROP_Rotation,
 	TWEENPROP_Scale,
@@ -321,6 +323,7 @@ public:
 	static EditorShape GetShapeFromString(QString sShape);
 	static QStringList GetTweenNameList();
 	static TweenType GetTweenFromString(QString sTween);
+	static TweenProperty GetTweenPropFromString(QString sTweenProp);
 	static QStringList GetTweenPropNameList();
 	static HyTweenFunc GetTweenFunc(TweenType eTween);
 	static QStringList GetTextStyleNameList();
@@ -365,6 +368,8 @@ public:
 
 	// Includes 'pParentItem' in returned list
 	static QList<QTreeWidgetItem *> RecursiveTreeChildren(QTreeWidgetItem *pParentItem);
+
+	static QPair<QString, QString> GetTweenCategoryProperty(TweenProperty eTweenProp);
 
 	static QDir PrepTempDir(Project &projectRef, QString sDirName);
 	static void CleanAllTempDirs(Project &projectRef);

@@ -386,6 +386,17 @@
 	return TWEEN_Unknown;
 }
 
+/*static*/ TweenProperty HyGlobal::GetTweenPropFromString(QString sTweenProp)
+{
+	for(int i = 0; i < NUM_TWEENPROPS; ++i)
+	{
+		if(sTweenProp.compare(TweenPropName(static_cast<TweenProperty>(i)), Qt::CaseInsensitive) == 0)
+			return static_cast<TweenProperty>(i);
+	}
+
+	return TWEENPROP_Unknown;
+}
+
 /*static*/ HyTweenFunc HyGlobal::GetTweenFunc(TweenType eTween)
 {
 	switch(eTween)
@@ -662,6 +673,26 @@
 	}
 
 	return returnList;
+}
+
+/*static*/ QPair<QString, QString> HyGlobal::GetTweenCategoryProperty(TweenProperty eTweenProp)
+{
+	switch(eTweenProp)
+	{
+	case TWEENPROP_Position:
+	case TWEENPROP_Rotation:
+	case TWEENPROP_Scale:
+		return QPair<QString, QString>("Transformation", sm_TweenPropNames[eTweenProp]);
+		break;
+
+	case TWEENPROP_Alpha:
+		return QPair<QString, QString>("Body", sm_TweenPropNames[eTweenProp]);
+		break;
+
+	default:
+		HyGuiLog("EntityDopeSheetScene::GetUniquePropertiesList - unhandled tween property", LOGTYPE_Error);
+		break;
+	}
 }
 
 /*static*/ QDir HyGlobal::PrepTempDir(Project &projectRef, QString sDirName)
