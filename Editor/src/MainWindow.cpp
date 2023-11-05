@@ -408,7 +408,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	}
 
 	// If this is the item that is currently being shown, unhook all its actions and widget
-	if(sm_pInstance->ui->dopeSheet->GetEntityStateModel() == nullptr || pItem == &sm_pInstance->ui->dopeSheet->GetEntityStateModel()->GetModel().GetItem())
+	if(pItem->GetType() == ITEM_Entity)
 	{
 		sm_pInstance->ui->dopeSheet->SetEntityStateModel(nullptr);
 		sm_pInstance->ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, false);
