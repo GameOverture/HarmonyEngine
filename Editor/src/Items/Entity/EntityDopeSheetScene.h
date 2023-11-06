@@ -38,7 +38,9 @@ typedef std::tuple<QJsonValue, QJsonValue, QJsonValue> TweenJsonValues;
 
 class GraphicsKeyFrameItem : public QGraphicsRectItem
 {
-	bool				m_bIsTweenKeyFrame;
+	bool					m_bIsTweenKeyFrame;
+	QGraphicsLineItem *		m_pGfxTweenLine;
+	QGraphicsEllipseItem *	m_pGfxTweenDurationKnob;
 
 public:
 	enum DataKey
@@ -53,6 +55,7 @@ public:
 
 	KeyFrameKey GetKey() const;
 	bool IsTweenKeyFrame() const;
+	void SetTweenLineLength(qreal fLength);
 
 protected:
 	virtual QVariant itemChange(GraphicsItemChange eChange, const QVariant &value) override;

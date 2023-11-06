@@ -19,7 +19,9 @@
 
 GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKeyFrame, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent /*= nullptr*/) :
 	QGraphicsRectItem(x, y, width, height, parent),
-	m_bIsTweenKeyFrame(bIsTweenKeyFrame)
+	m_bIsTweenKeyFrame(bIsTweenKeyFrame),
+	m_pGfxTweenLine(nullptr),
+	m_pGfxTweenDurationKnob(nullptr)
 {
 	setData(DATAKEY_TreeItemData, QVariant::fromValue(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey)));
 	setData(DATAKEY_FrameIndex, std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey));
@@ -30,10 +32,23 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKe
 	setAcceptHoverEvents(true);
 	setAcceptedMouseButtons(Qt::LeftButton);
 	setFlags(QGraphicsItem::ItemIsSelectable); // Can't use 'QGraphicsItem::ItemIsMovable' because key frames are only allowed to move horizontally and snapped to frames
+
+	if(m_bIsTweenKeyFrame)
+	{
+		m_pGfxTweenLine = new QGraphicsLineItem(this);
+		m_pGfxTweenLine->setFlag(QGraphicsItem::ItemStacksBehindParent);
+
+		QPen dashLinePen;
+		dashLinePen.setStyle(Qt::DashLine);
+		dashLinePen.setColor(HyGlobal::ConvertHyColor(HyColor::Green));
+		m_pGfxTweenLine->setPen(dashLinePen);
+	}
 }
 
 /*virtual*/ GraphicsKeyFrameItem::~GraphicsKeyFrameItem()
 {
+	delete m_pGfxTweenDurationKnob;
+	delete m_pGfxTweenLine;
 }
 
 KeyFrameKey GraphicsKeyFrameItem::GetKey() const
@@ -46,6 +61,11 @@ KeyFrameKey GraphicsKeyFrameItem::GetKey() const
 bool GraphicsKeyFrameItem::IsTweenKeyFrame() const
 {
 	return m_bIsTweenKeyFrame;
+}
+
+void GraphicsKeyFrameItem::SetTweenLineLength(qreal fLength)
+{
+	m_pGfxTweenLine->setLine(0.0f, KEYFRAME_HEIGHT * 0.5f, fLength, KEYFRAME_HEIGHT * 0.5f);
 }
 
 /*virtual*/ QVariant GraphicsKeyFrameItem::itemChange(GraphicsItemChange eChange, const QVariant &value) /*override*/
@@ -638,6 +658,13 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 						}
 						else
 							m_TweenGfxRectMap[gfxRectMapKey]->setPos(fPosX + (bPropKeyFrame ? (KEYFRAME_WIDTH + 1.0f) : 0.0f), fPosY);
+
+						// Calculate the dash-line "Duration"
+						double dDuration = GetKeyFrameProperty(pCurItemData, iFrameIndex, "Tween " % propPair.second, "Duration").toDouble();
+						qreal fLineLength = (dDuration * m_iFramesPerSecond) * TIMELINE_NOTCH_SUBLINES_WIDTH;
+						if(bPropKeyFrame)
+							fLineLength -= (KEYFRAME_WIDTH + 1.0f);
+						m_TweenGfxRectMap[gfxRectMapKey]->SetTweenLineLength(fLineLength);
 					}
 
 					if(pCurItemData->IsSelected())
