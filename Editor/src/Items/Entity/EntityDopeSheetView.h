@@ -15,6 +15,7 @@
 class EntityStateData;
 class EntityTreeItemData;
 class EntityDopeSheetScene;
+class GraphicsTweenKnobItem;
 
 class EntityDopeSheetView : public QGraphicsView
 {
@@ -37,8 +38,8 @@ class EntityDopeSheetView : public QGraphicsView
 	DragState					m_eDragState;
 	QPointF						m_ptDragStart; // In View Coordinates
 	int							m_iDragFrame;
+	GraphicsTweenKnobItem *		m_pGfxDragTweenKnobItem; // If dragging a tween duration knob
 
-	// Tween Key Frame Actions
 	EntityTreeItemData *		m_pContextClickItem;
 	QList<QAction *>			m_ActionTweenList;
 

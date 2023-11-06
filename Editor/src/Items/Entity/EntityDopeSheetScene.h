@@ -29,6 +29,7 @@
 #define ITEMS_LINE_HEIGHT 22.0f
 #define KEYFRAME_HEIGHT 19.0f
 #define KEYFRAME_WIDTH 4.0f
+#define KEYFRAME_TWEEN_KNOB_RADIUS 5.0f
 
 class EntityStateData;
 class EntityTreeItemData;
@@ -36,18 +37,32 @@ class EntityTreeItemData;
 typedef std::tuple<EntityTreeItemData *, int, QString> KeyFrameKey;
 typedef std::tuple<QJsonValue, QJsonValue, QJsonValue> TweenJsonValues;
 
+class GraphicsTweenKnobItem : public QGraphicsEllipseItem
+{
+public:
+	GraphicsTweenKnobItem(QGraphicsItem *pParent = nullptr);
+	virtual ~GraphicsTweenKnobItem();
+
+protected:
+	virtual QVariant itemChange(GraphicsItemChange eChange, const QVariant &value) override;
+	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) override;
+	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *pEvent) override;
+};
+
 class GraphicsKeyFrameItem : public QGraphicsRectItem
 {
 	bool					m_bIsTweenKeyFrame;
 	QGraphicsLineItem *		m_pGfxTweenLine;
-	QGraphicsEllipseItem *	m_pGfxTweenDurationKnob;
+	GraphicsTweenKnobItem *	m_pGfxTweenDurationKnob;
 
 public:
 	enum DataKey
 	{
 		DATAKEY_TreeItemData = 0,
 		DATAKEY_FrameIndex,
-		DATAKEY_CategoryPropString	// Category + "/" + Property
+		DATAKEY_CategoryPropString,	// Category + "/" + Property
+
+		DATAKEY_IsTweenKnob
 	};
 
 	GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKeyFrame, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent = nullptr);

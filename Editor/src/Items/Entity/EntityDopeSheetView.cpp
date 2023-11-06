@@ -28,6 +28,8 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	m_fZoom(1.0f),
 	m_eDragState(DRAGSTATE_None),
 	m_ptDragStart(0.0f, 0.0f),
+	m_iDragFrame(-1),
+	m_pGfxDragTweenKnobItem(nullptr),
 	m_pContextClickItem(nullptr)
 {
 	for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
@@ -446,10 +448,17 @@ float EntityDopeSheetView::GetZoom() const
 		{
 			m_eDragState = DRAGSTATE_InitialPress;
 			m_ptDragStart = pEvent->pos();
+
+			if(pItemUnderMouse->data(GraphicsKeyFrameItem::DATAKEY_IsTweenKnob).toBool())
+			{
+				GetScene()->clearSelection();
+				m_pGfxDragTweenKnobItem = static_cast<GraphicsTweenKnobItem *>(pItemUnderMouse);
+			}
 		}
 
-		// Only want default selection behavior when NOT clicking in the 'time line' or an 'item name' column
-		QGraphicsView::mousePressEvent(pEvent);
+		// Only want default selection behavior when NOT clicking in the 'time line' or an 'item name' column AND it's not a tween knob
+		if(pItemUnderMouse == nullptr || pItemUnderMouse->data(GraphicsKeyFrameItem::DATAKEY_IsTweenKnob).toBool() == false)
+			QGraphicsView::mousePressEvent(pEvent);
 	}
 
 	update();

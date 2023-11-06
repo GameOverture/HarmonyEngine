@@ -17,6 +17,50 @@
 #include <QGraphicsSceneHoverEvent>
 #include <QPainter>
 
+GraphicsTweenKnobItem::GraphicsTweenKnobItem(QGraphicsItem *pParent /*= nullptr*/) :
+	QGraphicsEllipseItem(-KEYFRAME_TWEEN_KNOB_RADIUS, -KEYFRAME_TWEEN_KNOB_RADIUS, KEYFRAME_TWEEN_KNOB_RADIUS * 2.0f, KEYFRAME_TWEEN_KNOB_RADIUS * 2.0f, pParent)
+{
+	setData(GraphicsKeyFrameItem::DATAKEY_IsTweenKnob, true);
+
+	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
+	setBrush(HyGlobal::ConvertHyColor(HyColor::Green));
+	setAcceptHoverEvents(true);
+	setAcceptedMouseButtons(Qt::LeftButton);
+}
+
+/*virtual*/ GraphicsTweenKnobItem::~GraphicsTweenKnobItem()
+{
+}
+
+/*virtual*/ QVariant GraphicsTweenKnobItem::itemChange(GraphicsItemChange eChange, const QVariant &value) /*override*/
+{
+	switch(eChange)
+	{
+	case QGraphicsItem::ItemSelectedHasChanged:
+		if(value.toBool())
+			setCursor(Qt::SizeHorCursor);
+		else
+			unsetCursor();
+		break;
+	}
+
+	return QGraphicsEllipseItem::itemChange(eChange, value);
+}
+
+/*virtual*/ void GraphicsTweenKnobItem::hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) /*override*/
+{
+	setPen(HyGlobal::ConvertHyColor(HyColor::White));
+	scene()->update();
+}
+
+/*virtual*/ void GraphicsTweenKnobItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *pEvent) /*override*/
+{
+	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
+	scene()->update();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKeyFrame, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent /*= nullptr*/) :
 	QGraphicsRectItem(x, y, width, height, parent),
 	m_bIsTweenKeyFrame(bIsTweenKeyFrame),
@@ -42,6 +86,8 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKe
 		dashLinePen.setStyle(Qt::DashLine);
 		dashLinePen.setColor(HyGlobal::ConvertHyColor(HyColor::Green));
 		m_pGfxTweenLine->setPen(dashLinePen);
+
+		m_pGfxTweenDurationKnob = new GraphicsTweenKnobItem(this);
 	}
 }
 
@@ -66,6 +112,7 @@ bool GraphicsKeyFrameItem::IsTweenKeyFrame() const
 void GraphicsKeyFrameItem::SetTweenLineLength(qreal fLength)
 {
 	m_pGfxTweenLine->setLine(0.0f, KEYFRAME_HEIGHT * 0.5f, fLength, KEYFRAME_HEIGHT * 0.5f);
+	m_pGfxTweenDurationKnob->setPos(fLength, KEYFRAME_HEIGHT * 0.5f);
 }
 
 /*virtual*/ QVariant GraphicsKeyFrameItem::itemChange(GraphicsItemChange eChange, const QVariant &value) /*override*/
