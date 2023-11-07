@@ -754,6 +754,8 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 	m_iFrameOffset(iFrameOffset)
 {
 	QList<QGraphicsItem *> selectedItemsList = m_DopeSheetSceneRef.selectedItems();
+	setText("Offset " % QString::number(selectedItemsList.size()) % " Key Frame(s)");
+
 	for(QGraphicsItem *pSelectedGfxItem : selectedItemsList)
 	{
 		GraphicsKeyFrameItem *pSelectedGfxKeyFrameItem = static_cast<GraphicsKeyFrameItem *>(pSelectedGfxItem);
@@ -924,6 +926,34 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 	}
 
 	m_DopeSheetSceneRef.RefreshAllGfxItems();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_NudgeTweenDuration::EntityUndoCmd_NudgeTweenDuration(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, double dNewDuration, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_pItemData(pItemData),
+	m_iFrameIndex(iFrameIndex),
+	m_eTweenProp(eTweenProp),
+	m_dNewDuration(dNewDuration)
+{
+	setText("Adjust " % m_pItemData->GetCodeName() % "'s Tween " % HyGlobal::TweenPropName(m_eTweenProp) % " Duration");
+	m_dOldDuration = m_DopeSheetSceneRef.GetKeyFrameProperty(m_pItemData, m_iFrameIndex, "Tween " % HyGlobal::TweenPropName(m_eTweenProp), "Duration").toDouble();
+};
+
+/*virtual*/ EntityUndoCmd_NudgeTweenDuration::~EntityUndoCmd_NudgeTweenDuration()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_NudgeTweenDuration::redo() /*override*/
+{
+	m_DopeSheetSceneRef.SetKeyFrameProperty(m_pItemData, m_iFrameIndex, "Tween " % HyGlobal::TweenPropName(m_eTweenProp), "Duration", m_dNewDuration, true);
+}
+
+/*virtual*/ void EntityUndoCmd_NudgeTweenDuration::undo() /*override*/
+{
+	m_DopeSheetSceneRef.SetKeyFrameProperty(m_pItemData, m_iFrameIndex, "Tween " % HyGlobal::TweenPropName(m_eTweenProp), "Duration", m_dOldDuration, true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

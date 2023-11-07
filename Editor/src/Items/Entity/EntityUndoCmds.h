@@ -257,6 +257,25 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class EntityUndoCmd_NudgeTweenDuration : public QUndoCommand
+{
+	EntityDopeSheetScene &					m_DopeSheetSceneRef;
+	EntityTreeItemData *					m_pItemData;
+	int										m_iFrameIndex;
+	TweenProperty							m_eTweenProp;
+	double									m_dNewDuration;
+	double									m_dOldDuration;
+
+public:
+	EntityUndoCmd_NudgeTweenDuration(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, double dNewDuration, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_NudgeTweenDuration();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_PropertyModified : public PropertiesUndoCmd
 {
 	int								m_iStateIndex;

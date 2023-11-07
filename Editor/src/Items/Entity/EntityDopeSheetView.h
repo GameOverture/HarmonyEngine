@@ -36,7 +36,7 @@ class EntityDopeSheetView : public QGraphicsView
 		DRAGSTATE_Dragging,
 	};
 	DragState					m_eDragState;
-	QPointF						m_ptDragStart; // In View Coordinates
+	QPoint						m_ptDragStart; // In View Coordinates
 	int							m_iDragFrame;
 	GraphicsTweenKnobItem *		m_pGfxDragTweenKnobItem; // If dragging a tween duration knob
 

@@ -178,34 +178,48 @@ float EntityDopeSheetView::GetZoom() const
 	//////////////////////////////////////////////////////////////////////////
 	if(m_eDragState == DRAGSTATE_Dragging)
 	{
-		int iFrameOffset = m_iDragFrame - GetNearestFrame(m_ptDragStart.x());
+		QPointF ptSceneDragStart = mapToScene(m_ptDragStart);
+		int iFrameOffset = m_iDragFrame - GetNearestFrame(ptSceneDragStart.x());
 		qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * m_fZoom;
 
 		QList<QGraphicsItem *> itemList = items();
-		GraphicsKeyFrameItem *pKeyFrameItem = nullptr; // Just need one item to get the pen and brush
+		QAbstractGraphicsShapeItem *pGfxItem = nullptr; // Just need one item to get the pen and brush
 		QVector<QRectF> rectList;
-		for(QGraphicsItem *pItem : itemList)
-		{
-			if(pItem->isSelected())
-			{
-				QRectF rect = pItem->sceneBoundingRect();
-				rect.translate(fSubLineSpacing * iFrameOffset, 0.0f);
 
-				rectList.push_back(rect);
-				pKeyFrameItem = static_cast<GraphicsKeyFrameItem *>(pItem);
+		if(m_pGfxDragTweenKnobItem)
+			pGfxItem = m_pGfxDragTweenKnobItem;
+		else
+		{
+			for(QGraphicsItem *pItem : itemList)
+			{
+				if(pItem->isSelected())
+				{
+					QRectF rect = pItem->sceneBoundingRect();
+					rect.translate(fSubLineSpacing * iFrameOffset, 0.0f);
+
+					rectList.push_back(rect);
+					pGfxItem = static_cast<QAbstractGraphicsShapeItem *>(pItem);
+				}
 			}
 		}
 
-		if(pKeyFrameItem)
+		if(pGfxItem)
 		{
-			pPainter->setPen(pKeyFrameItem->pen());
-			QBrush brush = pKeyFrameItem->brush();
+			pPainter->setPen(pGfxItem->pen());
+			QBrush brush = pGfxItem->brush();
 			QColor color = brush.color();
 			color.setAlphaF(0.5f);
 			brush.setColor(color);
 			pPainter->setBrush(brush);
 
-			pPainter->drawRects(rectList);
+			if(m_pGfxDragTweenKnobItem)
+			{
+				QRectF rect = m_pGfxDragTweenKnobItem->sceneBoundingRect();
+				rect.translate(fSubLineSpacing * iFrameOffset, 0.0f);
+				pPainter->drawEllipse(rect);
+			}
+			else
+				pPainter->drawRects(rectList);
 		}
 	}
 
@@ -470,12 +484,28 @@ float EntityDopeSheetView::GetZoom() const
 
 	if(DRAGSTATE_Dragging == m_eDragState)
 	{
-		EntityUndoCmd_NudgeSelectedKeyFrames *pCmd = new EntityUndoCmd_NudgeSelectedKeyFrames(m_pStateData->GetDopeSheetScene(), GetNearestFrame(m_MouseScenePos.x()) - GetNearestFrame(m_ptDragStart.x()));
-		m_pStateData->GetModel().GetItem().GetUndoStack()->push(pCmd);
+		if(m_pGfxDragTweenKnobItem)
+		{
+			EntityTreeItemData *pTreeItemData = m_pGfxDragTweenKnobItem->parentItem()->data(GraphicsKeyFrameItem::DATAKEY_TreeItemData).value<EntityTreeItemData *>();
+			TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(m_pGfxDragTweenKnobItem->parentItem()->data(GraphicsKeyFrameItem::DATAKEY_CategoryPropString).toString().split('/')[1]);
+			int iTweenStartKeyFrame = m_pGfxDragTweenKnobItem->parentItem()->data(GraphicsKeyFrameItem::DATAKEY_FrameIndex).toInt();
+			int iTweenEndKeyFrame = HyMath::Max(iTweenStartKeyFrame, m_iDragFrame);
+
+			double dNewDuration = (iTweenEndKeyFrame - iTweenStartKeyFrame) * (1.0 / m_pStateData->GetDopeSheetScene().GetFramesPerSecond());
+			EntityUndoCmd_NudgeTweenDuration *pCmd = new EntityUndoCmd_NudgeTweenDuration(m_pStateData->GetDopeSheetScene(), pTreeItemData, iTweenStartKeyFrame, eTweenProp, dNewDuration);
+			m_pStateData->GetModel().GetItem().GetUndoStack()->push(pCmd);
+		}
+		else
+		{
+			QPointF ptSceneDragStart = mapToScene(m_ptDragStart);
+			EntityUndoCmd_NudgeSelectedKeyFrames *pCmd = new EntityUndoCmd_NudgeSelectedKeyFrames(m_pStateData->GetDopeSheetScene(), GetNearestFrame(m_MouseScenePos.x()) - GetNearestFrame(ptSceneDragStart.x()));
+			m_pStateData->GetModel().GetItem().GetUndoStack()->push(pCmd);
+		}
 	}
 	else if(rubberBandRect().isNull() && pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f)
 		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
 
+	m_pGfxDragTweenKnobItem = nullptr;
 	m_eDragState = DRAGSTATE_None;
 
 	update();
