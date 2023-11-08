@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>739</width>
-    <height>195</height>
+    <height>236</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,6 +34,53 @@
      <property name="spacing">
       <number>2</number>
      </property>
+     <item>
+      <widget class="QSpinBox" name="sbFramesPerSecond">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="value">
+        <number>60</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Frames Per Second</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkAutoInitialize">
+       <property name="toolTip">
+        <string>When setting a property on a later frame, insert the default value on frame '0' (when no property has already been set)</string>
+       </property>
+       <property name="text">
+        <string>Auto Initialize</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
      <item>
       <widget class="QToolButton" name="btnRewind">
        <property name="text">
@@ -70,29 +117,31 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Frames Per Second</string>
+      <widget class="Line" name="line_3">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="sbFramesPerSecond">
-       <property name="minimum">
-        <number>1</number>
+      <widget class="QPushButton" name="btnCallback">
+       <property name="text">
+        <string>Create Callback</string>
        </property>
-       <property name="maximum">
-        <number>1000</number>
-       </property>
-       <property name="value">
-        <number>60</number>
+       <property name="icon">
+        <iconset resource="../../../data/HyEditor.qrc">
+         <normaloff>:/icons16x16/callback.png</normaloff>:/icons16x16/callback.png</iconset>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="checkBox">
+      <widget class="QPushButton" name="btnTween">
        <property name="text">
-        <string>CheckBox</string>
+        <string>Create Position Tween</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../data/HyEditor.qrc">
+         <normaloff>:/icons16x16/tween-Position.png</normaloff>:/icons16x16/tween-Position.png</iconset>
        </property>
       </widget>
      </item>

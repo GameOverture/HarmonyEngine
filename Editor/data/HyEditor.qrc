@@ -250,5 +250,8 @@
         <file>icons16x16/tween-Position.png</file>
         <file>icons16x16/tween-Rotate.png</file>
         <file>icons16x16/tween-Scale.png</file>
+        <file>icons16x16/callback.png</file>
+        <file>icons16x16/callback-delete.png</file>
+        <file>icons16x16/callback-rename.png</file>
     </qresource>
 </RCC>

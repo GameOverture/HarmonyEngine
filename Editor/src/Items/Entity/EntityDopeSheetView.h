@@ -12,6 +12,7 @@
 
 #include <QGraphicsView>
 
+class AuxDopeSheet;
 class EntityStateData;
 class EntityTreeItemData;
 class EntityDopeSheetScene;
@@ -19,6 +20,7 @@ class GraphicsTweenKnobItem;
 
 class EntityDopeSheetView : public QGraphicsView
 {
+	AuxDopeSheet *				m_pAuxDopeSheet;
 	EntityStateData *			m_pStateData;
 
 	QPointF						m_MouseScenePos;

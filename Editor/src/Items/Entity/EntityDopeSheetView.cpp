@@ -21,6 +21,7 @@
 
 EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	QGraphicsView(pParent),
+	m_pAuxDopeSheet(nullptr),
 	m_pStateData(nullptr),
 	m_pMouseHoverItem(nullptr),
 	m_bTimeLineMouseDown(false),

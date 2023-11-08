@@ -276,6 +276,38 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class EntityUndoCmd_FramesPerSecond : public QUndoCommand
+{
+	EntityDopeSheetScene &					m_DopeSheetSceneRef;
+	int										m_iNewFPS;
+	int										m_iOldFPS;
+
+public:
+	EntityUndoCmd_FramesPerSecond(EntityDopeSheetScene &entityDopeSheetSceneRef, int iNewFPS, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_FramesPerSecond();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_AutoInitialize : public QUndoCommand
+{
+	EntityDopeSheetScene &					m_DopeSheetSceneRef;
+	bool									m_bNewValue;
+	bool									m_bOldValue;
+
+public:
+	EntityUndoCmd_AutoInitialize(EntityDopeSheetScene &entityDopeSheetSceneRef, bool bNewValue, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AutoInitialize();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_PropertyModified : public PropertiesUndoCmd
 {
 	int								m_iStateIndex;

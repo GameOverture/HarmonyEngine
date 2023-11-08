@@ -11,6 +11,7 @@
 #define AuxDopeSheet_H
 
 #include <QWidget>
+#include <QDataWidgetMapper>
 
 class EntityStateData;
 
@@ -22,12 +23,16 @@ class AuxDopeSheet : public QWidget
 {
 	Q_OBJECT
 
+	QDataWidgetMapper		m_WidgetMapper;
+
 public:
 	explicit AuxDopeSheet(QWidget *pParent = nullptr);
 	virtual ~AuxDopeSheet();
 
 	EntityStateData *GetEntityStateModel() const;
 	void SetEntityStateModel(EntityStateData *pEntStateData);
+
+	void UpdateWidgets();
 
 private:
 	Ui::AuxDopeSheet *ui;

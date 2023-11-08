@@ -37,6 +37,15 @@ class EntityTreeItemData;
 typedef std::tuple<EntityTreeItemData *, int, QString> KeyFrameKey;
 typedef std::tuple<QJsonValue, QJsonValue, QJsonValue> TweenJsonValues;
 
+// NOTE: If you update this enum, apply the update to AuxDopeSheet's constructor
+enum AuxDopeWidgetsSection
+{
+	AUXDOPEWIDGETSECTION_FramesPerSecond = 0,
+	AUXDOPEWIDGETSECTION_AutoInitialize,
+
+	NUM_AUXDOPEWIDGETSECTIONS
+};
+
 class GraphicsTweenKnobItem : public QGraphicsEllipseItem
 {
 public:
@@ -82,12 +91,27 @@ class EntityDopeSheetScene : public QGraphicsScene
 {
 	EntityStateData *																m_pEntStateData;
 
-	int																				m_iFramesPerSecond;
+	class AuxWidgetsModel : public QAbstractTableModel
+	{
+		EntityDopeSheetScene &														m_DopeSheetSceneRef;
+		int																			m_iFramesPerSecond;
+		bool 																		m_bAutoInitialize;
 
-	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;
+	public:
+		AuxWidgetsModel(EntityDopeSheetScene &dopeSheetSceneRef, int iFramesPerSecond, bool bAutoInitialize);
+		virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+		virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+		virtual QVariant data(const QModelIndex &modelIndex, int role = Qt::DisplayRole) const override;
+		virtual bool setData(const QModelIndex &modelIndex, const QVariant &value, int role = Qt::EditRole) override;
+	};
+	AuxWidgetsModel																	m_AuxWidgetsModel;
+
+	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;		// Store properties and tween values
+	QMap<int, QString>																m_CallbackMap;
 
 	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_KeyFramesGfxRectMap;
 	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_TweenGfxRectMap;
+	QMap<int, GraphicsKeyFrameItem *>												m_CallbackGfxMap;
 
 	int																				m_iCurrentFrame;
 	QGraphicsLineItem *																m_pCurrentFrameLine;
@@ -98,8 +122,10 @@ public:
 
 	EntityStateData *GetStateData() const;
 
+	QAbstractItemModel *GetAuxWidgetsModel();
+
 	int GetFramesPerSecond() const;
-	void SetFramesPerSecond(int iFramesPerSecond);
+	bool IsAutoInitialize() const;
 
 	int GetCurrentFrame() const;
 	void SetCurrentFrame(int iFrameIndex);
@@ -125,6 +151,11 @@ public:
 
 	TweenJsonValues GetTweenJsonValues(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp) const;
 	void SetKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, TweenJsonValues tweenValues, bool bRefreshGfxItems);
+
+	QJsonArray SerializeCallbacks() const;
+	QString GetCallback(int iFrameIndex) const;
+	void SetCallback(int iFrameIndex, QString sCallback);
+	void RemoveCallback(int iFrameIndex);
 
 	void NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems);
 	void NudgeKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, int iNudgeAmount, bool bRefreshGfxItems);

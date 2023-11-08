@@ -638,6 +638,7 @@ QString EntityModel::GenerateSrc_SetStates() const
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_StateList[uiIndex]);
 
 	stateFileDataOut.m_Meta.insert("framesPerSecond", pStateData->GetDopeSheetScene().GetFramesPerSecond());
+	stateFileDataOut.m_Meta.insert("autoInitialize", pStateData->GetDopeSheetScene().IsAutoInitialize());
 
 	// Combine all items (root, children, and shapes) into a single list 'itemList'
 	QList<EntityTreeItemData *> itemList, shapeList;
@@ -657,4 +658,8 @@ QString EntityModel::GenerateSrc_SetStates() const
 		stateKeyFramesObj.insert(sUuid, keyFramesArray);
 	}
 	stateFileDataOut.m_Meta.insert("keyFrames", stateKeyFramesObj);
+
+	// Serialize all callbacks for this state
+	QJsonArray callbackArray = pStateData->GetDopeSheetScene().SerializeCallbacks();
+	stateFileDataOut.m_Meta.insert("callbacks", callbackArray);
 }

@@ -9,9 +9,10 @@
  *************************************************************************/
 #include "Global.h"
 #include "AuxDopeSheet.h"
+#include "EntityModel.h"
+#include "GlobalUndoCmds.h"
 #include "ui_AuxDopeSheet.h"
 
-#include "EntityModel.h"
 
 AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
@@ -24,6 +25,9 @@ AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 	ui->btnPlayAnimations->setDefaultAction(ui->actionPlayAnimations);
 	ui->btnNextKeyFrame->setDefaultAction(ui->actionNextKeyFrame);
 	ui->btnLastKeyFrame->setDefaultAction(ui->actionLastKeyFrame);
+
+	m_WidgetMapper.setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
+	UpdateWidgets();
 }
 
 /*virtual*/ AuxDopeSheet::~AuxDopeSheet()
@@ -42,6 +46,36 @@ EntityStateData *AuxDopeSheet::GetEntityStateModel() const
 void AuxDopeSheet::SetEntityStateModel(EntityStateData *pEntStateData)
 {
 	ui->graphicsView->SetScene(pEntStateData);
+
+	m_WidgetMapper.clearMapping();
+
+	if(pEntStateData)
+	{
+		m_WidgetMapper.setModel(pEntStateData->GetDopeSheetScene().GetAuxWidgetsModel());
+		m_WidgetMapper.addMapping(ui->sbFramesPerSecond, AUXDOPEWIDGETSECTION_FramesPerSecond);
+		m_WidgetMapper.addMapping(ui->chkAutoInitialize, AUXDOPEWIDGETSECTION_AutoInitialize);
+
+		m_WidgetMapper.toFirst();
+		m_WidgetMapper.revert();
+	}
+	else
+		m_WidgetMapper.setModel(nullptr);
+
+	UpdateWidgets();
+}
+
+void AuxDopeSheet::UpdateWidgets()
+{
+	if(ui->graphicsView->scene())
+	{
+		ui->sbFramesPerSecond->setEnabled(true);
+		ui->chkAutoInitialize->setEnabled(true);
+	}
+	else
+	{
+		ui->sbFramesPerSecond->setEnabled(false);
+		ui->chkAutoInitialize->setEnabled(false);
+	}
 }
 
 void AuxDopeSheet::on_actionRewind_triggered()

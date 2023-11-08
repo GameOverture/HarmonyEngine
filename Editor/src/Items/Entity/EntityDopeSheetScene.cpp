@@ -12,6 +12,7 @@
 #include "EntityModel.h"
 #include "EntityWidget.h"
 #include "EntityDraw.h"
+#include "EntityUndoCmds.h"
 
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneHoverEvent>
@@ -143,16 +144,83 @@ void GraphicsKeyFrameItem::SetTweenLineLength(qreal fLength)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+EntityDopeSheetScene::AuxWidgetsModel::AuxWidgetsModel(EntityDopeSheetScene &dopeSheetSceneRef, int iFramesPerSecond, bool bAutoInitialize) :
+	m_DopeSheetSceneRef(dopeSheetSceneRef),
+	m_iFramesPerSecond(iFramesPerSecond),
+	m_bAutoInitialize(bAutoInitialize)
+{
+	if(m_iFramesPerSecond <= 0)
+		m_iFramesPerSecond = 60;
+	dataChanged(index(0, 0), index(0, NUM_AUXDOPEWIDGETSECTIONS - 1));
+}
 
+/*virtual*/ int EntityDopeSheetScene::AuxWidgetsModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/
+{
+	return 1;
+}
+
+/*virtual*/ int EntityDopeSheetScene::AuxWidgetsModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/
+{
+	return NUM_AUXDOPEWIDGETSECTIONS;
+}
+
+/*virtual*/ QVariant EntityDopeSheetScene::AuxWidgetsModel::data(const QModelIndex &modelIndex, int role /*= Qt::DisplayRole*/) const /*override*/
+{
+	if(role == Qt::UserRole || role == Qt::EditRole)
+	{
+		if(modelIndex.column() == AUXDOPEWIDGETSECTION_FramesPerSecond)
+			return QVariant(m_iFramesPerSecond);
+		else
+			return QVariant(m_bAutoInitialize);
+	}
+	return QVariant();
+}
+
+/*virtual*/ bool EntityDopeSheetScene::AuxWidgetsModel::setData(const QModelIndex &modelIndex, const QVariant &value, int role /*= Qt::EditRole*/) /*override*/
+{
+	if(role == Qt::EditRole)
+	{
+		if(modelIndex.column() == AUXDOPEWIDGETSECTION_FramesPerSecond)
+		{
+			if(m_iFramesPerSecond == value.toInt())
+				return false;
+
+			EntityUndoCmd_FramesPerSecond *pCmd = new EntityUndoCmd_FramesPerSecond(m_DopeSheetSceneRef, value.toInt());
+			m_DopeSheetSceneRef.GetStateData()->GetModel().GetItem().GetUndoStack()->push(pCmd);
+		}
+		else if(modelIndex.column() == AUXDOPEWIDGETSECTION_AutoInitialize)
+		{
+			if(m_bAutoInitialize == value.toBool())
+				return false;
+
+			EntityUndoCmd_AutoInitialize *pCmd = new EntityUndoCmd_AutoInitialize(m_DopeSheetSceneRef, value.toBool());
+			m_DopeSheetSceneRef.GetStateData()->GetModel().GetItem().GetUndoStack()->push(pCmd);
+		}
+
+		return false;
+	}
+	if(role == Qt::UserRole) // This occurs from the above undo commands
+	{
+		if(modelIndex.column() == AUXDOPEWIDGETSECTION_FramesPerSecond)
+			m_iFramesPerSecond = value.toInt();
+		else if(modelIndex.column() == AUXDOPEWIDGETSECTION_AutoInitialize)
+			m_bAutoInitialize = value.toBool();
+		else
+			return false;
+
+		dataChanged(modelIndex, modelIndex);
+		m_DopeSheetSceneRef.RefreshAllGfxItems();
+		return true;
+	}
+	return QAbstractTableModel::setData(modelIndex, value, role);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj) :
 	QGraphicsScene(),
 	m_pEntStateData(pStateData),
-	m_iFramesPerSecond(metaFileObj["framesPerSecond"].toInt()),
+	m_AuxWidgetsModel(*this, metaFileObj["framesPerSecond"].toInt(60), metaFileObj["autoInitialize"].toBool(true)),
 	m_iCurrentFrame(0)
 {
-	if(m_iFramesPerSecond == 0)
-		m_iFramesPerSecond = 60;
-
 	QJsonObject keyFramesObj = metaFileObj["keyFrames"].toObject();
 	for(auto iter = keyFramesObj.begin(); iter != keyFramesObj.end(); ++iter)
 	{
@@ -172,6 +240,13 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 			else
 				HyGuiLog("EntityStateData::EntityStateData - item " % iter.key() % " has an empty keyframe at frame " % QString::number(keyFramesArray[i].toObject()["frame"].toInt()), LOGTYPE_Info);
 		}
+	}
+
+	QJsonArray callbackArray = metaFileObj["callbacks"].toArray();
+	for(int i = 0; i < callbackArray.size(); ++i)
+	{
+		const QJsonObject &callbackObj = callbackArray[i].toObject();
+		m_CallbackMap.insert(callbackObj["frame"].toInt(), callbackObj["function"].toString());
 	}
 
 	setBackgroundBrush(HyGlobal::ConvertHyColor(HyColor::WidgetPanel));
@@ -195,14 +270,19 @@ EntityStateData *EntityDopeSheetScene::GetStateData() const
 	return m_pEntStateData;
 }
 
-int EntityDopeSheetScene::GetFramesPerSecond() const
+QAbstractItemModel *EntityDopeSheetScene::GetAuxWidgetsModel()
 {
-	return m_iFramesPerSecond;
+	return &m_AuxWidgetsModel;
 }
 
-void EntityDopeSheetScene::SetFramesPerSecond(int iFramesPerSecond)
+int EntityDopeSheetScene::GetFramesPerSecond() const
 {
-	m_iFramesPerSecond = iFramesPerSecond;
+	return m_AuxWidgetsModel.data(m_AuxWidgetsModel.index(0, AUXDOPEWIDGETSECTION_FramesPerSecond), Qt::UserRole).toInt();
+}
+
+bool EntityDopeSheetScene::IsAutoInitialize() const
+{
+	return m_AuxWidgetsModel.data(m_AuxWidgetsModel.index(0, AUXDOPEWIDGETSECTION_AutoInitialize), Qt::UserRole).toBool();
 }
 
 int EntityDopeSheetScene::GetCurrentFrame() const
@@ -584,6 +664,43 @@ void EntityDopeSheetScene::SetKeyFrameTween(EntityTreeItemData *pItemData, int i
 	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type", std::get<2>(tweenValues), bRefreshGfxItems);
 }
 
+QJsonArray EntityDopeSheetScene::SerializeCallbacks() const
+{
+	QJsonArray callbackArray;
+	for(auto iter = m_CallbackMap.begin(); iter != m_CallbackMap.end(); ++iter)
+	{
+		QJsonObject callbackObj;
+		callbackObj.insert("frame", iter.key());
+		callbackObj.insert("function", iter.value());
+		callbackArray.append(callbackObj);
+	}
+	return callbackArray;
+}
+
+QString EntityDopeSheetScene::GetCallback(int iFrameIndex) const
+{
+	if(m_CallbackMap.contains(iFrameIndex))
+		return m_CallbackMap[iFrameIndex];
+	
+	return QString();
+}
+
+void EntityDopeSheetScene::SetCallback(int iFrameIndex, QString sCallback)
+{
+	if(m_CallbackMap.contains(iFrameIndex))
+		m_CallbackMap[iFrameIndex] = sCallback;
+	else
+		HyGuiLog("EntityDopeSheetScene::SetCallback() - No callback found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+}
+
+void EntityDopeSheetScene::RemoveCallback(int iFrameIndex)
+{
+	if(m_CallbackMap.contains(iFrameIndex))
+		m_CallbackMap.remove(iFrameIndex);
+	else
+		HyGuiLog("EntityDopeSheetScene::RemoveCallback() - No callback found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+}
+
 void EntityDopeSheetScene::NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems)
 {
 	QJsonValue propValue = GetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, sPropName);
@@ -708,7 +825,7 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 
 						// Calculate the dash-line "Duration"
 						double dDuration = GetKeyFrameProperty(pCurItemData, iFrameIndex, "Tween " % propPair.second, "Duration").toDouble();
-						qreal fLineLength = (dDuration * m_iFramesPerSecond) * TIMELINE_NOTCH_SUBLINES_WIDTH;
+						qreal fLineLength = (dDuration * GetFramesPerSecond()) * TIMELINE_NOTCH_SUBLINES_WIDTH;
 						if(bPropKeyFrame)
 							fLineLength -= (KEYFRAME_WIDTH + 1.0f);
 						m_TweenGfxRectMap[gfxRectMapKey]->SetTweenLineLength(fLineLength);
