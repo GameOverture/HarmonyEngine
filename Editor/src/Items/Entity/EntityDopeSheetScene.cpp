@@ -429,6 +429,10 @@ QJsonObject EntityDopeSheetScene::ExtrapolateKeyFramesProperties(EntityTreeItemD
 			iter--; // Don't want an iterator with a greater key, so go back one
 	}
 
+	// If still empty then there aren't any key frames for this item
+	if(iter == itemKeyFrameMapRef.end())
+		return QJsonObject();
+
 	// Starting with this key frame and going backwards in time, combine any properties from key frames that *haven't been set yet*
 	// This creates an 'extrapolatedPropObj' that contains all the properties that have been set from the beginning of the timeline, up to 'm_iCurrentFrame'
 	QJsonObject extrapolatedPropObj = iter.value();
