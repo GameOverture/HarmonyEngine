@@ -21,7 +21,7 @@
 GraphicsTweenKnobItem::GraphicsTweenKnobItem(QGraphicsItem *pParent /*= nullptr*/) :
 	QGraphicsEllipseItem(-KEYFRAME_TWEEN_KNOB_RADIUS, -KEYFRAME_TWEEN_KNOB_RADIUS, KEYFRAME_TWEEN_KNOB_RADIUS * 2.0f, KEYFRAME_TWEEN_KNOB_RADIUS * 2.0f, pParent)
 {
-	setData(GraphicsKeyFrameItem::DATAKEY_Type, DOPESHEETITEMTYPE_TweenKnob);
+	setData(GFXDATAKEY_Type, GFXITEM_TweenKnob);
 
 	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
 	setBrush(HyGlobal::ConvertHyColor(HyColor::Green));
@@ -62,15 +62,15 @@ GraphicsTweenKnobItem::GraphicsTweenKnobItem(QGraphicsItem *pParent /*= nullptr*
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKeyFrame, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent /*= nullptr*/) :
-	QGraphicsRectItem(x, y, width, height, parent),
+GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKeyFrame, QGraphicsItem *pParent /*= nullptr*/) :
+	QGraphicsRectItem(0.0, 0.0, KEYFRAME_WIDTH, KEYFRAME_HEIGHT, pParent),
 	m_pGfxTweenLine(nullptr),
 	m_pGfxTweenDurationKnob(nullptr)
 {
-	setData(DATAKEY_TreeItemData, QVariant::fromValue(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey)));
-	setData(DATAKEY_FrameIndex, std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey));
-	setData(DATAKEY_CategoryPropString, std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey));
-	setData(DATAKEY_Type, bIsTweenKeyFrame ? DOPESHEETITEMTYPE_TweenKeyFrame : DOPESHEETITEMTYPE_PropertyKeyFrame);
+	setData(GFXDATAKEY_TreeItemData, QVariant::fromValue(std::get<GFXDATAKEY_TreeItemData>(tupleKey)));
+	setData(GFXDATAKEY_FrameIndex, std::get<GFXDATAKEY_FrameIndex>(tupleKey));
+	setData(GFXDATAKEY_CategoryPropString, std::get<GFXDATAKEY_CategoryPropString>(tupleKey));
+	setData(GFXDATAKEY_Type, bIsTweenKeyFrame ? GFXITEM_TweenKeyFrame : GFXITEM_PropertyKeyFrame);
 
 	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
 	setBrush(HyGlobal::ConvertHyColor(bIsTweenKeyFrame ? HyColor::Green : HyColor::LightGray));
@@ -100,14 +100,14 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKe
 
 KeyFrameKey GraphicsKeyFrameItem::GetKey() const
 {
-	return std::make_tuple(data(DATAKEY_TreeItemData).value<EntityTreeItemData *>(),
-						   data(DATAKEY_FrameIndex).toInt(),
-						   data(DATAKEY_CategoryPropString).toString());
+	return std::make_tuple(data(GFXDATAKEY_TreeItemData).value<EntityTreeItemData *>(),
+						   data(GFXDATAKEY_FrameIndex).toInt(),
+						   data(GFXDATAKEY_CategoryPropString).toString());
 }
 
 bool GraphicsKeyFrameItem::IsTweenKeyFrame() const
 {
-	return data(DATAKEY_Type).toInt() == DOPESHEETITEMTYPE_TweenKeyFrame;
+	return data(GFXDATAKEY_Type).toInt() == GFXITEM_TweenKeyFrame;
 }
 
 void GraphicsKeyFrameItem::SetTweenLineLength(qreal fLength)
@@ -246,7 +246,7 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	for(int i = 0; i < callbackArray.size(); ++i)
 	{
 		const QJsonObject &callbackObj = callbackArray[i].toObject();
-		m_CallbackMap.insert(callbackObj["frame"].toInt(), callbackObj["function"].toString());
+		CreateCallback(callbackObj["frame"].toInt(), callbackObj["function"].toString());
 	}
 
 	setBackgroundBrush(HyGlobal::ConvertHyColor(HyColor::WidgetPanel));
@@ -687,12 +687,27 @@ QString EntityDopeSheetScene::GetCallback(int iFrameIndex) const
 	if(m_CallbackMap.contains(iFrameIndex))
 		return m_CallbackMap[iFrameIndex];
 	
-	return QString();
+	return QString(); // Indicates that no callback exists for this frame
 }
 
-void EntityDopeSheetScene::SetCallback(int iFrameIndex, QString sCallback)
+void EntityDopeSheetScene::CreateCallback(int iFrameIndex, QString sCallback)
 {
+	if(m_CallbackMap.contains(iFrameIndex))
+	{
+		HyGuiLog("EntityDopeSheetScene::CreateCallback() - Callback already exists for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+		return;
+	}
+	
 	m_CallbackMap.insert(iFrameIndex, sCallback);
+	update();
+}
+
+void EntityDopeSheetScene::RenameCallback(int iFrameIndex, QString sCallback)
+{
+	if(m_CallbackMap.contains(iFrameIndex))
+		m_CallbackMap[iFrameIndex] = sCallback;
+	else
+		HyGuiLog("EntityDopeSheetScene::RenameCallback() - No callback found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
 }
 
 void EntityDopeSheetScene::RemoveCallback(int iFrameIndex)
@@ -701,6 +716,8 @@ void EntityDopeSheetScene::RemoveCallback(int iFrameIndex)
 		m_CallbackMap.remove(iFrameIndex);
 	else
 		HyGuiLog("EntityDopeSheetScene::RemoveCallback() - No callback found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+
+	update();
 }
 
 void EntityDopeSheetScene::NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems)
@@ -754,6 +771,7 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 	entireItemList += shapeList;
 	entireItemList.prepend(static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetTreeModel().GetRootTreeItemData());
 
+	// Process all the items and draw their key frames
 	qreal fPosY = TIMELINE_HEIGHT + 2.0f;
 	for(EntityTreeItemData *pCurItemData : entireItemList)
 	{
@@ -802,7 +820,7 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 					{
 						if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
 						{
-							GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(gfxRectMapKey, false, 0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
+							GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(gfxRectMapKey, false);
 							pNewGfxRectItem->setPos(fPosX, fPosY);
 
 							m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
@@ -816,7 +834,7 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 						if(m_TweenGfxRectMap.contains(gfxRectMapKey) == false)
 						{
 							fPosX += (bPropKeyFrame ? (KEYFRAME_WIDTH + 1.0f) : 0.0f);
-							GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(gfxRectMapKey, true, 0.0f, 0.0f, KEYFRAME_WIDTH, KEYFRAME_HEIGHT);
+							GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(gfxRectMapKey, true);
 							pNewGfxRectItem->setPos(fPosX, fPosY);
 
 							m_TweenGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;

@@ -37,7 +37,7 @@ public:
 	void SetEntityStateModel(EntityStateData *pEntStateData);
 
 	void UpdateWidgets();
-	QList<QAction *> GetContextActions();
+	QList<QAction *> GetContextActions(bool bOnlyCallbackActions);
 
 private:
 	Ui::AuxDopeSheet *ui;

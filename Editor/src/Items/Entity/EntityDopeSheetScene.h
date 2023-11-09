@@ -30,6 +30,7 @@
 #define KEYFRAME_HEIGHT 19.0f
 #define KEYFRAME_WIDTH 4.0f
 #define KEYFRAME_TWEEN_KNOB_RADIUS 5.0f
+#define CALLBACK_DIAMETER 8.0
 
 class EntityStateData;
 class EntityTreeItemData;
@@ -46,13 +47,25 @@ enum AuxDopeWidgetsSection
 	NUM_AUXDOPEWIDGETSECTIONS
 };
 
-enum DopeSheetItemType
+enum DopeSheetGfxItemType
 {
-	DOPESHEETITEMTYPE_PropertyKeyFrame = 0,
-	DOPESHEETITEMTYPE_TweenKeyFrame,
-	DOPESHEETITEMTYPE_TweenKnob,
+	GFXITEM_PropertyKeyFrame = 0,
+	GFXITEM_TweenKeyFrame,
+	GFXITEM_TweenKnob
 };
 
+enum DopeSheetGfxDataKey // NOTE: Order matters, the first 3 are used when accessing a KeyFrameKey tuple
+{
+	// Data required to assemble KeyFrameKey
+	GFXDATAKEY_TreeItemData = 0,
+	GFXDATAKEY_FrameIndex,
+	GFXDATAKEY_CategoryPropString,	// Category + "/" + Property
+
+	// Additional info saved to QGraphicsItem
+	GFXDATAKEY_Type, // DopeSheetItemType
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class GraphicsTweenKnobItem : public QGraphicsEllipseItem
 {
 public:
@@ -64,25 +77,14 @@ protected:
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) override;
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *pEvent) override;
 };
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class GraphicsKeyFrameItem : public QGraphicsRectItem
 {
 	QGraphicsLineItem *		m_pGfxTweenLine;
 	GraphicsTweenKnobItem *	m_pGfxTweenDurationKnob;
 
 public:
-	enum DataKey // NOTE: Order matters, the first 3 are used when accessing a KeyFrameKey tuple
-	{
-		// Data required to assemble KeyFrameKey
-		DATAKEY_TreeItemData = 0,
-		DATAKEY_FrameIndex,
-		DATAKEY_CategoryPropString,	// Category + "/" + Property
-		
-		// Additional info saved to QGraphicsItem
-		DATAKEY_Type, // DopeSheetItemType
-	};
-
-	GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKeyFrame, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent = nullptr);
+	GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKeyFrame, QGraphicsItem *pParent = nullptr);
 	virtual ~GraphicsKeyFrameItem();
 
 	KeyFrameKey GetKey() const;
@@ -94,17 +96,17 @@ protected:
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) override;
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *pEvent) override;
 };
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityDopeSheetScene : public QGraphicsScene
 {
 	EntityStateData *																m_pEntStateData;
 
+	// This 'AuxWidgetsModel' is used to map (QDataWidgetMapper) to the widgets in AuxDopeSheet. It also contains the data for the widgets
 	class AuxWidgetsModel : public QAbstractTableModel
 	{
 		EntityDopeSheetScene &														m_DopeSheetSceneRef;
 		int																			m_iFramesPerSecond;
 		bool 																		m_bAutoInitialize;
-
 	public:
 		AuxWidgetsModel(EntityDopeSheetScene &dopeSheetSceneRef, int iFramesPerSecond, bool bAutoInitialize);
 		virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -114,12 +116,14 @@ class EntityDopeSheetScene : public QGraphicsScene
 	};
 	AuxWidgetsModel																	m_AuxWidgetsModel;
 
+	// These maps store the actual property data for the entire entity
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;		// Store properties and tween values
 	QMap<int, QString>																m_CallbackMap;
 
+	// These maps store the visual graphics items that correspond to the above maps
 	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_KeyFramesGfxRectMap;
 	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_TweenGfxRectMap;
-	QMap<int, GraphicsKeyFrameItem *>												m_CallbackGfxMap;
+	//QMap<QString, GraphicsCallbackItem *>											m_CallbackGfxMap;
 
 	int																				m_iCurrentFrame;
 	QGraphicsLineItem *																m_pCurrentFrameLine;
@@ -163,7 +167,8 @@ public:
 
 	QJsonArray SerializeCallbacks() const;
 	QString GetCallback(int iFrameIndex) const;
-	void SetCallback(int iFrameIndex, QString sCallback);
+	void CreateCallback(int iFrameIndex, QString sCallback);
+	void RenameCallback(int iFrameIndex, QString sCallback);
 	void RemoveCallback(int iFrameIndex);
 
 	void NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems);

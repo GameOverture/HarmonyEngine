@@ -376,6 +376,7 @@ public:
 	static const HyColor DarkGray;
 	static const HyColor LightGray;
 	static const HyColor Orange;
+	static const HyColor Brown;
 	static const HyColor Transparent;
 	static const HyColor ContainerPanel;
 	static const HyColor ContainerFrame;

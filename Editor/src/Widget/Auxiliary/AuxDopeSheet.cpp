@@ -94,22 +94,22 @@ void AuxDopeSheet::UpdateWidgets()
 		ui->btnTween->setVisible(false);
 		if(dopeSheetSceneRef.selectedItems().count() == 2)
 		{
-			if(dopeSheetSceneRef.selectedItems()[0]->data(GraphicsKeyFrameItem::DATAKEY_Type).toInt() == DOPESHEETITEMTYPE_PropertyKeyFrame &&
-				dopeSheetSceneRef.selectedItems()[1]->data(GraphicsKeyFrameItem::DATAKEY_Type).toInt() == DOPESHEETITEMTYPE_PropertyKeyFrame)
+			if(dopeSheetSceneRef.selectedItems()[0]->data(GFXDATAKEY_Type).toInt() == GFXITEM_PropertyKeyFrame &&
+				dopeSheetSceneRef.selectedItems()[1]->data(GFXDATAKEY_Type).toInt() == GFXITEM_PropertyKeyFrame)
 			{
 				KeyFrameKey tupleKey0 = static_cast<GraphicsKeyFrameItem *>(dopeSheetSceneRef.selectedItems()[0])->GetKey();
 				KeyFrameKey tupleKey1 = static_cast<GraphicsKeyFrameItem *>(dopeSheetSceneRef.selectedItems()[1])->GetKey();
 
-				EntityTreeItemData *pTreeItemData0 = std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey0);
-				EntityTreeItemData *pTreeItemData1 = std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey1);
+				EntityTreeItemData *pTreeItemData0 = std::get<GFXDATAKEY_TreeItemData>(tupleKey0);
+				EntityTreeItemData *pTreeItemData1 = std::get<GFXDATAKEY_TreeItemData>(tupleKey1);
 				
-				m_iContextTweenStartFrame = std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey0);
-				m_iContextTweenEndFrame = std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey1);
+				m_iContextTweenStartFrame = std::get<GFXDATAKEY_FrameIndex>(tupleKey0);
+				m_iContextTweenEndFrame = std::get<GFXDATAKEY_FrameIndex>(tupleKey1);
 				if(m_iContextTweenStartFrame > m_iContextTweenEndFrame)
 					std::swap(m_iContextTweenStartFrame, m_iContextTweenEndFrame);
 
-				QString sCategoryProp0 = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey0);
-				QString sCategoryProp1 = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey1);
+				QString sCategoryProp0 = std::get<GFXDATAKEY_CategoryPropString>(tupleKey0);
+				QString sCategoryProp1 = std::get<GFXDATAKEY_CategoryPropString>(tupleKey1);
 
 				if(pTreeItemData0 == pTreeItemData1 &&
 				   m_iContextTweenStartFrame != m_iContextTweenEndFrame &&
@@ -149,15 +149,18 @@ void AuxDopeSheet::UpdateWidgets()
 	}
 }
 
-QList<QAction *> AuxDopeSheet::GetContextActions()
+QList<QAction *> AuxDopeSheet::GetContextActions(bool bOnlyCallbackActions)
 {
 	QList<QAction *> actionList;
 	actionList.push_back(ui->btnCallback->defaultAction());
 	if(actionList[0] == ui->actionRenameCallback)
 		actionList.push_back(ui->actionDeleteCallback);
 
-	if(ui->btnTween->isVisible())
-		actionList.push_back(ui->btnTween->defaultAction());
+	if(bOnlyCallbackActions == false)
+	{
+		if(ui->btnTween->isVisible())
+			actionList.push_back(ui->btnTween->defaultAction());
+	}
 
 	return actionList;
 }

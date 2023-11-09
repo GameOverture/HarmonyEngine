@@ -65,7 +65,7 @@ float EntityDopeSheetView::GetZoom() const
 
 /*virtual*/ void EntityDopeSheetView::contextMenuEvent(QContextMenuEvent *pEvent) /*override*/
 {
-	if(m_pStateData == nullptr || pEvent->pos().y() <= TIMELINE_HEIGHT + 1)
+	if(m_pStateData == nullptr)
 		return;
 
 	m_pContextClickItem = nullptr;
@@ -73,44 +73,46 @@ float EntityDopeSheetView::GetZoom() const
 
 	qreal fPosY = TIMELINE_HEIGHT + 1.0f;
 
-	QList<EntityTreeItemData *> itemList = GetItems();
-	for(EntityTreeItemData *pEntItemData : itemList)
+	if(pEvent->pos().y() > fPosY)
 	{
-		fPosY += ITEMS_LINE_HEIGHT;
-		if(ptScenePos.y() < fPosY)
+		QList<EntityTreeItemData *> itemList = GetItems();
+		for(EntityTreeItemData *pEntItemData : itemList)
 		{
-			m_pContextClickItem = pEntItemData;
-			break;
-		}
-
-		if(pEntItemData->IsSelected())
-		{
-			QList<QPair<QString, QString>> propList;
-			propList = GetScene()->GetUniquePropertiesList(pEntItemData);
-
-			for(QPair<QString, QString> &propPair : propList)
+			fPosY += ITEMS_LINE_HEIGHT;
+			if(ptScenePos.y() < fPosY)
 			{
-				fPosY += ITEMS_LINE_HEIGHT;
-				if(ptScenePos.y() < fPosY)
+				m_pContextClickItem = pEntItemData;
+				break;
+			}
+
+			if(pEntItemData->IsSelected())
+			{
+				QList<QPair<QString, QString>> propList;
+				propList = GetScene()->GetUniquePropertiesList(pEntItemData);
+
+				for(QPair<QString, QString> &propPair : propList)
 				{
-					m_pContextClickItem = pEntItemData;
-					break;
+					fPosY += ITEMS_LINE_HEIGHT;
+					if(ptScenePos.y() < fPosY)
+					{
+						m_pContextClickItem = pEntItemData;
+						break;
+					}
 				}
 			}
+			if(m_pContextClickItem)
+				break;
 		}
-		if(m_pContextClickItem)
-			break;
 	}
 
+	QMenu menu;
 	if(m_pContextClickItem)
 	{
 		int iFrame = GetNearestFrame(ptScenePos.x());
 
 		int iNumSelected = scene()->selectedItems().size();
 
-		QMenu menu;
-
-		QList<QAction *> contextActionList = m_pAuxDopeSheet->GetContextActions();
+		QList<QAction *> contextActionList = m_pAuxDopeSheet->GetContextActions(false);
 		for(QAction *pAction : contextActionList)
 			menu.addAction(pAction);
 		menu.addSeparator();
@@ -124,8 +126,17 @@ float EntityDopeSheetView::GetZoom() const
 			menu.addSeparator();
 			menu.addAction(QIcon(":/icons16x16/edit-delete.png"), "Delete '" % QString::number(iNumSelected) % "' Selected Key Frames", this, &EntityDopeSheetView::OnDeleteKeyFrames);
 		}
-		menu.exec(pEvent->globalPos());
 	}
+	else if(pEvent->pos().y() <= TIMELINE_HEIGHT + 1.0f) // On timeline
+	{
+		QList<QAction *> contextActionList = m_pAuxDopeSheet->GetContextActions(true);
+		for(QAction *pAction : contextActionList)
+			menu.addAction(pAction);
+	}
+	else
+		return;
+
+	menu.exec(pEvent->globalPos());
 }
 
 /*virtual*/ void EntityDopeSheetView::drawBackground(QPainter *painter, const QRectF &rect) /*override*/
@@ -285,6 +296,8 @@ float EntityDopeSheetView::GetZoom() const
 	pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
 	pPainter->drawLine(rect.x(), rect.y() + TIMELINE_HEIGHT, rect.x() + rect.width(), rect.y() + TIMELINE_HEIGHT);
 
+	const QMap<int, QString> &callbackMapRef = GetScene()->GetCallbackMap();
+
 	int iFrameIndex = 0;
 	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * m_fZoom;
 	int iNumSubLines = 4; // Either 0, 1, or 4
@@ -316,6 +329,18 @@ float EntityDopeSheetView::GetZoom() const
 			const float fTextWidth = pPainter->fontMetrics().horizontalAdvance(QString::number(iFrameIndex));
 			QRectF textRect(fPosX - (fTextWidth * 0.5f), rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT - 20.0f, fTextWidth, 20.0f);
 			DrawShadowText(pPainter, textRect, QString::number(iFrameIndex), eColor, HyColor::Black);
+
+			// Callback diamond
+			if(callbackMapRef.contains(iFrameIndex))
+			{
+				pPainter->setPen(Qt::NoPen);// HyGlobal::ConvertHyColor(HyColor::Black));
+				pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::Orange));
+				
+				pPainter->translate(fPosX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f));
+				pPainter->rotate(45.0);
+				pPainter->drawRect(CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER, CALLBACK_DIAMETER);
+				pPainter->resetTransform();
+			}
 		}
 
 		// Sub Notch Lines
@@ -341,6 +366,18 @@ float EntityDopeSheetView::GetZoom() const
 					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
 
 				pPainter->drawLine(fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, fPosX, rect.y() + TIMELINE_HEIGHT);
+
+				// Callback diamond
+				if(callbackMapRef.contains(iCurSubNotchFrame))
+				{
+					pPainter->setPen(Qt::NoPen);//pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::Black));
+					pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::Orange));
+
+					pPainter->translate(fPosX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f));
+					pPainter->rotate(45.0);
+					pPainter->drawRect(CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER, CALLBACK_DIAMETER);
+					pPainter->resetTransform();
+				}
 			}
 		}
 		
@@ -368,6 +405,9 @@ float EntityDopeSheetView::GetZoom() const
 	if(m_bTimeLineMouseDown)
 	{
 		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
+		if(m_pAuxDopeSheet)
+			m_pAuxDopeSheet->UpdateWidgets();
+
 		pEvent->accept();
 	}
 	else
@@ -427,6 +467,9 @@ float EntityDopeSheetView::GetZoom() const
 
 		m_bTimeLineMouseDown = true;
 		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
+		if(m_pAuxDopeSheet)
+			m_pAuxDopeSheet->UpdateWidgets();
+
 		pEvent->accept();
 	}
 	else if(pEvent->pos().y() > TIMELINE_HEIGHT)
@@ -437,7 +480,7 @@ float EntityDopeSheetView::GetZoom() const
 			m_eDragState = DRAGSTATE_InitialPress;
 			m_ptDragStart = pEvent->pos();
 
-			if(pItemUnderMouse->data(GraphicsKeyFrameItem::DATAKEY_Type).toInt() == DOPESHEETITEMTYPE_TweenKnob)
+			if(pItemUnderMouse->data(GFXDATAKEY_Type).toInt() == GFXITEM_TweenKnob)
 			{
 				GetScene()->clearSelection();
 				m_pGfxDragTweenKnobItem = static_cast<GraphicsTweenKnobItem *>(pItemUnderMouse);
@@ -445,7 +488,7 @@ float EntityDopeSheetView::GetZoom() const
 		}
 
 		// Only want default selection behavior when NOT clicking in the 'time line' or an 'item name' column AND it's not a tween knob
-		if(pItemUnderMouse == nullptr || pItemUnderMouse->data(GraphicsKeyFrameItem::DATAKEY_Type).toInt() != DOPESHEETITEMTYPE_TweenKnob)
+		if(pItemUnderMouse == nullptr || pItemUnderMouse->data(GFXDATAKEY_Type).toInt() != GFXITEM_TweenKnob)
 			QGraphicsView::mousePressEvent(pEvent);
 	}
 
@@ -460,9 +503,9 @@ float EntityDopeSheetView::GetZoom() const
 	{
 		if(m_pGfxDragTweenKnobItem)
 		{
-			EntityTreeItemData *pTreeItemData = m_pGfxDragTweenKnobItem->parentItem()->data(GraphicsKeyFrameItem::DATAKEY_TreeItemData).value<EntityTreeItemData *>();
-			TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(m_pGfxDragTweenKnobItem->parentItem()->data(GraphicsKeyFrameItem::DATAKEY_CategoryPropString).toString().split('/')[1]);
-			int iTweenStartKeyFrame = m_pGfxDragTweenKnobItem->parentItem()->data(GraphicsKeyFrameItem::DATAKEY_FrameIndex).toInt();
+			EntityTreeItemData *pTreeItemData = m_pGfxDragTweenKnobItem->parentItem()->data(GFXDATAKEY_TreeItemData).value<EntityTreeItemData *>();
+			TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(m_pGfxDragTweenKnobItem->parentItem()->data(GFXDATAKEY_CategoryPropString).toString().split('/')[1]);
+			int iTweenStartKeyFrame = m_pGfxDragTweenKnobItem->parentItem()->data(GFXDATAKEY_FrameIndex).toInt();
 			int iTweenEndKeyFrame = HyMath::Max(iTweenStartKeyFrame, m_iDragFrame);
 
 			double dNewDuration = (iTweenEndKeyFrame - iTweenStartKeyFrame) * (1.0 / m_pStateData->GetDopeSheetScene().GetFramesPerSecond());
