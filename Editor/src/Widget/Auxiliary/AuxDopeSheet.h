@@ -33,6 +33,7 @@ public:
 	void SetEntityStateModel(EntityStateData *pEntStateData);
 
 	void UpdateWidgets();
+	QList<QAction *> GetContextActions();
 
 private:
 	Ui::AuxDopeSheet *ui;
@@ -43,6 +44,16 @@ private Q_SLOTS:
 	void on_actionPlayAnimations_triggered();
 	void on_actionNextKeyFrame_triggered();
 	void on_actionLastKeyFrame_triggered();
+	
+	void on_actionCreateCallback_triggered();
+	void on_actionRenameCallback_triggered();
+	void SetCallbackName();
+
+	void on_actionDeleteCallback_triggered();
+	void on_actionCreatePositionTween_triggered();
+	void on_actionCreateRotationTween_triggered();
+	void on_actionCreateScaleTween_triggered();
+	void on_actionCreateAlphaTween_triggered();
 };
 
 #endif // WIDGETOUTPUTLOG_H

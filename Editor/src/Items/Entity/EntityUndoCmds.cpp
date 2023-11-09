@@ -958,6 +958,47 @@ EntityUndoCmd_NudgeTweenDuration::EntityUndoCmd_NudgeTweenDuration(EntityDopeShe
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EntityUndoCmd_SetCallback::EntityUndoCmd_SetCallback(EntityDopeSheetScene &entityDopeSheetSceneRef, QString sCallback, int iFrameIndex, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_sNewCallback(sCallback),
+	m_iFrameIndex(iFrameIndex)
+{
+	m_sOldCallback = m_DopeSheetSceneRef.GetCallback(m_iFrameIndex);
+
+	if(m_sNewCallback.isEmpty())
+		setText("Remove " % m_sOldCallback % " Callback");
+	else
+	{
+		if(m_sOldCallback.isEmpty())
+			setText("Create " % m_sNewCallback % " Callback");
+		else
+			setText("Rename Callback To " % m_sNewCallback);
+	}
+}
+
+/*virtual*/ EntityUndoCmd_SetCallback::~EntityUndoCmd_SetCallback()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_SetCallback::redo() /*override*/
+{
+	if(m_sNewCallback.isEmpty())
+		m_DopeSheetSceneRef.RemoveCallback(m_iFrameIndex);
+	else
+		m_DopeSheetSceneRef.SetCallback(m_iFrameIndex, m_sNewCallback);
+}
+
+/*virtual*/ void EntityUndoCmd_SetCallback::undo() /*override*/
+{
+	if(m_sOldCallback.isEmpty())
+		m_DopeSheetSceneRef.RemoveCallback(m_iFrameIndex);
+	else
+		m_DopeSheetSceneRef.SetCallback(m_iFrameIndex, m_sOldCallback);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_FramesPerSecond::EntityUndoCmd_FramesPerSecond(EntityDopeSheetScene &entityDopeSheetSceneRef, int iNewFPS, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_DopeSheetSceneRef(entityDopeSheetSceneRef),

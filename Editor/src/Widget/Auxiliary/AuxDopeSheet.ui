@@ -82,13 +82,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnRewind">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QToolButton" name="btnPreviousKeyFrame">
        <property name="text">
         <string>...</string>
@@ -96,14 +89,28 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnPlayAnimations">
+      <widget class="QToolButton" name="btnNextKeyFrame">
        <property name="text">
         <string>...</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnNextKeyFrame">
+      <widget class="Line" name="line_4">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnRewind">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnPlayAnimations">
        <property name="text">
         <string>...</string>
        </property>
@@ -124,7 +131,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnCallback">
+      <widget class="QToolButton" name="btnCallback">
        <property name="text">
         <string>Create Callback</string>
        </property>
@@ -132,16 +139,22 @@
         <iconset resource="../../../data/HyEditor.qrc">
          <normaloff>:/icons16x16/callback.png</normaloff>:/icons16x16/callback.png</iconset>
        </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnTween">
+      <widget class="QToolButton" name="btnTween">
        <property name="text">
         <string>Create Position Tween</string>
        </property>
        <property name="icon">
         <iconset resource="../../../data/HyEditor.qrc">
          <normaloff>:/icons16x16/tween-Position.png</normaloff>:/icons16x16/tween-Position.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
        </property>
       </widget>
      </item>
@@ -222,6 +235,90 @@
    </property>
    <property name="toolTip">
     <string>Jump to the last key frame</string>
+   </property>
+  </action>
+  <action name="actionCreateCallback">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/callback.png</normaloff>:/icons16x16/callback.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create Callback</string>
+   </property>
+   <property name="toolTip">
+    <string>Set a callback function at the currently selected frame, that derived classes may override and implement</string>
+   </property>
+  </action>
+  <action name="actionRenameCallback">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/callback-rename.png</normaloff>:/icons16x16/callback-rename.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rename Callback</string>
+   </property>
+   <property name="toolTip">
+    <string>Rename the callback function set at the currently selected frame</string>
+   </property>
+  </action>
+  <action name="actionDeleteCallback">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/callback-delete.png</normaloff>:/icons16x16/callback-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Delete Callback</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes the callback function at the currently selected frame</string>
+   </property>
+  </action>
+  <action name="actionCreatePositionTween">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/tween-Position.png</normaloff>:/icons16x16/tween-Position.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create Position Tween</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a position tween between the two currently selected keyframes</string>
+   </property>
+  </action>
+  <action name="actionCreateRotationTween">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/tween-Rotate.png</normaloff>:/icons16x16/tween-Rotate.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create Rotation Tween</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a rotational tween between the two currently selected keyframes</string>
+   </property>
+  </action>
+  <action name="actionCreateScaleTween">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/tween-Scale.png</normaloff>:/icons16x16/tween-Scale.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create Scale Tween</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a scaling tween between the two currently selected keyframes</string>
+   </property>
+  </action>
+  <action name="actionCreateAlphaTween">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/tween-Alpha.png</normaloff>:/icons16x16/tween-Alpha.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create Alpha Tween</string>
+   </property>
+   <property name="toolTip">
+    <string>Create an alpha tween between the two currently selected keyframes</string>
    </property>
   </action>
  </widget>

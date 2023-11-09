@@ -394,7 +394,7 @@
 			return static_cast<TweenProperty>(i);
 	}
 
-	return TWEENPROP_Unknown;
+	return TWEENPROP_None;
 }
 
 /*static*/ HyTweenFunc HyGlobal::GetTweenFunc(TweenType eTween)

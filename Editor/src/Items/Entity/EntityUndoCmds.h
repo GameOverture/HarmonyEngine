@@ -276,6 +276,37 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class EntityUndoCmd_ContextTween : public QUndoCommand
+{
+	EntityDopeSheetScene &					m_DopeSheetSceneRef;
+	EntityTreeItemData *					m_pItemData;
+	
+	int										m_iStartFrameIndex;
+	QJsonValue								m_StartValue;
+
+	int										m_iEndFrameIndex;
+	QJsonValue								m_EndValue;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_SetCallback : public QUndoCommand
+{
+	EntityDopeSheetScene &					m_DopeSheetSceneRef;
+	QString									m_sNewCallback;
+	QString									m_sOldCallback;
+	int										m_iFrameIndex;
+
+public:
+	EntityUndoCmd_SetCallback(EntityDopeSheetScene &entityDopeSheetSceneRef, QString sCallback, int iFrameIndex, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_SetCallback();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_FramesPerSecond : public QUndoCommand
 {
 	EntityDopeSheetScene &					m_DopeSheetSceneRef;

@@ -13,6 +13,7 @@
 #include "EntityModel.h"
 #include "EntityWidget.h"
 #include "EntityUndoCmds.h"
+#include "AuxDopeSheet.h"
 
 #include <QPainter>
 #include <QScrollBar>
@@ -33,21 +34,12 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	m_pGfxDragTweenKnobItem(nullptr),
 	m_pContextClickItem(nullptr)
 {
-	for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
-	{
-		TweenProperty eTweenProp = static_cast<TweenProperty>(iTweenProp);
-		m_ActionTweenList.push_back(new QAction(HyGlobal::TweenPropIcon(eTweenProp), "Tween " % HyGlobal::TweenPropName(eTweenProp)));
-		connect(m_ActionTweenList[iTweenProp], &QAction::triggered, this, &EntityDopeSheetView::OnTweenAction);
-	}
-
 	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	setDragMode(QGraphicsView::RubberBandDrag);
 }
 
 /*virtual*/ EntityDopeSheetView::~EntityDopeSheetView()
 {
-	for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
-		delete m_ActionTweenList[iTweenProp];
 }
 
 EntityDopeSheetScene *EntityDopeSheetView::GetScene() const
@@ -55,8 +47,10 @@ EntityDopeSheetScene *EntityDopeSheetView::GetScene() const
 	return static_cast<EntityDopeSheetScene *>(scene());
 }
 
-void EntityDopeSheetView::SetScene(EntityStateData *pStateData)
+void EntityDopeSheetView::SetScene(AuxDopeSheet *pAuxDopeSheet, EntityStateData *pStateData)
 {
+	m_pAuxDopeSheet = pAuxDopeSheet;
+
 	m_pStateData = pStateData;
 	if(m_pStateData == nullptr)
 		setScene(nullptr);
@@ -75,8 +69,6 @@ float EntityDopeSheetView::GetZoom() const
 		return;
 
 	m_pContextClickItem = nullptr;
-	QPair<QString, QString> contextProp = QPair<QString, QString>("", "");
-
 	QPointF ptScenePos = mapToScene(pEvent->pos());
 
 	qreal fPosY = TIMELINE_HEIGHT + 1.0f;
@@ -102,7 +94,6 @@ float EntityDopeSheetView::GetZoom() const
 				if(ptScenePos.y() < fPosY)
 				{
 					m_pContextClickItem = pEntItemData;
-					contextProp = propPair;
 					break;
 				}
 			}
@@ -118,29 +109,11 @@ float EntityDopeSheetView::GetZoom() const
 		int iNumSelected = scene()->selectedItems().size();
 
 		QMenu menu;
-		//// Determine the main tween action based on 'rightClickProp', then insert the tween menu containing all valid tweens for this item
-		//if(contextProp.first == "Transformation")
-		//{
-		//	if(contextProp.second == "Position")
-		//		menu.addAction(&m_ActionTweenPos);
-		//	else if(contextProp.second == "Rotation")
-		//		menu.addAction(&m_ActionTweenRot);
-		//	else if(contextProp.second == "Scale")
-		//		menu.addAction(&m_ActionTweenScale);
-		//}
-		//else if(contextProp.first == "Body")
-		//{
-		//	if(contextProp.second == "Alpha")
-		//		menu.addAction(&m_ActionTweenAlpha);
-		//}
-		//QMenu tweenMenu("Add Tween");
-		//tweenMenu.addAction(&m_ActionTweenPos);
-		//tweenMenu.addAction(&m_ActionTweenRot);
-		//tweenMenu.addAction(&m_ActionTweenScale);
-		//tweenMenu.addAction(&m_ActionTweenAlpha);
 
-		//menu.addMenu(&tweenMenu);
-		//menu.addSeparator();
+		QList<QAction *> contextActionList = m_pAuxDopeSheet->GetContextActions();
+		for(QAction *pAction : contextActionList)
+			menu.addAction(pAction);
+		menu.addSeparator();
 		menu.addAction(QIcon(":/icons16x16/edit-copy.png"), "Copy");// , this, &EntityDopeSheetView::OnCopy);
 		menu.addAction(QIcon(":/icons16x16/edit-paste.png"), "Paste");//, this, &EntityDopeSheetView::OnPaste);
 		menu.addSeparator();
@@ -464,7 +437,7 @@ float EntityDopeSheetView::GetZoom() const
 			m_eDragState = DRAGSTATE_InitialPress;
 			m_ptDragStart = pEvent->pos();
 
-			if(pItemUnderMouse->data(GraphicsKeyFrameItem::DATAKEY_IsTweenKnob).toBool())
+			if(pItemUnderMouse->data(GraphicsKeyFrameItem::DATAKEY_Type).toInt() == DOPESHEETITEMTYPE_TweenKnob)
 			{
 				GetScene()->clearSelection();
 				m_pGfxDragTweenKnobItem = static_cast<GraphicsTweenKnobItem *>(pItemUnderMouse);
@@ -472,7 +445,7 @@ float EntityDopeSheetView::GetZoom() const
 		}
 
 		// Only want default selection behavior when NOT clicking in the 'time line' or an 'item name' column AND it's not a tween knob
-		if(pItemUnderMouse == nullptr || pItemUnderMouse->data(GraphicsKeyFrameItem::DATAKEY_IsTweenKnob).toBool() == false)
+		if(pItemUnderMouse == nullptr || pItemUnderMouse->data(GraphicsKeyFrameItem::DATAKEY_Type).toInt() != DOPESHEETITEMTYPE_TweenKnob)
 			QGraphicsView::mousePressEvent(pEvent);
 	}
 
@@ -511,6 +484,9 @@ float EntityDopeSheetView::GetZoom() const
 
 	update();
 	QGraphicsView::mouseReleaseEvent(pEvent);
+
+	if(m_pAuxDopeSheet)
+		m_pAuxDopeSheet->UpdateWidgets();
 }
 
 void EntityDopeSheetView::DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color /*= HyColor::WidgetFrame*/, HyColor shadowColor /*= HyColor::Black*/)
@@ -553,12 +529,6 @@ int EntityDopeSheetView::GetNearestFrame(qreal fScenePosX) const
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
 	return ((fScenePosX - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
-}
-
-void EntityDopeSheetView::OnTweenAction()
-{
-	int i = 0;
-	i++;
 }
 
 void EntityDopeSheetView::OnSelectAllItemKeyFrames()

@@ -365,6 +365,20 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 	return m_TreeModel.GenerateCodeName(sDesiredName);
 }
 
+bool EntityModel::IsCallbackNameUnique(QString sCallbackName) const
+{
+	for(int iStateIndex = 0; iStateIndex < m_StateList.size(); ++iStateIndex)
+	{
+		EntityStateData *pStateData = static_cast<EntityStateData *>(m_StateList[iStateIndex]);
+
+		const QMap<int, QString> &callbackMapRef = pStateData->GetDopeSheetScene().GetCallbackMap();
+		if(callbackMapRef.values().contains(sCallbackName))
+			return false;
+	}
+
+	return true;
+}
+
 QString EntityModel::GenerateSrc_FileIncludes() const
 {
 	QString sSrc;

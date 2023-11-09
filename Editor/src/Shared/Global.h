@@ -174,7 +174,7 @@ enum TweenType
 
 enum TweenProperty
 {
-	TWEENPROP_Unknown = -1,
+	TWEENPROP_None = -1,
 
 	TWEENPROP_Position = 0,
 	TWEENPROP_Rotation,

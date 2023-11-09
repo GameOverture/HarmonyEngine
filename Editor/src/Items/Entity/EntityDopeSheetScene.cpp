@@ -21,7 +21,7 @@
 GraphicsTweenKnobItem::GraphicsTweenKnobItem(QGraphicsItem *pParent /*= nullptr*/) :
 	QGraphicsEllipseItem(-KEYFRAME_TWEEN_KNOB_RADIUS, -KEYFRAME_TWEEN_KNOB_RADIUS, KEYFRAME_TWEEN_KNOB_RADIUS * 2.0f, KEYFRAME_TWEEN_KNOB_RADIUS * 2.0f, pParent)
 {
-	setData(GraphicsKeyFrameItem::DATAKEY_IsTweenKnob, true);
+	setData(GraphicsKeyFrameItem::DATAKEY_Type, DOPESHEETITEMTYPE_TweenKnob);
 
 	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
 	setBrush(HyGlobal::ConvertHyColor(HyColor::Green));
@@ -64,21 +64,21 @@ GraphicsTweenKnobItem::GraphicsTweenKnobItem(QGraphicsItem *pParent /*= nullptr*
 
 GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKeyFrame, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent /*= nullptr*/) :
 	QGraphicsRectItem(x, y, width, height, parent),
-	m_bIsTweenKeyFrame(bIsTweenKeyFrame),
 	m_pGfxTweenLine(nullptr),
 	m_pGfxTweenDurationKnob(nullptr)
 {
 	setData(DATAKEY_TreeItemData, QVariant::fromValue(std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey)));
 	setData(DATAKEY_FrameIndex, std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey));
 	setData(DATAKEY_CategoryPropString, std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey));
+	setData(DATAKEY_Type, bIsTweenKeyFrame ? DOPESHEETITEMTYPE_TweenKeyFrame : DOPESHEETITEMTYPE_PropertyKeyFrame);
 
 	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
-	setBrush(HyGlobal::ConvertHyColor(m_bIsTweenKeyFrame ? HyColor::Green : HyColor::LightGray));
+	setBrush(HyGlobal::ConvertHyColor(bIsTweenKeyFrame ? HyColor::Green : HyColor::LightGray));
 	setAcceptHoverEvents(true);
 	setAcceptedMouseButtons(Qt::LeftButton);
 	setFlags(QGraphicsItem::ItemIsSelectable); // Can't use 'QGraphicsItem::ItemIsMovable' because key frames are only allowed to move horizontally and snapped to frames
 
-	if(m_bIsTweenKeyFrame)
+	if(bIsTweenKeyFrame)
 	{
 		m_pGfxTweenLine = new QGraphicsLineItem(this);
 		m_pGfxTweenLine->setFlag(QGraphicsItem::ItemStacksBehindParent);
@@ -107,7 +107,7 @@ KeyFrameKey GraphicsKeyFrameItem::GetKey() const
 
 bool GraphicsKeyFrameItem::IsTweenKeyFrame() const
 {
-	return m_bIsTweenKeyFrame;
+	return data(DATAKEY_Type).toInt() == DOPESHEETITEMTYPE_TweenKeyFrame;
 }
 
 void GraphicsKeyFrameItem::SetTweenLineLength(qreal fLength)
@@ -308,6 +308,11 @@ void EntityDopeSheetScene::SetCurrentFrame(int iFrame)
 const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &EntityDopeSheetScene::GetKeyFramesMap() const
 {
 	return m_KeyFramesMap;
+}
+
+const QMap<int, QString> &EntityDopeSheetScene::GetCallbackMap() const
+{
+	return m_CallbackMap;
 }
 
 bool EntityDopeSheetScene::ContainsKeyFrameProperty(KeyFrameKey tupleKey)

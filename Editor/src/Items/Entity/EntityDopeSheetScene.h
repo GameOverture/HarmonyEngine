@@ -46,6 +46,13 @@ enum AuxDopeWidgetsSection
 	NUM_AUXDOPEWIDGETSECTIONS
 };
 
+enum DopeSheetItemType
+{
+	DOPESHEETITEMTYPE_PropertyKeyFrame = 0,
+	DOPESHEETITEMTYPE_TweenKeyFrame,
+	DOPESHEETITEMTYPE_TweenKnob,
+};
+
 class GraphicsTweenKnobItem : public QGraphicsEllipseItem
 {
 public:
@@ -60,18 +67,19 @@ protected:
 
 class GraphicsKeyFrameItem : public QGraphicsRectItem
 {
-	bool					m_bIsTweenKeyFrame;
 	QGraphicsLineItem *		m_pGfxTweenLine;
 	GraphicsTweenKnobItem *	m_pGfxTweenDurationKnob;
 
 public:
-	enum DataKey
+	enum DataKey // NOTE: Order matters, the first 3 are used when accessing a KeyFrameKey tuple
 	{
+		// Data required to assemble KeyFrameKey
 		DATAKEY_TreeItemData = 0,
 		DATAKEY_FrameIndex,
 		DATAKEY_CategoryPropString,	// Category + "/" + Property
-
-		DATAKEY_IsTweenKnob
+		
+		// Additional info saved to QGraphicsItem
+		DATAKEY_Type, // DopeSheetItemType
 	};
 
 	GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKeyFrame, qreal x, qreal y, qreal width, qreal height, QGraphicsItem *parent = nullptr);
@@ -131,6 +139,7 @@ public:
 	void SetCurrentFrame(int iFrameIndex);
 
 	const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &GetKeyFramesMap() const;
+	const QMap<int, QString> &GetCallbackMap() const;
 
 	bool ContainsKeyFrameProperty(KeyFrameKey tupleKey);
 	bool ContainsKeyFrameTween(KeyFrameKey tupleKey);

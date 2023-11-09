@@ -73,6 +73,7 @@ public:
 	void ClearShapeEdit();
 
 	QString GenerateCodeName(QString sDesiredName) const;
+	bool IsCallbackNameUnique(QString sCallbackName) const;
 
 	QString GenerateSrc_FileIncludes() const;
 	QString GenerateSrc_MemberVariables() const;
