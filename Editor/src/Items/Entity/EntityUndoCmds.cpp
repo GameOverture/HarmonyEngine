@@ -958,6 +958,45 @@ EntityUndoCmd_NudgeTweenDuration::EntityUndoCmd_NudgeTweenDuration(EntityDopeShe
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EntityUndoCmd_CreateTween::EntityUndoCmd_CreateTween(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, TweenProperty eTweenProp, int iStartFrameIndex, int iEndFrameIndex, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_pItemData(pItemData),
+	m_eTweenProp(eTweenProp),
+	m_iStartFrameIndex(iStartFrameIndex),
+	m_iEndFrameIndex(iEndFrameIndex)
+{
+	setText("Create " % HyGlobal::TweenPropName(m_eTweenProp) % " Tween");
+
+	QPair<QString, QString> propPair = HyGlobal::GetTweenCategoryProperty(m_eTweenProp);
+	m_StartValue = m_DopeSheetSceneRef.GetKeyFrameProperty(m_pItemData, m_iStartFrameIndex, propPair.first, propPair.second);
+	m_EndValue = m_DopeSheetSceneRef.GetKeyFrameProperty(m_pItemData, m_iEndFrameIndex, propPair.first, propPair.second);
+}
+
+/*virtual*/ EntityUndoCmd_CreateTween::~EntityUndoCmd_CreateTween()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_CreateTween::redo() /*override*/
+{
+	QPair<QString, QString> propPair = HyGlobal::GetTweenCategoryProperty(m_eTweenProp);
+	m_DopeSheetSceneRef.RemoveKeyFrameProperty(m_pItemData, m_iEndFrameIndex, propPair.first, propPair.second, false);
+
+	double dDuration = (m_iEndFrameIndex - m_iStartFrameIndex) * (1.0 / m_DopeSheetSceneRef.GetFramesPerSecond());
+	TweenJsonValues tweenValues = std::make_tuple(m_EndValue, QJsonValue(dDuration), QJsonValue(HyGlobal::TweenName(TWEEN_Linear)));
+	m_DopeSheetSceneRef.SetKeyFrameTween(m_pItemData, m_iStartFrameIndex, m_eTweenProp, tweenValues, true);
+}
+
+/*virtual*/ void EntityUndoCmd_CreateTween::undo() /*override*/
+{
+	m_DopeSheetSceneRef.RemoveKeyFrameTween(m_pItemData, m_iStartFrameIndex, m_eTweenProp, false);
+
+	QPair<QString, QString> propPair = HyGlobal::GetTweenCategoryProperty(m_eTweenProp);
+	m_DopeSheetSceneRef.SetKeyFrameProperty(m_pItemData, m_iEndFrameIndex, propPair.first, propPair.second, m_EndValue, true);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_SetCallback::EntityUndoCmd_SetCallback(EntityDopeSheetScene &entityDopeSheetSceneRef, QString sCallback, int iFrameIndex, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_DopeSheetSceneRef(entityDopeSheetSceneRef),

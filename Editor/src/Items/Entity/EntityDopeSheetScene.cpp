@@ -692,10 +692,7 @@ QString EntityDopeSheetScene::GetCallback(int iFrameIndex) const
 
 void EntityDopeSheetScene::SetCallback(int iFrameIndex, QString sCallback)
 {
-	if(m_CallbackMap.contains(iFrameIndex))
-		m_CallbackMap[iFrameIndex] = sCallback;
-	else
-		HyGuiLog("EntityDopeSheetScene::SetCallback() - No callback found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+	m_CallbackMap.insert(iFrameIndex, sCallback);
 }
 
 void EntityDopeSheetScene::RemoveCallback(int iFrameIndex)

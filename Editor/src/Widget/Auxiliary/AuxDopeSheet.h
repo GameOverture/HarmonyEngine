@@ -13,6 +13,7 @@
 #include <QWidget>
 #include <QDataWidgetMapper>
 
+class EntityTreeItemData;
 class EntityStateData;
 
 namespace Ui {
@@ -24,6 +25,9 @@ class AuxDopeSheet : public QWidget
 	Q_OBJECT
 
 	QDataWidgetMapper		m_WidgetMapper;
+	EntityTreeItemData *	m_pContextTweenTreeItemData;
+	int						m_iContextTweenStartFrame;
+	int						m_iContextTweenEndFrame;
 
 public:
 	explicit AuxDopeSheet(QWidget *pParent = nullptr);
@@ -54,6 +58,7 @@ private Q_SLOTS:
 	void on_actionCreateRotationTween_triggered();
 	void on_actionCreateScaleTween_triggered();
 	void on_actionCreateAlphaTween_triggered();
+	void CreateContextTween(TweenProperty eTweenProp);
 };
 
 #endif // WIDGETOUTPUTLOG_H

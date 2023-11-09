@@ -16,7 +16,10 @@
 
 AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
-	ui(new Ui::AuxDopeSheet)
+	ui(new Ui::AuxDopeSheet),
+	m_pContextTweenTreeItemData(nullptr),
+	m_iContextTweenStartFrame(-1),
+	m_iContextTweenEndFrame(-1)
 {
 	ui->setupUi(this);
 
@@ -85,6 +88,8 @@ void AuxDopeSheet::UpdateWidgets()
 			ui->btnCallback->setDefaultAction(ui->actionRenameCallback);
 		}
 
+		m_pContextTweenTreeItemData = nullptr;
+		m_iContextTweenStartFrame = m_iContextTweenEndFrame = -1;
 		ui->btnTween->setDefaultAction(nullptr);
 		ui->btnTween->setVisible(false);
 		if(dopeSheetSceneRef.selectedItems().count() == 2)
@@ -97,11 +102,21 @@ void AuxDopeSheet::UpdateWidgets()
 
 				EntityTreeItemData *pTreeItemData0 = std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey0);
 				EntityTreeItemData *pTreeItemData1 = std::get<GraphicsKeyFrameItem::DATAKEY_TreeItemData>(tupleKey1);
+				
+				m_iContextTweenStartFrame = std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey0);
+				m_iContextTweenEndFrame = std::get<GraphicsKeyFrameItem::DATAKEY_FrameIndex>(tupleKey1);
+				if(m_iContextTweenStartFrame > m_iContextTweenEndFrame)
+					std::swap(m_iContextTweenStartFrame, m_iContextTweenEndFrame);
+
 				QString sCategoryProp0 = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey0);
 				QString sCategoryProp1 = std::get<GraphicsKeyFrameItem::DATAKEY_CategoryPropString>(tupleKey1);
 
-				if(pTreeItemData0 == pTreeItemData1 && sCategoryProp0 == sCategoryProp1)
+				if(pTreeItemData0 == pTreeItemData1 &&
+				   m_iContextTweenStartFrame != m_iContextTweenEndFrame &&
+				   sCategoryProp0 == sCategoryProp1)
 				{
+					m_pContextTweenTreeItemData = pTreeItemData0;
+
 					ui->btnTween->setVisible(true);
 
 					TweenProperty eCurrentTweenProp = HyGlobal::GetTweenPropFromString(sCategoryProp0.split('/')[1]);
@@ -126,6 +141,7 @@ void AuxDopeSheet::UpdateWidgets()
 	}
 	else
 	{
+		m_pContextTweenTreeItemData = nullptr;
 		ui->sbFramesPerSecond->setEnabled(false);
 		ui->chkAutoInitialize->setEnabled(false);
 		ui->btnCallback->setVisible(false);
@@ -246,22 +262,35 @@ void AuxDopeSheet::on_actionDeleteCallback_triggered()
 
 void AuxDopeSheet::on_actionCreatePositionTween_triggered()
 {
-	if(GetEntityStateModel() == nullptr)
-	{
-		HyGuiLog("AuxDopeSheet::on_actionCreatePositionTween_triggered() - GetEntityStateModel() == nullptr", LOGTYPE_Error);
-		return;
-	}
-
+	CreateContextTween(TWEENPROP_Position);
 }
 
 void AuxDopeSheet::on_actionCreateRotationTween_triggered()
 {
+	CreateContextTween(TWEENPROP_Rotation);
 }
 
 void AuxDopeSheet::on_actionCreateScaleTween_triggered()
 {
+	CreateContextTween(TWEENPROP_Scale);
 }
 
 void AuxDopeSheet::on_actionCreateAlphaTween_triggered()
 {
+	CreateContextTween(TWEENPROP_Alpha);
+}
+
+void AuxDopeSheet::CreateContextTween(TweenProperty eTweenProp)
+{
+	if(GetEntityStateModel() == nullptr)
+	{
+		HyGuiLog("AuxDopeSheet::CreateContextTween() - GetEntityStateModel() == nullptr", LOGTYPE_Error);
+		return;
+	}
+	EntityUndoCmd_CreateTween *pNewCmd = new EntityUndoCmd_CreateTween(GetEntityStateModel()->GetDopeSheetScene(),
+		m_pContextTweenTreeItemData,
+		eTweenProp,
+		m_iContextTweenStartFrame,
+		m_iContextTweenEndFrame);
+	GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
 }

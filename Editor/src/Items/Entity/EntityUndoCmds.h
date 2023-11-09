@@ -276,16 +276,23 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_ContextTween : public QUndoCommand
+class EntityUndoCmd_CreateTween : public QUndoCommand
 {
 	EntityDopeSheetScene &					m_DopeSheetSceneRef;
 	EntityTreeItemData *					m_pItemData;
+	TweenProperty							m_eTweenProp;
 	
 	int										m_iStartFrameIndex;
 	QJsonValue								m_StartValue;
-
 	int										m_iEndFrameIndex;
 	QJsonValue								m_EndValue;
+
+public:
+	EntityUndoCmd_CreateTween(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, TweenProperty eTweenProp, int iStartFrameIndex, int iEndFrameIndex, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_CreateTween();
+
+	virtual void redo() override;
+	virtual void undo() override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
