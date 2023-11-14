@@ -45,8 +45,6 @@ class EntityTreeItemData : public TreeModelItemData
 	EntityModel &										m_EntityModelRef;
 	EntityItemType										m_eEntType;
 
-	EntityDrawItem *									m_pDrawItem;
-
 	EntityPropertiesTreeModel *							m_pPropertiesModel;
 
 	QString												m_sPromotedEntityType;

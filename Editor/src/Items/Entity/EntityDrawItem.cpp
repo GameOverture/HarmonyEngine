@@ -43,7 +43,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 		pReferencedProjItemData->GetSavedFileData(fileDataPair);
 
 		if(m_pEntityTreeItemData->GetType() == ITEM_Entity)
-			m_pChild = new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), pParent);
+			m_pChild = new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), fileDataPair.m_Meta["stateArray"].toArray(), pParent);
 		else
 		{
 			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
@@ -119,6 +119,215 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 	const int iCURRENT_FRAME = entityDopeSheetSceneRef.GetCurrentFrame();
 	const QMap<int, QJsonObject> &keyFrameMapRef = entityDopeSheetSceneRef.GetKeyFramesMap()[m_pEntityTreeItemData];
 
+	ExtrapolateProperties(pThisHyNode, &m_ShapeCtrl, m_pEntityTreeItemData->IsSelected(), eItemType, fFRAME_DURATION, iCURRENT_FRAME, keyFrameMapRef, pCamera);
+}
+
+ShapeCtrl &EntityDrawItem::GetShapeCtrl()
+{
+	return m_ShapeCtrl;
+}
+
+TransformCtrl &EntityDrawItem::GetTransformCtrl()
+{
+	return m_Transform;
+}
+
+bool EntityDrawItem::IsMouseInBounds()
+{
+	HyShape2d boundingShape;
+	glm::mat4 transformMtx;
+	ExtractTransform(boundingShape, transformMtx);
+	
+	glm::vec2 ptWorldMousePos;
+	return HyEngine::Input().GetWorldMousePos(ptWorldMousePos) && boundingShape.TestPoint(transformMtx, ptWorldMousePos);
+}
+
+void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
+{
+	HyShape2d boundingShape;
+	glm::mat4 mtxShapeTransform;
+	ExtractTransform(boundingShape, mtxShapeTransform);
+
+	m_Transform.WrapTo(boundingShape, mtxShapeTransform, pCamera);
+	GetShapeCtrl().DeserializeOutline(pCamera);
+}
+
+void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)
+{
+	transformMtxOut = glm::identity<glm::mat4>();
+	switch(m_pEntityTreeItemData->GetType())
+	{
+	case ITEM_BoundingVolume:
+	case ITEM_AtlasFrame:
+	case ITEM_Primitive:
+	case ITEM_Text:
+	case ITEM_Spine:
+	case ITEM_Sprite:
+	case ITEM_Entity: {
+		IHyBody2d *pHyBody = static_cast<IHyBody2d *>(GetHyNode());
+		pHyBody->CalcLocalBoundingShape(boundingShapeOut);
+		transformMtxOut = GetHyNode()->GetSceneTransform(0.0f);
+		break; }
+
+	case ITEM_Audio:
+	default:
+		HyGuiLog("EntityItemDraw::ExtractTransform - unhandled child node type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
+		break;
+	}
+}
+
+void EntityDrawItem::ShowTransformCtrl(bool bShowGrabPoints)
+{
+	m_Transform.Show(bShowGrabPoints);
+}
+
+void EntityDrawItem::HideTransformCtrl()
+{
+	m_Transform.Hide();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent) :
+	HyEntity2d(pParent)
+{
+	QMap<QUuid, IHyLoadable2d *> uuidChildMap; // Temporary map to hold the QUuid's of the children so we can link them up with their key frame properties
+
+	for(int i = 0; i < descArray.size(); ++i)
+	{
+		QJsonObject childObj = descArray[i].toObject();
+
+		ItemType eItemType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
+		IHyLoadable2d *pNewChild = nullptr;
+		switch(eItemType)
+		{
+		case ITEM_Primitive:
+			pNewChild = new HyPrimitive2d(this);
+			break;
+
+		case ITEM_Audio:
+			pNewChild = new HyAudio2d("", HY_GUI_DATAOVERRIDE, this);
+			// TODO: how do we GuiOverrideData for audio?
+			//static_cast<HyAudio2d *>(pNewChild)->GuiOverrideData<HyAudioData>(itemDataDoc.GetObject());
+			break;
+
+		case ITEM_Particles:
+			HyGuiLog("SubEntity ctor - Particles not implemented", LOGTYPE_Error);
+			break;
+
+		case ITEM_Text: {
+			pNewChild = new HyText2d("", HY_GUI_DATAOVERRIDE, this);
+
+			TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+			FileDataPair fileDataPair;
+			static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+			HyJsonDoc itemDataDoc;
+			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+				HyGuiLog("SubEntity ctor failed to parse audio: " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
+
+			static_cast<HyText2d *>(pNewChild)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject());
+			break; }
+
+		case ITEM_Spine: {
+			pNewChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, this);
+
+			TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+			FileDataPair fileDataPair;
+			static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+			HyJsonDoc itemDataDoc;
+			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+				HyGuiLog("SubEntity ctor failed to parse audio: " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
+
+			static_cast<HySpine2d *>(pNewChild)->GuiOverrideData<HySpineData>(itemDataDoc.GetObject());
+			break; }
+
+		case ITEM_Sprite: {
+			pNewChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, this);
+
+			TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+			FileDataPair fileDataPair;
+			static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+			HyJsonDoc itemDataDoc;
+			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+				HyGuiLog("SubEntity ctor failed to parse audio: " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
+
+			static_cast<HySprite2d *>(pNewChild)->GuiOverrideData<HySpriteData>(itemDataDoc.GetObject());
+			break; }
+
+		case ITEM_Prefab:
+			HyGuiLog("SubEntity ctor - Prefab not implemented", LOGTYPE_Error);
+			break;
+
+		case ITEM_Entity: {
+			TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+			FileDataPair fileDataPair;
+			static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+			pNewChild = new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), fileDataPair.m_Meta["stateArray"].toArray(), this);
+			break; }
+
+		case ITEM_AtlasFrame: {
+			TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+			pNewChild = new HyTexturedQuad2d(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum(),
+											 static_cast<IAssetItemData *>(pReferencedItemData)->GetBankId(),
+											 this);
+			break; }
+
+		default:
+			HyGuiLog("SubEntity ctor - unhandled child node type: " % HyGlobal::ItemName(eItemType, false), LOGTYPE_Error);
+			break;
+		}
+		m_ChildTypeList.append(QPair<IHyLoadable2d *, ItemType>(pNewChild, eItemType));
+		uuidChildMap.insert(QUuid(childObj["UUID"].toString()), pNewChild);
+	}
+
+	for(int i = 0; i < stateArray.size(); ++i)
+	{
+		QJsonObject stateObj = stateArray[i].toObject();
+		
+		m_StateInfoList.push_back(StateInfo());
+		m_StateInfoList.back().m_iFramesPerSecond = stateObj["framesPerSecond"].toInt();
+
+		QJsonObject keyFramesObj = stateObj["keyFrames"].toObject();
+		for(auto iter = keyFramesObj.begin(); iter != keyFramesObj.end(); ++iter)
+		{
+			QUuid uuid(iter.key());
+			m_StateInfoList.back().m_PropertiesMap.insert(uuidChildMap[uuid], QMap<int, QJsonObject>());
+			QMap<int, QJsonObject> &propMapRef = m_StateInfoList.back().m_PropertiesMap[uuidChildMap[uuid]];
+
+			QJsonArray itemKeyFrameArray = iter.value().toArray();
+			for(int iKeyFrameArrayIndex = 0; iKeyFrameArrayIndex < itemKeyFrameArray.size(); ++iKeyFrameArrayIndex)
+			{
+				QJsonObject itemKeyFrameObj = itemKeyFrameArray[iKeyFrameArrayIndex].toObject();
+				int iFrame = itemKeyFrameObj["frame"].toInt();
+				QJsonObject propsObj = itemKeyFrameObj["props"].toObject();
+
+				propMapRef.insert(iFrame, propsObj);
+			}
+		}
+	}
+
+	SetState(0);
+}
+/*virtual*/ SubEntity::~SubEntity()
+{
+	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
+		delete childTypePair.first;
+}
+void SubEntity::ExtrapolateChildProperties(const int iCURRENT_FRAME, HyCamera2d *pCamera)
+{
+	const float fFRAME_DURATION = 1.0f / m_StateInfoList[GetState()].m_iFramesPerSecond;
+	const QMap<IHyNode2d *, QMap<int, QJsonObject>>	&propMapRef = m_StateInfoList[GetState()].m_PropertiesMap;
+	
+	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
+		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, fFRAME_DURATION, iCURRENT_FRAME, propMapRef[childTypePair.first], pCamera);
+}
+// SubEntity
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, HyCamera2d *pCamera)
+{
 	// Sprite Special Case:
 	// To determine the sprite's animation frame that should be presented, whenever a property that might affect
 	// what frame the sprite's animation could be on, calculate 'spriteLastKnownAnimInfo' up to that point.
@@ -251,6 +460,9 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 		switch(eItemType)
 		{
 		case ITEM_Entity:
+			// Call ExtrapolateProperties recursively on all pThisHyNode's children
+			static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(iCURRENT_FRAME, pCamera);
+
 			// "Physics" category doesn't need to be set
 			break;
 
@@ -266,20 +478,20 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 		}
 		[[fallthrough]];
 		case ITEM_BoundingVolume: {
-			if(propsObj.contains("Shape"))
+			if(pShapeCtrl && propsObj.contains("Shape"))
 			{
 				QJsonObject shapeObj = propsObj["Shape"].toObject();
 				if(shapeObj.contains("Type") && shapeObj.contains("Data"))
 				{
 					EditorShape eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
 					float fBvAlpha = (eItemType == ITEM_BoundingVolume) ? 0.0f : 1.0f;
-					float fOutlineAlpha = (eItemType == ITEM_BoundingVolume || m_pEntityTreeItemData->IsSelected()) ? 1.0f : 0.0f;
+					float fOutlineAlpha = (eItemType == ITEM_BoundingVolume || bIsSelected) ? 1.0f : 0.0f;
 
-					m_ShapeCtrl.Setup(eShape, ENTCOLOR_Shape, fBvAlpha, fOutlineAlpha);
-					m_ShapeCtrl.Deserialize(shapeObj["Data"].toString(), pCamera);
+					pShapeCtrl->Setup(eShape, ENTCOLOR_Shape, fBvAlpha, fOutlineAlpha);
+					pShapeCtrl->Deserialize(shapeObj["Data"].toString(), pCamera);
 				}
 			}
-			
+
 			// "Fixture" category doesn't need to be set
 			break; }
 
@@ -347,7 +559,8 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 					}
 				}
 			}
-			m_ShapeCtrl.SetAsText(pTextNode, m_pEntityTreeItemData->IsSelected(), pCamera);
+			if(pShapeCtrl)
+				pShapeCtrl->SetAsText(pTextNode, bIsSelected, pCamera);
 			break; }
 
 		case ITEM_Sprite:
@@ -421,23 +634,23 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 			fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenInfo[iTweenProp].m_fDuration);
 			HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenInfo[iTweenProp].m_eTweenType);
 			float fRatio = (tweenInfo[iTweenProp].m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenInfo[iTweenProp].m_fDuration) : 1.0f;
-			
+
 			switch(iTweenProp)
 			{
 			case TWEENPROP_Position:
 				pThisHyNode->pos.SetX(static_cast<float>(tweenInfo[iTweenProp].m_Start.toPointF().x() + (tweenInfo[iTweenProp].m_Destination.toPointF().x() - tweenInfo[iTweenProp].m_Start.toPointF().x()) * fRatio));
 				pThisHyNode->pos.SetY(static_cast<float>(tweenInfo[iTweenProp].m_Start.toPointF().y() + (tweenInfo[iTweenProp].m_Destination.toPointF().y() - tweenInfo[iTweenProp].m_Start.toPointF().y()) * fRatio));
 				break;
-			
+
 			case TWEENPROP_Rotation:
 				pThisHyNode->rot.Set(tweenInfo[iTweenProp].m_Start.toDouble() + (tweenInfo[iTweenProp].m_Destination.toDouble() - tweenInfo[iTweenProp].m_Start.toDouble()) * fRatio);
 				break;
-			
+
 			case TWEENPROP_Scale:
 				pThisHyNode->scale.SetX(static_cast<float>(tweenInfo[iTweenProp].m_Start.toPointF().x() + (tweenInfo[iTweenProp].m_Destination.toPointF().x() - tweenInfo[iTweenProp].m_Start.toPointF().x()) * fRatio));
 				pThisHyNode->scale.SetY(static_cast<float>(tweenInfo[iTweenProp].m_Start.toPointF().y() + (tweenInfo[iTweenProp].m_Destination.toPointF().y() - tweenInfo[iTweenProp].m_Start.toPointF().y()) * fRatio));
 				break;
-			
+
 			case TWEENPROP_Alpha:
 				static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(tweenInfo[iTweenProp].m_Start.toDouble() + (tweenInfo[iTweenProp].m_Destination.toDouble() - tweenInfo[iTweenProp].m_Start.toDouble()) * fRatio);
 				break;
@@ -449,171 +662,3 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 		}
 	}
 }
-
-ShapeCtrl &EntityDrawItem::GetShapeCtrl()
-{
-	return m_ShapeCtrl;
-}
-
-TransformCtrl &EntityDrawItem::GetTransformCtrl()
-{
-	return m_Transform;
-}
-
-bool EntityDrawItem::IsMouseInBounds()
-{
-	HyShape2d boundingShape;
-	glm::mat4 transformMtx;
-	ExtractTransform(boundingShape, transformMtx);
-	
-	glm::vec2 ptWorldMousePos;
-	return HyEngine::Input().GetWorldMousePos(ptWorldMousePos) && boundingShape.TestPoint(transformMtx, ptWorldMousePos);
-}
-
-void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
-{
-	HyShape2d boundingShape;
-	glm::mat4 mtxShapeTransform;
-	ExtractTransform(boundingShape, mtxShapeTransform);
-
-	m_Transform.WrapTo(boundingShape, mtxShapeTransform, pCamera);
-	GetShapeCtrl().DeserializeOutline(pCamera);
-}
-
-void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)
-{
-	transformMtxOut = glm::identity<glm::mat4>();
-	switch(m_pEntityTreeItemData->GetType())
-	{
-	case ITEM_BoundingVolume:
-	case ITEM_AtlasFrame:
-	case ITEM_Primitive:
-	case ITEM_Text:
-	case ITEM_Spine:
-	case ITEM_Sprite:
-	case ITEM_Entity: {
-		IHyBody2d *pHyBody = static_cast<IHyBody2d *>(GetHyNode());
-		pHyBody->CalcLocalBoundingShape(boundingShapeOut);
-		transformMtxOut = GetHyNode()->GetSceneTransform(0.0f);
-		break; }
-
-	case ITEM_Audio:
-	default:
-		HyGuiLog("EntityItemDraw::ExtractTransform - unhandled child node type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
-		break;
-	}
-}
-
-void EntityDrawItem::ShowTransformCtrl(bool bShowGrabPoints)
-{
-	m_Transform.Show(bShowGrabPoints);
-}
-
-void EntityDrawItem::HideTransformCtrl()
-{
-	m_Transform.Hide();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, HyEntity2d *pParent) :
-	HyEntity2d(pParent)
-{
-	for(int i = 0; i < descArray.size(); ++i)
-	{
-		QJsonObject childObj = descArray[i].toObject();
-
-		ItemType eItemType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
-		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
-
-		switch(eItemType)
-		{
-		case ITEM_Primitive:
-			m_ChildPtrList.append(qMakePair(new HyPrimitive2d(this), eItemType));
-			break;
-
-		case ITEM_Audio: {
-			m_ChildPtrList.append(qMakePair(new HyAudio2d("", HY_GUI_DATAOVERRIDE, this), eItemType));
-
-			FileDataPair fileDataPair; static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
-			HyJsonDoc itemDataDoc;
-			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-				HyGuiLog("SubEntity ctor failed to parse " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
-
-			static_cast<IHyDrawable2d *>(m_ChildPtrList.back().first)->GuiOverrideData<HyAudioData>(itemDataDoc.GetObject());
-			break; }
-
-		case ITEM_Particles:
-			HyGuiLog("SubEntity ctor - Particles not implemented", LOGTYPE_Error);
-			break;
-
-		case ITEM_Text: {
-			m_ChildPtrList.append(qMakePair(new HyText2d("", HY_GUI_DATAOVERRIDE, this), eItemType));
-
-			FileDataPair fileDataPair; static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
-			HyJsonDoc itemDataDoc;
-			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-				HyGuiLog("SubEntity ctor failed to parse " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
-
-			static_cast<IHyDrawable2d *>(m_ChildPtrList.back().first)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject());
-			break; }
-
-		case ITEM_Spine: {
-			m_ChildPtrList.append(qMakePair(new HySpine2d("", HY_GUI_DATAOVERRIDE, this), eItemType));
-
-			FileDataPair fileDataPair; static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
-			HyJsonDoc itemDataDoc;
-			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-				HyGuiLog("SubEntity ctor failed to parse " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
-
-			static_cast<IHyDrawable2d *>(m_ChildPtrList.back().first)->GuiOverrideData<HySpineData>(itemDataDoc.GetObject());
-			break; }
-
-		case ITEM_Sprite: {
-			m_ChildPtrList.append(qMakePair(new HySprite2d("", HY_GUI_DATAOVERRIDE, this), eItemType));
-
-			FileDataPair fileDataPair; static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
-			HyJsonDoc itemDataDoc;
-			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-				HyGuiLog("SubEntity ctor failed to parse " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
-
-			static_cast<IHyDrawable2d *>(m_ChildPtrList.back().first)->GuiOverrideData<HySpriteData>(itemDataDoc.GetObject());
-			break; }
-
-		case ITEM_Prefab:
-			HyGuiLog("SubEntity ctor - Prefab not implemented", LOGTYPE_Error);
-			break;
-
-		case ITEM_Entity: {
-			FileDataPair fileDataPair; static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-			m_ChildPtrList.append(qMakePair(new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), this), eItemType));
-			break; }
-
-		case ITEM_AtlasFrame:
-			//uint32 uiAtlasFrameChecksum = static_cast<uint32>(childObj["assetChecksum"].toVariant().toLongLong());
-			m_ChildPtrList.append(qMakePair(new HyTexturedQuad2d(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum(), static_cast<IAssetItemData *>(pReferencedItemData)->GetBankId(), this), eItemType));
-			break;
-
-		default:
-			HyGuiLog("SubEntity ctor - unhandled child node type: " % HyGlobal::ItemName(eItemType, false), LOGTYPE_Error);
-			break;
-		}
-	}
-
-	SetState(0);
-}
-/*virtual*/ SubEntity::~SubEntity()
-{
-	for(int i = 0; i < m_ChildPtrList.size(); ++i)
-		delete m_ChildPtrList[i].first;
-}
-void SubEntity::RefreshProperties(const QList<QJsonObject> &propsObjList, float fElapsedTime)
-{
-	//for(int i = 0; i < m_ChildPtrList.size(); ++i)
-	//	ApplyExtrapolatedProperties(m_ChildPtrList[i].first, nullptr, m_ChildPtrList[i].second, false, propsObjList[i], fElapsedTime, nullptr);
-}
-// SubEntity
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
