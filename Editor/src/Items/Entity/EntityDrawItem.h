@@ -86,6 +86,8 @@ public:
 	SubEntity(Project &projectRef, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent);
 	virtual ~SubEntity();
 
+	void CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj);
+
 	void ExtrapolateChildProperties(const int iCURRENT_FRAME, HyCamera2d *pCamera);
 };
 

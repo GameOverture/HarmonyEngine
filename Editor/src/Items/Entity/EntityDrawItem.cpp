@@ -194,92 +194,20 @@ SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, const QJs
 
 	for(int i = 0; i < descArray.size(); ++i)
 	{
-		QJsonObject childObj = descArray[i].toObject();
-
-		ItemType eItemType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
-		IHyLoadable2d *pNewChild = nullptr;
-		switch(eItemType)
+		if(descArray[i].isObject())
 		{
-		case ITEM_Primitive:
-			pNewChild = new HyPrimitive2d(this);
-			break;
-
-		case ITEM_Audio:
-			pNewChild = new HyAudio2d("", HY_GUI_DATAOVERRIDE, this);
-			// TODO: how do we GuiOverrideData for audio?
-			//static_cast<HyAudio2d *>(pNewChild)->GuiOverrideData<HyAudioData>(itemDataDoc.GetObject());
-			break;
-
-		case ITEM_Particles:
-			HyGuiLog("SubEntity ctor - Particles not implemented", LOGTYPE_Error);
-			break;
-
-		case ITEM_Text: {
-			pNewChild = new HyText2d("", HY_GUI_DATAOVERRIDE, this);
-
-			TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
-			FileDataPair fileDataPair;
-			static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
-			HyJsonDoc itemDataDoc;
-			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-				HyGuiLog("SubEntity ctor failed to parse audio: " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
-
-			static_cast<HyText2d *>(pNewChild)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject());
-			break; }
-
-		case ITEM_Spine: {
-			pNewChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, this);
-
-			TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
-			FileDataPair fileDataPair;
-			static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
-			HyJsonDoc itemDataDoc;
-			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-				HyGuiLog("SubEntity ctor failed to parse audio: " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
-
-			static_cast<HySpine2d *>(pNewChild)->GuiOverrideData<HySpineData>(itemDataDoc.GetObject());
-			break; }
-
-		case ITEM_Sprite: {
-			pNewChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, this);
-
-			TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
-			FileDataPair fileDataPair;
-			static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
-			HyJsonDoc itemDataDoc;
-			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-				HyGuiLog("SubEntity ctor failed to parse audio: " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
-
-			static_cast<HySprite2d *>(pNewChild)->GuiOverrideData<HySpriteData>(itemDataDoc.GetObject());
-			break; }
-
-		case ITEM_Prefab:
-			HyGuiLog("SubEntity ctor - Prefab not implemented", LOGTYPE_Error);
-			break;
-
-		case ITEM_Entity: {
-			TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
-			FileDataPair fileDataPair;
-			static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-			pNewChild = new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), fileDataPair.m_Meta["stateArray"].toArray(), this);
-			break; }
-
-		case ITEM_AtlasFrame: {
-			TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
-			pNewChild = new HyTexturedQuad2d(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum(),
-											 static_cast<IAssetItemData *>(pReferencedItemData)->GetBankId(),
-											 this);
-			break; }
-
-		default:
-			HyGuiLog("SubEntity ctor - unhandled child node type: " % HyGlobal::ItemName(eItemType, false), LOGTYPE_Error);
-			break;
+			QJsonObject childObj = descArray[i].toObject();
+			CtorInitJsonObj(projectRef, uuidChildMap, childObj);
 		}
-		m_ChildTypeList.append(QPair<IHyLoadable2d *, ItemType>(pNewChild, eItemType));
-		uuidChildMap.insert(QUuid(childObj["UUID"].toString()), pNewChild);
+		else // isArray()
+		{
+			QJsonArray childArray = descArray[i].toArray();
+			for(int i = 0; i < childArray.size(); ++i)
+			{
+				QJsonObject childObj = childArray[i].toObject();
+				CtorInitJsonObj(projectRef, uuidChildMap, childObj);
+			}
+		}
 	}
 
 	for(int i = 0; i < stateArray.size(); ++i)
@@ -315,6 +243,95 @@ SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, const QJs
 	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
 		delete childTypePair.first;
 }
+void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj)
+{
+	ItemType eItemType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
+	IHyLoadable2d *pNewChild = nullptr;
+	switch(eItemType)
+	{
+	case ITEM_Primitive:
+		pNewChild = new HyPrimitive2d(this);
+		break;
+
+	case ITEM_Audio:
+		pNewChild = new HyAudio2d("", HY_GUI_DATAOVERRIDE, this);
+		// TODO: how do we GuiOverrideData for audio?
+		//static_cast<HyAudio2d *>(pNewChild)->GuiOverrideData<HyAudioData>(itemDataDoc.GetObject());
+		break;
+
+	case ITEM_Particles:
+		HyGuiLog("SubEntity ctor - Particles not implemented", LOGTYPE_Error);
+		break;
+
+	case ITEM_Text: {
+		pNewChild = new HyText2d("", HY_GUI_DATAOVERRIDE, this);
+
+		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+		FileDataPair fileDataPair;
+		static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+		QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+		HyJsonDoc itemDataDoc;
+		if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+			HyGuiLog("SubEntity ctor failed to parse audio: " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
+
+		static_cast<HyText2d *>(pNewChild)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject());
+		break; }
+
+	case ITEM_Spine: {
+		pNewChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, this);
+
+		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+		FileDataPair fileDataPair;
+		static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+		QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+		HyJsonDoc itemDataDoc;
+		if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+			HyGuiLog("SubEntity ctor failed to parse audio: " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
+
+		static_cast<HySpine2d *>(pNewChild)->GuiOverrideData<HySpineData>(itemDataDoc.GetObject());
+		break; }
+
+	case ITEM_Sprite: {
+		pNewChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, this);
+
+		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+		FileDataPair fileDataPair;
+		static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+		QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+		HyJsonDoc itemDataDoc;
+		if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+			HyGuiLog("SubEntity ctor failed to parse audio: " % HyGlobal::ItemName(eItemType, false) % " JSON data", LOGTYPE_Error);
+
+		static_cast<HySprite2d *>(pNewChild)->GuiOverrideData<HySpriteData>(itemDataDoc.GetObject());
+		break; }
+
+	case ITEM_Prefab:
+		HyGuiLog("SubEntity ctor - Prefab not implemented", LOGTYPE_Error);
+		break;
+
+	case ITEM_Entity: {
+		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+		FileDataPair fileDataPair;
+		static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
+		pNewChild = new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), fileDataPair.m_Meta["stateArray"].toArray(), this);
+		break; }
+
+	case ITEM_AtlasFrame: {
+		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+		pNewChild = new HyTexturedQuad2d(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum(),
+			static_cast<IAssetItemData *>(pReferencedItemData)->GetBankId(),
+			this);
+		break; }
+
+	default:
+		HyGuiLog("SubEntity ctor - unhandled child node type: " % HyGlobal::ItemName(eItemType, false), LOGTYPE_Error);
+		break;
+	}
+	m_ChildTypeList.append(QPair<IHyLoadable2d *, ItemType>(pNewChild, eItemType));
+	uuidChildMapRef.insert(QUuid(childObj["UUID"].toString()), pNewChild);
+
+	pNewChild->Load();
+}
 void SubEntity::ExtrapolateChildProperties(const int iCURRENT_FRAME, HyCamera2d *pCamera)
 {
 	const float fFRAME_DURATION = 1.0f / m_StateInfoList[GetState()].m_iFramesPerSecond;
@@ -343,6 +360,9 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 	// Tween Special Case:
 	// To determine the tween's current value, store the info that kicked it off, and extrapolate the based on Entity's 'iCURRENT_FRAME'
 	TweenInfo tweenInfo[NUM_TWEENPROPS];// = { PROPERTIESTYPE_vec2, PROPERTIESTYPE_double, PROPERTIESTYPE_vec2, PROPERTIESTYPE_double };
+
+	if(eItemType == ITEM_Entity)
+		static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(iCURRENT_FRAME, pCamera);
 
 	for(int iFrame : keyFrameMapRef.keys())
 	{
@@ -460,10 +480,10 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 		switch(eItemType)
 		{
 		case ITEM_Entity:
-			// Call ExtrapolateProperties recursively on all pThisHyNode's children
-			static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(iCURRENT_FRAME, pCamera);
+		//	// Call ExtrapolateProperties recursively on all pThisHyNode's children
+		//	static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(iCURRENT_FRAME, pCamera);
 
-			// "Physics" category doesn't need to be set
+		//	// "Physics" category doesn't need to be set
 			break;
 
 		case ITEM_Primitive: {
