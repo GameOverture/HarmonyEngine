@@ -12,7 +12,6 @@
 #include "EntityModel.h"
 #include "EntityWidget.h"
 #include "EntityDraw.h"
-#include "EntityUndoCmds.h"
 
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneHoverEvent>
@@ -144,81 +143,10 @@ void GraphicsKeyFrameItem::SetTweenLineLength(qreal fLength)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-EntityDopeSheetScene::AuxWidgetsModel::AuxWidgetsModel(EntityDopeSheetScene &dopeSheetSceneRef, int iFramesPerSecond, bool bAutoInitialize) :
-	m_DopeSheetSceneRef(dopeSheetSceneRef),
-	m_iFramesPerSecond(iFramesPerSecond),
-	m_bAutoInitialize(bAutoInitialize)
-{
-	if(m_iFramesPerSecond <= 0)
-		m_iFramesPerSecond = 60;
-	dataChanged(index(0, 0), index(0, NUM_AUXDOPEWIDGETSECTIONS - 1));
-}
 
-/*virtual*/ int EntityDopeSheetScene::AuxWidgetsModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/
-{
-	return 1;
-}
-
-/*virtual*/ int EntityDopeSheetScene::AuxWidgetsModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/
-{
-	return NUM_AUXDOPEWIDGETSECTIONS;
-}
-
-/*virtual*/ QVariant EntityDopeSheetScene::AuxWidgetsModel::data(const QModelIndex &modelIndex, int role /*= Qt::DisplayRole*/) const /*override*/
-{
-	if(role == Qt::UserRole || role == Qt::EditRole)
-	{
-		if(modelIndex.column() == AUXDOPEWIDGETSECTION_FramesPerSecond)
-			return QVariant(m_iFramesPerSecond);
-		else
-			return QVariant(m_bAutoInitialize);
-	}
-	return QVariant();
-}
-
-/*virtual*/ bool EntityDopeSheetScene::AuxWidgetsModel::setData(const QModelIndex &modelIndex, const QVariant &value, int role /*= Qt::EditRole*/) /*override*/
-{
-	if(role == Qt::EditRole)
-	{
-		if(modelIndex.column() == AUXDOPEWIDGETSECTION_FramesPerSecond)
-		{
-			if(m_iFramesPerSecond == value.toInt())
-				return false;
-
-			EntityUndoCmd_FramesPerSecond *pCmd = new EntityUndoCmd_FramesPerSecond(m_DopeSheetSceneRef, value.toInt());
-			m_DopeSheetSceneRef.GetStateData()->GetModel().GetItem().GetUndoStack()->push(pCmd);
-		}
-		else if(modelIndex.column() == AUXDOPEWIDGETSECTION_AutoInitialize)
-		{
-			if(m_bAutoInitialize == value.toBool())
-				return false;
-
-			EntityUndoCmd_AutoInitialize *pCmd = new EntityUndoCmd_AutoInitialize(m_DopeSheetSceneRef, value.toBool());
-			m_DopeSheetSceneRef.GetStateData()->GetModel().GetItem().GetUndoStack()->push(pCmd);
-		}
-
-		return false;
-	}
-	if(role == Qt::UserRole) // This occurs from the above undo commands
-	{
-		if(modelIndex.column() == AUXDOPEWIDGETSECTION_FramesPerSecond)
-			m_iFramesPerSecond = value.toInt();
-		else if(modelIndex.column() == AUXDOPEWIDGETSECTION_AutoInitialize)
-			m_bAutoInitialize = value.toBool();
-		else
-			return false;
-
-		dataChanged(modelIndex, modelIndex);
-		m_DopeSheetSceneRef.RefreshAllGfxItems();
-		return true;
-	}
-	return QAbstractTableModel::setData(modelIndex, value, role);
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj) :
 	QGraphicsScene(),
 	m_pEntStateData(pStateData),
-	m_AuxWidgetsModel(*this, metaFileObj["framesPerSecond"].toInt(60), metaFileObj["autoInitialize"].toBool(true)),
 	m_iCurrentFrame(0)
 {
 	QJsonObject keyFramesObj = metaFileObj["keyFrames"].toObject();
@@ -268,21 +196,6 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 EntityStateData *EntityDopeSheetScene::GetStateData() const
 {
 	return m_pEntStateData;
-}
-
-QAbstractItemModel *EntityDopeSheetScene::GetAuxWidgetsModel()
-{
-	return &m_AuxWidgetsModel;
-}
-
-int EntityDopeSheetScene::GetFramesPerSecond() const
-{
-	return m_AuxWidgetsModel.data(m_AuxWidgetsModel.index(0, AUXDOPEWIDGETSECTION_FramesPerSecond), Qt::UserRole).toInt();
-}
-
-bool EntityDopeSheetScene::IsAutoInitialize() const
-{
-	return m_AuxWidgetsModel.data(m_AuxWidgetsModel.index(0, AUXDOPEWIDGETSECTION_AutoInitialize), Qt::UserRole).toBool();
 }
 
 int EntityDopeSheetScene::GetCurrentFrame() const
@@ -516,6 +429,27 @@ QJsonValue EntityDopeSheetScene::ExtrapolateKeyFrameProperty(EntityTreeItemData 
 	}
 
 	return QJsonValue();
+}
+
+QMap<int, QMap<EntityTreeItemData *, QJsonObject>> EntityDopeSheetScene::GetKeyFrameMapPropertiesByFrame() const
+{
+	QMap<int, QMap<EntityTreeItemData *, QJsonObject>> keyFrameMapPropertiesByFrame;
+
+	for(auto iterItem = m_KeyFramesMap.begin(); iterItem != m_KeyFramesMap.end(); ++iterItem)
+	{
+		EntityTreeItemData *pItemData = iterItem.key();
+		const QMap<int, QJsonObject> &itemKeyFrameMapRef = iterItem.value();
+		for(auto iterKeyFrame = itemKeyFrameMapRef.begin(); iterKeyFrame != itemKeyFrameMapRef.end(); ++iterKeyFrame)
+		{
+			int iFrameIndex = iterKeyFrame.key();
+			const QJsonObject &keyFrameObjRef = iterKeyFrame.value();
+			if(keyFrameMapPropertiesByFrame.contains(iFrameIndex) == false)
+				keyFrameMapPropertiesByFrame.insert(iFrameIndex, QMap<EntityTreeItemData *, QJsonObject>());
+			keyFrameMapPropertiesByFrame[iFrameIndex].insert(pItemData, keyFrameObjRef);
+		}
+	}
+
+	return keyFrameMapPropertiesByFrame;
 }
 
 void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj)
@@ -849,7 +783,7 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 
 						// Calculate the dash-line "Duration"
 						double dDuration = GetKeyFrameProperty(pCurItemData, iFrameIndex, "Tween " % propPair.second, "Duration").toDouble();
-						qreal fLineLength = (dDuration * GetFramesPerSecond()) * TIMELINE_NOTCH_SUBLINES_WIDTH;
+						qreal fLineLength = (dDuration * static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetFramesPerSecond()) * TIMELINE_NOTCH_SUBLINES_WIDTH;
 						if(bPropKeyFrame)
 							fLineLength -= (KEYFRAME_WIDTH + 1.0f);
 						m_TweenGfxRectMap[gfxRectMapKey]->SetTweenLineLength(fLineLength);

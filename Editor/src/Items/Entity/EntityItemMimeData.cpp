@@ -35,7 +35,7 @@ EntityItemMimeData::EntityItemMimeData(ProjectItemData &entityRef, QList<EntityT
 			EntityStateData *pStateData = static_cast<EntityStateData *>(entityRef.GetModel()->GetStateData(iStateIndex));
 			QJsonObject stateObj;
 			stateObj.insert("name", pStateData->GetName());
-			stateObj.insert("framesPerSecond", pStateData->GetDopeSheetScene().GetFramesPerSecond());
+			stateObj.insert("framesPerSecond", static_cast<EntityModel *>(entityRef.GetModel())->GetFramesPerSecond());
 			stateObj.insert("keyFrames", pStateData->GetDopeSheetScene().SerializeAllKeyFrames(itemListRef[i]));// GetPropertiesTreeModel(itemListRef[i])->SerializeJson();
 
 			stateKeyFramesArray.append(stateObj);

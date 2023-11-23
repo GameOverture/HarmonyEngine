@@ -93,19 +93,19 @@ QString EntityTreeItemData::GetHyNodeTypeName() const
 {
 	switch(m_eTYPE)
 	{
-	case ITEM_Primitive:		return "HyPrimitive2d";
-	case ITEM_Audio:			return "HyAudio2d";
-	case ITEM_Text:				return "HyText2d";
-	case ITEM_Spine:			return "HySpine2d";
-	case ITEM_Sprite:			return "HySprite2d";
-	case ITEM_AtlasFrame:		return "HyTexturedQuad2d";
-	case ITEM_BoundingVolume:	return "HyShape2d";
+	case ITEM_Primitive:		return "HyPrimitive2d\t\t\t";
+	case ITEM_Audio:			return "HyAudio2d\t\t\t\t";
+	case ITEM_Text:				return "HyText2d\t\t\t\t";
+	case ITEM_Spine:			return "HySpine2d\t\t\t\t";
+	case ITEM_Sprite:			return "HySprite2d\t\t\t\t";
+	case ITEM_AtlasFrame:		return "HyTexturedQuad2d\t\t";
+	case ITEM_BoundingVolume:	return "HyShape2d\t\t\t\t";
 	
 	case ITEM_Entity:
 		if(m_sPromotedEntityType.isEmpty() == false)
 			return m_sPromotedEntityType;
 		else
-			return "HyEntity2d";
+			return "HyEntity2d\t\t\t\t";
 
 	case ITEM_SoundClip:
 	case ITEM_Prefab:
@@ -165,217 +165,7 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 
 // NOTE: The listed 3 functions below share logic that process all item properties. Any updates should reflect to all of them
 //             - EntityTreeItemData::InitalizePropertyModel
-//             - EntityTreeItemData::GenerateStateSrc
-//             - EntityDrawItem::SetHyNode
-QString EntityTreeItemData::GenerateStateSrc(uint32 uiStateIndex, QString sNewLine, bool &bActivatePhysicsOut, uint32 &uiMaxVertListSizeOut)
-{
-	
-	return "";
-	// TODO: Rewrite this function
-	PropertiesTreeModel *pPropertiesModel = nullptr;// &GetPropertiesModel(/*uiStateIndex*/);
-	if(pPropertiesModel == nullptr)
-	{
-		HyGuiLog("EntityTreeItemData::GenerateStateSrc() - pPropertiesModel is nullptr", LOGTYPE_Error);
-		return QString();
-	}
-
-	QString sCodeName;
-	if(m_eEntType != ENTTYPE_Root)
-	{
-		if(IsForwardDeclared())
-			sCodeName = GetCodeName() + "->";
-		else
-			sCodeName = GetCodeName() + ".";
-	}
-	
-	QString sSrc;
-	
-	std::function<void(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)> fpForEach = [&](QString sCategoryName, QString sPropertyName, const QVariant &valueRef)
-	{
-		if(sCategoryName == "Common")
-		{
-			if(sPropertyName == "State")
-				sSrc += sCodeName + "SetState(" + QString::number(valueRef.toInt()) + ");" + sNewLine;
-			else if(sPropertyName == "Update During Paused")
-				sSrc += sCodeName + "SetPauseUpdate(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
-			else if(sPropertyName == "User Tag")
-			{
-				sSrc += "#ifdef HY_ENABLE_USER_TAGS" + sNewLine;
-				sSrc += sCodeName + "SetTag(" + QString::number(valueRef.toLongLong()) + ");" + sNewLine;
-				sSrc += "#endif" + sNewLine;
-			}
-		}
-		else if(sCategoryName == "Transformation")
-		{
-			if(sPropertyName == "Position")
-				sSrc += sCodeName + "pos.Set(" + QString::number(valueRef.toPointF().x(), 'f') + "f, " + QString::number(valueRef.toPointF().y(), 'f') + "f);" + sNewLine;
-			else if(sPropertyName == "Scale")
-				sSrc += sCodeName + "scale.Set(" + QString::number(valueRef.toPointF().x(), 'f') + "f, " + QString::number(valueRef.toPointF().y(), 'f') + "f);" + sNewLine;
-			else if(sPropertyName == "Rotation")
-				sSrc += sCodeName + "rot.Set(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
-		}
-		else if(sCategoryName == "Body")
-		{
-			if(sPropertyName == "Visible")
-				sSrc += sCodeName + "SetVisible(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
-			else if(sPropertyName == "Color Tint")
-				sSrc += sCodeName + "SetTint(HyColor(" + QString::number(valueRef.toRect().left()) + ", " + QString::number(valueRef.toRect().top()) + ", " + QString::number(valueRef.toRect().width()) + "));" + sNewLine;
-			else if(sPropertyName == "Alpha")
-				sSrc += sCodeName + "alpha.Set(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
-			else if(sPropertyName == "Override Display Order")
-				sSrc += sCodeName + "SetDisplayOrder(" + QString::number(valueRef.toInt()) + ");" + sNewLine;
-		}
-		else if(sCategoryName == "Physics") // NOTE: This is only from the 'root' node (aka *this entity)
-		{
-			// TODO: _checked doesn't exist anymore. The category will simply just be present or not
-
-			if(sPropertyName == "Physics_checked") // NOTE: We can rely on *_checked to be the first property in the category
-			{
-				if(valueRef.toBool() == false)
-					sSrc += "physics.Deactivate();" + sNewLine;
-			}
-			else if(sPropertyName == "Start Activated")
-				bActivatePhysicsOut = valueRef.toBool();
-			else if(sPropertyName == "Type")
-				sSrc += "physics.SetType(static_cast<HyBodyType>(" + QString::number(valueRef.toInt()) + "));" + sNewLine;
-			else if(sPropertyName == "Fixed Rotation")
-				sSrc += "physics.SetFixedRotation(" + (valueRef.toBool() ? QString("true);") : QString("false);")) + sNewLine;
-			else if(sPropertyName == "Initially Awake")
-				sSrc += "physics.SetAwake(" + (valueRef.toBool() ? QString("true);") : QString("false);")) + sNewLine;
-			else if(sPropertyName == "Allow Sleep")
-				sSrc += "physics.SetSleepingAllowed(" + (valueRef.toBool() ? QString("true);") : QString("false);")) + sNewLine;
-			else if(sPropertyName == "Gravity Scale")
-				sSrc += "physics.SetGravityScale(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
-			else if(sPropertyName == "Dynamic CCD")
-				sSrc += "physics.SetCcd(" + (valueRef.toBool() ? QString("true);") : QString("false);")) + sNewLine;
-			else if(sPropertyName == "Linear Damping")
-				sSrc += "physics.SetLinearDamping(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
-			else if(sPropertyName == "Angular Damping")
-				sSrc += "physics.SetAngularDamping(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
-			else if(sPropertyName == "Linear Velocity")
-				sSrc += "physics.SetVel(" + QString::number(valueRef.toPointF().x(), 'f') + "f, " + QString::number(valueRef.toPointF().y(), 'f') + "f);" + sNewLine;
-			else if(sPropertyName == "Angular Velocity")
-				sSrc += "physics.SetAngVel(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
-		}
-		else if(sCategoryName == "Primitive")
-		{
-			if(sPropertyName == "Wireframe")
-				sSrc += sCodeName + "SetWireframe(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
-			else if(sPropertyName == "Line Thickness")
-				sSrc += sCodeName + "SetLineThickness(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
-		}
-		else if(sCategoryName == "Shape")
-		{
-			if(sPropertyName == "Data")
-			{
-				EditorShape eShapeType = HyGlobal::GetShapeFromString(pPropertiesModel->FindPropertyValue("Shape", "Type").toString());
-				sSrc += ShapeCtrl::DeserializeAsRuntimeCode(sCodeName, eShapeType, valueRef.toString(), sNewLine, uiMaxVertListSizeOut);
-			}
-		}
-		else if(sCategoryName == "Fixture")
-		{
-			// TODO: _checked doesn't exist anymore. The category will simply just be present or not
-
-			if(sPropertyName == "Fixture_checked") // NOTE: We can rely on *_checked to be the first property in the category
-				sSrc += sCodeName + "SetFixtureAllowed(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
-			else if(sPropertyName == "Density")
-				sSrc += sCodeName + "SetDensity(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
-			else if(sPropertyName == "Friction")
-				sSrc += sCodeName + "SetFriction(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
-			else if(sPropertyName == "Restitution")
-				sSrc += sCodeName + "SetRestitution(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
-			else if(sPropertyName == "Restitution Threshold")
-				sSrc += sCodeName + "SetRestitutionThreshold(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
-			else if(sPropertyName == "Sensor")
-				sSrc += sCodeName + "SetSensor(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
-			else if(sPropertyName == "Filter: Category Mask")
-			{
-				uint16 iCategory = static_cast<uint16>(valueRef.toInt());
-				uint16 iMask = static_cast<uint16>(pPropertiesModel->FindPropertyValue("Fixture", "Filter: Collision Mask").toInt());
-				uint16 iGroup = static_cast<uint16>(pPropertiesModel->FindPropertyValue("Fixture", "Filter: Group Override").toInt());
-				sSrc += sCodeName + "SetFilter([](){ b2Filter filter; filter.categoryBits = " + QString::number(iCategory) + "; filter.maskBits = " + QString::number(iMask) + "; filter.groupIndex = " + QString::number(iGroup) + "; return filter; }());" + sNewLine;
-			}
-		}
-		else if(sCategoryName == "Sprite")
-		{
-			if(sPropertyName == "Frame")
-				sSrc += sCodeName + "SetFrame(" + QString::number(valueRef.toInt()) + ");" + sNewLine;
-			else if(sPropertyName == "Anim Rate")
-				sSrc += sCodeName + "SetAnimRate(" + QString::number(valueRef.toDouble(), 'f') + "f);" + sNewLine;
-			else if(sPropertyName == "Anim Paused")
-				sSrc += sCodeName + "SetAnimPause(" + (valueRef.toBool() ? "true" : "false") + ");" + sNewLine;
-			else if(sPropertyName == "Anim Loop")
-				sSrc += sCodeName + "SetAnimCtrl(" + (valueRef.toBool() ? "HYANIMCTRL_Loop" : "HYANIMCTRL_DontLoop") + ");" + sNewLine;
-			else if(sPropertyName == "Anim Reverse")
-				sSrc += sCodeName + "SetAnimCtrl(" + (valueRef.toBool() ? "HYANIMCTRL_Reverse" : "HYANIMCTRL_DontReverse") + ");" + sNewLine;
-			else if(sPropertyName == "Anim Bounce")
-				sSrc += sCodeName + "SetAnimCtrl(" + (valueRef.toBool() ? "HYANIMCTRL_Bounce" : "HYANIMCTRL_DontBounce") + ");" + sNewLine;
-		}
-		else if(sCategoryName == "Text")
-		{
-			if(sPropertyName == "Text")
-				sSrc += sCodeName + "SetText(\"" + valueRef.toString() + "\");" + sNewLine;
-			else if(sPropertyName == "Style")
-			{
-				QPointF vStyleDimensions = pPropertiesModel->FindPropertyValue("Text", "Style Dimensions").toPointF();
-				switch(HyGlobal::GetTextStyleFromString(valueRef.toString()))
-				{
-				case TEXTSTYLE_Line:				sSrc += sCodeName + "SetAsLine();" + sNewLine; break;
-				case TEXTSTYLE_Column:				sSrc += sCodeName + "SetAsColumn(" + QString::number(vStyleDimensions.x(), 'f') + "f);" + sNewLine; break;
-				case TEXTSTYLE_ScaleBox:			sSrc += sCodeName + "SetAsScaleBox(" + QString::number(vStyleDimensions.x(), 'f') + "f, " + QString::number(vStyleDimensions.y(), 'f') + "f, true);" + sNewLine; break;
-				case TEXTSTYLE_ScaleBoxTopAlign:	sSrc += sCodeName + "SetAsScaleBox(" + QString::number(vStyleDimensions.x(), 'f') + "f, " + QString::number(vStyleDimensions.y(), 'f') + "f, false);" + sNewLine; break;
-				case TEXTSTYLE_Vertical:			sSrc += sCodeName + "SetAsVertical();" + sNewLine; break;
-				}
-			}
-		}
-	};
-
-	// 'Foreach' property
-	for(int i = 0; i < pPropertiesModel->GetNumCategories(); ++i)
-	{
-		QString sCategoryName = pPropertiesModel->GetCategoryName(i);
-
-		if(pPropertiesModel->IsCategoryCheckable(i))
-		{
-			// TODO: _checked doesn't exist anymore. The category will simply just be present or not
-			
-			// Logic elsewhere relies on _checked being the first property in the category
-			bool bIsChecked = pPropertiesModel->IsCategoryEnabled(sCategoryName);
-			fpForEach(sCategoryName, sCategoryName % "_checked", bIsChecked);
-
-			if(bIsChecked == false)
-				continue;
-		}
-
-		for(int j = 0; j < pPropertiesModel->GetNumProperties(i); ++j)
-		{
-			QString sPropertyName = pPropertiesModel->GetPropertyName(i, j);
-
-			// TODO: This isn't needed if this function is passed delta keyframes
-
-			//// Only invoke 'fpForEach' if the value is different from the default value in every state's properties
-			//bool bIsDefault = true;
-			//for(int iStateIndex = 0; iStateIndex < m_EntityModelRef.GetNumStates(); ++iStateIndex)
-			//{
-			//	PropertiesTreeModel *pTestPropertiesModel = GetPropertiesModel(iStateIndex);
-			//	if(pTestPropertiesModel->IsPropertyDefaultValue(i, j) == false)
-			//	{
-			//		bIsDefault = false;
-			//		break;
-			//	}
-			//}
-
-			//if(bIsDefault == false)
-				fpForEach(sCategoryName, sPropertyName, pPropertiesModel->GetPropertyValue(i, j));
-		}
-	}
-
-	return sSrc;
-}
-
-// NOTE: The listed 3 functions below share logic that process all item properties. Any updates should reflect to all of them
-//             - EntityTreeItemData::InitalizePropertyModel
-//             - EntityTreeItemData::GenerateStateSrc
+//             - EntityModel::GenerateSrc_SetStateImpl
 //             - EntityDrawItem::SetHyNode
 void EntityTreeItemData::InitalizePropertyModel()
 {
@@ -415,7 +205,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		if(GetEntType() == ENTTYPE_Root)
 		{
 			m_pPropertiesModel->AppendCategory("Physics", QVariant(), true, "Optionally create a physics component that can affect the transformation of this entity");
-			m_pPropertiesModel->AppendProperty("Physics", "Activate", PROPERTIESTYPE_bool, Qt::Checked, "This entity will begin its physics simulation", PROPERTIESACCESS_ToggleOff);
+			m_pPropertiesModel->AppendProperty("Physics", "Activate/Deactivate", PROPERTIESTYPE_bool, Qt::Checked, "This entity will begin its physics simulation", PROPERTIESACCESS_ToggleOff);
 			m_pPropertiesModel->AppendProperty("Physics", "Type", PROPERTIESTYPE_ComboBoxInt, 0, "A static body does not move. A kinematic body moves only by forces. A dynamic body moves by forces and collision (fully simulated)", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Static" << "Kinematic" << "Dynamic");
 			m_pPropertiesModel->AppendProperty("Physics", "Fixed Rotation", PROPERTIESTYPE_bool, Qt::Unchecked, "Prevents this body from rotating if checked. Useful for characters", PROPERTIESACCESS_ToggleOff);
 			m_pPropertiesModel->AppendProperty("Physics", "Initially Awake", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to make body initially awake. Start sleeping otherwise", PROPERTIESACCESS_ToggleOff);
@@ -467,7 +257,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_Sprite:
 		m_pPropertiesModel->AppendCategory("Sprite", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
 		m_pPropertiesModel->AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
-		m_pPropertiesModel->AppendProperty("Sprite", "Anim Paused", PROPERTIESTYPE_bool, false, "The current state's animation starts paused", PROPERTIESACCESS_ToggleOff);
+		m_pPropertiesModel->AppendProperty("Sprite", "Anim Pause", PROPERTIESTYPE_bool, false, "The current state's animation starts paused", PROPERTIESACCESS_ToggleOff);
 		m_pPropertiesModel->AppendProperty("Sprite", "Anim Rate", PROPERTIESTYPE_double, 1.0, "The animation rate modifier", PROPERTIESACCESS_ToggleOff, 0.0, fRANGE, 0.1);
 		m_pPropertiesModel->AppendProperty("Sprite", "Anim Loop", PROPERTIESTYPE_bool, false, "Override whatever the sprite's loop flag is, and make the animation loop (check) or don't loop (uncheck)", PROPERTIESACCESS_ToggleOff);
 		m_pPropertiesModel->AppendProperty("Sprite", "Anim Reverse", PROPERTIESTYPE_bool, false, "Override whatever the sprite's reverse flag is, and make the animation play in reverse (checked) or don't play in reverse (uncheck)", PROPERTIESACCESS_ToggleOff);

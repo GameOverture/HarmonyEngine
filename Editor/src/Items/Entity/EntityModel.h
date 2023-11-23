@@ -41,6 +41,7 @@ public:
 	virtual ~EntityStateData();
 
 	EntityDopeSheetScene &GetDopeSheetScene();
+	const EntityDopeSheetScene &GetDopeSheetScene() const;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class EntityModel : public IModel
@@ -50,11 +51,31 @@ class EntityModel : public IModel
 	EntityTreeModel											m_TreeModel;
 	bool													m_bVertexEditMode;
 
+	// This 'AuxWidgetsModel' is used to map (QDataWidgetMapper) to the widgets in AuxDopeSheet. It also contains the data for the widgets
+	class AuxWidgetsModel : public QAbstractTableModel
+	{
+		EntityModel &										m_EntityModelRef;
+		int													m_iFramesPerSecond;
+		bool 												m_bAutoInitialize;
+	public:
+		AuxWidgetsModel(EntityModel &entityModelRef, int iFramesPerSecond, bool bAutoInitialize);
+		virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+		virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+		virtual QVariant data(const QModelIndex &modelIndex, int role = Qt::DisplayRole) const override;
+		virtual bool setData(const QModelIndex &modelIndex, const QVariant &value, int role = Qt::EditRole) override;
+	};
+	AuxWidgetsModel											m_AuxWidgetsModel;
+
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
 	EntityTreeModel &GetTreeModel();
+
+	QAbstractItemModel *GetAuxWidgetsModel();
+
+	int GetFramesPerSecond() const;
+	bool IsAutoInitialize() const;
 
 	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from UndoCmd's
 	QList<EntityTreeItemData *> Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow);
@@ -79,7 +100,8 @@ public:
 	QString GenerateSrc_MemberVariables() const;
 	QString GenerateSrc_MemberInitializerList() const;
 	QString GenerateSrc_Ctor() const;
-	QString GenerateSrc_SetStates() const;
+	QString GenerateSrc_SetStateImpl() const;
+	QString GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJsonObject propObj, QString sNewLine) const;
 
 	virtual void OnPopState(int iPoppedStateIndex) override;
 	virtual bool OnPrepSave() override;

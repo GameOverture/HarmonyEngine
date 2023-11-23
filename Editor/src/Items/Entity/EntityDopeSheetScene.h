@@ -101,21 +101,6 @@ class EntityDopeSheetScene : public QGraphicsScene
 {
 	EntityStateData *																m_pEntStateData;
 
-	// This 'AuxWidgetsModel' is used to map (QDataWidgetMapper) to the widgets in AuxDopeSheet. It also contains the data for the widgets
-	class AuxWidgetsModel : public QAbstractTableModel
-	{
-		EntityDopeSheetScene &														m_DopeSheetSceneRef;
-		int																			m_iFramesPerSecond;
-		bool 																		m_bAutoInitialize;
-	public:
-		AuxWidgetsModel(EntityDopeSheetScene &dopeSheetSceneRef, int iFramesPerSecond, bool bAutoInitialize);
-		virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-		virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-		virtual QVariant data(const QModelIndex &modelIndex, int role = Qt::DisplayRole) const override;
-		virtual bool setData(const QModelIndex &modelIndex, const QVariant &value, int role = Qt::EditRole) override;
-	};
-	AuxWidgetsModel																	m_AuxWidgetsModel;
-
 	// These maps store the actual property data for the entire entity
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;		// Store properties and tween values
 	QMap<int, QString>																m_CallbackMap;
@@ -134,11 +119,6 @@ public:
 
 	EntityStateData *GetStateData() const;
 
-	QAbstractItemModel *GetAuxWidgetsModel();
-
-	int GetFramesPerSecond() const;
-	bool IsAutoInitialize() const;
-
 	int GetCurrentFrame() const;
 	void SetCurrentFrame(int iFrameIndex);
 
@@ -156,6 +136,7 @@ public:
 	QJsonObject ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData) const;
 	QJsonValue GetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const;
 	QJsonValue ExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, QString sCategoryName, QString sPropName) const;
+	QMap<int, QMap<EntityTreeItemData *, QJsonObject>> GetKeyFrameMapPropertiesByFrame() const;
 
 	void SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj);
 	bool SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue, bool bRefreshGfxItems);

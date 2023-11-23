@@ -17,6 +17,7 @@
 #include "EntityItemMimeData.h"
 #include "IAssetItemData.h"
 #include "SourceModel.h"
+#include "EntityUndoCmds.h"
 
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData),
@@ -29,6 +30,11 @@ EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair
 }
 
 EntityDopeSheetScene &EntityStateData::GetDopeSheetScene()
+{
+	return m_DopeSheetScene;
+}
+
+const EntityDopeSheetScene &EntityStateData::GetDopeSheetScene() const
 {
 	return m_DopeSheetScene;
 }
@@ -49,12 +55,84 @@ EntityDopeSheetScene &EntityStateData::GetDopeSheetScene()
 //}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+EntityModel::AuxWidgetsModel::AuxWidgetsModel(EntityModel &entityModelRef, int iFramesPerSecond, bool bAutoInitialize) :
+	m_EntityModelRef(entityModelRef),
+	m_iFramesPerSecond(iFramesPerSecond),
+	m_bAutoInitialize(bAutoInitialize)
+{
+	if(m_iFramesPerSecond <= 0)
+		m_iFramesPerSecond = 60;
+	dataChanged(index(0, 0), index(0, NUM_AUXDOPEWIDGETSECTIONS - 1));
+}
+
+/*virtual*/ int EntityModel::AuxWidgetsModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/
+{
+	return 1;
+}
+
+/*virtual*/ int EntityModel::AuxWidgetsModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const /*override*/
+{
+	return NUM_AUXDOPEWIDGETSECTIONS;
+}
+
+/*virtual*/ QVariant EntityModel::AuxWidgetsModel::data(const QModelIndex &modelIndex, int role /*= Qt::DisplayRole*/) const /*override*/
+{
+	if(role == Qt::UserRole || role == Qt::EditRole)
+	{
+		if(modelIndex.column() == AUXDOPEWIDGETSECTION_FramesPerSecond)
+			return QVariant(m_iFramesPerSecond);
+		else
+			return QVariant(m_bAutoInitialize);
+	}
+	return QVariant();
+}
+
+/*virtual*/ bool EntityModel::AuxWidgetsModel::setData(const QModelIndex &modelIndex, const QVariant &value, int role /*= Qt::EditRole*/) /*override*/
+{
+	if(role == Qt::EditRole)
+	{
+		if(modelIndex.column() == AUXDOPEWIDGETSECTION_FramesPerSecond)
+		{
+			if(m_iFramesPerSecond == value.toInt())
+				return false;
+
+			EntityUndoCmd_FramesPerSecond *pCmd = new EntityUndoCmd_FramesPerSecond(m_EntityModelRef, value.toInt());
+			m_EntityModelRef.GetItem().GetUndoStack()->push(pCmd);
+		}
+		else if(modelIndex.column() == AUXDOPEWIDGETSECTION_AutoInitialize)
+		{
+			if(m_bAutoInitialize == value.toBool())
+				return false;
+
+			EntityUndoCmd_AutoInitialize *pCmd = new EntityUndoCmd_AutoInitialize(m_EntityModelRef, value.toBool());
+			m_EntityModelRef.GetItem().GetUndoStack()->push(pCmd);
+		}
+
+		return false;
+	}
+	if(role == Qt::UserRole) // This occurs from the above undo commands
+	{
+		if(modelIndex.column() == AUXDOPEWIDGETSECTION_FramesPerSecond)
+			m_iFramesPerSecond = value.toInt();
+		else if(modelIndex.column() == AUXDOPEWIDGETSECTION_AutoInitialize)
+			m_bAutoInitialize = value.toBool();
+		else
+			return false;
+
+		dataChanged(modelIndex, modelIndex);
+		//m_DopeSheetSceneRef.RefreshAllGfxItems();
+		return true;
+	}
+	return QAbstractTableModel::setData(modelIndex, value, role);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
 	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this),
-	m_bVertexEditMode(false)
+	m_bVertexEditMode(false),
+	m_AuxWidgetsModel(*this, itemFileDataRef.m_Meta["framesPerSecond"].toInt(60), itemFileDataRef.m_Meta["autoInitialize"].toBool(true))
 {
 	// The EntityTreeModel ('m_TreeModel') was initialized first so that all the EntityTreeItemData's exist.
 	// InitStates will look them up using their UUID when initializing its Key Frames map within the state's DopeSheetScene
@@ -68,6 +146,21 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 EntityTreeModel &EntityModel::GetTreeModel()
 {
 	return m_TreeModel;
+}
+
+QAbstractItemModel *EntityModel::GetAuxWidgetsModel()
+{
+	return &m_AuxWidgetsModel;
+}
+
+int EntityModel::GetFramesPerSecond() const
+{
+	return m_AuxWidgetsModel.data(m_AuxWidgetsModel.index(0, AUXDOPEWIDGETSECTION_FramesPerSecond), Qt::UserRole).toInt();
+}
+
+bool EntityModel::IsAutoInitialize() const
+{
+	return m_AuxWidgetsModel.data(m_AuxWidgetsModel.index(0, AUXDOPEWIDGETSECTION_AutoInitialize), Qt::UserRole).toBool();
 }
 
 QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow)
@@ -230,7 +323,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewArray(QList<EntityTreeItem
 			EntityStateData *pStateData = static_cast<EntityStateData *>(m_StateList[j]);
 
 			QJsonObject stateKeyFramesObj = stateKeyFramesArray[j].toObject();
-			if(pStateData->GetName() != stateKeyFramesObj["name"].toString() || pStateData->GetDopeSheetScene().GetFramesPerSecond() != stateKeyFramesObj["framesPerSecond"].toInt())
+			if(pStateData->GetName() != stateKeyFramesObj["name"].toString() || GetFramesPerSecond() != stateKeyFramesObj["framesPerSecond"].toInt())
 				HyGuiLog("EntityModel::Cmd_CreateNewArray - states mismatch", LOGTYPE_Error);
 			
 			QJsonArray keyFramesArray = stateKeyFramesObj["keyFrames"].toArray();
@@ -429,12 +522,12 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 		}
 		else
 			sSrc += pItem->GetHyNodeTypeName();
-		sSrc += " " + pItem->GetCodeName();
+		sSrc += pItem->GetCodeName();
 		if(pItem->GetEntType() != ENTTYPE_ArrayItem)
 			sSrc += ";\n";
 		else
 		{
-			sSrc += "\t[" + QString::number(m_TreeModel.GetArrayFolderTreeItem(pItem)->GetNumChildren()) + "];\n";
+			sSrc += "[" + QString::number(m_TreeModel.GetArrayFolderTreeItem(pItem)->GetNumChildren()) + "];\n";
 			pCurArray = pItem;
 		}
 	}
@@ -445,6 +538,11 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 QString EntityModel::GenerateSrc_MemberInitializerList() const
 {
 	QString sSrc = " :\n\tHyEntity2d(pParent)";
+
+	sSrc += ",\n\tm_fFRAME_DURATION(" + QString::number(1.0 / GetFramesPerSecond(), 'f') + "f)";
+	sSrc += ",\n\tm_fpUpdateFunc(nullptr)";
+	sSrc += ",\n\tm_fElapsedFrameTime(0.0f)";
+	sSrc += ",\n\tm_uiCurFrame(0)";
 
 	QList<EntityTreeItemData *> itemList, shapeList;
 	m_TreeModel.GetTreeItemData(itemList, shapeList);
@@ -513,7 +611,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 			else
 				sSrc += ", ";
 
-			sSrc += pItem->GetHyNodeTypeName() + sInitialization;
+			sSrc += pItem->GetHyNodeTypeName().trimmed() + sInitialization;
 			pCurArray = pItem;
 		}
 	}
@@ -529,38 +627,310 @@ QString EntityModel::GenerateSrc_Ctor() const
 	return "SetState(0);";
 }
 
-QString EntityModel::GenerateSrc_SetStates() const
+// NOTE: The listed 3 functions below share logic that process all item properties. Any updates should reflect to all of them
+//             - EntityTreeItemData::InitalizePropertyModel
+//             - EntityModel::GenerateSrc_SetStateImpl
+//             - EntityDrawItem::SetHyNode
+QString EntityModel::GenerateSrc_SetStateImpl() const
 {
-	QString sSrc = "switch(uiStateIndex)\n\t{\n\t";
-
-	QList<EntityTreeItemData *> itemList, shapeList;
-	m_TreeModel.GetTreeItemData(itemList, shapeList);
-	itemList.append(shapeList);
-	itemList.prepend(m_TreeModel.GetRootTreeItemData());
-
-	bool bActivatePhysics = false;
-	uint32 uiMaxVertListSize = 0;
+	QString sSrc = "switch(m_uiState)\n\t{";
 
 	for(int i = 0; i < GetNumStates(); ++i)
 	{
-		sSrc += "case " + QString::number(i) + ":\n\t\t";
+		const EntityDopeSheetScene &entDopeSheetSceneRef = static_cast<const EntityStateData *>(GetStateData(i))->GetDopeSheetScene();
+		QMap<int, QMap<EntityTreeItemData *, QJsonObject>> propertiesMapByFrame = entDopeSheetSceneRef.GetKeyFrameMapPropertiesByFrame();
+		const QMap<int, QString> &callbackMap = entDopeSheetSceneRef.GetCallbackMap();
 
-		for(EntityTreeItemData *pItem : itemList)
+		sSrc += "\n\tcase " + QString::number(i) + ":\n\t\t";
+		sSrc += "m_fpUpdateFunc = [this]()\n\t\t{\n\t\t\t";
+
+		sSrc += "std::vector<glm::vec2> vertList;\n\t\t\t";
+
+		sSrc += "m_fElapsedFrameTime += HyEngine::DeltaTime();\n\t\t\t";
+		sSrc += "while(m_fElapsedFrameTime >= 0.0f)\n\t\t\t";
+		sSrc += "{\n\t\t\t\t";
+
+		sSrc += "switch(m_uiCurFrame)\n\t\t\t\t{\n\t\t\t\t";
+		sSrc += "default:\n\t\t\t\t\tbreak;\n\n\t\t\t\t";
+
+		QList<int> frameList = propertiesMapByFrame.keys();
+		for(int iFrameIndex : frameList)
 		{
-			sSrc += pItem->GenerateStateSrc(i, "\n\t\t", bActivatePhysics, uiMaxVertListSize);
-			sSrc += "\n\t\t";
+			sSrc += "case " + QString::number(iFrameIndex) + ":\n\t\t\t\t\t";
+			for(QMap<EntityTreeItemData *, QJsonObject>::const_iterator iter = propertiesMapByFrame[iFrameIndex].begin(); iter != propertiesMapByFrame[iFrameIndex].end(); ++iter)
+				sSrc += GenerateSrc_SetProperties(iter.key(), iter.value(), "\n\t\t\t\t\t");
+			sSrc += "break;\n\n\t\t\t\t";
 		}
+		sSrc += "}\n\t\t\t\t"; // End switch(m_uiCurFrame)
 
-		if(bActivatePhysics)
-			sSrc += "physics.Activate();\n\n\t";
+		sSrc += "m_uiCurFrame++;\n\t\t\t\t";
+		sSrc += "m_fElapsedFrameTime -= m_fFRAME_DURATION;\n\t\t\t";
+		sSrc += "}\n\t\t"; // End while(m_fElapsedFrameTime >= 0.0f)
 
-		sSrc += "break;\n\n\t";
+		sSrc += "};\n"; // End m_fpUpdateFunc
 	}
-	sSrc += "default:\n\t\tHyLogWarning(\"" + QString(HySrcEntityNamespace) + "::" + GetItem().GetName(false) + "::SetState() was passed an invalid state: \" << uiStateIndex);\n\t\treturn false;\n\t}";
-	sSrc += "\n\n\treturn true;";
+	sSrc += "\t}"; // End switch(m_uiState)
 
-	if(uiMaxVertListSize > 0)
-		sSrc.prepend("std::vector<glm::vec2> vertList;\n\tvertList.reserve(" + QString::number(uiMaxVertListSize) + ");\n\t");
+	return sSrc;
+}
+
+QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJsonObject propObj, QString sNewLine) const
+{
+	QString sSrc;
+
+	QString sCodeName;
+	if(pItemData->GetEntType() != ENTTYPE_Root)
+	{
+		if(pItemData->GetEntType() == ENTTYPE_ArrayItem)
+			sCodeName = pItemData->GetCodeName() % "[" % QString::number(pItemData->GetArrayIndex()) % "]";
+		else
+			sCodeName = pItemData->GetCodeName();
+
+		if(pItemData->IsForwardDeclared())
+			sCodeName += "->";
+		else
+			sCodeName += ".";
+	}
+
+	for(QString sCategoryName : propObj.keys())
+	{
+		if(sCategoryName == "Common")
+		{
+			QJsonObject commonObj = propObj["Common"].toObject();
+			if(commonObj.contains("State"))
+				sSrc += sCodeName + "SetState(" + QString::number(commonObj["State"].toInt()) + ");" + sNewLine;
+
+			if(commonObj.contains("Update During Paused"))
+				sSrc += sCodeName + "SetPauseUpdate(" + (commonObj["Update During Paused"].toBool() ? "true" : "false") + ");" + sNewLine;
+
+			if(commonObj.contains("User Tag"))
+			{
+				sSrc += "#ifdef HY_ENABLE_USER_TAGS" + sNewLine;
+				sSrc += sCodeName + "SetTag(" + QString::number(commonObj["User Tag"].toInt()) + ");" + sNewLine;
+				sSrc += "#endif" + sNewLine;
+			}
+		}
+		else if(sCategoryName == "Transformation")
+		{
+			QJsonObject transformObj = propObj["Transformation"].toObject();
+			if(transformObj.contains("Position"))
+			{
+				QJsonArray posArray = transformObj["Position"].toArray();
+				sSrc += sCodeName + "pos.Set(" + QString::number(posArray[0].toDouble(), 'f') + "f, " + QString::number(posArray[1].toDouble(), 'f') + "f);" + sNewLine;
+			}
+			if(transformObj.contains("Scale"))
+			{
+				QJsonArray scaleArray = transformObj["Scale"].toArray();
+				sSrc += sCodeName + "scale.Set(" + QString::number(scaleArray[0].toDouble(), 'f') + "f, " + QString::number(scaleArray[1].toDouble(), 'f') + "f);" + sNewLine;
+			}
+			if(transformObj.contains("Rotation"))
+				sSrc += sCodeName + "rot.Set(" + QString::number(transformObj["Rotation"].toDouble(), 'f') + "f);" + sNewLine;
+		}
+		else if(sCategoryName == "Body")
+		{
+			QJsonObject bodyObj = propObj["Body"].toObject();
+			if(bodyObj.contains("Visible"))
+				sSrc += sCodeName + "SetVisible(" + (bodyObj["Visible"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(bodyObj.contains("Color Tint"))
+			{
+				QJsonArray colorArray = bodyObj["Color Tint"].toArray();
+				sSrc += sCodeName + "SetTint(HyColor(" + QString::number(colorArray[0].toInt()) + ", " + QString::number(colorArray[1].toInt()) + ", " + QString::number(colorArray[2].toInt()) + ", " + QString::number(colorArray[3].toInt()) + "));" + sNewLine;
+			}
+			if(bodyObj.contains("Alpha"))
+				sSrc += sCodeName + "alpha.Set(" + QString::number(bodyObj["Alpha"].toDouble(), 'f') + "f);" + sNewLine;
+			if(bodyObj.contains("Override Display Order"))
+				sSrc += sCodeName + "SetDisplayOrder(" + QString::number(bodyObj["Override Display Order"].toInt()) + ");" + sNewLine;
+		}
+		else if(sCategoryName == "Physics")
+		{
+			QJsonObject physicsObj = propObj["Physics"].toObject();
+			if(physicsObj.contains("Type"))
+			{
+				sSrc += sCodeName + "physics.SetType(";
+				switch(physicsObj["Type"].toInt())
+				{
+				case HYBODY_Static:		sSrc += "HYBODY_Static";	break;
+				case HYBODY_Kinematic:	sSrc += "HYBODY_Kinematic";	break;
+				case HYBODY_Dynamic:	sSrc += "HYBODY_Dynamic";	break;
+				}
+				sSrc += ");" + sNewLine;
+			}
+			if(physicsObj.contains("Fixed Rotation"))
+				sSrc += sCodeName + "physics.SetFixedRotation(" + (physicsObj["Fixed Rotation"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(physicsObj.contains("Initially Awake"))
+				sSrc += sCodeName + "physics.SetAwake(" + (physicsObj["Initially Awake"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(physicsObj.contains("Allow Sleep"))
+				sSrc += sCodeName + "physics.SetSleepingAllowed(" + (physicsObj["Allow Sleep"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(physicsObj.contains("Gravity Scale"))
+				sSrc += sCodeName + "physics.SetGravityScale(" + QString::number(physicsObj["Gravity Scale"].toDouble(), 'f') + "f);" + sNewLine;
+			if(physicsObj.contains("Dynamic CCD"))
+				sSrc += sCodeName + "physics.SetCcd(" + (physicsObj["Dynamic CCD"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(physicsObj.contains("Linear Damping"))
+				sSrc += sCodeName + "physics.SetLinearDamping(" + QString::number(physicsObj["Linear Damping"].toDouble(), 'f') + "f);" + sNewLine;
+			if(physicsObj.contains("Angular Damping"))
+				sSrc += sCodeName + "physics.SetAngularDamping(" + QString::number(physicsObj["Angular Damping"].toDouble(), 'f') + "f);" + sNewLine;
+			if(physicsObj.contains("Linear Velocity"))
+			{
+				QJsonArray velArray = physicsObj["Linear Velocity"].toArray();
+				sSrc += sCodeName + "physics.SetVel(" + QString::number(velArray[0].toDouble(), 'f') + "f, " + QString::number(velArray[1].toDouble(), 'f') + "f);" + sNewLine;
+			}
+			if(physicsObj.contains("Angular Velocity"))
+				sSrc += sCodeName + "physics.SetAngVel(" + QString::number(physicsObj["Angular Velocity"].toDouble(), 'f') + "f);" + sNewLine;
+			if(physicsObj.contains("Activate/Deactivate"))
+			{
+				if(physicsObj["Activate/Deactivate"].toBool())
+					sSrc += sCodeName + "physics.Activate();" + sNewLine;
+				else
+					sSrc += sCodeName + "physics.Deactivate();" + sNewLine;
+			}
+		}
+		else if(sCategoryName == "Entity")
+		{
+			QJsonObject entityObj = propObj["Entity"].toObject();
+			if(entityObj.contains("Mouse Input"))
+			{
+				if(entityObj["Mouse Input"].toBool())
+					sSrc += sCodeName + "EnableMouseInput();" + sNewLine;
+				else
+					sSrc += sCodeName + "DisableMouseInput();" + sNewLine;
+			}
+		}
+		else if(sCategoryName == "Primitive")
+		{
+			QJsonObject primitiveObj = propObj["Primitive"].toObject();
+			if(primitiveObj.contains("Wireframe"))
+				sSrc += sCodeName + "SetWireframe(" + (primitiveObj["Wireframe"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(primitiveObj.contains("Line Thickness"))
+				sSrc += sCodeName + "SetLineThickness(" + QString::number(primitiveObj["Line Thickness"].toDouble(), 'f') + "f);" + sNewLine;
+		}
+		else if(sCategoryName == "Shape")
+		{
+			QJsonObject shapeObj = propObj["Shape"].toObject();
+			if(shapeObj.contains("Type") && shapeObj.contains("Data"))
+			{
+				EditorShape eShapeType = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
+				uint32 uiMaxVertListSizeOut = 0;
+				sSrc += ShapeCtrl::DeserializeAsRuntimeCode(sCodeName, eShapeType, shapeObj["Data"].toString(), sNewLine, uiMaxVertListSizeOut);
+			}
+		}
+		else if(sCategoryName == "Fixture")
+		{
+			QJsonObject fixtureObj = propObj["Fixture"].toObject();
+			if(fixtureObj.contains("Density"))
+				sSrc += sCodeName + "SetDensity(" + QString::number(fixtureObj["Density"].toDouble(), 'f') + "f);" + sNewLine;
+			if(fixtureObj.contains("Friction"))
+				sSrc += sCodeName + "SetFriction(" + QString::number(fixtureObj["Friction"].toDouble(), 'f') + "f);" + sNewLine;
+			if(fixtureObj.contains("Restitution"))
+				sSrc += sCodeName + "SetRestitution(" + QString::number(fixtureObj["Restitution"].toDouble(), 'f') + "f);" + sNewLine;
+			if(fixtureObj.contains("Restitution Threshold"))
+				sSrc += sCodeName + "SetRestitutionThreshold(" + QString::number(fixtureObj["Restitution Threshold"].toDouble(), 'f') + "f);" + sNewLine;
+			if(fixtureObj.contains("Sensor"))
+				sSrc += sCodeName + "SetSensor(" + (fixtureObj["Sensor"].toBool() ? "true" : "false") + ");" + sNewLine;
+
+			// TODO: filter
+			//m_pPropertiesModel->AppendProperty("Fixture", "Filter: Category Mask", PROPERTIESTYPE_int, 0x0001, "The collision category bits for this shape. Normally you would just set one bit", PROPERTIESACCESS_ToggleOff, 0, 0xFFFF, 1, QString(), QString(), QVariant());
+			//m_pPropertiesModel->AppendProperty("Fixture", "Filter: Collision Mask", PROPERTIESTYPE_int, 0xFFFF, "The collision mask bits. This states the categories that this shape would accept for collision", PROPERTIESACCESS_ToggleOff, 0, 0xFFFF, 1, QString(), QString(), QVariant());
+			//m_pPropertiesModel->AppendProperty("Fixture", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", PROPERTIESACCESS_ToggleOff, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
+		}
+		else if(sCategoryName == "Sprite")
+		{
+			QJsonObject spriteObj = propObj["Sprite"].toObject();
+			if(spriteObj.contains("Frame"))
+				sSrc += sCodeName + "SetFrame(" + QString::number(spriteObj["Frame"].toInt()) + ");" + sNewLine;
+			if(spriteObj.contains("Anim Pause"))
+				sSrc += sCodeName + "SetAnimPause(" + (spriteObj["Anim Pause"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(spriteObj.contains("Anim Rate"))
+				sSrc += sCodeName + "SetAnimRate(" + QString::number(spriteObj["Anim Rate"].toDouble(), 'f') + "f);" + sNewLine;
+			if(spriteObj.contains("Anim Loop"))
+				sSrc += sCodeName + "SetAnimCtrl(" + (spriteObj["Anim Loop"].toBool() ? "HYANIMCTRL_Loop" : "HYANIMCTRL_DontLoop") + ");" + sNewLine;
+			if(spriteObj.contains("Anim Reverse"))
+				sSrc += sCodeName + "SetAnimCtrl(" + (spriteObj["Anim Reverse"].toBool() ? "HYANIMCTRL_Reverse" : "HYANIMCTRL_DontReverse") + ");" + sNewLine;
+			if(spriteObj.contains("Anim Bounce"))
+				sSrc += sCodeName + "SetAnimCtrl(" + (spriteObj["Anim Bounce"].toBool() ? "HYANIMCTRL_Bounce" : "HYANIMCTRL_DontBounce") + ");" + sNewLine;
+		}
+		else if(sCategoryName == "Text")
+		{
+			QJsonObject textObj = propObj["Text"].toObject();
+			if(textObj.contains("Text"))
+				sSrc += sCodeName + "SetText(\"" + textObj["Text"].toString() + "\");" + sNewLine;
+			if(textObj.contains("Style"))
+			{
+				TextStyle eTextStyle = HyGlobal::GetTextStyleFromString(textObj["Style"].toString());
+				switch(eTextStyle)
+				{
+				case TEXTSTYLE_Line:
+					sSrc += sCodeName + "SetAsLine();" + sNewLine;
+					break;
+				case TEXTSTYLE_Column:
+					if(textObj.contains("Style Dimensions"))
+						sSrc += sCodeName + "SetAsColumn(" + QString::number(textObj["Style Dimensions"].toArray()[0].toDouble(), 'f') + "f);" + sNewLine;
+					else
+						HyGuiLog("Missing Style Dimensions for Text Style: " + textObj["Style"].toString(), LOGTYPE_Error);
+					break;
+				case TEXTSTYLE_ScaleBox:
+					if(textObj.contains("Style Dimensions"))
+						sSrc += sCodeName + "SetAsScaleBox(" + QString::number(textObj["Style Dimensions"].toArray()[0].toDouble(), 'f') + "f, " + QString::number(textObj["Style Dimensions"].toArray()[1].toDouble(), 'f') + "f, true);" + sNewLine;
+					else
+						HyGuiLog("Missing Style Dimensions for Text Style: " + textObj["Style"].toString(), LOGTYPE_Error);
+					break;
+				case TEXTSTYLE_ScaleBoxTopAlign:
+					if(textObj.contains("Style Dimensions"))
+						sSrc += sCodeName + "SetAsScaleBox(" + QString::number(textObj["Style Dimensions"].toArray()[0].toDouble(), 'f') + "f, " + QString::number(textObj["Style Dimensions"].toArray()[1].toDouble(), 'f') + "f, false);" + sNewLine;
+					else
+						HyGuiLog("Missing Style Dimensions for Text Style: " + textObj["Style"].toString(), LOGTYPE_Error);
+					break;
+				case TEXTSTYLE_Vertical:
+					sSrc += sCodeName + "SetAsVertical();" + sNewLine;
+					break;
+				}
+			}
+			if(textObj.contains("Alignment"))
+			{
+				HyAlignment eAlignment = HyGlobal::GetAlignmentFromString(textObj["Alignment"].toString());
+				switch(eAlignment)
+				{
+				case HYALIGN_Left:		sSrc += sCodeName + "SetTextAlignment(HYALIGN_Left);" + sNewLine;	break;
+				case HYALIGN_Center:	sSrc += sCodeName + "SetTextAlignment(HYALIGN_Center);" + sNewLine;	break;
+				case HYALIGN_Right:		sSrc += sCodeName + "SetTextAlignment(HYALIGN_Right);" + sNewLine;	break;
+				case HYALIGN_Justify:	sSrc += sCodeName + "SetTextAlignment(HYALIGN_Justify);" + sNewLine;break;
+				}
+			}
+			if(textObj.contains("Monospaced Digits"))
+				sSrc += sCodeName + "SetMonospacedDigits(" + (textObj["Monospaced Digits"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(textObj.contains("Text Indent"))
+				sSrc += sCodeName + "SetTextIndent(" + QString::number(textObj["Text Indent"].toInt()) + ");" + sNewLine;
+		}
+		else if(sCategoryName == "Tween Position")
+		{
+			QJsonObject tweenObj = propObj["Tween Position"].toObject();
+			QJsonArray destArray = tweenObj["Destination"].toArray();
+			QString sTweenType = "HyTween::" + tweenObj["Tween Type"].toString();
+			
+			sSrc += sCodeName + "pos.Tween(" + QString::number(destArray[0].toDouble(), 'f') + "f, " + QString::number(destArray[1].toDouble(), 'f') + "f, " + QString::number(tweenObj["Duration"].toDouble(), 'f') + "f, " + sTweenType + ");" + sNewLine;
+		}
+		else if(sCategoryName == "Tween Rotation")
+		{
+			QJsonObject tweenObj = propObj["Tween Position"].toObject();
+			QString sTweenType = "HyTween::" + tweenObj["Tween Type"].toString();
+
+			sSrc += sCodeName + "rot.Tween(" + QString::number(tweenObj["Destination"].toDouble(), 'f') + "f, " + QString::number(tweenObj["Duration"].toDouble(), 'f') + "f, " + sTweenType + ");" + sNewLine;
+		}
+		else if(sCategoryName == "Tween Scale")
+		{
+			QJsonObject tweenObj = propObj["Tween Position"].toObject();
+			QJsonArray destArray = tweenObj["Destination"].toArray();
+			QString sTweenType = "HyTween::" + tweenObj["Tween Type"].toString();
+
+			sSrc += sCodeName + "scale.Tween(" + QString::number(destArray[0].toDouble(), 'f') + "f, " + QString::number(destArray[1].toDouble(), 'f') + "f, " + QString::number(tweenObj["Duration"].toDouble(), 'f') + "f, " + sTweenType + ");" + sNewLine;
+		}
+		else if(sCategoryName == "Tween Alpha")
+		{
+			QJsonObject tweenObj = propObj["Tween Position"].toObject();
+			QString sTweenType = "HyTween::" + tweenObj["Tween Type"].toString();
+
+			sSrc += sCodeName + "alpha.Tween(" + QString::number(tweenObj["Destination"].toDouble(), 'f') + "f, " + QString::number(tweenObj["Duration"].toDouble(), 'f') + "f, " + sTweenType + ");" + sNewLine;
+		}
+	}
 
 	return sSrc;
 }
@@ -579,6 +949,9 @@ QString EntityModel::GenerateSrc_SetStates() const
 /*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
 	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetRootTreeItemData()->GetCodeName());
+
+	itemSpecificFileDataOut.m_Meta.insert("framesPerSecond", GetFramesPerSecond());
+	itemSpecificFileDataOut.m_Meta.insert("autoInitialize", IsAutoInitialize());
 	
 	QList<EntityTreeItemData *> childList;
 	QList<EntityTreeItemData *> shapeList;
@@ -650,9 +1023,6 @@ QString EntityModel::GenerateSrc_SetStates() const
 /*virtual*/ void EntityModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_StateList[uiIndex]);
-
-	stateFileDataOut.m_Meta.insert("framesPerSecond", pStateData->GetDopeSheetScene().GetFramesPerSecond());
-	stateFileDataOut.m_Meta.insert("autoInitialize", pStateData->GetDopeSheetScene().IsAutoInitialize());
 
 	// Combine all items (root, children, and shapes) into a single list 'itemList'
 	QList<EntityTreeItemData *> itemList, shapeList;

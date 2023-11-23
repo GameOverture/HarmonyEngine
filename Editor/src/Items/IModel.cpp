@@ -78,6 +78,12 @@ IStateData *IModel::GetStateData(int iStateIndex)
 	return m_StateList[iStateIndex];
 }
 
+
+const IStateData *IModel::GetStateData(int iStateIndex) const
+{
+	return m_StateList[iStateIndex];
+}
+
 FileDataPair IModel::GetStateFileData(uint32 uiIndex) const
 {
 	FileDataPair stateFileData;

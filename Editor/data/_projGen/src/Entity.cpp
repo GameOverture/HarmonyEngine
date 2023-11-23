@@ -19,14 +19,24 @@ namespace %HY_NAMESPACE% {
 
 /*virtual*/ bool %HY_CLASS%::SetState(uint32 uiStateIndex)
 {
-	%HY_BASECLASS%::SetState(uiStateIndex);
+	if(%HY_BASECLASS%::SetState(uiStateIndex) == false || uiStateIndex >= GetNumStates())
+		return false;
 	
-	%HY_SETSTATESIMPL%
+	%HY_SETSTATEIMPL%
+	
+	m_fElapsedFrameTime = 0.0f;
+	m_uiCurFrame = 0;
 }
 
 /*virtual*/ uint32 %HY_CLASS%::GetNumStates()
 {
 	return %HY_NUMSTATES%;
+}
+
+/*virtual*/ void %HY_CLASS%::Update() /*override*/
+{
+	m_fpUpdateFunc();
+	HyEntity2d::Update();
 }
 
 } // '%HY_NAMESPACE%' namespace

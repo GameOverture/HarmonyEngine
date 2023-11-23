@@ -983,7 +983,7 @@ EntityUndoCmd_CreateTween::EntityUndoCmd_CreateTween(EntityDopeSheetScene &entit
 	QPair<QString, QString> propPair = HyGlobal::GetTweenCategoryProperty(m_eTweenProp);
 	m_DopeSheetSceneRef.RemoveKeyFrameProperty(m_pItemData, m_iEndFrameIndex, propPair.first, propPair.second, false);
 
-	double dDuration = (m_iEndFrameIndex - m_iStartFrameIndex) * (1.0 / m_DopeSheetSceneRef.GetFramesPerSecond());
+	double dDuration = (m_iEndFrameIndex - m_iStartFrameIndex) * (1.0 / static_cast<EntityModel &>(m_DopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond());
 	TweenJsonValues tweenValues = std::make_tuple(m_EndValue, QJsonValue(dDuration), QJsonValue(HyGlobal::TweenName(TWEEN_Linear)));
 	m_DopeSheetSceneRef.SetKeyFrameTween(m_pItemData, m_iStartFrameIndex, m_eTweenProp, tweenValues, true);
 }
@@ -1053,13 +1053,13 @@ EntityUndoCmd_SetCallback::EntityUndoCmd_SetCallback(EntityDopeSheetScene &entit
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_FramesPerSecond::EntityUndoCmd_FramesPerSecond(EntityDopeSheetScene &entityDopeSheetSceneRef, int iNewFPS, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_FramesPerSecond::EntityUndoCmd_FramesPerSecond(EntityModel &entityModelRef, int iNewFPS, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
-	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_EntityModelRef(entityModelRef),
 	m_iNewFPS(iNewFPS)
 {
 	setText("Change Frames Per Second");
-	m_iOldFPS = m_DopeSheetSceneRef.GetFramesPerSecond();
+	m_iOldFPS = m_EntityModelRef.GetFramesPerSecond();
 }
 
 /*virtual*/ EntityUndoCmd_FramesPerSecond::~EntityUndoCmd_FramesPerSecond()
@@ -1068,23 +1068,23 @@ EntityUndoCmd_FramesPerSecond::EntityUndoCmd_FramesPerSecond(EntityDopeSheetScen
 
 /*virtual*/ void EntityUndoCmd_FramesPerSecond::redo() /*override*/
 {
-	m_DopeSheetSceneRef.GetAuxWidgetsModel()->setData(m_DopeSheetSceneRef.GetAuxWidgetsModel()->index(0, AUXDOPEWIDGETSECTION_FramesPerSecond), m_iNewFPS, Qt::UserRole);
+	m_EntityModelRef.GetAuxWidgetsModel()->setData(m_EntityModelRef.GetAuxWidgetsModel()->index(0, AUXDOPEWIDGETSECTION_FramesPerSecond), m_iNewFPS, Qt::UserRole);
 }
 
 /*virtual*/ void EntityUndoCmd_FramesPerSecond::undo() /*override*/
 {
-	m_DopeSheetSceneRef.GetAuxWidgetsModel()->setData(m_DopeSheetSceneRef.GetAuxWidgetsModel()->index(0, AUXDOPEWIDGETSECTION_FramesPerSecond), m_iOldFPS, Qt::UserRole);
+	m_EntityModelRef.GetAuxWidgetsModel()->setData(m_EntityModelRef.GetAuxWidgetsModel()->index(0, AUXDOPEWIDGETSECTION_FramesPerSecond), m_iOldFPS, Qt::UserRole);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_AutoInitialize::EntityUndoCmd_AutoInitialize(EntityDopeSheetScene &entityDopeSheetSceneRef, bool bNewValue, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_AutoInitialize::EntityUndoCmd_AutoInitialize(EntityModel &entityModelRef, bool bNewValue, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
-	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_EntityModelRef(entityModelRef),
 	m_bNewValue(bNewValue)
 {
 	setText("Toggle Auto Initialize");
-	m_bOldValue = m_DopeSheetSceneRef.IsAutoInitialize();
+	m_bOldValue = m_EntityModelRef.IsAutoInitialize();
 }
 
 /*virtual*/ EntityUndoCmd_AutoInitialize::~EntityUndoCmd_AutoInitialize()
@@ -1093,12 +1093,12 @@ EntityUndoCmd_AutoInitialize::EntityUndoCmd_AutoInitialize(EntityDopeSheetScene 
 
 /*virtual*/ void EntityUndoCmd_AutoInitialize::redo() /*override*/
 {
-	m_DopeSheetSceneRef.GetAuxWidgetsModel()->setData(m_DopeSheetSceneRef.GetAuxWidgetsModel()->index(0, AUXDOPEWIDGETSECTION_AutoInitialize), m_bNewValue, Qt::UserRole);
+	m_EntityModelRef.GetAuxWidgetsModel()->setData(m_EntityModelRef.GetAuxWidgetsModel()->index(0, AUXDOPEWIDGETSECTION_AutoInitialize), m_bNewValue, Qt::UserRole);
 }
 
 /*virtual*/ void EntityUndoCmd_AutoInitialize::undo() /*override*/
 {
-	m_DopeSheetSceneRef.GetAuxWidgetsModel()->setData(m_DopeSheetSceneRef.GetAuxWidgetsModel()->index(0, AUXDOPEWIDGETSECTION_AutoInitialize), m_bOldValue, Qt::UserRole);
+	m_EntityModelRef.GetAuxWidgetsModel()->setData(m_EntityModelRef.GetAuxWidgetsModel()->index(0, AUXDOPEWIDGETSECTION_AutoInitialize), m_bOldValue, Qt::UserRole);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

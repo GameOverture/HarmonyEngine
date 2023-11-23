@@ -193,8 +193,8 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 				sClassCtorSignature = "HyEntity2d *pParent /*= nullptr*/";
 				sMemberInitializerList = pEntityModel->GenerateSrc_MemberInitializerList();
 				sContents.replace("%HY_CTORIMPL%", pEntityModel->GenerateSrc_Ctor());
-				sContents.replace("%HY_SETSTATESIMPL%", pEntityModel->GenerateSrc_SetStates());
 				sContents.replace("%HY_NUMSTATES%", QString::number(pEntityModel->GetNumStates()));
+				sContents.replace("%HY_SETSTATEIMPL%", pEntityModel->GenerateSrc_SetStateImpl());
 				break;
 			}
 		}

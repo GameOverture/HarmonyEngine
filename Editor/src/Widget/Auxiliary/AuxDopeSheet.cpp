@@ -54,7 +54,7 @@ void AuxDopeSheet::SetEntityStateModel(EntityStateData *pEntStateData)
 
 	if(pEntStateData)
 	{
-		m_WidgetMapper.setModel(pEntStateData->GetDopeSheetScene().GetAuxWidgetsModel());
+		m_WidgetMapper.setModel(static_cast<EntityModel &>(pEntStateData->GetModel()).GetAuxWidgetsModel());
 		m_WidgetMapper.addMapping(ui->sbFramesPerSecond, AUXDOPEWIDGETSECTION_FramesPerSecond);
 		m_WidgetMapper.addMapping(ui->chkAutoInitialize, AUXDOPEWIDGETSECTION_AutoInitialize);
 

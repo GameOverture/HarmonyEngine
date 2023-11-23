@@ -316,12 +316,12 @@ public:
 
 class EntityUndoCmd_FramesPerSecond : public QUndoCommand
 {
-	EntityDopeSheetScene &					m_DopeSheetSceneRef;
+	EntityModel &							m_EntityModelRef;
 	int										m_iNewFPS;
 	int										m_iOldFPS;
 
 public:
-	EntityUndoCmd_FramesPerSecond(EntityDopeSheetScene &entityDopeSheetSceneRef, int iNewFPS, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_FramesPerSecond(EntityModel &entityModelRef, int iNewFPS, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_FramesPerSecond();
 
 	virtual void redo() override;
@@ -332,12 +332,12 @@ public:
 
 class EntityUndoCmd_AutoInitialize : public QUndoCommand
 {
-	EntityDopeSheetScene &					m_DopeSheetSceneRef;
+	EntityModel &							m_EntityModelRef;
 	bool									m_bNewValue;
 	bool									m_bOldValue;
 
 public:
-	EntityUndoCmd_AutoInitialize(EntityDopeSheetScene &entityDopeSheetSceneRef, bool bNewValue, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_AutoInitialize(EntityModel &entityModelRef, bool bNewValue, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_AutoInitialize();
 
 	virtual void redo() override;

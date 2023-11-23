@@ -105,7 +105,7 @@ IHyLoadable2d *EntityDrawItem::GetHyNode()
 
 // NOTE: The listed 3 functions below share logic that process all item properties. Any updates should reflect to all of them
 //             - EntityTreeItemData::InitalizePropertyModel
-//             - EntityTreeItemData::GenerateStateSrc
+//             - EntityModel::GenerateSrc_SetStateImpl
 //             - EntityDrawItem::SetHyNode
 void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneRef, HyCamera2d *pCamera)
 {
@@ -115,7 +115,7 @@ void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneR
 
 	IHyLoadable2d *pThisHyNode = GetHyNode();
 
-	const float fFRAME_DURATION = 1.0f / entityDopeSheetSceneRef.GetFramesPerSecond();
+	const float fFRAME_DURATION = 1.0f / static_cast<EntityModel &>(entityDopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond();
 	const int iCURRENT_FRAME = entityDopeSheetSceneRef.GetCurrentFrame();
 	const QMap<int, QJsonObject> &keyFrameMapRef = entityDopeSheetSceneRef.GetKeyFramesMap()[m_pEntityTreeItemData];
 
@@ -620,8 +620,8 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Bounce"].toBool() ? HYANIMCTRL_Bounce : HYANIMCTRL_DontBounce);
 
 				// Store whether the animation is paused, so we don't AdvanceAnim()
-				if(spriteObj.contains("Anim Paused"))
-					std::get<SPRITE_Paused>(spriteLastKnownAnimInfo) = spriteObj["Anim Paused"].toBool();
+				if(spriteObj.contains("Anim Pause"))
+					std::get<SPRITE_Paused>(spriteLastKnownAnimInfo) = spriteObj["Anim Pause"].toBool();
 			}
 			break;
 

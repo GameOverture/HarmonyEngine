@@ -82,6 +82,7 @@ public:
 	
 	int GetNumStates() const;
 	IStateData *GetStateData(int iStateIndex);
+	const IStateData *GetStateData(int iStateIndex) const;
 	FileDataPair GetStateFileData(uint32 uiIndex) const;
 	
 	QString SetStateName(int iStateIndex, QString sNewName);

@@ -508,7 +508,7 @@ float EntityDopeSheetView::GetZoom() const
 			int iTweenStartKeyFrame = m_pGfxDragTweenKnobItem->parentItem()->data(GFXDATAKEY_FrameIndex).toInt();
 			int iTweenEndKeyFrame = HyMath::Max(iTweenStartKeyFrame, m_iDragFrame);
 
-			double dNewDuration = (iTweenEndKeyFrame - iTweenStartKeyFrame) * (1.0 / m_pStateData->GetDopeSheetScene().GetFramesPerSecond());
+			double dNewDuration = (iTweenEndKeyFrame - iTweenStartKeyFrame) * (1.0 / static_cast<EntityModel &>(m_pStateData->GetModel()).GetFramesPerSecond());
 			EntityUndoCmd_NudgeTweenDuration *pCmd = new EntityUndoCmd_NudgeTweenDuration(m_pStateData->GetDopeSheetScene(), pTreeItemData, iTweenStartKeyFrame, eTweenProp, dNewDuration);
 			m_pStateData->GetModel().GetItem().GetUndoStack()->push(pCmd);
 		}

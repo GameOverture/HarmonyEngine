@@ -921,7 +921,7 @@ void EntityWidget::on_actionPasteEntityItems_triggered()
 			EntityStateData *pStateData = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(iStateIndex));
 			if(pStateData->GetName() != stateKeyFramesArray[iStateIndex].toObject()["name"].toString())
 				bIsStatesMatch = false;
-			else if(pStateData->GetDopeSheetScene().GetFramesPerSecond() != stateKeyFramesArray[iStateIndex].toObject()["framesPerSecond"].toInt())
+			else if(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetFramesPerSecond() != stateKeyFramesArray[iStateIndex].toObject()["framesPerSecond"].toInt())
 				bIsStatesMatch = false;
 		}
 		if(bIsStatesMatch == false)

@@ -75,8 +75,6 @@ public:
 
 	void InsertJsonInfo_Desc(QJsonObject &childObjRef);
 
-	QString GenerateStateSrc(uint32 uiStateIndex, QString sNewLine, bool &bActivatePhysicsOut, uint32 &uiMaxVertListSizeOut);
-
 protected:
 	void InitalizePropertyModel();
 };
