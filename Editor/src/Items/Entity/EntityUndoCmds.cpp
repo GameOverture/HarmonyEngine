@@ -381,11 +381,12 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 		}
 		else // ITEM_BoundingVolume
 		{
+			QString sShapeType = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_ComboBoxString, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Type")).toString();
 			QString sShapeData = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_LineEdit, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data")).toString();
 			m_sOldShapeDataList.push_back(sShapeData);
 			
 			ShapeCtrl shapeCtrl(nullptr);
-			shapeCtrl.Setup(HyGlobal::GetShapeFromString(sShapeData), HyColor::White, 0.0f, 1.0f);
+			shapeCtrl.Setup(HyGlobal::GetShapeFromString(sShapeType), HyColor::White, 0.0f, 1.0f);
 			shapeCtrl.Deserialize(m_sOldShapeDataList.last(), nullptr);
 			shapeCtrl.TransformSelf(m_NewTransformList[i]);
 			
