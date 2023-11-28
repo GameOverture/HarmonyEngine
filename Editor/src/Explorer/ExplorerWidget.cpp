@@ -372,6 +372,8 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 	ExplorerItemData *pContextExplorerItem = GetSelected();
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
 	GetSelected(selectedItems, selectedPrefixes, true);
+
+	bool bPreserveCloseProjectEnabled = FINDACTION("actionCloseProject")->isEnabled();
 	
 	QMenu contextMenu;
 	if(pContextExplorerItem == nullptr)
@@ -389,6 +391,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 			else
 				contextMenu.addMenu(MainWindow::GetNewItemMenu());
 			contextMenu.addSeparator();
+			FINDACTION("actionCloseProject")->setEnabled(true);
 			contextMenu.addAction(FINDACTION("actionCloseProject"));
 			contextMenu.addAction(FINDACTION("actionProjectSettings"));
 			contextMenu.addSeparator();
@@ -457,6 +460,8 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 	}
 	
 	contextMenu.exec(ui->treeView->mapToGlobal(pos));
+
+	FINDACTION("actionCloseProject")->setEnabled(bPreserveCloseProjectEnabled);
 }
 
 void ExplorerWidget::on_actionFilterAll_triggered()
