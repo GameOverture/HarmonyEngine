@@ -330,6 +330,8 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	for(auto iter = repackTexIndexMap.begin(); iter != repackTexIndexMap.end(); ++iter)
 		AddTexturesToRepack(iter.key(), iter.value());
 
+	m_pCurInspectorAsset = nullptr;
+
 	return true;
 }
 
@@ -344,6 +346,8 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 
 	for(auto iter = repackTexIndexMap.begin(); iter != repackTexIndexMap.end(); ++iter)
 		AddTexturesToRepack(iter.key(), iter.value());
+
+	m_pCurInspectorAsset = nullptr;
 
 	return true;
 }

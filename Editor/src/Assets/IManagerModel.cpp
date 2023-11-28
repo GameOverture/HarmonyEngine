@@ -352,6 +352,8 @@ void IManagerModel::ReplaceAssets(QList<IAssetItemData *> assetsList, bool bWith
 	else
 		OnUpdateAssets(assetsList);
 
+	m_InspectorScene.clear();
+
 	FlushRepack();
 }
 

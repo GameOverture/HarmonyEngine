@@ -662,6 +662,7 @@ void ManagerWidget::on_actionReplaceAssets_triggered()
 	}
 
 	m_pModel->ReplaceAssets(selectedAssetsList, true);
+	m_pModel->UpdateInspectorScene(selectedAssetsList);
 }
 
 void ManagerWidget::on_actionRename_triggered()
