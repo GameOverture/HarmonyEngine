@@ -515,6 +515,18 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 	}
 	else if(m_pModel->GetAssetType() == ASSETMAN_Source)
 	{
+		// If any selected item is 'HySrcEntityFilter' or a child of 'HySrcEntityFilter', then cancel context menu
+		for(auto selectedItem : selectedAssetsList)
+		{
+			if(selectedItem->GetFilter() == HySrcEntityFilter)
+				return;
+		}
+		for(auto selectedFilter : selectedFiltersList)
+		{
+			if(selectedFilter->GetText() == HySrcEntityFilter)
+				return;
+		}
+
 		contextMenu.addAction(ui->actionOpenAssetExplorer);
 		contextMenu.addAction(ui->actionGenerateAsset);
 		contextMenu.addSeparator();

@@ -36,7 +36,7 @@ public:
 	ItemType GetType() const;
 	const QUuid &GetUuid() const;
 	QString GetText() const;
-	void SetText(QString sText);
+	virtual void SetText(QString sText);
 	QIcon GetIcon(SubIcon eSubIcon) const;
 
 	bool IsProjectItem() const;

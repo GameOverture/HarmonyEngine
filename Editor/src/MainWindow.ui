@@ -605,8 +605,8 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset>
-     <normaloff>:/icons16x16/items/Entity2d-New.png</normaloff>:/icons16x16/items/Entity2d-New.png</iconset>
+    <iconset resource="../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Entity-New.png</normaloff>:/icons16x16/items/Entity-New.png</iconset>
    </property>
    <property name="text">
     <string>New Entity</string>

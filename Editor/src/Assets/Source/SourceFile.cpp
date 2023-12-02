@@ -63,3 +63,11 @@ void SourceFile::UpdateChecksum(quint32 uiChecksum)
 {
 	m_uiChecksum = uiChecksum;
 }
+
+/*virtual*/ void SourceFile::SetText(QString sText) /*override*/
+{
+	QFile srcFile(m_ModelRef.GetMetaDir().absoluteFilePath(ConstructMetaFileName()));
+	
+	IAssetItemData::SetText(sText);
+	srcFile.rename(m_ModelRef.GetMetaDir().absoluteFilePath(ConstructMetaFileName()));
+}

@@ -35,6 +35,8 @@ public:
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
 
 	void UpdateChecksum(quint32 uiChecksum);
+
+	virtual void SetText(QString sText) override;
 };
 
 #endif // SourceFile_H
