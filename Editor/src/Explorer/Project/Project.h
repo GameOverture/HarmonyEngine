@@ -65,6 +65,8 @@ class Project : public ExplorerItemData
 
 	FileDataPair										m_ProjectFileData;
 
+	uint32												m_uiSnappingSettings;	// Snapping
+
 	QMap<QUuid, TreeModelItemData *>					m_ItemDataUuidMap;		// Lookup map to help find tree item data pointers
 
 	QSet<IManagerModel *>								m_DirtyManagerSet;		// Dirty managers that need to SaveRuntime() during ReloadHarmony()
@@ -128,6 +130,9 @@ public:
 	void ShowGridBackground(bool bShow);
 	void ShowGridOrigin(bool bShow);
 	void ShowGridOverlay(bool bShow);
+
+	uint32 GetSnappingSettings() const;
+	void SetSnappingSettings(uint32 uiSnappingSettings, bool bSaveUserData);
 
 	void SaveItemData(ItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
 	void DeleteItemData(ItemType eType, QString sPath, bool bWriteToDisk);

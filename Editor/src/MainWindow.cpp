@@ -303,13 +303,18 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		pProject->GetAudioWidget()->SetSelectedBankIndex(iAudioBankIndex);
 		QStringList expandedAudioList = settings.value(HyGlobal::AssetName(ASSETMAN_Audio)).toStringList();
 		pProject->GetAudioWidget()->RestoreExpandedState(expandedAudioList);
-
+	}
+	settings.endGroup();
+	settings.beginGroup("ProjectSettings");
+	{
 		ui->actionShowGridBackground->setChecked(settings.value("ShowGridBackground", true).toBool());
 		ui->actionShowGridOrigin->setChecked(settings.value("ShowGridOrigin", true).toBool());
 		ui->actionShowGridOverlay->setChecked(settings.value("ShowGridOverlay", false).toBool());
 		pProject->ShowGridBackground(ui->actionShowGridBackground->isChecked());
 		pProject->ShowGridOrigin(ui->actionShowGridOrigin->isChecked());
 		pProject->ShowGridOverlay(ui->actionShowGridOverlay->isChecked());
+
+		pProject->SetSnappingSettings(settings.value("SnappingSettings", QVariant(static_cast<uint>(SNAPSETTING_DefaultSettings))).toUInt(), false);
 	}
 	settings.endGroup();
 

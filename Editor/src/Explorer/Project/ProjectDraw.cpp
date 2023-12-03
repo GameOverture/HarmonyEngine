@@ -174,8 +174,8 @@ const float fDIMENSION_SIZE = 20000.0f;
 
 ProjectDraw::ProjectDraw() :
 	IDraw(nullptr, FileDataPair()),
-	m_CheckerGrid(fDIMENSION_SIZE, fDIMENSION_SIZE, 25.0f),
-	m_OverGrid(fDIMENSION_SIZE, fDIMENSION_SIZE, 25.0f)
+	m_CheckerGrid(fDIMENSION_SIZE, fDIMENSION_SIZE, DEFAULT_GRID_SIZE),
+	m_OverGrid(fDIMENSION_SIZE, fDIMENSION_SIZE, DEFAULT_GRID_SIZE)
 {
 	ChildAppend(m_CheckerGrid);
 

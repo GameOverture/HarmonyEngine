@@ -46,6 +46,8 @@ class Project;
 #define DISPLAYORDER_TransformCtrl 9999999
 //#define HYGUI_UseBinaryMetaFiles
 
+#define DEFAULT_GRID_SIZE 25.0f
+
 enum ItemType
 {
 	ITEM_Unknown = -1,
@@ -200,6 +202,20 @@ enum TextStyle
 	TEXTSTYLE_Vertical,
 
 	NUM_TEXTSTYLES
+};
+
+enum SnappingSetting
+{
+	SNAPSETTING_ToleranceMask	= 0x0000FFFF,
+	SNAPSETTING_Enabled			= 1 << 16,
+	SNAPSETTING_Grid			= 1 << 17,
+	SNAPSETTING_Guides			= 1 << 18,
+	SNAPSETTING_Origin			= 1 << 19,
+	SNAPSETTING_Items			= 1 << 20,
+	SNAPSETTING_ItemMidPoints	= 1 << 21,
+	// NOTE: Cannot exceed 32 bits (SnappingSetting is stored as a uint32)
+
+	SNAPSETTING_DefaultSettings = 8 | SNAPSETTING_Enabled | SNAPSETTING_Guides | SNAPSETTING_Origin | SNAPSETTING_Items | SNAPSETTING_ItemMidPoints
 };
 
 enum SubIcon

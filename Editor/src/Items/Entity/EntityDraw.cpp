@@ -817,6 +817,34 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		}
 		else
 			m_ActiveTransform.pos.Set(HyMath::RoundVec(ptMousePos - m_ptDragStart));
+
+		// Perform snapping
+		if(m_pProjItem->GetProject().GetSnappingSettings() & SNAPSETTING_Enabled)
+		{
+			uint32 uiSnappingSettings = m_pProjItem->GetProject().GetSnappingSettings();
+
+			float fSnapTolerance = static_cast<float>(uiSnappingSettings & SNAPSETTING_ToleranceMask);
+			if(uiSnappingSettings & SNAPSETTING_Grid)
+			{
+				glm::vec2 ptGridSize = glm::vec2(DEFAULT_GRID_SIZE, DEFAULT_GRID_SIZE);// m_pProjItem->GetProject().GetGridSize();
+				m_ActiveTransform.pos.Set(HyMath::RoundVec(m_ActiveTransform.pos.Get() / ptGridSize) * ptGridSize);
+			}
+			//if(uiSnappingSettings & SNAPSETTING_Guides)
+			//{
+			//	glm::vec2 ptGuidePos;
+			//	if(m_pProjItem->GetProject().GetClosestGuidePos(ptMousePos, ptGuidePos))
+			//		m_ActiveTransform.pos.Set(ptGuidePos - m_ptDragStart);
+			//}
+			if(uiSnappingSettings & SNAPSETTING_Origin)
+			{
+
+			}
+			if(uiSnappingSettings & SNAPSETTING_Items)
+			{
+
+			}
+		}
+
 		break;
 
 	case Qt::SizeBDiagCursor:	// Scaling

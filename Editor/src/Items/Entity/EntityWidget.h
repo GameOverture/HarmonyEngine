@@ -70,6 +70,7 @@ private Q_SLOTS:
 	void on_actionAddLineChainShape_triggered();
 	void on_actionAddLineLoopShape_triggered();
 
+	void on_actionEntitySnappingSettings_triggered();
 	void on_actionVertexEditMode_toggled(bool bChecked);
 
 	void on_actionOrderChildrenUp_triggered();

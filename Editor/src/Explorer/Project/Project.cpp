@@ -691,6 +691,18 @@ void Project::ShowGridOverlay(bool bShow)
 	m_pDraw->EnableGridOverlay(bShow);
 }
 
+uint32 Project::GetSnappingSettings() const
+{
+	return m_uiSnappingSettings;
+}
+
+void Project::SetSnappingSettings(uint32 uiSnappingSettings, bool bSaveUserData)
+{
+	m_uiSnappingSettings = uiSnappingSettings;
+	if(bSaveUserData)
+		SaveUserData();
+}
+
 void Project::SaveItemData(ItemType eType, QString sPath, const FileDataPair &itemFileDataRef, bool bWriteToDisk)
 {
 	QString sItemTypeName = HyGlobal::ItemName(eType, true);
@@ -948,12 +960,17 @@ void Project::SaveUserData() const
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Atlases) + "BankIndex", m_pAtlasWidget->GetSelectedBankIndex());
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Audio), m_pAudioWidget->GetExpandedFilters());
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Audio) + "BankIndex", m_pAudioWidget->GetSelectedBankIndex());
-
+	}
+	settings.endGroup();
+	settings.beginGroup("ProjectSettings");
+	{
 		bool bShowGridBackground, bShowGridOrigin, bShowGridOverlay;
 		MainWindow::GetGridStatus(bShowGridBackground, bShowGridOrigin, bShowGridOverlay);
 		settings.setValue("ShowGridBackground", bShowGridBackground);
 		settings.setValue("ShowGridOrigin", bShowGridOrigin);
 		settings.setValue("ShowGridOverlay", bShowGridOverlay);
+
+		settings.setValue("SnappingSettings", m_uiSnappingSettings);
 	}
 	settings.endGroup();
 }
