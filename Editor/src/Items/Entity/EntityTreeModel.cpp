@@ -37,7 +37,8 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	m_pPropertiesModel(nullptr),
 	m_bIsForwardDeclared(bIsForwardDeclared),
 	m_ReferencedItemUuid(uuidOfReferencedItem),
-	m_bIsSelected(false)
+	m_bIsSelected(false),
+	m_bReallocateDrawItem(false)
 {
 	QVariant ptrVariant;
 	ptrVariant.setValue<TreeModelItemData *>(this);
@@ -55,7 +56,8 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 	m_sPromotedEntityType(descObj["promotedEntityType"].toString()),
 	m_bIsForwardDeclared(bIsForwardDeclared),
 	m_ReferencedItemUuid(descObj["itemUUID"].toString()),
-	m_bIsSelected(descObj["isSelected"].toBool())
+	m_bIsSelected(descObj["isSelected"].toBool()),
+	m_bReallocateDrawItem(false)
 {
 	QVariant ptrVariant;
 	ptrVariant.setValue<TreeModelItemData *>(this);
@@ -136,6 +138,16 @@ bool EntityTreeItemData::IsSelected() const
 void EntityTreeItemData::SetSelected(bool bIsSelected)
 {
 	m_bIsSelected = bIsSelected;
+}
+
+bool EntityTreeItemData::IsReallocateDrawItem() const
+{
+	return m_bReallocateDrawItem;
+}
+
+void EntityTreeItemData::SetReallocateDrawItem(bool bReallocateDrawItem)
+{
+	m_bReallocateDrawItem = bReallocateDrawItem;
 }
 
 int EntityTreeItemData::GetArrayIndex() const

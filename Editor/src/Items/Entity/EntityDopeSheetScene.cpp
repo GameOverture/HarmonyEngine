@@ -528,6 +528,7 @@ void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData,
 	if(keyFrameObjRef.empty())
 	{
 		m_KeyFramesMap[pItemData].remove(iFrameIndex);
+		pItemData->SetReallocateDrawItem(true);
 		return;
 	}
 
@@ -549,6 +550,8 @@ void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData,
 	}
 	else
 		keyFrameObjRef.insert(sCategoryName, categoryObj);
+
+	pItemData->SetReallocateDrawItem(true);
 
 	// Remove the corresponding gfx rect for this property
 	KeyFrameKey gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, sCategoryName % "/" % sPropName);

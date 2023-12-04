@@ -53,6 +53,8 @@ class EntityTreeItemData : public TreeModelItemData
 	QUuid												m_ReferencedItemUuid;
 
 	bool												m_bIsSelected;
+	
+	bool												m_bReallocateDrawItem; // This is set when the draw item needs any of its default values set that doesn't have a corresponding key frame
 
 public:
 	EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfReferencedItem, QUuid uuidOfThis);
@@ -70,6 +72,9 @@ public:
 
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);
+
+	bool IsReallocateDrawItem() const;
+	void SetReallocateDrawItem(bool bReallocateDrawItem);
 
 	int GetArrayIndex() const; // Returns -1 when not an array item
 

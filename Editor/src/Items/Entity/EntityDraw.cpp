@@ -384,7 +384,17 @@ void EntityDraw::SetExtrapolatedProperties()
 			pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), pEntityTreeItemData, this);
 		}
 		else
+		{
 			staleItemList.removeOne(pDrawItem);
+
+			if(pDrawItem->GetEntityTreeItemData()->IsReallocateDrawItem())
+			{
+				EntityTreeItemData *pEntityTreeItemData = pDrawItem->GetEntityTreeItemData();
+				delete pDrawItem;
+				pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), pEntityTreeItemData, this);
+				pEntityTreeItemData->SetReallocateDrawItem(false);
+			}
+		}
 
 		m_ItemList.push_back(pDrawItem);
 		ChildAppend(*pDrawItem->GetHyNode());
