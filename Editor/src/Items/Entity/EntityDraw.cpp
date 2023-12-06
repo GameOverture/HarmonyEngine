@@ -777,6 +777,56 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 	if(HyEngine::Input().GetWorldMousePos(ptMousePos) == false)
 		return; // Cursor is currently dragged off render window
 
+	TransformCtrl *pCurTransform = nullptr;
+	if(m_MultiTransform.IsShown())
+		pCurTransform = &m_MultiTransform;
+	else
+		pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
+
+	// Gather snapping candidates
+	std::vector<glm::vec2> snapCandidateList;
+	uint32 uiSnappingSettings = m_pProjItem->GetProject().GetSnappingSettings();
+	float fSnapTolerance = static_cast<float>(uiSnappingSettings & SNAPSETTING_ToleranceMask);
+	if(uiSnappingSettings & SNAPSETTING_Enabled)
+	{
+		if(uiSnappingSettings & SNAPSETTING_Grid)
+		{
+			//glm::vec2 ptGridSize = glm::vec2(DEFAULT_GRID_SIZE, DEFAULT_GRID_SIZE);// m_pProjItem->GetProject().GetGridSize();
+			//ptGridSize = HyMath::RoundVec(m_ActiveTransform.pos.Get() / ptGridSize) * ptGridSize;				
+			//m_ActiveTransform.pos.Set(HyMath::RoundToNearest(m_ActiveTransform.pos.GetX(), DEFAULT_GRID_SIZE), HyMath::RoundToNearest(m_ActiveTransform.pos.GetY(), DEFAULT_GRID_SIZE));
+		}
+		if(uiSnappingSettings & SNAPSETTING_Guides)
+		{
+			// TODO: implement guides
+			glm::vec2 ptGuidePos;
+		}
+		if(uiSnappingSettings & SNAPSETTING_Origin)
+		{
+			snapCandidateList.push_back(glm::vec2(0, 0));
+		}
+		if(uiSnappingSettings & SNAPSETTING_Items)
+		{
+			for(EntityDrawItem *pItem : m_ItemList)
+			{
+				// Find snap candidates, and test against them
+				if(pItem->GetEntityTreeItemData()->IsSelected() == false)
+				{
+					snapCandidateList.push_back(pItem->GetTransformCtrl().GetGrabPointWorldPos(TransformCtrl::GRAB_BotLeft, m_pCamera));
+					snapCandidateList.push_back(pItem->GetTransformCtrl().GetGrabPointWorldPos(TransformCtrl::GRAB_BotRight, m_pCamera));
+					snapCandidateList.push_back(pItem->GetTransformCtrl().GetGrabPointWorldPos(TransformCtrl::GRAB_TopRight, m_pCamera));
+					snapCandidateList.push_back(pItem->GetTransformCtrl().GetGrabPointWorldPos(TransformCtrl::GRAB_TopLeft, m_pCamera));
+
+					if(uiSnappingSettings & SNAPSETTING_ItemMidPoints)
+					{
+						glm::vec2 ptMid;
+						pItem->GetTransformCtrl().GetCentroid(ptMid);
+						snapCandidateList.push_back(ptMid);
+					}
+				}
+			}
+		}
+	}
+
 	// The mouse cursor must be set when transforming - it is used to determine the type of transform
 	switch(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape())
 	{
@@ -828,45 +878,43 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		else
 			m_ActiveTransform.pos.Set(HyMath::RoundVec(ptMousePos - m_ptDragStart));
 
-		// Perform snapping
-		if(m_pProjItem->GetProject().GetSnappingSettings() & SNAPSETTING_Enabled)
+		if(snapCandidateList.empty() == false)
 		{
-			uint32 uiSnappingSettings = m_pProjItem->GetProject().GetSnappingSettings();
+			RefreshTransforms(); // Need to refreshTransforms here because of the above m_ActiveTransform.pos.Set() call
 
-			float fSnapTolerance = static_cast<float>(uiSnappingSettings & SNAPSETTING_ToleranceMask);
-			if(uiSnappingSettings & SNAPSETTING_Grid)
+			bool bSnapX = false;
+			bool bSnapY = false;
+			TransformCtrl::GrabPointType eLastGrabPoint = (uiSnappingSettings & SNAPSETTING_ItemMidPoints) ? TransformCtrl::GRAB_BotMid : TransformCtrl::GRAB_TopLeft;
+			for(glm::vec2 ptSnapCandidate : snapCandidateList)
 			{
-				glm::vec2 ptGridSize = glm::vec2(DEFAULT_GRID_SIZE, DEFAULT_GRID_SIZE);// m_pProjItem->GetProject().GetGridSize();
-				m_ActiveTransform.pos.Set(HyMath::RoundVec(m_ActiveTransform.pos.Get() / ptGridSize) * ptGridSize);
-			}
-			//if(uiSnappingSettings & SNAPSETTING_Guides)
-			//{
-			//	glm::vec2 ptGuidePos;
-			//	if(m_pProjItem->GetProject().GetClosestGuidePos(ptMousePos, ptGuidePos))
-			//		m_ActiveTransform.pos.Set(ptGuidePos - m_ptDragStart);
-			//}
-			if(uiSnappingSettings & SNAPSETTING_Origin)
-			{
+				for(int i = 0; i <= eLastGrabPoint; ++i)
+				{
+					glm::vec2 ptTestPoint = pCurTransform->GetGrabPointWorldPos(static_cast<TransformCtrl::GrabPointType>(i), m_pCamera);
+					if(bSnapX == false && abs(ptSnapCandidate.x - ptTestPoint.x) <= fSnapTolerance)
+					{
+						m_ActiveTransform.pos.Offset(ptSnapCandidate.x - ptTestPoint.x, 0.0f);
+						bSnapX = true;
+					}
+					if(bSnapY == false && abs(ptSnapCandidate.y - ptTestPoint.y) <= fSnapTolerance)
+					{
+						m_ActiveTransform.pos.Offset(0.0f, ptSnapCandidate.y - ptTestPoint.y);
+						bSnapY = true;
+					}
 
-			}
-			if(uiSnappingSettings & SNAPSETTING_Items)
-			{
+					if(bSnapX && bSnapY)
+						break;
+				}
 
+				if(bSnapX && bSnapY)
+					break;
 			}
 		}
-
 		break;
 
 	case Qt::SizeBDiagCursor:	// Scaling
 	case Qt::SizeVerCursor:		// Scaling
 	case Qt::SizeFDiagCursor:	// Scaling
 	case Qt::SizeHorCursor: {	// Scaling
-		TransformCtrl *pCurTransform = nullptr;
-		if(m_MultiTransform.IsShown())
-			pCurTransform = &m_MultiTransform;
-		else
-			pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
-
 		bool bUniformScale = true;
 		TransformCtrl::GrabPointType eAnchorPoint = TransformCtrl::GRAB_None;
 		TransformCtrl::GrabPointType eAnchorWidth = TransformCtrl::GRAB_None;

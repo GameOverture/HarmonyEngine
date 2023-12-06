@@ -45,6 +45,7 @@ public:
 	{
 		GRAB_None = -1,
 
+		// NOTE: Order matters - snap logic relies on this order
 		GRAB_BotLeft = 0,
 		GRAB_BotRight,
 		GRAB_TopRight,
