@@ -39,7 +39,7 @@ public:
 
 	static void OnProjectDestructor(Project *pProject);
 
-	static HarmonyWidget *GetWidget(Project *pProject);
+	static HarmonyWidget *GetHarmonyWidget(Project *pProject);
 
 private Q_SLOTS:
 	void OnHarmonyWidgetReady(HarmonyWidget *pWidget);

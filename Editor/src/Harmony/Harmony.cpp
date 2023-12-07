@@ -78,7 +78,7 @@ Harmony::Harmony(MainWindow &mainWindowRef) :
 		sm_pInstance->m_pWidget->CloseProject();
 }
 
-/*static*/ HarmonyWidget *Harmony::GetWidget(Project *pProject)
+/*static*/ HarmonyWidget *Harmony::GetHarmonyWidget(Project *pProject)
 {
 	if(sm_pInstance->m_pWidget->IsProject(pProject) == false)
 	{

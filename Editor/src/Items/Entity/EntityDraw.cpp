@@ -139,7 +139,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	if(m_bPanCameraKeyDown || m_bPlayingPreview)
 		RefreshTransforms();
-	else if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
+	else if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
 		DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 }
 
@@ -149,7 +149,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	if(m_bPanCameraKeyDown || m_bPlayingPreview)
 		RefreshTransforms();
-	else if(pEvent->button() == Qt::LeftButton && Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
+	else if(pEvent->button() == Qt::LeftButton && Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
 	{
 		if(m_eShapeEditState != SHAPESTATE_None)
 			DoMousePress_ShapeEdit(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
@@ -167,7 +167,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	if(m_bPanCameraKeyDown || m_bPlayingPreview)
 		IDraw::OnMouseReleaseEvent(pEvent);
-	else if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
+	else if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
 	{
 		IDraw::OnMouseReleaseEvent(pEvent);
 
@@ -227,7 +227,7 @@ void EntityDraw::SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive)
 	m_eShapeEditState = bAsPrimitive ? SHAPESTATE_DragAddPrimitive : SHAPESTATE_DragAddShape;
 	m_DragShape.Setup(eShape, bAsPrimitive ? ENTCOLOR_Primitive : ENTCOLOR_Shape, 1.0f, 1.0f);
 	
-	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
+	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
 }
 
 void EntityDraw::ActivateVemOnNextJsonMeta()
@@ -253,7 +253,7 @@ void EntityDraw::SetShapeEditVertex()
 	m_pCurVertexEditItem->HideTransformCtrl();
 	m_pCurVertexEditItem->GetShapeCtrl().EnableVertexEditMode();
 
-	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
 void EntityDraw::RequestClearShapeEdit()
@@ -276,7 +276,7 @@ void EntityDraw::ClearShapeEdit()
 	}
 	m_eCurVemAction = ShapeCtrl::VEMACTION_None;
 
-	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
 void EntityDraw::SetExtrapolatedProperties()
@@ -564,7 +564,7 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 {
 	if(m_eDragState == DRAGSTATE_Marquee)
 	{
-		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
 
 		glm::vec2 ptCurMousePos;
 		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
@@ -581,8 +581,8 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 	}
 	else // 'm_eDragState' is DRAGSTATE_None
 	{
-		if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
-			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+		if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 		
 		m_pCurHoverItem = nullptr;
 		for(int32 i = m_ItemList.size() - 1; i >= 0; --i) // iterate backwards to prioritize selecting items with higher display order
@@ -599,7 +599,7 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 		{
 			m_eCurHoverGrabPoint = m_MultiTransform.IsMouseOverGrabPoint();
 			Qt::CursorShape eNextCursorShape = GetGrabPointCursorShape(m_eCurHoverGrabPoint, m_MultiTransform.GetCachedRotation());
-			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(eNextCursorShape);
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(eNextCursorShape);
 		}
 
 		if(m_SelectedItemList.size() == 1)
@@ -608,7 +608,7 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 
 			m_eCurHoverGrabPoint = transformCtrlRef.IsMouseOverGrabPoint();
 			Qt::CursorShape eNextCursorShape = GetGrabPointCursorShape(m_eCurHoverGrabPoint, transformCtrlRef.GetCachedRotation());
-			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(eNextCursorShape);
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(eNextCursorShape);
 			if(eNextCursorShape != Qt::ArrowCursor)
 				m_pCurHoverItem = m_SelectedItemList[0]; // Override whatever might be above this item, because we're hovering over a grab point
 		}
@@ -617,8 +617,8 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 
 void EntityDraw::DoMousePress_Select(bool bCtrlMod, bool bShiftMod)
 {
-	if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() == Qt::OpenHandCursor)
-		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
+	if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() == Qt::OpenHandCursor)
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
 
 	if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
 		HyGuiLog("EntityDraw::DoMousePress - GetWorldMousePos failed", LOGTYPE_Error);
@@ -715,7 +715,7 @@ void EntityDraw::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 
 	// Reset
 	m_bSelectionHandled = false;
-	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
 void EntityDraw::BeginTransform(bool bWithMouse)
@@ -762,8 +762,8 @@ void EntityDraw::BeginTransform(bool bWithMouse)
 	{
 		// The mouse cursor must be set when transforming - it is used to determine the type of transform
 		// If it isn't set, then it must be translating (it isn't from GetGrabPointCursorShape())
-		if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() == Qt::ArrowCursor)
-			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::SizeAllCursor);
+		if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() == Qt::ArrowCursor)
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::SizeAllCursor);
 
 		m_eDragState = DRAGSTATE_Transforming;
 	}
@@ -828,7 +828,7 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 	}
 
 	// The mouse cursor must be set when transforming - it is used to determine the type of transform
-	switch(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape())
+	switch(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape())
 	{
 	case Qt::ClosedHandCursor: // Rotating
 		m_ActiveTransform.rot_pivot.Set(m_ptDragCenter);
@@ -1023,7 +1023,7 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		break;
 
 	default:
-		HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
+		HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
 	}
 
 	// This updates the preview of a shape (its 'outline') when being transformed
@@ -1070,7 +1070,7 @@ void EntityDraw::DoMouseRelease_Transform()
 	m_ActiveTransform.rot.Set(0.0f);
 	m_ActiveTransform.scale.Set(1.0f, 1.0f);
 
-	Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
 void EntityDraw::DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod)
@@ -1099,12 +1099,12 @@ void EntityDraw::DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 				HyGuiLog("EntityDraw::DoMouseMove_ShapeEdit() - Unhandled ShapeCtrl::VemAction for DRAGSTATE_None", LOGTYPE_Error);
 				break;
 			}
-			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(eCursorShape);
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(eCursorShape);
 		}
 		break;
 
 	case DRAGSTATE_Marquee:
-		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
 
 		m_DragShape.Setup(SHAPE_Box, ENTCOLOR_Marquee, 0.25f, 1.0f);
 		m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptCurMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
@@ -1123,10 +1123,10 @@ void EntityDraw::DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 			if(m_pCurVertexEditItem->GetShapeCtrl().TransformVemVerts(m_eCurVemAction, m_ptDragStart, ptCurMousePos, m_pCamera))
 			{
 				if(m_eCurVemAction != ShapeCtrl::VEMACTION_Add)
-					Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::BlankCursor);
+					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::BlankCursor);
 			}
 			else
-				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ForbiddenCursor);
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ForbiddenCursor);
 		}
 		break;
 	}
@@ -1156,10 +1156,10 @@ void EntityDraw::DoMousePress_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 			if(m_eCurVemAction == ShapeCtrl::VEMACTION_Add)
 			{
 				if(m_pCurVertexEditItem->GetShapeCtrl().TransformVemVerts(m_eCurVemAction, m_ptDragStart, m_ptDragStart, m_pCamera) == false)
-					Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ForbiddenCursor);
+					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ForbiddenCursor);
 			}
 			else
-				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::BlankCursor);
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::BlankCursor);
 
 			m_PressTimer.InitStart(0.5f);
 			m_eDragState = DRAGSTATE_Pending;
@@ -1216,7 +1216,7 @@ void EntityDraw::DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 			m_pProjItem->GetUndoStack()->push(pCmd);
 		}
 
-		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 	}
 }
 

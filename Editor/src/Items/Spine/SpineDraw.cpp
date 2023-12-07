@@ -45,7 +45,7 @@ SpineDraw::~SpineDraw()
 			uchar *pPixelData = SOIL_load_image(subAtlasRef.m_ImageFileInfo.absoluteFilePath().toStdString().c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);
 			uint32 uiPixelDataSize = iWidth * iHeight * 4;
 
-			HyTextureHandle hNewTex = Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(
+			HyTextureHandle hNewTex = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(
 				HyTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0),
 				iWidth,
 				iHeight,

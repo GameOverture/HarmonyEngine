@@ -130,7 +130,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 	if(pEvent->key() == KEY_PanCamera)
 	{
 		if(m_bIsCameraPanning == false)
-			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::OpenHandCursor);
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::OpenHandCursor);
 		m_bPanCameraKeyDown = true;
 	}
 }
@@ -142,7 +142,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		m_bPanCameraKeyDown = false;
 
 		if(m_bIsCameraPanning == false)
-			Harmony::GetWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
 	}
 }
 
@@ -154,7 +154,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		{
 			m_bIsCameraPanning = true;
 			m_ptOldMousePos = pEvent->localPos();
-			Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
 		}
 	}
 }
@@ -167,9 +167,9 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		{
 			m_bIsCameraPanning = false;
 			if(m_bPanCameraKeyDown)
-				Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::OpenHandCursor);
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::OpenHandCursor);
 			else
-				Harmony::GetWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
 
 			if(m_ptCamPos.x != m_pCamera->pos.X() || m_ptCamPos.y != m_pCamera->pos.Y())
 			{
@@ -214,9 +214,9 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 /*virtual*/ void IDraw::OnMouseMoveEvent(QMouseEvent *pEvent)
 {
 	if(MainWindow::GetCurrentLoading().empty() == false)
-		Harmony::GetWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::WaitCursor);
-	else if(Harmony::GetWidget(&m_pProjItem->GetProject())->GetCursorShape() == Qt::WaitCursor)
-		Harmony::GetWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::WaitCursor);
+	else if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() == Qt::WaitCursor)
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
 
 	QPointF ptCurMousePos = pEvent->localPos();
 

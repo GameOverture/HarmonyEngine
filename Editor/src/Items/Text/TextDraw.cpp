@@ -25,7 +25,7 @@ TextDraw::TextDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataR
 TextDraw::~TextDraw()
 {
 	if(m_hTexture != HY_UNUSED_HANDLE)
-		Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->DeleteTexture(m_hTexture);
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->DeleteTexture(m_hTexture);
 }
 
 void TextDraw::SetTextState(uint uiStateIndex)
@@ -38,19 +38,19 @@ void TextDraw::SetTextState(uint uiStateIndex)
 	uint uiAtlasPixelDataSize = 0;
 	QSize atlasDimensions;
 	unsigned char *pAtlasPixelData = static_cast<TextModel *>(m_pProjItem->GetModel())->GetFontManager().GetAtlasInfo(uiAtlasPixelDataSize, atlasDimensions);
-	if(pAtlasPixelData == nullptr || Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer() == nullptr)
+	if(pAtlasPixelData == nullptr || Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer() == nullptr)
 		return;
 
 	if(m_hTexture != HY_UNUSED_HANDLE)
-		Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->DeleteTexture(m_hTexture);
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->DeleteTexture(m_hTexture);
 
 	// Upload texture to gfx api
-	m_hTexture = Harmony::GetWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(HyTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0),
-																								  atlasDimensions.width(),
-																								  atlasDimensions.height(),
-																								  pAtlasPixelData,
-																								  uiAtlasPixelDataSize,
-																								  0);
+	m_hTexture = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(HyTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0),
+																										atlasDimensions.width(),
+																										atlasDimensions.height(),
+																										pAtlasPixelData,
+																										uiAtlasPixelDataSize,
+																										0);
 
 	// Re-acquire latest FileDataPair because a newly generated preview texture may have been created above via GetAtlasInfo()
 	FileDataPair itemFileData;

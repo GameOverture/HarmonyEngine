@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	while(ui->stackedTabWidgets->count())
 		ui->stackedTabWidgets->removeWidget(ui->stackedTabWidgets->currentWidget());
 
-	SetHarmonyWidget(m_Harmony.GetWidget(nullptr));
+	SetHarmonyWidget(m_Harmony.GetHarmonyWidget(nullptr));
 	SetCurrentProject(nullptr);
 
 	connect(ui->menu_View, SIGNAL(aboutToShow), this, SLOT(on_menu_View_aboutToShow));
