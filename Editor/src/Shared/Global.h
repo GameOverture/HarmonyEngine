@@ -43,7 +43,8 @@ class Project;
 
 #define HYGUI_FILE_VERSION 14
 
-#define DISPLAYORDER_TransformCtrl 9999999
+#define DISPLAYORDER_SnapGuide		99999999
+#define DISPLAYORDER_TransformCtrl	9999999
 //#define HYGUI_UseBinaryMetaFiles
 
 #define DEFAULT_GRID_SIZE 25.0f
@@ -215,7 +216,7 @@ enum SnappingSetting
 	SNAPSETTING_ItemMidPoints	= 1 << 21,
 	// NOTE: Cannot exceed 32 bits (SnappingSetting is stored as a uint32)
 
-	SNAPSETTING_DefaultSettings = 8 | SNAPSETTING_Enabled | SNAPSETTING_Guides | SNAPSETTING_Origin | SNAPSETTING_Items | SNAPSETTING_ItemMidPoints
+	SNAPSETTING_DefaultSettings = 20 | SNAPSETTING_Enabled | SNAPSETTING_Guides | SNAPSETTING_Origin | SNAPSETTING_Items | SNAPSETTING_ItemMidPoints
 };
 
 enum SubIcon

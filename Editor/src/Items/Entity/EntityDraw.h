@@ -67,6 +67,9 @@ class EntityDraw : public IDraw
 	HyEntity2d								m_ActiveTransform;
 	QList<glm::mat4>						m_PrevTransformList;
 
+	HyPrimitive2d							m_SnapGuideHorz;
+	HyPrimitive2d							m_SnapGuideVert;
+
 	bool									m_bActivateVemOnNextJsonMeta;
 	bool									m_bPlayingPreview;
 

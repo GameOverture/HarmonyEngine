@@ -28,11 +28,25 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_eShapeEditState(SHAPESTATE_None),
 	m_pCurVertexEditItem(nullptr),
 	m_eCurVemAction(ShapeCtrl::VEMACTION_None),
+	m_SnapGuideHorz(this),
+	m_SnapGuideVert(this),
 	m_bActivateVemOnNextJsonMeta(false),
 	m_bPlayingPreview(false)
 {
 	m_MultiTransform.Hide();
 	m_PressTimer.SetExpiredCallback(OnMousePressTimer, this);
+
+	m_SnapGuideHorz.SetVisible(false);
+	m_SnapGuideHorz.SetTint(HyColor::DarkGreen);
+	m_SnapGuideHorz.SetLineThickness(4.0f);
+	//m_SnapGuideHorz.UseWindowCoordinates();
+	m_SnapGuideHorz.SetDisplayOrder(DISPLAYORDER_SnapGuide);
+
+	m_SnapGuideVert.SetVisible(false);
+	m_SnapGuideVert.SetTint(HyColor::DarkGreen);
+	m_SnapGuideVert.SetLineThickness(4.0f);
+	//m_SnapGuideVert.UseWindowCoordinates();
+	m_SnapGuideVert.SetDisplayOrder(DISPLAYORDER_SnapGuide);
 }
 
 /*virtual*/ EntityDraw::~EntityDraw()
@@ -820,6 +834,7 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 					{
 						glm::vec2 ptMid;
 						pItem->GetTransformCtrl().GetCentroid(ptMid);
+						m_pCamera->ProjectToWorld(ptMid, ptMid);
 						snapCandidateList.push_back(ptMid);
 					}
 				}
@@ -884,20 +899,72 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 
 			bool bSnapX = false;
 			bool bSnapY = false;
-			TransformCtrl::GrabPointType eLastGrabPoint = (uiSnappingSettings & SNAPSETTING_ItemMidPoints) ? TransformCtrl::GRAB_BotMid : TransformCtrl::GRAB_TopLeft;
+
 			for(glm::vec2 ptSnapCandidate : snapCandidateList)
 			{
-				for(int i = 0; i <= eLastGrabPoint; ++i)
+				for(int i = 0; i <= TransformCtrl::GRAB_TopLeft + 1; ++i)
 				{
-					glm::vec2 ptTestPoint = pCurTransform->GetGrabPointWorldPos(static_cast<TransformCtrl::GrabPointType>(i), m_pCamera);
+					glm::vec2 ptTestPoint;
+					if(i == TransformCtrl::GRAB_TopLeft + 1)
+					{
+						pCurTransform->GetCentroid(ptTestPoint);
+						m_pCamera->ProjectToWorld(ptTestPoint, ptTestPoint);
+					}
+					else
+						ptTestPoint = pCurTransform->GetGrabPointWorldPos(static_cast<TransformCtrl::GrabPointType>(i), m_pCamera);
+
 					if(bSnapX == false && abs(ptSnapCandidate.x - ptTestPoint.x) <= fSnapTolerance)
 					{
+						// Perform the snap
 						m_ActiveTransform.pos.Offset(ptSnapCandidate.x - ptTestPoint.x, 0.0f);
+						
+						// Determine the horizontal snap guide line (in scene coordinates)
+						glm::vec2 ptStartPos, ptEndPos;
+						if(ptTestPoint.y < ptSnapCandidate.y)
+							ptTestPoint.y = pCurTransform->GetSceneAABB().lowerBound.y;
+						else
+							ptTestPoint.y = pCurTransform->GetSceneAABB().upperBound.y;
+
+						// Convert to camera coordinates
+						//m_pCamera->ProjectToCamera(ptTestPoint, ptTestPoint);
+						//m_pCamera->ProjectToCamera(ptSnapCandidate, ptSnapCandidate);
+
+						// Initialize the horizontal snap guide line
+						ptTestPoint.x = ptSnapCandidate.x;
+						m_SnapGuideHorz.SetAsLineSegment(ptTestPoint, ptSnapCandidate);
+						if(m_SnapGuideHorz.IsVisible() == false)
+						{
+							m_SnapGuideHorz.alpha.Set(0.0f);
+							m_SnapGuideHorz.alpha.Tween(1.0f, 0.33f);
+						}
+						m_SnapGuideHorz.SetVisible(true);
 						bSnapX = true;
 					}
 					if(bSnapY == false && abs(ptSnapCandidate.y - ptTestPoint.y) <= fSnapTolerance)
 					{
+						// Perform the snap
 						m_ActiveTransform.pos.Offset(0.0f, ptSnapCandidate.y - ptTestPoint.y);
+
+						// Determine the vertical snap guide line (in scene coordinates)
+						glm::vec2 ptStartPos, ptEndPos;
+						if(ptTestPoint.x < ptSnapCandidate.x)
+							ptTestPoint.x = pCurTransform->GetSceneAABB().lowerBound.x;
+						else
+							ptTestPoint.x = pCurTransform->GetSceneAABB().upperBound.x;
+
+						// Convert to camera coordinates
+						//m_pCamera->ProjectToCamera(ptTestPoint, ptTestPoint);
+						//m_pCamera->ProjectToCamera(ptSnapCandidate, ptSnapCandidate);
+
+						// Initialize the vertical snap guide line
+						ptTestPoint.y = ptSnapCandidate.y;
+						m_SnapGuideVert.SetAsLineSegment(ptTestPoint, ptSnapCandidate);
+						if(m_SnapGuideVert.IsVisible() == false)
+						{
+							m_SnapGuideVert.alpha.Set(0.0f);
+							m_SnapGuideVert.alpha.Tween(1.0f, 0.33f);
+						}
+						m_SnapGuideVert.SetVisible(true);
 						bSnapY = true;
 					}
 
@@ -908,6 +975,11 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 				if(bSnapX && bSnapY)
 					break;
 			}
+
+			if(bSnapX == false)
+				m_SnapGuideHorz.SetVisible(false);
+			if(bSnapY == false)
+				m_SnapGuideVert.SetVisible(false);
 		}
 		break;
 
@@ -1069,6 +1141,9 @@ void EntityDraw::DoMouseRelease_Transform()
 	m_ActiveTransform.pos.Set(0.0f, 0.0f);
 	m_ActiveTransform.rot.Set(0.0f);
 	m_ActiveTransform.scale.Set(1.0f, 1.0f);
+
+	m_SnapGuideHorz.SetVisible(false);
+	m_SnapGuideVert.SetVisible(false);
 
 	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
