@@ -95,7 +95,25 @@
 /*static*/ std::string HyIO::CleanPath(const char *szPath, const char *szExtension, bool bMakeLowercase)
 {
 	std::string sPath(szPath ? szPath : "");
+
+	// If sPath starts with "\\", set 'bIsNetworkPath' to true
+	bool bIsNetworkPath = false;
+	if(sPath.length() >= 2 && sPath[0] == '\\' && sPath[1] == '\\')
+		bIsNetworkPath = true;
+
+	// If this is a newtwork path, get rid of the leading '\\'
+	if(bIsNetworkPath)
+	{
+		sPath.erase(0, 2);
+		if(sPath.empty())
+			return sPath;
+	}
+
 	std::replace(sPath.begin(), sPath.end(), '\\', '/');
+
+	// Prepend the "\\" back onto the path if it was a network path
+	if(bIsNetworkPath)
+		sPath.insert(0, "\\\\");
 
 	if(szExtension)
 	{

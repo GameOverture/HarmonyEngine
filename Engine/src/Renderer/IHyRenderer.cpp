@@ -183,6 +183,7 @@ void IHyRenderer::Render()
 
 		Begin_2d();
 		HyWindow::CameraIterator2d cameraIter(m_pCurWindow->GetCamera2dList());
+		HyAssert(cameraIter.IsEnd() == false, "No cameras have been created for this window");
 		for(uint32 k = 0; k < pRsHeader->m_uiNum2dRenderStates; k++)
 		{
 			pCurRenderState = reinterpret_cast<HyRenderBuffer::State *>(pRsBufferPos);

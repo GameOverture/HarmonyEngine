@@ -172,6 +172,7 @@ int32 HyTexturedQuad2d::GetEntireTextureHeight() const
 		SOIL_free_image_data(pPixelData);
 
 		m_ShaderUniforms.SetTexHandle(0, m_hTextureHandle);
+		m_UvRect.Set(0.0f, 1.0f, 1.0f, 0.0f);
 	}
 	else
 	{
@@ -206,7 +207,7 @@ int32 HyTexturedQuad2d::GetEntireTextureHeight() const
 
 /*virtual*/ bool HyTexturedQuad2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent)
 {
-	const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(UncheckedGetData());
+	//const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(UncheckedGetData());
 
 	glm::vec2 vSize(m_UvRect.Width() * m_iFullTextureWidth, m_UvRect.Height() * m_iFullTextureHeight);
 
