@@ -46,6 +46,7 @@ class HyInputMap
 	std::map<int32, uint32>			m_ActionIndexMap;
 	std::vector<ActionInfo>			m_ActionList;
 
+	int32							m_iGamePadIndex;
 	float							m_AxisValues[HYNUM_HYPADAXIS];
 
 public:
@@ -70,6 +71,9 @@ public:
 
 	bool Unmap(int32 iActionId);
 	bool IsMapped(int32 iActionId) const;
+
+	int GetGamePadIndex() const;
+	void SetGamePadIndex(int32 iGamePadIndex);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check input

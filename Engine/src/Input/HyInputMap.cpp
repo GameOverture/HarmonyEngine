@@ -13,7 +13,8 @@
 #include "Input/HyInput.h"
 #include "Window/HyWindow.h"
 
-HyInputMap::HyInputMap()
+HyInputMap::HyInputMap() :
+	m_iGamePadIndex(0)
 {
 	for(uint32 i = 0; i < HYNUM_HYPADAXIS; ++i)
 		m_AxisValues[i] = 0.0f;
@@ -196,6 +197,16 @@ bool HyInputMap::IsMapped(int32 iUserId) const
 	// TODO:
 	HyError("HyInputMap::IsMapped not implemented");
 	return false;
+}
+
+int HyInputMap::GetGamePadIndex() const
+{
+	return m_iGamePadIndex;
+}
+
+void HyInputMap::SetGamePadIndex(int32 iGamePadIndex)
+{
+	m_iGamePadIndex = iGamePadIndex;
 }
 
 bool HyInputMap::IsActionDown(int32 iActionId) const

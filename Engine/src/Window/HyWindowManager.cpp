@@ -26,6 +26,7 @@ HyWindowManager::HyWindowManager(HyEngine &engineRef, uint32 uiNumWindows, bool 
 	// Setup error callback before glfwInit to catch anything that might go wrong with glfwInit
 	glfwSetErrorCallback(HyGlfw_ErrorCallback);
 
+	glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
 	if(glfwInit() == GLFW_FALSE)
 		HyLogError("glfwInit failed");
 #endif

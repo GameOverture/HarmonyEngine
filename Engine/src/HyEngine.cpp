@@ -151,6 +151,8 @@ bool HyEngine::PollPlatformApi()
 			return false;
 	}
 
+	m_Input.UpdateGlfwGamepads();
+
 	// OnWindowResized() and OnWindowMoved() are invoked when appropriate
 	glfwPollEvents();
 #elif defined(HY_USE_SDL2)

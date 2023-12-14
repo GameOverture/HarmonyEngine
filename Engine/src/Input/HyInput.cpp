@@ -283,6 +283,20 @@ bool HyInput::IsMapped(int32 iActionId, uint32 uiMappingIndex /*= 0*/) const
 	return m_pInputMaps[uiMappingIndex].IsMapped(iActionId);
 }
 
+bool HyInput::AssignGamePadIndex(int32 iGamePadIndex, uint32 uiMappingIndex /*= 0*/)
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
+
+#ifdef HY_USE_GLFW
+	if(GLFW_FALSE == glfwJoystickPresent(iGamePadIndex))
+		return false;
+#elif defined(HY_USE_SDL2)
+	SDL_GameControllerOpen(iGamePadIndex);
+#endif
+
+	m_pInputMaps[uiMappingIndex].SetGamePadIndex(iGamePadIndex);
+}
+
 bool HyInput::IsActionDown(int32 iUserId, uint32 uiMappingIndex /*= 0*/) const
 {
 	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
@@ -408,6 +422,35 @@ void HyInput::DoTouchCancel(int32 iId)
 
 		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
 			m_pInputMaps[i].ApplyInput(iKey, static_cast<HyBtnPressState>(iAction));
+	}
+
+	void HyInput::UpdateGlfwGamepads()
+	{
+		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+		{
+			int iGamepadIndex = m_pInputMaps[i].GetGamePadIndex();
+			int iCount = 0;
+			
+			// Buttons
+			const unsigned char *pButtonValues = glfwGetJoystickButtons(iGamepadIndex, &iCount);
+			for(int iBtnIndex = 0; iBtnIndex < iCount; ++iBtnIndex)
+				m_pInputMaps[i].ApplyPadInput(static_cast<HyGamePadBtn>(iBtnIndex), pButtonValues[iBtnIndex] == GLFW_PRESS ? HYBTN_Press : HYBTN_Release);
+
+			// Hats
+			const unsigned char *pHatValues = glfwGetJoystickHats(iGamepadIndex, &iCount);
+			HyAssert(iCount == 1, "HyInput::UpdateGlfwGamepads() - GLFW only supports 1 hat per gamepad");
+			m_pInputMaps[i].ApplyPadInput(HYPAD_DpadUp, (pHatValues[0] & GLFW_HAT_UP) != 0 ? HYBTN_Press : HYBTN_Release);
+			m_pInputMaps[i].ApplyPadInput(HYPAD_DpadRight, (pHatValues[0] & GLFW_HAT_RIGHT) != 0 ? HYBTN_Press : HYBTN_Release);
+			m_pInputMaps[i].ApplyPadInput(HYPAD_DpadDown, (pHatValues[0] & GLFW_HAT_DOWN) != 0 ? HYBTN_Press : HYBTN_Release);
+			m_pInputMaps[i].ApplyPadInput(HYPAD_DpadLeft, (pHatValues[0] & GLFW_HAT_LEFT) != 0 ? HYBTN_Press : HYBTN_Release);
+
+			// Axes
+			const float *pAxesValues = glfwGetJoystickAxes(iGamepadIndex, &iCount);
+			iCount = HyMath::Min(iCount, static_cast<int>(HYNUM_HYPADAXIS));
+
+			for(int iAxesIndex = 0; iAxesIndex < iCount; ++iAxesIndex)
+				m_pInputMaps[i].ApplyPadAxis(iAxesIndex, pAxesValues[iAxesIndex]);
+		}
 	}
 #elif defined(HY_USE_SDL2)
 	void HyInput::DoKeyDownEvent(const SDL_Event &eventRef)

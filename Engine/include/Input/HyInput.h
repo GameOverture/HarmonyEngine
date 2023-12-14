@@ -87,6 +87,8 @@ public:
 	bool Unmap(int32 iActionId, uint32 uiMappingIndex = 0);
 	bool IsMapped(int32 iActionId, uint32 uiMappingIndex = 0) const;
 
+	bool AssignGamePadIndex(int32 iGamePadIndex, uint32 uiMappingIndex = 0);
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check for Input
 	bool IsActionDown(int32 iUserId, uint32 uiMappingIndex = 0) const;
@@ -128,6 +130,7 @@ private:
 	friend void HyGlfw_JoystickCallback(int32 iJoyId, int32 iEvent);
 
 	void OnGlfwKey(int32 iKey, int32 iAction);
+	void UpdateGlfwGamepads();
 #elif defined(HY_USE_SDL2)
 	void DoKeyDownEvent(const SDL_Event &eventRef);
 	void DoKeyUpEvent(const SDL_Event &eventRef);
