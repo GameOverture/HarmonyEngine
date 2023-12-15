@@ -686,7 +686,7 @@ void PropertiesTreeModel::ResetValues()
 			if(propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn || propDefRef.eAccessType == PROPERTIESACCESS_ToggleOff)
 				return propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn ? Qt::Checked : Qt::Unchecked;
 		}
-		else if(propDefRef.eType == PROPERTIESTYPE_bool && propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn)
+		else if(propDefRef.eType == PROPERTIESTYPE_bool && (propDefRef.eAccessType == PROPERTIESACCESS_ToggleOn || propDefRef.eAccessType == PROPERTIESACCESS_Mutable))
 			return pTreeItem->data(PROPERTIESCOLUMN_Value);
 	}
 
