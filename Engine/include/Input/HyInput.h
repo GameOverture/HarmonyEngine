@@ -14,6 +14,8 @@
 #include "Input/HyInputMap.h"
 
 class HyWindow;
+class HyGamePad;
+class HyJoystick;
 
 class HyInput
 {
@@ -39,12 +41,13 @@ class HyInput
 	int32							m_iTextCursorIndex;
 	int32							m_iTextSelectLength;
 
-	bool							m_bTouchScreen;	// Whether the user has a touch screen instead of a mouse
+	bool							m_bTouchScreen;							// Whether the user has a touch screen instead of a mouse
 	bool							m_bTouchActive;
 	int32							m_iTouchId;
 
-	int32							m_JoystickList[HYNUM_JOYSTICK];
-	uint32							m_uiJoystickCount;
+	bool							m_bControllerBackgroundInputEnabled;	// Whether to process GamePad/Joystick input when the window is not in focus
+	std::vector<HyGamePad *>		m_GamePadList;							// Currently connected GamePads
+	std::vector<HyJoystick *>		m_JoystickList;							// Currently connected Joysticks
 
 	std::map<int, HyMouseCursorPtr>	m_LoadedCursorsMap;
 	bool							m_bCursorWasSet;
@@ -87,14 +90,25 @@ public:
 	bool Unmap(int32 iActionId, uint32 uiMappingIndex = 0);
 	bool IsMapped(int32 iActionId, uint32 uiMappingIndex = 0) const;
 
-	bool AssignGamePadIndex(int32 iGamePadIndex, uint32 uiMappingIndex = 0);
+	bool IsControllerBackgroundInputEnabled() const;
+	void SetControllerBackgroundInputEnabled(bool bEnable);
+
+	uint32 GetNumGamePads() const;
+	HyGamePad *GetGamePad(uint32 uiIndex) const;
+
+	uint32 GetNumJoysticks() const;
+	HyJoystick *GetJoystick(uint32 uiIndex) const;
+
+	void AssignGamePad(HyGamePad *pGamePad, uint32 uiMappingIndex = 0);
+	void RemoveGamePad(uint32 uiMappingIndex = 0);
+	void AssignJoystick(HyJoystick *pJoystick, uint32 uiMappingIndex = 0);
+	void RemoveJoystick(HyJoystick *pJoystick, uint32 uiMappingIndex = 0);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check for Input
 	bool IsActionDown(int32 iUserId, uint32 uiMappingIndex = 0) const;
 	bool IsActionReleased(int32 iUserId, uint32 uiMappingIndex = 0) const;	// Only true for a single frame upon button release
 	float GetGamePadAxis(HyGamePadAxis eAxis, uint32 uiMappingIndex = 0) const;
-	float GetGamePadAxisDelta(HyGamePadAxis eAxis, uint32 uiMappingIndex = 0) const;
 
 	bool IsTextInputActive();
 	void StartTextInput();
@@ -121,6 +135,8 @@ public:
 	void DoTouchCancel(int32 iId);
 
 private:
+	void AllocateController(int32 iDeviceIndex, bool bIsGamePad);
+
 #ifdef HY_USE_GLFW
 	friend void HyGlfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods);
 	friend void HyGlfw_CursorPosCallback(GLFWwindow *pWindow, double dX, double dY);
@@ -130,7 +146,7 @@ private:
 	friend void HyGlfw_JoystickCallback(int32 iJoyId, int32 iEvent);
 
 	void OnGlfwKey(int32 iKey, int32 iAction);
-	void UpdateGlfwGamepads();
+	void UpdateGlfwControllers();							// Update all assigned controllers (GamePads/Joysticks)
 #elif defined(HY_USE_SDL2)
 	void DoKeyDownEvent(const SDL_Event &eventRef);
 	void DoKeyUpEvent(const SDL_Event &eventRef);
@@ -141,15 +157,15 @@ private:
 	void DoMouseUpEvent(const SDL_Event &eventRef);
 	void DoMouseWheelEvent(const SDL_Event &eventRef);
 	void SetMouseWindow(HyWindow *pWindow);
-	void DoPadAxis(const SDL_Event &eventRef);
-	void DoPadBtnDown(const SDL_Event &eventRef);
-	void DoPadBtnUp(const SDL_Event &eventRef);
 	void DoTouchDownEvent(const SDL_Event &eventRef);
 	void DoTouchMoveEvent(const SDL_Event &eventRef);
 	void DoTouchUpEvent(const SDL_Event &eventRef);
 #elif defined(HY_PLATFORM_GUI)
 	void SetWidgetMousePos(glm::vec2 ptMousePos);
 #endif
+
+	void OnEventGamePadAxis(int32 iGamePadId, HyGamePadAxis eAxis, float fAxisValue);
+	void OnEventGamePadButton(int32 iGamePadId, HyGamePadBtn eButtonType, HyBtnPressState ePressState);
 
 	void DistrubuteTextInput(std::string sNewText);
 	void DistrubuteKeyboardInput(HyKeyboardBtn eBtn);

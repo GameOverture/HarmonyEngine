@@ -11,13 +11,12 @@
 #include "Afx/HyInteropAfx.h"
 #include "Input/HyInputMap.h"
 #include "Input/HyInput.h"
+#include "Input/IHyController.h"
 #include "Window/HyWindow.h"
 
 HyInputMap::HyInputMap() :
-	m_iGamePadIndex(0)
+	m_pGamePad(nullptr)
 {
-	for(uint32 i = 0; i < HYNUM_HYPADAXIS; ++i)
-		m_AxisValues[i] = 0.0f;
 }
 
 HyInputMap::~HyInputMap(void)
@@ -199,14 +198,48 @@ bool HyInputMap::IsMapped(int32 iUserId) const
 	return false;
 }
 
-int HyInputMap::GetGamePadIndex() const
+HyGamePad *HyInputMap::GetGamePad() const
 {
-	return m_iGamePadIndex;
+	return m_pGamePad;
 }
 
-void HyInputMap::SetGamePadIndex(int32 iGamePadIndex)
+void HyInputMap::AssignGamePad(HyGamePad *pGamePad)
 {
-	m_iGamePadIndex = iGamePadIndex;
+	m_pGamePad = pGamePad;
+}
+
+void HyInputMap::RemoveGamePad()
+{
+	m_pGamePad = nullptr;
+}
+
+const std::vector<HyJoystick *> &HyInputMap::GetJoystickList() const
+{
+	return m_JoystickList;
+}
+
+void HyInputMap::AssignJoystick(HyJoystick *pJoystick)
+{
+	if(pJoystick == nullptr)
+		return;
+	for(uint32 i = 0; i < m_JoystickList.size(); ++i)
+	{
+		if(m_JoystickList[i] == pJoystick)
+			return;
+	}
+	m_JoystickList.push_back(pJoystick);
+}
+
+void HyInputMap::RemoveJoystick(HyJoystick *pJoystick)
+{
+	for(uint32 i = 0; i < m_JoystickList.size(); ++i)
+	{
+		if(m_JoystickList[i] == pJoystick)
+		{
+			m_JoystickList.erase(m_JoystickList.begin() + i);
+			return;
+		}
+	}
 }
 
 bool HyInputMap::IsActionDown(int32 iActionId) const
@@ -227,18 +260,6 @@ bool HyInputMap::IsActionReleased(int32 iActionId) const
 	return (m_ActionList[iter->second].uiFlags & ActionInfo::FLAG_IsReleased) != 0;
 }
 
-float HyInputMap::GetAxis(HyGamePadAxis eAxis) const
-{
-	return m_AxisValues[eAxis];
-}
-
-float HyInputMap::GetAxisDelta(HyGamePadAxis eAxis) const
-{
-	// TODO:
-	HyError("HyInputMap::GetAxisDelta not implemented");
-	return 0.0f;
-}
-
 void HyInputMap::Update()
 {
 	for(uint32 i = 0; i < static_cast<uint32>(m_ActionList.size()); ++i)
@@ -253,7 +274,7 @@ void HyInputMap::Update()
 	}
 }
 
-void HyInputMap::ApplyInput(int32 iKey, HyBtnPressState ePressState)
+void HyInputMap::ApplyKeyBoardInput(int32 iKey, HyBtnPressState ePressState)
 {
 	for(uint32 i = 0; i < static_cast<uint32>(m_ActionList.size()); ++i)
 	{
@@ -270,11 +291,11 @@ void HyInputMap::ApplyInput(int32 iKey, HyBtnPressState ePressState)
 	}
 }
 
-void HyInputMap::ApplyPadInput(int32 iPadBtn, HyBtnPressState ePressState)
+void HyInputMap::ApplyGamePadButton(HyGamePadBtn eGamePadBtn, HyBtnPressState ePressState)
 {
 	for(uint32 i = 0; i < static_cast<uint32>(m_ActionList.size()); ++i)
 	{
-		if(m_ActionList[i].ePadBtn == iPadBtn)
+		if(m_ActionList[i].ePadBtn == eGamePadBtn)
 		{
 			if(ePressState == HYBTN_Press)
 				m_ActionList[i].uiFlags |= ActionInfo::FLAG_Pressed;
@@ -285,9 +306,4 @@ void HyInputMap::ApplyPadInput(int32 iPadBtn, HyBtnPressState ePressState)
 			}
 		}
 	}
-}
-
-void HyInputMap::ApplyPadAxis(int32 iAxis, float fValue)
-{
-	m_AxisValues[iAxis] = fValue;
 }

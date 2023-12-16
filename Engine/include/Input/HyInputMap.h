@@ -13,6 +13,9 @@
 #include "Afx/HyStdAfx.h"
 #include "Input/HyInputKeys.h"
 
+class HyGamePad;
+class HyJoystick;
+
 class HyInputMap
 {
 	struct ActionInfo
@@ -46,8 +49,8 @@ class HyInputMap
 	std::map<int32, uint32>			m_ActionIndexMap;
 	std::vector<ActionInfo>			m_ActionList;
 
-	int32							m_iGamePadIndex;
-	float							m_AxisValues[HYNUM_HYPADAXIS];
+	HyGamePad *						m_pGamePad;		// The GamePad assigned to this input map (a GamePad is a Joystick, but not all Joysticks are GamePads)
+	std::vector<HyJoystick *>		m_JoystickList; // Joysticks assigned to this input map (may have multiple joysticks assigned to a single input map)
 
 public:
 	HyInputMap();
@@ -72,21 +75,23 @@ public:
 	bool Unmap(int32 iActionId);
 	bool IsMapped(int32 iActionId) const;
 
-	int GetGamePadIndex() const;
-	void SetGamePadIndex(int32 iGamePadIndex);
+	HyGamePad *GetGamePad() const;
+	void AssignGamePad(HyGamePad *pGamePad);
+	void RemoveGamePad();
+
+	const std::vector<HyJoystick *> &GetJoystickList() const;
+	void AssignJoystick(HyJoystick *pJoystick);
+	void RemoveJoystick(HyJoystick *pJoystick);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Check input
 
 	bool IsActionDown(int32 iUserId) const;
 	bool IsActionReleased(int32 iUserId) const;	// Only true for a single frame upon button release
-	float GetAxis(HyGamePadAxis eAxis) const;
-	float GetAxisDelta(HyGamePadAxis eAxis) const;
 
 	void Update();
-	void ApplyInput(int32 iKey, HyBtnPressState ePressState);
-	void ApplyPadInput(int32 iPadBtn, HyBtnPressState ePressState);
-	void ApplyPadAxis(int32 iAxis, float fValue);
+	void ApplyKeyBoardInput(int32 iKey, HyBtnPressState ePressState);
+	void ApplyGamePadButton(HyGamePadBtn eGamePadBtn, HyBtnPressState ePressState);
 };
 
 #endif /* HyInputMap_h__ */

@@ -26,6 +26,8 @@ public:
 	std::vector<HyWindow *> &GetWindowList();
 	HyWindow &GetWindow(uint32 uiWindowIndex);
 
+	bool HasFocus() const;
+
 	void DoWindowResized(HyWindow &windowRef);
 	void DoWindowMoved(HyWindow &windowRef);
 

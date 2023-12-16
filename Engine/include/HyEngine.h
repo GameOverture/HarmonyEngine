@@ -16,6 +16,7 @@
 #include "Diagnostics/HyDiagnostics.h"
 #include "Diagnostics/GuiComms/HyGuiComms.h"
 #include "Input/HyInput.h"
+#include "Input/IHyController.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "Networking/IHyNetworkClass.h"
 #include "Scene/HyScene.h"

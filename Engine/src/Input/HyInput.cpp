@@ -12,6 +12,7 @@
 #include "HyEngine.h"
 #include "Input/HyInput.h"
 #include "Input/HyInputMap.h"
+#include "Input/IHyController.h"
 #include "Window/HyWindow.h"
 #include "UI/HyUiContainer.h"
 
@@ -83,30 +84,45 @@
 	{
 		HyInput &inputRef = HyEngine::Input();
 
-		if(iEvent == GLFW_CONNECTED)
-		{
-			int32 iAxisCount, iButtonCount;
-			glfwGetJoystickAxes(iJoyId, &iAxisCount);
-			glfwGetJoystickButtons(iJoyId, &iButtonCount);
+		//if(iEvent == GLFW_CONNECTED)
+		//{
+		//	inputRef.AllocateController(iJoyId, glfwJoystickIsGamepad(iJoyId));
+		//}
+		//else // GLFW_DISCONNECTED
+		//{
+		//	for(uint32 i = 0; i < static_cast<uint32>(inputRef.m_GamePadList.size()); ++i)
+		//	{
+		//		if(inputRef.m_GamePadList[i]->m_iId == iJoyId)
+		//		{
+		//			HyLog("Lost GamePad controller named \"" << inputRef.m_GamePadList[i]->GetName() << "\"");
 
-			HyLog("Found joystick " << iJoyId + 1 << " named \"" << glfwGetJoystickName(iJoyId) << "\" with " << iAxisCount << " axes, " << iButtonCount <<" buttons");
-			inputRef.m_JoystickList[inputRef.m_uiJoystickCount++] = iJoyId;
-		}
-		else // GLFW_DISCONNECTED
-		{
-			uint32 i = 0;
-			for(; i < inputRef.m_uiJoystickCount; ++i)
-			{
-				if(inputRef.m_JoystickList[i] == iJoyId)
-					break;
-			}
+		//			while(inputRef.m_GamePadList[i]->m_iRefCount > 0)
+		//			{
+		//				asdf;
+		//			}
 
-			for (i = i + 1; i < inputRef.m_uiJoystickCount; ++i)
-				inputRef.m_JoystickList[i - 1] = inputRef.m_JoystickList[i];
+		//			delete inputRef.m_GamePadList[i];
+		//			inputRef.m_GamePadList.erase(inputRef.m_GamePadList.begin() + i);
+		//			break;
+		//		}
+		//	}
+		//	for(uint32 i = 0; i < static_cast<uint32>(inputRef.m_JoystickList.size()); ++i)
+		//	{
+		//		if(inputRef.m_JoystickList[i]->m_iId == iJoyId)
+		//		{
+		//			HyLog("Lost Joystick controller named \"" << inputRef.m_JoystickList[i]->GetName() << "\"");
 
-			HyLog("Lost joystick " << iJoyId + 1);
-			inputRef.m_uiJoystickCount--;
-		}
+		//			while(inputRef.m_JoystickList[i]->m_iRefCount > 0)
+		//			{
+		//				asdf;
+		//			}
+
+		//			delete inputRef.m_JoystickList[i];
+		//			inputRef.m_JoystickList.erase(inputRef.m_JoystickList.begin() + i);
+		//			break;
+		//		}
+		//	}
+		//}
 	}
 #endif
 
@@ -121,10 +137,8 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	m_bTouchScreen(false),
 	m_bTouchActive(false),
 	m_iTouchId(0),
-	m_uiJoystickCount(0)
+	m_bControllerBackgroundInputEnabled(false)
 {
-	memset(m_JoystickList, 0, sizeof(int32) * HYNUM_JOYSTICK);
-
 	m_pInputMaps = reinterpret_cast<HyInputMap *>(HY_NEW unsigned char[sizeof(HyInputMap) * m_uiNUM_INPUT_MAPS]);
 
 	HyInputMap *pWriteLoc = static_cast<HyInputMap *>(m_pInputMaps);
@@ -134,7 +148,7 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	HyAssert(m_WindowListRef.empty() == false, "HyInput::HyInput has a window list that is empty");
 	m_pMouseWindow = m_WindowListRef[0];
 
-#ifdef HY_USE_GLFW
+#if defined(HY_USE_GLFW)
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		glfwSetMouseButtonCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_MouseButtonCallback);
@@ -143,8 +157,28 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 		glfwSetKeyCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_KeyCallback);
 		glfwSetCharCallback(m_WindowListRef[i]->GetInterop(), HyGlfw_CharCallback);
 	}
+
 	glfwSetJoystickCallback(HyGlfw_JoystickCallback);
+	for(int i = 0; i < GLFW_JOYSTICK_LAST; ++i)
+	{
+		if(glfwJoystickPresent(i))
+			AllocateController(i, glfwJoystickIsGamepad(i) == GLFW_TRUE);
+	}
+#elif defined(HY_USE_SDL2)
+	SDL_JoystickEventState(SDL_ENABLE);
+	int iNumConnectedJoysticks = SDL_NumJoysticks();
+	for(int i = 0; i < iNumConnectedJoysticks; ++i)
+		AllocateController(i, SDL_IsGameController(i) == SDL_TRUE);
 #endif
+
+	// Try assigning controllers to input maps
+	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+	{
+		if(m_GamePadList.size() > i)
+			AssignGamePad(m_GamePadList[i], i);
+		else
+			break;
+	}
 
 	StopTextInput();
 }
@@ -263,11 +297,6 @@ bool HyInput::MapGamePadBtn(int32 iActionId, HyGamePadBtn eBtn, uint32 uiMapping
 {
 	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
 
-#ifdef HY_USE_GLFW
-#elif defined(HY_USE_SDL2)
-	SDL_GameControllerOpen(uiMappingIndex);
-#endif
-
 	return m_pInputMaps[uiMappingIndex].MapPadBtn(iActionId, eBtn);
 }
 
@@ -283,18 +312,193 @@ bool HyInput::IsMapped(int32 iActionId, uint32 uiMappingIndex /*= 0*/) const
 	return m_pInputMaps[uiMappingIndex].IsMapped(iActionId);
 }
 
-bool HyInput::AssignGamePadIndex(int32 iGamePadIndex, uint32 uiMappingIndex /*= 0*/)
+bool HyInput::IsControllerBackgroundInputEnabled() const
+{
+	return m_bControllerBackgroundInputEnabled;
+}
+
+void HyInput::SetControllerBackgroundInputEnabled(bool bEnable)
+{
+	m_bControllerBackgroundInputEnabled = bEnable;
+#ifdef HY_USE_SDL2
+	//SDL_JoystickEventState(m_bControllerBackgroundInputEnabled ? SDL_IGNORE : SDL_ENABLE);
+	SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, m_bControllerBackgroundInputEnabled ? "1" : "0");
+#endif
+}
+
+uint32 HyInput::GetNumGamePads() const
+{
+	return static_cast<uint32>(m_GamePadList.size());
+}
+
+HyGamePad *HyInput::GetGamePad(uint32 uiIndex) const
+{
+	if(uiIndex >= m_GamePadList.size())
+	{
+		HyLogWarning("HyInput::GetGamePad() - uiIndex out of range");
+		return nullptr;
+	}
+
+	return m_GamePadList[uiIndex];
+}
+
+uint32 HyInput::GetNumJoysticks() const
+{
+	return static_cast<uint32>(m_JoystickList.size());
+}
+
+HyJoystick *HyInput::GetJoystick(uint32 uiIndex) const
+{
+	if(uiIndex >= m_JoystickList.size())
+	{
+		HyLogWarning("HyInput::GetJoystick() - uiIndex out of range");
+		return nullptr;
+	}
+
+	return m_JoystickList[uiIndex];
+}
+
+void HyInput::AssignGamePad(HyGamePad *pGamePad, uint32 uiMappingIndex /*= 0*/)
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
+	
+	if(pGamePad == nullptr)
+	{
+		RemoveGamePad(uiMappingIndex);
+		return;
+	}
+
+	if(m_pInputMaps[uiMappingIndex].GetGamePad() == pGamePad) // Already assigned
+		return;
+
+#if defined(HY_USE_SDL2)
+	if(pGamePad->m_iRefCount == 0)
+	{
+		// This GamePad hasn't been assigned yet, so we need to open it
+		// Reacquire the device index using the instance id
+		int iDeviceIndex = -1;
+		int iNumConnectedJoysticks = SDL_NumJoysticks();
+		for(int i = 0; i < iNumConnectedJoysticks; ++i)
+		{
+			if(SDL_JoystickGetDeviceInstanceID(i) == pGamePad->m_iId)
+			{
+				iDeviceIndex = i;
+				break;
+			}
+		}
+		if(iDeviceIndex == -1)
+		{
+			HyLogWarning("HyInput::AssignGamePad() - Could not find gamepad with instance id: " << pGamePad->m_iId);
+			return;
+		}
+		
+		HyAssert(SDL_IsGameController(iDeviceIndex), "HyInput::AssignGamePad() - Device at index " << iDeviceIndex << " is not a gamepad");
+		pGamePad->m_pSdlGameController = SDL_GameControllerOpen(iDeviceIndex);
+	}
+#endif
+	pGamePad->m_iRefCount++;
+
+	m_pInputMaps[uiMappingIndex].AssignGamePad(pGamePad);
+}
+
+void HyInput::RemoveGamePad(uint32 uiMappingIndex /*= 0*/)
+{
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
+	
+	HyGamePad *pGamePad = m_pInputMaps[uiMappingIndex].GetGamePad();
+	if(pGamePad == nullptr)
+		return;
+
+	pGamePad->m_iRefCount--;
+
+#if defined(HY_USE_SDL2)
+	// After decrementing the reference count, if it's zero then close the gamepad
+	if(pGamePad->m_iRefCount == 0)
+	{
+		SDL_GameControllerClose(pGamePad->m_pSdlGameController);
+		pGamePad->m_pSdlGameController = nullptr;
+	}
+#endif
+
+	m_pInputMaps[uiMappingIndex].RemoveGamePad();
+}
+
+void HyInput::AssignJoystick(HyJoystick *pJoystick, uint32 uiMappingIndex /*= 0*/)
+{
+	if(pJoystick == nullptr)
+		return;
+
+	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
+	const std::vector<HyJoystick *> &joystickListRef = m_pInputMaps[uiMappingIndex].GetJoystickList();
+	for(uint32 i = 0; i < joystickListRef.size(); ++i)
+	{
+		if(joystickListRef[i] == pJoystick) // Already assigned
+			return;
+	}
+
+#if defined(HY_USE_SDL2)
+	if(pJoystick->m_iRefCount == 0)
+	{
+		// This Joystick hasn't been assigned yet, so we need to open it
+		// Reacquire the device index using the instance id
+		int iDeviceIndex = -1;
+		int iNumConnectedJoysticks = SDL_NumJoysticks();
+		for(int i = 0; i < iNumConnectedJoysticks; ++i)
+		{
+			if(SDL_JoystickGetDeviceInstanceID(i) == pJoystick->m_iId)
+			{
+				iDeviceIndex = i;
+				break;
+			}
+		}
+		if(iDeviceIndex == -1)
+		{
+			HyLogWarning("HyInput::AssignJoystick() - Could not find joystick with instance id: " << pJoystick->m_iId);
+			return;
+		}
+
+		HyAssert(SDL_IsGameController(iDeviceIndex) == false, "HyInput::AssignJoystick() - Device at index " << iDeviceIndex << " is a gamepad, not a joystick");
+		pJoystick->m_pSdlJoystick = SDL_JoystickOpen(iDeviceIndex);
+	}
+#endif
+	pJoystick->m_iRefCount++;
+
+	m_pInputMaps[uiMappingIndex].AssignJoystick(pJoystick);
+}
+
+void HyInput::RemoveJoystick(HyJoystick *pJoystick, uint32 uiMappingIndex /*= 0*/)
 {
 	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
 
-#ifdef HY_USE_GLFW
-	if(GLFW_FALSE == glfwJoystickPresent(iGamePadIndex))
-		return false;
-#elif defined(HY_USE_SDL2)
-	SDL_GameControllerOpen(iGamePadIndex);
+	if(pJoystick == nullptr)
+		return;
+
+	// Make sure the joystick is assigned to this mapping
+	const std::vector<HyJoystick *> &joystickListRef = m_pInputMaps[uiMappingIndex].GetJoystickList();
+	bool bFound = false;
+	for(uint32 i = 0; i < joystickListRef.size(); ++i)
+	{
+		if(joystickListRef[i] == pJoystick) // Already assigned
+		{
+			bFound = true;
+			break;
+		}
+	}
+	if(bFound == false)
+		return;
+
+	pJoystick->m_iRefCount--;
+
+#if defined(HY_USE_SDL2)
+	// After decrementing the reference count, if it's zero then close the gamepad
+	if(pJoystick->m_iRefCount == 0)
+	{
+		SDL_JoystickClose(pJoystick->m_pSdlJoystick);
+		pJoystick->m_pSdlJoystick = nullptr;
+	}
 #endif
 
-	m_pInputMaps[uiMappingIndex].SetGamePadIndex(iGamePadIndex);
+	m_pInputMaps[uiMappingIndex].RemoveJoystick(pJoystick);
 }
 
 bool HyInput::IsActionDown(int32 iUserId, uint32 uiMappingIndex /*= 0*/) const
@@ -312,13 +516,10 @@ bool HyInput::IsActionReleased(int32 iUserId, uint32 uiMappingIndex /*= 0*/) con
 float HyInput::GetGamePadAxis(HyGamePadAxis eAxis, uint32 uiMappingIndex /*= 0*/) const
 {
 	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
-	return m_pInputMaps[uiMappingIndex].GetAxis(eAxis);
-}
+	if(m_pInputMaps[uiMappingIndex].GetGamePad() == nullptr)
+		return 0.0f;
 
-float HyInput::GetGamePadAxisDelta(HyGamePadAxis eAxis, uint32 uiMappingIndex /*= 0*/) const
-{
-	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
-	return m_pInputMaps[uiMappingIndex].GetAxisDelta(eAxis);
+	return m_pInputMaps[uiMappingIndex].GetGamePad()->GetAxisValue(eAxis);
 }
 
 bool HyInput::IsTextInputActive()
@@ -415,41 +616,70 @@ void HyInput::DoTouchCancel(int32 iId)
 	m_uiMouseBtnFlags &= ~(1 << HYMOUSE_BtnLeft);
 }
 
+void HyInput::AllocateController(int32 iDeviceIndex, bool bIsGamePad)
+{
+	if(bIsGamePad)
+	{
+		HyGamePad *pNewGamePad = HY_NEW HyGamePad(iDeviceIndex);
+		HyLog("Allocated controller[" << iDeviceIndex << "] (Game Pad) named \"" << pNewGamePad->GetName() << "\"");
+		m_GamePadList.push_back(pNewGamePad);
+	}
+	else
+	{
+		HyJoystick *pNewJoystick = HY_NEW HyJoystick(iDeviceIndex);
+		HyLog("Allocated controller[" << iDeviceIndex << "] (Joystick) named \"" << pNewJoystick->GetName() << "\"");
+		m_JoystickList.push_back(pNewJoystick);
+	}
+}
+
 #ifdef HY_USE_GLFW
 	void HyInput::OnGlfwKey(int32 iKey, int32 iAction)
 	{
 		DistrubuteKeyboardInput(static_cast<HyKeyboardBtn>(iKey));
 
 		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
-			m_pInputMaps[i].ApplyInput(iKey, static_cast<HyBtnPressState>(iAction));
+			m_pInputMaps[i].ApplyKeyBoardInput(iKey, static_cast<HyBtnPressState>(iAction));
 	}
 
-	void HyInput::UpdateGlfwGamepads()
+	void HyInput::UpdateGlfwControllers()
 	{
+		GLFWgamepadstate gamePadState;
 		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
 		{
-			int iGamepadIndex = m_pInputMaps[i].GetGamePadIndex();
-			int iCount = 0;
-			
-			// Buttons
-			const unsigned char *pButtonValues = glfwGetJoystickButtons(iGamepadIndex, &iCount);
-			for(int iBtnIndex = 0; iBtnIndex < iCount; ++iBtnIndex)
-				m_pInputMaps[i].ApplyPadInput(static_cast<HyGamePadBtn>(iBtnIndex), pButtonValues[iBtnIndex] == GLFW_PRESS ? HYBTN_Press : HYBTN_Release);
+			HyGamePad *pGamePad = m_pInputMaps[i].GetGamePad();
+			if(pGamePad)
+			{
+				glfwGetGamepadState(pGamePad->m_iId, &gamePadState);
 
-			// Hats
-			const unsigned char *pHatValues = glfwGetJoystickHats(iGamepadIndex, &iCount);
-			HyAssert(iCount == 1, "HyInput::UpdateGlfwGamepads() - GLFW only supports 1 hat per gamepad");
-			m_pInputMaps[i].ApplyPadInput(HYPAD_DpadUp, (pHatValues[0] & GLFW_HAT_UP) != 0 ? HYBTN_Press : HYBTN_Release);
-			m_pInputMaps[i].ApplyPadInput(HYPAD_DpadRight, (pHatValues[0] & GLFW_HAT_RIGHT) != 0 ? HYBTN_Press : HYBTN_Release);
-			m_pInputMaps[i].ApplyPadInput(HYPAD_DpadDown, (pHatValues[0] & GLFW_HAT_DOWN) != 0 ? HYBTN_Press : HYBTN_Release);
-			m_pInputMaps[i].ApplyPadInput(HYPAD_DpadLeft, (pHatValues[0] & GLFW_HAT_LEFT) != 0 ? HYBTN_Press : HYBTN_Release);
+				for(int iBtn = 0; iBtn < HYNUM_GAMEPADBUTTONS; ++iBtn)
+				{
+					HyGamePadBtn eBtn = static_cast<HyGamePadBtn>(iBtn);
+					if(pGamePad->GetButtonValue(eBtn) != gamePadState.buttons[eBtn])
+						OnEventGamePadButton(pGamePad->m_iId, eBtn, gamePadState.buttons[eBtn] == GLFW_PRESS ? HYBTN_Press : HYBTN_Release);
+				}
 
-			// Axes
-			const float *pAxesValues = glfwGetJoystickAxes(iGamepadIndex, &iCount);
-			iCount = HyMath::Min(iCount, static_cast<int>(HYNUM_HYPADAXIS));
+				pGamePad->UpdateGamePadState(gamePadState);
+			}
 
-			for(int iAxesIndex = 0; iAxesIndex < iCount; ++iAxesIndex)
-				m_pInputMaps[i].ApplyPadAxis(iAxesIndex, pAxesValues[iAxesIndex]);
+			const std::vector<HyJoystick *> joystickListRef = m_pInputMaps[i].GetJoystickList();
+			for(uint32 j = 0; j < joystickListRef.size(); ++j)
+			{
+				HyJoystick *pJoystick = joystickListRef[j];
+
+				// TODO: Implement this!
+
+				// Axes
+				int iNumAxes = 0;
+				const float *pAxesValues = glfwGetJoystickAxes(pJoystick->m_iId, &iNumAxes);
+				
+				// Buttons
+				int iNumButtons = 0;
+				const unsigned char *pButtonValues = glfwGetJoystickButtons(pJoystick->m_iId, &iNumButtons);
+
+				// Hats
+				int iNumHats = 0;
+				const unsigned char *pHatValues = glfwGetJoystickHats(pJoystick->m_iId, &iNumHats);
+			}
 		}
 	}
 #elif defined(HY_USE_SDL2)
@@ -458,13 +688,13 @@ void HyInput::DoTouchCancel(int32 iId)
 		DistrubuteKeyboardInput(static_cast<HyKeyboardBtn>(eventRef.key.keysym.sym));
 
 		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
-			m_pInputMaps[i].ApplyInput(eventRef.key.keysym.sym, HYBTN_Press);
+			m_pInputMaps[i].ApplyKeyBoardInput(eventRef.key.keysym.sym, HYBTN_Press);
 	}
 
 	void HyInput::DoKeyUpEvent(const SDL_Event &eventRef)
 	{
 		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
-			m_pInputMaps[i].ApplyInput(eventRef.key.keysym.sym, HYBTN_Release);
+			m_pInputMaps[i].ApplyKeyBoardInput(eventRef.key.keysym.sym, HYBTN_Release);
 	}
 
 	void HyInput::DoTextInputEvent(const SDL_Event &eventRef)
@@ -520,24 +750,6 @@ void HyInput::DoTouchCancel(int32 iId)
 		m_pMouseWindow = pWindow;
 	}
 
-	void HyInput::DoPadAxis(const SDL_Event &eventRef)
-	{
-		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
-			m_pInputMaps[i].ApplyPadAxis(eventRef.caxis.axis, static_cast<float>(eventRef.caxis.value) / static_cast<float>(SDL_JOYSTICK_AXIS_MAX));
-	}
-
-	void HyInput::DoPadBtnDown(const SDL_Event &eventRef)
-	{
-		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
-			m_pInputMaps[i].ApplyPadInput(static_cast<HyGamePadBtn>(eventRef.cbutton.button), HYBTN_Press);
-	}
-
-	void HyInput::DoPadBtnUp(const SDL_Event &eventRef)
-	{
-		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
-			m_pInputMaps[i].ApplyPadInput(static_cast<HyGamePadBtn>(eventRef.cbutton.button), HYBTN_Release);
-	}
-
 	void HyInput::DoTouchDownEvent(const SDL_Event &eventRef)
 	{
 		m_ptMousePos.x = eventRef.tfinger.x * m_pMouseWindow->GetWidthF();
@@ -566,6 +778,24 @@ void HyInput::DoTouchCancel(int32 iId)
 		m_ptMousePos = ptMousePos;
 	}
 #endif
+
+void HyInput::OnEventGamePadAxis(int32 iGamePadId, HyGamePadAxis eAxis, float fAxisValue)
+{
+	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+	{
+		if(m_pInputMaps[i].GetGamePad() && iGamePadId == m_pInputMaps[i].GetGamePad()->m_iId)
+			m_pInputMaps[i].GetGamePad()->SetAxisValue(eAxis, fAxisValue);
+	}
+}
+
+void HyInput::OnEventGamePadButton(int32 iGamePadId, HyGamePadBtn eButtonType, HyBtnPressState ePressState)
+{
+	for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+	{
+		if(m_pInputMaps[i].GetGamePad() && iGamePadId == m_pInputMaps[i].GetGamePad()->m_iId)
+			m_pInputMaps[i].ApplyGamePadButton(eButtonType, ePressState);
+	}
+}
 
 void HyInput::DistrubuteTextInput(std::string sNewText)
 {

@@ -151,7 +151,8 @@ bool HyEngine::PollPlatformApi()
 			return false;
 	}
 
-	m_Input.UpdateGlfwGamepads();
+	if(m_Input.IsControllerBackgroundInputEnabled() || m_WindowManager.HasFocus())
+		m_Input.UpdateGlfwControllers();
 
 	// OnWindowResized() and OnWindowMoved() are invoked when appropriate
 	glfwPollEvents();
@@ -199,14 +200,42 @@ bool HyEngine::PollPlatformApi()
 			m_Input.DoMouseWheelEvent(sdlEvent);
 			break;
 
+		case SDL_JOYAXISMOTION:
+			break;
+		case SDL_JOYHATMOTION:
+			break;
+		case SDL_JOYBUTTONDOWN:
+			break;
+		case SDL_JOYBUTTONUP:
+			break;
+		case SDL_JOYDEVICEADDED:
+			{
+				int asdf = 0;
+				asdf++;
+			}
+			break;
+		case SDL_JOYDEVICEREMOVED:
+			break;
+
 		case SDL_CONTROLLERAXISMOTION:
-			m_Input.DoPadAxis(sdlEvent);
+			m_Input.OnEventGamePadAxis(sdlEvent.caxis.which, static_cast<HyGamePadAxis>(sdlEvent.caxis.axis), static_cast<float>(sdlEvent.caxis.value) / static_cast<float>(SDL_JOYSTICK_AXIS_MAX));
 			break;
 		case SDL_CONTROLLERBUTTONDOWN:
-			m_Input.DoPadBtnDown(sdlEvent);
+			m_Input.OnEventGamePadButton(sdlEvent.cbutton.which, static_cast<HyGamePadBtn>(sdlEvent.cbutton.button), HYBTN_Press);
 			break;
 		case SDL_CONTROLLERBUTTONUP:
-			m_Input.DoPadBtnUp(sdlEvent);
+			m_Input.OnEventGamePadButton(sdlEvent.cbutton.which, static_cast<HyGamePadBtn>(sdlEvent.cbutton.button), HYBTN_Release);
+			break;
+		case SDL_CONTROLLERDEVICEADDED:
+			{
+				// NOTE: This is redundant to the SDL_JOYDEVICEADDED event
+				int asdf = 0;
+				asdf++;
+			}
+			break;
+		case SDL_CONTROLLERDEVICEREMOVED:
+			break;
+		case SDL_CONTROLLERDEVICEREMAPPED:
 			break;
 
 		case SDL_FINGERDOWN:
@@ -220,6 +249,7 @@ bool HyEngine::PollPlatformApi()
 			break;
 		}
 	}
+
 #endif
 
 	m_Input.Update();

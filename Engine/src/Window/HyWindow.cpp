@@ -13,6 +13,15 @@
 #include "Window/HyWindowManager.h"
 
 #ifdef HY_USE_GLFW
+	void HyGlfw_WindowFocusCallback(GLFWwindow *pWindow, int32 iFocused)
+	{
+		HyWindow *pHyWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
+		if(iFocused)
+			pHyWindow->m_bHasFocus = true;
+		else
+			pHyWindow->m_bHasFocus = false;
+	}
+
 	void HyGlfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight)
 	{
 		HyWindow *pHyWindow = reinterpret_cast<HyWindow *>(glfwGetWindowUserPointer(pWindow));
@@ -45,6 +54,7 @@ HyWindow::HyWindow(uint32 uiIndex, HyWindowManager &managerRef, const HyWindowIn
 	m_uiINDEX(uiIndex),
 	m_ManagerRef(managerRef),
 	m_uiId(m_uiINDEX),
+	m_bHasFocus(true),
 	m_pInterop(nullptr)
 {
 	m_Info = windowInfoRef;
@@ -104,6 +114,7 @@ HyWindow::HyWindow(uint32 uiIndex, HyWindowManager &managerRef, const HyWindowIn
 	glfwShowWindow(m_pInterop);
 
 	// Set callbacks
+	glfwSetWindowFocusCallback(m_pInterop, HyGlfw_WindowFocusCallback);
 	glfwSetWindowSizeCallback(m_pInterop, HyGlfw_WindowSizeCallback);
 	glfwSetFramebufferSizeCallback(m_pInterop, HyGlfw_FramebufferSizeCallback);
 	glfwSetWindowPosCallback(m_pInterop, HyGlfw_WindowPosCallback);
@@ -205,6 +216,11 @@ void HyWindow::SetTitle(const std::string &sTitle)
 #ifdef HY_USE_GLFW
 	glfwSetWindowTitle(m_pInterop, m_Info.sName.c_str());
 #endif
+}
+
+bool HyWindow::HasFocus() const
+{
+	return m_bHasFocus;
 }
 
 int32 HyWindow::GetWidth()
@@ -615,10 +631,12 @@ void HyWindow::DoEvent(const SDL_Event &eventRef, HyInput &inputRef)
 		//HyLog("Mouse left window " << m_uiId);
 		break;
 	case SDL_WINDOWEVENT_FOCUS_GAINED:
-		HyLog("Window " << m_uiId << " gained keyboard focus");
+		m_bHasFocus = true;
+		//HyLog("Window " << m_uiId << " gained keyboard focus");
 		break;
 	case SDL_WINDOWEVENT_FOCUS_LOST:
-		HyLog("Window " << m_uiId << " lost keyboard focus");
+		m_bHasFocus = false;
+		//HyLog("Window " << m_uiId << " lost keyboard focus");
 		break;
 	case SDL_WINDOWEVENT_CLOSE:
 		HyLog("Window " << m_uiId << " closed");

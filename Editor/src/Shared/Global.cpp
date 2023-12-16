@@ -693,6 +693,8 @@
 		HyGuiLog("EntityDopeSheetScene::GetUniquePropertiesList - unhandled tween property", LOGTYPE_Error);
 		break;
 	}
+
+	return QPair<QString, QString>();
 }
 
 /*static*/ QDir HyGlobal::PrepTempDir(Project &projectRef, QString sDirName)

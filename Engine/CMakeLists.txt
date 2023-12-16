@@ -93,6 +93,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Diagnostics/GuiComms/HyLiveVarManager.cpp
 	src/Input/HyInput.cpp
 	src/Input/HyInputMap.cpp
+	src/Input/IHyController.cpp
 	src/Networking/Sockets/HyNullSocket.cpp
 	src/Networking/Sockets/HyPosix.cpp
 	src/Networking/Sockets/HySdlNet.cpp
@@ -222,6 +223,7 @@ set(HYENGINE_HEADER_FILES
 	include/Input/HyInput.h
 	include/Input/HyInputKeys.h
 	include/Input/HyInputMap.h
+	include/Input/IHyController.h
 	include/Networking/Sockets/HyNullSocket.h
 	include/Networking/Sockets/HyPosix.h
 	include/Networking/Sockets/HySdlNet.h

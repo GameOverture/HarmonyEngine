@@ -26,6 +26,7 @@ class HyWindow
 	uint32									m_uiId;
 
 	HyWindowInfo							m_Info;
+	bool									m_bHasFocus;
 	glm::ivec2								m_vFramebufferSize;
 	
 	std::vector<HyCamera2d *>				m_Cams2dList;
@@ -84,6 +85,8 @@ public:
 	std::string							GetTitle();
 	void								SetTitle(const std::string &sTitle);
 
+	bool								HasFocus() const;
+
 	int32								GetWidth();
 	int32								GetHeight();
 	float								GetWidthF(float fPercent = 1.0f);
@@ -124,6 +127,7 @@ public:
 	// (Determined by the monitor closest to window's center)
 	GLFWmonitor *						GetGlfwMonitor();
 
+	friend void HyGlfw_WindowFocusCallback(GLFWwindow *pWindow, int32 iFocused);
 	friend void HyGlfw_WindowSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight);
 	friend void HyGlfw_FramebufferSizeCallback(GLFWwindow *pWindow, int32 iWidth, int32 iHeight);
 	friend void HyGlfw_WindowPosCallback(GLFWwindow *pWindow, int32 iX, int32 iY);

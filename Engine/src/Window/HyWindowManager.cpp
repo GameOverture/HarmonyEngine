@@ -71,6 +71,16 @@ HyWindow& HyWindowManager::GetWindow(uint32 uiWindowIndex)
 	return *m_WindowList[uiWindowIndex];
 }
 
+bool HyWindowManager::HasFocus() const
+{
+	for(auto pWindow : m_WindowList)
+	{
+		if(pWindow->HasFocus())
+			return true;
+	}
+	return false;
+}
+
 void HyWindowManager::DoWindowResized(HyWindow &windowRef)
 {
 	m_EngineRef.OnWindowResized(windowRef);
