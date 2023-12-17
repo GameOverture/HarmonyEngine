@@ -395,6 +395,8 @@ void HyInput::AssignGamePad(HyGamePad *pGamePad, uint32 uiMappingIndex /*= 0*/)
 	if(m_pInputMaps[uiMappingIndex].GetGamePad() == pGamePad) // Already assigned
 		return;
 
+	RemoveGamePad(uiMappingIndex); // Remove any previous assignment (to decrement its ref count)
+
 	pGamePad->IncRefCount();
 	m_pInputMaps[uiMappingIndex].AssignGamePad(pGamePad);
 }
