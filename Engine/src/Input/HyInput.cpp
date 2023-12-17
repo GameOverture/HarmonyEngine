@@ -164,6 +164,11 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 
 	unsigned char *pMemBuffer = reinterpret_cast<unsigned char *>(m_pInputMaps);
 	delete[] pMemBuffer;
+
+	for(HyGamePad *pGamePad : m_GamePadList)
+		delete pGamePad;
+	for(HyJoystick *pJoystick : m_JoystickList)
+		delete pJoystick;
 }
 
 bool HyInput::UserInputOccured() const
