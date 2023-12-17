@@ -209,12 +209,10 @@ bool HyEngine::PollPlatformApi()
 		case SDL_JOYBUTTONUP:
 			break;
 		case SDL_JOYDEVICEADDED:
-			{
-				int asdf = 0;
-				asdf++;
-			}
+			m_Input.AllocateController(sdlEvent.jdevice.which);
 			break;
 		case SDL_JOYDEVICEREMOVED:
+			m_Input.RemoveController(sdlEvent.jdevice.which);
 			break;
 
 		case SDL_CONTROLLERAXISMOTION:
@@ -226,16 +224,13 @@ bool HyEngine::PollPlatformApi()
 		case SDL_CONTROLLERBUTTONUP:
 			m_Input.OnEventGamePadButton(sdlEvent.cbutton.which, static_cast<HyGamePadBtn>(sdlEvent.cbutton.button), HYBTN_Release);
 			break;
-		case SDL_CONTROLLERDEVICEADDED:
-			{
-				// NOTE: This is redundant to the SDL_JOYDEVICEADDED event
-				int asdf = 0;
-				asdf++;
-			}
-			break;
-		case SDL_CONTROLLERDEVICEREMOVED:
-			break;
-		case SDL_CONTROLLERDEVICEREMAPPED:
+		//case SDL_CONTROLLERDEVICEADDED:
+		//	m_Input.OnEventControllerAdded(sdlEvent.cdevice.which);
+		//	break;
+		//case SDL_CONTROLLERDEVICEREMOVED:
+		//	m_Input.OnEventControllerRemoved(sdlEvent.cdevice.which);
+		//	break;
+		case SDL_CONTROLLERDEVICEREMAPPED: // TODO: What does this event do? If SDL_GameControllerAddMapping() affects a connected controller?
 			break;
 
 		case SDL_FINGERDOWN:

@@ -84,45 +84,10 @@
 	{
 		HyInput &inputRef = HyEngine::Input();
 
-		//if(iEvent == GLFW_CONNECTED)
-		//{
-		//	inputRef.AllocateController(iJoyId, glfwJoystickIsGamepad(iJoyId));
-		//}
-		//else // GLFW_DISCONNECTED
-		//{
-		//	for(uint32 i = 0; i < static_cast<uint32>(inputRef.m_GamePadList.size()); ++i)
-		//	{
-		//		if(inputRef.m_GamePadList[i]->m_iId == iJoyId)
-		//		{
-		//			HyLog("Lost GamePad controller named \"" << inputRef.m_GamePadList[i]->GetName() << "\"");
-
-		//			while(inputRef.m_GamePadList[i]->m_iRefCount > 0)
-		//			{
-		//				asdf;
-		//			}
-
-		//			delete inputRef.m_GamePadList[i];
-		//			inputRef.m_GamePadList.erase(inputRef.m_GamePadList.begin() + i);
-		//			break;
-		//		}
-		//	}
-		//	for(uint32 i = 0; i < static_cast<uint32>(inputRef.m_JoystickList.size()); ++i)
-		//	{
-		//		if(inputRef.m_JoystickList[i]->m_iId == iJoyId)
-		//		{
-		//			HyLog("Lost Joystick controller named \"" << inputRef.m_JoystickList[i]->GetName() << "\"");
-
-		//			while(inputRef.m_JoystickList[i]->m_iRefCount > 0)
-		//			{
-		//				asdf;
-		//			}
-
-		//			delete inputRef.m_JoystickList[i];
-		//			inputRef.m_JoystickList.erase(inputRef.m_JoystickList.begin() + i);
-		//			break;
-		//		}
-		//	}
-		//}
+		if(iEvent == GLFW_CONNECTED)
+			inputRef.AllocateController(iJoyId);
+		else // GLFW_DISCONNECTED
+			inputRef.RemoveController(iJoyId);
 	}
 #endif
 
@@ -162,13 +127,13 @@ HyInput::HyInput(uint32 uiNumInputMappings, std::vector<HyWindow *> &windowListR
 	for(int i = 0; i < GLFW_JOYSTICK_LAST; ++i)
 	{
 		if(glfwJoystickPresent(i))
-			AllocateController(i, glfwJoystickIsGamepad(i) == GLFW_TRUE);
+			AllocateController(i);
 	}
 #elif defined(HY_USE_SDL2)
 	SDL_JoystickEventState(SDL_ENABLE);
 	int iNumConnectedJoysticks = SDL_NumJoysticks();
 	for(int i = 0; i < iNumConnectedJoysticks; ++i)
-		AllocateController(i, SDL_IsGameController(i) == SDL_TRUE);
+		AllocateController(i);
 #endif
 
 	// Try assigning controllers to input maps
@@ -371,33 +336,7 @@ void HyInput::AssignGamePad(HyGamePad *pGamePad, uint32 uiMappingIndex /*= 0*/)
 	if(m_pInputMaps[uiMappingIndex].GetGamePad() == pGamePad) // Already assigned
 		return;
 
-#if defined(HY_USE_SDL2)
-	if(pGamePad->m_iRefCount == 0)
-	{
-		// This GamePad hasn't been assigned yet, so we need to open it
-		// Reacquire the device index using the instance id
-		int iDeviceIndex = -1;
-		int iNumConnectedJoysticks = SDL_NumJoysticks();
-		for(int i = 0; i < iNumConnectedJoysticks; ++i)
-		{
-			if(SDL_JoystickGetDeviceInstanceID(i) == pGamePad->m_iId)
-			{
-				iDeviceIndex = i;
-				break;
-			}
-		}
-		if(iDeviceIndex == -1)
-		{
-			HyLogWarning("HyInput::AssignGamePad() - Could not find gamepad with instance id: " << pGamePad->m_iId);
-			return;
-		}
-		
-		HyAssert(SDL_IsGameController(iDeviceIndex), "HyInput::AssignGamePad() - Device at index " << iDeviceIndex << " is not a gamepad");
-		pGamePad->m_pSdlGameController = SDL_GameControllerOpen(iDeviceIndex);
-	}
-#endif
-	pGamePad->m_iRefCount++;
-
+	pGamePad->IncRefCount();
 	m_pInputMaps[uiMappingIndex].AssignGamePad(pGamePad);
 }
 
@@ -409,17 +348,7 @@ void HyInput::RemoveGamePad(uint32 uiMappingIndex /*= 0*/)
 	if(pGamePad == nullptr)
 		return;
 
-	pGamePad->m_iRefCount--;
-
-#if defined(HY_USE_SDL2)
-	// After decrementing the reference count, if it's zero then close the gamepad
-	if(pGamePad->m_iRefCount == 0)
-	{
-		SDL_GameControllerClose(pGamePad->m_pSdlGameController);
-		pGamePad->m_pSdlGameController = nullptr;
-	}
-#endif
-
+	pGamePad->DecRefCount();
 	m_pInputMaps[uiMappingIndex].RemoveGamePad();
 }
 
@@ -436,33 +365,7 @@ void HyInput::AssignJoystick(HyJoystick *pJoystick, uint32 uiMappingIndex /*= 0*
 			return;
 	}
 
-#if defined(HY_USE_SDL2)
-	if(pJoystick->m_iRefCount == 0)
-	{
-		// This Joystick hasn't been assigned yet, so we need to open it
-		// Reacquire the device index using the instance id
-		int iDeviceIndex = -1;
-		int iNumConnectedJoysticks = SDL_NumJoysticks();
-		for(int i = 0; i < iNumConnectedJoysticks; ++i)
-		{
-			if(SDL_JoystickGetDeviceInstanceID(i) == pJoystick->m_iId)
-			{
-				iDeviceIndex = i;
-				break;
-			}
-		}
-		if(iDeviceIndex == -1)
-		{
-			HyLogWarning("HyInput::AssignJoystick() - Could not find joystick with instance id: " << pJoystick->m_iId);
-			return;
-		}
-
-		HyAssert(SDL_IsGameController(iDeviceIndex) == false, "HyInput::AssignJoystick() - Device at index " << iDeviceIndex << " is a gamepad, not a joystick");
-		pJoystick->m_pSdlJoystick = SDL_JoystickOpen(iDeviceIndex);
-	}
-#endif
-	pJoystick->m_iRefCount++;
-
+	pJoystick->IncRefCount();
 	m_pInputMaps[uiMappingIndex].AssignJoystick(pJoystick);
 }
 
@@ -487,17 +390,7 @@ void HyInput::RemoveJoystick(HyJoystick *pJoystick, uint32 uiMappingIndex /*= 0*
 	if(bFound == false)
 		return;
 
-	pJoystick->m_iRefCount--;
-
-#if defined(HY_USE_SDL2)
-	// After decrementing the reference count, if it's zero then close the gamepad
-	if(pJoystick->m_iRefCount == 0)
-	{
-		SDL_JoystickClose(pJoystick->m_pSdlJoystick);
-		pJoystick->m_pSdlJoystick = nullptr;
-	}
-#endif
-
+	pJoystick->DecRefCount();
 	m_pInputMaps[uiMappingIndex].RemoveJoystick(pJoystick);
 }
 
@@ -616,19 +509,101 @@ void HyInput::DoTouchCancel(int32 iId)
 	m_uiMouseBtnFlags &= ~(1 << HYMOUSE_BtnLeft);
 }
 
-void HyInput::AllocateController(int32 iDeviceIndex, bool bIsGamePad)
+void HyInput::AllocateController(int32 iDeviceIndex)
 {
+	bool bIsGamePad = false;
+#if defined(HY_USE_GLFW)
+	bIsGamePad = glfwJoystickIsGamepad(iDeviceIndex);
+#elif defined(HY_USE_SDL2)
+	bIsGamePad = SDL_IsGameController(iDeviceIndex);
+#endif
+
 	if(bIsGamePad)
 	{
 		HyGamePad *pNewGamePad = HY_NEW HyGamePad(iDeviceIndex);
-		HyLog("Allocated controller[" << iDeviceIndex << "] (Game Pad) named \"" << pNewGamePad->GetName() << "\"");
-		m_GamePadList.push_back(pNewGamePad);
+
+		bool bFound = false;
+		for(HyGamePad *pGamePad : m_GamePadList)
+		{
+			if(pNewGamePad->m_iId == pGamePad->m_iId)
+			{
+				bFound = true;
+				break;
+			}
+		}
+		
+		if(bFound)
+			delete pNewGamePad;
+		else
+		{
+			HyLog("Allocated controller[" << iDeviceIndex << "] (Game Pad) named \"" << pNewGamePad->GetName() << "\"");
+			m_GamePadList.push_back(pNewGamePad);
+		}
 	}
 	else
 	{
 		HyJoystick *pNewJoystick = HY_NEW HyJoystick(iDeviceIndex);
-		HyLog("Allocated controller[" << iDeviceIndex << "] (Joystick) named \"" << pNewJoystick->GetName() << "\"");
-		m_JoystickList.push_back(pNewJoystick);
+
+		bool bFound = false;
+		for(HyJoystick *pJoystick : m_JoystickList)
+		{
+			if(pNewJoystick->m_iId == pJoystick->m_iId)
+			{
+				bFound = true;
+				break;
+			}
+		}
+
+		if(bFound)
+			delete pNewJoystick;
+		else
+		{
+			HyLog("Allocated controller[" << iDeviceIndex << "] (Joystick) named \"" << pNewJoystick->GetName() << "\"");
+			m_JoystickList.push_back(pNewJoystick);
+		}
+	}
+}
+
+void HyInput::RemoveController(int32 iId)
+{
+	for(auto iter = m_GamePadList.begin(); iter != m_GamePadList.end(); ++iter)
+	{
+		if((*iter)->m_iId == iId)
+		{
+			for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+			{
+				if(m_pInputMaps[i].GetGamePad() == *iter)
+					m_pInputMaps[i].RemoveGamePad();
+			}
+
+			HyLog("Removed controller (Game Pad) named \"" << (*iter)->GetName() << "\"");
+			delete *iter;
+			m_GamePadList.erase(iter);
+			return;
+		}
+	}
+	for(auto iter = m_JoystickList.begin(); iter != m_JoystickList.end(); ++iter)
+	{
+		if((*iter)->m_iId == iId)
+		{
+			for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
+			{
+				const std::vector<HyJoystick *> &joystickListRef = m_pInputMaps[i].GetJoystickList();
+				for(auto joystickIter = joystickListRef.begin(); joystickIter != joystickListRef.end(); ++joystickIter)
+				{
+					if(*joystickIter == *iter)
+					{
+						m_pInputMaps[i].RemoveJoystick(*joystickIter);
+						break;
+					}
+				}
+			}
+
+			HyLog("Removed controller (Joystick) named \"" << (*iter)->GetName() << "\"");
+			delete *iter;
+			m_JoystickList.erase(iter);
+			return;
+		}
 	}
 }
 

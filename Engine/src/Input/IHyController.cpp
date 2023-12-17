@@ -9,21 +9,39 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Input/IHyController.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
-IHyController::IHyController() :
+IHyController::IHyController(int32 iIndex, bool bIsGamePad) :
+	m_bIS_GAMEPAD(bIsGamePad),
 	m_iRefCount(0),
-	m_iId(-1),
-	m_sName("")
+	m_iId(-1) // -1 is invalid, should be set in ctor
 {
+#ifdef HY_USE_GLFW
+	m_iId = iIndex;
+	if(m_bIS_GAMEPAD)
+		m_sName = glfwGetGamepadName(m_iId);
+	else
+		m_sName = glfwGetJoystickName(m_iId);
+	m_sGuid = glfwGetJoystickGUID(m_iId);
+#elif defined(HY_USE_SDL2)
+	m_iId = SDL_JoystickGetDeviceInstanceID(iIndex);
+	if(m_bIS_GAMEPAD)
+		m_sName = SDL_GameControllerNameForIndex(iIndex);
+	else
+		m_sName = SDL_JoystickNameForIndex(iIndex);
+	char szGuid[40];
+	SDL_JoystickGetGUIDString(SDL_JoystickGetDeviceGUID(iIndex), szGuid, 40);
+	m_sGuid = szGuid;
+#endif
 }
 
 /*virtual*/ IHyController::~IHyController(void)
 {
 }
 
-int32 IHyController::GetId() const
+bool IHyController::IsGamePad() const
 {
-	return m_iId;
+	return m_bIS_GAMEPAD;
 }
 
 std::string IHyController::GetName() const
@@ -31,18 +49,59 @@ std::string IHyController::GetName() const
 	return m_sName;
 }
 
+std::string IHyController::GetGuid() const
+{
+	return m_sGuid;
+}
+
+void IHyController::IncRefCount()
+{
+#if defined(HY_USE_SDL2)
+	if(m_iRefCount == 0)
+	{
+		// This GamePad hasn't been assigned yet, so we need to open it
+		// Reacquire the device index using the instance id
+		int iDeviceIndex = -1;
+		int iNumConnectedJoysticks = SDL_NumJoysticks();
+		for(int i = 0; i < iNumConnectedJoysticks; ++i)
+		{
+			if(SDL_JoystickGetDeviceInstanceID(i) == m_iId)
+			{
+				iDeviceIndex = i;
+				break;
+			}
+		}
+		if(iDeviceIndex == -1)
+		{
+			HyLogWarning("HyInput::AssignGamePad() - Could not find gamepad with instance id: " << m_iId);
+			return;
+		}
+
+		OnOpenController(iDeviceIndex);
+	}
+#endif
+	m_iRefCount++;
+}
+
+void IHyController::DecRefCount()
+{
+	m_iRefCount--;
+
+#if defined(HY_USE_SDL2)
+	// After decrementing the reference count, if it's zero then close the gamepad
+	if(m_iRefCount == 0)
+		OnCloseController();
+#endif
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 HyGamePad::HyGamePad(int32 iIndex) :
-	IHyController()
+	IHyController(iIndex, true)
 {
 #ifdef HY_USE_GLFW
-	m_iId = iIndex;
-	m_sName = glfwGetGamepadName(m_iId);
 	m_CachedGamePadState = {};
 #elif defined(HY_USE_SDL2)
-	m_iId = SDL_JoystickGetDeviceInstanceID(iIndex);
-	m_sName = SDL_GameControllerNameForIndex(iIndex);
 	m_pSdlGameController = nullptr;
 	for(uint32 i = 0; i < HYNUM_GAMEPADAXES; ++i)
 		m_AxisValueList[i] = 0.0f;
@@ -61,6 +120,17 @@ unsigned char HyGamePad::GetButtonValue(HyGamePadBtn eBtn) const
 void HyGamePad::UpdateGamePadState(GLFWgamepadstate &gamePadStateRef)
 {
 	m_CachedGamePadState = gamePadStateRef;
+}
+#elif defined(HY_USE_SDL2)
+/*virtual*/ void HyGamePad::OnOpenController(int32 iIndex) /*override*/
+{
+	HyAssert(SDL_IsGameController(iIndex), "HyInput::AssignGamePad() - Device at index " << iIndex << " is not a gamepad");
+	m_pSdlGameController = SDL_GameControllerOpen(iIndex);
+}
+/*virtual*/ void HyGamePad::OnCloseController() /*override*/
+{
+	SDL_GameControllerClose(m_pSdlGameController);
+	m_pSdlGameController = nullptr;
 }
 #endif
 
@@ -85,14 +155,9 @@ void HyGamePad::SetAxisValue(HyGamePadAxis eAxis, float fValue)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 HyJoystick::HyJoystick(int iIndex) :
-	IHyController()
+	IHyController(iIndex, false)
 {
-#ifdef HY_USE_GLFW
-	m_iId = iIndex;
-	m_sName = glfwGetJoystickName(m_iId);
-#elif defined(HY_USE_SDL2)
-	m_iId = SDL_JoystickGetDeviceInstanceID(iIndex);
-	m_sName = SDL_JoystickNameForIndex(iIndex);
+#if defined(HY_USE_SDL2)
 	m_pSdlJoystick = nullptr;
 #endif
 }
@@ -100,3 +165,17 @@ HyJoystick::HyJoystick(int iIndex) :
 HyJoystick::~HyJoystick(void)
 {
 }
+
+#if defined(HY_USE_SDL2)
+/*virtual*/ void HyJoystick::OnOpenController(int32 iIndex) /*override*/
+{
+	HyAssert(SDL_IsGameController(iIndex) == false, "HyInput::AssignJoystick() - Device at index " << iIndex << " is a gamepad, not a joystick");
+	m_pSdlJoystick = SDL_JoystickOpen(iIndex);
+}
+
+/*virtual*/ void HyJoystick::OnCloseController() /*override*/
+{
+	SDL_JoystickClose(m_pSdlJoystick);
+	m_pSdlJoystick = nullptr;
+}
+#endif

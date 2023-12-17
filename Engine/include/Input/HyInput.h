@@ -135,7 +135,8 @@ public:
 	void DoTouchCancel(int32 iId);
 
 private:
-	void AllocateController(int32 iDeviceIndex, bool bIsGamePad);
+	void AllocateController(int32 iDeviceIndex);
+	void RemoveController(int32 iId);
 
 #ifdef HY_USE_GLFW
 	friend void HyGlfw_MouseButtonCallback(GLFWwindow *pWindow, int32 iButton, int32 iAction, int32 iMods);
