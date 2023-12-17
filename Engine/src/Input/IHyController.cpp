@@ -16,7 +16,7 @@ IHyController::IHyController(int32 iIndex, bool bIsGamePad) :
 	m_iRefCount(0),
 	m_iId(-1) // -1 is invalid, should be set in ctor
 {
-#ifdef HY_USE_GLFW
+#if defined(HY_USE_GLFW)
 	m_iId = iIndex;
 	if(m_bIS_GAMEPAD)
 		m_sName = glfwGetGamepadName(m_iId);
@@ -54,30 +54,49 @@ std::string IHyController::GetGuid() const
 	return m_sGuid;
 }
 
+int32 IHyController::GetCurrentIndex() const
+{
+	// Reacquire the device index using the instance id
+	int iDeviceIndex = -1;
+
+#if defined(HY_USE_GLFW)
+	for(int i = 0; i < GLFW_JOYSTICK_LAST; ++i)
+	{
+		if(glfwJoystickPresent(i))
+		{
+			iDeviceIndex++;
+			if(iDeviceIndex == m_iId)
+				break;
+		}
+	}
+#elif defined(HY_USE_SDL2)
+	int iNumConnectedJoysticks = SDL_NumJoysticks();
+	for(int i = 0; i < iNumConnectedJoysticks; ++i)
+	{
+		if(SDL_JoystickGetDeviceInstanceID(i) == m_iId)
+		{
+			iDeviceIndex = i;
+			break;
+		}
+	}
+	if(iDeviceIndex == -1)
+	{
+		HyLogWarning("IHyController::GetCurrentIndex() - Could not find gamepad with instance id: " << m_iId);
+		return -1;
+	}
+#endif
+
+	return iDeviceIndex;
+}
+
 void IHyController::IncRefCount()
 {
 #if defined(HY_USE_SDL2)
 	if(m_iRefCount == 0)
 	{
 		// This GamePad hasn't been assigned yet, so we need to open it
-		// Reacquire the device index using the instance id
-		int iDeviceIndex = -1;
-		int iNumConnectedJoysticks = SDL_NumJoysticks();
-		for(int i = 0; i < iNumConnectedJoysticks; ++i)
-		{
-			if(SDL_JoystickGetDeviceInstanceID(i) == m_iId)
-			{
-				iDeviceIndex = i;
-				break;
-			}
-		}
-		if(iDeviceIndex == -1)
-		{
-			HyLogWarning("HyInput::AssignGamePad() - Could not find gamepad with instance id: " << m_iId);
+		if(OnOpenController() == false)
 			return;
-		}
-
-		OnOpenController(iDeviceIndex);
 	}
 #endif
 	m_iRefCount++;
@@ -122,10 +141,21 @@ void HyGamePad::UpdateGamePadState(GLFWgamepadstate &gamePadStateRef)
 	m_CachedGamePadState = gamePadStateRef;
 }
 #elif defined(HY_USE_SDL2)
-/*virtual*/ void HyGamePad::OnOpenController(int32 iIndex) /*override*/
+/*virtual*/ bool HyGamePad::OnOpenController() /*override*/
 {
-	HyAssert(SDL_IsGameController(iIndex), "HyInput::AssignGamePad() - Device at index " << iIndex << " is not a gamepad");
-	m_pSdlGameController = SDL_GameControllerOpen(iIndex);
+	int iDeviceIndex = GetCurrentIndex();
+	if(iDeviceIndex < 0)
+		return false;
+
+	HyAssert(SDL_IsGameController(iDeviceIndex), "HyGamePad::OnOpenController() - Device at index " << iDeviceIndex << " is not a gamepad");
+	m_pSdlGameController = SDL_GameControllerOpen(iDeviceIndex);
+	if(m_pSdlGameController == nullptr)
+	{
+		HyLogWarning("HyGamePad::OnOpenController() - Could not open gamepad at index " << iDeviceIndex << ": " << SDL_GetError());
+		return false;
+	}
+
+	return true;
 }
 /*virtual*/ void HyGamePad::OnCloseController() /*override*/
 {
@@ -167,10 +197,21 @@ HyJoystick::~HyJoystick(void)
 }
 
 #if defined(HY_USE_SDL2)
-/*virtual*/ void HyJoystick::OnOpenController(int32 iIndex) /*override*/
+/*virtual*/ bool HyJoystick::OnOpenController() /*override*/
 {
-	HyAssert(SDL_IsGameController(iIndex) == false, "HyInput::AssignJoystick() - Device at index " << iIndex << " is a gamepad, not a joystick");
-	m_pSdlJoystick = SDL_JoystickOpen(iIndex);
+	int iDeviceIndex = GetCurrentIndex();
+	if(iDeviceIndex < 0)
+		return false;
+
+	HyAssert(SDL_IsGameController(iDeviceIndex) == false, "HyJoystick::OnOpenController() - Device at index " << iDeviceIndex << " is a gamepad, not a joystick");
+	m_pSdlJoystick = SDL_JoystickOpen(iDeviceIndex);
+	if(m_pSdlJoystick == nullptr)
+	{
+		HyLogWarning("HyJoystick::OnOpenController() - Could not open joystick at index " << iDeviceIndex << ": " << SDL_GetError());
+		return false;
+	}
+
+	return true;
 }
 
 /*virtual*/ void HyJoystick::OnCloseController() /*override*/

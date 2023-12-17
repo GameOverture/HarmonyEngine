@@ -216,13 +216,13 @@ bool HyEngine::PollPlatformApi()
 			break;
 
 		case SDL_CONTROLLERAXISMOTION:
-			m_Input.OnEventGamePadAxis(sdlEvent.caxis.which, static_cast<HyGamePadAxis>(sdlEvent.caxis.axis), static_cast<float>(sdlEvent.caxis.value) / static_cast<float>(SDL_JOYSTICK_AXIS_MAX));
+			m_Input.ApplyControllerAxis(sdlEvent.caxis.which, static_cast<HyGamePadAxis>(sdlEvent.caxis.axis), static_cast<float>(sdlEvent.caxis.value) / static_cast<float>(SDL_JOYSTICK_AXIS_MAX));
 			break;
 		case SDL_CONTROLLERBUTTONDOWN:
-			m_Input.OnEventGamePadButton(sdlEvent.cbutton.which, static_cast<HyGamePadBtn>(sdlEvent.cbutton.button), HYBTN_Press);
+			m_Input.ApplyControllerButton(sdlEvent.cbutton.which, static_cast<HyGamePadBtn>(sdlEvent.cbutton.button), HYBTN_Press);
 			break;
 		case SDL_CONTROLLERBUTTONUP:
-			m_Input.OnEventGamePadButton(sdlEvent.cbutton.which, static_cast<HyGamePadBtn>(sdlEvent.cbutton.button), HYBTN_Release);
+			m_Input.ApplyControllerButton(sdlEvent.cbutton.which, static_cast<HyGamePadBtn>(sdlEvent.cbutton.button), HYBTN_Release);
 			break;
 		//case SDL_CONTROLLERDEVICEADDED:
 		//	m_Input.OnEventControllerAdded(sdlEvent.cdevice.which);

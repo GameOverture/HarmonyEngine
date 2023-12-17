@@ -17,7 +17,7 @@ class IHyController
 {
 protected:
 	const bool			m_bIS_GAMEPAD;	// True if this controller is a gamepad, false if it is a joystick
-	int32				m_iRefCount;	// HyInputMap reference count. Zero means this controller is not in use
+	int32				m_iRefCount;	// HyInputMap reference count. Zero means this controller is not in use by an input map
 
 	int32				m_iId;			// -1 means invalid
 	std::string			m_sName;
@@ -30,13 +30,14 @@ public:
 	bool IsGamePad() const;
 	std::string GetName() const;
 	std::string GetGuid() const;
+	int32 GetCurrentIndex() const;
 
 protected:
 	void IncRefCount();
 	void DecRefCount();
 
 #if defined(HY_USE_SDL2)
-	virtual void OnOpenController(int32 iIndex) = 0;
+	virtual bool OnOpenController() = 0;
 	virtual void OnCloseController() = 0;
 #endif
 };
@@ -62,7 +63,7 @@ private:
 	unsigned char GetButtonValue(HyGamePadBtn eBtn) const;
 	void UpdateGamePadState(GLFWgamepadstate &gamePadStateRef);
 #elif defined(HY_USE_SDL2)
-	virtual void OnOpenController(int32 iIndex) override;
+	virtual bool OnOpenController() override;
 	virtual void OnCloseController() override;
 #endif
 	
@@ -88,7 +89,7 @@ private:
 	virtual ~HyJoystick(void);
 
 #if defined(HY_USE_SDL2)
-	virtual void OnOpenController(int32 iIndex) override;
+	virtual bool OnOpenController() override;
 	virtual void OnCloseController() override;
 #endif
 };
