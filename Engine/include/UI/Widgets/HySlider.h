@@ -28,14 +28,14 @@ protected:
 	};
 	static_assert((int)SLIDERATTRIB_UseStepList == (int)UIATTRIB_FLAG_NEXT, "HySlider is not matching with base classes attrib flags");
 
-	int32									m_iMin;
-	int32									m_iMax;
+	int64									m_iMin;
+	int64									m_iMax;
 	uint32									m_uiStep;
-	std::vector<int32>						m_StepList;				// When used, only values present in this std::vector can be selected
+	std::vector<int64>						m_StepList;				// When used, only values present in this std::vector can be selected
 	float									m_fLength;				// Length of the slider bar in pixels (does not include the radius of the rounded ends)
 	float									m_fStrokeAmt;			// The stroke amount in pixels when rendering the bar
 
-	int32									m_iValue;
+	int64									m_iValue;
 
 	struct BarPrimitives : public HyEntity2d
 	{
@@ -66,14 +66,14 @@ public:
 
 	void Setup(const HyPanelInit &sliderInitRef);
 
-	uint32 GetNumTicks() const;
-	int32 GetValue() const;
-	void SetValue(int32 iValue);
+	int64 GetNumTicks() const;
+	int64 GetValue() const;
+	void SetValue(int64 iValue);
 
-	int32 GetMin() const;
-	int32 GetMax() const;
-	void SetRange(int32 iMin, int32 iMax, uint32 uiStepAmt); // If iMax < iMin, iMin becomes the only legal value. An invalid 'uiStepAmt' will become 1
-	void SetRange(const std::vector<int32> &stepList); // An empty stepList is ignored
+	int64 GetMin() const;
+	int64 GetMax() const;
+	void SetRange(int64 iMin, int64 iMax, uint32 uiStepAmt); // If iMax < iMin, iMin becomes the only legal value. An invalid 'uiStepAmt' will become 1
+	void SetRange(const std::vector<int64> &stepList); // An empty stepList is ignored
 
 	HyOrientation GetOrientation() const;
 	void SetOrientation(HyOrientation eOrien);

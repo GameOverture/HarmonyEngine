@@ -114,24 +114,24 @@ void HySlider::Setup(const HyPanelInit &sliderInitRef)
 	Assemble();
 }
 
-uint32 HySlider::GetNumTicks() const
+int64 HySlider::GetNumTicks() const
 {
 	if(m_uiAttribs & SLIDERATTRIB_UseStepList)
 		return static_cast<uint32>(m_StepList.size());
 
-	uint32 uiNumSteps = abs(m_iMax - m_iMin) / m_uiStep;
-	if(uiNumSteps == 0)
-		uiNumSteps = 1;
+	int64 iNumSteps = abs(m_iMax - m_iMin) / m_uiStep;
+	if(iNumSteps == 0)
+		iNumSteps = 1;
 
-	return uiNumSteps;
+	return iNumSteps;
 }
 
-int32 HySlider::GetValue() const
+int64 HySlider::GetValue() const
 {
 	return m_iValue;
 }
 
-void HySlider::SetValue(int32 iValue)
+void HySlider::SetValue(int64 iValue)
 {
 	if(m_iValue == iValue)
 		return;
@@ -143,18 +143,18 @@ void HySlider::SetValue(int32 iValue)
 		m_fpOnValueChanged(this, m_pValueChangedParam);
 }
 
-int32 HySlider::GetMin() const
+int64 HySlider::GetMin() const
 {
 	return m_iMin;
 }
 
-int32 HySlider::GetMax() const
+int64 HySlider::GetMax() const
 {
 	return m_iMax;
 }
 
 // If iMax < iMin, iMin becomes the only legal value. An invalid 'uiStepAmt' will become 1
-void HySlider::SetRange(int32 iMin, int32 iMax, uint32 uiStepAmt)
+void HySlider::SetRange(int64 iMin, int64 iMax, uint32 uiStepAmt)
 {
 	if(iMax < iMin)
 		m_iMin = m_iMax = iMin;
@@ -171,7 +171,7 @@ void HySlider::SetRange(int32 iMin, int32 iMax, uint32 uiStepAmt)
 }
 
 // An empty stepList is ignored
-void HySlider::SetRange(const std::vector<int32> &stepList)
+void HySlider::SetRange(const std::vector<int64> &stepList)
 {
 	if(stepList.empty())
 		return;
@@ -256,7 +256,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 		float fTickSpacing = m_fLength / GetNumTicks();
 		glm::vec2 vDist = ptMousePos - m_ptSliderCenter;
 		int32 iNumThresholds = static_cast<int32>(vDist[GetOrientation()] / fTickSpacing);
-		int32 iNewValue = 0;
+		int64 iNewValue = 0;
 		if(iNumThresholds != 0)
 		{
 			if(m_uiAttribs & SLIDERATTRIB_UseStepList)
@@ -274,7 +274,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 				iNewValue = m_StepList[iCurIndex];
 			}
 			else
-				iNewValue = HyMath::Clamp(m_iValue + static_cast<int32>(iNumThresholds * m_uiStep), m_iMin, m_iMax);
+				iNewValue = HyMath::Clamp(m_iValue + static_cast<int64>(iNumThresholds * m_uiStep), m_iMin, m_iMax);
 
 			SetValue(iNewValue);
 		}
@@ -361,13 +361,13 @@ void HySlider::FixValues()
 			//       dragging the slider
 
 			// Find closest value within m_StepList
-			uint32 uiDiff = std::numeric_limits<uint32>::max();
+			int64 iDiff = std::numeric_limits<int64>::max();
 			for(uint32 i = 0; i < m_StepList.size(); ++i)
 			{
-				if(uiDiff > static_cast<uint32>(abs(m_iValue - m_StepList[i])))
+				if(iDiff > static_cast<uint32>(abs(m_iValue - m_StepList[i])))
 				{
 					m_iValue = m_StepList[i];
-					uiDiff = abs(m_iValue - m_StepList[i]);
+					iDiff = abs(m_iValue - m_StepList[i]);
 				}
 			}
 		}
