@@ -225,7 +225,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		if(ptCurMousePos != m_ptOldMousePos)
 		{
 			QPointF vDeltaMousePos = m_ptOldMousePos - ptCurMousePos;
-			m_pCamera->pos.Offset(vDeltaMousePos.x(), vDeltaMousePos.y() * -1.0f);
+			m_pCamera->pos.Offset(static_cast<float>(vDeltaMousePos.x()), vDeltaMousePos.y() * -1.0f);
 		}
 
 		m_ptOldMousePos = ptCurMousePos;
