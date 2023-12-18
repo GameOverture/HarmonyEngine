@@ -170,6 +170,8 @@ float HyGamePad::GetAxisValue(HyGamePadAxis eAxis) const
 	return m_CachedGamePadState.axes[eAxis];
 #elif defined(HY_USE_SDL2)
 	return m_AxisValueList[eAxis];
+#else
+	return 0.0f;
 #endif
 }
 
