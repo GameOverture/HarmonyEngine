@@ -20,11 +20,15 @@ class HyInputMap
 {
 	struct ActionInfo
 	{
-		const int32	iID;
+		const int32		iID;
 
 		int32			iBtn;
 		int32			iBtnAlternative;
+		
 		HyGamePadBtn	ePadBtn;
+
+		HyJoystick *	pJoystick;
+		int32			iJoyBtn;
 
 		enum Flag
 		{
@@ -37,12 +41,14 @@ class HyInputMap
 			FLAG_CategoryShiftAmt	= 8,
 			FLAG_JoystickBitMask	= 0xFFFF0000
 		};
-		uint32	uiFlags;
+		uint32			uiFlags;
 
 		ActionInfo(int32 iId) :	iID(iId),
 								iBtn(HYKEY_Unassigned),
 								iBtnAlternative(HYKEY_Unassigned),
 								ePadBtn(HYPAD_Unassigned),
+								pJoystick(nullptr),
+								iJoyBtn(-1),
 								uiFlags(0)
 		{ }
 	};

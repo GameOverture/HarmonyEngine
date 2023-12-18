@@ -153,7 +153,7 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 	case HYKEY_Enter:
 		break;
 
-	case HYKEY_BackSpace: {
+	case HYKEY_Backspace: {
 		std::string sText = m_Text.GetUtf8String();
 		do
 		{

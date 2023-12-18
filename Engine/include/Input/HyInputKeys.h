@@ -114,7 +114,7 @@ enum HyKeyboardBtn
 	HYKEY_ScrollLock		= GLFW_KEY_SCROLL_LOCK,
 	HYKEY_Pause				= GLFW_KEY_PAUSE,
 
-	HYKEY_BackSpace			= GLFW_KEY_BACKSPACE,
+	HYKEY_Backspace			= GLFW_KEY_BACKSPACE,
 	HYKEY_Tab				= GLFW_KEY_TAB,
 	HYKEY_Enter				= GLFW_KEY_ENTER,
 	HYKEY_CapsLock			= GLFW_KEY_CAPS_LOCK,
@@ -242,7 +242,7 @@ enum HyKeyboardBtn
 	HYKEY_ScrollLock		= SDLK_SCROLLLOCK,
 	HYKEY_Pause				= SDLK_PAUSE,
 
-	HYKEY_BackSpace			= SDLK_BACKSPACE,
+	HYKEY_Backspace			= SDLK_BACKSPACE,
 	HYKEY_Tab				= SDLK_TAB,
 	HYKEY_Enter				= SDLK_RETURN,
 	HYKEY_CapsLock			= SDLK_CAPSLOCK,
@@ -370,7 +370,7 @@ enum HyKeyboardBtn
 	HYKEY_ScrollLock,
 	HYKEY_Pause,
 
-	HYKEY_BackSpace,
+	HYKEY_Backspace,
 	HYKEY_Tab,
 	HYKEY_Enter,
 	HYKEY_CapsLock,
@@ -463,9 +463,7 @@ enum HyMouseBtn
 	HYMOUSE_BtnMiddle		= HYMOUSE_Btn3,
 #endif
 };
-#if HYMOUSE_NumBtns > 32
-	#error "HyMouseBtn enum has a value greater than or equal to '32', which will cause HyInput's bitfield to fail"
-#endif
+static_assert(HYMOUSE_NumBtns <= 8, "HyMouseBtn enum has a value greater than or equal to '8', which conflicts with HYKEY_Backspace (which is 8)");
 
 enum HyMouseCursor
 {

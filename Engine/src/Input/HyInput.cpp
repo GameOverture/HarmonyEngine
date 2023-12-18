@@ -693,61 +693,75 @@ void HyInput::RemoveController(int32 iId)
 			m_pInputMaps[i].ApplyKeyBoardInput(iKey, static_cast<HyBtnPressState>(iAction));
 	}
 
-	void HyInput::UpdateGlfwControllers()
+	void HyInput::GlfwUpdateControllers()
 	{
+		GLFWgamepadstate gamePadState;
 		if(m_fpControllerInputCallback)
 		{
 			// Process all controllers
-			
+			for(HyGamePad *pGamePad : m_GamePadList)
+				GlfwProcessGamePad(pGamePad, gamePadState);
+
+			for(HyJoystick *pJoystick : m_JoystickList)
+				GlfwProcessJoystick(pJoystick);
 		}
 		else
 		{
-			GLFWgamepadstate gamePadState;
+			// Process only controllers that are assigned to an input map
 			for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
 			{
 				HyGamePad *pGamePad = m_pInputMaps[i].GetGamePad();
 				if(pGamePad)
-				{
-					glfwGetGamepadState(pGamePad->m_iId, &gamePadState);
-
-					for(int iBtn = 0; iBtn < HYNUM_GAMEPADBUTTONS; ++iBtn)
-					{
-						HyGamePadBtn eBtn = static_cast<HyGamePadBtn>(iBtn);
-						if(pGamePad->GetButtonValue(eBtn) != gamePadState.buttons[eBtn])
-							ApplyControllerButton(pGamePad->m_iId, eBtn, gamePadState.buttons[eBtn] == GLFW_PRESS ? HYBTN_Press : HYBTN_Release);
-					}
-
-					for(int iAxis = 0; iAxis < HYNUM_GAMEPADAXES; ++iAxis)
-					{
-						HyGamePadAxis eAxis = static_cast<HyGamePadAxis>(iAxis);
-						if(pGamePad->GetAxisValue(eAxis) != gamePadState.axes[eAxis])
-							ApplyControllerAxis(pGamePad->m_iId, eAxis, gamePadState.axes[eAxis]);
-					}
-
-					pGamePad->UpdateGamePadState(gamePadState);
-				}
+					GlfwProcessGamePad(pGamePad, gamePadState);
 
 				const std::vector<HyJoystick *> joystickListRef = m_pInputMaps[i].GetJoystickList();
 				for(uint32 j = 0; j < joystickListRef.size(); ++j)
 				{
 					HyJoystick *pJoystick = joystickListRef[j];
-
-					// TODO: Implement this!
-
-					// Axes
-					int iNumAxes = 0;
-					const float *pAxesValues = glfwGetJoystickAxes(pJoystick->m_iId, &iNumAxes);
-
-					// Buttons
-					int iNumButtons = 0;
-					const unsigned char *pButtonValues = glfwGetJoystickButtons(pJoystick->m_iId, &iNumButtons);
-
-					// Hats
-					int iNumHats = 0;
-					const unsigned char *pHatValues = glfwGetJoystickHats(pJoystick->m_iId, &iNumHats);
+					GlfwProcessJoystick(pJoystick);
 				}
 			}
 		}
+	}
+
+	void HyInput::GlfwProcessGamePad(HyGamePad *pGamePad, GLFWgamepadstate &gamePadStateRef)
+	{
+		glfwGetGamepadState(pGamePad->m_iId, &gamePadStateRef);
+		for(int iBtn = 0; iBtn < HYNUM_GAMEPADBUTTONS; ++iBtn)
+		{
+			HyGamePadBtn eBtn = static_cast<HyGamePadBtn>(iBtn);
+			if(pGamePad->GetButtonValue(eBtn) != gamePadStateRef.buttons[eBtn])
+				ApplyControllerButton(pGamePad->m_iId, eBtn, gamePadStateRef.buttons[eBtn] == GLFW_PRESS ? HYBTN_Press : HYBTN_Release);
+		}
+
+		for(int iAxis = 0; iAxis < HYNUM_GAMEPADAXES; ++iAxis)
+		{
+			HyGamePadAxis eAxis = static_cast<HyGamePadAxis>(iAxis);
+			if(pGamePad->GetAxisValue(eAxis) != gamePadStateRef.axes[eAxis])
+				ApplyControllerAxis(pGamePad->m_iId, eAxis, gamePadStateRef.axes[eAxis]);
+		}
+
+		pGamePad->UpdateGamePadState(gamePadStateRef);
+	}
+
+	void HyInput::GlfwProcessJoystick(HyJoystick *pJoystick)
+	{
+		int iCount = 0;
+		
+		// Axes
+		const float *pAxesValues = glfwGetJoystickAxes(pJoystick->m_iId, &iCount);
+		//for(int iAxis = 0; iAxis < iCount; ++iAxis)
+		//{
+		//	if(pJoystick->GetAxisValue(iAxis) != pAxesValues[iAxis])
+		//		ApplyControllerAxis(pJoystick->m_iId, eAxis, pAxesValues[iAxis]);
+		//}
+		
+
+		// Buttons
+		const unsigned char *pButtonValues = glfwGetJoystickButtons(pJoystick->m_iId, &iCount);
+
+		// Hats
+		const unsigned char *pHatValues = glfwGetJoystickHats(pJoystick->m_iId, &iCount);
 	}
 #elif defined(HY_USE_SDL2)
 	void HyInput::DoKeyDownEvent(const SDL_Event &eventRef)

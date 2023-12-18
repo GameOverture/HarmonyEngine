@@ -164,7 +164,9 @@ private:
 	friend void HyGlfw_JoystickCallback(int32 iJoyId, int32 iEvent);
 
 	void OnGlfwKey(int32 iKey, int32 iAction);
-	void UpdateGlfwControllers();							// Update all assigned controllers (GamePads/Joysticks). Dispatches calls to OnEventGamePadAxis/OnEventGamePadButton
+	void GlfwUpdateControllers();														// Update all assigned controllers (GamePads/Joysticks). Dispatches calls to OnEventGamePadAxis/OnEventGamePadButton
+	void GlfwProcessGamePad(HyGamePad *pGamePad, GLFWgamepadstate &gamePadStateRef);	// Use GlfwUpdateControllers() instead of GlfwProcessGamePad() directly
+	void GlfwProcessJoystick(HyJoystick *pJoystick);									// Use GlfwUpdateControllers() instead of GlfwProcessJoystick() directly
 #elif defined(HY_USE_SDL2)
 	void DoKeyDownEvent(const SDL_Event &eventRef);
 	void DoKeyUpEvent(const SDL_Event &eventRef);

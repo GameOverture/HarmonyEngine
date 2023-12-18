@@ -152,7 +152,7 @@ bool HyEngine::PollPlatformApi()
 	}
 
 	if(m_Input.IsControllerBackgroundInput() || m_WindowManager.HasFocus())
-		m_Input.UpdateGlfwControllers();
+		m_Input.GlfwUpdateControllers();
 
 	// OnWindowResized() and OnWindowMoved() are invoked when appropriate
 	glfwPollEvents();
