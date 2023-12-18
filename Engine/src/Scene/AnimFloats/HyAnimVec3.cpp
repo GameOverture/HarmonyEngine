@@ -179,6 +179,13 @@ void HyAnimVec3::Set(float fX, float fY, float fZ)
 	m_AnimFloatList[2] = fZ;
 }
 
+void HyAnimVec3::Set(int32 iX, int32 iY, int32 iZ)
+{
+	m_AnimFloatList[0] = static_cast<float>(iX);
+	m_AnimFloatList[1] = static_cast<float>(iY);
+	m_AnimFloatList[2] = static_cast<float>(iZ);
+}
+
 void HyAnimVec3::Set(const glm::vec3 &srcVec)
 {
 	m_AnimFloatList[0].Set(srcVec[0]);
@@ -205,6 +212,13 @@ void HyAnimVec3::Offset(float fX, float fY, float fZ)
 	m_AnimFloatList[0] += fX;
 	m_AnimFloatList[1] += fY;
 	m_AnimFloatList[2] += fZ;
+}
+
+void HyAnimVec3::Offset(int32 iX, int32 iY, int32 iZ)
+{
+	m_AnimFloatList[0] += static_cast<float>(iX);
+	m_AnimFloatList[1] += static_cast<float>(iY);
+	m_AnimFloatList[2] += static_cast<float>(iZ);
 }
 
 void HyAnimVec3::Offset(const glm::vec3 &srcVec)

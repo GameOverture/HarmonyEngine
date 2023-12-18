@@ -121,16 +121,16 @@ void HyAnimVec2::Set(float fAll)
 	m_AnimFloatList[1].Set(fAll);
 }
 
-void HyAnimVec2::Set(int32 iX, int32 iY)
-{
-	m_AnimFloatList[0] = static_cast<float>(iX);
-	m_AnimFloatList[1] = static_cast<float>(iY);
-}
-
 void HyAnimVec2::Set(float fX, float fY)
 {
 	m_AnimFloatList[0] = fX;
 	m_AnimFloatList[1] = fY;
+}
+
+void HyAnimVec2::Set(int32 iX, int32 iY)
+{
+	m_AnimFloatList[0] = static_cast<float>(iX);
+	m_AnimFloatList[1] = static_cast<float>(iY);
 }
 
 void HyAnimVec2::Set(const glm::vec2 &srcVec)
@@ -161,6 +161,12 @@ void HyAnimVec2::Offset(float fX, float fY)
 {
 	m_AnimFloatList[0] += fX;
 	m_AnimFloatList[1] += fY;
+}
+
+void HyAnimVec2::Offset(int32 iX, int32 iY)
+{
+	m_AnimFloatList[0] += static_cast<float>(iX);
+	m_AnimFloatList[1] += static_cast<float>(iY);
 }
 
 void HyAnimVec2::Offset(const glm::vec2 &srcVec)

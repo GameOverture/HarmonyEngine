@@ -51,11 +51,13 @@ public:
 
 	void Set(float fAll);
 	void Set(float fX, float fY, float fZ);
+	void Set(int32 iX, int32 iY, int32 iZ);
 	void Set(const glm::vec3 &srcVec);
 	void Set(const glm::ivec3 &srcVec);
 	void Set(const HyAnimVec3 &srcVec);
 
 	void Offset(float fX, float fY, float fZ);
+	void Offset(int32 iX, int32 iY, int32 iZ);
 	void Offset(const glm::vec3 &srcVec);
 	void Offset(const glm::ivec3 &srcVec);
 	void Offset(const HyAnimVec3 &srcVec);

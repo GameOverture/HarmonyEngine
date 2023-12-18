@@ -43,14 +43,15 @@ public:
 	void SetY(int32 iNewValue);
 
 	void Set(float fAll);
-	void Set(int32 iX, int32 iY);
 	void Set(float fX, float fY);
+	void Set(int32 iX, int32 iY);
 	void Set(const glm::vec2 &srcVec);
 	void Set(const glm::vec3 &srcVec);
 	void Set(const glm::ivec2 &srcVec);
 	void Set(const HyAnimVec2 &srcVec);
 
 	void Offset(float fX, float fY);
+	void Offset(int32 iX, int32 iY);
 	void Offset(const glm::vec2 &srcVec);
 	void Offset(const glm::ivec2 &srcVec);
 	void Offset(const HyAnimVec2 &srcVec);
