@@ -23,6 +23,7 @@
 #include "AuxAssetInspector.h"
 #include "DlgAssetProperties.h"
 #include "DlgImportTileSheet.h"
+#include "SourceModel.h"
 
 #include <QUndoCommand>
 #include <QMessageBox>
@@ -149,6 +150,35 @@ ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 	pDrag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
 
 	Qt::DropAction eDropAction = pDrag->exec(supportedActions);
+}
+
+/*virtual*/ void ManagerTreeView::dropEvent(QDropEvent *pEvent) /*override*/
+{
+	// Do a special case for Source Manager - move files to correct directory location
+	if(static_cast<ManagerWidget *>(parent())->GetModel().GetAssetType() == ASSETMAN_Source)
+	{
+		SourceModel &sourceModelRef = static_cast<SourceModel &>(static_cast<ManagerWidget *>(parent())->GetModel());
+
+		// TODO - indexAt(pEvent->pos()) is bullshit and gives invalid 'internalPointer'
+		HyGuiLog("TODO: Source Files in explorer need to be moved manually to this new location - this is not implemented yet in editor. Everything else (CMake, build, etc) is correct ", LOGTYPE_Warning);
+		
+		//QModelIndex dropIndex = indexAt(pEvent->pos());
+		//TreeModelItem *pItem = static_cast<TreeModelItem *>(dropIndex.internalPointer());
+
+		//QVariant variant = sourceModelRef.data(dropIndex, Qt::UserRole);
+		//TreeModelItemData *pDropItemData = variant.value<TreeModelItemData *>();
+
+		//QString sFilterPath = sourceModelRef.AssembleFilter(pDropItemData, true);
+
+		//QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
+		//static_cast<ManagerWidget *>(parent())->GetSelected(selectedAssetsList, selectedFiltersList, true);
+
+		//for(IAssetItemData *pAsset : selectedAssetsList)
+		//{
+		//}
+	}
+
+	QTreeView::dropEvent(pEvent);
 }
 
 ManagerWidget::ManagerWidget(QWidget *pParent /*= nullptr*/) :

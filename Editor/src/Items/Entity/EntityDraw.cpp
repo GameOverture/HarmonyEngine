@@ -740,8 +740,8 @@ void EntityDraw::BeginTransform(bool bWithMouse)
 	TransformCtrl *pCurTransform = nullptr;
 	if(m_MultiTransform.IsShown())
 		pCurTransform = &m_MultiTransform;
-	else if(m_pCurHoverItem)
-		pCurTransform = &m_pCurHoverItem->GetTransformCtrl();
+	else// if(m_pCurHoverItem)
+		pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl(); // &m_pCurHoverItem->GetTransformCtrl();
 
 	if(pCurTransform)
 	{
@@ -925,12 +925,13 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 						else
 							ptTestPoint.y = pCurTransform->GetSceneAABB().upperBound.y;
 
+						ptTestPoint.x = ptSnapCandidate.x;
+
 						// Convert to camera coordinates
 						//m_pCamera->ProjectToCamera(ptTestPoint, ptTestPoint);
 						//m_pCamera->ProjectToCamera(ptSnapCandidate, ptSnapCandidate);
 
 						// Initialize the horizontal snap guide line
-						ptTestPoint.x = ptSnapCandidate.x;
 						m_SnapGuideHorz.SetAsLineSegment(ptTestPoint, ptSnapCandidate);
 						if(m_SnapGuideHorz.IsVisible() == false)
 						{
@@ -952,12 +953,13 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 						else
 							ptTestPoint.x = pCurTransform->GetSceneAABB().upperBound.x;
 
+						ptTestPoint.y = ptSnapCandidate.y;
+
 						// Convert to camera coordinates
 						//m_pCamera->ProjectToCamera(ptTestPoint, ptTestPoint);
 						//m_pCamera->ProjectToCamera(ptSnapCandidate, ptSnapCandidate);
 
 						// Initialize the vertical snap guide line
-						ptTestPoint.y = ptSnapCandidate.y;
 						m_SnapGuideVert.SetAsLineSegment(ptTestPoint, ptSnapCandidate);
 						if(m_SnapGuideVert.IsVisible() == false)
 						{
@@ -1062,14 +1064,24 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		if(bScaleDimensions.x)
 		{
 			glm::vec2 ptAnchorWidth = pCurTransform->GetGrabPointWorldPos(eAnchorWidth, m_pCamera);
-			ptAnchorWidth = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorWidth - ptDragAnchorPoint), ptMousePos);
-			vDesiredSize.x = glm::distance(ptDragAnchorPoint, ptAnchorWidth);
+			if(ptAnchorWidth == ptDragAnchorPoint)
+				vDesiredSize.x = 0.01f;
+			else
+			{
+				ptAnchorWidth = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorWidth - ptDragAnchorPoint), ptMousePos);
+				vDesiredSize.x = glm::distance(ptDragAnchorPoint, ptAnchorWidth);
+			}
 		}
 		if(bScaleDimensions.y)
 		{
 			glm::vec2 ptAnchorHeight = pCurTransform->GetGrabPointWorldPos(eAnchorHeight, m_pCamera);
-			ptAnchorHeight = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorHeight - ptDragAnchorPoint), ptMousePos);
-			vDesiredSize.y = glm::distance(ptDragAnchorPoint, ptAnchorHeight);
+			if(ptAnchorHeight == ptDragAnchorPoint)
+				vDesiredSize.y = 0.01f;
+			else
+			{
+				ptAnchorHeight = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorHeight - ptDragAnchorPoint), ptMousePos);
+				vDesiredSize.y = glm::distance(ptDragAnchorPoint, ptAnchorHeight);
+			}
 		}
 
 		if(bShiftMod)
@@ -1085,6 +1097,13 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 			HySetVec(vScaleAmt, vDesiredSize.x / m_vDragStartSize.x, vDesiredSize.y / m_vDragStartSize.y);
 
 		// TODO: When transforming a single item that has a non-zero rotation, it skews the scaling during preview
+		if(std::isnan(vScaleAmt.x) || std::isnan(vScaleAmt.y))
+		{
+			HyGuiLog("Scaling resulted in NaN", LOGTYPE_Error);
+			int asdf = 0;
+			asdf++;
+		}
+
 		m_ActiveTransform.scale.Set(vScaleAmt);
 
 		break; }

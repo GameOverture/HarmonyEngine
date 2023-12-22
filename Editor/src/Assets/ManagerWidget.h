@@ -49,6 +49,7 @@ public:
 protected:
 	virtual void mousePressEvent(QMouseEvent *event) override;
 	virtual void startDrag(Qt::DropActions supportedActions) override;
+	virtual void dropEvent(QDropEvent *pEvent) override;
 };
 
 class ManagerWidget : public QWidget
