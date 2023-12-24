@@ -981,7 +981,7 @@ void IManagerModel::RegisterAsset(IAssetItemData *pAsset)
 	if(m_AssetChecksumMap.contains(uiChecksum))
 	{
 		m_AssetChecksumMap.find(uiChecksum).value().append(pAsset);
-		HyGuiLog("'" % pAsset->GetName() % "' is a duplicate of '" % m_AssetChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_AssetChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Info);
+		HyGuiLog("'" % pAsset->GetName() % "' is a duplicate of '" % m_AssetChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_AssetChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Debug);
 	}
 	else
 	{

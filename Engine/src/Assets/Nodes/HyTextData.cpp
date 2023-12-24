@@ -67,7 +67,7 @@ HyTextData::HyTextData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets
 	uint32 uiFullAtlasHeight = 0;
 	if(m_pAtlas)
 	{
-		m_RequiredAtlases.Set(m_pAtlas->GetManifestIndex());
+		m_RequiredFiles[HYFILE_Atlas].Set(m_pAtlas->GetManifestIndex());
 
 		uiFullAtlasWidth = m_pAtlas->GetWidth();
 		uiFullAtlasHeight = m_pAtlas->GetHeight();

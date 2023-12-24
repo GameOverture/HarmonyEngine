@@ -545,6 +545,7 @@ void MainWindow::RefreshLoading()
 		{
 			switch(sm_pInstance->m_LoadingMap.firstKey())
 			{
+			case LOADINGTYPE_Project:			sm_pInstance->m_LoadingMsg.setText(iSumOfTotalBlocks == 0 ? "Loading Project" : "Version Patcher"); break;
 			case LOADINGTYPE_ImportAssets:		sm_pInstance->m_LoadingMsg.setText(iSumOfTotalBlocks == 0 ? "Validating Assets" : "Importing Assets"); break;
 			case LOADINGTYPE_AtlasManager:		sm_pInstance->m_LoadingMsg.setText(iSumOfTotalBlocks == 0 ? "Repacking Atlases" : "Constructing Atlas Textures"); break;
 			case LOADINGTYPE_AudioManager:		sm_pInstance->m_LoadingMsg.setText("Constructing Audio Banks"); break;

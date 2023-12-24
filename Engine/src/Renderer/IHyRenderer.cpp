@@ -92,7 +92,7 @@ void IHyRenderer::AppendDrawable3d(uint32 uiId, IHyDrawable3d &instanceRef, HyCa
 	instanceRef.OnUpdateUniforms(fExtrapolatePercent);
 	
 	const HyPrefabData *pData = static_cast<const HyPrefabData *>(instanceRef.AcquireData());
-	pData->GetGltf()->AppendRenderStates(m_RenderBuffer);
+	//pData->GetGltf()->AppendRenderStates(m_RenderBuffer);
 }
 
 void IHyRenderer::AppendDrawable2d(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask, float fExtrapolatePercent)

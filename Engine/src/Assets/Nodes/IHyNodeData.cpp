@@ -10,16 +10,27 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
 
+IHyNodeData::IHyNodeData(bool bIsExtrinsic) :
+	m_sPATH(""),
+	m_uiNumStates(0),
+	m_RequiredFiles{ HYFILE_Atlas, HYFILE_GLTF, HYFILE_AudioBank, HYFILE_Shader }
+{ }
+
 IHyNodeData::IHyNodeData(const std::string &sPath) :
 	m_sPATH(sPath),
 	m_uiNumStates(0),
-	m_RequiredAtlases(HYFILE_Atlas),
-	m_RequiredAudio(HYFILE_AudioBank),
-	m_pGltf(nullptr)
-{ }
+	m_RequiredFiles{ HYFILE_Atlas, HYFILE_GLTF, HYFILE_AudioBank, HYFILE_Shader }
+{
+	HyAssert(m_sPATH.empty() == false, "IHyNodeData::IHyNodeData() 'sPath' cannot be empty");
+}
 
 /*virtual*/ IHyNodeData::~IHyNodeData(void)
 { }
+
+bool IHyNodeData::IsExtrinsic() const
+{
+	return m_sPATH.empty();
+}
 
 uint32 IHyNodeData::GetNumStates() const
 {
@@ -31,17 +42,15 @@ const std::string &IHyNodeData::GetPath() const
 	return m_sPATH;
 }
 
-const HyFilesManifest *IHyNodeData::GetRequiredFiles(HyFileType eFileType) const
+const HyFilesManifest *IHyNodeData::GetManifestFiles(HyFileType eFileType) const
 {
-	if(eFileType == HYFILE_Atlas)
-		return &m_RequiredAtlases;
-	else if(eFileType == HYFILE_AudioBank)
-		return &m_RequiredAudio;
+	if(IsExtrinsic())
+		return nullptr;
 
-	return nullptr;
+	return &m_RequiredFiles[eFileType];
 }
 
-HyGLTF *IHyNodeData::GetGltf() const
+/*virtual*/ IHyFile *IHyNodeData::GetExtrinsicFile() const
 {
-	return m_pGltf;
+	return nullptr;
 }

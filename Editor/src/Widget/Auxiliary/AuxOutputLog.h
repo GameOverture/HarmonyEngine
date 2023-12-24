@@ -22,7 +22,8 @@ enum eLogType
 	LOGTYPE_Warning,
 	LOGTYPE_Error,
 	LOGTYPE_Info,
-	LOGTYPE_Title
+	LOGTYPE_Title,
+	LOGTYPE_Debug
 };
 
 class AuxOutputLog : public QWidget

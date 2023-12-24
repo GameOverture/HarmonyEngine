@@ -112,10 +112,8 @@ public:
 	static HyShaderHandle DefaultShaderHandle(HyType eType);
 	static std::string DateTime();
 	static std::string DataDir();
-	//static HyTextureHandle HotLoadTexture(std::string sFilePath, HyTextureFiltering eFiltering, int32 &iWidthOut, int32 &iHeightOut);
-	//static void HotUnloadTexture(HyTextureHandle hTexHandle);
-	static HyAudioHandle HotLoadAudio(std::string sFilePath, bool bIsStreaming = false, int32 iInstanceLimit = 0);
-	static void HotUnloadAudio(HyAudioHandle hAudioHandle);
+	static HyTextureQuadHandle CreateTexture(std::string sFilePath, HyTextureInfo textureInfo);
+	static HyAudioHandle CreateAudio(std::string sFilePath, bool bIsStreaming = false, int32 iInstanceLimit = 0, int32 iCategoryId = 0);
 };
 
 #endif /* HyEngine_h__ */

@@ -15,7 +15,17 @@
 
 #define HYAUDIO_InfiniteLoops 255
 
-typedef std::vector<std::pair<uint32, uint32>> HyAudioPlayList;	// <checksum, weight>
+struct HyAudioPlaylistEntry
+{
+	HyAudioHandle	m_hAudioHandle;
+	uint32			m_uiWeight;
+
+	HyAudioPlaylistEntry(uint32 uiFirst, uint32 uiSecond, uint32 uiWeight) :
+		m_hAudioHandle(uiFirst, uiSecond),
+		m_uiWeight(uiWeight)
+	{ }
+};
+typedef std::vector<HyAudioPlaylistEntry> HyAudioPlaylist;
 
 template<typename NODETYPE, typename ENTTYPE>
 class IHyAudio : public NODETYPE
@@ -30,15 +40,15 @@ class IHyAudio : public NODETYPE
 	// Configurable
 	struct AudioStateAttribs
 	{
-		uint32						m_ePlayListMode : 3;
+		uint32						m_ePlaylistMode : 3;
 		uint32						m_bAllowRepeats : 1;
 		uint32						m_uiPriority : 4;
 		uint32						m_uiLoops : 8;			// 255 = loop forever (HYAUDIO_InfiniteLoops)
 		uint32						m_uiMaxDistance : 16;
 
-		AudioStateAttribs(HyPlayListMode ePlayList, bool bAllowRepeats, uint8 uiPriority, uint8 uiLoops, uint16 uiMaxDist)
+		AudioStateAttribs(HyPlaylistMode ePlaylist, bool bAllowRepeats, uint8 uiPriority, uint8 uiLoops, uint16 uiMaxDist)
 		{
-			m_ePlayListMode = ePlayList;
+			m_ePlaylistMode = ePlaylist;
 			m_bAllowRepeats = bAllowRepeats ? 1 : 0;
 			m_uiPriority = uiPriority;
 			m_uiLoops = uiLoops;
@@ -46,8 +56,8 @@ class IHyAudio : public NODETYPE
 		}
 	};
 	std::vector<AudioStateAttribs>	m_AudioStateAttribList;
-	std::vector<uint32>				m_CurPlayList;		// Holds Checksums
-	uint32							m_uiLastPlayed;		// Checksum of last played audio
+	std::vector<HyAudioHandle>		m_SoundOrderList;		// Holds the sorted, currently determined order of sound handles (checksum/bankId) to play
+	HyAudioHandle					m_hLastPlayed;			// Checksum/BankId of last played sound from m_SoundOrderList
 
 public:
 	HyAnimFloat						volume;
@@ -55,7 +65,9 @@ public:
 
 public:
 	IHyAudio(std::string sPrefix, std::string sName, ENTTYPE *pParent);
+	IHyAudio(uint32 uiSoundChecksum, uint32 uiBankId, ENTTYPE *pParent);
 	IHyAudio(HyAudioHandle hAudioHandle, ENTTYPE *pParent);
+	IHyAudio(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, ENTTYPE *pParent);
 	IHyAudio(const IHyAudio &copyRef);
 	virtual ~IHyAudio(void);
 	
@@ -73,18 +85,12 @@ public:
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;
 
-	uint32 PullNextSound();	// Returns the next sound checksum to be played
-	uint32 GetLastPulledSound() const;
+	HyAudioHandle PullNextSound();	// Returns the next sound 'HyAudioHandle' (checksum/bankId) to be played
+	HyAudioHandle GetLastPulledSound() const;
 
 protected:
 	virtual void OnDataAcquired() override;
 	virtual void OnLoadedUpdate() override;
-
-	void Shuffle();
-
-	uint32 PullEntryIndex(const HyAudioPlayList &entriesList);
 };
-
-
 
 #endif /* IHyAudio_h__ */

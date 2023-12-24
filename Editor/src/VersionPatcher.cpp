@@ -210,8 +210,12 @@
 			Patch_13to14(metaAtlasDoc, dataAtlasDoc);
 			[[fallthrough]];
 		case 14:
+			HyGuiLog("Patching project files: version 14 -> 15", LOGTYPE_Info);
+			Patch_14to15(dataItemsDoc, metaItemsDoc, metaAudioDoc, dataAudioDoc);
+			[[fallthrough]];
+		case 15:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 14, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 15, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -1205,6 +1209,133 @@
 	}
 	metaAtlasObj.insert("banks", metaBanksArray);
 	metaAtlasDocRef.setObject(metaAtlasObj);
+}
+
+/*static*/ void VersionPatcher::Patch_14to15(QJsonDocument &dataItemsDocRef, const QJsonDocument &metaItemsDocRef, QJsonDocument &metaAudioDocRef, QJsonDocument &dataAudioDocRef)
+{
+	// META-AUDIO : Renaming 'group' -> 'category'
+	QJsonObject metaAudioDocObj = metaAudioDocRef.object();
+	QJsonArray audioAssetsArray = metaAudioDocObj["assets"].toArray();
+	for(int iAssetIndex = 0; iAssetIndex < audioAssetsArray.size(); ++iAssetIndex)
+	{
+		QJsonObject assetObj = audioAssetsArray.at(iAssetIndex).toObject();
+		int iCategoryId = assetObj["groupId"].toInt();
+
+		assetObj.remove("groupId");
+		assetObj.insert("categoryId", iCategoryId);
+
+		audioAssetsArray.replace(iAssetIndex, assetObj);
+	}
+	metaAudioDocObj.insert("assets", audioAssetsArray);
+
+	int iNextCategoryId = metaAudioDocObj["nextGroupId"].toInt();
+	metaAudioDocObj.remove("nextGroupId");
+	metaAudioDocObj.insert("nextCategoryId", iNextCategoryId);
+
+	metaAudioDocRef.setObject(metaAudioDocObj);
+
+	// DATA-AUDIO : Renaming 'group' -> 'category'
+	QJsonObject dataAudioDocObj = dataAudioDocRef.object();
+	QJsonArray dataAudioBanksArray = dataAudioDocObj["banks"].toArray();
+	for(int iBankIndex = 0; iBankIndex < dataAudioBanksArray.size(); ++iBankIndex)
+	{
+		QJsonObject bankObj = dataAudioBanksArray.at(iBankIndex).toObject();
+		QJsonArray dataAudioAssetsArray = bankObj["assets"].toArray();
+		for(int iAssetIndex = 0; iAssetIndex < dataAudioAssetsArray.size(); ++iAssetIndex)
+		{
+			QJsonObject assetObj = dataAudioAssetsArray.at(iAssetIndex).toObject();
+			int iCategoryId = assetObj["groupId"].toInt();
+			assetObj.remove("groupId");
+			assetObj.insert("categoryId", iCategoryId);
+			dataAudioAssetsArray.replace(iAssetIndex, assetObj);
+		}
+		bankObj.insert("assets", dataAudioAssetsArray);
+		dataAudioBanksArray.replace(iBankIndex, bankObj);
+	}
+	dataAudioDocObj.insert("banks", dataAudioBanksArray);
+
+	QJsonArray categoriesArray = dataAudioDocObj["groups"].toArray();
+	for(int iCategoryIndex = 0; iCategoryIndex < categoriesArray.size(); ++iCategoryIndex)
+	{
+		QJsonObject categoryObj = categoriesArray.at(iCategoryIndex).toObject();
+		
+		int iCategoryId = categoryObj["groupId"].toInt();
+		categoryObj.remove("groupId");
+		categoryObj.insert("categoryId", iCategoryId);
+
+		QString sCategoryName = categoryObj["groupName"].toString();
+		categoryObj.remove("groupName");
+		categoryObj.insert("categoryName", sCategoryName);
+
+		categoriesArray.replace(iCategoryIndex, categoryObj);
+	}
+	dataAudioDocObj.remove("groups");
+	dataAudioDocObj.insert("categories", categoriesArray);
+
+	dataAudioDocRef.setObject(dataAudioDocObj);
+
+	// inline function to find the bankId for a given UUID
+	std::function<int(const QString &)> fpFindBankId = [&audioAssetsArray](const QString &sUuid) -> int
+	{
+		for(int iAssetIndex = 0; iAssetIndex < audioAssetsArray.size(); ++iAssetIndex)
+		{
+			// Find the asset with this UUID, and write its bankId to the dataFrameObj
+			QJsonObject metaAssetObj = audioAssetsArray[iAssetIndex].toObject();
+			if(sUuid == metaAssetObj["assetUUID"].toString())
+				return metaAssetObj["bankId"].toInt();
+		}
+		HyGuiLog("VersionPatcher::Patch_14to15 - Failed to find asset with UUID: " % sUuid, LOGTYPE_Error);
+		return 0;
+	};
+
+	// Adding 'bankId' wherever an audio checksum was used in the "playList"
+	QJsonObject dataItemsObj = dataItemsDocRef.object();
+	QJsonObject dataAudioListObj = dataItemsObj["Audio"].toObject();
+
+	QJsonObject metaItemsObj = metaItemsDocRef.object();
+	QJsonObject metaAudioListObj = metaItemsObj["Audio"].toObject();
+
+	QStringList sAudioKeysList = dataAudioListObj.keys();
+	for(int iKeyIndex = 0; iKeyIndex < sAudioKeysList.size(); ++iKeyIndex)
+	{
+		QJsonObject dataAudioObj = dataAudioListObj[sAudioKeysList.at(iKeyIndex)].toObject();
+		const QJsonObject metaAudioObj = metaAudioListObj[sAudioKeysList.at(iKeyIndex)].toObject();
+
+		// Do each state
+		QJsonArray dataAudioStateArray = dataAudioObj["stateArray"].toArray();
+		const QJsonArray metaAudioStateArray = metaAudioObj["stateArray"].toArray();
+		for(int iStateIndex = 0; iStateIndex < dataAudioStateArray.size(); ++iStateIndex)
+		{
+			QJsonObject dataStateObj = dataAudioStateArray[iStateIndex].toObject();
+			const QJsonObject metaStateObj = metaAudioStateArray[iStateIndex].toObject();
+
+			QJsonArray dataPlayListArray = dataStateObj["playList"].toArray();
+			QJsonArray metaAssetUuidArray = metaStateObj["assetUUIDs"].toArray();
+			for(int iPlayListIndex = 0; iPlayListIndex < dataPlayListArray.size(); ++iPlayListIndex)
+			{
+				QJsonObject dataPlayListObj = dataPlayListArray[iPlayListIndex].toObject();
+				QString sUuid = metaAssetUuidArray[iPlayListIndex].toString();
+
+				dataPlayListObj.insert("bankId", fpFindBankId(sUuid));
+				dataPlayListArray.replace(iPlayListIndex, dataPlayListObj);
+			}
+			dataStateObj.remove("playList");	// Renaming "playList" -> "playlist"
+			dataStateObj.insert("playlist", dataPlayListArray);
+
+			// Renaming "playListMode" -> "playlistMode"
+			int iPlaylistMode = dataStateObj["playListMode"].toInt(); 
+			dataStateObj.remove("playListMode");
+			dataStateObj.insert("playlistMode", iPlaylistMode);
+
+			dataAudioStateArray.replace(iStateIndex, dataStateObj);
+		}
+		dataAudioObj.insert("stateArray", dataAudioStateArray);
+		dataAudioListObj.insert(sAudioKeysList.at(iKeyIndex), dataAudioObj);
+	}
+	dataItemsObj.insert("Audio", dataAudioListObj);
+
+	// Write out the new dataItemsObj, which contains updated "audio"
+	dataItemsDocRef.setObject(dataItemsObj);
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)

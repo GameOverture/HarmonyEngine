@@ -41,7 +41,7 @@ class Project;
 #define HySrcEntityFilter "_hy_"
 #define HySrcEntityNamespace "hy"
 
-#define HYGUI_FILE_VERSION 14
+#define HYGUI_FILE_VERSION 15
 
 #define DISPLAYORDER_SnapGuide		99999999
 #define DISPLAYORDER_TransformCtrl	9999999
@@ -110,7 +110,8 @@ enum LoadingType
 {
 	LOADINGTYPE_Unknown = -1,
 
-	LOADINGTYPE_ImportAssets = 0,
+	LOADINGTYPE_Project = 0,
+	LOADINGTYPE_ImportAssets,
 	LOADINGTYPE_AtlasManager,
 	LOADINGTYPE_AudioManager,
 	LOADINGTYPE_ReloadHarmony,

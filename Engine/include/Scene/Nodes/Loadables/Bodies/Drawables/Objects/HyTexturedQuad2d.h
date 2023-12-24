@@ -16,40 +16,39 @@
 
 class HyTexturedQuad2d : public IHyDrawable2d
 {
-	int32										m_iFullTextureWidth;
-	int32										m_iFullTextureHeight;
-	HyRectangle<float>							m_UvRect;
-	HyTextureHandle								m_hTextureHandle;
+	HyRectangle<float>			m_UvCoords;
 
 public:
 	HyTexturedQuad2d(HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent = nullptr);
-	HyTexturedQuad2d(std::string sFilePath, HyTextureInfo useTextureInfo, HyEntity2d *pParent = nullptr);
+	HyTexturedQuad2d(HyTextureQuadHandle hTextureQuadHandle, HyEntity2d *pParent = nullptr);
+	HyTexturedQuad2d(std::string sFilePath, HyTextureInfo textureInfo, HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(const HyTexturedQuad2d &copyRef);
 	virtual ~HyTexturedQuad2d();
 
 	const HyTexturedQuad2d &operator=(const HyTexturedQuad2d &rhs);
 
 	void Init(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent);
-	void Init(std::string sFilePath, HyTextureInfo useTextureInfo, HyEntity2d *pParent);
+	void Init(HyTextureQuadHandle hTextureQuadHandle, HyEntity2d *pParent);
+	void Init(std::string sFilePath, HyTextureInfo textureInfo, HyEntity2d *pParent);
 	void Uninit();
 
-	bool IsHotloading() const;
+	bool IsExtrinsic() const;
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 
-	//void SetUvCoordinates(int iX, int iY, int iWidth, int iHeight);
+	void SetUvCoordinates(int iX, int iY, int iWidth, int iHeight);
 
-	uint32 GetWidth() const;
-	uint32 GetHeight() const;
+	uint32 GetWidth();
+	uint32 GetHeight();
 
-	int32 GetEntireTextureWidth() const;
-	int32 GetEntireTextureHeight() const;
+	int32 GetEntireTextureWidth();
+	int32 GetEntireTextureHeight();
 
 protected:
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;
-	virtual void OnUnloaded() override;
+	//virtual void OnUnloaded() override;
 
 	virtual bool OnIsValidToRender() override;
 

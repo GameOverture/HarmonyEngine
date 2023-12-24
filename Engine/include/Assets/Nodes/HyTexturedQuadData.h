@@ -18,12 +18,18 @@
 class HyTexturedQuadData : public IHyNodeData
 {
 	HyFileAtlas *				m_pAtlas;
+	HyRectangle<float>			m_UvCoords;
+
+	HyExtrinsicFileHandle		m_eExtrinsicFileHandle;
 
 public:
-	HyTexturedQuadData(HyFileAtlas *pAtlas);
+	HyTexturedQuadData(uint32 uiChecksum, uint32 uiBankId, HyAssets &assetsRef);
+	HyTexturedQuadData(HyExtrinsicFileHandle hHandle, std::string sFilePath, HyTextureInfo textureInfo, HyAssets &assetsRef);
 	virtual ~HyTexturedQuadData();
 
+	virtual IHyFile *GetExtrinsicFile() const override;
 	HyFileAtlas *GetAtlas() const;
+	const HyRectangle<float> &GetUvCoords() const;
 };
 
 #endif /* HyTexturedQuad2dData_h__ */

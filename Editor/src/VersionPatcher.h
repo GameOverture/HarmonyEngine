@@ -22,6 +22,7 @@ private:
 	static void Patch_11to12(QJsonDocument &metaAtlasDocRef, QJsonDocument &metaAudioDocRef);
 	static void Patch_12to13(const QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, const QJsonDocument &metaAtlasDocRef); // Adding 'bankId' wherever only a checksum was used
 	static void Patch_13to14(QJsonDocument &metaAtlasDocRef, const QJsonDocument &dataAtlasDocRef); // Adding 'textureSizes' array to each meta atlas bank. Also adding 'cropUnusedSpace', 'squareTexturesOnly', 'aggressiveResizing', and 'minimumFillRate' packing settings
+	static void Patch_14to15(QJsonDocument &dataItemsDocRef, const QJsonDocument &metaItemsDocRef, QJsonDocument &metaAudioDocRef, QJsonDocument &dataAudioDocRef); // Adding 'bankId' wherever only an audio checksum was used; Renaming 'group' -> 'category'; Renaming "playList" -> "playlist"
 
 	static void RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta);
 };

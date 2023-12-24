@@ -19,8 +19,9 @@ class IHyFile
 	friend class HyAssets;
 
 protected:
-	const std::string				m_sFILE_NAME;
 	const HyFileType				m_eLOADABLE_TYPE;
+	const std::string				m_sFILE_NAME;
+	const uint32					m_uiBANK_ID;
 	const uint32					m_uiMANIFEST_INDEX;
 
 	HyLoadState						m_eLoadState;
@@ -30,9 +31,10 @@ protected:
 	uint8 *							m_pGfxApiPixelBuffer;
 
 public:
-	IHyFile(std::string sFileName, HyFileType eType, uint32 uiManifestIndex) :
-		m_sFILE_NAME(sFileName),
+	IHyFile(HyFileType eType, std::string sFileName, uint32 uiBankId, uint32 uiManifestIndex) :
 		m_eLOADABLE_TYPE(eType),
+		m_sFILE_NAME(sFileName),
+		m_uiBANK_ID(uiBankId),
 		m_uiMANIFEST_INDEX(uiManifestIndex),
 		m_eLoadState(HYLOADSTATE_Inactive),
 		m_uiRefCount(0),
@@ -40,8 +42,12 @@ public:
 		m_pGfxApiPixelBuffer(nullptr)
 	{ }
 
+	bool IsExtrinsic() const		{ return m_uiMANIFEST_INDEX == std::numeric_limits<uint32>::max(); }
+
 	HyFileType GetLoadableType()	{ return m_eLOADABLE_TYPE; }
 	HyLoadState GetLoadableState()	{ return m_eLoadState; }
+
+	uint32 GetBankId() const		{ return m_uiBANK_ID; }
 
 	uint32 GetManifestIndex() const { return m_uiMANIFEST_INDEX; }
 

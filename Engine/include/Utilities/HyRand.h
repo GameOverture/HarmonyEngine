@@ -71,7 +71,7 @@ public:
 		return Range<T>(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
 	}
 
-	// Generate a random value in a [min; max] range
+	// Generate a random value in a [min; max] range. A min/max of [1-6] would generate numbers: 1, 2, 3, 4, 5, 6
 	template<typename T>
 	static typename std::enable_if<hy_is_type_integer<T>::value, T>::type Range(T min, T max)
 	{
@@ -81,7 +81,7 @@ public:
 		return std::uniform_int_distribution<T>{ max, min }(GetPseudoRandInstance());
 	}
 
-	// Generate a random value in a [min; max] range
+	// Generate a random value in a [min; max] range. A min/max of [1-6] would generate numbers: 1, 2, 3, 4, 5, 6
 	template<typename T>
 	static typename std::enable_if<hy_is_type_real<T>::value, T>::type Range(T min, T max)
 	{
@@ -91,7 +91,7 @@ public:
 		return std::uniform_real_distribution<T>{ max, min }(GetPseudoRandInstance());
 	}
 
-	// Generate a random value in a [min; max] range
+	// Generate a random value in a [min; max] range. A min/max of [1-6] would generate numbers: 1, 2, 3, 4, 5, 6
 	template<typename T>
 	static typename std::enable_if<hy_is_type_byte<T>::value, T>::type Range(T min, T max)
 	{
@@ -100,7 +100,7 @@ public:
 		return static_cast<T>( Range<short_t>(min, max));
 	}
 
-	// Generate a random value in a [min; max] range
+	// Generate a random value in a [min; max] range. A min/max of [1-6] would generate numbers: 1, 2, 3, 4, 5, 6
 	template<typename T>
 	static typename std::enable_if<hy_is_type_character<T>::value, T>::type Range(T min, T max)
 	{
@@ -115,6 +115,13 @@ public:
 	{
 		HyAssert(0 <= dProbability && 1 >= dProbability, "HyRand::Boolean was passed an invalid probability: " << dProbability);
 		return std::bernoulli_distribution{ dProbability }(GetPseudoRandInstance());
+	}
+
+	// Shuffle the elements in the given container
+	template<typename T>
+	static void Shuffle(T &containerOut)
+	{
+		std::shuffle(containerOut.begin(), containerOut.end(), GetPseudoRandInstance());
 	}
 
 	static std::mt19937 &GetRng()

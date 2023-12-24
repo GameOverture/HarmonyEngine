@@ -15,18 +15,13 @@
 
 #include "vendor/SOIL2/src/SOIL2/SOIL2.h"
 
-HyFileAtlas::HyFileAtlas(std::string sFileName,
-				 uint32 uiBankId,
-				 uint32 uiIndexInBank,
-				 uint32 uiManifestIndex,
-				 HyJsonObj textureObj) :
-	IHyFile(sFileName, HYFILE_Atlas, uiManifestIndex),
-	m_uiBANK_ID(uiBankId),
+HyFileAtlas::HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexInBank, uint32 uiManifestIndex, HyJsonObj textureObj) :
+	IHyFile(HYFILE_Atlas, sFileName, uiBankId, uiManifestIndex),
 	m_uiINDEX_IN_BANK(uiIndexInBank),
-	m_uiWIDTH(textureObj["width"].GetUint()),
-	m_uiHEIGHT(textureObj["height"].GetUint()),
+	m_uiWidth(textureObj["width"].GetUint()),
+	m_uiHeight(textureObj["height"].GetUint()),
 	m_TextureInfo(textureObj["textureInfo"].GetUint()),
-	m_hTextureHandle(0),
+	m_hTextureHandle(HY_UNUSED_HANDLE),
 	m_uiNUM_FRAMES(textureObj["assets"].GetArray().Size()),
 	m_pPixelData(nullptr),
 	m_uiPixelDataSize(0)
@@ -47,16 +42,26 @@ HyFileAtlas::HyFileAtlas(std::string sFileName,
 	}
 }
 
+HyFileAtlas::HyFileAtlas(HyExtrinsicFileHandle hGivenHandle, std::string sFileName, HyTextureInfo textureInfo) :
+	IHyFile(HYFILE_Atlas, sFileName, std::numeric_limits<uint32>::max(), std::numeric_limits<uint32>::max()),
+	m_uiINDEX_IN_BANK(std::numeric_limits<uint32>::max()),
+	m_uiWidth(0),
+	m_uiHeight(0),
+	m_TextureInfo(textureInfo),
+	m_hTextureHandle(HY_UNUSED_HANDLE),
+	m_uiNUM_FRAMES(1),
+	m_pPixelData(nullptr),
+	m_uiPixelDataSize(0),
+	m_pFrames(nullptr)
+{
+	m_ChecksumMap[hGivenHandle] = nullptr;
+}
+
 HyFileAtlas::~HyFileAtlas()
 {
 	delete [] m_pFrames;
 	DeletePixelData();
 }
-
-uint32 HyFileAtlas::GetBankId() const
-{
-	return m_uiBANK_ID;
-} 
 
 uint32 HyFileAtlas::GetIndexInBank() const
 {
@@ -65,12 +70,12 @@ uint32 HyFileAtlas::GetIndexInBank() const
 
 uint32 HyFileAtlas::GetWidth() const
 {
-	return m_uiWIDTH;
+	return m_uiWidth;
 }
 
 uint32 HyFileAtlas::GetHeight() const
 {
-	return m_uiHEIGHT;
+	return m_uiHeight;
 }
 
 HyTextureHandle HyFileAtlas::GetTextureHandle() const
@@ -80,8 +85,9 @@ HyTextureHandle HyFileAtlas::GetTextureHandle() const
 
 bool HyFileAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
 {
-	float fTexWidth = static_cast<float>(m_uiWIDTH);
-	float fTexHeight = static_cast<float>(m_uiHEIGHT);
+	float fTexWidth = static_cast<float>(m_uiWidth);
+	float fTexHeight = static_cast<float>(m_uiHeight);
+	HyAssert(fTexWidth > 0.0f && fTexHeight > 0.0f, "HyFileAtlas::GetUvRect was called before the texture was loaded");
 
 	const HyRectangle<int32> *pSrcRect = nullptr;
 	std::map<uint32, HyRectangle<int32> *>::const_iterator iter = m_ChecksumMap.find(uiChecksum);
@@ -129,12 +135,18 @@ void HyFileAtlas::DeletePixelData()
 			return;
 		}
 
-		char szTmpBuffer[16];
-		std::string sAtlasFilePath = HyEngine::DataDir() + HYASSETS_AtlasDir;
-		sprintf(szTmpBuffer, "%05d", m_uiBANK_ID);
-		sAtlasFilePath += szTmpBuffer;
-		sAtlasFilePath += "/";
-		sAtlasFilePath += m_sFILE_NAME;
+		std::string sAtlasFilePath;
+		if(m_uiWidth != 0 && m_uiHeight != 0)
+		{
+			char szTmpBuffer[16];
+			sAtlasFilePath = HyEngine::DataDir() + HYASSETS_AtlasDir;
+			sprintf(szTmpBuffer, "%05d", m_uiBANK_ID);
+			sAtlasFilePath += szTmpBuffer;
+			sAtlasFilePath += "/";
+			sAtlasFilePath += m_sFILE_NAME;
+		}
+		else
+			sAtlasFilePath = m_sFILE_NAME; // This is an extrinsic file, don't prepend the data directory
 
 		switch(m_TextureInfo.GetFormat())
 		{
@@ -143,7 +155,13 @@ void HyFileAtlas::DeletePixelData()
 			// Param2: disk file type (PNG, ...)
 			int iWidth, iHeight, iNum8bitClrChannels; // out variables
 			m_pPixelData = SOIL_load_image(sAtlasFilePath.c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, m_TextureInfo.m_uiFormatParam1);
-			m_uiPixelDataSize = iWidth * iHeight * 4;
+
+			if(m_uiWidth == 0)
+				m_uiWidth = iWidth;
+			if(m_uiHeight == 0)
+				m_uiHeight = iHeight;
+
+			m_uiPixelDataSize = m_uiWidth * m_uiHeight * 4;
 			break; }
 
 		case HYTEXTURE_DXT:
@@ -177,7 +195,8 @@ void HyFileAtlas::DeletePixelData()
 	m_Mutex_PixelData.lock();
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		m_hTextureHandle = rendererRef.AddTexture(m_TextureInfo, m_uiWIDTH, m_uiHEIGHT, m_pPixelData, m_uiPixelDataSize, m_hGfxApiPbo);
+		HyAssert(m_uiWidth > 0 && m_uiHeight > 0, "HyFileAtlas::OnRenderThread() - Texture dimensions are invalid");
+		m_hTextureHandle = rendererRef.AddTexture(m_TextureInfo, m_uiWidth, m_uiHeight, m_pPixelData, m_uiPixelDataSize, m_hGfxApiPbo);
 		DeletePixelData();
 	}
 	else // GetLoadableState() == HYLOADSTATE_Discarded

@@ -80,6 +80,11 @@ void IHyLoadable3d::Init(std::string sPrefix, std::string sName, HyEntity3d *pPa
 	return GetType();
 }
 
+/*virtual*/ bool IHyLoadable3d::_IsExtrinsic() /*override final*/
+{
+	return GetInternalFlags() & SETTING_IsExtrinsic;
+}
+
 /*virtual*/ IHyLoadable *IHyLoadable3d::_LoadableGetParentPtr() /*override final*/
 {
 	return m_pParent;

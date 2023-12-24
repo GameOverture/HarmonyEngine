@@ -88,6 +88,11 @@ void IHyLoadable2d::Uninit()
 	return GetType();
 }
 
+/*virtual*/ bool IHyLoadable2d::_IsExtrinsic() /*override final*/
+{
+	return GetInternalFlags() & SETTING_IsExtrinsic;
+}
+
 /*virtual*/ IHyLoadable *IHyLoadable2d::_LoadableGetParentPtr() /*override final*/
 {
 	return m_pParent;

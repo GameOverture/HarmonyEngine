@@ -18,10 +18,17 @@ class HyAudio2d : public IHyAudio<IHyLoadable2d, HyEntity2d>
 {
 public:
 	HyAudio2d(std::string sPrefix = "", std::string sName = "", HyEntity2d *pParent = nullptr);
+	HyAudio2d(uint32 uiSoundChecksum, uint32 uiBankId, HyEntity2d *pParent);
 	HyAudio2d(HyAudioHandle hAudioHandle, HyEntity2d *pParent = nullptr);
+	HyAudio2d(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit = 0, int32 iCategoryId = 0, HyEntity2d *pParent = nullptr);
 	// TODO: copy ctor and move ctor
 	virtual ~HyAudio2d(void);
 	// TODO: assignment operator and move operator
+
+	using IHyLoadable2d::Init;
+	void Init(uint32 uiAudioChecksum, uint32 uiBankId, HyEntity2d *pParent);
+	void Init(HyAudioHandle hAudioHandle, HyEntity2d *pParent);
+	void Init(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyEntity2d *pParent);
 
 private:
 	// Hide any transform functionality inherited from IHyNode2d

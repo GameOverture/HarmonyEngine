@@ -24,19 +24,20 @@ class IHyNodeData
 
 protected:
 	uint32							m_uiNumStates;
-	HyFilesManifest					m_RequiredAtlases;
-	HyFilesManifest					m_RequiredAudio;
-	HyGLTF *						m_pGltf;
+	HyFilesManifest					m_RequiredFiles[HYNUM_FILETYPES];
 
 public:
+	IHyNodeData(bool bIsExtrinsic); // For extrinsic nodes // TODO: remove 'bIsExtrinsic' (just using it to test against compiler errors)
 	IHyNodeData(const std::string &sPath);
 	virtual ~IHyNodeData(void);
+
+	bool IsExtrinsic() const;
 
 	uint32 GetNumStates() const;
 	
 	const std::string &GetPath() const;
-	const HyFilesManifest *GetRequiredFiles(HyFileType eFileType) const;
-	HyGLTF *GetGltf() const;
+	const HyFilesManifest *GetManifestFiles(HyFileType eFileType) const;
+	virtual IHyFile *GetExtrinsicFile() const;
 };
 
 #endif /* IHyNodeData_h__ */

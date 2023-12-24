@@ -70,6 +70,7 @@ public:
 		SETTING_IsRegistered		= 1 << 24,
 		SETTING_IsVisible			= 1 << 25,
 		SETTING_IsPauseUpdate		= 1 << 26,
+		SETTING_IsExtrinsic			= 1 << 27,		// This node is at least a IHyLoadable, and uses the prefix/name as a different way to load its data
 	};
 protected:
 	uint32							m_uiFlags;

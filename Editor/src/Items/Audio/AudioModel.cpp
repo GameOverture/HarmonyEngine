@@ -18,7 +18,7 @@ AudioStateData::AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair s
 	m_PropertiesModel(modelRef.GetItem(), iStateIndex, -1, &modelRef)
 {
 	QJsonArray metaAssetArray = stateFileData.m_Meta["assetUUIDs"].toArray();
-	QJsonArray dataPlayListArray = stateFileData.m_Data["playList"].toArray();
+	QJsonArray dataPlayListArray = stateFileData.m_Data["playlist"].toArray();
 
 	QList<QUuid> uuidRequestList;
 	for(int i = 0; i < metaAssetArray.size(); ++i)
@@ -42,7 +42,7 @@ AudioStateData::AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair s
 	const int iRANGE = 16777215;	// Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
 
 	m_PropertiesModel.AppendCategory("Play List");
-	m_PropertiesModel.AppendProperty("Play List", "Mode", PROPERTIESTYPE_ComboBoxInt, stateFileData.m_Data["playListMode"].toInt(0), "The method by which the next audio asset is chosen when this item is played", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), QString(), QString(), sPlayListModeList);
+	m_PropertiesModel.AppendProperty("Play List", "Mode", PROPERTIESTYPE_ComboBoxInt, stateFileData.m_Data["playlistMode"].toInt(0), "The method by which the next audio asset is chosen when this item is played", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), QString(), QString(), sPlayListModeList);
 
 	m_PropertiesModel.AppendCategory("Mixing");
 	m_PropertiesModel.AppendProperty("Mixing", "Volume", PROPERTIESTYPE_double, stateFileData.m_Data["volume"].toDouble(1.0), "Volume modifier [0.0 to 1.0] applied to source volume", PROPERTIESACCESS_Mutable, 0.0, 1.0, 0.1, QString(), QString(), 4);
@@ -180,8 +180,8 @@ PropertiesTreeModel &AudioModel::GetPropertiesModel(uint uiStateIndex)
 	stateFileDataOut.m_Meta.insert("assetUUIDs", assetUuidArray);
 
 	// DATA ////////////////////////////////////////////////////////////////////////
-	stateFileDataOut.m_Data.insert("playList", pState->GenPlayListArray());
-	stateFileDataOut.m_Data.insert("playListMode", propertiesModelRef.FindPropertyValue("Play List", "Mode").toInt());
+	stateFileDataOut.m_Data.insert("playlist", pState->GenPlayListArray());
+	stateFileDataOut.m_Data.insert("playlistMode", propertiesModelRef.FindPropertyValue("Play List", "Mode").toInt());
 	stateFileDataOut.m_Data.insert("volume", propertiesModelRef.FindPropertyValue("Mixing", "Volume").toDouble());
 	stateFileDataOut.m_Data.insert("pitch", propertiesModelRef.FindPropertyValue("Mixing", "Pitch").toDouble());
 	stateFileDataOut.m_Data.insert("priority", propertiesModelRef.FindPropertyValue("Mixing", "Priority").toInt());

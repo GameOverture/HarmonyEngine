@@ -28,8 +28,13 @@ public:
 	static void Utf8Insert(std::string &sStrRef, size_t uiOffset, const std::string &sUtf8Str);
 
 	static std::string CleanPath(const char *szPath, const char *szExtension, bool bMakeLowercase);
-	static std::string GetFileFromPath(const char *szPath, bool bMakeLowercase);
+	static std::string GetFileNameFromPath(const std::string &sPath, bool bMakeLowercase);
+	static std::string GetDirectoryFromPath(const std::string &sPath, bool bMakeLowercase);
+	static std::string GetExtensionFromPath(const std::string &sPath, bool bMakeLowercase);
+	static std::string GetFileNameWithoutExtension(const std::string &sPath, bool bMakeLowercase);
 	static bool FileExists(const std::string &sFilePath);
+	static bool DirectoryExists(const std::string &sDirPath);
+	static std::vector<std::string> GetFileList(const std::string &sDirPath, const std::string &sFilterExtension, bool bRecursively); // sFilterExtension can be empty or in the form of example: ".png" or ".txt"
 
 	static void ReadTextFile(const char *szFilePath, std::vector<char> &sContentsOut);
 	static void WriteTextFile(const char *szFilePath, const char *szContentBuffer);

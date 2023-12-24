@@ -23,6 +23,7 @@
 #include "vendor/miniaudio/miniaudio.h"
 
 class HyInput;
+class HyAssets;
 
 enum HySoundCue
 {
@@ -40,10 +41,10 @@ enum HySoundCue
 
 class HyAudioCore
 {
-	friend class HyAssets;
 	friend class HyScene;
 
 	HyInput &										m_InputRef;
+	HyAssets *										m_pAssets;
 
 	struct SoundCategory
 	{
@@ -57,9 +58,7 @@ class HyAudioCore
 		{ }
 	};
 	std::vector<SoundCategory *>					m_CategoryList;
-	std::vector<HyFileAudio *>						m_BankList;
-	std::map<HyAudioHandle, HySoundAsset *>			m_HotLoadMap;
-	uint32											m_uiHotLoadCount;
+	//std::map<HyExternalAudioHandle, HySoundAsset *>	m_ExternalFileMap;
 
 	// Track what is currently playing, or paused
 	struct PlayInfo
@@ -84,6 +83,8 @@ public:
 	HyAudioCore(HyInput &inputRef);
 	virtual ~HyAudioCore(void);
 
+	void SetHyAssetsPtr(HyAssets *pAssets);
+
 	void InitDevice();
 	void StartDevice();
 	void StopDevice();
@@ -97,18 +98,17 @@ public:
 
 	void DeferLoading(HySoundAsset *pBuffer);
 
-	HyAudioHandle HotLoad(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit);
-	void HotUnload(HyAudioHandle hAudioHandle);
+	//HyExternalAudioHandle LoadExternalFile(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit);
+	//void UnloadExternalFile(HyExternalAudioHandle hAudioHandle);
 
 protected:
 	void Update();
 
-	void AddBank(HyFileAudio *pBankFile);
 	void AddCategory(std::string sName, int32 iId);
 	void CategoryInit(SoundCategory *pSndCategory);
 	void ProcessCue(IHyNode *pNode, HySoundCue eCueType);
 
-	ma_sound *FindIdleBuffer(uint32 uiChecksum); // Returns 'nullptr' if there are no buffers available (instance limit) or can't find via checksum
+	ma_sound *FindIdleBuffer(HyAudioHandle hHandle); // Returns 'nullptr' if there are no buffers available (instance limit) or can't find via checksum
 
 	static void DataCallback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount);
 

@@ -178,7 +178,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	runtimeFile.close();
 
 	QJsonObject runtimeObj = runtimeDoc.object();
-	QJsonArray groupArray = runtimeObj["groups"].toArray(); // TODO: File Patcher - Rename Group -> Category
+	QJsonArray groupArray = runtimeObj["categories"].toArray();
 	if(groupArray.empty())
 	{
 		// Add default categories
@@ -191,8 +191,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 		for(int i = 0; i < groupArray.size(); ++i)
 		{
 			QJsonObject groupObj = groupArray[i].toObject();
-			// TODO: File Patcher - Rename Group -> Category
-			m_AudioCategoriesModel.AddCategory(groupObj["groupName"].toString(), groupObj["groupId"].toInt());
+			m_AudioCategoriesModel.AddCategory(groupObj["categoryName"].toString(), groupObj["categoryId"].toInt());
 		}
 	}
 
@@ -211,7 +210,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	settingsFile.close();
 
 	QJsonObject settingsObj = settingsDoc.object();
-	m_uiNextCategoryId = JSONOBJ_TOINT(settingsObj, "nextGroupId"); // TODO: File Patcher - Rename Group -> Category
+	m_uiNextCategoryId = JSONOBJ_TOINT(settingsObj, "nextCategoryId");
 }
 
 /*virtual*/ void AudioManagerModel::OnCreateNewBank(QJsonObject &newMetaBankObjRef) /*override*/
@@ -227,7 +226,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 										   JSONOBJ_TOINT(metaObj, "bankId"),
 										   metaObj["name"].toString(),
 										   wavHeader,
-										   metaObj["groupId"].toInt(), // TODO: File Patcher - Rename Group -> Category
+										   metaObj["categoryId"].toInt(),
 										   metaObj["isStreaming"].toBool(),
 										   metaObj["isExportMono"].toBool(),
 										   metaObj["instanceLimit"].toInt(),
@@ -357,8 +356,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 
 /*virtual*/ void AudioManagerModel::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
 {
-	// TODO: File Patcher - Rename Group -> Category
-	metaObjRef.insert("nextGroupId", static_cast<qint64>(m_uiNextCategoryId));
+	metaObjRef.insert("nextCategoryId", static_cast<qint64>(m_uiNextCategoryId));
 }
 
 /*virtual*/ QJsonObject AudioManagerModel::GetSaveJson() /*override*/
@@ -377,8 +375,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 			QJsonObject assetObj;
 			assetObj.insert("checksum", QJsonValue(static_cast<qint64>(bankAssetListRef[i]->GetChecksum())));
 			assetObj.insert("fileName", static_cast<SoundClip *>(bankAssetListRef[i])->ConstructDataFileName(true));
-			// TODO: File Patcher - Rename Group -> Category
-			assetObj.insert("groupId", static_cast<SoundClip *>(bankAssetListRef[i])->GetCategoryId());
+			assetObj.insert("categoryId", static_cast<SoundClip *>(bankAssetListRef[i])->GetCategoryId());
 			assetObj.insert("isStreaming", static_cast<SoundClip *>(bankAssetListRef[i])->IsStreaming());
 			assetObj.insert("instanceLimit", static_cast<SoundClip *>(bankAssetListRef[i])->GetInstanceLimit());
 
@@ -393,9 +390,8 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	for(int i = 0; i < m_AudioCategoriesModel.rowCount(); ++i)
 	{
 		QJsonObject groupObj;
-		// TODO: File Patcher - Rename Group -> Category
-		groupObj.insert("groupName", m_AudioCategoriesModel.GetName(i));
-		groupObj.insert("groupId", static_cast<qint64>(m_AudioCategoriesModel.GetId(i)));
+		groupObj.insert("categoryName", m_AudioCategoriesModel.GetName(i));
+		groupObj.insert("categoryId", static_cast<qint64>(m_AudioCategoriesModel.GetId(i)));
 
 		groupArray.append(groupObj);
 	}
@@ -403,7 +399,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	QJsonObject atlasInfoObj;
 	atlasInfoObj.insert("$fileVersion", HYGUI_FILE_VERSION);
 	atlasInfoObj.insert("banks", bankArray);
-	atlasInfoObj.insert("groups", groupArray);
+	atlasInfoObj.insert("categories", groupArray);
 
 	return atlasInfoObj;
 }

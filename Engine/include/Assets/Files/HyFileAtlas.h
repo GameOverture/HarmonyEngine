@@ -19,10 +19,9 @@ class HyAssets;
 
 class HyFileAtlas : public IHyFile
 {
-	const uint32							m_uiBANK_ID;
 	const uint32							m_uiINDEX_IN_BANK;
-	const uint32							m_uiWIDTH;
-	const uint32							m_uiHEIGHT;
+	uint32									m_uiWidth;
+	uint32									m_uiHeight;
 
 	const HyTextureInfo						m_TextureInfo;
 	HyTextureHandle							m_hTextureHandle;
@@ -47,15 +46,11 @@ class HyFileAtlas : public IHyFile
 	std::mutex								m_Mutex_PixelData;
 
 public:
-	HyFileAtlas(std::string sFileName,
-		uint32 uiBankId,
-		uint32 uiIndexInBank,
-		uint32 uiManifestIndex,
-		HyJsonObj textureObj);
+	HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexInBank, uint32 uiManifestIndex, HyJsonObj textureObj);
+	HyFileAtlas(HyExtrinsicFileHandle hGivenHandle, std::string sFileName, HyTextureInfo textureInfo);
 
 	~HyFileAtlas();
 
-	uint32 GetBankId() const;
 	uint32 GetIndexInBank() const;
 	
 	uint32 GetWidth() const;

@@ -117,6 +117,7 @@ QJsonArray AudioPlayListModel::GenPlayListArray() const
 	{
 		QJsonObject frameObj;
 		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_PlayList[i]->GetAudioAsset()->GetChecksum())));
+		frameObj.insert("bankId", QJsonValue(static_cast<qint64>(m_PlayList[i]->GetAudioAsset()->GetBankId())));
 		frameObj.insert("weight", static_cast<int>(m_PlayList[i]->GetWeight()));
 		playListArray.append(frameObj);
 	}

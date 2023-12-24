@@ -16,7 +16,6 @@
 #include "Utilities/HyMath.h"
 #include "Utilities/HyJson.h"
 
-#define HYASSETS_Hotload "+HotLoad"
 #define HYASSETS_DataFile "Items.data"
 #define HYASSETS_AtlasFile "Atlases.data"
 #define HYASSETS_AudioFile "Audio.data"
@@ -57,6 +56,7 @@ class HyAssets : public IHyThreadClass
 		HyFilesManifest *										m_pLoadedManifest = nullptr;
 	};
 	FilesMap													m_FilesMap[HYNUM_FILETYPES];
+	std::map<HyExtrinsicFileHandle, IHyFile *>					m_ExtrinsicFileMap;
 
 	std::map<std::string, HyGLTF *>								m_GltfMap;
 
@@ -75,8 +75,9 @@ class HyAssets : public IHyThreadClass
 	Factory<HyTextData>											m_TextFactory;
 	Factory<HySpineData>										m_SpineFactory;
 	Factory<HyPrefabData>										m_PrefabFactory;
-	std::map<uint32, HyTexturedQuadData *>						m_TextureQuadMap;	// Key is the manifest index
-	std::map<HyAudioHandle, HyAudioData *>						m_HotLoadAudioMap;
+
+	std::map<HyTextureQuadHandle, HyTexturedQuadData *>			m_ExtrinsicTextureQuadMap;
+	std::map<HyAudioHandle, HyAudioData *>						m_ExtrinsicAudioMap;
 
 	std::vector<IHyLoadable *>									m_QueuedInstList;
 	std::vector<IHyFile *>										m_ReloadDataList;
@@ -91,14 +92,16 @@ public:
 	HyAssets(HyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataDirPath);
 	virtual ~HyAssets();
 
+	HyAudioCore &GetAudioCore() const;
 	const std::string &GetDataDir();
 	bool IsInitialized();
 
 	IHyFile *GetFile(HyFileType eFileType, uint32 uiManifestIndex);
-	IHyFile *GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum);
+	IHyFile *GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum, uint32 uiBankId);
+	IHyFile *GetExtrinsicFile(HyExtrinsicFileHandle hHandle);
+	void SetExtrinsicFile(HyExtrinsicFileHandle hHandle, IHyFile *pFile);
 
-	HyFileAtlas *GetAtlas(uint32 uiChecksum, uint32 uiAtlasBankId, HyRectangle<float> &UVRectOut);
-	//HyFileAtlas *GetAtlasUsingBankId(uint32 uiAtlasBankId, uint32 uiIndexInBank);
+	HyFileAtlas *GetAtlas(uint32 uiChecksum, uint32 uiBankId, HyRectangle<float> &UVRectOut);
 	uint32 GetNumAtlases();
 	HyFilesManifest *GetLoadedAtlases();
 
@@ -111,6 +114,9 @@ public:
 	bool IsInstLoaded(IHyLoadable *pLoadable);
 
 	void GetNodeLoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut) const;
+
+	HyTextureQuadHandle CreateExtrinsicTextureQuad(const std::string &sFilePath, HyTextureInfo textureInfo);
+	HyAudioHandle CreateExtrinsicAudio(const std::string &sFilePath, bool bIsStreamed, int32 iInstanceLimit, int32 iCategoryId);
 
 	void Shutdown();
 	bool IsShutdown();

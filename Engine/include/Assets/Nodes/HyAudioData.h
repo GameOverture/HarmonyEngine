@@ -21,9 +21,9 @@ class HyAudioData : public IHyNodeData
 	class AudioState
 	{
 	public:
-		HyAudioPlayList			m_PlayList;
+		HyAudioPlaylist			m_Playlist;
 
-		HyPlayListMode			m_ePlayListMode;
+		HyPlaylistMode			m_ePlaylistMode;
 		float					m_fVolume;
 		float					m_fPitch;
 		int32					m_iPriority;
@@ -32,23 +32,31 @@ class HyAudioData : public IHyNodeData
 	};
 	AudioState *				m_pAudioStates;
 
-	std::vector<uint32> *		m_pSequentialCountList; // Needs to be dynamically allocated so we can update the vector within a const function
+	std::vector<uint32> *		m_pSequentialCountList; // Needs to be dynambically allocated so we can update the vector within a const function
+
+	HyFileAudio *				m_pExtrinsicFile;
 
 public:
 	HyAudioData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
-	HyAudioData(HyAudioHandle hAudioHandle);
+	HyAudioData(uint32 uiChecksum, uint32 uiBankId, HyAssets &assetsRef);
+	HyAudioData(HyExtrinsicFileHandle hFileHandle, std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);
 
-	const HyAudioPlayList &GetPlayList(uint32 uiStateIndex) const;
+	virtual IHyFile *GetExtrinsicFile() const override;
 
-	HyPlayListMode GetPlayListMode(uint32 uiStateIndex) const;
+	const HyAudioPlaylist &GetPlaylist(uint32 uiStateIndex) const;
+
+	HyPlaylistMode GetPlaylistMode(uint32 uiStateIndex) const;
 	int32 GetPriority(uint32 uiStateIndex) const;
 	int32 GetLoops(uint32 uiStateIndex) const;
 	uint32 GetMaxDistance(uint32 uiStateIndex) const;
 	float GetVolume(uint32 uiStateIndex) const;
 	float GetPitch(uint32 uiStateIndex) const;
 
-	uint32 GetNextSequential(uint32 uiStateIndex) const;
+	int32 WeightedEntryPull(const HyAudioPlaylist &entriesList) const; // Returns the index within 'entriesList' that was chosen. -1 if 'entriesList' is empty
+	void WeightedShuffle(uint32 uiStateIndex, std::vector<HyAudioHandle> &soundOrderListOut) const;
+
+	HyAudioHandle GetNextSequential(uint32 uiStateIndex) const;
 };
 
 #endif /* HyAudioData_h__ */

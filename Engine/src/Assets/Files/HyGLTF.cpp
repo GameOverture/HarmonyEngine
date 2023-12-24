@@ -17,7 +17,7 @@
 #include "vendor/glm/gtx/quaternion.hpp"
 
 HyGLTF::HyGLTF(const std::string &sIdentifier, uint32 uiManifestIndex) :
-	IHyFile(sIdentifier, HYFILE_GLTF, uiManifestIndex),
+	IHyFile(HYFILE_GLTF, sIdentifier, 0, uiManifestIndex),
 	m_sIDENTIFIER(sIdentifier)
 {
 }

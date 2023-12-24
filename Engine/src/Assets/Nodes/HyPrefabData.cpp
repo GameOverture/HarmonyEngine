@@ -22,10 +22,10 @@ HyPrefabData::HyPrefabData(const std::string &sPath, HyJsonObj itemDataObj, HyAs
 		int32 iBankId = 0;
 		m_UvRectList.emplace_back();
 		m_UvRectList[i].first = assetsRef.GetAtlas(prefabArray[i].GetUint(), iBankId, m_UvRectList[i].second);
-		m_RequiredAtlases.Set(m_UvRectList[i].first->GetManifestIndex());
+		m_RequiredFiles[HYFILE_Atlas].Set(m_UvRectList[i].first->GetManifestIndex());
 	}
 
-	m_pGltf = assetsRef.GetGltf(sPath);
+	//m_pGltf = assetsRef.GetGltf(sPath);
 }
 
 HyPrefabData::~HyPrefabData(void)

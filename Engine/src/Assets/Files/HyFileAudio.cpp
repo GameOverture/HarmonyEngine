@@ -11,8 +11,8 @@
 #include "Assets/Files/HyFileAudio.h"
 #include "HyEngine.h"
 
-HyFileAudio::HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, HyAudioCore &coreRef, HyJsonObj bankObj) :
-	IHyFile(sFilePath, HYFILE_AudioBank, uiManifestIndex)
+HyFileAudio::HyFileAudio(std::string sFilePath, uint32 uiBankId, uint32 uiManifestIndex, HyJsonObj bankObj, HyAudioCore &coreRef) :
+	IHyFile(HYFILE_AudioBank, sFilePath, uiBankId, uiManifestIndex)
 {
 	HyJsonArray assetsArray = bankObj["assets"].GetArray();
 	for(uint32 i = 0; i < assetsArray.Size(); ++i)
@@ -20,11 +20,19 @@ HyFileAudio::HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, HyAudioC
 		HyJsonObj assetObj = assetsArray[i].GetObject();
 		std::string sSoundFilePath = m_sFILE_NAME + "/";
 		sSoundFilePath += assetObj["fileName"].GetString();
-		HySoundAsset *pNewSndAsset = HY_NEW HySoundAsset(coreRef, sSoundFilePath, assetObj["groupId"].GetInt(), assetObj["isStreaming"].GetBool(), assetObj["instanceLimit"].GetInt());
+		HySoundAsset *pNewSndAsset = HY_NEW HySoundAsset(coreRef, sSoundFilePath, assetObj["categoryId"].GetInt(), assetObj["isStreaming"].GetBool(), assetObj["instanceLimit"].GetInt());
 
 		m_SoundAssetsList.push_back(pNewSndAsset);
 		m_ChecksumMap[assetObj["checksum"].GetUint()] = pNewSndAsset;
 	}
+}
+
+HyFileAudio::HyFileAudio(HyExtrinsicFileHandle hGivenHandle, std::string sFileName, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyAudioCore &coreRef) :
+	IHyFile(HYFILE_AudioBank, sFileName, std::numeric_limits<uint32>::max(), std::numeric_limits<uint32>::max())
+{
+	HySoundAsset *pNewSndAsset = HY_NEW HySoundAsset(coreRef, sFileName, iCategoryId, bIsStreaming, iInstanceLimit);
+	m_SoundAssetsList.push_back(pNewSndAsset);
+	m_ChecksumMap[hGivenHandle] = pNewSndAsset;
 }
 
 HyFileAudio::~HyFileAudio()

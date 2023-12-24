@@ -64,6 +64,10 @@ AuxOutputLog::~AuxOutputLog()
 	case LOGTYPE_Title:
 		sLogMsg = "<br>" % sm_ksTitleHtml % "<b>----- " % sLogMsg % " -----</b><br>";
 		break;
+	case LOGTYPE_Debug:
+	default:
+		return;
+		break;
 	}
 
 	sLogMsg = sLogMsg % sm_ksEndHtml;

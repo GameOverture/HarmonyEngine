@@ -42,7 +42,7 @@ HySpriteData::HySpriteData(const std::string &sPath, HyJsonObj itemDataObj, HyAs
 											   spriteStateObj["reverse"].GetBool(),
 											   spriteStateObj["bounce"].GetBool(),
 											   spriteStateObj["duration"].GetFloat(),
-											   m_RequiredAtlases,
+											   m_RequiredFiles[HYFILE_Atlas],
 											   spriteStateObj["frames"].GetArray(),
 											   assetsRef);
 	}

@@ -27,7 +27,7 @@ HySpineTextureLoader::HySpineTextureLoader(std::vector<HySpineAtlas> &subAtlasLi
 
 /*virtual*/ void HySpineTextureLoader::load(spine::AtlasPage &page, const spine::String &path) /*override*/
 {
-	std::string sFileName = HyIO::GetFileFromPath(path.buffer(), true); // Make lowercase for easier compare
+	std::string sFileName = HyIO::GetFileNameFromPath(path.buffer(), true); // Make lowercase for easier compare
 	uint32 uiNumAtlases = m_SubAtlasListRef.size();
 	for(uint32 i = 0; i < uiNumAtlases; ++i)
 	{

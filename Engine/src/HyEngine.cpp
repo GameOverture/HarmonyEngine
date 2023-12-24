@@ -370,25 +370,14 @@ void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
 	return sAbsDataDir;
 }
 
-///*static*/ HyTextureHandle HyEngine::HotLoadTexture(std::string sFilePath, HyTextureFiltering eFiltering, int32 &iWidthOut, int32 &iHeightOut)
-//{
-//	HyAssert(sm_pInstance != nullptr, "HyEngine::HotLoadTexture() was invoked before engine has been initialized.");
-//
-//	
-//}
-
-///*static*/ void HyEngine::HotUnloadTexture(HyTextureHandle hTexHandle)
-//{
-//	HyAssert(sm_pInstance != nullptr, "HyEngine::HotUnloadTexture() was invoked before engine has been initialized.");
-//	
-//}
-
-/*static*/ HyAudioHandle HyEngine::HotLoadAudio(std::string sFilePath, bool bIsStreaming /*= false*/, int32 iInstanceLimit /*= 0*/)
+/*static*/ HyTextureQuadHandle HyEngine::CreateTexture(std::string sFilePath, HyTextureInfo textureInfo)
 {
-	HyAssert(sm_pInstance != nullptr, "HyEngine::HotLoadAudio() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Audio.HotLoad(sFilePath, bIsStreaming, iInstanceLimit);
+	HyAssert(sm_pInstance != nullptr, "HyEngine::CreateTexture() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Assets.CreateExtrinsicTextureQuad(sFilePath, textureInfo);
 }
 
-/*static*/ void HyEngine::HotUnloadAudio(HyAudioHandle hAudioHandle)
+/*static*/ HyAudioHandle HyEngine::CreateAudio(std::string sFilePath, bool bIsStreaming /*= false*/, int32 iInstanceLimit /*= 0*/, int32 iCategoryId /*= 0*/)
 {
+	HyAssert(sm_pInstance != nullptr, "HyEngine::LoadExternalAudio() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Assets.CreateExtrinsicAudio(sFilePath, bIsStreaming, iInstanceLimit, iCategoryId);
 }

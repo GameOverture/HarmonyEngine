@@ -168,7 +168,7 @@ void SoundClip::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader 
 	wavHeaderObj.insert("dataSize", QJsonValue(static_cast<qint64>(m_WaveHeader.Subchunk2Size)));
 
 	frameObj.insert("wavHeader", wavHeaderObj);
-	frameObj.insert("groupId", m_iCategoryId); // TODO: File Patcher - Rename Group -> Category
+	frameObj.insert("categoryId", m_iCategoryId);
 	frameObj.insert("isStreaming", m_bIsStreaming);
 	frameObj.insert("isExportMono", m_bExportMono);
 	frameObj.insert("instanceLimit", m_iInstanceLimit);

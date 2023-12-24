@@ -15,6 +15,7 @@
 
 #include <fstream>
 #include <iomanip>
+#include <filesystem>
 
 /*static*/ HyStorage HyIO::SessionStorage(true);
 /*static*/ HyStorage HyIO::LocalStorage(false);
@@ -174,18 +175,74 @@
 	return sPath;
 }
 
-/*static*/ std::string HyIO::GetFileFromPath(const char *szPath, bool bMakeLowercase)
+/*static*/ std::string HyIO::GetFileNameFromPath(const std::string &sPath, bool bMakeLowercase)
 {
-	std::string sPath = CleanPath(szPath, nullptr, bMakeLowercase);
-	size_t uiStartIndex = sPath.rfind("/", std::string::npos) + 1;
+	std::string sTmpPath = HyIO::CleanPath(sPath.c_str(), nullptr, bMakeLowercase);
+	size_t uiStartIndex = sTmpPath.rfind("/", std::string::npos) + 1;
 
-	return sPath.substr(uiStartIndex);
+	return sTmpPath.substr(uiStartIndex);
+}
+
+/*static*/ std::string HyIO::GetDirectoryFromPath(const std::string &sPath, bool bMakeLowercase)
+{
+	std::string sTmpPath = HyIO::CleanPath(sPath.c_str(), nullptr, bMakeLowercase);
+	size_t uiEndIndex = sTmpPath.rfind("/", std::string::npos);
+
+	return sTmpPath.substr(0, uiEndIndex);
+}
+
+/*static*/ std::string HyIO::GetExtensionFromPath(const std::string &sPath, bool bMakeLowercase)
+{
+	std::string sTmpPath = HyIO::CleanPath(sPath.c_str(), nullptr, bMakeLowercase);
+	size_t uiStartIndex = sTmpPath.rfind(".", std::string::npos);
+
+	return sTmpPath.substr(uiStartIndex);
+}
+
+/*static*/ std::string HyIO::GetFileNameWithoutExtension(const std::string &sPath, bool bMakeLowercase)
+{
+	std::string sTmpPath = HyIO::CleanPath(sPath.c_str(), nullptr, bMakeLowercase);
+	size_t uiStartIndex = sTmpPath.rfind("/", std::string::npos) + 1;
+	size_t uiEndIndex = sTmpPath.rfind(".", std::string::npos);
+
+	return sTmpPath.substr(uiStartIndex, uiEndIndex - uiStartIndex);
 }
 
 /*static*/ bool HyIO::FileExists(const std::string &sFilePath)
 {
-	std::ifstream infile(sFilePath.c_str());
-	return infile.good();
+	return std::filesystem::exists(sFilePath) && std::filesystem::is_directory(sFilePath) == false;
+}
+
+/*static*/ bool HyIO::DirectoryExists(const std::string &sDirPath)
+{
+	return std::filesystem::exists(sDirPath) && std::filesystem::is_directory(sDirPath);
+}
+
+/*static*/ std::vector<std::string> HyIO::GetFileList(const std::string &sDirPath, const std::string &sFilterExtension, bool bRecursively)
+{
+	std::vector<std::string> fileList;
+	if(DirectoryExists(sDirPath) == false)
+		return fileList;
+
+	std::filesystem::recursive_directory_iterator iter(sDirPath);
+	std::filesystem::recursive_directory_iterator end;
+	while(iter != end)
+	{
+		if(std::filesystem::is_regular_file(iter->path()))
+		{
+			if(sFilterExtension.empty() || iter->path().extension() == sFilterExtension)
+				fileList.push_back(iter->path().string());
+		}
+		if(bRecursively == false)
+			iter.disable_recursion_pending();
+		
+		std::error_code ec;
+		iter.increment(ec);
+		if(ec)
+			break;
+	}
+
+	return fileList;
 }
 
 /*static*/ void HyIO::ReadTextFile(const char *szFilePath, std::vector<char> &contentsOut)

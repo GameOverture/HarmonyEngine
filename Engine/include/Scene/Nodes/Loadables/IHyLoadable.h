@@ -71,6 +71,7 @@ protected:
 
 private:
 	virtual HyType _LoadableGetType() = 0;
+	virtual bool _IsExtrinsic() = 0;
 	virtual IHyLoadable *_LoadableGetParentPtr() = 0;
 };
 

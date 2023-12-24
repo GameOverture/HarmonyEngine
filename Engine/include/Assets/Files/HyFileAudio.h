@@ -15,13 +15,15 @@
 #include "Audio/HySoundAsset.h"
 #include "Utilities/HyJson.h"
 
+// TODO: rename to HyFileAudioBank
 class HyFileAudio : public IHyFile
 {
 	std::vector<HySoundAsset *>			m_SoundAssetsList;
 	std::map<uint32, HySoundAsset *>	m_ChecksumMap;
 
 public:
-	HyFileAudio(std::string sFilePath, uint32 uiManifestIndex, HyAudioCore &coreRef, HyJsonObj bankObj);
+	HyFileAudio(std::string sFilePath, uint32 uiBankId, uint32 uiManifestIndex, HyJsonObj bankObj, HyAudioCore &coreRef);
+	HyFileAudio(HyExtrinsicFileHandle hGivenHandle, std::string sFileName, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyAudioCore &coreRef);
 	virtual ~HyFileAudio();
 
 	bool ContainsAsset(uint32 uiAssetChecksum);
