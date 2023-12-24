@@ -55,9 +55,9 @@ typedef uint32 HyStencilHandle;
 typedef uint8 HyShaderHandle;
 typedef uint32 HyVertexBufferHandle;
 typedef uint32 HyAudioNodeHandle;
-typedef std::pair<uint32, uint32> HyTextureQuadHandle;	// FIRST is the checksum, SECOND is the bank ID ---OR--- FIRST is '0', indicating SECOND is a 'HyExtrinsicFileHandle'
-typedef std::pair<uint32, uint32> HyAudioHandle;		// FIRST is the checksum, SECOND is the bank ID ---OR--- FIRST is '0', indicating SECOND is a 'HyExtrinsicFileHandle'
-typedef uint32 HyExtrinsicFileHandle;
+typedef std::pair<uint32, uint32> HyTextureQuadHandle;	// FIRST is the checksum, SECOND is the bank ID ---OR--- FIRST is '0', indicating SECOND is a 'HyAuxiliaryFileHandle'
+typedef std::pair<uint32, uint32> HyAudioHandle;		// FIRST is the checksum, SECOND is the bank ID ---OR--- FIRST is '0', indicating SECOND is a 'HyAuxiliaryFileHandle'
+typedef uint32 HyAuxiliaryFileHandle;
 typedef uint32 HySpacerHandle;
 typedef uint32 HyLayoutHandle;
 

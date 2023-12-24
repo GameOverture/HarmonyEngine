@@ -42,7 +42,7 @@ public:
 		m_pGfxApiPixelBuffer(nullptr)
 	{ }
 
-	bool IsExtrinsic() const		{ return m_uiMANIFEST_INDEX == std::numeric_limits<uint32>::max(); }
+	bool IsAuxiliary() const		{ return m_uiMANIFEST_INDEX == std::numeric_limits<uint32>::max(); }
 
 	HyFileType GetLoadableType()	{ return m_eLOADABLE_TYPE; }
 	HyLoadState GetLoadableState()	{ return m_eLoadState; }

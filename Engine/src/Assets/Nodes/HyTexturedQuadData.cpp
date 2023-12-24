@@ -14,27 +14,27 @@
 HyTexturedQuadData::HyTexturedQuadData(uint32 uiChecksum, uint32 uiBankId, HyAssets &assetsRef) :
 	IHyNodeData(true),
 	m_pAtlas(nullptr),
-	m_eExtrinsicFileHandle(HY_UNUSED_HANDLE)
+	m_eAuxiliaryFileHandle(HY_UNUSED_HANDLE)
 {
 	m_pAtlas = assetsRef.GetAtlas(uiChecksum, uiBankId, m_UvCoords);
 }
 
-HyTexturedQuadData::HyTexturedQuadData(HyExtrinsicFileHandle hFileHandle, std::string sFilePath, HyTextureInfo textureInfo, HyAssets &assetsRef) :
+HyTexturedQuadData::HyTexturedQuadData(HyAuxiliaryFileHandle hFileHandle, std::string sFilePath, HyTextureInfo textureInfo, HyAssets &assetsRef) :
 	IHyNodeData(true),
 	m_pAtlas(HY_NEW HyFileAtlas(hFileHandle, sFilePath, textureInfo)),
 	m_UvCoords(0.0f, 1.0f, 1.0f, 0.0f),
-	m_eExtrinsicFileHandle(hFileHandle)
+	m_eAuxiliaryFileHandle(hFileHandle)
 {
-	assetsRef.SetExtrinsicFile(hFileHandle, m_pAtlas);
+	assetsRef.SetAuxiliaryFile(hFileHandle, m_pAtlas);
 }
 
 HyTexturedQuadData::~HyTexturedQuadData()
 {
 }
 
-/*virtual*/ IHyFile *HyTexturedQuadData::GetExtrinsicFile() const /*override*/
+/*virtual*/ IHyFile *HyTexturedQuadData::GetAuxiliaryFile() const /*override*/
 {
-	HyAssert(IsExtrinsic(), "HyTexturedQuadData::GetExtrinsicFile() was called on an non-extrinsic object");
+	HyAssert(IsAuxiliary(), "HyTexturedQuadData::GetAuxiliaryFile() was called on an non-auxiliary object");
 	return m_pAtlas;
 }
 

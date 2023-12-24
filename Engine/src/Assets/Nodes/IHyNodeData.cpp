@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
 
-IHyNodeData::IHyNodeData(bool bIsExtrinsic) :
+IHyNodeData::IHyNodeData(bool bIsAuxiliary) :
 	m_sPATH(""),
 	m_uiNumStates(0),
 	m_RequiredFiles{ HYFILE_Atlas, HYFILE_GLTF, HYFILE_AudioBank, HYFILE_Shader }
@@ -27,7 +27,7 @@ IHyNodeData::IHyNodeData(const std::string &sPath) :
 /*virtual*/ IHyNodeData::~IHyNodeData(void)
 { }
 
-bool IHyNodeData::IsExtrinsic() const
+bool IHyNodeData::IsAuxiliary() const
 {
 	return m_sPATH.empty();
 }
@@ -44,13 +44,13 @@ const std::string &IHyNodeData::GetPath() const
 
 const HyFilesManifest *IHyNodeData::GetManifestFiles(HyFileType eFileType) const
 {
-	if(IsExtrinsic())
+	if(IsAuxiliary())
 		return nullptr;
 
 	return &m_RequiredFiles[eFileType];
 }
 
-/*virtual*/ IHyFile *IHyNodeData::GetExtrinsicFile() const
+/*virtual*/ IHyFile *IHyNodeData::GetAuxiliaryFile() const
 {
 	return nullptr;
 }

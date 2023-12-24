@@ -56,7 +56,7 @@ class HyAssets : public IHyThreadClass
 		HyFilesManifest *										m_pLoadedManifest = nullptr;
 	};
 	FilesMap													m_FilesMap[HYNUM_FILETYPES];
-	std::map<HyExtrinsicFileHandle, IHyFile *>					m_ExtrinsicFileMap;
+	std::map<HyAuxiliaryFileHandle, IHyFile *>					m_AuxiliaryFileMap;
 
 	std::map<std::string, HyGLTF *>								m_GltfMap;
 
@@ -76,8 +76,8 @@ class HyAssets : public IHyThreadClass
 	Factory<HySpineData>										m_SpineFactory;
 	Factory<HyPrefabData>										m_PrefabFactory;
 
-	std::map<HyTextureQuadHandle, HyTexturedQuadData *>			m_ExtrinsicTextureQuadMap;
-	std::map<HyAudioHandle, HyAudioData *>						m_ExtrinsicAudioMap;
+	std::map<HyTextureQuadHandle, HyTexturedQuadData *>			m_AuxiliaryTextureQuadMap;
+	std::map<HyAudioHandle, HyAudioData *>						m_AuxiliaryAudioMap;
 
 	std::vector<IHyLoadable *>									m_QueuedInstList;
 	std::vector<IHyFile *>										m_ReloadDataList;
@@ -98,8 +98,8 @@ public:
 
 	IHyFile *GetFile(HyFileType eFileType, uint32 uiManifestIndex);
 	IHyFile *GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum, uint32 uiBankId);
-	IHyFile *GetExtrinsicFile(HyExtrinsicFileHandle hHandle);
-	void SetExtrinsicFile(HyExtrinsicFileHandle hHandle, IHyFile *pFile);
+	IHyFile *GetAuxiliaryFile(HyAuxiliaryFileHandle hHandle);
+	void SetAuxiliaryFile(HyAuxiliaryFileHandle hHandle, IHyFile *pFile);
 
 	HyFileAtlas *GetAtlas(uint32 uiChecksum, uint32 uiBankId, HyRectangle<float> &UVRectOut);
 	uint32 GetNumAtlases();
@@ -115,8 +115,8 @@ public:
 
 	void GetNodeLoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut) const;
 
-	HyTextureQuadHandle CreateExtrinsicTextureQuad(const std::string &sFilePath, HyTextureInfo textureInfo);
-	HyAudioHandle CreateExtrinsicAudio(const std::string &sFilePath, bool bIsStreamed, int32 iInstanceLimit, int32 iCategoryId);
+	HyTextureQuadHandle CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyTextureInfo textureInfo);
+	HyAudioHandle CreateAuxiliaryAudio(const std::string &sFilePath, bool bIsStreamed, int32 iInstanceLimit, int32 iCategoryId);
 
 	void Shutdown();
 	bool IsShutdown();

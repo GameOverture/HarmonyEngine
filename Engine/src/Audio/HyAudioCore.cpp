@@ -463,7 +463,7 @@ ma_sound *HyAudioCore::FindIdleBuffer(HyAudioHandle hHandle)
 	}
 	else
 	{
-		pAudioFile = static_cast<HyFileAudio *>(m_pAssets->GetExtrinsicFile(hHandle.second));
+		pAudioFile = static_cast<HyFileAudio *>(m_pAssets->GetAuxiliaryFile(hHandle.second));
 		uiChecksum = hHandle.second;
 	}
 	if(pAudioFile == nullptr)

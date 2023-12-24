@@ -38,19 +38,19 @@ HyAudio2d::HyAudio2d(std::string sFilePath, bool bIsStreaming, int32 iInstanceLi
 
 void HyAudio2d::Init(uint32 uiAudioChecksum, uint32 uiBankId, HyEntity2d *pParent)
 {
-	m_uiFlags |= SETTING_IsExtrinsic;
+	m_uiFlags |= SETTING_IsAuxiliary;
 	IHyLoadable2d::Init(std::to_string(uiAudioChecksum), std::to_string(uiBankId), pParent);
 }
 
 void HyAudio2d::Init(HyAudioHandle hAudioHandle, HyEntity2d *pParent)
 {
-	m_uiFlags |= SETTING_IsExtrinsic;
+	m_uiFlags |= SETTING_IsAuxiliary;
 	IHyLoadable2d::Init(std::to_string(hAudioHandle.first), std::to_string(hAudioHandle.second), pParent);
 }
 
 void HyAudio2d::Init(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyEntity2d *pParent)
 {
-	m_uiFlags |= SETTING_IsExtrinsic;
+	m_uiFlags |= SETTING_IsAuxiliary;
 	HyAudioHandle hAudioHandle = HyEngine::CreateAudio(HyIO::CleanPath(sFilePath.c_str(), nullptr, false), bIsStreaming, iInstanceLimit, iCategoryId);
 	IHyLoadable2d::Init(std::to_string(hAudioHandle.first), std::to_string(hAudioHandle.second), pParent);
 }

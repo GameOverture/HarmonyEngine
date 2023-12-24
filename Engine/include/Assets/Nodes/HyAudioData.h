@@ -34,15 +34,15 @@ class HyAudioData : public IHyNodeData
 
 	std::vector<uint32> *		m_pSequentialCountList; // Needs to be dynambically allocated so we can update the vector within a const function
 
-	HyFileAudio *				m_pExtrinsicFile;
+	HyFileAudio *				m_pAuxiliaryFile;
 
 public:
 	HyAudioData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	HyAudioData(uint32 uiChecksum, uint32 uiBankId, HyAssets &assetsRef);
-	HyAudioData(HyExtrinsicFileHandle hFileHandle, std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyAssets &assetsRef);
+	HyAudioData(HyAuxiliaryFileHandle hFileHandle, std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);
 
-	virtual IHyFile *GetExtrinsicFile() const override;
+	virtual IHyFile *GetAuxiliaryFile() const override;
 
 	const HyAudioPlaylist &GetPlaylist(uint32 uiStateIndex) const;
 

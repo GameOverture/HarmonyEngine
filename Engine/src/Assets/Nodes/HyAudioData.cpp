@@ -16,7 +16,7 @@
 HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &assetsRef) :
 	IHyNodeData(sPath),
 	m_pAudioStates(nullptr),
-	m_pExtrinsicFile(nullptr)
+	m_pAuxiliaryFile(nullptr)
 {
 	HyJsonArray audioStateArray = itemObj["stateArray"].GetArray();
 	m_uiNumStates = audioStateArray.Size();
@@ -54,7 +54,7 @@ HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &
 HyAudioData::HyAudioData(uint32 uiChecksum, uint32 uiBankId, HyAssets &assetsRef) :
 	IHyNodeData(true),
 	m_pAudioStates(nullptr),
-	m_pExtrinsicFile(static_cast<HyFileAudio *>(assetsRef.GetFileWithAsset(HYFILE_AudioBank, uiChecksum, uiBankId)))
+	m_pAuxiliaryFile(static_cast<HyFileAudio *>(assetsRef.GetFileWithAsset(HYFILE_AudioBank, uiChecksum, uiBankId)))
 {
 	m_uiNumStates = 1;
 	m_pAudioStates = HY_NEW AudioState[m_uiNumStates];
@@ -71,12 +71,12 @@ HyAudioData::HyAudioData(uint32 uiChecksum, uint32 uiBankId, HyAssets &assetsRef
 	m_pSequentialCountList = HY_NEW std::vector<uint32>(m_uiNumStates, 0);
 }
 
-HyAudioData::HyAudioData(HyExtrinsicFileHandle hFileHandle, std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyAssets &assetsRef) :
+HyAudioData::HyAudioData(HyAuxiliaryFileHandle hFileHandle, std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyAssets &assetsRef) :
 	IHyNodeData(true),
 	m_pAudioStates(nullptr),
-	m_pExtrinsicFile(HY_NEW HyFileAudio(hFileHandle, sFilePath, bIsStreaming, iInstanceLimit, iCategoryId, assetsRef.GetAudioCore()))
+	m_pAuxiliaryFile(HY_NEW HyFileAudio(hFileHandle, sFilePath, bIsStreaming, iInstanceLimit, iCategoryId, assetsRef.GetAudioCore()))
 {
-	assetsRef.SetExtrinsicFile(hFileHandle, m_pExtrinsicFile);
+	assetsRef.SetAuxiliaryFile(hFileHandle, m_pAuxiliaryFile);
 
 	m_uiNumStates = 1;
 	m_pAudioStates = HY_NEW AudioState[m_uiNumStates];
@@ -99,10 +99,10 @@ HyAudioData::~HyAudioData(void)
 	delete m_pSequentialCountList;
 }
 
-/*virtual*/ IHyFile *HyAudioData::GetExtrinsicFile() const /*override*/
+/*virtual*/ IHyFile *HyAudioData::GetAuxiliaryFile() const /*override*/
 {
-	HyAssert(IsExtrinsic(), "HyAudioData::GetExtrinsicFile() was called on an non-extrinsic object");
-	return m_pExtrinsicFile;
+	HyAssert(IsAuxiliary(), "HyAudioData::GetAuxiliaryFile() was called on an non-auxiliary object");
+	return m_pAuxiliaryFile;
 }
 
 const HyAudioPlaylist &HyAudioData::GetPlaylist(uint32 uiStateIndex) const

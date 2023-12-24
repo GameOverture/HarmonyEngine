@@ -27,17 +27,17 @@ protected:
 	HyFilesManifest					m_RequiredFiles[HYNUM_FILETYPES];
 
 public:
-	IHyNodeData(bool bIsExtrinsic); // For extrinsic nodes // TODO: remove 'bIsExtrinsic' (just using it to test against compiler errors)
+	IHyNodeData(bool bIsAuxiliary); // For auxiliary nodes // TODO: remove 'bIsAuxiliary' (just using it to test against compiler errors)
 	IHyNodeData(const std::string &sPath);
 	virtual ~IHyNodeData(void);
 
-	bool IsExtrinsic() const;
+	bool IsAuxiliary() const;
 
 	uint32 GetNumStates() const;
 	
 	const std::string &GetPath() const;
 	const HyFilesManifest *GetManifestFiles(HyFileType eFileType) const;
-	virtual IHyFile *GetExtrinsicFile() const;
+	virtual IHyFile *GetAuxiliaryFile() const;
 };
 
 #endif /* IHyNodeData_h__ */

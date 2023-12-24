@@ -373,11 +373,11 @@ void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
 /*static*/ HyTextureQuadHandle HyEngine::CreateTexture(std::string sFilePath, HyTextureInfo textureInfo)
 {
 	HyAssert(sm_pInstance != nullptr, "HyEngine::CreateTexture() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Assets.CreateExtrinsicTextureQuad(sFilePath, textureInfo);
+	return sm_pInstance->m_Assets.CreateAuxiliaryTextureQuad(sFilePath, textureInfo);
 }
 
 /*static*/ HyAudioHandle HyEngine::CreateAudio(std::string sFilePath, bool bIsStreaming /*= false*/, int32 iInstanceLimit /*= 0*/, int32 iCategoryId /*= 0*/)
 {
-	HyAssert(sm_pInstance != nullptr, "HyEngine::LoadExternalAudio() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Assets.CreateExtrinsicAudio(sFilePath, bIsStreaming, iInstanceLimit, iCategoryId);
+	HyAssert(sm_pInstance != nullptr, "HyEngine::CreateAudio() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Assets.CreateAuxiliaryAudio(sFilePath, bIsStreaming, iInstanceLimit, iCategoryId);
 }

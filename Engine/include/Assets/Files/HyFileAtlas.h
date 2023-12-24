@@ -47,7 +47,7 @@ class HyFileAtlas : public IHyFile
 
 public:
 	HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexInBank, uint32 uiManifestIndex, HyJsonObj textureObj);
-	HyFileAtlas(HyExtrinsicFileHandle hGivenHandle, std::string sFileName, HyTextureInfo textureInfo);
+	HyFileAtlas(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, HyTextureInfo textureInfo);
 
 	~HyFileAtlas();
 

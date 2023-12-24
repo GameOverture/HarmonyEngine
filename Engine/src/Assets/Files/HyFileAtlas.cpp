@@ -42,7 +42,7 @@ HyFileAtlas::HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexI
 	}
 }
 
-HyFileAtlas::HyFileAtlas(HyExtrinsicFileHandle hGivenHandle, std::string sFileName, HyTextureInfo textureInfo) :
+HyFileAtlas::HyFileAtlas(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, HyTextureInfo textureInfo) :
 	IHyFile(HYFILE_Atlas, sFileName, std::numeric_limits<uint32>::max(), std::numeric_limits<uint32>::max()),
 	m_uiINDEX_IN_BANK(std::numeric_limits<uint32>::max()),
 	m_uiWidth(0),
@@ -146,7 +146,7 @@ void HyFileAtlas::DeletePixelData()
 			sAtlasFilePath += m_sFILE_NAME;
 		}
 		else
-			sAtlasFilePath = m_sFILE_NAME; // This is an extrinsic file, don't prepend the data directory
+			sAtlasFilePath = m_sFILE_NAME; // This is an auxiliary file, don't prepend the data directory
 
 		switch(m_TextureInfo.GetFormat())
 		{

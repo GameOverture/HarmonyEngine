@@ -33,7 +33,7 @@ public:
 	void Init(std::string sFilePath, HyTextureInfo textureInfo, HyEntity2d *pParent);
 	void Uninit();
 
-	bool IsExtrinsic() const;
+	bool IsAuxiliary() const;
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 

@@ -120,10 +120,10 @@ HyAssets::~HyAssets()
 		delete iter->second;
 	m_GltfMap.clear();
 
-	for(auto iter = m_ExtrinsicTextureQuadMap.begin(); iter != m_ExtrinsicTextureQuadMap.end(); ++iter)
+	for(auto iter = m_AuxiliaryTextureQuadMap.begin(); iter != m_AuxiliaryTextureQuadMap.end(); ++iter)
 		delete iter->second;
 
-	for(auto iter = m_ExtrinsicAudioMap.begin(); iter != m_ExtrinsicAudioMap.end(); ++iter)
+	for(auto iter = m_AuxiliaryAudioMap.begin(); iter != m_AuxiliaryAudioMap.end(); ++iter)
 		delete iter->second;
 }
 
@@ -188,16 +188,16 @@ IHyFile *HyAssets::GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum
 	return nullptr;
 }
 
-IHyFile *HyAssets::GetExtrinsicFile(HyExtrinsicFileHandle hHandle)
+IHyFile *HyAssets::GetAuxiliaryFile(HyAuxiliaryFileHandle hHandle)
 {
-	HyAssert(m_ExtrinsicFileMap.find(hHandle) != m_ExtrinsicFileMap.end(), "HyAssets::GetExtrinsicFile was given an invalid handle: " << hHandle);
-	return m_ExtrinsicFileMap[hHandle];
+	HyAssert(m_AuxiliaryFileMap.find(hHandle) != m_AuxiliaryFileMap.end(), "HyAssets::GetAuxiliaryFile was given an invalid handle: " << hHandle);
+	return m_AuxiliaryFileMap[hHandle];
 }
 
-void HyAssets::SetExtrinsicFile(HyExtrinsicFileHandle hHandle, IHyFile *pFile)
+void HyAssets::SetAuxiliaryFile(HyAuxiliaryFileHandle hHandle, IHyFile *pFile)
 {
-	HyAssert(m_ExtrinsicFileMap.find(hHandle) == m_ExtrinsicFileMap.end(), "HyAssets::SetExtrinsicFile was given a handle that already exists: " << hHandle);
-	m_ExtrinsicFileMap.insert({ hHandle, pFile });
+	HyAssert(m_AuxiliaryFileMap.find(hHandle) == m_AuxiliaryFileMap.end(), "HyAssets::SetAuxiliaryFile was given a handle that already exists: " << hHandle);
+	m_AuxiliaryFileMap.insert({ hHandle, pFile });
 }
 
 HyFileAtlas *HyAssets::GetAtlas(uint32 uiChecksum, uint32 uiBankId, HyRectangle<float> &UVRectOut)
@@ -248,53 +248,53 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 		pDataOut = m_PrefabFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		break;
 	
-	// Handle types that could be extrinsic together here
+	// Handle types that could be auxiliary together here
 	case HYTYPE_Audio:
 	case HYTYPE_TexturedQuad:
-		if(pLoadable->_IsExtrinsic())
+		if(pLoadable->_IsAuxiliary())
 		{
-			// Convert Prefix and Name back into an extrinsic handle
-			std::pair<uint32, uint32> extrinsicHandle = std::make_pair(static_cast<uint32>(std::stoll(pLoadable->GetPrefix())),
+			// Convert Prefix and Name back into an auxiliary handle
+			std::pair<uint32, uint32> auxiliaryHandle = std::make_pair(static_cast<uint32>(std::stoll(pLoadable->GetPrefix())),
 																	   static_cast<uint32>(std::stoll(pLoadable->GetName())));
 
 			// If FIRST is non-zero then it's holding a checksum, and SECOND is bankId
-			if(extrinsicHandle.first != 0)
+			if(auxiliaryHandle.first != 0)
 			{
-				if(m_ExtrinsicTextureQuadMap.find(extrinsicHandle) == m_ExtrinsicTextureQuadMap.end())
+				if(m_AuxiliaryTextureQuadMap.find(auxiliaryHandle) == m_AuxiliaryTextureQuadMap.end())
 				{
-					uint32 uiChecksum = extrinsicHandle.first;
-					uint32 uiBankId = extrinsicHandle.second;
+					uint32 uiChecksum = auxiliaryHandle.first;
+					uint32 uiBankId = auxiliaryHandle.second;
 					if(pLoadable->_LoadableGetType() == HYTYPE_TexturedQuad)
 					{
 						HyTexturedQuadData *pNewTexQuadData = HY_NEW HyTexturedQuadData(uiChecksum, uiBankId, *this);
-						m_ExtrinsicTextureQuadMap.insert({ extrinsicHandle, pNewTexQuadData });
+						m_AuxiliaryTextureQuadMap.insert({ auxiliaryHandle, pNewTexQuadData });
 						pDataOut = pNewTexQuadData;
 					}
 					else if(pLoadable->_LoadableGetType() == HYTYPE_Audio)
 					{
 						HyAudioData *pNewAudioData = HY_NEW HyAudioData(uiChecksum, uiBankId, *this);
-						m_ExtrinsicAudioMap.insert({ extrinsicHandle, pNewAudioData });
+						m_AuxiliaryAudioMap.insert({ auxiliaryHandle, pNewAudioData });
 						pDataOut = pNewAudioData;
 					}
 				}
 			}
-			else // If FIRST is zero, then SECOND is holding a HyExtrinsicFileHandle
+			else // If FIRST is zero, then SECOND is holding a HyAuxiliaryFileHandle
 			{
 				if(pLoadable->_LoadableGetType() == HYTYPE_TexturedQuad)
 				{
-					HyAssert(m_ExtrinsicTextureQuadMap.find(extrinsicHandle) != m_ExtrinsicTextureQuadMap.end(), "HyAssets::AcquireNodeData was given an invalid extrinsic file handle: " << extrinsicHandle.first << ", " << extrinsicHandle.second);
-					pDataOut = m_ExtrinsicTextureQuadMap[extrinsicHandle];
+					HyAssert(m_AuxiliaryTextureQuadMap.find(auxiliaryHandle) != m_AuxiliaryTextureQuadMap.end(), "HyAssets::AcquireNodeData was given an invalid auxiliary file handle: " << auxiliaryHandle.first << ", " << auxiliaryHandle.second);
+					pDataOut = m_AuxiliaryTextureQuadMap[auxiliaryHandle];
 				}
 				else if(pLoadable->_LoadableGetType() == HYTYPE_Audio)
 				{
-					HyAssert(m_ExtrinsicAudioMap.find(extrinsicHandle) != m_ExtrinsicAudioMap.end(), "HyAssets::AcquireNodeData was given an invalid extrinsic file handle: " << extrinsicHandle.first << ", " << extrinsicHandle.second);
-					pDataOut = m_ExtrinsicAudioMap[extrinsicHandle];
+					HyAssert(m_AuxiliaryAudioMap.find(auxiliaryHandle) != m_AuxiliaryAudioMap.end(), "HyAssets::AcquireNodeData was given an invalid auxiliary file handle: " << auxiliaryHandle.first << ", " << auxiliaryHandle.second);
+					pDataOut = m_AuxiliaryAudioMap[auxiliaryHandle];
 				}
 			}
 		}
 		else
 		{
-			// TODO: Possibly add a new item type that is just a 'sampled' extrinsic audio, so HyAudio can be just a regular project item handled above
+			// TODO: Possibly add a new item type that is just a 'sampled' auxiliary audio, so HyAudio can be just a regular project item handled above
 			if(pLoadable->_LoadableGetType() == HYTYPE_Audio)
 				pDataOut = m_AudioFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
 		}
@@ -338,14 +338,14 @@ void HyAssets::LoadNodeData(IHyLoadable *pLoadable)
 			}
 			else
 			{
-				// Non valid manifest means the files are extrinsic
-				IHyFile *pFile = pLoadable->UncheckedGetData()->GetExtrinsicFile();
+				// Non valid manifest means the files are auxiliary
+				IHyFile *pFile = pLoadable->UncheckedGetData()->GetAuxiliaryFile();
 				QueueData(pFile);
 
 				if(pFile->GetLoadableState() != HYLOADSTATE_Loaded)
 					bFullyLoaded = false;
 
-				break; // Only one extrinsic file per loadable
+				break; // Only one auxiliary file per loadable
 			}
 		}
 	}
@@ -386,9 +386,9 @@ void HyAssets::RemoveNodeData(IHyLoadable *pLoadable)
 					}
 				}
 			}
-			else // Non valid manifest means the files are extrinsic
+			else // Non valid manifest means the files are auxiliary
 			{
-				IHyFile *pFile = pLoadable->UncheckedGetData()->GetExtrinsicFile();
+				IHyFile *pFile = pLoadable->UncheckedGetData()->GetAuxiliaryFile();
 				DequeData(pFile);
 			}
 		}
@@ -428,9 +428,9 @@ bool HyAssets::IsInstLoaded(IHyLoadable *pLoadable)
 				if(m_FilesMap[iFileType].m_pLoadedManifest->IsSet(*pRequiredManifest) == false)
 					return false;
 			}
-			else // Non valid manifest means the files are extrinsic
+			else // Non valid manifest means the files are auxiliary
 			{
-				return pLoadable->UncheckedGetData()->GetExtrinsicFile()->GetLoadableState() == HYLOADSTATE_Loaded;
+				return pLoadable->UncheckedGetData()->GetAuxiliaryFile()->GetLoadableState() == HYLOADSTATE_Loaded;
 			}
 		}
 	}
@@ -444,7 +444,7 @@ void HyAssets::GetNodeLoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut) 
 	uiTotalOut = m_uiLoadingCountTotal;
 }
 
-HyTextureQuadHandle HyAssets::CreateExtrinsicTextureQuad(const std::string &sFilePath, HyTextureInfo textureInfo)
+HyTextureQuadHandle HyAssets::CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyTextureInfo textureInfo)
 {
 	std::vector<char> handleData(sFilePath.begin(), sFilePath.end());
 	handleData.push_back(textureInfo.m_uiFiltering);
@@ -452,16 +452,16 @@ HyTextureQuadHandle HyAssets::CreateExtrinsicTextureQuad(const std::string &sFil
 	handleData.push_back(textureInfo.m_uiFormatParam1);
 	handleData.push_back(textureInfo.m_uiFormatParam2);
 	
-	HyExtrinsicFileHandle hFileHandle = crc32_fast(handleData.data(), handleData.size());
+	HyAuxiliaryFileHandle hFileHandle = crc32_fast(handleData.data(), handleData.size());
 	HyTextureQuadHandle hTexQuadHandle(0, hFileHandle);
 
-	if(m_ExtrinsicTextureQuadMap.find(hTexQuadHandle) == m_ExtrinsicTextureQuadMap.end())
-		m_ExtrinsicTextureQuadMap.insert({ hTexQuadHandle, HY_NEW HyTexturedQuadData(hFileHandle, sFilePath, textureInfo, *this) });
+	if(m_AuxiliaryTextureQuadMap.find(hTexQuadHandle) == m_AuxiliaryTextureQuadMap.end())
+		m_AuxiliaryTextureQuadMap.insert({ hTexQuadHandle, HY_NEW HyTexturedQuadData(hFileHandle, sFilePath, textureInfo, *this) });
 
 	return hTexQuadHandle;
 }
 
-HyAudioHandle HyAssets::CreateExtrinsicAudio(const std::string &sFilePath, bool bIsStreamed, int32 iInstanceLimit, int32 iCategoryId)
+HyAudioHandle HyAssets::CreateAuxiliaryAudio(const std::string &sFilePath, bool bIsStreamed, int32 iInstanceLimit, int32 iCategoryId)
 {
 	std::vector<char> handleData(sFilePath.begin(), sFilePath.end());
 	handleData.push_back(bIsStreamed ? '1' : '0');
@@ -474,11 +474,11 @@ HyAudioHandle HyAssets::CreateExtrinsicAudio(const std::string &sFilePath, bool 
 	handleData.push_back(static_cast<char>((iCategoryId & 0x00FF0000) >> 16));
 	handleData.push_back(static_cast<char>((iCategoryId & 0xFF000000) >> 24));
 
-	HyExtrinsicFileHandle hFileHandle = crc32_fast(handleData.data(), handleData.size());
+	HyAuxiliaryFileHandle hFileHandle = crc32_fast(handleData.data(), handleData.size());
 	HyAudioHandle hAudioHandle(0, hFileHandle);
 
-	if(m_ExtrinsicAudioMap.find(hAudioHandle) == m_ExtrinsicAudioMap.end())
-		m_ExtrinsicAudioMap.insert({ hAudioHandle, HY_NEW HyAudioData(hFileHandle, sFilePath, bIsStreamed, iInstanceLimit, iCategoryId, *this) });
+	if(m_AuxiliaryAudioMap.find(hAudioHandle) == m_AuxiliaryAudioMap.end())
+		m_AuxiliaryAudioMap.insert({ hAudioHandle, HY_NEW HyAudioData(hFileHandle, sFilePath, bIsStreamed, iInstanceLimit, iCategoryId, *this) });
 
 	return hAudioHandle;
 }
@@ -843,7 +843,7 @@ void HyAssets::DequeData(IHyFile *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Discarded;
 
-			if(pData->IsExtrinsic() == false)//m_FilesMap[pData->GetLoadableType()].m_pLoadedManifest)
+			if(pData->IsAuxiliary() == false)//m_FilesMap[pData->GetLoadableType()].m_pLoadedManifest)
 				m_FilesMap[pData->GetLoadableType()].m_pLoadedManifest->Clear(pData->GetManifestIndex());
 
 			m_Load_Prepare.push(pData);
@@ -880,7 +880,7 @@ void HyAssets::FinalizeData(IHyFile *pData)
 		{
 			pData->m_eLoadState = HYLOADSTATE_Loaded;
 
-			if(pData->IsExtrinsic() == false)// && m_FilesMap[pData->GetLoadableType()].m_pLoadedManifest)
+			if(pData->IsAuxiliary() == false)// && m_FilesMap[pData->GetLoadableType()].m_pLoadedManifest)
 			{
 				m_FilesMap[pData->GetLoadableType()].m_pLoadedManifest->Set(static_cast<HyFileAtlas *>(pData)->GetManifestIndex());
 				HyLogInfo(pData->AssetTypeName() << " loaded [" << std::setw(2) << std::setfill('0') << pData->GetManifestIndex() << "] " << pData->GetAssetInfo());

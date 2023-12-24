@@ -27,7 +27,7 @@ HyFileAudio::HyFileAudio(std::string sFilePath, uint32 uiBankId, uint32 uiManife
 	}
 }
 
-HyFileAudio::HyFileAudio(HyExtrinsicFileHandle hGivenHandle, std::string sFileName, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyAudioCore &coreRef) :
+HyFileAudio::HyFileAudio(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyAudioCore &coreRef) :
 	IHyFile(HYFILE_AudioBank, sFileName, std::numeric_limits<uint32>::max(), std::numeric_limits<uint32>::max())
 {
 	HySoundAsset *pNewSndAsset = HY_NEW HySoundAsset(coreRef, sFileName, iCategoryId, bIsStreaming, iInstanceLimit);

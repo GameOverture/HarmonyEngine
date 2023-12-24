@@ -34,7 +34,7 @@ protected:
 
 private:
 	virtual HyType _LoadableGetType() override final;
-	virtual bool _IsExtrinsic() override final;
+	virtual bool _IsAuxiliary() override final;
 	virtual IHyLoadable *_LoadableGetParentPtr() override final;
 };
 

@@ -41,7 +41,7 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(uint32 uiSoundChecksum, uint32 uiBankId, E
 	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
 	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
 {
-	m_uiFlags |= SETTING_IsExtrinsic;
+	m_uiFlags |= SETTING_IsAuxiliary;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -54,7 +54,7 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(HyAudioHandle hAudioHandle, ENTTYPE *pPare
 	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
 	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
 {
-	m_uiFlags |= SETTING_IsExtrinsic;
+	m_uiFlags |= SETTING_IsAuxiliary;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -67,7 +67,7 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sFilePath, bool bIsStreaming, 
 	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
 	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
 {
-	m_uiFlags |= SETTING_IsExtrinsic;
+	m_uiFlags |= SETTING_IsAuxiliary;
 
 	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateAudio(HyIO::CleanPath(sFilePath.c_str(), nullptr, false), bIsStreaming, iInstanceLimit, iCategoryId);
 	m_sPrefix = std::to_string(hTexQuadHandle.first);

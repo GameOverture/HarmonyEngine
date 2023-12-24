@@ -88,9 +88,9 @@ void IHyLoadable2d::Uninit()
 	return GetType();
 }
 
-/*virtual*/ bool IHyLoadable2d::_IsExtrinsic() /*override final*/
+/*virtual*/ bool IHyLoadable2d::_IsAuxiliary() /*override final*/
 {
-	return GetInternalFlags() & SETTING_IsExtrinsic;
+	return GetInternalFlags() & SETTING_IsAuxiliary;
 }
 
 /*virtual*/ IHyLoadable *IHyLoadable2d::_LoadableGetParentPtr() /*override final*/
