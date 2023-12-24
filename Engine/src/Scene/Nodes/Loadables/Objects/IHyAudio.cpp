@@ -69,7 +69,7 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sFilePath, bool bIsStreaming, 
 {
 	m_uiFlags |= SETTING_IsAuxiliary;
 
-	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateAudio(HyIO::CleanPath(sFilePath.c_str(), nullptr, false), bIsStreaming, iInstanceLimit, iCategoryId);
+	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateAudio(HyIO::CleanPath(sFilePath.c_str()), bIsStreaming, iInstanceLimit, iCategoryId);
 	m_sPrefix = std::to_string(hTexQuadHandle.first);
 	m_sName = std::to_string(hTexQuadHandle.second);
 }

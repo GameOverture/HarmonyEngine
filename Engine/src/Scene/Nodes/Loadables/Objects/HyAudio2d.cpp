@@ -51,6 +51,6 @@ void HyAudio2d::Init(HyAudioHandle hAudioHandle, HyEntity2d *pParent)
 void HyAudio2d::Init(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyEntity2d *pParent)
 {
 	m_uiFlags |= SETTING_IsAuxiliary;
-	HyAudioHandle hAudioHandle = HyEngine::CreateAudio(HyIO::CleanPath(sFilePath.c_str(), nullptr, false), bIsStreaming, iInstanceLimit, iCategoryId);
+	HyAudioHandle hAudioHandle = HyEngine::CreateAudio(HyIO::CleanPath(sFilePath.c_str()), bIsStreaming, iInstanceLimit, iCategoryId);
 	IHyLoadable2d::Init(std::to_string(hAudioHandle.first), std::to_string(hAudioHandle.second), pParent);
 }

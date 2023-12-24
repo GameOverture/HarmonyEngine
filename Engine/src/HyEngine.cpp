@@ -365,7 +365,7 @@ void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
 	free(pBuffer);
 
 	sAbsDataDir += sm_pInstance->m_Assets.GetDataDir();
-	sAbsDataDir = HyIO::CleanPath(sAbsDataDir.c_str(), "/", false);
+	sAbsDataDir = HyIO::CleanPath(sAbsDataDir.c_str(), "/");
 	
 	return sAbsDataDir;
 }

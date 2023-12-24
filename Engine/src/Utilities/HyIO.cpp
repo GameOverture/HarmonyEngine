@@ -20,6 +20,11 @@
 /*static*/ HyStorage HyIO::SessionStorage(true);
 /*static*/ HyStorage HyIO::LocalStorage(false);
 
+/*static*/ void HyIO::MakeLowercase(std::string &sStringOut)
+{
+	std::transform(sStringOut.begin(), sStringOut.end(), sStringOut.begin(), ::tolower);
+}
+
 /*static*/ size_t HyIO::Utf8Length(const std::string &sStrRef)
 {
 	const char *szStr = sStrRef.c_str();
@@ -93,9 +98,9 @@
 	sStrRef = sStrRef.insert(uiOffset, sUtf8Str);
 }
 
-/*static*/ std::string HyIO::CleanPath(const char *szPath, const char *szExtension, bool bMakeLowercase)
+/*static*/ std::string HyIO::CleanPath(const std::string &sDirtyPath, const std::string &sExtension /*= ""*/)
 {
-	std::string sPath(szPath ? szPath : "");
+	std::string sPath(sDirtyPath);
 
 	// If sPath starts with "\\", set 'bIsNetworkPath' to true
 	bool bIsNetworkPath = false;
@@ -116,13 +121,18 @@
 	if(bIsNetworkPath)
 		sPath.insert(0, "\\\\");
 
-	if(szExtension)
+	if(sExtension.empty() == false)
 	{
-		std::string sExtension(szExtension);
-		//if(sExtension[0] != '.')
-		//	sExtension = "." + sExtension;	// <-- Don't prepend '.' to szExtension, because GUI tool ItemDir's use just '/' as an extension
+		// Don't enforce '.' on sExtension (directories use '/' as an extension)
 
-		if(sPath.empty() || 0 != strcmp(&sPath[sPath.length() - sExtension.size()], sExtension.c_str()))
+		std::string sTestExistingExtension = sPath.substr(sPath.length() - sExtension.length());
+		std::string sTestNewExtension = sExtension;
+#if defined(HY_PLATFORM_WINDOWS)
+		// Test for case insensitive file extension
+		std::transform(sTestExistingExtension.begin(), sTestExistingExtension.end(), sTestExistingExtension.begin(), ::tolower);
+		std::transform(sTestNewExtension.begin(), sTestNewExtension.end(), sTestNewExtension.begin(), ::tolower);
+#endif
+		if(sPath.empty() || sTestNewExtension != sTestExistingExtension)
 			sPath += sExtension;
 	}
 
@@ -168,40 +178,59 @@
 		sPath.erase(uiStartIndex, (uiIndex+3) - uiStartIndex);
 	}
 
-
-	if(bMakeLowercase)
-		transform(sPath.begin(), sPath.end(), sPath.begin(), ::tolower);
-
 	return sPath;
 }
 
-/*static*/ std::string HyIO::GetFileNameFromPath(const std::string &sPath, bool bMakeLowercase)
+/*static*/ std::string HyIO::GetWorkingDirectory()
 {
-	std::string sTmpPath = HyIO::CleanPath(sPath.c_str(), nullptr, bMakeLowercase);
+	std::string sWorkingDir;
+#if defined(HY_PLATFORM_WINDOWS)
+	char szBuffer[MAX_PATH];
+	GetCurrentDirectoryA(MAX_PATH, szBuffer);
+	sWorkingDir = szBuffer;
+#elif defined(HY_PLATFORM_LINUX)
+	char szBuffer[PATH_MAX];
+	getcwd(szBuffer, PATH_MAX);
+	sWorkingDir = szBuffer;
+#endif
+
+	return HyIO::CleanPath(sWorkingDir, "/");
+}
+
+/*static*/ std::string HyIO::GetFileNameFromPath(const std::string &sPath)
+{
+	std::string sTmpPath = HyIO::CleanPath(sPath.c_str());
 	size_t uiStartIndex = sTmpPath.rfind("/", std::string::npos) + 1;
 
 	return sTmpPath.substr(uiStartIndex);
 }
 
-/*static*/ std::string HyIO::GetDirectoryFromPath(const std::string &sPath, bool bMakeLowercase)
+/*static*/ std::string HyIO::GetDirectoryFromPath(const std::string &sPath)
 {
-	std::string sTmpPath = HyIO::CleanPath(sPath.c_str(), nullptr, bMakeLowercase);
+	std::string sTmpPath = HyIO::CleanPath(sPath.c_str());
+	if(sTmpPath.empty())
+		return "/";
+
+	// If sTmpPath's last character is a '/', then remove it
+	if(sTmpPath[sTmpPath.length() - 1] == '/')
+		sTmpPath = sTmpPath.substr(0, sTmpPath.length() - 1);
+
 	size_t uiEndIndex = sTmpPath.rfind("/", std::string::npos);
 
-	return sTmpPath.substr(0, uiEndIndex);
+	return HyIO::CleanPath(sTmpPath.substr(0, uiEndIndex), "/");
 }
 
-/*static*/ std::string HyIO::GetExtensionFromPath(const std::string &sPath, bool bMakeLowercase)
+/*static*/ std::string HyIO::GetExtensionFromPath(const std::string &sPath)
 {
-	std::string sTmpPath = HyIO::CleanPath(sPath.c_str(), nullptr, bMakeLowercase);
+	std::string sTmpPath = HyIO::CleanPath(sPath.c_str());
 	size_t uiStartIndex = sTmpPath.rfind(".", std::string::npos);
 
 	return sTmpPath.substr(uiStartIndex);
 }
 
-/*static*/ std::string HyIO::GetFileNameWithoutExtension(const std::string &sPath, bool bMakeLowercase)
+/*static*/ std::string HyIO::GetFileNameWithoutExtension(const std::string &sPath)
 {
-	std::string sTmpPath = HyIO::CleanPath(sPath.c_str(), nullptr, bMakeLowercase);
+	std::string sTmpPath = HyIO::CleanPath(sPath.c_str());
 	size_t uiStartIndex = sTmpPath.rfind("/", std::string::npos) + 1;
 	size_t uiEndIndex = sTmpPath.rfind(".", std::string::npos);
 

@@ -42,7 +42,9 @@ void HyAssets::Factory<tData>::Init(HyJsonObj subDirObjRef, HyAssets &assetsRef)
 	uint32 i = 0;
 	for(auto &v : subDirObjRef)
 	{
-		std::string sPath = HyIO::CleanPath(v.name.GetString(), nullptr, true);
+		std::string sPath = HyIO::CleanPath(v.name.GetString());
+		HyIO::MakeLowercase(sPath);
+
 		m_LookupIndexMap.insert(std::make_pair(sPath, i));
 
 		HyJsonObj obj = v.value.GetObject();
@@ -58,10 +60,11 @@ const tData *HyAssets::Factory<tData>::GetData(const std::string &sPrefix, const
 	std::string sPath;
 
 	if(sPrefix.empty() == false)
-		sPath += HyIO::CleanPath(sPrefix.c_str(), "/", true);
+		sPath += HyIO::CleanPath(sPrefix.c_str(), "/");
 
 	sPath += sName;
-	sPath = HyIO::CleanPath(sPath.c_str(), nullptr, true);
+	sPath = HyIO::CleanPath(sPath.c_str());
+	HyIO::MakeLowercase(sPath);
 
 	auto iter = m_LookupIndexMap.find(sPath);
 	if(iter == m_LookupIndexMap.end())
@@ -80,7 +83,7 @@ HyAssets::HyAssets(HyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDa
 	IHyThreadClass(HYTHREAD_Lowest),
 	m_AudioCoreRef(audioCoreRef),
 	m_SceneRef(sceneRef),
-	m_sDATADIR(HyIO::CleanPath(sDataDirPath.c_str(), "/", true)),
+	m_sDATADIR(HyIO::CleanPath(sDataDirPath.c_str(), "/")),
 	m_bInitialized(false),
 	m_uiLoadingCountTotal(0)
 {

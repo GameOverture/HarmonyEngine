@@ -19,19 +19,18 @@ public:
 	static HyStorage	SessionStorage;
 	static HyStorage	LocalStorage;
 
-	// Return the number of UTF-8 characters from a well formed UTF-8 string sequence
-	static size_t Utf8Length(const std::string &sStrRef);
+	static void MakeLowercase(std::string &sStringOut);
 
-	// Erase the number of UTF-8 characters 'uiCount' starting from UTF-8 character 'uiOffset'
-	static void Utf8Erase(std::string &sStrRef, size_t uiOffset, size_t uiCount);
-
+	static size_t Utf8Length(const std::string &sStrRef); // Return the number of UTF-8 characters from a well formed UTF-8 string sequence
+	static void Utf8Erase(std::string &sStrRef, size_t uiOffset, size_t uiCount); // Erase the number of UTF-8 characters 'uiCount' starting from UTF-8 character 'uiOffset'
 	static void Utf8Insert(std::string &sStrRef, size_t uiOffset, const std::string &sUtf8Str);
 
-	static std::string CleanPath(const char *szPath, const char *szExtension, bool bMakeLowercase);
-	static std::string GetFileNameFromPath(const std::string &sPath, bool bMakeLowercase);
-	static std::string GetDirectoryFromPath(const std::string &sPath, bool bMakeLowercase);
-	static std::string GetExtensionFromPath(const std::string &sPath, bool bMakeLowercase);
-	static std::string GetFileNameWithoutExtension(const std::string &sPath, bool bMakeLowercase);
+	static std::string CleanPath(const std::string &sDirtyPath, const std::string &sExtension = "");
+	static std::string GetWorkingDirectory();
+	static std::string GetFileNameFromPath(const std::string &sPath);
+	static std::string GetDirectoryFromPath(const std::string &sPath); // Returns the directory of sPath. If sPath is a directory, then it returns the parent directory of sPath. Return value will have a trailing slash.
+	static std::string GetExtensionFromPath(const std::string &sPath);
+	static std::string GetFileNameWithoutExtension(const std::string &sPath);
 	static bool FileExists(const std::string &sFilePath);
 	static bool DirectoryExists(const std::string &sDirPath);
 	static std::vector<std::string> GetFileList(const std::string &sDirPath, const std::string &sFilterExtension, bool bRecursively); // sFilterExtension can be empty or in the form of example: ".png" or ".txt"

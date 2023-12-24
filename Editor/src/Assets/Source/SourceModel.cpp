@@ -116,7 +116,8 @@ quint32 SourceModel::ComputeFileChecksum(QString sFilterPath, QString sFileName)
 	else
 		sCombinedPath = sFilterPath + "/" + sFileName;
 
-	std::string sCleanPath = HyIO::CleanPath(sCombinedPath.toLocal8Bit(), nullptr, true);
+	std::string sCleanPath = HyIO::CleanPath(std::string(sCombinedPath.toLocal8Bit()));
+	HyIO::MakeLowercase(sCleanPath);
 	return HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(sCleanPath.data()), sCleanPath.size());
 }
 

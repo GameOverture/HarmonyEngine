@@ -78,7 +78,7 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
-	ExplorerItemData(*this, ITEM_Project, QUuid(), HyIO::CleanPath(sProjectFilePath.toStdString().c_str(), HyGlobal::ItemExt(ITEM_Project).toStdString().c_str(), false).c_str()),
+	ExplorerItemData(*this, ITEM_Project, QUuid(), HyIO::CleanPath(sProjectFilePath.toStdString(), HyGlobal::ItemExt(ITEM_Project).toStdString()).c_str()),
 	m_pDraw(nullptr),
 	m_pSourceModel(nullptr),
 	m_pSourceWidget(nullptr),

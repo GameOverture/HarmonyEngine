@@ -133,7 +133,7 @@ HarmonyInit::HarmonyInit()
 
 HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 {
-	sHyProjFileName = HyIO::CleanPath(sHyProjFileName.c_str(), ".hyproj", false);
+	sHyProjFileName = HyIO::CleanPath(sHyProjFileName.c_str(), ".hyproj");
 
 	std::vector<char> sProjFileContents;
 	HyIO::ReadTextFile(sHyProjFileName.c_str(), sProjFileContents);
@@ -150,7 +150,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	{
 		sProjectDir = projDoc["AdjustWorkingDirectory"].GetString();
 		sHyProjFileName = sProjectDir + "/" + sHyProjFileName;
-		sHyProjFileName = HyIO::CleanPath(sHyProjFileName.c_str(), ".hyproj", false);
+		sHyProjFileName = HyIO::CleanPath(sHyProjFileName.c_str(), ".hyproj");
 
 		std::vector<char> trueProjFileContents;
 		HyIO::ReadTextFile(sHyProjFileName.c_str(), trueProjFileContents);
@@ -169,8 +169,8 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 		sProjectDir = ".";
 		sDataDir = projDoc["DataPath"].GetString();
 	}
-	sProjectDir = HyIO::CleanPath(sProjectDir.c_str(), "", true);
-	sDataDir = HyIO::CleanPath(sDataDir.c_str(), "", true);
+	sProjectDir = HyIO::CleanPath(sProjectDir.c_str(), "/");
+	sDataDir = HyIO::CleanPath(sDataDir.c_str(), "/");
 
 	HarmonyInit defaultVals;
 	

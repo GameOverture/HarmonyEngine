@@ -42,7 +42,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(std::string sFilePath, HyTextureInfo textureI
 	m_uiFlags |= SETTING_IsAuxiliary;
 	m_ShaderUniforms.SetNumTexUnits(1);
 
-	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTexture(HyIO::CleanPath(sFilePath.c_str(), nullptr, false), textureInfo);
+	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTexture(HyIO::CleanPath(sFilePath.c_str()), textureInfo);
 	m_sPrefix = std::to_string(hTexQuadHandle.first);
 	m_sName = std::to_string(hTexQuadHandle.second);
 }
@@ -80,7 +80,7 @@ void HyTexturedQuad2d::Init(HyTextureQuadHandle hTextureQuadHandle, HyEntity2d *
 void HyTexturedQuad2d::Init(std::string sFilePath, HyTextureInfo textureInfo, HyEntity2d *pParent)
 {
 	m_uiFlags |= SETTING_IsAuxiliary;
-	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTexture(HyIO::CleanPath(sFilePath.c_str(), nullptr, false), textureInfo);
+	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTexture(HyIO::CleanPath(sFilePath.c_str()), textureInfo);
 	IHyLoadable2d::Init(std::to_string(hTexQuadHandle.first), std::to_string(hTexQuadHandle.second), pParent);
 }
 
