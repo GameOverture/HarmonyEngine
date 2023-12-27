@@ -30,7 +30,7 @@ protected:
 	std::string						m_sPrefix;
 	std::string						m_sName;
 
-	uint32							m_uiState;
+	uint32							m_uiState;	// All 'Loadable' type nodes utilize a state system when setting up
 
 public:
 	IHyLoadable(std::string sPrefix, std::string sName);

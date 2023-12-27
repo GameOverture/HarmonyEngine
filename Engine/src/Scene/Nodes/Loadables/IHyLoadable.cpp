@@ -106,6 +106,7 @@ void IHyLoadable::_Reinitialize(std::string sPrefix, std::string sName)
 	m_sPrefix = sPrefix;
 	m_sName = sName;
 	m_pData = nullptr;
+	m_uiState = 0;
 
 	if(bWasLoaded)
 		Load();
@@ -118,9 +119,12 @@ uint32 IHyLoadable::GetState() const
 
 /*virtual*/ bool IHyLoadable::SetState(uint32 uiStateIndex)
 {
-	if(AcquireData() != nullptr && uiStateIndex >= UncheckedGetData()->GetNumStates())
+	if(AcquireData() == nullptr || uiStateIndex >= UncheckedGetData()->GetNumStates())
 	{
-		HyLogWarning(m_sPrefix << "/" << m_sName << " wants to set state index of '" << uiStateIndex << "' when total number of states is '" << UncheckedGetData()->GetNumStates() << "'");
+		if(UncheckedGetData() == nullptr)
+			HyLogWarning(m_sPrefix << "/" << m_sName << " wants to set state index of '" << uiStateIndex << "' when data is null");
+		else
+			HyLogWarning(m_sPrefix << "/" << m_sName << " wants to set state index of '" << uiStateIndex << "' when total number of states is '" << UncheckedGetData()->GetNumStates() << "'");
 		return false;
 	}
 

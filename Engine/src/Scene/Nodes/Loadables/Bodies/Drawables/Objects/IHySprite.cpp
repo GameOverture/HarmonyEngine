@@ -410,7 +410,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth(float fPercent /*= 1.0f*/)
 	   this->m_uiState >= this->UncheckedGetData()->GetNumStates() ||
 	   m_uiCurFrame >= static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES)
 	{
-		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth invoked on null data");
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth invoked on invalid data");
 		return 0.0f;
 	}
 
@@ -447,7 +447,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateWidth(uint32 uiStateIndex, float fPe
 	   uiStateIndex >= pData->GetNumStates() ||
 	   pData->GetFrame(uiStateIndex, 0).pAtlas == nullptr)
 	{
-		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth invoked on null data");
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth invoked on invalid data");
 		return 0.0f;
 	}
 	
@@ -471,7 +471,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateHeight(uint32 uiStateIndex, float fP
 	   uiStateIndex >= pData->GetNumStates() ||
 	   pData->GetFrame(uiStateIndex, 0).pAtlas == nullptr)
 	{
-		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetStateMaxHeight invoked on null data");
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetStateMaxHeight invoked on invalid data");
 		return 0.0f;
 	}
 
@@ -494,7 +494,7 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset()
 	   this->m_uiState >= this->UncheckedGetData()->GetNumStates() ||
 	   m_uiCurFrame >= static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES)
 	{
-		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset invoked on null data");
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset invoked on invalid data");
 		return glm::ivec2(0);
 	}
 
@@ -509,7 +509,7 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetStateOffset(uint32 uiStateIndex)
 	if(pData == nullptr ||
 	   uiStateIndex >= this->UncheckedGetData()->GetNumStates())
 	{
-		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset invoked on null data");
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset invoked on invalid data");
 		return glm::vec2(0);
 	}
 

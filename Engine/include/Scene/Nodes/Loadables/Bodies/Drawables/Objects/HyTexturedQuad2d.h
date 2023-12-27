@@ -45,6 +45,8 @@ public:
 	int32 GetEntireTextureWidth();
 	int32 GetEntireTextureHeight();
 
+	virtual bool IsLoadDataValid() override;
+
 protected:
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;

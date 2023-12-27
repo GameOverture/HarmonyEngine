@@ -159,6 +159,12 @@ int32 HyTexturedQuad2d::GetEntireTextureHeight()
 	return static_cast<const HyTexturedQuadData *>(UncheckedGetData())->GetAtlas()->GetHeight();
 }
 
+/*virtual*/ bool HyTexturedQuad2d::IsLoadDataValid() /*override*/
+{
+	const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(AcquireData());
+	return pData && pData->GetAtlas() != nullptr;
+}
+
 /*virtual*/ void HyTexturedQuad2d::OnDataAcquired() /*override*/
 {
 	// NOTE: Data is only valid when the checksum ctor is used (checksum stored in the name as a string). Otherwise OnDataAcquired() isn't invoked and internal data is set when the texture is 'hotloaded' within Load()
