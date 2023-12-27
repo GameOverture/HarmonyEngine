@@ -169,6 +169,27 @@ ma_sound_group *HyAudioCore::GetCategory(int32 iId)
 	return nullptr;
 }
 
+bool HyAudioCore::IsPlaying(HyAudioNodeHandle hHandle)
+{
+	if(m_pEngine == nullptr)
+		return false;
+
+	return m_PlayMap.count(hHandle) > 0;
+}
+
+float HyAudioCore::GetElapsedPlayTime(HyAudioNodeHandle hHandle)
+{
+	if(m_pEngine == nullptr || m_PlayMap.count(hHandle) == 0)
+		return 0.0f;
+
+	uint64 uiFramesPlayed;
+	ma_result eResult = ma_sound_get_cursor_in_pcm_frames(m_PlayMap[hHandle].m_pSoundBuffer, &uiFramesPlayed);
+	if(eResult != MA_SUCCESS)
+		HyLogError("ma_sound_get_cursor_in_pcm_frames failed: " << eResult);
+
+	return static_cast<float>(uiFramesPlayed) / ma_engine_get_sample_rate(m_pEngine);
+}
+
 void HyAudioCore::SetGlobalVolume(float fVolume)
 {
 	if(m_pEngine == nullptr)

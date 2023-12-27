@@ -94,6 +94,9 @@ public:
 	ma_engine *GetEngine();
 	ma_sound_group *GetCategory(int32 iId);
 
+	bool IsPlaying(HyAudioNodeHandle hHandle);
+	float GetElapsedPlayTime(HyAudioNodeHandle hHandle);
+
 	void SetGlobalVolume(float fVolume);
 
 	void DeferLoading(HySoundAsset *pBuffer);

@@ -20,8 +20,8 @@ class HyAssets;
 class HyFileAtlas : public IHyFile
 {
 	const uint32							m_uiINDEX_IN_BANK;
-	uint32									m_uiWidth;
-	uint32									m_uiHeight;
+	int32									m_iWidth;
+	int32									m_iHeight;
 
 	const HyTextureInfo						m_TextureInfo;
 	HyTextureHandle							m_hTextureHandle;
@@ -53,8 +53,8 @@ public:
 
 	uint32 GetIndexInBank() const;
 	
-	uint32 GetWidth() const;
-	uint32 GetHeight() const;
+	int32 GetWidth() const;
+	int32 GetHeight() const;
 	HyTextureHandle GetTextureHandle() const;
 	bool GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const;
 

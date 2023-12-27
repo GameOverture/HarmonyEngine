@@ -39,8 +39,8 @@ public:
 
 	void SetUvCoordinates(int iX, int iY, int iWidth, int iHeight);
 
-	uint32 GetWidth();
-	uint32 GetHeight();
+	float GetWidth(float fPercent = 1.0f); // Get pixel width of the sampled UV coordinates (ignores any scaling)
+	float GetHeight(float fPercent = 1.0f); // Get pixel height of the sampled UV coordinates  (ignores any scaling)
 
 	int32 GetEntireTextureWidth();
 	int32 GetEntireTextureHeight();

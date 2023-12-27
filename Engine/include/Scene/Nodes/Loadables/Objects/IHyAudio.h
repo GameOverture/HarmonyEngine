@@ -77,10 +77,13 @@ public:
 
 	int32 GetLoops() const;
 	void SetLoops(int32 iLoops);
+	bool IsPlaying() const;
 	void PlayOneShot(bool bUseCurrentSettings /*= true*/);
 	void Play();
-	void Stop();
 	void SetPause(bool bPause);
+	float GetElapsedPlayTime() const;
+	void Stop();
+
 
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;

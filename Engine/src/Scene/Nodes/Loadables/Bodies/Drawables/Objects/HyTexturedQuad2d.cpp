@@ -127,14 +127,14 @@ void HyTexturedQuad2d::SetUvCoordinates(int iX, int iY, int iWidth, int iHeight)
 	m_UvCoords.bottom = (fY + fHeight) / iTextureHeight;
 }
 
-uint32 HyTexturedQuad2d::GetWidth()
+float HyTexturedQuad2d::GetWidth(float fPercent /*= 1.0f*/)
 {
-	return static_cast<uint32>(m_UvCoords.Width() * GetEntireTextureHeight());
+	return (m_UvCoords.Width() * GetEntireTextureHeight()) * fPercent;
 }
 
-uint32 HyTexturedQuad2d::GetHeight()
+float HyTexturedQuad2d::GetHeight(float fPercent /*= 1.0f*/)
 {
-	return static_cast<uint32>(m_UvCoords.Height() * GetEntireTextureHeight());
+	return (m_UvCoords.Height() * GetEntireTextureHeight()) * fPercent;
 }
 
 int32 HyTexturedQuad2d::GetEntireTextureWidth()
