@@ -129,7 +129,7 @@ void HyTexturedQuad2d::SetUvCoordinates(int iX, int iY, int iWidth, int iHeight)
 
 float HyTexturedQuad2d::GetWidth(float fPercent /*= 1.0f*/)
 {
-	return (m_UvCoords.Width() * GetEntireTextureHeight()) * fPercent;
+	return (m_UvCoords.Width() * GetEntireTextureWidth()) * fPercent;
 }
 
 float HyTexturedQuad2d::GetHeight(float fPercent /*= 1.0f*/)

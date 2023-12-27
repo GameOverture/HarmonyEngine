@@ -75,8 +75,13 @@ public:
 	float GetAnimDuration();
 	void AdvanceAnim(float fDeltaTime);				// Must have valid data to use this function! - Advances the animation by fDeltaTime seconds using all the current anim attributes, ignoring whether it's paused or not. You are not required to call this function yourself.
 
-	float GetFrameWidth(float fPercent = 1.0f);		// Returns the ALPHA-CROPPED width of the current frame (ignores any scaling)
-	float GetFrameHeight(float fPercent = 1.0f);	// Returns the ALPHA-CROPPED height of the current frame (ignores any scaling)
+	float GetWidth(float fPercent = 1.0f);			// Returns the ALPHA-CROPPED width of the current frame (ignores any scaling)
+	float GetHeight(float fPercent = 1.0f);			// Returns the ALPHA-CROPPED height of the current frame (ignores any scaling)
+
+	float GetFrameWidth(float fPercent = 1.0f);
+	float GetFrameWidth(uint32 uiStateIndex, uint32 uiFrameIndex, float fPercent = 1.0f);	// Returns the ALPHA-CROPPED width of the specified frame (ignores any scaling)
+	float GetFrameHeight(float fPercent = 1.0f);
+	float GetFrameHeight(uint32 uiStateIndex, uint32 uiFrameIndex, float fPercent = 1.0f);	// Returns the ALPHA-CROPPED height of the specified frame (ignores any scaling)
 
 	float GetStateWidth(uint32 uiStateIndex, float fPercent = 1.0f);	// Returns the ALPHA-CROPPED width of the widest frame in this animation state (ignores any scaling)
 	float GetStateHeight(uint32 uiStateIndex, float fPercent = 1.0f);	// Returns the ALPHA-CROPPED height of the tallest frame in this animation state (ignores any scaling)

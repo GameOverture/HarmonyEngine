@@ -404,17 +404,35 @@ void IHySprite<NODETYPE, ENTTYPE>::AdvanceAnim(float fDeltaTime)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+float IHySprite<NODETYPE, ENTTYPE>::GetWidth(float fPercent /*= 1.0f*/)
+{
+	return GetFrameWidth(this->m_uiState, m_uiCurFrame, fPercent);
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+float IHySprite<NODETYPE, ENTTYPE>::GetHeight(float fPercent /*= 1.0f*/)
+{
+	return GetFrameHeight(this->m_uiState, m_uiCurFrame, fPercent);
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 float IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth(float fPercent /*= 1.0f*/)
 {
+	return GetWidth(fPercent);
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+float IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth(uint32 uiStateIndex, uint32 uiFrameIndex, float fPercent /*= 1.0f*/)
+{
 	if(this->AcquireData() == nullptr ||
-	   this->m_uiState >= this->UncheckedGetData()->GetNumStates() ||
-	   m_uiCurFrame >= static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES)
+		uiStateIndex >= this->UncheckedGetData()->GetNumStates() ||
+		uiFrameIndex >= static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(uiStateIndex).m_uiNUMFRAMES)
 	{
-		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth invoked on invalid data");
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth invoked on invalid frame [State: " << uiStateIndex << ", Frame: " << uiFrameIndex << "]");
 		return 0.0f;
 	}
 
-	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(uiStateIndex, uiFrameIndex);
 	if(frameRef.pAtlas == nullptr)
 		return 0.0f;
 
@@ -424,15 +442,21 @@ float IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth(float fPercent /*= 1.0f*/)
 template<typename NODETYPE, typename ENTTYPE>
 float IHySprite<NODETYPE, ENTTYPE>::GetFrameHeight(float fPercent /*= 1.0f*/)
 {
+	return GetHeight(fPercent);
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+float IHySprite<NODETYPE, ENTTYPE>::GetFrameHeight(uint32 uiStateIndex, uint32 uiFrameIndex, float fPercent /*= 1.0f*/)
+{
 	if(this->AcquireData() == nullptr ||
-		this->m_uiState >= this->UncheckedGetData()->GetNumStates() ||
-		m_uiCurFrame >= static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(this->m_uiState).m_uiNUMFRAMES)
+		uiStateIndex >= this->UncheckedGetData()->GetNumStates() ||
+		uiFrameIndex >= static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(uiStateIndex).m_uiNUMFRAMES)
 	{
-		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetFrameHeight invoked on null data");
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetHeight invoked on invalid frame [State: " << uiStateIndex << ", Frame: " << uiFrameIndex << "]");
 		return 0.0f;
 	}
 
-	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(uiStateIndex, uiFrameIndex);
 	if(frameRef.pAtlas == nullptr)
 		return 0.0f;
 

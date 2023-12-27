@@ -97,6 +97,7 @@ public:
 	bool IsPlaying(HyAudioNodeHandle hHandle);
 	float GetElapsedPlayTime(HyAudioNodeHandle hHandle);
 
+	//float GetGlobalVolume() const;
 	void SetGlobalVolume(float fVolume);
 
 	void DeferLoading(HySoundAsset *pBuffer);

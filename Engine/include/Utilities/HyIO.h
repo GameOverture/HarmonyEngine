@@ -20,6 +20,7 @@ public:
 	static HyStorage	LocalStorage;
 
 	static void MakeLowercase(std::string &sStringOut);
+	static void TrimWhitespace(std::string &sStringOut);	// Trim whitespace on the ends of sStringOut
 
 	static size_t Utf8Length(const std::string &sStrRef); // Return the number of UTF-8 characters from a well formed UTF-8 string sequence
 	static void Utf8Erase(std::string &sStrRef, size_t uiOffset, size_t uiCount); // Erase the number of UTF-8 characters 'uiCount' starting from UTF-8 character 'uiOffset'

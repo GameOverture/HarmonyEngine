@@ -190,6 +190,13 @@ float HyAudioCore::GetElapsedPlayTime(HyAudioNodeHandle hHandle)
 	return static_cast<float>(uiFramesPlayed) / ma_engine_get_sample_rate(m_pEngine);
 }
 
+//float HyAudioCore::GetGlobalVolume() const
+//{
+//	if(m_pEngine == nullptr)
+//		return 0.0f;
+//	return ma_engine_get_volume(m_pEngine);
+//}
+
 void HyAudioCore::SetGlobalVolume(float fVolume)
 {
 	if(m_pEngine == nullptr)

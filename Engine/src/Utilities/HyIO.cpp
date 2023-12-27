@@ -25,6 +25,12 @@
 	std::transform(sStringOut.begin(), sStringOut.end(), sStringOut.begin(), ::tolower);
 }
 
+/*static*/ void HyIO::TrimWhitespace(std::string &sStringOut)
+{
+	sStringOut.erase(0, sStringOut.find_first_not_of(" \t\r\n"));
+	sStringOut.erase(sStringOut.find_last_not_of(" \t\r\n") + 1);
+}
+
 /*static*/ size_t HyIO::Utf8Length(const std::string &sStrRef)
 {
 	const char *szStr = sStrRef.c_str();
@@ -120,6 +126,8 @@
 	// Prepend the "\\" back onto the path if it was a network path
 	if(bIsNetworkPath)
 		sPath.insert(0, "\\\\");
+
+	TrimWhitespace(sPath);
 
 	if(sExtension.empty() == false)
 	{
