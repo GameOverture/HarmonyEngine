@@ -137,7 +137,7 @@ void IHyAudio<NODETYPE, ENTTYPE>::SetLoops(int32 iLoops)
 template<typename NODETYPE, typename ENTTYPE>
 bool IHyAudio<NODETYPE, ENTTYPE>::IsPlaying() const
 {
-	return HyEngine::Audio().IsPlaying(m_hUNIQUE_ID);
+	return 0 == (m_uiCueFlags & ((1 << HYSOUNDCUE_Stop) | (1 << HYSOUNDCUE_Pause))) && HyEngine::Audio().IsPlaying(m_hUNIQUE_ID);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -294,9 +294,6 @@ template<typename NODETYPE, typename ENTTYPE>
 {
 	if(IHyNode::IsDirty(IHyNode::DIRTY_Audio))
 	{
-		volume.Set(HyMath::Max(0.0f, volume.Get()));
-		pitch.Set(HyMath::Max(0.0f, pitch.Get()));
-
 		m_uiCueFlags |= (1 << HYSOUNDCUE_Attributes);
 		IHyNode::ClearDirty(IHyNode::DIRTY_Audio);
 	}

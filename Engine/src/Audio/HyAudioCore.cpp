@@ -174,7 +174,7 @@ bool HyAudioCore::IsPlaying(HyAudioNodeHandle hHandle)
 	if(m_pEngine == nullptr)
 		return false;
 
-	return m_PlayMap.count(hHandle) > 0;
+	return m_PlayMap.count(hHandle) > 0 && m_PlayMap[hHandle].m_pSoundBuffer != nullptr;
 }
 
 float HyAudioCore::GetElapsedPlayTime(HyAudioNodeHandle hHandle)

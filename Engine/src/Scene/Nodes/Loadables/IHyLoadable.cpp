@@ -99,7 +99,7 @@ void IHyLoadable::_Reinitialize(std::string sPrefix, std::string sName)
 	if(m_sPrefix == sPrefix && m_sName == sName)
 		return;
 
-	bool bWasLoaded = IsLoaded();
+	bool bWasLoaded = IsLoaded() || m_eLoadState == HYLOADSTATE_Queued;
 	if(bWasLoaded)
 		Unload();
 

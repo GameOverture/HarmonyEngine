@@ -77,7 +77,7 @@ public:
 
 	int32 GetLoops() const;
 	void SetLoops(int32 iLoops);
-	bool IsPlaying() const;
+	bool IsPlaying() const;	// Does not return true for playing OneShots
 	void PlayOneShot(bool bUseCurrentSettings /*= true*/);
 	void Play();
 	void SetPause(bool bPause);
