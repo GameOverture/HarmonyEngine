@@ -48,6 +48,8 @@ protected:
 	std::map<HyShaderHandle, HyShader *>			m_ShaderMap;
 	std::map<HyStencilHandle, HyStencil *>			m_StencilMap;
 
+	HyStencilHandle									m_hCurrentStencilBuffer; // The current stencil written to the stencil buffer
+
 	// Built-in shaders
 	HyShader *										m_pShaderQuadBatch;
 	HyShader *										m_pShaderPrimitive;

@@ -41,7 +41,7 @@ class HyShaderUniforms
 			strcpy(reinterpret_cast<char *>(m_pData + sizeof(uint32)), szName);
 		}
 	};
-	std::vector<UniformBuffer>	m_UniformList;
+	std::vector<UniformBuffer>		m_UniformList;
 
 public:
 	HyShaderUniforms();

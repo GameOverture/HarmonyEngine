@@ -81,6 +81,10 @@ HySoundAsset *HyFileAudio::GetSoundAsset(uint32 uiChecksum)
 /*virtual*/ std::string HyFileAudio::GetAssetInfo() /*override*/
 {
 	std::stringstream ss;
-	ss << "Bank " << m_sFILE_NAME << ", NumSounds: " << m_SoundAssetsList.size();
+	if(IsAuxiliary())
+		ss << "[AUX] " << HyIO::GetFileNameFromPath(m_sFILE_NAME);
+	else
+		ss << "[" << std::setw(3) << std::setfill('0') << m_uiMANIFEST_INDEX << "] Bank " << m_sFILE_NAME << ", NumSounds: " << m_SoundAssetsList.size();
+
 	return ss.str();
 }

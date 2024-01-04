@@ -25,6 +25,7 @@ IHyRenderer::IHyRenderer(int32 iVSync, std::vector<HyWindow *> &windowListRef, H
 	m_DiagnosticsRef(diagnosticsRef),
 	m_VertexBuffer(*this),
 	m_pCurWindow(nullptr),
+	m_hCurrentStencilBuffer(HY_UNUSED_HANDLE),
 	m_pShaderQuadBatch(HY_NEW HyShader(HYSHADERPROG_QuadBatch)),
 	m_pShaderPrimitive(HY_NEW HyShader(HYSHADERPROG_Primitive))
 {

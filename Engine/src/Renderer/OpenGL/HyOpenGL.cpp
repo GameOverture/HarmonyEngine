@@ -275,27 +275,35 @@ HyOpenGL::~HyOpenGL(void)
 	// Setup stencil buffer if required
 	if(pRenderState->m_hSTENCIL != HY_UNUSED_HANDLE)
 	{
-		glEnable(GL_STENCIL_TEST);
-		glStencilMask(0xFF);									// This mask allows any 8bit value to be written to the stencil buffer (and allows clears to work)
-
-		glDisable(GL_SCISSOR_TEST);								// Ensure scissor test isn't affecting our initial stencil clear
-		glClear(GL_STENCIL_BUFFER_BIT);							// Clear stencil buffer by writing default stencil value '0' to entire buffer.
-		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);	// Disable rendering color while we determine the stencil buffer
-
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);						// All fragments rendered next will "pass" the stencil test, and 'ref' is set to '1'
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);				// Fragments that "passed" will write the 'ref' value in the stencil buffer
-
-		// Render all instances stored in the HyStencil, and affect their pixel locations in stencil buffer
 		HyStencil *pStencil = FindStencil(pRenderState->m_hSTENCIL);
-		uint32 uiNumStencilInstance = static_cast<uint32>(pStencil->GetInstanceList().size());
-		char *pStencilRenderStateBufferPos = reinterpret_cast<char *>(pStencil->GetRenderStatePtr());
-		for(uint32 i = 0; i < uiNumStencilInstance; ++i)
-		{
-			HyRenderBuffer::State *pCurRenderState = reinterpret_cast<HyRenderBuffer::State *>(pStencilRenderStateBufferPos);
-			if(pCurRenderState->m_iCOORDINATE_SYSTEM < 0 || pCurRenderState->m_iCOORDINATE_SYSTEM == m_pCurWindow->GetIndex())
-				RenderPass2d(pCurRenderState, pCurRenderState->m_iCOORDINATE_SYSTEM < 0 ? pCamera : nullptr);
+		glEnable(GL_STENCIL_TEST);
 
-			pStencilRenderStateBufferPos += pCurRenderState->m_uiExDataSize + sizeof(HyRenderBuffer::State);
+		// Only write to the stencil buffer if m_hSTENCIL isn't the current stencil in the stencil buffer
+		if(m_hCurrentStencilBuffer != pRenderState->m_hSTENCIL)
+		{
+			glStencilMask(0xFF);									// This mask allows any 8bit value to be written to the stencil buffer (and allows clears to work)
+
+			glDisable(GL_SCISSOR_TEST);								// Ensure scissor test isn't affecting our initial stencil clear
+			glClear(GL_STENCIL_BUFFER_BIT);							// Clear stencil buffer by writing default stencil value '0' to entire buffer.
+
+			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);	// Disable rendering color while we determine the stencil buffer
+
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);						// All fragments rendered next will "pass" the stencil test, and 'ref' is set to '1'
+			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);				// Fragments that "passed" will write the 'ref' value in the stencil buffer
+
+			// Render all instances stored in the HyStencil, and affect their pixel locations in stencil buffer
+			uint32 uiNumStencilInstance = static_cast<uint32>(pStencil->GetInstanceList().size());
+			char *pStencilRenderStateBufferPos = reinterpret_cast<char *>(pStencil->GetRenderStatePtr());
+			for(uint32 i = 0; i < uiNumStencilInstance; ++i)
+			{
+				HyRenderBuffer::State *pCurRenderState = reinterpret_cast<HyRenderBuffer::State *>(pStencilRenderStateBufferPos);
+				if(pCurRenderState->m_iCOORDINATE_SYSTEM < 0 || pCurRenderState->m_iCOORDINATE_SYSTEM == m_pCurWindow->GetIndex())
+					RenderPass2d(pCurRenderState, pCurRenderState->m_iCOORDINATE_SYSTEM < 0 ? pCamera : nullptr);
+
+				pStencilRenderStateBufferPos += pCurRenderState->m_uiExDataSize + sizeof(HyRenderBuffer::State);
+			}
+
+			m_hCurrentStencilBuffer = pRenderState->m_hSTENCIL;
 		}
 
 		switch(pStencil->GetBehavior())
