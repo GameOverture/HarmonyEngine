@@ -34,3 +34,9 @@ void HyStopwatch::Reset()
 	m_bIsRunning = false;
 	m_dElapsedTime = 0.0;
 }
+
+/*virtual*/ std::string HyStopwatch::ToString() const /*override*/
+{
+	double dTimeLeft = TimeElapsed();
+	return FormatString(dTimeLeft);
+}

@@ -24,10 +24,14 @@ public:
 
 	bool IsRunning() const;
 	double TimeElapsed() const;
+	
+	virtual std::string ToString() const = 0;
 
-private:
+protected:
 	void Update(double dDelta);
 	virtual void OnUpdate() { };
+
+	std::string FormatString(double dSeconds) const;
 };
 
 #endif /* IHyTimeInst_h__ */

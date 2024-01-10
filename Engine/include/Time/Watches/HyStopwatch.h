@@ -22,6 +22,8 @@ public:
 	void Pause();
 
 	void Reset();
+
+	virtual std::string ToString() const override;
 };
 
 #endif /* HyStopwatch_h__ */

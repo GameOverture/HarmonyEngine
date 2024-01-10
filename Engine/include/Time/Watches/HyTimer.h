@@ -38,6 +38,8 @@ public:
 
 	void SetExpiredCallback(std::function<void(void *)> fpFunc, void *pData);
 
+	virtual std::string ToString() const override;
+
 private:
 	virtual void OnUpdate() override;
 };
