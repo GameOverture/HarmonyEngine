@@ -333,7 +333,7 @@ if(Qt5_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Engine/include/Harmony")
 
 	target_compile_definitions(HyEditor PRIVATE HY_USE_QT)
-	target_link_libraries(HyEditor PUBLIC HyEngine freetype-gl ogg vorbis Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets Qt5::Multimedia)
+	target_link_libraries(HyEditor PUBLIC HyEngine freetype-gl ogg vorbis QCodeEditor Qt5::Core Qt5::Gui Qt5::Network Qt5::Widgets Qt5::Multimedia)
 
 	set_target_properties(HyEditor PROPERTIES
 		CXX_STANDARD 17
