@@ -19,6 +19,9 @@ if(Qt5_DIR)
 	set_target_properties(vorbis PROPERTIES FOLDER "Editor Libs")
 	set_target_properties(vorbisenc PROPERTIES FOLDER "Editor Libs")
 	set_target_properties(vorbisfile PROPERTIES FOLDER "Editor Libs")
+	
+	add_subdirectory(vendor/QCodeEditor)
+	set_target_properties(QCodeEditor PROPERTIES FOLDER "Editor Libs")
 
 	find_package(Qt5 COMPONENTS Core Gui Network Widgets Multimedia REQUIRED)
 

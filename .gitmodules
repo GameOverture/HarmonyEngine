@@ -31,3 +31,9 @@
 [submodule "Engine/vendor/tinygltf"]
 	path = Engine/vendor/tinygltf
 	url = https://github.com/GameOverture/Hy_tinygltf.git
+[submodule "Editor/vendor/QCodeEditor"]
+	path = Editor/vendor/QCodeEditor
+	url = https://github.com/GameOverture/Hy_QCodeEditor.git
+[submodule "Editor/vendor/Editor/vendor/QCodeEditor"]
+	path = Editor/vendor/Editor/vendor/QCodeEditor
+	url = https://github.com/GameOverture/Hy_QCodeEditor.git
