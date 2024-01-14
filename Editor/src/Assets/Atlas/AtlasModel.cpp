@@ -21,8 +21,7 @@
 #include <QMimeData>
 
 AtlasModel::AtlasModel(Project &projRef) :
-	IManagerModel(projRef, ASSETMAN_Atlases),
-	m_pCurInspectorAsset(nullptr)
+	IManagerModel(projRef, ASSETMAN_Atlases)
 {
 
 }
@@ -194,22 +193,6 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	return QStringList() << ".png";
 }
 
-/*virtual*/ void AtlasModel::UpdateInspectorScene(const QList<IAssetItemData *> &selectedAssetsList) /*override*/
-{
-	if(selectedAssetsList.empty())
-	{
-		m_InspectorScene.clear();
-		m_pCurInspectorAsset = nullptr;
-	}
-	else if(m_pCurInspectorAsset != selectedAssetsList[0])
-	{
-		m_InspectorScene.clear();
-		m_pCurInspectorAsset = selectedAssetsList[0];
-		//pNewPixmapItem->setPixmap(QPixmap(m_pCurInspectorAsset->GetAbsMetaFilePath()));
-		QGraphicsPixmapItem *pNewPixmapItem = m_InspectorScene.addPixmap(QPixmap(m_pCurInspectorAsset->GetAbsMetaFilePath()));
-	}
-}
-
 /*virtual*/ void AtlasModel::OnInit() /*override*/
 {
 	// Create data manifest file if one doesn't exist
@@ -330,8 +313,6 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	for(auto iter = repackTexIndexMap.begin(); iter != repackTexIndexMap.end(); ++iter)
 		AddTexturesToRepack(iter.key(), iter.value());
 
-	m_pCurInspectorAsset = nullptr;
-
 	return true;
 }
 
@@ -346,8 +327,6 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 
 	for(auto iter = repackTexIndexMap.begin(); iter != repackTexIndexMap.end(); ++iter)
 		AddTexturesToRepack(iter.key(), iter.value());
-
-	m_pCurInspectorAsset = nullptr;
 
 	return true;
 }

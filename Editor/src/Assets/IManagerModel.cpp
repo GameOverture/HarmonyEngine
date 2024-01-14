@@ -20,6 +20,7 @@
 #include "SourceImportThread.h"
 #include "AtlasRepackThread.h"
 #include "AudioRepackThread.h"
+#include "AuxAssetInspector.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -32,8 +33,7 @@ IManagerModel::IManagerModel(Project &projRef, AssetManagerType eAssetType) :
 	m_bIsSingleBank(false),
 	m_MetaDir(m_ProjectRef.GetMetaAbsPath() + HyGlobal::AssetName(eAssetType)),
 	m_DataDir(m_ProjectRef.GetAssetsAbsPath() + HyGlobal::AssetName(eAssetType)),
-	m_uiNextBankId(99999), // Should be properly initialized with Init()
-	m_InspectorScene(this)
+	m_uiNextBankId(99999) // Should be properly initialized with Init()
 {
 }
 
@@ -352,7 +352,7 @@ void IManagerModel::ReplaceAssets(QList<IAssetItemData *> assetsList, bool bWith
 	else
 		OnUpdateAssets(assetsList);
 
-	m_InspectorScene.clear();
+	static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_AssetInspector))->Clear(m_eASSET_TYPE);
 
 	FlushRepack();
 }
@@ -957,11 +957,6 @@ void IManagerModel::SaveRuntime()
 		SaveMeta();
 
 	return true;
-}
-
-QGraphicsScene *IManagerModel::GetInspectorScene()
-{
-	return &m_InspectorScene;
 }
 
 void IManagerModel::RegisterAsset(IAssetItemData *pAsset)

@@ -256,12 +256,18 @@ if(Qt5_DIR)
 		src/Widget/Auxiliary/AuxOutputLog.cpp
 		src/Widget/Auxiliary/AuxOutputLog.h
 		src/Widget/Auxiliary/AuxOutputLog.ui
+		src/Widget/Auxiliary/AuxShaderEditor.cpp
+		src/Widget/Auxiliary/AuxShaderEditor.h
+		src/Widget/Auxiliary/AuxShaderEditor.ui
 		src/Widget/Auxiliary/AuxToolBox.cpp
 		src/Widget/Auxiliary/AuxToolBox.h
 		src/Widget/Auxiliary/AuxToolBox.ui
 		src/Widget/WgtAudioCategory.cpp
 		src/Widget/WgtAudioCategory.h
 		src/Widget/WgtAudioCategory.ui
+		src/Widget/WgtCodeEditor.cpp
+		src/Widget/WgtCodeEditor.h
+		src/Widget/WgtCodeEditor.ui
 		src/Widget/WgtMakeRelDir.cpp
 		src/Widget/WgtMakeRelDir.h
 		src/Widget/WgtMakeRelDir.ui

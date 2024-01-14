@@ -26,6 +26,7 @@
 #include "SourceModel.h"
 #include "Themes.h"
 #include "EntityModel.h"
+#include "WgtCodeEditor.h"
 
 #include <QFileDialog>
 #include <QShowEvent>
@@ -122,6 +123,9 @@ MainWindow::MainWindow(QWidget *pParent) :
 		m_sEnginePath += "/";
 	}
 	m_Settings.endGroup();
+
+	// If ui->dockWidgetAssets is shown or hidden, set a slot to also show/hide ui->tabWidgetAux's Asset Manager tab
+	//connect(ui->dockWidgetAssets, &QDockWidget::visibilityChanged, this, &MainWindow::on_dockWidgetAssets_visibilityChanged);
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Restore workspace
@@ -130,7 +134,10 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->dockWidgetProperties->setWidget(nullptr);
 	ui->dockWidgetProperties->hide();
 
-	ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, false);
+	for(int i = 0; i < ui->tabWidgetAux->count(); ++i)
+		ui->tabWidgetAux->setTabVisible(i, false);
+	ui->tabWidgetAux->setTabVisible(AUXTAB_Log, true);
+	ui->tabWidgetAux->setCurrentIndex(AUXTAB_Log);
 
 	HyGuiLog("Recovering previously opened session...", LOGTYPE_Normal);
 	m_Settings.beginGroup("MainWindow");
@@ -363,7 +370,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	Harmony::GetProject()->OpenTab(pItem);
 
 	// Setup the item properties docking window to be the current item
-	QString sWindowTitle = pItem->GetName(true) % " Properties";
+	QString sWindowTitle = pItem->GetName(false) % " Properties";
 
 	sm_pInstance->ui->dockWidgetProperties->show();
 	sm_pInstance->ui->dockWidgetProperties->setWindowTitle(sWindowTitle);
@@ -423,7 +430,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	{
 		pItem->BlockAllWidgetSignals(true);
 
-		sm_pInstance->ui->dockWidgetProperties->setWindowTitle("Item Properties");
+		sm_pInstance->ui->dockWidgetProperties->setWindowTitle("Properties");
 		sm_pInstance->ui->dockWidgetProperties->hide();
 
 		QList<QAction *> editActionList = sm_pInstance->ui->menu_Edit->actions();
@@ -470,14 +477,18 @@ void MainWindow::SetCurrentProject(Project *pProject)
 {
 	switch(eTabIndex)
 	{
-	case AUXTAB_Output:
+	case AUXTAB_Log:
 		return sm_pInstance->ui->outputLog;
 	case AUXTAB_AssetInspector:
 		return sm_pInstance->ui->assetInspector;
 	case AUXTAB_DopeSheet:
 		return sm_pInstance->ui->dopeSheet;
-	//case AUXTAB_ToolBox:
-	//	return sm_pInstance->ui->toolBox;
+	case AUXTAB_ShaderEditor:
+		return sm_pInstance->ui->shaderEditor;
+
+	default:
+		HyGuiLog("MainWindow::GetAuxWidget() - Unknown tab index: " % QString::number(eTabIndex), LOGTYPE_Error);
+		break;
 	}
 
 	return nullptr;
@@ -621,25 +632,33 @@ void MainWindow::on_tabWidgetAssetManager_currentChanged(int iIndex)
 
 	ManagerWidget *pManagerWidget = static_cast<ManagerWidget *>(sm_pInstance->ui->tabWidgetAssetManager->widget(iIndex));
 	if(pManagerWidget)
-		ui->assetInspector->SetAssetManager(pManagerWidget);
+		ui->assetInspector->SetAssetManager(pManagerWidget->GetModel().GetAssetType());
 }
 
 void MainWindow::on_tabWidgetAux_currentChanged(int iIndex)
 {
-	switch(iIndex)
-	{
-	case AUXTAB_Output:
-		ui->dockWidgetAuxiliary->setWindowTitle("Output");
-		break;
+	//switch(iIndex)
+	//{
+	//case AUXTAB_Log:
+	//	ui->dockWidgetAuxiliary->setWindowTitle("Log");
+	//	break;
 
-	case AUXTAB_AssetInspector:
-		ui->dockWidgetAuxiliary->setWindowTitle("Asset Preview");
-		break;
+	//case AUXTAB_AssetManager:
+	//	ui->dockWidgetAuxiliary->setWindowTitle("Asset Manager");
+	//	break;
 
-	case AUXTAB_DopeSheet:
-		ui->dockWidgetAuxiliary->setWindowTitle("Entity Dope Sheet");
-		break;
-	}
+	//case AUXTAB_DopeSheet:
+	//	ui->dockWidgetAuxiliary->setWindowTitle("Entity Dope Sheet");
+	//	break;
+
+	//case AUXTAB_ShaderEditor:
+	//	ui->dockWidgetAuxiliary->setWindowTitle("Shader Editor");
+	//	break;
+
+	//default:
+	//	HyGuiLog("MainWindow::on_tabWidgetAux_currentChanged() - Unhandled tab index: " % QString::number(iIndex), LOGTYPE_Error);
+	//	break;
+	//}
 }
 
 void MainWindow::on_actionNewProject_triggered()
@@ -723,6 +742,11 @@ void MainWindow::on_actionOpenFolderExplorer_triggered()
 		return;
 
 	HyGlobal::OpenFileInExplorer(pProj->GetAbsPath());
+}
+
+void MainWindow::on_dockWidgetAssets_visibilityChanged(bool bVisible)
+{
+	ui->tabWidgetAux->setTabVisible(AUXTAB_AssetInspector, bVisible);
 }
 
 void MainWindow::on_actionNewPrefix_triggered()
@@ -1039,7 +1063,7 @@ void MainWindow::on_actionActivateProject_triggered()
 	bool bNewProject = Harmony::GetProject() != &pFirstSelected->GetProject();
 	if(bNewProject)
 	{
-		sm_pInstance->ui->dockWidgetProperties->setWindowTitle("Item Properties");
+		sm_pInstance->ui->dockWidgetProperties->setWindowTitle("Properties");
 		sm_pInstance->ui->dockWidgetProperties->setWidget(nullptr);
 	}
 
@@ -1198,4 +1222,7 @@ void MainWindow::SelectTheme(Theme eTheme)
 		HyGuiLog("MainWindow::SelectTheme was given unknown theme", LOGTYPE_Error);
 		break;
 	}
+
+	static_cast<AuxAssetInspector *>(GetAuxWidget(AUXTAB_AssetInspector))->GetCodeEditor().SetTheme(m_eTheme);
+	static_cast<AuxShaderEditor *>(GetAuxWidget(AUXTAB_ShaderEditor))->GetCodeEditor().SetTheme(m_eTheme);
 }

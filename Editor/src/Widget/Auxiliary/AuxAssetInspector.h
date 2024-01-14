@@ -15,6 +15,9 @@
 #include "ManagerWidget.h"
 
 #include <QWidget>
+#include <QGraphicsScene>
+
+class WgtCodeEditor;
 
 namespace Ui {
 class AuxAssetInspector;
@@ -24,11 +27,21 @@ class AuxAssetInspector : public QWidget
 {
 	Q_OBJECT
 
+	QGraphicsScene				m_AtlasesGfxScene;
+	IAssetItemData *			m_pCurAtlasesAsset;
+
+	QGraphicsScene				m_AudioGfxScene;
+
 public:
 	explicit AuxAssetInspector(QWidget *parent = 0);
 	virtual ~AuxAssetInspector();
 
-	void SetAssetManager(ManagerWidget *pManagerWidget);
+	WgtCodeEditor &GetCodeEditor();
+
+	void SetAssetManager(AssetManagerType eAssetManager);
+	void SetFocusedAssets(AssetManagerType eAssetManager, const QList<IAssetItemData *> &selectedAssetsList);
+
+	void Clear(AssetManagerType eAssetManager);
 
 private:
 	Ui::AuxAssetInspector *ui;

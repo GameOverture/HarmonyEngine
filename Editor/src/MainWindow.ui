@@ -246,6 +246,12 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidgetAuxiliary">
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetFeatureMask</set>
+   </property>
    <property name="windowTitle">
     <string>Aux</string>
    </property>
@@ -275,11 +281,11 @@
         <enum>QTabWidget::South</enum>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>3</number>
        </property>
        <widget class="QWidget" name="tabOutputLog">
         <attribute name="title">
-         <string>Output</string>
+         <string>Log</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <property name="spacing">
@@ -304,7 +310,7 @@
        </widget>
        <widget class="QWidget" name="tabPreview">
         <attribute name="title">
-         <string>Asset Preview</string>
+         <string>Asset Inspector</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <property name="spacing">
@@ -349,6 +355,28 @@
          </property>
          <item>
           <widget class="AuxDopeSheet" name="dopeSheet" native="true"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Shader Editor</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_9">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="AuxShaderEditor" name="shaderEditor" native="true"/>
          </item>
         </layout>
        </widget>
@@ -874,6 +902,12 @@
    <class>AuxDopeSheet</class>
    <extends>QWidget</extends>
    <header>AuxDopeSheet.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AuxShaderEditor</class>
+   <extends>QWidget</extends>
+   <header>AuxShaderEditor.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

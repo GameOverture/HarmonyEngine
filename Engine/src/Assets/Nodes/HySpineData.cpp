@@ -27,7 +27,9 @@ HySpineTextureLoader::HySpineTextureLoader(std::vector<HySpineAtlas> &subAtlasLi
 
 /*virtual*/ void HySpineTextureLoader::load(spine::AtlasPage &page, const spine::String &path) /*override*/
 {
-	std::string sFileName = HyIO::GetFileNameFromPath(path.buffer(), true); // Make lowercase for easier compare
+	std::string sFileName = HyIO::GetFileNameFromPath(path.buffer());
+	HyIO::MakeLowercase(sFileName); // Make lowercase for easier compare
+
 	uint32 uiNumAtlases = m_SubAtlasListRef.size();
 	for(uint32 i = 0; i < uiNumAtlases; ++i)
 	{
@@ -80,16 +82,16 @@ HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAsse
 
 		if(bIsUsingTempFiles == false)
 		{
-			HyFileAtlas *pAtlas = assetsRef.GetAtlas(atlasObj["checksum"].GetUint(), rSubAtlasUVRect);
+			HyFileAtlas *pAtlas = assetsRef.GetAtlas(atlasObj["checksum"].GetUint(), atlasObj["bankId"].GetUint(), rSubAtlasUVRect);
 			HyAssert(pAtlas, "HySpineData atlas was not found with checksum: " << atlasObj["checksum"].GetUint());
 
-			m_RequiredAtlases.Set(pAtlas->GetManifestIndex());
+			m_RequiredFiles[HYFILE_Atlas].Set(pAtlas->GetManifestIndex());
 			m_SubAtlasList.push_back(HySpineAtlas(sName, pAtlas, rSubAtlasUVRect.left, rSubAtlasUVRect.top, rSubAtlasUVRect.right, rSubAtlasUVRect.bottom));
 		}
 		else // Using GUI temp files
 		{
-			uint32 uiAtlasWidth = static_cast<uint32>(HyMax(0, atlasObj["subAtlasWidth"].GetInt()));
-			uint32 uiAtlasHeight = static_cast<uint32>(HyMax(0, atlasObj["subAtlasHeight"].GetInt()));
+			uint32 uiAtlasWidth = static_cast<uint32>(HyMath::Max(0, atlasObj["subAtlasWidth"].GetInt()));
+			uint32 uiAtlasHeight = static_cast<uint32>(HyMath::Max(0, atlasObj["subAtlasHeight"].GetInt()));
 
 			HyJsonArray guiTexturesArray = itemDataObj["guiTextures"].GetArray();
 			HyTextureHandle hGfxApiHandle = guiTexturesArray[i].GetUint();
@@ -103,7 +105,7 @@ HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAsse
 	// Atlas ------------------------------------------------------------------------
 	std::string sAtlasFilePath = sDataDir;
 	sAtlasFilePath += itemDataObj["UUID"].GetString();
-	sAtlasFilePath = HyIO::CleanPath(sAtlasFilePath.c_str(), ".atlas", false);
+	sAtlasFilePath = HyIO::CleanPath(sAtlasFilePath.c_str(), ".atlas");
 	//std::vector<char> atlasFile;
 	//HyIO::ReadTextFile(sAtlasFilePath.c_str(), atlasFile);
 	
@@ -118,7 +120,7 @@ HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAsse
 	{
 		spine::SkeletonBinary binary(m_pAtlasData);
 		binary.setScale(fScale);
-		sSkeletonFilePath = HyIO::CleanPath(sSkeletonFilePath.c_str(), ".skel", false);
+		sSkeletonFilePath = HyIO::CleanPath(sSkeletonFilePath.c_str(), ".skel");
 
 		m_pSkeletonData = binary.readSkeletonDataFile(sSkeletonFilePath.c_str());
 		HyAssert(m_pSkeletonData, "HySpineData binary load failed: " << binary.getError().buffer());
@@ -128,7 +130,7 @@ HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAsse
 		spine::SkeletonJson json(m_pAtlasData);
 		json.setScale(fScale);
 
-		sSkeletonFilePath = HyIO::CleanPath(sSkeletonFilePath.c_str(), ".json", false);
+		sSkeletonFilePath = HyIO::CleanPath(sSkeletonFilePath.c_str(), ".json");
 		m_pSkeletonData = json.readSkeletonDataFile(sSkeletonFilePath.c_str());
 		HyAssert(m_pSkeletonData, "HySpineData json load failed: " << json.getError().buffer());
 	}

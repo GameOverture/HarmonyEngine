@@ -229,16 +229,16 @@ uint32 HySpine2d::GetNumSlots()
 
 			glm::vec4 vColor;
 			// TOP COLOR
-			HyCopyVec(vColor, CalculateTopTint());
-			vColor.a = CalculateAlpha();
+			HySetVec(vColor, CalculateTopTint(fExtrapolatePercent));
+			vColor.a = CalculateAlpha(fExtrapolatePercent);
 			vColor.r *= slotTint.r;
 			vColor.g *= slotTint.g;
 			vColor.b *= slotTint.b;
 			vColor.a *= slotTint.a;
 			vertexBufferRef.AppendData2d(&vColor, sizeof(glm::vec4));
 			// BOT COLOR
-			HyCopyVec(vColor, CalculateBotTint());
-			vColor.a = CalculateAlpha();
+			HySetVec(vColor, CalculateBotTint(fExtrapolatePercent));
+			vColor.a = CalculateAlpha(fExtrapolatePercent);
 			vColor.r *= slotTint.r;
 			vColor.g *= slotTint.g;
 			vColor.b *= slotTint.b;
@@ -263,7 +263,7 @@ uint32 HySpine2d::GetNumSlots()
 			vertexBufferRef.AppendData2d(&pRegionAttachment->getUVs()[Vert3Index], sizeof(glm::vec2));
 
 			// TRANSFORM MTX
-			vertexBufferRef.AppendData2d(&GetSceneTransform(), sizeof(glm::mat4));
+			vertexBufferRef.AppendData2d(&GetSceneTransform(fExtrapolatePercent), sizeof(glm::mat4));
 		}
 		else if(pAttachment->getRTTI().isExactly(spine::MeshAttachment::rtti))
 		{

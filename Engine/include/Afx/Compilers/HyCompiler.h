@@ -10,6 +10,12 @@
 #ifndef HyCompiler_h__
 #define HyCompiler_h__
 
+ // SPINE RUNTIME ////////////////////////////////////////////////////////////
+#ifdef HY_USE_SPINE
+	#include "spine/spine.h"
+#endif
+//////////////////////////////////////////////////////////////////////////////
+
  // Data types
 typedef signed char			int8;
 typedef unsigned char		uint8;

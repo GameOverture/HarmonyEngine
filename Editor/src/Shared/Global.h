@@ -100,10 +100,10 @@ enum AssetErrorType
 
 enum AuxTab
 {
-	AUXTAB_Output = 0,
-	AUXTAB_AssetInspector,
-	AUXTAB_DopeSheet,
-	//AUXTAB_ToolBox
+	AUXTAB_Log = 0,			// Always visible
+	AUXTAB_AssetInspector,	// Visible when Asset Manager Docking Window is visible
+	AUXTAB_DopeSheet,		// Only visible when an Entity is the current item opened
+	AUXTAB_ShaderEditor		// Only visible when a Shader is the current item opened
 };
 
 enum LoadingType

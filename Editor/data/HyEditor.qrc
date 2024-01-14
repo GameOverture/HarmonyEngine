@@ -254,5 +254,6 @@
         <file>icons16x16/callback-delete.png</file>
         <file>icons16x16/callback-rename.png</file>
         <file>icons16x16/entity-snapping.png</file>
+        <file>styles/Decemberween.xml</file>
     </qresource>
 </RCC>

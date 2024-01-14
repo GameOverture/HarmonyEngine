@@ -30,7 +30,6 @@
 #include <QFileDialog>
 #include <QDrag>
 #include <QMouseEvent>
-#include <QGraphicsPixmapItem>
 
 ManagerProxyModel::ManagerProxyModel(QObject *pParent /*= nullptr*/) :
 	QSortFilterProxyModel(pParent),
@@ -641,7 +640,7 @@ void ManagerWidget::on_assetTree_pressed(const QModelIndex &index)
 	ui->actionDeleteAssets->setEnabled(iNumSelected != 0 || selectedFiltersList.empty() == false);
 	ui->actionReplaceAssets->setEnabled(iNumSelected != 0);
 
-	m_pModel->UpdateInspectorScene(selectedAssetsList);
+	static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_AssetInspector))->SetFocusedAssets(m_pModel->GetAssetType(), selectedAssetsList);
 }
 
 void ManagerWidget::on_cmbBanks_currentIndexChanged(int index)
@@ -704,7 +703,7 @@ void ManagerWidget::on_actionReplaceAssets_triggered()
 	}
 
 	m_pModel->ReplaceAssets(selectedAssetsList, true);
-	m_pModel->UpdateInspectorScene(selectedAssetsList);
+	static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_AssetInspector))->SetFocusedAssets(m_pModel->GetAssetType(), selectedAssetsList);
 }
 
 void ManagerWidget::on_actionRename_triggered()

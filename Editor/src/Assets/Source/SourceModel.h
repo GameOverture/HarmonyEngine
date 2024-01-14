@@ -12,8 +12,10 @@
 
 #include "IManagerModel.h"
 
-#include "AtlasFrame.h"
+#include <QFileSystemWatcher>
 
+class WgtCodeEditor;
+class SourceFile;
 class EntityModel;
 
 class SourceModel : public IManagerModel
@@ -22,7 +24,10 @@ class SourceModel : public IManagerModel
 
 	friend class SourceImportThread;
 
-	TreeModelItemData *			m_pEntityFolderItem;
+	TreeModelItemData *							m_pEntityFolderItem;
+
+	QFileSystemWatcher							m_OpenFileWatcher;
+	QList<QPair<WgtCodeEditor *, SourceFile *>>	m_OpenFileList;
 
 public:
 	SourceModel(Project &projRef);
@@ -33,8 +38,6 @@ public:
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 	virtual QStringList GetSupportedFileExtList() const override;
-
-	virtual void UpdateInspectorScene(const QList<IAssetItemData *> &selectedAssetsList) override;
 
 protected:
 	quint32 ComputeFileChecksum(QString sFilterPath, QString sFileName) const;
@@ -56,6 +59,9 @@ protected:
 
 	virtual void OnSaveMeta(QJsonObject &metaObjRef) override;
 	virtual QJsonObject GetSaveJson() override;
+
+public Q_SLOTS:
+	void OnOpenFileChanged(const QString &sFilePath);
 };
 
 #endif // SOURCEMODEL_H

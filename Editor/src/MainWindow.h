@@ -114,6 +114,8 @@ private Q_SLOTS:
 	void on_actionProjectSettings_triggered();
 	void on_actionOpenFolderExplorer_triggered();
 
+	void on_dockWidgetAssets_visibilityChanged(bool visible);
+
 	void on_actionNewPrefix_triggered();
 	void on_actionNewAudio_triggered();
 	void on_actionNewEntity_triggered();

@@ -36,7 +36,7 @@ public:
 
 	void UpdateChecksum(quint32 uiChecksum);
 
-	virtual void SetText(QString sText) override;
+	virtual void SetText(QString sText) override; // NOTE: This is just renaming the asset. It also renames the file on disk.
 };
 
 #endif // SourceFile_H

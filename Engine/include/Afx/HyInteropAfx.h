@@ -86,11 +86,6 @@ typedef HyOpenGL HyRendererInterop;
 	typedef HyNullSocket HyNetworkInterop;
 #endif
 
-// SPINE RUNTIME ////////////////////////////////////////////////////////////
-#ifdef HY_USE_SPINE
-	#include "spine/spine.h"
-#endif
-
 #endif /* HyInteropAfx_h__ */
 
 // AUDIO ////////////////////////////////////////////////////////////////////
