@@ -26,6 +26,7 @@ AuxAssetInspector::AuxAssetInspector(QWidget *parent) :
 
 	ui->atlasesGfxView->setScene(&m_AtlasesGfxScene);
 	ui->audioGfxView->setScene(&m_AudioGfxScene);
+	ui->wgtCodeEditor->SetReadOnly(true);
 }
 
 /*virtual*/ AuxAssetInspector::~AuxAssetInspector()

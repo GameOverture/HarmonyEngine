@@ -38,12 +38,19 @@ public:
 	explicit WgtCodeEditor(QWidget *pParent = nullptr);
 	virtual ~WgtCodeEditor();
 
+	bool IsDirty() const;
+	void SetReadOnly(bool bReadOnly);
 	void SetTheme(Theme eTheme);
 
 	void SetSourceFile(SourceFile *pSourceFileRef);
 	void Reload();
 	
 private Q_SLOTS:
+	void on_chkReadOnly_toggled(bool bChecked);
+	void on_chkWordWrap_toggled(bool bChecked);
+	void on_chkAutoBracket_toggled(bool bChecked);
+	void on_chkTabsToSpaces_toggled(bool bChecked);
+	void on_chkAutoIndentation_toggled(bool bChecked);
 
 private:
 	Ui::WgtCodeEditor *ui;

@@ -27,7 +27,7 @@ class SourceModel : public IManagerModel
 	TreeModelItemData *							m_pEntityFolderItem;
 
 	QFileSystemWatcher							m_OpenFileWatcher;
-	QList<QPair<WgtCodeEditor *, SourceFile *>>	m_OpenFileList;
+	QList<SourceFile *>							m_OpenFileList;
 
 public:
 	SourceModel(Project &projRef);

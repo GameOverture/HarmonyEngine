@@ -21,6 +21,7 @@
 #include "AtlasRepackThread.h"
 #include "AudioRepackThread.h"
 #include "AuxAssetInspector.h"
+#include "SourceFile.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -765,10 +766,10 @@ void IManagerModel::SaveRuntime()
 					return QVariant(pItemData->GetIcon(SUBICON_Warning));
 				else if(m_eASSET_TYPE == ASSETMAN_Atlases)
 					return QVariant(static_cast<AtlasFrame *>(pAsset)->GetThumbnail());
+				else if(m_eASSET_TYPE == ASSETMAN_Source)
+					return static_cast<SourceFile *>(pAsset)->GetSourceIcon();
 			}
-
-			// Special case: The source code's entity folder
-			if(m_eASSET_TYPE == ASSETMAN_Source && pItemData->GetText() == HySrcEntityFilter)
+			else if(m_eASSET_TYPE == ASSETMAN_Source && pItemData->GetText() == HySrcEntityFilter)
 				return QVariant(QIcon(":/icons16x16/entity-folder.png"));
 
 			return QVariant(pItemData->GetIcon(SUBICON_None));

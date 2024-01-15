@@ -679,15 +679,15 @@ void SourceModel::OnOpenFileChanged(const QString &sFilePath)
 	QFileInfo changedFileInfo(sFilePath);
 
 	bool bFoundInOpenList = false;
-	for(auto &openFilePair : m_OpenFileList)
+	for(auto &openFile : m_OpenFileList)
 	{
-		QFileInfo sourceFileInfo(openFilePair.second->GetAbsMetaFilePath());
+		QFileInfo sourceFileInfo(openFile->GetAbsMetaFilePath());
 		if(changedFileInfo == sourceFileInfo)
 		{
 			int iDlgReturn = QMessageBox::question(nullptr, "File Changed", "The file " % changedFileInfo.fileName() % " has changed on disk. Do you want to reload it?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 			if(iDlgReturn == QMessageBox::Yes)
 			{
-				openFilePair.first->Reload();
+				//openFile->Reload();
 			}
 			
 			bFoundInOpenList = true;

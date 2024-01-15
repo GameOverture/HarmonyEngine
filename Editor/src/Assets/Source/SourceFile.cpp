@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "SourceFile.h"
 #include "IManagerModel.h"
-#include "_Dependencies/scriptum/imagepacker.h"
+#include "WgtCodeEditor.h"
 
 SourceFile::SourceFile(IManagerModel &modelRef,
 					   QUuid uuid,
@@ -19,7 +19,8 @@ SourceFile::SourceFile(IManagerModel &modelRef,
 					   uint uiErrors) :
 	IAssetItemData(modelRef,
 		QFileInfo(fileName).suffix().compare("cpp", Qt::CaseInsensitive) == 0 ? ITEM_Source : ITEM_Header,
-		uuid, uiChecksum, 0, fileName, QFileInfo(fileName).suffix(), uiErrors)
+		uuid, uiChecksum, 0, fileName, QFileInfo(fileName).suffix(), uiErrors),
+	m_pCodeEditor(nullptr)
 {
 }
 
@@ -57,6 +58,15 @@ SourceFile::~SourceFile()
 	//frameObj.insert("cropBottom", QJsonValue(GetCrop().bottom()));
 	//frameObj.insert("textureFormat", HyAssets::GetTextureFormatName(m_eFormat).c_str());
 	//frameObj.insert("textureFiltering", HyAssets::GetTextureFilteringName(m_eFiltering).c_str());
+}
+
+QIcon SourceFile::GetSourceIcon() const
+{
+	SubIcon eSubIcon = SUBICON_None;
+	if(m_pCodeEditor && m_pCodeEditor->IsDirty())
+		eSubIcon = SUBICON_Dirty;
+
+	return GetIcon(eSubIcon);
 }
 
 void SourceFile::UpdateChecksum(quint32 uiChecksum)

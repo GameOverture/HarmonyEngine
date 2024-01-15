@@ -52,6 +52,16 @@ WgtCodeEditor::WgtCodeEditor(QWidget *pParent /*= nullptr*/) :
 	delete ui;
 }
 
+bool WgtCodeEditor::IsDirty() const
+{
+	return ui->codeEditor->document()->isModified();
+}
+
+void WgtCodeEditor::SetReadOnly(bool bReadOnly)
+{
+	ui->chkReadOnly->setChecked(bReadOnly);
+}
+
 void WgtCodeEditor::SetTheme(Theme eTheme)
 {
 	if(m_ThemeStyleMap.contains(eTheme) == false)
@@ -73,6 +83,10 @@ void WgtCodeEditor::SetSourceFile(SourceFile *pSourceFileRef)
 	}
 
 	m_pSourceFile = pSourceFileRef;
+
+	// Set ui->lblFileIcon QLabel to a pixmap of m_pSourceFile's QIcon
+	ui->lblFileIcon->setPixmap(m_pSourceFile->GetSourceIcon().pixmap(16, 16));
+	ui->lblFileName->setText(m_pSourceFile->GetName());
 
 	ui->codeEditor->setCompleter(nullptr);
 	ui->codeEditor->setHighlighter(nullptr);
@@ -115,4 +129,31 @@ void WgtCodeEditor::Reload()
 	}
 	else
 		HyGuiLog("WgtCodeEditor::Reload failed to open file: " % m_pSourceFile->GetAbsMetaFilePath(), LOGTYPE_Error);
+}
+
+void WgtCodeEditor::on_chkReadOnly_toggled(bool bChecked)
+{
+	ui->codeEditor->setReadOnly(bChecked);
+	ui->wgtCtrls->setVisible(!bChecked);
+	//SetReadOnly(bChecked);
+}
+
+void WgtCodeEditor::on_chkWordWrap_toggled(bool bChecked)
+{
+	ui->codeEditor->setWordWrapMode(bChecked ? QTextOption::WrapAtWordBoundaryOrAnywhere : QTextOption::NoWrap);
+}
+
+void WgtCodeEditor::on_chkAutoBracket_toggled(bool bChecked)
+{
+	ui->codeEditor->setAutoParentheses(bChecked);
+}
+
+void WgtCodeEditor::on_chkTabsToSpaces_toggled(bool bChecked)
+{
+	ui->codeEditor->setTabReplace(bChecked);
+}
+
+void WgtCodeEditor::on_chkAutoIndentation_toggled(bool bChecked)
+{
+	ui->codeEditor->setAutoIndentation(bChecked);
 }
