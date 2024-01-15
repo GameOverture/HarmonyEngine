@@ -538,9 +538,12 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 			contextMenu.addAction(ui->actionDeleteAssets);
 		}
 
-		ui->assetTree->selectionModel()->clear();
-		ui->assetTree->selectionModel()->clearSelection();
-		ui->assetTree->selectionModel()->clearCurrentIndex();
+		if(index.isValid() == false)
+		{
+			ui->assetTree->selectionModel()->clear();
+			ui->assetTree->selectionModel()->clearSelection();
+			ui->assetTree->selectionModel()->clearCurrentIndex();
+		}
 	}
 	else if(m_pModel->GetAssetType() == ASSETMAN_Source)
 	{

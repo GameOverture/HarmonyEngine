@@ -1004,7 +1004,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 		m_pCurWindow->GetWidth(),
 		m_pCurWindow->GetHeight());
 	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glViewport");
-	// TODO: glViewport width and height are silently clamped to a range that depends on the implementation. To query this range, call glGet with argument GL_MAX_VIEWPORT_DIMS
+	// glViewport width and height are silently clamped to a range that depends on the implementation. To query this range, call glGet with argument GL_MAX_VIEWPORT_DIMS
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Set the proper shader program
