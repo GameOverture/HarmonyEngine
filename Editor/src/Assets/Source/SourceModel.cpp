@@ -22,19 +22,14 @@
 #include <QJsonArray>
 #include <QMimeData>
 #include <QTextCodec>
-#include <QMessageBox>
 
 SourceModel::SourceModel(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Source),
-	m_pEntityFolderItem(nullptr),
-	m_OpenFileWatcher(this)
+	m_pEntityFolderItem(nullptr)
 {
 	m_bIsSingleBank = true;
 	m_MetaDir.setPath(m_ProjectRef.GetSourceAbsPath());
 	m_DataDir.setPath(m_ProjectRef.GetSourceAbsPath()); // SourceModel doesn't use a DataDir
-
-	// Watch for the fileChanged() signal emitted by the QFileSystemWatcher
-	QObject::connect(&m_OpenFileWatcher, &QFileSystemWatcher::fileChanged, this, &SourceModel::OnOpenFileChanged);
 }
 
 /*virtual*/ SourceModel::~SourceModel()
@@ -669,35 +664,4 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 {
 	// This function doesn't make sense with m_bHasRuntimeMantifest == false
 	return QJsonObject();
-}
-
-void SourceModel::OnOpenFileChanged(const QString &sFilePath)
-{
-	// Note: As a safety measure, many applications save an open file by writing a new file
-	// and then deleting the old one. In your slot function, you can check m_FileWatcher.files().contains(path)
-	// If it returns false, check whether the file still exists and then call addPath() to continue watching it.
-	QFileInfo changedFileInfo(sFilePath);
-
-	bool bFoundInOpenList = false;
-	for(auto &openFile : m_OpenFileList)
-	{
-		QFileInfo sourceFileInfo(openFile->GetAbsMetaFilePath());
-		if(changedFileInfo == sourceFileInfo)
-		{
-			int iDlgReturn = QMessageBox::question(nullptr, "File Changed", "The file " % changedFileInfo.fileName() % " has changed on disk. Do you want to reload it?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-			if(iDlgReturn == QMessageBox::Yes)
-			{
-				//openFile->Reload();
-			}
-			
-			bFoundInOpenList = true;
-			break;
-		}
-	}
-
-	// If not found in m_OpenFileList, then it was renamed or removed. This is NOT proper usage, but try to handle it gracefully
-	if(bFoundInOpenList == false)
-	{
-		QMessageBox::warning(nullptr, "File Changed", "The file " % changedFileInfo.fileName() % " has changed on disk. This file is not currently open in the editor, so it will not be reloaded. Please close and reopen the file to continue editing.");
-	}
 }

@@ -98,6 +98,7 @@ private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);
 
 	void on_assetTree_pressed(const QModelIndex &index);
+	void on_assetTree_doubleClicked(const QModelIndex &index);
 
 	void on_cmbBanks_currentIndexChanged(int index);
 

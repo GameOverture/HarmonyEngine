@@ -19,8 +19,7 @@ SourceFile::SourceFile(IManagerModel &modelRef,
 					   uint uiErrors) :
 	IAssetItemData(modelRef,
 		QFileInfo(fileName).suffix().compare("cpp", Qt::CaseInsensitive) == 0 ? ITEM_Source : ITEM_Header,
-		uuid, uiChecksum, 0, fileName, QFileInfo(fileName).suffix(), uiErrors),
-	m_pCodeEditor(nullptr)
+		uuid, uiChecksum, 0, fileName, QFileInfo(fileName).suffix(), uiErrors)
 {
 }
 
@@ -60,11 +59,27 @@ SourceFile::~SourceFile()
 	//frameObj.insert("textureFiltering", HyAssets::GetTextureFilteringName(m_eFiltering).c_str());
 }
 
+void SourceFile::AddCodeEditor(WgtCodeEditor *pCodeEditor)
+{
+	m_CodeEditorSet.insert(pCodeEditor);
+}
+
+void SourceFile::RemoveCodeEditor(WgtCodeEditor *pCodeEditor)
+{
+	m_CodeEditorSet.remove(pCodeEditor);
+}
+
 QIcon SourceFile::GetSourceIcon() const
 {
 	SubIcon eSubIcon = SUBICON_None;
-	if(m_pCodeEditor && m_pCodeEditor->IsDirty())
-		eSubIcon = SUBICON_Dirty;
+	for(WgtCodeEditor *pCodeEditor : m_CodeEditorSet)
+	{
+		if(pCodeEditor && pCodeEditor->IsDirty(this))
+		{
+			eSubIcon = SUBICON_Dirty;
+			break;
+		}
+	}
 
 	return GetIcon(eSubIcon);
 }

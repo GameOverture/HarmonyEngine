@@ -63,11 +63,12 @@ public:
 	explicit MainWindow(QWidget *pParent = 0);
 	~MainWindow();
 
-	static MainWindow *GetInstance();   // Should only be used to set QWidget parents // TODO: Check if messageboxes even care about their parent set, if not then remove this
+	static MainWindow *GetInstance();   // Should only be used to set QWidget parents // TODO: Check if messageboxes even care about their parent set, if not then remove this	
 
 	void SetHarmonyWidget(HarmonyWidget *pWidget);
 	void SetCurrentProject(Project *pProject);
 
+	static Theme GetTheme();
 	static QList<LoadingType> GetCurrentLoading();
 	static void SetLoading(LoadingType eLoadingType, int iLoadedBlocks, int iTotalBlocks);
 	static void ClearLoading(LoadingType eLoadingType);
@@ -88,6 +89,7 @@ public:
 	static IWidget *GetItemProperties();
 
 	static QWidget *GetAuxWidget(AuxTab eTabIndex);
+	static void FocusAuxWidget(AuxTab eTabIndex);
 
 	static void SetStatus(const QString &sMessage, int iTimeoutMs);
 	static void ClearStatus();

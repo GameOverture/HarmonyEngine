@@ -43,6 +43,11 @@ void IAssetItemData::SetBankId(quint32 uiNewBankId)
 	m_uiBankId = uiNewBankId;
 }
 
+IManagerModel &IAssetItemData::GetManagerModel()
+{
+	return m_ModelRef;
+}
+
 Project &IAssetItemData::GetProject()
 {
 	return m_ModelRef.GetProjOwner();

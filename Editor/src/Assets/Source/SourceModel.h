@@ -12,8 +12,6 @@
 
 #include "IManagerModel.h"
 
-#include <QFileSystemWatcher>
-
 class WgtCodeEditor;
 class SourceFile;
 class EntityModel;
@@ -25,9 +23,6 @@ class SourceModel : public IManagerModel
 	friend class SourceImportThread;
 
 	TreeModelItemData *							m_pEntityFolderItem;
-
-	QFileSystemWatcher							m_OpenFileWatcher;
-	QList<SourceFile *>							m_OpenFileList;
 
 public:
 	SourceModel(Project &projRef);
@@ -59,9 +54,6 @@ protected:
 
 	virtual void OnSaveMeta(QJsonObject &metaObjRef) override;
 	virtual QJsonObject GetSaveJson() override;
-
-public Q_SLOTS:
-	void OnOpenFileChanged(const QString &sFilePath);
 };
 
 #endif // SOURCEMODEL_H

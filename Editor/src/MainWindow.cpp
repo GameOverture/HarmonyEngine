@@ -55,6 +55,9 @@ MainWindow::MainWindow(QWidget *pParent) :
 	while(ui->stackedTabWidgets->count())
 		ui->stackedTabWidgets->removeWidget(ui->stackedTabWidgets->currentWidget());
 
+	// Initialize Code Editor static theme stuff
+	WgtCodeEditor::InitThemeStyleMap();
+
 	SetHarmonyWidget(m_Harmony.GetHarmonyWidget(nullptr));
 	SetCurrentProject(nullptr);
 
@@ -239,6 +242,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 
 MainWindow::~MainWindow()
 {
+	WgtCodeEditor::DestroyThemeStyleMap();
 	//if(Harmony::GetProject())
 	//	delete Harmony::GetProject()->GetAtlasWidget();
 	delete ui;
@@ -326,6 +330,11 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	settings.endGroup();
 
 	RefreshBuildMenu();
+}
+
+/*static*/ Theme MainWindow::GetTheme()
+{
+	return sm_pInstance->m_eTheme;
 }
 
 /*static*/ QList<LoadingType> MainWindow::GetCurrentLoading()
@@ -492,6 +501,11 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	}
 
 	return nullptr;
+}
+
+/*static*/ void MainWindow::FocusAuxWidget(AuxTab eTabIndex)
+{
+	sm_pInstance->ui->tabWidgetAux->setCurrentIndex(eTabIndex);
 }
 
 /*static*/ void MainWindow::SetStatus(const QString &sMessage, int iTimeoutMs)

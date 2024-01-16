@@ -24,7 +24,7 @@ class SourceFile : public IAssetItemData
 {
 	Q_OBJECT
 
-	WgtCodeEditor *			m_pCodeEditor;	// When not nullptr, this editor has this file opened
+	QSet<WgtCodeEditor *>	m_CodeEditorSet;	// Keeps references to any WgtCodeEditor that opens this
 
 public:
 	SourceFile(IManagerModel &modelRef,
@@ -37,6 +37,9 @@ public:
 	virtual QString ConstructMetaFileName() const override;
 	virtual QString GetPropertyInfo() override;
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
+
+	void AddCodeEditor(WgtCodeEditor *pCodeEditor);
+	void RemoveCodeEditor(WgtCodeEditor *pCodeEditor);
 
 	QIcon GetSourceIcon() const;
 

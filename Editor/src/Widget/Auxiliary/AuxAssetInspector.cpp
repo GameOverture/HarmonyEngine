@@ -11,6 +11,7 @@
 #include "AuxAssetInspector.h"
 #include "ui_AuxAssetInspector.h"
 #include "IManagerModel.h"
+#include "SourceModel.h"
 #include "SourceFile.h"
 
 #include <QGraphicsPixmapItem>
@@ -56,10 +57,15 @@ void AuxAssetInspector::SetFocusedAssets(AssetManagerType eAssetManager, const Q
 	switch(eAssetManager)
 	{
 	case ASSETMAN_Source:
-		if(selectedAssetsList.empty())
-			ui->wgtCodeEditor->SetSourceFile(nullptr);
-		else
-			ui->wgtCodeEditor->SetSourceFile(static_cast<SourceFile *>(selectedAssetsList[0]));
+		ui->wgtCodeEditor->CloseUnmodified();
+		if(selectedAssetsList.empty() == false)
+		{
+			HyAssert(selectedAssetsList[0]->GetType() == ITEM_Header || selectedAssetsList[0]->GetType() == ITEM_Source, "AuxAssetInspector::SetFocusedAssets() - selectedAssetsList[0] is not a SourceFile");
+			SourceFile *pSrcFile = static_cast<SourceFile *>(selectedAssetsList[0]);
+			HyAssert(pSrcFile->GetManagerModel().GetAssetType() == eAssetManager, "AuxAssetInspector::SetFocusedAssets() - SourceFile's ManagerModel is not ASSETMAN_Source");
+
+			ui->wgtCodeEditor->Open(pSrcFile);
+		}
 		break;
 
 	case ASSETMAN_Atlases:

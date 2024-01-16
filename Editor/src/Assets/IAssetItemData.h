@@ -39,6 +39,7 @@ public:
 	quint32 GetBankId();
 	void SetBankId(quint32 uiNewBankId);
 
+	IManagerModel &GetManagerModel();
 	Project &GetProject();
 
 	QString GetFilter() const;

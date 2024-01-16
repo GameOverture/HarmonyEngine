@@ -646,6 +646,11 @@ void ManagerWidget::on_assetTree_pressed(const QModelIndex &index)
 	static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_AssetInspector))->SetFocusedAssets(m_pModel->GetAssetType(), selectedAssetsList);
 }
 
+void ManagerWidget::on_assetTree_doubleClicked(const QModelIndex &index)
+{
+	MainWindow::FocusAuxWidget(AUXTAB_AssetInspector);
+}
+
 void ManagerWidget::on_cmbBanks_currentIndexChanged(int index)
 {
 	RefreshInfo();
