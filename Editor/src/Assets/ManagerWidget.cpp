@@ -25,6 +25,7 @@
 #include "DlgImportTileSheet.h"
 #include "SourceModel.h"
 #include "SourceFile.h"
+#include "AssetMimeData.h"
 
 #include <QUndoCommand>
 #include <QMessageBox>
@@ -143,6 +144,33 @@ ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 	if(pMimeData == nullptr)
 		return;
 
+	// Special case for Source Manager, close any source files that are open in any editor. Abort if any of them are dirty
+	if(static_cast<ManagerWidget *>(parent())->GetModel().GetAssetType() == ASSETMAN_Source)
+	{
+		ManagerWidget *pManagerWidget = static_cast<ManagerWidget *>(parent());
+		Project &projRef = pManagerWidget->GetModel().GetProjOwner();
+
+		// Acquire a list of the SourceFiles being moved using the Project and mime data's assetUUIDs
+		QList<SourceFile *> srcFileList;
+		QJsonArray assetsArray = static_cast<const AssetMimeData *>(pMimeData)->GetAssetsArray(ASSETMAN_Source);
+		for(int i = 0; i < assetsArray.size(); ++i)
+		{
+			QJsonObject assetObj = assetsArray[i].toObject();
+
+			TreeModelItemData *pFoundAsset = projRef.FindItemData(assetObj["assetUUID"].toString());
+			if(pFoundAsset)
+				srcFileList.push_back(static_cast<SourceFile *>(pFoundAsset));
+		}
+
+		// Close any open editors that are editing the SourceFiles being moved
+		for(SourceFile *pSrcFile : srcFileList)
+		{
+			if(pSrcFile->TryCloseAllCodeEditors() == false)
+				return;
+		}
+	}
+
+
 	QPixmap pixmap = indexes.first().data(Qt::DecorationRole).value<QPixmap>();
 	QDrag *pDrag = new QDrag(this);
 	pDrag->setPixmap(pixmap);
@@ -154,31 +182,47 @@ ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 
 /*virtual*/ void ManagerTreeView::dropEvent(QDropEvent *pEvent) /*override*/
 {
-	// Do a special case for Source Manager - move files to correct directory location
-	if(static_cast<ManagerWidget *>(parent())->GetModel().GetAssetType() == ASSETMAN_Source)
+	if(static_cast<ManagerWidget *>(parent())->GetModel().GetAssetType() != ASSETMAN_Source)
+		QTreeView::dropEvent(pEvent);
+	else // Do a special case for Source Manager - move files to correct directory location
 	{
-		SourceModel &sourceModelRef = static_cast<SourceModel &>(static_cast<ManagerWidget *>(parent())->GetModel());
+		// Acquire the Project using this ManagerTreeView's parent (which is a ManagerWidget)
+		ManagerWidget *pManagerWidget = static_cast<ManagerWidget *>(parent());
+		Project &projRef = pManagerWidget->GetModel().GetProjOwner();
 
-		// TODO - indexAt(pEvent->pos()) is bullshit and gives invalid 'internalPointer'
-		HyGuiLog("TODO: Source Files in explorer need to be moved manually to this new location - this is not implemented yet in editor. Everything else (CMake, build, etc) is correct ", LOGTYPE_Warning);
+		// Acquire a list of the SourceFiles being moved using the Project and mime data's assetUUIDs
+		QList<SourceFile *> srcFileList;
+		const AssetMimeData *pMimeData = static_cast<const AssetMimeData *>(pEvent->mimeData());
+		QJsonArray assetsArray = pMimeData->GetAssetsArray(ASSETMAN_Source);
+		for(int i = 0; i < assetsArray.size(); ++i)
+		{
+			QJsonObject assetObj = assetsArray[i].toObject();
+
+			TreeModelItemData *pFoundAsset = projRef.FindItemData(assetObj["assetUUID"].toString());
+			if(pFoundAsset)
+				srcFileList.push_back(static_cast<SourceFile *>(pFoundAsset));
+		}
+
+		// Store a list of the old paths (before the move)
+		QStringList sOldPathList;
+		for(SourceFile *pSrcFile : srcFileList)
+			sOldPathList.push_back(pSrcFile->GetAbsMetaFilePath());
+
+		// Move items to new filter location
+		QTreeView::dropEvent(pEvent);
+
+		// Store a list of the new paths (after the move)
+		QStringList sNewPathList;
+		for(SourceFile *pSrcFile : srcFileList)
+			sNewPathList.push_back(pSrcFile->GetAbsMetaFilePath());
 		
-		//QModelIndex dropIndex = indexAt(pEvent->pos());
-		//TreeModelItem *pItem = static_cast<TreeModelItem *>(dropIndex.internalPointer());
-
-		//QVariant variant = sourceModelRef.data(dropIndex, Qt::UserRole);
-		//TreeModelItemData *pDropItemData = variant.value<TreeModelItemData *>();
-
-		//QString sFilterPath = sourceModelRef.AssembleFilter(pDropItemData, true);
-
-		//QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
-		//static_cast<ManagerWidget *>(parent())->GetSelected(selectedAssetsList, selectedFiltersList, true);
-
-		//for(IAssetItemData *pAsset : selectedAssetsList)
-		//{
-		//}
+		// Finally, move the source files on disk
+		for(int i = 0; i < sOldPathList.size(); ++i)
+		{
+			if(QFile::rename(sOldPathList[i], sNewPathList[i]) == false)
+				HyGuiLog("ManagerTreeView::dropEvent() failed to rename file: " % sOldPathList[i] % " to " % sNewPathList[i], LOGTYPE_Error);
+		}
 	}
-
-	QTreeView::dropEvent(pEvent);
 }
 
 ManagerWidget::ManagerWidget(QWidget *pParent /*= nullptr*/) :
