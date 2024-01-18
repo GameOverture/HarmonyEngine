@@ -24,6 +24,7 @@
 #include "DlgAssetProperties.h"
 #include "DlgImportTileSheet.h"
 #include "SourceModel.h"
+#include "SourceFile.h"
 
 #include <QUndoCommand>
 #include <QMessageBox>
@@ -720,13 +721,36 @@ void ManagerWidget::on_actionRename_triggered()
 
 	DlgInputName *pDlg = nullptr;
 	if(m_pModel->GetAssetType() == ASSETMAN_Source)
-		pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText(), HyGlobal::FileNameValidator(), nullptr, nullptr);
+	{
+		if(pItemToBeRenamed->IsAssetItem() && static_cast<SourceFile *>(pItemToBeRenamed)->TryCloseAllCodeEditors() == false)
+		{
+			HyGuiLog("Rename canceled (" % pItemToBeRenamed->GetText() % ")", LOGTYPE_Normal);
+			return;
+		}
+
+		std::function<QString(QString)> fpErrorCheck = [pItemToBeRenamed](QString sNewName) -> QString
+		{
+			QFileInfo srcFileInfo(static_cast<SourceFile *>(pItemToBeRenamed)->GetAbsMetaFilePath());
+			if(QFile::exists(srcFileInfo.absoluteDir().filePath(sNewName)))
+				return QString("A file with this name already exists");
+
+			return QString();
+		};
+		pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText(), HyGlobal::FileNameValidator(), fpErrorCheck, nullptr);
+	}
 	else
 		pDlg = new DlgInputName("Rename " % pItemToBeRenamed->GetText(), pItemToBeRenamed->GetText(), HyGlobal::FreeFormValidator(), nullptr, nullptr);
 
 	if(pDlg->exec() == QDialog::Accepted)
 	{
 		m_pModel->Rename(pItemToBeRenamed, pDlg->GetName());
+
+		// TODO: Ask to save corresponding file in same directory (.h <-> .cpp)
+		//if(m_pModel->GetAssetType() == ASSETMAN_Source)
+		//{
+		//	QFileInfo srcFileInfo(static_cast<SourceFile *>(pItemToBeRenamed)->GetAbsMetaFilePath());
+		//	srcFileInfo.dir()
+		//}
 
 		// HACK: I can't seem to make this ProxyModel resort/refresh other than by calling this?
 		m_pModel->GetProjOwner().SaveUserData(); // Save expanded state so below hack works nicer

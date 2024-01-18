@@ -69,6 +69,20 @@ void SourceFile::RemoveCodeEditor(WgtCodeEditor *pCodeEditor)
 	m_CodeEditorSet.remove(pCodeEditor);
 }
 
+bool SourceFile::TryCloseAllCodeEditors() // Returns false after the first fail
+{
+	while(m_CodeEditorSet.isEmpty() == false)
+	{
+		WgtCodeEditor *pCodeEditor = (*m_CodeEditorSet.begin());
+		if(pCodeEditor->Close(this))
+			RemoveCodeEditor(pCodeEditor);
+		else
+			return false;
+	}
+
+	return true;
+}
+
 QIcon SourceFile::GetSourceIcon() const
 {
 	SubIcon eSubIcon = SUBICON_None;

@@ -49,7 +49,7 @@ QString TreeModelItemData::GetText() const
 	return m_sName;
 }
 
-void TreeModelItemData::SetText(QString sText)
+/*virtual*/ void TreeModelItemData::SetText(QString sText)
 {
 	m_sName = sText;
 }

@@ -22,13 +22,19 @@ void DlgInputName::CtorInit(QString sDlgTitle, QString sCurName, const QValidato
 	setWindowIcon(QIcon(":/icons16x16/generic-rename.png"));
 
 	ui->txtName->setValidator(pValidator);
-	ui->txtName->setText(sCurName);
 
 	QFileInfo curFileName(sCurName);
 	if(curFileName.suffix().isEmpty())
-		ui->txtName->selectAll();
+	{
+		ui->txtName->setText(sCurName);
+		ui->txtExtension->setVisible(false);
+	}
 	else
-		ui->txtName->setSelection(0, ui->txtName->text().length() - curFileName.suffix().length() - 1);
+	{
+		ui->txtName->setText(curFileName.baseName());
+		ui->txtExtension->setText("." + curFileName.suffix());
+	}
+	ui->txtName->selectAll();
 
 	ui->lblName->setText("Name:");
 }
@@ -72,7 +78,7 @@ void DlgInputName::on_txtName_textChanged(const QString &arg1)
 
 QString DlgInputName::GetName()
 {
-	return ui->txtName->text();
+	return ui->txtName->text() + ui->txtExtension->text();
 }
 
 void DlgInputName::ErrorCheck()

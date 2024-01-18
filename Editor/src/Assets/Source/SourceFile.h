@@ -40,6 +40,7 @@ public:
 
 	void AddCodeEditor(WgtCodeEditor *pCodeEditor);
 	void RemoveCodeEditor(WgtCodeEditor *pCodeEditor);
+	bool TryCloseAllCodeEditors();
 
 	QIcon GetSourceIcon() const;
 
