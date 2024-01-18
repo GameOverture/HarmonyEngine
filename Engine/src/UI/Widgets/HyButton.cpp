@@ -169,7 +169,9 @@ void HyButton::InvokeButtonClicked()
 {
 	if(m_fpBtnClickedCallback)
 		m_fpBtnClickedCallback(this, m_pBtnClickedParam);
-	m_ClickedSound.PlayOneShot(true);
+
+	if(m_ClickedSound.IsLoadDataValid() && m_ClickedSound.IsLoaded())
+		m_ClickedSound.PlayOneShot(true);
 
 	HyButtonState eCurState = GetBtnState();
 	m_Panel.SetSpriteState(eCurState);
