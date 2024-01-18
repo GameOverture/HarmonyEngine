@@ -232,6 +232,17 @@ void IManagerModel::RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeMo
 		}
 	}
 
+	// Special Case: Close source files that are about to be deleted, abort if they don't close
+	if(m_eASSET_TYPE == ASSETMAN_Source)
+	{
+		for(IAssetItemData *pAsset : assetsList)
+		{
+			SourceFile *pSrcFile = static_cast<SourceFile *>(pAsset);
+			if(pSrcFile->TryCloseAllCodeEditors() == false)
+				return;
+		}
+	}
+
 	// No dependencies found, resume with deleting
 	if(assetsList.size() > 0)
 	{
