@@ -17,16 +17,17 @@
 void DlgInputName::CtorInit(QString sDlgTitle, QString sCurName, const QValidator *pValidator)
 {
 	ui->setupUi(this);
+	m_sOriginalName = sCurName;
 
 	setWindowTitle(sDlgTitle);
 	setWindowIcon(QIcon(":/icons16x16/generic-rename.png"));
 
 	ui->txtName->setValidator(pValidator);
 
-	QFileInfo curFileName(sCurName);
+	QFileInfo curFileName(m_sOriginalName);
 	if(curFileName.suffix().isEmpty())
 	{
-		ui->txtName->setText(sCurName);
+		ui->txtName->setText(m_sOriginalName);
 		ui->txtExtension->setVisible(false);
 	}
 	else
@@ -79,6 +80,11 @@ void DlgInputName::on_txtName_textChanged(const QString &arg1)
 QString DlgInputName::GetName()
 {
 	return ui->txtName->text() + ui->txtExtension->text();
+}
+
+QString DlgInputName::GetOldName()
+{
+	return m_sOriginalName;
 }
 
 void DlgInputName::ErrorCheck()

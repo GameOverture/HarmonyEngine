@@ -21,6 +21,7 @@ class DlgInputName : public QDialog
 {
 	Q_OBJECT
 
+	QString									m_sOriginalName;
 	std::function<QString(QString)>			m_fpErrorCheckFunc;
 	
 	void CtorInit(QString sDlgTitle, QString sCurName, const QValidator *pValidator);
@@ -31,6 +32,7 @@ public:
 	~DlgInputName();
 	
 	QString GetName();
+	QString GetOldName();
 	
 private Q_SLOTS:
 	void on_txtName_textChanged(const QString &arg1);

@@ -745,12 +745,39 @@ void ManagerWidget::on_actionRename_triggered()
 	{
 		m_pModel->Rename(pItemToBeRenamed, pDlg->GetName());
 
-		// TODO: Ask to save corresponding file in same directory (.h <-> .cpp)
-		//if(m_pModel->GetAssetType() == ASSETMAN_Source)
-		//{
-		//	QFileInfo srcFileInfo(static_cast<SourceFile *>(pItemToBeRenamed)->GetAbsMetaFilePath());
-		//	srcFileInfo.dir()
-		//}
+		// Ask to rename old corresponding TreeModelItemData in same filter/directory (.h <-> .cpp) to new name
+		if(m_pModel->GetAssetType() == ASSETMAN_Source && pItemToBeRenamed->IsAssetItem())
+		{
+			SourceFile *pRenamedSrcFile = static_cast<SourceFile *>(pItemToBeRenamed);
+			QString sOldName = QFileInfo(pDlg->GetOldName()).baseName();
+			QString sNewName = QFileInfo(pDlg->GetName()).baseName();
+
+			TreeModelItemData *pFilter = m_pModel->FindTreeItemFilter(pItemToBeRenamed);
+			QList<TreeModelItemData *> itemList = m_pModel->GetItemsRecursively(m_pModel->FindIndex<TreeModelItemData *>(pFilter, 0));
+
+			if(pRenamedSrcFile->GetMetaFileExt() == ".h")
+			{
+				for(TreeModelItemData *pItem : itemList)
+				{
+					if(pItem->IsAssetItem() && pItem->GetText() == sOldName % ".cpp")
+					{
+						if(QMessageBox::Yes == QMessageBox::question(this, "Rename Corresponding File", "Also rename " % static_cast<SourceFile *>(pItem)->GetFilter() % "/" % sOldName % ".cpp to " % sNewName % ".cpp?", QMessageBox::Yes | QMessageBox::No))
+							m_pModel->Rename(pItem, sNewName % ".cpp");
+					}
+				}
+			}
+			else if(pRenamedSrcFile->GetMetaFileExt() == ".cpp")
+			{
+				for(TreeModelItemData *pItem : itemList)
+				{
+					if(pItem->IsAssetItem() && pItem->GetText() == sOldName % ".h")
+					{
+						if(QMessageBox::Yes == QMessageBox::question(this, "Rename Corresponding File", "Also rename " % static_cast<SourceFile *>(pItem)->GetFilter() % "/" % sOldName % ".h to " % sNewName % ".h?", QMessageBox::Yes | QMessageBox::No))
+							m_pModel->Rename(pItem, sNewName % ".h");
+					}
+				}
+			}
+		}
 
 		// HACK: I can't seem to make this ProxyModel resort/refresh other than by calling this?
 		m_pModel->GetProjOwner().SaveUserData(); // Save expanded state so below hack works nicer

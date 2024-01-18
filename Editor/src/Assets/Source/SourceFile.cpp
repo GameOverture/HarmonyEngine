@@ -19,7 +19,7 @@ SourceFile::SourceFile(IManagerModel &modelRef,
 					   uint uiErrors) :
 	IAssetItemData(modelRef,
 		QFileInfo(fileName).suffix().compare("cpp", Qt::CaseInsensitive) == 0 ? ITEM_Source : ITEM_Header,
-		uuid, uiChecksum, 0, fileName, QFileInfo(fileName).suffix(), uiErrors)
+		uuid, uiChecksum, 0, fileName, "." + QFileInfo(fileName).suffix(), uiErrors)
 {
 }
 
