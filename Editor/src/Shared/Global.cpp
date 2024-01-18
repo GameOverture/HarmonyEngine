@@ -51,6 +51,7 @@
 	sm_sItemNames[ITEM_Text] = "Text";
 	sm_sItemNames[ITEM_Spine] = "Spine";
 	sm_sItemNames[ITEM_Sprite] = "Sprite";
+	sm_sItemNames[ITEM_Shader] = "Shader";
 	sm_sItemNames[ITEM_Prefab] = "Prefab";
 	sm_sItemNames[ITEM_Entity] = "Entity";
 	sm_sItemNames[ITEM_Entity3d] = "Entity3d";
@@ -70,6 +71,7 @@
 	sm_sItemNamesPlural[ITEM_Text] = "Texts";
 	sm_sItemNamesPlural[ITEM_Spine] = "Spine";
 	sm_sItemNamesPlural[ITEM_Sprite] = "Sprites";
+	sm_sItemNamesPlural[ITEM_Shader] = "Shaders";
     sm_sItemNamesPlural[ITEM_Prefab] = "Prefabs";
 	sm_sItemNamesPlural[ITEM_Entity] = "Entities";
 	sm_sItemNamesPlural[ITEM_Entity3d] = "Entities3d";
@@ -164,6 +166,7 @@
 	sm_ItemColors[ITEM_Text] = QColor(179, 179, 179);
 	sm_ItemColors[ITEM_Spine] = QColor(209, 159, 223);
 	sm_ItemColors[ITEM_Sprite] = QColor(129, 166, 225);
+	sm_ItemColors[ITEM_Shader] = QColor(255, 128, 0);
 	sm_ItemColors[ITEM_Prefab] = QColor(203, 233, 131);
 	sm_ItemColors[ITEM_Entity] = QColor(128, 128, 128);
 	sm_ItemColors[ITEM_Entity3d] = QColor(128, 128, 128);
@@ -186,7 +189,7 @@
 
 	sm_pCodeNameValidator = new QRegExpValidator(QRegExp("[A-Za-z_]+[A-Za-z0-9_]*"));					// Can't begin with number. Alphanumberic and underscore only.
 	sm_pFreeFormValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-\\s]*"));				// Alphanumeric and valid filename symbols. Allows whitespace.
-	sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-]*"));					// Alphanumeric and valid filename symbols.
+	sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\.\\(\\)|_\\-]*"));				// Alphanumeric and valid filename symbols. Allows periods '.'
 	sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_\\-]*"));					// Alphanumeric and valid filename symbols. Allows forward slashes.
 	sm_pNumbersValidator  = new QRegExpValidator(QRegExp("[0-9]*"));									// Numbers only
 	sm_pVector2dValidator = new QRegExpValidator(QRegExp("\\([0-9]*\\.?[0-9]*,[0-9]*\\.?[0-9]*\\)"));	// When user needs to input values for a 2d vector
@@ -207,6 +210,7 @@
 	list.append(ITEM_Text);
 	list.append(ITEM_Spine);
 	list.append(ITEM_Sprite);
+	list.append(ITEM_Shader);
 	list.append(ITEM_Prefab);
 	list.append(ITEM_Entity);
 	list.append(ITEM_Entity3d);
@@ -232,6 +236,7 @@
 	list.append(ITEM_Text);
 	list.append(ITEM_Spine);
 	list.append(ITEM_Sprite);
+	list.append(ITEM_Shader);
 	list.append(ITEM_Prefab);
 	list.append(ITEM_Entity);
 	list.append(ITEM_Entity3d);

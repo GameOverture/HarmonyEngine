@@ -255,5 +255,14 @@
         <file>icons16x16/callback-rename.png</file>
         <file>icons16x16/entity-snapping.png</file>
         <file>styles/Decemberween.xml</file>
+        <file>icons16x16/items/Shader.png</file>
+        <file>icons16x16/items/Shader-Close.png</file>
+        <file>icons16x16/items/Shader-Delete.png</file>
+        <file>icons16x16/items/Shader-Dirty.png</file>
+        <file>icons16x16/items/Shader-New.png</file>
+        <file>icons16x16/items/Shader-Open.png</file>
+        <file>icons16x16/items/Shader-Pending.png</file>
+        <file>icons16x16/items/Shader-Settings.png</file>
+        <file>icons16x16/items/Shader-Warning.png</file>
     </qresource>
 </RCC>

@@ -62,6 +62,7 @@ enum ItemType
 	ITEM_Text,
 	ITEM_Spine,
 	ITEM_Sprite,
+	ITEM_Shader,
 	ITEM_Prefab,
 	ITEM_Entity,
 	ITEM_Entity3d,

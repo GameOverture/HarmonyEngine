@@ -23,7 +23,12 @@ void DlgInputName::CtorInit(QString sDlgTitle, QString sCurName, const QValidato
 
 	ui->txtName->setValidator(pValidator);
 	ui->txtName->setText(sCurName);
-	ui->txtName->selectAll();
+
+	QFileInfo curFileName(sCurName);
+	if(curFileName.suffix().isEmpty())
+		ui->txtName->selectAll();
+	else
+		ui->txtName->setSelection(0, ui->txtName->text().length() - curFileName.suffix().length() - 1);
 
 	ui->lblName->setText("Name:");
 }
