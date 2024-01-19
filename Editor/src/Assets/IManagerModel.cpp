@@ -239,7 +239,10 @@ void IManagerModel::RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeMo
 		{
 			SourceFile *pSrcFile = static_cast<SourceFile *>(pAsset);
 			if(pSrcFile->TryCloseAllCodeEditors() == false)
+			{
+				HyGuiLog("Delete aborted because source file '" % pSrcFile->GetName() % "' is still open", LOGTYPE_Normal);
 				return;
+			}
 		}
 	}
 
