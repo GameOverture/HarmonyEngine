@@ -187,7 +187,7 @@
 	sm_Themes[THEME_Lappy486] = "Lappy 486";
 	sm_Themes[THEME_Compe] = "Compe";
 
-	sm_pCodeNameValidator = new QRegExpValidator(QRegExp("[A-Za-z_]+[A-Za-z0-9_]*"));					// Can't begin with number. Alphanumberic and underscore only.
+	sm_pCodeNameValidator = new QRegExpValidator(QRegExp("^[A-Za-z_]+[A-Za-z0-9_]*$"));					// Can't begin with number. Alphanumberic and underscore only.
 	sm_pFreeFormValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-\\s]*"));				// Alphanumeric and valid filename symbols. Allows whitespace.
 	sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\.\\(\\)|_\\-]*"));				// Alphanumeric and valid filename symbols. Allows periods '.'
 	sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_\\-]*"));					// Alphanumeric and valid filename symbols. Allows forward slashes.

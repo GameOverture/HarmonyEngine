@@ -789,7 +789,7 @@ void EntityWidget::on_actionRenameItem_triggered()
 
 	DlgInputName dlg("Rename " % pEntTreeItemData->GetText(),
 		pEntTreeItemData->GetCodeName(),
-		HyGlobal::FileNameValidator(),
+		HyGlobal::CodeNameValidator(),
 		[&](QString sTest) -> QString {
 			QString sGenName = static_cast<EntityModel *>(m_ItemRef.GetModel())->GenerateCodeName(sTest);
 			if(sGenName == sTest)

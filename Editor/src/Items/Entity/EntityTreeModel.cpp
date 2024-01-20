@@ -815,6 +815,14 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 
 QString EntityTreeModel::GenerateCodeName(QString sDesiredName) const
 {
+	// Use 'HyGlobal::CodeNameValidator()' (QRegExpValidator) to make sure 'sDesiredName' is valid
+	int pos = 0;
+	if(HyGlobal::CodeNameValidator()->validate(sDesiredName, pos) != QValidator::Acceptable)
+		sDesiredName.remove(QRegExp("[^a-zA-Z0-9_]"));
+
+	if(sDesiredName.isEmpty())
+		sDesiredName = "unnamed";
+
 	QList<EntityTreeItemData *> childList;
 	QList<EntityTreeItemData *> shapeList;
 	GetTreeItemData(childList, shapeList);
