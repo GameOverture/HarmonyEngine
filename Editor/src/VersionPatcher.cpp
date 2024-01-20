@@ -1393,7 +1393,13 @@
 						QRect rAlphaCrop(QPoint(metaAssetObj["cropLeft"].toInt(), metaAssetObj["cropTop"].toInt()),
 										 QPoint(metaAssetObj["cropRight"].toInt(), metaAssetObj["cropBottom"].toInt()));
 
-						quint64 uiCropMask = (quint64(rAlphaCrop.x()) << 48) | (quint64(rAlphaCrop.y()) << 32) | (quint64(rAlphaCrop.width()) << 16) | quint64(rAlphaCrop.height());
+						// NOTE: QRect (rAlphaCrop) needs to be converted to L,T,R,B margins
+						quint16 uiCropLeft = rAlphaCrop.left();
+						quint16 uiCropTop = rAlphaCrop.top();
+						quint16 uiCropRight = metaAssetObj["width"].toInt() - (rAlphaCrop.left() + rAlphaCrop.width());
+						quint16 uiCropBottom = metaAssetObj["height"].toInt() - (rAlphaCrop.top() + rAlphaCrop.height());
+						
+						quint64 uiCropMask = (quint64(uiCropLeft) << 48) | (quint64(uiCropTop) << 32) | (quint64(uiCropRight) << 16) | quint64(uiCropBottom);
 						
 						dataTextureAssetObj.insert("cropMaskHi", QJsonValue(static_cast<qint64>(uiCropMask >> 32)));
 						dataTextureAssetObj.insert("cropMaskLo", QJsonValue(static_cast<qint64>(uiCropMask & 0xFFFFFFFF)));
@@ -1417,8 +1423,13 @@
 	for(int iMetaAssetIndex = 0; iMetaAssetIndex < metaAssetsArray.size(); ++iMetaAssetIndex)
 	{
 		QJsonObject metaAssetObj = metaAssetsArray[iMetaAssetIndex].toObject();
-		metaAssetObj.insert("cropRight", metaAssetObj["width"].toInt() - (metaAssetObj["cropRight"].toInt()+1));
-		metaAssetObj.insert("cropBottom", metaAssetObj["height"].toInt() - (metaAssetObj["cropBottom"].toInt()+1));
+
+		// NOTE: Using 2 QPoint constructor which stores differently than if passed 4 scalars
+		QRect rAlphaCrop(QPoint(metaAssetObj["cropLeft"].toInt(), metaAssetObj["cropTop"].toInt()),
+						 QPoint(metaAssetObj["cropRight"].toInt(), metaAssetObj["cropBottom"].toInt()));
+
+		metaAssetObj.insert("cropRight", metaAssetObj["width"].toInt() - (rAlphaCrop.left() + rAlphaCrop.width()));
+		metaAssetObj.insert("cropBottom", metaAssetObj["height"].toInt() - (rAlphaCrop.top() + rAlphaCrop.height()));
 
 		metaAssetsArray.replace(iMetaAssetIndex, metaAssetObj);
 	}

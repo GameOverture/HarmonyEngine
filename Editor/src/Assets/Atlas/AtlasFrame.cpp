@@ -202,16 +202,17 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	m_uiWidth = newImage.width();
 	m_uiHeight = newImage.height();
 
-	QRect rAlphaCrop; // NOTE: QRect needs to be converted to L,T,R,B margins
+	QRect rAlphaCrop; 
 	if(m_bIsSubAtlas == false)
 		rAlphaCrop = ImagePacker::crop(newImage);
 	else // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
 		rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
 
-	m_uiCropLeft = rAlphaCrop.x();
-	m_uiCropTop = rAlphaCrop.y();
-	m_uiCropRight = newImage.width() - (rAlphaCrop.right()+1);
-	m_uiCropBottom = newImage.height() - (rAlphaCrop.bottom()+1);
+	// NOTE: QRect (rAlphaCrop) needs to be converted to L,T,R,B margins
+	m_uiCropLeft = rAlphaCrop.left();
+	m_uiCropTop = rAlphaCrop.top();
+	m_uiCropRight = newImage.width() - (rAlphaCrop.left()+rAlphaCrop.width());
+	m_uiCropBottom = newImage.height() - (rAlphaCrop.top()+rAlphaCrop.height());
 
 	// DO NOT clear 'm_iTextureIndex' as it's needed in the Repack()
 

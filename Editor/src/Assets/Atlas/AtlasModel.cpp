@@ -583,12 +583,13 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiB
 
 	QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
 	if(bIsSubAtlas == false) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
-		rAlphaCrop = ImagePacker::crop(newImage); // NOTE: ImagePacker::crop() returned QRect needs to be converted to L,T,R,B margins
+		rAlphaCrop = ImagePacker::crop(newImage);
 
-	quint16 uiCropLeft = rAlphaCrop.x();
-	quint16 uiCropTop = rAlphaCrop.y();
-	quint16 uiCropRight = newImage.width() - (rAlphaCrop.right()+1);
-	quint16 uiCropBottom = newImage.height() - (rAlphaCrop.bottom()+1);
+	// NOTE: QRect (rAlphaCrop) needs to be converted to L,T,R,B margins
+	quint16 uiCropLeft = rAlphaCrop.left();
+	quint16 uiCropTop = rAlphaCrop.top();
+	quint16 uiCropRight = newImage.width() - (rAlphaCrop.left() + rAlphaCrop.width());
+	quint16 uiCropBottom = newImage.height() - (rAlphaCrop.top() + rAlphaCrop.height());
 
 	HyTextureInfo info(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0);
 	AtlasFrame *pNewAsset = new AtlasFrame(*this,

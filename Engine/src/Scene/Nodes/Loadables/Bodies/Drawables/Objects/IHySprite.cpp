@@ -418,7 +418,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetHeight(float fPercent /*= 1.0f*/)
 template<typename NODETYPE, typename ENTTYPE>
 float IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth(float fPercent /*= 1.0f*/)
 {
-	return GetWidth(fPercent);
+	return GetFrameWidth(this->m_uiState, m_uiCurFrame, fPercent);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -442,7 +442,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth(uint32 uiStateIndex, uint32 ui
 template<typename NODETYPE, typename ENTTYPE>
 float IHySprite<NODETYPE, ENTTYPE>::GetFrameHeight(float fPercent /*= 1.0f*/)
 {
-	return GetHeight(fPercent);
+	return GetFrameHeight(this->m_uiState, m_uiCurFrame, fPercent);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -548,6 +548,52 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetStateOffset(uint32 uiStateIndex)
 	}
 	
 	return vMaxOffset;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHySprite<NODETYPE, ENTTYPE>::IsBoundsIncludeAlphaCrop()
+{
+	return IsBoundsIncludeAlphaCrop(this->m_uiState);
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHySprite<NODETYPE, ENTTYPE>::IsBoundsIncludeAlphaCrop(uint32 uiStateIndex)
+{
+	if(this->AcquireData() == nullptr) {
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::IsBoundsIncludeAlphaCrop invoked on null data");
+		return false;
+	}
+	return (m_AnimCtrlAttribList[uiStateIndex] & ANIMCTRLATTRIB_BoundsIncludeAlphaCrop) != 0;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHySprite<NODETYPE, ENTTYPE>::SetBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop)
+{
+	SetBoundsIncludeAlphaCrop(bIncludeAlphaCrop, this->m_uiState);
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHySprite<NODETYPE, ENTTYPE>::SetBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop, uint32 uiStateIndex)
+{
+	while(uiStateIndex >= m_AnimCtrlAttribList.size())
+		m_AnimCtrlAttribList.push_back(0);
+
+	if(bIncludeAlphaCrop)
+		m_AnimCtrlAttribList[uiStateIndex] |= ANIMCTRLATTRIB_BoundsIncludeAlphaCrop;
+	else
+		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_BoundsIncludeAlphaCrop;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHySprite<NODETYPE, ENTTYPE>::SetAllBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop)
+{
+	if(this->AcquireData() == nullptr) {
+		HyLogWarning("IHySprite<NODETYPE, ENTTYPE>::SetAllBoundsIncludeAlphaCrop invoked on null data. This call will have no effect!");
+		return;
+	}
+
+	for(uint32 i = 0; i < this->UncheckedGetData()->GetNumStates(); ++i)
+		SetBoundsIncludeAlphaCrop(bIncludeAlphaCrop, i);
 }
 
 template<typename NODETYPE, typename ENTTYPE>

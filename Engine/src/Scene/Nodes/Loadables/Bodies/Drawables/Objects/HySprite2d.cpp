@@ -48,14 +48,30 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 		return;
 	}
 
-	glm::vec2 vFrameOffset = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame).vOFFSET;
-
 	float fHalfWidth = GetFrameWidth(0.5f);
 	float fHalfHeight = GetFrameHeight(0.5f);
 	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
 		return;
 
-	shapeOut.SetAsBox(fHalfWidth, fHalfHeight, glm::vec2(vFrameOffset.x + fHalfWidth, vFrameOffset.y + fHalfHeight), 0.0f);
+	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
+	glm::vec2 ptBoxCenter(frameRef.vOFFSET.x + fHalfWidth, frameRef.vOFFSET.y + fHalfHeight);
+
+	if((m_AnimCtrlAttribList[m_uiState] & ANIMCTRLATTRIB_BoundsIncludeAlphaCrop) != 0)
+	{
+		glm::vec2 ptBotLeft = ptBoxCenter - glm::vec2(fHalfWidth, fHalfHeight);
+		glm::vec2 ptTopRight = ptBoxCenter + glm::vec2(fHalfWidth, fHalfHeight);
+
+		ptBotLeft.x -= frameRef.rCROP_MARGINS.left;
+		ptBotLeft.y -= frameRef.rCROP_MARGINS.bottom;
+		ptTopRight.x += frameRef.rCROP_MARGINS.right;
+		ptTopRight.y += frameRef.rCROP_MARGINS.top;
+
+		fHalfWidth = (ptTopRight.x - ptBotLeft.x) * 0.5f;
+		fHalfHeight = (ptTopRight.y - ptBotLeft.y) * 0.5f;
+		ptBoxCenter = ptBotLeft + glm::vec2(fHalfWidth, fHalfHeight);
+	}
+
+	shapeOut.SetAsBox(fHalfWidth, fHalfHeight, ptBoxCenter, 0.0f);
 }
 
 void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack /*= HySprite2d::NullAnimCallback*/, void *pParam /*= nullptr*/)

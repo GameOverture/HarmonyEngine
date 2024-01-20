@@ -19,7 +19,7 @@ template<typename NODETYPE, typename ENTTYPE>
 class IHySprite : public NODETYPE
 {
 protected:
-	// Array of BYTE's where each BYTE describes how each animation state is supposed to play
+	// Array of BYTE's where each BYTE describes how each state is supposed to play
 	enum AnimCtrlAttribs
 	{
 		ANIMCTRLATTRIB_Loop						= 1 << 0,
@@ -27,7 +27,8 @@ protected:
 		ANIMCTRLATTRIB_Bounce					= 1 << 2,
 		ANIMCTRLATTRIB_IsBouncing				= 1 << 3,	// True if anim state is supposed to 'bounce' animation, AND it is currently in the reverse/bounce part of the sequence
 		ANIMCTRLATTRIB_Finished					= 1 << 4,	// True if a non-looping animation finishes its full sequence and reset to false whenever any animation is played
-		ANIMCTRLATTRIB_Invalid					= 1 << 5
+		ANIMCTRLATTRIB_Invalid					= 1 << 5,
+		ANIMCTRLATTRIB_BoundsIncludeAlphaCrop	= 1 << 6,	// True if the bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
 
 		// Do not exceed '8' attributes, or else increase uint8s
 	};
@@ -88,6 +89,12 @@ public:
 
 	glm::ivec2 GetCurFrameOffset();
 	glm::ivec2 GetStateOffset(uint32 uiStateIndex);
+
+	bool IsBoundsIncludeAlphaCrop();												// Returns true if the current state's bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
+	bool IsBoundsIncludeAlphaCrop(uint32 uiStateIndex);								// Returns true if the specified state's bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
+	void SetBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop);							// Set whether the current state's bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
+	void SetBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop, uint32 uiStateIndex);	// Set whether the specified state's bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
+	void SetAllBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop);						// Must have valid data! Set whether ALL states' bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
 
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;
