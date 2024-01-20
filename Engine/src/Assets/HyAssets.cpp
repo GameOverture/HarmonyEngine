@@ -169,9 +169,10 @@ IHyFile *HyAssets::GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum
 	{
 	case HYFILE_Atlas: {
 		HyRectangle<float> tmp;
+		uint64 uiCropMask = 0;
 		for(uint32 i = 0; i < m_FilesMap[HYFILE_Atlas].m_uiNumFiles; ++i)
 		{
-			if(static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetBankId() == uiBankId && static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetUvRect(uiAssetChecksum, tmp))
+			if(static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetBankId() == uiBankId && static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetUvRect(uiAssetChecksum, tmp, uiCropMask))
 				return &static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i];
 		}
 		break; }
@@ -203,11 +204,11 @@ void HyAssets::SetAuxiliaryFile(HyAuxiliaryFileHandle hHandle, IHyFile *pFile)
 	m_AuxiliaryFileMap.insert({ hHandle, pFile });
 }
 
-HyFileAtlas *HyAssets::GetAtlas(uint32 uiChecksum, uint32 uiBankId, HyRectangle<float> &UVRectOut)
+HyFileAtlas *HyAssets::GetAtlas(uint32 uiChecksum, uint32 uiBankId, HyRectangle<float> &UVRectOut, uint64 &uiCropMaskOut)
 {
 	for(uint32 i = 0; i < m_FilesMap[HYFILE_Atlas].m_uiNumFiles; ++i)
 	{
-		if(static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetBankId() == uiBankId && static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetUvRect(uiChecksum, UVRectOut))
+		if(static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetBankId() == uiBankId && static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i].GetUvRect(uiChecksum, UVRectOut, uiCropMaskOut))
 			return &static_cast<HyFileAtlas *>(m_FilesMap[HYFILE_Atlas].m_pFiles)[i];
 	}
 

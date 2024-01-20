@@ -69,11 +69,16 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 			// Repack the affected frames and determine how many textures this repack took
 			for(int i = 0; i < iter.value()->m_FramesList.size(); ++i)
 			{
+				QRect alphaCropRect(iter.value()->m_FramesList[i]->GetCropL(),
+									iter.value()->m_FramesList[i]->GetCropT(),
+									iter.value()->m_FramesList[i]->GetCroppedWidth(),
+									iter.value()->m_FramesList[i]->GetCroppedHeight());
+
 				iter.value()->m_Packer.addItem(iter.value()->m_FramesList[i]->GetSize(),
-					iter.value()->m_FramesList[i]->GetCrop(),
-					iter.value()->m_FramesList[i]->GetChecksum(),
-					iter.value()->m_FramesList[i],
-					m_MetaDir.absoluteFilePath(iter.value()->m_FramesList[i]->ConstructMetaFileName()));
+											   alphaCropRect,
+											   iter.value()->m_FramesList[i]->GetChecksum(),
+											   iter.value()->m_FramesList[i],
+											   m_MetaDir.absoluteFilePath(iter.value()->m_FramesList[i]->ConstructMetaFileName()));
 			}
 
 			SetPackerSettings(pBankData, iter.value()->m_Packer);

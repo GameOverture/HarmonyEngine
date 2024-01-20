@@ -146,8 +146,8 @@ QJsonArray SpriteFramesModel::GetFramesInfo(float &fTotalDurationRef)
 		frameObj.insert("bankId", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetBankId())));
 		frameObj.insert("checksum", QJsonValue(static_cast<qint64>(m_FramesList[i]->m_pFrame->GetChecksum())));
 		frameObj.insert("duration", m_FramesList[i]->m_fDuration);
-		frameObj.insert("offsetX", m_FramesList[i]->m_vOffset.x() + m_FramesList[i]->m_pFrame->GetCrop().left());
-		frameObj.insert("offsetY", m_FramesList[i]->m_vOffset.y() + ((m_FramesList[i]->m_pFrame->GetSize().height() - 1) - m_FramesList[i]->m_pFrame->GetCrop().bottom())); // -1 on height because it's NOT zero based like everything else);
+		frameObj.insert("offsetX", m_FramesList[i]->m_vOffset.x() + m_FramesList[i]->m_pFrame->GetCropL());
+		frameObj.insert("offsetY", m_FramesList[i]->m_vOffset.y() + m_FramesList[i]->m_pFrame->GetCropB());// ((m_FramesList[i]->m_pFrame->GetSize().height() - 1) - m_FramesList[i]->m_pFrame->GetCrop().bottom())); // -1 on height because it's NOT zero based like everything else);
 
 		framesArray.append(frameObj);
 	}
@@ -299,8 +299,8 @@ SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, FileDataPair
 		AtlasFrame *pFrame = static_cast<AtlasFrame *>(requestedAtlasFramesList[i]);
 
 		QJsonObject spriteFrameObj = dataFrameArray[i].toObject();
-		QPoint vOffset(spriteFrameObj["offsetX"].toInt() - pFrame->GetCrop().left(),
-						spriteFrameObj["offsetY"].toInt() - ((pFrame->GetSize().height() - 1) - pFrame->GetCrop().bottom()));  // -1 on height because it's NOT zero based like everything else
+		QPoint vOffset(spriteFrameObj["offsetX"].toInt() - static_cast<int>(pFrame->GetCropL()),
+						spriteFrameObj["offsetY"].toInt() - static_cast<int>(pFrame->GetCropB()));// ((pFrame->GetSize().height() - 1) - pFrame->GetCrop().bottom()));  // -1 on height because it's NOT zero based like everything else
 
 		m_pFramesModel->SetFrameOffset(i, vOffset);
 		m_pFramesModel->DurationFrame(i, spriteFrameObj["duration"].toDouble());

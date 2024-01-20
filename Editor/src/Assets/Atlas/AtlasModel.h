@@ -36,6 +36,8 @@ public:
 	bool IsImageValid(int iWidth, int iHeight, quint32 uiBankId) const;
 	bool IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings) const;
 
+	AtlasFrame *FindFrame(quint32 uiChecksum, quint32 uiBankId) const;
+	AtlasFrame *FindFrame(const QUuid &itemUuidRef, quint32 uiBankId) const;
 	AtlasFrame *GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, bool bIsSubAtlas);
 	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bIsSubAtlas);
 	

@@ -19,23 +19,29 @@ AtlasFrame::AtlasFrame(IManagerModel &modelRef,
 					   quint32 uiChecksum,
 					   quint32 uiBankId,
 					   QString sName,
-					   QRect rAlphaCrop,
+					   quint16 uiCropLeft,
+					   quint16 uiCropTop,
+					   quint16 uiCropRight,
+					   quint16 uiCropBottom,
 					   HyTextureInfo texInfo,
-					   int iW,
-					   int iH,
-					   int iX,
-					   int iY,
+					   quint16 uiW,
+					   quint16 uiH,
+					   quint16 uiX,
+					   quint16 uiY,
 					   int iTextureIndex,
 					   uint uiErrors) :
 	IAssetItemData(modelRef, ITEM_AtlasFrame, uuid, uiChecksum, uiBankId, sName, ".png", uiErrors),
 	m_bIsSubAtlas(bIsSubAtlas),
-	m_iWidth(iW),
-	m_iHeight(iH),
-	m_rAlphaCrop(rAlphaCrop),
+	m_uiWidth(uiW),
+	m_uiHeight(uiH),
+	m_uiCropLeft(uiCropLeft),
+	m_uiCropTop(uiCropTop),
+	m_uiCropRight(uiCropRight),
+	m_uiCropBottom(uiCropBottom),
 	m_TexInfo(texInfo),
 	m_iTextureIndex(iTextureIndex),
-	m_iPosX(iX),
-	m_iPosY(iY)
+	m_uiPosX(uiX),
+	m_uiPosY(uiY)
 {
 }
 
@@ -50,12 +56,49 @@ bool AtlasFrame::IsSubAtlas() const
 
 QSize AtlasFrame::GetSize() const
 {
-	return QSize(m_iWidth, m_iHeight);
+	return QSize(m_uiWidth, m_uiHeight);
 }
 
-QRect AtlasFrame::GetCrop() const
+quint16 AtlasFrame::GetCropL() const
 {
-	return m_rAlphaCrop;
+	return m_uiCropLeft;
+}
+
+quint16 AtlasFrame::GetCropT() const
+{
+	return m_uiCropTop;
+}
+
+quint16 AtlasFrame::GetCropR() const
+{
+	return m_uiCropRight;
+}
+
+quint16 AtlasFrame::GetCropB() const
+{
+	return m_uiCropBottom;
+}
+
+quint16 AtlasFrame::GetCroppedWidth() const
+{
+	return m_uiWidth - m_uiCropLeft - m_uiCropRight;
+}
+
+quint16 AtlasFrame::GetCroppedHeight() const
+{
+	return m_uiHeight - m_uiCropTop - m_uiCropBottom;
+}
+
+// LEFT, TOP, WIDTH, HEIGHT = 16 bits each. Laid out like: 0xLLLLTTTTRRRRBBBBB
+quint64 AtlasFrame::GetCropMask() const
+{
+	return (quint64(m_uiCropLeft) << 48) | (quint64(m_uiCropTop) << 32) | (quint64(m_uiCropRight) << 16) | quint64(m_uiCropBottom);
+}
+
+// LEFT, TOP, RIGHT, BOTTOM = 16 bits each. Laid out like: 0xLLLLTTTTRRRRBBBB
+quint64 AtlasFrame::GetFrameMask() const
+{
+	return (quint64(m_uiPosX) << 48) | (quint64(m_uiPosY) << 32) | (quint64(m_uiPosX + GetCroppedWidth()) << 16) | quint64(m_uiPosY + GetCroppedHeight());
 }
 
 HyTextureFormat AtlasFrame::GetFormat() const
@@ -87,7 +130,7 @@ HyTextureInfo AtlasFrame::GetTextureInfo() const
 
 QPoint AtlasFrame::GetPosition() const
 {
-	return QPoint(m_iPosX, m_iPosY);
+	return QPoint(m_uiPosX, m_uiPosY);
 }
 
 int AtlasFrame::GetTextureIndex() const
@@ -95,14 +138,14 @@ int AtlasFrame::GetTextureIndex() const
 	return m_iTextureIndex;
 }
 
-int AtlasFrame::GetX() const
+quint16 AtlasFrame::GetX() const
 {
-	return m_iPosX;
+	return m_uiPosX;
 }
 
-int AtlasFrame::GetY() const
+quint16 AtlasFrame::GetY() const
 {
-	return m_iPosY;
+	return m_uiPosY;
 }
 
 QIcon &AtlasFrame::GetThumbnail()
@@ -118,11 +161,11 @@ void AtlasFrame::ClearTextureIndex()
 	m_iTextureIndex = -1;
 }
 
-void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize textureSize)
+void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, quint16 uiX, quint16 uiY, QSize textureSize)
 {
 	m_iTextureIndex = iTextureIndex;
-	m_iPosX = iX;
-	m_iPosY = iY;
+	m_uiPosX = uiX;
+	m_uiPosY = uiY;
 
 	if(m_iTextureIndex != -1)
 	{
@@ -153,13 +196,22 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	m_sName = sName;
 
 	m_uiChecksum = uiChecksum;
-	m_iWidth = newImage.width();
-	m_iHeight = newImage.height();
+	
+	if(newImage.width() > std::numeric_limits<quint16>::max() || newImage.height() > std::numeric_limits<quint16>::max())
+		HyGuiLog("Image dimensions are too large: " % QString::number(newImage.width()) % "x" % QString::number(newImage.height()), LOGTYPE_Error);
+	m_uiWidth = newImage.width();
+	m_uiHeight = newImage.height();
 
+	QRect rAlphaCrop; // NOTE: QRect needs to be converted to L,T,R,B margins
 	if(m_bIsSubAtlas == false)
-		m_rAlphaCrop = ImagePacker::crop(newImage);
+		rAlphaCrop = ImagePacker::crop(newImage);
 	else // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
-		m_rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
+		rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
+
+	m_uiCropLeft = rAlphaCrop.x();
+	m_uiCropTop = rAlphaCrop.y();
+	m_uiCropRight = newImage.width() - (rAlphaCrop.right()+1);
+	m_uiCropBottom = newImage.height() - (rAlphaCrop.bottom()+1);
 
 	// DO NOT clear 'm_iTextureIndex' as it's needed in the Repack()
 
@@ -182,9 +234,9 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));
 	frameObj.insert("x", QJsonValue(GetX()));
 	frameObj.insert("y", QJsonValue(GetY()));
-	frameObj.insert("cropLeft", QJsonValue(GetCrop().left()));
-	frameObj.insert("cropTop", QJsonValue(GetCrop().top()));
-	frameObj.insert("cropRight", QJsonValue(GetCrop().right()));
-	frameObj.insert("cropBottom", QJsonValue(GetCrop().bottom()));
+	frameObj.insert("cropLeft", QJsonValue(m_uiCropLeft));// GetCrop().left()));
+	frameObj.insert("cropTop", QJsonValue(m_uiCropTop));//GetCrop().top()));
+	frameObj.insert("cropRight", QJsonValue(m_uiCropRight));//GetCrop().right()));
+	frameObj.insert("cropBottom", QJsonValue(m_uiCropBottom));//GetCrop().bottom()));
 	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TexInfo.GetBucketId())));
 }

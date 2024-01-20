@@ -41,7 +41,7 @@ class Project;
 #define HySrcEntityFilter "_hy_"
 #define HySrcEntityNamespace "hy"
 
-#define HYGUI_FILE_VERSION 15
+#define HYGUI_FILE_VERSION 16
 
 #define DISPLAYORDER_SnapGuide		99999999
 #define DISPLAYORDER_TransformCtrl	9999999

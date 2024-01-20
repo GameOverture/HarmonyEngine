@@ -125,7 +125,12 @@ bool EntityTreeItemData::IsForwardDeclared() const
 	return m_bIsForwardDeclared;
 }
 
-EntityPropertiesTreeModel &EntityTreeItemData::GetPropertiesModel()
+EntityModel &EntityTreeItemData::GetEntityModel() const
+{
+	return m_EntityModelRef;
+}
+
+EntityPropertiesTreeModel &EntityTreeItemData::GetPropertiesModel() const
 {
 	return *m_pPropertiesModel;
 }

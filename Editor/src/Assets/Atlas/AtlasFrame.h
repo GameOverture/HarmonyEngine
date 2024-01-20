@@ -24,15 +24,19 @@ class AtlasFrame : public IAssetItemData
 
 	bool								m_bIsSubAtlas;
 
-	int									m_iWidth;
-	int									m_iHeight;
-	QRect								m_rAlphaCrop;
+	quint16								m_uiWidth;
+	quint16								m_uiHeight;
+	
+	quint16								m_uiCropLeft;
+	quint16								m_uiCropTop;
+	quint16								m_uiCropRight;
+	quint16								m_uiCropBottom;
 
 	HyTextureInfo						m_TexInfo;
 	int									m_iTextureIndex;
 
-	int									m_iPosX;
-	int									m_iPosY;
+	quint16								m_uiPosX;
+	quint16								m_uiPosY;
 
 	QIcon								m_Thumbnail;
 
@@ -43,17 +47,27 @@ public:
 			   quint32 uiChecksum,
 			   quint32 uiBankId,
 			   QString sName,
-			   QRect rAlphaCrop,
+			   quint16 uiCropLeft,
+			   quint16 uiCropTop,
+			   quint16 uiCropRight,
+			   quint16 uiCropBottom,
 			   HyTextureInfo texInfo,
-			   int iW, int iH, int iX, int iY,
+			   quint16 uiW, quint16 uiH, quint16 uiX, quint16 uiY,
 			   int iTextureIndex,
 			   uint uiErrors);
 	~AtlasFrame();
 
 	bool IsSubAtlas() const;
 
-	QSize GetSize() const;
-	QRect GetCrop() const;
+	QSize GetSize() const;	// This is the size of the original import (with alpha)
+	quint16 GetCropL() const;
+	quint16 GetCropT() const;
+	quint16 GetCropR() const;
+	quint16 GetCropB() const;
+	quint16 GetCroppedWidth() const;
+	quint16 GetCroppedHeight() const;
+	quint64 GetCropMask() const;
+	quint64 GetFrameMask() const;
 	
 	HyTextureFormat GetFormat() const;
 	void SetFormat(HyTextureFormat eFormat, uint8 uiFormatParam1, uint8 uiFormatParam2);
@@ -66,13 +80,13 @@ public:
 	QPoint GetPosition() const;
 
 	int GetTextureIndex() const;
-	int GetX() const;
-	int GetY() const;
+	quint16 GetX() const;
+	quint16 GetY() const;
 
 	QIcon &GetThumbnail();
 
 	void ClearTextureIndex();
-	void UpdateInfoFromPacker(int iTextureIndex, int iX, int iY, QSize textureSize);
+	void UpdateInfoFromPacker(int iTextureIndex, quint16 uiX, quint16 uiY, QSize textureSize);
 	void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, bool bIsSubAtlas, QDir metaDir);
 
 	virtual QString GetPropertyInfo() override;

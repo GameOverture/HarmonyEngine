@@ -88,6 +88,36 @@ bool AtlasModel::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasS
 	return true;
 }
 
+AtlasFrame *AtlasModel::FindFrame(quint32 uiChecksum, quint32 uiBankId) const
+{
+	uint uiBankIndex = GetBankIndexFromBankId(uiBankId);
+	const QList<IAssetItemData *> &assetListRef = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
+
+	for(int i = 0; i < assetListRef.size(); ++i)
+	{
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetListRef[i]);
+		if(pFrame->GetChecksum() == uiChecksum)
+			return pFrame;
+	}
+
+	return nullptr;
+}
+
+AtlasFrame *AtlasModel::FindFrame(const QUuid &itemUuidRef, quint32 uiBankId) const
+{
+	uint uiBankIndex = GetBankIndexFromBankId(uiBankId);
+	const QList<IAssetItemData *> &assetListRef = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
+
+	for(int i = 0; i < assetListRef.size(); ++i)
+	{
+		AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetListRef[i]);
+		if(pFrame->GetUuid() == itemUuidRef)
+			return pFrame;
+	}
+
+	return nullptr;
+}
+
 AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiBankIndex, bool bIsSubAtlas)
 {
 	if(IsImageValid(newImage, m_BanksModel.GetBank(uiBankIndex)->GetId()) == false)
@@ -219,8 +249,9 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 
 /*virtual*/ IAssetItemData *AtlasModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
-	QRect rAlphaCrop(QPoint(metaObj["cropLeft"].toInt(), metaObj["cropTop"].toInt()),
-					 QPoint(metaObj["cropRight"].toInt(), metaObj["cropBottom"].toInt()));
+	//// NOTE: Using 2 QPoint constructor which stores differently than if passed 4 scalars
+	//QRect rAlphaCrop(QPoint(metaObj["cropLeft"].toInt(), metaObj["cropTop"].toInt()),
+	//				 QPoint(metaObj["cropRight"].toInt(), metaObj["cropBottom"].toInt()));
 
 	AtlasFrame *pNewFrame = new AtlasFrame(*this,
 										   metaObj["isSubAtlas"].toBool(false),
@@ -228,7 +259,10 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 										   JSONOBJ_TOINT(metaObj, "checksum"),
 										   JSONOBJ_TOINT(metaObj, "bankId"),
 										   metaObj["name"].toString(),
-										   rAlphaCrop,
+										   metaObj["cropLeft"].toInt(),
+										   metaObj["cropTop"].toInt(),
+										   metaObj["cropRight"].toInt(),
+										   metaObj["cropBottom"].toInt(),
 										   HyTextureInfo(JSONOBJ_TOINT(metaObj, "textureInfo")),
 										   metaObj["width"].toInt(),
 										   metaObj["height"].toInt(),
@@ -475,10 +509,18 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 
 			QJsonObject frameObj;
 			frameObj.insert("checksum", QJsonValue(static_cast<qint64>(pAtlasFrame->GetChecksum())));
-			frameObj.insert("left", QJsonValue(pAtlasFrame->GetX()));
-			frameObj.insert("top", QJsonValue(pAtlasFrame->GetY()));
-			frameObj.insert("right", QJsonValue(pAtlasFrame->GetX() + pAtlasFrame->GetCrop().width()));
-			frameObj.insert("bottom", QJsonValue(pAtlasFrame->GetY() + pAtlasFrame->GetCrop().height()));
+
+			quint64 uiCropMask = pAtlasFrame->GetCropMask();
+			frameObj.insert("cropMaskHi", QJsonValue(static_cast<qint64>(uiCropMask >> 32)));
+			frameObj.insert("cropMaskLo", QJsonValue(static_cast<qint64>(uiCropMask & 0xFFFFFFFF)));
+			//frameObj.insert("left", QJsonValue(pAtlasFrame->GetX()));
+			//frameObj.insert("top", QJsonValue(pAtlasFrame->GetY()));
+			//frameObj.insert("right", QJsonValue(pAtlasFrame->GetX() + pAtlasFrame->GetCrop().width()));
+			//frameObj.insert("bottom", QJsonValue(pAtlasFrame->GetY() + pAtlasFrame->GetCrop().height()));
+			
+			quint64 uiFrameMask = pAtlasFrame->GetFrameMask();
+			frameObj.insert("frameMaskHi", QJsonValue(static_cast<qint64>(uiFrameMask >> 32)));
+			frameObj.insert("frameMaskLo", QJsonValue(static_cast<qint64>(uiFrameMask & 0xFFFFFFFF)));
 
 			assetArrayList[pAtlasFrame->GetTextureIndex()].append(frameObj);
 			textureInfoList[pAtlasFrame->GetTextureIndex()] = pAtlasFrame->GetTextureInfo();
@@ -541,7 +583,12 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiB
 
 	QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
 	if(bIsSubAtlas == false) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
-		rAlphaCrop = ImagePacker::crop(newImage);
+		rAlphaCrop = ImagePacker::crop(newImage); // NOTE: ImagePacker::crop() returned QRect needs to be converted to L,T,R,B margins
+
+	quint16 uiCropLeft = rAlphaCrop.x();
+	quint16 uiCropTop = rAlphaCrop.y();
+	quint16 uiCropRight = newImage.width() - (rAlphaCrop.right()+1);
+	quint16 uiCropBottom = newImage.height() - (rAlphaCrop.bottom()+1);
 
 	HyTextureInfo info(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0);
 	AtlasFrame *pNewAsset = new AtlasFrame(*this,
@@ -550,7 +597,10 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiB
 											uiChecksum,
 											uiBankId,
 											fileInfo.baseName(),
-											rAlphaCrop,
+											uiCropLeft,
+											uiCropTop,
+											uiCropRight,
+											uiCropBottom,
 											info,
 											newImage.width(),
 											newImage.height(),

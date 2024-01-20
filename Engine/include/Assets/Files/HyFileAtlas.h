@@ -40,8 +40,13 @@ class HyFileAtlas : public IHyFile
 	unsigned char *							m_pPixelData;
 	uint32									m_uiPixelDataSize;
 
-	HyRectangle<int32> *					m_pFrames;
-	std::map<uint32, HyRectangle<int32> *>	m_ChecksumMap;
+	struct Frame
+	{
+		uint64								m_uiFrameMask;	// LEFT, TOP, RIGHT, BOTTOM order. In pixel coordinates on Atlas
+		uint64								m_uiCropMask;	// LEFT, TOP, RIGHT, BOTTOM order. As margins
+	};
+	Frame *									m_pFrames;
+	std::map<uint32, Frame *>				m_ChecksumMap;
 
 	std::mutex								m_Mutex_PixelData;
 
@@ -56,7 +61,7 @@ public:
 	int32 GetWidth() const;
 	int32 GetHeight() const;
 	HyTextureHandle GetTextureHandle() const;
-	bool GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const;
+	bool GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut, uint64 &cropMaskOut) const;
 
 	void DeletePixelData();
 

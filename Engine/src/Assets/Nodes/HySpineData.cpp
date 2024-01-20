@@ -79,10 +79,11 @@ HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAsse
 		std::string sName = atlasObj["name"].GetString();
 		
 		HyRectangle<float> rSubAtlasUVRect;
+		uint64 uiCropMask = 0;
 
 		if(bIsUsingTempFiles == false)
 		{
-			HyFileAtlas *pAtlas = assetsRef.GetAtlas(atlasObj["checksum"].GetUint(), atlasObj["bankId"].GetUint(), rSubAtlasUVRect);
+			HyFileAtlas *pAtlas = assetsRef.GetAtlas(atlasObj["checksum"].GetUint(), atlasObj["bankId"].GetUint(), rSubAtlasUVRect, uiCropMask);
 			HyAssert(pAtlas, "HySpineData atlas was not found with checksum: " << atlasObj["checksum"].GetUint());
 
 			m_RequiredFiles[HYFILE_Atlas].Set(pAtlas->GetManifestIndex());

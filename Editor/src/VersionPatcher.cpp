@@ -214,8 +214,12 @@
 			Patch_14to15(dataItemsDoc, metaItemsDoc, metaAudioDoc, dataAudioDoc);
 			[[fallthrough]];
 		case 15:
+			HyGuiLog("Patching project files: version 15 -> 16", LOGTYPE_Info);
+			Patch_15to16(metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
+		case 16:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 15, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 16, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -1336,6 +1340,91 @@
 
 	// Write out the new dataItemsObj, which contains updated "audio"
 	dataItemsDocRef.setObject(dataItemsObj);
+}
+
+/*static*/ void VersionPatcher::Patch_15to16(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef)
+{
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
+	QJsonArray metaAssetsArray = metaAtlasObj["assets"].toArray();
+
+	// Within 'dataAtlasDocRef', adding 'cropMask' and changing [top,left,right,bottom] to 'frameMask' for each asset.
+	QJsonObject dataAtlasObj = dataAtlasDocRef.object();
+	QJsonArray dataBanksArray = dataAtlasObj["banks"].toArray();
+	for(int iDataBankIndex = 0; iDataBankIndex < dataBanksArray.size(); ++iDataBankIndex)
+	{
+		QJsonObject dataBankObj = dataBanksArray[iDataBankIndex].toObject();
+		
+		int iBankId = dataBankObj["bankId"].toInt();
+		QJsonArray dataTexturesArray = dataBankObj["textures"].toArray();
+
+		for(int iTextureIndex = 0; iTextureIndex < dataTexturesArray.size(); ++iTextureIndex)
+		{
+			QJsonObject dataTextureObj = dataTexturesArray[iTextureIndex].toObject();
+
+			QJsonArray dataTextureAssetsArray = dataTextureObj["assets"].toArray();
+			for(int iTextureAssetIndex = 0; iTextureAssetIndex < dataTextureAssetsArray.size(); ++iTextureAssetIndex)
+			{
+				QJsonObject dataTextureAssetObj = dataTextureAssetsArray[iTextureAssetIndex].toObject();
+
+				quint32 uiChecksum = JSONOBJ_TOINT(dataTextureAssetObj, "checksum");
+
+				// LEFT, TOP, RIGHT, BOTTOM = 16 bits each. Laid out like: 0xLLLLTTTTRRRRBBBB
+				quint64 uiLeft = dataTextureAssetObj["left"].toInt();
+				quint64 uiTop = dataTextureAssetObj["top"].toInt();
+				quint64 uiRight = dataTextureAssetObj["right"].toInt();
+				quint64 uiBottom = dataTextureAssetObj["bottom"].toInt();
+				quint64 uiFrameMask = (uiLeft << 48) | (uiTop << 32) | (uiRight << 16) | uiBottom;
+
+				dataTextureAssetObj.insert("frameMaskHi", QJsonValue(static_cast<qint64>(uiFrameMask >> 32)));
+				dataTextureAssetObj.insert("frameMaskLo", QJsonValue(static_cast<qint64>(uiFrameMask & 0xFFFFFFFF)));
+				dataTextureAssetObj.remove("left");
+				dataTextureAssetObj.remove("top");
+				dataTextureAssetObj.remove("right");
+				dataTextureAssetObj.remove("bottom");
+
+				// Find the asset in 'metaAssetsArray' using iBankId and uiChecksum, and make the 'cropMask' from it using 'cropLeft', 'cropTop', 'cropRight', 'cropBottom'
+				for(int iMetaAssetIndex = 0; iMetaAssetIndex < metaAssetsArray.size(); ++iMetaAssetIndex)
+				{
+					QJsonObject metaAssetObj = metaAssetsArray[iMetaAssetIndex].toObject();
+					quint32 uiMetaChecksum = JSONOBJ_TOINT(metaAssetObj, "checksum");
+					if(metaAssetObj["bankId"].toInt() == iBankId && uiMetaChecksum == uiChecksum)
+					{
+						// NOTE: Using 2 QPoint constructor which stores differently than if passed 4 scalars
+						QRect rAlphaCrop(QPoint(metaAssetObj["cropLeft"].toInt(), metaAssetObj["cropTop"].toInt()),
+										 QPoint(metaAssetObj["cropRight"].toInt(), metaAssetObj["cropBottom"].toInt()));
+
+						quint64 uiCropMask = (quint64(rAlphaCrop.x()) << 48) | (quint64(rAlphaCrop.y()) << 32) | (quint64(rAlphaCrop.width()) << 16) | quint64(rAlphaCrop.height());
+						
+						dataTextureAssetObj.insert("cropMaskHi", QJsonValue(static_cast<qint64>(uiCropMask >> 32)));
+						dataTextureAssetObj.insert("cropMaskLo", QJsonValue(static_cast<qint64>(uiCropMask & 0xFFFFFFFF)));
+						break;
+					}
+				}
+
+				dataTextureAssetsArray.replace(iTextureAssetIndex, dataTextureAssetObj);
+			}
+			dataTextureObj.insert("assets", dataTextureAssetsArray);
+			dataTexturesArray.replace(iTextureIndex, dataTextureObj);
+		}
+		dataBankObj.insert("textures", dataTexturesArray);
+		dataBanksArray.replace(iDataBankIndex, dataBankObj);
+	}
+	dataAtlasObj.insert("banks", dataBanksArray);
+
+	dataAtlasDocRef.setObject(dataAtlasObj);
+
+	// Now within 'metaAtlasDocRef', update all assets' 'cropRight' and 'cropBottom' to be margins, not stored QRect
+	for(int iMetaAssetIndex = 0; iMetaAssetIndex < metaAssetsArray.size(); ++iMetaAssetIndex)
+	{
+		QJsonObject metaAssetObj = metaAssetsArray[iMetaAssetIndex].toObject();
+		metaAssetObj.insert("cropRight", metaAssetObj["width"].toInt() - (metaAssetObj["cropRight"].toInt()+1));
+		metaAssetObj.insert("cropBottom", metaAssetObj["height"].toInt() - (metaAssetObj["cropBottom"].toInt()+1));
+
+		metaAssetsArray.replace(iMetaAssetIndex, metaAssetObj);
+	}
+	metaAtlasObj.insert("assets", metaAssetsArray);
+
+	metaAtlasDocRef.setObject(metaAtlasObj);
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)

@@ -88,6 +88,7 @@ HySpriteData::AnimState::AnimState(bool bLoop,
 	{
 		HyFileAtlas *pAtlas = nullptr;
 		HyRectangle<float> rUVRect(0.0f, 0.0f, 0.0f, 0.0f);
+		uint64 uiCropMask = 0;
 		glm::ivec2 vOffset(0);
 		float fDuration(0.0f);
 
@@ -95,7 +96,7 @@ HySpriteData::AnimState::AnimState(bool bLoop,
 		{
 			HyJsonObj frameObj = frameArray[i].GetObject();
 
-			pAtlas = assetsRef.GetAtlas(frameObj["checksum"].GetUint(), frameObj["bankId"].GetUint(), rUVRect);
+			pAtlas = assetsRef.GetAtlas(frameObj["checksum"].GetUint(), frameObj["bankId"].GetUint(), rUVRect, uiCropMask);
 			requiredAtlasIndicesRef.Set(pAtlas->GetManifestIndex());
 
 			HySetVec(vOffset, frameObj["offsetX"].GetInt(), frameObj["offsetY"].GetInt());
@@ -103,9 +104,10 @@ HySpriteData::AnimState::AnimState(bool bLoop,
 		}
 
 		new (pFrameWriteLocation)HySpriteFrame(pAtlas,
-												 rUVRect.left, rUVRect.top, rUVRect.right, rUVRect.bottom,
-												 vOffset,
-												 fDuration);
+											   rUVRect.left, rUVRect.top, rUVRect.right, rUVRect.bottom,
+											   uiCropMask,
+											   vOffset,
+											   fDuration);
 	}
 }
 

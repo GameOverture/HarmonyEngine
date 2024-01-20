@@ -26,17 +26,27 @@ HyFileAtlas::HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexI
 	m_pPixelData(nullptr),
 	m_uiPixelDataSize(0)
 {
-	m_pFrames = HY_NEW HyRectangle<int32>[m_uiNUM_FRAMES];
+	m_pFrames = HY_NEW Frame[m_uiNUM_FRAMES];
 
 	HyJsonArray framesArrayRef = textureObj["assets"].GetArray();
 	for(uint32 k = 0; k < m_uiNUM_FRAMES; ++k)
 	{
 		HyJsonObj srcFrameObj = framesArrayRef[k].GetObject();
 
-		m_pFrames[k].bottom = srcFrameObj["bottom"].GetUint();
-		m_pFrames[k].right = srcFrameObj["right"].GetUint();
-		m_pFrames[k].left = srcFrameObj["left"].GetUint();
-		m_pFrames[k].top = srcFrameObj["top"].GetUint();
+		// NOTE: Masks are serialized in LEFT, TOP, RIGHT, BOTTOM order. Each value is uint16 bits.
+
+		uint32 uiCropMaskHi = srcFrameObj["cropMaskHi"].GetUint();
+		uint32 uiCropMaskLo = srcFrameObj["cropMaskLo"].GetUint();
+		m_pFrames[k].m_uiCropMask = (static_cast<uint64>(uiCropMaskHi) << 32) | uiCropMaskLo;
+		
+		//m_pFrames[k].m_Rect.bottom = srcFrameObj["bottom"].GetUint();
+		//m_pFrames[k].m_Rect.right = srcFrameObj["right"].GetUint();
+		//m_pFrames[k].m_Rect.left = srcFrameObj["left"].GetUint();
+		//m_pFrames[k].m_Rect.top = srcFrameObj["top"].GetUint();
+
+		uint32 uiFrameMaskHi = srcFrameObj["frameMaskHi"].GetUint();
+		uint32 uiFrameMaskLo = srcFrameObj["frameMaskLo"].GetUint();
+		m_pFrames[k].m_uiFrameMask = (static_cast<uint64>(uiFrameMaskHi) << 32) | uiFrameMaskLo;
 
 		m_ChecksumMap[srcFrameObj["checksum"].GetUint()] = &m_pFrames[k];
 	}
@@ -83,25 +93,39 @@ HyTextureHandle HyFileAtlas::GetTextureHandle() const
 	return m_hTextureHandle;
 }
 
-bool HyFileAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut) const
+bool HyFileAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut, uint64 &cropMaskOut) const
 {
 	float fTexWidth = static_cast<float>(m_iWidth);
 	float fTexHeight = static_cast<float>(m_iHeight);
 	HyAssert(fTexWidth > 0.0f && fTexHeight > 0.0f, "HyFileAtlas::GetUvRect was called before the texture was loaded");
 
-	const HyRectangle<int32> *pSrcRect = nullptr;
-	std::map<uint32, HyRectangle<int32> *>::const_iterator iter = m_ChecksumMap.find(uiChecksum);
+	//const HyRectangle<int32> *pSrcRect = nullptr;
+	std::map<uint32, Frame *>::const_iterator iter = m_ChecksumMap.find(uiChecksum);
 	if(iter != m_ChecksumMap.end())
-		pSrcRect = iter->second;
-
-	if(pSrcRect)
 	{
-		UVRectOut.left = static_cast<float>(pSrcRect->left) / fTexWidth;
-		UVRectOut.top = static_cast<float>(pSrcRect->top) / fTexHeight;
-		UVRectOut.right = static_cast<float>(pSrcRect->right) / fTexWidth;
-		UVRectOut.bottom = static_cast<float>(pSrcRect->bottom) / fTexHeight;
+		//pSrcRect = ;
+		uint64 uiFrameMask = iter->second->m_uiFrameMask;
+
+		// LEFT, TOP, RIGHT, BOTTOM = 16 bits each. Laid out like: 0xLLLLTTTTRRRRBBBB
+		uint16 uiLeft = static_cast<uint16>((uiFrameMask >> 48) & 0xFFFF);
+		uint16 uiTop = static_cast<uint16>((uiFrameMask >> 32) & 0xFFFF);
+		uint16 uiRight = static_cast<uint16>((uiFrameMask >> 16) & 0xFFFF);
+		uint16 uiBottom = static_cast<uint16>(uiFrameMask & 0xFFFF);
+		UVRectOut.left = static_cast<float>(uiLeft) / fTexWidth;
+		UVRectOut.top = static_cast<float>(uiTop) / fTexHeight;
+		UVRectOut.right = static_cast<float>(uiRight) / fTexWidth;
+		UVRectOut.bottom = static_cast<float>(uiBottom) / fTexHeight;
+
+		cropMaskOut = iter->second->m_uiCropMask;
+
+
+		//UVRectOut.left = static_cast<float>(iter->second->m_uiFrameMask ->left) / fTexWidth;
+		//UVRectOut.top = static_cast<float>(pSrcRect->top) / fTexHeight;
+		//UVRectOut.right = static_cast<float>(pSrcRect->right) / fTexWidth;
+		//UVRectOut.bottom = static_cast<float>(pSrcRect->bottom) / fTexHeight;
 
 		return true;
+		
 	}
 
 	return false;

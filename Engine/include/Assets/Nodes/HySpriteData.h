@@ -19,17 +19,21 @@ struct HySpriteFrame
 {
 	HyFileAtlas *				pAtlas;
 	const HyRectangle<float>	rSRC_RECT;
+	const HyRectangle<uint16>	rCROP_MARGINS;
 	const glm::ivec2			vOFFSET;
 	const float					fDURATION;
 
+	// NOTE: Masks are serialized in LEFT, TOP, RIGHT, BOTTOM order. Each value is uint16 bits. In 0xLLLLTTTTRRRRBBBB order
 	HySpriteFrame(HyFileAtlas *pAtlas,
 					float fSrcLeft,
 					float fSrcTop,
 					float fSrcRight,
 					float fSrcBot,
+					uint64 uiCropMask,
 					glm::ivec2 vOffset,
 					float fDuration) :	pAtlas(pAtlas),
 										rSRC_RECT(fSrcLeft, fSrcBot, fSrcRight, fSrcTop),
+										rCROP_MARGINS((uiCropMask >> 48) & 0xFFFF, uiCropMask & 0xFFFF, (uiCropMask >> 16) & 0xFFFF, (uiCropMask >> 32) & 0xFFFF),
 										vOFFSET(vOffset),
 										fDURATION(fDuration)
 	{ }

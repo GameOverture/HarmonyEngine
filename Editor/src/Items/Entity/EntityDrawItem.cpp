@@ -157,12 +157,29 @@ void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &tr
 	transformMtxOut = glm::identity<glm::mat4>();
 	switch(m_pEntityTreeItemData->GetType())
 	{
+	//case ITEM_Sprite: {
+
+	//	TreeModelItemData *pReferencedItemData = GetEntityTreeItemData()->GetEntityModel().GetItem().GetProject().FindItemData(m_pEntityTreeItemData->GetReferencedItemUuid());
+	//	pReferencedItemData = pReferencedItemData;
+	//	const QUuid &itemUuidRef = ;
+	//	AtlasFrame *pAtlasFrame = GetEntityModel()->GetItem().GetProject().GetAtlasModel().FindFrame(itemUuidRef, );
+
+	//	//HySprite2d *pSprite = static_cast<HySprite2d *>(GetHyNode());
+	//	//const HySpriteData *pData = static_cast<const HySpriteData *>(pSprite->AcquireData());
+	//	//if(pData)
+	//	//{
+	//	//	 // GetEntityModel()->GetItem().GetProject().GetAtlasModel().FindFrame(
+
+	//	//	AtlasFrame *pAtlasFrame = pData->GetAtlasFrame();
+	//	//}
+	//	//break;
+	//}
+	case ITEM_Sprite:
 	case ITEM_BoundingVolume:
 	case ITEM_AtlasFrame:
 	case ITEM_Primitive:
 	case ITEM_Text:
 	case ITEM_Spine:
-	case ITEM_Sprite:
 	case ITEM_Entity: {
 		IHyBody2d *pHyBody = static_cast<IHyBody2d *>(GetHyNode());
 		pHyBody->CalcLocalBoundingShape(boundingShapeOut);
