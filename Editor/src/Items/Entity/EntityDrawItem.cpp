@@ -364,6 +364,8 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 
 	if(eItemType == ITEM_Entity)
 		static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(iCURRENT_FRAME, pCamera);
+	else if(eItemType == ITEM_Sprite)
+		static_cast<HySprite2d *>(pThisHyNode)->SetAnimPause(true); // We always pause the animation because it is set manually by extrapolating what frame it should be, and don't want time passing to affect it.
 
 	for(int iFrame : keyFrameMapRef.keys())
 	{
@@ -585,9 +587,6 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 			break; }
 
 		case ITEM_Sprite:
-			// We always pause the animation because it is set manually by extrapolating what frame it should be, and don't want time passing to affect it.
-			static_cast<HySprite2d *>(pThisHyNode)->SetAnimPause(true);
-
 			// If the state was changed on this frame 'iFrame', it was already applied to pThisNode above in "Common", "State"
 			if(propsObj.contains("Sprite"))
 			{

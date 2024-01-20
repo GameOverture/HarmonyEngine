@@ -50,8 +50,6 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 
 	float fHalfWidth = GetFrameWidth(0.5f);
 	float fHalfHeight = GetFrameHeight(0.5f);
-	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
-		return;
 
 	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
 	glm::vec2 ptBoxCenter(frameRef.vOFFSET.x + fHalfWidth, frameRef.vOFFSET.y + fHalfHeight);
@@ -71,6 +69,8 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 		ptBoxCenter = ptBotLeft + glm::vec2(fHalfWidth, fHalfHeight);
 	}
 
+	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
+		return;
 	shapeOut.SetAsBox(fHalfWidth, fHalfHeight, ptBoxCenter, 0.0f);
 }
 
