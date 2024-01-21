@@ -192,6 +192,13 @@ bool ProjectItemData::Save(bool bWriteToDisk)
 	m_bExistencePendingSave = false;
 	m_pUndoStack->setClean();
 
+	if(bWriteToDisk)
+	{
+		this->m_pWidget->update();
+		MainWindow::GetExplorerWidget().update();
+		MainWindow::GetAuxWidget(AUXTAB_DopeSheet)->update();
+	}
+
 	return true;
 }
 
