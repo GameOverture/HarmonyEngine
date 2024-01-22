@@ -194,7 +194,8 @@ bool ProjectItemData::Save(bool bWriteToDisk)
 
 	if(bWriteToDisk)
 	{
-		this->m_pWidget->update();
+		if(m_pWidget)
+			m_pWidget->update();
 		MainWindow::GetExplorerWidget().update();
 		MainWindow::GetAuxWidget(AUXTAB_DopeSheet)->update();
 	}
