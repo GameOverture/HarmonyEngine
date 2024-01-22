@@ -264,40 +264,54 @@ TweenProperty EntityDopeSheetScene::DetermineIfContextQuickTween(EntityTreeItemD
 	if(selectedItems().count() != 2)
 		return TWEENPROP_None;
 
-	// Make sure both selected items are valid 'GraphicsKeyFrameItem's
+	// Make sure both selected items are valid GraphicsKeyFrameItem's
 	QGraphicsItem *pItem0 = selectedItems()[0];
 	QGraphicsItem *pItem1 = selectedItems()[1];
 
-	// Make Item0 and Item1 in order from left to right
-	if(pItem1->x() < pItem0->x())
-		std::swap(pItem0, pItem1);
-
 	bool bAcquiredDataType = false;
+	// ITEM 0
 	DopeSheetGfxItemType eItemType0 = static_cast<DopeSheetGfxItemType>(pItem0->data(GFXDATAKEY_Type).toInt(&bAcquiredDataType));
 	if(bAcquiredDataType == false)
 		return TWEENPROP_None;
-	if(eItemType0 == GFXITEM_TweenKnob) // If item 0 is a tween knob, reassign it to its parent (which is a tween keyframe)
-		pItem0 = pItem0->parentItem();
-
-	// Item on right (pItem1) must be a regular property keyframe
+	if(eItemType0 == GFXITEM_TweenKnob)
+	{
+		pItem0 = pItem0->parentItem(); // If item 0 is a tween knob, reassign it to its parent (which is a tween keyframe)
+		eItemType0 = static_cast<DopeSheetGfxItemType>(pItem1->data(GFXDATAKEY_Type).toInt(&bAcquiredDataType));
+	}
+	int iFrame0 = pItem0->data(GFXDATAKEY_FrameIndex).toInt();
+	if(static_cast<GraphicsKeyFrameItem *>(pItem0)->IsTweenKeyFrame())
+		iFrame0 += static_cast<GraphicsKeyFrameItem *>(pItem0)->GetTweenFramesDuration();
+	// ITEM 1
 	DopeSheetGfxItemType eItemType1 = static_cast<DopeSheetGfxItemType>(pItem1->data(GFXDATAKEY_Type).toInt(&bAcquiredDataType));
-	if(bAcquiredDataType == false || eItemType1 != GFXITEM_PropertyKeyFrame)
+	if(bAcquiredDataType == false)
+		return TWEENPROP_None;
+	if(eItemType1 == GFXITEM_TweenKnob)
+	{
+		pItem1 = pItem1->parentItem(); // If item 1 is a tween knob, reassign it to its parent (which is a tween keyframe)
+		eItemType1 = static_cast<DopeSheetGfxItemType>(pItem1->data(GFXDATAKEY_Type).toInt(&bAcquiredDataType));
+	}
+	int iFrame1 = pItem1->data(GFXDATAKEY_FrameIndex).toInt();
+	if(static_cast<GraphicsKeyFrameItem *>(pItem1)->IsTweenKeyFrame())
+		iFrame1 += static_cast<GraphicsKeyFrameItem *>(pItem1)->GetTweenFramesDuration();
+
+	// Sort pItem0 and pItem1 by their frame index
+	if(iFrame0 > iFrame1)
+	{
+		std::swap(pItem0, pItem1);
+		std::swap(eItemType0, eItemType1);
+		std::swap(iFrame0, iFrame1);
+	}
+
+	// The right side item must be a regular property keyframe
+	if(eItemType1 != GFXITEM_PropertyKeyFrame)
 		return TWEENPROP_None;
 
 	// Collect all the info stored in the FrameKey for item 0
-	GraphicsKeyFrameItem *pGfxKeyFrame0 = static_cast<GraphicsKeyFrameItem *>(pItem0);
-	KeyFrameKey tupleKey0 = pGfxKeyFrame0->GetKey();
-	int iFrame0 = std::get<GFXDATAKEY_FrameIndex>(tupleKey0);
-	if(pGfxKeyFrame0->IsTweenKeyFrame())
-		iFrame0 += pGfxKeyFrame0->GetTweenFramesDuration();
+	KeyFrameKey tupleKey0 = static_cast<GraphicsKeyFrameItem *>(pItem0)->GetKey();
 	QString sCategoryProp0 = std::get<GFXDATAKEY_CategoryPropString>(tupleKey0);
 
 	// Collect all the info stored in the FrameKey for item 1
-	GraphicsKeyFrameItem *pGfxKeyFrame1 = static_cast<GraphicsKeyFrameItem *>(pItem1);
-	KeyFrameKey tupleKey1 = pGfxKeyFrame1->GetKey();
-	int iFrame1 = std::get<GFXDATAKEY_FrameIndex>(tupleKey1);
-	if(pGfxKeyFrame1->IsTweenKeyFrame())
-		iFrame1 += pGfxKeyFrame1->GetTweenFramesDuration();
+	KeyFrameKey tupleKey1 = static_cast<GraphicsKeyFrameItem *>(pItem1)->GetKey();
 	QString sCategoryProp1 = std::get<GFXDATAKEY_CategoryPropString>(tupleKey1);
 
 	// Final check to determine if a quick-tween button should be shown, and if so, which one
@@ -308,9 +322,6 @@ TweenProperty EntityDopeSheetScene::DetermineIfContextQuickTween(EntityTreeItemD
 		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sCategoryProp0.split('/')[1]);
 		if(eTweenProp == TWEENPROP_None)
 			return TWEENPROP_None;
-
-		if(iFrame0 > iFrame1)
-			std::swap(iFrame0, iFrame1);
 
 		pTweenTreeItemDataOut = std::get<GFXDATAKEY_TreeItemData>(tupleKey0);
 		iTweenStartFrameOut = iFrame0;
