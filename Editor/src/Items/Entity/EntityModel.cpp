@@ -910,14 +910,14 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 		}
 		else if(sCategoryName == "Tween Rotation")
 		{
-			QJsonObject tweenObj = propObj["Tween Position"].toObject();
+			QJsonObject tweenObj = propObj["Tween Rotation"].toObject();
 			QString sTweenType = "HyTween::" + tweenObj["Tween Type"].toString();
 
 			sSrc += sCodeName + "rot.Tween(" + QString::number(tweenObj["Destination"].toDouble(), 'f') + "f, " + QString::number(tweenObj["Duration"].toDouble(), 'f') + "f, " + sTweenType + ");" + sNewLine;
 		}
 		else if(sCategoryName == "Tween Scale")
 		{
-			QJsonObject tweenObj = propObj["Tween Position"].toObject();
+			QJsonObject tweenObj = propObj["Tween Scale"].toObject();
 			QJsonArray destArray = tweenObj["Destination"].toArray();
 			QString sTweenType = "HyTween::" + tweenObj["Tween Type"].toString();
 
@@ -925,7 +925,7 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 		}
 		else if(sCategoryName == "Tween Alpha")
 		{
-			QJsonObject tweenObj = propObj["Tween Position"].toObject();
+			QJsonObject tweenObj = propObj["Tween Alpha"].toObject();
 			QString sTweenType = "HyTween::" + tweenObj["Tween Type"].toString();
 
 			sSrc += sCodeName + "alpha.Tween(" + QString::number(tweenObj["Destination"].toDouble(), 'f') + "f, " + QString::number(tweenObj["Duration"].toDouble(), 'f') + "f, " + sTweenType + ");" + sNewLine;

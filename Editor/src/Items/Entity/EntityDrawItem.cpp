@@ -361,6 +361,34 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 	// Tween Special Case:
 	// To determine the tween's current value, store the info that kicked it off, and extrapolate the based on Entity's 'iCURRENT_FRAME'
 	TweenInfo tweenInfo[NUM_TWEENPROPS] = { TWEENPROP_Position, TWEENPROP_Rotation, TWEENPROP_Scale, TWEENPROP_Scale };
+	std::function<void(int, int)> fpApplyTween = [&](int iTweenProp, int iFrameIndex)
+		{
+			QVariant extrapolatedValue = tweenInfo[iTweenProp].Extrapolate(iFrameIndex, fFRAME_DURATION);
+			switch(iTweenProp)
+			{
+			case TWEENPROP_Position:
+				pThisHyNode->pos.SetX(static_cast<float>(extrapolatedValue.toPointF().x()));
+				pThisHyNode->pos.SetY(static_cast<float>(extrapolatedValue.toPointF().y()));
+				break;
+
+			case TWEENPROP_Rotation:
+				pThisHyNode->rot.Set(extrapolatedValue.toDouble());
+				break;
+
+			case TWEENPROP_Scale:
+				pThisHyNode->scale.SetX(static_cast<float>(extrapolatedValue.toPointF().x()));
+				pThisHyNode->scale.SetY(static_cast<float>(extrapolatedValue.toPointF().y()));
+				break;
+
+			case TWEENPROP_Alpha:
+				static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(extrapolatedValue.toDouble());
+				break;
+
+			default:
+				HyGuiLog("EntityDrawItem::SetHyNode() - Unhandled tween property (fpApplyTween)", LOGTYPE_Error);
+				break;
+			}
+		};
 
 	if(eItemType == ITEM_Entity)
 		static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(iCURRENT_FRAME, pCamera);
@@ -443,7 +471,9 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 				QString sCategory = "Tween " % HyGlobal::TweenPropName(eTweenProp);
 				if(propsObj.contains(sCategory))
 				{
-					QJsonObject tweenObj = propsObj[sCategory].toObject();
+					// If a tween is already active, then we need to extrapolate the tween's value to the current frame before replacing it
+					if(tweenInfo[iTweenProp].IsActive())
+						fpApplyTween(iTweenProp, iFrame);
 
 					QVariant startValue;
 					switch(iTweenProp)
@@ -465,7 +495,8 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 						HyGuiLog("HyEntity2d::ExtrapolateProperties - Unknown TweenProperty", LOGTYPE_Error);
 						break;
 					}
-					
+
+					QJsonObject tweenObj = propsObj[sCategory].toObject();
 					tweenInfo[iTweenProp].Set(iFrame, tweenObj, startValue);
 				}
 			}
@@ -636,36 +667,10 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 			static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iCURRENT_FRAME - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
 	}
 
-	// Apply any active tweens
+	// Apply any remaining active tweens
 	for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
 	{
-		if(tweenInfo[iTweenProp].m_iStartFrame != -1)
-		{
-			QVariant extrapolatedValue = tweenInfo[iTweenProp].Extrapolate(iCURRENT_FRAME, fFRAME_DURATION);
-			switch(iTweenProp)
-			{
-			case TWEENPROP_Position:
-				pThisHyNode->pos.SetX(static_cast<float>(extrapolatedValue.toPointF().x()));
-				pThisHyNode->pos.SetY(static_cast<float>(extrapolatedValue.toPointF().y()));
-				break;
-
-			case TWEENPROP_Rotation:
-				pThisHyNode->rot.Set(extrapolatedValue.toDouble());
-				break;
-
-			case TWEENPROP_Scale:
-				pThisHyNode->scale.SetX(static_cast<float>(extrapolatedValue.toPointF().x()));
-				pThisHyNode->scale.SetY(static_cast<float>(extrapolatedValue.toPointF().y()));
-				break;
-
-			case TWEENPROP_Alpha:
-				static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(extrapolatedValue.toDouble());
-				break;
-
-			default:
-				HyGuiLog("EntityDrawItem::SetHyNode() - Unhandled tween property (applying active tween)", LOGTYPE_Error);
-				break;
-			}
-		}
+		if(tweenInfo[iTweenProp].IsActive())
+			fpApplyTween(iTweenProp, iCURRENT_FRAME);
 	}
 }

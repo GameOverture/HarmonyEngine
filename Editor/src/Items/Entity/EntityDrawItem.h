@@ -30,6 +30,11 @@ struct TweenInfo
 		Clear();
 	}
 
+	bool IsActive() const
+	{
+		return m_iStartFrame != -1;
+	}
+
 	void Clear()
 	{
 		m_iStartFrame = -1;
