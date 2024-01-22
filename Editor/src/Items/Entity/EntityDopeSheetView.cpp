@@ -482,8 +482,9 @@ float EntityDopeSheetView::GetZoom() const
 
 			if(pItemUnderMouse->data(GFXDATAKEY_Type).toInt() == GFXITEM_TweenKnob)
 			{
-				GetScene()->clearSelection();
+				//GetScene()->clearSelection();
 				m_pGfxDragTweenKnobItem = static_cast<GraphicsTweenKnobItem *>(pItemUnderMouse);
+				m_pGfxDragTweenKnobItem->setSelected(true);
 			}
 		}
 

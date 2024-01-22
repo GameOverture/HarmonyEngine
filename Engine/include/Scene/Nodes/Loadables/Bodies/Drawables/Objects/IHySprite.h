@@ -90,9 +90,8 @@ public:
 	glm::ivec2 GetCurFrameOffset();
 	glm::ivec2 GetStateOffset(uint32 uiStateIndex);
 
-	bool IsBoundsIncludeAlphaCrop();												// Returns true if the current state's bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
-	bool IsBoundsIncludeAlphaCrop(uint32 uiStateIndex);								// Returns true if the specified state's bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
-	void SetBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop);							// Set whether the current state's bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
+	bool IsBoundsIncludeAlphaCrop();												// Returns true if the current state's bounds of this sprite should include the alpha crop area when calculating bounding volume/shape. Default is false.
+	bool IsBoundsIncludeAlphaCrop(uint32 uiStateIndex);								// Returns true if the specified state's bounds of this sprite should include the alpha crop area when calculating bounding volume/shape. Default is false.
 	void SetBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop, uint32 uiStateIndex);	// Set whether the specified state's bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
 	void SetAllBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop);						// Must have valid data! Set whether ALL states' bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
 

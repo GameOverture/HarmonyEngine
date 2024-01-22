@@ -360,7 +360,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 
 	// Tween Special Case:
 	// To determine the tween's current value, store the info that kicked it off, and extrapolate the based on Entity's 'iCURRENT_FRAME'
-	TweenInfo tweenInfo[NUM_TWEENPROPS];// = { PROPERTIESTYPE_vec2, PROPERTIESTYPE_double, PROPERTIESTYPE_vec2, PROPERTIESTYPE_double };
+	TweenInfo tweenInfo[NUM_TWEENPROPS] = { TWEENPROP_Position, TWEENPROP_Rotation, TWEENPROP_Scale, TWEENPROP_Scale };
 
 	if(eItemType == ITEM_Entity)
 		static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(iCURRENT_FRAME, pCamera);
@@ -445,37 +445,28 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 				{
 					QJsonObject tweenObj = propsObj[sCategory].toObject();
 
-					tweenInfo[iTweenProp].m_iStartFrame = iFrame;
-					tweenInfo[iTweenProp].m_fDuration = tweenObj["Duration"].toDouble();
-					tweenInfo[iTweenProp].m_eTweenType = HyGlobal::GetTweenFromString(tweenObj["Tween Type"].toString());
+					QVariant startValue;
 					switch(iTweenProp)
 					{
-					case TWEENPROP_Position: {
-						tweenInfo[iTweenProp].m_Start.setValue(QPointF(pThisHyNode->pos.GetX(), pThisHyNode->pos.GetY()));
-						QJsonArray destinationArray = tweenObj["Destination"].toArray();
-						tweenInfo[iTweenProp].m_Destination.setValue(QPointF(destinationArray[0].toDouble(), destinationArray[1].toDouble()));
-						break; }
-
-					case TWEENPROP_Rotation:
-						tweenInfo[iTweenProp].m_Start = pThisHyNode->rot.Get();
-						tweenInfo[iTweenProp].m_Destination = tweenObj["Destination"].toDouble();
+					case TWEENPROP_Position:
+						startValue = QPointF(pThisHyNode->pos.GetX(), pThisHyNode->pos.GetY());
 						break;
-
-					case TWEENPROP_Scale: {
-						tweenInfo[iTweenProp].m_Start.setValue(QPointF(pThisHyNode->scale.GetX(), pThisHyNode->scale.GetY()));
-						QJsonArray destinationArray = tweenObj["Destination"].toArray();
-						tweenInfo[iTweenProp].m_Destination.setValue(QPointF(destinationArray[0].toDouble(), destinationArray[1].toDouble()));
-						break; }
-
+					case TWEENPROP_Rotation:
+						startValue = pThisHyNode->rot.Get();
+						break;
+					case TWEENPROP_Scale:
+						startValue = QPointF(pThisHyNode->scale.GetX(), pThisHyNode->scale.GetY());
+						break;
 					case TWEENPROP_Alpha:
-						tweenInfo[iTweenProp].m_Start = static_cast<IHyBody2d *>(pThisHyNode)->alpha.Get();
-						tweenInfo[iTweenProp].m_Destination = tweenObj["Destination"].toDouble();
+						startValue = static_cast<IHyBody2d *>(pThisHyNode)->alpha.Get();
 						break;
 
 					default:
-						HyGuiLog("EntityDrawItem::SetHyNode() - Unhandled tween property", LOGTYPE_Error);
+						HyGuiLog("HyEntity2d::ExtrapolateProperties - Unknown TweenProperty", LOGTYPE_Error);
 						break;
 					}
+					
+					tweenInfo[iTweenProp].Set(iFrame, tweenObj, startValue);
 				}
 			}
 		}
@@ -650,29 +641,25 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 	{
 		if(tweenInfo[iTweenProp].m_iStartFrame != -1)
 		{
-			float fElapsedTime = (iCURRENT_FRAME - tweenInfo[iTweenProp].m_iStartFrame) * fFRAME_DURATION;
-			fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, tweenInfo[iTweenProp].m_fDuration);
-			HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(tweenInfo[iTweenProp].m_eTweenType);
-			float fRatio = (tweenInfo[iTweenProp].m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / tweenInfo[iTweenProp].m_fDuration) : 1.0f;
-
+			QVariant extrapolatedValue = tweenInfo[iTweenProp].Extrapolate(iCURRENT_FRAME, fFRAME_DURATION);
 			switch(iTweenProp)
 			{
 			case TWEENPROP_Position:
-				pThisHyNode->pos.SetX(static_cast<float>(tweenInfo[iTweenProp].m_Start.toPointF().x() + (tweenInfo[iTweenProp].m_Destination.toPointF().x() - tweenInfo[iTweenProp].m_Start.toPointF().x()) * fRatio));
-				pThisHyNode->pos.SetY(static_cast<float>(tweenInfo[iTweenProp].m_Start.toPointF().y() + (tweenInfo[iTweenProp].m_Destination.toPointF().y() - tweenInfo[iTweenProp].m_Start.toPointF().y()) * fRatio));
+				pThisHyNode->pos.SetX(static_cast<float>(extrapolatedValue.toPointF().x()));
+				pThisHyNode->pos.SetY(static_cast<float>(extrapolatedValue.toPointF().y()));
 				break;
 
 			case TWEENPROP_Rotation:
-				pThisHyNode->rot.Set(tweenInfo[iTweenProp].m_Start.toDouble() + (tweenInfo[iTweenProp].m_Destination.toDouble() - tweenInfo[iTweenProp].m_Start.toDouble()) * fRatio);
+				pThisHyNode->rot.Set(extrapolatedValue.toDouble());
 				break;
 
 			case TWEENPROP_Scale:
-				pThisHyNode->scale.SetX(static_cast<float>(tweenInfo[iTweenProp].m_Start.toPointF().x() + (tweenInfo[iTweenProp].m_Destination.toPointF().x() - tweenInfo[iTweenProp].m_Start.toPointF().x()) * fRatio));
-				pThisHyNode->scale.SetY(static_cast<float>(tweenInfo[iTweenProp].m_Start.toPointF().y() + (tweenInfo[iTweenProp].m_Destination.toPointF().y() - tweenInfo[iTweenProp].m_Start.toPointF().y()) * fRatio));
+				pThisHyNode->scale.SetX(static_cast<float>(extrapolatedValue.toPointF().x()));
+				pThisHyNode->scale.SetY(static_cast<float>(extrapolatedValue.toPointF().y()));
 				break;
 
 			case TWEENPROP_Alpha:
-				static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(tweenInfo[iTweenProp].m_Start.toDouble() + (tweenInfo[iTweenProp].m_Destination.toDouble() - tweenInfo[iTweenProp].m_Start.toDouble()) * fRatio);
+				static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(extrapolatedValue.toDouble());
 				break;
 
 			default:

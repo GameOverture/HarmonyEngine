@@ -567,12 +567,6 @@ bool IHySprite<NODETYPE, ENTTYPE>::IsBoundsIncludeAlphaCrop(uint32 uiStateIndex)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHySprite<NODETYPE, ENTTYPE>::SetBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop)
-{
-	SetBoundsIncludeAlphaCrop(bIncludeAlphaCrop, this->m_uiState);
-}
-
-template<typename NODETYPE, typename ENTTYPE>
 void IHySprite<NODETYPE, ENTTYPE>::SetBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop, uint32 uiStateIndex)
 {
 	while(uiStateIndex >= m_AnimCtrlAttribList.size())

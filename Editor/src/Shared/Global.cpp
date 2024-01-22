@@ -18,7 +18,7 @@
 /*static*/ QString HyGlobal::sm_sItemNamesPlural[NUM_ITEMTYPES];
 /*static*/ QString HyGlobal::sm_AssetNames[NUM_ASSETMANTYPES];
 /*static*/ QString HyGlobal::sm_ShapeNames[NUM_SHAPES];
-/*static*/ QString HyGlobal::sm_TweenNames[NUM_TWEENS];
+/*static*/ QString HyGlobal::sm_TweenFuncNames[NUM_TWEENFUNCS];
 /*static*/ QString HyGlobal::sm_TweenPropNames[NUM_TWEENPROPS];
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
 /*static*/ QStringList HyGlobal::sm_sTextStyleList;
@@ -96,34 +96,34 @@
 	sm_ShapeNames[SHAPE_LineChain] = "Line Chain";
 	sm_ShapeNames[SHAPE_LineLoop] = "Line Loop";
 
-	sm_TweenNames[TWEEN_Linear] = "Linear";
-	sm_TweenNames[TWEEN_QuadIn] = "QuadIn";
-	sm_TweenNames[TWEEN_QuadOut] = "QuadOut";
-	sm_TweenNames[TWEEN_QuadInOut] = "QuadInOut";
-	sm_TweenNames[TWEEN_CubeIn] = "CubeIn";
-	sm_TweenNames[TWEEN_CubeOut] = "CubeOut";
-	sm_TweenNames[TWEEN_CubeInOut] = "CubeInOut";
-	sm_TweenNames[TWEEN_QuartIn] = "QuartIn";
-	sm_TweenNames[TWEEN_QuartOut] = "QuartOut";
-	sm_TweenNames[TWEEN_QuartInOut] = "QuartInOut";
-	sm_TweenNames[TWEEN_QuintIn] = "QuintIn";
-	sm_TweenNames[TWEEN_QuintOut] = "QuintOut";
-	sm_TweenNames[TWEEN_QuintInOut] = "QuintInOut";
-	sm_TweenNames[TWEEN_SineIn] = "SineIn";
-	sm_TweenNames[TWEEN_SineOut] = "SineOut";
-	sm_TweenNames[TWEEN_SineInOut] = "SineInOut";
-	sm_TweenNames[TWEEN_BounceIn] = "BounceIn";
-	sm_TweenNames[TWEEN_BounceOut] = "BounceOut";
-	sm_TweenNames[TWEEN_BounceInOut] = "BounceInOut";
-	sm_TweenNames[TWEEN_CircIn] = "CircIn";
-	sm_TweenNames[TWEEN_CircOut] = "CircOut";
-	sm_TweenNames[TWEEN_CircInOut] = "CircInOut";
-	sm_TweenNames[TWEEN_ExpoIn] = "ExpoIn";
-	sm_TweenNames[TWEEN_ExpoOut] = "ExpoOut";
-	sm_TweenNames[TWEEN_ExpoInOut] = "ExpoInOut";
-	sm_TweenNames[TWEEN_BackIn] = "BackIn";
-	sm_TweenNames[TWEEN_BackOut] = "BackOut";
-	sm_TweenNames[TWEEN_BackInOut] = "BackInOut";
+	sm_TweenFuncNames[TWEENFUNC_Linear] = "Linear";
+	sm_TweenFuncNames[TWEENFUNC_QuadIn] = "QuadIn";
+	sm_TweenFuncNames[TWEENFUNC_QuadOut] = "QuadOut";
+	sm_TweenFuncNames[TWEENFUNC_QuadInOut] = "QuadInOut";
+	sm_TweenFuncNames[TWEENFUNC_CubeIn] = "CubeIn";
+	sm_TweenFuncNames[TWEENFUNC_CubeOut] = "CubeOut";
+	sm_TweenFuncNames[TWEENFUNC_CubeInOut] = "CubeInOut";
+	sm_TweenFuncNames[TWEENFUNC_QuartIn] = "QuartIn";
+	sm_TweenFuncNames[TWEENFUNC_QuartOut] = "QuartOut";
+	sm_TweenFuncNames[TWEENFUNC_QuartInOut] = "QuartInOut";
+	sm_TweenFuncNames[TWEENFUNC_QuintIn] = "QuintIn";
+	sm_TweenFuncNames[TWEENFUNC_QuintOut] = "QuintOut";
+	sm_TweenFuncNames[TWEENFUNC_QuintInOut] = "QuintInOut";
+	sm_TweenFuncNames[TWEENFUNC_SineIn] = "SineIn";
+	sm_TweenFuncNames[TWEENFUNC_SineOut] = "SineOut";
+	sm_TweenFuncNames[TWEENFUNC_SineInOut] = "SineInOut";
+	sm_TweenFuncNames[TWEENFUNC_BounceIn] = "BounceIn";
+	sm_TweenFuncNames[TWEENFUNC_BounceOut] = "BounceOut";
+	sm_TweenFuncNames[TWEENFUNC_BounceInOut] = "BounceInOut";
+	sm_TweenFuncNames[TWEENFUNC_CircIn] = "CircIn";
+	sm_TweenFuncNames[TWEENFUNC_CircOut] = "CircOut";
+	sm_TweenFuncNames[TWEENFUNC_CircInOut] = "CircInOut";
+	sm_TweenFuncNames[TWEENFUNC_ExpoIn] = "ExpoIn";
+	sm_TweenFuncNames[TWEENFUNC_ExpoOut] = "ExpoOut";
+	sm_TweenFuncNames[TWEENFUNC_ExpoInOut] = "ExpoInOut";
+	sm_TweenFuncNames[TWEENFUNC_BackIn] = "BackIn";
+	sm_TweenFuncNames[TWEENFUNC_BackOut] = "BackOut";
+	sm_TweenFuncNames[TWEENFUNC_BackInOut] = "BackInOut";
 
 	sm_TweenPropNames[TWEENPROP_Position] = "Position";
 	sm_TweenPropNames[TWEENPROP_Rotation] = "Rotation";
@@ -272,39 +272,39 @@
 	return list;
 }
 
-/*static*/ QList<TweenType> HyGlobal::GetTweenList()
+/*static*/ QList<TweenFuncType> HyGlobal::GetTweenFuncList()
 {
-	QList<TweenType> list;
-	list.append(TWEEN_Linear);
-	list.append(TWEEN_QuadIn);
-	list.append(TWEEN_QuadOut);
-	list.append(TWEEN_QuadInOut);
-	list.append(TWEEN_CubeIn);
-	list.append(TWEEN_CubeOut);
-	list.append(TWEEN_CubeInOut);
-	list.append(TWEEN_QuartIn);
-	list.append(TWEEN_QuartOut);
-	list.append(TWEEN_QuartInOut);
-	list.append(TWEEN_QuintIn);
-	list.append(TWEEN_QuintOut);
-	list.append(TWEEN_QuintInOut);
-	list.append(TWEEN_SineIn);
-	list.append(TWEEN_SineOut);
-	list.append(TWEEN_SineInOut);
-	list.append(TWEEN_BounceIn);
-	list.append(TWEEN_BounceOut);
-	list.append(TWEEN_BounceInOut);
-	list.append(TWEEN_CircIn);
-	list.append(TWEEN_CircOut);
-	list.append(TWEEN_CircInOut);
-	list.append(TWEEN_ExpoIn);
-	list.append(TWEEN_ExpoOut);
-	list.append(TWEEN_ExpoInOut);
-	list.append(TWEEN_BackIn);
-	list.append(TWEEN_BackOut);
-	list.append(TWEEN_BackInOut);
+	QList<TweenFuncType> list;
+	list.append(TWEENFUNC_Linear);
+	list.append(TWEENFUNC_QuadIn);
+	list.append(TWEENFUNC_QuadOut);
+	list.append(TWEENFUNC_QuadInOut);
+	list.append(TWEENFUNC_CubeIn);
+	list.append(TWEENFUNC_CubeOut);
+	list.append(TWEENFUNC_CubeInOut);
+	list.append(TWEENFUNC_QuartIn);
+	list.append(TWEENFUNC_QuartOut);
+	list.append(TWEENFUNC_QuartInOut);
+	list.append(TWEENFUNC_QuintIn);
+	list.append(TWEENFUNC_QuintOut);
+	list.append(TWEENFUNC_QuintInOut);
+	list.append(TWEENFUNC_SineIn);
+	list.append(TWEENFUNC_SineOut);
+	list.append(TWEENFUNC_SineInOut);
+	list.append(TWEENFUNC_BounceIn);
+	list.append(TWEENFUNC_BounceOut);
+	list.append(TWEENFUNC_BounceInOut);
+	list.append(TWEENFUNC_CircIn);
+	list.append(TWEENFUNC_CircOut);
+	list.append(TWEENFUNC_CircInOut);
+	list.append(TWEENFUNC_ExpoIn);
+	list.append(TWEENFUNC_ExpoOut);
+	list.append(TWEENFUNC_ExpoInOut);
+	list.append(TWEENFUNC_BackIn);
+	list.append(TWEENFUNC_BackOut);
+	list.append(TWEENFUNC_BackInOut);
 
-	if(list.size() != NUM_TWEENS)
+	if(list.size() != NUM_TWEENFUNCS)
 		HyGuiLog("HyGlobal::GetTweenList missing a type!", LOGTYPE_Error);
 
 	return list;
@@ -369,26 +369,26 @@
 	return SHAPE_None;
 }
 
-/*static*/ QStringList HyGlobal::GetTweenNameList()
+/*static*/ QStringList HyGlobal::GetTweenFuncNameList()
 {
-	QList<TweenType> tweenList = GetTweenList();
+	QList<TweenFuncType> tweenList = GetTweenFuncList();
 
 	QStringList list;
 	for(int i = 0; i < tweenList.size(); ++i)
-		list.append(TweenName(tweenList[i]));
+		list.append(TweenFuncName(tweenList[i]));
 
 	return list;
 }
 
-/*static*/ TweenType HyGlobal::GetTweenFromString(QString sTween)
+/*static*/ TweenFuncType HyGlobal::GetTweenFuncFromString(QString sTween)
 {
-	for(int i = 0; i < NUM_TWEENS; ++i)
+	for(int i = 0; i < NUM_TWEENFUNCS; ++i)
 	{
-		if(sTween.compare(TweenName(static_cast<TweenType>(i)), Qt::CaseInsensitive) == 0)
-			return static_cast<TweenType>(i);
+		if(sTween.compare(TweenFuncName(static_cast<TweenFuncType>(i)), Qt::CaseInsensitive) == 0)
+			return static_cast<TweenFuncType>(i);
 	}
 
-	return TWEEN_Unknown;
+	return TWEENFUNC_Unknown;
 }
 
 /*static*/ TweenProperty HyGlobal::GetTweenPropFromString(QString sTweenProp)
@@ -402,38 +402,38 @@
 	return TWEENPROP_None;
 }
 
-/*static*/ HyTweenFunc HyGlobal::GetTweenFunc(TweenType eTween)
+/*static*/ HyTweenFunc HyGlobal::GetTweenFunc(TweenFuncType eTween)
 {
 	switch(eTween)
 	{
-	case TWEEN_Linear:		return HyTween::Linear;
-	case TWEEN_QuadIn:		return HyTween::QuadIn;
-	case TWEEN_QuadOut:		return HyTween::QuadOut;
-	case TWEEN_QuadInOut:	return HyTween::QuadInOut;
-	case TWEEN_CubeIn:		return HyTween::CubeIn;
-	case TWEEN_CubeOut:		return HyTween::CubeOut;
-	case TWEEN_CubeInOut:	return HyTween::CubeInOut;
-	case TWEEN_QuartIn:		return HyTween::QuartIn;
-	case TWEEN_QuartOut:	return HyTween::QuartOut;
-	case TWEEN_QuartInOut:	return HyTween::QuartInOut;
-	case TWEEN_QuintIn:		return HyTween::QuintIn;
-	case TWEEN_QuintOut:	return HyTween::QuintOut;
-	case TWEEN_QuintInOut:	return HyTween::QuintInOut;
-	case TWEEN_SineIn:		return HyTween::SineIn;
-	case TWEEN_SineOut:		return HyTween::SineOut;
-	case TWEEN_SineInOut:	return HyTween::SineInOut;
-	case TWEEN_BounceIn:	return HyTween::BounceIn;
-	case TWEEN_BounceOut:	return HyTween::BounceOut;
-	case TWEEN_BounceInOut:	return HyTween::BounceInOut;
-	case TWEEN_CircIn:		return HyTween::CircIn;
-	case TWEEN_CircOut:		return HyTween::CircOut;
-	case TWEEN_CircInOut:	return HyTween::CircInOut;
-	case TWEEN_ExpoIn:		return HyTween::ExpoIn;
-	case TWEEN_ExpoOut:		return HyTween::ExpoOut;
-	case TWEEN_ExpoInOut:	return HyTween::ExpoInOut;
-	case TWEEN_BackIn:		return HyTween::BackIn;
-	case TWEEN_BackOut:		return HyTween::BackOut;
-	case TWEEN_BackInOut:	return HyTween::BackInOut;
+	case TWEENFUNC_Linear:		return HyTween::Linear;
+	case TWEENFUNC_QuadIn:		return HyTween::QuadIn;
+	case TWEENFUNC_QuadOut:		return HyTween::QuadOut;
+	case TWEENFUNC_QuadInOut:	return HyTween::QuadInOut;
+	case TWEENFUNC_CubeIn:		return HyTween::CubeIn;
+	case TWEENFUNC_CubeOut:		return HyTween::CubeOut;
+	case TWEENFUNC_CubeInOut:	return HyTween::CubeInOut;
+	case TWEENFUNC_QuartIn:		return HyTween::QuartIn;
+	case TWEENFUNC_QuartOut:	return HyTween::QuartOut;
+	case TWEENFUNC_QuartInOut:	return HyTween::QuartInOut;
+	case TWEENFUNC_QuintIn:		return HyTween::QuintIn;
+	case TWEENFUNC_QuintOut:	return HyTween::QuintOut;
+	case TWEENFUNC_QuintInOut:	return HyTween::QuintInOut;
+	case TWEENFUNC_SineIn:		return HyTween::SineIn;
+	case TWEENFUNC_SineOut:		return HyTween::SineOut;
+	case TWEENFUNC_SineInOut:	return HyTween::SineInOut;
+	case TWEENFUNC_BounceIn:	return HyTween::BounceIn;
+	case TWEENFUNC_BounceOut:	return HyTween::BounceOut;
+	case TWEENFUNC_BounceInOut:	return HyTween::BounceInOut;
+	case TWEENFUNC_CircIn:		return HyTween::CircIn;
+	case TWEENFUNC_CircOut:		return HyTween::CircOut;
+	case TWEENFUNC_CircInOut:	return HyTween::CircInOut;
+	case TWEENFUNC_ExpoIn:		return HyTween::ExpoIn;
+	case TWEENFUNC_ExpoOut:		return HyTween::ExpoOut;
+	case TWEENFUNC_ExpoInOut:	return HyTween::ExpoInOut;
+	case TWEENFUNC_BackIn:		return HyTween::BackIn;
+	case TWEENFUNC_BackOut:		return HyTween::BackOut;
+	case TWEENFUNC_BackInOut:	return HyTween::BackInOut;
 
 	default:
 		HyGuiLog("HyGlobal::GetTweenFunc missing a type!", LOGTYPE_Error);
@@ -680,7 +680,7 @@
 	return returnList;
 }
 
-/*static*/ QPair<QString, QString> HyGlobal::GetTweenCategoryProperty(TweenProperty eTweenProp)
+/*static*/ QPair<QString, QString> HyGlobal::ConvertTweenPropToRegularPropPair(TweenProperty eTweenProp)
 {
 	switch(eTweenProp)
 	{

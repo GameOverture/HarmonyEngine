@@ -17,19 +17,31 @@
 #include <QGraphicsSceneHoverEvent>
 #include <QPainter>
 
-GraphicsTweenKnobItem::GraphicsTweenKnobItem(QGraphicsItem *pParent /*= nullptr*/) :
+GraphicsTweenKnobItem::GraphicsTweenKnobItem(KeyFrameKey tupleKey, QGraphicsItem *pParent /*= nullptr*/) :
 	QGraphicsEllipseItem(-KEYFRAME_TWEEN_KNOB_RADIUS, -KEYFRAME_TWEEN_KNOB_RADIUS, KEYFRAME_TWEEN_KNOB_RADIUS * 2.0f, KEYFRAME_TWEEN_KNOB_RADIUS * 2.0f, pParent)
 {
+	setData(GFXDATAKEY_TreeItemData, QVariant::fromValue(std::get<GFXDATAKEY_TreeItemData>(tupleKey)));
+	setData(GFXDATAKEY_FrameIndex, std::get<GFXDATAKEY_FrameIndex>(tupleKey));
+	setData(GFXDATAKEY_CategoryPropString, std::get<GFXDATAKEY_CategoryPropString>(tupleKey));
+
 	setData(GFXDATAKEY_Type, GFXITEM_TweenKnob);
 
 	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
 	setBrush(HyGlobal::ConvertHyColor(HyColor::Green));
 	setAcceptHoverEvents(true);
 	setAcceptedMouseButtons(Qt::LeftButton);
+	setFlags(QGraphicsItem::ItemIsSelectable);
 }
 
 /*virtual*/ GraphicsTweenKnobItem::~GraphicsTweenKnobItem()
 {
+}
+
+KeyFrameKey GraphicsTweenKnobItem::GetKey() const
+{
+	return std::make_tuple(data(GFXDATAKEY_TreeItemData).value<EntityTreeItemData *>(),
+						   data(GFXDATAKEY_FrameIndex).toInt(),
+						   data(GFXDATAKEY_CategoryPropString).toString());
 }
 
 /*virtual*/ QVariant GraphicsTweenKnobItem::itemChange(GraphicsItemChange eChange, const QVariant &value) /*override*/
@@ -64,11 +76,13 @@ GraphicsTweenKnobItem::GraphicsTweenKnobItem(QGraphicsItem *pParent /*= nullptr*
 GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKeyFrame, QGraphicsItem *pParent /*= nullptr*/) :
 	QGraphicsRectItem(0.0, 0.0, KEYFRAME_WIDTH, KEYFRAME_HEIGHT, pParent),
 	m_pGfxTweenLine(nullptr),
-	m_pGfxTweenDurationKnob(nullptr)
+	m_pGfxTweenDurationKnob(nullptr),
+	m_iTweenFramesDuration(0)
 {
 	setData(GFXDATAKEY_TreeItemData, QVariant::fromValue(std::get<GFXDATAKEY_TreeItemData>(tupleKey)));
 	setData(GFXDATAKEY_FrameIndex, std::get<GFXDATAKEY_FrameIndex>(tupleKey));
 	setData(GFXDATAKEY_CategoryPropString, std::get<GFXDATAKEY_CategoryPropString>(tupleKey));
+
 	setData(GFXDATAKEY_Type, bIsTweenKeyFrame ? GFXITEM_TweenKeyFrame : GFXITEM_PropertyKeyFrame);
 
 	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
@@ -87,7 +101,7 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKe
 		dashLinePen.setColor(HyGlobal::ConvertHyColor(HyColor::Green));
 		m_pGfxTweenLine->setPen(dashLinePen);
 
-		m_pGfxTweenDurationKnob = new GraphicsTweenKnobItem(this);
+		m_pGfxTweenDurationKnob = new GraphicsTweenKnobItem(tupleKey, this);
 	}
 }
 
@@ -109,10 +123,16 @@ bool GraphicsKeyFrameItem::IsTweenKeyFrame() const
 	return data(GFXDATAKEY_Type).toInt() == GFXITEM_TweenKeyFrame;
 }
 
-void GraphicsKeyFrameItem::SetTweenLineLength(qreal fLength)
+void GraphicsKeyFrameItem::SetTweenLineLength(qreal fLength, int iFramesDuration)
 {
 	m_pGfxTweenLine->setLine(0.0f, KEYFRAME_HEIGHT * 0.5f, fLength, KEYFRAME_HEIGHT * 0.5f);
 	m_pGfxTweenDurationKnob->setPos(fLength, KEYFRAME_HEIGHT * 0.5f);
+	m_iTweenFramesDuration = iFramesDuration;
+}
+
+int GraphicsKeyFrameItem::GetTweenFramesDuration() const
+{
+	return m_iTweenFramesDuration;
 }
 
 /*virtual*/ QVariant GraphicsKeyFrameItem::itemChange(GraphicsItemChange eChange, const QVariant &value) /*override*/
@@ -238,6 +258,70 @@ bool EntityDopeSheetScene::ContainsKeyFrameTween(KeyFrameKey tupleKey)
 	return m_TweenGfxRectMap.contains(tupleKey);
 }
 
+TweenProperty EntityDopeSheetScene::DetermineIfContextQuickTween(EntityTreeItemData *&pTweenTreeItemDataOut, int &iTweenStartFrameOut, int &iTweenEndFrameOut) const
+{
+	// Only check if there are 2 items selected
+	if(selectedItems().count() != 2)
+		return TWEENPROP_None;
+
+	// Make sure both selected items are valid 'GraphicsKeyFrameItem's
+	QGraphicsItem *pItem0 = selectedItems()[0];
+	QGraphicsItem *pItem1 = selectedItems()[1];
+
+	// Make Item0 and Item1 in order from left to right
+	if(pItem1->x() < pItem0->x())
+		std::swap(pItem0, pItem1);
+
+	bool bAcquiredDataType = false;
+	DopeSheetGfxItemType eItemType0 = static_cast<DopeSheetGfxItemType>(pItem0->data(GFXDATAKEY_Type).toInt(&bAcquiredDataType));
+	if(bAcquiredDataType == false)
+		return TWEENPROP_None;
+	if(eItemType0 == GFXITEM_TweenKnob) // If item 0 is a tween knob, reassign it to its parent (which is a tween keyframe)
+		pItem0 = pItem0->parentItem();
+
+	// Item on right (pItem1) must be a regular property keyframe
+	DopeSheetGfxItemType eItemType1 = static_cast<DopeSheetGfxItemType>(pItem1->data(GFXDATAKEY_Type).toInt(&bAcquiredDataType));
+	if(bAcquiredDataType == false || eItemType1 != GFXITEM_PropertyKeyFrame)
+		return TWEENPROP_None;
+
+	// Collect all the info stored in the FrameKey for item 0
+	GraphicsKeyFrameItem *pGfxKeyFrame0 = static_cast<GraphicsKeyFrameItem *>(pItem0);
+	KeyFrameKey tupleKey0 = pGfxKeyFrame0->GetKey();
+	int iFrame0 = std::get<GFXDATAKEY_FrameIndex>(tupleKey0);
+	if(pGfxKeyFrame0->IsTweenKeyFrame())
+		iFrame0 += pGfxKeyFrame0->GetTweenFramesDuration();
+	QString sCategoryProp0 = std::get<GFXDATAKEY_CategoryPropString>(tupleKey0);
+
+	// Collect all the info stored in the FrameKey for item 1
+	GraphicsKeyFrameItem *pGfxKeyFrame1 = static_cast<GraphicsKeyFrameItem *>(pItem1);
+	KeyFrameKey tupleKey1 = pGfxKeyFrame1->GetKey();
+	int iFrame1 = std::get<GFXDATAKEY_FrameIndex>(tupleKey1);
+	if(pGfxKeyFrame1->IsTweenKeyFrame())
+		iFrame1 += pGfxKeyFrame1->GetTweenFramesDuration();
+	QString sCategoryProp1 = std::get<GFXDATAKEY_CategoryPropString>(tupleKey1);
+
+	// Final check to determine if a quick-tween button should be shown, and if so, which one
+	if(std::get<GFXDATAKEY_TreeItemData>(tupleKey0) == std::get<GFXDATAKEY_TreeItemData>(tupleKey1) &&
+		iFrame0 != iFrame1 &&
+		sCategoryProp0 == sCategoryProp1)
+	{
+		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sCategoryProp0.split('/')[1]);
+		if(eTweenProp == TWEENPROP_None)
+			return TWEENPROP_None;
+
+		if(iFrame0 > iFrame1)
+			std::swap(iFrame0, iFrame1);
+
+		pTweenTreeItemDataOut = std::get<GFXDATAKEY_TreeItemData>(tupleKey0);
+		iTweenStartFrameOut = iFrame0;
+		iTweenEndFrameOut = iFrame1;
+		
+		return eTweenProp;
+	}
+	
+	return TWEENPROP_None;
+}
+
 QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(EntityTreeItemData *pItemData) const
 {
 	QSet<QPair<QString, QString>> uniquePropertiesSet;
@@ -256,7 +340,7 @@ QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(Ent
 				// Match the tween category to its corresponding property
 				QString sTween = sCategoryName.mid(6);
 				TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sTween);
-				uniquePropertiesSet.insert(HyGlobal::GetTweenCategoryProperty(eTweenProp));
+				uniquePropertiesSet.insert(HyGlobal::ConvertTweenPropToRegularPropPair(eTweenProp));
 			}
 			else
 			{
@@ -394,21 +478,21 @@ QJsonValue EntityDopeSheetScene::GetKeyFrameProperty(EntityTreeItemData *pItemDa
 	return itemKeyFrameMapRef[iFrameIndex][sCategoryName].toObject()[sPropName];
 }
 
-QJsonValue EntityDopeSheetScene::ExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, QString sCategoryName, QString sPropName) const
+QJsonValue EntityDopeSheetScene::BasicExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const
 {
 	if(m_KeyFramesMap.contains(pItemData) == false)
 		return QJsonValue();
 
 	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
 
-	// Get the closest key frame that is less than or equal to 'm_iCurrentFrame'
-	QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.find(m_iCurrentFrame);
+	// Get the closest key frame that is less than or equal to 'iFrameIndex'
+	QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.find(iFrameIndex);
 	if(iter == itemKeyFrameMapRef.end())
 	{
-		// lowerBound() - Returns an iterator pointing to the first item with key 'm_iCurrentFrame' in the map.
-		//                If the map contains no item with key 'm_iCurrentFrame', the function returns an iterator
+		// lowerBound() - Returns an iterator pointing to the first item with key 'iFrameIndex' in the map.
+		//                If the map contains no item with key 'iFrameIndex', the function returns an iterator
 		//                to the nearest item with a greater key.
-		iter = itemKeyFrameMapRef.lowerBound(m_iCurrentFrame);
+		iter = itemKeyFrameMapRef.lowerBound(iFrameIndex);
 		if(iter != itemKeyFrameMapRef.begin())
 			iter--; // Don't want an iterator with a greater key, so go back one
 	}
@@ -567,7 +651,7 @@ void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData,
 	{
 		QString sTweenName = sCategoryName.mid(6);
 		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sTweenName);
-		QPair<QString, QString> tweenPair = HyGlobal::GetTweenCategoryProperty(eTweenProp);
+		QPair<QString, QString> tweenPair = HyGlobal::ConvertTweenPropToRegularPropPair(eTweenProp);
 		gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, tweenPair.first % "/" % tweenPair.second);
 		if(m_TweenGfxRectMap.contains(gfxRectMapKey))
 		{
@@ -598,16 +682,16 @@ TweenJsonValues EntityDopeSheetScene::GetTweenJsonValues(EntityTreeItemData *pIt
 	QJsonValue durationValue = GetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Duration");
 	QJsonValue tweenTypeValue = GetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type");
 
-	return std::make_tuple(destinationValue, durationValue, tweenTypeValue);
+	return TweenJsonValues(destinationValue, durationValue, tweenTypeValue);
 }
 
-void EntityDopeSheetScene::SetKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, TweenJsonValues tweenValues, bool bRefreshGfxItems)
+void EntityDopeSheetScene::SetKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, const TweenJsonValues &tweenValues, bool bRefreshGfxItems)
 {
 	QString sCategoryName = "Tween " % HyGlobal::TweenPropName(eTweenProp);
 
-	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Destination", std::get<0>(tweenValues), bRefreshGfxItems);
-	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Duration", std::get<1>(tweenValues), bRefreshGfxItems);
-	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type", std::get<2>(tweenValues), bRefreshGfxItems);
+	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Destination", tweenValues.m_Destination, bRefreshGfxItems);
+	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Duration", tweenValues.m_Duration, bRefreshGfxItems);
+	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type", tweenValues.m_TweenFuncType, bRefreshGfxItems);
 }
 
 QJsonArray EntityDopeSheetScene::SerializeCallbacks() const
@@ -739,7 +823,7 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 					bool bPropKeyFrame = propsObj.contains(propPair.first) && propsObj[propPair.first].toObject().contains(propPair.second);
 					
 					bool bTweenKeyFrame = std::any_of(tweenPropList.begin(), tweenPropList.end(), [&](TweenProperty eTweenProp) {
-						QPair<QString, QString> tweenPair = HyGlobal::GetTweenCategoryProperty(eTweenProp);
+						QPair<QString, QString> tweenPair = HyGlobal::ConvertTweenPropToRegularPropPair(eTweenProp);
 						return (propPair == tweenPair && propsObj.contains("Tween " % HyGlobal::TweenPropName(eTweenProp)));
 					});
 
@@ -786,10 +870,12 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 
 						// Calculate the dash-line "Duration"
 						double dDuration = GetKeyFrameProperty(pCurItemData, iFrameIndex, "Tween " % propPair.second, "Duration").toDouble();
-						qreal fLineLength = (dDuration * static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetFramesPerSecond()) * TIMELINE_NOTCH_SUBLINES_WIDTH;
+						int iNumFrames = (dDuration * static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetFramesPerSecond());
+						qreal fLineLength = iNumFrames * TIMELINE_NOTCH_SUBLINES_WIDTH;
 						if(bPropKeyFrame)
 							fLineLength -= (KEYFRAME_WIDTH + 1.0f);
-						m_TweenGfxRectMap[gfxRectMapKey]->SetTweenLineLength(fLineLength);
+
+						m_TweenGfxRectMap[gfxRectMapKey]->SetTweenLineLength(fLineLength, iNumFrames);
 					}
 
 					if(pCurItemData->IsSelected())

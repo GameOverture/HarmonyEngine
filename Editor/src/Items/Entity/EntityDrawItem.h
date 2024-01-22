@@ -17,13 +17,16 @@ class EntityDopeSheetScene;
 
 struct TweenInfo
 {
+	const TweenProperty m_eTWEEN_PROPERTY;
 	int m_iStartFrame;
 	QVariant m_Start;
 	QVariant m_Destination;
 	float m_fDuration;
-	TweenType m_eTweenType;
+	TweenFuncType m_eTweenFunc;
 
-	TweenInfo() {
+	TweenInfo(TweenProperty eTweenProp) :
+		m_eTWEEN_PROPERTY(eTweenProp)
+	{
 		Clear();
 	}
 
@@ -33,7 +36,63 @@ struct TweenInfo
 		m_Start.clear();
 		m_Destination.clear();
 		m_fDuration = 0.0f;
-		m_eTweenType = TWEEN_Unknown;
+		m_eTweenFunc = TWEENFUNC_Unknown;
+	}
+
+	void Set(int iStartFrame, const QJsonObject &tweenObj, QVariant startValue)
+	{
+		m_iStartFrame = iStartFrame;
+		m_fDuration = tweenObj["Duration"].toDouble();
+		m_eTweenFunc = HyGlobal::GetTweenFuncFromString(tweenObj["Tween Type"].toString());
+		m_Start = startValue;
+		switch(m_eTWEEN_PROPERTY)
+		{
+		case TWEENPROP_Position:
+		case TWEENPROP_Scale: {
+			QJsonArray destinationArray = tweenObj["Destination"].toArray();
+			m_Destination = QPointF(destinationArray[0].toDouble(), destinationArray[1].toDouble());
+			break; }
+
+		case TWEENPROP_Rotation:
+		case TWEENPROP_Alpha:
+			m_Destination = tweenObj["Destination"].toDouble();
+			break;
+
+		default:
+			HyGuiLog("TweenInfo::Set() - Unhandled tween property", LOGTYPE_Error);
+			break;
+		}
+	}
+
+	QVariant Extrapolate(int iFrameIndex, float fFrameDuration)
+	{
+		float fElapsedTime = (iFrameIndex - m_iStartFrame) * fFrameDuration;
+		fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, m_fDuration);
+		HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(m_eTweenFunc);
+		float fRatio = (m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / m_fDuration) : 1.0f;
+
+		QVariant extrapolatedValue;
+		switch(m_eTWEEN_PROPERTY)
+		{
+		case TWEENPROP_Position:
+		case TWEENPROP_Scale: {
+			QPointF ptStart = m_Start.toPointF();
+			QPointF ptDest = m_Destination.toPointF();
+			extrapolatedValue = QPointF(static_cast<float>(ptStart.x() + (ptDest.x() - ptStart.x()) * fRatio),
+										static_cast<float>(ptStart.y() + (ptDest.y() - ptStart.y()) * fRatio));
+			break; }
+
+		case TWEENPROP_Rotation:
+		case TWEENPROP_Alpha:
+			extrapolatedValue = m_Start.toDouble() + (m_Destination.toDouble() - m_Start.toDouble()) * fRatio;
+			break;
+
+		default:
+			HyGuiLog("TweenInfo::Extrapolate() - Unhandled tween property", LOGTYPE_Error);
+			break;
+		}
+
+		return extrapolatedValue;
 	}
 };
 

@@ -141,40 +141,40 @@ enum EditorShape
 	NUM_SHAPES
 };
 
-enum TweenType
+enum TweenFuncType
 {
-	TWEEN_Unknown = -1,
+	TWEENFUNC_Unknown = -1,
 
-	TWEEN_Linear = 0,
-	TWEEN_QuadIn,
-	TWEEN_QuadOut,
-	TWEEN_QuadInOut,
-	TWEEN_CubeIn,
-	TWEEN_CubeOut,
-	TWEEN_CubeInOut,
-	TWEEN_QuartIn,
-	TWEEN_QuartOut,
-	TWEEN_QuartInOut,
-	TWEEN_QuintIn,
-	TWEEN_QuintOut,
-	TWEEN_QuintInOut,
-	TWEEN_SineIn,
-	TWEEN_SineOut,
-	TWEEN_SineInOut,
-	TWEEN_BounceIn,
-	TWEEN_BounceOut,
-	TWEEN_BounceInOut,
-	TWEEN_CircIn,
-	TWEEN_CircOut,
-	TWEEN_CircInOut,
-	TWEEN_ExpoIn,
-	TWEEN_ExpoOut,
-	TWEEN_ExpoInOut,
-	TWEEN_BackIn,
-	TWEEN_BackOut,
-	TWEEN_BackInOut,
+	TWEENFUNC_Linear = 0,
+	TWEENFUNC_QuadIn,
+	TWEENFUNC_QuadOut,
+	TWEENFUNC_QuadInOut,
+	TWEENFUNC_CubeIn,
+	TWEENFUNC_CubeOut,
+	TWEENFUNC_CubeInOut,
+	TWEENFUNC_QuartIn,
+	TWEENFUNC_QuartOut,
+	TWEENFUNC_QuartInOut,
+	TWEENFUNC_QuintIn,
+	TWEENFUNC_QuintOut,
+	TWEENFUNC_QuintInOut,
+	TWEENFUNC_SineIn,
+	TWEENFUNC_SineOut,
+	TWEENFUNC_SineInOut,
+	TWEENFUNC_BounceIn,
+	TWEENFUNC_BounceOut,
+	TWEENFUNC_BounceInOut,
+	TWEENFUNC_CircIn,
+	TWEENFUNC_CircOut,
+	TWEENFUNC_CircInOut,
+	TWEENFUNC_ExpoIn,
+	TWEENFUNC_ExpoOut,
+	TWEENFUNC_ExpoInOut,
+	TWEENFUNC_BackIn,
+	TWEENFUNC_BackOut,
+	TWEENFUNC_BackInOut,
 
-	NUM_TWEENS
+	NUM_TWEENFUNCS
 };
 
 enum TweenProperty
@@ -304,7 +304,7 @@ class HyGlobal
 	static QString														sm_sItemNamesPlural[NUM_ITEMTYPES];
 	static QString														sm_AssetNames[NUM_ASSETMANTYPES];
 	static QString														sm_ShapeNames[NUM_SHAPES];
-	static QString														sm_TweenNames[NUM_TWEENS];
+	static QString														sm_TweenFuncNames[NUM_TWEENFUNCS];
 	static QString														sm_TweenPropNames[NUM_TWEENPROPS];
 	static QString														sm_sSubIconNames[NUM_SUBICONS];
 	static QStringList													sm_sTextStyleList;
@@ -334,17 +334,17 @@ public:
 	static QList<ItemType> GetItemTypeList_Project();
 	static QList<ItemType> GetItemTypeList_Asset();
 	static QList<EditorShape> GetShapeList();
-	static QList<TweenType> GetTweenList();
+	static QList<TweenFuncType> GetTweenFuncList();
 	static QList<TweenProperty> GetTweenPropList();
 	static QStringList GetTypeNameList();
 	static ItemType GetTypeFromString(QString sType);
 	static QStringList GetShapeNameList();
 	static EditorShape GetShapeFromString(QString sShape);
-	static QStringList GetTweenNameList();
-	static TweenType GetTweenFromString(QString sTween);
+	static QStringList GetTweenFuncNameList();
+	static TweenFuncType GetTweenFuncFromString(QString sTween);
 	static TweenProperty GetTweenPropFromString(QString sTweenProp);
 	static QStringList GetTweenPropNameList();
-	static HyTweenFunc GetTweenFunc(TweenType eTween);
+	static HyTweenFunc GetTweenFunc(TweenFuncType eTween);
 	static QStringList GetTextStyleNameList();
 	static TextStyle GetTextStyleFromString(QString sTextStyle);
 	static QStringList GetAlignmentNameList();
@@ -356,7 +356,7 @@ public:
 	static const QString ItemName(ItemType eItem, bool bPlural)			{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
 	static const QString AssetName(AssetManagerType eAsset)				{ return sm_AssetNames[eAsset]; }
 	static const QString ShapeName(EditorShape eShape)					{ return sm_ShapeNames[eShape]; }
-	static const QString TweenName(TweenType eTween)					{ return sm_TweenNames[eTween]; }
+	static const QString TweenFuncName(TweenFuncType eTween)			{ return sm_TweenFuncNames[eTween]; }
 	static const QString TweenPropName(TweenProperty eTweenProp)		{ return sm_TweenPropNames[eTweenProp]; }
 	static const QIcon TweenPropIcon(TweenProperty eTweenProp)			{ return sm_TweenPropIcons[eTweenProp]; }
 	static const QString ItemExt(ItemType eItem);
@@ -388,7 +388,7 @@ public:
 	// Includes 'pParentItem' in returned list
 	static QList<QTreeWidgetItem *> RecursiveTreeChildren(QTreeWidgetItem *pParentItem);
 
-	static QPair<QString, QString> GetTweenCategoryProperty(TweenProperty eTweenProp);
+	static QPair<QString, QString> ConvertTweenPropToRegularPropPair(TweenProperty eTweenProp);
 
 	static QDir PrepTempDir(Project &projectRef, QString sDirName);
 	static void CleanAllTempDirs(Project &projectRef);

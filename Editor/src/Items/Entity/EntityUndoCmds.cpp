@@ -960,7 +960,7 @@ EntityUndoCmd_NudgeTweenDuration::EntityUndoCmd_NudgeTweenDuration(EntityDopeShe
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_CreateTween::EntityUndoCmd_CreateTween(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, TweenProperty eTweenProp, int iStartFrameIndex, int iEndFrameIndex, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_ConvertToTween::EntityUndoCmd_ConvertToTween(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, TweenProperty eTweenProp, int iStartFrameIndex, int iEndFrameIndex, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
 	m_pItemData(pItemData),
@@ -969,32 +969,37 @@ EntityUndoCmd_CreateTween::EntityUndoCmd_CreateTween(EntityDopeSheetScene &entit
 	m_iEndFrameIndex(iEndFrameIndex)
 {
 	setText("Create " % HyGlobal::TweenPropName(m_eTweenProp) % " Tween");
+	QPair<QString, QString> propPair = HyGlobal::ConvertTweenPropToRegularPropPair(m_eTweenProp);
 
-	QPair<QString, QString> propPair = HyGlobal::GetTweenCategoryProperty(m_eTweenProp);
-	m_StartValue = m_DopeSheetSceneRef.GetKeyFrameProperty(m_pItemData, m_iStartFrameIndex, propPair.first, propPair.second);
-	m_EndValue = m_DopeSheetSceneRef.GetKeyFrameProperty(m_pItemData, m_iEndFrameIndex, propPair.first, propPair.second);
+	if(m_DopeSheetSceneRef.ContainsKeyFrameProperty(KeyFrameKey(m_pItemData, m_iEndFrameIndex, propPair.first % '/' % propPair.second)) == false)
+	{
+		HyGuiLog("EntityUndoCmd_ConvertToTween::EntityUndoCmd_ConvertToTween() - Destination key frame must be a valid (non-tween) property", LOGTYPE_Error);
+		return;
+	}
+
+	m_DestinationValue = m_DopeSheetSceneRef.GetKeyFrameProperty(m_pItemData, m_iEndFrameIndex, propPair.first, propPair.second);
 }
 
-/*virtual*/ EntityUndoCmd_CreateTween::~EntityUndoCmd_CreateTween()
+/*virtual*/ EntityUndoCmd_ConvertToTween::~EntityUndoCmd_ConvertToTween()
 {
 }
 
-/*virtual*/ void EntityUndoCmd_CreateTween::redo() /*override*/
+/*virtual*/ void EntityUndoCmd_ConvertToTween::redo() /*override*/
 {
-	QPair<QString, QString> propPair = HyGlobal::GetTweenCategoryProperty(m_eTweenProp);
+	QPair<QString, QString> propPair = HyGlobal::ConvertTweenPropToRegularPropPair(m_eTweenProp);
 	m_DopeSheetSceneRef.RemoveKeyFrameProperty(m_pItemData, m_iEndFrameIndex, propPair.first, propPair.second, false);
 
 	double dDuration = (m_iEndFrameIndex - m_iStartFrameIndex) * (1.0 / static_cast<EntityModel &>(m_DopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond());
-	TweenJsonValues tweenValues = std::make_tuple(m_EndValue, QJsonValue(dDuration), QJsonValue(HyGlobal::TweenName(TWEEN_Linear)));
+	TweenJsonValues tweenValues(m_DestinationValue, QJsonValue(dDuration), QJsonValue(HyGlobal::TweenFuncName(TWEENFUNC_Linear)));
 	m_DopeSheetSceneRef.SetKeyFrameTween(m_pItemData, m_iStartFrameIndex, m_eTweenProp, tweenValues, true);
 }
 
-/*virtual*/ void EntityUndoCmd_CreateTween::undo() /*override*/
+/*virtual*/ void EntityUndoCmd_ConvertToTween::undo() /*override*/
 {
 	m_DopeSheetSceneRef.RemoveKeyFrameTween(m_pItemData, m_iStartFrameIndex, m_eTweenProp, false);
 
-	QPair<QString, QString> propPair = HyGlobal::GetTweenCategoryProperty(m_eTweenProp);
-	m_DopeSheetSceneRef.SetKeyFrameProperty(m_pItemData, m_iEndFrameIndex, propPair.first, propPair.second, m_EndValue, true);
+	QPair<QString, QString> propPair = HyGlobal::ConvertTweenPropToRegularPropPair(m_eTweenProp);
+	m_DopeSheetSceneRef.SetKeyFrameProperty(m_pItemData, m_iEndFrameIndex, propPair.first, propPair.second, m_DestinationValue, true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1190,12 +1195,12 @@ void EntityUndoCmd_PropertyModified::UpdateEntityModel(bool bIsRedo)
 			}
 			else
 			{
-				if(std::get<0>(m_OldTweenData).isUndefined() || std::get<0>(m_OldTweenData).isNull())
+				if(m_OldTweenData.m_Destination.isUndefined() || m_OldTweenData.m_Destination.isNull())
 				{
 					QJsonValue destinationValue = m_pModel->FindPropertyJsonValue(sCategory, "Destination");
 					QJsonValue durationValue = m_pModel->FindPropertyJsonValue(sCategory, "Duration");
 					QJsonValue tweenTypeValue = m_pModel->FindPropertyJsonValue(sCategory, "Tween Type");
-					dopeSheetSceneRef.SetKeyFrameTween(pEntityTreeData, m_iFrameIndex, eTweenProp, std::make_tuple(destinationValue, durationValue, tweenTypeValue), true);
+					dopeSheetSceneRef.SetKeyFrameTween(pEntityTreeData, m_iFrameIndex, eTweenProp, TweenJsonValues(destinationValue, durationValue, tweenTypeValue), true);
 				}
 				else
 					dopeSheetSceneRef.SetKeyFrameTween(pEntityTreeData, m_iFrameIndex, eTweenProp, m_OldTweenData, true);
