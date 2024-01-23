@@ -365,6 +365,10 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 
 	ClearShapeEdit();
 
+	// Pop all the key frames associated with this item
+	for(IStateData *pStateData : m_StateList)
+		static_cast<EntityStateData *>(pStateData)->GetDopeSheetScene().PopAllKeyFrames(pItem, true);
+
 	return iRow;
 }
 
@@ -374,6 +378,10 @@ bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
 		return false;
 
 	m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, QList<QUuid>() << pNodeItem->GetReferencedItemUuid());
+
+	// Re-add all the key frames associated with this item
+	for(IStateData *pStateData : m_StateList)
+		static_cast<EntityStateData *>(pStateData)->GetDopeSheetScene().PushAllKeyFrames(pNodeItem, true);
 
 	return true;
 }
@@ -630,7 +638,7 @@ QString EntityModel::GenerateSrc_Ctor() const
 // NOTE: The listed 3 functions below share logic that process all item properties. Any updates should reflect to all of them
 //             - EntityTreeItemData::InitalizePropertyModel
 //             - EntityModel::GenerateSrc_SetStateImpl
-//             - EntityDrawItem::SetHyNode
+//             - ExtrapolateProperties
 QString EntityModel::GenerateSrc_SetStateImpl() const
 {
 	QString sSrc = "switch(m_uiState)\n\t{";

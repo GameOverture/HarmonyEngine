@@ -361,6 +361,7 @@ void EntityWidget::RequestSelectedItemChange(EntityTreeItemData *pTreeItemData, 
 
 void EntityWidget::SetExtrapolatedProperties()
 {
+	// Get selected items only, removing any folders
 	QList<EntityTreeItemData *> selectedItemsDataList;
 	QModelIndexList selectedIndexList = GetSelectedItems();
 	for(const QModelIndex &index : selectedIndexList)

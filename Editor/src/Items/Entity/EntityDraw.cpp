@@ -301,27 +301,36 @@ void EntityDraw::SetExtrapolatedProperties()
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(m_pProjItem->GetWidget()->GetCurStateIndex()))->GetDopeSheetScene();
 
 	// Set the extrapolated properties for the root item (aka this entity)
-	QJsonObject rootPropObj = entityDopeSheetSceneRef.ExtrapolateKeyFramesProperties(static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().GetRootTreeItemData());
-	if(rootPropObj.contains("Transformation"))
-	{
-		QJsonObject transformObj = rootPropObj["Transformation"].toObject();
-		if(transformObj.contains("Position"))
-		{
-			QJsonArray posArray = transformObj["Position"].toArray();
-			pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
-		}
-		if(transformObj.contains("Rotation"))
-			rot.Set(transformObj["Rotation"].toDouble());
-		if(transformObj.contains("Scale"))
-		{
-			QJsonArray scaleArray = transformObj["Scale"].toArray();
-			scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
-		}
-	}
+	const float fFRAME_DURATION = 1.0f / static_cast<EntityModel &>(entityDopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond();
+	const int iCURRENT_FRAME = entityDopeSheetSceneRef.GetCurrentFrame();
 
-	// Use SetHyNode() to set the extrapolated properties for all the children
+	EntityTreeItemData *pRootTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().GetRootTreeItemData();
+	ExtrapolateProperties(this,
+						  nullptr,
+						  false,
+						  ITEM_Unknown, // 'ITEM_Unknown' indicates this is the root
+						  fFRAME_DURATION,
+						  iCURRENT_FRAME,
+						  entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData],
+						  m_pCamera);
+
+	// Set the extrapolated properties for all the children items
 	for(EntityDrawItem *pDrawItem : m_ItemList)
-		pDrawItem->SetHyNode(entityDopeSheetSceneRef, m_pCamera);
+	{
+		EntityTreeItemData *pEntityTreeItemData = pDrawItem->GetEntityTreeItemData();
+		ItemType eItemType = pEntityTreeItemData->GetType();
+		if(eItemType == ITEM_Prefix) // aka Shapes folder
+			continue;
+
+		ExtrapolateProperties(pDrawItem->GetHyNode(),
+							  &pDrawItem->GetShapeCtrl(),
+							  pEntityTreeItemData->IsSelected(),
+							  eItemType,
+							  fFRAME_DURATION,
+							  iCURRENT_FRAME,
+							  entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData],
+							  m_pCamera);
+	}
 
 	RefreshTransforms();
 }

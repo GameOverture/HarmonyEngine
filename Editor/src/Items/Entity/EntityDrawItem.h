@@ -118,7 +118,6 @@ public:
 	EntityTreeItemData *GetEntityTreeItemData() const;
 
 	IHyLoadable2d *GetHyNode();
-	void SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneRef, HyCamera2d *pCamera);
 
 	ShapeCtrl &GetShapeCtrl();
 	TransformCtrl &GetTransformCtrl();

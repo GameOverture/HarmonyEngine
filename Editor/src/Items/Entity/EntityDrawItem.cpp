@@ -104,25 +104,6 @@ IHyLoadable2d *EntityDrawItem::GetHyNode()
 	return m_pChild;
 }
 
-// NOTE: The listed 3 functions below share logic that process all item properties. Any updates should reflect to all of them
-//             - EntityTreeItemData::InitalizePropertyModel
-//             - EntityModel::GenerateSrc_SetStateImpl
-//             - EntityDrawItem::SetHyNode
-void EntityDrawItem::SetHyNode(const EntityDopeSheetScene &entityDopeSheetSceneRef, HyCamera2d *pCamera)
-{
-	ItemType eItemType = m_pEntityTreeItemData->GetType();
-	if(eItemType == ITEM_Prefix) // aka Shapes folder
-		return;
-
-	IHyLoadable2d *pThisHyNode = GetHyNode();
-
-	const float fFRAME_DURATION = 1.0f / static_cast<EntityModel &>(entityDopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond();
-	const int iCURRENT_FRAME = entityDopeSheetSceneRef.GetCurrentFrame();
-	const QMap<int, QJsonObject> &keyFrameMapRef = entityDopeSheetSceneRef.GetKeyFramesMap()[m_pEntityTreeItemData];
-
-	ExtrapolateProperties(pThisHyNode, &m_ShapeCtrl, m_pEntityTreeItemData->IsSelected(), eItemType, fFRAME_DURATION, iCURRENT_FRAME, keyFrameMapRef, pCamera);
-}
-
 ShapeCtrl &EntityDrawItem::GetShapeCtrl()
 {
 	return m_ShapeCtrl;
@@ -344,6 +325,10 @@ void SubEntity::ExtrapolateChildProperties(const int iCURRENT_FRAME, HyCamera2d 
 // SubEntity
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// NOTE: The listed 3 functions below share logic that process all item properties. Any updates should reflect to all of them
+//             - EntityTreeItemData::InitalizePropertyModel
+//             - EntityModel::GenerateSrc_SetStateImpl
+//             - ExtrapolateProperties
 void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, HyCamera2d *pCamera)
 {
 	// Sprite Special Case:
@@ -385,7 +370,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 				break;
 
 			default:
-				HyGuiLog("EntityDrawItem::SetHyNode() - Unhandled tween property (fpApplyTween)", LOGTYPE_Error);
+				HyGuiLog("ExtrapolateProperties() - Unhandled tween property (fpApplyTween)", LOGTYPE_Error);
 				break;
 			}
 		};
@@ -502,6 +487,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 			}
 		}
 
+		// 'ITEM_Unknown' is passed for the entity root node
 		switch(eItemType)
 		{
 		case ITEM_Entity:

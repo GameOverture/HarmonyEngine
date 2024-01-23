@@ -88,7 +88,7 @@ float EntityDopeSheetView::GetZoom() const
 			if(pEntItemData->IsSelected())
 			{
 				QList<QPair<QString, QString>> propList;
-				propList = GetScene()->GetUniquePropertiesList(pEntItemData);
+				propList = GetScene()->GetUniquePropertiesList(pEntItemData, true);
 
 				for(QPair<QString, QString> &propPair : propList)
 				{
@@ -227,7 +227,7 @@ float EntityDopeSheetView::GetZoom() const
 		{
 			textColor = HyColor::LightGray;
 
-			propList = GetScene()->GetUniquePropertiesList(pEntItemData);
+			propList = GetScene()->GetUniquePropertiesList(pEntItemData, true);
 			iNumRows += propList.size();
 		}
 

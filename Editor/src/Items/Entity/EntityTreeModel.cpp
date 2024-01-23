@@ -183,7 +183,7 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 // NOTE: The listed 3 functions below share logic that process all item properties. Any updates should reflect to all of them
 //             - EntityTreeItemData::InitalizePropertyModel
 //             - EntityModel::GenerateSrc_SetStateImpl
-//             - EntityDrawItem::SetHyNode
+//             - ExtrapolateProperties
 void EntityTreeItemData::InitalizePropertyModel()
 {
 	// Default ranges

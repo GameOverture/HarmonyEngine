@@ -35,8 +35,6 @@
 class EntityStateData;
 class EntityTreeItemData;
 
-typedef std::tuple<EntityTreeItemData *, int, QString> KeyFrameKey;
-
 // NOTE: If you update this enum, apply the update to AuxDopeSheet's constructor
 enum AuxDopeWidgetsSection
 {
@@ -53,6 +51,7 @@ enum DopeSheetGfxItemType
 	GFXITEM_TweenKnob
 };
 
+typedef std::tuple<EntityTreeItemData *, int, QString> KeyFrameKey;
 enum DopeSheetGfxDataKey // NOTE: Order matters, the first 3 are used when accessing a KeyFrameKey tuple
 {
 	// Data required to assemble KeyFrameKey
@@ -145,7 +144,8 @@ class EntityDopeSheetScene : public QGraphicsScene
 	EntityStateData *																m_pEntStateData;
 
 	// These maps store the actual property data for the entire entity
-	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;		// Store properties and tween values
+	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;			// Store properties and tween values
+	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_PoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added
 	QMap<int, QString>																m_CallbackMap;
 
 	// These maps store the visual graphics items that correspond to the above maps
@@ -175,22 +175,25 @@ public:
 	TweenProperty DetermineIfContextQuickTween(EntityTreeItemData *&pTweenTreeItemDataOut, int &iTweenStartFrameOut, int &iTweenEndFrameOut) const;
 
 	// 'm_KeyFrameMap' must be fully updated before using this function
-	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData) const; // This is mainly useful for rendering the dope sheet
+	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps) const; // This is mainly useful for rendering the dope sheet. 'bCollapseTweenProps' will combine tween properties into a single entry (the regular category/property name)
 
 	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const;
 	QJsonObject GetKeyFrameProperties(EntityTreeItemData *pItemData) const;
-	QJsonObject ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData) const;
 	QJsonValue GetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const;
 	QJsonValue BasicExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const; // Only works on properties that don't tween, or interpolate values between key frames
 	QMap<int, QMap<EntityTreeItemData *, QJsonObject>> GetKeyFrameMapPropertiesByFrame() const;
 
 	void SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj);
 	bool SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue, bool bRefreshGfxItems);
+	void RemoveKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, bool bRefreshGfxItems);
 	void RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, bool bRefreshGfxItems);
 	void RemoveKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, bool bRefreshGfxItems);
 
 	TweenJsonValues GetTweenJsonValues(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp) const;
 	void SetKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, const TweenJsonValues &tweenValues, bool bRefreshGfxItems);
+
+	void PopAllKeyFrames(EntityTreeItemData *pItemData, bool bRefreshGfxItems);
+	void PushAllKeyFrames(EntityTreeItemData *pItemData, bool bRefreshGfxItems);
 
 	QJsonArray SerializeCallbacks() const;
 	QString GetCallback(int iFrameIndex) const;

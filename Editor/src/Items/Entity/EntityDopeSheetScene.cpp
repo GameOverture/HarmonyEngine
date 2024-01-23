@@ -333,7 +333,7 @@ TweenProperty EntityDopeSheetScene::DetermineIfContextQuickTween(EntityTreeItemD
 	return TWEENPROP_None;
 }
 
-QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(EntityTreeItemData *pItemData) const
+QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps) const
 {
 	QSet<QPair<QString, QString>> uniquePropertiesSet;
 	if(m_KeyFramesMap.contains(pItemData) == false)
@@ -346,7 +346,7 @@ QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(Ent
 		for(QString sCategoryName : sCategoryList)
 		{
 			// If this category is a tween, skip over all the properties and "insert" a single QPair<> to represent it
-			if(sCategoryName.startsWith("Tween "))
+			if(bCollapseTweenProps && sCategoryName.startsWith("Tween "))
 			{
 				// Match the tween category to its corresponding property
 				QString sTween = sCategoryName.mid(6);
@@ -416,59 +416,6 @@ QJsonObject EntityDopeSheetScene::GetKeyFrameProperties(EntityTreeItemData *pIte
 		return QJsonObject();
 
 	return iter.value();
-}
-
-QJsonObject EntityDopeSheetScene::ExtrapolateKeyFramesProperties(EntityTreeItemData *pItemData) const
-{
-	if(m_KeyFramesMap.contains(pItemData) == false)
-		return QJsonObject();
-
-	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
-
-	// Get the closest key frame that is less than or equal to 'm_iCurrentFrame'
-	QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.find(m_iCurrentFrame);
-	if(iter == itemKeyFrameMapRef.end())
-	{
-		// lowerBound() - Returns an iterator pointing to the first item with key 'm_iCurrentFrame' in the map.
-		//                If the map contains no item with key 'm_iCurrentFrame', the function returns an iterator
-		//                to the nearest item with a greater key.
-		iter = itemKeyFrameMapRef.lowerBound(m_iCurrentFrame);
-		if(iter != itemKeyFrameMapRef.begin())
-			iter--; // Don't want an iterator with a greater key, so go back one
-	}
-
-	// If still empty then there aren't any key frames for this item
-	if(iter == itemKeyFrameMapRef.end())
-		return QJsonObject();
-
-	// Starting with this key frame and going backwards in time, combine any properties from key frames that *haven't been set yet*
-	// This creates an 'extrapolatedPropObj' that contains all the properties that have been set from the beginning of the timeline, up to 'm_iCurrentFrame'
-	QJsonObject extrapolatedPropObj = iter.value();
-	while(iter != itemKeyFrameMapRef.begin())
-	{
-		iter--;
-		QJsonObject curKeyFrameObj = iter.value();
-		for(QString sCategoryName : curKeyFrameObj.keys())
-		{
-			if(extrapolatedPropObj.contains(sCategoryName) == false)
-				extrapolatedPropObj.insert(sCategoryName, curKeyFrameObj[sCategoryName]);
-			else
-			{
-				QJsonObject extrapolatedCategoryObj = extrapolatedPropObj[sCategoryName].toObject();
-				QJsonObject curCategoryObj = curKeyFrameObj[sCategoryName].toObject();
-
-				for(QString sPropName : curCategoryObj.keys())
-				{
-					if(extrapolatedCategoryObj.contains(sPropName) == false)
-						extrapolatedCategoryObj.insert(sPropName, curCategoryObj[sPropName]);
-				}
-
-				extrapolatedPropObj.insert(sCategoryName, extrapolatedCategoryObj);
-			}
-		}
-	}
-
-	return extrapolatedPropObj;
 }
 
 QJsonValue EntityDopeSheetScene::GetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const
@@ -614,6 +561,22 @@ bool EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, in
 	return bIsNewKeyFrame;
 }
 
+void EntityDopeSheetScene::RemoveKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, bool bRefreshGfxItems)
+{
+	if(m_KeyFramesMap.contains(pItemData) == false || m_KeyFramesMap[pItemData].contains(iFrameIndex) == false)
+		return;
+
+	QJsonObject keyFrameObjCopy = m_KeyFramesMap[pItemData][iFrameIndex];
+	for(auto iterCategory = keyFrameObjCopy.begin(); iterCategory != keyFrameObjCopy.end(); ++iterCategory)
+	{
+		QString sCategoryName = iterCategory.key();
+		QJsonObject &categoryObjRef = iterCategory.value().toObject();
+		QStringList sPropList = categoryObjRef.keys();
+		for(int i = 0; i < sPropList.size(); ++i)
+			RemoveKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, sPropList[i], bRefreshGfxItems && (i == (sPropList.size()-1)));
+	}
+}
+
 void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, bool bRefreshGfxItems)
 {
 	if(m_KeyFramesMap.contains(pItemData) == false || m_KeyFramesMap[pItemData].contains(iFrameIndex) == false)
@@ -703,6 +666,37 @@ void EntityDopeSheetScene::SetKeyFrameTween(EntityTreeItemData *pItemData, int i
 	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Destination", tweenValues.m_Destination, bRefreshGfxItems);
 	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Duration", tweenValues.m_Duration, bRefreshGfxItems);
 	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type", tweenValues.m_TweenFuncType, bRefreshGfxItems);
+}
+
+void EntityDopeSheetScene::PopAllKeyFrames(EntityTreeItemData *pItemData, bool bRefreshGfxItems)
+{
+	if(m_KeyFramesMap.contains(pItemData) == false)
+		return;
+
+	// Store the "popped" key frames in case the user wants to readd ("Push") this item back
+	m_PoppedKeyFramesMap[pItemData] = m_KeyFramesMap[pItemData];
+
+	QMap<int, QJsonObject> &keyFrameMapRef = m_KeyFramesMap[pItemData];
+	QList<int> frameIndexList = keyFrameMapRef.keys();
+	for(int i = 0; i < frameIndexList.size(); ++i)
+		RemoveKeyFrameProperties(pItemData, frameIndexList[i], false);
+
+	if(bRefreshGfxItems)
+		RefreshAllGfxItems();
+}
+
+void EntityDopeSheetScene::PushAllKeyFrames(EntityTreeItemData *pItemData, bool bRefreshGfxItems)
+{
+	if(m_PoppedKeyFramesMap.contains(pItemData) == false)
+		return;
+	
+	for(auto iter = m_PoppedKeyFramesMap[pItemData].begin(); iter != m_PoppedKeyFramesMap[pItemData].end(); ++iter)
+		SetKeyFrameProperties(pItemData, iter.key(), iter.value());
+
+	m_PoppedKeyFramesMap.remove(pItemData);
+
+	if(bRefreshGfxItems)
+		RefreshAllGfxItems();
 }
 
 QJsonArray EntityDopeSheetScene::SerializeCallbacks() const
@@ -811,8 +805,8 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 	qreal fPosY = TIMELINE_HEIGHT + 2.0f;
 	for(EntityTreeItemData *pCurItemData : entireItemList)
 	{
-		// 'uniquePropList' will contain every row of key frames for this item, across all frames
-		QList<QPair<QString, QString>> uniquePropList = GetUniquePropertiesList(pCurItemData);
+		// 'uniquePropList' will contain every row of key frames for this item, across all frames (tweens are collapsed to their regular category/property)
+		QList<QPair<QString, QString>> uniquePropList = GetUniquePropertiesList(pCurItemData, true);
 
 		// - If NOT selected, draw all the key frames in one row (its name row)
 		// - If selected, skip the name row and then draw each property in its own row
