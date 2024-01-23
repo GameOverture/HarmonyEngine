@@ -90,11 +90,6 @@ void HyTexturedQuad2d::Uninit()
 	IHyLoadable2d::Init("N/A", "", m_pParent);
 }
 
-bool HyTexturedQuad2d::IsAuxiliary() const
-{
-	return GetInternalFlags() & SETTING_IsAuxiliary;
-}
-
 /*virtual*/ void HyTexturedQuad2d::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
 {
 	if(GetWidth() == 0 || GetHeight() == 0)

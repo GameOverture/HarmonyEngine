@@ -33,8 +33,6 @@ public:
 	void Init(std::string sFilePath, HyTextureInfo textureInfo, HyEntity2d *pParent);
 	void Uninit();
 
-	bool IsAuxiliary() const;
-
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 
 	void SetUvCoordinates(int iX, int iY, int iWidth, int iHeight);

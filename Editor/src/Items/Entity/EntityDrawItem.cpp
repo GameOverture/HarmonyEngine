@@ -345,7 +345,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 
 	// Tween Special Case:
 	// To determine the tween's current value, store the info that kicked it off, and extrapolate the based on Entity's 'iCURRENT_FRAME'
-	TweenInfo tweenInfo[NUM_TWEENPROPS] = { TWEENPROP_Position, TWEENPROP_Rotation, TWEENPROP_Scale, TWEENPROP_Scale };
+	TweenInfo tweenInfo[NUM_TWEENPROPS] = { TWEENPROP_Position, TWEENPROP_Rotation, TWEENPROP_Scale, TWEENPROP_Alpha };
 	std::function<void(int, int)> fpApplyTween = [&](int iTweenProp, int iFrameIndex)
 		{
 			QVariant extrapolatedValue = tweenInfo[iTweenProp].Extrapolate(iFrameIndex, fFRAME_DURATION);

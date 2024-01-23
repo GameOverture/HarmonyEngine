@@ -264,22 +264,30 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 			// If FIRST is non-zero then it's holding a checksum, and SECOND is bankId
 			if(auxiliaryHandle.first != 0)
 			{
-				if(m_AuxiliaryTextureQuadMap.find(auxiliaryHandle) == m_AuxiliaryTextureQuadMap.end())
+				uint32 uiChecksum = auxiliaryHandle.first;
+				uint32 uiBankId = auxiliaryHandle.second;
+
+				if(pLoadable->_LoadableGetType() == HYTYPE_TexturedQuad)
 				{
-					uint32 uiChecksum = auxiliaryHandle.first;
-					uint32 uiBankId = auxiliaryHandle.second;
-					if(pLoadable->_LoadableGetType() == HYTYPE_TexturedQuad)
+					if(m_AuxiliaryTextureQuadMap.find(auxiliaryHandle) == m_AuxiliaryTextureQuadMap.end())
 					{
 						HyTexturedQuadData *pNewTexQuadData = HY_NEW HyTexturedQuadData(uiChecksum, uiBankId, *this);
 						m_AuxiliaryTextureQuadMap.insert({ auxiliaryHandle, pNewTexQuadData });
 						pDataOut = pNewTexQuadData;
 					}
-					else if(pLoadable->_LoadableGetType() == HYTYPE_Audio)
+					else
+						pDataOut = m_AuxiliaryTextureQuadMap[auxiliaryHandle];
+				}
+				else if(pLoadable->_LoadableGetType() == HYTYPE_Audio)
+				{
+					if(m_AuxiliaryAudioMap.find(auxiliaryHandle) == m_AuxiliaryAudioMap.end())
 					{
 						HyAudioData *pNewAudioData = HY_NEW HyAudioData(uiChecksum, uiBankId, *this);
 						m_AuxiliaryAudioMap.insert({ auxiliaryHandle, pNewAudioData });
 						pDataOut = pNewAudioData;
 					}
+					else
+						pDataOut = m_AuxiliaryAudioMap[auxiliaryHandle];
 				}
 			}
 			else // If FIRST is zero, then SECOND is holding a HyAuxiliaryFileHandle
