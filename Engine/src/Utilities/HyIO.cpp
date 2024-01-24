@@ -47,39 +47,50 @@
 
 /*static*/ void HyIO::Utf8Erase(std::string &sStrRef, size_t uiOffset, size_t uiCount)
 {
-	const char *szStr = sStrRef.c_str();
-	size_t uiUtf8Count = 0;
-	size_t uiNumByteOffset = 0;
-	while(*szStr != '\0')
-	{
-		if((*szStr & 0xC0) != 0x80)
-		{
-			if(uiUtf8Count == uiOffset)
-				break;
-		
-			++uiUtf8Count;
-		}
-		++uiNumByteOffset;
-		++szStr;
-	}
+	//const char *szStr = sStrRef.c_str();
+	//size_t uiUtf8Count = 0;
+	//size_t uiNumByteOffset = 0;
+	//while(*szStr != '\0')
+	//{
+	//	if((*szStr & 0xC0) != 0x80)
+	//	{
+	//		if(uiUtf8Count == uiOffset)
+	//			break;
+	//	
+	//		++uiUtf8Count;
+	//	}
+	//	++uiNumByteOffset;
+	//	++szStr;
+	//}
 
-	szStr = &sStrRef.at(uiNumByteOffset);
-	uiUtf8Count = 0;
-	size_t uiNumByteCount = 0;
-	while(*szStr != '\0')
-	{
-		if((*szStr & 0xC0) != 0x80)
-		{
-			if(uiUtf8Count == uiOffset)
-				break;
+	//szStr = &sStrRef.at(uiNumByteOffset);
+	//uiUtf8Count = 0;
+	//size_t uiNumByteCount = 0;
+	//while(*szStr != '\0')
+	//{
+	//	if((*szStr & 0xC0) != 0x80)
+	//	{
+	//		if(uiUtf8Count == uiOffset)
+	//			break;
 
-			++uiUtf8Count;
-		}
-		++uiNumByteCount;
-		++szStr;
-	}
+	//		++uiUtf8Count;
+	//	}
+	//	++uiNumByteCount;
+	//	++szStr;
+	//}
 
-	sStrRef = sStrRef.erase(uiNumByteOffset, uiNumByteCount);
+	//sStrRef = sStrRef.erase(uiNumByteOffset, uiNumByteCount);
+
+
+	// Convert UTF-8 string to wstring
+	std::wstring_convert<std::remove_reference<decltype(std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t>>(std::locale()))>::type, wchar_t> converter;
+	std::wstring wstr = converter.from_bytes(sStrRef);
+
+	// Erase characters in the wstring
+	wstr.erase(uiOffset, uiCount);
+
+	// Convert back to UTF-8
+	sStrRef = converter.to_bytes(wstr);
 }
 
 /*static*/ void HyIO::Utf8Insert(std::string &sStrRef, size_t uiOffset, const std::string &sUtf8Str)

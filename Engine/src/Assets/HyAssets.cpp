@@ -128,6 +128,9 @@ HyAssets::~HyAssets()
 
 	for(auto iter = m_AuxiliaryAudioMap.begin(); iter != m_AuxiliaryAudioMap.end(); ++iter)
 		delete iter->second;
+
+	for(auto iter = m_AuxiliaryFileMap.begin(); iter != m_AuxiliaryFileMap.end(); ++iter)
+		delete iter->second;
 }
 
 HyAudioCore &HyAssets::GetAudioCore() const

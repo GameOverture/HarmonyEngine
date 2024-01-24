@@ -114,9 +114,9 @@ void HyCheckBox::AssembleCheckmark()
 {
 	if(m_Panel.IsValid())
 	{
-		float fRadius = (HyMath::Min(m_Panel.size.X(), m_Panel.size.Y()) - (m_Panel.GetFrameSize() * 4)) * 0.5f;
+		float fRadius = (HyMath::Min(m_Panel.size.X(), m_Panel.size.Y()) - (m_Panel.GetFrameStrokeSize() * 4)) * 0.5f;
 		m_CheckMarkStroke.SetAsCircle(fRadius);
-		m_CheckMarkFill.SetAsCircle(fRadius - m_Panel.GetFrameSize());
+		m_CheckMarkFill.SetAsCircle(fRadius - m_Panel.GetFrameStrokeSize());
 	}
 
 	ResetTextAndPanel();

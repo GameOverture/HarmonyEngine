@@ -206,7 +206,7 @@ glm::ivec2 HyPanel::GetSizeHint()
 //	}
 //}
 
-uint32 HyPanel::GetFrameSize() const
+uint32 HyPanel::GetFrameStrokeSize() const
 {
 	return m_uiFrameSize;
 }
@@ -223,7 +223,6 @@ glm::vec2 HyPanel::GetBotLeftOffset()
 		auto vUiSizeHint = GetSizeHint();
 		return -glm::vec2(frameRef.vOFFSET.x * (vPanelDimensions.x / vUiSizeHint.x), frameRef.vOFFSET.y * (vPanelDimensions.y / vUiSizeHint.y));
 	}
-
 	return glm::vec2(0.0f, 0.0f);
 }
 

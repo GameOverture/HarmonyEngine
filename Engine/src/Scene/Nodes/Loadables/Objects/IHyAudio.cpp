@@ -144,10 +144,7 @@ template<typename NODETYPE, typename ENTTYPE>
 void IHyAudio<NODETYPE, ENTTYPE>::PlayOneShot(bool bUseCurrentSettings /*= true*/)
 {
 	if(this->IsLoaded() == false)
-	{
 		HyLogWarning("IHyAudio::PlayOneShot() called on a HyAudio that is not loaded: " << this->GetPrefix() << "/" << this->GetName());
-		return;
-	}
 
 	if(bUseCurrentSettings)
 		m_uiCueFlags |= (1 << HYSOUNDCUE_PlayOneShot);
@@ -159,10 +156,7 @@ template<typename NODETYPE, typename ENTTYPE>
 void IHyAudio<NODETYPE, ENTTYPE>::Play()
 {
 	if(this->IsLoaded() == false)
-	{
 		HyLogWarning("IHyAudio::Play() called on a HyAudio that is not loaded: " << this->GetPrefix() << "/" << this->GetName());
-		return;
-	}
 
 	m_uiCueFlags &= ~(1 << HYSOUNDCUE_Stop);
 	m_uiCueFlags |= (1 << HYSOUNDCUE_Start);

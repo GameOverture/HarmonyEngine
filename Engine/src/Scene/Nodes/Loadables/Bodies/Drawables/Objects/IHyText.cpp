@@ -172,6 +172,21 @@ float IHyText<NODETYPE, ENTTYPE>::GetLineBreakHeight(float fPercent /*= 1.0f*/)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+float IHyText<NODETYPE, ENTTYPE>::GetLineDescender(float fPercent /*= 1.0f*/)
+{
+	if(this->AcquireData() == nullptr)
+	{
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetDescender invoked on null data");
+		return 0.0f;
+	}
+
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
+	float fDescender = pData->GetLineDescender(this->m_uiState);
+
+	return fDescender * fPercent;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 uint32 IHyText<NODETYPE, ENTTYPE>::GetNumCharacters() const
 {
 	return static_cast<uint32>(m_Utf32CodeList.size());

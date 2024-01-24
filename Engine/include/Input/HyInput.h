@@ -189,7 +189,7 @@ private:
 	void ApplyControllerButton(int32 iId, HyGamePadBtn eButtonType, HyBtnPressState ePressState);
 
 	void DistrubuteTextInput(std::string sNewText);
-	void DistrubuteKeyboardInput(HyKeyboardBtn eBtn);
+	void DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState);
 
 	void Update();		// This update occurs AFTER event polls are processed
 };

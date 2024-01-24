@@ -45,7 +45,7 @@ public:
 
 protected:
 	virtual void OnUiTextInput(std::string sNewUtf8Text) override;
-	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn) override;
+	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState) override;
 	virtual void OnUiMouseClicked() override;
 
 	virtual void OnTakeKeyboardFocus() override;

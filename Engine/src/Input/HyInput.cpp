@@ -687,7 +687,7 @@ void HyInput::RemoveController(int32 iId)
 #ifdef HY_USE_GLFW
 	void HyInput::OnGlfwKey(int32 iKey, int32 iAction)
 	{
-		DistrubuteKeyboardInput(static_cast<HyKeyboardBtn>(iKey));
+		DistrubuteKeyboardInput(static_cast<HyKeyboardBtn>(iKey), static_cast<HyBtnPressState>(iAction));
 
 		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
 			m_pInputMaps[i].ApplyKeyBoardInput(iKey, static_cast<HyBtnPressState>(iAction));
@@ -897,9 +897,9 @@ void HyInput::DistrubuteTextInput(std::string sNewText)
 	HyUiContainer::DistrubuteTextInput(sNewText);
 }
 
-void HyInput::DistrubuteKeyboardInput(HyKeyboardBtn eBtn)
+void HyInput::DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState)
 {
-	HyUiContainer::DistrubuteKeyboardInput(eBtn);
+	HyUiContainer::DistrubuteKeyboardInput(eBtn, eBtnState);
 }
 
 void HyInput::Update()

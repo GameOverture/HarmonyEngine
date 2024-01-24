@@ -378,7 +378,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 				m_Text.SetTextAlignment(HYALIGN_Right);
 
 			pFirst = &m_Text;
-			HySetVec(vFirstSize, m_Text.GetWidth() * m_Text.scale.X(), m_Text.GetHeight() * m_Text.scale.Y());
+			HySetVec(vFirstSize, m_Text.GetWidth() * m_Text.scale.X(), m_Text.GetLineBreakHeight(m_Text.scale.Y()));
 			vFirstOffset = m_Text.GetTextBottomLeft();
 
 			pSecond = &m_Panel;
@@ -397,7 +397,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 			vFirstOffset = -m_Panel.GetBotLeftOffset();
 
 			pSecond = &m_Text;
-			HySetVec(vSecondSize, m_Text.GetWidth() * m_Text.scale.X(), m_Text.GetHeight() * m_Text.scale.Y());
+			HySetVec(vSecondSize, m_Text.GetWidth() * m_Text.scale.X(), m_Text.GetLineBreakHeight(m_Text.scale.Y()));
 			vSecondOffset = m_Text.GetTextBottomLeft();
 		}
 
@@ -426,6 +426,8 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 				pSecond->pos.Offset(vFirstSize.x + m_TextMargins.iTag, 0.0f);
 			}
 		}
+
+		m_Text.pos.Offset(0.0f, -m_Text.GetLineDescender(m_Text.scale.GetY()));
 	}
 	else // Stacked Panel/Text
 	{
@@ -434,8 +436,8 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 		glm::ivec2 vPanelOffset = m_Panel.GetBotLeftOffset();
 
 		// Position text to bottom left of 'm_TextMargins'
-		m_Text.pos.Set((m_TextMargins.left * (vPanelDimensions.x / vUiSizeHint.x)) - vPanelOffset.x,
-					   (m_TextMargins.bottom * (vPanelDimensions.y / vUiSizeHint.y)) - vPanelOffset.y);
+		m_Text.pos.Set(m_Panel.GetFrameStrokeSize() + ((m_TextMargins.left * (vPanelDimensions.x / vUiSizeHint.x)) - vPanelOffset.x),
+					   m_Panel.GetFrameStrokeSize() + ((m_TextMargins.bottom * (vPanelDimensions.y / vUiSizeHint.y)) - vPanelOffset.y));
 
 		HyAlignment eAlignment;
 		float fLineOffsetX = 0.0f;	// If *this is 'LABELATTRIB_StackedTextUseLine' determine how much to offset m_Text's position (not needed for scale boxes)
@@ -463,11 +465,11 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 				m_Text.SetAsLine();
 
 				float fLineOffsetY = 0.0f;
-				float fVerticalSpace = vPanelDimensions.y - ((m_TextMargins.top + m_TextMargins.bottom) * (vPanelDimensions.y / vUiSizeHint.y));
-				float fTextHeight = m_Text.GetHeight() * m_Text.scale.Y();
+				float fVerticalSpace = vPanelDimensions.y - ((m_TextMargins.top + m_TextMargins.bottom) * (vPanelDimensions.y / vUiSizeHint.y)) - (m_Panel.GetFrameStrokeSize() * 2);
+				float fTextHeight = m_Text.GetLineBreakHeight(m_Text.scale.Y());
 				if(fVerticalSpace > fTextHeight)
 					fLineOffsetY = (fVerticalSpace - fTextHeight) * 0.5f;
-				m_Text.pos.Offset(fLineOffsetX, fLineOffsetY);
+				m_Text.pos.Offset(fLineOffsetX, fLineOffsetY - m_Text.GetLineDescender(m_Text.scale.Y()));
 			}
 			else
 				m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x)),

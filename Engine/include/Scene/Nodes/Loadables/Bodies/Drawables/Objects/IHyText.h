@@ -120,6 +120,7 @@ public:
 	float GetHeight(float fPercent = 1.0f);		// Returns the maximum pixel height of all lines of text (ignores any scaling)
 	
 	float GetLineBreakHeight(float fPercent = 1.0f);
+	float GetLineDescender(float fPercent = 1.0f);
 
 	uint32 GetNumCharacters() const;
 	uint32 GetNumShownCharacters() const;

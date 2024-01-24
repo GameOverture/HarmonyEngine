@@ -119,7 +119,7 @@ private:
 	bool RequestWidgetFocus(IHyWidget *pWidget);
 
 	static void DistrubuteTextInput(std::string sText);
-	static void DistrubuteKeyboardInput(HyKeyboardBtn eBtn);
+	static void DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState);
 
 	static void OnScroll(HyScrollBar *pSelf, float fNewPosition, float fTotalRange, void *pData);
 };

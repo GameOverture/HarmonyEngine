@@ -81,7 +81,7 @@ public:
 	void SetSpriteState(uint32 uiStateIndex);
 
 	glm::ivec2 GetSizeHint();
-	uint32 GetFrameSize() const;
+	uint32 GetFrameStrokeSize() const;
 	glm::vec2 GetBotLeftOffset();
 
 	HyColor GetPanelColor() const;

@@ -57,7 +57,7 @@ protected:
 	virtual void OnMouseClicked() override final;
 
 	virtual void OnUiTextInput(std::string sNewText) { }
-	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn) { }
+	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState) { }
 	virtual void OnUiMouseEnter() { }
 	virtual void OnUiMouseLeave() { }
 	virtual void OnUiMouseDown() { }

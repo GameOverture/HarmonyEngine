@@ -535,7 +535,7 @@ void HyUiContainer::OnRootLayoutUpdate()
 	if(bVertBarShown || bHorzBarShown)
 	{
 		if(m_Panel.IsPrimitive())
-			iScissorMargin = m_Panel.GetFrameSize();
+			iScissorMargin = m_Panel.GetFrameStrokeSize();
 
 		int32 iScissorWidth = static_cast<int32>(m_Panel.size.X()) - (iScissorMargin * 2) - (static_cast<int32>(bVertBarShown) * m_VertBar.GetDiameter());
 		int32 iScissorHeight = static_cast<int32>(m_Panel.size.Y()) - (iScissorMargin * 2) - (static_cast<int32>(bHorzBarShown) * m_HorzBar.GetDiameter());
@@ -614,7 +614,7 @@ bool HyUiContainer::RequestWidgetFocus(IHyWidget *pWidget)
 	}
 }
 
-/*static*/ void HyUiContainer::DistrubuteKeyboardInput(HyKeyboardBtn eBtn)
+/*static*/ void HyUiContainer::DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState)
 {
 	// Check for 'TAB' and 'SHIFT+TAB' to cycle keyboard focus to valid widgets
 	switch(eBtn)
@@ -635,7 +635,7 @@ bool HyUiContainer::RequestWidgetFocus(IHyWidget *pWidget)
 	{
 		IHyWidget *pFocusedWidget = sm_pContainerList[i]->GetFocusedWidget();
 		if(pFocusedWidget && sm_pContainerList[i]->IsInputAllowed())
-			pFocusedWidget->OnUiKeyboardInput(eBtn);
+			pFocusedWidget->OnUiKeyboardInput(eBtn, eBtnState);
 	}
 }
 

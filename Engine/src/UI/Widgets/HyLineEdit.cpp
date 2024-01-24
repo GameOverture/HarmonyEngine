@@ -99,7 +99,7 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 	m_Cursor.SetDisplayOrder(m_Text.GetDisplayOrder() + 1);
 
 	m_Cursor.pos.Set(m_Text.pos);
-	m_Cursor.pos.Offset(m_Text.GetTextCursorPos().x, 0.0f);
+	m_Cursor.pos.Offset(m_Text.GetTextCursorPos().x, m_Text.GetLineDescender(m_Text.scale.Y()));
 	
 	m_Selection.alpha.Set(m_BlinkTimer.IsRunning() * 1.0f);
 	m_Cursor.alpha.Set(m_BlinkTimer.IsRunning() * 1.0f);
@@ -146,37 +146,21 @@ void HyLineEdit::SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen)
 	SetText(m_Text.GetUtf8String()); // Ensure HyLabel is informed of m_Text changing
 }
 
-/*virtual*/ void HyLineEdit::OnUiKeyboardInput(HyKeyboardBtn eBtn) /*override*/
+/*virtual*/ void HyLineEdit::OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState) /*override*/
 {
 	switch(eBtn)
 	{
 	case HYKEY_Enter:
 		break;
 
-	case HYKEY_Backspace: {
-		std::string sText = m_Text.GetUtf8String();
-		do
+	case HYKEY_Backspace:
+		if(m_iCursorIndex > 0 && eBtnState != HYBTN_Release)
 		{
-			if(sText.empty())
-				break;
-
-			if((sText.back() & 0x80) == 0x00) // One byte
-			{
-				sText.pop_back();
-				break;
-			}
-
-			if((sText.back() & 0xC0) == 0x80) // Byte from the multi-byte sequence
-				sText.pop_back();
-			if((sText.back() & 0xC0) == 0xC0) // First byte of multi-byte sequence (now UTF-8 character fully deleted)
-			{
-				sText.pop_back();
-				break;
-			}
-
-		} while(true);
-		m_Text.SetText(sText);
-		break; }
+			std::string sText = m_Text.GetUtf8String();
+			HyIO::Utf8Erase(sText, m_iCursorIndex - 1, 1);
+			m_Text.SetText(sText);
+		}
+		break;
 
 	default:
 		break;
