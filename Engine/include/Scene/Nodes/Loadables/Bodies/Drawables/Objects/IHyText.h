@@ -111,6 +111,7 @@ public:
 	bool IsGlyphAvailable(const std::string sUtf8Character); // Pass a single utf8 character, returns whether that character exists in the font
 
 	const std::string &GetUtf8String() const;
+	std::string GetUtf8Character(uint32 uiCharIndex) const;
 
 	// Assumes UTF-8 encoding. Accepts newline characters '\n'
 	void SetText(const std::string &sUtf8Text);
@@ -186,9 +187,6 @@ protected:
 
 private:
 	void MarkAsDirty();
-
-	// Converts a given UTF-8 encoded character (array) to its UTF-32 LE equivalent
-	uint32 HyUtf8_to_Utf32(const char *pChar, uint32 &uiNumBytesUsedRef);
 };
 
 #endif /* HyText2d_h__ */

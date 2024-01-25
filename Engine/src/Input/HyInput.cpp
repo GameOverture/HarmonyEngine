@@ -59,7 +59,7 @@
 
 	/*friend*/ void HyGlfw_KeyCallback(GLFWwindow *pWindow, int32 iKey, int32 iScancode, int32 iAction, int32 iMods)
 	{
-		HyEngine::Input().OnGlfwKey(iKey, iAction);
+		HyEngine::Input().OnGlfwKey(iKey, iAction, iMods);
 	}
 
 	/*friend*/ void HyGlfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint)
@@ -685,9 +685,9 @@ void HyInput::RemoveController(int32 iId)
 }
 
 #ifdef HY_USE_GLFW
-	void HyInput::OnGlfwKey(int32 iKey, int32 iAction)
+	void HyInput::OnGlfwKey(int32 iKey, int32 iAction, int32 iMods)
 	{
-		DistrubuteKeyboardInput(static_cast<HyKeyboardBtn>(iKey), static_cast<HyBtnPressState>(iAction));
+		DistrubuteKeyboardInput(static_cast<HyKeyboardBtn>(iKey), static_cast<HyBtnPressState>(iAction), iMods);
 
 		for(uint32 i = 0; i < m_uiNUM_INPUT_MAPS; ++i)
 			m_pInputMaps[i].ApplyKeyBoardInput(iKey, static_cast<HyBtnPressState>(iAction));
@@ -897,9 +897,9 @@ void HyInput::DistrubuteTextInput(std::string sNewText)
 	HyUiContainer::DistrubuteTextInput(sNewText);
 }
 
-void HyInput::DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState)
+void HyInput::DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods)
 {
-	HyUiContainer::DistrubuteKeyboardInput(eBtn, eBtnState);
+	HyUiContainer::DistrubuteKeyboardInput(eBtn, eBtnState, iMods);
 }
 
 void HyInput::Update()

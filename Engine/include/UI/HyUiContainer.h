@@ -81,7 +81,7 @@ public:
 	bool IsInputAllowed() const;
 	void SetInputAllowed(bool bEnable);
 	IHyWidget *GetFocusedWidget();
-	IHyWidget *FocusNextWidget();
+	IHyWidget *FocusNextWidget(bool bForwardDirection);
 
 	bool InsertWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 
@@ -119,7 +119,7 @@ private:
 	bool RequestWidgetFocus(IHyWidget *pWidget);
 
 	static void DistrubuteTextInput(std::string sText);
-	static void DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState);
+	static void DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods);
 
 	static void OnScroll(HyScrollBar *pSelf, float fNewPosition, float fTotalRange, void *pData);
 };

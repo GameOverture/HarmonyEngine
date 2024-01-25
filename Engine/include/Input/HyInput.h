@@ -163,7 +163,7 @@ private:
 	friend void HyGlfw_CharCallback(GLFWwindow *pWindow, uint32 uiCodepoint);
 	friend void HyGlfw_JoystickCallback(int32 iJoyId, int32 iEvent);
 
-	void OnGlfwKey(int32 iKey, int32 iAction);
+	void OnGlfwKey(int32 iKey, int32 iAction, int32 iMods);
 	void GlfwUpdateControllers();														// Update all assigned controllers (GamePads/Joysticks). Dispatches calls to OnEventGamePadAxis/OnEventGamePadButton
 	void GlfwProcessGamePad(HyGamePad *pGamePad, GLFWgamepadstate &gamePadStateRef);	// Use GlfwUpdateControllers() instead of GlfwProcessGamePad() directly
 	void GlfwProcessJoystick(HyJoystick *pJoystick);									// Use GlfwUpdateControllers() instead of GlfwProcessJoystick() directly
@@ -189,7 +189,7 @@ private:
 	void ApplyControllerButton(int32 iId, HyGamePadBtn eButtonType, HyBtnPressState ePressState);
 
 	void DistrubuteTextInput(std::string sNewText);
-	void DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState);
+	void DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods);
 
 	void Update();		// This update occurs AFTER event polls are processed
 };

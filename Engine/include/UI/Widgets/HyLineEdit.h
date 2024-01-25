@@ -22,8 +22,8 @@ protected:
 	bool								m_bUseValidator;
 	std::regex							m_InputValidator;
 
-	int32								m_iCursorIndex;			// Cursor index in full UTF-8 characters
-	int32								m_iSelectionLength;		// Selection length in full UTF-8 characters
+	uint32								m_uiCursorIndex;		// Cursor index in full UTF-8 characters
+	uint32								m_uiSelectionIndex;		// Selection index in full UTF-8 characters. Anything between m_iCursorIndex and m_iSelectionIndex will be selected. Will equal when no selection.
 	HyPrimitive2d						m_Selection;			// Actual text selection highlight visual
 	HyPrimitive2d						m_Cursor;				// Shows a standard vertical line draw with a primitive
 
@@ -41,11 +41,16 @@ public:
 	void ClearInputValidator();
 
 	bool IsCursorShown() const;
-	void SetCursor(int32 iUtf8CharIndex, int32 iSelectionLen);
+	uint32 GetCursorIndex() const;
+	uint32 GetSelectionIndex() const; // Anything between GetCursorIndex() and GetSelectionIndex() will be selected. Will equal when no selection.
+	void GetSelection(uint32 &uiStartIndexOut, uint32 &uiEndIndexOut) const;
+	
+	void SetCursor(uint32 uiCharIndex);
+	void SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex);
 
 protected:
 	virtual void OnUiTextInput(std::string sNewUtf8Text) override;
-	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState) override;
+	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) override;
 	virtual void OnUiMouseClicked() override;
 
 	virtual void OnTakeKeyboardFocus() override;
@@ -53,6 +58,7 @@ protected:
 
 	virtual void OnSetup() override;
 
+	void MoveCursor(int32 iOffset, bool bSelection);
 	void ToggleCursorVisible(bool bForceShown);
 	static void OnCursorTimer(void *pThisData);
 };

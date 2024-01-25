@@ -101,7 +101,7 @@ bool IHyText<NODETYPE, ENTTYPE>::IsGlyphAvailable(const std::string sUtf8Charact
 
 	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 	uint32 uiUsedBytes = 0;
-	const HyTextGlyph *pGlyphRef = pData->GetGlyph(this->m_uiState, 0, HyUtf8_to_Utf32(sUtf8Character.c_str(), uiUsedBytes));
+	const HyTextGlyph *pGlyphRef = pData->GetGlyph(this->m_uiState, 0, HyIO::Utf8_to_Utf32(sUtf8Character.c_str(), uiUsedBytes));
 
 	return pGlyphRef != nullptr;
 }
@@ -110,6 +110,15 @@ template<typename NODETYPE, typename ENTTYPE>
 const std::string &IHyText<NODETYPE, ENTTYPE>::GetUtf8String() const
 {
 	return m_sRawString;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+std::string IHyText<NODETYPE, ENTTYPE>::GetUtf8Character(uint32 uiCharIndex) const
+{
+	if(uiCharIndex >= m_Utf32CodeList.size())
+		return "";
+	
+	return HyIO::Utf32_to_Utf8(m_Utf32CodeList[uiCharIndex]);
 }
 
 // Assumes UTF-8 encoding. Accepts newline characters '\n'
@@ -128,7 +137,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetText(const std::string &sUtf8Text)
 	uint32 uiNumBytesUsed = 0;
 	for(uint32 i = 0; i < m_sRawString.size(); i += uiNumBytesUsed)
 	{
-		m_Utf32CodeList.push_back(HyUtf8_to_Utf32(&m_sRawString[i], uiNumBytesUsed));
+		m_Utf32CodeList.push_back(HyIO::Utf8_to_Utf32(&m_sRawString[i], uiNumBytesUsed));
 		HyAssert(uiNumBytesUsed > 0, "IHyText<NODETYPE, ENTTYPE>::TextSet failed to convert utf8 -> utf32");
 	}
 
@@ -215,6 +224,9 @@ uint32 IHyText<NODETYPE, ENTTYPE>::GetCharacterCode(uint32 uiCharIndex) const
 template<typename NODETYPE, typename ENTTYPE>
 glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex)
 {
+	if(uiCharIndex >= m_Utf32CodeList.size())
+		return GetTextCursorPos();
+
 	CalculateGlyphInfos();
 
 	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr)
@@ -230,8 +242,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 
 	uint32 uiNumLayers = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex);
-	if(uiGlyphOffsetIndex >= m_uiNumReservedGlyphs) // "IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset() was passed invalid 'uiCharIndex'");
-		return glm::vec2(0);
+	HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset() - HYTEXT2D_GlyphIndex returned index that is out of bounds of m_pGlyphInfos");
 
 	return m_pGlyphInfos[uiGlyphOffsetIndex].vOffset;
 }
@@ -1164,53 +1175,6 @@ template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::MarkAsDirty()
 {
 	m_uiTextAttributes |= TEXTATTRIB_IsDirty;
-}
-
-// Converts a given UTF-8 encoded character (array) to its UTF-32 LE equivalent
-template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::HyUtf8_to_Utf32(const char *pChar, uint32 &uiNumBytesUsedRef)
-{
-#ifndef HY_ENDIAN_LITTLE
-	#error "IHyText<NODETYPE, ENTTYPE>::HyUtf8_to_Utf32 does not support big endian"
-#endif
-
-	uint32 uiResult = -1;
-	uiNumBytesUsedRef = 0;
-
-	if(!pChar)
-		return uiResult;
-
-	if((pChar[0] & 0x80) == 0x0)
-	{
-		uiNumBytesUsedRef = 1;
-		uiResult = pChar[0];
-	}
-
-	if((pChar[0] & 0xC0) == 0xC0)
-	{
-		uiNumBytesUsedRef = 2;
-		uiResult = ((pChar[0] & 0x3F) << 6) | (pChar[1] & 0x3F);
-	}
-
-	if((pChar[0] & 0xE0) == 0xE0)
-	{
-		uiNumBytesUsedRef = 3;
-		uiResult = ((pChar[0] & 0x1F) << (6 + 6)) | ((pChar[1] & 0x3F) << 6) | (pChar[2] & 0x3F);
-	}
-
-	if((pChar[0] & 0xF0) == 0xF0)
-	{
-		uiNumBytesUsedRef = 4;
-		uiResult = ((pChar[0] & 0x0F) << (6 + 6 + 6)) | ((pChar[1] & 0x3F) << (6 + 6)) | ((pChar[2] & 0x3F) << 6) | (pChar[3] & 0x3F);
-	}
-
-	if((pChar[0] & 0xF8) == 0xF8)
-	{
-		uiNumBytesUsedRef = 5;
-		uiResult = ((pChar[0] & 0x07) << (6 + 6 + 6 + 6)) | ((pChar[1] & 0x3F) << (6 + 6 + 6)) | ((pChar[2] & 0x3F) << (6 + 6)) | ((pChar[3] & 0x3F) << 6) | (pChar[4] & 0x3F);
-	}
-
-	return uiResult;
 }
 
 template class IHyText<IHyDrawable2d, HyEntity2d>;

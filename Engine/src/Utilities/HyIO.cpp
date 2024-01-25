@@ -16,6 +16,7 @@
 #include <fstream>
 #include <iomanip>
 #include <filesystem>
+#include <cwctype>
 
 /*static*/ HyStorage HyIO::SessionStorage(true);
 /*static*/ HyStorage HyIO::LocalStorage(false);
@@ -111,8 +112,117 @@
 		++szStr;
 	}
 
-	// TODO: Fix
-	sStrRef = sStrRef.insert(uiOffset, sUtf8Str);
+	sStrRef = sStrRef.insert(uiNumByteOffset, sUtf8Str);
+}
+
+/*static*/ bool HyIO::Utf8IsAlnum(const std::string &sStrRef) // Returns true if all characters in sStrRef are alphanumeric
+{
+	const char *szStr = sStrRef.c_str();
+	while(*szStr != '\0')
+	{
+		if((*szStr & 0xC0) != 0x80)
+		{
+			if(std::iswalnum(*szStr) == 0)
+				return false;
+		}
+		++szStr;
+	}
+	return true;
+}
+
+/*static*/ bool HyIO::Utf8IsWhitespace(const std::string &sStrRef) // Returns true if all characters in sStrRef are whitespace
+{
+	const char *szStr = sStrRef.c_str();
+	while(*szStr != '\0')
+	{
+		if((*szStr & 0xC0) != 0x80)
+		{
+			if(std::iswspace(*szStr) == 0)
+				return false;
+		}
+		++szStr;
+	}
+	return true;
+}
+
+/*static*/ uint32 HyIO::Utf8_to_Utf32(const char *pChar, uint32 &uiNumBytesUsedRef)
+{
+#ifndef HY_ENDIAN_LITTLE
+	#error "HyIO::Utf8_to_Utf32 does not support big endian"
+#endif
+
+	uint32 uiResult = -1;
+	uiNumBytesUsedRef = 0;
+
+	if(!pChar)
+		return uiResult;
+
+	if((pChar[0] & 0x80) == 0x0)
+	{
+		uiNumBytesUsedRef = 1;
+		uiResult = pChar[0];
+	}
+
+	if((pChar[0] & 0xC0) == 0xC0)
+	{
+		uiNumBytesUsedRef = 2;
+		uiResult = ((pChar[0] & 0x3F) << 6) | (pChar[1] & 0x3F);
+	}
+
+	if((pChar[0] & 0xE0) == 0xE0)
+	{
+		uiNumBytesUsedRef = 3;
+		uiResult = ((pChar[0] & 0x1F) << (6 + 6)) | ((pChar[1] & 0x3F) << 6) | (pChar[2] & 0x3F);
+	}
+
+	if((pChar[0] & 0xF0) == 0xF0)
+	{
+		uiNumBytesUsedRef = 4;
+		uiResult = ((pChar[0] & 0x0F) << (6 + 6 + 6)) | ((pChar[1] & 0x3F) << (6 + 6)) | ((pChar[2] & 0x3F) << 6) | (pChar[3] & 0x3F);
+	}
+
+	if((pChar[0] & 0xF8) == 0xF8)
+	{
+		uiNumBytesUsedRef = 5;
+		uiResult = ((pChar[0] & 0x07) << (6 + 6 + 6 + 6)) | ((pChar[1] & 0x3F) << (6 + 6 + 6)) | ((pChar[2] & 0x3F) << (6 + 6)) | ((pChar[3] & 0x3F) << 6) | (pChar[4] & 0x3F);
+	}
+
+	return uiResult;
+}
+
+/*static*/ std::string HyIO::Utf32_to_Utf8(uint32 uiChar)
+{
+	std::string sResult;
+	if(uiChar <= 0x7F)
+	{
+		sResult.resize(1);
+		sResult[0] = uiChar;
+	}
+	else if(uiChar <= 0x7FF)
+	{
+		sResult.resize(2);
+		sResult[0] = 0xC0 | ((uiChar >> 6) & 0x1F);
+		sResult[1] = 0x80 | (uiChar & 0x3F);
+	}
+	else if(uiChar <= 0xFFFF)
+	{
+		sResult.resize(3);
+		sResult[0] = 0xE0 | ((uiChar >> 12) & 0x0F);
+		sResult[1] = 0x80 | ((uiChar >> 6) & 0x3F);
+		sResult[2] = 0x80 | (uiChar & 0x3F);
+	}
+	else if(uiChar <= 0x1FFFFF)
+	{
+		sResult.resize(4);
+		sResult[0] = 0xF0 | ((uiChar >> 18) & 0x07);
+		sResult[1] = 0x80 | ((uiChar >> 12) & 0x3F);
+		sResult[2] = 0x80 | ((uiChar >> 6) & 0x3F);
+		sResult[3] = 0x80 | (uiChar & 0x3F);
+	}
+	else
+		HyLogWarning("HyIO::Utf32_to_Utf8 - Unhandled UTF32 character: " << uiChar);
+
+	return sResult;
 }
 
 /*static*/ std::string HyIO::CleanPath(const std::string &sDirtyPath, const std::string &sExtension /*= ""*/)

@@ -196,44 +196,61 @@ IHyWidget *HyUiContainer::GetFocusedWidget()
 	return nullptr;
 }
 
-IHyWidget *HyUiContainer::FocusNextWidget()
+IHyWidget *HyUiContainer::FocusNextWidget(bool bForwardDirection)
 {
 	auto widgetList = AssembleWidgetList();
 	IHyWidget *pOldFocusedWidget = nullptr;
 	IHyWidget *pNewFocusedWidget = nullptr;
-	for(uint32 i = 0; i < static_cast<uint32>(widgetList.size()); ++i)
+
+	std::function<void(IHyWidget *)> fpSortedFind = [&](IHyWidget *pWidget) -> void
 	{
+		if(pWidget == nullptr || (pOldFocusedWidget && pNewFocusedWidget))
+			return;
 		if(pOldFocusedWidget == nullptr)
 		{
-			if(widgetList[i]->IsKeyboardFocus())
-				pOldFocusedWidget = widgetList[i];
+			if(pWidget->IsKeyboardFocus())
+				pOldFocusedWidget = pWidget;
 		}
 		else
 		{
-			if(widgetList[i]->IsKeyboardFocusAllowed())
+			if(pWidget->IsKeyboardFocusAllowed())
 			{
-				pNewFocusedWidget = widgetList[i];
-				break;
+				pNewFocusedWidget = pWidget;
+				return;
 			}
 		}
-	}
+	};
+	if(bForwardDirection)
+		std::for_each(widgetList.begin(), widgetList.end(), fpSortedFind);
+	else
+		std::for_each(widgetList.rbegin(), widgetList.rend(), fpSortedFind);
 
-	if(pNewFocusedWidget == nullptr)
+	std::function<void(IHyWidget *)> fpSecondPass = [&](IHyWidget *pWidget) -> void
 	{
-		for(uint32 i = 0; i < static_cast<uint32>(widgetList.size()); ++i)
+		if(pWidget == nullptr || pNewFocusedWidget)
+			return;
+		if(pNewFocusedWidget == nullptr)
 		{
-			if(widgetList[i]->IsKeyboardFocusAllowed())
+			for(uint32 i = 0; i < static_cast<uint32>(widgetList.size()); ++i)
 			{
-				pNewFocusedWidget = widgetList[i];
-				break;
+				if(widgetList[i]->IsKeyboardFocusAllowed())
+				{
+					pNewFocusedWidget = widgetList[i];
+					break;
+				}
 			}
 		}
-	}
+	};
+	if(bForwardDirection)
+		std::for_each(widgetList.begin(), widgetList.end(), fpSecondPass);
+	else
+		std::for_each(widgetList.rbegin(), widgetList.rend(), fpSecondPass);
 
-	if(pOldFocusedWidget)
+	if(pOldFocusedWidget && pNewFocusedWidget)
+	{
 		pOldFocusedWidget->RelinquishKeyboardFocus();
-	if(pNewFocusedWidget)
 		pNewFocusedWidget->TakeKeyboardFocus();
+	}
 
 	return pNewFocusedWidget;
 }
@@ -614,7 +631,7 @@ bool HyUiContainer::RequestWidgetFocus(IHyWidget *pWidget)
 	}
 }
 
-/*static*/ void HyUiContainer::DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState)
+/*static*/ void HyUiContainer::DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods)
 {
 	// Check for 'TAB' and 'SHIFT+TAB' to cycle keyboard focus to valid widgets
 	switch(eBtn)
@@ -623,7 +640,7 @@ bool HyUiContainer::RequestWidgetFocus(IHyWidget *pWidget)
 		for(uint32 i = 0; i < static_cast<uint32>(sm_pContainerList.size()); ++i)
 		{
 			if(sm_pContainerList[i]->IsInputAllowed())
-				sm_pContainerList[i]->FocusNextWidget();
+				sm_pContainerList[i]->FocusNextWidget((iMods & HYKBMOD_Shift) == 0);
 		}
 		break;
 
@@ -635,7 +652,7 @@ bool HyUiContainer::RequestWidgetFocus(IHyWidget *pWidget)
 	{
 		IHyWidget *pFocusedWidget = sm_pContainerList[i]->GetFocusedWidget();
 		if(pFocusedWidget && sm_pContainerList[i]->IsInputAllowed())
-			pFocusedWidget->OnUiKeyboardInput(eBtn, eBtnState);
+			pFocusedWidget->OnUiKeyboardInput(eBtn, eBtnState, iMods);
 	}
 }
 

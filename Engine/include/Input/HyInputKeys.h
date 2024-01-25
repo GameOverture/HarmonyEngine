@@ -28,6 +28,26 @@ enum HyBtnPressState
 #endif
 };
 
+enum HyKeyboardModFlag
+{
+#ifdef HY_USE_GLFW
+	HYKBMOD_Shift		= GLFW_MOD_SHIFT,
+	HYKBMOD_Control		= GLFW_MOD_CONTROL,
+	HYKBMOD_Alt			= GLFW_MOD_ALT,
+	HYKBMOD_Super		= GLFW_MOD_SUPER,
+	HYKBMOD_CapsLock	= GLFW_MOD_CAPS_LOCK,
+	HYKBMOD_NumLock		= GLFW_MOD_NUM_LOCK
+#else
+	HYKBMOD_Shift		= 1 << 0,
+	HYKBMOD_Control		= 1 << 1,
+	HYKBMOD_Alt			= 1 << 2,
+	HYKBMOD_Super		= 1 << 3,
+	HYKBMOD_CapsLock	= 1 << 4,
+	HYKBMOD_NumLock		= 1 << 5
+#endif
+};
+typedef int32 HyKeyboardModifer;
+
 enum HyKeyboardBtn
 {
 #if defined(HY_USE_GLFW)
