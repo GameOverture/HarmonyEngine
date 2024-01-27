@@ -30,7 +30,7 @@ HyAudioCore::HyAudioCore(HyInput &inputRef) :
 	m_InputRef(inputRef),
 	m_pAssets(nullptr),
 	m_pEngine(nullptr),
-	m_fDeferredGlobalVolume(1.0f)
+	m_fGlobalVolume(1.0f)
 {
 	InitDevice();
 }
@@ -190,22 +190,21 @@ float HyAudioCore::GetElapsedPlayTime(HyAudioNodeHandle hHandle)
 	return static_cast<float>(uiFramesPlayed) / ma_engine_get_sample_rate(m_pEngine);
 }
 
-//float HyAudioCore::GetGlobalVolume() const
-//{
-//	if(m_pEngine == nullptr)
-//		return 0.0f;
-//	return ma_engine_get_volume(m_pEngine);
-//}
+float HyAudioCore::GetGlobalVolume() const
+{
+	if(m_pEngine == nullptr)
+		return 0.0f;
+	
+	return m_fGlobalVolume;
+}
 
 void HyAudioCore::SetGlobalVolume(float fVolume)
 {
+	m_fGlobalVolume = fVolume;
 	if(m_pEngine == nullptr)
-	{
-		m_fDeferredGlobalVolume = fVolume;
 		return;
-	}
 
-	ma_result eResult = ma_engine_set_volume(m_pEngine, fVolume);
+	ma_result eResult = ma_engine_set_volume(m_pEngine, m_fGlobalVolume);
 	if(eResult != MA_SUCCESS)
 		HyLogError("ma_engine_set_volume failed: " << eResult);
 }

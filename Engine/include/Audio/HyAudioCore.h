@@ -77,7 +77,7 @@ class HyAudioCore
 
 	// Used in browser environments to queue up loads (and other settings) until user input occurs. Once input occurs we can initialize the audio device (then load all the sounds that are queued up)
 	std::vector<HySoundAsset *>						m_DeferredLoadingList;
-	float											m_fDeferredGlobalVolume;
+	float											m_fGlobalVolume;
 
 public:
 	HyAudioCore(HyInput &inputRef);
@@ -97,7 +97,7 @@ public:
 	bool IsPlaying(HyAudioNodeHandle hHandle);
 	float GetElapsedPlayTime(HyAudioNodeHandle hHandle);
 
-	//float GetGlobalVolume() const;
+	float GetGlobalVolume() const;
 	void SetGlobalVolume(float fVolume);
 
 	void DeferLoading(HySoundAsset *pBuffer);
