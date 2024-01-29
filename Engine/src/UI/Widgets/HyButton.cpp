@@ -99,17 +99,21 @@ void HyButton::SetAsHighlighted(bool bIsHighlighted)
 	HyButtonState eOldState = GetBtnState();
 
 	if(bIsHighlighted)
-	{
 		m_uiAttribs |= BTNATTRIB_IsHighlighted;
-		m_Panel.SetFrameColor(0x0000FF);
-	}
 	else
-	{
 		m_uiAttribs &= ~BTNATTRIB_IsHighlighted;
-		m_Panel.SetFrameColor(0x3F3F41);
-	}
 
 	SetBtnState(eOldState);
+}
+
+bool HyButton::IsMouseHover() const
+{
+	return (m_uiAttribs & BTNATTRIB_IsHoverState) != 0;
+}
+
+bool HyButton::IsDown() const
+{
+	return (m_uiAttribs & (BTNATTRIB_IsMouseDownState | BTNATTRIB_IsKbDownState)) != 0;
 }
 
 void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
@@ -128,40 +132,42 @@ void HyButton::InvokeButtonClicked()
 {
 	HyLabel::OnUpdate();
 
-	if(m_uiAttribs & BTNATTRIB_IsDownState && HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft))
-		m_uiAttribs &= ~BTNATTRIB_IsDownState;
+	if(m_uiAttribs & BTNATTRIB_IsMouseDownState && HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft) == false)
+	{
+		HyButtonState eOldState = GetBtnState();
+		m_uiAttribs &= ~BTNATTRIB_IsMouseDownState;
+		SetBtnState(eOldState);
+	}
 }
 
-/*virtual*/ void HyButton::OnSetup() /*override*/
+/*virtual*/ void HyButton::OnTakeKeyboardFocus() /*override*/
 {
-	SetAsHighlighted(IsHighlighted());
-	SetHoverCursor(HYMOUSECURSOR_Hand);
+	SetAsHighlighted(true);
+}
+
+/*virtual*/ void HyButton::OnRelinquishKeyboardFocus() /*override*/
+{
+	SetAsHighlighted(false);
 }
 
 /*virtual*/ void HyButton::OnUiMouseEnter() /*override*/
 {
 	HyButtonState eOldState = GetBtnState();
-
 	m_uiAttribs |= BTNATTRIB_IsHoverState;
-
 	SetBtnState(eOldState);
 }
 
 /*virtual*/ void HyButton::OnUiMouseLeave() /*override*/
 {
 	HyButtonState eOldState = GetBtnState();
-
 	m_uiAttribs &= ~BTNATTRIB_IsHoverState;
-
 	SetBtnState(eOldState);
 }
 
 /*virtual*/ void HyButton::OnUiMouseDown() /*override*/
 {
 	HyButtonState eOldState = GetBtnState();
-
-	m_uiAttribs |= BTNATTRIB_IsDownState;
-
+	m_uiAttribs |= BTNATTRIB_IsMouseDownState;
 	SetBtnState(eOldState);
 }
 
@@ -178,18 +184,50 @@ void HyButton::InvokeButtonClicked()
 	OnBtnStateChange(eCurState);
 }
 
+/*virtual*/ void HyButton::OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) /*override*/
+{
+	if(eBtn == HYKEY_Space || eBtn == HYKEY_Enter)
+	{
+		if(eBtnState == HYBTN_Press && (m_uiAttribs & BTNATTRIB_IsKbDownState) == 0)
+		{
+			HyButtonState eOldState = GetBtnState();
+			m_uiAttribs |= BTNATTRIB_IsKbDownState;
+			SetBtnState(eOldState);
+		}
+		else if(eBtnState == HYBTN_Release && (m_uiAttribs & BTNATTRIB_IsKbDownState) != 0)
+		{
+			HyButtonState eOldState = GetBtnState();
+			m_uiAttribs &= ~BTNATTRIB_IsKbDownState;
+			SetBtnState(eOldState);
+
+			if(IsDown() == false)
+				InvokeButtonClicked();
+		}
+	}
+}
+
+/*virtual*/ void HyButton::OnSetup() /*override*/
+{
+	SetKeyboardFocusAllowed(true);
+	SetAsHighlighted(IsHighlighted());
+	SetHoverCursor(HYMOUSECURSOR_Hand);
+
+	m_PanelColor = m_Panel.GetPanelColor();
+	m_FrameColor = m_Panel.GetFrameColor();
+}
+
 HyButtonState HyButton::GetBtnState()
 {
 	if(IsEnabled())
 	{
-		if(m_uiAttribs & BTNATTRIB_IsDownState && IsHideDownState() == false)
+		if(IsDown() && IsHideDownState() == false)
 		{
 			if(IsHighlighted())
 				return HYBUTTONSTATE_HighlightedDown;
 			else
 				return HYBUTTONSTATE_Down;
 		}
-		else if(m_uiAttribs & BTNATTRIB_IsHoverState && IsHideHoverState() == false)
+		else if(IsMouseHover() && IsHideHoverState() == false)
 		{
 			if(IsHighlighted())
 				return HYBUTTONSTATE_HighlightedHover;
@@ -227,6 +265,21 @@ void HyButton::SetBtnState(HyButtonState eOldState)
 				m_Panel.SetSpriteState(HYBUTTONSTATE_Highlighted);
 			else
 				m_Panel.SetSpriteState(HYBUTTONSTATE_Idle);
+		}
+		else
+		{
+			HyLog(eCurState);
+			if(IsDown())
+				m_Panel.SetPanelColor(m_PanelColor.Darken());
+			else if(IsMouseHover())
+				m_Panel.SetPanelColor(m_PanelColor.Lighten());
+			else
+				m_Panel.SetPanelColor(m_PanelColor);
+
+			if(IsHighlighted())
+				m_Panel.SetFrameColor(m_FrameColor.Lighten());
+			else
+				m_Panel.SetFrameColor(m_FrameColor);
 		}
 
 		OnBtnStateChange(eCurState);

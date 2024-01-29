@@ -84,15 +84,18 @@ public:
 	IHyWidget *FocusNextWidget(bool bForwardDirection);
 
 	bool InsertWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
+	bool RemoveWidget(IHyWidget &widgetRef);
 
 	HySpacerHandle InsertSpacer(HySizePolicy eSizePolicy = HYSIZEPOLICY_Expanding, uint32 uiSizeHint = 0, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 	uint32 GetSpacerSize(HySpacerHandle hSpacer);
 	bool SetSpacerSize(HySpacerHandle hSpacer, HySizePolicy eSizePolicy, uint32 uiSizeHint);
+	bool RemoveSpacer(HySpacerHandle hSpacer);
 
 	HyLayoutHandle InsertLayout(HyOrientation eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 	glm::ivec2 GetLayoutSize(HyLayoutHandle hLayout);
 	bool SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 	bool SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+	bool RemoveLayout(HyLayoutHandle hLayout);
 	
 	void ClearItems();
 

@@ -19,6 +19,14 @@
 class HyLineEdit : public HyLabel
 {
 protected:
+	enum ButtonAttributes
+	{
+		LINEEDITATTRIB_IsHighlighted = 1 << 11,		// Indicates keyboard focus, or an optional cosmetic state
+
+		LINEEDITATTRIB_FLAG_NEXT = 1 << 12
+	};
+	static_assert((int)LINEEDITATTRIB_IsHighlighted == (int)LABELATTRIB_FLAG_NEXT, "HyLineEdit is not matching with base classes attrib flags");
+
 	bool								m_bUseValidator;
 	std::regex							m_InputValidator;
 
@@ -47,6 +55,9 @@ public:
 	
 	void SetCursor(uint32 uiCharIndex);
 	void SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex);
+
+	bool IsHighlighted() const;
+	void SetAsHighlighted(bool bIsHighlighted);
 
 protected:
 	virtual void OnUiTextInput(std::string sNewUtf8Text) override;

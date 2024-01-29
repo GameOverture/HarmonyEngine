@@ -35,16 +35,20 @@ protected:
 		BTNATTRIB_HideDownState		= 1 << 11,		// Don't visually indicate down state (when available)
 		BTNATTRIB_HideHoverState	= 1 << 12,		// Don't visually indicate hover state (when available)
 		BTNATTRIB_IsHoverState		= 1 << 13,		// When cursor is overtop button
-		BTNATTRIB_IsDownState		= 1 << 14,		// When button is pressed
-		BTNATTRIB_IsHighlighted		= 1 << 15,		// An optional cosmetic state
+		BTNATTRIB_IsMouseDownState	= 1 << 14,		// When the mouse button is presses (left clicks) this button
+		BTNATTRIB_IsHighlighted		= 1 << 15,		// Indicates keyboard focus, or an optional cosmetic state
+		BTNATTRIB_IsKbDownState		= 1 << 16,		// Indicates this button is currently receiving keyboard input that is pressing (BTNATTRIB_IsDownState) the button
 
-		BTNATTRIB_FLAG_NEXT			= 1 << 16
+		BTNATTRIB_FLAG_NEXT			= 1 << 17
 	};
 	static_assert((int)BTNATTRIB_HideDownState == (int)LABELATTRIB_FLAG_NEXT, "HyButton is not matching with base classes attrib flags");
 
 	HyButtonClickedCallback			m_fpBtnClickedCallback;
 	void *							m_pBtnClickedParam;
 	HyAudio2d						m_ClickedSound;
+
+	HyColor							m_PanelColor;	// Only used when m_Panel.IsSprite() == false
+	HyColor							m_FrameColor;	// Only used when m_Panel.IsSprite() == false
 
 public:
 	HyButton(HyEntity2d *pParent = nullptr);
@@ -64,18 +68,25 @@ public:
 	bool IsHighlighted() const;
 	void SetAsHighlighted(bool bIsHighlighted);
 
+	bool IsMouseHover() const;
+	bool IsDown() const;
+
 	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr, std::string sAudioPrefix = "", std::string sAudioName = "");
 	void InvokeButtonClicked();
 
 protected:
 	virtual void OnUpdate() override;
 
-	virtual void OnSetup() override;
+	virtual void OnTakeKeyboardFocus() override;
+	virtual void OnRelinquishKeyboardFocus() override;
 
 	virtual void OnUiMouseEnter() override;
 	virtual void OnUiMouseLeave() override;
 	virtual void OnUiMouseDown() override;
 	virtual void OnUiMouseClicked() override;
+	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) override;
+
+	virtual void OnSetup() override;
 
 	HyButtonState GetBtnState();
 

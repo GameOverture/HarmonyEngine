@@ -91,6 +91,17 @@ void HyLayout::AppendItem(IHyEntityUi &itemRef)
 	SetLayoutDirty();
 }
 
+bool HyLayout::RemoveItem(IHyEntityUi &itemRef)
+{
+	if(ChildRemove(&itemRef))
+	{
+		SetLayoutDirty();
+		return true;
+	}
+
+	return false;
+}
+
 void HyLayout::DetachAllItems()
 {
 	while(m_ChildList.empty() == false)

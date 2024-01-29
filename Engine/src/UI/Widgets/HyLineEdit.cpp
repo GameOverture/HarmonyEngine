@@ -136,6 +136,17 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 	m_Selection.alpha.Set(m_BlinkTimer.IsRunning() * 1.0f);
 }
 
+bool HyLineEdit::IsHighlighted() const
+{
+	return (m_uiAttribs & LINEEDITATTRIB_IsHighlighted) != 0;
+}
+
+void HyLineEdit::SetAsHighlighted(bool bIsHighlighted)
+{
+	m_uiAttribs |= LINEEDITATTRIB_IsHighlighted;
+	// TODO: Move HyButton's highlighting to HyPanel, and use that here
+}
+
 /*virtual*/ void HyLineEdit::OnUiTextInput(std::string sNewUtf8Text) /*override*/
 {
 	if(m_bUseValidator)
@@ -188,6 +199,7 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 	switch(eBtn)
 	{
 	case HYKEY_Enter:
+
 		break;
 
 	case HYKEY_Backspace:
@@ -290,6 +302,8 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 
 /*virtual*/ void HyLineEdit::OnTakeKeyboardFocus() /*override*/
 {
+	// TODO: HyPanel should handle highlighting the widget
+
 	HyEngine::Input().StartTextInput();
 
 	m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);

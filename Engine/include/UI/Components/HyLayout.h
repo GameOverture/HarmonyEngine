@@ -45,6 +45,7 @@ public:
 	virtual glm::vec2 GetPosOffset() override;	// What offset is needed to get *this oriented to its bottom left
 
 	void AppendItem(IHyEntityUi &itemRef);
+	bool RemoveItem(IHyEntityUi &itemRef);
 	void DetachAllItems();
 
 	bool IsReverseOrder();

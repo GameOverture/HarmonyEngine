@@ -336,14 +336,36 @@ public:
 	glm::vec3 GetAsVec3() const {
 		return glm::vec3(GetRedF(), GetGreenF(), GetBlueF());
 	}
+	HyColor Shade(int32 iPercent) const
+	{
+		int32 R = m_uiR;
+		int32 G = m_uiG;
+		int32 B = m_uiB;
 
+		if(R == 0)
+			R = 64;
+		if(G == 0)
+			G = 64;
+		if(B == 0)
+			B = 64;
+
+		R = R * (100 + iPercent) / 100;
+		G = G * (100 + iPercent) / 100;
+		B = B * (100 + iPercent) / 100;
+
+		R = HyMath::Clamp(R, 0, 255);
+		G = HyMath::Clamp(G, 0, 255);
+		B = HyMath::Clamp(B, 0, 255);
+
+		return HyColor(R, G, B, m_uiA);
+	}
 	HyColor Lighten() const
 	{
-		return HyColor((GetAsUint32() & 0xfefefe) << 1);
+		return Shade(40);
 	}
 	HyColor Darken() const
 	{
-		return HyColor((GetAsUint32() & 0xfefefe) >> 1);
+		return Shade(-40);
 	}
 	float Brightness() const
 	{

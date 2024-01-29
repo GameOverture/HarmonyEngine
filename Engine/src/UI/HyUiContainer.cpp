@@ -271,6 +271,32 @@ bool HyUiContainer::InsertWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInt
 	return false;
 }
 
+bool HyUiContainer::RemoveWidget(IHyWidget &widgetRef)
+{
+	for(int i = 0; i < m_RootLayout.ChildCount(); ++i)
+	{
+		if(m_RootLayout.ChildGet(i) == &widgetRef)
+		{
+			m_RootLayout.RemoveItem(widgetRef);
+			return true;
+		}
+	}
+	
+	for(auto iter = m_SubLayoutMap.begin(); iter != m_SubLayoutMap.end(); ++iter)
+	{
+		for(int i = 0; i < iter->second->ChildCount(); ++i)
+		{
+			if(iter->second->ChildGet(i) == &widgetRef)
+			{
+				m_RootLayout.RemoveItem(widgetRef);
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 HySpacerHandle HyUiContainer::InsertSpacer(HySizePolicy eSizePolicy /*= HYSIZEPOLICY_Expanding*/, uint32 uiSizeHint /*= 0*/, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
 {
 	HySpacerHandle hNewSpacerHandle = HY_UNUSED_HANDLE;
@@ -312,6 +338,20 @@ bool HyUiContainer::SetSpacerSize(HySpacerHandle hSpacer, HySizePolicy eSizePoli
 	{
 		m_SubSpacerMap[hSpacer]->Setup(eSizePolicy, uiSizeHint);
 		return true;
+	}
+	return false;
+}
+
+bool HyUiContainer::RemoveSpacer(HySpacerHandle hSpacer)
+{
+	if(m_SubSpacerMap.find(hSpacer) != m_SubSpacerMap.end())
+	{
+		if(RemoveWidget(*m_SubSpacerMap[hSpacer]))
+		{
+			delete m_SubSpacerMap[hSpacer];
+			m_SubSpacerMap.erase(hSpacer);
+			return true;
+		}
 	}
 	return false;
 }
@@ -388,6 +428,33 @@ bool HyUiContainer::SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle 
 	}
 
 	HyLogWarning("HyUiContainer::SetLayoutWidgetSpacing could not find specified layout: " << hAffectedLayout);
+	return false;
+}
+
+bool HyUiContainer::RemoveLayout(HyLayoutHandle hLayout)
+{
+	if(m_SubLayoutMap.find(hLayout) == m_SubLayoutMap.end())
+		return false;
+
+	HyLayout *pLayoutToRemove = m_SubLayoutMap[hLayout];
+
+	if(m_RootLayout.RemoveItem(*pLayoutToRemove))
+	{
+		m_SubLayoutMap.erase(hLayout);
+		delete pLayoutToRemove;
+		return true;
+	}
+
+	for(auto iter = m_SubLayoutMap.begin(); iter != m_SubLayoutMap.end(); ++iter)
+	{
+		if(iter->second->RemoveItem(*pLayoutToRemove))
+		{
+			m_SubLayoutMap.erase(hLayout);
+			delete pLayoutToRemove;
+			return true;
+		}
+	}
+
 	return false;
 }
 
@@ -637,10 +704,13 @@ bool HyUiContainer::RequestWidgetFocus(IHyWidget *pWidget)
 	switch(eBtn)
 	{
 	case HYKEY_Tab:
-		for(uint32 i = 0; i < static_cast<uint32>(sm_pContainerList.size()); ++i)
+		if(eBtnState != HYBTN_Release)
 		{
-			if(sm_pContainerList[i]->IsInputAllowed())
-				sm_pContainerList[i]->FocusNextWidget((iMods & HYKBMOD_Shift) == 0);
+			for(uint32 i = 0; i < static_cast<uint32>(sm_pContainerList.size()); ++i)
+			{
+				if(sm_pContainerList[i]->IsInputAllowed())
+					sm_pContainerList[i]->FocusNextWidget((iMods & HYKBMOD_Shift) == 0);
+			}
 		}
 		break;
 

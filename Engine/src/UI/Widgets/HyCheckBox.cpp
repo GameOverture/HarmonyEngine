@@ -107,6 +107,7 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void
 
 /*virtual*/ void HyCheckBox::OnUiMouseClicked() /*override*/
 {
+	HyButton::OnUiMouseClicked();
 	SetChecked(!IsChecked());
 }
 

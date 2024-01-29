@@ -20,18 +20,18 @@ class HyComboBox : public HyButton
 protected:
 	enum ComboBoxAttributes
 	{
-		COMBOBOXATTRIB_IsExpanded		= 1 << 16,
-		COMBOBOXATTRIB_IsTransition		= 1 << 17,
+		COMBOBOXATTRIB_IsExpanded		= 1 << 17,
+		COMBOBOXATTRIB_IsTransition		= 1 << 18,
 		COMBOBOXATTRIB_STATEMASK = (COMBOBOXATTRIB_IsExpanded | COMBOBOXATTRIB_IsTransition),
 
-		COMBOBOXATTRIB_IsHorzExpand		= 1 << 18,
-		COMBOBOXATTRIB_IsPositiveExpand = 1 << 19,
-		COMBOBOXATTRIB_IsInstantExpand	= 1 << 20,
+		COMBOBOXATTRIB_IsHorzExpand		= 1 << 19,
+		COMBOBOXATTRIB_IsPositiveExpand = 1 << 20,
+		COMBOBOXATTRIB_IsInstantExpand	= 1 << 21,
 
-		COMBOBOXATTRIB_IsExpandMouseDwn = 1 << 21,		// While expanded, keeps track of a left mouse click (anywhere) to retract the combo box upon release
-		COMBOBOXATTRIB_NeedsRetracting	= 1 << 22,		// While expanded, this flag indicates that this combo box should retract on the next update. (This allows sub btn callbacks to occur before getting disabled on the retract)
+		COMBOBOXATTRIB_IsExpandMouseDwn = 1 << 22,		// While expanded, keeps track of a left mouse click (anywhere) to retract the combo box upon release
+		COMBOBOXATTRIB_NeedsRetracting	= 1 << 23,		// While expanded, this flag indicates that this combo box should retract on the next update. (This allows sub btn callbacks to occur before getting disabled on the retract)
 
-		COMBOBOXATTRIB_FLAG_NEXT		= 1 << 23
+		COMBOBOXATTRIB_FLAG_NEXT		= 1 << 24
 	};
 	static_assert((int)COMBOBOXATTRIB_IsExpanded == (int)BTNATTRIB_FLAG_NEXT, "HyComboBox is not matching with base classes attrib flags");
 
