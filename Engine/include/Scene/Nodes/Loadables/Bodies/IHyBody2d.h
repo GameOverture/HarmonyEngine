@@ -43,7 +43,7 @@ public:
 	HyAnimFloat						alpha;
 
 public:
-	IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent);
+	IHyBody2d(HyType eNodeType, const HyNodePath &nodePath, HyEntity2d *pParent);
 	IHyBody2d(const IHyBody2d &copyRef);
 	IHyBody2d(IHyBody2d &&donor) noexcept;
 	virtual ~IHyBody2d();

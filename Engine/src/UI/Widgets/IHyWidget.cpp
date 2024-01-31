@@ -12,10 +12,11 @@
 #include "UI/Components/HyLayout.h"
 #include "HyEngine.h"
 
-IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
+IHyWidget::IHyWidget(const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
 	m_uiAttribs(0),
-	m_eHoverCursor(HYMOUSECURSOR_Default)
+	m_eHoverCursor(HYMOUSECURSOR_Default),
+	m_Panel(initRef, this)
 {
 }
 
@@ -165,4 +166,45 @@ void IHyWidget::RelinquishKeyboardFocus()
 {
 	m_uiAttribs &= ~UIATTRIB_IsKeyboardFocus;
 	OnRelinquishKeyboardFocus();
+}
+
+
+HyPanelState IHyWidget::GetPanelState() const
+{
+	return m_Panel.GetPanelState();
+}
+
+void IHyWidget::SetPanelState(HyPanelState eOldState)
+{
+	HyPanelState eCurState = GetPanelState();
+	if(eOldState != eCurState)
+	{
+		if(m_Panel.IsSprite())
+		{
+			uint32 uiNumStates = m_Panel.GetSprite().GetNumStates();
+			if(static_cast<uint32>(eCurState) < uiNumStates)
+				m_Panel.SetSpriteState(eCurState);
+			else if(IsHighlighted() && uiNumStates > HYBUTTONSTATE_Highlighted)
+				m_Panel.SetSpriteState(HYBUTTONSTATE_Highlighted);
+			else
+				m_Panel.SetSpriteState(HYBUTTONSTATE_Idle);
+		}
+		else
+		{
+			HyLog(eCurState);
+			if(IsDown())
+				m_Panel.SetPanelColor(m_PanelColor.Darken());
+			else if(IsMouseHover())
+				m_Panel.SetPanelColor(m_PanelColor.Lighten());
+			else
+				m_Panel.SetPanelColor(m_PanelColor);
+
+			if(IsHighlighted())
+				m_Panel.SetFrameColor(m_FrameColor.Lighten());
+			else
+				m_Panel.SetFrameColor(m_FrameColor);
+		}
+
+		OnBtnStateChange(eCurState);
+	}
 }

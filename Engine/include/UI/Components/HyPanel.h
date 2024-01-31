@@ -11,30 +11,33 @@
 #define HyPanel_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Assets/Nodes/HyNodePath.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
-#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
+#include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
 struct HyPanelInit
 {
-	std::string				m_sSpritePrefix;
-	std::string				m_sSpriteName;
-
-	uint32					m_uiWidth;
-	uint32					m_uiHeight;
-	uint32					m_uiFrameSize;
-
-	HyColor					m_PanelColor;
-	HyColor					m_FrameColor;
-
 	// Whatever PanelType is chosen will affect UI layout positioning and metrics
 	enum PanelType
 	{
+		PANELTYPE_Invalid = -1,
 		PANELTYPE_BoundingVolume = 0,	// The panel isn't visibly seen, but can still have a width and height
-		PANELTYPE_Sprite,				// The panel metrics are dictated by the HySprite
+		PANELTYPE_HyBody,				// The panel metrics are dictated by the IHyBody instance
 		PANELTYPE_Primitive				// The panel is assembled in this class using primitives
 	};
-	PanelType				m_ePanelType;
+	PanelType					m_ePanelType;
+
+	uint32						m_uiWidth;
+	uint32						m_uiHeight;
+
+	HyType						m_eBodyType;
+	HyNodePath					m_HyBodyPath;
+
+	uint32						m_uiFrameSize;
+	HyColor						m_PanelColor;
+	HyColor						m_FrameColor;
+	HyColor						m_TertiaryColor;
 
 	// Constructs a 'BoundingVolume' panel with 0 width/height
 	HyPanelInit();
@@ -42,43 +45,50 @@ struct HyPanelInit
 	// Constructs a 'BoundingVolume' panel
 	HyPanelInit(uint32 uiWidth, uint32 uiHeight);
 
-	// Constructs a 'Sprite' panel. uiFrameSize can be specified if the art of the sprite has a framesize to be considered when various widgets are assembled
-	HyPanelInit(std::string sSpritePrefix, std::string sSpriteName, uint32 uiFrameSize = 0);
+	// Constructs a 'HyBody' panel
+	HyPanelInit(HyType eBodyType, const HyNodePath &nodePath);
 
 	// Constructs a 'Primitive' panel. Colors of HyColor(0,0,0,0) will be set to a default color determined by the panel's usage
-	HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0,0,0,0), HyColor frameColor = HyColor(0,0,0,0));
+	HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0,0,0,0), HyColor frameColor = HyColor(0,0,0,0), HyColor tertiaryColor = HyColor(0,0,0,0));
 };
 
 class HyPanel : public HyEntity2d
 {
-	HyPanelInit::PanelType	m_ePanelType;
-	bool					m_bIsContainer;	// Either is a container, otherwise is considered a widget (used for default colors)
+	HyPanelInit::PanelType		m_ePanelType;
 
-	HySprite2d				m_SpritePanel;
+	// Only used when PANELTYPE_HyBody
+	IHyBody2d *					m_pHyBody;
 
-	uint32					m_uiFrameSize;
-	HyPrimitive2d			m_Frame1;
-	HyPrimitive2d			m_Frame2;	// When thicc enough, a frame can have two tones to it
-	HyPrimitive2d			m_Panel;
+	// Only used when PANELTYPE_Primitive
+	struct Primitive
+	{
+		uint32					m_uiFrameSize;
+		HyPrimitive2d			m_Frame1;
+		HyPrimitive2d			m_Frame2;	// When thicc enough, a frame can have two tones to it
+		HyPrimitive2d			m_Panel;
+		HyColor					m_PanelColor;
+		HyColor					m_FrameColor;
+		HyColor					m_TertiaryColor;
+	};
+	Primitive *					m_pPrimitive;
 
 public:
-	HyAnimVec2				size;
+	HyAnimVec2					size;
 
 public:
-	HyPanel(HyEntity2d *pParent = nullptr);
-	HyPanel(const HyPanelInit &initRef, bool bIsContainer, HyEntity2d *pParent);
+	HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent);
 	virtual ~HyPanel();
 
-	void Setup(const HyPanelInit &initRef, bool bIsContainer);
+	void Setup(const HyPanelInit &initRef);
 	bool IsValid();
 
 	bool IsBoundingVolume() const;
+	bool IsHyBody() const;
 	bool IsPrimitive() const;
-	bool IsSprite() const;
 
-	HySprite2d &GetSprite();
-	uint32 GetSpriteState() const;
-	void SetSpriteState(uint32 uiStateIndex);
+	void ApplyPanelState(HyPanelState ePanelState);
+
+	IHyBody2d *GetHyBody();
 
 	glm::ivec2 GetSizeHint();
 	uint32 GetFrameStrokeSize() const;

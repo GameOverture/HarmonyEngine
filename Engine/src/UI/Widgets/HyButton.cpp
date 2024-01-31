@@ -250,38 +250,3 @@ HyButtonState HyButton::GetBtnState()
 			return HYBUTTONSTATE_Idle;
 	}
 }
-
-void HyButton::SetBtnState(HyButtonState eOldState)
-{
-	HyButtonState eCurState = GetBtnState();
-	if(eOldState != eCurState)
-	{
-		if(m_Panel.IsSprite())
-		{
-			uint32 uiNumStates = m_Panel.GetSprite().GetNumStates();
-			if(static_cast<uint32>(eCurState) < uiNumStates)
-				m_Panel.SetSpriteState(eCurState);
-			else if(IsHighlighted() && uiNumStates > HYBUTTONSTATE_Highlighted)
-				m_Panel.SetSpriteState(HYBUTTONSTATE_Highlighted);
-			else
-				m_Panel.SetSpriteState(HYBUTTONSTATE_Idle);
-		}
-		else
-		{
-			HyLog(eCurState);
-			if(IsDown())
-				m_Panel.SetPanelColor(m_PanelColor.Darken());
-			else if(IsMouseHover())
-				m_Panel.SetPanelColor(m_PanelColor.Lighten());
-			else
-				m_Panel.SetPanelColor(m_PanelColor);
-
-			if(IsHighlighted())
-				m_Panel.SetFrameColor(m_FrameColor.Lighten());
-			else
-				m_Panel.SetFrameColor(m_FrameColor);
-		}
-
-		OnBtnStateChange(eCurState);
-	}
-}

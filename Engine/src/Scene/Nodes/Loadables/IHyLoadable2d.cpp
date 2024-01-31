@@ -12,9 +12,9 @@
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h"
 
-IHyLoadable2d::IHyLoadable2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
+IHyLoadable2d::IHyLoadable2d(HyType eNodeType, const HyNodePath &nodePath, HyEntity2d *pParent) :
 	IHyNode2d(eNodeType, pParent),
-	IHyLoadable(sPrefix, sName)
+	IHyLoadable(nodePath)
 {
 	m_uiFlags |= NODETYPE_IsLoadable;
 
@@ -56,9 +56,9 @@ IHyLoadable2d &IHyLoadable2d::operator=(IHyLoadable2d &&donor)
 	return *this;
 }
 
-void IHyLoadable2d::Init(std::string sPrefix, std::string sName, HyEntity2d *pParent)
+void IHyLoadable2d::Init(const HyNodePath &nodePath, HyEntity2d *pParent)
 {
-	IHyLoadable::_Reinitialize(sPrefix, sName);
+	IHyLoadable::_Reinitialize(nodePath);
 
 	if(m_pParent != pParent)
 	{
@@ -67,6 +67,11 @@ void IHyLoadable2d::Init(std::string sPrefix, std::string sName, HyEntity2d *pPa
 		else
 			ParentDetach();
 	}
+}
+
+void IHyLoadable2d::Init(std::string sPrefix, std::string sName, HyEntity2d *pParent)
+{
+	Init(HyNodePath(sPrefix, sName), pParent);
 }
 
 void IHyLoadable2d::Uninit()

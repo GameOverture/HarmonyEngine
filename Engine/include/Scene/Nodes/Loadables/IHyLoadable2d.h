@@ -18,7 +18,7 @@
 class IHyLoadable2d : public IHyNode2d, public IHyLoadable
 {
 public:
-	IHyLoadable2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent);
+	IHyLoadable2d(HyType eNodeType, const HyNodePath &nodePath, HyEntity2d *pParent);
 	IHyLoadable2d(const IHyLoadable2d &copyRef);
 	IHyLoadable2d(IHyLoadable2d &&donor) noexcept;
 	virtual ~IHyLoadable2d();
@@ -26,6 +26,7 @@ public:
 	IHyLoadable2d &operator=(const IHyLoadable2d &rhs);
 	IHyLoadable2d &operator=(IHyLoadable2d &&donor);
 
+	void Init(const HyNodePath &nodePath, HyEntity2d *pParent);
 	void Init(std::string sPrefix, std::string sName, HyEntity2d *pParent);
 	void Uninit();
 

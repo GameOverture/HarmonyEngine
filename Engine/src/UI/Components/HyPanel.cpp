@@ -9,74 +9,71 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "UI/Components/HyPanel.h"
+#include "Diagnostics/Console/IHyConsole.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySpine2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h"
 
 // Constructs a 'BoundingVolume' panel with 0 width/height
 HyPanelInit::HyPanelInit() :
+	m_ePanelType(PANELTYPE_BoundingVolume),
 	m_uiWidth(0),
 	m_uiHeight(0),
+	m_eBodyType(HYTYPE_Unknown),
 	m_uiFrameSize(0),
-	m_PanelColor(HyColor()),
-	m_FrameColor(HyColor()),
-	m_ePanelType(PANELTYPE_BoundingVolume)
+	m_PanelColor(HyColor(0, 0, 0, 0)),
+	m_FrameColor(HyColor(0, 0, 0, 0)),
+	m_TertiaryColor(HyColor(0, 0, 0, 0))
 {
 }
 
 // Constructs a 'BoundingVolume' panel
 HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight) :
+	m_ePanelType(PANELTYPE_BoundingVolume),
 	m_uiWidth(uiWidth),
 	m_uiHeight(uiHeight),
+	m_eBodyType(HYTYPE_Unknown),
 	m_uiFrameSize(0),
-	m_PanelColor(HyColor()),
-	m_FrameColor(HyColor()),
-	m_ePanelType(PANELTYPE_BoundingVolume)
+	m_PanelColor(HyColor(0, 0, 0, 0)),
+	m_FrameColor(HyColor(0, 0, 0, 0)),
+	m_TertiaryColor(HyColor(0, 0, 0, 0))
 {
 }
 
-// Constructs a 'Sprite' panel
-HyPanelInit::HyPanelInit(std::string sSpritePrefix, std::string sSpriteName, uint32 uiFrameSize /*= 0*/) :
-	m_sSpritePrefix(sSpritePrefix),
-	m_sSpriteName(sSpriteName),
+// Constructs a 'HyBody' panel
+HyPanelInit::HyPanelInit(HyType eBodyType, const HyNodePath &nodePath) :
+	m_ePanelType(PANELTYPE_HyBody),
+	m_eBodyType(eBodyType),
+	m_HyBodyPath(nodePath),
 	m_uiWidth(0), // TBD by loading the sprite
 	m_uiHeight(0),// TBD by loading the sprite
-	m_uiFrameSize(uiFrameSize),
-	m_PanelColor(HyColor()),
-	m_FrameColor(HyColor()),
-	m_ePanelType(PANELTYPE_Sprite)
+	m_uiFrameSize(0),
+	m_PanelColor(HyColor(0, 0, 0, 0)),
+	m_FrameColor(HyColor(0, 0, 0, 0)),
+	m_TertiaryColor(HyColor(0, 0, 0, 0))
 {
 }
 
 // Constructs a 'Primitive' panel. Colors of HyColor(0,0,0,0) will be set to a default color determined by the panel's usage
-HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor /*= HyColor(0,0,0,0)*/, HyColor frameColor /*= HyColor(0,0,0,0)*/) :
+HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor /*= HyColor(0,0,0,0)*/, HyColor frameColor /*= HyColor(0,0,0,0)*/, HyColor tertiaryColor /*= HyColor(0, 0, 0, 0)*/) :
+	m_ePanelType(PANELTYPE_Primitive),
 	m_uiWidth(uiWidth),
 	m_uiHeight(uiHeight),
 	m_uiFrameSize(uiFrameSize),
 	m_PanelColor(panelColor),
 	m_FrameColor(frameColor),
-	m_ePanelType(PANELTYPE_Primitive)
+	m_TertiaryColor(tertiaryColor)
 { }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-HyPanel::HyPanel(HyEntity2d *pParent /*= nullptr*/) :
+HyPanel::HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
-	m_Panel(this),
-	m_uiFrameSize(0),
-	m_Frame1(this),
-	m_Frame2(this),
+	m_ePanelType(HyPanelInit::PANELTYPE_Invalid),
+	m_pHyBody(nullptr),
+	m_pPrimitive(nullptr),
 	size(*this, DIRTY_Size | DIRTY_SceneAABB)
 {
-	Setup(HyPanelInit(), false);
-}
-
-HyPanel::HyPanel(const HyPanelInit &initRef, bool bIsContainer, HyEntity2d *pParent) :
-	HyEntity2d(pParent),
-	m_bIsContainer(bIsContainer),
-	m_Panel(this),
-	m_uiFrameSize(0),
-	m_Frame1(this),
-	m_Frame2(this),
-	size(*this, DIRTY_Size | DIRTY_SceneAABB)
-{
-	Setup(initRef, m_bIsContainer);
+	Setup(initRef);
 }
 
 /*virtual*/ HyPanel::~HyPanel()
@@ -84,24 +81,47 @@ HyPanel::HyPanel(const HyPanelInit &initRef, bool bIsContainer, HyEntity2d *pPar
 	ParentDetach(); // This avoids a crash when SetEntityLoaded() propagates to parents and invokes this->IsValid() after being deleted
 }
 
-void HyPanel::Setup(const HyPanelInit &initRef, bool bIsContainer)
+void HyPanel::Setup(const HyPanelInit &initRef)
 {
-	m_bIsContainer = bIsContainer;
-
-	m_SpritePanel.Uninit();
-	m_Frame1.SetAsNothing();
-	m_Frame2.SetAsNothing();
-	m_Panel.SetAsNothing();
+	m_pHyBody;
+	m_pPrimitive;
+	size;
 	
-	m_uiFrameSize = initRef.m_uiFrameSize;
 	m_ePanelType = initRef.m_ePanelType;
 	switch(m_ePanelType)
 	{
 	case HyPanelInit::PANELTYPE_BoundingVolume:
+		delete m_pHyBody;
+		m_pHyBody = nullptr;
+		delete m_pPrimitive;
+		m_pPrimitive = nullptr;
 		size.Set(static_cast<int32>(initRef.m_uiWidth), static_cast<int32>(initRef.m_uiHeight));
 		break;
 
-	case HyPanelInit::PANELTYPE_Sprite:
+	case HyPanelInit::PANELTYPE_HyBody:
+		if(false == (m_pHyBody && m_pHyBody->GetType() == initRef.m_eBodyType && m_pHyBody->GetPath() == initRef.m_HyBodyPath))
+		{
+			delete m_pHyBody;
+
+			switch(initRef.m_eBodyType)
+			{
+			case HYTYPE_Sprite:
+				m_pHyBody = HY_NEW HySprite2d(initRef.m_HyBodyPath, this);
+				break;
+			case HYTYPE_Spine:
+				m_pHyBody = HY_NEW HySpine2d(initRef.m_HyBodyPath, this);
+				break;
+			case HYTYPE_TexturedQuad:
+				m_pHyBody = HY_NEW HyTexturedQuad2d(initRef.m_HyBodyPath, this);
+				break;
+
+			default:
+				HyLogError("HyPanel::Setup() - Invalid HyType for HyBody: " << initRef.m_eBodyType);
+				break;
+			}
+			m_pHyBody = HY_NEW 
+		}
+
 		m_SpritePanel.Init(initRef.m_sSpritePrefix, initRef.m_sSpriteName, this);
 		size.Set(m_SpritePanel.GetStateWidth(m_SpritePanel.GetState()), m_SpritePanel.GetStateHeight(m_SpritePanel.GetState()));
 		break;
@@ -136,33 +156,28 @@ bool HyPanel::IsBoundingVolume() const
 	return m_ePanelType == HyPanelInit::PANELTYPE_BoundingVolume;
 }
 
+bool HyPanel::IsHyBody() const
+{
+	return m_ePanelType == HyPanelInit::PANELTYPE_HyBody;
+}
+
 bool HyPanel::IsPrimitive() const
 {
 	return m_ePanelType == HyPanelInit::PANELTYPE_Primitive;
 }
 
-bool HyPanel::IsSprite() const
-{
-	return m_ePanelType == HyPanelInit::PANELTYPE_Sprite;
-}
-
-HySprite2d &HyPanel::GetSprite()
-{
-	return m_SpritePanel;
-}
-
-uint32 HyPanel::GetSpriteState() const
-{
-	return m_SpritePanel.GetState();
-}
-
-void HyPanel::SetSpriteState(uint32 uiStateIndex)
+void HyPanel::ApplyPanelState(HyPanelState ePanelState)
 {
 	if(uiStateIndex < m_SpritePanel.GetNumStates())
 		m_SpritePanel.SetState(uiStateIndex);
-	
+
 	if(IsSprite())
 		size.Set(m_SpritePanel.GetStateWidth(m_SpritePanel.GetState()), m_SpritePanel.GetStateHeight(m_SpritePanel.GetState()));
+}
+
+IHyBody2d *HyPanel::GetHyBody()
+{
+	return m_pHyBody;
 }
 
 glm::ivec2 HyPanel::GetSizeHint()

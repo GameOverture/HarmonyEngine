@@ -13,9 +13,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/IHyBody3d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable.h"
-#include "Renderer/Effects/HyShader.h"
-#include "Assets/Nodes/HySpriteData.h"
-#include "Assets/Nodes/HyTextData.h"
 
 class IHyDrawable3d : public IHyBody3d, public IHyDrawable
 {

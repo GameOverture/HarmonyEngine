@@ -16,8 +16,8 @@
 #include "Renderer/Effects/HyStencil.h"
 #include "HyEngine.h"
 
-IHyBody2d::IHyBody2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
-	IHyLoadable2d(eNodeType, sPrefix, sName, pParent),
+IHyBody2d::IHyBody2d(HyType eNodeType, const HyNodePath &nodePath, HyEntity2d *pParent) :
+	IHyLoadable2d(eNodeType, nodePath, pParent),
 	IHyBody(),
 	m_fAlpha(1.0f),
 	m_fCachedAlpha(1.0f),

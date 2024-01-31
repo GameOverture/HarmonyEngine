@@ -243,6 +243,16 @@ enum HyWindowMode
 	HYWINDOW_BorderlessWindow
 };
 
+enum HyPanelState
+{
+	HYPANELSTATE_Idle = 0,
+	HYPANELSTATE_Down,
+	HYPANELSTATE_Hover,
+	HYPANELSTATE_Highlighted,
+	HYPANELSTATE_HighlightedDown,
+	HYPANELSTATE_HighlightedHover
+};
+
 enum HySizePolicy
 {
 	HYSIZEPOLICY_Fixed = 0,												// GetSizeHint() is the only acceptable alternative, so the widget can never grow or shrink (e.g. the vertical direction of a push button).

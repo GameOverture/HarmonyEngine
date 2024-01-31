@@ -20,22 +20,20 @@ class HyLabel : public IHyWidget
 protected:
 	enum LabelAttributes
 	{
-		LABELATTRIB_IsSideBySide			= 1 << 4,
-		LABELATTRIB_SideBySideTextFirst		= 1 << 5,		// When 'PANELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
-		LABELATTRIB_SideBySideVertical		= 1 << 6,		// When 'PANELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
+		LABELATTRIB_IsSideBySide			= 1 << 10,
+		LABELATTRIB_SideBySideTextFirst		= 1 << 11,		// When 'PANELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
+		LABELATTRIB_SideBySideVertical		= 1 << 12,		// When 'PANELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
 		
-		LABELATTRIB_StackedTextLeftAlign	= 1 << 7,		// When panel is stacked, use left alignment (when neither left, right, or justify, it will center)
-		LABELATTRIB_StackedTextRightAlign	= 1 << 8,		// When panel is stacked, use right alignment (when neither right, left, or justify, it will center)
-		LABELATTRIB_StackedTextJustifyAlign	= 1 << 9,		// When panel is stacked, use justify alignment (when neither justify, left, or right, it will center)
-		LABELATTRIB_StackedTextUseLine		= 1 << 10,		// When panel is stacked, use standard text line located at bot left margin, instead of scale box
+		LABELATTRIB_StackedTextLeftAlign	= 1 << 13,		// When panel is stacked, use left alignment (when neither left, right, or justify, it will center)
+		LABELATTRIB_StackedTextRightAlign	= 1 << 14,		// When panel is stacked, use right alignment (when neither right, left, or justify, it will center)
+		LABELATTRIB_StackedTextJustifyAlign	= 1 << 15,		// When panel is stacked, use justify alignment (when neither justify, left, or right, it will center)
+		LABELATTRIB_StackedTextUseLine		= 1 << 16,		// When panel is stacked, use standard text line located at bot left margin, instead of scale box
 		
-		LABELATTRIB_FLAG_NEXT				= 1 << 11
+		LABELATTRIB_FLAG_NEXT				= 1 << 17
 	};
 	static_assert((int)LABELATTRIB_IsSideBySide == (int)UIATTRIB_FLAG_NEXT, "HyLabel is not matching with base classes attrib flags");
 
-	HyPanel					m_Panel;
 	HyText2d				m_Text;
-
 	HyRectangle<float>		m_TextMargins;					// Margins used for Stacked text scale box; The 'iTag' is used for Side-by-side padding between text/panel
 
 public:

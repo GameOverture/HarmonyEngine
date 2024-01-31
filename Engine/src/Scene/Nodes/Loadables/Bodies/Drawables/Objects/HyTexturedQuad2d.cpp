@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
-#include "Assets/Nodes/HyTexturedQuadData.h"
+#include "Assets/Nodes/Objects/HyTexturedQuadData.h"
 #include "Utilities/HyIO.h"
 #include "HyEngine.h"
 

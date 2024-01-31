@@ -12,13 +12,13 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
-#include "Assets/Nodes/HySpriteData.h"
+#include "Assets/Nodes/Objects/HySpriteData.h"
 #include "Renderer/Components/HyVertexBuffer.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
 template<typename NODETYPE, typename ENTTYPE>
-IHySprite<NODETYPE, ENTTYPE>::IHySprite(std::string sPrefix, std::string sName, ENTTYPE *pParent) :
-	NODETYPE(HYTYPE_Sprite, sPrefix, sName, pParent),
+IHySprite<NODETYPE, ENTTYPE>::IHySprite(const HyNodePath &nodePath, ENTTYPE *pParent) :
+	NODETYPE(HYTYPE_Sprite, nodePath, pParent),
 	m_bIsAnimPaused(false),
 	m_fAnimPlayRate(1.0f),
 	m_fElapsedFrameTime(0.0f),

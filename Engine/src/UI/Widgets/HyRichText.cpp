@@ -11,6 +11,7 @@
 #include "UI/Widgets/HyRichText.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
+#include "Assets/Nodes/Objects/HyTextData.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
 #include <regex>

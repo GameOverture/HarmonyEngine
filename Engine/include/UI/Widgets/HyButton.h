@@ -17,38 +17,20 @@
 class HyButton;
 typedef std::function<void(HyButton *, void *)> HyButtonClickedCallback;
 
-enum HyButtonState
-{
-	HYBUTTONSTATE_Idle = 0,
-	HYBUTTONSTATE_Down,
-	HYBUTTONSTATE_Hover,
-	HYBUTTONSTATE_Highlighted,
-	HYBUTTONSTATE_HighlightedDown,
-	HYBUTTONSTATE_HighlightedHover
-};
-
 class HyButton : public HyLabel
 {
 protected:
 	enum ButtonAttributes
 	{
-		BTNATTRIB_HideDownState		= 1 << 11,		// Don't visually indicate down state (when available)
-		BTNATTRIB_HideHoverState	= 1 << 12,		// Don't visually indicate hover state (when available)
-		BTNATTRIB_IsHoverState		= 1 << 13,		// When cursor is overtop button
-		BTNATTRIB_IsMouseDownState	= 1 << 14,		// When the mouse button is presses (left clicks) this button
-		BTNATTRIB_IsHighlighted		= 1 << 15,		// Indicates keyboard focus, or an optional cosmetic state
-		BTNATTRIB_IsKbDownState		= 1 << 16,		// Indicates this button is currently receiving keyboard input that is pressing (BTNATTRIB_IsDownState) the button
+		BTNATTRIB_IsKbDownState		= 1 << 17,		// Indicates this button is currently receiving keyboard input that is pressing (BTNATTRIB_IsDownState) the button
 
-		BTNATTRIB_FLAG_NEXT			= 1 << 17
+		BTNATTRIB_FLAG_NEXT			= 1 << 18
 	};
-	static_assert((int)BTNATTRIB_HideDownState == (int)LABELATTRIB_FLAG_NEXT, "HyButton is not matching with base classes attrib flags");
+	static_assert((int)BTNATTRIB_IsKbDownState == (int)LABELATTRIB_FLAG_NEXT, "HyButton is not matching with base classes attrib flags");
 
 	HyButtonClickedCallback			m_fpBtnClickedCallback;
 	void *							m_pBtnClickedParam;
 	HyAudio2d						m_ClickedSound;
-
-	HyColor							m_PanelColor;	// Only used when m_Panel.IsSprite() == false
-	HyColor							m_FrameColor;	// Only used when m_Panel.IsSprite() == false
 
 public:
 	HyButton(HyEntity2d *pParent = nullptr);
@@ -87,13 +69,6 @@ protected:
 	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) override;
 
 	virtual void OnSetup() override;
-
-	HyButtonState GetBtnState();
-
-	virtual void OnBtnStateChange(HyButtonState eNewState) { }	// Derived classes optional override
-
-private:
-	void SetBtnState(HyButtonState eOldState);
 };
 
 #endif /* HyButton_h__ */

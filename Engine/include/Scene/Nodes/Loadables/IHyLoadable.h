@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
+#include "Assets/Nodes/HyNodePath.h"
 
 class HyEntity2d;
 class HyEntity3d;
@@ -27,13 +28,12 @@ protected:
 	
 	HyLoadState						m_eLoadState;
 	const IHyNodeData *				m_pData;
-	std::string						m_sPrefix;
-	std::string						m_sName;
+	HyNodePath						m_NodePath;
 
 	uint32							m_uiState;	// All 'Loadable' type nodes utilize a state system when setting up
 
 public:
-	IHyLoadable(std::string sPrefix, std::string sName);
+	IHyLoadable(const HyNodePath &nodePath);
 	IHyLoadable(const IHyLoadable &copyRef);
 	IHyLoadable(IHyLoadable &&donor) noexcept;
 	virtual ~IHyLoadable();
@@ -41,6 +41,7 @@ public:
 	IHyLoadable &operator=(const IHyLoadable &rhs);
 	IHyLoadable &operator=(IHyLoadable &&donor);
 
+	const HyNodePath &GetPath() const;
 	const std::string &GetName() const;
 	const std::string &GetPrefix() const;
 
@@ -57,7 +58,7 @@ public:
 	virtual bool IsLoadDataValid() { return true; }	// Optional public override for derived classes to indicate that its current state 
 
 protected:
-	void _Reinitialize(std::string sPrefix, std::string sName);
+	void _Reinitialize(const HyNodePath &nodePathRef);
 
 	virtual bool IsChildrenLoaded() const { return true; }// Required override for entities to properly determine whether they're loaded
 

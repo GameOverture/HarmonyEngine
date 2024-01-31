@@ -11,10 +11,15 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
-#include "Assets/Nodes/HySpriteData.h"
+#include "Assets/Nodes/Objects/HySpriteData.h"
 
-HySprite2d::HySprite2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
-	IHySprite<IHyDrawable2d, HyEntity2d>(sPrefix, sName, pParent)
+HySprite2d::HySprite2d(const HyNodePath &nodePath = HyNodePath(), HyEntity2d *pParent /*= nullptr*/) :
+	IHySprite<IHyDrawable2d, HyEntity2d>(nodePath, pParent)
+{
+}
+
+HySprite2d::HySprite2d(std::string sPrefix, std::string sName, HyEntity2d *pParent /*= nullptr*/) :
+	IHySprite<IHyDrawable2d, HyEntity2d>(HyNodePath(sPrefix, sName), pParent)
 {
 }
 

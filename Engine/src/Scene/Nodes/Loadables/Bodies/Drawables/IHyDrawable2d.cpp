@@ -11,8 +11,8 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "HyEngine.h"
 
-IHyDrawable2d::IHyDrawable2d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity2d *pParent) :
-	IHyBody2d(eNodeType, sPrefix, sName, pParent)
+IHyDrawable2d::IHyDrawable2d(HyType eInstType, const HyNodePath &nodePath, HyEntity2d *pParent) :
+	IHyBody2d(eInstType, nodePath, pParent)
 {
 	m_uiFlags |= NODETYPE_IsDrawable;
 }

@@ -74,13 +74,14 @@ set(HYENGINE_SOURCE_FILES
 	src/Assets/Files/HyFileAudio.cpp
 	src/Assets/Files/HyFilesManifest.cpp
 	src/Assets/Files/HyGLTF.cpp
-	src/Assets/Nodes/HyAudioData.cpp
-	src/Assets/Nodes/HyPrefabData.cpp
-	src/Assets/Nodes/HySpineData.cpp
-	src/Assets/Nodes/HySpriteData.cpp
-	src/Assets/Nodes/HyTextData.cpp
-	src/Assets/Nodes/HyTexturedQuadData.cpp
+	src/Assets/Nodes/HyNodePath.cpp
 	src/Assets/Nodes/IHyNodeData.cpp
+	src/Assets/Nodes/Objects/HyAudioData.cpp
+	src/Assets/Nodes/Objects/HyPrefabData.cpp
+	src/Assets/Nodes/Objects/HySpineData.cpp
+	src/Assets/Nodes/Objects/HySpriteData.cpp
+	src/Assets/Nodes/Objects/HyTextData.cpp
+	src/Assets/Nodes/Objects/HyTexturedQuadData.cpp
 	src/Audio/HyAudioCore.cpp
 	src/Audio/HySoundAsset.cpp
 	src/Diagnostics/HyDiagnostics.cpp
@@ -203,13 +204,14 @@ set(HYENGINE_HEADER_FILES
 	include/Assets/Files/HyFilesManifest.h
 	include/Assets/Files/HyGLTF.h
 	include/Assets/Files/IHyFile.h
-	include/Assets/Nodes/HyAudioData.h
-	include/Assets/Nodes/HyPrefabData.h
-	include/Assets/Nodes/HySpineData.h
-	include/Assets/Nodes/HySpriteData.h
-	include/Assets/Nodes/HyTextData.h
-	include/Assets/Nodes/HyTexturedQuadData.h
+	include/Assets/Nodes/HyNodePath.h
 	include/Assets/Nodes/IHyNodeData.h
+	include/Assets/Nodes/Objects/HyAudioData.h
+	include/Assets/Nodes/Objects/HyPrefabData.h
+	include/Assets/Nodes/Objects/HySpineData.h
+	include/Assets/Nodes/Objects/HySpriteData.h
+	include/Assets/Nodes/Objects/HyTextData.h
+	include/Assets/Nodes/Objects/HyTexturedQuadData.h
 	include/Audio/HyAudioCore.h
 	include/Audio/HySoundAsset.h
 	include/Diagnostics/HyDiagnostics.h

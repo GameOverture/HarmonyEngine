@@ -14,11 +14,10 @@
 
 /*static*/ HyAssets *IHyLoadable::sm_pHyAssets = nullptr;
 
-IHyLoadable::IHyLoadable(std::string sPrefix, std::string sName) :
+IHyLoadable::IHyLoadable(const HyNodePath &nodePath) :
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(nullptr),
-	m_sPrefix(sPrefix),
-	m_sName(sName),
+	m_NodePath(nodePath),
 	m_uiState(0)
 {
 }
@@ -26,8 +25,7 @@ IHyLoadable::IHyLoadable(std::string sPrefix, std::string sName) :
 IHyLoadable::IHyLoadable(const IHyLoadable &copyRef) :
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(copyRef.m_pData),
-	m_sPrefix(copyRef.m_sPrefix),
-	m_sName(copyRef.m_sName),
+	m_NodePath(copyRef.m_NodePath),
 	m_uiState(copyRef.m_uiState)
 {
 }
@@ -35,8 +33,7 @@ IHyLoadable::IHyLoadable(const IHyLoadable &copyRef) :
 IHyLoadable::IHyLoadable(IHyLoadable &&donor) noexcept :
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(std::move(donor.m_pData)),
-	m_sPrefix(std::move(donor.m_sPrefix)),
-	m_sName(std::move(donor.m_sName)),
+	m_NodePath(std::move(donor.m_NodePath)),
 	m_uiState(std::move(donor.m_uiState))
 {
 }
@@ -47,13 +44,12 @@ IHyLoadable::IHyLoadable(IHyLoadable &&donor) noexcept :
 
 IHyLoadable &IHyLoadable::operator=(const IHyLoadable &rhs)
 {
-	if(m_sPrefix != rhs.m_sPrefix || m_sName != rhs.m_sName)
+	if(m_NodePath != rhs.m_NodePath)
 	{
 		if(m_eLoadState != HYLOADSTATE_Inactive)
 			Unload();
 
-		m_sPrefix = rhs.m_sPrefix;
-		m_sName = rhs.m_sName;
+		m_NodePath = rhs.m_NodePath;
 		m_pData = nullptr;			// Ensures virtual OnDataAcquired() is invoked when the below Load() is invoked
 	}
 
@@ -65,13 +61,12 @@ IHyLoadable &IHyLoadable::operator=(const IHyLoadable &rhs)
 
 IHyLoadable &IHyLoadable::operator=(IHyLoadable &&donor)
 {
-	if(m_sPrefix != donor.m_sPrefix || m_sName != donor.m_sName)
+	if(m_NodePath != donor.m_NodePath)
 	{
 		if(m_eLoadState != HYLOADSTATE_Inactive)
 			Unload();
 
-		m_sPrefix = std::move(donor.m_sPrefix);
-		m_sName = std::move(donor.m_sName);
+		m_NodePath = std::move(donor.m_NodePath);
 		m_pData = nullptr;			// Ensures virtual OnDataAcquired() is invoked when the below Load() is invoked
 	}
 
@@ -84,27 +79,31 @@ IHyLoadable &IHyLoadable::operator=(IHyLoadable &&donor)
 	return *this;
 }
 
+const HyNodePath &IHyLoadable::GetPath() const
+{
+	return m_NodePath;
+}
+
 const std::string &IHyLoadable::GetName() const
 {
-	return m_sName;
+	return m_NodePath.GetName();
 }
 
 const std::string &IHyLoadable::GetPrefix() const
 {
-	return m_sPrefix;
+	return m_NodePath.GetPrefix();
 }
 
-void IHyLoadable::_Reinitialize(std::string sPrefix, std::string sName)
+void IHyLoadable::_Reinitialize(const HyNodePath &nodePathRef)
 {
-	if(m_sPrefix == sPrefix && m_sName == sName)
+	if(m_NodePath == nodePathRef)
 		return;
 
 	bool bWasLoaded = IsLoaded() || m_eLoadState == HYLOADSTATE_Queued;
 	if(bWasLoaded)
 		Unload();
 
-	m_sPrefix = sPrefix;
-	m_sName = sName;
+	m_NodePath = nodePathRef;
 	m_pData = nullptr;
 	m_uiState = 0;
 
@@ -122,9 +121,9 @@ uint32 IHyLoadable::GetState() const
 	if(AcquireData() == nullptr || uiStateIndex >= UncheckedGetData()->GetNumStates())
 	{
 		if(UncheckedGetData() == nullptr)
-			HyLogWarning(m_sPrefix << "/" << m_sName << " wants to set state index of '" << uiStateIndex << "' when data is null");
+			HyLogWarning(m_NodePath.GetPath() << " wants to set state index of '" << uiStateIndex << "' when data is null");
 		else
-			HyLogWarning(m_sPrefix << "/" << m_sName << " wants to set state index of '" << uiStateIndex << "' when total number of states is '" << UncheckedGetData()->GetNumStates() << "'");
+			HyLogWarning(m_NodePath.GetPath() << " wants to set state index of '" << uiStateIndex << "' when total number of states is '" << UncheckedGetData()->GetNumStates() << "'");
 		return false;
 	}
 

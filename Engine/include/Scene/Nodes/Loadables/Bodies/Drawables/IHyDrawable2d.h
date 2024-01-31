@@ -13,18 +13,13 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable.h"
-#include "Scene/Physics/HyShape2d.h"
-#include "Assets/Nodes/HySpriteData.h"
-#include "Assets/Nodes/HyTextData.h"
-#include "Assets/Nodes/HySpineData.h"
-#include "Assets/Nodes/HyAudioData.h"
 
 class IHyDrawable2d : public IHyBody2d, public IHyDrawable
 {
 	friend class HyScene;
 
 public:
-	IHyDrawable2d(HyType eInstType, std::string sPrefix, std::string sName, HyEntity2d *pParent);
+	IHyDrawable2d(HyType eInstType, const HyNodePath &nodePath, HyEntity2d *pParent);
 	IHyDrawable2d(const IHyDrawable2d &copyRef);
 	IHyDrawable2d(IHyDrawable2d &&donor) noexcept;
 	virtual ~IHyDrawable2d();

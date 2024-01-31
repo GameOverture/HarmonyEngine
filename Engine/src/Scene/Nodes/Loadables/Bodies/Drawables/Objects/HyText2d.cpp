@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
-#include "Assets/Nodes/HyTextData.h"
+#include "Assets/Nodes/Objects/HyTextData.h"
 
 HyText2d::HyText2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
 	IHyText<IHyDrawable2d, HyEntity2d>(sPrefix, sName, pParent)

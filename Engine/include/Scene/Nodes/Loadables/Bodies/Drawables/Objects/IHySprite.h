@@ -41,7 +41,7 @@ protected:
 	uint32					m_uiCurFrame;
 
 public:
-	IHySprite(std::string sPrefix, std::string sName, ENTTYPE *pParent);
+	IHySprite(const HyNodePath &nodePath, ENTTYPE *pParent);
 	IHySprite(const IHySprite &copyRef);
 	virtual ~IHySprite(void);
 

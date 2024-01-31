@@ -21,9 +21,9 @@ class HyLineEdit : public HyLabel
 protected:
 	enum ButtonAttributes
 	{
-		LINEEDITATTRIB_IsHighlighted = 1 << 11,		// Indicates keyboard focus, or an optional cosmetic state
+		LINEEDITATTRIB_IsHighlighted = 1 << 17,		// Indicates keyboard focus, or an optional cosmetic state
 
-		LINEEDITATTRIB_FLAG_NEXT = 1 << 12
+		LINEEDITATTRIB_FLAG_NEXT = 1 << 18
 	};
 	static_assert((int)LINEEDITATTRIB_IsHighlighted == (int)LABELATTRIB_FLAG_NEXT, "HyLineEdit is not matching with base classes attrib flags");
 

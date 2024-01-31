@@ -14,7 +14,7 @@
 #include "Renderer/Effects/HyStencil.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Assets/Files/HyGLTF.h"
-#include "Assets/Nodes/HyPrefabData.h"
+#include "Assets/Nodes/Objects/HyPrefabData.h"
 #include "HyEngine.h"
 
 IHyRenderer *IHyRenderer::sm_pInstance = nullptr;

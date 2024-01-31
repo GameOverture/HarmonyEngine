@@ -11,7 +11,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
-#include "Assets/Nodes/HyTextData.h"
+#include "Assets/Nodes/Objects/HyTextData.h"
 #include "Utilities/HyMath.h"
 #include "Diagnostics/Console/IHyConsole.h"
 #include "HyEngine.h"

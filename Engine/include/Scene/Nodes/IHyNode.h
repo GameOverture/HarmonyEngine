@@ -37,7 +37,7 @@ public:
 		NODETYPE_IsBody				= 1 << 6,	// Must at least be a 'body' to participate in physics and collisions
 		NODETYPE_IsDrawable			= 1 << 7,
 		NODETYPE_IsLayout			= 1 << 8,	// A special entity type used for UI to arrange its child nodes as widgets
-		NODETYPE_IsPhysicsGrid		= 1 << 9,
+		NODETYPE_IsPhysicsGrid		= 1 << 9,	// Not used - TODO: Repurpose
 	};
 	// These flags get set by HyAnimFloat's when their corresponding respective values are manipulated
 	enum DirtyFlag // NOTE: continue the bits in TypeFlag (stored in same 32bit member 'm_uiFlags')

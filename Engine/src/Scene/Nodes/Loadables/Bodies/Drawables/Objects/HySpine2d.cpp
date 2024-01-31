@@ -11,11 +11,23 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySpine2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
-#include "Assets/Nodes/HySpineData.h"
+#include "Assets/Nodes/Objects/HySpineData.h"
 #include "HyEngine.h"
 
-HySpine2d::HySpine2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_Spine, sPrefix, sName, pParent),
+HySpine2d::HySpine2d(const HyNodePath &nodePath /*= HyNodePath()*/, HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_Spine, nodePath, pParent),
+#ifdef HY_USE_SPINE
+	m_pSkeleton(nullptr),
+	m_pAnimationState(nullptr),
+	m_pSkeletonBounds(nullptr),
+#endif
+	m_uiStartingSlotIndex(0)
+{
+	m_ShaderUniforms.SetNumTexUnits(1);
+}
+
+HySpine2d::HySpine2d(std::string sPrefix, std::string sName, HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_Spine, HyNodePath(sPrefix, sName), pParent),
 #ifdef HY_USE_SPINE
 	m_pSkeleton(nullptr),
 	m_pAnimationState(nullptr),
