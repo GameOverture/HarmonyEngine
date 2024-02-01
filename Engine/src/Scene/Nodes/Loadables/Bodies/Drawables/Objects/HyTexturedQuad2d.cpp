@@ -17,8 +17,8 @@
 
 #include "vendor/SOIL2/src/SOIL2/SOIL2.h"
 
-HyTexturedQuad2d::HyTexturedQuad2d(HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_TexturedQuad, HyNodePath(), pParent)
+HyTexturedQuad2d::HyTexturedQuad2d(const HyNodePath &nodePath /*= HyNodePath()*/, HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_TexturedQuad, nodePath, pParent)
 {
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
@@ -95,6 +95,16 @@ void HyTexturedQuad2d::Uninit()
 	shapeOut.SetAsBox(static_cast<float>(GetWidth()), static_cast<float>(GetHeight()));
 }
 
+/*virtual*/ float HyTexturedQuad2d::GetWidth(float fPercent /*= 1.0f*/) /*override*/
+{
+	return (m_UvCoords.Width() * GetEntireTextureWidth()) * fPercent;
+}
+
+/*virtual*/ float HyTexturedQuad2d::GetHeight(float fPercent /*= 1.0f*/) /*override*/
+{
+	return (m_UvCoords.Height() * GetEntireTextureHeight()) * fPercent;
+}
+
 void HyTexturedQuad2d::SetUvCoordinates(int iX, int iY, int iWidth, int iHeight)
 {
 	int32 iTextureWidth = GetEntireTextureWidth();
@@ -114,16 +124,6 @@ void HyTexturedQuad2d::SetUvCoordinates(int iX, int iY, int iWidth, int iHeight)
 	m_UvCoords.top = fY / iTextureHeight;
 	m_UvCoords.right = (fX + fWidth) / iTextureWidth;
 	m_UvCoords.bottom = (fY + fHeight) / iTextureHeight;
-}
-
-float HyTexturedQuad2d::GetWidth(float fPercent /*= 1.0f*/)
-{
-	return (m_UvCoords.Width() * GetEntireTextureWidth()) * fPercent;
-}
-
-float HyTexturedQuad2d::GetHeight(float fPercent /*= 1.0f*/)
-{
-	return (m_UvCoords.Height() * GetEntireTextureHeight()) * fPercent;
 }
 
 int32 HyTexturedQuad2d::GetEntireTextureWidth()

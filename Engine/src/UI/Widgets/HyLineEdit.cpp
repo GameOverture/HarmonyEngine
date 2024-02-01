@@ -302,8 +302,6 @@ void HyLineEdit::SetAsHighlighted(bool bIsHighlighted)
 
 /*virtual*/ void HyLineEdit::OnTakeKeyboardFocus() /*override*/
 {
-	// TODO: HyPanel should handle highlighting the widget
-
 	HyEngine::Input().StartTextInput();
 
 	m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);

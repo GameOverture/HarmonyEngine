@@ -25,7 +25,7 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 	m_iDefaultWidgetSpacing(HYUICONTAINER_DefaultWidgetSpacing),
 	m_bFlexSizeX(true),
 	m_bFlexSizeY(true),
-	m_Panel(initRef, true, this),
+	m_Panel(initRef, this),
 	m_RootLayout(eRootLayoutDirection, HYUICONTAINER_DefaultWidgetSpacing, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f),

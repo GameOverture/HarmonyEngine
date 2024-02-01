@@ -405,13 +405,13 @@ void IHySprite<NODETYPE, ENTTYPE>::AdvanceAnim(float fDeltaTime)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHySprite<NODETYPE, ENTTYPE>::GetWidth(float fPercent /*= 1.0f*/)
+/*virtual*/ float IHySprite<NODETYPE, ENTTYPE>::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
 	return GetFrameWidth(this->m_uiState, m_uiCurFrame, fPercent);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHySprite<NODETYPE, ENTTYPE>::GetHeight(float fPercent /*= 1.0f*/)
+/*virtual*/ float IHySprite<NODETYPE, ENTTYPE>::GetHeight(float fPercent /*= 1.0f*/) /*override*/
 {
 	return GetFrameHeight(this->m_uiState, m_uiCurFrame, fPercent);
 }

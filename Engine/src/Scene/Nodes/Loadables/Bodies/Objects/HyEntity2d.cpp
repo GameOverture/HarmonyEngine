@@ -262,6 +262,26 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	return m_SceneAABB;
 }
 
+/*virtual*/ float HyEntity2d::GetWidth(float fPercent = 1.0f) /*override*/
+{
+	HyShape2d shape;
+	CalcLocalBoundingShape(shape);
+	
+	b2AABB aabb;
+	shape.ComputeAABB(aabb, glm::mat4(1.0f));
+	return (aabb.GetExtents().x * 2.0f) * fPercent;
+}
+
+/*virtual*/ float HyEntity2d::GetHeight(float fPercent = 1.0f) /*override*/
+{
+	HyShape2d shape;
+	CalcLocalBoundingShape(shape);
+	
+	b2AABB aabb;
+	shape.ComputeAABB(aabb, glm::mat4(1.0f));
+	return (aabb.GetExtents().y * 2.0f) * fPercent;
+}
+
 void HyEntity2d::ChildAppend(IHyNode2d &childRef)
 {
 	HyAssert(&childRef != this, "HyEntity2d::ChildAppend was passed a child that was itself!");

@@ -118,8 +118,8 @@ public:
 	void SetText(const std::string &sUtf8Text);
 	void SetText(const std::stringstream &ssUtf8Text);
 
-	float GetWidth(float fPercent = 1.0f);		// Returns the maximum pixel width of all lines of text (ignores any scaling)
-	float GetHeight(float fPercent = 1.0f);		// Returns the maximum pixel height of all lines of text (ignores any scaling)
+	virtual float GetWidth(float fPercent = 1.0f) override;		// Returns the maximum pixel width of all lines of text (ignores any scaling)
+	virtual float GetHeight(float fPercent = 1.0f) override;	// Returns the maximum pixel height of all lines of text (ignores any scaling)
 	
 	float GetLineBreakHeight(float fPercent = 1.0f);
 	float GetLineDescender(float fPercent = 1.0f);

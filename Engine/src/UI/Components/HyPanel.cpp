@@ -81,11 +81,21 @@ HyPanel::HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent) :
 	ParentDetach(); // This avoids a crash when SetEntityLoaded() propagates to parents and invokes this->IsValid() after being deleted
 }
 
+/*virtual*/ float HyPanel::GetWidth(float fPercent = 1.0f) /*override*/
+{
+	return size.X() * fPercent;
+}
+
+/*virtual*/ float HyPanel::GetHeight(float fPercent = 1.0f) /*override*/
+{
+	return size.Y() * fPercent;
+}
+
 void HyPanel::Setup(const HyPanelInit &initRef)
 {
-	m_pHyBody;
-	m_pPrimitive;
-	size;
+	//m_pHyBody;
+	//m_pPrimitive;
+	//size;
 	
 	m_ePanelType = initRef.m_ePanelType;
 	switch(m_ePanelType)
@@ -119,11 +129,8 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 				HyLogError("HyPanel::Setup() - Invalid HyType for HyBody: " << initRef.m_eBodyType);
 				break;
 			}
-			m_pHyBody = HY_NEW 
 		}
-
-		m_SpritePanel.Init(initRef.m_sSpritePrefix, initRef.m_sSpriteName, this);
-		size.Set(m_SpritePanel.GetStateWidth(m_SpritePanel.GetState()), m_SpritePanel.GetStateHeight(m_SpritePanel.GetState()));
+		size.Set(m_pHyBody->GetWidth() m_SpritePanel.GetStateWidth(m_SpritePanel.GetState()), m_SpritePanel.GetStateHeight(m_SpritePanel.GetState()));
 		break;
 
 	case HyPanelInit::PANELTYPE_Primitive:
@@ -173,6 +180,32 @@ void HyPanel::ApplyPanelState(HyPanelState ePanelState)
 
 	if(IsSprite())
 		size.Set(m_SpritePanel.GetStateWidth(m_SpritePanel.GetState()), m_SpritePanel.GetStateHeight(m_SpritePanel.GetState()));
+
+	if(m_Panel.IsSprite())
+	{
+		uint32 uiNumStates = m_Panel.GetSprite().GetNumStates();
+		if(static_cast<uint32>(eCurState) < uiNumStates)
+			m_Panel.SetSpriteState(eCurState);
+		else if(IsHighlighted() && uiNumStates > HYBUTTONSTATE_Highlighted)
+			m_Panel.SetSpriteState(HYBUTTONSTATE_Highlighted);
+		else
+			m_Panel.SetSpriteState(HYBUTTONSTATE_Idle);
+	}
+	else
+	{
+		HyLog(eCurState);
+		if(IsDown())
+			m_Panel.SetPanelColor(m_PanelColor.Darken());
+		else if(IsMouseHover())
+			m_Panel.SetPanelColor(m_PanelColor.Lighten());
+		else
+			m_Panel.SetPanelColor(m_PanelColor);
+
+		if(IsHighlighted())
+			m_Panel.SetFrameColor(m_FrameColor.Lighten());
+		else
+			m_Panel.SetFrameColor(m_FrameColor);
+	}
 }
 
 IHyBody2d *HyPanel::GetHyBody()

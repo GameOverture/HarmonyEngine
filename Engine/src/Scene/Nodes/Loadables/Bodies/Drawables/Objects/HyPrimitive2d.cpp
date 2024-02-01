@@ -64,6 +64,20 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	shapeOut = m_Shape;
 }
 
+/*virtual*/ float HyPrimitive2d::GetWidth(float fPercent = 1.0f) /*override*/
+{
+	b2AABB aabb;
+	m_Shape.ComputeAABB(aabb, glm::mat4(1.0f));
+	return (aabb.GetExtents().x * 2.0f) * fPercent;
+}
+
+/*virtual*/ float HyPrimitive2d::GetHeight(float fPercent = 1.0f) /*override*/
+{
+	b2AABB aabb;
+	m_Shape.ComputeAABB(aabb, glm::mat4(1.0f));
+	return (aabb.GetExtents().y * 2.0f) * fPercent;
+}
+
 HyShapeType HyPrimitive2d::GetShapeType() const
 {
 	return m_Shape.GetType();

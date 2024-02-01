@@ -53,9 +53,6 @@ public:
 
 	glm::ivec2 GetSizeHint();
 
-	virtual float GetWidth(float fPercent = 1.0f) = 0;
-	virtual float GetHeight(float fPercent = 1.0f) = 0;
-
 protected:
 	glm::ivec2 Resize(uint32 uiNewWidth, uint32 uiNewHeight);
 

@@ -12,7 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/IHyWidget.h"
-#include "UI/Components/HyPanel.h"
 
 class HySlider : public IHyWidget
 {
@@ -50,7 +49,6 @@ protected:
 	BarPrimitives							m_BarStroke;
 	BarPrimitives							m_BarFill;
 
-	HyPanel									m_Slider;
 	glm::vec2								m_ptSliderCenter;
 
 	std::function<void(HySlider *, void *)>	m_fpOnValueChanged;

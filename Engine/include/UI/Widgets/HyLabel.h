@@ -12,7 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/IHyWidget.h"
-#include "UI/Components/HyPanel.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 
 class HyLabel : public IHyWidget

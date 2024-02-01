@@ -38,6 +38,8 @@ public:
 	const HyPrimitive2d &operator=(const HyPrimitive2d &rhs);
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
+	virtual float GetWidth(float fPercent = 1.0f) override;
+	virtual float GetHeight(float fPercent = 1.0f) override;
 
 	HyShapeType GetShapeType() const;
 

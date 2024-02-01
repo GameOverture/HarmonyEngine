@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/IHyEntityUi.h"
+#include "UI/Components/HyPanel.h"
 
 class IHyWidget : public IHyEntityUi
 {
@@ -47,20 +48,32 @@ public:
 	bool IsInputAllowed() const;					// Checks itself and the container it's inserted in if input is allowed
 
 	bool IsEnabled() const;
-	virtual void SetAsEnabled(bool bEnabled);
-
 	bool IsHideDisabled() const;					// Whether to not visually indicate if disabled
 	void SetHideDisabled(bool bIsHideDisabled);		// Whether to not visually indicate if disabled
+	void SetAsEnabled(bool bEnabled);
 
+	bool IsKeyboardFocus() const;
 	bool IsKeyboardFocusAllowed() const;
 	void SetKeyboardFocusAllowed(bool bEnabled);
-	bool IsKeyboardFocus() const;
 	bool RequestKeyboardFocus();
 
-	bool IsHoverCursor() const;
-	void SetHoverCursor(HyMouseCursor eMouseCursor);
+	bool IsMouseDown() const;
+	bool IsHideMouseDownState() const;
+	void SetHideMouseDownState(bool bIsHideDownState);
+
+	bool IsMouseHover() const;
+	bool IsHideMouseHoverState() const;
+	void SetHideMouseHoverState(bool bIsHideHoverState);
+	bool IsMouseHoverCursorSet() const;
+	void SetMouseHoverCursor(HyMouseCursor eMouseCursor);
+
+	bool IsHighlighted() const;
+	bool IsHideHighlightedState() const;
+	void SetHideHighlightedState(bool bIsHideHighlightedState);
+	void SetAsHighlighted(bool bIsHighlighted);
 
 protected:
+	virtual void OnUpdate() override final;
 	virtual void OnMouseEnter() override final;
 	virtual void OnMouseLeave() override final;
 	virtual void OnMouseDown() override final;
@@ -79,10 +92,9 @@ protected:
 	virtual void OnRelinquishKeyboardFocus() { }	// Widgets that are 'IsKeyboardFocusAllowed' should override this
 
 	HyPanelState GetPanelState() const;
-	virtual void OnPanelStateChange(HyPanelState eNewState) { }	// Derived classes optional override
 
 private:
-	void SetPanelState(HyPanelState eOldState);
+	void ApplyPanelState(HyPanelState eOldState);
 };
 
 #endif /* IHyWidget_h__ */

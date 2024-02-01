@@ -19,7 +19,7 @@ class HyTexturedQuad2d : public IHyDrawable2d
 	HyRectangle<float>			m_UvCoords;
 
 public:
-	HyTexturedQuad2d(HyEntity2d *pParent = nullptr);
+	HyTexturedQuad2d(const HyNodePath &nodePath = HyNodePath(), HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(HyTextureQuadHandle hTextureQuadHandle, HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(std::string sFilePath, HyTextureInfo textureInfo, HyEntity2d *pParent = nullptr);
@@ -35,10 +35,10 @@ public:
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 
-	void SetUvCoordinates(int iX, int iY, int iWidth, int iHeight);
+	virtual float GetWidth(float fPercent = 1.0f) override; // Get pixel width of the sampled UV coordinates (ignores any scaling)
+	virtual float GetHeight(float fPercent = 1.0f) override; // Get pixel height of the sampled UV coordinates  (ignores any scaling)
 
-	float GetWidth(float fPercent = 1.0f); // Get pixel width of the sampled UV coordinates (ignores any scaling)
-	float GetHeight(float fPercent = 1.0f); // Get pixel height of the sampled UV coordinates  (ignores any scaling)
+	void SetUvCoordinates(int iX, int iY, int iWidth, int iHeight);
 
 	int32 GetEntireTextureWidth();
 	int32 GetEntireTextureHeight();

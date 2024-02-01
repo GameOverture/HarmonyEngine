@@ -39,33 +39,12 @@ public:
 	HyButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyButton();
 
-	virtual void SetAsEnabled(bool bEnabled) override;
-
-	bool IsHideDownState() const;
-	void SetHideDownState(bool bIsHideDownState);
-
-	bool IsHideHoverState() const;
-	void SetHideHoverState(bool bIsHideHoverState);
-
-	bool IsHighlighted() const;
-	void SetAsHighlighted(bool bIsHighlighted);
-
-	bool IsMouseHover() const;
-	bool IsDown() const;
-
 	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr, std::string sAudioPrefix = "", std::string sAudioName = "");
 	void InvokeButtonClicked();
 
 protected:
-	virtual void OnUpdate() override;
-
-	virtual void OnTakeKeyboardFocus() override;
-	virtual void OnRelinquishKeyboardFocus() override;
-
-	virtual void OnUiMouseEnter() override;
-	virtual void OnUiMouseLeave() override;
-	virtual void OnUiMouseDown() override;
 	virtual void OnUiMouseClicked() override;
+	virtual void OnRelinquishKeyboardFocus() override;
 	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) override;
 
 	virtual void OnSetup() override;

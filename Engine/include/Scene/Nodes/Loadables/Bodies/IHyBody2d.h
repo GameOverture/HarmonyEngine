@@ -67,6 +67,9 @@ public:
 	float GetSceneHeight();
 	float GetSceneWidth();
 
+	virtual float GetWidth(float fPercent = 1.0f) = 0;
+	virtual float GetHeight(float fPercent = 1.0f) = 0;
+
 protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
 	virtual void Update() override;

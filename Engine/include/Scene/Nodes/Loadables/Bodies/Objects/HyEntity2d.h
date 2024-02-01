@@ -78,6 +78,8 @@ public:
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 	virtual const b2AABB &GetSceneAABB() override;
+	virtual float GetWidth(float fPercent = 1.0f) override;		// Child classes encouraged to override with faster implementation if required
+	virtual float GetHeight(float fPercent = 1.0f) override;	// Child classes encouraged to override with faster implementation if required
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// CHILDREN NODES

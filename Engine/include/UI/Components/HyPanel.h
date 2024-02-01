@@ -79,6 +79,9 @@ public:
 	HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent);
 	virtual ~HyPanel();
 
+	virtual float GetWidth(float fPercent = 1.0f) override;
+	virtual float GetHeight(float fPercent = 1.0f) override;
+
 	void Setup(const HyPanelInit &initRef);
 	bool IsValid();
 
