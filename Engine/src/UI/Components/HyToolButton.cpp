@@ -119,25 +119,3 @@ void HyToolButton::SetColor(HyColor panelColor, HyColor frameColor, HyColor glyp
 	OnSetSizeHint();
 	return m_vSizeHint;
 }
-
-/*virtual*/ void HyToolButton::OnBtnStateChange(HyButtonState eNewState) /*override*/
-{
-	switch(eNewState)
-	{
-	case HYBUTTONSTATE_Idle:
-	case HYBUTTONSTATE_Highlighted:
-		SetColor(m_PanelColor, m_FrameColor, m_GlyphColor);
-		break;
-
-	case HYBUTTONSTATE_Down:
-	case HYBUTTONSTATE_HighlightedDown:
-		SetColor(m_PanelColor.Darken(), m_FrameColor.Darken(), m_GlyphColor);
-		break;
-
-	case HYBUTTONSTATE_Hover:
-	case HYBUTTONSTATE_HighlightedHover:
-		SetColor(m_PanelColor.Lighten(), m_FrameColor.Lighten(), m_GlyphColor);
-		break;
-	}
-}
-

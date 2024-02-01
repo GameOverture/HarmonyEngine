@@ -11,7 +11,7 @@
 #include "Scene/Nodes/Loadables/Objects/HyAudio3d.h"
 
 HyAudio3d::HyAudio3d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity3d *pParent /*= nullptr*/) :
-	IHyAudio<IHyLoadable3d, HyEntity3d>(sPrefix, sName, pParent)
+	IHyAudio<IHyLoadable3d, HyEntity3d>(HyNodePath(sPrefix, sName), pParent)
 {
 }
 

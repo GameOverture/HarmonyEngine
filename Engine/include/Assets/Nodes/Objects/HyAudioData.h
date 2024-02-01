@@ -37,7 +37,7 @@ class HyAudioData : public IHyNodeData
 	HyFileAudio *				m_pAuxiliaryFile;
 
 public:
-	HyAudioData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
+	HyAudioData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	HyAudioData(uint32 uiChecksum, uint32 uiBankId, HyAssets &assetsRef);
 	HyAudioData(HyAuxiliaryFileHandle hFileHandle, std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyAssets &assetsRef);
 	virtual ~HyAudioData(void);

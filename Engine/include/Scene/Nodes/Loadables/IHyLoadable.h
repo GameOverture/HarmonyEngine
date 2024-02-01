@@ -72,7 +72,6 @@ protected:
 
 private:
 	virtual HyType _LoadableGetType() = 0;
-	virtual bool _IsAuxiliary() = 0;
 	virtual IHyLoadable *_LoadableGetParentPtr() = 0;
 };
 

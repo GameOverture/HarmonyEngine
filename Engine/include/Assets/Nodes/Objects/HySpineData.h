@@ -12,6 +12,7 @@
 
 #include "Afx/HyInteropAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
+#include "Assets/Files/HyFileAtlas.h"
 
 struct HySpineAtlas
 {
@@ -68,7 +69,7 @@ class HySpineData : public IHyNodeData
 #endif
 
 public:
-	HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
+	HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HySpineData();
 
 	HyTextureHandle GetTexHandle(uint32 uiAtlasIndex) const

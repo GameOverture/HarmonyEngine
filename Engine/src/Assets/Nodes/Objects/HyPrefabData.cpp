@@ -8,10 +8,11 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Nodes/HyPrefabData.h"
+#include "Assets/Nodes/Objects/HyPrefabData.h"
+#include "Assets/Files/HyFileAtlas.h"
 
-HyPrefabData::HyPrefabData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
-	IHyNodeData(sPath)
+HyPrefabData::HyPrefabData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
+	IHyNodeData(nodePath)
 {
 	HyJsonArray prefabArray = itemDataObj["uvRects"].GetArray();
 

@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Threading/IHyThreadClass.h"
 #include "Assets/Files/HyFilesManifest.h"
+#include "Assets/Nodes/HyNodePath.h"
 #include "Utilities/HyMath.h"
 #include "Utilities/HyJson.h"
 
@@ -63,12 +64,12 @@ class HyAssets : public IHyThreadClass
 	template<typename tData>
 	class Factory
 	{
-		std::map<std::string, uint32>							m_LookupIndexMap;
+		std::map<uint32, uint32>								m_LookupIndexMap; // Key is the HyNodePath's hash
 		std::vector<tData>										m_DataList;
 
 	public:
 		void Init(HyJsonObj subDirObjRef, HyAssets &assetsRef);
-		const tData *GetData(const std::string &sPrefix, const std::string &sName) const;
+		const tData *GetData(const HyNodePath &nodePath) const;
 	};
 	Factory<HyAudioData>										m_AudioFactory;
 	Factory<HySpriteData>										m_SpriteFactory;

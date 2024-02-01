@@ -11,7 +11,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h"
 
 HyEntity3d::HyEntity3d(HyEntity3d *pParent /*= nullptr*/) :
-	IHyBody3d(HYTYPE_Entity, "", "", pParent)
+	IHyBody3d(HYTYPE_Entity, HyNodePath(), pParent)
 {
 }
 

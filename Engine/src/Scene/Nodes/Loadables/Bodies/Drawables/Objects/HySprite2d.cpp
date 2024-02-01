@@ -12,8 +12,9 @@
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
 #include "Assets/Nodes/Objects/HySpriteData.h"
+#include "Assets/Files/HyFileAtlas.h"
 
-HySprite2d::HySprite2d(const HyNodePath &nodePath = HyNodePath(), HyEntity2d *pParent /*= nullptr*/) :
+HySprite2d::HySprite2d(const HyNodePath &nodePath /*= HyNodePath()*/, HyEntity2d *pParent /*= nullptr*/) :
 	IHySprite<IHyDrawable2d, HyEntity2d>(nodePath, pParent)
 {
 }
@@ -86,7 +87,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 		if(UncheckedGetData() == nullptr)
 			HyLogDebug("HySprite2d::AnimSetCallback invoked on null data");
 		else
-			HyLogWarning(this->m_sPrefix << "/" << this->m_sName << " (HySprite) wants to set anim callback on index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HySpriteData *>(AcquireData())->GetNumStates() << "'");
+			HyLogWarning(this->m_NodePath.GetPath() << " (HySprite) wants to set anim callback on index of '" << uiStateIndex << "' when total number of states is '" << static_cast<const HySpriteData *>(AcquireData())->GetNumStates() << "'");
 
 		return;
 	}

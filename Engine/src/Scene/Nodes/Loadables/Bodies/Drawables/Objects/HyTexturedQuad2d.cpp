@@ -11,40 +11,37 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Assets/Nodes/Objects/HyTexturedQuadData.h"
+#include "Assets/Files/HyFileAtlas.h"
 #include "Utilities/HyIO.h"
 #include "HyEngine.h"
 
 #include "vendor/SOIL2/src/SOIL2/SOIL2.h"
 
 HyTexturedQuad2d::HyTexturedQuad2d(HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_TexturedQuad, "", "", pParent)
+	IHyDrawable2d(HYTYPE_TexturedQuad, HyNodePath(), pParent)
 {
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_TexturedQuad, std::to_string(uiAtlasFrameChecksum), std::to_string(uiBankId), pParent)
+	IHyDrawable2d(HYTYPE_TexturedQuad, HyNodePath(uiAtlasFrameChecksum, uiBankId), pParent)
 {
-	m_uiFlags |= SETTING_IsAuxiliary;
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(HyTextureQuadHandle hTextureQuadHandle, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_TexturedQuad, std::to_string(hTextureQuadHandle.first), std::to_string(hTextureQuadHandle.second), pParent)
+	IHyDrawable2d(HYTYPE_TexturedQuad, HyNodePath(hTextureQuadHandle.first, hTextureQuadHandle.second), pParent)
 {
-	m_uiFlags |= SETTING_IsAuxiliary;
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(std::string sFilePath, HyTextureInfo textureInfo, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_TexturedQuad, "", "", pParent)
+	IHyDrawable2d(HYTYPE_TexturedQuad, HyNodePath(), pParent)
 {
-	m_uiFlags |= SETTING_IsAuxiliary;
 	m_ShaderUniforms.SetNumTexUnits(1);
 
 	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTexture(HyIO::CleanPath(sFilePath.c_str()), textureInfo);
-	m_sPrefix = std::to_string(hTexQuadHandle.first);
-	m_sName = std::to_string(hTexQuadHandle.second);
+	m_NodePath.Set(hTexQuadHandle.first, hTexQuadHandle.second);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(const HyTexturedQuad2d &copyRef) :
@@ -67,21 +64,18 @@ const HyTexturedQuad2d &HyTexturedQuad2d::operator=(const HyTexturedQuad2d &rhs)
 
 void HyTexturedQuad2d::Init(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent)
 {
-	m_uiFlags |= SETTING_IsAuxiliary;
-	IHyLoadable2d::Init(std::to_string(uiAtlasFrameChecksum), std::to_string(uiBankId), pParent);
+	IHyLoadable2d::Init(HyNodePath(uiAtlasFrameChecksum, uiBankId), pParent);
 }
 
 void HyTexturedQuad2d::Init(HyTextureQuadHandle hTextureQuadHandle, HyEntity2d *pParent)
 {
-	m_uiFlags |= SETTING_IsAuxiliary;
-	IHyLoadable2d::Init(std::to_string(hTextureQuadHandle.first), std::to_string(hTextureQuadHandle.second), pParent);
+	IHyLoadable2d::Init(HyNodePath(hTextureQuadHandle.first, hTextureQuadHandle.second), pParent);
 }
 
 void HyTexturedQuad2d::Init(std::string sFilePath, HyTextureInfo textureInfo, HyEntity2d *pParent)
 {
-	m_uiFlags |= SETTING_IsAuxiliary;
 	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTexture(HyIO::CleanPath(sFilePath.c_str()), textureInfo);
-	IHyLoadable2d::Init(std::to_string(hTexQuadHandle.first), std::to_string(hTexQuadHandle.second), pParent);
+	IHyLoadable2d::Init(HyNodePath(hTexQuadHandle.first, hTexQuadHandle.second), pParent);
 }
 
 void HyTexturedQuad2d::Uninit()

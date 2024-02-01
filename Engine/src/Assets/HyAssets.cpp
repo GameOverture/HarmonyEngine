@@ -42,35 +42,25 @@ void HyAssets::Factory<tData>::Init(HyJsonObj subDirObjRef, HyAssets &assetsRef)
 	uint32 i = 0;
 	for(auto &v : subDirObjRef)
 	{
-		std::string sPath = HyIO::CleanPath(v.name.GetString());
-		HyIO::MakeLowercase(sPath);
-
-		m_LookupIndexMap.insert(std::make_pair(sPath, i));
+		HyNodePath nodePath(v.name.GetString());
+	
+		m_LookupIndexMap.insert(std::make_pair(nodePath.GetHash(), i));
 
 		HyJsonObj obj = v.value.GetObject();
-		m_DataList.emplace_back(v.name.GetString(), obj, assetsRef);
+		m_DataList.emplace_back(nodePath, obj, assetsRef);
 
 		++i;
 	}
 }
 
 template<typename tData>
-const tData *HyAssets::Factory<tData>::GetData(const std::string &sPrefix, const std::string &sName) const
+const tData *HyAssets::Factory<tData>::GetData(const HyNodePath &nodePath) const
 {
-	std::string sPath;
-
-	if(sPrefix.empty() == false)
-		sPath += HyIO::CleanPath(sPrefix.c_str(), "/");
-
-	sPath += sName;
-	sPath = HyIO::CleanPath(sPath.c_str());
-	HyIO::MakeLowercase(sPath);
-
-	auto iter = m_LookupIndexMap.find(sPath);
+	auto iter = m_LookupIndexMap.find(nodePath.GetHash());
 	if(iter == m_LookupIndexMap.end())
 	{
-		if(sName.empty() == false)
-			HyLogError("Cannot find data for: " << sPrefix << "/" << sName);
+		if(nodePath.GetName().empty() == false)
+			HyLogError("Cannot find data for: " << nodePath.GetPath());
 
 		return nullptr;
 	}
@@ -243,22 +233,22 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 	switch(pLoadable->_LoadableGetType())
 	{
 	case HYTYPE_Sprite:
-		pDataOut = m_SpriteFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
+		pDataOut = m_SpriteFactory.GetData(pLoadable->GetPath());
 		break;
 	case HYTYPE_Text:
-		pDataOut = m_TextFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
+		pDataOut = m_TextFactory.GetData(pLoadable->GetPath());
 		break;
 	case HYTYPE_Spine:
-		pDataOut = m_SpineFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
+		pDataOut = m_SpineFactory.GetData(pLoadable->GetPath());
 		break;
 	case HYTYPE_Prefab:
-		pDataOut = m_PrefabFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
+		pDataOut = m_PrefabFactory.GetData(pLoadable->GetPath());
 		break;
 	
 	// Handle types that could be auxiliary together here
 	case HYTYPE_Audio:
 	case HYTYPE_TexturedQuad:
-		if(pLoadable->_IsAuxiliary())
+		if(pLoadable->GetPath().IsAuxiliary())
 		{
 			// Convert Prefix and Name back into an auxiliary handle
 			std::pair<uint32, uint32> auxiliaryHandle = std::make_pair(static_cast<uint32>(std::stoll(pLoadable->GetPrefix())),
@@ -311,7 +301,7 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 		{
 			// TODO: Possibly add a new item type that is just a 'sampled' auxiliary audio, so HyAudio can be just a regular project item handled above
 			if(pLoadable->_LoadableGetType() == HYTYPE_Audio)
-				pDataOut = m_AudioFactory.GetData(pLoadable->GetPrefix(), pLoadable->GetName());
+				pDataOut = m_AudioFactory.GetData(pLoadable->GetPath());
 		}
 		break;
 

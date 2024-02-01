@@ -12,7 +12,7 @@
 #include "Assets/Nodes/Objects/HyTextData.h"
 
 HyText2d::HyText2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
-	IHyText<IHyDrawable2d, HyEntity2d>(sPrefix, sName, pParent)
+	IHyText<IHyDrawable2d, HyEntity2d>(HyNodePath(sPrefix, sName), pParent)
 {
 }
 

@@ -14,7 +14,7 @@
 #include "HyEngine.h"
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
-	IHyBody2d(HYTYPE_Entity, "", "", pParent),
+	IHyBody2d(HYTYPE_Entity, HyNodePath(), pParent),
 	m_uiEntAttribs(0),
 	physics(*this)
 {

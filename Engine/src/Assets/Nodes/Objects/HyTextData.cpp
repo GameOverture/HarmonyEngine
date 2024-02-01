@@ -8,7 +8,8 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Nodes/HyTextData.h"
+#include "Assets/Nodes/Objects/HyTextData.h"
+#include "Assets/Files/HyFileAtlas.h"
 #include "Renderer/IHyRenderer.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
@@ -44,8 +45,8 @@ HyTextData::FontState::~FontState()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyTextData::HyTextData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
-	IHyNodeData(sPath),
+HyTextData::HyTextData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
+	IHyNodeData(nodePath),
 	m_pTypefaces(nullptr),
 	m_uiNumTypefaces(0),
 	m_pFontStates(nullptr)

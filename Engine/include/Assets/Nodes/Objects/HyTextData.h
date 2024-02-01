@@ -121,7 +121,7 @@ class HyTextData : public IHyNodeData
 	FontState *						m_pFontStates;
 
 public:
-	HyTextData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef);
+	HyTextData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HyTextData();
 
 	uint32 GetNumLayers(uint32 uiStateIndex) const;

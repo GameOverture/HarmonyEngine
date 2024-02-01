@@ -12,7 +12,7 @@
 #include "Scene/Nodes/Loadables/Objects/IHyAudio.h"
 #include "Scene/Nodes/Loadables/IHyLoadable2d.h"
 #include "Scene/Nodes/Loadables/IHyLoadable3d.h"
-#include "Assets/Nodes/HyAudioData.h"
+#include "Assets/Nodes/Objects/HyAudioData.h"
 #include "Scene/HyScene.h"
 #include "HyEngine.h"
 
@@ -20,8 +20,8 @@ template<typename NODETYPE, typename ENTTYPE>
 HyAudioNodeHandle IHyAudio<NODETYPE, ENTTYPE>::sm_hUniqueIdCounter = 1;
 
 template<typename NODETYPE, typename ENTTYPE>
-IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix, std::string sName, ENTTYPE *pParent) :
-	NODETYPE(HYTYPE_Audio, sPrefix, sName, pParent),
+IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(const HyNodePath &nodePath, ENTTYPE *pParent) :
+	NODETYPE(HYTYPE_Audio, nodePath, pParent),
 	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(0),
 	m_fVolume(1.0f),
@@ -33,7 +33,7 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sPrefix, std::string sName, EN
 
 template<typename NODETYPE, typename ENTTYPE>
 IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(uint32 uiSoundChecksum, uint32 uiBankId, ENTTYPE *pParent) :
-	NODETYPE(HYTYPE_Audio, std::to_string(uiSoundChecksum), std::to_string(uiBankId), pParent),
+	NODETYPE(HYTYPE_Audio, HyNodePath(uiSoundChecksum, uiBankId), pParent),
 	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(0),
 	m_fVolume(1.0f),
@@ -41,12 +41,11 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(uint32 uiSoundChecksum, uint32 uiBankId, E
 	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
 	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
 {
-	m_uiFlags |= SETTING_IsAuxiliary;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(HyAudioHandle hAudioHandle, ENTTYPE *pParent) :
-	NODETYPE(HYTYPE_Audio, std::to_string(hAudioHandle.first), std::to_string(hAudioHandle.second), pParent),
+	NODETYPE(HYTYPE_Audio, HyNodePath(hAudioHandle.first, hAudioHandle.second), pParent),
 	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(0),
 	m_fVolume(1.0f),
@@ -54,12 +53,11 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(HyAudioHandle hAudioHandle, ENTTYPE *pPare
 	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
 	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
 {
-	m_uiFlags |= SETTING_IsAuxiliary;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, ENTTYPE *pParent) :
-	NODETYPE(HYTYPE_Audio, "", "", pParent),
+	NODETYPE(HYTYPE_Audio, HyNodePath(), pParent),
 	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(0),
 	m_fVolume(1.0f),
@@ -67,11 +65,8 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sFilePath, bool bIsStreaming, 
 	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
 	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
 {
-	m_uiFlags |= SETTING_IsAuxiliary;
-
 	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateAudio(HyIO::CleanPath(sFilePath.c_str()), bIsStreaming, iInstanceLimit, iCategoryId);
-	m_sPrefix = std::to_string(hTexQuadHandle.first);
-	m_sName = std::to_string(hTexQuadHandle.second);
+	this->m_NodePath.Set(hTexQuadHandle.first, hTexQuadHandle.second);
 }
 
 template<typename NODETYPE, typename ENTTYPE>

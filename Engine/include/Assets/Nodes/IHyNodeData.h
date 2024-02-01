@@ -11,31 +11,24 @@
 #define IHyNodeData_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/Files/HyFileAtlas.h"
+#include "Assets/Nodes/HyNodePath.h"
 #include "Assets/Files/HyFilesManifest.h"
-
-class IHyRenderer;
-class HyGLTF;
-class HyFileAudio;
 
 class IHyNodeData
 {
-	const std::string				m_sPATH;
-
 protected:
+	const HyNodePath				m_PATH;
+
 	uint32							m_uiNumStates;
 	HyFilesManifest					m_RequiredFiles[HYNUM_FILETYPES];
 
 public:
-	IHyNodeData(bool bIsAuxiliary); // For auxiliary nodes // TODO: remove 'bIsAuxiliary' (just using it to test against compiler errors)
-	IHyNodeData(const std::string &sPath);
+	IHyNodeData(const HyNodePath &nodePath);
 	virtual ~IHyNodeData(void);
 
-	bool IsAuxiliary() const;
-
+	const HyNodePath &GetPath() const;
 	uint32 GetNumStates() const;
 	
-	const std::string &GetPath() const;
 	const HyFilesManifest *GetManifestFiles(HyFileType eFileType) const;
 	virtual IHyFile *GetAuxiliaryFile() const;
 };

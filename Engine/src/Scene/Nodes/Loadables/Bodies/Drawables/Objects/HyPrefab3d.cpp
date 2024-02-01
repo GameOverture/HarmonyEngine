@@ -11,7 +11,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrefab3d.h"
 
 HyPrefab3d::HyPrefab3d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity3d *pParent /*= nullptr*/) :
-	IHyDrawable3d(HYTYPE_Prefab, sPrefix, sName, pParent)
+	IHyDrawable3d(HYTYPE_Prefab, HyNodePath(sPrefix, sName), pParent)
 {
 }
 

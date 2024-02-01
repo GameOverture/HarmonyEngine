@@ -13,6 +13,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
 #include "Assets/Nodes/Objects/HySpriteData.h"
+#include "Assets/Files/HyFileAtlas.h"
 #include "Renderer/Components/HyVertexBuffer.h"
 #include "Diagnostics/Console/IHyConsole.h"
 

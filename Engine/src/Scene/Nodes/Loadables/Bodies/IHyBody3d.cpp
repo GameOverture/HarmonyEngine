@@ -14,8 +14,8 @@
 #include "Renderer/IHyRenderer.h"
 #include "Renderer/Effects/HyStencil.h"
 
-IHyBody3d::IHyBody3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
-	IHyLoadable3d(eNodeType, sPrefix, sName, pParent),
+IHyBody3d::IHyBody3d(HyType eNodeType, const HyNodePath &nodePath, HyEntity3d *pParent) :
+	IHyLoadable3d(eNodeType, nodePath, pParent),
 	m_fAlpha(1.0f),
 	m_fCachedAlpha(1.0f),
 	tint(*this, DIRTY_Color),

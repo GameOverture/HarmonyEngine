@@ -8,13 +8,13 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Nodes/HyAudioData.h"
+#include "Assets/Nodes/Objects/HyAudioData.h"
 #include "Assets/Files/HyFileAudio.h"
 #include "Diagnostics/Console/IHyConsole.h"
 #include "HyEngine.h"
 
-HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &assetsRef) :
-	IHyNodeData(sPath),
+HyAudioData::HyAudioData(const HyNodePath &nodePath, HyJsonObj itemObj, HyAssets &assetsRef) :
+	IHyNodeData(nodePath),
 	m_pAudioStates(nullptr),
 	m_pAuxiliaryFile(nullptr)
 {
@@ -52,7 +52,7 @@ HyAudioData::HyAudioData(const std::string &sPath, HyJsonObj itemObj, HyAssets &
 }
 
 HyAudioData::HyAudioData(uint32 uiChecksum, uint32 uiBankId, HyAssets &assetsRef) :
-	IHyNodeData(true),
+	IHyNodeData(HyNodePath(uiChecksum, uiBankId)),
 	m_pAudioStates(nullptr),
 	m_pAuxiliaryFile(static_cast<HyFileAudio *>(assetsRef.GetFileWithAsset(HYFILE_AudioBank, uiChecksum, uiBankId)))
 {
@@ -72,7 +72,7 @@ HyAudioData::HyAudioData(uint32 uiChecksum, uint32 uiBankId, HyAssets &assetsRef
 }
 
 HyAudioData::HyAudioData(HyAuxiliaryFileHandle hFileHandle, std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyAssets &assetsRef) :
-	IHyNodeData(true),
+	IHyNodeData(HyNodePath(0, hFileHandle)),
 	m_pAudioStates(nullptr),
 	m_pAuxiliaryFile(HY_NEW HyFileAudio(hFileHandle, sFilePath, bIsStreaming, iInstanceLimit, iCategoryId, assetsRef.GetAudioCore()))
 {
@@ -101,7 +101,7 @@ HyAudioData::~HyAudioData(void)
 
 /*virtual*/ IHyFile *HyAudioData::GetAuxiliaryFile() const /*override*/
 {
-	HyAssert(IsAuxiliary(), "HyAudioData::GetAuxiliaryFile() was called on an non-auxiliary object");
+	HyAssert(m_PATH.IsAuxiliary(), "HyAudioData::GetAuxiliaryFile() was called on an non-auxiliary object");
 	return m_pAuxiliaryFile;
 }
 

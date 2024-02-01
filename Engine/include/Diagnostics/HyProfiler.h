@@ -39,7 +39,8 @@ class HyGraphWidget : public IHyWidget
 	Portion					m_PortionList[NUM_PORTIONS];
 
 public:
-	HyGraphWidget() {
+	HyGraphWidget() : IHyWidget(HyPanelInit())
+	{
 		m_PortionList[PORTION_Update].m_sName = "Update";
 		m_PortionList[PORTION_Update].m_Bar.SetTint(HyColor::Cyan);
 		ChildAppend(m_PortionList[PORTION_Update].m_Bar);

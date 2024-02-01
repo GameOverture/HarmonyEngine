@@ -12,13 +12,14 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable3d.h"
 #include "Assets/Nodes/Objects/HyTextData.h"
+#include "Assets/Files/HyFileAtlas.h"
 #include "Utilities/HyMath.h"
 #include "Diagnostics/Console/IHyConsole.h"
 #include "HyEngine.h"
 
 template<typename NODETYPE, typename ENTTYPE>
-IHyText<NODETYPE, ENTTYPE>::IHyText(std::string sPrefix, std::string sName, ENTTYPE *pParent) :
-	NODETYPE(HYTYPE_Text, sPrefix, sName, pParent),
+IHyText<NODETYPE, ENTTYPE>::IHyText(const HyNodePath &nodePath, ENTTYPE *pParent) :
+	NODETYPE(HYTYPE_Text, nodePath, pParent),
 	m_uiTextAttributes(0),
 	m_sRawString(""),
 	m_vBoxDimensions(0.0f, 0.0f),

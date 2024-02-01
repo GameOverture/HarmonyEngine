@@ -11,6 +11,7 @@
 #include "Diagnostics/HyDiagnostics.h"
 #include "Time/HyTime.h"
 #include "Assets/HyAssets.h"
+#include "Assets/Files/HyFileAtlas.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 #include "HyEngine.h"

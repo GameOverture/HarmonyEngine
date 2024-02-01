@@ -13,7 +13,7 @@
 #include "HyEngine.h"
 
 HyAudio2d::HyAudio2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
-	IHyAudio<IHyLoadable2d, HyEntity2d>(sPrefix, sName, pParent)
+	IHyAudio<IHyLoadable2d, HyEntity2d>(HyNodePath(sPrefix, sName), pParent)
 {
 }
 
@@ -39,21 +39,18 @@ HyAudio2d::HyAudio2d(std::string sFilePath, bool bIsStreaming, int32 iInstanceLi
 void HyAudio2d::Init(uint32 uiAudioChecksum, uint32 uiBankId, HyEntity2d *pParent)
 {
 	IHyNode::sm_pScene->ProcessAudioCue(this, HYSOUNDCUE_Stop);
-	m_uiFlags |= SETTING_IsAuxiliary;
-	IHyLoadable2d::Init(std::to_string(uiAudioChecksum), std::to_string(uiBankId), pParent);
+	IHyLoadable2d::Init(HyNodePath(uiAudioChecksum, uiBankId), pParent);
 }
 
 void HyAudio2d::Init(HyAudioHandle hAudioHandle, HyEntity2d *pParent)
 {
 	IHyNode::sm_pScene->ProcessAudioCue(this, HYSOUNDCUE_Stop);
-	m_uiFlags |= SETTING_IsAuxiliary;
-	IHyLoadable2d::Init(std::to_string(hAudioHandle.first), std::to_string(hAudioHandle.second), pParent);
+	IHyLoadable2d::Init(HyNodePath(hAudioHandle.first, hAudioHandle.second), pParent);
 }
 
 void HyAudio2d::Init(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, HyEntity2d *pParent)
 {
 	IHyNode::sm_pScene->ProcessAudioCue(this, HYSOUNDCUE_Stop);
-	m_uiFlags |= SETTING_IsAuxiliary;
 	HyAudioHandle hAudioHandle = HyEngine::CreateAudio(HyIO::CleanPath(sFilePath.c_str()), bIsStreaming, iInstanceLimit, iCategoryId);
-	IHyLoadable2d::Init(std::to_string(hAudioHandle.first), std::to_string(hAudioHandle.second), pParent);
+	IHyLoadable2d::Init(HyNodePath(hAudioHandle.first, hAudioHandle.second), pParent);
 }

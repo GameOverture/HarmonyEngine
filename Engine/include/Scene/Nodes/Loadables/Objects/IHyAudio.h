@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/AnimFloats/HyAnimFloat.h"
+#include "Assets/Nodes/HyNodePath.h"
 
 #define HYAUDIO_InfiniteLoops 255
 
@@ -64,7 +65,7 @@ public:
 	HyAnimFloat						pitch;
 
 public:
-	IHyAudio(std::string sPrefix, std::string sName, ENTTYPE *pParent);
+	IHyAudio(const HyNodePath &nodePath, ENTTYPE *pParent);
 	IHyAudio(uint32 uiSoundChecksum, uint32 uiBankId, ENTTYPE *pParent);
 	IHyAudio(HyAudioHandle hAudioHandle, ENTTYPE *pParent);
 	IHyAudio(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit, int32 iCategoryId, ENTTYPE *pParent);

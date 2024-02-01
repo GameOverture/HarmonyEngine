@@ -8,7 +8,7 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Nodes/HySpineData.h"
+#include "Assets/Nodes/Objects/HySpineData.h"
 #include "Assets/HyAssets.h"
 #include "Renderer/IHyRenderer.h"
 #include "Diagnostics/Console/IHyConsole.h"
@@ -51,8 +51,8 @@ HySpineTextureLoader::HySpineTextureLoader(std::vector<HySpineAtlas> &subAtlasLi
 }
 #endif
 
-HySpineData::HySpineData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
-	IHyNodeData(sPath)
+HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
+	IHyNodeData(nodePath)
 #ifdef HY_USE_SPINE
 	, m_pAtlasData(nullptr),
 	m_pSkeletonData(nullptr),

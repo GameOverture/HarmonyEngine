@@ -19,7 +19,7 @@ class IHyDrawable3d : public IHyBody3d, public IHyDrawable
 	friend class HyScene;
 
 public:
-	IHyDrawable3d(HyType eInstType, std::string sPrefix, std::string sName, HyEntity3d *pParent);
+	IHyDrawable3d(HyType eInstType, const HyNodePath &nodePath, HyEntity3d *pParent);
 	IHyDrawable3d(const IHyDrawable3d &copyRef);
 	IHyDrawable3d(IHyDrawable3d &&donor) noexcept;
 	virtual ~IHyDrawable3d();

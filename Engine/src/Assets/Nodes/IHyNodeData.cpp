@@ -10,26 +10,19 @@
 #include "Afx/HyStdAfx.h"
 #include "Assets/Nodes/IHyNodeData.h"
 
-IHyNodeData::IHyNodeData(bool bIsAuxiliary) :
-	m_sPATH(""),
-	m_uiNumStates(0),
-	m_RequiredFiles{ HYFILE_Atlas, HYFILE_GLTF, HYFILE_AudioBank, HYFILE_Shader }
-{ }
-
-IHyNodeData::IHyNodeData(const std::string &sPath) :
-	m_sPATH(sPath),
+IHyNodeData::IHyNodeData(const HyNodePath &nodePath) :
+	m_PATH(nodePath),
 	m_uiNumStates(0),
 	m_RequiredFiles{ HYFILE_Atlas, HYFILE_GLTF, HYFILE_AudioBank, HYFILE_Shader }
 {
-	HyAssert(m_sPATH.empty() == false, "IHyNodeData::IHyNodeData() 'sPath' cannot be empty");
 }
 
 /*virtual*/ IHyNodeData::~IHyNodeData(void)
 { }
 
-bool IHyNodeData::IsAuxiliary() const
+const HyNodePath &IHyNodeData::GetPath() const
 {
-	return m_sPATH.empty();
+	return m_PATH;
 }
 
 uint32 IHyNodeData::GetNumStates() const
@@ -37,14 +30,9 @@ uint32 IHyNodeData::GetNumStates() const
 	return m_uiNumStates;
 }
 
-const std::string &IHyNodeData::GetPath() const
-{ 
-	return m_sPATH;
-}
-
 const HyFilesManifest *IHyNodeData::GetManifestFiles(HyFileType eFileType) const
 {
-	if(IsAuxiliary())
+	if(m_PATH.IsAuxiliary())
 		return nullptr;
 
 	return &m_RequiredFiles[eFileType];

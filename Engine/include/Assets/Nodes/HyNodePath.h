@@ -14,15 +14,14 @@
 
 class HyNodePath
 {
-	// TODO: Combine these into one std string 'path'
-	std::string		m_sPrefix;
-	std::string		m_sName;
-
+	std::string		m_sPath;
 	uint32			m_uiHash;
 
 public:
-	HyNodePath();
-	HyNodePath(const std::string &sPrefix, const std::string &sName);
+	HyNodePath(); // Invalid Path
+	HyNodePath(const std::string &sPath); // Project Path
+	HyNodePath(const std::string &sPrefix, const std::string &sName); // Project Path
+	HyNodePath(uint32 uiAuxFirst, uint32 uiAuxSecond); // Auxiliary Path
 	HyNodePath(const HyNodePath &copyRef);
 	HyNodePath(HyNodePath &&donor);
 	~HyNodePath();
@@ -31,10 +30,16 @@ public:
 	bool operator==(const HyNodePath &rhs) const;
 	bool operator!=(const HyNodePath &rhs) const;
 
+	uint32 GetHash() const;
 	std::string GetPath() const;
 	std::string GetName() const;
 	std::string GetPrefix() const;
-	void Set(const std::string &sPrefix, const std::string &sName);
+	bool Set(const std::string &sPath); // Project Set
+	bool Set(const std::string &sPrefix, const std::string &sName); // Project Set
+	bool Set(uint32 uiAuxFirst, uint32 uiAuxSecond); // Auxiliary Set
+
+	bool IsValid() const;
+	bool IsAuxiliary() const;
 };
 
 #endif /* HyNodePath_h__ */

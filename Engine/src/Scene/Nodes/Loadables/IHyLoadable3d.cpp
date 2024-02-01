@@ -11,9 +11,9 @@
 #include "Scene/Nodes/Loadables/IHyLoadable3d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h"
 
-IHyLoadable3d::IHyLoadable3d(HyType eNodeType, std::string sPrefix, std::string sName, HyEntity3d *pParent) :
+IHyLoadable3d::IHyLoadable3d(HyType eNodeType, const HyNodePath &nodePath, HyEntity3d *pParent) :
 	IHyNode3d(eNodeType, pParent),
-	IHyLoadable(sPrefix, sName)
+	IHyLoadable(nodePath)
 {
 	m_uiFlags |= NODETYPE_IsLoadable;
 
@@ -54,9 +54,9 @@ IHyLoadable3d &IHyLoadable3d::operator=(IHyLoadable3d &&donor)
 	return *this;
 }
 
-void IHyLoadable3d::Init(std::string sPrefix, std::string sName, HyEntity3d *pParent)
+void IHyLoadable3d::Init(const HyNodePath &nodePath, HyEntity3d *pParent)
 {
-	IHyLoadable::_Reinitialize(sPrefix, sName);
+	IHyLoadable::_Reinitialize(nodePath);
 
 	if(m_pParent != pParent)
 	{
@@ -65,6 +65,11 @@ void IHyLoadable3d::Init(std::string sPrefix, std::string sName, HyEntity3d *pPa
 		else
 			ParentDetach();
 	}
+}
+
+void IHyLoadable3d::Init(std::string sPrefix, std::string sName, HyEntity3d *pParent)
+{
+	Init(HyNodePath(sPrefix, sName), pParent);
 }
 
 /*virtual*/ void IHyLoadable3d::Update() /*override*/
@@ -78,11 +83,6 @@ void IHyLoadable3d::Init(std::string sPrefix, std::string sName, HyEntity3d *pPa
 /*virtual*/ HyType IHyLoadable3d::_LoadableGetType() /*override final*/
 {
 	return GetType();
-}
-
-/*virtual*/ bool IHyLoadable3d::_IsAuxiliary() /*override final*/
-{
-	return GetInternalFlags() & SETTING_IsAuxiliary;
 }
 
 /*virtual*/ IHyLoadable *IHyLoadable3d::_LoadableGetParentPtr() /*override final*/

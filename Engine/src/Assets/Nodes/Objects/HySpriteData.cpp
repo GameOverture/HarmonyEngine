@@ -8,7 +8,8 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Nodes/HySpriteData.h"
+#include "Assets/Nodes/Objects/HySpriteData.h"
+#include "Assets/Files/HyFileAtlas.h"
 #include "Renderer/IHyRenderer.h"
 
 HyTextureHandle HySpriteFrame::GetGfxApiHandle() const
@@ -24,8 +25,8 @@ bool HySpriteFrame::IsAtlasValid() const
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HySpriteData::HySpriteData(const std::string &sPath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
-	IHyNodeData(sPath),
+HySpriteData::HySpriteData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAssets &assetsRef) :
+	IHyNodeData(nodePath),
 	m_pAnimStates(nullptr)
 {
 	HyJsonArray spriteStateArray = itemDataObj["stateArray"].GetArray();

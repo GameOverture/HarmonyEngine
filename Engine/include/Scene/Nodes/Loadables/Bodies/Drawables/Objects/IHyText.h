@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/AnimFloats/HyAnimVec3.h"
 #include "Utilities/HyMath.h"
+#include "Assets/Nodes/HyNodePath.h"
 
 #if defined(HY_DEBUG) && !defined(HY_PLATFORM_GUI)
 	#define HY_USE_TEXT_DEBUG_BOXES
@@ -102,7 +103,7 @@ protected:
 	float								m_fUsedPixelHeight;
 
 public:
-	IHyText(std::string sPrefix, std::string sName, ENTTYPE *pParent);
+	IHyText(const HyNodePath &nodePath, ENTTYPE *pParent);
 	IHyText(const IHyText &copyRef);
 	virtual ~IHyText(void);
 

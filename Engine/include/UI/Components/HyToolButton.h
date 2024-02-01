@@ -47,9 +47,6 @@ protected:
 	virtual void OnSetSizeHint() override;
 	virtual glm::vec2 GetPosOffset() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
-
-	virtual void OnBtnStateChange(HyButtonState eNewState) override;
-
 };
 
 #endif /* HyToolButton_h__ */

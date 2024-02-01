@@ -8,11 +8,12 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Assets/Nodes/HyTexturedQuadData.h"
+#include "Assets/Nodes/Objects/HyTexturedQuadData.h"
+#include "Assets/Files/HyFileAtlas.h"
 #include "Renderer/IHyRenderer.h"
 
 HyTexturedQuadData::HyTexturedQuadData(uint32 uiChecksum, uint32 uiBankId, HyAssets &assetsRef) :
-	IHyNodeData(true),
+	IHyNodeData(HyNodePath(uiChecksum, uiBankId)),
 	m_pAtlas(nullptr),
 	m_eAuxiliaryFileHandle(HY_UNUSED_HANDLE)
 {
@@ -20,7 +21,7 @@ HyTexturedQuadData::HyTexturedQuadData(uint32 uiChecksum, uint32 uiBankId, HyAss
 }
 
 HyTexturedQuadData::HyTexturedQuadData(HyAuxiliaryFileHandle hFileHandle, std::string sFilePath, HyTextureInfo textureInfo, HyAssets &assetsRef) :
-	IHyNodeData(true),
+	IHyNodeData(HyNodePath(0, hFileHandle)),
 	m_pAtlas(HY_NEW HyFileAtlas(hFileHandle, sFilePath, textureInfo)),
 	m_UvCoords(0.0f, 1.0f, 1.0f, 0.0f),
 	m_uiCropMask(0),
@@ -35,7 +36,7 @@ HyTexturedQuadData::~HyTexturedQuadData()
 
 /*virtual*/ IHyFile *HyTexturedQuadData::GetAuxiliaryFile() const /*override*/
 {
-	HyAssert(IsAuxiliary(), "HyTexturedQuadData::GetAuxiliaryFile() was called on an non-auxiliary object");
+	HyAssert(m_PATH.IsAuxiliary(), "HyTexturedQuadData::GetAuxiliaryFile() was called on an non-auxiliary object");
 	return m_pAtlas;
 }
 
