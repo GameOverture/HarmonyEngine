@@ -55,10 +55,10 @@ public:
 	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_Center, bool bUseScaleBox = true);							// Default setup. Shows text positioned on top and inside the panel based on 'eTextAlignment' and 'bUseScaleBox'
 	void SetAsSideBySide(bool bPanelBeforeText = true, int32 iPadding = 5, HyOrientation eOrientation = HYORIEN_Horizontal);	// Show the panel and text side by side specified accordingly to the arguments passed
 
-	void SetPanelVisible(bool bVisible);
-	uint32 GetSpriteState() const;
-	virtual void SetSpriteState(uint32 uiStateIndex);
-	void SetSpriteAnimCtrl(HyAnimCtrl eAnimCtrl);
+	//void SetPanelVisible(bool bVisible);
+	//uint32 GetSpriteState() const;
+	//virtual void SetSpriteState(uint32 uiStateIndex);
+	//void SetSpriteAnimCtrl(HyAnimCtrl eAnimCtrl);
 
 	bool IsGlyphAvailable(std::string sUtf8Character);
 	std::string GetUtf8String() const;
@@ -79,6 +79,8 @@ public:
 protected:
 	virtual void OnSetSizeHint() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
+
+	virtual void OnPanelUpdated() override;
 
 	virtual void OnSetup() { }					// Optional override for derived classes
 

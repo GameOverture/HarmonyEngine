@@ -16,10 +16,10 @@
 
 // Constructs a 'BoundingVolume' panel with 0 width/height
 HyPanelInit::HyPanelInit() :
-	m_ePanelType(PANELTYPE_BoundingVolume),
+	m_eNodeType(HYTYPE_Unknown),
 	m_uiWidth(0),
 	m_uiHeight(0),
-	m_eBodyType(HYTYPE_Unknown),
+	m_NodePath(),
 	m_uiFrameSize(0),
 	m_PanelColor(HyColor(0, 0, 0, 0)),
 	m_FrameColor(HyColor(0, 0, 0, 0)),
@@ -29,10 +29,10 @@ HyPanelInit::HyPanelInit() :
 
 // Constructs a 'BoundingVolume' panel
 HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight) :
-	m_ePanelType(PANELTYPE_BoundingVolume),
+	m_eNodeType(HYTYPE_Unknown),
 	m_uiWidth(uiWidth),
 	m_uiHeight(uiHeight),
-	m_eBodyType(HYTYPE_Unknown),
+	m_NodePath(),
 	m_uiFrameSize(0),
 	m_PanelColor(HyColor(0, 0, 0, 0)),
 	m_FrameColor(HyColor(0, 0, 0, 0)),
@@ -40,13 +40,12 @@ HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight) :
 {
 }
 
-// Constructs a 'HyBody' panel
-HyPanelInit::HyPanelInit(HyType eBodyType, const HyNodePath &nodePath) :
-	m_ePanelType(PANELTYPE_HyBody),
-	m_eBodyType(eBodyType),
-	m_HyBodyPath(nodePath),
+// Constructs a 'NodeItem' panel
+HyPanelInit::HyPanelInit(HyType eNodeType, const HyNodePath &nodePath) :
+	m_eNodeType(eNodeType),
 	m_uiWidth(0), // TBD by loading the sprite
 	m_uiHeight(0),// TBD by loading the sprite
+	m_NodePath(nodePath),
 	m_uiFrameSize(0),
 	m_PanelColor(HyColor(0, 0, 0, 0)),
 	m_FrameColor(HyColor(0, 0, 0, 0)),
@@ -54,11 +53,12 @@ HyPanelInit::HyPanelInit(HyType eBodyType, const HyNodePath &nodePath) :
 {
 }
 
-// Constructs a 'Primitive' panel. Colors of HyColor(0,0,0,0) will be set to a default color determined by the panel's usage
+// Constructs an 'EntityPrimitive' panel. Colors of HyColor(0,0,0,0) will be set to a default color determined by the panel's usage
 HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor /*= HyColor(0,0,0,0)*/, HyColor frameColor /*= HyColor(0,0,0,0)*/, HyColor tertiaryColor /*= HyColor(0, 0, 0, 0)*/) :
-	m_ePanelType(PANELTYPE_Primitive),
+	m_eNodeType(HYTYPE_Entity),
 	m_uiWidth(uiWidth),
 	m_uiHeight(uiHeight),
+	m_NodePath(),
 	m_uiFrameSize(uiFrameSize),
 	m_PanelColor(panelColor),
 	m_FrameColor(frameColor),
@@ -68,10 +68,9 @@ HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, Hy
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 HyPanel::HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
-	m_ePanelType(HyPanelInit::PANELTYPE_Invalid),
-	m_pHyBody(nullptr),
-	m_pPrimitive(nullptr),
-	size(*this, DIRTY_Size | DIRTY_SceneAABB)
+	m_pPrimParts(nullptr),
+	m_pNodeItem(nullptr),
+	size(*this, DIRTY_SceneAABB)
 {
 	Setup(initRef);
 }
@@ -79,6 +78,20 @@ HyPanel::HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent) :
 /*virtual*/ HyPanel::~HyPanel()
 {
 	ParentDetach(); // This avoids a crash when SetEntityLoaded() propagates to parents and invokes this->IsValid() after being deleted
+}
+
+/*virtual*/ const b2AABB &HyPanel::GetSceneAABB() /*override*/
+{
+	b2AABB aabb;
+	if(m_pPrimParts)
+	{
+		aabb.lowerBound = b2Vec2(0.0f, 0.0f);
+		aabb.upperBound = b2Vec2(size.X(), size.Y());
+	}
+	else if(m_pNodeItem)
+		return m_pNodeItem->GetSceneAABB();
+	else
+		return HyEntity2d::GetSceneAABB();
 }
 
 /*virtual*/ float HyPanel::GetWidth(float fPercent = 1.0f) /*override*/
@@ -152,8 +165,8 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 
 bool HyPanel::IsValid()
 {
-	if(m_ePanelType == HyPanelInit::PANELTYPE_Sprite)
-		return m_SpritePanel.IsLoadDataValid();
+	if(m_ePanelType == HyPanelInit::PANELTYPE_HyBody && m_pHyBody)
+		return m_pHyBody->IsLoadDataValid();
 	else
 		return size.X() > 0.0f && size.Y() > 0.0f;
 }

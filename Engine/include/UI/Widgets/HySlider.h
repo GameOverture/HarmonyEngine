@@ -82,7 +82,7 @@ public:
 	void SetValueChangedCallback(std::function<void(HySlider *, void *)> fpCallback, void *pParam = nullptr);
 
 protected:
-	virtual void OnUpdate() override;
+	virtual void OnUiUpdate() override;
 
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnSetSizeHint() override;

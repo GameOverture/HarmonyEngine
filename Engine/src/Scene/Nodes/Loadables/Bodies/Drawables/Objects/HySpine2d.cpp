@@ -63,6 +63,18 @@ const HySpine2d &HySpine2d::operator=(const HySpine2d &rhs)
 	HyError("HySpine2d::CalcLocalBoundingShape not implemented");
 }
 
+/*virtual*/ float HySpine2d::GetWidth(float fPercent) /*override*/
+{
+	HyError("HySpine2d::GetWidth not implemented");
+	return 0.0f;
+}
+
+/*virtual*/ float HySpine2d::GetHeight(float fPercent) /*override*/
+{
+	HyError("HySpine2d::GetHeight not implemented");
+	return 0.0f;
+}
+
 /*virtual*/ bool HySpine2d::SetState(uint32 uiStateIndex) /*override*/
 {
 	if(this->m_uiState == uiStateIndex || IHyLoadable::SetState(uiStateIndex) == false)

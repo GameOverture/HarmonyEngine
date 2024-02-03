@@ -137,7 +137,7 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 	AdjustProgress();
 }
 
-/*virtual*/ void HyProgressBar::OnUpdate() /*override*/
+/*virtual*/ void HyProgressBar::OnUiUpdate() /*override*/
 {
 	if(m_pBar)
 		m_pBar->SetScissor(0, 0, static_cast<uint32>(m_BarScissorAmt.Get()), static_cast<uint32>(m_pBar->GetSceneHeight()));

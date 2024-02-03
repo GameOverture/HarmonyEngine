@@ -97,7 +97,7 @@ public:
 	virtual void SetTextMonospacedDigits(bool bSet) override;
 
 protected:
-	virtual void OnUpdate() override;
+	virtual void OnUiUpdate() override;
 
 	using HyLabel::SetText; // Hiding SetText() since it doesn't make sense to use with HyRackMeters
 

@@ -228,7 +228,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 	m_pValueChangedParam = pParam;
 }
 
-/*virtual*/ void HySlider::OnUpdate() /*override*/
+/*virtual*/ void HySlider::OnUiUpdate() /*override*/
 {
 	if(m_uiAttribs & SLIDERATTRIB_IsDragging)
 	{

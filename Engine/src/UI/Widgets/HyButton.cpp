@@ -46,6 +46,11 @@ HyButton::HyButton(const HyPanelInit &initRef, std::string sTextPrefix, std::str
 {
 }
 
+/*virtual*/ bool HyButton::IsDown() const
+{
+	return IHyWidget::IsDown() || (m_uiAttribs & BTNATTRIB_IsKbDownState) != 0;
+}
+
 void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
 {
 	m_fpBtnClickedCallback = fpCallBack;
@@ -73,7 +78,7 @@ void HyButton::InvokeButtonClicked()
 	{
 		HyPanelState eOldState = GetPanelState();
 		m_uiAttribs &= ~BTNATTRIB_IsKbDownState;
-		SetPanelState(eOldState);
+		ApplyPanelState(eOldState);
 	}
 }
 
@@ -83,15 +88,15 @@ void HyButton::InvokeButtonClicked()
 	{
 		if(eBtnState == HYBTN_Press && (m_uiAttribs & BTNATTRIB_IsKbDownState) == 0)
 		{
-			HyButtonState eOldState = GetBtnState();
+			HyPanelState eOldState = GetPanelState();
 			m_uiAttribs |= BTNATTRIB_IsKbDownState;
-			SetBtnState(eOldState);
+			ApplyPanelState(eOldState);
 		}
 		else if(eBtnState == HYBTN_Release && (m_uiAttribs & BTNATTRIB_IsKbDownState) != 0)
 		{
-			HyButtonState eOldState = GetBtnState();
+			HyPanelState eOldState = GetPanelState();
 			m_uiAttribs &= ~BTNATTRIB_IsKbDownState;
-			SetBtnState(eOldState);
+			ApplyPanelState(eOldState);
 
 			if(IsDown() == false)
 				InvokeButtonClicked();
@@ -104,7 +109,4 @@ void HyButton::InvokeButtonClicked()
 	SetKeyboardFocusAllowed(true);
 	SetAsHighlighted(IsHighlighted());
 	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
-
-	m_PanelColor = m_Panel.GetPanelColor();
-	m_FrameColor = m_Panel.GetFrameColor();
 }

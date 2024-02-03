@@ -14,7 +14,7 @@
 HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(pParent),
 	m_Shape(this),
-	m_SubBtnPanel(this),
+	m_SubBtnPanel(HyPanelInit(), this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
 	m_fExpandedTimeout(0.0f)
@@ -24,7 +24,7 @@ HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 HyComboBox::HyComboBox(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(initRef, sTextPrefix, sTextName, pParent),
 	m_Shape(this),
-	m_SubBtnPanel(this),
+	m_SubBtnPanel(HyPanelInit(), this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
 	m_fExpandedTimeout(0.0f)
@@ -35,7 +35,7 @@ HyComboBox::HyComboBox(const HyPanelInit &initRef, std::string sTextPrefix, std:
 HyComboBox::HyComboBox(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
 	m_Shape(this),
-	m_SubBtnPanel(this),
+	m_SubBtnPanel(HyPanelInit(), this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
 	m_fExpandedTimeout(0.0f)
@@ -106,8 +106,10 @@ void HyComboBox::ClearSubButtons()
 	m_SubBtnEnabledMap.clear();
 }
 
-void HyComboBox::SetExpandType(HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate)
+void HyComboBox::SetExpandPanel(const HyPanelInit &panelInit, HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate)
 {
+	m_SubBtnPanel.Setup(panelInit);
+
 	if(eOrientation == HYORIEN_Horizontal)
 		m_uiAttribs |= COMBOBOXATTRIB_IsHorzExpand;
 	else
@@ -122,16 +124,6 @@ void HyComboBox::SetExpandType(HyOrientation eOrientation, bool bPositiveDirecti
 		m_uiAttribs &= ~COMBOBOXATTRIB_IsInstantExpand;
 	else
 		m_uiAttribs |= COMBOBOXATTRIB_IsInstantExpand;
-}
-
-void HyComboBox::SetExpandPanel(std::string sSpritePrefix, std::string sSpriteName)
-{
-	m_SubBtnPanel.Setup(HyPanelInit(sSpritePrefix, sSpriteName), false);
-}
-
-void HyComboBox::SetExpandPanel(uint32 uiFrameSize, HyColor panelColor /*= HyColor(0x252526)*/, HyColor frameColor /*= HyColor(0x3F3F41)*/)
-{
-	m_SubBtnPanel.Setup(HyPanelInit(0, 0, uiFrameSize, panelColor, frameColor), false);
 }
 
 bool HyComboBox::IsExpanded() const
@@ -206,10 +198,8 @@ void HyComboBox::ResetExpandedTimeout()
 	m_fElapsedExpandedTime = 0.0f;
 }
 
-/*virtual*/ void HyComboBox::OnUpdate() /*override*/
+/*virtual*/ void HyComboBox::OnUiUpdate() /*override*/
 {
-	HyButton::OnUpdate();
-
 	switch(m_uiAttribs & COMBOBOXATTRIB_STATEMASK)
 	{
 	case 0:

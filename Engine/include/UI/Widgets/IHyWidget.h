@@ -26,7 +26,7 @@ protected:
 
 		UIATTRIB_HideMouseHoverState = 1 << 2,		// Don't visually indicate mouse hover state (when available)
 		UIATTRIB_IsMouseHoverState = 1 << 3,		// When mouse cursor is over top this widget
-		UIATTRIB_HideMouseDownState = 1 << 4,		// Don't visually indicate mouse down state (when available)
+		UIATTRIB_HideDownState = 1 << 4,			// Don't visually indicate down state (when available)
 		UIATTRIB_IsMouseDownState = 1 << 5,			// When the mouse is holding left click on this widget
 		
 		UIATTRIB_KeyboardFocusAllowed = 1 << 6,		// Allow this widget to be the target of keyboard input
@@ -45,6 +45,9 @@ public:
 	IHyWidget(const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~IHyWidget();
 
+	void SetPanel(const HyPanelInit &initRef);
+	IHyBody2d *GetPanel();
+
 	bool IsInputAllowed() const;					// Checks itself and the container it's inserted in if input is allowed
 
 	bool IsEnabled() const;
@@ -57,9 +60,9 @@ public:
 	void SetKeyboardFocusAllowed(bool bEnabled);
 	bool RequestKeyboardFocus();
 
-	bool IsMouseDown() const;
-	bool IsHideMouseDownState() const;
-	void SetHideMouseDownState(bool bIsHideDownState);
+	virtual bool IsDown() const;
+	bool IsHideDownState() const;
+	void SetHideDownState(bool bIsHideDownState);
 
 	bool IsMouseHover() const;
 	bool IsHideMouseHoverState() const;
@@ -79,6 +82,7 @@ protected:
 	virtual void OnMouseDown() override final;
 	virtual void OnMouseClicked() override final;
 
+	virtual void OnUiUpdate() { }
 	virtual void OnUiTextInput(std::string sNewText) { }
 	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) { }
 	virtual void OnUiMouseEnter() { }
@@ -92,9 +96,8 @@ protected:
 	virtual void OnRelinquishKeyboardFocus() { }	// Widgets that are 'IsKeyboardFocusAllowed' should override this
 
 	HyPanelState GetPanelState() const;
-
-private:
 	void ApplyPanelState(HyPanelState eOldState);
+	virtual void OnPanelUpdated() { }				// Invoked whenever m_Panel is modified
 };
 
 #endif /* IHyWidget_h__ */

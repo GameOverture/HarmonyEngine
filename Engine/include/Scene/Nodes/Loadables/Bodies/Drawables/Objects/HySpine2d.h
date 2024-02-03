@@ -34,6 +34,8 @@ public:
 	const HySpine2d &operator=(const HySpine2d &rhs);
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
+	virtual float GetWidth(float fPercent) override;
+	virtual float GetHeight(float fPercent) override;
 
 	virtual bool SetState(uint32 uiStateIndex) override;
 

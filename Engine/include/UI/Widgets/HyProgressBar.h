@@ -47,7 +47,7 @@ public:
 	void SetNumFormat(HyNumberFormat format);
 
 protected:
-	virtual void OnUpdate() override;
+	virtual void OnUiUpdate() override;
 	virtual void OnSetup() override;
 	void AdjustProgress();
 };

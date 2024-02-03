@@ -262,7 +262,7 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	return m_SceneAABB;
 }
 
-/*virtual*/ float HyEntity2d::GetWidth(float fPercent = 1.0f) /*override*/
+/*virtual*/ float HyEntity2d::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
 	HyShape2d shape;
 	CalcLocalBoundingShape(shape);
@@ -272,7 +272,7 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	return (aabb.GetExtents().x * 2.0f) * fPercent;
 }
 
-/*virtual*/ float HyEntity2d::GetHeight(float fPercent = 1.0f) /*override*/
+/*virtual*/ float HyEntity2d::GetHeight(float fPercent /*= 1.0f*/) /*override*/
 {
 	HyShape2d shape;
 	CalcLocalBoundingShape(shape);

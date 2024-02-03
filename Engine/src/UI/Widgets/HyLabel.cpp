@@ -97,7 +97,7 @@ void HyLabel::Setup(const HyPanelInit &initRef, int32 iTextMarginLeft, int32 iTe
 
 void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
 {
-	m_Panel.Setup(initRef, false);
+	m_Panel.Setup(initRef);
 
 	m_Text.Init(sTextPrefix, sTextName, this);
 	m_TextMargins.Set(static_cast<float>(iTextMarginLeft),
@@ -346,6 +346,11 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 	ResetTextAndPanel();
 	
 	return glm::ivec2(uiNewWidth, uiNewHeight);
+}
+
+/*virtual*/ void HyLabel::OnPanelUpdated() /*override*/
+{
+	ResetTextAndPanel();
 }
 
 /*virtual*/ void HyLabel::ResetTextAndPanel()

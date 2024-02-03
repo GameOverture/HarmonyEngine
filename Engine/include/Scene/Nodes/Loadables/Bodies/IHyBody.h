@@ -67,6 +67,9 @@ public:
 	void SetCameraCoordinates();
 	void SetWindowCoordinates(int32 iWindowIndex = 0);
 
+	virtual float GetWidth(float fPercent = 1.0f) = 0;
+	virtual float GetHeight(float fPercent = 1.0f) = 0;
+
 protected:
 	// Internal Entity propagation function overrides
 	virtual void _SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding);

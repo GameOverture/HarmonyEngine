@@ -56,9 +56,7 @@ public:
 	void RemoveSubButton(uint32 uiSubBtnIndex);
 	void ClearSubButtons();
 
-	void SetExpandType(HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate);
-	void SetExpandPanel(std::string sSpritePrefix, std::string sSpriteName);
-	void SetExpandPanel(uint32 uiFrameSize, HyColor panelColor = HyColor(0x252526), HyColor frameColor = HyColor(0x3F3F41));
+	void SetExpandPanel(const HyPanelInit &panelInit, HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate);
 
 	bool IsExpanded() const;
 	bool IsTransition() const;
@@ -68,7 +66,7 @@ public:
 	void ResetExpandedTimeout();
 
 protected:
-	virtual void OnUpdate() override;
+	virtual void OnUiUpdate() override;
 	virtual void OnSetup() override;
 
 	static void OnComboBoxClickedCallback(HyButton *pBtn, void *pData);

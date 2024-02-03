@@ -18,21 +18,12 @@
 
 struct HyPanelInit
 {
-	// Whatever PanelType is chosen will affect UI layout positioning and metrics
-	enum PanelType
-	{
-		PANELTYPE_Invalid = -1,
-		PANELTYPE_BoundingVolume = 0,	// The panel isn't visibly seen, but can still have a width and height
-		PANELTYPE_HyBody,				// The panel metrics are dictated by the IHyBody instance
-		PANELTYPE_Primitive				// The panel is assembled in this class using primitives
-	};
-	PanelType					m_ePanelType;
+	HyType						m_eNodeType;
 
 	uint32						m_uiWidth;
 	uint32						m_uiHeight;
 
-	HyType						m_eBodyType;
-	HyNodePath					m_HyBodyPath;
+	HyNodePath					m_NodePath;
 
 	uint32						m_uiFrameSize;
 	HyColor						m_PanelColor;
@@ -42,35 +33,33 @@ struct HyPanelInit
 	// Constructs a 'BoundingVolume' panel with 0 width/height
 	HyPanelInit();
 
-	// Constructs a 'BoundingVolume' panel
+	// Constructs a 'BoundingVolume' panel. A bounding volume 
 	HyPanelInit(uint32 uiWidth, uint32 uiHeight);
 
-	// Constructs a 'HyBody' panel
+	// Constructs a 'NodeItem' panel
 	HyPanelInit(HyType eBodyType, const HyNodePath &nodePath);
 
-	// Constructs a 'Primitive' panel. Colors of HyColor(0,0,0,0) will be set to a default color determined by the panel's usage
+	// Constructs a 'EntityPrimitive' panel. Colors of HyColor(0,0,0,0) will be set to a default color determined by the panel's usage
 	HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0,0,0,0), HyColor frameColor = HyColor(0,0,0,0), HyColor tertiaryColor = HyColor(0,0,0,0));
 };
 
 class HyPanel : public HyEntity2d
 {
-	HyPanelInit::PanelType		m_ePanelType;
-
-	// Only used when PANELTYPE_HyBody
-	IHyBody2d *					m_pHyBody;
-
-	// Only used when PANELTYPE_Primitive
-	struct Primitive
+	struct PrimParts
 	{
+		glm::ivec2				m_vSize;
 		uint32					m_uiFrameSize;
-		HyPrimitive2d			m_Frame1;
-		HyPrimitive2d			m_Frame2;	// When thicc enough, a frame can have two tones to it
-		HyPrimitive2d			m_Panel;
+		
 		HyColor					m_PanelColor;
 		HyColor					m_FrameColor;
 		HyColor					m_TertiaryColor;
+		
+		HyPrimitive2d			m_Frame1;
+		HyPrimitive2d			m_Frame2;	// When thicc enough, a frame can have two tones to it
+		HyPrimitive2d			m_Panel;
 	};
-	Primitive *					m_pPrimitive;
+	PrimParts *					m_pPrimParts;	// Only dynamically allocated when 'EntityPrimitive' panel type. Otherwise nullptr
+	IHyBody2d *					m_pNodeItem;	// Only dynamically allocated when 'NodeItem' panel type. Otherwise nullptr
 
 public:
 	HyAnimVec2					size;
@@ -79,6 +68,7 @@ public:
 	HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent);
 	virtual ~HyPanel();
 
+	virtual const b2AABB &GetSceneAABB() override;
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
 
@@ -86,12 +76,12 @@ public:
 	bool IsValid();
 
 	bool IsBoundingVolume() const;
-	bool IsHyBody() const;
+	bool IsNodeItem() const;
 	bool IsPrimitive() const;
 
 	void ApplyPanelState(HyPanelState ePanelState);
 
-	IHyBody2d *GetHyBody();
+	IHyBody2d *GetPanelBody();
 
 	glm::ivec2 GetSizeHint();
 	uint32 GetFrameStrokeSize() const;

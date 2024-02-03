@@ -114,24 +114,24 @@ bool IHyWidget::RequestKeyboardFocus()
 	return false;
 }
 
-bool IHyWidget::IsMouseDown() const
+/*virtual*/ bool IHyWidget::IsDown() const
 {
 	return (m_uiAttribs & UIATTRIB_IsMouseDownState) != 0;
 }
 
-bool IHyWidget::IsHideMouseDownState() const
+bool IHyWidget::IsHideDownState() const
 {
-	return (m_uiAttribs & UIATTRIB_HideMouseDownState) != 0;
+	return (m_uiAttribs & UIATTRIB_HideDownState) != 0;
 }
 
-void IHyWidget::SetHideMouseDownState(bool bIsHideDownState)
+void IHyWidget::SetHideDownState(bool bIsHideDownState)
 {
 	HyPanelState eOldState = GetPanelState();
 
 	if(bIsHideDownState)
-		m_uiAttribs |= UIATTRIB_HideMouseDownState;
+		m_uiAttribs |= UIATTRIB_HideDownState;
 	else
-		m_uiAttribs &= ~UIATTRIB_HideMouseDownState;
+		m_uiAttribs &= ~UIATTRIB_HideDownState;
 
 	ApplyPanelState(eOldState);
 }
@@ -210,6 +210,8 @@ void IHyWidget::SetAsHighlighted(bool bIsHighlighted)
 		m_uiAttribs &= ~UIATTRIB_IsMouseDownState;
 		ApplyPanelState(eOldState);
 	}
+
+	OnUiUpdate();
 }
 
 /*virtual*/ void IHyWidget::OnMouseEnter() /*override final*/
@@ -324,5 +326,8 @@ void IHyWidget::ApplyPanelState(HyPanelState eOldState)
 {
 	HyPanelState eCurState = GetPanelState();
 	if(eOldState != eCurState)
+	{
 		m_Panel.ApplyPanelState(eCurState);
+		OnPanelUpdated();
+	}
 }

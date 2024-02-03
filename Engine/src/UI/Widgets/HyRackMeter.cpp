@@ -167,7 +167,7 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 	HyLabel::SetTextMonospacedDigits(bSet);
 }
 
-/*virtual*/ void HyRackMeter::OnUpdate() /*override*/
+/*virtual*/ void HyRackMeter::OnUiUpdate() /*override*/
 {
 	if(m_iCurValue == m_iTargetValue)
 		return;
