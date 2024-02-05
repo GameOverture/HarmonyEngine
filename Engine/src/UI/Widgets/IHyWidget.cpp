@@ -291,7 +291,7 @@ HyPanelState IHyWidget::GetPanelState() const
 {
 	if(IsEnabled())
 	{
-		if(IsMouseDown() && IsHideMouseDownState() == false)
+		if(IsDown() && IsHideDownState() == false)
 		{
 			if(IsHighlighted() && IsHideHighlightedState() == false)
 				return HYPANELSTATE_HighlightedDown;
@@ -327,7 +327,7 @@ void IHyWidget::ApplyPanelState(HyPanelState eOldState)
 	HyPanelState eCurState = GetPanelState();
 	if(eOldState != eCurState)
 	{
-		m_Panel.ApplyPanelState(eCurState);
+		m_Panel.SetState(eCurState);
 		OnPanelUpdated();
 	}
 }

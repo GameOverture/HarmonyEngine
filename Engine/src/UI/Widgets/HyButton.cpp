@@ -18,24 +18,24 @@ HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-HyButton::HyButton(const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(initRef, pParent),
+HyButton::HyButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(panelInit, pParent),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
 	OnSetup();
 }
 
-HyButton::HyButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(initRef, sTextPrefix, sTextName, pParent),
+HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(panelInit, textNodePath, pParent),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
 	OnSetup();
 }
 
-HyButton::HyButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
+HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {

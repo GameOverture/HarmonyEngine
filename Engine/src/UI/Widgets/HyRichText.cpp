@@ -16,8 +16,8 @@
 
 #include <regex>
 
-HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent),
+HyRichText::HyRichText(const HyPanelInit &panelInit /*= HyPanelInit()*/, HyEntity2d *pParent /*= nullptr*/) :
+	IHyWidget(panelInit, pParent),
 	m_uiColumnWidth(0),
 	m_eAlignment(HYALIGN_Left),
 	m_fTotalHeight(0.0f),
@@ -26,8 +26,8 @@ HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-HyRichText::HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent),
+HyRichText::HyRichText(const HyPanelInit &panelInit, const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment, HyEntity2d *pParent /*= nullptr*/) :
+	IHyWidget(panelInit, pParent),
 	m_uiColumnWidth(0),
 	m_eAlignment(eAlignment),
 	m_fTotalHeight(0.0f),

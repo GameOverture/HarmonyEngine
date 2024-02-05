@@ -37,9 +37,9 @@ protected:
 
 public:
 	HyLabel(HyEntity2d *pParent = nullptr);
-	HyLabel(const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
-	HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
-	HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
+	HyLabel(const HyPanelInit &panelInit, HyEntity2d *pParent = nullptr);
+	HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
+	HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyLabel();
 
 	virtual float GetWidth(float fPercent = 1.0f) override;
@@ -47,10 +47,9 @@ public:
 
 	virtual bool IsLoadDataValid() override;
 
-	void Setup(const HyPanelInit &initRef);
-	void Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName);
-	void Setup(const HyPanelInit &initRef, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
-	void Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
+	void Setup(const HyPanelInit &panelInit);
+	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath);
+	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
 
 	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_Center, bool bUseScaleBox = true);							// Default setup. Shows text positioned on top and inside the panel based on 'eTextAlignment' and 'bUseScaleBox'
 	void SetAsSideBySide(bool bPanelBeforeText = true, int32 iPadding = 5, HyOrientation eOrientation = HYORIEN_Horizontal);	// Show the panel and text side by side specified accordingly to the arguments passed
@@ -60,7 +59,8 @@ public:
 	//virtual void SetSpriteState(uint32 uiStateIndex);
 	//void SetSpriteAnimCtrl(HyAnimCtrl eAnimCtrl);
 
-	bool IsGlyphAvailable(std::string sUtf8Character);
+	bool IsTextVisible() const;
+	void SetTextVisible(bool bVisible);
 	std::string GetUtf8String() const;
 	void SetText(const std::stringstream &ssUtf8Text);
 	virtual void SetText(const std::string &sUtf8Text);
@@ -71,6 +71,7 @@ public:
 	virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor);
 	bool IsTextMonospacedDigits() const;
 	virtual void SetTextMonospacedDigits(bool bSet);
+	bool IsGlyphAvailable(std::string sUtf8Character);
 	float GetTextWidth(float fPercent = 1.0f);
 	float GetTextHeight(float fPercent = 1.0f);
 

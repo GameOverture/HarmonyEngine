@@ -14,7 +14,19 @@
 #include "Assets/Nodes/Objects/HySpineData.h"
 #include "HyEngine.h"
 
-HySpine2d::HySpine2d(const HyNodePath &nodePath /*= HyNodePath()*/, HyEntity2d *pParent /*= nullptr*/) :
+HySpine2d::HySpine2d(HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_Spine, HyNodePath(), pParent),
+#ifdef HY_USE_SPINE
+	m_pSkeleton(nullptr),
+	m_pAnimationState(nullptr),
+	m_pSkeletonBounds(nullptr),
+#endif
+	m_uiStartingSlotIndex(0)
+{
+	m_ShaderUniforms.SetNumTexUnits(1);
+}
+
+HySpine2d::HySpine2d(const HyNodePath &nodePath, HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_Spine, nodePath, pParent),
 #ifdef HY_USE_SPINE
 	m_pSkeleton(nullptr),
@@ -39,7 +51,13 @@ HySpine2d::HySpine2d(std::string sPrefix, std::string sName, HyEntity2d *pParent
 }
 
 HySpine2d::HySpine2d(const HySpine2d &copyRef) :
-	IHyDrawable2d(copyRef)
+	IHyDrawable2d(copyRef),
+#ifdef HY_USE_SPINE
+	m_pSkeleton(nullptr),
+	m_pAnimationState(nullptr),
+	m_pSkeletonBounds(nullptr),
+#endif
+	m_uiStartingSlotIndex(copyRef.m_uiStartingSlotIndex)
 {
 }
 

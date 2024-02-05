@@ -34,22 +34,27 @@ HyProfiler::HyProfiler() :
 {
 }
 
-void HyProfiler::InitText(std::string sPrefix, std::string sName, uint32 uiTextState)
+void HyProfiler::InitText(const HyNodePath &nodePath, uint32 uiTextState)
 {
-	m_txtFps.Setup(HyPanelInit(), sPrefix, sName);
+	m_txtFps.Setup(HyPanelInit(), nodePath);
 	m_txtFps.SetTextState(uiTextState);
 
-	m_txtFrameTimes.Setup(HyPanelInit(), sPrefix, sName);
+	m_txtFrameTimes.Setup(HyPanelInit(), nodePath);
 	m_txtFrameTimes.SetTextState(uiTextState);
 
-	m_txtMouse.Setup(HyPanelInit(), sPrefix, sName);
+	m_txtMouse.Setup(HyPanelInit(), nodePath);
 	m_txtMouse.SetTextState(uiTextState);
 
-	m_txtMouseWorld.Setup(HyPanelInit(), sPrefix, sName);
+	m_txtMouseWorld.Setup(HyPanelInit(), nodePath);
 	m_txtMouseWorld.SetTextState(uiTextState);
 
-	m_txtMouseBtns.Setup(HyPanelInit(), sPrefix, sName);
+	m_txtMouseBtns.Setup(HyPanelInit(), nodePath);
 	m_txtMouseBtns.SetTextState(uiTextState);
+}
+
+void HyProfiler::InitText(std::string sPrefix, std::string sName, uint32 uiTextState)
+{
+	InitText(HyNodePath(sPrefix, sName), uiTextState);
 }
 
 void HyProfiler::SetShowFlags(uint32 uiDiagFlags)

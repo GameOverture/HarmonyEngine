@@ -11,7 +11,7 @@
 #include "UI/Components/HySpacer.h"
 
 HySpacer::HySpacer(HyOrientation eOrienType) :
-	IHyWidget(nullptr),
+	IHyWidget(HyPanelInit(), nullptr),
 	m_eORIEN_TYPE(eOrienType),
 	m_iSizeHint(0),
 	m_iActualSize(0)

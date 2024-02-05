@@ -76,7 +76,6 @@ public:
 	HyOrientation GetOrientation() const;
 	void SetOrientation(HyOrientation eOrien);
 
-	void SetSliderColors(HyColor panelColor = HyColor::WidgetPanel, HyColor frameColor = HyColor::WidgetFrame);
 	void SetBarColors(HyColor posColor = HyColor::Blue, HyColor negColor = HyColor::Gray, HyColor strokeColor = HyColor::Black);
 
 	void SetValueChangedCallback(std::function<void(HySlider *, void *)> fpCallback, void *pParam = nullptr);

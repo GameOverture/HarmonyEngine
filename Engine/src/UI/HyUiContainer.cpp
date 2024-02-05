@@ -34,8 +34,8 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 	m_VertBar(HYORIEN_Vertical, 20, this),
 	m_HorzBar(HYORIEN_Horizontal, 20, this)
 {
-	m_bFlexSizeX = m_Panel.size.X() == 0.0f;
-	m_bFlexSizeY = m_Panel.size.Y() == 0.0f;
+	m_bFlexSizeX = m_Panel.GetWidth() == 0.0f;
+	m_bFlexSizeY = m_Panel.GetHeight() == 0.0f;
 
 	m_RootLayout.SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Flexible);
 	m_RootLayout.SetLayoutDirty();
@@ -43,7 +43,7 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 	sm_pContainerList.push_back(this);
 
 	// Scroll bars
-	SetScrollBarColor(m_Panel.GetPanelColor());
+	SetScrollBarColor(initRef.m_PanelColor);
 	EnableScrollBars(m_bUseVertBar, m_bUseHorzBar);
 
 	SetSize(initRef.m_uiWidth, initRef.m_uiHeight);
@@ -70,13 +70,13 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 
 glm::ivec2 HyUiContainer::GetSize()
 {
-	return m_Panel.size.Get();
+	return glm::ivec2(m_Panel.GetWidth(), m_Panel.GetHeight());
 }
 
 void HyUiContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
 {
 	m_Shape.SetAsBox(iNewWidth, iNewHeight);
-	m_Panel.size.Set(iNewWidth, iNewHeight);
+	m_Panel.SetSize(iNewWidth, iNewHeight);
 	m_RootLayout.SetLayoutDirty();
 }
 
@@ -584,8 +584,8 @@ std::vector<IHyWidget *> HyUiContainer::AssembleWidgetList()
 
 void HyUiContainer::OnRootLayoutUpdate()
 {
-	int32 iNewWidth = static_cast<int32>(m_Panel.size.X());
-	int32 iNewHeight = static_cast<int32>(m_Panel.size.Y());
+	int32 iNewWidth = static_cast<int32>(m_Panel.GetWidth(m_Panel.scale.X()));
+	int32 iNewHeight = static_cast<int32>(m_Panel.GetHeight(m_Panel.scale.Y()));
 
 	if(iNewWidth == 0 || iNewHeight == 0)
 		return;
@@ -621,8 +621,8 @@ void HyUiContainer::OnRootLayoutUpdate()
 		if(m_Panel.IsPrimitive())
 			iScissorMargin = m_Panel.GetFrameStrokeSize();
 
-		int32 iScissorWidth = static_cast<int32>(m_Panel.size.X()) - (iScissorMargin * 2) - (static_cast<int32>(bVertBarShown) * m_VertBar.GetDiameter());
-		int32 iScissorHeight = static_cast<int32>(m_Panel.size.Y()) - (iScissorMargin * 2) - (static_cast<int32>(bHorzBarShown) * m_HorzBar.GetDiameter());
+		int32 iScissorWidth = static_cast<int32>(m_Panel.GetWidth(m_Panel.scale.X())) - (iScissorMargin * 2) - (static_cast<int32>(bVertBarShown) * m_VertBar.GetDiameter());
+		int32 iScissorHeight = static_cast<int32>(m_Panel.GetHeight(m_Panel.scale.Y())) - (iScissorMargin * 2) - (static_cast<int32>(bHorzBarShown) * m_HorzBar.GetDiameter());
 		if(iScissorWidth > 0 && iScissorHeight > 0)
 			SetScissor(iScissorMargin, iScissorMargin, iScissorWidth, iScissorHeight);
 		else

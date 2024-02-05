@@ -35,6 +35,13 @@ HyStencilHandle HyStencil::GetHandle() const
 
 void HyStencil::AddMask(IHyDrawable2d &nodeRef)
 {
+	// Don't add nodeRef if it's already in the list
+	for(auto it = m_MaskInstanceList.begin(); it != m_MaskInstanceList.end(); ++it)
+	{
+		if((*it) == &nodeRef)
+			return;
+	}
+
 	nodeRef.Load();
 	m_MaskInstanceList.push_back(&nodeRef);
 

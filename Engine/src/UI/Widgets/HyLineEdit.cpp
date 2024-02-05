@@ -23,8 +23,8 @@ HyLineEdit::HyLineEdit(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-HyLineEdit::HyLineEdit(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(initRef, sTextPrefix, sTextName, pParent),
+HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(initRef, textNodePath, pParent),
 	m_bUseValidator(false),
 	m_uiCursorIndex(0),
 	m_uiSelectionIndex(0),
@@ -34,8 +34,8 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, std::string sTextPrefix, std:
 	OnSetup();
 }
 
-HyLineEdit::HyLineEdit(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
+HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(initRef, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
 	m_bUseValidator(false),
 	m_uiCursorIndex(0),
 	m_uiSelectionIndex(0),
@@ -323,7 +323,7 @@ void HyLineEdit::SetAsHighlighted(bool bIsHighlighted)
 	m_BlinkTimer.Init(HYLINEEDIT_BLINKDUR);
 
 	SetKeyboardFocusAllowed(true);
-	SetHoverCursor(HYMOUSECURSOR_IBeam);
+	SetMouseHoverCursor(HYMOUSECURSOR_IBeam);
 	m_uiAttribs |= LABELATTRIB_StackedTextUseLine | LABELATTRIB_StackedTextLeftAlign;
 
 	m_Selection.SetDisplayOrder(m_Text.GetDisplayOrder() - 1);

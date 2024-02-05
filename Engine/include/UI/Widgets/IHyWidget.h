@@ -45,9 +45,6 @@ public:
 	IHyWidget(const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~IHyWidget();
 
-	void SetPanel(const HyPanelInit &initRef);
-	IHyBody2d *GetPanel();
-
 	bool IsInputAllowed() const;					// Checks itself and the container it's inserted in if input is allowed
 
 	bool IsEnabled() const;

@@ -14,25 +14,24 @@
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(HyPanelInit(), pParent)
 {
-	Setup(HyPanelInit(), "", "");
 }
 
-HyLabel::HyLabel(const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(HyPanelInit(), pParent)
 {
-	Setup(initRef, "", "", 0, 0, 0, 0);
+	Setup(panelInit, HyNodePath(), 0, 0, 0, 0);
 }
 
-HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(HyPanelInit(), pParent)
 {
-	Setup(initRef, sTextPrefix, sTextName, 0, 0, 0, 0);
+	Setup(panelInit, textNodePath, 0, 0, 0, 0);
 }
 
-HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(HyPanelInit(), pParent)
 {
-	Setup(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
+	Setup(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }
 
 /*virtual*/ HyLabel::~HyLabel()
@@ -44,16 +43,16 @@ HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::strin
 	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
 	{
 		if((m_uiAttribs & LABELATTRIB_SideBySideVertical) == 0)
-			return (m_Panel.size.X() + (m_Text.GetWidth() * m_Text.scale.X()) + m_TextMargins.iTag) * fPercent;
+			return (m_Panel.GetWidth(m_Panel.scale.X()) + m_Text.GetWidth(m_Text.scale.X()) + m_TextMargins.iTag) * fPercent;
 		else
-			return HyMath::Max(m_Panel.size.X(), m_Text.GetWidth() * m_Text.scale.X()) * fPercent;
+			return HyMath::Max(m_Panel.GetWidth(m_Panel.scale.X()), m_Text.GetWidth(m_Text.scale.X())) * fPercent;
 	}
 	else // Is stacked
 	{
 		if(m_Panel.IsValid())
-			return m_Panel.size.X() * fPercent;
+			return m_Panel.GetWidth(m_Panel.scale.X()) * fPercent;
 		else
-			return m_Text.GetWidth(fPercent);
+			return m_Text.GetWidth(m_Text.scale.X()) * fPercent;
 	}
 }
 
@@ -62,16 +61,16 @@ HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::strin
 	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
 	{
 		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
-			return (m_Panel.size.Y() + (m_Text.GetHeight() * m_Text.scale.Y()) + m_TextMargins.iTag) * fPercent;
+			return (m_Panel.GetHeight(m_Panel.scale.Y()) + m_Text.GetHeight(m_Text.scale.Y()) + m_TextMargins.iTag) * fPercent;
 		else
-			return HyMath::Max(m_Panel.size.Y(), m_Text.GetHeight() * m_Text.scale.Y()) * fPercent;
+			return HyMath::Max(m_Panel.GetHeight(m_Panel.scale.Y()), m_Text.GetHeight(m_Text.scale.Y())) * fPercent;
 	}
 	else // Is stacked
 	{
 		if(m_Panel.IsValid())
-			return m_Panel.size.Y() * fPercent;
+			return m_Panel.GetHeight(m_Panel.scale.Y()) * fPercent;
 		else
-			return m_Text.GetHeight(fPercent);
+			return m_Text.GetHeight(m_Text.scale.Y()) * fPercent;
 	}
 }
 
@@ -80,26 +79,21 @@ HyLabel::HyLabel(const HyPanelInit &initRef, std::string sTextPrefix, std::strin
 	return m_Panel.IsValid() || m_Text.IsLoadDataValid();
 }
 
-void HyLabel::Setup(const HyPanelInit &initRef)
+void HyLabel::Setup(const HyPanelInit &panelInit)
 {
-	Setup(initRef, m_Text.GetPrefix(), m_Text.GetName(), 0, 0, 0, 0);
+	Setup(panelInit, m_Text.GetPath(), 0, 0, 0, 0);
 }
 
-void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName)
+void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath)
 {
-	Setup(initRef, sTextPrefix, sTextName, 0, 0, 0, 0);
+	Setup(panelInit, textNodePath, 0, 0, 0, 0);
 }
 
-void HyLabel::Setup(const HyPanelInit &initRef, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
+void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
 {
-	Setup(initRef, m_Text.GetPrefix(), m_Text.GetName(), iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
-}
+	m_Panel.Setup(panelInit);
 
-void HyLabel::Setup(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
-{
-	m_Panel.Setup(initRef);
-
-	m_Text.Init(sTextPrefix, sTextName, this);
+	m_Text.Init(textNodePath, this);
 	m_TextMargins.Set(static_cast<float>(iTextMarginLeft),
 					  static_cast<float>(iTextMarginBottom),
 					  static_cast<float>(iTextMarginRight),
@@ -159,31 +153,36 @@ void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /
 	ResetTextAndPanel();
 }
 
-uint32 HyLabel::GetSpriteState() const
+//uint32 HyLabel::GetSpriteState() const
+//{
+//	return m_Panel.GetSpriteState();
+//}
+//
+//void HyLabel::SetPanelVisible(bool bVisible)
+//{
+//	m_Panel.SetVisible(bVisible);
+//}
+//
+///*virtual*/ void HyLabel::SetSpriteState(uint32 uiStateIndex)
+//{
+//	m_Panel.SetSpriteState(uiStateIndex);
+//	ResetTextAndPanel();
+//}
+//
+//void HyLabel::SetSpriteAnimCtrl(HyAnimCtrl eAnimCtrl)
+//{
+//	m_Panel.GetSprite().SetAnimCtrl(eAnimCtrl);
+//	ResetTextAndPanel();
+//}
+
+bool HyLabel::IsTextVisible() const
 {
-	return m_Panel.GetSpriteState();
+	return m_Text.IsVisible();
 }
 
-void HyLabel::SetPanelVisible(bool bVisible)
+void HyLabel::SetTextVisible(bool bVisible)
 {
-	m_Panel.SetVisible(bVisible);
-}
-
-/*virtual*/ void HyLabel::SetSpriteState(uint32 uiStateIndex)
-{
-	m_Panel.SetSpriteState(uiStateIndex);
-	ResetTextAndPanel();
-}
-
-void HyLabel::SetSpriteAnimCtrl(HyAnimCtrl eAnimCtrl)
-{
-	m_Panel.GetSprite().SetAnimCtrl(eAnimCtrl);
-	ResetTextAndPanel();
-}
-
-bool HyLabel::IsGlyphAvailable(std::string sUtf8Character)
-{
-	return m_Text.IsGlyphAvailable(sUtf8Character);
+	m_Text.SetVisible(bVisible);
 }
 
 /*virtual*/ std::string HyLabel::GetUtf8String() const
@@ -237,6 +236,11 @@ bool HyLabel::IsTextMonospacedDigits() const
 {
 	m_Text.SetMonospacedDigits(bSet);
 	ResetTextAndPanel();
+}
+
+bool HyLabel::IsGlyphAvailable(std::string sUtf8Character)
+{
+	return m_Text.IsGlyphAvailable(sUtf8Character);
 }
 
 float HyLabel::GetTextWidth(float fPercent /*= 1.0f*/)
@@ -309,7 +313,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 			uiNewHeight = static_cast<uint32>(m_Text.GetHeight(m_Text.scale.Y()));
 		}
 		else
-			m_Panel.size.Set(static_cast<int32>(uiNewWidth), static_cast<int32>(uiNewHeight));
+			m_Panel.SetSize(uiNewWidth, uiNewHeight);
 	}
 	else // Side-by-side
 	{
@@ -336,7 +340,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 			//HySetVec(vNewTextSize, uiNewWidth * fTextPerc, vTextSizeHint.y);
 		}
 
-		m_Panel.size.Set(vNewPanelSize.x, vNewPanelSize.y);
+		m_Panel.SetSize(vNewPanelSize.x, vNewPanelSize.y);
 
 		float fScaleX = static_cast<float>(vNewTextSize.x) / static_cast<float>(vTextSizeHint.x);
 		float fScaleY = static_cast<float>(vNewTextSize.y) / static_cast<float>(vTextSizeHint.y);
@@ -378,11 +382,11 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 				m_Text.SetTextAlignment(HYALIGN_Right);
 
 			pFirst = &m_Text;
-			HySetVec(vFirstSize, m_Text.GetWidth() * m_Text.scale.X(), m_Text.GetLineBreakHeight(m_Text.scale.Y()));
+			HySetVec(vFirstSize, m_Text.GetWidth(m_Text.scale.X()), m_Text.GetLineBreakHeight(m_Text.scale.Y()));
 			vFirstOffset = m_Text.GetTextBottomLeft();
 
 			pSecond = &m_Panel;
-			vSecondSize = m_Panel.size.Get();
+			HySetVec(vSecondSize, m_Panel.GetWidth(m_Panel.scale.GetX()), m_Panel.GetHeight(m_Panel.scale.GetY()));
 			vSecondOffset = -m_Panel.GetBotLeftOffset();
 		}
 		else
@@ -393,11 +397,11 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 				m_Text.SetTextAlignment(HYALIGN_Left);
 
 			pFirst = &m_Panel;
-			vFirstSize = m_Panel.size.Get();
+			HySetVec(vFirstSize, m_Panel.GetWidth(m_Panel.scale.GetX()), m_Panel.GetHeight(m_Panel.scale.GetY()));
 			vFirstOffset = -m_Panel.GetBotLeftOffset();
 
 			pSecond = &m_Text;
-			HySetVec(vSecondSize, m_Text.GetWidth() * m_Text.scale.X(), m_Text.GetLineBreakHeight(m_Text.scale.Y()));
+			HySetVec(vSecondSize, m_Text.GetWidth(m_Text.scale.X()), m_Text.GetLineBreakHeight(m_Text.scale.Y()));
 			vSecondOffset = m_Text.GetTextBottomLeft();
 		}
 
@@ -432,7 +436,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 	else // Stacked Panel/Text
 	{
 		glm::ivec2 vUiSizeHint = GetSizeHint();
-		glm::vec2 vPanelDimensions = m_Panel.size.Get();
+		glm::vec2 vPanelDimensions(m_Panel.GetWidth(m_Panel.scale.GetX()), m_Panel.GetHeight(m_Panel.scale.GetY()));
 		glm::ivec2 vPanelOffset = m_Panel.GetBotLeftOffset();
 
 		// Position text to bottom left of 'm_TextMargins'

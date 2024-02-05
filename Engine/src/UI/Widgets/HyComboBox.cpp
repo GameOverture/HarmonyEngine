@@ -17,28 +17,31 @@ HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 	m_SubBtnPanel(HyPanelInit(), this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
-	m_fExpandedTimeout(0.0f)
+	m_fExpandedTimeout(0.0f),
+	m_ExpandAnimVec(*this, 0)
 {
 }
 
-HyComboBox::HyComboBox(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent /*= nullptr*/) :
-	HyButton(initRef, sTextPrefix, sTextName, pParent),
+HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
+	HyButton(panelInit, textNodePath, pParent),
 	m_Shape(this),
 	m_SubBtnPanel(HyPanelInit(), this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
-	m_fExpandedTimeout(0.0f)
+	m_fExpandedTimeout(0.0f),
+	m_ExpandAnimVec(*this, 0)
 {
 	OnSetup();
 }
 
-HyComboBox::HyComboBox(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
-	HyButton(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
+HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
+	HyButton(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
 	m_Shape(this),
 	m_SubBtnPanel(HyPanelInit(), this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
-	m_fExpandedTimeout(0.0f)
+	m_fExpandedTimeout(0.0f),
+	m_ExpandAnimVec(*this, 0)
 {
 	OnSetup();
 }
@@ -48,14 +51,14 @@ HyComboBox::HyComboBox(const HyPanelInit &initRef, std::string sTextPrefix, std:
 	ClearSubButtons();
 }
 
-uint32 HyComboBox::InsertSubButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
+uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
 {
-	return InsertSubButton(initRef, sTextPrefix, sTextName, 0, 0, 0, 0, fpCallBack, pParam, sAudioPrefix, sAudioName);
+	return InsertSubButton(panelInit, textNodePath, 0, 0, 0, 0, fpCallBack, pParam, sAudioPrefix, sAudioName);
 }
 
-uint32 HyComboBox::InsertSubButton(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
+uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
 {
-	HyButton *pNewBtn = HY_NEW HyButton(initRef, sTextPrefix, sTextName, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, this);
+	HyButton *pNewBtn = HY_NEW HyButton(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, this);
 	pNewBtn->SetButtonClickedCallback(fpCallBack, pParam, sAudioPrefix, sAudioName);
 	pNewBtn->SetAsEnabled(false);
 	pNewBtn->pos.Set(pNewBtn->GetPosOffset());
@@ -167,10 +170,14 @@ void HyComboBox::ToggleExpanded()
 
 			ptTweenDest[iExpandIndex] += (pSubBtn->GetSizeHint()[iExpandIndex] + m_fSubBtnSpacing) * iExpandDir;
 		}
+
 		if(m_uiAttribs & COMBOBOXATTRIB_IsInstantExpand)
-			m_SubBtnPanel.size.Set(ptTweenDest[0], ptTweenDest[1]);
+			m_SubBtnPanel.SetSize(ptTweenDest[0], ptTweenDest[1]);
 		else
-			m_SubBtnPanel.size.Tween(ptTweenDest[0], ptTweenDest[1], 0.5f, HyTween::QuadOut);
+		{
+			m_ExpandAnimVec.Set(0.0f, 0.0f);
+			m_ExpandAnimVec.Tween(ptTweenDest[0], ptTweenDest[1], 0.5f, HyTween::QuadOut, 0.0f, [this](IHyNode *pThis) { m_SubBtnPanel.SetSize(m_ExpandAnimVec.X(), m_ExpandAnimVec.Y()); });
+		}
 	}
 	else
 	{
@@ -200,6 +207,9 @@ void HyComboBox::ResetExpandedTimeout()
 
 /*virtual*/ void HyComboBox::OnUiUpdate() /*override*/
 {
+	if(m_ExpandAnimVec.IsAnimating())
+		m_SubBtnPanel.SetSize(m_ExpandAnimVec.X(), m_ExpandAnimVec.Y());
+
 	switch(m_uiAttribs & COMBOBOXATTRIB_STATEMASK)
 	{
 	case 0:

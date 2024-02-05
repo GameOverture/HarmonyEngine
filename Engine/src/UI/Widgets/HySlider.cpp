@@ -53,7 +53,7 @@ void HySlider::BarPrimitives::Assemble(HyOrientation eOrientation, float fBarThi
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 HySlider::HySlider(HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent),
+	IHyWidget(HyPanelInit(), pParent),
 	m_iMin(0),
 	m_iMax(100),
 	m_uiStep(5),
@@ -62,7 +62,6 @@ HySlider::HySlider(HyEntity2d *pParent /*= nullptr*/) :
 	m_iValue(0),
 	m_BarStroke(this),
 	m_BarFill(this),
-	m_Slider(this),
 	m_ptSliderCenter(0.0f, 0.0f),
 	m_fpOnValueChanged(nullptr),
 	m_pValueChangedParam(nullptr)
@@ -70,7 +69,7 @@ HySlider::HySlider(HyEntity2d *pParent /*= nullptr*/) :
 }
 
 HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent),
+	IHyWidget(HyPanelInit(), pParent),
 	m_iMin(0),
 	m_iMax(100),
 	m_uiStep(5),
@@ -79,7 +78,6 @@ HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nul
 	m_iValue(0),
 	m_BarStroke(this),
 	m_BarFill(this),
-	m_Slider(this),
 	m_ptSliderCenter(0.0f, 0.0f),
 	m_fpOnValueChanged(nullptr),
 	m_pValueChangedParam(nullptr)
@@ -105,8 +103,7 @@ HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nul
 
 void HySlider::Setup(const HyPanelInit &sliderInitRef)
 {
-	//if(sliderInitRef.m_PanelColor.
-	m_Slider.Setup(sliderInitRef, false);
+	m_Panel.Setup(sliderInitRef);
 	SetBarColors();
 
 	SetAsEnabled(IsEnabled());
@@ -206,12 +203,6 @@ void HySlider::SetOrientation(HyOrientation eOrien)
 	Assemble();
 }
 
-void HySlider::SetSliderColors(HyColor panelColor /*= HyColor::WidgetPanel*/, HyColor frameColor /*= HyColor::WidgetFrame*/)
-{
-	m_Slider.SetPanelColor(panelColor);
-	m_Slider.SetFrameColor(frameColor);
-}
-
 void HySlider::SetBarColors(HyColor posColor /*= HyColor::Blue*/, HyColor negColor /*= HyColor::Gray*/, HyColor strokeColor /*= HyColor::Black*/)
 {
 	m_BarStroke.SetTint(strokeColor);
@@ -283,10 +274,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 
 /*virtual*/ glm::vec2 HySlider::GetPosOffset() /*override*/
 {
-	if(GetOrientation() == HYORIEN_Horizontal)
-		return glm::vec2(m_Slider.size.GetAnimFloat(HYORIEN_Horizontal).Get() * 0.5f, m_Slider.size.GetAnimFloat(HYORIEN_Vertical).Get() * 0.5f);
-	else
-		return glm::vec2(m_Slider.size.GetAnimFloat(HYORIEN_Horizontal).Get() * 0.5f, m_Slider.size.GetAnimFloat(HYORIEN_Vertical).Get() * 0.5f);
+	return glm::vec2(m_Panel.GetWidth(m_Panel.scale.X()) * 0.5f, m_Panel.GetHeight(m_Panel.scale.Y()) * 0.5f);
 }
 
 /*virtual*/ void HySlider::OnSetSizeHint() /*override*/
@@ -294,9 +282,9 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 	float fRadius = GetBarRadius();
 
 	if(GetOrientation() == HYORIEN_Horizontal)
-		HySetVec(m_vSizeHint, static_cast<int32>(m_fLength + m_Slider.size.X()), static_cast<int32>(m_Slider.size.Y()));
+		HySetVec(m_vSizeHint, static_cast<int32>(m_fLength + m_Panel.GetWidth(m_Panel.scale.X())), static_cast<int32>(m_Panel.GetHeight(m_Panel.scale.Y())));
 	else
-		HySetVec(m_vSizeHint, static_cast<int32>(m_Slider.size.X()), static_cast<int32>(m_fLength + m_Slider.size.Y()));
+		HySetVec(m_vSizeHint, static_cast<int32>(m_Panel.GetWidth(m_Panel.scale.X())), static_cast<int32>(m_fLength + m_Panel.GetHeight(m_Panel.scale.Y())));
 }
 
 /*virtual*/ glm::ivec2 HySlider::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/

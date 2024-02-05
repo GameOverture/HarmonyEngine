@@ -67,9 +67,9 @@ protected:
 
 public:
 	HyRackMeter(HyEntity2d *pParent = nullptr);
-	HyRackMeter(const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
-	HyRackMeter(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, HyEntity2d *pParent = nullptr);
-	HyRackMeter(const HyPanelInit &initRef, std::string sTextPrefix, std::string sTextName, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
+	HyRackMeter(const HyPanelInit &panelInit, HyEntity2d *pParent = nullptr);
+	HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
+	HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyRackMeter();
 
 	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_Center, bool bUseScaleBox = true) override;

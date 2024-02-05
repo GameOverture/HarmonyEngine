@@ -39,15 +39,16 @@ struct HyPanelInit
 	// Constructs a 'NodeItem' panel
 	HyPanelInit(HyType eBodyType, const HyNodePath &nodePath);
 
-	// Constructs a 'EntityPrimitive' panel. Colors of HyColor(0,0,0,0) will be set to a default color determined by the panel's usage
+	// Constructs a 'Primitive' panel. Colors of HyColor(0,0,0,0) will be set to a default color determined by the panel's usage
 	HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0,0,0,0), HyColor frameColor = HyColor(0,0,0,0), HyColor tertiaryColor = HyColor(0,0,0,0));
 };
 
 class HyPanel : public HyEntity2d
 {
+	glm::ivec2					m_vSize;		// Holds the specified size this panel should be
+
 	struct PrimParts
 	{
-		glm::ivec2				m_vSize;
 		uint32					m_uiFrameSize;
 		
 		HyColor					m_PanelColor;
@@ -55,45 +56,53 @@ class HyPanel : public HyEntity2d
 		HyColor					m_TertiaryColor;
 		
 		HyPrimitive2d			m_Frame1;
-		HyPrimitive2d			m_Frame2;	// When thicc enough, a frame can have two tones to it
-		HyPrimitive2d			m_Panel;
+		HyPrimitive2d			m_Frame2;
+		HyPrimitive2d			m_Body;
+
+		bool					m_bIsContainer; // TODO: Construct panels differently?
+
+		PrimParts(const HyPanelInit &initRef, HyPanel *pParent) :
+			m_uiFrameSize(initRef.m_uiFrameSize),
+			m_PanelColor(initRef.m_PanelColor),
+			m_FrameColor(initRef.m_FrameColor),
+			m_TertiaryColor(initRef.m_TertiaryColor),
+			m_Frame1(pParent),
+			m_Frame2(pParent),
+			m_Body(pParent),
+			m_bIsContainer(false)
+		{ }
 	};
-	PrimParts *					m_pPrimParts;	// Only dynamically allocated when 'EntityPrimitive' panel type. Otherwise nullptr
+	PrimParts *					m_pPrimParts;	// Only dynamically allocated when 'Primitive' panel type. Otherwise nullptr
 	IHyBody2d *					m_pNodeItem;	// Only dynamically allocated when 'NodeItem' panel type. Otherwise nullptr
 
 public:
-	HyAnimVec2					size;
-
-public:
-	HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent);
+	HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent); // TODO: Remove initRef, since no UI Widget uses it in the ctor
 	virtual ~HyPanel();
 
-	virtual const b2AABB &GetSceneAABB() override;
+	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
+
+	glm::ivec2 GetSizeHint() const;
+
+	void SetSize(uint32 uiWidth, uint32 uiHeight);
 
 	void Setup(const HyPanelInit &initRef);
 	bool IsValid();
 
 	bool IsBoundingVolume() const;
-	bool IsNodeItem() const;
+
+	bool IsNode() const;
+
 	bool IsPrimitive() const;
-
-	void ApplyPanelState(HyPanelState ePanelState);
-
-	IHyBody2d *GetPanelBody();
-
-	glm::ivec2 GetSizeHint();
 	uint32 GetFrameStrokeSize() const;
+	HyColor GetPanelColor() const;
+	HyColor GetFrameColor() const;
+	HyColor GetTertiaryColor() const;
+
 	glm::vec2 GetBotLeftOffset();
 
-	HyColor GetPanelColor() const;
-	void SetPanelColor(HyColor color);
-	HyColor GetFrameColor() const;
-	void SetFrameColor(HyColor color);
-
 protected:
-	virtual void OnUpdate() override;
 	void ConstructPrimitives();
 };
 

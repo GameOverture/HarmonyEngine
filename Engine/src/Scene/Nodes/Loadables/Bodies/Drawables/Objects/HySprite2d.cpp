@@ -14,7 +14,12 @@
 #include "Assets/Nodes/Objects/HySpriteData.h"
 #include "Assets/Files/HyFileAtlas.h"
 
-HySprite2d::HySprite2d(const HyNodePath &nodePath /*= HyNodePath()*/, HyEntity2d *pParent /*= nullptr*/) :
+HySprite2d::HySprite2d(HyEntity2d *pParent /*= nullptr*/) :
+	IHySprite<IHyDrawable2d, HyEntity2d>(HyNodePath(), pParent)
+{
+}
+
+HySprite2d::HySprite2d(const HyNodePath &nodePath, HyEntity2d *pParent /*= nullptr*/) :
 	IHySprite<IHyDrawable2d, HyEntity2d>(nodePath, pParent)
 {
 }

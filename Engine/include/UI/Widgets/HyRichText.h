@@ -29,8 +29,8 @@ protected:
 	std::vector<IHyDrawable2d *>	m_DrawableList;
 
 public:
-	HyRichText(HyEntity2d *pParent = nullptr);
-	HyRichText(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment, HyEntity2d *pParent = nullptr);
+	HyRichText(const HyPanelInit &panelInit = HyPanelInit(), HyEntity2d *pParent = nullptr);
+	HyRichText(const HyPanelInit &panelInit, const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment, HyEntity2d *pParent = nullptr);
 	virtual ~HyRichText();
 
 	bool IsGlyphAvailable(std::string sUtf8Character);
