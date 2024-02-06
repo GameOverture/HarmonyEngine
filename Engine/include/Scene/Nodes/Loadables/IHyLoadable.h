@@ -42,8 +42,8 @@ public:
 	IHyLoadable &operator=(IHyLoadable &&donor);
 
 	const HyNodePath &GetPath() const;
-	const std::string &GetName() const;
-	const std::string &GetPrefix() const;
+	std::string GetName() const;
+	std::string GetPrefix() const;
 
 	uint32 GetState() const;
 	virtual bool SetState(uint32 uiStateIndex);

@@ -68,17 +68,72 @@ HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, Hy
 { }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-HyPanel::HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent) :
+HyPanel::HyPanel(HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_pPrimParts(nullptr),
 	m_pNodeItem(nullptr)
 {
-	Setup(initRef);
 }
 
 /*virtual*/ HyPanel::~HyPanel()
 {
 	ParentDetach(); // This avoids a crash when SetEntityLoaded() propagates to parents and invokes this->IsValid() after being deleted
+}
+
+void HyPanel::Setup(const HyPanelInit &initRef)
+{
+	switch(initRef.m_eNodeType)
+	{
+	case HYTYPE_Unknown: // 'BoundingVolume' panel
+		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
+		delete m_pPrimParts;
+		m_pPrimParts = nullptr;
+		delete m_pNodeItem;
+		m_pNodeItem = nullptr;
+		break;
+
+	case HYTYPE_Sprite: // 'NodeItem' panel
+		HySetVec(m_vSize, 0, 0);
+		delete m_pPrimParts;
+		m_pPrimParts = nullptr;
+		m_pNodeItem = HY_NEW HySprite2d(initRef.m_NodePath, this);
+		break;
+	case HYTYPE_Spine: // 'NodeItem' panel
+		HySetVec(m_vSize, 0, 0);
+		delete m_pPrimParts;
+		m_pPrimParts = nullptr;
+		m_pNodeItem = HY_NEW HySpine2d(initRef.m_NodePath, this);
+		break;
+	case HYTYPE_TexturedQuad: // 'NodeItem' panel
+		HySetVec(m_vSize, 0, 0);
+		delete m_pPrimParts;
+		m_pPrimParts = nullptr;
+		m_pNodeItem = HY_NEW HyTexturedQuad2d(initRef.m_NodePath, this);
+		break;
+
+	case HYTYPE_Entity: // 'Primitive' panel
+		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
+		m_pPrimParts = HY_NEW PrimParts(initRef, this);
+		delete m_pNodeItem;
+		m_pNodeItem = nullptr;
+
+		ConstructPrimitives();
+
+		if(m_pPrimParts->m_PanelColor.GetAlpha() == 0)
+			m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_bIsContainer ? HyColor::ContainerPanel : HyColor::WidgetPanel);
+		else
+			m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_PanelColor);
+
+		if(m_pPrimParts->m_FrameColor.GetAlpha() == 0)
+			m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_bIsContainer ? HyColor::ContainerFrame : HyColor::WidgetFrame);
+		else
+			m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_FrameColor);
+		break;
+
+	default:
+		HyLogError("HyPanel::Setup() - Invalid HyType for HyBody: " << initRef.m_eNodeType);
+		break;
+	}
 }
 
 /*virtual*/ bool HyPanel::SetState(uint32 uiStateIndex) /*override*/
@@ -150,6 +205,14 @@ HyPanel::HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent) :
 	return m_vSize.y * fPercent;
 }
 
+float HyPanel::GetSizeDimension(int32 iDimensionIndex, float fPercent /*= 1.0f*/)
+{
+	if(iDimensionIndex == HYORIEN_Horizontal)
+		return GetWidth(fPercent);
+
+	return GetHeight(fPercent);
+}
+
 glm::ivec2 HyPanel::GetSizeHint() const
 {
 	if(IsNode())
@@ -173,60 +236,10 @@ void HyPanel::SetSize(uint32 uiWidth, uint32 uiHeight)
 		ConstructPrimitives();
 }
 
-void HyPanel::Setup(const HyPanelInit &initRef)
+void HyPanel::SetSizeDimension(int32 iDimensionIndex, uint32 uiSize)
 {
-	switch(initRef.m_eNodeType)
-	{
-	case HYTYPE_Unknown: // 'BoundingVolume' panel
-		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
-		delete m_pPrimParts;
-		m_pPrimParts = nullptr;
-		delete m_pNodeItem;
-		m_pNodeItem = nullptr;
-		break;
-
-	case HYTYPE_Sprite: // 'NodeItem' panel
-		HySetVec(m_vSize, 0, 0);
-		delete m_pPrimParts;
-		m_pPrimParts = nullptr;
-		m_pNodeItem = HY_NEW HySprite2d(initRef.m_NodePath, this);
-		break;
-	case HYTYPE_Spine: // 'NodeItem' panel
-		HySetVec(m_vSize, 0, 0);
-		delete m_pPrimParts;
-		m_pPrimParts = nullptr;
-		m_pNodeItem = HY_NEW HySpine2d(initRef.m_NodePath, this);
-		break;
-	case HYTYPE_TexturedQuad: // 'NodeItem' panel
-		HySetVec(m_vSize, 0, 0);
-		delete m_pPrimParts;
-		m_pPrimParts = nullptr;
-		m_pNodeItem = HY_NEW HyTexturedQuad2d(initRef.m_NodePath, this);
-		break;
-
-	case HYTYPE_Entity: // 'Primitive' panel
-		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
-		m_pPrimParts = HY_NEW PrimParts(initRef, this);
-		delete m_pNodeItem;
-		m_pNodeItem = nullptr;
-
-		ConstructPrimitives();
-
-		if(m_pPrimParts->m_PanelColor.GetAlpha() == 0)
-			m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_bIsContainer ? HyColor::ContainerPanel : HyColor::WidgetPanel);
-		else
-			m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_PanelColor);
-
-		if(m_pPrimParts->m_FrameColor.GetAlpha() == 0)
-			m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_bIsContainer ? HyColor::ContainerFrame : HyColor::WidgetFrame);
-		else
-			m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_FrameColor);
-		break;
-
-	default:
-		HyLogError("HyPanel::Setup() - Invalid HyType for HyBody: " << initRef.m_eNodeType);
-		break;
-	}
+	m_vSize[iDimensionIndex] = uiSize;
+	SetSize(m_vSize.x, m_vSize.y);
 }
 
 bool HyPanel::IsValid()

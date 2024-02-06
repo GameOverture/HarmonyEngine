@@ -36,6 +36,7 @@ protected:
 
 	int64									m_iValue;
 
+	// TODO: Move 'BarPrimitives' to HyPanel, and have HyPanel construct itself based on a UI widget type
 	struct BarPrimitives : public HyEntity2d
 	{
 		HyPrimitive2d						m_EndCapNeg;

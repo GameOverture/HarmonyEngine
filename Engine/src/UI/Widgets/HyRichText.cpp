@@ -16,8 +16,8 @@
 
 #include <regex>
 
-HyRichText::HyRichText(const HyPanelInit &panelInit /*= HyPanelInit()*/, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(panelInit, pParent),
+HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
+	IHyWidget(pParent),
 	m_uiColumnWidth(0),
 	m_eAlignment(HYALIGN_Left),
 	m_fTotalHeight(0.0f),
@@ -26,15 +26,26 @@ HyRichText::HyRichText(const HyPanelInit &panelInit /*= HyPanelInit()*/, HyEntit
 {
 }
 
-HyRichText::HyRichText(const HyPanelInit &panelInit, const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(panelInit, pParent),
+HyRichText::HyRichText(const HyNodePath &textNodePath, uint32 uiColumnWidth, HyAlignment eAlignment, HyEntity2d *pParent /*= nullptr*/) :
+	IHyWidget(pParent),
 	m_uiColumnWidth(0),
 	m_eAlignment(eAlignment),
 	m_fTotalHeight(0.0f),
 	m_fUsedWidth(0.0f),
 	m_fColumnLineHeightOffset(0.0f)
 {
-	Setup(sTextPrefix, sTextName, uiColumnWidth, m_eAlignment);
+	Setup(HyPanelInit(), textNodePath, uiColumnWidth, m_eAlignment);
+}
+
+HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodePath, uint32 uiColumnWidth, HyAlignment eAlignment, HyEntity2d *pParent /*= nullptr*/) :
+	IHyWidget(pParent),
+	m_uiColumnWidth(0),
+	m_eAlignment(eAlignment),
+	m_fTotalHeight(0.0f),
+	m_fUsedWidth(0.0f),
+	m_fColumnLineHeightOffset(0.0f)
+{
+	Setup(panelInit, textNodePath, uiColumnWidth, m_eAlignment);
 }
 
 /*virtual*/ HyRichText::~HyRichText()
@@ -48,7 +59,7 @@ HyRichText::HyRichText(const HyPanelInit &panelInit, const std::string &sTextPre
 
 bool HyRichText::IsGlyphAvailable(std::string sUtf8Character)
 {
-	HyText2d *pNewText = HY_NEW HyText2d(m_sTextPrefix, m_sTextName, this);
+	HyText2d *pNewText = HY_NEW HyText2d(m_TextPath, this);
 	bool bIsAvailable = pNewText->IsGlyphAvailable(sUtf8Character);
 	delete pNewText;
 
@@ -70,12 +81,18 @@ float HyRichText::GetTextWidth(float fPercent /*= 1.0f*/)
 	return m_fUsedWidth * fPercent;
 }
 
-void HyRichText::Setup(const std::string &sTextPrefix, const std::string &sTextName, uint32 uiColumnWidth, HyAlignment eAlignment)
+void HyRichText::Setup(const HyNodePath &textNodePath, uint32 uiColumnWidth, HyAlignment eAlignment)
+{
+	Setup(HyPanelInit(), textNodePath, uiColumnWidth, eAlignment);
+}
+
+void HyRichText::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, uint32 uiColumnWidth, HyAlignment eAlignment)
 {
 	SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Fixed);
 
-	m_sTextPrefix = sTextPrefix;
-	m_sTextName = sTextName;
+	m_Panel.Setup(panelInit); // TODO: Properly implement and use m_Panel, error check and fit behind the text
+
+	m_TextPath = textNodePath;
 	m_uiColumnWidth = uiColumnWidth;
 	m_eAlignment = eAlignment;
 
@@ -85,11 +102,6 @@ void HyRichText::Setup(const std::string &sTextPrefix, const std::string &sTextN
 uint32 HyRichText::GetColumnWidth() const
 {
 	return m_uiColumnWidth;
-}
-
-void HyRichText::SetColumnWidth(uint32 uiColumnWidth)
-{
-	Setup(m_sTextPrefix, m_sTextName, uiColumnWidth, m_eAlignment);
 }
 
 // {1} = Any text inserted after this uses state '1'
@@ -173,7 +185,7 @@ void HyRichText::AssembleDrawables()
 	uint32 uiCurFmtIndex = 0;
 	while(std::getline(ssCleanText, sCurText, '\x7F'))
 	{
-		HyText2d *pNewText = HY_NEW HyText2d(m_sTextPrefix, m_sTextName, this);
+		HyText2d *pNewText = HY_NEW HyText2d(m_TextPath, this);
 		pNewText->Load();
 		m_DrawableList.push_back(pNewText);
 		pNewText->pos.Set(0.0f, ptCurPos.y);

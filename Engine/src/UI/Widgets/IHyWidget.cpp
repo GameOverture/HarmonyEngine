@@ -12,11 +12,11 @@
 #include "UI/Components/HyLayout.h"
 #include "HyEngine.h"
 
-IHyWidget::IHyWidget(const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
+IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
 	m_uiAttribs(0),
 	m_eHoverCursor(HYMOUSECURSOR_Default),
-	m_Panel(initRef, this)
+	m_Panel(this)
 {
 }
 

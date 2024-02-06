@@ -14,7 +14,7 @@
 HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(pParent),
 	m_Shape(this),
-	m_SubBtnPanel(HyPanelInit(), this),
+	m_SubBtnPanel(this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
 	m_fExpandedTimeout(0.0f),
@@ -25,7 +25,7 @@ HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, textNodePath, pParent),
 	m_Shape(this),
-	m_SubBtnPanel(HyPanelInit(), this),
+	m_SubBtnPanel(this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
 	m_fExpandedTimeout(0.0f),
@@ -37,7 +37,7 @@ HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
 	m_Shape(this),
-	m_SubBtnPanel(HyPanelInit(), this),
+	m_SubBtnPanel(this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
 	m_fExpandedTimeout(0.0f),

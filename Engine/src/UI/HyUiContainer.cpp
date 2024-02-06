@@ -25,7 +25,7 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 	m_iDefaultWidgetSpacing(HYUICONTAINER_DefaultWidgetSpacing),
 	m_bFlexSizeX(true),
 	m_bFlexSizeY(true),
-	m_Panel(initRef, this),
+	m_Panel(this),
 	m_RootLayout(eRootLayoutDirection, HYUICONTAINER_DefaultWidgetSpacing, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f),
@@ -34,6 +34,8 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 	m_VertBar(HYORIEN_Vertical, 20, this),
 	m_HorzBar(HYORIEN_Horizontal, 20, this)
 {
+	m_Panel.Setup(initRef);
+
 	m_bFlexSizeX = m_Panel.GetWidth() == 0.0f;
 	m_bFlexSizeY = m_Panel.GetHeight() == 0.0f;
 

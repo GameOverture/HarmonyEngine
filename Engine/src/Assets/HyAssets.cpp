@@ -44,7 +44,7 @@ void HyAssets::Factory<tData>::Init(HyJsonObj subDirObjRef, HyAssets &assetsRef)
 	{
 		HyNodePath nodePath(v.name.GetString());
 	
-		m_LookupIndexMap.insert(std::make_pair(nodePath.GetHash(), i));
+		m_LookupIndexMap.insert(std::make_pair(nodePath.GetHash1(), i));
 
 		HyJsonObj obj = v.value.GetObject();
 		m_DataList.emplace_back(nodePath, obj, assetsRef);
@@ -56,7 +56,7 @@ void HyAssets::Factory<tData>::Init(HyJsonObj subDirObjRef, HyAssets &assetsRef)
 template<typename tData>
 const tData *HyAssets::Factory<tData>::GetData(const HyNodePath &nodePath) const
 {
-	auto iter = m_LookupIndexMap.find(nodePath.GetHash());
+	auto iter = m_LookupIndexMap.find(nodePath.GetHash1());
 	if(iter == m_LookupIndexMap.end())
 	{
 		if(nodePath.GetName().empty() == false)
@@ -251,8 +251,8 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 		if(pLoadable->GetPath().IsAuxiliary())
 		{
 			// Convert Prefix and Name back into an auxiliary handle
-			std::pair<uint32, uint32> auxiliaryHandle = std::make_pair(static_cast<uint32>(std::stoll(pLoadable->GetPrefix())),
-																	   static_cast<uint32>(std::stoll(pLoadable->GetName())));
+			std::pair<uint32, uint32> auxiliaryHandle = std::make_pair(pLoadable->GetPath().GetHash1(),
+																	   pLoadable->GetPath().GetHash2());
 
 			// If FIRST is non-zero then it's holding a checksum, and SECOND is bankId
 			if(auxiliaryHandle.first != 0)

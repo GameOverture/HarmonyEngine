@@ -84,12 +84,12 @@ const HyNodePath &IHyLoadable::GetPath() const
 	return m_NodePath;
 }
 
-const std::string &IHyLoadable::GetName() const
+std::string IHyLoadable::GetName() const
 {
 	return m_NodePath.GetName();
 }
 
-const std::string &IHyLoadable::GetPrefix() const
+std::string IHyLoadable::GetPrefix() const
 {
 	return m_NodePath.GetPrefix();
 }

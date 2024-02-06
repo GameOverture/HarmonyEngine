@@ -53,7 +53,7 @@ void HySlider::BarPrimitives::Assemble(HyOrientation eOrientation, float fBarThi
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 HySlider::HySlider(HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(HyPanelInit(), pParent),
+	IHyWidget(pParent),
 	m_iMin(0),
 	m_iMax(100),
 	m_uiStep(5),
@@ -69,7 +69,7 @@ HySlider::HySlider(HyEntity2d *pParent /*= nullptr*/) :
 }
 
 HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(HyPanelInit(), pParent),
+	IHyWidget(pParent),
 	m_iMin(0),
 	m_iMax(100),
 	m_uiStep(5),
@@ -289,8 +289,11 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 
 /*virtual*/ glm::ivec2 HySlider::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
 {
-	m_Slider.size.GetAnimFloat(GetOrientation() ^ 1) = static_cast<float>(uiNewHeight);
-	m_fLength = uiNewWidth - (m_Slider.size.GetAnimFloat(GetOrientation()).Get());
+	// TODO: Check if vertical breaks this... this seems incorrect
+
+	m_Panel.SetSizeDimension(GetOrientation() ^ 1, uiNewHeight);
+
+	m_fLength = uiNewWidth - m_Panel.GetSizeDimension(GetOrientation());
 	OnSetSizeHint();
 
 	Assemble();
@@ -304,7 +307,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 
 float HySlider::GetBarThickness()
 {
-	return m_Slider.size.GetAnimFloat(GetOrientation() ^ 1).Get() * 0.25f;
+	return m_Panel.GetSizeDimension(GetOrientation() ^ 1, 0.25f);
 }
 
 float HySlider::GetBarRadius()
@@ -314,7 +317,7 @@ float HySlider::GetBarRadius()
 
 void HySlider::Assemble()
 {
-	if(m_Slider.IsValid() == false)
+	if(m_Panel.IsValid() == false)
 		return;
 
 	HyOrientation eOrientation = GetOrientation();
@@ -326,7 +329,7 @@ void HySlider::Assemble()
 
 	// Build the slider bar out out of primitives
 	float fBarThickness = GetBarThickness();
-	m_Slider.pos.GetAnimFloat(eOrientation ^ 1) = m_Slider.size.GetAnimFloat(eOrientation ^ 1).Get() * -0.5f;
+	m_Panel.pos.GetAnimFloat(eOrientation ^ 1) = m_Panel.GetSizeDimension(eOrientation ^ 1, -0.5f);
 	
 	m_BarStroke.Assemble(eOrientation, fBarThickness, m_fLength, 0.0f);
 	m_BarFill.Assemble(eOrientation, fBarThickness, m_fLength, m_fStrokeAmt);
@@ -364,9 +367,9 @@ void HySlider::FixValues()
 		m_iValue = HyMath::Clamp(m_iValue, m_iMin, m_iMax);
 
 	float fLocalSliderPos = m_fLength * (static_cast<float>(m_iValue - m_iMin) / static_cast<float>(m_iMax - m_iMin));
-	m_Slider.pos.GetAnimFloat(eOrientation) = fLocalSliderPos - (m_Slider.size.GetAnimFloat(eOrientation).Get() * 0.5f);
+	m_Panel.pos.GetAnimFloat(eOrientation) = fLocalSliderPos - m_Panel.GetSizeDimension(eOrientation, 0.5f);
 
-	auto ptCenter = m_Slider.GetSceneAABB().GetCenter();
+	auto ptCenter = m_Panel.GetSceneAABB().GetCenter();
 	HySetVec(m_ptSliderCenter, ptCenter.x, ptCenter.y);
 
 	m_BarStroke.m_BarPos.scale.GetAnimFloat(eOrientation) = fLocalSliderPos;

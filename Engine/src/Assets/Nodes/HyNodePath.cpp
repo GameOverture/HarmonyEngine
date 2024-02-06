@@ -13,41 +13,46 @@
 #include "Utilities/Crc32.h"
 #include "Utilities/HyIO.h"
 
-#define HYNODEPATH_INVALID_HASH 0xFFFFFFFF
-#define HYNODEPATH_AUX_HASH 0
+#define HYNODEPATH_PROJECT_HASH2 0xFFFFFFFF
 
 HyNodePath::HyNodePath() :
-	m_uiHash(HYNODEPATH_INVALID_HASH)
+	m_uiHash1(0),
+	m_uiHash2(0)
 {
 }
 
 HyNodePath::HyNodePath(const std::string &sPath) :
-	m_uiHash(HYNODEPATH_INVALID_HASH) // This should become valid in Set()
+	m_uiHash1(0),
+	m_uiHash2(0)
 {
 	Set(sPath);
 }
 
 HyNodePath::HyNodePath(const std::string &sPrefix, const std::string &sName) :
-	m_uiHash(HYNODEPATH_INVALID_HASH) // This should become valid in Set()
+	m_uiHash1(0),
+	m_uiHash2(0)
 {
 	Set(sPrefix, sName);
 }
 
-HyNodePath::HyNodePath(uint32 uiAuxFirst, uint32 uiAuxSecond) :
-	m_uiHash(HYNODEPATH_INVALID_HASH)
+HyNodePath::HyNodePath(uint32 uiChecksum, uint32 uiBankId) :
+	m_uiHash1(0),
+	m_uiHash2(0)
 {
-	Set(uiAuxFirst, uiAuxSecond);
+	Set(uiChecksum, uiBankId);
 }
 
 HyNodePath::HyNodePath(const HyNodePath &copyRef) :
 	m_sPath(copyRef.m_sPath),
-	m_uiHash(copyRef.m_uiHash)
+	m_uiHash1(copyRef.m_uiHash1),
+	m_uiHash2(copyRef.m_uiHash2)
 {
 }
 
 HyNodePath::HyNodePath(HyNodePath &&donor) :
 	m_sPath(std::move(donor.m_sPath)),
-	m_uiHash(donor.m_uiHash)
+	m_uiHash1(donor.m_uiHash1),
+	m_uiHash2(donor.m_uiHash2)
 {
 }
 
@@ -58,13 +63,14 @@ HyNodePath::~HyNodePath()
 HyNodePath &HyNodePath::operator=(const HyNodePath &rhs)
 {
 	m_sPath = rhs.m_sPath;
-	m_uiHash = rhs.m_uiHash;
+	m_uiHash1 = rhs.m_uiHash1;
+	m_uiHash2 = rhs.m_uiHash2;
 	return *this;
 }
 
 bool HyNodePath::operator==(const HyNodePath &rhs) const
 {
-	return m_uiHash == rhs.m_uiHash;
+	return m_uiHash1 == rhs.m_uiHash1 && m_uiHash2 == rhs.m_uiHash2;
 }
 
 bool HyNodePath::operator!=(const HyNodePath &rhs) const
@@ -72,9 +78,14 @@ bool HyNodePath::operator!=(const HyNodePath &rhs) const
 	return !(*this == rhs);
 }
 
-uint32 HyNodePath::GetHash() const
+uint32 HyNodePath::GetHash1() const
 {
-	return m_uiHash;
+	return m_uiHash1;
+}
+
+uint32 HyNodePath::GetHash2() const
+{
+	return m_uiHash2;
 }
 
 std::string HyNodePath::GetPath() const
@@ -104,14 +115,15 @@ bool HyNodePath::Set(const std::string &sPath)
 
 	if(m_sPath.empty())
 	{
-		m_uiHash = HYNODEPATH_INVALID_HASH;
+		m_uiHash1 = m_uiHash2 = 0;
 		return false;
 	}
 	else
 	{
 		std::string sHash = m_sPath; // Preserve case in 'm_sPath', but hash is case-insensitive
 		HyIO::MakeLowercase(sHash);
-		m_uiHash = crc32_fast(sHash.c_str(), sHash.size(), 0);
+		m_uiHash1 = crc32_fast(sHash.c_str(), sHash.size(), 0);
+		m_uiHash2 = HYNODEPATH_PROJECT_HASH2;
 	}
 
 	return true;
@@ -127,27 +139,21 @@ bool HyNodePath::Set(const std::string &sPrefix, const std::string &sName)
 	return Set(m_sPath);
 }
 
-bool HyNodePath::Set(uint32 uiAuxFirst, uint32 uiAuxSecond)
+bool HyNodePath::Set(uint32 uiChecksum, uint32 uiBankId)
 {
-	if(uiAuxFirst == 0 && uiAuxSecond == 0)
-	{
-		m_sPath.clear();
-		m_uiHash = HYNODEPATH_INVALID_HASH;
-		return false;
-	}
+	m_sPath.clear();
+	m_uiHash1 = uiChecksum;
+	m_uiHash2 = uiBankId;
 
-	m_sPath = std::to_string(uiAuxFirst) + "/" + std::to_string(uiAuxSecond);
-	m_uiHash = HYNODEPATH_AUX_HASH;
-	
-	return true;
+	return m_uiHash1 != 0;
 }
 
 bool HyNodePath::IsValid() const
 {
-	return m_uiHash != HYNODEPATH_INVALID_HASH;
+	return m_uiHash1 != 0 || m_uiHash2 != 0;
 }
 
 bool HyNodePath::IsAuxiliary() const
 {
-	return m_uiHash == HYNODEPATH_AUX_HASH;
+	return IsValid() && m_uiHash2 != HYNODEPATH_PROJECT_HASH2;
 }

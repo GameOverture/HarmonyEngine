@@ -12,24 +12,24 @@
 #include "Diagnostics/Console/IHyConsole.h"
 
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(HyPanelInit(), pParent)
+	IHyWidget(pParent)
 {
 }
 
 HyLabel::HyLabel(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(HyPanelInit(), pParent)
+	IHyWidget(pParent)
 {
 	Setup(panelInit, HyNodePath(), 0, 0, 0, 0);
 }
 
 HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(HyPanelInit(), pParent)
+	IHyWidget(pParent)
 {
 	Setup(panelInit, textNodePath, 0, 0, 0, 0);
 }
 
 HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(HyPanelInit(), pParent)
+	IHyWidget(pParent)
 {
 	Setup(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }

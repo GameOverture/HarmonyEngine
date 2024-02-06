@@ -42,7 +42,7 @@ protected:
 	HyPanel						m_Panel;			// A rectangular width/height that is typically a visible graphic background (or main part) of the widget
 
 public:
-	IHyWidget(const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
+	IHyWidget(HyEntity2d *pParent = nullptr);
 	virtual ~IHyWidget();
 
 	bool IsInputAllowed() const;					// Checks itself and the container it's inserted in if input is allowed

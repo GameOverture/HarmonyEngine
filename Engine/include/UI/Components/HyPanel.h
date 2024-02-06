@@ -76,18 +76,21 @@ class HyPanel : public HyEntity2d
 	IHyBody2d *					m_pNodeItem;	// Only dynamically allocated when 'NodeItem' panel type. Otherwise nullptr
 
 public:
-	HyPanel(const HyPanelInit &initRef, HyEntity2d *pParent); // TODO: Remove initRef, since no UI Widget uses it in the ctor
+	HyPanel(HyEntity2d *pParent);
 	virtual ~HyPanel();
+
+	void Setup(const HyPanelInit &initRef);
 
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
+	float GetSizeDimension(int32 iDimensionIndex, float fPercent = 1.0f);
 
 	glm::ivec2 GetSizeHint() const;
 
 	void SetSize(uint32 uiWidth, uint32 uiHeight);
+	void SetSizeDimension(int32 iDimensionIndex, uint32 uiSize);	// This is for widgets who programmatically choose between vertical or horizontal sizing
 
-	void Setup(const HyPanelInit &initRef);
 	bool IsValid();
 
 	bool IsBoundingVolume() const;
