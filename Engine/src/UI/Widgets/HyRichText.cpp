@@ -104,6 +104,12 @@ uint32 HyRichText::GetColumnWidth() const
 	return m_uiColumnWidth;
 }
 
+void HyRichText::SetColumnWidth(uint32 uiColumnWidth)
+{
+	m_uiColumnWidth = uiColumnWidth;
+	AssembleDrawables();
+}
+
 // {1} = Any text inserted after this uses state '1'
 // {spritePrefix/spriteName,3} = Insert a sprite ('spritePrefix/spriteName') with state '3', scaled to fit within text line
 void HyRichText::SetRichText(const std::string &sRichTextFormat)

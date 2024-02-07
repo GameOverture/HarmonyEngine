@@ -22,9 +22,9 @@ class HyButton : public HyLabel
 protected:
 	enum ButtonAttributes
 	{
-		BTNATTRIB_IsKbDownState		= 1 << 17,		// Indicates this button is currently receiving keyboard input that is pressing (BTNATTRIB_IsDownState) the button
+		BTNATTRIB_IsKbDownState		= 1 << 18,		// Indicates this button is currently receiving keyboard input that is pressing (BTNATTRIB_IsDownState) the button
 
-		BTNATTRIB_FLAG_NEXT			= 1 << 18
+		BTNATTRIB_FLAG_NEXT			= 1 << 19
 	};
 	static_assert((int)BTNATTRIB_IsKbDownState == (int)LABELATTRIB_FLAG_NEXT, "HyButton is not matching with base classes attrib flags");
 
@@ -41,7 +41,7 @@ public:
 
 	virtual bool IsDown() const;
 
-	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr, std::string sAudioPrefix = "", std::string sAudioName = "");
+	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr, const HyNodePath &audioNodePath = HyNodePath());
 	void InvokeButtonClicked();
 
 protected:

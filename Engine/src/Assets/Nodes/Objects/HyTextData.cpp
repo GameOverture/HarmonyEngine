@@ -55,7 +55,7 @@ HyTextData::HyTextData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAsse
 	uint64 uiCropMask = 0;
 
 #ifdef HY_PLATFORM_GUI
-	if(sPath == HY_GUI_DATAOVERRIDE)
+	if(nodePath.GetPath() == HY_GUI_DATAOVERRIDE)
 		m_pAtlas = nullptr;
 	else
 		m_pAtlas = assetsRef.GetAtlas(itemDataObj["checksum"].GetUint(), itemDataObj["bankId"].GetUint(), rSubAtlasUVRect, uiCropMask);

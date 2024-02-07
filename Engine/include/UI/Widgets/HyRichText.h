@@ -43,6 +43,7 @@ public:
 	void Setup(const HyNodePath &textNodePath, uint32 uiColumnWidth, HyAlignment eAlignment);
 	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, uint32 uiColumnWidth, HyAlignment eAlignment);
 	uint32 GetColumnWidth() const;
+	void SetColumnWidth(uint32 uiColumnWidth);
 
 	// {1} = Any text inserted after this uses state '1'
 	// {spritePrefix/spriteName,3} = Insert a sprite ('spritePrefix/spriteName') with state '3', scaled to fit within text line

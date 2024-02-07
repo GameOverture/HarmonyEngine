@@ -51,15 +51,15 @@ HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	ClearSubButtons();
 }
 
-uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
+uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, const HyNodePath &audioNodePath /*= HyNodePath()*/)
 {
-	return InsertSubButton(panelInit, textNodePath, 0, 0, 0, 0, fpCallBack, pParam, sAudioPrefix, sAudioName);
+	return InsertSubButton(panelInit, textNodePath, 0, 0, 0, 0, fpCallBack, pParam, audioNodePath);
 }
 
-uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
+uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, const HyNodePath &audioNodePath /*= HyNodePath()*/)
 {
 	HyButton *pNewBtn = HY_NEW HyButton(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, this);
-	pNewBtn->SetButtonClickedCallback(fpCallBack, pParam, sAudioPrefix, sAudioName);
+	pNewBtn->SetButtonClickedCallback(fpCallBack, pParam, audioNodePath);
 	pNewBtn->SetAsEnabled(false);
 	pNewBtn->pos.Set(pNewBtn->GetPosOffset());
 	pNewBtn->alpha.Set(0.0f);

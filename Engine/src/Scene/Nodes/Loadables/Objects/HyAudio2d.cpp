@@ -12,7 +12,17 @@
 #include "Assets/HyAssets.h"
 #include "HyEngine.h"
 
-HyAudio2d::HyAudio2d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity2d *pParent /*= nullptr*/) :
+HyAudio2d::HyAudio2d(HyEntity2d *pParent /*= nullptr*/) :
+	IHyAudio<IHyLoadable2d, HyEntity2d>(HyNodePath(), pParent)
+{
+}
+
+HyAudio2d::HyAudio2d(const HyNodePath &nodePath, HyEntity2d *pParent /*= nullptr*/) :
+	IHyAudio<IHyLoadable2d, HyEntity2d>(nodePath, pParent)
+{
+}
+
+HyAudio2d::HyAudio2d(std::string sPrefix, std::string sName, HyEntity2d *pParent /*= nullptr*/) :
 	IHyAudio<IHyLoadable2d, HyEntity2d>(HyNodePath(sPrefix, sName), pParent)
 {
 }

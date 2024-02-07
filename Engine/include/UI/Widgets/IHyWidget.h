@@ -24,18 +24,20 @@ protected:
 		UIATTRIB_HideDisabled = 1 << 0,				// Don't visually indicate if disabled
 		UIATTRIB_IsDisabled = 1 << 1,				// When this widget is disabled
 
-		UIATTRIB_HideMouseHoverState = 1 << 2,		// Don't visually indicate mouse hover state (when available)
-		UIATTRIB_IsMouseHoverState = 1 << 3,		// When mouse cursor is over top this widget
-		UIATTRIB_HideDownState = 1 << 4,			// Don't visually indicate down state (when available)
-		UIATTRIB_IsMouseDownState = 1 << 5,			// When the mouse is holding left click on this widget
+		UIATTRIB_OverridePanelState = 1 << 2,		// When the panel state is manually set with SetPanelState(). This flag prevents a node panel's state from being automatically changed to use HyPanelState
+
+		UIATTRIB_HideMouseHoverState = 1 << 3,		// Don't visually indicate mouse hover state (when available)
+		UIATTRIB_IsMouseHoverState = 1 << 4,		// When mouse cursor is over top this widget
+		UIATTRIB_HideDownState = 1 << 5,			// Don't visually indicate down state (when available)
+		UIATTRIB_IsMouseDownState = 1 << 6,			// When the mouse is holding left click on this widget
 		
-		UIATTRIB_KeyboardFocusAllowed = 1 << 6,		// Allow this widget to be the target of keyboard input
-		UIATTRIB_IsKeyboardFocus = 1 << 7,			// When this widget will take keyboard input
+		UIATTRIB_KeyboardFocusAllowed = 1 << 7,		// Allow this widget to be the target of keyboard input
+		UIATTRIB_IsKeyboardFocus = 1 << 8,			// When this widget will take keyboard input
 
-		UIATTRIB_HideHighlightedState = 1 << 8,		// Don't visually indicate highlighted state (when available)
-		UIATTRIB_IsHighlighted = 1 << 9,			// Indicates keyboard focus, or as an optional cosmetic state
+		UIATTRIB_HideHighlightedState = 1 << 9,		// Don't visually indicate highlighted state (when available)
+		UIATTRIB_IsHighlighted = 1 << 10,			// Indicates keyboard focus, or as an optional cosmetic state
 
-		UIATTRIB_FLAG_NEXT = 1 << 10,
+		UIATTRIB_FLAG_NEXT = 1 << 11,
 	};
 	uint32						m_uiAttribs;
 	HyMouseCursor				m_eHoverCursor;		// When mouse hovers over *this, change to a specified cursor
@@ -44,6 +46,12 @@ protected:
 public:
 	IHyWidget(HyEntity2d *pParent = nullptr);
 	virtual ~IHyWidget();
+
+	bool IsPanelVisible() const;
+	void SetPanelVisible(bool bVisible);
+	HyPanelState GetPanelState() const;
+	uint32 GetOverridePanelState() const;
+	bool OverridePanelState(uint32 uiStateIndex);	// Overrides the panel state to a specific index. Will no longer automatically update the panel state based on HyPanelState
 
 	bool IsInputAllowed() const;					// Checks itself and the container it's inserted in if input is allowed
 
@@ -92,7 +100,6 @@ protected:
 	virtual void OnTakeKeyboardFocus() { }			// Widgets that are 'IsKeyboardFocusAllowed' should override this
 	virtual void OnRelinquishKeyboardFocus() { }	// Widgets that are 'IsKeyboardFocusAllowed' should override this
 
-	HyPanelState GetPanelState() const;
 	void ApplyPanelState(HyPanelState eOldState);
 	virtual void OnPanelUpdated() { }				// Invoked whenever m_Panel is modified
 };

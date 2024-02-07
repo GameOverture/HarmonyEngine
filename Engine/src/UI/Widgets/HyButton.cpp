@@ -51,11 +51,11 @@ HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath,
 	return IHyWidget::IsDown() || (m_uiAttribs & BTNATTRIB_IsKbDownState) != 0;
 }
 
-void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, std::string sAudioPrefix /*= ""*/, std::string sAudioName /*= ""*/)
+void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, const HyNodePath &audioNodePath /*= HyNodePath()*/)
 {
 	m_fpBtnClickedCallback = fpCallBack;
 	m_pBtnClickedParam = pParam;
-	m_ClickedSound.Init(sAudioPrefix, sAudioName, this);
+	m_ClickedSound.Init(audioNodePath, this);
 }
 
 void HyButton::InvokeButtonClicked()

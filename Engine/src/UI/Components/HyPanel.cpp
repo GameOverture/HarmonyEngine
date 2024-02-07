@@ -136,8 +136,18 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 	}
 }
 
+bool HyPanel::SetNodeState(uint32 uiStateIndex)
+{
+	if(IsNode())
+		return SetState(uiStateIndex);
+	
+	return false;
+}
+
 /*virtual*/ bool HyPanel::SetState(uint32 uiStateIndex) /*override*/
 {
+	m_uiState = uiStateIndex;
+
 	if(IsNode())
 	{
 		if(uiStateIndex < m_pNodeItem->GetNumStates())

@@ -18,9 +18,9 @@ class HyCheckBox : public HyButton
 protected:
 	enum CheckBoxAttributes
 	{
-		CHECKBOXATTRIB_IsChecked = 1 << 18,
+		CHECKBOXATTRIB_IsChecked = 1 << 19,
 
-		CHECKBOXATTRIB_FLAG_NEXT = 1 << 19
+		CHECKBOXATTRIB_FLAG_NEXT = 1 << 20
 	};
 	static_assert((int)CHECKBOXATTRIB_IsChecked == (int)BTNATTRIB_FLAG_NEXT, "HyCheckBox is not matching with base classes attrib flags");
 

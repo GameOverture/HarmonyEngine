@@ -153,28 +153,6 @@ void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /
 	ResetTextAndPanel();
 }
 
-//uint32 HyLabel::GetSpriteState() const
-//{
-//	return m_Panel.GetSpriteState();
-//}
-//
-//void HyLabel::SetPanelVisible(bool bVisible)
-//{
-//	m_Panel.SetVisible(bVisible);
-//}
-//
-///*virtual*/ void HyLabel::SetSpriteState(uint32 uiStateIndex)
-//{
-//	m_Panel.SetSpriteState(uiStateIndex);
-//	ResetTextAndPanel();
-//}
-//
-//void HyLabel::SetSpriteAnimCtrl(HyAnimCtrl eAnimCtrl)
-//{
-//	m_Panel.GetSprite().SetAnimCtrl(eAnimCtrl);
-//	ResetTextAndPanel();
-//}
-
 bool HyLabel::IsTextVisible() const
 {
 	return m_Text.IsVisible();

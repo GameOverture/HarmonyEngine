@@ -43,6 +43,8 @@ struct HyPanelInit
 	HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0,0,0,0), HyColor frameColor = HyColor(0,0,0,0), HyColor tertiaryColor = HyColor(0,0,0,0));
 };
 
+// Internal class component of UI widgets. Is a visual representation of single panel.
+// Not exposed because IHyWidget's handles modifications. IHyWidget's may have multiple HyPanel's, but they all have one main one 'm_Panel'
 class HyPanel : public HyEntity2d
 {
 	glm::ivec2					m_vSize;		// Holds the specified size this panel should be
@@ -81,6 +83,7 @@ public:
 
 	void Setup(const HyPanelInit &initRef);
 
+	bool SetNodeState(uint32 uiStateIndex);		// If this is a 'NodeItem' panel, this will set the state of the node. Returns false otherwise
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;

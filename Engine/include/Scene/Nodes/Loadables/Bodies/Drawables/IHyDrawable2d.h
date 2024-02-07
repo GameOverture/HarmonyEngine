@@ -42,16 +42,7 @@ protected:
 #ifdef HY_PLATFORM_GUI
 public:
 	template<typename HYDATATYPE>
-	void GuiOverrideData(HyJsonObj itemDataObj, bool bUseGuiOverrideName = true)
-	{
-		// TODO: THREAD SAFETY FIX! Ensure HarmonyWidget::paintGL() doesn't invoke m_pHyEngine->Update() while we delete/reallocate 'm_pData'
-		delete m_pData;
-		m_pData = HY_NEW HYDATATYPE(bUseGuiOverrideName ? HY_GUI_DATAOVERRIDE : "", itemDataObj, *IHyLoadable::sm_pHyAssets);
-		OnDataAcquired();
-
-		if(m_hShader == HY_UNUSED_HANDLE)
-			m_hShader = HyEngine::DefaultShaderHandle(GetType());
-	}
+	void GuiOverrideData(HyJsonObj itemDataObj, bool bUseGuiOverrideName = true);
 #endif
 
 private:

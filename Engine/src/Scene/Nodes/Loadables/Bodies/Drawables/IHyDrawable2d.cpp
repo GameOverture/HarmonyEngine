@@ -10,6 +10,9 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include "HyEngine.h"
+#include "Assets/Nodes/Objects/HySpineData.h"
+#include "Assets/Nodes/Objects/HySpriteData.h"
+#include "Assets/Nodes/Objects/HyTextData.h"
 
 IHyDrawable2d::IHyDrawable2d(HyType eInstType, const HyNodePath &nodePath, HyEntity2d *pParent) :
 	IHyBody2d(eInstType, nodePath, pParent)
@@ -98,6 +101,25 @@ IHyDrawable2d &IHyDrawable2d::operator=(IHyDrawable2d &&donor) noexcept
 {
 	sm_pScene->RemoveNode_Loaded(this);
 }
+
+#ifdef HY_PLATFORM_GUI
+template<typename HYDATATYPE>
+void IHyDrawable2d::GuiOverrideData(HyJsonObj itemDataObj, bool bUseGuiOverrideName /*= true*/)
+{
+	// TODO: THREAD SAFETY FIX! Ensure HarmonyWidget::paintGL() doesn't invoke m_pHyEngine->Update() while we delete/reallocate 'm_pData'
+	delete m_pData;
+	m_pData = HY_NEW HYDATATYPE(HyNodePath(bUseGuiOverrideName ? HY_GUI_DATAOVERRIDE : ""), itemDataObj, *IHyLoadable::sm_pHyAssets);
+	OnDataAcquired();
+
+	if(m_hShader == HY_UNUSED_HANDLE)
+		m_hShader = HyEngine::DefaultShaderHandle(GetType());
+}
+
+// Explicit instantiations
+template void IHyDrawable2d::GuiOverrideData<HySpriteData>(HyJsonObj, bool);
+template void IHyDrawable2d::GuiOverrideData<HySpineData>(HyJsonObj, bool);
+template void IHyDrawable2d::GuiOverrideData<HyTextData>(HyJsonObj, bool);
+#endif
 
 /*virtual*/ IHyNode &IHyDrawable2d::_DrawableGetNodeRef() /*override final*/
 {

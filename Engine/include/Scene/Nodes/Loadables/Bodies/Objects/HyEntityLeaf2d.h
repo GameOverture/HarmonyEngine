@@ -24,7 +24,13 @@ protected:
 public:
 	HyEntityLeaf2d(HyEntity2d *pParent = nullptr) :
 		HyEntity2d(pParent),
-		m_Leaf("", "", this)
+		m_Leaf(HyNodePath(), this)
+	{
+	}
+
+	HyEntityLeaf2d(const HyNodePath &leafNodePath, HyEntity2d *pParent = nullptr) :
+		HyEntity2d(pParent),
+		m_Leaf(leafNodePath, this)
 	{
 	}
 
