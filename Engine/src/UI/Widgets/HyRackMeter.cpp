@@ -226,7 +226,7 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 /*virtual*/ void HyRackMeter::OnSetup() /*override*/
 {
 	SetTextMonospacedDigits(true);
-	m_SpinText.Setup(m_Text.GetPrefix(), m_Text.GetName());
+	m_SpinText.Setup(m_Text.GetPath());
 	FormatDigits();
 }
 

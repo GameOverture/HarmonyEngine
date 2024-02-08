@@ -67,9 +67,9 @@ void IHyLoadable3d::Init(const HyNodePath &nodePath, HyEntity3d *pParent)
 	}
 }
 
-void IHyLoadable3d::Init(std::string sPrefix, std::string sName, HyEntity3d *pParent)
+void IHyLoadable3d::Init(const char *szPrefix, const char *szName, HyEntity3d *pParent)
 {
-	Init(HyNodePath(sPrefix, sName), pParent);
+	Init(HyNodePath(szPrefix, szName), pParent);
 }
 
 /*virtual*/ void IHyLoadable3d::Update() /*override*/

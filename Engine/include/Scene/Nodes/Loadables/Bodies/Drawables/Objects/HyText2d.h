@@ -24,7 +24,7 @@ class HyText2d : public IHyText<IHyDrawable2d, HyEntity2d>
 public:
 	HyText2d(HyEntity2d *pParent = nullptr);
 	HyText2d(const HyNodePath &nodePath, HyEntity2d *pParent = nullptr);
-	HyText2d(std::string sPrefix, std::string sName, HyEntity2d *pParent = nullptr);
+	HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	HyText2d(const HyText2d &copyRef);
 	virtual ~HyText2d(void);
 

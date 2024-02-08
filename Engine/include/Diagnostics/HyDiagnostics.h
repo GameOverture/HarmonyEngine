@@ -62,7 +62,8 @@ public:
 	HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef);
 	~HyDiagnostics();
 
-	void Init(std::string sTextPrefix, std::string sTextName, uint32 uiTextState);
+	void Init(const HyNodePath &textNodePath, uint32 uiTextState);
+	void Init(const char *szTextPrefix, const char *szTextName, uint32 uiTextState);
 	void Show(uint32 uiDiagFlags);
 	uint32 GetShowFlags();
 

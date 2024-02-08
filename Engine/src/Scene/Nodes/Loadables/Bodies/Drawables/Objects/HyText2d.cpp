@@ -21,8 +21,8 @@ HyText2d::HyText2d(const HyNodePath &nodePath, HyEntity2d *pParent /*= nullptr*/
 {
 }
 
-HyText2d::HyText2d(std::string sPrefix, std::string sName, HyEntity2d *pParent /*= nullptr*/) :
-	IHyText<IHyDrawable2d, HyEntity2d>(HyNodePath(sPrefix, sName), pParent)
+HyText2d::HyText2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :
+	IHyText<IHyDrawable2d, HyEntity2d>(HyNodePath(szPrefix, szName), pParent)
 {
 }
 

@@ -29,7 +29,7 @@ public:
 	IHyLoadable3d &operator=(IHyLoadable3d &&donor);
 
 	void Init(const HyNodePath &nodePath, HyEntity3d *pParent);
-	void Init(std::string sPrefix, std::string sName, HyEntity3d *pParent);
+	void Init(const char *szPrefix, const char *szName, HyEntity3d *pParent);
 
 protected:
 	virtual void Update() override;

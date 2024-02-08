@@ -118,7 +118,8 @@ uint32 IHyLoadable::GetState() const
 
 /*virtual*/ bool IHyLoadable::SetState(uint32 uiStateIndex)
 {
-	if(AcquireData() == nullptr || uiStateIndex >= UncheckedGetData()->GetNumStates())
+	if(_LoadableGetType() != HYTYPE_Entity &&
+	   (AcquireData() == nullptr || uiStateIndex >= UncheckedGetData()->GetNumStates()))
 	{
 		if(UncheckedGetData() == nullptr)
 			HyLogWarning(m_NodePath.GetPath() << " wants to set state index of '" << uiStateIndex << "' when data is null");

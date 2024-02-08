@@ -52,11 +52,6 @@ void HyProfiler::InitText(const HyNodePath &nodePath, uint32 uiTextState)
 	m_txtMouseBtns.SetTextState(uiTextState);
 }
 
-void HyProfiler::InitText(std::string sPrefix, std::string sName, uint32 uiTextState)
-{
-	InitText(HyNodePath(sPrefix, sName), uiTextState);
-}
-
 void HyProfiler::SetShowFlags(uint32 uiDiagFlags)
 {
 	m_uiShowFlags = uiDiagFlags;

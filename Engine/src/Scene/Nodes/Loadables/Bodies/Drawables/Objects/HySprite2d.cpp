@@ -24,8 +24,8 @@ HySprite2d::HySprite2d(const HyNodePath &nodePath, HyEntity2d *pParent /*= nullp
 {
 }
 
-HySprite2d::HySprite2d(std::string sPrefix, std::string sName, HyEntity2d *pParent /*= nullptr*/) :
-	IHySprite<IHyDrawable2d, HyEntity2d>(HyNodePath(sPrefix, sName), pParent)
+HySprite2d::HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :
+	IHySprite<IHyDrawable2d, HyEntity2d>(HyNodePath(szPrefix, szName), pParent)
 {
 }
 

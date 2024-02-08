@@ -21,18 +21,18 @@ HyNodePath::HyNodePath() :
 {
 }
 
-HyNodePath::HyNodePath(const std::string &sPath) :
+HyNodePath::HyNodePath(const char *szPath) :
 	m_uiHash1(0),
 	m_uiHash2(0)
 {
-	Set(sPath);
+	Set(szPath);
 }
 
-HyNodePath::HyNodePath(const std::string &sPrefix, const std::string &sName) :
+HyNodePath::HyNodePath(const char *szPrefix, const char *szName) :
 	m_uiHash1(0),
 	m_uiHash2(0)
 {
-	Set(sPrefix, sName);
+	Set(szPrefix, szName);
 }
 
 HyNodePath::HyNodePath(uint32 uiChecksum, uint32 uiBankId) :
@@ -109,9 +109,9 @@ std::string HyNodePath::GetPrefix() const
 		return m_sPath.substr(0, m_sPath.find_last_of('/'));
 }
 
-bool HyNodePath::Set(const std::string &sPath)
+bool HyNodePath::Set(const char *szPath)
 {
-	m_sPath = HyIO::CleanPath(sPath);
+	m_sPath = HyIO::CleanPath(szPath ? szPath : "");
 
 	if(m_sPath.empty())
 	{
@@ -129,14 +129,16 @@ bool HyNodePath::Set(const std::string &sPath)
 	return true;
 }
 
-bool HyNodePath::Set(const std::string &sPrefix, const std::string &sName)
+bool HyNodePath::Set(const char *szPrefix, const char *szName)
 {
+	std::string sPrefix(szPrefix ? szPrefix : "");
 	if(sPrefix.empty() == false)
 		m_sPath = sPrefix + "/";
 
+	std::string sName(szName ? szName : "");
 	m_sPath += sName;
 
-	return Set(m_sPath);
+	return Set(m_sPath.c_str());
 }
 
 bool HyNodePath::Set(uint32 uiChecksum, uint32 uiBankId)

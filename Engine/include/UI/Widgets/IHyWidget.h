@@ -24,7 +24,7 @@ protected:
 		UIATTRIB_HideDisabled = 1 << 0,				// Don't visually indicate if disabled
 		UIATTRIB_IsDisabled = 1 << 1,				// When this widget is disabled
 
-		UIATTRIB_OverridePanelState = 1 << 2,		// When the panel state is manually set with SetPanelState(). This flag prevents a node panel's state from being automatically changed to use HyPanelState
+		UIATTRIB_IsCustomPanelState = 1 << 2,		// When the panel state is manually set with SetPanelState(). This flag prevents a node panel's state from being automatically changed to use HyPanelState
 
 		UIATTRIB_HideMouseHoverState = 1 << 3,		// Don't visually indicate mouse hover state (when available)
 		UIATTRIB_IsMouseHoverState = 1 << 4,		// When mouse cursor is over top this widget
@@ -47,11 +47,17 @@ public:
 	IHyWidget(HyEntity2d *pParent = nullptr);
 	virtual ~IHyWidget();
 
+	virtual bool SetState(uint32 uiStateIndex) override; // If used, this overrides the panel state to a specific index. Will no longer automatically update the panel state based on HyPanelState
+	virtual uint32 GetNumStates() override;
+
+	bool IsCustomPanelState() const;
+	void ClearCustomPanelState();
+
 	bool IsPanelVisible() const;
 	void SetPanelVisible(bool bVisible);
 	HyPanelState GetPanelState() const;
-	uint32 GetOverridePanelState() const;
-	bool OverridePanelState(uint32 uiStateIndex);	// Overrides the panel state to a specific index. Will no longer automatically update the panel state based on HyPanelState
+	uint32 GetCustomPanelState() const;
+	bool SetCustomPanelState(uint32 uiStateIndex);	
 
 	bool IsInputAllowed() const;					// Checks itself and the container it's inserted in if input is allowed
 

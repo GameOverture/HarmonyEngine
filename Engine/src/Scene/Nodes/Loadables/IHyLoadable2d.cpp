@@ -69,9 +69,9 @@ void IHyLoadable2d::Init(const HyNodePath &nodePath, HyEntity2d *pParent)
 	}
 }
 
-void IHyLoadable2d::Init(std::string sPrefix, std::string sName, HyEntity2d *pParent)
+void IHyLoadable2d::Init(const char *szPrefix, const char *szName, HyEntity2d *pParent)
 {
-	Init(HyNodePath(sPrefix, sName), pParent);
+	Init(HyNodePath(szPrefix, szName), pParent);
 }
 
 void IHyLoadable2d::Uninit()

@@ -83,8 +83,10 @@ public:
 
 	void Setup(const HyPanelInit &initRef);
 
-	bool SetNodeState(uint32 uiStateIndex);		// If this is a 'NodeItem' panel, this will set the state of the node. Returns false otherwise
 	virtual bool SetState(uint32 uiStateIndex) override;
+	virtual uint32 GetNumStates() override;
+
+	//bool SetNodeState(uint32 uiStateIndex);		// If this is a 'NodeItem' panel, this will set the state of the node. Returns false otherwise
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
 	float GetSizeDimension(int32 iDimensionIndex, float fPercent = 1.0f);

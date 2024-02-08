@@ -10,8 +10,18 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrefab3d.h"
 
-HyPrefab3d::HyPrefab3d(std::string sPrefix /*= ""*/, std::string sName /*= ""*/, HyEntity3d *pParent /*= nullptr*/) :
-	IHyDrawable3d(HYTYPE_Prefab, HyNodePath(sPrefix, sName), pParent)
+HyPrefab3d::HyPrefab3d(HyEntity3d *pParent /*= nullptr*/) :
+	IHyDrawable3d(HYTYPE_Prefab, HyNodePath(), pParent)
+{
+}
+
+HyPrefab3d::HyPrefab3d(const HyNodePath &nodePath, HyEntity3d *pParent /*= nullptr*/) :
+	IHyDrawable3d(HYTYPE_Prefab, nodePath, pParent)
+{
+}
+
+HyPrefab3d::HyPrefab3d(const char *szPrefix, const char *szName, HyEntity3d *pParent /*= nullptr*/) :
+	IHyDrawable3d(HYTYPE_Prefab, HyNodePath(szPrefix, szName), pParent)
 {
 }
 

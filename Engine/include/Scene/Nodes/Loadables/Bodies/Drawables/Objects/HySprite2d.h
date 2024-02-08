@@ -25,7 +25,7 @@ class HySprite2d : public IHySprite<IHyDrawable2d, HyEntity2d>
 public:
 	HySprite2d(HyEntity2d *pParent = nullptr);
 	HySprite2d(const HyNodePath &nodePath, HyEntity2d *pParent = nullptr);
-	HySprite2d(std::string sPrefix, std::string sName, HyEntity2d *pParent = nullptr);
+	HySprite2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	HySprite2d(const HySprite2d &copyRef);
 	virtual ~HySprite2d(void);
 

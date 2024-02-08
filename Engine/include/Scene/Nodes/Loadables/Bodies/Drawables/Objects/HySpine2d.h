@@ -28,7 +28,7 @@ class HySpine2d : public IHyDrawable2d
 public:
 	HySpine2d(HyEntity2d *pParent = nullptr);
 	HySpine2d(const HyNodePath &nodePath, HyEntity2d *pParent = nullptr);
-	HySpine2d(std::string sPrefix, std::string sName, HyEntity2d *pParent = nullptr);
+	HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	HySpine2d(const HySpine2d &copyRef);
 	virtual ~HySpine2d(void);
 

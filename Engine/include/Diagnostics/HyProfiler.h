@@ -126,7 +126,6 @@ public:
 	virtual ~HyProfiler();
 
 	void InitText(const HyNodePath &nodePath, uint32 uiTextState);
-	void InitText(std::string sPrefix, std::string sName, uint32 uiTextState);
 
 	void SetShowFlags(uint32 uiDiagFlags);
 	uint32 GetShowFlags();

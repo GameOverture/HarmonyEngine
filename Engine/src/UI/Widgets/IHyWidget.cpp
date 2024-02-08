@@ -24,6 +24,35 @@ IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
+/*virtual*/ bool IHyWidget::SetState(uint32 uiStateIndex) /*override*/
+{
+	if(m_Panel.SetState(uiStateIndex) == false)
+		return false;
+	
+	IHyLoadable::SetState(uiStateIndex);
+	m_uiAttribs |= UIATTRIB_IsCustomPanelState;
+	
+	OnPanelUpdated();
+	return true;
+}
+
+/*virtual*/ uint32 IHyWidget::GetNumStates() /*override*/
+{
+	return m_Panel.GetNumStates();
+}
+
+bool IHyWidget::IsCustomPanelState() const
+{
+	return (m_uiAttribs & UIATTRIB_IsCustomPanelState) != 0;
+}
+
+void IHyWidget::ClearCustomPanelState()
+{
+	m_uiAttribs &= ~UIATTRIB_IsCustomPanelState;
+	if(m_Panel.SetState(HYPANELSTATE_Idle))
+		OnPanelUpdated();
+}
+
 bool IHyWidget::IsPanelVisible() const
 {
 	return m_Panel.IsVisible();
@@ -67,23 +96,6 @@ HyPanelState IHyWidget::GetPanelState() const
 		else
 			return HYPANELSTATE_Idle;
 	}
-}
-
-uint32 IHyWidget::GetOverridePanelState() const
-{
-	return m_Panel.GetState();
-}
-
-bool IHyWidget::OverridePanelState(uint32 uiStateIndex)
-{
-	if(m_Panel.SetNodeState(uiStateIndex))
-	{
-		m_uiAttribs |= UIATTRIB_OverridePanelState;
-		OnPanelUpdated();
-		return true;
-	}
-
-	return false;
 }
 
 bool IHyWidget::IsInputAllowed() const
@@ -350,7 +362,7 @@ void IHyWidget::RelinquishKeyboardFocus()
 
 void IHyWidget::ApplyPanelState(HyPanelState eOldState)
 {
-	if((m_uiAttribs & UIATTRIB_OverridePanelState) == 0)
+	if((m_uiAttribs & UIATTRIB_IsCustomPanelState) == 0)
 	{
 		HyPanelState eCurState = GetPanelState();
 		if(eOldState != eCurState)

@@ -38,8 +38,8 @@ HySpine2d::HySpine2d(const HyNodePath &nodePath, HyEntity2d *pParent /*= nullptr
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
-HySpine2d::HySpine2d(std::string sPrefix, std::string sName, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_Spine, HyNodePath(sPrefix, sName), pParent),
+HySpine2d::HySpine2d(const char *szPrefix, const char *szName, HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_Spine, HyNodePath(szPrefix, szName), pParent),
 #ifdef HY_USE_SPINE
 	m_pSkeleton(nullptr),
 	m_pAnimationState(nullptr),

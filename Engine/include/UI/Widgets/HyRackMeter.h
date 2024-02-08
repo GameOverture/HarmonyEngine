@@ -54,12 +54,12 @@ protected:
 		virtual ~SpinText()
 		{ }
 
-		void Setup(std::string sTextPrefix, std::string sTextName)
+		void Setup(const HyNodePath &textNodePath)
 		{
-			m_SpinText_Shown.Init(sTextPrefix, sTextName, this);
+			m_SpinText_Shown.Init(textNodePath, this);
 			m_SpinText_Shown.SetTextAlignment(HYALIGN_Center);
 
-			m_SpinText_Padded.Init(sTextPrefix, sTextName, this);
+			m_SpinText_Padded.Init(textNodePath, this);
 			m_SpinText_Padded.SetTextAlignment(HYALIGN_Center);
 		}
 	};

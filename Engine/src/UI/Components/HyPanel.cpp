@@ -136,14 +136,6 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 	}
 }
 
-bool HyPanel::SetNodeState(uint32 uiStateIndex)
-{
-	if(IsNode())
-		return SetState(uiStateIndex);
-	
-	return false;
-}
-
 /*virtual*/ bool HyPanel::SetState(uint32 uiStateIndex) /*override*/
 {
 	m_uiState = uiStateIndex;
@@ -198,6 +190,24 @@ bool HyPanel::SetNodeState(uint32 uiStateIndex)
 
 	return false;
 }
+
+/*virtual*/ uint32 HyPanel::GetNumStates() /*override*/
+{
+	if(IsNode())
+		return m_pNodeItem->GetNumStates();
+	else if(IsPrimitive())
+		return HYNUM_PANELSTATES;
+
+	return 0;
+}
+
+//bool HyPanel::SetNodeState(uint32 uiStateIndex)
+//{
+//	if(IsNode())
+//		return SetState(uiStateIndex);
+//
+//	return false;
+//}
 
 /*virtual*/ float HyPanel::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {

@@ -27,7 +27,7 @@ public:
 	IHyLoadable2d &operator=(IHyLoadable2d &&donor);
 
 	void Init(const HyNodePath &nodePath, HyEntity2d *pParent);
-	void Init(std::string sPrefix, std::string sName, HyEntity2d *pParent);
+	void Init(const char *szPrefix, const char *szName, HyEntity2d *pParent);
 	void Uninit();
 
 protected:

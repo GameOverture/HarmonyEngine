@@ -20,8 +20,8 @@ class HyNodePath
 
 public:
 	HyNodePath(); // Invalid Path
-	HyNodePath(const std::string &sPath); // Project Path
-	HyNodePath(const std::string &sPrefix, const std::string &sName); // Project Path
+	HyNodePath(const char *szPath); // Project Path
+	HyNodePath(const char *szPrefix, const char *szName); // Project Path
 	HyNodePath(uint32 uiChecksum, uint32 uiBankId); // Auxiliary Path
 	HyNodePath(const HyNodePath &copyRef);
 	HyNodePath(HyNodePath &&donor);
@@ -36,8 +36,8 @@ public:
 	std::string GetPath() const;
 	std::string GetName() const;
 	std::string GetPrefix() const;
-	bool Set(const std::string &sPath); // Project Set
-	bool Set(const std::string &sPrefix, const std::string &sName); // Project Set
+	bool Set(const char *szPath); // Project Set
+	bool Set(const char *szPrefix, const char *szName); // Project Set
 	bool Set(uint32 uiChecksum, uint32 uiBankId); // Auxiliary Set
 
 	bool IsValid() const;

@@ -230,16 +230,17 @@ void HyRichText::AssembleDrawables()
 					HyLogWarning("HyRichText could not acquire data for text: " << pNewText->GetPrefix() << "/" << pNewText->GetName());
 
 				// Assemble the prefix and name for this sprite
-				std::string sName = formatChangeList[uiCurFmtIndex].first;
-				std::string sPrefix;
-				if(sName.find_last_of('/') != std::string::npos)
-				{
-					sPrefix = sName.substr(0, sName.find_last_of('/'));
-					sName = sName.substr(sName.find_last_of('/') + 1);
-				}
+				std::string sPath = formatChangeList[uiCurFmtIndex].first;
+				//std::string sName = formatChangeList[uiCurFmtIndex].first;
+				//std::string sPrefix;
+				//if(sName.find_last_of('/') != std::string::npos)
+				//{
+				//	sPrefix = sName.substr(0, sName.find_last_of('/'));
+				//	sName = sName.substr(sName.find_last_of('/') + 1);
+				//}
 
 				// Allocate sprite and initialize
-				HySprite2d *pNewSprite = HY_NEW HySprite2d(sPrefix, sName, this);
+				HySprite2d *pNewSprite = HY_NEW HySprite2d(HyNodePath(sPath.c_str()), this);
 				pNewSprite->Load();
 				m_DrawableList.push_back(pNewSprite);
 

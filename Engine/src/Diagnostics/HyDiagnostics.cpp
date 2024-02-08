@@ -117,12 +117,17 @@ HyDiagnostics::~HyDiagnostics()
 	delete m_pBox2dDraw;
 }
 
-void HyDiagnostics::Init(std::string sTextPrefix, std::string sTextName, uint32 uiTextState)
+void HyDiagnostics::Init(const HyNodePath &textNodePath, uint32 uiTextState)
 {
 	if(m_pProfiler == nullptr)
 		m_pProfiler = HY_NEW HyProfiler();
 
-	m_pProfiler->InitText(sTextPrefix, sTextName, uiTextState);
+	m_pProfiler->InitText(textNodePath, uiTextState);
+}
+
+void HyDiagnostics::Init(const char *szTextPrefix, const char *szTextName, uint32 uiTextState)
+{
+	Init(HyNodePath(szTextPrefix, szTextName), uiTextState);
 }
 
 void HyDiagnostics::Show(uint32 uiDiagFlags)

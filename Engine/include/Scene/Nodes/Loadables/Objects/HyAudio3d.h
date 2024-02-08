@@ -17,7 +17,9 @@
 class HyAudio3d : public IHyAudio<IHyLoadable3d, HyEntity3d>
 {
 public:
-	HyAudio3d(std::string sPrefix = "", std::string sName = "", HyEntity3d *pParent = nullptr);
+	HyAudio3d(HyEntity3d *pParent = nullptr);
+	HyAudio3d(const HyNodePath &nodePath, HyEntity3d *pParent = nullptr);
+	HyAudio3d(const char *szPrefix, const char *szName, HyEntity3d *pParent = nullptr);
 	// TODO: copy ctor and move ctor
 	virtual ~HyAudio3d(void);
 	// TODO: assignment operator and move operator

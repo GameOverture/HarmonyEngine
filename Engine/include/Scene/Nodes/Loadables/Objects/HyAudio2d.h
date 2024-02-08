@@ -19,7 +19,7 @@ class HyAudio2d : public IHyAudio<IHyLoadable2d, HyEntity2d>
 public:
 	HyAudio2d(HyEntity2d *pParent = nullptr);
 	HyAudio2d(const HyNodePath &nodePath, HyEntity2d *pParent = nullptr);
-	HyAudio2d(std::string sPrefix, std::string sName, HyEntity2d *pParent = nullptr);
+	HyAudio2d(const char *szPrefix, const char *szName, HyEntity2d *pParent = nullptr);
 	HyAudio2d(uint32 uiSoundChecksum, uint32 uiBankId, HyEntity2d *pParent);
 	HyAudio2d(HyAudioHandle hAudioHandle, HyEntity2d *pParent = nullptr);
 	HyAudio2d(std::string sFilePath, bool bIsStreaming, int32 iInstanceLimit = 0, int32 iCategoryId = 0, HyEntity2d *pParent = nullptr);

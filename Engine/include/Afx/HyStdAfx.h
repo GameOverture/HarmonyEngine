@@ -250,7 +250,9 @@ enum HyPanelState
 	HYPANELSTATE_Hover,
 	HYPANELSTATE_Highlighted,
 	HYPANELSTATE_HighlightedDown,
-	HYPANELSTATE_HighlightedHover
+	HYPANELSTATE_HighlightedHover,
+
+	HYNUM_PANELSTATES
 };
 
 enum HySizePolicy
