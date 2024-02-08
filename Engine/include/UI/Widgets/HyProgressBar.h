@@ -62,6 +62,7 @@ public:
 	glm::vec2 GetBarOffset() const;
 	void SetBarOffset(const glm::ivec2 &barOffset);
 	void SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY);
+	bool SetBarState(uint32 uiStateIndex);
 
 	bool IsVertical() const;
 	void SetVertical(bool bIsVertical);

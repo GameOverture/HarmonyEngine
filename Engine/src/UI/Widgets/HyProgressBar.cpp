@@ -120,6 +120,11 @@ void HyProgressBar::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
 	OnSetup();
 }
 
+bool HyProgressBar::SetBarState(uint32 uiStateIndex)
+{
+	return m_Bar.SetState(uiStateIndex);
+}
+
 bool HyProgressBar::IsVertical() const
 {
 	return (m_uiAttribs & PROGBARATTRIB_IsVertical) != 0;
@@ -275,6 +280,7 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 	else
 	{
 		m_BarMask.SetAsBox(m_Bar.GetWidth(), m_Bar.GetHeight());
+		m_BarMask.SetVisible(false);
 		m_BarStencil.AddMask(m_BarMask);
 		m_Bar.SetStencil(&m_BarStencil);
 		
