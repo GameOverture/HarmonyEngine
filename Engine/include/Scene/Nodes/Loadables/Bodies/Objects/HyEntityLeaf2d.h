@@ -34,10 +34,10 @@ public:
 	{
 	}
 
-	HyEntityLeaf2d(std::string sLeafPrefix, std::string sLeafName, HyEntity2d *pParent = nullptr) :
+	HyEntityLeaf2d(const char *szLeafPrefix, const char *szLeafName, HyEntity2d *pParent = nullptr) :
 		HyEntity2d(pParent)
 	{
-		m_Leaf.Init(sLeafPrefix, sLeafName, this);
+		m_Leaf.Init(szLeafPrefix, szLeafName, this);
 	}
 
 	virtual ~HyEntityLeaf2d()
@@ -51,9 +51,9 @@ public:
 		return m_Leaf.IsDataValid();
 	}
 
-	void InitLeaf(std::string sLeafPrefix, std::string sLeafName)
+	void InitLeaf(const char *szLeafPrefix, const char *szLeafName)
 	{
-		m_Leaf.Init(sLeafPrefix, sLeafName, this);
+		m_Leaf.Init(szLeafPrefix, szLeafName, this);
 	}
 
 	LEAF &GetLeaf()
