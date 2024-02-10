@@ -19,7 +19,8 @@ class HyTexturedQuad2d : public IHyDrawable2d
 	HyRectangle<float>			m_UvCoords;
 
 public:
-	HyTexturedQuad2d(const HyNodePath &nodePath = HyNodePath(), HyEntity2d *pParent = nullptr);
+	HyTexturedQuad2d(HyEntity2d *pParent = nullptr);
+	HyTexturedQuad2d(const HyNodePath &nodePath, HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(HyTextureQuadHandle hTextureQuadHandle, HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(std::string sFilePath, HyTextureInfo textureInfo, HyEntity2d *pParent = nullptr);
