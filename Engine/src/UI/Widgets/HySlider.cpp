@@ -219,8 +219,10 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 	m_pValueChangedParam = pParam;
 }
 
-/*virtual*/ void HySlider::OnUiUpdate() /*override*/
+/*virtual*/ void HySlider::Update() /*override*/
 {
+	IHyWidget::Update();
+
 	if(m_uiAttribs & SLIDERATTRIB_IsDragging)
 	{
 		if(HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft) == false)

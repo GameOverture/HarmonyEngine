@@ -11,8 +11,6 @@
 #include "UI/Widgets/HyProgressBar.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-#define HYPROGRESSBAR_DEFAULT_ADJUST_DUR 0.2f
-
 HyProgressBar::HyProgressBar(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_iMinimum(0),
@@ -21,8 +19,7 @@ HyProgressBar::HyProgressBar(HyEntity2d *pParent /*= nullptr*/) :
 	m_Bar(this),
 	m_BarMask(this),
 	m_fBarProgressAmt(0.0f),
-	m_BarProgressAmt(m_fBarProgressAmt, *this, 0),
-	m_fBarAdjustDuration(HYPROGRESSBAR_DEFAULT_ADJUST_DUR)
+	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
 	m_NumberFormat.SetFractionPrecision(0, 1);
 }
@@ -35,8 +32,7 @@ HyProgressBar::HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &ba
 	m_Bar(this),
 	m_BarMask(this),
 	m_fBarProgressAmt(0.0f),
-	m_BarProgressAmt(m_fBarProgressAmt, *this, 0),
-	m_fBarAdjustDuration(HYPROGRESSBAR_DEFAULT_ADJUST_DUR)
+	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
 	m_NumberFormat.SetFractionPrecision(0, 1);
 	Setup(panelInit, barInit);
@@ -50,8 +46,7 @@ HyProgressBar::HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &ba
 	m_Bar(this),
 	m_BarMask(this),
 	m_fBarProgressAmt(0.0f),
-	m_BarProgressAmt(m_fBarProgressAmt, *this, 0),
-	m_fBarAdjustDuration(HYPROGRESSBAR_DEFAULT_ADJUST_DUR)
+	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
 	m_NumberFormat.SetFractionPrecision(0, 1);
 	Setup(panelInit, barInit, textNodePath, 0, 0, 0, 0);
@@ -65,8 +60,7 @@ HyProgressBar::HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &ba
 	m_Bar(this),
 	m_BarMask(this),
 	m_fBarProgressAmt(0.0f),
-	m_BarProgressAmt(m_fBarProgressAmt, *this, 0),
-	m_fBarAdjustDuration(HYPROGRESSBAR_DEFAULT_ADJUST_DUR)
+	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
 	m_NumberFormat.SetFractionPrecision(0, 1);
 	Setup(panelInit, barInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
@@ -228,13 +222,13 @@ void HyProgressBar::SetRange(int32 iMinimum, int32 iMaximum)
 	AdjustProgress(0.0f);
 }
 
-void HyProgressBar::SetValue(int32 iValue)
+void HyProgressBar::SetValue(int32 iValue, float fAdjustDuration)
 {
 	if(m_iValue == iValue)
 		return;
 
 	m_iValue = HyMath::Clamp(iValue, m_iMinimum, m_iMaximum);
-	AdjustProgress(m_fBarAdjustDuration);
+	AdjustProgress(fAdjustDuration);
 }
 
 HyNumberFormat HyProgressBar::GetNumFormat() const
@@ -245,11 +239,13 @@ HyNumberFormat HyProgressBar::GetNumFormat() const
 void HyProgressBar::SetNumFormat(HyNumberFormat format)
 {
 	m_NumberFormat = format;
-	AdjustProgress(m_fBarAdjustDuration);
+	AdjustProgress(0.0f);
 }
 
-/*virtual*/ void HyProgressBar::OnUiUpdate() /*override*/
+/*virtual*/ void HyProgressBar::Update() /*override*/
 {
+	HyLabel::Update();
+
 	if(m_BarProgressAmt.IsAnimating())
 		ApplyProgress();
 }
@@ -288,6 +284,7 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 	}
 
 	AdjustProgress(0.0f);
+	ApplyProgress();
 }
 
 void HyProgressBar::AdjustProgress(float fDuration)

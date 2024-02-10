@@ -119,17 +119,19 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 		delete m_pNodeItem;
 		m_pNodeItem = nullptr;
 
-		ConstructPrimitives();
-
+		// If a PrimPart's color's alpha is 0, then reassign it to a default color
 		if(m_pPrimParts->m_PanelColor.GetAlpha() == 0)
-			m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_bIsContainer ? HyColor::ContainerPanel : HyColor::WidgetPanel);
-		else
-			m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_PanelColor);
-
+			m_pPrimParts->m_PanelColor = m_pPrimParts->m_bIsContainer ? HyColor::ContainerPanel : HyColor::WidgetPanel;
 		if(m_pPrimParts->m_FrameColor.GetAlpha() == 0)
-			m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_bIsContainer ? HyColor::ContainerFrame : HyColor::WidgetFrame);
-		else
-			m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_FrameColor);
+			m_pPrimParts->m_FrameColor = m_pPrimParts->m_bIsContainer ? HyColor::ContainerFrame : HyColor::WidgetFrame;
+		if(m_pPrimParts->m_TertiaryColor.GetAlpha() == 0)
+			m_pPrimParts->m_TertiaryColor = HyColor::Orange;
+
+		ConstructPrimitives();
+		m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_PanelColor);
+		m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_FrameColor);
+		m_pPrimParts->m_Frame2.SetTint(m_pPrimParts->m_TertiaryColor);
+		SetState(HYPANELSTATE_Idle);
 		break;
 
 	default:
@@ -154,32 +156,32 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 		case HYPANELSTATE_Idle:
 			m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_PanelColor);
 			m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_FrameColor);
-			m_pPrimParts->m_Frame2.SetTint(m_pPrimParts->m_TertiaryColor);
+			m_pPrimParts->m_Frame2.SetVisible(false);
 			break;
 		case HYPANELSTATE_Down:
 			m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_PanelColor.Darken());
 			m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_FrameColor);
-			m_pPrimParts->m_Frame2.SetTint(m_pPrimParts->m_TertiaryColor);
+			m_pPrimParts->m_Frame2.SetVisible(false);
 			break;
 		case HYPANELSTATE_Hover:
 			m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_PanelColor.Lighten());
 			m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_FrameColor);
-			m_pPrimParts->m_Frame2.SetTint(m_pPrimParts->m_TertiaryColor);
+			m_pPrimParts->m_Frame2.SetVisible(false);
 			break;
 		case HYPANELSTATE_Highlighted:
 			m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_PanelColor);
 			m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_FrameColor.Lighten());
-			m_pPrimParts->m_Frame2.SetTint(m_pPrimParts->m_TertiaryColor);
+			m_pPrimParts->m_Frame2.SetVisible(true);
 			break;
 		case HYPANELSTATE_HighlightedDown:
 			m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_PanelColor.Darken());
 			m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_FrameColor.Lighten());
-			m_pPrimParts->m_Frame2.SetTint(m_pPrimParts->m_TertiaryColor);
+			m_pPrimParts->m_Frame2.SetVisible(true);
 			break;
 		case HYPANELSTATE_HighlightedHover:
 			m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_PanelColor.Lighten());
 			m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_FrameColor.Lighten());
-			m_pPrimParts->m_Frame2.SetTint(m_pPrimParts->m_TertiaryColor);
+			m_pPrimParts->m_Frame2.SetVisible(true);
 			break;
 
 		default:
@@ -334,30 +336,6 @@ glm::vec2 HyPanel::GetBotLeftOffset()
 	return glm::vec2(0.0f, 0.0f);
 }
 
-//HyColor HyPanel::GetPanelColor() const
-//{
-//	return HyColor(m_Panel.topColor.X(), m_Panel.topColor.Y(), m_Panel.topColor.Z());
-//}
-//
-//void HyPanel::SetPanelColor(HyColor color)
-//{
-//	m_Panel.SetTint(color);
-//}
-//
-//HyColor HyPanel::GetFrameColor() const
-//{
-//	return HyColor(m_Frame1.topColor.X(), m_Frame1.topColor.Y(), m_Frame1.topColor.Z());
-//}
-//
-//void HyPanel::SetFrameColor(HyColor color)
-//{
-//	m_Frame1.SetTint(color);
-//	if(color.IsDark())
-//		m_Frame2.SetTint(color.Lighten());
-//	else
-//		m_Frame2.SetTint(color.Darken());
-//}
-
 void HyPanel::ConstructPrimitives()
 {
 	if(m_pPrimParts->m_uiFrameSize > 0)
@@ -365,7 +343,10 @@ void HyPanel::ConstructPrimitives()
 		m_pPrimParts->m_Frame1.SetAsBox(m_vSize.x, m_vSize.y);
 
 		if(m_pPrimParts->m_uiFrameSize > 1)
-			m_pPrimParts->m_Frame2.SetAsBox(m_vSize.x - (m_pPrimParts->m_uiFrameSize * 2.0f) - 1.0f, m_vSize.y - (m_pPrimParts->m_uiFrameSize * 2.0f) - 1.0f);
+		{
+			m_pPrimParts->m_Frame2.SetAsBox(m_vSize.x - (m_pPrimParts->m_uiFrameSize * 2.0f) + 2.0f, m_vSize.y - (m_pPrimParts->m_uiFrameSize * 2.0f) + 2.0f);
+			m_pPrimParts->m_Frame2.pos.Set(static_cast<int32>(m_pPrimParts->m_uiFrameSize) - 1.0f, static_cast<int32>(m_pPrimParts->m_uiFrameSize) - 1.0f);
+		}
 		else
 			m_pPrimParts->m_Frame2.SetAsNothing();
 	}

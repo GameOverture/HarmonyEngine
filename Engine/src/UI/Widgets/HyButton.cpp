@@ -46,9 +46,9 @@ HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath,
 {
 }
 
-/*virtual*/ bool HyButton::IsDown() const
+/*virtual*/ bool HyButton::IsDepressed() const /*override*/
 {
-	return IHyWidget::IsDown() || (m_uiAttribs & BTNATTRIB_IsKbDownState) != 0;
+	return IHyWidget::IsDepressed() || (m_uiAttribs & BTNATTRIB_IsKbDownState) != 0;
 }
 
 void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, const HyNodePath &audioNodePath /*= HyNodePath()*/)
@@ -76,9 +76,8 @@ void HyButton::InvokeButtonClicked()
 {
 	if((m_uiAttribs & BTNATTRIB_IsKbDownState) != 0)
 	{
-		HyPanelState eOldState = GetPanelState();
 		m_uiAttribs &= ~BTNATTRIB_IsKbDownState;
-		ApplyPanelState(eOldState);
+		ApplyPanelState();
 	}
 }
 
@@ -88,17 +87,15 @@ void HyButton::InvokeButtonClicked()
 	{
 		if(eBtnState == HYBTN_Press && (m_uiAttribs & BTNATTRIB_IsKbDownState) == 0)
 		{
-			HyPanelState eOldState = GetPanelState();
 			m_uiAttribs |= BTNATTRIB_IsKbDownState;
-			ApplyPanelState(eOldState);
+			ApplyPanelState();
 		}
 		else if(eBtnState == HYBTN_Release && (m_uiAttribs & BTNATTRIB_IsKbDownState) != 0)
 		{
-			HyPanelState eOldState = GetPanelState();
 			m_uiAttribs &= ~BTNATTRIB_IsKbDownState;
-			ApplyPanelState(eOldState);
+			ApplyPanelState();
 
-			if(IsDown() == false)
+			if(IsDepressed() == false)
 				InvokeButtonClicked();
 		}
 	}

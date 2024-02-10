@@ -18,21 +18,21 @@ class HySlider : public IHyWidget
 protected:
 	enum SliderAttributes
 	{
-		SLIDERATTRIB_UseStepList = 1 << 11,
-		SLIDERATTRIB_IsVertical = 1 << 12,			// When 'SLIDERATTRIB_IsVertical' enabled, slider moves up/down instead of left/right
-		SLIDERATTRIB_InvertedAppearance = 1 << 13,	// When 'SLIDERATTRIB_InvertedAppearance' is false (the default), the minimum and maximum along the slider will be shown in its classic position
-		SLIDERATTRIB_IsDragging = 1 << 14,			// When 'SLIDERATTRIB_IsDragging' enabled, the user is currently dragging the slider handle
+		SLIDERATTRIB_UseStepList			= 1 << 13,
+		SLIDERATTRIB_IsVertical				= 1 << 14,		// When 'SLIDERATTRIB_IsVertical' enabled, slider moves up/down instead of left/right
+		SLIDERATTRIB_InvertedAppearance		= 1 << 15,		// When 'SLIDERATTRIB_InvertedAppearance' is false (the default), the minimum and maximum along the slider will be shown in its classic position
+		SLIDERATTRIB_IsDragging				= 1 << 16,		// When 'SLIDERATTRIB_IsDragging' enabled, the user is currently dragging the slider handle
 
-		SLIDERATTRIB_FLAG_NEXT = 1 << 15
+		SLIDERATTRIB_NEXTFLAG				= 1 << 17
 	};
-	static_assert((int)SLIDERATTRIB_UseStepList == (int)UIATTRIB_FLAG_NEXT, "HySlider is not matching with base classes attrib flags");
+	static_assert((int)SLIDERATTRIB_UseStepList == (int)WIDGETATTRIB_NEXTFLAG, "HySlider is not matching with base classes attrib flags");
 
 	int64									m_iMin;
 	int64									m_iMax;
 	uint32									m_uiStep;
-	std::vector<int64>						m_StepList;				// When used, only values present in this std::vector can be selected
-	float									m_fLength;				// Length of the slider bar in pixels (does not include the radius of the rounded ends)
-	float									m_fStrokeAmt;			// The stroke amount in pixels when rendering the bar
+	std::vector<int64>						m_StepList;		// When used, only values present in this std::vector can be selected
+	float									m_fLength;		// Length of the slider bar in pixels (does not include the radius of the rounded ends)
+	float									m_fStrokeAmt;	// The stroke amount in pixels when rendering the bar
 
 	int64									m_iValue;
 
@@ -41,8 +41,8 @@ protected:
 	{
 		HyPrimitive2d						m_EndCapNeg;
 		HyPrimitive2d						m_EndCapPos;
-		HyPrimitive2d						m_BarPos;				// Colored side of the slider
-		HyPrimitive2d						m_BarNeg;				// Dimmed side of the slider
+		HyPrimitive2d						m_BarPos;		// Colored side of the slider
+		HyPrimitive2d						m_BarNeg;		// Dimmed side of the slider
 
 		BarPrimitives(HyEntity2d *pParent);
 		void Assemble(HyOrientation eOrientation, float fBarThickness, float fBarLength, float fIndentAmt);
@@ -82,7 +82,7 @@ public:
 	void SetValueChangedCallback(std::function<void(HySlider *, void *)> fpCallback, void *pParam = nullptr);
 
 protected:
-	virtual void OnUiUpdate() override;
+	virtual void Update() override;
 
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnSetSizeHint() override;

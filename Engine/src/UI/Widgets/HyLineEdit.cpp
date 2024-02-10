@@ -15,7 +15,6 @@
 
 HyLineEdit::HyLineEdit(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
-	m_bUseValidator(false),
 	m_uiCursorIndex(0),
 	m_uiSelectionIndex(0),
 	m_Selection(this),
@@ -25,7 +24,6 @@ HyLineEdit::HyLineEdit(HyEntity2d *pParent /*= nullptr*/) :
 
 HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(initRef, textNodePath, pParent),
-	m_bUseValidator(false),
 	m_uiCursorIndex(0),
 	m_uiSelectionIndex(0),
 	m_Selection(this),
@@ -36,7 +34,6 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 
 HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(initRef, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
-	m_bUseValidator(false),
 	m_uiCursorIndex(0),
 	m_uiSelectionIndex(0),
 	m_Selection(this),
@@ -55,15 +52,20 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 	//SetCursor(static_cast<int32>(sUtf8Text.length()));
 }
 
+bool HyLineEdit::IsInputValidated() const
+{
+	return (m_uiAttribs & LINEEDITATTRIB_UseValidator) != 0;
+}
+
 void HyLineEdit::SetInputValidator(const std::regex &regEx)
 {
-	m_bUseValidator = true;
+	m_uiAttribs |= LINEEDITATTRIB_UseValidator;
 	m_InputValidator = regEx;
 }
 
 void HyLineEdit::ClearInputValidator()
 {
-	m_bUseValidator = false;
+	m_uiAttribs &= ~LINEEDITATTRIB_UseValidator;
 }
 
 bool HyLineEdit::IsCursorShown() const
@@ -136,20 +138,9 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 	m_Selection.alpha.Set(m_BlinkTimer.IsRunning() * 1.0f);
 }
 
-bool HyLineEdit::IsHighlighted() const
-{
-	return (m_uiAttribs & LINEEDITATTRIB_IsHighlighted) != 0;
-}
-
-void HyLineEdit::SetAsHighlighted(bool bIsHighlighted)
-{
-	m_uiAttribs |= LINEEDITATTRIB_IsHighlighted;
-	// TODO: Move HyButton's highlighting to HyPanel, and use that here
-}
-
 /*virtual*/ void HyLineEdit::OnUiTextInput(std::string sNewUtf8Text) /*override*/
 {
-	if(m_bUseValidator)
+	if(IsInputValidated())
 	{
 		std::smatch base_match;
 		if(std::regex_match(sNewUtf8Text, base_match, m_InputValidator))
@@ -295,10 +286,10 @@ void HyLineEdit::SetAsHighlighted(bool bIsHighlighted)
 	SetText(m_Text.GetUtf8String()); // Ensure HyLabel is informed of m_Text changing
 }
 
-/*virtual*/ void HyLineEdit::OnUiMouseClicked() /*override*/
-{
-	RequestKeyboardFocus();
-}
+///*virtual*/ void HyLineEdit::OnUiMouseClicked() /*override*/
+//{
+//	RequestKeyboardFocus();
+//}
 
 /*virtual*/ void HyLineEdit::OnTakeKeyboardFocus() /*override*/
 {

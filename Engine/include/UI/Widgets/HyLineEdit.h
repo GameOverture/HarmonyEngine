@@ -19,22 +19,20 @@
 class HyLineEdit : public HyLabel
 {
 protected:
-	enum ButtonAttributes
+	enum LineEditAttributes
 	{
-		LINEEDITATTRIB_IsHighlighted = 1 << 18,		// Indicates keyboard focus, or an optional cosmetic state
-
-		LINEEDITATTRIB_FLAG_NEXT = 1 << 19
+		LINEEDITATTRIB_UseValidator = 1 << 20,
+		LINEEDITATTRIB_NEXTFLAG = 1 << 21
 	};
-	static_assert((int)LINEEDITATTRIB_IsHighlighted == (int)LABELATTRIB_FLAG_NEXT, "HyLineEdit is not matching with base classes attrib flags");
+	static_assert((int)LINEEDITATTRIB_UseValidator == (int)LABELATTRIB_NEXTFLAG, "HyLineEdit is not matching with base classes attrib flags");
 
-	bool								m_bUseValidator;
 	std::regex							m_InputValidator;
 
 	uint32								m_uiCursorIndex;		// Cursor index in full UTF-8 characters
 	uint32								m_uiSelectionIndex;		// Selection index in full UTF-8 characters. Anything between m_iCursorIndex and m_iSelectionIndex will be selected. Will equal when no selection.
 	HyPrimitive2d						m_Selection;			// Actual text selection highlight visual
-	HyPrimitive2d						m_Cursor;				// Shows a standard vertical line draw with a primitive
 
+	HyPrimitive2d						m_Cursor;				// Shows a standard vertical line draw with a primitive
 	HyTimer								m_BlinkTimer;
 
 public:
@@ -45,6 +43,7 @@ public:
 
 	virtual void SetText(const std::string &sUtf8Text) override;
 
+	bool IsInputValidated() const;
 	void SetInputValidator(const std::regex &regEx);
 	void ClearInputValidator();
 
@@ -56,13 +55,10 @@ public:
 	void SetCursor(uint32 uiCharIndex);
 	void SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex);
 
-	bool IsHighlighted() const;
-	void SetAsHighlighted(bool bIsHighlighted);
-
 protected:
 	virtual void OnUiTextInput(std::string sNewUtf8Text) override;
 	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) override;
-	virtual void OnUiMouseClicked() override;
+	//virtual void OnUiMouseClicked() override;
 
 	virtual void OnTakeKeyboardFocus() override;
 	virtual void OnRelinquishKeyboardFocus() override;

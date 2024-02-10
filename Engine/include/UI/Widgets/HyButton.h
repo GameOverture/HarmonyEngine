@@ -22,11 +22,11 @@ class HyButton : public HyLabel
 protected:
 	enum ButtonAttributes
 	{
-		BTNATTRIB_IsKbDownState		= 1 << 18,		// Indicates this button is currently receiving keyboard input that is pressing (BTNATTRIB_IsDownState) the button
+		BTNATTRIB_IsKbDownState		= 1 << 20,		// Indicates this button is currently receiving keyboard input that is pressing (BTNATTRIB_IsDownState) the button
 
-		BTNATTRIB_FLAG_NEXT			= 1 << 19
+		BTNATTRIB_NEXTFLAG			= 1 << 21
 	};
-	static_assert((int)BTNATTRIB_IsKbDownState == (int)LABELATTRIB_FLAG_NEXT, "HyButton is not matching with base classes attrib flags");
+	static_assert((int)BTNATTRIB_IsKbDownState == (int)LABELATTRIB_NEXTFLAG, "HyButton is not matching with base classes attrib flags");
 
 	HyButtonClickedCallback			m_fpBtnClickedCallback;
 	void *							m_pBtnClickedParam;
@@ -39,7 +39,7 @@ public:
 	HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
 	virtual ~HyButton();
 
-	virtual bool IsDown() const;
+	virtual bool IsDepressed() const override;
 
 	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr, const HyNodePath &audioNodePath = HyNodePath());
 	void InvokeButtonClicked();

@@ -69,7 +69,7 @@ public:
 
 protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
-	virtual void Update() override;
+	//virtual void Update() override;
 
 	// Internal Entity propagation function overrides
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding);

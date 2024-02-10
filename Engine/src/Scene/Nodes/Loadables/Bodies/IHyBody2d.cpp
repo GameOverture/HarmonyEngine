@@ -230,10 +230,10 @@ float IHyBody2d::GetSceneWidth()
 	IHyNode2d::SetDirty(uiDirtyFlags);
 }
 
-/*virtual*/ void IHyBody2d::Update() /*override*/
-{
-	IHyLoadable2d::Update();
-}
+///*virtual*/ void IHyBody2d::Update() /*override*/
+//{
+//	IHyLoadable2d::Update();
+//}
 
 /*virtual*/ int32 IHyBody2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)
 {

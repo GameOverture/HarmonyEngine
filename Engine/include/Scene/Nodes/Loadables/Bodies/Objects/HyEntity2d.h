@@ -21,16 +21,18 @@ protected:
 	std::vector<IHyNode2d *>				m_ChildList;
 	std::vector<HyShape2d *>				m_ShapeList;
 
-	enum Entity2dAttributes
+	enum EntityAttributes
 	{
-		ENT2DATTRIB_MouseInputEnabled		= 1 << 1,
-		ENT2DATTRIB_MouseInputHover			= 1 << 2,
-		ENT2DATTRIB_MouseInputDown			= 1 << 3,
-		ENT2DATTRIB_MouseInputInvalid		= 1 << 4,				// When mouse input was initially pressed outside of bounds
+		ENTITYATTRIB_MouseInputEnabled		= 1 << 0,
+		ENTITYATTRIB_MouseInputHover		= 1 << 1,
+		ENTITYATTRIB_MouseInputDown			= 1 << 2,
+		ENTITYATTRIB_MouseInputInvalid		= 1 << 3,				// When mouse input was initially pressed outside of bounds
 
-		ENT2DATTRIB_ReverseDisplayOrder		= 1 << 5,
+		ENTITYATTRIB_ReverseDisplayOrder	= 1 << 4,
+
+		ENTITYATTRIB_NEXTFLAG				= 1 << 5,
 	};
-	uint32									m_uiEntAttribs;
+	uint32									m_uiAttribs;
 
 public:
 	HyPhysicsCtrl2d							physics;				// Optional physics component
@@ -95,9 +97,11 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// MOUSE INPUT & SHAPES (hitboxes and/or collision)
+	bool IsMouseInputEnabled() const;
 	void EnableMouseInput();
 	void DisableMouseInput();
-	bool IsMouseInBounds();
+	bool IsMouseHover() const;
+	bool IsMouseDown() const;
 
 	void ShapeAppend(HyShape2d &shapeRef);
 	bool ShapeRemove(HyShape2d &shapeRef);
@@ -118,8 +122,8 @@ public:
 protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
 	virtual void Update() override;
+	
 	virtual bool IsChildrenLoaded() const override final;
-
 	virtual void SetNewChildAttributes(IHyNode2d &childRef);
 
 	virtual void SetParentsVisible(bool bParentsVisible) override final;
@@ -129,6 +133,8 @@ protected:
 	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override final;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override final;
 
+	bool CalcMouseInBounds();
+
 	void SyncPhysicsFixtures();
 	void SyncPhysicsBody();
 
@@ -137,7 +143,8 @@ protected:
 	virtual void OnMouseEnter() { }
 	virtual void OnMouseLeave() { }
 	virtual void OnMouseDown() { }
-	virtual void OnMouseClicked() { }
+	virtual void OnMouseUp() { }			// If considered 'mouse down' and the mouse is released (regardless of where)
+	virtual void OnMouseClicked() { }		// If considered 'mouse down' and the mouse is released inside of bounds of this (IsMouseHover() == true)
 
 	friend void HyNodeCtorAppend(HyEntity2d *pEntity, IHyNode2d *pChildNode);
 

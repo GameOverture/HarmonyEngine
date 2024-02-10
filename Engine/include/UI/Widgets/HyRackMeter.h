@@ -19,12 +19,12 @@ class HyRackMeter : public HyLabel
 protected:
 	enum RackMeterAttributes
 	{
-		RACKMETERATTRIB_IsSpinDigits = 1 << 18,
-		RACKMETERATTRIB_IsMoney = 1 << 19,
+		RACKMETERATTRIB_IsSpinDigits = 1 << 20,
+		RACKMETERATTRIB_IsMoney = 1 << 21,
 
-		RACKMETERATTRIB_FLAG_NEXT = 1 << 20
+		RACKMETERATTRIB_NEXTFLAG = 1 << 22
 	};
-	static_assert((int)RACKMETERATTRIB_IsSpinDigits == (int)LABELATTRIB_FLAG_NEXT, "HyRackMeter is not matching with base classes attrib flags");
+	static_assert((int)RACKMETERATTRIB_IsSpinDigits == (int)LABELATTRIB_NEXTFLAG, "HyRackMeter is not matching with base classes attrib flags");
 
 
 	int64					m_iCurValue = 0;
@@ -97,7 +97,7 @@ public:
 	virtual void SetTextMonospacedDigits(bool bSet) override;
 
 protected:
-	virtual void OnUiUpdate() override;
+	virtual void Update() override;
 
 	using HyLabel::SetText; // Hiding SetText() since it doesn't make sense to use with HyRackMeters
 

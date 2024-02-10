@@ -18,11 +18,11 @@ class HyCheckBox : public HyButton
 protected:
 	enum CheckBoxAttributes
 	{
-		CHECKBOXATTRIB_IsChecked = 1 << 19,
+		CHECKBOXATTRIB_IsChecked = 1 << 21,
 
-		CHECKBOXATTRIB_FLAG_NEXT = 1 << 20
+		CHECKBOXATTRIB_NEXTFLAG = 1 << 22
 	};
-	static_assert((int)CHECKBOXATTRIB_IsChecked == (int)BTNATTRIB_FLAG_NEXT, "HyCheckBox is not matching with base classes attrib flags");
+	static_assert((int)CHECKBOXATTRIB_IsChecked == (int)BTNATTRIB_NEXTFLAG, "HyCheckBox is not matching with base classes attrib flags");
 
 	// To be drawn on panel when IsChecked
 	HyPrimitive2d								m_CheckMarkStroke;

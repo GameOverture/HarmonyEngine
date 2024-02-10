@@ -26,6 +26,8 @@ namespace %HY_NAMESPACE% {
 	
 	m_fElapsedFrameTime = 0.0f;
 	m_uiCurFrame = 0;
+	
+	return true;
 }
 
 /*virtual*/ uint32 %HY_CLASS%::GetNumStates()

@@ -14,8 +14,8 @@
 
 IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
-	m_uiAttribs(0),
 	m_eHoverCursor(HYMOUSECURSOR_Default),
+	m_ePanelState(HYPANELSTATE_Idle),
 	m_Panel(this)
 {
 }
@@ -26,13 +26,12 @@ IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 
 /*virtual*/ bool IHyWidget::SetState(uint32 uiStateIndex) /*override*/
 {
-	if(m_Panel.SetState(uiStateIndex) == false)
+	if(IHyLoadable::SetState(uiStateIndex) == false || m_Panel.SetState(uiStateIndex) == false)
 		return false;
 	
-	IHyLoadable::SetState(uiStateIndex);
-	m_uiAttribs |= UIATTRIB_IsCustomPanelState;
-	
+	m_ePanelState = HYPANELSTATE_UserCustom;
 	OnPanelUpdated();
+
 	return true;
 }
 
@@ -41,15 +40,21 @@ IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 	return m_Panel.GetNumStates();
 }
 
+HyPanelState IHyWidget::GetPanelState() const
+{
+	return m_ePanelState;
+}
+
 bool IHyWidget::IsCustomPanelState() const
 {
-	return (m_uiAttribs & UIATTRIB_IsCustomPanelState) != 0;
+	return m_ePanelState == HYPANELSTATE_UserCustom;
 }
 
 void IHyWidget::ClearCustomPanelState()
 {
-	m_uiAttribs &= ~UIATTRIB_IsCustomPanelState;
-	if(m_Panel.SetState(HYPANELSTATE_Idle))
+	m_ePanelState = HYPANELSTATE_Idle;
+
+	if(m_Panel.SetState(m_ePanelState))
 		OnPanelUpdated();
 }
 
@@ -63,11 +68,236 @@ void IHyWidget::SetPanelVisible(bool bVisible)
 	m_Panel.SetVisible(bVisible);
 }
 
-HyPanelState IHyWidget::GetPanelState() const
+bool IHyWidget::IsInputAllowed() const
+{
+	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+		return IsEnabled() && static_cast<HyLayout *>(m_pParent)->IsWidgetInputAllowed();
+
+	return IsEnabled();
+}
+
+bool IHyWidget::IsEnabled() const
+{
+	return (m_uiAttribs & WIDGETATTRIB_IsDisabled) == 0;
+}
+
+bool IHyWidget::IsHideDisabled() const
+{
+	return (m_uiAttribs & WIDGETATTRIB_HideDisabled) != 0;
+}
+
+void IHyWidget::SetHideDisabled(bool bIsHideDisabled)
+{
+	if(bIsHideDisabled)
+	{
+		m_uiAttribs |= WIDGETATTRIB_HideDisabled;
+		SetTint(HyColor::White);
+	}
+	else
+	{
+		m_uiAttribs &= ~WIDGETATTRIB_HideDisabled;
+		SetAsEnabled(IsEnabled());
+	}
+}
+
+void IHyWidget::SetAsEnabled(bool bEnabled)
+{
+	if(bEnabled)
+	{
+		m_uiAttribs &= ~WIDGETATTRIB_IsDisabled;
+		topColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
+		botColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
+
+		EnableMouseInput();
+	}
+	else
+	{
+		m_uiAttribs |= WIDGETATTRIB_IsDisabled;
+
+		if(IsHideDisabled() == false)
+		{
+			topColor.Tween(0.3f, 0.3f, 0.3f, 0.25f);
+			botColor.Tween(0.3f, 0.3f, 0.3f, 0.25f);
+		}
+
+		DisableMouseInput();
+	}
+
+	ApplyPanelState();
+}
+
+bool IHyWidget::IsKeyboardFocus() const
+{
+	return (m_uiAttribs & WIDGETATTRIB_IsKeyboardFocus);
+}
+
+bool IHyWidget::IsKeyboardFocusAllowed() const
+{
+	return (m_uiAttribs & WIDGETATTRIB_KeyboardFocusAllowed);
+}
+
+void IHyWidget::SetKeyboardFocusAllowed(bool bEnabled)
+{
+	if(bEnabled)
+		m_uiAttribs |= WIDGETATTRIB_KeyboardFocusAllowed;
+	else
+		m_uiAttribs &= ~WIDGETATTRIB_KeyboardFocusAllowed;
+}
+
+bool IHyWidget::RequestKeyboardFocus()
+{
+	if(IsKeyboardFocusAllowed() && m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+		return static_cast<HyLayout *>(m_pParent)->RequestWidgetFocus(this);
+
+	return false;
+}
+
+bool IHyWidget::IsHideDownState() const
+{
+	return (m_uiAttribs & WIDGETATTRIB_HideDownState) != 0;
+}
+
+void IHyWidget::SetHideDownState(bool bIsHideDownState)
+{
+	if(bIsHideDownState)
+		m_uiAttribs |= WIDGETATTRIB_HideDownState;
+	else
+		m_uiAttribs &= ~WIDGETATTRIB_HideDownState;
+
+	ApplyPanelState();
+}
+
+bool IHyWidget::IsHideMouseHoverState() const
+{
+	return (m_uiAttribs & WIDGETATTRIB_HideMouseHoverState) != 0 || HyEngine::Input().IsUsingTouchScreen();
+}
+
+void IHyWidget::SetHideMouseHoverState(bool bIsHideHoverState)
+{
+	if(bIsHideHoverState)
+		m_uiAttribs |= WIDGETATTRIB_HideMouseHoverState;
+	else
+		m_uiAttribs &= ~WIDGETATTRIB_HideMouseHoverState;
+
+	ApplyPanelState();
+}
+
+bool IHyWidget::IsMouseHoverCursorSet() const
+{
+	return m_eHoverCursor != HYMOUSECURSOR_Default;
+}
+
+void IHyWidget::SetMouseHoverCursor(HyMouseCursor eMouseCursor)
+{
+	m_eHoverCursor = eMouseCursor;
+}
+
+bool IHyWidget::IsHighlighted() const
+{
+	return (m_uiAttribs & (WIDGETATTRIB_IsHighlighted | WIDGETATTRIB_IsKeyboardFocus)) != 0;
+}
+
+bool IHyWidget::IsHideHighlightedState() const
+{
+	return (m_uiAttribs & WIDGETATTRIB_HideHighlightedState) != 0;
+}
+
+void IHyWidget::SetHideHighlightedState(bool bIsHideHighlightedState)
+{
+	if(bIsHideHighlightedState)
+		m_uiAttribs |= WIDGETATTRIB_HideHighlightedState;
+	else
+		m_uiAttribs &= ~WIDGETATTRIB_HideHighlightedState;
+
+	ApplyPanelState();
+}
+
+void IHyWidget::SetAsHighlighted(bool bIsHighlighted)
+{
+	if(bIsHighlighted)
+		m_uiAttribs |= WIDGETATTRIB_IsHighlighted;
+	else
+		m_uiAttribs &= ~WIDGETATTRIB_IsHighlighted;
+
+	ApplyPanelState();
+}
+
+/*virtual*/ bool IHyWidget::IsDepressed() const
+{
+	return IsMouseDown();
+}
+
+/*virtual*/ void IHyWidget::OnMouseEnter() /*override final*/
+{
+	if(IsInputAllowed())
+	{
+		if(IsMouseHoverCursorSet())
+			HyEngine::Input().SetMouseCursor(m_eHoverCursor);
+
+		ApplyPanelState();
+		OnUiMouseEnter();
+	}
+}
+
+/*virtual*/ void IHyWidget::OnMouseLeave() /*override final*/
+{
+	if(IsInputAllowed())
+	{
+		if(IsMouseHoverCursorSet())
+			HyEngine::Input().ResetMouseCursor();
+
+		ApplyPanelState();
+		OnUiMouseLeave();
+	}
+}
+
+/*virtual*/ void IHyWidget::OnMouseDown() /*override final*/
+{
+	if(IsInputAllowed())
+	{
+		ApplyPanelState();
+		OnUiMouseDown();
+	}
+}
+
+/*virtual*/ void IHyWidget::OnMouseUp() /*override final*/
+{
+	ApplyPanelState();
+}
+
+/*virtual*/ void IHyWidget::OnMouseClicked() /*override final*/
+{
+	if(IsInputAllowed())
+	{
+		ApplyPanelState();
+		RequestKeyboardFocus();
+		OnUiMouseClicked();
+	}
+}
+
+void IHyWidget::TakeKeyboardFocus()
+{
+	HyAssert(IsKeyboardFocusAllowed(), "IHyWidget::TakeKeyboardFocus was invoked when keyboard focus is NOT allowed");
+	
+	m_uiAttribs |= WIDGETATTRIB_IsKeyboardFocus;
+	OnTakeKeyboardFocus();
+
+	ApplyPanelState();
+}
+
+void IHyWidget::RelinquishKeyboardFocus()
+{
+	m_uiAttribs &= ~WIDGETATTRIB_IsKeyboardFocus;
+	OnRelinquishKeyboardFocus();
+
+	ApplyPanelState();
+}
+
+HyPanelState IHyWidget::CalcPanelState() const
 {
 	if(IsEnabled())
 	{
-		if(IsDown() && IsHideDownState() == false)
+		if(IsDepressed() && IsHideDownState() == false)
 		{
 			if(IsHighlighted() && IsHideHighlightedState() == false)
 				return HYPANELSTATE_HighlightedDown;
@@ -98,276 +328,15 @@ HyPanelState IHyWidget::GetPanelState() const
 	}
 }
 
-bool IHyWidget::IsInputAllowed() const
+void IHyWidget::ApplyPanelState()
 {
-	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
-		return IsEnabled() && static_cast<HyLayout *>(m_pParent)->IsWidgetInputAllowed();
-
-	return IsEnabled();
-}
-
-bool IHyWidget::IsEnabled() const
-{
-	return (m_uiAttribs & UIATTRIB_IsDisabled) == 0;
-}
-
-bool IHyWidget::IsHideDisabled() const
-{
-	return (m_uiAttribs & UIATTRIB_HideDisabled) != 0;
-}
-
-void IHyWidget::SetHideDisabled(bool bIsHideDisabled)
-{
-	if(bIsHideDisabled)
+	if(IsCustomPanelState() == false)
 	{
-		m_uiAttribs |= UIATTRIB_HideDisabled;
-		SetTint(HyColor::White);
-	}
-	else
-	{
-		m_uiAttribs &= ~UIATTRIB_HideDisabled;
-		SetAsEnabled(IsEnabled());
-	}
-}
-
-void IHyWidget::SetAsEnabled(bool bEnabled)
-{
-	HyPanelState eOldState = GetPanelState();
-
-	if(bEnabled)
-	{
-		m_uiAttribs &= ~UIATTRIB_IsDisabled;
-		topColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
-		botColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
-
-		EnableMouseInput();
-		if(IsMouseInBounds())
-			OnMouseEnter();
-	}
-	else
-	{
-		m_uiAttribs |= UIATTRIB_IsDisabled;
-
-		if(IsHideDisabled() == false)
+		HyPanelState eCurState = CalcPanelState();
+		if(m_ePanelState != eCurState)
 		{
-			topColor.Tween(0.3f, 0.3f, 0.3f, 0.25f);
-			botColor.Tween(0.3f, 0.3f, 0.3f, 0.25f);
-		}
-
-		DisableMouseInput();
-		if(IsMouseInBounds())
-			OnMouseLeave();
-	}
-
-	ApplyPanelState(eOldState);
-}
-
-bool IHyWidget::IsKeyboardFocus() const
-{
-	return (m_uiAttribs & UIATTRIB_IsKeyboardFocus);
-}
-
-bool IHyWidget::IsKeyboardFocusAllowed() const
-{
-	return (m_uiAttribs & UIATTRIB_KeyboardFocusAllowed);
-}
-
-void IHyWidget::SetKeyboardFocusAllowed(bool bEnabled)
-{
-	if(bEnabled)
-		m_uiAttribs |= UIATTRIB_KeyboardFocusAllowed;
-	else
-		m_uiAttribs &= ~UIATTRIB_KeyboardFocusAllowed;
-}
-
-bool IHyWidget::RequestKeyboardFocus()
-{
-	if(IsKeyboardFocusAllowed() && m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
-		return static_cast<HyLayout *>(m_pParent)->RequestWidgetFocus(this);
-
-	return false;
-}
-
-/*virtual*/ bool IHyWidget::IsDown() const
-{
-	return (m_uiAttribs & UIATTRIB_IsMouseDownState) != 0;
-}
-
-bool IHyWidget::IsHideDownState() const
-{
-	return (m_uiAttribs & UIATTRIB_HideDownState) != 0;
-}
-
-void IHyWidget::SetHideDownState(bool bIsHideDownState)
-{
-	HyPanelState eOldState = GetPanelState();
-
-	if(bIsHideDownState)
-		m_uiAttribs |= UIATTRIB_HideDownState;
-	else
-		m_uiAttribs &= ~UIATTRIB_HideDownState;
-
-	ApplyPanelState(eOldState);
-}
-
-bool IHyWidget::IsMouseHover() const
-{
-	return (m_uiAttribs & UIATTRIB_IsMouseHoverState) != 0;
-}
-
-bool IHyWidget::IsHideMouseHoverState() const
-{
-	return (m_uiAttribs & UIATTRIB_HideMouseHoverState) != 0 || HyEngine::Input().IsUsingTouchScreen();
-}
-
-void IHyWidget::SetHideMouseHoverState(bool bIsHideHoverState)
-{
-	HyPanelState eOldState = GetPanelState();
-
-	if(bIsHideHoverState)
-		m_uiAttribs |= UIATTRIB_HideMouseHoverState;
-	else
-		m_uiAttribs &= ~UIATTRIB_HideMouseHoverState;
-
-	ApplyPanelState(eOldState);
-}
-
-bool IHyWidget::IsMouseHoverCursorSet() const
-{
-	return m_eHoverCursor != HYMOUSECURSOR_Default;
-}
-
-void IHyWidget::SetMouseHoverCursor(HyMouseCursor eMouseCursor)
-{
-	m_eHoverCursor = eMouseCursor;
-}
-
-bool IHyWidget::IsHighlighted() const
-{
-	return (m_uiAttribs & (UIATTRIB_IsHighlighted | UIATTRIB_IsKeyboardFocus)) != 0;
-}
-
-bool IHyWidget::IsHideHighlightedState() const
-{
-	return (m_uiAttribs & UIATTRIB_HideHighlightedState) != 0;
-}
-
-void IHyWidget::SetHideHighlightedState(bool bIsHideHighlightedState)
-{
-	HyPanelState eOldState = GetPanelState();
-
-	if(bIsHideHighlightedState)
-		m_uiAttribs |= UIATTRIB_HideHighlightedState;
-	else
-		m_uiAttribs &= ~UIATTRIB_HideHighlightedState;
-
-	ApplyPanelState(eOldState);
-}
-
-void IHyWidget::SetAsHighlighted(bool bIsHighlighted)
-{
-	HyPanelState eOldState = GetPanelState();
-
-	if(bIsHighlighted)
-		m_uiAttribs |= UIATTRIB_IsHighlighted;
-	else
-		m_uiAttribs &= ~UIATTRIB_IsHighlighted;
-
-	ApplyPanelState(eOldState);
-}
-
-/*virtual*/ void IHyWidget::OnUpdate() /*override final*/
-{
-	if(m_uiAttribs & UIATTRIB_IsMouseDownState && HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft) == false)
-	{
-		HyPanelState eOldState = GetPanelState();
-		m_uiAttribs &= ~UIATTRIB_IsMouseDownState;
-		ApplyPanelState(eOldState);
-	}
-
-	OnUiUpdate();
-}
-
-/*virtual*/ void IHyWidget::OnMouseEnter() /*override final*/
-{
-	if(IsInputAllowed())
-	{
-		if(IsMouseHoverCursorSet())
-			HyEngine::Input().SetMouseCursor(m_eHoverCursor);
-
-		HyPanelState eOldState = GetPanelState();
-		m_uiAttribs |= UIATTRIB_IsMouseHoverState;
-		ApplyPanelState(eOldState);
-
-		OnUiMouseEnter();
-	}
-}
-
-/*virtual*/ void IHyWidget::OnMouseLeave() /*override final*/
-{
-	if(IsInputAllowed())
-	{
-		if(IsMouseHoverCursorSet())
-			HyEngine::Input().ResetMouseCursor();
-
-		HyPanelState eOldState = GetPanelState();
-		m_uiAttribs &= ~UIATTRIB_IsMouseHoverState;
-		ApplyPanelState(eOldState);
-
-		OnUiMouseLeave();
-	}
-}
-
-/*virtual*/ void IHyWidget::OnMouseDown() /*override final*/
-{
-	if(IsInputAllowed())
-	{
-		HyPanelState eOldState = GetPanelState();
-		m_uiAttribs |= UIATTRIB_IsMouseDownState;
-		ApplyPanelState(eOldState);
-
-		OnUiMouseDown();
-	}
-}
-
-/*virtual*/ void IHyWidget::OnMouseClicked() /*override final*/
-{
-	if(IsInputAllowed())
-	{
-		HyPanelState eOldState = GetPanelState();
-		m_uiAttribs &= ~UIATTRIB_IsMouseDownState;
-		ApplyPanelState(eOldState);
-
-		//HyBState eCurState = GetBtnState();
-		//m_Panel.SetSpriteState(eCurState);
-		//OnBtnStateChange(eCurState);
-
-		OnUiMouseClicked();
-	}
-}
-
-void IHyWidget::TakeKeyboardFocus()
-{
-	HyAssert(IsKeyboardFocusAllowed(), "IHyWidget::TakeKeyboardFocus was invoked when keyboard focus is NOT allowed");
-	
-	m_uiAttribs |= UIATTRIB_IsKeyboardFocus;
-	OnTakeKeyboardFocus();
-}
-
-void IHyWidget::RelinquishKeyboardFocus()
-{
-	m_uiAttribs &= ~UIATTRIB_IsKeyboardFocus;
-	OnRelinquishKeyboardFocus();
-}
-
-void IHyWidget::ApplyPanelState(HyPanelState eOldState)
-{
-	if((m_uiAttribs & UIATTRIB_IsCustomPanelState) == 0)
-	{
-		HyPanelState eCurState = GetPanelState();
-		if(eOldState != eCurState)
-		{
-			m_Panel.SetState(eCurState);
+			m_ePanelState = eCurState;
+			m_Panel.SetState(m_ePanelState);
 			OnPanelUpdated();
 		}
 	}

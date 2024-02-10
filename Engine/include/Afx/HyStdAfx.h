@@ -245,6 +245,8 @@ enum HyWindowMode
 
 enum HyPanelState
 {
+	HYPANELSTATE_UserCustom = -1,
+
 	HYPANELSTATE_Idle = 0,
 	HYPANELSTATE_Down,
 	HYPANELSTATE_Hover,

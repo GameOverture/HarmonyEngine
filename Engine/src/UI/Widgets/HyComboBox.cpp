@@ -205,8 +205,10 @@ void HyComboBox::ResetExpandedTimeout()
 	m_fElapsedExpandedTime = 0.0f;
 }
 
-/*virtual*/ void HyComboBox::OnUiUpdate() /*override*/
+/*virtual*/ void HyComboBox::Update() /*override*/
 {
+	HyButton::Update();
+
 	if(m_ExpandAnimVec.IsAnimating())
 		m_SubBtnPanel.SetSize(m_ExpandAnimVec.X(), m_ExpandAnimVec.Y());
 
