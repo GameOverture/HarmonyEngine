@@ -58,15 +58,15 @@ public:
 protected:
 	virtual void OnUiTextInput(std::string sNewUtf8Text) override;
 	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) override;
-	//virtual void OnUiMouseClicked() override;
 
 	virtual void OnTakeKeyboardFocus() override;
 	virtual void OnRelinquishKeyboardFocus() override;
 
+	virtual void OnPanelUpdated() override;
+
 	virtual void OnSetup() override;
 
 	void MoveCursor(int32 iOffset, bool bSelection);
-	void ToggleCursorVisible(bool bForceShown);
 	static void OnCursorTimer(void *pThisData);
 };
 

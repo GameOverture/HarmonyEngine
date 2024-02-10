@@ -49,7 +49,6 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 /*virtual*/ void HyLineEdit::SetText(const std::string &sUtf8Text) /*override*/
 {
 	HyLabel::SetText(sUtf8Text);
-	//SetCursor(static_cast<int32>(sUtf8Text.length()));
 }
 
 bool HyLineEdit::IsInputValidated() const
@@ -119,7 +118,6 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 
 	m_Cursor.pos.Set(m_Text.pos);
 	m_Cursor.pos.Offset(m_Text.GetGlyphOffset(m_uiCursorIndex, 0).x * m_Text.scale.GetX(), m_Text.GetLineDescender(m_Text.scale.Y()));
-	m_Cursor.alpha.Set(m_BlinkTimer.IsRunning() * 1.0f);
 	
 	if(m_uiCursorIndex == m_uiSelectionIndex)
 		m_Selection.SetAsNothing();
@@ -135,7 +133,17 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 		m_Selection.pos.Offset(m_Text.GetGlyphOffset(uiStartIndex, 0).x * m_Text.scale.GetX(), m_Text.GetLineDescender(m_Text.scale.Y()));
 	}
 
-	m_Selection.alpha.Set(m_BlinkTimer.IsRunning() * 1.0f);
+	if(IsKeyboardFocus())
+	{
+		m_Selection.SetVisible(true);
+		m_Cursor.SetVisible(true);
+		m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
+	}
+	else
+	{
+		m_Selection.SetVisible(false);
+		m_Cursor.SetVisible(false);
+	}
 }
 
 /*virtual*/ void HyLineEdit::OnUiTextInput(std::string sNewUtf8Text) /*override*/
@@ -271,7 +279,7 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 
 
 	case HYKEY_Home:
-		MoveCursor(-GetCursorIndex(), iMods & HYKBMOD_Shift);
+		MoveCursor(-static_cast<int32>(GetCursorIndex()), iMods & HYKBMOD_Shift);
 		break;
 
 	case HYKEY_End:
@@ -286,11 +294,6 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 	SetText(m_Text.GetUtf8String()); // Ensure HyLabel is informed of m_Text changing
 }
 
-///*virtual*/ void HyLineEdit::OnUiMouseClicked() /*override*/
-//{
-//	RequestKeyboardFocus();
-//}
-
 /*virtual*/ void HyLineEdit::OnTakeKeyboardFocus() /*override*/
 {
 	HyEngine::Input().StartTextInput();
@@ -303,11 +306,25 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 {
 	HyEngine::Input().StopTextInput();
 	m_BlinkTimer.Reset();
-	m_Cursor.alpha.Set(0.0f);
+	
+	m_Selection.SetVisible(false);
+	m_Cursor.SetVisible(false);
+}
+
+/*virtual*/ void HyLineEdit::OnPanelUpdated() /*override*/
+{
+	HyLabel::OnPanelUpdated();
+
+	m_Cursor.SetTint(m_Panel.GetPanelColor().IsDark() ? HyColor::White : HyColor::Black);
+	m_Selection.SetTint(m_Panel.GetPanelColor().IsDark() ? HyColor::White : HyColor::Black);
 }
 
 /*virtual*/ void HyLineEdit::OnSetup() /*override*/
 {
+	m_Selection.alpha.Set(0.5f);
+	ChildInsert(m_Text, m_Selection);
+	ChildAppend(m_Cursor);
+
 	SetCursor(GetCursorIndex(), GetSelectionIndex());
 
 	m_BlinkTimer.SetExpiredCallback(OnCursorTimer, this);
@@ -316,9 +333,6 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 	SetKeyboardFocusAllowed(true);
 	SetMouseHoverCursor(HYMOUSECURSOR_IBeam);
 	m_uiAttribs |= LABELATTRIB_StackedTextUseLine | LABELATTRIB_StackedTextLeftAlign;
-
-	m_Selection.SetDisplayOrder(m_Text.GetDisplayOrder() - 1);
-	m_Cursor.SetDisplayOrder(m_Text.GetDisplayOrder() + 1);
 }
 
 void HyLineEdit::MoveCursor(int32 iOffset, bool bSelection)
@@ -326,25 +340,16 @@ void HyLineEdit::MoveCursor(int32 iOffset, bool bSelection)
 	int32 iNewCursorIndex = GetCursorIndex() + iOffset;
 	if(iNewCursorIndex < 0)
 		iNewCursorIndex = 0;
-	else if(iNewCursorIndex > m_Text.GetNumCharacters())
+	else if(iNewCursorIndex > static_cast<int32>(m_Text.GetNumCharacters()))
 		iNewCursorIndex = m_Text.GetNumCharacters();
 
 	SetCursor(iNewCursorIndex, bSelection ? GetSelectionIndex() : iNewCursorIndex);
-}
-
-void HyLineEdit::ToggleCursorVisible(bool bForceShown)
-{
-	if(bForceShown || m_Cursor.alpha.Get() == 0.0f)
-		m_Cursor.alpha.Set(1.0f);
-	else
-		m_Cursor.alpha.Set(0.0f);
 }
 
 /*static*/ void HyLineEdit::OnCursorTimer(void *pThisData)
 {
 	HyLineEdit *pThis = static_cast<HyLineEdit *>(pThisData);
 
-	pThis->ToggleCursorVisible(false);
-
+	pThis->m_Cursor.SetVisible(!pThis->m_Cursor.IsVisible());
 	pThis->m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
 }
