@@ -293,7 +293,7 @@ void IHyWidget::RelinquishKeyboardFocus()
 	ApplyPanelState();
 }
 
-HyPanelState IHyWidget::CalcPanelState() const
+HyPanelState IHyWidget::CalcPanelState()
 {
 	if(IsEnabled())
 	{

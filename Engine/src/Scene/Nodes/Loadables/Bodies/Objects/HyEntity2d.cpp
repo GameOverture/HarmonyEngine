@@ -414,9 +414,12 @@ void HyEntity2d::DisableMouseInput()
 	m_uiAttribs &= ~(ENTITYATTRIB_MouseInputEnabled | ENTITYATTRIB_MouseInputHover | ENTITYATTRIB_MouseInputDown | ENTITYATTRIB_MouseInputInvalid);
 }
 
-bool HyEntity2d::IsMouseHover() const
+bool HyEntity2d::IsMouseHover()
 {
-	return (m_uiAttribs & ENTITYATTRIB_MouseInputHover) != 0;
+	if(IsMouseInputEnabled())
+		return (m_uiAttribs & ENTITYATTRIB_MouseInputHover) != 0;
+	else
+		return CalcMouseInBounds();
 }
 
 bool HyEntity2d::IsMouseDown() const

@@ -100,7 +100,7 @@ public:
 	bool IsMouseInputEnabled() const;
 	void EnableMouseInput();
 	void DisableMouseInput();
-	bool IsMouseHover() const;
+	bool IsMouseHover();
 	bool IsMouseDown() const;
 
 	void ShapeAppend(HyShape2d &shapeRef);

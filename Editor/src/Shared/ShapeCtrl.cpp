@@ -512,7 +512,7 @@ ShapeCtrl::VemAction ShapeCtrl::GetMouseVemAction(bool bCtrlMod, bool bShiftMod,
 	case SHAPE_LineLoop:
 		for(GrabPoint *pGrabPt : m_VertexGrabPointList)
 		{
-			if(pGrabPt->IsMouseInBounds())
+			if(pGrabPt->IsMouseHover())
 			{
 				if(bSelectVert)
 					pGrabPt->SetSelected(true);
@@ -524,7 +524,7 @@ ShapeCtrl::VemAction ShapeCtrl::GetMouseVemAction(bool bCtrlMod, bool bShiftMod,
 	case SHAPE_Circle:
 		for(int i = 0; i < m_VertexGrabPointList.size(); ++i)
 		{
-			if(m_VertexGrabPointList[i]->IsMouseInBounds())
+			if(m_VertexGrabPointList[i]->IsMouseHover())
 			{
 				if(bSelectVert)
 					m_VertexGrabPointList[i]->SetSelected(true);

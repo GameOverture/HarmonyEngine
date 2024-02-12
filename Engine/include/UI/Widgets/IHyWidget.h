@@ -101,7 +101,7 @@ protected:
 	virtual void OnTakeKeyboardFocus() { }			// Widgets that are 'IsKeyboardFocusAllowed' should override this
 	virtual void OnRelinquishKeyboardFocus() { }	// Widgets that are 'IsKeyboardFocusAllowed' should override this
 
-	HyPanelState CalcPanelState() const;
+	HyPanelState CalcPanelState();
 	void ApplyPanelState();
 	virtual void OnPanelUpdated() { }				// Invoked whenever m_Panel is modified
 };

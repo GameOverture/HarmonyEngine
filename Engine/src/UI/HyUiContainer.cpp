@@ -29,7 +29,7 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 	m_RootLayout(eRootLayoutDirection, HYUICONTAINER_DefaultWidgetSpacing, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f),
-	m_bUseVertBar(false),
+	m_bUseVertBar(true),
 	m_bUseHorzBar(false),
 	m_VertBar(HYORIEN_Vertical, 20, this),
 	m_HorzBar(HYORIEN_Horizontal, 20, this)
