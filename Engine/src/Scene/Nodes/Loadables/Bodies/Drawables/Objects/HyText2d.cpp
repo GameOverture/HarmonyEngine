@@ -73,8 +73,9 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	m_DebugBox.SetWireframe(true);
 
 	// SetAsLine
-	if((m_uiTextAttributes & (TEXTATTRIB_IsColumn | TEXTATTRIB_IsScaleBox | TEXTATTRIB_IsVertical)) == 0)
+	switch(GetTextType())
 	{
+	case HYTEXT_Line:
 		switch(m_eAlignment)
 		{
 		case HYALIGN_Left:
@@ -90,15 +91,25 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 			m_DebugBox.SetAsLineSegment(glm::vec2(-GetWidth(), 0.0f), glm::vec2(0.0f, 0.0f));
 			break;
 		}
-	}
-	else if(m_uiTextAttributes & TEXTATTRIB_IsScaleBox)
+		break;
+
+	case HYTEXT_Box:
+	case HYTEXT_ScaleBox:
 		m_DebugBox.SetAsBox(m_vBoxDimensions.x, m_vBoxDimensions.y);
-	else if(m_uiTextAttributes & TEXTATTRIB_IsColumn)
+		break;
+
+	case HYTEXT_Column:
 		m_DebugBox.SetAsBox(m_vBoxDimensions.x, GetHeight());
-	else if(m_uiTextAttributes & TEXTATTRIB_IsVertical)
+		break;
+
+	case HYTEXT_Vertical:
 		m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, GetHeight()));
-	else
-		HyError("HyText2d::OnSetDebugBox - Unknown HyText2d text attributes");
+		break;
+
+	default:
+		HyError("HyText2d::OnSetDebugBox - Unknown HyText2d text type");
+		break;
+	}
 }
 #endif
 

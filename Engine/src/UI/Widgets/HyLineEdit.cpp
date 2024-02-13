@@ -325,6 +325,8 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 	ChildInsert(m_Text, m_Selection);
 	ChildAppend(m_Cursor);
 
+	SetAsStacked(HYALIGN_Left, HYTEXT_Line);
+
 	SetCursor(GetCursorIndex(), GetSelectionIndex());
 
 	m_BlinkTimer.SetExpiredCallback(OnCursorTimer, this);
@@ -332,7 +334,6 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 
 	SetKeyboardFocusAllowed(true);
 	SetMouseHoverCursor(HYMOUSECURSOR_IBeam);
-	m_uiAttribs |= LABELATTRIB_StackedTextUseLine | LABELATTRIB_StackedTextLeftAlign;
 }
 
 void HyLineEdit::MoveCursor(int32 iOffset, bool bSelection)

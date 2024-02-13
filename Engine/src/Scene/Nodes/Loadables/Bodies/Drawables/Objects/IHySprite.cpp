@@ -595,7 +595,7 @@ template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ bool IHySprite<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
 {
 	if(this->m_uiState == uiStateIndex || IHyLoadable::SetState(uiStateIndex) == false)
-		return false;
+		return this->m_uiState == uiStateIndex; // Return true if the state is already set, otherwise return false because IHyLoadable::SetState() failed
 
 	while(this->m_uiState >= m_AnimCtrlAttribList.size())
 		m_AnimCtrlAttribList.push_back(0);

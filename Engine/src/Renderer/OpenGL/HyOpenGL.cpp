@@ -278,8 +278,10 @@ HyOpenGL::~HyOpenGL(void)
 		HyStencil *pStencil = FindStencil(pRenderState->m_hSTENCIL);
 		glEnable(GL_STENCIL_TEST);
 
+		// TODO: This conditional check optimization seems to break if there's only one stencil (or if stencil mask updates over time)
+		// 
 		// Only write to the stencil buffer if m_hSTENCIL isn't the current stencil in the stencil buffer
-		if(m_hCurrentStencilBuffer != pRenderState->m_hSTENCIL)
+		//if(m_hCurrentStencilBuffer != pRenderState->m_hSTENCIL)
 		{
 			glStencilMask(0xFF);									// This mask allows any 8bit value to be written to the stencil buffer (and allows clears to work)
 

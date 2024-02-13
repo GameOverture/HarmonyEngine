@@ -42,9 +42,9 @@ HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNod
 {
 }
 
-/*virtual*/ void HyRackMeter::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_Center*/, bool bUseScaleBox /*= true*/) /*override*/
+/*virtual*/ void HyRackMeter::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_Center*/, HyTextType eTextType /*= HYTEXT_ScaleBox*/) /*override*/
 {
-	HyLabel::SetAsStacked(eTextAlignment, bUseScaleBox);
+	HyLabel::SetAsStacked(eTextAlignment, eTextType);
 
 	m_SpinText.m_SpinText_Shown.SetTextAlignment(eTextAlignment);
 	m_SpinText.m_SpinText_Padded.SetTextAlignment(eTextAlignment);

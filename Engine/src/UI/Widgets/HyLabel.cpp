@@ -94,10 +94,15 @@ void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath
 	m_Panel.Setup(panelInit);
 
 	m_Text.Init(textNodePath, this);
+	m_Text.SetTextAlignment(HYALIGN_Center);
 	m_TextMargins.Set(static_cast<float>(iTextMarginLeft),
 					  static_cast<float>(iTextMarginBottom),
 					  static_cast<float>(iTextMarginRight),
 					  static_cast<float>(iTextMarginTop));
+
+	// Default the Stacked text type to ScaleBox
+	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;
+	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
 
 	SetAsEnabled(IsEnabled());
 
@@ -105,32 +110,13 @@ void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath
 	OnSetup();
 }
 
-/*virtual*/ void HyLabel::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_Center*/, bool bUseScaleBox /*= true*/)
+/*virtual*/ void HyLabel::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_Center*/, HyTextType eTextType /*= HYTEXT_ScaleBox*/)
 {
 	m_uiAttribs &= ~LABELATTRIB_IsSideBySide;
-	switch(eTextAlignment)
-	{
-	case HYALIGN_Left:
-		m_uiAttribs &= ~(LABELATTRIB_StackedTextRightAlign | LABELATTRIB_StackedTextJustifyAlign);
-		m_uiAttribs |= LABELATTRIB_StackedTextLeftAlign;
-		break;
-	case HYALIGN_Center:
-		m_uiAttribs &= ~(LABELATTRIB_StackedTextLeftAlign | LABELATTRIB_StackedTextRightAlign | LABELATTRIB_StackedTextJustifyAlign);
-		break;
-	case HYALIGN_Right:
-		m_uiAttribs &= ~(LABELATTRIB_StackedTextLeftAlign | LABELATTRIB_StackedTextJustifyAlign);
-		m_uiAttribs |= LABELATTRIB_StackedTextRightAlign;
-		break;
-	case HYALIGN_Justify:
-		m_uiAttribs &= ~(LABELATTRIB_StackedTextLeftAlign | LABELATTRIB_StackedTextRightAlign);
-		m_uiAttribs |= LABELATTRIB_StackedTextJustifyAlign;
-		break;
-	}
 
-	if(bUseScaleBox)
-		m_uiAttribs &= ~LABELATTRIB_StackedTextUseLine;
-	else
-		m_uiAttribs |= LABELATTRIB_StackedTextUseLine;
+	m_Text.SetTextAlignment(eTextAlignment);
+	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;					// Clear the existing stacked text type bits
+	m_uiAttribs |= (eTextType << LABELATTRIB_StackedTextTypeOffset);	// Set the new stacked text type bits in the proper location
 	
 	ResetTextAndPanel();
 }
@@ -421,42 +407,55 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 		m_Text.pos.Set(m_Panel.GetFrameStrokeSize() + ((m_TextMargins.left * (vPanelDimensions.x / vUiSizeHint.x)) - vPanelOffset.x),
 					   m_Panel.GetFrameStrokeSize() + ((m_TextMargins.bottom * (vPanelDimensions.y / vUiSizeHint.y)) - vPanelOffset.y));
 
-		HyAlignment eAlignment;
+		
 		float fLineOffsetX = 0.0f;	// If *this is 'LABELATTRIB_StackedTextUseLine' determine how much to offset m_Text's position (not needed for scale boxes)
-		if(0 == (m_uiAttribs & (LABELATTRIB_StackedTextLeftAlign | LABELATTRIB_StackedTextRightAlign | LABELATTRIB_StackedTextJustifyAlign)))
-		{
-			eAlignment = HYALIGN_Center;
+		if(m_Text.GetTextAlignment() == HYALIGN_Center)
 			fLineOffsetX = (vPanelDimensions.x * 0.5f) - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x));
-		}
-		else if(m_uiAttribs & LABELATTRIB_StackedTextLeftAlign)
-			eAlignment = HYALIGN_Left;
-		else if(m_uiAttribs & LABELATTRIB_StackedTextRightAlign)
-		{
-			eAlignment = HYALIGN_Right;
+		else if(m_Text.GetTextAlignment() == HYALIGN_Right)
 			fLineOffsetX = vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x));
-		}
-		else
-			eAlignment = HYALIGN_Justify;
-		m_Text.SetTextAlignment(eAlignment);
 
-		// Size text
+		// Set text type/size
+		HyTextType eStackedTextType = static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
+
 		if(vPanelDimensions.x != 0.0f && vPanelDimensions.y != 0.0f)
 		{
-			if(m_uiAttribs & LABELATTRIB_StackedTextUseLine)
+			switch(eStackedTextType)
 			{
+			case HYTEXT_Line: {
 				m_Text.SetAsLine();
-
 				float fLineOffsetY = 0.0f;
 				float fVerticalSpace = vPanelDimensions.y - ((m_TextMargins.top + m_TextMargins.bottom) * (vPanelDimensions.y / vUiSizeHint.y)) - (m_Panel.GetFrameStrokeSize() * 2);
 				float fTextHeight = m_Text.GetLineBreakHeight(m_Text.scale.Y());
 				if(fVerticalSpace > fTextHeight)
 					fLineOffsetY = (fVerticalSpace - fTextHeight) * 0.5f;
 				m_Text.pos.Offset(fLineOffsetX, fLineOffsetY - m_Text.GetLineDescender(m_Text.scale.Y()));
-			}
-			else
+				break; }
+
+			case HYTEXT_ScaleBox:
 				m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x)) - (m_Panel.GetFrameStrokeSize() * 2),
 									 vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (vPanelDimensions.y / vUiSizeHint.y)) - (m_Panel.GetFrameStrokeSize() * 2), true);
+				break;
+
+			case HYTEXT_Box:
+				m_Text.SetAsBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x)) - (m_Panel.GetFrameStrokeSize() * 2),
+								vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (vPanelDimensions.y / vUiSizeHint.y)) - (m_Panel.GetFrameStrokeSize() * 2), true);
+				break;
+
+			case HYTEXT_Column:
+				m_Text.SetAsColumn(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x)) - (m_Panel.GetFrameStrokeSize() * 2));
+				break;
+
+			case HYTEXT_Vertical:
+				m_Text.SetAsVertical();
+				break;
+
+			default:
+				HyLogError("HyLabel::ResetTextAndPanel - Unknown text type");
+				break;
+			}
 		}
+		else if(eStackedTextType == HYTEXT_Vertical)
+			m_Text.SetAsVertical();
 		else
 			m_Text.SetAsLine();
 	}

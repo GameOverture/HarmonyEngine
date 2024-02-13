@@ -36,9 +36,9 @@ protected:
 	int32				m_iMaximum;
 	int32				m_iValue;
 
-	HyPanel				m_Bar;
 	HyPrimitive2d		m_BarMask;					// Used with m_BarStencil to crop m_Bar when 'PROGBARATTRIB_IsBarStretched' is off
 	HyStencil			m_BarStencil;
+	HyPanel				m_Bar;
 
 	float				m_fBarProgressAmt;
 	HyAnimFloat			m_BarProgressAmt;

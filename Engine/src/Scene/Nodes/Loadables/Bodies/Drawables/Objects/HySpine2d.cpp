@@ -96,7 +96,7 @@ const HySpine2d &HySpine2d::operator=(const HySpine2d &rhs)
 /*virtual*/ bool HySpine2d::SetState(uint32 uiStateIndex) /*override*/
 {
 	if(this->m_uiState == uiStateIndex || IHyLoadable::SetState(uiStateIndex) == false)
-		return false;
+		return this->m_uiState == uiStateIndex; // Return true if the state is already set, otherwise return false because IHyLoadable::SetState() failed
 
 #ifdef HY_USE_SPINE
 	const HySpineData *pData = static_cast<const HySpineData *>(this->AcquireData());

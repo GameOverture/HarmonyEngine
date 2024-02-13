@@ -574,14 +574,14 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 							if(eTextStyle == TEXTSTYLE_Column)
 							{
 								if(pTextNode->IsColumn() == false || vStyleSize.x != pTextNode->GetTextBoxDimensions().x)
-									pTextNode->SetAsColumn(vStyleSize.x, false);
+									pTextNode->SetAsColumn(vStyleSize.x);
 							}
 							else // TEXTSTYLE_ScaleBox or TEXTSTYLE_ScaleBoxTopAlign
 							{
 								if(pTextNode->IsScaleBox() == false ||
 									vStyleSize.x != pTextNode->GetTextBoxDimensions().x ||
 									vStyleSize.y != pTextNode->GetTextBoxDimensions().y ||
-									(eTextStyle == TEXTSTYLE_ScaleBox) != pTextNode->IsScaleBoxCenterVertically())
+									(eTextStyle == TEXTSTYLE_ScaleBox) != pTextNode->IsCenterVertically())
 								{
 									pTextNode->SetAsScaleBox(vStyleSize.x, vStyleSize.y, eTextStyle == TEXTSTYLE_ScaleBox);
 								}

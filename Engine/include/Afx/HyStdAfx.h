@@ -130,6 +130,20 @@ enum HyAnimCtrl
 	HYANIMCTRL_DontBounce
 };
 
+enum HyTextType
+{
+	HYTEXT_Line = 0,
+	HYTEXT_Column,
+	HYTEXT_Box,
+	HYTEXT_ScaleBox,
+	HYTEXT_Vertical,
+
+	HYNUM_TEXTTYPES,
+
+	HYTEXT_MASK = 0x07	// 3 bits
+};
+static_assert((int)HYNUM_TEXTTYPES < 8, "HyTextType cannot exceed 8 items due to 'IHyText' and 'HyLabel' only reserving 3 bits to store this value");
+
 enum HyAlignment
 {
 	HYALIGN_Unknown = -1,
@@ -153,6 +167,18 @@ enum HyPlaylistMode
 	HYNUM_PLAYLISTS
 };
 static_assert(HYNUM_PLAYLISTS < 7, "HyPlayListMode enum cannot exceed '7' entries because it's stored using '3' bits in struct AudioStateAttribs");
+
+enum HyShapeType
+{
+	HYSHAPE_Nothing = -1,
+
+	HYSHAPE_Circle = 0,
+	HYSHAPE_LineSegment,
+	HYSHAPE_Polygon,
+	HYSHAPE_LineChain,
+
+	HYNUM_SHAPES
+};
 
 enum HyLoadState
 {

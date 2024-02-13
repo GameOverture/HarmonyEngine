@@ -16,8 +16,8 @@ HyProgressBar::HyProgressBar(HyEntity2d *pParent /*= nullptr*/) :
 	m_iMinimum(0),
 	m_iMaximum(0),
 	m_iValue(0),
-	m_Bar(this),
 	m_BarMask(this),
+	m_Bar(this),
 	m_fBarProgressAmt(0.0f),
 	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
@@ -29,8 +29,8 @@ HyProgressBar::HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &ba
 	m_iMinimum(0),
 	m_iMaximum(0),
 	m_iValue(0),
-	m_Bar(this),
 	m_BarMask(this),
+	m_Bar(this),
 	m_fBarProgressAmt(0.0f),
 	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
@@ -43,8 +43,8 @@ HyProgressBar::HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &ba
 	m_iMinimum(0),
 	m_iMaximum(0),
 	m_iValue(0),
-	m_Bar(this),
 	m_BarMask(this),
+	m_Bar(this),
 	m_fBarProgressAmt(0.0f),
 	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
@@ -57,8 +57,8 @@ HyProgressBar::HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &ba
 	m_iMinimum(0),
 	m_iMaximum(0),
 	m_iValue(0),
-	m_Bar(this),
 	m_BarMask(this),
+	m_Bar(this),
 	m_fBarProgressAmt(0.0f),
 	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
@@ -116,7 +116,9 @@ void HyProgressBar::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
 
 bool HyProgressBar::SetBarState(uint32 uiStateIndex)
 {
-	return m_Bar.SetState(uiStateIndex);
+	bool bSuccess = m_Bar.SetState(uiStateIndex);
+	OnSetup();
+	return bSuccess;
 }
 
 bool HyProgressBar::IsVertical() const
@@ -252,23 +254,28 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 
 /*virtual*/ void HyProgressBar::OnSetup() /*override*/
 {
+	SetState(GetState()); // Disable auto HyPanelState's
+
+	m_BarMask.pos.Set(m_vBarOffset);
+	m_Bar.pos.Set(m_vBarOffset);
+
 	if(IsInverted())
 	{
 		if(IsVertical())
 		{
-			m_Bar.scale_pivot.Set(0.0f, m_Bar.GetHeight(1.0f));
 			m_BarMask.scale_pivot.Set(0.0f, m_Bar.GetHeight(1.0f));
+			m_Bar.scale_pivot.Set(0.0f, m_Bar.GetHeight(1.0f));
 		}
 		else
 		{
-			m_Bar.scale_pivot.Set(m_Bar.GetWidth(1.0f), 0.0f);
 			m_BarMask.scale_pivot.Set(m_Bar.GetWidth(1.0f), 0.0f);
+			m_Bar.scale_pivot.Set(m_Bar.GetWidth(1.0f), 0.0f);
 		}
 	}
 	else
 	{
-		m_Bar.scale_pivot.Set(0.0f, 0.0f);
 		m_BarMask.scale_pivot.Set(0.0f, 0.0f);
+		m_Bar.scale_pivot.Set(0.0f, 0.0f);
 	}
 
 	if(IsBarStretched())
@@ -278,8 +285,8 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 		m_BarMask.SetAsBox(m_Bar.GetWidth(), m_Bar.GetHeight());
 		m_BarMask.SetVisible(false);
 		m_BarStencil.AddMask(m_BarMask);
-		m_Bar.SetStencil(&m_BarStencil);
 		
+		m_Bar.SetStencil(&m_BarStencil);
 		m_Bar.scale.Set(1.0f, 1.0f);
 	}
 
@@ -291,7 +298,7 @@ void HyProgressBar::AdjustProgress(float fDuration)
 {
 	float fProgress = 0.0f;
 	if((m_iMaximum - m_iMinimum) != 0)
-		fProgress = 1.0f - static_cast<float>(m_iValue - m_iMinimum) / static_cast<float>(m_iMaximum - m_iMinimum);
+		fProgress = static_cast<float>(m_iValue - m_iMinimum) / static_cast<float>(m_iMaximum - m_iMinimum);
 
 	if(fProgress != m_BarProgressAmt.GetAnimDestination())
 		m_BarProgressAmt.Tween(fProgress, fDuration, HyTween::QuadInOut, 0.0f, [this](IHyNode *pThis) { ApplyProgress(); });

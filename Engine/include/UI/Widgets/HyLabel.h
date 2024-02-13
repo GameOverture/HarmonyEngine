@@ -23,11 +23,14 @@ protected:
 		LABELATTRIB_SideBySideTextFirst		= 1 << 14,		// When 'PANELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
 		LABELATTRIB_SideBySideVertical		= 1 << 15,		// When 'PANELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
 		
-		LABELATTRIB_StackedTextLeftAlign	= 1 << 16,		// When panel is stacked, use left alignment (when neither left, right, or justify, it will center)
-		LABELATTRIB_StackedTextRightAlign	= 1 << 17,		// When panel is stacked, use right alignment (when neither right, left, or justify, it will center)
-		LABELATTRIB_StackedTextJustifyAlign	= 1 << 18,		// When panel is stacked, use justify alignment (when neither justify, left, or right, it will center)
-		LABELATTRIB_StackedTextUseLine		= 1 << 19,		// When panel is stacked, use standard text line located at bot left margin, instead of scale box
+		LABELATTRIB_Reserved				= 1 << 16,		// Reserved (unused)
 		
+		LABELATTRIB_StackedTextTypeMask		= 0xE0000,		// When Panel is 'Stacked' (default), this mask holds HyTextType enum value.
+		LABELATTRIB_StackedTextTypeOffset	= 17,			// Bit shift offset to get/set 'HyTextType'
+		//									= 1 << 17
+		//									= 1 << 18		// 3 bits, bit's 17-19
+		//									= 1 << 19
+
 		LABELATTRIB_NEXTFLAG				= 1 << 20
 	};
 	static_assert((int)LABELATTRIB_IsSideBySide == (int)WIDGETATTRIB_NEXTFLAG, "HyLabel is not matching with base classes attrib flags");
@@ -51,7 +54,7 @@ public:
 	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath);
 	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
 
-	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_Center, bool bUseScaleBox = true);							// Default setup. Shows text positioned on top and inside the panel based on 'eTextAlignment' and 'bUseScaleBox'
+	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_Center, HyTextType eTextType = HYTEXT_ScaleBox);				// Default setup. Shows text positioned on top and inside the panel based on 'eTextAlignment' and 'eTextType'
 	void SetAsSideBySide(bool bPanelBeforeText = true, int32 iPadding = 5, HyOrientation eOrientation = HYORIEN_Horizontal);	// Show the panel and text side by side specified accordingly to the arguments passed
 
 	bool IsTextVisible() const;

@@ -45,7 +45,7 @@ public:
 	std::string GetName() const;
 	std::string GetPrefix() const;
 
-	uint32 GetState() const;
+	virtual uint32 GetState() const;
 	virtual bool SetState(uint32 uiStateIndex);
 	virtual uint32 GetNumStates();
 

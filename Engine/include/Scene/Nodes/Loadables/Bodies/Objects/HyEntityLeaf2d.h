@@ -46,6 +46,26 @@ public:
 		HyEntity2d::ChildRemove(&m_Leaf);
 	}
 
+	virtual uint32 GetState() const override
+	{
+		return m_Leaf.GetState();
+	}
+
+	virtual bool SetState(uint32 uiStateIndex) override
+	{
+		uint32 uiPrevState = m_Leaf.GetState();
+		if(m_Leaf.SetState(uiStateIndex) == false)
+			return false;
+		
+		if(IHyLoadable::SetState(uiStateIndex) == false)
+		{
+			m_Leaf.SetState(uiPrevState);
+			return false;
+		}
+
+		return true;
+	}
+
 	bool IsLeafValid() const
 	{
 		return m_Leaf.IsDataValid();

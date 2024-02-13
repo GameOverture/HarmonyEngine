@@ -68,6 +68,11 @@ protected:
 
 	void MoveCursor(int32 iOffset, bool bSelection);
 	static void OnCursorTimer(void *pThisData);
+
+//private:
+//	using HyLabel::SetAsStacked;
+//	using HyLabel::SetAsSideBySide;
+
 };
 
 #endif /* HyLineEdit_h__ */

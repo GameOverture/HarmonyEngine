@@ -30,16 +30,15 @@ class IHyText : public NODETYPE
 protected:
 	enum TextAttributes
 	{
-		TEXTATTRIB_IsDirty					= 1 << 0,
-		TEXTATTRIB_IsColumn					= 1 << 1,
-		TEXTATTRIB_IsVertical				= 1 << 2,
-		TEXTATTRIB_ColumnSplitWordsToFit	= 1 << 3,
-		TEXTATTRIB_IsScaleBox				= 1 << 4,
-		TEXTATTRIB_ScaleBoxCenterVertically	= 1 << 5,
-		TEXTATTRIB_UseMonospacedDigits		= 1 << 6,
-		TEXTATTRIB_IsTweeningLayerColor		= 1 << 7,
+		TEXTATTRIB_TypeMask					= 0x7, // 3 bits to hold a 'HyTextType' value
+		TEXTATTRIB_IsDirty					= 1 << 3,
+		TEXTATTRIB_CenterVertically			= 1 << 4,
+		TEXTATTRIB_UseMonospacedDigits		= 1 << 5,
+		TEXTATTRIB_IsTweeningLayerColor		= 1 << 6,
+
+		// NOTE: do not exceed 8 bits
 	};
-	uint32								m_uiTextAttributes;
+	uint8								m_uiTextAttributes;
 
 	std::string							m_sRawString;
 	std::vector<uint32>					m_Utf32CodeList;
@@ -109,6 +108,8 @@ public:
 
 	const IHyText &operator=(const IHyText &rhs);
 
+	HyTextType GetTextType() const;
+
 	bool IsGlyphAvailable(const std::string sUtf8Character); // Pass a single utf8 character, returns whether that character exists in the font
 
 	const std::string &GetUtf8String() const;
@@ -159,16 +160,19 @@ public:
 	bool IsMonospacedDigits() const;
 	void SetMonospacedDigits(bool bSet);
 
+	bool IsCenterVertically() const;
+
 	const glm::vec2 &GetTextBoxDimensions() const;
 
 	bool IsLine() const;
 	bool IsColumn() const;
+	bool IsBox() const;
 	bool IsScaleBox() const;
-	bool IsScaleBoxCenterVertically() const;
 	bool IsVertical() const;
 
 	void SetAsLine();
-	void SetAsColumn(float fWidth, bool bSplitWordsToFit = false);
+	void SetAsColumn(float fWidth);
+	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically);
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 	void SetAsVertical();
 

@@ -12,18 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 
-enum HyShapeType
-{
-	HYSHAPE_Nothing = -1,
-
-	HYSHAPE_Circle = 0,
-	HYSHAPE_LineSegment,
-	HYSHAPE_Polygon,
-	HYSHAPE_LineChain,
-
-	HYNUM_SHAPE
-};
-
 class HyEntity2d;
 
 class HyShape2d

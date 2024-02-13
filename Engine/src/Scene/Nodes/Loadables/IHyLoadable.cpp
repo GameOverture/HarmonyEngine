@@ -111,7 +111,7 @@ void IHyLoadable::_Reinitialize(const HyNodePath &nodePathRef)
 		Load();
 }
 
-uint32 IHyLoadable::GetState() const
+/*virtual*/ uint32 IHyLoadable::GetState() const
 {
 	return m_uiState;
 }

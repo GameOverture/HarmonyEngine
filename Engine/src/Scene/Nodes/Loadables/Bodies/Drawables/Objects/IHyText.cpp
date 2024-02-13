@@ -95,6 +95,12 @@ const IHyText<NODETYPE, ENTTYPE> &IHyText<NODETYPE, ENTTYPE>::operator=(const IH
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+HyTextType IHyText<NODETYPE, ENTTYPE>::GetTextType() const
+{
+	return static_cast<HyTextType>(m_uiTextAttributes & TEXTATTRIB_TypeMask);
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 bool IHyText<NODETYPE, ENTTYPE>::IsGlyphAvailable(const std::string sUtf8Character)
 {
 	if(this->AcquireData() == nullptr)
@@ -453,7 +459,9 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 template<typename NODETYPE, typename ENTTYPE>
 glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
 {
-	if(m_uiTextAttributes & TEXTATTRIB_IsScaleBox)
+	HyTextType eTextType = GetTextType();
+
+	if(eTextType == HYTEXT_Box || eTextType == HYTEXT_ScaleBox)
 		return glm::vec2(0.0f, 0.0f);
 
 	if(this->AcquireData() == nullptr) {
@@ -465,7 +473,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
 	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 
 	float fX = 0.0f;
-	if((m_uiTextAttributes & TEXTATTRIB_IsColumn) == 0)
+	if(eTextType != HYTEXT_Column)
 	{
 		switch(m_eAlignment)
 		{
@@ -481,8 +489,8 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
 			break;
 		}
 	}
-		
-	return glm::vec2(fX, GetTextCursorPos().y);// -(abs(pData->GetLineDescender(this->m_uiState) * this->scale.Y())));
+
+	return glm::vec2(fX, GetTextCursorPos().y);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -504,6 +512,12 @@ void IHyText<NODETYPE, ENTTYPE>::SetMonospacedDigits(bool bSet)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+bool IHyText<NODETYPE, ENTTYPE>::IsCenterVertically() const
+{
+	return m_uiTextAttributes & TEXTATTRIB_CenterVertically;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::GetTextBoxDimensions() const
 {
 	return m_vBoxDimensions;
@@ -512,37 +526,39 @@ const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::GetTextBoxDimensions() const
 template<typename NODETYPE, typename ENTTYPE>
 bool IHyText<NODETYPE, ENTTYPE>::IsLine() const
 {
-	return (m_uiTextAttributes & (TEXTATTRIB_IsColumn | TEXTATTRIB_IsScaleBox | TEXTATTRIB_IsVertical)) == 0;
+	return GetTextType() == HYTEXT_Line;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 bool IHyText<NODETYPE, ENTTYPE>::IsColumn() const
 {
-	return m_uiTextAttributes & TEXTATTRIB_IsColumn;
+	return GetTextType() == HYTEXT_Column;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHyText<NODETYPE, ENTTYPE>::IsBox() const
+{
+	return GetTextType() == HYTEXT_Box;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 bool IHyText<NODETYPE, ENTTYPE>::IsScaleBox() const
 {
-	return m_uiTextAttributes & TEXTATTRIB_IsScaleBox;
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-bool IHyText<NODETYPE, ENTTYPE>::IsScaleBoxCenterVertically() const
-{
-	return m_uiTextAttributes & TEXTATTRIB_ScaleBoxCenterVertically;
+	return GetTextType() == HYTEXT_ScaleBox;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 bool IHyText<NODETYPE, ENTTYPE>::IsVertical() const
 {
-	return m_uiTextAttributes & TEXTATTRIB_IsVertical;
+	return GetTextType() == HYTEXT_Vertical;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsLine()
 {
-	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_ColumnSplitWordsToFit | TEXTATTRIB_IsScaleBox | TEXTATTRIB_ScaleBoxCenterVertically | TEXTATTRIB_IsVertical);
+	m_uiTextAttributes &= ~HYTEXT_MASK;
+	m_uiTextAttributes |= HYTEXT_Line;
+
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
@@ -550,7 +566,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsLine()
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit /*= false*/)
+void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth)
 {
 	if(fWidth <= 0.0f)
 	{
@@ -558,16 +574,35 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth, bool bSplitWordsToFit
 		fWidth = HyMath::Max(1.0f, fWidth);
 	}
 
-	m_uiTextAttributes &= ~(TEXTATTRIB_IsScaleBox | TEXTATTRIB_ScaleBoxCenterVertically | TEXTATTRIB_IsVertical);
-	m_uiTextAttributes |= TEXTATTRIB_IsColumn;
-
-	if(bSplitWordsToFit)
-		m_uiTextAttributes |= TEXTATTRIB_ColumnSplitWordsToFit;
-	else
-		m_uiTextAttributes &= ~TEXTATTRIB_ColumnSplitWordsToFit;
+	m_uiTextAttributes &= ~HYTEXT_MASK;
+	m_uiTextAttributes |= HYTEXT_Column;
 
 	m_vBoxDimensions.x = fWidth;
 	m_vBoxDimensions.y = 0.0f;
+
+	MarkAsDirty();
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHyText<NODETYPE, ENTTYPE>::SetAsBox(float fWidth, float fHeight, bool bCenterVertically)
+{
+	if(fWidth <= 0.0f || fHeight <= 0.0f)
+	{
+		HyLogWarning("IHyText<NODETYPE, ENTTYPE>::SetAsTextBox() invoked with invalid dimensions: " << fWidth << ", " << fHeight);
+		fWidth = HyMath::Max(1.0f, fWidth);
+		fHeight = HyMath::Max(1.0f, fHeight);
+	}
+
+	m_uiTextAttributes &= ~HYTEXT_MASK;
+	m_uiTextAttributes |= HYTEXT_Box;
+
+	if(bCenterVertically)
+		m_uiTextAttributes |= TEXTATTRIB_CenterVertically;
+	else
+		m_uiTextAttributes &= ~TEXTATTRIB_CenterVertically;
+
+	m_vBoxDimensions.x = fWidth;
+	m_vBoxDimensions.y = fHeight;
 
 	MarkAsDirty();
 }
@@ -582,13 +617,13 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsScaleBox(float fWidth, float fHeight, bool
 		fHeight = HyMath::Max(1.0f, fHeight);
 	}
 
-	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_ColumnSplitWordsToFit | TEXTATTRIB_IsVertical);
-	m_uiTextAttributes |= TEXTATTRIB_IsScaleBox;
+	m_uiTextAttributes &= ~HYTEXT_MASK;
+	m_uiTextAttributes |= HYTEXT_ScaleBox;
 
 	if(bCenterVertically)
-		m_uiTextAttributes |= TEXTATTRIB_ScaleBoxCenterVertically;
+		m_uiTextAttributes |= TEXTATTRIB_CenterVertically;
 	else
-		m_uiTextAttributes &= ~TEXTATTRIB_ScaleBoxCenterVertically;
+		m_uiTextAttributes &= ~TEXTATTRIB_CenterVertically;
 
 	m_vBoxDimensions.x = fWidth;
 	m_vBoxDimensions.y = fHeight;
@@ -599,8 +634,9 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsScaleBox(float fWidth, float fHeight, bool
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetAsVertical()
 {
-	m_uiTextAttributes &= ~(TEXTATTRIB_IsColumn | TEXTATTRIB_ColumnSplitWordsToFit | TEXTATTRIB_IsScaleBox | TEXTATTRIB_ScaleBoxCenterVertically);
-	m_uiTextAttributes |= TEXTATTRIB_IsVertical;
+	m_uiTextAttributes &= ~HYTEXT_MASK;
+	m_uiTextAttributes |= HYTEXT_Vertical;
+
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
 
@@ -611,7 +647,7 @@ template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ bool IHyText<NODETYPE, ENTTYPE>::SetState(uint32 uiStateIndex) /*override*/
 {
 	if(this->m_uiState == uiStateIndex || IHyLoadable::SetState(uiStateIndex) == false)
-		return false;
+		return this->m_uiState == uiStateIndex; // Return true if the state is already set, otherwise return false because IHyLoadable::SetState() failed
 
 	MarkAsDirty();
 	return true;
@@ -748,6 +784,7 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 	if((m_uiTextAttributes & TEXTATTRIB_IsDirty) == 0 || this->AcquireData() == nullptr)
 		return;
 
+	const HyTextType eTEXT_TYPE = GetTextType();
 	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 
 	m_uiNumValidCharacters = m_uiNumRenderQuads = 0;
@@ -930,10 +967,8 @@ offsetCalculation:
 				if(fCurLineDecender < (fDecender * m_fScaleBoxModifier))
 					fCurLineDecender = (fDecender * m_fScaleBoxModifier);
 
-				// If drawing text within a column, and we advance past our width, determine if we should newline
-				if((m_uiTextAttributes & TEXTATTRIB_IsScaleBox) == 0 &&
-					(m_uiTextAttributes & TEXTATTRIB_IsColumn) != 0 &&
-					fCurLineWidth > m_vBoxDimensions.x)
+				// If drawing text within a column or box, and we advance past our width, determine if we should newline
+				if((eTEXT_TYPE == HYTEXT_Column || eTEXT_TYPE == HYTEXT_Box) && fCurLineWidth > m_vBoxDimensions.x)
 				{
 					// If splitting words is ok, continue. Otherwise ensure this isn't the only word on the line
 					//if((m_uiTextAttributes & TEXTATTRIB_ColumnSplitWordsToFit) != 0 ||
@@ -949,7 +984,7 @@ offsetCalculation:
 				}
 			}
 
-			if((m_uiTextAttributes & TEXTATTRIB_IsVertical) != 0)
+			if(eTEXT_TYPE == HYTEXT_Vertical)
 			{
 				bDoNewline = true;
 			}
@@ -971,10 +1006,10 @@ offsetCalculation:
 			}
 		}
 
-		// If this is the first line, and we're a TEXTATTRIB_ScaleBox, then place text snug against the top of the bounds box
+		// If this is the first line, and we're a Box or ScaleBox, then place text snug against the top of the bounds box
 		if(bFirstLine && (bDoNewline || uiStrIndex == (uiSTR_SIZE - 1)))
 		{
-			if((m_uiTextAttributes & TEXTATTRIB_IsScaleBox) != 0)
+			if(eTEXT_TYPE == HYTEXT_Box || eTEXT_TYPE == HYTEXT_ScaleBox)
 			{
 				for(int32 iFirstLineStrIndex = static_cast<int32>(uiStrIndex); iFirstLineStrIndex >= 0; --iFirstLineStrIndex)
 				{
@@ -999,7 +1034,7 @@ offsetCalculation:
 		{
 			float fNewLineOffset = (pData->GetLineHeight(this->m_uiState) * m_fScaleBoxModifier);
 
-			if((m_uiTextAttributes & TEXTATTRIB_IsVertical) != 0)
+			if(eTEXT_TYPE == HYTEXT_Vertical)
 				fNewLineOffset = fCurLineHeight;
 			//else if(m_uiIndent == 0 && uiStrIndex == 0 && m_Utf32CodeList[uiStrIndex] != '\n') {
 			//	HyLogWarning("Text box is too small to fit a single character");
@@ -1012,7 +1047,7 @@ offsetCalculation:
 				pWritePos[i].y -= fNewLineOffset;
 			}
 
-			if((m_uiTextAttributes & TEXTATTRIB_IsVertical) == 0)
+			if(eTEXT_TYPE != HYTEXT_Vertical)
 			{
 				// Restart calculation of glyph offsets at the beginning of this this word (on a newline)
 				if(bHandleNewlineCharacter == false && (uiNewlineIndex != iLastSpaceIndex || iLastSpaceIndex == 0))
@@ -1133,9 +1168,9 @@ offsetCalculation:
 	for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
 		m_fUsedPixelHeight += vNewlineInfo[i].fUSED_HEIGHT;
 
-	if(0 != (m_uiTextAttributes & TEXTATTRIB_IsScaleBox))
+	if(eTEXT_TYPE == HYTEXT_Box || eTEXT_TYPE == HYTEXT_ScaleBox)
 	{
-		if(bScaleBoxModiferIsSet == false)
+		if(eTEXT_TYPE == HYTEXT_ScaleBox && bScaleBoxModiferIsSet == false)
 		{
 			float fScaleX = m_vBoxDimensions.x / m_fUsedPixelWidth;
 			float fScaleY = m_vBoxDimensions.y / m_fUsedPixelHeight;
@@ -1145,7 +1180,7 @@ offsetCalculation:
 			bScaleBoxModiferIsSet = true;
 			goto offsetCalculation;
 		}
-		else if(0 != (m_uiTextAttributes & TEXTATTRIB_ScaleBoxCenterVertically))
+		else if(0 != (m_uiTextAttributes & TEXTATTRIB_CenterVertically))
 		{
 			float fCenterNudgeAmt = (m_vBoxDimensions.y - m_fUsedPixelHeight) * 0.5f;
 			for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
