@@ -19,10 +19,10 @@ class HyRackMeter : public HyLabel
 protected:
 	enum RackMeterAttributes
 	{
-		RACKMETERATTRIB_IsSpinDigits = 1 << 20,
-		RACKMETERATTRIB_IsMoney = 1 << 21,
+		RACKMETERATTRIB_IsSpinDigits = 1 << 24,
+		RACKMETERATTRIB_IsMoney = 1 << 25,
 
-		RACKMETERATTRIB_NEXTFLAG = 1 << 22
+		RACKMETERATTRIB_NEXTFLAG = 1 << 26
 	};
 	static_assert((int)RACKMETERATTRIB_IsSpinDigits == (int)LABELATTRIB_NEXTFLAG, "HyRackMeter is not matching with base classes attrib flags");
 

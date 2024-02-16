@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyProgressBar.cpp
+*	HyBarMeter.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
@@ -8,10 +8,10 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/Widgets/HyProgressBar.h"
+#include "UI/Widgets/HyBarMeter.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-HyProgressBar::HyProgressBar(HyEntity2d *pParent /*= nullptr*/) :
+HyBarMeter::HyBarMeter(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_iMinimum(0),
 	m_iMaximum(0),
@@ -21,10 +21,13 @@ HyProgressBar::HyProgressBar(HyEntity2d *pParent /*= nullptr*/) :
 	m_fBarProgressAmt(0.0f),
 	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_ProgressBar << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+
 	m_NumberFormat.SetFractionPrecision(0, 1);
 }
 
-HyProgressBar::HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &barInit, HyEntity2d *pParent /*= nullptr*/) :
+HyBarMeter::HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_iMinimum(0),
 	m_iMaximum(0),
@@ -38,7 +41,7 @@ HyProgressBar::HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &ba
 	Setup(panelInit, barInit);
 }
 
-HyProgressBar::HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
+HyBarMeter::HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_iMinimum(0),
 	m_iMaximum(0),
@@ -52,7 +55,7 @@ HyProgressBar::HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &ba
 	Setup(panelInit, barInit, textNodePath, 0, 0, 0, 0);
 }
 
-HyProgressBar::HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
+HyBarMeter::HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_iMinimum(0),
 	m_iMaximum(0),
@@ -66,133 +69,133 @@ HyProgressBar::HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &ba
 	Setup(panelInit, barInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }
 
-/*virtual*/ HyProgressBar::~HyProgressBar()
+/*virtual*/ HyBarMeter::~HyBarMeter()
 {
 }
 
-/*virtual*/ void HyProgressBar::SetText(const std::string &sUtf8Text) /*override*/
+/*virtual*/ void HyBarMeter::SetText(const std::string &sUtf8Text) /*override*/
 {
 	if(sUtf8Text.empty())
-		m_uiAttribs &= ~PROGBARATTRIB_IsTextOverride;
+		m_uiAttribs &= ~BARMETERATTRIB_IsTextOverride;
 	else
-		m_uiAttribs |= PROGBARATTRIB_IsTextOverride;
+		m_uiAttribs |= BARMETERATTRIB_IsTextOverride;
 
 	HyLabel::SetText(sUtf8Text);
 }
 
-void HyProgressBar::Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit)
+void HyBarMeter::Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit)
 {
 	m_Bar.Setup(barInit);
 	HyLabel::Setup(panelInit);
 }
 
-void HyProgressBar::Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath)
+void HyBarMeter::Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath)
 {
 	m_Bar.Setup(barInit);
 	HyLabel::Setup(panelInit, textNodePath);
 }
 
-void HyProgressBar::Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
+void HyBarMeter::Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
 {
 	m_Bar.Setup(barInit);
 	HyLabel::Setup(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }
 
-glm::vec2 HyProgressBar::GetBarOffset() const
+glm::vec2 HyBarMeter::GetBarOffset() const
 {
 	return m_vBarOffset;
 }
 
-void HyProgressBar::SetBarOffset(const glm::ivec2 &barOffset)
+void HyBarMeter::SetBarOffset(const glm::ivec2 &barOffset)
 {
 	SetBarOffset(barOffset.x, barOffset.y);
 }
 
-void HyProgressBar::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
+void HyBarMeter::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
 {
 	HySetVec(m_vBarOffset, iBarOffsetX, iBarOffsetY);
 	OnSetup();
 }
 
-bool HyProgressBar::SetBarState(uint32 uiStateIndex)
+bool HyBarMeter::SetBarState(uint32 uiStateIndex)
 {
 	bool bSuccess = m_Bar.SetState(uiStateIndex);
 	OnSetup();
 	return bSuccess;
 }
 
-bool HyProgressBar::IsVertical() const
+bool HyBarMeter::IsVertical() const
 {
-	return (m_uiAttribs & PROGBARATTRIB_IsVertical) != 0;
+	return (m_uiAttribs & BARMETERATTRIB_IsVertical) != 0;
 }
 
-void HyProgressBar::SetVertical(bool bIsVertical)
+void HyBarMeter::SetVertical(bool bIsVertical)
 {
 	if(bIsVertical)
-		m_uiAttribs |= PROGBARATTRIB_IsVertical;
+		m_uiAttribs |= BARMETERATTRIB_IsVertical;
 	else
-		m_uiAttribs &= ~PROGBARATTRIB_IsVertical;
+		m_uiAttribs &= ~BARMETERATTRIB_IsVertical;
 
 	OnSetup();
 }
 
-bool HyProgressBar::IsInverted() const
+bool HyBarMeter::IsInverted() const
 {
-	return (m_uiAttribs & PROGBARATTRIB_IsInverted) != 0;
+	return (m_uiAttribs & BARMETERATTRIB_IsInverted) != 0;
 }
 
-void HyProgressBar::SetInverted(bool bIsInverted)
+void HyBarMeter::SetInverted(bool bIsInverted)
 {
 	if(bIsInverted)
-		m_uiAttribs |= PROGBARATTRIB_IsInverted;
+		m_uiAttribs |= BARMETERATTRIB_IsInverted;
 	else
-		m_uiAttribs &= ~PROGBARATTRIB_IsInverted;
+		m_uiAttribs &= ~BARMETERATTRIB_IsInverted;
 
 	OnSetup();
 }
 
-bool HyProgressBar::IsBarStretched() const
+bool HyBarMeter::IsBarStretched() const
 {
-	return (m_uiAttribs & PROGBARATTRIB_IsBarStretched) != 0;
+	return (m_uiAttribs & BARMETERATTRIB_IsBarStretched) != 0;
 }
 
-void HyProgressBar::SetBarStreteched(bool bIsBarStretched)
+void HyBarMeter::SetBarStreteched(bool bIsBarStretched)
 {
 	if(bIsBarStretched)
-		m_uiAttribs |= PROGBARATTRIB_IsBarStretched;
+		m_uiAttribs |= BARMETERATTRIB_IsBarStretched;
 	else
 	{
 		m_Bar.scale.Set(1.0f, 1.0f);
-		m_uiAttribs &= ~PROGBARATTRIB_IsBarStretched;
+		m_uiAttribs &= ~BARMETERATTRIB_IsBarStretched;
 	}
 
 	OnSetup();
 }
 
-bool HyProgressBar::IsBarUnderPanel() const
+bool HyBarMeter::IsBarUnderPanel() const
 {
-	return (m_uiAttribs & PROGBARATTRIB_IsBarUnderPanel) != 0;
+	return (m_uiAttribs & BARMETERATTRIB_IsBarUnderPanel) != 0;
 }
 
-void HyProgressBar::SetBarUnderPanel(bool bIsBarUnderPanel)
+void HyBarMeter::SetBarUnderPanel(bool bIsBarUnderPanel)
 {
 	if(bIsBarUnderPanel && IsBarUnderPanel() == false)
 	{
 		ChildRemove(&m_Bar);
 		ChildInsert(m_Panel, m_Bar);
-		m_uiAttribs |= PROGBARATTRIB_IsBarUnderPanel;
+		m_uiAttribs |= BARMETERATTRIB_IsBarUnderPanel;
 	}
 	else if(bIsBarUnderPanel == false && IsBarUnderPanel())
 	{
 		ChildRemove(&m_Bar);
 		ChildInsert(m_Text, m_Bar);
-		m_uiAttribs &= ~PROGBARATTRIB_IsBarUnderPanel;
+		m_uiAttribs &= ~BARMETERATTRIB_IsBarUnderPanel;
 	}
 	else
 		return;
 }
 
-void HyProgressBar::SetMinimum(int32 iMinimum)
+void HyBarMeter::SetMinimum(int32 iMinimum)
 {
 	if(m_iMinimum == iMinimum)
 		return;
@@ -203,7 +206,7 @@ void HyProgressBar::SetMinimum(int32 iMinimum)
 	AdjustProgress(0.0f);
 }
 
-void HyProgressBar::SetMaximum(int32 iMaximum)
+void HyBarMeter::SetMaximum(int32 iMaximum)
 {
 	if(m_iMaximum == iMaximum)
 		return;
@@ -214,7 +217,7 @@ void HyProgressBar::SetMaximum(int32 iMaximum)
 	AdjustProgress(0.0f);
 }
 
-void HyProgressBar::SetRange(int32 iMinimum, int32 iMaximum)
+void HyBarMeter::SetRange(int32 iMinimum, int32 iMaximum)
 {
 	if(m_iMinimum == iMinimum && m_iMaximum == iMaximum)
 		return;
@@ -224,7 +227,7 @@ void HyProgressBar::SetRange(int32 iMinimum, int32 iMaximum)
 	AdjustProgress(0.0f);
 }
 
-void HyProgressBar::SetValue(int32 iValue, float fAdjustDuration)
+void HyBarMeter::SetValue(int32 iValue, float fAdjustDuration)
 {
 	if(m_iValue == iValue)
 		return;
@@ -233,18 +236,18 @@ void HyProgressBar::SetValue(int32 iValue, float fAdjustDuration)
 	AdjustProgress(fAdjustDuration);
 }
 
-HyNumberFormat HyProgressBar::GetNumFormat() const
+HyNumberFormat HyBarMeter::GetNumFormat() const
 {
 	return m_NumberFormat;
 }
 
-void HyProgressBar::SetNumFormat(HyNumberFormat format)
+void HyBarMeter::SetNumFormat(HyNumberFormat format)
 {
 	m_NumberFormat = format;
 	AdjustProgress(0.0f);
 }
 
-/*virtual*/ void HyProgressBar::Update() /*override*/
+/*virtual*/ void HyBarMeter::Update() /*override*/
 {
 	HyLabel::Update();
 
@@ -252,7 +255,7 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 		ApplyProgress();
 }
 
-/*virtual*/ void HyProgressBar::OnSetup() /*override*/
+/*virtual*/ void HyBarMeter::OnSetup() /*override*/
 {
 	SetState(GetState()); // Disable auto HyPanelState's
 
@@ -294,7 +297,7 @@ void HyProgressBar::SetNumFormat(HyNumberFormat format)
 	ApplyProgress();
 }
 
-void HyProgressBar::AdjustProgress(float fDuration)
+void HyBarMeter::AdjustProgress(float fDuration)
 {
 	float fProgress = 0.0f;
 	if((m_iMaximum - m_iMinimum) != 0)
@@ -303,11 +306,11 @@ void HyProgressBar::AdjustProgress(float fDuration)
 	if(fProgress != m_BarProgressAmt.GetAnimDestination())
 		m_BarProgressAmt.Tween(fProgress, fDuration, HyTween::QuadInOut, 0.0f, [this](IHyNode *pThis) { ApplyProgress(); });
 
-	if((m_uiAttribs & PROGBARATTRIB_IsTextOverride) == 0)
+	if((m_uiAttribs & BARMETERATTRIB_IsTextOverride) == 0)
 		HyLabel::SetText(HyLocale::Percent_Format(fProgress * 100.0, m_NumberFormat)); // NOTE: Don't use this class's SetText() so m_uiAttribs doesn't get set
 }
 
-void HyProgressBar::ApplyProgress()
+void HyBarMeter::ApplyProgress()
 {
 	if(IsVertical())
 	{

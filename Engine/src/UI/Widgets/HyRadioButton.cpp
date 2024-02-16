@@ -1,76 +1,76 @@
 /**************************************************************************
-*	HyCheckBox.h
+*	HyRadioButton.h
 *
 *	Harmony Engine
-*	Copyright (c) 2022 Jason Knobler
+*	Copyright (c) 2024 Jason Knobler
 *
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/Widgets/HyCheckBox.h"
+#include "UI/Widgets/HyRadioButton.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-HyCheckBox::HyCheckBox(HyEntity2d *pParent /*= nullptr*/) :
+HyRadioButton::HyRadioButton(HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_CheckBox << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;									// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_RadioButton << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
 }
 
-HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
+HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_CheckBox << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;									// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_RadioButton << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
 
 	OnSetup();
 }
 
-HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
+HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, textNodePath, pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_CheckBox << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;									// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_RadioButton << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
 
 	OnSetup();
 }
 
-HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
+HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, textNodePath, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_CheckBox << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;									// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_RadioButton << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
 
 	OnSetup();
 }
 
-/*virtual*/ HyCheckBox::~HyCheckBox()
+/*virtual*/ HyRadioButton::~HyRadioButton()
 {
 }
 
-bool HyCheckBox::IsChecked() const
+bool HyRadioButton::IsChecked() const
 {
-	return m_uiAttribs & CHECKBOXATTRIB_IsChecked;
+	return m_uiAttribs & RADIOBTNATTRIB_IsChecked;
 }
 
-void HyCheckBox::SetChecked(bool bChecked)
+void HyRadioButton::SetChecked(bool bChecked)
 {
 	if(bChecked == IsChecked())
 		return;
 
 	if(bChecked)
-		m_uiAttribs |= CHECKBOXATTRIB_IsChecked;
+		m_uiAttribs |= RADIOBTNATTRIB_IsChecked;
 	else
-		m_uiAttribs &= ~CHECKBOXATTRIB_IsChecked;
+		m_uiAttribs &= ~RADIOBTNATTRIB_IsChecked;
 
 	ResetTextAndPanel();
 	
@@ -78,13 +78,13 @@ void HyCheckBox::SetChecked(bool bChecked)
 		m_fpOnCheckedChanged(this, m_pCheckedChangedParam);
 }
 
-void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void *)> fpCallback, void *pParam /*= nullptr*/)
+void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *, void *)> fpCallback, void *pParam /*= nullptr*/)
 {
 	m_fpOnCheckedChanged = fpCallback;
 	m_pCheckedChangedParam = pParam;
 }
 
-/*virtual*/ void HyCheckBox::OnSetup() /*override*/
+/*virtual*/ void HyRadioButton::OnSetup() /*override*/
 {
 	HyButton::OnSetup();
 	SetAsSideBySide();
@@ -92,7 +92,7 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void
 	AssembleCheckmark();
 }
 
-/*virtual*/ void HyCheckBox::ResetTextAndPanel() /*override*/
+/*virtual*/ void HyRadioButton::ResetTextAndPanel() /*override*/
 {
 	HyButton::ResetTextAndPanel();
 
@@ -116,13 +116,13 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void
 	m_CheckMarkFill.SetTint(m_Panel.GetPanelColor().Lighten());
 }
 
-/*virtual*/ void HyCheckBox::OnUiMouseClicked() /*override*/
+/*virtual*/ void HyRadioButton::OnUiMouseClicked() /*override*/
 {
 	HyButton::OnUiMouseClicked();
 	SetChecked(!IsChecked());
 }
 
-void HyCheckBox::AssembleCheckmark()
+void HyRadioButton::AssembleCheckmark()
 {
 	if(m_Panel.IsValid())
 	{

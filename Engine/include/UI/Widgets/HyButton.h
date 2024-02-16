@@ -22,9 +22,9 @@ class HyButton : public HyLabel
 protected:
 	enum ButtonAttributes
 	{
-		BTNATTRIB_IsKbDownState		= 1 << 20,		// Indicates this button is currently receiving keyboard input that is pressing (BTNATTRIB_IsDownState) the button
+		BTNATTRIB_IsKbDownState		= 1 << 24,		// Indicates this button is currently receiving keyboard input that is pressing (BTNATTRIB_IsDownState) the button
 
-		BTNATTRIB_NEXTFLAG			= 1 << 21
+		BTNATTRIB_NEXTFLAG			= 1 << 25
 	};
 	static_assert((int)BTNATTRIB_IsKbDownState == (int)LABELATTRIB_NEXTFLAG, "HyButton is not matching with base classes attrib flags");
 

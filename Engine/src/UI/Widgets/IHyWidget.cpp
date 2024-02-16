@@ -24,6 +24,11 @@ IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
+HyWidgetType IHyWidget::GetWidgetType() const
+{
+	return static_cast<HyWidgetType>((m_uiAttribs & WIDGETATTRIB_TypeMask) >> WIDGETATTRIB_TypeOffset);
+}
+
 /*virtual*/ bool IHyWidget::SetState(uint32 uiStateIndex) /*override*/
 {
 	if(IHyLoadable::SetState(uiStateIndex) == false || m_Panel.SetState(uiStateIndex) == false)

@@ -20,6 +20,8 @@ HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 	m_fExpandedTimeout(0.0f),
 	m_ExpandAnimVec(*this, 0)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_ComboBox << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
 }
 
 HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
@@ -31,6 +33,9 @@ HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	m_fExpandedTimeout(0.0f),
 	m_ExpandAnimVec(*this, 0)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_ComboBox << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+
 	OnSetup();
 }
 
@@ -43,6 +48,9 @@ HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	m_fExpandedTimeout(0.0f),
 	m_ExpandAnimVec(*this, 0)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_ComboBox << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+
 	OnSetup();
 }
 

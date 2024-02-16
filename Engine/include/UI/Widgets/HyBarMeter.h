@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyProgressBar.h
+*	HyBarMeter.h
 *
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
@@ -7,28 +7,28 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HyProgressBar_h__
-#define HyProgressBar_h__
+#ifndef HyHyBarMeter_h__
+#define HyHyBarMeter_h__
 
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/HyLabel.h"
 #include "UI/Localization/HyLocale.h"
 
-class HyProgressBar : public HyLabel
+class HyBarMeter : public HyLabel
 {
 protected:
 	enum ProgressBarAttributes
 	{
-		PROGBARATTRIB_IsVertical		= 1 << 20,	// If set, the bar will grow vertically instead of horizontally
-		PROGBARATTRIB_IsInverted		= 1 << 21,	// If set, the bar will grow from right to left or bottom to top
-		PROGBARATTRIB_IsBarStretched	= 1 << 22,	// If set and the bar is a Node item, the bar node will be scaled to fit the range of the progress bar. Otherwise, the bar is stenciled/cropped to fit the range (default)
+		BARMETERATTRIB_IsVertical		= 1 << 24,	// If set, the bar will grow vertically instead of horizontally
+		BARMETERATTRIB_IsInverted		= 1 << 25,	// If set, the bar will grow from right to left or bottom to top
+		BARMETERATTRIB_IsBarStretched	= 1 << 26,	// If set and the bar is a Node item, the bar node will be scaled to fit the range of the progress bar. Otherwise, the bar is stenciled/cropped to fit the range (default)
 		
-		PROGBARATTRIB_IsBarUnderPanel	= 1 << 23,	// If set, the bar will be drawn under the panel instead of over it. Only useful if panel is a node item with transparent center
-		PROGBARATTRIB_IsTextOverride	= 1 << 24,	// This is set by this class, and indicates that the text is being overridden by the user SetText(), and should not update to the percentage
-
-		PROGBARATTRIB_NEXTFLAG			= 1 << 25
+		BARMETERATTRIB_IsBarUnderPanel	= 1 << 27,	// If set, the bar will be drawn under the panel instead of over it. Only useful if panel is a node item with transparent center
+		BARMETERATTRIB_IsTextOverride	= 1 << 28,	// This is set by this class, and indicates that the text is being overridden by the user SetText(), and should not update to the percentage
+		
+		BARMETERATTRIB_NEXTFLAG			= 1 << 29
 	};
-	static_assert((int)PROGBARATTRIB_IsVertical == (int)LABELATTRIB_NEXTFLAG, "HyProgressBar is not matching with base classes attrib flags");
+	static_assert((int)BARMETERATTRIB_IsVertical == (int)LABELATTRIB_NEXTFLAG, "HyBarMeter is not matching with base classes attrib flags");
 
 	glm::vec2			m_vBarOffset;
 
@@ -46,11 +46,11 @@ protected:
 	HyNumberFormat		m_NumberFormat;
 
 public:
-	HyProgressBar(HyEntity2d *pParent = nullptr);
-	HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &barInit, HyEntity2d *pParent = nullptr);
-	HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
-	HyProgressBar(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
-	virtual ~HyProgressBar();
+	HyBarMeter(HyEntity2d *pParent = nullptr);
+	HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, HyEntity2d *pParent = nullptr);
+	HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
+	HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
+	virtual ~HyBarMeter();
 
 	virtual void SetText(const std::string &sUtf8Text) override;
 
@@ -95,4 +95,6 @@ private:
 	void ApplyProgress();
 };
 
-#endif /* HyProgressBar_h__ */
+typedef HyBarMeter HyProgressBar;
+
+#endif /* HyBarMeter_h__ */

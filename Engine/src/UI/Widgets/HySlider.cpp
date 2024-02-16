@@ -66,6 +66,8 @@ HySlider::HySlider(HyEntity2d *pParent /*= nullptr*/) :
 	m_fpOnValueChanged(nullptr),
 	m_pValueChangedParam(nullptr)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_Slider << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
 }
 
 HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nullptr*/) :
@@ -82,6 +84,9 @@ HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nul
 	m_fpOnValueChanged(nullptr),
 	m_pValueChangedParam(nullptr)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_Slider << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+
 	Setup(sliderInitRef);
 }
 

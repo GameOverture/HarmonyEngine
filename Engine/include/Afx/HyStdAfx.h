@@ -85,7 +85,7 @@ enum HyType
 
 	HYNUM_TYPES
 };
-static_assert((int)HYNUM_TYPES < 16, "HyType cannot exceed 15 items due to IHyNode only reserving 4 bits to store this value");
+static_assert((int)HYNUM_TYPES <= 16, "HyType cannot exceed 16 items due to IHyNode only reserving 4 bits to store this value");
 
 enum HyBodyType
 {
@@ -142,7 +142,7 @@ enum HyTextType
 
 	HYTEXT_MASK = 0x07	// 3 bits
 };
-static_assert((int)HYNUM_TEXTTYPES < 8, "HyTextType cannot exceed 8 items due to 'IHyText' and 'HyLabel' only reserving 3 bits to store this value");
+static_assert((int)HYNUM_TEXTTYPES <= 8, "HyTextType cannot exceed 8 items due to 'IHyText' and 'HyLabel' only reserving 3 bits to store this value");
 
 enum HyAlignment
 {
@@ -166,7 +166,7 @@ enum HyPlaylistMode
 
 	HYNUM_PLAYLISTS
 };
-static_assert(HYNUM_PLAYLISTS < 7, "HyPlayListMode enum cannot exceed '7' entries because it's stored using '3' bits in struct AudioStateAttribs");
+static_assert(HYNUM_PLAYLISTS <= 8, "HyPlayListMode enum cannot exceed '8' entries because it's stored using '3' bits in struct AudioStateAttribs");
 
 enum HyShapeType
 {
@@ -268,6 +268,27 @@ enum HyWindowMode
 	HYWINDOW_FullScreen,
 	HYWINDOW_BorderlessWindow
 };
+
+enum HyWidgetType
+{
+	HYWIDGETTYPE_Unknown = 0,
+
+	HYWIDGETTYPE_Spacer,
+	HYWIDGETTYPE_Label,
+	HYWIDGETTYPE_ProgressBar,
+	HYWIDGETTYPE_RackMeter,
+	HYWIDGETTYPE_Button,
+	HYWIDGETTYPE_CheckBox,
+	HYWIDGETTYPE_RadioButton,
+	HYWIDGETTYPE_Slider,
+	HYWIDGETTYPE_LineEdit,
+	HYWIDGETTYPE_RichText,
+	HYWIDGETTYPE_ComboBox,
+	HYWIDGETTYPE_ProfilerGraph,
+
+	HYNUM_WIDGETTYPES
+};
+static_assert((int)HYNUM_WIDGETTYPES <= 32, "HyWidgetType cannot exceed 32 items due to IHyWidget only reserving 5 bits to store this value");
 
 enum HyPanelState
 {

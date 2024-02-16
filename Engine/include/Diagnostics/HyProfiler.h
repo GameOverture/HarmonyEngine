@@ -39,8 +39,12 @@ class HyGraphWidget : public IHyWidget
 	Portion					m_PortionList[NUM_PORTIONS];
 
 public:
-	HyGraphWidget() : IHyWidget()
+	HyGraphWidget() :
+		IHyWidget()
 	{
+		m_uiAttribs &= ~WIDGETATTRIB_TypeMask;									// Clear the widget type bits in case derived class set the type
+		m_uiAttribs |= (HYWIDGETTYPE_ProfilerGraph << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+
 		m_PortionList[PORTION_Update].m_sName = "Update";
 		m_PortionList[PORTION_Update].m_Bar.SetTint(HyColor::Cyan);
 		ChildAppend(m_PortionList[PORTION_Update].m_Bar);

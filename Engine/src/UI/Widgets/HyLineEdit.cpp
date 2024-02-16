@@ -20,6 +20,8 @@ HyLineEdit::HyLineEdit(HyEntity2d *pParent /*= nullptr*/) :
 	m_Selection(this),
 	m_Cursor(this)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_LineEdit << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
 }
 
 HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
@@ -29,6 +31,9 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 	m_Selection(this),
 	m_Cursor(this)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_LineEdit << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+
 	OnSetup();
 }
 
@@ -39,6 +44,9 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 	m_Selection(this),
 	m_Cursor(this)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_LineEdit << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+
 	OnSetup();
 }
 

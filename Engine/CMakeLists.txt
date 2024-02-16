@@ -155,13 +155,14 @@ set(HYENGINE_SOURCE_FILES
 	src/Time/Watches/IHyTimeInst.cpp
 	src/UI/IHyEntityUi.cpp
 	src/UI/HyUiContainer.cpp
+	src/UI/Widgets/HyBarMeter.cpp
 	src/UI/Widgets/HyButton.cpp
 	src/UI/Widgets/HyCheckBox.cpp
 	src/UI/Widgets/HyComboBox.cpp
 	src/UI/Widgets/HyLabel.cpp
 	src/UI/Widgets/HyLineEdit.cpp
-	src/UI/Widgets/HyProgressBar.cpp
 	src/UI/Widgets/HyRackMeter.cpp
+	src/UI/Widgets/HyRadioButton.cpp
 	src/UI/Widgets/HyRichText.cpp
 	src/UI/Widgets/HySlider.cpp
 	src/UI/Widgets/IHyWidget.cpp
@@ -289,13 +290,14 @@ set(HYENGINE_HEADER_FILES
 	include/Time/Watches/IHyTimeInst.h
 	include/UI/IHyEntityUi.h
 	include/UI/HyUiContainer.h
+	include/UI/Widgets/HyBarMeter.h
 	include/UI/Widgets/HyButton.h
 	include/UI/Widgets/HyCheckBox.h
 	include/UI/Widgets/HyComboBox.h
 	include/UI/Widgets/HyLabel.h
 	include/UI/Widgets/HyLineEdit.h
-	include/UI/Widgets/HyProgressBar.h
 	include/UI/Widgets/HyRackMeter.h
+	include/UI/Widgets/HyRadioButton.h
 	include/UI/Widgets/HyRichText.h
 	include/UI/Widgets/HySlider.h
 	include/UI/Widgets/IHyWidget.h

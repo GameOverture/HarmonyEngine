@@ -16,6 +16,8 @@ HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_Button << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
 }
 
 HyButton::HyButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
@@ -23,6 +25,9 @@ HyButton::HyButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_Button << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+
 	OnSetup();
 }
 
@@ -31,6 +36,9 @@ HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath,
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_Button << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+
 	OnSetup();
 }
 
@@ -39,6 +47,9 @@ HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath,
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_Button << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+
 	OnSetup();
 }
 

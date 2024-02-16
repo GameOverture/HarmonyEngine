@@ -24,6 +24,8 @@ HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 	m_fUsedWidth(0.0f),
 	m_fColumnLineHeightOffset(0.0f)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_RichText << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
 }
 
 HyRichText::HyRichText(const HyNodePath &textNodePath, uint32 uiColumnWidth, HyAlignment eAlignment, HyEntity2d *pParent /*= nullptr*/) :
@@ -34,6 +36,9 @@ HyRichText::HyRichText(const HyNodePath &textNodePath, uint32 uiColumnWidth, HyA
 	m_fUsedWidth(0.0f),
 	m_fColumnLineHeightOffset(0.0f)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_RichText << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+
 	Setup(HyPanelInit(), textNodePath, uiColumnWidth, m_eAlignment);
 }
 
@@ -45,6 +50,9 @@ HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	m_fUsedWidth(0.0f),
 	m_fColumnLineHeightOffset(0.0f)
 {
+	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
+	m_uiAttribs |= (HYWIDGETTYPE_RichText << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+
 	Setup(panelInit, textNodePath, uiColumnWidth, m_eAlignment);
 }
 

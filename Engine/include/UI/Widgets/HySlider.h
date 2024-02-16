@@ -18,12 +18,12 @@ class HySlider : public IHyWidget
 protected:
 	enum SliderAttributes
 	{
-		SLIDERATTRIB_UseStepList			= 1 << 13,
-		SLIDERATTRIB_IsVertical				= 1 << 14,		// When 'SLIDERATTRIB_IsVertical' enabled, slider moves up/down instead of left/right
-		SLIDERATTRIB_InvertedAppearance		= 1 << 15,		// When 'SLIDERATTRIB_InvertedAppearance' is false (the default), the minimum and maximum along the slider will be shown in its classic position
-		SLIDERATTRIB_IsDragging				= 1 << 16,		// When 'SLIDERATTRIB_IsDragging' enabled, the user is currently dragging the slider handle
+		SLIDERATTRIB_UseStepList			= 1 << 18,
+		SLIDERATTRIB_IsVertical				= 1 << 19,		// When 'SLIDERATTRIB_IsVertical' enabled, slider moves up/down instead of left/right
+		SLIDERATTRIB_InvertedAppearance		= 1 << 20,		// When 'SLIDERATTRIB_InvertedAppearance' is false (the default), the minimum and maximum along the slider will be shown in its classic position
+		SLIDERATTRIB_IsDragging				= 1 << 21,		// When 'SLIDERATTRIB_IsDragging' enabled, the user is currently dragging the slider handle
 
-		SLIDERATTRIB_NEXTFLAG				= 1 << 17
+		SLIDERATTRIB_NEXTFLAG				= 1 << 22
 	};
 	static_assert((int)SLIDERATTRIB_UseStepList == (int)WIDGETATTRIB_NEXTFLAG, "HySlider is not matching with base classes attrib flags");
 

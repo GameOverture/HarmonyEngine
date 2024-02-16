@@ -33,7 +33,15 @@ protected:
 		WIDGETATTRIB_HideHighlightedState	= 1 << 11,		// Don't visually indicate highlighted state (when available)
 		WIDGETATTRIB_IsHighlighted			= 1 << 12,		// Indicates keyboard focus, or as an optional cosmetic state
 
-		WIDGETATTRIB_NEXTFLAG				= 1 << 13,
+		WIDGETATTRIB_TypeMask				= 0x3E000,		// his mask holds HyWidgetType enum value.
+		WIDGETATTRIB_TypeOffset				= 13,			// Bit shift offset to get/set 'HyWidgetType'
+		//									= 1 << 13,
+		//									= 1 << 14,
+		//									= 1 << 15,		// 5 bits, bit's 13-17
+		//									= 1 << 16,
+		//									= 1 << 17,
+
+		WIDGETATTRIB_NEXTFLAG				= 1 << 18,
 	};
 	static_assert((int)WIDGETATTRIB_HideDisabled == (int)ENTITYATTRIB_NEXTFLAG, "IHyWidget is not matching with base classes attrib flags");
 
@@ -44,6 +52,8 @@ protected:
 public:
 	IHyWidget(HyEntity2d *pParent = nullptr);
 	virtual ~IHyWidget();
+
+	HyWidgetType GetWidgetType() const;
 
 	virtual bool SetState(uint32 uiStateIndex) override; // If used, this overrides the panel state to a specific index. Will no longer automatically update the panel state based on HyPanelState
 	virtual uint32 GetNumStates() override;
