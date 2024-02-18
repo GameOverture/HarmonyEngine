@@ -15,17 +15,12 @@ HyRackMeter::HyRackMeter(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_SpinText(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_RackMeter << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
 }
 
 HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(panelInit, pParent),
 	m_SpinText(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_RackMeter << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
 	OnSetup();
 }
 
@@ -33,9 +28,6 @@ HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNod
 	HyLabel(panelInit, textNodePath, pParent),
 	m_SpinText(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_RackMeter << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
 	OnSetup();
 }
 
@@ -43,9 +35,6 @@ HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNod
 	HyLabel(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
 	m_SpinText(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_RackMeter << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
 	OnSetup();
 }
 

@@ -124,6 +124,7 @@ enum MimeType
 	MIMETYPE_ProjectItems = 0,
 	MIMETYPE_AssetItems,
 	MIMETYPE_EntityItems,
+	MIMETYPE_EntityFrames,
 
 	NUM_MIMETYPES
 };

@@ -21,9 +21,6 @@ HyBarMeter::HyBarMeter(HyEntity2d *pParent /*= nullptr*/) :
 	m_fBarProgressAmt(0.0f),
 	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_ProgressBar << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
 	m_NumberFormat.SetFractionPrecision(0, 1);
 }
 

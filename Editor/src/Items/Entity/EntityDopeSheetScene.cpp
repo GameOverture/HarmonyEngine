@@ -405,6 +405,40 @@ QJsonArray EntityDopeSheetScene::SerializeAllKeyFrames(EntityTreeItemData *pItem
 	return serializedKeyFramesArray;
 }
 
+QJsonArray EntityDopeSheetScene::SerializeSelectedKeyFrames() const
+{
+	QList<QGraphicsItem *> selectedItemList = selectedItems();
+	if(selectedItemList.isEmpty())
+		return QJsonArray();
+
+	EntityTreeItemData *pItemData = nullptr;
+	QJsonArray serializedKeyFramesArray;
+	for(QGraphicsItem *pItem : selectedItemList)
+	{
+		bool bAcquiredDataType = false;
+		DopeSheetGfxItemType eItemType = static_cast<DopeSheetGfxItemType>(pItem->data(GFXDATAKEY_Type).toInt(&bAcquiredDataType));
+		if(bAcquiredDataType == false)
+			continue;
+
+		if(eItemType == GFXITEM_PropertyKeyFrame || eItemType == GFXITEM_TweenKeyFrame)
+		{
+			KeyFrameKey tupleKey = static_cast<GraphicsKeyFrameItem *>(pItem)->GetKey();
+			int iFrameIndex = std::get<GFXDATAKEY_FrameIndex>(tupleKey);
+
+			if(pItemData != nullptr && pItemData != std::get<GFXDATAKEY_TreeItemData>(tupleKey))
+				HyGuiLog("EntityDopeSheetScene::SerializeSelectedKeyFrames() - Multiple item's selected while Copying", LOGTYPE_Error);
+			pItemData = std::get<GFXDATAKEY_TreeItemData>(tupleKey);
+
+			QJsonObject serializedKeyFramesObj;
+			serializedKeyFramesObj["frame"] = iFrameIndex;
+			serializedKeyFramesObj["props"] = m_KeyFramesMap[pItemData][iFrameIndex];
+			serializedKeyFramesArray.append(serializedKeyFramesObj);
+		}
+	}
+
+	return serializedKeyFramesArray;
+}
+
 QJsonObject EntityDopeSheetScene::GetKeyFrameProperties(EntityTreeItemData *pItemData) const
 {
 	if(m_KeyFramesMap.contains(pItemData) == false)
@@ -791,6 +825,24 @@ void EntityDopeSheetScene::SelectAllItemKeyFrames(EntityTreeItemData *pItemData)
 			}
 		}
 	}
+}
+
+QList<EntityTreeItemData *> EntityDopeSheetScene::GetItemsFromSelectedFrames() const
+{
+	QSet<EntityTreeItemData *> itemSet;
+	QList<QGraphicsItem *> gfxItemList = selectedItems();
+	for(QGraphicsItem *pGfxItem : gfxItemList)
+	{
+		bool bAcquiredDataType = false;
+		DopeSheetGfxItemType eItemType = static_cast<DopeSheetGfxItemType>(pGfxItem->data(GFXDATAKEY_Type).toInt(&bAcquiredDataType));
+		if(bAcquiredDataType == false)
+			continue;
+
+		KeyFrameKey tupleKey = static_cast<GraphicsKeyFrameItem *>(pGfxItem)->GetKey();
+		itemSet.insert(std::get<GFXDATAKEY_TreeItemData>(tupleKey));
+	}
+	
+	return itemSet.toList();
 }
 
 void EntityDopeSheetScene::RefreshAllGfxItems()

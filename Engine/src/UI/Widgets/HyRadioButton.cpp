@@ -16,8 +16,6 @@ HyRadioButton::HyRadioButton(HyEntity2d *pParent /*= nullptr*/) :
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;									// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_RadioButton << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
 }
 
 HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
@@ -25,9 +23,6 @@ HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, HyEntity2d *pParent /
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;									// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_RadioButton << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
 	OnSetup();
 }
 
@@ -36,9 +31,6 @@ HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &tex
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;									// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_RadioButton << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
 	OnSetup();
 }
 
@@ -47,9 +39,6 @@ HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &tex
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;									// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_RadioButton << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
 	OnSetup();
 }
 

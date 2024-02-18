@@ -16,8 +16,6 @@ HyCheckBox::HyCheckBox(HyEntity2d *pParent /*= nullptr*/) :
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_CheckBox << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
 }
 
 HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
@@ -25,9 +23,6 @@ HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nul
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_CheckBox << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
 	OnSetup();
 }
 
@@ -36,9 +31,6 @@ HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_CheckBox << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
 	OnSetup();
 }
 
@@ -47,9 +39,6 @@ HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_CheckBox << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
 	OnSetup();
 }
 
@@ -71,6 +60,9 @@ void HyCheckBox::SetChecked(bool bChecked)
 		m_uiAttribs |= CHECKBOXATTRIB_IsChecked;
 	else
 		m_uiAttribs &= ~CHECKBOXATTRIB_IsChecked;
+
+	if(m_pButtonGroup)
+		m_pButtonGroup->OnButtonChecked(this);
 
 	ResetTextAndPanel();
 	

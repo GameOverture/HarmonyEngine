@@ -14,6 +14,7 @@
 #include "UI/IHyEntityUi.h"
 #include "UI/Components/HyPanel.h"
 #include "UI/Components/HyLayout.h"
+#include "UI/Components/HyButtonGroup.h"
 #include "UI/Components/HySpacer.h"
 #include "UI/Components/HyToolButton.h"
 #include "UI/Components/HyScrollBar.h"
@@ -38,6 +39,7 @@ protected:
 
 	HyPanel									m_Panel;
 	HyLayout								m_RootLayout;
+	HyButtonGroup							m_RootBtnGrp;
 
 	std::map<HySpacerHandle, HySpacer *>	m_SubSpacerMap;
 	static HySpacerHandle					sm_hSpacerHandleCounter;

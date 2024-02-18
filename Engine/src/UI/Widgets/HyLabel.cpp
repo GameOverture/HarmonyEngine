@@ -14,34 +14,27 @@
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;							// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_Label << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+	m_uiAttribs |= WIDGETATTRIB_IsTypeLabel;
 }
 
 HyLabel::HyLabel(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;							// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_Label << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
+	m_uiAttribs |= WIDGETATTRIB_IsTypeLabel;
 	Setup(panelInit, HyNodePath(), 0, 0, 0, 0);
 }
 
 HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;							// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_Label << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
+	m_uiAttribs |= WIDGETATTRIB_IsTypeLabel;
 	Setup(panelInit, textNodePath, 0, 0, 0, 0);
 }
 
 HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;							// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_Label << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
+	m_uiAttribs |= WIDGETATTRIB_IsTypeLabel;
 	Setup(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
 }
 

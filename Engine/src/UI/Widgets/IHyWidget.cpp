@@ -24,9 +24,14 @@ IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-HyWidgetType IHyWidget::GetWidgetType() const
+bool IHyWidget::IsLabel() const
 {
-	return static_cast<HyWidgetType>((m_uiAttribs & WIDGETATTRIB_TypeMask) >> WIDGETATTRIB_TypeOffset);
+	return (m_uiAttribs & WIDGETATTRIB_IsTypeLabel) != 0;
+}
+
+bool IHyWidget::IsButton() const
+{
+	return (m_uiAttribs & WIDGETATTRIB_IsTypeButton) != 0;
 }
 
 /*virtual*/ bool IHyWidget::SetState(uint32 uiStateIndex) /*override*/

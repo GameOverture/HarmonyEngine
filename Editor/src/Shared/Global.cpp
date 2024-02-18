@@ -181,6 +181,7 @@
 	sm_MimeTypes[MIMETYPE_ProjectItems] = "application/x-hyprojitems";
 	sm_MimeTypes[MIMETYPE_AssetItems] = "application/x-hyassetitems";
 	sm_MimeTypes[MIMETYPE_EntityItems] = "application/x-hyentityitems";
+	sm_MimeTypes[MIMETYPE_EntityFrames] = "application/x-hyentityframes";
 
 	sm_Themes[THEME_Decemberween] = "Decemberween";
 	sm_Themes[THEME_CorpyNT6] = "Corpy NT6";

@@ -34,6 +34,7 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 	m_VertBar(HYORIEN_Vertical, 20, this),
 	m_HorzBar(HYORIEN_Horizontal, 20, this)
 {
+	m_RootBtnGrp.SetAsAutoExclusive();
 	m_Panel.Setup(initRef);
 
 	m_bFlexSizeX = m_Panel.GetWidth() == 0.0f;
@@ -259,18 +260,23 @@ IHyWidget *HyUiContainer::FocusNextWidget(bool bForwardDirection)
 
 bool HyUiContainer::InsertWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
 {
+	bool bSuccess = false;
 	if(hInsertInto == HY_UNUSED_HANDLE)
 	{
 		m_RootLayout.AppendItem(widgetRef);
-		return true;
+		bSuccess = true;
 	}
 	else if(m_SubLayoutMap.find(hInsertInto) != m_SubLayoutMap.end())
 	{
 		m_SubLayoutMap[hInsertInto]->AppendItem(widgetRef);
-		return true;
+		bSuccess = true;
 	}
 
-	return false;
+	if(bSuccess && widgetRef.IsButton() && static_cast<HyButton &>(widgetRef).GetButtonGroup() == nullptr)
+	{
+		m_RootBtnGrp.AddButton( static_cast<HyButton &>(widgetRef)
+	}
+	return bSuccess;
 }
 
 bool HyUiContainer::RemoveWidget(IHyWidget &widgetRef)

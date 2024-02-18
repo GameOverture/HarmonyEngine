@@ -13,43 +13,40 @@
 
 HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
+	m_pButtonGroup(nullptr),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_Button << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
+	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
 }
 
 HyButton::HyButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(panelInit, pParent),
+	m_pButtonGroup(nullptr),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_Button << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
+	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
 	OnSetup();
 }
 
 HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(panelInit, textNodePath, pParent),
+	m_pButtonGroup(nullptr),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_Button << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
+	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
 	OnSetup();
 }
 
 HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
+	m_pButtonGroup(nullptr),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_Button << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
+	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
 	OnSetup();
 }
 
@@ -60,6 +57,16 @@ HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath,
 /*virtual*/ bool HyButton::IsDepressed() const /*override*/
 {
 	return IHyWidget::IsDepressed() || (m_uiAttribs & BTNATTRIB_IsKbDownState) != 0;
+}
+
+HyButtonGroup *HyButton::GetButtonGroup() const
+{
+	return m_pButtonGroup;
+}
+
+bool HyButton::IsAutoExclusive() const
+{
+	return (m_uiAttribs & BTNATTRIB_IsAutoExclusive) != 0;
 }
 
 void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, const HyNodePath &audioNodePath /*= HyNodePath()*/)

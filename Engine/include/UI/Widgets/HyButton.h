@@ -15,19 +15,25 @@
 #include "Scene/Nodes/Loadables/Objects/HyAudio2d.h"
 
 class HyButton;
+class HyButtonGroup;
 typedef std::function<void(HyButton *, void *)> HyButtonClickedCallback;
 
 class HyButton : public HyLabel
 {
+	friend class HyButtonGroup;
+
 protected:
 	enum ButtonAttributes
 	{
 		BTNATTRIB_IsKbDownState		= 1 << 24,		// Indicates this button is currently receiving keyboard input that is pressing (BTNATTRIB_IsDownState) the button
+		BTNATTRIB_IsAutoExclusive	= 1 << 25,		// When ON, and this button is apart of an 'auto' HyButtonGroup, it will exclusively be checked with other 'BNTATTRIB_IsAutoExclusive' buttons
+		BTNATTRIB_IsChecked			= 1 << 26,
 
-		BTNATTRIB_NEXTFLAG			= 1 << 25
+		BTNATTRIB_NEXTFLAG			= 1 << 26
 	};
 	static_assert((int)BTNATTRIB_IsKbDownState == (int)LABELATTRIB_NEXTFLAG, "HyButton is not matching with base classes attrib flags");
 
+	HyButtonGroup *					m_pButtonGroup;
 	HyButtonClickedCallback			m_fpBtnClickedCallback;
 	void *							m_pBtnClickedParam;
 	HyAudio2d						m_ClickedSound;
@@ -40,6 +46,9 @@ public:
 	virtual ~HyButton();
 
 	virtual bool IsDepressed() const override;
+	
+	HyButtonGroup *GetButtonGroup() const;
+	bool IsAutoExclusive() const;
 
 	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr, const HyNodePath &audioNodePath = HyNodePath());
 	void InvokeButtonClicked();

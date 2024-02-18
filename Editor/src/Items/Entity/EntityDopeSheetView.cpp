@@ -19,6 +19,8 @@
 #include <QScrollBar>
 #include <QGraphicsItem>
 #include <QMouseEvent>
+#include <QClipboard>
+#include <QApplication>
 
 EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	QGraphicsView(pParent),
@@ -116,9 +118,15 @@ float EntityDopeSheetView::GetZoom() const
 		for(QAction *pAction : contextActionList)
 			menu.addAction(pAction);
 		menu.addSeparator();
-		menu.addAction(QIcon(":/icons16x16/edit-copy.png"), "Copy");// , this, &EntityDopeSheetView::OnCopy);
-		menu.addAction(QIcon(":/icons16x16/edit-paste.png"), "Paste");//, this, &EntityDopeSheetView::OnPaste);
-		menu.addSeparator();
+		
+		QList<EntityTreeItemData *> selectedFrameItemList = GetScene()->GetItemsFromSelectedFrames();
+		if(selectedFrameItemList.size() == 1)
+		{
+			menu.addAction(QIcon(":/icons16x16/edit-copy.png"), "Copy", this, &EntityDopeSheetView::OnCopy);
+			menu.addAction(QIcon(":/icons16x16/edit-paste.png"), "Paste", this, &EntityDopeSheetView::OnPaste);
+			menu.addSeparator();
+		}
+
 		menu.addAction("Select All '" % m_pContextClickItem->GetCodeName() % "' Key Frames", this, &EntityDopeSheetView::OnSelectAllItemKeyFrames);
 		if(iNumSelected >= 1)
 		{
@@ -531,6 +539,39 @@ float EntityDopeSheetView::GetZoom() const
 
 	if(m_pAuxDopeSheet)
 		m_pAuxDopeSheet->UpdateWidgets();
+}
+
+void EntityDopeSheetView::OnCopy()
+{
+	// Get selected items
+	QList<QGraphicsItem *> selectedItems = GetScene()->selectedItems();
+
+	// Serialize all the selected items to the clipboard
+	QByteArray clipboardData;
+	QDataStream dataStream(&clipboardData, QIODevice::WriteOnly);
+	QJsonArray serializedKeyFrameArray = GetScene()->SerializeSelectedKeyFrames();
+	dataStream << serializedKeyFrameArray;
+
+	// Copy the serialized data to the clipboard
+	QMimeData *pMimeData = new QMimeData();
+	pMimeData->setData(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames), clipboardData);
+	QApplication::clipboard()->setMimeData(pMimeData);
+}
+
+void EntityDopeSheetView::OnPaste()
+{
+	// Get the serialized data from the clipboard
+	const QMimeData *pMimeData = QApplication::clipboard()->mimeData();
+	if(pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)))
+	{
+		QByteArray clipboardData = pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames));
+		QDataStream dataStream(&clipboardData, QIODevice::ReadOnly);
+		
+		QJsonArray serializedKeyFrameArray;
+		dataStream >> serializedKeyFrameArray;
+		// Deserialize the data and add the key frames to the scene
+		GetScene()->PasteFrameData(serializedKeyFrameArray);
+	}
 }
 
 void EntityDopeSheetView::DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color /*= HyColor::WidgetFrame*/, HyColor shadowColor /*= HyColor::Black*/)

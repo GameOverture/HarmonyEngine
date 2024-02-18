@@ -16,9 +16,6 @@ HySpacer::HySpacer(HyOrientation eOrienType) :
 	m_iSizeHint(0),
 	m_iActualSize(0)
 {
-	m_uiAttribs &= ~WIDGETATTRIB_TypeMask;								// Clear the widget type bits in case derived class set the type
-	m_uiAttribs |= (HYWIDGETTYPE_Spacer << WIDGETATTRIB_TypeOffset);	// Set the widget type bits in the proper location
-
 	m_eLoadState = HYLOADSTATE_Loaded;
 }
 

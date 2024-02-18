@@ -269,27 +269,6 @@ enum HyWindowMode
 	HYWINDOW_BorderlessWindow
 };
 
-enum HyWidgetType
-{
-	HYWIDGETTYPE_Unknown = 0,
-
-	HYWIDGETTYPE_Spacer,
-	HYWIDGETTYPE_Label,
-	HYWIDGETTYPE_ProgressBar,
-	HYWIDGETTYPE_RackMeter,
-	HYWIDGETTYPE_Button,
-	HYWIDGETTYPE_CheckBox,
-	HYWIDGETTYPE_RadioButton,
-	HYWIDGETTYPE_Slider,
-	HYWIDGETTYPE_LineEdit,
-	HYWIDGETTYPE_RichText,
-	HYWIDGETTYPE_ComboBox,
-	HYWIDGETTYPE_ProfilerGraph,
-
-	HYNUM_WIDGETTYPES
-};
-static_assert((int)HYNUM_WIDGETTYPES <= 32, "HyWidgetType cannot exceed 32 items due to IHyWidget only reserving 5 bits to store this value");
-
 enum HyPanelState
 {
 	HYPANELSTATE_UserCustom = -1,

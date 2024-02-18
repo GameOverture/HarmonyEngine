@@ -18,7 +18,7 @@ class HyCheckBox : public HyButton
 protected:
 	enum CheckBoxAttributes
 	{
-		CHECKBOXATTRIB_IsChecked = 1 << 25,
+		
 
 		CHECKBOXATTRIB_NEXTFLAG = 1 << 26
 	};

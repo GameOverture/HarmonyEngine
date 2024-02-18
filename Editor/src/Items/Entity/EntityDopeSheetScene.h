@@ -178,6 +178,7 @@ public:
 	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps) const; // This is mainly useful for rendering the dope sheet. 'bCollapseTweenProps' will combine tween properties into a single entry (the regular category/property name)
 
 	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const;
+	QJsonArray SerializeSelectedKeyFrames() const;
 	QJsonObject GetKeyFrameProperties(EntityTreeItemData *pItemData) const;
 	QJsonValue GetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const;
 	QJsonValue BasicExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const; // Only works on properties that don't tween, or interpolate values between key frames
@@ -205,6 +206,7 @@ public:
 	void NudgeKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, int iNudgeAmount, bool bRefreshGfxItems);
 
 	void SelectAllItemKeyFrames(EntityTreeItemData *pItemData);
+	QList<EntityTreeItemData *> GetItemsFromSelectedFrames() const;
 
 	void RefreshAllGfxItems();
 

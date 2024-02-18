@@ -65,6 +65,10 @@ protected:
 	virtual void mousePressEvent(QMouseEvent *pEvent) override;
 	virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;
 
+protected Q_SLOTS:
+	void OnCopy();
+	void OnPaste();
+
 private:
 	void DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color = HyColor::WidgetFrame, HyColor shadowColor = HyColor::Black);
 	void DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY, HyColor color);
