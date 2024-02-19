@@ -46,27 +46,6 @@ HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &tex
 {
 }
 
-bool HyRadioButton::IsChecked() const
-{
-	return m_uiAttribs & RADIOBTNATTRIB_IsChecked;
-}
-
-void HyRadioButton::SetChecked(bool bChecked)
-{
-	if(bChecked == IsChecked())
-		return;
-
-	if(bChecked)
-		m_uiAttribs |= RADIOBTNATTRIB_IsChecked;
-	else
-		m_uiAttribs &= ~RADIOBTNATTRIB_IsChecked;
-
-	ResetTextAndPanel();
-	
-	if(m_fpOnCheckedChanged)
-		m_fpOnCheckedChanged(this, m_pCheckedChangedParam);
-}
-
 void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *, void *)> fpCallback, void *pParam /*= nullptr*/)
 {
 	m_fpOnCheckedChanged = fpCallback;
@@ -81,11 +60,18 @@ void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *
 	AssembleCheckmark();
 }
 
-/*virtual*/ void HyRadioButton::ResetTextAndPanel() /*override*/
+/*virtual*/ void HyRadioButton::OnUiMouseClicked() /*override*/
 {
-	HyButton::ResetTextAndPanel();
+	HyButton::OnUiMouseClicked();
+	SetChecked(!IsChecked());
+}
 
-	if(IsChecked())
+/*virtual*/ void HyRadioButton::OnSetChecked(bool bChecked) /*override*/
+{
+	if(m_fpOnCheckedChanged)
+		m_fpOnCheckedChanged(this, m_pCheckedChangedParam);
+
+	if(bChecked)
 	{
 		m_CheckMarkStroke.alpha.Set(1.0f);
 		m_CheckMarkFill.alpha.Set(1.0f);
@@ -103,12 +89,6 @@ void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *
 	m_CheckMarkFill.pos.Set(m_Panel.pos);
 	m_CheckMarkFill.pos.Offset(m_Panel.GetWidth(m_Panel.scale.X()) * 0.5f, m_Panel.GetHeight(m_Panel.scale.Y()) * 0.5f);
 	m_CheckMarkFill.SetTint(m_Panel.GetPanelColor().Lighten());
-}
-
-/*virtual*/ void HyRadioButton::OnUiMouseClicked() /*override*/
-{
-	HyButton::OnUiMouseClicked();
-	SetChecked(!IsChecked());
 }
 
 void HyRadioButton::AssembleCheckmark()

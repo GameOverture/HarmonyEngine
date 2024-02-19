@@ -28,6 +28,16 @@ bool HyButtonGroup::IsExclusive() const
 	return m_eExclusiveState == EXCLUSIVE_Yes;
 }
 
+bool HyButtonGroup::Contains(HyButton *button) const
+{
+	for(auto iter = m_ButtonMap.begin(); iter != m_ButtonMap.end(); ++iter)
+	{
+		if(iter->second == button)
+			return true;
+	}
+	return false;
+}
+
 HyButton *HyButtonGroup::GetButton(int32 iId) const
 {
 	auto iter = m_ButtonMap.find(iId);
@@ -145,4 +155,29 @@ void HyButtonGroup::SetAsExclusive(bool bIsExclusive)
 void HyButtonGroup::SetAsAutoExclusive()
 {
 	m_eExclusiveState = EXCLUSIVE_Auto;
+}
+
+bool HyButtonGroup::ProcessButtonChecked(HyButton &buttonRef, bool bChecked)
+{
+	HyAssert(Contains(&buttonRef), "HyButtonGroup::OnButtonChecked() - buttonRef is not part of this group");
+
+	if(bChecked)
+	{
+		if(m_eExclusiveState == EXCLUSIVE_Yes || (m_eExclusiveState == EXCLUSIVE_Auto && buttonRef.IsAutoExclusive()))
+		{
+			for(auto iter = m_ButtonMap.begin(); iter != m_ButtonMap.end(); ++iter)
+			{
+				if(iter->second != &buttonRef)
+					iter->second->SetChecked(false);
+			}
+			m_iExclusiveCheckedId = GetId(&buttonRef);
+		}
+	}
+	else
+	{
+		if(m_iExclusiveCheckedId == GetId(&buttonRef))
+			return false;
+	}
+
+	return true;
 }

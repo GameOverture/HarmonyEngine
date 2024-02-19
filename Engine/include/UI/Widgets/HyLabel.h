@@ -19,17 +19,17 @@ class HyLabel : public IHyWidget
 protected:
 	enum LabelAttributes
 	{
-		LABELATTRIB_IsSideBySide			= 1 << 18,
-		LABELATTRIB_SideBySideTextFirst		= 1 << 19,		// When 'PANELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
-		LABELATTRIB_SideBySideVertical		= 1 << 20,		// When 'PANELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
+		LABELATTRIB_IsSideBySide			= 1 << 16,
+		LABELATTRIB_SideBySideTextFirst		= 1 << 17,		// When 'PANELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
+		LABELATTRIB_SideBySideVertical		= 1 << 18,		// When 'PANELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
 		
 		LABELATTRIB_StackedTextTypeMask		= 0xE00000,		// When Panel is 'Stacked' (default), this mask holds HyTextType enum value.
-		LABELATTRIB_StackedTextTypeOffset	= 21,			// Bit shift offset to get/set 'HyTextType'
+		LABELATTRIB_StackedTextTypeOffset	= 19,			// Bit shift offset to get/set 'HyTextType'
+		//									= 1 << 19
+		//									= 1 << 20		// 3 bits, bit's 21-23
 		//									= 1 << 21
-		//									= 1 << 22		// 3 bits, bit's 21-23
-		//									= 1 << 23
 
-		LABELATTRIB_NEXTFLAG				= 1 << 24
+		LABELATTRIB_NEXTFLAG				= 1 << 22
 	};
 	static_assert((int)LABELATTRIB_IsSideBySide == (int)WIDGETATTRIB_NEXTFLAG, "HyLabel is not matching with base classes attrib flags");
 

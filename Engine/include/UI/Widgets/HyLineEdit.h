@@ -21,9 +21,9 @@ class HyLineEdit : public HyLabel
 protected:
 	enum LineEditAttributes
 	{
-		LINEEDITATTRIB_UseValidator = 1 << 24,
+		LINEEDITATTRIB_UseValidator = 1 << 22,
 		
-		LINEEDITATTRIB_NEXTFLAG = 1 << 25
+		LINEEDITATTRIB_NEXTFLAG = 1 << 23
 	};
 	static_assert((int)LINEEDITATTRIB_UseValidator == (int)LABELATTRIB_NEXTFLAG, "HyLineEdit is not matching with base classes attrib flags");
 

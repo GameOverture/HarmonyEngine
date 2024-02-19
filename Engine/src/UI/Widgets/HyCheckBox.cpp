@@ -46,30 +46,6 @@ HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 {
 }
 
-bool HyCheckBox::IsChecked() const
-{
-	return m_uiAttribs & CHECKBOXATTRIB_IsChecked;
-}
-
-void HyCheckBox::SetChecked(bool bChecked)
-{
-	if(bChecked == IsChecked())
-		return;
-
-	if(bChecked)
-		m_uiAttribs |= CHECKBOXATTRIB_IsChecked;
-	else
-		m_uiAttribs &= ~CHECKBOXATTRIB_IsChecked;
-
-	if(m_pButtonGroup)
-		m_pButtonGroup->OnButtonChecked(this);
-
-	ResetTextAndPanel();
-	
-	if(m_fpOnCheckedChanged)
-		m_fpOnCheckedChanged(this, m_pCheckedChangedParam);
-}
-
 void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void *)> fpCallback, void *pParam /*= nullptr*/)
 {
 	m_fpOnCheckedChanged = fpCallback;
@@ -84,11 +60,18 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void
 	AssembleCheckmark();
 }
 
-/*virtual*/ void HyCheckBox::ResetTextAndPanel() /*override*/
+/*virtual*/ void HyCheckBox::OnUiMouseClicked() /*override*/
 {
-	HyButton::ResetTextAndPanel();
+	HyButton::OnUiMouseClicked();
+	SetChecked(!IsChecked());
+}
 
-	if(IsChecked())
+/*virtual*/ void HyCheckBox::OnSetChecked(bool bChecked) /*override*/
+{
+	if(m_fpOnCheckedChanged)
+		m_fpOnCheckedChanged(this, m_pCheckedChangedParam);
+
+	if(bChecked)
 	{
 		m_CheckMarkStroke.alpha.Set(1.0f);
 		m_CheckMarkFill.alpha.Set(1.0f);
@@ -106,12 +89,6 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void
 	m_CheckMarkFill.pos.Set(m_Panel.pos);
 	m_CheckMarkFill.pos.Offset(m_Panel.GetWidth(m_Panel.scale.X()) * 0.5f, m_Panel.GetHeight(m_Panel.scale.Y()) * 0.5f);
 	m_CheckMarkFill.SetTint(m_Panel.GetPanelColor().Lighten());
-}
-
-/*virtual*/ void HyCheckBox::OnUiMouseClicked() /*override*/
-{
-	HyButton::OnUiMouseClicked();
-	SetChecked(!IsChecked());
 }
 
 void HyCheckBox::AssembleCheckmark()

@@ -69,6 +69,36 @@ bool HyButton::IsAutoExclusive() const
 	return (m_uiAttribs & BTNATTRIB_IsAutoExclusive) != 0;
 }
 
+bool HyButton::IsChecked() const
+{
+	return m_uiAttribs & BTNATTRIB_IsChecked;
+}
+
+void HyButton::SetChecked(bool bChecked)
+{
+	if(bChecked == IsChecked())
+		return;
+
+	if(bChecked)
+		m_uiAttribs |= BTNATTRIB_IsChecked;
+	else
+		m_uiAttribs &= ~BTNATTRIB_IsChecked;
+
+	if(m_pButtonGroup && m_pButtonGroup->ProcessButtonChecked(*this, bChecked) == false)
+	{
+		// Undo the change
+		if(!bChecked)
+			m_uiAttribs |= BTNATTRIB_IsChecked;
+		else
+			m_uiAttribs &= ~BTNATTRIB_IsChecked;
+
+		return;
+	}
+	
+	ResetTextAndPanel();
+	OnSetChecked(bChecked);
+}
+
 void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, const HyNodePath &audioNodePath /*= HyNodePath()*/)
 {
 	m_fpBtnClickedCallback = fpCallBack;
@@ -124,4 +154,5 @@ void HyButton::InvokeButtonClicked()
 	SetKeyboardFocusAllowed(true);
 	SetAsHighlighted(IsHighlighted());
 	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
+	OnSetChecked(IsChecked());
 }

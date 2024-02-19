@@ -273,9 +273,8 @@ bool HyUiContainer::InsertWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInt
 	}
 
 	if(bSuccess && widgetRef.IsButton() && static_cast<HyButton &>(widgetRef).GetButtonGroup() == nullptr)
-	{
-		m_RootBtnGrp.AddButton( static_cast<HyButton &>(widgetRef)
-	}
+		m_RootBtnGrp.AddButton(static_cast<HyButton &>(widgetRef));
+	
 	return bSuccess;
 }
 

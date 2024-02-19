@@ -33,13 +33,11 @@ protected:
 		WIDGETATTRIB_HideHighlightedState	= 1 << 11,		// Don't visually indicate highlighted state (when available)
 		WIDGETATTRIB_IsHighlighted			= 1 << 12,		// Indicates keyboard focus, or as an optional cosmetic state
 
-		WIDGETATTRIB_IsTypeLabel			= 1 << 13,		// Is ON when this widget is a HyLabel
-		WIDGETATTRIB_IsTypeButton			= 1 << 14,		// Is ON when this widget is a HyButton
-		WIDGETATTRIB_IsTypeReserved1		= 1 << 15,
-		WIDGETATTRIB_IsTypeReserved2		= 1 << 16,		// Reserved for future use (when a widget type needs to be distinguished)
-		WIDGETATTRIB_IsTypeReserved3		= 1 << 17,
+		WIDGETATTRIB_IsTypeButton			= 1 << 13,		// Is ON when this widget is a HyButton
+		WIDGETATTRIB_IsTypeReserved1		= 1 << 14,		// Reserved for future use (when a widget type needs to be distinguished)
+		WIDGETATTRIB_IsTypeReserved2		= 1 << 15,		// Reserved for future use (when a widget type needs to be distinguished)
 
-		WIDGETATTRIB_NEXTFLAG				= 1 << 18,
+		WIDGETATTRIB_NEXTFLAG				= 1 << 16,
 	};
 	static_assert((int)WIDGETATTRIB_HideDisabled == (int)ENTITYATTRIB_NEXTFLAG, "IHyWidget is not matching with base classes attrib flags");
 
@@ -51,7 +49,6 @@ public:
 	IHyWidget(HyEntity2d *pParent = nullptr);
 	virtual ~IHyWidget();
 
-	bool IsLabel() const;
 	bool IsButton() const;
 
 	virtual bool SetState(uint32 uiStateIndex) override; // If used, this overrides the panel state to a specific index. Will no longer automatically update the panel state based on HyPanelState

@@ -18,6 +18,8 @@ class HyButton;
 
 class HyButtonGroup
 {
+	friend class HyButton;
+
 	enum ExclusiveState
 	{
 		EXCLUSIVE_Auto,
@@ -35,6 +37,7 @@ public:
 
 	bool IsExclusive() const;
 
+	bool Contains(HyButton *button) const;
 	HyButton *GetButton(int32 iId) const;
 	std::vector<HyButton *> GetButtonList() const;
 	
@@ -45,6 +48,9 @@ public:
 	bool RemoveButton(HyButton &buttonRef);
 	void SetAsExclusive(bool bIsExclusive);
 	void SetAsAutoExclusive();
+
+private:
+	bool ProcessButtonChecked(HyButton &buttonRef, bool bChecked);
 };
 
 #endif /* HyButtonGroup_h__ */

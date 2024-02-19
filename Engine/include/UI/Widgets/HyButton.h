@@ -25,11 +25,11 @@ class HyButton : public HyLabel
 protected:
 	enum ButtonAttributes
 	{
-		BTNATTRIB_IsKbDownState		= 1 << 24,		// Indicates this button is currently receiving keyboard input that is pressing (BTNATTRIB_IsDownState) the button
-		BTNATTRIB_IsAutoExclusive	= 1 << 25,		// When ON, and this button is apart of an 'auto' HyButtonGroup, it will exclusively be checked with other 'BNTATTRIB_IsAutoExclusive' buttons
-		BTNATTRIB_IsChecked			= 1 << 26,
+		BTNATTRIB_IsKbDownState		= 1 << 22,		// Indicates this button is currently receiving keyboard input that is pressing (BTNATTRIB_IsDownState) the button
+		BTNATTRIB_IsAutoExclusive	= 1 << 23,		// When ON, and this button is apart of an 'auto' HyButtonGroup, it will exclusively be checked with other 'BNTATTRIB_IsAutoExclusive' buttons
+		BTNATTRIB_IsChecked			= 1 << 24,
 
-		BTNATTRIB_NEXTFLAG			= 1 << 26
+		BTNATTRIB_NEXTFLAG			= 1 << 25
 	};
 	static_assert((int)BTNATTRIB_IsKbDownState == (int)LABELATTRIB_NEXTFLAG, "HyButton is not matching with base classes attrib flags");
 
@@ -49,6 +49,8 @@ public:
 	
 	HyButtonGroup *GetButtonGroup() const;
 	bool IsAutoExclusive() const;
+	bool IsChecked() const;
+	void SetChecked(bool bChecked);
 
 	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr, const HyNodePath &audioNodePath = HyNodePath());
 	void InvokeButtonClicked();
@@ -59,6 +61,8 @@ protected:
 	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) override;
 
 	virtual void OnSetup() override;
+
+	virtual void OnSetChecked(bool bChecked) { }
 };
 
 #endif /* HyButton_h__ */

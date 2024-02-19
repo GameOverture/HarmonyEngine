@@ -19,14 +19,14 @@ class HyBarMeter : public HyLabel
 protected:
 	enum ProgressBarAttributes
 	{
-		BARMETERATTRIB_IsVertical		= 1 << 24,	// If set, the bar will grow vertically instead of horizontally
-		BARMETERATTRIB_IsInverted		= 1 << 25,	// If set, the bar will grow from right to left or bottom to top
-		BARMETERATTRIB_IsBarStretched	= 1 << 26,	// If set and the bar is a Node item, the bar node will be scaled to fit the range of the progress bar. Otherwise, the bar is stenciled/cropped to fit the range (default)
+		BARMETERATTRIB_IsVertical		= 1 << 22,	// If set, the bar will grow vertically instead of horizontally
+		BARMETERATTRIB_IsInverted		= 1 << 23,	// If set, the bar will grow from right to left or bottom to top
+		BARMETERATTRIB_IsBarStretched	= 1 << 24,	// If set and the bar is a Node item, the bar node will be scaled to fit the range of the progress bar. Otherwise, the bar is stenciled/cropped to fit the range (default)
 		
-		BARMETERATTRIB_IsBarUnderPanel	= 1 << 27,	// If set, the bar will be drawn under the panel instead of over it. Only useful if panel is a node item with transparent center
-		BARMETERATTRIB_IsTextOverride	= 1 << 28,	// This is set by this class, and indicates that the text is being overridden by the user SetText(), and should not update to the percentage
+		BARMETERATTRIB_IsBarUnderPanel	= 1 << 25,	// If set, the bar will be drawn under the panel instead of over it. Only useful if panel is a node item with transparent center
+		BARMETERATTRIB_IsTextOverride	= 1 << 26,	// This is set by this class, and indicates that the text is being overridden by the user SetText(), and should not update to the percentage
 		
-		BARMETERATTRIB_NEXTFLAG			= 1 << 29
+		BARMETERATTRIB_NEXTFLAG			= 1 << 27
 	};
 	static_assert((int)BARMETERATTRIB_IsVertical == (int)LABELATTRIB_NEXTFLAG, "HyBarMeter is not matching with base classes attrib flags");
 
