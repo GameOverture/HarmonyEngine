@@ -13,6 +13,8 @@
 #include "EntityUndoCmds.h"
 #include "DlgInputName.h"
 #include "ui_AuxDopeSheet.h"
+#include <QClipboard>
+#include <QApplication>
 
 AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
@@ -111,6 +113,12 @@ void AuxDopeSheet::UpdateWidgets()
 			ui->btnTween->setDefaultAction(nullptr);
 			ui->btnTween->setVisible(false);
 		}
+		
+		QList<EntityTreeItemData *> selectedFrameItemList = ui->graphicsView->GetScene()->GetItemsFromSelectedFrames();
+		ui->actionCopyFrames->setEnabled(selectedFrameItemList.size() == 1);
+
+		const QMimeData *pMimeData = QApplication::clipboard()->mimeData();
+		ui->actionPasteFrames->setEnabled(pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)));
 	}
 	else
 	{
@@ -122,6 +130,9 @@ void AuxDopeSheet::UpdateWidgets()
 		ui->sbFramesPerSecond->setEnabled(false);
 		ui->chkAutoInitialize->setEnabled(false);
 		ui->btnCallback->setVisible(false);
+
+		ui->actionCopyFrames->setEnabled(false);
+		ui->actionPasteFrames->setEnabled(false);
 	}
 }
 
@@ -138,6 +149,14 @@ QList<QAction *> AuxDopeSheet::GetContextActions(bool bOnlyCallbackActions)
 			actionList.push_back(ui->btnTween->defaultAction());
 	}
 
+	return actionList;
+}
+
+QList<QAction *> AuxDopeSheet::GetCopyPasteActions()
+{
+	QList<QAction *> actionList;
+	actionList.push_back(ui->actionCopyFrames);
+	actionList.push_back(ui->actionPasteFrames);
 	return actionList;
 }
 
@@ -257,6 +276,40 @@ void AuxDopeSheet::on_actionCreateScaleTween_triggered()
 void AuxDopeSheet::on_actionCreateAlphaTween_triggered()
 {
 	CreateContextTween(TWEENPROP_Alpha);
+}
+
+void AuxDopeSheet::on_actionCopyFrames_triggered()
+{
+	// Get selected items
+	QList<QGraphicsItem *> selectedItems = ui->graphicsView->GetScene()->selectedItems();
+
+	// Serialize all the selected items to the clipboard
+	QByteArray clipboardData;
+	QDataStream dataStream(&clipboardData, QIODevice::WriteOnly);
+	QJsonArray serializedKeyFrameArray = ui->graphicsView->GetScene()->SerializeSelectedKeyFrames();
+	dataStream << serializedKeyFrameArray;
+
+	// Copy the serialized data to the clipboard
+	QMimeData *pMimeData = new QMimeData();
+	pMimeData->setData(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames), clipboardData);
+	QApplication::clipboard()->setMimeData(pMimeData);
+}
+
+void AuxDopeSheet::on_actionPasteFrames_triggered()
+{
+	// Get the serialized data from the clipboard
+	const QMimeData *pMimeData = QApplication::clipboard()->mimeData();
+	if(pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)))
+	{
+		QByteArray clipboardData = pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames));
+		QDataStream dataStream(&clipboardData, QIODevice::ReadOnly);
+
+		QJsonArray serializedKeyFrameArray;
+		dataStream >> serializedKeyFrameArray;
+
+		EntityUndoCmd_PasteKeyFrames *pCmd = new EntityUndoCmd_PasteKeyFrames(*ui->graphicsView->GetScene(), ui->graphicsView->GetContextClickItem(), serializedKeyFrameArray);
+		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pCmd);
+	}
 }
 
 void AuxDopeSheet::CreateContextTween(TweenProperty eTweenProp)

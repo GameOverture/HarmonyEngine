@@ -190,8 +190,8 @@ public:
 	void RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, bool bRefreshGfxItems);
 	void RemoveKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, bool bRefreshGfxItems);
 
-	void PasteFrameData(EntityTreeItemData *pItemData, int iStartingFrameIndex, QJsonArray frameDataArray);
-	void UnpasteFrameData(EntityTreeItemData *pItemData, int iStartingFrameIndex, QJsonArray frameDataArray);
+	void PasteFrameData(EntityTreeItemData *pItemData, QJsonArray frameDataArray);
+	void UnpasteFrameData(EntityTreeItemData *pItemData, QJsonArray frameDataArray);
 
 	TweenJsonValues GetTweenJsonValues(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp) const;
 	void SetKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, const TweenJsonValues &tweenValues, bool bRefreshGfxItems);

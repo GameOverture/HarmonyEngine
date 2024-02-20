@@ -16,7 +16,7 @@
 EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, HyEntity2d *pParent) :
 	m_pEntityTreeItemData(pEntityTreeItemData),
 	m_pChild(nullptr),
-	m_Transform(pParent),
+	m_Transform(nullptr),
 	m_ShapeCtrl(pParent)
 {
 	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
@@ -490,6 +490,9 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 		// 'ITEM_Unknown' is passed for the entity root node
 		switch(eItemType)
 		{
+		case ITEM_Unknown:
+			break;
+
 		case ITEM_Entity:
 		//	// Call ExtrapolateProperties recursively on all pThisHyNode's children
 		//	static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(iCURRENT_FRAME, pCamera);

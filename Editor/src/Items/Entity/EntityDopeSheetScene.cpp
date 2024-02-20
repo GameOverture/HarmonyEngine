@@ -435,56 +435,89 @@ QJsonArray EntityDopeSheetScene::SerializeSelectedKeyFrames() const
 				HyGuiLog("EntityDopeSheetScene::SerializeSelectedKeyFrames() - Multiple item's selected while Copying", LOGTYPE_Error);
 			pItemData = std::get<GFXDATAKEY_TreeItemData>(tupleKey);
 			int iFrameIndex = std::get<GFXDATAKEY_FrameIndex>(tupleKey);
-			QString sCategoryProp = std::get<GFXDATAKEY_CategoryPropString>(tupleKey);
+			QString sCategory = std::get<GFXDATAKEY_CategoryPropString>(tupleKey).split('/')[0];
+			QString sProperty = std::get<GFXDATAKEY_CategoryPropString>(tupleKey).split('/')[1];
 
-			// Look for existing 'frame' in 'serializedKeyFramesArray' and append to 'props' if found
-			bool bFoundFrame = false;
-			for(int i = 0; i < serializedKeyFramesArray.size(); ++i)
+			std::function<void(int, QString, QString)> fpSerializeProperty = [&](int iFrameIndex, QString sCategory, QString sProperty)
 			{
-				QJsonObject serializedKeyFrameObj = serializedKeyFramesArray[i].toObject();
-				if(serializedKeyFrameObj["frame"].toInt() == iFrameIndex)
+				// Look for existing 'frame' in 'serializedKeyFramesArray' and append to 'props' if found
+				bool bFoundFrame = false;
+				for(int i = 0; i < serializedKeyFramesArray.size(); ++i)
 				{
-					QJsonObject sceneCategoryPropsObj = m_KeyFramesMap[pItemData][iFrameIndex]["props"].toObject();
-
-					QString sCategory = sCategoryProp.split('/')[0];
-					QString sProperty = sCategoryProp.split('/')[1];
-
-					// If this category already exists, then merge the property
-					if(serializedKeyFrameObj["props"].toObject().contains(sCategory))
+					QJsonObject serializedKeyFrameObj = serializedKeyFramesArray[i].toObject();
+					if(serializedKeyFrameObj["frame"].toInt() == iFrameIndex)
 					{
-						QJsonObject serializedPropsObj = serializedKeyFrameObj["props"].toObject();
-						
-						QJsonObject serializedCategoryObj = serializedPropsObj[sCategory].toObject();
-						serializedCategoryObj.insert(sProperty, sceneCategoryPropsObj[sCategory].toObject()[sProperty]);
-						serializedPropsObj.insert(sCategory, serializedCategoryObj);
+						QJsonObject sceneCategoryObj = m_KeyFramesMap[pItemData][iFrameIndex][sCategory].toObject();
 
-						serializedKeyFrameObj.insert("props", serializedPropsObj); // Overwrite the 'props' with the merged properties
+						// If this category already exists, then merge the property
+						if(serializedKeyFrameObj["props"].toObject().contains(sCategory))
+						{
+							QJsonObject serializedPropsObj = serializedKeyFrameObj["props"].toObject();
+							QJsonObject serializedCategoryObj = serializedPropsObj[sCategory].toObject();
+
+							if(sceneCategoryObj.contains(sProperty) == false)
+								HyGuiLog("EntityDopeSheetScene::SerializeSelectedKeyFrames() - sceneCategoryObj does not contain property: " % sProperty, LOGTYPE_Error);
+
+							serializedCategoryObj.insert(sProperty, sceneCategoryObj[sProperty]);
+							serializedPropsObj.insert(sCategory, serializedCategoryObj);
+
+							serializedKeyFrameObj.insert("props", serializedPropsObj); // Overwrite the 'props' with the merged properties
+						}
+						else // Otherwise, just add the category and property
+						{
+							if(sceneCategoryObj.contains(sProperty) == false)
+								HyGuiLog("EntityDopeSheetScene::SerializeSelectedKeyFrames() - SceneCategoryPropsObj does not contain category: " % sCategory, LOGTYPE_Error);
+
+							QJsonObject serializedCategoryObj;
+							serializedCategoryObj.insert(sProperty, sceneCategoryObj[sProperty]);
+							QJsonObject serializedPropsObj = serializedKeyFrameObj["props"].toObject();
+							serializedPropsObj.insert(sCategory, serializedCategoryObj);
+
+							serializedKeyFrameObj.insert("props", serializedPropsObj); // Overwrite the 'props' with the merged properties
+						}
+
+						// Overwrite the 'frame' with the merged properties
+						serializedKeyFramesArray.removeAt(i);
+						serializedKeyFramesArray.insert(i, serializedKeyFrameObj);
+						bFoundFrame = true;
+						break;
 					}
-					else // Otherwise, just add the category and property
-					{
-						QJsonObject serializedCategoryObj;
-						serializedCategoryObj.insert(sProperty, sceneCategoryPropsObj[sCategory].toObject()[sProperty]);
-						QJsonObject serializedPropsObj = serializedKeyFrameObj["props"].toObject();
-						serializedPropsObj.insert(sCategory, serializedCategoryObj);
-
-						serializedKeyFrameObj.insert("props", serializedPropsObj); // Overwrite the 'props' with the merged properties
-					}
-
-					// Overwrite the 'frame' with the merged properties
-					serializedKeyFramesArray.removeAt(i);
-					serializedKeyFramesArray.insert(i, serializedKeyFrameObj);
-					bFoundFrame = true;
-					break;
 				}
-			}
 
-			if(bFoundFrame == false)
+				if(bFoundFrame == false)
+				{
+					QJsonObject propertyObj;
+					propertyObj.insert(sProperty, m_KeyFramesMap[pItemData][iFrameIndex][sCategory].toObject()[sProperty]);
+
+					//QJsonValue test = propertyObj.value(sProperty);
+					//if(test.isArray())
+					//{
+					//	QJsonArray testArray = test.toArray();
+					//	double dTest = testArray[0].toDouble();
+					//	dTest = testArray[1].toDouble();
+					//}
+
+					QJsonObject categoryObj;
+					categoryObj.insert(sCategory, propertyObj);
+
+					QJsonObject serializedKeyFramesObj;
+					serializedKeyFramesObj["frame"] = iFrameIndex;
+					serializedKeyFramesObj["props"] = categoryObj;
+					serializedKeyFramesArray.append(serializedKeyFramesObj);
+				}
+			};
+			
+			if(eItemType == GFXITEM_TweenKeyFrame)
 			{
-				QJsonObject serializedKeyFramesObj;
-				serializedKeyFramesObj["frame"] = iFrameIndex;
-				serializedKeyFramesObj["props"] = m_KeyFramesMap[pItemData][iFrameIndex];
-				serializedKeyFramesArray.append(serializedKeyFramesObj);
+				// If this is a tween key frame, then we need to serialize all 3 corresponding tween properties: "Destination", "Duration", "Tween Type"
+				sCategory = "Tween " + sProperty;
+
+				fpSerializeProperty(iFrameIndex, sCategory, "Destination");
+				fpSerializeProperty(iFrameIndex, sCategory, "Duration");
+				fpSerializeProperty(iFrameIndex, sCategory, "Tween Type");
 			}
+			else
+				fpSerializeProperty(iFrameIndex, sCategory, sProperty);
 		}
 	}
 
@@ -734,7 +767,7 @@ void EntityDopeSheetScene::RemoveKeyFrameTween(EntityTreeItemData *pItemData, in
 	RemoveKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type", bRefreshGfxItems);
 }
 
-void EntityDopeSheetScene::PasteFrameData(EntityTreeItemData *pItemData, int iStartingFrameIndex, QJsonArray frameDataArray)
+void EntityDopeSheetScene::PasteFrameData(EntityTreeItemData *pItemData, QJsonArray frameDataArray)
 {
 	if(m_KeyFramesMap.contains(pItemData) == false)
 		m_KeyFramesMap.insert(pItemData, QMap<int, QJsonObject>());
@@ -775,7 +808,7 @@ void EntityDopeSheetScene::PasteFrameData(EntityTreeItemData *pItemData, int iSt
 	RefreshAllGfxItems();
 }
 
-void EntityDopeSheetScene::UnpasteFrameData(EntityTreeItemData *pItemData, int iStartingFrameIndex, QJsonArray frameDataArray)
+void EntityDopeSheetScene::UnpasteFrameData(EntityTreeItemData *pItemData, QJsonArray frameDataArray)
 {
 	HyGuiLog("UnpasteFrameData not implemented", LOGTYPE_Error);
 }
@@ -915,11 +948,21 @@ void EntityDopeSheetScene::SelectAllItemKeyFrames(EntityTreeItemData *pItemData)
 			QStringList sPropList = categoryObj.keys();
 			for(QString sPropName : sPropList)
 			{
-				KeyFrameKey gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, sCategoryName % "/" % sPropName);
-				if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey))
-					m_KeyFramesGfxRectMap[gfxRectMapKey]->setSelected(true);
-				if(m_TweenGfxRectMap.contains(gfxRectMapKey))
-					m_TweenGfxRectMap[gfxRectMapKey]->setSelected(true);
+				if(sCategoryName.startsWith("Tween "))
+				{
+					QString sTweenName = sCategoryName.mid(6);
+					TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sTweenName);
+					QPair<QString, QString> tweenPair = HyGlobal::ConvertTweenPropToRegularPropPair(eTweenProp);
+					KeyFrameKey gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, tweenPair.first % "/" % tweenPair.second);
+					if(m_TweenGfxRectMap.contains(gfxRectMapKey))
+						m_TweenGfxRectMap[gfxRectMapKey]->setSelected(true);
+				}
+				else
+				{
+					KeyFrameKey gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, sCategoryName % "/" % sPropName);
+					if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey))
+						m_KeyFramesGfxRectMap[gfxRectMapKey]->setSelected(true);
+				}
 			}
 		}
 	}

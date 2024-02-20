@@ -238,11 +238,10 @@ class EntityUndoCmd_PasteKeyFrames : public QUndoCommand
 {
 	EntityDopeSheetScene &					m_DopeSheetSceneRef;
 	EntityTreeItemData *					m_pItemData;
-	int										m_iFrameStart;
 	QJsonArray								m_PasteDataArray;
 
 public:
-	EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, int iFrameStart, QJsonArray pasteDataArray, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, QJsonArray pasteDataArray, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_PasteKeyFrames();
 
 	virtual void redo() override;

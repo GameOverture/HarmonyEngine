@@ -321,6 +321,24 @@
     <string>Create an alpha tween between the two currently selected keyframes</string>
    </property>
   </action>
+  <action name="actionCopyFrames">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/edit-copy.png</normaloff>:/icons16x16/edit-copy.png</iconset>
+   </property>
+   <property name="text">
+    <string>Copy Frames</string>
+   </property>
+  </action>
+  <action name="actionPasteFrames">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/edit-paste.png</normaloff>:/icons16x16/edit-paste.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paste Frames</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

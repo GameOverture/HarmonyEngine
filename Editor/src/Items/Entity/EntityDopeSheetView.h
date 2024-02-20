@@ -54,6 +54,8 @@ public:
 
 	float GetZoom() const;
 
+	EntityTreeItemData *GetContextClickItem();
+
 protected:
 	virtual void contextMenuEvent(QContextMenuEvent *pEvent) override;
 
@@ -65,10 +67,6 @@ protected:
 	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
 	virtual void mousePressEvent(QMouseEvent *pEvent) override;
 	virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;
-
-protected Q_SLOTS:
-	void OnCopy();
-	void OnPaste();
 
 private:
 	void DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color = HyColor::WidgetFrame, HyColor shadowColor = HyColor::Black);

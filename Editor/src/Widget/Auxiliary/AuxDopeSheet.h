@@ -38,6 +38,7 @@ public:
 
 	void UpdateWidgets();
 	QList<QAction *> GetContextActions(bool bOnlyCallbackActions);
+	QList<QAction *> GetCopyPasteActions();
 
 private:
 	Ui::AuxDopeSheet *ui;
@@ -58,6 +59,11 @@ private Q_SLOTS:
 	void on_actionCreateRotationTween_triggered();
 	void on_actionCreateScaleTween_triggered();
 	void on_actionCreateAlphaTween_triggered();
+
+	void on_actionCopyFrames_triggered();
+	void on_actionPasteFrames_triggered();
+
+private:
 	void CreateContextTween(TweenProperty eTweenProp);
 };
 
