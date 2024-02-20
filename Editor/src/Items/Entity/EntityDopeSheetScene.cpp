@@ -772,17 +772,6 @@ void EntityDopeSheetScene::PasteFrameData(EntityTreeItemData *pItemData, QJsonAr
 	if(m_KeyFramesMap.contains(pItemData) == false)
 		m_KeyFramesMap.insert(pItemData, QMap<int, QJsonObject>());
 
-	//int iFrameOffset = -1;
-	//for(int i = 0; i < frameDataArray.size(); ++i)
-	//{
-	//	QJsonObject frameDataObj = frameDataArray[i].toObject();
-	//	int iFrameIndex = frameDataObj["frame"].toInt();
-	//	if(iFrameOffset == -1)
-	//		iFrameOffset = iFrameIndex;
-	//	else if(iFrameOffset < iFrameIndex)
-	//		iFrameOffset = iFrameIndex;
-	//}
-
 	for(int i = 0; i < frameDataArray.size(); ++i)
 	{
 		QJsonObject frameDataObj = frameDataArray[i].toObject();
@@ -796,11 +785,7 @@ void EntityDopeSheetScene::PasteFrameData(EntityTreeItemData *pItemData, QJsonAr
 			{
 				// First determine if this frame has valid properties for 'pItemData'
 				if(pItemData->GetPropertiesModel().FindPropertyDefinition(sCategory, sPropName).IsValid())
-				{
-					int iFrameIndex = frameDataObj["frame"].toInt();
-					//iFrameIndex = iStartingFrameIndex + (iFrameIndex - iFrameOffset);
-					SetKeyFrameProperty(pItemData, iFrameIndex, sCategory, sPropName, categoryObj[sPropName], false);
-				}
+					SetKeyFrameProperty(pItemData, frameDataObj["frame"].toInt(), sCategory, sPropName, categoryObj[sPropName], false);
 			}
 		}
 	}
@@ -810,7 +795,26 @@ void EntityDopeSheetScene::PasteFrameData(EntityTreeItemData *pItemData, QJsonAr
 
 void EntityDopeSheetScene::UnpasteFrameData(EntityTreeItemData *pItemData, QJsonArray frameDataArray)
 {
-	HyGuiLog("UnpasteFrameData not implemented", LOGTYPE_Error);
+	if(m_KeyFramesMap.contains(pItemData) == false)
+		return;
+
+	for(int i = 0; i < frameDataArray.size(); ++i)
+	{
+		QJsonObject frameDataObj = frameDataArray[i].toObject();
+		QJsonObject propsObj = frameDataObj["props"].toObject();
+		for(QString sCategory : propsObj.keys())
+		{
+			QJsonObject categoryObj = propsObj[sCategory].toObject();
+			for(QString sPropName : categoryObj.keys())
+			{
+				// First determine if this frame has valid properties for 'pItemData'
+				if(pItemData->GetPropertiesModel().FindPropertyDefinition(sCategory, sPropName).IsValid())
+					RemoveKeyFrameProperty(pItemData, frameDataObj["frame"].toInt(), sCategory, sPropName, false);
+			}
+		}
+	}
+
+	RefreshAllGfxItems();
 }
 
 TweenJsonValues EntityDopeSheetScene::GetTweenJsonValues(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp) const
