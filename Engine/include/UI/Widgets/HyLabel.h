@@ -23,10 +23,10 @@ protected:
 		LABELATTRIB_SideBySideTextFirst		= 1 << 17,		// When 'PANELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
 		LABELATTRIB_SideBySideVertical		= 1 << 18,		// When 'PANELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
 		
-		LABELATTRIB_StackedTextTypeMask		= 0xE00000,		// When Panel is 'Stacked' (default), this mask holds HyTextType enum value.
+		LABELATTRIB_StackedTextTypeMask		= 0x380000,		// When Panel is 'Stacked' (default), this mask holds HyTextType enum value.
 		LABELATTRIB_StackedTextTypeOffset	= 19,			// Bit shift offset to get/set 'HyTextType'
 		//									= 1 << 19
-		//									= 1 << 20		// 3 bits, bit's 21-23
+		//									= 1 << 20		// 3 bits, bit's 19-21
 		//									= 1 << 21
 
 		LABELATTRIB_NEXTFLAG				= 1 << 22
