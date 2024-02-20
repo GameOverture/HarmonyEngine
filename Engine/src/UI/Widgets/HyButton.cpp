@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/HyButton.h"
+#include "UI/Components/HyButtonGroup.h"
 #include "HyEngine.h"
 
 HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
