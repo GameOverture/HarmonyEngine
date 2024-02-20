@@ -142,9 +142,11 @@ bool HyButtonGroup::RemoveButton(HyButton &buttonRef)
 				}
 			}
 			
-			break;
+			return true;
 		}
 	}
+
+	return false;
 }
 
 void HyButtonGroup::SetAsExclusive(bool bIsExclusive)

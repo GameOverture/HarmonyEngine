@@ -750,6 +750,33 @@ EntityUndoCmd_PackToArray::EntityUndoCmd_PackToArray(ProjectItemData &entityItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, int iFrameStart, QJsonArray pasteDataArray, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_pItemData(pItemData),
+	m_iFrameStart(iFrameStart),
+	m_PasteDataArray(pasteDataArray)
+{
+	setText("Paste Key Frames");
+}
+
+/*virtual*/ EntityUndoCmd_PasteKeyFrames::~EntityUndoCmd_PasteKeyFrames()
+{
+}
+
+
+/*virtual*/ void EntityUndoCmd_PasteKeyFrames::redo() /*override*/
+{
+	m_DopeSheetSceneRef.PasteFrameData(m_pItemData, m_iFrameStart, m_PasteDataArray);
+}
+
+/*virtual*/ void EntityUndoCmd_PasteKeyFrames::undo() /*override*/
+{
+	m_DopeSheetSceneRef.UnpasteFrameData(m_pItemData, m_iFrameStart, m_PasteDataArray);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameOffset, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_DopeSheetSceneRef(entityDopeSheetSceneRef),

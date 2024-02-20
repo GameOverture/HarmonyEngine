@@ -234,6 +234,23 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class EntityUndoCmd_PasteKeyFrames : public QUndoCommand
+{
+	EntityDopeSheetScene &					m_DopeSheetSceneRef;
+	EntityTreeItemData *					m_pItemData;
+	int										m_iFrameStart;
+	QJsonArray								m_PasteDataArray;
+
+public:
+	EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, int iFrameStart, QJsonArray pasteDataArray, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_PasteKeyFrames();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_NudgeSelectedKeyFrames : public QUndoCommand
 {
 	EntityDopeSheetScene &					m_DopeSheetSceneRef;

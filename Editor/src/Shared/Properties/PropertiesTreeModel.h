@@ -90,6 +90,10 @@ struct PropertiesDef
 		delegateBuilder(delegateBuilder_)
 	{ }
 
+	bool IsValid() const {
+		return eType != PROPERTIESTYPE_Unknown;
+	}
+
 	bool IsCategory() const {
 		return eType == PROPERTIESTYPE_Category;
 	}

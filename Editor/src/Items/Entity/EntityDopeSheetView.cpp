@@ -34,7 +34,8 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	m_ptDragStart(0.0f, 0.0f),
 	m_iDragFrame(-1),
 	m_pGfxDragTweenKnobItem(nullptr),
-	m_pContextClickItem(nullptr)
+	m_pContextClickItem(nullptr),
+	m_iContextClickFrame(-1)
 {
 	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	setDragMode(QGraphicsView::RubberBandDrag);
@@ -110,7 +111,7 @@ float EntityDopeSheetView::GetZoom() const
 	QMenu menu;
 	if(m_pContextClickItem)
 	{
-		int iFrame = GetNearestFrame(ptScenePos.x());
+		m_iContextClickFrame = GetNearestFrame(ptScenePos.x());
 
 		int iNumSelected = scene()->selectedItems().size();
 
@@ -569,8 +570,9 @@ void EntityDopeSheetView::OnPaste()
 		
 		QJsonArray serializedKeyFrameArray;
 		dataStream >> serializedKeyFrameArray;
-		// Deserialize the data and add the key frames to the scene
-		GetScene()->PasteFrameData(serializedKeyFrameArray);
+
+		EntityUndoCmd_PasteKeyFrames *pCmd = new EntityUndoCmd_PasteKeyFrames(*GetScene(), m_pContextClickItem, m_iContextClickFrame, serializedKeyFrameArray);
+		m_pStateData->GetModel().GetItem().GetUndoStack()->push(pCmd);
 	}
 }
 
