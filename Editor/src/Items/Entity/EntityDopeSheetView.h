@@ -79,7 +79,6 @@ private:
 private Q_SLOTS:
 	void OnSelectAllItemKeyFrames();
 	void OnDeselectItemKeyFrames();
-	void OnDeleteKeyFrames();
 };
 
 #endif // ENTITYDOPESHEETVIEW_H

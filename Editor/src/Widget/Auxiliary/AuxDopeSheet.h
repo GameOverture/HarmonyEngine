@@ -39,6 +39,7 @@ public:
 	void UpdateWidgets();
 	QList<QAction *> GetContextActions(bool bOnlyCallbackActions);
 	QList<QAction *> GetCopyPasteActions();
+	QAction *GetDeleteAction();
 
 private:
 	Ui::AuxDopeSheet *ui;
@@ -62,6 +63,7 @@ private Q_SLOTS:
 
 	void on_actionCopyFrames_triggered();
 	void on_actionPasteFrames_triggered();
+	void on_actionDeleteFrames_triggered();
 
 private:
 	void CreateContextTween(TweenProperty eTweenProp);

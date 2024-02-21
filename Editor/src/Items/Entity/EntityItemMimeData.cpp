@@ -53,3 +53,22 @@ EntityItemMimeData::EntityItemMimeData(ProjectItemData &entityRef, QList<EntityT
 
 /*virtual*/ EntityItemMimeData::~EntityItemMimeData()
 { }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityFrameMimeData::EntityFrameMimeData(QJsonObject serializedKeyFramesObj) :
+	IMimeData(MIMETYPE_EntityFrames)
+{
+	// Serialize the item info into json source
+	m_Data = JsonValueToSrc(QJsonValue(serializedKeyFramesObj));
+	setData(HyGlobal::MimeTypeString(m_eMIME_TYPE), m_Data);
+}
+
+/*virtual*/ EntityFrameMimeData::~EntityFrameMimeData()
+{ }
+
+bool EntityFrameMimeData::IsValidForPaste() const
+{
+	QJsonDocument jsonDocument = QJsonDocument::fromJson(m_Data);
+	return jsonDocument.object().size() == 1;
+}

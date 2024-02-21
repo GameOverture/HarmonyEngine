@@ -22,4 +22,15 @@ public:
 	virtual ~EntityItemMimeData();
 };
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityFrameMimeData : public IMimeData
+{
+public:
+	EntityFrameMimeData(QJsonObject serializedKeyFramesObj);
+	virtual ~EntityFrameMimeData();
+
+	bool IsValidForPaste() const;
+};
+
 #endif // EntityItemMimeData_H

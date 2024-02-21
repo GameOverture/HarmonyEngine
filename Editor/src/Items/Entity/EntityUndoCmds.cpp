@@ -750,11 +750,11 @@ EntityUndoCmd_PackToArray::EntityUndoCmd_PackToArray(ProjectItemData &entityItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, QJsonArray pasteDataArray, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, const QJsonObject &pasteKeyFrameObj, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
 	m_pItemData(pItemData),
-	m_PasteDataArray(pasteDataArray)
+	m_PasteMimeObject(pasteKeyFrameObj)
 {
 	setText("Paste Key Frames");
 }
@@ -763,15 +763,38 @@ EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene 
 {
 }
 
-
 /*virtual*/ void EntityUndoCmd_PasteKeyFrames::redo() /*override*/
 {
-	m_DopeSheetSceneRef.PasteFrameData(m_pItemData, m_PasteDataArray);
+	m_DopeSheetSceneRef.PasteSerializedKeyFrames(m_pItemData, m_PasteMimeObject);
 }
 
 /*virtual*/ void EntityUndoCmd_PasteKeyFrames::undo() /*override*/
 {
-	m_DopeSheetSceneRef.UnpasteFrameData(m_pItemData, m_PasteDataArray);
+	m_DopeSheetSceneRef.UnpasteSerializedKeyFrames(m_pItemData, m_PasteMimeObject);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_PopKeyFrames::EntityUndoCmd_PopKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, const QJsonObject &KeyFrameObj, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_KeyFramesObject(KeyFrameObj)
+{
+	setText("Delete Key Frames");
+}
+
+/*virtual*/ EntityUndoCmd_PopKeyFrames::~EntityUndoCmd_PopKeyFrames()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_PopKeyFrames::redo() /*override*/
+{
+	m_DopeSheetSceneRef.RemoveSerializedKeyFrames(m_KeyFramesObject);
+}
+
+/*virtual*/ void EntityUndoCmd_PopKeyFrames::undo() /*override*/
+{
+	m_DopeSheetSceneRef.InsertSerializedKeyFrames(m_KeyFramesObject);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

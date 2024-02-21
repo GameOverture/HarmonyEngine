@@ -12,6 +12,7 @@
 
 #include "EntityModel.h"
 #include "PropertiesUndoCmd.h"
+#include "EntityItemMimeData.h"
 
 #include <QUndoCommand>
 
@@ -238,11 +239,26 @@ class EntityUndoCmd_PasteKeyFrames : public QUndoCommand
 {
 	EntityDopeSheetScene &					m_DopeSheetSceneRef;
 	EntityTreeItemData *					m_pItemData;
-	QJsonArray								m_PasteDataArray;
+	QJsonObject								m_PasteMimeObject;
 
 public:
-	EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, QJsonArray pasteDataArray, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, const QJsonObject &pasteKeyFrameObj, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_PasteKeyFrames();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_PopKeyFrames : public QUndoCommand
+{
+	EntityDopeSheetScene &					m_DopeSheetSceneRef;
+	QJsonObject								m_KeyFramesObject;
+
+public:
+	EntityUndoCmd_PopKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, const QJsonObject &KeyFrameObj, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_PopKeyFrames();
 
 	virtual void redo() override;
 	virtual void undo() override;

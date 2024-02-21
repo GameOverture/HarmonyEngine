@@ -129,12 +129,10 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		menu.addSeparator();
 
 		menu.addAction("Select All '" % m_pContextClickItem->GetCodeName() % "' Key Frames", this, &EntityDopeSheetView::OnSelectAllItemKeyFrames);
-		if(iNumSelected >= 1)
-		{
-			menu.addAction("Deselect Key Frames", this, &EntityDopeSheetView::OnDeselectItemKeyFrames);
-			menu.addSeparator();
-			menu.addAction(QIcon(":/icons16x16/edit-delete.png"), "Delete '" % QString::number(iNumSelected) % "' Selected Key Frames", this, &EntityDopeSheetView::OnDeleteKeyFrames);
-		}
+		menu.addAction("Deselect Key Frames", this, &EntityDopeSheetView::OnDeselectItemKeyFrames);
+		menu.addSeparator();
+		menu.addAction(m_pAuxDopeSheet->GetDeleteAction());
+		
 	}
 	else if(pEvent->pos().y() <= TIMELINE_HEIGHT + 1.0f) // On timeline
 	{
@@ -595,8 +593,4 @@ void EntityDopeSheetView::OnSelectAllItemKeyFrames()
 void EntityDopeSheetView::OnDeselectItemKeyFrames()
 {
 	scene()->clearSelection();
-}
-
-void EntityDopeSheetView::OnDeleteKeyFrames()
-{
 }

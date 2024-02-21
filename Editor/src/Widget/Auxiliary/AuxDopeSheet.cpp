@@ -31,6 +31,10 @@ AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 	ui->btnNextKeyFrame->setDefaultAction(ui->actionNextKeyFrame);
 	ui->btnLastKeyFrame->setDefaultAction(ui->actionLastKeyFrame);
 
+	ui->btnCopyKeyFrames->setDefaultAction(ui->actionCopyFrames);
+	ui->btnPasteKeyFrames->setDefaultAction(ui->actionPasteFrames);
+	ui->btnDeleteKeyFrames->setDefaultAction(ui->actionDeleteFrames);
+
 	m_WidgetMapper.setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
 	UpdateWidgets();
 }
@@ -119,6 +123,8 @@ void AuxDopeSheet::UpdateWidgets()
 
 		const QMimeData *pMimeData = QApplication::clipboard()->mimeData();
 		ui->actionPasteFrames->setEnabled(pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)));
+
+		ui->actionDeleteFrames->setEnabled(selectedFrameItemList.size() > 0);
 	}
 	else
 	{
@@ -133,6 +139,7 @@ void AuxDopeSheet::UpdateWidgets()
 
 		ui->actionCopyFrames->setEnabled(false);
 		ui->actionPasteFrames->setEnabled(false);
+		ui->actionDeleteFrames->setEnabled(false);
 	}
 }
 
@@ -158,6 +165,11 @@ QList<QAction *> AuxDopeSheet::GetCopyPasteActions()
 	actionList.push_back(ui->actionCopyFrames);
 	actionList.push_back(ui->actionPasteFrames);
 	return actionList;
+}
+
+QAction *AuxDopeSheet::GetDeleteAction()
+{
+	return ui->actionDeleteFrames;
 }
 
 void AuxDopeSheet::on_actionRewind_triggered()
@@ -284,15 +296,11 @@ void AuxDopeSheet::on_actionCopyFrames_triggered()
 	QList<QGraphicsItem *> selectedItems = ui->graphicsView->GetScene()->selectedItems();
 
 	// Serialize all the selected items to the clipboard
-	QByteArray clipboardData;
-	QDataStream dataStream(&clipboardData, QIODevice::WriteOnly);
-	QJsonArray serializedKeyFrameArray = ui->graphicsView->GetScene()->SerializeSelectedKeyFrames();
-	dataStream << serializedKeyFrameArray;
+	QJsonObject serializedKeyFramesObj = ui->graphicsView->GetScene()->SerializeSpecifiedKeyFrames(selectedItems);
 
 	// Copy the serialized data to the clipboard
-	QMimeData *pMimeData = new QMimeData();
-	pMimeData->setData(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames), clipboardData);
-	QApplication::clipboard()->setMimeData(pMimeData);
+	EntityFrameMimeData *pFrameMimeData = new EntityFrameMimeData(serializedKeyFramesObj);
+	QApplication::clipboard()->setMimeData(pFrameMimeData);
 }
 
 void AuxDopeSheet::on_actionPasteFrames_triggered()
@@ -301,15 +309,33 @@ void AuxDopeSheet::on_actionPasteFrames_triggered()
 	const QMimeData *pMimeData = QApplication::clipboard()->mimeData();
 	if(pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)))
 	{
-		QByteArray clipboardData = pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames));
-		QDataStream dataStream(&clipboardData, QIODevice::ReadOnly);
+		const EntityFrameMimeData &entityFrameMimeDataRef = static_cast<const EntityFrameMimeData &>(*pMimeData);
+		if(entityFrameMimeDataRef.IsValidForPaste() == false)
+		{
+			HyGuiLog("AuxDopeSheet::on_actionPasteFrames_triggered() - entityFrameMimeDataRef.IsValidForPaste() == false", LOGTYPE_Error);
+			return;
+		}
 
-		QJsonArray serializedKeyFrameArray;
-		dataStream >> serializedKeyFrameArray;
+		QJsonDocument jsonDocument = QJsonDocument::fromJson(pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)));
+		QJsonObject serializedKeyFrameObj = jsonDocument.object();
 
-		EntityUndoCmd_PasteKeyFrames *pCmd = new EntityUndoCmd_PasteKeyFrames(*ui->graphicsView->GetScene(), ui->graphicsView->GetContextClickItem(), serializedKeyFrameArray);
+		EntityUndoCmd_PasteKeyFrames *pCmd = new EntityUndoCmd_PasteKeyFrames(*ui->graphicsView->GetScene(),
+																			  ui->graphicsView->GetContextClickItem(),
+																			  serializedKeyFrameObj);
 		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pCmd);
 	}
+}
+
+void AuxDopeSheet::on_actionDeleteFrames_triggered()
+{
+	// Get selected items
+	QList<QGraphicsItem *> selectedItems = ui->graphicsView->GetScene()->selectedItems();
+
+	// Serialize all the selected items to the clipboard
+	QJsonObject serializedKeyFramesObj = ui->graphicsView->GetScene()->SerializeSpecifiedKeyFrames(selectedItems);
+
+	EntityUndoCmd_PopKeyFrames *pNewCmd = new EntityUndoCmd_PopKeyFrames(*ui->graphicsView->GetScene(), serializedKeyFramesObj);
+	GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
 }
 
 void AuxDopeSheet::CreateContextTween(TweenProperty eTweenProp)
