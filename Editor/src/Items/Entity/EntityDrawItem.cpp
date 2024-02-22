@@ -43,7 +43,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 		pReferencedProjItemData->GetSavedFileData(fileDataPair);
 
 		if(m_pEntityTreeItemData->GetType() == ITEM_Entity)
-			m_pChild = new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), fileDataPair.m_Meta["stateArray"].toArray(), pParent);
+			m_pChild = new SubEntity(projectRef, fileDataPair.m_Meta["framesPerSecond"].toInt(), fileDataPair.m_Meta["descChildList"].toArray(), fileDataPair.m_Meta["stateArray"].toArray(), pParent);
 		else
 		{
 			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
@@ -169,8 +169,9 @@ void EntityDrawItem::HideTransformCtrl()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent) :
-	HyEntity2d(pParent)
+SubEntity::SubEntity(Project &projectRef, int iFps, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent) :
+	HyEntity2d(pParent),
+	m_iFramesPerSecond(iFps)
 {
 	QMap<QUuid, IHyLoadable2d *> uuidChildMap; // Temporary map to hold the QUuid's of the children so we can link them up with their key frame properties
 
@@ -197,7 +198,6 @@ SubEntity::SubEntity(Project &projectRef, const QJsonArray &descArray, const QJs
 		QJsonObject stateObj = stateArray[i].toObject();
 		
 		m_StateInfoList.push_back(StateInfo());
-		m_StateInfoList.back().m_iFramesPerSecond = stateObj["framesPerSecond"].toInt();
 
 		QJsonObject keyFramesObj = stateObj["keyFrames"].toObject();
 		for(auto iter = keyFramesObj.begin(); iter != keyFramesObj.end(); ++iter)
@@ -295,7 +295,7 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
 		FileDataPair fileDataPair;
 		static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-		pNewChild = new SubEntity(projectRef, fileDataPair.m_Meta["descChildList"].toArray(), fileDataPair.m_Meta["stateArray"].toArray(), this);
+		pNewChild = new SubEntity(projectRef, fileDataPair.m_Meta["framesPerSecond"].toInt(), fileDataPair.m_Meta["descChildList"].toArray(), fileDataPair.m_Meta["stateArray"].toArray(), this);
 		break; }
 
 	case ITEM_AtlasFrame: {
@@ -316,7 +316,7 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 }
 void SubEntity::ExtrapolateChildProperties(const int iCURRENT_FRAME, HyCamera2d *pCamera)
 {
-	const float fFRAME_DURATION = 1.0f / m_StateInfoList[GetState()].m_iFramesPerSecond;
+	const float fFRAME_DURATION = 1.0f / m_iFramesPerSecond;
 	const QMap<IHyNode2d *, QMap<int, QJsonObject>>	&propMapRef = m_StateInfoList[GetState()].m_PropertiesMap;
 	
 	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)

@@ -709,11 +709,6 @@ EntityUndoCmd_PackToArray::EntityUndoCmd_PackToArray(ProjectItemData &entityItem
 
 /*virtual*/ void EntityUndoCmd_PackToArray::redo() /*override*/
 {
-	// NOTE: m_PackItemList has been sorted to be in row descending order
-	m_PoppedIndexList.clear();
-	for(EntityTreeItemData *pItem : m_PackItemList)
-		m_PoppedIndexList.append(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pItem));
-
 	if(m_ArrayItemList.empty())
 		m_ArrayItemList = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewArray(m_PackItemList, m_sArrayName, m_iArrayFolderRow);
 	else
@@ -721,6 +716,11 @@ EntityUndoCmd_PackToArray::EntityUndoCmd_PackToArray(ProjectItemData &entityItem
 		for(int i = 0; i < m_ArrayItemList.size(); ++i)
 			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_ArrayItemList[i], (i == 0) ? m_iArrayFolderRow : -1);
 	}
+
+	// NOTE: m_PackItemList has been sorted to be in row descending order
+	m_PoppedIndexList.clear();
+	for(EntityTreeItemData *pItem : m_PackItemList)
+		m_PoppedIndexList.append(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pItem));
 
 	QList<QUuid> arrayItemUuidList;
 	for(EntityTreeItemData *pArrayItem : m_ArrayItemList)

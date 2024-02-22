@@ -287,11 +287,8 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewPasteItems(QJsonObject mimeOb
 	return pastedItemList;
 }
 
-// It is assumed that the items within 'itemDataList' have been removed/popped prior
 QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewArray(QList<EntityTreeItemData *> itemDataList, QString sArrayName, int iArrayFolderRow)
 {
-	sArrayName = GenerateCodeName(sArrayName);
-
 	// Create temporary EntityItemMimeData to generate JSON object that contains an "itemList" JSON array of that represents 'itemDataList'
 	EntityItemMimeData *pMimeData = new EntityItemMimeData(m_ItemRef, itemDataList);
 	QByteArray jsonData = pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityItems));

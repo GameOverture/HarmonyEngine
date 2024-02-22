@@ -84,7 +84,10 @@ public:
 	{
 		FileDataPair fileDataPair;
 		if(m_iCopyFromStateIndex >= 0)
+		{
 			fileDataPair = m_ItemRef.GetModel()->GetStateFileData(m_iCopyFromStateIndex);
+			fileDataPair.m_Meta.insert("name", QJsonValue(fileDataPair.m_Meta["name"].toString() + " (Copy)"));
+		}
 
 		m_iIndex = m_ItemRef.GetModel()->AppendState<STATEDATA>(fileDataPair);
 		m_ItemRef.FocusWidgetState(m_iIndex, -1);

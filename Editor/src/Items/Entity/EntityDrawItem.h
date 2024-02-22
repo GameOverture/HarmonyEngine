@@ -136,17 +136,17 @@ public:
 
 class SubEntity : public HyEntity2d
 {
+	int												m_iFramesPerSecond;
 	QList<QPair<IHyLoadable2d *, ItemType>>			m_ChildTypeList;
 
 	struct StateInfo
 	{
-		int											m_iFramesPerSecond;
 		QMap<IHyNode2d *, QMap<int, QJsonObject>>	m_PropertiesMap;
 	};
 	QList<StateInfo>								m_StateInfoList;
 
 public:
-	SubEntity(Project &projectRef, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent);
+	SubEntity(Project &projectRef, int iFps, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent);
 	virtual ~SubEntity();
 
 	void CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj);
