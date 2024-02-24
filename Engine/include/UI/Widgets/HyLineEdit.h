@@ -36,6 +36,8 @@ protected:
 	HyPrimitive2d						m_Cursor;				// Shows a standard vertical line draw with a primitive
 	HyTimer								m_BlinkTimer;
 
+	std::function<void(HyLineEdit *)>	m_fpOnSubmit;			// Called when the user presses enter, or invokes Submit()
+
 public:
 	HyLineEdit(HyEntity2d *pParent = nullptr);
 	HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
@@ -55,6 +57,9 @@ public:
 	
 	void SetCursor(uint32 uiCharIndex);
 	void SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex);
+
+	void SetOnSubmit(std::function<void(HyLineEdit *)> fpOnSubmit);
+	void Submit();
 
 protected:
 	virtual void OnUiTextInput(std::string sNewUtf8Text) override;

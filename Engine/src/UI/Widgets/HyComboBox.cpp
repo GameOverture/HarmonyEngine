@@ -172,11 +172,11 @@ void HyComboBox::ToggleExpanded()
 		}
 
 		if(m_uiAttribs & COMBOBOXATTRIB_IsInstantExpand)
-			m_SubBtnPanel.SetSize(ptTweenDest[0], ptTweenDest[1]);
+			m_SubBtnPanel.SetSize(static_cast<uint32>(ptTweenDest[0]), static_cast<uint32>(ptTweenDest[1]));
 		else
 		{
 			m_ExpandAnimVec.Set(0.0f, 0.0f);
-			m_ExpandAnimVec.Tween(ptTweenDest[0], ptTweenDest[1], 0.5f, HyTween::QuadOut, 0.0f, [this](IHyNode *pThis) { m_SubBtnPanel.SetSize(m_ExpandAnimVec.X(), m_ExpandAnimVec.Y()); });
+			m_ExpandAnimVec.Tween(ptTweenDest[0], ptTweenDest[1], 0.5f, HyTween::QuadOut, 0.0f, [this](IHyNode *pThis) { m_SubBtnPanel.SetSize(static_cast<uint32>(m_ExpandAnimVec.X()), static_cast<uint32>(m_ExpandAnimVec.Y())); });
 		}
 	}
 	else
@@ -210,7 +210,7 @@ void HyComboBox::ResetExpandedTimeout()
 	HyButton::Update();
 
 	if(m_ExpandAnimVec.IsAnimating())
-		m_SubBtnPanel.SetSize(m_ExpandAnimVec.X(), m_ExpandAnimVec.Y());
+		m_SubBtnPanel.SetSize(static_cast<uint32>(m_ExpandAnimVec.X()), static_cast<uint32>(m_ExpandAnimVec.Y()));
 
 	switch(m_uiAttribs & COMBOBOXATTRIB_STATEMASK)
 	{

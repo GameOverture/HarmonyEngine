@@ -13,7 +13,8 @@
 
 HyButtonGroup::HyButtonGroup() :
 	m_eExclusiveState(EXCLUSIVE_Yes),
-	m_iExclusiveCheckedId(HYBUTTONGROUP_AUTO_ID)
+	m_iExclusiveCheckedId(HYBUTTONGROUP_AUTO_ID),
+	m_bProcessing(false)
 {
 }
 
@@ -163,9 +164,14 @@ bool HyButtonGroup::ProcessButtonChecked(HyButton &buttonRef, bool bChecked)
 {
 	HyAssert(Contains(&buttonRef), "HyButtonGroup::OnButtonChecked() - buttonRef is not part of this group");
 
+	if(m_bProcessing) // Avoid recursion
+		return true;
+
+	m_bProcessing = true;
+
 	if(bChecked)
 	{
-		if(m_eExclusiveState == EXCLUSIVE_Yes || (m_eExclusiveState == EXCLUSIVE_Auto && buttonRef.IsAutoExclusive()))
+		if(m_eExclusiveState == EXCLUSIVE_Yes)
 		{
 			for(auto iter = m_ButtonMap.begin(); iter != m_ButtonMap.end(); ++iter)
 			{
@@ -174,12 +180,25 @@ bool HyButtonGroup::ProcessButtonChecked(HyButton &buttonRef, bool bChecked)
 			}
 			m_iExclusiveCheckedId = GetId(&buttonRef);
 		}
+		else if(m_eExclusiveState == EXCLUSIVE_Auto && buttonRef.IsAutoExclusive())
+		{
+			for(auto iter = m_ButtonMap.begin(); iter != m_ButtonMap.end(); ++iter)
+			{
+				if(iter->second != &buttonRef && iter->second->IsAutoExclusive())
+					iter->second->SetChecked(false);
+			}
+			m_iExclusiveCheckedId = GetId(&buttonRef);
+		}
 	}
 	else
 	{
 		if(m_iExclusiveCheckedId == GetId(&buttonRef))
+		{
+			m_bProcessing = false;
 			return false;
+		}
 	}
 
+	m_bProcessing = false;
 	return true;
 }

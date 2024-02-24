@@ -31,6 +31,8 @@ class HyButtonGroup
 
 	std::map<int32, HyButton *>		m_ButtonMap;
 
+	bool							m_bProcessing;
+
 public:
 	HyButtonGroup();
 	virtual ~HyButtonGroup();

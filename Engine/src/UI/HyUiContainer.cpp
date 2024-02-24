@@ -280,7 +280,7 @@ bool HyUiContainer::InsertWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInt
 
 bool HyUiContainer::RemoveWidget(IHyWidget &widgetRef)
 {
-	for(int i = 0; i < m_RootLayout.ChildCount(); ++i)
+	for(uint32 i = 0; i < m_RootLayout.ChildCount(); ++i)
 	{
 		if(m_RootLayout.ChildGet(i) == &widgetRef)
 		{
@@ -291,7 +291,7 @@ bool HyUiContainer::RemoveWidget(IHyWidget &widgetRef)
 	
 	for(auto iter = m_SubLayoutMap.begin(); iter != m_SubLayoutMap.end(); ++iter)
 	{
-		for(int i = 0; i < iter->second->ChildCount(); ++i)
+		for(uint32 i = 0; i < iter->second->ChildCount(); ++i)
 		{
 			if(iter->second->ChildGet(i) == &widgetRef)
 			{

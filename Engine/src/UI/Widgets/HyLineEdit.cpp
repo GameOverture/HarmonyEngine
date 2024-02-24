@@ -18,7 +18,8 @@ HyLineEdit::HyLineEdit(HyEntity2d *pParent /*= nullptr*/) :
 	m_uiCursorIndex(0),
 	m_uiSelectionIndex(0),
 	m_Selection(this),
-	m_Cursor(this)
+	m_Cursor(this),
+	m_fpOnSubmit(nullptr)
 {
 }
 
@@ -27,7 +28,8 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 	m_uiCursorIndex(0),
 	m_uiSelectionIndex(0),
 	m_Selection(this),
-	m_Cursor(this)
+	m_Cursor(this),
+	m_fpOnSubmit(nullptr)
 {
 	OnSetup();
 }
@@ -37,7 +39,8 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 	m_uiCursorIndex(0),
 	m_uiSelectionIndex(0),
 	m_Selection(this),
-	m_Cursor(this)
+	m_Cursor(this),
+	m_fpOnSubmit(nullptr)
 {
 	OnSetup();
 }
@@ -49,6 +52,9 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 /*virtual*/ void HyLineEdit::SetText(const std::string &sUtf8Text) /*override*/
 {
 	HyLabel::SetText(sUtf8Text);
+
+	if(m_uiCursorIndex > HyIO::Utf8Length(sUtf8Text))
+		SetCursor(HyIO::Utf8Length(sUtf8Text));
 }
 
 bool HyLineEdit::IsInputValidated() const
@@ -146,6 +152,17 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 	}
 }
 
+void HyLineEdit::SetOnSubmit(std::function<void(HyLineEdit *)> fpOnSubmit)
+{
+	m_fpOnSubmit = fpOnSubmit;
+}
+
+void HyLineEdit::Submit()
+{
+	if(m_fpOnSubmit != nullptr)
+		m_fpOnSubmit(this);
+}
+
 /*virtual*/ void HyLineEdit::OnUiTextInput(std::string sNewUtf8Text) /*override*/
 {
 	if(IsInputValidated())
@@ -198,7 +215,7 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 	switch(eBtn)
 	{
 	case HYKEY_Enter:
-
+		Submit();
 		break;
 
 	case HYKEY_Backspace:

@@ -110,7 +110,7 @@ void HyBarMeter::SetBarOffset(const glm::ivec2 &barOffset)
 
 void HyBarMeter::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
 {
-	HySetVec(m_vBarOffset, iBarOffsetX, iBarOffsetY);
+	HySetVec(m_vBarOffset, static_cast<float>(iBarOffsetX), static_cast<float>(iBarOffsetY));
 	OnSetup();
 }
 

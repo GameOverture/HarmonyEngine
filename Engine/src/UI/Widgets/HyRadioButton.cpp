@@ -54,6 +54,7 @@ void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *
 
 /*virtual*/ void HyRadioButton::OnSetup() /*override*/
 {
+	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
 	HyButton::OnSetup();
 	SetAsSideBySide();
 
