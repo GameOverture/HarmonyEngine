@@ -43,7 +43,14 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 		pReferencedProjItemData->GetSavedFileData(fileDataPair);
 
 		if(m_pEntityTreeItemData->GetType() == ITEM_Entity)
-			m_pChild = new SubEntity(projectRef, fileDataPair.m_Meta["framesPerSecond"].toInt(), fileDataPair.m_Meta["descChildList"].toArray(), fileDataPair.m_Meta["stateArray"].toArray(), pParent);
+		{
+			m_pChild = new SubEntity(projectRef,
+									 fileDataPair.m_Meta["framesPerSecond"].toInt(),
+									 QUuid(fileDataPair.m_Meta["UUID"].toString()),
+									 fileDataPair.m_Meta["descChildList"].toArray(),
+									 fileDataPair.m_Meta["stateArray"].toArray(),
+									 pParent);
+		}
 		else
 		{
 			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
@@ -169,11 +176,14 @@ void EntityDrawItem::HideTransformCtrl()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SubEntity::SubEntity(Project &projectRef, int iFps, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent) :
+SubEntity::SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
-	m_iFramesPerSecond(iFps)
+	m_iFramesPerSecond(iFps),
+	m_bTimelinePaused(false)
 {
 	QMap<QUuid, IHyLoadable2d *> uuidChildMap; // Temporary map to hold the QUuid's of the children so we can link them up with their key frame properties
+	uuidChildMap[subEntityUuid] = this; // This' root, the SubEntity
+	m_ChildTypeList.append(QPair<IHyLoadable2d *, ItemType>(this, ITEM_Unknown));
 
 	for(int i = 0; i < descArray.size(); ++i)
 	{
@@ -223,7 +233,16 @@ SubEntity::SubEntity(Project &projectRef, int iFps, const QJsonArray &descArray,
 /*virtual*/ SubEntity::~SubEntity()
 {
 	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
+	{
+		if(childTypePair.first == this)
+			continue;
+
 		delete childTypePair.first;
+	}
+}
+void SubEntity::SetTimelinePaused(float fElapsedTime, bool bPaused)
+{
+	m_bTimelinePaused = bPaused;
 }
 void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj)
 {
@@ -295,7 +314,12 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
 		FileDataPair fileDataPair;
 		static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-		pNewChild = new SubEntity(projectRef, fileDataPair.m_Meta["framesPerSecond"].toInt(), fileDataPair.m_Meta["descChildList"].toArray(), fileDataPair.m_Meta["stateArray"].toArray(), this);
+		pNewChild = new SubEntity(projectRef,
+								  fileDataPair.m_Meta["framesPerSecond"].toInt(),
+								  QUuid(fileDataPair.m_Meta["UUID"].toString()),
+								  fileDataPair.m_Meta["descChildList"].toArray(),
+								  fileDataPair.m_Meta["stateArray"].toArray(),
+								  this);
 		break; }
 
 	case ITEM_AtlasFrame: {
@@ -314,8 +338,12 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 
 	pNewChild->Load();
 }
-void SubEntity::ExtrapolateChildProperties(const int iCURRENT_FRAME, HyCamera2d *pCamera)
+void SubEntity::ExtrapolateChildProperties(float fElapsedTime, HyCamera2d *pCamera)
 {
+	if(m_bTimelinePaused)
+		return;
+
+	const int iCURRENT_FRAME = static_cast<int>(fElapsedTime * m_iFramesPerSecond);
 	const float fFRAME_DURATION = 1.0f / m_iFramesPerSecond;
 	const QMap<IHyNode2d *, QMap<int, QJsonObject>>	&propMapRef = m_StateInfoList[GetState()].m_PropertiesMap;
 	
@@ -375,17 +403,35 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 			}
 		};
 
-	if(eItemType == ITEM_Entity)
-		static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(iCURRENT_FRAME, pCamera);
-	else if(eItemType == ITEM_Sprite)
+	if(eItemType == ITEM_Sprite)
 		static_cast<HySprite2d *>(pThisHyNode)->SetAnimPause(true); // We always pause the animation because it is set manually by extrapolating what frame it should be, and don't want time passing to affect it.
 
+	bool bIsTimelinePaused = false;
 	for(int iFrame : keyFrameMapRef.keys())
 	{
 		if(iFrame > iCURRENT_FRAME)
 			break;
 
 		const QJsonObject &propsObj = keyFrameMapRef[iFrame];
+
+		// Check for Timeline Pause/Unpause first before processing any other properties
+		//
+		// ITEM_Unknown means it's the root entity
+		// ITEM_Entity means it's a sub-entity
+		if((eItemType == ITEM_Unknown || eItemType == ITEM_Entity) && propsObj.contains("Entity"))
+		{
+			QJsonObject entityObj = propsObj["Entity"].toObject();
+			if(entityObj.contains("Timeline Pause"))
+			{
+				if(eItemType == ITEM_Unknown)
+					bIsTimelinePaused = entityObj["Timeline Pause"].toBool();
+				else // ITEM_Entity
+					static_cast<SubEntity *>(pThisHyNode)->SetTimelinePaused(fFRAME_DURATION * iCURRENT_FRAME, entityObj["Timeline Pause"].toBool());
+			}
+		}
+		if(bIsTimelinePaused)
+			continue;
+
 		// Parse all and only the potential categories of the 'eItemType' type, and set the values to 'pHyNode'
 		if(eItemType != ITEM_BoundingVolume)
 		{
@@ -487,17 +533,11 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 			}
 		}
 
-		// 'ITEM_Unknown' is passed for the entity root node
+		
 		switch(eItemType)
 		{
-		case ITEM_Unknown:
-			break;
-
-		case ITEM_Entity:
-		//	// Call ExtrapolateProperties recursively on all pThisHyNode's children
-		//	static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(iCURRENT_FRAME, pCamera);
-
-		//	// "Physics" category doesn't need to be set
+		case ITEM_Unknown:	// 'ITEM_Unknown' is passed for the entity root node
+		case ITEM_Entity:	// 'ITEM_Entity' is passed when this is a sub-entity
 			break;
 
 		case ITEM_Primitive: {
@@ -640,8 +680,13 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 			HyGuiLog(QString("EntityDrawItem::RefreshJson - unsupported type: ") % HyGlobal::ItemName(eItemType, false), LOGTYPE_Error);
 			break;
 		}
-	}
 
+		if(eItemType == ITEM_Entity)
+			static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(fFRAME_DURATION * iCURRENT_FRAME, pCamera);
+	} // For Loop - keyFrameMapRef.keys()
+
+	// Extrapolate any remaining time to iCURRENT_FRAME
+	// SPRITE ANIMS
 	if(eItemType == ITEM_Sprite)
 	{
 		if(std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo) == -1)
@@ -655,8 +700,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 		if(std::get<SPRITE_Paused>(spriteLastKnownAnimInfo) == false)
 			static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iCURRENT_FRAME - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
 	}
-
-	// Apply any remaining active tweens
+	// TWEENS
 	for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
 	{
 		if(tweenInfo[iTweenProp].IsActive())

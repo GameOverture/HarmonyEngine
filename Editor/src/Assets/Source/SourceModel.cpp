@@ -30,6 +30,9 @@ SourceModel::SourceModel(Project &projRef) :
 	m_bIsSingleBank = true;
 	m_MetaDir.setPath(m_ProjectRef.GetSourceAbsPath());
 	m_DataDir.setPath(m_ProjectRef.GetSourceAbsPath()); // SourceModel doesn't use a DataDir
+
+	m_pEntityFolderItem = new TreeModelItemData(ITEM_Filter, QUuid(), HySrcEntityFilter);
+	InsertTreeItem(m_ProjectRef, m_pEntityFolderItem, nullptr);
 }
 
 /*virtual*/ SourceModel::~SourceModel()
@@ -39,13 +42,6 @@ SourceModel::SourceModel(Project &projRef) :
 bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 {
 	QString sClassName = entityModelRef.GetItem().GetName(false);
-
-	// Create the Entity folder if it doesn't exist
-	if(m_pEntityFolderItem == nullptr)
-	{
-		m_pEntityFolderItem = new TreeModelItemData(ITEM_Filter, QUuid(), HySrcEntityFilter);
-		InsertTreeItem(m_ProjectRef, m_pEntityFolderItem, nullptr);
-	}
 
 	// Generate the cpp and h file of the entity (it will overwrite the entity files if they already exist)
 	QModelIndex entityFolderIndex = FindIndex<TreeModelItemData *>(m_pEntityFolderItem, 0);
@@ -71,6 +67,21 @@ bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 	}
 
 	return ImportNewAssets(sImportList, 0, correspondingParentList, correspondingUuidList);
+}
+
+QStringList SourceModel::GetEditorEntityList() const
+{
+	QStringList sEntityList;
+	
+	QModelIndex entityFolderIndex = FindIndex<TreeModelItemData *>(m_pEntityFolderItem, 0);
+	QList<TreeModelItemData *> editorEntityList = GetItemsRecursively(entityFolderIndex);
+	for(int i = 0; i < editorEntityList.size(); ++i)
+	{
+		if(editorEntityList[i]->GetType() == ITEM_Source)
+			sEntityList << QFileInfo(static_cast<SourceFile *>(editorEntityList[i])->GetName()).baseName();
+	}
+
+	return sEntityList;
 }
 
 /*virtual*/ QString SourceModel::OnBankInfo(uint uiBankIndex) /*override*/
@@ -399,7 +410,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 
 /*virtual*/ void SourceModel::OnGenerateAssetsDlg(const QModelIndex &indexDestination) /*override*/
 {
-	SourceGenFileDlg *pDlg = new SourceGenFileDlg();
+	SourceGenFileDlg *pDlg = new SourceGenFileDlg(GetEditorEntityList());
 	if(QDialog::Accepted == pDlg->exec())
 	{
 		QStringList sImportList;

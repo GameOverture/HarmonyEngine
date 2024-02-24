@@ -26,7 +26,7 @@ class SourceGenFileDlg : public QDialog
 	Ui::SourceGenFileDlg *		ui;
 
 public:
-	SourceGenFileDlg(QWidget *pParent = nullptr);
+	SourceGenFileDlg(QStringList sEditorEntityList, QWidget *pParent = nullptr);
 	virtual ~SourceGenFileDlg();
 
 	QString GetCodeClassName() const;
@@ -35,11 +35,16 @@ public:
 	QString GetBaseClassName() const;
 	bool IsEntityBaseClass() const;
 
-private Q_SLOTS:
+protected Q_SLOTS:
 	void on_txtClassName_textChanged(const QString &arg1);
 	void on_txtHFile_textChanged(const QString &arg1);
 	void on_txtCppFile_textChanged(const QString &arg1);
 	void on_txtBaseClass_textChanged(const QString &arg1);
+
+	void on_radBaseSpecify_toggled(bool bChecked);
+	void on_radBaseEditor_toggled(bool bChecked);
+
+	void on_editorEntitiesList_itemSelectionChanged();
 
 private:
 	void ErrorCheck();

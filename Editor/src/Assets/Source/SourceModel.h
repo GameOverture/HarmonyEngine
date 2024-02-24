@@ -29,10 +29,12 @@ public:
 	virtual ~SourceModel();
 
 	bool GenerateEntitySrcFiles(EntityModel &entityModelRef);
+	QStringList GetEditorEntityList() const;
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 	virtual QStringList GetSupportedFileExtList() const override;
+
 
 protected:
 	quint32 ComputeFileChecksum(QString sFilterPath, QString sFileName) const;

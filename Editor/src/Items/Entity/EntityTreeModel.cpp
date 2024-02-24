@@ -95,19 +95,23 @@ QString EntityTreeItemData::GetHyNodeTypeName() const
 {
 	switch(m_eTYPE)
 	{
-	case ITEM_Primitive:		return "HyPrimitive2d\t\t\t";
-	case ITEM_Audio:			return "HyAudio2d\t\t\t\t";
-	case ITEM_Text:				return "HyText2d\t\t\t\t";
-	case ITEM_Spine:			return "HySpine2d\t\t\t\t";
-	case ITEM_Sprite:			return "HySprite2d\t\t\t\t";
-	case ITEM_AtlasFrame:		return "HyTexturedQuad2d\t\t";
-	case ITEM_BoundingVolume:	return "HyShape2d\t\t\t\t";
+	case ITEM_Primitive:		return "HyPrimitive2d";
+	case ITEM_Audio:			return "HyAudio2d";
+	case ITEM_Text:				return "HyText2d";
+	case ITEM_Spine:			return "HySpine2d";
+	case ITEM_Sprite:			return "HySprite2d";
+	case ITEM_AtlasFrame:		return "HyTexturedQuad2d";
+	case ITEM_BoundingVolume:	return "HyShape2d";
 	
-	case ITEM_Entity:
+	case ITEM_Entity: {
 		if(m_sPromotedEntityType.isEmpty() == false)
 			return m_sPromotedEntityType;
-		else
-			return "HyEntity2d\t\t\t\t";
+
+		QUuid referencedItemUuid = GetReferencedItemUuid();
+		ProjectItemData *pReferencedItemData = static_cast<ProjectItemData *>(m_EntityModelRef.GetItem().GetProject().FindItemData(referencedItemUuid));
+		if(pReferencedItemData == nullptr)
+			HyGuiLog("Could not find referenced item data from Sub-Entity's UUID: " + referencedItemUuid.toString(), LOGTYPE_Error);
+		return "hy::" + pReferencedItemData->GetName(false); }
 
 	case ITEM_SoundClip:
 	case ITEM_Prefab:
@@ -240,6 +244,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	{
 	case ITEM_Entity:
 		m_pPropertiesModel->AppendCategory("Entity", QVariant(), false, "A visible shape that can be drawn to the screen");
+		m_pPropertiesModel->AppendProperty("Entity", "Timeline Pause", PROPERTIESTYPE_bool, Qt::Unchecked, "Pausing the timeline will stop processing key frames (starting from this frame indefinately", PROPERTIESACCESS_ToggleOff);
 		m_pPropertiesModel->AppendProperty("Entity", "Mouse Input", PROPERTIESTYPE_bool, Qt::Unchecked, "Mouse hover and button inputs over this bounding volume or specified shapes", PROPERTIESACCESS_ToggleOff);
 		break;
 

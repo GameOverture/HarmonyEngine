@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>546</width>
-    <height>198</height>
+    <width>554</width>
+    <height>460</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -28,13 +28,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="3" column="0">
-      <widget class="QLineEdit" name="txtBaseClass">
-       <property name="text">
-        <string>HyEntity2d</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="2">
       <widget class="QLineEdit" name="txtHFile">
        <property name="text">
@@ -42,29 +35,15 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="lblHFile">
+       <property name="text">
+        <string>.h File:</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="0">
       <widget class="QLineEdit" name="txtClassName">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="4">
-      <widget class="QLabel" name="lblCppFile">
-       <property name="text">
-        <string>.cpp File:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="lblBaseClass">
-       <property name="text">
-        <string>Base Class:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="4">
-      <widget class="QLineEdit" name="txtCppFile">
        <property name="text">
         <string/>
        </property>
@@ -77,24 +56,92 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="lblHFile">
+     <item row="1" column="4">
+      <widget class="QLineEdit" name="txtCppFile">
        <property name="text">
-        <string>.h File:</string>
+        <string/>
        </property>
       </widget>
      </item>
-     <item row="3" column="2">
-      <widget class="QCheckBox" name="chkHyEntityBaseClass">
+     <item row="0" column="4">
+      <widget class="QLabel" name="lblCppFile">
        <property name="text">
-        <string>Is apart of HyEntity Hierarchy</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
+        <string>.cpp File:</string>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Base Class:</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QRadioButton" name="radBaseSpecify">
+        <property name="text">
+         <string>Specify</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLineEdit" name="txtBaseClass">
+          <property name="text">
+           <string>HyEntity2d</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkHyEntityBaseClass">
+          <property name="text">
+           <string>Is apart of HyEntity Hierarchy</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radBaseEditor">
+        <property name="text">
+         <string>Editor Entity</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QListWidget" name="editorEntitiesList">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">
@@ -132,8 +179,6 @@
   <tabstop>txtClassName</tabstop>
   <tabstop>txtHFile</tabstop>
   <tabstop>txtCppFile</tabstop>
-  <tabstop>txtBaseClass</tabstop>
-  <tabstop>chkHyEntityBaseClass</tabstop>
  </tabstops>
  <resources>
   <include location="../../../data/HyEditor.qrc"/>

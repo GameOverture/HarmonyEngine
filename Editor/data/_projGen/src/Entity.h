@@ -17,6 +17,7 @@ protected:
 	std::function<void()>	m_fpUpdateFunc;
 	float					m_fElapsedFrameTime;
 	uint32					m_uiCurFrame;
+	bool					m_bTimelinePaused;
 
 %HY_MEMBERVARIABLES%
 public:
@@ -25,6 +26,9 @@ public:
 	
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual uint32 GetNumStates() override;
+	
+	bool IsTimelinePaused();
+	void SetTimelinePause(bool bPause);
 	
 protected:
 	virtual void Update() override;

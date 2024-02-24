@@ -483,6 +483,8 @@ QString EntityModel::GenerateSrc_FileIncludes() const
 
 	QList<EntityTreeItemData *> itemList, shapeList;
 	m_TreeModel.GetTreeItemData(itemList, shapeList);
+
+	QStringList sIncludeList;
 	for(EntityTreeItemData *pItem : itemList)
 	{
 		if(pItem->GetType() != ITEM_Entity)
@@ -492,9 +494,13 @@ QString EntityModel::GenerateSrc_FileIncludes() const
 		ProjectItemData *pReferencedItemData = static_cast<ProjectItemData *>(GetItem().GetProject().FindItemData(referencedItemUuid));
 		if(pReferencedItemData == nullptr)
 			HyGuiLog("Could not find referenced item data from Sub-Entity's UUID: " + referencedItemUuid.toString(), LOGTYPE_Error);
-		sSrc += "#include \"" + pReferencedItemData->GetName(false);
-		sSrc += ".h\"\n";
+		
+		sIncludeList.append(pReferencedItemData->GetName(false) + ".h");
 	}
+	sIncludeList.removeDuplicates();
+
+	for(QString sInclude : sIncludeList)
+		sSrc += "#include \"" + sInclude + "\"\n";
 
 	return sSrc;
 }
@@ -517,16 +523,16 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 		}
 
 		sSrc += "\t";
-		if(pItem->GetType() == ITEM_Entity)
+		QString sType = pItem->GetHyNodeTypeName();
+		sSrc += sType;
+		int iNumTabs = 6 - (sType.length() / 4); // Do 6 tabs (minus sType's length / 4) to align the variable names
+		if(iNumTabs > 0)
 		{
-			QUuid referencedItemUuid = pItem->GetReferencedItemUuid();
-			ProjectItemData *pReferencedItemData = static_cast<ProjectItemData *>(GetItem().GetProject().FindItemData(referencedItemUuid));
-			if(pReferencedItemData == nullptr)
-				HyGuiLog("Could not find referenced item data from Sub-Entity's UUID: " + referencedItemUuid.toString(), LOGTYPE_Error);
-			sSrc += pReferencedItemData->GetName(false);
+			for(int i = 0; i < 6 - (sType.length() / 4); ++i)
+				sSrc += "\t";
 		}
 		else
-			sSrc += pItem->GetHyNodeTypeName();
+			sSrc += " ";
 		sSrc += pItem->GetCodeName();
 		if(pItem->GetEntType() != ENTTYPE_ArrayItem)
 			sSrc += ";\n";
@@ -548,6 +554,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 	sSrc += ",\n\tm_fpUpdateFunc(nullptr)";
 	sSrc += ",\n\tm_fElapsedFrameTime(0.0f)";
 	sSrc += ",\n\tm_uiCurFrame(0)";
+	sSrc += ",\n\tm_bTimelinePaused(false)";
 
 	QList<EntityTreeItemData *> itemList, shapeList;
 	m_TreeModel.GetTreeItemData(itemList, shapeList);
@@ -585,11 +592,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 			else
 			{
 				QString sItemPath = static_cast<ProjectItemData *>(pReferencedItemData)->GetName(true);
-				int iLastIndex = sItemPath.lastIndexOf('/');
-				QString sPrefix = sItemPath.left(iLastIndex);
-				QString sName = sItemPath.mid(iLastIndex + 1);
-
-				sInitialization = "(\"" + sPrefix + "\", \"" + sName + "\", this)";
+				sInitialization = "(HyNodePath(\"" + sItemPath + "\"), this)";
 			}
 			break;
 
@@ -616,7 +619,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 			else
 				sSrc += ", ";
 
-			sSrc += pItem->GetHyNodeTypeName().trimmed() + sInitialization;
+			sSrc += pItem->GetHyNodeTypeName() + sInitialization;
 			pCurArray = pItem;
 		}
 	}
@@ -651,7 +654,8 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 
 		sSrc += "std::vector<glm::vec2> vertList;\n\t\t\t";
 
-		sSrc += "m_fElapsedFrameTime += HyEngine::DeltaTime();\n\t\t\t";
+		sSrc += "if(m_bTimelinePaused == false)\n\t\t\t";
+		sSrc += "\tm_fElapsedFrameTime += HyEngine::DeltaTime();\n\t\t\t";
 		sSrc += "while(m_fElapsedFrameTime >= 0.0f)\n\t\t\t";
 		sSrc += "{\n\t\t\t\t";
 
@@ -672,7 +676,8 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 		sSrc += "m_fElapsedFrameTime -= m_fFRAME_DURATION;\n\t\t\t";
 		sSrc += "}\n\t\t"; // End while(m_fElapsedFrameTime >= 0.0f)
 
-		sSrc += "};\n"; // End m_fpUpdateFunc
+		sSrc += "};\n\t\t"; // End m_fpUpdateFunc
+		sSrc += "break;\n"; // End case m_uiState
 	}
 	sSrc += "\t}"; // End switch(m_uiState)
 
@@ -792,6 +797,15 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 		else if(sCategoryName == "Entity")
 		{
 			QJsonObject entityObj = propObj["Entity"].toObject();
+
+			if(entityObj.contains("Timeline Pause"))
+			{
+				if(entityObj["Timeline Pause"].toBool())
+					sSrc += sCodeName + "SetTimelinePause(true);" + sNewLine;
+				else
+					sSrc += sCodeName + "SetTimelinePause(false);" + sNewLine;
+			}
+
 			if(entityObj.contains("Mouse Input"))
 			{
 				if(entityObj["Mouse Input"].toBool())

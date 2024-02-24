@@ -13,7 +13,7 @@
 
 #include <QPushButton>
 
-SourceGenFileDlg::SourceGenFileDlg(QWidget *pParent /*= nullptr*/) :
+SourceGenFileDlg::SourceGenFileDlg(QStringList sEditorEntityList, QWidget *pParent /*= nullptr*/) :
 	QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
 	ui(new Ui::SourceGenFileDlg)
 {
@@ -25,6 +25,10 @@ SourceGenFileDlg::SourceGenFileDlg(QWidget *pParent /*= nullptr*/) :
 	ui->txtBaseClass->setValidator(HyGlobal::CodeNameValidator());
 
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
+
+	for(QString sEditorEntity : sEditorEntityList)
+		ui->editorEntitiesList->addItem(sEditorEntity);
+
 	ErrorCheck();
 }
 
@@ -50,7 +54,10 @@ QString SourceGenFileDlg::GetCppFileName() const
 
 QString SourceGenFileDlg::GetBaseClassName() const
 {
-	return ui->txtBaseClass->text();
+	if(ui->radBaseSpecify->isChecked())
+		return ui->txtBaseClass->text();
+	else
+		return "hy::" + ui->editorEntitiesList->currentItem()->text();
 }
 
 bool SourceGenFileDlg::IsEntityBaseClass() const
@@ -93,6 +100,27 @@ void SourceGenFileDlg::on_txtBaseClass_textChanged(const QString &arg1)
 	ErrorCheck();
 }
 
+void SourceGenFileDlg::on_radBaseSpecify_toggled(bool bChecked)
+{
+	ui->txtBaseClass->setEnabled(bChecked);
+	ui->chkHyEntityBaseClass->setEnabled(bChecked);
+	ui->editorEntitiesList->setEnabled(!bChecked);
+	ErrorCheck();
+}
+
+void SourceGenFileDlg::on_radBaseEditor_toggled(bool bChecked)
+{
+	ui->txtBaseClass->setEnabled(!bChecked);
+	ui->chkHyEntityBaseClass->setEnabled(!bChecked);
+	ui->editorEntitiesList->setEnabled(bChecked);
+	ErrorCheck();
+}
+
+void SourceGenFileDlg::on_editorEntitiesList_itemSelectionChanged()
+{
+	ErrorCheck();
+}
+
 void SourceGenFileDlg::ErrorCheck()
 {
 	bool bIsError = false;
@@ -117,6 +145,16 @@ void SourceGenFileDlg::ErrorCheck()
 			ui->lblError->setText(".cpp File name cannot be blank");
 			bIsError = true;
 			break;
+		}
+
+		if(ui->radBaseEditor->isChecked())
+		{
+			if(ui->editorEntitiesList->currentItem() == nullptr || ui->editorEntitiesList->currentItem()->text().isEmpty())
+			{
+				ui->lblError->setText("Invalid editor entity selected");
+				bIsError = true;
+				break;
+			}
 		}
 
 	}while(false);

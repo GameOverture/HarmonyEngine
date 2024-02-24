@@ -35,6 +35,16 @@ namespace %HY_NAMESPACE% {
 	return %HY_NUMSTATES%;
 }
 
+bool %HY_CLASS%::IsTimelinePaused()
+{
+	return m_bTimelinePaused;
+}
+
+void %HY_CLASS%::SetTimelinePause(bool bPause)
+{
+	m_bTimelinePaused = bPause;
+}
+
 /*virtual*/ void %HY_CLASS%::Update() /*override*/
 {
 	m_fpUpdateFunc();

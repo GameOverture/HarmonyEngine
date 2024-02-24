@@ -145,13 +145,17 @@ class SubEntity : public HyEntity2d
 	};
 	QList<StateInfo>								m_StateInfoList;
 
+	bool											m_bTimelinePaused;
+
 public:
-	SubEntity(Project &projectRef, int iFps, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent);
+	SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent);
 	virtual ~SubEntity();
+
+	void SetTimelinePaused(float fElapsedTime, bool bPaused);
 
 	void CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj);
 
-	void ExtrapolateChildProperties(const int iCURRENT_FRAME, HyCamera2d *pCamera);
+	void ExtrapolateChildProperties(float fElapsedTime, HyCamera2d *pCamera);
 };
 
 void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, HyCamera2d *pCamera);
