@@ -43,7 +43,6 @@ class EntityDopeSheetView : public QGraphicsView
 	GraphicsTweenKnobItem *		m_pGfxDragTweenKnobItem; // If dragging a tween duration knob
 
 	EntityTreeItemData *		m_pContextClickItem;
-	int							m_iContextClickFrame;
 
 public:
 	EntityDopeSheetView(QWidget *pParent = nullptr);
@@ -75,10 +74,6 @@ private:
 	QList<EntityTreeItemData *> GetItems() const;
 
 	int GetNearestFrame(qreal fScenePosX) const;
-
-private Q_SLOTS:
-	void OnSelectAllItemKeyFrames();
-	void OnDeselectItemKeyFrames();
 };
 
 #endif // ENTITYDOPESHEETVIEW_H

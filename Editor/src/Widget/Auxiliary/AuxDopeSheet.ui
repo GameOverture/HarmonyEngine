@@ -166,20 +166,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnCallback">
-       <property name="text">
-        <string>Create Callback</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../../data/HyEditor.qrc">
-         <normaloff>:/icons16x16/callback.png</normaloff>:/icons16x16/callback.png</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextBesideIcon</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QToolButton" name="btnTween">
        <property name="text">
         <string>Create Position Tween</string>
@@ -270,42 +256,6 @@
    </property>
    <property name="toolTip">
     <string>Jump to the last key frame</string>
-   </property>
-  </action>
-  <action name="actionCreateCallback">
-   <property name="icon">
-    <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/callback.png</normaloff>:/icons16x16/callback.png</iconset>
-   </property>
-   <property name="text">
-    <string>Create Callback</string>
-   </property>
-   <property name="toolTip">
-    <string>Set a callback function at the currently selected frame, that derived classes may override and implement</string>
-   </property>
-  </action>
-  <action name="actionRenameCallback">
-   <property name="icon">
-    <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/callback-rename.png</normaloff>:/icons16x16/callback-rename.png</iconset>
-   </property>
-   <property name="text">
-    <string>Rename Callback</string>
-   </property>
-   <property name="toolTip">
-    <string>Rename the callback function set at the currently selected frame</string>
-   </property>
-  </action>
-  <action name="actionDeleteCallback">
-   <property name="icon">
-    <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/callback-delete.png</normaloff>:/icons16x16/callback-delete.png</iconset>
-   </property>
-   <property name="text">
-    <string>Delete Callback</string>
-   </property>
-   <property name="toolTip">
-    <string>Removes the callback function at the currently selected frame</string>
    </property>
   </action>
   <action name="actionCreatePositionTween">

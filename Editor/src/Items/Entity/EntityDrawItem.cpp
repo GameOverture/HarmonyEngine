@@ -225,6 +225,20 @@ SubEntity::SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const Q
 
 				propMapRef.insert(iFrame, propsObj);
 			}
+
+			QJsonArray eventsArray = stateObj["events"].toArray();
+			for(int i = 0; i < eventsArray.size(); ++i)
+			{
+				QJsonObject eventObj = eventsArray[i].toObject();
+				int iFrameIndex = eventObj["frame"].toInt();
+				
+				QStringList sFunctionList;
+				QJsonArray functionsArray = eventObj["functions"].toArray();
+				for(int i = 0; i < functionsArray.size(); ++i)
+					sFunctionList << functionsArray[i].toString();
+				
+				m_StateInfoList.back().m_EventMap.insert(iFrameIndex, sFunctionList);
+			}
 		}
 	}
 
@@ -348,7 +362,7 @@ void SubEntity::ExtrapolateChildProperties(float fElapsedTime, HyCamera2d *pCame
 	const QMap<IHyNode2d *, QMap<int, QJsonObject>>	&propMapRef = m_StateInfoList[GetState()].m_PropertiesMap;
 	
 	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
-		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, fFRAME_DURATION, iCURRENT_FRAME, propMapRef[childTypePair.first], pCamera);
+		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, fFRAME_DURATION, iCURRENT_FRAME, propMapRef[childTypePair.first], m_StateInfoList[GetState()].m_EventMap, pCamera);
 }
 // SubEntity
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -357,7 +371,7 @@ void SubEntity::ExtrapolateChildProperties(float fElapsedTime, HyCamera2d *pCame
 //             - EntityTreeItemData::InitalizePropertyModel
 //             - EntityModel::GenerateSrc_SetStateImpl
 //             - ExtrapolateProperties
-void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, HyCamera2d *pCamera)
+void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, const QMap<int, QStringList> &eventMap, HyCamera2d *pCamera)
 {
 	// Sprite Special Case:
 	// To determine the sprite's animation frame that should be presented, whenever a property that might affect
@@ -406,31 +420,57 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 	if(eItemType == ITEM_Sprite)
 		static_cast<HySprite2d *>(pThisHyNode)->SetAnimPause(true); // We always pause the animation because it is set manually by extrapolating what frame it should be, and don't want time passing to affect it.
 
+	QList<int> eventFrameIndexList = eventMap.keys();
+	QList<int>::iterator eventFrameIter = eventFrameIndexList.begin();
+
 	bool bIsTimelinePaused = false;
 	for(int iFrame : keyFrameMapRef.keys())
 	{
-		if(iFrame > iCURRENT_FRAME)
+		if(iFrame > iCURRENT_FRAME || bIsTimelinePaused)
 			break;
 
+		// Process all events (in order) that occurred up until 'iFrame'
+		while(eventFrameIter != eventFrameIndexList.end() && iFrame >= *eventFrameIter)
+		{
+			for(const QString &sEvent : eventMap[*eventFrameIter])
+			{
+				for(int i = 0; i < NUM_DOPEEVENTS; ++i)
+				{
+					if(DOPEEVENT_STRINGS[i] == sEvent)
+					{
+						// Process the event
+						DopeSheetEventType eEventType = static_cast<DopeSheetEventType>(i);
+						switch(eEventType)
+						{
+						case DOPEEVENT_PauseTimeline:
+							bIsTimelinePaused = true;
+							break;
+						}
+
+						break;
+					}
+				}
+			}
+
+			if(bIsTimelinePaused)
+				break;
+
+			++eventFrameIter;
+		}
+
+		// Process all properties that occurred on frame 'iFrame'
 		const QJsonObject &propsObj = keyFrameMapRef[iFrame];
 
-		// Check for Timeline Pause/Unpause first before processing any other properties
+		// Check for Timeline Pause/Unpause. As will the runtime, it will still process everything this frame, then break out of the loop
 		//
 		// ITEM_Unknown means it's the root entity
 		// ITEM_Entity means it's a sub-entity
-		if((eItemType == ITEM_Unknown || eItemType == ITEM_Entity) && propsObj.contains("Entity"))
+		if(eItemType == ITEM_Entity && propsObj.contains("Entity"))
 		{
 			QJsonObject entityObj = propsObj["Entity"].toObject();
 			if(entityObj.contains("Timeline Pause"))
-			{
-				if(eItemType == ITEM_Unknown)
-					bIsTimelinePaused = entityObj["Timeline Pause"].toBool();
-				else // ITEM_Entity
-					static_cast<SubEntity *>(pThisHyNode)->SetTimelinePaused(fFRAME_DURATION * iCURRENT_FRAME, entityObj["Timeline Pause"].toBool());
-			}
+				static_cast<SubEntity *>(pThisHyNode)->SetTimelinePaused(fFRAME_DURATION * iCURRENT_FRAME, entityObj["Timeline Pause"].toBool());
 		}
-		if(bIsTimelinePaused)
-			continue;
 
 		// Parse all and only the potential categories of the 'eItemType' type, and set the values to 'pHyNode'
 		if(eItemType != ITEM_BoundingVolume)

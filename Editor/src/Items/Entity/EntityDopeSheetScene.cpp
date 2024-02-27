@@ -191,11 +191,18 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 		}
 	}
 
-	QJsonArray callbackArray = metaFileObj["callbacks"].toArray();
+	QJsonArray callbackArray = metaFileObj["events"].toArray();
 	for(int i = 0; i < callbackArray.size(); ++i)
 	{
 		const QJsonObject &callbackObj = callbackArray[i].toObject();
-		CreateCallback(callbackObj["frame"].toInt(), callbackObj["function"].toString());
+
+		QJsonArray functionsArray = callbackObj["functions"].toArray();
+		for(int iFuncIndex = 0; i < functionsArray.size(); ++iFuncIndex)
+		{
+			QString sFunc = functionsArray[iFuncIndex].toString();
+			if(sFunc.startsWith('_') == false)
+				CreateCallback(callbackObj["frame"].toInt(), sFunc);
+		}
 	}
 
 	setBackgroundBrush(HyGlobal::ConvertHyColor(HyColor::WidgetPanel));
@@ -244,9 +251,9 @@ const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &EntityDopeSheetScene::
 	return m_KeyFramesMap;
 }
 
-const QMap<int, QString> &EntityDopeSheetScene::GetCallbackMap() const
+const QMap<int, QStringList> &EntityDopeSheetScene::GetEventMap() const
 {
-	return m_CallbackMap;
+	return m_EventMap;
 }
 
 bool EntityDopeSheetScene::ContainsKeyFrameProperty(KeyFrameKey tupleKey)
@@ -942,55 +949,122 @@ void EntityDopeSheetScene::PushAllKeyFrames(EntityTreeItemData *pItemData, bool 
 		RefreshAllGfxItems();
 }
 
-QJsonArray EntityDopeSheetScene::SerializeCallbacks() const
+QJsonArray EntityDopeSheetScene::SerializeEvents() const
 {
 	QJsonArray callbackArray;
-	for(auto iter = m_CallbackMap.begin(); iter != m_CallbackMap.end(); ++iter)
+	for(auto iter = m_EventMap.begin(); iter != m_EventMap.end(); ++iter)
 	{
 		QJsonObject callbackObj;
 		callbackObj.insert("frame", iter.key());
-		callbackObj.insert("function", iter.value());
+
+		QJsonArray functionsArray;
+		for(int i = 0; i < iter.value().size(); ++i)
+			functionsArray.append(iter.value()[i]);
+		callbackObj.insert("functions", functionsArray);
 		callbackArray.append(callbackObj);
 	}
 	return callbackArray;
 }
 
-QString EntityDopeSheetScene::GetCallback(int iFrameIndex) const
+QStringList EntityDopeSheetScene::GetCallbackList(int iFrameIndex) const
 {
-	if(m_CallbackMap.contains(iFrameIndex))
-		return m_CallbackMap[iFrameIndex];
-	
-	return QString(); // Indicates that no callback exists for this frame
-}
-
-void EntityDopeSheetScene::CreateCallback(int iFrameIndex, QString sCallback)
-{
-	if(m_CallbackMap.contains(iFrameIndex))
+	QStringList callbackList;
+	if(m_EventMap.contains(iFrameIndex))
 	{
-		HyGuiLog("EntityDopeSheetScene::CreateCallback() - Callback already exists for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
-		return;
+		for(QString sEvent : m_EventMap[iFrameIndex])
+		{
+			if(sEvent.startsWith('_') == false)
+				callbackList.append(sEvent);
+		}
 	}
 	
-	m_CallbackMap.insert(iFrameIndex, sCallback);
-	update();
+	return callbackList;
 }
 
-void EntityDopeSheetScene::RenameCallback(int iFrameIndex, QString sCallback)
+bool EntityDopeSheetScene::CreateCallback(int iFrameIndex, QString sCallback)
 {
-	if(m_CallbackMap.contains(iFrameIndex))
-		m_CallbackMap[iFrameIndex] = sCallback;
+	if(m_EventMap.contains(iFrameIndex))
+	{
+		if(m_EventMap[iFrameIndex].contains(sCallback))
+		{
+			HyGuiLog("EntityDopeSheetScene::CreateCallback() - Callback '" % sCallback % "' already exists for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+			return false;
+		}
+	}
 	else
-		HyGuiLog("EntityDopeSheetScene::RenameCallback() - No callback found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+		m_EventMap.insert(iFrameIndex, QStringList());
+
+	m_EventMap[iFrameIndex].append(sCallback);
+	update();
+
+	return true;
 }
 
-void EntityDopeSheetScene::RemoveCallback(int iFrameIndex)
+bool EntityDopeSheetScene::RenameCallback(int iFrameIndex, QString sOldCallback, QString sNewCallback)
 {
-	if(m_CallbackMap.contains(iFrameIndex))
-		m_CallbackMap.remove(iFrameIndex);
-	else
-		HyGuiLog("EntityDopeSheetScene::RemoveCallback() - No callback found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+	if(m_EventMap.contains(iFrameIndex))
+	{
+		int iCallbackIndex = m_EventMap[iFrameIndex].indexOf(sOldCallback);
+		if(iCallbackIndex >= 0)
+		{
+			m_EventMap[iFrameIndex][iCallbackIndex] = sNewCallback;
+			return true;
+		}
+	}
+	
+	HyGuiLog("EntityDopeSheetScene::RenameCallback() - No callback '" % sOldCallback % "' found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+	return false;
+}
 
-	update();
+bool EntityDopeSheetScene::RemoveCallback(int iFrameIndex, QString sCallback)
+{
+	if(m_EventMap.contains(iFrameIndex))
+	{
+		int iCallbackIndex = m_EventMap[iFrameIndex].indexOf(sCallback);
+		if(iCallbackIndex >= 0)
+		{
+			m_EventMap[iFrameIndex].removeAt(iCallbackIndex);
+			update();
+			return true;
+		}
+	}
+
+	HyGuiLog("EntityDopeSheetScene::RemoveCallback() - No callback '" % sCallback % "' found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+	return false;
+}
+
+QList<DopeSheetEventType> EntityDopeSheetScene::GetEventList(int iFrameIndex) const
+{
+	QList<DopeSheetEventType> eventList;
+	if(m_EventMap.contains(iFrameIndex))
+	{
+		for(QString sEvent : m_EventMap[iFrameIndex])
+		{
+			if(sEvent.startsWith('_'))
+			{
+				for(int i = 0; i < NUM_DOPEEVENTS; ++i)
+				{
+					if(sEvent == DOPEEVENT_STRINGS[i])
+					{
+						eventList.append(static_cast<DopeSheetEventType>(i));
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	return eventList;
+}
+
+bool EntityDopeSheetScene::CreateTimelineEvent(int iFrameIndex, DopeSheetEventType eEventType)
+{
+	return CreateCallback(iFrameIndex, DOPEEVENT_STRINGS[eEventType]);
+}
+
+bool EntityDopeSheetScene::RemoveTimelineEvent(int iFrameIndex, DopeSheetEventType eEventType)
+{
+	return RemoveCallback(iFrameIndex, DOPEEVENT_STRINGS[eEventType]);
 }
 
 void EntityDopeSheetScene::NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems)
@@ -1012,6 +1086,8 @@ void EntityDopeSheetScene::NudgeKeyFrameTween(EntityTreeItemData *pItemData, int
 void EntityDopeSheetScene::SelectAllItemKeyFrames(EntityTreeItemData *pItemData)
 {
 	clearSelection();
+	if(pItemData == nullptr)
+		return;
 
 	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
 	for(QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.begin(); iter != itemKeyFrameMapRef.end(); ++iter)

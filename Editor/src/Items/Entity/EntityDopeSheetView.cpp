@@ -32,8 +32,7 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	m_ptDragStart(0.0f, 0.0f),
 	m_iDragFrame(-1),
 	m_pGfxDragTweenKnobItem(nullptr),
-	m_pContextClickItem(nullptr),
-	m_iContextClickFrame(-1)
+	m_pContextClickItem(nullptr)
 {
 	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	setDragMode(QGraphicsView::RubberBandDrag);
@@ -111,39 +110,10 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		}
 	}
 
-	QMenu menu;
-	if(m_pContextClickItem)
-	{
-		m_iContextClickFrame = GetNearestFrame(ptScenePos.x());
-
-		int iNumSelected = scene()->selectedItems().size();
-
-		QList<QAction *> contextActionList = m_pAuxDopeSheet->GetContextActions(false);
-		for(QAction *pAction : contextActionList)
-			menu.addAction(pAction);
-		menu.addSeparator();
-		
-		contextActionList = m_pAuxDopeSheet->GetCopyPasteActions();
-		for(QAction *pAction : contextActionList)
-			menu.addAction(pAction);
-		menu.addSeparator();
-
-		menu.addAction("Select All '" % m_pContextClickItem->GetCodeName() % "' Key Frames", this, &EntityDopeSheetView::OnSelectAllItemKeyFrames);
-		menu.addAction("Deselect Key Frames", this, &EntityDopeSheetView::OnDeselectItemKeyFrames);
-		menu.addSeparator();
-		menu.addAction(m_pAuxDopeSheet->GetDeleteAction());
-		
-	}
-	else if(pEvent->pos().y() <= TIMELINE_HEIGHT + 1.0f) // On timeline
-	{
-		QList<QAction *> contextActionList = m_pAuxDopeSheet->GetContextActions(true);
-		for(QAction *pAction : contextActionList)
-			menu.addAction(pAction);
-	}
-	else
-		return;
-
-	menu.exec(pEvent->globalPos());
+	bool bOnTimeline = pEvent->pos().y() <= (TIMELINE_HEIGHT + 1.0f);
+	QMenu *pNewMenu = m_pAuxDopeSheet->AllocContextMenu(bOnTimeline, m_pContextClickItem, GetNearestFrame(ptScenePos.x()));
+	pNewMenu->exec(pEvent->globalPos());
+	delete pNewMenu;
 }
 
 /*virtual*/ void EntityDopeSheetView::drawBackground(QPainter *painter, const QRectF &rect) /*override*/
@@ -303,7 +273,30 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 	pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
 	pPainter->drawLine(rect.x(), rect.y() + TIMELINE_HEIGHT, rect.x() + rect.width(), rect.y() + TIMELINE_HEIGHT);
 
-	const QMap<int, QString> &callbackMapRef = GetScene()->GetCallbackMap();
+	//const QMap<int, QStringList> &eventMapRef = GetScene()->GetEventMap();
+
+	std::function<void(DopeSheetEventType, float)> fpPaintEvent = [&](DopeSheetEventType eEvent, float fPosX)
+	{
+		switch(eEvent)
+		{
+		case DOPEEVENT_Callback:
+			pPainter->setPen(Qt::NoPen);// HyGlobal::ConvertHyColor(HyColor::Black));
+			pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::Orange));
+
+			pPainter->translate(fPosX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f));
+			pPainter->rotate(45.0);
+			pPainter->drawRect(CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER, CALLBACK_DIAMETER);
+			break;
+
+		case DOPEEVENT_PauseTimeline: {
+			QSize iconSize(16, 16);
+			QIcon pauseIcon(":/icons/pause.png");
+			pPainter->drawPixmap(fPosX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f), pauseIcon.pixmap(iconSize.width(), iconSize.height()));
+			break; }
+		}
+
+		pPainter->resetTransform();
+	};
 
 	int iFrameIndex = 0;
 	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * m_fZoom;
@@ -338,15 +331,12 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 			DrawShadowText(pPainter, textRect, QString::number(iFrameIndex), eColor, HyColor::Black);
 
 			// Callback diamond
-			if(callbackMapRef.contains(iFrameIndex))
+			if(GetScene()->GetCallbackList(iFrameIndex).isEmpty() == false)
+				fpPaintEvent(DOPEEVENT_Callback, fPosX);
+			if(GetScene()->GetEventList(iFrameIndex).isEmpty() == false)
 			{
-				pPainter->setPen(Qt::NoPen);// HyGlobal::ConvertHyColor(HyColor::Black));
-				pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::Orange));
-				
-				pPainter->translate(fPosX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f));
-				pPainter->rotate(45.0);
-				pPainter->drawRect(CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER, CALLBACK_DIAMETER);
-				pPainter->resetTransform();
+				for(DopeSheetEventType eEvent : GetScene()->GetEventList(iFrameIndex))
+					fpPaintEvent(eEvent, fPosX);
 			}
 		}
 
@@ -375,15 +365,12 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 				pPainter->drawLine(fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, fPosX, rect.y() + TIMELINE_HEIGHT);
 
 				// Callback diamond
-				if(callbackMapRef.contains(iCurSubNotchFrame))
+				if(GetScene()->GetCallbackList(iCurSubNotchFrame).isEmpty() == false)
+					fpPaintEvent(DOPEEVENT_Callback, fPosX);
+				if(GetScene()->GetEventList(iCurSubNotchFrame).isEmpty() == false)
 				{
-					pPainter->setPen(Qt::NoPen);//pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::Black));
-					pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::Orange));
-
-					pPainter->translate(fPosX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f));
-					pPainter->rotate(45.0);
-					pPainter->drawRect(CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER, CALLBACK_DIAMETER);
-					pPainter->resetTransform();
+					for(DopeSheetEventType eEvent : GetScene()->GetEventList(iCurSubNotchFrame))
+						fpPaintEvent(eEvent, fPosX);
 				}
 			}
 		}
@@ -580,17 +567,4 @@ int EntityDopeSheetView::GetNearestFrame(qreal fScenePosX) const
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
 	return ((fScenePosX - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
-}
-
-void EntityDopeSheetView::OnSelectAllItemKeyFrames()
-{
-	if(scene() == nullptr)
-		return;
-
-	static_cast<EntityDopeSheetScene *>(scene())->SelectAllItemKeyFrames(m_pContextClickItem);
-}
-
-void EntityDopeSheetView::OnDeselectItemKeyFrames()
-{
-	scene()->clearSelection();
 }

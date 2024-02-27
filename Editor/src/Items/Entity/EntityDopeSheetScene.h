@@ -64,6 +64,15 @@ enum DopeSheetGfxDataKey // NOTE: Order matters, the first 3 are used when acces
 	GFXDATAKEY_Type, // DopeSheetItemType
 };
 
+enum DopeSheetEventType
+{
+	DOPEEVENT_Callback = -1,
+	DOPEEVENT_PauseTimeline,
+	
+	NUM_DOPEEVENTS
+};
+const QString DOPEEVENT_STRINGS[NUM_DOPEEVENTS] = { "_PauseTimeline" };
+
 struct TweenJsonValues
 {
 	QJsonValue		m_Destination;
@@ -147,12 +156,11 @@ class EntityDopeSheetScene : public QGraphicsScene
 	// These maps store the actual property data for the entire entity
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;			// Store properties and tween values
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_PoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added
-	QMap<int, QString>																m_CallbackMap;
+	QMap<int, QStringList>															m_EventMap;				// KEY: frame index, VALUE: string that doesn't prefix with '_' is a callback name. Otherwise built in function (ex. _PauseTimeline)
 
 	// These maps store the visual graphics items that correspond to the above maps
 	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_KeyFramesGfxRectMap;
 	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_TweenGfxRectMap;
-	//QMap<QString, GraphicsCallbackItem *>											m_CallbackGfxMap;
 
 	int																				m_iCurrentFrame;
 	QGraphicsLineItem *																m_pCurrentFrameLine;
@@ -167,7 +175,7 @@ public:
 	void SetCurrentFrame(int iFrameIndex);
 
 	const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &GetKeyFramesMap() const;
-	const QMap<int, QString> &GetCallbackMap() const;
+	const QMap<int, QStringList> &GetEventMap() const;
 
 	bool ContainsKeyFrameProperty(KeyFrameKey tupleKey);
 	bool ContainsKeyFrameTween(KeyFrameKey tupleKey);
@@ -202,11 +210,15 @@ public:
 	void PopAllKeyFrames(EntityTreeItemData *pItemData, bool bRefreshGfxItems);
 	void PushAllKeyFrames(EntityTreeItemData *pItemData, bool bRefreshGfxItems);
 
-	QJsonArray SerializeCallbacks() const;
-	QString GetCallback(int iFrameIndex) const;
-	void CreateCallback(int iFrameIndex, QString sCallback);
-	void RenameCallback(int iFrameIndex, QString sCallback);
-	void RemoveCallback(int iFrameIndex);
+	QJsonArray SerializeEvents() const;
+	QStringList GetCallbackList(int iFrameIndex) const;
+	bool CreateCallback(int iFrameIndex, QString sCallback);
+	bool RenameCallback(int iFrameIndex, QString sOldCallback, QString sNewCallback);
+	bool RemoveCallback(int iFrameIndex, QString sCallback);
+
+	QList<DopeSheetEventType> GetEventList(int iFrameIndex) const;
+	bool CreateTimelineEvent(int iFrameIndex, DopeSheetEventType eEventType);
+	bool RemoveTimelineEvent(int iFrameIndex, DopeSheetEventType eEventType);
 
 	void NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems);
 	void NudgeKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, int iNudgeAmount, bool bRefreshGfxItems);

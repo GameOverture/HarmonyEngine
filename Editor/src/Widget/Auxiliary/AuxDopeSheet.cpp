@@ -73,26 +73,128 @@ void AuxDopeSheet::SetEntityStateModel(EntityStateData *pEntStateData)
 	UpdateWidgets();
 }
 
+QMenu *AuxDopeSheet::AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pContextItem, int iContextFrameIndex)
+{
+	EntityDopeSheetScene *pScene = ui->graphicsView->GetScene();
+	if(pScene == nullptr)
+		return nullptr;
+
+	QMenu *pNewMenu = new QMenu(nullptr);
+
+	if(bOnTimeline)
+	{
+		// Create Callback
+		QAction *pCreateCallback = new QAction(QIcon(":/icons16x16/callback.png"),
+			"Create Frame " % QString::number(iContextFrameIndex) % " Callback",
+			this);
+		QJsonObject dataObj;
+		dataObj.insert("type", EVENTACTION_CallbackCreate);
+		dataObj.insert("frame", iContextFrameIndex);
+		pCreateCallback->setData(QVariant(dataObj));
+		pCreateCallback->setToolTip("Set a callback function at the currently selected frame, that derived classes may override and implement");
+		pNewMenu->addAction(pCreateCallback);
+
+		// Rename Callback(s)
+		QStringList sCallbackList = pScene->GetCallbackList(iContextFrameIndex);
+		for(QString sCallback : sCallbackList)
+		{
+			QAction *pRenameCallback = new QAction(QIcon(":/icons16x16/callback-rename.png"),
+												   "Rename '" % sCallback % "'");
+			QJsonObject dataObj;
+			dataObj.insert("type", EVENTACTION_CallbackRename);
+			dataObj.insert("frame", iContextFrameIndex);
+			dataObj.insert("name", sCallback);
+			pRenameCallback->setData(QVariant(dataObj));
+			pRenameCallback->setToolTip("Rename the callback function set at the currently selected frame");
+			pNewMenu->addAction(pRenameCallback);
+		}
+
+		// Delete Callback(s)
+		for(QString sCallback : sCallbackList)
+		{
+			QAction *pDeleteCallback = new QAction(QIcon(":/icons16x16/callback-delete.png"),
+												   "Delete '" % sCallback % "'");
+			QJsonObject dataObj;
+			dataObj.insert("type", EVENTACTION_CallbackDelete);
+			dataObj.insert("frame", iContextFrameIndex);
+			dataObj.insert("name", sCallback);
+			pDeleteCallback->setData(QVariant(dataObj));
+			pDeleteCallback->setToolTip("Removes the callback function at the currently selected frame");
+			pNewMenu->addAction(pDeleteCallback);
+		}
+		pNewMenu->addSeparator();
+
+		// Pause Timeline
+		QList<DopeSheetEventType> eventList = pScene->GetEventList(iContextFrameIndex);
+
+		if(eventList.contains(DOPEEVENT_PauseTimeline))
+		{
+			QAction *pUnpauseTimeline = new QAction(QIcon(":/icons16x16/media-play.png"),
+													"Unpause Timeline On Frame " % QString::number(iContextFrameIndex));
+			QJsonObject pauseDataObj;
+			pauseDataObj.insert("type", EVENTACTION_UnpauseTimeline);
+			pauseDataObj.insert("frame", iContextFrameIndex);
+			pUnpauseTimeline->setData(QVariant(pauseDataObj));
+			pUnpauseTimeline->setToolTip("Unpause the timeline at the currently selected frame");
+			pNewMenu->addAction(pUnpauseTimeline);
+		}
+		else
+		{
+			QAction *pPauseTimeline = new QAction(QIcon(":/icons16x16/media-pause.png"),
+												  "Pause Timeline On Frame " % QString::number(iContextFrameIndex));
+			QJsonObject pauseDataObj;
+			pauseDataObj.insert("type", EVENTACTION_PauseTimeline);
+			pauseDataObj.insert("frame", iContextFrameIndex);
+			pPauseTimeline->setData(QVariant(pauseDataObj));
+			pPauseTimeline->setToolTip("Pause the timeline at the currently selected frame");
+			pNewMenu->addAction(pPauseTimeline);
+		}
+	}
+	else // Context not on timeline
+	{
+		// Copy/Paste Frames actions
+		pNewMenu->addAction(ui->actionCopyFrames);
+		pNewMenu->addAction(ui->actionPasteFrames);
+		pNewMenu->addSeparator();
+
+		QString sSelectAll;
+		if(pContextItem)
+			sSelectAll = "Select All '" % pContextItem->GetCodeName() % "' Key Frames";
+		else
+			sSelectAll = "Select All Key Frames";
+		QAction *pSelectAllCallback = new QAction(sSelectAll);
+		pSelectAllCallback->setEnabled(pContextItem != nullptr);
+		QJsonObject selectDataObj;
+		selectDataObj.insert("type", EVENTACTION_SelectAllItemKeyFrames);
+		pSelectAllCallback->setData(QVariant(selectDataObj));
+		pNewMenu->addAction(pSelectAllCallback);
+
+		QAction *pDeselectAllCallback = new QAction("Deselect Key Frames");
+		pDeselectAllCallback->setEnabled(pScene->selectedItems().size() > 0);
+		QJsonObject deselectDataObj;
+		deselectDataObj.insert("type", EVENTACTION_DeselectAllKeyFrames);
+		pDeselectAllCallback->setData(QVariant(deselectDataObj));
+		pNewMenu->addAction(pDeselectAllCallback);
+
+		pNewMenu->addSeparator();
+
+		// Delete Frames action
+		pNewMenu->addAction(ui->actionDeleteFrames);
+	}
+
+	connect(pNewMenu, &QMenu::triggered, this, &AuxDopeSheet::OnEventActionTriggered);
+
+	return pNewMenu;
+}
+
 void AuxDopeSheet::UpdateWidgets()
 {
 	if(ui->graphicsView->scene())
 	{
 		ui->sbFramesPerSecond->setEnabled(true);
 		ui->chkAutoInitialize->setEnabled(true);
-		ui->btnCallback->setVisible(true);
 
 		EntityDopeSheetScene &dopeSheetSceneRef = GetEntityStateModel()->GetDopeSheetScene();
-		QString sCallback = dopeSheetSceneRef.GetCallback(dopeSheetSceneRef.GetCurrentFrame());
-		if(sCallback.isEmpty())
-		{
-			ui->actionCreateCallback->setText("Create Frame " % QString::number(dopeSheetSceneRef.GetCurrentFrame()) % " Callback");
-			ui->btnCallback->setDefaultAction(ui->actionCreateCallback);
-		}
-		else
-		{
-			ui->actionRenameCallback->setText("Rename " % sCallback);
-			ui->btnCallback->setDefaultAction(ui->actionRenameCallback);
-		}
 
 		// Determine if a quick-tween button should be shown
 		TweenProperty eQuickTweenProp = dopeSheetSceneRef.DetermineIfContextQuickTween(m_pContextTweenTreeItemData, m_iContextTweenStartFrame, m_iContextTweenEndFrame);
@@ -135,7 +237,6 @@ void AuxDopeSheet::UpdateWidgets()
 
 		ui->sbFramesPerSecond->setEnabled(false);
 		ui->chkAutoInitialize->setEnabled(false);
-		ui->btnCallback->setVisible(false);
 
 		ui->actionCopyFrames->setEnabled(false);
 		ui->actionPasteFrames->setEnabled(false);
@@ -143,33 +244,12 @@ void AuxDopeSheet::UpdateWidgets()
 	}
 }
 
-QList<QAction *> AuxDopeSheet::GetContextActions(bool bOnlyCallbackActions)
+QAction *AuxDopeSheet::GetTweenAction()
 {
-	QList<QAction *> actionList;
-	actionList.push_back(ui->btnCallback->defaultAction());
-	if(actionList[0] == ui->actionRenameCallback)
-		actionList.push_back(ui->actionDeleteCallback);
+	if(ui->btnTween->isVisible())
+		return ui->btnTween->defaultAction();
 
-	if(bOnlyCallbackActions == false)
-	{
-		if(ui->btnTween->isVisible())
-			actionList.push_back(ui->btnTween->defaultAction());
-	}
-
-	return actionList;
-}
-
-QList<QAction *> AuxDopeSheet::GetCopyPasteActions()
-{
-	QList<QAction *> actionList;
-	actionList.push_back(ui->actionCopyFrames);
-	actionList.push_back(ui->actionPasteFrames);
-	return actionList;
-}
-
-QAction *AuxDopeSheet::GetDeleteAction()
-{
-	return ui->actionDeleteFrames;
+	return nullptr;
 }
 
 void AuxDopeSheet::on_actionRewind_triggered()
@@ -208,66 +288,98 @@ void AuxDopeSheet::on_actionLastKeyFrame_triggered()
 
 }
 
-void AuxDopeSheet::on_actionCreateCallback_triggered()
-{
-	SetCallbackName();
-}
-
-void AuxDopeSheet::on_actionRenameCallback_triggered()
-{
-	SetCallbackName();
-}
-
-void AuxDopeSheet::SetCallbackName()
+void AuxDopeSheet::OnEventActionTriggered(QAction *pEventAction)
 {
 	if(GetEntityStateModel() == nullptr)
 	{
-		HyGuiLog("AuxDopeSheet::on_actionCreateCallback_triggered() - GetEntityStateModel() == nullptr", LOGTYPE_Error);
+		HyGuiLog("AuxDopeSheet::OnEventActionTriggered() - GetEntityStateModel() == nullptr", LOGTYPE_Error);
+		return;
+	}
+	QJsonObject dataObj = pEventAction->data().toJsonObject();
+	if(dataObj.isEmpty())
+	{
+		HyGuiLog("AuxDopeSheet::OnEventActionTriggered() - dataObj.isEmpty()", LOGTYPE_Error);
 		return;
 	}
 
-	int iFrame = GetEntityStateModel()->GetDopeSheetScene().GetCurrentFrame();
-
-	QString sDefaultName = GetEntityStateModel()->GetDopeSheetScene().GetCallback(iFrame);
-	if(sDefaultName.isEmpty())
+	ContextActionType eActionType = static_cast<ContextActionType>(dataObj["type"].toInt());
+	switch(eActionType)
 	{
-		if(iFrame == 0)
+	case EVENTACTION_CallbackCreate:
+	case EVENTACTION_CallbackRename: {
+		int iFrameIndex = dataObj["frame"].toInt();
+
+		QString sDefaultName;
+		QString sTitle;
+		if(eActionType == EVENTACTION_CallbackRename)
 		{
-			if(GetEntityStateModel()->GetName().isEmpty() == false)
-				sDefaultName = "OnState" % GetEntityStateModel()->GetName();
-			else
-				sDefaultName = "OnState" % QString::number(GetEntityStateModel()->GetIndex());
+			sDefaultName = dataObj["name"].toString();
+			sTitle = "Renaming '" % sDefaultName % "' Callback Function";
 		}
 		else
-			sDefaultName = "OnFrame" % QString::number(iFrame);
-	}
+		{
+			if(iFrameIndex == 0)
+			{
+				if(GetEntityStateModel()->GetName().isEmpty() == false)
+					sDefaultName = "OnState" % GetEntityStateModel()->GetName();
+				else
+					sDefaultName = "OnState" % QString::number(GetEntityStateModel()->GetIndex());
+			}
+			else
+				sDefaultName = "OnFrame" % QString::number(iFrameIndex);
 
-	DlgInputName dlg("Set Callback Function Name", sDefaultName, HyGlobal::CodeNameValidator(), [&](QString sName) -> QString {
-			if(static_cast<EntityModel &>(GetEntityStateModel()->GetModel()).IsCallbackNameUnique(sName) == false)
-				return "This callback function name already exists for this entity";
+			sTitle = "Create New Callback";
+		}
+
+		DlgInputName dlg(sTitle, sDefaultName, HyGlobal::CodeNameValidator(), [&](QString sName) -> QString {
+			if(GetEntityStateModel()->GetDopeSheetScene().GetCallbackList(iFrameIndex).contains(sName))
+				return "This frame (" % QString::number(iFrameIndex) % ") already has this callback function";
 			return "";
-		});
-	if(dlg.exec() == QDialog::Accepted)
-	{
-		EntityUndoCmd_SetCallback *pNewCmd = new EntityUndoCmd_SetCallback(GetEntityStateModel()->GetDopeSheetScene(), dlg.GetName(), iFrame);
+			});
+		if(dlg.exec() == QDialog::Accepted)
+		{
+			if(eActionType == EVENTACTION_CallbackCreate)
+			{
+				EntityUndoCmd_CreateCallback *pNewCmd = new EntityUndoCmd_CreateCallback(GetEntityStateModel()->GetDopeSheetScene(), iFrameIndex, dlg.GetName());
+				GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+			}
+			else // EVENTACTION_CallbackRename
+			{
+				EntityUndoCmd_RenameCallback *pNewCmd = new EntityUndoCmd_RenameCallback(GetEntityStateModel()->GetDopeSheetScene(), iFrameIndex, sDefaultName, dlg.GetName());
+				GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+			}
+		}
+		break; }
+	
+	case EVENTACTION_CallbackDelete: {
+		int iFrameIndex = dataObj["frame"].toInt();
+		QString sCallbackName = dataObj["name"].toString();
+		EntityUndoCmd_RemoveCallback *pNewCmd = new EntityUndoCmd_RemoveCallback(GetEntityStateModel()->GetDopeSheetScene(), iFrameIndex, sCallbackName);
 		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+		break; }
+
+	case EVENTACTION_SelectAllItemKeyFrames:
+		GetEntityStateModel()->GetDopeSheetScene().SelectAllItemKeyFrames(ui->graphicsView->GetContextClickItem());
+		break;
+
+	case EVENTACTION_DeselectAllKeyFrames:
+		GetEntityStateModel()->GetDopeSheetScene().clearSelection();
+		break;
+
+	case EVENTACTION_PauseTimeline: {
+		EntityUndoCmd_AddEvent *pNewCmd = new EntityUndoCmd_AddEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), DOPEEVENT_PauseTimeline);
+		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+		break; }
+
+	case EVENTACTION_UnpauseTimeline: {
+		EntityUndoCmd_RemoveEvent *pNewCmd = new EntityUndoCmd_RemoveEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), DOPEEVENT_PauseTimeline);
+		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+		break; }
+
+	default:
+		HyGuiLog("AuxDopeSheet::OnEventActionTriggered() - Unknown ContextActionType", LOGTYPE_Error);
+		break;
 	}
-}
-
-void AuxDopeSheet::on_actionDeleteCallback_triggered()
-{
-	if(GetEntityStateModel() == nullptr)
-	{
-		HyGuiLog("AuxDopeSheet::on_actionDeleteCallback_triggered() - GetEntityStateModel() == nullptr", LOGTYPE_Error);
-		return;
-	}
-
-	int iFrame = GetEntityStateModel()->GetDopeSheetScene().GetCurrentFrame();
-	if(GetEntityStateModel()->GetDopeSheetScene().GetCallback(iFrame).isEmpty())
-		return;
-
-	EntityUndoCmd_SetCallback *pNewCmd = new EntityUndoCmd_SetCallback(GetEntityStateModel()->GetDopeSheetScene(), "", iFrame);
-	GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
 }
 
 void AuxDopeSheet::on_actionCreatePositionTween_triggered()

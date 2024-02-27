@@ -29,6 +29,17 @@ class AuxDopeSheet : public QWidget
 	int						m_iContextTweenStartFrame;
 	int						m_iContextTweenEndFrame;
 
+	enum ContextActionType
+	{
+		EVENTACTION_CallbackCreate = 0,
+		EVENTACTION_CallbackRename,
+		EVENTACTION_CallbackDelete,
+		EVENTACTION_SelectAllItemKeyFrames,
+		EVENTACTION_DeselectAllKeyFrames,
+		EVENTACTION_PauseTimeline,
+		EVENTACTION_UnpauseTimeline,
+	};
+
 public:
 	explicit AuxDopeSheet(QWidget *pParent = nullptr);
 	virtual ~AuxDopeSheet();
@@ -37,9 +48,9 @@ public:
 	void SetEntityStateModel(EntityStateData *pEntStateData);
 
 	void UpdateWidgets();
-	QList<QAction *> GetContextActions(bool bOnlyCallbackActions);
-	QList<QAction *> GetCopyPasteActions();
-	QAction *GetDeleteAction();
+
+	QMenu *AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pContextItem, int iContextFrameIndex);
+	QAction *GetTweenAction();
 
 private:
 	Ui::AuxDopeSheet *ui;
@@ -51,11 +62,8 @@ private Q_SLOTS:
 	void on_actionNextKeyFrame_triggered();
 	void on_actionLastKeyFrame_triggered();
 	
-	void on_actionCreateCallback_triggered();
-	void on_actionRenameCallback_triggered();
-	void SetCallbackName();
+	void OnEventActionTriggered(QAction *pEventAction);
 
-	void on_actionDeleteCallback_triggered();
 	void on_actionCreatePositionTween_triggered();
 	void on_actionCreateRotationTween_triggered();
 	void on_actionCreateScaleTween_triggered();

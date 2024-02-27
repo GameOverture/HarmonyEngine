@@ -142,6 +142,7 @@ class SubEntity : public HyEntity2d
 	struct StateInfo
 	{
 		QMap<IHyNode2d *, QMap<int, QJsonObject>>	m_PropertiesMap;
+		QMap<int, QStringList>						m_EventMap;
 	};
 	QList<StateInfo>								m_StateInfoList;
 
@@ -158,6 +159,6 @@ public:
 	void ExtrapolateChildProperties(float fElapsedTime, HyCamera2d *pCamera);
 };
 
-void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, HyCamera2d *pCamera);
+void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, const QMap<int, QStringList> &eventMap, HyCamera2d *pCamera);
 
 #endif // ENTITYDRAWITEM_H

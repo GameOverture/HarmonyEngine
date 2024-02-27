@@ -1053,56 +1053,152 @@ EntityUndoCmd_ConvertToTween::EntityUndoCmd_ConvertToTween(EntityDopeSheetScene 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_SetCallback::EntityUndoCmd_SetCallback(EntityDopeSheetScene &entityDopeSheetSceneRef, QString sCallback, int iFrameIndex, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_CreateCallback::EntityUndoCmd_CreateCallback(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, QString sCallback, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
-	m_sNewCallback(sCallback),
-	m_iFrameIndex(iFrameIndex)
+	m_iFrameIndex(iFrameIndex),
+	m_sCallback(sCallback)
 {
-	m_sOldCallback = m_DopeSheetSceneRef.GetCallback(m_iFrameIndex);
+	if(m_sCallback.isEmpty())
+		HyGuiLog("EntityUndoCmd_CreateCallback::EntityUndoCmd_CreateCallback() - Callback name cannot be empty", LOGTYPE_Error);
 
-	if(m_sNewCallback.isEmpty())
-		setText("Remove " % m_sOldCallback % " Callback");
-	else
-	{
-		if(m_sOldCallback.isEmpty())
-			setText("Create " % m_sNewCallback % " Callback");
-		else
-			setText("Rename Callback To " % m_sNewCallback);
-	}
+	setText("Create " % m_sCallback % " Callback");
 }
 
-/*virtual*/ EntityUndoCmd_SetCallback::~EntityUndoCmd_SetCallback()
+/*virtual*/ EntityUndoCmd_CreateCallback::~EntityUndoCmd_CreateCallback()
 {
 }
 
-/*virtual*/ void EntityUndoCmd_SetCallback::redo() /*override*/
+/*virtual*/ void EntityUndoCmd_CreateCallback::redo() /*override*/
 {
-	if(m_sNewCallback.isEmpty())
-		m_DopeSheetSceneRef.RemoveCallback(m_iFrameIndex);
-	else
-	{
-		if(m_sOldCallback.isEmpty())
-			m_DopeSheetSceneRef.CreateCallback(m_iFrameIndex, m_sNewCallback);
-		else
-			m_DopeSheetSceneRef.RenameCallback(m_iFrameIndex, m_sNewCallback);
-	}
-
+	m_DopeSheetSceneRef.CreateCallback(m_iFrameIndex, m_sCallback);
 	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
 }
 
-/*virtual*/ void EntityUndoCmd_SetCallback::undo() /*override*/
+/*virtual*/ void EntityUndoCmd_CreateCallback::undo() /*override*/
 {
-	if(m_sNewCallback.isEmpty())
-		m_DopeSheetSceneRef.CreateCallback(m_iFrameIndex, m_sOldCallback);
-	else
-	{
-		if(m_sOldCallback.isEmpty())
-			m_DopeSheetSceneRef.RemoveCallback(m_iFrameIndex);
-		else
-			m_DopeSheetSceneRef.RenameCallback(m_iFrameIndex, m_sOldCallback);
-	}
+	m_DopeSheetSceneRef.RemoveCallback(m_iFrameIndex, m_sCallback);
+	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
+}
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_RenameCallback::EntityUndoCmd_RenameCallback(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, QString sOldCallback, QString sNewCallback, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_iFrameIndex(iFrameIndex),
+	m_sOldCallback(sOldCallback),
+	m_sNewCallback(sNewCallback)
+{
+	if(m_sOldCallback.isEmpty() || m_sNewCallback.isEmpty())
+		HyGuiLog("EntityUndoCmd_RenameCallback::EntityUndoCmd_RenameCallback() - Callback name cannot be empty", LOGTYPE_Error);
+	
+	setText("Rename " % m_sOldCallback % " Callback");
+}
+
+/*virtual*/ EntityUndoCmd_RenameCallback::~EntityUndoCmd_RenameCallback()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_RenameCallback::redo() /*override*/
+{
+	m_DopeSheetSceneRef.RenameCallback(m_iFrameIndex, m_sOldCallback, m_sNewCallback);
+	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
+}
+
+/*virtual*/ void EntityUndoCmd_RenameCallback::undo() /*override*/
+{
+	m_DopeSheetSceneRef.RenameCallback(m_iFrameIndex, m_sNewCallback, m_sOldCallback);
+	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_RemoveCallback::EntityUndoCmd_RemoveCallback(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, QString sCallback, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_iFrameIndex(iFrameIndex),
+	m_sCallback(sCallback)
+{
+	if(m_sCallback.isEmpty())
+		HyGuiLog("EntityUndoCmd_RemoveCallback::EntityUndoCmd_RemoveCallback() - Callback name cannot be empty", LOGTYPE_Error);
+
+	setText("Remove " % m_sCallback % " Callback");
+}
+
+/*virtual*/ EntityUndoCmd_RemoveCallback::~EntityUndoCmd_RemoveCallback()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_RemoveCallback::redo() /*override*/
+{
+	m_DopeSheetSceneRef.RemoveCallback(m_iFrameIndex, m_sCallback);
+	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
+}
+
+/*virtual*/ void EntityUndoCmd_RemoveCallback::undo() /*override*/
+{
+	m_DopeSheetSceneRef.CreateCallback(m_iFrameIndex, m_sCallback);
+	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_AddEvent::EntityUndoCmd_AddEvent(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, DopeSheetEventType eEventType, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_iFrameIndex(iFrameIndex),
+	m_eEventType(eEventType)
+{
+	QString sEventName = DOPEEVENT_STRINGS[m_eEventType];
+	// Remove the first character of 'sEventName' which is an underscore
+	sEventName.remove(0, 1);
+	setText("Add " % sEventName % " Event");
+}
+
+/*virtual*/ EntityUndoCmd_AddEvent::~EntityUndoCmd_AddEvent()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_AddEvent::redo() /*override*/
+{
+	m_DopeSheetSceneRef.CreateTimelineEvent(m_iFrameIndex, m_eEventType);
+	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
+}
+
+/*virtual*/ void EntityUndoCmd_AddEvent::undo() /*override*/
+{
+	m_DopeSheetSceneRef.RemoveTimelineEvent(m_iFrameIndex, m_eEventType);
+	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_RemoveEvent::EntityUndoCmd_RemoveEvent(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, DopeSheetEventType eEventType, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_iFrameIndex(iFrameIndex),
+	m_eEventType(eEventType)
+{
+	QString sEventName = DOPEEVENT_STRINGS[m_eEventType];
+	// Remove the first character of 'sEventName' which is an underscore
+	sEventName.remove(0, 1);
+	setText("Remove " % sEventName % " Event");
+}
+
+/*virtual*/ EntityUndoCmd_RemoveEvent::~EntityUndoCmd_RemoveEvent()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_RemoveEvent::redo() /*override*/
+{
+	m_DopeSheetSceneRef.RemoveTimelineEvent(m_iFrameIndex, m_eEventType);
+	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
+}
+
+/*virtual*/ void EntityUndoCmd_RemoveEvent::undo() /*override*/
+{
+	m_DopeSheetSceneRef.CreateTimelineEvent(m_iFrameIndex, m_eEventType);
 	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
 }
 

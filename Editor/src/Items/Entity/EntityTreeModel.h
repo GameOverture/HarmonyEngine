@@ -62,10 +62,13 @@ public:
 	virtual ~EntityTreeItemData();
 
 	EntityItemType GetEntType() const;
+	QString GetHyNodeTypeName() const;
 	QString GetCodeName() const;
+
 	const QUuid &GetThisUuid() const;
 	const QUuid &GetReferencedItemUuid() const;
-	QString GetHyNodeTypeName() const;
+
+	bool IsPromotedEntity() const;
 	bool IsForwardDeclared() const;
 
 	EntityModel &GetEntityModel() const;

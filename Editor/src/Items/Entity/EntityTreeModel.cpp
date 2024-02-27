@@ -76,21 +76,6 @@ EntityItemType EntityTreeItemData::GetEntType() const
 	return m_eEntType;
 }
 
-QString EntityTreeItemData::GetCodeName() const
-{
-	return m_sName;
-}
-
-const QUuid &EntityTreeItemData::GetThisUuid() const
-{
-	return GetUuid();
-}
-
-const QUuid &EntityTreeItemData::GetReferencedItemUuid() const
-{
-	return m_ReferencedItemUuid;
-}
-
 QString EntityTreeItemData::GetHyNodeTypeName() const
 {
 	switch(m_eTYPE)
@@ -102,7 +87,7 @@ QString EntityTreeItemData::GetHyNodeTypeName() const
 	case ITEM_Sprite:			return "HySprite2d";
 	case ITEM_AtlasFrame:		return "HyTexturedQuad2d";
 	case ITEM_BoundingVolume:	return "HyShape2d";
-	
+
 	case ITEM_Entity: {
 		if(m_sPromotedEntityType.isEmpty() == false)
 			return m_sPromotedEntityType;
@@ -122,6 +107,26 @@ QString EntityTreeItemData::GetHyNodeTypeName() const
 	}
 
 	return QString();
+}
+
+QString EntityTreeItemData::GetCodeName() const
+{
+	return m_sName;
+}
+
+const QUuid &EntityTreeItemData::GetThisUuid() const
+{
+	return GetUuid();
+}
+
+const QUuid &EntityTreeItemData::GetReferencedItemUuid() const
+{
+	return m_ReferencedItemUuid;
+}
+
+bool EntityTreeItemData::IsPromotedEntity() const
+{
+	return m_sPromotedEntityType.isEmpty() == false;
 }
 
 bool EntityTreeItemData::IsForwardDeclared() const
@@ -244,7 +249,8 @@ void EntityTreeItemData::InitalizePropertyModel()
 	{
 	case ITEM_Entity:
 		m_pPropertiesModel->AppendCategory("Entity", QVariant(), false, "A visible shape that can be drawn to the screen");
-		m_pPropertiesModel->AppendProperty("Entity", "Timeline Pause", PROPERTIESTYPE_bool, Qt::Unchecked, "Pausing the timeline will stop processing key frames (starting from this frame indefinately", PROPERTIESACCESS_ToggleOff);
+		if(GetEntType() != ENTTYPE_Root)
+			m_pPropertiesModel->AppendProperty("Entity", "Timeline Pause", PROPERTIESTYPE_bool, Qt::Unchecked, "Pausing the timeline will stop processing key frames, after this frame", PROPERTIESACCESS_ToggleOff);
 		m_pPropertiesModel->AppendProperty("Entity", "Mouse Input", PROPERTIESTYPE_bool, Qt::Unchecked, "Mouse hover and button inputs over this bounding volume or specified shapes", PROPERTIESACCESS_ToggleOff);
 		break;
 

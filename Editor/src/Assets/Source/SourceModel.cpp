@@ -47,11 +47,11 @@ bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 	QModelIndex entityFolderIndex = FindIndex<TreeModelItemData *>(m_pEntityFolderItem, 0);
 	QStringList sImportList;
 
-	QString sHeaderFile = GenerateSrcFile(TEMPLATE_EntityH, entityFolderIndex, sClassName, sClassName, "HyEntity2d", true, &entityModelRef);
+	QString sHeaderFile = GenerateSrcFile(TEMPLATE_EntityH, entityFolderIndex, sClassName, "hy_" % sClassName, "HyEntity2d", true, &entityModelRef);
 	if(false == DoesAssetExist(ComputeFileChecksum(AssembleFilter(m_pEntityFolderItem, true), QFileInfo(sHeaderFile).fileName())))
 		sImportList << sHeaderFile;
 
-	QString sSrcFile = GenerateSrcFile(TEMPLATE_EntityCpp, entityFolderIndex, sClassName, sClassName, "HyEntity2d", true, &entityModelRef);
+	QString sSrcFile = GenerateSrcFile(TEMPLATE_EntityCpp, entityFolderIndex, sClassName, "hy_" % sClassName, "HyEntity2d", true, &entityModelRef);
 	if(false == DoesAssetExist(ComputeFileChecksum(AssembleFilter(m_pEntityFolderItem, true), QFileInfo(sSrcFile).fileName())))
 		sImportList << sSrcFile;
 

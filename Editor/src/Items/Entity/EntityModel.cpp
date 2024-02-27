@@ -463,20 +463,6 @@ QString EntityModel::GenerateCodeName(QString sDesiredName) const
 	return m_TreeModel.GenerateCodeName(sDesiredName);
 }
 
-bool EntityModel::IsCallbackNameUnique(QString sCallbackName) const
-{
-	for(int iStateIndex = 0; iStateIndex < m_StateList.size(); ++iStateIndex)
-	{
-		EntityStateData *pStateData = static_cast<EntityStateData *>(m_StateList[iStateIndex]);
-
-		const QMap<int, QString> &callbackMapRef = pStateData->GetDopeSheetScene().GetCallbackMap();
-		if(callbackMapRef.values().contains(sCallbackName))
-			return false;
-	}
-
-	return true;
-}
-
 QString EntityModel::GenerateSrc_FileIncludes() const
 {
 	QString sSrc;
@@ -490,12 +476,13 @@ QString EntityModel::GenerateSrc_FileIncludes() const
 		if(pItem->GetType() != ITEM_Entity)
 			continue;
 
-		QUuid referencedItemUuid = pItem->GetReferencedItemUuid();
-		ProjectItemData *pReferencedItemData = static_cast<ProjectItemData *>(GetItem().GetProject().FindItemData(referencedItemUuid));
-		if(pReferencedItemData == nullptr)
-			HyGuiLog("Could not find referenced item data from Sub-Entity's UUID: " + referencedItemUuid.toString(), LOGTYPE_Error);
+		QString sIncludeFileName;
+		if(pItem->IsPromotedEntity() == false)
+			sIncludeFileName = "hy_" + pItem->GetHyNodeTypeName() + ".h";
+		else
+			sIncludeFileName = pItem->GetHyNodeTypeName() + ".h";
 		
-		sIncludeList.append(pReferencedItemData->GetName(false) + ".h");
+		sIncludeList.append(sIncludeFileName);
 	}
 	sIncludeList.removeDuplicates();
 
@@ -647,7 +634,7 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 	{
 		const EntityDopeSheetScene &entDopeSheetSceneRef = static_cast<const EntityStateData *>(GetStateData(i))->GetDopeSheetScene();
 		QMap<int, QMap<EntityTreeItemData *, QJsonObject>> propertiesMapByFrame = entDopeSheetSceneRef.GetKeyFrameMapPropertiesByFrame();
-		const QMap<int, QString> &callbackMap = entDopeSheetSceneRef.GetCallbackMap();
+		const QMap<int, QStringList> &eventMap = entDopeSheetSceneRef.GetEventMap();
 
 		sSrc += "\n\tcase " + QString::number(i) + ":\n\t\t";
 		sSrc += "m_fpUpdateFunc = [this]()\n\t\t{\n\t\t\t";
@@ -1062,7 +1049,7 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 	}
 	stateFileDataOut.m_Meta.insert("keyFrames", stateKeyFramesObj);
 
-	// Serialize all callbacks for this state
-	QJsonArray callbackArray = pStateData->GetDopeSheetScene().SerializeCallbacks();
-	stateFileDataOut.m_Meta.insert("callbacks", callbackArray);
+	// Serialize all events for this state
+	QJsonArray eventArray = pStateData->GetDopeSheetScene().SerializeEvents();
+	stateFileDataOut.m_Meta.insert("events", eventArray);
 }

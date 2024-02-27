@@ -312,6 +312,7 @@ void EntityDraw::SetExtrapolatedProperties()
 						  fFRAME_DURATION,
 						  iCURRENT_FRAME,
 						  entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData],
+						  entityDopeSheetSceneRef.GetEventMap(),
 						  m_pCamera);
 
 	// Set the extrapolated properties for all the children items
@@ -329,6 +330,7 @@ void EntityDraw::SetExtrapolatedProperties()
 							  fFRAME_DURATION,
 							  iCURRENT_FRAME,
 							  entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData],
+							  entityDopeSheetSceneRef.GetEventMap(),
 							  m_pCamera);
 	}
 
