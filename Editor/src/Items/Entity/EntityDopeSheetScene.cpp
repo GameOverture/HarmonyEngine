@@ -197,7 +197,7 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 		const QJsonObject &callbackObj = callbackArray[i].toObject();
 
 		QJsonArray functionsArray = callbackObj["functions"].toArray();
-		for(int iFuncIndex = 0; i < functionsArray.size(); ++iFuncIndex)
+		for(int iFuncIndex = 0; iFuncIndex < functionsArray.size(); ++iFuncIndex)
 		{
 			QString sFunc = functionsArray[iFuncIndex].toString();
 			if(sFunc.startsWith('_') == false)

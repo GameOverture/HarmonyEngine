@@ -275,23 +275,25 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 
 	//const QMap<int, QStringList> &eventMapRef = GetScene()->GetEventMap();
 
-	std::function<void(DopeSheetEventType, float)> fpPaintEvent = [&](DopeSheetEventType eEvent, float fPosX)
+	std::function<void(DopeSheetEventType, float)> fpPaintEvent = [&](DopeSheetEventType eEvent, float fX)
 	{
+
 		switch(eEvent)
 		{
 		case DOPEEVENT_Callback:
+			pPainter->translate(fX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f));
 			pPainter->setPen(Qt::NoPen);// HyGlobal::ConvertHyColor(HyColor::Black));
 			pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::Orange));
 
-			pPainter->translate(fPosX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f));
 			pPainter->rotate(45.0);
 			pPainter->drawRect(CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER, CALLBACK_DIAMETER);
 			break;
 
 		case DOPEEVENT_PauseTimeline: {
 			QSize iconSize(16, 16);
-			QIcon pauseIcon(":/icons/pause.png");
-			pPainter->drawPixmap(fPosX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f), pauseIcon.pixmap(iconSize.width(), iconSize.height()));
+			QIcon pauseIcon(":/icons16x16/media-pause.png");
+			QPoint pt = QPoint(fX - (iconSize.width() / 2) + 1.0f, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f) - iconSize.width());
+			pPainter->drawPixmap(pt, pauseIcon.pixmap(iconSize.width(), iconSize.height()));
 			break; }
 		}
 

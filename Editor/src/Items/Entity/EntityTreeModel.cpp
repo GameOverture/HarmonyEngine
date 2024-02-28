@@ -944,8 +944,8 @@ bool EntityTreeModel::FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut
 		QModelIndex parentIndex = FindIndex<EntityTreeItemData *>(pParentTreeItemOut->data(0).value<EntityTreeItemData *>(), 0);
 		int iArrayFolderRow = (iRowToCreateAt == -1 ? pParentTreeItemOut->GetNumChildren() : iRowToCreateAt);
 
-		if(pParentTreeItemOut->GetNumChildren() > 0)
-			iArrayFolderRow = HyMath::Min(iArrayFolderRow, pParentTreeItemOut->GetNumChildren() - 1);
+		//if(pParentTreeItemOut->GetNumChildren() > 0)
+		//	iArrayFolderRow = HyMath::Min(iArrayFolderRow, pParentTreeItemOut->GetNumChildren() - 1);
 
 		if(insertRow(iArrayFolderRow, parentIndex) == false)
 		{
