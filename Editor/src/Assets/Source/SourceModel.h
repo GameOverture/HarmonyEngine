@@ -21,8 +21,10 @@ class SourceModel : public IManagerModel
 	Q_OBJECT
 
 	friend class SourceImportThread;
+	friend class Project;
 
 	TreeModelItemData *							m_pEntityFolderItem;
+	QStringList									m_ImportBaseClassList;
 
 public:
 	SourceModel(Project &projRef);

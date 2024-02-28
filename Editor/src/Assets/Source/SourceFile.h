@@ -24,11 +24,13 @@ class SourceFile : public IAssetItemData
 {
 	Q_OBJECT
 
+	QString					m_sBaseClass;		// The C++ base class, if applicable
 	QSet<WgtCodeEditor *>	m_CodeEditorSet;	// Keeps references to any WgtCodeEditor that opens this
 
 public:
 	SourceFile(IManagerModel &modelRef,
 			   QUuid uuid,
+			   QString sBaseClass,
 			   quint32 uiChecksum,			// Checksum is the (filter path + filename) string all lowercase with forward slashes ('/'). No filter will not have any forward slashes.
 			   QString fileName,			// Includes file extension
 			   uint uiErrors);

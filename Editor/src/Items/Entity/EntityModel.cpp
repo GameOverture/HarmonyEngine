@@ -478,9 +478,9 @@ QString EntityModel::GenerateSrc_FileIncludes() const
 
 		QString sIncludeFileName;
 		if(pItem->IsPromotedEntity() == false)
-			sIncludeFileName = "hy_" + pItem->GetHyNodeTypeName() + ".h";
+			sIncludeFileName = "hy_" + pItem->GetHyNodeTypeName(false) + ".h";
 		else
-			sIncludeFileName = pItem->GetHyNodeTypeName() + ".h";
+			sIncludeFileName = pItem->GetHyNodeTypeName(false) + ".h";
 		
 		sIncludeList.append(sIncludeFileName);
 	}
@@ -510,7 +510,7 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 		}
 
 		sSrc += "\t";
-		QString sType = pItem->GetHyNodeTypeName();
+		QString sType = pItem->GetHyNodeTypeName(true);
 		sSrc += sType;
 		int iNumTabs = 6 - (sType.length() / 4); // Do 6 tabs (minus sType's length / 4) to align the variable names
 		if(iNumTabs > 0)
@@ -606,7 +606,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 			else
 				sSrc += ", ";
 
-			sSrc += pItem->GetHyNodeTypeName() + sInitialization;
+			sSrc += pItem->GetHyNodeTypeName(true) + sInitialization;
 			pCurArray = pItem;
 		}
 	}
@@ -632,10 +632,6 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 
 	for(int i = 0; i < GetNumStates(); ++i)
 	{
-		const EntityDopeSheetScene &entDopeSheetSceneRef = static_cast<const EntityStateData *>(GetStateData(i))->GetDopeSheetScene();
-		QMap<int, QMap<EntityTreeItemData *, QJsonObject>> propertiesMapByFrame = entDopeSheetSceneRef.GetKeyFrameMapPropertiesByFrame();
-		const QMap<int, QStringList> &eventMap = entDopeSheetSceneRef.GetEventMap();
-
 		sSrc += "\n\tcase " + QString::number(i) + ":\n\t\t";
 		sSrc += "m_fpUpdateFunc = [this]()\n\t\t{\n\t\t\t";
 
@@ -649,12 +645,52 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 		sSrc += "switch(m_uiCurFrame)\n\t\t\t\t{\n\t\t\t\t";
 		sSrc += "default:\n\t\t\t\t\tbreak;\n\n\t\t\t\t";
 
+		const EntityDopeSheetScene &entDopeSheetSceneRef = static_cast<const EntityStateData *>(GetStateData(i))->GetDopeSheetScene();
+		QMap<int, QMap<EntityTreeItemData *, QJsonObject>> propertiesMapByFrame = entDopeSheetSceneRef.GetKeyFrameMapPropertiesByFrame();
+		const QMap<int, QStringList> &eventMap = entDopeSheetSceneRef.GetEventMap();
+
+		QList<int> eventFrameIndexList = eventMap.keys();
 		QList<int> frameList = propertiesMapByFrame.keys();
 		for(int iFrameIndex : frameList)
 		{
 			sSrc += "case " + QString::number(iFrameIndex) + ":\n\t\t\t\t\t";
+
+			// Properties
 			for(QMap<EntityTreeItemData *, QJsonObject>::const_iterator iter = propertiesMapByFrame[iFrameIndex].begin(); iter != propertiesMapByFrame[iFrameIndex].end(); ++iter)
 				sSrc += GenerateSrc_SetProperties(iter.key(), iter.value(), "\n\t\t\t\t\t");
+
+			// Events
+			if(eventFrameIndexList.contains(iFrameIndex))
+			{
+				QStringList sEventsToProcess = eventMap[iFrameIndex];
+
+				for(QString &sEvent : sEventsToProcess)
+				{
+					// Determine the event type
+					DopeSheetEventType eEventType = DOPEEVENT_Callback;
+					for(int iEventTypeIndex = 0; iEventTypeIndex < NUM_DOPEEVENTS; ++iEventTypeIndex)
+					{
+						if(sEvent == DOPEEVENT_STRINGS[iEventTypeIndex])
+						{
+							eEventType = static_cast<DopeSheetEventType>(iEventTypeIndex);
+							break;
+						}
+					}
+
+					// Process the event
+					switch(eEventType)
+					{
+					case DOPEEVENT_Callback:
+						sSrc += sEvent + "();\n\t\t\t\t\t";
+						break;
+
+					case DOPEEVENT_PauseTimeline:
+						sSrc += "SetTimelinePause(true);\n\t\t\t\t\t";
+						break;
+					}
+				}
+			}
+
 			sSrc += "break;\n\n\t\t\t\t";
 		}
 		sSrc += "}\n\t\t\t\t"; // End switch(m_uiCurFrame)

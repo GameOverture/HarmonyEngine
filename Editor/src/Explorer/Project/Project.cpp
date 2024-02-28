@@ -577,6 +577,9 @@ bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType
 	QList<TreeModelItemData *>	correspondingParentList;
 	QList<QUuid>				correspondingUuidList;
 
+	if(eAssetType == ASSETMAN_Source)
+		static_cast<SourceModel *>(pManager)->m_ImportBaseClassList.clear();
+
 	for(int i = 0; i < assetArrayRef.size(); ++i)
 	{
 		QJsonObject assetObj = assetArrayRef[i].toObject();
@@ -592,6 +595,9 @@ bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType
 			importAssetList.push_back(sFilePath);
 			correspondingParentList.push_back(pManager->ReturnFilter(assetObj["filter"].toString()));
 			correspondingUuidList.push_back(QUuid(assetObj["assetUUID"].toString())); // The UUID has already been re-created for this imported asset if moving to another project (so it doesn't conflict with its old project)
+
+			if(eAssetType == ASSETMAN_Source)
+				static_cast<SourceModel *>(pManager)->m_ImportBaseClassList.push_back(assetObj["baseClass"].toString());
 		}
 	}
 

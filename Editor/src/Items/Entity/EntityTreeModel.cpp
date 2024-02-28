@@ -76,7 +76,7 @@ EntityItemType EntityTreeItemData::GetEntType() const
 	return m_eEntType;
 }
 
-QString EntityTreeItemData::GetHyNodeTypeName() const
+QString EntityTreeItemData::GetHyNodeTypeName(bool bIncludeNamespace) const
 {
 	switch(m_eTYPE)
 	{
@@ -96,7 +96,12 @@ QString EntityTreeItemData::GetHyNodeTypeName() const
 		ProjectItemData *pReferencedItemData = static_cast<ProjectItemData *>(m_EntityModelRef.GetItem().GetProject().FindItemData(referencedItemUuid));
 		if(pReferencedItemData == nullptr)
 			HyGuiLog("Could not find referenced item data from Sub-Entity's UUID: " + referencedItemUuid.toString(), LOGTYPE_Error);
-		return "hy::" + pReferencedItemData->GetName(false); }
+
+		if(bIncludeNamespace)
+			return "hy::" + pReferencedItemData->GetName(false);
+		else
+			return pReferencedItemData->GetName(false);
+	}
 
 	case ITEM_SoundClip:
 	case ITEM_Prefab:

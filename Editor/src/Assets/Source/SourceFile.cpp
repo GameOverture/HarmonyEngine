@@ -14,12 +14,14 @@
 
 SourceFile::SourceFile(IManagerModel &modelRef,
 					   QUuid uuid,
+					   QString sBaseClass,
 					   quint32 uiChecksum,
 					   QString fileName,
 					   uint uiErrors) :
 	IAssetItemData(modelRef,
 		QFileInfo(fileName).suffix().compare("cpp", Qt::CaseInsensitive) == 0 ? ITEM_Source : ITEM_Header,
-		uuid, uiChecksum, 0, fileName, "." + QFileInfo(fileName).suffix(), uiErrors)
+		uuid, uiChecksum, 0, fileName, "." + QFileInfo(fileName).suffix(), uiErrors),
+	m_sBaseClass(sBaseClass)
 {
 }
 
@@ -46,17 +48,7 @@ SourceFile::~SourceFile()
 
 /*virtual*/ void SourceFile::InsertUniqueJson(QJsonObject &frameObj) /*override*/
 {
-	//frameObj.insert("width", QJsonValue(GetSize().width()));
-	//frameObj.insert("height", QJsonValue(GetSize().height()));
-	//frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));
-	//frameObj.insert("x", QJsonValue(GetX()));
-	//frameObj.insert("y", QJsonValue(GetY()));
-	//frameObj.insert("cropLeft", QJsonValue(GetCrop().left()));
-	//frameObj.insert("cropTop", QJsonValue(GetCrop().top()));
-	//frameObj.insert("cropRight", QJsonValue(GetCrop().right()));
-	//frameObj.insert("cropBottom", QJsonValue(GetCrop().bottom()));
-	//frameObj.insert("textureFormat", HyAssets::GetTextureFormatName(m_eFormat).c_str());
-	//frameObj.insert("textureFiltering", HyAssets::GetTextureFilteringName(m_eFiltering).c_str());
+	frameObj.insert("baseClass", QJsonValue(m_sBaseClass));
 }
 
 void SourceFile::AddCodeEditor(WgtCodeEditor *pCodeEditor)

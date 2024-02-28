@@ -62,7 +62,7 @@ public:
 	virtual ~EntityTreeItemData();
 
 	EntityItemType GetEntType() const;
-	QString GetHyNodeTypeName() const;
+	QString GetHyNodeTypeName(bool bIncludeNamespace) const;
 	QString GetCodeName() const;
 
 	const QUuid &GetThisUuid() const;

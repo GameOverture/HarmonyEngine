@@ -62,8 +62,12 @@ SourceImportThread::SourceImportThread(IManagerModel &managerModelRef, QStringLi
 			}
 		}
 
+		QString sBaseClass;
+		if(sourceModelRef.m_ImportBaseClassList.size() > i)
+			sBaseClass = sourceModelRef.m_ImportBaseClassList[i];
+
 		quint32 uiChecksum = sourceModelRef.ComputeFileChecksum(sNewFilterPath, sNewFileName);
-		SourceFile *pNewFile = new SourceFile(sourceModelRef, m_CorrespondingUuidList[i], uiChecksum, sNewFileName, 0);
+		SourceFile *pNewFile = new SourceFile(sourceModelRef, m_CorrespondingUuidList[i], sBaseClass, uiChecksum, sNewFileName, 0);
 		sourceModelRef.m_ImportedAssetList.append(pNewFile);
 		sourceModelRef.RegisterAsset(pNewFile);
 

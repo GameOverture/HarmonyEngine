@@ -41,6 +41,8 @@ SourceModel::SourceModel(Project &projRef) :
 
 bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 {
+	m_ImportBaseClassList.clear();
+
 	QString sClassName = entityModelRef.GetItem().GetName(false);
 
 	// Generate the cpp and h file of the entity (it will overwrite the entity files if they already exist)
@@ -49,11 +51,17 @@ bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 
 	QString sHeaderFile = GenerateSrcFile(TEMPLATE_EntityH, entityFolderIndex, sClassName, "hy_" % sClassName, "HyEntity2d", true, &entityModelRef);
 	if(false == DoesAssetExist(ComputeFileChecksum(AssembleFilter(m_pEntityFolderItem, true), QFileInfo(sHeaderFile).fileName())))
+	{
 		sImportList << sHeaderFile;
+		m_ImportBaseClassList << "HyEntity2d";
+	}
 
 	QString sSrcFile = GenerateSrcFile(TEMPLATE_EntityCpp, entityFolderIndex, sClassName, "hy_" % sClassName, "HyEntity2d", true, &entityModelRef);
 	if(false == DoesAssetExist(ComputeFileChecksum(AssembleFilter(m_pEntityFolderItem, true), QFileInfo(sSrcFile).fileName())))
+	{
 		sImportList << sSrcFile;
+		m_ImportBaseClassList << "HyEntity2d";
+	}
 
 	if(sImportList.empty())
 		return true;
@@ -78,7 +86,12 @@ QStringList SourceModel::GetEditorEntityList() const
 	for(int i = 0; i < editorEntityList.size(); ++i)
 	{
 		if(editorEntityList[i]->GetType() == ITEM_Source)
-			sEntityList << QFileInfo(static_cast<SourceFile *>(editorEntityList[i])->GetName()).baseName();
+		{
+			QString sEntCodeName = QFileInfo(static_cast<SourceFile *>(editorEntityList[i])->GetName()).baseName();
+			if(sEntCodeName.startsWith("hy_"))
+				sEntCodeName = sEntCodeName.mid(3);
+			sEntityList << sEntCodeName;
+		}
 	}
 
 	return sEntityList;
@@ -315,6 +328,8 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 {
 	if(m_BanksModel.GetBank(0)->m_AssetList.empty())
 	{
+		m_ImportBaseClassList.clear();
+
 		// If asset list is empty try importing (refreshing) everything in m_MetaDir (source) directory.
 		// If this is also empty, then generate a brand new project
 		QStringList sImportList;
@@ -350,6 +365,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 							sImportList.push_back(info.filePath());
 							correspondingParentList.push_back(curDir.second);
 							correspondingUuidList.append(QUuid::createUuid());
+							m_ImportBaseClassList.push_back(QString());
 							break;
 						}
 					}
@@ -363,18 +379,22 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 			sImportList << GenerateSrcFile(TEMPLATE_Main, QModelIndex(), m_ProjectRef.GetName(), "main", QString(), false, nullptr);
 			correspondingParentList << nullptr;
 			correspondingUuidList << QUuid::createUuid();
+			m_ImportBaseClassList.push_back(QString());
 
 			sImportList << GenerateSrcFile(TEMPLATE_Pch, QModelIndex(), m_ProjectRef.GetName(), "pch", QString(), false, nullptr);
 			correspondingParentList << nullptr;
 			correspondingUuidList << QUuid::createUuid();
+			m_ImportBaseClassList.push_back(QString());
 
 			sImportList << GenerateSrcFile(TEMPLATE_MainClassCpp, QModelIndex(), m_ProjectRef.GetName(), m_ProjectRef.GetName(), QString(), false, nullptr);
 			correspondingParentList << nullptr;
 			correspondingUuidList << QUuid::createUuid();
+			m_ImportBaseClassList.push_back(QString());
 
 			sImportList << GenerateSrcFile(TEMPLATE_MainClassH, QModelIndex(), m_ProjectRef.GetName(), m_ProjectRef.GetName(), QString(), false, nullptr);
 			correspondingParentList << nullptr;
 			correspondingUuidList << QUuid::createUuid();
+			m_ImportBaseClassList.push_back(QString());
 		}
 		
 		ImportNewAssets(sImportList,
@@ -401,6 +421,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 {
 	SourceFile *pNewFile = new SourceFile(*this,
 										  QUuid(metaObj["assetUUID"].toString()),
+										  metaObj["baseClass"].toString(),
 										  JSONOBJ_TOINT(metaObj, "checksum"),
 										  metaObj["name"].toString(),
 										  metaObj["errors"].toInt(0));
@@ -413,6 +434,8 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	SourceGenFileDlg *pDlg = new SourceGenFileDlg(GetEditorEntityList());
 	if(QDialog::Accepted == pDlg->exec())
 	{
+		m_ImportBaseClassList.clear();
+
 		QStringList sImportList;
 		QList<TreeModelItemData *> correspondingParentList;
 		QList<QUuid> correspondingUuidList;
@@ -422,10 +445,12 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 		sImportList << GenerateSrcFile(TEMPLATE_ClassCpp, indexDestination, pDlg->GetCodeClassName(), pDlg->GetCppFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass(), nullptr);
 		correspondingParentList << pParentLocation;
 		correspondingUuidList << QUuid::createUuid();
+		m_ImportBaseClassList.push_back(pDlg->GetBaseClassName());
 
 		sImportList << GenerateSrcFile(TEMPLATE_ClassH, indexDestination, pDlg->GetCodeClassName(), pDlg->GetHeaderFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass(), nullptr);
 		correspondingParentList << pParentLocation;
 		correspondingUuidList << QUuid::createUuid();
+		m_ImportBaseClassList.push_back(pDlg->GetBaseClassName());
 		
 		ImportNewAssets(sImportList,
 						0,
