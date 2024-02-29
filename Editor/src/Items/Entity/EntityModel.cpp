@@ -651,13 +651,26 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 
 		QList<int> eventFrameIndexList = eventMap.keys();
 		QList<int> frameList = propertiesMapByFrame.keys();
+
+		// Combine and remove duplicates
+		QSet<int> frameSet = eventFrameIndexList.toSet();
+		frameSet.unite(frameList.toSet());
+		frameList = frameSet.toList();
+
+		std::sort(frameList.begin(), frameList.end()); // Then sort by frame index
+		
+		bool bIsFinalFrameHandled = false;
+		int iFinalFrame = entDopeSheetSceneRef.GetFinalFrame();
 		for(int iFrameIndex : frameList)
 		{
 			sSrc += "case " + QString::number(iFrameIndex) + ":\n\t\t\t\t\t";
 
 			// Properties
-			for(QMap<EntityTreeItemData *, QJsonObject>::const_iterator iter = propertiesMapByFrame[iFrameIndex].begin(); iter != propertiesMapByFrame[iFrameIndex].end(); ++iter)
-				sSrc += GenerateSrc_SetProperties(iter.key(), iter.value(), "\n\t\t\t\t\t");
+			if(propertiesMapByFrame.contains(iFrameIndex))
+			{
+				for(QMap<EntityTreeItemData *, QJsonObject>::const_iterator iter = propertiesMapByFrame[iFrameIndex].begin(); iter != propertiesMapByFrame[iFrameIndex].end(); ++iter)
+					sSrc += GenerateSrc_SetProperties(iter.key(), iter.value(), "\n\t\t\t\t\t");
+			}
 
 			// Events
 			if(eventFrameIndexList.contains(iFrameIndex))
@@ -666,19 +679,9 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 
 				for(QString &sEvent : sEventsToProcess)
 				{
-					// Determine the event type
-					DopeSheetEventType eEventType = DOPEEVENT_Callback;
-					for(int iEventTypeIndex = 0; iEventTypeIndex < NUM_DOPEEVENTS; ++iEventTypeIndex)
-					{
-						if(sEvent == DOPEEVENT_STRINGS[iEventTypeIndex])
-						{
-							eEventType = static_cast<DopeSheetEventType>(iEventTypeIndex);
-							break;
-						}
-					}
-
 					// Process the event
-					switch(eEventType)
+					DopeSheetEvent dopeSheetEvent(sEvent);
+					switch(dopeSheetEvent.m_eType)
 					{
 					case DOPEEVENT_Callback:
 						sSrc += sEvent + "();\n\t\t\t\t\t";
@@ -686,13 +689,46 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 
 					case DOPEEVENT_PauseTimeline:
 						sSrc += "SetTimelinePause(true);\n\t\t\t\t\t";
+						if(iFinalFrame == iFrameIndex)
+							bIsFinalFrameHandled = true;
+						break;
+
+					case DOPEEVENT_GotoFrame:
+						sSrc += "SetFrame(" + dopeSheetEvent.m_sData + ");\n\t\t\t\t\t";
+						if(iFinalFrame == iFrameIndex)
+						{
+							// If this is the final frame, it must be going to a previous frame
+							if(dopeSheetEvent.m_sData.toInt() >= iFinalFrame)
+								HyGuiLog("EntityModel::GenerateSrc_SetStateImpl - GotoFrame event on final frame must go to a previous frame", LOGTYPE_Error);
+
+							bIsFinalFrameHandled = true;
+						}
+						break;
+
+					default:
+						HyGuiLog("EntityModel::GenerateSrc_SetStateImpl - Unhandled event type", LOGTYPE_Error);
 						break;
 					}
 				}
 			}
 
+			if(iFrameIndex == iFinalFrame && bIsFinalFrameHandled == false)
+			{
+				sSrc += "SetTimelinePause(true);\n\t\t\t\t\t";
+				bIsFinalFrameHandled = true;
+			}
+
 			sSrc += "break;\n\n\t\t\t\t";
 		}
+
+		if(bIsFinalFrameHandled == false)
+		{
+			sSrc += "case " + QString::number(iFinalFrame) + ":\n\t\t\t\t\t";
+			sSrc += "SetTimelinePause(true);\n\t\t\t\t\t";
+			sSrc += "break;\n\n\t\t\t\t";
+			bIsFinalFrameHandled = true;
+		}
+
 		sSrc += "}\n\t\t\t\t"; // End switch(m_uiCurFrame)
 
 		sSrc += "m_uiCurFrame++;\n\t\t\t\t";

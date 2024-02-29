@@ -434,21 +434,23 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 		{
 			for(const QString &sEvent : eventMap[*eventFrameIter])
 			{
-				for(int i = 0; i < NUM_DOPEEVENTS; ++i)
+				DopeSheetEvent dopeSheetEvent(sEvent);
+				switch(dopeSheetEvent.m_eType)
 				{
-					if(DOPEEVENT_STRINGS[i] == sEvent)
-					{
-						// Process the event
-						DopeSheetEventType eEventType = static_cast<DopeSheetEventType>(i);
-						switch(eEventType)
-						{
-						case DOPEEVENT_PauseTimeline:
-							bIsTimelinePaused = true;
-							break;
-						}
+				case DOPEEVENT_Callback:
+					break;
 
-						break;
-					}
+				case DOPEEVENT_PauseTimeline:
+					bIsTimelinePaused = true;
+					break;
+
+				case DOPEEVENT_GotoFrame:
+					HyGuiLog("ExtrapolateProperties() - DOPEEVENT_GotoFrame not implemented", LOGTYPE_Error);
+					break;
+
+				default:
+					HyGuiLog("ExtrapolateProperties() - Unhandled DopeSheetEvent type", LOGTYPE_Error);
+					break;
 				}
 			}
 

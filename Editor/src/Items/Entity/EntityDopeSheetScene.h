@@ -64,15 +64,6 @@ enum DopeSheetGfxDataKey // NOTE: Order matters, the first 3 are used when acces
 	GFXDATAKEY_Type, // DopeSheetItemType
 };
 
-enum DopeSheetEventType
-{
-	DOPEEVENT_Callback = -1,
-	DOPEEVENT_PauseTimeline,
-	
-	NUM_DOPEEVENTS
-};
-const QString DOPEEVENT_STRINGS[NUM_DOPEEVENTS] = { "_PauseTimeline" };
-
 struct TweenJsonValues
 {
 	QJsonValue		m_Destination;
@@ -165,6 +156,8 @@ class EntityDopeSheetScene : public QGraphicsScene
 	int																				m_iCurrentFrame;
 	QGraphicsLineItem *																m_pCurrentFrameLine;
 
+	int																				m_iFinalFrame;			// This is the last frame that has a keyframe or event. It includes tweens' duration and what would be the ending frame it finishes
+
 public:
 	EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj);
 	virtual ~EntityDopeSheetScene();
@@ -173,6 +166,8 @@ public:
 
 	int GetCurrentFrame() const;
 	void SetCurrentFrame(int iFrameIndex);
+
+	int GetFinalFrame() const;
 
 	const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &GetKeyFramesMap() const;
 	const QMap<int, QStringList> &GetEventMap() const;
@@ -211,14 +206,11 @@ public:
 	void PushAllKeyFrames(EntityTreeItemData *pItemData, bool bRefreshGfxItems);
 
 	QJsonArray SerializeEvents() const;
+	QList<DopeSheetEvent> GetEventList(int iFrameIndex) const;
+	bool SetEvent(int iFrameIndex, QString sSerializedEvent);
+	bool RemoveEvent(int iFrameIndex, QString sSerializedEvent);
 	QStringList GetCallbackList(int iFrameIndex) const;
-	bool CreateCallback(int iFrameIndex, QString sCallback);
 	bool RenameCallback(int iFrameIndex, QString sOldCallback, QString sNewCallback);
-	bool RemoveCallback(int iFrameIndex, QString sCallback);
-
-	QList<DopeSheetEventType> GetEventList(int iFrameIndex) const;
-	bool CreateTimelineEvent(int iFrameIndex, DopeSheetEventType eEventType);
-	bool RemoveTimelineEvent(int iFrameIndex, DopeSheetEventType eEventType);
 
 	void NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems);
 	void NudgeKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, int iNudgeAmount, bool bRefreshGfxItems);

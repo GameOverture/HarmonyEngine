@@ -275,11 +275,10 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 
 	//const QMap<int, QStringList> &eventMapRef = GetScene()->GetEventMap();
 
-	std::function<void(DopeSheetEventType, float)> fpPaintEvent = [&](DopeSheetEventType eEvent, float fX)
+	std::function<void(DopeSheetEvent, int, float)> fpPaintEvent = [&](DopeSheetEvent dopeSheetEvent, int iFrameIndex, float fX)
 	{
-
-		switch(eEvent)
-		{
+		switch(dopeSheetEvent.m_eType)
+		{ 
 		case DOPEEVENT_Callback:
 			pPainter->translate(fX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f));
 			pPainter->setPen(Qt::NoPen);// HyGlobal::ConvertHyColor(HyColor::Black));
@@ -295,6 +294,26 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 			QPoint pt = QPoint(fX - (iconSize.width() / 2) + 1.0f, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f) - iconSize.width());
 			pPainter->drawPixmap(pt, pauseIcon.pixmap(iconSize.width(), iconSize.height()));
 			break; }
+
+		case DOPEEVENT_GotoFrame: {
+			QSize iconSize(16, 16);
+			QPoint pt = QPoint(fX - (iconSize.width() / 2) + 1.0f, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f) - iconSize.width());
+			int iGotoFrameIndex = dopeSheetEvent.m_sData.toInt();
+			if(iGotoFrameIndex > iFrameIndex)
+			{
+				QIcon gotoIcon(":/icons16x16/media-forward.png");
+				pPainter->drawPixmap(pt, gotoIcon.pixmap(iconSize.width(), iconSize.height()));
+			}
+			else
+			{
+				QIcon gotoIcon(":/icons16x16/media-rewind.png");
+				pPainter->drawPixmap(pt, gotoIcon.pixmap(iconSize.width(), iconSize.height()));
+			}
+			break; }
+
+		default:
+			HyGuiLog("fpPaintEvent: Unknown DopeSheetEventType", LOGTYPE_Error);
+			break;
 		}
 
 		pPainter->resetTransform();
@@ -332,14 +351,10 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 			QRectF textRect(fPosX - (fTextWidth * 0.5f), rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT - 20.0f, fTextWidth, 20.0f);
 			DrawShadowText(pPainter, textRect, QString::number(iFrameIndex), eColor, HyColor::Black);
 
-			// Callback diamond
-			if(GetScene()->GetCallbackList(iFrameIndex).isEmpty() == false)
-				fpPaintEvent(DOPEEVENT_Callback, fPosX);
-			if(GetScene()->GetEventList(iFrameIndex).isEmpty() == false)
-			{
-				for(DopeSheetEventType eEvent : GetScene()->GetEventList(iFrameIndex))
-					fpPaintEvent(eEvent, fPosX);
-			}
+			// Draw timeline events
+			QList<DopeSheetEvent> dopeSheetEventList = GetScene()->GetEventList(iFrameIndex);
+			for(DopeSheetEvent dopeEvent : dopeSheetEventList)
+				fpPaintEvent(dopeEvent, iFrameIndex, fPosX);
 		}
 
 		// Sub Notch Lines
@@ -366,14 +381,10 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 
 				pPainter->drawLine(fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, fPosX, rect.y() + TIMELINE_HEIGHT);
 
-				// Callback diamond
-				if(GetScene()->GetCallbackList(iCurSubNotchFrame).isEmpty() == false)
-					fpPaintEvent(DOPEEVENT_Callback, fPosX);
-				if(GetScene()->GetEventList(iCurSubNotchFrame).isEmpty() == false)
-				{
-					for(DopeSheetEventType eEvent : GetScene()->GetEventList(iCurSubNotchFrame))
-						fpPaintEvent(eEvent, fPosX);
-				}
+				// Draw timeline events
+				QList<DopeSheetEvent> dopeSheetEventList = GetScene()->GetEventList(iCurSubNotchFrame);
+				for(DopeSheetEvent dopeEvent : dopeSheetEventList)
+					fpPaintEvent(dopeEvent, iCurSubNotchFrame, fPosX);
 			}
 		}
 		

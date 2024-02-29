@@ -328,15 +328,15 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_CreateCallback : public QUndoCommand
+class EntityUndoCmd_AddEvent : public QUndoCommand
 {
 	EntityDopeSheetScene &					m_DopeSheetSceneRef;
 	int										m_iFrameIndex;
-	QString									m_sCallback;
+	QString									m_sSerializedEvent;
 
 public:
-	EntityUndoCmd_CreateCallback(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, QString sCallback, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_CreateCallback();
+	EntityUndoCmd_AddEvent(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, QString sSerializedEvent, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddEvent();
 
 	virtual void redo() override;
 	virtual void undo() override;
@@ -361,46 +361,14 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_RemoveCallback : public QUndoCommand
-{
-	EntityDopeSheetScene &					m_DopeSheetSceneRef;
-	int										m_iFrameIndex;
-	QString									m_sCallback;
-
-public:
-	EntityUndoCmd_RemoveCallback(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, QString sCallback, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_RemoveCallback();
-
-	virtual void redo() override;
-	virtual void undo() override;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class EntityUndoCmd_AddEvent : public QUndoCommand
-{
-	EntityDopeSheetScene &					m_DopeSheetSceneRef;
-	int										m_iFrameIndex;
-	DopeSheetEventType						m_eEventType;
-
-public:
-	EntityUndoCmd_AddEvent(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, DopeSheetEventType eEventType, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_AddEvent();
-
-	virtual void redo() override;
-	virtual void undo() override;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class EntityUndoCmd_RemoveEvent : public QUndoCommand
 {
 	EntityDopeSheetScene &					m_DopeSheetSceneRef;
 	int										m_iFrameIndex;
-	DopeSheetEventType						m_eEventType;
+	QString									m_sSerializedEvent;
 
 public:
-	EntityUndoCmd_RemoveEvent(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, DopeSheetEventType eEventType, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_RemoveEvent(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, QString sSerializedEvent, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_RemoveEvent();
 
 	virtual void redo() override;

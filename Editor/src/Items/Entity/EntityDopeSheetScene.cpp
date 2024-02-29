@@ -168,7 +168,9 @@ int GraphicsKeyFrameItem::GetTweenFramesDuration() const
 EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj) :
 	QGraphicsScene(),
 	m_pEntStateData(pStateData),
-	m_iCurrentFrame(0)
+	m_iCurrentFrame(0),
+	m_pCurrentFrameLine(nullptr),
+	m_iFinalFrame(0)
 {
 	QJsonObject keyFramesObj = metaFileObj["keyFrames"].toObject();
 	for(auto iter = keyFramesObj.begin(); iter != keyFramesObj.end(); ++iter)
@@ -191,17 +193,16 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 		}
 	}
 
-	QJsonArray callbackArray = metaFileObj["events"].toArray();
-	for(int i = 0; i < callbackArray.size(); ++i)
+	QJsonArray eventsArray = metaFileObj["events"].toArray();
+	for(int i = 0; i < eventsArray.size(); ++i)
 	{
-		const QJsonObject &callbackObj = callbackArray[i].toObject();
+		const QJsonObject &eventObj = eventsArray[i].toObject();
 
-		QJsonArray functionsArray = callbackObj["functions"].toArray();
+		QJsonArray functionsArray = eventObj["functions"].toArray();
 		for(int iFuncIndex = 0; iFuncIndex < functionsArray.size(); ++iFuncIndex)
 		{
 			QString sFunc = functionsArray[iFuncIndex].toString();
-			if(sFunc.startsWith('_') == false)
-				CreateCallback(callbackObj["frame"].toInt(), sFunc);
+			SetEvent(eventObj["frame"].toInt(), sFunc);
 		}
 	}
 
@@ -244,6 +245,11 @@ void EntityDopeSheetScene::SetCurrentFrame(int iFrame)
 	IDraw *pDraw = m_pEntStateData->GetModel().GetItem().GetDraw();
 	if(pDraw)
 		static_cast<EntityDraw *>(pDraw)->SetExtrapolatedProperties();
+}
+
+int EntityDopeSheetScene::GetFinalFrame() const
+{
+	return m_iFinalFrame;
 }
 
 const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &EntityDopeSheetScene::GetKeyFramesMap() const
@@ -776,6 +782,12 @@ void EntityDopeSheetScene::RemoveKeyFrameTween(EntityTreeItemData *pItemData, in
 
 void EntityDopeSheetScene::PasteSerializedKeyFrames(EntityTreeItemData *pItemData, QJsonObject keyFrameMimeObj)
 {
+	if(pItemData == nullptr)
+	{
+		HyGuiLog("EntityDopeSheetScene::PasteSerializedKeyFrames() - pItemData is nullptr", LOGTYPE_Error);
+		return;
+	}
+
 	if(keyFrameMimeObj.size() != 1)
 	{
 		HyGuiLog("EntityDopeSheetScene::PasteSerializedKeyFrames() - Invalid keyFrameMimeObj size", LOGTYPE_Error);
@@ -966,6 +978,54 @@ QJsonArray EntityDopeSheetScene::SerializeEvents() const
 	return callbackArray;
 }
 
+QList<DopeSheetEvent> EntityDopeSheetScene::GetEventList(int iFrameIndex) const
+{
+	QList<DopeSheetEvent> eventList;
+	if(m_EventMap.contains(iFrameIndex))
+	{
+		for(QString sEvent : m_EventMap[iFrameIndex])
+			eventList.append(DopeSheetEvent(sEvent));
+	}
+
+	return eventList;
+}
+
+bool EntityDopeSheetScene::SetEvent(int iFrameIndex, QString sSerializedEvent)
+{
+	if(m_EventMap.contains(iFrameIndex))
+	{
+		if(m_EventMap[iFrameIndex].contains(sSerializedEvent))
+		{
+			HyGuiLog("EntityDopeSheetScene::SetEvent() - '" % sSerializedEvent % "' already exists for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+			return false;
+		}
+	}
+	else
+		m_EventMap.insert(iFrameIndex, QStringList());
+
+	m_EventMap[iFrameIndex].append(sSerializedEvent);
+	update();
+
+	return true;
+}
+
+bool EntityDopeSheetScene::RemoveEvent(int iFrameIndex, QString sSerializedEvent)
+{
+	if(m_EventMap.contains(iFrameIndex))
+	{
+		int iCallbackIndex = m_EventMap[iFrameIndex].indexOf(sSerializedEvent);
+		if(iCallbackIndex >= 0)
+		{
+			m_EventMap[iFrameIndex].removeAt(iCallbackIndex);
+			update();
+			return true;
+		}
+	}
+
+	HyGuiLog("EntityDopeSheetScene::RemoveEvent() - No '" % sSerializedEvent % "' found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+	return false;
+}
+
 QStringList EntityDopeSheetScene::GetCallbackList(int iFrameIndex) const
 {
 	QStringList callbackList;
@@ -979,25 +1039,6 @@ QStringList EntityDopeSheetScene::GetCallbackList(int iFrameIndex) const
 	}
 	
 	return callbackList;
-}
-
-bool EntityDopeSheetScene::CreateCallback(int iFrameIndex, QString sCallback)
-{
-	if(m_EventMap.contains(iFrameIndex))
-	{
-		if(m_EventMap[iFrameIndex].contains(sCallback))
-		{
-			HyGuiLog("EntityDopeSheetScene::CreateCallback() - Callback '" % sCallback % "' already exists for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
-			return false;
-		}
-	}
-	else
-		m_EventMap.insert(iFrameIndex, QStringList());
-
-	m_EventMap[iFrameIndex].append(sCallback);
-	update();
-
-	return true;
 }
 
 bool EntityDopeSheetScene::RenameCallback(int iFrameIndex, QString sOldCallback, QString sNewCallback)
@@ -1014,57 +1055,6 @@ bool EntityDopeSheetScene::RenameCallback(int iFrameIndex, QString sOldCallback,
 	
 	HyGuiLog("EntityDopeSheetScene::RenameCallback() - No callback '" % sOldCallback % "' found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
 	return false;
-}
-
-bool EntityDopeSheetScene::RemoveCallback(int iFrameIndex, QString sCallback)
-{
-	if(m_EventMap.contains(iFrameIndex))
-	{
-		int iCallbackIndex = m_EventMap[iFrameIndex].indexOf(sCallback);
-		if(iCallbackIndex >= 0)
-		{
-			m_EventMap[iFrameIndex].removeAt(iCallbackIndex);
-			update();
-			return true;
-		}
-	}
-
-	HyGuiLog("EntityDopeSheetScene::RemoveCallback() - No callback '" % sCallback % "' found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
-	return false;
-}
-
-QList<DopeSheetEventType> EntityDopeSheetScene::GetEventList(int iFrameIndex) const
-{
-	QList<DopeSheetEventType> eventList;
-	if(m_EventMap.contains(iFrameIndex))
-	{
-		for(QString sEvent : m_EventMap[iFrameIndex])
-		{
-			if(sEvent.startsWith('_'))
-			{
-				for(int i = 0; i < NUM_DOPEEVENTS; ++i)
-				{
-					if(sEvent == DOPEEVENT_STRINGS[i])
-					{
-						eventList.append(static_cast<DopeSheetEventType>(i));
-						break;
-					}
-				}
-			}
-		}
-	}
-	
-	return eventList;
-}
-
-bool EntityDopeSheetScene::CreateTimelineEvent(int iFrameIndex, DopeSheetEventType eEventType)
-{
-	return CreateCallback(iFrameIndex, DOPEEVENT_STRINGS[eEventType]);
-}
-
-bool EntityDopeSheetScene::RemoveTimelineEvent(int iFrameIndex, DopeSheetEventType eEventType)
-{
-	return RemoveCallback(iFrameIndex, DOPEEVENT_STRINGS[eEventType]);
 }
 
 void EntityDopeSheetScene::NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems)
@@ -1148,6 +1138,8 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 	entireItemList += shapeList;
 	entireItemList.prepend(static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetTreeModel().GetRootTreeItemData());
 
+	m_iFinalFrame = 0; // Determine the final frame
+
 	// Process all the items and draw their key frames
 	qreal fPosY = TIMELINE_HEIGHT + 2.0f;
 	for(EntityTreeItemData *pCurItemData : entireItemList)
@@ -1166,6 +1158,9 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 			const QMap<int, QJsonObject> &keyFrameMapRef = m_KeyFramesMap[pCurItemData];
 			for(int iFrameIndex : keyFrameMapRef.keys())
 			{
+				if(m_iFinalFrame < iFrameIndex)
+					m_iFinalFrame = iFrameIndex;
+
 				const float fITEM_START_POSY = fPosY;
 				QJsonObject propsObj = keyFrameMapRef[iFrameIndex];
 
@@ -1228,6 +1223,9 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 							fLineLength -= (KEYFRAME_WIDTH + 1.0f);
 
 						m_TweenGfxRectMap[gfxRectMapKey]->SetTweenLineLength(fLineLength, iNumFrames);
+
+						if(m_iFinalFrame < (iFrameIndex + iNumFrames))
+							m_iFinalFrame = (iFrameIndex + iNumFrames);
 					}
 
 					if(pCurItemData->IsSelected())
@@ -1244,6 +1242,13 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 			fPosY += uniquePropList.size() * ITEMS_LINE_HEIGHT; // Already accounted for the name row, now move past the property rows
 
 		fPosY += 1.0f; // Account for the space between items
+	} // for each 'EntityTreeItemData'
+
+	// Also check events to ensure the final frame is accurate
+	for(int iEventFrameIndex : m_EventMap.keys())
+	{
+		if(m_iFinalFrame < iEventFrameIndex)
+			m_iFinalFrame = iEventFrameIndex;
 	}
 
 	update();

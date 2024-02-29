@@ -27,12 +27,19 @@ namespace %HY_NAMESPACE% {
 	m_fElapsedFrameTime = 0.0f;
 	m_uiCurFrame = 0;
 	
+	m_fpUpdateFunc();
+	
 	return true;
 }
 
 /*virtual*/ uint32 %HY_CLASS%::GetNumStates()
 {
 	return %HY_NUMSTATES%;
+}
+
+void %HY_CLASS%::SetFrame(uint32 uiFrameIndex)
+{
+	m_uiCurFrame = uiFrameIndex;
 }
 
 bool %HY_CLASS%::IsTimelinePaused()

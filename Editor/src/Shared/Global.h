@@ -299,6 +299,38 @@ struct FileDataPair
 	QJsonObject	m_Meta;
 };
 
+enum DopeSheetEventType
+{
+	DOPEEVENT_Callback = -1,
+	DOPEEVENT_PauseTimeline,
+	DOPEEVENT_GotoFrame,
+
+	NUM_DOPEEVENTS
+};
+struct DopeSheetEvent
+{
+	const QString DOPEEVENT_STRINGS[NUM_DOPEEVENTS] = { "_PauseTimeline", "_GotoFrame=" };
+
+	DopeSheetEventType	m_eType;
+	QString				m_sData;
+
+	DopeSheetEvent(QString sSerializedEvent) :
+		m_eType(DOPEEVENT_Callback),
+		m_sData(sSerializedEvent)
+	{
+		for(int iDopeEventIndex = 0; iDopeEventIndex < NUM_DOPEEVENTS; ++iDopeEventIndex)
+		{
+			if(sSerializedEvent.startsWith(DOPEEVENT_STRINGS[iDopeEventIndex]))
+			{
+				m_eType = static_cast<DopeSheetEventType>(iDopeEventIndex);
+				// Parse data after '=' character
+				m_sData = sSerializedEvent.split('=').last();
+				break;
+			}
+		}
+	}
+};
+
 class HyGlobal
 {
 	static QString														sm_sItemNames[NUM_ITEMTYPES];

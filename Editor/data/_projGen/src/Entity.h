@@ -27,6 +27,8 @@ public:
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual uint32 GetNumStates() override;
 	
+	void SetFrame(uint32 uiFrameIndex);
+	
 	bool IsTimelinePaused();
 	void SetTimelinePause(bool bPause);
 	

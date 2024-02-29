@@ -125,23 +125,30 @@ QMenu *AuxDopeSheet::AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pCon
 		pNewMenu->addSeparator();
 
 		// Pause Timeline
-		QList<DopeSheetEventType> eventList = pScene->GetEventList(iContextFrameIndex);
+		QList<DopeSheetEvent> eventList = pScene->GetEventList(iContextFrameIndex);
 
-		if(eventList.contains(DOPEEVENT_PauseTimeline))
+		bool bHasPauseEvent = false;
+		for(DopeSheetEvent dopeEvent : eventList)
 		{
-			QAction *pUnpauseTimeline = new QAction(QIcon(":/icons16x16/media-play.png"),
-													"Unpause Timeline On Frame " % QString::number(iContextFrameIndex));
-			QJsonObject pauseDataObj;
-			pauseDataObj.insert("type", EVENTACTION_UnpauseTimeline);
-			pauseDataObj.insert("frame", iContextFrameIndex);
-			pUnpauseTimeline->setData(QVariant(pauseDataObj));
-			pUnpauseTimeline->setToolTip("Unpause the timeline at the currently selected frame");
-			pNewMenu->addAction(pUnpauseTimeline);
+			if(dopeEvent.m_eType == DOPEEVENT_PauseTimeline)
+			{
+				QAction *pUnpauseTimeline = new QAction(QIcon(":/icons16x16/media-play.png"),
+					"Unpause Timeline On Frame " % QString::number(iContextFrameIndex));
+				QJsonObject pauseDataObj;
+				pauseDataObj.insert("type", EVENTACTION_UnpauseTimeline);
+				pauseDataObj.insert("frame", iContextFrameIndex);
+				pUnpauseTimeline->setData(QVariant(pauseDataObj));
+				pUnpauseTimeline->setToolTip("Unpause the timeline at the currently selected frame");
+				pNewMenu->addAction(pUnpauseTimeline);
+
+				bHasPauseEvent = true;
+			}
 		}
-		else
+
+		if(bHasPauseEvent == false)
 		{
 			QAction *pPauseTimeline = new QAction(QIcon(":/icons16x16/media-pause.png"),
-												  "Pause Timeline On Frame " % QString::number(iContextFrameIndex));
+				"Pause Timeline On Frame " % QString::number(iContextFrameIndex));
 			QJsonObject pauseDataObj;
 			pauseDataObj.insert("type", EVENTACTION_PauseTimeline);
 			pauseDataObj.insert("frame", iContextFrameIndex);
@@ -224,7 +231,7 @@ void AuxDopeSheet::UpdateWidgets()
 		ui->actionCopyFrames->setEnabled(selectedFrameItemList.size() == 1);
 
 		const QMimeData *pMimeData = QApplication::clipboard()->mimeData();
-		ui->actionPasteFrames->setEnabled(pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)));
+		ui->actionPasteFrames->setEnabled(ui->graphicsView->GetContextClickItem() && pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)));
 
 		ui->actionDeleteFrames->setEnabled(selectedFrameItemList.size() > 0);
 	}
@@ -340,7 +347,7 @@ void AuxDopeSheet::OnEventActionTriggered(QAction *pEventAction)
 		{
 			if(eActionType == EVENTACTION_CallbackCreate)
 			{
-				EntityUndoCmd_CreateCallback *pNewCmd = new EntityUndoCmd_CreateCallback(GetEntityStateModel()->GetDopeSheetScene(), iFrameIndex, dlg.GetName());
+				EntityUndoCmd_AddEvent *pNewCmd = new EntityUndoCmd_AddEvent(GetEntityStateModel()->GetDopeSheetScene(), iFrameIndex, dlg.GetName());
 				GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
 			}
 			else // EVENTACTION_CallbackRename
@@ -354,7 +361,7 @@ void AuxDopeSheet::OnEventActionTriggered(QAction *pEventAction)
 	case EVENTACTION_CallbackDelete: {
 		int iFrameIndex = dataObj["frame"].toInt();
 		QString sCallbackName = dataObj["name"].toString();
-		EntityUndoCmd_RemoveCallback *pNewCmd = new EntityUndoCmd_RemoveCallback(GetEntityStateModel()->GetDopeSheetScene(), iFrameIndex, sCallbackName);
+		EntityUndoCmd_RemoveEvent *pNewCmd = new EntityUndoCmd_RemoveEvent(GetEntityStateModel()->GetDopeSheetScene(), iFrameIndex, sCallbackName);
 		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
 		break; }
 
@@ -367,12 +374,12 @@ void AuxDopeSheet::OnEventActionTriggered(QAction *pEventAction)
 		break;
 
 	case EVENTACTION_PauseTimeline: {
-		EntityUndoCmd_AddEvent *pNewCmd = new EntityUndoCmd_AddEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), DOPEEVENT_PauseTimeline);
+		EntityUndoCmd_AddEvent *pNewCmd = new EntityUndoCmd_AddEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), "_PauseTimeline");
 		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
 		break; }
 
 	case EVENTACTION_UnpauseTimeline: {
-		EntityUndoCmd_RemoveEvent *pNewCmd = new EntityUndoCmd_RemoveEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), DOPEEVENT_PauseTimeline);
+		EntityUndoCmd_RemoveEvent *pNewCmd = new EntityUndoCmd_RemoveEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), "_PauseTimeline");
 		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
 		break; }
 
@@ -430,6 +437,12 @@ void AuxDopeSheet::on_actionPasteFrames_triggered()
 
 		QJsonDocument jsonDocument = QJsonDocument::fromJson(pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)));
 		QJsonObject serializedKeyFrameObj = jsonDocument.object();
+
+		if(ui->graphicsView->GetContextClickItem() == nullptr)
+		{
+			HyGuiLog("AuxDopeSheet::on_actionPasteFrames_triggered() - ui->graphicsView->GetContextClickItem() == nullptr", LOGTYPE_Error);
+			return;
+		}
 
 		EntityUndoCmd_PasteKeyFrames *pCmd = new EntityUndoCmd_PasteKeyFrames(*ui->graphicsView->GetScene(),
 																			  ui->graphicsView->GetContextClickItem(),
