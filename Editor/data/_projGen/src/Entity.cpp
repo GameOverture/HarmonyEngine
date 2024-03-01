@@ -26,6 +26,7 @@ namespace %HY_NAMESPACE% {
 	
 	m_fElapsedFrameTime = 0.0f;
 	m_uiCurFrame = 0;
+	m_bTimelinePaused = false;
 	
 	m_fpUpdateFunc();
 	

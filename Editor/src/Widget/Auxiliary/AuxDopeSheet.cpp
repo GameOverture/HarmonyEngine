@@ -304,10 +304,7 @@ void AuxDopeSheet::OnEventActionTriggered(QAction *pEventAction)
 	}
 	QJsonObject dataObj = pEventAction->data().toJsonObject();
 	if(dataObj.isEmpty())
-	{
-		HyGuiLog("AuxDopeSheet::OnEventActionTriggered() - dataObj.isEmpty()", LOGTYPE_Error);
-		return;
-	}
+		return; // No data to process, it was handled with the action's trigger signal
 
 	ContextActionType eActionType = static_cast<ContextActionType>(dataObj["type"].toInt());
 	switch(eActionType)
