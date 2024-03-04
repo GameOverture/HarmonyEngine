@@ -29,7 +29,7 @@ protected:
 
 	int64									m_iMin;
 	int64									m_iMax;
-	uint32									m_uiStep;
+	int32									m_iStep;
 	std::vector<int64>						m_StepList;		// When used, only values present in this std::vector can be selected
 	float									m_fLength;		// Length of the slider bar in pixels (does not include the radius of the rounded ends)
 	float									m_fStrokeAmt;	// The stroke amount in pixels when rendering the bar
@@ -71,13 +71,13 @@ public:
 
 	int64 GetMin() const;
 	int64 GetMax() const;
-	void SetRange(int64 iMin, int64 iMax, uint32 uiStepAmt); // If iMax < iMin, iMin becomes the only legal value. An invalid 'uiStepAmt' will become 1
+	void SetRange(int64 iMin, int64 iMax, int32 iStepAmt); // If iMax < iMin, iMin becomes the only legal value. An invalid 'iStepAmt' will become 1
 	void SetRange(const std::vector<int64> &stepList); // An empty stepList is ignored
 
 	HyOrientation GetOrientation() const;
 	void SetOrientation(HyOrientation eOrien);
 
-	void SetBarColors(HyColor posColor = HyColor::Blue, HyColor negColor = HyColor::Gray, HyColor strokeColor = HyColor::Black);
+	void SetBarColors(HyColor posColor, HyColor negColor, HyColor strokeColor);
 
 	void SetValueChangedCallback(std::function<void(HySlider *, void *)> fpCallback, void *pParam = nullptr);
 

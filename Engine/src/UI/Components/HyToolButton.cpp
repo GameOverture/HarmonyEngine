@@ -11,33 +11,22 @@
 #include "UI/Components/HyToolButton.h"
 #include "HyEngine.h"
 
-HyToolButton::HyToolButton(HyToolButtonType eToolBtnType, uint32 uiDiameter, HyColor panelColor, HyColor frameColor, HyColor glyphColor, HyEntity2d *pParent /*= nullptr*/) :
-	HyButton(pParent),
-	m_uiDiameter(uiDiameter),
-	m_CircleStroke(this),
-	m_Circle(this),
+HyToolButton::HyToolButton(HyToolButtonType eToolBtnType, const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
+	HyButton(panelInit, pParent),
 	m_X1(this),
 	m_X2(this)
 {
-	m_PanelColor = panelColor;
-	m_FrameColor = frameColor;
-	m_GlyphColor = glyphColor;
-
-	m_CircleStroke.SetAsCircle((m_uiDiameter + 4) * 0.5f);
-	m_Circle.SetAsCircle(m_uiDiameter * 0.5f);
-
-	m_Circle.SetNumCircleSegments(20);
-	m_CircleStroke.SetNumCircleSegments(20);
-
-	float fGlyphRadius = static_cast<float>(m_uiDiameter / 4);
+	const float fGlyphRadius = m_Panel.GetWidth(0.25f);
 	switch(eToolBtnType)
 	{
 	case HYTOOLBTN_Close: {
 		m_X1.SetAsLineSegment(glm::vec2(-fGlyphRadius, -fGlyphRadius), glm::vec2(fGlyphRadius, fGlyphRadius));
-		m_X1.SetLineThickness(3);
+		m_X1.SetLineThickness(m_Panel.GetFrameStrokeSize());
+		m_X1.pos.Offset(fGlyphRadius * 2, fGlyphRadius * 2);
 
 		m_X2.SetAsLineSegment(glm::vec2(-fGlyphRadius, fGlyphRadius), glm::vec2(fGlyphRadius, -fGlyphRadius));
-		m_X2.SetLineThickness(3);
+		m_X2.SetLineThickness(m_Panel.GetFrameStrokeSize());
+		m_X2.pos.Offset(fGlyphRadius * 2, fGlyphRadius * 2);
 		break; }
 
 	case HYTOOLBTN_LeftArrow: {
@@ -88,34 +77,10 @@ HyToolButton::HyToolButton(HyToolButtonType eToolBtnType, uint32 uiDiameter, HyC
 		HyLogError("HyToolButton recieved an invalid HyToolButtonType in its ctor");
 	}
 
-	SetColor(m_PanelColor, m_FrameColor, m_GlyphColor);
+	m_X1.SetTint(m_Panel.GetTertiaryColor());
+	m_X2.SetTint(m_Panel.GetTertiaryColor());
 }
 
 /*virtual*/ HyToolButton::~HyToolButton()
 {
-}
-
-void HyToolButton::SetColor(HyColor panelColor, HyColor frameColor, HyColor glyphColor)
-{
-	m_CircleStroke.SetTint(frameColor);
-	m_Circle.SetTint(panelColor);
-
-	m_X1.SetTint(glyphColor);
-	m_X2.SetTint(glyphColor);
-}
-
-/*virtual*/ void HyToolButton::OnSetSizeHint() /*override*/
-{
-	HySetVec(m_vSizeHint, m_uiDiameter, m_uiDiameter);
-}
-
-/*virtual*/ glm::vec2 HyToolButton::GetPosOffset() /*override*/
-{
-	return glm::vec2(m_uiDiameter * 0.5f, m_uiDiameter * 0.5f);
-}
-
-/*virtual*/ glm::ivec2 HyToolButton::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
-{
-	OnSetSizeHint();
-	return m_vSizeHint;
 }

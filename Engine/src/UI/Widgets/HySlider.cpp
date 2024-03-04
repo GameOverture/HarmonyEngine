@@ -56,7 +56,7 @@ HySlider::HySlider(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_iMin(0),
 	m_iMax(100),
-	m_uiStep(5),
+	m_iStep(5),
 	m_fLength(200.0f),
 	m_fStrokeAmt(2.0f),
 	m_iValue(0),
@@ -72,7 +72,7 @@ HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nul
 	IHyWidget(pParent),
 	m_iMin(0),
 	m_iMax(100),
-	m_uiStep(5),
+	m_iStep(5),
 	m_fLength(200.0f),
 	m_fStrokeAmt(2.0f),
 	m_iValue(0),
@@ -104,7 +104,8 @@ HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nul
 void HySlider::Setup(const HyPanelInit &sliderInitRef)
 {
 	m_Panel.Setup(sliderInitRef);
-	SetBarColors();
+	SetBarColors(m_Panel.GetTertiaryColor(), m_Panel.GetFrameColor(), m_Panel.GetFrameColor());
+	ChildAppend(m_Panel); // Moves the panel to the front of the display order
 
 	SetAsEnabled(IsEnabled());
 	
@@ -116,7 +117,7 @@ int64 HySlider::GetNumTicks() const
 	if(m_uiAttribs & SLIDERATTRIB_UseStepList)
 		return static_cast<uint32>(m_StepList.size());
 
-	int64 iNumSteps = abs(m_iMax - m_iMin) / m_uiStep;
+	int64 iNumSteps = abs(m_iMax - m_iMin) / m_iStep;
 	if(iNumSteps == 0)
 		iNumSteps = 1;
 
@@ -150,8 +151,8 @@ int64 HySlider::GetMax() const
 	return m_iMax;
 }
 
-// If iMax < iMin, iMin becomes the only legal value. An invalid 'uiStepAmt' will become 1
-void HySlider::SetRange(int64 iMin, int64 iMax, uint32 uiStepAmt)
+// If iMax < iMin, iMin becomes the only legal value. An invalid 'iStepAmt' will become 1
+void HySlider::SetRange(int64 iMin, int64 iMax, int32 iStepAmt)
 {
 	if(iMax < iMin)
 		m_iMin = m_iMax = iMin;
@@ -162,7 +163,7 @@ void HySlider::SetRange(int64 iMin, int64 iMax, uint32 uiStepAmt)
 	}
 
 	m_uiAttribs &= ~SLIDERATTRIB_UseStepList;
-	m_uiStep = (uiStepAmt == 0 || uiStepAmt > static_cast<uint32>(m_iMax - m_iMin)) ? 1u : uiStepAmt;
+	m_iStep = (iStepAmt <= 0 || iStepAmt > static_cast<int32>(m_iMax - m_iMin)) ? 1 : iStepAmt;
 	
 	FixValues();
 }
@@ -203,7 +204,7 @@ void HySlider::SetOrientation(HyOrientation eOrien)
 	Assemble();
 }
 
-void HySlider::SetBarColors(HyColor posColor /*= HyColor::Blue*/, HyColor negColor /*= HyColor::Gray*/, HyColor strokeColor /*= HyColor::Black*/)
+void HySlider::SetBarColors(HyColor posColor, HyColor negColor, HyColor strokeColor)
 {
 	m_BarStroke.SetTint(strokeColor);
 
@@ -267,7 +268,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 				iNewValue = m_StepList[iCurIndex];
 			}
 			else
-				iNewValue = HyMath::Clamp(m_iValue + static_cast<int64>(iNumThresholds * m_uiStep), m_iMin, m_iMax);
+				iNewValue = HyMath::Clamp(m_iValue + (iNumThresholds * m_iStep), m_iMin, m_iMax);
 
 			SetValue(iNewValue);
 		}
