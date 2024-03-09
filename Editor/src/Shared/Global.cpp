@@ -838,6 +838,17 @@
 	return QColor(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
 }
 
+/*static*/ EntityItemDeclarationType HyGlobal::GetEntityDeclType(QString sType)
+{
+	for(int i = 0; i < NUM_ENTDECLTYPES; ++i)
+	{
+		if(sType == ENTITYITEMDECLARATIONTYPE_STRINGS[i])
+			return static_cast<EntityItemDeclarationType>(i);
+	}
+	
+	return ENTDECLTYPE_Static;// ENTDECLTYPE_Unknown;
+}
+
 QAction *FindAction(QList<QAction *> list, QString sName)
 {
 	for(int i = 0; i < list.size(); ++i)

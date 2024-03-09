@@ -2,7 +2,7 @@
 #define %HY_FILENAME%_h__
 
 #include "pch.h"
-
+%HY_INCLUDES%
 class %HY_CLASS%%HY_BASECLASSDECL%
 {
 public:

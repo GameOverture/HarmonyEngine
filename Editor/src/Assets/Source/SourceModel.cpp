@@ -191,13 +191,17 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 				break;
 
 			case TEMPLATE_ClassH:
+				if(sBaseClass == "HyEntity2d" || sBaseClass == "HyEntity3d")
+					sContents.replace("%HY_INCLUDES%", "");
+				else
+					sContents.replace("%HY_INCLUDES%", "#include \"" + sBaseClass + ".h\"\n");
 				sClassCtorSignature = "HyEntity2d *pParent = nullptr";
 				sClassFuncs = "virtual void OnUpdate() override;";
 				break;
 
 			case TEMPLATE_ClassCpp:
 				sClassCtorSignature = "HyEntity2d *pParent /*= nullptr*/";
-				sMemberInitializerList = " :\n\tHyEntity2d(pParent)";
+				sMemberInitializerList = " :\n\t" + sBaseClass + "(pParent)";
 				sClassFuncs = "/*virtual*/ void " + sClassName + "::OnUpdate() /*override*/\n{\n}";
 				break;
 
@@ -205,8 +209,10 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 				if(pEntityModel == nullptr)
 					HyGuiLog("SourceModel::GenerateSrcFile() is TEMPLATE_EntityH and was passed a nullptr 'pEntityModel'", LOGTYPE_Error);
 				sContents.replace("%HY_INCLUDES%", pEntityModel->GenerateSrc_FileIncludes());
+				sContents.replace("%HY_STATEENUMS%", pEntityModel->GenerateSrc_StateEnums());
 				sClassCtorSignature = "HyEntity2d *pParent = nullptr";
 				sContents.replace("%HY_MEMBERVARIABLES%", pEntityModel->GenerateSrc_MemberVariables());
+				sContents.replace("%HY_ACCESSORDECL%", pEntityModel->GenerateSrc_AccessorDecl());
 				break;
 
 			case TEMPLATE_EntityCpp:
@@ -217,6 +223,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 				sContents.replace("%HY_CTORIMPL%", pEntityModel->GenerateSrc_Ctor());
 				sContents.replace("%HY_NUMSTATES%", QString::number(pEntityModel->GetNumStates()));
 				sContents.replace("%HY_SETSTATEIMPL%", pEntityModel->GenerateSrc_SetStateImpl());
+				sContents.replace("%HY_ACCESSORDEFINITION%", pEntityModel->GenerateSrc_AccessorDefinition(sClassName));
 				break;
 			}
 		}
@@ -671,6 +678,12 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 		sDependAdd += "\" \"";
 		sDependAdd += srcDepObj["ProjectName"].toString();
 		sDependAdd += "\")\n";
+
+		sDependAdd += "set_target_properties(\"";
+		sDependAdd += srcDepObj["ProjectName"].toString();
+		sDependAdd += "\" PROPERTIES FOLDER \"";
+		sDependAdd += m_ProjectRef.GetName();
+		sDependAdd += " Libs\")\n";
 	}
 	sContents.replace("%HY_DEPENDENCIES_ADD%", sDependAdd);
 

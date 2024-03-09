@@ -31,7 +31,7 @@ PropertiesTreeMultiModel::PropertiesTreeMultiModel(ProjectItemData &ownerRef, in
 	//m_PropertyDefMap[pTreeItem].eAccessType = bToggleOn ? PROPERTIESACCESS_ToggleOn : PROPERTIESACCESS_ToggleOff;
 }
 
-/*virtual*/ void PropertiesTreeMultiModel::SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef) /*override*/
+/*virtual*/ void PropertiesTreeMultiModel::SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef, bool bIsProceduralObj) /*override*/
 {
 	//for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	//{

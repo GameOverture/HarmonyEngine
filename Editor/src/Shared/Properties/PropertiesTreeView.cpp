@@ -281,43 +281,51 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 {
 	const QVariant &propValue = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyValue(index);
 	const PropertiesDef &propDefRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyDefinition(index);
-	switch(propDefRef.eType)
-	{
-	case PROPERTIESTYPE_bool:
-		// Handled natively within tree model's CheckStateRole
-		break;
-	case PROPERTIESTYPE_int:
-	case PROPERTIESTYPE_int64:
-		static_cast<QSpinBox *>(pEditor)->setValue(propValue.toLongLong());
-		break;
-	case PROPERTIESTYPE_double:
-		static_cast<QDoubleSpinBox *>(pEditor)->setValue(propValue.toDouble());
-		break;
-	case PROPERTIESTYPE_ivec2:
-	case PROPERTIESTYPE_vec2:
-	case PROPERTIESTYPE_ivec3:
-	case PROPERTIESTYPE_vec3:
-	case PROPERTIESTYPE_ivec4:
-	case PROPERTIESTYPE_vec4:
-		static_cast<WidgetVectorSpinBox *>(pEditor)->SetValue(propValue);
-		break;
-	case PROPERTIESTYPE_LineEdit:
-		static_cast<QLineEdit *>(pEditor)->setText(propValue.toString());
-		break;
-	case PROPERTIESTYPE_ComboBoxString:
-		static_cast<QComboBox *>(pEditor)->setCurrentIndex(propDefRef.delegateBuilder.toStringList().indexOf(propValue.toString()));
-		break;
-	case PROPERTIESTYPE_ComboBoxInt:
-	case PROPERTIESTYPE_StatesComboBox:
-		static_cast<QComboBox *>(pEditor)->setCurrentIndex(propValue.toInt());
-		break;
-	case PROPERTIESTYPE_Slider:
-	case PROPERTIESTYPE_SpriteFrames:
-		static_cast<QSlider *>(pEditor)->setValue(propValue.toInt());
-		break;
 
-	default:
-		HyGuiLog("PropertiesDelegate::setEditorData() Unsupported Delegate type:" % QString::number(propDefRef.eType), LOGTYPE_Error);
+	if(propDefRef.m_bIsProceduralValue)
+	{
+		HyGuiLog("PropertiesDelegate::setEditorData not implemented for procedural value", LOGTYPE_Error);
+	}
+	else
+	{
+		switch(propDefRef.eType)
+		{
+		case PROPERTIESTYPE_bool:
+			// Handled natively within tree model's CheckStateRole
+			break;
+		case PROPERTIESTYPE_int:
+		case PROPERTIESTYPE_int64:
+			static_cast<QSpinBox *>(pEditor)->setValue(propValue.toLongLong());
+			break;
+		case PROPERTIESTYPE_double:
+			static_cast<QDoubleSpinBox *>(pEditor)->setValue(propValue.toDouble());
+			break;
+		case PROPERTIESTYPE_ivec2:
+		case PROPERTIESTYPE_vec2:
+		case PROPERTIESTYPE_ivec3:
+		case PROPERTIESTYPE_vec3:
+		case PROPERTIESTYPE_ivec4:
+		case PROPERTIESTYPE_vec4:
+			static_cast<WidgetVectorSpinBox *>(pEditor)->SetValue(propValue);
+			break;
+		case PROPERTIESTYPE_LineEdit:
+			static_cast<QLineEdit *>(pEditor)->setText(propValue.toString());
+			break;
+		case PROPERTIESTYPE_ComboBoxString:
+			static_cast<QComboBox *>(pEditor)->setCurrentIndex(propDefRef.delegateBuilder.toStringList().indexOf(propValue.toString()));
+			break;
+		case PROPERTIESTYPE_ComboBoxInt:
+		case PROPERTIESTYPE_StatesComboBox:
+			static_cast<QComboBox *>(pEditor)->setCurrentIndex(propValue.toInt());
+			break;
+		case PROPERTIESTYPE_Slider:
+		case PROPERTIESTYPE_SpriteFrames:
+			static_cast<QSlider *>(pEditor)->setValue(propValue.toInt());
+			break;
+
+		default:
+			HyGuiLog("PropertiesDelegate::setEditorData() Unsupported Delegate type:" % QString::number(propDefRef.eType), LOGTYPE_Error);
+		}
 	}
 }
 

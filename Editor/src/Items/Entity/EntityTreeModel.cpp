@@ -16,6 +16,7 @@
 #include "EntityUndoCmds.h"
 
 #include <QVariant>
+#include <QStack>
 
 EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
 	PropertiesTreeModel(ownerRef, iStateIndex, subState, pParent)
@@ -30,12 +31,12 @@ EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &ownerRef, 
 	return new EntityUndoCmd_PropertyModified(this, index, newData);
 }
 
-EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfReferencedItem, QUuid uuidOfThis) :
+EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, EntityItemDeclarationType eDeclarationType, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfReferencedItem, QUuid uuidOfThis) :
 	TreeModelItemData(eItemType, uuidOfThis, sCodeName),
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(eEntType),
 	m_pPropertiesModel(nullptr),
-	m_bIsForwardDeclared(bIsForwardDeclared),
+	m_eDeclarationType(eDeclarationType),
 	m_ReferencedItemUuid(uuidOfReferencedItem),
 	m_bIsSelected(false),
 	m_bReallocateDrawItem(false)
@@ -48,13 +49,13 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForw
 		InitalizePropertyModel();
 }
 
-EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QJsonObject descObj, bool bIsArrayItem) :
+EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject descObj, bool bIsArrayItem) :
 	TreeModelItemData(HyGlobal::GetTypeFromString(descObj["itemType"].toString()), descObj["UUID"].toString(), descObj["codeName"].toString()),
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(bIsArrayItem ? ENTTYPE_ArrayItem : ENTTYPE_Item),
 	m_pPropertiesModel(nullptr),
 	m_sPromotedEntityType(descObj["promotedEntityType"].toString()),
-	m_bIsForwardDeclared(bIsForwardDeclared),
+	m_eDeclarationType(HyGlobal::GetEntityDeclType(descObj["declarationType"].toString())),
 	m_ReferencedItemUuid(descObj["itemUUID"].toString()),
 	m_bIsSelected(descObj["isSelected"].toBool()),
 	m_bReallocateDrawItem(false)
@@ -134,9 +135,9 @@ bool EntityTreeItemData::IsPromotedEntity() const
 	return m_sPromotedEntityType.isEmpty() == false;
 }
 
-bool EntityTreeItemData::IsForwardDeclared() const
+EntityItemDeclarationType EntityTreeItemData::GetDeclarationType() const
 {
-	return m_bIsForwardDeclared;
+	return m_eDeclarationType;
 }
 
 EntityModel &EntityTreeItemData::GetEntityModel() const
@@ -190,6 +191,7 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 	childObjRef.insert("itemType", HyGlobal::ItemName(m_eTYPE, false));
 	childObjRef.insert("UUID", GetUuid().toString(QUuid::WithoutBraces));
 	childObjRef.insert("promotedEntityType", m_sPromotedEntityType);
+	childObjRef.insert("declarationType", ENTITYITEMDECLARATIONTYPE_STRINGS[m_eDeclarationType]);
 	childObjRef.insert("itemUUID", m_ReferencedItemUuid.toString(QUuid::WithoutBraces));
 	childObjRef.insert("isSelected", m_bIsSelected);
 }
@@ -352,7 +354,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		HyGuiLog("EntityTreeModel::EntityTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
-	EntityTreeItemData *pThisEntityItem = new EntityTreeItemData(m_ModelRef, false, sEntityCodeName, ITEM_Entity, ENTTYPE_Root, QUuid(fileMetaObj["UUID"].toString()), QUuid(fileMetaObj["UUID"].toString()));
+	EntityTreeItemData *pThisEntityItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sEntityCodeName, ITEM_Entity, ENTTYPE_Root, QUuid(fileMetaObj["UUID"].toString()), QUuid(fileMetaObj["UUID"].toString()));
 	QVariant v;
 	v.setValue<EntityTreeItemData *>(pThisEntityItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
@@ -367,7 +369,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		HyGuiLog("EntityTreeModel::EntityTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
-	EntityTreeItemData *pShapeFolderItem = new EntityTreeItemData(m_ModelRef, false, "Bounding Volumes", ITEM_Prefix, ENTTYPE_BvFolder, QUuid(), QUuid());
+	EntityTreeItemData *pShapeFolderItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "Bounding Volumes", ITEM_Prefix, ENTTYPE_BvFolder, QUuid(), QUuid());
 	QVariant shapeData;
 	shapeData.setValue<EntityTreeItemData *>(pShapeFolderItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
@@ -579,11 +581,74 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 		return false;
 	}
 
-	if(HyGlobal::IsItemType_Project(pItem->GetType()) == false && pItem->GetType() != ITEM_AtlasFrame && pItem->GetType() != ITEM_SoundClip)
+	if(HyGlobal::IsItemType_Project(pItem->GetType()) == false && HyGlobal::IsItemType_Asset(pItem->GetType()) == false)
 	{
 		if(bShowDialogsOnFail)
-			HyGuiLog(pItem->GetText() % " is not a valid child type: " % QString::number(pItem->GetType()), LOGTYPE_Error);
+			HyGuiLog(pItem->GetText() % " is not a valid child type: " % QString::number(pItem->GetType()), LOGTYPE_Warning);
 		return false;
+	}
+
+	// Make sure the Project of 'pItem' is the same as this project
+	if(m_ModelRef.GetItem().GetProject().FindItemData(pItem->GetUuid()) == nullptr)
+	{
+		if(bShowDialogsOnFail)
+			HyGuiLog(pItem->GetText() % " is not a apart of this project", LOGTYPE_Warning);
+		return false;
+	}
+
+	// Make sure pItem isn't or does not contain itself
+	if(pItem->GetType() == ITEM_Entity)
+	{
+		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pItem);
+
+		FileDataPair entFileDataPair;
+		pProjItem->GetLatestFileData(entFileDataPair);
+
+		const QUuid &thisUuid = m_ModelRef.GetItem().GetUuid();
+		if(thisUuid == QUuid(entFileDataPair.m_Meta["UUID"].toString()))
+		{
+			if(bShowDialogsOnFail)
+				HyGuiLog(pItem->GetText() % " cannot insert a child node of itself", LOGTYPE_Warning);
+			return false;
+		}
+
+		// Exhaustively look through all children (and children's children) to make sure this entity isn't a child of itself
+		QJsonArray descChildList = entFileDataPair.m_Meta["descChildList"].toArray();
+		QStack<QJsonObject> childObjStack;
+		for(int i = 0; i < descChildList.size(); ++i)
+		{
+			if(descChildList[i].isObject())
+				childObjStack.push_back(descChildList[i].toObject());
+			else // QJsonArray
+			{
+				QJsonArray childArray = descChildList[i].toArray();
+				for(int j = 0; j < childArray.size(); ++j)
+					childObjStack.push_back(childArray[j].toObject());
+			}
+
+			while(childObjStack.empty() == false)
+			{
+				QJsonObject childObj = childObjStack.pop();
+				QUuid childUuid(childObj["itemUUID"].toString());
+				if(thisUuid == childUuid)
+				{
+					if(bShowDialogsOnFail)
+						HyGuiLog(pItem->GetText() % " cannot insert an entity that cointains a child node of this", LOGTYPE_Warning);
+					return false;
+				}
+
+				if(childObj["itemType"].toString() == HyGlobal::ItemName(ITEM_Entity, false))
+				{
+					ProjectItemData *pEntTreeItem = static_cast<ProjectItemData *>(m_ModelRef.GetItem().GetProject().FindItemData(childUuid));
+					pEntTreeItem->GetLatestFileData(entFileDataPair);
+					QJsonArray nestedChildList = entFileDataPair.m_Meta["descChildList"].toArray();
+					for(int j = 0; j < nestedChildList.size(); ++j)
+					{
+						childObjStack.push_back(nestedChildList[j].toObject());
+					}
+				}
+			}
+		}
 	}
 
 	return true;
@@ -594,8 +659,65 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocChildTreeItem(ProjectItemData *pPr
 	// Generate a unique code name for this new item
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pProjItem->GetName(false));
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ShouldForwardDeclare(pProjItem), sCodeName, pProjItem->GetType(), ENTTYPE_Item, pProjItem->GetUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, pProjItem->GetType(), ENTTYPE_Item, pProjItem->GetUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
+
+	//// If pProjItem is a sub-entity, also create tree items for all of its children
+	//if(pProjItem->GetType() == ITEM_Entity)
+	//{
+	//	TreeModelItem *pCurParent = GetItem(FindIndex<EntityTreeItemData *>(pNewItem, 0));
+
+	//	FileDataPair entFileDataPair;
+	//	pProjItem->GetLatestFileData(entFileDataPair);
+	//	QJsonArray descChildList = entFileDataPair.m_Meta["descChildList"].toArray();
+	//	for(int i = 0; i < descChildList.size(); ++i)
+	//	{
+	//		if(descChildList[i].isObject())
+	//		{
+	//			QJsonObject childObj = descChildList[i].toObject();
+	//		}
+	//		else
+	//		{
+	//			QJsonArray childArray = descChildList[i].toArray();
+	//			for(int j = 0; j < childArray.size(); ++j)
+	//			{
+	//				QJsonObject childObj = childArray[j].toObject();
+	//			}
+	//		}
+
+	//		EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef,
+	//															  HyGlobal::GetEntityDeclType(childObj["declarationType"].toString()),
+	//															  childObj["codeName"].toString(),
+	//															  HyGlobal::GetTypeFromString(childObj["itemType"].toString()), ENTTYPE_Item, pProjItem->GetUuid(), QUuid::createUuid());
+	//		InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pCurParent, iRow);
+	//	}
+
+	//	QStack<ProjectItemData *> projItemStack;
+	//	for(ProjectItemData *pProjItem : projItemList)
+	//		projItemStack.push_back(pProjItem);
+
+	//	while(projItemStack.empty() == false)
+	//	{
+	//		ProjectItemData *pProjItem = projItemStack.pop();
+
+	//		if(pProjItem->GetType() == ITEM_Entity)
+	//		{
+	//			// Exhaustively add all sub-entity children (and children's children)
+	//			pProjItem->GetLatestFileData(entFileDataPair);
+
+	//			QJsonArray descChildList = entFileDataPair.m_Meta["descChildList"].toArray();
+	//			for(int i = 0; i < descChildList.size(); ++i)
+	//			{
+	//				QUuid nestedChildUuid(descChildList[i].toObject()["itemUUID"].toString());
+	//				projItemStack.push_back(static_cast<ProjectItemData *>(m_ItemRef.GetProject().FindItemData(nestedChildUuid)));
+	//			}
+	//		}
+	//	}
+	//}
+
+
+
+
 
 	return pNewItem;
 }
@@ -615,7 +737,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocAssetTreeItem(IAssetItemData *pAss
 		break;
 	}
 	QUuid assetUuid = pAssetItem->GetUuid();
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, eItemType, ENTTYPE_Item, assetUuid, QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, eItemType, ENTTYPE_Item, assetUuid, QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
 
 	return pNewItem;
@@ -638,7 +760,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descO
 	if(bIsArrayItem)
 		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, sCodeName, eGuiType, iRow);
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ShouldForwardDeclare(descObj), descObj, bIsArrayItem);
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, descObj, bIsArrayItem);
 	iRow = (iRow < 0 || (bIsArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 
@@ -656,7 +778,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocShapeTreeItem(EditorShape eShape, 
 	else
 		pParentTreeItem = GetBvFolderTreeItem();
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_BoundingVolume, ENTTYPE_Item, QUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_BoundingVolume, ENTTYPE_Item, QUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 
 	return pNewItem;
@@ -876,58 +998,6 @@ QString EntityTreeModel::GenerateCodeName(QString sDesiredName) const
 	return sDesiredName;
 }
 
-bool EntityTreeModel::ShouldForwardDeclare(ProjectItemData *pProjItem)
-{
-	if(m_ModelRef.GetUuid() == pProjItem->GetUuid())
-		return true;
-
-	if(pProjItem->GetType() != ITEM_Entity)
-		return false;
-	
-	FileDataPair projItemFileData;
-	pProjItem->GetSavedFileData(projItemFileData);
-
-	return false;
-	//std::function<bool(const QJsonObject &entItemObj, const QUuid &thisUuid)> fpCheckForSelf =
-	//	[](const QJsonObject &entItemObj, const QUuid &thisUuid) -> bool
-	//{
-	//	if(
-	//	return QUuid::fromString(entItemObj["itemUUID"].toString()) == thisUuid;
-
-	//};
-
-	//QJsonArray childListArray = projItemFileData.m_Meta["childList"].toArray();
-	//for(int i = 0; i < childListArray.size(); ++i)
-	//{
-	//	if(childListArray[i].isObject())
-	//	{
-
-	//	}
-	//	else if(childListArray[i].isArray())
-	//	{
-	//		QJsonArray arrayFolder = childListArray[i].toArray();
-	//		for(int j = 0; j < arrayFolder.size(); ++j)
-	//		{
-	//			arrayFolder[j].toObject()
-	//		}
-	//	}
-	//}
-	
-}
-
-bool EntityTreeModel::ShouldForwardDeclare(const QJsonObject &initObj)
-{
-	if(QUuid::fromString(initObj["itemUUID"].toString()) == m_ModelRef.GetUuid())
-		return true;
-
-	if(HyGlobal::GetTypeFromString(initObj["itemType"].toString()) == ITEM_Entity)
-	{
-
-	}
-
-	return false;
-}
-
 bool EntityTreeModel::FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, ItemType eItemType, int iRowToCreateAt)
 {
 	bool bFoundArrayFolder = false;
@@ -958,7 +1028,7 @@ bool EntityTreeModel::FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut
 			return nullptr;
 		}
 		// Allocate and store the new array folder item in the tree model
-		EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, false, sCodeName, eItemType, ENTTYPE_ArrayFolder, QUuid(), QUuid());
+		EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, eItemType, ENTTYPE_ArrayFolder, QUuid(), QUuid());
 		QVariant v;
 		v.setValue<EntityTreeItemData *>(pNewItem);
 		for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)

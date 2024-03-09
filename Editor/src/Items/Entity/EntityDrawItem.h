@@ -156,7 +156,7 @@ public:
 
 	void CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj);
 
-	void ExtrapolateChildProperties(float fElapsedTime, HyCamera2d *pCamera);
+	void ExtrapolateChildProperties(float fElapsedTime, const QJsonObject &additionalChildPropObj, HyCamera2d *pCamera);
 };
 
 void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, const QMap<int, QStringList> &eventMap, HyCamera2d *pCamera);

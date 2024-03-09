@@ -65,7 +65,7 @@ enum ItemType
 	ITEM_Shader,
 	ITEM_Prefab,
 	ITEM_Entity,
-	ITEM_Entity3d,
+	ITEM_Entity3d, // TODO: Determine whether to remove this
 	// Asset items
 	ITEM_Filter,
 	ITEM_AtlasFrame,
@@ -331,6 +331,18 @@ struct DopeSheetEvent
 	}
 };
 
+enum EntityItemDeclarationType
+{
+	ENTDECLTYPE_Unknown = -1,
+
+	ENTDECLTYPE_Static = 0,
+	ENTDECLTYPE_Dynamic,
+	ENTDECLTYPE_DynamicLeaked,
+
+	NUM_ENTDECLTYPES
+};
+const QString ENTITYITEMDECLARATIONTYPE_STRINGS[NUM_ENTDECLTYPES] = { "Static", "Dynamic", "DynamicLeaked" };
+
 class HyGlobal
 {
 	static QString														sm_sItemNames[NUM_ITEMTYPES];
@@ -435,6 +447,8 @@ public:
 	static void OpenFileInExplorer(QString sFilePath);
 
 	static QColor ConvertHyColor(HyColor color);
+
+	static EntityItemDeclarationType GetEntityDeclType(QString sType);
 };
 
 struct SortTreeWidgetsPredicate

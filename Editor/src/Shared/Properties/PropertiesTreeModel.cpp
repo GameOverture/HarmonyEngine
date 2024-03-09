@@ -219,7 +219,7 @@ QModelIndex PropertiesTreeModel::FindPropertyModelIndex(QString sCategoryName, Q
 	return QModelIndex();
 }
 
-/*virtual*/ void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)
+/*virtual*/ void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef, bool bIsProceduralObj)
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
@@ -234,6 +234,8 @@ QModelIndex PropertiesTreeModel::FindPropertyModelIndex(QString sCategoryName, Q
 				{
 					if(setData(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Value, pPropertyTreeItem), valueRef, Qt::UserRole) == false)
 						HyGuiLog("PropertiesTreeModel::SetPropertyValue() - setData failed", LOGTYPE_Error);
+
+					m_PropertyDefMap[pPropertyTreeItem].m_bIsProceduralValue = bIsProceduralObj;
 
 					if(m_PropertyDefMap[pPropertyTreeItem].eAccessType == PROPERTIESACCESS_ToggleOff)
 						SetToggle(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Name, pPropertyTreeItem), true);
@@ -482,83 +484,96 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 		for(const QString &sProperty : sPropertyList)
 		{
 			const PropertiesDef propDef = FindPropertyDefinition(sCategory, sProperty);
-			switch(propDef.eType)
+
+			QVariant propValue;
+			bool bIsProceduralObj = false;
+			if(categoryObj[sProperty].isObject())
 			{
-			case PROPERTIESTYPE_Unknown:
-				break;
-
-			case PROPERTIESTYPE_bool:
-				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toBool() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
-				break;
-
-			case PROPERTIESTYPE_ComboBoxString:
-				if(propDef.delegateBuilder.toStringList().contains(categoryObj[sProperty].toString()) == false)
-					HyGuiLog("PropertiesTreeModel::DeserializeJson could not resolve ComboBoxString: " % categoryObj[sProperty].toString(), LOGTYPE_Error);
-
-				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toString());
-				break;
-
-			case PROPERTIESTYPE_int:
-			case PROPERTIESTYPE_ComboBoxInt:
-			case PROPERTIESTYPE_StatesComboBox:
-			case PROPERTIESTYPE_Slider:
-			case PROPERTIESTYPE_SpriteFrames:
-				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toInt());
-				break;
-
-			case PROPERTIESTYPE_int64:
-				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toVariant().toLongLong());
-				break;
-					
-			case PROPERTIESTYPE_double:
-				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toDouble());
-				break;
-
-			case PROPERTIESTYPE_ivec2: {
-				QJsonArray ivec2Array = categoryObj[sProperty].toArray();
-				QPoint ptPoint(ivec2Array[0].toInt(), ivec2Array[1].toInt());
-				SetPropertyValue(sCategory, sProperty, ptPoint);
-				break; }
-					
-			case PROPERTIESTYPE_vec2: {
-				QJsonArray vec2Array = categoryObj[sProperty].toArray();
-				QPointF ptPoint(vec2Array[0].toDouble(), vec2Array[1].toDouble());
-				SetPropertyValue(sCategory, sProperty, ptPoint);
-				break; }
-
-			case PROPERTIESTYPE_ivec3:
-			case PROPERTIESTYPE_Color: {
-				QJsonArray ivec3Array = categoryObj[sProperty].toArray();
-				QRect rect(ivec3Array[0].toInt(), ivec3Array[1].toInt(), ivec3Array[2].toInt(), 0);
-				SetPropertyValue(sCategory, sProperty, rect);
-				break; }
-
-			case PROPERTIESTYPE_vec3: {
-				QJsonArray vec3Array = categoryObj[sProperty].toArray();
-				QRectF rect(vec3Array[0].toDouble(), vec3Array[1].toDouble(), vec3Array[2].toDouble(), 0.0);
-				SetPropertyValue(sCategory, sProperty, rect);
-				break; }
-
-			case PROPERTIESTYPE_ivec4: {
-				QJsonArray ivec4Array = categoryObj[sProperty].toArray();
-				QRect rect(ivec4Array[0].toInt(), ivec4Array[1].toInt(), ivec4Array[2].toInt(), ivec4Array[3].toInt());
-				SetPropertyValue(sCategory, sProperty, rect);
-				break; }
-
-			case PROPERTIESTYPE_vec4: {
-				QJsonArray vec4Array = categoryObj[sProperty].toArray();
-				QRectF rect(vec4Array[0].toDouble(), vec4Array[1].toDouble(), vec4Array[2].toDouble(), vec4Array[3].toDouble());
-				SetPropertyValue(sCategory, sProperty, rect);
-				break; }
-
-			case PROPERTIESTYPE_LineEdit:
-				SetPropertyValue(sCategory, sProperty, categoryObj[sProperty].toString());
-				break;
-
-			default:
-				HyGuiLog("Unhandled PropertiesTreeModel::DeserializeJson property", LOGTYPE_Error);
-				break;
+				propValue = categoryObj[sProperty].toObject();
+				bIsProceduralObj = true;
 			}
+			else
+			{
+				switch(propDef.eType)
+				{
+				case PROPERTIESTYPE_Unknown:
+					break;
+
+				case PROPERTIESTYPE_bool:
+					propValue = categoryObj[sProperty].toBool() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
+					break;
+
+				case PROPERTIESTYPE_ComboBoxString:
+					if(propDef.delegateBuilder.toStringList().contains(categoryObj[sProperty].toString()) == false)
+						HyGuiLog("PropertiesTreeModel::DeserializeJson could not resolve ComboBoxString: " % categoryObj[sProperty].toString(), LOGTYPE_Error);
+
+					propValue = categoryObj[sProperty].toString();
+					break;
+
+				case PROPERTIESTYPE_int:
+				case PROPERTIESTYPE_ComboBoxInt:
+				case PROPERTIESTYPE_StatesComboBox:
+				case PROPERTIESTYPE_Slider:
+				case PROPERTIESTYPE_SpriteFrames:
+					propValue = categoryObj[sProperty].toInt();
+					break;
+
+				case PROPERTIESTYPE_int64:
+					propValue = categoryObj[sProperty].toVariant().toLongLong();
+					break;
+
+				case PROPERTIESTYPE_double:
+					propValue = categoryObj[sProperty].toDouble();
+					break;
+
+				case PROPERTIESTYPE_ivec2: {
+					QJsonArray ivec2Array = categoryObj[sProperty].toArray();
+					QPoint ptPoint(ivec2Array[0].toInt(), ivec2Array[1].toInt());
+					propValue = ptPoint;
+					break; }
+
+				case PROPERTIESTYPE_vec2: {
+					QJsonArray vec2Array = categoryObj[sProperty].toArray();
+					QPointF ptPoint(vec2Array[0].toDouble(), vec2Array[1].toDouble());
+					propValue = ptPoint;
+					break; }
+
+				case PROPERTIESTYPE_ivec3:
+				case PROPERTIESTYPE_Color: {
+					QJsonArray ivec3Array = categoryObj[sProperty].toArray();
+					QRect rect(ivec3Array[0].toInt(), ivec3Array[1].toInt(), ivec3Array[2].toInt(), 0);
+					propValue = rect;
+					break; }
+
+				case PROPERTIESTYPE_vec3: {
+					QJsonArray vec3Array = categoryObj[sProperty].toArray();
+					QRectF rect(vec3Array[0].toDouble(), vec3Array[1].toDouble(), vec3Array[2].toDouble(), 0.0);
+					propValue = rect;
+					break; }
+
+				case PROPERTIESTYPE_ivec4: {
+					QJsonArray ivec4Array = categoryObj[sProperty].toArray();
+					QRect rect(ivec4Array[0].toInt(), ivec4Array[1].toInt(), ivec4Array[2].toInt(), ivec4Array[3].toInt());
+					propValue = rect;
+					break; }
+
+				case PROPERTIESTYPE_vec4: {
+					QJsonArray vec4Array = categoryObj[sProperty].toArray();
+					QRectF rect(vec4Array[0].toDouble(), vec4Array[1].toDouble(), vec4Array[2].toDouble(), vec4Array[3].toDouble());
+					propValue = rect;
+					break; }
+
+				case PROPERTIESTYPE_LineEdit:
+					propValue = categoryObj[sProperty].toString();
+					break;
+
+				default:
+					HyGuiLog("Unhandled PropertiesTreeModel::DeserializeJson property", LOGTYPE_Error);
+					break;
+				}
+			}
+
+			SetPropertyValue(sCategory, sProperty, propValue, bIsProceduralObj);
 		}
 	}
 }

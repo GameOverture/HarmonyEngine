@@ -48,7 +48,7 @@ class EntityTreeItemData : public TreeModelItemData
 	EntityPropertiesTreeModel *							m_pPropertiesModel;
 
 	QString												m_sPromotedEntityType;
-	bool												m_bIsForwardDeclared;
+	EntityItemDeclarationType							m_eDeclarationType;
 
 	QUuid												m_ReferencedItemUuid;
 
@@ -57,8 +57,8 @@ class EntityTreeItemData : public TreeModelItemData
 	bool												m_bReallocateDrawItem; // This is set when the draw item needs any of its default values set that doesn't have a corresponding key frame
 
 public:
-	EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfReferencedItem, QUuid uuidOfThis);
-	EntityTreeItemData(EntityModel &entityModelRef, bool bIsForwardDeclared, QJsonObject descObj, bool bIsArrayItem);
+	EntityTreeItemData(EntityModel &entityModelRef, EntityItemDeclarationType eDeclarationType, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfReferencedItem, QUuid uuidOfThis);
+	EntityTreeItemData(EntityModel &entityModelRef, QJsonObject descObj, bool bIsArrayItem);
 	virtual ~EntityTreeItemData();
 
 	EntityItemType GetEntType() const;
@@ -69,7 +69,7 @@ public:
 	const QUuid &GetReferencedItemUuid() const;
 
 	bool IsPromotedEntity() const;
-	bool IsForwardDeclared() const;
+	EntityItemDeclarationType GetDeclarationType() const;
 
 	EntityModel &GetEntityModel() const;
 	EntityPropertiesTreeModel &GetPropertiesModel() const;
@@ -139,9 +139,6 @@ public:
 	QString GenerateCodeName(QString sDesiredName) const;
 
 protected:
-	bool ShouldForwardDeclare(ProjectItemData *pProjItem);
-	bool ShouldForwardDeclare(const QJsonObject &initObj);
-
 	bool FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut, QString sCodeName, ItemType eItemType, int iRowToCreateAt); // 'pParentTreeItemOut' must point to either Root or BvFolder, it will be reassigned to the ArrayFolder that is either found (return true), or newly created (return false)
 };
 

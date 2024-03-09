@@ -291,7 +291,7 @@ HyRendererInterop *HarmonyWidget::GetHarmonyRenderer()
 			{
 				QJsonObject itemObj = itemArray[iIndex].toObject();
 
-				// Ensure this item is apart of this project
+				// Ensure this item is valid - Apart of this project, and doesn't include itself
 				if(itemObj["project"].toString().toLower() == m_pProject->GetAbsPath().toLower())
 				{
 					QString sItemPath = itemObj["name"].toString();

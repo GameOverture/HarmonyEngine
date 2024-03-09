@@ -352,7 +352,7 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 
 	pNewChild->Load();
 }
-void SubEntity::ExtrapolateChildProperties(float fElapsedTime, HyCamera2d *pCamera)
+void SubEntity::ExtrapolateChildProperties(float fElapsedTime, const QJsonObject &additionalChildPropObj, HyCamera2d *pCamera)
 {
 	if(m_bTimelinePaused)
 		return;
@@ -360,6 +360,8 @@ void SubEntity::ExtrapolateChildProperties(float fElapsedTime, HyCamera2d *pCame
 	const int iCURRENT_FRAME = static_cast<int>(fElapsedTime * m_iFramesPerSecond);
 	const float fFRAME_DURATION = 1.0f / m_iFramesPerSecond;
 	const QMap<IHyNode2d *, QMap<int, QJsonObject>>	&propMapRef = m_StateInfoList[GetState()].m_PropertiesMap;
+
+	// TODO: Merge 'additionalChildPropObj' into 'propMapRef' for iCURRENT_FRAME
 	
 	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
 		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, fFRAME_DURATION, iCURRENT_FRAME, propMapRef[childTypePair.first], m_StateInfoList[GetState()].m_EventMap, pCamera);
@@ -724,7 +726,10 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 		}
 
 		if(eItemType == ITEM_Entity)
-			static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(fFRAME_DURATION * iCURRENT_FRAME, pCamera);
+		{
+			QJsonObject additionalChildPropObj = propsObj["childProps"].toObject();
+			static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(fFRAME_DURATION * iCURRENT_FRAME, additionalChildPropObj, pCamera);
+		}
 	} // For Loop - keyFrameMapRef.keys()
 
 	// Extrapolate any remaining time to iCURRENT_FRAME

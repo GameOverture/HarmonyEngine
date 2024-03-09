@@ -13,6 +13,8 @@ namespace %HY_NAMESPACE% {
 class %HY_CLASS%%HY_BASECLASSDECL%
 {
 protected:
+%HY_STATEENUMS%
+
 	const float				m_fFRAME_DURATION;
 	std::function<void()>	m_fpUpdateFunc;
 	float					m_fElapsedFrameTime;
@@ -26,6 +28,7 @@ public:
 	
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual uint32 GetNumStates() override;
+%HY_ACCESSORDECL%
 	
 	void SetFrame(uint32 uiFrameIndex);
 	

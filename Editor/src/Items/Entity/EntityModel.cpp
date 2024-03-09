@@ -492,6 +492,23 @@ QString EntityModel::GenerateSrc_FileIncludes() const
 	return sSrc;
 }
 
+QString EntityModel::GenerateSrc_StateEnums() const
+{
+	QString sSrc;
+	sSrc += "\tenum " + m_ItemRef.GetName(false) + "State\n\t{\n\t";
+	for(int i = 0; i < m_StateList.size(); ++i)
+	{
+		sSrc += "\t\tSTATE_" + m_StateList[i]->GetName();
+		if(i == 0)
+			sSrc += " = 0";
+		if(i < m_StateList.size() - 1)
+			sSrc += ",\n";
+	}
+	sSrc += "\n\t};";
+
+	return sSrc;
+}
+
 QString EntityModel::GenerateSrc_MemberVariables() const
 {
 	QString sSrc;
@@ -530,6 +547,44 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 		}
 	}
 
+	return sSrc;
+}
+
+QString EntityModel::GenerateSrc_AccessorDecl() const
+{
+	QString sSrc;
+	QList<EntityTreeItemData *> itemList, shapeList;
+	m_TreeModel.GetTreeItemData(itemList, shapeList);
+	itemList.append(shapeList);
+	for(EntityTreeItemData *pItem : itemList)
+	{
+		QString sCodeName = pItem->GetCodeName();
+		if(sCodeName.startsWith("m_"))
+			sCodeName.remove(0, 2);
+
+		sSrc += "\n\t" + pItem->GetHyNodeTypeName(true) +
+			(pItem->GetDeclarationType() == ENTDECLTYPE_Static ? " &" : " *") +
+			"Get" + sCodeName + "();";
+	}
+
+	return sSrc;
+}
+
+QString EntityModel::GenerateSrc_AccessorDefinition(QString sClassName) const
+{
+	QString sSrc;
+	QList<EntityTreeItemData *> itemList, shapeList;
+	m_TreeModel.GetTreeItemData(itemList, shapeList);
+	itemList.append(shapeList);
+	for(EntityTreeItemData *pItem : itemList)
+	{
+		QString sCodeName = pItem->GetCodeName();
+		if(sCodeName.startsWith("m_"))
+			sCodeName.remove(0, 2);
+		sSrc += "\n" + pItem->GetHyNodeTypeName(true) +
+			(pItem->GetDeclarationType() == ENTDECLTYPE_Static ? " &" : " *") +
+			sClassName + "::Get" + sCodeName + "() { return " + pItem->GetCodeName() + "; }";
+	}
 	return sSrc;
 }
 
@@ -755,10 +810,10 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 		else
 			sCodeName = pItemData->GetCodeName();
 
-		if(pItemData->IsForwardDeclared())
-			sCodeName += "->";
-		else
+		if(pItemData->GetDeclarationType() == ENTDECLTYPE_Static)
 			sCodeName += ".";
+		else
+			sCodeName += "->";
 	}
 
 	for(QString sCategoryName : propObj.keys())

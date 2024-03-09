@@ -71,11 +71,14 @@ struct PropertiesDef
 	QString									sPrefix;
 	QString									sSuffix;
 
-	QVariant								delegateBuilder; // Some types need an additional QVariant to build their delegate widget (e.g. ComboBox uses defaultData as currently selected index, but also needs a string list to select from)
+	QVariant								delegateBuilder;		// Some types need an additional QVariant to build their delegate widget (e.g. ComboBox uses defaultData as currently selected index, but also needs a string list to select from)
+
+	bool									m_bIsProceduralValue;	// Defaults to false. When 'true', the value is stored as a QJsonObject instead of its normal type
 
 	PropertiesDef() : 
 		eType(PROPERTIESTYPE_Unknown),
-		eAccessType(PROPERTIESACCESS_Mutable)
+		eAccessType(PROPERTIESACCESS_Mutable),
+		m_bIsProceduralValue(false)
 	{ }
 	PropertiesDef(PropertiesType type, PropertiesAccessType accessType, QString toolTip, QVariant defaultData_, QVariant minRange_, QVariant maxRange_, QVariant stepAmt_, QString prefix, QString suffix, QVariant delegateBuilder_) :
 		eType(type),
@@ -87,7 +90,8 @@ struct PropertiesDef
 		stepAmt(stepAmt_),
 		sPrefix(prefix),
 		sSuffix(suffix),
-		delegateBuilder(delegateBuilder_)
+		delegateBuilder(delegateBuilder_),
+		m_bIsProceduralValue(false)
 	{ }
 
 	bool IsValid() const {
@@ -144,7 +148,7 @@ public:
 	QVariant FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
 	QJsonValue FindPropertyJsonValue(QString sCategoryName, QString sPropertyName) const;
 	QModelIndex FindPropertyModelIndex(QString sCategoryName, QString sPropertyName) const;
-	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
+	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef, bool bIsProceduralObj);
 
 	bool IsCategory(const QModelIndex &indexRef) const;
 	bool IsCategoryEnabled(QString sCategoryName) const;

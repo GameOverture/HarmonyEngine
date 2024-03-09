@@ -37,6 +37,7 @@ namespace %HY_NAMESPACE% {
 {
 	return %HY_NUMSTATES%;
 }
+%HY_ACCESSORDEFINITION%
 
 void %HY_CLASS%::SetFrame(uint32 uiFrameIndex)
 {
