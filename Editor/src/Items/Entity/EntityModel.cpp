@@ -494,17 +494,22 @@ QString EntityModel::GenerateSrc_FileIncludes() const
 
 QString EntityModel::GenerateSrc_StateEnums() const
 {
+	// Just print states as comments instead of declaring an enum
 	QString sSrc;
-	sSrc += "\tenum " + m_ItemRef.GetName(false) + "State\n\t{\n\t";
 	for(int i = 0; i < m_StateList.size(); ++i)
-	{
-		sSrc += "\t\tSTATE_" + m_StateList[i]->GetName();
-		if(i == 0)
-			sSrc += " = 0";
-		if(i < m_StateList.size() - 1)
-			sSrc += ",\n";
-	}
-	sSrc += "\n\t};";
+		sSrc += "// State " + QString::number(i) + ((i < 10) ? ":  " : ": ") + m_StateList[i]->GetName() + "\n";
+
+	//QString sSrc;
+	//sSrc += "\tenum " + m_ItemRef.GetName(false) + "State\n\t{\n\t";
+	//for(int i = 0; i < m_StateList.size(); ++i)
+	//{
+	//	sSrc += "\t\tSTATE_" + m_StateList[i]->GetName();
+	//	if(i == 0)
+	//		sSrc += " = 0";
+	//	if(i < m_StateList.size() - 1)
+	//		sSrc += ",\n";
+	//}
+	//sSrc += "\n\t};";
 
 	return sSrc;
 }
@@ -687,7 +692,7 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 
 	for(int i = 0; i < GetNumStates(); ++i)
 	{
-		sSrc += "\n\tcase " + QString::number(i) + ":\n\t\t";
+		sSrc += "\n\tcase " + QString::number(i) + ": // " + m_StateList[i]->GetName() + "\n\t\t";
 		sSrc += "m_fpUpdateFunc = [this]()\n\t\t{\n\t\t\t";
 
 		sSrc += "std::vector<glm::vec2> vertList;\n\t\t\t";

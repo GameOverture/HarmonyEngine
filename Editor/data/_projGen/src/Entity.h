@@ -10,11 +10,10 @@
 %HY_INCLUDES%
 namespace %HY_NAMESPACE% {
 
+%HY_STATEENUMS%
 class %HY_CLASS%%HY_BASECLASSDECL%
 {
 protected:
-%HY_STATEENUMS%
-
 	const float				m_fFRAME_DURATION;
 	std::function<void()>	m_fpUpdateFunc;
 	float					m_fElapsedFrameTime;
@@ -26,6 +25,7 @@ public:
 	%HY_CLASS%(%HY_CLASSCTORSIG%);
 	virtual ~%HY_CLASS%();
 	
+	using IHyLoadable::GetState;
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual uint32 GetNumStates() override;
 %HY_ACCESSORDECL%
