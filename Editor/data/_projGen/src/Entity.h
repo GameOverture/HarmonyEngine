@@ -14,10 +14,10 @@ namespace %HY_NAMESPACE% {
 class %HY_CLASS%%HY_BASECLASSDECL%
 {
 protected:
-	const float				m_fFRAME_DURATION;
-	std::function<void()>	m_fpUpdateFunc;
-	float					m_fElapsedFrameTime;
-	uint32					m_uiCurFrame;
+	const float				m_fTIMELINE_FRAME_DURATION;
+	std::function<void()>	m_fpTimelineUpdate;
+	float					m_fTimelineFrameTime;
+	uint32					m_uiTimelineFrame;
 	bool					m_bTimelinePaused;
 
 %HY_MEMBERVARIABLES%
@@ -32,7 +32,7 @@ public:
 	
 	void SetFrame(uint32 uiFrameIndex);
 	
-	bool IsTimelinePaused();
+	bool IsTimelinePaused() const;
 	void SetTimelinePause(bool bPause);
 	
 protected:

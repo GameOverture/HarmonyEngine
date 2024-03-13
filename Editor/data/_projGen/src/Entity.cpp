@@ -24,11 +24,11 @@ namespace %HY_NAMESPACE% {
 	
 	%HY_SETSTATEIMPL%
 	
-	m_fElapsedFrameTime = 0.0f;
-	m_uiCurFrame = 0;
+	m_fTimelineFrameTime = 0.0f;
+	m_uiTimelineFrame = 0;
 	m_bTimelinePaused = false;
 	
-	m_fpUpdateFunc();
+	m_fpTimelineUpdate();
 	
 	return true;
 }
@@ -41,10 +41,10 @@ namespace %HY_NAMESPACE% {
 
 void %HY_CLASS%::SetFrame(uint32 uiFrameIndex)
 {
-	m_uiCurFrame = uiFrameIndex;
+	m_uiTimelineFrame = uiFrameIndex;
 }
 
-bool %HY_CLASS%::IsTimelinePaused()
+bool %HY_CLASS%::IsTimelinePaused() const
 {
 	return m_bTimelinePaused;
 }
@@ -56,7 +56,7 @@ void %HY_CLASS%::SetTimelinePause(bool bPause)
 
 /*virtual*/ void %HY_CLASS%::Update() /*override*/
 {
-	m_fpUpdateFunc();
+	m_fpTimelineUpdate();
 	HyEntity2d::Update();
 }
 

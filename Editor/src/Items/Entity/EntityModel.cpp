@@ -597,10 +597,10 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 {
 	QString sSrc = " :\n\tHyEntity2d(pParent)";
 
-	sSrc += ",\n\tm_fFRAME_DURATION(" + QString::number(1.0 / GetFramesPerSecond(), 'f') + "f)";
-	sSrc += ",\n\tm_fpUpdateFunc(nullptr)";
-	sSrc += ",\n\tm_fElapsedFrameTime(0.0f)";
-	sSrc += ",\n\tm_uiCurFrame(0)";
+	sSrc += ",\n\tm_fTIMELINE_FRAME_DURATION(" + QString::number(1.0 / GetFramesPerSecond(), 'f') + "f)";
+	sSrc += ",\n\tm_fpTimelineUpdate(nullptr)";
+	sSrc += ",\n\tm_fTimelineFrameTime(0.0f)";
+	sSrc += ",\n\tm_uiTimelineFrame(0)";
 	sSrc += ",\n\tm_bTimelinePaused(false)";
 
 	QList<EntityTreeItemData *> itemList, shapeList;
@@ -693,16 +693,16 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 	for(int i = 0; i < GetNumStates(); ++i)
 	{
 		sSrc += "\n\tcase " + QString::number(i) + ": // " + m_StateList[i]->GetName() + "\n\t\t";
-		sSrc += "m_fpUpdateFunc = [this]()\n\t\t{\n\t\t\t";
+		sSrc += "m_fpTimelineUpdate = [this]()\n\t\t{\n\t\t\t";
 
 		sSrc += "std::vector<glm::vec2> vertList;\n\t\t\t";
 
 		sSrc += "if(m_bTimelinePaused == false)\n\t\t\t";
-		sSrc += "\tm_fElapsedFrameTime += HyEngine::DeltaTime();\n\t\t\t";
-		sSrc += "while(m_fElapsedFrameTime >= 0.0f)\n\t\t\t";
+		sSrc += "\tm_fTimelineFrameTime += HyEngine::DeltaTime();\n\t\t\t";
+		sSrc += "while(m_fTimelineFrameTime >= 0.0f)\n\t\t\t";
 		sSrc += "{\n\t\t\t\t";
 
-		sSrc += "switch(m_uiCurFrame)\n\t\t\t\t{\n\t\t\t\t";
+		sSrc += "switch(m_uiTimelineFrame)\n\t\t\t\t{\n\t\t\t\t";
 		sSrc += "default:\n\t\t\t\t\tbreak;\n\n\t\t\t\t";
 
 		const EntityDopeSheetScene &entDopeSheetSceneRef = static_cast<const EntityStateData *>(GetStateData(i))->GetDopeSheetScene();
@@ -789,13 +789,13 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 			bIsFinalFrameHandled = true;
 		}
 
-		sSrc += "}\n\t\t\t\t"; // End switch(m_uiCurFrame)
+		sSrc += "}\n\t\t\t\t"; // End switch(m_uiTimelineFrame)
 
-		sSrc += "m_uiCurFrame++;\n\t\t\t\t";
-		sSrc += "m_fElapsedFrameTime -= m_fFRAME_DURATION;\n\t\t\t";
-		sSrc += "}\n\t\t"; // End while(m_fElapsedFrameTime >= 0.0f)
+		sSrc += "m_uiTimelineFrame++;\n\t\t\t\t";
+		sSrc += "m_fTimelineFrameTime -= m_fTIMELINE_FRAME_DURATION;\n\t\t\t";
+		sSrc += "}\n\t\t"; // End while(m_fTimelineFrameTime >= 0.0f)
 
-		sSrc += "};\n\t\t"; // End m_fpUpdateFunc
+		sSrc += "};\n\t\t"; // End m_fpTimelineUpdate
 		sSrc += "break;\n"; // End case m_uiState
 	}
 	sSrc += "\t}"; // End switch(m_uiState)
