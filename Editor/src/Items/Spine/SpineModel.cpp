@@ -371,6 +371,15 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 #endif
 }
 
+/*virtual*/ void SpineModel::OnItemDeleted() /*override*/
+{
+	QList<IAssetItemData *> deleteList;
+	for(SpineSubAtlas &subAtlas : m_SubAtlasList)
+		deleteList.push_back(subAtlas.m_pAtlasFrame);
+
+	m_ItemRef.GetProject().GetAtlasModel().RemoveItems(deleteList, QList<TreeModelItemData *>(), false);
+}
+
 bool SpineModel::IsUsingTempFiles() const
 {
 	return m_bUsingTempFiles;

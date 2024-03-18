@@ -741,7 +741,7 @@ void ManagerWidget::on_actionDeleteAssets_triggered()
 	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
 	GetSelected(selectedAssetsList, selectedFiltersList, false); // False sorts by depth, so we delete from bottom up
 
-	m_pModel->RemoveItems(selectedAssetsList, selectedFiltersList);
+	m_pModel->RemoveItems(selectedAssetsList, selectedFiltersList, true);
 }
 
 void ManagerWidget::on_actionReplaceAssets_triggered()

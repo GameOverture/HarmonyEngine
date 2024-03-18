@@ -226,3 +226,10 @@ void TextModel::SetRuntimeAtlasDirty()
 	QJsonArray layersArray = static_cast<TextStateData *>(m_StateList[uiIndex])->GetLayersModel().GetLayersArray();
 	stateFileDataOut.m_Data.insert("layers", layersArray);
 }
+
+/*virtual*/ void TextModel::OnItemDeleted() /*override*/
+{
+	QList<IAssetItemData *> deleteList;
+	deleteList.push_back(m_pAtlasFrame);
+	m_ItemRef.GetProject().GetAtlasModel().RemoveItems(deleteList, QList<TreeModelItemData *>(), false);
+}

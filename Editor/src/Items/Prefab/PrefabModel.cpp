@@ -336,6 +336,11 @@ PropertiesTreeModel &PrefabModel::GetPropertiesModel()
 {
 }
 
+/*virtual*/ void PrefabModel::OnItemDeleted() /*override*/
+{
+	// TODO: Delete sub-atlases
+}
+
 //void PrefabModel::AppendGltfValueProperty(QString sCategoryName, QString sPropertyName, const tinygltf::Value &valueRef, QString sToolTip)
 //{
 //	switch(valueRef.Type())

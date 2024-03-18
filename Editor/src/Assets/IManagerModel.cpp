@@ -210,7 +210,7 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, Q
 	return true;
 }
 
-void IManagerModel::RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeModelItemData *> filtersList)
+void IManagerModel::RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeModelItemData *> filtersList, bool bAskToConfirm)
 {
 	// First loop through and check to see if any links are present, and abort if dependencies are found
 	for(int i = 0; i < assetsList.count(); ++i)
@@ -247,7 +247,7 @@ void IManagerModel::RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeMo
 	}
 
 	// No dependencies found, resume with deleting
-	if(assetsList.size() > 0)
+	if(bAskToConfirm && assetsList.size() > 0)
 	{
 		QString sItemDesc;
 		if(assetsList.size() > 1)

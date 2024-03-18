@@ -66,6 +66,7 @@ public:
 	virtual bool OnPrepSave() override;
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
+	virtual void OnItemDeleted() override;
 };
 
 #endif // TEXTMODEL_H

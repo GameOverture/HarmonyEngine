@@ -341,6 +341,9 @@ void ProjectItemData::FocusWidgetState(int iStateIndex, QVariant subState)
 {
 	m_pUndoStack->setClean();
 	ExplorerItemData::DeleteFromProject();
+
+	if(m_pModel)
+		m_pModel->OnItemDeleted();
 }
 
 void ProjectItemData::on_undoStack_cleanChanged(bool bClean)

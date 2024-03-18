@@ -77,6 +77,22 @@ bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 	return ImportNewAssets(sImportList, 0, correspondingParentList, correspondingUuidList);
 }
 
+void SourceModel::DeleteEntitySrcFiles(EntityModel &entityModelRef)
+{
+	QList<IAssetItemData *> &assetListRef = m_BanksModel.GetBank(0)->m_AssetList;
+
+	QList<IAssetItemData *> deleteList;
+	QString sFileName = "hy_" + entityModelRef.GetItem().GetName(false);
+	for(IAssetItemData *pSrcAsset : assetListRef)
+	{
+		QFileInfo srcFileInfo(pSrcAsset->GetAbsMetaFilePath());
+		if(sFileName.startsWith(srcFileInfo.baseName()))
+			deleteList.push_back(pSrcAsset);
+	}
+
+	RemoveItems(deleteList, QList<TreeModelItemData *>(), false);
+}
+
 QStringList SourceModel::GetEditorEntityList() const
 {
 	QStringList sEntityList;

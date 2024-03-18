@@ -31,6 +31,7 @@ public:
 	virtual ~SourceModel();
 
 	bool GenerateEntitySrcFiles(EntityModel &entityModelRef);
+	void DeleteEntitySrcFiles(EntityModel &entityModelRef);
 	QStringList GetEditorEntityList() const;
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;

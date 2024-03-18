@@ -1185,3 +1185,9 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 	QJsonArray eventArray = pStateData->GetDopeSheetScene().SerializeEvents();
 	stateFileDataOut.m_Meta.insert("events", eventArray);
 }
+
+/*virtual*/ void EntityModel::OnItemDeleted() /*override*/
+{
+	SourceModel &sourceModelRef = m_ItemRef.GetProject().GetSourceModel();
+	sourceModelRef.DeleteEntitySrcFiles(*this);
+}

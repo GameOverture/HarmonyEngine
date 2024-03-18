@@ -67,7 +67,7 @@ public:
 
 	void GenerateAssetsDlg(const QModelIndex &indexDestination);
 	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
-	void RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeModelItemData *> filtersList);
+	void RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeModelItemData *> filtersList, bool bAskToConfirm);
 	bool GetAffectedItems(QList<IAssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const; // Returns false if any affected items are not saved and should not proceed with asset repack
 	void ReplaceAssets(QList<IAssetItemData *> assetsList, bool bWithNewAssets);
 	void Rename(TreeModelItemData *pItem, QString sNewName);

@@ -40,6 +40,7 @@ public:
 	virtual bool OnPrepSave() override { return true; }
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
+	virtual void OnItemDeleted() override;
 
 private:
 	//void AppendGltfValueProperty(QString sCategoryName, QString sPropertyName, const tinygltf::Value &valueRef, QString sToolTip);

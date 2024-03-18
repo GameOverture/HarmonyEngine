@@ -194,3 +194,8 @@ PropertiesTreeModel &AudioModel::GetPropertiesModel(uint uiStateIndex)
 	else
 		stateFileDataOut.m_Data.insert("maxDist", 0);
 }
+
+/*virtual*/ void AudioModel::OnItemDeleted() /*override*/
+{
+	// No item-specific resources to delete
+}

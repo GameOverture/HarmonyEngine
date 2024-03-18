@@ -459,3 +459,8 @@ void SpriteModel::Cmd_RemoveFrames(int iStateIndex, QList<AtlasFrame *> frameLis
 	stateFileDataOut.m_Data.insert("frames", framesArray);
 	stateFileDataOut.m_Data.insert("duration", fTotalDuration);
 }
+
+/*virtual*/ void SpriteModel::OnItemDeleted() /*override*/
+{
+	// No item-specific resources to delete
+}

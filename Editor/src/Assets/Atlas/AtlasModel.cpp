@@ -126,6 +126,8 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QIm
 	// This will also create a meta image and register asset
 	AtlasFrame *pFrame = ImportImage(sName, newImage, m_BanksModel.GetBank(uiBankIndex)->GetId(), bIsSubAtlas, QUuid::createUuid());
 
+	InsertTreeItem(pItem->GetProject(), pFrame, nullptr);
+
 	// This retrieves the newly created AtlasFrame and links it to its ProjectItemData
 	QList<TreeModelItemData *> returnList = pItem->GetProject().IncrementDependencies(pItem, QList<QUuid>() << pFrame->GetUuid());
 	if(returnList.empty() == false)
