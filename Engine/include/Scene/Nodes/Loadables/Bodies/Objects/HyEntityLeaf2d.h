@@ -71,6 +71,11 @@ public:
 		return m_Leaf.IsDataValid();
 	}
 
+	void InitLeaf(const HyNodePath &nodePath)
+	{
+		m_Leaf.Init(nodePath, this);
+	}
+
 	void InitLeaf(const char *szLeafPrefix, const char *szLeafName)
 	{
 		m_Leaf.Init(szLeafPrefix, szLeafName, this);

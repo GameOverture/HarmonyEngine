@@ -81,6 +81,7 @@ public:
 	void SetReallocateDrawItem(bool bReallocateDrawItem);
 
 	int GetArrayIndex() const; // Returns -1 when not an array item
+	int GetNumArrayItems() const; // Returns the number of array items that this item is apart of. -1 when not an array item
 
 	void InsertJsonInfo_Desc(QJsonObject &childObjRef);
 

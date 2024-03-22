@@ -561,15 +561,31 @@ QString EntityModel::GenerateSrc_AccessorDecl() const
 	QList<EntityTreeItemData *> itemList, shapeList;
 	m_TreeModel.GetTreeItemData(itemList, shapeList);
 	itemList.append(shapeList);
+
+	QStringList arrayList;
 	for(EntityTreeItemData *pItem : itemList)
 	{
 		QString sCodeName = pItem->GetCodeName();
 		if(sCodeName.startsWith("m_"))
 			sCodeName.remove(0, 2);
 
-		sSrc += "\n\t" + pItem->GetHyNodeTypeName(true) +
-			(pItem->GetDeclarationType() == ENTDECLTYPE_Static ? " &" : " *") +
-			"Get" + sCodeName + "();";
+		if(pItem->GetEntType() == ENTTYPE_ArrayItem)
+		{
+			if(arrayList.contains(sCodeName) == false)
+			{
+				sSrc += "\n\t" + pItem->GetHyNodeTypeName(true) +
+					(pItem->GetDeclarationType() == ENTDECLTYPE_Static ? " &" : " *") +
+					"Get" + sCodeName + "(int iIndex);";
+				
+				arrayList.push_back(sCodeName);
+			}
+		}
+		else
+		{
+			sSrc += "\n\t" + pItem->GetHyNodeTypeName(true) +
+				(pItem->GetDeclarationType() == ENTDECLTYPE_Static ? " &" : " *") +
+				"Get" + sCodeName + "();";
+		}
 	}
 
 	return sSrc;
@@ -581,14 +597,34 @@ QString EntityModel::GenerateSrc_AccessorDefinition(QString sClassName) const
 	QList<EntityTreeItemData *> itemList, shapeList;
 	m_TreeModel.GetTreeItemData(itemList, shapeList);
 	itemList.append(shapeList);
+
+	QStringList arrayList;
 	for(EntityTreeItemData *pItem : itemList)
 	{
 		QString sCodeName = pItem->GetCodeName();
 		if(sCodeName.startsWith("m_"))
 			sCodeName.remove(0, 2);
-		sSrc += "\n" + pItem->GetHyNodeTypeName(true) +
-			(pItem->GetDeclarationType() == ENTDECLTYPE_Static ? " &" : " *") +
-			sClassName + "::Get" + sCodeName + "() { return " + pItem->GetCodeName() + "; }";
+
+		if(pItem->GetEntType() == ENTTYPE_ArrayItem)
+		{
+			if(arrayList.contains(sCodeName) == false)
+			{
+				sSrc += "\n" + pItem->GetHyNodeTypeName(true) +
+					(pItem->GetDeclarationType() == ENTDECLTYPE_Static ? " &" : " *") +
+					sClassName + "::Get" + sCodeName + "(int iIndex)\n{";
+				sSrc += "\n\tHyAssert(iIndex >= 0 && iIndex < " + QString::number(pItem->GetNumArrayItems()) + ", \"" + sClassName + "::Get" + sCodeName + " tried to access an array element '\" << iIndex << \"' which is out of bounds.\");";
+				sSrc += "\n\treturn " + pItem->GetCodeName() + "[iIndex];";
+				sSrc += "\n}";
+
+				arrayList.push_back(sCodeName);
+			}
+		}
+		else
+		{
+			sSrc += "\n" + pItem->GetHyNodeTypeName(true) +
+				(pItem->GetDeclarationType() == ENTDECLTYPE_Static ? " &" : " *") +
+				sClassName + "::Get" + sCodeName + "() { return " + pItem->GetCodeName() + "; }";
+		}
 	}
 	return sSrc;
 }
@@ -863,7 +899,7 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 			if(bodyObj.contains("Color Tint"))
 			{
 				QJsonArray colorArray = bodyObj["Color Tint"].toArray();
-				sSrc += sCodeName + "SetTint(HyColor(" + QString::number(colorArray[0].toInt()) + ", " + QString::number(colorArray[1].toInt()) + ", " + QString::number(colorArray[2].toInt()) + ", " + QString::number(colorArray[3].toInt()) + "));" + sNewLine;
+				sSrc += sCodeName + "SetTint(HyColor(" + QString::number(colorArray[0].toInt()) + ", " + QString::number(colorArray[1].toInt()) + ", " + QString::number(colorArray[2].toInt()) + ", 255));" + sNewLine;
 			}
 			if(bodyObj.contains("Alpha"))
 				sSrc += sCodeName + "alpha.Set(" + QString::number(bodyObj["Alpha"].toDouble(), 'f') + "f);" + sNewLine;

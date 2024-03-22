@@ -210,7 +210,11 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 				if(sBaseClass == "HyEntity2d" || sBaseClass == "HyEntity3d")
 					sContents.replace("%HY_INCLUDES%", "");
 				else
-					sContents.replace("%HY_INCLUDES%", "#include \"" + sBaseClass + ".h\"\n");
+				{
+					QString sFileName = sBaseClass;
+					sFileName.replace("hy::", "hy_");
+					sContents.replace("%HY_INCLUDES%", "#include \"" + sFileName + ".h\"\n");
+				}
 				sClassCtorSignature = "HyEntity2d *pParent = nullptr";
 				sClassFuncs = "virtual void OnUpdate() override;";
 				break;

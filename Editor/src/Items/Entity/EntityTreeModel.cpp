@@ -184,6 +184,21 @@ int EntityTreeItemData::GetArrayIndex() const
 	return -1;
 }
 
+int EntityTreeItemData::GetNumArrayItems() const
+{
+	if(m_eEntType == ENTTYPE_ArrayItem)
+	{
+		QModelIndex thisIndex = m_EntityModelRef.GetTreeModel().FindIndex<EntityTreeItemData *>(const_cast<EntityTreeItemData *>(this), 0);
+		QModelIndex arrayFolderIndex = m_EntityModelRef.GetTreeModel().parent(thisIndex);
+		if(thisIndex.isValid() && arrayFolderIndex.isValid())
+			return m_EntityModelRef.GetTreeModel().rowCount(arrayFolderIndex);
+		else
+			HyGuiLog("EntityTreeItemData::GetNumArrayItems() - Failed to find parent index of this array item", LOGTYPE_Error);
+	}
+
+	return -1;
+}
+
 void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 {
 	// Common stuff
