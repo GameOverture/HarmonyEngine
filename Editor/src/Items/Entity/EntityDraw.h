@@ -22,6 +22,8 @@
 
 class EntityDraw : public IDraw
 {
+	HyEntity2d 								m_RootEntity;
+
 	QList<EntityDrawItem *>					m_ItemList;
 	QList<EntityDrawItem *>					m_SelectedItemList;
 

@@ -12,6 +12,7 @@
 
 #include "IDraw.h"
 
+class EntityDraw;
 class EntityTreeItemData;
 class EntityDopeSheetScene;
 
@@ -112,7 +113,7 @@ class EntityDrawItem
 	ShapeCtrl								m_ShapeCtrl;
 
 public:
-	EntityDrawItem(Project &projectRef, EntityTreeItemData *pModelItemData, HyEntity2d *pParent);
+	EntityDrawItem(Project &projectRef, EntityTreeItemData *pModelItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent);
 	virtual ~EntityDrawItem();
 
 	EntityTreeItemData *GetEntityTreeItemData() const;

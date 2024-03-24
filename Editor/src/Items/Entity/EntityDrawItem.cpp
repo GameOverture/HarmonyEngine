@@ -10,13 +10,14 @@
 #include "Global.h"
 #include "EntityDrawItem.h"
 #include "EntityModel.h"
-#include "MainWindow.h"
+#include "EntityDraw.h"
 #include "EntityDopeSheetScene.h"
+#include "MainWindow.h"
 
-EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, HyEntity2d *pParent) :
+EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
 	m_pEntityTreeItemData(pEntityTreeItemData),
 	m_pChild(nullptr),
-	m_Transform(nullptr),
+	m_Transform(pEntityDraw),
 	m_ShapeCtrl(pParent)
 {
 	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();

@@ -18,6 +18,7 @@
 
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),
+	m_RootEntity(this),
 	m_DragShape(this),
 	m_MultiTransform(this),
 	m_fMultiTransformStartRot(0.0f),
@@ -300,12 +301,12 @@ void EntityDraw::SetExtrapolatedProperties()
 
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(m_pProjItem->GetWidget()->GetCurStateIndex()))->GetDopeSheetScene();
 
-	// Set the extrapolated properties for the root item (aka this entity)
 	const float fFRAME_DURATION = 1.0f / static_cast<EntityModel &>(entityDopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond();
 	const int iCURRENT_FRAME = entityDopeSheetSceneRef.GetCurrentFrame();
 
+	// Set the extrapolated properties for the 'm_RootEntity' item
 	EntityTreeItemData *pRootTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().GetRootTreeItemData();
-	ExtrapolateProperties(this,
+	ExtrapolateProperties(&m_RootEntity,
 						  nullptr,
 						  false,
 						  ITEM_Unknown, // 'ITEM_Unknown' indicates this is the root
@@ -406,7 +407,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		if(pDrawItem == nullptr)
 		{
 			EntityTreeItemData *pEntityTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(uuid);
-			pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), pEntityTreeItemData, this);
+			pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), pEntityTreeItemData, this, &m_RootEntity);
 		}
 		else
 		{
@@ -416,13 +417,13 @@ void EntityDraw::SetExtrapolatedProperties()
 			{
 				EntityTreeItemData *pEntityTreeItemData = pDrawItem->GetEntityTreeItemData();
 				delete pDrawItem;
-				pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), pEntityTreeItemData, this);
+				pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), pEntityTreeItemData, this, &m_RootEntity);
 				pEntityTreeItemData->SetReallocateDrawItem(false);
 			}
 		}
 
 		m_ItemList.push_back(pDrawItem);
-		ChildAppend(*pDrawItem->GetHyNode());
+		m_RootEntity.ChildAppend(*pDrawItem->GetHyNode());
 
 		if(bSelected)
 			m_SelectedItemList.push_back(pDrawItem);
@@ -1160,7 +1161,7 @@ void EntityDraw::DoMouseRelease_Transform()
 		iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
 	}
 
-	// Transferring the children in 'm_ActiveTransform' back into *this will be done automatically in OnApplyJsonMeta()
+	// Transferring the children in 'm_ActiveTransform' back into 'm_RootEntity' will be done automatically in OnApplyJsonMeta()
 	QUndoCommand *pCmd = new EntityUndoCmd_Transform(*m_pProjItem, iStateIndex, iFrameIndex, treeItemDataList, newTransformList, m_PrevTransformList);
 	m_pProjItem->GetUndoStack()->push(pCmd);
 
