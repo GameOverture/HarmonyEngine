@@ -416,8 +416,12 @@ void EntityDraw::SetExtrapolatedProperties()
 			if(pDrawItem->GetEntityTreeItemData()->IsReallocateDrawItem())
 			{
 				EntityTreeItemData *pEntityTreeItemData = pDrawItem->GetEntityTreeItemData();
-				delete pDrawItem;
+				
+				// Allocate first, then delete so Harmony doesn't unload the item data
+				EntityDrawItem *pOldDrawItem = pDrawItem;
 				pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), pEntityTreeItemData, this, &m_RootEntity);
+
+				delete pOldDrawItem;
 				pEntityTreeItemData->SetReallocateDrawItem(false);
 			}
 		}
