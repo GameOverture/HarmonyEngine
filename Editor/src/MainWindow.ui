@@ -100,7 +100,6 @@
     </property>
     <addaction name="actionChangeHarmonyLocation"/>
     <addaction name="separator"/>
-    <addaction name="actionProjectSettings"/>
     <addaction name="actionConnect"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
@@ -114,19 +113,21 @@
      <string>&amp;Edit</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menu_Build">
+   <widget class="QMenu" name="menu_Project">
     <property name="title">
-     <string>&amp;Build</string>
+     <string>&amp;Project</string>
     </property>
+    <action name=""/>
+    <addaction name="actionProjectSettings"/>
+    <addaction name="separator"/>
     <addaction name="actionBuildSettings"/>
     <addaction name="actionNewBuild"/>
-    <addaction name="separator"/>
     <addaction name="actionNewPackage"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menu_View"/>
-   <addaction name="menu_Build"/>
+   <addaction name="menu_Project"/>
    <addaction name="menu_Tool"/>
    <addaction name="menu_Help"/>
   </widget>

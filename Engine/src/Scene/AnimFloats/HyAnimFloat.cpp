@@ -80,9 +80,14 @@ void HyAnimFloat::Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc /*= H
 {
 	if(fSeconds <= 0.0f)
 	{
-		Set(fTo);
-		fpFinishedCallback(&m_OwnerRef);
-		return;
+		if(fDeferStart == 0.0f)
+		{
+			Set(fTo);
+			fpFinishedCallback(&m_OwnerRef);
+			return;
+		}
+		
+		fSeconds = 0.00001f; // Prevents divide by zero, and allows deferred start to work
 	}
 
 	m_fStart = m_fValueRef;
@@ -100,9 +105,14 @@ void HyAnimFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTw
 {
 	if(fSeconds <= 0.0f)
 	{
-		Set(m_fValueRef + fOffsetAmt);
-		fpFinishedCallback(&m_OwnerRef);
-		return;
+		if(fDeferStart == 0.0f)
+		{
+			Set(m_fValueRef + fOffsetAmt);
+			fpFinishedCallback(&m_OwnerRef);
+			return;
+		}
+
+		fSeconds = 0.00001f; // Prevents divide by zero, and allows deferred start to work
 	}
 
 	m_fStart = m_fValueRef;
@@ -120,17 +130,10 @@ void HyAnimFloat::Proc(float fSeconds, std::function<float(float)> fpProcFunc, f
 {
 	// Even if duration is instant, we still need to invoke the proc func once. Do so safely by ensuring m_fDuration isn't 0.0
 	if(fSeconds <= 0.0f)
-	{
-		// This will simulate the final update of the proc func
-		m_fDuration = 1.0f;
-		m_fElapsedTime = 1.0f;
-	}
-	else
-	{
-		// Standard initialization
-		m_fDuration = fSeconds;
-		m_fElapsedTime = fabs(fDeferStart) * -1.0f;
-	}
+		fSeconds = 0.00001f; // Prevents divide by zero, and allows deferred start to work
+	
+	m_fDuration = fSeconds;
+	m_fElapsedTime = fabs(fDeferStart) * -1.0f;
 	m_fpAnimFunc = fpProcFunc;
 	m_fpBehaviorUpdate = &HyAnimFloat::_Proc;
 	m_fpAnimFinishedFunc = fpFinishedCallback;
@@ -180,6 +183,9 @@ float HyAnimFloat::GetAnimDestination() const
 
 float HyAnimFloat::GetAnimRemainingDuration() const
 {
+	if(m_fElapsedTime <= 0.0f)
+		return fabs(m_fElapsedTime) + m_fDuration;
+
 	return m_fDuration - m_fElapsedTime;
 }
 

@@ -1139,9 +1139,11 @@ void MainWindow::NewItem(ItemType eItem)
 void MainWindow::RefreshBuildMenu()
 {
 	// Clean out existing actionOpenIde's
-	ui->menu_Build->clear();
-	ui->menu_Build->addAction(ui->actionBuildSettings);
-	ui->menu_Build->addAction(ui->actionNewBuild);
+	ui->menu_Project->clear();
+	ui->menu_Project->addAction(ui->actionProjectSettings);
+	ui->menu_Project->addSeparator();
+	ui->menu_Project->addAction(ui->actionBuildSettings);
+	ui->menu_Project->addAction(ui->actionNewBuild);
 
 	if(Harmony::GetProject() == nullptr)
 		return;
@@ -1153,7 +1155,7 @@ void MainWindow::RefreshBuildMenu()
 	QStringList buildDirList = buildDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
 	if(buildDirList.empty() == false)
 	{
-		ui->menu_Build->addSeparator();
+		ui->menu_Project->addSeparator();
 
 		for(auto sDirName : buildDirList)
 		{
@@ -1176,7 +1178,7 @@ void MainWindow::RefreshBuildMenu()
 
 			// Setup the action and its trigger
 			if(pBuildsMenu == nullptr)
-				pBuildsMenu = ui->menu_Build->addMenu(QIcon(":/icons16x16/items/Build-Open.png"), "Builds");
+				pBuildsMenu = ui->menu_Project->addMenu(QIcon(":/icons16x16/items/Build-Open.png"), "Builds");
 
 			QAction *pActionOpenIde = new QAction(pBuildsMenu);
 			pActionOpenIde->setText(sDirName);
