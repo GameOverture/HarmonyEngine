@@ -28,6 +28,8 @@ public:
 	using IHyLoadable::GetState;
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual uint32 GetNumStates() override;
+	
+	float GetTimelineFrameDuration() const;
 %HY_ACCESSORDECL%
 	
 	void SetFrame(uint32 uiFrameIndex);

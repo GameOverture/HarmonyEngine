@@ -37,6 +37,11 @@ namespace %HY_NAMESPACE% {
 {
 	return %HY_NUMSTATES%;
 }
+
+float %HY_CLASS%::GetTimelineFrameDuration() const
+{
+	return m_fTIMELINE_FRAME_DURATION;
+}
 %HY_ACCESSORDEFINITION%
 
 void %HY_CLASS%::SetFrame(uint32 uiFrameIndex)

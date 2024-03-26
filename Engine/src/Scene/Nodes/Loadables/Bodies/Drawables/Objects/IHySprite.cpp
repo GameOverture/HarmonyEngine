@@ -245,6 +245,8 @@ void IHySprite<NODETYPE, ENTTYPE>::SetFrame(uint32 uiFrameIndex)
 
 	m_uiCurFrame = uiFrameIndex;
 
+	m_AnimCtrlAttribList[this->m_uiState] &= ~ANIMCTRLATTRIB_Finished;
+
 	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	this->m_ShaderUniforms.SetTexHandle(0, UpdatedFrameRef.GetGfxApiHandle());
 	
@@ -604,6 +606,8 @@ template<typename NODETYPE, typename ENTTYPE>
 		m_uiCurFrame = 0;
 	else
 		m_uiCurFrame = GetNumFrames() - 1;
+
+	m_AnimCtrlAttribList[this->m_uiState] &= ~ANIMCTRLATTRIB_Finished;
 
 	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	this->m_ShaderUniforms.SetTexHandle(0, UpdatedFrameRef.GetGfxApiHandle());
