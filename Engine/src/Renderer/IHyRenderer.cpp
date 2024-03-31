@@ -25,7 +25,6 @@ IHyRenderer::IHyRenderer(int32 iVSync, std::vector<HyWindow *> &windowListRef, H
 	m_DiagnosticsRef(diagnosticsRef),
 	m_VertexBuffer(*this),
 	m_pCurWindow(nullptr),
-	m_hCurrentStencilBuffer(HY_UNUSED_HANDLE),
 	m_pShaderQuadBatch(HY_NEW HyShader(HYSHADERPROG_QuadBatch)),
 	m_pShaderPrimitive(HY_NEW HyShader(HYSHADERPROG_Primitive))
 {
@@ -45,9 +44,11 @@ IHyRenderer::~IHyRenderer(void)
 		delete iter->second;
 	m_ShaderMap.clear();
 
-	for(auto iter = m_StencilMap.begin(); iter != m_StencilMap.end(); ++iter)
-		delete iter->second;
-	m_StencilMap.clear();
+	if(m_StencilMap.empty() == false)
+		HyLogError("IHyRenderer::~IHyRenderer had non-empty stencil map");
+	//for(auto iter = m_StencilMap.begin(); iter != m_StencilMap.end(); ++iter)
+	//	delete iter->second;
+	//m_StencilMap.clear();
 }
 
 void IHyRenderer::SetRendererInfo(const std::string &sApiName, const std::string &sVersion, const std::string &sVendor, const std::string &sRenderer, const std::string &sShader, int32 iMaxTextureSize, const std::string &sCompressedTextures)

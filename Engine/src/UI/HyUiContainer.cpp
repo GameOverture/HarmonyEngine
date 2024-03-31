@@ -78,7 +78,7 @@ glm::ivec2 HyUiContainer::GetSize()
 
 void HyUiContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
 {
-	m_Shape.SetAsBox(iNewWidth, iNewHeight);
+	//m_Shape.SetAsBox(iNewWidth, iNewHeight);
 	m_Panel.SetSize(iNewWidth, iNewHeight);
 	m_RootLayout.SetLayoutDirty();
 }

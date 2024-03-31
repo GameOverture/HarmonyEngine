@@ -63,7 +63,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 		return;
 
 	glm::vec2 ptCenter(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight);
-	shapeOut.SetAsBox(fHalfWidth, fHalfHeight, ptCenter, 0.0f);
+	shapeOut.SetAsBox(HyRect(fHalfWidth, fHalfHeight, ptCenter, 0.0f));
 }
 
 #ifdef HY_USE_TEXT_DEBUG_BOXES
@@ -95,11 +95,11 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 
 	case HYTEXT_Box:
 	case HYTEXT_ScaleBox:
-		m_DebugBox.SetAsBox(m_vBoxDimensions.x, m_vBoxDimensions.y);
+		m_DebugBox.SetAsBox(HyRect(m_vBoxDimensions.x, m_vBoxDimensions.y));
 		break;
 
 	case HYTEXT_Column:
-		m_DebugBox.SetAsBox(m_vBoxDimensions.x, GetHeight());
+		m_DebugBox.SetAsBox(HyRect(m_vBoxDimensions.x, GetHeight()));
 		break;
 
 	case HYTEXT_Vertical:

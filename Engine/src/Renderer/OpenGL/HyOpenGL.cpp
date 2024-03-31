@@ -23,9 +23,7 @@
 HyOpenGL::HyOpenGL(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagnostics &diagnosticsRef) :
 	IHyRenderer(iVSync, windowListRef, diagnosticsRef),
 	m_mtxView(1.0f),
-	m_mtxProj(1.0f),
-	m_pPboHandles(nullptr),
-	m_pPboStates(nullptr)
+	m_mtxProj(1.0f)
 {
 	HyLog("OpenGL is initializing...");
 
@@ -107,16 +105,16 @@ HyOpenGL::HyOpenGL(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagn
 	#elif defined(HY_USE_SDL2)
 		bPboSupport = (SDL_TRUE == SDL_GL_ExtensionSupported("GL_ARB_pixel_buffer_object") || SDL_TRUE == SDL_GL_ExtensionSupported("GLEW_EXT_pixel_buffer_object"));
 	#endif
-	if(false)//bPboSupport)
-	{
-		m_pPboHandles = HY_NEW GLuint[HY_NUM_PBO];
-		glGenBuffers(HY_NUM_PBO, m_pPboHandles);
-		HyErrorCheck_OpenGL("HyOpenGL::HyOpenGL", "glGenBuffers");
+	//if(false)//bPboSupport)
+	//{
+	//	m_pPboHandles = HY_NEW GLuint[HY_NUM_PBO];
+	//	glGenBuffers(HY_NUM_PBO, m_pPboHandles);
+	//	HyErrorCheck_OpenGL("HyOpenGL::HyOpenGL", "glGenBuffers");
 
-		m_pPboStates = HY_NEW PboState[HY_NUM_PBO];
-		for(uint32 i = 0; i < HY_NUM_PBO; ++i)
-			m_pPboStates[i] = PBO_Free;
-	}
+	//	m_pPboStates = HY_NEW PboState[HY_NUM_PBO];
+	//	for(uint32 i = 0; i < HY_NUM_PBO; ++i)
+	//		m_pPboStates[i] = PBO_Free;
+	//}
 
 	GLint iFormatCount = 0;
 	glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS, &iFormatCount);
@@ -172,15 +170,18 @@ HyOpenGL::HyOpenGL(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagn
 #ifndef HY_PLATFORM_BROWSER
 	SetVSync(m_iVSync);
 #endif
+
+	glDisable(GL_SCISSOR_TEST); // Harmony scissors are handled by using 2d quad (HyPrimitive2d) stencils, allowing transformations to take place
+	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDisable");
 }
 
 HyOpenGL::~HyOpenGL(void)
 {
-	if(m_pPboHandles)
-		glDeleteBuffers(HY_NUM_PBO, m_pPboHandles);
+	//if(m_pPboHandles)
+	//	glDeleteBuffers(HY_NUM_PBO, m_pPboHandles);
 
-	delete [] m_pPboHandles;
-	delete [] m_pPboStates;
+	//delete [] m_pPboHandles;
+	//delete [] m_pPboStates;
 
 #if defined(HY_USE_SDL2) && !defined(HY_USE_GLFW)
 	SDL_GL_DeleteContext(m_Context);
@@ -217,18 +218,18 @@ HyOpenGL::~HyOpenGL(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	HyErrorCheck_OpenGL("HyOpenGL:StartRender", "glClear");
 
-	if(m_pPboHandles)
-	{
-		for(uint32 i = 0; i < HY_NUM_PBO; ++i)
-		{
-			if(m_pPboStates[i] == PBO_Pending3)
-				m_pPboStates[i] = PBO_Pending2;
-			if(m_pPboStates[i] == PBO_Pending2)
-				m_pPboStates[i] = PBO_Pending1;
-			if(m_pPboStates[i] == PBO_Pending1)
-				m_pPboStates[i] = PBO_Free;
-		}
-	}
+	//if(m_pPboHandles)
+	//{
+	//	for(uint32 i = 0; i < HY_NUM_PBO; ++i)
+	//	{
+	//		if(m_pPboStates[i] == PBO_Pending3)
+	//			m_pPboStates[i] = PBO_Pending2;
+	//		if(m_pPboStates[i] == PBO_Pending2)
+	//			m_pPboStates[i] = PBO_Pending1;
+	//		if(m_pPboStates[i] == PBO_Pending1)
+	//			m_pPboStates[i] = PBO_Free;
+	//	}
+	//}
 }
 
 /*virtual*/ void HyOpenGL::Begin_3d()
@@ -273,25 +274,66 @@ HyOpenGL::~HyOpenGL(void)
 {
 	//////////////////////////////////////////////////////////////////////////
 	// Setup stencil buffer if required
-	if(pRenderState->m_hSTENCIL != HY_UNUSED_HANDLE)
+	if(pRenderState->m_hSCISSOR_STENCIL != HY_UNUSED_HANDLE || pRenderState->m_hSTENCIL != HY_UNUSED_HANDLE)
 	{
-		HyStencil *pStencil = FindStencil(pRenderState->m_hSTENCIL);
 		glEnable(GL_STENCIL_TEST);
 
-		// TODO: This conditional check optimization seems to break if there's only one stencil (or if stencil mask updates over time)
-		// 
-		// Only write to the stencil buffer if m_hSTENCIL isn't the current stencil in the stencil buffer
-		//if(m_hCurrentStencilBuffer != pRenderState->m_hSTENCIL)
+		glStencilMask(0xFF);									// This mask allows any 8bit value to be written to the stencil buffer (and allows clears to work)
+		glClear(GL_STENCIL_BUFFER_BIT);							// Clear stencil buffer by writing default stencil value '0' to entire buffer.
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);	// Disable rendering color while we determine the stencil buffer
+		//glDisable(GL_SCISSOR_TEST);							// Ensure scissor test isn't affecting our initial stencil clear
+
+		GLenum eRenderStencilFunc = GL_ALWAYS;					// What glStencilFunc func to use when rendering to the color buffer
+		GLint iRenderStencilRef = 1;							// What glStencilFunc ref value to check against when rendering to the color buffer
+
+		// SCISSOR - Writes '1' to stencil buffer where scissor rect is
+		if(pRenderState->m_hSCISSOR_STENCIL != HY_UNUSED_HANDLE)
 		{
-			glStencilMask(0xFF);									// This mask allows any 8bit value to be written to the stencil buffer (and allows clears to work)
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);					// All fragments rendered next will "pass" the stencil test, and 'ref' is set to '1'
+			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);			// Fragments that "passed" will write the 'ref' value in the stencil buffer
 
-			glDisable(GL_SCISSOR_TEST);								// Ensure scissor test isn't affecting our initial stencil clear
-			glClear(GL_STENCIL_BUFFER_BIT);							// Clear stencil buffer by writing default stencil value '0' to entire buffer.
+			// Render the HyPrimitive2d scissor rect, and write the pixel locations in stencil buffer
+			HyStencil *pScissorStencil = FindStencil(pRenderState->m_hSCISSOR_STENCIL);
+			char *pStencilRenderStateBufferPos = reinterpret_cast<char *>(pScissorStencil->GetRenderStatePtr());
+			HyRenderBuffer::State *pCurRenderState = reinterpret_cast<HyRenderBuffer::State *>(pStencilRenderStateBufferPos);
+			if(pCurRenderState->m_iCOORDINATE_SYSTEM < 0 || pCurRenderState->m_iCOORDINATE_SYSTEM == m_pCurWindow->GetIndex())
+				RenderPass2d(pCurRenderState, pCurRenderState->m_iCOORDINATE_SYSTEM < 0 ? pCamera : nullptr);
 
-			glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);	// Disable rendering color while we determine the stencil buffer
+			// Set these as if only scissor is being used
+			eRenderStencilFunc = GL_EQUAL;
+			iRenderStencilRef = 1;
+		}
 
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);						// All fragments rendered next will "pass" the stencil test, and 'ref' is set to '1'
-			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);				// Fragments that "passed" will write the 'ref' value in the stencil buffer
+		if(pRenderState->m_hSTENCIL != HY_UNUSED_HANDLE)
+		{
+			HyStencil *pStencil = FindStencil(pRenderState->m_hSTENCIL);
+			if(pRenderState->m_hSCISSOR_STENCIL != HY_UNUSED_HANDLE) // Both stencil and scissor
+			{
+				if(pStencil->GetBehavior() == HYSTENCILBEHAVIOR_Mask)
+				{
+					glStencilFunc(GL_EQUAL, 1, 0xFF);
+					glStencilOp(GL_KEEP, GL_KEEP, GL_INCR); // Increment past '1' to indicate a valid pixel
+
+					eRenderStencilFunc = GL_GREATER;
+					iRenderStencilRef = 1;
+				}
+				else // HYSTENCILBEHAVIOR_InvertedMask
+				{
+					glStencilFunc(GL_EQUAL, 1, 0xFF);
+					glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO); // Turn off any '1' from the scissor rect
+
+					eRenderStencilFunc = GL_EQUAL;
+					iRenderStencilRef = 1;
+				}
+			}
+			else // Only stencil
+			{
+				glStencilFunc(GL_ALWAYS, 1, 0xFF);
+				glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); // Turn off any '1' from the scissor rect
+
+				eRenderStencilFunc = (pStencil->GetBehavior() == HYSTENCILBEHAVIOR_Mask) ? GL_EQUAL : GL_NOTEQUAL;
+				iRenderStencilRef = 1;
+			}
 
 			// Render all instances stored in the HyStencil, and affect their pixel locations in stencil buffer
 			uint32 uiNumStencilInstance = static_cast<uint32>(pStencil->GetInstanceList().size());
@@ -304,22 +346,11 @@ HyOpenGL::~HyOpenGL(void)
 
 				pStencilRenderStateBufferPos += pCurRenderState->m_uiExDataSize + sizeof(HyRenderBuffer::State);
 			}
-
-			m_hCurrentStencilBuffer = pRenderState->m_hSTENCIL;
 		}
 
-		switch(pStencil->GetBehavior())
-		{
-		case HYSTENCILBEHAVIOR_Mask:
-			glStencilFunc(GL_EQUAL, 1, 0xFF);					// Only render pixels that pass this check while stencil test is enabled
-			break;
-		case HYSTENCILBEHAVIOR_InvertedMask:
-			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);				// Only render pixels that pass this check while stencil test is enabled
-			break;
-		}
-
-		glStencilMask(0x00);									// Disable further writing to the the stencil buffer
-		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);		// Re-enable the color buffer
+		glStencilFunc(eRenderStencilFunc, iRenderStencilRef, 0xFF);	// Only render pixels that pass this check while stencil test is enabled
+		glStencilMask(0x00);										// Disable further writing to the the stencil buffer
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);			// Re-enable the color buffer
 	}
 	else
 	{
@@ -722,15 +753,15 @@ HyOpenGL::~HyOpenGL(void)
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glCompressedTexImage2D");
 	}
 
-	if(hPBO != 0)
-	{
-		for(uint32 i = 0; i < HY_NUM_PBO; ++i)
-		{
-			if(m_pPboHandles[i] == hPBO)
-				m_pPboStates[i] = PBO_Pending3;
-		}
-		//glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-	}
+	//if(hPBO != 0)
+	//{
+	//	for(uint32 i = 0; i < HY_NUM_PBO; ++i)
+	//	{
+	//		if(m_pPboHandles[i] == hPBO)
+	//			m_pPboStates[i] = PBO_Pending3;
+	//	}
+	//	//glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+	//}
 
 	switch(infoRef.m_uiFiltering)
 	{
@@ -863,33 +894,33 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ uint8 *HyOpenGL::GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) /*override*/
 {
-	hPboOut = 0;
-
-	if(m_pPboHandles == nullptr)
-		return nullptr;
-
-#ifndef HY_PLATFORM_BROWSER
-	for(uint32 i = 0; i < HY_NUM_PBO; ++i)
-	{
-		if(m_pPboStates[i] == PBO_Free)
-		{
-			m_pPboStates[i] = PBO_Mapped;
-
-			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pPboHandles[i]);
-			HyErrorCheck_OpenGL("HyOpenGL::GetPixelBufferPtr", "glBindBuffer");
-			glBufferData(GL_PIXEL_UNPACK_BUFFER, uiMaxBufferSize, nullptr, GL_STREAM_DRAW); // Reserve size
-			HyErrorCheck_OpenGL("HyOpenGL::GetPixelBufferPtr", "glBufferData");
-
-			uint8 *pMappedPtr = static_cast<uint8 *>(glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY));
-			HyErrorCheck_OpenGL("HyOpenGL::GetPixelBufferPtr", "glMapBuffer");
-
-			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-
-			hPboOut = m_pPboHandles[i];
-			return pMappedPtr;
-		}
-	}
-#endif
+//	hPboOut = 0;
+//
+//	if(m_pPboHandles == nullptr)
+//		return nullptr;
+//
+//#ifndef HY_PLATFORM_BROWSER
+//	for(uint32 i = 0; i < HY_NUM_PBO; ++i)
+//	{
+//		if(m_pPboStates[i] == PBO_Free)
+//		{
+//			m_pPboStates[i] = PBO_Mapped;
+//
+//			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pPboHandles[i]);
+//			HyErrorCheck_OpenGL("HyOpenGL::GetPixelBufferPtr", "glBindBuffer");
+//			glBufferData(GL_PIXEL_UNPACK_BUFFER, uiMaxBufferSize, nullptr, GL_STREAM_DRAW); // Reserve size
+//			HyErrorCheck_OpenGL("HyOpenGL::GetPixelBufferPtr", "glBufferData");
+//
+//			uint8 *pMappedPtr = static_cast<uint8 *>(glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY));
+//			HyErrorCheck_OpenGL("HyOpenGL::GetPixelBufferPtr", "glMapBuffer");
+//
+//			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+//
+//			hPboOut = m_pPboHandles[i];
+//			return pMappedPtr;
+//		}
+//	}
+//#endif
 
 	return nullptr;
 }
@@ -1041,25 +1072,25 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	if(pRenderState->m_SCISSOR_RECT.iTag != IHyBody::SCISSORTAG_Disabled)
-	{
-		const HyScreenRect<int32> &scissorRectRef = pRenderState->m_SCISSOR_RECT;
+	//if(pRenderState->m_SCISSOR_RECT.iTag != IHyBody::SCISSORTAG_Disabled)
+	//{
+	//	const HyScreenRect<int32> &scissorRectRef = pRenderState->m_SCISSOR_RECT;
 
-		glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_pCurWindow->GetFramebufferSize().x / 2),
-				  static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_pCurWindow->GetFramebufferSize().y / 2),
-				  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
-				  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
+	//	glScissor(static_cast<GLint>(m_mtxView[0].x * scissorRectRef.x) + static_cast<GLint>(m_mtxView[3].x) + (m_pCurWindow->GetFramebufferSize().x / 2),
+	//			  static_cast<GLint>(m_mtxView[1].y * scissorRectRef.y) + static_cast<GLint>(m_mtxView[3].y) + (m_pCurWindow->GetFramebufferSize().y / 2),
+	//			  static_cast<GLsizei>(m_mtxView[0].x * scissorRectRef.width),
+	//			  static_cast<GLsizei>(m_mtxView[1].y * scissorRectRef.height));
 
-		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glScissor");
+	//	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glScissor");
 
-		glEnable(GL_SCISSOR_TEST);
-		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glEnable");
-	}
-	else
-	{
-		glDisable(GL_SCISSOR_TEST);
-		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDisable");
-	}
+	//	glEnable(GL_SCISSOR_TEST);
+	//	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glEnable");
+	//}
+	//else
+	//{
+	//	glDisable(GL_SCISSOR_TEST);
+	//	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDisable");
+	//}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Always attempt to assign these uniforms if the shader chooses to use them

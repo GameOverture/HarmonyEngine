@@ -75,14 +75,8 @@ public:
 	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount);
 	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount);
 
-	// Build vertices to represent an axis-aligned box
-	void SetAsBox(int32 iWidth, int32 iHeight);
-	void SetAsBox(float fWidth, float fHeight);
-
-	// Build vertices to represent an oriented box.
-	// ptBoxCenter is the center of the box in local coordinates.
-	// fRot the rotation of the box in local coordinates.
-	void SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
+	//void SetAsBox(float fWidth, float fHeight); // Axis-aligned box, bottom left corner at origin
+	void SetAsBox(const HyRect &rect); // Represent an oriented box
 
 	uint32 GetNumVerts() const;
 	const glm::vec2 *GetVerts() const;

@@ -34,16 +34,16 @@ class HyOpenGL : public IHyRenderer
 	glm::mat4										m_mtxView;
 	glm::mat4										m_mtxProj;
 
-	enum PboState
-	{
-		PBO_Free = 0,
-		PBO_Mapped,
-		PBO_Pending3,	// Pending frames to give GPU time to finish its usage with the PBO
-		PBO_Pending2,
-		PBO_Pending1
-	};
-	GLuint *										m_pPboHandles;
-	PboState *										m_pPboStates;
+	//enum PboState
+	//{
+	//	PBO_Free = 0,
+	//	PBO_Mapped,
+	//	PBO_Pending3,	// Pending frames to give GPU time to finish its usage with the PBO
+	//	PBO_Pending2,
+	//	PBO_Pending1
+	//};
+	//GLuint *										m_pPboHandles;
+	//PboState *										m_pPboStates;
 
 	//GLuint										m_hVBO3d;
 	//bool											m_bVBO3dDirty;

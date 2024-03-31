@@ -56,8 +56,8 @@ public:
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused) override;
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
 	
-	virtual void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight) override;
-	void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren);
+	virtual void SetScissor(const HyRect &scissorRect) override;
+	void SetScissor(const HyRect &scissorRect, bool bOverrideExplicitChildren);
 	
 	virtual void ClearScissor(bool bUseParentScissor) override;
 	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren);
@@ -128,7 +128,7 @@ protected:
 
 	virtual void SetParentsVisible(bool bParentsVisible) override final;
 	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override final;
-	virtual void _SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding) override final;
+	virtual void _SetScissorStencil(HyStencilHandle hHandle, bool bIsOverriding) override final;
 	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override final;
 	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override final;
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override final;

@@ -21,23 +21,9 @@ class HyEntity3d;
 
 class IHyBody
 {
-public:
-	enum ScissorTag
-	{
-		SCISSORTAG_Disabled = 0,
-		SCISSORTAG_Enabled,
-	};
-
 protected:
-	struct ScissorRect
-	{
-		HyScreenRect<int32>			m_LocalScissorRect;
-		HyScreenRect<int32>			m_WorldScissorRect;
-	};
-	ScissorRect *					m_pScissor;
-	HyStencilHandle					m_hStencil;
-
 	int32							m_iCoordinateSystem;	// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
+	HyStencilHandle					m_hStencil;
 
 public:
 	IHyBody();
@@ -47,12 +33,6 @@ public:
 
 	IHyBody &operator=(const IHyBody &rhs);
 	IHyBody &operator=(IHyBody &&donor);
-
-	bool IsScissorSet() const;
-	void GetLocalScissor(HyScreenRect<int32> &scissorOut) const;
-	void GetWorldScissor(HyScreenRect<int32> &scissorOut, float fExtrapolatePercent);
-	virtual void SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight);
-	virtual void ClearScissor(bool bUseParentScissor);
 
 	bool IsStencilSet() const;
 	HyStencil *GetStencil() const;
@@ -72,7 +52,6 @@ public:
 
 protected:
 	// Internal Entity propagation function overrides
-	virtual void _SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding);
 	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding);
 	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding);
 

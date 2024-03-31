@@ -17,11 +17,11 @@ extern void HyNodeCtorAppend(HyEntity3d *pEntity, IHyNode3d *pChildNode);
 IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :
 	IHyNode(eNodeType),
 	m_pParent(pParent),
-	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	rot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB)
+	pos(*this, DIRTY_Transform | DIRTY_SceneAABB),
+	rot(*this, DIRTY_Transform | DIRTY_SceneAABB),
+	rot_pivot(*this, DIRTY_Transform | DIRTY_SceneAABB),
+	scale(*this, DIRTY_Transform | DIRTY_SceneAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_SceneAABB)
 {
 	scale.Set(1.0f);
 
@@ -42,11 +42,11 @@ IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :
 
 IHyNode3d::IHyNode3d(const IHyNode3d &copyRef) :
 	IHyNode(copyRef),
-	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	rot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB)
+	pos(*this, DIRTY_Transform | DIRTY_SceneAABB),
+	rot(*this, DIRTY_Transform | DIRTY_SceneAABB),
+	rot_pivot(*this, DIRTY_Transform | DIRTY_SceneAABB),
+	scale(*this, DIRTY_Transform | DIRTY_SceneAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_SceneAABB)
 {
 	pos.Set(copyRef.pos.Get());
 	rot.Set(copyRef.rot.Get());
@@ -59,11 +59,11 @@ IHyNode3d::IHyNode3d(IHyNode3d &&donor) noexcept :
 	IHyNode(std::move(donor)),
 	m_pParent(donor.ParentGet()),
 	m_mtxCached(std::move(donor.m_mtxCached)),
-	pos(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	rot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	rot_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	scale(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_Scissor | DIRTY_SceneAABB)
+	pos(*this, DIRTY_Transform | DIRTY_SceneAABB),
+	rot(*this, DIRTY_Transform | DIRTY_SceneAABB),
+	rot_pivot(*this, DIRTY_Transform | DIRTY_SceneAABB),
+	scale(*this, DIRTY_Transform | DIRTY_SceneAABB),
+	scale_pivot(*this, DIRTY_Transform | DIRTY_SceneAABB)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 

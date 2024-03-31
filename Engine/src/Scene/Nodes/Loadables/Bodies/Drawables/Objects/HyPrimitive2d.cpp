@@ -167,21 +167,15 @@ void HyPrimitive2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount)
 	AssembleData();
 }
 
-void HyPrimitive2d::SetAsBox(int32 iWidth, int32 iHeight)
-{
-	m_Shape.SetAsBox(iWidth, iHeight);
-	AssembleData();
-}
+//void HyPrimitive2d::SetAsBox(float fWidth, float fHeight)
+//{
+//	m_Shape.SetAsBox(fWidth, fHeight);
+//	AssembleData();
+//}
 
-void HyPrimitive2d::SetAsBox(float fWidth, float fHeight)
+void HyPrimitive2d::SetAsBox(const HyRect &rect)
 {
-	m_Shape.SetAsBox(fWidth, fHeight);
-	AssembleData();
-}
-
-void HyPrimitive2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg)
-{
-	m_Shape.SetAsBox(fHalfWidth, fHalfHeight, ptBoxCenter, fRotDeg);
+	m_Shape.SetAsBox(rect);
 	AssembleData();
 }
 

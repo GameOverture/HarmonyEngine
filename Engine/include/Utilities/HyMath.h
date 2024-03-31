@@ -60,6 +60,7 @@ bool HyCompareFloat(T lhs, T rhs)
 	return trunc(1000. * lhs) == trunc(1000. * rhs);
 }
 
+// DEPRECATED: Use 'HyRect' instead
 template<typename T>
 struct HyRectangle
 {
@@ -68,12 +69,10 @@ struct HyRectangle
 	T right;
 	T top;
 
-	int32 iTag;
-
-	HyRectangle() : left(0), bottom(0), right(0), top(0), iTag(0)
+	HyRectangle() : left(0), bottom(0), right(0), top(0)
 	{ }
 
-	HyRectangle(T tLeft, T tBottom, T tRight, T tTop) : left(tLeft), bottom(tBottom), right(tRight), top(tTop), iTag(0)
+	HyRectangle(T tLeft, T tBottom, T tRight, T tTop) : left(tLeft), bottom(tBottom), right(tRight), top(tTop)
 	{ }
 
 	std::string ToString() const
@@ -108,33 +107,84 @@ struct HyRectangle
 	}
 };
 
-template<typename T>
-struct HyScreenRect
+class HyRect
 {
-	T x;
-	T y;
-	T width;
-	T height;
+	float		m_fHalfWidth;
+	float		m_fHalfHeight;
+	glm::vec2	m_ptCenter;
+	float		m_fRotDegrees; // Rotates around the center of the rect
 
-	int32 iTag;
-
-	HyScreenRect() : x(0), y(0), width(0), height(0), iTag(0)
+public:
+	HyRect() :
+		m_fHalfWidth(0.0f),
+		m_fHalfHeight(0.0f),
+		m_ptCenter(0.0f),
+		m_fRotDegrees(0.0f)
 	{ }
 
-	HyScreenRect(T tX, T tY, T tWidth, T tHeight) : x(tX), y(tY), width(tWidth), height(tHeight), iTag(0)
-	{ }
-
-	std::string ToString() const
+	// Creates a rectangle with the bottom left corner at 0,0
+	HyRect(float fWidth, float fHeight)
 	{
-		std::ostringstream s;
-		s << "(X:" << x << ", Y:" << y << ", W:" << width << ", H:" << height << ")";
-		return s.str();
+		Set(fWidth, fHeight);
 	}
 
-	// Does not compare tags
-	bool operator==(const HyScreenRect<T> &rhs) const
+	HyRect(float fX, float fY, float fWidth, float fHeight, float fRotDegrees = 0.0f)
 	{
-		return (0 == memcmp(this, &rhs, sizeof(T) * 4));
+		Set(fX, fY, fWidth, fHeight, fRotDegrees);
+	}
+
+	HyRect(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptCenter, float fRotDegrees = 0.0f)
+	{
+		Set(fHalfWidth, fHalfHeight, ptCenter, fRotDegrees);
+	}
+
+	//std::string ToString() const
+	//{
+	//	std::ostringstream s;
+	//	s << "(X:" <<  << ", Y:" << y << ", W:" << width << ", H:" << height;
+	//	if(rot != 0.0f)
+	//		s << ", Rot:" << rot;
+	//	s << ")";
+	//	return s.str();
+	//}
+
+	glm::vec2 GetCenter() const
+	{
+		return m_ptCenter;
+	}
+
+	// TODO: Write these with rotation in mind
+	//float GetWidth(float fPercent = 1.0f) const
+	//{
+	//	return width * fPercent;
+	//}
+	//float GetHeight(float fPercent = 1.0f) const
+	//{
+	//	return height * fPercent;
+	//}
+
+	void Set(float fWidth, float fHeight)
+	{
+		m_fHalfWidth = fWidth * 0.5f;
+		m_fHalfHeight = fHeight * 0.5f;
+		HySetVec(m_ptCenter, m_fHalfWidth, m_fHalfHeight);
+		m_fRotDegrees = 0.0f;
+	}
+
+	void Set(float fX, float fY, float fWidth, float fHeight, float fRotDegrees = 0.0f)
+	{
+		m_fHalfWidth = fWidth * 0.5f;
+		m_fHalfHeight = fHeight * 0.5f;
+		HySetVec(m_ptCenter, fX + m_fHalfWidth, fY + m_fHalfHeight);
+		m_fRotDegrees = fRotDegrees;
+	}
+
+	void Set(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptCenter, float fRotDegrees = 0.0f)
+	{
+		m_fHalfWidth = fHalfWidth;
+		m_fHalfHeight = fHalfHeight;
+		m_ptCenter = ptCenter;
+		m_fRotDegrees = fRotDegrees;
 	}
 };
 

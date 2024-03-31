@@ -29,14 +29,6 @@ IHyBody3d::IHyBody3d(HyType eNodeType, const HyNodePath &nodePath, HyEntity3d *p
 	{
 		m_iCoordinateSystem = m_pParent->GetCoordinateSystem();
 
-		if(m_pParent->IsScissorSet())
-		{
-			if(m_pScissor == nullptr)
-				m_pScissor = HY_NEW ScissorRect();
-
-			m_pScissor->m_WorldScissorRect = m_pParent->m_pScissor->m_WorldScissorRect;
-		}
-
 		if(m_pParent->IsStencilSet())
 			m_hStencil = m_pParent->m_hStencil;
 	}

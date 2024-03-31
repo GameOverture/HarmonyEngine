@@ -90,19 +90,19 @@ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitCh
 		m_ChildList[i]->_SetPauseUpdate(IsPauseUpdate(), bOverrideExplicitChildren);
 }
 
-/*virtual*/ void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight) /*override*/
+/*virtual*/ void HyEntity2d::SetScissor(const HyRect &scissorRect) /*override*/
 {
-	SetScissor(uiLocalX, uiLocalY, uiWidth, uiHeight, false);
+	SetScissor(scissorRect, false);
 }
 
-void HyEntity2d::SetScissor(int32 uiLocalX, int32 uiLocalY, uint32 uiWidth, uint32 uiHeight, bool bOverrideExplicitChildren)
+void HyEntity2d::SetScissor(const HyRect &scissorRect, bool bOverrideExplicitChildren)
 {
-	IHyBody2d::SetScissor(uiLocalX, uiLocalY, uiWidth, uiHeight);
+	IHyBody2d::SetScissor(scissorRect);
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-			static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissor(m_pScissor, bOverrideExplicitChildren);
+			static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissorStencil(m_hScissorStencil, bOverrideExplicitChildren);
 	}
 }
 
@@ -118,7 +118,7 @@ void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChil
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-			static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissor(m_pScissor, bOverrideExplicitChildren);
+			static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissorStencil(m_hScissorStencil, bOverrideExplicitChildren);
 	}
 }
 
@@ -236,7 +236,7 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	}
 
 	if(localAABB.IsValid())
-		shapeOut.SetAsBox(localAABB.GetExtents().x, localAABB.GetExtents().y, glm::vec2(localAABB.GetCenter().x, localAABB.GetCenter().y), 0.0f);
+		shapeOut.SetAsBox(HyRect(localAABB.GetExtents().x, localAABB.GetExtents().y, glm::vec2(localAABB.GetCenter().x, localAABB.GetCenter().y), 0.0f));
 	else
 		shapeOut.SetAsNothing();
 }
@@ -674,7 +674,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 		static_cast<IHyBody2d &>(childRef)._SetCoordinateSystem(GetCoordinateSystem(), false);
 
 		if(IsScissorSet())
-			static_cast<IHyBody2d &>(childRef)._SetScissor(m_pScissor, false);
+			static_cast<IHyBody2d &>(childRef)._SetScissorStencil(m_hScissorStencil, false);
 
 		if(IsStencilSet())
 			static_cast<IHyBody2d &>(childRef)._SetStencil(m_hStencil, false);
@@ -704,16 +704,16 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 	}
 }
 
-/*virtual*/ void HyEntity2d::_SetScissor(const ScissorRect *pParentScissor, bool bIsOverriding) /*override final*/
+/*virtual*/ void HyEntity2d::_SetScissorStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override final*/
 {
-	IHyBody2d::_SetScissor(pParentScissor, bIsOverriding);
+	IHyBody2d::_SetScissorStencil(hHandle, bIsOverriding);
 	
-	if(0 == (m_uiFlags & EXPLICIT_Scissor))
+	if(0 == (m_uiFlags & EXPLICIT_ScissorStencil))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
 			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-				static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissor(m_pScissor, bIsOverriding);
+				static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissorStencil(m_hScissorStencil, bIsOverriding);
 		}
 	}
 }

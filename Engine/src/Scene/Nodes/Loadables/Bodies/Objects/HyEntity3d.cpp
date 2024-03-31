@@ -9,6 +9,9 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h"
+#include "Scene/HyScene.h"
+#include "Renderer/Effects/HyStencil.h"
+#include "HyEngine.h"
 
 HyEntity3d::HyEntity3d(HyEntity3d *pParent /*= nullptr*/) :
 	IHyBody3d(HYTYPE_Entity, HyNodePath(), pParent)
@@ -139,9 +142,12 @@ void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 	{
 		static_cast<IHyBody3d &>(childRef)._SetCoordinateSystem(GetCoordinateSystem(), false);
 
-		if(IsScissorSet())
-			static_cast<IHyBody3d &>(childRef)._SetScissor(m_pScissor, false);
+		if(IsStencilSet())
+			static_cast<IHyBody3d &>(childRef)._SetStencil(m_hStencil, false);
 	}
+
+	if(sm_pHyAssets)
+		sm_pHyAssets->SetEntityLoaded(this);
 }
 
 /*virtual*/ void HyEntity3d::SetDirty(uint32 uiDirtyFlags)

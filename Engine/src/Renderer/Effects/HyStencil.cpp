@@ -11,6 +11,7 @@
 #include "Renderer/Effects/HyStencil.h"
 #include "Renderer/IHyRenderer.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
 HyStencilHandle HyStencil::sm_hHandleCount = 0;
 
@@ -25,6 +26,9 @@ HyStencil::HyStencil() :
 
 HyStencil::~HyStencil()
 {
+	if(m_eBehavior == HYSTENCILBEHAVIOR_Scissor)
+		delete m_MaskInstanceList[0]; // Scissor stencil is a single HyPrimitive2d dynamically allocated internally
+
 	IHyRenderer::RemoveStencil(this);
 }
 
@@ -90,6 +94,17 @@ const std::vector<IHyDrawable2d *> &HyStencil::GetInstanceList() const
 HyRenderBuffer::State *HyStencil::GetRenderStatePtr() const
 {
 	return m_pRenderStatePtr;
+}
+
+void HyStencil::SetAsScissor(const HyRect &scissorRect)
+{
+	HyAssert(m_eBehavior != HYSTENCILBEHAVIOR_Scissor && m_MaskInstanceList.empty(), "HyStencil::SetAsScissor() was called on a stencil that is already a scissor (or already contains masks)");
+	m_eBehavior = HYSTENCILBEHAVIOR_Scissor;
+
+	HyPrimitive2d *pScissorPrim = HY_NEW HyPrimitive2d();
+	pScissorPrim->SetAsBox(scissorRect);
+	pScissorPrim->SetVisible(false);
+	AddMask(*pScissorPrim);
 }
 
 bool HyStencil::ConfirmMaskReady()

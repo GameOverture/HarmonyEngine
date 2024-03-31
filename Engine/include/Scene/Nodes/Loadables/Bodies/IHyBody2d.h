@@ -37,6 +37,8 @@ protected:
 	b2AABB							m_SceneAABB;			// Don't directly use, acquiring using GetSceneAABB()
 															// Derived versions of this function will properly update 'm_SceneAABB' before returning
 
+	HyStencilHandle					m_hScissorStencil;		// An additional stencil that works like a local clipping scissor rect, that will transform along with this node
+
 public:
 	HyAnimVec3						topColor;
 	HyAnimVec3						botColor;
@@ -67,15 +69,23 @@ public:
 	float GetSceneHeight();
 	float GetSceneWidth();
 
+	bool IsScissorSet() const;
+	void GetScissor(HyRect &scissorOut) const;
+	const HyStencil *GetScissorStencil() const;
+	virtual void SetScissor(const HyRect &scissorRect);
+	virtual void ClearScissor(bool bUseParentScissor);
+
 protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
 	//virtual void Update() override;
 
 	// Internal Entity propagation function overrides
 	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding);
+	virtual void _SetScissorStencil(HyStencilHandle hHandle, bool bIsOverriding);
 
 private:
 	void CalculateColor(float fExtrapolatePercent);
+	void SyncScissorStencil(float fExtrapolatePercent);
 
 	virtual IHyNode &_VisableGetNodeRef() override final;
 	virtual HyEntity2d *_VisableGetParent2dPtr() override final;

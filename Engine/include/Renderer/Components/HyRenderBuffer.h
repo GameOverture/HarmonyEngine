@@ -39,7 +39,7 @@ public:
 		const uint32							m_uiDATA_OFFSET;				// Offset into vertex buffer
 		const HyRenderMode						m_eRENDER_MODE;
 		const HyShaderHandle					m_hSHADER;
-		const HyScreenRect<int32>				m_SCISSOR_RECT;
+		const HyShaderHandle					m_hSCISSOR_STENCIL;
 		const HyStencilHandle					m_hSTENCIL;
 		const int32								m_iCOORDINATE_SYSTEM;			// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
 		
@@ -54,7 +54,7 @@ public:
 			uint32 uiDataOffset,
 			HyRenderMode eRenderMode,
 			HyShaderHandle hShader,
-			HyScreenRect<int32> &scissorRect,
+			HyStencilHandle hScissorStencil,
 			HyStencilHandle hStencil,
 			int32 iCoordinateSystem,
 			uint32 uiNumInstances,
@@ -63,7 +63,7 @@ public:
 												m_uiDATA_OFFSET(uiDataOffset),
 												m_eRENDER_MODE(eRenderMode),
 												m_hSHADER(hShader),
-												m_SCISSOR_RECT(scissorRect),
+												m_hSCISSOR_STENCIL(hScissorStencil),
 												m_hSTENCIL(hStencil),
 												m_iCOORDINATE_SYSTEM(iCoordinateSystem),
 												m_uiNumInstances(uiNumInstances),
@@ -79,7 +79,7 @@ public:
 				   //m_uiDATA_OFFSET == rhs.m_uiDATA_OFFSET && // Don't check
 				   m_eRENDER_MODE == rhs.m_eRENDER_MODE &&
 				   m_hSHADER == rhs.m_hSHADER &&
-				   m_SCISSOR_RECT == rhs.m_SCISSOR_RECT &&
+				   m_hSCISSOR_STENCIL == rhs.m_hSCISSOR_STENCIL &&
 				   m_hSTENCIL == rhs.m_hSTENCIL &&
 				   m_iCOORDINATE_SYSTEM == rhs.m_iCOORDINATE_SYSTEM &&
 				   m_uiNUM_VERTS_PER_INSTANCE == rhs.m_uiNUM_VERTS_PER_INSTANCE;

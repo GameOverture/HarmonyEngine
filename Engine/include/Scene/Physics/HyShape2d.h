@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 
 class HyEntity2d;
+class HyRect;
 
 class HyShape2d
 {
@@ -84,14 +85,8 @@ public:
 	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount);
 	void SetAsPolygon(const std::vector<glm::vec2> &verticesList);
 
-	// Build vertices to represent an axis-aligned box
-	bool SetAsBox(int32 iWidth, int32 iHeight);
-	bool SetAsBox(float fWidth, float fHeight);
-
-	// Build vertices to represent an oriented box.
-	// ptBoxCenter is the center of the box in local coordinates.
-	// fRot the rotation of the box in local coordinates.
-	bool SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg);
+	//bool SetAsBox(float fWidth, float fHeight); // Build vertices to represent an axis-aligned box, bottom left corner at origin
+	bool SetAsBox(const HyRect &rect); // Build vertices to represent an oriented box
 
 	// Applies when attached to a physics body
 	bool IsFixtureAllowed() const;

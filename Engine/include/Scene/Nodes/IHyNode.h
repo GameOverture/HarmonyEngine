@@ -47,10 +47,10 @@ public:
 		DIRTY_Collision				= 1 << 12,	// Not used - TODO: Possibly repurpose this to mark a flag when the local BV is changed, and cache a HyShape in IHyBody. This improves GetWidth()/GetHeight(), but fattens the node size
 		DIRTY_Transform				= 1 << 13,
 		DIRTY_Color					= 1 << 14,
-		DIRTY_Scissor				= 1 << 15,
+		DIRTY_ScissorStencil		= 1 << 15,
 		DIRTY_Audio					= 1 << 16,
 
-		DIRTY_ALL =					DIRTY_FromUpdater | DIRTY_Collision | DIRTY_SceneAABB | DIRTY_Transform | DIRTY_Color | DIRTY_Scissor | DIRTY_Audio
+		DIRTY_ALL =					DIRTY_FromUpdater | DIRTY_Collision | DIRTY_SceneAABB | DIRTY_Transform | DIRTY_Color | DIRTY_ScissorStencil | DIRTY_Audio
 	};
 	// When directly manipulating a node, store a flag to indicate that this attribute has been explicitly set. If later 
 	// changes occur to a parent of this node, it may optionally ignore the change when it propagates down the child hierarchy.
@@ -58,7 +58,7 @@ public:
 	{
 		EXPLICIT_ParentsVisible		= 1 << 17,
 		EXPLICIT_PauseUpdate		= 1 << 18,
-		EXPLICIT_Scissor			= 1 << 19,
+		EXPLICIT_ScissorStencil		= 1 << 19,
 		EXPLICIT_Stencil			= 1 << 20,
 		EXPLICIT_DisplayOrder		= 1 << 21,
 		EXPLICIT_CoordinateSystem	= 1 << 22,

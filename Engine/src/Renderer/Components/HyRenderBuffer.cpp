@@ -55,20 +55,18 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 {
 	HyRenderMode eRenderMode = HYRENDERMODE_Unknown;
 	uint32 uiNumInstances = 0, uiNumVerticesPerInstance = 0;
-	HyScreenRect<int32> scissorRect;
 	bool bIsBatchable = false;
 	uint32 uiStageIndex = 0;
 	do
 	{
 		instanceRef.PrepRenderStage(uiStageIndex, eRenderMode, uiNumInstances, uiNumVerticesPerInstance, bIsBatchable);
-		instanceRef.GetWorldScissor(scissorRect, fExtrapolatePercent);
 
 		State *pRenderState = new (m_pCurWritePosition)State(uiId,
 															 uiCameraMask,
 															 vertexBufferRef.GetNumUsedBytes2d(), // Gets current offset into vertex buffer
 															 eRenderMode,
 															 instanceRef.GetShaderHandle(),
-															 scissorRect,
+															 (instanceRef.GetScissorStencil() != nullptr) ? instanceRef.GetScissorStencil()->GetHandle() : HY_UNUSED_HANDLE,
 															 (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
 															 instanceRef.GetCoordinateSystem(),
 															 uiNumInstances,

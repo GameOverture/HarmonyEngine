@@ -17,13 +17,17 @@ class IHyDrawable2d;
 
 enum HyStencilBehavior
 {
-	HYSTENCILBEHAVIOR_Mask = 0,
-	HYSTENCILBEHAVIOR_InvertedMask
+	HYSTENCILBEHAVIOR_Scissor = 0,
+	HYSTENCILBEHAVIOR_Mask,
+	HYSTENCILBEHAVIOR_InvertedMask,
+	
+	// NOTE: Any new behaviors need to be properly implemented in HyOpenGL::DrawRenderState_2d
 };
 
 class HyStencil
 {
 	friend class IHyRenderer;
+	friend class IHyBody2d;
 
 	static HyStencilHandle			sm_hHandleCount;
 	const HyStencilHandle			m_hHANDLE;
@@ -56,6 +60,8 @@ public:
 	HyRenderBuffer::State *GetRenderStatePtr() const;
 
 private:
+	void SetAsScissor(const HyRect &scissorRect);
+
 	bool ConfirmMaskReady();
 	void SetRenderStatePtr(HyRenderBuffer::State *pPtr);
 };

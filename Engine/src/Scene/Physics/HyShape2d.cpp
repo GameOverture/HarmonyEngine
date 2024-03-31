@@ -396,14 +396,14 @@ void HyShape2d::SetAsPolygon(const std::vector<glm::vec2> &verticesList)
 	SetAsPolygon(verticesList.data(), static_cast<uint32>(verticesList.size()));
 }
 
-bool HyShape2d::SetAsBox(int32 iWidth, int32 iHeight)
-{
-	return SetAsBox(static_cast<float>(iWidth), static_cast<float>(iHeight));
-}
+//bool HyShape2d::SetAsBox(float fWidth, float fHeight)
+//{
+//	return SetAsBox(HyRect(fWidth, fHeight));
+//}
 
-bool HyShape2d::SetAsBox(float fWidth, float fHeight)
+bool HyShape2d::SetAsBox(const HyRect &rect)
 {
-	if(fWidth < FloatSlop || fHeight < FloatSlop)
+	if(rect.width < FloatSlop || rect.height < FloatSlop)
 	{
 		SetAsNothing();
 		return false;
@@ -413,31 +413,9 @@ bool HyShape2d::SetAsBox(float fWidth, float fHeight)
 
 	delete m_pShape;
 	m_pShape = HY_NEW b2PolygonShape();
-	
-	// Offsets Box2d's center to Harmony's default bottom left
-	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fWidth * 0.5f, fHeight * 0.5f, b2Vec2(fWidth * 0.5f, fHeight * 0.5f), 0.0f);
+	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(rect.width * 0.5f, rect.height * 0.5f, b2Vec2(rect.x + rect.width * 0.5f, rect.y + rect.height * 0.5f), glm::radians(rect.rot));
 
 	ShapeChanged();
-
-	return true;
-}
-
-bool HyShape2d::SetAsBox(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptBoxCenter, float fRotDeg)
-{
-	if(fHalfWidth * 2 < FloatSlop || fHalfHeight * 2 < FloatSlop)
-	{
-		SetAsNothing();
-		return false;
-	}
-
-	m_eType = HYSHAPE_Polygon;
-
-	delete m_pShape;
-	m_pShape = HY_NEW b2PolygonShape();
-	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(fHalfWidth, fHalfHeight, b2Vec2(ptBoxCenter.x, ptBoxCenter.y), glm::radians(fRotDeg));
-
-	ShapeChanged();
-
 	return true;
 }
 
