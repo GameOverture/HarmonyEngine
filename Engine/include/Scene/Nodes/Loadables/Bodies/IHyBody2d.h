@@ -87,7 +87,6 @@ protected:
 
 private:
 	void CalculateColor(float fExtrapolatePercent);
-	//void SyncScissorStencil(float fExtrapolatePercent);
 
 	virtual IHyNode &_VisableGetNodeRef() override final;
 	virtual HyEntity2d *_VisableGetParent2dPtr() override final;

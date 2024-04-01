@@ -383,26 +383,6 @@ void IHyBody2d::CalculateColor(float fExtrapolatePercent)
 	}
 }
 
-//void IHyBody2d::SyncScissorStencil(float fExtrapolatePercent)
-//{
-//	if((GetInternalFlags() & EXPLICIT_ScissorStencil) == 0)
-//		return;
-//
-//	if(IsScissorSet() == false)
-//		return;
-//
-//	if(IsDirty(DIRTY_ScissorStencil) == false)
-//		return;
-//
-//	HyStencil *pScissorStencil = IHyRenderer::FindStencil(m_hScissorStencil);
-//	HyAssert(pScissorStencil &&
-//		pScissorStencil->GetBehavior() == HYSTENCILBEHAVIOR_Scissor &&
-//		pScissorStencil->GetInstanceList().size() == 1 &&
-//		pScissorStencil->GetInstanceList()[0]->GetType() == HYTYPE_Primitive, "IHyBody::SyncScissorStencil() m_hScissorStencil was a stencil that is not a scissor");
-//
-//	
-//}
-
 /*virtual*/ IHyNode &IHyBody2d::_VisableGetNodeRef() /*override final*/
 {
 	return *this;
