@@ -274,7 +274,7 @@ void TransformCtrl::WrapTo(QList<EntityDrawItem *> itemDrawList, HyCamera2d *pCa
 
 	// Using 'combinedAabb' create an OBB in 'boundingShape', then rotate it back by the previous rotation compensation
 	// Cannot use SetAsPolygon() because Box2d wields the vertices in an odd order
-	boundingShape.SetAsBox(combinedAabb.GetExtents().x, combinedAabb.GetExtents().y, ptRotPivot, 0.0f);
+	boundingShape.SetAsBox(HyRect(combinedAabb.GetExtents().x, combinedAabb.GetExtents().y, ptRotPivot, 0.0f));
 
 	//glm::mat4 mtxRotateCompensate(1.0f);
 	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot);

@@ -294,7 +294,7 @@ const HyStencil *IHyBody2d::GetScissorStencil() const
 		HyAssert(pScissorStencil &&
 			pScissorStencil->GetBehavior() == HYSTENCILBEHAVIOR_Scissor &&
 			pScissorStencil->GetInstanceList().size() == 1 &&
-			pScissorStencil->GetInstanceList()[0]->GetType() == HYTYPE_Primitive, "IHyBody::SyncScissorStencil() m_hScissorStencil was a stencil that is not a scissor");
+			pScissorStencil->GetInstanceList()[0]->GetType() == HYTYPE_Primitive, "IHyBody2d::SetScissor() m_hScissorStencil was a stencil that is not a scissor");
 
 		HyPrimitive2d *pScissorPrim = static_cast<HyPrimitive2d *>(pScissorStencil->GetInstanceList()[0]);
 		pScissorPrim->SetAsBox(scissorRect);
@@ -307,6 +307,8 @@ const HyStencil *IHyBody2d::GetScissorStencil() const
 		m_hScissorStencil = pNewScissorStencil->GetHandle();
 		m_uiFlags |= IHyNode::EXPLICIT_ScissorStencil;
 	}
+
+	SetDirty(DIRTY_ScissorStencil);
 }
 
 /*virtual*/ void IHyBody2d::ClearScissor(bool bUseParentScissor)
@@ -377,7 +379,6 @@ void IHyBody2d::CalculateColor(float fExtrapolatePercent)
 	}
 }
 
-call_this_somewhere;
 void IHyBody2d::SyncScissorStencil(float fExtrapolatePercent)
 {
 	if((GetInternalFlags() & IHyNode::EXPLICIT_ScissorStencil) == 0 ||

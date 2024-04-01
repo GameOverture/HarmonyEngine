@@ -23,6 +23,7 @@ class IHyBody2d : public IHyLoadable2d, public IHyBody
 	friend class HyEntity2d;
 	friend class HyShape2d;
 	friend class HyPhysicsCtrl2d;
+	friend class HyRenderBuffer;
 
 protected:
 	float							m_fAlpha;

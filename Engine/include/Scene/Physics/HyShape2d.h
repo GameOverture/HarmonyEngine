@@ -85,8 +85,8 @@ public:
 	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount);
 	void SetAsPolygon(const std::vector<glm::vec2> &verticesList);
 
-	//bool SetAsBox(float fWidth, float fHeight); // Build vertices to represent an axis-aligned box, bottom left corner at origin
-	bool SetAsBox(const HyRect &rect); // Build vertices to represent an oriented box
+	bool SetAsBox(float fWidth, float fHeight); // Build vertices to represent an axis-aligned box, bottom left corner at 0,0
+	bool SetAsBox(const HyRect &rect);			// Build vertices to represent an oriented box
 
 	// Applies when attached to a physics body
 	bool IsFixtureAllowed() const;

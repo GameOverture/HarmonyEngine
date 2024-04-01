@@ -128,9 +128,9 @@ public:
 		Set(fWidth, fHeight);
 	}
 
-	HyRect(float fX, float fY, float fWidth, float fHeight, float fRotDegrees = 0.0f)
+	HyRect(float fX, float fY, float fWidth, float fHeight)
 	{
-		Set(fX, fY, fWidth, fHeight, fRotDegrees);
+		Set(fX, fY, fWidth, fHeight);
 	}
 
 	HyRect(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptCenter, float fRotDegrees = 0.0f)
@@ -148,20 +148,22 @@ public:
 	//	return s.str();
 	//}
 
+	float GetWidth(float fPercent = 1.0f) const
+	{
+		return (m_fHalfWidth * 2.0f) * fPercent;
+	}
+	float GetHeight(float fPercent = 1.0f) const
+	{
+		return (m_fHalfHeight * 2.0f) * fPercent;
+	}
 	glm::vec2 GetCenter() const
 	{
 		return m_ptCenter;
 	}
-
-	// TODO: Write these with rotation in mind
-	//float GetWidth(float fPercent = 1.0f) const
-	//{
-	//	return width * fPercent;
-	//}
-	//float GetHeight(float fPercent = 1.0f) const
-	//{
-	//	return height * fPercent;
-	//}
+	float GetRotation() const
+	{
+		return m_fRotDegrees;
+	}
 
 	void Set(float fWidth, float fHeight)
 	{
@@ -171,15 +173,15 @@ public:
 		m_fRotDegrees = 0.0f;
 	}
 
-	void Set(float fX, float fY, float fWidth, float fHeight, float fRotDegrees = 0.0f)
+	void Set(float fX, float fY, float fWidth, float fHeight)
 	{
 		m_fHalfWidth = fWidth * 0.5f;
 		m_fHalfHeight = fHeight * 0.5f;
 		HySetVec(m_ptCenter, fX + m_fHalfWidth, fY + m_fHalfHeight);
-		m_fRotDegrees = fRotDegrees;
+		m_fRotDegrees = 0.0f;
 	}
 
-	void Set(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptCenter, float fRotDegrees = 0.0f)
+	void Set(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptCenter, float fRotDegrees)
 	{
 		m_fHalfWidth = fHalfWidth;
 		m_fHalfHeight = fHalfHeight;

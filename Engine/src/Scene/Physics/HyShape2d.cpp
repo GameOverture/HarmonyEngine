@@ -396,14 +396,14 @@ void HyShape2d::SetAsPolygon(const std::vector<glm::vec2> &verticesList)
 	SetAsPolygon(verticesList.data(), static_cast<uint32>(verticesList.size()));
 }
 
-//bool HyShape2d::SetAsBox(float fWidth, float fHeight)
-//{
-//	return SetAsBox(HyRect(fWidth, fHeight));
-//}
+bool HyShape2d::SetAsBox(float fWidth, float fHeight)
+{
+	return SetAsBox(HyRect(fWidth, fHeight));
+}
 
 bool HyShape2d::SetAsBox(const HyRect &rect)
 {
-	if(rect.width < FloatSlop || rect.height < FloatSlop)
+	if(rect.GetWidth() < FloatSlop || rect.GetHeight() < FloatSlop)
 	{
 		SetAsNothing();
 		return false;
@@ -413,7 +413,10 @@ bool HyShape2d::SetAsBox(const HyRect &rect)
 
 	delete m_pShape;
 	m_pShape = HY_NEW b2PolygonShape();
-	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(rect.width * 0.5f, rect.height * 0.5f, b2Vec2(rect.x + rect.width * 0.5f, rect.y + rect.height * 0.5f), glm::radians(rect.rot));
+	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(rect.GetWidth() * 0.5f,
+													  rect.GetHeight() * 0.5f,
+													  b2Vec2(rect.GetCenter().x, rect.GetCenter().y),
+													  glm::radians(rect.GetRotation()));
 
 	ShapeChanged();
 	return true;

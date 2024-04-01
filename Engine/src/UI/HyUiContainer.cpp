@@ -20,7 +20,7 @@ HyLayoutHandle HyUiContainer::sm_hLayoutHandleCounter = 1;
 
 HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
-	m_Shape(this),
+	//m_Shape(this),
 	m_bInputAllowed(true),
 	m_iDefaultWidgetSpacing(HYUICONTAINER_DefaultWidgetSpacing),
 	m_bFlexSizeX(true),
@@ -400,12 +400,12 @@ bool HyUiContainer::SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, in
 {
 	if(hAffectedLayout == HY_UNUSED_HANDLE)
 	{
-		m_RootLayout.SetMargins(iLeft, iBottom, iRight, iTop, m_RootLayout.GetMargins().iTag);
+		m_RootLayout.SetMargins(iLeft, iBottom, iRight, iTop, m_RootLayout.GetWidgetSpacing());
 		return true;
 	}
 	else if(m_SubLayoutMap.find(hAffectedLayout) != m_SubLayoutMap.end())
 	{
-		m_SubLayoutMap[hAffectedLayout]->SetMargins(iLeft, iBottom, iRight, iTop, m_SubLayoutMap[hAffectedLayout]->GetMargins().iTag);
+		m_SubLayoutMap[hAffectedLayout]->SetMargins(iLeft, iBottom, iRight, iTop, m_SubLayoutMap[hAffectedLayout]->GetWidgetSpacing());
 		return true;
 	}
 
@@ -597,7 +597,6 @@ void HyUiContainer::OnRootLayoutUpdate()
 	if(iNewWidth == 0 || iNewHeight == 0)
 		return;
 
-	int32 iScissorMargin = 0;
 	if(m_bUseVertBar || m_bUseHorzBar)
 	{
 		// If scrolling, then use '0' for that dimension, to indicate to the layout use the exact amount it needs.
@@ -623,6 +622,7 @@ void HyUiContainer::OnRootLayoutUpdate()
 	bool bVertBarShown = iNewHeight == 0;
 	bool bHorzBarShown = iNewWidth == 0;
 
+	int32 iScissorMargin = 0;
 	if(bVertBarShown || bHorzBarShown)
 	{
 		if(m_Panel.IsPrimitive())
@@ -631,7 +631,7 @@ void HyUiContainer::OnRootLayoutUpdate()
 		int32 iScissorWidth = static_cast<int32>(m_Panel.GetWidth(m_Panel.scale.X())) - (iScissorMargin * 2) - (static_cast<int32>(bVertBarShown) * m_VertBar.GetDiameter());
 		int32 iScissorHeight = static_cast<int32>(m_Panel.GetHeight(m_Panel.scale.Y())) - (iScissorMargin * 2) - (static_cast<int32>(bHorzBarShown) * m_HorzBar.GetDiameter());
 		if(iScissorWidth > 0 && iScissorHeight > 0)
-			SetScissor(iScissorMargin, iScissorMargin, iScissorWidth, iScissorHeight);
+			SetScissor(HyRect(iScissorMargin, iScissorMargin, iScissorWidth, iScissorHeight));
 		else
 			ClearScissor(true);
 	}

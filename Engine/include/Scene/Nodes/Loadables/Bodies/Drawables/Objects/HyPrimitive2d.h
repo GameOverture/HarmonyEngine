@@ -75,8 +75,8 @@ public:
 	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount);
 	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount);
 
-	//void SetAsBox(float fWidth, float fHeight); // Axis-aligned box, bottom left corner at origin
-	void SetAsBox(const HyRect &rect); // Represent an oriented box
+	void SetAsBox(float fWidth, float fHeight);	// Axis-aligned box, bottom left corner at 0,0
+	void SetAsBox(const HyRect &rect);			// Represent an oriented box
 
 	uint32 GetNumVerts() const;
 	const glm::vec2 *GetVerts() const;

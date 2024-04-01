@@ -35,13 +35,13 @@ void HySlider::BarPrimitives::Assemble(HyOrientation eOrientation, float fBarThi
 
 	if(eOrientation == HYORIEN_Horizontal)
 	{
-		m_BarPos.SetAsBox(1.0f, fBarThickness - fIndentAmt);
-		m_BarNeg.SetAsBox(1.0f, fBarThickness - fIndentAmt);
+		m_BarPos.SetAsBox(HyRect(1.0f, fBarThickness - fIndentAmt));
+		m_BarNeg.SetAsBox(HyRect(1.0f, fBarThickness - fIndentAmt));
 	}
 	else
 	{
-		m_BarPos.SetAsBox(fBarThickness - fIndentAmt, 1.0f);
-		m_BarNeg.SetAsBox(fBarThickness - fIndentAmt, 1.0f);
+		m_BarPos.SetAsBox(HyRect(fBarThickness - fIndentAmt, 1.0f));
+		m_BarNeg.SetAsBox(HyRect(fBarThickness - fIndentAmt, 1.0f));
 	}
 
 	m_BarPos.pos.GetAnimFloat(eOrientation) = 0.0f;

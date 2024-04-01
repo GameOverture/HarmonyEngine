@@ -282,7 +282,7 @@ void HyBarMeter::SetNumFormat(HyNumberFormat format)
 		m_Bar.SetStencil(nullptr);
 	else
 	{
-		m_BarMask.SetAsBox(m_Bar.GetWidth(), m_Bar.GetHeight());
+		m_BarMask.SetAsBox(HyRect(m_Bar.GetWidth(), m_Bar.GetHeight()));
 		m_BarMask.SetVisible(false);
 		m_BarStencil.AddMask(m_BarMask);
 		

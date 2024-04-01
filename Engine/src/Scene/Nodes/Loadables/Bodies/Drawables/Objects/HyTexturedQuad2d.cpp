@@ -98,7 +98,7 @@ void HyTexturedQuad2d::Uninit()
 		return;
 	}
 
-	shapeOut.SetAsBox(HyRect(static_cast<float>(GetWidth()), static_cast<float>(GetHeight())));
+	shapeOut.SetAsBox(GetWidth(), GetHeight());
 }
 
 /*virtual*/ float HyTexturedQuad2d::GetWidth(float fPercent /*= 1.0f*/) /*override*/

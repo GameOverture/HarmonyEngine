@@ -128,8 +128,8 @@ void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDrag
 		break;
 
 	case SHAPE_Box:
-		m_BoundingVolume.SetAsBox((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f);
-		m_Outline.SetAsBox((ptWindowUpperBound.x - ptWindowLowerBound.x) * 0.5f, (ptWindowUpperBound.y - ptWindowLowerBound.y) * 0.5f, ptWindowCenter, 0.0f);
+		m_BoundingVolume.SetAsBox(HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f));
+		m_Outline.SetAsBox(HyRect((ptWindowUpperBound.x - ptWindowLowerBound.x) * 0.5f, (ptWindowUpperBound.y - ptWindowLowerBound.y) * 0.5f, ptWindowCenter, 0.0f));
 		break;
 
 	case SHAPE_Circle:
@@ -220,7 +220,7 @@ void ShapeCtrl::SetAsText(HyText2d *pTextNode, bool bShowOutline, HyCamera2d *pC
 	{
 		Setup(SHAPE_Box, color, 0.0f, fOutlineAlpha);
 		glm::vec2 ptCenter(pTextNode->GetTextBoxDimensions().x * 0.5f, pTextNode->GetHeight() * -0.5f);
-		m_BoundingVolume.SetAsBox(pTextNode->GetTextBoxDimensions().x * 0.5f, pTextNode->GetHeight() * 0.5f, ptCenter, 0.0f);
+		m_BoundingVolume.SetAsBox(HyRect(pTextNode->GetTextBoxDimensions().x * 0.5f, pTextNode->GetHeight() * 0.5f, ptCenter, 0.0f));
 	}
 	else if(pTextNode->IsVertical())
 	{

@@ -25,7 +25,8 @@ class HyLayout : public IHyEntityUi
 	
 	bool								m_bReverse;			// By default items are appended left->right, or top->bottom (NOTE: 'm_bReverse' is defaulted ON when 'm_eOrientation' is HYORIEN_Vertical to achieve top->bottom as default)
 
-	HyRectangle<int16>					m_Margins;			// Tag = Spacing between widgets inside the layout
+	HyRectangle<int16>					m_Margins;			// Pixel margins
+	int32								m_iWidgetSpacing;	// Spacing between widgets inside the layout
 
 	bool								m_bLayoutDirty;
 

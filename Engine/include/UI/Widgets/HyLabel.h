@@ -34,7 +34,8 @@ protected:
 	static_assert((int)LABELATTRIB_IsSideBySide == (int)WIDGETATTRIB_NEXTFLAG, "HyLabel is not matching with base classes attrib flags");
 
 	HyText2d				m_Text;
-	HyRectangle<float>		m_TextMargins;					// Margins used for Stacked text scale box; The 'iTag' is used for Side-by-side padding between text/panel
+	HyRectangle<float>		m_TextMargins;					// Margins used for Stacked text scale box
+	int32					m_iSideBySidePadding;			// When set as 'Side-by-side', the pixel padding between text/panel
 
 public:
 	HyLabel(HyEntity2d *pParent = nullptr);

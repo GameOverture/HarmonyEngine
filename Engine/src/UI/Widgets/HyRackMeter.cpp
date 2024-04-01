@@ -352,7 +352,7 @@ void HyRackMeter::FormatDigits()
 		else
 			uiWidth = static_cast<uint32>(m_Text.GetWidth());
 
-		m_SpinText.SetScissor(0, 0, uiWidth, static_cast<uint32>(fThreshold));
+		m_SpinText.SetScissor(HyRect(uiWidth, static_cast<uint32>(fThreshold)));
 	}
 	else
 	{

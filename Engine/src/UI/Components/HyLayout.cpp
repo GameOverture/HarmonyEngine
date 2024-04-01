@@ -18,14 +18,13 @@ HyLayout::HyLayout(HyOrientation eLayoutType, int32 iWidgetSpacing, HyEntity2d *
 	m_eLayoutType(eLayoutType),
 	m_vActualSize(0, 0),
 	m_bReverse(m_eLayoutType == HYORIEN_Horizontal ? false : true), // 'm_bReverse' is defaulted ON when 'm_eLayoutType' is HYORIEN_Vertical to achieve top->bottom as default
-	m_bLayoutDirty(false)
+	m_bLayoutDirty(false),
+	m_iWidgetSpacing(iWidgetSpacing)
 {
 	m_uiFlags |= NODETYPE_IsLayout;
 
 	m_SizePolicies[HYORIEN_Horizontal] = HYSIZEPOLICY_Flexible;
 	m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Flexible;
-
-	m_Margins.iTag = iWidgetSpacing;
 }
 
 /*virtual*/ HyLayout::~HyLayout()
@@ -136,14 +135,14 @@ const HyRectangle<int16> &HyLayout::GetMargins() const
 void HyLayout::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing)
 {
 	m_Margins.Set(iLeft, iBottom, iRight, iTop);
-	m_Margins.iTag = iWidgetSpacing;
+	m_iWidgetSpacing = iWidgetSpacing;
 	
 	SetLayoutDirty();
 }
 
 int32 HyLayout::GetWidgetSpacing()
 {
-	return m_Margins.iTag;
+	return m_iWidgetSpacing;
 }
 
 bool HyLayout::IsLayoutDirty() const
