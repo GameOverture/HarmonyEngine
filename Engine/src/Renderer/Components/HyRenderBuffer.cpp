@@ -66,7 +66,7 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 															 vertexBufferRef.GetNumUsedBytes2d(), // Gets current offset into vertex buffer
 															 eRenderMode,
 															 instanceRef.GetShaderHandle(),
-															 (instanceRef.GetScissorStencil() != nullptr) ? instanceRef.GetScissorStencil()->GetHandle() : HY_UNUSED_HANDLE,
+															 instanceRef.GetScissorHandle(),
 															 (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
 															 instanceRef.GetCoordinateSystem(),
 															 uiNumInstances,

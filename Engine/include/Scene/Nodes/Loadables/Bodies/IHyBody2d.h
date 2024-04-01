@@ -73,7 +73,7 @@ public:
 
 	bool IsScissorSet() const;
 	void GetScissor(HyRect &scissorOut) const;
-	const HyStencil *GetScissorStencil() const;
+	HyStencilHandle GetScissorHandle() const;
 	virtual void SetScissor(const HyRect &scissorRect);
 	virtual void ClearScissor(bool bUseParentScissor);
 

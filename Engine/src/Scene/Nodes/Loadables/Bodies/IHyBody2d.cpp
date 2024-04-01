@@ -282,9 +282,14 @@ void IHyBody2d::GetScissor(HyRect &scissorOut) const
 	scissorOut.Set(fHalfWidth, fHalfHeight, ptCenter, fRotDegrees);
 }
 
-const HyStencil *IHyBody2d::GetScissorStencil() const
+//const HyStencil *IHyBody2d::GetScissorStencil() const
+//{
+//	return IHyRenderer::FindStencil(m_hScissorStencil);
+//}
+
+HyStencilHandle IHyBody2d::GetScissorHandle() const
 {
-	return IHyRenderer::FindStencil(m_hScissorStencil);
+	return m_hScissorStencil;
 }
 
 /*virtual*/ void IHyBody2d::SetScissor(const HyRect &scissorRect)
@@ -317,7 +322,7 @@ const HyStencil *IHyBody2d::GetScissorStencil() const
 	m_hScissorStencil = HY_UNUSED_HANDLE;
 
 	if((m_uiFlags & EXPLICIT_ScissorStencil) != 0)
-		delete GetScissorStencil();
+		delete IHyRenderer::FindStencil(m_hScissorStencil);
 
 	if(bUseParentScissor == false)
 		m_uiFlags |= EXPLICIT_ScissorStencil;
@@ -325,7 +330,7 @@ const HyStencil *IHyBody2d::GetScissorStencil() const
 	{
 		m_uiFlags &= ~EXPLICIT_ScissorStencil;
 		if(m_pParent && m_pParent->IsScissorSet())
-			m_hScissorStencil = m_pParent->GetScissorStencil()->GetHandle();
+			m_hScissorStencil = m_pParent->GetScissorHandle();
 	}
 }
 
