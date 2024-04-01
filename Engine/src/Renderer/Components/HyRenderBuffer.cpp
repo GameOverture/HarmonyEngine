@@ -60,7 +60,6 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 	do
 	{
 		instanceRef.PrepRenderStage(uiStageIndex, eRenderMode, uiNumInstances, uiNumVerticesPerInstance, bIsBatchable);
-		instanceRef.SyncScissorStencil(fExtrapolatePercent);
 
 		State *pRenderState = new (m_pCurWritePosition)State(uiId,
 															 uiCameraMask,

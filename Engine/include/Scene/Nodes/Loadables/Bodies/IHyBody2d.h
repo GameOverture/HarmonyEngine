@@ -24,6 +24,7 @@ class IHyBody2d : public IHyLoadable2d, public IHyBody
 	friend class HyShape2d;
 	friend class HyPhysicsCtrl2d;
 	friend class HyRenderBuffer;
+	friend class HyStencil;
 
 protected:
 	float							m_fAlpha;
@@ -86,7 +87,7 @@ protected:
 
 private:
 	void CalculateColor(float fExtrapolatePercent);
-	void SyncScissorStencil(float fExtrapolatePercent);
+	//void SyncScissorStencil(float fExtrapolatePercent);
 
 	virtual IHyNode &_VisableGetNodeRef() override final;
 	virtual HyEntity2d *_VisableGetParent2dPtr() override final;

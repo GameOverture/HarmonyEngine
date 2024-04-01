@@ -71,7 +71,7 @@ void IHyRenderer::PrepareBuffers(float fExtrapolatePercent)
 		if(pStencil->IsMaskReady() == false && pStencil->ConfirmMaskReady() == false)
 			continue;
 
-		pStencil->SetRenderStatePtr(m_RenderBuffer.GetCurWritePosPtr());
+		pStencil->PrepRender(m_RenderBuffer.GetCurWritePosPtr(), fExtrapolatePercent);
 
 		const std::vector<IHyDrawable2d *> &instanceListRef = pStencil->GetInstanceList();
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)

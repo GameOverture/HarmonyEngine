@@ -17,9 +17,10 @@ HyStencilHandle HyStencil::sm_hHandleCount = 0;
 
 HyStencil::HyStencil() :
 	m_hHANDLE(++sm_hHandleCount),
+	m_bMaskIsReady(false),
 	m_pRenderStatePtr(nullptr),
 	m_eBehavior(HYSTENCILBEHAVIOR_Mask),
-	m_bMaskIsReady(false)
+	m_pScissorOwner(nullptr)
 {
 	IHyRenderer::AddStencil(this);
 }
@@ -96,7 +97,7 @@ HyRenderBuffer::State *HyStencil::GetRenderStatePtr() const
 	return m_pRenderStatePtr;
 }
 
-void HyStencil::SetAsScissor(const HyRect &scissorRect)
+void HyStencil::SetAsScissor(const HyRect &scissorRect, IHyBody2d *pScissorOwner)
 {
 	HyAssert(m_eBehavior != HYSTENCILBEHAVIOR_Scissor && m_MaskInstanceList.empty(), "HyStencil::SetAsScissor() was called on a stencil that is already a scissor (or already contains masks)");
 	m_eBehavior = HYSTENCILBEHAVIOR_Scissor;
@@ -105,6 +106,8 @@ void HyStencil::SetAsScissor(const HyRect &scissorRect)
 	pScissorPrim->SetAsBox(scissorRect);
 	pScissorPrim->SetVisible(false);
 	AddMask(*pScissorPrim);
+
+	m_pScissorOwner = pScissorOwner;
 }
 
 bool HyStencil::ConfirmMaskReady()
@@ -123,7 +126,28 @@ bool HyStencil::ConfirmMaskReady()
 	return m_bMaskIsReady;
 }
 
-void HyStencil::SetRenderStatePtr(HyRenderBuffer::State *pPtr)
+void HyStencil::PrepRender(HyRenderBuffer::State *pPtr, float fExtrapolatePercent)
 {
 	m_pRenderStatePtr = pPtr;
+
+	if(m_eBehavior == HYSTENCILBEHAVIOR_Scissor && m_pScissorOwner->IsDirty(IHyNode::DIRTY_ScissorStencil))
+	{
+		const glm::mat4 &mtxSceneRef = m_pScissorOwner->GetSceneTransform(fExtrapolatePercent);
+		glm::vec3 vScale(1.0f);
+		glm::quat quatRot;
+		glm::vec3 ptTranslation;
+		glm::vec3 vSkew;
+		glm::vec4 vPerspective;
+		glm::decompose(mtxSceneRef, vScale, quatRot, ptTranslation, vSkew, vPerspective);
+
+		HyPrimitive2d *pScissorPrim = static_cast<HyPrimitive2d *>(m_MaskInstanceList[0]);
+		pScissorPrim->pos.Set(ptTranslation);
+		pScissorPrim->rot_pivot.Set(m_pScissorOwner->rot_pivot); // TODO: Determine if rot_pivot required
+		pScissorPrim->rot.Set(glm::degrees(glm::atan(mtxSceneRef[0][1], mtxSceneRef[0][0])));
+		pScissorPrim->scale_pivot.Set(m_pScissorOwner->scale_pivot); // TODO: Determine if scale_pivot required
+		pScissorPrim->scale.Set(vScale);
+		pScissorPrim->UseWindowCoordinates(m_pScissorOwner->GetCoordinateSystem());
+
+		m_pScissorOwner->ClearDirty(IHyNode::DIRTY_ScissorStencil);
+	}
 }

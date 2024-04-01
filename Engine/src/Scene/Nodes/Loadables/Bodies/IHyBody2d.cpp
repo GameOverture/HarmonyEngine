@@ -95,6 +95,7 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 
 IHyBody2d::~IHyBody2d()
 {
+	ClearScissor(true);
 }
 
 IHyBody2d &IHyBody2d::operator=(const IHyBody2d &rhs)
@@ -288,7 +289,7 @@ const HyStencil *IHyBody2d::GetScissorStencil() const
 
 /*virtual*/ void IHyBody2d::SetScissor(const HyRect &scissorRect)
 {
-	if(IsScissorSet() && (GetInternalFlags() & IHyNode::EXPLICIT_ScissorStencil))
+	if((GetInternalFlags() & EXPLICIT_ScissorStencil) != 0)
 	{
 		HyStencil *pScissorStencil = IHyRenderer::FindStencil(m_hScissorStencil);
 		HyAssert(pScissorStencil &&
@@ -302,10 +303,10 @@ const HyStencil *IHyBody2d::GetScissorStencil() const
 	else
 	{
 		HyStencil *pNewScissorStencil = HY_NEW HyStencil();
-		pNewScissorStencil->SetAsScissor(scissorRect);
+		pNewScissorStencil->SetAsScissor(scissorRect, this);
 
 		m_hScissorStencil = pNewScissorStencil->GetHandle();
-		m_uiFlags |= IHyNode::EXPLICIT_ScissorStencil;
+		m_uiFlags |= EXPLICIT_ScissorStencil;
 	}
 
 	SetDirty(DIRTY_ScissorStencil);
@@ -315,11 +316,14 @@ const HyStencil *IHyBody2d::GetScissorStencil() const
 {
 	m_hScissorStencil = HY_UNUSED_HANDLE;
 
+	if((m_uiFlags & EXPLICIT_ScissorStencil) != 0)
+		delete GetScissorStencil();
+
 	if(bUseParentScissor == false)
-		m_uiFlags |= IHyNode::EXPLICIT_ScissorStencil;
+		m_uiFlags |= EXPLICIT_ScissorStencil;
 	else
 	{
-		m_uiFlags &= ~IHyNode::EXPLICIT_ScissorStencil;
+		m_uiFlags &= ~EXPLICIT_ScissorStencil;
 		if(m_pParent && m_pParent->IsScissorSet())
 			m_hScissorStencil = m_pParent->GetScissorStencil()->GetHandle();
 	}
@@ -354,9 +358,9 @@ const HyStencil *IHyBody2d::GetScissorStencil() const
 /*virtual*/ void IHyBody2d::_SetScissorStencil(HyStencilHandle hHandle, bool bIsOverriding)
 {
 	if(bIsOverriding)
-		m_uiFlags &= ~IHyNode::EXPLICIT_ScissorStencil;
+		m_uiFlags &= ~EXPLICIT_ScissorStencil;
 
-	if(0 == (m_uiFlags & IHyNode::EXPLICIT_ScissorStencil))
+	if(0 == (m_uiFlags & EXPLICIT_ScissorStencil))
 		m_hScissorStencil = hHandle;
 }
 
@@ -379,39 +383,25 @@ void IHyBody2d::CalculateColor(float fExtrapolatePercent)
 	}
 }
 
-void IHyBody2d::SyncScissorStencil(float fExtrapolatePercent)
-{
-	if((GetInternalFlags() & IHyNode::EXPLICIT_ScissorStencil) == 0 ||
-		IsScissorSet() == false ||
-		IsDirty(IHyNode::DIRTY_ScissorStencil) == false)
-	{
-		return;
-	}
-
-	HyStencil *pScissorStencil = IHyRenderer::FindStencil(m_hScissorStencil);
-	HyAssert(pScissorStencil &&
-		pScissorStencil->GetBehavior() == HYSTENCILBEHAVIOR_Scissor &&
-		pScissorStencil->GetInstanceList().size() == 1 &&
-		pScissorStencil->GetInstanceList()[0]->GetType() == HYTYPE_Primitive, "IHyBody::SyncScissorStencil() m_hScissorStencil was a stencil that is not a scissor");
-
-	const glm::mat4 &mtxSceneRef = GetSceneTransform(fExtrapolatePercent);
-	glm::vec3 vScale(1.0f);
-	glm::quat quatRot;
-	glm::vec3 ptTranslation;
-	glm::vec3 vSkew;
-	glm::vec4 vPerspective;
-	glm::decompose(mtxSceneRef, vScale, quatRot, ptTranslation, vSkew, vPerspective);
-
-	HyPrimitive2d *pScissorPrim = static_cast<HyPrimitive2d *>(pScissorStencil->GetInstanceList()[0]);
-	pScissorPrim->pos.Set(ptTranslation);
-	pScissorPrim->rot_pivot.Set(rot_pivot); // TODO: Determine if rot_pivot required
-	pScissorPrim->rot.Set(glm::degrees(glm::atan(mtxSceneRef[0][1], mtxSceneRef[0][0])));
-	pScissorPrim->scale_pivot.Set(scale_pivot); // TODO: Determine if scale_pivot required
-	pScissorPrim->scale.Set(vScale);
-	pScissorPrim->UseWindowCoordinates(GetCoordinateSystem());
-
-	ClearDirty(IHyNode::DIRTY_ScissorStencil);
-}
+//void IHyBody2d::SyncScissorStencil(float fExtrapolatePercent)
+//{
+//	if((GetInternalFlags() & EXPLICIT_ScissorStencil) == 0)
+//		return;
+//
+//	if(IsScissorSet() == false)
+//		return;
+//
+//	if(IsDirty(DIRTY_ScissorStencil) == false)
+//		return;
+//
+//	HyStencil *pScissorStencil = IHyRenderer::FindStencil(m_hScissorStencil);
+//	HyAssert(pScissorStencil &&
+//		pScissorStencil->GetBehavior() == HYSTENCILBEHAVIOR_Scissor &&
+//		pScissorStencil->GetInstanceList().size() == 1 &&
+//		pScissorStencil->GetInstanceList()[0]->GetType() == HYTYPE_Primitive, "IHyBody::SyncScissorStencil() m_hScissorStencil was a stencil that is not a scissor");
+//
+//	
+//}
 
 /*virtual*/ IHyNode &IHyBody2d::_VisableGetNodeRef() /*override final*/
 {

@@ -14,6 +14,7 @@
 #include "Renderer/Components/HyRenderBuffer.h"
 
 class IHyDrawable2d;
+class IHyBody2d;
 
 enum HyStencilBehavior
 {
@@ -38,6 +39,7 @@ class HyStencil
 	HyRenderBuffer::State *			m_pRenderStatePtr;
 
 	HyStencilBehavior				m_eBehavior;
+	IHyBody2d *						m_pScissorOwner;
 
 public:
 	HyStencil();
@@ -60,10 +62,10 @@ public:
 	HyRenderBuffer::State *GetRenderStatePtr() const;
 
 private:
-	void SetAsScissor(const HyRect &scissorRect);
+	void SetAsScissor(const HyRect &scissorRect, IHyBody2d *pScissorOwner);
 
 	bool ConfirmMaskReady();
-	void SetRenderStatePtr(HyRenderBuffer::State *pPtr);
+	void PrepRender(HyRenderBuffer::State *pPtr, float fExtrapolatePercent);
 };
 
 #endif /* HyStencil_h__ */
