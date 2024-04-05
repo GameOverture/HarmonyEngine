@@ -61,7 +61,7 @@ public:
 	int32 GetWidth() const;
 	int32 GetHeight() const;
 	HyTextureHandle GetTextureHandle() const;
-	bool GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut, uint64 &cropMaskOut) const;
+	bool GetUvRect(uint32 uiChecksum, HyMargins<float> &UVRectOut, uint64 &cropMaskOut) const;
 
 	void DeletePixelData();
 

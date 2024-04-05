@@ -78,7 +78,7 @@ HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAs
 
 		std::string sName = atlasObj["name"].GetString();
 		
-		HyRectangle<float> rSubAtlasUVRect;
+		HyMargins<float> rSubAtlasUVRect;
 		uint64 uiCropMask = 0;
 
 		if(bIsUsingTempFiles == false)

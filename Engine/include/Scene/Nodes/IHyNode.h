@@ -69,6 +69,7 @@ public:
 		SETTING_IsRegistered		= 1 << 23,
 		SETTING_IsVisible			= 1 << 24,
 		SETTING_IsPauseUpdate		= 1 << 25,
+		SETTING_AllocScissorStencil	= 1 << 26,
 	};
 protected:
 	uint32							m_uiFlags;

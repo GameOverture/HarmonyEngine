@@ -60,53 +60,6 @@ bool HyCompareFloat(T lhs, T rhs)
 	return trunc(1000. * lhs) == trunc(1000. * rhs);
 }
 
-// DEPRECATED: Use 'HyRect' instead
-template<typename T>
-struct HyRectangle
-{
-	T left;
-	T bottom;
-	T right;
-	T top;
-
-	HyRectangle() : left(0), bottom(0), right(0), top(0)
-	{ }
-
-	HyRectangle(T tLeft, T tBottom, T tRight, T tTop) : left(tLeft), bottom(tBottom), right(tRight), top(tTop)
-	{ }
-
-	std::string ToString() const
-	{
-		std::ostringstream s;
-		s << "(L:" << left << ", T:" << top << ", R:" << right << ", B:" << bottom << ")";
-		return s.str();
-	}
-
-	T Width() const
-	{
-		return right - left;
-	}
-
-	T Height() const
-	{
-		return abs(bottom - top);
-	}
-
-	void Set(T tLeft, T tBottom, T tRight, T tTop)
-	{
-		left = tLeft;
-		top = tTop;
-		right = tRight;
-		bottom = tBottom;
-	}
-
-	// Does not compare tags
-	bool operator==(const HyRectangle<T> &rhs) const
-	{
-		return (0 == memcmp(this, &rhs, sizeof(T) * 4));
-	}
-};
-
 class HyRect
 {
 	float		m_fHalfWidth;
@@ -187,6 +140,47 @@ public:
 		m_fHalfHeight = fHalfHeight;
 		m_ptCenter = ptCenter;
 		m_fRotDegrees = fRotDegrees;
+	}
+};
+
+// Useful for storing margins or UV texture coordinates
+template<typename T>
+struct HyMargins
+{
+	T left;
+	T bottom;
+	T right;
+	T top;
+
+	HyMargins() : left(0), bottom(0), right(0), top(0)
+	{ }
+
+	HyMargins(T tLeft, T tBottom, T tRight, T tTop) : left(tLeft), bottom(tBottom), right(tRight), top(tTop)
+	{ }
+
+	std::string ToString() const
+	{
+		std::ostringstream s;
+		s << "(L:" << left << ", T:" << top << ", R:" << right << ", B:" << bottom << ")";
+		return s.str();
+	}
+
+	T Width() const
+	{
+		return right - left;
+	}
+
+	T Height() const
+	{
+		return abs(bottom - top);
+	}
+
+	void Set(T tLeft, T tBottom, T tRight, T tTop)
+	{
+		left = tLeft;
+		top = tTop;
+		right = tRight;
+		bottom = tBottom;
 	}
 };
 

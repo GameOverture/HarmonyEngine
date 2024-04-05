@@ -25,7 +25,7 @@ class HyLayout : public IHyEntityUi
 	
 	bool								m_bReverse;			// By default items are appended left->right, or top->bottom (NOTE: 'm_bReverse' is defaulted ON when 'm_eOrientation' is HYORIEN_Vertical to achieve top->bottom as default)
 
-	HyRectangle<int16>					m_Margins;			// Pixel margins
+	HyMargins<int16>					m_Margins;			// Pixel margins
 	int32								m_iWidgetSpacing;	// Spacing between widgets inside the layout
 
 	bool								m_bLayoutDirty;
@@ -52,7 +52,7 @@ public:
 	bool IsReverseOrder();
 	void ReverseOrder(bool bReverse);
 
-	const HyRectangle<int16> &GetMargins() const;
+	const HyMargins<int16> &GetMargins() const;
 	void SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing);
 	int32 GetWidgetSpacing();
 

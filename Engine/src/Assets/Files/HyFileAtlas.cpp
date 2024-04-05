@@ -93,13 +93,13 @@ HyTextureHandle HyFileAtlas::GetTextureHandle() const
 	return m_hTextureHandle;
 }
 
-bool HyFileAtlas::GetUvRect(uint32 uiChecksum, HyRectangle<float> &UVRectOut, uint64 &cropMaskOut) const
+bool HyFileAtlas::GetUvRect(uint32 uiChecksum, HyMargins<float> &UVRectOut, uint64 &cropMaskOut) const
 {
 	float fTexWidth = static_cast<float>(m_iWidth);
 	float fTexHeight = static_cast<float>(m_iHeight);
 	HyAssert(fTexWidth > 0.0f && fTexHeight > 0.0f, "HyFileAtlas::GetUvRect was called before the texture was loaded");
 
-	//const HyRectangle<int32> *pSrcRect = nullptr;
+	//const HyMargins<int32> *pSrcRect = nullptr;
 	std::map<uint32, Frame *>::const_iterator iter = m_ChecksumMap.find(uiChecksum);
 	if(iter != m_ChecksumMap.end())
 	{

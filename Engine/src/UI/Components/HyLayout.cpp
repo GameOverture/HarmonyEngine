@@ -127,7 +127,7 @@ void HyLayout::ReverseOrder(bool bReverse)
 	SetLayoutDirty();
 }
 
-const HyRectangle<int16> &HyLayout::GetMargins() const
+const HyMargins<int16> &HyLayout::GetMargins() const
 {
 	return m_Margins;
 }

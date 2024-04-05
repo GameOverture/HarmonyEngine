@@ -1004,7 +1004,7 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera)
 {
 	glm::ivec2 vFramebufferSize = m_pCurWindow->GetFramebufferSize();
-	HyRectangle<float> viewportRect;
+	HyMargins<float> viewportRect;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Set glViewport based on coordinate system

@@ -57,6 +57,8 @@ public:
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
 	
 	virtual void SetScissor(const HyRect &scissorRect) override;
+	virtual void SetScissor(HyStencilHandle hScissorHandle) override;
+	void SetScissor(HyStencilHandle hScissorHandle, bool bOverrideExplicitChildren);
 	void SetScissor(const HyRect &scissorRect, bool bOverrideExplicitChildren);
 	
 	virtual void ClearScissor(bool bUseParentScissor) override;

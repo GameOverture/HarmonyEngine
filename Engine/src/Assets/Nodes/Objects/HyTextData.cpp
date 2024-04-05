@@ -51,7 +51,7 @@ HyTextData::HyTextData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAsse
 	m_uiNumTypefaces(0),
 	m_pFontStates(nullptr)
 {
-	HyRectangle<float> rSubAtlasUVRect;
+	HyMargins<float> rSubAtlasUVRect;
 	uint64 uiCropMask = 0;
 
 #ifdef HY_PLATFORM_GUI

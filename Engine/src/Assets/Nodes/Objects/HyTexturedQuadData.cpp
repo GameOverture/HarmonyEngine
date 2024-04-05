@@ -45,7 +45,7 @@ HyFileAtlas *HyTexturedQuadData::GetAtlas() const
 	return m_pAtlas;
 }
 
-const HyRectangle<float> &HyTexturedQuadData::GetUvCoords() const
+const HyMargins<float> &HyTexturedQuadData::GetUvCoords() const
 {
 	return m_UvCoords;
 }

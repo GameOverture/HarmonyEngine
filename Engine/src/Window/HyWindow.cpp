@@ -385,7 +385,7 @@ bool HyWindow::ProjectToWorldPos2d(const glm::vec2 &ptWindowCoordinate, glm::vec
 	// Find the first camera that encompasses this window coordinate in its viewport
 	for(uint32 i = 0; i < m_Cams2dList.size(); ++i)
 	{
-		const HyRectangle<float> &viewportRect = m_Cams2dList[i]->GetViewport();
+		const HyMargins<float> &viewportRect = m_Cams2dList[i]->GetViewport();
 
 		if(ptNormalizedCoord.x >= viewportRect.left   && ptNormalizedCoord.x <= viewportRect.right &&
 		   ptNormalizedCoord.y >= viewportRect.bottom && ptNormalizedCoord.y <= viewportRect.top)
@@ -434,7 +434,7 @@ bool HyWindow::ProjectToWindow2d(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindo
 		m_Cams2dList[i]->CalcWorldViewBounds(aabbWorld);
 		if(HyMath::TestPointAABB(aabbWorld, ptWorldPos))
 		{
-			const HyRectangle<float> &viewportRect = m_Cams2dList[i]->GetViewport();
+			const HyMargins<float> &viewportRect = m_Cams2dList[i]->GetViewport();
 			float fFbWidth = (viewportRect.Width() * GetFramebufferSize().x);
 			float fFbHeight = (viewportRect.Height() * GetFramebufferSize().y);
 

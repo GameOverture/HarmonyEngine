@@ -19,7 +19,7 @@ struct HySpineAtlas
 	std::string					m_sName;
 	HyFileAtlas *				m_pAtlas;
 	HyTextureHandle				m_hGfxApiHandle;
-	const HyRectangle<float>	m_rSRC_RECT;
+	const HyMargins<float>		m_rSRC_RECT;
 
 	// GUI temp data constructor
 	HySpineAtlas(std::string sName, HyTextureHandle hGfxApiHandle) :

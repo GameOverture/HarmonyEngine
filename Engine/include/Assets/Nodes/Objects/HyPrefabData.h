@@ -17,7 +17,7 @@
 
 class HyPrefabData : public IHyNodeData
 {
-	std::vector<std::pair<HyFileAtlas *, HyRectangle<float> > >		m_UvRectList;
+	std::vector<std::pair<HyFileAtlas *, HyMargins<float> > >		m_UvRectList;
 
 public:
 	HyPrefabData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAssets &assetsRef);

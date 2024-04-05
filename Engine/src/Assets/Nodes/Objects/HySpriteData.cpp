@@ -88,7 +88,7 @@ HySpriteData::AnimState::AnimState(bool bLoop,
 	for(uint32 i = 0; i < m_uiNUMFRAMES; ++i, ++pFrameWriteLocation)
 	{
 		HyFileAtlas *pAtlas = nullptr;
-		HyRectangle<float> rUVRect(0.0f, 0.0f, 0.0f, 0.0f);
+		HyMargins<float> rUVRect(0.0f, 0.0f, 0.0f, 0.0f);
 		uint64 uiCropMask = 0;
 		glm::ivec2 vOffset(0);
 		float fDuration(0.0f);

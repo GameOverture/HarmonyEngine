@@ -16,7 +16,7 @@
 
 class HyTexturedQuad2d : public IHyDrawable2d
 {
-	HyRectangle<float>			m_UvCoords;
+	HyMargins<float>			m_UvCoords;
 
 public:
 	HyTexturedQuad2d(HyEntity2d *pParent = nullptr);
