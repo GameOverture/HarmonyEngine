@@ -33,7 +33,7 @@ HySprite2d::HySprite2d(const HySprite2d &copyRef) :
 	IHySprite<IHyDrawable2d, HyEntity2d>(copyRef)
 {
 	for(uint32 i = 0; i < static_cast<uint32>(copyRef.m_AnimCallbackList.size()); ++i)
-		m_AnimCallbackList.push_back(std::pair<HySprite2dAnimFinishedCallback, void *>(copyRef.m_AnimCallbackList[i].first, copyRef.m_AnimCallbackList[i].second));
+		m_AnimCallbackList.push_back(HySprite2d::NullAnimCallback);
 }
 
 HySprite2d::~HySprite2d(void)
@@ -46,7 +46,7 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 
 	m_AnimCallbackList.clear();
 	for(uint32 i = 0; i < static_cast<uint32>(rhs.m_AnimCallbackList.size()); ++i)
-		m_AnimCallbackList.push_back(std::pair<HySprite2dAnimFinishedCallback, void *>(rhs.m_AnimCallbackList[i].first, rhs.m_AnimCallbackList[i].second));
+		m_AnimCallbackList.push_back(HySprite2d::NullAnimCallback);
 
 	return *this;
 }
@@ -95,7 +95,7 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 	return GetFrameHeight(this->m_uiState, m_uiCurFrame, fPercent);
 }
 
-void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack /*= HySprite2d::NullAnimCallback*/, void *pParam /*= nullptr*/)
+void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack /*= HySprite2d::NullAnimCallback*/)
 {
 	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HySpriteData *>(UncheckedGetData())->GetNumStates())
 	{
@@ -108,16 +108,14 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	}
 
 	if(callBack == nullptr)
-		m_AnimCallbackList[uiStateIndex].first = NullAnimCallback;
+		m_AnimCallbackList[uiStateIndex] = NullAnimCallback;
 	else
-		m_AnimCallbackList[uiStateIndex].first = callBack;
-
-	m_AnimCallbackList[uiStateIndex].second = pParam;
+		m_AnimCallbackList[uiStateIndex] = callBack;
 }
 
 /*virtual*/ void HySprite2d::OnInvokeCallback(uint32 uiStateIndex) /*override*/
 {
-	m_AnimCallbackList[uiStateIndex].first(this, m_AnimCallbackList[uiStateIndex].second);
+	m_AnimCallbackList[uiStateIndex](this);
 }
 
 /*virtual*/ void HySprite2d::OnDataAcquired() /*override*/
@@ -128,7 +126,7 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 	uint32 uiNumStates = pData->GetNumStates();
 
 	while(m_AnimCallbackList.size() < uiNumStates)
-		m_AnimCallbackList.push_back(std::pair<HySprite2dAnimFinishedCallback, void *>(NullAnimCallback, nullptr));
+		m_AnimCallbackList.push_back(NullAnimCallback);
 }
 
 /*virtual*/ void HySprite2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/

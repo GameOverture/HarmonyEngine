@@ -35,7 +35,15 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_bPlayingPreview(false)
 {
 	m_MultiTransform.Hide();
-	m_PressTimer.SetExpiredCallback(OnMousePressTimer, this);
+	m_PressTimer.SetExpiredCallback(
+		[this]()
+		{
+			if(m_eDragState == DRAGSTATE_Marquee)
+				return;
+
+			if(m_eShapeEditState == SHAPESTATE_None && m_eDragState == DRAGSTATE_Pending)
+				BeginTransform(true);
+		});
 
 	m_SnapGuideHorz.SetVisible(false);
 	m_SnapGuideHorz.SetTint(HyColor::DarkGreen);
@@ -1328,15 +1336,4 @@ void EntityDraw::DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod)
 
 		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 	}
-}
-
-/*static*/ void EntityDraw::OnMousePressTimer(void *pData)
-{
-	EntityDraw *pThis = static_cast<EntityDraw *>(pData);
-
-	if(pThis->m_eDragState == DRAGSTATE_Marquee)
-		return;
-
-	if(pThis->m_eShapeEditState == SHAPESTATE_None && pThis->m_eDragState == DRAGSTATE_Pending)
-		pThis->BeginTransform(true);
 }

@@ -15,12 +15,12 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.h"
 
 class HySprite2d;
-typedef std::function<void(HySprite2d *pSelf, void *pParam)> HySprite2dAnimFinishedCallback;
+typedef std::function<void(HySprite2d *pSelf)> HySprite2dAnimFinishedCallback;
 
 class HySprite2d : public IHySprite<IHyDrawable2d, HyEntity2d>
 {
 	// Optional callback invoked upon anim completion/loop
-	std::vector<std::pair<HySprite2dAnimFinishedCallback, void *> >	m_AnimCallbackList;
+	std::vector<HySprite2dAnimFinishedCallback>			m_AnimCallbackList;
 
 public:
 	HySprite2d(HyEntity2d *pParent = nullptr);
@@ -41,7 +41,7 @@ public:
 	//
 	// Leaving default arguments will clear any currently assigned call back.
 	//--------------------------------------------------------------------------------------
-	void SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack = HySprite2d::NullAnimCallback, void *pParam = nullptr);
+	void SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack = HySprite2d::NullAnimCallback);
 
 protected:
 	virtual void OnInvokeCallback(uint32 uiStateIndex) override;
@@ -50,7 +50,7 @@ protected:
 	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
 	
-	static void NullAnimCallback(HySprite2d *pSelf, void *pParam) { }
+	static void NullAnimCallback(HySprite2d *pSelf) { }
 };
 
 #endif /* HySprite2d_h__ */

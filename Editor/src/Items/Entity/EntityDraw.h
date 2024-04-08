@@ -126,8 +126,6 @@ protected:
 	void DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod);
 	void DoMousePress_ShapeEdit(bool bCtrlMod, bool bShiftMod);
 	void DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod);
-
-	static void OnMousePressTimer(void *pData);
 };
 
 #endif // ENTITYDRAW_H
