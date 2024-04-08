@@ -74,6 +74,7 @@ public:
 	bool IsAnimFinished();				// Returns a boolean value that represents whether this animation has finished playing. A looping animation will not return true.
 
 	float GetAnimDuration();
+	float GetAnimDurationAt(uint32 uiFrameIndex);
 	void AdvanceAnim(float fDeltaTime);				// Must have valid data to use this function! - Advances the animation by fDeltaTime seconds using all the current anim attributes, ignoring whether it's paused or not. You are not required to call this function yourself.
 
 	virtual float GetWidth(float fPercent = 1.0f) override;		// Returns the ALPHA-CROPPED width of the current frame (ignores any scaling)

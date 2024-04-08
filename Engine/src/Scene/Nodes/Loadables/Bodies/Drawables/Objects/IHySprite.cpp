@@ -290,6 +290,23 @@ float IHySprite<NODETYPE, ENTTYPE>::GetAnimDuration()
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+float IHySprite<NODETYPE, ENTTYPE>::GetAnimDurationAt(uint32 uiFrameIndex)
+{
+	if(this->AcquireData() == nullptr ||
+	   this->m_uiState >= this->UncheckedGetData()->GetNumStates())
+	{
+		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetAnimDurationAt invoked on null data");
+		return 0.0f;
+	}
+	
+	float fDuration = 0.0f;
+	for(uint32 i = 0; i <= uiFrameIndex; ++i)
+		fDuration += static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, i).fDURATION;
+	
+	return fDuration;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 void IHySprite<NODETYPE, ENTTYPE>::AdvanceAnim(float fDeltaTime)
 {
 	m_fElapsedFrameTime += (fDeltaTime * m_fAnimPlayRate);

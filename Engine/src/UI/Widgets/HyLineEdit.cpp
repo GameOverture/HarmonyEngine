@@ -346,7 +346,12 @@ void HyLineEdit::Submit()
 
 	SetCursor(GetCursorIndex(), GetSelectionIndex());
 
-	m_BlinkTimer.SetExpiredCallback(OnCursorTimer, this);
+	m_BlinkTimer.SetExpiredCallback(
+		[this]()
+		{
+			m_Cursor.SetVisible(!m_Cursor.IsVisible());
+			m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
+		});
 	m_BlinkTimer.Init(HYLINEEDIT_BLINKDUR);
 
 	SetKeyboardFocusAllowed(true);
@@ -362,12 +367,4 @@ void HyLineEdit::MoveCursor(int32 iOffset, bool bSelection)
 		iNewCursorIndex = m_Text.GetNumCharacters();
 
 	SetCursor(iNewCursorIndex, bSelection ? GetSelectionIndex() : iNewCursorIndex);
-}
-
-/*static*/ void HyLineEdit::OnCursorTimer(void *pThisData)
-{
-	HyLineEdit *pThis = static_cast<HyLineEdit *>(pThisData);
-
-	pThis->m_Cursor.SetVisible(!pThis->m_Cursor.IsVisible());
-	pThis->m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
 }

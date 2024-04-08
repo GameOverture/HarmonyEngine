@@ -17,7 +17,7 @@ HyTimer::HyTimer(void) :
 	IHyTimeInst(),
 	m_dDuration(0.0),
 	m_fpCallbackFunc(nullptr),
-	m_pCallbackData(nullptr)
+	m_bCallbackInvoked(false)
 {
 }
 
@@ -25,7 +25,7 @@ HyTimer::HyTimer(double dDuration) :
 	IHyTimeInst(),
 	m_dDuration(0.0),
 	m_fpCallbackFunc(nullptr),
-	m_pCallbackData(nullptr)
+	m_bCallbackInvoked(false)
 {
 	Init(dDuration);
 }
@@ -44,6 +44,7 @@ void HyTimer::Init(double dDuration)
 	m_dElapsedTime = 0.0f;
 	m_dDuration = dDuration;
 	m_bIsRunning = false;
+	m_bCallbackInvoked = false;
 }
 
 void HyTimer::InitStart(double dDuration)
@@ -85,10 +86,10 @@ double HyTimer::TimeLeft() const
 	return HyMath::Max(m_dDuration - m_dElapsedTime, 0.0);
 }
 
-void HyTimer::SetExpiredCallback(std::function<void(void *)> fpFunc, void *pData)
+void HyTimer::SetExpiredCallback(std::function<void(void)> fpFunc)
 {
 	m_fpCallbackFunc = fpFunc;
-	m_pCallbackData = pData;
+	m_bCallbackInvoked = false;
 }
 
 /*virtual*/ std::string HyTimer::ToString() const /*override*/
@@ -99,6 +100,9 @@ void HyTimer::SetExpiredCallback(std::function<void(void *)> fpFunc, void *pData
 
 /*virtual*/ void HyTimer::OnUpdate() /*override*/
 {
-	if(m_fpCallbackFunc && IsExpired() && m_dDuration > 0.0)
-		m_fpCallbackFunc(m_pCallbackData);
+	if(m_fpCallbackFunc && IsExpired() && m_bCallbackInvoked == false && m_dDuration > 0.0)
+	{
+		m_bCallbackInvoked = true; // Set this before invoking the callback in case the callback calls Init/Reset
+		m_fpCallbackFunc();
+	}
 }

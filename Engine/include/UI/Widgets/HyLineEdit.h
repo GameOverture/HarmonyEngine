@@ -73,7 +73,6 @@ protected:
 	virtual void OnSetup() override;
 
 	void MoveCursor(int32 iOffset, bool bSelection);
-	static void OnCursorTimer(void *pThisData);
 
 //private:
 //	using HyLabel::SetAsStacked;
