@@ -75,7 +75,7 @@ public:
 	void GetScissor(HyRect &scissorOut) const;
 	HyStencilHandle GetScissorHandle() const;
 	virtual void SetScissor(const HyRect &scissorRect);
-	virtual void SetScissor(HyStencilHandle hScissorHandle);
+	//virtual void SetScissor(HyStencilHandle hScissorHandle);
 	virtual void ClearScissor(bool bUseParentScissor);
 
 protected:

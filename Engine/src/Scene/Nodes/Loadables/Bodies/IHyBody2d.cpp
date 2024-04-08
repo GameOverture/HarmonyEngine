@@ -318,13 +318,13 @@ HyStencilHandle IHyBody2d::GetScissorHandle() const
 	SetDirty(DIRTY_ScissorStencil);
 }
 
-/*virtual*/ void IHyBody2d::SetScissor(HyStencilHandle hScissorHandle)
-{
-	ClearScissor(false);
-
-	m_hScissorStencil = hScissorHandle;
-	m_uiFlags |= EXPLICIT_ScissorStencil;
-}
+///*virtual*/ void IHyBody2d::SetScissor(HyStencilHandle hScissorHandle)
+//{
+//	ClearScissor(false);
+//
+//	m_hScissorStencil = hScissorHandle;
+//	m_uiFlags |= EXPLICIT_ScissorStencil;
+//}
 
 /*virtual*/ void IHyBody2d::ClearScissor(bool bUseParentScissor)
 {
