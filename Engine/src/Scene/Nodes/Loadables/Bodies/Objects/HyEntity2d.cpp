@@ -34,6 +34,8 @@ HyEntity2d::~HyEntity2d(void)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 
 	physics.Deactivate();
+
+	ClearScissor(true);
 }
 
 HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor) noexcept
@@ -361,10 +363,15 @@ bool HyEntity2d::ChildExists(IHyNode2d &childRef)
 	{
 		if(*iter == pChild)
 		{
-			(*iter)->m_uiFlags |= EXPLICIT_ParentsVisible;
-
+			// Remove child/parent connection
 			(*iter)->m_pParent = nullptr;
 			m_ChildList.erase(iter);
+
+			// Clear all of the child's inherited attributes
+			pChild->m_uiFlags |= EXPLICIT_ParentsVisible;
+			//if((pChild->GetInternalFlags() & NODETYPE_IsBody) != 0 && (pChild->GetInternalFlags() & EXPLICIT_ScissorStencil) == 0)
+			//	static_cast<IHyBody2d *>(pChild)->ClearScissor(true);
+
 
 			if(sm_pHyAssets)
 				sm_pHyAssets->SetEntityLoaded(this);

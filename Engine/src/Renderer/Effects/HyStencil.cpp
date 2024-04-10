@@ -142,9 +142,7 @@ void HyStencil::PrepRender(HyRenderBuffer::State *pPtr, float fExtrapolatePercen
 
 		HyPrimitive2d *pScissorPrim = static_cast<HyPrimitive2d *>(m_MaskInstanceList[0]);
 		pScissorPrim->pos.Set(ptTranslation);
-	//	pScissorPrim->rot_pivot.Set(m_pScissorOwner->rot_pivot); // TODO: Determine if rot_pivot required
 		pScissorPrim->rot.Set(glm::degrees(glm::atan(mtxSceneRef[0][1], mtxSceneRef[0][0])));
-//		pScissorPrim->scale_pivot.Set(m_pScissorOwner->scale_pivot); // TODO: Determine if scale_pivot required
 		pScissorPrim->scale.Set(vScale);
 		pScissorPrim->UseWindowCoordinates(m_pScissorOwner->GetCoordinateSystem());
 

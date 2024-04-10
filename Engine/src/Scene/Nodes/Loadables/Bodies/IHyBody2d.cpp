@@ -227,12 +227,15 @@ float IHyBody2d::GetSceneWidth()
 	return 0.0f;
 }
 
-bool IHyBody2d::IsScissorSet() const
+bool IHyBody2d::IsScissorSet()
 {
+	if(m_hScissorStencil != HY_UNUSED_HANDLE && IHyRenderer::FindStencil(m_hScissorStencil) == nullptr)
+		m_hScissorStencil = HY_UNUSED_HANDLE;
+
 	return m_hScissorStencil != HY_UNUSED_HANDLE;
 }
 
-void IHyBody2d::GetScissor(HyRect &scissorOut) const
+void IHyBody2d::GetScissor(HyRect &scissorOut)
 {
 	if(IsScissorSet() == false)
 	{
@@ -287,8 +290,11 @@ void IHyBody2d::GetScissor(HyRect &scissorOut) const
 //	return IHyRenderer::FindStencil(m_hScissorStencil);
 //}
 
-HyStencilHandle IHyBody2d::GetScissorHandle() const
+HyStencilHandle IHyBody2d::GetScissorHandle()
 {
+	if(m_hScissorStencil != HY_UNUSED_HANDLE && IHyRenderer::FindStencil(m_hScissorStencil) == nullptr)
+		m_hScissorStencil = HY_UNUSED_HANDLE;
+
 	return m_hScissorStencil;
 }
 
@@ -328,13 +334,13 @@ HyStencilHandle IHyBody2d::GetScissorHandle() const
 
 /*virtual*/ void IHyBody2d::ClearScissor(bool bUseParentScissor)
 {
-	m_hScissorStencil = HY_UNUSED_HANDLE;
-
 	if((m_uiFlags & SETTING_AllocScissorStencil) != 0)
 	{
 		delete IHyRenderer::FindStencil(m_hScissorStencil);
 		m_uiFlags &= ~SETTING_AllocScissorStencil;
 	}
+
+	m_hScissorStencil = HY_UNUSED_HANDLE;
 
 	if(bUseParentScissor == false)
 		m_uiFlags |= EXPLICIT_ScissorStencil;

@@ -274,7 +274,9 @@ HyOpenGL::~HyOpenGL(void)
 {
 	//////////////////////////////////////////////////////////////////////////
 	// Setup stencil buffer if required
-	if(pRenderState->m_hSCISSOR_STENCIL != HY_UNUSED_HANDLE || pRenderState->m_hSTENCIL != HY_UNUSED_HANDLE)
+	HyStencil *pScissorStencil = FindStencil(pRenderState->m_hSCISSOR_STENCIL);
+	HyStencil *pStencil = FindStencil(pRenderState->m_hSTENCIL);
+	if(pScissorStencil != nullptr || pStencil != nullptr)
 	{
 		glEnable(GL_STENCIL_TEST);
 
@@ -287,13 +289,12 @@ HyOpenGL::~HyOpenGL(void)
 		GLint iRenderStencilRef = 1;							// What glStencilFunc ref value to check against when rendering to the color buffer
 
 		// SCISSOR - Writes '1' to stencil buffer where scissor rect is
-		if(pRenderState->m_hSCISSOR_STENCIL != HY_UNUSED_HANDLE)
+		if(pScissorStencil != nullptr)
 		{
 			glStencilFunc(GL_ALWAYS, 1, 0xFF);					// All fragments rendered next will "pass" the stencil test, and 'ref' is set to '1'
 			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);			// Fragments that "passed" will write the 'ref' value in the stencil buffer
 
 			// Render the HyPrimitive2d scissor rect, and write the pixel locations in stencil buffer
-			HyStencil *pScissorStencil = FindStencil(pRenderState->m_hSCISSOR_STENCIL);
 			char *pStencilRenderStateBufferPos = reinterpret_cast<char *>(pScissorStencil->GetRenderStatePtr());
 			HyRenderBuffer::State *pCurRenderState = reinterpret_cast<HyRenderBuffer::State *>(pStencilRenderStateBufferPos);
 			if(pCurRenderState->m_iCOORDINATE_SYSTEM < 0 || pCurRenderState->m_iCOORDINATE_SYSTEM == m_pCurWindow->GetIndex())
@@ -304,10 +305,9 @@ HyOpenGL::~HyOpenGL(void)
 			iRenderStencilRef = 1;
 		}
 
-		if(pRenderState->m_hSTENCIL != HY_UNUSED_HANDLE)
+		if(pStencil != nullptr)
 		{
-			HyStencil *pStencil = FindStencil(pRenderState->m_hSTENCIL);
-			if(pRenderState->m_hSCISSOR_STENCIL != HY_UNUSED_HANDLE) // Both stencil and scissor
+			if(pScissorStencil != nullptr) // Both stencil and scissor
 			{
 				if(pStencil->GetBehavior() == HYSTENCILBEHAVIOR_Mask)
 				{

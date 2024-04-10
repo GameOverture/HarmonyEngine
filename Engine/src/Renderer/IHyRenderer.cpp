@@ -250,9 +250,11 @@ void IHyRenderer::Render()
 /*static*/ void IHyRenderer::AddStencil(HyStencil *pStencil)
 {
 	sm_pInstance->m_StencilMap[pStencil->GetHandle()] = pStencil;
+	HyLogInfo("Stencil added [" << pStencil->GetHandle() << "]");
 }
 
 /*static*/ void IHyRenderer::RemoveStencil(HyStencil *pStencil)
 {
+	HyLogInfo("Stencil removed [" << pStencil->GetHandle() << "]");
 	sm_pInstance->m_StencilMap.erase(sm_pInstance->m_StencilMap.find(pStencil->GetHandle()));
 }

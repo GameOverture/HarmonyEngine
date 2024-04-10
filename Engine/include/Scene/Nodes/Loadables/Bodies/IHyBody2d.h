@@ -71,9 +71,9 @@ public:
 	float GetSceneHeight();
 	float GetSceneWidth();
 
-	bool IsScissorSet() const;
-	void GetScissor(HyRect &scissorOut) const;
-	HyStencilHandle GetScissorHandle() const;
+	bool IsScissorSet();
+	void GetScissor(HyRect &scissorOut);
+	HyStencilHandle GetScissorHandle();
 	virtual void SetScissor(const HyRect &scissorRect);
 	//virtual void SetScissor(HyStencilHandle hScissorHandle);
 	virtual void ClearScissor(bool bUseParentScissor);
