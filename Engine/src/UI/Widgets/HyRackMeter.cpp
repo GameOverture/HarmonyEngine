@@ -122,7 +122,17 @@ bool HyRackMeter::IsSpinningMeter()
 void HyRackMeter::SetAsSpinningMeter(bool bSet)
 {
 	if(bSet)
+	{
 		m_uiAttribs |= RACKMETERATTRIB_IsSpinDigits;
+
+		uint32 uiWidth;
+		if(m_Text.IsScaleBox())
+			uiWidth = static_cast<uint32>(m_Text.GetTextBoxDimensions().x);
+		else
+			uiWidth = 5000;// static_cast<uint32>(m_Text.GetWidth());
+
+		m_SpinText.SetScissor(HyRect(uiWidth, static_cast<uint32>(GetSpinHeightThreshold())));
+	}
 	else
 		m_uiAttribs &= ~RACKMETERATTRIB_IsSpinDigits;
 
@@ -345,14 +355,6 @@ void HyRackMeter::FormatDigits()
 				m_SpinText.m_SpinText_Padded.SetGlyphAlpha(i, 0.0f);
 			}
 		}
-
-		uint32 uiWidth;
-		if(m_Text.IsScaleBox())
-			uiWidth = static_cast<uint32>(m_Text.GetTextBoxDimensions().x);
-		else
-			uiWidth = static_cast<uint32>(m_Text.GetWidth());
-
-		m_SpinText.SetScissor(HyRect(uiWidth, static_cast<uint32>(fThreshold)));
 	}
 	else
 	{

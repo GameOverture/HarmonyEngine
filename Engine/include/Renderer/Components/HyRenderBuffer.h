@@ -39,7 +39,7 @@ public:
 		const uint32							m_uiDATA_OFFSET;				// Offset into vertex buffer
 		const HyRenderMode						m_eRENDER_MODE;
 		const HyShaderHandle					m_hSHADER;
-		const HyShaderHandle					m_hSCISSOR_STENCIL;
+		const HyStencilHandle					m_hSCISSOR_STENCIL;
 		const HyStencilHandle					m_hSTENCIL;
 		const int32								m_iCOORDINATE_SYSTEM;			// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
 		
