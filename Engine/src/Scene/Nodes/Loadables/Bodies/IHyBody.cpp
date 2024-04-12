@@ -64,6 +64,11 @@ HyStencil *IHyBody::GetStencil() const
 	return IHyRenderer::FindStencil(m_hStencil);
 }
 
+HyStencilHandle IHyBody::GetStencilHandle() const
+{
+	return m_hStencil;
+}
+
 /*virtual*/ void IHyBody::SetStencil(HyStencil *pStencil)
 {
 	if(pStencil == nullptr)

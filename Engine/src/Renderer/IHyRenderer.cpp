@@ -75,7 +75,10 @@ void IHyRenderer::PrepareBuffers(float fExtrapolatePercent)
 
 		const std::vector<IHyDrawable2d *> &instanceListRef = pStencil->GetInstanceList();
 		for(uint32 i = 0; i < static_cast<uint32>(instanceListRef.size()); ++i)
+		{
+			// NOTE: MUST PASS '0' AS THE ID. This disables any render batching
 			AppendDrawable2d(0, *instanceListRef[i], HY_FULL_CAMERA_MASK, fExtrapolatePercent);
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

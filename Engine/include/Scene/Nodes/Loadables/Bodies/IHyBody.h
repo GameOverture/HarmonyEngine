@@ -36,6 +36,7 @@ public:
 
 	bool IsStencilSet() const;
 	HyStencil *GetStencil() const;
+	HyStencilHandle GetStencilHandle() const;
 	virtual void SetStencil(HyStencil *pStencil);
 	virtual void ClearStencil(bool bUseParentStencil);
 

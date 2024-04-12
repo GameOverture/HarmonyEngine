@@ -67,7 +67,7 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 															 eRenderMode,
 															 instanceRef.GetShaderHandle(),
 															 instanceRef.GetScissorHandle(),
-															 (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
+															 instanceRef.GetStencilHandle(),// (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
 															 instanceRef.GetCoordinateSystem(),
 															 uiNumInstances,
 															 uiNumVerticesPerInstance);
@@ -77,7 +77,8 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 		// Determine if we can combine this render state with the previous one, to batch less render calls
 		if(bIsBatchable &&
 		   m_uiPrevUniformCrc == instanceRef.GetShaderUniforms().GetCrc64() &&
-		   m_pPrevRenderState && *pRenderState == *m_pPrevRenderState)
+		   m_pPrevRenderState && *pRenderState == *m_pPrevRenderState &&
+		   uiId != 0) // NOTE: 'uiId' is 0 for any stencil masks, which should not be batched (or it's the first scene render state, which doesn't get batched anyway)
 		{
 			m_pPrevRenderState->m_uiNumInstances += pRenderState->m_uiNumInstances;
 			m_pCurWritePosition -= sizeof(State);
