@@ -435,7 +435,7 @@ void IManagerModel::FlushRepack()
 	}
 }
 
-QString IManagerModel::AssembleFilter(TreeModelItemData *pAsset, bool bIncludeSelfIfFilter) const
+QString IManagerModel::AssembleFilter(const TreeModelItemData *pAsset, bool bIncludeSelfIfFilter) const
 {
 	if(pAsset == nullptr)
 		return QString();
@@ -445,7 +445,7 @@ QString IManagerModel::AssembleFilter(TreeModelItemData *pAsset, bool bIncludeSe
 	if(bIncludeSelfIfFilter && pAsset->GetType() == ITEM_Filter)
 		sPrefixParts.append(pAsset->GetText());
 
-	TreeModelItem *pTreeItem = GetItem(FindIndex<TreeModelItemData *>(pAsset, 0))->GetParent();
+	TreeModelItem *pTreeItem = GetItem(FindIndex<TreeModelItemData *>(const_cast<TreeModelItemData *>(pAsset), 0))->GetParent();
 	while(pTreeItem && pTreeItem != m_pRootItem)
 	{
 		TreeModelItemData *pItem = pTreeItem->data(0).value<TreeModelItemData *>();
@@ -915,7 +915,11 @@ void IManagerModel::SaveRuntime()
 	QJsonDocument assetDoc = QJsonDocument::fromJson(sSrc);
 	QJsonObject rootAssetObj = assetDoc.object();
 
+	QList<TreeModelItemData *> processedItemDataList; // Used to ensure the same item isn't moved/processed twice (preserves the filter hierarchy)
+
 	QJsonArray assetArray = rootAssetObj[HyGlobal::AssetName(m_eASSET_TYPE)].toArray();
+
+	// NOTE: 'assetArray' is sorted so filters are processed first
 	for(int iAssetIndex = 0; iAssetIndex < assetArray.size(); ++iAssetIndex)
 	{
 		QJsonObject assetObj = assetArray[iAssetIndex].toObject();
@@ -935,7 +939,7 @@ void IManagerModel::SaveRuntime()
 				pItemData = ReturnFilter(sFilterPath, false);
 				if(pItemData == nullptr)
 				{
-					HyGuiLog("IManagerModel::dropMimeData - ReturnFilter return nullptr with " % sFilterPath, LOGTYPE_Warning);
+					// NOTE: A null returned filter here probably indicates it was a nested filter that was already moved
 					continue;
 				}
 			}
@@ -949,8 +953,18 @@ void IManagerModel::SaveRuntime()
 				}
 			}
 
+			// Don't move/process the same item twice or it will flatten the filter hierarchy at the destination
+			if(processedItemDataList.contains(pItemData))
+				continue;
+
 			QModelIndex sourceIndex = FindIndex<TreeModelItemData *>(pItemData, 0);
 			TreeModelItem *pSourceTreeItem = GetItem(sourceIndex);
+
+			// Populate 'processedItemDataList' to indicate this item has been moved/processed
+			// All children of 'pSourceTreeItem' will be considered moved/processed because the filter is being moved
+			QList<TreeModelItemData *> movedItemsList = GetItemsRecursively(sourceIndex);
+			for(int iChildIndex = 0; iChildIndex < movedItemsList.size(); ++iChildIndex)
+				processedItemDataList.push_back(movedItemsList[iChildIndex]);
 
 			// Move asset item to new filter location within manager
 			QModelIndex destIndex = FindIndex<TreeModelItemData *>(pDestFilter, 0);

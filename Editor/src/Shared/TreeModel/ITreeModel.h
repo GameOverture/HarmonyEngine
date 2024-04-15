@@ -53,7 +53,7 @@ public:
 	}
 
 	bool InsertTreeItem(Project &projectRef, TreeModelItemData *pNewItemData, TreeModelItem *pParentTreeItem, int iRow = -1);
-	QList<TreeModelItemData *> GetItemsRecursively(const QModelIndex &indexRef) const;
+	QList<TreeModelItemData *> GetItemsRecursively(const QModelIndex &indexRef) const; // Returned list includes the item at indexRef
 	QModelIndexList GetAllIndices() const;
 
 	int CalculateDepth(TreeModelItemData *pItemData) const;

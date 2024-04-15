@@ -14,12 +14,37 @@
 #include "IModel.h"
 #include "AtlasFrame.h"
 #include "IManagerModel.h"
+#include "Project.h"
 
 AssetMimeData::AssetMimeData(Project &projRef, QList<TreeModelItemData *> &assetListRef, AssetManagerType eAssetType) :
 	IMimeData(MIMETYPE_AssetItems)
 {
 	for(uint32 i = 0; i < NUM_ASSETMANTYPES; ++i)
 		m_AssetCounts[i] = 0;
+
+	// Sort 'assetListRef' so that root filters are listed first
+	std::sort(assetListRef.begin(), assetListRef.end(), 
+		[&projRef, eAssetType](const TreeModelItemData *pLhs, const TreeModelItemData *pRhs) -> bool
+		{
+			if(pLhs->GetType() == ITEM_Filter && pRhs->GetType() == ITEM_Filter)
+			{
+				IManagerModel *pManager = projRef.GetManagerModel(eAssetType);
+				QString sLhsFilter = pManager->AssembleFilter(pLhs, true);
+				QString sRhsFilter = pManager->AssembleFilter(pRhs, true);
+				if(sLhsFilter.contains(sRhsFilter))
+					return false;
+				else if(sRhsFilter.contains(sLhsFilter))
+					return true;
+				else
+					return sLhsFilter < sRhsFilter;
+			}
+			else if(pLhs->GetType() == ITEM_Filter && pRhs->GetType() != ITEM_Filter)
+				return true;
+			else if(pLhs->GetType() != ITEM_Filter && pRhs->GetType() == ITEM_Filter)
+				return false;
+
+			return pLhs->GetText() < pRhs->GetText();
+		});
 
 	QJsonObject rootAssetObj;
 	for(int iAssetCount = 0; iAssetCount < NUM_ASSETMANTYPES; ++iAssetCount)

@@ -78,7 +78,7 @@ public:
 	void AddAssetsToRepack(BankData *pBankData, QSet<IAssetItemData *> &assetsSet);
 	void FlushRepack();
 
-	QString AssembleFilter(TreeModelItemData *pAsset, bool bIncludeSelfIfFilter) const;
+	QString AssembleFilter(const TreeModelItemData *pAsset, bool bIncludeSelfIfFilter) const;
 	TreeModelItemData *FindTreeItemFilter(TreeModelItemData *pItem) const;
 	TreeModelItemData *ReturnFilter(QString sFilterPath, bool bCreateNonExistingFilter = true);
 
