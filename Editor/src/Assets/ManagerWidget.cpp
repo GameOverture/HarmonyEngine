@@ -772,11 +772,23 @@ void ManagerWidget::on_actionRename_triggered()
 			return;
 		}
 
-		std::function<QString(QString)> fpErrorCheck = [pItemToBeRenamed](QString sNewName) -> QString
+		std::function<QString(QString)> fpErrorCheck = [this](QString sNewName) -> QString
 		{
-			QFileInfo srcFileInfo(static_cast<SourceFile *>(pItemToBeRenamed)->GetAbsMetaFilePath());
-			if(QFile::exists(srcFileInfo.absoluteDir().filePath(sNewName)))
-				return QString("A file with this name already exists");
+			TreeModelItemData *pItemToBeRenamed = GetSelected();
+			if(pItemToBeRenamed->GetType() == ITEM_Filter)
+			{
+				QString sFilterPath = m_pModel->AssembleFilter(pItemToBeRenamed, true);
+				QDir srcDir(m_pModel->GetMetaDir().absoluteFilePath(sFilterPath));
+				srcDir.cdUp();
+				if(QDir(srcDir.filePath(sNewName)).exists())
+					return QString("A filter with this name already exists");
+			}
+			else
+			{
+				QFileInfo srcFileInfo(static_cast<SourceFile *>(pItemToBeRenamed)->GetAbsMetaFilePath());
+				if(QFile::exists(srcFileInfo.absoluteDir().filePath(sNewName)))
+					return QString("A file with this name already exists");
+			}
 
 			return QString();
 		};
@@ -787,39 +799,59 @@ void ManagerWidget::on_actionRename_triggered()
 
 	if(pDlg->exec() == QDialog::Accepted)
 	{
-		m_pModel->Rename(pItemToBeRenamed, pDlg->GetName());
-
-		// Ask to rename old corresponding TreeModelItemData in same filter/directory (.h <-> .cpp) to new name
-		if(m_pModel->GetAssetType() == ASSETMAN_Source && pItemToBeRenamed->IsAssetItem())
+		if(m_pModel->GetAssetType() != ASSETMAN_Source)
+			m_pModel->Rename(pItemToBeRenamed, pDlg->GetName());
+		else
 		{
-			SourceFile *pRenamedSrcFile = static_cast<SourceFile *>(pItemToBeRenamed);
 			QString sOldName = QFileInfo(pDlg->GetOldName()).baseName();
 			QString sNewName = QFileInfo(pDlg->GetName()).baseName();
 
-			TreeModelItemData *pFilter = m_pModel->FindTreeItemFilter(pItemToBeRenamed);
-			QList<TreeModelItemData *> itemList = m_pModel->GetItemsRecursively(m_pModel->FindIndex<TreeModelItemData *>(pFilter, 0));
-
-			if(pRenamedSrcFile->GetMetaFileExt() == ".h")
+			if(pItemToBeRenamed->IsAssetItem())
 			{
-				for(TreeModelItemData *pItem : itemList)
+				m_pModel->Rename(pItemToBeRenamed, pDlg->GetName());
+
+				// Ask to rename old corresponding TreeModelItemData in same filter/directory (.h <-> .cpp) to new name
+				SourceFile *pRenamedSrcFile = static_cast<SourceFile *>(pItemToBeRenamed);
+
+				TreeModelItemData *pFilter = m_pModel->FindTreeItemFilter(pItemToBeRenamed);
+				QList<TreeModelItemData *> itemList = m_pModel->GetItemsRecursively(m_pModel->FindIndex<TreeModelItemData *>(pFilter, 0));
+
+				if(pRenamedSrcFile->GetMetaFileExt() == ".h")
 				{
-					if(pItem->IsAssetItem() && pItem->GetText() == sOldName % ".cpp")
+					for(TreeModelItemData *pItem : itemList)
 					{
-						if(QMessageBox::Yes == QMessageBox::question(this, "Rename Corresponding File", "Also rename " % static_cast<SourceFile *>(pItem)->GetFilter() % "/" % sOldName % ".cpp to " % sNewName % ".cpp?", QMessageBox::Yes | QMessageBox::No))
-							m_pModel->Rename(pItem, sNewName % ".cpp");
+						if(pItem->IsAssetItem() && pItem->GetText() == sOldName % ".cpp")
+						{
+							if(QMessageBox::Yes == QMessageBox::question(this, "Rename Corresponding File", "Also rename " % static_cast<SourceFile *>(pItem)->GetFilter() % "/" % sOldName % ".cpp to " % sNewName % ".cpp?", QMessageBox::Yes | QMessageBox::No))
+								m_pModel->Rename(pItem, sNewName % ".cpp");
+						}
+					}
+				}
+				else if(pRenamedSrcFile->GetMetaFileExt() == ".cpp")
+				{
+					for(TreeModelItemData *pItem : itemList)
+					{
+						if(pItem->IsAssetItem() && pItem->GetText() == sOldName % ".h")
+						{
+							if(QMessageBox::Yes == QMessageBox::question(this, "Rename Corresponding File", "Also rename " % static_cast<SourceFile *>(pItem)->GetFilter() % "/" % sOldName % ".h to " % sNewName % ".h?", QMessageBox::Yes | QMessageBox::No))
+								m_pModel->Rename(pItem, sNewName % ".h");
+						}
 					}
 				}
 			}
-			else if(pRenamedSrcFile->GetMetaFileExt() == ".cpp")
+			else // Renamed filter
 			{
-				for(TreeModelItemData *pItem : itemList)
-				{
-					if(pItem->IsAssetItem() && pItem->GetText() == sOldName % ".h")
-					{
-						if(QMessageBox::Yes == QMessageBox::question(this, "Rename Corresponding File", "Also rename " % static_cast<SourceFile *>(pItem)->GetFilter() % "/" % sOldName % ".h to " % sNewName % ".h?", QMessageBox::Yes | QMessageBox::No))
-							m_pModel->Rename(pItem, sNewName % ".h");
-					}
-				}
+				QString sParentPath = m_pModel->AssembleFilter(pItemToBeRenamed, false);
+				QString sOldFilterPath = sParentPath % "/" % sOldName;
+				QString sNewFilterPath = sParentPath % "/" % sNewName;
+				sOldFilterPath = m_pModel->GetMetaDir().absoluteFilePath(sOldFilterPath);
+				sNewFilterPath = m_pModel->GetMetaDir().absoluteFilePath(sNewFilterPath);
+
+				QDir parentDir(sOldFilterPath);
+				parentDir.cdUp();
+				parentDir.rename(sOldFilterPath, sNewFilterPath);
+
+				m_pModel->Rename(pItemToBeRenamed, pDlg->GetName());
 			}
 		}
 
