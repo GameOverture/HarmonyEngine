@@ -38,15 +38,42 @@ namespace %HY_NAMESPACE% {
 	return %HY_NUMSTATES%;
 }
 
+uint32 %HY_CLASS%::GetTimelineFrame() const
+{
+	return m_uiTimelineFrame;
+}
+
 float %HY_CLASS%::GetTimelineFrameDuration() const
 {
 	return m_fTIMELINE_FRAME_DURATION;
 }
 %HY_ACCESSORDEFINITION%
 
-void %HY_CLASS%::SetFrame(uint32 uiFrameIndex)
+void %HY_CLASS%::SetTimelineFrame(uint32 uiFrameIndex)
 {
+	uiFrameIndex = HyMath::Min(uiFrameIndex, m_uiTimelineFinalFrame);
+
+	// Extrapolate to frame 'uiFrameIndex'
+	m_uiTimelineFrame = 0;
+	bool bWasPaused = m_bTimelinePaused;
+	m_bTimelinePaused = false;
+
+	while(true)
+	{
+		if(m_uiTimelineFrame == uiFrameIndex)
+		{
+			m_fTimelineFrameTime = 0.0f;
+			m_fpTimelineUpdate();
+			break;
+		}
+		
+		m_fTimelineFrameTime = 0.0f;
+		m_fpTimelineUpdate();
+		TimelineAdvance();
+	}
+
 	m_uiTimelineFrame = uiFrameIndex;
+	m_bTimelinePaused = bWasPaused;
 }
 
 bool %HY_CLASS%::IsTimelinePaused() const
@@ -63,6 +90,11 @@ void %HY_CLASS%::SetTimelinePause(bool bPause)
 {
 	m_fpTimelineUpdate();
 	HyEntity2d::Update();
+}
+
+void %HY_CLASS%::TimelineAdvance()
+{
+%HY_TIMELINEADVANCEIMPL%
 }
 
 } // '%HY_NAMESPACE%' namespace

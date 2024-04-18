@@ -74,6 +74,7 @@ public:
 
 	QAbstractItemModel *GetAuxWidgetsModel();
 
+	int GetFinalFrameIndex(int iStateIndex) const;
 	int GetFramesPerSecond() const;
 	bool IsAutoInitialize() const;
 
@@ -104,6 +105,7 @@ public:
 	QString GenerateSrc_Ctor() const;
 	QString GenerateSrc_SetStateImpl() const;
 	QString GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJsonObject propObj, QString sNewLine) const;
+	QString GenerateSrc_TimelineAdvance() const;
 
 	virtual void OnPopState(int iPoppedStateIndex) override;
 	virtual bool OnPrepSave() override;

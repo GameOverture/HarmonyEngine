@@ -244,6 +244,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 				sContents.replace("%HY_NUMSTATES%", QString::number(pEntityModel->GetNumStates()));
 				sContents.replace("%HY_SETSTATEIMPL%", pEntityModel->GenerateSrc_SetStateImpl());
 				sContents.replace("%HY_ACCESSORDEFINITION%", pEntityModel->GenerateSrc_AccessorDefinition(sClassName));
+				sContents.replace("%HY_TIMELINEADVANCEIMPL%", pEntityModel->GenerateSrc_TimelineAdvance());
 				break;
 			}
 		}
@@ -680,6 +681,8 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	}
 	QSet<QString> uniqueSet(srcFolderList.begin(), srcFolderList.end());
 	srcFolderList = uniqueSet.values(); // Remove duplicates
+	srcFolderList.sort(); // The type of sort doesn't matter, just want to be consistent
+
 	QString sIncludeDirs;
 	for(auto sFolder : srcFolderList)
 		sIncludeDirs += "list(APPEND GAME_INCLUDE_DIRS \"${CMAKE_CURRENT_SOURCE_DIR}/" + sFolder + "\")\n";

@@ -153,6 +153,11 @@ QAbstractItemModel *EntityModel::GetAuxWidgetsModel()
 	return &m_AuxWidgetsModel;
 }
 
+int EntityModel::GetFinalFrameIndex(int iStateIndex) const
+{
+	return static_cast<const EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().GetFinalFrame();
+}
+
 int EntityModel::GetFramesPerSecond() const
 {
 	return m_AuxWidgetsModel.data(m_AuxWidgetsModel.index(0, AUXDOPEWIDGETSECTION_FramesPerSecond), Qt::UserRole).toInt();
@@ -638,6 +643,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 	sSrc += ",\n\tm_fTimelineFrameTime(0.0f)";
 	sSrc += ",\n\tm_uiTimelineFrame(0)";
 	sSrc += ",\n\tm_bTimelinePaused(false)";
+	sSrc += ",\n\tm_uiTimelineFinalFrame(0)";
 
 	QList<EntityTreeItemData *> itemList, shapeList;
 	m_TreeModel.GetTreeItemData(itemList, shapeList);
@@ -728,7 +734,11 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 
 	for(int i = 0; i < GetNumStates(); ++i)
 	{
+		const EntityDopeSheetScene &entDopeSheetSceneRef = static_cast<const EntityStateData *>(GetStateData(i))->GetDopeSheetScene();
+
 		sSrc += "\n\tcase " + QString::number(i) + ": // " + m_StateList[i]->GetName() + "\n\t\t";
+
+		sSrc += "m_uiTimelineFinalFrame = " + QString::number(entDopeSheetSceneRef.GetFinalFrame()) + ";\n\t\t";
 		sSrc += "m_fpTimelineUpdate = [this]()\n\t\t{\n\t\t\t";
 
 		sSrc += "std::vector<glm::vec2> vertList;\n\t\t\t";
@@ -741,7 +751,6 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 		sSrc += "switch(m_uiTimelineFrame)\n\t\t\t\t{\n\t\t\t\t";
 		sSrc += "default:\n\t\t\t\t\tbreak;\n\n\t\t\t\t";
 
-		const EntityDopeSheetScene &entDopeSheetSceneRef = static_cast<const EntityStateData *>(GetStateData(i))->GetDopeSheetScene();
 		QMap<int, QMap<EntityTreeItemData *, QJsonObject>> propertiesMapByFrame = entDopeSheetSceneRef.GetKeyFrameMapPropertiesByFrame();
 		const QMap<int, QStringList> &eventMap = entDopeSheetSceneRef.GetEventMap();
 
@@ -790,7 +799,7 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 						break;
 
 					case DOPEEVENT_GotoFrame:
-						sSrc += "SetFrame(" + dopeSheetEvent.m_sData + ");\n\t\t\t\t\t";
+						sSrc += "SetTimelineFrame(" + dopeSheetEvent.m_sData + ");\n\t\t\t\t\t";
 						if(iFinalFrame == iFrameIndex)
 						{
 							// If this is the final frame, it must be going to a previous frame
@@ -1103,6 +1112,48 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 			QString sTweenType = "HyTween::" + tweenObj["Tween Type"].toString();
 
 			sSrc += sCodeName + "alpha.Tween(" + QString::number(tweenObj["Destination"].toDouble(), 'f') + "f, " + QString::number(tweenObj["Duration"].toDouble(), 'f') + "f, " + sTweenType + ");" + sNewLine;
+		}
+	}
+
+	return sSrc;
+}
+
+QString EntityModel::GenerateSrc_TimelineAdvance() const
+{
+	QString sSrc;
+
+	QList<EntityTreeItemData *> itemList, shapeList;
+	m_TreeModel.GetTreeItemData(itemList, shapeList);
+	itemList.append(shapeList);
+	EntityTreeItemData *pCurArray = nullptr;
+	for(EntityTreeItemData *pItem : itemList)
+	{
+		if(pCurArray)
+		{
+			if(pCurArray->GetCodeName() == pItem->GetCodeName())
+				continue;
+			pCurArray = nullptr;
+		}
+
+		QString sAccessOperator;
+		if(pItem->GetDeclarationType() == ENTDECLTYPE_Static)
+			sAccessOperator = ".";
+		else
+			sAccessOperator = "->";
+
+		if(pItem->GetEntType() != ENTTYPE_ArrayItem)
+		{
+			if(pItem->GetType() == ITEM_Sprite)
+				sSrc += "\t" + pItem->GetCodeName() + sAccessOperator + "AdvanceAnim(m_fTIMELINE_FRAME_DURATION);\n";
+		}
+		else // ENTTYPE_ArrayItem
+		{
+			if(pItem->GetType() == ITEM_Sprite)
+			{
+				for(int i = 0; i < m_TreeModel.GetArrayFolderTreeItem(pItem)->GetNumChildren(); ++i)
+					sSrc += "\t" + pItem->GetCodeName() + "[" + QString::number(i) + "]" + sAccessOperator + "AdvanceAnim(m_fTIMELINE_FRAME_DURATION);\n";
+			}
+			pCurArray = pItem;
 		}
 	}
 

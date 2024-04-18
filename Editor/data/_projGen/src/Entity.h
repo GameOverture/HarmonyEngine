@@ -19,6 +19,7 @@ protected:
 	float					m_fTimelineFrameTime;
 	uint32					m_uiTimelineFrame;
 	bool					m_bTimelinePaused;
+	uint32					m_uiTimelineFinalFrame;
 
 %HY_MEMBERVARIABLES%
 public:
@@ -29,16 +30,19 @@ public:
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual uint32 GetNumStates() override;
 	
+	uint32 GetTimelineFrame() const;
 	float GetTimelineFrameDuration() const;
 %HY_ACCESSORDECL%
 	
-	void SetFrame(uint32 uiFrameIndex);
+	void SetTimelineFrame(uint32 uiFrameIndex);
 	
 	bool IsTimelinePaused() const;
 	void SetTimelinePause(bool bPause);
 	
 protected:
 	virtual void Update() override;
+	
+	void TimelineAdvance();
 };
 
 } // '%HY_NAMESPACE%' namespace
