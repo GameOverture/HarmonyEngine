@@ -14,12 +14,12 @@ namespace %HY_NAMESPACE% {
 class %HY_CLASS%%HY_BASECLASSDECL%
 {
 protected:
-	const float				m_fTIMELINE_FRAME_DURATION;
-	std::function<void()>	m_fpTimelineUpdate;
-	float					m_fTimelineFrameTime;
-	uint32					m_uiTimelineFrame;
-	bool					m_bTimelinePaused;
-	uint32					m_uiTimelineFinalFrame;
+	const float					m_fTIMELINE_FRAME_DURATION;
+	std::function<void()>		m_fpTimelineUpdate;
+	float						m_fTimelineFrameTime;
+	uint32						m_uiTimelineFrame;
+	bool						m_bTimelinePaused;
+	uint32						m_uiTimelineFinalFrame;
 
 %HY_MEMBERVARIABLES%
 public:
@@ -41,8 +41,6 @@ public:
 	
 protected:
 	virtual void Update() override;
-	
-	void TimelineAdvance();
 };
 
 } // '%HY_NAMESPACE%' namespace

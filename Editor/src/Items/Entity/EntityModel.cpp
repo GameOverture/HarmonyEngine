@@ -539,10 +539,11 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 		sSrc += "\t";
 		QString sType = pItem->GetHyNodeTypeName(true);
 		sSrc += sType;
-		int iNumTabs = 6 - (sType.length() / 4); // Do 6 tabs (minus sType's length / 4) to align the variable names
+		const int iNUM_TAB_WIDTH = 7;
+		int iNumTabs = iNUM_TAB_WIDTH - (sType.length() / 4); // Do 'iNUM_TAB_WIDTH' tabs (minus sType's length / 4) to align the variable names
 		if(iNumTabs > 0)
 		{
-			for(int i = 0; i < 6 - (sType.length() / 4); ++i)
+			for(int i = 0; i < iNumTabs; ++i)
 				sSrc += "\t";
 		}
 		else
@@ -742,14 +743,8 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 		sSrc += "m_fpTimelineUpdate = [this]()\n\t\t{\n\t\t\t";
 
 		sSrc += "std::vector<glm::vec2> vertList;\n\t\t\t";
-
-		sSrc += "if(m_bTimelinePaused == false)\n\t\t\t";
-		sSrc += "\tm_fTimelineFrameTime += HyEngine::DeltaTime();\n\t\t\t";
-		sSrc += "while(m_fTimelineFrameTime >= 0.0f)\n\t\t\t";
-		sSrc += "{\n\t\t\t\t";
-
-		sSrc += "switch(m_uiTimelineFrame)\n\t\t\t\t{\n\t\t\t\t";
-		sSrc += "default:\n\t\t\t\t\tbreak;\n\n\t\t\t\t";
+		sSrc += "switch(m_uiTimelineFrame)\n\t\t\t{\n\t\t\t";
+		sSrc += "default:\n\t\t\t\tbreak;\n\n\t\t\t";
 
 		QMap<int, QMap<EntityTreeItemData *, QJsonObject>> propertiesMapByFrame = entDopeSheetSceneRef.GetKeyFrameMapPropertiesByFrame();
 		const QMap<int, QStringList> &eventMap = entDopeSheetSceneRef.GetEventMap();
@@ -768,13 +763,13 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 		int iFinalFrame = entDopeSheetSceneRef.GetFinalFrame();
 		for(int iFrameIndex : frameList)
 		{
-			sSrc += "case " + QString::number(iFrameIndex) + ":\n\t\t\t\t\t";
+			sSrc += "case " + QString::number(iFrameIndex) + ":\n\t\t\t\t";
 
 			// Properties
 			if(propertiesMapByFrame.contains(iFrameIndex))
 			{
 				for(QMap<EntityTreeItemData *, QJsonObject>::const_iterator iter = propertiesMapByFrame[iFrameIndex].begin(); iter != propertiesMapByFrame[iFrameIndex].end(); ++iter)
-					sSrc += GenerateSrc_SetProperties(iter.key(), iter.value(), "\n\t\t\t\t\t");
+					sSrc += GenerateSrc_SetProperties(iter.key(), iter.value(), "\n\t\t\t\t");
 			}
 
 			// Events
@@ -789,17 +784,17 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 					switch(dopeSheetEvent.m_eType)
 					{
 					case DOPEEVENT_Callback:
-						sSrc += sEvent + "();\n\t\t\t\t\t";
+						sSrc += sEvent + "();\n\t\t\t\t";
 						break;
 
 					case DOPEEVENT_PauseTimeline:
-						sSrc += "SetTimelinePause(true);\n\t\t\t\t\t";
+						sSrc += "SetTimelinePause(true);\n\t\t\t\t";
 						if(iFinalFrame == iFrameIndex)
 							bIsFinalFrameHandled = true;
 						break;
 
 					case DOPEEVENT_GotoFrame:
-						sSrc += "SetTimelineFrame(" + dopeSheetEvent.m_sData + ");\n\t\t\t\t\t";
+						sSrc += "SetTimelineFrame(" + dopeSheetEvent.m_sData + ");\n\t\t\t\t";
 						if(iFinalFrame == iFrameIndex)
 						{
 							// If this is the final frame, it must be going to a previous frame
@@ -819,26 +814,22 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 
 			if(iFrameIndex == iFinalFrame && bIsFinalFrameHandled == false)
 			{
-				sSrc += "SetTimelinePause(true);\n\t\t\t\t\t";
+				sSrc += "SetTimelinePause(true);\n\t\t\t\t";
 				bIsFinalFrameHandled = true;
 			}
 
-			sSrc += "break;\n\n\t\t\t\t";
+			sSrc += "break;\n\n\t\t\t";
 		}
 
 		if(bIsFinalFrameHandled == false)
 		{
-			sSrc += "case " + QString::number(iFinalFrame) + ":\n\t\t\t\t\t";
-			sSrc += "SetTimelinePause(true);\n\t\t\t\t\t";
-			sSrc += "break;\n\n\t\t\t\t";
+			sSrc += "case " + QString::number(iFinalFrame) + ":\n\t\t\t\t";
+			sSrc += "SetTimelinePause(true);\n\t\t\t\t";
+			sSrc += "break;\n\n\t\t\t";
 			bIsFinalFrameHandled = true;
 		}
 
-		sSrc += "}\n\t\t\t\t"; // End switch(m_uiTimelineFrame)
-
-		sSrc += "m_uiTimelineFrame++;\n\t\t\t\t";
-		sSrc += "m_fTimelineFrameTime -= m_fTIMELINE_FRAME_DURATION;\n\t\t\t";
-		sSrc += "}\n\t\t"; // End while(m_fTimelineFrameTime >= 0.0f)
+		sSrc += "}\n\t\t\t"; // End switch(m_uiTimelineFrame)
 
 		sSrc += "};\n\t\t"; // End m_fpTimelineUpdate
 		sSrc += "break;\n"; // End case m_uiState
@@ -1144,14 +1135,14 @@ QString EntityModel::GenerateSrc_TimelineAdvance() const
 		if(pItem->GetEntType() != ENTTYPE_ArrayItem)
 		{
 			if(pItem->GetType() == ITEM_Sprite)
-				sSrc += "\t" + pItem->GetCodeName() + sAccessOperator + "AdvanceAnim(m_fTIMELINE_FRAME_DURATION);\n";
+				sSrc += "\t\t" + pItem->GetCodeName() + sAccessOperator + "AdvanceAnim(m_fTIMELINE_FRAME_DURATION);\n";
 		}
 		else // ENTTYPE_ArrayItem
 		{
 			if(pItem->GetType() == ITEM_Sprite)
 			{
 				for(int i = 0; i < m_TreeModel.GetArrayFolderTreeItem(pItem)->GetNumChildren(); ++i)
-					sSrc += "\t" + pItem->GetCodeName() + "[" + QString::number(i) + "]" + sAccessOperator + "AdvanceAnim(m_fTIMELINE_FRAME_DURATION);\n";
+					sSrc += "\t\t" + pItem->GetCodeName() + "[" + QString::number(i) + "]" + sAccessOperator + "AdvanceAnim(m_fTIMELINE_FRAME_DURATION);\n";
 			}
 			pCurArray = pItem;
 		}

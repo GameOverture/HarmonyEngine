@@ -24,11 +24,11 @@ namespace %HY_NAMESPACE% {
 	
 	%HY_SETSTATEIMPL%
 	
-	m_fTimelineFrameTime = 0.0f;
 	m_uiTimelineFrame = 0;
-	m_bTimelinePaused = false;
-	
 	m_fpTimelineUpdate();
+	
+	m_bTimelinePaused = false;
+	m_fTimelineFrameTime = m_fTIMELINE_FRAME_DURATION;
 	
 	return true;
 }
@@ -55,25 +55,19 @@ void %HY_CLASS%::SetTimelineFrame(uint32 uiFrameIndex)
 
 	// Extrapolate to frame 'uiFrameIndex'
 	m_uiTimelineFrame = 0;
-	bool bWasPaused = m_bTimelinePaused;
-	m_bTimelinePaused = false;
-
 	while(true)
 	{
-		if(m_uiTimelineFrame == uiFrameIndex)
-		{
-			m_fTimelineFrameTime = 0.0f;
-			m_fpTimelineUpdate();
-			break;
-		}
-		
-		m_fTimelineFrameTime = 0.0f;
 		m_fpTimelineUpdate();
-		TimelineAdvance();
+		if(m_uiTimelineFrame == uiFrameIndex)
+			break;
+		
+		// Advance timeline by 1 frame
+%HY_TIMELINEADVANCEIMPL%
+		
+		m_uiTimelineFrame++;
 	}
-
-	m_uiTimelineFrame = uiFrameIndex;
-	m_bTimelinePaused = bWasPaused;
+	
+	m_fTimelineFrameTime = m_fTIMELINE_FRAME_DURATION;
 }
 
 bool %HY_CLASS%::IsTimelinePaused() const
@@ -88,13 +82,19 @@ void %HY_CLASS%::SetTimelinePause(bool bPause)
 
 /*virtual*/ void %HY_CLASS%::Update() /*override*/
 {
-	m_fpTimelineUpdate();
+	if(m_bTimelinePaused == false && m_uiTimelineFrame < m_uiTimelineFinalFrame)
+	{
+		m_fTimelineFrameTime += HyEngine::DeltaTime();
+		while(m_fTimelineFrameTime >= 0.0f)
+		{
+			m_uiTimelineFrame++;
+			m_fpTimelineUpdate();
+			
+			m_fTimelineFrameTime -= m_fTIMELINE_FRAME_DURATION;
+		}
+	}
+	
 	HyEntity2d::Update();
-}
-
-void %HY_CLASS%::TimelineAdvance()
-{
-%HY_TIMELINEADVANCEIMPL%
 }
 
 } // '%HY_NAMESPACE%' namespace
