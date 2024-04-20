@@ -320,7 +320,6 @@ bool IManagerModel::GetAffectedItems(QList<IAssetItemData *> assetsList, QList<P
 				}
 			}
 		}
-		
 	}
 
 	return true;
@@ -333,6 +332,21 @@ void IManagerModel::ReplaceAssets(QList<IAssetItemData *> assetsList, bool bWith
 
 	if(bWithNewAssets)
 	{
+		// Make sure no sub-atlases are being replaced
+		for(IAssetItemData *pAsset : assetsList)
+		{
+			if(pAsset->GetType() == ITEM_AtlasFrame && static_cast<AtlasFrame *>(pAsset)->IsSubAtlas())
+			{
+				QString sDependant;
+				if(pAsset->GetDependants().empty() == false && pAsset->GetDependants()[0]->IsProjectItem())
+					sDependant = static_cast<ProjectItemData *>(pAsset->GetDependants()[0])->GetName(true);
+				QString sMessage = "'" % pAsset->GetName() % "' asset cannot be replaced because it is a sub-atlas of item:\n\n" % sDependant;
+				HyGuiLog(sMessage, LOGTYPE_Warning);
+
+				return;
+			}
+		}
+
 		// Initialize file dialog to choose new assets as replacement(s)
 		QFileDialog dlg(MainWindow::GetInstance());
 		dlg.setDirectory("");

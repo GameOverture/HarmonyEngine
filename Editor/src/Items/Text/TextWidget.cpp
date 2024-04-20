@@ -42,7 +42,20 @@ TextWidget::TextWidget(ProjectItemData &itemRef, QWidget *parent) :
 
 	// Set font size combobox with the standard sizes.
 	QFontDatabase fontDatabase;
+	
+	// Get the standard sizes and add some larger ones.
 	QList<int> sizeList = fontDatabase.standardSizes();
+	if(sizeList.last() < 128)
+		sizeList.append(128);
+	if(sizeList.last() < 192)
+		sizeList.append(192);
+	if(sizeList.last() < 256)
+		sizeList.append(256);
+	if(sizeList.last() < 384)
+		sizeList.append(384);
+	if(sizeList.last() < 512)
+		sizeList.append(512);
+
 	QStringList sSizeList;
 	for(int i = 0; i < sizeList.size(); ++i)
 		sSizeList.append(QString::number(sizeList[i]));
@@ -146,7 +159,7 @@ void TextWidget::on_cmbFont_currentIndexChanged(int index)
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
-void TextWidget::on_cmbSize_currentIndexChanged(int index)
+void TextWidget::on_cmbSize_currentTextChanged(const QString &sText)
 {
 	TextLayersModel *pTextLayerModel = static_cast<TextModel *>(m_ItemRef.GetModel())->GetLayersModel(GetCurStateIndex());
 	if(pTextLayerModel == nullptr || pTextLayerModel->IsEmpty())

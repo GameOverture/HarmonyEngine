@@ -19,6 +19,7 @@
 #include "AtlasModel.h"
 #include "GlobalUndoCmds.h"
 #include "IAssetItemData.h"
+#include "TextModel.h" // For Project::ReloadHarmony() hack
 #include "SourceSettingsDlg.h"
 
 #include <QFile>
@@ -530,6 +531,11 @@ void Project::ReloadHarmony()
 		bool bWriteToDisk = (i == (dirtyItemList.size() - 1));
 
 		dirtyItemList[i]->LoadModel();
+
+		// HACK: Text sub-atlases sometimes need to be rebuilt
+		if(dirtyItemList[i]->GetType() == ITEM_Text)
+			static_cast<TextModel *>(dirtyItemList[i]->GetModel())->SetRuntimeAtlasDirty();
+
 		if(dirtyItemList[i]->Save(bWriteToDisk) == false)
 			HyGuiLog(dirtyItemList[i]->GetName(true) % " failed to save during Project::ReloadHarmony", LOGTYPE_Error);
 	}
