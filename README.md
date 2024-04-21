@@ -1,10 +1,11 @@
     
 # Harmony Engine
 
-### Cross-platform game engine and editor for making expansive 2D or 2.5D games.
+#### Cross-platform game engine and editor for making expansive 2D or 2.5D games.
 
-**Disclaimer:** This is a very much work in progress and not ready for public consumption.
-
+### [Feature Roadmap](https://github.com/users/GameOverture/projects/2)
+##### **Disclaimer:** This is a very much work in progress and not ready for public consumption.
+---
 The Harmony Engine consists of two main projects
 - The GUI editor (HyEditor) that manages and handles all the offline work
 - The engine itself (HyEngine) which is a static library that links into your application.
@@ -35,7 +36,7 @@ The Harmony Engine consists of two main projects
 * Create complex Entities using the elements above
     - Apply physics, add colliders, and setup bounding volumes
 
-![Harmony Editor Screenshot](https://user-images.githubusercontent.com/344924/140581279-a3899c64-ea8b-4c9a-b869-b11d07444db2.png)
+![Harmony Editor Screenshot](https://private-user-images.githubusercontent.com/344924/324213397-200843ab-a37d-4cb2-8800-5bae9ce0aa4d.gif?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MTM2NTk2MjQsIm5iZiI6MTcxMzY1OTMyNCwicGF0aCI6Ii8zNDQ5MjQvMzI0MjEzMzk3LTIwMDg0M2FiLWEzN2QtNGNiMi04ODAwLTViYWU5Y2UwYWE0ZC5naWY_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwNDIxJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDQyMVQwMDI4NDRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1mNGNlODkyZTAwNDU5NzljZDVhMmM3NTY4ZjYxYzdlODc5Zjc2NmE4MGRmZDc1OGNmNzM5MmIzM2M5NjM0OWViJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.shuIVQuke4F7ooLAROYShwvO0f3dL7JF9JoZGF97as0)
 
 ## Engine Features (HyEngine)
 
