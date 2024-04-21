@@ -47,6 +47,8 @@ public:
 	void GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut);
 
 	void ApplyTransform(QPoint &vTransformAmtRef);
+
+	void RefreshFrameRateSpinBox();
 	
 private Q_SLOTS:
 	void on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection);
@@ -94,6 +96,8 @@ private Q_SLOTS:
 	void on_btnHz50_clicked();
 
 	void on_btnHz60_clicked();
+
+	void on_sbFrameRate_valueChanged(double dValue);
 
 private:
 	Ui::SpriteWidget *ui;

@@ -146,10 +146,22 @@ void SpriteWidget::ApplyTransform(QPoint &vTransformAmtRef)
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
+void SpriteWidget::RefreshFrameRateSpinBox()
+{
+	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(ui->framesView->model());
+
+	ui->sbFrameRate->setEnabled(true);
+	ui->sbFrameRate->blockSignals(true);
+	ui->sbFrameRate->setValue(pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row())->m_fDuration);
+	ui->sbFrameRate->blockSignals(false);
+}
+
 void SpriteWidget::on_framesView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection)
 {
 	if(m_ItemRef.GetDraw())
 		static_cast<SpriteDraw *>(m_ItemRef.GetDraw())->SetFrame(GetCurStateIndex(), ui->framesView->currentIndex().row());
+
+	RefreshFrameRateSpinBox();
 
 	UpdateActions();
 }
@@ -397,5 +409,11 @@ void SpriteWidget::on_btnHz50_clicked()
 void SpriteWidget::on_btnHz60_clicked()
 {
 	QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, 1.0f / 60.0f);
+	GetItem().GetUndoStack()->push(pCmd);
+}
+
+void SpriteWidget::on_sbFrameRate_valueChanged(double dValue)
+{
+	QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, dValue);
 	GetItem().GetUndoStack()->push(pCmd);
 }

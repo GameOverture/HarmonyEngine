@@ -11,6 +11,7 @@
 #include "SpriteModels.h"
 #include "Project.h"
 #include "AtlasModel.h"
+#include "SpriteWidget.h"
 
 #include <QJsonArray>
 
@@ -131,6 +132,10 @@ void SpriteFramesModel::DurationFrame(int iIndex, float fDuration)
 		m_FramesList[iIndex]->m_fDuration = fDuration;
 		dataChanged(createIndex(iIndex, COLUMN_Duration), createIndex(iIndex, COLUMN_Duration));
 	}
+
+	IWidget *pWidget = static_cast<SpriteModel *>(parent())->GetItem().GetWidget();
+	if(pWidget)
+		static_cast<SpriteWidget *>(pWidget)->RefreshFrameRateSpinBox();
 }
 
 QJsonArray SpriteFramesModel::GetFramesInfo(float &fTotalDurationRef)
