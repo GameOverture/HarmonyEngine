@@ -1,10 +1,11 @@
     
 # Harmony Engine
 
-### Cross-platform game engine and editor for making expansive 2D or 2.5D games.
+#### Cross-platform game engine and editor for making expansive 2D or 2.5D games.
 
-**Disclaimer:** This is a very much work in progress and not ready for public consumption.
-
+### [Feature Roadmap](https://github.com/users/GameOverture/projects/2)
+##### **Disclaimer:** This is a very much work in progress and not ready for public consumption.
+---
 The Harmony Engine consists of two main projects
 - The GUI editor (HyEditor) that manages and handles all the offline work
 - The engine itself (HyEngine) which is a static library that links into your application.
