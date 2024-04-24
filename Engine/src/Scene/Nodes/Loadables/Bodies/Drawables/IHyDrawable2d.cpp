@@ -113,6 +113,9 @@ void IHyDrawable2d::GuiOverrideData(HyJsonObj itemDataObj, bool bUseGuiOverrideN
 
 	if(m_hShader == HY_UNUSED_HANDLE)
 		m_hShader = HyEngine::DefaultShaderHandle(GetType());
+
+	if(m_uiState >= GetNumStates())
+		m_uiState = 0;
 }
 
 // Explicit instantiations

@@ -151,8 +151,13 @@ void SpriteWidget::RefreshFrameRateSpinBox()
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(ui->framesView->model());
 
 	ui->sbFrameRate->setEnabled(true);
+
 	ui->sbFrameRate->blockSignals(true);
-	ui->sbFrameRate->setValue(pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row())->m_fDuration);
+	SpriteFrame *pSpriteFrame = pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row());
+	if(pSpriteFrame)
+		ui->sbFrameRate->setValue(pSpriteFrame->m_fDuration);
+	else
+		ui->sbFrameRate->setValue(0.0f);
 	ui->sbFrameRate->blockSignals(false);
 }
 

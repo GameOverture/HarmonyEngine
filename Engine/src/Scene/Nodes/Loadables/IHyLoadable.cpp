@@ -56,6 +56,8 @@ IHyLoadable &IHyLoadable::operator=(const IHyLoadable &rhs)
 	if(rhs.IsLoaded())
 		Load();
 
+	m_uiState = rhs.m_uiState;
+
 	return *this;
 }
 
@@ -75,6 +77,8 @@ IHyLoadable &IHyLoadable::operator=(IHyLoadable &&donor)
 		Load();
 		donor.Unload();
 	}
+
+	m_uiState = std::move(donor.m_uiState);
 
 	return *this;
 }
