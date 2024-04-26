@@ -11,7 +11,6 @@
 #include "EntityDraw.h"
 #include "EntityWidget.h"
 #include "MainWindow.h"
-#include "HarmonyWidget.h"
 #include "EntityUndoCmds.h"
 
 #include <QKeyEvent>

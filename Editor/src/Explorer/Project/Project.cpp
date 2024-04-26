@@ -665,9 +665,6 @@ ProjectItemData *Project::GetCurrentOpenItem()
 
 void Project::SetRenderSize(int iWidth, int iHeight)
 {
-	HyEngine::Window().SetWindowSize(glm::ivec2(iWidth, iHeight));
-	HyEngine::Window().SetFramebufferSize(glm::ivec2(iWidth, iHeight));
-
 	if(m_pTabBar && m_pTabBar->count() != 0)
 	{
 		if(m_pTabBar->currentIndex() >= 0)

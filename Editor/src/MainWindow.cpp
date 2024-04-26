@@ -11,7 +11,6 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 #include "Harmony.h"
-#include "HarmonyWidget.h"
 #include "Project.h"
 #include "DlgSetEngineLocation.h"
 #include "DlgNewProject.h"

@@ -13,7 +13,6 @@
 #include "IModel.h"
 #include "MainWindow.h"
 #include "Harmony.h"
-#include "HarmonyWidget.h"
 #include "GlobalUndoCmds.h"
 
 #include <QJsonDocument>

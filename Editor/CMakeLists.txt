@@ -219,10 +219,11 @@ if(Qt5_DIR)
 		src/Explorer/Project/ProjectItemMimeData.h
 		src/Harmony/Harmony.cpp
 		src/Harmony/HarmonyConnection.cpp
-		src/Harmony/HarmonyWidget.cpp
 		src/Harmony/Harmony.h
 		src/Harmony/HarmonyConnection.h
+		src/Harmony/HarmonyWidget.cpp
 		src/Harmony/HarmonyWidget.h
+		src/Harmony/HarmonyWidget.ui
 		src/Shared/Global.cpp
 		src/Shared/Global.h
 		src/Shared/GlobalUndoCmds.h
@@ -268,6 +269,8 @@ if(Qt5_DIR)
 		src/Widget/WgtCodeEditor.cpp
 		src/Widget/WgtCodeEditor.h
 		src/Widget/WgtCodeEditor.ui
+		src/Widget/WgtHarmony.cpp
+		src/Widget/WgtHarmony.h
 		src/Widget/WgtMakeRelDir.cpp
 		src/Widget/WgtMakeRelDir.h
 		src/Widget/WgtMakeRelDir.ui

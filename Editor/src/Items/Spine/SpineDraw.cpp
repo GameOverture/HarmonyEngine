@@ -12,7 +12,6 @@
 #include "ProjectItemData.h"
 #include "SpineModel.h"
 #include "Harmony.h"
-#include "HarmonyWidget.h"
 
 #include "vendor/SOIL2/src/SOIL2/SOIL2.h"
 

@@ -27,7 +27,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class HarmonyWidget;
+class WgtHarmony;
 class Project;
 class ProjectItemData;
 

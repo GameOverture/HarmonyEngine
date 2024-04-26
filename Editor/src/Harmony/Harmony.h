@@ -12,12 +12,12 @@
 
 #include "Project.h"
 #include "HarmonyConnection.h"
+#include "HarmonyWidget.h"
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 
 class MainWindow;
-class HarmonyWidget;
 
 class Harmony : public QObject
 {
@@ -42,7 +42,7 @@ public:
 	static HarmonyWidget *GetHarmonyWidget(Project *pProject);
 
 private Q_SLOTS:
-	void OnHarmonyWidgetReady(HarmonyWidget *pWidget);
+	void OnHarmonyWidgetReady(WgtHarmony *pWidget);
 };
 
 #endif // HARMONY_H

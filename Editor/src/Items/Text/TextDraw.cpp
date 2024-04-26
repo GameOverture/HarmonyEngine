@@ -12,7 +12,6 @@
 #include "ProjectItemData.h"
 #include "TextModel.h"
 #include "Harmony.h"
-#include "HarmonyWidget.h"
 
 TextDraw::TextDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),

@@ -10,7 +10,6 @@
 #include "Global.h"
 #include "Harmony.h"
 #include "MainWindow.h"
-#include "HarmonyWidget.h"
 
 Harmony *Harmony::sm_pInstance = nullptr;
 
@@ -53,7 +52,7 @@ Harmony::Harmony(MainWindow &mainWindowRef) :
 
 	if(pProject != nullptr)
 	{
-		connect(sm_pInstance->m_pWidget, &HarmonyWidget::HarmonyWidgetReady, sm_pInstance, &Harmony::OnHarmonyWidgetReady);
+		connect(sm_pInstance->m_pWidget->GetWgtHarmony(), &WgtHarmony::HarmonyWidgetReady, sm_pInstance, &Harmony::OnHarmonyWidgetReady);
 		sm_pInstance->m_MainWindowRef.SetStatus("Loading new Harmony instance", 0);
 	}
 	else
@@ -89,7 +88,7 @@ Harmony::Harmony(MainWindow &mainWindowRef) :
 	return sm_pInstance->m_pWidget;
 }
 
-/*slot*/ void Harmony::OnHarmonyWidgetReady(HarmonyWidget *pWidget)
+/*slot*/ void Harmony::OnHarmonyWidgetReady(WgtHarmony *pWidget)
 {
 	m_pWidget->GetProject()->HarmonyInitialize();
 
