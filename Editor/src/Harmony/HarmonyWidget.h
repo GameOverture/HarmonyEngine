@@ -13,6 +13,8 @@
 #include <QWidget>
 #include "WgtHarmony.h"
 
+#include <QGraphicsScene>
+
 class Project;
 
 namespace Ui {
