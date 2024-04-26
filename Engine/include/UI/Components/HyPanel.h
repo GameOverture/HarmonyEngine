@@ -101,6 +101,7 @@ public:
 	bool IsBoundingVolume() const;
 
 	bool IsNode() const;
+	IHyBody2d *GetNode();
 
 	bool IsPrimitive() const;
 	uint32 GetFrameStrokeSize() const;

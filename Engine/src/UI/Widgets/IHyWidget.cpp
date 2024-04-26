@@ -73,6 +73,11 @@ void IHyWidget::SetPanelVisible(bool bVisible)
 	m_Panel.SetVisible(bVisible);
 }
 
+IHyBody2d *IHyWidget::GetPanelNode()
+{
+	return m_Panel.GetNode();
+}
+
 bool IHyWidget::IsInputAllowed() const
 {
 	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)

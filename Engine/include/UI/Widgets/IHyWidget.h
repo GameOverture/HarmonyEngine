@@ -61,6 +61,8 @@ public:
 	bool IsPanelVisible() const;
 	void SetPanelVisible(bool bVisible);
 
+	IHyBody2d *GetPanelNode();
+
 	bool IsInputAllowed() const;					// Checks itself and the container it's inserted in if input is allowed
 
 	bool IsEnabled() const;

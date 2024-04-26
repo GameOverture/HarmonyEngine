@@ -284,6 +284,11 @@ bool HyPanel::IsNode() const
 	return m_pNodeItem != nullptr;
 }
 
+IHyBody2d *HyPanel::GetNode()
+{
+	return m_pNodeItem;
+}
+
 bool HyPanel::IsPrimitive() const
 {
 	return m_pPrimParts != nullptr;
