@@ -17,14 +17,14 @@ HyLayout::HyLayout(HyOrientation eLayoutType, int32 iWidgetSpacing, HyEntity2d *
 	IHyEntityUi(pParent),
 	m_eLayoutType(eLayoutType),
 	m_vActualSize(0, 0),
-	m_bReverse(m_eLayoutType == HYORIEN_Horizontal ? false : true), // 'm_bReverse' is defaulted ON when 'm_eLayoutType' is HYORIEN_Vertical to achieve top->bottom as default
+	m_bReverse(m_eLayoutType == HYORIENT_Horizontal ? false : true), // 'm_bReverse' is defaulted ON when 'm_eLayoutType' is HYORIENT_Vertical to achieve top->bottom as default
 	m_bLayoutDirty(false),
 	m_iWidgetSpacing(iWidgetSpacing)
 {
 	m_uiFlags |= NODETYPE_IsLayout;
 
-	m_SizePolicies[HYORIEN_Horizontal] = HYSIZEPOLICY_Flexible;
-	m_SizePolicies[HYORIEN_Vertical] = HYSIZEPOLICY_Flexible;
+	m_SizePolicies[HYORIENT_Horizontal] = HYSIZEPOLICY_Flexible;
+	m_SizePolicies[HYORIENT_Vertical] = HYSIZEPOLICY_Flexible;
 }
 
 /*virtual*/ HyLayout::~HyLayout()
@@ -52,7 +52,7 @@ void HyLayout::SetLayoutType(HyOrientation eLayoutType)
 		return;
 
 	m_eLayoutType = eLayoutType;
-	m_bReverse = (m_eLayoutType == HYORIEN_Horizontal ? false : true), // 'm_bReverse' is defaulted ON when 'm_eLayoutType' is HYORIEN_Vertical to achieve top->bottom as default
+	m_bReverse = (m_eLayoutType == HYORIENT_Horizontal ? false : true), // 'm_bReverse' is defaulted ON when 'm_eLayoutType' is HYORIENT_Vertical to achieve top->bottom as default
 	SetLayoutDirty();
 }
 
@@ -111,16 +111,16 @@ void HyLayout::DetachAllItems()
 
 bool HyLayout::IsReverseOrder()
 {
-	if(m_eLayoutType == HYORIEN_Vertical)
-		return !m_bReverse; // HYORIEN_Vertical needs this flipped to achieve top->bottom default
+	if(m_eLayoutType == HYORIENT_Vertical)
+		return !m_bReverse; // HYORIENT_Vertical needs this flipped to achieve top->bottom default
 	else
 		return m_bReverse;
 }
 
 void HyLayout::ReverseOrder(bool bReverse)
 {
-	if(m_eLayoutType == HYORIEN_Vertical)
-		m_bReverse = !bReverse; // HYORIEN_Vertical needs this flipped to achieve top->bottom default
+	if(m_eLayoutType == HYORIENT_Vertical)
+		m_bReverse = !bReverse; // HYORIENT_Vertical needs this flipped to achieve top->bottom default
 	else
 		m_bReverse = bReverse;
 
@@ -198,15 +198,15 @@ bool HyLayout::IsWidgetInputAllowed()
 		return;
 
 	HyOrientation eOrientation, eInverseOrien;
-	if(m_eLayoutType == HYORIEN_Horizontal)
+	if(m_eLayoutType == HYORIENT_Horizontal)
 	{
-		eOrientation = HYORIEN_Horizontal;
-		eInverseOrien = HYORIEN_Vertical;
+		eOrientation = HYORIENT_Horizontal;
+		eInverseOrien = HYORIENT_Vertical;
 	}
 	else
 	{
-		eOrientation = HYORIEN_Vertical;
-		eInverseOrien = HYORIEN_Horizontal;
+		eOrientation = HYORIENT_Vertical;
+		eInverseOrien = HYORIENT_Horizontal;
 	}
 
 	// Figure out m_vSizeHint while counting size policies
@@ -242,16 +242,16 @@ bool HyLayout::IsWidgetInputAllowed()
 
 	HyOrientation eOrientation, eInverseOrien;
 	int32 iInverseOrienMargin;
-	if(m_eLayoutType == HYORIEN_Horizontal)
+	if(m_eLayoutType == HYORIENT_Horizontal)
 	{
-		eOrientation = HYORIEN_Horizontal;
-		eInverseOrien = HYORIEN_Vertical;
+		eOrientation = HYORIENT_Horizontal;
+		eInverseOrien = HYORIENT_Vertical;
 		iInverseOrienMargin = m_Margins.top + m_Margins.bottom;
 	}
 	else
 	{
-		eOrientation = HYORIEN_Vertical;
-		eInverseOrien = HYORIEN_Horizontal;
+		eOrientation = HYORIENT_Vertical;
+		eInverseOrien = HYORIENT_Horizontal;
 		iInverseOrienMargin = m_Margins.left + m_Margins.right;
 	}
 

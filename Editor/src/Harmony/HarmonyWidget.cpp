@@ -16,14 +16,16 @@
 
 HarmonyWidget::HarmonyWidget(Project *pProject, QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
-	ui(new Ui::HarmonyWidget),
-	m_HorzScene(this),
-	m_VertScene(this)
+	ui(new Ui::HarmonyWidget)//,
+	//m_HorzScene(this),
+	//m_VertScene(this)
 {
 	ui->setupUi(this);
 	ui->wgtHarmony->InitProject(pProject);
-	ui->rulerHorz->setScene(&m_HorzScene);
-	ui->rulerVert->setScene(&m_VertScene);
+	//ui->rulerHorz->setScene(&m_HorzScene);
+	ui->rulerHorz->setBackgroundBrush(HyGlobal::ConvertHyColor(HyColor::ContainerPanel));
+	//ui->rulerVert->setScene(&m_VertScene);
+	ui->rulerVert->setBackgroundBrush(HyGlobal::ConvertHyColor(HyColor::ContainerPanel));
 
 	RestoreCursorShape();
 }

@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QGraphicsView" name="rulerHorz">
+    <widget class="HarmonyRulerGfxView" name="rulerHorz">
      <property name="maximumSize">
       <size>
        <width>16777215</width>
@@ -54,7 +54,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QGraphicsView" name="rulerVert">
+      <widget class="HarmonyRulerGfxView" name="rulerVert">
        <property name="maximumSize">
         <size>
          <width>20</width>
@@ -84,6 +84,11 @@
    <class>WgtHarmony</class>
    <extends>QOpenGLWidget</extends>
    <header>WgtHarmony.h</header>
+  </customwidget>
+  <customwidget>
+   <class>HarmonyRulerGfxView</class>
+   <extends>QGraphicsView</extends>
+   <header>HarmonyRulerGfxView.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

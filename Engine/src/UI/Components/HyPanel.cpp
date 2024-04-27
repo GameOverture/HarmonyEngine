@@ -231,7 +231,7 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 
 float HyPanel::GetSizeDimension(int32 iDimensionIndex, float fPercent /*= 1.0f*/)
 {
-	if(iDimensionIndex == HYORIEN_Horizontal)
+	if(iDimensionIndex == HYORIENT_Horizontal)
 		return GetWidth(fPercent);
 
 	return GetHeight(fPercent);

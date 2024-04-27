@@ -119,7 +119,7 @@ void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath
 	ResetTextAndPanel();
 }
 
-void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /*= 5*/, HyOrientation eOrientation /*= HYORIEN_Horizontal*/)
+void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /*= 5*/, HyOrientation eOrientation /*= HYORIENT_Horizontal*/)
 {
 	m_uiAttribs |= LABELATTRIB_IsSideBySide;
 	if(bPanelBeforeText)
@@ -129,7 +129,7 @@ void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /
 
 	m_iSideBySidePadding = iPadding;
 
-	if(eOrientation == HYORIEN_Horizontal)
+	if(eOrientation == HYORIENT_Horizontal)
 		m_uiAttribs &= ~LABELATTRIB_SideBySideVertical;
 	else
 		m_uiAttribs |= LABELATTRIB_SideBySideVertical;

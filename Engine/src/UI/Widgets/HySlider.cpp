@@ -33,7 +33,7 @@ void HySlider::BarPrimitives::Assemble(HyOrientation eOrientation, float fBarThi
 	m_EndCapPos.pos.GetAnimFloat(eInverseOrien) = 0.0f;
 	m_EndCapPos.SetAsCircle(fRadius);
 
-	if(eOrientation == HYORIEN_Horizontal)
+	if(eOrientation == HYORIENT_Horizontal)
 	{
 		m_BarPos.SetAsBox(HyRect(1.0f, fBarThickness - fIndentAmt));
 		m_BarNeg.SetAsBox(HyRect(1.0f, fBarThickness - fIndentAmt));
@@ -191,12 +191,12 @@ void HySlider::SetRange(const std::vector<int64> &stepList)
 
 HyOrientation HySlider::GetOrientation() const
 {
-	return (m_uiAttribs & SLIDERATTRIB_IsVertical) ? HYORIEN_Vertical : HYORIEN_Horizontal;
+	return (m_uiAttribs & SLIDERATTRIB_IsVertical) ? HYORIENT_Vertical : HYORIENT_Horizontal;
 }
 
 void HySlider::SetOrientation(HyOrientation eOrien)
 {
-	if(eOrien == HYORIEN_Horizontal)
+	if(eOrien == HYORIENT_Horizontal)
 		m_uiAttribs &= ~SLIDERATTRIB_IsVertical;
 	else
 		m_uiAttribs |= SLIDERATTRIB_IsVertical;
@@ -284,7 +284,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 {
 	float fRadius = GetBarRadius();
 
-	if(GetOrientation() == HYORIEN_Horizontal)
+	if(GetOrientation() == HYORIENT_Horizontal)
 		HySetVec(m_vSizeHint, static_cast<int32>(m_fLength + m_Panel.GetWidth(m_Panel.scale.X())), static_cast<int32>(m_Panel.GetHeight(m_Panel.scale.Y())));
 	else
 		HySetVec(m_vSizeHint, static_cast<int32>(m_Panel.GetWidth(m_Panel.scale.X())), static_cast<int32>(m_fLength + m_Panel.GetHeight(m_Panel.scale.Y())));
@@ -325,7 +325,7 @@ void HySlider::Assemble()
 
 	HyOrientation eOrientation = GetOrientation();
 
-	if(eOrientation == HYORIEN_Horizontal)
+	if(eOrientation == HYORIENT_Horizontal)
 		SetSizePolicy(HYSIZEPOLICY_Expanding, HYSIZEPOLICY_Fixed);
 	else
 		SetSizePolicy(HYSIZEPOLICY_Fixed, HYSIZEPOLICY_Expanding);

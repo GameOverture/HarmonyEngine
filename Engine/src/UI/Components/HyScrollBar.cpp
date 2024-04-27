@@ -43,7 +43,7 @@ void HyScrollBar::PageControl::SetMetrics(HyOrientation eOrientation, uint32 uiL
 {
 	m_uiDiameter = uiDiameter;
 
-	if(eOrientation == HYORIEN_Vertical)
+	if(eOrientation == HYORIENT_Vertical)
 	{
 		m_Panel.SetAsBox(static_cast<int32>(m_uiDiameter), static_cast<int32>(uiLength));
 		m_Slider.SetAsBox(static_cast<float>(m_uiDiameter) * 0.5f, (uiLength - (m_uiDiameter * 2)) * fSliderPercent);
@@ -57,7 +57,7 @@ void HyScrollBar::PageControl::SetMetrics(HyOrientation eOrientation, uint32 uiL
 
 void HyScrollBar::PageControl::SetSliderPos(HyOrientation eOrientation, float fAnimScrollPos, float fClientTotalSize, float fClientShownSize)
 {
-	if(eOrientation == HYORIEN_Vertical)
+	if(eOrientation == HYORIENT_Vertical)
 		m_Slider.pos.Set(static_cast<float>(m_uiDiameter) * 0.25f, ((static_cast<float>(fClientTotalSize - fClientShownSize) - fAnimScrollPos) * (m_Panel.GetSceneHeight() - m_Slider.GetSceneHeight())) / static_cast<float>(fClientTotalSize - fClientShownSize));
 	else
 		m_Slider.pos.Set((fAnimScrollPos * (m_Panel.GetSceneWidth() - m_Slider.GetSceneWidth())) / static_cast<float>(fClientTotalSize - fClientShownSize), static_cast<float>(m_uiDiameter) * 0.25f);
@@ -96,7 +96,7 @@ void HyScrollBar::PageControl::SetColor(HyColor color)
 		glm::vec2 vDist = ptMousePos - m_ptDragPos;
 
 		HyScrollBar *pScrollBar = static_cast<HyScrollBar *>(m_pParent);
-		if(pScrollBar->GetOrientation() == HYORIEN_Vertical)
+		if(pScrollBar->GetOrientation() == HYORIENT_Vertical)
 			pScrollBar->OffsetSlider(vDist.y, false);
 		else
 			pScrollBar->OffsetSlider(vDist.x, false);
@@ -116,7 +116,7 @@ void HyScrollBar::PageControl::SetColor(HyColor color)
 		HyEngine::Input().GetWorldMousePos(ptMousePos);
 
 	b2AABB sliderAABB = m_Slider.GetSceneAABB();
-	if(pScrollBar->GetOrientation() == HYORIEN_Vertical)
+	if(pScrollBar->GetOrientation() == HYORIENT_Vertical)
 	{
 		sliderAABB.lowerBound.x -= static_cast<float>(m_uiDiameter) * 0.5f;
 		sliderAABB.upperBound.x += static_cast<float>(m_uiDiameter) * 0.5f;
@@ -135,14 +135,14 @@ void HyScrollBar::PageControl::SetColor(HyColor color)
 	else
 	{
 		
-		if(pScrollBar->GetOrientation() == HYORIEN_Vertical)
+		if(pScrollBar->GetOrientation() == HYORIENT_Vertical)
 		{
 			if(ptMousePos.y >= sliderAABB.GetCenter().y)
 				pScrollBar->DoPageScroll(-1);
 			else
 				pScrollBar->DoPageScroll(1);
 		}
-		else // HYORIEN_Horizontal
+		else // HYORIENT_Horizontal
 		{
 			if(ptMousePos.x >= sliderAABB.GetCenter().x)
 				pScrollBar->DoPageScroll(1);
@@ -185,7 +185,7 @@ void HyScrollBar::Button::SetMetrics(HyOrientation eOrientation, bool bPositive,
 {
 	m_Panel.SetAsBox(static_cast<int32>(uiDiameter), static_cast<int32>(uiDiameter));
 
-	if(eOrientation == HYORIEN_Vertical)
+	if(eOrientation == HYORIENT_Vertical)
 	{
 		if(bPositive)
 		{
@@ -204,7 +204,7 @@ void HyScrollBar::Button::SetMetrics(HyOrientation eOrientation, bool bPositive,
 			m_Decal.SetAsPolygon(ptUpArrow, 3);
 		}
 	}
-	else // HYORIEN_Horizontal
+	else // HYORIENT_Horizontal
 	{
 		if(bPositive)
 		{
@@ -302,13 +302,13 @@ void HyScrollBar::SetMetrics(uint32 uiLength, uint32 uiClientTotalSize, uint32 u
 	m_PosBtn.SetMetrics(m_eORIENTATION, true, uiDiameter);
 	m_NegBtn.SetMetrics(m_eORIENTATION, false, uiDiameter);
 
-	if(m_eORIENTATION == HYORIEN_Vertical)
+	if(m_eORIENTATION == HYORIENT_Vertical)
 	{
 		m_PageControl.pos.Set(0, uiDiameter);
 		m_PosBtn.pos.Set(0, 0);
 		m_NegBtn.pos.Set(0, uiLength - uiDiameter);
 	}
-	else // HYORIEN_Horizontal
+	else // HYORIENT_Horizontal
 	{
 		m_PageControl.pos.Set(uiDiameter, 0);
 		m_PosBtn.pos.Set(uiLength - uiDiameter, 0);
@@ -347,14 +347,14 @@ void HyScrollBar::DoPageScroll(int32 iPagesOffset)
 
 void HyScrollBar::OffsetSlider(float fPixels, bool bOffsetClientContentPixels)
 {
-	if(m_eORIENTATION == HYORIEN_Vertical)
+	if(m_eORIENTATION == HYORIENT_Vertical)
 		fPixels *= -1.0f;
 
 	if(bOffsetClientContentPixels == false)
 	{
 		// Convert fPixels to scroll bar size
 		float fScrollBarLength = 0.0f;
-		if(m_eORIENTATION == HYORIEN_Vertical)
+		if(m_eORIENTATION == HYORIENT_Vertical)
 			fScrollBarLength = m_PageControl.GetSceneHeight();
 		else
 			fScrollBarLength = m_PageControl.GetSceneWidth();

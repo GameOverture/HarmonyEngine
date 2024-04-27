@@ -113,7 +113,7 @@ void HyComboBox::SetExpandPanel(const HyPanelInit &panelInit, HyOrientation eOri
 {
 	m_SubBtnPanel.Setup(panelInit);
 
-	if(eOrientation == HYORIEN_Horizontal)
+	if(eOrientation == HYORIENT_Horizontal)
 		m_uiAttribs |= COMBOBOXATTRIB_IsHorzExpand;
 	else
 		m_uiAttribs &= ~COMBOBOXATTRIB_IsHorzExpand;

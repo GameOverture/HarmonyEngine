@@ -31,8 +31,8 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelIn
 	m_fElapsedTime(0.0f),
 	m_bUseVertBar(false),
 	m_bUseHorzBar(false),
-	m_VertBar(HYORIEN_Vertical, 20, this),
-	m_HorzBar(HYORIEN_Horizontal, 20, this)
+	m_VertBar(HYORIENT_Vertical, 20, this),
+	m_HorzBar(HYORIENT_Horizontal, 20, this)
 {
 	m_RootBtnGrp.SetAsAutoExclusive();
 	m_Panel.Setup(initRef);
@@ -737,7 +737,7 @@ bool HyUiContainer::RequestWidgetFocus(IHyWidget *pWidget)
 {
 	HyUiContainer *pThis = static_cast<HyUiContainer *>(pData);
 
-	if(pSelf->GetOrientation() == HYORIEN_Vertical)
+	if(pSelf->GetOrientation() == HYORIENT_Vertical)
 		pThis->m_RootLayout.pos.SetY(fNewPosition - fTotalRange);
 	else
 		pThis->m_RootLayout.pos.SetX(fNewPosition);

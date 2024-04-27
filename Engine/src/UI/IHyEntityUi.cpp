@@ -29,12 +29,12 @@ IHyEntityUi::IHyEntityUi(HyEntity2d *pParent /*= nullptr*/) :
 
 HySizePolicy IHyEntityUi::GetHorizontalPolicy()
 {
-	return GetSizePolicy(HYORIEN_Horizontal);
+	return GetSizePolicy(HYORIENT_Horizontal);
 }
 
 HySizePolicy IHyEntityUi::GetVerticalPolicy()
 {
-	return GetSizePolicy(HYORIEN_Vertical);
+	return GetSizePolicy(HYORIENT_Vertical);
 }
 
 /*virtual*/ HySizePolicy IHyEntityUi::GetSizePolicy(HyOrientation eOrien)
@@ -44,20 +44,20 @@ HySizePolicy IHyEntityUi::GetVerticalPolicy()
 
 void IHyEntityUi::SetSizePolicy(HySizePolicy eHorizPolicy, HySizePolicy eVertPolicy)
 {
-	m_SizePolicies[HYORIEN_Horizontal] = eHorizPolicy;
-	m_SizePolicies[HYORIEN_Vertical] = eVertPolicy;
+	m_SizePolicies[HYORIENT_Horizontal] = eHorizPolicy;
+	m_SizePolicies[HYORIENT_Vertical] = eVertPolicy;
 	SetSizeAndLayoutDirty();
 }
 
 void IHyEntityUi::SetHorizontalPolicy(HySizePolicy ePolicy)
 {
-	m_SizePolicies[HYORIEN_Horizontal] = ePolicy;
+	m_SizePolicies[HYORIENT_Horizontal] = ePolicy;
 	SetSizeAndLayoutDirty();
 }
 
 void IHyEntityUi::SetVerticalPolicy(HySizePolicy ePolicy)
 {
-	m_SizePolicies[HYORIEN_Vertical] = ePolicy;
+	m_SizePolicies[HYORIENT_Vertical] = ePolicy;
 	SetSizeAndLayoutDirty();
 }
 
@@ -77,12 +77,12 @@ glm::ivec2 IHyEntityUi::GetMinSize()
 	glm::ivec2 vSizeHint = GetSizeHint();
 
 	glm::ivec2 vMinSize = m_vMinSize;
-	if((m_SizePolicies[HYORIEN_Horizontal] & HY_SIZEFLAG_SHRINK) == 0)
+	if((m_SizePolicies[HYORIENT_Horizontal] & HY_SIZEFLAG_SHRINK) == 0)
 		vMinSize.x = vSizeHint.x;
 	else
 		vMinSize.x = HyMath::Min(vMinSize.x, vSizeHint.x);
 
-	if((m_SizePolicies[HYORIEN_Vertical] & HY_SIZEFLAG_SHRINK) == 0)
+	if((m_SizePolicies[HYORIENT_Vertical] & HY_SIZEFLAG_SHRINK) == 0)
 		vMinSize.y = vSizeHint.y;
 	else
 		vMinSize.y = HyMath::Min(vMinSize.y, vSizeHint.y);
@@ -101,12 +101,12 @@ glm::ivec2 IHyEntityUi::GetMaxSize()
 	glm::ivec2 vSizeHint = GetSizeHint();
 
 	glm::ivec2 vMaxSize = m_vMaxSize;
-	if((m_SizePolicies[HYORIEN_Horizontal] & HY_SIZEFLAG_EXPAND) == 0)
+	if((m_SizePolicies[HYORIENT_Horizontal] & HY_SIZEFLAG_EXPAND) == 0)
 		vMaxSize.x = vSizeHint.x;
 	else
 		vMaxSize.x = HyMath::Max(vMaxSize.x, vSizeHint.x);
 
-	if((m_SizePolicies[HYORIEN_Vertical] & HY_SIZEFLAG_EXPAND) == 0)
+	if((m_SizePolicies[HYORIENT_Vertical] & HY_SIZEFLAG_EXPAND) == 0)
 		vMaxSize.y = vSizeHint.y;
 	else
 		vMaxSize.y = HyMath::Max(vMaxSize.y, vSizeHint.y);

@@ -25,12 +25,12 @@ HySpacer::HySpacer(HyOrientation eOrienType) :
 
 /*virtual*/ float HySpacer::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
-	return (m_eORIEN_TYPE == HYORIEN_Horizontal) ? m_iActualSize * fPercent : 0;
+	return (m_eORIEN_TYPE == HYORIENT_Horizontal) ? m_iActualSize * fPercent : 0;
 }
 
 /*virtual*/ float HySpacer::GetHeight(float fPercent /*= 1.0f*/) /*override*/
 {
-	return (m_eORIEN_TYPE == HYORIEN_Vertical) ? m_iActualSize * fPercent : 0;
+	return (m_eORIEN_TYPE == HYORIENT_Vertical) ? m_iActualSize * fPercent : 0;
 }
 
 int32 HySpacer::GetActualSize() const
@@ -43,7 +43,7 @@ void HySpacer::Setup(HySizePolicy eSizePolicy, uint32 uiSizeHint)
 	HyAssert(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0, "HySpacer::Setup() invoked and not attached to a layout");
 
 	m_iSizeHint = uiSizeHint;
-	if(m_eORIEN_TYPE == HYORIEN_Horizontal)
+	if(m_eORIEN_TYPE == HYORIENT_Horizontal)
 		SetSizePolicy(eSizePolicy, HYSIZEPOLICY_Fixed);
 	else
 		SetSizePolicy(HYSIZEPOLICY_Fixed, eSizePolicy);
@@ -56,7 +56,7 @@ void HySpacer::Setup(HySizePolicy eSizePolicy, uint32 uiSizeHint)
 
 /*virtual*/ void HySpacer::OnSetSizeHint() /*override*/
 {
-	if(m_eORIEN_TYPE == HYORIEN_Horizontal)
+	if(m_eORIEN_TYPE == HYORIENT_Horizontal)
 		HySetVec(m_vSizeHint, m_iSizeHint, 0);
 	else
 		HySetVec(m_vSizeHint, 0, m_iSizeHint);
@@ -65,6 +65,6 @@ void HySpacer::Setup(HySizePolicy eSizePolicy, uint32 uiSizeHint)
 /*virtual*/ glm::ivec2 HySpacer::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
 {
 	// NOTE: Values incoming to this OnResize() are already clamped to Min/Max sizes and respect size policies
-	m_iActualSize = (m_eORIEN_TYPE == HYORIEN_Horizontal) ? uiNewWidth : uiNewHeight;
+	m_iActualSize = (m_eORIEN_TYPE == HYORIENT_Horizontal) ? uiNewWidth : uiNewHeight;
 	return glm::ivec2(uiNewWidth, uiNewHeight);
 }

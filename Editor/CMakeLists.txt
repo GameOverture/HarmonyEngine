@@ -221,6 +221,8 @@ if(Qt5_DIR)
 		src/Harmony/HarmonyConnection.cpp
 		src/Harmony/Harmony.h
 		src/Harmony/HarmonyConnection.h
+		src/Harmony/HarmonyRulerGfxView.cpp
+		src/Harmony/HarmonyRulerGfxView.h
 		src/Harmony/HarmonyWidget.cpp
 		src/Harmony/HarmonyWidget.h
 		src/Harmony/HarmonyWidget.ui

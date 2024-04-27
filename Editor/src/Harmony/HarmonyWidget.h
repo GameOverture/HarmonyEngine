@@ -25,8 +25,8 @@ class HarmonyWidget : public QWidget
 {
 	Q_OBJECT
 
-	QGraphicsScene		m_HorzScene;
-	QGraphicsScene		m_VertScene;
+	//QGraphicsScene		m_HorzScene;
+	//QGraphicsScene		m_VertScene;
 	
 public:
 	explicit HarmonyWidget(Project *pProject, QWidget *pParent = 0);
