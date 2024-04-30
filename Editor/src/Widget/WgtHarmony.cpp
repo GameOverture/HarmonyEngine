@@ -140,6 +140,8 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 		HyEngine::Window().SetFramebufferSize(newSize);
 	
 		m_pProject->SetRenderSize(newSize.x, newSize.y);
+
+		static_cast<HarmonyWidget *>(parent())->RefreshRulers();
 	}
 }
 
@@ -412,6 +414,8 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	
 	if(pCurItem->GetDraw())
 		pCurItem->GetDraw()->OnMouseMoveEvent(pEvent);
+	
+	static_cast<HarmonyWidget *>(parent())->RefreshMousePos();
 }
 
 /*virtual*/ void WgtHarmony::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/

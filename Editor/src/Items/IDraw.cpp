@@ -46,13 +46,10 @@ IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 		m_fCamZoom = m_pCamera->GetZoom();
 		m_sZoomStatus = g_sZoomLevels[eZoomLevel];
 	}
-	//m_pCamera->SetVisible(false);
 }
 
 /*virtual*/ IDraw::~IDraw()
 {
-	//if(HyEngine::IsInitialized())
-	//	HyEngine::Window().RemoveCamera(m_pCamera);
 }
 
 void IDraw::GetCameraInfo(glm::vec2 &ptPosOut, float &fZoomOut)
@@ -68,6 +65,9 @@ void IDraw::SetCamera(glm::vec2 ptCamPos, float fZoom)
 
 	m_pCamera->pos.Set(m_ptCamPos);
 	m_pCamera->SetZoom(m_fCamZoom);
+
+	if(m_pProjItem)
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RefreshRulers();
 }
 
 void IDraw::ApplyJsonData()
@@ -96,8 +96,9 @@ void IDraw::Show()
 	m_pCamera->pos.Set(m_ptCamPos);
 	m_pCamera->SetZoom(m_fCamZoom);
 
-	//m_pCamera->SetVisible(true);
 	OnResizeRenderer();
+	if(m_pProjItem)
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RefreshRulers();
 
 	OnShow();
 	UpdateDrawStatus(m_sSizeStatus);
@@ -105,7 +106,6 @@ void IDraw::Show()
 
 void IDraw::Hide()
 {
-	//m_pCamera->SetVisible(false);
 	OnHide();
 }
 
@@ -205,6 +205,8 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 		m_fCamZoom = m_pCamera->GetZoom();
 		OnZoom(static_cast<HyZoomLevel>(iZoomLevel));
+
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RefreshRulers();
 	}
 
 	pEvent->accept();
@@ -225,6 +227,8 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		{
 			QPointF vDeltaMousePos = m_ptOldMousePos - ptCurMousePos;
 			m_pCamera->pos.Offset(static_cast<float>(vDeltaMousePos.x()), vDeltaMousePos.y() * -1.0f);
+
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RefreshRulers();
 		}
 
 		m_ptOldMousePos = ptCurMousePos;

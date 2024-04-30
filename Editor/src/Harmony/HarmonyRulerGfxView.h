@@ -12,25 +12,44 @@
 
 #include <QGraphicsView>
 
+#define RULER_WIDTH				20.0f
+#define RULER_TEXT_HEIGHT		8.0f
+#define RULER_MAIN_NOTCH		8.0f
+#define RULER_SUB_NOTCH			5.0f
+
 class HarmonyRulerGfxView : public QGraphicsView
 {
 	HyOrientation		m_eOrientation;
+
+	int					m_iDrawStart;
+	int					m_iDrawEnd;
+	int					m_iDrawWidth;
+
+	int					m_iWorldStart;
+	int					m_iWorldEnd;
+	int					m_iWorldWidth;
 
 public:
 	HarmonyRulerGfxView(QWidget *pParent = nullptr);
 	virtual ~HarmonyRulerGfxView();
 
-	void Init(HyOrientation eOrientation);
+	void Init(HyOrientation eOrientation, HyColor bgColor);
+
+	void UpdateMouseLine(QGraphicsLineItem *pGfxLineItem);
 
 protected:
-	virtual void drawBackground(QPainter *painter, const QRectF &rect) override;
-	virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
+	virtual void drawBackground(QPainter *pPainter, const QRectF &rect) override;
+	//virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
 
 	virtual bool event(QEvent *pEvent) override;
 
 	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
 	virtual void mousePressEvent(QMouseEvent *pEvent) override;
 	virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;
+
+private:
+	float ConvertWorldToDraw(float fWorldPos);
+	float ConvertDrawToWorld(float fDrawPos);
 };
 
 #endif // HARMONYRULERGFXVIEW_H

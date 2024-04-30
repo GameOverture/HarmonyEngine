@@ -97,6 +97,8 @@ public:
 
 	static void GetGridStatus(bool &bShowBackgroundOut, bool &bShowOriginOut, bool &bShowOverlayOut);
 
+	virtual QMenu *createPopupMenu() override;
+
 protected:
 	virtual void closeEvent(QCloseEvent *pEvent) override;
 

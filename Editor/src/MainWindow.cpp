@@ -237,6 +237,8 @@ MainWindow::MainWindow(QWidget *pParent) :
 
 	setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
 	setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+
+	on_menu_View_aboutToShow();
 }
 
 MainWindow::~MainWindow()
@@ -529,6 +531,22 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	bShowBackgroundOut = sm_pInstance->ui->actionShowGridBackground->isChecked();
 	bShowOriginOut = sm_pInstance->ui->actionShowGridOrigin->isChecked();
 	bShowOverlayOut = sm_pInstance->ui->actionShowGridOverlay->isChecked();
+}
+
+/*virtual*/ QMenu *MainWindow::createPopupMenu() /*override*/
+{
+	QMenu *pMenu = QMainWindow::createPopupMenu();
+
+	for(QAction *pAction : pMenu->actions())
+	{
+		if(pAction->text() == "Aux")
+		{
+			pAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Space));
+			break;
+		}
+	}
+
+	return pMenu;
 }
 
 /*virtual*/ void MainWindow::closeEvent(QCloseEvent *pEvent) /*override*/ 
@@ -863,8 +881,6 @@ void MainWindow::on_actionSaveAll_triggered()
 
 void MainWindow::on_menu_View_aboutToShow()
 {
-	QMenu *pPopupMenu = this->createPopupMenu();
-
 	ui->menu_View->clear();
 
 	QMenu *pThemesMenu = new QMenu("Themes");
@@ -877,8 +893,11 @@ void MainWindow::on_menu_View_aboutToShow()
 	ui->menu_View->addAction(ui->actionShowGridBackground);
 	ui->menu_View->addAction(ui->actionShowGridOrigin);
 	ui->menu_View->addAction(ui->actionShowGridOverlay);
+	
 	ui->menu_View->addSeparator();
+	QMenu *pPopupMenu = this->createPopupMenu();
 	ui->menu_View->addActions(pPopupMenu->actions());
+	delete pPopupMenu;
 }
 
 void MainWindow::on_actionShowGridBackground_triggered()
