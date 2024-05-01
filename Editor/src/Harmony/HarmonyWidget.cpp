@@ -18,18 +18,15 @@ HarmonyWidget::HarmonyWidget(Project *pProject, QWidget *pParent /*= nullptr*/) 
 	QWidget(pParent),
 	ui(new Ui::HarmonyWidget),
 	m_HorzScene(this),
-	m_pHorzLine(nullptr),
-	m_VertScene(this),
-	m_pVertLine(nullptr)
+	m_VertScene(this)
 {
 	ui->setupUi(this);
 	ui->wgtHarmony->InitProject(pProject);
 
-	//m_pHorzLine = m_HorzScene.addLine(QLineF(0, 0, 0, RULER_WIDTH), QPen(HyGlobal::ConvertHyColor(HyColor::Orange)));
 	ui->rulerHorz->setScene(&m_HorzScene);
+	ui->rulerHorz->translate(0, 0);
 	ui->rulerHorz->Init(HYORIENT_Horizontal, HyColor::ContainerPanel);
 
-	//m_pVertLine = m_VertScene.addLine(QLineF(0, 0, RULER_WIDTH, 0), QPen(HyGlobal::ConvertHyColor(HyColor::Orange)));
 	ui->rulerVert->setScene(&m_VertScene);
 	ui->rulerVert->Init(HYORIENT_Vertical, HyColor::ContainerPanel);
 
@@ -87,8 +84,17 @@ void HarmonyWidget::RefreshRulers()
 	ui->rulerVert->update();
 }
 
-void HarmonyWidget::RefreshMousePos()
+void HarmonyWidget::ShowRulerMouse(bool bShow)
 {
-	//ui->rulerHorz->UpdateMouseLine(m_pHorzLine);
-	//ui->rulerVert->UpdateMouseLine(m_pVertLine);
+	ui->rulerHorz->ShowMouse(bShow);
+	ui->rulerVert->ShowMouse(bShow);
+	RefreshRulers();
+}
+
+/*virtual*/ void HarmonyWidget::resizeEvent(QResizeEvent *pEvent) /*override*/
+{
+	QWidget::resizeEvent(pEvent);
+
+	m_HorzScene.setSceneRect(0, 0, ui->rulerHorz->width(), RULER_WIDTH);
+	m_VertScene.setSceneRect(0, 0, RULER_WIDTH, ui->rulerVert->height());
 }

@@ -29,19 +29,18 @@ class HarmonyRulerGfxView : public QGraphicsView
 	int					m_iWorldEnd;
 	int					m_iWorldWidth;
 
+	bool				m_bShowMouse;
+
 public:
 	HarmonyRulerGfxView(QWidget *pParent = nullptr);
 	virtual ~HarmonyRulerGfxView();
 
 	void Init(HyOrientation eOrientation, HyColor bgColor);
 
-	void UpdateMouseLine(QGraphicsLineItem *pGfxLineItem);
+	void ShowMouse(bool bShowMouse);
 
 protected:
-	virtual void drawBackground(QPainter *pPainter, const QRectF &rect) override;
-	//virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
-
-	virtual bool event(QEvent *pEvent) override;
+	virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
 
 	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
 	virtual void mousePressEvent(QMouseEvent *pEvent) override;

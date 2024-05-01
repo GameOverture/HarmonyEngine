@@ -145,6 +145,16 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	}
 }
 
+/*virtual*/ bool WgtHarmony::event(QEvent *pEvent) /*override*/
+{
+	if(pEvent->type() == QEvent::HoverEnter)
+		static_cast<HarmonyWidget *>(parent())->ShowRulerMouse(true);
+	else if(pEvent->type() == QEvent::HoverLeave)
+		static_cast<HarmonyWidget *>(parent())->ShowRulerMouse(false);
+	
+	return QWidget::event(pEvent);
+}
+
 /*virtual*/ void WgtHarmony::enterEvent(QEvent *pEvent) /*override*/
 {
 	this->setFocus();
@@ -415,7 +425,8 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	if(pCurItem->GetDraw())
 		pCurItem->GetDraw()->OnMouseMoveEvent(pEvent);
 	
-	static_cast<HarmonyWidget *>(parent())->RefreshMousePos();
+	static_cast<HarmonyWidget *>(parent())->RefreshRulers();
+	//static_cast<HarmonyWidget *>(parent())->RefreshMousePos();
 }
 
 /*virtual*/ void WgtHarmony::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/

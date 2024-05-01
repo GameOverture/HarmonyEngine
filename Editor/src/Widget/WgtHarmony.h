@@ -67,6 +67,7 @@ protected:
 	virtual void initializeGL() override;
 	virtual void paintGL() override;
 	virtual void resizeGL(int w, int h) override;
+	virtual bool event(QEvent *pEvent) override;
 
 	// QWidget overrides
 	virtual void enterEvent(QEvent *pEvent) override;

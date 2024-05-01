@@ -23,7 +23,8 @@ HarmonyRulerGfxView::HarmonyRulerGfxView(QWidget *pParent /*= nullptr*/) :
 	m_iDrawWidth(0),
 	m_iWorldStart(0),
 	m_iWorldEnd(0),
-	m_iWorldWidth(0)
+	m_iWorldWidth(0),
+	m_bShowMouse(false)
 {
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -39,20 +40,14 @@ void HarmonyRulerGfxView::Init(HyOrientation eOrientation, HyColor bgColor)
 	setBackgroundBrush(HyGlobal::ConvertHyColor(bgColor));
 }
 
-void HarmonyRulerGfxView::UpdateMouseLine(QGraphicsLineItem *pGfxLineItem)
+void HarmonyRulerGfxView::ShowMouse(bool bShowMouse)
 {
-	glm::vec2 ptWorldMousePos;
-	bool bWorldMousePosValid = HyEngine::Input().GetWorldMousePos(ptWorldMousePos);
-
-	if(m_eOrientation == HYORIENT_Horizontal)
-		pGfxLineItem->setPos(ConvertWorldToDraw(ptWorldMousePos.x), 0);
-	else
-		pGfxLineItem->setPos(0, ConvertWorldToDraw(ptWorldMousePos.y));
+	m_bShowMouse = bShowMouse;
 }
 
-/*virtual*/ void HarmonyRulerGfxView::drawBackground(QPainter *pPainter, const QRectF &rect) /*override*/
+/*virtual*/ void HarmonyRulerGfxView::drawForeground(QPainter *pPainter, const QRectF &rect) /*override*/
 {
-	QGraphicsView::drawBackground(pPainter, rect);
+	QGraphicsView::drawForeground(pPainter, rect);
 	
 	HarmonyWidget *pHarmonyWidget = static_cast<HarmonyWidget *>(parent());
 	if(pHarmonyWidget == nullptr || pHarmonyWidget->GetProject() == nullptr)
@@ -133,9 +128,9 @@ void HarmonyRulerGfxView::UpdateMouseLine(QGraphicsLineItem *pGfxLineItem)
 					// Main Notch Keyframe Text
 					pPainter->rotate(-90.0f);
 					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::Black));
-					pPainter->drawText(QPointF(-1 * (iCurDrawPos + 1.0f) - (fTextWidth * 0.5f), RULER_WIDTH + 1.0f - (RULER_WIDTH)), sNotch);
+					pPainter->drawText(QPointF(-1 * (iCurDrawPos + 1.0f) - (fTextWidth * 0.5f), RULER_WIDTH + 1.0f - (RULER_WIDTH - RULER_TEXT_HEIGHT)), sNotch);
 					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
-					pPainter->drawText(QPointF(-1 * iCurDrawPos - (fTextWidth * 0.5f), RULER_WIDTH - (RULER_WIDTH)), sNotch);
+					pPainter->drawText(QPointF(-1 * iCurDrawPos - (fTextWidth * 0.5f), RULER_WIDTH - (RULER_WIDTH - RULER_TEXT_HEIGHT)), sNotch);
 					pPainter->rotate(90.0f);
 
 					// Draw notch line
@@ -158,32 +153,30 @@ void HarmonyRulerGfxView::UpdateMouseLine(QGraphicsLineItem *pGfxLineItem)
 			iCurWorldPos -= 25;
 		iCurDrawPos = ConvertWorldToDraw(iCurWorldPos);
 	}
-}
 
-///*virtual*/ void HarmonyRulerGfxView::drawForeground(QPainter *pPainter, const QRectF &rect) /*override*/
-//{
-//	HarmonyWidget *pHarmonyWidget = static_cast<HarmonyWidget *>(parent());
-//	if(pHarmonyWidget == nullptr || pHarmonyWidget->GetProject() == nullptr)
-//		return;
-//
-//
-//}
+	
+	glm::vec2 ptWorldMousePos;
+	bool bWorldMousePosValid = HyEngine::Input().GetWorldMousePos(ptWorldMousePos);
+	if(bWorldMousePosValid && m_bShowMouse)
+	{
+		pPainter->setPen(QPen(HyGlobal::ConvertHyColor(HyColor::Cyan)));
 
-/*virtual*/ bool HarmonyRulerGfxView::event(QEvent *pEvent) /*override*/
-{
-	//if(pEvent->type() == QEvent::HoverEnter || pEvent->type() == QEvent::HoverLeave)
-	//{
-	//	m_MouseScenePos.setX(0.0f);
-	//	m_MouseScenePos.setY(0.0f);
-	//	update();
-	//}
-
-	return QGraphicsView::event(pEvent);
+		if(m_eOrientation == HYORIENT_Horizontal)
+			pPainter->drawLine(ConvertWorldToDraw(static_cast<int>(ptWorldMousePos.x)), rect.top(), ConvertWorldToDraw(static_cast<int>(ptWorldMousePos.x)), rect.bottom());
+		else // HYORIENT_Vertical
+			pPainter->drawLine(rect.left(), ConvertWorldToDraw(static_cast<int>(ptWorldMousePos.y)), rect.right(), ConvertWorldToDraw(static_cast<int>(ptWorldMousePos.y)));
+	}
 }
 
 /*virtual*/ void HarmonyRulerGfxView::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {	
 	QGraphicsView::mouseMoveEvent(pEvent);
+
+	HarmonyWidget *pHarmonyWidget = static_cast<HarmonyWidget *>(parent());
+	if(pHarmonyWidget == nullptr || pHarmonyWidget->GetProject() == nullptr)
+		return;
+
+	update();
 }
 
 /*virtual*/ void HarmonyRulerGfxView::mousePressEvent(QMouseEvent *pEvent) /*override*/

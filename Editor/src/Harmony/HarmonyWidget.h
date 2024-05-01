@@ -26,9 +26,7 @@ class HarmonyWidget : public QWidget
 	Q_OBJECT
 
 	QGraphicsScene		m_HorzScene;
-	QGraphicsLineItem *	m_pHorzLine;
 	QGraphicsScene		m_VertScene;
-	QGraphicsLineItem *	m_pVertLine;
 	
 public:
 	explicit HarmonyWidget(Project *pProject, QWidget *pParent = 0);
@@ -47,7 +45,10 @@ public:
 	HyRendererInterop *GetHarmonyRenderer();
 
 	void RefreshRulers();
-	void RefreshMousePos();
+	void ShowRulerMouse(bool bShow);
+
+protected:
+	void resizeEvent(QResizeEvent *pEvent) override;
 	
 private Q_SLOTS:
 
