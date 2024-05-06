@@ -27,7 +27,7 @@ public:
 	HyRadioButton(HyEntity2d *pParent = nullptr);
 	HyRadioButton(const HyPanelInit &panelInit, HyEntity2d *pParent = nullptr);
 	HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
-	HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent = nullptr);
+	HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
 	virtual ~HyRadioButton();
 
 	void SetCheckedChangedCallback(std::function<void(HyRadioButton *, void *)> fpCallback, void *pParam = nullptr);

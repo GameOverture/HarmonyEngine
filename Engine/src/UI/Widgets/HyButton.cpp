@@ -41,8 +41,8 @@ HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath,
 	OnSetup();
 }
 
-HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
+HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(panelInit, textNodePath, textMargins, pParent),
 	m_pButtonGroup(nullptr),
 	m_fpBtnClickedCallback(nullptr),
 	m_pBtnClickedParam(nullptr)

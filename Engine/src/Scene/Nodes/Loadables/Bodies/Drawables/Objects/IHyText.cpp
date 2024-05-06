@@ -854,7 +854,7 @@ offsetCalculation:
 	if(m_uiIndent != 0)
 	{
 		for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
-			pWritePos[uiLayerIndex].x += m_uiIndent * m_fScaleBoxModifier;
+			pWritePos[uiLayerIndex].x += m_uiIndent;// *m_fScaleBoxModifier;
 	}
 
 	// vNewlineInfo is used to set text alignment of center, right, or justified. (left alignment is already accomplished by default)

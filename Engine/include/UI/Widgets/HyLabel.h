@@ -41,7 +41,7 @@ public:
 	HyLabel(HyEntity2d *pParent = nullptr);
 	HyLabel(const HyPanelInit &panelInit, HyEntity2d *pParent = nullptr);
 	HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
-	HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
+	HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
 	virtual ~HyLabel();
 
 	virtual float GetWidth(float fPercent = 1.0f) override;
@@ -51,8 +51,9 @@ public:
 
 	void Setup(const HyPanelInit &panelInit);
 	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath);
-	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
+	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins);
 
+	bool IsSideBySide() const;
 	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_Center, HyTextType eTextType = HYTEXT_ScaleBox);				// Default setup. Shows text positioned on top and inside the panel based on 'eTextAlignment' and 'eTextType'
 	void SetAsSideBySide(bool bPanelBeforeText = true, int32 iPadding = 5, HyOrientation eOrientation = HYORIENT_Horizontal);	// Show the panel and text side by side specified accordingly to the arguments passed
 

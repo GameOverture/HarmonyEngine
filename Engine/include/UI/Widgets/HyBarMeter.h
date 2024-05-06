@@ -49,14 +49,14 @@ public:
 	HyBarMeter(HyEntity2d *pParent = nullptr);
 	HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, HyEntity2d *pParent = nullptr);
 	HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
-	HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent = nullptr);
+	HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
 	virtual ~HyBarMeter();
 
 	virtual void SetText(const std::string &sUtf8Text) override;
 
 	void Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit);
 	void Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath);
-	void Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop);
+	void Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins);
 
 	glm::vec2 GetBarOffset() const;
 	void SetBarOffset(const glm::ivec2 &barOffset);

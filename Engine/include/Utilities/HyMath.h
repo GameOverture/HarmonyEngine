@@ -158,6 +158,15 @@ struct HyMargins
 	HyMargins(T tLeft, T tBottom, T tRight, T tTop) : left(tLeft), bottom(tBottom), right(tRight), top(tTop)
 	{ }
 
+	HyMargins<T> &operator=(const HyMargins<T> &rhs)
+	{
+		left = rhs.left;
+		bottom = rhs.bottom;
+		right = rhs.right;
+		top = rhs.top;
+		return *this;
+	}
+
 	std::string ToString() const
 	{
 		std::ostringstream s;

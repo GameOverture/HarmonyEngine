@@ -14,24 +14,32 @@
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent)
 {
+	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
+	m_Text.SetTextAlignment(HYALIGN_Center);
 }
 
 HyLabel::HyLabel(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent)
 {
-	Setup(panelInit, HyNodePath(), 0, 0, 0, 0);
+	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
+	m_Text.SetTextAlignment(HYALIGN_Center);
+	Setup(panelInit, HyNodePath(), HyMargins<float>());
 }
 
 HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent)
 {
-	Setup(panelInit, textNodePath, 0, 0, 0, 0);
+	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
+	m_Text.SetTextAlignment(HYALIGN_Center);
+	Setup(panelInit, textNodePath, HyMargins<float>());
 }
 
-HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent)
 {
-	Setup(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop);
+	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
+	m_Text.SetTextAlignment(HYALIGN_Center);
+	Setup(panelInit, textNodePath, textMargins);
 }
 
 /*virtual*/ HyLabel::~HyLabel()
@@ -81,30 +89,38 @@ HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, i
 
 void HyLabel::Setup(const HyPanelInit &panelInit)
 {
-	Setup(panelInit, m_Text.GetPath(), 0, 0, 0, 0);
+	Setup(panelInit, m_Text.GetPath(), m_TextMargins);
 }
 
 void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath)
 {
-	Setup(panelInit, textNodePath, 0, 0, 0, 0);
+	Setup(panelInit, textNodePath, m_TextMargins);
 }
 
-void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop)
+void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins)
 {
 	m_Panel.Setup(panelInit);
-
 	m_Text.Init(textNodePath, this);
-	m_TextMargins.Set(static_cast<float>(iTextMarginLeft),
-					  static_cast<float>(iTextMarginBottom),
-					  static_cast<float>(iTextMarginRight),
-					  static_cast<float>(iTextMarginTop));
+	m_TextMargins = textMargins;
 
-	// Ctor/Setup defaults to be set as a 'Stacked', centered scaleBox
-	SetAsStacked(HYALIGN_Center, HYTEXT_ScaleBox);
+	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
+	{
+		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
+			SetAsSideBySide((m_uiAttribs & LABELATTRIB_SideBySideTextFirst) == 0, m_iSideBySidePadding, HYORIENT_Vertical);
+		else
+			SetAsSideBySide((m_uiAttribs & LABELATTRIB_SideBySideTextFirst) == 0, m_iSideBySidePadding, HYORIENT_Horizontal);
+	}
+	else
+		SetAsStacked(m_Text.GetTextAlignment(), static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset));
 
 	SetAsEnabled(IsEnabled());
 	ResetTextAndPanel();
 	OnSetup();
+}
+
+bool HyLabel::IsSideBySide() const
+{
+	return (m_uiAttribs & LABELATTRIB_IsSideBySide) != 0;
 }
 
 /*virtual*/ void HyLabel::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_Center*/, HyTextType eTextType /*= HYTEXT_ScaleBox*/)

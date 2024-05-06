@@ -34,8 +34,8 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 	OnSetup();
 }
 
-HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(initRef, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
+HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(initRef, textNodePath, textMargins, pParent),
 	m_uiCursorIndex(0),
 	m_uiSelectionIndex(0),
 	m_Selection(this),

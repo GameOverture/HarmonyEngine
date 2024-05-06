@@ -34,8 +34,8 @@ HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &tex
 	OnSetup();
 }
 
-HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextDimensionsX, int32 iTextDimensionsY, int32 iTextOffsetX, int32 iTextOffsetY, HyEntity2d *pParent /*= nullptr*/) :
-	HyButton(panelInit, textNodePath, iTextDimensionsX, iTextDimensionsY, iTextOffsetX, iTextOffsetY, pParent),
+HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
+	HyButton(panelInit, textNodePath, textMargins, pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {

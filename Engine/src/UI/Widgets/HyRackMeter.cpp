@@ -31,8 +31,8 @@ HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNod
 	OnSetup();
 }
 
-HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
+HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(panelInit, textNodePath, textMargins, pParent),
 	m_SpinText(this)
 {
 	OnSetup();

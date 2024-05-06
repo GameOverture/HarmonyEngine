@@ -34,8 +34,8 @@ HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	OnSetup();
 }
 
-HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyEntity2d *pParent /*= nullptr*/) :
-	HyButton(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, pParent),
+HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
+	HyButton(panelInit, textNodePath, textMargins, pParent),
 	m_Shape(this),
 	m_SubBtnPanel(this),
 	m_fSubBtnSpacing(5.0f),
@@ -53,12 +53,12 @@ HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 
 uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, const HyNodePath &audioNodePath /*= HyNodePath()*/)
 {
-	return InsertSubButton(panelInit, textNodePath, 0, 0, 0, 0, fpCallBack, pParam, audioNodePath);
+	return InsertSubButton(panelInit, textNodePath, HyMargins<float>(), fpCallBack, pParam, audioNodePath);
 }
 
-uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, int32 iTextMarginLeft, int32 iTextMarginBottom, int32 iTextMarginRight, int32 iTextMarginTop, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, const HyNodePath &audioNodePath /*= HyNodePath()*/)
+uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, const HyNodePath &audioNodePath /*= HyNodePath()*/)
 {
-	HyButton *pNewBtn = HY_NEW HyButton(panelInit, textNodePath, iTextMarginLeft, iTextMarginBottom, iTextMarginRight, iTextMarginTop, this);
+	HyButton *pNewBtn = HY_NEW HyButton(panelInit, textNodePath, textMargins, this);
 	pNewBtn->SetButtonClickedCallback(fpCallBack, pParam, audioNodePath);
 	pNewBtn->SetAsEnabled(false);
 	pNewBtn->pos.Set(pNewBtn->GetPosOffset());
