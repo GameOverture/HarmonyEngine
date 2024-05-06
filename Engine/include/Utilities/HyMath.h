@@ -328,7 +328,7 @@ public:
 		m_uiG(iGreen & 0xFF),
 		m_uiB(iBlue & 0xFF)
 	{ }
-	HyColor(uint32 uiColor) : // 24-bit color, does not initialize alpha channel
+	HyColor(uint32 uiColor) : // 24-bit color, does not initialize alpha channel (which is set to 0xFF)
 		m_uiA(0xFF),
 		m_uiR((uiColor >> 16) & 0xFF),
 		m_uiG((uiColor >> 8) & 0xFF),
@@ -351,9 +351,14 @@ public:
 		return !(*this == rhs);
 	}
 
-	// Returned as uint32 mask: ARGB
-	uint32 GetAsUint32() const {
-		return (m_uiA << 24) | (m_uiR << 16) | (m_uiG << 8) | m_uiB;
+	uint32 GetAsRGBA() const {
+		return (m_uiR << 24) | (m_uiG << 16) | (m_uiB << 8) | m_uiA; // Returned as uint32 mask: RGBA
+	}
+	uint32 GetAsARGB() const {
+		return (m_uiA << 24) | (m_uiR << 16) | (m_uiG << 8) | m_uiB; // Returned as uint32 mask: ARGB
+	}
+	uint32 GetAsABGR() const {
+		return (m_uiA << 24) | (m_uiB << 16) | (m_uiG << 8) | m_uiR; // Returned as uint32 mask: ABGR
 	}
 
 	uint8 GetRed() const {

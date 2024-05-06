@@ -22,9 +22,9 @@ HyPanelInit::HyPanelInit() :
 	m_uiHeight(0),
 	m_NodePath(),
 	m_uiFrameSize(0),
-	m_PanelColor(HyColor(0, 0, 0, 0)),
-	m_FrameColor(HyColor(0, 0, 0, 0)),
-	m_TertiaryColor(HyColor(0, 0, 0, 0))
+	m_PanelColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
+	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
+	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF))
 {
 }
 
@@ -35,9 +35,9 @@ HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight) :
 	m_uiHeight(uiHeight),
 	m_NodePath(),
 	m_uiFrameSize(0),
-	m_PanelColor(HyColor(0, 0, 0, 0)),
-	m_FrameColor(HyColor(0, 0, 0, 0)),
-	m_TertiaryColor(HyColor(0, 0, 0, 0))
+	m_PanelColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
+	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
+	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF))
 {
 }
 
@@ -48,9 +48,9 @@ HyPanelInit::HyPanelInit(HyType eNodeType, const HyNodePath &nodePath) :
 	m_uiHeight(0),// TBD by loading the sprite
 	m_NodePath(nodePath),
 	m_uiFrameSize(0),
-	m_PanelColor(HyColor(0, 0, 0, 0)),
-	m_FrameColor(HyColor(0, 0, 0, 0)),
-	m_TertiaryColor(HyColor(0, 0, 0, 0))
+	m_PanelColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
+	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
+	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF))
 {
 	HyAssert(m_eNodeType != HYTYPE_Entity, "HyPanelInit::HyPanelInit(eNodeType, nodePath) 'NodeItem' panels cannot be of type 'Entity'");
 }
@@ -119,18 +119,21 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 		delete m_pNodeItem;
 		m_pNodeItem = nullptr;
 
-		// If a PrimPart's color's alpha is 0, then reassign it to a default color
-		if(m_pPrimParts->m_PanelColor.GetAlpha() == 0)
+		// If a PrimPart's color's RGBA is 0xDEADBEEF, then reassign it to a default color
+		if(m_pPrimParts->m_PanelColor.GetAsRGBA() == 0xDEADBEEF)
 			m_pPrimParts->m_PanelColor = m_pPrimParts->m_bIsContainer ? HyColor::ContainerPanel : HyColor::WidgetPanel;
-		if(m_pPrimParts->m_FrameColor.GetAlpha() == 0)
+		if(m_pPrimParts->m_FrameColor.GetAsRGBA() == 0xDEADBEEF)
 			m_pPrimParts->m_FrameColor = m_pPrimParts->m_bIsContainer ? HyColor::ContainerFrame : HyColor::WidgetFrame;
-		if(m_pPrimParts->m_TertiaryColor.GetAlpha() == 0)
+		if(m_pPrimParts->m_TertiaryColor.GetAsRGBA() == 0xDEADBEEF)
 			m_pPrimParts->m_TertiaryColor = HyColor::Orange;
 
 		ConstructPrimitives();
 		m_pPrimParts->m_Body.SetTint(m_pPrimParts->m_PanelColor);
+		m_pPrimParts->m_Body.alpha.Set(m_pPrimParts->m_PanelColor.GetAlphaF());
 		m_pPrimParts->m_Frame1.SetTint(m_pPrimParts->m_FrameColor);
+		m_pPrimParts->m_Frame1.alpha.Set(m_pPrimParts->m_FrameColor.GetAlphaF());
 		m_pPrimParts->m_Frame2.SetTint(m_pPrimParts->m_TertiaryColor);
+		m_pPrimParts->m_Frame2.alpha.Set(m_pPrimParts->m_TertiaryColor.GetAlphaF());
 		SetState(HYPANELSTATE_Idle);
 		break;
 
