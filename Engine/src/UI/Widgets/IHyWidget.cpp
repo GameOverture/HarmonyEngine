@@ -63,6 +63,11 @@ void IHyWidget::ClearCustomPanelState()
 		OnPanelUpdated();
 }
 
+bool IHyWidget::IsPanelValid() const
+{
+	return m_Panel.IsValid();
+}
+
 bool IHyWidget::IsPanelVisible() const
 {
 	return m_Panel.IsVisible();
@@ -71,6 +76,16 @@ bool IHyWidget::IsPanelVisible() const
 void IHyWidget::SetPanelVisible(bool bVisible)
 {
 	m_Panel.SetVisible(bVisible);
+}
+
+bool IHyWidget::IsPanelBoundingVolume() const
+{
+	return m_Panel.IsBoundingVolume();
+}
+
+bool IHyWidget::IsPanelNode() const
+{
+	return m_Panel.IsNode();
 }
 
 IHyBody2d *IHyWidget::GetPanelNode()

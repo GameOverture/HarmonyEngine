@@ -269,7 +269,7 @@ void HyPanel::SetSizeDimension(int32 iDimensionIndex, uint32 uiSize)
 	SetSize(m_vSize.x, m_vSize.y);
 }
 
-bool HyPanel::IsValid()
+bool HyPanel::IsValid() const
 {
 	if(IsNode())
 		return m_pNodeItem->IsLoadDataValid();

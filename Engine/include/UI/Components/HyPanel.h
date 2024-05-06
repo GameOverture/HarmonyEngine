@@ -96,7 +96,7 @@ public:
 	void SetSize(uint32 uiWidth, uint32 uiHeight);
 	void SetSizeDimension(int32 iDimensionIndex, uint32 uiSize);	// This is for widgets who programmatically choose between vertical or horizontal sizing
 
-	bool IsValid();
+	bool IsValid() const;
 
 	bool IsBoundingVolume() const;
 

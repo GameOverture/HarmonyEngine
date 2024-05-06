@@ -58,9 +58,13 @@ public:
 	bool IsCustomPanelState() const;
 	void ClearCustomPanelState();
 
+	bool IsPanelValid() const;
+
 	bool IsPanelVisible() const;
 	void SetPanelVisible(bool bVisible);
 
+	bool IsPanelBoundingVolume() const;
+	bool IsPanelNode() const;
 	IHyBody2d *GetPanelNode();
 
 	bool IsInputAllowed() const;					// Checks itself and the container it's inserted in if input is allowed
