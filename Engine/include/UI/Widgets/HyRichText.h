@@ -25,8 +25,9 @@ protected:
 		//							  = 1 << 17
 		//							  = 1 << 18			// 3 bits, bit's 17-19
 		//							  = 1 << 19
+		RICHTEXTATTRIB_IsMonospacedDigits = 1 << 20,
 
-		RICHTEXTATTRIB_NEXTFLAG = 1 << 20
+		RICHTEXTATTRIB_NEXTFLAG = 1 << 21
 	};
 	static_assert((int)RICHTEXTATTRIB_IsCenterVertically == (int)WIDGETATTRIB_NEXTFLAG, "HyRichText is not matching with base classes attrib flags");
 
@@ -66,6 +67,9 @@ public:
 
 	HyAlignment GetAlignment() const;
 	void SetAlignment(HyAlignment eAlignment);
+
+	bool IsMonospacedDigits() const;
+	void SetMonospacedDigits(bool bEnable);
 
 	// Formatting examples:
 	// {1} = All text after this uses state 1

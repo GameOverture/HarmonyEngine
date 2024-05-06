@@ -177,6 +177,21 @@ void HyRichText::SetAlignment(HyAlignment eAlignment)
 	AssembleDrawables();
 }
 
+bool HyRichText::IsMonospacedDigits() const
+{
+	return (m_uiAttribs & RICHTEXTATTRIB_IsMonospacedDigits) != 0;
+}
+
+void HyRichText::SetMonospacedDigits(bool bEnable)
+{
+	if(bEnable)
+		m_uiAttribs |= RICHTEXTATTRIB_IsMonospacedDigits;
+	else
+		m_uiAttribs &= ~RICHTEXTATTRIB_IsMonospacedDigits;
+
+	AssembleDrawables();
+}
+
 // Formatting examples:
 // {1} = All text after this uses state 1
 // {spritePrefix/spriteName,3} = Insert a sprite "spritePrefix/spriteName" with state 3, scaled to fit within text line
@@ -273,6 +288,7 @@ void HyRichText::AssembleDrawables()
 
 		pNewText->SetTextIndent(static_cast<uint32>(ptCurPos.x));
 		pNewText->SetTextAlignment(m_eAlignment);
+		pNewText->SetMonospacedDigits(IsMonospacedDigits());
 		pNewText->SetState(uiCurTextState);
 		pNewText->SetText(sCurText);
 		pNewText->pos.Set(0.0f, ptCurPos.y);
