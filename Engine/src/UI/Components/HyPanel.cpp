@@ -115,6 +115,7 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 
 	case HYTYPE_Entity: // 'Primitive' panel
 		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
+		delete m_pPrimParts;
 		m_pPrimParts = HY_NEW PrimParts(initRef, this);
 		delete m_pNodeItem;
 		m_pNodeItem = nullptr;

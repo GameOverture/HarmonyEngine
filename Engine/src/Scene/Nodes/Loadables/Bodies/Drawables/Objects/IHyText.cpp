@@ -446,6 +446,8 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - uiLastCharOffset, pData->GetNumLayers(this->m_uiState), 0);
 
 		glm::vec2 ptCursorPos = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pGlyph->fADVANCE_X * m_fScaleBoxModifier, 0.0f);
+
+		ptCursorPos.x += pData->GetLeftSideNudgeAmt(this->m_uiState); // HACK: Technically this should be GetRightSideNudgeAmt, but we don't store it and this is probably close enough
 		ptCursorPos.y += (static_cast<int32>(pGlyph->uiHEIGHT) - pGlyph->iOFFSET_Y) * m_fScaleBoxModifier; // Find the baseline of this last glyph
 		
 		ptCursorPos.x *= this->scale.X();

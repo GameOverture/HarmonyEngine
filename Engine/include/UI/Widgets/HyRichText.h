@@ -18,18 +18,20 @@ class HyRichText : public IHyWidget
 protected:
 	enum RichTextAttributes
 	{
-		RICHTEXTATTRIB_IsCenterVertically = 1 << 16,
+		RICHTEXTATTRIB_IsDirty				= 1 << 16,
 
-		RICHTEXTATTRIB_TextTypeMask = 0xE0000,			// When Panel is 'Stacked' (default), this mask holds HyTextType enum value.
-		RICHTEXTATTRIB_TextTypeOffset = 17,				// Bit shift offset to get/set 'HyTextType'
-		//							  = 1 << 17
-		//							  = 1 << 18			// 3 bits, bit's 17-19
-		//							  = 1 << 19
-		RICHTEXTATTRIB_IsMonospacedDigits = 1 << 20,
+		RICHTEXTATTRIB_TextTypeMask			= 0xE0000,		// When Panel is 'Stacked' (default), this mask holds HyTextType enum value.
+		RICHTEXTATTRIB_TextTypeOffset		= 17,			// Bit shift offset to get/set 'HyTextType'
+		//									= 1 << 17
+		//									= 1 << 18		// 3 bits, bit's 17-19
+		//									= 1 << 19
+		RICHTEXTATTRIB_IsCenterVertically	= 1 << 20,
+		RICHTEXTATTRIB_IsMonospacedDigits	= 1 << 21,
+		RICHTEXTATTRIB_IsFitPanelToText		= 1 << 22,
 
-		RICHTEXTATTRIB_NEXTFLAG = 1 << 21
+		RICHTEXTATTRIB_NEXTFLAG				= 1 << 23
 	};
-	static_assert((int)RICHTEXTATTRIB_IsCenterVertically == (int)WIDGETATTRIB_NEXTFLAG, "HyRichText is not matching with base classes attrib flags");
+	static_assert((int)RICHTEXTATTRIB_IsDirty == (int)WIDGETATTRIB_NEXTFLAG, "HyRichText is not matching with base classes attrib flags");
 
 	HyNodePath						m_TextPath;
 	
@@ -52,6 +54,9 @@ public:
 
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
+
+	float GetTextWidth(float fPercent = 1.0f);	// Includes formatted sprites
+	float GetTextHeight(float fPercent = 1.0f);	// Includes formatted sprites
 
 	void Setup(const HyPanelInit &panelInit);
 	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath);
@@ -76,12 +81,15 @@ public:
 	// {spritePrefix/spriteName,3} = Insert a sprite "spritePrefix/spriteName" with state 3, scaled to fit within text line
 	void SetText(const std::string &sRichTextFormat);
 
+	void ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachDrawable);
+
 protected:
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnSetSizeHint() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
 
-	void AssembleDrawables();
+	void MarkRichTextDirty();
+	void AssembleRichTextDrawables();
 
 	virtual void OnSetup() { }					// Optional override for derived classes
 };

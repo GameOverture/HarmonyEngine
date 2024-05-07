@@ -71,12 +71,39 @@ bool HyRichText::IsGlyphAvailable(std::string sUtf8Character) const
 
 /*virtual*/ float HyRichText::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
+	AssembleRichTextDrawables();
 	return m_vBoxDimensions.x * fPercent;
 }
 
 /*virtual*/ float HyRichText::GetHeight(float fPercent /*= 1.0f*/) /*override*/
 {
+	AssembleRichTextDrawables();
 	return m_vBoxDimensions.y * fPercent;
+}
+
+float HyRichText::GetTextWidth(float fPercent /*= 1.0f*/)
+{
+	AssembleRichTextDrawables();
+
+	float fTextWidth = 0.0f;
+	ForEachDrawable([&fTextWidth](IHyDrawable2d *pDrawable) 
+		{
+			HyAssert(pDrawable->GetType() == HYTYPE_Text || pDrawable->GetType() == HYTYPE_Sprite, "HyRichText::GetTextWidth() - Drawable is not a text or sprite");
+			if(pDrawable->GetType() == HYTYPE_Text)
+				fTextWidth += (static_cast<HyText2d *>(pDrawable)->GetTextCursorPos().x - static_cast<HyText2d *>(pDrawable)->GetTextIndent());
+			else // HYTYPE_Sprite
+				fTextWidth += static_cast<HySprite2d *>(pDrawable)->GetStateWidth(pDrawable->GetState(), pDrawable->scale.GetX());
+		});
+	return fTextWidth * fPercent;
+}
+
+float HyRichText::GetTextHeight(float fPercent /*= 1.0f*/)
+{
+	AssembleRichTextDrawables();
+
+	float fTextHeight = 0.0f;
+	ForEachDrawable([&fTextHeight](IHyDrawable2d *pDrawable) { fTextHeight = HyMath::Max(fTextHeight, pDrawable->GetHeight(pDrawable->scale.GetY())); });
+	return fTextHeight * fPercent;
 }
 
 void HyRichText::Setup(const HyPanelInit &panelInit)
@@ -109,6 +136,8 @@ void HyRichText::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 		HyLogError("HyRichText::Setup() - Unhandled text type: " << GetTextType());
 		break;
 	}
+
+	MarkRichTextDirty();
 	OnSetup();
 }
 
@@ -121,18 +150,20 @@ void HyRichText::SetAsLine()
 {
 	HySetVec(m_vBoxDimensions, 0.0f, 0.0f);
 
+	m_uiAttribs &= ~RICHTEXTATTRIB_IsCenterVertically;
 	m_uiAttribs &= ~RICHTEXTATTRIB_TextTypeMask;
 	m_uiAttribs |= HYTEXT_Line << RICHTEXTATTRIB_TextTypeOffset;
-	AssembleDrawables();
+	MarkRichTextDirty();
 }
 
 void HyRichText::SetAsColumn(float fWidth)
 {
 	HySetVec(m_vBoxDimensions, fWidth, 0.0f);
 
+	m_uiAttribs &= ~RICHTEXTATTRIB_IsCenterVertically;
 	m_uiAttribs &= ~RICHTEXTATTRIB_TextTypeMask;
 	m_uiAttribs |= HYTEXT_Column << RICHTEXTATTRIB_TextTypeOffset;
-	AssembleDrawables();
+	MarkRichTextDirty();
 }
 
 void HyRichText::SetAsBox(float fWidth, float fHeight, bool bCenterVertically)
@@ -145,7 +176,7 @@ void HyRichText::SetAsBox(float fWidth, float fHeight, bool bCenterVertically)
 
 	m_uiAttribs &= ~RICHTEXTATTRIB_TextTypeMask;
 	m_uiAttribs |= HYTEXT_Box << RICHTEXTATTRIB_TextTypeOffset;
-	AssembleDrawables();
+	MarkRichTextDirty();
 }
 
 void HyRichText::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
@@ -158,7 +189,7 @@ void HyRichText::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertical
 
 	m_uiAttribs &= ~RICHTEXTATTRIB_TextTypeMask;
 	m_uiAttribs |= HYTEXT_ScaleBox << RICHTEXTATTRIB_TextTypeOffset;
-	AssembleDrawables();
+	MarkRichTextDirty();
 }
 
 bool HyRichText::IsCenterVertically() const
@@ -173,8 +204,11 @@ HyAlignment HyRichText::GetAlignment() const
 
 void HyRichText::SetAlignment(HyAlignment eAlignment)
 {
+	if(m_eAlignment == eAlignment)
+		return;
+
 	m_eAlignment = eAlignment;
-	AssembleDrawables();
+	MarkRichTextDirty();
 }
 
 bool HyRichText::IsMonospacedDigits() const
@@ -184,12 +218,15 @@ bool HyRichText::IsMonospacedDigits() const
 
 void HyRichText::SetMonospacedDigits(bool bEnable)
 {
+	if(IsMonospacedDigits() == bEnable)
+		return;
+
 	if(bEnable)
 		m_uiAttribs |= RICHTEXTATTRIB_IsMonospacedDigits;
 	else
 		m_uiAttribs &= ~RICHTEXTATTRIB_IsMonospacedDigits;
 
-	AssembleDrawables();
+	MarkRichTextDirty();
 }
 
 // Formatting examples:
@@ -198,16 +235,25 @@ void HyRichText::SetMonospacedDigits(bool bEnable)
 void HyRichText::SetText(const std::string &sRichTextFormat)
 {
 	m_sRichText = sRichTextFormat;
-	AssembleDrawables();
+	MarkRichTextDirty();
+}
+
+void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachDrawable)
+{
+	AssembleRichTextDrawables();
+	for(uint32 i = 0; i < m_DrawableList.size(); ++i)
+		fpForEachDrawable(m_DrawableList[i]);
 }
 
 /*virtual*/ glm::vec2 HyRichText::GetPosOffset() /*override*/
 {
+	AssembleRichTextDrawables();
 	return glm::vec2(0.0f, m_vBoxDimensions.y - m_fColumnLineHeightOffset);
 }
 
 /*virtual*/ void HyRichText::OnSetSizeHint() /*override*/
 {
+	AssembleRichTextDrawables();
 	HySetVec(m_vSizeHint, m_vBoxDimensions.x, m_vBoxDimensions.y);
 }
 
@@ -224,17 +270,21 @@ void HyRichText::SetText(const std::string &sRichTextFormat)
 		break;
 	}
 
+	AssembleRichTextDrawables();
 	return glm::ivec2(GetWidth(), GetHeight());
 }
 
-void HyRichText::AssembleDrawables()
+void HyRichText::MarkRichTextDirty()
 {
-	// Clear out drawable list
-	while(m_DrawableList.empty() == false)
-	{
-		delete m_DrawableList.back();
-		m_DrawableList.pop_back();
-	}
+	m_uiAttribs |= RICHTEXTATTRIB_IsDirty;
+}
+
+void HyRichText::AssembleRichTextDrawables()
+{
+	if((m_uiAttribs & RICHTEXTATTRIB_IsDirty) == 0)
+		return;
+
+	std::vector<IHyDrawable2d *> newDrawableList;
 
 	// Capture each formatting change within 'm_sRichText'
 	std::regex rgx("\\{(.+?)\\}");
@@ -283,7 +333,7 @@ void HyRichText::AssembleDrawables()
 	while(std::getline(ssCleanText, sCurText, '\x7F'))
 	{
 		HyText2d *pNewText = HY_NEW HyText2d(m_TextPath, this);
-		m_DrawableList.push_back(pNewText);
+		newDrawableList.push_back(pNewText);
 		pNewText->Load();
 
 		pNewText->SetTextIndent(static_cast<uint32>(ptCurPos.x));
@@ -360,7 +410,7 @@ void HyRichText::AssembleDrawables()
 
 				// Allocate sprite and initialize
 				HySprite2d *pNewSprite = HY_NEW HySprite2d(HyNodePath(formatChangeList[uiCurFmtIndex].first.c_str()), this);
-				m_DrawableList.push_back(pNewSprite);
+				newDrawableList.push_back(pNewSprite);
 				pNewSprite->Load();
 
 				pNewSprite->SetState(formatChangeList[uiCurFmtIndex].second);
@@ -410,6 +460,16 @@ void HyRichText::AssembleDrawables()
 		}
 	}
 
+	// Delete old drawable list, then replace with new list
+	// NOTE: This is done at the end to avoid potentially unloading and reloading the same assets
+	while(m_DrawableList.empty() == false)
+	{
+		delete m_DrawableList.back();
+		m_DrawableList.pop_back();
+	}
+	m_DrawableList = newDrawableList;
+
+	// Ensure m_vBoxDimensions has the correct dimensions
 	if(m_vBoxDimensions.x == 0.0f)
 		m_vBoxDimensions.x = fUsedWidth;
 	if(m_vBoxDimensions.y == 0.0f)
@@ -418,6 +478,10 @@ void HyRichText::AssembleDrawables()
 		m_vBoxDimensions.y += m_fColumnLineHeightOffset;// std::fabs(pTextData->GetLineDescender(uiCurTextState)
 	}
 
+	// Inform everwhere that *this has been updated
 	SetDirty(IHyNode::DIRTY_SceneAABB);
 	SetSizeAndLayoutDirty();
+
+	// But *this itself is no longer dirty
+	m_uiAttribs &= ~RICHTEXTATTRIB_IsDirty;
 }
