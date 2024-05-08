@@ -180,7 +180,8 @@ void EntityDrawItem::HideTransformCtrl()
 SubEntity::SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_iFramesPerSecond(iFps),
-	m_bTimelinePaused(false)
+	m_bTimelinePaused(false),
+	m_fTimelinePausedAt(0.0f)
 {
 	QMap<QUuid, IHyLoadable2d *> uuidChildMap; // Temporary map to hold the QUuid's of the children so we can link them up with their key frame properties
 	uuidChildMap[subEntityUuid] = this; // This' root, the SubEntity
@@ -257,6 +258,7 @@ SubEntity::SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const Q
 }
 void SubEntity::SetTimelinePaused(float fElapsedTime, bool bPaused)
 {
+	m_fTimelinePausedAt = fElapsedTime;
 	m_bTimelinePaused = bPaused;
 }
 void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj)
@@ -355,8 +357,15 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 }
 void SubEntity::ExtrapolateChildProperties(float fElapsedTime, const QJsonObject &additionalChildPropObj, HyCamera2d *pCamera)
 {
-	if(m_bTimelinePaused)
+	if(m_bTimelinePaused && fElapsedTime > m_fTimelinePausedAt)
+	{
+		for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
+		{
+			if(childTypePair.second == ITEM_Sprite)
+				static_cast<HySprite2d *>(childTypePair.first)->SetAnimPause(true); // We always pause the animation because it is set manually by extrapolating what frame it should be, and don't want time passing to affect it.
+		}
 		return;
+	}
 
 	const int iCURRENT_FRAME = static_cast<int>(fElapsedTime * m_iFramesPerSecond);
 	const float fFRAME_DURATION = 1.0f / m_iFramesPerSecond;
@@ -474,7 +483,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 		{
 			QJsonObject entityObj = propsObj["Entity"].toObject();
 			if(entityObj.contains("Timeline Pause"))
-				static_cast<SubEntity *>(pThisHyNode)->SetTimelinePaused(fFRAME_DURATION * iCURRENT_FRAME, entityObj["Timeline Pause"].toBool());
+				static_cast<SubEntity *>(pThisHyNode)->SetTimelinePaused(fFRAME_DURATION * iFrame, entityObj["Timeline Pause"].toBool());
 		}
 
 		// Parse all and only the potential categories of the 'eItemType' type, and set the values to 'pHyNode'

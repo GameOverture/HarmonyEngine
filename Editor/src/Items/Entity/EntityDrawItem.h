@@ -148,6 +148,7 @@ class SubEntity : public HyEntity2d
 	QList<StateInfo>								m_StateInfoList;
 
 	bool											m_bTimelinePaused;
+	float											m_fTimelinePausedAt;
 
 public:
 	SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent);
