@@ -84,41 +84,34 @@ HyPanel::HyPanel(HyEntity2d *pParent) :
 
 void HyPanel::Setup(const HyPanelInit &initRef)
 {
+	delete m_pPrimParts;
+	m_pPrimParts = nullptr;
+
+	delete m_pNodeItem;
+	m_pNodeItem = nullptr;
+
 	switch(initRef.m_eNodeType)
 	{
 	case HYTYPE_Unknown: // 'BoundingVolume' panel
 		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
-		delete m_pPrimParts;
-		m_pPrimParts = nullptr;
-		delete m_pNodeItem;
-		m_pNodeItem = nullptr;
 		break;
 
 	case HYTYPE_Sprite: // 'NodeItem' panel
 		HySetVec(m_vSize, 0, 0);
-		delete m_pPrimParts;
-		m_pPrimParts = nullptr;
 		m_pNodeItem = HY_NEW HySprite2d(initRef.m_NodePath, this);
 		break;
 	case HYTYPE_Spine: // 'NodeItem' panel
 		HySetVec(m_vSize, 0, 0);
-		delete m_pPrimParts;
-		m_pPrimParts = nullptr;
 		m_pNodeItem = HY_NEW HySpine2d(initRef.m_NodePath, this);
 		break;
 	case HYTYPE_TexturedQuad: // 'NodeItem' panel
 		HySetVec(m_vSize, 0, 0);
-		delete m_pPrimParts;
-		m_pPrimParts = nullptr;
 		m_pNodeItem = HY_NEW HyTexturedQuad2d(initRef.m_NodePath, this);
 		break;
 
 	case HYTYPE_Entity: // 'Primitive' panel
 		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
-		delete m_pPrimParts;
 		m_pPrimParts = HY_NEW PrimParts(initRef, this);
-		delete m_pNodeItem;
-		m_pNodeItem = nullptr;
 
 		// If a PrimPart's color's RGBA is 0xDEADBEEF, then reassign it to a default color
 		if(m_pPrimParts->m_PanelColor.GetAsRGBA() == 0xDEADBEEF)
