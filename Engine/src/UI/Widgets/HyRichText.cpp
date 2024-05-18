@@ -90,7 +90,7 @@ float HyRichText::GetTextWidth(float fPercent /*= 1.0f*/)
 		{
 			HyAssert(pDrawable->GetType() == HYTYPE_Text || pDrawable->GetType() == HYTYPE_Sprite, "HyRichText::GetTextWidth() - Drawable is not a text or sprite");
 			if(pDrawable->GetType() == HYTYPE_Text)
-				fTextWidth += (static_cast<HyText2d *>(pDrawable)->GetTextCursorPos().x - static_cast<HyText2d *>(pDrawable)->GetTextIndent());
+				fTextWidth += (static_cast<HyText2d *>(pDrawable)->GetCursorPos().x - static_cast<HyText2d *>(pDrawable)->GetTextIndent());
 			else // HYTYPE_Sprite
 				fTextWidth += static_cast<HySprite2d *>(pDrawable)->GetStateWidth(pDrawable->GetState(), pDrawable->scale.GetX());
 		});
@@ -137,6 +137,8 @@ void HyRichText::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 		break;
 	}
 
+	ResetDisplayOrder();
+
 	MarkRichTextDirty();
 	OnSetup();
 }
@@ -169,6 +171,8 @@ void HyRichText::SetAsColumn(float fWidth)
 void HyRichText::SetAsBox(float fWidth, float fHeight, bool bCenterVertically)
 {
 	HySetVec(m_vBoxDimensions, fWidth, fHeight);
+	SetScissor(HyRect(fWidth, fHeight));
+
 	if(bCenterVertically)
 		m_uiAttribs |= RICHTEXTATTRIB_IsCenterVertically;
 	else
@@ -245,6 +249,12 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 		fpForEachDrawable(m_DrawableList[i]);
 }
 
+/*virtual*/ void HyRichText::Update() /*override*/
+{
+	IHyWidget::Update();
+	AssembleRichTextDrawables();
+}
+
 /*virtual*/ glm::vec2 HyRichText::GetPosOffset() /*override*/
 {
 	AssembleRichTextDrawables();
@@ -254,7 +264,7 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 /*virtual*/ void HyRichText::OnSetSizeHint() /*override*/
 {
 	AssembleRichTextDrawables();
-	HySetVec(m_vSizeHint, m_vBoxDimensions.x, m_vBoxDimensions.y);
+	HySetVec(m_vSizeHint, static_cast<int>(m_vBoxDimensions.x), static_cast<int>(m_vBoxDimensions.y));
 }
 
 /*virtual*/ glm::ivec2 HyRichText::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
@@ -328,16 +338,18 @@ void HyRichText::AssembleRichTextDrawables()
 	uint32 uiCurTextState = 0;
 	glm::vec2 ptCurPos(0.0f, 0.0f);
 	float fUsedWidth = 0.0f;
+	bool bIsLoaded = IsLoaded(); // Store whether it's loaded here before creating any new drawables
 
 	uint32 uiCurFmtIndex = 0;
 	while(std::getline(ssCleanText, sCurText, '\x7F'))
 	{
 		HyText2d *pNewText = HY_NEW HyText2d(m_TextPath, this);
 		newDrawableList.push_back(pNewText);
-		pNewText->Load();
+		if(bIsLoaded)
+			pNewText->Load();
 
 		pNewText->SetTextIndent(static_cast<uint32>(ptCurPos.x));
-		pNewText->SetTextAlignment(m_eAlignment);
+		pNewText->SetAlignment(m_eAlignment);
 		pNewText->SetMonospacedDigits(IsMonospacedDigits());
 		pNewText->SetState(uiCurTextState);
 		pNewText->SetText(sCurText);
@@ -349,27 +361,27 @@ void HyRichText::AssembleRichTextDrawables()
 			HySetVec(m_vBoxDimensions, 0.0f, 0.0f);
 			pNewText->SetAsLine();
 
-			ptCurPos.x = pNewText->GetTextCursorPos().x;
-			ptCurPos.y += pNewText->GetTextCursorPos().y;
+			ptCurPos.x = pNewText->GetCursorPos().x;
+			ptCurPos.y += pNewText->GetCursorPos().y;
 			break;
 
 		case HYTEXT_Column:
 			m_vBoxDimensions.y = 0.0f;
 			pNewText->SetAsColumn(m_vBoxDimensions.x);
 
-			ptCurPos.x = pNewText->GetTextCursorPos().x;
-			ptCurPos.y += pNewText->GetTextCursorPos().y;
+			ptCurPos.x = pNewText->GetCursorPos().x;
+			ptCurPos.y += pNewText->GetCursorPos().y;
 			break;
 			
 		case HYTEXT_Box:
 			pNewText->SetAsBox(m_vBoxDimensions.x, m_vBoxDimensions.y, IsCenterVertically());
 
-			ptCurPos.x = pNewText->GetTextCursorPos().x; // Only update X
+			ptCurPos.x = pNewText->GetCursorPos().x; // Only update X
 			break;
 
 		case HYTEXT_ScaleBox:
 			pNewText->SetAsScaleBox(m_vBoxDimensions.x, m_vBoxDimensions.y, IsCenterVertically());
-			ptCurPos.x = pNewText->GetTextCursorPos().x; // Only update X
+			ptCurPos.x = pNewText->GetCursorPos().x; // Only update X
 			break;
 
 		default:
@@ -411,7 +423,8 @@ void HyRichText::AssembleRichTextDrawables()
 				// Allocate sprite and initialize
 				HySprite2d *pNewSprite = HY_NEW HySprite2d(HyNodePath(formatChangeList[uiCurFmtIndex].first.c_str()), this);
 				newDrawableList.push_back(pNewSprite);
-				pNewSprite->Load();
+				if(bIsLoaded)
+					pNewSprite->Load();
 
 				pNewSprite->SetState(formatChangeList[uiCurFmtIndex].second);
 

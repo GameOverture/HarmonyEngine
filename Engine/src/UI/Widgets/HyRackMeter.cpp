@@ -46,8 +46,8 @@ HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNod
 {
 	HyLabel::SetAsStacked(eTextAlignment, eTextType);
 
-	m_SpinText.m_SpinText_Shown.SetTextAlignment(eTextAlignment);
-	m_SpinText.m_SpinText_Padded.SetTextAlignment(eTextAlignment);
+	m_SpinText.m_SpinText_Shown.SetAlignment(eTextAlignment);
+	m_SpinText.m_SpinText_Padded.SetAlignment(eTextAlignment);
 
 	FormatDigits();
 }

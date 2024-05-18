@@ -35,8 +35,9 @@ protected:
 		TEXTATTRIB_CenterVertically			= 1 << 4,
 		TEXTATTRIB_UseMonospacedDigits		= 1 << 5,
 		TEXTATTRIB_IsTweeningLayerColor		= 1 << 6,
+		TEXTATTRIB_BoxScissor				= 1 << 7,
 
-		// NOTE: do not exceed 8 bits
+		// NOTE: CURRENTLY MAXED OUT (do not exceed 8 bits)
 	};
 	uint8								m_uiTextAttributes;
 
@@ -145,17 +146,17 @@ public:
 	bool IsTweeningLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex);
 	void StopTweeningLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex);
 
-	HyAlignment GetTextAlignment() const;
-	void SetTextAlignment(HyAlignment eAlignment);
+	HyAlignment GetAlignment() const;
+	void SetAlignment(HyAlignment eAlignment);
 
 	uint32 GetTextIndent() const;
 	void SetTextIndent(uint32 uiIndentPixels);
 
 	// The offset location past the last glyph. Essentially where the user input cursor in a command window would be, on the baseline
-	glm::vec2 GetTextCursorPos();
+	glm::vec2 GetCursorPos();
 
 	// The offset location from 'pos' to the bottom left of all the written glyphs. Affected by things like alignment and SetAs.
-	glm::vec2 GetTextBottomLeft();
+	glm::vec2 GetBottomLeft();
 
 	bool IsMonospacedDigits() const;
 	void SetMonospacedDigits(bool bSet);
@@ -172,7 +173,7 @@ public:
 
 	void SetAsLine();
 	void SetAsColumn(float fWidth);
-	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically);
+	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically = false, bool bUseScissor = true);
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 	void SetAsVertical();
 

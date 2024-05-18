@@ -232,7 +232,7 @@ template<typename NODETYPE, typename ENTTYPE>
 glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex)
 {
 	if(uiCharIndex >= m_Utf32CodeList.size())
-		return GetTextCursorPos();
+		return GetCursorPos();
 
 	CalculateGlyphInfos();
 
@@ -384,13 +384,13 @@ void IHyText<NODETYPE, ENTTYPE>::StopTweeningLayerColor(uint32 uiStateIndex, uin
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-HyAlignment IHyText<NODETYPE, ENTTYPE>::GetTextAlignment() const
+HyAlignment IHyText<NODETYPE, ENTTYPE>::GetAlignment() const
 {
 	return m_eAlignment;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetTextAlignment(HyAlignment eAlignment)
+void IHyText<NODETYPE, ENTTYPE>::SetAlignment(HyAlignment eAlignment)
 {
 	if(m_eAlignment != eAlignment)
 	{
@@ -417,12 +417,12 @@ void IHyText<NODETYPE, ENTTYPE>::SetTextIndent(uint32 uiIndentPixels)
 
 // The offset location past the last glyph. Essentially where the user input cursor in a command window would be, on the baseline
 template<typename NODETYPE, typename ENTTYPE>
-glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
+glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetCursorPos()
 {
 	CalculateGlyphInfos();
 
 	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos invoked on null data");
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetCursorPos invoked on null data");
 		return glm::vec2();
 	}
 
@@ -459,7 +459,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextCursorPos()
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
+glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetBottomLeft()
 {
 	HyTextType eTextType = GetTextType();
 
@@ -467,7 +467,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
 		return glm::vec2(0.0f, 0.0f);
 
 	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft invoked on null data");
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetBottomLeft invoked on null data");
 		return glm::vec2(0.0f, 0.0f);
 	}
 
@@ -492,7 +492,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBottomLeft()
 		}
 	}
 
-	return glm::vec2(fX, GetTextCursorPos().y);
+	return glm::vec2(fX, GetCursorPos().y);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -563,6 +563,11 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsLine()
 
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
+	if(m_uiTextAttributes & TEXTATTRIB_BoxScissor)
+	{
+		this->ClearScissor(true);
+		m_uiTextAttributes &= ~TEXTATTRIB_BoxScissor;
+	}
 
 	MarkAsDirty();
 }
@@ -581,12 +586,17 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsColumn(float fWidth)
 
 	m_vBoxDimensions.x = fWidth;
 	m_vBoxDimensions.y = 0.0f;
+	if(m_uiTextAttributes & TEXTATTRIB_BoxScissor)
+	{
+		this->ClearScissor(true);
+		m_uiTextAttributes &= ~TEXTATTRIB_BoxScissor;
+	}
 
 	MarkAsDirty();
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetAsBox(float fWidth, float fHeight, bool bCenterVertically)
+void IHyText<NODETYPE, ENTTYPE>::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/, bool bUseScissor /*= true*/)
 {
 	if(fWidth <= 0.0f || fHeight <= 0.0f)
 	{
@@ -605,6 +615,16 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsBox(float fWidth, float fHeight, bool bCen
 
 	m_vBoxDimensions.x = fWidth;
 	m_vBoxDimensions.y = fHeight;
+	if(bUseScissor)
+	{
+		SetScissor(HyRect(fWidth, fHeight));
+		m_uiTextAttributes |= TEXTATTRIB_BoxScissor;
+	}
+	else if(m_uiTextAttributes & TEXTATTRIB_BoxScissor)
+	{
+		this->ClearScissor(true);
+		m_uiTextAttributes &= ~TEXTATTRIB_BoxScissor;
+	}
 
 	MarkAsDirty();
 }
@@ -629,6 +649,11 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsScaleBox(float fWidth, float fHeight, bool
 
 	m_vBoxDimensions.x = fWidth;
 	m_vBoxDimensions.y = fHeight;
+	if(m_uiTextAttributes & TEXTATTRIB_BoxScissor)
+	{
+		this->ClearScissor(true);
+		m_uiTextAttributes &= ~TEXTATTRIB_BoxScissor;
+	}
 
 	MarkAsDirty();
 }
@@ -641,6 +666,11 @@ void IHyText<NODETYPE, ENTTYPE>::SetAsVertical()
 
 	m_vBoxDimensions.x = 0.0f;
 	m_vBoxDimensions.y = 0.0f;
+	if(m_uiTextAttributes & TEXTATTRIB_BoxScissor)
+	{
+		this->ClearScissor(true);
+		m_uiTextAttributes &= ~TEXTATTRIB_BoxScissor;
+	}
 
 	MarkAsDirty();
 }
@@ -1091,12 +1121,12 @@ offsetCalculation:
 	{
 		for(uint32 i = 0; i < vNewlineInfo.size(); ++i)
 		{
-			// Don't bother with alignment on first line if there's an indent (use HYALIGN_Left instead)
+			// Don't bother with alignment on first line if there's an indent (will use HYALIGN_Left instead)
 			if(i == 0 && m_uiIndent != 0)
 				continue;
 
 			float fNudgeAmt = (m_vBoxDimensions.x - vNewlineInfo[i].fUSED_WIDTH);
-			fNudgeAmt *= (m_eAlignment == HYALIGN_Center) ? 0.5f : 1.0f; // HYALIGN_Right == (fNudgeAmt *= 1.0f)
+			fNudgeAmt *= (m_eAlignment == HYALIGN_Center) ? 0.5f : 1.0f; // else HYALIGN_Right|HYALIGN_Justify
 
 			uint32 uiStrIndex = vNewlineInfo[i].uiSTART_CHARACTER_INDEX;
 			uint32 uiEndIndex = (i + 1) < vNewlineInfo.size() ? vNewlineInfo[i + 1].uiSTART_CHARACTER_INDEX : m_uiNumValidCharacters;
@@ -1132,6 +1162,9 @@ offsetCalculation:
 						bSpaceFound = false;
 					}
 				}
+
+				if(uiNumWords == 0)
+					continue;
 
 				fNudgeAmt /= uiNumWords;
 

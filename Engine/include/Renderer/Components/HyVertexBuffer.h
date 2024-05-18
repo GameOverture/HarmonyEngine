@@ -12,8 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
-#define HY_VERTEX_BUFFER_SIZE_2D ((1024 * 1024) * 2) // 2MB
-#define HY_VERTEX_BUFFER_SIZE ((1024 * 1024) * 2) // 2MB
+#define HY_VERTEX_BUFFER_SIZE_2D ((1024 * 1024) * 4) // 4MB
+#define HY_VERTEX_BUFFER_SIZE ((1024 * 1024) * 4) // 4MB
 
 class IHyRenderer;
 
@@ -43,7 +43,7 @@ class HyVertexBuffer
 	};
 
 	Buffer									m_Buffer2d;	// This get cleared every frame
-	std::vector<Buffer>						m_StaticBufferList;	// Somewhat persistent data
+	//std::vector<Buffer>						m_StaticBufferList;	// Somewhat persistent data
 
 public:
 	HyVertexBuffer(IHyRenderer &rendererRef);

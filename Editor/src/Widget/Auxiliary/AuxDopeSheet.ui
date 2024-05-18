@@ -314,6 +314,9 @@
    <property name="text">
     <string>Copy Frames</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
   </action>
   <action name="actionPasteFrames">
    <property name="icon">
@@ -322,6 +325,9 @@
    </property>
    <property name="text">
     <string>Paste Frames</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
    </property>
   </action>
   <action name="actionDeleteFrames">
@@ -334,6 +340,9 @@
    </property>
    <property name="toolTip">
     <string>Delete selected key frames</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
    </property>
   </action>
  </widget>

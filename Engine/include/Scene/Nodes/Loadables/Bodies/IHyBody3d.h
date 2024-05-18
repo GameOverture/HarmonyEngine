@@ -44,6 +44,13 @@ public:
 	float CalculateAlpha();
 	const glm::vec3 &CalculateTint();
 
+	// Scissors on a 3D body is TBD - These functions exist for IHyText<>'s use of scissors with Box type
+	bool IsScissorSet() { }
+	void GetScissor(HyRect &scissorOut) { }
+	HyStencilHandle GetScissorHandle() { return HY_UNUSED_HANDLE; }
+	virtual void SetScissor(const HyRect &scissorRect) { }
+	virtual void ClearScissor(bool bUseParentScissor) { }
+
 protected:
 	virtual void Update() override;
 

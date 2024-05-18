@@ -84,6 +84,8 @@ public:
 	void ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachDrawable);
 
 protected:
+	virtual void Update() override;
+
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnSetSizeHint() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;

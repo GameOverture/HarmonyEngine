@@ -257,24 +257,24 @@ void IHyBody2d::GetScissor(HyRect &scissorOut)
 	float maxX = pVertArray[0].x;
 	float minY = pVertArray[0].y;
 	float maxY = pVertArray[0].y;
-	for(int iVertIndex = 0; iVertIndex < uiVertCount; ++iVertIndex)
+	for(uint32 uiVertIndex = 0; uiVertIndex < uiVertCount; ++uiVertIndex)
 	{
-		if(pVertArray[iVertIndex].x < minX)
-			minX = pVertArray[iVertIndex].x;
-		if(pVertArray[iVertIndex].x > maxX)
-			maxX = pVertArray[iVertIndex].x;
-		if(pVertArray[iVertIndex].y < minY)
-			minY = pVertArray[iVertIndex].y;
-		if(pVertArray[iVertIndex].y > maxY)
-			maxY = pVertArray[iVertIndex].y;
+		if(pVertArray[uiVertIndex].x < minX)
+			minX = pVertArray[uiVertIndex].x;
+		if(pVertArray[uiVertIndex].x > maxX)
+			maxX = pVertArray[uiVertIndex].x;
+		if(pVertArray[uiVertIndex].y < minY)
+			minY = pVertArray[uiVertIndex].y;
+		if(pVertArray[uiVertIndex].y > maxY)
+			maxY = pVertArray[uiVertIndex].y;
 	}
 	float fHalfWidth = (maxX - minX) / 2.0f;
 	float fHalfHeight = (maxY - minY) / 2.0f;
 
 	// Find center of the box
 	glm::vec2 ptCenter = glm::vec2(0.0f);
-	for(int iVertIndex = 0; iVertIndex < uiVertCount; ++iVertIndex)
-		ptCenter += pVertArray[iVertIndex];
+	for(uint32 uiVertIndex = 0; uiVertIndex < uiVertCount; ++uiVertIndex)
+		ptCenter += pVertArray[uiVertIndex];
 	ptCenter /= static_cast<float>(uiVertCount); // Averaging the sum coordinates of the vertices.
 
 	// Calculate rotation angle

@@ -99,11 +99,11 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 		break;
 
 	case HYTEXT_Column:
-		m_DebugBox.SetAsBox(m_vBoxDimensions.x, GetHeight());
+		m_DebugBox.SetAsBox(HyRect(m_vBoxDimensions.x * 0.5f, GetHeight() * 0.5f, glm::vec2(m_vBoxDimensions.x * 0.5f, GetHeight() * -0.5f), 0.0f));
 		break;
 
 	case HYTEXT_Vertical:
-		m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, GetHeight()));
+		m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, -GetHeight()));
 		break;
 
 	default:

@@ -15,7 +15,7 @@ HyVertexBuffer::HyVertexBuffer(IHyRenderer &rendererRef) :
 	m_RendererRef(rendererRef),
 	m_Buffer2d(true)
 {
-	m_StaticBufferList.emplace_back(false);
+	//m_StaticBufferList.emplace_back(false);
 }
 
 HyVertexBuffer::~HyVertexBuffer()

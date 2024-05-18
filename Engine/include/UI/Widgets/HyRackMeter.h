@@ -57,10 +57,10 @@ protected:
 		void Setup(const HyNodePath &textNodePath)
 		{
 			m_SpinText_Shown.Init(textNodePath, this);
-			m_SpinText_Shown.SetTextAlignment(HYALIGN_Center);
+			m_SpinText_Shown.SetAlignment(HYALIGN_Center);
 
 			m_SpinText_Padded.Init(textNodePath, this);
-			m_SpinText_Padded.SetTextAlignment(HYALIGN_Center);
+			m_SpinText_Padded.SetAlignment(HYALIGN_Center);
 		}
 	};
 	SpinText 				m_SpinText;
