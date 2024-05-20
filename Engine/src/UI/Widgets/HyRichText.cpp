@@ -168,7 +168,7 @@ void HyRichText::SetAsColumn(float fWidth)
 	MarkRichTextDirty();
 }
 
-void HyRichText::SetAsBox(float fWidth, float fHeight, bool bCenterVertically)
+void HyRichText::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/)
 {
 	HySetVec(m_vBoxDimensions, fWidth, fHeight);
 	SetScissor(HyRect(fWidth, fHeight));
@@ -338,7 +338,7 @@ void HyRichText::AssembleRichTextDrawables()
 	uint32 uiCurTextState = 0;
 	glm::vec2 ptCurPos(0.0f, 0.0f);
 	float fUsedWidth = 0.0f;
-	bool bIsLoaded = IsLoaded(); // Store whether it's loaded here before creating any new drawables
+	bool bIsLoaded = true;// IsLoaded(); // Store whether it's loaded here before creating any new drawables
 
 	uint32 uiCurFmtIndex = 0;
 	while(std::getline(ssCleanText, sCurText, '\x7F'))

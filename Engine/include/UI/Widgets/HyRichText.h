@@ -65,7 +65,7 @@ public:
 	HyTextType GetTextType() const;
 	void SetAsLine();
 	void SetAsColumn(float fWidth);
-	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically);
+	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically = false);
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 
 	bool IsCenterVertically() const;
