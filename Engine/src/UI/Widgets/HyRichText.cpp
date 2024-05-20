@@ -13,6 +13,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
 #include "Assets/Nodes/Objects/HyTextData.h"
 #include "Diagnostics/Console/IHyConsole.h"
+#include "Utilities/HyIO.h"
 
 #include <regex>
 
@@ -66,11 +67,13 @@ HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 
 bool HyRichText::IsGlyphAvailable(std::string sUtf8Character) const
 {
-	HyText2d *pNewText = HY_NEW HyText2d(m_TextPath);
-	bool bIsAvailable = pNewText->IsGlyphAvailable(sUtf8Character);
-	delete pNewText;
+	if(m_pTextData == nullptr)
+		return false;
 
-	return bIsAvailable;
+	uint32 uiUsedBytes = 0;
+	const HyTextGlyph *pGlyphRef = m_pTextData->GetGlyph(0, 0, HyIO::Utf8_to_Utf32(sUtf8Character.c_str(), uiUsedBytes));
+
+	return pGlyphRef != nullptr;
 }
 
 /*virtual*/ float HyRichText::GetWidth(float fPercent /*= 1.0f*/) /*override*/
@@ -182,7 +185,7 @@ void HyRichText::SetAsColumn(float fWidth)
 void HyRichText::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/)
 {
 	HySetVec(m_vBoxDimensions, fWidth, fHeight);
-	SetScissor(HyRect(fWidth, fHeight));
+	//SetScissor(HyRect(fWidth, fHeight));
 
 	if(bCenterVertically)
 		m_uiAttribs |= RICHTEXTATTRIB_IsCenterVertically;
@@ -351,17 +354,17 @@ void HyRichText::AssembleRichTextDrawables()
 	float fUsedWidth = 0.0f;
 	bool bIsLoaded = true; // TODO: Store whether it's loaded here before creating any new drawables
 
-	float fLineDescender = 0.0f;
-	float fLineHeight = 32.0f; // 32 is just some default value to fallback to
-	if(m_pTextData)
-	{
-		fLineDescender = m_pTextData->GetLineDescender(uiCurTextState);
-		fLineHeight = m_pTextData->GetLineHeight(uiCurTextState);
-	}
-
 	uint32 uiCurFmtIndex = 0;
 	while(std::getline(ssCleanText, sCurText, '\x7F'))
 	{
+		float fLineDescender = 0.0f;
+		float fLineHeight = 32.0f; // 32 is just some default value to fallback to
+		if(m_pTextData)
+		{
+			fLineDescender = m_pTextData->GetLineDescender(uiCurTextState);
+			fLineHeight = m_pTextData->GetLineHeight(uiCurTextState);
+		}
+
 		if(sCurText.empty() == false)
 		{
 			HyText2d *pNewText = HY_NEW HyText2d(m_TextPath, this);
@@ -401,7 +404,6 @@ void HyRichText::AssembleRichTextDrawables()
 				break;
 			}
 
-
 			if(fUsedWidth < ptCurPos.x)
 				fUsedWidth = ptCurPos.x;
 
@@ -419,8 +421,8 @@ void HyRichText::AssembleRichTextDrawables()
 				uiCurTextState = formatChangeList[uiCurFmtIndex].second;
 			else // Otherwise insert sprite
 			{
-				if(m_vBoxDimensions.y != 0.0f)
-					fLineHeight = m_vBoxDimensions.y;
+				//if(GetTextType() == HYTEXT_ScaleBox || GetTextType() == HYTEXT_Box)
+				//	fLineHeight = m_vBoxDimensions.y;
 
 				// Allocate sprite and initialize
 				HySprite2d *pNewSprite = HY_NEW HySprite2d(HyNodePath(formatChangeList[uiCurFmtIndex].first.c_str()), this);
@@ -432,14 +434,14 @@ void HyRichText::AssembleRichTextDrawables()
 
 				// Determine sprite scale with remaining room left on line
 				float fScaleX = pNewSprite->GetStateWidth(pNewSprite->GetState());
-				if(m_vBoxDimensions.x != 0.0f)
+				if(GetTextType() == HYTEXT_Box || GetTextType() == HYTEXT_Column) // NOTE: Don't check ScaleBox because that will be scaled to fit after assembling at full size
 					fScaleX = (m_vBoxDimensions.x - ptCurPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
 				float fScaleY = fLineHeight / pNewSprite->GetStateHeight(pNewSprite->GetState());
 				
 				pNewSprite->scale.Set(HyMath::Min(fScaleX, fScaleY));
 
 				// If there's limited horizontal space, determine if this sprite will not fit in the remaining space on this text line
-				if(m_vBoxDimensions.x != 0.0f &&
+				if(GetTextType() == HYTEXT_Box || GetTextType() == HYTEXT_Column && // NOTE: Don't check ScaleBox because that will be scaled to fit after assembling at full size
 					((ptCurPos.x + pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X())) >= (m_vBoxDimensions.x - 1))) // the -1 should help with scale floating point above
 				{
 					fUsedWidth = m_vBoxDimensions.x;
@@ -484,14 +486,32 @@ void HyRichText::AssembleRichTextDrawables()
 	}
 	m_DrawableList = newDrawableList;
 
+	float fUsedHeight = std::fabs(ptCurPos.y) + m_fColumnLineHeightOffset;
+
+	if(GetTextType() == HYTEXT_ScaleBox)
+	{
+		// Scale all drawables to fit within the box
+		float fScaleAmt = HyMath::Min(m_vBoxDimensions.x / fUsedWidth, m_vBoxDimensions.y / fUsedHeight);
+		for(auto pDrawable : m_DrawableList)
+		{
+			if(pDrawable->GetType() == HYTYPE_Sprite)
+			{
+				pDrawable->pos.Set(pDrawable->pos.Get() * fScaleAmt);
+				pDrawable->scale.Set(pDrawable->scale.GetX() * fScaleAmt, pDrawable->scale.GetY() * fScaleAmt);
+			}
+			else
+				pDrawable->scale.Set(fScaleAmt);
+
+			if(IsCenterVertically())
+				pDrawable->pos.Offset(0.0f, m_vBoxDimensions.y * 0.5f);
+		}
+	}
+
 	// Ensure m_vBoxDimensions has the correct dimensions
 	if(m_vBoxDimensions.x == 0.0f)
 		m_vBoxDimensions.x = fUsedWidth;
 	if(m_vBoxDimensions.y == 0.0f)
-	{
-		m_vBoxDimensions.y = std::fabs(ptCurPos.y);
-		m_vBoxDimensions.y += m_fColumnLineHeightOffset;// std::fabs(pTextData->GetLineDescender(uiCurTextState)
-	}
+		m_vBoxDimensions.y = fUsedHeight;
 
 	// Inform everwhere that *this has been updated
 	SetDirty(IHyNode::DIRTY_SceneAABB);
