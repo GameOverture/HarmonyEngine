@@ -195,7 +195,7 @@ void ShapeCtrl::SetAsText(HyText2d *pTextNode, bool bShowOutline, HyCamera2d *pC
 	if(pTextNode->IsLine())
 	{
 		Setup(SHAPE_LineSegment, color, 0.0f, fOutlineAlpha);
-		switch(pTextNode->GetTextAlignment())
+		switch(pTextNode->GetAlignment())
 		{
 		case HYALIGN_Left:
 		case HYALIGN_Justify:

@@ -93,5 +93,5 @@ void TextDraw::SetPreviewText()
 		"1234567890 !\"#$%&'()*+,-./\\[]^_`{|}~:;<=>?@\n" <<
 		sAdditionalGlyphs.toStdString().c_str());
 	
-	m_Text.SetTextAlignment(HYALIGN_Center);
+	m_Text.SetAlignment(HYALIGN_Center);
 }

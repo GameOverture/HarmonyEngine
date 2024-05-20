@@ -637,7 +637,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 				if(textObj.contains("Text"))
 					pTextNode->SetText(textObj["Text"].toString().toStdString());
 				if(textObj.contains("Alignment"))
-					pTextNode->SetTextAlignment(HyGlobal::GetAlignmentFromString(textObj["Alignment"].toString()));
+					pTextNode->SetAlignment(HyGlobal::GetAlignmentFromString(textObj["Alignment"].toString()));
 				if(textObj.contains("Monospaced Digits"))
 					pTextNode->SetMonospacedDigits(textObj["Monospaced Digits"].toBool());
 				if(textObj.contains("Text Indent"))
