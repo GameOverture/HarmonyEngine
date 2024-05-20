@@ -1063,10 +1063,10 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 				HyAlignment eAlignment = HyGlobal::GetAlignmentFromString(textObj["Alignment"].toString());
 				switch(eAlignment)
 				{
-				case HYALIGN_Left:		sSrc += sCodeName + "SetTextAlignment(HYALIGN_Left);" + sNewLine;	break;
-				case HYALIGN_Center:	sSrc += sCodeName + "SetTextAlignment(HYALIGN_Center);" + sNewLine;	break;
-				case HYALIGN_Right:		sSrc += sCodeName + "SetTextAlignment(HYALIGN_Right);" + sNewLine;	break;
-				case HYALIGN_Justify:	sSrc += sCodeName + "SetTextAlignment(HYALIGN_Justify);" + sNewLine;break;
+				case HYALIGN_Left:		sSrc += sCodeName + "SetAlignment(HYALIGN_Left);" + sNewLine;	break;
+				case HYALIGN_Center:	sSrc += sCodeName + "SetAlignment(HYALIGN_Center);" + sNewLine;	break;
+				case HYALIGN_Right:		sSrc += sCodeName + "SetAlignment(HYALIGN_Right);" + sNewLine;	break;
+				case HYALIGN_Justify:	sSrc += sCodeName + "SetAlignment(HYALIGN_Justify);" + sNewLine;break;
 				}
 			}
 			if(textObj.contains("Monospaced Digits"))
