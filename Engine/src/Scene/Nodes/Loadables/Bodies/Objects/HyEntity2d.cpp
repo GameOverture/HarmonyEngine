@@ -427,6 +427,14 @@ bool HyEntity2d::IsMouseInputEnabled() const
 	return (m_uiAttribs & ENTITYATTRIB_MouseInputEnabled) != 0;
 }
 
+void HyEntity2d::SetMouseInput(bool bEnable)
+{
+	if(bEnable)
+		EnableMouseInput();
+	else
+		DisableMouseInput();
+}
+
 void HyEntity2d::EnableMouseInput()
 {
 	m_uiAttribs |= ENTITYATTRIB_MouseInputEnabled;

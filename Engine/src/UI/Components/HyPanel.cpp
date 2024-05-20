@@ -342,7 +342,7 @@ void HyPanel::ConstructPrimitives()
 {
 	if(m_pPrimParts->m_uiFrameSize > 0)
 	{
-		m_pPrimParts->m_Frame1.SetAsBox(m_vSize.x, m_vSize.y);
+		m_pPrimParts->m_Frame1.SetAsBox(static_cast<float>(m_vSize.x), static_cast<float>(m_vSize.y));
 
 		if(m_pPrimParts->m_uiFrameSize > 1)
 		{

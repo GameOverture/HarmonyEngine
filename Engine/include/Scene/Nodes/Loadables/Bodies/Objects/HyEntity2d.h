@@ -101,6 +101,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// MOUSE INPUT & SHAPES (hitboxes and/or collision)
 	bool IsMouseInputEnabled() const;
+	void SetMouseInput(bool bEnable);
 	void EnableMouseInput();
 	void DisableMouseInput();
 	bool IsMouseHover();

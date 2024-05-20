@@ -18,6 +18,7 @@
 
 HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
+	m_pTextData(nullptr),
 	m_vBoxDimensions(0.0f),
 	m_eAlignment(HYALIGN_Left),
 	m_fColumnLineHeightOffset(0.0f)
@@ -26,6 +27,7 @@ HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 
 HyRichText::HyRichText(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
+	m_pTextData(nullptr),
 	m_vBoxDimensions(0.0f),
 	m_eAlignment(HYALIGN_Left),
 	m_fColumnLineHeightOffset(0.0f)
@@ -35,6 +37,7 @@ HyRichText::HyRichText(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nul
 
 HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
+	m_pTextData(nullptr),
 	m_vBoxDimensions(0.0f),
 	m_eAlignment(HYALIGN_Left),
 	m_fColumnLineHeightOffset(0.0f)
@@ -44,6 +47,7 @@ HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 
 HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
+	m_pTextData(nullptr),
 	m_vBoxDimensions(0.0f),
 	m_eAlignment(HYALIGN_Left),
 	m_fColumnLineHeightOffset(0.0f)
@@ -123,6 +127,13 @@ void HyRichText::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	m_Panel.Setup(panelInit);
 	m_TextPath = textNodePath;
 	m_TextMargins = textMargins;
+
+	HyText2d *pTempNewText = HY_NEW HyText2d(m_TextPath, this);
+	m_pTextData = static_cast<const HyTextData *>(pTempNewText->AcquireData());
+	if(m_pTextData == nullptr)
+		HyLogWarning("HyRichText could not acquire data for text: " << pTempNewText->GetPrefix() << "/" << pTempNewText->GetName());
+	delete pTempNewText;
+
 
 	SetAsEnabled(IsEnabled());
 
@@ -338,64 +349,67 @@ void HyRichText::AssembleRichTextDrawables()
 	uint32 uiCurTextState = 0;
 	glm::vec2 ptCurPos(0.0f, 0.0f);
 	float fUsedWidth = 0.0f;
-	bool bIsLoaded = true;// IsLoaded(); // Store whether it's loaded here before creating any new drawables
+	bool bIsLoaded = true; // TODO: Store whether it's loaded here before creating any new drawables
+
+	float fLineDescender = 0.0f;
+	float fLineHeight = 32.0f; // 32 is just some default value to fallback to
+	if(m_pTextData)
+	{
+		fLineDescender = m_pTextData->GetLineDescender(uiCurTextState);
+		fLineHeight = m_pTextData->GetLineHeight(uiCurTextState);
+	}
 
 	uint32 uiCurFmtIndex = 0;
 	while(std::getline(ssCleanText, sCurText, '\x7F'))
 	{
-		HyText2d *pNewText = HY_NEW HyText2d(m_TextPath, this);
-		newDrawableList.push_back(pNewText);
-		if(bIsLoaded)
-			pNewText->Load();
-
-		pNewText->SetTextIndent(static_cast<uint32>(ptCurPos.x));
-		pNewText->SetAlignment(m_eAlignment);
-		pNewText->SetMonospacedDigits(IsMonospacedDigits());
-		pNewText->SetState(uiCurTextState);
-		pNewText->SetText(sCurText);
-		pNewText->pos.Set(0.0f, ptCurPos.y);
-
-		switch(GetTextType())
+		if(sCurText.empty() == false)
 		{
-		case HYTEXT_Line:
-			HySetVec(m_vBoxDimensions, 0.0f, 0.0f);
-			pNewText->SetAsLine();
+			HyText2d *pNewText = HY_NEW HyText2d(m_TextPath, this);
+			newDrawableList.push_back(pNewText);
+			if(bIsLoaded)
+				pNewText->Load();
 
-			ptCurPos.x = pNewText->GetCursorPos().x;
-			ptCurPos.y += pNewText->GetCursorPos().y;
-			break;
+			pNewText->SetTextIndent(static_cast<uint32>(ptCurPos.x));
+			pNewText->SetAlignment(m_eAlignment);
+			pNewText->SetMonospacedDigits(IsMonospacedDigits());
+			pNewText->SetState(uiCurTextState);
+			pNewText->SetText(sCurText);
+			pNewText->pos.Set(0.0f, ptCurPos.y);
 
-		case HYTEXT_Column:
-			m_vBoxDimensions.y = 0.0f;
-			pNewText->SetAsColumn(m_vBoxDimensions.x);
+			switch(GetTextType())
+			{
+			case HYTEXT_Line:
+				HySetVec(m_vBoxDimensions, 0.0f, 0.0f);
+			case HYTEXT_ScaleBox: // ScaleBox is treated as a line, because it will be scaled to fit the box after all IHyDrawable's are created
+				pNewText->SetAsLine();
 
-			ptCurPos.x = pNewText->GetCursorPos().x;
-			ptCurPos.y += pNewText->GetCursorPos().y;
-			break;
-			
-		case HYTEXT_Box:
-			pNewText->SetAsBox(m_vBoxDimensions.x, m_vBoxDimensions.y, IsCenterVertically());
+				ptCurPos.x = pNewText->GetCursorPos().x;
+				ptCurPos.y += pNewText->GetCursorPos().y;
+				break;
 
-			ptCurPos.x = pNewText->GetCursorPos().x; // Only update X
-			break;
+			case HYTEXT_Column:
+				m_vBoxDimensions.y = 0.0f;
+			case HYTEXT_Box: // Box is treated as a column, because it will be cropped to fit the box after all IHyDrawable's are created
+				pNewText->SetAsColumn(m_vBoxDimensions.x);
 
-		case HYTEXT_ScaleBox:
-			pNewText->SetAsScaleBox(m_vBoxDimensions.x, m_vBoxDimensions.y, IsCenterVertically());
-			ptCurPos.x = pNewText->GetCursorPos().x; // Only update X
-			break;
+				ptCurPos.x = pNewText->GetCursorPos().x;
+				ptCurPos.y += pNewText->GetCursorPos().y;
+				break;
 
-		default:
-			HyLogError("HyRichText::AssembleDrawables() - Unhandled text type: " << GetTextType());
-			break;
+			default:
+				HyLogError("HyRichText::AssembleDrawables() - Unhandled text type: " << GetTextType());
+				break;
+			}
+
+
+			if(fUsedWidth < ptCurPos.x)
+				fUsedWidth = ptCurPos.x;
+
+			// TODO: 'm_fColumnLineHeightOffset' should actually be (I think) the max of first line's height, not the max line height overall
+			const HyTextData *pTextData = static_cast<const HyTextData *>(pNewText->AcquireData());
+			if(sCurText.empty() == false && pTextData)
+				m_fColumnLineHeightOffset = HyMath::Max(m_fColumnLineHeightOffset, pTextData->GetLineHeight(uiCurTextState));
 		}
-
-		if(fUsedWidth < ptCurPos.x)
-			fUsedWidth = ptCurPos.x;
-
-		// TODO: 'm_fColumnLineHeightOffset' should actually be (I think) the max of first line's height, not the max line height overall
-		const HyTextData *pTextData = static_cast<const HyTextData *>(pNewText->AcquireData());
-		if(sCurText.empty() == false && pTextData)
-			m_fColumnLineHeightOffset = HyMath::Max(m_fColumnLineHeightOffset, pTextData->GetLineHeight(uiCurTextState));
 
 		// Handle next format change
 		if(uiCurFmtIndex < formatChangeList.size())
@@ -405,18 +419,6 @@ void HyRichText::AssembleRichTextDrawables()
 				uiCurTextState = formatChangeList[uiCurFmtIndex].second;
 			else // Otherwise insert sprite
 			{
-				float fLineDescender = 0.0f;
-				float fLineHeight = 32.0f; // 32 is just some default value to fallback to
-
-				const HyTextData *pTextData = static_cast<const HyTextData *>(pNewText->AcquireData());
-				if(pTextData)
-				{
-					fLineDescender = pTextData->GetLineDescender(uiCurTextState);
-					fLineHeight = pTextData->GetLineHeight(uiCurTextState);
-				}
-				else
-					HyLogWarning("HyRichText could not acquire data for text: " << pNewText->GetPrefix() << "/" << pNewText->GetName());
-
 				if(m_vBoxDimensions.y != 0.0f)
 					fLineHeight = m_vBoxDimensions.y;
 

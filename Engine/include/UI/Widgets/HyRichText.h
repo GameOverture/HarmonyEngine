@@ -34,10 +34,12 @@ protected:
 	static_assert((int)RICHTEXTATTRIB_IsDirty == (int)WIDGETATTRIB_NEXTFLAG, "HyRichText is not matching with base classes attrib flags");
 
 	HyNodePath						m_TextPath;
+	const HyTextData *				m_pTextData;
 	
 	HyMargins<float>				m_TextMargins;
 	glm::vec2						m_vBoxDimensions;
 	HyAlignment						m_eAlignment;
+
 	float							m_fColumnLineHeightOffset;
 
 	std::string						m_sRichText;
