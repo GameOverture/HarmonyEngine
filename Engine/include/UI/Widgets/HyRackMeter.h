@@ -82,7 +82,7 @@ public:
 	bool IsRacking();
 
 	bool IsShowAsCash();
-	void ShowAsCash(bool bShow);
+	virtual void ShowAsCash(bool bShow);
 
 	bool IsSpinningMeter();
 	void SetAsSpinningMeter(bool bSet);
