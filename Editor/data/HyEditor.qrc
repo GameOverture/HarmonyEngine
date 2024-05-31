@@ -264,5 +264,6 @@
         <file>icons16x16/items/Shader-Pending.png</file>
         <file>icons16x16/items/Shader-Settings.png</file>
         <file>icons16x16/items/Shader-Warning.png</file>
+        <file>icons16x16/tween-Break.png</file>
     </qresource>
 </RCC>

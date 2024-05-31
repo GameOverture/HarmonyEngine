@@ -240,9 +240,10 @@ class EntityUndoCmd_PasteKeyFrames : public QUndoCommand
 	EntityDopeSheetScene &					m_DopeSheetSceneRef;
 	EntityTreeItemData *					m_pItemData;
 	QJsonObject								m_PasteMimeObject;
+	int										m_iStartFrameIndex;
 
 public:
-	EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, const QJsonObject &pasteKeyFrameObj, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, const QJsonObject &pasteKeyFrameObj, int iStartFrameIndex, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_PasteKeyFrames();
 
 	virtual void redo() override;
@@ -311,16 +312,28 @@ public:
 class EntityUndoCmd_ConvertToTween : public QUndoCommand
 {
 	EntityDopeSheetScene &					m_DopeSheetSceneRef;
-	EntityTreeItemData *					m_pItemData;
-	TweenProperty							m_eTweenProp;
-	
-	int										m_iStartFrameIndex;
-	int										m_iEndFrameIndex;
-	QJsonValue								m_DestinationValue;
+	QList<ContextTweenData>					m_ContextTweenDataList;
 
 public:
-	EntityUndoCmd_ConvertToTween(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, TweenProperty eTweenProp, int iStartFrameIndex, int iEndFrameIndex, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_ConvertToTween(EntityDopeSheetScene &entityDopeSheetSceneRef, QList<ContextTweenData> contextTweenDataList, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_ConvertToTween();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_BreakTween : public QUndoCommand
+{
+	EntityDopeSheetScene &				m_DopeSheetSceneRef;
+	QList<ContextTweenData>				m_BreakTweenDataList;
+
+	QList<QJsonValue>					m_TweenFuncValueList;
+
+public:
+	EntityUndoCmd_BreakTween(EntityDopeSheetScene &entityDopeSheetSceneRef, QList<ContextTweenData> breakTweenDataList, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_BreakTween();
 
 	virtual void redo() override;
 	virtual void undo() override;
@@ -344,23 +357,6 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_RenameCallback : public QUndoCommand
-{
-	EntityDopeSheetScene &					m_DopeSheetSceneRef;
-	int										m_iFrameIndex;
-	QString									m_sOldCallback;
-	QString									m_sNewCallback;
-
-public:
-	EntityUndoCmd_RenameCallback(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, QString sOldCallback, QString sNewCallback, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_RenameCallback();
-
-	virtual void redo() override;
-	virtual void undo() override;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class EntityUndoCmd_RemoveEvent : public QUndoCommand
 {
 	EntityDopeSheetScene &					m_DopeSheetSceneRef;
@@ -370,6 +366,23 @@ class EntityUndoCmd_RemoveEvent : public QUndoCommand
 public:
 	EntityUndoCmd_RemoveEvent(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, QString sSerializedEvent, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_RemoveEvent();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_RenameCallback : public QUndoCommand
+{
+	EntityDopeSheetScene &m_DopeSheetSceneRef;
+	int										m_iFrameIndex;
+	QString									m_sOldCallback;
+	QString									m_sNewCallback;
+
+public:
+	EntityUndoCmd_RenameCallback(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, QString sOldCallback, QString sNewCallback, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_RenameCallback();
 
 	virtual void redo() override;
 	virtual void undo() override;

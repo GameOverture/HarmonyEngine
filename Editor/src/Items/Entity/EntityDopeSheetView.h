@@ -63,6 +63,9 @@ protected:
 
 	virtual bool event(QEvent *pEvent) override;
 
+	virtual void keyPressEvent(QKeyEvent *pEvent) override;
+	virtual void keyReleaseEvent(QKeyEvent *pEvent) override;
+
 	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
 	virtual void mousePressEvent(QMouseEvent *pEvent) override;
 	virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;

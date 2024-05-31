@@ -750,16 +750,20 @@ EntityUndoCmd_PackToArray::EntityUndoCmd_PackToArray(ProjectItemData &entityItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, const QJsonObject &pasteKeyFrameObj, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, const QJsonObject &pasteKeyFrameObj, int iStartFrameIndex, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
 	m_pItemData(pItemData),
-	m_PasteMimeObject(pasteKeyFrameObj)
+	m_PasteMimeObject(pasteKeyFrameObj),
+	m_iStartFrameIndex(iStartFrameIndex)
 {
 	if(m_pItemData == nullptr)
 		HyGuiLog("EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames pItemData is nullptr", LOGTYPE_Error);
 
-	setText("Paste Key Frames");
+	if(m_iStartFrameIndex < 0)
+		setText("Paste Key Frames");
+	else
+		setText("Paste Key Frames at frame " % QString::number(m_iStartFrameIndex));
 }
 
 /*virtual*/ EntityUndoCmd_PasteKeyFrames::~EntityUndoCmd_PasteKeyFrames()
@@ -768,12 +772,12 @@ EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene 
 
 /*virtual*/ void EntityUndoCmd_PasteKeyFrames::redo() /*override*/
 {
-	m_DopeSheetSceneRef.PasteSerializedKeyFrames(m_pItemData, m_PasteMimeObject);
+	m_DopeSheetSceneRef.PasteSerializedKeyFrames(m_pItemData, m_PasteMimeObject, m_iStartFrameIndex);
 }
 
 /*virtual*/ void EntityUndoCmd_PasteKeyFrames::undo() /*override*/
 {
-	m_DopeSheetSceneRef.UnpasteSerializedKeyFrames(m_pItemData, m_PasteMimeObject);
+	m_DopeSheetSceneRef.UnpasteSerializedKeyFrames(m_pItemData, m_PasteMimeObject, m_iStartFrameIndex);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1012,24 +1016,29 @@ EntityUndoCmd_NudgeTweenDuration::EntityUndoCmd_NudgeTweenDuration(EntityDopeShe
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_ConvertToTween::EntityUndoCmd_ConvertToTween(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, TweenProperty eTweenProp, int iStartFrameIndex, int iEndFrameIndex, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_ConvertToTween::EntityUndoCmd_ConvertToTween(EntityDopeSheetScene &entityDopeSheetSceneRef, QList<ContextTweenData> contextTweenDataList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
-	m_pItemData(pItemData),
-	m_eTweenProp(eTweenProp),
-	m_iStartFrameIndex(iStartFrameIndex),
-	m_iEndFrameIndex(iEndFrameIndex)
+	m_ContextTweenDataList(contextTweenDataList)
 {
-	setText("Create " % HyGlobal::TweenPropName(m_eTweenProp) % " Tween");
-	QPair<QString, QString> propPair = HyGlobal::ConvertTweenPropToRegularPropPair(m_eTweenProp);
+	bool bMultiPropertyType = std::any_of(m_ContextTweenDataList.begin(), m_ContextTweenDataList.end(), [this](const ContextTweenData &contextTweenData) { return contextTweenData.m_eTweenProperty != m_ContextTweenDataList[0].m_eTweenProperty; });
 
-	if(m_DopeSheetSceneRef.ContainsKeyFrameProperty(KeyFrameKey(m_pItemData, m_iEndFrameIndex, propPair.first % '/' % propPair.second)) == false)
-	{
-		HyGuiLog("EntityUndoCmd_ConvertToTween::EntityUndoCmd_ConvertToTween() - Destination key frame must be a valid (non-tween) property", LOGTYPE_Error);
-		return;
-	}
-
-	m_DestinationValue = m_DopeSheetSceneRef.GetKeyFrameProperty(m_pItemData, m_iEndFrameIndex, propPair.first, propPair.second);
+	if(bMultiPropertyType)
+		setText("Convert to Multiple Tweens");
+	else if(contextTweenDataList.size() == 1)
+		setText("Convert to " % HyGlobal::TweenPropName(contextTweenDataList[0].m_eTweenProperty) % " Tween");
+	else
+		setText("Convert to Multiple " % HyGlobal::TweenPropName(contextTweenDataList[0].m_eTweenProperty) % " Tweens");
+		
+	//// Populate m_DestinationValuesList to be used with undo
+	//for(const ContextTweenData &contextTweenData : m_ContextTweenDataList)
+	//{
+	//	QPair<QString, QString> propPair = HyGlobal::ConvertTweenPropToRegularPropPair(contextTweenData.m_eTweenProperty);
+	//	if(m_DopeSheetSceneRef.ContainsKeyFrameProperty(KeyFrameKey(contextTweenData.m_pTreeItemData, contextTweenData.m_iEndFrame, propPair.first % '/' % propPair.second)) == false)
+	//		HyGuiLog("EntityUndoCmd_ConvertToTween::EntityUndoCmd_ConvertToTween() - Destination key frame must be a valid (non-tween) property", LOGTYPE_Error);
+	//	else
+	//		m_DestinationValuesList.push_back(m_DopeSheetSceneRef.GetKeyFrameProperty(contextTweenData.m_pTreeItemData, contextTweenData.m_iEndFrame, propPair.first, propPair.second));
+	//}
 }
 
 /*virtual*/ EntityUndoCmd_ConvertToTween::~EntityUndoCmd_ConvertToTween()
@@ -1038,20 +1047,81 @@ EntityUndoCmd_ConvertToTween::EntityUndoCmd_ConvertToTween(EntityDopeSheetScene 
 
 /*virtual*/ void EntityUndoCmd_ConvertToTween::redo() /*override*/
 {
-	QPair<QString, QString> propPair = HyGlobal::ConvertTweenPropToRegularPropPair(m_eTweenProp);
-	m_DopeSheetSceneRef.RemoveKeyFrameProperty(m_pItemData, m_iEndFrameIndex, propPair.first, propPair.second, false);
+	for(int i = 0; i < m_ContextTweenDataList.size(); ++i)
+	{
+		const ContextTweenData &contextTweenData = m_ContextTweenDataList[i];
 
-	double dDuration = (m_iEndFrameIndex - m_iStartFrameIndex) * (1.0 / static_cast<EntityModel &>(m_DopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond());
-	TweenJsonValues tweenValues(m_DestinationValue, QJsonValue(dDuration), QJsonValue(HyGlobal::TweenFuncName(TWEENFUNC_Linear)));
-	m_DopeSheetSceneRef.SetKeyFrameTween(m_pItemData, m_iStartFrameIndex, m_eTweenProp, tweenValues, true);
+		QPair<QString, QString> propPair = HyGlobal::ConvertTweenPropToRegularPropPair(contextTweenData.m_eTweenProperty);
+		m_DopeSheetSceneRef.RemoveKeyFrameProperty(contextTweenData.m_pTreeItemData, contextTweenData.m_iEndFrame, propPair.first, propPair.second, false);
+
+		double dDuration = (contextTweenData.m_iEndFrame - contextTweenData.m_iStartFrame) * (1.0 / static_cast<EntityModel &>(m_DopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond());
+		TweenJsonValues tweenValues(contextTweenData.m_EndValue, QJsonValue(dDuration), QJsonValue(HyGlobal::TweenFuncName(TWEENFUNC_Linear)));
+		m_DopeSheetSceneRef.SetKeyFrameTween(contextTweenData.m_pTreeItemData, contextTweenData.m_iStartFrame, contextTweenData.m_eTweenProperty, tweenValues, i == (m_ContextTweenDataList.size() - 1));
+	}
 }
 
 /*virtual*/ void EntityUndoCmd_ConvertToTween::undo() /*override*/
 {
-	m_DopeSheetSceneRef.RemoveKeyFrameTween(m_pItemData, m_iStartFrameIndex, m_eTweenProp, false);
+	for(int i = 0; i < m_ContextTweenDataList.size(); ++i)
+	{
+		const ContextTweenData &contextTweenData = m_ContextTweenDataList[i];
 
-	QPair<QString, QString> propPair = HyGlobal::ConvertTweenPropToRegularPropPair(m_eTweenProp);
-	m_DopeSheetSceneRef.SetKeyFrameProperty(m_pItemData, m_iEndFrameIndex, propPair.first, propPair.second, m_DestinationValue, true);
+		m_DopeSheetSceneRef.RemoveKeyFrameTween(contextTweenData.m_pTreeItemData, contextTweenData.m_iStartFrame, contextTweenData.m_eTweenProperty, false);
+		
+		QPair<QString, QString> propPair = HyGlobal::ConvertTweenPropToRegularPropPair(contextTweenData.m_eTweenProperty);
+		m_DopeSheetSceneRef.SetKeyFrameProperty(contextTweenData.m_pTreeItemData, contextTweenData.m_iEndFrame, propPair.first, propPair.second, contextTweenData.m_EndValue, i == (m_ContextTweenDataList.size() - 1));
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_BreakTween::EntityUndoCmd_BreakTween(EntityDopeSheetScene &entityDopeSheetSceneRef, QList<ContextTweenData> breakTweenDataList, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_BreakTweenDataList(breakTweenDataList)
+{
+	if(m_BreakTweenDataList.size() == 1)
+		setText("Break Tween");
+	else
+		setText("Break Tweens");
+
+	// Store the original tween types in m_TweenFuncValueList to be used with undo
+	for(const ContextTweenData &contextTweenData : m_BreakTweenDataList)
+		m_TweenFuncValueList.push_back(m_DopeSheetSceneRef.GetTweenJsonValues(contextTweenData.m_pTreeItemData, contextTweenData.m_iStartFrame, contextTweenData.m_eTweenProperty).m_TweenFuncType);
+}
+
+/*virtual*/ EntityUndoCmd_BreakTween::~EntityUndoCmd_BreakTween()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_BreakTween::redo() /*override*/
+{
+	for(int i = 0; i < m_BreakTweenDataList.size(); ++i)
+	{
+		const ContextTweenData &contextTweenData = m_BreakTweenDataList[i];
+		m_DopeSheetSceneRef.RemoveKeyFrameTween(contextTweenData.m_pTreeItemData, contextTweenData.m_iStartFrame, contextTweenData.m_eTweenProperty, false);
+		
+		QPair<QString, QString> propPair = HyGlobal::ConvertTweenPropToRegularPropPair(contextTweenData.m_eTweenProperty);
+		if(contextTweenData.m_StartValue.isUndefined() == false)
+			m_DopeSheetSceneRef.SetKeyFrameProperty(contextTweenData.m_pTreeItemData, contextTweenData.m_iStartFrame, propPair.first, propPair.second, contextTweenData.m_StartValue, false);
+		m_DopeSheetSceneRef.SetKeyFrameProperty(contextTweenData.m_pTreeItemData, contextTweenData.m_iEndFrame, propPair.first, propPair.second, contextTweenData.m_EndValue, i == (m_BreakTweenDataList.size() - 1));
+	}
+}
+
+/*virtual*/ void EntityUndoCmd_BreakTween::undo() /*override*/
+{
+	for(int i = 0; i < m_BreakTweenDataList.size(); ++i)
+	{
+		const ContextTweenData &contextTweenData = m_BreakTweenDataList[i];
+		
+		QPair<QString, QString> propPair = HyGlobal::ConvertTweenPropToRegularPropPair(contextTweenData.m_eTweenProperty);
+		m_DopeSheetSceneRef.RemoveKeyFrameProperty(contextTweenData.m_pTreeItemData, contextTweenData.m_iStartFrame, propPair.first, propPair.second, false);
+		m_DopeSheetSceneRef.RemoveKeyFrameProperty(contextTweenData.m_pTreeItemData, contextTweenData.m_iEndFrame, propPair.first, propPair.second, false);
+
+		double dDuration = (contextTweenData.m_iEndFrame - contextTweenData.m_iStartFrame) * (1.0 / static_cast<EntityModel &>(m_DopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond());
+		TweenJsonValues tweenValues(contextTweenData.m_EndValue, QJsonValue(dDuration), m_TweenFuncValueList[i]);
+		m_DopeSheetSceneRef.SetKeyFrameTween(contextTweenData.m_pTreeItemData, contextTweenData.m_iStartFrame, contextTweenData.m_eTweenProperty, tweenValues, i == (m_BreakTweenDataList.size() - 1));
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1080,7 +1150,38 @@ EntityUndoCmd_AddEvent::EntityUndoCmd_AddEvent(EntityDopeSheetScene &entityDopeS
 
 /*virtual*/ void EntityUndoCmd_AddEvent::undo() /*override*/
 {
-	m_DopeSheetSceneRef.RemoveEvent(m_iFrameIndex, m_sSerializedEvent);
+	DopeSheetEventType eDopeEventType = DopeSheetEvent::GetTypeFromSerialized(m_sSerializedEvent);
+
+	m_DopeSheetSceneRef.RemoveEvent(m_iFrameIndex, eDopeEventType);
+	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_RemoveEvent::EntityUndoCmd_RemoveEvent(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, QString sSerializedEvent, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
+	m_iFrameIndex(iFrameIndex),
+	m_sSerializedEvent(sSerializedEvent)
+{
+	setText("Remove " % m_sSerializedEvent % " Callback");
+}
+
+/*virtual*/ EntityUndoCmd_RemoveEvent::~EntityUndoCmd_RemoveEvent()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_RemoveEvent::redo() /*override*/
+{
+	DopeSheetEventType eDopeEventType = DopeSheetEvent::GetTypeFromSerialized(m_sSerializedEvent);
+
+	m_DopeSheetSceneRef.RemoveEvent(m_iFrameIndex, eDopeEventType);
+	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
+}
+
+/*virtual*/ void EntityUndoCmd_RemoveEvent::undo() /*override*/
+{
+	m_DopeSheetSceneRef.SetEvent(m_iFrameIndex, m_sSerializedEvent);
 	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
 }
 
@@ -1095,7 +1196,7 @@ EntityUndoCmd_RenameCallback::EntityUndoCmd_RenameCallback(EntityDopeSheetScene 
 {
 	if(m_sOldCallback.isEmpty() || m_sNewCallback.isEmpty())
 		HyGuiLog("EntityUndoCmd_RenameCallback::EntityUndoCmd_RenameCallback() - Callback name cannot be empty", LOGTYPE_Error);
-	
+
 	setText("Rename " % m_sOldCallback % " Callback");
 }
 
@@ -1112,36 +1213,6 @@ EntityUndoCmd_RenameCallback::EntityUndoCmd_RenameCallback(EntityDopeSheetScene 
 /*virtual*/ void EntityUndoCmd_RenameCallback::undo() /*override*/
 {
 	m_DopeSheetSceneRef.RenameCallback(m_iFrameIndex, m_sNewCallback, m_sOldCallback);
-	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-EntityUndoCmd_RemoveEvent::EntityUndoCmd_RemoveEvent(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameIndex, QString sSerializedEvent, QUndoCommand *pParent /*= nullptr*/) :
-	QUndoCommand(pParent),
-	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
-	m_iFrameIndex(iFrameIndex),
-	m_sSerializedEvent(sSerializedEvent)
-{
-	if(m_sSerializedEvent.isEmpty())
-		HyGuiLog("EntityUndoCmd_RemoveEvent::EntityUndoCmd_RemoveEvent() - serialized event name cannot be empty", LOGTYPE_Error);
-
-	setText("Remove " % m_sSerializedEvent % " Callback");
-}
-
-/*virtual*/ EntityUndoCmd_RemoveEvent::~EntityUndoCmd_RemoveEvent()
-{
-}
-
-/*virtual*/ void EntityUndoCmd_RemoveEvent::redo() /*override*/
-{
-	m_DopeSheetSceneRef.RemoveEvent(m_iFrameIndex, m_sSerializedEvent);
-	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
-}
-
-/*virtual*/ void EntityUndoCmd_RemoveEvent::undo() /*override*/
-{
-	m_DopeSheetSceneRef.SetEvent(m_iFrameIndex, m_sSerializedEvent);
 	static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->UpdateWidgets();
 }
 

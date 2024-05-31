@@ -5,7 +5,7 @@
  *	Copyright (c) 2013 Jason Knobler
  *
  *	Harmony License:
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *	https://github.com/GameOverture/HarmonyEngine/blob/main/LICENSE
  *************************************************************************/
 #ifndef HyText2d_h__
 #define HyText2d_h__
@@ -31,6 +31,10 @@ public:
 	const HyText2d &operator=(const HyText2d &rhs);
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
+
+#ifdef HY_USE_TEXT_DEBUG_BOXES
+	virtual void ShowDebugBox(bool bShow) override;
+#endif
 
 protected:
 #ifdef HY_USE_TEXT_DEBUG_BOXES

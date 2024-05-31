@@ -5,7 +5,7 @@
  *	Copyright (c) 2013 Jason Knobler
  *
  *	Harmony License:
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *	https://github.com/GameOverture/HarmonyEngine/blob/main/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
@@ -67,6 +67,11 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 }
 
 #ifdef HY_USE_TEXT_DEBUG_BOXES
+/*virtual*/ void HyText2d::ShowDebugBox(bool bShow) /*override*/
+{
+	m_DebugBox.alpha.Set(bShow ? 1.0f : 0.0f);
+}
+
 /*virtual*/ void HyText2d::OnSetDebugBox() /*override*/
 {
 	m_DebugBox.SetTint(HyColor::Red);

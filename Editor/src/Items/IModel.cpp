@@ -75,18 +75,28 @@ int IModel::GetNumStates() const
 
 IStateData *IModel::GetStateData(int iStateIndex)
 {
+	if(iStateIndex < 0 || iStateIndex >= m_StateList.size())
+		return nullptr;
 	return m_StateList[iStateIndex];
 }
 
 
 const IStateData *IModel::GetStateData(int iStateIndex) const
 {
+	if(iStateIndex < 0 || iStateIndex >= m_StateList.size())
+		return nullptr;
 	return m_StateList[iStateIndex];
 }
 
 FileDataPair IModel::GetStateFileData(uint32 uiIndex) const
 {
 	FileDataPair stateFileData;
+	if(uiIndex >= m_StateList.size())
+	{
+		HyGuiLog("IModel::GetStateFileData() out of bounds", LOGTYPE_Error);
+		return stateFileData;
+	}
+
 	stateFileData.m_Meta.insert("name", m_StateList[uiIndex]->GetName());
 	InsertStateSpecificData(uiIndex, stateFileData);
 

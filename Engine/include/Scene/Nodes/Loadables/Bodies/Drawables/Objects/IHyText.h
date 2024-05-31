@@ -180,6 +180,10 @@ public:
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;
 
+#ifdef HY_USE_TEXT_DEBUG_BOXES
+	virtual void ShowDebugBox(bool bShow) = 0;
+#endif
+
 protected:
 #ifdef HY_USE_TEXT_DEBUG_BOXES
 	virtual void OnSetDebugBox() = 0;

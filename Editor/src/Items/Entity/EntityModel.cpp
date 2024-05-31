@@ -781,7 +781,7 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 				{
 					// Process the event
 					DopeSheetEvent dopeSheetEvent(sEvent);
-					switch(dopeSheetEvent.m_eType)
+					switch(dopeSheetEvent.GetDopeEventType())
 					{
 					case DOPEEVENT_Callback:
 						sSrc += sEvent + "();\n\t\t\t\t";
@@ -794,15 +794,19 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 						break;
 
 					case DOPEEVENT_GotoFrame:
-						sSrc += "SetTimelineFrame(" + dopeSheetEvent.m_sData + ");\n\t\t\t\t";
+						sSrc += "SetTimelineFrame(" + dopeSheetEvent.GetOptionalData() + ");\n\t\t\t\t";
 						if(iFinalFrame == iFrameIndex)
 						{
 							// If this is the final frame, it must be going to a previous frame
-							if(dopeSheetEvent.m_sData.toInt() >= iFinalFrame)
+							if(dopeSheetEvent.GetOptionalData().toInt() >= iFinalFrame)
 								HyGuiLog("EntityModel::GenerateSrc_SetStateImpl - GotoFrame event on final frame must go to a previous frame", LOGTYPE_Error);
 
 							bIsFinalFrameHandled = true;
 						}
+						break;
+
+					case DOPEEVENT_GotoState:
+						sSrc += "SetState(" + dopeSheetEvent.GetOptionalData() + ");\n\t\t\t\t";
 						break;
 
 					default:

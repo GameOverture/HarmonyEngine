@@ -277,7 +277,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 
 	std::function<void(DopeSheetEvent, int, float)> fpPaintEvent = [&](DopeSheetEvent dopeSheetEvent, int iFrameIndex, float fX)
 	{
-		switch(dopeSheetEvent.m_eType)
+		switch(dopeSheetEvent.GetDopeEventType())
 		{ 
 		case DOPEEVENT_Callback:
 			pPainter->translate(fX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f));
@@ -298,7 +298,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		case DOPEEVENT_GotoFrame: {
 			QSize iconSize(16, 16);
 			QPoint pt = QPoint(fX - (iconSize.width() / 2) + 1.0f, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f) - iconSize.width());
-			int iGotoFrameIndex = dopeSheetEvent.m_sData.toInt();
+			int iGotoFrameIndex = dopeSheetEvent.GetOptionalData().toInt();
 			if(iGotoFrameIndex > iFrameIndex)
 			{
 				QIcon gotoIcon(":/icons16x16/media-forward.png");
@@ -309,6 +309,13 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 				QIcon gotoIcon(":/icons16x16/media-rewind.png");
 				pPainter->drawPixmap(pt, gotoIcon.pixmap(iconSize.width(), iconSize.height()));
 			}
+			break; }
+
+		case DOPEEVENT_GotoState: {
+			QSize iconSize(16, 16);
+			QIcon gotoIcon(":/icons16x16/items/Entity.png");
+			QPoint pt = QPoint(fX - (iconSize.width() / 2) + 1.0f, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f) - iconSize.width());
+			pPainter->drawPixmap(pt, gotoIcon.pixmap(iconSize.width(), iconSize.height()));
 			break; }
 
 		default:
@@ -400,9 +407,59 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		m_MouseScenePos.setX(0.0f);
 		m_MouseScenePos.setY(0.0f);
 		update();
+
+		if(pEvent->type() == QEvent::HoverEnter)
+			setFocus();
+		else if(pEvent->type() == QEvent::HoverLeave)
+			clearFocus();
 	}
 
 	return QGraphicsView::event(pEvent);
+}
+
+/*virtual*/ void EntityDopeSheetView::keyPressEvent(QKeyEvent *pEvent) /*override*/
+{
+	// WASD to pan the timeline
+	if(pEvent->key() == Qt::Key_A)
+	{
+		horizontalScrollBar()->setValue(horizontalScrollBar()->value() - 10);
+	}
+	else if(pEvent->key() == Qt::Key_D)
+	{
+		horizontalScrollBar()->setValue(horizontalScrollBar()->value() + 10);
+	}
+	else if(pEvent->key() == Qt::Key_W)
+	{
+		verticalScrollBar()->setValue(verticalScrollBar()->value() - 10);
+	}
+	else if(pEvent->key() == Qt::Key_S)
+	{
+		verticalScrollBar()->setValue(verticalScrollBar()->value() + 10);
+	}
+	//else if(pEvent->key() == Qt::Key_Space)
+	//{
+	//	GetScene()->TogglePlay();
+	//}
+	else if(pEvent->key() == Qt::Key_Left)
+	{
+		GetScene()->SetCurrentFrame(GetScene()->GetCurrentFrame() - 1);
+	}
+	else if(pEvent->key() == Qt::Key_Right)
+	{
+		GetScene()->SetCurrentFrame(GetScene()->GetCurrentFrame() + 1);
+	}
+	//else if(pEvent->key() == Qt::Key_Delete)
+	//{
+	//	GetScene()->DeleteSelectedEvents();
+	//}
+	//else if(pEvent->key() == Qt::Key_Escape)
+	//{
+	//	GetScene()->ClearSelectedEvents();
+	//}
+}
+
+/*virtual*/ void EntityDopeSheetView::keyReleaseEvent(QKeyEvent *pEvent) /*override*/
+{
 }
 
 /*virtual*/ void EntityDopeSheetView::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
@@ -414,6 +471,10 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
 		if(m_pAuxDopeSheet)
 			m_pAuxDopeSheet->UpdateWidgets();
+
+		// If 'm_MouseScenePos' is out of view, then scroll the view
+		ensureVisible(m_MouseScenePos.x(), m_MouseScenePos.y(), 1, 1, 0, 0);
+
 
 		pEvent->accept();
 	}

@@ -64,6 +64,7 @@ enum DopeSheetGfxDataKey // NOTE: Order matters, the first 3 are used when acces
 	GFXDATAKEY_Type, // DopeSheetItemType
 };
 
+// A tween represented in JSON format
 struct TweenJsonValues
 {
 	QJsonValue		m_Destination;
@@ -101,6 +102,33 @@ struct TweenJsonValues
 		m_Destination = destVal;
 		m_Duration = durVal;
 		m_TweenFuncType = tweenFuncVal;
+	}
+};
+
+// Upon contextual keyframe selection - This structure holds one quick-tween button that should be shown
+struct ContextTweenData
+{
+	bool					m_bIsBreakTween;
+	EntityTreeItemData *	m_pTreeItemData;
+	TweenProperty			m_eTweenProperty;
+	int						m_iStartFrame;
+	QJsonValue				m_StartValue; // This value may be invalid/null
+	int						m_iEndFrame;
+	QJsonValue				m_EndValue; // This value will always be valid
+
+	ContextTweenData(bool bIsBreakTween, EntityTreeItemData *pTreeItemData, TweenProperty eTweenProperty, int iStartFrame, QJsonValue startValue, int iEndFrame, QJsonValue endValue) :
+		m_bIsBreakTween(bIsBreakTween),
+		m_pTreeItemData(pTreeItemData),
+		m_eTweenProperty(eTweenProperty),
+		m_iStartFrame(iStartFrame),
+		m_StartValue(startValue),
+		m_iEndFrame(iEndFrame),
+		m_EndValue(endValue)
+	{ }
+
+	bool operator <(const ContextTweenData &rhs) const
+	{
+		return m_iStartFrame < rhs.m_iStartFrame;
 	}
 };
 
@@ -147,7 +175,7 @@ class EntityDopeSheetScene : public QGraphicsScene
 	// These maps store the actual property data for the entire entity
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;			// Store properties and tween values
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_PoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added
-	QMap<int, QStringList>															m_EventMap;				// KEY: frame index, VALUE: string that doesn't prefix with '_' is a callback name. Otherwise built in function (ex. _PauseTimeline)
+	QMap<int, QStringList>															m_EventMap;				// KEY: frame index, VALUE: string that doesn't prefix with '_' is a callback name. Otherwise built in function (ex. _PauseTimeline) with an optional '=' delimiter and a value (ex. _GotoFrame=5)
 
 	// These maps store the visual graphics items that correspond to the above maps
 	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_KeyFramesGfxRectMap;
@@ -175,8 +203,9 @@ public:
 	bool ContainsKeyFrameProperty(KeyFrameKey tupleKey);
 	bool ContainsKeyFrameTween(KeyFrameKey tupleKey);
 
-	// Based on currently selected items, this function will determine if a tween can be created, and if so, what type of tween
-	TweenProperty DetermineIfContextQuickTween(EntityTreeItemData *&pTweenTreeItemDataOut, int &iTweenStartFrameOut, int &iTweenEndFrameOut) const;
+	// Based on currently selected keyframes, this function will determine if a tween can be created, and if so, what type of tween
+	// Determines what quick-tween buttons should be shown in the AuxDopeSheet
+	QList<ContextTweenData> DetermineIfContextQuickTween() const;
 
 	// 'm_KeyFrameMap' must be fully updated before using this function
 	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps) const; // This is mainly useful for rendering the dope sheet. 'bCollapseTweenProps' will combine tween properties into a single entry (the regular category/property name)
@@ -194,8 +223,8 @@ public:
 	void RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, bool bRefreshGfxItems);
 	void RemoveKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, bool bRefreshGfxItems);
 
-	void PasteSerializedKeyFrames(EntityTreeItemData *pItemData, QJsonObject keyFrameMimeObj);		// Inserts 'keyFrameMimeObj' frames into 'pItemData'
-	void UnpasteSerializedKeyFrames(EntityTreeItemData *pItemData, QJsonObject keyFrameMimeObj);	// Removes 'keyFrameMimeObj' frames from 'pItemData'
+	void PasteSerializedKeyFrames(EntityTreeItemData *pItemData, QJsonObject keyFrameMimeObj, int iStartFrameIndex);	// Inserts 'keyFrameMimeObj' frames into 'pItemData' - if 'iStartFrameIndex' is not negative, it will offset the paste to start at the specified frame
+	void UnpasteSerializedKeyFrames(EntityTreeItemData *pItemData, QJsonObject keyFrameMimeObj, int iStartFrameIndex);	// Removes 'keyFrameMimeObj' frames from 'pItemData' - if 'iStartFrameIndex' is not negative, it will remove the paste that was offset to start at the specified frame
 	void InsertSerializedKeyFrames(QJsonObject keyFrameMimeObj);									// Inserts 'keyFrameMimeObj' frames into the serialized items
 	void RemoveSerializedKeyFrames(QJsonObject keyFrameMimeObj);									// Removes 'keyFrameMimeObj' frames from the serialized items
 
@@ -208,7 +237,7 @@ public:
 	QJsonArray SerializeEvents() const;
 	QList<DopeSheetEvent> GetEventList(int iFrameIndex) const;
 	bool SetEvent(int iFrameIndex, QString sSerializedEvent);
-	bool RemoveEvent(int iFrameIndex, QString sSerializedEvent);
+	bool RemoveEvent(int iFrameIndex, DopeSheetEventType eDopeEventType);
 	QStringList GetCallbackList(int iFrameIndex) const;
 	bool RenameCallback(int iFrameIndex, QString sOldCallback, QString sNewCallback);
 

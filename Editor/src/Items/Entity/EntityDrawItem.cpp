@@ -447,7 +447,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 			for(const QString &sEvent : eventMap[*eventFrameIter])
 			{
 				DopeSheetEvent dopeSheetEvent(sEvent);
-				switch(dopeSheetEvent.m_eType)
+				switch(dopeSheetEvent.GetDopeEventType())
 				{
 				case DOPEEVENT_Callback:
 					break;
@@ -458,6 +458,10 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 
 				case DOPEEVENT_GotoFrame:
 					HyGuiLog("ExtrapolateProperties() - DOPEEVENT_GotoFrame not implemented", LOGTYPE_Error);
+					break;
+
+				case DOPEEVENT_GotoState:
+					HyGuiLog("ExtrapolateProperties() - DOPEEVENT_GotoState not implemented", LOGTYPE_Error);
 					break;
 
 				default:

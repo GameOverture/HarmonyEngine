@@ -503,7 +503,7 @@ void HyRichText::AssembleRichTextDrawables()
 				pDrawable->scale.Set(fScaleAmt);
 
 			if(IsCenterVertically())
-				pDrawable->pos.Offset(0.0f, m_vBoxDimensions.y * 0.5f);
+				pDrawable->pos.Offset(0.0f, (m_vBoxDimensions.y - m_fColumnLineHeightOffset) * 0.5f);
 		}
 	}
 

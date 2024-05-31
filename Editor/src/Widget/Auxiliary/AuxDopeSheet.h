@@ -25,19 +25,23 @@ class AuxDopeSheet : public QWidget
 	Q_OBJECT
 
 	QDataWidgetMapper		m_WidgetMapper;
-	EntityTreeItemData *	m_pContextTweenTreeItemData;
-	int						m_iContextTweenStartFrame;
-	int						m_iContextTweenEndFrame;
 
+	// These are actions the user can take to manipulate the timeline within the editor.
+	// These are not used to serialize actions to be used during runtime
 	enum ContextActionType
 	{
-		EVENTACTION_CallbackCreate = 0,
-		EVENTACTION_CallbackRename,
-		EVENTACTION_CallbackDelete,
-		EVENTACTION_SelectAllItemKeyFrames,
-		EVENTACTION_DeselectAllKeyFrames,
-		EVENTACTION_PauseTimeline,
-		EVENTACTION_UnpauseTimeline,
+		CONTEXTACTION_CallbackCreate = 0,
+		CONTEXTACTION_CallbackRename,
+		CONTEXTACTION_CallbackDelete,
+		CONTEXTACTION_PauseTimeline,
+		CONTEXTACTION_UnpauseTimeline,
+		CONTEXTACTION_GotoFrame,
+		CONTEXTACTION_RemoveGotoFrame,
+		CONTEXTACTION_GotoState,
+		CONTEXTACTION_RemoveGotoState,
+
+		CONTEXTACTION_SelectAllItemKeyFrames,
+		CONTEXTACTION_DeselectAllKeyFrames,
 	};
 
 public:
@@ -50,7 +54,6 @@ public:
 	void UpdateWidgets();
 
 	QMenu *AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pContextItem, int iContextFrameIndex);
-	QAction *GetTweenAction();
 
 private:
 	Ui::AuxDopeSheet *ui;
@@ -64,6 +67,7 @@ private Q_SLOTS:
 	
 	void OnEventActionTriggered(QAction *pEventAction);
 
+	void on_actionBreakTween_triggered();
 	void on_actionCreatePositionTween_triggered();
 	void on_actionCreateRotationTween_triggered();
 	void on_actionCreateScaleTween_triggered();
@@ -71,10 +75,13 @@ private Q_SLOTS:
 
 	void on_actionCopyFrames_triggered();
 	void on_actionPasteFrames_triggered();
+	void on_actionPasteOnFrame_triggered();
 	void on_actionDeleteFrames_triggered();
 
 private:
 	void CreateContextTween(TweenProperty eTweenProp);
+
+	void PasteFrames(int iStartFrameIndex); // -1 means don't offset pasted frames
 };
 
 #endif // WIDGETOUTPUTLOG_H

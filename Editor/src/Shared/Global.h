@@ -299,35 +299,56 @@ struct FileDataPair
 	QJsonObject	m_Meta;
 };
 
+// These events are done while traversing the timeline at runtime
 enum DopeSheetEventType
 {
 	DOPEEVENT_Callback = -1,
 	DOPEEVENT_PauseTimeline,
 	DOPEEVENT_GotoFrame,
+	DOPEEVENT_GotoState,
 
-	NUM_DOPEEVENTS
+	NUM_DOPEEVENTS,
+	DOPEEVENT_Unknown = NUM_DOPEEVENTS
 };
-struct DopeSheetEvent
+const QString DOPEEVENT_STRINGS[NUM_DOPEEVENTS] = { "_PauseTimeline", "_GotoFrame=", "_GotoState=" };
+class DopeSheetEvent
 {
-	const QString DOPEEVENT_STRINGS[NUM_DOPEEVENTS] = { "_PauseTimeline", "_GotoFrame=" };
-
+	QString				m_sSerializedData;
 	DopeSheetEventType	m_eType;
-	QString				m_sData;
 
+public:
 	DopeSheetEvent(QString sSerializedEvent) :
-		m_eType(DOPEEVENT_Callback),
-		m_sData(sSerializedEvent)
+		m_sSerializedData(sSerializedEvent),
+		m_eType(GetTypeFromSerialized(sSerializedEvent))
+	{
+	}
+
+	QString GetSerialized() const
+	{
+		return m_sSerializedData;
+	}
+
+	QString GetOptionalData() const
+	{
+		if(m_sSerializedData.contains('='))
+			return m_sSerializedData.split('=').last();
+
+		return "";
+	}
+
+	DopeSheetEventType GetDopeEventType() const
+	{
+		return m_eType;
+	}
+
+	static DopeSheetEventType GetTypeFromSerialized(QString sSerializedEvent)
 	{
 		for(int iDopeEventIndex = 0; iDopeEventIndex < NUM_DOPEEVENTS; ++iDopeEventIndex)
 		{
 			if(sSerializedEvent.startsWith(DOPEEVENT_STRINGS[iDopeEventIndex]))
-			{
-				m_eType = static_cast<DopeSheetEventType>(iDopeEventIndex);
-				// Parse data after '=' character
-				m_sData = sSerializedEvent.split('=').last();
-				break;
-			}
+				return static_cast<DopeSheetEventType>(iDopeEventIndex);
 		}
+		return DOPEEVENT_Callback;
 	}
 };
 
