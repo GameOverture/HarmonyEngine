@@ -132,6 +132,8 @@ enum HyAnimCtrl
 
 enum HyTextType
 {
+	HYTEXT_Unknown = -1,
+
 	HYTEXT_Line = 0,
 	HYTEXT_Column,
 	HYTEXT_Box,

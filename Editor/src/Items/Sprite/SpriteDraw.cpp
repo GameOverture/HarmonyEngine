@@ -146,6 +146,8 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnUpdate() /*override*/
 {
+	IDraw::OnUpdate();
+
 	SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
 	if(pWidget == nullptr)
 		return;

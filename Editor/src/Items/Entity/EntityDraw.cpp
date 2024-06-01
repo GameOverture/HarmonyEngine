@@ -63,6 +63,11 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		delete pItem;
 }
 
+QList<EntityDrawItem *> EntityDraw::GetCurrentItemList()
+{
+	return m_ItemList;
+}
+
 /*virtual*/ void EntityDraw::OnUndoStackIndexChanged(int iIndex) /*override*/
 {
 	if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
@@ -73,7 +78,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDraw::OnKeyPressEvent(pEvent);
 	
-	if(m_bPanCameraKeyDown || m_bPlayingPreview)
+	if(IsCameraPanning() || m_bPlayingPreview)
 		RefreshTransforms();
 	else
 	{
@@ -129,7 +134,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDraw::OnKeyReleaseEvent(pEvent);
 	
-	if(m_bPanCameraKeyDown || m_bPlayingPreview)
+	if(IsCameraPanning() || m_bPlayingPreview)
 		RefreshTransforms();
 	else
 	{
@@ -159,7 +164,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDraw::OnMouseMoveEvent(pEvent);
 
-	if(m_bPanCameraKeyDown || m_bPlayingPreview)
+	if(IsCameraPanning() || m_bPlayingPreview)
 		RefreshTransforms();
 	else if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
 		DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
@@ -169,7 +174,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDraw::OnMousePressEvent(pEvent);
 
-	if(m_bPanCameraKeyDown || m_bPlayingPreview)
+	if(IsCameraPanning() || m_bPlayingPreview)
 		RefreshTransforms();
 	else if(pEvent->button() == Qt::LeftButton && Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
 	{
@@ -187,7 +192,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 /*virtual*/ void EntityDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
 {
-	if(m_bPanCameraKeyDown || m_bPlayingPreview)
+	if(IsCameraPanning() || m_bPlayingPreview)
 		IDraw::OnMouseReleaseEvent(pEvent);
 	else if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
 	{

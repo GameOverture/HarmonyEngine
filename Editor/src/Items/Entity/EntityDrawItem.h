@@ -127,10 +127,12 @@ public:
 
 	void RefreshTransform(HyCamera2d *pCamera);
 
-	void ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut);
-
 	void ShowTransformCtrl(bool bShowGrabPoints);
 	void HideTransformCtrl();
+	void ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut);
+
+	// This draw visual has all the current extrapolated data set for the current frame
+	QJsonValue ExtractPropertyData(QString sCategory, QString sPropertyName);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,6 +156,7 @@ public:
 	SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent);
 	virtual ~SubEntity();
 
+	bool IsTimelinePaused() const;
 	void SetTimelinePaused(float fElapsedTime, bool bPaused);
 
 	void CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj);

@@ -142,6 +142,16 @@ void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
 	GetShapeCtrl().DeserializeOutline(pCamera);
 }
 
+void EntityDrawItem::ShowTransformCtrl(bool bShowGrabPoints)
+{
+	m_Transform.Show(bShowGrabPoints);
+}
+
+void EntityDrawItem::HideTransformCtrl()
+{
+	m_Transform.Hide();
+}
+
 void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)
 {
 	transformMtxOut = glm::identity<glm::mat4>();
@@ -166,14 +176,96 @@ void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &tr
 	}
 }
 
-void EntityDrawItem::ShowTransformCtrl(bool bShowGrabPoints)
+// NOTE: The listed 4 functions below share logic that process all item properties. Any updates should reflect to all of them
+//             - EntityTreeItemData::InitalizePropertyModel
+//             - EntityModel::GenerateSrc_SetStateImpl
+//             - EntityDrawItem::ExtractPropertyData
+//             - ExtrapolateProperties
+QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPropertyName)
 {
-	m_Transform.Show(bShowGrabPoints);
-}
+	if(m_pChild == nullptr)
+		return QJsonValue();
 
-void EntityDrawItem::HideTransformCtrl()
-{
-	m_Transform.Hide();
+	if(sCategory == "Common")
+	{
+		if(sPropertyName == "State")
+			return QJsonValue(static_cast<qint64>(m_pChild->GetState()));
+		if(sPropertyName == "Update During Paused")
+			return QJsonValue(m_pChild->IsPauseUpdate());
+		if(sPropertyName == "User Tag")
+			return QJsonValue(m_pChild->GetTag());
+	}
+	else if(sCategory == "Transformation")
+	{
+		if(sPropertyName == "Position")
+			return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(m_pChild->pos.GetX())), QJsonValue(static_cast<double>(m_pChild->pos.GetY())) }));
+		if(sPropertyName == "Scale")
+			return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(m_pChild->scale.GetX())), QJsonValue(static_cast<double>(m_pChild->scale.GetY())) }));
+		if(sPropertyName == "Rotation")
+			return QJsonValue(static_cast<double>(m_pChild->rot.Get()));
+	}
+	else if(sCategory == "Body")
+	{
+		if(sPropertyName == "Visible")
+			return QJsonValue(m_pChild->IsVisible());
+		if(sPropertyName == "Color Tint")
+			QJsonValue(QJsonArray({ QJsonValue(static_cast<IHyBody2d *>(m_pChild)->topColor.GetX()), QJsonValue(static_cast<IHyBody2d *>(m_pChild)->topColor.GetY()), QJsonValue(static_cast<IHyBody2d *>(m_pChild)->topColor.GetZ()) }));
+		if(sPropertyName == "Alpha")
+			return QJsonValue(static_cast<double>(static_cast<IHyBody2d *>(m_pChild)->alpha.Get()));
+		if(sPropertyName == "Override Display Order")
+			return QJsonValue(static_cast<IHyBody2d *>(m_pChild)->GetDisplayOrder());
+	}
+	//else if(sCategory == "Physics")
+	//{
+	//}
+	else if(sCategory == "Entity")
+	{
+		if(sPropertyName == "Timeline Pause")
+			return QJsonValue(static_cast<SubEntity *>(m_pChild)->IsTimelinePaused());
+		if(sPropertyName == "Mouse Input")
+			return QJsonValue(static_cast<HyEntity2d *>(m_pChild)->IsMouseInputEnabled());
+	}
+	//else if(sCategory == "Primitive")
+	//{
+	//}
+	//else if(sCategory == "Shape")
+	//{
+	//}
+	//else if(sCategory == "Fixture")
+	//{
+	//}
+	else if(sCategory == "Sprite")
+	{
+		if(sPropertyName == "Frame")
+			return QJsonValue(static_cast<int>(static_cast<HySprite2d *>(m_pChild)->GetFrame()));
+		if(sPropertyName == "Anim Pause")
+			return QJsonValue(static_cast<HySprite2d *>(m_pChild)->IsAnimPaused());
+		if(sPropertyName == "Anim Rate")
+			return QJsonValue(static_cast<double>(static_cast<HySprite2d *>(m_pChild)->GetAnimRate()));
+		if(sPropertyName == "Anim Loop")
+			return QJsonValue(static_cast<HySprite2d *>(m_pChild)->IsAnimLoop());
+		if(sPropertyName == "Anim Reverse")
+			return QJsonValue(static_cast<HySprite2d *>(m_pChild)->IsAnimReverse());
+		if(sPropertyName == "Anim Bounce")
+			return QJsonValue(static_cast<HySprite2d *>(m_pChild)->IsAnimBounce());
+	}
+	else if(sCategory == "Text")
+	{
+		if(sPropertyName == "Text")
+			return QJsonValue(QString::fromUtf8(static_cast<HyText2d *>(m_pChild)->GetUtf8String().c_str()));
+		if(sPropertyName == "Style")
+			return QJsonValue(HyGlobal::GetTextTypeNameList()[static_cast<HyText2d *>(m_pChild)->GetTextType()]);
+		if(sPropertyName == "Style Dimensions")
+			return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(static_cast<HyText2d *>(m_pChild)->GetTextBoxDimensions().x)), QJsonValue(static_cast<double>(static_cast<HyText2d *>(m_pChild)->GetTextBoxDimensions().y)) }));
+		if(sPropertyName == "Alignment")
+			return QJsonValue(HyGlobal::GetAlignmentNameList()[static_cast<HyText2d *>(m_pChild)->GetAlignment()]);
+		if(sPropertyName == "Monospaced Digits")
+			return QJsonValue(static_cast<HyText2d *>(m_pChild)->IsMonospacedDigits());
+		if(sPropertyName == "Text Indent")
+			return QJsonValue(static_cast<int>(static_cast<HyText2d *>(m_pChild)->GetTextIndent()));
+	}
+
+	return QJsonValue();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -255,6 +347,10 @@ SubEntity::SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const Q
 
 		delete childTypePair.first;
 	}
+}
+bool SubEntity::IsTimelinePaused() const
+{
+	return m_bTimelinePaused;
 }
 void SubEntity::SetTimelinePaused(float fElapsedTime, bool bPaused)
 {
@@ -379,9 +475,10 @@ void SubEntity::ExtrapolateChildProperties(float fElapsedTime, const QJsonObject
 // SubEntity
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// NOTE: The listed 3 functions below share logic that process all item properties. Any updates should reflect to all of them
+// NOTE: The listed 4 functions below share logic that process all item properties. Any updates should reflect to all of them
 //             - EntityTreeItemData::InitalizePropertyModel
 //             - EntityModel::GenerateSrc_SetStateImpl
+//             - EntityDrawItem::ExtractPropertyData
 //             - ExtrapolateProperties
 void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, const QMap<int, QStringList> &eventMap, HyCamera2d *pCamera)
 {
@@ -650,13 +747,13 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 				// Apply the style and call ShapeCtrl::SetAsText()
 				if(textObj.contains("Style"))
 				{
-					TextStyle eTextStyle = HyGlobal::GetTextStyleFromString(textObj["Style"].toString());
-					if(eTextStyle == TEXTSTYLE_Line)
+					HyTextType eTextStyle = HyGlobal::GetTextTypeFromString(textObj["Style"].toString());
+					if(eTextStyle == HYTEXT_Line)
 					{
 						if(pTextNode->IsLine() == false)
 							pTextNode->SetAsLine();
 					}
-					else if(eTextStyle == TEXTSTYLE_Vertical)
+					else if(eTextStyle == HYTEXT_Vertical)
 					{
 						if(pTextNode->IsVertical() == false)
 							pTextNode->SetAsVertical();
@@ -672,19 +769,27 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 							else
 								HyGuiLog("Invalid 'Style Dimensions' array size", LOGTYPE_Error);
 
-							if(eTextStyle == TEXTSTYLE_Column)
+							if(eTextStyle == HYTEXT_Column)
 							{
 								if(pTextNode->IsColumn() == false || vStyleSize.x != pTextNode->GetTextBoxDimensions().x)
 									pTextNode->SetAsColumn(vStyleSize.x);
 							}
-							else // TEXTSTYLE_ScaleBox or TEXTSTYLE_ScaleBoxTopAlign
+							else if(eTextStyle == HYTEXT_Box)
+							{
+								if(pTextNode->IsBox() == false ||
+									vStyleSize.x != pTextNode->GetTextBoxDimensions().x ||
+									vStyleSize.y != pTextNode->GetTextBoxDimensions().y)
+								{
+									pTextNode->SetAsBox(vStyleSize.x, vStyleSize.y, false); // TODO: Add ability to set vertical alignment
+								}
+							}
+							else if(eTextStyle == HYTEXT_ScaleBox)
 							{
 								if(pTextNode->IsScaleBox() == false ||
 									vStyleSize.x != pTextNode->GetTextBoxDimensions().x ||
-									vStyleSize.y != pTextNode->GetTextBoxDimensions().y ||
-									(eTextStyle == TEXTSTYLE_ScaleBox) != pTextNode->IsCenterVertically())
+									vStyleSize.y != pTextNode->GetTextBoxDimensions().y)
 								{
-									pTextNode->SetAsScaleBox(vStyleSize.x, vStyleSize.y, eTextStyle == TEXTSTYLE_ScaleBox);
+									pTextNode->SetAsScaleBox(vStyleSize.x, vStyleSize.y, true); // TODO: Add ability to set vertical alignment
 								}
 							}
 						}

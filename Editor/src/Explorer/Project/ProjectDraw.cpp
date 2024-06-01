@@ -232,6 +232,8 @@ ProjectDraw::ProjectDraw() :
 
 /*virtual*/ void ProjectDraw::OnUpdate() /*override*/
 {
+	IDraw::OnUpdate();
+
 	glm::vec2 m_ptCameraPos;
 	m_pCamera->ProjectToCamera(glm::vec2(0.0f, 0.0f), m_ptCameraPos);
 

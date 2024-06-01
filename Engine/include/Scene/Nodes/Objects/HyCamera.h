@@ -26,10 +26,10 @@ class HyCamera2d final : public IHyCamera<IHyNode2d>
 	float					m_fPanDecel;
 	enum PanFlags
 	{
-		PAN_UP = 0x01,
-		PAN_DOWN = 0x02,
-		PAN_LEFT = 0x04,
-		PAN_RIGHT = 0x08
+		PAN_UP				= 1 << 0,
+		PAN_DOWN			= 1 << 1,
+		PAN_LEFT			= 1 << 2,
+		PAN_RIGHT			= 1 << 3
 	};
 	uint32					m_uiPanFlags;
 
@@ -42,6 +42,7 @@ public:
 	void PanDown();
 	void PanLeft();
 	void PanRight();
+	bool IsPanning() const;
 
 	virtual float GetZoom() const override;
 	virtual void SetZoom(const float fZoom) override;

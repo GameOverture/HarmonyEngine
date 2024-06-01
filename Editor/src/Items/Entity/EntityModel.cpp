@@ -725,9 +725,10 @@ QString EntityModel::GenerateSrc_Ctor() const
 	return "SetState(0);";
 }
 
-// NOTE: The listed 3 functions below share logic that process all item properties. Any updates should reflect to all of them
+// NOTE: The listed 4 functions below share logic that process all item properties. Any updates should reflect to all of them
 //             - EntityTreeItemData::InitalizePropertyModel
 //             - EntityModel::GenerateSrc_SetStateImpl
+//             - EntityDrawItem::ExtractPropertyData
 //             - ExtrapolateProperties
 QString EntityModel::GenerateSrc_SetStateImpl() const
 {
@@ -1033,31 +1034,31 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 				sSrc += sCodeName + "SetText(\"" + textObj["Text"].toString() + "\");" + sNewLine;
 			if(textObj.contains("Style"))
 			{
-				TextStyle eTextStyle = HyGlobal::GetTextStyleFromString(textObj["Style"].toString());
+				HyTextType eTextStyle = HyGlobal::GetTextTypeFromString(textObj["Style"].toString());
 				switch(eTextStyle)
 				{
-				case TEXTSTYLE_Line:
+				case HYTEXT_Line:
 					sSrc += sCodeName + "SetAsLine();" + sNewLine;
 					break;
-				case TEXTSTYLE_Column:
+				case HYTEXT_Column:
 					if(textObj.contains("Style Dimensions"))
 						sSrc += sCodeName + "SetAsColumn(" + QString::number(textObj["Style Dimensions"].toArray()[0].toDouble(), 'f') + "f);" + sNewLine;
 					else
 						HyGuiLog("Missing Style Dimensions for Text Style: " + textObj["Style"].toString(), LOGTYPE_Error);
 					break;
-				case TEXTSTYLE_ScaleBox:
+				case HYTEXT_Box:
+					if(textObj.contains("Style Dimensions"))
+						sSrc += sCodeName + "SetAsBox(" + QString::number(textObj["Style Dimensions"].toArray()[0].toDouble(), 'f') + "f, " + QString::number(textObj["Style Dimensions"].toArray()[1].toDouble(), 'f') + "f, false);" + sNewLine;
+					else
+						HyGuiLog("Missing Style Dimensions for Text Style: " + textObj["Style"].toString(), LOGTYPE_Error);
+					break;
+				case HYTEXT_ScaleBox:
 					if(textObj.contains("Style Dimensions"))
 						sSrc += sCodeName + "SetAsScaleBox(" + QString::number(textObj["Style Dimensions"].toArray()[0].toDouble(), 'f') + "f, " + QString::number(textObj["Style Dimensions"].toArray()[1].toDouble(), 'f') + "f, true);" + sNewLine;
 					else
 						HyGuiLog("Missing Style Dimensions for Text Style: " + textObj["Style"].toString(), LOGTYPE_Error);
 					break;
-				case TEXTSTYLE_ScaleBoxTopAlign:
-					if(textObj.contains("Style Dimensions"))
-						sSrc += sCodeName + "SetAsScaleBox(" + QString::number(textObj["Style Dimensions"].toArray()[0].toDouble(), 'f') + "f, " + QString::number(textObj["Style Dimensions"].toArray()[1].toDouble(), 'f') + "f, false);" + sNewLine;
-					else
-						HyGuiLog("Missing Style Dimensions for Text Style: " + textObj["Style"].toString(), LOGTYPE_Error);
-					break;
-				case TEXTSTYLE_Vertical:
+				case HYTEXT_Vertical:
 					sSrc += sCodeName + "SetAsVertical();" + sNewLine;
 					break;
 				}

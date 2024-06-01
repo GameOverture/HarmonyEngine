@@ -21,15 +21,18 @@
 #include <QApplication>
 #include <QString>
 
-#define KEY_PanCamera Qt::Key_Space
+#define KEY_PanUp Qt::Key_W
+#define KEY_PanDown Qt::Key_S
+#define KEY_PanLeft Qt::Key_A
+#define KEY_PanRight Qt::Key_D
 
 const QString g_sZoomLevels[HYNUM_ZOOMLEVELS] = { "6.25%","12.5%", "25%",  "33.33%","50%", "75%","100%","200%","300%","400%","500%","600%","800%","1200%","1600%" };
 
 IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	m_pProjItem(pProjItem),
 	m_pCamera(HyEngine::Window().GetCamera2d(0)),
-	m_bPanCameraKeyDown(false),
-	m_bIsCameraPanning(false),
+	m_uiPanFlags(0),
+	m_bIsMiddleMouseDown(false),
 	m_ptCamPos(0.0f, 0.0f),
 	m_fCamZoom(1.0f),
 	m_sZoomStatus("100%")
@@ -126,32 +129,35 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 /*virtual*/ void IDraw::OnKeyPressEvent(QKeyEvent *pEvent)
 {
-	if(pEvent->key() == KEY_PanCamera)
-	{
-		if(m_bIsCameraPanning == false)
-			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::OpenHandCursor);
-		m_bPanCameraKeyDown = true;
-	}
+	if(pEvent->key() == KEY_PanUp)
+		m_uiPanFlags |= PAN_UP;
+	else if(pEvent->key() == KEY_PanDown)
+		m_uiPanFlags |= PAN_DOWN;
+	else if(pEvent->key() == KEY_PanLeft)
+		m_uiPanFlags |= PAN_LEFT;
+	else if(pEvent->key() == KEY_PanRight)
+		m_uiPanFlags |= PAN_RIGHT;
 }
 
 /*virtual*/ void IDraw::OnKeyReleaseEvent(QKeyEvent *pEvent)
 {
-	if(pEvent->key() == KEY_PanCamera)
-	{
-		m_bPanCameraKeyDown = false;
-
-		if(m_bIsCameraPanning == false)
-			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
-	}
+	if(pEvent->key() == KEY_PanUp)
+		m_uiPanFlags &= ~PAN_UP;
+	else if(pEvent->key() == KEY_PanDown)
+		m_uiPanFlags &= ~PAN_DOWN;
+	else if(pEvent->key() == KEY_PanLeft)
+		m_uiPanFlags &= ~PAN_LEFT;
+	else if(pEvent->key() == KEY_PanRight)
+		m_uiPanFlags &= ~PAN_RIGHT;
 }
 
 /*virtual*/ void IDraw::OnMousePressEvent(QMouseEvent *pEvent)
 {
-	if(pEvent->button() == Qt::LeftButton)
+	if(pEvent->button() == Qt::MiddleButton)
 	{
-		if(m_bPanCameraKeyDown && m_bIsCameraPanning == false)
+		if(m_bIsMiddleMouseDown == false)
 		{
-			m_bIsCameraPanning = true;
+			m_bIsMiddleMouseDown = true;
 			m_ptOldMousePos = pEvent->localPos();
 			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
 		}
@@ -160,23 +166,12 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 /*virtual*/ void IDraw::OnMouseReleaseEvent(QMouseEvent *pEvent)
 {
-	if(pEvent->button() == Qt::LeftButton)
+	if(pEvent->button() == Qt::MiddleButton)
 	{
-		if(m_bIsCameraPanning)
+		if(m_bIsMiddleMouseDown)
 		{
-			m_bIsCameraPanning = false;
-			if(m_bPanCameraKeyDown)
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::OpenHandCursor);
-			else
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
-
-			if(m_ptCamPos.x != m_pCamera->pos.X() || m_ptCamPos.y != m_pCamera->pos.Y())
-			{
-				//QUndoCommand *pCmd = new UndoCmd_CameraUpdate("Camera Pan", *m_pProjItem, m_ptCamPos, m_fCamZoom, m_pCamera->pos.Get(), m_pCamera->GetZoom());
-				//m_pProjItem->GetUndoStack()->push(pCmd);
-				
-				m_ptCamPos = m_pCamera->pos.Get();
-			}
+			m_bIsMiddleMouseDown = false;
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
 		}
 	}
 }
@@ -221,7 +216,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 	QPointF ptCurMousePos = pEvent->localPos();
 
-	if(m_bIsCameraPanning)//0 != (pEvent->buttons() & Qt::MidButton))
+	if(m_bIsMiddleMouseDown)
 	{
 		if(ptCurMousePos != m_ptOldMousePos)
 		{
@@ -235,6 +230,31 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 	}
 
 	UpdateDrawStatus(m_sSizeStatus);
+}
+
+/*virtual*/ void IDraw::OnUpdate() /*override*/
+{
+	if(m_uiPanFlags)
+	{
+		if(m_uiPanFlags & PAN_UP)
+			m_pCamera->PanUp();
+		if(m_uiPanFlags & PAN_DOWN)
+			m_pCamera->PanDown();
+		if(m_uiPanFlags & PAN_LEFT)
+			m_pCamera->PanLeft();
+		if(m_uiPanFlags & PAN_RIGHT)
+			m_pCamera->PanRight();
+
+		//if(m_pProjItem)
+		//	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RefreshRulers();
+	}
+	else if(m_bIsMiddleMouseDown == false)
+		m_ptCamPos = m_pCamera->pos.Get();
+}
+
+bool IDraw::IsCameraPanning() const
+{
+	return m_pCamera->IsPanning() || m_bIsMiddleMouseDown;
 }
 
 float IDraw::GetLineThickness(HyZoomLevel eZoomLevel)

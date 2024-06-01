@@ -44,6 +44,11 @@ void HyCamera2d::PanRight()
 	m_uiPanFlags |= PAN_RIGHT;
 }
 
+bool HyCamera2d::IsPanning() const
+{
+	return m_uiPanFlags || m_vCamVelocity.x != 0.0f || m_vCamVelocity.y != 0.0f;
+}
+
 /*virtual*/ float HyCamera2d::GetZoom() const
 {
 	return 1.0f / scale.Get().x;
@@ -87,7 +92,7 @@ void HyCamera2d::ProjectToWorld(const glm::vec2 &ptCameraCoordinate, glm::vec2 &
 {
 	IHyCamera<IHyNode2d>::Update();
 
-	if(m_uiPanFlags || m_vCamVelocity.x != 0.0f || m_vCamVelocity.y != 0.0f)
+	if(IsPanning())
 	{
 		if(m_uiPanFlags & PAN_LEFT)
 			m_vCamVelocity.x -= m_fPanAccel * HyEngine::DeltaTime();

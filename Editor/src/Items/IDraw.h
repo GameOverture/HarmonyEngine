@@ -26,8 +26,16 @@ protected:
 	glm::vec2			m_ptCamPos;
 	float				m_fCamZoom;
 
-	bool				m_bPanCameraKeyDown;
-	bool				m_bIsCameraPanning;
+	enum PanFlags
+	{
+		PAN_UP			= 1 << 0,
+		PAN_DOWN		= 1 << 1,
+		PAN_LEFT		= 1 << 2,
+		PAN_RIGHT		= 1 << 3
+	};
+	uint32				m_uiPanFlags;
+
+	bool				m_bIsMiddleMouseDown;
 	QPointF				m_ptOldMousePos;
 
 private:
@@ -60,6 +68,10 @@ public:
 	virtual void OnMouseMoveEvent(QMouseEvent *pEvent);
 
 protected:
+	virtual void OnUpdate() override;
+
+	bool IsCameraPanning() const;
+	
 	virtual void OnApplyJsonData(HyJsonDoc &itemDataDocRef) { }
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) { }
 	virtual void OnShow() = 0;

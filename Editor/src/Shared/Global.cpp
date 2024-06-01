@@ -21,8 +21,8 @@
 /*static*/ QString HyGlobal::sm_TweenFuncNames[NUM_TWEENFUNCS];
 /*static*/ QString HyGlobal::sm_TweenPropNames[NUM_TWEENPROPS];
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
-/*static*/ QStringList HyGlobal::sm_sTextStyleList;
-/*static*/ QStringList HyGlobal::sm_sAlignmentList;
+/*static*/ QString HyGlobal::sm_sTextTypeNames[HYNUM_TEXTTYPES];
+/*static*/ QString HyGlobal::sm_sAlignmentNames[HYNUM_ALIGNMENTS];
 
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
 /*static*/ QIcon HyGlobal::sm_TweenPropIcons[NUM_TWEENPROPS];
@@ -155,8 +155,16 @@
 		sm_TweenPropIcons[i].addFile(sUrl);
 	}
 
-	sm_sTextStyleList << "Line" << "Column" << "Scale Box" << "Scale Box (top align)" << "Vertical";
-	sm_sAlignmentList << "Left" << "Center" << "Right" << "Justify";
+	sm_sTextTypeNames[HYTEXT_Line] = "Lines";
+	sm_sTextTypeNames[HYTEXT_Column] = "Column";
+	sm_sTextTypeNames[HYTEXT_Box] = "Box";
+	sm_sTextTypeNames[HYTEXT_ScaleBox] = "Scale Box";
+	sm_sTextTypeNames[HYTEXT_Vertical] = "Vertical";
+
+	sm_sAlignmentNames[HYALIGN_Left] = "Left";
+	sm_sAlignmentNames[HYALIGN_Center] = "Center";
+	sm_sAlignmentNames[HYALIGN_Right] = "Right";
+	sm_sAlignmentNames[HYALIGN_Justify] = "Justify";
 
 	sm_ItemColors[ITEM_Project] = QColor(9, 215, 33);
 	sm_ItemColors[ITEM_Prefix] = QColor(228, 212, 128);
@@ -455,33 +463,41 @@
 	return list;
 }
 
-/*static*/ QStringList HyGlobal::GetTextStyleNameList()
+/*static*/ QStringList HyGlobal::GetTextTypeNameList()
 {
-	return sm_sTextStyleList;
+	QStringList list;
+	for(int i = 0; i < HYNUM_TEXTTYPES; ++i)
+		list.append(sm_sTextTypeNames[i]);
+	
+	return list;
 }
 
-/*static*/ TextStyle HyGlobal::GetTextStyleFromString(QString sTextStyle)
+/*static*/ HyTextType HyGlobal::GetTextTypeFromString(QString sTextStyle)
 {
-	for(int i = 0; i < NUM_TEXTSTYLES; ++i)
+	for(int i = 0; i < HYNUM_TEXTTYPES; ++i)
 	{
-		if(sTextStyle.compare(sm_sTextStyleList[i], Qt::CaseInsensitive) == 0)
-			return static_cast<TextStyle>(i);
+		if(sTextStyle.compare(sm_sTextTypeNames[i], Qt::CaseInsensitive) == 0)
+			return static_cast<HyTextType>(i);
 	}
 
-	return TEXTSTYLE_Unknown;
+	return HYTEXT_Unknown;
 }
 
 
 /*static*/ QStringList HyGlobal::GetAlignmentNameList()
 {
-	return sm_sAlignmentList;
+	QStringList list;
+	for(int i = 0; i < HYNUM_ALIGNMENTS; ++i)
+		list.append(sm_sAlignmentNames[i]);
+	
+	return list;
 }
 
 /*static*/ HyAlignment HyGlobal::GetAlignmentFromString(QString sAlignment)
 {
 	for(int i = 0; i < HYNUM_ALIGNMENTS; ++i)
 	{
-		if(sAlignment.compare(sm_sAlignmentList[i], Qt::CaseInsensitive) == 0)
+		if(sAlignment.compare(sm_sAlignmentNames[i], Qt::CaseInsensitive) == 0)
 			return static_cast<HyAlignment>(i);
 	}
 

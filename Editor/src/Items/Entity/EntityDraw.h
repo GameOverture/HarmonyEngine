@@ -79,6 +79,8 @@ public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~EntityDraw();
 
+	QList<EntityDrawItem *> GetCurrentItemList();
+
 	virtual void OnUndoStackIndexChanged(int iIndex) override;
 
 	virtual void OnKeyPressEvent(QKeyEvent *pEvent) override;

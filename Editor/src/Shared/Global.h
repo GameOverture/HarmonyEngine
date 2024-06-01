@@ -195,19 +195,6 @@ enum TweenProperty
 	NUM_TWEENPROPS
 };
 
-enum TextStyle
-{
-	TEXTSTYLE_Unknown = -1,
-
-	TEXTSTYLE_Line,
-	TEXTSTYLE_Column,
-	TEXTSTYLE_ScaleBox,
-	TEXTSTYLE_ScaleBoxTopAlign,
-	TEXTSTYLE_Vertical,
-
-	NUM_TEXTSTYLES
-};
-
 enum SnappingSetting
 {
 	SNAPSETTING_ToleranceMask	= 0x0000FFFF,
@@ -373,8 +360,8 @@ class HyGlobal
 	static QString														sm_TweenFuncNames[NUM_TWEENFUNCS];
 	static QString														sm_TweenPropNames[NUM_TWEENPROPS];
 	static QString														sm_sSubIconNames[NUM_SUBICONS];
-	static QStringList													sm_sTextStyleList;
-	static QStringList													sm_sAlignmentList;
+	static QString														sm_sTextTypeNames[HYNUM_TEXTTYPES];
+	static QString														sm_sAlignmentNames[HYNUM_ALIGNMENTS];
 
 	static QIcon														sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
 	static QIcon														sm_TweenPropIcons[NUM_TWEENPROPS];
@@ -411,8 +398,8 @@ public:
 	static TweenProperty GetTweenPropFromString(QString sTweenProp);
 	static QStringList GetTweenPropNameList();
 	static HyTweenFunc GetTweenFunc(TweenFuncType eTween);
-	static QStringList GetTextStyleNameList();
-	static TextStyle GetTextStyleFromString(QString sTextStyle);
+	static QStringList GetTextTypeNameList();
+	static HyTextType GetTextTypeFromString(QString sTextType);
 	static QStringList GetAlignmentNameList();
 	static HyAlignment GetAlignmentFromString(QString sAlignment);
 
