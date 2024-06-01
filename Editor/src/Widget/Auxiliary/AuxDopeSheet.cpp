@@ -599,6 +599,12 @@ void AuxDopeSheet::CreateContextTween(TweenProperty eTweenProp)
 	}
 
 	QList<ContextTweenData> fullContextTweenDataList = GetEntityStateModel()->GetDopeSheetScene().DetermineIfContextQuickTween();
+	if(fullContextTweenDataList.isEmpty())
+	{
+		HyGuiLog("AuxDopeSheet::CreateContextTween() - No valid " + HyGlobal::TweenPropName(eTweenProp) + " context tweens found", LOGTYPE_Error);
+		UpdateWidgets(); // UpdateWidgets() should have been called to hide invalid context tool buttons
+		return;
+	}
 
 	if(eTweenProp == TWEENPROP_None) // Indicates break tweens when used here
 	{
