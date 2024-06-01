@@ -296,9 +296,10 @@ QList<ContextTweenData> EntityDopeSheetScene::DetermineIfContextQuickTween() con
 			pGfxItem = pGfxItem->parentItem(); // If item is a tween knob, reassign it to its parent (which is a tween keyframe)
 			eItemType = GFXITEM_TweenKeyFrame;
 		}
-		int iFrame = pGfxItem->data(GFXDATAKEY_FrameIndex).toInt();
+		int iStartFrame = pGfxItem->data(GFXDATAKEY_FrameIndex).toInt();
+		int iEndFrame = iStartFrame;
 		if(static_cast<GraphicsKeyFrameItem *>(pGfxItem)->IsTweenKeyFrame())
-			iFrame += static_cast<GraphicsKeyFrameItem *>(pGfxItem)->GetTweenFramesDuration();
+			iEndFrame += static_cast<GraphicsKeyFrameItem *>(pGfxItem)->GetTweenFramesDuration();
 
 		// Compare against all other selected items to see if they are tweenable
 		bool bFoundQuickTween = false;
@@ -313,7 +314,7 @@ QList<ContextTweenData> EntityDopeSheetScene::DetermineIfContextQuickTween() con
 				continue;
 
 			int iFrame2 = pGfxItem2->data(GFXDATAKEY_FrameIndex).toInt();
-			if(iFrame >= iFrame2)
+			if(iEndFrame >= iFrame2)
 				continue;
 
 			// Collect all the info stored in the FrameKey for 'left' item
@@ -335,23 +336,22 @@ QList<ContextTweenData> EntityDopeSheetScene::DetermineIfContextQuickTween() con
 				// Ensure that the 'left' and 'right' keyframes are adjacent to each other
 				const QMap<int, QJsonObject> &treeItemFramesMapRef = m_KeyFramesMap[std::get<GFXDATAKEY_TreeItemData>(tupleKey)];
 				QList<int> frameIndicesList = treeItemFramesMapRef.keys();
-				if(frameIndicesList.indexOf(iFrame) + 1 != frameIndicesList.indexOf(iFrame2))
+				if(frameIndicesList.indexOf(iStartFrame) + 1 != frameIndicesList.indexOf(iFrame2))
 					continue;
 
 				// All checks complete - valid context tween: determine the start and end values of the tween
 				QJsonValue startValue;
 				if(eItemType == GFXITEM_PropertyKeyFrame)
-					startValue = GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey), iFrame, sCategoryProp.split('/')[0], sCategoryProp.split('/')[1]);
+					startValue = GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey), iStartFrame, sCategoryProp.split('/')[0], sCategoryProp.split('/')[1]);
 				else if(eItemType == GFXITEM_TweenKeyFrame)
-					startValue = GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey), pGfxItem->data(GFXDATAKEY_FrameIndex).toInt(), "Tween " + HyGlobal::TweenPropName(eTweenProp), "Destination");
+					startValue = GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey), iStartFrame, "Tween " + HyGlobal::TweenPropName(eTweenProp), "Destination");
 				
-				QJsonValue endValue = GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey2), iFrame2, "Tween " + HyGlobal::TweenPropName(eTweenProp), "Destination");
+				QJsonValue endValue = GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey2), iFrame2, sCategoryProp2.split('/')[0], sCategoryProp2.split('/')[1]);
 
 				// Finally append the ContextTweenData
-				contextTweenList.push_back(ContextTweenData(false, std::get<GFXDATAKEY_TreeItemData>(tupleKey), eTweenProp, iFrame, startValue, iFrame2, endValue));
+				contextTweenList.push_back(ContextTweenData(false, std::get<GFXDATAKEY_TreeItemData>(tupleKey), eTweenProp, iEndFrame, startValue, iFrame2, endValue));
 				bFoundQuickTween = true;
 			}
-
 		}
 
 		// Finally check for 'break tween'
@@ -369,25 +369,24 @@ QList<ContextTweenData> EntityDopeSheetScene::DetermineIfContextQuickTween() con
 			QList<int> frameIndicesList = treeItemFramesMapRef.keys();
 
 			QPair<QString, QString> regPropPair = HyGlobal::ConvertTweenPropToRegularPropPair(eTweenProp);
-			QJsonValue regPropValue = GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey), iFrame, regPropPair.first, regPropPair.second);
-			if(regPropValue.isUndefined() == false)
+			QJsonValue regPropValue = GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey), iStartFrame, regPropPair.first, regPropPair.second);
+			if(regPropValue.isUndefined() == false && regPropValue.isNull() == false)
 				startValue = regPropValue;
-			else if(frameIndicesList.indexOf(iFrame) > 0)// test for previous tween which finishes on this frame
+			else if(frameIndicesList.indexOf(iStartFrame) > 0)// test for previous tween which finishes on this frame
 			{
-				int iPrevFrameIndex = frameIndicesList[frameIndicesList.indexOf(iFrame) - 1];
+				int iPrevFrameIndex = frameIndicesList[frameIndicesList.indexOf(iStartFrame) - 1];
 				TweenJsonValues tweenJsonValues = GetTweenJsonValues(std::get<GFXDATAKEY_TreeItemData>(tupleKey), iPrevFrameIndex, eTweenProp);
-				if(tweenJsonValues.m_Destination.isUndefined() == false)
+				if(tweenJsonValues.m_Destination.isUndefined() == false && tweenJsonValues.m_Destination.isNull() == false)
 					startValue = tweenJsonValues.m_Destination;
 				else // Finally check for a previous regular keyframe property
 					startValue = GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey), iPrevFrameIndex, regPropPair.first, regPropPair.second);
 			}
 
 			// The end value is the current tween's destination
-			QJsonValue endValue = GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey), iFrame, "Tween " + HyGlobal::TweenPropName(eTweenProp), "Destination");
-
+			QJsonValue endValue = GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey), iStartFrame, "Tween " + HyGlobal::TweenPropName(eTweenProp), "Destination");
 
 			// Append a ContextTweenData that is for a 'break tween' indicated by the first boolean
-			contextTweenList.push_back(ContextTweenData(true, std::get<GFXDATAKEY_TreeItemData>(tupleKey), eTweenProp, std::get<GFXDATAKEY_FrameIndex>(tupleKey), startValue, iFrame, endValue));
+			contextTweenList.push_back(ContextTweenData(true, std::get<GFXDATAKEY_TreeItemData>(tupleKey), eTweenProp, std::get<GFXDATAKEY_FrameIndex>(tupleKey), startValue, iEndFrame, endValue));
 		}
 	}
 
@@ -1061,8 +1060,8 @@ void EntityDopeSheetScene::SetKeyFrameTween(EntityTreeItemData *pItemData, int i
 {
 	QString sCategoryName = "Tween " % HyGlobal::TweenPropName(eTweenProp);
 
-	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Destination", tweenValues.m_Destination, bRefreshGfxItems);
-	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Duration", tweenValues.m_Duration, bRefreshGfxItems);
+	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Destination", tweenValues.m_Destination, false);
+	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Duration", tweenValues.m_Duration, false);
 	SetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type", tweenValues.m_TweenFuncType, bRefreshGfxItems);
 }
 

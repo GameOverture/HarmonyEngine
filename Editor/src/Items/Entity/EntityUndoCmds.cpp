@@ -1102,7 +1102,7 @@ EntityUndoCmd_BreakTween::EntityUndoCmd_BreakTween(EntityDopeSheetScene &entityD
 		m_DopeSheetSceneRef.RemoveKeyFrameTween(contextTweenData.m_pTreeItemData, contextTweenData.m_iStartFrame, contextTweenData.m_eTweenProperty, false);
 		
 		QPair<QString, QString> propPair = HyGlobal::ConvertTweenPropToRegularPropPair(contextTweenData.m_eTweenProperty);
-		if(contextTweenData.m_StartValue.isUndefined() == false)
+		if(contextTweenData.m_StartValue.isUndefined() == false && contextTweenData.m_StartValue.isNull() == false)
 			m_DopeSheetSceneRef.SetKeyFrameProperty(contextTweenData.m_pTreeItemData, contextTweenData.m_iStartFrame, propPair.first, propPair.second, contextTweenData.m_StartValue, false);
 		m_DopeSheetSceneRef.SetKeyFrameProperty(contextTweenData.m_pTreeItemData, contextTweenData.m_iEndFrame, propPair.first, propPair.second, contextTweenData.m_EndValue, i == (m_BreakTweenDataList.size() - 1));
 	}
