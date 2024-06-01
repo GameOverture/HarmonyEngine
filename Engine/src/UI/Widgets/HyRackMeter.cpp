@@ -104,7 +104,7 @@ bool HyRackMeter::IsShowAsCash()
 	return m_uiAttribs & RACKMETERATTRIB_IsMoney;
 }
 
-void HyRackMeter::ShowAsCash(bool bShow)
+/*virtual*/ void HyRackMeter::ShowAsCash(bool bShow)
 {
 	if(bShow)
 		m_uiAttribs |= RACKMETERATTRIB_IsMoney;
