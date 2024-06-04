@@ -33,6 +33,7 @@ class AuxDopeSheet : public QWidget
 		CONTEXTACTION_CallbackCreate = 0,
 		CONTEXTACTION_CallbackRename,
 		CONTEXTACTION_CallbackDelete,
+
 		CONTEXTACTION_PauseTimeline,
 		CONTEXTACTION_UnpauseTimeline,
 		CONTEXTACTION_GotoFrame,

@@ -128,124 +128,124 @@ QMenu *AuxDopeSheet::AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pCon
 		}
 		pNewMenu->addSeparator();
 
-		// Timeline Events - Insert appropriate context actions for each dope event type, based on what's already set
-		QAction *pUnpauseAction = nullptr;
-		QAction *pGotoFrameAction = nullptr;
-		QAction *pRemoveGotoFrameAction = nullptr;
-		QAction *pGotoStateAction = nullptr;
-		QAction *pRemoveGotoStateAction = nullptr;
-		QList<DopeSheetEvent> eventList = pScene->GetEventList(iContextFrameIndex);
-		for(DopeSheetEvent dopeEvent : eventList)
-		{
-			switch(dopeEvent.GetDopeEventType())
-			{
-			case DOPEEVENT_PauseTimeline: {
-				pUnpauseAction = new QAction(QIcon(":/icons16x16/media-play.png"), "Unpause Timeline On Frame " % QString::number(iContextFrameIndex));
-				pUnpauseAction->setToolTip("Unpause the timeline at the currently selected frame");
-				QJsonObject pauseDataObj;
-				pauseDataObj.insert("contextAction", CONTEXTACTION_UnpauseTimeline);
-				pauseDataObj.insert("frame", iContextFrameIndex);
-				pauseDataObj.insert("serializedData", dopeEvent.GetSerialized());
-				pUnpauseAction->setData(QVariant(pauseDataObj));
-				break; }
+		//// Timeline Events - Insert appropriate context actions for each dope event type, based on what's already set
+		//QAction *pUnpauseAction = nullptr;
+		//QAction *pGotoFrameAction = nullptr;
+		//QAction *pRemoveGotoFrameAction = nullptr;
+		//QAction *pGotoStateAction = nullptr;
+		//QAction *pRemoveGotoStateAction = nullptr;
+		//QList<DopeSheetEvent> eventList = pScene->GetEventList(iContextFrameIndex);
+		//for(DopeSheetEvent dopeEvent : eventList)
+		//{
+		//	switch(dopeEvent.GetDopeEventType())
+		//	{
+		//	case DOPEEVENT_PauseTimeline: {
+		//		pUnpauseAction = new QAction(QIcon(":/icons16x16/media-play.png"), "Unpause Timeline On Frame " % QString::number(iContextFrameIndex));
+		//		pUnpauseAction->setToolTip("Unpause the timeline at the currently selected frame");
+		//		QJsonObject pauseDataObj;
+		//		pauseDataObj.insert("contextAction", CONTEXTACTION_UnpauseTimeline);
+		//		pauseDataObj.insert("frame", iContextFrameIndex);
+		//		pauseDataObj.insert("serializedData", dopeEvent.GetSerialized());
+		//		pUnpauseAction->setData(QVariant(pauseDataObj));
+		//		break; }
 
-			case DOPEEVENT_GotoFrame: {
-				pGotoFrameAction = new QAction(QIcon(":/icons16x16/media-seek-forward.png"), "Modify Goto Frame " + dopeEvent.GetOptionalData());
-				pGotoFrameAction->setToolTip("Change which frame to jump to. Currently set to " % dopeEvent.GetOptionalData());
-				QJsonObject gotoDataObj;
-				gotoDataObj.insert("contextAction", CONTEXTACTION_GotoFrame);
-				gotoDataObj.insert("frame", iContextFrameIndex);
-				gotoDataObj.insert("serializedData", dopeEvent.GetSerialized());
-				pGotoFrameAction->setData(QVariant(gotoDataObj));
+		//	case DOPEEVENT_GotoFrame: {
+		//		pGotoFrameAction = new QAction(QIcon(":/icons16x16/media-seek-forward.png"), "Modify Goto Frame " + dopeEvent.GetOptionalData());
+		//		pGotoFrameAction->setToolTip("Change which frame to jump to. Currently set to " % dopeEvent.GetOptionalData());
+		//		QJsonObject gotoDataObj;
+		//		gotoDataObj.insert("contextAction", CONTEXTACTION_GotoFrame);
+		//		gotoDataObj.insert("frame", iContextFrameIndex);
+		//		gotoDataObj.insert("serializedData", dopeEvent.GetSerialized());
+		//		pGotoFrameAction->setData(QVariant(gotoDataObj));
 
-				pRemoveGotoFrameAction = new QAction(QIcon(":/icons16x16/edit-delete.png"), "Remove Goto Frame " % dopeEvent.GetOptionalData());
-				pRemoveGotoFrameAction->setToolTip("Remove the Goto Frame " % dopeEvent.GetOptionalData());
-				QJsonObject removeGotoDataObj;
-				removeGotoDataObj.insert("contextAction", CONTEXTACTION_RemoveGotoFrame);
-				removeGotoDataObj.insert("frame", iContextFrameIndex);
-				removeGotoDataObj.insert("serializedData", dopeEvent.GetSerialized());
-				pRemoveGotoFrameAction->setData(QVariant(removeGotoDataObj));
-				break; }
+		//		pRemoveGotoFrameAction = new QAction(QIcon(":/icons16x16/edit-delete.png"), "Remove Goto Frame " % dopeEvent.GetOptionalData());
+		//		pRemoveGotoFrameAction->setToolTip("Remove the Goto Frame " % dopeEvent.GetOptionalData());
+		//		QJsonObject removeGotoDataObj;
+		//		removeGotoDataObj.insert("contextAction", CONTEXTACTION_RemoveGotoFrame);
+		//		removeGotoDataObj.insert("frame", iContextFrameIndex);
+		//		removeGotoDataObj.insert("serializedData", dopeEvent.GetSerialized());
+		//		pRemoveGotoFrameAction->setData(QVariant(removeGotoDataObj));
+		//		break; }
 
-			case DOPEEVENT_GotoState: {
-				int iStateIndex = dopeEvent.GetOptionalData().toInt();
-				const IStateData *pGotoStateData = static_cast<EntityModel &>(GetEntityStateModel()->GetModel()).GetStateData(iStateIndex);
-				if(pGotoStateData)
-				{
-					pGotoStateAction = new QAction(QIcon(":/icons16x16/media-seek-forward.png"), "Modify Goto State " % pGotoStateData->GetName());
-					pGotoStateAction->setToolTip("Change which state to jump to. Currently set to " % pGotoStateData->GetName());
-					QJsonObject gotoDataObj;
-					gotoDataObj.insert("contextAction", CONTEXTACTION_GotoState);
-					gotoDataObj.insert("frame", iContextFrameIndex);
-					gotoDataObj.insert("serializedData", dopeEvent.GetSerialized());
-					pGotoStateAction->setData(QVariant(gotoDataObj));
+		//	case DOPEEVENT_GotoState: {
+		//		int iStateIndex = dopeEvent.GetOptionalData().toInt();
+		//		const IStateData *pGotoStateData = static_cast<EntityModel &>(GetEntityStateModel()->GetModel()).GetStateData(iStateIndex);
+		//		if(pGotoStateData)
+		//		{
+		//			pGotoStateAction = new QAction(QIcon(":/icons16x16/media-seek-forward.png"), "Modify Goto State " % pGotoStateData->GetName());
+		//			pGotoStateAction->setToolTip("Change which state to jump to. Currently set to " % pGotoStateData->GetName());
+		//			QJsonObject gotoDataObj;
+		//			gotoDataObj.insert("contextAction", CONTEXTACTION_GotoState);
+		//			gotoDataObj.insert("frame", iContextFrameIndex);
+		//			gotoDataObj.insert("serializedData", dopeEvent.GetSerialized());
+		//			pGotoStateAction->setData(QVariant(gotoDataObj));
 
-					pRemoveGotoStateAction = new QAction(QIcon(":/icons16x16/edit-delete.png"), "Remove Goto State " % pGotoStateData->GetName());
-					pRemoveGotoStateAction->setToolTip("Remove the Goto State " % pGotoStateData->GetName());
-					QJsonObject removeGotoDataObj;
-					removeGotoDataObj.insert("contextAction", CONTEXTACTION_RemoveGotoState);
-					removeGotoDataObj.insert("frame", iContextFrameIndex);
-					removeGotoDataObj.insert("serializedData", dopeEvent.GetSerialized());
-					pRemoveGotoStateAction->setData(QVariant(removeGotoDataObj));
-				}
-				break; }
+		//			pRemoveGotoStateAction = new QAction(QIcon(":/icons16x16/edit-delete.png"), "Remove Goto State " % pGotoStateData->GetName());
+		//			pRemoveGotoStateAction->setToolTip("Remove the Goto State " % pGotoStateData->GetName());
+		//			QJsonObject removeGotoDataObj;
+		//			removeGotoDataObj.insert("contextAction", CONTEXTACTION_RemoveGotoState);
+		//			removeGotoDataObj.insert("frame", iContextFrameIndex);
+		//			removeGotoDataObj.insert("serializedData", dopeEvent.GetSerialized());
+		//			pRemoveGotoStateAction->setData(QVariant(removeGotoDataObj));
+		//		}
+		//		break; }
 
-			default:
-				break;
-			} // switch(dopeEvent.m_eType)
-		} // for each dopeEvent set on this frame
+		//	default:
+		//		break;
+		//	} // switch(dopeEvent.m_eType)
+		//} // for each dopeEvent set on this frame
 
-		// Insert all the actions into the context menu
-		if(pUnpauseAction)
-			pNewMenu->addAction(pUnpauseAction);
-		else
-		{
-			QAction *pPauseTimeline = new QAction(QIcon(":/icons16x16/media-pause.png"),
-				"Pause Timeline On Frame " % QString::number(iContextFrameIndex));
-			QJsonObject pauseDataObj;
-			pauseDataObj.insert("contextAction", CONTEXTACTION_PauseTimeline);
-			pauseDataObj.insert("frame", iContextFrameIndex);
-			pauseDataObj.insert("serializedData", DOPEEVENT_STRINGS[DOPEEVENT_PauseTimeline]);
-			pPauseTimeline->setData(QVariant(pauseDataObj));
-			pPauseTimeline->setToolTip("Pause the timeline at the currently selected frame");
-			pNewMenu->addAction(pPauseTimeline);
-		}
+		//// Insert all the actions into the context menu
+		//if(pUnpauseAction)
+		//	pNewMenu->addAction(pUnpauseAction);
+		//else
+		//{
+		//	QAction *pPauseTimeline = new QAction(QIcon(":/icons16x16/media-pause.png"),
+		//		"Pause Timeline On Frame " % QString::number(iContextFrameIndex));
+		//	QJsonObject pauseDataObj;
+		//	pauseDataObj.insert("contextAction", CONTEXTACTION_PauseTimeline);
+		//	pauseDataObj.insert("frame", iContextFrameIndex);
+		//	pauseDataObj.insert("serializedData", DOPEEVENT_STRINGS[DOPEEVENT_PauseTimeline]);
+		//	pPauseTimeline->setData(QVariant(pauseDataObj));
+		//	pPauseTimeline->setToolTip("Pause the timeline at the currently selected frame");
+		//	pNewMenu->addAction(pPauseTimeline);
+		//}
 
-		if(pGotoFrameAction)
-		{
-			pNewMenu->addAction(pGotoFrameAction);
-			pNewMenu->addAction(pRemoveGotoFrameAction);
-		}
-		else
-		{
-			QAction *pGotoFrame = new QAction(QIcon(":/icons16x16/media-seek-forward.png"),
-				"Set Goto Frame " % QString::number(iContextFrameIndex));
-			QJsonObject gotoDataObj;
-			gotoDataObj.insert("contextAction", CONTEXTACTION_GotoFrame);
-			gotoDataObj.insert("frame", iContextFrameIndex);
-			gotoDataObj.insert("serializedData", QString(DOPEEVENT_STRINGS[DOPEEVENT_GotoFrame] + "0"));
-			pGotoFrame->setData(QVariant(gotoDataObj));
-			pGotoFrame->setToolTip("Set which frame to jump to");
-			pNewMenu->addAction(pGotoFrame);
-		}
+		//if(pGotoFrameAction)
+		//{
+		//	pNewMenu->addAction(pGotoFrameAction);
+		//	pNewMenu->addAction(pRemoveGotoFrameAction);
+		//}
+		//else
+		//{
+		//	QAction *pGotoFrame = new QAction(QIcon(":/icons16x16/media-seek-forward.png"),
+		//		"Set Goto Frame " % QString::number(iContextFrameIndex));
+		//	QJsonObject gotoDataObj;
+		//	gotoDataObj.insert("contextAction", CONTEXTACTION_GotoFrame);
+		//	gotoDataObj.insert("frame", iContextFrameIndex);
+		//	gotoDataObj.insert("serializedData", QString(DOPEEVENT_STRINGS[DOPEEVENT_GotoFrame] + "0"));
+		//	pGotoFrame->setData(QVariant(gotoDataObj));
+		//	pGotoFrame->setToolTip("Set which frame to jump to");
+		//	pNewMenu->addAction(pGotoFrame);
+		//}
 
-		if(pGotoStateAction)
-		{
-			pNewMenu->addAction(pGotoStateAction);
-			pNewMenu->addAction(pRemoveGotoStateAction);
-		}
-		else
-		{
-			QAction *pGotoState = new QAction(QIcon(":/icons16x16/media-seek-forward.png"),
-				"Set Goto State");
-			QJsonObject gotoDataObj;
-			gotoDataObj.insert("contextAction", CONTEXTACTION_GotoState);
-			gotoDataObj.insert("frame", iContextFrameIndex);
-			gotoDataObj.insert("serializedData", QString(DOPEEVENT_STRINGS[DOPEEVENT_GotoState] + "0"));
-			pGotoState->setData(QVariant(gotoDataObj));
-			pGotoState->setToolTip("Set which state to jump to");
-			pNewMenu->addAction(pGotoState);
-		}
+		//if(pGotoStateAction)
+		//{
+		//	pNewMenu->addAction(pGotoStateAction);
+		//	pNewMenu->addAction(pRemoveGotoStateAction);
+		//}
+		//else
+		//{
+		//	QAction *pGotoState = new QAction(QIcon(":/icons16x16/media-seek-forward.png"),
+		//		"Set Goto State");
+		//	QJsonObject gotoDataObj;
+		//	gotoDataObj.insert("contextAction", CONTEXTACTION_GotoState);
+		//	gotoDataObj.insert("frame", iContextFrameIndex);
+		//	gotoDataObj.insert("serializedData", QString(DOPEEVENT_STRINGS[DOPEEVENT_GotoState] + "0"));
+		//	pGotoState->setData(QVariant(gotoDataObj));
+		//	pGotoState->setToolTip("Set which state to jump to");
+		//	pNewMenu->addAction(pGotoState);
+		//}
 	}
 	else // Context not on timeline
 	{
@@ -446,7 +446,7 @@ void AuxDopeSheet::OnEventActionTriggered(QAction *pEventAction)
 		{
 			if(eActionType == CONTEXTACTION_CallbackCreate)
 			{
-				EntityUndoCmd_AddEvent *pNewCmd = new EntityUndoCmd_AddEvent(GetEntityStateModel()->GetDopeSheetScene(), iFrameIndex, dlg.GetName());
+				EntityUndoCmd_AddCallback *pNewCmd = new EntityUndoCmd_AddCallback(GetEntityStateModel()->GetDopeSheetScene(), iFrameIndex, dlg.GetName());
 				GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
 			}
 			else // EVENTACTION_CallbackRename
@@ -460,61 +460,61 @@ void AuxDopeSheet::OnEventActionTriggered(QAction *pEventAction)
 	case CONTEXTACTION_CallbackDelete: {
 		int iFrameIndex = dataObj["frame"].toInt();
 		QString sCallbackName = dataObj["serializedData"].toString();
-		EntityUndoCmd_RemoveEvent *pNewCmd = new EntityUndoCmd_RemoveEvent(GetEntityStateModel()->GetDopeSheetScene(), iFrameIndex, sCallbackName);
+		EntityUndoCmd_RemoveCallback *pNewCmd = new EntityUndoCmd_RemoveCallback(GetEntityStateModel()->GetDopeSheetScene(), iFrameIndex, sCallbackName);
 		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
 		break; }
 
-	case CONTEXTACTION_PauseTimeline: {
-		EntityUndoCmd_AddEvent *pNewCmd = new EntityUndoCmd_AddEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), "_PauseTimeline");
-		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
-		break; }
+	//case CONTEXTACTION_PauseTimeline: {
+	//	EntityUndoCmd_AddEvent *pNewCmd = new EntityUndoCmd_AddEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), "_PauseTimeline");
+	//	GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+	//	break; }
 
-	case CONTEXTACTION_UnpauseTimeline: {
-		EntityUndoCmd_RemoveEvent *pNewCmd = new EntityUndoCmd_RemoveEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), "_PauseTimeline");
-		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
-		break; }
+	//case CONTEXTACTION_UnpauseTimeline: {
+	//	EntityUndoCmd_RemoveEvent *pNewCmd = new EntityUndoCmd_RemoveEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), "_PauseTimeline");
+	//	GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+	//	break; }
 
-	case CONTEXTACTION_GotoFrame: {
-		if(dataObj["serializedData"].isString())
-		{
-			DopeSheetEvent dopeSheetEvent(dataObj["serializedData"].toString());
+	//case CONTEXTACTION_GotoFrame: {
+	//	if(dataObj["serializedData"].isString())
+	//	{
+	//		DopeSheetEvent dopeSheetEvent(dataObj["serializedData"].toString());
 
-			DlgInputNumber dlg("Jump to Frame", "Frame", QIcon(), dopeSheetEvent.GetOptionalData().toInt(), 0, 99999, [](int) {return QString(""); });
-			if(dlg.exec() == QDialog::Accepted)
-			{
-				dlg.GetValue();
-				EntityUndoCmd_AddEvent *pNewCmd = new EntityUndoCmd_AddEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), DOPEEVENT_STRINGS[DOPEEVENT_GotoFrame] + QString::number(dlg.GetValue()));
-				GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
-			}
-		}
-		break; }
+	//		DlgInputNumber dlg("Jump to Frame", "Frame", QIcon(), dopeSheetEvent.GetOptionalData().toInt(), 0, 99999, [](int) {return QString(""); });
+	//		if(dlg.exec() == QDialog::Accepted)
+	//		{
+	//			dlg.GetValue();
+	//			EntityUndoCmd_AddEvent *pNewCmd = new EntityUndoCmd_AddEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), DOPEEVENT_STRINGS[DOPEEVENT_GotoFrame] + QString::number(dlg.GetValue()));
+	//			GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+	//		}
+	//	}
+	//	break; }
 
-	case CONTEXTACTION_RemoveGotoFrame: {
-		EntityUndoCmd_RemoveEvent *pNewCmd = new EntityUndoCmd_RemoveEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), dataObj["serializedData"].toString());
-		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
-		break; }
+	//case CONTEXTACTION_RemoveGotoFrame: {
+	//	EntityUndoCmd_RemoveEvent *pNewCmd = new EntityUndoCmd_RemoveEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), dataObj["serializedData"].toString());
+	//	GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+	//	break; }
 
-	case CONTEXTACTION_GotoState: {
-		if(dataObj["serializedData"].isString())
-		{
-			DopeSheetEvent dopeSheetEvent(dataObj["serializedData"].toString());
-			int iNumStates = GetEntityStateModel()->GetModel().GetNumStates();
-			
-			// TODO: Make a DropDown for the state selection
-			DlgInputNumber dlg("Jump to State", "State", QIcon(), dopeSheetEvent.GetOptionalData().toInt(), 0, iNumStates - 1, [](int) {return QString(""); });
-			if(dlg.exec() == QDialog::Accepted)
-			{
-				dlg.GetValue();
-				EntityUndoCmd_AddEvent *pNewCmd = new EntityUndoCmd_AddEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), DOPEEVENT_STRINGS[DOPEEVENT_GotoState] + QString::number(dlg.GetValue()));
-				GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
-			}
-		}
-		break; }
+	//case CONTEXTACTION_GotoState: {
+	//	if(dataObj["serializedData"].isString())
+	//	{
+	//		DopeSheetEvent dopeSheetEvent(dataObj["serializedData"].toString());
+	//		int iNumStates = GetEntityStateModel()->GetModel().GetNumStates();
+	//		
+	//		// TODO: Make a DropDown for the state selection
+	//		DlgInputNumber dlg("Jump to State", "State", QIcon(), dopeSheetEvent.GetOptionalData().toInt(), 0, iNumStates - 1, [](int) {return QString(""); });
+	//		if(dlg.exec() == QDialog::Accepted)
+	//		{
+	//			dlg.GetValue();
+	//			EntityUndoCmd_AddEvent *pNewCmd = new EntityUndoCmd_AddEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), DOPEEVENT_STRINGS[DOPEEVENT_GotoState] + QString::number(dlg.GetValue()));
+	//			GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+	//		}
+	//	}
+	//	break; }
 
-	case CONTEXTACTION_RemoveGotoState: {
-		EntityUndoCmd_RemoveEvent *pNewCmd = new EntityUndoCmd_RemoveEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), dataObj["serializedData"].toString());
-		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
-		break; }
+	//case CONTEXTACTION_RemoveGotoState: {
+	//	EntityUndoCmd_RemoveEvent *pNewCmd = new EntityUndoCmd_RemoveEvent(GetEntityStateModel()->GetDopeSheetScene(), dataObj["frame"].toInt(), dataObj["serializedData"].toString());
+	//	GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+	//	break; }
 
 	case CONTEXTACTION_SelectAllItemKeyFrames:
 		GetEntityStateModel()->GetDopeSheetScene().SelectAllItemKeyFrames(ui->graphicsView->GetContextClickItem());

@@ -227,7 +227,14 @@ void EntityTreeItemData::InitalizePropertyModel()
 
 	if(GetType() != ITEM_BoundingVolume)
 	{
-		if(IsAssetItem() == false && GetEntType() != ENTTYPE_Root)
+		if(GetEntType() == ENTTYPE_Root || GetType() == ITEM_Entity)
+		{
+			m_pPropertiesModel->AppendCategory("Timeline");
+			m_pPropertiesModel->AppendProperty("Timeline", "State", PROPERTIESTYPE_StatesComboBox, 0, "Jump to a new state after processing this frame", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
+			m_pPropertiesModel->AppendProperty("Timeline", "Pause", PROPERTIESTYPE_bool, Qt::Unchecked, "Pausing the timeline will stop processing key frames, after this frame", PROPERTIESACCESS_ToggleOff);
+			m_pPropertiesModel->AppendProperty("Timeline", "Frame", PROPERTIESTYPE_int, 0, "Jump to a different frame on the timeline, after processing this frame", PROPERTIESACCESS_ToggleOff, 0, iRANGE, 1);
+		}
+		else if(IsAssetItem() == false)
 		{
 			m_pPropertiesModel->AppendCategory("Common");
 			m_pPropertiesModel->AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(GetType(), false) % "'s state to be displayed", PROPERTIESACCESS_ToggleOff, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
@@ -271,9 +278,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	switch(GetType())
 	{
 	case ITEM_Entity:
-		m_pPropertiesModel->AppendCategory("Entity", QVariant(), false, "A visible shape that can be drawn to the screen");
-		if(GetEntType() != ENTTYPE_Root)
-			m_pPropertiesModel->AppendProperty("Entity", "Timeline Pause", PROPERTIESTYPE_bool, Qt::Unchecked, "Pausing the timeline will stop processing key frames, after this frame", PROPERTIESACCESS_ToggleOff);
+		m_pPropertiesModel->AppendCategory("Entity", QVariant(), false, "Entity is an object that controls multiple nodes and components");
 		m_pPropertiesModel->AppendProperty("Entity", "Mouse Input", PROPERTIESTYPE_bool, Qt::Unchecked, "Mouse hover and button inputs over this bounding volume or specified shapes", PROPERTIESACCESS_ToggleOff);
 		break;
 

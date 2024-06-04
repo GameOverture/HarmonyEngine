@@ -101,7 +101,7 @@ public:
 	void RequestClearShapeEdit();
 	void ClearShapeEdit();
 
-	void SetExtrapolatedProperties();
+	void SetExtrapolatedProperties(bool bPreviewPlaying);
 
 protected:
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;

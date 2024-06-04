@@ -748,90 +748,60 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 		sSrc += "default:\n\t\t\t\tbreak;\n\n\t\t\t";
 
 		QMap<int, QMap<EntityTreeItemData *, QJsonObject>> propertiesMapByFrame = entDopeSheetSceneRef.GetKeyFrameMapPropertiesByFrame();
-		const QMap<int, QStringList> &eventMap = entDopeSheetSceneRef.GetEventMap();
+		const QMap<int, QStringList> &callbacksMap = entDopeSheetSceneRef.GetCallbackMap();
 
-		QList<int> eventFrameIndexList = eventMap.keys();
+		QList<int> callbacksFrameIndexList = callbacksMap.keys();
 		QList<int> frameList = propertiesMapByFrame.keys();
 
 		// Combine and remove duplicates
-		QSet<int> frameSet = eventFrameIndexList.toSet();
+		QSet<int> frameSet = callbacksFrameIndexList.toSet();
 		frameSet.unite(frameList.toSet());
 		frameList = frameSet.toList();
 
 		std::sort(frameList.begin(), frameList.end()); // Then sort by frame index
-		
-		bool bIsFinalFrameHandled = false;
-		int iFinalFrame = entDopeSheetSceneRef.GetFinalFrame();
 		for(int iFrameIndex : frameList)
 		{
 			sSrc += "case " + QString::number(iFrameIndex) + ":\n\t\t\t\t";
 
-			// Properties
+			// CALL IN THIS ORDER:
+			// 1: Standard Properties
 			if(propertiesMapByFrame.contains(iFrameIndex))
 			{
 				for(QMap<EntityTreeItemData *, QJsonObject>::const_iterator iter = propertiesMapByFrame[iFrameIndex].begin(); iter != propertiesMapByFrame[iFrameIndex].end(); ++iter)
 					sSrc += GenerateSrc_SetProperties(iter.key(), iter.value(), "\n\t\t\t\t");
 			}
 
-			// Events
-			if(eventFrameIndexList.contains(iFrameIndex))
+			// 2: Callbacks
+			if(callbacksFrameIndexList.contains(iFrameIndex))
 			{
-				QStringList sEventsToProcess = eventMap[iFrameIndex];
+				QStringList sCallbacks = callbacksMap[iFrameIndex];
+				for(QString &sCallback : sCallbacks)
+					sSrc += sCallback + "();\n\t\t\t\t";
+			}
 
-				for(QString &sEvent : sEventsToProcess)
+			// 3: Root Entity Timeline Events
+			if(propertiesMapByFrame.contains(iFrameIndex) && propertiesMapByFrame[iFrameIndex].contains(m_TreeModel.GetRootTreeItemData()))
+			{
+				QJsonObject rootPropsObj = propertiesMapByFrame[iFrameIndex][m_TreeModel.GetRootTreeItemData()];
+				for(QString sCategoryName : rootPropsObj.keys())
 				{
-					// Process the event
-					DopeSheetEvent dopeSheetEvent(sEvent);
-					switch(dopeSheetEvent.GetDopeEventType())
+					if(sCategoryName == "Timeline")
 					{
-					case DOPEEVENT_Callback:
-						sSrc += sEvent + "();\n\t\t\t\t";
-						break;
+						QJsonObject timelineObj = rootPropsObj["Timeline"].toObject();
 
-					case DOPEEVENT_PauseTimeline:
-						sSrc += "SetTimelinePause(true);\n\t\t\t\t";
-						if(iFinalFrame == iFrameIndex)
-							bIsFinalFrameHandled = true;
-						break;
+						if(timelineObj.contains("Pause"))
+							sSrc += "SetTimelinePause(" + QString(timelineObj["Pause"].toBool() ? "true" : "false") + ");" + "\n\t\t\t\t";
 
-					case DOPEEVENT_GotoFrame:
-						sSrc += "SetTimelineFrame(" + dopeSheetEvent.GetOptionalData() + ");\n\t\t\t\t";
-						if(iFinalFrame == iFrameIndex)
-						{
-							// If this is the final frame, it must be going to a previous frame
-							if(dopeSheetEvent.GetOptionalData().toInt() >= iFinalFrame)
-								HyGuiLog("EntityModel::GenerateSrc_SetStateImpl - GotoFrame event on final frame must go to a previous frame", LOGTYPE_Error);
+						if(timelineObj.contains("Frame"))
+							sSrc += "SetTimelineFrame(" + QString::number(timelineObj["Frame"].toInt()) + ");" + "\n\t\t\t\t";
 
-							bIsFinalFrameHandled = true;
-						}
-						break;
-
-					case DOPEEVENT_GotoState:
-						sSrc += "SetState(" + dopeSheetEvent.GetOptionalData() + ");\n\t\t\t\t";
-						break;
-
-					default:
-						HyGuiLog("EntityModel::GenerateSrc_SetStateImpl - Unhandled event type", LOGTYPE_Error);
-						break;
+						if(timelineObj.contains("State"))
+							sSrc += "SetState(" + QString::number(timelineObj["State"].toInt()) + ");" + "\n\t\t\t\t";
 					}
 				}
 			}
 
-			if(iFrameIndex == iFinalFrame && bIsFinalFrameHandled == false)
-			{
-				sSrc += "SetTimelinePause(true);\n\t\t\t\t";
-				bIsFinalFrameHandled = true;
-			}
-
 			sSrc += "break;\n\n\t\t\t";
-		}
-
-		if(bIsFinalFrameHandled == false)
-		{
-			sSrc += "case " + QString::number(iFinalFrame) + ":\n\t\t\t\t";
-			sSrc += "SetTimelinePause(true);\n\t\t\t\t";
-			sSrc += "break;\n\n\t\t\t";
-			bIsFinalFrameHandled = true;
 		}
 
 		sSrc += "}\n\t\t\t"; // End switch(m_uiTimelineFrame)
@@ -864,7 +834,21 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 
 	for(QString sCategoryName : propObj.keys())
 	{
-		if(sCategoryName == "Common")
+		// NOTE: Only do sub-entity "Timeline" properties. The root "Timeline" is handled last
+		if(sCategoryName == "Timeline" && pItemData->GetEntType() != ENTTYPE_Root)
+		{
+			QJsonObject timelineObj = propObj["Timeline"].toObject();
+
+			if(timelineObj.contains("Pause"))
+				sSrc += sCodeName + "SetTimelinePause(" + (timelineObj["Pause"].toBool() ? "true" : "false") + ");" + sNewLine;
+
+			if(timelineObj.contains("Frame"))
+				sSrc += sCodeName + "SetTimelineFrame(" + QString::number(timelineObj["Frame"].toInt()) + ");" + sNewLine;
+
+			if(timelineObj.contains("State"))
+				sSrc += sCodeName + "SetState(" + QString::number(timelineObj["State"].toInt()) + ");" + sNewLine;
+		}
+		else if(sCategoryName == "Common")
 		{
 			QJsonObject commonObj = propObj["Common"].toObject();
 			if(commonObj.contains("State"))
@@ -957,15 +941,6 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 		else if(sCategoryName == "Entity")
 		{
 			QJsonObject entityObj = propObj["Entity"].toObject();
-
-			if(entityObj.contains("Timeline Pause"))
-			{
-				if(entityObj["Timeline Pause"].toBool())
-					sSrc += sCodeName + "SetTimelinePause(true);" + sNewLine;
-				else
-					sSrc += sCodeName + "SetTimelinePause(false);" + sNewLine;
-			}
-
 			if(entityObj.contains("Mouse Input"))
 			{
 				if(entityObj["Mouse Input"].toBool())
@@ -1264,9 +1239,9 @@ QString EntityModel::GenerateSrc_TimelineAdvance() const
 	}
 	stateFileDataOut.m_Meta.insert("keyFrames", stateKeyFramesObj);
 
-	// Serialize all events for this state
-	QJsonArray eventArray = pStateData->GetDopeSheetScene().SerializeEvents();
-	stateFileDataOut.m_Meta.insert("events", eventArray);
+	// Serialize all callbacks for this state
+	QJsonArray callbacksArray = pStateData->GetDopeSheetScene().SerializeCallbacks();
+	stateFileDataOut.m_Meta.insert("callbacks", callbacksArray);
 }
 
 /*virtual*/ void EntityModel::OnItemDeleted() /*override*/

@@ -27,7 +27,6 @@ namespace %HY_NAMESPACE% {
 	m_uiTimelineFrame = 0;
 	m_fpTimelineUpdate();
 	
-	m_bTimelinePaused = false;
 	m_fTimelineFrameTime = m_fTIMELINE_FRAME_DURATION;
 	
 	return true;

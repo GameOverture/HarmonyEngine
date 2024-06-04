@@ -273,32 +273,35 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 	pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
 	pPainter->drawLine(rect.x(), rect.y() + TIMELINE_HEIGHT, rect.x() + rect.width(), rect.y() + TIMELINE_HEIGHT);
 
-	//const QMap<int, QStringList> &eventMapRef = GetScene()->GetEventMap();
-
-	std::function<void(DopeSheetEvent, int, float)> fpPaintEvent = [&](DopeSheetEvent dopeSheetEvent, int iFrameIndex, float fX)
+	std::function<void(int, float)> fpPaintEvent = [&](int iFrameIndex, float fX)
 	{
-		switch(dopeSheetEvent.GetDopeEventType())
-		{ 
-		case DOPEEVENT_Callback:
+		if(GetScene()->GetCallbackList(iFrameIndex).empty() == false)
+		{
 			pPainter->translate(fX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f));
 			pPainter->setPen(Qt::NoPen);// HyGlobal::ConvertHyColor(HyColor::Black));
 			pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::Orange));
 
 			pPainter->rotate(45.0);
 			pPainter->drawRect(CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER, CALLBACK_DIAMETER);
-			break;
+			pPainter->resetTransform();
+		}
 
-		case DOPEEVENT_PauseTimeline: {
+		EntityTreeItemData *pRootTreeItemData = static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetRootTreeItemData();
+		QJsonValue pauseValue = GetScene()->GetKeyFrameProperty(pRootTreeItemData, iFrameIndex, "Timeline", "Pause");
+		if(pauseValue.isBool() && pauseValue.toBool())
+		{
 			QSize iconSize(16, 16);
 			QIcon pauseIcon(":/icons16x16/media-pause.png");
 			QPoint pt = QPoint(fX - (iconSize.width() / 2) + 1.0f, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f) - iconSize.width());
 			pPainter->drawPixmap(pt, pauseIcon.pixmap(iconSize.width(), iconSize.height()));
-			break; }
+		}
 
-		case DOPEEVENT_GotoFrame: {
+		QJsonValue frameValue = GetScene()->GetKeyFrameProperty(pRootTreeItemData, iFrameIndex, "Timeline", "Frame");
+		if(frameValue.isUndefined() == false && frameValue.isNull() == false)
+		{
 			QSize iconSize(16, 16);
 			QPoint pt = QPoint(fX - (iconSize.width() / 2) + 1.0f, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f) - iconSize.width());
-			int iGotoFrameIndex = dopeSheetEvent.GetOptionalData().toInt();
+			int iGotoFrameIndex = frameValue.toInt();
 			if(iGotoFrameIndex > iFrameIndex)
 			{
 				QIcon gotoIcon(":/icons16x16/media-forward.png");
@@ -309,21 +312,16 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 				QIcon gotoIcon(":/icons16x16/media-rewind.png");
 				pPainter->drawPixmap(pt, gotoIcon.pixmap(iconSize.width(), iconSize.height()));
 			}
-			break; }
+		}
 
-		case DOPEEVENT_GotoState: {
+		QJsonValue stateValue = GetScene()->GetKeyFrameProperty(pRootTreeItemData, iFrameIndex, "Timeline", "State");
+		if(stateValue.isUndefined() == false && stateValue.isNull() == false)
+		{
 			QSize iconSize(16, 16);
 			QIcon gotoIcon(":/icons16x16/items/Entity.png");
 			QPoint pt = QPoint(fX - (iconSize.width() / 2) + 1.0f, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f) - iconSize.width());
 			pPainter->drawPixmap(pt, gotoIcon.pixmap(iconSize.width(), iconSize.height()));
-			break; }
-
-		default:
-			HyGuiLog("fpPaintEvent: Unknown DopeSheetEventType", LOGTYPE_Error);
-			break;
 		}
-
-		pPainter->resetTransform();
 	};
 
 	int iFrameIndex = 0;
@@ -359,9 +357,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 			DrawShadowText(pPainter, textRect, QString::number(iFrameIndex), eColor, HyColor::Black);
 
 			// Draw timeline events
-			QList<DopeSheetEvent> dopeSheetEventList = GetScene()->GetEventList(iFrameIndex);
-			for(DopeSheetEvent dopeEvent : dopeSheetEventList)
-				fpPaintEvent(dopeEvent, iFrameIndex, fPosX);
+			fpPaintEvent(iFrameIndex, fPosX);
 		}
 
 		// Sub Notch Lines
@@ -389,9 +385,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 				pPainter->drawLine(fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, fPosX, rect.y() + TIMELINE_HEIGHT);
 
 				// Draw timeline events
-				QList<DopeSheetEvent> dopeSheetEventList = GetScene()->GetEventList(iCurSubNotchFrame);
-				for(DopeSheetEvent dopeEvent : dopeSheetEventList)
-					fpPaintEvent(dopeEvent, iCurSubNotchFrame, fPosX);
+				fpPaintEvent(iCurSubNotchFrame, fPosX);
 			}
 		}
 		

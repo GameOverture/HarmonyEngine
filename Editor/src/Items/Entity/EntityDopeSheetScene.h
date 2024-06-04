@@ -175,7 +175,7 @@ class EntityDopeSheetScene : public QGraphicsScene
 	// These maps store the actual property data for the entire entity
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;			// Store properties and tween values
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_PoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added
-	QMap<int, QStringList>															m_EventMap;				// KEY: frame index, VALUE: string that doesn't prefix with '_' is a callback name. Otherwise built in function (ex. _PauseTimeline) with an optional '=' delimiter and a value (ex. _GotoFrame=5)
+	QMap<int, QStringList>															m_CallbackMap;			// KEY: frame index, VALUE: a list of strings that are the callback name(s)
 
 	// These maps store the visual graphics items that correspond to the above maps
 	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_KeyFramesGfxRectMap;
@@ -198,10 +198,10 @@ public:
 	int GetFinalFrame() const;
 
 	const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &GetKeyFramesMap() const;
-	const QMap<int, QStringList> &GetEventMap() const;
+	const QMap<int, QStringList> &GetCallbackMap() const;
 
-	bool ContainsKeyFrameProperty(KeyFrameKey tupleKey);
-	bool ContainsKeyFrameTween(KeyFrameKey tupleKey);
+	bool ContainsKeyFrameProperty(KeyFrameKey tupleKey) const;
+	bool ContainsKeyFrameTween(KeyFrameKey tupleKey) const;
 
 	// Based on currently selected keyframes, this function will determine if a tween can be created, and if so, what type of tween
 	// Determines what quick-tween buttons should be shown in the AuxDopeSheet
@@ -234,12 +234,15 @@ public:
 	void PopAllKeyFrames(EntityTreeItemData *pItemData, bool bRefreshGfxItems);
 	void PushAllKeyFrames(EntityTreeItemData *pItemData, bool bRefreshGfxItems);
 
-	QJsonArray SerializeEvents() const;
-	QList<DopeSheetEvent> GetEventList(int iFrameIndex) const;
-	bool SetEvent(int iFrameIndex, QString sSerializedEvent);
-	bool RemoveEvent(int iFrameIndex, DopeSheetEventType eDopeEventType);
+	QJsonArray SerializeCallbacks() const;
+	bool SetCallback(int iFrameIndex, QString sCallback);
+	bool RemoveCallback(int iFrameIndex, QString sCallback);
 	QStringList GetCallbackList(int iFrameIndex) const;
 	bool RenameCallback(int iFrameIndex, QString sOldCallback, QString sNewCallback);
+
+	// Returns any timeline event properties set on 'pItemData', which would be the root or a sub-entity
+	QMap<int, QList<TimelineEvent>> AssembleTimelineEvents(EntityTreeItemData *pItemData) const;
+	QMap<int, QList<TimelineEvent>> AssembleTimelineEvents(const QMap<int, QJsonObject> &itemKeyFrameMapRef) const;
 
 	void NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems);
 	void NudgeKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, int iNudgeAmount, bool bRefreshGfxItems);

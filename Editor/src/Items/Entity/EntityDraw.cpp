@@ -306,7 +306,7 @@ void EntityDraw::ClearShapeEdit()
 	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 }
 
-void EntityDraw::SetExtrapolatedProperties()
+void EntityDraw::SetExtrapolatedProperties(bool bPreviewPlaying)
 {
 	if(m_pProjItem->GetWidget() == nullptr)
 		HyGuiLog("EntityDraw::SetExtrapolatedProperties - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
@@ -318,6 +318,8 @@ void EntityDraw::SetExtrapolatedProperties()
 
 	// Set the extrapolated properties for the 'm_RootEntity' item
 	EntityTreeItemData *pRootTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().GetRootTreeItemData();
+	QMap<int, QList<TimelineEvent>> timelineEventList = entityDopeSheetSceneRef.AssembleTimelineEvents(pRootTreeItemData);
+
 	ExtrapolateProperties(&m_RootEntity,
 						  nullptr,
 						  false,
@@ -325,7 +327,7 @@ void EntityDraw::SetExtrapolatedProperties()
 						  fFRAME_DURATION,
 						  iCURRENT_FRAME,
 						  entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData],
-						  entityDopeSheetSceneRef.GetEventMap(),
+						  timelineEventList,
 						  m_pCamera);
 
 	// Set the extrapolated properties for all the children items
@@ -343,7 +345,7 @@ void EntityDraw::SetExtrapolatedProperties()
 							  fFRAME_DURATION,
 							  iCURRENT_FRAME,
 							  entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData],
-							  entityDopeSheetSceneRef.GetEventMap(),
+							  timelineEventList,
 							  m_pCamera);
 	}
 
@@ -451,7 +453,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		delete pStaleItem;
 	staleItemList.clear();
 
-	SetExtrapolatedProperties();
+	SetExtrapolatedProperties(false);
 
 	if(m_bActivateVemOnNextJsonMeta)
 	{

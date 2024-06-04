@@ -286,57 +286,30 @@ struct FileDataPair
 	QJsonObject	m_Meta;
 };
 
-// These events are done while traversing the timeline at runtime
-enum DopeSheetEventType
+enum TimelineEventType
 {
-	DOPEEVENT_Callback = -1,
-	DOPEEVENT_PauseTimeline,
-	DOPEEVENT_GotoFrame,
-	DOPEEVENT_GotoState,
+	// NOTE: These values are serialized as numbers via JSON - do not change them
+	TIMELINEEVENT_Unknown = -1,
 
-	NUM_DOPEEVENTS,
-	DOPEEVENT_Unknown = NUM_DOPEEVENTS
+	TIMELINEEVENT_PauseTimeline = 0,
+	TIMELINEEVENT_GotoPrevFrame = 1,
+	TIMELINEEVENT_GotoState = 2,
+
+	NUM_TIMELINEEVENTS
 };
-const QString DOPEEVENT_STRINGS[NUM_DOPEEVENTS] = { "_PauseTimeline", "_GotoFrame=", "_GotoState=" };
-class DopeSheetEvent
+struct TimelineEvent
 {
-	QString				m_sSerializedData;
-	DopeSheetEventType	m_eType;
+	TimelineEventType	m_eType;
+	QJsonValue			m_Data;
 
-public:
-	DopeSheetEvent(QString sSerializedEvent) :
-		m_sSerializedData(sSerializedEvent),
-		m_eType(GetTypeFromSerialized(sSerializedEvent))
-	{
-	}
-
-	QString GetSerialized() const
-	{
-		return m_sSerializedData;
-	}
-
-	QString GetOptionalData() const
-	{
-		if(m_sSerializedData.contains('='))
-			return m_sSerializedData.split('=').last();
-
-		return "";
-	}
-
-	DopeSheetEventType GetDopeEventType() const
-	{
-		return m_eType;
-	}
-
-	static DopeSheetEventType GetTypeFromSerialized(QString sSerializedEvent)
-	{
-		for(int iDopeEventIndex = 0; iDopeEventIndex < NUM_DOPEEVENTS; ++iDopeEventIndex)
-		{
-			if(sSerializedEvent.startsWith(DOPEEVENT_STRINGS[iDopeEventIndex]))
-				return static_cast<DopeSheetEventType>(iDopeEventIndex);
-		}
-		return DOPEEVENT_Callback;
-	}
+	TimelineEvent() :
+		m_eType(TIMELINEEVENT_Unknown),
+		m_Data(QJsonValue())
+	{ }
+	TimelineEvent(TimelineEventType eType, QJsonValue data) :
+		m_eType(eType),
+		m_Data(data)
+	{ }
 };
 
 enum EntityItemDeclarationType
@@ -457,6 +430,8 @@ public:
 	static QColor ConvertHyColor(HyColor color);
 
 	static EntityItemDeclarationType GetEntityDeclType(QString sType);
+
+	static QMap<int, QList<TimelineEvent>> AssembleTimelineEvents(const QMap<int, QJsonObject> &itemKeyFrameMapRef);
 };
 
 struct SortTreeWidgetsPredicate
