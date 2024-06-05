@@ -69,8 +69,7 @@ void IDraw::SetCamera(glm::vec2 ptCamPos, float fZoom)
 	m_pCamera->pos.Set(m_ptCamPos);
 	m_pCamera->SetZoom(m_fCamZoom);
 
-	if(m_pProjItem)
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RefreshRulers();
+	CameraUpdated();
 }
 
 void IDraw::ApplyJsonData()
@@ -98,10 +97,9 @@ void IDraw::Show()
 {
 	m_pCamera->pos.Set(m_ptCamPos);
 	m_pCamera->SetZoom(m_fCamZoom);
+	CameraUpdated();
 
 	OnResizeRenderer();
-	if(m_pProjItem)
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RefreshRulers();
 
 	OnShow();
 	UpdateDrawStatus(m_sSizeStatus);
@@ -195,13 +193,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		m_sZoomStatus = g_sZoomLevels[iZoomLevel];
 		UpdateDrawStatus(m_sSizeStatus);
 
-		//QUndoCommand *pCmd = new UndoCmd_CameraUpdate("Camera Zoom", *m_pProjItem, m_ptCamPos, m_fCamZoom, m_pCamera->pos.Get(), m_pCamera->GetZoom());
-		//m_pProjItem->GetUndoStack()->push(pCmd);
-
-		m_fCamZoom = m_pCamera->GetZoom();
-		OnZoom(static_cast<HyZoomLevel>(iZoomLevel));
-
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RefreshRulers();
+		CameraUpdated();
 	}
 
 	pEvent->accept();
@@ -223,7 +215,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 			QPointF vDeltaMousePos = m_ptOldMousePos - ptCurMousePos;
 			m_pCamera->pos.Offset(static_cast<float>(vDeltaMousePos.x()), vDeltaMousePos.y() * -1.0f);
 
-			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RefreshRulers();
+			CameraUpdated();
 		}
 
 		m_ptOldMousePos = ptCurMousePos;
@@ -234,7 +226,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 /*virtual*/ void IDraw::OnUpdate() /*override*/
 {
-	if(m_uiPanFlags)
+	if(m_uiPanFlags || IsCameraPanning())
 	{
 		if(m_uiPanFlags & PAN_UP)
 			m_pCamera->PanUp();
@@ -245,16 +237,24 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		if(m_uiPanFlags & PAN_RIGHT)
 			m_pCamera->PanRight();
 
-		//if(m_pProjItem)
-		//	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RefreshRulers();
+		CameraUpdated();
 	}
-	else if(m_bIsMiddleMouseDown == false)
-		m_ptCamPos = m_pCamera->pos.Get();
 }
 
 bool IDraw::IsCameraPanning() const
 {
 	return m_pCamera->IsPanning() || m_bIsMiddleMouseDown;
+}
+
+void IDraw::CameraUpdated()
+{
+	m_ptCamPos = m_pCamera->pos.Get();
+	m_fCamZoom = m_pCamera->GetZoom();
+
+	if(m_pProjItem)
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RefreshRulers();
+
+	OnCameraUpdated();
 }
 
 float IDraw::GetLineThickness(HyZoomLevel eZoomLevel)

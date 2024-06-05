@@ -77,7 +77,8 @@ protected:
 	virtual void OnShow() = 0;
 	virtual void OnHide() = 0;
 	virtual void OnResizeRenderer() = 0;
-	virtual void OnZoom(HyZoomLevel eZoomLevel) { }
+	void CameraUpdated();
+	virtual void OnCameraUpdated() { }
 
 	float GetLineThickness(HyZoomLevel eZoomLevel);
 };

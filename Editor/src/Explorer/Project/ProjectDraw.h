@@ -60,7 +60,7 @@ protected:
 	virtual void OnShow() override;
 	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
-	virtual void OnZoom(HyZoomLevel eZoomLevel) override;
+	virtual void OnCameraUpdated() override;
 };
 
 #endif // PROJECTDRAW_H

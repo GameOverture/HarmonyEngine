@@ -1123,39 +1123,72 @@ void EntityDopeSheetScene::NudgeKeyFrameTween(EntityTreeItemData *pItemData, int
 	NudgeKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type", iNudgeAmount, bRefreshGfxItems);
 }
 
-void EntityDopeSheetScene::SelectAllItemKeyFrames(EntityTreeItemData *pItemData)
+void EntityDopeSheetScene::SelectKeyFrames(bool bAppendSelection, EntityTreeItemData *pItemData, int iSelectionPivotFrame, bool bPivotLessThan)
 {
-	clearSelection();
+	if(bAppendSelection == false)
+		clearSelection();
+
 	if(pItemData == nullptr)
-		return;
-
-	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
-	for(QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.begin(); iter != itemKeyFrameMapRef.end(); ++iter)
 	{
-		int iFrameIndex = iter.key();
-		QJsonObject propsObj = iter.value();
-
-		QStringList sCategoryList = propsObj.keys();
-		for(QString sCategoryName : sCategoryList)
+		for(auto iter = m_KeyFramesGfxRectMap.begin(); iter != m_KeyFramesGfxRectMap.end(); ++iter)
 		{
-			QJsonObject categoryObj = propsObj[sCategoryName].toObject();
-			QStringList sPropList = categoryObj.keys();
-			for(QString sPropName : sPropList)
+			int iFrameIndex = std::get<GFXDATAKEY_FrameIndex>(iter.key());
+			if(iSelectionPivotFrame < 0 ||
+				iSelectionPivotFrame == iFrameIndex ||
+				(bPivotLessThan && iFrameIndex < iSelectionPivotFrame) ||
+				(bPivotLessThan == false && iFrameIndex > iSelectionPivotFrame))
 			{
-				if(sCategoryName.startsWith("Tween "))
+				iter.value()->setSelected(true);
+			}
+		}
+		for(auto iter = m_TweenGfxRectMap.begin(); iter != m_TweenGfxRectMap.end(); ++iter)
+		{
+			int iFrameIndex = std::get<GFXDATAKEY_FrameIndex>(iter.key());
+			if(iSelectionPivotFrame < 0 ||
+				iSelectionPivotFrame == iFrameIndex ||
+				(bPivotLessThan && iFrameIndex < iSelectionPivotFrame) ||
+				(bPivotLessThan == false && iFrameIndex > iSelectionPivotFrame))
+			{
+				iter.value()->setSelected(true);
+			}
+		}
+	}
+	else // pItemData != nullptr
+	{
+		const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
+		for(QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.begin(); iter != itemKeyFrameMapRef.end(); ++iter)
+		{
+			int iFrameIndex = iter.key();
+			
+			if(iSelectionPivotFrame < 0 ||
+				iSelectionPivotFrame == iFrameIndex ||
+				(bPivotLessThan && iFrameIndex < iSelectionPivotFrame) ||
+				(bPivotLessThan == false && iFrameIndex > iSelectionPivotFrame))
+			{
+				QJsonObject propsObj = iter.value();
+				QStringList sCategoryList = propsObj.keys();
+				for(QString sCategoryName : sCategoryList)
 				{
-					QString sTweenName = sCategoryName.mid(6);
-					TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sTweenName);
-					QPair<QString, QString> tweenPair = HyGlobal::ConvertTweenPropToRegularPropPair(eTweenProp);
-					KeyFrameKey gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, tweenPair.first % "/" % tweenPair.second);
-					if(m_TweenGfxRectMap.contains(gfxRectMapKey))
-						m_TweenGfxRectMap[gfxRectMapKey]->setSelected(true);
-				}
-				else
-				{
-					KeyFrameKey gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, sCategoryName % "/" % sPropName);
-					if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey))
-						m_KeyFramesGfxRectMap[gfxRectMapKey]->setSelected(true);
+					QJsonObject categoryObj = propsObj[sCategoryName].toObject();
+					QStringList sPropList = categoryObj.keys();
+					for(QString sPropName : sPropList)
+					{
+						if(sCategoryName.startsWith("Tween "))
+						{
+							QString sTweenName = sCategoryName.mid(6);
+							TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sTweenName);
+							QPair<QString, QString> tweenPair = HyGlobal::ConvertTweenPropToRegularPropPair(eTweenProp);
+							KeyFrameKey gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, tweenPair.first % "/" % tweenPair.second);
+							if(m_TweenGfxRectMap.contains(gfxRectMapKey))
+								m_TweenGfxRectMap[gfxRectMapKey]->setSelected(true);
+						}
+						else
+						{
+							KeyFrameKey gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, sCategoryName % "/" % sPropName);
+							if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey))
+								m_KeyFramesGfxRectMap[gfxRectMapKey]->setSelected(true);
+						}
+					}
 				}
 			}
 		}

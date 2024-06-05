@@ -41,8 +41,13 @@ class AuxDopeSheet : public QWidget
 		CONTEXTACTION_GotoState,
 		CONTEXTACTION_RemoveGotoState,
 
-		CONTEXTACTION_SelectAllItemKeyFrames,
-		CONTEXTACTION_DeselectAllKeyFrames,
+		CONTEXTACTION_SelectAll,			// Select every keyframe in the entire dope sheet
+		CONTEXTACTION_SelectAllPrior,		// Select every keyframe at the specified index and all prior
+		CONTEXTACTION_SelectAllAfter,		// Select every keyframe at the specified index and all after
+		CONTEXTACTION_SelectAllItem,		// Select every keyframe for the specified item
+		CONTEXTACTION_SelectAllItemPrior,	// Select every keyframe for the specified item at the specified index and all prior
+		CONTEXTACTION_SelectAllItemAfter,	// Select every keyframe for the specified item at the specified index and all after
+		CONTEXTACTION_DeselectAll,
 	};
 
 public:

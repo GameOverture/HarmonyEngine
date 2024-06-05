@@ -269,8 +269,10 @@ void ProjectDraw::EnableGridOverlay(bool bEnable)
 {
 }
 
-/*virtual*/ void ProjectDraw::OnZoom(HyZoomLevel eZoomLevel) /*override*/
+/*virtual*/ void ProjectDraw::OnCameraUpdated() /*override*/
 {
+	HyZoomLevel eZoomLevel = m_pCamera->SetZoomLevel();
+
 	float fLineThickness = GetLineThickness(eZoomLevel);
 	m_OriginHorz.SetLineThickness(fLineThickness);
 	m_OriginVert.SetLineThickness(fLineThickness);

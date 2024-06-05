@@ -540,57 +540,60 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 
 	QList<int> timelineEventFrameIndexList = timelineEventListRef.keys();
 	QList<int>::iterator timelineEventFrameIter = timelineEventFrameIndexList.begin();
-
 	bool bIsTimelineStopped = false;
 	int iTimelineStoppedOnFrame = -1;
+	std::function<void()> fpProcessTimelineEvents = [&]()
+	{
+		for(TimelineEvent &timelineEvent : timelineEventListRef[*timelineEventFrameIter])
+		{
+			switch(timelineEvent.m_eType)
+			{
+			case TIMELINEEVENT_PauseTimeline:
+				//if(eItemType == ITEM_Entity) // SubEntity
+				//	static_cast<SubEntity *>(pThisHyNode)->SyncTimelinePause(timelineEvent.m_Data.toBool());
+				if(timelineEvent.m_Data.toBool())
+				{
+					bIsTimelineStopped = true;
+					iTimelineStoppedOnFrame = *timelineEventFrameIter;
+				}
+				else
+				{
+					bIsTimelineStopped = false;
+					iTimelineStoppedOnFrame = -1;
+				}
+				break;
+
+			case TIMELINEEVENT_GotoState:
+				if(eItemType == ITEM_Entity) // SubEntity
+					pThisHyNode->SetState(timelineEvent.m_Data.toInt());
+				else
+				{
+					bIsTimelineStopped = true;
+					iTimelineStoppedOnFrame = *timelineEventFrameIter;
+				}
+				break;
+
+			case TIMELINEEVENT_GotoPrevFrame:
+				//if(eItemType == ITEM_Entity) // SubEntity
+				//	static_cast<SubEntity *>(pThisHyNode)->SetCurrentFrame(timelineEvent.m_Data.toInt());
+				//else
+				//{
+				//	bIsTimelineStopped = true;
+				//	iTimelineStoppedOnFrame = *timelineEventFrameIter;
+				//}
+				break;
+			}
+		}
+
+		++timelineEventFrameIter;
+	};
+
+
 	for(int iFrame : keyFrameMapRef.keys())
 	{
 		// First process all timeline events (in order) that occurred up until 'iFrame'
 		while(timelineEventFrameIter != timelineEventFrameIndexList.end() && iFrame >= *timelineEventFrameIter)
-		{
-			for(TimelineEvent &timelineEvent : timelineEventListRef[*timelineEventFrameIter])
-			{
-				switch(timelineEvent.m_eType)
-				{
-				case TIMELINEEVENT_PauseTimeline:
-					//if(eItemType == ITEM_Entity) // SubEntity
-					//	static_cast<SubEntity *>(pThisHyNode)->SyncTimelinePause(timelineEvent.m_Data.toBool());
-					if(timelineEvent.m_Data.toBool())
-					{
-						bIsTimelineStopped = true;
-						iTimelineStoppedOnFrame = *timelineEventFrameIter;
-					}
-					else
-					{
-						bIsTimelineStopped = false;
-						iTimelineStoppedOnFrame = -1;
-					}
-					break;
-
-				case TIMELINEEVENT_GotoState:
-					if(eItemType == ITEM_Entity) // SubEntity
-						pThisHyNode->SetState(timelineEvent.m_Data.toInt());
-					else
-					{
-						bIsTimelineStopped = true;
-						iTimelineStoppedOnFrame = *timelineEventFrameIter;
-					}
-					break;
-
-				case TIMELINEEVENT_GotoPrevFrame:
-					//if(eItemType == ITEM_Entity) // SubEntity
-					//	static_cast<SubEntity *>(pThisHyNode)->SetCurrentFrame(timelineEvent.m_Data.toInt());
-					//else
-					//{
-					//	bIsTimelineStopped = true;
-					//	iTimelineStoppedOnFrame = *timelineEventFrameIter;
-					//}
-					break;
-				}
-			}
-
-			++timelineEventFrameIter;
-		}
+			fpProcessTimelineEvents();
 
 		if(iFrame > iCURRENT_FRAME || (bIsTimelineStopped && iFrame != iTimelineStoppedOnFrame)) // Allow the frame this was stopped on to be processed
 			break;
@@ -861,7 +864,13 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 
 	} // For Loop - keyFrameMapRef.keys()
 
-	// Extrapolate any remaining time to iCURRENT_FRAME
+	// Finish processing any remaining timeline events
+	while(timelineEventFrameIter != timelineEventFrameIndexList.end())
+		fpProcessTimelineEvents();
+
+	const int iFINAL_FRAME = (bIsTimelineStopped) ? HyMath::Min(iTimelineStoppedOnFrame, iCURRENT_FRAME) : iCURRENT_FRAME;
+
+	// Extrapolate any remaining time to iFINAL_FRAME
 	// SPRITE ANIMS
 	if(eItemType == ITEM_Sprite)
 	{
@@ -874,17 +883,17 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 		}
 
 		if(std::get<SPRITE_Paused>(spriteLastKnownAnimInfo) == false)
-			static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iCURRENT_FRAME - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
+			static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFINAL_FRAME - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
 	}
 	else if(eItemType == ITEM_Entity) // Sub-Entity
 	{
-		static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(fFRAME_DURATION * iCURRENT_FRAME, HyGlobal::AssembleTimelineEvents(keyFrameMapRef), pCamera);
+		static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(fFRAME_DURATION *iFINAL_FRAME, HyGlobal::AssembleTimelineEvents(keyFrameMapRef), pCamera);
 	}
 
 	// TWEENS
 	for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
 	{
 		if(tweenInfo[iTweenProp].IsActive())
-			fpApplyTween(iTweenProp, iCURRENT_FRAME);
+			fpApplyTween(iTweenProp, iFINAL_FRAME);
 	}
 }

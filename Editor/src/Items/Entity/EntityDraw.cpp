@@ -500,7 +500,7 @@ void EntityDraw::SetExtrapolatedProperties(bool bPreviewPlaying)
 	RefreshTransforms();
 }
 
-/*virtual*/ void EntityDraw::OnZoom(HyZoomLevel eZoomLevel) /*override*/
+/*virtual*/ void EntityDraw::OnCameraUpdated() /*override*/
 {
 	RefreshTransforms();
 }

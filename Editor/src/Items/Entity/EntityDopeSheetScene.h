@@ -242,12 +242,13 @@ public:
 
 	// Returns any timeline event properties set on 'pItemData', which would be the root or a sub-entity
 	QMap<int, QList<TimelineEvent>> AssembleTimelineEvents(EntityTreeItemData *pItemData) const;
-	QMap<int, QList<TimelineEvent>> AssembleTimelineEvents(const QMap<int, QJsonObject> &itemKeyFrameMapRef) const;
 
 	void NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems);
 	void NudgeKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, int iNudgeAmount, bool bRefreshGfxItems);
 
-	void SelectAllItemKeyFrames(EntityTreeItemData *pItemData);
+	// pItemData - The item that is being selected, nullptr indicates all items
+	// iSelectionPivotFrame - When >= 0, the value is to select prior or subsequent frames
+	void SelectKeyFrames(bool bAppendSelection, EntityTreeItemData *pItemData, int iSelectionPivotFrame, bool bPivotLessThan);
 	QList<EntityTreeItemData *> GetItemsFromSelectedFrames() const;
 
 	void RefreshAllGfxItems();
