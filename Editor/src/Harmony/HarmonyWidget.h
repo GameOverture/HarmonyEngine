@@ -45,6 +45,7 @@ public:
 	HyRendererInterop *GetHarmonyRenderer();
 
 	void RefreshRulers();
+	bool IsShowRulersMouse() const;
 	void ShowRulerMouse(bool bShow);
 
 protected:

@@ -40,6 +40,11 @@ void HarmonyRulerGfxView::Init(HyOrientation eOrientation, HyColor bgColor)
 	setBackgroundBrush(HyGlobal::ConvertHyColor(bgColor));
 }
 
+bool HarmonyRulerGfxView::IsShowMouse() const
+{
+	return m_bShowMouse;
+}
+
 void HarmonyRulerGfxView::ShowMouse(bool bShowMouse)
 {
 	m_bShowMouse = bShowMouse;

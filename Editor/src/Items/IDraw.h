@@ -48,6 +48,8 @@ public:
 
 	void GetCameraInfo(glm::vec2 &ptPosOut, float &fZoomOut);
 	void SetCamera(glm::vec2 ptCamPos, float fZoom);
+
+	void StopCameraPanning();
 	
 	void ApplyJsonData();
 
@@ -58,7 +60,8 @@ public:
 
 	virtual void OnUndoStackIndexChanged(int iIndex) { }
 
-	// Derived classes should pass their input events to this class, if they want their main camera to accept user control
+	// NOTE: Qt Input Events are passed in from WgtHarmony
+	// Derived classes should invoke IDraw's version and pass their input events to this class, if they want their main camera to accept user control
 	virtual void OnKeyPressEvent(QKeyEvent *pEvent);
 	virtual void OnKeyReleaseEvent(QKeyEvent *pEvent);
 

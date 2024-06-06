@@ -84,6 +84,11 @@ void HarmonyWidget::RefreshRulers()
 	ui->rulerVert->update();
 }
 
+bool HarmonyWidget::IsShowRulersMouse() const
+{
+	return ui->rulerHorz->IsShowMouse();
+}
+
 void HarmonyWidget::ShowRulerMouse(bool bShow)
 {
 	ui->rulerHorz->ShowMouse(bShow);

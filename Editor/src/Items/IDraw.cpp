@@ -72,6 +72,11 @@ void IDraw::SetCamera(glm::vec2 ptCamPos, float fZoom)
 	CameraUpdated();
 }
 
+void IDraw::StopCameraPanning()
+{
+	m_uiPanFlags = 0;
+}
+
 void IDraw::ApplyJsonData()
 {
 	if(m_pProjItem == nullptr)
@@ -226,7 +231,10 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 /*virtual*/ void IDraw::OnUpdate() /*override*/
 {
-	if(m_uiPanFlags || IsCameraPanning())
+	if(m_pProjItem == nullptr)
+		return;
+	HarmonyWidget *pHarmonyWidget = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject());
+	if(pHarmonyWidget->IsShowRulersMouse() && m_uiPanFlags || IsCameraPanning())
 	{
 		if(m_uiPanFlags & PAN_UP)
 			m_pCamera->PanUp();

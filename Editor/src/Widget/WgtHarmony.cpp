@@ -145,23 +145,27 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	}
 }
 
-/*virtual*/ bool WgtHarmony::event(QEvent *pEvent) /*override*/
-{
-	if(pEvent->type() == QEvent::HoverEnter)
-		static_cast<HarmonyWidget *>(parent())->ShowRulerMouse(true);
-	else if(pEvent->type() == QEvent::HoverLeave)
-		static_cast<HarmonyWidget *>(parent())->ShowRulerMouse(false);
-	
-	return QWidget::event(pEvent);
-}
+///*virtual*/ bool WgtHarmony::event(QEvent *pEvent) /*override*/
+//{
+//	return QWidget::event(pEvent);
+//}
 
 /*virtual*/ void WgtHarmony::enterEvent(QEvent *pEvent) /*override*/
 {
 	this->setFocus();
+	static_cast<HarmonyWidget *>(parent())->ShowRulerMouse(true);
 }
 
 /*virtual*/ void WgtHarmony::leaveEvent(QEvent *pEvent) /*override*/
 {
+	static_cast<HarmonyWidget *>(parent())->ShowRulerMouse(false);
+
+	if(m_pProject)
+	{
+		ProjectItemData *pCurItem = m_pProject->GetCurrentOpenItem();
+		if(pCurItem)
+			pCurItem->GetDraw()->StopCameraPanning();
+	}
 }
 
 /*virtual*/ void WgtHarmony::dragEnterEvent(QDragEnterEvent *pEvent) /*override*/

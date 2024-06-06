@@ -37,6 +37,7 @@ public:
 
 	void Init(HyOrientation eOrientation, HyColor bgColor);
 
+	bool IsShowMouse() const;
 	void ShowMouse(bool bShowMouse);
 
 protected:
