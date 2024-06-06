@@ -333,10 +333,20 @@ void EntityDraw::SetExtrapolatedProperties(bool bPreviewPlaying)
 	// Set the extrapolated properties for all the children items
 	for(EntityDrawItem *pDrawItem : m_ItemList)
 	{
+		QMap<int, QList<TimelineEvent>> mergedTimelineEventList = timelineEventList;
+
 		EntityTreeItemData *pEntityTreeItemData = pDrawItem->GetEntityTreeItemData();
 		ItemType eItemType = pEntityTreeItemData->GetType();
 		if(eItemType == ITEM_Prefix) // aka Shapes folder
 			continue;
+		else if(eItemType == ITEM_Entity) // Sub-Entity
+		{
+			QMap<int, QList<TimelineEvent>> subEntTimelineEventList = entityDopeSheetSceneRef.AssembleTimelineEvents(pEntityTreeItemData);
+
+			// Merge 'subEntTimelineEventList' into 'mergedTimelineEventList'
+			for(auto cachedEventIter = subEntTimelineEventList.begin(); cachedEventIter != subEntTimelineEventList.end(); ++cachedEventIter)
+				mergedTimelineEventList[cachedEventIter.key()].append(cachedEventIter.value());
+		}
 
 		ExtrapolateProperties(pDrawItem->GetHyNode(),
 							  &pDrawItem->GetShapeCtrl(),
@@ -345,7 +355,7 @@ void EntityDraw::SetExtrapolatedProperties(bool bPreviewPlaying)
 							  fFRAME_DURATION,
 							  iCURRENT_FRAME,
 							  entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData],
-							  timelineEventList,
+							  mergedTimelineEventList,
 							  m_pCamera);
 	}
 

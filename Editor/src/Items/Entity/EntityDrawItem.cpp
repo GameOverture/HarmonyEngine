@@ -592,7 +592,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 	for(int iFrame : keyFrameMapRef.keys())
 	{
 		// First process all timeline events (in order) that occurred up until 'iFrame'
-		while(timelineEventFrameIter != timelineEventFrameIndexList.end() && iFrame >= *timelineEventFrameIter)
+		while(iFrame <= iCURRENT_FRAME && timelineEventFrameIter != timelineEventFrameIndexList.end() && iFrame >= *timelineEventFrameIter)
 			fpProcessTimelineEvents();
 
 		if(iFrame > iCURRENT_FRAME || (bIsTimelineStopped && iFrame != iTimelineStoppedOnFrame)) // Allow the frame this was stopped on to be processed
@@ -865,7 +865,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 	} // For Loop - keyFrameMapRef.keys()
 
 	// Finish processing any remaining timeline events
-	while(timelineEventFrameIter != timelineEventFrameIndexList.end())
+	while(timelineEventFrameIter != timelineEventFrameIndexList.end() && iCURRENT_FRAME >= *timelineEventFrameIter)
 		fpProcessTimelineEvents();
 
 	const int iFINAL_FRAME = (bIsTimelineStopped) ? HyMath::Min(iTimelineStoppedOnFrame, iCURRENT_FRAME) : iCURRENT_FRAME;
@@ -887,7 +887,8 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 	}
 	else if(eItemType == ITEM_Entity) // Sub-Entity
 	{
-		static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(fFRAME_DURATION *iFINAL_FRAME, HyGlobal::AssembleTimelineEvents(keyFrameMapRef), pCamera);
+		// NOTE: AssembleTimelineEvents(keyFrameMapRef) is getting merged with the saved/serialized timeline events
+		static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(fFRAME_DURATION * iFINAL_FRAME, HyGlobal::AssembleTimelineEvents(keyFrameMapRef), pCamera);
 	}
 
 	// TWEENS

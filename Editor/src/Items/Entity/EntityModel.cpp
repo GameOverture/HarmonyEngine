@@ -1089,6 +1089,7 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 	return sSrc;
 }
 
+// Advance runtime by 1 frame on the timeline
 QString EntityModel::GenerateSrc_TimelineAdvance() const
 {
 	QString sSrc;
