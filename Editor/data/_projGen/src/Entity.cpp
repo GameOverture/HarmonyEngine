@@ -27,7 +27,7 @@ namespace %HY_NAMESPACE% {
 	m_uiTimelineFrame = 0;
 	m_fpTimelineUpdate();
 	
-	m_fTimelineFrameTime = m_fTIMELINE_FRAME_DURATION;
+	m_fTimelineFrameTime = -m_fTIMELINE_FRAME_DURATION;
 	
 	return true;
 }
@@ -37,18 +37,23 @@ namespace %HY_NAMESPACE% {
 	return %HY_NUMSTATES%;
 }
 
+float %HY_CLASS%::GetTimelineFrameDuration() const
+{
+	return m_fTIMELINE_FRAME_DURATION;
+}
+
 uint32 %HY_CLASS%::GetTimelineFrame() const
 {
 	return m_uiTimelineFrame;
 }
 
-float %HY_CLASS%::GetTimelineFrameDuration() const
-{
-	return m_fTIMELINE_FRAME_DURATION;
-}
-%HY_ACCESSORDEFINITION%
-
 void %HY_CLASS%::SetTimelineFrame(uint32 uiFrameIndex)
+{
+	m_uiTimelineFrame = HyMath::Min(uiFrameIndex, m_uiTimelineFinalFrame);
+	m_fTimelineFrameTime = -m_fTIMELINE_FRAME_DURATION;
+}
+
+void %HY_CLASS%::ExtrapolateTimelineFrame(uint32 uiFrameIndex)
 {
 	uiFrameIndex = HyMath::Min(uiFrameIndex, m_uiTimelineFinalFrame);
 
@@ -66,7 +71,7 @@ void %HY_CLASS%::SetTimelineFrame(uint32 uiFrameIndex)
 		m_uiTimelineFrame++;
 	}
 	
-	m_fTimelineFrameTime = m_fTIMELINE_FRAME_DURATION;
+	m_fTimelineFrameTime = -m_fTIMELINE_FRAME_DURATION;
 }
 
 bool %HY_CLASS%::IsTimelinePaused() const
@@ -74,17 +79,24 @@ bool %HY_CLASS%::IsTimelinePaused() const
 	return m_bTimelinePaused;
 }
 
+bool %HY_CLASS%::IsTimelineFinished() const
+{
+	return m_uiTimelineFrame == m_uiTimelineFinalFrame;
+}
+
 void %HY_CLASS%::SetTimelinePause(bool bPause)
 {
 	m_bTimelinePaused = bPause;
 }
+
+%HY_ACCESSORDEFINITION%
 
 /*virtual*/ void %HY_CLASS%::Update() /*override*/
 {
 	if(m_bTimelinePaused == false && m_uiTimelineFrame < m_uiTimelineFinalFrame)
 	{
 		m_fTimelineFrameTime += HyEngine::DeltaTime();
-		while(m_fTimelineFrameTime >= 0.0f)
+		while(m_fTimelineFrameTime >= 0.0f && m_uiTimelineFrame < m_uiTimelineFinalFrame)
 		{
 			m_uiTimelineFrame++;
 			m_fpTimelineUpdate();

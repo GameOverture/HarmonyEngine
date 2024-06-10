@@ -362,17 +362,20 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 			if(ptNewTranslation != ptOldTranslation)
 			{
 				QVariant tmpVariant = QPointF(ptNewTranslation.x, ptNewTranslation.y);
-				bCreatedTranslationKeyFrame = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant), false);
+				QJsonValue overwrittenValue = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Position", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant), false);
+				bCreatedTranslationKeyFrame = (overwrittenValue.isUndefined() || overwrittenValue.isNull());
 			}
 			if(dNewRotation != dOldRotation)
 			{
 				QVariant tmpVariant = dNewRotation;
-				bCreatedRotationKeyFrame = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_double, tmpVariant), false);
+				QJsonValue overwrittenValue = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Rotation", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_double, tmpVariant), false);
+				bCreatedRotationKeyFrame = (overwrittenValue.isUndefined() || overwrittenValue.isNull());
 			}
 			if(vNewScale != vOldScale)
 			{
 				QVariant tmpVariant = QPointF(vNewScale.x, vNewScale.y);
-				bCreatedScaleKeyFrame = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant), false);
+				QJsonValue overwrittenValue = pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Transformation", "Scale", PropertiesTreeModel::ConvertVariantToJson(PROPERTIESTYPE_vec2, tmpVariant), false);
+				bCreatedScaleKeyFrame = (overwrittenValue.isUndefined() || overwrittenValue.isNull());
 			}
 
 			m_CreatedKeyFrameList.push_back(std::make_tuple(bCreatedTranslationKeyFrame, bCreatedRotationKeyFrame, bCreatedScaleKeyFrame));
@@ -750,15 +753,14 @@ EntityUndoCmd_PackToArray::EntityUndoCmd_PackToArray(ProjectItemData &entityItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, const QJsonObject &pasteKeyFrameObj, int iStartFrameIndex, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, QList<QPair<EntityTreeItemData *, QJsonArray>> pasteKeyFramesPairList, int iStartFrameIndex, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
-	m_pItemData(pItemData),
-	m_PasteMimeObject(pasteKeyFrameObj),
+	m_PasteKeyFramesPairList(pasteKeyFramesPairList),
 	m_iStartFrameIndex(iStartFrameIndex)
 {
-	if(m_pItemData == nullptr)
-		HyGuiLog("EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames pItemData is nullptr", LOGTYPE_Error);
+	if(m_PasteKeyFramesPairList.empty())
+		HyGuiLog("EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames m_PasteKeyFramesPairList is empty", LOGTYPE_Error);
 
 	if(m_iStartFrameIndex < 0)
 		setText("Paste Key Frames");
@@ -772,12 +774,12 @@ EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene 
 
 /*virtual*/ void EntityUndoCmd_PasteKeyFrames::redo() /*override*/
 {
-	m_DopeSheetSceneRef.PasteSerializedKeyFrames(m_pItemData, m_PasteMimeObject, m_iStartFrameIndex);
+	m_PoppedKeyFramesPairList = m_DopeSheetSceneRef.PasteSerializedKeyFrames(m_PasteKeyFramesPairList, m_iStartFrameIndex);
 }
 
 /*virtual*/ void EntityUndoCmd_PasteKeyFrames::undo() /*override*/
 {
-	m_DopeSheetSceneRef.UnpasteSerializedKeyFrames(m_pItemData, m_PasteMimeObject, m_iStartFrameIndex);
+	m_DopeSheetSceneRef.UnpasteSerializedKeyFrames(m_PasteKeyFramesPairList, m_PoppedKeyFramesPairList, m_iStartFrameIndex);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -141,6 +141,7 @@ class SubEntity : public HyEntity2d
 {
 	int												m_iFramesPerSecond;
 	int												m_iCurrentFrame;
+	int												m_iFrameOffset;
 
 	QList<QPair<IHyLoadable2d *, ItemType>>			m_ChildTypeList;
 
@@ -157,8 +158,9 @@ class SubEntity : public HyEntity2d
 public:
 	SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent);
 	virtual ~SubEntity();
-
 	void CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj);
+
+	virtual bool SetState(uint32 uiStateIndex) override;
 	
 	int GetTimelineFrame() const;
 
@@ -169,6 +171,6 @@ public:
 };
 
 
-void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, QMap<int, QList<TimelineEvent>> &timelineEventListRef, HyCamera2d *pCamera);
+void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, QMap<int, QList<TimelineEvent>> &timelineEventListRef, bool bEventsStopTimeline, HyCamera2d *pCamera);
 
 #endif // ENTITYDRAWITEM_H

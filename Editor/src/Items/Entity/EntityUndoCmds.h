@@ -237,13 +237,14 @@ public:
 
 class EntityUndoCmd_PasteKeyFrames : public QUndoCommand
 {
-	EntityDopeSheetScene &					m_DopeSheetSceneRef;
-	EntityTreeItemData *					m_pItemData;
-	QJsonObject								m_PasteMimeObject;
-	int										m_iStartFrameIndex;
+	EntityDopeSheetScene &							m_DopeSheetSceneRef;
+	QList<QPair<EntityTreeItemData *, QJsonArray>>	m_PasteKeyFramesPairList;
+	int												m_iStartFrameIndex;
+
+	QList<QPair<EntityTreeItemData *, QJsonArray>>	m_PoppedKeyFramesPairList; // Keyframes that were overwritten
 
 public:
-	EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, const QJsonObject &pasteKeyFrameObj, int iStartFrameIndex, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, QList<QPair<EntityTreeItemData *, QJsonArray>> pasteKeyFramesPairList, int iStartFrameIndex, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_PasteKeyFrames();
 
 	virtual void redo() override;

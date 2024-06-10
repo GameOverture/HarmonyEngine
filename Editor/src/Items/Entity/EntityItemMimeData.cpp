@@ -69,6 +69,7 @@ EntityFrameMimeData::EntityFrameMimeData(QJsonObject serializedKeyFramesObj) :
 
 bool EntityFrameMimeData::IsValidForPaste() const
 {
-	QJsonDocument jsonDocument = QJsonDocument::fromJson(m_Data);
-	return jsonDocument.object().size() == 1;
+	return true;
+	//QJsonDocument jsonDocument = QJsonDocument::fromJson(m_Data);
+	//return jsonDocument.object().size() == 1;
 }

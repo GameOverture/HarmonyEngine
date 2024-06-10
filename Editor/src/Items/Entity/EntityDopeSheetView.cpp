@@ -551,8 +551,9 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		}
 
 		// Only want default selection behavior when NOT clicking in the 'time line' or an 'item name' column AND it's not a tween knob
-		if(pItemUnderMouse == nullptr || pItemUnderMouse->data(GFXDATAKEY_Type).toInt() != GFXITEM_TweenKnob)
+		//if(pItemUnderMouse == nullptr || pItemUnderMouse->data(GFXDATAKEY_Type).toInt() != GFXITEM_TweenKnob)
 		{
+			GetScene()->ClearSelectionPivot();
 			// TODO: Swap control and shift modifiers when QGraphicsView takes the wheel
 			QGraphicsView::mousePressEvent(pEvent);
 		}

@@ -804,7 +804,7 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 			sSrc += "break;\n\n\t\t\t";
 		}
 
-		sSrc += "}\n\t\t\t"; // End switch(m_uiTimelineFrame)
+		sSrc += "}\n\t\t"; // End switch(m_uiTimelineFrame)
 
 		sSrc += "};\n\t\t"; // End m_fpTimelineUpdate
 		sSrc += "break;\n"; // End case m_uiState

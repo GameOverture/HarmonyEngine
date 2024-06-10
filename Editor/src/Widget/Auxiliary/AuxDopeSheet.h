@@ -41,6 +41,11 @@ class AuxDopeSheet : public QWidget
 		CONTEXTACTION_GotoState,
 		CONTEXTACTION_RemoveGotoState,
 
+		CONTEXTACTION_Paste,				// Paste frames at their copied frame index - if keyframe items are not 1:1 it will use best guess
+		CONTEXTACTION_PasteAtFrame,			// Paste frames starting at the specified frame index - if keyframe items are not 1:1 it will use best guess
+		CONTEXTACTION_PasteIntoItem,		// Paste frames at their copied frame index into the specified item - if the copied frames don't have a matching item, it will use best guess
+		CONTEXTACTION_PasteIntoItemAtFrame,	// Paste frames starting at the specified frame index into the specified item - if the copied frames don't have a matching item, it will use best guess
+
 		CONTEXTACTION_SelectAll,			// Select every keyframe in the entire dope sheet
 		CONTEXTACTION_SelectAllPrior,		// Select every keyframe at the specified index and all prior
 		CONTEXTACTION_SelectAllAfter,		// Select every keyframe at the specified index and all after
@@ -80,14 +85,12 @@ private Q_SLOTS:
 	void on_actionCreateAlphaTween_triggered();
 
 	void on_actionCopyFrames_triggered();
-	void on_actionPasteFrames_triggered();
-	void on_actionPasteOnFrame_triggered();
 	void on_actionDeleteFrames_triggered();
 
 private:
 	void CreateContextTween(TweenProperty eTweenProp);
 
-	void PasteFrames(int iStartFrameIndex); // -1 means don't offset pasted frames
+	void PasteFrames(int iStartFrameIndex, EntityTreeItemData *pContextTreeItemData); // -1 means don't offset pasted frames, pContextTreeItemData can be nullptr and it tries to best guess
 };
 
 #endif // WIDGETOUTPUTLOG_H

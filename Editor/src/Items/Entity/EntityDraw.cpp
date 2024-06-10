@@ -328,6 +328,7 @@ void EntityDraw::SetExtrapolatedProperties(bool bPreviewPlaying)
 						  iCURRENT_FRAME,
 						  entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData],
 						  timelineEventList,
+						  bPreviewPlaying == false,
 						  m_pCamera);
 
 	// Set the extrapolated properties for all the children items
@@ -356,6 +357,7 @@ void EntityDraw::SetExtrapolatedProperties(bool bPreviewPlaying)
 							  iCURRENT_FRAME,
 							  entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData],
 							  mergedTimelineEventList,
+							  bPreviewPlaying == false,
 							  m_pCamera);
 	}
 

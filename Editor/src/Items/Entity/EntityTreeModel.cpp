@@ -994,7 +994,7 @@ QString EntityTreeModel::GenerateCodeName(QString sDesiredName) const
 	{
 		QString sFullCodeName = sDesiredName;
 		if(uiConflictCount > 0)
-			sFullCodeName += QString::number(uiConflictCount);
+			sFullCodeName += QString::number(uiConflictCount + 1);
 
 		int i = 0;
 		for(; i < childList.size(); ++i)

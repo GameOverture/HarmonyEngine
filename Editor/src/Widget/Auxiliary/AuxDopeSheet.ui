@@ -347,18 +347,6 @@
     <string>Ctrl+C</string>
    </property>
   </action>
-  <action name="actionPasteFrames">
-   <property name="icon">
-    <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/edit-paste.png</normaloff>:/icons16x16/edit-paste.png</iconset>
-   </property>
-   <property name="text">
-    <string>Paste Frames</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+V</string>
-   </property>
-  </action>
   <action name="actionDeleteFrames">
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
@@ -372,18 +360,6 @@
    </property>
    <property name="shortcut">
     <string>Del</string>
-   </property>
-  </action>
-  <action name="actionPasteOnFrame">
-   <property name="icon">
-    <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/edit-paste.png</normaloff>:/icons16x16/edit-paste.png</iconset>
-   </property>
-   <property name="text">
-    <string>Paste Frames Starting Here</string>
-   </property>
-   <property name="toolTip">
-    <string>Pastes all frames with an offset so that the first paste frame starts here</string>
    </property>
   </action>
   <action name="actionBreakTween">

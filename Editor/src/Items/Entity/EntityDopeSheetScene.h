@@ -184,6 +184,10 @@ class EntityDopeSheetScene : public QGraphicsScene
 	int																				m_iCurrentFrame;
 	QGraphicsLineItem *																m_pCurrentFrameLine;
 
+	// Special selection variables that can be used to select/copy/paste empty space
+	int																				m_iSelectionPivotFrame;	// When >= 0, this frame index describes where the selection starts (or ends if m_bPivotLessThan == true)
+	bool																			m_bPivotLessThan;		// When m_iSelectionPivotFrame >= 0, true indicates selection goes 0 -> m_iSelectionPivotFrame, and false indicates selection goes m_iSelectionPivotFrame -> m_iFinalFrame
+
 	int																				m_iFinalFrame;			// This is the last frame that has a keyframe or event. It includes tweens' duration and what would be the ending frame it finishes
 
 public:
@@ -210,23 +214,23 @@ public:
 	// 'm_KeyFrameMap' must be fully updated before using this function
 	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps) const; // This is mainly useful for rendering the dope sheet. 'bCollapseTweenProps' will combine tween properties into a single entry (the regular category/property name)
 
-	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const;						// This QJsonArray layout will mimic the "stateArray"->"keyFrames"->"<GUID>" array in the Items.meta file
-	QJsonObject SerializeSpecifiedKeyFrames(QList<QGraphicsItem *> specifiedFrameList) const;	// This QJsonObject layout will mimic the "stateArray"->"keyFrames" object in the Items.meta file
+	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const; // This QJsonArray layout will mimic the "stateArray"->"keyFrames"->"<GUID>" array in the Items.meta file
+	QJsonObject SerializeSelectedKeyFrames() const; // All selected items (INCLUDING m_iSelectionPivotFrame/m_bPivotLessThan "empty frames") This QJsonObject layout will mimic the "stateArray"->"keyFrames" object in the Items.meta file
 	QJsonObject GetCurrentFrameProperties(EntityTreeItemData *pItemData) const;
 	QJsonValue GetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const;
 	QJsonValue BasicExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const; // Only works on properties that don't tween, or interpolate values between key frames
 	QMap<int, QMap<EntityTreeItemData *, QJsonObject>> GetKeyFrameMapPropertiesByFrame() const;
 
 	void SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj);
-	bool SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue, bool bRefreshGfxItems);
+	QJsonValue SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue, bool bRefreshGfxItems);
 	void RemoveKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, bool bRefreshGfxItems);
 	void RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, bool bRefreshGfxItems);
 	void RemoveKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, bool bRefreshGfxItems);
 
-	void PasteSerializedKeyFrames(EntityTreeItemData *pItemData, QJsonObject keyFrameMimeObj, int iStartFrameIndex);	// Inserts 'keyFrameMimeObj' frames into 'pItemData' - if 'iStartFrameIndex' is not negative, it will offset the paste to start at the specified frame
-	void UnpasteSerializedKeyFrames(EntityTreeItemData *pItemData, QJsonObject keyFrameMimeObj, int iStartFrameIndex);	// Removes 'keyFrameMimeObj' frames from 'pItemData' - if 'iStartFrameIndex' is not negative, it will remove the paste that was offset to start at the specified frame
-	void InsertSerializedKeyFrames(QJsonObject keyFrameMimeObj);									// Inserts 'keyFrameMimeObj' frames into the serialized items
-	void RemoveSerializedKeyFrames(QJsonObject keyFrameMimeObj);									// Removes 'keyFrameMimeObj' frames from the serialized items
+	QList<QPair<EntityTreeItemData *, QJsonArray>> PasteSerializedKeyFrames(QList<QPair<EntityTreeItemData *, QJsonArray>> pasteKeyFramesPairList, int iStartFrameIndex);
+	void UnpasteSerializedKeyFrames(QList<QPair<EntityTreeItemData *, QJsonArray>> unpasteKeyFramesPairList, QList<QPair<EntityTreeItemData *, QJsonArray>> overwrittenKeyFramesPairList, int iStartFrameIndex);
+	void InsertSerializedKeyFrames(QJsonObject keyFrameMimeObj);	// Inserts 'keyFrameMimeObj' frames into the serialized items
+	void RemoveSerializedKeyFrames(QJsonObject keyFrameMimeObj);	// Removes 'keyFrameMimeObj' frames from the serialized items
 
 	TweenJsonValues GetTweenJsonValues(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp) const;
 	void SetKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, const TweenJsonValues &tweenValues, bool bRefreshGfxItems);
@@ -249,6 +253,8 @@ public:
 	// pItemData - The item that is being selected, nullptr indicates all items
 	// iSelectionPivotFrame - When >= 0, the value is to select prior or subsequent frames
 	void SelectKeyFrames(bool bAppendSelection, EntityTreeItemData *pItemData, int iSelectionPivotFrame, bool bPivotLessThan);
+	void ClearSelectionPivot();
+
 	QList<EntityTreeItemData *> GetItemsFromSelectedFrames() const;
 
 	void RefreshAllGfxItems();

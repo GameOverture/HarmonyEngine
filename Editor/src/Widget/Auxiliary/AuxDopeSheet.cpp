@@ -30,7 +30,7 @@ AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 	ui->btnLastKeyFrame->setDefaultAction(ui->actionLastKeyFrame);
 
 	ui->btnCopyKeyFrames->setDefaultAction(ui->actionCopyFrames);
-	ui->btnPasteKeyFrames->setDefaultAction(ui->actionPasteFrames);
+	//ui->btnPasteKeyFrames->setDefaultAction(ui->actionPasteFrames);
 	ui->btnDeleteKeyFrames->setDefaultAction(ui->actionDeleteFrames);
 
 	ui->btnTweenBreak->setDefaultAction(ui->actionBreakTween);
@@ -249,10 +249,55 @@ QMenu *AuxDopeSheet::AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pCon
 	}
 	else // Context not on timeline
 	{
-		// Copy/Paste Frames actions
+		// Copy Frames action
 		pNewMenu->addAction(ui->actionCopyFrames);
-		pNewMenu->addAction(ui->actionPasteFrames);
-		pNewMenu->addAction(ui->actionPasteOnFrame);
+
+		// Paste Frames actions
+		const QMimeData *pMimeData = QApplication::clipboard()->mimeData();
+		bool bCanPaste = pMimeData && pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames));
+
+		QAction *pPasteAction = new QAction("Paste Frames");
+		if(bCanPaste)
+		{
+			//if(bBestGuess)
+			//	pPasteAction->setText("Paste Frames (Best Guess)");
+
+			QJsonObject pasteDataObj;
+			pasteDataObj.insert("contextAction", CONTEXTACTION_Paste);
+			pPasteAction->setData(QVariant(pasteDataObj));
+			pNewMenu->addAction(pPasteAction);
+
+			QAction *pPasteAtFrameAction = new QAction("Paste Frames starting at " % QString::number(iContextFrameIndex));
+			QJsonObject pasteAtFrameDataObj;
+			pasteAtFrameDataObj.insert("contextAction", CONTEXTACTION_PasteAtFrame);
+			pasteAtFrameDataObj.insert("frame", iContextFrameIndex);
+			pPasteAtFrameAction->setData(QVariant(pasteAtFrameDataObj));
+			pNewMenu->addAction(pPasteAtFrameAction);
+
+			if(pContextItem)
+			{
+				QAction *pPasteIntoItemAction = new QAction("Paste Frames into " % pContextItem->GetCodeName());
+				QJsonObject pasteIntoItemDataObj;
+				pasteIntoItemDataObj.insert("contextAction", CONTEXTACTION_PasteIntoItem);
+				pasteIntoItemDataObj.insert("contextData", pContextItem->GetThisUuid().toString(QUuid::WithoutBraces));
+				pPasteIntoItemAction->setData(QVariant(pasteIntoItemDataObj));
+				pNewMenu->addAction(pPasteIntoItemAction);
+
+				QAction *pPasteIntoItemAtFrameAction = new QAction("Paste Frames onto " % pContextItem->GetCodeName() % " starting at " % QString::number(iContextFrameIndex));
+				QJsonObject pasteIntoItemAtFrameDataObj;
+				pasteIntoItemAtFrameDataObj.insert("contextAction", CONTEXTACTION_PasteIntoItemAtFrame);
+				pasteIntoItemAtFrameDataObj.insert("frame", iContextFrameIndex);
+				pasteIntoItemAtFrameDataObj.insert("contextData", pContextItem->GetThisUuid().toString(QUuid::WithoutBraces));
+				pPasteIntoItemAtFrameAction->setData(QVariant(pasteIntoItemAtFrameDataObj));
+				pNewMenu->addAction(pPasteIntoItemAtFrameAction);
+			}
+		}
+		else // bCanPaste == false
+		{
+			pPasteAction->setEnabled(false);
+			pNewMenu->addAction(pPasteAction);
+		}
+		
 		pNewMenu->addSeparator();
 		
 		QAction *pSelectAllAction = new QAction("Select All Key Frames");
@@ -378,8 +423,8 @@ void AuxDopeSheet::UpdateWidgets()
 		const QMimeData *pMimeData = QApplication::clipboard()->mimeData();
 
 		bool bCanPaste = ui->graphicsView->GetContextClickItem() && pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames));
-		ui->actionPasteFrames->setEnabled(bCanPaste);
-		ui->actionPasteOnFrame->setEnabled(bCanPaste);
+		//ui->actionPasteFrames->setEnabled(bCanPaste);
+		//ui->actionPasteOnFrame->setEnabled(bCanPaste);
 
 		ui->actionDeleteFrames->setEnabled(selectedFrameItemList.size() > 0);
 	}
@@ -389,8 +434,8 @@ void AuxDopeSheet::UpdateWidgets()
 		ui->chkAutoInitialize->setEnabled(false);
 
 		ui->actionCopyFrames->setEnabled(false);
-		ui->actionPasteFrames->setEnabled(false);
-		ui->actionPasteOnFrame->setEnabled(false);
+		//ui->actionPasteFrames->setEnabled(false);
+		//ui->actionPasteOnFrame->setEnabled(false);
 		ui->actionDeleteFrames->setEnabled(false);
 	}
 }
@@ -550,6 +595,22 @@ void AuxDopeSheet::OnEventActionTriggered(QAction *pEventAction)
 	//	GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
 	//	break; }
 
+	case CONTEXTACTION_Paste:
+		PasteFrames(-1, nullptr);
+		break;
+				
+	case CONTEXTACTION_PasteAtFrame:
+		PasteFrames(dataObj["frame"].toInt(), nullptr);
+		break;
+		
+	case CONTEXTACTION_PasteIntoItem:
+		PasteFrames(-1, static_cast<EntityModel &>(GetEntityStateModel()->GetModel()).GetTreeModel().FindTreeItemData(QUuid(dataObj["contextData"].toString())));
+		break;
+
+	case CONTEXTACTION_PasteIntoItemAtFrame:
+		PasteFrames(dataObj["frame"].toInt(), static_cast<EntityModel &>(GetEntityStateModel()->GetModel()).GetTreeModel().FindTreeItemData(QUuid(dataObj["contextData"].toString())));
+		break;
+
 	case CONTEXTACTION_SelectAll:
 		GetEntityStateModel()->GetDopeSheetScene().SelectKeyFrames(QGuiApplication::queryKeyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier),
 																	nullptr,
@@ -631,34 +692,18 @@ void AuxDopeSheet::on_actionCreateAlphaTween_triggered()
 
 void AuxDopeSheet::on_actionCopyFrames_triggered()
 {
-	// Get selected items
-	QList<QGraphicsItem *> selectedItems = ui->graphicsView->GetScene()->selectedItems();
-
 	// Serialize all the selected items to the clipboard
-	QJsonObject serializedKeyFramesObj = ui->graphicsView->GetScene()->SerializeSpecifiedKeyFrames(selectedItems);
+	QJsonObject serializedKeyFramesObj = ui->graphicsView->GetScene()->SerializeSelectedKeyFrames();
 
 	// Copy the serialized data to the clipboard
 	EntityFrameMimeData *pFrameMimeData = new EntityFrameMimeData(serializedKeyFramesObj);
 	QApplication::clipboard()->setMimeData(pFrameMimeData);
 }
 
-void AuxDopeSheet::on_actionPasteFrames_triggered()
-{
-	PasteFrames(-1);
-}
-
-void AuxDopeSheet::on_actionPasteOnFrame_triggered()
-{
-	PasteFrames(ui->graphicsView->GetScene()->GetCurrentFrame());
-}
-
 void AuxDopeSheet::on_actionDeleteFrames_triggered()
 {
-	// Get selected items
-	QList<QGraphicsItem *> selectedItems = ui->graphicsView->GetScene()->selectedItems();
-
-	// Serialize all the selected items to the clipboard
-	QJsonObject serializedKeyFramesObj = ui->graphicsView->GetScene()->SerializeSpecifiedKeyFrames(selectedItems);
+	// Serialize all the selected items to be deleted
+	QJsonObject serializedKeyFramesObj = ui->graphicsView->GetScene()->SerializeSelectedKeyFrames();
 
 	EntityUndoCmd_PopKeyFrames *pNewCmd = new EntityUndoCmd_PopKeyFrames(*ui->graphicsView->GetScene(), serializedKeyFramesObj);
 	GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
@@ -705,32 +750,100 @@ void AuxDopeSheet::CreateContextTween(TweenProperty eTweenProp)
 	}
 }
 
-void AuxDopeSheet::PasteFrames(int iStartFrameIndex)
+void AuxDopeSheet::PasteFrames(int iStartFrameIndex, EntityTreeItemData *pContextTreeItemData)
 {
 	// Get the serialized data from the clipboard
 	const QMimeData *pMimeData = QApplication::clipboard()->mimeData();
-	if(pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)))
+	if(false == pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)))
 	{
-		const EntityFrameMimeData &entityFrameMimeDataRef = static_cast<const EntityFrameMimeData &>(*pMimeData);
-		if(entityFrameMimeDataRef.IsValidForPaste() == false)
-		{
-			HyGuiLog("AuxDopeSheet::on_actionPasteFrames_triggered() - entityFrameMimeDataRef.IsValidForPaste() == false", LOGTYPE_Error);
-			return;
-		}
-
-		QJsonDocument jsonDocument = QJsonDocument::fromJson(pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)));
-		QJsonObject serializedKeyFrameObj = jsonDocument.object();
-
-		if(ui->graphicsView->GetContextClickItem() == nullptr)
-		{
-			HyGuiLog("AuxDopeSheet::on_actionPasteFrames_triggered() - ui->graphicsView->GetContextClickItem() == nullptr", LOGTYPE_Error);
-			return;
-		}
-
-		EntityUndoCmd_PasteKeyFrames *pCmd = new EntityUndoCmd_PasteKeyFrames(*ui->graphicsView->GetScene(),
-																			  ui->graphicsView->GetContextClickItem(),
-																			  serializedKeyFrameObj,
-																			  iStartFrameIndex);
-		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pCmd);
+		HyGuiLog("AuxDopeSheet::PasteFrames() - pMimeData->hasFormat(MIMETYPE_EntityFrames) == false", LOGTYPE_Error);
+		return;
 	}
+	const EntityFrameMimeData &entityFrameMimeDataRef = static_cast<const EntityFrameMimeData &>(*pMimeData);
+	if(entityFrameMimeDataRef.IsValidForPaste() == false)
+	{
+		HyGuiLog("AuxDopeSheet::on_actionPasteFrames_triggered() - entityFrameMimeDataRef.IsValidForPaste() == false", LOGTYPE_Error);
+		return;
+	}
+
+	QJsonDocument jsonDocument = QJsonDocument::fromJson(pMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames)));
+	QJsonObject keyFrameMimeObj = jsonDocument.object();
+
+
+	QList<QPair<EntityTreeItemData *, QJsonArray>> pasteKeyFramesPairList;
+
+	if(pContextTreeItemData)
+	{
+		// Determine if there's a priority frame array for 'pContextTreeItemData' (one that has copied frames from the same UUID)
+		QJsonArray priorityFrameArray;
+		for(QString sKey : keyFrameMimeObj.keys())
+		{
+			QUuid keyFrameUuid(sKey);
+			if(pContextTreeItemData->GetThisUuid() == keyFrameUuid)
+			{
+				priorityFrameArray = keyFrameMimeObj[sKey].toArray();
+				break;
+			}
+		}
+
+		// Iterate through all the 'keyFrameMimeObj' properties in order, and only insert them into 'priorityFrameArray' if they don't already exist AND it's a compatible property
+		for(QString sKey : keyFrameMimeObj.keys())
+		{
+			QUuid keyFrameUuid(sKey);
+			if(pContextTreeItemData->GetThisUuid() == keyFrameUuid)
+				continue;
+
+			QJsonArray frameDataArray = keyFrameMimeObj[sKey].toArray();
+			for(int iArrayIndex = 0; iArrayIndex < frameDataArray.size(); ++iArrayIndex)
+			{
+				bool bPastePropertyAccountedFor = false;
+				QJsonObject pasteFrameObj = frameDataArray[iArrayIndex].toObject();
+				int iPasteFrameIndex = pasteFrameObj["frame"].toInt();
+				QJsonObject pastePropsObj = pasteFrameObj["props"].toObject();
+
+				// Check if this frame index already exists in 'priorityFrameArray', if it does merge property in
+				for(int iProrityFrameArrayIndex = 0; iProrityFrameArrayIndex < priorityFrameArray.size(); ++iProrityFrameArrayIndex)
+				{
+					QJsonObject priorityFrameObj = priorityFrameArray[iProrityFrameArrayIndex].toObject();
+					int iPriorityFrameIndex = priorityFrameObj["frame"].toInt();
+					if(iPriorityFrameIndex == iPasteFrameIndex)
+					{
+						// This frame exists, so make sure it's not overwriting anything in 'priorityFrameArray', but merge the rest
+						QJsonObject priorityPropsObj = priorityFrameObj["props"].toObject();
+						for(QString sCategory : pastePropsObj.keys())
+						{
+							QJsonObject pasteCategoryObj = pastePropsObj[sCategory].toObject();
+							for(QString sPropName : pasteCategoryObj.keys())
+							{
+								if(priorityPropsObj.contains(sCategory) == false)
+									priorityPropsObj.insert(sCategory, QJsonObject());
+								QJsonObject priorityCategoryObj = priorityPropsObj[sCategory].toObject();
+								if(priorityCategoryObj.contains(sPropName) == false)
+									priorityCategoryObj.insert(sPropName, pasteCategoryObj[sPropName]);
+								priorityPropsObj[sCategory] = priorityCategoryObj;
+							}
+						}
+						priorityFrameObj["props"] = priorityPropsObj;
+						priorityFrameArray[iProrityFrameArrayIndex] = priorityFrameObj;
+
+						bPastePropertyAccountedFor = true;
+						break;
+					}
+				}
+
+				if(bPastePropertyAccountedFor == false)
+					priorityFrameArray.append(pasteFrameObj);
+			} // for(frameDataArray)
+		} // for(keyFrameMimeObj.keys())
+
+		pasteKeyFramesPairList.push_back(QPair<EntityTreeItemData *, QJsonArray>(pContextTreeItemData, priorityFrameArray));
+	}
+	else // if 'pContextTreeItemData' is nullptr, then try to divvy the paste 'keyFrameMimeObj' between all items
+	{
+		HyGuiLog("AuxDopeSheet::PasteFrames() - null destination item Unimplemented", LOGTYPE_Error);
+	}
+
+	EntityUndoCmd_PasteKeyFrames *pCmd = new EntityUndoCmd_PasteKeyFrames(*ui->graphicsView->GetScene(), pasteKeyFramesPairList, iStartFrameIndex);
+	GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pCmd);
+	
 }

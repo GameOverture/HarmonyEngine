@@ -30,14 +30,18 @@ public:
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual uint32 GetNumStates() override;
 	
-	uint32 GetTimelineFrame() const;
 	float GetTimelineFrameDuration() const;
-%HY_ACCESSORDECL%
+	uint32 GetTimelineFrame() const;
 	
 	void SetTimelineFrame(uint32 uiFrameIndex);
+	void ExtrapolateTimelineFrame(uint32 uiFrameIndex);
 	
 	bool IsTimelinePaused() const;
 	void SetTimelinePause(bool bPause);
+	
+	bool IsTimelineFinished() const;
+	
+	%HY_ACCESSORDECL%
 	
 protected:
 	virtual void Update() override;

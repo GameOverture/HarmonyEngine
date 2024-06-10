@@ -170,6 +170,8 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	m_pEntStateData(pStateData),
 	m_iCurrentFrame(0),
 	m_pCurrentFrameLine(nullptr),
+	m_iSelectionPivotFrame(-1),
+	m_bPivotLessThan(false),
 	m_iFinalFrame(0)
 {
 	QJsonObject keyFramesObj = metaFileObj["keyFrames"].toObject();
@@ -466,28 +468,29 @@ QJsonArray EntityDopeSheetScene::SerializeAllKeyFrames(EntityTreeItemData *pItem
 	return serializedKeyFramesArray;
 }
 
-QJsonObject EntityDopeSheetScene::SerializeSpecifiedKeyFrames(QList<QGraphicsItem *> specifiedFrameList) const
+QJsonObject EntityDopeSheetScene::SerializeSelectedKeyFrames() const
 {
-	QMap<QUuid, QJsonArray> serializedKeyFrameMap; // Store specifiedFrameList properties into this
-
-	if(specifiedFrameList.isEmpty())
+	QList<QGraphicsItem *> selectedItemList = selectedItems();
+	if(selectedItemList.isEmpty())
 		return QJsonObject();
 
-	// Sort 'specifiedFrameList' by X position
-	std::sort(specifiedFrameList.begin(), specifiedFrameList.end(),
+	QMap<QUuid, QJsonArray> serializedKeyFrameMap; // Store selectedItemList's properties into this
+
+	// Sort 'selectedItemList' by X position
+	std::sort(selectedItemList.begin(), selectedItemList.end(),
 		[](const QGraphicsItem *a, const QGraphicsItem *b) -> bool
 		{
 			return a->scenePos().x() < b->scenePos().x();
 		});
 
-	for(QGraphicsItem *pItem : specifiedFrameList)
+	for(QGraphicsItem *pItem : selectedItemList)
 	{
 		// Only process 'GraphicsKeyFrameItem' types
 		bool bAcquiredDataType = false;
 		DopeSheetGfxItemType eItemType = static_cast<DopeSheetGfxItemType>(pItem->data(GFXDATAKEY_Type).toInt(&bAcquiredDataType));
 		if(bAcquiredDataType == false || (eItemType != GFXITEM_PropertyKeyFrame && eItemType != GFXITEM_TweenKeyFrame))
 			continue;
-		
+
 		// Extract key frame data
 		KeyFrameKey tupleKey = static_cast<GraphicsKeyFrameItem *>(pItem)->GetKey();
 		EntityTreeItemData *pCurItemData = std::get<GFXDATAKEY_TreeItemData>(tupleKey);
@@ -575,6 +578,38 @@ QJsonObject EntityDopeSheetScene::SerializeSpecifiedKeyFrames(QList<QGraphicsIte
 		}
 		else
 			fpSerializeProperty(pCurItemData, iFrameIndex, sCategory, sProperty);
+	}
+
+	// If there's a pivot frame, insert a null category/property at iBeginningFrameIndex if one doesn't exist
+	if(m_iSelectionPivotFrame >= 0)
+	{
+		int iBeginningFrameIndex = m_bPivotLessThan ? 0 : m_iSelectionPivotFrame;
+
+		for(auto iter = serializedKeyFrameMap.begin(); iter != serializedKeyFrameMap.end(); ++iter)
+		{
+			bool bKeyFrameFoundOnStartFrame = false;
+
+			QJsonArray &itemFramesArrayRef = iter.value();
+			for(int i = 0; i < itemFramesArrayRef.size(); ++i)
+			{
+				QJsonObject frameObj = itemFramesArrayRef[i].toObject();
+				int iFrameIndex = frameObj["frame"].toInt();
+				if(iFrameIndex == m_iSelectionPivotFrame)
+				{
+					bKeyFrameFoundOnStartFrame = true;
+					break;
+				}
+			}
+
+			// Insert a null category/property at iBeginningFrameIndex if one doesn't exist
+			if(bKeyFrameFoundOnStartFrame == false)
+			{
+				QJsonObject serializedKeyFramesObj;
+				serializedKeyFramesObj["frame"] = iBeginningFrameIndex;
+				serializedKeyFramesObj["props"] = QJsonObject();
+				itemFramesArrayRef.append(serializedKeyFramesObj);
+			}
+		}
 	}
 
 	QJsonObject serializedKeyFramesObj; // This layout will mimic "stateArray" -> "keyFrames" object in the Items.meta file
@@ -709,9 +744,9 @@ void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, 
 	RefreshAllGfxItems();
 }
 
-bool EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue, bool bRefreshGfxItems)
+QJsonValue EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue, bool bRefreshGfxItems)
 {
-	bool bIsNewKeyFrame = false;
+	bool bIsKeyFrameOverwritten = true;
 
 	if(m_KeyFramesMap.contains(pItemData) == false)
 		m_KeyFramesMap.insert(pItemData, QMap<int, QJsonObject>());
@@ -724,10 +759,14 @@ bool EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, in
 	if(keyFrameObjRef.contains(sCategoryName) == false)
 	{
 		keyFrameObjRef.insert(sCategoryName, QJsonObject());
-		bIsNewKeyFrame = true;
+		bIsKeyFrameOverwritten = false;
 	}
 	else if(keyFrameObjRef[sCategoryName].toObject().contains(sPropName) == false)
-		bIsNewKeyFrame = true;
+		bIsKeyFrameOverwritten = false;
+
+	QJsonValue overwrittenValueOut;
+	if(bIsKeyFrameOverwritten)
+		overwrittenValueOut = keyFrameObjRef[sCategoryName].toObject()[sPropName];
 
 	QJsonObject categoryObj = keyFrameObjRef[sCategoryName].toObject();
 	categoryObj.insert(sPropName, jsonValue);
@@ -737,7 +776,7 @@ bool EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, in
 	if(bRefreshGfxItems)
 		RefreshAllGfxItems();
 
-	return bIsNewKeyFrame;
+	return overwrittenValueOut;
 }
 
 void EntityDopeSheetScene::RemoveKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, bool bRefreshGfxItems)
@@ -827,90 +866,134 @@ void EntityDopeSheetScene::RemoveKeyFrameTween(EntityTreeItemData *pItemData, in
 	RemoveKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, "Tween Type", bRefreshGfxItems);
 }
 
-void EntityDopeSheetScene::PasteSerializedKeyFrames(EntityTreeItemData *pItemData, QJsonObject keyFrameMimeObj, int iStartFrameIndex)
+QList<QPair<EntityTreeItemData *, QJsonArray>> EntityDopeSheetScene::PasteSerializedKeyFrames(QList<QPair<EntityTreeItemData *, QJsonArray>> pasteKeyFramesPairList, int iStartFrameIndex)
 {
-	if(pItemData == nullptr)
+	QList<QPair<EntityTreeItemData *, QJsonArray>> overwrittenKeyFramesPairList;
+
+	for(QPair<EntityTreeItemData *, QJsonArray> &pair : pasteKeyFramesPairList)
 	{
-		HyGuiLog("EntityDopeSheetScene::PasteSerializedKeyFrames() - pItemData is nullptr", LOGTYPE_Error);
-		return;
-	}
+		EntityTreeItemData *pItemData = pair.first;
+		QJsonArray &frameDataArray = pair.second;
 
-	if(keyFrameMimeObj.size() != 1)
-	{
-		HyGuiLog("EntityDopeSheetScene::PasteSerializedKeyFrames() - Invalid keyFrameMimeObj size", LOGTYPE_Error);
-		return;
-	}
-
-	if(m_KeyFramesMap.contains(pItemData) == false)
-		m_KeyFramesMap.insert(pItemData, QMap<int, QJsonObject>());
-
-	QJsonArray frameDataArray = keyFrameMimeObj.begin()->toArray();
-
-	int iFrameOffset = 0;
-	if(iStartFrameIndex >= 0 && frameDataArray.count() > 0)
-	{
-		int iPasteStartFrame = frameDataArray[0].toObject()["frame"].toInt();
-		iFrameOffset = iStartFrameIndex - iPasteStartFrame;
-	}
-	
-	for(int i = 0; i < frameDataArray.size(); ++i)
-	{
-		QJsonObject frameDataObj = frameDataArray[i].toObject();
-
-		QJsonObject propsObj = frameDataObj["props"].toObject();
-		for(QString sCategory : propsObj.keys())
+		int iFrameOffset = 0;
+		if(iStartFrameIndex >= 0 && frameDataArray.count() > 0)
 		{
-			QJsonObject categoryObj = propsObj[sCategory].toObject();
+			int iPasteStartFrame = frameDataArray[0].toObject()["frame"].toInt();
+			iFrameOffset = iStartFrameIndex - iPasteStartFrame;
+		}
 
-			for(QString sPropName : categoryObj.keys())
+		QJsonArray overwrittenKeyFrameArray;
+
+		for(int i = 0; i < frameDataArray.size(); ++i)
+		{
+			QJsonObject frameDataObj = frameDataArray[i].toObject();
+
+			QJsonObject propsObj = frameDataObj["props"].toObject();
+			for(QString sCategory : propsObj.keys())
 			{
-				// First determine if this frame has valid properties for 'pItemData'
-				if(pItemData->GetPropertiesModel().FindPropertyDefinition(sCategory, sPropName).IsValid())
-					SetKeyFrameProperty(pItemData, frameDataObj["frame"].toInt() + iFrameOffset, sCategory, sPropName, categoryObj[sPropName], false);
+				QJsonObject categoryObj = propsObj[sCategory].toObject();
+
+				for(QString sPropName : categoryObj.keys())
+				{
+					// First determine if this frame has valid properties for 'pItemData'
+					if(pItemData->GetPropertiesModel().FindPropertyDefinition(sCategory, sPropName).IsValid())
+					{
+						// If a keyframe already exists at this frame, save the properties that will be overwritten in 'overwrittenPropertiesObj'
+						int iFrameIndex = frameDataObj["frame"].toInt() + iFrameOffset;
+						QJsonValue overWrittenValue = SetKeyFrameProperty(pItemData, iFrameIndex, sCategory, sPropName, categoryObj[sPropName], false);
+						if(overWrittenValue.isUndefined() == false && overWrittenValue.isNull() == false)
+						{
+							bool bFoundKeyFrame = false;
+							for(int i = 0; i < overwrittenKeyFrameArray.size(); ++i)
+							{
+								QJsonObject keyFrameObj = overwrittenKeyFrameArray[i].toObject();
+								if(keyFrameObj["frame"].toInt() == iFrameIndex)
+								{
+									QJsonObject propsObj = keyFrameObj["props"].toObject();
+									if(propsObj.contains(sCategory) == false)
+										propsObj.insert(sCategory, QJsonObject());
+
+									QJsonObject categoryObj = propsObj[sCategory].toObject();
+									categoryObj.insert(sPropName, overWrittenValue);
+
+									propsObj[sCategory] = categoryObj;
+									keyFrameObj["props"] = propsObj;
+
+									overwrittenKeyFrameArray[i] = keyFrameObj;
+									bFoundKeyFrame = true;
+									break;
+								}
+							}
+
+							if(bFoundKeyFrame == false)
+							{
+								QJsonObject keyFrameObj;
+								keyFrameObj.insert("frame", iFrameIndex);
+								keyFrameObj.insert("props", QJsonObject({{sCategory, QJsonObject({{sPropName, overWrittenValue}})}}));
+								overwrittenKeyFrameArray.append(keyFrameObj);
+							}
+						}
+					}
+				}
 			}
 		}
-	}
+
+		if(overwrittenKeyFrameArray.size() > 0)
+			overwrittenKeyFramesPairList.append(QPair<EntityTreeItemData *, QJsonArray>(pItemData, overwrittenKeyFrameArray));
+	};
 
 	RefreshAllGfxItems();
+
+	return overwrittenKeyFramesPairList;
 }
 
-void EntityDopeSheetScene::UnpasteSerializedKeyFrames(EntityTreeItemData *pItemData, QJsonObject keyFrameMimeObj, int iStartFrameIndex)
+void EntityDopeSheetScene::UnpasteSerializedKeyFrames(QList<QPair<EntityTreeItemData *, QJsonArray>> unpasteKeyFramesPairList, QList<QPair<EntityTreeItemData *, QJsonArray>> overwrittenKeyFramesPairList, int iStartFrameIndex)
 {
-	if(m_KeyFramesMap.contains(pItemData) == false)
-		return;
+	//if(m_KeyFramesMap.contains(pItemData) == false)
+	//	return;
 
-	if(keyFrameMimeObj.size() != 1)
+	//if(keyFrameMimeObj.size() != 1)
+	//{
+	//	HyGuiLog("EntityDopeSheetScene::UnpasteSerializedKeyFrames() - Invalid keyFrameMimeObj size", LOGTYPE_Error);
+	//	return;
+	//}
+
+	//QJsonArray frameDataArray = keyFrameMimeObj.begin()->toArray();
+
+
+	for(QPair<EntityTreeItemData *, QJsonArray> &pair : unpasteKeyFramesPairList)
 	{
-		HyGuiLog("EntityDopeSheetScene::UnpasteSerializedKeyFrames() - Invalid keyFrameMimeObj size", LOGTYPE_Error);
-		return;
-	}
+		EntityTreeItemData *pItemData = pair.first;
+		QJsonArray &frameDataArray = pair.second;
 
-	QJsonArray frameDataArray = keyFrameMimeObj.begin()->toArray();
-
-	int iFrameOffset = 0;
-	if(iStartFrameIndex >= 0 && frameDataArray.count() > 0)
-	{
-		int iPasteStartFrame = frameDataArray[0].toObject()["frame"].toInt();
-		iFrameOffset = iStartFrameIndex - iPasteStartFrame;
-	}
-
-	for(int i = 0; i < frameDataArray.size(); ++i)
-	{
-		QJsonObject frameDataObj = frameDataArray[i].toObject();
-		QJsonObject propsObj = frameDataObj["props"].toObject();
-		for(QString sCategory : propsObj.keys())
+		int iFrameOffset = 0;
+		if(iStartFrameIndex >= 0 && frameDataArray.count() > 0)
 		{
-			QJsonObject categoryObj = propsObj[sCategory].toObject();
-			for(QString sPropName : categoryObj.keys())
+			int iPasteStartFrame = frameDataArray[0].toObject()["frame"].toInt();
+			iFrameOffset = iStartFrameIndex - iPasteStartFrame;
+		}
+
+		for(int i = 0; i < frameDataArray.size(); ++i)
+		{
+			QJsonObject frameDataObj = frameDataArray[i].toObject();
+			QJsonObject propsObj = frameDataObj["props"].toObject();
+			for(QString sCategory : propsObj.keys())
 			{
-				// First determine if this frame has valid properties for 'pItemData'
-				if(pItemData->GetPropertiesModel().FindPropertyDefinition(sCategory, sPropName).IsValid())
-					RemoveKeyFrameProperty(pItemData, frameDataObj["frame"].toInt() + iFrameOffset, sCategory, sPropName, false);
+				QJsonObject categoryObj = propsObj[sCategory].toObject();
+				for(QString sPropName : categoryObj.keys())
+				{
+					// First determine if this frame has valid properties for 'pItemData'
+					if(pItemData->GetPropertiesModel().FindPropertyDefinition(sCategory, sPropName).IsValid())
+						RemoveKeyFrameProperty(pItemData, frameDataObj["frame"].toInt() + iFrameOffset, sCategory, sPropName, false);
+				}
 			}
 		}
 	}
 
-	RefreshAllGfxItems();
+	if(overwrittenKeyFramesPairList.empty())
+		RefreshAllGfxItems();
+	else
+		PasteSerializedKeyFrames(overwrittenKeyFramesPairList, -1); // This happens to write the overwritten keyframes back into the model
 }
 
 void EntityDopeSheetScene::InsertSerializedKeyFrames(QJsonObject keyFrameMimeObj)
@@ -1128,15 +1211,18 @@ void EntityDopeSheetScene::SelectKeyFrames(bool bAppendSelection, EntityTreeItem
 	if(bAppendSelection == false)
 		clearSelection();
 
+	m_iSelectionPivotFrame = iSelectionPivotFrame;
+	m_bPivotLessThan = bPivotLessThan;
+
 	if(pItemData == nullptr)
 	{
 		for(auto iter = m_KeyFramesGfxRectMap.begin(); iter != m_KeyFramesGfxRectMap.end(); ++iter)
 		{
 			int iFrameIndex = std::get<GFXDATAKEY_FrameIndex>(iter.key());
-			if(iSelectionPivotFrame < 0 ||
-				iSelectionPivotFrame == iFrameIndex ||
-				(bPivotLessThan && iFrameIndex < iSelectionPivotFrame) ||
-				(bPivotLessThan == false && iFrameIndex > iSelectionPivotFrame))
+			if(m_iSelectionPivotFrame < 0 ||
+				m_iSelectionPivotFrame == iFrameIndex ||
+				(m_bPivotLessThan && iFrameIndex < m_iSelectionPivotFrame) ||
+				(m_bPivotLessThan == false && iFrameIndex > m_iSelectionPivotFrame))
 			{
 				iter.value()->setSelected(true);
 			}
@@ -1144,10 +1230,10 @@ void EntityDopeSheetScene::SelectKeyFrames(bool bAppendSelection, EntityTreeItem
 		for(auto iter = m_TweenGfxRectMap.begin(); iter != m_TweenGfxRectMap.end(); ++iter)
 		{
 			int iFrameIndex = std::get<GFXDATAKEY_FrameIndex>(iter.key());
-			if(iSelectionPivotFrame < 0 ||
-				iSelectionPivotFrame == iFrameIndex ||
-				(bPivotLessThan && iFrameIndex < iSelectionPivotFrame) ||
-				(bPivotLessThan == false && iFrameIndex > iSelectionPivotFrame))
+			if(m_iSelectionPivotFrame < 0 ||
+				m_iSelectionPivotFrame == iFrameIndex ||
+				(m_bPivotLessThan && iFrameIndex < m_iSelectionPivotFrame) ||
+				(m_bPivotLessThan == false && iFrameIndex > m_iSelectionPivotFrame))
 			{
 				iter.value()->setSelected(true);
 			}
@@ -1160,10 +1246,10 @@ void EntityDopeSheetScene::SelectKeyFrames(bool bAppendSelection, EntityTreeItem
 		{
 			int iFrameIndex = iter.key();
 			
-			if(iSelectionPivotFrame < 0 ||
-				iSelectionPivotFrame == iFrameIndex ||
-				(bPivotLessThan && iFrameIndex < iSelectionPivotFrame) ||
-				(bPivotLessThan == false && iFrameIndex > iSelectionPivotFrame))
+			if(m_iSelectionPivotFrame < 0 ||
+				m_iSelectionPivotFrame == iFrameIndex ||
+				(m_bPivotLessThan && iFrameIndex < m_iSelectionPivotFrame) ||
+				(m_bPivotLessThan == false && iFrameIndex > m_iSelectionPivotFrame))
 			{
 				QJsonObject propsObj = iter.value();
 				QStringList sCategoryList = propsObj.keys();
@@ -1193,6 +1279,11 @@ void EntityDopeSheetScene::SelectKeyFrames(bool bAppendSelection, EntityTreeItem
 			}
 		}
 	}
+}
+
+void EntityDopeSheetScene::ClearSelectionPivot()
+{
+	m_iSelectionPivotFrame = -1;
 }
 
 QList<EntityTreeItemData *> EntityDopeSheetScene::GetItemsFromSelectedFrames() const

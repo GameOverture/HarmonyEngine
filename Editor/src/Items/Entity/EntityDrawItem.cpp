@@ -280,6 +280,7 @@ SubEntity::SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const Q
 	HyEntity2d(pParent),
 	m_iFramesPerSecond(iFps),
 	m_iCurrentFrame(0),
+	m_iFrameOffset(0),
 	m_bTimelinePaused(false)
 {
 	QMap<QUuid, IHyLoadable2d *> uuidChildMap; // Temporary map to hold the QUuid's of the children so we can link them up with their key frame properties
@@ -454,6 +455,11 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 
 	pNewChild->Load();
 }
+/*virtual*/ bool SubEntity::SetState(uint32 uiStateIndex) /*SubEntity*/
+{
+	m_iFrameOffset = m_iCurrentFrame + m_iFrameOffset;
+	return HyEntity2d::SetState(uiStateIndex);
+}
 int SubEntity::GetTimelineFrame() const
 {
 	return m_iCurrentFrame;
@@ -479,7 +485,7 @@ void SubEntity::ExtrapolateChildProperties(float fElapsedTime, QMap<int, QList<T
 		mergedTimelineEventMapOut[cachedEventIter.key()].append(cachedEventIter.value());
 	
 	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
-		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, fFRAME_DURATION, m_iCurrentFrame, propMapRef[childTypePair.first], mergedTimelineEventMapOut, pCamera);
+		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, fFRAME_DURATION, m_iCurrentFrame, propMapRef[childTypePair.first], mergedTimelineEventMapOut, false, pCamera);
 }
 // SubEntity
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -489,7 +495,7 @@ void SubEntity::ExtrapolateChildProperties(float fElapsedTime, QMap<int, QList<T
 //             - EntityModel::GenerateSrc_SetStateImpl
 //             - EntityDrawItem::ExtractPropertyData
 //             - ExtrapolateProperties
-void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, QMap<int, QList<TimelineEvent>> &timelineEventListRef, HyCamera2d *pCamera)
+void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, QMap<int, QList<TimelineEvent>> &timelineEventListRef, bool bEventsStopTimeline, HyCamera2d *pCamera)
 {
 	// Sprite Special Case:
 	// To determine the sprite's animation frame that should be presented, whenever a property that might affect
@@ -565,8 +571,11 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 
 			case TIMELINEEVENT_GotoState:
 				if(eItemType == ITEM_Entity) // SubEntity
+				{
 					pThisHyNode->SetState(timelineEvent.m_Data.toInt());
-				else
+					static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(fFRAME_DURATION * (iCURRENT_FRAME - *timelineEventFrameIter), HyGlobal::AssembleTimelineEvents(keyFrameMapRef), pCamera);
+				}
+				else if(bEventsStopTimeline)
 				{
 					bIsTimelineStopped = true;
 					iTimelineStoppedOnFrame = *timelineEventFrameIter;
