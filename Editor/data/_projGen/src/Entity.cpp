@@ -50,6 +50,7 @@ uint32 %HY_CLASS%::GetTimelineFrame() const
 void %HY_CLASS%::SetTimelineFrame(uint32 uiFrameIndex)
 {
 	m_uiTimelineFrame = HyMath::Min(uiFrameIndex, m_uiTimelineFinalFrame);
+	m_fpTimelineUpdate();
 	m_fTimelineFrameTime = -m_fTIMELINE_FRAME_DURATION;
 }
 
