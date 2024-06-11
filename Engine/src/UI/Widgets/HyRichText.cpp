@@ -352,6 +352,7 @@ void HyRichText::AssembleRichTextDrawables()
 	uint32 uiCurTextState = 0;
 	glm::vec2 ptCurPos(0.0f, 0.0f);
 	float fUsedWidth = 0.0f;
+	float fMaxLineDescender = 0.0f;
 	bool bIsLoaded = true; // TODO: Store whether it's loaded here before creating any new drawables
 
 	uint32 uiCurFmtIndex = 0;
@@ -364,6 +365,8 @@ void HyRichText::AssembleRichTextDrawables()
 			fLineDescender = m_pTextData->GetLineDescender(uiCurTextState);
 			fLineHeight = m_pTextData->GetLineHeight(uiCurTextState);
 		}
+
+		fMaxLineDescender = HyMath::Min(fMaxLineDescender, fLineDescender); // NOTE: Descenders are stored as negative values
 
 		if(sCurText.empty() == false)
 		{
@@ -478,7 +481,7 @@ void HyRichText::AssembleRichTextDrawables()
 	}
 
 	// Delete old drawable list, then replace with new list
-	// NOTE: This is done at the end to avoid potentially unloading and reloading the same assets
+	// NOTE: This is done at the end to avoid Harmony from potentially unloading and reloading the same assets (keeps ref count non-zero)
 	while(m_DrawableList.empty() == false)
 	{
 		delete m_DrawableList.back();
@@ -512,6 +515,24 @@ void HyRichText::AssembleRichTextDrawables()
 		m_vBoxDimensions.x = fUsedWidth;
 	if(m_vBoxDimensions.y == 0.0f)
 		m_vBoxDimensions.y = fUsedHeight;
+
+	// Adjust the panel to fit around the text
+	m_Panel.SetSize(m_vBoxDimensions.x, m_vBoxDimensions.y);
+	switch(GetTextType())
+	{
+	case HYTEXT_Line:
+		m_Panel.pos.Set(0.0f, fMaxLineDescender);
+		break;
+
+	case HYTEXT_ScaleBox:
+	case HYTEXT_Column:
+	case HYTEXT_Box:
+		break;
+
+	default:
+		HyLogError("HyRichText::AssembleDrawables() - Unhandled text type: " << GetTextType());
+		break;
+	}
 
 	// Inform everwhere that *this has been updated
 	SetDirty(IHyNode::DIRTY_SceneAABB);
