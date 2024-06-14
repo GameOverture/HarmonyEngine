@@ -21,26 +21,30 @@ class ProjectItemData;
 class IDraw : public HyEntity2d
 {
 protected:
-	ProjectItemData *	m_pProjItem;
-	HyCamera2d *		m_pCamera;
-	glm::vec2			m_ptCamPos;
-	float				m_fCamZoom;
+	ProjectItemData *									m_pProjItem;
+	HyCamera2d *										m_pCamera;
+	glm::vec2											m_ptCamPos;
+	float												m_fCamZoom;
 
 	enum PanFlags
 	{
-		PAN_UP			= 1 << 0,
-		PAN_DOWN		= 1 << 1,
-		PAN_LEFT		= 1 << 2,
-		PAN_RIGHT		= 1 << 3
+		PAN_UP											= 1 << 0,
+		PAN_DOWN										= 1 << 1,
+		PAN_LEFT										= 1 << 2,
+		PAN_RIGHT										= 1 << 3
 	};
-	uint32				m_uiPanFlags;
+	uint32												m_uiPanFlags;
 
-	bool				m_bIsMiddleMouseDown;
-	QPointF				m_ptOldMousePos;
+	bool												m_bIsMiddleMouseDown;
+	QPointF												m_ptOldMousePos;
+
+	HyPrimitive2d										m_PendingGuide;
+	QMap<QPair<HyOrientation, int>, HyPrimitive2d *>	m_GuideMap;
+	HyOrientation										m_eModifyingGuidePending; // This is only used when an existing guide is being dragged (and doesn't use the HarmonyRulerGfxView's input events)
 
 private:
-	QString				m_sSizeStatus;	// Derived classes should set this using UpdateDrawStatus()
-	QString				m_sZoomStatus;
+	QString												m_sSizeStatus;	// Derived classes should set this using UpdateDrawStatus()
+	QString												m_sZoomStatus;
 
 public:
 	IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
@@ -69,6 +73,10 @@ public:
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent);
 	virtual void OnMouseWheelEvent(QWheelEvent *pEvent);
 	virtual void OnMouseMoveEvent(QMouseEvent *pEvent);
+
+	void SetPendingGuide(HyOrientation eOrientation);
+	bool TryAllocateGuide(HyOrientation eOrientation, int iWorldPos);
+	void AllocateGuide(HyOrientation eOrientation, int iWorldPos);
 
 protected:
 	virtual void OnUpdate() override;

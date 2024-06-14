@@ -189,27 +189,42 @@ ProjectDraw::ProjectDraw() :
 	m_CheckerGrid.SetShader(m_pCheckerGridShader);
 	m_CheckerGrid.SetDisplayOrder(-1000);
 
-	std::vector<glm::vec2> lineList(2, glm::vec2());
-	lineList[0].x = -fDIMENSION_SIZE * 0.5f;
-	lineList[0].y = 0.0f;
-	lineList[1].x = fDIMENSION_SIZE * 0.5f;
-	lineList[1].y = 0.0f;
+	//std::vector<glm::vec2> lineList(2, glm::vec2());
+	//lineList[0].x = -fDIMENSION_SIZE * 0.5f;
+	//lineList[0].y = 0.0f;
+	//lineList[1].x = fDIMENSION_SIZE * 0.5f;
+	//lineList[1].y = 0.0f;
+
+	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
+
+	m_OriginHorzBg.SetLineThickness(3.0f);
+	m_OriginHorzBg.SetTint(HyColor::Black);
+	m_OriginHorzBg.SetVisible(false);
+	m_OriginHorzBg.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
+	m_OriginHorzBg.UseWindowCoordinates();
 	m_OriginHorz.SetLineThickness(1.0f);
 	m_OriginHorz.SetTint(HyColor::White);
 	m_OriginHorz.SetVisible(false);
-	m_OriginHorz.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
+	m_OriginHorz.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
 	m_OriginHorz.UseWindowCoordinates();
 
-	lineList[0].x = 0.0f;
-	lineList[0].y = -fDIMENSION_SIZE * 0.5f;
-	lineList[1].x = 0.0f;
-	lineList[1].y = fDIMENSION_SIZE * 0.5f;
+	//lineList[0].x = 0.0f;
+	//lineList[0].y = -fDIMENSION_SIZE * 0.5f;
+	//lineList[1].x = 0.0f;
+	//lineList[1].y = fDIMENSION_SIZE * 0.5f;
+	m_OriginVertBg.SetLineThickness(3.0f);
+	m_OriginVertBg.SetTint(HyColor::Black);
+	m_OriginVertBg.SetVisible(false);
+	m_OriginVertBg.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
+	m_OriginVertBg.UseWindowCoordinates();
 	m_OriginVert.SetLineThickness(1.0f);
 	m_OriginVert.SetTint(HyColor::White);
 	m_OriginVert.SetVisible(false);
-	m_OriginVert.SetAsLineChain(&lineList[0], static_cast<uint32>(lineList.size()));
+	m_OriginVert.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
 	m_OriginVert.UseWindowCoordinates();
 
+	ChildAppend(m_OriginHorzBg);
+	ChildAppend(m_OriginVertBg);
 	ChildAppend(m_OriginHorz);
 	ChildAppend(m_OriginVert);
 
@@ -234,11 +249,14 @@ ProjectDraw::ProjectDraw() :
 {
 	IDraw::OnUpdate();
 
-	glm::vec2 m_ptCameraPos;
-	m_pCamera->ProjectToCamera(glm::vec2(0.0f, 0.0f), m_ptCameraPos);
+	// TODO: Do this in OnCameraUpdated() instead - Requires OnCameraUpdated() to be called for ProjectDraw (only other items' IDraw::OnCameraUpdated are called)
+	glm::vec2 ptOriginPos;
+	m_pCamera->ProjectToCamera(glm::vec2(0.0f, 0.0f), ptOriginPos);
 
-	m_OriginHorz.pos.Set(m_ptCameraPos);
-	m_OriginVert.pos.Set(m_ptCameraPos);
+	m_OriginHorzBg.pos.Set(0.0f, ptOriginPos.y);
+	m_OriginVertBg.pos.Set(ptOriginPos.x, 0.0f);
+	m_OriginHorz.pos.Set(0.0f, ptOriginPos.y);
+	m_OriginVert.pos.Set(ptOriginPos.x, 0.0f);
 }
 
 void ProjectDraw::EnableGridBackground(bool bEnable)
@@ -248,6 +266,8 @@ void ProjectDraw::EnableGridBackground(bool bEnable)
 
 void ProjectDraw::EnableGridOrigin(bool bEnable)
 {
+	m_OriginHorzBg.SetVisible(bEnable);
+	m_OriginVertBg.SetVisible(bEnable);
 	m_OriginHorz.SetVisible(bEnable);
 	m_OriginVert.SetVisible(bEnable);
 }
@@ -267,13 +287,21 @@ void ProjectDraw::EnableGridOverlay(bool bEnable)
 
 /*virtual*/ void ProjectDraw::OnResizeRenderer() /*override*/
 {
+	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
+
+	m_OriginHorzBg.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
+	m_OriginHorz.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
+	m_OriginVertBg.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
+	m_OriginVert.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
 }
 
-/*virtual*/ void ProjectDraw::OnCameraUpdated() /*override*/
-{
-	HyZoomLevel eZoomLevel = m_pCamera->SetZoomLevel();
+///*virtual*/ void ProjectDraw::OnCameraUpdated() /*override*/
+//{
+	//glm::vec2 ptOriginPos;
+	//m_pCamera->ProjectToCamera(glm::vec2(0.0f, 0.0f), ptOriginPos);
 
-	float fLineThickness = GetLineThickness(eZoomLevel);
-	m_OriginHorz.SetLineThickness(fLineThickness);
-	m_OriginVert.SetLineThickness(fLineThickness);
-}
+	//m_OriginHorzBg.pos.Set(0.0f, ptOriginPos.y);
+	//m_OriginVertBg.pos.Set(ptOriginPos.x, 0.0f);
+	//m_OriginHorz.pos.Set(0.0f, ptOriginPos.y);
+	//m_OriginVert.pos.Set(ptOriginPos.x, 0.0f);
+//}

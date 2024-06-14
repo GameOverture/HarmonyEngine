@@ -303,7 +303,7 @@ void EntityDraw::ClearShapeEdit()
 	}
 	m_eCurVemAction = ShapeCtrl::VEMACTION_None;
 
-	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
 }
 
 void EntityDraw::SetExtrapolatedProperties(bool bPreviewPlaying)
@@ -637,7 +637,8 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 	}
 	else // 'm_eDragState' is DRAGSTATE_None
 	{
-		if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
+		Qt::CursorShape eCurCursorShape = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape();
+		if(eCurCursorShape != Qt::WaitCursor && eCurCursorShape != Qt::SplitHCursor && eCurCursorShape != Qt::SplitVCursor)
 			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
 		
 		m_pCurHoverItem = nullptr;
@@ -655,7 +656,12 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 		{
 			m_eCurHoverGrabPoint = m_MultiTransform.IsMouseOverGrabPoint();
 			Qt::CursorShape eNextCursorShape = GetGrabPointCursorShape(m_eCurHoverGrabPoint, m_MultiTransform.GetCachedRotation());
-			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(eNextCursorShape);
+
+			if(eNextCursorShape != Qt::ArrowCursor ||
+			   (eCurCursorShape != Qt::WaitCursor && eCurCursorShape != Qt::SplitHCursor && eCurCursorShape != Qt::SplitVCursor))
+			{
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(eNextCursorShape);
+			}
 		}
 
 		if(m_SelectedItemList.size() == 1)
@@ -664,9 +670,15 @@ void EntityDraw::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 
 			m_eCurHoverGrabPoint = transformCtrlRef.IsMouseOverGrabPoint();
 			Qt::CursorShape eNextCursorShape = GetGrabPointCursorShape(m_eCurHoverGrabPoint, transformCtrlRef.GetCachedRotation());
-			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(eNextCursorShape);
+
 			if(eNextCursorShape != Qt::ArrowCursor)
 				m_pCurHoverItem = m_SelectedItemList[0]; // Override whatever might be above this item, because we're hovering over a grab point
+
+			if(eNextCursorShape != Qt::ArrowCursor ||
+				(eCurCursorShape != Qt::WaitCursor && eCurCursorShape != Qt::SplitHCursor && eCurCursorShape != Qt::SplitVCursor))
+			{
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(eNextCursorShape);
+			}
 		}
 	}
 }

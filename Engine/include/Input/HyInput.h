@@ -85,6 +85,10 @@ public:
 	void SetMouseCursor(HyMouseCursor eCursor);
 	void ResetMouseCursor();
 
+#if defined(HY_PLATFORM_GUI)
+	void SetWidgetMousePos(glm::vec2 ptMousePos);
+#endif
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Setup Button/Axis Mapping
 
@@ -180,8 +184,6 @@ private:
 	void DoTouchDownEvent(const SDL_Event &eventRef);
 	void DoTouchMoveEvent(const SDL_Event &eventRef);
 	void DoTouchUpEvent(const SDL_Event &eventRef);
-#elif defined(HY_PLATFORM_GUI)
-	void SetWidgetMousePos(glm::vec2 ptMousePos);
 #endif
 
 	// All controller input is fed through these ApplyController* functions

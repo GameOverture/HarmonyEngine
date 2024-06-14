@@ -424,7 +424,7 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 		return;
 
 	QPointF ptCurMousePos = pEvent->localPos();
-	m_pHyEngine->SetWidgetMousePos(glm::vec2(ptCurMousePos.x(), ptCurMousePos.y()));
+	HyEngine::Input().SetWidgetMousePos(glm::vec2(ptCurMousePos.x(), ptCurMousePos.y()));
 	
 	if(pCurItem->GetDraw())
 		pCurItem->GetDraw()->OnMouseMoveEvent(pEvent);

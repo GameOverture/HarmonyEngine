@@ -235,6 +235,13 @@ void HyInput::ResetMouseCursor()
 #endif
 }
 
+#if defined(HY_PLATFORM_GUI)
+void HyInput::SetWidgetMousePos(glm::vec2 ptMousePos)
+{
+	m_ptMousePos = ptMousePos;
+}
+#endif
+
 void HyInput::SetActionCategory(int32 iActionId, uint8 uiCategory, uint32 uiMappingIndex /*= 0*/)
 {
 	HyAssert(uiMappingIndex < m_uiNUM_INPUT_MAPS, "HyInput - Improper uiMappingIndex '" << uiMappingIndex << "' specified while max is: " << m_uiNUM_INPUT_MAPS);
@@ -852,11 +859,6 @@ void HyInput::RemoveController(int32 iId)
 		m_ptMousePos.y = eventRef.tfinger.y * m_pMouseWindow->GetHeightF();
 
 		m_uiMouseBtnFlags &= ~(1 << SDL_BUTTON_LEFT);
-	}
-#elif defined(HY_PLATFORM_GUI)
-	void HyInput::SetWidgetMousePos(glm::vec2 ptMousePos)
-	{
-		m_ptMousePos = ptMousePos;
 	}
 #endif
 

@@ -35,6 +35,7 @@ IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	m_bIsMiddleMouseDown(false),
 	m_ptCamPos(0.0f, 0.0f),
 	m_fCamZoom(1.0f),
+	m_eModifyingGuidePending(HYORIENT_Null),
 	m_sZoomStatus("100%")
 {
 	if(HyGlobal::IsItemFileDataValid(initFileDataRef))
@@ -48,11 +49,26 @@ IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 
 		m_fCamZoom = m_pCamera->GetZoom();
 		m_sZoomStatus = g_sZoomLevels[eZoomLevel];
+
+		QJsonArray guideHorzArray = initFileDataRef.m_Meta["guideHorzArray"].toArray();
+		for(int i = 0; i < guideHorzArray.size(); ++i)
+			AllocateGuide(HYORIENT_Horizontal, guideHorzArray[i].toInt());
+		
+		QJsonArray guideVertArray = initFileDataRef.m_Meta["guideVertArray"].toArray();
+		for(int i = 0; i < guideVertArray.size(); ++i)
+			AllocateGuide(HYORIENT_Vertical, guideVertArray[i].toInt());
 	}
+
+	m_PendingGuide.SetTint(HyColor::DarkCyan);
+	m_PendingGuide.SetVisible(false);
+	m_PendingGuide.UseWindowCoordinates();
+	ChildAppend(m_PendingGuide);
 }
 
 /*virtual*/ IDraw::~IDraw()
 {
+	for(HyPrimitive2d *pGuide : m_GuideMap.values())
+		delete pGuide;
 }
 
 void IDraw::GetCameraInfo(glm::vec2 &ptPosOut, float &fZoomOut)
@@ -117,7 +133,17 @@ void IDraw::Hide()
 
 void IDraw::ResizeRenderer()
 {
+	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
+	for(auto iter = m_GuideMap.begin(); iter != m_GuideMap.end(); ++iter)
+	{
+		if(iter.key().first == HYORIENT_Horizontal)
+			iter.value()->SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
+		else
+			iter.value()->SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
+	}
+
 	OnResizeRenderer();
+	CameraUpdated();
 }
 
 void IDraw::UpdateDrawStatus(QString sSizeDescription)
@@ -165,6 +191,50 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
 		}
 	}
+
+	// If hovering over an existing guide, then "select" it by removing it, and starting SetPendingGuide()
+	Qt::CursorShape eCurCursorShape = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape();
+	glm::vec2 ptWorldMousePos;
+	if(pEvent->button() == Qt::LeftButton &&
+	   m_GuideMap.empty() == false &&
+	   HyEngine::Input().GetWorldMousePos(ptWorldMousePos) &&
+	   (eCurCursorShape == Qt::SplitHCursor || eCurCursorShape == Qt::SplitVCursor))
+	{
+		// Find closest existing guide
+		QPair<HyOrientation, int> closestGuideKey;
+		int iClosestDist = INT_MAX;
+		for(auto iter = m_GuideMap.begin(); iter != m_GuideMap.end(); ++iter)
+		{
+			if(eCurCursorShape == Qt::SplitVCursor && iter.key().first == HYORIENT_Horizontal)
+			{
+				int iDist = abs((int)ptWorldMousePos.y - iter.key().second);
+				if(iDist < iClosestDist)
+				{
+					iClosestDist = iDist;
+					closestGuideKey = iter.key();
+				}
+			}
+			else if(eCurCursorShape == Qt::SplitHCursor && iter.key().first == HYORIENT_Vertical)
+			{
+				int iDist = abs((int)ptWorldMousePos.x - iter.key().second);
+				if(iDist < iClosestDist)
+				{
+					iClosestDist = iDist;
+					closestGuideKey = iter.key();
+				}
+			}
+		}
+		if(iClosestDist == INT_MAX)
+			HyGuiLog("IDraw::OnMousePressEvent failed to find closest guide", LOGTYPE_Error);
+		else
+		{
+			delete m_GuideMap[closestGuideKey];
+			m_GuideMap.remove(closestGuideKey);
+
+			m_eModifyingGuidePending = closestGuideKey.first;
+			SetPendingGuide(m_eModifyingGuidePending);
+		}
+	}
 }
 
 /*virtual*/ void IDraw::OnMouseReleaseEvent(QMouseEvent *pEvent)
@@ -175,6 +245,18 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		{
 			m_bIsMiddleMouseDown = false;
 			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
+		}
+	}
+
+	if(m_eModifyingGuidePending != HYORIENT_Null)
+	{
+		glm::vec2 ptWorldPos;
+		if(HyEngine::Input().GetWorldMousePos(ptWorldPos))
+		{
+			int iPos = m_eModifyingGuidePending == HYORIENT_Horizontal ? static_cast<int>(ptWorldPos.y) : static_cast<int>(ptWorldPos.x);
+			TryAllocateGuide(m_eModifyingGuidePending, iPos);
+			m_eModifyingGuidePending = HYORIENT_Null;
+			SetPendingGuide(HYORIENT_Null);
 		}
 	}
 }
@@ -213,6 +295,43 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 	QPointF ptCurMousePos = pEvent->localPos();
 
+	if(m_eModifyingGuidePending != HYORIENT_Null)
+	{
+		SetPendingGuide(m_eModifyingGuidePending);
+	}
+	else
+	{
+		// Check if mouse is over an existing guide
+		glm::vec2 ptWorldMousePos;
+		if(m_GuideMap.empty() == false && HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
+		{
+			const int iSELECT_RADIUS = 2;
+			bool bIsHovering = false;
+			for(auto iter = m_GuideMap.begin(); iter != m_GuideMap.end(); ++iter)
+			{
+				int iWorldPos = iter.key().second;
+
+				if(iter.key().first == HYORIENT_Horizontal &&
+					ptWorldMousePos.y >= (iWorldPos - iSELECT_RADIUS) &&
+					ptWorldMousePos.y <= (iWorldPos + iSELECT_RADIUS))
+				{
+					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::SplitVCursor);
+					bIsHovering = true;
+				}
+				else if(iter.key().first == HYORIENT_Vertical &&
+					ptWorldMousePos.x >= (iWorldPos - iSELECT_RADIUS) &&
+					ptWorldMousePos.x <= (iWorldPos + iSELECT_RADIUS))
+				{
+					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::SplitHCursor);
+					bIsHovering = true;
+				}
+			}
+
+			if(bIsHovering == false)
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
+		}
+	}
+
 	if(m_bIsMiddleMouseDown)
 	{
 		if(ptCurMousePos != m_ptOldMousePos)
@@ -229,10 +348,67 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 	UpdateDrawStatus(m_sSizeStatus);
 }
 
+void IDraw::SetPendingGuide(HyOrientation eOrientation)
+{
+	glm::vec2 ptMousePos = HyEngine::Input().GetMousePos();
+	glm::ivec2 vRendererSize = HyEngine::Window().GetWindowSize();
+
+	if(eOrientation == HYORIENT_Horizontal)
+	{
+		m_PendingGuide.SetAsLineSegment(glm::vec2(0.0f, ptMousePos.y),
+										glm::vec2(static_cast<float>(vRendererSize.x), ptMousePos.y));
+		m_PendingGuide.SetVisible(true);
+	}
+	else if(eOrientation == HYORIENT_Vertical)
+	{
+		m_PendingGuide.SetAsLineSegment(glm::vec2(ptMousePos.x, 0.0f),
+										glm::vec2(ptMousePos.x, static_cast<float>(vRendererSize.y)));
+		m_PendingGuide.SetVisible(true);
+	}
+	else
+		m_PendingGuide.SetVisible(false);
+}
+
+bool IDraw::TryAllocateGuide(HyOrientation eOrientation, int iWorldPos)
+{
+	b2AABB aabb;
+	m_pCamera->CalcWorldViewBounds(aabb);
+	if((eOrientation == HYORIENT_Horizontal && (iWorldPos < aabb.lowerBound.y || iWorldPos > aabb.upperBound.y)) ||
+		(eOrientation == HYORIENT_Vertical && (iWorldPos < aabb.lowerBound.x || iWorldPos > aabb.upperBound.x)))
+	{
+		return false;
+	}
+
+	AllocateGuide(eOrientation, iWorldPos);
+	return true;
+}
+
+void IDraw::AllocateGuide(HyOrientation eOrientation, int iWorldPos)
+{
+	if(m_GuideMap.contains(QPair<HyOrientation, int>(eOrientation, iWorldPos)))
+		return;
+
+	HyPrimitive2d *pNewGuide = new HyPrimitive2d();
+	pNewGuide->SetTint(HyColor::Cyan);
+	pNewGuide->UseWindowCoordinates();
+
+	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
+	if(eOrientation == HYORIENT_Horizontal)
+		pNewGuide->SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
+	else
+		pNewGuide->SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
+
+	ChildAppend(*pNewGuide);
+	m_GuideMap.insert(QPair<HyOrientation, int>(eOrientation, iWorldPos), pNewGuide);
+
+	CameraUpdated();
+}
+
 /*virtual*/ void IDraw::OnUpdate() /*override*/
 {
 	if(m_pProjItem == nullptr)
 		return;
+
 	HarmonyWidget *pHarmonyWidget = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject());
 	if(pHarmonyWidget->IsShowRulersMouse() && m_uiPanFlags || IsCameraPanning())
 	{
@@ -261,6 +437,28 @@ void IDraw::CameraUpdated()
 
 	if(m_pProjItem)
 		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RefreshRulers();
+
+	if(m_GuideMap.empty() == false)
+	{
+		for(auto iter = m_GuideMap.begin(); iter != m_GuideMap.end(); ++iter)
+		{
+			QPair<HyOrientation, int> keyPair = iter.key();
+			HyPrimitive2d *pGuide = iter.value();
+
+			if(keyPair.first == HYORIENT_Horizontal)
+			{
+				glm::vec2 ptCamProjPos;
+				m_pCamera->ProjectToCamera(glm::vec2(0.0f, keyPair.second), ptCamProjPos);
+				pGuide->pos.Set(0.0f, ptCamProjPos.y);
+			}
+			else // HYORIENT_Vertical
+			{
+				glm::vec2 ptCamProjPos;
+				m_pCamera->ProjectToCamera(glm::vec2(keyPair.second, 0.0f), ptCamProjPos);
+				pGuide->pos.Set(ptCamProjPos.x, 0.0f);
+			}
+		}
+	}
 
 	OnCameraUpdated();
 }

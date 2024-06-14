@@ -663,6 +663,11 @@ ProjectItemData *Project::GetCurrentOpenItem()
 	return m_pCurOpenItem;
 }
 
+ProjectDraw *Project::GetProjDraw()
+{
+	return m_pDraw;
+}
+
 void Project::SetRenderSize(int iWidth, int iHeight)
 {
 	if(m_pTabBar && m_pTabBar->count() != 0)
@@ -674,6 +679,9 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 				pDraw->ResizeRenderer();
 		}
 	}
+
+	if(m_pDraw)
+		m_pDraw->ResizeRenderer();
 }
 
 void Project::ShowGridBackground(bool bShow)

@@ -251,12 +251,12 @@ bool HyEngine::PollPlatformApi()
 	return true;
 }
 
-#if defined(HY_PLATFORM_GUI)
-void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
-{
-	m_Input.SetWidgetMousePos(ptMousePos);
-}
-#endif
+//#if defined(HY_PLATFORM_GUI)
+//void HyEngine::SetWidgetMousePos(glm::vec2 ptMousePos)
+//{
+//	m_Input.SetWidgetMousePos(ptMousePos);
+//}
+//#endif
 
 /*static*/ bool HyEngine::IsInitialized()
 {

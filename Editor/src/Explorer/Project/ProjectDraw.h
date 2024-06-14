@@ -40,7 +40,9 @@ class ProjectDraw : public IDraw
 	CheckerGrid			m_CheckerGrid;
 	HyShader *			m_pCheckerGridShader;
 
+	HyPrimitive2d		m_OriginHorzBg;
 	HyPrimitive2d		m_OriginHorz;
+	HyPrimitive2d		m_OriginVertBg;
 	HyPrimitive2d		m_OriginVert;
 
 	OverGrid			m_OverGrid;
@@ -60,7 +62,7 @@ protected:
 	virtual void OnShow() override;
 	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
-	virtual void OnCameraUpdated() override;
+	//virtual void OnCameraUpdated() override;
 };
 
 #endif // PROJECTDRAW_H

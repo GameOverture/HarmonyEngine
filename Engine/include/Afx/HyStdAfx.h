@@ -177,9 +177,7 @@ enum HyShapeType
 	HYSHAPE_Circle = 0,
 	HYSHAPE_LineSegment,
 	HYSHAPE_Polygon,
-	HYSHAPE_LineChain,
-
-	HYNUM_SHAPES
+	HYSHAPE_LineChain
 };
 
 enum HyLoadState
@@ -295,6 +293,8 @@ enum HySizePolicy
 
 enum HyOrientation
 {
+	HYORIENT_Null = -1,
+
 	HYORIENT_Horizontal = 0,
 	HYORIENT_Vertical,
 
