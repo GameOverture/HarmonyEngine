@@ -76,9 +76,9 @@ protected:
 	virtual void dropEvent(QDropEvent *pEvent) override;
 	virtual void keyPressEvent(QKeyEvent *pEvent) override;
 	virtual void keyReleaseEvent(QKeyEvent *pEvent) override;
-	virtual void mousePressEvent(QMouseEvent *pEvent) override;
 	virtual void wheelEvent(QWheelEvent *pEvent) override;
 	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
+	virtual void mousePressEvent(QMouseEvent *pEvent) override;
 	virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;
 
 private Q_SLOTS:

@@ -37,6 +37,9 @@
        <height>20</height>
       </size>
      </property>
+     <property name="mouseTracking">
+      <bool>false</bool>
+     </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -60,6 +63,9 @@
          <width>20</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>

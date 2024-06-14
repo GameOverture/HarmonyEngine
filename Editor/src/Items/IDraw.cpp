@@ -35,7 +35,6 @@ IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	m_bIsMiddleMouseDown(false),
 	m_ptCamPos(0.0f, 0.0f),
 	m_fCamZoom(1.0f),
-	m_eModifyingGuidePending(HYORIENT_Null),
 	m_sZoomStatus("100%")
 {
 	if(HyGlobal::IsItemFileDataValid(initFileDataRef))
@@ -180,87 +179,6 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		m_uiPanFlags &= ~PAN_RIGHT;
 }
 
-/*virtual*/ void IDraw::OnMousePressEvent(QMouseEvent *pEvent)
-{
-	if(pEvent->button() == Qt::MiddleButton)
-	{
-		if(m_bIsMiddleMouseDown == false)
-		{
-			m_bIsMiddleMouseDown = true;
-			m_ptOldMousePos = pEvent->localPos();
-			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
-		}
-	}
-
-	// If hovering over an existing guide, then "select" it by removing it, and starting SetPendingGuide()
-	Qt::CursorShape eCurCursorShape = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape();
-	glm::vec2 ptWorldMousePos;
-	if(pEvent->button() == Qt::LeftButton &&
-	   m_GuideMap.empty() == false &&
-	   HyEngine::Input().GetWorldMousePos(ptWorldMousePos) &&
-	   (eCurCursorShape == Qt::SplitHCursor || eCurCursorShape == Qt::SplitVCursor))
-	{
-		// Find closest existing guide
-		QPair<HyOrientation, int> closestGuideKey;
-		int iClosestDist = INT_MAX;
-		for(auto iter = m_GuideMap.begin(); iter != m_GuideMap.end(); ++iter)
-		{
-			if(eCurCursorShape == Qt::SplitVCursor && iter.key().first == HYORIENT_Horizontal)
-			{
-				int iDist = abs((int)ptWorldMousePos.y - iter.key().second);
-				if(iDist < iClosestDist)
-				{
-					iClosestDist = iDist;
-					closestGuideKey = iter.key();
-				}
-			}
-			else if(eCurCursorShape == Qt::SplitHCursor && iter.key().first == HYORIENT_Vertical)
-			{
-				int iDist = abs((int)ptWorldMousePos.x - iter.key().second);
-				if(iDist < iClosestDist)
-				{
-					iClosestDist = iDist;
-					closestGuideKey = iter.key();
-				}
-			}
-		}
-		if(iClosestDist == INT_MAX)
-			HyGuiLog("IDraw::OnMousePressEvent failed to find closest guide", LOGTYPE_Error);
-		else
-		{
-			delete m_GuideMap[closestGuideKey];
-			m_GuideMap.remove(closestGuideKey);
-
-			m_eModifyingGuidePending = closestGuideKey.first;
-			SetPendingGuide(m_eModifyingGuidePending);
-		}
-	}
-}
-
-/*virtual*/ void IDraw::OnMouseReleaseEvent(QMouseEvent *pEvent)
-{
-	if(pEvent->button() == Qt::MiddleButton)
-	{
-		if(m_bIsMiddleMouseDown)
-		{
-			m_bIsMiddleMouseDown = false;
-			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
-		}
-	}
-
-	if(m_eModifyingGuidePending != HYORIENT_Null)
-	{
-		glm::vec2 ptWorldPos;
-		if(HyEngine::Input().GetWorldMousePos(ptWorldPos))
-		{
-			int iPos = m_eModifyingGuidePending == HYORIENT_Horizontal ? static_cast<int>(ptWorldPos.y) : static_cast<int>(ptWorldPos.x);
-			TryAllocateGuide(m_eModifyingGuidePending, iPos);
-			m_eModifyingGuidePending = HYORIENT_Null;
-			SetPendingGuide(HYORIENT_Null);
-		}
-	}
-}
-
 /*virtual*/ void IDraw::OnMouseWheelEvent(QWheelEvent *pEvent)
 {
 	QPoint numPixels = pEvent->pixelDelta();
@@ -271,7 +189,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		int iZoomLevel = m_pCamera->SetZoomLevel();
 		if(numDegrees.y() < 0.0f)
 			iZoomLevel--;
-		else 
+		else
 			iZoomLevel++;
 
 		iZoomLevel = HyMath::Clamp(iZoomLevel, 0, HYNUM_ZOOMLEVELS - 1);
@@ -288,49 +206,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 /*virtual*/ void IDraw::OnMouseMoveEvent(QMouseEvent *pEvent)
 {
-	if(MainWindow::GetCurrentLoading().empty() == false)
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::WaitCursor);
-	else if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() == Qt::WaitCursor)
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
-
 	QPointF ptCurMousePos = pEvent->localPos();
-
-	if(m_eModifyingGuidePending != HYORIENT_Null)
-	{
-		SetPendingGuide(m_eModifyingGuidePending);
-	}
-	else
-	{
-		// Check if mouse is over an existing guide
-		glm::vec2 ptWorldMousePos;
-		if(m_GuideMap.empty() == false && HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
-		{
-			const int iSELECT_RADIUS = 2;
-			bool bIsHovering = false;
-			for(auto iter = m_GuideMap.begin(); iter != m_GuideMap.end(); ++iter)
-			{
-				int iWorldPos = iter.key().second;
-
-				if(iter.key().first == HYORIENT_Horizontal &&
-					ptWorldMousePos.y >= (iWorldPos - iSELECT_RADIUS) &&
-					ptWorldMousePos.y <= (iWorldPos + iSELECT_RADIUS))
-				{
-					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::SplitVCursor);
-					bIsHovering = true;
-				}
-				else if(iter.key().first == HYORIENT_Vertical &&
-					ptWorldMousePos.x >= (iWorldPos - iSELECT_RADIUS) &&
-					ptWorldMousePos.x <= (iWorldPos + iSELECT_RADIUS))
-				{
-					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::SplitHCursor);
-					bIsHovering = true;
-				}
-			}
-
-			if(bIsHovering == false)
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
-		}
-	}
 
 	if(m_bIsMiddleMouseDown)
 	{
@@ -346,6 +222,36 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 	}
 
 	UpdateDrawStatus(m_sSizeStatus);
+}
+
+/*virtual*/ void IDraw::OnMousePressEvent(QMouseEvent *pEvent)
+{
+	if(pEvent->button() == Qt::MiddleButton)
+	{
+		if(m_bIsMiddleMouseDown == false)
+		{
+			m_bIsMiddleMouseDown = true;
+			m_ptOldMousePos = pEvent->localPos();
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
+		}
+	}
+}
+
+/*virtual*/ void IDraw::OnMouseReleaseEvent(QMouseEvent *pEvent)
+{
+	if(pEvent->button() == Qt::MiddleButton)
+	{
+		if(m_bIsMiddleMouseDown)
+		{
+			m_bIsMiddleMouseDown = false;
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
+		}
+	}
+}
+
+QMap<QPair<HyOrientation, int>, HyPrimitive2d *> &IDraw::GetGuideMap()
+{
+	return m_GuideMap;
 }
 
 void IDraw::SetPendingGuide(HyOrientation eOrientation)

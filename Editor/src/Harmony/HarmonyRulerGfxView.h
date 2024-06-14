@@ -31,8 +31,6 @@ class HarmonyRulerGfxView : public QGraphicsView
 
 	bool				m_bShowMouse;
 
-	bool				m_bGuidePending; // Clicked ruler and held mouse button down
-
 public:
 	HarmonyRulerGfxView(QWidget *pParent = nullptr);
 	virtual ~HarmonyRulerGfxView();

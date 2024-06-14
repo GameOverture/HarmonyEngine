@@ -390,18 +390,6 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	pCurItem->GetDraw()->OnKeyReleaseEvent(pEvent);
 }
 
-/*virtual*/ void WgtHarmony::mousePressEvent(QMouseEvent *pEvent) /*override*/
-{
-	if(m_pProject == nullptr)
-		return;
-
-	ProjectItemData *pCurItem = m_pProject->GetCurrentOpenItem();
-	if(pCurItem == nullptr)
-		return;
-
-	pCurItem->GetDraw()->OnMousePressEvent(pEvent);
-}
-
 /*virtual*/ void WgtHarmony::wheelEvent(QWheelEvent *pEvent) /*override*/
 {
 	if(m_pProject == nullptr)
@@ -422,15 +410,25 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	ProjectItemData *pCurItem = m_pProject->GetCurrentOpenItem();
 	if(pCurItem == nullptr)
 		return;
-
-	QPointF ptCurMousePos = pEvent->localPos();
-	HyEngine::Input().SetWidgetMousePos(glm::vec2(ptCurMousePos.x(), ptCurMousePos.y()));
 	
 	if(pCurItem->GetDraw())
+	{
+		static_cast<HarmonyWidget *>(parent())->OnWgtMouseMoveEvent(pCurItem->GetDraw(), pEvent);
 		pCurItem->GetDraw()->OnMouseMoveEvent(pEvent);
-	
-	static_cast<HarmonyWidget *>(parent())->RefreshRulers();
-	//static_cast<HarmonyWidget *>(parent())->RefreshMousePos();
+	}
+}
+
+/*virtual*/ void WgtHarmony::mousePressEvent(QMouseEvent *pEvent) /*override*/
+{
+	if(m_pProject == nullptr)
+		return;
+
+	ProjectItemData *pCurItem = m_pProject->GetCurrentOpenItem();
+	if(pCurItem == nullptr)
+		return;
+
+	pCurItem->GetDraw()->OnMousePressEvent(pEvent);
+	static_cast<HarmonyWidget *>(parent())->OnWgtMousePressEvent(pCurItem->GetDraw(), pEvent);
 }
 
 /*virtual*/ void WgtHarmony::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/
@@ -443,6 +441,7 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 		return;
 
 	pCurItem->GetDraw()->OnMouseReleaseEvent(pEvent);
+	static_cast<HarmonyWidget *>(parent())->OnWgtMouseReleaseEvent(pCurItem->GetDraw(), pEvent);
 }
 
 void WgtHarmony::OnBootCheck()

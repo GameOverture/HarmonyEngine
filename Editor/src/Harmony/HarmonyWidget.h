@@ -25,8 +25,10 @@ class HarmonyWidget : public QWidget
 {
 	Q_OBJECT
 
-	QGraphicsScene		m_HorzScene;
-	QGraphicsScene		m_VertScene;
+	QGraphicsScene		m_RulerHorzScene;
+	QGraphicsScene		m_RulerVertScene;
+
+	HyOrientation		m_eGuidePending; // Clicked ruler (or existing guide) and held mouse button down
 	
 public:
 	explicit HarmonyWidget(Project *pProject, QWidget *pParent = 0);
@@ -47,6 +49,16 @@ public:
 	void RefreshRulers();
 	bool IsShowRulersMouse() const;
 	void ShowRulerMouse(bool bShow);
+
+	// Child widgets will pass the event upward to its parent HarmonyWidget
+	void OnRulerMouseMoveEvent(HyOrientation eOrientation, QMouseEvent *pEvent);
+	void OnWgtMouseMoveEvent(IDraw *pDrawItem, QMouseEvent *pEvent);
+	
+	void OnRulerMousePressEvent(HyOrientation eOrientation, QMouseEvent *pEvent);
+	void OnWgtMousePressEvent(IDraw *pDrawItem, QMouseEvent *pEvent);
+	
+	void OnRulerMouseReleaseEvent(HyOrientation eOrientation, QMouseEvent *pEvent);
+	void OnWgtMouseReleaseEvent(IDraw *pDrawItem, QMouseEvent *pEvent);
 
 protected:
 	void resizeEvent(QResizeEvent *pEvent) override;

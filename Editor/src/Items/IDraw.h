@@ -40,7 +40,6 @@ protected:
 
 	HyPrimitive2d										m_PendingGuide;
 	QMap<QPair<HyOrientation, int>, HyPrimitive2d *>	m_GuideMap;
-	HyOrientation										m_eModifyingGuidePending; // This is only used when an existing guide is being dragged (and doesn't use the HarmonyRulerGfxView's input events)
 
 private:
 	QString												m_sSizeStatus;	// Derived classes should set this using UpdateDrawStatus()
@@ -69,11 +68,12 @@ public:
 	virtual void OnKeyPressEvent(QKeyEvent *pEvent);
 	virtual void OnKeyReleaseEvent(QKeyEvent *pEvent);
 
-	virtual void OnMousePressEvent(QMouseEvent *pEvent);
-	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent);
 	virtual void OnMouseWheelEvent(QWheelEvent *pEvent);
 	virtual void OnMouseMoveEvent(QMouseEvent *pEvent);
+	virtual void OnMousePressEvent(QMouseEvent *pEvent);
+	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent);
 
+	QMap<QPair<HyOrientation, int>, HyPrimitive2d *> &GetGuideMap();
 	void SetPendingGuide(HyOrientation eOrientation);
 	bool TryAllocateGuide(HyOrientation eOrientation, int iWorldPos);
 	void AllocateGuide(HyOrientation eOrientation, int iWorldPos);

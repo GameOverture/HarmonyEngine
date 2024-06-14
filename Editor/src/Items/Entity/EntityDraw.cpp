@@ -174,9 +174,14 @@ QList<EntityDrawItem *> EntityDraw::GetCurrentItemList()
 {
 	IDraw::OnMousePressEvent(pEvent);
 
+	Qt::CursorShape eCursorShape = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape();
+
 	if(IsCameraPanning() || m_bPlayingPreview)
 		RefreshTransforms();
-	else if(pEvent->button() == Qt::LeftButton && Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
+	else if(pEvent->button() == Qt::LeftButton &&
+			eCursorShape != Qt::WaitCursor &&
+			eCursorShape != Qt::SplitHCursor &&
+			eCursorShape != Qt::SplitVCursor)
 	{
 		if(m_eShapeEditState != SHAPESTATE_None)
 			DoMousePress_ShapeEdit(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
@@ -192,9 +197,13 @@ QList<EntityDrawItem *> EntityDraw::GetCurrentItemList()
 
 /*virtual*/ void EntityDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
 {
+	Qt::CursorShape eCursorShape = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape();
+
 	if(IsCameraPanning() || m_bPlayingPreview)
 		IDraw::OnMouseReleaseEvent(pEvent);
-	else if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
+	else if(eCursorShape != Qt::WaitCursor &&
+			eCursorShape != Qt::SplitHCursor &&
+			eCursorShape != Qt::SplitVCursor)
 	{
 		IDraw::OnMouseReleaseEvent(pEvent);
 
@@ -1164,6 +1173,8 @@ void EntityDraw::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 
 	case Qt::ArrowCursor:
 	case Qt::WaitCursor:
+	case Qt::SplitHCursor: // placing Guide
+	case Qt::SplitVCursor: // placing Guide
 		m_eDragState = DRAGSTATE_None;
 		break;
 

@@ -13,7 +13,6 @@
 
 #include <QPainter>
 #include <QGraphicsLineItem>
-#include <QMouseEvent>
 
 HarmonyRulerGfxView::HarmonyRulerGfxView(QWidget *pParent /*= nullptr*/) :
 	QGraphicsView(pParent),
@@ -24,8 +23,7 @@ HarmonyRulerGfxView::HarmonyRulerGfxView(QWidget *pParent /*= nullptr*/) :
 	m_iWorldStart(0),
 	m_iWorldEnd(0),
 	m_iWorldWidth(0),
-	m_bShowMouse(false),
-	m_bGuidePending(false)
+	m_bShowMouse(false)
 {
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -176,77 +174,19 @@ void HarmonyRulerGfxView::ShowMouse(bool bShowMouse)
 
 /*virtual*/ void HarmonyRulerGfxView::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {	
+	static_cast<HarmonyWidget *>(parent())->OnRulerMouseMoveEvent(m_eOrientation, pEvent); // Pass this event to HarmonyWidget to manage the logic for placing guides
 	QGraphicsView::mouseMoveEvent(pEvent);
-
-	if(m_bGuidePending)
-	{
-		QPointF ptCurMousePos = pEvent->localPos();
-		if(m_eOrientation == HYORIENT_Horizontal)
-			HyEngine::Input().SetWidgetMousePos(glm::vec2(ptCurMousePos.x(), ptCurMousePos.y() - RULER_WIDTH));
-		else
-			HyEngine::Input().SetWidgetMousePos(glm::vec2(ptCurMousePos.x() - RULER_WIDTH, ptCurMousePos.y()));
-
-		HarmonyWidget *pHarmonyWidget = static_cast<HarmonyWidget *>(parent());
-		if(pHarmonyWidget->GetWgtHarmony() &&
-			pHarmonyWidget->GetWgtHarmony()->GetProject() &&
-			pHarmonyWidget->GetWgtHarmony()->GetProject()->GetCurrentOpenItem())
-		{
-			ProjectItemData *pCurProjItem = pHarmonyWidget->GetWgtHarmony()->GetProject()->GetCurrentOpenItem();
-			pCurProjItem->GetDraw()->SetPendingGuide(m_eOrientation);
-		}
-	}
-
-	HarmonyWidget *pHarmonyWidget = static_cast<HarmonyWidget *>(parent());
-	if(pHarmonyWidget == nullptr || pHarmonyWidget->GetProject() == nullptr)
-		return;
-
-	update();
 }
 
 /*virtual*/ void HarmonyRulerGfxView::mousePressEvent(QMouseEvent *pEvent) /*override*/
 {
-	if(pEvent->button() == Qt::LeftButton)
-	{
-		HarmonyWidget *pHarmonyWidget = static_cast<HarmonyWidget *>(parent());
-		if(pHarmonyWidget == nullptr || pHarmonyWidget->GetProject() == nullptr)
-			return;
-
-		if(m_eOrientation == HYORIENT_Horizontal)
-			pHarmonyWidget->SetCursorShape(Qt::SplitVCursor);
-		else
-			pHarmonyWidget->SetCursorShape(Qt::SplitHCursor);
-
-		m_bGuidePending = true;
-	}
-
+	static_cast<HarmonyWidget *>(parent())->OnRulerMousePressEvent(m_eOrientation, pEvent); // Pass this event to HarmonyWidget to manage the logic for placing guides
 	QGraphicsView::mousePressEvent(pEvent);
 }
 
 /*virtual*/ void HarmonyRulerGfxView::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/
 {
-	if(m_bGuidePending)
-	{
-		HarmonyWidget *pHarmonyWidget = static_cast<HarmonyWidget *>(parent());
-		if(pHarmonyWidget->GetWgtHarmony() &&
-			pHarmonyWidget->GetWgtHarmony()->GetProject() &&
-			pHarmonyWidget->GetWgtHarmony()->GetProject()->GetCurrentOpenItem())
-		{
-			ProjectItemData *pCurProjItem = pHarmonyWidget->GetWgtHarmony()->GetProject()->GetCurrentOpenItem();
-
-			glm::vec2 ptWorldPos;
-			if(HyEngine::Input().GetWorldMousePos(ptWorldPos))
-			{
-				int iPos = m_eOrientation == HYORIENT_Horizontal ? static_cast<int>(ptWorldPos.y) : static_cast<int>(ptWorldPos.x);
-				
-				pCurProjItem->GetDraw()->TryAllocateGuide(m_eOrientation, iPos);
-				pCurProjItem->GetDraw()->SetPendingGuide(HYORIENT_Null);
-			}
-		}
-
-		pHarmonyWidget->RestoreCursorShape();
-
-		m_bGuidePending = false;
-	}
+	static_cast<HarmonyWidget *>(parent())->OnRulerMouseReleaseEvent(m_eOrientation, pEvent); // Pass this event to HarmonyWidget to manage the logic for placing guides
 	QGraphicsView::mouseReleaseEvent(pEvent);
 }
 
