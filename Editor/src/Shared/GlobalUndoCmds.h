@@ -239,6 +239,109 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class UndoCmd_AddGuide : public QUndoCommand
+{
+	IDraw &				m_DrawRef;
+	HyOrientation		m_eOrientation;
+	int					m_iNewPos;
+	bool				m_bNewGuidePlaced;
+
+public:
+	UndoCmd_AddGuide(IDraw &drawRef, HyOrientation eOrientation, int iPos, QUndoCommand *pParent = nullptr) :
+		QUndoCommand(pParent),
+		m_DrawRef(drawRef),
+		m_eOrientation(eOrientation),
+		m_iNewPos(iPos),
+		m_bNewGuidePlaced(false)
+	{
+		setText(QString("New ") % (m_eOrientation == HYORIENT_Horizontal ? "Horizontal" : "Vertical") % " Guide at " % QString::number(m_iNewPos));
+	}
+
+	virtual ~UndoCmd_AddGuide()
+	{ }
+
+	void redo() override
+	{
+		m_bNewGuidePlaced = m_DrawRef.AllocateGuide(m_eOrientation, m_iNewPos);
+	}
+
+	void undo() override
+	{
+		if(m_bNewGuidePlaced)
+			m_DrawRef.DeleteGuide(m_eOrientation, m_iNewPos);
+	}
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class UndoCmd_RemoveGuide : public QUndoCommand
+{
+	IDraw &				m_DrawRef;
+	HyOrientation		m_eOrientation;
+	int					m_iOldPos;
+
+public:
+	UndoCmd_RemoveGuide(IDraw &drawRef, HyOrientation eOrientation, int iOldPos, QUndoCommand *pParent = nullptr) :
+		QUndoCommand(pParent),
+		m_DrawRef(drawRef),
+		m_eOrientation(eOrientation),
+		m_iOldPos(iOldPos)
+	{
+		setText(QString("Remove ") % (m_eOrientation == HYORIENT_Horizontal ? "Horizontal" : "Vertical") % " Guide from " % QString::number(m_iOldPos));
+	}
+
+	virtual ~UndoCmd_RemoveGuide()
+	{ }
+
+	void redo() override
+	{
+		m_DrawRef.DeleteGuide(m_eOrientation, m_iOldPos);
+	}
+
+	void undo() override
+	{
+		m_DrawRef.AllocateGuide(m_eOrientation, m_iOldPos);
+	}
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class UndoCmd_MoveGuide : public QUndoCommand
+{
+	IDraw &m_DrawRef;
+	HyOrientation		m_eOrientation;
+	int					m_iNewPos;
+	int					m_iOldPos;
+	bool				m_bNewGuidePlaced;
+
+public:
+	UndoCmd_MoveGuide(IDraw &drawRef, HyOrientation eOrientation, int iOldPos, int iNewPos, QUndoCommand *pParent = nullptr) :
+		QUndoCommand(pParent),
+		m_DrawRef(drawRef),
+		m_eOrientation(eOrientation),
+		m_iOldPos(iOldPos),
+		m_iNewPos(iNewPos),
+		m_bNewGuidePlaced(false)
+	{
+		setText(QString("Move ") % (m_eOrientation == HYORIENT_Horizontal ? "Horizontal" : "Vertical") % " Guide to " % QString::number(m_iNewPos));
+	}
+
+	virtual ~UndoCmd_MoveGuide()
+	{ }
+
+	void redo() override
+	{
+		m_DrawRef.DeleteGuide(m_eOrientation, m_iOldPos);
+		m_bNewGuidePlaced = m_DrawRef.AllocateGuide(m_eOrientation, m_iNewPos);
+	}
+
+	void undo() override
+	{
+		if(m_bNewGuidePlaced)
+			m_DrawRef.DeleteGuide(m_eOrientation, m_iNewPos);
+		m_DrawRef.AllocateGuide(m_eOrientation, m_iOldPos);
+	}
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class UndoCmd_ComboBox : public QUndoCommand
 {
 	ProjectItemData &       m_ItemRef;

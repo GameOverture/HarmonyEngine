@@ -52,6 +52,9 @@ void HarmonyRulerGfxView::ShowMouse(bool bShowMouse)
 /*virtual*/ void HarmonyRulerGfxView::drawForeground(QPainter *pPainter, const QRectF &rect) /*override*/
 {
 	QGraphicsView::drawForeground(pPainter, rect);
+
+	if(HyEngine::IsInitialized() == false)
+		return;
 	
 	HarmonyWidget *pHarmonyWidget = static_cast<HarmonyWidget *>(parent());
 	if(pHarmonyWidget == nullptr || pHarmonyWidget->GetProject() == nullptr)
@@ -157,7 +160,6 @@ void HarmonyRulerGfxView::ShowMouse(bool bShowMouse)
 			iCurWorldPos -= 25;
 		iCurDrawPos = ConvertWorldToDraw(iCurWorldPos);
 	}
-
 	
 	glm::vec2 ptWorldMousePos;
 	bool bWorldMousePosValid = HyEngine::Input().GetWorldMousePos(ptWorldMousePos);

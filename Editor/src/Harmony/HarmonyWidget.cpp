@@ -12,6 +12,7 @@
 #include "ui_HarmonyWidget.h"
 #include "Project.h"
 #include "MainWindow.h"
+#include "GlobalUndoCmds.h"
 
 #include <QColorDialog>
 #include <QMouseEvent>
@@ -225,9 +226,9 @@ void HarmonyWidget::OnWgtMousePressEvent(IDraw *pDrawItem, QMouseEvent *pEvent)
 		else
 		{
 			m_eGuidePending = closestGuideKey.first;
+			m_iGuideOldMovePos = closestGuideKey.second;
 
-			delete pDrawItem->GetGuideMap()[closestGuideKey];
-			pDrawItem->GetGuideMap().remove(closestGuideKey);
+			pDrawItem->DeleteGuide(closestGuideKey.first, closestGuideKey.second);
 		}
 	}
 }
@@ -268,11 +269,28 @@ void HarmonyWidget::OnWgtMouseReleaseEvent(IDraw *pDrawItem, QMouseEvent *pEvent
 
 	if(pDrawItem && m_eGuidePending != HYORIENT_Null)
 	{
+		bool bMoveSuccessfull = false;
+
 		glm::vec2 ptWorldPos;
 		if(HyEngine::Input().GetWorldMousePos(ptWorldPos))
 		{
 			int iPos = m_eGuidePending == HYORIENT_Horizontal ? static_cast<int>(ptWorldPos.y) : static_cast<int>(ptWorldPos.x);
-			pDrawItem->TryAllocateGuide(m_eGuidePending, iPos);
+			//b2AABB aabb;
+			//m_pCamera->CalcWorldViewBounds(aabb);
+			//if((eOrientation == HYORIENT_Horizontal && (iNewPos < aabb.lowerBound.y || iNewPos > aabb.upperBound.y)) ||
+			//	(eOrientation == HYORIENT_Vertical && (iNewPos < aabb.lowerBound.x || iNewPos > aabb.upperBound.x)))
+			//{
+			//	return false;
+			//}
+
+			UndoCmd_MoveGuide *pNewCmd = new UndoCmd_MoveGuide(*pDrawItem, m_eGuidePending, m_iGuideOldMovePos, iPos);
+			pDrawItem->GetProjItemData()->GetUndoStack()->push(pNewCmd);
+			bMoveSuccessfull = true;
+		}
+		if(bMoveSuccessfull == false)
+		{
+			UndoCmd_RemoveGuide *pNewCmd = new UndoCmd_RemoveGuide(*pDrawItem, m_eGuidePending, m_iGuideOldMovePos);
+			pDrawItem->GetProjItemData()->GetUndoStack()->push(pNewCmd);
 		}
 
 		pDrawItem->SetPendingGuide(HYORIENT_Null);

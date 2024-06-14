@@ -70,6 +70,11 @@ IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 		delete pGuide;
 }
 
+ProjectItemData *IDraw::GetProjItemData()
+{
+	return m_pProjItem;
+}
+
 void IDraw::GetCameraInfo(glm::vec2 &ptPosOut, float &fZoomOut)
 {
 	ptPosOut = m_ptCamPos;
@@ -85,6 +90,18 @@ void IDraw::SetCamera(glm::vec2 ptCamPos, float fZoom)
 	m_pCamera->SetZoom(m_fCamZoom);
 
 	CameraUpdated();
+}
+
+QJsonArray IDraw::GetGuideArray(HyOrientation eOrientation)
+{
+	QJsonArray guideArray;
+	for(auto iter = m_GuideMap.begin(); iter != m_GuideMap.end(); ++iter)
+	{
+		if(iter.key().first == eOrientation)
+			guideArray.append(iter.key().second);
+	}
+	
+	return guideArray;
 }
 
 void IDraw::StopCameraPanning()
@@ -249,7 +266,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 	}
 }
 
-QMap<QPair<HyOrientation, int>, HyPrimitive2d *> &IDraw::GetGuideMap()
+const QMap<QPair<HyOrientation, int>, HyPrimitive2d *> &IDraw::GetGuideMap() const
 {
 	return m_GuideMap;
 }
@@ -285,29 +302,9 @@ bool IDraw::TryAllocateGuide(HyOrientation eOrientation, int iWorldPos)
 		return false;
 	}
 
-	AllocateGuide(eOrientation, iWorldPos);
+	UndoCmd_AddGuide *pNewCmd = new UndoCmd_AddGuide(*this, eOrientation, iWorldPos);
+	m_pProjItem->GetUndoStack()->push(pNewCmd);
 	return true;
-}
-
-void IDraw::AllocateGuide(HyOrientation eOrientation, int iWorldPos)
-{
-	if(m_GuideMap.contains(QPair<HyOrientation, int>(eOrientation, iWorldPos)))
-		return;
-
-	HyPrimitive2d *pNewGuide = new HyPrimitive2d();
-	pNewGuide->SetTint(HyColor::Cyan);
-	pNewGuide->UseWindowCoordinates();
-
-	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
-	if(eOrientation == HYORIENT_Horizontal)
-		pNewGuide->SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
-	else
-		pNewGuide->SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
-
-	ChildAppend(*pNewGuide);
-	m_GuideMap.insert(QPair<HyOrientation, int>(eOrientation, iWorldPos), pNewGuide);
-
-	CameraUpdated();
 }
 
 /*virtual*/ void IDraw::OnUpdate() /*override*/
@@ -415,4 +412,41 @@ float IDraw::GetLineThickness(HyZoomLevel eZoomLevel)
 	case HYZOOM_1600:
 		return 0.0625f;
 	}
+}
+
+bool IDraw::AllocateGuide(HyOrientation eOrientation, int iWorldPos)
+{
+	if(m_GuideMap.contains(QPair<HyOrientation, int>(eOrientation, iWorldPos)))
+		return false;
+
+	HyPrimitive2d *pNewGuide = new HyPrimitive2d();
+	pNewGuide->SetTint(HyColor::Cyan);
+	pNewGuide->UseWindowCoordinates();
+
+	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
+	if(eOrientation == HYORIENT_Horizontal)
+		pNewGuide->SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
+	else
+		pNewGuide->SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
+
+	ChildAppend(*pNewGuide);
+	m_GuideMap.insert(QPair<HyOrientation, int>(eOrientation, iWorldPos), pNewGuide);
+
+	CameraUpdated();
+	return true;
+}
+
+bool IDraw::DeleteGuide(HyOrientation eOrientation, int iWorldPos)
+{
+	QPair<HyOrientation, int> key = QPair<HyOrientation, int>(eOrientation, iWorldPos);
+	if(m_GuideMap.contains(key) == false)
+		return false;
+
+	HyPrimitive2d *pGuide = m_GuideMap.value(key);
+	delete pGuide;
+
+	m_GuideMap.remove(key);
+
+	CameraUpdated();
+	return true;
 }

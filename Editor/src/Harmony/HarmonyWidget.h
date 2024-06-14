@@ -29,6 +29,7 @@ class HarmonyWidget : public QWidget
 	QGraphicsScene		m_RulerVertScene;
 
 	HyOrientation		m_eGuidePending; // Clicked ruler (or existing guide) and held mouse button down
+	int					m_iGuideOldMovePos; // When dragging an existing guide, this was its old position
 	
 public:
 	explicit HarmonyWidget(Project *pProject, QWidget *pParent = 0);

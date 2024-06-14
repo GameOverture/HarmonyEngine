@@ -168,6 +168,9 @@ void ProjectItemData::GetLatestFileData(FileDataPair &itemFileDataOut) const
 		cameraPosArray.append(ptCamPos.y);
 		itemFileDataOut.m_Meta["CameraPos"] = cameraPosArray;
 		itemFileDataOut.m_Meta["CameraZoom"] = fCamZoom;
+
+		itemFileDataOut.m_Meta["guideHorzArray"] = m_pDraw->GetGuideArray(HYORIENT_Horizontal);
+		itemFileDataOut.m_Meta["guideVertArray"] = m_pDraw->GetGuideArray(HYORIENT_Vertical);
 	}
 
 	// Assemble item specific data
@@ -299,6 +302,8 @@ void ProjectItemData::DrawLoad()
 
 void ProjectItemData::DrawUnload()
 {
+	m_pUndoStack->clear();
+
 	delete m_pDraw;
 	m_pDraw = nullptr;
 }
@@ -376,15 +381,12 @@ void ProjectItemData::on_undoStack_cleanChanged(bool bClean)
 
 void ProjectItemData::on_undoStack_indexChanged(int iIndex)
 {
-	if(m_pDraw == nullptr)
-	{
-		HyGuiLog("m_pDraw was nullptr in on_undoStack_indexChanged", LOGTYPE_Error);
+	if(m_pDraw == nullptr || m_pWidget == nullptr)
 		return;
-	}
+	
 	m_pDraw->OnUndoStackIndexChanged(iIndex);
 	m_pDraw->ApplyJsonData();
 
-	if(m_pWidget)
-		m_pWidget->UpdateActions();
+	m_pWidget->UpdateActions();
 }
 

@@ -20,6 +20,11 @@ class ProjectItemData;
 
 class IDraw : public HyEntity2d
 {
+	friend class HarmonyWidget;
+	friend class UndoCmd_AddGuide;
+	friend class UndoCmd_RemoveGuide;
+	friend class UndoCmd_MoveGuide;
+
 protected:
 	ProjectItemData *									m_pProjItem;
 	HyCamera2d *										m_pCamera;
@@ -49,8 +54,12 @@ public:
 	IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~IDraw();
 
+	ProjectItemData *GetProjItemData();
+
 	void GetCameraInfo(glm::vec2 &ptPosOut, float &fZoomOut);
 	void SetCamera(glm::vec2 ptCamPos, float fZoom);
+
+	QJsonArray GetGuideArray(HyOrientation eOrientation);
 
 	void StopCameraPanning();
 	
@@ -73,10 +82,9 @@ public:
 	virtual void OnMousePressEvent(QMouseEvent *pEvent);
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent);
 
-	QMap<QPair<HyOrientation, int>, HyPrimitive2d *> &GetGuideMap();
+	const QMap<QPair<HyOrientation, int>, HyPrimitive2d *> &GetGuideMap() const;
 	void SetPendingGuide(HyOrientation eOrientation);
 	bool TryAllocateGuide(HyOrientation eOrientation, int iWorldPos);
-	void AllocateGuide(HyOrientation eOrientation, int iWorldPos);
 
 protected:
 	virtual void OnUpdate() override;
@@ -92,6 +100,10 @@ protected:
 	virtual void OnCameraUpdated() { }
 
 	float GetLineThickness(HyZoomLevel eZoomLevel);
+
+private:
+	bool AllocateGuide(HyOrientation eOrientation, int iWorldPos);
+	bool DeleteGuide(HyOrientation eOrientation, int iWorldPos);
 };
 
 #endif // IDRAW_H
