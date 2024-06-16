@@ -27,8 +27,8 @@ GraphicsTweenKnobItem::GraphicsTweenKnobItem(KeyFrameKey tupleKey, QGraphicsItem
 
 	setData(GFXDATAKEY_Type, GFXITEM_TweenKnob);
 
-	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
-	setBrush(HyGlobal::ConvertHyColor(HyColor::Green));
+	setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetTweenFrameOutline));
+	setBrush(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetTweenFrameFill));
 	setAcceptHoverEvents(true);
 	setAcceptedMouseButtons(Qt::LeftButton);
 	setFlags(QGraphicsItem::ItemIsSelectable);
@@ -62,13 +62,13 @@ KeyFrameKey GraphicsTweenKnobItem::GetKey() const
 
 /*virtual*/ void GraphicsTweenKnobItem::hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) /*override*/
 {
-	setPen(HyGlobal::ConvertHyColor(HyColor::White));
+	setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetTweenFrameHover));
 	scene()->update();
 }
 
 /*virtual*/ void GraphicsTweenKnobItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *pEvent) /*override*/
 {
-	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
+	setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetTweenFrameOutline));
 	scene()->update();
 }
 
@@ -86,8 +86,16 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKe
 
 	setData(GFXDATAKEY_Type, bIsTweenKeyFrame ? GFXITEM_TweenKeyFrame : GFXITEM_PropertyKeyFrame);
 
-	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
-	setBrush(HyGlobal::ConvertHyColor(bIsTweenKeyFrame ? HyColor::Green : HyColor::LightGray));
+	if(bIsTweenKeyFrame)
+	{
+		setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetTweenFrameOutline));
+		setBrush(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetTweenFrameFill));
+	}
+	else
+	{
+		setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetKeyFrameOutline));
+		setBrush(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetKeyFrameFill));
+	}
 	setAcceptHoverEvents(true);
 	setAcceptedMouseButtons(Qt::LeftButton);
 	setFlags(QGraphicsItem::ItemIsSelectable); // Can't use 'QGraphicsItem::ItemIsMovable' because key frames are only allowed to move horizontally and snapped to frames
@@ -99,7 +107,7 @@ GraphicsKeyFrameItem::GraphicsKeyFrameItem(KeyFrameKey tupleKey, bool bIsTweenKe
 
 		QPen dashLinePen;
 		dashLinePen.setStyle(Qt::DashLine);
-		dashLinePen.setColor(HyGlobal::ConvertHyColor(HyColor::Green));
+		dashLinePen.setColor(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetTweenFrameFill));
 		m_pGfxTweenLine->setPen(dashLinePen);
 
 		m_pGfxTweenDurationKnob = new GraphicsTweenKnobItem(tupleKey, this);
@@ -153,13 +161,13 @@ int GraphicsKeyFrameItem::GetTweenFramesDuration() const
 
 /*virtual*/ void GraphicsKeyFrameItem::hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) /*override*/
 {
-	setPen(HyGlobal::ConvertHyColor(HyColor::White));
+	setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetKeyFrameHover));
 	scene()->update();
 }
 
 /*virtual*/ void GraphicsKeyFrameItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *pEvent) /*override*/
 {
-	setPen(HyGlobal::ConvertHyColor(HyColor::Black));
+	setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetKeyFrameOutline));
 	scene()->update();
 }
 
@@ -208,7 +216,7 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 		}
 	}
 
-	setBackgroundBrush(HyGlobal::ConvertHyColor(HyColor::WidgetPanel));
+	setBackgroundBrush(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheet));
 
 	// These lines allow QGraphicsView to align itself to the top-left corner of the scene
 	addLine(0.0, 0.0, 10.0, 0.0f)->setAcceptedMouseButtons(Qt::NoButton);

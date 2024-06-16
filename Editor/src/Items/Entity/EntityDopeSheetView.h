@@ -71,8 +71,8 @@ protected:
 	virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;
 
 private:
-	void DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color = HyColor::WidgetFrame, HyColor shadowColor = HyColor::Black);
-	void DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY, HyColor color);
+	void DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor textColor);
+	void DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY);
 
 	QList<EntityTreeItemData *> GetItems() const;
 

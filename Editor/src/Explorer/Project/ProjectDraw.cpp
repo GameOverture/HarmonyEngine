@@ -99,8 +99,8 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 	m_ShaderUniforms.Set("u_mtxTransform", mtx);
 	m_ShaderUniforms.Set("u_fGridSize", m_fGridSize);
 	m_ShaderUniforms.Set("u_vDimensions", m_vDIMENSIONS);
-	m_ShaderUniforms.Set("u_vGridColor1", glm::vec4(106.0f / 255.0f, 105.0f / 255.0f, 113.0f / 255.0f, 1.0f));
-	m_ShaderUniforms.Set("u_vGridColor2", glm::vec4(93.0f / 255.0f, 93.0f / 255.0f, 97.0f / 255.0f, 1.0f));
+	m_ShaderUniforms.Set("u_vGridColor1", glm::vec4(HyGlobal::GetEditorColor(EDITORCOLOR_GridColor1).GetAsVec4()));
+	m_ShaderUniforms.Set("u_vGridColor2", glm::vec4(HyGlobal::GetEditorColor(EDITORCOLOR_GridColor2).GetAsVec4()));
 }
 
 /*virtual*/ bool CheckerGrid::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
@@ -275,14 +275,6 @@ void ProjectDraw::EnableGridOrigin(bool bEnable)
 void ProjectDraw::EnableGridOverlay(bool bEnable)
 {
 	m_OverGrid.SetVisible(bEnable);
-}
-
-/*virtual*/ void ProjectDraw::OnShow() /*override*/
-{
-}
-
-/*virtual*/ void ProjectDraw::OnHide() /*override*/
-{
 }
 
 /*virtual*/ void ProjectDraw::OnResizeRenderer() /*override*/

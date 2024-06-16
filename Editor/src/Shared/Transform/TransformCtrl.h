@@ -11,32 +11,9 @@
 #define TRANSFORMCTRL_H
 
 #include "Global.h"
+#include "GrabPoint.h"
 
-class EntityDrawItem;
-
-class GrabPoint : public HyEntity2d
-{
-	HyPrimitive2d				m_GrabOutline;
-	HyPrimitive2d				m_GrabFill;
-
-	HyColor						m_OutlineColor;
-	HyColor						m_FillColor;
-	HyColor						m_SelectedOutlineColor;
-	HyColor						m_SelectedFillColor;
-
-	bool						m_bIsSelected;
-
-public:
-	GrabPoint(HyColor outlineColor, HyColor fillColor, HyColor selectedOutlineColor, HyColor selectedFillColor, HyEntity2d *pParent);
-	virtual ~GrabPoint();
-
-	void GetLocalBoundingShape(HyShape2d &shapeRefOut);
-
-	bool IsSelected() const;
-	void SetSelected(bool bSelected);
-	HyColor GetOutlineColor();
-	HyColor GetFillColor();
-};
+class IDrawExItem;
 
 class TransformCtrl : public HyEntity2d
 {
@@ -76,7 +53,7 @@ public:
 	virtual ~TransformCtrl();
 
 	void WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera);
-	void WrapTo(QList<EntityDrawItem *> itemDrawList, HyCamera2d *pCamera);
+	void WrapTo(QList<IDrawExItem *> itemDrawList, HyCamera2d *pCamera);
 
 	bool IsShown() const;
 	void Show(bool bShowGrabPoints);

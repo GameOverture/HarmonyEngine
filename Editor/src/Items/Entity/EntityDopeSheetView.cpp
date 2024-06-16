@@ -128,7 +128,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 
 	if(fPosX >= fPOSX_DRAW_THRESHOLD && fPosX < (rect.x() + rect.width()))
 	{
-		painter->setPen(HyGlobal::ConvertHyColor(HyColor::Cyan));
+		painter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetCurFrameIndicator));
 		painter->drawLine(fPosX, rect.y(), fPosX, rect.y() + rect.height());
 	}
 }
@@ -195,14 +195,14 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 	QList<EntityTreeItemData *> itemList = GetItems();
 	for(EntityTreeItemData *pEntItemData : itemList)
 	{
-		HyColor textColor = HyColor::WidgetFrame;
+		HyColor textColor = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetText);
 
 		// Determine number of rows of key frames
 		int iNumRows = 1;
 		QList<QPair<QString, QString>> propList;
 		if(pEntItemData->IsSelected())
 		{
-			textColor = HyColor::LightGray;
+			textColor = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetTextSelected);
 
 			propList = GetScene()->GetUniquePropertiesList(pEntItemData, true);
 			iNumRows += propList.size();
@@ -210,7 +210,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 
 		// Background Rect
 		pPainter->setPen(Qt::NoPen);
-		pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::ContainerPanel));
+		pPainter->setBrush(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetItemsColumn));
 		pPainter->drawRect(QRectF(rect.x(), fPosY, ITEMS_WIDTH, iNumRows * ITEMS_LINE_HEIGHT));
 
 		// Item Name
@@ -228,7 +228,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		if(nameBoundingRect.contains(m_MouseScenePos))
 		{
 			m_pMouseHoverItem = pEntItemData;
-			textColor = HyColor::White;
+			textColor = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetTextHover);
 		}
 
 		DrawShadowText(pPainter, nameBoundingRect, sCodeName, textColor);
@@ -267,10 +267,10 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 	// TIMELINE
 	//////////////////////////////////////////////////////////////////////////
 	pPainter->setPen(Qt::NoPen);
-	pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::ContainerPanel));
+	pPainter->setBrush(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetTimeline));
 	pPainter->drawRect(QRectF(rect.x(), rect.y(), rect.width(), TIMELINE_HEIGHT));
 
-	pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
+	pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetNotch));
 	pPainter->drawLine(rect.x(), rect.y() + TIMELINE_HEIGHT, rect.x() + rect.width(), rect.y() + TIMELINE_HEIGHT);
 
 	std::function<void(int, float)> fpPaintEvent = [&](int iFrameIndex, float fX)
@@ -278,7 +278,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		if(GetScene()->GetCallbackList(iFrameIndex).empty() == false)
 		{
 			pPainter->translate(fX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f));
-			pPainter->setPen(Qt::NoPen);// HyGlobal::ConvertHyColor(HyColor::Black));
+			pPainter->setPen(Qt::NoPen);
 			pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::Orange));
 
 			pPainter->rotate(45.0);
@@ -337,31 +337,30 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		// Main Notch Line
 		if(fPosX >= fPOSX_DRAW_THRESHOLD)
 		{
-			HyColor eColor = HyColor::WidgetFrame;
+			HyColor color = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetNotch);
 
 			if(GetScene()->GetCurrentFrame() == iFrameIndex)
 			{
-				eColor = HyColor::Cyan;
-				
-				DrawCurrentFrameIndicator(pPainter, fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, eColor);
-				pPainter->setPen(HyGlobal::ConvertHyColor(eColor));
+				color = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetCurFrameIndicator);
+				DrawCurrentFrameIndicator(pPainter, fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT);
+				pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetCurFrameIndicator));
 			}
 			else
-				pPainter->setPen(HyGlobal::ConvertHyColor(eColor));
+				pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetNotch));
 			
 			pPainter->drawLine(fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT, fPosX, rect.y() + TIMELINE_HEIGHT);
 
 			// Main Notch Keyframe Text
 			const float fTextWidth = pPainter->fontMetrics().horizontalAdvance(QString::number(iFrameIndex));
 			QRectF textRect(fPosX - (fTextWidth * 0.5f), rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT - 20.0f, fTextWidth, 20.0f);
-			DrawShadowText(pPainter, textRect, QString::number(iFrameIndex), eColor, HyColor::Black);
+			DrawShadowText(pPainter, textRect, QString::number(iFrameIndex), color);
 
 			// Draw timeline events
 			fpPaintEvent(iFrameIndex, fPosX);
 		}
 
 		// Sub Notch Lines
-		pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
+		pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetNotch));
 		for(int i = 0; i < iNumSubLines; ++i)
 		{
 			fPosX += fSubLineSpacing;
@@ -370,17 +369,17 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 				int iCurSubNotchFrame = (iFrameIndex + 1) + i;
 				if(GetScene()->GetCurrentFrame() == iCurSubNotchFrame)
 				{
-					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::Cyan));
+					pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetCurFrameIndicator));
 
 					const float fTextWidth = pPainter->fontMetrics().horizontalAdvance(QString::number(iCurSubNotchFrame));
 					QRectF textRect(fPosX - (fTextWidth * 0.5f), rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT - 20.0f, fTextWidth, 20.0f);
-					DrawShadowText(pPainter, textRect, QString::number(iCurSubNotchFrame), HyColor::Cyan, HyColor::Black);
+					DrawShadowText(pPainter, textRect, QString::number(iCurSubNotchFrame), HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetCurFrameIndicator));
 
-					DrawCurrentFrameIndicator(pPainter, fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, HyColor::Cyan);
-					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::Cyan));
+					DrawCurrentFrameIndicator(pPainter, fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT);
+					pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetCurFrameIndicator));
 				}
 				else
-					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
+					pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetNotch));
 
 				pPainter->drawLine(fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT, fPosX, rect.y() + TIMELINE_HEIGHT);
 
@@ -599,18 +598,19 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		m_pAuxDopeSheet->UpdateWidgets();
 }
 
-void EntityDopeSheetView::DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor color /*= HyColor::WidgetFrame*/, HyColor shadowColor /*= HyColor::Black*/)
+void EntityDopeSheetView::DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor textColor)
 {
 	textRect.translate(1.0f, 1.0f);
-	pPainter->setPen(HyGlobal::ConvertHyColor(shadowColor));
+	pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetTextShadow));
 	pPainter->drawText(textRect, sText);
 	textRect.translate(-1.0f, -1.0f);
-	pPainter->setPen(HyGlobal::ConvertHyColor(color));
+	pPainter->setPen(HyGlobal::ConvertHyColor(textColor));
 	pPainter->drawText(textRect, sText);
 }
 
-void EntityDopeSheetView::DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY, HyColor color)
-{	
+void EntityDopeSheetView::DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY)
+{
+	HyColor color = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetCurFrameIndicator);
 	pPainter->setPen(HyGlobal::ConvertHyColor(color.Darken()));
 	pPainter->setBrush(HyGlobal::ConvertHyColor(color));
 

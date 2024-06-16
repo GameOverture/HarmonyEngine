@@ -11,7 +11,7 @@
 #define SHAPECTRL_H
 
 #include "Global.h"
-#include "TransformCtrl.h"
+#include "GrabPoint.h"
 
 class ShapeCtrl
 {

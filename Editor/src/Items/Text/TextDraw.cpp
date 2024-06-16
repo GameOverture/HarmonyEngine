@@ -66,17 +66,6 @@ void TextDraw::SetTextState(uint uiStateIndex)
 	SetPreviewText();
 }
 
-/*virtual*/ void TextDraw::OnShow() /*override*/
-{
-	SetVisible(true);
-	m_Text.SetVisible(true);
-}
-
-/*virtual*/ void TextDraw::OnHide() /*override*/
-{
-	SetVisible(false);
-}
-
 /*virtual*/ void TextDraw::OnResizeRenderer() /*override*/
 {
 }

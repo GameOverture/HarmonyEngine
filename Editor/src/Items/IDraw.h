@@ -11,10 +11,6 @@
 #define IDRAW_H
 
 #include "Global.h"
-#include "ShapeCtrl.h"
-
-#include <QWidget>
-#include <QString>
 
 class ProjectItemData;
 
@@ -93,8 +89,6 @@ protected:
 	
 	virtual void OnApplyJsonData(HyJsonDoc &itemDataDocRef) { }
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) { }
-	virtual void OnShow() = 0;
-	virtual void OnHide() = 0;
 	virtual void OnResizeRenderer() = 0;
 	void CameraUpdated();
 	virtual void OnCameraUpdated() { }

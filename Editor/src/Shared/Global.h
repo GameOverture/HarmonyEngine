@@ -119,6 +119,49 @@ enum LoadingType
 	LOADINGTYPE_HarmonyStreaming
 };
 
+enum EditorColor
+{
+	// NOTE: Custom colors are serialized using this order as IDs in the QSettings file, so don't change the order
+	EDITORCOLOR_Origin,
+	EDITORCOLOR_OriginStroke,
+	EDITORCOLOR_GridColor1,
+	EDITORCOLOR_GridColor2,
+	EDITORCOLOR_GridOverlay,
+
+	EDITORCOLOR_PropertiesCategory,
+	EDITORCOLOR_PropertiesItem,
+
+	EDITORCOLOR_Marquee,
+	EDITORCOLOR_TransformBoundingVolume,
+	EDITORCOLOR_TransformGrabPointOutline,
+	EDITORCOLOR_TransformGrabPointFill,
+	EDITORCOLOR_TransformGrabPointSelectedOutline,
+	EDITORCOLOR_TransformGrabPointSelectedFill,
+
+	EDITORCOLOR_EditGrabPointOutline,
+	EDITORCOLOR_EditGrabPointFill,
+	EDITORCOLOR_EditGrabPointSelectedOutline,
+	EDITORCOLOR_EditGrabPointSelectedFill,
+
+	EDITORCOLOR_DopeSheet,
+	EDITORCOLOR_DopeSheetTimeline,
+	EDITORCOLOR_DopeSheetNotch,
+	EDITORCOLOR_DopeSheetCurFrameIndicator,
+	EDITORCOLOR_DopeSheetText,
+	EDITORCOLOR_DopeSheetTextSelected,
+	EDITORCOLOR_DopeSheetTextHover,
+	EDITORCOLOR_DopeSheetTextShadow,
+	EDITORCOLOR_DopeSheetItemsColumn,
+	EDITORCOLOR_DopeSheetKeyFrameOutline,
+	EDITORCOLOR_DopeSheetKeyFrameFill,
+	EDITORCOLOR_DopeSheetKeyFrameHover,
+	EDITORCOLOR_DopeSheetTweenFrameOutline,
+	EDITORCOLOR_DopeSheetTweenFrameFill,
+	EDITORCOLOR_DopeSheetTweenFrameHover,
+
+	NUM_EDITORCOLORS
+};
+
 enum MimeType
 {
 	MIMETYPE_ProjectItems = 0,
@@ -338,7 +381,7 @@ class HyGlobal
 
 	static QIcon														sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
 	static QIcon														sm_TweenPropIcons[NUM_TWEENPROPS];
-	static QColor														sm_ItemColors[NUM_ITEMTYPES];
+	static HyColor														sm_EditorColors[NUM_EDITORCOLORS];
 
 	static QString														sm_MimeTypes[NUM_MIMETYPES];
 
@@ -388,7 +431,8 @@ public:
 	static const QString ItemExt(ItemType eItem);
 	static const QIcon ItemIcon(ItemType eItm, SubIcon eSubIcon)		{ return sm_ItemIcons[eItm][eSubIcon]; }
 	static const QIcon AssetIcon(AssetManagerType eAsset, SubIcon eSubIcon);
-	static const QColor ItemColor(ItemType eItem)						{ return sm_ItemColors[eItem]; }
+	static const HyColor GetEditorColor(EditorColor eColor)				{ return sm_EditorColors[eColor]; }
+	static const QColor GetEditorQtColor(EditorColor eColor)			{ return HyGlobal::ConvertHyColor(sm_EditorColors[eColor]); }
 	static const QString MimeTypeString(MimeType eMimeType)				{ return sm_MimeTypes[eMimeType]; }
 	static const QString ThemeString(Theme eTheme)						{ return sm_Themes[eTheme]; }
 

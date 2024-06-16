@@ -160,6 +160,9 @@ private Q_SLOTS:
 private:
 	Ui::MainWindow *ui;
 
+	void DeserializeColors(const QByteArray &serializedColors);
+	void SerializeColors(const QByteArray &serializedColors);
+
 	void NewItem(ItemType eItem);
 	void RefreshBuildMenu();
 	void SaveSettings();

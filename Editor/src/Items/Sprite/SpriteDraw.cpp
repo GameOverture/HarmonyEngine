@@ -130,16 +130,6 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 	m_pSwapSprite = pTmpSwap;
 }
 
-/*virtual*/ void SpriteDraw::OnShow() /*override*/
-{
-	SetVisible(true);
-}
-
-/*virtual*/ void SpriteDraw::OnHide() /*override*/
-{
-	SetVisible(false);
-}
-
 /*virtual*/ void SpriteDraw::OnResizeRenderer() /*override*/
 {
 }

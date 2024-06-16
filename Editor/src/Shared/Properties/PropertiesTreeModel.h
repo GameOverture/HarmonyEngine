@@ -105,10 +105,8 @@ struct PropertiesDef
 		return eAccessType == PROPERTIESACCESS_ToggleOn || eAccessType == PROPERTIESACCESS_ToggleOff;
 	}
 
-	QColor GetColor() const {
-		return IsCategory() ?
-			QColor(HyColor::WidgetPanel.GetRed(), HyColor::WidgetPanel.GetGreen(), HyColor::WidgetPanel.GetBlue()) :
-			QColor(HyColor::WidgetFrame.GetRed(), HyColor::WidgetFrame.GetGreen(), HyColor::WidgetFrame.GetBlue());
+	HyColor GetColor() const {
+		return IsCategory() ? HyGlobal::GetEditorColor(EDITORCOLOR_PropertiesCategory) : HyGlobal::GetEditorColor(EDITORCOLOR_PropertiesItem);
 	}
 };
 

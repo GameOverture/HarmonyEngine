@@ -10,7 +10,7 @@
 #ifndef ENTITYDRAWITEM_H
 #define ENTITYDRAWITEM_H
 
-#include "IDraw.h"
+#include "IDrawItem.h"
 
 class EntityDraw;
 class EntityTreeItemData;
@@ -103,33 +103,19 @@ struct TweenInfo
 };
 
 // NOTE: this class does not keep its state when removed, it is deleted (should not be passed to UndoCmd's)
-class EntityDrawItem
+class EntityDrawItem : public IDrawItem
 {
 	EntityTreeItemData *					m_pEntityTreeItemData;
-
-	IHyLoadable2d *							m_pChild;
-
-	TransformCtrl							m_Transform;
-	ShapeCtrl								m_ShapeCtrl;
+	IHyBody2d *								m_pChild;
 
 public:
 	EntityDrawItem(Project &projectRef, EntityTreeItemData *pModelItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent);
 	virtual ~EntityDrawItem();
 
+	virtual void InitHyNode() override;
+	virtual IHyBody2d *GetHyNode() override;
+
 	EntityTreeItemData *GetEntityTreeItemData() const;
-
-	IHyLoadable2d *GetHyNode();
-
-	ShapeCtrl &GetShapeCtrl();
-	TransformCtrl &GetTransformCtrl();
-
-	bool IsMouseInBounds();
-
-	void RefreshTransform(HyCamera2d *pCamera);
-
-	void ShowTransformCtrl(bool bShowGrabPoints);
-	void HideTransformCtrl();
-	void ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut);
 
 	// This draw visual has all the current extrapolated data set for the current frame
 	QJsonValue ExtractPropertyData(QString sCategory, QString sPropertyName);

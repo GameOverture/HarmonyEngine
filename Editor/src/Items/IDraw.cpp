@@ -138,13 +138,13 @@ void IDraw::Show()
 
 	OnResizeRenderer();
 
-	OnShow();
 	UpdateDrawStatus(m_sSizeStatus);
+	SetVisible(true);
 }
 
 void IDraw::Hide()
 {
-	OnHide();
+	SetVisible(false);
 }
 
 void IDraw::ResizeRenderer()

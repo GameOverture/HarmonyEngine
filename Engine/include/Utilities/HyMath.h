@@ -460,10 +460,10 @@ public:
 	static const HyColor Orange;
 	static const HyColor Brown;
 	static const HyColor Transparent;
-	static const HyColor ContainerPanel;
-	static const HyColor ContainerFrame;
-	static const HyColor WidgetPanel;
-	static const HyColor WidgetFrame;
+	static const HyColor PanelContainer;
+	static const HyColor FrameContainer;
+	static const HyColor PanelWidget;
+	static const HyColor FrameWidget;
 };
 typedef HyColor HyColour;
 

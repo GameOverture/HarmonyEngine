@@ -15,14 +15,6 @@ AudioDraw::AudioDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDat
 {
 }
 
-/*virtual*/ void AudioDraw::OnShow() /*override*/
-{
-}
-
-/*virtual*/ void AudioDraw::OnHide() /*override*/
-{
-}
-
 /*virtual*/ void AudioDraw::OnResizeRenderer() /*override*/
 {
 }

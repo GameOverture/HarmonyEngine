@@ -146,6 +146,8 @@ MainWindow::MainWindow(QWidget *pParent) :
 	{
 		restoreGeometry(m_Settings.value("geometry").toByteArray());
 		restoreState(m_Settings.value("windowState").toByteArray());
+
+		DeserializeColors(m_Settings.value("colors", QByteArray()).toByteArray());
 	}
 	m_Settings.endGroup();
 	
@@ -1105,6 +1107,16 @@ void MainWindow::on_actionActivateProject_triggered()
 		OpenItem(Harmony::GetProject()->GetCurrentOpenItem());
 }
 
+void MainWindow::DeserializeColors(const QByteArray &serializedColors)
+{
+	
+}
+
+void MainWindow::SerializeColors(const QByteArray &serializedColors)
+{
+	m_Settings.setValue("colors", serializedColors);
+}
+
 void MainWindow::NewItem(ItemType eItem)
 {
 	ExplorerItemData *pFirstSelected = ui->explorer->GetSelected();
@@ -1222,6 +1234,7 @@ void MainWindow::SaveSettings()
 	{
 		m_Settings.setValue("geometry", saveGeometry());
 		m_Settings.setValue("windowState", saveState());
+		//m_Settings.setValue("colors", m_Settings.value("colors", QByteArray()).toByteArray());
 	}
 	m_Settings.endGroup();
 

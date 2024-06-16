@@ -13,6 +13,7 @@
 #include "EntityModel.h"
 #include "PropertiesUndoCmd.h"
 #include "EntityItemMimeData.h"
+#include "ShapeCtrl.h"
 
 #include <QUndoCommand>
 

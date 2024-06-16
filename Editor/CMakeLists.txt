@@ -85,10 +85,12 @@ if(Qt5_DIR)
 		src/Assets/Audio/SoundClip.cpp
 		src/Assets/Audio/SoundClip.h
 		src/Items/IDraw.cpp
-		src/Items/IModel.cpp
-		src/Items/IWidget.cpp
 		src/Items/IDraw.h
+		src/Items/IDrawEx.cpp
+		src/Items/IDrawEx.h
+		src/Items/IModel.cpp
 		src/Items/IModel.h
+		src/Items/IWidget.cpp
 		src/Items/IWidget.h
 		src/Items/IWidget.ui
 		src/Items/Spine/SpineDraw.cpp
@@ -232,10 +234,14 @@ if(Qt5_DIR)
 		src/Shared/GlobalWidgetMappers.h
 		src/Shared/IMimeData.cpp
 		src/Shared/IMimeData.h
-		src/Shared/ShapeCtrl.cpp
-		src/Shared/ShapeCtrl.h
-		src/Shared/TransformCtrl.cpp
-		src/Shared/TransformCtrl.h
+		src/Shared/Transform/GrabPoint.cpp
+		src/Shared/Transform/GrabPoint.h
+		src/Shared/Transform/IDrawItem.cpp
+		src/Shared/Transform/IDrawItem.h
+		src/Shared/Transform/ShapeCtrl.cpp
+		src/Shared/Transform/ShapeCtrl.h
+		src/Shared/Transform/TransformCtrl.cpp
+		src/Shared/Transform/TransformCtrl.h
 		src/Shared/Properties/PropertiesTreeModel.cpp
 		src/Shared/Properties/PropertiesTreeModel.h
 		src/Shared/Properties/PropertiesTreeMultiModel.cpp
@@ -338,6 +344,7 @@ if(Qt5_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Manager")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Properties")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Transform")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/TreeModel")
 
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Engine/include")

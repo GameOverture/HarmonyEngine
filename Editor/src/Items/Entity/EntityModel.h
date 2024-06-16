@@ -21,17 +21,6 @@
 #include <QJsonArray>
 #include <QGraphicsScene>
 
-#define ENTCOLOR_TransformBv HyColor::Blue.Lighten()
-#define ENTCOLOR_Primitive HyColor::DarkMagenta
-#define ENTCOLOR_Shape HyColor::Cyan
-#define ENTCOLOR_Marquee HyColor::Blue.Lighten()
-#define ENTCOLOR_Clear HyColor::White
-
-#define ENTCOLORPOINT_Transform HyColor::White, HyColor::Blue.Lighten()
-#define ENTCOLORPOINT_TransformRotate HyColor::Blue.Lighten(), HyColor::White
-#define ENTCOLORPOINT_Vem HyColor::White, HyColor::Red
-#define ENTCOLORPOINT_VemSelected HyColor::White, HyColor::Blue.Lighten()
-
 class EntityStateData : public IStateData
 {
 	EntityDopeSheetScene									m_DopeSheetScene;	// This stores the framesPerSecond and property key frames for this state

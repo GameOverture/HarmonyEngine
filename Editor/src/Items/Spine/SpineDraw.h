@@ -22,8 +22,6 @@ public:
 	virtual ~SpineDraw();
 
 	virtual void OnApplyJsonData(HyJsonDoc &itemDataDocRef) override;
-	virtual void OnShow() override;
-	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
 };
 

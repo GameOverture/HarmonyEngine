@@ -15,10 +15,8 @@
 #include "MainWindow.h"
 
 EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
-	m_pEntityTreeItemData(pEntityTreeItemData),
-	m_pChild(nullptr),
-	m_Transform(pEntityDraw),
-	m_ShapeCtrl(pParent)
+	IDrawItem(pEntityDraw),
+	m_pEntityTreeItemData(pEntityTreeItemData)
 {
 	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
 	TreeModelItemData *pReferencedItemData = projectRef.FindItemData(referencedItemUuid);
@@ -99,12 +97,81 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 	delete m_pChild;
 }
 
-EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
+/*virtual*/ void EntityDrawItem::InitHyNode() /*override*/
 {
-	return m_pEntityTreeItemData;
+	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
+	TreeModelItemData *pReferencedItemData = projectRef.FindItemData(referencedItemUuid);
+
+	if(m_pEntityTreeItemData->IsAssetItem())
+	{
+		if(m_pEntityTreeItemData->GetType() == ITEM_AtlasFrame)
+			m_pChild = new HyTexturedQuad2d(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum(), static_cast<IAssetItemData *>(pReferencedItemData)->GetBankId(), pParent);
+		else
+			HyGuiLog("EntityDrawItem ctor - asset item not handled: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
+	}
+	else if(HyGlobal::IsItemType_Project(m_pEntityTreeItemData->GetType()))
+	{
+		if(pReferencedItemData == nullptr || pReferencedItemData->IsProjectItem() == false)
+		{
+			HyGuiLog("EntityDrawItem ctor - could not find referenced item data UUID: " % referencedItemUuid.toString(), LOGTYPE_Error);
+			return;
+		}
+
+		ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pReferencedItemData);
+
+		FileDataPair fileDataPair;
+		pReferencedProjItemData->GetSavedFileData(fileDataPair);
+
+		if(m_pEntityTreeItemData->GetType() == ITEM_Entity)
+		{
+			m_pChild = new SubEntity(projectRef,
+				fileDataPair.m_Meta["framesPerSecond"].toInt(),
+				QUuid(fileDataPair.m_Meta["UUID"].toString()),
+				fileDataPair.m_Meta["descChildList"].toArray(),
+				fileDataPair.m_Meta["stateArray"].toArray(),
+				pParent);
+		}
+		else
+		{
+			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+			HyJsonDoc itemDataDoc;
+			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+				HyGuiLog("EntityDrawItem ctor - failed to parse its file data", LOGTYPE_Error);
+
+#undef GetObject
+			switch(m_pEntityTreeItemData->GetType())
+			{
+			case ITEM_Text:
+				m_pChild = new HyText2d("", HY_GUI_DATAOVERRIDE, pParent);
+				static_cast<HyText2d *>(m_pChild)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject(), false); // The 'false' here has it so HyTextData loads the atlas as it would normally
+				break;
+
+			case ITEM_Spine:
+				m_pChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, pParent);
+				static_cast<HySpine2d *>(m_pChild)->GuiOverrideData<HySpineData>(itemDataDoc.GetObject());
+				break;
+
+			case ITEM_Sprite:
+				m_pChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, pParent);
+				static_cast<HySprite2d *>(m_pChild)->GuiOverrideData<HySpriteData>(itemDataDoc.GetObject());
+				static_cast<HySprite2d *>(m_pChild)->SetAllBoundsIncludeAlphaCrop(true);
+				break;
+
+			case ITEM_Primitive:
+			case ITEM_Audio:
+			case ITEM_SoundClip:
+			default:
+				HyGuiLog("EntityDrawItem ctor - unhandled gui item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
+				break;
+			}
+		}
+	}
+
+	if(m_pChild)
+		m_pChild->Load();
 }
 
-IHyLoadable2d *EntityDrawItem::GetHyNode()
+/*virtual*/ IHyLoadable2d *EntityDrawItem::GetHyNode() /*override*/
 {
 	if(m_pEntityTreeItemData->GetType() == ITEM_Primitive || m_pEntityTreeItemData->GetType() == ITEM_BoundingVolume)
 		return &m_ShapeCtrl.GetPrimitive();
@@ -112,68 +179,9 @@ IHyLoadable2d *EntityDrawItem::GetHyNode()
 	return m_pChild;
 }
 
-ShapeCtrl &EntityDrawItem::GetShapeCtrl()
+EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 {
-	return m_ShapeCtrl;
-}
-
-TransformCtrl &EntityDrawItem::GetTransformCtrl()
-{
-	return m_Transform;
-}
-
-bool EntityDrawItem::IsMouseInBounds()
-{
-	HyShape2d boundingShape;
-	glm::mat4 transformMtx;
-	ExtractTransform(boundingShape, transformMtx);
-	
-	glm::vec2 ptWorldMousePos;
-	return HyEngine::Input().GetWorldMousePos(ptWorldMousePos) && boundingShape.TestPoint(transformMtx, ptWorldMousePos);
-}
-
-void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera)
-{
-	HyShape2d boundingShape;
-	glm::mat4 mtxShapeTransform;
-	ExtractTransform(boundingShape, mtxShapeTransform);
-
-	m_Transform.WrapTo(boundingShape, mtxShapeTransform, pCamera);
-	GetShapeCtrl().DeserializeOutline(pCamera);
-}
-
-void EntityDrawItem::ShowTransformCtrl(bool bShowGrabPoints)
-{
-	m_Transform.Show(bShowGrabPoints);
-}
-
-void EntityDrawItem::HideTransformCtrl()
-{
-	m_Transform.Hide();
-}
-
-void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)
-{
-	transformMtxOut = glm::identity<glm::mat4>();
-	switch(m_pEntityTreeItemData->GetType())
-	{
-	case ITEM_Sprite:
-	case ITEM_BoundingVolume:
-	case ITEM_AtlasFrame:
-	case ITEM_Primitive:
-	case ITEM_Text:
-	case ITEM_Spine:
-	case ITEM_Entity: {
-		IHyBody2d *pHyBody = static_cast<IHyBody2d *>(GetHyNode());
-		pHyBody->CalcLocalBoundingShape(boundingShapeOut);
-		transformMtxOut = GetHyNode()->GetSceneTransform(0.0f);
-		break; }
-
-	case ITEM_Audio:
-	default:
-		HyGuiLog("EntityItemDraw::ExtractTransform - unhandled child node type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
-		break;
-	}
+	return m_pEntityTreeItemData;
 }
 
 // NOTE: The listed 4 functions below share logic that process all item properties. Any updates should reflect to all of them

@@ -66,16 +66,6 @@ SpineDraw::~SpineDraw()
 	m_Spine.Load();
 }
 
-/*virtual*/ void SpineDraw::OnShow() /*override*/
-{
-	SetVisible(true);
-}
- 
-/*virtual*/ void SpineDraw::OnHide() /*override*/
-{
-	SetVisible(false);
-}
-
 /*virtual*/ void SpineDraw::OnResizeRenderer() /*override*/
 {
 }

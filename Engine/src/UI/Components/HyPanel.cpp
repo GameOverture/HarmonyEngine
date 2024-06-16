@@ -115,9 +115,9 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 
 		// If a PrimPart's color's RGBA is 0xDEADBEEF, then reassign it to a default color
 		if(m_pPrimParts->m_PanelColor.GetAsRGBA() == 0xDEADBEEF)
-			m_pPrimParts->m_PanelColor = m_pPrimParts->m_bIsContainer ? HyColor::ContainerPanel : HyColor::WidgetPanel;
+			m_pPrimParts->m_PanelColor = m_pPrimParts->m_bIsContainer ? HyColor::PanelContainer : HyColor::PanelWidget;
 		if(m_pPrimParts->m_FrameColor.GetAsRGBA() == 0xDEADBEEF)
-			m_pPrimParts->m_FrameColor = m_pPrimParts->m_bIsContainer ? HyColor::ContainerFrame : HyColor::WidgetFrame;
+			m_pPrimParts->m_FrameColor = m_pPrimParts->m_bIsContainer ? HyColor::FrameContainer : HyColor::FrameWidget;
 		if(m_pPrimParts->m_TertiaryColor.GetAsRGBA() == 0xDEADBEEF)
 			m_pPrimParts->m_TertiaryColor = HyColor::Orange;
 

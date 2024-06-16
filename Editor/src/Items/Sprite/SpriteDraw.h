@@ -36,8 +36,6 @@ public:
 
 protected:
 	virtual void OnApplyJsonData(HyJsonDoc &itemDataDocRef) override;
-	virtual void OnShow() override;
-	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
 	
 	virtual void OnUpdate() override;

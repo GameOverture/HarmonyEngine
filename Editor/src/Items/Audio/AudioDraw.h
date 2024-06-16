@@ -17,8 +17,6 @@ class AudioDraw : public IDraw
 public:
 	AudioDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 
-	virtual void OnShow() override;
-	virtual void OnHide() override;
 	virtual void OnResizeRenderer() override;
 };
 

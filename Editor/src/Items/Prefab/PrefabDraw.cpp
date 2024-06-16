@@ -15,14 +15,6 @@ PrefabDraw::PrefabDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 }
 
-/*virtual*/ void PrefabDraw::OnShow() /*override*/
-{
-}
-
-/*virtual*/ void PrefabDraw::OnHide() /*override*/
-{
-}
-
 /*virtual*/ void PrefabDraw::OnResizeRenderer() /*override*/
 {
 }
