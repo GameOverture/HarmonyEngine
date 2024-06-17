@@ -29,9 +29,6 @@ public:
 	TransformCtrl &GetTransformCtrl();
 	ShapeCtrl &GetShapeCtrl();
 
-	ShapeCtrl &GetShapeCtrl();
-	TransformCtrl &GetTransformCtrl();
-
 	bool IsMouseInBounds();
 
 	void RefreshTransform(HyCamera2d *pCamera);

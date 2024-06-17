@@ -29,10 +29,10 @@ HarmonyWidget::HarmonyWidget(Project *pProject, QWidget *pParent /*= nullptr*/) 
 
 	ui->rulerHorz->setScene(&m_RulerHorzScene);
 	ui->rulerHorz->translate(0, 0);
-	ui->rulerHorz->Init(HYORIENT_Horizontal, HyColor::ContainerPanel);
+	ui->rulerHorz->Init(HYORIENT_Horizontal);
 
 	ui->rulerVert->setScene(&m_RulerVertScene);
-	ui->rulerVert->Init(HYORIENT_Vertical, HyColor::ContainerPanel);
+	ui->rulerVert->Init(HYORIENT_Vertical);
 
 	RestoreCursorShape();
 }

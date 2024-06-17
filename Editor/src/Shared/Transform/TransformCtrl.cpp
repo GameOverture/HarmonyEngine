@@ -11,25 +11,33 @@
 #include "TransformCtrl.h"
 #include "IDrawItem.h"
 
-#define TRANSFORMCOLOR_TransformBv HyColor::Blue.Lighten()
-
 TransformCtrl::TransformCtrl(HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_bIsShown(false),
 	m_bShowGrabPoints(false),
 	m_fCachedRotation(0.0f)
 {
-	m_BoundingVolume.SetTint(ENTCOLOR_TransformBv);
+	m_BoundingVolume.SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_TransformBoundingVolume));
 	m_BoundingVolume.SetWireframe(true);
 	ChildAppend(m_BoundingVolume);
 
-	m_ExtrudeSegment.SetTint(ENTCOLOR_TransformBv);
+	m_ExtrudeSegment.SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_TransformBoundingVolume));
 	m_ExtrudeSegment.SetWireframe(true);
 	ChildAppend(m_ExtrudeSegment);
 
 	for(uint i = 0; i < GRAB_Rotate; ++i)
-		m_GrabPoints[i] = new GrabPoint(ENTCOLORPOINT_Transform, ENTCOLORPOINT_Transform, this);
-	m_GrabPoints[GRAB_Rotate] = new GrabPoint(ENTCOLORPOINT_TransformRotate, ENTCOLORPOINT_TransformRotate, this);
+	{
+		m_GrabPoints[i] = new GrabPoint(HyGlobal::GetEditorColor(EDITORCOLOR_TransformGrabPointOutline),
+										HyGlobal::GetEditorColor(EDITORCOLOR_TransformGrabPointFill),
+										HyGlobal::GetEditorColor(EDITORCOLOR_TransformGrabPointSelectedOutline),
+										HyGlobal::GetEditorColor(EDITORCOLOR_TransformGrabPointSelectedFill),
+										this);
+	}
+	m_GrabPoints[GRAB_Rotate] = new GrabPoint(HyGlobal::GetEditorColor(EDITORCOLOR_TransformGrabPointFill),
+											  HyGlobal::GetEditorColor(EDITORCOLOR_TransformGrabPointOutline),
+											  HyGlobal::GetEditorColor(EDITORCOLOR_TransformGrabPointSelectedFill),
+											  HyGlobal::GetEditorColor(EDITORCOLOR_TransformGrabPointSelectedOutline),
+											  this);
 
 	UseWindowCoordinates(0);
 	SetDisplayOrder(DISPLAYORDER_TransformCtrl);
@@ -140,7 +148,7 @@ void TransformCtrl::WrapTo(QList<IDrawExItem *> itemDrawList, HyCamera2d *pCamer
 	glm::vec3 ptRotPivot;
 	b2AABB combinedAabb;
 	HyMath::InvalidateAABB(combinedAabb);
-	for(IDrawItem *pDrawItem : itemDrawList)
+	for(IDrawExItem *pDrawItem : itemDrawList)
 	{
 		HyShape2d *pItemShape = new HyShape2d();
 		glm::mat4 mtxItemTransform;

@@ -21,11 +21,6 @@ IDrawExItem::IDrawExItem(HyEntity2d *pParent) :
 {
 }
 
-ShapeCtrl &IDrawExItem::GetShapeCtrl()
-{
-	return m_ShapeCtrl;
-}
-
 TransformCtrl &IDrawExItem::GetTransformCtrl()
 {
 	return m_Transform;
@@ -34,11 +29,6 @@ TransformCtrl &IDrawExItem::GetTransformCtrl()
 ShapeCtrl &IDrawExItem::GetShapeCtrl()
 {
 	return m_ShapeCtrl;
-}
-
-TransformCtrl &IDrawExItem::GetTransformCtrl()
-{
-	return m_Transform;
 }
 
 bool IDrawExItem::IsMouseInBounds()

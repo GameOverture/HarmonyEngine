@@ -91,7 +91,10 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		return;
 	}
 
-	IDrawEx::OnMouseMoveEvent(pEvent);
+	if(m_eShapeEditState != SHAPESTATE_None)
+		DoMouseMove_ShapeEdit(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+	else
+		IDrawEx::OnMouseMoveEvent(pEvent);
 }
 
 /*virtual*/ void EntityDraw::OnMousePressEvent(QMouseEvent *pEvent) /*override*/
@@ -102,7 +105,18 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		return;
 	}
 
-	IDrawEx::OnMousePressEvent(pEvent);
+	if(pEvent->button() == Qt::LeftButton)
+	{
+		if(m_eShapeEditState != SHAPESTATE_None)
+			DoMousePress_ShapeEdit(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+		else
+			IDrawEx::OnMousePressEvent(pEvent);
+	}
+	else if(pEvent->button() == Qt::RightButton)
+	{
+		if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
+			RequestClearShapeEdit();
+	}
 }
 
 /*virtual*/ void EntityDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
@@ -113,7 +127,10 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		return;
 	}
 
-	IDrawEx::OnMouseReleaseEvent(pEvent);
+	if(m_eShapeEditState != SHAPESTATE_None)
+		DoMouseRelease_ShapeEdit(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+	else
+		IDrawEx::OnMouseReleaseEvent(pEvent);
 }
 
 void EntityDraw::SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive)

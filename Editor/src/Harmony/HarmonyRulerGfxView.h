@@ -35,7 +35,7 @@ public:
 	HarmonyRulerGfxView(QWidget *pParent = nullptr);
 	virtual ~HarmonyRulerGfxView();
 
-	void Init(HyOrientation eOrientation, HyColor bgColor);
+	void Init(HyOrientation eOrientation);
 
 	bool IsShowMouse() const;
 	void ShowMouse(bool bShowMouse);

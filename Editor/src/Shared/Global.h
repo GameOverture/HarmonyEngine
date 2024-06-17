@@ -128,6 +128,12 @@ enum EditorColor
 	EDITORCOLOR_GridColor2,
 	EDITORCOLOR_GridOverlay,
 
+	EDITORCOLOR_Rulers,
+	EDITORCOLOR_RulersNotch,
+	EDITORCOLOR_RulersText,
+	EDITORCOLOR_RulersTextShadow,
+	EDITORCOLOR_RulersMousePos,
+
 	EDITORCOLOR_PropertiesCategory,
 	EDITORCOLOR_PropertiesItem,
 

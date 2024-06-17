@@ -33,10 +33,10 @@ HarmonyRulerGfxView::HarmonyRulerGfxView(QWidget *pParent /*= nullptr*/) :
 {
 }
 
-void HarmonyRulerGfxView::Init(HyOrientation eOrientation, HyColor bgColor)
+void HarmonyRulerGfxView::Init(HyOrientation eOrientation)
 {
 	m_eOrientation = eOrientation;
-	setBackgroundBrush(HyGlobal::ConvertHyColor(bgColor));
+	setBackgroundBrush(HyGlobal::GetEditorQtColor(EDITORCOLOR_Rulers));
 }
 
 bool HarmonyRulerGfxView::IsShowMouse() const
@@ -62,7 +62,7 @@ void HarmonyRulerGfxView::ShowMouse(bool bShowMouse)
 
 	if(m_eOrientation == HYORIENT_Horizontal)
 	{
-		pPainter->setPen(QPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame)));
+		pPainter->setPen(QPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_RulersNotch)));
 		pPainter->drawLine(rect.left(), rect.top(), rect.right(), rect.top());
 	}
 
@@ -72,7 +72,7 @@ void HarmonyRulerGfxView::ShowMouse(bool bShowMouse)
 	pCamera->CalcWorldViewBounds(worldViewBounds);
 
 	qreal fSubLineSpacing = 4 * pCamera->GetZoom();
-	pPainter->setPen(QPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame)));
+	pPainter->setPen(QPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_RulersText)));
 	pPainter->setFont(QFont("Arial", 7));
 
 	int iCurDrawPos = 0;
@@ -121,26 +121,28 @@ void HarmonyRulerGfxView::ShowMouse(bool bShowMouse)
 					// Main Notch Keyframe Text
 					QRectF textRect(iCurDrawPos - (fTextWidth * 0.5f) - 1.0f, rect.top(), fTextWidth + 2.0f, RULER_TEXT_HEIGHT + 2.0f);
 					textRect.translate(1.0f, 1.0f);
-					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::Black));
+					pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_RulersTextShadow));
 					pPainter->drawText(textRect, sNotch);
 					textRect.translate(-1.0f, -1.0f);
-					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
+					pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_RulersText));
 					pPainter->drawText(textRect, sNotch);
 
 					// Draw notch line
+					pPainter->setPen(QPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_RulersNotch)));
 					pPainter->drawLine(iCurDrawPos, rect.bottom(), iCurDrawPos, rect.bottom() - RULER_MAIN_NOTCH);
 				}
 				else // HYORIENT_Vertical
 				{
 					// Main Notch Keyframe Text
 					pPainter->rotate(-90.0f);
-					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::Black));
+					pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_RulersTextShadow));
 					pPainter->drawText(QPointF(-1 * (iCurDrawPos + 1.0f) - (fTextWidth * 0.5f), RULER_WIDTH + 1.0f - (RULER_WIDTH - RULER_TEXT_HEIGHT)), sNotch);
-					pPainter->setPen(HyGlobal::ConvertHyColor(HyColor::WidgetFrame));
+					pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_RulersText));
 					pPainter->drawText(QPointF(-1 * iCurDrawPos - (fTextWidth * 0.5f), RULER_WIDTH - (RULER_WIDTH - RULER_TEXT_HEIGHT)), sNotch);
 					pPainter->rotate(90.0f);
 
 					// Draw notch line
+					pPainter->setPen(QPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_RulersNotch)));
 					pPainter->drawLine(rect.right(), iCurDrawPos, rect.right() - RULER_MAIN_NOTCH, iCurDrawPos);
 				}
 			}
@@ -165,7 +167,7 @@ void HarmonyRulerGfxView::ShowMouse(bool bShowMouse)
 	bool bWorldMousePosValid = HyEngine::Input().GetWorldMousePos(ptWorldMousePos);
 	if(bWorldMousePosValid && m_bShowMouse)
 	{
-		pPainter->setPen(QPen(HyGlobal::ConvertHyColor(HyColor::Cyan)));
+		pPainter->setPen(QPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_RulersMousePos)));
 
 		if(m_eOrientation == HYORIENT_Horizontal)
 			pPainter->drawLine(ConvertWorldToDraw(static_cast<int>(ptWorldMousePos.x)), rect.top(), ConvertWorldToDraw(static_cast<int>(ptWorldMousePos.x)), rect.bottom());

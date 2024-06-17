@@ -171,6 +171,11 @@
 	sm_EditorColors[EDITORCOLOR_GridColor1] = HyColor(106, 105, 113, 255);
 	sm_EditorColors[EDITORCOLOR_GridColor2] = HyColor(93, 93, 97, 255);
 	sm_EditorColors[EDITORCOLOR_GridOverlay] = HyColor::Black;
+	sm_EditorColors[EDITORCOLOR_Rulers] = HyColor::PanelContainer;
+	sm_EditorColors[EDITORCOLOR_RulersNotch] = HyColor::FrameWidget;
+	sm_EditorColors[EDITORCOLOR_RulersText] = HyColor::FrameWidget;
+	sm_EditorColors[EDITORCOLOR_RulersTextShadow] = HyColor::Black;
+	sm_EditorColors[EDITORCOLOR_RulersMousePos] = HyColor::Cyan;
 	sm_EditorColors[EDITORCOLOR_PropertiesCategory] = HyColor::PanelWidget;
 	sm_EditorColors[EDITORCOLOR_PropertiesItem] = HyColor::FrameWidget;
 	sm_EditorColors[EDITORCOLOR_Marquee] = HyColor::Blue.Lighten();

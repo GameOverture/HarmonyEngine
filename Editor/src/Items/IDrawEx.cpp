@@ -142,19 +142,12 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 	if(IsCameraPanning())
 		RefreshTransforms();
 	else if(pEvent->button() == Qt::LeftButton &&
-		eCursorShape != Qt::WaitCursor &&
-		eCursorShape != Qt::SplitHCursor &&
-		eCursorShape != Qt::SplitVCursor)
+			eCursorShape != Qt::WaitCursor &&
+			eCursorShape != Qt::SplitHCursor &&
+			eCursorShape != Qt::SplitVCursor &&
+			m_eDragState == DRAGSTATE_None)
 	{
-		if(m_eShapeEditState != SHAPESTATE_None)
-			DoMousePress_ShapeEdit(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
-		else if(m_eDragState == DRAGSTATE_None)
-			DoMousePress_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
-	}
-	else if(pEvent->button() == Qt::RightButton)
-	{
-		if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
-			RequestClearShapeEdit();
+		DoMousePress_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 	}
 }
 
@@ -170,9 +163,7 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 	{
 		IDraw::OnMouseReleaseEvent(pEvent);
 
-		if(m_eShapeEditState != SHAPESTATE_None)
-			DoMouseRelease_ShapeEdit(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
-		else if(pEvent->button() == Qt::LeftButton)
+		if(pEvent->button() == Qt::LeftButton)
 		{
 			if(m_eDragState == DRAGSTATE_None ||
 				m_eDragState == DRAGSTATE_Marquee ||
@@ -291,19 +282,14 @@ Qt::CursorShape IDrawEx::GetGrabPointCursorShape(TransformCtrl::GrabPointType eG
 
 void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 {
-	if(m_eShapeEditState == SHAPESTATE_None)
+	if(m_eDragState == DRAGSTATE_None ||
+		m_eDragState == DRAGSTATE_Marquee ||
+		m_eDragState == DRAGSTATE_Pending)
 	{
-		if(m_eDragState == DRAGSTATE_None ||
-			m_eDragState == DRAGSTATE_Marquee ||
-			m_eDragState == DRAGSTATE_Pending)
-		{
-			DoMouseMove_Select(bCtrlMod, bShiftMod);
-		}
-		else if(m_eDragState == DRAGSTATE_Transforming)
-			DoMouseMove_Transform(bCtrlMod, bShiftMod);
+		DoMouseMove_Select(bCtrlMod, bShiftMod);
 	}
-	else
-		DoMouseMove_ShapeEdit(bCtrlMod, bShiftMod);
+	else if(m_eDragState == DRAGSTATE_Transforming)
+		DoMouseMove_Transform(bCtrlMod, bShiftMod);
 }
 
 void IDrawEx::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
@@ -315,7 +301,7 @@ void IDrawEx::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
 		glm::vec2 ptCurMousePos;
 		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
 
-		m_DragShape.Setup(SHAPE_Box, ENTCOLOR_Marquee, 0.25f, 1.0f);
+		m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
 		m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptCurMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
 	}
 	else if(m_eDragState == DRAGSTATE_Pending)
@@ -446,7 +432,7 @@ void IDrawEx::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 				affectedItemList << pItem;
 		}
 
-		m_DragShape.Setup(SHAPE_None, ENTCOLOR_Clear, 1.0f, 1.0f);
+		m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
 	}
 	else if(m_pCurHoverItem) // This covers the resolution of "Special Case" in EntityDraw::DoMousePress_Select
 		affectedItemList << m_pCurHoverItem;
