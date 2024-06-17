@@ -53,7 +53,7 @@ void ShapeCtrl::Setup(EditorShape eShape, HyColor color, float fBvAlpha, float f
 	m_eShape = eShape;
 
 	m_BoundingVolume.SetTint(color);
-	if(color != ENTCOLOR_Shape)
+	//if(color != ENTCOLOR_Shape)
 	{
 		if(color.IsDark())
 			color = color.Lighten();
@@ -930,7 +930,11 @@ void ShapeCtrl::SetVertexGrabPointListSize(uint32 uiNumGrabPoints)
 
 	while(static_cast<uint32>(m_VertexGrabPointList.size()) < uiNumGrabPoints)
 	{
-		GrabPoint *pNewGrabPt = new GrabPoint(ENTCOLORPOINT_Vem, ENTCOLORPOINT_VemSelected, m_BoundingVolume.ParentGet());
+		GrabPoint *pNewGrabPt = new GrabPoint(HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointOutline),
+											  HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointFill),
+											  HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointSelectedOutline),
+											  HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointSelectedFill),
+											  m_BoundingVolume.ParentGet());
 		pNewGrabPt->SetVisible(false);
 		pNewGrabPt->SetDisplayOrder(DISPLAYORDER_TransformCtrl);
 		m_VertexGrabPointList.push_back(pNewGrabPt);

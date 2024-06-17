@@ -103,7 +103,7 @@ struct TweenInfo
 };
 
 // NOTE: this class does not keep its state when removed, it is deleted (should not be passed to UndoCmd's)
-class EntityDrawItem : public IDrawItem
+class EntityDrawItem : public IDrawExItem
 {
 	EntityTreeItemData *					m_pEntityTreeItemData;
 	IHyBody2d *								m_pChild;
@@ -112,8 +112,8 @@ public:
 	EntityDrawItem(Project &projectRef, EntityTreeItemData *pModelItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent);
 	virtual ~EntityDrawItem();
 
-	virtual void InitHyNode() override;
 	virtual IHyBody2d *GetHyNode() override;
+	virtual bool IsSelected() override;
 
 	EntityTreeItemData *GetEntityTreeItemData() const;
 

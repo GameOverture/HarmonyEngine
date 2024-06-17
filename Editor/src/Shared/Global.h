@@ -144,10 +144,11 @@ enum EditorColor
 	EDITORCOLOR_TransformGrabPointSelectedOutline,
 	EDITORCOLOR_TransformGrabPointSelectedFill,
 
-	EDITORCOLOR_EditGrabPointOutline,
-	EDITORCOLOR_EditGrabPointFill,
-	EDITORCOLOR_EditGrabPointSelectedOutline,
-	EDITORCOLOR_EditGrabPointSelectedFill,
+	EDITORCOLOR_Shape,
+	EDITORCOLOR_ShapeGrabPointOutline,
+	EDITORCOLOR_ShapeGrabPointFill,
+	EDITORCOLOR_ShapeGrabPointSelectedOutline,
+	EDITORCOLOR_ShapeGrabPointSelectedFill,
 
 	EDITORCOLOR_DopeSheet,
 	EDITORCOLOR_DopeSheetTimeline,

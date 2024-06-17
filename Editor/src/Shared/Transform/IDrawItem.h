@@ -16,6 +16,7 @@
 
 class IDrawExItem
 {
+protected:
 	TransformCtrl							m_Transform;
 	ShapeCtrl								m_ShapeCtrl;
 
@@ -23,8 +24,8 @@ public:
 	IDrawExItem(HyEntity2d *pParent);
 	virtual ~IDrawExItem();
 
-	virtual void InitHyNode() = 0;
 	virtual IHyBody2d *GetHyNode() = 0;
+	virtual bool IsSelected() = 0;
 
 	TransformCtrl &GetTransformCtrl();
 	ShapeCtrl &GetShapeCtrl();

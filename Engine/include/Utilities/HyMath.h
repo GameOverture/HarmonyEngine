@@ -449,9 +449,9 @@ public:
 	static const HyColor Blue;
 	static const HyColor DarkBlue;
 	static const HyColor Cyan;
-	static const HyColor DarkCyan;
+	static const HyColor DarkCyan; // Teal
 	static const HyColor Magenta;
-	static const HyColor DarkMagenta;
+	static const HyColor DarkMagenta; // Purple
 	static const HyColor Yellow;
 	static const HyColor DarkYellow;
 	static const HyColor Gray;

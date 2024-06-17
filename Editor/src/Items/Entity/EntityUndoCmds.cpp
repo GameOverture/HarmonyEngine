@@ -1313,12 +1313,13 @@ EntityUndoCmd_PropertyModified::EntityUndoCmd_PropertyModified(PropertiesTreeMod
 			EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_pModel->GetOwner().GetModel()->GetStateData(m_iStateIndex))->GetDopeSheetScene();
 			EntityTreeItemData *pEntityTreeData = m_pModel->GetSubstate().value<EntityTreeItemData *>();
 
-			QList<EntityDrawItem *> entDrawItemList = static_cast<EntityDraw *>(m_pModel->GetOwner().GetDraw())->GetCurrentItemList();
-			for(EntityDrawItem *pDrawItem : entDrawItemList)
+			QList<IDrawExItem *> drawItemList = static_cast<EntityDraw *>(m_pModel->GetOwner().GetDraw())->GetDrawItemList();
+			for(IDrawExItem *pDrawItem : drawItemList)
 			{
-				if(pDrawItem->GetEntityTreeItemData() == pEntityTreeData)
+				EntityDrawItem *pEntDrawItem = static_cast<EntityDrawItem *>(pDrawItem);
+				if(pEntDrawItem->GetEntityTreeItemData() == pEntityTreeData)
 				{
-					m_OverridePropertyValue = pDrawItem->ExtractPropertyData(m_pModel->GetCategoryName(m_ModelIndex), m_pModel->GetPropertyName(m_ModelIndex));
+					m_OverridePropertyValue = pEntDrawItem->ExtractPropertyData(m_pModel->GetCategoryName(m_ModelIndex), m_pModel->GetPropertyName(m_ModelIndex));
 					break;
 				}
 			}

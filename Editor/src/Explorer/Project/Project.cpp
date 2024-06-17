@@ -1207,11 +1207,6 @@ bool Project::HarmonyInitialize()
 // IHyEngine
 bool Project::HarmonyUpdate()
 {
-	if(m_pTabBar->count() > 0)
-		m_pDraw->Hide();
-	else
-		m_pDraw->Show();
-
 	return true;
 }
 

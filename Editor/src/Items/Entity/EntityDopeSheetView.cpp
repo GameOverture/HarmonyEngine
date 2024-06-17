@@ -252,7 +252,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		{
 			for(QPair<QString, QString> &propPair : propList)
 			{
-				DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN + ITEMS_LEFT_MARGIN, fPosY + 5.0f, ITEMS_WIDTH - ITEMS_LEFT_MARGIN, ITEMS_LINE_HEIGHT), propPair.second);
+				DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN + ITEMS_LEFT_MARGIN, fPosY + 5.0f, ITEMS_WIDTH - ITEMS_LEFT_MARGIN, ITEMS_LINE_HEIGHT), propPair.second, HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetTextSelected));
 				fPosY += ITEMS_LINE_HEIGHT;
 			}
 		}

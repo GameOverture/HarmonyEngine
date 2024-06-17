@@ -15,7 +15,7 @@
 #include "MainWindow.h"
 
 EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
-	IDrawItem(pEntityDraw),
+	IDrawExItem(pEntityDraw),
 	m_pEntityTreeItemData(pEntityTreeItemData)
 {
 	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
@@ -97,86 +97,17 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 	delete m_pChild;
 }
 
-/*virtual*/ void EntityDrawItem::InitHyNode() /*override*/
-{
-	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
-	TreeModelItemData *pReferencedItemData = projectRef.FindItemData(referencedItemUuid);
-
-	if(m_pEntityTreeItemData->IsAssetItem())
-	{
-		if(m_pEntityTreeItemData->GetType() == ITEM_AtlasFrame)
-			m_pChild = new HyTexturedQuad2d(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum(), static_cast<IAssetItemData *>(pReferencedItemData)->GetBankId(), pParent);
-		else
-			HyGuiLog("EntityDrawItem ctor - asset item not handled: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
-	}
-	else if(HyGlobal::IsItemType_Project(m_pEntityTreeItemData->GetType()))
-	{
-		if(pReferencedItemData == nullptr || pReferencedItemData->IsProjectItem() == false)
-		{
-			HyGuiLog("EntityDrawItem ctor - could not find referenced item data UUID: " % referencedItemUuid.toString(), LOGTYPE_Error);
-			return;
-		}
-
-		ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pReferencedItemData);
-
-		FileDataPair fileDataPair;
-		pReferencedProjItemData->GetSavedFileData(fileDataPair);
-
-		if(m_pEntityTreeItemData->GetType() == ITEM_Entity)
-		{
-			m_pChild = new SubEntity(projectRef,
-				fileDataPair.m_Meta["framesPerSecond"].toInt(),
-				QUuid(fileDataPair.m_Meta["UUID"].toString()),
-				fileDataPair.m_Meta["descChildList"].toArray(),
-				fileDataPair.m_Meta["stateArray"].toArray(),
-				pParent);
-		}
-		else
-		{
-			QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
-			HyJsonDoc itemDataDoc;
-			if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-				HyGuiLog("EntityDrawItem ctor - failed to parse its file data", LOGTYPE_Error);
-
-#undef GetObject
-			switch(m_pEntityTreeItemData->GetType())
-			{
-			case ITEM_Text:
-				m_pChild = new HyText2d("", HY_GUI_DATAOVERRIDE, pParent);
-				static_cast<HyText2d *>(m_pChild)->GuiOverrideData<HyTextData>(itemDataDoc.GetObject(), false); // The 'false' here has it so HyTextData loads the atlas as it would normally
-				break;
-
-			case ITEM_Spine:
-				m_pChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, pParent);
-				static_cast<HySpine2d *>(m_pChild)->GuiOverrideData<HySpineData>(itemDataDoc.GetObject());
-				break;
-
-			case ITEM_Sprite:
-				m_pChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, pParent);
-				static_cast<HySprite2d *>(m_pChild)->GuiOverrideData<HySpriteData>(itemDataDoc.GetObject());
-				static_cast<HySprite2d *>(m_pChild)->SetAllBoundsIncludeAlphaCrop(true);
-				break;
-
-			case ITEM_Primitive:
-			case ITEM_Audio:
-			case ITEM_SoundClip:
-			default:
-				HyGuiLog("EntityDrawItem ctor - unhandled gui item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
-				break;
-			}
-		}
-	}
-
-	if(m_pChild)
-		m_pChild->Load();
-}
-
-/*virtual*/ IHyLoadable2d *EntityDrawItem::GetHyNode() /*override*/
+/*virtual*/ IHyBody2d *EntityDrawItem::GetHyNode() /*override*/
 {
 	if(m_pEntityTreeItemData->GetType() == ITEM_Primitive || m_pEntityTreeItemData->GetType() == ITEM_BoundingVolume)
 		return &m_ShapeCtrl.GetPrimitive();
 
 	return m_pChild;
+}
+
+/*virtual*/ bool EntityDrawItem::IsSelected() /*override*/
+{
+	return m_pEntityTreeItemData->IsSelected();
 }
 
 EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
@@ -751,7 +682,18 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 					float fBvAlpha = (eItemType == ITEM_BoundingVolume) ? 0.0f : 1.0f;
 					float fOutlineAlpha = (eItemType == ITEM_BoundingVolume || bIsSelected) ? 1.0f : 0.0f;
 
-					pShapeCtrl->Setup(eShape, ENTCOLOR_Shape, fBvAlpha, fOutlineAlpha);
+					HyColor color = HyGlobal::GetEditorColor(EDITORCOLOR_Shape);
+					if(eItemType == ITEM_Primitive)
+					{
+						color = HyColor::White;
+						if(propsObj.contains("Body") && propsObj["Body"].toObject().contains("Color Tint"))
+						{
+							QJsonArray colorArray = propsObj["Color Tint"].toArray();
+							color = HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt());
+						}
+					}
+
+					pShapeCtrl->Setup(eShape, color, fBvAlpha, fOutlineAlpha);
 					pShapeCtrl->Deserialize(shapeObj["Data"].toString(), pCamera);
 				}
 			}

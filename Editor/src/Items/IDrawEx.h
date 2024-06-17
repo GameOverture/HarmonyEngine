@@ -79,6 +79,8 @@ protected:
 	virtual void OnResizeRenderer() override;
 	virtual void OnCameraUpdated() override;
 
+	virtual void OnRequestSelection(QList<IDrawExItem *> selectionList) = 0;
+
 	Qt::CursorShape GetGrabPointCursorShape(TransformCtrl::GrabPointType eGrabPoint, float fRotation) const;
 
 	void DoMouseMove(bool bCtrlMod, bool bShiftMod);
@@ -91,6 +93,7 @@ protected:
 
 	void DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod);
 	void DoMouseRelease_Transform();
+	virtual void OnPerformTransform() = 0;
 };
 
 #endif // IDRAWEX_H

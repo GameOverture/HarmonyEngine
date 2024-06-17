@@ -404,7 +404,7 @@ void IDrawEx::DoMousePress_Select(bool bCtrlMod, bool bShiftMod)
 					if(bShiftMod)
 						selectList += m_SelectedItemList;
 
-					RequestSelection(selectList);
+					OnRequestSelection(selectList);
 					m_bSelectionHandled = true;
 				}
 			}
@@ -440,7 +440,7 @@ void IDrawEx::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 	if(m_bSelectionHandled == false)
 	{
 		if(bShiftMod == false)
-			RequestSelection(affectedItemList);
+			OnRequestSelection(affectedItemList);
 		else
 		{
 			QList<IDrawExItem *> selectList = m_SelectedItemList;
@@ -453,7 +453,7 @@ void IDrawEx::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
 					selectList.append(pAffectedItem);
 			}
 
-			RequestSelection(selectList);
+			OnRequestSelection(selectList);
 		}
 	}
 
@@ -553,7 +553,7 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 			for(IDrawExItem *pItem : m_ItemList)
 			{
 				// Find snap candidates, and test against them
-				if(pItem->GetEntityTreeItemData()->IsSelected() == false)
+				if(pItem->IsSelected() == false)
 				{
 					snapCandidateList.push_back(pItem->GetTransformCtrl().GetGrabPointWorldPos(TransformCtrl::GRAB_BotLeft, m_pCamera));
 					snapCandidateList.push_back(pItem->GetTransformCtrl().GetGrabPointWorldPos(TransformCtrl::GRAB_BotRight, m_pCamera));
@@ -849,41 +849,19 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
 	}
 
-	// This updates the preview of a shape (its 'outline') when being transformed
-	for(IDrawExItem *pSelectedItem : m_SelectedItemList)
-	{
-		if(pSelectedItem->GetEntityTreeItemData()->GetType() == ITEM_BoundingVolume)
-			pSelectedItem->GetShapeCtrl().Setup(pSelectedItem->GetShapeCtrl().GetShapeType(), ENTCOLOR_Shape, 0.7f, 0.0f);
-	}
+	//// This updates the preview of a shape (its 'outline') when being transformed
+	//for(IDrawExItem *pSelectedItem : m_SelectedItemList)
+	//{
+	//	if(pSelectedItem->GetEntityTreeItemData()->GetType() == ITEM_BoundingVolume)
+	//		pSelectedItem->GetShapeCtrl().Setup(pSelectedItem->GetShapeCtrl().GetShapeType(), ENTCOLOR_Shape, 0.7f, 0.0f);
+	//}
 
 	RefreshTransforms();
 }
 
 void IDrawEx::DoMouseRelease_Transform()
 {
-	QList<EntityTreeItemData *> treeItemDataList;
-	QList<glm::mat4> newTransformList;
-	for(IDrawExItem *pDrawItem : m_SelectedItemList)
-	{
-		newTransformList.push_back(pDrawItem->GetHyNode()->GetSceneTransform(0.0f));
-
-		EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pDrawItem->GetEntityTreeItemData()->GetThisUuid());
-		treeItemDataList.push_back(pTreeItemData);
-	}
-
-	int iStateIndex = 0;
-	int iFrameIndex = 0;
-	if(m_pProjItem->GetWidget() == nullptr)
-		HyGuiLog("EntityDraw::DoMouseRelease_Transform - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
-	else
-	{
-		iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
-		iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
-	}
-
-	// Transferring the children in 'm_ActiveTransform' back into 'm_RootEntity' will be done automatically in OnApplyJsonMeta()
-	QUndoCommand *pCmd = new EntityUndoCmd_Transform(*m_pProjItem, iStateIndex, iFrameIndex, treeItemDataList, newTransformList, m_PrevTransformList);
-	m_pProjItem->GetUndoStack()->push(pCmd);
+	OnPerformTransform();
 
 	m_vNudgeTranslate.setX(0);
 	m_vNudgeTranslate.setY(0);

@@ -57,8 +57,8 @@ public:
 
 protected:
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;
-
-	void RequestSelection(QList<EntityDrawItem *> selectionList);
+	virtual void OnRequestSelection(QList<IDrawExItem *> selectionList) override;
+	virtual void OnPerformTransform() override;
 
 	void DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod);
 	void DoMousePress_ShapeEdit(bool bCtrlMod, bool bShiftMod);

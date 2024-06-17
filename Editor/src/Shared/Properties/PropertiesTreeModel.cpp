@@ -663,7 +663,7 @@ void PropertiesTreeModel::ResetValues()
 
 	case Qt::BackgroundRole:
 		if(propDefRef.IsCategory())
-			return QBrush(propDefRef.GetColor());
+			return QBrush(HyGlobal::ConvertHyColor(propDefRef.GetColor()));
 		else if(indexRef.column() == PROPERTIESCOLUMN_Value && propDefRef.eType == PROPERTIESTYPE_Color && propDefRef.eAccessType != PROPERTIESACCESS_ToggleOff)
 			return QBrush(QColor(pTreeItem->data(PROPERTIESCOLUMN_Value).toRect().left(), pTreeItem->data(PROPERTIESCOLUMN_Value).toRect().top(), pTreeItem->data(PROPERTIESCOLUMN_Value).toRect().width()));
 		//	return QBrush((0 == (pTreeItem->GetIndex() & 1)) ? propDefRef.GetColor() : propDefRef.GetColor().lighter());

@@ -26,7 +26,7 @@
 
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
 /*static*/ QIcon HyGlobal::sm_TweenPropIcons[NUM_TWEENPROPS];
-/*static*/ QColor HyGlobal::sm_ItemColors[NUM_ITEMTYPES];
+/*static*/ HyColor HyGlobal::sm_EditorColors[NUM_EDITORCOLORS];
 
 /*static*/ QString HyGlobal::sm_MimeTypes[NUM_MIMETYPES];
 
@@ -184,10 +184,11 @@
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointFill] = HyColor::Blue.Lighten();
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointSelectedOutline] = HyColor::White;
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointSelectedFill] = HyColor::Blue.Lighten();
-	sm_EditorColors[EDITORCOLOR_EditGrabPointOutline] = HyColor::White;
-	sm_EditorColors[EDITORCOLOR_EditGrabPointFill] = HyColor::Red;
-	sm_EditorColors[EDITORCOLOR_EditGrabPointSelectedOutline] = HyColor::White;
-	sm_EditorColors[EDITORCOLOR_EditGrabPointSelectedFill] = HyColor::Blue.Lighten();
+	sm_EditorColors[EDITORCOLOR_Shape] = HyColor::DarkMagenta;
+	sm_EditorColors[EDITORCOLOR_ShapeGrabPointOutline] = HyColor::White;
+	sm_EditorColors[EDITORCOLOR_ShapeGrabPointFill] = HyColor::Red;
+	sm_EditorColors[EDITORCOLOR_ShapeGrabPointSelectedOutline] = HyColor::White;
+	sm_EditorColors[EDITORCOLOR_ShapeGrabPointSelectedFill] = HyColor::Blue.Lighten();
 	sm_EditorColors[EDITORCOLOR_DopeSheet] = HyColor::PanelWidget;
 	sm_EditorColors[EDITORCOLOR_DopeSheetTimeline] = HyColor::PanelContainer;
 	sm_EditorColors[EDITORCOLOR_DopeSheetNotch] = HyColor::FrameWidget;
