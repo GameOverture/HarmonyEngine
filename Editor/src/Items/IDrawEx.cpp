@@ -849,13 +849,6 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
 	}
 
-	//// This updates the preview of a shape (its 'outline') when being transformed
-	//for(IDrawExItem *pSelectedItem : m_SelectedItemList)
-	//{
-	//	if(pSelectedItem->GetEntityTreeItemData()->GetType() == ITEM_BoundingVolume)
-	//		pSelectedItem->GetShapeCtrl().Setup(pSelectedItem->GetShapeCtrl().GetShapeType(), ENTCOLOR_Shape, 0.7f, 0.0f);
-	//}
-
 	RefreshTransforms();
 }
 
