@@ -60,6 +60,7 @@ public:
 	void Tween(float fX, float fY, float fSeconds, HyTweenFunc fpTween = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
 	void TweenOffset(float fOffsetX, float fOffsetY, float fSeconds, HyTweenFunc fpTween = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
 
+	void BezierQuick(const glm::vec2 &ptDest, bool bClockwise, float fSeconds, HyTweenFunc fpTween = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
 	void Bezier(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &pt3, float fSeconds, HyTweenFunc fpTween = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
 	void Bezier(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &pt3, const glm::vec2 &pt4, float fSeconds, HyTweenFunc fpTween = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = HyAnimFloat::NullFinishedCallback);
 

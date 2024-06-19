@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/AnimFloats/HyAnimVec2.h"
+#include "Utilities/HyMath.h"
 
 HyAnimVec2::HyAnimVec2(IHyNode &ownerRef, uint32 uiDirtyFlags)
 {
@@ -202,6 +203,21 @@ void HyAnimVec2::TweenOffset(float fOffsetX, float fOffsetY, float fSeconds, HyT
 {
 	m_AnimFloatList[0].TweenOffset(fOffsetX, fSeconds, fpTween, fDeferStart, fpFinishedCallback);
 	m_AnimFloatList[1].TweenOffset(fOffsetY, fSeconds, fpTween, fDeferStart);
+}
+
+void HyAnimVec2::BezierQuick(const glm::vec2 &ptDest, bool bClockwise, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullFinishedCallback*/)
+{
+	glm::vec2 ptMidPoint = (Get() + ptDest) * 0.5f;
+	glm::vec2 vDirection = ptDest - Get();
+	
+	if(bClockwise)
+		vDirection = HyMath::PerpendicularClockwise(vDirection);
+	else
+		vDirection = HyMath::PerpendicularCounterClockwise(vDirection);
+	
+	ptMidPoint += (vDirection * 0.5f);
+
+	Bezier(Get(), ptMidPoint, ptDest, fSeconds, fpTween, fDeferStart, fpFinishedCallback);
 }
 
 void HyAnimVec2::Bezier(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &pt3, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /* = HyAnimFloat::NullTweenCallback */)
