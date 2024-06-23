@@ -265,5 +265,8 @@
         <file>icons16x16/items/Shader-Settings.png</file>
         <file>icons16x16/items/Shader-Warning.png</file>
         <file>icons16x16/tween-Break.png</file>
+        <file>icons16x16/time-hourglass.png</file>
+        <file>icons16x16/time-stopwatch.png</file>
+        <file>icons16x16/time-stopwatchDelete.png</file>
     </qresource>
 </RCC>

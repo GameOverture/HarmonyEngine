@@ -403,6 +403,44 @@ QList<ContextTweenData> EntityDopeSheetScene::DetermineIfContextQuickTween() con
 	return contextTweenList;
 }
 
+int EntityDopeSheetScene::DetermineEmptyTimeFromFrame(int iFrameIndex) const
+{
+	int iEmptyFrames = 0;
+
+	// Check the m_*GfxRectMaps for empty time because it's easier to check for existing TweenKnobs (end of tweens)
+	while(true)
+	{
+		bool bNoLimit = true;
+		for(KeyFrameKey tupleKey : m_KeyFramesGfxRectMap.keys())
+		{
+			int iKeyFrameIndex = std::get<GFXDATAKEY_FrameIndex>(tupleKey);
+
+			if(iKeyFrameIndex > (iFrameIndex + iEmptyFrames))
+				bNoLimit = false;
+			if(iKeyFrameIndex == (iFrameIndex + iEmptyFrames))
+				return iEmptyFrames;
+		}
+		for(KeyFrameKey tupleKey : m_TweenGfxRectMap.keys())
+		{
+			int iKeyFrameIndex = std::get<GFXDATAKEY_FrameIndex>(tupleKey);
+			int iTweenFramesDuration = m_TweenGfxRectMap[tupleKey]->GetTweenFramesDuration();
+
+			if((iKeyFrameIndex + iTweenFramesDuration) > (iFrameIndex + iEmptyFrames))
+				bNoLimit = false;
+			if(iKeyFrameIndex == (iFrameIndex + iEmptyFrames) || (iKeyFrameIndex + iTweenFramesDuration) == (iFrameIndex + iEmptyFrames))
+				return iEmptyFrames;
+		}
+
+		if(bNoLimit)
+			return -1;
+
+		++iEmptyFrames;
+	}
+
+	HyGuiLog("EntityDopeSheetScene::DetermineEmptyTimeFromFrame() - Should never reach here", LOGTYPE_Error);
+	return 0;
+}
+
 // NOTE: Tween properties are represented by a single property keyframe
 QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps) const
 {

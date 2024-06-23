@@ -23,9 +23,10 @@ class DlgInputNumber : public QDialog
 
 	int									m_iStartValue;
 	std::function<QString(int)>			m_fpErrorCheckFunc;
+	bool								m_bAllowStartValue;
 
 public:
-	explicit DlgInputNumber(const QString &sDlgTitle, const QString &sLabel, const QIcon &icon, int iStartValue, int iMin, int iMax, std::function<QString(int)> fpErrorCheckFunc, QWidget *pParent = nullptr);
+	explicit DlgInputNumber(const QString &sDlgTitle, const QString &sLabel, const QIcon &icon, int iStartValue, int iMin, int iMax, std::function<QString(int)> fpErrorCheckFunc, bool bAllowStartValue = false, QWidget *pParent = nullptr);
 	virtual ~DlgInputNumber();
 	
 	int GetValue();

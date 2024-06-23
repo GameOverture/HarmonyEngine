@@ -128,7 +128,31 @@ QMenu *AuxDopeSheet::AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pCon
 		}
 		pNewMenu->addSeparator();
 
-		//// Timeline Events - Insert appropriate context actions for each dope event type, based on what's already set
+		// Timeline Events - Insert appropriate context actions for each dope event type, based on what's already set
+		QAction *pTimeInsertAction = new QAction(QIcon(":/icons16x16/time-stopwatch.png"),
+			"Insert Time After Frame " % QString::number(iContextFrameIndex),
+			this);
+		QJsonObject timeInsertDataObj;
+		timeInsertDataObj.insert("contextAction", CONTEXTACTION_TimeInsert);
+		timeInsertDataObj.insert("frame", iContextFrameIndex);
+		pTimeInsertAction->setData(QVariant(timeInsertDataObj));
+		pTimeInsertAction->setToolTip("All tweens active on frame " % QString::number(iContextFrameIndex) % " have their durations extended, and all frames beyond this one are offset later");
+		pNewMenu->addAction(pTimeInsertAction);
+		
+		EntityDopeSheetScene &dopeSheetSceneRef = GetEntityStateModel()->GetDopeSheetScene();
+		if(dopeSheetSceneRef.DetermineEmptyTimeFromFrame(iContextFrameIndex) > 0)
+		{
+			QAction *pTimeRemoveAction = new QAction(QIcon(":/icons16x16/time-stopwatchDelete.png"),
+				"Remove Time After Frame " % QString::number(iContextFrameIndex),
+				this);
+			QJsonObject timeRemoveDataObj;
+			timeRemoveDataObj.insert("contextAction", CONTEXTACTION_TimeRemove);
+			timeRemoveDataObj.insert("frame", iContextFrameIndex);
+			pTimeRemoveAction->setData(QVariant(timeRemoveDataObj));
+			pTimeRemoveAction->setToolTip("All tweens active on frame " % QString::number(iContextFrameIndex) % " have their durations shortened, and all frames beyond this one are offset earlier");
+			pNewMenu->addAction(pTimeRemoveAction);
+		}
+
 		//QAction *pUnpauseAction = nullptr;
 		//QAction *pGotoFrameAction = nullptr;
 		//QAction *pRemoveGotoFrameAction = nullptr;
@@ -541,6 +565,40 @@ void AuxDopeSheet::OnEventActionTriggered(QAction *pEventAction)
 		QString sCallbackName = dataObj["contextData"].toString();
 		EntityUndoCmd_RemoveCallback *pNewCmd = new EntityUndoCmd_RemoveCallback(GetEntityStateModel()->GetDopeSheetScene(), iFrameIndex, sCallbackName);
 		GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+		break; }
+
+	case CONTEXTACTION_TimeInsert: {
+		int iFrameIndex = dataObj["frame"].toInt();
+		int iMaxFrames = 16777215; // Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
+
+		DlgInputNumber dlg("Insert empty frames starting at " % QString::number(iFrameIndex), "Frames", QIcon(":/icons16x16/time-stopwatch.png"), 1, 1, iMaxFrames, [](int iValue) { return ""; }, true);
+		if(dlg.exec() == QDialog::Accepted)
+		{
+			GetEntityStateModel()->GetDopeSheetScene().SelectKeyFrames(false, nullptr, iFrameIndex, false);
+
+			int iOffsetAmt = dlg.GetValue();
+			EntityUndoCmd_NudgeSelectedKeyFrames *pNewCmd = new EntityUndoCmd_NudgeSelectedKeyFrames(GetEntityStateModel()->GetDopeSheetScene(), iOffsetAmt);
+			GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+		}
+		break; }
+
+	case CONTEXTACTION_TimeRemove: {
+		int iFrameIndex = dataObj["frame"].toInt();
+		int iMaxFrames = GetEntityStateModel()->GetDopeSheetScene().DetermineEmptyTimeFromFrame(iFrameIndex);
+		if(iMaxFrames <= 0)
+		{
+			HyGuiLog("AuxDopeSheet::OnEventActionTriggered() - CONTEXTACTION_TimeRemove - Invalid pivot frame", LOGTYPE_Error);
+			break;
+		}
+		DlgInputNumber dlg("Remove empty frames starting at " % QString::number(iFrameIndex), "Frames", QIcon(":/icons16x16/time-stopwatch.png"), iMaxFrames, 1, iMaxFrames, [](int iValue) { return ""; }, true);
+		if(dlg.exec() == QDialog::Accepted)
+		{
+			GetEntityStateModel()->GetDopeSheetScene().SelectKeyFrames(false, nullptr, iFrameIndex, false);
+
+			int iOffsetAmt = -dlg.GetValue();
+			EntityUndoCmd_NudgeSelectedKeyFrames *pNewCmd = new EntityUndoCmd_NudgeSelectedKeyFrames(GetEntityStateModel()->GetDopeSheetScene(), iOffsetAmt);
+			GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+		}
 		break; }
 
 	//case CONTEXTACTION_PauseTimeline: {

@@ -34,6 +34,9 @@ class AuxDopeSheet : public QWidget
 		CONTEXTACTION_CallbackRename,
 		CONTEXTACTION_CallbackDelete,
 
+		CONTEXTACTION_TimeInsert,			// All tweens active on this frame have their durations extended, and all frames beyond this one are offset
+		CONTEXTACTION_TimeRemove,			// All tweens active on this frame have their durations shortened, and all frames beyond this one are offset
+
 		CONTEXTACTION_PauseTimeline,
 		CONTEXTACTION_UnpauseTimeline,
 		CONTEXTACTION_GotoFrame,

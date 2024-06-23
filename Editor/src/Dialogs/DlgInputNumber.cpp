@@ -15,10 +15,11 @@
 #include <QStringBuilder>
 
 
-DlgInputNumber::DlgInputNumber(const QString &sDlgTitle, const QString &sLabel, const QIcon &icon, int iStartValue, int iMin, int iMax, std::function<QString(int)> fpErrorCheckFunc, QWidget *pParent /*= nullptr*/) :
+DlgInputNumber::DlgInputNumber(const QString &sDlgTitle, const QString &sLabel, const QIcon &icon, int iStartValue, int iMin, int iMax, std::function<QString(int)> fpErrorCheckFunc, bool bAllowStartValue /*= false*/, QWidget *pParent /*= nullptr*/) :
 	QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
 	m_iStartValue(iStartValue),
 	m_fpErrorCheckFunc(fpErrorCheckFunc),
+	m_bAllowStartValue(bAllowStartValue),
 	ui(new Ui::DlgInputNumber)
 {
 	ui->setupUi(this);
@@ -55,7 +56,7 @@ void DlgInputNumber::ErrorCheck()
 	bool bIsError = false;
 	do
 	{
-		if(ui->sbValue->value() == m_iStartValue)
+		if(m_bAllowStartValue == false && ui->sbValue->value() == m_iStartValue)
 		{
 			ui->lblError->setText(ui->lblName->text() % " already set to " % QString::number(m_iStartValue));
 			bIsError = true;

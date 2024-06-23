@@ -211,6 +211,8 @@ public:
 	// Determines what quick-tween buttons should be shown in the AuxDopeSheet
 	QList<ContextTweenData> DetermineIfContextQuickTween() const;
 
+	int DetermineEmptyTimeFromFrame(int iFrameIndex) const; // Returns the number of empty frames from the given frame index. Returns -1 when there is no limit
+
 	// 'm_KeyFrameMap' must be fully updated before using this function
 	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps) const; // This is mainly useful for rendering the dope sheet. 'bCollapseTweenProps' will combine tween properties into a single entry (the regular category/property name)
 
