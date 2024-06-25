@@ -365,10 +365,25 @@ QList<ContextTweenData> EntityDopeSheetScene::DetermineIfContextQuickTween() con
 				if(eTweenProp == TWEENPROP_None)
 					continue;
 
-				// Ensure that the 'left' and 'right' keyframes are adjacent to each other
-				const QMap<int, QJsonObject> &treeItemFramesMapRef = m_KeyFramesMap[std::get<GFXDATAKEY_TreeItemData>(tupleKey)];
-				QList<int> frameIndicesList = treeItemFramesMapRef.keys();
-				if(frameIndicesList.indexOf(iStartFrame) + 1 != frameIndicesList.indexOf(iFrame2))
+				// Ensure that the 'left' and 'right' are adjacent keyframes to each other WITHIN the same Category/Property
+				bool bIsAdjacent = true;
+				for(KeyFrameKey key : m_KeyFramesGfxRectMap.keys())
+				{
+					int iCheckFrame = std::get<GFXDATAKEY_FrameIndex>(key);
+					if(iCheckFrame <= iEndFrame ||
+					   std::get<GFXDATAKEY_TreeItemData>(key) != std::get<GFXDATAKEY_TreeItemData>(tupleKey) ||
+					   std::get<GFXDATAKEY_CategoryPropString>(key) != sCategoryProp)
+					{
+						continue;
+					}
+
+					if(iCheckFrame < iFrame2)
+					{
+						bIsAdjacent = false;
+						break;
+					}
+				}
+				if(bIsAdjacent == false)
 					continue;
 
 				// All checks complete - valid context tween: determine the start and end values of the tween

@@ -250,10 +250,8 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 
 /*virtual*/ void EntityUndoCmd_OrderChildren::redo() /*override*/
 {
-	EntityModel *pModel = static_cast<EntityModel *>(m_EntityItemRef.GetModel());
-	EntityTreeModel &entTreeModelRef = pModel->GetTreeModel();
+	EntityTreeModel &entTreeModelRef = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel();
 
-	//QList<QUuid> selectedItemUuidList;
 	for(int i = 0; i < m_SelectedItemDataList.size(); ++i)
 	{
 		TreeModelItemData *pDestinationParent = nullptr;
@@ -268,20 +266,15 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 		}
 
 		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], pDestinationParent, m_NewItemIndexList[i]);
-
-		//selectedItemUuidList << m_SelectedItemDataList[i]->GetThisUuid();
 	}
-
-	//EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
-	//if(pWidget)
-	//	pWidget->RequestSelectedItems(selectedItemUuidList);
+	
+	static_cast<EntityStateData *>(static_cast<EntityWidget *>(m_EntityItemRef.GetWidget())->GetCurStateData())->GetDopeSheetScene().RefreshAllGfxItems();
 }
 
 /*virtual*/ void EntityUndoCmd_OrderChildren::undo() /*override*/
 {
 	EntityTreeModel &entTreeModelRef = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel();
 
-	//QList<QUuid> selectedItemUuidList;
 	for(int i = m_SelectedItemDataList.size() - 1; i >= 0; --i)
 	{
 		TreeModelItemData *pDestinationParent = nullptr;
@@ -296,13 +289,9 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 		}
 
 		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], pDestinationParent, m_PrevItemIndexList[i]);
-
-		//selectedItemUuidList << m_SelectedItemDataList[i]->GetThisUuid();
 	}
 
-	//EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
-	//if(pWidget)
-	//	pWidget->RequestSelectedItems(selectedItemUuidList);
+	static_cast<EntityStateData *>(static_cast<EntityWidget *>(m_EntityItemRef.GetWidget())->GetCurStateData())->GetDopeSheetScene().RefreshAllGfxItems();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
