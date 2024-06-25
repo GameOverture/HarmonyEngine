@@ -1409,9 +1409,9 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 		// 'uniquePropList' will contain every row of key frames for this item, across all frames (tweens are collapsed to their regular category/property)
 		QList<QPair<QString, QString>> uniquePropList = GetUniquePropertiesList(pCurItemData, true);
 
-		// - If NOT selected, draw all the key frames in one row (its name row)
-		// - If selected, skip the name row and then draw each property in its own row
-		if(pCurItemData->IsSelected())
+		// - If NOT expanded, draw all the key frames in one row (its name row)
+		// - If expanded, skip the name row and then draw each property in its own row
+		if(pCurItemData->IsDopeExpanded())
 			fPosY += ITEMS_LINE_HEIGHT; // skip the name row
 
 		if(m_KeyFramesMap.contains(pCurItemData))
@@ -1438,7 +1438,7 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 
 					if(bPropKeyFrame == false && bTweenKeyFrame == false)
 					{
-						if(pCurItemData->IsSelected())
+						if(pCurItemData->IsDopeExpanded())
 							fPosY += ITEMS_LINE_HEIGHT;
 						continue;
 					}
@@ -1490,7 +1490,7 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 							m_iFinalFrame = (iFrameIndex + iNumFrames);
 					}
 
-					if(pCurItemData->IsSelected())
+					if(pCurItemData->IsDopeExpanded())
 						fPosY += ITEMS_LINE_HEIGHT;
 				}
 
@@ -1498,7 +1498,7 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 			}
 		}
 
-		if(pCurItemData->IsSelected() == false)
+		if(pCurItemData->IsDopeExpanded() == false)
 			fPosY += ITEMS_LINE_HEIGHT; // Move past the name row
 		else
 			fPosY += uniquePropList.size() * ITEMS_LINE_HEIGHT; // Already accounted for the name row, now move past the property rows

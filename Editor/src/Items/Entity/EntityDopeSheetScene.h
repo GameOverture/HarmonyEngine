@@ -25,7 +25,8 @@
 #define TIMELINE_CURRENTFRAME_TRIANGLE_HEIGHT 8.0f
 
 #define ITEMS_WIDTH (TIMELINE_LEFT_MARGIN - 5.0f)
-#define ITEMS_LEFT_MARGIN 32.0f
+#define ITEMS_LEFT_AUXMARGIN 22.0f // Includes the "Aux" vertical titlebar + the visible margin (approx 1px)
+#define ITEMS_EXPAND_ARROW 20.0f // The dopesheet item property expand/collapse arrow's width
 #define ITEMS_LINE_HEIGHT 22.0f
 #define KEYFRAME_HEIGHT 19.0f
 #define KEYFRAME_WIDTH 4.0f

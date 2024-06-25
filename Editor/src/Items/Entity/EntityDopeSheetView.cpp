@@ -25,6 +25,7 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	m_pAuxDopeSheet(nullptr),
 	m_pStateData(nullptr),
 	m_pMouseHoverItem(nullptr),
+	m_bHoveringExpandArrow(false),
 	m_bTimeLineMouseDown(false),
 	m_bLeftSideDirty(false),
 	m_fZoom(1.0f),
@@ -90,7 +91,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 				break;
 			}
 
-			if(pEntItemData->IsSelected())
+			if(pEntItemData->IsDopeExpanded())
 			{
 				QList<QPair<QString, QString>> propList;
 				propList = GetScene()->GetUniquePropertiesList(pEntItemData, true);
@@ -189,6 +190,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 	// LEFT SIDE ITEM LIST
 	//////////////////////////////////////////////////////////////////////////
 	m_pMouseHoverItem = nullptr;
+	m_bHoveringExpandArrow = false;
 	qreal fPosY = rect.y() + TIMELINE_HEIGHT + 1.0f;
 	fPosY -= verticalScrollBar()->value();
 
@@ -200,7 +202,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		// Determine number of rows of key frames
 		int iNumRows = 1;
 		QList<QPair<QString, QString>> propList;
-		if(pEntItemData->IsSelected())
+		if(pEntItemData->IsDopeExpanded())
 		{
 			textColor = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetTextSelected);
 
@@ -224,13 +226,44 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		bold.setBold(pEntItemData->IsSelected());
 		pPainter->setFont(bold);
 
-		QRectF nameBoundingRect(rect.x() + ITEMS_LEFT_MARGIN, fPosY + 4.0f, pPainter->fontMetrics().horizontalAdvance(sCodeName), ITEMS_LINE_HEIGHT - 5.0f);		
+		QRectF expandArrowBoundingRect(rect.x(), fPosY, ITEMS_EXPAND_ARROW, ITEMS_LINE_HEIGHT - 2.0f);
+		QRectF nameBoundingRect(rect.x() + ITEMS_EXPAND_ARROW, fPosY + 4.0f, ITEMS_WIDTH - ITEMS_EXPAND_ARROW, ITEMS_LINE_HEIGHT - 5.0f);
+		
+		HyColor expandArrowColor = HyColor::Black;
+		if(expandArrowBoundingRect.contains(m_MouseScenePos))
+		{
+			m_pMouseHoverItem = pEntItemData;
+			m_bHoveringExpandArrow = true;
+			expandArrowColor = HyColor::Cyan;
+		}
 		if(nameBoundingRect.contains(m_MouseScenePos))
 		{
 			m_pMouseHoverItem = pEntItemData;
 			textColor = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetTextHover);
 		}
 
+		// Draw Expand Arrow \/ or > (collapsed)
+		QPen expandArrowPen(HyGlobal::ConvertHyColor(expandArrowColor));
+		expandArrowPen.setWidthF(2.0f);
+		pPainter->setPen(expandArrowPen);
+		QVector<QPointF> pointPairsList;
+		if(pEntItemData->IsDopeExpanded())
+		{
+			pointPairsList.push_back(QPointF(expandArrowBoundingRect.left() + 6.0f, expandArrowBoundingRect.top() + 8.0f));
+			pointPairsList.push_back(QPointF(expandArrowBoundingRect.left() + 10.0f, expandArrowBoundingRect.top() + 12.0f));
+			pointPairsList.push_back(QPointF(expandArrowBoundingRect.left() + 10.0f, expandArrowBoundingRect.top() + 12.0f));
+			pointPairsList.push_back(QPointF(expandArrowBoundingRect.left() + 14.0f, expandArrowBoundingRect.top() + 8.0f));
+		}
+		else
+		{
+			pointPairsList.push_back(QPointF(expandArrowBoundingRect.left() + 8.0f, expandArrowBoundingRect.top() + 6.0f));
+			pointPairsList.push_back(QPointF(expandArrowBoundingRect.left() + 12.0f, expandArrowBoundingRect.top() + 10.0f));
+			pointPairsList.push_back(QPointF(expandArrowBoundingRect.left() + 12.0f, expandArrowBoundingRect.top() + 10.0f));
+			pointPairsList.push_back(QPointF(expandArrowBoundingRect.left() + 8.0f, expandArrowBoundingRect.top() + 14.0f));
+		}
+		pPainter->drawLines(pointPairsList);
+
+		nameBoundingRect.translate(ITEMS_EXPAND_ARROW, 0);
 		DrawShadowText(pPainter, nameBoundingRect, sCodeName, textColor);
 
 		// Draw Item Icon
@@ -239,7 +272,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		if(variantIcon.isValid())
 		{
 			QSize iconSize(16, 16);
-			pPainter->drawPixmap(rect.x() + ITEMS_LEFT_MARGIN - iconSize.width() - 5.0f, fPosY + ((ITEMS_LINE_HEIGHT - iconSize.height()) / 2), variantIcon.value<QIcon>().pixmap(iconSize.width(), iconSize.height()));
+			pPainter->drawPixmap(rect.x() + ITEMS_EXPAND_ARROW, fPosY + ((ITEMS_LINE_HEIGHT - iconSize.height()) / 2), variantIcon.value<QIcon>().pixmap(iconSize.width(), iconSize.height()));
 		}
 
 		fPosY += ITEMS_LINE_HEIGHT;
@@ -248,11 +281,11 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		pPainter->setFont(bold);
 
 		// Properties
-		if(pEntItemData->IsSelected())
+		if(pEntItemData->IsDopeExpanded())
 		{
 			for(QPair<QString, QString> &propPair : propList)
 			{
-				DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_MARGIN + ITEMS_LEFT_MARGIN, fPosY + 5.0f, ITEMS_WIDTH - ITEMS_LEFT_MARGIN, ITEMS_LINE_HEIGHT), propPair.second, HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetTextSelected));
+				DrawShadowText(pPainter, QRectF(rect.x() + ITEMS_LEFT_AUXMARGIN + (ITEMS_EXPAND_ARROW * 2), fPosY + 5.0f, ITEMS_WIDTH - ITEMS_LEFT_AUXMARGIN, ITEMS_LINE_HEIGHT), propPair.second, HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetTextSelected));
 				fPosY += ITEMS_LINE_HEIGHT;
 			}
 		}
@@ -516,11 +549,19 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 
 	if(m_pMouseHoverItem)
 	{
-		bool bShiftPressed = pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier);
+		if(m_bHoveringExpandArrow)
+		{
+			m_pMouseHoverItem->SetDopeExpanded(!m_pMouseHoverItem->IsDopeExpanded());
+			GetScene()->RefreshAllGfxItems();
+		}
+		else
+		{
+			bool bShiftPressed = pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier);
 
-		QItemSelectionModel::SelectionFlags flags = bShiftPressed ? QItemSelectionModel::Toggle : QItemSelectionModel::ClearAndSelect;
-		static_cast<EntityWidget *>(m_pStateData->GetModel().GetItem().GetWidget())->RequestSelectedItemChange(m_pMouseHoverItem, flags);
-		pEvent->accept();
+			QItemSelectionModel::SelectionFlags flags = bShiftPressed ? QItemSelectionModel::Toggle : QItemSelectionModel::ClearAndSelect;
+			static_cast<EntityWidget *>(m_pStateData->GetModel().GetItem().GetWidget())->RequestSelectedItemChange(m_pMouseHoverItem, flags);
+			pEvent->accept();
+		}
 	}
 	else if(pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f && pEvent->pos().y() < TIMELINE_HEIGHT)
 	{
@@ -559,6 +600,17 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 	}
 
 	update();
+}
+
+/*virtual*/ void EntityDopeSheetView::mouseDoubleClickEvent(QMouseEvent *pEvent) /*override*/
+{
+	if(m_pMouseHoverItem && m_bHoveringExpandArrow == false)
+	{
+		m_pMouseHoverItem->SetDopeExpanded(!m_pMouseHoverItem->IsDopeExpanded());
+		GetScene()->RefreshAllGfxItems();
+	}
+
+	QGraphicsView::mouseDoubleClickEvent(pEvent);
 }
 
 /*virtual*/ void EntityDopeSheetView::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/

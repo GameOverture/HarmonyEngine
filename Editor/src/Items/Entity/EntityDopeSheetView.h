@@ -25,6 +25,7 @@ class EntityDopeSheetView : public QGraphicsView
 
 	QPointF						m_MouseScenePos;
 	EntityTreeItemData *		m_pMouseHoverItem;
+	bool						m_bHoveringExpandArrow;
 
 	bool						m_bTimeLineMouseDown;
 	bool						m_bLeftSideDirty;
@@ -68,6 +69,7 @@ protected:
 
 	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
 	virtual void mousePressEvent(QMouseEvent *pEvent) override;
+	virtual void mouseDoubleClickEvent(QMouseEvent *pEvent) override;
 	virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;
 
 private:

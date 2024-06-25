@@ -324,20 +324,20 @@ QMenu *AuxDopeSheet::AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pCon
 		
 		pNewMenu->addSeparator();
 		
-		QAction *pSelectAllAction = new QAction("Select All Key Frames");
+		QAction *pSelectAllAction = new QAction("Select All KeyFrames");
 		QJsonObject selectAllDataObj;
 		selectAllDataObj.insert("contextAction", CONTEXTACTION_SelectAll);
 		pSelectAllAction->setData(QVariant(selectAllDataObj));
 		pNewMenu->addAction(pSelectAllAction);
 
-		QAction *pSelectAllPriorAction = new QAction("Select All Key Frames <= " % QString::number(iContextFrameIndex));
+		QAction *pSelectAllPriorAction = new QAction("Select KeyFrames <= " % QString::number(iContextFrameIndex));
 		QJsonObject selectAllPriorDataObj;
 		selectAllPriorDataObj.insert("contextAction", CONTEXTACTION_SelectAllPrior);
 		selectAllPriorDataObj.insert("frame", iContextFrameIndex);
 		pSelectAllPriorAction->setData(QVariant(selectAllPriorDataObj));
 		pNewMenu->addAction(pSelectAllPriorAction);
 
-		QAction *pSelectAllAfterAction = new QAction("Select All Key Frames >= " % QString::number(iContextFrameIndex));
+		QAction *pSelectAllAfterAction = new QAction("Select KeyFrames >= " % QString::number(iContextFrameIndex));
 		QJsonObject selectAllAfterDataObj;
 		selectAllAfterDataObj.insert("contextAction", CONTEXTACTION_SelectAllAfter);
 		selectAllAfterDataObj.insert("frame", iContextFrameIndex);
@@ -346,14 +346,14 @@ QMenu *AuxDopeSheet::AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pCon
 
 		if(pContextItem)
 		{
-			QAction *pSelectAllItemAction = new QAction("Select All '" % pContextItem->GetCodeName() % "' Key Frames");
+			QAction *pSelectAllItemAction = new QAction("Select All '" % pContextItem->GetCodeName() % "' KeyFrames");
 			QJsonObject selectAllItemDataObj;
 			selectAllItemDataObj.insert("contextAction", CONTEXTACTION_SelectAllItem);
 			selectAllItemDataObj.insert("contextData", pContextItem->GetThisUuid().toString(QUuid::WithoutBraces));
 			pSelectAllItemAction->setData(QVariant(selectAllItemDataObj));
 			pNewMenu->addAction(pSelectAllItemAction);
 
-			QAction *pSelectAllItemPriorAction = new QAction("Select All '" % pContextItem->GetCodeName() % "' Key Frames <= " % QString::number(iContextFrameIndex));
+			QAction *pSelectAllItemPriorAction = new QAction("Select '" % pContextItem->GetCodeName() % "' KeyFrames <= " % QString::number(iContextFrameIndex));
 			QJsonObject selectAllItemPriorDataObj;
 			selectAllItemPriorDataObj.insert("contextAction", CONTEXTACTION_SelectAllItemPrior);
 			selectAllItemPriorDataObj.insert("frame", iContextFrameIndex);
@@ -361,7 +361,7 @@ QMenu *AuxDopeSheet::AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pCon
 			pSelectAllItemPriorAction->setData(QVariant(selectAllItemPriorDataObj));
 			pNewMenu->addAction(pSelectAllItemPriorAction);
 
-			QAction *pSelectAllItemAfterAction = new QAction("Select All '" % pContextItem->GetCodeName() % "' Key Frames >= " % QString::number(iContextFrameIndex));
+			QAction *pSelectAllItemAfterAction = new QAction("Select '" % pContextItem->GetCodeName() % "' KeyFrames >= " % QString::number(iContextFrameIndex));
 			QJsonObject selectAllItemAfterDataObj;
 			selectAllItemAfterDataObj.insert("contextAction", CONTEXTACTION_SelectAllItemAfter);
 			selectAllItemAfterDataObj.insert("frame", iContextFrameIndex);
@@ -370,7 +370,7 @@ QMenu *AuxDopeSheet::AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pCon
 			pNewMenu->addAction(pSelectAllItemAfterAction);
 		}
 
-		QAction *pDeselectAllCallback = new QAction("Deselect Key Frames");
+		QAction *pDeselectAllCallback = new QAction("Deselect KeyFrames");
 		pDeselectAllCallback->setEnabled(pScene->selectedItems().size() > 0);
 		QJsonObject deselectDataObj;
 		deselectDataObj.insert("contextAction", CONTEXTACTION_DeselectAll);

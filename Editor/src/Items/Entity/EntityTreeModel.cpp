@@ -39,6 +39,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, EntityItemDe
 	m_eDeclarationType(eDeclarationType),
 	m_ReferencedItemUuid(uuidOfReferencedItem),
 	m_bIsSelected(false),
+	m_bIsDopeExpanded(true),
 	m_bReallocateDrawItem(false)
 {
 	QVariant ptrVariant;
@@ -58,6 +59,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject 
 	m_eDeclarationType(HyGlobal::GetEntityDeclType(descObj["declarationType"].toString())),
 	m_ReferencedItemUuid(descObj["itemUUID"].toString()),
 	m_bIsSelected(descObj["isSelected"].toBool()),
+	m_bIsDopeExpanded(descObj["isDopeExpanded"].toBool(true)),
 	m_bReallocateDrawItem(false)
 {
 	QVariant ptrVariant;
@@ -160,6 +162,16 @@ void EntityTreeItemData::SetSelected(bool bIsSelected)
 	m_bIsSelected = bIsSelected;
 }
 
+bool EntityTreeItemData::IsDopeExpanded() const
+{
+	return m_bIsDopeExpanded;
+}
+
+void EntityTreeItemData::SetDopeExpanded(bool bIsDopeExpanded)
+{
+	m_bIsDopeExpanded = bIsDopeExpanded;
+}
+
 bool EntityTreeItemData::IsReallocateDrawItem() const
 {
 	return m_bReallocateDrawItem;
@@ -209,6 +221,7 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 	childObjRef.insert("declarationType", ENTITYITEMDECLARATIONTYPE_STRINGS[m_eDeclarationType]);
 	childObjRef.insert("itemUUID", m_ReferencedItemUuid.toString(QUuid::WithoutBraces));
 	childObjRef.insert("isSelected", m_bIsSelected);
+	childObjRef.insert("isDopeExpanded", m_bIsDopeExpanded);
 }
 
 // NOTE: The listed 4 functions below share logic that process all item properties. Any updates should reflect to all of them
