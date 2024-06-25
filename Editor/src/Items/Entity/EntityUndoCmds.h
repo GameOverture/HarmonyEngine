@@ -277,6 +277,7 @@ class EntityUndoCmd_NudgeSelectedKeyFrames : public QUndoCommand
 	// Store the original/old key frame data, before 'nudge' takes place
 	QMap<KeyFrameKey, QJsonValue>			m_Prop_SelectedDataMap;
 	QMap<KeyFrameKey, TweenJsonValues>		m_Tween_SelectedDataMap;
+	QMap<KeyFrameKey, double>				m_TweenKnobs_SelectedDataMap;		// Only stored when a Tween's knob is selected, and not the tween keyframe itself
 
 	// Old key frame data that will be overwritten by the 'nudge' operation
 	QMap<KeyFrameKey, QJsonValue>			m_Prop_OverwrittenDataMap;
@@ -285,25 +286,6 @@ class EntityUndoCmd_NudgeSelectedKeyFrames : public QUndoCommand
 public:
 	EntityUndoCmd_NudgeSelectedKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, int iFrameOffset, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_NudgeSelectedKeyFrames();
-
-	virtual void redo() override;
-	virtual void undo() override;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class EntityUndoCmd_NudgeTweenDuration : public QUndoCommand
-{
-	EntityDopeSheetScene &					m_DopeSheetSceneRef;
-	EntityTreeItemData *					m_pItemData;
-	int										m_iFrameIndex;
-	TweenProperty							m_eTweenProp;
-	double									m_dNewDuration;
-	double									m_dOldDuration;
-
-public:
-	EntityUndoCmd_NudgeTweenDuration(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, double dNewDuration, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_NudgeTweenDuration();
 
 	virtual void redo() override;
 	virtual void undo() override;

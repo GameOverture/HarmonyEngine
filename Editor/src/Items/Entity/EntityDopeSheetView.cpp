@@ -567,23 +567,9 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 
 	if(DRAGSTATE_Dragging == m_eDragState)
 	{
-		if(m_pGfxDragTweenKnobItem)
-		{
-			EntityTreeItemData *pTreeItemData = m_pGfxDragTweenKnobItem->parentItem()->data(GFXDATAKEY_TreeItemData).value<EntityTreeItemData *>();
-			TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(m_pGfxDragTweenKnobItem->parentItem()->data(GFXDATAKEY_CategoryPropString).toString().split('/')[1]);
-			int iTweenStartKeyFrame = m_pGfxDragTweenKnobItem->parentItem()->data(GFXDATAKEY_FrameIndex).toInt();
-			int iTweenEndKeyFrame = HyMath::Max(iTweenStartKeyFrame, m_iDragFrame);
-
-			double dNewDuration = (iTweenEndKeyFrame - iTweenStartKeyFrame) * (1.0 / static_cast<EntityModel &>(m_pStateData->GetModel()).GetFramesPerSecond());
-			EntityUndoCmd_NudgeTweenDuration *pCmd = new EntityUndoCmd_NudgeTweenDuration(m_pStateData->GetDopeSheetScene(), pTreeItemData, iTweenStartKeyFrame, eTweenProp, dNewDuration);
-			m_pStateData->GetModel().GetItem().GetUndoStack()->push(pCmd);
-		}
-		else
-		{
-			QPointF ptSceneDragStart = mapToScene(m_ptDragStart);
-			EntityUndoCmd_NudgeSelectedKeyFrames *pCmd = new EntityUndoCmd_NudgeSelectedKeyFrames(m_pStateData->GetDopeSheetScene(), GetNearestFrame(m_MouseScenePos.x()) - GetNearestFrame(ptSceneDragStart.x()));
-			m_pStateData->GetModel().GetItem().GetUndoStack()->push(pCmd);
-		}
+		QPointF ptSceneDragStart = mapToScene(m_ptDragStart);
+		EntityUndoCmd_NudgeSelectedKeyFrames *pCmd = new EntityUndoCmd_NudgeSelectedKeyFrames(m_pStateData->GetDopeSheetScene(), GetNearestFrame(m_MouseScenePos.x()) - GetNearestFrame(ptSceneDragStart.x()));
+		m_pStateData->GetModel().GetItem().GetUndoStack()->push(pCmd);
 	}
 	else if(rubberBandRect().isNull() && pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f)
 		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));

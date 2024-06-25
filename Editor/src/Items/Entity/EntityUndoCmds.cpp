@@ -814,50 +814,90 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 	m_iFrameOffset(iFrameOffset)
 {
 	QList<QGraphicsItem *> selectedItemsList = m_DopeSheetSceneRef.selectedItems();
-	setText("Offset " % QString::number(selectedItemsList.size()) % " Key Frame(s)");
-
 	for(QGraphicsItem *pSelectedGfxItem : selectedItemsList)
 	{
-		GraphicsKeyFrameItem *pSelectedGfxKeyFrameItem = static_cast<GraphicsKeyFrameItem *>(pSelectedGfxItem);
-		std::tuple<EntityTreeItemData *, int, QString> tupleKey = pSelectedGfxKeyFrameItem->GetKey();
-		QString sCategory = std::get<GFXDATAKEY_CategoryPropString>(tupleKey).split('/')[0];
-		QString sProperty = std::get<GFXDATAKEY_CategoryPropString>(tupleKey).split('/')[1];
-		
-		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sProperty); // If Tween key frame found, this will be the 'TweenProperty'
+		bool bAcquiredDataType = false;
+		DopeSheetGfxItemType eItemType = static_cast<DopeSheetGfxItemType>(pSelectedGfxItem->data(GFXDATAKEY_Type).toInt(&bAcquiredDataType));
+		if(bAcquiredDataType == false)
+			continue;
 
-		// Store the original/old key frame data, before 'nudge' takes place
-		if(pSelectedGfxKeyFrameItem->IsTweenKeyFrame() == false)
+		if(eItemType == GFXITEM_TweenKnob)
 		{
-			m_Prop_SelectedDataMap[tupleKey] = m_DopeSheetSceneRef.GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
-																					   std::get<GFXDATAKEY_FrameIndex>(tupleKey),
-																					   sCategory,
-																					   sProperty);
-		}
-		else
-		{
-			m_Tween_SelectedDataMap[tupleKey] = m_DopeSheetSceneRef.GetTweenJsonValues(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
-																					   std::get<GFXDATAKEY_FrameIndex>(tupleKey),
-																					   eTweenProp);
-		}
-		
-		// Update 'tupleKey' to what it will be after the 'nudge' operation
-		tupleKey = std::make_tuple(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
-								   HyMath::Max(0, std::get<GFXDATAKEY_FrameIndex>(tupleKey) + m_iFrameOffset),
-								   std::get<GFXDATAKEY_CategoryPropString>(tupleKey));
+			GraphicsTweenKnobItem *pTweenKnobItem = static_cast<GraphicsTweenKnobItem *>(pSelectedGfxItem);
+			KeyFrameKey tweenKnobKey = pTweenKnobItem->GetKey();
 
-		// Check if this key frame will be overwritten by the 'nudge' operation
-		if(m_DopeSheetSceneRef.ContainsKeyFrameProperty(tupleKey))
-		{
-			m_Prop_OverwrittenDataMap[tupleKey] = m_DopeSheetSceneRef.GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
-																						  std::get<GFXDATAKEY_FrameIndex>(tupleKey),
-																						  sCategory,
-																						  sProperty);
+			// Determine if only the tween knob is selected (ignore this knob selection if the corresponding tween keyframe is also selected)
+			bool bOnlyTweenKnobSelected = true;
+			for(QGraphicsItem *pCheckingGfxItem : selectedItemsList)
+			{
+				DopeSheetGfxItemType eCheckingItemType = static_cast<DopeSheetGfxItemType>(pCheckingGfxItem->data(GFXDATAKEY_Type).toInt(&bAcquiredDataType));
+				if(pCheckingGfxItem == pTweenKnobItem || bAcquiredDataType == false || eCheckingItemType != GFXITEM_TweenKeyFrame)
+					continue;
+
+				if(tweenKnobKey == static_cast<GraphicsKeyFrameItem *>(pCheckingGfxItem)->GetKey())
+				{
+					bOnlyTweenKnobSelected = false;
+					break;
+				}
+			}
+
+			if(bOnlyTweenKnobSelected)
+			{
+				QString sCategoryProp = std::get<GFXDATAKEY_CategoryPropString>(tweenKnobKey);
+				TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sCategoryProp.split('/')[1]);
+
+				double dOldDuration = m_DopeSheetSceneRef.GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tweenKnobKey),
+																			  std::get<GFXDATAKEY_FrameIndex>(tweenKnobKey),
+																			  "Tween " % HyGlobal::TweenPropName(eTweenProp),
+																			  "Duration").toDouble();
+
+				// Store the original/old duration, before 'nudge' takes place
+				m_TweenKnobs_SelectedDataMap.insert(pTweenKnobItem->GetKey(), dOldDuration);
+			}
 		}
-		if(m_DopeSheetSceneRef.ContainsKeyFrameTween(tupleKey))
+		else // GFXITEM_PropertyKeyFrame or GFXITEM_TweenKeyFrame
 		{
-			m_Tween_OverwrittenDataMap[tupleKey] = m_DopeSheetSceneRef.GetTweenJsonValues(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
-																						  std::get<GFXDATAKEY_FrameIndex>(tupleKey),
-																						  eTweenProp);
+			GraphicsKeyFrameItem *pSelectedGfxKeyFrameItem = static_cast<GraphicsKeyFrameItem *>(pSelectedGfxItem);
+			std::tuple<EntityTreeItemData *, int, QString> tupleKey = pSelectedGfxKeyFrameItem->GetKey();
+			QString sCategory = std::get<GFXDATAKEY_CategoryPropString>(tupleKey).split('/')[0];
+			QString sProperty = std::get<GFXDATAKEY_CategoryPropString>(tupleKey).split('/')[1];
+		
+			TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sProperty); // If Tween key frame found, this will be the 'TweenProperty'
+
+			// Store the original/old key frame data, before 'nudge' takes place
+			if(pSelectedGfxKeyFrameItem->IsTweenKeyFrame() == false)
+			{
+				m_Prop_SelectedDataMap[tupleKey] = m_DopeSheetSceneRef.GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
+																						   std::get<GFXDATAKEY_FrameIndex>(tupleKey),
+																						   sCategory,
+																						   sProperty);
+			}
+			else
+			{
+				m_Tween_SelectedDataMap[tupleKey] = m_DopeSheetSceneRef.GetTweenJsonValues(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
+																						   std::get<GFXDATAKEY_FrameIndex>(tupleKey),
+																						   eTweenProp);
+			}
+		
+			// Update 'tupleKey' to what it will be after the 'nudge' operation
+			tupleKey = std::make_tuple(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
+									   HyMath::Max(0, std::get<GFXDATAKEY_FrameIndex>(tupleKey) + m_iFrameOffset),
+									   std::get<GFXDATAKEY_CategoryPropString>(tupleKey));
+
+			// Check if this key frame will be overwritten by the 'nudge' operation
+			if(m_DopeSheetSceneRef.ContainsKeyFrameProperty(tupleKey))
+			{
+				m_Prop_OverwrittenDataMap[tupleKey] = m_DopeSheetSceneRef.GetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
+																							  std::get<GFXDATAKEY_FrameIndex>(tupleKey),
+																							  sCategory,
+																							  sProperty);
+			}
+			if(m_DopeSheetSceneRef.ContainsKeyFrameTween(tupleKey))
+			{
+				m_Tween_OverwrittenDataMap[tupleKey] = m_DopeSheetSceneRef.GetTweenJsonValues(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
+																							  std::get<GFXDATAKEY_FrameIndex>(tupleKey),
+																							  eTweenProp);
+			}
 		}
 	}
 }
@@ -906,6 +946,35 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 											   eTweenProp,
 											   m_iFrameOffset,
 											   false);
+	}
+
+	// Sort and nudge the tween knobs
+	sortedKeyList = m_TweenKnobs_SelectedDataMap.keys();
+	std::sort(sortedKeyList.begin(), sortedKeyList.end(), fpSortPredicate);
+	for(KeyFrameKey tupleKey : sortedKeyList)
+	{
+		QString sCategoryProp = std::get<GFXDATAKEY_CategoryPropString>(tupleKey);
+		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sCategoryProp.split('/')[1]);
+
+		int iFramesPerSec = static_cast<EntityModel &>(m_DopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond();
+		int iTweenStartKeyFrame = std::get<GFXDATAKEY_FrameIndex>(tupleKey);
+
+		GraphicsKeyFrameItem *pGfxTweenFrame = m_DopeSheetSceneRef.FindTweenKeyFrameItem(tupleKey);
+		if(pGfxTweenFrame == nullptr)
+		{
+			HyGuiLog("EntityUndoCmd_NudgeSelectedKeyFrames::redo() - pGfxTweenFrame is nullptr", LOGTYPE_Error);
+			continue;
+		}
+		int iTweenEndKeyFrame = pGfxTweenFrame->GetTweenFramesDuration() + iTweenStartKeyFrame + m_iFrameOffset;
+		iTweenEndKeyFrame = HyMath::Max(iTweenStartKeyFrame, iTweenEndKeyFrame);
+
+		double dNewDuration = (iTweenEndKeyFrame - iTweenStartKeyFrame) * (1.0 / iFramesPerSec);
+		m_DopeSheetSceneRef.SetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
+												std::get<GFXDATAKEY_FrameIndex>(tupleKey),
+												"Tween " % HyGlobal::TweenPropName(eTweenProp),
+												"Duration",
+												dNewDuration,
+												false);
 	}
 	
 	m_DopeSheetSceneRef.RefreshAllGfxItems();
@@ -960,6 +1029,17 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 											 m_Tween_SelectedDataMap[tupleKey],
 											 false);
 	}
+	for(KeyFrameKey tupleKey : m_TweenKnobs_SelectedDataMap.keys())
+	{
+		QString sCategoryProp = std::get<GFXDATAKEY_CategoryPropString>(tupleKey);
+		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sCategoryProp.split('/')[1]);
+		m_DopeSheetSceneRef.SetKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
+												std::get<GFXDATAKEY_FrameIndex>(tupleKey),
+												"Tween " % HyGlobal::TweenPropName(eTweenProp),
+												"Duration",
+												m_TweenKnobs_SelectedDataMap[tupleKey],
+												false);
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// As well as the data that was overwritten
@@ -986,34 +1066,6 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 	}
 
 	m_DopeSheetSceneRef.RefreshAllGfxItems();
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-EntityUndoCmd_NudgeTweenDuration::EntityUndoCmd_NudgeTweenDuration(EntityDopeSheetScene &entityDopeSheetSceneRef, EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, double dNewDuration, QUndoCommand *pParent /*= nullptr*/) :
-	QUndoCommand(pParent),
-	m_DopeSheetSceneRef(entityDopeSheetSceneRef),
-	m_pItemData(pItemData),
-	m_iFrameIndex(iFrameIndex),
-	m_eTweenProp(eTweenProp),
-	m_dNewDuration(dNewDuration)
-{
-	setText("Adjust " % m_pItemData->GetCodeName() % "'s Tween " % HyGlobal::TweenPropName(m_eTweenProp) % " Duration");
-	m_dOldDuration = m_DopeSheetSceneRef.GetKeyFrameProperty(m_pItemData, m_iFrameIndex, "Tween " % HyGlobal::TweenPropName(m_eTweenProp), "Duration").toDouble();
-};
-
-/*virtual*/ EntityUndoCmd_NudgeTweenDuration::~EntityUndoCmd_NudgeTweenDuration()
-{
-}
-
-/*virtual*/ void EntityUndoCmd_NudgeTweenDuration::redo() /*override*/
-{
-	m_DopeSheetSceneRef.SetKeyFrameProperty(m_pItemData, m_iFrameIndex, "Tween " % HyGlobal::TweenPropName(m_eTweenProp), "Duration", m_dNewDuration, true);
-}
-
-/*virtual*/ void EntityUndoCmd_NudgeTweenDuration::undo() /*override*/
-{
-	m_DopeSheetSceneRef.SetKeyFrameProperty(m_pItemData, m_iFrameIndex, "Tween " % HyGlobal::TweenPropName(m_eTweenProp), "Duration", m_dOldDuration, true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

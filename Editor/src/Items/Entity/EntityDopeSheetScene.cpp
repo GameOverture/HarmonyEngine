@@ -144,6 +144,12 @@ int GraphicsKeyFrameItem::GetTweenFramesDuration() const
 	return m_iTweenFramesDuration;
 }
 
+void GraphicsKeyFrameItem::SelectTweenKnob(bool bSelect)
+{
+	if(m_pGfxTweenDurationKnob)
+		m_pGfxTweenDurationKnob->setSelected(bSelect);
+}
+
 /*virtual*/ QVariant GraphicsKeyFrameItem::itemChange(GraphicsItemChange eChange, const QVariant &value) /*override*/
 {
 	switch(eChange)
@@ -280,6 +286,22 @@ bool EntityDopeSheetScene::ContainsKeyFrameProperty(KeyFrameKey tupleKey) const
 bool EntityDopeSheetScene::ContainsKeyFrameTween(KeyFrameKey tupleKey) const
 {
 	return m_TweenGfxRectMap.contains(tupleKey);
+}
+
+GraphicsKeyFrameItem *EntityDopeSheetScene::FindKeyFrameItem(KeyFrameKey tupleKey) const
+{
+	if(ContainsKeyFrameProperty(tupleKey))
+		return m_KeyFramesGfxRectMap[tupleKey];
+
+	return nullptr;
+}
+
+GraphicsKeyFrameItem *EntityDopeSheetScene::FindTweenKeyFrameItem(KeyFrameKey tupleKey) const
+{
+	if(ContainsKeyFrameTween(tupleKey))
+		return m_TweenGfxRectMap[tupleKey];
+
+	return nullptr;
 }
 
 QList<ContextTweenData> EntityDopeSheetScene::DetermineIfContextQuickTween() const
@@ -1282,6 +1304,7 @@ void EntityDopeSheetScene::SelectKeyFrames(bool bAppendSelection, EntityTreeItem
 				(m_bPivotLessThan == false && iFrameIndex > m_iSelectionPivotFrame))
 			{
 				iter.value()->setSelected(true);
+				iter.value()->SelectTweenKnob(true);
 			}
 		}
 	}
@@ -1307,12 +1330,16 @@ void EntityDopeSheetScene::SelectKeyFrames(bool bAppendSelection, EntityTreeItem
 					{
 						if(sCategoryName.startsWith("Tween "))
 						{
+							// NOTE: Convert the tween property name from "Tween <TweenPropName>" to regular category/property equivalent
 							QString sTweenName = sCategoryName.mid(6);
 							TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sTweenName);
 							QPair<QString, QString> tweenPair = HyGlobal::ConvertTweenPropToRegularPropPair(eTweenProp);
 							KeyFrameKey gfxRectMapKey = std::make_tuple(pItemData, iFrameIndex, tweenPair.first % "/" % tweenPair.second);
 							if(m_TweenGfxRectMap.contains(gfxRectMapKey))
+							{
 								m_TweenGfxRectMap[gfxRectMapKey]->setSelected(true);
+								m_TweenGfxRectMap[gfxRectMapKey]->SelectTweenKnob(true);
+							}
 						}
 						else
 						{

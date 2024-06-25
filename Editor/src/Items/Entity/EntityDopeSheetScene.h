@@ -162,6 +162,8 @@ public:
 	void SetTweenLineLength(qreal fLength, int iFramesDuration);
 	int GetTweenFramesDuration() const;
 
+	void SelectTweenKnob(bool bSelect);
+
 protected:
 	virtual QVariant itemChange(GraphicsItemChange eChange, const QVariant &value) override;
 	virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *pEvent) override;
@@ -179,7 +181,8 @@ class EntityDopeSheetScene : public QGraphicsScene
 
 	// These maps store the visual graphics items that correspond to the above maps
 	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_KeyFramesGfxRectMap;
-	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_TweenGfxRectMap;
+	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_TweenGfxRectMap;		// NOTE: For the keys, the tween property name is converted from "Tween <TweenPropName>" to the regular category/property equivalent
+																											//       This is done so the DopeSheet lists the tween keyframe and their corresponding property keyframes on the same property row.
 
 	int																				m_iCurrentFrame;
 	QGraphicsLineItem *																m_pCurrentFrameLine;
@@ -206,6 +209,9 @@ public:
 
 	bool ContainsKeyFrameProperty(KeyFrameKey tupleKey) const;
 	bool ContainsKeyFrameTween(KeyFrameKey tupleKey) const;
+
+	GraphicsKeyFrameItem *FindKeyFrameItem(KeyFrameKey tupleKey) const;
+	GraphicsKeyFrameItem *FindTweenKeyFrameItem(KeyFrameKey tupleKey) const;
 
 	// Based on currently selected keyframes, this function will determine if a tween can be created, and if so, what type of tween
 	// Determines what quick-tween buttons should be shown in the AuxDopeSheet
