@@ -165,7 +165,7 @@ void HyAnimVec3::SetZ(int32 iNewValue)
 	m_AnimFloatList[2] = static_cast<float>(iNewValue);
 }
 
-void HyAnimVec3::Set(float fAll)
+void HyAnimVec3::SetAll(float fAll)
 {
 	m_AnimFloatList[0].Set(fAll);
 	m_AnimFloatList[1].Set(fAll);

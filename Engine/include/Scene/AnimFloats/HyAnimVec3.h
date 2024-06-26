@@ -49,7 +49,7 @@ public:
 	void SetZ(float fNewValue);
 	void SetZ(int32 iNewValue);
 
-	void Set(float fAll);
+	void SetAll(float fAll);
 	void Set(float fX, float fY, float fZ);
 	void Set(int32 iX, int32 iY, int32 iZ);
 	void Set(const glm::vec3 &srcVec);

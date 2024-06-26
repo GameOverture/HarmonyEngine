@@ -26,7 +26,7 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
-	scale.Set(1.0f);
+	scale.SetAll(1.0f);
 
 	if(m_pParent)
 	{

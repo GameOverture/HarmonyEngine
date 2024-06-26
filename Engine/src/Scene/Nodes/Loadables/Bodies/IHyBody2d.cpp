@@ -33,8 +33,8 @@ IHyBody2d::IHyBody2d(HyType eNodeType, const HyNodePath &nodePath, HyEntity2d *p
 	// Initialize as 'invalid'
 	HyMath::InvalidateAABB(m_SceneAABB);
 
-	topColor.Set(1.0f);
-	botColor.Set(1.0f);
+	topColor.SetAll(1.0f);
+	botColor.SetAll(1.0f);
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();

@@ -23,7 +23,7 @@ IHyNode3d::IHyNode3d(HyType eNodeType, HyEntity3d *pParent) :
 	scale(*this, DIRTY_Transform | DIRTY_SceneAABB),
 	scale_pivot(*this, DIRTY_Transform | DIRTY_SceneAABB)
 {
-	scale.Set(1.0f);
+	scale.SetAll(1.0f);
 
 	if(m_pParent)
 	{

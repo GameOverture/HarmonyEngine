@@ -80,12 +80,18 @@ public:
 	{
 		Set(fWidth, fHeight);
 	}
-
+	HyRect(const glm::ivec2 &vSize) // Creates a rectangle with the bottom left corner at 0,0
+	{
+		Set(static_cast<float>(vSize.x), static_cast<float>(vSize.y));
+	}
+	HyRect(const glm::vec2 &vSize) // Creates a rectangle with the bottom left corner at 0,0
+	{
+		Set(vSize.x, vSize.y);
+	}
 	HyRect(float fX, float fY, float fWidth, float fHeight)
 	{
 		Set(fX, fY, fWidth, fHeight);
 	}
-
 	HyRect(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptCenter, float fRotDegrees = 0.0f)
 	{
 		Set(fHalfWidth, fHalfHeight, ptCenter, fRotDegrees);

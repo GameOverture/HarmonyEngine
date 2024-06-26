@@ -23,7 +23,7 @@ IHyBody3d::IHyBody3d(HyType eNodeType, const HyNodePath &nodePath, HyEntity3d *p
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
-	tint.Set(1.0f);
+	tint.SetAll(1.0f);
 
 	if(m_pParent)
 	{

@@ -57,7 +57,7 @@ bool HyCamera2d::IsPanning() const
 /*virtual*/ void HyCamera2d::SetZoom(const float fZoom)
 {
 	// Inverse the value before storing it in scale. This is done because the renderer will glm::inverse(pCamera->GetSceneTransform()) to get the view matrix
-	scale.Set(1.0f / fZoom);
+	scale.SetAll(1.0f / fZoom);
 }
 
 // NOTE: Doesn't account for camera rotation!

@@ -285,7 +285,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 
 			float fScaleX = uiNewWidth / vTextSize.x;
 			float fScaleY = uiNewHeight / vTextSize.y;
-			m_Text.scale.Set(HyMath::Min(fScaleX, fScaleY));
+			m_Text.scale.SetAll(HyMath::Min(fScaleX, fScaleY));
 
 			uiNewWidth = static_cast<uint32>(m_Text.GetWidth(m_Text.scale.X()));
 			uiNewHeight = static_cast<uint32>(m_Text.GetHeight(m_Text.scale.Y()));
@@ -322,7 +322,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 
 		float fScaleX = static_cast<float>(vNewTextSize.x) / static_cast<float>(vTextSizeHint.x);
 		float fScaleY = static_cast<float>(vNewTextSize.y) / static_cast<float>(vTextSizeHint.y);
-		m_Text.scale.Set(HyMath::Min(fScaleX, fScaleY));
+		m_Text.scale.SetAll(HyMath::Min(fScaleX, fScaleY));
 	}
 
 	ResetTextAndPanel();

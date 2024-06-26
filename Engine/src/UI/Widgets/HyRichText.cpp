@@ -441,7 +441,7 @@ void HyRichText::AssembleRichTextDrawables()
 					fScaleX = (m_vBoxDimensions.x - ptCurPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
 				float fScaleY = fLineHeight / pNewSprite->GetStateHeight(pNewSprite->GetState());
 				
-				pNewSprite->scale.Set(HyMath::Min(fScaleX, fScaleY));
+				pNewSprite->scale.SetAll(HyMath::Min(fScaleX, fScaleY));
 
 				// If there's limited horizontal space, determine if this sprite will not fit in the remaining space on this text line
 				if(GetTextType() == HYTEXT_Box || GetTextType() == HYTEXT_Column && // NOTE: Don't check ScaleBox because that will be scaled to fit after assembling at full size
@@ -455,7 +455,7 @@ void HyRichText::AssembleRichTextDrawables()
 					// Recalculate sprite scale with modified ptCurPos
 					float fScaleX = (m_vBoxDimensions.x - ptCurPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
 					float fScaleY = fLineHeight / pNewSprite->GetStateHeight(pNewSprite->GetState());
-					pNewSprite->scale.Set(HyMath::Min(fScaleX, fScaleY));
+					pNewSprite->scale.SetAll(HyMath::Min(fScaleX, fScaleY));
 				}
 				
 				pNewSprite->pos.Set(ptCurPos);
@@ -503,7 +503,7 @@ void HyRichText::AssembleRichTextDrawables()
 				pDrawable->scale.Set(pDrawable->scale.GetX() * fScaleAmt, pDrawable->scale.GetY() * fScaleAmt);
 			}
 			else
-				pDrawable->scale.Set(fScaleAmt);
+				pDrawable->scale.SetAll(fScaleAmt);
 
 			if(IsCenterVertically())
 				pDrawable->pos.Offset(0.0f, (m_vBoxDimensions.y - m_fColumnLineHeightOffset) * 0.5f);

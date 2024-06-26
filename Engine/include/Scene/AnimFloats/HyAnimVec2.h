@@ -42,7 +42,7 @@ public:
 	void SetY(float fNewValue);
 	void SetY(int32 iNewValue);
 
-	void Set(float fAll);
+	void SetAll(float fAll);
 	void Set(float fX, float fY);
 	void Set(int32 iX, int32 iY);
 	void Set(const glm::vec2 &srcVec);
