@@ -287,6 +287,14 @@ enum TemplateFileType
 	TEMPLATE_EntityH
 };
 
+enum PanFlags
+{
+	PAN_UP = 1 << 0,
+	PAN_DOWN = 1 << 1,
+	PAN_LEFT = 1 << 2,
+	PAN_RIGHT = 1 << 3
+};
+
 enum Theme
 {
 	THEME_Decemberween = 0,

@@ -15,19 +15,25 @@
 #include "SourceFile.h"
 
 #include <QGraphicsPixmapItem>
+#include <QKeyEvent>
+#include <QScrollBar>
 
 AuxAssetInspector::AuxAssetInspector(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::AuxAssetInspector),
 	m_AtlasesGfxScene(this),
 	m_pCurAtlasesAsset(nullptr),
-	m_AudioGfxScene(this)
+	m_AudioGfxScene(this),
+	m_PanTimer(this),
+	m_uiPanFlags(0)
 {
 	ui->setupUi(this);
 
 	ui->atlasesGfxView->setScene(&m_AtlasesGfxScene);
 	ui->audioGfxView->setScene(&m_AudioGfxScene);
 	ui->wgtCodeEditor->SetReadOnly(true);
+
+	connect(&m_PanTimer, SIGNAL(timeout()), this, SLOT(OnPanTimer()));
 }
 
 /*virtual*/ AuxAssetInspector::~AuxAssetInspector()
@@ -96,4 +102,112 @@ void AuxAssetInspector::Clear(AssetManagerType eAssetManager)
 {
 	m_AtlasesGfxScene.clear();
 	m_pCurAtlasesAsset = nullptr;
+}
+
+/*virtual*/ bool AuxAssetInspector::event(QEvent *pEvent) /*override*/
+{
+	if(pEvent->type() == QEvent::HoverEnter || pEvent->type() == QEvent::HoverLeave)
+	{
+		if(pEvent->type() == QEvent::HoverEnter)
+			setFocus();
+		else if(pEvent->type() == QEvent::HoverLeave)
+		{
+			m_uiPanFlags = 0;
+			clearFocus();
+		}
+	}
+
+	return QWidget::event(pEvent);
+}
+
+/*virtual*/ void AuxAssetInspector::keyPressEvent(QKeyEvent *pEvent) /*override*/
+{
+	if(pEvent->key() == Qt::Key_A)
+	{
+		m_uiPanFlags |= PAN_LEFT;
+		if(m_PanTimer.isActive() == false)
+			m_PanTimer.start(16);
+	}
+	else if(pEvent->key() == Qt::Key_D)
+	{
+		m_uiPanFlags |= PAN_RIGHT;
+		if(m_PanTimer.isActive() == false)
+			m_PanTimer.start(16);
+	}
+	else if(pEvent->key() == Qt::Key_W)
+	{
+		m_uiPanFlags |= PAN_UP;
+		if(m_PanTimer.isActive() == false)
+			m_PanTimer.start(16);
+	}
+	else if(pEvent->key() == Qt::Key_S)
+	{
+		m_uiPanFlags |= PAN_DOWN;
+		if(m_PanTimer.isActive() == false)
+			m_PanTimer.start(16);
+	}
+}
+
+/*virtual*/ void AuxAssetInspector::keyReleaseEvent(QKeyEvent *pEvent) /*override*/
+{
+	if(pEvent->key() == Qt::Key_A)
+		m_uiPanFlags &= ~PAN_LEFT;
+	else if(pEvent->key() == Qt::Key_D)
+		m_uiPanFlags &= ~PAN_RIGHT;
+	else if(pEvent->key() == Qt::Key_W)
+		m_uiPanFlags &= ~PAN_UP;
+	else if(pEvent->key() == Qt::Key_S)
+		m_uiPanFlags &= ~PAN_DOWN;
+}
+
+void AuxAssetInspector::OnPanTimer()
+{
+	if(m_uiPanFlags & PAN_LEFT)
+		m_PanLocomotion.GoLeft();
+	if(m_uiPanFlags & PAN_RIGHT)
+		m_PanLocomotion.GoRight();
+	if(m_uiPanFlags & PAN_UP)
+		m_PanLocomotion.GoUp();
+	if(m_uiPanFlags & PAN_DOWN)
+		m_PanLocomotion.GoDown();
+
+	m_PanLocomotion.Update();
+
+	if(m_PanLocomotion.IsMoving())
+	{
+		AssetManagerType eAssetManager = static_cast<AssetManagerType>(ui->stackedWidget->currentIndex());
+
+		QScrollBar *pHorzScrollBar = nullptr;
+		QScrollBar *pVertScrollBar = nullptr;
+		switch(eAssetManager)
+		{
+		case ASSETMAN_Source:
+		case ASSETMAN_Prefabs:
+			break;
+
+		case ASSETMAN_Atlases:
+			pHorzScrollBar = ui->atlasesGfxView->horizontalScrollBar();
+			pVertScrollBar = ui->atlasesGfxView->verticalScrollBar();
+			break;
+
+		case ASSETMAN_Audio:
+			pHorzScrollBar = ui->audioGfxView->horizontalScrollBar();
+			pVertScrollBar = ui->audioGfxView->verticalScrollBar();
+			break;
+
+		default:
+			HyGuiLog("AuxAssetInspector::OnPanTimer() - Unhandled Asset Type " % QString::number(eAssetManager), LOGTYPE_Error);
+			break;
+		}
+
+		pHorzScrollBar->setValue(pHorzScrollBar->value() + m_PanLocomotion.GetVelocity().x);
+		pVertScrollBar->setValue(pVertScrollBar->value() + (m_PanLocomotion.GetVelocity().y * -1.0f));
+		
+		if(pHorzScrollBar->value() == pHorzScrollBar->minimum() || pHorzScrollBar->value() == pHorzScrollBar->maximum())
+			m_PanLocomotion.StopX();
+		if(pVertScrollBar->value() == pVertScrollBar->minimum() || pVertScrollBar->value() == pVertScrollBar->maximum())
+			m_PanLocomotion.StopY();
+	}
+	else
+		m_PanTimer.stop();
 }

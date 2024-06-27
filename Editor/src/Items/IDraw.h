@@ -27,13 +27,6 @@ protected:
 	glm::vec2											m_ptCamPos;
 	float												m_fCamZoom;
 
-	enum PanFlags
-	{
-		PAN_UP											= 1 << 0,
-		PAN_DOWN										= 1 << 1,
-		PAN_LEFT										= 1 << 2,
-		PAN_RIGHT										= 1 << 3
-	};
 	uint32												m_uiPanFlags;
 
 	bool												m_bIsMiddleMouseDown;

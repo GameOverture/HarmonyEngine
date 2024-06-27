@@ -13,12 +13,7 @@
 #include "HyEngine.h"
 
 HyCamera2d::HyCamera2d(HyWindow *pWindow) :
-	IHyCamera<IHyNode2d>(pWindow),
-	m_vCamVelocity(0.0f),
-	m_fPanMaxSpeed(250.0f),
-	m_fPanAccel(100.0f),
-	m_fPanDecel(300.0f),
-	m_uiPanFlags(0)
+	IHyCamera<IHyNode2d>(pWindow)
 { }
 
 HyCamera2d::~HyCamera2d()
@@ -26,27 +21,27 @@ HyCamera2d::~HyCamera2d()
 
 void HyCamera2d::PanUp()
 {
-	m_uiPanFlags |= PAN_UP;
+	m_PanLocomotion.GoUp();
 }
 
 void HyCamera2d::PanDown()
 {
-	m_uiPanFlags |= PAN_DOWN;
+	m_PanLocomotion.GoDown();
 }
 
 void HyCamera2d::PanLeft()
 {
-	m_uiPanFlags |= PAN_LEFT;
+	m_PanLocomotion.GoLeft();
 }
 
 void HyCamera2d::PanRight()
 {
-	m_uiPanFlags |= PAN_RIGHT;
+	m_PanLocomotion.GoRight();
 }
 
 bool HyCamera2d::IsPanning() const
 {
-	return m_uiPanFlags || m_vCamVelocity.x != 0.0f || m_vCamVelocity.y != 0.0f;
+	return m_PanLocomotion.IsMoving();
 }
 
 /*virtual*/ float HyCamera2d::GetZoom() const
@@ -92,31 +87,9 @@ void HyCamera2d::ProjectToWorld(const glm::vec2 &ptCameraCoordinate, glm::vec2 &
 {
 	IHyCamera<IHyNode2d>::Update();
 
+	m_PanLocomotion.Update();
 	if(IsPanning())
-	{
-		if(m_uiPanFlags & PAN_LEFT)
-			m_vCamVelocity.x -= m_fPanAccel * HyEngine::DeltaTime();
-		else if(m_vCamVelocity.x < 0.0f)
-			m_vCamVelocity.x = HyMath::Min(0.0f, m_vCamVelocity.x + (m_fPanDecel * HyEngine::DeltaTime()));
-		if(m_uiPanFlags & PAN_RIGHT)
-			m_vCamVelocity.x += m_fPanAccel * HyEngine::DeltaTime();
-		else if(m_vCamVelocity.x > 0.0f)
-			m_vCamVelocity.x = HyMath::Max(0.0f, m_vCamVelocity.x - (m_fPanDecel * HyEngine::DeltaTime()));
-		if(m_uiPanFlags & PAN_UP)
-			m_vCamVelocity.y += m_fPanAccel * HyEngine::DeltaTime();
-		else if(m_vCamVelocity.y > 0.0f)
-			m_vCamVelocity.y = HyMath::Max(0.0f, m_vCamVelocity.y - (m_fPanDecel * HyEngine::DeltaTime()));
-		if(m_uiPanFlags & PAN_DOWN)
-			m_vCamVelocity.y -= m_fPanAccel * HyEngine::DeltaTime();
-		else if(m_vCamVelocity.y < 0.0f)
-			m_vCamVelocity.y = HyMath::Min(0.0f, m_vCamVelocity.y + (m_fPanDecel * HyEngine::DeltaTime()));
-
-		m_vCamVelocity.x = HyMath::Clamp(m_vCamVelocity.x, -m_fPanMaxSpeed, m_fPanMaxSpeed);
-		m_vCamVelocity.y = HyMath::Clamp(m_vCamVelocity.y, -m_fPanMaxSpeed, m_fPanMaxSpeed);
-		pos.Offset(m_vCamVelocity);
-
-		m_uiPanFlags = 0;
-	}
+		pos.Offset(m_PanLocomotion.GetVelocity());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

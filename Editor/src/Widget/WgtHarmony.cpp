@@ -45,6 +45,7 @@ WgtHarmony::WgtHarmony(QWidget *pParent /*= nullptr*/) :
 	m_pTimer->stop();
 
 	makeCurrent();
+	delete m_pTimer;
 	delete m_pHyEngine;
 }
 

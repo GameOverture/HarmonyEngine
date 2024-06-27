@@ -33,10 +33,14 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	m_ptDragStart(0.0f, 0.0f),
 	m_iDragFrame(-1),
 	m_pGfxDragTweenKnobItem(nullptr),
-	m_pContextClickItem(nullptr)
+	m_pContextClickItem(nullptr),
+	m_PanTimer(this),
+	m_uiPanFlags(0)
 {
 	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	setDragMode(QGraphicsView::RubberBandDrag);
+	
+	connect(&m_PanTimer, SIGNAL(timeout()), this, SLOT(OnPanTimer()));
 }
 
 /*virtual*/ EntityDopeSheetView::~EntityDopeSheetView()
@@ -437,7 +441,10 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		if(pEvent->type() == QEvent::HoverEnter)
 			setFocus();
 		else if(pEvent->type() == QEvent::HoverLeave)
+		{
+			m_uiPanFlags = 0;
 			clearFocus();
+		}
 	}
 
 	return QGraphicsView::event(pEvent);
@@ -445,47 +452,46 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 
 /*virtual*/ void EntityDopeSheetView::keyPressEvent(QKeyEvent *pEvent) /*override*/
 {
-	// WASD to pan the timeline
 	if(pEvent->key() == Qt::Key_A)
 	{
-		horizontalScrollBar()->setValue(horizontalScrollBar()->value() - 10);
+		m_uiPanFlags |= PAN_LEFT;
+		if(m_PanTimer.isActive() == false)
+			m_PanTimer.start(16);
 	}
 	else if(pEvent->key() == Qt::Key_D)
 	{
-		horizontalScrollBar()->setValue(horizontalScrollBar()->value() + 10);
+		m_uiPanFlags |= PAN_RIGHT;
+		if(m_PanTimer.isActive() == false)
+			m_PanTimer.start(16);
 	}
 	else if(pEvent->key() == Qt::Key_W)
 	{
-		verticalScrollBar()->setValue(verticalScrollBar()->value() - 10);
+		m_uiPanFlags |= PAN_UP;
+		if(m_PanTimer.isActive() == false)
+			m_PanTimer.start(16);
 	}
 	else if(pEvent->key() == Qt::Key_S)
 	{
-		verticalScrollBar()->setValue(verticalScrollBar()->value() + 10);
+		m_uiPanFlags |= PAN_DOWN;
+		if(m_PanTimer.isActive() == false)
+			m_PanTimer.start(16);
 	}
-	//else if(pEvent->key() == Qt::Key_Space)
-	//{
-	//	GetScene()->TogglePlay();
-	//}
 	else if(pEvent->key() == Qt::Key_Left)
-	{
 		GetScene()->SetCurrentFrame(GetScene()->GetCurrentFrame() - 1);
-	}
 	else if(pEvent->key() == Qt::Key_Right)
-	{
 		GetScene()->SetCurrentFrame(GetScene()->GetCurrentFrame() + 1);
-	}
-	//else if(pEvent->key() == Qt::Key_Delete)
-	//{
-	//	GetScene()->DeleteSelectedEvents();
-	//}
-	//else if(pEvent->key() == Qt::Key_Escape)
-	//{
-	//	GetScene()->ClearSelectedEvents();
-	//}
 }
 
 /*virtual*/ void EntityDopeSheetView::keyReleaseEvent(QKeyEvent *pEvent) /*override*/
 {
+	if(pEvent->key() == Qt::Key_A)
+		m_uiPanFlags &= ~PAN_LEFT;
+	else if(pEvent->key() == Qt::Key_D)
+		m_uiPanFlags &= ~PAN_RIGHT;
+	else if(pEvent->key() == Qt::Key_W)
+		m_uiPanFlags &= ~PAN_UP;
+	else if(pEvent->key() == Qt::Key_S)
+		m_uiPanFlags &= ~PAN_DOWN;
 }
 
 /*virtual*/ void EntityDopeSheetView::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
@@ -677,4 +683,31 @@ int EntityDopeSheetView::GetNearestFrame(qreal fScenePosX) const
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
 	return ((fScenePosX - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
+}
+
+void EntityDopeSheetView::OnPanTimer()
+{
+	if(m_uiPanFlags & PAN_LEFT)
+		m_PanLocomotion.GoLeft();
+	if(m_uiPanFlags & PAN_RIGHT)
+		m_PanLocomotion.GoRight();
+	if(m_uiPanFlags & PAN_UP)
+		m_PanLocomotion.GoUp();
+	if(m_uiPanFlags & PAN_DOWN)
+		m_PanLocomotion.GoDown();
+
+	m_PanLocomotion.Update();
+
+	if(m_PanLocomotion.IsMoving())
+	{
+		horizontalScrollBar()->setValue(horizontalScrollBar()->value() + m_PanLocomotion.GetVelocity().x);
+		verticalScrollBar()->setValue(verticalScrollBar()->value() + (m_PanLocomotion.GetVelocity().y * -1.0f));
+
+		if(horizontalScrollBar()->value() == horizontalScrollBar()->minimum() || horizontalScrollBar()->value() == horizontalScrollBar()->maximum())
+			m_PanLocomotion.StopX();
+		if(verticalScrollBar()->value() == verticalScrollBar()->minimum() || verticalScrollBar()->value() == verticalScrollBar()->maximum())
+			m_PanLocomotion.StopY();
+	}
+	else
+		m_PanTimer.stop();
 }

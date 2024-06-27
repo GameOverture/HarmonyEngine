@@ -16,6 +16,7 @@
 
 #include <QWidget>
 #include <QGraphicsScene>
+#include <QTimer>
 
 class WgtCodeEditor;
 
@@ -32,6 +33,10 @@ class AuxAssetInspector : public QWidget
 
 	QGraphicsScene				m_AudioGfxScene;
 
+	QTimer						m_PanTimer;
+	uint32						m_uiPanFlags;
+	HyLocomotion2d				m_PanLocomotion;
+
 public:
 	explicit AuxAssetInspector(QWidget *parent = 0);
 	virtual ~AuxAssetInspector();
@@ -43,8 +48,17 @@ public:
 
 	void Clear(AssetManagerType eAssetManager);
 
+protected:
+	virtual bool event(QEvent *pEvent) override;
+
+	virtual void keyPressEvent(QKeyEvent *pEvent) override;
+	virtual void keyReleaseEvent(QKeyEvent *pEvent) override;
+
 private:
 	Ui::AuxAssetInspector *ui;
+
+private Q_SLOTS:
+	void OnPanTimer();
 };
 
 #endif // AUXASSETINSPECTOR_H

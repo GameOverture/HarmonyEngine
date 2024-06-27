@@ -179,6 +179,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Utilities/Crc32.cpp
 	src/Utilities/HyIO.cpp
 	src/Utilities/HyJson.cpp
+	src/Utilities/HyLocomotion.cpp
 	src/Utilities/HyMain.cpp
 	src/Utilities/HyMath.cpp
 	src/Utilities/HyStorage.cpp
@@ -316,6 +317,7 @@ set(HYENGINE_HEADER_FILES
 	include/Utilities/Crc32.h
 	include/Utilities/HyIO.h
 	include/Utilities/HyJson.h
+	include/Utilities/HyLocomotion.h
 	include/Utilities/HyMain.h
 	include/Utilities/HyMath.h
 	include/Utilities/HyRand.h

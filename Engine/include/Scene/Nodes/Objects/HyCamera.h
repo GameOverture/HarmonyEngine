@@ -15,23 +15,13 @@
 #include "Scene/Nodes/Objects/IHyCamera.h"
 #include "Scene/Nodes/IHyNode2d.h"
 #include "Scene/Nodes/IHyNode3d.h"
+#include "Utilities/HyLocomotion.h"
 
 class HyCamera2d final : public IHyCamera<IHyNode2d>
 {
 	friend class HyWindow;
 
-	glm::vec2				m_vCamVelocity;
-	float					m_fPanMaxSpeed;
-	float					m_fPanAccel;
-	float					m_fPanDecel;
-	enum PanFlags
-	{
-		PAN_UP				= 1 << 0,
-		PAN_DOWN			= 1 << 1,
-		PAN_LEFT			= 1 << 2,
-		PAN_RIGHT			= 1 << 3
-	};
-	uint32					m_uiPanFlags;
+	HyLocomotion2d		m_PanLocomotion;
 
 private:
 	HyCamera2d(HyWindow *pWindow);

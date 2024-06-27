@@ -11,6 +11,7 @@
 #define ENTITYDOPESHEETVIEW_H
 
 #include <QGraphicsView>
+#include <QTimer>
 
 class AuxDopeSheet;
 class EntityStateData;
@@ -20,6 +21,8 @@ class GraphicsTweenKnobItem;
 
 class EntityDopeSheetView : public QGraphicsView
 {
+	Q_OBJECT
+
 	AuxDopeSheet *				m_pAuxDopeSheet;
 	EntityStateData *			m_pStateData;
 
@@ -44,6 +47,10 @@ class EntityDopeSheetView : public QGraphicsView
 	GraphicsTweenKnobItem *		m_pGfxDragTweenKnobItem; // If dragging a tween duration knob
 
 	EntityTreeItemData *		m_pContextClickItem;
+
+	QTimer						m_PanTimer;
+	uint32						m_uiPanFlags;
+	HyLocomotion2d				m_PanLocomotion;
 
 public:
 	EntityDopeSheetView(QWidget *pParent = nullptr);
@@ -79,6 +86,9 @@ private:
 	QList<EntityTreeItemData *> GetItems() const;
 
 	int GetNearestFrame(qreal fScenePosX) const;
+
+private Q_SLOTS:
+	void OnPanTimer();
 };
 
 #endif // ENTITYDOPESHEETVIEW_H
