@@ -19,7 +19,6 @@
 #include "DlgInputNumber.h"
 #include "MainWindow.h"
 #include "AuxDopeSheet.h"
-#include "DlgSnappingSettings.h"
 
 #include <QClipboard>
 
@@ -120,7 +119,6 @@ EntityWidget::~EntityWidget()
 
 /*virtual*/ void EntityWidget::OnGiveMenuActions(QMenu *pMenu) /*override*/
 {
-	pMenu->addAction(ui->actionEntitySnappingSettings);
 	pMenu->addAction(ui->actionVertexEditMode);
 }
 
@@ -629,16 +627,6 @@ void EntityWidget::on_actionAddLineChainShape_triggered()
 void EntityWidget::on_actionAddLineLoopShape_triggered()
 {
 	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeEditDrag(SHAPE_LineLoop, false);
-}
-
-void EntityWidget::on_actionEntitySnappingSettings_triggered()
-{
-	DlgSnappingSettings *pNewDlg = new DlgSnappingSettings(m_ItemRef.GetProject().GetSnappingSettings(), this);
-
-	if(pNewDlg->exec() == QDialog::Accepted)
-		m_ItemRef.GetProject().SetSnappingSettings(pNewDlg->GetSnappingSettings(), true);
-
-	delete pNewDlg;
 }
 
 void EntityWidget::on_actionVertexEditMode_toggled(bool bChecked)

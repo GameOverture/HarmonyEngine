@@ -22,14 +22,6 @@ class EntityDraw : public IDrawEx
 	bool									m_bActivateVemOnNextJsonMeta;
 	bool									m_bPlayingPreview;
 
-	enum ShapeEditState
-	{
-		SHAPESTATE_None = 0,
-		SHAPESTATE_DragAddPrimitive,		// Uses 'm_DragShape' when initially placing a new primitive
-		SHAPESTATE_DragAddShape,			// Uses 'm_DragShape' when initially placing a new shape
-		SHAPESTATE_VertexEditMode			// When editing polygons, line chains, and line loops
-	};
-	ShapeEditState							m_eShapeEditState;
 	EntityDrawItem *						m_pCurVertexEditItem;
 	ShapeCtrl::VemAction					m_eCurVemAction;
 

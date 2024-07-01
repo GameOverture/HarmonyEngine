@@ -31,10 +31,11 @@ const QString g_sZoomLevels[HYNUM_ZOOMLEVELS] = { "6.25%","12.5%", "25%",  "33.3
 IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	m_pProjItem(pProjItem),
 	m_pCamera(HyEngine::Window().GetCamera2d(0)),
+	m_eDrawAction(HYACTION_None),
 	m_uiPanFlags(0),
-	m_bIsMiddleMouseDown(false),
 	m_ptCamPos(0.0f, 0.0f),
 	m_fCamZoom(1.0f),
+	m_iGuideOldMovePos(0),
 	m_sZoomStatus("100%")
 {
 	if(HyGlobal::IsItemFileDataValid(initFileDataRef))
@@ -90,6 +91,74 @@ void IDraw::SetCamera(glm::vec2 ptCamPos, float fZoom)
 	m_pCamera->SetZoom(m_fCamZoom);
 
 	CameraUpdated();
+}
+
+DrawAction IDraw::GetCurAction() const
+{
+	return m_eDrawAction;
+}
+
+bool IDraw::IsActionTransforming() const
+{
+	return m_eDrawAction == HYACTION_TransformingScale ||
+		   m_eDrawAction == HYACTION_TransformingRotation ||
+		   m_eDrawAction == HYACTION_TransformingTranslate ||
+		   m_eDrawAction == HYACTION_TransformingNudging;
+}
+
+bool IDraw::SetAction(DrawAction eHyAction)
+{
+	if(m_eDrawAction >= eHyAction)
+		return false;
+
+	m_eDrawAction = eHyAction;
+	switch(m_eDrawAction)
+	{
+	case HYACTION_None:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
+	case HYACTION_Streaming:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BusyCursor); break;
+
+	case HYACTION_Pan:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ClosedHandCursor); break;
+	case HYACTION_Marquee:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;
+
+	case HYACTION_HoverGuideHorz:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitVCursor); break;
+	case HYACTION_HoverGuideVert:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitHCursor); break;
+	case HYACTION_ManipGuideHorz:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitVCursor); break;
+	case HYACTION_ManipGuideVert:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitHCursor); break;
+
+	case HYACTION_HoverScale:			// NOTE: HYACTION_HoverScale should be handled by IDrawEx::SetTransformHoverActionViaGrabPoint()
+	case HYACTION_TransformingScale:
+		break;
+	case HYACTION_HoverRotate:
+	case HYACTION_TransformingRotation:
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::UpArrowCursor);
+		break;
+	case HYACTION_TransformingTranslate:
+	case HYACTION_TransformingNudging:
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor);
+		break;
+
+	case HYACTION_Wait:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::WaitCursor); break;
+
+	default:
+		HyGuiLog("HarmonyWidget::SetAction() - Unknown HarmonyAction: " % QString::number(eHyAction), LOGTYPE_Error);
+		return false;
+	}
+
+	return true;
+}
+
+void IDraw::ClearAction()
+{
+	SetAction(HYACTION_None);
+
+	QList<LoadingType> currentLoadingTypeList = MainWindow::GetCurrentLoading();
+	if(currentLoadingTypeList.empty() == false)
+	{
+		if(currentLoadingTypeList.size() == 1 && currentLoadingTypeList.contains(LOADINGTYPE_HarmonyStreaming))
+			SetAction(HYACTION_Streaming);
+		else
+			SetAction(HYACTION_Wait);
+	}
 }
 
 QJsonArray IDraw::GetGuideArray(HyOrientation eOrientation)
@@ -225,7 +294,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 {
 	QPointF ptCurMousePos = pEvent->localPos();
 
-	if(m_bIsMiddleMouseDown)
+	if(GetCurAction() == HYACTION_Pan)
 	{
 		if(ptCurMousePos != m_ptOldMousePos)
 		{
@@ -238,6 +307,30 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		m_ptOldMousePos = ptCurMousePos;
 	}
 
+	// Check if mouse is over an existing guide
+	glm::vec2 ptWorldMousePos;
+	if(m_GuideMap.empty() == false && HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
+	{
+		const int iSELECT_RADIUS = 2;
+		for(auto iter = m_GuideMap.begin(); iter != m_GuideMap.end(); ++iter)
+		{
+			int iWorldPos = iter.key().second;
+
+			if(iter.key().first == HYORIENT_Horizontal &&
+				ptWorldMousePos.y >= (iWorldPos - iSELECT_RADIUS) &&
+				ptWorldMousePos.y <= (iWorldPos + iSELECT_RADIUS))
+			{
+				SetAction(HYACTION_HoverGuideHorz);
+			}
+			else if(iter.key().first == HYORIENT_Vertical &&
+				ptWorldMousePos.x >= (iWorldPos - iSELECT_RADIUS) &&
+				ptWorldMousePos.x <= (iWorldPos + iSELECT_RADIUS))
+			{
+				SetAction(HYACTION_HoverGuideVert);
+			}
+		}
+	}
+
 	UpdateDrawStatus(m_sSizeStatus);
 }
 
@@ -245,51 +338,81 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 {
 	if(pEvent->button() == Qt::MiddleButton)
 	{
-		if(m_bIsMiddleMouseDown == false)
-		{
-			m_bIsMiddleMouseDown = true;
+		if(SetAction(HYACTION_Pan))
 			m_ptOldMousePos = pEvent->localPos();
-			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
+	}
+
+	// If hovering over an existing guide, then "select" it by removing it, and starting SetPendingGuide()
+	glm::vec2 ptWorldMousePos;
+	if(pEvent->button() == Qt::LeftButton &&
+		m_GuideMap.empty() == false &&
+		HyEngine::Input().GetWorldMousePos(ptWorldMousePos) &&
+		(GetCurAction() == HYACTION_HoverGuideHorz || GetCurAction() == HYACTION_HoverGuideVert))
+	{
+		// Find closest existing guide
+		QPair<HyOrientation, int> closestGuideKey;
+		int iClosestDist = INT_MAX;
+		for(auto iter = m_GuideMap.begin(); iter != m_GuideMap.end(); ++iter)
+		{
+			if(GetCurAction() == HYACTION_HoverGuideHorz && iter.key().first == HYORIENT_Horizontal)
+			{
+				int iDist = abs((int)ptWorldMousePos.y - iter.key().second);
+				if(iDist < iClosestDist)
+				{
+					iClosestDist = iDist;
+					closestGuideKey = iter.key();
+				}
+			}
+			else if(GetCurAction() == HYACTION_HoverGuideVert && iter.key().first == HYORIENT_Vertical)
+			{
+				int iDist = abs((int)ptWorldMousePos.x - iter.key().second);
+				if(iDist < iClosestDist)
+				{
+					iClosestDist = iDist;
+					closestGuideKey = iter.key();
+				}
+			}
+		}
+		if(iClosestDist == INT_MAX)
+			HyGuiLog("IDraw::OnMousePressEvent failed to find closest guide", LOGTYPE_Error);
+		else
+		{
+			SetAction(closestGuideKey.first ? HYACTION_ManipGuideHorz : HYACTION_ManipGuideVert);
+			m_iGuideOldMovePos = closestGuideKey.second;
+
+			DeleteGuide(closestGuideKey.first, closestGuideKey.second);
 		}
 	}
 }
 
 /*virtual*/ void IDraw::OnMouseReleaseEvent(QMouseEvent *pEvent)
 {
-	if(pEvent->button() == Qt::MiddleButton)
+	if(pEvent->button() == Qt::MiddleButton &&
+		GetCurAction() == HYACTION_Pan)
 	{
-		if(m_bIsMiddleMouseDown)
+		ClearAction();
+	}
+
+	if(GetCurAction() == HYACTION_ManipGuideHorz ||
+	   GetCurAction() == HYACTION_ManipGuideVert)
+	{
+		HyOrientation eOrientation = GetCurAction() == HYACTION_ManipGuideHorz ? HYORIENT_Horizontal : HYORIENT_Vertical;
+
+		glm::vec2 ptWorldPos;
+		if(HyEngine::Input().GetWorldMousePos(ptWorldPos))
 		{
-			m_bIsMiddleMouseDown = false;
-			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->RestoreCursorShape();
+			int iPos = GetCurAction() == HYACTION_ManipGuideHorz ? static_cast<int>(ptWorldPos.y) : static_cast<int>(ptWorldPos.x);
+			UndoCmd_MoveGuide *pNewCmd = new UndoCmd_MoveGuide(*this, eOrientation, m_iGuideOldMovePos, iPos);
+			GetProjItemData()->GetUndoStack()->push(pNewCmd);
 		}
-	}
-}
+		else
+		{
+			UndoCmd_RemoveGuide *pNewCmd = new UndoCmd_RemoveGuide(*this, eOrientation, m_iGuideOldMovePos);
+			GetProjItemData()->GetUndoStack()->push(pNewCmd);
+		}
 
-const QMap<QPair<HyOrientation, int>, HyPrimitive2d *> &IDraw::GetGuideMap() const
-{
-	return m_GuideMap;
-}
-
-void IDraw::SetPendingGuide(HyOrientation eOrientation)
-{
-	glm::vec2 ptMousePos = HyEngine::Input().GetMousePos();
-	glm::ivec2 vRendererSize = HyEngine::Window().GetWindowSize();
-
-	if(eOrientation == HYORIENT_Horizontal)
-	{
-		m_PendingGuide.SetAsLineSegment(glm::vec2(0.0f, ptMousePos.y),
-										glm::vec2(static_cast<float>(vRendererSize.x), ptMousePos.y));
-		m_PendingGuide.SetVisible(true);
+		ClearAction();
 	}
-	else if(eOrientation == HYORIENT_Vertical)
-	{
-		m_PendingGuide.SetAsLineSegment(glm::vec2(ptMousePos.x, 0.0f),
-										glm::vec2(ptMousePos.x, static_cast<float>(vRendererSize.y)));
-		m_PendingGuide.SetVisible(true);
-	}
-	else
-		m_PendingGuide.SetVisible(false);
 }
 
 bool IDraw::TryAllocateGuide(HyOrientation eOrientation, int iWorldPos)
@@ -326,11 +449,36 @@ bool IDraw::TryAllocateGuide(HyOrientation eOrientation, int iWorldPos)
 
 		CameraUpdated();
 	}
+
+	switch(GetCurAction())
+	{
+	case HYACTION_ManipGuideHorz: {
+		glm::vec2 ptMousePos = HyEngine::Input().GetMousePos();
+		glm::ivec2 vRendererSize = HyEngine::Window().GetWindowSize();
+
+		m_PendingGuide.SetAsLineSegment(glm::vec2(0.0f, ptMousePos.y),
+										glm::vec2(static_cast<float>(vRendererSize.x), ptMousePos.y));
+		m_PendingGuide.SetVisible(true);
+		break; }
+
+	case HYACTION_ManipGuideVert: {
+		glm::vec2 ptMousePos = HyEngine::Input().GetMousePos();
+		glm::ivec2 vRendererSize = HyEngine::Window().GetWindowSize();
+
+		m_PendingGuide.SetAsLineSegment(glm::vec2(ptMousePos.x, 0.0f),
+										glm::vec2(ptMousePos.x, static_cast<float>(vRendererSize.y)));
+		m_PendingGuide.SetVisible(true);
+		break; }
+
+	default:
+		m_PendingGuide.SetVisible(false);
+		break;
+	}
 }
 
 bool IDraw::IsCameraPanning() const
 {
-	return m_pCamera->IsPanning() || m_bIsMiddleMouseDown;
+	return m_pCamera->IsPanning() || GetCurAction() == HYACTION_Pan;
 }
 
 void IDraw::CameraUpdated()

@@ -149,6 +149,7 @@
    <addaction name="actionShowGridBackground"/>
    <addaction name="actionShowGridOrigin"/>
    <addaction name="actionShowGridOverlay"/>
+   <addaction name="actionSnappingSettings"/>
    <addaction name="separator"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -876,6 +877,18 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+Shift+B</string>
+   </property>
+  </action>
+  <action name="actionSnappingSettings">
+   <property name="icon">
+    <iconset resource="../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/entity-snapping.png</normaloff>:/icons16x16/entity-snapping.png</iconset>
+   </property>
+   <property name="text">
+    <string>Snapping Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Open the snapping settings dialog</string>
    </property>
   </action>
  </widget>

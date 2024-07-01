@@ -14,6 +14,40 @@
 
 class ProjectItemData;
 
+enum DrawAction
+{
+	// NOTE: Actions are ordered by priority [low->high]. Only allow setting a higher priority action
+	HYACTION_None = 0,
+	HYACTION_Streaming,
+
+	HYACTION_Pan,
+	HYACTION_Marquee,						// When clicking outside any items' bounds
+
+	HYACTION_HoverGuideHorz,
+	HYACTION_HoverGuideVert,
+	HYACTION_ManipGuideHorz,
+	HYACTION_ManipGuideVert,
+
+	// IDrawEx Specific:
+	HYACTION_HoverScale,
+	HYACTION_HoverRotate,
+	
+	HYACTION_Pending,						// Using 'm_PressTimer' (or mouse movement) to determine if selection or drag will occur
+
+	HYACTION_TransformingScale,
+	HYACTION_TransformingRotation,
+	HYACTION_TransformingTranslate,
+	HYACTION_TransformingNudging,			// Using arrow keys to nudge selected items
+
+	// Entity Specific:
+	HYACTION_EntityShapeDragAddPrimitive,	// Uses 'm_DragShape' when initially placing a new primitive
+	HYACTION_EntityShapeDragAddShape,		// Uses 'm_DragShape' when initially placing a new shape
+	HYACTION_EntityShapeVertexEditMode,		// When editing polygons, line chains, and line loops
+
+	// Editor Loading (locked input):
+	HYACTION_Wait
+};
+
 class IDraw : public HyEntity2d
 {
 	friend class HarmonyWidget;
@@ -27,13 +61,14 @@ protected:
 	glm::vec2											m_ptCamPos;
 	float												m_fCamZoom;
 
-	uint32												m_uiPanFlags;
+	DrawAction											m_eDrawAction;
 
-	bool												m_bIsMiddleMouseDown;
+	uint32												m_uiPanFlags;
 	QPointF												m_ptOldMousePos;
 
 	HyPrimitive2d										m_PendingGuide;
 	QMap<QPair<HyOrientation, int>, HyPrimitive2d *>	m_GuideMap;
+	int													m_iGuideOldMovePos; // When dragging an existing guide, this was its old position
 
 private:
 	QString												m_sSizeStatus;	// Derived classes should set this using UpdateDrawStatus()
@@ -47,6 +82,12 @@ public:
 
 	void GetCameraInfo(glm::vec2 &ptPosOut, float &fZoomOut);
 	void SetCamera(glm::vec2 ptCamPos, float fZoom);
+
+	// Action management
+	DrawAction GetCurAction() const;
+	bool IsActionTransforming() const;
+	bool SetAction(DrawAction eHyAction);
+	void ClearAction();
 
 	QJsonArray GetGuideArray(HyOrientation eOrientation);
 
@@ -71,8 +112,6 @@ public:
 	virtual void OnMousePressEvent(QMouseEvent *pEvent);
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent);
 
-	const QMap<QPair<HyOrientation, int>, HyPrimitive2d *> &GetGuideMap() const;
-	void SetPendingGuide(HyOrientation eOrientation);
 	bool TryAllocateGuide(HyOrientation eOrientation, int iWorldPos);
 
 protected:

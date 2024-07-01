@@ -27,9 +27,6 @@ class HarmonyWidget : public QWidget
 
 	QGraphicsScene		m_RulerHorzScene;
 	QGraphicsScene		m_RulerVertScene;
-
-	HyOrientation		m_eGuidePending; // Clicked ruler (or existing guide) and held mouse button down
-	int					m_iGuideOldMovePos; // When dragging an existing guide, this was its old position
 	
 public:
 	explicit HarmonyWidget(Project *pProject, QWidget *pParent = 0);
@@ -39,10 +36,6 @@ public:
 
 	bool IsProject(Project *pProjectToTest);
 	void CloseProject();
-
-	Qt::CursorShape GetCursorShape() const;
-	void SetCursorShape(Qt::CursorShape eShape);
-	void RestoreCursorShape();
 
 	WgtHarmony *GetWgtHarmony();
 	HyRendererInterop *GetHarmonyRenderer();
@@ -56,10 +49,9 @@ public:
 	void OnWgtMouseMoveEvent(IDraw *pDrawItem, QMouseEvent *pEvent);
 	
 	void OnRulerMousePressEvent(HyOrientation eOrientation, QMouseEvent *pEvent);
-	void OnWgtMousePressEvent(IDraw *pDrawItem, QMouseEvent *pEvent);
-	
 	void OnRulerMouseReleaseEvent(HyOrientation eOrientation, QMouseEvent *pEvent);
-	void OnWgtMouseReleaseEvent(IDraw *pDrawItem, QMouseEvent *pEvent);
+
+	void OnRefreshLoading();
 
 protected:
 	void resizeEvent(QResizeEvent *pEvent) override;

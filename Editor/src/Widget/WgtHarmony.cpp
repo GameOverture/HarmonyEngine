@@ -125,7 +125,6 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 		else if(MainWindow::GetCurrentLoading().contains(LOADINGTYPE_HarmonyStreaming))
 		{
 			MainWindow::ClearLoading(LOADINGTYPE_HarmonyStreaming);
-			static_cast<HarmonyWidget *>(parent())->RestoreCursorShape();
 		}
 	}
 }
@@ -429,7 +428,6 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 		return;
 
 	pCurItem->GetDraw()->OnMousePressEvent(pEvent);
-	static_cast<HarmonyWidget *>(parent())->OnWgtMousePressEvent(pCurItem->GetDraw(), pEvent);
 }
 
 /*virtual*/ void WgtHarmony::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/
@@ -442,7 +440,6 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 		return;
 
 	pCurItem->GetDraw()->OnMouseReleaseEvent(pEvent);
-	static_cast<HarmonyWidget *>(parent())->OnWgtMouseReleaseEvent(pCurItem->GetDraw(), pEvent);
 }
 
 void WgtHarmony::OnBootCheck()

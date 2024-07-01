@@ -37,15 +37,6 @@ protected:
 	// Mouse press/dragging (and arrow key nudging)
 	HyTimer									m_PressTimer;
 	bool									m_bSelectionHandled; // During mouse release, this bool can signify if selection was already handled by previous logic (or if selection is not necessary)
-	enum DragState
-	{
-		DRAGSTATE_None = 0,
-		DRAGSTATE_Marquee,					// When clicking outside any items' bounds
-		DRAGSTATE_Pending,					// Using 'm_PressTimer' (or mouse movement) to determine if selection or drag will occur
-		DRAGSTATE_Transforming,				// Dragging confirmed, and transforming is occurring
-		DRAGSTATE_Nudging					// Using arrow keys to nudge selected items
-	};
-	DragState								m_eDragState;
 	glm::vec2								m_ptDragStart;
 	glm::vec2								m_ptDragCenter;
 	glm::vec2								m_vDragStartSize;
@@ -81,15 +72,11 @@ protected:
 
 	virtual void OnRequestSelection(QList<IDrawExItem *> selectionList) = 0;
 
-	Qt::CursorShape GetGrabPointCursorShape(TransformCtrl::GrabPointType eGrabPoint, float fRotation) const;
-
 	void DoMouseMove(bool bCtrlMod, bool bShiftMod);
 
-	void DoMouseMove_Select(bool bCtrlMod, bool bShiftMod);
-	void DoMousePress_Select(bool bCtrlMod, bool bShiftMod);
-	void DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod);
+	bool SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType eGrabPoint, float fRotation);
 
-	void BeginTransform(bool bWithMouse);
+	void BeginTransform();
 
 	void DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod);
 	void DoMouseRelease_Transform();

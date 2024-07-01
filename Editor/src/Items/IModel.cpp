@@ -91,7 +91,7 @@ const IStateData *IModel::GetStateData(int iStateIndex) const
 FileDataPair IModel::GetStateFileData(uint32 uiIndex) const
 {
 	FileDataPair stateFileData;
-	if(uiIndex >= m_StateList.size())
+	if(uiIndex >= static_cast<uint32>(m_StateList.size()))
 	{
 		HyGuiLog("IModel::GetStateFileData() out of bounds", LOGTYPE_Error);
 		return stateFileData;

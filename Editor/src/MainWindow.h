@@ -138,6 +138,7 @@ private Q_SLOTS:
 	void on_actionShowGridBackground_triggered();
 	void on_actionShowGridOrigin_triggered();
 	void on_actionShowGridOverlay_triggered();
+	void on_actionSnappingSettings_triggered();
 	
 	void on_actionBuildSettings_triggered();
 	void on_actionNewBuild_triggered();

@@ -707,18 +707,6 @@
     <string>Removes the selected entity items while also copying them to the clipboard</string>
    </property>
   </action>
-  <action name="actionEntitySnappingSettings">
-   <property name="icon">
-    <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/entity-snapping.png</normaloff>:/icons16x16/entity-snapping.png</iconset>
-   </property>
-   <property name="text">
-    <string>Entity Snapping Settings</string>
-   </property>
-   <property name="toolTip">
-    <string>Open the entity snapping settings dialog</string>
-   </property>
-  </action>
  </widget>
  <customwidgets>
   <customwidget>

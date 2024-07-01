@@ -20,7 +20,6 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_RootEntity(this),
 	m_bActivateVemOnNextJsonMeta(false),
 	m_bPlayingPreview(false),
-	m_eShapeEditState(SHAPESTATE_None),
 	m_pCurVertexEditItem(nullptr),
 	m_eCurVemAction(ShapeCtrl::VEMACTION_None)
 {

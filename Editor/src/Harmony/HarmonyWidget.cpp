@@ -21,8 +21,7 @@ HarmonyWidget::HarmonyWidget(Project *pProject, QWidget *pParent /*= nullptr*/) 
 	QWidget(pParent),
 	ui(new Ui::HarmonyWidget),
 	m_RulerHorzScene(this),
-	m_RulerVertScene(this),
-	m_eGuidePending(HYORIENT_Null)
+	m_RulerVertScene(this)
 {
 	ui->setupUi(this);
 	ui->wgtHarmony->InitProject(pProject);
@@ -33,8 +32,6 @@ HarmonyWidget::HarmonyWidget(Project *pProject, QWidget *pParent /*= nullptr*/) 
 
 	ui->rulerVert->setScene(&m_RulerVertScene);
 	ui->rulerVert->Init(HYORIENT_Vertical);
-
-	RestoreCursorShape();
 }
 
 HarmonyWidget::~HarmonyWidget()
@@ -55,21 +52,6 @@ bool HarmonyWidget::IsProject(Project *pProjectToTest)
 void HarmonyWidget::CloseProject()
 {
 	ui->wgtHarmony->CloseProject();
-}
-
-Qt::CursorShape HarmonyWidget::GetCursorShape() const
-{
-	return cursor().shape();
-}
-
-void HarmonyWidget::SetCursorShape(Qt::CursorShape eShape)
-{
-	setCursor(eShape);
-}
-
-void HarmonyWidget::RestoreCursorShape()
-{
-	setCursor(Qt::ArrowCursor);
 }
 
 WgtHarmony *HarmonyWidget::GetWgtHarmony()
@@ -102,200 +84,85 @@ void HarmonyWidget::ShowRulerMouse(bool bShow)
 
 void HarmonyWidget::OnRulerMouseMoveEvent(HyOrientation eOrientation, QMouseEvent *pEvent)
 {
-	if(m_eGuidePending != HYORIENT_Null)
-	{
-		if(m_eGuidePending != eOrientation)
-			HyGuiLog("HarmonyWidget::OnRulerMouseMoveEvent - Wrong orientation set in m_eGuidePending", LOGTYPE_Error);
-
-		QPointF ptCurMousePos = pEvent->localPos();
-		if(eOrientation == HYORIENT_Horizontal)
-			HyEngine::Input().SetWidgetMousePos(glm::vec2(ptCurMousePos.x(), ptCurMousePos.y() - RULER_WIDTH));
-		else
-			HyEngine::Input().SetWidgetMousePos(glm::vec2(ptCurMousePos.x() - RULER_WIDTH, ptCurMousePos.y()));
-
-		if(GetWgtHarmony() &&
-			GetWgtHarmony()->GetProject() &&
-			GetWgtHarmony()->GetProject()->GetCurrentOpenItem())
-		{
-			ProjectItemData *pCurProjItem = GetWgtHarmony()->GetProject()->GetCurrentOpenItem();
-			pCurProjItem->GetDraw()->SetPendingGuide(eOrientation);
-		}
-	}
+	QPointF ptCurMousePos = pEvent->localPos();
+	if(eOrientation == HYORIENT_Horizontal)
+		HyEngine::Input().SetWidgetMousePos(glm::vec2(ptCurMousePos.x(), ptCurMousePos.y() - RULER_WIDTH));
+	else
+		HyEngine::Input().SetWidgetMousePos(glm::vec2(ptCurMousePos.x() - RULER_WIDTH, ptCurMousePos.y()));
 }
 
 void HarmonyWidget::OnWgtMouseMoveEvent(IDraw *pDrawItem, QMouseEvent *pEvent)
 {
-	if(MainWindow::GetCurrentLoading().empty() == false)
-		SetCursorShape(Qt::WaitCursor);
-	else if(GetCursorShape() == Qt::WaitCursor)
-		RestoreCursorShape();
-
 	QPointF ptCurMousePos = pEvent->localPos();
 	HyEngine::Input().SetWidgetMousePos(glm::vec2(ptCurMousePos.x(), ptCurMousePos.y()));
-
-	if(m_eGuidePending != HYORIENT_Null && pDrawItem)
-		pDrawItem->SetPendingGuide(m_eGuidePending);
-	else if(pDrawItem)
-	{
-		// Check if mouse is over an existing guide
-		glm::vec2 ptWorldMousePos;
-		if(pDrawItem->GetGuideMap().empty() == false && HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
-		{
-			const int iSELECT_RADIUS = 2;
-			bool bIsHovering = false;
-			for(auto iter = pDrawItem->GetGuideMap().begin(); iter != pDrawItem->GetGuideMap().end(); ++iter)
-			{
-				int iWorldPos = iter.key().second;
-
-				if(iter.key().first == HYORIENT_Horizontal &&
-					ptWorldMousePos.y >= (iWorldPos - iSELECT_RADIUS) &&
-					ptWorldMousePos.y <= (iWorldPos + iSELECT_RADIUS))
-				{
-					SetCursorShape(Qt::SplitVCursor);
-					bIsHovering = true;
-				}
-				else if(iter.key().first == HYORIENT_Vertical &&
-					ptWorldMousePos.x >= (iWorldPos - iSELECT_RADIUS) &&
-					ptWorldMousePos.x <= (iWorldPos + iSELECT_RADIUS))
-				{
-					SetCursorShape(Qt::SplitHCursor);
-					bIsHovering = true;
-				}
-			}
-
-			if(bIsHovering == false)
-				RestoreCursorShape();
-		}
-	}
 
 	RefreshRulers();
 }
 
 void HarmonyWidget::OnRulerMousePressEvent(HyOrientation eOrientation, QMouseEvent *pEvent)
 {
-	if(pEvent->button() == Qt::LeftButton)
-	{
-		if(GetProject() == nullptr)
-			return;
+	if(GetProject() == nullptr)
+		return;
 
-		m_eGuidePending = eOrientation;
-		if(m_eGuidePending == HYORIENT_Horizontal)
-			SetCursorShape(Qt::SplitVCursor);
-		else
-			SetCursorShape(Qt::SplitHCursor);
-	}
-}
-
-void HarmonyWidget::OnWgtMousePressEvent(IDraw *pDrawItem, QMouseEvent *pEvent)
-{
-	// If hovering over an existing guide, then "select" it by removing it, and starting SetPendingGuide()
-	Qt::CursorShape eCurCursorShape = GetCursorShape();
-	glm::vec2 ptWorldMousePos;
 	if(pEvent->button() == Qt::LeftButton &&
-		pDrawItem &&
-		pDrawItem->GetGuideMap().empty() == false &&
-		HyEngine::Input().GetWorldMousePos(ptWorldMousePos) &&
-		(eCurCursorShape == Qt::SplitHCursor || eCurCursorShape == Qt::SplitVCursor))
+		GetWgtHarmony() &&
+		GetWgtHarmony()->GetProject() &&
+		GetWgtHarmony()->GetProject()->GetCurrentOpenItem() &&
+		GetWgtHarmony()->GetProject()->GetCurrentOpenItem()->GetDraw())
 	{
-		// Find closest existing guide
-		QPair<HyOrientation, int> closestGuideKey;
-		int iClosestDist = INT_MAX;
-		for(auto iter = pDrawItem->GetGuideMap().begin(); iter != pDrawItem->GetGuideMap().end(); ++iter)
-		{
-			if(eCurCursorShape == Qt::SplitVCursor && iter.key().first == HYORIENT_Horizontal)
-			{
-				int iDist = abs((int)ptWorldMousePos.y - iter.key().second);
-				if(iDist < iClosestDist)
-				{
-					iClosestDist = iDist;
-					closestGuideKey = iter.key();
-				}
-			}
-			else if(eCurCursorShape == Qt::SplitHCursor && iter.key().first == HYORIENT_Vertical)
-			{
-				int iDist = abs((int)ptWorldMousePos.x - iter.key().second);
-				if(iDist < iClosestDist)
-				{
-					iClosestDist = iDist;
-					closestGuideKey = iter.key();
-				}
-			}
-		}
-		if(iClosestDist == INT_MAX)
-			HyGuiLog("IDraw::OnMousePressEvent failed to find closest guide", LOGTYPE_Error);
-		else
-		{
-			m_eGuidePending = closestGuideKey.first;
-			m_iGuideOldMovePos = closestGuideKey.second;
+		IDraw *pDraw = GetWgtHarmony()->GetProject()->GetCurrentOpenItem()->GetDraw();
 
-			pDrawItem->DeleteGuide(closestGuideKey.first, closestGuideKey.second);
-		}
+		if(eOrientation == HYORIENT_Horizontal)
+			pDraw->SetAction(HYACTION_ManipGuideHorz);
+		else
+			pDraw->SetAction(HYACTION_ManipGuideVert);
 	}
 }
 
 void HarmonyWidget::OnRulerMouseReleaseEvent(HyOrientation eOrientation, QMouseEvent *pEvent)
 {
-	HyGuiLog("HarmonyWidget::OnRulerMouseReleaseEvent", LOGTYPE_Normal);
-
-	if(m_eGuidePending != HYORIENT_Null)
+	if(GetWgtHarmony() &&
+		GetWgtHarmony()->GetProject() &&
+		GetWgtHarmony()->GetProject()->GetCurrentOpenItem() &&
+		GetWgtHarmony()->GetProject()->GetCurrentOpenItem()->GetDraw())
 	{
-		if(m_eGuidePending != eOrientation)
-			HyGuiLog("HarmonyWidget::OnRulerMouseReleaseEvent - Wrong orientation set in m_eGuidePending", LOGTYPE_Error);
+		IDraw *pDraw = GetWgtHarmony()->GetProject()->GetCurrentOpenItem()->GetDraw();
 
-		if(GetWgtHarmony() &&
-			GetWgtHarmony()->GetProject() &&
-			GetWgtHarmony()->GetProject()->GetCurrentOpenItem())
+		if(pDraw->GetCurAction() == HYACTION_ManipGuideHorz || pDraw->GetCurAction() == HYACTION_ManipGuideVert)
 		{
-			ProjectItemData *pCurProjItem = GetWgtHarmony()->GetProject()->GetCurrentOpenItem();
+			if((pDraw->GetCurAction() == HYACTION_ManipGuideHorz && HYORIENT_Horizontal != eOrientation) ||
+				(pDraw->GetCurAction() == HYACTION_ManipGuideVert && HYORIENT_Vertical != eOrientation))
+			{
+				HyGuiLog("HarmonyWidget::OnRulerMouseReleaseEvent - Wrong orientation set in m_eGuidePending", LOGTYPE_Error);
+			}
 
 			glm::vec2 ptWorldPos;
 			if(HyEngine::Input().GetWorldMousePos(ptWorldPos))
 			{
 				int iPos = eOrientation == HYORIENT_Horizontal ? static_cast<int>(ptWorldPos.y) : static_cast<int>(ptWorldPos.x);
-				pCurProjItem->GetDraw()->TryAllocateGuide(eOrientation, iPos);
+				pDraw->TryAllocateGuide(eOrientation, iPos);
 			}
-			
-			pCurProjItem->GetDraw()->SetPendingGuide(HYORIENT_Null);
-		}
 
-		RestoreCursorShape();
-		m_eGuidePending = HYORIENT_Null;
+			pDraw->ClearAction();
+		}
 	}
 }
 
-void HarmonyWidget::OnWgtMouseReleaseEvent(IDraw *pDrawItem, QMouseEvent *pEvent)
+void HarmonyWidget::OnRefreshLoading()
 {
-	HyGuiLog("HarmonyWidget::OnWgtMouseReleaseEvent", LOGTYPE_Normal);
-
-	if(pDrawItem && m_eGuidePending != HYORIENT_Null)
+	QList<LoadingType> currentLoadingTypeList = MainWindow::GetCurrentLoading();
+	if(currentLoadingTypeList.empty() == false &&
+		GetWgtHarmony() &&
+		GetWgtHarmony()->GetProject() &&
+		GetWgtHarmony()->GetProject()->GetCurrentOpenItem() &&
+		GetWgtHarmony()->GetProject()->GetCurrentOpenItem()->GetDraw())
 	{
-		bool bMoveSuccessfull = false;
-
-		glm::vec2 ptWorldPos;
-		if(HyEngine::Input().GetWorldMousePos(ptWorldPos))
-		{
-			int iPos = m_eGuidePending == HYORIENT_Horizontal ? static_cast<int>(ptWorldPos.y) : static_cast<int>(ptWorldPos.x);
-			//b2AABB aabb;
-			//m_pCamera->CalcWorldViewBounds(aabb);
-			//if((eOrientation == HYORIENT_Horizontal && (iNewPos < aabb.lowerBound.y || iNewPos > aabb.upperBound.y)) ||
-			//	(eOrientation == HYORIENT_Vertical && (iNewPos < aabb.lowerBound.x || iNewPos > aabb.upperBound.x)))
-			//{
-			//	return false;
-			//}
-
-			UndoCmd_MoveGuide *pNewCmd = new UndoCmd_MoveGuide(*pDrawItem, m_eGuidePending, m_iGuideOldMovePos, iPos);
-			pDrawItem->GetProjItemData()->GetUndoStack()->push(pNewCmd);
-			bMoveSuccessfull = true;
-		}
-		if(bMoveSuccessfull == false)
-		{
-			UndoCmd_RemoveGuide *pNewCmd = new UndoCmd_RemoveGuide(*pDrawItem, m_eGuidePending, m_iGuideOldMovePos);
-			pDrawItem->GetProjItemData()->GetUndoStack()->push(pNewCmd);
-		}
-
-		pDrawItem->SetPendingGuide(HYORIENT_Null);
-		RestoreCursorShape();
-		m_eGuidePending = HYORIENT_Null;
+		IDraw *pDraw = GetWgtHarmony()->GetProject()->GetCurrentOpenItem()->GetDraw();
+	
+		if(currentLoadingTypeList.size() == 1 && currentLoadingTypeList.contains(LOADINGTYPE_HarmonyStreaming))
+			pDraw->SetAction(HYACTION_Streaming);
+		else
+			pDraw->SetAction(HYACTION_Wait);
 	}
 }
 

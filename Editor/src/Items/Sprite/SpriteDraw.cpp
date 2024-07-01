@@ -15,39 +15,71 @@
 
 #include <QKeyEvent>
 
-SpriteDraw::SpriteDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
-	IDraw(pProjItem, initFileDataRef)
+void SpriteDraw::SpriteDrawItem::OnApplyJsonData(HyJsonDoc &itemDataDocRef, bool bIsAnimPlaying)
 {
-	m_pSprite = new HySprite2d("", "+GuiPreview", this);
-	m_pSwapSprite = new HySprite2d("", "+GuiPreview", this);
+	if(m_pSwapSprite->AcquireData() != nullptr)
+	{
+		// Clear whatever anim ctrl was set since it will only set the proper attributes from GuiOverrideData, leaving stale flags behind
+		for(uint32 i = 0; i < m_pSwapSprite->GetNumStates(); ++i)
+		{
+			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_DontLoop, i);
+			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_DontBounce, i);
+			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_DontReverse, i);
+		}
+	}
+
+#undef GetObject
+	HyJsonObj itemDataObj = itemDataDocRef.GetObject();
+
+	m_pSwapSprite->GuiOverrideData<HySpriteData>(itemDataObj);
+	m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_Reset);
+
+	m_pSwapSprite->SetAnimPause(bIsAnimPlaying == false);
+	m_pSwapSprite->Load();
+
+	m_pSprite->Unload();
+	HySprite2d *pTmpSwap = m_pSprite;
+	m_pSprite = m_pSwapSprite;
+	m_pSwapSprite = pTmpSwap;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+SpriteDraw::SpriteDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
+	IDrawEx(pProjItem, initFileDataRef),
+	m_Sprite(this)
+{
+	m_ItemList.push_back(&m_Sprite);
 }
 
 /*virtual*/ SpriteDraw::~SpriteDraw()
 {
-	delete m_pSprite;
-	delete m_pSwapSprite;
 }
 
 void SpriteDraw::PlayAnim(quint32 uiFrameIndex)
 {
-	if(m_pSprite->IsAnimReverse())
-		m_pSprite->SetAnimCtrl(HYANIMCTRL_Reverse);
-	else
-		m_pSprite->SetAnimCtrl(HYANIMCTRL_DontReverse);
+	HySprite2d *pSprite = static_cast<HySprite2d *>(m_Sprite.GetHyNode());
 
-	m_pSprite->SetAnimCtrl(HYANIMCTRL_ResetAndPlay);
-	m_pSprite->SetFrame(uiFrameIndex);
+	if(pSprite->IsAnimReverse())
+		pSprite->SetAnimCtrl(HYANIMCTRL_Reverse);
+	else
+		pSprite->SetAnimCtrl(HYANIMCTRL_DontReverse);
+
+	pSprite->SetAnimCtrl(HYANIMCTRL_ResetAndPlay);
+	pSprite->SetFrame(uiFrameIndex);
 }
 
 void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 {
-	m_pSprite->SetState(uiStateIndex);
-	m_pSprite->SetFrame(uiFrameIndex);
+	HySprite2d *pSprite = static_cast<HySprite2d *>(m_Sprite.GetHyNode());
+
+	pSprite->SetState(uiStateIndex);
+	pSprite->SetFrame(uiFrameIndex);
 }
 
 /*virtual*/ void SpriteDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
 {
-	if(m_pSprite->IsAnimPaused())
+	if(static_cast<HySprite2d *>(m_Sprite.GetHyNode())->IsAnimPaused())
 	{
 		if(pEvent->key() == Qt::Key_Left)
 			m_vTranslateAmt.setX(m_vTranslateAmt.x() - 1);
@@ -59,7 +91,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 			m_vTranslateAmt.setY(m_vTranslateAmt.y() - 1);
 	}
 
-	IDraw::OnKeyPressEvent(pEvent);
+	IDrawEx::OnKeyPressEvent(pEvent);
 }
 
 /*virtual*/ void SpriteDraw::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/
@@ -78,56 +110,39 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 		m_vTranslateAmt.setY(0);
 	}
 
-	IDraw::OnKeyReleaseEvent(pEvent);
+	IDrawEx::OnKeyReleaseEvent(pEvent);
 }
 
 /*virtual*/ void SpriteDraw::OnMousePressEvent(QMouseEvent *pEvent) /*override*/
 {
-	IDraw::OnMousePressEvent(pEvent);
+	IDrawEx::OnMousePressEvent(pEvent);
 }
 
 /*virtual*/ void SpriteDraw::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
 {
-	IDraw::OnMouseReleaseEvent(pEvent);
+	IDrawEx::OnMouseReleaseEvent(pEvent);
 }
 
 /*virtual*/ void SpriteDraw::OnMouseWheelEvent(QWheelEvent *pEvent) /*override*/
 {
-	IDraw::OnMouseWheelEvent(pEvent);
+	IDrawEx::OnMouseWheelEvent(pEvent);
 }
 
 /*virtual*/ void SpriteDraw::OnMouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {
-	IDraw::OnMouseMoveEvent(pEvent);
+	IDrawEx::OnMouseMoveEvent(pEvent);
 }
 
 /*virtual*/ void SpriteDraw::OnApplyJsonData(HyJsonDoc &itemDataDocRef) /*override*/
 {
-	if(m_pSwapSprite->AcquireData() != nullptr)
+	SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
+	if(pWidget == nullptr)
 	{
-		// Clear whatever anim ctrl was set since it will only set the proper attributes from GuiOverrideData, leaving stale flags behind
-		for(uint32 i = 0; i < m_pSwapSprite->GetNumStates(); ++i)
-		{
-			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_DontLoop, i);
-			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_DontBounce, i);
-			m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_DontReverse, i);
-		}
+		HyGuiLog("SpriteDraw::OnApplyJsonData() - pWidget is nullptr", LOGTYPE_Error);
+		return;
 	}
 
-#undef GetObject
-	HyJsonObj itemDataObj = itemDataDocRef.GetObject();
-
-	m_pSwapSprite->GuiOverrideData<HySpriteData>(itemDataObj);
-	m_pSwapSprite->SetAnimCtrl(HYANIMCTRL_Reset);
-	
-	SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
-	m_pSwapSprite->SetAnimPause(pWidget->IsPlayingAnim() == false);
-	m_pSwapSprite->Load();
-
-	m_pSprite->Unload();
-	HySprite2d *pTmpSwap = m_pSprite;
-	m_pSprite = m_pSwapSprite;
-	m_pSwapSprite = pTmpSwap;
+	m_Sprite.OnApplyJsonData(itemDataDocRef, pWidget->IsPlayingAnim());
 }
 
 /*virtual*/ void SpriteDraw::OnResizeRenderer() /*override*/
@@ -136,21 +151,23 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnUpdate() /*override*/
 {
-	IDraw::OnUpdate();
+	IDrawEx::OnUpdate();
 
 	SpriteWidget *pWidget = static_cast<SpriteWidget *>(m_pProjItem->GetWidget());
 	if(pWidget == nullptr)
 		return;
-	
-	m_pSprite->SetAnimPause(pWidget->IsPlayingAnim() == false);
 
-	m_pSprite->pos.Set(m_vTranslateAmt.x(), m_vTranslateAmt.y());
+	HySprite2d *pSprite = static_cast<HySprite2d *>(m_Sprite.GetHyNode());
+	
+	pSprite->SetAnimPause(pWidget->IsPlayingAnim() == false);
+
+	pSprite->pos.Set(m_vTranslateAmt.x(), m_vTranslateAmt.y());
 
 	// NOTE: Data in sprite may be invalid/null because of GUI usage
-	if(m_pSprite->AcquireData() == nullptr)
+	if(pSprite->AcquireData() == nullptr)
 		return;
 	
-	if(m_pSprite->IsAnimPaused())
+	if(pSprite->IsAnimPaused())
 	{
 		int iStateIndex, iFrameIndex;
 		pWidget->GetSpriteInfo(iStateIndex, iFrameIndex);
@@ -161,16 +178,28 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 		if(iFrameIndex < 0)
 			iFrameIndex = 0;
 
-		m_pSprite->SetState(static_cast<uint32>(iStateIndex));
-		m_pSprite->SetFrame(static_cast<uint32>(iFrameIndex));
+		pSprite->SetState(static_cast<uint32>(iStateIndex));
+		pSprite->SetFrame(static_cast<uint32>(iFrameIndex));
 	}
 	else
 	{
-		pWidget->SetSelectedFrame(m_pSprite->GetFrame());
+		pWidget->SetSelectedFrame(pSprite->GetFrame());
 
-		if(m_pSprite->IsAnimFinished())
+		if(pSprite->IsAnimFinished())
 			pWidget->StopPlayingAnim();
 	}
 
-	UpdateDrawStatus(QString("[") % QString::number(m_pSprite->GetFrameWidth()) % " " % QString::number(m_pSprite->GetFrameHeight()) % "]");
+	UpdateDrawStatus(QString("[") % QString::number(pSprite->GetFrameWidth()) % " " % QString::number(pSprite->GetFrameHeight()) % "]");
+}
+
+/*virtual*/ void SpriteDraw::OnRequestSelection(QList<IDrawExItem *> selectionList) /*override*/
+{
+	m_Sprite.SetSelected(selectionList.contains(&m_Sprite));
+	m_SelectedItemList = selectionList;
+}
+
+/*virtual*/ void SpriteDraw::OnPerformTransform() /*override*/
+{
+	int i = 0;
+	i++;
 }

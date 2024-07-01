@@ -22,7 +22,6 @@ IDrawEx::IDrawEx(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef
 	m_pCurHoverItem(nullptr),
 	m_eCurHoverGrabPoint(TransformCtrl::GRAB_None),
 	m_bSelectionHandled(false),
-	m_eDragState(DRAGSTATE_None),
 	m_SnapGuideHorz(this),
 	m_SnapGuideVert(this)
 {
@@ -30,11 +29,8 @@ IDrawEx::IDrawEx(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef
 	m_PressTimer.SetExpiredCallback(
 		[this]()
 		{
-			if(m_eDragState == DRAGSTATE_Marquee)
-				return;
-
-			if(/*m_eShapeEditState == SHAPESTATE_None &&*/ m_eDragState == DRAGSTATE_Pending)
-				BeginTransform(true);
+			if(GetCurAction() == HYACTION_Pending)
+				BeginTransform();
 		});
 
 	m_SnapGuideHorz.SetVisible(false);
@@ -78,7 +74,8 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 		pEvent->key() == Qt::Key_Up ||
 		pEvent->key() == Qt::Key_Down)
 	{
-		BeginTransform(false);
+		BeginTransform();
+		SetAction(HYACTION_TransformingNudging);
 
 		if(pEvent->key() == Qt::Key_Left)
 			m_vNudgeTranslate.setX(m_vNudgeTranslate.x() - 1);
@@ -100,21 +97,18 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 
 	if(IsCameraPanning())
 		RefreshTransforms();
-	else
-	{
-		if(pEvent->key() == Qt::Key_Control || pEvent->key() == Qt::Key_Shift)
-			DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
-	}
+
+	if(pEvent->key() == Qt::Key_Control || pEvent->key() == Qt::Key_Shift)
+		DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 
 	if(pEvent->isAutoRepeat() == false &&
 		(pEvent->key() == Qt::Key_Left ||
-			pEvent->key() == Qt::Key_Right ||
-			pEvent->key() == Qt::Key_Up ||
-			pEvent->key() == Qt::Key_Down))
+		 pEvent->key() == Qt::Key_Right ||
+		 pEvent->key() == Qt::Key_Up ||
+		 pEvent->key() == Qt::Key_Down))
 	{
 		// We can reuse 'DoMouseRelease_Transform' to submit the nudging transform (via undo/redo cmd), while also resetting/cleaning up the state
 		DoMouseRelease_Transform();
-		m_eDragState = DRAGSTATE_None;
 	}
 }
 
@@ -129,54 +123,127 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 
 	if(IsCameraPanning())
 		RefreshTransforms();
-	else if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() != Qt::WaitCursor)
-		DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+
+	DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 }
 
 /*virtual*/ void IDrawEx::OnMousePressEvent(QMouseEvent *pEvent) /*override*/
 {
 	IDraw::OnMousePressEvent(pEvent);
 
-	Qt::CursorShape eCursorShape = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape();
-
 	if(IsCameraPanning())
 		RefreshTransforms();
-	else if(pEvent->button() == Qt::LeftButton &&
-			eCursorShape != Qt::WaitCursor &&
-			eCursorShape != Qt::SplitHCursor &&
-			eCursorShape != Qt::SplitVCursor &&
-			m_eDragState == DRAGSTATE_None)
+
+	if(pEvent->button() == Qt::LeftButton)
 	{
-		DoMousePress_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+		if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
+			HyGuiLog("EntityDraw::DoMousePress - GetWorldMousePos failed", LOGTYPE_Error);
+
+		if(m_eCurHoverGrabPoint != TransformCtrl::GRAB_None)
+			BeginTransform();
+		else
+		{
+			// Check if the click position (m_ptDragStart) is over an item
+			if((m_MultiTransform.IsShown() && m_MultiTransform.IsMouseOverBoundingVolume()) == false &&
+				m_pCurHoverItem == nullptr)
+			{
+				SetAction(HYACTION_Marquee);
+			}
+			else
+			{
+				m_PressTimer.InitStart(0.5f);
+
+				// Select the hover item if it's not apart of the selection
+				if(m_SelectedItemList.contains(m_pCurHoverItem) == false)
+				{
+					// Special Case: Allow user to optionally translate selected item(s) if possible - meaning the mouse is ALSO hovering the selected item(s)
+					//               Therefore, don't decide to make selection until the is mouse button release
+					bool bSpecialCase = m_MultiTransform.IsShown() && m_MultiTransform.IsMouseOverBoundingVolume();
+					for(IDrawExItem *pSelectedItem : m_SelectedItemList)
+					{
+						if(pSelectedItem->IsMouseInBounds())
+						{
+							bSpecialCase = true;
+							break;
+						}
+					}
+
+					if(bSpecialCase == false)
+					{
+						QList<IDrawExItem *> selectList;
+						selectList << m_pCurHoverItem;
+
+						if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
+							selectList += m_SelectedItemList;
+
+						OnRequestSelection(selectList);
+						m_bSelectionHandled = true;
+					}
+				}
+
+				SetAction(HYACTION_Pending);
+			}
+		}
 	}
 }
 
 /*virtual*/ void IDrawEx::OnMouseReleaseEvent(QMouseEvent *pEvent) /*override*/
 {
-	Qt::CursorShape eCursorShape = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape();
+	IDraw::OnMouseReleaseEvent(pEvent);
 
-	if(IsCameraPanning())
-		IDraw::OnMouseReleaseEvent(pEvent);
-	else if(eCursorShape != Qt::WaitCursor &&
-		eCursorShape != Qt::SplitHCursor &&
-		eCursorShape != Qt::SplitVCursor)
+	if(pEvent->button() == Qt::LeftButton)
 	{
-		IDraw::OnMouseReleaseEvent(pEvent);
-
-		if(pEvent->button() == Qt::LeftButton)
+		if(GetCurAction() == HYACTION_Marquee || GetCurAction() == HYACTION_Pending)
 		{
-			if(m_eDragState == DRAGSTATE_None ||
-				m_eDragState == DRAGSTATE_Marquee ||
-				m_eDragState == DRAGSTATE_Pending)
-			{
-				DoMouseRelease_Select(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
-			}
-			else // DRAGSTATE_Transforming or DRAGSTATE_Nudging
-				DoMouseRelease_Transform();
-		}
-	}
+			m_PressTimer.Reset();
 
-	m_eDragState = DRAGSTATE_None;
+			QList<IDrawExItem *> affectedItemList;	// Items that are getting selected or deselected
+			if(GetCurAction() == HYACTION_Marquee)
+			{
+				b2AABB marqueeAabb;
+				HyShape2d tmpShape;
+				m_DragShape.GetPrimitive().CalcLocalBoundingShape(tmpShape);
+				tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
+
+				for(IDrawExItem *pItem : m_ItemList)
+				{
+					if(pItem->GetTransformCtrl().IsContained(marqueeAabb, m_pCamera))
+						affectedItemList << pItem;
+				}
+
+				m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+			}
+			else if(m_pCurHoverItem) // This covers the resolution of "Special Case" in DoMousePress
+				affectedItemList << m_pCurHoverItem;
+
+			if(m_bSelectionHandled == false)
+			{
+				if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier) == false)
+					OnRequestSelection(affectedItemList);
+				else
+				{
+					QList<IDrawExItem *> selectList = m_SelectedItemList;
+
+					for(IDrawExItem *pAffectedItem : affectedItemList)
+					{
+						if(m_SelectedItemList.contains(pAffectedItem))
+							selectList.removeOne(pAffectedItem);
+						else
+							selectList.append(pAffectedItem);
+					}
+
+					OnRequestSelection(selectList);
+				}
+			}
+
+			// Reset
+			m_bSelectionHandled = false;
+			ClearAction();
+		}
+		else if(IsActionTransforming())
+			DoMouseRelease_Transform();
+	}
+	
 	RefreshTransforms();
 }
 
@@ -191,15 +258,12 @@ void IDrawEx::RefreshTransforms()
 			m_MultiTransform.rot.Set(0.0f);
 			m_MultiTransform.WrapTo(m_SelectedItemList, m_pCamera);
 		}
-		else
+		else if(IsActionTransforming())
 		{
-			if(m_eDragState == DRAGSTATE_Transforming || m_eDragState == DRAGSTATE_Nudging)
-			{
-				glm::vec2 ptCenterPivot;
-				m_MultiTransform.GetCentroid(ptCenterPivot);
-				m_MultiTransform.rot_pivot.Set(ptCenterPivot);
-				m_MultiTransform.rot.Set(m_fMultiTransformStartRot + m_ActiveTransform.rot.Get());
-			}
+			glm::vec2 ptCenterPivot;
+			m_MultiTransform.GetCentroid(ptCenterPivot);
+			m_MultiTransform.rot_pivot.Set(ptCenterPivot);
+			m_MultiTransform.rot.Set(m_fMultiTransformStartRot + m_ActiveTransform.rot.Get());
 		}
 	}
 	else
@@ -219,7 +283,58 @@ void IDrawEx::RefreshTransforms()
 	RefreshTransforms();
 }
 
-Qt::CursorShape IDrawEx::GetGrabPointCursorShape(TransformCtrl::GrabPointType eGrabPoint, float fRotation) const
+void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
+{
+	if(GetCurAction() == HYACTION_Marquee)
+	{
+		glm::vec2 ptCurMousePos;
+		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
+
+		m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
+		m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptCurMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
+	}
+	else if(GetCurAction() == HYACTION_Pending)
+	{
+		glm::vec2 ptCurMousePos;
+		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
+		if(glm::distance(m_ptDragStart, ptCurMousePos) >= 2.0f)
+			BeginTransform();
+	}
+	else if(IsActionTransforming())
+	{
+		if(GetCurAction() != HYACTION_TransformingNudging)
+			DoMouseMove_Transform(bCtrlMod, bShiftMod);
+	}
+	else
+	{
+		m_pCurHoverItem = nullptr;
+		for(int32 i = m_ItemList.size() - 1; i >= 0; --i) // iterate backwards to prioritize selecting items with higher display order
+		{
+			if(m_ItemList[i]->IsMouseInBounds())
+			{
+				m_pCurHoverItem = m_ItemList[i];
+				break;
+			}
+		}
+		m_eCurHoverGrabPoint = TransformCtrl::GRAB_None;
+
+		if(m_MultiTransform.IsShown())
+		{
+			m_eCurHoverGrabPoint = m_MultiTransform.IsMouseOverGrabPoint();
+			SetTransformHoverActionViaGrabPoint(m_eCurHoverGrabPoint, m_MultiTransform.GetCachedRotation());
+		}
+
+		if(m_SelectedItemList.size() == 1)
+		{
+			TransformCtrl &transformCtrlRef = m_SelectedItemList[0]->GetTransformCtrl();
+			m_eCurHoverGrabPoint = transformCtrlRef.IsMouseOverGrabPoint();
+			if(SetTransformHoverActionViaGrabPoint(m_eCurHoverGrabPoint, transformCtrlRef.GetCachedRotation()))
+				m_pCurHoverItem = m_SelectedItemList[0]; // Override whatever might be above this item, because we're hovering over a grab point
+		}
+	}
+}
+
+bool IDrawEx::SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType eGrabPoint, float fRotation)
 {
 	fRotation = HyMath::NormalizeRange(fRotation, 0.0f, 360.0f);
 
@@ -257,221 +372,89 @@ Qt::CursorShape IDrawEx::GetGrabPointCursorShape(TransformCtrl::GrabPointType eG
 	{
 	default:
 	case TransformCtrl::GRAB_None:
-		return Qt::ArrowCursor;
+		return false;
 
 	case TransformCtrl::GRAB_BotLeft:
-		return fpRotateCursor(Qt::SizeBDiagCursor, iThresholds);
+		if(m_eDrawAction <= HYACTION_HoverScale)
+		{
+			m_eDrawAction = HYACTION_HoverScale;
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(fpRotateCursor(Qt::SizeBDiagCursor, iThresholds));
+			return true;
+		}
+		break;
 	case TransformCtrl::GRAB_BotRight:
-		return fpRotateCursor(Qt::SizeFDiagCursor, iThresholds);
+		if(m_eDrawAction <= HYACTION_HoverScale)
+		{
+			m_eDrawAction = HYACTION_HoverScale;
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(fpRotateCursor(Qt::SizeFDiagCursor, iThresholds));
+			return true;
+		}
+		break;
 	case TransformCtrl::GRAB_TopRight:
-		return fpRotateCursor(Qt::SizeBDiagCursor, iThresholds);
+		if(m_eDrawAction <= HYACTION_HoverScale)
+		{
+			m_eDrawAction = HYACTION_HoverScale;
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(fpRotateCursor(Qt::SizeBDiagCursor, iThresholds));
+			return true;
+		}
+		break;
 	case TransformCtrl::GRAB_TopLeft:
-		return fpRotateCursor(Qt::SizeFDiagCursor, iThresholds);
+		if(m_eDrawAction <= HYACTION_HoverScale)
+		{
+			m_eDrawAction = HYACTION_HoverScale;
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(fpRotateCursor(Qt::SizeFDiagCursor, iThresholds));
+			return true;
+		}
+		break;
 	case TransformCtrl::GRAB_BotMid:
-		return fpRotateCursor(Qt::SizeVerCursor, iThresholds);
+		if(m_eDrawAction <= HYACTION_HoverScale)
+		{
+			m_eDrawAction = HYACTION_HoverScale;
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(fpRotateCursor(Qt::SizeVerCursor, iThresholds));
+			return true;
+		}
+		break;
 	case TransformCtrl::GRAB_MidRight:
-		return fpRotateCursor(Qt::SizeHorCursor, iThresholds);
+		if(m_eDrawAction <= HYACTION_HoverScale)
+		{
+			m_eDrawAction = HYACTION_HoverScale;
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(fpRotateCursor(Qt::SizeHorCursor, iThresholds));
+			return true;
+		}
+		break;
 	case TransformCtrl::GRAB_TopMid:
-		return fpRotateCursor(Qt::SizeVerCursor, iThresholds);
+		if(m_eDrawAction <= HYACTION_HoverScale)
+		{
+			m_eDrawAction = HYACTION_HoverScale;
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(fpRotateCursor(Qt::SizeVerCursor, iThresholds));
+			return true;
+		}
+		break;
 	case TransformCtrl::GRAB_MidLeft:
-		return fpRotateCursor(Qt::SizeHorCursor, iThresholds);
+		if(m_eDrawAction <= HYACTION_HoverScale)
+		{
+			m_eDrawAction = HYACTION_HoverScale;
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(fpRotateCursor(Qt::SizeHorCursor, iThresholds));
+			return true;
+		}
+		break;
 	case TransformCtrl::GRAB_Rotate:
-		return Qt::OpenHandCursor;
+		return SetAction(HYACTION_HoverRotate);
 	}
+
+	return false;
 }
 
-void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
+void IDrawEx::BeginTransform()
 {
-	if(m_eDragState == DRAGSTATE_None ||
-		m_eDragState == DRAGSTATE_Marquee ||
-		m_eDragState == DRAGSTATE_Pending)
-	{
-		DoMouseMove_Select(bCtrlMod, bShiftMod);
-	}
-	else if(m_eDragState == DRAGSTATE_Transforming)
-		DoMouseMove_Transform(bCtrlMod, bShiftMod);
-}
-
-void IDrawEx::DoMouseMove_Select(bool bCtrlMod, bool bShiftMod)
-{
-	if(m_eDragState == DRAGSTATE_Marquee)
-	{
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::CrossCursor);
-
-		glm::vec2 ptCurMousePos;
-		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
-
-		m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
-		m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptCurMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
-	}
-	else if(m_eDragState == DRAGSTATE_Pending)
-	{
-		glm::vec2 ptCurMousePos;
-		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
-		if(glm::distance(m_ptDragStart, ptCurMousePos) >= 2.0f)
-			BeginTransform(true);
-	}
-	else // 'm_eDragState' is DRAGSTATE_None
-	{
-		Qt::CursorShape eCurCursorShape = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape();
-		if(eCurCursorShape != Qt::WaitCursor && eCurCursorShape != Qt::SplitHCursor && eCurCursorShape != Qt::SplitVCursor)
-			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
-
-		m_pCurHoverItem = nullptr;
-		for(int32 i = m_ItemList.size() - 1; i >= 0; --i) // iterate backwards to prioritize selecting items with higher display order
-		{
-			if(m_ItemList[i]->IsMouseInBounds())
-			{
-				m_pCurHoverItem = m_ItemList[i];
-				break;
-			}
-		}
-		m_eCurHoverGrabPoint = TransformCtrl::GRAB_None;
-
-		if(m_MultiTransform.IsShown())
-		{
-			m_eCurHoverGrabPoint = m_MultiTransform.IsMouseOverGrabPoint();
-			Qt::CursorShape eNextCursorShape = GetGrabPointCursorShape(m_eCurHoverGrabPoint, m_MultiTransform.GetCachedRotation());
-
-			if(eNextCursorShape != Qt::ArrowCursor ||
-				(eCurCursorShape != Qt::WaitCursor && eCurCursorShape != Qt::SplitHCursor && eCurCursorShape != Qt::SplitVCursor))
-			{
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(eNextCursorShape);
-			}
-		}
-
-		if(m_SelectedItemList.size() == 1)
-		{
-			TransformCtrl &transformCtrlRef = m_SelectedItemList[0]->GetTransformCtrl();
-
-			m_eCurHoverGrabPoint = transformCtrlRef.IsMouseOverGrabPoint();
-			Qt::CursorShape eNextCursorShape = GetGrabPointCursorShape(m_eCurHoverGrabPoint, transformCtrlRef.GetCachedRotation());
-
-			if(eNextCursorShape != Qt::ArrowCursor)
-				m_pCurHoverItem = m_SelectedItemList[0]; // Override whatever might be above this item, because we're hovering over a grab point
-
-			if(eNextCursorShape != Qt::ArrowCursor ||
-				(eCurCursorShape != Qt::WaitCursor && eCurCursorShape != Qt::SplitHCursor && eCurCursorShape != Qt::SplitVCursor))
-			{
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(eNextCursorShape);
-			}
-		}
-	}
-}
-
-void IDrawEx::DoMousePress_Select(bool bCtrlMod, bool bShiftMod)
-{
-	if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() == Qt::OpenHandCursor)
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ClosedHandCursor);
-
-	if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
-		HyGuiLog("EntityDraw::DoMousePress - GetWorldMousePos failed", LOGTYPE_Error);
-
-	if(m_eCurHoverGrabPoint != TransformCtrl::GRAB_None)
-		BeginTransform(true);
-	else
-	{
-		// Check if the click position (m_ptDragStart) is over an item
-		if((m_MultiTransform.IsShown() && m_MultiTransform.IsMouseOverBoundingVolume()) == false &&
-			m_pCurHoverItem == nullptr)
-		{
-			m_eDragState = DRAGSTATE_Marquee;
-		}
-		else
-		{
-			m_PressTimer.InitStart(0.5f);
-
-			// Select the hover item if it's not apart of the selection
-			if(m_SelectedItemList.contains(m_pCurHoverItem) == false)
-			{
-				// Special Case: Allow user to optionally translate selected item(s) if possible - meaning the mouse is ALSO hovering the selected item(s)
-				//               Therefore, don't decide to make selection until the is mouse button release
-				bool bSpecialCase = m_MultiTransform.IsShown() && m_MultiTransform.IsMouseOverBoundingVolume();
-				for(IDrawExItem *pSelectedItem : m_SelectedItemList)
-				{
-					if(pSelectedItem->IsMouseInBounds())
-					{
-						bSpecialCase = true;
-						break;
-					}
-				}
-
-				if(bSpecialCase == false)
-				{
-					QList<IDrawExItem *> selectList;
-					selectList << m_pCurHoverItem;
-
-					if(bShiftMod)
-						selectList += m_SelectedItemList;
-
-					OnRequestSelection(selectList);
-					m_bSelectionHandled = true;
-				}
-			}
-
-			m_eDragState = DRAGSTATE_Pending;
-		}
-	}
-}
-
-void IDrawEx::DoMouseRelease_Select(bool bCtrlMod, bool bShiftMod)
-{
-	m_PressTimer.Reset();
-
-	QList<IDrawExItem *> affectedItemList;	// Items that are getting selected or deselected
-	if(m_eDragState == DRAGSTATE_Marquee)
-	{
-		b2AABB marqueeAabb;
-		HyShape2d tmpShape;
-		m_DragShape.GetPrimitive().CalcLocalBoundingShape(tmpShape);
-		tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
-
-		for(IDrawExItem *pItem : m_ItemList)
-		{
-			if(pItem->GetTransformCtrl().IsContained(marqueeAabb, m_pCamera))
-				affectedItemList << pItem;
-		}
-
-		m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
-	}
-	else if(m_pCurHoverItem) // This covers the resolution of "Special Case" in EntityDraw::DoMousePress_Select
-		affectedItemList << m_pCurHoverItem;
-
-	if(m_bSelectionHandled == false)
-	{
-		if(bShiftMod == false)
-			OnRequestSelection(affectedItemList);
-		else
-		{
-			QList<IDrawExItem *> selectList = m_SelectedItemList;
-
-			for(IDrawExItem *pAffectedItem : affectedItemList)
-			{
-				if(m_SelectedItemList.contains(pAffectedItem))
-					selectList.removeOne(pAffectedItem);
-				else
-					selectList.append(pAffectedItem);
-			}
-
-			OnRequestSelection(selectList);
-		}
-	}
-
-	// Reset
-	m_bSelectionHandled = false;
-	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
-}
-
-void IDrawEx::BeginTransform(bool bWithMouse)
-{
-	if(m_eDragState == DRAGSTATE_Transforming || m_eDragState == DRAGSTATE_Nudging)
+	if(IsActionTransforming())
 		return;
 
 	TransformCtrl *pCurTransform = nullptr;
 	if(m_MultiTransform.IsShown())
 		pCurTransform = &m_MultiTransform;
-	else// if(m_pCurHoverItem)
-		pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl(); // &m_pCurHoverItem->GetTransformCtrl();
+	else
+		pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
 
 	if(pCurTransform)
 	{
@@ -502,17 +485,12 @@ void IDrawEx::BeginTransform(bool bWithMouse)
 
 	m_fMultiTransformStartRot = m_MultiTransform.rot.Get();
 
-	if(bWithMouse)
-	{
-		// The mouse cursor must be set when transforming - it is used to determine the type of transform
-		// If it isn't set, then it must be translating (it isn't from GetGrabPointCursorShape())
-		if(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape() == Qt::ArrowCursor)
-			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::SizeAllCursor);
-
-		m_eDragState = DRAGSTATE_Transforming;
-	}
+	if(GetCurAction() == HYACTION_HoverScale)
+		SetAction(HYACTION_TransformingScale);
+	else if(GetCurAction() == HYACTION_HoverRotate)
+		SetAction(HYACTION_TransformingRotation);
 	else
-		m_eDragState = DRAGSTATE_Nudging;
+		SetAction(HYACTION_TransformingTranslate);
 }
 
 void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
@@ -572,10 +550,10 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		}
 	}
 
-	// The mouse cursor must be set when transforming - it is used to determine the type of transform
-	switch(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape())
+	// Process the transform
+	switch(GetCurAction())
 	{
-	case Qt::ClosedHandCursor: // Rotating
+	case HYACTION_TransformingRotation:
 		m_ActiveTransform.rot_pivot.Set(m_ptDragCenter);
 		if(bShiftMod)
 		{
@@ -590,7 +568,7 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 			m_ActiveTransform.rot.Set(HyMath::Round(HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart)));
 		break;
 
-	case Qt::SizeAllCursor:		// Translating
+	case HYACTION_TransformingTranslate:
 		if(bShiftMod)
 		{
 			glm::vec2 ptTarget = ptMousePos;
@@ -715,10 +693,7 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		}
 		break;
 
-	case Qt::SizeBDiagCursor:	// Scaling
-	case Qt::SizeVerCursor:		// Scaling
-	case Qt::SizeFDiagCursor:	// Scaling
-	case Qt::SizeHorCursor: {	// Scaling
+	case HYACTION_TransformingScale: {
 		bool bUniformScale = true;
 		TransformCtrl::GrabPointType eAnchorPoint = TransformCtrl::GRAB_None;
 		TransformCtrl::GrabPointType eAnchorWidth = TransformCtrl::GRAB_None;
@@ -838,15 +813,9 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 
 		break; }
 
-	case Qt::ArrowCursor:
-	case Qt::WaitCursor:
-	case Qt::SplitHCursor: // placing Guide
-	case Qt::SplitVCursor: // placing Guide
-		m_eDragState = DRAGSTATE_None;
-		break;
-
 	default:
-		HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown cursor state not handled: " % QString::number(Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetCursorShape()), LOGTYPE_Error);
+		HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown transform state not handled: " % QString::number(GetCurAction()), LOGTYPE_Error);
+		break;
 	}
 
 	RefreshTransforms();
@@ -867,5 +836,5 @@ void IDrawEx::DoMouseRelease_Transform()
 	m_SnapGuideHorz.SetVisible(false);
 	m_SnapGuideVert.SetVisible(false);
 
-	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->SetCursorShape(Qt::ArrowCursor);
+	ClearAction();
 }

@@ -19,6 +19,7 @@
 #include "DlgNewPackage.h"
 #include "DlgInputName.h"
 #include "DlgProjectSettings.h"
+#include "DlgSnappingSettings.h"
 #include "ExplorerWidget.h"
 #include "AudioAssetsWidget.h"
 #include "ManagerWidget.h"
@@ -570,71 +571,75 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 void MainWindow::RefreshLoading()
 {
-	if(sm_pInstance->m_LoadingMap.empty() == false)
+	if(m_LoadingMap.empty() == false)
 	{
 		int iSumOfLoadedBlocks = 0;
 		int iSumOfTotalBlocks = 0;
-		for(LoadingType eCurLoadingType : sm_pInstance->m_LoadingMap.keys())
+		for(LoadingType eCurLoadingType : m_LoadingMap.keys())
 		{
-			QPair<int, int> &curPair = sm_pInstance->m_LoadingMap[eCurLoadingType];
+			QPair<int, int> &curPair = m_LoadingMap[eCurLoadingType];
 			iSumOfLoadedBlocks += curPair.first;
 			iSumOfTotalBlocks += curPair.second;
 		}
 
 		bool bLockUI = true;
 
-		if(sm_pInstance->m_LoadingMap.size() > 1)
-			sm_pInstance->m_LoadingMsg.setText("Multi-Processing");
+		if(m_LoadingMap.size() > 1)
+			m_LoadingMsg.setText("Multi-Processing");
 		else
 		{
-			switch(sm_pInstance->m_LoadingMap.firstKey())
+			switch(m_LoadingMap.firstKey())
 			{
-			case LOADINGTYPE_Project:			sm_pInstance->m_LoadingMsg.setText(iSumOfTotalBlocks == 0 ? "Loading Project" : "Version Patcher"); break;
-			case LOADINGTYPE_ImportAssets:		sm_pInstance->m_LoadingMsg.setText(iSumOfTotalBlocks == 0 ? "Validating Assets" : "Importing Assets"); break;
-			case LOADINGTYPE_AtlasManager:		sm_pInstance->m_LoadingMsg.setText(iSumOfTotalBlocks == 0 ? "Repacking Atlases" : "Constructing Atlas Textures"); break;
-			case LOADINGTYPE_AudioManager:		sm_pInstance->m_LoadingMsg.setText("Constructing Audio Banks"); break;
-			case LOADINGTYPE_ReloadHarmony:		sm_pInstance->m_LoadingMsg.setText("Reloading Harmony"); break;
-			case LOADINGTYPE_HarmonyStreaming:	sm_pInstance->m_LoadingMsg.setText("Harmony Streaming"); bLockUI = false; break;
+			case LOADINGTYPE_Project:			m_LoadingMsg.setText(iSumOfTotalBlocks == 0 ? "Loading Project" : "Version Patcher"); break;
+			case LOADINGTYPE_ImportAssets:		m_LoadingMsg.setText(iSumOfTotalBlocks == 0 ? "Validating Assets" : "Importing Assets"); break;
+			case LOADINGTYPE_AtlasManager:		m_LoadingMsg.setText(iSumOfTotalBlocks == 0 ? "Repacking Atlases" : "Constructing Atlas Textures"); break;
+			case LOADINGTYPE_AudioManager:		m_LoadingMsg.setText("Constructing Audio Banks"); break;
+			case LOADINGTYPE_ReloadHarmony:		m_LoadingMsg.setText("Reloading Harmony"); break;
+			case LOADINGTYPE_HarmonyStreaming:	m_LoadingMsg.setText("Harmony Streaming"); bLockUI = false; break;
 
 			default:
-				HyGuiLog("MainWindow::SetLoading() - Unhandled LoadingType: " % QString::number(sm_pInstance->m_LoadingMap.firstKey()), LOGTYPE_Error);
+				HyGuiLog("MainWindow::SetLoading() - Unhandled LoadingType: " % QString::number(m_LoadingMap.firstKey()), LOGTYPE_Error);
 				break;
 			}
 		}
 
-		sm_pInstance->m_LoadingBar.setRange(0, iSumOfTotalBlocks);
-		sm_pInstance->m_LoadingBar.setValue(iSumOfLoadedBlocks);
+		m_LoadingBar.setRange(0, iSumOfTotalBlocks);
+		m_LoadingBar.setValue(iSumOfLoadedBlocks);
 		
-		sm_pInstance->statusBar()->addWidget(&m_LoadingMsg);
-		sm_pInstance->statusBar()->addWidget(&m_LoadingBar);
+		statusBar()->addWidget(&m_LoadingMsg);
+		statusBar()->addWidget(&m_LoadingBar);
 		m_LoadingMsg.show();
 		m_LoadingBar.show();
 
 		if(bLockUI)
 		{
 			// Start spinners and disable UI
-			for(int i = 0; i < sm_pInstance->m_LoadingSpinnerList.size(); ++i)
+			for(int i = 0; i < m_LoadingSpinnerList.size(); ++i)
 			{
-				if(sm_pInstance->m_LoadingSpinnerList[i]->isSpinning() == false)
-					sm_pInstance->m_LoadingSpinnerList[i]->start();
+				if(m_LoadingSpinnerList[i]->isSpinning() == false)
+					m_LoadingSpinnerList[i]->start();
 			}
-			sm_pInstance->ui->mainToolBar->setEnabled(false);
-			sm_pInstance->ui->menuBar->setEnabled(false);
+			ui->mainToolBar->setEnabled(false);
+			ui->menuBar->setEnabled(false);
 		}
 	}
 	else // Loading Complete
 	{
-		sm_pInstance->statusBar()->showMessage("Loading Complete", 2000);
+		statusBar()->showMessage("Loading Complete", 2000);
 
 		// Stop spinners and enable UI
-		sm_pInstance->statusBar()->removeWidget(&m_LoadingMsg);
-		sm_pInstance->statusBar()->removeWidget(&m_LoadingBar);
-		for(int i = 0; i < sm_pInstance->m_LoadingSpinnerList.size(); ++i)
-			sm_pInstance->m_LoadingSpinnerList[i]->stop();
+		statusBar()->removeWidget(&m_LoadingMsg);
+		statusBar()->removeWidget(&m_LoadingBar);
+		for(int i = 0; i < m_LoadingSpinnerList.size(); ++i)
+			m_LoadingSpinnerList[i]->stop();
 
-		sm_pInstance->ui->mainToolBar->setEnabled(true);
-		sm_pInstance->ui->menuBar->setEnabled(true);
+		ui->mainToolBar->setEnabled(true);
+		ui->menuBar->setEnabled(true);
 	}
+
+	Project *pCurProject = Harmony::GetProject();
+	if(pCurProject)
+		m_Harmony.GetHarmonyWidget(pCurProject)->OnRefreshLoading();
 }
 
 void MainWindow::OnCtrlTab()
@@ -918,6 +923,20 @@ void MainWindow::on_actionShowGridOverlay_triggered()
 {
 	if(Harmony::GetProject())
 		Harmony::GetProject()->ShowGridOverlay(ui->actionShowGridOverlay->isChecked());
+}
+
+void MainWindow::on_actionSnappingSettings_triggered()
+{
+	Project *pCurProject = Harmony::GetProject();
+	if(pCurProject == nullptr)
+		return;
+
+	DlgSnappingSettings *pNewDlg = new DlgSnappingSettings(pCurProject->GetSnappingSettings(), this);
+
+	if(pNewDlg->exec() == QDialog::Accepted)
+		pCurProject->SetSnappingSettings(pNewDlg->GetSnappingSettings(), true);
+
+	delete pNewDlg;
 }
 
 void MainWindow::on_actionBuildSettings_triggered()
