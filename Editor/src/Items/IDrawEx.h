@@ -21,7 +21,7 @@
 class IDrawEx : public IDraw
 {
 protected:
-	QList<IDrawExItem *>					m_ItemList;
+	QList<IDrawExItem *>					m_ItemList;			// Items MUST be dynamically allocated
 	QList<IDrawExItem *>					m_SelectedItemList;
 
 	ShapeCtrl								m_DragShape;		// Used for marquee selects and initially adding new shapes

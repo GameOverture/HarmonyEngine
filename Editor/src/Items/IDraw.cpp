@@ -328,6 +328,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 	if(m_GuideMap.empty() == false && HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
 	{
 		const int iSELECT_RADIUS = 2;
+		bool bIsOverGuide = false;
 		for(auto iter = m_GuideMap.begin(); iter != m_GuideMap.end(); ++iter)
 		{
 			int iWorldPos = iter.key().second;
@@ -337,14 +338,19 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 				ptWorldMousePos.y <= (iWorldPos + iSELECT_RADIUS))
 			{
 				SetAction(HYACTION_HoverGuideHorz);
+				bIsOverGuide = true;
 			}
 			else if(iter.key().first == HYORIENT_Vertical &&
 				ptWorldMousePos.x >= (iWorldPos - iSELECT_RADIUS) &&
 				ptWorldMousePos.x <= (iWorldPos + iSELECT_RADIUS))
 			{
 				SetAction(HYACTION_HoverGuideVert);
+				bIsOverGuide = true;
 			}
 		}
+
+		if(bIsOverGuide == false && (GetCurAction() == HYACTION_HoverGuideHorz || GetCurAction() == HYACTION_HoverGuideVert))
+			ClearAction();
 	}
 
 	UpdateDrawStatus(m_sSizeStatus);

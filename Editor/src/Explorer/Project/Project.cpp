@@ -1106,9 +1106,6 @@ void Project::OpenTab(ProjectItemData *pItem)
 
 void Project::CloseTab(ProjectItemData *pItem)
 {
-	pItem->WidgetUnload();
-	pItem->DrawUnload();
-
 	if(pItem == m_pCurOpenItem)
 		m_pCurOpenItem = nullptr;
 
@@ -1120,6 +1117,9 @@ void Project::CloseTab(ProjectItemData *pItem)
 			break;
 		}
 	}
+
+	pItem->WidgetUnload();
+	pItem->DrawUnload();
 }
 
 bool Project::CloseAllTabs()

@@ -50,7 +50,7 @@ class SpriteDraw : public IDrawEx
 
 		void OnApplyJsonData(HyJsonDoc &itemDataDocRef, bool bIsAnimPlaying);
 	};
-	SpriteDrawItem			m_Sprite;
+	SpriteDrawItem *		m_pSpriteDrawItem;
 
 	QPoint					m_vTranslateAmt;
 

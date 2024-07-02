@@ -150,19 +150,23 @@ void HarmonyWidget::OnRulerMouseReleaseEvent(HyOrientation eOrientation, QMouseE
 
 void HarmonyWidget::OnRefreshLoading()
 {
-	QList<LoadingType> currentLoadingTypeList = MainWindow::GetCurrentLoading();
-	if(currentLoadingTypeList.empty() == false &&
-		GetWgtHarmony() &&
+	if(	GetWgtHarmony() &&
 		GetWgtHarmony()->GetProject() &&
 		GetWgtHarmony()->GetProject()->GetCurrentOpenItem() &&
 		GetWgtHarmony()->GetProject()->GetCurrentOpenItem()->GetDraw())
 	{
 		IDraw *pDraw = GetWgtHarmony()->GetProject()->GetCurrentOpenItem()->GetDraw();
-	
-		if(currentLoadingTypeList.size() == 1 && currentLoadingTypeList.contains(LOADINGTYPE_HarmonyStreaming))
-			pDraw->SetAction(HYACTION_Streaming);
-		else
-			pDraw->SetAction(HYACTION_Wait);
+
+		QList<LoadingType> currentLoadingTypeList = MainWindow::GetCurrentLoading();
+		if(currentLoadingTypeList.empty() == false)
+		{
+			if(currentLoadingTypeList.size() == 1 && currentLoadingTypeList.contains(LOADINGTYPE_HarmonyStreaming))
+				pDraw->SetAction(HYACTION_Streaming);
+			else
+				pDraw->SetAction(HYACTION_Wait);
+		}
+		else if(pDraw->GetCurAction() == HYACTION_Wait || pDraw->GetCurAction() == HYACTION_Streaming)
+			pDraw->ClearAction();
 	}
 }
 
