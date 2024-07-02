@@ -48,6 +48,8 @@ IDrawEx::IDrawEx(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef
 
 /*virtual*/ IDrawEx::~IDrawEx()
 {
+	// TODO: This is causing a crash on closing the item and OnResize being triggered
+	
 	for(auto pItem : m_ItemList)
 		delete pItem;
 }

@@ -51,10 +51,6 @@ protected:
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;
 	virtual void OnRequestSelection(QList<IDrawExItem *> selectionList) override;
 	virtual void OnPerformTransform() override;
-
-	void DoMouseMove_ShapeEdit(bool bCtrlMod, bool bShiftMod);
-	void DoMousePress_ShapeEdit(bool bCtrlMod, bool bShiftMod);
-	void DoMouseRelease_ShapeEdit(bool bCtrlMod, bool bShiftMod);
 };
 
 #endif // ENTITYDRAW_H

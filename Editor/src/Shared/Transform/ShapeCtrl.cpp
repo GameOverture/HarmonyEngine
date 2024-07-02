@@ -36,8 +36,8 @@ ShapeCtrl::ShapeCtrl(const ShapeCtrl &copyRef) :
 
 /*virtual*/ ShapeCtrl::~ShapeCtrl()
 {
-	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
-		delete pGrabPt;
+	for(int i = 0; i < m_VertexGrabPointList.size(); ++i)
+		delete m_VertexGrabPointList[i];
 }
 
 void ShapeCtrl::Setup(EditorShape eShape, HyColor color, float fBvAlpha, float fOutlineAlpha)

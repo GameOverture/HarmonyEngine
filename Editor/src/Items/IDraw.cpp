@@ -125,22 +125,37 @@ bool IDraw::SetAction(DrawAction eHyAction)
 	case HYACTION_ManipGuideHorz:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitVCursor); break;
 	case HYACTION_ManipGuideVert:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitHCursor); break;
 
-	case HYACTION_HoverScale:			// NOTE: HYACTION_HoverScale should be handled by IDrawEx::SetTransformHoverActionViaGrabPoint()
-	case HYACTION_TransformingScale:
+	case HYACTION_Pending:
 		break;
+
+	case HYACTION_HoverScale:
+	case HYACTION_TransformingScale:
+		// NOTE: HYACTION_HoverScale/HYACTION_TransformingScale should be handled by IDrawEx::SetTransformHoverActionViaGrabPoint()
+		break;
+
 	case HYACTION_HoverRotate:
 	case HYACTION_TransformingRotation:
 		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::UpArrowCursor);
 		break;
+
 	case HYACTION_TransformingTranslate:
 	case HYACTION_TransformingNudging:
 		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor);
 		break;
 
+	case HYACTION_EntityAddPrimitive:
+	case HYACTION_EntityAddShape:
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor);
+		break;
+
+	case HYACTION_EntityShapeVertexEditMode:
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor);
+		break;
+
 	case HYACTION_Wait:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::WaitCursor); break;
 
 	default:
-		HyGuiLog("HarmonyWidget::SetAction() - Unknown HarmonyAction: " % QString::number(eHyAction), LOGTYPE_Error);
+		HyGuiLog("IDraw::SetAction() - Unknown DrawAction: " % QString::number(eHyAction), LOGTYPE_Error);
 		return false;
 	}
 
@@ -149,7 +164,8 @@ bool IDraw::SetAction(DrawAction eHyAction)
 
 void IDraw::ClearAction()
 {
-	SetAction(HYACTION_None);
+	m_eDrawAction = HYACTION_None;
+	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor);
 
 	QList<LoadingType> currentLoadingTypeList = MainWindow::GetCurrentLoading();
 	if(currentLoadingTypeList.empty() == false)
@@ -377,7 +393,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 			HyGuiLog("IDraw::OnMousePressEvent failed to find closest guide", LOGTYPE_Error);
 		else
 		{
-			SetAction(closestGuideKey.first ? HYACTION_ManipGuideHorz : HYACTION_ManipGuideVert);
+			SetAction(closestGuideKey.first == HYORIENT_Horizontal ? HYACTION_ManipGuideHorz : HYACTION_ManipGuideVert);
 			m_iGuideOldMovePos = closestGuideKey.second;
 
 			DeleteGuide(closestGuideKey.first, closestGuideKey.second);

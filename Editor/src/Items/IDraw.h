@@ -40,8 +40,8 @@ enum DrawAction
 	HYACTION_TransformingNudging,			// Using arrow keys to nudge selected items
 
 	// Entity Specific:
-	HYACTION_EntityShapeDragAddPrimitive,	// Uses 'm_DragShape' when initially placing a new primitive
-	HYACTION_EntityShapeDragAddShape,		// Uses 'm_DragShape' when initially placing a new shape
+	HYACTION_EntityAddPrimitive,
+	HYACTION_EntityAddShape,
 	HYACTION_EntityShapeVertexEditMode,		// When editing polygons, line chains, and line loops
 
 	// Editor Loading (locked input):
