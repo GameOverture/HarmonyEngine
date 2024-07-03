@@ -14,6 +14,26 @@
 #include "IDraw.h"
 #include "IDrawItem.h"
 
+struct SnapCandidates
+{
+	float 						m_fSnapTolerance;
+	QSet<float>					m_HorzSet;
+	QSet<float>					m_VertSet;
+
+	SnapCandidates() { Clear(); }
+	void Clear()
+	{
+		m_fSnapTolerance = 0.0f;
+		m_HorzSet.clear();
+		m_VertSet.clear();
+	}
+
+	bool IsEmpty() const
+	{
+		return m_HorzSet.empty() && m_VertSet.empty();
+	}
+};
+
 // LOGIC FLOW NOTES:
 // 1) Input is handled with the standard OnKey*Event and OnMouse*Event() functions, then are delegated out to respective DoMouse*_*() functions
 // 2) ShapeEditShape takes precedence over DragState
@@ -75,11 +95,14 @@ protected:
 	void DoMouseMove(bool bCtrlMod, bool bShiftMod);
 
 	bool SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType eGrabPoint, float fRotation);
-
 	void BeginTransform();
 
 	void DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod);
 	void DoMouseRelease_Transform();
+
+	void GetSnapCandidateList(SnapCandidates &snapCandidatesOut); // Gather snapping candidates using the snapping settings and items from m_ItemList
+	glm::vec2 SnapTransform(const SnapCandidates &snapCandidatesRef, TransformCtrl *pCurTransform);
+
 	virtual void OnPerformTransform() = 0;
 };
 
