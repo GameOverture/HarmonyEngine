@@ -65,7 +65,7 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class SpriteUndoCmd_OffsetFrame : public QUndoCommand
+class SpriteUndoCmd_PositionFrame : public QUndoCommand
 {
 	SpriteTableView *           m_pSpriteTableView;
 	int                         m_iFrameIndex;
@@ -73,15 +73,15 @@ class SpriteUndoCmd_OffsetFrame : public QUndoCommand
 	QList<QPoint>               m_vNewOffsetList;
 	
 public:
-	SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint vOffset, bool bAddOffset, QUndoCommand *pParent = 0);
-	virtual ~SpriteUndoCmd_OffsetFrame();
+	SpriteUndoCmd_PositionFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint ptNewPos, bool bApplyAsOffset, QUndoCommand *pParent = 0);
+	virtual ~SpriteUndoCmd_PositionFrame();
 
 	void redo() override;
 	void undo() override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class SpriteUndoCmd_OffsetXFrame : public QUndoCommand
+class SpriteUndoCmd_SetXFrame : public QUndoCommand
 {
 	SpriteTableView *     m_pSpriteTableView;
 	int                         m_iFrameIndex;
@@ -89,15 +89,15 @@ class SpriteUndoCmd_OffsetXFrame : public QUndoCommand
 	QList<int>                  m_NewOffsetList;
 
 public:
-	SpriteUndoCmd_OffsetXFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent = 0);
-	virtual ~SpriteUndoCmd_OffsetXFrame();
+	SpriteUndoCmd_SetXFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent = 0);
+	virtual ~SpriteUndoCmd_SetXFrame();
 
 	void redo() override;
 	void undo() override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class SpriteUndoCmd_OffsetYFrame : public QUndoCommand
+class SpriteUndoCmd_SetYFrame : public QUndoCommand
 {
 	SpriteTableView *     m_pSpriteTableView;
 	int                         m_iFrameIndex;
@@ -105,8 +105,8 @@ class SpriteUndoCmd_OffsetYFrame : public QUndoCommand
 	QList<int>                  m_NewOffsetList;
 
 public:
-	SpriteUndoCmd_OffsetYFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent = 0);
-	virtual ~SpriteUndoCmd_OffsetYFrame();
+	SpriteUndoCmd_SetYFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent = 0);
+	virtual ~SpriteUndoCmd_SetYFrame();
 
 	void redo() override;
 	void undo() override;

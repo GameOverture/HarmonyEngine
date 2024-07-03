@@ -128,38 +128,36 @@ void SpriteUndoCmd_OrderFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SpriteUndoCmd_OffsetFrame::SpriteUndoCmd_OffsetFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint vOffset, bool bAddOffset, QUndoCommand *pParent /*= 0*/) :
+SpriteUndoCmd_PositionFrame::SpriteUndoCmd_PositionFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint ptNewPos, bool bApplyAsOffset, QUndoCommand *pParent /*= 0*/) :
 	QUndoCommand(pParent),
 	m_pSpriteTableView(pSpriteTableView),
 	m_iFrameIndex(iIndex)
 {
-
-	
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
 	if(m_iFrameIndex == -1)
 	{
-		setText("Translate Every Frame Offset");
+		setText("Translate All Frames");
 
 		for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
 		{
 			m_OriginalOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_vOffset);
-			m_vNewOffsetList.append(bAddOffset ? pSpriteFramesModel->GetFrameAt(i)->m_vOffset + vOffset : vOffset);
+			m_vNewOffsetList.append(bApplyAsOffset ? pSpriteFramesModel->GetFrameAt(i)->m_vOffset + ptNewPos : ptNewPos);
 		}
 	}
 	else
 	{
-		setText("Translate Frame Offset");
+		setText("Translate Frame");
 		m_OriginalOffsetList.append(pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_vOffset);
-		m_vNewOffsetList.append(bAddOffset ? pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_vOffset + vOffset : vOffset);
+		m_vNewOffsetList.append(bApplyAsOffset ? pSpriteFramesModel->GetFrameAt(m_iFrameIndex)->m_vOffset + ptNewPos : ptNewPos);
 	}
 }
 
-/*virtual*/ SpriteUndoCmd_OffsetFrame::~SpriteUndoCmd_OffsetFrame()
+/*virtual*/ SpriteUndoCmd_PositionFrame::~SpriteUndoCmd_PositionFrame()
 {
 }
 
-void SpriteUndoCmd_OffsetFrame::redo()
+void SpriteUndoCmd_PositionFrame::redo()
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -177,7 +175,7 @@ void SpriteUndoCmd_OffsetFrame::redo()
 	// TODO: replace this with ProjectItem::FocusWidgetState
 }
 
-void SpriteUndoCmd_OffsetFrame::undo()
+void SpriteUndoCmd_PositionFrame::undo()
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -196,7 +194,7 @@ void SpriteUndoCmd_OffsetFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SpriteUndoCmd_OffsetXFrame::SpriteUndoCmd_OffsetXFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) :
+SpriteUndoCmd_SetXFrame::SpriteUndoCmd_SetXFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) :
 	QUndoCommand(pParent),
 	m_pSpriteTableView(pSpriteTableView),
 	m_iFrameIndex(iIndex),
@@ -218,11 +216,11 @@ SpriteUndoCmd_OffsetXFrame::SpriteUndoCmd_OffsetXFrame(SpriteTableView *pSpriteT
 	}
 }
 
-/*virtual*/ SpriteUndoCmd_OffsetXFrame::~SpriteUndoCmd_OffsetXFrame()
+/*virtual*/ SpriteUndoCmd_SetXFrame::~SpriteUndoCmd_SetXFrame()
 {
 }
 
-void SpriteUndoCmd_OffsetXFrame::redo()
+void SpriteUndoCmd_SetXFrame::redo()
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -242,7 +240,7 @@ void SpriteUndoCmd_OffsetXFrame::redo()
 	}
 }
 
-void SpriteUndoCmd_OffsetXFrame::undo()
+void SpriteUndoCmd_SetXFrame::undo()
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -259,7 +257,7 @@ void SpriteUndoCmd_OffsetXFrame::undo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SpriteUndoCmd_OffsetYFrame::SpriteUndoCmd_OffsetYFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) :
+SpriteUndoCmd_SetYFrame::SpriteUndoCmd_SetYFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent /*= 0*/) :
 	QUndoCommand(pParent),
 	m_pSpriteTableView(pSpriteTableView),
 	m_iFrameIndex(iIndex),
@@ -281,11 +279,11 @@ SpriteUndoCmd_OffsetYFrame::SpriteUndoCmd_OffsetYFrame(SpriteTableView *pSpriteT
 	}
 }
 
-/*virtual*/ SpriteUndoCmd_OffsetYFrame::~SpriteUndoCmd_OffsetYFrame()
+/*virtual*/ SpriteUndoCmd_SetYFrame::~SpriteUndoCmd_SetYFrame()
 {
 }
 
-void SpriteUndoCmd_OffsetYFrame::redo()
+void SpriteUndoCmd_SetYFrame::redo()
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -305,7 +303,7 @@ void SpriteUndoCmd_OffsetYFrame::redo()
 	}
 }
 
-void SpriteUndoCmd_OffsetYFrame::undo()
+void SpriteUndoCmd_SetYFrame::undo()
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 

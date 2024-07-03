@@ -104,7 +104,7 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ProjectItemData *pItem, SpriteTableVi
 		QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
 		vOffset.setX(static_cast<QSpinBox *>(pEditor)->value());
 
-		m_pItem->GetUndoStack()->push(new SpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset, false));
+		m_pItem->GetUndoStack()->push(new SpriteUndoCmd_PositionFrame(m_pTableView, index.row(), vOffset, false));
 		break;
 	}
 
@@ -114,7 +114,7 @@ WidgetSpriteDelegate::WidgetSpriteDelegate(ProjectItemData *pItem, SpriteTableVi
 		QPoint vOffset = pSpriteModel->GetFrameAt(index.row())->m_vOffset;
 		vOffset.setY(static_cast<QSpinBox *>(pEditor)->value());
 
-		m_pItem->GetUndoStack()->push(new SpriteUndoCmd_OffsetFrame(m_pTableView, index.row(), vOffset, false));
+		m_pItem->GetUndoStack()->push(new SpriteUndoCmd_PositionFrame(m_pTableView, index.row(), vOffset, false));
 		break;
 	}
 	

@@ -179,7 +179,7 @@
 	sm_EditorColors[EDITORCOLOR_PropertiesCategory] = HyColor::PanelWidget;
 	sm_EditorColors[EDITORCOLOR_PropertiesItem] = HyColor::FrameWidget;
 	sm_EditorColors[EDITORCOLOR_Marquee] = HyColor::Blue.Lighten();
-	sm_EditorColors[EDITORCOLOR_TransformBoundingVolume] = HyColor::Blue.Lighten();
+	sm_EditorColors[EDITORCOLOR_TransformBoundingVolume] = HyColor::Orange;// HyColor::Blue.Lighten();
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointOutline] = HyColor::White;
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointFill] = HyColor::Blue.Lighten();
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointSelectedOutline] = HyColor::White;

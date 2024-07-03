@@ -70,6 +70,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="chkSnapToGrid">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>Snap to Grid</string>
      </property>
@@ -78,7 +81,7 @@
    <item>
     <widget class="QCheckBox" name="chkSnapToGuides">
      <property name="text">
-      <string>Snap to Guides</string>
+      <string>Snap to Ruler Guides</string>
      </property>
      <property name="checked">
       <bool>true</bool>

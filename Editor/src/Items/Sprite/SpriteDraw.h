@@ -29,7 +29,9 @@ class SpriteDraw : public IDrawEx
 			m_pSwapSprite(nullptr)
 		{
 			m_pSprite = new HySprite2d("", "+GuiPreview", pParent);
+			m_pSprite->SetAllBoundsIncludeAlphaCrop(true);
 			m_pSwapSprite = new HySprite2d("", "+GuiPreview", pParent);
+			m_pSwapSprite->SetAllBoundsIncludeAlphaCrop(true);
 		}
 		virtual ~SpriteDrawItem()
 		{
@@ -51,8 +53,6 @@ class SpriteDraw : public IDrawEx
 		void OnApplyJsonData(HyJsonDoc &itemDataDocRef, bool bIsAnimPlaying);
 	};
 	SpriteDrawItem *		m_pSpriteDrawItem;
-
-	QPoint					m_vTranslateAmt;
 
 public:
 	SpriteDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);

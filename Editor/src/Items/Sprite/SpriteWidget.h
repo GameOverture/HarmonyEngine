@@ -45,8 +45,9 @@ public:
 	void SetSelectedFrame(int iFrameIndex);
 	void StopPlayingAnim();
 	void GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut);
+	QPoint GetSelectedFrameOffset();
 
-	void ApplyTransform(QPoint &vTransformAmtRef);
+	void ApplyTranslate(QPoint ptPosition, bool bApplyAsOffset);
 
 	void RefreshFrameRateSpinBox();
 	

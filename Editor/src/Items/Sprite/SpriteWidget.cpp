@@ -140,9 +140,20 @@ void SpriteWidget::GetSpriteInfo(int &iStateIndexOut, int &iFrameIndexOut)
 	iFrameIndexOut = ui->framesView->currentIndex().row();
 }
 
-void SpriteWidget::ApplyTransform(QPoint &vTransformAmtRef)
+QPoint SpriteWidget::GetSelectedFrameOffset()
 {
-	QUndoCommand *pCmd = new SpriteUndoCmd_OffsetFrame(ui->framesView, ui->actionApplyToAll->isChecked() ? -1 : ui->framesView->currentIndex().row(), vTransformAmtRef, true);
+	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(ui->framesView->model());
+	SpriteFrame *pSpriteFrame = pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row());
+	if(pSpriteFrame)
+		return pSpriteFrame->m_vOffset;
+	
+	HyGuiLog("SpriteWidget::GetSelectedFrameOffset() - No frame selected", LOGTYPE_Error);
+	return QPoint(0, 0);
+}
+
+void SpriteWidget::ApplyTranslate(QPoint ptPosition, bool bApplyAsOffset)
+{
+	QUndoCommand *pCmd = new SpriteUndoCmd_PositionFrame(ui->framesView, ui->actionApplyToAll->isChecked() ? -1 : ui->framesView->currentIndex().row(), ptPosition, bApplyAsOffset);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
@@ -180,17 +191,17 @@ void SpriteWidget::on_actionAlignLeft_triggered()
 
 	if(ui->actionApplyToAll->isChecked())
 	{
-		QList<int> newOffsetList;
+		QList<int> newPosList;
 		for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
-			newOffsetList.append(0.0f);
+			newPosList.append(0.0f);
 
-		m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_OffsetXFrame(ui->framesView, -1, newOffsetList));
+		m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_SetXFrame(ui->framesView, -1, newPosList));
 		return;
 	}
 
-	QList<int> newOffsetList;
-	newOffsetList.append(0.0f);
-	m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_OffsetXFrame(ui->framesView, ui->framesView->currentIndex().row(), newOffsetList));
+	QList<int> newPosList;
+	newPosList.append(0.0f);
+	m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_SetXFrame(ui->framesView, ui->framesView->currentIndex().row(), newPosList));
 }
 
 void SpriteWidget::on_actionAlignRight_triggered()
@@ -202,17 +213,17 @@ void SpriteWidget::on_actionAlignRight_triggered()
 
 	if(ui->actionApplyToAll->isChecked())
 	{
-		QList<int> newOffsetList;
+		QList<int> newPosList;
 		for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
-			newOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().width() * -1);
+			newPosList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().width() * -1);
 
-		m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_OffsetXFrame(ui->framesView, -1, newOffsetList));
+		m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_SetXFrame(ui->framesView, -1, newPosList));
 		return;
 	}
 
-	QList<int> newOffsetList;
-	newOffsetList.append(pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row())->m_pFrame->GetSize().width() * -1);
-	m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_OffsetXFrame(ui->framesView, ui->framesView->currentIndex().row(), newOffsetList));
+	QList<int> newPosList;
+	newPosList.append(pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row())->m_pFrame->GetSize().width() * -1);
+	m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_SetXFrame(ui->framesView, ui->framesView->currentIndex().row(), newPosList));
 }
 
 void SpriteWidget::on_actionAlignUp_triggered()
@@ -224,17 +235,17 @@ void SpriteWidget::on_actionAlignUp_triggered()
 
 	if(ui->actionApplyToAll->isChecked())
 	{
-		QList<int> newOffsetList;
+		QList<int> newPosList;
 		for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
-			newOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().height() * -1);
+			newPosList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().height() * -1);
 
-		m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_OffsetYFrame(ui->framesView, -1, newOffsetList));
+		m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_SetYFrame(ui->framesView, -1, newPosList));
 		return;
 	}
 
-	QList<int> newOffsetList;
-	newOffsetList.append(pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row())->m_pFrame->GetSize().height() * -1);
-	m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_OffsetYFrame(ui->framesView, ui->framesView->currentIndex().row(), newOffsetList));
+	QList<int> newPosList;
+	newPosList.append(pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row())->m_pFrame->GetSize().height() * -1);
+	m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_SetYFrame(ui->framesView, ui->framesView->currentIndex().row(), newPosList));
 }
 
 void SpriteWidget::on_actionAlignDown_triggered()
@@ -246,17 +257,17 @@ void SpriteWidget::on_actionAlignDown_triggered()
 
 	if(ui->actionApplyToAll->isChecked())
 	{
-		QList<int> newOffsetList;
+		QList<int> newPosList;
 		for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
-			newOffsetList.append(0.0f);
+			newPosList.append(0.0f);
 
-		m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_OffsetYFrame(ui->framesView, -1, newOffsetList));
+		m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_SetYFrame(ui->framesView, -1, newPosList));
 		return;
 	}
 
-	QList<int> newOffsetList;
-	newOffsetList.append(0.0f);
-	m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_OffsetYFrame(ui->framesView, ui->framesView->currentIndex().row(), newOffsetList));
+	QList<int> newPosList;
+	newPosList.append(0.0f);
+	m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_SetYFrame(ui->framesView, ui->framesView->currentIndex().row(), newPosList));
 }
 
 void SpriteWidget::on_actionAlignCenterVertical_triggered()
@@ -268,17 +279,17 @@ void SpriteWidget::on_actionAlignCenterVertical_triggered()
 
 	if(ui->actionApplyToAll->isChecked())
 	{
-		QList<int> newOffsetList;
+		QList<int> newPosList;
 		for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
-			newOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().height() * -0.5f);
+			newPosList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().height() * -0.5f);
 
-		m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_OffsetYFrame(ui->framesView, -1, newOffsetList));
+		m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_SetYFrame(ui->framesView, -1, newPosList));
 		return;
 	}
 
-	QList<int> newOffsetList;
-	newOffsetList.append(pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row())->m_pFrame->GetSize().height() * -0.5f);
-	m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_OffsetYFrame(ui->framesView, ui->framesView->currentIndex().row(), newOffsetList));
+	QList<int> newPosList;
+	newPosList.append(pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row())->m_pFrame->GetSize().height() * -0.5f);
+	m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_SetYFrame(ui->framesView, ui->framesView->currentIndex().row(), newPosList));
 }
 
 void SpriteWidget::on_actionAlignCenterHorizontal_triggered()
@@ -290,17 +301,17 @@ void SpriteWidget::on_actionAlignCenterHorizontal_triggered()
 
 	if(ui->actionApplyToAll->isChecked())
 	{
-		QList<int> newOffsetList;
+		QList<int> newPosList;
 		for(int i = 0; i < pSpriteFramesModel->rowCount(); ++i)
-			newOffsetList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().width() * -0.5f);
+			newPosList.append(pSpriteFramesModel->GetFrameAt(i)->m_pFrame->GetSize().width() * -0.5f);
 
-		m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_OffsetXFrame(ui->framesView, -1, newOffsetList));
+		m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_SetXFrame(ui->framesView, -1, newPosList));
 		return;
 	}
 
-	QList<int> newOffsetList;
-	newOffsetList.append(pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row())->m_pFrame->GetSize().width() * -0.5f);
-	m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_OffsetXFrame(ui->framesView, ui->framesView->currentIndex().row(), newOffsetList));
+	QList<int> newPosList;
+	newPosList.append(pSpriteFramesModel->GetFrameAt(ui->framesView->currentIndex().row())->m_pFrame->GetSize().width() * -0.5f);
+	m_ItemRef.GetUndoStack()->push(new SpriteUndoCmd_SetXFrame(ui->framesView, ui->framesView->currentIndex().row(), newPosList));
 }
 
 void SpriteWidget::on_actionImportFrames_triggered()

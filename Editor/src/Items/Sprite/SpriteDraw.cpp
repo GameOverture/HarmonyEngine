@@ -14,6 +14,7 @@
 #include "Project.h"
 
 #include <QKeyEvent>
+#include <QGuiApplication>
 
 void SpriteDraw::SpriteDrawItem::OnApplyJsonData(HyJsonDoc &itemDataDocRef, bool bIsAnimPlaying)
 {
@@ -41,6 +42,9 @@ void SpriteDraw::SpriteDrawItem::OnApplyJsonData(HyJsonDoc &itemDataDocRef, bool
 	HySprite2d *pTmpSwap = m_pSprite;
 	m_pSprite = m_pSwapSprite;
 	m_pSwapSprite = pTmpSwap;
+
+	m_pSprite->SetAllBoundsIncludeAlphaCrop(true);
+	m_pSwapSprite->SetAllBoundsIncludeAlphaCrop(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,37 +84,11 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
 {
-	if(static_cast<HySprite2d *>(m_pSpriteDrawItem->GetHyNode())->IsAnimPaused())
-	{
-		if(pEvent->key() == Qt::Key_Left)
-			m_vTranslateAmt.setX(m_vTranslateAmt.x() - 1);
-		if(pEvent->key() == Qt::Key_Right)
-			m_vTranslateAmt.setX(m_vTranslateAmt.x() + 1);
-		if(pEvent->key() == Qt::Key_Up)
-			m_vTranslateAmt.setY(m_vTranslateAmt.y() + 1);
-		if(pEvent->key() == Qt::Key_Down)
-			m_vTranslateAmt.setY(m_vTranslateAmt.y() - 1);
-	}
-
 	IDrawEx::OnKeyPressEvent(pEvent);
 }
 
 /*virtual*/ void SpriteDraw::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/
 {
-	if(pEvent->isAutoRepeat() == false &&
-	   (pEvent->key() == Qt::Key_Left ||
-		pEvent->key() == Qt::Key_Right ||
-		pEvent->key() == Qt::Key_Up ||
-		pEvent->key() == Qt::Key_Down))
-	{
-		// Submit the pending transform to the model and reset it
-		if(m_pProjItem->GetWidget())
-			static_cast<SpriteWidget *>(m_pProjItem->GetWidget())->ApplyTransform(m_vTranslateAmt);
-
-		m_vTranslateAmt.setX(0);
-		m_vTranslateAmt.setY(0);
-	}
-
 	IDrawEx::OnKeyReleaseEvent(pEvent);
 }
 
@@ -163,8 +141,6 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 	
 	pSprite->SetAnimPause(pWidget->IsPlayingAnim() == false);
 
-	pSprite->pos.Set(m_vTranslateAmt.x(), m_vTranslateAmt.y());
-
 	// NOTE: Data in sprite may be invalid/null because of GUI usage
 	if(pSprite->AcquireData() == nullptr)
 		return;
@@ -203,8 +179,16 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 /*virtual*/ void SpriteDraw::OnPerformTransform() /*override*/
 {
 	if(m_pProjItem->GetWidget())
-		static_cast<SpriteWidget *>(m_pProjItem->GetWidget())->ApplyTransform(QPoint(m_ActiveTransform.pos.GetX(), m_ActiveTransform.pos.GetY()));
+	{
+		QPoint vOffsetAmt(static_cast<int>(HyMath::Round(m_ActiveTransform.pos.GetX())), static_cast<int>(HyMath::Round(m_ActiveTransform.pos.GetY())));
 
-	m_vTranslateAmt.setX(0);
-	m_vTranslateAmt.setY(0);
+		Qt::KeyboardModifiers kbModifiers = QGuiApplication::queryKeyboardModifiers();
+		if(kbModifiers.testFlag(Qt::ControlModifier)) // Applies the mouse drag as an OFFSET - Which matters if all frames are selected
+			static_cast<SpriteWidget *>(m_pProjItem->GetWidget())->ApplyTranslate(vOffsetAmt, true);
+		else // Apply the mouse drag as a POSITION - Which is applied to all frames if all frames are selected
+		{
+			QPoint vCurFrameOffset = static_cast<SpriteWidget *>(m_pProjItem->GetWidget())->GetSelectedFrameOffset();
+			static_cast<SpriteWidget *>(m_pProjItem->GetWidget())->ApplyTranslate(vCurFrameOffset + vOffsetAmt, false);
+		}
+	}
 }

@@ -20,9 +20,6 @@ enum DrawAction
 	HYACTION_None = 0,
 	HYACTION_Streaming,
 
-	HYACTION_Pan,
-	HYACTION_Marquee,						// When clicking outside any items' bounds
-
 	HYACTION_HoverGuideHorz,
 	HYACTION_HoverGuideVert,
 	HYACTION_ManipGuideHorz,
@@ -43,6 +40,10 @@ enum DrawAction
 	HYACTION_EntityAddPrimitive,
 	HYACTION_EntityAddShape,
 	HYACTION_EntityShapeVertexEditMode,		// When editing polygons, line chains, and line loops
+
+	// High Priority Basic Actions:
+	HYACTION_Pan,
+	HYACTION_Marquee,						// When clicking outside any items' bounds
 
 	// Editor Loading (locked input):
 	HYACTION_Wait

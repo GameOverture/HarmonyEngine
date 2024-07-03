@@ -76,6 +76,7 @@ public:
 	QList<IDrawExItem *> GetDrawItemList();
 
 	virtual void ResizeRenderer();
+	virtual void OnUndoStackIndexChanged(int iIndex) override;
 
 	virtual void OnKeyPressEvent(QKeyEvent *pEvent) override;
 	virtual void OnKeyReleaseEvent(QKeyEvent *pEvent) override;

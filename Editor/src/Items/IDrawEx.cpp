@@ -66,6 +66,11 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 	m_SnapGuideVert.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
 }
 
+/*virtual*/ void IDrawEx::OnUndoStackIndexChanged(int iIndex) /*override*/
+{
+	RefreshTransforms();
+}
+
 /*virtual*/ void IDrawEx::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
 {
 	IDraw::OnKeyPressEvent(pEvent);
