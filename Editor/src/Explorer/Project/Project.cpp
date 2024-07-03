@@ -44,6 +44,30 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 {
 }
 
+Project *ProjectTabBar::GetProjectOwner()
+{
+	return m_pProjectOwner;
+}
+
+QList<ProjectItemData *> ProjectTabBar::GetCycleOrder()
+{
+	return m_CycleOrderList;
+}
+
+void ProjectTabBar::OnTabBarProjItemDataChanged(ProjectItemData *pItem)
+{
+	// Insert into m_CycleOrderList if not already in there, or move to front if it is
+	if(m_CycleOrderList.contains(pItem))
+		m_CycleOrderList.move(m_CycleOrderList.indexOf(pItem), 0);
+	else
+		m_CycleOrderList.prepend(pItem);
+}
+
+void ProjectTabBar::OnTabBarProjItemDataRemoved(ProjectItemData *pItem)
+{
+	m_CycleOrderList.removeOne(pItem);
+}
+
 /*virtual*/ void ProjectTabBar::dragEnterEvent(QDragEnterEvent *pEvent) /*override*/
 {
 	const QMimeData *pMimeData = pEvent->mimeData();
@@ -54,23 +78,32 @@ ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 
 /*virtual*/ void ProjectTabBar::dropEvent(QDropEvent *pEvent) /*override*/
 {
-	if(pEvent->proposedAction() == Qt::LinkAction && pEvent->mimeData()->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)))
+	if(pEvent->mimeData()->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)))
 	{
 		// Process the data from the event.
 		QByteArray dragDataSrc = pEvent->mimeData()->data(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems));
 		QJsonDocument userDoc = QJsonDocument::fromJson(dragDataSrc);
 
-		QJsonObject dragObj = userDoc.object();
-		if(dragObj["project"].toString().toLower() != m_pProjectOwner->GetAbsPath().toLower())
+		bool bValidDrop = false;
+		QJsonArray projItemArray = userDoc.array();
+		for(int i = 0; i < projItemArray.size(); ++i)
 		{
-			pEvent->ignore();
-			return;
+			QJsonObject itemObj = projItemArray[i].toObject();
+			if(itemObj["isPrefix"].toBool())
+				continue;
+
+			TreeModelItemData *pTreeModelItemData = m_pProjectOwner->FindItemData(QUuid(itemObj["UUID"].toString()));
+			if(pTreeModelItemData && pTreeModelItemData->IsProjectItem() == false)
+				continue;
+
+			MainWindow::OpenItem(static_cast<ProjectItemData *>(pTreeModelItemData));
+			bValidDrop = true;
 		}
-
-		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pEvent->source());
-		MainWindow::OpenItem(pProjItem);
-
-		pEvent->acceptProposedAction();
+			
+		if(bValidDrop)
+			pEvent->acceptProposedAction();
+		else
+			pEvent->ignore();
 	}
 	else
 		pEvent->ignore();
@@ -1066,6 +1099,7 @@ void Project::OpenTab(ProjectItemData *pItem)
 		m_pCurOpenItem->DrawHide();
 
 	m_pCurOpenItem = pItem;
+	m_pTabBar->OnTabBarProjItemDataChanged(m_pCurOpenItem);
 
 	bool bAlreadyLoaded = false;
 	// Search for existing tab
@@ -1117,6 +1151,8 @@ void Project::CloseTab(ProjectItemData *pItem)
 			break;
 		}
 	}
+
+	m_pTabBar->OnTabBarProjItemDataRemoved(pItem);
 
 	pItem->WidgetUnload();
 	pItem->DrawUnload();
@@ -1234,6 +1270,7 @@ void Project::OnTabBarCurrentChanged(int iIndex)
 void Project::OnCloseTab(int iIndex)
 {
 	ProjectItemData *pItem = m_pTabBar->tabData(iIndex).value<ProjectItemData *>();
+	
 	MainWindow::CloseItem(pItem);
 }
 

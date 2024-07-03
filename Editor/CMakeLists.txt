@@ -204,6 +204,9 @@ if(Qt5_DIR)
 		src/Dialogs/DlgSnappingSettings.cpp
 		src/Dialogs/DlgSnappingSettings.h
 		src/Dialogs/DlgSnappingSettings.ui
+		src/Dialogs/DlgTabCycle.cpp
+		src/Dialogs/DlgTabCycle.h
+		src/Dialogs/DlgTabCycle.ui
 		src/Explorer/ExplorerItemData.cpp
 		src/Explorer/ExplorerModel.cpp
 		src/Explorer/ExplorerWidget.cpp

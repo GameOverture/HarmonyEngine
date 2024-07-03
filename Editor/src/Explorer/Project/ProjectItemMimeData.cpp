@@ -19,9 +19,6 @@
 ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef) :
 	IMimeData(MIMETYPE_ProjectItems)
 {
-	// TODO: Find projItem dependencies for each item and add them to the rootArray
-
-
 	QJsonArray rootArray; // An array of ProjectItems
 	for(int i = 0; i < itemListRef.size(); ++i)
 	{

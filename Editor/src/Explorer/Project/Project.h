@@ -32,11 +32,20 @@ class ExplorerModel;
 
 class ProjectTabBar : public QTabBar
 {
+	Q_OBJECT
+
 	Project *										m_pProjectOwner;
+	QList<ProjectItemData *>						m_CycleOrderList;
 
 public:
 	ProjectTabBar(Project *pProjectOwner);
 	virtual ~ProjectTabBar();
+
+	Project *GetProjectOwner();
+	QList<ProjectItemData *> GetCycleOrder();
+
+	void OnTabBarProjItemDataChanged(ProjectItemData *pItem);
+	void OnTabBarProjItemDataRemoved(ProjectItemData *pItem);
 
 protected:
 	virtual void dragEnterEvent(QDragEnterEvent *pEvent) override;

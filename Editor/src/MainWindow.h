@@ -106,6 +106,7 @@ protected:
 
 private Q_SLOTS:
 	void OnCtrlTab();
+	void OnCtrlShiftTab();
 	void OnProcessStdOut();
 	void OnProcessErrorOut();
 
@@ -156,7 +157,6 @@ private Q_SLOTS:
 	void on_actionTheme_Compe_triggered();
 
 	void on_actionActivateProject_triggered();
-
 
 private:
 	Ui::MainWindow *ui;

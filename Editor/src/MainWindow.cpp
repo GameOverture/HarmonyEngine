@@ -20,6 +20,7 @@
 #include "DlgInputName.h"
 #include "DlgProjectSettings.h"
 #include "DlgSnappingSettings.h"
+#include "DlgTabCycle.h"
 #include "ExplorerWidget.h"
 #include "AudioAssetsWidget.h"
 #include "ManagerWidget.h"
@@ -63,6 +64,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 
 	connect(ui->menu_View, SIGNAL(aboutToShow), this, SLOT(on_menu_View_aboutToShow));
 	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this, SLOT(OnCtrlTab()));
+	new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Tab), this, SLOT(OnCtrlShiftTab()));
 
 	HyGuiLog(HyEditorToolName, LOGTYPE_Title);
 	HyGuiLog("Initializing...", LOGTYPE_Normal);
@@ -644,11 +646,24 @@ void MainWindow::RefreshLoading()
 
 void MainWindow::OnCtrlTab()
 {
-//    if(pCurProject == nullptr)
-//        return;
+	if(Harmony::GetProject() && Harmony::GetProject()->GetTabBar())
+	{
+		DlgTabCycle *pDlg = new DlgTabCycle(Harmony::GetProject()->GetTabBar(), true, this);
+		pDlg->exec();
 
-//    ProjectTabBar *pTabBar = pCurProject->GetTabBar();
-//    //pTabBar
+		delete pDlg;
+	}
+}
+
+void MainWindow::OnCtrlShiftTab()
+{
+	if(Harmony::GetProject() && Harmony::GetProject()->GetTabBar())
+	{
+		DlgTabCycle *pDlg = new DlgTabCycle(Harmony::GetProject()->GetTabBar(), false, this);
+		pDlg->exec();
+
+		delete pDlg;
+	}
 }
 
 void MainWindow::OnProcessStdOut()
