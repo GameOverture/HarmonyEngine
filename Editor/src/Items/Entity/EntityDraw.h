@@ -49,6 +49,7 @@ public:
 
 protected:
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;
+	virtual void OnResizeRenderer() override;
 	virtual void OnRequestSelection(QList<IDrawExItem *> selectionList) override;
 	virtual void OnPerformTransform() override;
 };

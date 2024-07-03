@@ -97,7 +97,7 @@ public:
 
 	void Show();
 	void Hide();
-	void ResizeRenderer();
+	virtual void ResizeRenderer();
 	void UpdateDrawStatus(QString sSizeDescription);
 
 	virtual void OnUndoStackIndexChanged(int iIndex) { }

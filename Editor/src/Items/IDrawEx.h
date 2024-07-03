@@ -75,6 +75,8 @@ public:
 
 	QList<IDrawExItem *> GetDrawItemList();
 
+	virtual void ResizeRenderer();
+
 	virtual void OnKeyPressEvent(QKeyEvent *pEvent) override;
 	virtual void OnKeyReleaseEvent(QKeyEvent *pEvent) override;
 
@@ -87,7 +89,7 @@ public:
 	void RefreshTransforms();
 
 protected:
-	virtual void OnResizeRenderer() override;
+	virtual void OnResizeRenderer() = 0;
 	virtual void OnCameraUpdated() override;
 
 	virtual void OnRequestSelection(QList<IDrawExItem *> selectionList) = 0;

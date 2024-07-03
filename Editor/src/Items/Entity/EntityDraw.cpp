@@ -477,6 +477,11 @@ void EntityDraw::SetExtrapolatedProperties(bool bPreviewPlaying)
 	RefreshTransforms();
 }
 
+/*virtual*/ void EntityDraw::OnResizeRenderer() /*override*/
+{
+
+}
+
 /*virtual*/ void EntityDraw::OnRequestSelection(QList<IDrawExItem *> selectionList) /*override*/
 {
 	selectionList = QSet<IDrawExItem *>(selectionList.begin(), selectionList.end()).values();

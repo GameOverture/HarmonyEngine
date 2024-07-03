@@ -148,6 +148,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnResizeRenderer() /*override*/
 {
+
 }
 
 /*virtual*/ void SpriteDraw::OnUpdate() /*override*/

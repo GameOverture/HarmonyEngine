@@ -34,15 +34,13 @@ IDrawEx::IDrawEx(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef
 		});
 
 	m_SnapGuideHorz.SetVisible(false);
-	m_SnapGuideHorz.SetTint(HyColor::DarkGreen);
-	m_SnapGuideHorz.SetLineThickness(4.0f);
-	//m_SnapGuideHorz.UseWindowCoordinates();
+	m_SnapGuideHorz.SetTint(HyColor::Red);
+	m_SnapGuideHorz.UseWindowCoordinates();
 	m_SnapGuideHorz.SetDisplayOrder(DISPLAYORDER_SnapGuide);
 
 	m_SnapGuideVert.SetVisible(false);
-	m_SnapGuideVert.SetTint(HyColor::DarkGreen);
-	m_SnapGuideVert.SetLineThickness(4.0f);
-	//m_SnapGuideVert.UseWindowCoordinates();
+	m_SnapGuideVert.SetTint(HyColor::Red);
+	m_SnapGuideVert.UseWindowCoordinates();
 	m_SnapGuideVert.SetDisplayOrder(DISPLAYORDER_SnapGuide);
 }
 
@@ -55,6 +53,17 @@ IDrawEx::IDrawEx(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef
 QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 {
 	return m_ItemList;
+}
+
+/*virtual*/ void IDrawEx::ResizeRenderer() /*override*/
+{
+	IDraw::ResizeRenderer();
+	
+	RefreshTransforms();
+	
+	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
+	m_SnapGuideHorz.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
+	m_SnapGuideVert.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
 }
 
 /*virtual*/ void IDrawEx::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
@@ -271,11 +280,6 @@ void IDrawEx::RefreshTransforms()
 
 	for(IDrawExItem *pItemDraw : m_ItemList /*m_SelectedItemList*/)
 		pItemDraw->RefreshTransform(m_pCamera);
-}
-
-/*virtual*/ void IDrawEx::OnResizeRenderer() /*override*/
-{
-	RefreshTransforms();
 }
 
 /*virtual*/ void IDrawEx::OnCameraUpdated() /*override*/
@@ -686,7 +690,7 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 
 	SnapCandidates snapCandidates;
 	GetSnapCandidateList(snapCandidates);
-	if(snapCandidates.IsEmpty() == false)
+	if(snapCandidates.IsEmpty() == false && GetCurAction() != HYACTION_TransformingRotation) 
 	{
 		glm::vec2 vSnapOffset = SnapTransform(snapCandidates, pCurTransform);
 		m_ActiveTransform.pos.Offset(vSnapOffset);
@@ -785,6 +789,8 @@ glm::vec2 IDrawEx::SnapTransform(const SnapCandidates &snapCandidatesRef, Transf
 {
 	glm::vec2 vSnapOffset(0.0f, 0.0f);
 
+	m_SnapGuideHorz.SetVisible(false);
+	m_SnapGuideVert.SetVisible(false);
 	bool bSnappedHorz = false;
 	bool bSnappedVert = false;
 	for(int i = TransformCtrl::GRAB_BotLeft; i <= TransformCtrl::GRAB_TopLeft + 1; ++i)
@@ -805,6 +811,12 @@ glm::vec2 IDrawEx::SnapTransform(const SnapCandidates &snapCandidatesRef, Transf
 				if(abs(fSnapCandidate - ptTestPoint.y) <= snapCandidatesRef.m_fSnapTolerance)
 				{
 					vSnapOffset.y = fSnapCandidate - ptTestPoint.y;
+
+					glm::vec2 ptSnapPos;
+					m_pCamera->ProjectToCamera(glm::vec2(0.0f, fSnapCandidate), ptSnapPos);
+					m_SnapGuideHorz.pos.SetY(ptSnapPos.y);
+					m_SnapGuideHorz.SetVisible(true);
+
 					bSnappedHorz = true;
 					break;
 				}
@@ -817,6 +829,12 @@ glm::vec2 IDrawEx::SnapTransform(const SnapCandidates &snapCandidatesRef, Transf
 				if(abs(fSnapCandidate - ptTestPoint.x) <= snapCandidatesRef.m_fSnapTolerance)
 				{
 					vSnapOffset.x = fSnapCandidate - ptTestPoint.x;
+
+					glm::vec2 ptSnapPos;
+					m_pCamera->ProjectToCamera(glm::vec2(fSnapCandidate, 0.0f), ptSnapPos);
+					m_SnapGuideVert.pos.SetX(ptSnapPos.x);
+					m_SnapGuideVert.SetVisible(true);
+
 					bSnappedVert = true;
 					break;
 				}
@@ -828,48 +846,4 @@ glm::vec2 IDrawEx::SnapTransform(const SnapCandidates &snapCandidatesRef, Transf
 	}
 
 	return vSnapOffset;
-
-
-	// Determine the horizontal snap guide line (in scene coordinates)
-	glm::vec2 ptStartPos, ptEndPos;
-	if(ptTestPoint.y < ptSnapCandidate.y)
-		ptTestPoint.y = pCurTransform->GetSceneAABB().lowerBound.y;
-	else
-		ptTestPoint.y = pCurTransform->GetSceneAABB().upperBound.y;
-
-	ptTestPoint.x = ptSnapCandidate.x;
-
-	// Initialize the horizontal snap guide line
-	m_SnapGuideHorz.SetAsLineSegment(ptTestPoint, ptSnapCandidate);
-	if(m_SnapGuideHorz.IsVisible() == false)
-	{
-		m_SnapGuideHorz.alpha.Set(0.0f);
-		m_SnapGuideHorz.alpha.Tween(1.0f, 0.33f);
-	}
-	m_SnapGuideHorz.SetVisible(true);
-
-	// Determine the vertical snap guide line (in scene coordinates)
-	glm::vec2 ptStartPos, ptEndPos;
-	if(ptTestPoint.x < ptSnapCandidate.x)
-		ptTestPoint.x = pCurTransform->GetSceneAABB().lowerBound.x;
-	else
-		ptTestPoint.x = pCurTransform->GetSceneAABB().upperBound.x;
-
-	ptTestPoint.y = ptSnapCandidate.y;
-
-	// Initialize the vertical snap guide line
-	m_SnapGuideVert.SetAsLineSegment(ptTestPoint, ptSnapCandidate);
-	if(m_SnapGuideVert.IsVisible() == false)
-	{
-		m_SnapGuideVert.alpha.Set(0.0f);
-		m_SnapGuideVert.alpha.Tween(1.0f, 0.33f);
-	}
-	m_SnapGuideVert.SetVisible(true);
-	bSnapY = true;
-
-
-	if(bSnapX == false)
-		m_SnapGuideHorz.SetVisible(false);
-	if(bSnapY == false)
-		m_SnapGuideVert.SetVisible(false);
 }
