@@ -44,7 +44,7 @@ struct WaveHeader
 		RIFF[0] = 'R'; RIFF[1] = 'I'; RIFF[2] = 'F'; RIFF[3] = 'F';
 		ChunkSize = headerObj["chunkSize"].toInt();
 		WAVE[0] = 'W'; WAVE[1] = 'A'; WAVE[2] = 'V'; WAVE[3] = 'E';
-		
+
 		fmt[0] = 'f'; fmt[1] = 'm'; fmt[2] = 't'; fmt[3] = ' ';
 		Subchunk1Size = 16;
 		AudioFormat = headerObj["audioFormat"].toInt();
@@ -53,7 +53,7 @@ struct WaveHeader
 		BytesPerSec = headerObj["byteRate"].toInt();
 		BlockAlign = headerObj["blockAlign"].toInt();
 		BitsPerSample = headerObj["bitsPerSample"].toInt();
-		
+
 		Subchunk2ID[0] = 'd'; Subchunk2ID[1] = 'a'; Subchunk2ID[2] = 't'; Subchunk2ID[3] = 'a';
 		Subchunk2Size = headerObj["dataSize"].toInt();
 	}
@@ -76,6 +76,7 @@ public:
 	SoundClip(IManagerModel &modelRef, QUuid uuid, quint32 uiChecksum, quint32 uiBankId, QString sName, const WaveHeader &wavHeaderRef, int32 iGroupId, bool bIsStreaming, bool bExportMono, int32 iInstanceLimit, bool bCompressed, double dVbrQuality, uint uiErrors);
 	~SoundClip();
 
+	const WaveHeader &GetWaveHeader() const;
 	int32 GetCategoryId() const;
 	bool IsStreaming() const;
 	bool IsExportMono() const;

@@ -13,16 +13,41 @@
 #include "Global.h"
 #include "IAssetItemData.h"
 #include "ManagerWidget.h"
+#include "SoundClip.h"
 
 #include <QWidget>
+#include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QTimer>
+#include <QWheelEvent>
+#include <QMediaPlayer>
+#include <QAudioDecoder>
 
 class WgtCodeEditor;
 
 namespace Ui {
 class AuxAssetInspector;
 }
+
+class AuxAssetInspectorGfxView : public QGraphicsView
+{
+	Q_OBJECT
+
+public:
+	AuxAssetInspectorGfxView(QWidget *pParent = nullptr) :
+		QGraphicsView(pParent)
+	{ }
+
+protected:
+	virtual void wheelEvent(QWheelEvent *pEvent) override
+	{
+		if(pEvent->angleDelta().y() > 0)
+			scale(1.1, 1.1);
+		else
+			scale(0.9, 0.9);
+		pEvent->accept();
+	}
+};
 
 class AuxAssetInspector : public QWidget
 {
@@ -32,6 +57,11 @@ class AuxAssetInspector : public QWidget
 	IAssetItemData *			m_pCurAtlasesAsset;
 
 	QGraphicsScene				m_AudioGfxScene;
+	SoundClip *					m_pCurAudioAsset;
+	QAudioDecoder				m_AudioDecoder;
+	QList<QAudioBuffer>			m_AudioBuffers;
+
+	QMediaPlayer *				m_pMediaPlayer;
 
 	QTimer						m_PanTimer;
 	uint32						m_uiPanFlags;
@@ -58,7 +88,11 @@ private:
 	Ui::AuxAssetInspector *ui;
 
 private Q_SLOTS:
+	void OnAudioBufferReady();
+	void OnAudioBufferFinished();
 	void OnPanTimer();
+
+	void on_btnPlay_clicked();
 };
 
 #endif // AUXASSETINSPECTOR_H

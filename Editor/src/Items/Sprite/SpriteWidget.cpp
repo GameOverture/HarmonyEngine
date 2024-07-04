@@ -21,6 +21,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QAction>
+#include <QShortcut>
 
 SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	IWidget(itemRef, pParent),
@@ -48,6 +49,10 @@ SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
 	connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
 			this, SLOT(on_framesView_selectionChanged(const QItemSelection &, const QItemSelection &)));
+
+	new QShortcut(QKeySequence(Qt::Key_Space), this, SLOT(on_actionPlay_triggered()));
+	new QShortcut(QKeySequence(Qt::Key_Q), this, SLOT(on_actionFirstFrame_triggered()));
+	new QShortcut(QKeySequence(Qt::Key_E), this, SLOT(on_actionLastFrame_triggered()));
 }
 
 /*virtual*/ SpriteWidget::~SpriteWidget()

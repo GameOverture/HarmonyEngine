@@ -102,7 +102,6 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 		return false;
 	}
 
-	
 	file.read(reinterpret_cast<char *>(&wavHeaderOut), sizeof(WaveHeader));
 	file.close();
 
@@ -112,7 +111,7 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 		return false;
 	}
 
-	if(wavHeaderOut.NumOfChan > 2)
+	if(wavHeaderOut.NumOfChan > 2 || wavHeaderOut.NumOfChan == 0)
 	{
 		HyGuiLog("Only mono and stereo wave files are supported", LOGTYPE_Warning);
 		return false;

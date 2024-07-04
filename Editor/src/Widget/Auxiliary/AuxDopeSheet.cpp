@@ -16,6 +16,7 @@
 #include "ui_AuxDopeSheet.h"
 #include <QClipboard>
 #include <QApplication>
+#include <QShortcut>
 
 AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
@@ -41,6 +42,10 @@ AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 
 	m_WidgetMapper.setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
 	UpdateWidgets();
+
+	new QShortcut(QKeySequence(Qt::Key_Space), this, SLOT(on_actionPlayAnimations_triggered()));
+	new QShortcut(QKeySequence(Qt::Key_Q), this, SLOT(on_actionRewind_triggered()));
+	new QShortcut(QKeySequence(Qt::Key_E), this, SLOT(on_actionLastKeyFrame_triggered()));
 }
 
 /*virtual*/ AuxDopeSheet::~AuxDopeSheet()
@@ -484,6 +489,8 @@ void AuxDopeSheet::on_actionPreviousKeyFrame_triggered()
 
 void AuxDopeSheet::on_actionPlayAnimations_triggered()
 {
+	int i = 0;
+	i++;
 }
 
 void AuxDopeSheet::on_actionNextKeyFrame_triggered()
@@ -497,7 +504,11 @@ void AuxDopeSheet::on_actionNextKeyFrame_triggered()
 
 void AuxDopeSheet::on_actionLastKeyFrame_triggered()
 {
+	if(GetEntityStateModel() == nullptr)
+		return;
 
+	GetEntityStateModel()->GetDopeSheetScene().SetCurrentFrame(GetEntityStateModel()->GetDopeSheetScene().GetFinalFrame());
+	UpdateWidgets();
 }
 
 void AuxDopeSheet::OnEventActionTriggered(QAction *pEventAction)

@@ -13,18 +13,18 @@
 #include "_Dependencies/scriptum/imagepacker.h"
 
 SoundClip::SoundClip(IManagerModel &modelRef,
-					   QUuid uuid,
-					   quint32 uiChecksum,
-					   quint32 uiBankId,
-					   QString sName,
-					   const WaveHeader &wavHeaderRef,
-					   int32 iGroupId,
-					   bool bIsStreaming,
-					   bool bExportMono,
-					   int32 iInstanceLimit,
-					   bool bCompressed,
-					   double dVbrQuality,
-					   uint uiErrors) :
+					 QUuid uuid,
+					 quint32 uiChecksum,
+					 quint32 uiBankId,
+					 QString sName,
+					 const WaveHeader &wavHeaderRef,
+					 int32 iGroupId,
+					 bool bIsStreaming,
+					 bool bExportMono,
+					 int32 iInstanceLimit,
+					 bool bCompressed,
+					 double dVbrQuality,
+					 uint uiErrors) :
 	IAssetItemData(modelRef, ITEM_SoundClip, uuid, uiChecksum, uiBankId, sName, ".wav", uiErrors),
 	m_WaveHeader(wavHeaderRef),
 	m_iCategoryId(iGroupId),
@@ -38,6 +38,11 @@ SoundClip::SoundClip(IManagerModel &modelRef,
 
 SoundClip::~SoundClip()
 {
+}
+
+const WaveHeader &SoundClip::GetWaveHeader() const
+{
+	return m_WaveHeader;
 }
 
 int32 SoundClip::GetCategoryId() const
