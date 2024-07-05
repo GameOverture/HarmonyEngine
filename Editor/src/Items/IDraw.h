@@ -20,16 +20,18 @@ enum DrawAction
 	HYACTION_None = 0,
 	HYACTION_Streaming,
 
+	HYACTION_MarqueeStart,					// When clicking outside any items' bounds
+	
+	HYACTION_HoverItem,
 	HYACTION_HoverGuideHorz,
 	HYACTION_HoverGuideVert,
-	HYACTION_ManipGuideHorz,
-	HYACTION_ManipGuideVert,
-
-	// IDrawEx Specific:
 	HYACTION_HoverScale,
 	HYACTION_HoverRotate,
 	
-	HYACTION_Pending,						// Using 'm_PressTimer' (or mouse movement) to determine if selection or drag will occur
+	HYACTION_Pending,						// Using 'm_PressTimer' (or mouse movement) to determine if new item selection, or drag existing selection will occur
+
+	HYACTION_ManipGuideHorz,
+	HYACTION_ManipGuideVert,
 
 	HYACTION_TransformingScale,
 	HYACTION_TransformingRotation,
@@ -43,7 +45,7 @@ enum DrawAction
 
 	// High Priority Basic Actions:
 	HYACTION_Pan,
-	HYACTION_Marquee,						// When clicking outside any items' bounds
+	HYACTION_MarqueeDrag,					// Marquee in progress
 
 	// Editor Loading (locked input):
 	HYACTION_Wait

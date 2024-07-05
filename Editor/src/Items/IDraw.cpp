@@ -117,27 +117,21 @@ bool IDraw::SetAction(DrawAction eHyAction)
 	case HYACTION_None:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
 	case HYACTION_Streaming:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BusyCursor); break;
 
-	case HYACTION_Pan:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ClosedHandCursor); break;
-	case HYACTION_Marquee:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;
+	case HYACTION_MarqueeStart:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
 
+	case HYACTION_HoverItem:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;
 	case HYACTION_HoverGuideHorz:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitVCursor); break;
 	case HYACTION_HoverGuideVert:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitHCursor); break;
+	case HYACTION_HoverScale:			break; // should be handled by IDrawEx::SetTransformHoverActionViaGrabPoint()
+	case HYACTION_HoverRotate:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::UpArrowCursor); break;
+
+	case HYACTION_Pending:				break;
+
 	case HYACTION_ManipGuideHorz:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitVCursor); break;
 	case HYACTION_ManipGuideVert:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitHCursor); break;
 
-	case HYACTION_Pending:
-		break;
-
-	case HYACTION_HoverScale:
-	case HYACTION_TransformingScale:
-		// NOTE: HYACTION_HoverScale/HYACTION_TransformingScale should be handled by IDrawEx::SetTransformHoverActionViaGrabPoint()
-		break;
-
-	case HYACTION_HoverRotate:
-	case HYACTION_TransformingRotation:
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::UpArrowCursor);
-		break;
-
+	case HYACTION_TransformingScale:	break; // should be handled by IDrawEx::SetTransformHoverActionViaGrabPoint()
+	case HYACTION_TransformingRotation:	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::UpArrowCursor); break;
 	case HYACTION_TransformingTranslate:
 	case HYACTION_TransformingNudging:
 		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor);
@@ -148,9 +142,10 @@ bool IDraw::SetAction(DrawAction eHyAction)
 		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor);
 		break;
 
-	case HYACTION_EntityShapeVertexEditMode:
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor);
-		break;
+	case HYACTION_EntityShapeVertexEditMode:	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
+
+	case HYACTION_Pan:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ClosedHandCursor); break;
+	case HYACTION_MarqueeDrag:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
 
 	case HYACTION_Wait:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::WaitCursor); break;
 

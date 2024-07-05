@@ -150,8 +150,7 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 
 	if(pEvent->button() == Qt::LeftButton)
 	{
-		if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
-			HyGuiLog("EntityDraw::DoMousePress - GetWorldMousePos failed", LOGTYPE_Error);
+		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), m_ptDragStart);
 
 		if(m_eCurHoverGrabPoint != TransformCtrl::GRAB_None)
 			BeginTransform();
@@ -161,9 +160,9 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 			if((m_MultiTransform.IsShown() && m_MultiTransform.IsMouseOverBoundingVolume()) == false &&
 				m_pCurHoverItem == nullptr)
 			{
-				SetAction(HYACTION_Marquee);
+				SetAction(HYACTION_MarqueeStart);
 			}
-			else
+			else if(SetAction(HYACTION_Pending))
 			{
 				m_PressTimer.InitStart(0.5f);
 
@@ -194,8 +193,6 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 						m_bSelectionHandled = true;
 					}
 				}
-
-				SetAction(HYACTION_Pending);
 			}
 		}
 	}
@@ -207,12 +204,13 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 
 	if(pEvent->button() == Qt::LeftButton)
 	{
-		if(GetCurAction() == HYACTION_Marquee || GetCurAction() == HYACTION_Pending)
+		// Wrap up selection actions
+		if(GetCurAction() == HYACTION_MarqueeStart || GetCurAction() == HYACTION_MarqueeDrag || GetCurAction() == HYACTION_Pending)
 		{
 			m_PressTimer.Reset();
 
 			QList<IDrawExItem *> affectedItemList;	// Items that are getting selected or deselected
-			if(GetCurAction() == HYACTION_Marquee)
+			if(GetCurAction() == HYACTION_MarqueeStart || GetCurAction() == HYACTION_MarqueeDrag)
 			{
 				b2AABB marqueeAabb;
 				HyShape2d tmpShape;
@@ -294,19 +292,19 @@ void IDrawEx::RefreshTransforms()
 
 void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 {
-	if(GetCurAction() == HYACTION_Marquee)
+	glm::vec2 ptWorldMousePos;
+	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
+
+	if(GetCurAction() == HYACTION_MarqueeStart || GetCurAction() == HYACTION_MarqueeDrag)
 	{
-		glm::vec2 ptCurMousePos;
-		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
+		SetAction(HYACTION_MarqueeDrag);
 
 		m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
-		m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptCurMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
+		m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptWorldMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
 	}
 	else if(GetCurAction() == HYACTION_Pending)
 	{
-		glm::vec2 ptCurMousePos;
-		HyEngine::Input().GetWorldMousePos(ptCurMousePos);
-		if(glm::distance(m_ptDragStart, ptCurMousePos) >= 2.0f)
+		if(glm::distance(m_ptDragStart, ptWorldMousePos) >= 2.0f)
 			BeginTransform();
 	}
 	else if(IsActionTransforming())
@@ -322,9 +320,16 @@ void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 			if(m_ItemList[i]->IsMouseInBounds())
 			{
 				m_pCurHoverItem = m_ItemList[i];
+
+				if(m_SelectedItemList.contains(m_pCurHoverItem) == false)
+					SetAction(HYACTION_HoverItem);
+
 				break;
 			}
 		}
+		if(GetCurAction() == HYACTION_HoverItem && m_pCurHoverItem == nullptr)
+			ClearAction();
+
 		m_eCurHoverGrabPoint = TransformCtrl::GRAB_None;
 
 		if(m_MultiTransform.IsShown())
@@ -504,9 +509,8 @@ void IDrawEx::BeginTransform()
 
 void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 {
-	glm::vec2 ptMousePos;
-	if(HyEngine::Input().GetWorldMousePos(ptMousePos) == false)
-		return; // Cursor is currently dragged off render window
+	glm::vec2 ptWorldMousePos;
+	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
 
 	TransformCtrl *pCurTransform = nullptr;
 	if(m_MultiTransform.IsShown())
@@ -521,7 +525,7 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		m_ActiveTransform.rot_pivot.Set(m_ptDragCenter);
 		if(bShiftMod)
 		{
-			float fRot = HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart);
+			float fRot = HyMath::AngleFromVector(m_ptDragCenter - ptWorldMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart);
 
 			if(m_ActiveTransform.ChildCount() == 1)
 				m_ActiveTransform.ChildGet(0)->rot.Set(HyMath::RoundToNearest(m_ActiveTransform.ChildGet(0)->rot.Get(), 15.0f));
@@ -529,13 +533,13 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 			m_ActiveTransform.rot.Set(HyMath::RoundToNearest(fRot, 15.0f));
 		}
 		else
-			m_ActiveTransform.rot.Set(HyMath::Round(HyMath::AngleFromVector(m_ptDragCenter - ptMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart)));
+			m_ActiveTransform.rot.Set(HyMath::Round(HyMath::AngleFromVector(m_ptDragCenter - ptWorldMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart)));
 		break;
 
 	case HYACTION_TransformingTranslate:
 		if(bShiftMod)
 		{
-			glm::vec2 ptTarget = ptMousePos;
+			glm::vec2 ptTarget = ptWorldMousePos;
 			const glm::vec2 UNIT_VECTOR_LIST[] = {
 				glm::vec2(1, 1),
 				glm::vec2(1, 0),
@@ -563,7 +567,7 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 			m_ActiveTransform.pos.Set(HyMath::RoundVec(ptClosest - m_ptDragCenter));
 		}
 		else
-			m_ActiveTransform.pos.Set(HyMath::RoundVec(ptMousePos - m_ptDragStart));
+			m_ActiveTransform.pos.Set(HyMath::RoundVec(ptWorldMousePos - m_ptDragStart));
 		break;
 
 	case HYACTION_TransformingScale: {
@@ -646,7 +650,7 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 				vDesiredSize.x = 0.01f;
 			else
 			{
-				ptAnchorWidth = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorWidth - ptDragAnchorPoint), ptMousePos);
+				ptAnchorWidth = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorWidth - ptDragAnchorPoint), ptWorldMousePos);
 				vDesiredSize.x = glm::distance(ptDragAnchorPoint, ptAnchorWidth);
 			}
 		}
@@ -657,7 +661,7 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 				vDesiredSize.y = 0.01f;
 			else
 			{
-				ptAnchorHeight = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorHeight - ptDragAnchorPoint), ptMousePos);
+				ptAnchorHeight = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorHeight - ptDragAnchorPoint), ptWorldMousePos);
 				vDesiredSize.y = glm::distance(ptDragAnchorPoint, ptAnchorHeight);
 			}
 		}
