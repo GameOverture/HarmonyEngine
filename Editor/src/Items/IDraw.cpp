@@ -245,11 +245,10 @@ void IDraw::ResizeRenderer()
 void IDraw::UpdateDrawStatus(QString sSizeDescription)
 {
 	m_sSizeStatus = sSizeDescription;
+
 	glm::vec2 ptWorldMousePos;
-	if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
-		MainWindow::SetDrawStatus("", m_sSizeStatus, m_sZoomStatus);
-	else
-		MainWindow::SetDrawStatus(QString::number(floor(ptWorldMousePos.x)) % " " % QString::number(floor(ptWorldMousePos.y)), m_sSizeStatus, m_sZoomStatus);
+	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
+	MainWindow::SetDrawStatus(QString::number(floor(ptWorldMousePos.x)) % " " % QString::number(floor(ptWorldMousePos.y)), m_sSizeStatus, m_sZoomStatus);
 }
 
 /*virtual*/ void IDraw::OnKeyPressEvent(QKeyEvent *pEvent)
@@ -320,7 +319,8 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 	// Check if mouse is over an existing guide
 	glm::vec2 ptWorldMousePos;
-	if(m_GuideMap.empty() == false && HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
+	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
+	if(m_GuideMap.empty() == false)
 	{
 		const int iSELECT_RADIUS = 2;
 		bool bIsOverGuide = false;
@@ -361,9 +361,9 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 
 	// If hovering over an existing guide, then "select" it by removing it, and starting SetPendingGuide()
 	glm::vec2 ptWorldMousePos;
+	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
 	if(pEvent->button() == Qt::LeftButton &&
 		m_GuideMap.empty() == false &&
-		HyEngine::Input().GetWorldMousePos(ptWorldMousePos) &&
 		(GetCurAction() == HYACTION_HoverGuideHorz || GetCurAction() == HYACTION_HoverGuideVert))
 	{
 		// Find closest existing guide
@@ -416,7 +416,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		HyOrientation eOrientation = GetCurAction() == HYACTION_ManipGuideHorz ? HYORIENT_Horizontal : HYORIENT_Vertical;
 
 		glm::vec2 ptWorldPos;
-		if(HyEngine::Input().GetWorldMousePos(ptWorldPos))
+		if(HyEngine::Input().GetWorldMousePos(ptWorldPos)) // Use Input's GetWorldMousePos() because it failing is a convienent way to know if the mouse is outside the window
 		{
 			int iPos = GetCurAction() == HYACTION_ManipGuideHorz ? static_cast<int>(ptWorldPos.y) : static_cast<int>(ptWorldPos.x);
 			UndoCmd_MoveGuide *pNewCmd = new UndoCmd_MoveGuide(*this, eOrientation, m_iGuideOldMovePos, iPos);

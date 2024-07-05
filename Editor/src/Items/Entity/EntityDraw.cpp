@@ -77,8 +77,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	//if(m_eShapeEditState != SHAPESTATE_None)
 	//{
+	// m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(),
 	//	glm::vec2 ptCurMousePos;
-	//	HyEngine::Input().GetWorldMousePos(ptCurMousePos);
 
 	//	switch(m_eDragState)
 	//	{
@@ -150,8 +150,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	//	if(m_eShapeEditState != SHAPESTATE_None)
 	//	{
-	//		if(HyEngine::Input().GetWorldMousePos(m_ptDragStart) == false)
-	//			HyGuiLog("EntityDraw::DoMousePress - GetWorldMousePos failed", LOGTYPE_Error);
+	//		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(),
 
 	//		if(m_eShapeEditState == SHAPESTATE_DragAddPrimitive || m_eShapeEditState == SHAPESTATE_DragAddShape)
 	//		{
