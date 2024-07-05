@@ -218,7 +218,7 @@ void IDraw::Show()
 
 	OnResizeRenderer();
 
-	UpdateDrawStatus(m_sSizeStatus);
+	UpdateDrawStatus();
 	SetVisible(true);
 }
 
@@ -242,13 +242,11 @@ void IDraw::ResizeRenderer()
 	CameraUpdated();
 }
 
-void IDraw::UpdateDrawStatus(QString sSizeDescription)
+void IDraw::UpdateDrawStatus()
 {
-	m_sSizeStatus = sSizeDescription;
-
 	glm::vec2 ptWorldMousePos;
 	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
-	MainWindow::SetDrawStatus(QString::number(floor(ptWorldMousePos.x)) % " " % QString::number(floor(ptWorldMousePos.y)), m_sSizeStatus, m_sZoomStatus);
+	MainWindow::SetDrawStatus("X: " % QString::number(floor(ptWorldMousePos.x)) % "  Y: " % QString::number(floor(ptWorldMousePos.y)), m_sZoomStatus);
 }
 
 /*virtual*/ void IDraw::OnKeyPressEvent(QKeyEvent *pEvent)
@@ -292,7 +290,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 		m_pCamera->SetZoomLevel(static_cast<HyZoomLevel>(iZoomLevel));
 
 		m_sZoomStatus = g_sZoomLevels[iZoomLevel];
-		UpdateDrawStatus(m_sSizeStatus);
+		UpdateDrawStatus();
 
 		CameraUpdated();
 	}
@@ -348,7 +346,7 @@ void IDraw::UpdateDrawStatus(QString sSizeDescription)
 			ClearAction();
 	}
 
-	UpdateDrawStatus(m_sSizeStatus);
+	UpdateDrawStatus();
 }
 
 /*virtual*/ void IDraw::OnMousePressEvent(QMouseEvent *pEvent)

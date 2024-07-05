@@ -40,13 +40,16 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page">
        <layout class="QVBoxLayout" name="verticalLayout_6"/>
       </widget>
       <widget class="QWidget" name="page_2"/>
      </widget>
+    </item>
+    <item>
+     <widget class="HarmonyStatusBar" name="harmonyStatusBar" native="true"/>
     </item>
    </layout>
   </widget>
@@ -922,6 +925,12 @@
    <class>AuxShaderEditor</class>
    <extends>QWidget</extends>
    <header>AuxShaderEditor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>HarmonyStatusBar</class>
+   <extends>QWidget</extends>
+   <header>MainWindow.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

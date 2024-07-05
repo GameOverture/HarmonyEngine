@@ -53,6 +53,8 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->setupUi(this);
 	sm_pInstance = this;
 
+	setStatusBar(nullptr);
+
 	while(ui->stackedTabWidgets->count())
 		ui->stackedTabWidgets->removeWidget(ui->stackedTabWidgets->currentWidget());
 
@@ -215,31 +217,12 @@ MainWindow::MainWindow(QWidget *pParent) :
 	m_LoadingBar.reset();
 	m_LoadingBar.setFormat("%v/%m (%p%)");
 
-	//QPixmap *pPixmap = new QPixmap(":/icons16x16/smiley-sad.gif");
-	//QLabel *pSvnStatusIcon = new QLabel;
-	//pSvnStatusIcon->setPixmap(*pPixmap);
-	//ui->statusBar->addPermanentWidget(&pSvnStatusIcon);
-
-	//QLabel *pSvnLoginLabel = new QLabel;
-	//pSvnLoginLabel->setText("SVN Not Detected");
-	//ui->statusBar->addPermanentWidget(pSvnLoginLabel);
-
-	QPixmap *pPixmap = new QPixmap(":/icons16x16/StatusMouse.png");
-	m_StatusBarMouseIcon.setPixmap(*pPixmap);
-	pPixmap = new QPixmap(":/icons16x16/StatusSize.png");
-	m_StatusBarSizeIcon.setPixmap(*pPixmap);
-	pPixmap = new QPixmap(":/icons16x16/search.png");
-	m_StatusBarZoomIcon.setPixmap(*pPixmap);
-
-	ui->statusBar->addPermanentWidget(&m_StatusBarMouseIcon);
-	ui->statusBar->addPermanentWidget(&m_StatusBarMouse);
-	ui->statusBar->addPermanentWidget(&m_StatusBarSizeIcon);
-	ui->statusBar->addPermanentWidget(&m_StatusBarSize);
-	ui->statusBar->addPermanentWidget(&m_StatusBarZoomIcon);
-	ui->statusBar->addPermanentWidget(&m_StatusBarZoom);
+	ui->harmonyStatusBar->addPermanentWidget(&m_StatusBarMouse);
+	ui->harmonyStatusBar->addPermanentWidget(&m_StatusBarZoom);
 
 	HyGuiLog("Ready to go!", LOGTYPE_Normal);
 
+	// Specify which dock widget area that should occupy the corners
 	setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
 	setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
@@ -262,6 +245,9 @@ MainWindow::~MainWindow()
 void MainWindow::SetHarmonyWidget(HarmonyWidget *pWidget)
 {
 	ui->centralVerticalLayout->addWidget(pWidget);
+
+	ui->centralVerticalLayout->removeWidget(ui->harmonyStatusBar);
+	ui->centralVerticalLayout->addWidget(ui->harmonyStatusBar);
 }
 
 void MainWindow::SetCurrentProject(Project *pProject)
@@ -516,18 +502,22 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 /*static*/ void MainWindow::SetStatus(const QString &sMessage, int iTimeoutMs)
 {
-	sm_pInstance->ui->statusBar->showMessage(sMessage, iTimeoutMs);
+	sm_pInstance->ui->harmonyStatusBar->showMessage(sMessage, iTimeoutMs);
+}
+
+/*static*/ void MainWindow::SetTempStatus(const QString &sMessage)
+{
+	sm_pInstance->ui->harmonyStatusBar->showMessage(sMessage, 2000);
 }
 
 /*static*/ void MainWindow::ClearStatus()
 {
-	sm_pInstance->ui->statusBar->clearMessage();
+	sm_pInstance->ui->harmonyStatusBar->clearMessage();
 }
 
-/*static*/ void MainWindow::SetDrawStatus(QString sMouse, QString sSize, QString sZoom)
+/*static*/ void MainWindow::SetDrawStatus(QString sMouse, QString sZoom)
 {
 	sm_pInstance->m_StatusBarMouse.setText(sMouse);
-	sm_pInstance->m_StatusBarSize.setText(sSize);
 	sm_pInstance->m_StatusBarZoom.setText(sZoom);
 }
 
@@ -608,8 +598,8 @@ void MainWindow::RefreshLoading()
 		m_LoadingBar.setRange(0, iSumOfTotalBlocks);
 		m_LoadingBar.setValue(iSumOfLoadedBlocks);
 		
-		statusBar()->addWidget(&m_LoadingMsg);
-		statusBar()->addWidget(&m_LoadingBar);
+		ui->harmonyStatusBar->addWidget(&m_LoadingMsg);
+		ui->harmonyStatusBar->addWidget(&m_LoadingBar);
 		m_LoadingMsg.show();
 		m_LoadingBar.show();
 
@@ -627,11 +617,11 @@ void MainWindow::RefreshLoading()
 	}
 	else // Loading Complete
 	{
-		statusBar()->showMessage("Loading Complete", 2000);
+		ui->harmonyStatusBar->showMessage("Loading Complete", 2000);
 
 		// Stop spinners and enable UI
-		statusBar()->removeWidget(&m_LoadingMsg);
-		statusBar()->removeWidget(&m_LoadingBar);
+		ui->harmonyStatusBar->removeWidget(&m_LoadingMsg);
+		ui->harmonyStatusBar->removeWidget(&m_LoadingBar);
 		for(int i = 0; i < m_LoadingSpinnerList.size(); ++i)
 			m_LoadingSpinnerList[i]->stop();
 

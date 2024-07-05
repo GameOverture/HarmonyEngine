@@ -31,6 +31,18 @@ class WgtHarmony;
 class Project;
 class ProjectItemData;
 
+class HarmonyStatusBar : public QStatusBar
+{
+	Q_OBJECT
+
+public:
+	HarmonyStatusBar(QWidget *pParent = nullptr) :
+		QStatusBar(pParent)
+	{
+	}
+	virtual ~HarmonyStatusBar() { }
+};
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -52,11 +64,11 @@ class MainWindow : public QMainWindow
 	QLabel								m_LoadingMsg;
 	QProgressBar						m_LoadingBar;
 
-	QLabel 								m_StatusBarMouseIcon;
+	//QLabel 								m_StatusBarMouseIcon;
 	QLabel 								m_StatusBarMouse;
-	QLabel 								m_StatusBarSizeIcon;
-	QLabel								m_StatusBarSize;
-	QLabel 								m_StatusBarZoomIcon;
+	//QLabel 								m_StatusBarSizeIcon;
+	//QLabel								m_StatusBarSize;
+	//QLabel 								m_StatusBarZoomIcon;
 	QLabel								m_StatusBarZoom;
 
 public:
@@ -92,8 +104,9 @@ public:
 	static void FocusAuxWidget(AuxTab eTabIndex);
 
 	static void SetStatus(const QString &sMessage, int iTimeoutMs);
+	static void SetTempStatus(const QString &sMessage);
 	static void ClearStatus();
-	static void SetDrawStatus(QString sMouse, QString sSize, QString sZoom);
+	static void SetDrawStatus(QString sMouse, QString sZoom);
 
 	static void GetGridStatus(bool &bShowBackgroundOut, bool &bShowOriginOut, bool &bShowOverlayOut);
 

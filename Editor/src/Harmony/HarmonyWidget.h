@@ -14,6 +14,7 @@
 #include "WgtHarmony.h"
 
 #include <QGraphicsScene>
+#include <QStatusBar>
 
 class Project;
 
@@ -30,7 +31,7 @@ class HarmonyWidget : public QWidget
 	
 public:
 	explicit HarmonyWidget(Project *pProject, QWidget *pParent = 0);
-	~HarmonyWidget();
+	virtual ~HarmonyWidget();
 
 	Project *GetProject();
 

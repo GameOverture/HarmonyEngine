@@ -546,7 +546,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 }
 
 /*virtual*/ void EntityDopeSheetView::mousePressEvent(QMouseEvent *pEvent) /*override*/
-{
+{	
 	if(pEvent->button() != Qt::LeftButton)
 	{
 		QGraphicsView::mousePressEvent(pEvent);

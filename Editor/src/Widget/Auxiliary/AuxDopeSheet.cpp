@@ -13,7 +13,9 @@
 #include "EntityUndoCmds.h"
 #include "DlgInputName.h"
 #include "DlgInputNumber.h"
+#include "MainWindow.h"
 #include "ui_AuxDopeSheet.h"
+
 #include <QClipboard>
 #include <QApplication>
 #include <QShortcut>
@@ -762,20 +764,36 @@ void AuxDopeSheet::on_actionCreateAlphaTween_triggered()
 void AuxDopeSheet::on_actionCopyFrames_triggered()
 {
 	// Serialize all the selected items to the clipboard
-	QJsonObject serializedKeyFramesObj = ui->graphicsView->GetScene()->SerializeSelectedKeyFrames();
+	int iNumFrames = 0;
+	QJsonObject serializedKeyFramesObj = ui->graphicsView->GetScene()->SerializeSelectedKeyFrames(iNumFrames);
+	if(iNumFrames == 0)
+	{
+		MainWindow::SetTempStatus("No frames selected to copy");
+		return;
+	}
 
 	// Copy the serialized data to the clipboard
 	EntityFrameMimeData *pFrameMimeData = new EntityFrameMimeData(serializedKeyFramesObj);
 	QApplication::clipboard()->setMimeData(pFrameMimeData);
+
+	MainWindow::SetTempStatus("Copied " % QString::number(iNumFrames) % " frame" % (iNumFrames == 1 ? "" : "s") % " to clipboard");
 }
 
 void AuxDopeSheet::on_actionDeleteFrames_triggered()
 {
 	// Serialize all the selected items to be deleted
-	QJsonObject serializedKeyFramesObj = ui->graphicsView->GetScene()->SerializeSelectedKeyFrames();
+	int iNumFrames = 0;
+	QJsonObject serializedKeyFramesObj = ui->graphicsView->GetScene()->SerializeSelectedKeyFrames(iNumFrames);
+	if(iNumFrames == 0)
+	{
+		MainWindow::SetTempStatus("No frames selected to delete");
+		return;
+	}
 
 	EntityUndoCmd_PopKeyFrames *pNewCmd = new EntityUndoCmd_PopKeyFrames(*ui->graphicsView->GetScene(), serializedKeyFramesObj);
 	GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+
+	MainWindow::SetTempStatus("Deleted " % QString::number(iNumFrames) % " frame" % (iNumFrames == 1 ? "" : "s"));
 }
 
 void AuxDopeSheet::CreateContextTween(TweenProperty eTweenProp)

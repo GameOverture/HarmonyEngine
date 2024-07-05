@@ -74,7 +74,6 @@ protected:
 	int													m_iGuideOldMovePos; // When dragging an existing guide, this was its old position
 
 private:
-	QString												m_sSizeStatus;	// Derived classes should set this using UpdateDrawStatus()
 	QString												m_sZoomStatus;
 
 public:
@@ -101,7 +100,7 @@ public:
 	void Show();
 	void Hide();
 	virtual void ResizeRenderer();
-	void UpdateDrawStatus(QString sSizeDescription);
+	void UpdateDrawStatus();
 
 	virtual void OnUndoStackIndexChanged(int iIndex) { }
 

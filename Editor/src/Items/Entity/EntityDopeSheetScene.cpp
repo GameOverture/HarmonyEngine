@@ -551,8 +551,10 @@ QJsonArray EntityDopeSheetScene::SerializeAllKeyFrames(EntityTreeItemData *pItem
 	return serializedKeyFramesArray;
 }
 
-QJsonObject EntityDopeSheetScene::SerializeSelectedKeyFrames() const
+QJsonObject EntityDopeSheetScene::SerializeSelectedKeyFrames(int &iNumFramesOut) const
 {
+	iNumFramesOut = 0;
+
 	QList<QGraphicsItem *> selectedItemList = selectedItems();
 	if(selectedItemList.isEmpty())
 		return QJsonObject();
@@ -661,6 +663,8 @@ QJsonObject EntityDopeSheetScene::SerializeSelectedKeyFrames() const
 		}
 		else
 			fpSerializeProperty(pCurItemData, iFrameIndex, sCategory, sProperty);
+
+		iNumFramesOut++;
 	}
 
 	// If there's a pivot frame, insert a null category/property at iBeginningFrameIndex if one doesn't exist
@@ -1518,8 +1522,9 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 
 /*virtual*/ void EntityDopeSheetScene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent) /*override*/
 {
+	// Eat right click to avoid deselecting items
 	if(pMouseEvent->buttons() & Qt::RightButton)
-		pMouseEvent->accept(); // Eat right click to avoid deselecting items
+		pMouseEvent->accept();
 	else
 		QGraphicsScene::mousePressEvent(pMouseEvent);
 }

@@ -175,9 +175,9 @@ class EntityDopeSheetScene : public QGraphicsScene
 {
 	EntityStateData *																m_pEntStateData;
 
-	// These maps store the actual property data for the entire entity
+	// These maps store the sole location of the property data for the entire entity
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;			// Store properties and tween values
-	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_PoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added
+	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_PoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added with UNDO
 	QMap<int, QStringList>															m_CallbackMap;			// KEY: frame index, VALUE: a list of strings that are the callback name(s)
 
 	// These maps store the visual graphics items that correspond to the above maps
@@ -224,7 +224,7 @@ public:
 	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps) const; // This is mainly useful for rendering the dope sheet. 'bCollapseTweenProps' will combine tween properties into a single entry (the regular category/property name)
 
 	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const; // This QJsonArray layout will mimic the "stateArray"->"keyFrames"->"<GUID>" array in the Items.meta file
-	QJsonObject SerializeSelectedKeyFrames() const; // All selected items (INCLUDING m_iSelectionPivotFrame/m_bPivotLessThan "empty frames") This QJsonObject layout will mimic the "stateArray"->"keyFrames" object in the Items.meta file
+	QJsonObject SerializeSelectedKeyFrames(int &iNumFramesOut) const; // All selected items (INCLUDING m_iSelectionPivotFrame/m_bPivotLessThan "empty frames") This QJsonObject layout will mimic the "stateArray"->"keyFrames" object in the Items.meta file
 	QJsonObject GetCurrentFrameProperties(EntityTreeItemData *pItemData) const;
 	QJsonValue GetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const;
 	QJsonValue BasicExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const; // Only works on properties that don't tween, or interpolate values between key frames

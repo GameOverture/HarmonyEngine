@@ -12,6 +12,7 @@
 #include "SpriteWidget.h"
 #include "SpriteUndoCmds.h"
 #include "Project.h"
+#include "MainWindow.h"
 
 #include <QKeyEvent>
 #include <QGuiApplication>
@@ -80,6 +81,8 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 	pSprite->SetState(uiStateIndex);
 	pSprite->SetFrame(uiFrameIndex);
+
+	MainWindow::SetStatus(QString("Cropped Size [") % QString::number(pSprite->GetFrameWidth()) % " x " % QString::number(pSprite->GetFrameHeight()) % "]", 0);
 }
 
 /*virtual*/ void SpriteDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
@@ -166,8 +169,6 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 		if(pSprite->IsAnimFinished())
 			pWidget->StopPlayingAnim();
 	}
-
-	UpdateDrawStatus(QString("[") % QString::number(pSprite->GetFrameWidth()) % " " % QString::number(pSprite->GetFrameHeight()) % "]");
 }
 
 /*virtual*/ void SpriteDraw::OnRequestSelection(QList<IDrawExItem *> selectionList) /*override*/
