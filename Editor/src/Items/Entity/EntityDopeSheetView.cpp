@@ -39,6 +39,9 @@ EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 {
 	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	setDragMode(QGraphicsView::RubberBandDrag);
+
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	
 	connect(&m_PanTimer, SIGNAL(timeout()), this, SLOT(OnPanTimer()));
 }

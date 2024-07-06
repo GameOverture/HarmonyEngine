@@ -24,23 +24,13 @@
 #include <QSpinBox>
 #include <QDoubleSpinBox>
 #include <QLineEdit>
+#include <QMouseEvent>
 
 PropertiesTreeView::PropertiesTreeView(QWidget *pParent /*= nullptr*/) :
 	QTreeView(pParent)
 {
-	//setIndentation(0);
 	setAnimated(true);
-	//setColumnWidth(0, 200);
-
-
-	QPalette pal = QPalette();
-
-	// set black background
-	// Qt::black / "#000000" / "black"
-	pal.setColor(QPalette::Window, Qt::black);
-
 	setAutoFillBackground(true);
-	setPalette(pal);
 }
 
 PropertiesTreeView::~PropertiesTreeView()
@@ -50,7 +40,7 @@ PropertiesTreeView::~PropertiesTreeView()
 /*virtual*/ void PropertiesTreeView::setModel(QAbstractItemModel *pModel) /*override*/
 {
 	QTreeView::setModel(pModel);
-	setItemDelegate(new PropertiesDelegate(this, this)); // TODO: delete old delegate (store pointer as member variable)
+	setItemDelegate(new PropertiesDelegate(this, this));
 
 	PropertiesTreeModel *pPropModel = static_cast<PropertiesTreeModel *>(model());
 	if(pPropModel == nullptr)
@@ -73,18 +63,30 @@ PropertiesTreeView::~PropertiesTreeView()
 	QPainter painter(viewport());
 	for(int i = 0; i < header()->count(); ++i)
 	{
-		// draw only visible sections starting from second column
+		// Draw only visible sections starting from second column
 		if(header()->isSectionHidden(i) || header()->visualIndex(i) <= 0)
 			continue;
 
-		// position mapped to viewport
+		// Position mapped to viewport
 		int iColumnStartPos = header()->sectionViewportPosition(i) - 1;
 		if(iColumnStartPos > 0)
-		{
-			//TODO: set QStyle::SH_Table_GridLineColor
 			painter.drawLine(QPoint(iColumnStartPos, 0), QPoint(iColumnStartPos, height()));
+	}
+}
+
+/*virtual*/ void PropertiesTreeView::mousePressEvent(QMouseEvent *pEvent) /*override*/
+{
+	if(pEvent->button() == Qt::LeftButton)
+	{
+		QModelIndex index = indexAt(pEvent->pos());
+		if(index.column() == PROPERTIESCOLUMN_Value && (model()->flags(index) & Qt::ItemIsEnabled))
+		{
+			setCurrentIndex(index);
+			edit(index);
 		}
 	}
+
+	QTreeView::mousePressEvent(pEvent);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -152,9 +154,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	case PROPERTIESTYPE_vec2:
 		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double2d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
-		{
 			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
-		}
 		break;
 
 	case PROPERTIESTYPE_ivec3:
@@ -190,6 +190,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
 	case PROPERTIESTYPE_ComboBoxString:
 		pReturnWidget = new QComboBox(pParent);
+		connect(static_cast<QComboBox *>(pReturnWidget), SIGNAL(currentIndexChanged(int)), this, SLOT(OnComboBoxEditorSubmit(int)));
 
 		if(propDefRef.delegateBuilder.isValid())
 			static_cast<QComboBox *>(pReturnWidget)->addItems(propDefRef.delegateBuilder.toStringList());
@@ -199,6 +200,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
 	case PROPERTIESTYPE_ComboBoxInt:
 		pReturnWidget = new QComboBox(pParent);
+		connect(static_cast<QComboBox *>(pReturnWidget), SIGNAL(currentIndexChanged(int)), this, SLOT(OnComboBoxEditorSubmit(int)));
 
 		if(propDefRef.delegateBuilder.isValid())
 			static_cast<QComboBox *>(pReturnWidget)->addItems(propDefRef.delegateBuilder.toStringList());
@@ -208,6 +210,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
 	case PROPERTIESTYPE_StatesComboBox: {
 		pReturnWidget = new QComboBox(pParent);
+		connect(static_cast<QComboBox *>(pReturnWidget), SIGNAL(currentIndexChanged(int)), this, SLOT(OnComboBoxEditorSubmit(int)));
 
 		PropertiesTreeModel *pModel = static_cast<PropertiesTreeModel *>(m_pTableView->model());
 		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pModel->GetOwner().GetProject().FindItemData(propDefRef.delegateBuilder.toUuid()));
@@ -273,7 +276,8 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break;
 	}
 
-	//pReturnWidget->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
+	if(pReturnWidget)
+		pReturnWidget->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 	return pReturnWidget;
 }
 
@@ -382,9 +386,17 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
 		pPropertiesTreeModel->GetOwner().GetUndoStack()->push(pUndoCmd);
 	}
+
+	// Select the name column after editing to force the editor to close
+	m_pTableView->selectionModel()->setCurrentIndex(m_pTableView->model()->index(index.row(), PROPERTIESCOLUMN_Name), QItemSelectionModel::Select);
 }
 
 /*virtual*/ void PropertiesDelegate::updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const /*override*/
 {
 	pEditor->setGeometry(option.rect);
+}
+
+void PropertiesDelegate::OnComboBoxEditorSubmit(int iIndex)
+{
+	Q_EMIT commitData(static_cast<QWidget *>(sender()));
 }
