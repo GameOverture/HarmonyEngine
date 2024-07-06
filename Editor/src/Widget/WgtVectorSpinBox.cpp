@@ -1,5 +1,5 @@
 /**************************************************************************
-*	WidgetVectorSpinBox.cpp
+*	WgtVectorSpinBox.cpp
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2018 Jason Knobler
@@ -8,31 +8,31 @@
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Global.h"
-#include "WidgetVectorSpinBox.h"
-#include "ui_WidgetVectorSpinBox.h"
+#include "WgtVectorSpinBox.h"
+#include "ui_WgtVectorSpinBox.h"
 
-WidgetVectorSpinBox::WidgetVectorSpinBox(QWidget *parent) :
+WgtVectorSpinBox::WgtVectorSpinBox(QWidget *parent) :
 	QWidget(parent),
-	ui(new Ui::WidgetVectorSpinBox)
+	ui(new Ui::WgtVectorSpinBox)
 {
 	ui->setupUi(this);
 	// NOTE: WHEN THIS CONSTRUCTOR IS USED. Init() MUST BE CALLED
 }
 
-WidgetVectorSpinBox::WidgetVectorSpinBox(SpinBoxType eSpinBoxType, QVariant minValue, QVariant maxValue, QWidget *parent /*= nullptr*/) :
+WgtVectorSpinBox::WgtVectorSpinBox(SpinBoxType eSpinBoxType, QVariant minValue, QVariant maxValue, QWidget *parent /*= nullptr*/) :
 	QWidget(parent),
-	ui(new Ui::WidgetVectorSpinBox)
+	ui(new Ui::WgtVectorSpinBox)
 {
 	ui->setupUi(this);
 	Init(eSpinBoxType, minValue, maxValue);
 }
 
-/*virtual*/ WidgetVectorSpinBox::~WidgetVectorSpinBox()
+/*virtual*/ WgtVectorSpinBox::~WgtVectorSpinBox()
 {
 	delete ui;
 }
 
-void WidgetVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVariant maxValue)
+void WgtVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVariant maxValue)
 {
 	ui->stackedWidget->setCurrentIndex(eSpinBoxType);
 	switch(eSpinBoxType)
@@ -110,12 +110,12 @@ void WidgetVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVar
 		break;
 
 	default:
-		HyGuiLog("Unknown WidgetVectorSpinBox type: " % QString::number(eSpinBoxType), LOGTYPE_Error);
+		HyGuiLog("Unknown WgtVectorSpinBox type: " % QString::number(eSpinBoxType), LOGTYPE_Error);
 		break;
 	}
 }
 
-QVariant WidgetVectorSpinBox::GetValue()
+QVariant WgtVectorSpinBox::GetValue()
 {
 	switch(ui->stackedWidget->currentIndex())
 	{
@@ -138,12 +138,12 @@ QVariant WidgetVectorSpinBox::GetValue()
 		return QVariant(QRectF(ui->doubleSpinBox4dX->value(), ui->doubleSpinBox4dY->value(), ui->doubleSpinBox4dZ->value(), ui->doubleSpinBox4dW->value()));
 
 	default:
-		HyGuiLog("Unknown WidgetVectorSpinBox type: " % QString::number(ui->stackedWidget->currentIndex()), LOGTYPE_Error);
+		HyGuiLog("Unknown WgtVectorSpinBox type: " % QString::number(ui->stackedWidget->currentIndex()), LOGTYPE_Error);
 		return QVariant();
 	}
 }
 
-void WidgetVectorSpinBox::SetValue(QVariant data)
+void WgtVectorSpinBox::SetValue(QVariant data)
 {
 	switch(ui->stackedWidget->currentIndex())
 	{
@@ -181,6 +181,38 @@ void WidgetVectorSpinBox::SetValue(QVariant data)
 		ui->doubleSpinBox4dY->setValue(data.toRectF().top());
 		ui->doubleSpinBox4dZ->setValue(data.toRectF().width());
 		ui->doubleSpinBox4dW->setValue(data.toRectF().height());
+		break;
+	}
+}
+
+/*virtual*/ void WgtVectorSpinBox::focusInEvent(QFocusEvent *pEvent) /*override*/
+{
+	QWidget::focusInEvent(pEvent);
+	switch(ui->stackedWidget->currentIndex())
+	{
+	case SPINBOXTYPE_Int2d:
+		ui->intSpinBoxX->setFocus(Qt::TabFocusReason);
+		ui->intSpinBoxX->selectAll();
+		break;
+	case SPINBOXTYPE_Double2d:
+		ui->doubleSpinBoxX->setFocus(Qt::TabFocusReason);
+		ui->doubleSpinBoxX->selectAll();
+		break;
+	case SPINBOXTYPE_Int3d:
+		ui->intSpinBox3dX->setFocus(Qt::TabFocusReason);
+		ui->intSpinBox3dX->selectAll();
+		break;
+	case SPINBOXTYPE_Double3d:
+		ui->doubleSpinBox3dX->setFocus(Qt::TabFocusReason);
+		ui->doubleSpinBox3dX->selectAll();
+		break;
+	case SPINBOXTYPE_Int4d:
+		ui->intSpinBox4dX->setFocus(Qt::TabFocusReason);
+		ui->intSpinBox4dX->selectAll();
+		break;
+	case SPINBOXTYPE_Double4d:
+		ui->doubleSpinBox4dX->setFocus(Qt::TabFocusReason);
+		ui->doubleSpinBox4dX->selectAll();
 		break;
 	}
 }

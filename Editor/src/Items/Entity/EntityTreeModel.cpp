@@ -260,7 +260,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendCategory("Transformation");
 		m_pPropertiesModel->AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", PROPERTIESACCESS_ToggleOff, -fRANGE, fRANGE, 1.0, "[", "]");
 		m_pPropertiesModel->AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Scale is relative to parent node", PROPERTIESACCESS_ToggleOff, -fRANGE, fRANGE, 0.01, "[", "]");
-		m_pPropertiesModel->AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", PROPERTIESACCESS_ToggleOff, -360.0, 360.0, 0.1, "", "°");
+		m_pPropertiesModel->AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", PROPERTIESACCESS_ToggleOff, -360.0, 360.0, 0.1);
 
 		if(bIsBody)
 		{

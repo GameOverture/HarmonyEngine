@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WidgetVectorSpinBox</class>
- <widget class="QWidget" name="WidgetVectorSpinBox">
+ <class>WgtVectorSpinBox</class>
+ <widget class="QWidget" name="WgtVectorSpinBox">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>196</width>
+    <width>383</width>
     <height>20</height>
    </rect>
   </property>
@@ -41,7 +41,7 @@
       <number>0</number>
      </property>
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="intPage">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -61,31 +61,36 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QSpinBox" name="intSpinBoxX">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="suffix">
-          <string/>
-         </property>
-         <property name="prefix">
-          <string>X: </string>
+        <widget class="QLabel" name="lblIntX">
+         <property name="text">
+          <string>X:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="intSpinBoxY">
+        <widget class="WgtIntSpinBox" name="intSpinBoxX">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="prefix">
-          <string>Y: </string>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblIntY">
+         <property name="text">
+          <string>Y:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="WgtIntSpinBox" name="intSpinBoxY">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
@@ -109,28 +114,36 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBoxX">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="prefix">
-          <string>X: </string>
+        <widget class="QLabel" name="lblDoubleX">
+         <property name="text">
+          <string>X:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBoxY">
+        <widget class="WgtDoubleSpinBox" name="doubleSpinBoxX">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="prefix">
-          <string>Y: </string>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblDoubleY">
+         <property name="text">
+          <string>Y:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="WgtDoubleSpinBox" name="doubleSpinBoxY">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
@@ -154,23 +167,53 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QSpinBox" name="intSpinBox3dX">
-         <property name="prefix">
-          <string>X: </string>
+        <widget class="QLabel" name="lblInt3dX">
+         <property name="text">
+          <string>X:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="intSpinBox3dY">
-         <property name="prefix">
-          <string>Y: </string>
+        <widget class="WgtIntSpinBox" name="intSpinBox3dX">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="intSpinBox3dZ">
-         <property name="prefix">
-          <string>Z: </string>
+        <widget class="QLabel" name="lblInt3d_2">
+         <property name="text">
+          <string>Y:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="WgtIntSpinBox" name="intSpinBox3dY">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblInt3d_3">
+         <property name="text">
+          <string>Z:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="WgtIntSpinBox" name="intSpinBox3dZ">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
@@ -194,23 +237,53 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBox3dX">
-         <property name="prefix">
-          <string>X: </string>
+        <widget class="QLabel" name="lblDouble3d">
+         <property name="text">
+          <string>X:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBox3dY">
-         <property name="prefix">
-          <string>Y: </string>
+        <widget class="WgtDoubleSpinBox" name="doubleSpinBox3dX">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBox3dZ">
-         <property name="prefix">
-          <string>Z: </string>
+        <widget class="QLabel" name="lblDouble3d_2">
+         <property name="text">
+          <string>Y:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="WgtDoubleSpinBox" name="doubleSpinBox3dY">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblDouble3d_3">
+         <property name="text">
+          <string>Z:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="WgtDoubleSpinBox" name="doubleSpinBox3dZ">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
         </widget>
        </item>
@@ -234,16 +307,44 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QSpinBox" name="intSpinBox4dX"/>
+        <widget class="WgtIntSpinBox" name="intSpinBox4dX">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="intSpinBox4dY"/>
+        <widget class="WgtIntSpinBox" name="intSpinBox4dY">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="intSpinBox4dZ"/>
+        <widget class="WgtIntSpinBox" name="intSpinBox4dZ">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="intSpinBox4dW"/>
+        <widget class="WgtIntSpinBox" name="intSpinBox4dW">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -265,16 +366,16 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBox4dX"/>
+        <widget class="WgtDoubleSpinBox" name="doubleSpinBox4dX"/>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBox4dY"/>
+        <widget class="WgtDoubleSpinBox" name="doubleSpinBox4dY"/>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBox4dZ"/>
+        <widget class="WgtDoubleSpinBox" name="doubleSpinBox4dZ"/>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBox4dW"/>
+        <widget class="WgtDoubleSpinBox" name="doubleSpinBox4dW"/>
        </item>
       </layout>
      </widget>
@@ -282,6 +383,18 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WgtIntSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>WgtVectorSpinBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>WgtDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>WgtVectorSpinBox.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>doubleSpinBox4dX</tabstop>
   <tabstop>doubleSpinBox4dY</tabstop>

@@ -193,7 +193,7 @@
              </widget>
             </item>
             <item>
-             <widget class="WidgetVectorSpinBox" name="wgtGravity2d" native="true"/>
+             <widget class="WgtVectorSpinBox" name="wgtGravity2d" native="true"/>
             </item>
            </layout>
           </item>
@@ -276,9 +276,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>WidgetVectorSpinBox</class>
+   <class>WgtVectorSpinBox</class>
    <extends>QWidget</extends>
-   <header>WidgetVectorSpinBox.h</header>
+   <header>WgtVectorSpinBox.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

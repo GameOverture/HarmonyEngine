@@ -11,7 +11,7 @@
 #include "PropertiesTreeModel.h"
 #include "PropertiesUndoCmd.h"
 #include "IModel.h"
-#include "WidgetVectorSpinBox.h"
+#include "WgtVectorSpinBox.h"
 #include "SpriteModels.h"
 #include "MainWindow.h"
 

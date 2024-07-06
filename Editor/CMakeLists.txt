@@ -288,24 +288,24 @@ if(Qt5_DIR)
 		src/Widget/WgtSrcDependency.cpp
 		src/Widget/WgtSrcDependency.h
 		src/Widget/WgtSrcDependency.ui
+		src/Widget/WgtVectorSpinBox.cpp
+		src/Widget/WgtVectorSpinBox.h
+		src/Widget/WgtVectorSpinBox.ui
 		src/Widget/WidgetColor.cpp
 		src/Widget/WidgetGradientEditor.cpp
 		src/Widget/WidgetLiveVariable.cpp
 		src/Widget/WidgetLiveVarManager.cpp
 		src/Widget/WidgetRangedSlider.cpp
-		src/Widget/WidgetVectorSpinBox.cpp
 		src/Widget/WidgetColor.h
 		src/Widget/WidgetGradientEditor.h
 		src/Widget/WidgetLiveVariable.h
 		src/Widget/WidgetLiveVarManager.h
 		src/Widget/WidgetRangedSlider.h
-		src/Widget/WidgetVectorSpinBox.h
 		src/Widget/WidgetColor.ui
 		src/Widget/WidgetGradientEditor.ui
 		src/Widget/WidgetLiveVariable.ui
 		src/Widget/WidgetLiveVarManager.ui
 		src/Widget/WidgetRangedSlider.ui
-		src/Widget/WidgetVectorSpinBox.ui
 		src/_Dependencies/QtWaitingSpinner/waitingspinnerwidget.cpp
 		src/_Dependencies/QtWaitingSpinner/waitingspinnerwidget.h
 		src/_Dependencies/scriptum/imagecrop.cpp

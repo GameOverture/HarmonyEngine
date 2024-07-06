@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "PropertiesTreeView.h"
 #include "PropertiesTreeModel.h"
-#include "WidgetVectorSpinBox.h"
+#include "WgtVectorSpinBox.h"
 #include "ProjectItemData.h"
 #include "IModel.h"
 #include "SpriteModels.h"
@@ -146,39 +146,39 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break;
 
 	case PROPERTIESTYPE_ivec2:
-		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Int2d, propDefRef.minRange, propDefRef.maxRange, pParent);
+		pReturnWidget = new WgtVectorSpinBox(SPINBOXTYPE_Int2d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
-			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
+			static_cast<WgtVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
 	case PROPERTIESTYPE_vec2:
-		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double2d, propDefRef.minRange, propDefRef.maxRange, pParent);
+		pReturnWidget = new WgtVectorSpinBox(SPINBOXTYPE_Double2d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
-			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
+			static_cast<WgtVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
 	case PROPERTIESTYPE_ivec3:
-		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Int3d, propDefRef.minRange, propDefRef.maxRange, pParent);
+		pReturnWidget = new WgtVectorSpinBox(SPINBOXTYPE_Int3d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
-			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
+			static_cast<WgtVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
 	case PROPERTIESTYPE_vec3:
-		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double3d, propDefRef.minRange, propDefRef.maxRange, pParent);
+		pReturnWidget = new WgtVectorSpinBox(SPINBOXTYPE_Double3d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
-			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
+			static_cast<WgtVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
 	case PROPERTIESTYPE_ivec4:
-		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Int4d, propDefRef.minRange, propDefRef.maxRange, pParent);
+		pReturnWidget = new WgtVectorSpinBox(SPINBOXTYPE_Int4d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
-			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
+			static_cast<WgtVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
 	case PROPERTIESTYPE_vec4:
-		pReturnWidget = new WidgetVectorSpinBox(SPINBOXTYPE_Double4d, propDefRef.minRange, propDefRef.maxRange, pParent);
+		pReturnWidget = new WgtVectorSpinBox(SPINBOXTYPE_Double4d, propDefRef.minRange, propDefRef.maxRange, pParent);
 		if(propDefRef.defaultData.isValid())
-			static_cast<WidgetVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
+			static_cast<WgtVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 
 	case PROPERTIESTYPE_LineEdit:
@@ -310,7 +310,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		case PROPERTIESTYPE_vec3:
 		case PROPERTIESTYPE_ivec4:
 		case PROPERTIESTYPE_vec4:
-			static_cast<WidgetVectorSpinBox *>(pEditor)->SetValue(propValue);
+			static_cast<WgtVectorSpinBox *>(pEditor)->SetValue(propValue);
 			break;
 		case PROPERTIESTYPE_LineEdit:
 			static_cast<QLineEdit *>(pEditor)->setText(propValue.toString());
@@ -358,7 +358,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	case PROPERTIESTYPE_vec3:
 	case PROPERTIESTYPE_ivec4:
 	case PROPERTIESTYPE_vec4:
-		newValue = QVariant(static_cast<WidgetVectorSpinBox *>(pEditor)->GetValue());
+		newValue = QVariant(static_cast<WgtVectorSpinBox *>(pEditor)->GetValue());
 		break;
 	case PROPERTIESTYPE_LineEdit:
 		newValue = QVariant(static_cast<QLineEdit *>(pEditor)->text());
