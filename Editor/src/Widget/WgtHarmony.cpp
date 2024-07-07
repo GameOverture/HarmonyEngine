@@ -163,8 +163,11 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	if(m_pProject)
 	{
 		ProjectItemData *pCurItem = m_pProject->GetCurrentOpenItem();
-		if(pCurItem)
+		if(pCurItem && pCurItem->GetDraw())
+		{
 			pCurItem->GetDraw()->StopCameraPanning();
+			pCurItem->GetDraw()->UpdateDrawStatus();
+		}
 	}
 }
 

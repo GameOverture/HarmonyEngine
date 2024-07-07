@@ -244,9 +244,18 @@ void IDraw::ResizeRenderer()
 
 void IDraw::UpdateDrawStatus()
 {
+	if(m_pProjItem == nullptr)
+		return;
+
+	HarmonyWidget *pHarmonyWidget = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject());
+
 	glm::vec2 ptWorldMousePos;
 	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
-	MainWindow::SetDrawStatus("X: " % QString::number(floor(ptWorldMousePos.x)) % "  Y: " % QString::number(floor(ptWorldMousePos.y)), m_sZoomStatus);
+
+	if(pHarmonyWidget->IsShowRulersMouse())
+		MainWindow::SetDrawStatus("X: " % QString::number(floor(ptWorldMousePos.x)) % "  Y: " % QString::number(floor(ptWorldMousePos.y)), m_sZoomStatus);
+	else
+		MainWindow::SetDrawStatus("", m_sZoomStatus);
 }
 
 /*virtual*/ void IDraw::OnKeyPressEvent(QKeyEvent *pEvent)

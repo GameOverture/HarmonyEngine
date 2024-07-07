@@ -82,7 +82,16 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 	pSprite->SetState(uiStateIndex);
 	pSprite->SetFrame(uiFrameIndex);
 
-	MainWindow::SetStatus(QString("Cropped Size [") % QString::number(pSprite->GetFrameWidth()) % " x " % QString::number(pSprite->GetFrameHeight()) % "]", 0);
+	// NOTE: The boundingShape has been set to include the alpha margin (whereas using HySprite2d::GetWidth/Height will crop out the alpha margin)
+	HyShape2d alphaBoundingShape;
+	pSprite->CalcLocalBoundingShape(alphaBoundingShape);
+	glm::ivec2 vAlphaSize = alphaBoundingShape.ComputeSize();
+
+	// Determine if the sprite has had its alpha cropped
+	if(vAlphaSize.x != pSprite->GetWidth() || vAlphaSize.y != pSprite->GetHeight())
+		MainWindow::SetStatus(QString("Frame Size [") % QString::number(pSprite->GetWidth()) % " x " % QString::number(pSprite->GetHeight()) % "]" % QString(" Alpha Margin Size [") % QString::number(vAlphaSize.x) % " x " % QString::number(vAlphaSize.y) % "]", 0);
+	else
+		MainWindow::SetStatus(QString("Frame Size [") % QString::number(pSprite->GetWidth()) % " x " % QString::number(pSprite->GetHeight()) % "]", 0);
 }
 
 /*virtual*/ void SpriteDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
@@ -125,6 +134,7 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 	}
 
 	m_pSpriteDrawItem->OnApplyJsonData(itemDataDocRef, pWidget->IsPlayingAnim());
+	SetFrame(static_cast<HySprite2d *>(m_pSpriteDrawItem->GetHyNode())->GetState(), static_cast<HySprite2d *>(m_pSpriteDrawItem->GetHyNode())->GetFrame());
 }
 
 /*virtual*/ void SpriteDraw::OnResizeRenderer() /*override*/

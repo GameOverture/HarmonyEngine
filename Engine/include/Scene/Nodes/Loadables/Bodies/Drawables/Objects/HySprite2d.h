@@ -32,8 +32,6 @@ public:
 	const HySprite2d &operator=(const HySprite2d &rhs);
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
-	virtual float GetWidth(float fPercent = 1.0f) override;		// Returns the ALPHA-CROPPED width of the current frame (ignores any scaling)
-	virtual float GetHeight(float fPercent = 1.0f) override;	// Returns the ALPHA-CROPPED height of the current frame (ignores any scaling)
 
 	//--------------------------------------------------------------------------------------
 	// Invoke a callback function when animation loops or completes. The

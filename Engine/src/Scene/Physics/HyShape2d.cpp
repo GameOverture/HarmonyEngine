@@ -63,6 +63,14 @@ bool HyShape2d::IsValidShape() const
 	return m_pShape != nullptr && m_eType != HYSHAPE_Nothing;
 }
 
+glm::vec2 HyShape2d::ComputeSize() const
+{
+	b2AABB aabb;
+	ComputeAABB(aabb, glm::mat4(1.0f));
+
+	return glm::vec2(aabb.GetExtents().x, aabb.GetExtents().y) * 2.0f;
+}
+
 void HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
 {
 	switch(m_eType)

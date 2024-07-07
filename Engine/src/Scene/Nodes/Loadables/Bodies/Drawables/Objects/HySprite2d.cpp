@@ -85,16 +85,6 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 	shapeOut.SetAsBox(HyRect(fHalfWidth, fHalfHeight, ptBoxCenter, 0.0f));
 }
 
-/*virtual*/ float HySprite2d::GetWidth(float fPercent /*= 1.0f*/) /*override*/
-{
-	return GetFrameWidth(this->m_uiState, m_uiCurFrame, fPercent);
-}
-
-/*virtual*/ float HySprite2d::GetHeight(float fPercent /*= 1.0f*/) /*override*/
-{
-	return GetFrameHeight(this->m_uiState, m_uiCurFrame, fPercent);
-}
-
 void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack /*= HySprite2d::NullAnimCallback*/)
 {
 	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HySpriteData *>(UncheckedGetData())->GetNumStates())

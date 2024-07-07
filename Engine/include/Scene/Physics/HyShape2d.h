@@ -44,6 +44,7 @@ public:
 	HyShapeType GetType() const;
 	bool IsValidShape() const;
 
+	glm::vec2 ComputeSize() const;
 	void GetCentroid(glm::vec2 &ptCentroidOut) const;
 	float CalcArea() const; // Returns the area in meters squared
 	

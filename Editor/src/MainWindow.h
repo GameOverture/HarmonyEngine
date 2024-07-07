@@ -64,11 +64,7 @@ class MainWindow : public QMainWindow
 	QLabel								m_LoadingMsg;
 	QProgressBar						m_LoadingBar;
 
-	//QLabel 								m_StatusBarMouseIcon;
 	QLabel 								m_StatusBarMouse;
-	//QLabel 								m_StatusBarSizeIcon;
-	//QLabel								m_StatusBarSize;
-	//QLabel 								m_StatusBarZoomIcon;
 	QLabel								m_StatusBarZoom;
 
 public:
