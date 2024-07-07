@@ -19,13 +19,15 @@
 #include "DlgInputNumber.h"
 #include "MainWindow.h"
 #include "AuxDopeSheet.h"
+#include "PropertiesTreeMultiModel.h"
 
 #include <QClipboard>
 
 EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 	IWidget(itemRef, pParent),
 	ui(new Ui::EntityWidget),
-	m_AddShapeActionGroup(this)
+	m_AddShapeActionGroup(this),
+	m_pMultiPropModel(nullptr)
 {
 	ui->setupUi(this);
 
@@ -392,13 +394,24 @@ void EntityWidget::SetExtrapolatedProperties()
 		ui->lblSelectedItemText->setVisible(true);
 		ui->lblSelectedItemText->setText(selectedItemsDataList[0]->GetCodeName() % " Properties [Frame " % QString::number(entityDopeSheetSceneRef.GetCurrentFrame()) % "]");
 	}
-	else
+	else // Multiple selection
 	{
-		// TODO: Support multiple selection
-		ui->propertyTree->setModel(nullptr);
+		EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
+
+		QList<PropertiesTreeModel *> multiModelList;
+		QList<QJsonObject> multiPropsObjList;
+		for(EntityTreeItemData *pEntItemData : selectedItemsDataList)
+		{
+			multiModelList.push_back(&pEntItemData->GetPropertiesModel());
+			multiPropsObjList.push_back(entityDopeSheetSceneRef.GetCurrentFrameProperties(pEntItemData));
+		}
+
+		delete m_pMultiPropModel;
+		m_pMultiPropModel = new PropertiesTreeMultiModel(m_ItemRef, GetCurStateIndex(), -1, multiModelList, multiPropsObjList);
+		ui->propertyTree->setModel(m_pMultiPropModel);
 		ui->lblSelectedItemIcon->setVisible(false);
 		ui->lblSelectedItemText->setVisible(true);
-		ui->lblSelectedItemText->setText("Multiple items selected");
+		ui->lblSelectedItemText->setText("Multiple items selected [Frame " % QString::number(entityDopeSheetSceneRef.GetCurrentFrame()) % "]");
 	}
 	
 	ui->propertyTree->resizeColumnToContents(0);

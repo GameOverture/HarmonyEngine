@@ -42,6 +42,19 @@ const QVariant &PropertiesTreeModel::GetSubstate() const
 	return m_iSUBSTATE;
 }
 
+const PropertiesDef PropertiesTreeModel::GetCategoryDefinition(QString sCategoryName) const
+{
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		{
+			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+			return m_PropertyDefMap[pCategoryTreeItem];
+		}
+	}
+	return PropertiesDef();
+}
+
 const PropertiesDef PropertiesTreeModel::GetPropertyDefinition(const QModelIndex &indexRef) const
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
@@ -232,10 +245,11 @@ QModelIndex PropertiesTreeModel::FindPropertyModelIndex(QString sCategoryName, Q
 
 				if(0 == pPropertyTreeItem->data(PROPERTIESCOLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
 				{
+					m_PropertyDefMap[pPropertyTreeItem].m_bIsProceduralValue = bIsProceduralObj;
+					m_PropertyDefMap[pPropertyTreeItem].m_bIsDifferentValues = false;
+
 					if(setData(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Value, pPropertyTreeItem), valueRef, Qt::UserRole) == false)
 						HyGuiLog("PropertiesTreeModel::SetPropertyValue() - setData failed", LOGTYPE_Error);
-
-					m_PropertyDefMap[pPropertyTreeItem].m_bIsProceduralValue = bIsProceduralObj;
 
 					if(m_PropertyDefMap[pPropertyTreeItem].eAccessType == PROPERTIESACCESS_ToggleOff)
 						SetToggle(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Name, pPropertyTreeItem), true);
@@ -245,6 +259,45 @@ QModelIndex PropertiesTreeModel::FindPropertyModelIndex(QString sCategoryName, Q
 			}
 		}
 	}
+}
+
+void PropertiesTreeModel::SetPropertyAsDifferentValues(QString sCategoryName, QString sPropertyName)
+{
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		{
+			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
+			{
+				TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(j);
+
+				if(0 == pPropertyTreeItem->data(PROPERTIESCOLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+				{
+					m_PropertyDefMap[pPropertyTreeItem].m_bIsProceduralValue = false;
+					m_PropertyDefMap[pPropertyTreeItem].m_bIsDifferentValues = true;
+
+					if(setData(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Value, pPropertyTreeItem), "<Different Values>", Qt::UserRole) == false)
+						HyGuiLog("PropertiesTreeModel::SetPropertyValue() - setData failed", LOGTYPE_Error);
+
+					if(m_PropertyDefMap[pPropertyTreeItem].eAccessType == PROPERTIESACCESS_ToggleOff)
+						SetToggle(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Name, pPropertyTreeItem), true);
+
+					return;
+				}
+			}
+		}
+	}
+}
+
+bool PropertiesTreeModel::DoesCategoryExist(QString sCategoryName) const
+{
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+			return true;
+	}
+	return false;
 }
 
 bool PropertiesTreeModel::IsCategory(const QModelIndex &indexRef) const
@@ -422,6 +475,21 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 	m_PropertyDefMap[pNewlyAddedTreeItem] = def;
 
 	return true;
+}
+
+QList<QPair<QString, QString>> PropertiesTreeModel::GetPropertiesList() const
+{
+	QList<QPair<QString, QString>> propertiesList;
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+		for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
+		{
+			TreeModelItem *pPropertyItem = pCategoryTreeItem->GetChild(j);
+			propertiesList.push_back(QPair<QString, QString>(pCategoryTreeItem->data(PROPERTIESCOLUMN_Name).toString(), pPropertyItem->data(PROPERTIESCOLUMN_Name).toString()));
+		}
+	}
+	return propertiesList;
 }
 
 QJsonObject PropertiesTreeModel::SerializeJson()
@@ -903,6 +971,9 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 	const PropertiesDef &propDefRef = m_PropertyDefMap[pTreeItem];
 	if(propDefRef.eAccessType == PROPERTIESACCESS_ToggleOff)
 		return "<NOT SET>";
+
+	if(propDefRef.m_bIsDifferentValues)
+		return "<Different Values>";
 
 	const QVariant &treeItemValue = pTreeItem->data(PROPERTIESCOLUMN_Value);
 

@@ -20,17 +20,8 @@ class PropertiesTreeMultiModel : public PropertiesTreeModel
 	QList<PropertiesTreeModel *>		m_MultiModelList;
 
 public:
-	explicit PropertiesTreeMultiModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, const QList<PropertiesTreeModel *> &multiModelListRef, QObject *pParent = nullptr);
+	explicit PropertiesTreeMultiModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, const QList<PropertiesTreeModel *> &multiModelListRef, QList<QJsonObject> multiPropsObjList, QObject *pParent = nullptr);
 	virtual ~PropertiesTreeMultiModel();
-	
-	virtual void SetToggle(const QModelIndex &indexRef, bool bToggleOn) override;
-
-	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef, bool bIsProceduralObj) override;
-
-	virtual bool setData(const QModelIndex &indexRef, const QVariant &valueRef, int iRole = Qt::EditRole) override;
-	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
-	
-	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
 
 private:
 	using PropertiesTreeModel::AppendCategory;

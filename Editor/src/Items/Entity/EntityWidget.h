@@ -21,12 +21,16 @@ namespace Ui {
 class EntityWidget;
 }
 
+class PropertiesTreeMultiModel;
+
 class EntityWidget : public IWidget
 {
 	Q_OBJECT
 
 	QActionGroup					m_AddShapeActionGroup;
 	QMenu							m_ContextMenu;
+
+	PropertiesTreeMultiModel *		m_pMultiPropModel;
 
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);

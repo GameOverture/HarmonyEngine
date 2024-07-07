@@ -286,7 +286,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	const QVariant &propValue = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyValue(index);
 	const PropertiesDef &propDefRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyDefinition(index);
 
-	if(propDefRef.m_bIsProceduralValue)
+	if(propValue.toJsonObject().isEmpty() == false)
 	{
 		HyGuiLog("PropertiesDelegate::setEditorData not implemented for procedural value", LOGTYPE_Error);
 	}

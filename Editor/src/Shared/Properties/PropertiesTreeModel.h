@@ -74,11 +74,13 @@ struct PropertiesDef
 	QVariant								delegateBuilder;		// Some types need an additional QVariant to build their delegate widget (e.g. ComboBox uses defaultData as currently selected index, but also needs a string list to select from)
 
 	bool									m_bIsProceduralValue;	// Defaults to false. When 'true', the value is stored as a QJsonObject instead of its normal type
+	bool									m_bIsDifferentValues;	// Defaults to false. Used in the PropertiesTreeMultiModel to indicate that the values are different across the models
 
 	PropertiesDef() : 
 		eType(PROPERTIESTYPE_Unknown),
 		eAccessType(PROPERTIESACCESS_Mutable),
-		m_bIsProceduralValue(false)
+		m_bIsProceduralValue(false),
+		m_bIsDifferentValues(false)
 	{ }
 	PropertiesDef(PropertiesType type, PropertiesAccessType accessType, QString toolTip, QVariant defaultData_, QVariant minRange_, QVariant maxRange_, QVariant stepAmt_, QString prefix, QString suffix, QVariant delegateBuilder_) :
 		eType(type),
@@ -91,7 +93,8 @@ struct PropertiesDef
 		sPrefix(prefix),
 		sSuffix(suffix),
 		delegateBuilder(delegateBuilder_),
-		m_bIsProceduralValue(false)
+		m_bIsProceduralValue(false),
+		m_bIsDifferentValues(false)
 	{ }
 
 	bool IsValid() const {
@@ -128,6 +131,7 @@ public:
 	int GetStateIndex() const;
 	const QVariant &GetSubstate() const;
 
+	const PropertiesDef GetCategoryDefinition(QString sCategoryName) const;
 	const PropertiesDef GetPropertyDefinition(const QModelIndex &indexRef) const;
 	const PropertiesDef FindPropertyDefinition(QString sCategoryName, QString sPropertyName) const;
 	
@@ -147,7 +151,9 @@ public:
 	QJsonValue FindPropertyJsonValue(QString sCategoryName, QString sPropertyName) const;
 	QModelIndex FindPropertyModelIndex(QString sCategoryName, QString sPropertyName) const;
 	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef, bool bIsProceduralObj);
+	void SetPropertyAsDifferentValues(QString sCategoryName, QString sPropertyName);
 
+	bool DoesCategoryExist(QString sCategoryName) const;
 	bool IsCategory(const QModelIndex &indexRef) const;
 	bool IsCategoryEnabled(QString sCategoryName) const;
 	bool IsCategoryEnabled(int iCategoryIndex) const;
@@ -170,6 +176,8 @@ public:
 						QString sPrefix = QString(),
 						QString sSuffix = QString(),
 						QVariant delegateBuilder = QVariant());
+
+	QList<QPair<QString, QString>> GetPropertiesList() const; // Returns a list of all properties in the form of (category, property) pairs
 
 	QJsonObject SerializeJson();
 	void DeserializeJson(const QJsonObject &propertiesObj);
