@@ -20,8 +20,26 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 	QString sText = pModel->GetPropertyName(m_ModelIndex);
 	if(m_ModelIndex.column() == PROPERTIESCOLUMN_Name)
 	{
-		m_OldData = static_cast<bool>(pModel->GetPropertyDefinition(m_ModelIndex).eAccessType == PROPERTIESACCESS_ToggleOn);
-		sText += " Checked";
+		Qt::CheckState eOldCheckState = Qt::Checked;
+		if(pModel->GetPropertyDefinition(m_ModelIndex).eAccessType == PROPERTIESACCESS_ToggleChecked)
+		{
+			sText += " Checked";
+			eOldCheckState = Qt::Checked;
+		}
+		else if(pModel->GetPropertyDefinition(m_ModelIndex).eAccessType == PROPERTIESACCESS_ToggleUnchecked)
+		{
+			sText += " Unchecked";
+			eOldCheckState = Qt::Unchecked;
+		}
+		else if(pModel->GetPropertyDefinition(m_ModelIndex).eAccessType == PROPERTIESACCESS_TogglePartial)
+		{
+			sText += " Partially Checked";
+			eOldCheckState = Qt::PartiallyChecked;
+		}
+		else
+			HyGuiLog("PropertiesUndoCmd::PropertiesUndoCmd() - Invalid AccessType", LOGTYPE_Error);
+
+		m_OldData = eOldCheckState;
 	}
 	else
 	{
@@ -38,12 +56,9 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 /*virtual*/ void PropertiesUndoCmd::redo() /*override*/
 {
 	if(m_ModelIndex.column() == PROPERTIESCOLUMN_Name)
-		m_pModel->SetToggle(m_ModelIndex, m_NewData.toBool());
+		m_pModel->SetToggleState(m_ModelIndex, m_NewData.value<Qt::CheckState>());
 	else
 		m_pModel->setData(m_ModelIndex, m_NewData, Qt::UserRole);
-
-	//if(m_pModel->GetPropertyDefinition(m_ModelIndex).IsCategory() == false)
-	//	m_pModel->GetOwner().PropertyModified(*m_pModel, m_ModelIndex);
 
 	if(m_bDoFocusWidgetState)
 		m_pModel->GetOwner().FocusWidgetState(m_pModel->GetStateIndex(), m_pModel->GetSubstate());
@@ -52,12 +67,9 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 /*virtual*/ void PropertiesUndoCmd::undo() /*override*/
 {
 	if(m_ModelIndex.column() == PROPERTIESCOLUMN_Name)
-		m_pModel->SetToggle(m_ModelIndex, m_OldData.toBool());
+		m_pModel->SetToggleState(m_ModelIndex, m_OldData.value<Qt::CheckState>());
 	else
 		m_pModel->setData(m_ModelIndex, m_OldData, Qt::UserRole);
-
-	//if(m_pModel->GetPropertyDefinition(m_ModelIndex).IsCategory() == false)
-	//	m_pModel->GetOwner().PropertyModified(*m_pModel, m_ModelIndex);
 	
 	if(m_bDoFocusWidgetState)
 		m_pModel->GetOwner().FocusWidgetState(m_pModel->GetStateIndex(), m_pModel->GetSubstate());

@@ -293,7 +293,7 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 void TextFontManager::SetAtlasGroup(quint32 uiBankId)
 {
 	AtlasModel &atlasModelRef = m_GlyphsModel.GetOwner().GetProject().GetAtlasModel();
-	m_GlyphsModel.SetPropertyValue("Atlas Info", TEXTPROP_AtlasGroup, atlasModelRef.GetBankName(atlasModelRef.GetBankIndexFromBankId(uiBankId)), false);
+	m_GlyphsModel.SetPropertyValue("Atlas Info", TEXTPROP_AtlasGroup, atlasModelRef.GetBankName(atlasModelRef.GetBankIndexFromBankId(uiBankId)), Qt::Checked);
 }
 
 void TextFontManager::SetFont(TextLayerHandle hLayer, QString sFontName)

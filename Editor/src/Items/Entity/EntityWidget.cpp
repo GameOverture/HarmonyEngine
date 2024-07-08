@@ -399,15 +399,18 @@ void EntityWidget::SetExtrapolatedProperties()
 		EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
 
 		QList<PropertiesTreeModel *> multiModelList;
-		QList<QJsonObject> multiPropsObjList;
 		for(EntityTreeItemData *pEntItemData : selectedItemsDataList)
 		{
-			multiModelList.push_back(&pEntItemData->GetPropertiesModel());
-			multiPropsObjList.push_back(entityDopeSheetSceneRef.GetCurrentFrameProperties(pEntItemData));
+			PropertiesTreeModel &propModelRef = pEntItemData->GetPropertiesModel();
+			QJsonObject propsObj = entityDopeSheetSceneRef.GetCurrentFrameProperties(pEntItemData);
+			propModelRef.ResetValues();
+			propModelRef.DeserializeJson(propsObj);
+
+			multiModelList.push_back(&propModelRef);
 		}
 
 		delete m_pMultiPropModel;
-		m_pMultiPropModel = new PropertiesTreeMultiModel(m_ItemRef, GetCurStateIndex(), -1, multiModelList, multiPropsObjList);
+		m_pMultiPropModel = new PropertiesTreeMultiModel(m_ItemRef, GetCurStateIndex(), -1, multiModelList);
 		ui->propertyTree->setModel(m_pMultiPropModel);
 		ui->lblSelectedItemIcon->setVisible(false);
 		ui->lblSelectedItemText->setVisible(true);

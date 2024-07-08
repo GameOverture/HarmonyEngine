@@ -27,16 +27,26 @@ Harmony::Harmony(MainWindow &mainWindowRef) :
 
 /*virtual*/ Harmony::~Harmony()
 {
+	sm_pInstance = nullptr;
 	delete m_pWidget;
 }
 
 /*static*/ Project *Harmony::GetProject()
 {
+	if(sm_pInstance == nullptr) // NOTE: This may happen if this static function is invoked between the dtor and ctor
+		return nullptr;
+
 	return sm_pInstance->m_pWidget->GetProject();
 }
 
 /*static*/ void Harmony::SetProject(Project *pProject)
 {
+	if(sm_pInstance == nullptr) // NOTE: This may happen if this static function is invoked between the dtor and ctor
+	{
+		HyGuiLog("Harmony::SetProject() invoked when 'sm_pInstance' was nullptr", LOGTYPE_Error);
+		return;
+	}
+
 	Project *pCurrentProject = GetProject();
 	if(pCurrentProject == pProject)
 		return;

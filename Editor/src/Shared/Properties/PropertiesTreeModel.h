@@ -53,8 +53,9 @@ enum PropertiesAccessType
 {
 	PROPERTIESACCESS_ReadOnly = 0,
 	PROPERTIESACCESS_Mutable,
-	PROPERTIESACCESS_ToggleOn,
-	PROPERTIESACCESS_ToggleOff
+	PROPERTIESACCESS_ToggleChecked,
+	PROPERTIESACCESS_ToggleUnchecked,
+	PROPERTIESACCESS_TogglePartial,
 };
 
 struct PropertiesDef
@@ -73,13 +74,11 @@ struct PropertiesDef
 
 	QVariant								delegateBuilder;		// Some types need an additional QVariant to build their delegate widget (e.g. ComboBox uses defaultData as currently selected index, but also needs a string list to select from)
 
-	bool									m_bIsProceduralValue;	// Defaults to false. When 'true', the value is stored as a QJsonObject instead of its normal type
 	bool									m_bIsDifferentValues;	// Defaults to false. Used in the PropertiesTreeMultiModel to indicate that the values are different across the models
 
 	PropertiesDef() : 
 		eType(PROPERTIESTYPE_Unknown),
 		eAccessType(PROPERTIESACCESS_Mutable),
-		m_bIsProceduralValue(false),
 		m_bIsDifferentValues(false)
 	{ }
 	PropertiesDef(PropertiesType type, PropertiesAccessType accessType, QString toolTip, QVariant defaultData_, QVariant minRange_, QVariant maxRange_, QVariant stepAmt_, QString prefix, QString suffix, QVariant delegateBuilder_) :
@@ -93,21 +92,18 @@ struct PropertiesDef
 		sPrefix(prefix),
 		sSuffix(suffix),
 		delegateBuilder(delegateBuilder_),
-		m_bIsProceduralValue(false),
 		m_bIsDifferentValues(false)
 	{ }
 
 	bool IsValid() const {
 		return eType != PROPERTIESTYPE_Unknown;
 	}
-
 	bool IsCategory() const {
 		return eType == PROPERTIESTYPE_Category;
 	}
-	bool IsTogglable() const {
-		return eAccessType == PROPERTIESACCESS_ToggleOn || eAccessType == PROPERTIESACCESS_ToggleOff;
+	bool IsToggleable() const {
+		return eAccessType == PROPERTIESACCESS_ToggleChecked || eAccessType == PROPERTIESACCESS_ToggleUnchecked || eAccessType == PROPERTIESACCESS_TogglePartial;
 	}
-
 	HyColor GetColor() const {
 		return IsCategory() ? HyGlobal::GetEditorColor(EDITORCOLOR_PropertiesCategory) : HyGlobal::GetEditorColor(EDITORCOLOR_PropertiesItem);
 	}
@@ -135,9 +131,9 @@ public:
 	const PropertiesDef GetPropertyDefinition(const QModelIndex &indexRef) const;
 	const PropertiesDef FindPropertyDefinition(QString sCategoryName, QString sPropertyName) const;
 	
-	void SetToggle(QString sCategoryName, bool bToggleOn);
-	void SetToggle(QString sCategoryName, QString sPropertyName, bool bToggleOn);
-	virtual void SetToggle(const QModelIndex &indexRef, bool bToggleOn);
+	void SetToggleState(QString sCategoryName, Qt::CheckState eCheckState);
+	void SetToggleState(QString sCategoryName, QString sPropertyName, Qt::CheckState eCheckState);
+	virtual void SetToggleState(const QModelIndex &indexRef, Qt::CheckState eCheckState);
 
 	int GetNumProperties(int iCategoryIndex) const;
 	QString GetPropertyName(const QModelIndex &indexRef) const;
@@ -150,8 +146,9 @@ public:
 	QVariant FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
 	QJsonValue FindPropertyJsonValue(QString sCategoryName, QString sPropertyName) const;
 	QModelIndex FindPropertyModelIndex(QString sCategoryName, QString sPropertyName) const;
-	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef, bool bIsProceduralObj);
-	void SetPropertyAsDifferentValues(QString sCategoryName, QString sPropertyName);
+
+	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef, Qt::CheckState eCheckState);
+	void SetPropertyAsDifferentValues(QString sCategoryName, QString sPropertyName, Qt::CheckState eCheckState);
 
 	bool DoesCategoryExist(QString sCategoryName) const;
 	bool IsCategory(const QModelIndex &indexRef) const;

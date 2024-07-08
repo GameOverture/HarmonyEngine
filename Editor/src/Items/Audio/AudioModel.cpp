@@ -58,10 +58,10 @@ AudioStateData::AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair s
 	m_PropertiesModel.AppendProperty("Positional", "Max Distance", PROPERTIESTYPE_int, iDist != 0 ? iDist : 1, "The distance (and beyond) at which the audio asset will be played at its quietest", PROPERTIESACCESS_Mutable, 0, iRANGE, 1);
 
 	if(iLoops != 0)
-		m_PropertiesModel.SetToggle("Looping", true);
+		m_PropertiesModel.SetToggleState("Looping", Qt::Checked);
 
 	if(iDist != 0)
-		m_PropertiesModel.SetToggle("Positional", true);
+		m_PropertiesModel.SetToggleState("Positional", Qt::Checked);
 }
 
 /*virtual*/ AudioStateData::~AudioStateData()

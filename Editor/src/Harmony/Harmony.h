@@ -33,6 +33,7 @@ public:
 	Harmony(MainWindow &mainWindowRef);
 	virtual ~Harmony();
 
+	// TODO: REMOVE THESE STATIC FUNCTIONS IF THIS CLASS CAN BE DELETED
 	static Project *GetProject();
 	static void SetProject(Project *pProject);
 	static void Reload(Project *pProject);
