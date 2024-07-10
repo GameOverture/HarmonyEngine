@@ -127,28 +127,29 @@ public:
 	int GetStateIndex() const;
 	const QVariant &GetSubstate() const;
 
-	const PropertiesDef GetCategoryDefinition(QString sCategoryName) const;
-	const PropertiesDef GetPropertyDefinition(const QModelIndex &indexRef) const;
-	const PropertiesDef FindPropertyDefinition(QString sCategoryName, QString sPropertyName) const;
+	PropertiesDef GetCategoryDefinition(QString sCategoryName) const;
+	PropertiesDef GetDefinition(QString sCategoryName, QString sPropertyName) const;
 	
 	void SetToggleState(QString sCategoryName, Qt::CheckState eCheckState);
 	void SetToggleState(QString sCategoryName, QString sPropertyName, Qt::CheckState eCheckState);
-	virtual void SetToggleState(const QModelIndex &indexRef, Qt::CheckState eCheckState);
+	void SetToggleState(const QModelIndex &indexRef, Qt::CheckState eCheckState);
+
+	PropertiesDef GetIndexDefinition(const QModelIndex &indexRef) const;
+	QString GetIndexName(const QModelIndex &indexRef) const;
+	QVariant GetIndexValue(const QModelIndex &indexRef) const;
+	QJsonValue GetIndexJsonValue(const QModelIndex &indexRef) const;
 
 	int GetNumProperties(int iCategoryIndex) const;
-	QString GetPropertyName(const QModelIndex &indexRef) const;
 	QString GetPropertyName(int iCategoryIndex, int iPropertyIndex) const;
-	QVariant GetPropertyValue(const QModelIndex &indexRef) const;
 	QVariant GetPropertyValue(int iCategoryIndex, int iPropertyIndex) const;
-	QJsonValue GetPropertyJsonValue(const QModelIndex &indexRef) const;
 	QJsonValue GetPropertyJsonValue(int iCategoryIndex, int iPropertyIndex) const;
 	bool IsPropertyDefaultValue(int iCategoryIndex, int iPropertyIndex) const;
 	QVariant FindPropertyValue(QString sCategoryName, QString sPropertyName) const;
 	QJsonValue FindPropertyJsonValue(QString sCategoryName, QString sPropertyName) const;
 	QModelIndex FindPropertyModelIndex(QString sCategoryName, QString sPropertyName) const;
 
-	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef, Qt::CheckState eCheckState);
-	void SetPropertyAsDifferentValues(QString sCategoryName, QString sPropertyName, Qt::CheckState eCheckState);
+	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
+	void SetPropertyAsDifferentValues(QString sCategoryName, QString sPropertyName);
 
 	bool DoesCategoryExist(QString sCategoryName) const;
 	bool IsCategory(const QModelIndex &indexRef) const;
@@ -174,7 +175,9 @@ public:
 						QString sSuffix = QString(),
 						QVariant delegateBuilder = QVariant());
 
+	QPair<QString, QString> GetCatPropPairName(const QModelIndex &indexRef) const;
 	QList<QPair<QString, QString>> GetPropertiesList() const; // Returns a list of all properties in the form of (category, property) pairs
+	void RemoveAllCategoryProperties();
 
 	QJsonObject SerializeJson();
 	void DeserializeJson(const QJsonObject &propertiesObj);

@@ -101,7 +101,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	QWidget *pReturnWidget = nullptr;
 
 	PropertiesTreeModel *pPropertiesTreeModel = static_cast<PropertiesTreeModel *>(m_pTableView->model());
-	const PropertiesDef &propDefRef = pPropertiesTreeModel->GetPropertyDefinition(index);
+	PropertiesDef propDefRef = pPropertiesTreeModel->GetIndexDefinition(index);
 	switch(propDefRef.eType)
 	{
 	case PROPERTIESTYPE_bool:
@@ -246,7 +246,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
 			QVariant newValue = QRect(newColor.red(), newColor.green(), newColor.blue(), newColor.alpha());
 
-			const QVariant &origValue = pPropertiesTreeModel->GetPropertyValue(index);
+			const QVariant &origValue = pPropertiesTreeModel->GetIndexValue(index);
 			if(origValue != newValue)
 			{
 				QUndoCommand *pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
@@ -283,8 +283,8 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
 /*virtual*/ void PropertiesDelegate::setEditorData(QWidget *pEditor, const QModelIndex &index) const /*override*/
 {
-	const QVariant &propValue = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyValue(index);
-	const PropertiesDef &propDefRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetPropertyDefinition(index);
+	const QVariant &propValue = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetIndexValue(index);
+	PropertiesDef propDefRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetIndexDefinition(index);
 
 	if(propValue.toJsonObject().isEmpty() == false)
 	{
@@ -339,7 +339,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
 	QUndoCommand *pUndoCmd = nullptr;
 
-	const PropertiesDef &propDefRef = pPropertiesTreeModel->GetPropertyDefinition(index);
+	PropertiesDef propDefRef = pPropertiesTreeModel->GetIndexDefinition(index);
 	QVariant newValue;
 	switch(propDefRef.eType)
 	{
@@ -380,7 +380,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		HyGuiLog("PropertiesDelegate::setModelData() Unsupported Delegate type:" % QString::number(propDefRef.eType), LOGTYPE_Error);
 	}
 
-	const QVariant &origValue = pPropertiesTreeModel->GetPropertyValue(index);
+	const QVariant &origValue = pPropertiesTreeModel->GetIndexValue(index);
 	if(origValue != newValue)
 	{
 		pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);

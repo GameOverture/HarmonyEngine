@@ -11,14 +11,18 @@
 #include "PropertiesTreeMultiModel.h"
 
 PropertiesTreeMultiModel::PropertiesTreeMultiModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, const QList<PropertiesTreeModel *> &multiModelListRef, QObject *pParent /*= nullptr*/) :
-	PropertiesTreeModel(ownerRef, iStateIndex, subState, pParent),
-	m_MultiModelList(multiModelListRef)
+	PropertiesTreeModel(ownerRef, iStateIndex, subState, pParent)
 {
+	Setup(multiModelListRef);
+}
+
+void PropertiesTreeMultiModel::Setup(const QList<PropertiesTreeModel *> &multiModelListRef)
+{
+	RemoveAllCategoryProperties();
+	
+	m_MultiModelList = multiModelListRef;
 	if(m_MultiModelList.isEmpty())
-	{
-		HyGuiLog("PropertiesTreeMultiModel::PropertiesTreeMultiModel() - 'multiModelListRef' is empty", LOGTYPE_Error);
 		return;
-	}
 
 	// Construct this model only with categories/properties that are shared in all the models within 'm_MultiModelList'
 
@@ -68,13 +72,13 @@ PropertiesTreeMultiModel::PropertiesTreeMultiModel(ProjectItemData &ownerRef, in
 			}
 		}
 
-		PropertiesDef propDef = pModel->FindPropertyDefinition(propPair.first, propPair.second);
-		PropertiesAccessType eAccessType = (propDef.IsToggleable()) ? PROPERTIESACCESS_ToggleUnchecked: propDef.eAccessType;
+		PropertiesDef propDef = pModel->GetDefinition(propPair.first, propPair.second);
+		PropertiesAccessType eAccessType = (propDef.IsToggleable()) ? PROPERTIESACCESS_ToggleUnchecked : propDef.eAccessType;
 		AppendProperty(propPair.first, propPair.second, propDef.eType, propDef.defaultData, propDef.sToolTip, eAccessType, propDef.minRange, propDef.maxRange, propDef.stepAmt, propDef.sPrefix, propDef.sSuffix, propDef.delegateBuilder);
 
 		QVariant value = pModel->FindPropertyValue(propPair.first, propPair.second);
 
-		Qt::CheckState eCheckState = pModel->FindPropertyDefinition(propPair.first, propPair.second).eAccessType == PROPERTIESACCESS_ToggleChecked ? Qt::Checked : Qt::Unchecked;
+		Qt::CheckState eCheckState = pModel->GetDefinition(propPair.first, propPair.second).eAccessType == PROPERTIESACCESS_ToggleChecked ? Qt::Checked : Qt::Unchecked;
 		bool bDifferentValues = false;
 		for(int i = 0; i < m_MultiModelList.size(); ++i)
 		{
@@ -82,7 +86,7 @@ PropertiesTreeMultiModel::PropertiesTreeMultiModel(ProjectItemData &ownerRef, in
 			if(pModel == pCheckAgainst)
 				continue;
 
-			Qt::CheckState eCheckAgainstCheckState = pCheckAgainst->FindPropertyDefinition(propPair.first, propPair.second).eAccessType == PROPERTIESACCESS_ToggleChecked ? Qt::Checked : Qt::Unchecked;
+			Qt::CheckState eCheckAgainstCheckState = pCheckAgainst->GetDefinition(propPair.first, propPair.second).eAccessType == PROPERTIESACCESS_ToggleChecked ? Qt::Checked : Qt::Unchecked;
 			if(eCheckState != eCheckAgainstCheckState)
 				eCheckState = Qt::PartiallyChecked;
 
@@ -91,12 +95,19 @@ PropertiesTreeMultiModel::PropertiesTreeMultiModel(ProjectItemData &ownerRef, in
 		}
 
 		if(bDifferentValues)
-			SetPropertyAsDifferentValues(propPair.first, propPair.second, eCheckState);
+			SetPropertyAsDifferentValues(propPair.first, propPair.second);
 		else
-			SetPropertyValue(propPair.first, propPair.second, value, eCheckState);
+			SetPropertyValue(propPair.first, propPair.second, value);
+
+		SetToggleState(propPair.first, propPair.second, eCheckState);
 	}
 }
 
 /*virtual*/ PropertiesTreeMultiModel::~PropertiesTreeMultiModel()
 {
+}
+
+QList<PropertiesTreeModel *> PropertiesTreeMultiModel::GetMultiModelList()
+{
+	return m_MultiModelList;
 }

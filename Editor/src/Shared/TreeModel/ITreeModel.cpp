@@ -249,19 +249,19 @@ void ITreeModel::MoveTreeItem(TreeModelItemData *pSourceItemData, TreeModelItemD
 /*virtual*/ bool ITreeModel::removeRows(int iPosition, int iRows, const QModelIndex &parentRef /*= QModelIndex()*/) /*override*/
 {
 	TreeModelItem *pParentItem = GetItem(parentRef);
-	bool bSuccess = true;
-
-	beginRemoveRows(parentRef, iPosition, iPosition + iRows - 1);
+	bool bSuccess = false;
 
 	if(pParentItem->IsRemoveValid(iPosition, iRows))
 	{
+		beginRemoveRows(parentRef, iPosition, iPosition + iRows - 1);
+
 		for(int i = 0; i < iRows; ++i)
 			OnTreeModelItemRemoved(pParentItem->GetChild(iPosition + i));
 
 		bSuccess = pParentItem->DeleteChildren(iPosition, iRows);
+	
+		endRemoveRows();
 	}
-
-	endRemoveRows();
 
 	return bSuccess;
 }
@@ -315,7 +315,10 @@ TreeModelItem *ITreeModel::GetItem(const QModelIndex &indexRef) const
 	{
 		TreeModelItem *pItem = static_cast<TreeModelItem *>(indexRef.internalPointer());
 		if(pItem)
+		{
+
 			return pItem;
+		}
 	}
 
 	return m_pRootItem;

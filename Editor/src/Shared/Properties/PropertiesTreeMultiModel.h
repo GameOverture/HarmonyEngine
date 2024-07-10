@@ -23,6 +23,9 @@ public:
 	explicit PropertiesTreeMultiModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, const QList<PropertiesTreeModel *> &multiModelListRef, QObject *pParent = nullptr);
 	virtual ~PropertiesTreeMultiModel();
 
+	void Setup(const QList<PropertiesTreeModel *> &multiModelListRef);
+	QList<PropertiesTreeModel *> GetMultiModelList();
+
 private:
 	using PropertiesTreeModel::AppendCategory;
 	using PropertiesTreeModel::AppendProperty;

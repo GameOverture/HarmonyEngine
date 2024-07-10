@@ -91,6 +91,21 @@ struct TweenJsonValues
 	{
 		Set(destVal, durVal, tweenFuncVal);
 	}
+	TweenJsonValues(TweenProperty eTweenProp)
+	{
+		switch(eTweenProp)
+		{
+		case TWEENPROP_Position:	m_Destination = QJsonArray({ 0.0, 0.0 }); break;
+		case TWEENPROP_Rotation:	m_Destination = 0.0; break;
+		case TWEENPROP_Scale:		m_Destination = QJsonArray({ 0.0, 0.0 }); break;
+		case TWEENPROP_Alpha:		m_Destination = 0.0; break;
+		default:
+			HyGuiLog("TweenJsonValues::TweenJsonValues - Unhandled TweenProperty", LOGTYPE_Error);
+			break;
+		}
+		m_Duration = 0.0;
+		m_TweenFuncType = HyGlobal::TweenFuncName(TWEENFUNC_Linear);
+	}
 	TweenJsonValues &operator=(const TweenJsonValues &rhs)
 	{
 		m_Destination = rhs.m_Destination;

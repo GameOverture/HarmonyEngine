@@ -27,10 +27,10 @@ class EntityWidget : public IWidget
 {
 	Q_OBJECT
 
-	QActionGroup					m_AddShapeActionGroup;
-	QMenu							m_ContextMenu;
+	QActionGroup						m_AddShapeActionGroup;
+	QMenu								m_ContextMenu;
 
-	PropertiesTreeMultiModel *		m_pMultiPropModel;
+	EntityPropertiesTreeMultiModel *	m_pMultiPropModel;
 
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);

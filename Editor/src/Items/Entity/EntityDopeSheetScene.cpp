@@ -983,7 +983,7 @@ QList<QPair<EntityTreeItemData *, QJsonArray>> EntityDopeSheetScene::PasteSerial
 				for(QString sPropName : categoryObj.keys())
 				{
 					// First determine if this frame has valid properties for 'pItemData'
-					if(pItemData->GetPropertiesModel().FindPropertyDefinition(sCategory, sPropName).IsValid())
+					if(pItemData->GetPropertiesModel().GetDefinition(sCategory, sPropName).IsValid())
 					{
 						// If a keyframe already exists at this frame, save the properties that will be overwritten in 'overwrittenPropertiesObj'
 						int iFrameIndex = frameDataObj["frame"].toInt() + iFrameOffset;
@@ -1070,7 +1070,7 @@ void EntityDopeSheetScene::UnpasteSerializedKeyFrames(QList<QPair<EntityTreeItem
 				for(QString sPropName : categoryObj.keys())
 				{
 					// First determine if this frame has valid properties for 'pItemData'
-					if(pItemData->GetPropertiesModel().FindPropertyDefinition(sCategory, sPropName).IsValid())
+					if(pItemData->GetPropertiesModel().GetDefinition(sCategory, sPropName).IsValid())
 						RemoveKeyFrameProperty(pItemData, frameDataObj["frame"].toInt() + iFrameOffset, sCategory, sPropName, false);
 				}
 			}
@@ -1105,7 +1105,7 @@ void EntityDopeSheetScene::InsertSerializedKeyFrames(QJsonObject keyFrameMimeObj
 				for(QString sPropName : categoryObj.keys())
 				{
 					// First determine if this frame has valid properties for 'pItemData'
-					if(pItemData->GetPropertiesModel().FindPropertyDefinition(sCategory, sPropName).IsValid())
+					if(pItemData->GetPropertiesModel().GetDefinition(sCategory, sPropName).IsValid())
 						SetKeyFrameProperty(pItemData, frameDataObj["frame"].toInt(), sCategory, sPropName, categoryObj[sPropName], false);
 				}
 			}

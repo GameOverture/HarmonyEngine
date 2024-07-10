@@ -42,7 +42,7 @@ const QVariant &PropertiesTreeModel::GetSubstate() const
 	return m_iSUBSTATE;
 }
 
-const PropertiesDef PropertiesTreeModel::GetCategoryDefinition(QString sCategoryName) const
+PropertiesDef PropertiesTreeModel::GetCategoryDefinition(QString sCategoryName) const
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
@@ -55,25 +55,25 @@ const PropertiesDef PropertiesTreeModel::GetCategoryDefinition(QString sCategory
 	return PropertiesDef();
 }
 
-const PropertiesDef PropertiesTreeModel::GetPropertyDefinition(const QModelIndex &indexRef) const
-{
-	TreeModelItem *pTreeItem = GetItem(indexRef);
-	return m_PropertyDefMap[pTreeItem];
-}
-
-const PropertiesDef PropertiesTreeModel::FindPropertyDefinition(QString sCategoryName, QString sPropertyName) const
+PropertiesDef PropertiesTreeModel::GetDefinition(QString sCategoryName, QString sPropertyName) const
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
 		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
 		{
 			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
-			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
+
+			if(sPropertyName.isEmpty())
+				return m_PropertyDefMap[pCategoryTreeItem]; // Return the category definition if 'sPropertyName' is empty
+			else
 			{
-				if(0 == pCategoryTreeItem->GetChild(j)->data(PROPERTIESCOLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+				for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
 				{
-					TreeModelItem *pPropertyItem = pCategoryTreeItem->GetChild(j);
-					return m_PropertyDefMap[pPropertyItem];
+					if(0 == pCategoryTreeItem->GetChild(j)->data(PROPERTIESCOLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+					{
+						TreeModelItem *pPropertyItem = pCategoryTreeItem->GetChild(j);
+						return m_PropertyDefMap[pPropertyItem];
+					}
 				}
 			}
 		}
@@ -101,6 +101,13 @@ void PropertiesTreeModel::SetToggleState(QString sCategoryName, QString sPropert
 		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
 		{
 			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+
+			if(sPropertyName.isEmpty())
+			{
+				SetToggleState(createIndex(i, PROPERTIESCOLUMN_Name, pCategoryTreeItem), eCheckState);
+				return;
+			}
+
 			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
 			{
 				if(0 == pCategoryTreeItem->GetChild(j)->data(PROPERTIESCOLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
@@ -113,9 +120,12 @@ void PropertiesTreeModel::SetToggleState(QString sCategoryName, QString sPropert
 	}
 }
 
-/*virtual*/ void PropertiesTreeModel::SetToggleState(const QModelIndex &indexRef, Qt::CheckState eCheckState)
+void PropertiesTreeModel::SetToggleState(const QModelIndex &indexRef, Qt::CheckState eCheckState)
 {
 	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(m_PropertyDefMap[pTreeItem].IsToggleable() == false)
+		return;
+
 	if(eCheckState == Qt::Checked)
 		m_PropertyDefMap[pTreeItem].eAccessType = PROPERTIESACCESS_ToggleChecked;
 	else if(eCheckState == Qt::Unchecked)
@@ -134,15 +144,45 @@ void PropertiesTreeModel::SetToggleState(QString sCategoryName, QString sPropert
 		Q_EMIT dataChanged(indexRef, indexRef);
 }
 
+PropertiesDef PropertiesTreeModel::GetIndexDefinition(const QModelIndex &indexRef) const
+{
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(pTreeItem == m_pRootItem)
+		HyGuiLog("PropertiesTreeModel::GetIndexDefinition() - Invalid indexRef sent", LOGTYPE_Error);
+
+	return m_PropertyDefMap[pTreeItem];
+}
+
+QString PropertiesTreeModel::GetIndexName(const QModelIndex &indexRef) const
+{
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(pTreeItem == m_pRootItem)
+		HyGuiLog("PropertiesTreeModel::GetIndexName() - Invalid indexRef sent", LOGTYPE_Error);
+
+	return pTreeItem->data(PROPERTIESCOLUMN_Name).toString();
+}
+
+QVariant PropertiesTreeModel::GetIndexValue(const QModelIndex &indexRef) const
+{
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(pTreeItem == m_pRootItem)
+		HyGuiLog("PropertiesTreeModel::GetIndexValue() - Invalid indexRef sent", LOGTYPE_Error);
+
+	return pTreeItem->data(PROPERTIESCOLUMN_Value);
+}
+
+QJsonValue PropertiesTreeModel::GetIndexJsonValue(const QModelIndex &indexRef) const
+{
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(pTreeItem == m_pRootItem)
+		HyGuiLog("PropertiesTreeModel::GetIndexJsonValue() - Invalid indexRef sent", LOGTYPE_Error);
+
+	return ConvertValueToJson(pTreeItem);
+}
+
 int PropertiesTreeModel::GetNumProperties(int iCategoryIndex) const
 {
 	return m_pRootItem->GetChild(iCategoryIndex)->GetNumChildren();
-}
-
-QString PropertiesTreeModel::GetPropertyName(const QModelIndex &indexRef) const
-{
-	TreeModelItem *pTreeItem = GetItem(indexRef);
-	return pTreeItem->data(PROPERTIESCOLUMN_Name).toString();
 }
 
 QString PropertiesTreeModel::GetPropertyName(int iCategoryIndex, int iPropertyIndex) const
@@ -150,23 +190,11 @@ QString PropertiesTreeModel::GetPropertyName(int iCategoryIndex, int iPropertyIn
 	return m_pRootItem->GetChild(iCategoryIndex)->GetChild(iPropertyIndex)->data(PROPERTIESCOLUMN_Name).toString();
 }
 
-QVariant PropertiesTreeModel::GetPropertyValue(const QModelIndex &indexRef) const
-{
-	TreeModelItem *pTreeItem = GetItem(indexRef);
-	return pTreeItem->data(PROPERTIESCOLUMN_Value);
-}
-
 QVariant PropertiesTreeModel::GetPropertyValue(int iCategoryIndex, int iPropertyIndex) const
 {
 	TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(iCategoryIndex);
 	TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(iPropertyIndex);
 	return pPropertyTreeItem->data(PROPERTIESCOLUMN_Value);
-}
-
-QJsonValue PropertiesTreeModel::GetPropertyJsonValue(const QModelIndex &indexRef) const
-{
-	TreeModelItem *pTreeItem = GetItem(indexRef);
-	return ConvertValueToJson(pTreeItem);
 }
 
 QJsonValue PropertiesTreeModel::GetPropertyJsonValue(int iCategoryIndex, int iPropertyIndex) const
@@ -237,7 +265,7 @@ QModelIndex PropertiesTreeModel::FindPropertyModelIndex(QString sCategoryName, Q
 	return QModelIndex();
 }
 
-/*virtual*/ void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef, Qt::CheckState eCheckState)
+/*virtual*/ void PropertiesTreeModel::SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef)
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
@@ -255,10 +283,6 @@ QModelIndex PropertiesTreeModel::FindPropertyModelIndex(QString sCategoryName, Q
 					if(setData(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Value, pPropertyTreeItem), valueRef, Qt::UserRole) == false)
 						HyGuiLog("PropertiesTreeModel::SetPropertyValue() - setData failed", LOGTYPE_Error);
 
-					// 'eCheckState' is only used for toggleable properties
-					if(m_PropertyDefMap[pPropertyTreeItem].IsToggleable())
-						SetToggleState(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Name, pPropertyTreeItem), eCheckState);
-
 					return;
 				}
 			}
@@ -266,7 +290,7 @@ QModelIndex PropertiesTreeModel::FindPropertyModelIndex(QString sCategoryName, Q
 	}
 }
 
-void PropertiesTreeModel::SetPropertyAsDifferentValues(QString sCategoryName, QString sPropertyName, Qt::CheckState eCheckState)
+void PropertiesTreeModel::SetPropertyAsDifferentValues(QString sCategoryName, QString sPropertyName)
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
 	{
@@ -283,9 +307,6 @@ void PropertiesTreeModel::SetPropertyAsDifferentValues(QString sCategoryName, QS
 
 					if(setData(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Value, pPropertyTreeItem), "<Different Values>", Qt::UserRole) == false)
 						HyGuiLog("PropertiesTreeModel::SetPropertyValue() - setData failed", LOGTYPE_Error);
-
-					if(m_PropertyDefMap[pPropertyTreeItem].IsToggleable())
-						SetToggleState(createIndex(pPropertyTreeItem->GetIndex(), PROPERTIESCOLUMN_Name, pPropertyTreeItem), eCheckState);
 
 					return;
 				}
@@ -481,6 +502,21 @@ bool PropertiesTreeModel::AppendProperty(QString sCategoryName,
 	return true;
 }
 
+QPair<QString, QString> PropertiesTreeModel::GetCatPropPairName(const QModelIndex &indexRef) const
+{
+	TreeModelItem *pTreeItem = GetItem(indexRef);
+	if(pTreeItem == m_pRootItem)
+		return QPair<QString, QString>();
+
+	if(IsCategory(indexRef))
+		return QPair<QString, QString>(pTreeItem->data(PROPERTIESCOLUMN_Name).toString(), "");
+	else
+	{
+		TreeModelItem *pCategoryTreeItem = pTreeItem->GetParent();
+		return QPair<QString, QString>(pCategoryTreeItem->data(PROPERTIESCOLUMN_Name).toString(), pTreeItem->data(PROPERTIESCOLUMN_Name).toString());
+	}
+}
+
 QList<QPair<QString, QString>> PropertiesTreeModel::GetPropertiesList() const
 {
 	QList<QPair<QString, QString>> propertiesList;
@@ -494,6 +530,12 @@ QList<QPair<QString, QString>> PropertiesTreeModel::GetPropertiesList() const
 		}
 	}
 	return propertiesList;
+}
+
+void PropertiesTreeModel::RemoveAllCategoryProperties()
+{
+	m_PropertyDefMap.clear();
+	removeRows(0, m_pRootItem->GetNumChildren(), createIndex(m_pRootItem->GetIndex(), 0, m_pRootItem));
 }
 
 QJsonObject PropertiesTreeModel::SerializeJson()
@@ -555,7 +597,7 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 		QStringList sPropertyList = categoryObj.keys();
 		for(const QString &sProperty : sPropertyList)
 		{
-			const PropertiesDef propDef = FindPropertyDefinition(sCategory, sProperty);
+			const PropertiesDef propDef = GetDefinition(sCategory, sProperty);
 
 			QVariant propValue;
 			bool bIsProceduralObj = false;
@@ -645,7 +687,8 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 				}
 			}
 
-			SetPropertyValue(sCategory, sProperty, propValue, Qt::Checked);
+			SetPropertyValue(sCategory, sProperty, propValue);
+			SetToggleState(sCategory, sProperty, Qt::Checked); // NOTE: SetToggleState() only sets if it's toggleable property def
 		}
 	}
 }
@@ -685,7 +728,7 @@ void PropertiesTreeModel::ResetValues()
 	//       3) Check/Uncheck a property that is 'toggleable', which changes the m_PropertyDefMap[]'s 'eAccessType'
 	if(indexRef.column() == PROPERTIESCOLUMN_Value) // Indicating case '1'
 	{
-		const QVariant &origValue = GetPropertyValue(indexRef);
+		const QVariant &origValue = GetIndexValue(indexRef);
 		if(origValue != valueRef)
 		{
 			PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
@@ -1068,7 +1111,7 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 			sRetStr += tmpComboBox.itemText(treeItemValue.toInt());
 		}
 		else
-			HyGuiLog("Project::FindItemData could not find UUID", LOGTYPE_Error);
+			HyGuiLog("PropertiesTreeModel::ConvertValueToString() - Project::FindItemData could not find UUID", LOGTYPE_Error);
 		break; }
 	case PROPERTIESTYPE_Color: {
 		QRect rect = treeItemValue.toRect();
@@ -1079,7 +1122,7 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 		break;
 
 	default:
-		HyGuiLog("PropertiesTreeItem::GetValue not implemented for type: " % QString::number(propDefRef.eType), LOGTYPE_Error);
+		HyGuiLog("PropertiesTreeModel::ConvertValueToString() - not implemented for type: " % QString::number(propDefRef.eType), LOGTYPE_Error);
 		break;
 	}
 

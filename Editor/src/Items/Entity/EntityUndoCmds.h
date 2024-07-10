@@ -408,21 +408,24 @@ public:
 
 class EntityUndoCmd_PropertyModified : public PropertiesUndoCmd
 {
-	int								m_iStateIndex;
+	PropertiesType					m_ePropTypeModified;
+
+	QList<EntityTreeItemData *>		m_EntityTreeItemDataList;
+
 	int								m_iFrameIndex;
 
 	// Only used if this UndoCmd is checking the toggle of this item - used to restore the old value(s) when undo() invoked, or override with extrapolated value
-	QJsonValue						m_OverridePropertyValue;
-	TweenJsonValues					m_OverrideTweenData;
+	QList<QJsonValue>				m_OverridePropertyValueList;
+	QList<TweenJsonValues>			m_OverrideTweenDataList;
 
 public:
 	EntityUndoCmd_PropertyModified(PropertiesTreeModel *pModel, const QModelIndex &index, const QVariant &newData, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_PropertyModified();
 
-	virtual void redo() override;
-	virtual void undo() override;
-
 protected:
+	virtual void OnRedo() override;
+	virtual void OnUndo() override;
+
 	void UpdateEntityModel(bool bIsRedo);
 };
 

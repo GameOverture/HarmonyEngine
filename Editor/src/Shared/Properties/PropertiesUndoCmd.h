@@ -11,17 +11,21 @@
 #define PROPERTIESUNDOCMD_H
 
 #include <QUndoCommand>
-#include "PropertiesTreeModel.h"
+#include "PropertiesTreeMultiModel.h"
 
 class PropertiesUndoCmd : public QUndoCommand
 {
 protected:
+	ProjectItemData &		m_ItemRef;
+	int						m_iStateIndex;
+	QVariant				m_Substate;
+
 	PropertiesTreeModel *	m_pModel;
-	QModelIndex				m_ModelIndex;
+	QPair<QString, QString> m_CatPropPair;
+	bool 					m_bIsColumnNameToggle;
 
 	QVariant				m_NewData;
 	QVariant				m_OldData;
-	bool					m_bDoFocusWidgetState;
 
 public:
 	PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIndex &index, const QVariant &newData, QUndoCommand *pParent = nullptr);
@@ -29,6 +33,10 @@ public:
 
 	virtual void redo() override;
 	virtual void undo() override;
+
+protected:
+	virtual void OnRedo();
+	virtual void OnUndo();
 };
 
 #endif // PROPERTIESUNDOCMD_H

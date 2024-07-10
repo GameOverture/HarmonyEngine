@@ -31,6 +31,21 @@ EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &ownerRef, 
 	return new EntityUndoCmd_PropertyModified(this, index, newData);
 }
 
+EntityPropertiesTreeMultiModel::EntityPropertiesTreeMultiModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QList<PropertiesTreeModel *> multiModelList, QObject *pParent /*= nullptr*/) :
+	PropertiesTreeMultiModel(ownerRef, iStateIndex, subState, multiModelList, pParent)
+{
+}
+
+/*virtual*/ EntityPropertiesTreeMultiModel::~EntityPropertiesTreeMultiModel()
+{ }
+
+/*virtual*/ PropertiesUndoCmd *EntityPropertiesTreeMultiModel::AllocateUndoCmd(const QModelIndex &index, const QVariant &newData) /*override*/
+{
+	return new EntityUndoCmd_PropertyModified(this, index, newData);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, EntityItemDeclarationType eDeclarationType, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfReferencedItem, QUuid uuidOfThis) :
 	TreeModelItemData(eItemType, uuidOfThis, sCodeName),
 	m_EntityModelRef(entityModelRef),
@@ -353,24 +368,24 @@ void EntityTreeItemData::InitalizePropertyModel()
 	{
 		m_pPropertiesModel->AppendCategory("Tween Position", QVariant(), true, "Start a positional tween from the currently selected frame");
 		m_pPropertiesModel->AppendProperty("Tween Position", "Destination", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "The target destination for the tween to reach", PROPERTIESACCESS_Mutable, -fRANGE, fRANGE, 1.0, "[", "]");
-		m_pPropertiesModel->AppendProperty("Tween Position", "Duration", PROPERTIESTYPE_double, QPointF(0.0f, 0.0f), "How long it will take to reach the target destination for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
+		m_pPropertiesModel->AppendProperty("Tween Position", "Duration", PROPERTIESTYPE_double, 0.0, "How long it will take to reach the target destination for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
 		m_pPropertiesModel->AppendProperty("Tween Position", "Tween Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::TweenFuncName(TWEENFUNC_Linear), "The type of tween to use", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTweenFuncNameList());
 
 		m_pPropertiesModel->AppendCategory("Tween Rotation", QVariant(), true, "Start a rotational tween from the currently selected frame");
 		m_pPropertiesModel->AppendProperty("Tween Rotation", "Destination", PROPERTIESTYPE_double, 0.0, "The target rotation (in degrees) for the tween to reach", PROPERTIESACCESS_Mutable, -360, 360, 1.0);
-		m_pPropertiesModel->AppendProperty("Tween Rotation", "Duration", PROPERTIESTYPE_double, QPointF(0.0f, 0.0f), "How long it will take to reach the target rotation for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
+		m_pPropertiesModel->AppendProperty("Tween Rotation", "Duration", PROPERTIESTYPE_double, 0.0, "How long it will take to reach the target rotation for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
 		m_pPropertiesModel->AppendProperty("Tween Rotation", "Tween Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::TweenFuncName(TWEENFUNC_Linear), "The type of tween to use", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTweenFuncNameList());
 
 		m_pPropertiesModel->AppendCategory("Tween Scale", QVariant(), true, "Start a scaling tween from the currently selected frame");
 		m_pPropertiesModel->AppendProperty("Tween Scale", "Destination", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "The target scale for the tween to reach", PROPERTIESACCESS_Mutable, -fRANGE, fRANGE, 0.01, "[", "]");
-		m_pPropertiesModel->AppendProperty("Tween Scale", "Duration", PROPERTIESTYPE_double, QPointF(0.0f, 0.0f), "How long it will take to reach the target scale for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
+		m_pPropertiesModel->AppendProperty("Tween Scale", "Duration", PROPERTIESTYPE_double, 0.0, "How long it will take to reach the target scale for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
 		m_pPropertiesModel->AppendProperty("Tween Scale", "Tween Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::TweenFuncName(TWEENFUNC_Linear), "The type of tween to use", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTweenFuncNameList());
 
 		if(bIsBody)
 		{
 			m_pPropertiesModel->AppendCategory("Tween Alpha", QVariant(), true, "Start an alpha/transparency tween from the currently selected frame");
 			m_pPropertiesModel->AppendProperty("Tween Alpha", "Destination", PROPERTIESTYPE_double, 1.0, "The target alpha for the tween to reach", PROPERTIESACCESS_Mutable, 0.0, 1.0, 0.01);
-			m_pPropertiesModel->AppendProperty("Tween Alpha", "Duration", PROPERTIESTYPE_double, QPointF(0.0f, 0.0f), "How long it will take to reach the target rotation for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
+			m_pPropertiesModel->AppendProperty("Tween Alpha", "Duration", PROPERTIESTYPE_double, 0.0, "How long it will take to reach the target rotation for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
 			m_pPropertiesModel->AppendProperty("Tween Alpha", "Tween Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::TweenFuncName(TWEENFUNC_Linear), "The type of tween to use", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTweenFuncNameList());
 		}
 	}

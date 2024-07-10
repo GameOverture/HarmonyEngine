@@ -11,7 +11,7 @@
 #define ENTITYTREEMODEL_H
 
 #include "ProjectItemData.h"
-#include "PropertiesTreeModel.h"
+#include "PropertiesTreeMultiModel.h"
 #include "IAssetItemData.h"
 #include "Shared/TreeModel/ITreeModel.h"
 
@@ -19,16 +19,31 @@
 #include <QJsonArray>
 
 class EntityModel;
-
 class PropertiesUndoCmd;
+
 class EntityPropertiesTreeModel : public PropertiesTreeModel
 {
+	Q_OBJECT
+
 public:
 	explicit EntityPropertiesTreeModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QObject *pParent = nullptr);
 	virtual ~EntityPropertiesTreeModel();
 
 	virtual PropertiesUndoCmd *AllocateUndoCmd(const QModelIndex &index, const QVariant &newData) override;
 };
+
+class EntityPropertiesTreeMultiModel : public PropertiesTreeMultiModel
+{
+	Q_OBJECT
+
+public:
+	explicit EntityPropertiesTreeMultiModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QList<PropertiesTreeModel *> multiModelList, QObject *pParent = nullptr);
+	virtual ~EntityPropertiesTreeMultiModel();
+
+	virtual PropertiesUndoCmd *AllocateUndoCmd(const QModelIndex &index, const QVariant &newData) override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 enum EntityItemType
 {

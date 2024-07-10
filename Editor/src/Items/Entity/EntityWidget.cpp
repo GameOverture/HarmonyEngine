@@ -409,9 +409,11 @@ void EntityWidget::SetExtrapolatedProperties()
 			multiModelList.push_back(&propModelRef);
 		}
 
+		ui->propertyTree->setModel(nullptr);
 		delete m_pMultiPropModel;
-		m_pMultiPropModel = new PropertiesTreeMultiModel(m_ItemRef, GetCurStateIndex(), -1, multiModelList);
+		m_pMultiPropModel = new EntityPropertiesTreeMultiModel(m_ItemRef, -1, 0, multiModelList, this);
 		ui->propertyTree->setModel(m_pMultiPropModel);
+
 		ui->lblSelectedItemIcon->setVisible(false);
 		ui->lblSelectedItemText->setVisible(true);
 		ui->lblSelectedItemText->setText("Multiple items selected [Frame " % QString::number(entityDopeSheetSceneRef.GetCurrentFrame()) % "]");

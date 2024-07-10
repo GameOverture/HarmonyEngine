@@ -111,8 +111,9 @@ bool TreeModelItem::InsertColumns(int iPosition, int iColumns)
 
 bool TreeModelItem::IsRemoveValid(int iPosition, int iCount)
 {
-	if(iPosition < 0 || iPosition + iCount > m_ChildList.size())
+	if(m_ChildList.empty() || iPosition < 0 || iPosition + iCount > m_ChildList.size())
 		return false;
+
 	return true;
 }
 bool TreeModelItem::DeleteChildren(int iPosition, int iCount)
