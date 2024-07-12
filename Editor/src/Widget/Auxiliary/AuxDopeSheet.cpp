@@ -46,8 +46,8 @@ AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 	UpdateWidgets();
 
 	new QShortcut(QKeySequence(Qt::Key_Space), this, SLOT(on_actionPlayAnimations_triggered()));
-	new QShortcut(QKeySequence(Qt::Key_Q), this, SLOT(on_actionRewind_triggered()));
-	new QShortcut(QKeySequence(Qt::Key_E), this, SLOT(on_actionLastKeyFrame_triggered()));
+	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this, SLOT(on_actionRewind_triggered()));
+	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_E), this, SLOT(on_actionLastKeyFrame_triggered()));
 }
 
 /*virtual*/ AuxDopeSheet::~AuxDopeSheet()

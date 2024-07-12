@@ -96,6 +96,14 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 /*virtual*/ void SpriteDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
 {
+	if(pEvent->key() == Qt::Key_Left ||
+		pEvent->key() == Qt::Key_Right ||
+		pEvent->key() == Qt::Key_Up ||
+		pEvent->key() == Qt::Key_Down)
+	{
+		OnRequestSelection(QList<IDrawExItem *>() << m_pSpriteDrawItem);
+	}
+
 	IDrawEx::OnKeyPressEvent(pEvent);
 }
 

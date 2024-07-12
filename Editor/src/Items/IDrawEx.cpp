@@ -461,7 +461,7 @@ bool IDrawEx::SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType e
 
 void IDrawEx::BeginTransform()
 {
-	if(IsActionTransforming())
+	if(IsActionTransforming() || m_SelectedItemList.isEmpty())
 		return;
 
 	TransformCtrl *pCurTransform = nullptr;
