@@ -116,6 +116,8 @@ protected:
 private Q_SLOTS:
 	void OnCtrlTab();
 	void OnCtrlShiftTab();
+	void OnCtrlF4();
+
 	void OnProcessStdOut();
 	void OnProcessErrorOut();
 

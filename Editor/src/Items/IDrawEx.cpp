@@ -13,6 +13,7 @@
 #include "Harmony.h"
 
 #include <QKeyEvent>
+#include <QApplication>
 
 IDrawEx::IDrawEx(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),
@@ -77,11 +78,6 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 
 	if(IsCameraPanning())
 		RefreshTransforms();
-	else
-	{
-		if(pEvent->key() == Qt::Key_Control || pEvent->key() == Qt::Key_Shift)
-			DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
-	}
 
 	if(pEvent->key() == Qt::Key_Left ||
 		pEvent->key() == Qt::Key_Right ||
@@ -103,6 +99,8 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 		m_ActiveTransform.pos.Set(m_vNudgeTranslate.x(), m_vNudgeTranslate.y());
 		RefreshTransforms();
 	}
+
+	DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 }
 
 /*virtual*/ void IDrawEx::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/
@@ -288,6 +286,7 @@ void IDrawEx::RefreshTransforms()
 /*virtual*/ void IDrawEx::OnCameraUpdated() /*override*/
 {
 	RefreshTransforms();
+	DoMouseMove(QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ControlModifier), QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 }
 
 void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
