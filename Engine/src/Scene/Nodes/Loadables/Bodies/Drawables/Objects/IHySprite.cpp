@@ -81,8 +81,8 @@ void IHySprite<NODETYPE, ENTTYPE>::SetAnimCtrl(HyAnimCtrl eAnimCtrl, uint32 uiSt
 	case HYANIMCTRL_ResetAndPause:
 		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_IsBouncing;
 		m_AnimCtrlAttribList[uiStateIndex] &= ~ANIMCTRLATTRIB_Finished;
-		if(m_AnimCtrlAttribList[uiStateIndex] & ANIMCTRLATTRIB_Reverse && static_cast<const HySpriteData *>(this->AcquireData())->GetState(uiStateIndex).m_uiNUMFRAMES > 0)
-			SetFrame(static_cast<const HySpriteData *>(this->AcquireData())->GetState(uiStateIndex).m_uiNUMFRAMES - 1);
+		if(m_AnimCtrlAttribList[uiStateIndex] & ANIMCTRLATTRIB_Reverse && this->AcquireData() && static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(uiStateIndex).m_uiNUMFRAMES > 0)
+			SetFrame(static_cast<const HySpriteData *>(this->UncheckedGetData())->GetState(uiStateIndex).m_uiNUMFRAMES - 1);
 		else
 			SetFrame(0);
 		
