@@ -36,7 +36,7 @@ The Harmony Engine consists of two main projects
 * Create complex Entities using the elements above
     - Apply physics, add colliders, and setup bounding volumes
 
-![Harmony Editor](https://imgur.com/a/DeCsMBW)
+![Demo](https://github.com/user-attachments/assets/d3e1ae6e-76ab-4d80-b16c-c71a6762d88a)
 
 ## Engine Features (HyEngine)
 
