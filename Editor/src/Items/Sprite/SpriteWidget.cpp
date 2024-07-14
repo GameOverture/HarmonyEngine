@@ -53,6 +53,9 @@ SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	new QShortcut(QKeySequence(Qt::Key_Space), this, SLOT(on_actionPlay_triggered()));
 	new QShortcut(QKeySequence(Qt::Key_Q), this, SLOT(on_actionFirstFrame_triggered()));
 	new QShortcut(QKeySequence(Qt::Key_E), this, SLOT(on_actionLastFrame_triggered()));
+
+	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Q), this, SLOT(OnKeyShiftQ()));
+	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_E), this, SLOT(OnKeyShiftE()));
 }
 
 /*virtual*/ SpriteWidget::~SpriteWidget()
@@ -377,6 +380,24 @@ void SpriteWidget::on_actionFirstFrame_triggered()
 void SpriteWidget::on_actionLastFrame_triggered()
 {
 	ui->framesView->selectRow(static_cast<SpriteFramesModel *>(ui->framesView->model())->rowCount() - 1);
+}
+
+void SpriteWidget::OnKeyShiftQ()
+{
+	int iRowIndex = ui->framesView->currentIndex().row() - 1;
+	if(iRowIndex < 0)
+		iRowIndex = 0;
+
+	ui->framesView->selectRow(iRowIndex);
+}
+
+void SpriteWidget::OnKeyShiftE()
+{
+	int iRowIndex = ui->framesView->currentIndex().row() + 1;
+	if(iRowIndex >= static_cast<SpriteFramesModel *>(ui->framesView->model())->rowCount())
+		iRowIndex = static_cast<SpriteFramesModel *>(ui->framesView->model())->rowCount() - 1;
+	
+	ui->framesView->selectRow(iRowIndex);
 }
 
 void SpriteWidget::on_chkReverse_clicked()

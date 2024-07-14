@@ -22,6 +22,7 @@
 #include "PropertiesTreeMultiModel.h"
 
 #include <QClipboard>
+#include <QShortcut>
 
 EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 	IWidget(itemRef, pParent),
@@ -110,6 +111,16 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	pSelectionModel->select(*pItemSelection, QItemSelectionModel::Select);
 	pSelectionModel->blockSignals(false);
 	delete pItemSelection;
+
+	m_pPreviewTimer = new QTimer(this);
+	connect(m_pPreviewTimer, SIGNAL(timeout()), this, SLOT(OnPreviewUpdate()));
+	m_pPreviewTimer->setInterval(1000 / 60);
+
+	new QShortcut(QKeySequence(Qt::Key_Space), this, SLOT(OnKeySpace()));
+	new QShortcut(QKeySequence(Qt::Key_Q), this, SLOT(OnKeyQ()));
+	new QShortcut(QKeySequence(Qt::Key_E), this, SLOT(OnKeyE()));
+	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Q), this, SLOT(OnKeyShiftQ()));
+	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_E), this, SLOT(OnKeyShiftE()));
 
 	UpdateActions();
 }
@@ -307,7 +318,8 @@ EntityWidget::~EntityWidget()
 		pEntDraw->ApplyJsonData();
 
 	AuxDopeSheet *pAuxDopeSheet = static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet));
-	pAuxDopeSheet->SetEntityStateModel(static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(iStateIndex)));
+	EntityStateData *pEntStateData = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(iStateIndex));
+	pAuxDopeSheet->SetEntityStateModel(pEntStateData);
 }
 
 QModelIndexList EntityWidget::GetSelectedItems()
@@ -351,16 +363,20 @@ void EntityWidget::RequestSelectedItemChange(EntityTreeItemData *pTreeItemData, 
 	EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
 	QModelIndex modelIndex = entityTreeModelRef.FindIndex<EntityTreeItemData *>(pTreeItemData, 0);
 
-	//QItemSelection *pItemSelection = new QItemSelection();
-	//pItemSelection->select(modelIndex, modelIndex);
-
 	ui->nodeTree->selectionModel()->select(modelIndex, flags);
-
-	//delete pItemSelection;
 }
 
 void EntityWidget::SetExtrapolatedProperties()
 {
+	if(m_pPreviewTimer->isActive())
+	{
+		ui->propertyTree->setModel(nullptr);
+		ui->lblSelectedItemIcon->setVisible(false);
+		ui->lblSelectedItemText->setVisible(true);
+		ui->lblSelectedItemText->setText("Preview Active");
+		return;
+	}
+
 	// Get selected items only, removing any folders
 	QList<EntityTreeItemData *> selectedItemsDataList;
 	QModelIndexList selectedIndexList = GetSelectedItems();
@@ -498,6 +514,55 @@ void EntityWidget::UncheckAll()
 
 	int iTotalWidth = ui->nodeTree->size().width();
 	ui->nodeTree->setColumnWidth(0, iTotalWidth - iInfoColumnWidth);
+}
+
+void EntityWidget::StopPreview()
+{
+	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntDraw == nullptr)
+		return;
+
+	pEntDraw->ClearBackgroundAction();
+	m_pPreviewTimer->stop();
+}
+
+void EntityWidget::OnKeySpace()
+{
+	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntDraw == nullptr || pEntDraw->IsActionTransforming())
+	{
+		HyGuiLog((pEntDraw == nullptr) ? "EntityDraw is nullptr" : "Finish transforming before previewing", LOGTYPE_Normal);
+		return;
+	}
+
+	if(pEntDraw->GetCurAction() == HYACTION_Previewing)
+		StopPreview();
+	else if(pEntDraw->SetBackgroundAction(HYACTION_Previewing))
+		m_pPreviewTimer->start();
+}
+
+void EntityWidget::OnKeyQ()
+{
+	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
+	entityDopeSheetSceneRef.SetCurrentFrame(0);
+}
+
+void EntityWidget::OnKeyE()
+{
+	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
+	entityDopeSheetSceneRef.SetCurrentFrame(entityDopeSheetSceneRef.GetFinalFrame());
+}
+
+void EntityWidget::OnKeyShiftQ()
+{
+	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
+	entityDopeSheetSceneRef.SetCurrentFrame(entityDopeSheetSceneRef.GetCurrentFrame() - 1);
+}
+
+void EntityWidget::OnKeyShiftE()
+{
+	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
+	entityDopeSheetSceneRef.SetCurrentFrame(entityDopeSheetSceneRef.GetCurrentFrame() + 1);
 }
 
 void EntityWidget::OnContextMenu(const QPoint &pos)
@@ -953,4 +1018,19 @@ void EntityWidget::on_actionPasteEntityItems_triggered()
 
 	EntityUndoCmd_PasteItems *pCmd = new EntityUndoCmd_PasteItems(m_ItemRef, pastedObject, pArrayFolder);
 	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::OnPreviewUpdate()
+{
+	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
+
+	int iCurFrame = entityDopeSheetSceneRef.GetCurrentFrame();
+	if(iCurFrame >= entityDopeSheetSceneRef.GetFinalFrame())
+	{
+		StopPreview();
+		return;
+	}
+
+	iCurFrame++;
+	entityDopeSheetSceneRef.SetCurrentFrame(iCurFrame);
 }

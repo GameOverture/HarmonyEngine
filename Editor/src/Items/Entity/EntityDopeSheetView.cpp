@@ -479,10 +479,6 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 		if(m_PanTimer.isActive() == false)
 			m_PanTimer.start(16);
 	}
-	else if(pEvent->key() == Qt::Key_Q)
-		GetScene()->SetCurrentFrame(GetScene()->GetCurrentFrame() - 1);
-	else if(pEvent->key() == Qt::Key_E)
-		GetScene()->SetCurrentFrame(GetScene()->GetCurrentFrame() + 1);
 }
 
 /*virtual*/ void EntityDopeSheetView::keyReleaseEvent(QKeyEvent *pEvent) /*override*/

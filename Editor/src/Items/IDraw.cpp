@@ -32,6 +32,7 @@ IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	m_pProjItem(pProjItem),
 	m_pCamera(HyEngine::Window().GetCamera2d(0)),
 	m_eDrawAction(HYACTION_None),
+	m_eBackgroundDrawAction(HYACTION_None),
 	m_uiPanFlags(0),
 	m_ptCamPos(0.0f, 0.0f),
 	m_fCamZoom(1.0f),
@@ -127,6 +128,8 @@ bool IDraw::SetAction(DrawAction eHyAction)
 
 	case HYACTION_Pending:				break;
 
+	case HYACTION_Previewing:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ForbiddenCursor); break;
+
 	case HYACTION_ManipGuideHorz:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitVCursor); break;
 	case HYACTION_ManipGuideVert:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitHCursor); break;
 
@@ -144,6 +147,7 @@ bool IDraw::SetAction(DrawAction eHyAction)
 
 	case HYACTION_EntityShapeVertexEditMode:	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
 
+	case HYACTION_Forbidden:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ForbiddenCursor); break;
 	case HYACTION_Pan:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ClosedHandCursor); break;
 	case HYACTION_MarqueeDrag:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
 
@@ -157,9 +161,18 @@ bool IDraw::SetAction(DrawAction eHyAction)
 	return true;
 }
 
+bool IDraw::SetBackgroundAction(DrawAction eHyAction)
+{
+	if(SetAction(eHyAction) == false)
+		return false;
+
+	m_eBackgroundDrawAction = eHyAction;
+	return true;
+}
+
 void IDraw::ClearAction()
 {
-	m_eDrawAction = HYACTION_None;
+	m_eDrawAction = m_eBackgroundDrawAction;
 	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor);
 
 	QList<LoadingType> currentLoadingTypeList = MainWindow::GetCurrentLoading();
@@ -170,6 +183,12 @@ void IDraw::ClearAction()
 		else
 			SetAction(HYACTION_Wait);
 	}
+}
+
+void IDraw::ClearBackgroundAction()
+{
+	m_eBackgroundDrawAction = HYACTION_None;
+	ClearAction();
 }
 
 QJsonArray IDraw::GetGuideArray(HyOrientation eOrientation)

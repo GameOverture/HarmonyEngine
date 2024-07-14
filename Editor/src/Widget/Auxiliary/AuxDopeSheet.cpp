@@ -11,6 +11,7 @@
 #include "AuxDopeSheet.h"
 #include "EntityModel.h"
 #include "EntityUndoCmds.h"
+#include "EntityWidget.h"
 #include "DlgInputName.h"
 #include "DlgInputNumber.h"
 #include "MainWindow.h"
@@ -44,10 +45,6 @@ AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 
 	m_WidgetMapper.setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
 	UpdateWidgets();
-
-	new QShortcut(QKeySequence(Qt::Key_Space), this, SLOT(on_actionPlayAnimations_triggered()));
-	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q), this, SLOT(on_actionRewind_triggered()));
-	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_E), this, SLOT(on_actionLastKeyFrame_triggered()));
 }
 
 /*virtual*/ AuxDopeSheet::~AuxDopeSheet()
@@ -491,8 +488,9 @@ void AuxDopeSheet::on_actionPreviousKeyFrame_triggered()
 
 void AuxDopeSheet::on_actionPlayAnimations_triggered()
 {
-	int i = 0;
-	i++;
+	IWidget *pWidget = GetEntityStateModel()->GetModel().GetItem().GetWidget();
+	if(pWidget)
+		static_cast<EntityWidget *>(pWidget)->OnKeySpace();
 }
 
 void AuxDopeSheet::on_actionNextKeyFrame_triggered()

@@ -32,6 +32,8 @@ class EntityWidget : public IWidget
 
 	EntityPropertiesTreeMultiModel *	m_pMultiPropModel;
 
+	QTimer *							m_pPreviewTimer;
+
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);
 	~EntityWidget();
@@ -54,7 +56,17 @@ protected:
 	virtual void showEvent(QShowEvent *pEvent) override;
 	virtual void resizeEvent(QResizeEvent *pEvent) override;
 
+	void StopPreview();
+
+public Q_SLOTS:
+	void OnKeySpace();
+
 private Q_SLOTS:
+	void OnKeyQ();
+	void OnKeyE();
+	void OnKeyShiftQ();
+	void OnKeyShiftE();
+
 	void OnContextMenu(const QPoint &pos);
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void OnCollapsedNode(const QModelIndex &indexRef);
@@ -91,6 +103,8 @@ private Q_SLOTS:
 	void on_actionCutEntityItems_triggered();
 	void on_actionCopyEntityItems_triggered();
 	void on_actionPasteEntityItems_triggered();
+
+	void OnPreviewUpdate();
 
 private:
 	Ui::EntityWidget *ui;

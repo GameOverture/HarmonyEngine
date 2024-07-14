@@ -80,6 +80,9 @@ private Q_SLOTS:
 
 	void on_actionLastFrame_triggered();
 
+	void OnKeyShiftQ();
+	void OnKeyShiftE();
+
 	void on_chkReverse_clicked();
 
 	void on_chkLoop_clicked();

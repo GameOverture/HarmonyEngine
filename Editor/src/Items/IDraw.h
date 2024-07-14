@@ -30,6 +30,8 @@ enum DrawAction
 	
 	HYACTION_Pending,						// Using 'm_PressTimer' (or mouse movement) to determine if new item selection, or drag existing selection will occur
 
+	HYACTION_Previewing,					// Previewing wants to prevent any new actions once set, but not start until any existing action in progress
+
 	HYACTION_ManipGuideHorz,
 	HYACTION_ManipGuideVert,
 
@@ -44,6 +46,7 @@ enum DrawAction
 	HYACTION_EntityShapeVertexEditMode,		// When editing polygons, line chains, and line loops
 
 	// High Priority Basic Actions:
+	HYACTION_Forbidden,						// Disable and prevents any other actions from occurring, but still allows camera panning
 	HYACTION_Pan,
 	HYACTION_MarqueeDrag,					// Marquee in progress
 
@@ -65,6 +68,7 @@ protected:
 	float												m_fCamZoom;
 
 	DrawAction											m_eDrawAction;
+	DrawAction											m_eBackgroundDrawAction;
 
 	uint32												m_uiPanFlags;
 	QPointF												m_ptOldMousePos;
@@ -89,7 +93,9 @@ public:
 	DrawAction GetCurAction() const;
 	bool IsActionTransforming() const;
 	bool SetAction(DrawAction eHyAction);
+	bool SetBackgroundAction(DrawAction eHyAction);
 	void ClearAction();
+	void ClearBackgroundAction();
 
 	QJsonArray GetGuideArray(HyOrientation eOrientation);
 

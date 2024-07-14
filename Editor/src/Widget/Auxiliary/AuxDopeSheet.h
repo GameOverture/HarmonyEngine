@@ -65,7 +65,7 @@ public:
 	EntityStateData *GetEntityStateModel() const;
 	void SetEntityStateModel(EntityStateData *pEntStateData);
 
-	void UpdateWidgets();
+	void UpdateWidgets(); // EntityWidget::OnFocusState() will call this
 
 	QMenu *AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pContextItem, int iContextFrameIndex);
 

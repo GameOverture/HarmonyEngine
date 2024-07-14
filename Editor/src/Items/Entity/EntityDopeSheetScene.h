@@ -186,6 +186,7 @@ protected:
 	virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *pEvent) override;
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// NOTE: This is a QGraphicsScene, however it is doubling as a model class as well
 class EntityDopeSheetScene : public QGraphicsScene
 {
 	EntityStateData *																m_pEntStateData;

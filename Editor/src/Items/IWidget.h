@@ -46,7 +46,7 @@ public:
 	void SetAddStateBtnEnabled(bool bEnabled);
 
 	virtual void OnGiveMenuActions(QMenu *pMenu) = 0;
-	virtual void OnUpdateActions() = 0;
+	virtual void OnUpdateActions() = 0; // TODO: Refactor IWidget::OnUpdateActions and IWidget::OnFocusState to be one function - also standardize UndoCmds to always send a minimal amount of info to widget when calling this
 	virtual void OnFocusState(int iStateIndex, QVariant subState) = 0;
 
 private Q_SLOTS:
