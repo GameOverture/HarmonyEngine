@@ -65,6 +65,7 @@ public:
 
 	float GetAnimDestination() const;
 	float GetAnimRemainingDuration() const;
+	void ChangeElapsedTime(float fNewElapsedTime);
 
 	float Extrapolate(float fExtrapolatePercent) const;
 

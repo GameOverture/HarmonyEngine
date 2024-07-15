@@ -189,6 +189,11 @@ float HyAnimFloat::GetAnimRemainingDuration() const
 	return m_fDuration - m_fElapsedTime;
 }
 
+void HyAnimFloat::ChangeElapsedTime(float fNewElapsedTime)
+{
+	m_fElapsedTime = fNewElapsedTime;
+}
+
 float HyAnimFloat::Extrapolate(float fExtrapolatePercent) const
 {
 	if(m_fpBehaviorUpdate == nullptr)
