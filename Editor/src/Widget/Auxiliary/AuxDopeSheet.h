@@ -69,6 +69,8 @@ public:
 
 	QMenu *AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pContextItem, int iContextFrameIndex);
 
+	void EnsureSelectedFrameVisible(); // Scrolls the graphics view to ensure the current frame is visible
+
 private:
 	Ui::AuxDopeSheet *ui;
 

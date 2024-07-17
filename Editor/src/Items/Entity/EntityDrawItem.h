@@ -126,37 +126,47 @@ public:
 class SubEntity : public HyEntity2d
 {
 	int												m_iFramesPerSecond;
-	int												m_iCurrentFrame;
-	int												m_iFrameOffset;
+
+	int												m_iCurrentFrame;		// Current frame (of the current state) of this sub-entity
+	float											m_fTimelineElapsed;		// How much of the root entity's timeline has been played/process before beginning this sub-entity state's timeline
+	bool											m_bTimelinePaused;
 
 	QList<QPair<IHyLoadable2d *, ItemType>>			m_ChildTypeList;
 
 	struct StateInfo
 	{
-		QMap<IHyNode2d *, QMap<int, QJsonObject>>	m_PropertiesMap;
-		QMap<int, QList<TimelineEvent>>				m_TimelineEventMap;
-		//QMap<int, QStringList>						m_CallbacksMap;
+		QMap<int, QJsonObject>						m_RootPropertiesMap;
+		QMap<IHyNode2d *, QMap<int, QJsonObject>>	m_ChildPropertiesMap;
 	};
 	QList<StateInfo>								m_StateInfoList;
 
-	bool											m_bTimelinePaused;
+	bool											m_bTimelineModified;	// If a timeline property has been modified, this indicates we need to re-extrapolate the properties with new inputs
+
+	QList<QPair<int, QString>>						m_ConflictingPropsList;	// A list of properties that are both set by the main entity, and this sub-entity at the same time
 
 public:
 	SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent);
 	virtual ~SubEntity();
 	void CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj);
 
-	virtual bool SetState(uint32 uiStateIndex) override;
-	
-	int GetTimelineFrame() const;
+	void MergeRootProperties(float fFrameDuration, QMap<int, QJsonObject> &mergeMapOut);
 
 	bool IsTimelinePaused() const;
-	void SetTimelinePaused(bool bPaused);
+	int GetTimelineFrame() const;
 
-	void ExtrapolateChildProperties(float fElapsedTime, QMap<int, QList<TimelineEvent>> &mergedTimelineEventMapOut, HyCamera2d *pCamera);
+	bool SetTimelineState(float fElapsedTime, uint32 uiStateIndex);
+	void SetTimelinePaused(float fElapsedTime, bool bPaused);
+	void SetTimelineFrame(float fElapsedTime, int iFrameIndex);
+
+	bool IsTimelineModified() const;
+
+	void ExtrapolateChildProperties(float fDestinationTime, HyCamera2d *pCamera);
+
+private:
+	using HyEntity2d::SetState;
 };
 
 
-void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, QMap<int, QList<TimelineEvent>> &timelineEventListRef, bool bEventsStopTimeline, HyCamera2d *pCamera);
+void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iSTART_FRAME, const int iDESTINATION_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, HyCamera2d *pCamera);
 
 #endif // ENTITYDRAWITEM_H

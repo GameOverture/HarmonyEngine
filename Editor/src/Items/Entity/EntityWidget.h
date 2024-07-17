@@ -32,7 +32,8 @@ class EntityWidget : public IWidget
 
 	EntityPropertiesTreeMultiModel *	m_pMultiPropModel;
 
-	QTimer *							m_pPreviewTimer;
+	QTimer *							m_pPreviewUpdateTimer;
+	QList<QUuid>						m_PreviewSelectedItemsList; // Used to restore what selected items were after previewing ends
 
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);

@@ -344,32 +344,6 @@ struct FileDataPair
 	QJsonObject	m_Meta;
 };
 
-enum TimelineEventType
-{
-	// NOTE: These values are serialized as numbers via JSON - do not change them
-	TIMELINEEVENT_Unknown = -1,
-
-	TIMELINEEVENT_PauseTimeline = 0,
-	TIMELINEEVENT_GotoPrevFrame = 1,
-	TIMELINEEVENT_GotoState = 2,
-
-	NUM_TIMELINEEVENTS
-};
-struct TimelineEvent
-{
-	TimelineEventType	m_eType;
-	QJsonValue			m_Data;
-
-	TimelineEvent() :
-		m_eType(TIMELINEEVENT_Unknown),
-		m_Data(QJsonValue())
-	{ }
-	TimelineEvent(TimelineEventType eType, QJsonValue data) :
-		m_eType(eType),
-		m_Data(data)
-	{ }
-};
-
 enum EntityItemDeclarationType
 {
 	ENTDECLTYPE_Unknown = -1,
@@ -489,8 +463,6 @@ public:
 	static QColor ConvertHyColor(HyColor color);
 
 	static EntityItemDeclarationType GetEntityDeclType(QString sType);
-
-	static QMap<int, QList<TimelineEvent>> AssembleTimelineEvents(const QMap<int, QJsonObject> &itemKeyFrameMapRef);
 };
 
 struct SortTreeWidgetsPredicate

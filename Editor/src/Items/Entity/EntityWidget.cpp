@@ -112,9 +112,9 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	pSelectionModel->blockSignals(false);
 	delete pItemSelection;
 
-	m_pPreviewTimer = new QTimer(this);
-	connect(m_pPreviewTimer, SIGNAL(timeout()), this, SLOT(OnPreviewUpdate()));
-	m_pPreviewTimer->setInterval(1000 / 60);
+	m_pPreviewUpdateTimer = new QTimer(this);
+	connect(m_pPreviewUpdateTimer, SIGNAL(timeout()), this, SLOT(OnPreviewUpdate()));
+	m_pPreviewUpdateTimer->setInterval(1000 / 60);
 
 	new QShortcut(QKeySequence(Qt::Key_Space), this, SLOT(OnKeySpace()));
 	new QShortcut(QKeySequence(Qt::Key_Q), this, SLOT(OnKeyQ()));
@@ -368,7 +368,7 @@ void EntityWidget::RequestSelectedItemChange(EntityTreeItemData *pTreeItemData, 
 
 void EntityWidget::SetExtrapolatedProperties()
 {
-	if(m_pPreviewTimer->isActive())
+	if(m_pPreviewUpdateTimer->isActive())
 	{
 		ui->propertyTree->setModel(nullptr);
 		ui->lblSelectedItemIcon->setVisible(false);
@@ -523,7 +523,11 @@ void EntityWidget::StopPreview()
 		return;
 
 	pEntDraw->ClearBackgroundAction();
-	m_pPreviewTimer->stop();
+	m_pPreviewUpdateTimer->stop();
+
+	// Restore selected items
+	RequestSelectedItems(m_PreviewSelectedItemsList);
+	m_PreviewSelectedItemsList.clear();
 }
 
 void EntityWidget::OnKeySpace()
@@ -538,31 +542,58 @@ void EntityWidget::OnKeySpace()
 	if(pEntDraw->GetCurAction() == HYACTION_Previewing)
 		StopPreview();
 	else if(pEntDraw->SetBackgroundAction(HYACTION_Previewing))
-		m_pPreviewTimer->start();
+	{
+		// Starts Preview:
+
+		// Store currently selected items to be restored after preview
+		m_PreviewSelectedItemsList.clear();
+		QModelIndexList selectedIndexList = GetSelectedItems();
+		for(const QModelIndex &index : selectedIndexList)
+		{
+			EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+			m_PreviewSelectedItemsList.push_back(pEntItemData->GetThisUuid());
+		}
+
+		// Clear selection and start preview update timer
+		RequestSelectedItems(QList<QUuid>());
+		m_pPreviewUpdateTimer->start();
+	}
 }
 
 void EntityWidget::OnKeyQ()
 {
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
 	entityDopeSheetSceneRef.SetCurrentFrame(0);
+
+	AuxDopeSheet *pAuxDopeSheet = static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet));
+	pAuxDopeSheet->EnsureSelectedFrameVisible();
 }
 
 void EntityWidget::OnKeyE()
 {
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
 	entityDopeSheetSceneRef.SetCurrentFrame(entityDopeSheetSceneRef.GetFinalFrame());
+
+	AuxDopeSheet *pAuxDopeSheet = static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet));
+	pAuxDopeSheet->EnsureSelectedFrameVisible();
 }
 
 void EntityWidget::OnKeyShiftQ()
 {
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
 	entityDopeSheetSceneRef.SetCurrentFrame(entityDopeSheetSceneRef.GetCurrentFrame() - 1);
+
+	AuxDopeSheet *pAuxDopeSheet = static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet));
+	pAuxDopeSheet->EnsureSelectedFrameVisible();
 }
 
 void EntityWidget::OnKeyShiftE()
 {
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
 	entityDopeSheetSceneRef.SetCurrentFrame(entityDopeSheetSceneRef.GetCurrentFrame() + 1);
+
+	AuxDopeSheet *pAuxDopeSheet = static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet));
+	pAuxDopeSheet->EnsureSelectedFrameVisible();
 }
 
 void EntityWidget::OnContextMenu(const QPoint &pos)
@@ -1033,4 +1064,8 @@ void EntityWidget::OnPreviewUpdate()
 
 	iCurFrame++;
 	entityDopeSheetSceneRef.SetCurrentFrame(iCurFrame);
+	
+	// Have the graphics view scroll while previewing
+	AuxDopeSheet *pAuxDopeSheet = static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet));
+	pAuxDopeSheet->EnsureSelectedFrameVisible();
 }

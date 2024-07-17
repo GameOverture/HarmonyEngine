@@ -76,6 +76,20 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 	return m_pContextClickItem;
 }
 
+void EntityDopeSheetView::EnsureSelectedFrameVisible()
+{
+	int iCurFrame = GetScene()->GetCurrentFrame();
+	QRectF viewport = sceneRect();
+	
+	QRectF curFrameRect;
+	curFrameRect.setLeft(TIMELINE_LEFT_MARGIN + (iCurFrame * TIMELINE_NOTCH_SUBLINES_WIDTH));
+	curFrameRect.setTop(viewport.top());
+	curFrameRect.setWidth(TIMELINE_NOTCH_SUBLINES_WIDTH);
+	curFrameRect.setHeight(TIMELINE_NOTCH_SUBLINES_HEIGHT);
+
+	ensureVisible(curFrameRect, TIMELINE_LEFT_MARGIN + 200, 0);
+}
+
 /*virtual*/ void EntityDopeSheetView::contextMenuEvent(QContextMenuEvent *pEvent) /*override*/
 {
 	if(m_pStateData == nullptr)
@@ -144,7 +158,7 @@ EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
 /*virtual*/ void EntityDopeSheetView::drawForeground(QPainter *pPainter, const QRectF &rect) /*override*/
 {
 	//////////////////////////////////////////////////////////////////////////
-	// DRAW CURRENT DRAGGING ITEMS PREVIEW
+	// DRAW CURRENT DRAGGING KEYFRAMES PREVIEW
 	//////////////////////////////////////////////////////////////////////////
 	if(m_eDragState == DRAGSTATE_Dragging)
 	{

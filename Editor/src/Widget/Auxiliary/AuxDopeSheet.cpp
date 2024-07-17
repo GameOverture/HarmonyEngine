@@ -468,6 +468,11 @@ void AuxDopeSheet::UpdateWidgets()
 	}
 }
 
+void AuxDopeSheet::EnsureSelectedFrameVisible()
+{
+	ui->graphicsView->EnsureSelectedFrameVisible();
+}
+
 void AuxDopeSheet::on_actionRewind_triggered()
 {
 	if(GetEntityStateModel() == nullptr)

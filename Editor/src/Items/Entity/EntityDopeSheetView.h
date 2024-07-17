@@ -63,6 +63,8 @@ public:
 
 	EntityTreeItemData *GetContextClickItem();
 
+	void EnsureSelectedFrameVisible();
+
 protected:
 	virtual void contextMenuEvent(QContextMenuEvent *pEvent) override;
 

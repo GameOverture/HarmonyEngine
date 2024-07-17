@@ -301,7 +301,7 @@ void EntityDraw::ClearShapeEdit()
 	ClearAction();
 }
 
-void EntityDraw::SetExtrapolatedProperties(bool bPreviewPlaying)
+void EntityDraw::SetExtrapolatedProperties()
 {
 	if(m_pProjItem->GetWidget() == nullptr)
 		HyGuiLog("EntityDraw::SetExtrapolatedProperties - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
@@ -309,51 +309,60 @@ void EntityDraw::SetExtrapolatedProperties(bool bPreviewPlaying)
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(m_pProjItem->GetWidget()->GetCurStateIndex()))->GetDopeSheetScene();
 
 	const float fFRAME_DURATION = 1.0f / static_cast<EntityModel &>(entityDopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond();
-	const int iCURRENT_FRAME = entityDopeSheetSceneRef.GetCurrentFrame();
+	const int iDESTINATION_FRAME = entityDopeSheetSceneRef.GetCurrentFrame();
 
 	// Set the extrapolated properties for the 'm_RootEntity' item
 	EntityTreeItemData *pRootTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().GetRootTreeItemData();
-	QMap<int, QList<TimelineEvent>> timelineEventList = entityDopeSheetSceneRef.AssembleTimelineEvents(pRootTreeItemData);
 
 	ExtrapolateProperties(&m_RootEntity,
 						  nullptr,
 						  false,
 						  ITEM_Unknown, // 'ITEM_Unknown' indicates this is the root
 						  fFRAME_DURATION,
-						  iCURRENT_FRAME,
+						  0,
+						  iDESTINATION_FRAME,
 						  entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData],
-						  timelineEventList,
-						  bPreviewPlaying == false,
 						  m_pCamera);
 
 	// Set the extrapolated properties for all the children items
 	for(IDrawExItem *pDrawItem : m_ItemList)
 	{
-		QMap<int, QList<TimelineEvent>> mergedTimelineEventList = timelineEventList;
-
 		EntityTreeItemData *pEntityTreeItemData = static_cast<EntityDrawItem *>(pDrawItem)->GetEntityTreeItemData();
 		ItemType eItemType = pEntityTreeItemData->GetType();
 		if(eItemType == ITEM_Prefix) // aka Shapes folder
 			continue;
-		else if(eItemType == ITEM_Entity) // Sub-Entity
+
+		if(eItemType == ITEM_Entity) // Sub-entity
 		{
-			QMap<int, QList<TimelineEvent>> subEntTimelineEventList = entityDopeSheetSceneRef.AssembleTimelineEvents(pEntityTreeItemData);
+			do
+			{
+				QMap<int, QJsonObject> mergedMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
+				static_cast<SubEntity *>(pDrawItem->GetHyNode())->MergeRootProperties(fFRAME_DURATION, mergedMap);
 
-			// Merge 'subEntTimelineEventList' into 'mergedTimelineEventList'
-			for(auto cachedEventIter = subEntTimelineEventList.begin(); cachedEventIter != subEntTimelineEventList.end(); ++cachedEventIter)
-				mergedTimelineEventList[cachedEventIter.key()].append(cachedEventIter.value());
+				ExtrapolateProperties(pDrawItem->GetHyNode(),
+					&pDrawItem->GetShapeCtrl(),
+					pEntityTreeItemData->IsSelected(),
+					eItemType,
+					fFRAME_DURATION,
+					0,//static_cast<SubEntity *>(pDrawItem->GetHyNode())->GetTimelineFrame(),
+					iDESTINATION_FRAME,
+					mergedMap,
+					m_pCamera);
+
+			} while(static_cast<SubEntity *>(pDrawItem->GetHyNode())->IsTimelineModified());
 		}
-
-		ExtrapolateProperties(pDrawItem->GetHyNode(),
-							  &pDrawItem->GetShapeCtrl(),
-							  pEntityTreeItemData->IsSelected(),
-							  eItemType,
-							  fFRAME_DURATION,
-							  iCURRENT_FRAME,
-							  entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData],
-							  mergedTimelineEventList,
-							  bPreviewPlaying == false,
-							  m_pCamera);
+		else
+		{
+			ExtrapolateProperties(pDrawItem->GetHyNode(),
+								  &pDrawItem->GetShapeCtrl(),
+								  pEntityTreeItemData->IsSelected(),
+								  eItemType,
+								  fFRAME_DURATION,
+								  0,
+								  iDESTINATION_FRAME,
+								  entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData],
+								  m_pCamera);
+		}
 	}
 
 	RefreshTransforms();
@@ -457,7 +466,7 @@ void EntityDraw::SetExtrapolatedProperties(bool bPreviewPlaying)
 		delete pStaleItem;
 	staleItemList.clear();
 
-	SetExtrapolatedProperties(false);
+	SetExtrapolatedProperties();
 
 	if(m_bActivateVemOnNextJsonMeta)
 	{

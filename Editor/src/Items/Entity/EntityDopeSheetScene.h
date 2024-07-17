@@ -269,9 +269,6 @@ public:
 	QStringList GetCallbackList(int iFrameIndex) const;
 	bool RenameCallback(int iFrameIndex, QString sOldCallback, QString sNewCallback);
 
-	// Returns any timeline event properties set on 'pItemData', which would be the root or a sub-entity
-	QMap<int, QList<TimelineEvent>> AssembleTimelineEvents(EntityTreeItemData *pItemData) const;
-
 	void NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems);
 	void NudgeKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, int iNudgeAmount, bool bRefreshGfxItems);
 

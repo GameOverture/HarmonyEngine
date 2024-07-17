@@ -219,13 +219,12 @@ SubEntity::SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const Q
 	HyEntity2d(pParent),
 	m_iFramesPerSecond(iFps),
 	m_iCurrentFrame(0),
-	m_iFrameOffset(0),
-	m_bTimelinePaused(false)
+	m_fTimelineElapsed(0.0f),
+	m_bTimelinePaused(false),
+	m_bTimelineModified(false)
 {
 	QMap<QUuid, IHyLoadable2d *> uuidChildMap; // Temporary map to hold the QUuid's of the children so we can link them up with their key frame properties
-	uuidChildMap[subEntityUuid] = this; // This' root, the SubEntity
-	m_ChildTypeList.append(QPair<IHyLoadable2d *, ItemType>(this, ITEM_Unknown));
-
+	
 	for(int i = 0; i < descArray.size(); ++i)
 	{
 		if(descArray[i].isObject())
@@ -246,49 +245,43 @@ SubEntity::SubEntity(Project &projectRef, int iFps, QUuid subEntityUuid, const Q
 
 	for(int i = 0; i < stateArray.size(); ++i)
 	{
-		QJsonObject stateObj = stateArray[i].toObject();
-		
 		m_StateInfoList.push_back(StateInfo());
 
-		// Cache the properties
+		// Store the child properties
+		QJsonObject stateObj = stateArray[i].toObject();
 		QJsonObject keyFramesObj = stateObj["keyFrames"].toObject();
 		for(auto iter = keyFramesObj.begin(); iter != keyFramesObj.end(); ++iter)
 		{
 			QUuid uuid(iter.key());
-			m_StateInfoList.back().m_PropertiesMap.insert(uuidChildMap[uuid], QMap<int, QJsonObject>());
-			QMap<int, QJsonObject> &propMapRef = m_StateInfoList.back().m_PropertiesMap[uuidChildMap[uuid]];
-
 			QJsonArray itemKeyFrameArray = iter.value().toArray();
-			for(int iKeyFrameArrayIndex = 0; iKeyFrameArrayIndex < itemKeyFrameArray.size(); ++iKeyFrameArrayIndex)
-			{
-				QJsonObject itemKeyFrameObj = itemKeyFrameArray[iKeyFrameArrayIndex].toObject();
-				int iFrame = itemKeyFrameObj["frame"].toInt();
-				QJsonObject propsObj = itemKeyFrameObj["props"].toObject();
 
-				propMapRef.insert(iFrame, propsObj);
+			if(subEntityUuid == uuid)
+			{
+				for(int iKeyFrameArrayIndex = 0; iKeyFrameArrayIndex < itemKeyFrameArray.size(); ++iKeyFrameArrayIndex)
+				{
+					QJsonObject itemKeyFrameObj = itemKeyFrameArray[iKeyFrameArrayIndex].toObject();
+					int iFrame = itemKeyFrameObj["frame"].toInt();
+					QJsonObject propsObj = itemKeyFrameObj["props"].toObject();
+
+					m_StateInfoList.back().m_RootPropertiesMap.insert(iFrame, propsObj);
+				}
+			}
+			else
+			{
+				m_StateInfoList.back().m_ChildPropertiesMap.insert(uuidChildMap[uuid], QMap<int, QJsonObject>());
+				QMap<int, QJsonObject> &childPropMapRef = m_StateInfoList.back().m_ChildPropertiesMap[uuidChildMap[uuid]];
+
+				for(int iKeyFrameArrayIndex = 0; iKeyFrameArrayIndex < itemKeyFrameArray.size(); ++iKeyFrameArrayIndex)
+				{
+					QJsonObject itemKeyFrameObj = itemKeyFrameArray[iKeyFrameArrayIndex].toObject();
+					int iFrame = itemKeyFrameObj["frame"].toInt();
+					QJsonObject propsObj = itemKeyFrameObj["props"].toObject();
+
+					childPropMapRef.insert(iFrame, propsObj);
+				}
 			}
 		}
-
-		// Cache the timeline Events
-		m_StateInfoList.back().m_TimelineEventMap = HyGlobal::AssembleTimelineEvents(m_StateInfoList.back().m_PropertiesMap[this]);
-
-		//// Cache the callbacks
-		//QJsonArray callbacksArray = stateObj["callbacks"].toArray();
-		//for(int i = 0; i < callbacksArray.size(); ++i)
-		//{
-		//	QJsonObject eventObj = callbacksArray[i].toObject();
-		//	int iFrameIndex = eventObj["frame"].toInt();
-
-		//	QStringList sFunctionList;
-		//	QJsonArray functionsArray = eventObj["functions"].toArray();
-		//	for(int i = 0; i < functionsArray.size(); ++i)
-		//		sFunctionList << functionsArray[i].toString();
-
-		//	m_StateInfoList.back().m_CallbacksMap.insert(iFrameIndex, sFunctionList);
-		//}
 	}
-
-	SetState(0);
 }
 /*virtual*/ SubEntity::~SubEntity()
 {
@@ -312,12 +305,13 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 
 	case ITEM_Audio:
 		pNewChild = new HyAudio2d("", HY_GUI_DATAOVERRIDE, this);
+		HyError("SubEntity ctor - Audio not implemented");
 		// TODO: how do we GuiOverrideData for audio?
 		//static_cast<HyAudio2d *>(pNewChild)->GuiOverrideData<HyAudioData>(itemDataDoc.GetObject());
 		break;
 
 	case ITEM_Particles:
-		HyGuiLog("SubEntity ctor - Particles not implemented", LOGTYPE_Error);
+		HyError("SubEntity ctor - Particles not implemented");
 		break;
 
 	case ITEM_Text: {
@@ -394,37 +388,87 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 
 	pNewChild->Load();
 }
-/*virtual*/ bool SubEntity::SetState(uint32 uiStateIndex) /*SubEntity*/
+void SubEntity::MergeRootProperties(float fFrameDuration, QMap<int, QJsonObject> &mergeMapOut)
 {
-	m_iFrameOffset = m_iCurrentFrame + m_iFrameOffset;
-	return HyEntity2d::SetState(uiStateIndex);
-}
-int SubEntity::GetTimelineFrame() const
-{
-	return m_iCurrentFrame;
+	m_ConflictingPropsList.clear();
+	m_bTimelineModified = false;
+
+	QMap<int, QJsonObject> &rootPropMapRef = m_StateInfoList[GetState()].m_RootPropertiesMap;
+	for(auto iter = rootPropMapRef.begin(); iter != rootPropMapRef.end(); ++iter)
+	{
+		int iConvertedFrameIndex = iter.key(); // TODO: Convert to main entity's frame based on frame durations
+		QJsonObject &subEntPropsObjRef = iter.value();
+
+		if(mergeMapOut.contains(iConvertedFrameIndex) == false)
+			mergeMapOut.insert(iConvertedFrameIndex, subEntPropsObjRef);
+		else
+		{
+			QJsonObject &mergePropsObjRef = mergeMapOut[iConvertedFrameIndex];
+
+			for(auto subEntIter = subEntPropsObjRef.begin(); subEntIter != subEntPropsObjRef.end(); ++subEntIter)
+			{
+				QString sSubEntCategoryName = subEntIter.key();
+
+				if(mergePropsObjRef.contains(sSubEntCategoryName) == false) // Doesn't contain the category
+					mergePropsObjRef.insert(sSubEntCategoryName, subEntIter.value());
+				else // Contains the same category, check if the properties are unique to merge. If not, add to `m_ConflictingPropsList`
+				{
+					QJsonObject mergePropsCatObj = mergePropsObjRef[sSubEntCategoryName].toObject();
+					QJsonObject subEntCatObj = subEntIter.value().toObject();
+
+					for(QString sSubEntPropertyName : subEntCatObj.keys())
+					{
+						if(mergePropsCatObj.contains(sSubEntPropertyName) == false)
+							mergePropsCatObj.insert(sSubEntPropertyName, subEntCatObj[sSubEntPropertyName]);
+						else // Conflict detected - don't overwrite main ent's property and store in conflict list
+							m_ConflictingPropsList.push_back(QPair<int, QString>(iConvertedFrameIndex, sSubEntCategoryName + '/' + sSubEntPropertyName));
+					}
+
+					mergePropsObjRef[sSubEntCategoryName] = mergePropsCatObj;
+				}
+			}
+		}
+	}
 }
 bool SubEntity::IsTimelinePaused() const
 {
 	return m_bTimelinePaused;
 }
-void SubEntity::SetTimelinePaused(bool bPaused)
+int SubEntity::GetTimelineFrame() const
 {
+	return m_iCurrentFrame;
+}
+bool SubEntity::SetTimelineState(float fElapsedTime, uint32 uiStateIndex)
+{
+	m_fTimelineElapsed = fElapsedTime;
+	m_iCurrentFrame = 0;
+	m_bTimelineModified = true;
+
+	return SetState(uiStateIndex);
+}
+void SubEntity::SetTimelinePaused(float fElapsedTime, bool bPaused)
+{
+	m_fTimelineElapsed = fElapsedTime;
 	m_bTimelinePaused = bPaused;
 }
-void SubEntity::ExtrapolateChildProperties(float fElapsedTime, QMap<int, QList<TimelineEvent>> &mergedTimelineEventMapOut, HyCamera2d *pCamera)
+void SubEntity::SetTimelineFrame(float fElapsedTime, int iFrameIndex)
 {
-	m_iCurrentFrame = static_cast<int>(fElapsedTime * m_iFramesPerSecond);
-
+	m_fTimelineElapsed = fElapsedTime;
+	m_iCurrentFrame = iFrameIndex;
+	m_bTimelineModified = true;
+}
+bool SubEntity::IsTimelineModified() const
+{
+	return m_bTimelineModified;
+}
+void SubEntity::ExtrapolateChildProperties(float fDestinationTime, HyCamera2d *pCamera)
+{
+	int iDestinationFrame = static_cast<int>((fDestinationTime - m_fTimelineElapsed) * m_iFramesPerSecond);
 	const float fFRAME_DURATION = 1.0f / m_iFramesPerSecond;
-	const QMap<IHyNode2d *, QMap<int, QJsonObject>>	&propMapRef = m_StateInfoList[GetState()].m_PropertiesMap;
 
-	// Merge 'cachedTimelineEventMapRef' into 'mergedTimelineEventMapOut'
-	const QMap<int, QList<TimelineEvent>> &cachedTimelineEventMapRef = m_StateInfoList[GetState()].m_TimelineEventMap;
-	for(auto cachedEventIter = cachedTimelineEventMapRef.begin(); cachedEventIter != cachedTimelineEventMapRef.end(); ++cachedEventIter)
-		mergedTimelineEventMapOut[cachedEventIter.key()].append(cachedEventIter.value());
-	
+	const QMap<IHyNode2d *, QMap<int, QJsonObject>> &childPropMapRef = m_StateInfoList[GetState()].m_ChildPropertiesMap;
 	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
-		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, fFRAME_DURATION, m_iCurrentFrame, propMapRef[childTypePair.first], mergedTimelineEventMapOut, false, pCamera);
+		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, fFRAME_DURATION, m_iCurrentFrame, iDestinationFrame, childPropMapRef[childTypePair.first], pCamera);
 }
 // SubEntity
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -434,7 +478,7 @@ void SubEntity::ExtrapolateChildProperties(float fElapsedTime, QMap<int, QList<T
 //             - EntityModel::GenerateSrc_SetStateImpl
 //             - EntityDrawItem::ExtractPropertyData
 //             - ExtrapolateProperties
-void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iCURRENT_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, QMap<int, QList<TimelineEvent>> &timelineEventListRef, bool bEventsStopTimeline, HyCamera2d *pCamera)
+void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iSTART_FRAME, const int iDESTINATION_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, HyCamera2d *pCamera)
 {
 	// Sprite Special Case:
 	// To determine the sprite's animation frame that should be presented, whenever a property that might affect
@@ -483,67 +527,10 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 	if(eItemType == ITEM_Sprite)
 		static_cast<HySprite2d *>(pThisHyNode)->SetAnimPause(true); // We always pause the animation because it is set manually by extrapolating what frame it should be, and don't want time passing to affect it.
 
-	QList<int> timelineEventFrameIndexList = timelineEventListRef.keys();
-	QList<int>::iterator timelineEventFrameIter = timelineEventFrameIndexList.begin();
-	bool bIsTimelineStopped = false;
-	int iTimelineStoppedOnFrame = -1;
-	std::function<void()> fpProcessTimelineEvents = [&]()
-	{
-		for(TimelineEvent &timelineEvent : timelineEventListRef[*timelineEventFrameIter])
-		{
-			switch(timelineEvent.m_eType)
-			{
-			case TIMELINEEVENT_PauseTimeline:
-				//if(eItemType == ITEM_Entity) // SubEntity
-				//	static_cast<SubEntity *>(pThisHyNode)->SyncTimelinePause(timelineEvent.m_Data.toBool());
-				if(timelineEvent.m_Data.toBool())
-				{
-					bIsTimelineStopped = true;
-					iTimelineStoppedOnFrame = *timelineEventFrameIter;
-				}
-				else
-				{
-					bIsTimelineStopped = false;
-					iTimelineStoppedOnFrame = -1;
-				}
-				break;
-
-			case TIMELINEEVENT_GotoState:
-				if(eItemType == ITEM_Entity) // SubEntity
-				{
-					pThisHyNode->SetState(timelineEvent.m_Data.toInt());
-					static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(fFRAME_DURATION * (iCURRENT_FRAME - *timelineEventFrameIter), HyGlobal::AssembleTimelineEvents(keyFrameMapRef), pCamera);
-				}
-				else if(bEventsStopTimeline)
-				{
-					bIsTimelineStopped = true;
-					iTimelineStoppedOnFrame = *timelineEventFrameIter;
-				}
-				break;
-
-			case TIMELINEEVENT_GotoPrevFrame:
-				//if(eItemType == ITEM_Entity) // SubEntity
-				//	static_cast<SubEntity *>(pThisHyNode)->SetCurrentFrame(timelineEvent.m_Data.toInt());
-				//else
-				//{
-				//	bIsTimelineStopped = true;
-				//	iTimelineStoppedOnFrame = *timelineEventFrameIter;
-				//}
-				break;
-			}
-		}
-
-		++timelineEventFrameIter;
-	};
-
 
 	for(int iFrame : keyFrameMapRef.keys())
 	{
-		// First process all timeline events (in order) that occurred up until 'iFrame'
-		while(iFrame <= iCURRENT_FRAME && timelineEventFrameIter != timelineEventFrameIndexList.end() && iFrame >= *timelineEventFrameIter)
-			fpProcessTimelineEvents();
-
-		if(iFrame > iCURRENT_FRAME || (bIsTimelineStopped && iFrame != iTimelineStoppedOnFrame)) // Allow the frame this was stopped on to be processed
+		if(iFrame > iDESTINATION_FRAME)// || (bIsTimelineStopped && iFrame != iTimelineStoppedOnFrame)) // Allow the frame this was stopped on to be processed
 			break;
 
 		// Process all properties that occurred on frame 'iFrame'
@@ -653,12 +640,8 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 		
 		switch(eItemType)
 		{
-		case ITEM_Unknown:	// 'ITEM_Unknown' is passed for the entity root node
-			break;
-
-		case ITEM_Entity:	// 'ITEM_Entity' is passed when this is a sub-entity
-			//if(propsObj.contains("Timeline") && propsObj["Timeline"].toObject().contains("Pause"))
-			//	static_cast<SubEntity *>(pThisHyNode)->SetTimelinePaused(fFRAME_DURATION * iFrame, propsObj["Timeline"].toObject()["Pause"].toBool());
+		case ITEM_Unknown:	// 'ITEM_Unknown' is passed for the main entity root node
+		case ITEM_Entity:	// 'ITEM_Entity' is passed when this is a sub-entity (NOTE: sub-entity timeline events are handled above)
 			break;
 
 		case ITEM_Primitive: {
@@ -821,15 +804,23 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 			break;
 		}
 
+		// Lastly, if this is a sub-entity, determine if the timeline is changing based on properties this frame
+		if(eItemType == ITEM_Entity && propsObj.contains("Timeline"))
+		{
+			QJsonObject timelineObj = propsObj["Timeline"].toObject();
+			if(timelineObj.contains("State"))
+				static_cast<SubEntity *>(pThisHyNode)->SetTimelineState(fFRAME_DURATION * iFrame, timelineObj["State"].toInt());
+			if(timelineObj.contains("Pause"))
+				static_cast<SubEntity *>(pThisHyNode)->SetTimelinePaused(fFRAME_DURATION * iFrame, timelineObj["Pause"].toBool());
+			if(timelineObj.contains("Frame"))
+				static_cast<SubEntity *>(pThisHyNode)->SetTimelineFrame(fFRAME_DURATION * iFrame, timelineObj["Frame"].toInt());
+
+			if(static_cast<SubEntity *>(pThisHyNode)->IsTimelineModified())
+				break; // This indicates we need to re-extrapolate the sub-entity's properties with new inputs
+		}
 	} // For Loop - keyFrameMapRef.keys()
 
-	// Finish processing any remaining timeline events
-	while(timelineEventFrameIter != timelineEventFrameIndexList.end() && iCURRENT_FRAME >= *timelineEventFrameIter)
-		fpProcessTimelineEvents();
-
-	const int iFINAL_FRAME = (bIsTimelineStopped) ? HyMath::Min(iTimelineStoppedOnFrame, iCURRENT_FRAME) : iCURRENT_FRAME;
-
-	// Extrapolate any remaining time to iFINAL_FRAME
+	// Extrapolate any remaining time to iDESTINATION_FRAME
 	// SPRITE ANIMS
 	if(eItemType == ITEM_Sprite)
 	{
@@ -842,18 +833,17 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bo
 		}
 
 		if(std::get<SPRITE_Paused>(spriteLastKnownAnimInfo) == false)
-			static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFINAL_FRAME - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
+			static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iDESTINATION_FRAME - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
 	}
-	else if(eItemType == ITEM_Entity) // Sub-Entity
+	else if(eItemType == ITEM_Entity && static_cast<SubEntity *>(pThisHyNode)->IsTimelineModified() == false) // Sub-Entity's children
 	{
-		// NOTE: AssembleTimelineEvents(keyFrameMapRef) is getting merged with the saved/serialized timeline events
-		static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(fFRAME_DURATION * iFINAL_FRAME, HyGlobal::AssembleTimelineEvents(keyFrameMapRef), pCamera);
+		static_cast<SubEntity *>(pThisHyNode)->ExtrapolateChildProperties(fFRAME_DURATION * iDESTINATION_FRAME, pCamera);
 	}
 
 	// TWEENS
 	for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
 	{
 		if(tweenInfo[iTweenProp].IsActive())
-			fpApplyTween(iTweenProp, iFINAL_FRAME);
+			fpApplyTween(iTweenProp, iDESTINATION_FRAME);
 	}
 }

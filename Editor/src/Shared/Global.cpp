@@ -884,32 +884,6 @@
 	return ENTDECLTYPE_Static;// ENTDECLTYPE_Unknown;
 }
 
-QMap<int, QList<TimelineEvent>> HyGlobal::AssembleTimelineEvents(const QMap<int, QJsonObject> &itemKeyFrameMapRef)
-{
-	QMap<int, QList<TimelineEvent>> timelineEventMap;
-	for(auto iter = itemKeyFrameMapRef.begin(); iter != itemKeyFrameMapRef.end(); ++iter)
-	{
-		QJsonObject keyFrameObj = iter.value();
-		if(keyFrameObj.contains("Timeline"))
-		{
-			QList<TimelineEvent> eventList;
-
-			QJsonObject timelineCategoryObj = keyFrameObj["Timeline"].toObject();
-
-			if(timelineCategoryObj.contains("Pause"))
-				eventList.append(TimelineEvent(TIMELINEEVENT_PauseTimeline, timelineCategoryObj["Pause"]));
-			if(timelineCategoryObj.contains("Frame"))
-				eventList.append(TimelineEvent(TIMELINEEVENT_GotoPrevFrame, timelineCategoryObj["Frame"]));
-			if(timelineCategoryObj.contains("State"))
-				eventList.append(TimelineEvent(TIMELINEEVENT_GotoState, timelineCategoryObj["State"]));
-
-			timelineEventMap.insert(iter.key(), eventList);
-		}
-	}
-
-	return timelineEventMap;
-}
-
 QAction *FindAction(QList<QAction *> list, QString sName)
 {
 	for(int i = 0; i < list.size(); ++i)

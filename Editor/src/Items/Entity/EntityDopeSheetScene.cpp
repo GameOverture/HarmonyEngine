@@ -260,7 +260,7 @@ void EntityDopeSheetScene::SetCurrentFrame(int iFrame)
 
 	IDraw *pDraw = m_pEntStateData->GetModel().GetItem().GetDraw();
 	if(pDraw)
-		static_cast<EntityDraw *>(pDraw)->SetExtrapolatedProperties(false);
+		static_cast<EntityDraw *>(pDraw)->SetExtrapolatedProperties();
 }
 
 int EntityDopeSheetScene::GetFinalFrame() const
@@ -1266,15 +1266,6 @@ bool EntityDopeSheetScene::RenameCallback(int iFrameIndex, QString sOldCallback,
 	
 	HyGuiLog("EntityDopeSheetScene::RenameCallback() - No callback '" % sOldCallback % "' found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
 	return false;
-}
-
-QMap<int, QList<TimelineEvent>> EntityDopeSheetScene::AssembleTimelineEvents(EntityTreeItemData *pItemData) const
-{
-	if(m_KeyFramesMap.contains(pItemData) == false)
-		return QMap<int, QList<TimelineEvent>>();
-
-	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
-	return HyGlobal::AssembleTimelineEvents(itemKeyFrameMapRef);
 }
 
 void EntityDopeSheetScene::NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems)
