@@ -35,8 +35,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Nested class Factory
 template<typename tData>
-void HyAssets::Factory<tData>::Init(HyJsonObj subDirObjRef, HyAssets &assetsRef)
+void HyAssets::Factory<tData>::Init(std::string sType, HyJsonObj subDirObjRef, HyAssets &assetsRef)
 {
+	m_sFactoryType = sType;
 	m_DataList.reserve(subDirObjRef.MemberCount());
 
 	uint32 i = 0;
@@ -60,7 +61,7 @@ const tData *HyAssets::Factory<tData>::GetData(const HyNodePath &nodePath) const
 	if(iter == m_LookupIndexMap.end())
 	{
 		if(nodePath.GetName().empty() == false)
-			HyLogError("Cannot find data for: " << nodePath.GetPath());
+			HyLogError("Cannot find data for " << m_sFactoryType << ": " << nodePath.GetPath());
 
 		return nullptr;
 	}
@@ -637,15 +638,15 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	HyAssert(itemsDoc.IsObject(), "HyAssets::OnThreadInit - Items json file wasn't an object");
 
 	if(itemsDoc.HasMember("Audio"))
-		m_AudioFactory.Init(itemsDoc["Audio"].GetObject(), *this);
+		m_AudioFactory.Init("Audio", itemsDoc["Audio"].GetObject(), *this);
 	if(itemsDoc.HasMember("Sprites"))
-		m_SpriteFactory.Init(itemsDoc["Sprites"].GetObject(), *this);
+		m_SpriteFactory.Init("Sprite", itemsDoc["Sprites"].GetObject(), *this);
 	if(itemsDoc.HasMember("Texts"))
-		m_TextFactory.Init(itemsDoc["Texts"].GetObject(), *this);
+		m_TextFactory.Init("Text", itemsDoc["Texts"].GetObject(), *this);
 	if(itemsDoc.HasMember("Spine"))
-		m_SpineFactory.Init(itemsDoc["Spine"].GetObject(), *this);
+		m_SpineFactory.Init("Spine", itemsDoc["Spine"].GetObject(), *this);
 	if(itemsDoc.HasMember("Prefabs"))
-		m_PrefabFactory.Init(itemsDoc["Prefabs"].GetObject(), *this);
+		m_PrefabFactory.Init("Prefab", itemsDoc["Prefabs"].GetObject(), *this);
 #endif
 
 	// Atomic boolean indicated to main thread that we're initialized

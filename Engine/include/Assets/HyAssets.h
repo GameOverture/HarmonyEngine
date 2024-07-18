@@ -64,11 +64,12 @@ class HyAssets : public IHyThreadClass
 	template<typename tData>
 	class Factory
 	{
+		std::string												m_sFactoryType;
 		std::map<uint32, uint32>								m_LookupIndexMap; // Key is the HyNodePath's hash
 		std::vector<tData>										m_DataList;
 
 	public:
-		void Init(HyJsonObj subDirObjRef, HyAssets &assetsRef);
+		void Init(std::string sType, HyJsonObj subDirObjRef, HyAssets &assetsRef);
 		const tData *GetData(const HyNodePath &nodePath) const;
 	};
 	Factory<HyAudioData>										m_AudioFactory;

@@ -339,14 +339,27 @@ uint32 IHyText<NODETYPE, ENTTYPE>::GetNumLayers(uint32 uiStateIndex)
 template<typename NODETYPE, typename ENTTYPE>
 std::pair<HyColor, HyColor> IHyText<NODETYPE, ENTTYPE>::GetLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex)
 {
+	if(this->AcquireData() == nullptr || uiStateIndex >= m_StateColors.size() || uiLayerIndex >= m_StateColors[uiStateIndex]->m_LayerColors.size())
+	{
+		if(this->AcquireData() == nullptr)
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::GetLayerColor invoked on null data");
+		else
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::GetLayerColor() was passed invalid 'uiStateIndex' or 'uiLayerIndex'");
+		return std::pair<HyColor, HyColor>(HyColor(0, 0, 0, 0), HyColor(0, 0, 0, 0));
+	}
+
 	return std::pair<HyColor, HyColor>(m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topClr, m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botClr);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor)
 {
-	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetLayerColor invoked on null data");
+	if(this->AcquireData() == nullptr || uiStateIndex >= m_StateColors.size() || uiLayerIndex >= m_StateColors[uiStateIndex]->m_LayerColors.size())
+	{
+		if(this->AcquireData() == nullptr)
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::SetLayerColor invoked on null data");
+		else
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::SetLayerColor() was passed invalid 'uiStateIndex' or 'uiLayerIndex'");
 		return;
 	}
 
@@ -358,6 +371,15 @@ void IHyText<NODETYPE, ENTTYPE>::SetLayerColor(uint32 uiStateIndex, uint32 uiLay
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::TweenLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor, float fDuration, HyTweenFunc fpTween /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/)
 {
+	if(this->AcquireData() == nullptr || uiStateIndex >= m_StateColors.size() || uiLayerIndex >= m_StateColors[uiStateIndex]->m_LayerColors.size())
+	{
+		if(this->AcquireData() == nullptr)
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TweenLayerColor invoked on null data");
+		else
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::TweenLayerColor() was passed invalid 'uiStateIndex' or 'uiLayerIndex'");
+		return;
+	}
+
 	m_uiTextAttributes |= TEXTATTRIB_IsTweeningLayerColor;
 
 	delete m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData;
@@ -373,12 +395,30 @@ bool IHyText<NODETYPE, ENTTYPE>::IsTweeningLayerColor()
 template<typename NODETYPE, typename ENTTYPE>
 bool IHyText<NODETYPE, ENTTYPE>::IsTweeningLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex)
 {
+	if(this->AcquireData() == nullptr || uiStateIndex >= m_StateColors.size() || uiLayerIndex >= m_StateColors[uiStateIndex]->m_LayerColors.size())
+	{
+		if(this->AcquireData() == nullptr)
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::IsTweeningLayerColor invoked on null data");
+		else
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::IsTweeningLayerColor() was passed invalid 'uiStateIndex' or 'uiLayerIndex'");
+		return false;
+	}
+
 	return m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData != nullptr;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
 void IHyText<NODETYPE, ENTTYPE>::StopTweeningLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex)
 {
+	if(this->AcquireData() == nullptr || uiStateIndex >= m_StateColors.size() || uiLayerIndex >= m_StateColors[uiStateIndex]->m_LayerColors.size())
+	{
+		if(this->AcquireData() == nullptr)
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::StopTweeningLayerColor invoked on null data");
+		else
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::StopTweeningLayerColor() was passed invalid 'uiStateIndex' or 'uiLayerIndex'");
+		return;
+	}
+
 	delete m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData;
 	m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->m_pActiveTweenData = nullptr;
 }
