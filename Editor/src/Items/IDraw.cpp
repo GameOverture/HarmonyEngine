@@ -475,7 +475,7 @@ bool IDraw::TryAllocateGuide(HyOrientation eOrientation, int iWorldPos)
 
 /*virtual*/ void IDraw::OnUpdate() /*override*/
 {
-	if(m_pProjItem == nullptr)
+	if(m_pProjItem == nullptr || IsVisible() == false)
 		return;
 
 	HarmonyWidget *pHarmonyWidget = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject());
