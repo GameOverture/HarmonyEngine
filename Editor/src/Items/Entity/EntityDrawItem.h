@@ -135,11 +135,10 @@ class SubEntity : public HyEntity2d
 	QList<StateInfo>								m_StateInfoList;
 
 	bool											m_bSubTimelinePaused;
-	int												m_iSubTimelineFrame;
+	int												m_iSubTimelineStartFrame;
 	bool											m_bSubTimelineDirty;			// If a timeline property has been modified, this indicates we need to re-extrapolate the properties with new inputs
 	
-	int												m_iMainTimelineElapsedFrames;
-	int												m_iMainLastDirtyFrame;
+	int												m_iMainTimelineStartFrame;
 
 	QList<QPair<int, QString>>						m_ConflictingPropsList;	// A list of properties that are both set by the main entity, and this sub-entity at the same time
 

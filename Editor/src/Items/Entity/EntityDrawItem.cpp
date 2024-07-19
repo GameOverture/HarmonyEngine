@@ -218,10 +218,9 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 SubEntity::SubEntity(Project &projectRef, QUuid subEntityUuid, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_bSubTimelinePaused(false),
-	m_iSubTimelineFrame(0),
+	m_iSubTimelineStartFrame(0),
 	m_bSubTimelineDirty(false),
-	m_iMainTimelineElapsedFrames(0),
-	m_iMainLastDirtyFrame(0)
+	m_iMainTimelineStartFrame(0)
 {
 	QMap<QUuid, IHyLoadable2d *> uuidChildMap; // Temporary map to hold the QUuid's of the children so we can link them up with their key frame properties
 	
@@ -436,7 +435,7 @@ bool SubEntity::IsTimelinePaused() const
 }
 int SubEntity::GetTimelineFrame() const
 {
-	return m_iSubTimelineFrame;
+	return m_iSubTimelineStartFrame;
 }
 void SubEntity::TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, HyCamera2d *pCamera)
 {
@@ -447,13 +446,12 @@ void SubEntity::TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, H
 	bool bFrameUpdated = timelineObj.contains("Frame");
 	if(bStateUpdated || bPausedUpdated || bFrameUpdated)
 	{
-		int iNumFramesPassed = iMainTimelineFrame - m_iMainLastDirtyFrame;
-		m_iMainLastDirtyFrame = iMainTimelineFrame;
+		int iNumFramesPassed = iMainTimelineFrame - m_iMainTimelineStartFrame;
 
 		if(m_bSubTimelinePaused == false)
-			ExtrapolateChildProperties(m_iSubTimelineFrame + iNumFramesPassed, iPrevState, pCamera);
+			ExtrapolateChildProperties(m_iSubTimelineStartFrame + iNumFramesPassed, iPrevState, pCamera);
 
-		m_iMainTimelineElapsedFrames += (iNumFramesPassed + 1);
+		m_iMainTimelineStartFrame += (iNumFramesPassed + 1);
 		m_bSubTimelineDirty = true;
 	}
 
@@ -463,9 +461,9 @@ void SubEntity::TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, H
 		m_bSubTimelinePaused = timelineObj["Paused"].toBool();
 
 	if(bFrameUpdated)
-		m_iSubTimelineFrame = timelineObj["Frame"].toInt();
+		m_iSubTimelineStartFrame = timelineObj["Frame"].toInt();
 	else if(bStateUpdated)
-		m_iSubTimelineFrame = 0;
+		m_iSubTimelineStartFrame = 0;
 }
 bool SubEntity::IsTimelineDirty() const
 {
@@ -474,7 +472,8 @@ bool SubEntity::IsTimelineDirty() const
 
 void SubEntity::ExtrapolateSubEntProperties(const QMap<int, QJsonObject> &propMapRef, bool bIsSelected, float fFrameDuration, int iMainDestinationFrame, HyCamera2d *pCamera)
 {
-	m_iMainTimelineElapsedFrames = 0;
+	m_iSubTimelineStartFrame = 0;
+	m_iMainTimelineStartFrame = 0;
 	do
 	{
 		QMap<int, QJsonObject> mergedMap = propMapRef;
@@ -485,7 +484,7 @@ void SubEntity::ExtrapolateSubEntProperties(const QMap<int, QJsonObject> &propMa
 							  bIsSelected,
 							  ITEM_Entity,
 							  fFrameDuration,
-							  m_iMainTimelineElapsedFrames,
+							  m_iMainTimelineStartFrame,
 							  iMainDestinationFrame,
 							  mergedMap,
 							  pCamera);
@@ -496,7 +495,9 @@ void SubEntity::ExtrapolateChildProperties(int iSubTimelineDestinationFrame, uin
 {
 	const QMap<IHyNode2d *, QMap<int, QJsonObject>> &childPropMapRef = m_StateInfoList[uiStateIndex].m_ChildPropertiesMap;
 	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
-		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, 1.0f / 60, m_iSubTimelineFrame, iSubTimelineDestinationFrame, childPropMapRef[childTypePair.first], pCamera);
+		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, 1.0f / 60, m_iSubTimelineStartFrame, iSubTimelineDestinationFrame, childPropMapRef[childTypePair.first], pCamera);
+
+	m_iSubTimelineStartFrame = (iSubTimelineDestinationFrame + 1);
 }
 // SubEntity
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
