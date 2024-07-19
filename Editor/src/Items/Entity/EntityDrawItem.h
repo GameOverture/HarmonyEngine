@@ -152,11 +152,11 @@ public:
 
 	bool IsTimelinePaused() const;
 	int GetTimelineFrame() const;
-	int GetMainTimelineElapsed() const;
 
 	void TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, HyCamera2d *pCamera);
 	bool IsTimelineDirty() const;
 
+	void ExtrapolateSubEntProperties(const QMap<int, QJsonObject> &propMapRef, bool bIsSelected, float fFrameDuration, int iMainDestinationFrame, HyCamera2d *pCamera);
 	void ExtrapolateChildProperties(int iSubTimelineDestinationFrame, uint32 uiStateIndex, HyCamera2d *pCamera);
 
 private:
