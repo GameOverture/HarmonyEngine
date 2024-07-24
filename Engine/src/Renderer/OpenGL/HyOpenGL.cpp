@@ -280,10 +280,10 @@ HyOpenGL::~HyOpenGL(void)
 	{
 		glEnable(GL_STENCIL_TEST);
 
+		glDisable(GL_SCISSOR_TEST);								// Ensure scissor test isn't affecting our initial stencil clear
 		glStencilMask(0xFF);									// This mask allows any 8bit value to be written to the stencil buffer (and allows clears to work)
 		glClear(GL_STENCIL_BUFFER_BIT);							// Clear stencil buffer by writing default stencil value '0' to entire buffer.
 		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);	// Disable rendering color while we determine the stencil buffer
-		//glDisable(GL_SCISSOR_TEST);							// Ensure scissor test isn't affecting our initial stencil clear
 
 		GLenum eRenderStencilFunc = GL_ALWAYS;					// What glStencilFunc func to use when rendering to the color buffer
 		GLint iRenderStencilRef = 1;							// What glStencilFunc ref value to check against when rendering to the color buffer
@@ -312,10 +312,10 @@ HyOpenGL::~HyOpenGL(void)
 				if(pStencil->GetBehavior() == HYSTENCILBEHAVIOR_Mask)
 				{
 					glStencilFunc(GL_EQUAL, 1, 0xFF);
-					glStencilOp(GL_KEEP, GL_KEEP, GL_INCR); // Increment past '1' to indicate a valid pixel
+					glStencilOp(GL_ZERO, GL_KEEP, GL_INCR); // If not a scissor pixel then zero it, otherwise increment it
 
-					eRenderStencilFunc = GL_GREATER;
-					iRenderStencilRef = 1;
+					eRenderStencilFunc = GL_EQUAL;			// Only valid pixels == 2 (both scissor and stencil) will be rendered
+					iRenderStencilRef = 2;
 				}
 				else // HYSTENCILBEHAVIOR_InvertedMask
 				{
@@ -329,7 +329,7 @@ HyOpenGL::~HyOpenGL(void)
 			else // Only stencil
 			{
 				glStencilFunc(GL_ALWAYS, 1, 0xFF);
-				glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); // Turn off any '1' from the scissor rect
+				glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE); // Write '1' to stencil buffer
 
 				eRenderStencilFunc = (pStencil->GetBehavior() == HYSTENCILBEHAVIOR_Mask) ? GL_EQUAL : GL_NOTEQUAL;
 				iRenderStencilRef = 1;
