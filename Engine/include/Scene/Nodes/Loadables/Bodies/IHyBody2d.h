@@ -64,7 +64,7 @@ public:
 
 	int32 GetDisplayOrder() const;
 	virtual void SetDisplayOrder(int32 iOrderValue);
-	virtual void ResetDisplayOrder();
+	virtual void ResetDisplayOrder(); // Unsets this's explicit display order flag, and tells the root parent to recalculate its display order for all children recursively. This recursion does not override any explicit display order values that have been set.
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) = 0;
 	virtual const b2AABB &GetSceneAABB() = 0;

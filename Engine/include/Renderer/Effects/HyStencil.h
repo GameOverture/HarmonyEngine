@@ -19,8 +19,8 @@ class IHyBody2d;
 enum HyStencilBehavior
 {
 	HYSTENCILBEHAVIOR_Scissor = 0,
-	HYSTENCILBEHAVIOR_Mask,
-	HYSTENCILBEHAVIOR_InvertedMask,
+	HYSTENCILBEHAVIOR_Mask,					// Only pixels within the stencil will be drawn
+	HYSTENCILBEHAVIOR_InvertedMask,			// Only pixels outside the stencil will be drawn
 	
 	// NOTE: Any new behaviors need to be properly implemented in HyOpenGL::DrawRenderState_2d
 };

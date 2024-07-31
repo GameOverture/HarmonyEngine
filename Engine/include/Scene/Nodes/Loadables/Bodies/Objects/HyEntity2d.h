@@ -78,7 +78,7 @@ public:
 	
 	virtual void SetDisplayOrder(int32 iOrderValue) override;
 	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
-	virtual void ResetDisplayOrder() override;
+	virtual void ResetDisplayOrder() override; // Will override all children's display order explicit flags, and assign them their 'sibling display order'
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 	virtual const b2AABB &GetSceneAABB() override;

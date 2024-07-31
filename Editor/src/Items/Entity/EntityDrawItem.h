@@ -18,12 +18,12 @@ class EntityDopeSheetScene;
 
 struct TweenInfo
 {
-	const TweenProperty m_eTWEEN_PROPERTY;
-	int m_iStartFrame;
-	QVariant m_Start;
-	QVariant m_Destination;
-	float m_fDuration;
-	TweenFuncType m_eTweenFunc;
+	const TweenProperty								m_eTWEEN_PROPERTY;
+	int												m_iStartFrame;
+	QVariant										m_Start;
+	QVariant										m_Destination;
+	float											m_fDuration;
+	TweenFuncType									m_eTweenFunc;
 
 	TweenInfo(TweenProperty eTweenProp) :
 		m_eTWEEN_PROPERTY(eTweenProp)
@@ -105,8 +105,8 @@ struct TweenInfo
 // NOTE: this class does not keep its state when removed, it is deleted (should not be passed to UndoCmd's)
 class EntityDrawItem : public IDrawExItem
 {
-	EntityTreeItemData *					m_pEntityTreeItemData;
-	IHyBody2d *								m_pChild;
+	EntityTreeItemData *							m_pEntityTreeItemData;
+	IHyBody2d *										m_pChild;
 
 public:
 	EntityDrawItem(Project &projectRef, EntityTreeItemData *pModelItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent);
