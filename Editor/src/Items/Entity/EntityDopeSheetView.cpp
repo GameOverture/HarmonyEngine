@@ -63,7 +63,13 @@ void EntityDopeSheetView::SetScene(AuxDopeSheet *pAuxDopeSheet, EntityStateData 
 	if(m_pStateData == nullptr)
 		setScene(nullptr);
 	else
+	{
 		setScene(&m_pStateData->GetDopeSheetScene());
+
+		QPoint ptScrollPos = m_pStateData->GetDopeSheetScene().GetScrollPos();
+		horizontalScrollBar()->setValue(ptScrollPos.x());
+		verticalScrollBar()->setValue(ptScrollPos.y());
+	}
 }
 
 float EntityDopeSheetView::GetZoom() const

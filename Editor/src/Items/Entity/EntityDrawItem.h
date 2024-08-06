@@ -136,9 +136,11 @@ class SubEntity : public HyEntity2d
 
 	bool											m_bSubTimelinePaused;
 	int												m_iSubTimelineStartFrame;
+	int												m_iSubTimelineRemainingFrames;
 	bool											m_bSubTimelineDirty;			// If a timeline property has been modified, this indicates we need to re-extrapolate the properties with new inputs
 	
-	int												m_iMainTimelineStartFrame;
+	int												m_iElapsedTimelineFrames;
+	int												m_iRemainingTimelineFrames;
 
 	QList<QPair<int, QString>>						m_ConflictingPropsList;	// A list of properties that are both set by the main entity, and this sub-entity at the same time
 
@@ -147,15 +149,16 @@ public:
 	virtual ~SubEntity();
 	void CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj);
 
+	void Extrapolate(const QMap<int, QJsonObject> &propMapRef, bool bIsSelected, float fFrameDuration, int iMainDestinationFrame, HyCamera2d *pCamera);
+
 	void MergeRootProperties(QMap<int, QJsonObject> &mergeMapOut);
 
 	bool IsTimelinePaused() const;
 	int GetTimelineFrame() const;
 
-	void TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, HyCamera2d *pCamera);
-	bool IsTimelineDirty() const;
+	bool TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, HyCamera2d *pCamera); // Returns true if state changes, invalidating the current timeline
 
-	void ExtrapolateSubEntProperties(const QMap<int, QJsonObject> &propMapRef, bool bIsSelected, float fFrameDuration, int iMainDestinationFrame, HyCamera2d *pCamera);
+protected:
 	void ExtrapolateChildProperties(int iSubTimelineDestinationFrame, uint32 uiStateIndex, HyCamera2d *pCamera);
 
 private:

@@ -335,11 +335,11 @@ void EntityDraw::SetExtrapolatedProperties()
 		if(eItemType == ITEM_Entity) // Sub-entity
 		{
 			const QMap<int, QJsonObject> &mergedMapRef = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
-			static_cast<SubEntity *>(pDrawItem->GetHyNode())->ExtrapolateSubEntProperties(mergedMapRef,
-																						  pEntityTreeItemData->IsSelected(),
-																						  fFRAME_DURATION,
-																						  iDESTINATION_FRAME,
-																						  m_pCamera);
+			static_cast<SubEntity *>(pDrawItem->GetHyNode())->Extrapolate(mergedMapRef,
+																		  pEntityTreeItemData->IsSelected(),
+																		  fFRAME_DURATION,
+																		  iDESTINATION_FRAME,
+																		  m_pCamera);
 		}
 		else
 		{

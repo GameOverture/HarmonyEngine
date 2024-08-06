@@ -243,6 +243,16 @@ EntityStateData *EntityDopeSheetScene::GetStateData() const
 	return m_pEntStateData;
 }
 
+QPoint EntityDopeSheetScene::GetScrollPos() const
+{
+	return m_ScrollPos;
+}
+
+void EntityDopeSheetScene::SetScrollPos(QPoint scrollPos)
+{
+	m_ScrollPos = scrollPos;
+}
+
 int EntityDopeSheetScene::GetCurrentFrame() const
 {
 	return m_iCurrentFrame;

@@ -191,6 +191,8 @@ class EntityDopeSheetScene : public QGraphicsScene
 {
 	EntityStateData *																m_pEntStateData;
 
+	QPoint																			m_ScrollPos;
+
 	// These maps store the sole location of the property data for the entire entity
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;			// Store properties and tween values
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_PoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added with UNDO
@@ -215,6 +217,9 @@ public:
 	virtual ~EntityDopeSheetScene();
 
 	EntityStateData *GetStateData() const;
+
+	QPoint GetScrollPos() const;
+	void SetScrollPos(QPoint scrollPos);
 
 	int GetCurrentFrame() const;
 	void SetCurrentFrame(int iFrameIndex);

@@ -20,6 +20,7 @@
 #include <QClipboard>
 #include <QApplication>
 #include <QShortcut>
+#include <QScrollBar>
 
 AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
@@ -62,6 +63,9 @@ EntityStateData *AuxDopeSheet::GetEntityStateModel() const
 
 void AuxDopeSheet::SetEntityStateModel(EntityStateData *pEntStateData)
 {
+	if(ui->graphicsView->GetScene())
+		ui->graphicsView->GetScene()->SetScrollPos(QPoint(ui->graphicsView->horizontalScrollBar()->value(), ui->graphicsView->verticalScrollBar()->value()));
+
 	ui->graphicsView->SetScene(this, pEntStateData);
 
 	m_WidgetMapper.clearMapping();
