@@ -417,7 +417,8 @@ void SubEntity::Extrapolate(const QMap<int, QJsonObject> &propMapRef, bool bIsSe
 
 	} while(m_bSubTimelineDirty);
 
-	ExtrapolateChildProperties(m_iSubTimelineRemainingFrames, GetState(), pCamera); // TODO: Fix this
+	if(m_iSubTimelineRemainingFrames > 0)
+		ExtrapolateChildProperties(m_iSubTimelineRemainingFrames, GetState(), pCamera);
 }
 
 void SubEntity::MergeRootProperties(QMap<int, QJsonObject> &mergeMapOut)
@@ -471,31 +472,24 @@ int SubEntity::GetTimelineFrame() const
 }
 bool SubEntity::TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, HyCamera2d *pCamera)
 {
+	int iPrevState = GetState(); // If the state is changing, we need to extrapolate the children on the current state's timeline up to this point
+
 	// Extrapolate the children on the current state timeline, up until this event was invoked on `iMainTimelineFrame`
-	int iPrevState = GetState();
 	bool bStateUpdated = timelineObj.contains("State") && SetState(timelineObj["State"].toInt());
 	bool bPausedUpdated = timelineObj.contains("Paused");
 	bool bFrameUpdated = timelineObj.contains("Frame");
-
-	if(bFrameUpdated)
-	{
-		int asdf = 0;
-		asdf++;
-	}
-
 	if(bStateUpdated || bPausedUpdated || bFrameUpdated)
 	{
 		int iNumFramesPassed = iMainTimelineFrame - m_iElapsedTimelineFrames;
 
-		if(m_bSubTimelinePaused == false)
-		{
-			ExtrapolateChildProperties(m_iSubTimelineStartFrame + iNumFramesPassed, iPrevState, pCamera);
-			m_iSubTimelineRemainingFrames -= iNumFramesPassed;
-		}
+		if(m_bSubTimelinePaused == false) // Checking if we were paused prior, NOT if we just got paused
+			ExtrapolateChildProperties(iNumFramesPassed, iPrevState, pCamera);
 
-		iNumFramesPassed += 1; // This frame has been processed, so count it for the main timeline
+		iNumFramesPassed += 1; // This frame has been processed, so add 1 when offsetting frame counters below
+
 		m_iElapsedTimelineFrames += iNumFramesPassed;
 		m_iRemainingTimelineFrames -= iNumFramesPassed;
+		m_iSubTimelineRemainingFrames -= iNumFramesPassed;
 	}
 
 	// After extrapolating children up until this point, now update the timeline properties, which will be re-merged
@@ -503,22 +497,20 @@ bool SubEntity::TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, H
 	if(bPausedUpdated)
 		m_bSubTimelinePaused = timelineObj["Paused"].toBool();
 
-	if(bFrameUpdated)
+	if(bFrameUpdated) // If both state and frame are updated, the specified frame will take precedence (runtime invokes setframe after setstate)
 		m_iSubTimelineStartFrame = timelineObj["Frame"].toInt();
 	else if(bStateUpdated)
 		m_iSubTimelineStartFrame = 0;
 
-	m_bSubTimelineDirty = bStateUpdated || bFrameUpdated;
+	m_bSubTimelineDirty = bStateUpdated || bPausedUpdated || bFrameUpdated;
 	return m_bSubTimelineDirty;
 }
 
-void SubEntity::ExtrapolateChildProperties(int iSubTimelineDestinationFrame, uint32 uiStateIndex, HyCamera2d *pCamera)
+void SubEntity::ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStateIndex, HyCamera2d *pCamera)
 {
 	const QMap<IHyNode2d *, QMap<int, QJsonObject>> &childPropMapRef = m_StateInfoList[uiStateIndex].m_ChildPropertiesMap;
 	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
-		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, 1.0f / 60, m_iSubTimelineStartFrame, iSubTimelineDestinationFrame, childPropMapRef[childTypePair.first], pCamera);
-
-	m_iSubTimelineStartFrame = (iSubTimelineDestinationFrame + 1);
+		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, 1.0f / 60, m_iSubTimelineStartFrame, m_iSubTimelineStartFrame + iNumFramesDuration, childPropMapRef[childTypePair.first], pCamera);
 }
 // SubEntity
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

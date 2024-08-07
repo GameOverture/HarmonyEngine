@@ -159,7 +159,7 @@ public:
 	bool TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, HyCamera2d *pCamera); // Returns true if state changes, invalidating the current timeline
 
 protected:
-	void ExtrapolateChildProperties(int iSubTimelineDestinationFrame, uint32 uiStateIndex, HyCamera2d *pCamera);
+	void ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStateIndex, HyCamera2d *pCamera);
 
 private:
 	using HyEntity2d::SetState;
