@@ -392,9 +392,9 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 
 void SubEntity::Extrapolate(const QMap<int, QJsonObject> &propMapRef, bool bIsSelected, float fFrameDuration, int iMainDestinationFrame, HyCamera2d *pCamera)
 {
+	m_bSubTimelinePaused = false;
 	m_iElapsedTimelineFrames = 0;
 	m_iRemainingTimelineFrames = iMainDestinationFrame;
-
 	m_iSubTimelineStartFrame = 0;
 	m_iSubTimelineRemainingFrames = iMainDestinationFrame;
 	do
@@ -404,7 +404,8 @@ void SubEntity::Extrapolate(const QMap<int, QJsonObject> &propMapRef, bool bIsSe
 		QMap<int, QJsonObject> mergedMap = propMapRef;
 		MergeRootProperties(mergedMap);
 
-		// NOTE: ExtrapolateProperties may invoke `this::TimelineEvent()` which may set m_bSubTimelineDirty to true
+		// NOTE: ExtrapolateProperties may invoke `this::TimelineEvent()` and exit early.
+		//       If so, it will set `m_bSubTimelineDirty` to true in order to re-merge the properties and then continue the extrapolation
 		ExtrapolateProperties(this,
 							  nullptr,
 							  bIsSelected,
@@ -417,7 +418,7 @@ void SubEntity::Extrapolate(const QMap<int, QJsonObject> &propMapRef, bool bIsSe
 
 	} while(m_bSubTimelineDirty);
 
-	if(m_iSubTimelineRemainingFrames > 0)
+	if(m_iSubTimelineRemainingFrames > 0 && m_bSubTimelinePaused == false)
 		ExtrapolateChildProperties(m_iSubTimelineRemainingFrames, GetState(), pCamera);
 }
 
