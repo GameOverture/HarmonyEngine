@@ -87,10 +87,14 @@ protected:
 	{
 		glm::vec2						vOffset;
 		float							fAlpha;
+		float							fScale;
+		glm::vec2						vScaleKerning; // This is applied to `vOffset` when rendering if fScale != 1.0f
 
 		GlyphInfo() :
 			vOffset(0.0f),
-			fAlpha(1.0f)
+			fAlpha(1.0f),
+			fScale(1.0f),
+			vScaleKerning(0.0f)
 		{ }
 	};
 	GlyphInfo *							m_pGlyphInfos;
@@ -133,6 +137,7 @@ public:
 	uint32 GetCharacterCode(uint32 uiCharIndex) const;
 	glm::vec2 GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);
 	glm::vec2 GetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex);
+	void SetGlyphScale(uint32 uiCharIndex, float fScale);
 	float GetGlyphAlpha(uint32 uiCharIndex);
 	void SetGlyphAlpha(uint32 uiCharIndex, float fAlpha);
 
@@ -194,6 +199,7 @@ protected:
 	virtual void OnLoadedUpdate() override;
 
 	void CalculateGlyphInfos();
+	void CalculateGlyphScaleKerning();
 
 private:
 	void MarkAsDirty();

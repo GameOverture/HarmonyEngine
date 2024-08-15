@@ -275,6 +275,33 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphSize(uint32 uiCharIndex, uint32 ui
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+void IHyText<NODETYPE, ENTTYPE>::SetGlyphScale(uint32 uiCharIndex, float fScale)
+{
+	CalculateGlyphInfos();
+
+	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr)
+	{
+		if(this->UncheckedGetData() == nullptr) {
+			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha invoked on null data");
+		}
+
+		return;
+	}
+
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
+	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
+
+	for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
+	{
+		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, uiLayerIndex);
+		HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha() was passed invalid 'uiCharIndex'");
+		m_pGlyphInfos[uiGlyphOffsetIndex].fScale = fScale;
+	}
+
+	CalculateGlyphScaleKerning();
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 float IHyText<NODETYPE, ENTTYPE>::GetGlyphAlpha(uint32 uiCharIndex)
 {
 	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr)
@@ -1274,12 +1301,57 @@ offsetCalculation:
 	delete[] pMonospaceAscender;
 	delete[] pMonospaceDecender;
 
+	CalculateGlyphScaleKerning();
+
 	this->SetDirty(this->DIRTY_SceneAABB);
 	m_uiTextAttributes &= ~TEXTATTRIB_IsDirty;
 
 #ifdef HY_USE_TEXT_DEBUG_BOXES
 	OnSetDebugBox();
 #endif
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphScaleKerning()
+{
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
+	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
+
+	float fGlyphScaleKerningAccum = 0.0f;
+
+	for(uint32 uiIndex = 1; uiIndex < m_uiNumValidCharacters; ++uiIndex) // NOTE: 'uiIndex' starts at 1, since [0] doesn't kern offset, and can't take distance from previous glyph
+	{
+		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiIndex, uiNUM_LAYERS, 0);
+
+		if(GetTextType() == HYTEXT_Vertical)
+		{
+			uint32 uiPrevGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiIndex - 1, uiNUM_LAYERS, 0);
+
+			fGlyphScaleKerningAccum += (m_pGlyphInfos[uiPrevGlyphOffsetIndex].vOffset.y - m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.y) * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
+			m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.y = fGlyphScaleKerningAccum;
+			
+			if(GetAlignment() == HYALIGN_Center)
+				m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.x = (-1.0f * m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.x) * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
+		}
+		else // Left-to-Right
+		{
+			const HyTextGlyph *pGlyphRef = pData->GetGlyph(m_uiState, 0, m_Utf32CodeList[uiIndex]);
+
+			fGlyphScaleKerningAccum -= pGlyphRef->iOFFSET_X * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
+			m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.x = fGlyphScaleKerningAccum;
+
+			fGlyphScaleKerningAccum -= pGlyphRef->uiWIDTH * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
+		}
+
+		// Apply this character's scale kerning to all layers (1 thru X)
+		for(uint32 uiLayerIndex = 1; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
+		{
+			uint32 uiLayerGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiIndex, uiNUM_LAYERS, uiLayerIndex);
+			glm::vec2 vLayerDiff = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset - m_pGlyphInfos[uiLayerGlyphOffsetIndex].vOffset;
+
+			m_pGlyphInfos[uiLayerGlyphOffsetIndex].vScaleKerning = m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning + (vLayerDiff * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale));
+		}
+	}
 }
 
 template<typename NODETYPE, typename ENTTYPE>

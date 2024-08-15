@@ -176,9 +176,15 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 
 			glm::vec2 vSize(pGlyphRef->uiWIDTH, pGlyphRef->uiHEIGHT);
 			vSize *= m_fScaleBoxModifier;
-			vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
 
-			vertexBufferRef.AppendData2d(&m_pGlyphInfos[uiGlyphOffsetIndex].vOffset, sizeof(glm::vec2));
+			glm::vec2 vOffset = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset;
+
+			// If any glyph scaling is set, it is applied here
+			vSize *= m_pGlyphInfos[uiGlyphOffsetIndex].fScale;
+			vOffset += m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning;
+
+			vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
+			vertexBufferRef.AppendData2d(&vOffset, sizeof(glm::vec2));
 
 			glm::vec3 vTopColor = m_StateColors[m_uiState]->m_LayerColors[i]->topClr.GetAsVec3();
 			vTopColor *= CalculateTopTint(fExtrapolatePercent);
