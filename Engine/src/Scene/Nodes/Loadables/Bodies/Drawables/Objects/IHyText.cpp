@@ -1336,11 +1336,15 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphScaleKerning()
 		else // Left-to-Right
 		{
 			const HyTextGlyph *pGlyphRef = pData->GetGlyph(m_uiState, 0, m_Utf32CodeList[uiIndex]);
+			if(pGlyphRef)
+			{
+				fGlyphScaleKerningAccum -= pGlyphRef->iOFFSET_X * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
+				m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.x = fGlyphScaleKerningAccum;
 
-			fGlyphScaleKerningAccum -= pGlyphRef->iOFFSET_X * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
-			m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.x = fGlyphScaleKerningAccum;
-
-			fGlyphScaleKerningAccum -= pGlyphRef->uiWIDTH * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
+				fGlyphScaleKerningAccum -= pGlyphRef->uiWIDTH * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
+			}
+			else
+				m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.x = fGlyphScaleKerningAccum;
 		}
 
 		// Apply this character's scale kerning to all layers (1 thru X)
