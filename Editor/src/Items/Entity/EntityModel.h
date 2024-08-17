@@ -79,7 +79,7 @@ public:
 	bool Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow);
 	void Cmd_RenameItem(EntityTreeItemData *pItemData, QString sNewName);
 
-	void SetShapeEditDrag(EditorShape eShapeType, bool bAsPrimitive);
+	void SetShapeAdd(EditorShape eShapeType, bool bAsPrimitive);
 	void SetShapeEditVemMode(bool bEnable);
 	void ClearShapeEdit();
 

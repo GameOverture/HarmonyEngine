@@ -413,20 +413,30 @@ void EntityModel::Cmd_RenameItem(EntityTreeItemData *pItemData, QString sNewName
 		pItemData->SetText(sNewName);
 }
 
-void EntityModel::SetShapeEditDrag(EditorShape eShapeType, bool bAsPrimitive)
+void EntityModel::SetShapeAdd(EditorShape eShapeType, bool bAsPrimitive)
 {
-	QString sStatusMsg("Drawing new ");
-	sStatusMsg += bAsPrimitive ? "primitive " : "";
-	sStatusMsg += HyGlobal::ShapeName(eShapeType);
-	MainWindow::SetStatus(sStatusMsg, 0);
-
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
-	if(pWidget)
+	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pWidget == nullptr || pEntDraw == nullptr)
+		return;
+
+	if(eShapeType != SHAPE_None)
+	{
 		pWidget->CheckShapeAddBtn(eShapeType, bAsPrimitive);
 
-	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pEntDraw)
-		pEntDraw->SetShapeEditDrag(eShapeType, bAsPrimitive);
+		QString sStatusMsg("Creating New ");
+		sStatusMsg += bAsPrimitive ? "Primitive: " : "Shape: ";
+		sStatusMsg += HyGlobal::ShapeName(eShapeType);
+		MainWindow::SetStatus(sStatusMsg, 0);
+
+		pEntDraw->SetShapeEditDrag(eShapeType, bAsPrimitive); 
+	}
+	else
+	{
+		pWidget->UncheckAll();
+		MainWindow::ClearStatus();
+		pEntDraw->ClearShapeEdit();
+	}
 }
 
 void EntityModel::SetShapeEditVemMode(bool bEnable)

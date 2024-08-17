@@ -22,8 +22,8 @@ class EntityDraw : public IDrawEx
 	bool									m_bActivateVemOnNextJsonMeta;
 	bool									m_bPlayingPreview;
 
+	bool									m_bIsShapeAddPrimitive; // True when primitive, false when bounding volume shape
 	EntityDrawItem *						m_pCurVertexEditItem;
-	ShapeCtrl::VemAction					m_eCurVemAction;
 
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
@@ -37,6 +37,9 @@ public:
 	virtual void OnMouseMoveEvent(QMouseEvent *pEvent) override;
 	virtual void OnMousePressEvent(QMouseEvent *pEvent) override;
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) override;
+
+	bool IsActionSemIdle() const;
+	bool IsActionSemTransforming() const;
 
 	void SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive);
 	void ActivateVemOnNextJsonMeta();

@@ -148,12 +148,11 @@ class EntityUndoCmd_ShapeData : public QUndoCommand
 	int								m_iStateIndex;
 	int								m_iFrameIndex;
 	EntityTreeItemData *			m_pShapeItemData;
-	ShapeCtrl::VemAction			m_eVemAction;
 	QString							m_sNewData;
 	QString							m_sPrevData;
 
 public:
-	EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pShapeItemData, ShapeCtrl::VemAction eVemAction, QString sNewData, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_ShapeData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pShapeItemData, QString sNewData, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_ShapeData();
 
 	virtual void redo() override;

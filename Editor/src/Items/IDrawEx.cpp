@@ -32,6 +32,8 @@ IDrawEx::IDrawEx(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef
 		{
 			if(GetCurAction() == HYACTION_Pending)
 				BeginTransform();
+			else if(GetCurAction() == HYACTION_EntityAddShapePending)
+				SetAction(HYACTION_EntityAddShapeDrag);
 		});
 
 	m_SnapGuideHorz.SetVisible(false);

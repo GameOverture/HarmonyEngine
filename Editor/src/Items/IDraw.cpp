@@ -115,43 +115,54 @@ bool IDraw::SetAction(DrawAction eHyAction)
 	m_eDrawAction = eHyAction;
 	switch(m_eDrawAction)
 	{
-	case HYACTION_None:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
-	case HYACTION_Streaming:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BusyCursor); break;
+	case HYACTION_None:							Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
+	case HYACTION_Streaming:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BusyCursor); break;
 
-	case HYACTION_MarqueeStart:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
+	case HYACTION_MarqueeStart:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
 
-	case HYACTION_HoverItem:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;
-	case HYACTION_HoverGuideHorz:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitVCursor); break;
-	case HYACTION_HoverGuideVert:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitHCursor); break;
-	case HYACTION_HoverScale:			break; // should be handled by IDrawEx::SetTransformHoverActionViaGrabPoint()
-	case HYACTION_HoverRotate:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::UpArrowCursor); break;
+	case HYACTION_HoverItem:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;
+	case HYACTION_HoverGuideHorz:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitVCursor); break;
+	case HYACTION_HoverGuideVert:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitHCursor); break;
+	case HYACTION_HoverScale:					break; // should be handled by IDrawEx::SetTransformHoverActionViaGrabPoint()
+	case HYACTION_HoverRotate:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::UpArrowCursor); break;
 
-	case HYACTION_Pending:				break;
+	case HYACTION_Pending:						break;
 
-	case HYACTION_Previewing:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ForbiddenCursor); break;
+	case HYACTION_Previewing:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ForbiddenCursor); break;
 
-	case HYACTION_ManipGuideHorz:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitVCursor); break;
-	case HYACTION_ManipGuideVert:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitHCursor); break;
+	case HYACTION_ManipGuideHorz:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitVCursor); break;
+	case HYACTION_ManipGuideVert:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SplitHCursor); break;
 
-	case HYACTION_TransformingScale:	break; // should be handled by IDrawEx::SetTransformHoverActionViaGrabPoint()
-	case HYACTION_TransformingRotation:	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::UpArrowCursor); break;
-	case HYACTION_TransformingTranslate:
-	case HYACTION_TransformingNudging:
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor);
-		break;
+	case HYACTION_TransformingScale:			break; // should be handled by IDrawEx::SetTransformHoverActionViaGrabPoint()
+	case HYACTION_TransformingRotation:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::UpArrowCursor); break;
+	case HYACTION_TransformingTranslate:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
+	case HYACTION_TransformingNudging:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
 
-	case HYACTION_EntityAddPrimitive:
-	case HYACTION_EntityAddShape:
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor);
-		break;
+	case HYACTION_EntityAddShape:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
+	case HYACTION_EntityAddShapePending:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
+	case HYACTION_EntityAddShapeDrag:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
+	
+	case HYACTION_EntitySem:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
+	case HYACTION_EntitySemHoverTranslate:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
+	case HYACTION_EntitySemHoverAddVertex:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
+	case HYACTION_EntitySemHoverGrabVertex:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;
+	case HYACTION_EntitySemHoverRadiusHorizontal: Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeHorCursor); break;
+	case HYACTION_EntitySemHoverRadiusVertical:	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeVerCursor); break;
 
-	case HYACTION_EntityShapeVertexEditMode:	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
+	case HYACTION_EntitySemInvalid:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ForbiddenCursor); break;
+	case HYACTION_EntitySemMarquee:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
 
-	case HYACTION_Forbidden:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ForbiddenCursor); break;
-	case HYACTION_Pan:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ClosedHandCursor); break;
-	case HYACTION_MarqueeDrag:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
+	case HYACTION_EntitySemTranslating:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
+	case HYACTION_EntitySemAddingVertex:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BlankCursor); break;
+	case HYACTION_EntitySemTranslateVertex:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BlankCursor); break;
+	case HYACTION_EntitySemRadiusHorizontal:	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeHorCursor); break;
+	case HYACTION_EntitySemRadiusVertical:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeVerCursor); break;
 
-	case HYACTION_Wait:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::WaitCursor); break;
+	case HYACTION_Forbidden:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ForbiddenCursor); break;
+	case HYACTION_Pan:							Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ClosedHandCursor); break;
+	case HYACTION_MarqueeDrag:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
+
+	case HYACTION_Wait:							Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::WaitCursor); break;
 
 	default:
 		HyGuiLog("IDraw::SetAction() - Unknown DrawAction: " % QString::number(eHyAction), LOGTYPE_Error);

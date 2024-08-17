@@ -475,43 +475,16 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pShapeItemData, ShapeCtrl::VemAction eVemAction, QString sNewData, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pShapeItemData, QString sNewData, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_iStateIndex(iStateIndex),
 	m_iFrameIndex(iFrameIndex),
 	m_pShapeItemData(pShapeItemData),
-	m_eVemAction(eVemAction),
 	m_sNewData(sNewData)
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
 	m_sPrevData = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_LineEdit, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data")).toString();
-
-	switch(m_eVemAction)
-	{
-	case ShapeCtrl::VEMACTION_Translate:
-	case ShapeCtrl::VEMACTION_GrabPoint:
-		setText("Translate vert(s) on " % pShapeItemData->GetCodeName());
-		break;
-
-	case ShapeCtrl::VEMACTION_RadiusHorizontal:
-	case ShapeCtrl::VEMACTION_RadiusVertical:
-		setText("Adjust circle radius on " % pShapeItemData->GetCodeName());
-		break;
-
-	case ShapeCtrl::VEMACTION_Add:
-		setText("Add vertex to " % pShapeItemData->GetCodeName());
-		break;
-
-	case ShapeCtrl::VEMACTION_RemoveSelected:
-		setText("Remove vert(s) from " % pShapeItemData->GetCodeName());
-		break;
-
-	case ShapeCtrl::VEMACTION_Invalid:
-	case ShapeCtrl::VEMACTION_None:
-	default:
-		HyGuiLog("EntityUndoCmd_ShapeData ctor - Invalid ShapeCtrl::VemAction", LOGTYPE_Error);
-		break;
-	}
+	setText(sText);
 }
 
 /*virtual*/ EntityUndoCmd_ShapeData::~EntityUndoCmd_ShapeData()

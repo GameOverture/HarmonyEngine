@@ -12,23 +12,10 @@
 
 #include "Global.h"
 #include "GrabPoint.h"
+#include "IDraw.h"
 
 class ShapeCtrl
 {
-public:
-	enum VemAction
-	{
-		VEMACTION_Invalid = -2,
-		VEMACTION_None = -1,
-
-		VEMACTION_Translate = 0,
-		VEMACTION_GrabPoint,
-		VEMACTION_RadiusHorizontal,
-		VEMACTION_RadiusVertical,
-		VEMACTION_Add,
-		VEMACTION_RemoveSelected
-	};
-
 protected:
 	EditorShape					m_eShape;
 
@@ -62,9 +49,10 @@ public:
 
 	bool IsVemEnabled() const;
 	void EnableVertexEditMode();
-	VemAction GetMouseVemAction(bool bCtrlMod, bool bShiftMod, bool bSelectVert);
+	DrawAction GetMouseSemHoverAction(bool bCtrlMod, bool bShiftMod, bool bSelectVert);
 	void SelectVemVerts(b2AABB selectionAabb, HyCamera2d *pCamera);
-	bool TransformVemVerts(VemAction eAction, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
+	void TransformSemVerts(DrawAction eAction, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
+	bool RemoveSelectedVerts();
 	QString SerializeVemVerts(HyCamera2d *pCamera);
 	void UnselectAllVemVerts();
 	void ClearVertexEditMode();
