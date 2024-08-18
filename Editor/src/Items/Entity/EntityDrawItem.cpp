@@ -16,7 +16,8 @@
 
 EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
 	IDrawExItem(pEntityDraw),
-	m_pEntityTreeItemData(pEntityTreeItemData)
+	m_pEntityTreeItemData(pEntityTreeItemData),
+	m_pChild(nullptr)
 {
 	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
 	TreeModelItemData *pReferencedItemData = projectRef.FindItemData(referencedItemUuid);
@@ -122,46 +123,47 @@ EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 //             - ExtrapolateProperties
 QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPropertyName)
 {
-	if(m_pChild == nullptr)
+	IHyBody2d *pThisHyNode = GetHyNode();
+	if(pThisHyNode == nullptr)
 		return QJsonValue();
 
 	if(sCategory == "Timeline")
 	{
 		if(sPropertyName == "State")
-			return QJsonValue(static_cast<qint64>(m_pChild->GetState()));
+			return QJsonValue(static_cast<qint64>(pThisHyNode->GetState()));
 		if(sPropertyName == "Pause")
-			return QJsonValue(static_cast<SubEntity *>(m_pChild)->IsTimelinePaused());
+			return QJsonValue(static_cast<SubEntity *>(pThisHyNode)->IsTimelinePaused());
 		if(sPropertyName == "Frame")
-			return QJsonValue(static_cast<SubEntity *>(m_pChild)->GetTimelineFrame());
+			return QJsonValue(static_cast<SubEntity *>(pThisHyNode)->GetTimelineFrame());
 	}
 	else if(sCategory == "Common")
 	{
 		if(sPropertyName == "State")
-			return QJsonValue(static_cast<qint64>(m_pChild->GetState()));
+			return QJsonValue(static_cast<qint64>(pThisHyNode->GetState()));
 		if(sPropertyName == "Update During Paused")
-			return QJsonValue(m_pChild->IsPauseUpdate());
+			return QJsonValue(pThisHyNode->IsPauseUpdate());
 		if(sPropertyName == "User Tag")
-			return QJsonValue(m_pChild->GetTag());
+			return QJsonValue(pThisHyNode->GetTag());
 	}
 	else if(sCategory == "Transformation")
 	{
 		if(sPropertyName == "Position")
-			return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(m_pChild->pos.GetX())), QJsonValue(static_cast<double>(m_pChild->pos.GetY())) }));
+			return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(pThisHyNode->pos.GetX())), QJsonValue(static_cast<double>(pThisHyNode->pos.GetY())) }));
 		if(sPropertyName == "Scale")
-			return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(m_pChild->scale.GetX())), QJsonValue(static_cast<double>(m_pChild->scale.GetY())) }));
+			return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(pThisHyNode->scale.GetX())), QJsonValue(static_cast<double>(pThisHyNode->scale.GetY())) }));
 		if(sPropertyName == "Rotation")
-			return QJsonValue(static_cast<double>(m_pChild->rot.Get()));
+			return QJsonValue(static_cast<double>(pThisHyNode->rot.Get()));
 	}
 	else if(sCategory == "Body")
 	{
 		if(sPropertyName == "Visible")
-			return QJsonValue(m_pChild->IsVisible());
+			return QJsonValue(pThisHyNode->IsVisible());
 		if(sPropertyName == "Color Tint")
-			QJsonValue(QJsonArray({ QJsonValue(static_cast<IHyBody2d *>(m_pChild)->topColor.GetX()), QJsonValue(static_cast<IHyBody2d *>(m_pChild)->topColor.GetY()), QJsonValue(static_cast<IHyBody2d *>(m_pChild)->topColor.GetZ()) }));
+			QJsonValue(QJsonArray({ QJsonValue(static_cast<IHyBody2d *>(pThisHyNode)->topColor.GetX()), QJsonValue(static_cast<IHyBody2d *>(pThisHyNode)->topColor.GetY()), QJsonValue(static_cast<IHyBody2d *>(pThisHyNode)->topColor.GetZ()) }));
 		if(sPropertyName == "Alpha")
-			return QJsonValue(static_cast<double>(static_cast<IHyBody2d *>(m_pChild)->alpha.Get()));
+			return QJsonValue(static_cast<double>(static_cast<IHyBody2d *>(pThisHyNode)->alpha.Get()));
 		if(sPropertyName == "Override Display Order")
-			return QJsonValue(static_cast<IHyBody2d *>(m_pChild)->GetDisplayOrder());
+			return QJsonValue(static_cast<IHyBody2d *>(pThisHyNode)->GetDisplayOrder());
 	}
 	//else if(sCategory == "Physics")
 	//{
@@ -169,7 +171,7 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 	else if(sCategory == "Entity")
 	{
 		if(sPropertyName == "Mouse Input")
-			return QJsonValue(static_cast<HyEntity2d *>(m_pChild)->IsMouseInputEnabled());
+			return QJsonValue(static_cast<HyEntity2d *>(pThisHyNode)->IsMouseInputEnabled());
 	}
 	//else if(sCategory == "Primitive")
 	//{
@@ -183,32 +185,32 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 	else if(sCategory == "Sprite")
 	{
 		if(sPropertyName == "Frame")
-			return QJsonValue(static_cast<int>(static_cast<HySprite2d *>(m_pChild)->GetFrame()));
+			return QJsonValue(static_cast<int>(static_cast<HySprite2d *>(pThisHyNode)->GetFrame()));
 		if(sPropertyName == "Anim Pause")
-			return QJsonValue(static_cast<HySprite2d *>(m_pChild)->IsAnimPaused());
+			return QJsonValue(static_cast<HySprite2d *>(pThisHyNode)->IsAnimPaused());
 		if(sPropertyName == "Anim Rate")
-			return QJsonValue(static_cast<double>(static_cast<HySprite2d *>(m_pChild)->GetAnimRate()));
+			return QJsonValue(static_cast<double>(static_cast<HySprite2d *>(pThisHyNode)->GetAnimRate()));
 		if(sPropertyName == "Anim Loop")
-			return QJsonValue(static_cast<HySprite2d *>(m_pChild)->IsAnimLoop());
+			return QJsonValue(static_cast<HySprite2d *>(pThisHyNode)->IsAnimLoop());
 		if(sPropertyName == "Anim Reverse")
-			return QJsonValue(static_cast<HySprite2d *>(m_pChild)->IsAnimReverse());
+			return QJsonValue(static_cast<HySprite2d *>(pThisHyNode)->IsAnimReverse());
 		if(sPropertyName == "Anim Bounce")
-			return QJsonValue(static_cast<HySprite2d *>(m_pChild)->IsAnimBounce());
+			return QJsonValue(static_cast<HySprite2d *>(pThisHyNode)->IsAnimBounce());
 	}
 	else if(sCategory == "Text")
 	{
 		if(sPropertyName == "Text")
-			return QJsonValue(QString::fromUtf8(static_cast<HyText2d *>(m_pChild)->GetUtf8String().c_str()));
+			return QJsonValue(QString::fromUtf8(static_cast<HyText2d *>(pThisHyNode)->GetUtf8String().c_str()));
 		if(sPropertyName == "Style")
-			return QJsonValue(HyGlobal::GetTextTypeNameList()[static_cast<HyText2d *>(m_pChild)->GetTextType()]);
+			return QJsonValue(HyGlobal::GetTextTypeNameList()[static_cast<HyText2d *>(pThisHyNode)->GetTextType()]);
 		if(sPropertyName == "Style Dimensions")
-			return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(static_cast<HyText2d *>(m_pChild)->GetTextBoxDimensions().x)), QJsonValue(static_cast<double>(static_cast<HyText2d *>(m_pChild)->GetTextBoxDimensions().y)) }));
+			return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(static_cast<HyText2d *>(pThisHyNode)->GetTextBoxDimensions().x)), QJsonValue(static_cast<double>(static_cast<HyText2d *>(pThisHyNode)->GetTextBoxDimensions().y)) }));
 		if(sPropertyName == "Alignment")
-			return QJsonValue(HyGlobal::GetAlignmentNameList()[static_cast<HyText2d *>(m_pChild)->GetAlignment()]);
+			return QJsonValue(HyGlobal::GetAlignmentNameList()[static_cast<HyText2d *>(pThisHyNode)->GetAlignment()]);
 		if(sPropertyName == "Monospaced Digits")
-			return QJsonValue(static_cast<HyText2d *>(m_pChild)->IsMonospacedDigits());
+			return QJsonValue(static_cast<HyText2d *>(pThisHyNode)->IsMonospacedDigits());
 		if(sPropertyName == "Text Indent")
-			return QJsonValue(static_cast<int>(static_cast<HyText2d *>(m_pChild)->GetTextIndent()));
+			return QJsonValue(static_cast<int>(static_cast<HyText2d *>(pThisHyNode)->GetTextIndent()));
 	}
 
 	return QJsonValue();
