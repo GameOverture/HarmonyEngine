@@ -109,7 +109,7 @@ bool IDraw::IsActionTransforming() const
 
 bool IDraw::SetAction(DrawAction eHyAction)
 {
-	if(m_eDrawAction >= eHyAction)
+	if(m_eDrawAction > eHyAction)
 		return false;
 
 	m_eDrawAction = eHyAction;

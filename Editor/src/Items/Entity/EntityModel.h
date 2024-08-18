@@ -79,8 +79,8 @@ public:
 	bool Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow);
 	void Cmd_RenameItem(EntityTreeItemData *pItemData, QString sNewName);
 
-	void SetShapeAdd(EditorShape eShapeType, bool bAsPrimitive);
-	void SetShapeEditVemMode(bool bEnable);
+	void ToggleShapeAdd(EditorShape eShapeType, bool bAsPrimitive);
+	void ToggleShapeEditMode(bool bEnable);
 	void ClearShapeEdit();
 
 	QString GenerateCodeName(QString sDesiredName) const;

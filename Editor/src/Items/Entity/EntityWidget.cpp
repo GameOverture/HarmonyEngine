@@ -685,67 +685,67 @@ void EntityWidget::on_actionAddChildren_triggered()
 
 void EntityWidget::on_actionAddBoxPrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeAdd(SHAPE_Box, true);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Box, true);
 }
 
 void EntityWidget::on_actionAddCirclePrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeAdd(SHAPE_Circle, true);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Circle, true);
 }
 
 void EntityWidget::on_actionAddPolygonPrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeAdd(SHAPE_Polygon, true);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Polygon, true);
 }
 
 void EntityWidget::on_actionAddSegmentPrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeAdd(SHAPE_LineSegment, true);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineSegment, true);
 }
 
 void EntityWidget::on_actionAddLineChainPrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeAdd(SHAPE_LineChain, true);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineChain, true);
 }
 
 void EntityWidget::on_actionAddLineLoopPrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeAdd(SHAPE_LineLoop, true);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineLoop, true);
 }
 
 void EntityWidget::on_actionAddBoxShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeAdd(SHAPE_Box, false);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Box, false);
 }
 
 void EntityWidget::on_actionAddCircleShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeAdd(SHAPE_Circle, false);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Circle, false);
 }
 
 void EntityWidget::on_actionAddPolygonShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeAdd(SHAPE_Polygon, false);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Polygon, false);
 }
 
 void EntityWidget::on_actionAddSegmentShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeAdd(SHAPE_LineSegment, false);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineSegment, false);
 }
 
 void EntityWidget::on_actionAddLineChainShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeAdd(SHAPE_LineChain, false);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineChain, false);
 }
 
 void EntityWidget::on_actionAddLineLoopShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeAdd(SHAPE_LineLoop, false);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineLoop, false);
 }
 
 void EntityWidget::on_actionVertexEditMode_toggled(bool bChecked)
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeEditVemMode(bChecked);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeEditMode(bChecked);
 }
 
 void EntityWidget::on_actionOrderChildrenUp_triggered()

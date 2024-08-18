@@ -41,9 +41,10 @@ public:
 	bool IsActionSemIdle() const;
 	bool IsActionSemTransforming() const;
 
-	void SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive);
+	EditorShape GetShapeAddType() const;
+	bool SetAsShapeAdd(EditorShape eShape, bool bAsPrimitive);
+	void SetAsShapeEditMode();
 	void ActivateVemOnNextJsonMeta();
-	void SetShapeEditVertex();
 
 	void RequestClearShapeEdit();
 	void ClearShapeEdit();

@@ -250,7 +250,12 @@ bool EntityDraw::IsActionSemTransforming() const
 		   m_eDrawAction == HYACTION_EntitySemRadiusVertical;
 }
 
-void EntityDraw::SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive)
+EditorShape EntityDraw::GetShapeAddType() const
+{
+	return m_DragShape.GetShapeType();
+}
+
+bool EntityDraw::SetAsShapeAdd(EditorShape eShape, bool bAsPrimitive)
 {
 	if(SetAction(HYACTION_EntityAddShape))
 	{
@@ -258,15 +263,14 @@ void EntityDraw::SetShapeEditDrag(EditorShape eShape, bool bAsPrimitive)
 		OnRequestSelection(QList<IDrawExItem *>()); // Clear any selected item
 
 		m_DragShape.Setup(eShape, bAsPrimitive ? HyColor::White : HyGlobal::GetEditorColor(EDITORCOLOR_Shape), 1.0f, 1.0f);
+
+		return true;
 	}
+
+	return false;
 }
 
-void EntityDraw::ActivateVemOnNextJsonMeta()
-{
-	m_bActivateVemOnNextJsonMeta = true;
-}
-
-void EntityDraw::SetShapeEditVertex()
+void EntityDraw::SetAsShapeEditMode()
 {
 	ItemType eType = static_cast<EntityDrawItem *>(m_SelectedItemList[0])->GetEntityTreeItemData()->GetType();
 
@@ -283,6 +287,11 @@ void EntityDraw::SetShapeEditVertex()
 		m_pCurVertexEditItem->HideTransformCtrl();
 		m_pCurVertexEditItem->GetShapeCtrl().EnableVertexEditMode();
 	}
+}
+
+void EntityDraw::ActivateVemOnNextJsonMeta()
+{
+	m_bActivateVemOnNextJsonMeta = true;
 }
 
 void EntityDraw::RequestClearShapeEdit()
@@ -469,7 +478,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		for(IDrawExItem *pSelectedItemDraw : m_SelectedItemList)
 			pSelectedItemDraw->HideTransformCtrl();
 
-		static_cast<EntityModel *>(m_pProjItem->GetModel())->SetShapeEditVemMode(true);
+		static_cast<EntityModel *>(m_pProjItem->GetModel())->ToggleShapeEditMode(true);
 		m_bActivateVemOnNextJsonMeta = false;
 	}
 	else

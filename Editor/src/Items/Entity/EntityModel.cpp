@@ -413,14 +413,14 @@ void EntityModel::Cmd_RenameItem(EntityTreeItemData *pItemData, QString sNewName
 		pItemData->SetText(sNewName);
 }
 
-void EntityModel::SetShapeAdd(EditorShape eShapeType, bool bAsPrimitive)
+void EntityModel::ToggleShapeAdd(EditorShape eShapeType, bool bAsPrimitive)
 {
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
 	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 	if(pWidget == nullptr || pEntDraw == nullptr)
 		return;
 
-	if(eShapeType != SHAPE_None)
+	if(eShapeType != SHAPE_None && eShapeType != pEntDraw->GetShapeAddType() && pEntDraw->SetAsShapeAdd(eShapeType, bAsPrimitive))
 	{
 		pWidget->CheckShapeAddBtn(eShapeType, bAsPrimitive);
 
@@ -428,8 +428,6 @@ void EntityModel::SetShapeAdd(EditorShape eShapeType, bool bAsPrimitive)
 		sStatusMsg += bAsPrimitive ? "Primitive: " : "Shape: ";
 		sStatusMsg += HyGlobal::ShapeName(eShapeType);
 		MainWindow::SetStatus(sStatusMsg, 0);
-
-		pEntDraw->SetShapeEditDrag(eShapeType, bAsPrimitive); 
 	}
 	else
 	{
@@ -439,12 +437,12 @@ void EntityModel::SetShapeAdd(EditorShape eShapeType, bool bAsPrimitive)
 	}
 }
 
-void EntityModel::SetShapeEditVemMode(bool bEnable)
+void EntityModel::ToggleShapeEditMode(bool bEnable)
 {
 	m_bVertexEditMode = bEnable;
 
 	if(m_bVertexEditMode)
-		MainWindow::SetStatus("Vertex Edit Mode", 0);
+		MainWindow::SetStatus("Shape Edit Mode", 0);
 	else
 		MainWindow::ClearStatus();
 
@@ -456,7 +454,7 @@ void EntityModel::SetShapeEditVemMode(bool bEnable)
 	if(pEntityDraw)
 	{
 		if(m_bVertexEditMode)
-			pEntityDraw->SetShapeEditVertex();
+			pEntityDraw->SetAsShapeEditMode();
 		else
 			pEntityDraw->ClearShapeEdit();
 	}
