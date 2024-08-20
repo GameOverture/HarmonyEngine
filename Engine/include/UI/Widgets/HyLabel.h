@@ -69,6 +69,8 @@ public:
 	uint32 GetNumCharacters() const;
 
 	uint32 GetCharacterCode(uint32 uiCharIndex) const;
+	glm::vec2 GetCharacterOffset(uint32 uiCharIndex);
+	void SetCharacterOffset(uint32 uiCharIndex, glm::vec2 vOffsetAmt);
 	float GetCharacterScale(uint32 uiCharIndex);
 	void SetCharacterScale(uint32 uiCharIndex, float fScale);
 	float GetCharacterAlpha(uint32 uiCharIndex);

@@ -207,6 +207,16 @@ uint32 HyLabel::GetCharacterCode(uint32 uiCharIndex) const
 	return m_Text.GetCharacterCode(uiCharIndex);
 }
 
+glm::vec2 HyLabel::GetCharacterOffset(uint32 uiCharIndex)
+{
+	return m_Text.GetCharacterOffset(uiCharIndex);
+}
+
+void HyLabel::SetCharacterOffset(uint32 uiCharIndex, glm::vec2 vOffsetAmt)
+{
+	m_Text.SetCharacterOffset(uiCharIndex, vOffsetAmt);
+}
+
 float HyLabel::GetCharacterScale(uint32 uiCharIndex)
 {
 	return m_Text.GetCharacterScale(uiCharIndex);
