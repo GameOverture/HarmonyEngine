@@ -27,9 +27,8 @@ protected:
 		//									= 1 << 19
 		RICHTEXTATTRIB_IsCenterVertically	= 1 << 20,
 		RICHTEXTATTRIB_IsMonospacedDigits	= 1 << 21,
-		RICHTEXTATTRIB_IsFitPanelToText		= 1 << 22,
 
-		RICHTEXTATTRIB_NEXTFLAG				= 1 << 23
+		RICHTEXTATTRIB_NEXTFLAG				= 1 << 22
 	};
 	static_assert((int)RICHTEXTATTRIB_IsDirty == (int)WIDGETATTRIB_NEXTFLAG, "HyRichText is not matching with base classes attrib flags");
 

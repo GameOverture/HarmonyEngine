@@ -33,9 +33,10 @@ protected:
 		WIDGETATTRIB_HideHighlightedState	= 1 << 11,		// Don't visually indicate highlighted state (when available)
 		WIDGETATTRIB_IsHighlighted			= 1 << 12,		// Indicates keyboard focus, or as an optional cosmetic state
 
-		WIDGETATTRIB_IsTypeButton			= 1 << 13,		// Is ON when this widget is a HyButton
-		WIDGETATTRIB_IsTypeReserved1		= 1 << 14,		// Reserved for future use (when a widget type needs to be distinguished)
-		WIDGETATTRIB_IsTypeReserved2		= 1 << 15,		// Reserved for future use (when a widget type needs to be distinguished)
+		WIDGETATTRIB_IsTypeButton			= 1 << 13,		// Is ON when this widget is a HyButton (mainly used to distinguish for checkbox groups)
+		
+		WIDGETATTRIB_ReservedBit1			= 1 << 14,		// Reserved baseclass bit for future use
+		WIDGETATTRIB_ReservedBit2			= 1 << 15,		// Reserved baseclass bit for future use
 
 		WIDGETATTRIB_NEXTFLAG				= 1 << 16,
 	};
@@ -57,8 +58,6 @@ public:
 	HyPanelState GetPanelState() const;
 	bool IsCustomPanelState() const;
 	void ClearCustomPanelState();
-
-	bool IsPanelValid() const;
 
 	bool IsPanelVisible() const;
 	void SetPanelVisible(bool bVisible);

@@ -30,16 +30,17 @@ struct HyPanelInit
 	HyColor						m_FrameColor;
 	HyColor						m_TertiaryColor;
 
-	// Constructs a 'BoundingVolume' panel with 0 width/height
+	// Constructs a 'BoundingVolume' panel with 0 width/height. The widget will ignore this panel and not use it for sizing
 	HyPanelInit();
 
-	// Constructs a 'BoundingVolume' panel. A bounding volume 
+	// Constructs a 'BoundingVolume' panel. A bounding volume is not visible, but the widget will use it to size itself or it's ignored if either width/height is 0
 	HyPanelInit(uint32 uiWidth, uint32 uiHeight);
 
-	// Constructs a 'NodeItem' panel
+	// Constructs a 'NodeItem' panel. The widget may use the node's width/height to size itself or it's ignored if nodePath is invalid
 	HyPanelInit(HyType eBodyType, const HyNodePath &nodePath);
 
-	// Constructs a 'Primitive' panel. Default HyColor values of 0xDEADBEEF will be set to a default color determined by the panel's usage
+	// Constructs a 'Primitive' panel. Default HyColor values of 0xDEADBEEF will be set to a default color determined by the widget
+	// Passing '0' for width/height will try to auto-size based on the widget if applicable (or it will be hidden)
 	HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0xDE,0xAD,0xBE,0xEF), HyColor frameColor = HyColor(0xDE, 0xAD, 0xBE, 0xEF), HyColor tertiaryColor = HyColor(0xDE, 0xAD, 0xBE, 0xEF));
 };
 
@@ -47,7 +48,8 @@ struct HyPanelInit
 // Not exposed because IHyWidget's handles modifications. IHyWidget's may have multiple HyPanel's, but they all have one main one 'm_Panel'
 class HyPanel : public HyEntity2d
 {
-	glm::ivec2					m_vSize;		// Holds the specified size this panel should be
+	glm::ivec2					m_vSizeHint;	// When BV or Primitive, holds the specified size this panel should be
+	glm::ivec2					m_vSizeActual;	// The current size of this panel, potentially after scaling, etc.
 
 	struct PrimParts
 	{
@@ -86,17 +88,15 @@ public:
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual uint32 GetNumStates() override;
 
-	//bool SetNodeState(uint32 uiStateIndex);		// If this is a 'NodeItem' panel, this will set the state of the node. Returns false otherwise
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
 	float GetSizeDimension(int32 iDimensionIndex, float fPercent = 1.0f);
 
-	glm::ivec2 GetSizeHint() const;
+	bool IsAutoSize() const;
+	glm::ivec2 GetPanelSizeHint() const;
 
 	void SetSize(uint32 uiWidth, uint32 uiHeight);
 	void SetSizeDimension(int32 iDimensionIndex, uint32 uiSize);	// This is for widgets who programmatically choose between vertical or horizontal sizing
-
-	bool IsValid() const;
 
 	bool IsBoundingVolume() const;
 

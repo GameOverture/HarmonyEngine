@@ -185,7 +185,6 @@ void HyRichText::SetAsColumn(float fWidth)
 void HyRichText::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/)
 {
 	HySetVec(m_vBoxDimensions, fWidth, fHeight);
-	//SetScissor(HyRect(fWidth, fHeight));
 
 	if(bCenterVertically)
 		m_uiAttribs |= RICHTEXTATTRIB_IsCenterVertically;
@@ -200,6 +199,7 @@ void HyRichText::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*
 void HyRichText::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
 {
 	HySetVec(m_vBoxDimensions, fWidth, fHeight);
+
 	if(bCenterVertically)
 		m_uiAttribs |= RICHTEXTATTRIB_IsCenterVertically;
 	else
@@ -305,7 +305,7 @@ void HyRichText::MarkRichTextDirty()
 
 void HyRichText::AssembleRichTextDrawables()
 {
-	if((m_uiAttribs & RICHTEXTATTRIB_IsDirty) == 0)
+	if((m_uiAttribs & RICHTEXTATTRIB_IsDirty) == 0 || m_TextPath.IsValid() == false)
 		return;
 
 	std::vector<IHyDrawable2d *> newDrawableList;

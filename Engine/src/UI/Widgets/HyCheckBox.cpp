@@ -93,7 +93,7 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void
 
 void HyCheckBox::AssembleCheckmark()
 {
-	if(m_Panel.IsValid())
+	if(m_Panel.IsAutoSize() == false)
 	{
 		float fRadius = (HyMath::Min(m_Panel.GetWidth(m_Panel.scale.X()), m_Panel.GetHeight(m_Panel.scale.Y())) - (m_Panel.GetFrameStrokeSize() * 4)) * 0.5f;
 		m_CheckMarkStroke.SetAsCircle(fRadius);

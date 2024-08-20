@@ -181,7 +181,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 
 			// If any glyph scaling is set, it is applied here
 			vSize *= m_pGlyphInfos[uiGlyphOffsetIndex].fScale;
-			vOffset += m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning;
+			vOffset += m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning + m_pGlyphInfos[uiGlyphOffsetIndex].vUserKerning;
 
 			vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
 			vertexBufferRef.AppendData2d(&vOffset, sizeof(glm::vec2));

@@ -320,7 +320,7 @@ float HySlider::GetBarRadius()
 
 void HySlider::Assemble()
 {
-	if(m_Panel.IsValid() == false)
+	if(m_Panel.IsAutoSize())
 		return;
 
 	HyOrientation eOrientation = GetOrientation();

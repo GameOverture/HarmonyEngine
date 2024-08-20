@@ -337,29 +337,29 @@ void HyRackMeter::FormatDigits()
 			{
 				if(i < uiCharIndexForScissor)
 				{
-					m_Text.SetGlyphAlpha(i, 1.0f);
-					m_SpinText.m_SpinText_Shown.SetGlyphAlpha(i, 0.0f);
-					m_SpinText.m_SpinText_Padded.SetGlyphAlpha(i, 0.0f);
+					m_Text.SetCharacterAlpha(i, 1.0f);
+					m_SpinText.m_SpinText_Shown.SetCharacterAlpha(i, 0.0f);
+					m_SpinText.m_SpinText_Padded.SetCharacterAlpha(i, 0.0f);
 				}
 				else
 				{
-					m_Text.SetGlyphAlpha(i, 0.0f);
-					m_SpinText.m_SpinText_Shown.SetGlyphAlpha(i, 1.0f);
-					m_SpinText.m_SpinText_Padded.SetGlyphAlpha(i, 1.0f);
+					m_Text.SetCharacterAlpha(i, 0.0f);
+					m_SpinText.m_SpinText_Shown.SetCharacterAlpha(i, 1.0f);
+					m_SpinText.m_SpinText_Padded.SetCharacterAlpha(i, 1.0f);
 				}
 			}
 			else
 			{
-				m_Text.SetGlyphAlpha(i, 1.0f);
-				m_SpinText.m_SpinText_Shown.SetGlyphAlpha(i, 0.0f);
-				m_SpinText.m_SpinText_Padded.SetGlyphAlpha(i, 0.0f);
+				m_Text.SetCharacterAlpha(i, 1.0f);
+				m_SpinText.m_SpinText_Shown.SetCharacterAlpha(i, 0.0f);
+				m_SpinText.m_SpinText_Padded.SetCharacterAlpha(i, 0.0f);
 			}
 		}
 	}
 	else
 	{
 		for(uint32 i = 0; i < m_Text.GetNumCharacters(); ++i)
-			m_Text.SetGlyphAlpha(i, 1.0f);
+			m_Text.SetCharacterAlpha(i, 1.0f);
 	}
 
 	m_SpinText.SetVisible(m_Text.IsVisible() && IsSpinningMeter());

@@ -87,14 +87,16 @@ protected:
 	{
 		glm::vec2						vOffset;
 		float							fAlpha;
-		float							fScale;
-		glm::vec2						vScaleKerning; // This is applied to `vOffset` when rendering if fScale != 1.0f
+		float							fScale;			// NOTE: When `fScale` is stored as negative, use the abs() value and the scale anchor is the center of the glyph
+		glm::vec2						vScaleKerning;	// This is applied to `vOffset` when rendering if fScale != 1.0f
+		glm::vec2						vUserKerning;	// Optional arbitrary user kerning value per glyph
 
 		GlyphInfo() :
 			vOffset(0.0f),
 			fAlpha(1.0f),
 			fScale(1.0f),
-			vScaleKerning(0.0f)
+			vScaleKerning(0.0f),
+			vUserKerning(0.0f)
 		{ }
 	};
 	GlyphInfo *							m_pGlyphInfos;
@@ -129,17 +131,20 @@ public:
 	
 	float GetLineBreakHeight(float fPercent = 1.0f);
 	float GetLineDescender(float fPercent = 1.0f);
+	glm::vec2 GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);
+	glm::vec2 GetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex);
 
 	uint32 GetNumCharacters() const;
 	uint32 GetNumShownCharacters() const;
 	uint32 GetNumRenderQuads();
 
 	uint32 GetCharacterCode(uint32 uiCharIndex) const;
-	glm::vec2 GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);
-	glm::vec2 GetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex);
-	void SetGlyphScale(uint32 uiCharIndex, float fScale);
-	float GetGlyphAlpha(uint32 uiCharIndex);
-	void SetGlyphAlpha(uint32 uiCharIndex, float fAlpha);
+	glm::vec2 GetCharacterOffset(uint32 uiCharIndex);
+	void SetCharacterOffset(uint32 uiCharIndex, glm::vec2 vOffsetAmt);
+	float GetCharacterScale(uint32 uiCharIndex);
+	void SetCharacterScale(uint32 uiCharIndex, float fScale);
+	float GetCharacterAlpha(uint32 uiCharIndex);
+	void SetCharacterAlpha(uint32 uiCharIndex, float fAlpha);
 
 	uint32 GetNumLayers();
 	uint32 GetNumLayers(uint32 uiStateIndex);

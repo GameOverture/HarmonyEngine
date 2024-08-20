@@ -203,32 +203,6 @@ float IHyText<NODETYPE, ENTTYPE>::GetLineDescender(float fPercent /*= 1.0f*/)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::GetNumCharacters() const
-{
-	return static_cast<uint32>(m_Utf32CodeList.size());
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::GetNumShownCharacters() const
-{
-	return m_uiNumValidCharacters;
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::GetNumRenderQuads()
-{
-	CalculateGlyphInfos();
-	return m_uiNumRenderQuads;
-}
-
-template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::GetCharacterCode(uint32 uiCharIndex) const
-{
-	HyAssert(uiCharIndex < m_Utf32CodeList.size(), "IHyText<NODETYPE, ENTTYPE>::GetCharacterCode() was passed invalid 'uiCharIndex'");
-	return m_Utf32CodeList[uiCharIndex];
-}
-
-template<typename NODETYPE, typename ENTTYPE>
 glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex)
 {
 	if(uiCharIndex >= m_Utf32CodeList.size())
@@ -260,7 +234,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphSize(uint32 uiCharIndex, uint32 ui
 	CalculateGlyphInfos();
 
 	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextGetGlyphSize invoked on null data");
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetGlyphSize invoked on null data");
 	}
 
 	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
@@ -275,14 +249,110 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphSize(uint32 uiCharIndex, uint32 ui
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetGlyphScale(uint32 uiCharIndex, float fScale)
+uint32 IHyText<NODETYPE, ENTTYPE>::GetNumCharacters() const
+{
+	return static_cast<uint32>(m_Utf32CodeList.size());
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+uint32 IHyText<NODETYPE, ENTTYPE>::GetNumShownCharacters() const
+{
+	return m_uiNumValidCharacters;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+uint32 IHyText<NODETYPE, ENTTYPE>::GetNumRenderQuads()
+{
+	CalculateGlyphInfos();
+	return m_uiNumRenderQuads;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+uint32 IHyText<NODETYPE, ENTTYPE>::GetCharacterCode(uint32 uiCharIndex) const
+{
+	HyAssert(uiCharIndex < m_Utf32CodeList.size(), "IHyText<NODETYPE, ENTTYPE>::GetCharacterCode() was passed invalid 'uiCharIndex'");
+	return m_Utf32CodeList[uiCharIndex];
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetCharacterOffset(uint32 uiCharIndex)
+{
+	CalculateGlyphInfos();
+
+	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr || uiCharIndex >= m_Utf32CodeList.size())
+	{
+		if(uiCharIndex >= m_Utf32CodeList.size())
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::GetCharacterOffset() was passed invalid 'uiCharIndex'");
+		else if(this->UncheckedGetData() == nullptr)
+			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetCharacterOffset invoked on null data");
+
+		return glm::vec2(0.0f, 0.0f);
+	}
+
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
+	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
+
+	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
+	HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::GetCharacterOffset() was passed invalid 'uiCharIndex'");
+
+	return m_pGlyphInfos[uiGlyphOffsetIndex].vUserKerning;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHyText<NODETYPE, ENTTYPE>::SetCharacterOffset(uint32 uiCharIndex, glm::vec2 vOffsetAmt)
+{
+	CalculateGlyphInfos();
+
+	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr || uiCharIndex >= m_Utf32CodeList.size())
+	{
+		if(uiCharIndex >= m_Utf32CodeList.size())
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::SetCharacterOffset() was passed invalid 'uiCharIndex'");
+		else if(this->UncheckedGetData() == nullptr)
+			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::SetCharacterOffset invoked on null data");
+
+		return;
+	}
+
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
+	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
+	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
+	HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::SetCharacterOffset() - HYTEXT2D_GlyphIndex returned index that is out of bounds of m_pGlyphInfos");
+	m_pGlyphInfos[uiGlyphOffsetIndex].vUserKerning = vOffsetAmt;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+float IHyText<NODETYPE, ENTTYPE>::GetCharacterScale(uint32 uiCharIndex)
+{
+	CalculateGlyphInfos();
+
+	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr || uiCharIndex >= m_Utf32CodeList.size())
+	{
+		if(uiCharIndex >= m_Utf32CodeList.size())
+			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::GetCharacterScale() was passed invalid 'uiCharIndex'");
+		else if(this->UncheckedGetData() == nullptr)
+			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetCharacterScale invoked on null data");
+
+		return 0.0f;
+	}
+
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
+	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
+
+	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
+	HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::GetCharacterScale() was passed invalid 'uiCharIndex'");
+	
+	return m_pGlyphInfos[uiGlyphOffsetIndex].fScale;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHyText<NODETYPE, ENTTYPE>::SetCharacterScale(uint32 uiCharIndex, float fScale)
 {
 	CalculateGlyphInfos();
 
 	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr)
 	{
 		if(this->UncheckedGetData() == nullptr) {
-			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha invoked on null data");
+			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::SetCharacterScale invoked on null data");
 		}
 
 		return;
@@ -302,12 +372,12 @@ void IHyText<NODETYPE, ENTTYPE>::SetGlyphScale(uint32 uiCharIndex, float fScale)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-float IHyText<NODETYPE, ENTTYPE>::GetGlyphAlpha(uint32 uiCharIndex)
+float IHyText<NODETYPE, ENTTYPE>::GetCharacterAlpha(uint32 uiCharIndex)
 {
 	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr)
 	{
 		if(this->UncheckedGetData() == nullptr) {
-			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextGetGlyphAlpha invoked on null data");
+			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetCharacterAlpha invoked on null data");
 		}
 
 		return 1.0f;
@@ -322,14 +392,14 @@ float IHyText<NODETYPE, ENTTYPE>::GetGlyphAlpha(uint32 uiCharIndex)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-void IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
+void IHyText<NODETYPE, ENTTYPE>::SetCharacterAlpha(uint32 uiCharIndex, float fAlpha)
 {
 	CalculateGlyphInfos();
 
 	if(this->AcquireData() == nullptr || m_pGlyphInfos == nullptr)
 	{
 		if(this->UncheckedGetData() == nullptr) {
-			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextSetGlyphAlpha invoked on null data");
+			HyLogDebug("IHyText<NODETYPE, ENTTYPE>::SetCharacterAlpha invoked on null data");
 		}
 
 		return;
@@ -341,7 +411,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha(uint32 uiCharIndex, float fAlpha)
 	for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
 	{
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, uiLayerIndex);
-		HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha() was passed invalid 'uiCharIndex'");
+		HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::SetCharacterAlpha() was passed invalid 'uiCharIndex'");
 		m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha = fAlpha;
 	}
 }
@@ -356,7 +426,7 @@ template<typename NODETYPE, typename ENTTYPE>
 uint32 IHyText<NODETYPE, ENTTYPE>::GetNumLayers(uint32 uiStateIndex)
 {
 	if(this->AcquireData() == nullptr) {
-		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::TextGetNumLayers invoked on null data");
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetNumLayers invoked on null data");
 		return 0;
 	}
 

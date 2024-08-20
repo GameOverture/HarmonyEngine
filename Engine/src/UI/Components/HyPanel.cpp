@@ -93,24 +93,35 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 	switch(initRef.m_eNodeType)
 	{
 	case HYTYPE_Unknown: // 'BoundingVolume' panel
-		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
+		HySetVec(m_vSizeHint, initRef.m_uiWidth, initRef.m_uiHeight);
+		m_vSizeActual = m_vSizeHint;
 		break;
 
 	case HYTYPE_Sprite: // 'NodeItem' panel
-		HySetVec(m_vSize, 0, 0);
 		m_pNodeItem = HY_NEW HySprite2d(initRef.m_NodePath, this);
+
+		HySetVec(m_vSizeHint, static_cast<HySprite2d *>(m_pNodeItem)->GetStateWidth(0, 1.0f), static_cast<HySprite2d *>(m_pNodeItem)->GetStateHeight(0, 1.0f));
+		m_vSizeActual = m_vSizeHint;
 		break;
+	
 	case HYTYPE_Spine: // 'NodeItem' panel
-		HySetVec(m_vSize, 0, 0);
 		m_pNodeItem = HY_NEW HySpine2d(initRef.m_NodePath, this);
+
+		HySetVec(m_vSizeHint, m_pNodeItem->GetWidth(1.0f), m_pNodeItem->GetHeight(1.0f));
+		m_vSizeActual = m_vSizeHint;
 		break;
+	
 	case HYTYPE_TexturedQuad: // 'NodeItem' panel
-		HySetVec(m_vSize, 0, 0);
 		m_pNodeItem = HY_NEW HyTexturedQuad2d(initRef.m_NodePath, this);
+
+		HySetVec(m_vSizeHint, m_pNodeItem->GetWidth(1.0f), m_pNodeItem->GetHeight(1.0f));
+		m_vSizeActual = m_vSizeHint;
 		break;
 
 	case HYTYPE_Entity: // 'Primitive' panel
-		HySetVec(m_vSize, initRef.m_uiWidth, initRef.m_uiHeight);
+		HySetVec(m_vSizeHint, initRef.m_uiWidth, initRef.m_uiHeight);
+		m_vSizeActual = m_vSizeHint;
+
 		m_pPrimParts = HY_NEW PrimParts(initRef, this);
 
 		// If a PrimPart's color's RGBA is 0xDEADBEEF, then reassign it to a default color
@@ -143,8 +154,18 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 
 	if(IsNode())
 	{
-		if(uiStateIndex < m_pNodeItem->GetNumStates())
-			return m_pNodeItem->SetState(uiStateIndex);
+		if(m_pNodeItem->SetState(uiStateIndex))
+		{
+			// Update size hint in case changing the state affected the size
+			if(m_pNodeItem->GetType() == HYTYPE_Sprite)
+				HySetVec(m_vSizeHint, static_cast<HySprite2d *>(m_pNodeItem)->GetStateWidth(m_pNodeItem->GetState(), 1.0f), static_cast<HySprite2d *>(m_pNodeItem)->GetStateHeight(m_pNodeItem->GetState(), 1.0f));
+			else
+				HySetVec(m_vSizeHint, m_pNodeItem->GetWidth(1.0f), m_pNodeItem->GetHeight(1.0f));
+
+			return true;
+		}
+
+		return false;
 	}
 	else if(IsPrimitive())
 	{
@@ -202,20 +223,12 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 	return 0;
 }
 
-//bool HyPanel::SetNodeState(uint32 uiStateIndex)
-//{
-//	if(IsNode())
-//		return SetState(uiStateIndex);
-//
-//	return false;
-//}
-
 /*virtual*/ float HyPanel::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
 	if(IsNode())
 		return m_pNodeItem->GetWidth(m_pNodeItem->scale.X()) * fPercent;
 	
-	return m_vSize.x * fPercent;
+	return m_vSizeActual.x * fPercent;
 }
 
 /*virtual*/ float HyPanel::GetHeight(float fPercent /*= 1.0f*/) /*override*/
@@ -223,7 +236,7 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 	if(IsNode())
 		return m_pNodeItem->GetHeight(m_pNodeItem->scale.Y()) * fPercent;
 
-	return m_vSize.y * fPercent;
+	return m_vSizeActual.y * fPercent;
 }
 
 float HyPanel::GetSizeDimension(int32 iDimensionIndex, float fPercent /*= 1.0f*/)
@@ -234,17 +247,22 @@ float HyPanel::GetSizeDimension(int32 iDimensionIndex, float fPercent /*= 1.0f*/
 	return GetHeight(fPercent);
 }
 
-glm::ivec2 HyPanel::GetSizeHint() const
+bool HyPanel::IsAutoSize() const
+{
+	return m_vSizeHint.x <= 0.0f || m_vSizeHint.y <= 0.0f;
+}
+
+glm::ivec2 HyPanel::GetPanelSizeHint() const
 {
 	if(IsNode())
 		return glm::ivec2(m_pNodeItem->GetWidth(1.0f), m_pNodeItem->GetHeight(1.0f));
 
-	return m_vSize;
+	return m_vSizeHint;
 }
 
 void HyPanel::SetSize(uint32 uiWidth, uint32 uiHeight)
 {
-	HySetVec(m_vSize, uiWidth, uiHeight);
+	HySetVec(m_vSizeActual, uiWidth, uiHeight);
 
 	if(IsNode())
 	{
@@ -259,16 +277,8 @@ void HyPanel::SetSize(uint32 uiWidth, uint32 uiHeight)
 
 void HyPanel::SetSizeDimension(int32 iDimensionIndex, uint32 uiSize)
 {
-	m_vSize[iDimensionIndex] = uiSize;
-	SetSize(m_vSize.x, m_vSize.y);
-}
-
-bool HyPanel::IsValid() const
-{
-	if(IsNode())
-		return m_pNodeItem->IsLoadDataValid();
-	else
-		return m_vSize.x > 0.0f && m_vSize.y > 0.0f;
+	m_vSizeActual[iDimensionIndex] = uiSize;
+	SetSize(m_vSizeActual.x, m_vSizeActual.y);
 }
 
 bool HyPanel::IsBoundingVolume() const
@@ -340,13 +350,21 @@ glm::vec2 HyPanel::GetBotLeftOffset()
 
 void HyPanel::ConstructPrimitives()
 {
+	if(m_vSizeActual.x <= 0.0f || m_vSizeActual.y <= 0.0f)
+	{
+		m_pPrimParts->m_Frame1.SetAsNothing();
+		m_pPrimParts->m_Frame2.SetAsNothing();
+		m_pPrimParts->m_Body.SetAsNothing();
+		return;
+	}
+
 	if(m_pPrimParts->m_uiFrameSize > 0)
 	{
-		m_pPrimParts->m_Frame1.SetAsBox(static_cast<float>(m_vSize.x), static_cast<float>(m_vSize.y));
+		m_pPrimParts->m_Frame1.SetAsBox(static_cast<float>(m_vSizeActual.x), static_cast<float>(m_vSizeActual.y));
 
 		if(m_pPrimParts->m_uiFrameSize > 1)
 		{
-			m_pPrimParts->m_Frame2.SetAsBox(m_vSize.x - (m_pPrimParts->m_uiFrameSize * 2.0f) + 2.0f, m_vSize.y - (m_pPrimParts->m_uiFrameSize * 2.0f) + 2.0f);
+			m_pPrimParts->m_Frame2.SetAsBox(m_vSizeActual.x - (m_pPrimParts->m_uiFrameSize * 2.0f) + 2.0f, m_vSizeActual.y - (m_pPrimParts->m_uiFrameSize * 2.0f) + 2.0f);
 			m_pPrimParts->m_Frame2.pos.Set(static_cast<int32>(m_pPrimParts->m_uiFrameSize) - 1.0f, static_cast<int32>(m_pPrimParts->m_uiFrameSize) - 1.0f);
 		}
 		else
@@ -358,6 +376,6 @@ void HyPanel::ConstructPrimitives()
 		m_pPrimParts->m_Frame2.SetAsNothing();
 	}
 
-	m_pPrimParts->m_Body.SetAsBox(m_vSize.x - (m_pPrimParts->m_uiFrameSize * 2.0f), m_vSize.y - (m_pPrimParts->m_uiFrameSize * 2.0f));
+	m_pPrimParts->m_Body.SetAsBox(m_vSizeActual.x - (m_pPrimParts->m_uiFrameSize * 2.0f), m_vSizeActual.y - (m_pPrimParts->m_uiFrameSize * 2.0f));
 	m_pPrimParts->m_Body.pos.Set(static_cast<int32>(m_pPrimParts->m_uiFrameSize), static_cast<int32>(m_pPrimParts->m_uiFrameSize));
 }

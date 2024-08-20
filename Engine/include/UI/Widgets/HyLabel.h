@@ -64,8 +64,20 @@ public:
 	virtual void SetText(const std::string &sUtf8Text);
 	uint32 GetTextState() const;
 	virtual void SetTextState(uint32 uiStateIndex);
-	std::string GetTextPrefix() const;
-	std::string GetTextName() const;
+	HyNodePath GetTextNodePath() const;
+
+	uint32 GetNumCharacters() const;
+
+	uint32 GetCharacterCode(uint32 uiCharIndex) const;
+	float GetCharacterScale(uint32 uiCharIndex);
+	void SetCharacterScale(uint32 uiCharIndex, float fScale);
+	float GetCharacterAlpha(uint32 uiCharIndex);
+	void SetCharacterAlpha(uint32 uiCharIndex, float fAlpha);
+
+	uint32 GetNumLayers();
+	uint32 GetNumLayers(uint32 uiStateIndex);
+
+	std::pair<HyColor, HyColor> GetLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex);
 	virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor);
 	bool IsTextMonospacedDigits() const;
 	virtual void SetTextMonospacedDigits(bool bSet);

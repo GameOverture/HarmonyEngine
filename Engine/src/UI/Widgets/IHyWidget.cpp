@@ -63,11 +63,6 @@ void IHyWidget::ClearCustomPanelState()
 		OnPanelUpdated();
 }
 
-bool IHyWidget::IsPanelValid() const
-{
-	return m_Panel.IsValid();
-}
-
 bool IHyWidget::IsPanelVisible() const
 {
 	return m_Panel.IsVisible();
