@@ -1393,16 +1393,19 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphScaleKerning()
 
 	float fGlyphScaleKerningAccum = 0.0f;
 
-	for(uint32 uiIndex = 1; uiIndex < m_uiNumValidCharacters; ++uiIndex) // NOTE: 'uiIndex' starts at 1, since [0] doesn't kern offset, and can't take distance from previous glyph
+	for(uint32 uiIndex = 0; uiIndex < m_uiNumValidCharacters; ++uiIndex)
 	{
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiIndex, uiNUM_LAYERS, 0);
 
 		if(GetTextType() == HYTEXT_Vertical)
 		{
-			uint32 uiPrevGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiIndex - 1, uiNUM_LAYERS, 0);
+			if(uiIndex > 0)
+			{
+				uint32 uiPrevGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiIndex - 1, uiNUM_LAYERS, 0);
 
-			fGlyphScaleKerningAccum += (m_pGlyphInfos[uiPrevGlyphOffsetIndex].vOffset.y - m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.y) * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
-			m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.y = fGlyphScaleKerningAccum;
+				fGlyphScaleKerningAccum += (m_pGlyphInfos[uiPrevGlyphOffsetIndex].vOffset.y - m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.y) * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
+				m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.y = fGlyphScaleKerningAccum;
+			}
 			
 			if(GetAlignment() == HYALIGN_Center)
 				m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.x = (-1.0f * m_pGlyphInfos[uiGlyphOffsetIndex].vOffset.x) * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
@@ -1412,10 +1415,10 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphScaleKerning()
 			const HyTextGlyph *pGlyphRef = pData->GetGlyph(m_uiState, 0, m_Utf32CodeList[uiIndex]);
 			if(pGlyphRef)
 			{
-				fGlyphScaleKerningAccum -= (pGlyphRef->iOFFSET_X * m_fScaleBoxModifier) * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
+				fGlyphScaleKerningAccum -= pGlyphRef->iOFFSET_X * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
 				m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.x = fGlyphScaleKerningAccum;
 
-				fGlyphScaleKerningAccum -= (pGlyphRef->uiWIDTH * m_fScaleBoxModifier) * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
+				fGlyphScaleKerningAccum -= pGlyphRef->uiWIDTH * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
 			}
 			else
 				m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.x = fGlyphScaleKerningAccum;
@@ -1425,7 +1428,7 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphScaleKerning()
 		for(uint32 uiLayerIndex = 1; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
 		{
 			uint32 uiLayerGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiIndex, uiNUM_LAYERS, uiLayerIndex);
-			glm::vec2 vLayerDiff = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset - m_pGlyphInfos[uiLayerGlyphOffsetIndex].vOffset;
+			glm::vec2 vLayerDiff = (m_pGlyphInfos[uiGlyphOffsetIndex].vOffset - m_pGlyphInfos[uiLayerGlyphOffsetIndex].vOffset);
 
 			m_pGlyphInfos[uiLayerGlyphOffsetIndex].vScaleKerning = m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning + (vLayerDiff * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale));
 		}
