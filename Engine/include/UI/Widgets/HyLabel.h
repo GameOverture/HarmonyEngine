@@ -66,6 +66,11 @@ public:
 	virtual void SetTextState(uint32 uiStateIndex);
 	HyNodePath GetTextNodePath() const;
 
+	float GetLineBreakHeight(float fPercent = 1.0f);
+	float GetLineDescender(float fPercent = 1.0f);
+	glm::vec2 GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);
+	glm::vec2 GetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex);
+
 	uint32 GetNumCharacters() const;
 
 	uint32 GetCharacterCode(uint32 uiCharIndex) const;

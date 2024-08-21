@@ -197,6 +197,26 @@ HyNodePath HyLabel::GetTextNodePath() const
 	return m_Text.GetPath();
 }
 
+float HyLabel::GetLineBreakHeight(float fPercent /*= 1.0f*/)
+{
+	return m_Text.GetLineBreakHeight(fPercent);
+}
+
+float HyLabel::GetLineDescender(float fPercent /*= 1.0f*/)
+{
+	return m_Text.GetLineDescender(fPercent);
+}
+
+glm::vec2 HyLabel::GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex)
+{
+	return m_Text.GetGlyphOffset(uiCharIndex, uiLayerIndex);
+}
+
+glm::vec2 HyLabel::GetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex)
+{
+	return m_Text.GetGlyphSize(uiCharIndex, uiLayerIndex);
+}
+
 uint32 HyLabel::GetNumCharacters() const
 {
 	return m_Text.GetNumCharacters();
