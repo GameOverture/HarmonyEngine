@@ -315,9 +315,13 @@ void IHyText<NODETYPE, ENTTYPE>::SetCharacterOffset(uint32 uiCharIndex, glm::vec
 
 	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
-	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
-	HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::SetCharacterOffset() - HYTEXT2D_GlyphIndex returned index that is out of bounds of m_pGlyphInfos");
-	m_pGlyphInfos[uiGlyphOffsetIndex].vUserKerning = vOffsetAmt;
+
+	for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
+	{
+		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, uiLayerIndex);
+		HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::SetCharacterOffset() - HYTEXT2D_GlyphIndex returned index that is out of bounds of m_pGlyphInfos");
+		m_pGlyphInfos[uiGlyphOffsetIndex].vUserKerning = vOffsetAmt;
+	}
 }
 
 template<typename NODETYPE, typename ENTTYPE>
