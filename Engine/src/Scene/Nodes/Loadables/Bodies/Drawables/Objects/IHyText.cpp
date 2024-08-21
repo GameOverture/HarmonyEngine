@@ -1412,10 +1412,10 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphScaleKerning()
 			const HyTextGlyph *pGlyphRef = pData->GetGlyph(m_uiState, 0, m_Utf32CodeList[uiIndex]);
 			if(pGlyphRef)
 			{
-				fGlyphScaleKerningAccum -= pGlyphRef->iOFFSET_X * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
+				fGlyphScaleKerningAccum -= (pGlyphRef->iOFFSET_X * m_fScaleBoxModifier) * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
 				m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.x = fGlyphScaleKerningAccum;
 
-				fGlyphScaleKerningAccum -= pGlyphRef->uiWIDTH * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
+				fGlyphScaleKerningAccum -= (pGlyphRef->uiWIDTH * m_fScaleBoxModifier) * (1.0f - m_pGlyphInfos[uiGlyphOffsetIndex].fScale);
 			}
 			else
 				m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning.x = fGlyphScaleKerningAccum;
