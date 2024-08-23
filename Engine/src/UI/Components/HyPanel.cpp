@@ -148,6 +148,33 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 	}
 }
 
+HyPanelInit HyPanel::CloneInit()
+{
+	HyPanelInit init;
+	if(IsBoundingVolume())
+	{
+		init.m_eNodeType = HYTYPE_Unknown;
+	}
+	else if(IsNode())
+	{
+		init.m_eNodeType = m_pNodeItem->GetType();
+		init.m_NodePath = m_pNodeItem->GetPath();
+	}
+	else if(IsPrimitive())
+	{
+		init.m_eNodeType = HYTYPE_Entity;
+		init.m_uiFrameSize = m_pPrimParts->m_uiFrameSize;
+		init.m_PanelColor = m_pPrimParts->m_PanelColor;
+		init.m_FrameColor = m_pPrimParts->m_FrameColor;
+		init.m_TertiaryColor = m_pPrimParts->m_TertiaryColor;
+	}
+
+	init.m_uiWidth = static_cast<uint32>(m_vSizeActual.x);
+	init.m_uiHeight = static_cast<uint32>(m_vSizeActual.y);
+
+	return init;
+}
+
 /*virtual*/ bool HyPanel::SetState(uint32 uiStateIndex) /*override*/
 {
 	m_uiState = uiStateIndex;

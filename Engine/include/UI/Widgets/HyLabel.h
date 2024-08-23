@@ -19,22 +19,23 @@ class HyLabel : public IHyWidget
 protected:
 	enum LabelAttributes
 	{
-		LABELATTRIB_IsSideBySide			= 1 << 16,
-		LABELATTRIB_SideBySideTextFirst		= 1 << 17,		// When 'PANELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
-		LABELATTRIB_SideBySideVertical		= 1 << 18,		// When 'PANELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
+		LABELATTRIB_IsSideBySide				= 1 << 16,		// When enabled, the panel and text are shown side-by-side, otherwise stacked
+		LABELATTRIB_BoxUseScissorOrSbsTextFirst	= 1 << 17,		// When not side-by-side, this means to Box text type uses scissor	// When 'LABELATTRIB_IsSideBySide' enabled, show the text and then the panel, otherwise vice versa
+		LABELATTRIB_Vertical					= 1 << 18,		// When not side-by-side, this means to center vertically			// When 'LABELATTRIB_IsSideBySide' enabled, show the panel/text above to below, otherwise left to right
 		
-		LABELATTRIB_StackedTextTypeMask		= 0x380000,		// When Panel is 'Stacked' (default), this mask holds HyTextType enum value.
-		LABELATTRIB_StackedTextTypeOffset	= 19,			// Bit shift offset to get/set 'HyTextType'
-		//									= 1 << 19
-		//									= 1 << 20		// 3 bits, bit's 19-21
-		//									= 1 << 21
+		LABELATTRIB_StackedTextTypeMask			= 0x380000,		// When Panel is 'Stacked' (default), this mask holds HyTextType enum value.
+		LABELATTRIB_StackedTextTypeOffset		= 19,			// Bit shift offset to get/set 'HyTextType'
+		//										= 1 << 19
+		//										= 1 << 20		// 3 bits, bit's 19-21
+		//										= 1 << 21
 
-		LABELATTRIB_NEXTFLAG				= 1 << 22
+		LABELATTRIB_NEXTFLAG					= 1 << 22
 	};
 	static_assert((int)LABELATTRIB_IsSideBySide == (int)WIDGETATTRIB_NEXTFLAG, "HyLabel is not matching with base classes attrib flags");
 
 	HyText2d				m_Text;
 	HyMargins<float>		m_TextMargins;					// Margins used for Stacked text scale box
+	HyAlignment				m_eStackedAlignment;			// The alignment used when set as 'Stacked'
 	int32					m_iSideBySidePadding;			// When set as 'Side-by-side', the pixel padding between text/panel
 
 public:
@@ -52,10 +53,23 @@ public:
 	void Setup(const HyPanelInit &panelInit);
 	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath);
 	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins);
-
+	
+	bool IsLine() const;
+	bool IsColumn() const;
+	bool IsBox() const;
+	bool IsScaleBox() const;
+	bool IsVertical() const;
 	bool IsSideBySide() const;
-	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_Center, HyTextType eTextType = HYTEXT_ScaleBox);				// Default setup. Shows text positioned on top and inside the panel based on 'eTextAlignment' and 'eTextType'
+
+	void SetAsLine();
+	void SetAsColumn(float fWidth);
+	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically = false, bool bUseScissor = true);
+	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
+	void SetAsVertical();
 	void SetAsSideBySide(bool bPanelBeforeText = true, int32 iPadding = 5, HyOrientation eOrientation = HYORIENT_Horizontal);	// Show the panel and text side by side specified accordingly to the arguments passed
+
+	HyAlignment GetAlignment() const;
+	void SetAlignment(HyAlignment eAlignment); // Has no effect when set as 'side-by-side'
 
 	bool IsTextVisible() const;
 	void SetTextVisible(bool bVisible);

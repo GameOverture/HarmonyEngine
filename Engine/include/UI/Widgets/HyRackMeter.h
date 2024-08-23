@@ -72,8 +72,6 @@ public:
 	HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
 	virtual ~HyRackMeter();
 
-	virtual void SetAsStacked(HyAlignment eTextAlignment = HYALIGN_Center, HyTextType eTextType = HYTEXT_ScaleBox) override;
-
 	int64 GetValue();
 	void SetValue(int64 iValue, float fRackDuration);
 	void OffsetValue(int64 iOffsetAmt, float fRackDuration);

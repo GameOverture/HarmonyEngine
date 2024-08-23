@@ -84,6 +84,7 @@ public:
 	virtual ~HyPanel();
 
 	void Setup(const HyPanelInit &initRef);
+	HyPanelInit CloneInit(); // Uses currently set properties of this panel to create an equivalent HyPanelInit struct
 
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual uint32 GetNumStates() override;

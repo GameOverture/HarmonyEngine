@@ -21,6 +21,7 @@ HyLineEdit::HyLineEdit(HyEntity2d *pParent /*= nullptr*/) :
 	m_Cursor(this),
 	m_fpOnSubmit(nullptr)
 {
+	UsePanelStates();
 }
 
 HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
@@ -32,6 +33,7 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 	m_fpOnSubmit(nullptr)
 {
 	OnSetup();
+	UsePanelStates();
 }
 
 HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
@@ -43,6 +45,7 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 	m_fpOnSubmit(nullptr)
 {
 	OnSetup();
+	UsePanelStates();
 }
 
 /*virtual*/ HyLineEdit::~HyLineEdit()
@@ -342,7 +345,8 @@ void HyLineEdit::Submit()
 	ChildInsert(m_Text, m_Selection);
 	ChildAppend(m_Cursor);
 
-	SetAsStacked(HYALIGN_Left, HYTEXT_Line);
+	SetAlignment(HYALIGN_Left);
+	SetAsLine();
 
 	SetCursor(GetCursorIndex(), GetSelectionIndex());
 

@@ -376,7 +376,6 @@ void HyRichText::AssembleRichTextDrawables()
 				pNewText->Load();
 
 			pNewText->SetTextIndent(static_cast<uint32>(ptCurPos.x));
-			pNewText->SetAlignment(m_eAlignment);
 			pNewText->SetMonospacedDigits(IsMonospacedDigits());
 			pNewText->SetState(uiCurTextState);
 			pNewText->SetText(sCurText);
@@ -386,6 +385,7 @@ void HyRichText::AssembleRichTextDrawables()
 			{
 			case HYTEXT_Line:
 				HySetVec(m_vBoxDimensions, 0.0f, 0.0f);
+				[[fallthrough]];
 			case HYTEXT_ScaleBox: // ScaleBox is treated as a line, because it will be scaled to fit the box after all IHyDrawable's are created
 				pNewText->SetAsLine();
 
@@ -395,6 +395,7 @@ void HyRichText::AssembleRichTextDrawables()
 
 			case HYTEXT_Column:
 				m_vBoxDimensions.y = 0.0f;
+				[[fallthrough]];
 			case HYTEXT_Box: // Box is treated as a column, because it will be cropped to fit the box after all IHyDrawable's are created
 				pNewText->SetAsColumn(m_vBoxDimensions.x);
 
@@ -510,29 +511,38 @@ void HyRichText::AssembleRichTextDrawables()
 		}
 	}
 
+	switch(m_eAlignment)
+	{
+	case HYALIGN_Left:
+		m_Panel.pos.Set(0.0f, fMaxLineDescender);
+		break;
+
+	case HYALIGN_Center:
+		for(auto pDrawable : m_DrawableList)
+			pDrawable->pos.Offset(fUsedWidth * -0.5f, 0.0f);
+
+		m_Panel.pos.Set(fUsedWidth * -0.5f, fMaxLineDescender);
+		break;
+
+	case HYALIGN_Right:
+		for(auto pDrawable : m_DrawableList)
+			pDrawable->pos.Offset(-fUsedWidth, 0.0f);
+
+		m_Panel.pos.Set(-fUsedWidth, fMaxLineDescender);
+		break;
+
+	case HYALIGN_Justify: // TODO: Implement
+		HyLogError("HyRichText::AssembleDrawables() - HYALIGN_Justify not implemented");
+		break;
+	}
+
 	// Ensure m_vBoxDimensions has the correct dimensions
 	if(m_vBoxDimensions.x == 0.0f)
 		m_vBoxDimensions.x = fUsedWidth;
 	if(m_vBoxDimensions.y == 0.0f)
 		m_vBoxDimensions.y = fUsedHeight;
 
-	// Adjust the panel to fit around the text
 	m_Panel.SetSize(m_vBoxDimensions.x, m_vBoxDimensions.y);
-	switch(GetTextType())
-	{
-	case HYTEXT_Line:
-		m_Panel.pos.Set(0.0f, fMaxLineDescender);
-		break;
-
-	case HYTEXT_ScaleBox:
-	case HYTEXT_Column:
-	case HYTEXT_Box:
-		break;
-
-	default:
-		HyLogError("HyRichText::AssembleDrawables() - Unhandled text type: " << GetTextType());
-		break;
-	}
 
 	// Inform everwhere that *this has been updated
 	SetDirty(IHyNode::DIRTY_SceneAABB);

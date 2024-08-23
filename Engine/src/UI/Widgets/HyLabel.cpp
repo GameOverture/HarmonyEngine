@@ -12,33 +12,40 @@
 #include "Diagnostics/Console/IHyConsole.h"
 
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent)
+	IHyWidget(pParent),
+	m_eStackedAlignment(HYALIGN_Center)
 {
 	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
-	m_Text.SetAlignment(HYALIGN_Center);
+	m_uiAttribs |= LABELATTRIB_Vertical;
 }
 
 HyLabel::HyLabel(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent)
+	IHyWidget(pParent),
+	m_eStackedAlignment(HYALIGN_Center)
 {
 	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
-	m_Text.SetAlignment(HYALIGN_Center);
+	m_uiAttribs |= LABELATTRIB_Vertical;
+
 	Setup(panelInit, HyNodePath(), HyMargins<float>());
 }
 
 HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent)
+	IHyWidget(pParent),
+	m_eStackedAlignment(HYALIGN_Center)
 {
 	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
-	m_Text.SetAlignment(HYALIGN_Center);
+	m_uiAttribs |= LABELATTRIB_Vertical;
+
 	Setup(panelInit, textNodePath, HyMargins<float>());
 }
 
 HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent)
+	IHyWidget(pParent),
+	m_eStackedAlignment(HYALIGN_Center)
 {
 	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
-	m_Text.SetAlignment(HYALIGN_Center);
+	m_uiAttribs |= LABELATTRIB_Vertical;
+
 	Setup(panelInit, textNodePath, textMargins);
 }
 
@@ -50,7 +57,7 @@ HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, c
 {
 	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
 	{
-		if((m_uiAttribs & LABELATTRIB_SideBySideVertical) == 0)
+		if((m_uiAttribs & LABELATTRIB_Vertical) == 0)
 			return (m_Panel.GetWidth(m_Panel.scale.X()) + m_Text.GetWidth(m_Text.scale.X()) + m_iSideBySidePadding) * fPercent;
 		else
 			return HyMath::Max(m_Panel.GetWidth(m_Panel.scale.X()), m_Text.GetWidth(m_Text.scale.X())) * fPercent;
@@ -68,7 +75,7 @@ HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, c
 {
 	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
 	{
-		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
+		if(m_uiAttribs & LABELATTRIB_Vertical)
 			return (m_Panel.GetHeight(m_Panel.scale.Y()) + m_Text.GetHeight(m_Text.scale.Y()) + m_iSideBySidePadding) * fPercent;
 		else
 			return HyMath::Max(m_Panel.GetHeight(m_Panel.scale.Y()), m_Text.GetHeight(m_Text.scale.Y())) * fPercent;
@@ -105,19 +112,35 @@ void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath
 	m_Text.Init(textNodePath, this);
 	m_TextMargins = textMargins;
 
-	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
-	{
-		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
-			SetAsSideBySide((m_uiAttribs & LABELATTRIB_SideBySideTextFirst) == 0, m_iSideBySidePadding, HYORIENT_Vertical);
-		else
-			SetAsSideBySide((m_uiAttribs & LABELATTRIB_SideBySideTextFirst) == 0, m_iSideBySidePadding, HYORIENT_Horizontal);
-	}
-	else
-		SetAsStacked(m_Text.GetAlignment(), static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset));
-
 	SetAsEnabled(IsEnabled());
+
 	ResetTextAndPanel();
 	OnSetup();
+}
+
+bool HyLabel::IsLine() const
+{
+	return IsSideBySide() == false && HYTEXT_Line == static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
+}
+
+bool HyLabel::IsColumn() const
+{
+	return IsSideBySide() == false && HYTEXT_Column == static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
+}
+
+bool HyLabel::IsBox() const
+{
+	return IsSideBySide() == false && HYTEXT_Box == static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
+}
+
+bool HyLabel::IsScaleBox() const
+{
+	return IsSideBySide() == false && HYTEXT_ScaleBox == static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
+}
+
+bool HyLabel::IsVertical() const
+{
+	return IsSideBySide() == false && HYTEXT_Vertical == static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
 }
 
 bool HyLabel::IsSideBySide() const
@@ -125,15 +148,82 @@ bool HyLabel::IsSideBySide() const
 	return (m_uiAttribs & LABELATTRIB_IsSideBySide) != 0;
 }
 
-/*virtual*/ void HyLabel::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_Center*/, HyTextType eTextType /*= HYTEXT_ScaleBox*/)
+void HyLabel::SetAsLine()
 {
 	m_uiAttribs &= ~LABELATTRIB_IsSideBySide;
-	m_iSideBySidePadding = 0;
 
-	m_Text.SetAlignment(eTextAlignment);
-	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;					// Clear the existing stacked text type bits
-	m_uiAttribs |= (eTextType << LABELATTRIB_StackedTextTypeOffset);	// Set the new stacked text type bits in the proper location
-	
+	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;
+	m_uiAttribs |= (HYTEXT_Line << LABELATTRIB_StackedTextTypeOffset);
+
+	ResetTextAndPanel();
+}
+
+void HyLabel::SetAsColumn(float fWidth)
+{
+	m_uiAttribs &= ~LABELATTRIB_IsSideBySide;
+
+	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;
+	m_uiAttribs |= (HYTEXT_Column << LABELATTRIB_StackedTextTypeOffset);
+
+	HyPanelInit panelInit = m_Panel.CloneInit();
+	panelInit.m_uiWidth = fWidth;
+	m_Panel.Setup(panelInit);
+
+	ResetTextAndPanel();
+}
+
+void HyLabel::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/, bool bUseScissor /*= true*/)
+{
+	m_uiAttribs &= ~LABELATTRIB_IsSideBySide;
+
+	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;
+	m_uiAttribs |= (HYTEXT_Box << LABELATTRIB_StackedTextTypeOffset);
+
+	if(bCenterVertically)
+		m_uiAttribs |= LABELATTRIB_Vertical;
+	else
+		m_uiAttribs &= ~LABELATTRIB_Vertical;
+
+	if(bUseScissor)
+		m_uiAttribs |= LABELATTRIB_BoxUseScissorOrSbsTextFirst;
+	else
+		m_uiAttribs &= ~LABELATTRIB_BoxUseScissorOrSbsTextFirst;
+
+	HyPanelInit panelInit = m_Panel.CloneInit();
+	panelInit.m_uiWidth = fWidth;
+	panelInit.m_uiHeight = fHeight;
+	m_Panel.Setup(panelInit);
+
+	ResetTextAndPanel();
+}
+
+void HyLabel::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
+{
+	m_uiAttribs &= ~LABELATTRIB_IsSideBySide;
+
+	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;
+	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
+
+	if(bCenterVertically)
+		m_uiAttribs |= LABELATTRIB_Vertical;
+	else
+		m_uiAttribs &= ~LABELATTRIB_Vertical;
+
+	HyPanelInit panelInit = m_Panel.CloneInit();
+	panelInit.m_uiWidth = fWidth;
+	panelInit.m_uiHeight = fHeight;
+	m_Panel.Setup(panelInit);
+
+	ResetTextAndPanel();
+}
+
+void HyLabel::SetAsVertical()
+{
+	m_uiAttribs &= ~LABELATTRIB_IsSideBySide;
+
+	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;
+	m_uiAttribs |= (HYTEXT_Vertical << LABELATTRIB_StackedTextTypeOffset);
+
 	ResetTextAndPanel();
 }
 
@@ -141,18 +231,28 @@ void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /
 {
 	m_uiAttribs |= LABELATTRIB_IsSideBySide;
 	if(bPanelBeforeText)
-		m_uiAttribs &= ~LABELATTRIB_SideBySideTextFirst;
+		m_uiAttribs &= ~LABELATTRIB_BoxUseScissorOrSbsTextFirst;
 	else
-		m_uiAttribs |= LABELATTRIB_SideBySideTextFirst;
+		m_uiAttribs |= LABELATTRIB_BoxUseScissorOrSbsTextFirst;
 
 	m_iSideBySidePadding = iPadding;
 
 	if(eOrientation == HYORIENT_Horizontal)
-		m_uiAttribs &= ~LABELATTRIB_SideBySideVertical;
+		m_uiAttribs &= ~LABELATTRIB_Vertical;
 	else
-		m_uiAttribs |= LABELATTRIB_SideBySideVertical;
+		m_uiAttribs |= LABELATTRIB_Vertical;
 
 	ResetTextAndPanel();
+}
+
+HyAlignment HyLabel::GetAlignment() const
+{
+	return IsSideBySide() ? HYALIGN_Unknown : m_eStackedAlignment;
+}
+
+void HyLabel::SetAlignment(HyAlignment eAlignment)
+{
+	m_eStackedAlignment = eAlignment;
 }
 
 bool HyLabel::IsTextVisible() const
@@ -334,7 +434,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 	else // Side-by-side
 	{
 		glm::vec2 vPanelSizeHint = m_Panel.GetPanelSizeHint();
-		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
+		if(m_uiAttribs & LABELATTRIB_Vertical)
 		{
 			m_vSizeHint.x = static_cast<int32>(HyMath::Max(vPanelSizeHint.x, m_Text.GetWidth()));
 			m_vSizeHint.y = static_cast<int32>(vPanelSizeHint.y + m_iSideBySidePadding + m_Text.GetHeight());
@@ -375,7 +475,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 		glm::ivec2 vTextSizeHint(m_Text.GetWidth(), m_Text.GetHeight());
 
 		glm::ivec2 vNewPanelSize, vNewTextSize;
-		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
+		if(m_uiAttribs & LABELATTRIB_Vertical)
 		{
 			vSizeHint.y -= m_iSideBySidePadding;
 
@@ -427,9 +527,9 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 		glm::vec2 vSecondSize;
 		glm::vec2 vSecondOffset;
 
-		if(m_uiAttribs & LABELATTRIB_SideBySideTextFirst)
+		if(m_uiAttribs & LABELATTRIB_BoxUseScissorOrSbsTextFirst)
 		{
-			if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
+			if(m_uiAttribs & LABELATTRIB_Vertical)
 				m_Text.SetAlignment(HYALIGN_Center);
 			else
 				m_Text.SetAlignment(HYALIGN_Right);
@@ -444,7 +544,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 		}
 		else
 		{
-			if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
+			if(m_uiAttribs & LABELATTRIB_Vertical)
 				m_Text.SetAlignment(HYALIGN_Center);
 			else
 				m_Text.SetAlignment(HYALIGN_Left);
@@ -462,7 +562,7 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 		pFirst->pos.Set(-vFirstOffset);
 		pSecond->pos.Set(-vSecondOffset);
 
-		if(m_uiAttribs & LABELATTRIB_SideBySideVertical)
+		if(m_uiAttribs & LABELATTRIB_Vertical)
 		{
 			if(vFirstSize.x >= vSecondSize.x)
 			{
@@ -487,19 +587,20 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 	}
 	else // Stacked Panel/Text
 	{
+		m_Text.SetAlignment(m_eStackedAlignment);
+
 		glm::ivec2 vUiSizeHint = GetSizeHint();
-		glm::vec2 vPanelDimensions(m_Panel.GetWidth(m_Panel.scale.GetX()), m_Panel.GetHeight(m_Panel.scale.GetY()));
+		glm::vec2 vPanelDimensions(m_Panel.GetWidth(m_Panel.scale.GetX()), m_Panel.GetHeight(m_Panel.scale.GetY())); // TODO: Test if Panel entity itself ever gets scaled (its internal node type might), but remove it from here
 		glm::ivec2 vPanelOffset = m_Panel.GetBotLeftOffset();
 
 		// Position text to bottom left of 'm_TextMargins'
 		m_Text.pos.Set(m_Panel.GetFrameStrokeSize() + ((m_TextMargins.left * (vPanelDimensions.x / vUiSizeHint.x)) - vPanelOffset.x),
 					   m_Panel.GetFrameStrokeSize() + ((m_TextMargins.bottom * (vPanelDimensions.y / vUiSizeHint.y)) - vPanelOffset.y));
 
-		
 		float fLineOffsetX = 0.0f;	// If *this is 'LABELATTRIB_StackedTextUseLine' determine how much to offset m_Text's position (not needed for scale boxes)
-		if(m_Text.GetAlignment() == HYALIGN_Center)
+		if(m_eStackedAlignment == HYALIGN_Center)
 			fLineOffsetX = (vPanelDimensions.x * 0.5f) - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x));
-		else if(m_Text.GetAlignment() == HYALIGN_Right)
+		else if(m_eStackedAlignment == HYALIGN_Right)
 			fLineOffsetX = vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (vPanelDimensions.x / vUiSizeHint.x));
 
 		// Set text type/size

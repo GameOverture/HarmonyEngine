@@ -52,12 +52,12 @@ public:
 
 	bool IsButton() const;
 
-	virtual bool SetState(uint32 uiStateIndex) override; // If used, this overrides the panel state to a specific index. Will no longer automatically update the panel state based on HyPanelState
+	virtual bool SetState(uint32 uiStateIndex) override;	// If used, this turns off using "panel states"
 	virtual uint32 GetNumStates() override;
 
 	HyPanelState GetPanelState() const;
-	bool IsCustomPanelState() const;
-	void ClearCustomPanelState();
+	bool IsUsingPanelStates() const;
+	void UsePanelStates();
 
 	bool IsPanelVisible() const;
 	void SetPanelVisible(bool bVisible);
@@ -66,11 +66,11 @@ public:
 	bool IsPanelNode() const;
 	IHyBody2d *GetPanelNode();
 
-	bool IsInputAllowed() const;					// Checks itself and the container it's inserted in if input is allowed
+	bool IsInputAllowed() const;							// Checks itself and the container it's inserted in if input is allowed
 
 	bool IsEnabled() const;
-	bool IsHideDisabled() const;					// Whether to not visually indicate if disabled
-	void SetHideDisabled(bool bIsHideDisabled);		// Whether to not visually indicate if disabled
+	bool IsHideDisabled() const;							// Whether to not visually indicate if disabled
+	void SetHideDisabled(bool bIsHideDisabled);				// Whether to not visually indicate if disabled
 	void SetAsEnabled(bool bEnabled);
 
 	bool IsKeyboardFocus() const;

@@ -19,6 +19,7 @@ HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 	m_pBtnClickedParam(nullptr)
 {
 	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
+	UsePanelStates();
 }
 
 HyButton::HyButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
@@ -29,6 +30,7 @@ HyButton::HyButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr
 {
 	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
 	OnSetup();
+	UsePanelStates();
 }
 
 HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
@@ -39,6 +41,7 @@ HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath,
 {
 	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
 	OnSetup();
+	UsePanelStates();
 }
 
 HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
@@ -49,6 +52,7 @@ HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath,
 {
 	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
 	OnSetup();
+	UsePanelStates();
 }
 
 /*virtual*/ HyButton::~HyButton()

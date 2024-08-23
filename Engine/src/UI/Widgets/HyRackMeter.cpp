@@ -42,16 +42,6 @@ HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNod
 {
 }
 
-/*virtual*/ void HyRackMeter::SetAsStacked(HyAlignment eTextAlignment /*= HYALIGN_Center*/, HyTextType eTextType /*= HYTEXT_ScaleBox*/) /*override*/
-{
-	HyLabel::SetAsStacked(eTextAlignment, eTextType);
-
-	m_SpinText.m_SpinText_Shown.SetAlignment(eTextAlignment);
-	m_SpinText.m_SpinText_Padded.SetAlignment(eTextAlignment);
-
-	FormatDigits();
-}
-
 int64 HyRackMeter::GetValue()
 {
 	return m_iTargetValue;
@@ -247,7 +237,10 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 	HyLabel::ResetTextAndPanel();
 
 	m_SpinText.m_SpinText_Shown.SetState(m_Text.GetState());
+	m_SpinText.m_SpinText_Shown.SetAlignment(m_Text.GetAlignment());
+
 	m_SpinText.m_SpinText_Padded.SetState(m_Text.GetState());
+	m_SpinText.m_SpinText_Padded.SetAlignment(m_Text.GetAlignment());
 
 	m_SpinText.pos.Set(m_Text.pos);
 	if(m_Text.IsScaleBox())
@@ -255,7 +248,7 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 		m_SpinText.m_SpinText_Shown.SetAsScaleBox(m_Text.GetTextBoxDimensions().x, m_Text.GetTextBoxDimensions().y);
 		m_SpinText.m_SpinText_Padded.SetAsScaleBox(m_Text.GetTextBoxDimensions().x, m_Text.GetTextBoxDimensions().y);
 	}
-	else
+	else // TODO: Implement this properly
 	{
 		m_SpinText.m_SpinText_Shown.SetAsLine();
 		m_SpinText.m_SpinText_Padded.SetAsLine();

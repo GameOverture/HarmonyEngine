@@ -15,7 +15,7 @@
 IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
 	m_eHoverCursor(HYMOUSECURSOR_Default),
-	m_ePanelState(HYPANELSTATE_Idle),
+	m_ePanelState(HYPANELSTATE_NotUsed),
 	m_Panel(this)
 {
 }
@@ -34,7 +34,7 @@ bool IHyWidget::IsButton() const
 	if(IHyLoadable::SetState(uiStateIndex) == false || m_Panel.SetState(uiStateIndex) == false)
 		return false;
 	
-	m_ePanelState = HYPANELSTATE_UserCustom;
+	m_ePanelState = HYPANELSTATE_NotUsed;
 	OnPanelUpdated();
 
 	return true;
@@ -50,12 +50,12 @@ HyPanelState IHyWidget::GetPanelState() const
 	return m_ePanelState;
 }
 
-bool IHyWidget::IsCustomPanelState() const
+bool IHyWidget::IsUsingPanelStates() const
 {
-	return m_ePanelState == HYPANELSTATE_UserCustom;
+	return m_ePanelState != HYPANELSTATE_NotUsed;
 }
 
-void IHyWidget::ClearCustomPanelState()
+void IHyWidget::UsePanelStates()
 {
 	m_ePanelState = HYPANELSTATE_Idle;
 
@@ -350,7 +350,7 @@ HyPanelState IHyWidget::CalcPanelState()
 
 void IHyWidget::ApplyPanelState()
 {
-	if(IsCustomPanelState() == false)
+	if(IsUsingPanelStates())
 	{
 		HyPanelState eCurState = CalcPanelState();
 		if(m_ePanelState != eCurState)
