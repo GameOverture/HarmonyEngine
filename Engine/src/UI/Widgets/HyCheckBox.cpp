@@ -52,12 +52,25 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void
 	m_pCheckedChangedParam = pParam;
 }
 
+
+/*virtual*/ void HyCheckBox::OnAssemble() /*override*/
+{
+	HyButton::OnAssemble();
+
+	if(m_Panel.IsAutoSize() == false)
+	{
+		float fRadius = (HyMath::Min(m_Panel.GetWidth(m_Panel.scale.X()), m_Panel.GetHeight(m_Panel.scale.Y())) - (m_Panel.GetFrameStrokeSize() * 4)) * 0.5f;
+		m_CheckMarkStroke.SetAsCircle(fRadius);
+		m_CheckMarkFill.SetAsCircle(fRadius - m_Panel.GetFrameStrokeSize());
+	}
+}
+
 /*virtual*/ void HyCheckBox::OnSetup() /*override*/
 {
 	HyButton::OnSetup();
 	SetAsSideBySide();
 
-	AssembleCheckmark();
+	SetAssembleNeeded();
 }
 
 /*virtual*/ void HyCheckBox::OnUiMouseClicked() /*override*/
@@ -89,16 +102,4 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void
 	m_CheckMarkFill.pos.Set(m_Panel.pos);
 	m_CheckMarkFill.pos.Offset(m_Panel.GetWidth(m_Panel.scale.X()) * 0.5f, m_Panel.GetHeight(m_Panel.scale.Y()) * 0.5f);
 	m_CheckMarkFill.SetTint(m_Panel.GetPanelColor().Lighten());
-}
-
-void HyCheckBox::AssembleCheckmark()
-{
-	if(m_Panel.IsAutoSize() == false)
-	{
-		float fRadius = (HyMath::Min(m_Panel.GetWidth(m_Panel.scale.X()), m_Panel.GetHeight(m_Panel.scale.Y())) - (m_Panel.GetFrameStrokeSize() * 4)) * 0.5f;
-		m_CheckMarkStroke.SetAsCircle(fRadius);
-		m_CheckMarkFill.SetAsCircle(fRadius - m_Panel.GetFrameStrokeSize());
-	}
-
-	ResetTextAndPanel();
 }

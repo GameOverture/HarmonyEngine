@@ -52,13 +52,25 @@ void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *
 	m_pCheckedChangedParam = pParam;
 }
 
+/*virtual*/ void HyRadioButton::OnAssemble() /*override*/
+{
+	HyButton::OnAssemble();
+
+	if(m_Panel.IsAutoSize() == false)
+	{
+		float fRadius = (HyMath::Min(m_Panel.GetWidth(m_Panel.scale.X()), m_Panel.GetHeight(m_Panel.scale.Y())) - (m_Panel.GetFrameStrokeSize() * 4)) * 0.5f;
+		m_CheckMarkStroke.SetAsCircle(fRadius);
+		m_CheckMarkFill.SetAsCircle(fRadius - m_Panel.GetFrameStrokeSize());
+	}
+}
+
 /*virtual*/ void HyRadioButton::OnSetup() /*override*/
 {
 	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
 	HyButton::OnSetup();
 	SetAsSideBySide();
 
-	AssembleCheckmark();
+	SetAssembleNeeded();
 }
 
 /*virtual*/ void HyRadioButton::OnUiMouseClicked() /*override*/
@@ -90,16 +102,4 @@ void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *
 	m_CheckMarkFill.pos.Set(m_Panel.pos);
 	m_CheckMarkFill.pos.Offset(m_Panel.GetWidth(m_Panel.scale.X()) * 0.5f, m_Panel.GetHeight(m_Panel.scale.Y()) * 0.5f);
 	m_CheckMarkFill.SetTint(m_Panel.GetPanelColor().Lighten());
-}
-
-void HyRadioButton::AssembleCheckmark()
-{
-	if(m_Panel.IsAutoSize() == false)
-	{
-		float fRadius = (HyMath::Min(m_Panel.GetWidth(m_Panel.scale.X()), m_Panel.GetHeight(m_Panel.scale.Y())) - (m_Panel.GetFrameStrokeSize() * 4)) * 0.5f;
-		m_CheckMarkStroke.SetAsCircle(fRadius);
-		m_CheckMarkFill.SetAsCircle(fRadius - m_Panel.GetFrameStrokeSize());
-	}
-
-	ResetTextAndPanel();
 }

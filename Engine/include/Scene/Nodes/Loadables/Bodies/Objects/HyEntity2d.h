@@ -23,14 +23,17 @@ protected:
 
 	enum EntityAttributes
 	{
-		ENTITYATTRIB_MouseInputEnabled		= 1 << 0,
-		ENTITYATTRIB_MouseInputHover		= 1 << 1,
-		ENTITYATTRIB_MouseInputDown			= 1 << 2,
-		ENTITYATTRIB_MouseInputInvalid		= 1 << 3,				// When mouse input was initially pressed outside of bounds
+		ENTITYATTRIB_IsRegisteredAssemble	= 1 << 0,				// Indicates this entity is registered for the "post-update" assemble step within HyScene
+		ENTITYATTRIB_AssembleNeeded			= 1 << 1,				// Flag to indicate this entity requires "post-update" assemble step
 
-		ENTITYATTRIB_ReverseDisplayOrder	= 1 << 4,
+		ENTITYATTRIB_MouseInputEnabled		= 1 << 2,
+		ENTITYATTRIB_MouseInputHover		= 1 << 3,
+		ENTITYATTRIB_MouseInputDown			= 1 << 4,
+		ENTITYATTRIB_MouseInputInvalid		= 1 << 5,				// When mouse input was initially pressed outside of bounds
 
-		ENTITYATTRIB_NEXTFLAG				= 1 << 5,
+		ENTITYATTRIB_ReverseDisplayOrder	= 1 << 6,
+
+		ENTITYATTRIB_NEXTFLAG				= 1 << 7,
 	};
 	uint32									m_uiAttribs;
 
@@ -122,6 +125,13 @@ public:
 	// LOAD/UNLOAD ALL CHILDREN
 	virtual void Load() override;
 	virtual void Unload() override;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// OPTIONAL ASSEMBLE (post-update) STEP
+	bool IsRegisteredAssembleEntity() const;
+	void RegisterAssembleEntity(bool bRegister = true);
+	void SetAssembleNeeded();
+	void Assemble();
 	
 protected:
 	virtual void SetDirty(uint32 uiDirtyFlags) override;
@@ -144,6 +154,7 @@ protected:
 
 	// Optional user overrides below
 	virtual void OnUpdate() { }
+	virtual void OnAssemble() { }
 	virtual void OnMouseEnter() { }
 	virtual void OnMouseLeave() { }
 	virtual void OnMouseDown() { }

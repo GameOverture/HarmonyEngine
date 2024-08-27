@@ -21,22 +21,19 @@ class IHyWidget : public IHyEntityUi
 protected:
 	enum WidgetAttributes
 	{
-		WIDGETATTRIB_HideDisabled			= 1 << 5,		// Don't visually indicate if disabled
-		WIDGETATTRIB_IsDisabled				= 1 << 6,		// When this widget is disabled
+		WIDGETATTRIB_HideDisabled			= 1 << 7,		// Don't visually indicate if disabled
+		WIDGETATTRIB_IsDisabled				= 1 << 8,		// When this widget is disabled
 
-		WIDGETATTRIB_HideMouseHoverState	= 1 << 7,		// Don't visually indicate mouse hover state (when available)
-		WIDGETATTRIB_HideDownState			= 1 << 8,		// Don't visually indicate down state (when available)
+		WIDGETATTRIB_HideMouseHoverState	= 1 << 9,		// Don't visually indicate mouse hover state (when available)
+		WIDGETATTRIB_HideDownState			= 1 << 10,		// Don't visually indicate down state (when available)
 
-		WIDGETATTRIB_KeyboardFocusAllowed	= 1 << 9,		// Allow this widget to be the target of keyboard input
-		WIDGETATTRIB_IsKeyboardFocus		= 1 << 10,		// When this widget will take keyboard input
+		WIDGETATTRIB_KeyboardFocusAllowed	= 1 << 11,		// Allow this widget to be the target of keyboard input
+		WIDGETATTRIB_IsKeyboardFocus		= 1 << 12,		// When this widget will take keyboard input
 
-		WIDGETATTRIB_HideHighlightedState	= 1 << 11,		// Don't visually indicate highlighted state (when available)
-		WIDGETATTRIB_IsHighlighted			= 1 << 12,		// Indicates keyboard focus, or as an optional cosmetic state
+		WIDGETATTRIB_HideHighlightedState	= 1 << 13,		// Don't visually indicate highlighted state (when available)
+		WIDGETATTRIB_IsHighlighted			= 1 << 14,		// Indicates keyboard focus, or as an optional cosmetic state
 
-		WIDGETATTRIB_IsTypeButton			= 1 << 13,		// Is ON when this widget is a HyButton (mainly used to distinguish for checkbox groups)
-		
-		WIDGETATTRIB_ReservedBit1			= 1 << 14,		// Reserved baseclass bit for future use
-		WIDGETATTRIB_ReservedBit2			= 1 << 15,		// Reserved baseclass bit for future use
+		WIDGETATTRIB_IsTypeButton			= 1 << 15,		// Is ON when this widget is a HyButton (mainly used to distinguish for checkbox groups)
 
 		WIDGETATTRIB_NEXTFLAG				= 1 << 16,
 	};

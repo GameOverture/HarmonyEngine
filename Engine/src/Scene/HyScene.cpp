@@ -23,6 +23,7 @@
 
 std::vector<IHyNode *> HyScene::sm_NodeList_All;
 std::vector<IHyNode *> HyScene::sm_NodeList_PauseUpdate;
+std::vector<HyEntity2d *> HyScene::sm_NodeList_AssembleEnts2d;
 bool HyScene::sm_bInst2dOrderingDirty = false;
 
 HyScene::HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef) :
@@ -157,6 +158,23 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 	}
 }
 
+/*static*/ void HyScene::AddEntNode_Assemble(HyEntity2d *pEntity)
+{
+	sm_NodeList_AssembleEnts2d.push_back(pEntity);
+}
+
+/*static*/ void HyScene::RemoveEntNode_Assemble(HyEntity2d *pEntity)
+{
+	for(auto it = sm_NodeList_AssembleEnts2d.begin(); it != sm_NodeList_AssembleEnts2d.end(); ++it)
+	{
+		if((*it) == pEntity)
+		{
+			sm_NodeList_AssembleEnts2d.erase(it);
+			break;
+		}
+	}
+}
+
 void HyScene::AddNode_PhysBody(HyEntity2d *pEntity)
 {
 	HyAssert(pEntity, "HyScene::AddNode_PhysBody was passed a null HyEntity2d *");
@@ -276,6 +294,12 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef, float fExtrapolatePercent)
 {
 	// TODO: Determine whether I can multi-thread this buffer prep and HyRenderBuffer::State instantiations... Make everything take const references!
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Process any entities that requested a assemble step
+	uint32 uiTotalPrepEnts = static_cast<uint32>(sm_NodeList_AssembleEnts2d.size());
+	for(uint32 i = 0; i < uiTotalPrepEnts; ++i)
+		sm_NodeList_AssembleEnts2d[i]->Assemble();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Initialize the buffer - PrepareBuffers writes internal render states first, used by things like HyStencil

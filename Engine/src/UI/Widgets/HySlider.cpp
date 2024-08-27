@@ -21,7 +21,7 @@ HySlider::BarPrimitives::BarPrimitives(HyEntity2d *pParent) :
 	m_BarPos(this),
 	m_BarNeg(this)
 { }
-void HySlider::BarPrimitives::Assemble(HyOrientation eOrientation, float fBarThickness, float fBarLength, float fIndentAmt)
+void HySlider::BarPrimitives::DoAssembly(HyOrientation eOrientation, float fBarThickness, float fBarLength, float fIndentAmt)
 {
 	HyOrientation eInverseOrien = static_cast<HyOrientation>(eOrientation ^ 1);
 
@@ -109,7 +109,7 @@ void HySlider::Setup(const HyPanelInit &sliderInitRef)
 
 	SetAsEnabled(IsEnabled());
 	
-	Assemble();
+	DoAssembly();
 }
 
 int64 HySlider::GetNumTicks() const
@@ -201,7 +201,7 @@ void HySlider::SetOrientation(HyOrientation eOrien)
 	else
 		m_uiAttribs |= SLIDERATTRIB_IsVertical;
 
-	Assemble();
+	DoAssembly();
 }
 
 void HySlider::SetBarColors(HyColor posColor, HyColor negColor, HyColor strokeColor)
@@ -299,7 +299,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 	m_fLength = uiNewWidth - m_Panel.GetSizeDimension(GetOrientation());
 	OnSetSizeHint();
 
-	Assemble();
+	DoAssembly();
 	return m_vSizeHint;
 }
 
@@ -318,7 +318,7 @@ float HySlider::GetBarRadius()
 	return GetBarThickness() * 0.5f;
 }
 
-void HySlider::Assemble()
+void HySlider::DoAssembly()
 {
 	if(m_Panel.IsAutoSize())
 		return;
@@ -334,8 +334,8 @@ void HySlider::Assemble()
 	float fBarThickness = GetBarThickness();
 	m_Panel.pos.GetAnimFloat(eOrientation ^ 1) = m_Panel.GetSizeDimension(eOrientation ^ 1, -0.5f);
 	
-	m_BarStroke.Assemble(eOrientation, fBarThickness, m_fLength, 0.0f);
-	m_BarFill.Assemble(eOrientation, fBarThickness, m_fLength, m_fStrokeAmt);
+	m_BarStroke.DoAssembly(eOrientation, fBarThickness, m_fLength, 0.0f);
+	m_BarFill.DoAssembly(eOrientation, fBarThickness, m_fLength, m_fStrokeAmt);
 
 	// Now position the slider on the bar at the proper location based on current values
 	FixValues();

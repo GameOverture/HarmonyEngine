@@ -26,7 +26,7 @@ protected:
 		LABELATTRIB_StackedTextTypeMask			= 0x380000,		// When Panel is 'Stacked' (default), this mask holds HyTextType enum value.
 		LABELATTRIB_StackedTextTypeOffset		= 19,			// Bit shift offset to get/set 'HyTextType'
 		//										= 1 << 19
-		//										= 1 << 20		// 3 bits, bit's 19-21
+		//										= 1 << 20		// 3 bits, bits 19-21
 		//										= 1 << 21
 
 		LABELATTRIB_NEXTFLAG					= 1 << 22
@@ -54,6 +54,7 @@ public:
 	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath);
 	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins);
 	
+	HyTextType GetTextType() const;
 	bool IsLine() const;
 	bool IsColumn() const;
 	bool IsBox() const;
@@ -109,14 +110,14 @@ public:
 	virtual glm::vec2 GetPosOffset() override;
 
 protected:
+	virtual void OnAssemble() override;
+
 	virtual void OnSetSizeHint() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
 
 	virtual void OnPanelUpdated() override;
 
 	virtual void OnSetup() { }					// Optional override for derived classes
-
-	virtual void ResetTextAndPanel();
 };
 
 #endif /* HyLabel_h__ */

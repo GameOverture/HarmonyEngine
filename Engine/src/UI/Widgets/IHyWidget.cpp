@@ -60,7 +60,10 @@ void IHyWidget::UsePanelStates()
 	m_ePanelState = HYPANELSTATE_Idle;
 
 	if(m_Panel.SetState(m_ePanelState))
+	{
 		OnPanelUpdated();
+		SetAssembleNeeded();
+	}
 }
 
 bool IHyWidget::IsPanelVisible() const

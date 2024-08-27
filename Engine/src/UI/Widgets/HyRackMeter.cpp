@@ -71,7 +71,7 @@ void HyRackMeter::SetValue(int64 iValue, float fRackDuration)
 		m_dTotalDistance -= m_fThresholdDist;
 	}
 
-	FormatDigits();
+	SetAssembleNeeded();
 }
 
 void HyRackMeter::OffsetValue(int64 iOffsetAmt, float fRackDuration)
@@ -101,7 +101,7 @@ bool HyRackMeter::IsShowAsCash()
 	else
 		m_uiAttribs &= ~RACKMETERATTRIB_IsMoney;
 
-	FormatDigits();
+	SetAssembleNeeded();
 }
 
 bool HyRackMeter::IsSpinningMeter()
@@ -126,7 +126,7 @@ void HyRackMeter::SetAsSpinningMeter(bool bSet)
 	else
 		m_uiAttribs &= ~RACKMETERATTRIB_IsSpinDigits;
 
-	FormatDigits();
+	SetAssembleNeeded();
 }
 
 HyNumberFormat HyRackMeter::GetNumFormat() const
@@ -137,7 +137,7 @@ HyNumberFormat HyRackMeter::GetNumFormat() const
 void HyRackMeter::SetNumFormat(HyNumberFormat format)
 {
 	m_NumberFormat = format;
-	FormatDigits();
+	SetAssembleNeeded();
 }
 
 uint32 HyRackMeter::GetDenomination() const
@@ -148,7 +148,7 @@ uint32 HyRackMeter::GetDenomination() const
 void HyRackMeter::SetDenomination(uint32 uiDenom)
 {
 	m_uiDenomination = uiDenom;
-	FormatDigits();
+	SetAssembleNeeded();
 }
 
 /*virtual*/ void HyRackMeter::SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor) /*override*/
@@ -189,7 +189,7 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 		if(iCurPennies != m_iCurValue)
 		{
 			m_iCurValue = iCurPennies;
-			FormatDigits();
+			SetAssembleNeeded(); //FormatDigits();
 		}
 	}
 	else	// Spinning (analog) digits
@@ -221,7 +221,7 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 		}
 
 		if(iTimesPastThreshold > 0)
-			FormatDigits();
+			SetAssembleNeeded(); //FormatDigits();
 	}
 }
 
@@ -229,12 +229,12 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 {
 	SetTextMonospacedDigits(true);
 	m_SpinText.Setup(m_Text.GetPath());
-	FormatDigits();
+	//FormatDigits();
 }
 
-/*virtual*/ void HyRackMeter::ResetTextAndPanel() /*override*/
+/*virtual*/ void HyRackMeter::OnAssemble() /*override*/
 {
-	HyLabel::ResetTextAndPanel();
+	HyLabel::OnAssemble();
 
 	m_SpinText.m_SpinText_Shown.SetState(m_Text.GetState());
 	m_SpinText.m_SpinText_Shown.SetAlignment(m_Text.GetAlignment());
@@ -254,19 +254,8 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 		m_SpinText.m_SpinText_Padded.SetAsLine();
 	}
 
-	FormatDigits();
-}
-
-float HyRackMeter::GetSpinHeightThreshold()
-{
-	if(m_Text.IsScaleBox())
-		return m_Text.GetTextBoxDimensions().y;
-
-	return m_Text.GetLineBreakHeight();
-}
-
-void HyRackMeter::FormatDigits()
-{
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Format Digits
 	m_NumberFormat.SetUsingCurrencySymbol(m_Text.IsGlyphAvailable(HyLocale::Money_GetCurrencySymbol()));
 
 	if(IsShowAsCash())
@@ -279,7 +268,7 @@ void HyRackMeter::FormatDigits()
 
 	if(IsSpinningMeter())
 	{
-		float fThreshold = GetSpinHeightThreshold();
+		float fThreshold = m_Text.IsScaleBox() ? m_Text.GetTextBoxDimensions().y : m_Text.GetLineBreakHeight();
 
 		m_SpinText.m_SpinText_Shown.SetText(m_Text.GetUtf8String());
 		uint32 uiCharIndexForScissor = m_Text.GetNumCharacters() - 1;
@@ -356,4 +345,14 @@ void HyRackMeter::FormatDigits()
 	}
 
 	m_SpinText.SetVisible(m_Text.IsVisible() && IsSpinningMeter());
+}
+
+float HyRackMeter::GetSpinHeightThreshold()
+{
+	Assemble();
+
+	if(m_Text.IsScaleBox())
+		return m_Text.GetTextBoxDimensions().y;
+
+	return m_Text.GetLineBreakHeight();
 }

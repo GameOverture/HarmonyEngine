@@ -45,7 +45,7 @@ protected:
 		HyPrimitive2d						m_BarNeg;		// Dimmed side of the slider
 
 		BarPrimitives(HyEntity2d *pParent);
-		void Assemble(HyOrientation eOrientation, float fBarThickness, float fBarLength, float fIndentAmt);
+		void DoAssembly(HyOrientation eOrientation, float fBarThickness, float fBarLength, float fIndentAmt);
 	};
 	BarPrimitives							m_BarStroke;
 	BarPrimitives							m_BarFill;
@@ -92,7 +92,7 @@ protected:
 
 	float GetBarThickness();
 	float GetBarRadius();
-	void Assemble();
+	void DoAssembly();
 	void FixValues();
 };
 

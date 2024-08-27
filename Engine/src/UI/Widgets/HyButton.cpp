@@ -100,7 +100,7 @@ void HyButton::SetChecked(bool bChecked)
 		return;
 	}
 	
-	ResetTextAndPanel();
+	SetAssembleNeeded();
 	OnSetChecked(bChecked);
 }
 

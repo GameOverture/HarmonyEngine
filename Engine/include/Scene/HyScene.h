@@ -44,6 +44,8 @@ class HyScene
 	std::vector<IHyDrawable2d *>						m_NodeList_LoadedDrawable2d;
 	std::vector<IHyDrawable3d *>						m_NodeList_LoadedDrawable3d;
 
+	static std::vector<HyEntity2d *>					sm_NodeList_AssembleEnts2d;
+
 	// Collision/Physics
 	float												m_fPixelsPerMeter;
 	float												m_fPpmInverse;
@@ -75,6 +77,9 @@ public:
 	void RemoveNode_Loaded(const IHyDrawable2d *pDrawable);
 	void RemoveNode_Loaded(const IHyDrawable3d *pDrawable);
 	void CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut);
+
+	static void AddEntNode_Assemble(HyEntity2d *pEntity);
+	static void RemoveEntNode_Assemble(HyEntity2d *pEntity);
 
 	void AddNode_PhysBody(HyEntity2d *pEntity);
 	void RemoveNode_PhysBody(HyEntity2d *pEntity);

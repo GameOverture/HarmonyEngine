@@ -96,14 +96,13 @@ public:
 
 protected:
 	virtual void Update() override;
+	virtual void OnAssemble() override;
 
 	using HyLabel::SetText; // Hiding SetText() since it doesn't make sense to use with HyRackMeters
 
 	virtual void OnSetup() override;
-	virtual void ResetTextAndPanel() override;
 
 	float GetSpinHeightThreshold();
-	void FormatDigits();
 };
 
 #endif /* HyRackMeter_h__ */

@@ -33,12 +33,12 @@ public:
 	void SetCheckedChangedCallback(std::function<void(HyRadioButton *, void *)> fpCallback, void *pParam = nullptr);
 
 protected:
+	virtual void OnAssemble() override;
+
 	virtual void OnSetup() override;
 	virtual void OnUiMouseClicked() override;
 
 	virtual void OnSetChecked(bool bChecked) override;
-
-	void AssembleCheckmark();
 };
 
 #endif /* HyRadioButton_h__ */

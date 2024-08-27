@@ -30,11 +30,13 @@ HyEntity2d::HyEntity2d(HyEntity2d &&donor) noexcept :
 
 HyEntity2d::~HyEntity2d(void)
 {
+	if(IsRegisteredAssembleEntity())
+		HyScene::RemoveEntNode_Assemble(this);
+
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 
 	physics.Deactivate();
-
 	ClearScissor(true);
 }
 
@@ -584,6 +586,45 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 
 	if(sm_pHyAssets)
 		sm_pHyAssets->SetEntityLoaded(this);
+}
+
+bool HyEntity2d::IsRegisteredAssembleEntity() const
+{
+	return (m_uiAttribs & ENTITYATTRIB_IsRegisteredAssemble);
+}
+
+void HyEntity2d::RegisterAssembleEntity(bool bRegister /*= true*/)
+{
+	if(bRegister)
+	{
+		if(IsRegisteredAssembleEntity() == false)
+		{
+			m_uiAttribs |= ENTITYATTRIB_IsRegisteredAssemble;
+			HyScene::AddEntNode_Assemble(this);
+		}
+	}
+	else
+	{
+		if(IsRegisteredAssembleEntity())
+		{
+			m_uiAttribs &= ~ENTITYATTRIB_IsRegisteredAssemble;
+			HyScene::RemoveEntNode_Assemble(this);
+		}
+	}
+}
+
+void HyEntity2d::SetAssembleNeeded()
+{
+	m_uiAttribs |= ENTITYATTRIB_AssembleNeeded;
+}
+
+void HyEntity2d::Assemble()
+{
+	if((m_uiAttribs & ENTITYATTRIB_AssembleNeeded) == 0)
+		return;
+
+	OnAssemble();
+	m_uiAttribs &= ~ENTITYATTRIB_AssembleNeeded;
 }
 
 /*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)
