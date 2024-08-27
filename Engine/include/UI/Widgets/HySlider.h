@@ -83,6 +83,7 @@ public:
 
 protected:
 	virtual void Update() override;
+	virtual void OnAssemble() override;
 
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnSetSizeHint() override;
@@ -90,10 +91,10 @@ protected:
 
 	virtual void OnUiMouseDown() override;
 
+	virtual void OnSetup() { }					// Optional override for derived classes
+
 	float GetBarThickness();
 	float GetBarRadius();
-	void DoAssembly();
-	void FixValues();
 };
 
 #endif /* HySlider_h__ */

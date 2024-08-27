@@ -66,6 +66,7 @@ HySlider::HySlider(HyEntity2d *pParent /*= nullptr*/) :
 	m_fpOnValueChanged(nullptr),
 	m_pValueChangedParam(nullptr)
 {
+	RegisterAssembleEntity();
 }
 
 HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nullptr*/) :
@@ -82,6 +83,7 @@ HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nul
 	m_fpOnValueChanged(nullptr),
 	m_pValueChangedParam(nullptr)
 {
+	RegisterAssembleEntity();
 	Setup(sliderInitRef);
 }
 
@@ -92,12 +94,14 @@ HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nul
 /*virtual*/ float HySlider::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
 	OnSetSizeHint();
+	Assemble();
 	return m_vSizeHint.x * fPercent;
 }
 
 /*virtual*/ float HySlider::GetHeight(float fPercent /*= 1.0f*/) /*override*/
 {
 	OnSetSizeHint();
+	Assemble();
 	return m_vSizeHint.y * fPercent;
 }
 
@@ -109,7 +113,8 @@ void HySlider::Setup(const HyPanelInit &sliderInitRef)
 
 	SetAsEnabled(IsEnabled());
 	
-	DoAssembly();
+	OnSetup();
+	SetAssembleNeeded();
 }
 
 int64 HySlider::GetNumTicks() const
@@ -136,7 +141,7 @@ void HySlider::SetValue(int64 iValue)
 
 	m_iValue = iValue;
 
-	FixValues();
+	SetAssembleNeeded();
 	if(m_fpOnValueChanged)
 		m_fpOnValueChanged(this, m_pValueChangedParam);
 }
@@ -165,7 +170,7 @@ void HySlider::SetRange(int64 iMin, int64 iMax, int32 iStepAmt)
 	m_uiAttribs &= ~SLIDERATTRIB_UseStepList;
 	m_iStep = (iStepAmt <= 0 || iStepAmt > static_cast<int32>(m_iMax - m_iMin)) ? 1 : iStepAmt;
 	
-	FixValues();
+	SetAssembleNeeded();
 }
 
 // An empty stepList is ignored
@@ -186,7 +191,7 @@ void HySlider::SetRange(const std::vector<int64> &stepList)
 		m_iMax = HyMath::Max(m_iMax, m_StepList[i]);
 	}
 	
-	FixValues();
+	SetAssembleNeeded();
 }
 
 HyOrientation HySlider::GetOrientation() const
@@ -201,7 +206,7 @@ void HySlider::SetOrientation(HyOrientation eOrien)
 	else
 		m_uiAttribs |= SLIDERATTRIB_IsVertical;
 
-	DoAssembly();
+	SetAssembleNeeded();
 }
 
 void HySlider::SetBarColors(HyColor posColor, HyColor negColor, HyColor strokeColor)
@@ -275,53 +280,13 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> f
 	}
 }
 
-/*virtual*/ glm::vec2 HySlider::GetPosOffset() /*override*/
-{
-	return glm::vec2(m_Panel.GetWidth(m_Panel.scale.X()) * 0.5f, m_Panel.GetHeight(m_Panel.scale.Y()) * 0.5f);
-}
-
-/*virtual*/ void HySlider::OnSetSizeHint() /*override*/
-{
-	float fRadius = GetBarRadius();
-
-	if(GetOrientation() == HYORIENT_Horizontal)
-		HySetVec(m_vSizeHint, static_cast<int32>(m_fLength + m_Panel.GetWidth(m_Panel.scale.X())), static_cast<int32>(m_Panel.GetHeight(m_Panel.scale.Y())));
-	else
-		HySetVec(m_vSizeHint, static_cast<int32>(m_Panel.GetWidth(m_Panel.scale.X())), static_cast<int32>(m_fLength + m_Panel.GetHeight(m_Panel.scale.Y())));
-}
-
-/*virtual*/ glm::ivec2 HySlider::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
-{
-	// TODO: Check if vertical breaks this... this seems incorrect
-
-	m_Panel.SetSizeDimension(GetOrientation() ^ 1, uiNewHeight);
-
-	m_fLength = uiNewWidth - m_Panel.GetSizeDimension(GetOrientation());
-	OnSetSizeHint();
-
-	DoAssembly();
-	return m_vSizeHint;
-}
-
-/*virtual*/ void HySlider::OnUiMouseDown() /*override*/
-{
-	m_uiAttribs |= SLIDERATTRIB_IsDragging;
-}
-
-float HySlider::GetBarThickness()
-{
-	return m_Panel.GetSizeDimension(GetOrientation() ^ 1, 0.25f);
-}
-
-float HySlider::GetBarRadius()
-{
-	return GetBarThickness() * 0.5f;
-}
-
-void HySlider::DoAssembly()
+/*virtual*/ void HySlider::OnAssemble() /*override*/
 {
 	if(m_Panel.IsAutoSize())
+	{
+		HyLogWarning("HySlider::OnAssemble() - Panel must have fixed size");
 		return;
+	}
 
 	HyOrientation eOrientation = GetOrientation();
 
@@ -333,18 +298,11 @@ void HySlider::DoAssembly()
 	// Build the slider bar out out of primitives
 	float fBarThickness = GetBarThickness();
 	m_Panel.pos.GetAnimFloat(eOrientation ^ 1) = m_Panel.GetSizeDimension(eOrientation ^ 1, -0.5f);
-	
+
 	m_BarStroke.DoAssembly(eOrientation, fBarThickness, m_fLength, 0.0f);
 	m_BarFill.DoAssembly(eOrientation, fBarThickness, m_fLength, m_fStrokeAmt);
 
 	// Now position the slider on the bar at the proper location based on current values
-	FixValues();
-}
-
-void HySlider::FixValues()
-{
-	HyOrientation eOrientation = GetOrientation();
-
 	if(m_uiAttribs & SLIDERATTRIB_UseStepList)
 	{
 		auto iter = std::find(m_StepList.begin(), m_StepList.end(), m_iValue);
@@ -384,4 +342,47 @@ void HySlider::FixValues()
 	m_BarFill.m_BarNeg.scale.GetAnimFloat(eOrientation) = m_fLength - fLocalSliderPos;
 
 	SetSizeAndLayoutDirty();
+}
+
+/*virtual*/ glm::vec2 HySlider::GetPosOffset() /*override*/
+{
+	return glm::vec2(m_Panel.GetWidth(m_Panel.scale.X()) * 0.5f, m_Panel.GetHeight(m_Panel.scale.Y()) * 0.5f);
+}
+
+/*virtual*/ void HySlider::OnSetSizeHint() /*override*/
+{
+	float fRadius = GetBarRadius();
+
+	if(GetOrientation() == HYORIENT_Horizontal)
+		HySetVec(m_vSizeHint, static_cast<int32>(m_fLength + m_Panel.GetWidth(m_Panel.scale.X())), static_cast<int32>(m_Panel.GetHeight(m_Panel.scale.Y())));
+	else
+		HySetVec(m_vSizeHint, static_cast<int32>(m_Panel.GetWidth(m_Panel.scale.X())), static_cast<int32>(m_fLength + m_Panel.GetHeight(m_Panel.scale.Y())));
+}
+
+/*virtual*/ glm::ivec2 HySlider::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
+{
+	// TODO: Check if vertical breaks this... this seems incorrect
+
+	m_Panel.SetSizeDimension(GetOrientation() ^ 1, uiNewHeight);
+
+	m_fLength = uiNewWidth - m_Panel.GetSizeDimension(GetOrientation());
+	OnSetSizeHint();
+
+	SetAssembleNeeded();
+	return m_vSizeHint;
+}
+
+/*virtual*/ void HySlider::OnUiMouseDown() /*override*/
+{
+	m_uiAttribs |= SLIDERATTRIB_IsDragging;
+}
+
+float HySlider::GetBarThickness()
+{
+	return m_Panel.GetSizeDimension(GetOrientation() ^ 1, 0.25f);
+}
+
+float HySlider::GetBarRadius()
+{
+	return GetBarThickness() * 0.5f;
 }

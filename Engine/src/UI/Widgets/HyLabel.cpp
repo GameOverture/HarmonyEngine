@@ -137,7 +137,6 @@ void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath
 		break;
 	}
 
-	//CalculateTextAndPanel();
 	OnSetup();
 	SetAssembleNeeded();
 }
@@ -185,7 +184,6 @@ void HyLabel::SetAsLine()
 	m_uiAttribs |= (HYTEXT_Line << LABELATTRIB_StackedTextTypeOffset);
 
 	SetAssembleNeeded();
-	//ResetTextAndPanel();
 }
 
 void HyLabel::SetAsColumn(float fWidth)
@@ -201,7 +199,6 @@ void HyLabel::SetAsColumn(float fWidth)
 	//OnPanelUpdated();
 
 	SetAssembleNeeded();
-	//ResetTextAndPanel();
 }
 
 void HyLabel::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/, bool bUseScissor /*= true*/)
@@ -227,7 +224,6 @@ void HyLabel::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= f
 	m_Panel.Setup(panelInit);
 
 	SetAssembleNeeded();
-	//ResetTextAndPanel();
 }
 
 void HyLabel::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
@@ -248,7 +244,6 @@ void HyLabel::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically 
 	m_Panel.Setup(panelInit);
 
 	SetAssembleNeeded();
-	//ResetTextAndPanel();
 }
 
 void HyLabel::SetAsVertical()
@@ -259,7 +254,6 @@ void HyLabel::SetAsVertical()
 	m_uiAttribs |= (HYTEXT_Vertical << LABELATTRIB_StackedTextTypeOffset);
 
 	SetAssembleNeeded();
-	//ResetTextAndPanel();
 }
 
 void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /*= 5*/, HyOrientation eOrientation /*= HYORIENT_Horizontal*/)
@@ -278,7 +272,6 @@ void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /
 		m_uiAttribs |= LABELATTRIB_Vertical;
 
 	SetAssembleNeeded();
-	//ResetTextAndPanel();
 }
 
 HyAlignment HyLabel::GetAlignment() const
@@ -684,7 +677,6 @@ float HyLabel::GetTextHeight(float fPercent /*= 1.0f*/)
 	}
 
 	SetAssembleNeeded();
-	//ResetTextAndPanel();
 	
 	return glm::ivec2(uiNewWidth, uiNewHeight);
 }
