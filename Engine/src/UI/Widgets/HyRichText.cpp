@@ -20,7 +20,7 @@
 HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_pTextData(nullptr),
-	m_vBoxDimensions(0.0f),
+	m_vTextDimensions(0.0f),
 	m_eAlignment(HYALIGN_Left),
 	m_fColumnLineHeightOffset(0.0f)
 {
@@ -30,7 +30,7 @@ HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
 HyRichText::HyRichText(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_pTextData(nullptr),
-	m_vBoxDimensions(0.0f),
+	m_vTextDimensions(0.0f),
 	m_eAlignment(HYALIGN_Left),
 	m_fColumnLineHeightOffset(0.0f)
 {
@@ -41,7 +41,7 @@ HyRichText::HyRichText(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nul
 HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_pTextData(nullptr),
-	m_vBoxDimensions(0.0f),
+	m_vTextDimensions(0.0f),
 	m_eAlignment(HYALIGN_Left),
 	m_fColumnLineHeightOffset(0.0f)
 {
@@ -52,7 +52,7 @@ HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_pTextData(nullptr),
-	m_vBoxDimensions(0.0f),
+	m_vTextDimensions(0.0f),
 	m_eAlignment(HYALIGN_Left),
 	m_fColumnLineHeightOffset(0.0f)
 {
@@ -69,27 +69,16 @@ HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	}
 }
 
-bool HyRichText::IsGlyphAvailable(std::string sUtf8Character) const
-{
-	if(m_pTextData == nullptr)
-		return false;
-
-	uint32 uiUsedBytes = 0;
-	const HyTextGlyph *pGlyphRef = m_pTextData->GetGlyph(0, 0, HyIO::Utf8_to_Utf32(sUtf8Character.c_str(), uiUsedBytes));
-
-	return pGlyphRef != nullptr;
-}
-
 /*virtual*/ float HyRichText::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
 	Assemble();
-	return m_vBoxDimensions.x * fPercent;
+	return m_vTextDimensions.x * fPercent;
 }
 
 /*virtual*/ float HyRichText::GetHeight(float fPercent /*= 1.0f*/) /*override*/
 {
 	Assemble();
-	return m_vBoxDimensions.y * fPercent;
+	return m_vTextDimensions.y * fPercent;
 }
 
 float HyRichText::GetTextWidth(float fPercent /*= 1.0f*/)
@@ -167,7 +156,7 @@ HyTextType HyRichText::GetTextType() const
 
 void HyRichText::SetAsLine()
 {
-	HySetVec(m_vBoxDimensions, 0.0f, 0.0f);
+	HySetVec(m_vTextDimensions, 0.0f, 0.0f);
 
 	m_uiAttribs &= ~RICHTEXTATTRIB_IsCenterVertically;
 	m_uiAttribs &= ~RICHTEXTATTRIB_TextTypeMask;
@@ -177,7 +166,7 @@ void HyRichText::SetAsLine()
 
 void HyRichText::SetAsColumn(float fWidth)
 {
-	HySetVec(m_vBoxDimensions, fWidth, 0.0f);
+	HySetVec(m_vTextDimensions, fWidth, 0.0f);
 
 	m_uiAttribs &= ~RICHTEXTATTRIB_IsCenterVertically;
 	m_uiAttribs &= ~RICHTEXTATTRIB_TextTypeMask;
@@ -185,14 +174,19 @@ void HyRichText::SetAsColumn(float fWidth)
 	SetAssembleNeeded();
 }
 
-void HyRichText::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/)
+void HyRichText::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/, bool bUseScissor /*= true*/)
 {
-	HySetVec(m_vBoxDimensions, fWidth, fHeight);
+	HySetVec(m_vTextDimensions, fWidth, fHeight);
 
 	if(bCenterVertically)
 		m_uiAttribs |= RICHTEXTATTRIB_IsCenterVertically;
 	else
 		m_uiAttribs &= ~RICHTEXTATTRIB_IsCenterVertically;
+
+	if(bUseScissor)
+		m_uiAttribs |= RICHTEXTATTRIB_BoxUseScissor;
+	else
+		m_uiAttribs &= ~RICHTEXTATTRIB_BoxUseScissor;
 
 	m_uiAttribs &= ~RICHTEXTATTRIB_TextTypeMask;
 	m_uiAttribs |= HYTEXT_Box << RICHTEXTATTRIB_TextTypeOffset;
@@ -201,7 +195,7 @@ void HyRichText::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*
 
 void HyRichText::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
 {
-	HySetVec(m_vBoxDimensions, fWidth, fHeight);
+	HySetVec(m_vTextDimensions, fWidth, fHeight);
 
 	if(bCenterVertically)
 		m_uiAttribs |= RICHTEXTATTRIB_IsCenterVertically;
@@ -211,6 +205,17 @@ void HyRichText::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertical
 	m_uiAttribs &= ~RICHTEXTATTRIB_TextTypeMask;
 	m_uiAttribs |= HYTEXT_ScaleBox << RICHTEXTATTRIB_TextTypeOffset;
 	SetAssembleNeeded();
+}
+
+bool HyRichText::IsCharacterAvailable(std::string sUtf8Character) const
+{
+	if(m_pTextData == nullptr)
+		return false;
+
+	uint32 uiUsedBytes = 0;
+	const HyTextGlyph *pGlyphRef = m_pTextData->GetGlyph(0, 0, HyIO::Utf8_to_Utf32(sUtf8Character.c_str(), uiUsedBytes));
+
+	return pGlyphRef != nullptr;
 }
 
 bool HyRichText::IsCenterVertically() const
@@ -347,7 +352,7 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 			switch(GetTextType())
 			{
 			case HYTEXT_Line:
-				HySetVec(m_vBoxDimensions, 0.0f, 0.0f);
+				HySetVec(m_vTextDimensions, 0.0f, 0.0f);
 				[[fallthrough]];
 			case HYTEXT_ScaleBox: // ScaleBox is treated as a line, because it will be scaled to fit the box after all IHyDrawable's are created
 				pNewText->SetAsLine();
@@ -357,10 +362,10 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 				break;
 
 			case HYTEXT_Column:
-				m_vBoxDimensions.y = 0.0f;
+				m_vTextDimensions.y = 0.0f;
 				[[fallthrough]];
 			case HYTEXT_Box: // Box is treated as a column, because it will be cropped to fit the box after all IHyDrawable's are created
-				pNewText->SetAsColumn(m_vBoxDimensions.x);
+				pNewText->SetAsColumn(m_vTextDimensions.x);
 
 				ptCurPos.x = pNewText->GetCursorPos().x;
 				ptCurPos.y += pNewText->GetCursorPos().y;
@@ -389,7 +394,7 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 			else // Otherwise insert sprite
 			{
 				//if(GetTextType() == HYTEXT_ScaleBox || GetTextType() == HYTEXT_Box)
-				//	fLineHeight = m_vBoxDimensions.y;
+				//	fLineHeight = m_vTextDimensions.y;
 
 				// Allocate sprite and initialize
 				HySprite2d *pNewSprite = HY_NEW HySprite2d(HyNodePath(formatChangeList[uiCurFmtIndex].first.c_str()), this);
@@ -402,22 +407,22 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 				// Determine sprite scale with remaining room left on line
 				float fScaleX = pNewSprite->GetStateWidth(pNewSprite->GetState());
 				if(GetTextType() == HYTEXT_Box || GetTextType() == HYTEXT_Column) // NOTE: Don't check ScaleBox because that will be scaled to fit after assembling at full size
-					fScaleX = (m_vBoxDimensions.x - ptCurPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
+					fScaleX = (m_vTextDimensions.x - ptCurPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
 				float fScaleY = fLineHeight / pNewSprite->GetStateHeight(pNewSprite->GetState());
 
 				pNewSprite->scale.SetAll(HyMath::Min(fScaleX, fScaleY));
 
 				// If there's limited horizontal space, determine if this sprite will not fit in the remaining space on this text line
 				if(GetTextType() == HYTEXT_Box || GetTextType() == HYTEXT_Column && // NOTE: Don't check ScaleBox because that will be scaled to fit after assembling at full size
-					((ptCurPos.x + pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X())) >= (m_vBoxDimensions.x - 1))) // the -1 should help with scale floating point above
+					((ptCurPos.x + pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X())) >= (m_vTextDimensions.x - 1))) // the -1 should help with scale floating point above
 				{
-					fUsedWidth = m_vBoxDimensions.x;
+					fUsedWidth = m_vTextDimensions.x;
 
 					ptCurPos.x = 0.0f;
 					ptCurPos.y -= fLineHeight;
 
 					// Recalculate sprite scale with modified ptCurPos
-					float fScaleX = (m_vBoxDimensions.x - ptCurPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
+					float fScaleX = (m_vTextDimensions.x - ptCurPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
 					float fScaleY = fLineHeight / pNewSprite->GetStateHeight(pNewSprite->GetState());
 					pNewSprite->scale.SetAll(HyMath::Min(fScaleX, fScaleY));
 				}
@@ -433,7 +438,7 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 				vOffset *= pNewSprite->scale.Get();
 				pNewSprite->pos.Offset(-vOffset);
 
-				if(m_vBoxDimensions.y == 0.0f)
+				if(m_vTextDimensions.y == 0.0f)
 				{
 					// Also offset the sprite down by the descender amount, because at the moment they're sitting on the 'baseline'
 					pNewSprite->pos.Offset(0.0f, -abs(fLineDescender));
@@ -458,7 +463,7 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 	if(GetTextType() == HYTEXT_ScaleBox)
 	{
 		// Scale all drawables to fit within the box
-		float fScaleAmt = HyMath::Min(m_vBoxDimensions.x / fUsedWidth, m_vBoxDimensions.y / fUsedHeight);
+		float fScaleAmt = HyMath::Min(m_vTextDimensions.x / fUsedWidth, m_vTextDimensions.y / fUsedHeight);
 		for(auto pDrawable : m_DrawableList)
 		{
 			if(pDrawable->GetType() == HYTYPE_Sprite)
@@ -470,7 +475,7 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 				pDrawable->scale.SetAll(fScaleAmt);
 
 			if(IsCenterVertically())
-				pDrawable->pos.Offset(0.0f, (m_vBoxDimensions.y - m_fColumnLineHeightOffset) * 0.5f);
+				pDrawable->pos.Offset(0.0f, (m_vTextDimensions.y - m_fColumnLineHeightOffset) * 0.5f);
 		}
 	}
 
@@ -499,13 +504,13 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 		break;
 	}
 
-	// Ensure m_vBoxDimensions has the correct dimensions
-	if(m_vBoxDimensions.x == 0.0f)
-		m_vBoxDimensions.x = fUsedWidth;
-	if(m_vBoxDimensions.y == 0.0f)
-		m_vBoxDimensions.y = fUsedHeight;
+	// Ensure m_vTextDimensions has the correct dimensions
+	if(m_vTextDimensions.x == 0.0f)
+		m_vTextDimensions.x = fUsedWidth;
+	if(m_vTextDimensions.y == 0.0f)
+		m_vTextDimensions.y = fUsedHeight;
 
-	m_Panel.SetSize(m_vBoxDimensions.x, m_vBoxDimensions.y);
+	m_Panel.SetSize(m_vTextDimensions.x, m_vTextDimensions.y);
 
 	// Inform everwhere that *this has been updated
 	SetDirty(IHyNode::DIRTY_SceneAABB);
@@ -516,12 +521,12 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 /*virtual*/ glm::vec2 HyRichText::GetPosOffset() /*override*/
 {
 	Assemble();
-	return glm::vec2(0.0f, m_vBoxDimensions.y - m_fColumnLineHeightOffset);
+	return glm::vec2(0.0f, m_vTextDimensions.y - m_fColumnLineHeightOffset);
 }
 
 /*virtual*/ void HyRichText::OnSetSizeHint() /*override*/
 {
-	HySetVec(m_vSizeHint, static_cast<int>(m_vBoxDimensions.x), static_cast<int>(m_vBoxDimensions.y));
+	HySetVec(m_vSizeHint, static_cast<int>(m_vTextDimensions.x), static_cast<int>(m_vTextDimensions.y));
 	Assemble();
 }
 

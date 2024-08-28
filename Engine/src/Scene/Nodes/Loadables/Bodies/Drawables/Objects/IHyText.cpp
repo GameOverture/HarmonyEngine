@@ -101,19 +101,6 @@ HyTextType IHyText<NODETYPE, ENTTYPE>::GetTextType() const
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-bool IHyText<NODETYPE, ENTTYPE>::IsGlyphAvailable(const std::string sUtf8Character)
-{
-	if(this->AcquireData() == nullptr)
-		return false;
-
-	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
-	uint32 uiUsedBytes = 0;
-	const HyTextGlyph *pGlyphRef = pData->GetGlyph(this->m_uiState, 0, HyIO::Utf8_to_Utf32(sUtf8Character.c_str(), uiUsedBytes));
-
-	return pGlyphRef != nullptr;
-}
-
-template<typename NODETYPE, typename ENTTYPE>
 const std::string &IHyText<NODETYPE, ENTTYPE>::GetUtf8String() const
 {
 	return m_sRawString;
@@ -246,6 +233,19 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphSize(uint32 uiCharIndex, uint32 ui
 	glm::vec2 vSize(pGlyphRef->uiWIDTH, pGlyphRef->uiHEIGHT);
 	vSize *= m_fScaleBoxModifier;
 	return vSize;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHyText<NODETYPE, ENTTYPE>::IsCharacterAvailable(const std::string sUtf8Character)
+{
+	if(this->AcquireData() == nullptr)
+		return false;
+
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
+	uint32 uiUsedBytes = 0;
+	const HyTextGlyph *pGlyphRef = pData->GetGlyph(this->m_uiState, 0, HyIO::Utf8_to_Utf32(sUtf8Character.c_str(), uiUsedBytes));
+
+	return pGlyphRef != nullptr;
 }
 
 template<typename NODETYPE, typename ENTTYPE>

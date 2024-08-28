@@ -86,6 +86,7 @@ public:
 	glm::vec2 GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);
 	glm::vec2 GetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex);
 
+	bool IsCharacterAvailable(const std::string sUtf8Character); // Pass a single utf8 character, returns whether that character exists in the font
 	uint32 GetNumCharacters() const;
 
 	uint32 GetCharacterCode(uint32 uiCharIndex) const;
@@ -103,7 +104,6 @@ public:
 	virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor);
 	bool IsTextMonospacedDigits() const;
 	virtual void SetTextMonospacedDigits(bool bSet);
-	bool IsGlyphAvailable(std::string sUtf8Character);
 	float GetTextWidth(float fPercent = 1.0f);
 	float GetTextHeight(float fPercent = 1.0f);
 

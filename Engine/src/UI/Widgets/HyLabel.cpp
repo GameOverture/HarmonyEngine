@@ -347,6 +347,11 @@ glm::vec2 HyLabel::GetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex)
 	return m_Text.GetGlyphSize(uiCharIndex, uiLayerIndex);
 }
 
+bool HyLabel::IsCharacterAvailable(const std::string sUtf8Character)
+{
+	return m_Text.IsCharacterAvailable(sUtf8Character);
+}
+
 uint32 HyLabel::GetNumCharacters() const
 {
 	return m_Text.GetNumCharacters();
@@ -416,11 +421,6 @@ bool HyLabel::IsTextMonospacedDigits() const
 {
 	m_Text.SetMonospacedDigits(bSet);
 	SetAssembleNeeded();
-}
-
-bool HyLabel::IsGlyphAvailable(std::string sUtf8Character)
-{
-	return m_Text.IsGlyphAvailable(sUtf8Character);
 }
 
 float HyLabel::GetTextWidth(float fPercent /*= 1.0f*/)

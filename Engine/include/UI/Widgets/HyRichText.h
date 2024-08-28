@@ -27,8 +27,9 @@ protected:
 		//									= 1 << 19
 		
 		RICHTEXTATTRIB_IsMonospacedDigits	= 1 << 20,
+		RICHTEXTATTRIB_BoxUseScissor		= 1 << 21,
 
-		RICHTEXTATTRIB_NEXTFLAG				= 1 << 21
+		RICHTEXTATTRIB_NEXTFLAG				= 1 << 22
 	};
 	static_assert((int)RICHTEXTATTRIB_IsCenterVertically == (int)WIDGETATTRIB_NEXTFLAG, "HyRichText is not matching with base classes attrib flags");
 
@@ -36,7 +37,7 @@ protected:
 	const HyTextData *				m_pTextData;
 	
 	HyMargins<float>				m_TextMargins;
-	glm::vec2						m_vBoxDimensions;
+	glm::vec2						m_vTextDimensions;
 	HyAlignment						m_eAlignment;
 
 	float							m_fColumnLineHeightOffset;
@@ -51,8 +52,6 @@ public:
 	HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
 	virtual ~HyRichText();
 
-	bool IsGlyphAvailable(std::string sUtf8Character) const;
-
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
 
@@ -66,8 +65,10 @@ public:
 	HyTextType GetTextType() const;
 	void SetAsLine();
 	void SetAsColumn(float fWidth);
-	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically = false);
+	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically = false, bool bUseScissor = true);
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
+
+	bool IsCharacterAvailable(std::string sUtf8Character) const;
 
 	bool IsCenterVertically() const;
 

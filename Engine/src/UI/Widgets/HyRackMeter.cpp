@@ -256,7 +256,7 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Format Digits
-	m_NumberFormat.SetUsingCurrencySymbol(m_Text.IsGlyphAvailable(HyLocale::Money_GetCurrencySymbol()));
+	m_NumberFormat.SetUsingCurrencySymbol(m_Text.IsCharacterAvailable(HyLocale::Money_GetCurrencySymbol()));
 
 	if(IsShowAsCash())
 		m_Text.SetText(HyLocale::Money_Format(m_iCurValue, m_NumberFormat));

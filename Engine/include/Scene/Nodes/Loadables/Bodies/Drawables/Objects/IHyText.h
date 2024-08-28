@@ -117,8 +117,6 @@ public:
 
 	HyTextType GetTextType() const;
 
-	bool IsGlyphAvailable(const std::string sUtf8Character); // Pass a single utf8 character, returns whether that character exists in the font
-
 	const std::string &GetUtf8String() const;
 	std::string GetUtf8Character(uint32 uiCharIndex) const;
 
@@ -134,6 +132,7 @@ public:
 	glm::vec2 GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);
 	glm::vec2 GetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex);
 
+	bool IsCharacterAvailable(const std::string sUtf8Character); // Pass a single utf8 character, returns whether that character exists in the font
 	uint32 GetNumCharacters() const;
 	uint32 GetNumShownCharacters() const;
 	uint32 GetNumRenderQuads();
