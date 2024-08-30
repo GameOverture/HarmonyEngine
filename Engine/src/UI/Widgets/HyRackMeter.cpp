@@ -15,27 +15,28 @@ HyRackMeter::HyRackMeter(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_SpinText(this)
 {
+	SetMonospacedDigits(true);
 }
 
 HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(panelInit, pParent),
 	m_SpinText(this)
 {
-	OnSetup();
+	SetMonospacedDigits(true);
 }
 
 HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(panelInit, textNodePath, pParent),
 	m_SpinText(this)
 {
-	OnSetup();
+	SetMonospacedDigits(true);
 }
 
 HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(panelInit, textNodePath, textMargins, pParent),
 	m_SpinText(this)
 {
-	OnSetup();
+	SetMonospacedDigits(true);
 }
 
 /*virtual*/ HyRackMeter::~HyRackMeter()
@@ -159,14 +160,6 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 	m_SpinText.m_SpinText_Padded.SetLayerColor(uiStateIndex, uiLayerIndex, topColor, botColor);
 }
 
-/*virtual*/ void HyRackMeter::SetTextMonospacedDigits(bool bSet)
-{
-	m_SpinText.m_SpinText_Shown.SetMonospacedDigits(bSet);
-	m_SpinText.m_SpinText_Padded.SetMonospacedDigits(bSet);
-
-	HyLabel::SetTextMonospacedDigits(bSet);
-}
-
 /*virtual*/ void HyRackMeter::Update() /*override*/
 {
 	HyLabel::Update();
@@ -225,16 +218,14 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 	}
 }
 
-/*virtual*/ void HyRackMeter::OnSetup() /*override*/
-{
-	SetTextMonospacedDigits(true);
-	m_SpinText.Setup(m_Text.GetPath());
-	//FormatDigits();
-}
-
 /*virtual*/ void HyRackMeter::OnAssemble() /*override*/
 {
 	HyLabel::OnAssemble();
+
+	m_SpinText.Setup(m_Text.GetPath());
+
+	m_SpinText.m_SpinText_Shown.SetMonospacedDigits(m_Text.IsMonospacedDigits());
+	m_SpinText.m_SpinText_Padded.SetMonospacedDigits(m_Text.IsMonospacedDigits());
 
 	m_SpinText.m_SpinText_Shown.SetState(m_Text.GetState());
 	m_SpinText.m_SpinText_Shown.SetAlignment(m_Text.GetAlignment());

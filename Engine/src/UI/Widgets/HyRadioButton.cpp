@@ -14,32 +14,45 @@
 HyRadioButton::HyRadioButton(HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(pParent),
 	m_CheckMarkStroke(this),
-	m_CheckMarkFill(this)
+	m_CheckMarkFill(this),
+	m_fpOnCheckedChanged(nullptr),
+	m_pCheckedChangedParam(nullptr)
 {
+	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
+	SetAsSideBySide();
 }
 
 HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, pParent),
 	m_CheckMarkStroke(this),
-	m_CheckMarkFill(this)
+	m_CheckMarkFill(this),
+	m_fpOnCheckedChanged(nullptr),
+	m_pCheckedChangedParam(nullptr)
 {
-	OnSetup();
+	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
+	SetAsSideBySide();
 }
 
 HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, textNodePath, pParent),
 	m_CheckMarkStroke(this),
-	m_CheckMarkFill(this)
+	m_CheckMarkFill(this),
+	m_fpOnCheckedChanged(nullptr),
+	m_pCheckedChangedParam(nullptr)
 {
-	OnSetup();
+	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
+	SetAsSideBySide();
 }
 
 HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, textNodePath, textMargins, pParent),
 	m_CheckMarkStroke(this),
-	m_CheckMarkFill(this)
+	m_CheckMarkFill(this),
+	m_fpOnCheckedChanged(nullptr),
+	m_pCheckedChangedParam(nullptr)
 {
-	OnSetup();
+	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
+	SetAsSideBySide();
 }
 
 /*virtual*/ HyRadioButton::~HyRadioButton()
@@ -62,15 +75,6 @@ void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *
 		m_CheckMarkStroke.SetAsCircle(fRadius);
 		m_CheckMarkFill.SetAsCircle(fRadius - m_Panel.GetFrameStrokeSize());
 	}
-}
-
-/*virtual*/ void HyRadioButton::OnSetup() /*override*/
-{
-	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
-	HyButton::OnSetup();
-	SetAsSideBySide();
-
-	SetAssembleNeeded();
 }
 
 /*virtual*/ void HyRadioButton::OnUiMouseClicked() /*override*/

@@ -166,6 +166,11 @@ bool IHyLoadable::IsLoaded() const
 	return m_eLoadState == HYLOADSTATE_Loaded;
 }
 
+HyLoadState IHyLoadable::GetLoadState() const
+{
+	return m_eLoadState;
+}
+
 /*virtual*/ void IHyLoadable::Load()
 {
 	HyAssert(sm_pHyAssets, "IHyLoadable::Load was invoked before engine has been initialized");

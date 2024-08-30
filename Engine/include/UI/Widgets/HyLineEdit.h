@@ -70,8 +70,6 @@ protected:
 
 	virtual void OnPanelUpdated() override;
 
-	virtual void OnSetup() override;
-
 	void MoveCursor(int32 iOffset, bool bSelection);
 
 //private:

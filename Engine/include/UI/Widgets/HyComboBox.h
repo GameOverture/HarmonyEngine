@@ -69,7 +69,6 @@ public:
 
 protected:
 	virtual void Update() override;
-	virtual void OnSetup() override;
 
 	static void OnComboBoxClickedCallback(HyButton *pBtn, void *pData);
 };

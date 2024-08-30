@@ -85,7 +85,7 @@ public:
 
 protected:
 	virtual void Update() override;
-	virtual void OnSetup() override;
+	virtual void OnAssemble() override;
 	void AdjustProgress(float fDuration);
 
 private:

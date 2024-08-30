@@ -238,6 +238,12 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphSize(uint32 uiCharIndex, uint32 ui
 template<typename NODETYPE, typename ENTTYPE>
 bool IHyText<NODETYPE, ENTTYPE>::IsCharacterAvailable(const std::string sUtf8Character)
 {
+	return IsCharacterAvailable(this->m_uiState, sUtf8Character);
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+bool IHyText<NODETYPE, ENTTYPE>::IsCharacterAvailable(uint32 uiStateIndex, const std::string sUtf8Character)
+{
 	if(this->AcquireData() == nullptr)
 		return false;
 

@@ -56,6 +56,9 @@ protected:
 
 		void Setup(const HyNodePath &textNodePath)
 		{
+			if(m_SpinText_Shown.IsLoadDataValid())
+				return;
+
 			m_SpinText_Shown.Init(textNodePath, this);
 			m_SpinText_Shown.SetAlignment(HYALIGN_Center);
 
@@ -92,15 +95,12 @@ public:
 	void SetDenomination(uint32 uiDenom);
 
 	virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor) override;
-	virtual void SetTextMonospacedDigits(bool bSet) override;
 
 protected:
 	virtual void Update() override;
 	virtual void OnAssemble() override;
 
 	using HyLabel::SetText; // Hiding SetText() since it doesn't make sense to use with HyRackMeters
-
-	virtual void OnSetup() override;
 
 	float GetSpinHeightThreshold();
 };

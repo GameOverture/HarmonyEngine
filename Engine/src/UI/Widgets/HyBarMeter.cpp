@@ -111,13 +111,13 @@ void HyBarMeter::SetBarOffset(const glm::ivec2 &barOffset)
 void HyBarMeter::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
 {
 	HySetVec(m_vBarOffset, static_cast<float>(iBarOffsetX), static_cast<float>(iBarOffsetY));
-	OnSetup();
+	SetAssembleNeeded();
 }
 
 bool HyBarMeter::SetBarState(uint32 uiStateIndex)
 {
 	bool bSuccess = m_Bar.SetState(uiStateIndex);
-	OnSetup();
+	SetAssembleNeeded();
 	return bSuccess;
 }
 
@@ -133,7 +133,7 @@ void HyBarMeter::SetVertical(bool bIsVertical)
 	else
 		m_uiAttribs &= ~BARMETERATTRIB_IsVertical;
 
-	OnSetup();
+	SetAssembleNeeded();
 }
 
 bool HyBarMeter::IsInverted() const
@@ -148,7 +148,7 @@ void HyBarMeter::SetInverted(bool bIsInverted)
 	else
 		m_uiAttribs &= ~BARMETERATTRIB_IsInverted;
 
-	OnSetup();
+	SetAssembleNeeded();
 }
 
 bool HyBarMeter::IsBarStretched() const
@@ -166,7 +166,7 @@ void HyBarMeter::SetBarStreteched(bool bIsBarStretched)
 		m_uiAttribs &= ~BARMETERATTRIB_IsBarStretched;
 	}
 
-	OnSetup();
+	SetAssembleNeeded();
 }
 
 bool HyBarMeter::IsBarUnderPanel() const
@@ -252,9 +252,9 @@ void HyBarMeter::SetNumFormat(HyNumberFormat format)
 		ApplyProgress();
 }
 
-/*virtual*/ void HyBarMeter::OnSetup() /*override*/
+/*virtual*/ void HyBarMeter::OnAssemble() /*override*/
 {
-	SetState(GetState()); // Disable auto HyPanelState's
+	HyLabel::OnAssemble();
 
 	m_BarMask.pos.Set(m_vBarOffset);
 	m_Bar.pos.Set(m_vBarOffset);

@@ -52,6 +52,7 @@ public:
 	const IHyNodeData *AcquireData();
 
 	bool IsLoaded() const;
+	HyLoadState GetLoadState() const;
 	virtual void Load();
 	virtual void Unload();
 

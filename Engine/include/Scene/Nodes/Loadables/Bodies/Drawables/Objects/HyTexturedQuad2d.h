@@ -49,7 +49,6 @@ public:
 protected:
 	virtual void OnDataAcquired() override;
 	virtual void OnLoaded() override;
-	//virtual void OnUnloaded() override;
 
 	virtual bool OnIsValidToRender() override;
 

@@ -270,26 +270,6 @@ template<typename NODETYPE, typename ENTTYPE>
 	}
 }
 
-//template<typename NODETYPE, typename ENTTYPE>
-///*virtual*/ void IHyAudio<NODETYPE, ENTTYPE>::OnLoaded() /*override*/
-//{
-//	IHyLoadable2d::OnLoaded();
-//
-//	if(IsExternalFile()) // Do blocking load of audio
-//	{
-//	}
-//}
-//
-//template<typename NODETYPE, typename ENTTYPE>
-///*virtual*/ void IHyAudio<NODETYPE, ENTTYPE>::OnUnloaded() /*override*/
-//{
-//	IHyLoadable2d::OnUnloaded();
-//
-//	if(IsExternalFile())
-//	{
-//	}
-//}
-
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ void IHyAudio<NODETYPE, ENTTYPE>::OnLoadedUpdate() /*override*/
 {
@@ -310,18 +290,6 @@ template<typename NODETYPE, typename ENTTYPE>
 		m_uiCueFlags = 0;
 	}
 }
-
-//template<typename NODETYPE, typename ENTTYPE>
-//void IHyAudio<NODETYPE, ENTTYPE>::Shuffle()
-//{
-//
-//}
-//
-//template<typename NODETYPE, typename ENTTYPE>
-//int32 IHyAudio<NODETYPE, ENTTYPE>::PullEntryIndex(const HyAudioPlaylist &entriesList)
-//{
-//
-//}
 
 template class IHyAudio<IHyLoadable2d, HyEntity2d>;
 template class IHyAudio<IHyLoadable3d, HyEntity3d>;

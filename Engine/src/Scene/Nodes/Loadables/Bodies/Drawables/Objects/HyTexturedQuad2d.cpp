@@ -198,17 +198,6 @@ int32 HyTexturedQuad2d::GetEntireTextureHeight()
 //	}
 }
 
-///*virtual*/ void HyTexturedQuad2d::OnUnloaded() /*override*/
-//{
-//	IHyDrawable2d::OnUnloaded();
-//
-//	if(IsAuxiliaryFile())
-//	{
-//		HyEngine::Renderer().DeleteTexture(m_hTextureHandle);
-//		m_hTextureHandle = HY_UNUSED_HANDLE;
-//	}
-//}
-
 /*virtual*/ bool HyTexturedQuad2d::OnIsValidToRender() /*override*/
 {
 	return true;

@@ -85,7 +85,6 @@ public:
 	float GetElapsedPlayTime() const;
 	void Stop();
 
-
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;
 

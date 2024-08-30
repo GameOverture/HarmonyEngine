@@ -21,6 +21,26 @@ HyLineEdit::HyLineEdit(HyEntity2d *pParent /*= nullptr*/) :
 	m_Cursor(this),
 	m_fpOnSubmit(nullptr)
 {
+	m_Selection.alpha.Set(0.5f);
+	ChildInsert(m_Text, m_Selection);
+	ChildAppend(m_Cursor);
+
+	SetAlignment(HYALIGN_Left);
+	SetAsLine();
+
+	SetCursor(GetCursorIndex(), GetSelectionIndex());
+
+	m_BlinkTimer.SetExpiredCallback(
+		[this]()
+		{
+			m_Cursor.SetVisible(!m_Cursor.IsVisible());
+			m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
+		});
+	m_BlinkTimer.Init(HYLINEEDIT_BLINKDUR);
+
+	SetKeyboardFocusAllowed(true);
+	SetMouseHoverCursor(HYMOUSECURSOR_IBeam);
+
 	UsePanelStates();
 }
 
@@ -32,7 +52,26 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 	m_Cursor(this),
 	m_fpOnSubmit(nullptr)
 {
-	OnSetup();
+	m_Selection.alpha.Set(0.5f);
+	ChildInsert(m_Text, m_Selection);
+	ChildAppend(m_Cursor);
+
+	SetAlignment(HYALIGN_Left);
+	SetAsLine();
+
+	SetCursor(GetCursorIndex(), GetSelectionIndex());
+
+	m_BlinkTimer.SetExpiredCallback(
+		[this]()
+		{
+			m_Cursor.SetVisible(!m_Cursor.IsVisible());
+			m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
+		});
+	m_BlinkTimer.Init(HYLINEEDIT_BLINKDUR);
+
+	SetKeyboardFocusAllowed(true);
+	SetMouseHoverCursor(HYMOUSECURSOR_IBeam);
+
 	UsePanelStates();
 }
 
@@ -44,7 +83,26 @@ HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePat
 	m_Cursor(this),
 	m_fpOnSubmit(nullptr)
 {
-	OnSetup();
+	m_Selection.alpha.Set(0.5f);
+	ChildInsert(m_Text, m_Selection);
+	ChildAppend(m_Cursor);
+
+	SetAlignment(HYALIGN_Left);
+	SetAsLine();
+
+	SetCursor(GetCursorIndex(), GetSelectionIndex());
+
+	m_BlinkTimer.SetExpiredCallback(
+		[this]()
+		{
+			m_Cursor.SetVisible(!m_Cursor.IsVisible());
+			m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
+		});
+	m_BlinkTimer.Init(HYLINEEDIT_BLINKDUR);
+
+	SetKeyboardFocusAllowed(true);
+	SetMouseHoverCursor(HYMOUSECURSOR_IBeam);
+
 	UsePanelStates();
 }
 
@@ -337,29 +395,6 @@ void HyLineEdit::Submit()
 
 	m_Cursor.SetTint(m_Panel.GetPanelColor().IsDark() ? HyColor::White : HyColor::Black);
 	m_Selection.SetTint(m_Panel.GetPanelColor().IsDark() ? HyColor::White : HyColor::Black);
-}
-
-/*virtual*/ void HyLineEdit::OnSetup() /*override*/
-{
-	m_Selection.alpha.Set(0.5f);
-	ChildInsert(m_Text, m_Selection);
-	ChildAppend(m_Cursor);
-
-	SetAlignment(HYALIGN_Left);
-	SetAsLine();
-
-	SetCursor(GetCursorIndex(), GetSelectionIndex());
-
-	m_BlinkTimer.SetExpiredCallback(
-		[this]()
-		{
-			m_Cursor.SetVisible(!m_Cursor.IsVisible());
-			m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
-		});
-	m_BlinkTimer.Init(HYLINEEDIT_BLINKDUR);
-
-	SetKeyboardFocusAllowed(true);
-	SetMouseHoverCursor(HYMOUSECURSOR_IBeam);
 }
 
 void HyLineEdit::MoveCursor(int32 iOffset, bool bSelection)

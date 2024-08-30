@@ -60,8 +60,6 @@ protected:
 	virtual void OnRelinquishKeyboardFocus() override;
 	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) override;
 
-	virtual void OnSetup() override;
-
 	virtual void OnSetChecked(bool bChecked) { }
 };
 

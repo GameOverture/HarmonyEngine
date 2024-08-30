@@ -20,6 +20,8 @@ HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 	m_fExpandedTimeout(0.0f),
 	m_ExpandAnimVec(*this, 0)
 {
+	SetButtonClickedCallback(OnComboBoxClickedCallback, this);
+	//m_Shape.SetAsBox(HyRect(GetWidth(), GetHeight()));
 }
 
 HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
@@ -31,7 +33,8 @@ HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	m_fExpandedTimeout(0.0f),
 	m_ExpandAnimVec(*this, 0)
 {
-	OnSetup();
+	SetButtonClickedCallback(OnComboBoxClickedCallback, this);
+	//m_Shape.SetAsBox(HyRect(GetWidth(), GetHeight()));
 }
 
 HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
@@ -43,7 +46,8 @@ HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	m_fExpandedTimeout(0.0f),
 	m_ExpandAnimVec(*this, 0)
 {
-	OnSetup();
+	SetButtonClickedCallback(OnComboBoxClickedCallback, this);
+	//m_Shape.SetAsBox(HyRect(GetWidth(), GetHeight()));
 }
 
 /*virtual*/ HyComboBox::~HyComboBox()
@@ -272,14 +276,6 @@ void HyComboBox::ResetExpandedTimeout()
 		}
 		break; }
 	}
-}
-
-/*virtual*/ void HyComboBox::OnSetup() /*override*/
-{
-	HyButton::OnSetup();
-	SetButtonClickedCallback(OnComboBoxClickedCallback, this);
-
-	m_Shape.SetAsBox(HyRect(GetWidth(), GetHeight()));
 }
 
 /*static*/ void HyComboBox::OnComboBoxClickedCallback(HyButton *pBtn, void *pData)

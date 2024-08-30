@@ -16,6 +16,7 @@ HyCheckBox::HyCheckBox(HyEntity2d *pParent /*= nullptr*/) :
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
+	SetAsSideBySide();
 }
 
 HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
@@ -23,7 +24,7 @@ HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nul
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	OnSetup();
+	SetAsSideBySide();
 }
 
 HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
@@ -31,7 +32,7 @@ HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	OnSetup();
+	SetAsSideBySide();
 }
 
 HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
@@ -39,7 +40,7 @@ HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {
-	OnSetup();
+	SetAsSideBySide();
 }
 
 /*virtual*/ HyCheckBox::~HyCheckBox()
@@ -63,14 +64,6 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void
 		m_CheckMarkStroke.SetAsCircle(fRadius);
 		m_CheckMarkFill.SetAsCircle(fRadius - m_Panel.GetFrameStrokeSize());
 	}
-}
-
-/*virtual*/ void HyCheckBox::OnSetup() /*override*/
-{
-	HyButton::OnSetup();
-	SetAsSideBySide();
-
-	SetAssembleNeeded();
 }
 
 /*virtual*/ void HyCheckBox::OnUiMouseClicked() /*override*/

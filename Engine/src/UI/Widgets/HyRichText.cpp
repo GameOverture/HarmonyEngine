@@ -1,8 +1,8 @@
 /**************************************************************************
-*	HyRichText.cpp
+*	HyRichLabel.cpp
 *
 *	Harmony Engine
-*	Copyright (c) 2018 Jason Knobler
+*	Copyright (c) 2024 Jason Knobler
 *
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
@@ -17,50 +17,31 @@
 
 #include <regex>
 
-HyRichText::HyRichText(HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent),
-	m_pTextData(nullptr),
-	m_vTextDimensions(0.0f),
-	m_eAlignment(HYALIGN_Left),
-	m_fColumnLineHeightOffset(0.0f)
+HyRichLabel::HyRichLabel(HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(pParent),
+	m_vTextDimensions(0.0f)
 {
-	RegisterAssembleEntity();
 }
 
-HyRichText::HyRichText(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent),
-	m_pTextData(nullptr),
-	m_vTextDimensions(0.0f),
-	m_eAlignment(HYALIGN_Left),
-	m_fColumnLineHeightOffset(0.0f)
+HyRichLabel::HyRichLabel(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(panelInit, pParent),
+	m_vTextDimensions(0.0f)
 {
-	RegisterAssembleEntity();
-	Setup(panelInit, HyNodePath(), HyMargins<float>());
 }
 
-HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent),
-	m_pTextData(nullptr),
-	m_vTextDimensions(0.0f),
-	m_eAlignment(HYALIGN_Left),
-	m_fColumnLineHeightOffset(0.0f)
+HyRichLabel::HyRichLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(panelInit, textNodePath, pParent),
+	m_vTextDimensions(0.0f)
 {
-	RegisterAssembleEntity();
-	Setup(panelInit, textNodePath, HyMargins<float>());
 }
 
-HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent),
-	m_pTextData(nullptr),
-	m_vTextDimensions(0.0f),
-	m_eAlignment(HYALIGN_Left),
-	m_fColumnLineHeightOffset(0.0f)
+HyRichLabel::HyRichLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(panelInit, textNodePath, textMargins, pParent),
+	m_vTextDimensions(0.0f)
 {
-	RegisterAssembleEntity();
-	Setup(panelInit, textNodePath, textMargins);
 }
 
-/*virtual*/ HyRichText::~HyRichText()
+/*virtual*/ HyRichLabel::~HyRichLabel()
 {
 	while(m_DrawableList.empty() == false)
 	{
@@ -69,215 +50,55 @@ HyRichText::HyRichText(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	}
 }
 
-/*virtual*/ float HyRichText::GetWidth(float fPercent /*= 1.0f*/) /*override*/
+/*virtual*/ float HyRichLabel::GetTextWidth(float fPercent /*= 1.0f*/) /*override*/
 {
 	Assemble();
 	return m_vTextDimensions.x * fPercent;
 }
 
-/*virtual*/ float HyRichText::GetHeight(float fPercent /*= 1.0f*/) /*override*/
+/*virtual*/ float HyRichLabel::GetTextHeight(float fPercent /*= 1.0f*/) /*override*/
 {
 	Assemble();
 	return m_vTextDimensions.y * fPercent;
 }
 
-float HyRichText::GetTextWidth(float fPercent /*= 1.0f*/)
+/*virtual*/ std::string HyRichLabel::GetUtf8String() const /*override*/
 {
-	Assemble();
-
-	float fTextWidth = 0.0f;
-	ForEachDrawable([&fTextWidth](IHyDrawable2d *pDrawable) 
-		{
-			HyAssert(pDrawable->GetType() == HYTYPE_Text || pDrawable->GetType() == HYTYPE_Sprite, "HyRichText::GetTextWidth() - Drawable is not a text or sprite");
-			if(pDrawable->GetType() == HYTYPE_Text)
-				fTextWidth += (static_cast<HyText2d *>(pDrawable)->GetCursorPos().x - static_cast<HyText2d *>(pDrawable)->GetTextIndent());
-			else // HYTYPE_Sprite
-				fTextWidth += static_cast<HySprite2d *>(pDrawable)->GetStateWidth(pDrawable->GetState(), pDrawable->scale.GetX());
-		});
-	return fTextWidth * fPercent;
+	return m_sRichText;
 }
 
-float HyRichText::GetTextHeight(float fPercent /*= 1.0f*/)
+/*virtual*/ void HyRichLabel::SetText(const std::string &sUtf8RichText) /*override*/
 {
-	Assemble();
-
-	float fTextHeight = 0.0f;
-	ForEachDrawable([&fTextHeight](IHyDrawable2d *pDrawable) { fTextHeight = HyMath::Max(fTextHeight, pDrawable->GetHeight(pDrawable->scale.GetY())); });
-	return fTextHeight * fPercent;
-}
-
-void HyRichText::Setup(const HyPanelInit &panelInit)
-{
-	Setup(panelInit, m_TextPath, m_TextMargins);
-}
-
-void HyRichText::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath)
-{
-	Setup(panelInit, textNodePath, m_TextMargins);
-}
-
-void HyRichText::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins)
-{
-	SetSizePolicy(HYSIZEPOLICY_Fixed, HYSIZEPOLICY_Fixed);
-
-	m_Panel.Setup(panelInit);
-	m_TextPath = textNodePath;
-	m_TextMargins = textMargins;
-
-	HyText2d *pTempNewText = HY_NEW HyText2d(m_TextPath, this);
-	m_pTextData = static_cast<const HyTextData *>(pTempNewText->AcquireData());
-	if(m_pTextData == nullptr)
-		HyLogWarning("HyRichText could not acquire data for text: " << pTempNewText->GetPrefix() << "/" << pTempNewText->GetName());
-	delete pTempNewText;
-
-	SetAsEnabled(IsEnabled());
-
-	switch(GetTextType())
-	{
-	case HYTEXT_Line:		SetAsLine(); break;
-	case HYTEXT_Column:		SetAsColumn(GetWidth()); break;
-	case HYTEXT_Box:		SetAsBox(GetWidth(), GetHeight(), IsCenterVertically()); break;
-	case HYTEXT_ScaleBox:	SetAsScaleBox(GetWidth(), GetHeight(), IsCenterVertically()); break;
-	default:
-		HyLogError("HyRichText::Setup() - Unhandled text type: " << GetTextType());
-		break;
-	}
-
-	ResetDisplayOrder();
-
-	SetAssembleNeeded();
-	OnSetup();
-}
-
-HyTextType HyRichText::GetTextType() const
-{
-	return static_cast<HyTextType>((m_uiAttribs & RICHTEXTATTRIB_TextTypeMask) >> RICHTEXTATTRIB_TextTypeOffset);
-}
-
-void HyRichText::SetAsLine()
-{
-	HySetVec(m_vTextDimensions, 0.0f, 0.0f);
-
-	m_uiAttribs &= ~RICHTEXTATTRIB_IsCenterVertically;
-	m_uiAttribs &= ~RICHTEXTATTRIB_TextTypeMask;
-	m_uiAttribs |= HYTEXT_Line << RICHTEXTATTRIB_TextTypeOffset;
+	m_sRichText = sUtf8RichText;
 	SetAssembleNeeded();
 }
 
-void HyRichText::SetAsColumn(float fWidth)
-{
-	HySetVec(m_vTextDimensions, fWidth, 0.0f);
-
-	m_uiAttribs &= ~RICHTEXTATTRIB_IsCenterVertically;
-	m_uiAttribs &= ~RICHTEXTATTRIB_TextTypeMask;
-	m_uiAttribs |= HYTEXT_Column << RICHTEXTATTRIB_TextTypeOffset;
-	SetAssembleNeeded();
-}
-
-void HyRichText::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/, bool bUseScissor /*= true*/)
-{
-	HySetVec(m_vTextDimensions, fWidth, fHeight);
-
-	if(bCenterVertically)
-		m_uiAttribs |= RICHTEXTATTRIB_IsCenterVertically;
-	else
-		m_uiAttribs &= ~RICHTEXTATTRIB_IsCenterVertically;
-
-	if(bUseScissor)
-		m_uiAttribs |= RICHTEXTATTRIB_BoxUseScissor;
-	else
-		m_uiAttribs &= ~RICHTEXTATTRIB_BoxUseScissor;
-
-	m_uiAttribs &= ~RICHTEXTATTRIB_TextTypeMask;
-	m_uiAttribs |= HYTEXT_Box << RICHTEXTATTRIB_TextTypeOffset;
-	SetAssembleNeeded();
-}
-
-void HyRichText::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
-{
-	HySetVec(m_vTextDimensions, fWidth, fHeight);
-
-	if(bCenterVertically)
-		m_uiAttribs |= RICHTEXTATTRIB_IsCenterVertically;
-	else
-		m_uiAttribs &= ~RICHTEXTATTRIB_IsCenterVertically;
-
-	m_uiAttribs &= ~RICHTEXTATTRIB_TextTypeMask;
-	m_uiAttribs |= HYTEXT_ScaleBox << RICHTEXTATTRIB_TextTypeOffset;
-	SetAssembleNeeded();
-}
-
-bool HyRichText::IsCharacterAvailable(std::string sUtf8Character) const
-{
-	if(m_pTextData == nullptr)
-		return false;
-
-	uint32 uiUsedBytes = 0;
-	const HyTextGlyph *pGlyphRef = m_pTextData->GetGlyph(0, 0, HyIO::Utf8_to_Utf32(sUtf8Character.c_str(), uiUsedBytes));
-
-	return pGlyphRef != nullptr;
-}
-
-bool HyRichText::IsCenterVertically() const
-{
-	return (m_uiAttribs & RICHTEXTATTRIB_IsCenterVertically) != 0;
-}
-
-HyAlignment HyRichText::GetAlignment() const
-{
-	return m_eAlignment;
-}
-
-void HyRichText::SetAlignment(HyAlignment eAlignment)
-{
-	if(m_eAlignment == eAlignment)
-		return;
-
-	m_eAlignment = eAlignment;
-	SetAssembleNeeded();
-}
-
-bool HyRichText::IsMonospacedDigits() const
-{
-	return (m_uiAttribs & RICHTEXTATTRIB_IsMonospacedDigits) != 0;
-}
-
-void HyRichText::SetMonospacedDigits(bool bEnable)
-{
-	if(IsMonospacedDigits() == bEnable)
-		return;
-
-	if(bEnable)
-		m_uiAttribs |= RICHTEXTATTRIB_IsMonospacedDigits;
-	else
-		m_uiAttribs &= ~RICHTEXTATTRIB_IsMonospacedDigits;
-
-	SetAssembleNeeded();
-}
-
-// Formatting examples:
-// {1} = All text after this uses state 1
-// {spritePrefix/spriteName,3} = Insert a sprite "spritePrefix/spriteName" with state 3, scaled to fit within text line
-void HyRichText::SetText(const std::string &sRichTextFormat)
-{
-	m_sRichText = sRichTextFormat;
-	SetAssembleNeeded();
-}
-
-void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachDrawable)
+void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachDrawable)
 {
 	Assemble();
 	for(uint32 i = 0; i < m_DrawableList.size(); ++i)
 		fpForEachDrawable(m_DrawableList[i]);
 }
 
-/*virtual*/ void HyRichText::OnAssemble() /*override*/
+/*virtual*/ void HyRichLabel::OnAssemble() /*override*/
 {
-	if(m_TextPath.IsValid() == false)
+	const HyTextData *pTextData = static_cast<const HyTextData *>(m_Text.AcquireData());
+	if(pTextData == nullptr || GetTextNodePath().IsValid() == false)
 		return;
 
-	std::vector<IHyDrawable2d *> newDrawableList;
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Store whether the current m_DrawableList are supposed to be loaded
+	bool bIsDrawablesLoaded = true;
+	for(uint32 i = 0; i < m_DrawableList.size(); ++i)
+	{
+		if(m_DrawableList[i]->GetLoadState() != HYLOADSTATE_Queued && m_DrawableList[i]->GetLoadState() != HYLOADSTATE_Loaded)
+		{
+			bIsDrawablesLoaded = false;
+			break;
+		}
+	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Capture each formatting change within 'm_sRichText'
 	std::regex rgx("\\{(.+?)\\}");
 	std::smatch match;
@@ -313,76 +134,65 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 	// Store results in a string stream 'ssCleanText' to process each delimited string
 	std::istringstream ssCleanText(std::regex_replace(m_sRichText, rgx, "\x7F")); // "\x7F" is delete character (127) to be used as a delimiter to split each drawable
 
-	// Reassemble the drawable list
-	m_fColumnLineHeightOffset = 0.0f;
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Reassemble the drawable list using 'ssCleanText' and 'formatChangeList'
+	std::vector<IHyDrawable2d *> newDrawableList;
 
-	std::string sCurText;
-	uint32 uiCurTextState = 0;
-	glm::vec2 ptCurPos(0.0f, 0.0f);
-	float fUsedWidth = 0.0f;
-	float fMaxLineDescender = 0.0f;
-	bool bIsLoaded = true; // TODO: Store whether it's loaded here before creating any new drawables
+	float fLargestLineAscender = 0.0f;
+	float fLargestLineDescender = 0.0f;
+	float fLineHeight = 0.0f;
+	const float fAVAILABLE_TEXT_WIDTH = m_Panel.GetWidth() - m_TextMargins.left - m_TextMargins.right;
 
+	glm::vec2 ptCursorPos(0.0f, 0.0f);
 	uint32 uiCurFmtIndex = 0;
+	uint32 uiCurTextState = 0;
+	std::string sCurText;
 	while(std::getline(ssCleanText, sCurText, '\x7F'))
 	{
-		float fLineDescender = 0.0f;
-		float fLineHeight = 32.0f; // 32 is just some default value to fallback to
-		if(m_pTextData)
-		{
-			fLineDescender = m_pTextData->GetLineDescender(uiCurTextState);
-			fLineHeight = m_pTextData->GetLineHeight(uiCurTextState);
-		}
-
-		fMaxLineDescender = HyMath::Min(fMaxLineDescender, fLineDescender); // NOTE: Descenders are stored as negative values
+		fLargestLineAscender = HyMath::Max(fLargestLineAscender, pTextData->GetLineAscender(uiCurTextState));
+		fLargestLineDescender = HyMath::Min(fLargestLineDescender, pTextData->GetLineDescender(uiCurTextState)); // NOTE: Descenders are stored as negative values
 
 		if(sCurText.empty() == false)
 		{
-			HyText2d *pNewText = HY_NEW HyText2d(m_TextPath, this);
+			HyText2d *pNewText = HY_NEW HyText2d(GetTextNodePath(), this);
 			newDrawableList.push_back(pNewText);
-			if(bIsLoaded)
+			if(bIsDrawablesLoaded)
 				pNewText->Load();
 
-			pNewText->SetTextIndent(static_cast<uint32>(ptCurPos.x));
+			pNewText->SetTextIndent(static_cast<uint32>(ptCursorPos.x));
 			pNewText->SetMonospacedDigits(IsMonospacedDigits());
 			pNewText->SetState(uiCurTextState);
 			pNewText->SetText(sCurText);
-			pNewText->pos.Set(0.0f, ptCurPos.y);
+			pNewText->pos.Set(0.0f, ptCursorPos.y);
 
 			switch(GetTextType())
 			{
 			case HYTEXT_Line:
-				HySetVec(m_vTextDimensions, 0.0f, 0.0f);
 				[[fallthrough]];
 			case HYTEXT_ScaleBox: // ScaleBox is treated as a line, because it will be scaled to fit the box after all IHyDrawable's are created
 				pNewText->SetAsLine();
 
-				ptCurPos.x = pNewText->GetCursorPos().x;
-				ptCurPos.y += pNewText->GetCursorPos().y;
+				fLineHeight = HyMath::Max(fLineHeight, pNewText->GetHeight());
+
+				ptCursorPos.x = pNewText->GetCursorPos().x;
+				ptCursorPos.y += pNewText->GetCursorPos().y;
 				break;
 
 			case HYTEXT_Column:
-				m_vTextDimensions.y = 0.0f;
 				[[fallthrough]];
 			case HYTEXT_Box: // Box is treated as a column, because it will be cropped to fit the box after all IHyDrawable's are created
-				pNewText->SetAsColumn(m_vTextDimensions.x);
+				pNewText->SetAsColumn(fAVAILABLE_TEXT_WIDTH);
 
-				ptCurPos.x = pNewText->GetCursorPos().x;
-				ptCurPos.y += pNewText->GetCursorPos().y;
+				fLineHeight = HyMath::Max(fLineHeight, pTextData->GetLineHeight(uiCurTextState));
+
+				ptCursorPos.x = pNewText->GetCursorPos().x;
+				ptCursorPos.y += pNewText->GetCursorPos().y;
 				break;
 
 			default:
 				HyLogError("HyRichText::AssembleDrawables() - Unhandled text type: " << GetTextType());
 				break;
 			}
-
-			if(fUsedWidth < ptCurPos.x)
-				fUsedWidth = ptCurPos.x;
-
-			// TODO: 'm_fColumnLineHeightOffset' should actually be (I think) the max of first line's height, not the max line height overall
-			const HyTextData *pTextData = static_cast<const HyTextData *>(pNewText->AcquireData());
-			if(sCurText.empty() == false && pTextData)
-				m_fColumnLineHeightOffset = HyMath::Max(m_fColumnLineHeightOffset, pTextData->GetLineHeight(uiCurTextState));
 		}
 
 		// Handle next format change
@@ -393,13 +203,10 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 				uiCurTextState = formatChangeList[uiCurFmtIndex].second;
 			else // Otherwise insert sprite
 			{
-				//if(GetTextType() == HYTEXT_ScaleBox || GetTextType() == HYTEXT_Box)
-				//	fLineHeight = m_vTextDimensions.y;
-
 				// Allocate sprite and initialize
 				HySprite2d *pNewSprite = HY_NEW HySprite2d(HyNodePath(formatChangeList[uiCurFmtIndex].first.c_str()), this);
 				newDrawableList.push_back(pNewSprite);
-				if(bIsLoaded)
+				if(bIsDrawablesLoaded)
 					pNewSprite->Load();
 
 				pNewSprite->SetState(formatChangeList[uiCurFmtIndex].second);
@@ -407,48 +214,69 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 				// Determine sprite scale with remaining room left on line
 				float fScaleX = pNewSprite->GetStateWidth(pNewSprite->GetState());
 				if(GetTextType() == HYTEXT_Box || GetTextType() == HYTEXT_Column) // NOTE: Don't check ScaleBox because that will be scaled to fit after assembling at full size
-					fScaleX = (m_vTextDimensions.x - ptCurPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
+					fScaleX = (fAVAILABLE_TEXT_WIDTH - ptCursorPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
+
 				float fScaleY = fLineHeight / pNewSprite->GetStateHeight(pNewSprite->GetState());
 
 				pNewSprite->scale.SetAll(HyMath::Min(fScaleX, fScaleY));
 
 				// If there's limited horizontal space, determine if this sprite will not fit in the remaining space on this text line
 				if(GetTextType() == HYTEXT_Box || GetTextType() == HYTEXT_Column && // NOTE: Don't check ScaleBox because that will be scaled to fit after assembling at full size
-					((ptCurPos.x + pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X())) >= (m_vTextDimensions.x - 1))) // the -1 should help with scale floating point above
+					((ptCursorPos.x + pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X())) >= (fAVAILABLE_TEXT_WIDTH - 1))) // the -1 should help with scale floating point above
 				{
-					fUsedWidth = m_vTextDimensions.x;
+					ptCursorPos.x = 0.0f;
+					ptCursorPos.y -= fLineHeight;
 
-					ptCurPos.x = 0.0f;
-					ptCurPos.y -= fLineHeight;
-
-					// Recalculate sprite scale with modified ptCurPos
-					float fScaleX = (m_vTextDimensions.x - ptCurPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
+					// Recalculate sprite scale with modified ptCursorPos
+					float fScaleX = (fAVAILABLE_TEXT_WIDTH - ptCursorPos.x) / pNewSprite->GetStateWidth(pNewSprite->GetState());
 					float fScaleY = fLineHeight / pNewSprite->GetStateHeight(pNewSprite->GetState());
 					pNewSprite->scale.SetAll(HyMath::Min(fScaleX, fScaleY));
 				}
 
-				pNewSprite->pos.Set(ptCurPos);
+				pNewSprite->pos.Set(ptCursorPos);
 
-				// Find next drawable location and position 'ptCurPos' to it
-				ptCurPos.x += pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X());
-				if(fUsedWidth < ptCurPos.x)
-					fUsedWidth = ptCurPos.x;
+				// Find next drawable location and position 'ptCursorPos' to it
+				ptCursorPos.x += pNewSprite->GetStateWidth(pNewSprite->GetState(), pNewSprite->scale.X());
 
 				glm::vec2 vOffset = pNewSprite->GetStateOffset(pNewSprite->GetState());
 				vOffset *= pNewSprite->scale.Get();
 				pNewSprite->pos.Offset(-vOffset);
 
-				if(m_vTextDimensions.y == 0.0f)
-				{
-					// Also offset the sprite down by the descender amount, because at the moment they're sitting on the 'baseline'
-					pNewSprite->pos.Offset(0.0f, -abs(fLineDescender));
-				}
+				// Also offset the sprite down by the descender amount, because at the moment they're sitting on the 'baseline'
+				//pNewSprite->pos.Offset(0.0f, fLargestLineDescender);
 			}
 
 			uiCurFmtIndex++;
 		}
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Determine final dimensions of rich text using the assembled drawables
+	HySetVec(m_vTextDimensions, 0.0f, 0.0f);
+	switch(GetTextType())
+	{
+	case HYTEXT_Line:
+	case HYTEXT_ScaleBox:
+		m_vTextDimensions.x = ptCursorPos.x;
+		m_vTextDimensions.y = fLineHeight;
+		break;
+
+	case HYTEXT_Vertical:
+	default:
+		HyLogError("HyRichText::AssembleDrawables() - Unhandled text type: " << GetTextType());
+		break;
+
+	case HYTEXT_Box:
+	case HYTEXT_Column:
+		m_vTextDimensions.x = fAVAILABLE_TEXT_WIDTH;
+		m_vTextDimensions.y = std::fabs(ptCursorPos.y + fLargestLineAscender);
+		break;
+	}
+
+	if(m_Panel.IsAutoSize())
+		m_Panel.SetSize(m_vTextDimensions.x + m_TextMargins.left + m_TextMargins.right, m_vTextDimensions.y + m_TextMargins.top + m_TextMargins.bottom);
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Delete old drawable list, then replace with new list
 	// NOTE: This is done at the end to avoid Harmony from potentially unloading and reloading the same assets (keeps ref count non-zero)
 	while(m_DrawableList.empty() == false)
@@ -458,12 +286,37 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 	}
 	m_DrawableList = newDrawableList;
 
-	float fUsedHeight = std::fabs(ptCurPos.y) + m_fColumnLineHeightOffset;
-
-	if(GetTextType() == HYTEXT_ScaleBox)
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Based on text type and alignment, adjust the items in 'm_DrawableList' accordingly
+	switch(GetTextType())
 	{
+	case HYTEXT_Line:
+		for(auto pDrawable : m_DrawableList)
+			pDrawable->pos.Offset(m_TextMargins.left, m_TextMargins.bottom + fabs(fLargestLineDescender));
+		break;
+
+	case HYTEXT_Column:
+		for(auto pDrawable : m_DrawableList)
+			pDrawable->pos.Offset(m_TextMargins.left, m_Panel.GetHeight() - m_TextMargins.top - fLargestLineAscender);
+		break;
+
+	case HYTEXT_Box:
+		for(auto pDrawable : m_DrawableList)
+			pDrawable->pos.Offset(m_TextMargins.left, m_vTextDimensions.y - m_TextMargins.top);
+		break;
+
+	case HYTEXT_ScaleBox: {
+		float fDesiredWidth = m_Panel.GetWidth() - m_TextMargins.left - m_TextMargins.right;
+		float fDesiredHeight = m_Panel.GetHeight() - m_TextMargins.bottom - m_TextMargins.top;
+
 		// Scale all drawables to fit within the box
-		float fScaleAmt = HyMath::Min(m_vTextDimensions.x / fUsedWidth, m_vTextDimensions.y / fUsedHeight);
+		float fScaleAmt = HyMath::Min(fDesiredWidth / m_vTextDimensions.x, fDesiredHeight / m_vTextDimensions.y);
+		
+		m_vTextDimensions *= fScaleAmt;
+		fLargestLineAscender *= fScaleAmt;
+		fLargestLineDescender *= fScaleAmt;
+		fLineHeight *= fScaleAmt;
+
 		for(auto pDrawable : m_DrawableList)
 		{
 			if(pDrawable->GetType() == HYTYPE_Sprite)
@@ -474,75 +327,46 @@ void HyRichText::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEachD
 			else
 				pDrawable->scale.SetAll(fScaleAmt);
 
-			if(IsCenterVertically())
-				pDrawable->pos.Offset(0.0f, (m_vTextDimensions.y - m_fColumnLineHeightOffset) * 0.5f);
+			if(m_uiAttribs & LABELATTRIB_Vertical)
+				pDrawable->pos.Offset(0.0f, (fDesiredHeight - fLineHeight) * -0.5f);
 		}
+
+		
+		break; }
+
+	case HYTEXT_Vertical:
+		break;
 	}
 
-	switch(m_eAlignment)
+	switch(m_eStackedAlignment)
 	{
 	case HYALIGN_Left:
-		m_Panel.pos.Set(0.0f, fMaxLineDescender);
 		break;
 
-	case HYALIGN_Center:
-		for(auto pDrawable : m_DrawableList)
-			pDrawable->pos.Offset(fUsedWidth * -0.5f, 0.0f);
+	case HYALIGN_Center: {
+		float fAvailableWidth = m_Panel.GetWidth() - m_TextMargins.left - m_TextMargins.right;
+		if(m_vTextDimensions.x < fAvailableWidth)
+		{
+			for(auto pDrawable : m_DrawableList)
+				pDrawable->pos.Offset((fAvailableWidth - m_vTextDimensions.x) * 0.5f, 0.0f);
+		}
+		break; }
 
-		m_Panel.pos.Set(fUsedWidth * -0.5f, fMaxLineDescender);
-		break;
-
-	case HYALIGN_Right:
-		for(auto pDrawable : m_DrawableList)
-			pDrawable->pos.Offset(-fUsedWidth, 0.0f);
-
-		m_Panel.pos.Set(-fUsedWidth, fMaxLineDescender);
-		break;
+	case HYALIGN_Right: {
+		float fAvailableWidth = m_Panel.GetWidth() - m_TextMargins.left - m_TextMargins.right;
+		if(m_vTextDimensions.x < fAvailableWidth)
+		{
+			for(auto pDrawable : m_DrawableList)
+				pDrawable->pos.Offset(fAvailableWidth - m_vTextDimensions.x, 0.0f);
+		}
+		break; }
 
 	case HYALIGN_Justify: // TODO: Implement
 		HyLogError("HyRichText::AssembleDrawables() - HYALIGN_Justify not implemented");
 		break;
 	}
 
-	// Ensure m_vTextDimensions has the correct dimensions
-	if(m_vTextDimensions.x == 0.0f)
-		m_vTextDimensions.x = fUsedWidth;
-	if(m_vTextDimensions.y == 0.0f)
-		m_vTextDimensions.y = fUsedHeight;
-
-	m_Panel.SetSize(m_vTextDimensions.x, m_vTextDimensions.y);
-
 	// Inform everwhere that *this has been updated
 	SetDirty(IHyNode::DIRTY_SceneAABB);
 	SetSizeAndLayoutDirty();
-}
-
-
-/*virtual*/ glm::vec2 HyRichText::GetPosOffset() /*override*/
-{
-	Assemble();
-	return glm::vec2(0.0f, m_vTextDimensions.y - m_fColumnLineHeightOffset);
-}
-
-/*virtual*/ void HyRichText::OnSetSizeHint() /*override*/
-{
-	HySetVec(m_vSizeHint, static_cast<int>(m_vTextDimensions.x), static_cast<int>(m_vTextDimensions.y));
-	Assemble();
-}
-
-/*virtual*/ glm::ivec2 HyRichText::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
-{
-	switch(GetTextType())
-	{
-	case HYTEXT_Line:		SetAsLine(); break;
-	case HYTEXT_Column:		SetAsColumn(static_cast<float>(uiNewWidth)); break;
-	case HYTEXT_Box:		SetAsBox(static_cast<float>(uiNewWidth), static_cast<float>(uiNewHeight), IsCenterVertically()); break;
-	case HYTEXT_ScaleBox:	SetAsScaleBox(static_cast<float>(uiNewWidth), static_cast<float>(uiNewHeight), IsCenterVertically()); break;
-	default:
-		HyLogError("HyRichText::Setup() - Unhandled text type: " << GetTextType());
-		break;
-	}
-
-	Assemble();
-	return glm::ivec2(GetWidth(), GetHeight());
 }

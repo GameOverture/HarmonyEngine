@@ -33,10 +33,10 @@ protected:
 	};
 	static_assert((int)LABELATTRIB_IsSideBySide == (int)WIDGETATTRIB_NEXTFLAG, "HyLabel is not matching with base classes attrib flags");
 
-	HyText2d				m_Text;
-	HyMargins<float>		m_TextMargins;					// Margins used for Stacked text scale box
-	HyAlignment				m_eStackedAlignment;			// The alignment used when set as 'Stacked'
-	int32					m_iSideBySidePadding;			// When set as 'Side-by-side', the pixel padding between text/panel
+	HyText2d									m_Text;
+	HyMargins<float>							m_TextMargins;					// Margins used for Stacked text scale box
+	HyAlignment									m_eStackedAlignment;			// The alignment used when set as 'Stacked'
+	int32										m_iSideBySidePadding;			// When set as 'Side-by-side', the pixel padding between text/panel
 
 public:
 	HyLabel(HyEntity2d *pParent = nullptr);
@@ -47,6 +47,8 @@ public:
 
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
+	virtual float GetTextWidth(float fPercent = 1.0f);
+	virtual float GetTextHeight(float fPercent = 1.0f);
 
 	virtual bool IsLoadDataValid() override;
 
@@ -54,6 +56,7 @@ public:
 	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath);
 	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins);
 	
+	HyNodePath GetTextNodePath() const;
 	HyTextType GetTextType() const;
 	bool IsLine() const;
 	bool IsColumn() const;
@@ -63,8 +66,11 @@ public:
 	bool IsSideBySide() const;
 
 	void SetAsLine();
+	void SetAsColumn();
 	void SetAsColumn(float fWidth);
+	void SetAsBox(bool bCenterVertically = false, bool bUseScissor = true);
 	void SetAsBox(float fWidth, float fHeight, bool bCenterVertically = false, bool bUseScissor = true);
+	void SetAsScaleBox(bool bCenterVertically = true);
 	void SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically = true);
 	void SetAsVertical();
 	void SetAsSideBySide(bool bPanelBeforeText = true, int32 iPadding = 5, HyOrientation eOrientation = HYORIENT_Horizontal);	// Show the panel and text side by side specified accordingly to the arguments passed
@@ -74,19 +80,18 @@ public:
 
 	bool IsTextVisible() const;
 	void SetTextVisible(bool bVisible);
-	std::string GetUtf8String() const;
+	virtual std::string GetUtf8String() const;
 	void SetText(const std::stringstream &ssUtf8Text);
 	virtual void SetText(const std::string &sUtf8Text);
 	uint32 GetTextState() const;
 	virtual void SetTextState(uint32 uiStateIndex);
-	HyNodePath GetTextNodePath() const;
 
 	float GetLineBreakHeight(float fPercent = 1.0f);
 	float GetLineDescender(float fPercent = 1.0f);
 	glm::vec2 GetGlyphOffset(uint32 uiCharIndex, uint32 uiLayerIndex);
 	glm::vec2 GetGlyphSize(uint32 uiCharIndex, uint32 uiLayerIndex);
 
-	bool IsCharacterAvailable(const std::string sUtf8Character); // Pass a single utf8 character, returns whether that character exists in the font
+	bool IsCharacterAvailable(uint32 uiStateIndex, const std::string sUtf8Character); // Pass a single utf8 character, returns whether that character exists in the font
 	uint32 GetNumCharacters() const;
 
 	uint32 GetCharacterCode(uint32 uiCharIndex) const;
@@ -102,10 +107,8 @@ public:
 
 	std::pair<HyColor, HyColor> GetLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex);
 	virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor);
-	bool IsTextMonospacedDigits() const;
-	virtual void SetTextMonospacedDigits(bool bSet);
-	float GetTextWidth(float fPercent = 1.0f);
-	float GetTextHeight(float fPercent = 1.0f);
+	bool IsMonospacedDigits() const;
+	virtual void SetMonospacedDigits(bool bSet);
 
 	virtual glm::vec2 GetPosOffset() override;
 
@@ -116,8 +119,6 @@ protected:
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
 
 	virtual void OnPanelUpdated() override;
-
-	virtual void OnSetup() { }					// Optional override for derived classes
 };
 
 #endif /* HyLabel_h__ */
