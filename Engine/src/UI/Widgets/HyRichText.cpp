@@ -149,9 +149,6 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 	std::string sCurText;
 	while(std::getline(ssCleanText, sCurText, '\x7F'))
 	{
-		fLargestLineAscender = HyMath::Max(fLargestLineAscender, pTextData->GetLineAscender(uiCurTextState));
-		fLargestLineDescender = HyMath::Min(fLargestLineDescender, pTextData->GetLineDescender(uiCurTextState)); // NOTE: Descenders are stored as negative values
-
 		if(sCurText.empty() == false)
 		{
 			HyText2d *pNewText = HY_NEW HyText2d(GetTextNodePath(), this);
@@ -165,6 +162,19 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 			pNewText->SetText(sCurText);
 			pNewText->pos.Set(0.0f, ptCursorPos.y);
 
+			for(uint32 uiCharIndex = 0; uiCharIndex < pNewText->GetNumCharacters(); ++uiCharIndex)
+			{
+				for(uint32 uiLayerIndex = 0; uiLayerIndex < pNewText->GetNumLayers(uiCurTextState); ++uiLayerIndex)
+				{
+					const HyTextGlyph *pGlyph = pTextData->GetGlyph(uiCurTextState, uiLayerIndex, pNewText->GetCharacterCode(uiCharIndex));
+					if(pGlyph)
+					{
+						fLargestLineAscender = HyMath::Max(fLargestLineAscender, static_cast<float>(pGlyph->iOFFSET_Y));
+						fLargestLineDescender = HyMath::Min(fLargestLineDescender, static_cast<float>(pGlyph->iOFFSET_Y - pGlyph->uiHEIGHT)); // NOTE: Descenders are stored as negative values
+					}
+				}
+			}
+			
 			switch(GetTextType())
 			{
 			case HYTEXT_Line:
@@ -291,18 +301,10 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 	switch(GetTextType())
 	{
 	case HYTEXT_Line:
-		for(auto pDrawable : m_DrawableList)
-			pDrawable->pos.Offset(m_TextMargins.left, m_TextMargins.bottom + fabs(fLargestLineDescender));
-		break;
-
 	case HYTEXT_Column:
-		for(auto pDrawable : m_DrawableList)
-			pDrawable->pos.Offset(m_TextMargins.left, m_Panel.GetHeight() - m_TextMargins.top - fLargestLineAscender);
-		break;
-
 	case HYTEXT_Box:
 		for(auto pDrawable : m_DrawableList)
-			pDrawable->pos.Offset(m_TextMargins.left, m_vTextDimensions.y - m_TextMargins.top);
+			pDrawable->pos.Offset(m_TextMargins.left, m_Panel.GetHeight() - m_TextMargins.top - fLargestLineAscender);
 		break;
 
 	case HYTEXT_ScaleBox: {
@@ -322,16 +324,18 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 			if(pDrawable->GetType() == HYTYPE_Sprite)
 			{
 				pDrawable->pos.Set(pDrawable->pos.Get() * fScaleAmt);
+				pDrawable->pos.Offset(m_TextMargins.left, m_Panel.GetHeight() - m_TextMargins.top - fLargestLineAscender);
 				pDrawable->scale.Set(pDrawable->scale.GetX() * fScaleAmt, pDrawable->scale.GetY() * fScaleAmt);
 			}
 			else
+			{
 				pDrawable->scale.SetAll(fScaleAmt);
+				pDrawable->pos.Offset(m_TextMargins.left, m_Panel.GetHeight() - m_TextMargins.top - fLargestLineAscender);
+			}
 
 			if(m_uiAttribs & LABELATTRIB_Vertical)
 				pDrawable->pos.Offset(0.0f, (fDesiredHeight - fLineHeight) * -0.5f);
 		}
-
-		
 		break; }
 
 	case HYTEXT_Vertical:
