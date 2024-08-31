@@ -10,7 +10,6 @@
 #include "Global.h"
 #include "SoundClip.h"
 #include "AudioManagerModel.h"
-#include "_Dependencies/scriptum/imagepacker.h"
 
 SoundClip::SoundClip(IManagerModel &modelRef,
 					 QUuid uuid,

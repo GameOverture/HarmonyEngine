@@ -302,11 +302,13 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		pProject->GetAtlasWidget()->SetSelectedBankIndex(iAtlasBankIndex);
 		QStringList expandedAtlasList = settings.value(HyGlobal::AssetName(ASSETMAN_Atlases)).toStringList();
 		pProject->GetAtlasWidget()->RestoreExpandedState(expandedAtlasList);
+		pProject->GetAtlasWidget()->SetShowAllBanksChecked(settings.value(HyGlobal::AssetName(ASSETMAN_Atlases) + "ShowAllBanks", false).toBool());
 
 		int iAudioBankIndex = settings.value(HyGlobal::AssetName(ASSETMAN_Audio) + "BankIndex").toInt();
 		pProject->GetAudioWidget()->SetSelectedBankIndex(iAudioBankIndex);
 		QStringList expandedAudioList = settings.value(HyGlobal::AssetName(ASSETMAN_Audio)).toStringList();
 		pProject->GetAudioWidget()->RestoreExpandedState(expandedAudioList);
+		pProject->GetAudioWidget()->SetShowAllBanksChecked(settings.value(HyGlobal::AssetName(ASSETMAN_Audio) + "ShowAllBanks", false).toBool());
 	}
 	settings.endGroup();
 	settings.beginGroup("ProjectSettings");

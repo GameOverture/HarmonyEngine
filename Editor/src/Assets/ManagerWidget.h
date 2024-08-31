@@ -73,9 +73,12 @@ public:
 	~ManagerWidget();
 
 	IManagerModel &GetModel();
-	quint32 GetSelectedBankId();
-	int GetSelectedBankIndex();
+	quint32 GetSelectedBankId() const;
+	int GetSelectedBankIndex() const;
 	void SetSelectedBankIndex(int iBankIndex);
+
+	bool IsShowAllBanksChecked() const;
+	void SetShowAllBanksChecked(bool bShowAllBanks);
 
 	void RefreshInfo();
 

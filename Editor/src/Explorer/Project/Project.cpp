@@ -1008,8 +1008,10 @@ void Project::SaveUserData() const
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Source), m_pSourceWidget->GetExpandedFilters());
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Atlases), m_pAtlasWidget->GetExpandedFilters());
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Atlases) + "BankIndex", m_pAtlasWidget->GetSelectedBankIndex());
+		settings.setValue(HyGlobal::AssetName(ASSETMAN_Atlases) + "ShowAllBanks", m_pAtlasWidget->IsShowAllBanksChecked());
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Audio), m_pAudioWidget->GetExpandedFilters());
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Audio) + "BankIndex", m_pAudioWidget->GetSelectedBankIndex());
+		settings.setValue(HyGlobal::AssetName(ASSETMAN_Audio) + "ShowAllBanks", m_pAudioWidget->IsShowAllBanksChecked());
 	}
 	settings.endGroup();
 	settings.beginGroup("ProjectSettings");

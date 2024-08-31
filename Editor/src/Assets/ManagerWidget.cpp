@@ -353,12 +353,12 @@ IManagerModel &ManagerWidget::GetModel()
 	return *m_pModel;
 }
 
-quint32 ManagerWidget::GetSelectedBankId()
+quint32 ManagerWidget::GetSelectedBankId() const
 {
 	return m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex());
 }
 
-int ManagerWidget::GetSelectedBankIndex()
+int ManagerWidget::GetSelectedBankIndex() const
 {
 	return ui->cmbBanks->currentIndex();
 }
@@ -366,6 +366,18 @@ int ManagerWidget::GetSelectedBankIndex()
 void ManagerWidget::SetSelectedBankIndex(int iBankIndex)
 {
 	ui->cmbBanks->setCurrentIndex(iBankIndex);
+	RefreshInfo();
+}
+
+bool ManagerWidget::IsShowAllBanksChecked() const
+{
+	return ui->chkShowAllBanks->isChecked();
+}
+
+void ManagerWidget::SetShowAllBanksChecked(bool bShowAllBanks)
+{
+	ui->chkShowAllBanks->setChecked(bShowAllBanks);
+	RefreshInfo();
 }
 
 void ManagerWidget::RefreshInfo()
