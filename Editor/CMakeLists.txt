@@ -71,6 +71,8 @@ if(Qt5_DIR)
 		src/Assets/Atlas/AtlasImportThread.h
 		src/Assets/Atlas/AtlasModel.cpp
 		src/Assets/Atlas/AtlasModel.h
+		src/Assets/Atlas/AtlasPacker.cpp
+		src/Assets/Atlas/AtlasPacker.h
 		src/Assets/Atlas/AtlasRepackThread.cpp
 		src/Assets/Atlas/AtlasRepackThread.h
 		src/Assets/Audio/AudioAssetsWidget.cpp
@@ -307,13 +309,7 @@ if(Qt5_DIR)
 		src/Widget/WidgetLiveVarManager.ui
 		src/Widget/WidgetRangedSlider.ui
 		src/_Dependencies/QtWaitingSpinner/waitingspinnerwidget.cpp
-		src/_Dependencies/QtWaitingSpinner/waitingspinnerwidget.h
-		src/_Dependencies/scriptum/imagecrop.cpp
-		src/_Dependencies/scriptum/imagepacker.cpp
-		src/_Dependencies/scriptum/imagesort.cpp
-		src/_Dependencies/scriptum/maxrects.cpp
-		src/_Dependencies/scriptum/imagepacker.h
-		src/_Dependencies/scriptum/maxrects.h)
+		src/_Dependencies/QtWaitingSpinner/waitingspinnerwidget.h)
 
 	set(CMAKE_AUTOMOC ON)
 	set(CMAKE_AUTORCC ON)

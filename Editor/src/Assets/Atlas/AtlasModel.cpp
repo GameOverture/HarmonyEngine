@@ -585,7 +585,7 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiB
 
 	QRect rAlphaCrop(0, 0, newImage.width(), newImage.height());
 	if(bIsSubAtlas == false) // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
-		rAlphaCrop = ImagePacker::crop(newImage);
+		rAlphaCrop = HyGlobal::AlphaCropImage(newImage);
 
 	// NOTE: QRect (rAlphaCrop) needs to be converted to L,T,R,B margins
 	quint16 uiCropLeft = rAlphaCrop.left();

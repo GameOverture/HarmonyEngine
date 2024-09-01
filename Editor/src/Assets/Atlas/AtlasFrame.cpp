@@ -10,7 +10,6 @@
 #include "Global.h"
 #include "AtlasFrame.h"
 #include "IManagerModel.h"
-#include "_Dependencies/scriptum/imagepacker.h"
 #include "SpineModel.h"
 
 AtlasFrame::AtlasFrame(IManagerModel &modelRef,
@@ -204,7 +203,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 
 	QRect rAlphaCrop; 
 	if(m_bIsSubAtlas == false)
-		rAlphaCrop = ImagePacker::crop(newImage);
+		rAlphaCrop = HyGlobal::AlphaCropImage(newImage);
 	else // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
 		rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
 

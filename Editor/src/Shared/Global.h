@@ -463,6 +463,8 @@ public:
 	static QColor ConvertHyColor(HyColor color);
 
 	static EntityItemDeclarationType GetEntityDeclType(QString sType);
+
+	static QRect AlphaCropImage(const QImage &img);
 };
 
 struct SortTreeWidgetsPredicate
