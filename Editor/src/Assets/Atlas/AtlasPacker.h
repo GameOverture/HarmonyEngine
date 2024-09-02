@@ -81,6 +81,8 @@ class AtlasPacker
 			//    QSize *i; //image
 			//trbl b; //border
 		};
+
+	public:
 		QList<MaxRectsNode>				F;
 		QList<QRect>					R;
 
@@ -88,7 +90,6 @@ class AtlasPacker
 		int								m_iWidth;
 		int								m_iHeight;
 
-	public:
 		FramesAssembler(HeuristicType eHeuristic, int iWidth, int iHeight) :
 			m_eHeuristicType(eHeuristic),
 			m_iWidth(iWidth),

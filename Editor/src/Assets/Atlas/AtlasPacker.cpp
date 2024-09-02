@@ -156,20 +156,28 @@ void AtlasPacker::SortImages(int w, int h)
 	}
 
 	m_uiNeededAreaPixels = 0;
+
+	QSize size;
 	for(int i = 0; i < m_PackFramesList.size(); i++)
 	{
 		m_PackFramesList.operator [](i).pos = QPoint(999999, 999999);
+		size = m_PackFramesList.at(i).crop.size();
+		
+		if(size.width() != 0 && size.height() != 0)
+		{
+			if(size.width() == w)
+				size.setWidth(size.width() - m_FrameMargins.left - m_FrameMargins.right - 2);
 
-		// Get the frame's cropped size. If cropped edge is the actual size of the atlas dimension, no margins are needed
-		QSize croppedFrameSize = m_PackFramesList.at(i).crop.size();
-		if(croppedFrameSize.width() != w)
-			croppedFrameSize.setWidth(croppedFrameSize.width() + m_FrameMargins.left + m_FrameMargins.right + 2);
-		if(croppedFrameSize.height() != h)
-			croppedFrameSize.setHeight(croppedFrameSize.height() + m_FrameMargins.top + m_FrameMargins.bottom - 2);
+			if(size.height() == h)
+				size.setHeight(size.height() - m_FrameMargins.top - m_FrameMargins.bottom - 2);
 
-		m_PackFramesList.operator [](i).sizeCurrent = croppedFrameSize;
+			size += QSize(m_FrameMargins.left + m_FrameMargins.right + 2,
+						  m_FrameMargins.top + m_FrameMargins.bottom + 2);
+		}
+	
+		m_PackFramesList.operator [](i).sizeCurrent = size;
 		if(m_PackFramesList.at(i).duplicateId == nullptr)
-			m_uiNeededAreaPixels += croppedFrameSize.width() * croppedFrameSize.height();
+			m_uiNeededAreaPixels += size.width() * size.height();
 	}
 
 	// Sort packer frames
@@ -226,7 +234,6 @@ int AtlasPacker::FillBin(HeuristicType eHeuristic, int w, int h, int binIndex)
 	int areaBuf = 0;
 	FramesAssembler framesAssembler(eHeuristic, w, h);
 
-	//rects.border = &m_FrameMargins;
 	for(int i = 0; i < m_PackFramesList.size(); i++)
 	{
 		if(QPoint(999999, 999999) != m_PackFramesList.at(i).pos)
@@ -425,7 +432,7 @@ QPoint AtlasPacker::FramesAssembler::InsertPackFrame(PackFrame *pPackFrame)
 	QSize img = pPackFrame->sizeCurrent;
 	//    if(img.width() == w) img.setWidth(img.width() - border->l - border->r);
 	//    if(img.height() == h) img.setHeight(img.height() - border->t - border->b);
-	if(img.width() == 0 || img.height() == 0)
+	if(img.width() <= 0 || img.height() <= 0)
 	{
 		return QPoint(0, 0);
 	}
