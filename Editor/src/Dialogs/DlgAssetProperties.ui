@@ -38,7 +38,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedAssetType">
      <property name="currentIndex">
-      <number>3</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="sourcePage"/>
      <widget class="QWidget" name="atlasPage">
@@ -62,7 +62,7 @@
           <item>
            <widget class="QStackedWidget" name="stackedFormatOptions">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page_3">
              <layout class="QFormLayout" name="formLayout_2">
@@ -111,12 +111,12 @@
                <widget class="QComboBox" name="cmbDxtType">
                 <item>
                  <property name="text">
-                  <string>RGB DXT 1</string>
+                  <string>RGBA DXT 5</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>RGBA DXT 5</string>
+                  <string>RGB DXT 1</string>
                  </property>
                 </item>
                </widget>

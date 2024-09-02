@@ -38,6 +38,9 @@ SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	
 	ui->btnAddFrames->setDefaultAction(ui->actionImportFrames);
 	ui->btnRemoveFrame->setDefaultAction(ui->actionRemoveFrames);
+	ui->btnRemoveAllFrames->setDefaultAction(ui->actionRemoveAllFrames);
+	ui->actionApplyToAll->setChecked(true);
+	ui->btnApplyToAll->setDefaultAction(ui->actionApplyToAll);
 	ui->btnOrderFrameUp->setDefaultAction(ui->actionOrderFrameUpwards);
 	ui->btnOrderFrameDown->setDefaultAction(ui->actionOrderFrameDownwards);
 	ui->btnPlay->setDefaultAction(ui->actionPlay);
@@ -339,6 +342,16 @@ void SpriteWidget::on_actionRemoveFrames_triggered()
 {
 	QList<AtlasFrame *> removeList;
 	removeList.append(static_cast<SpriteFramesModel *>(ui->framesView->model())->GetFrameAt(ui->framesView->currentIndex().row())->m_pFrame);
+
+	QUndoCommand *pCmd = new SpriteUndoCmd_RemoveFrames(m_ItemRef, GetCurStateIndex(), removeList);
+	GetItem().GetUndoStack()->push(pCmd);
+}
+
+void SpriteWidget::on_actionRemoveAllFrames_triggered()
+{
+	QList<AtlasFrame *> removeList;
+	for(int i = 0; i < static_cast<SpriteFramesModel *>(ui->framesView->model())->rowCount(); ++i)
+		removeList.append(static_cast<SpriteFramesModel *>(ui->framesView->model())->GetFrameAt(i)->m_pFrame);
 
 	QUndoCommand *pCmd = new SpriteUndoCmd_RemoveFrames(m_ItemRef, GetCurStateIndex(), removeList);
 	GetItem().GetUndoStack()->push(pCmd);

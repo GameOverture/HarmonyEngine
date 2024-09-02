@@ -70,6 +70,8 @@ private Q_SLOTS:
 
 	void on_actionRemoveFrames_triggered();
 
+	void on_actionRemoveAllFrames_triggered();
+
 	void on_actionOrderFrameUpwards_triggered();
 
 	void on_actionOrderFrameDownwards_triggered();

@@ -30,8 +30,8 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 	ui->cmbUncompressedColorChannels->setItemData(1, 4); // RGBA
 	ui->cmbUncompressedFileType->setItemData(0, HyTextureInfo::UNCOMPRESSEDFILE_PNG);
 	// DXT
-	ui->cmbDxtType->setItemData(0, 1); // DXT 1 (RGB)
-	ui->cmbDxtType->setItemData(1, 5); // DXT 5 (RGBA)
+	ui->cmbDxtType->setItemData(0, 5); // DXT 5 (RGBA)
+	ui->cmbDxtType->setItemData(1, 1); // DXT 1 (RGB)
 	// ASTC
 	ui->cmbAstcColorProfile->setItemData(0, 0); // LDR Linear
 	ui->cmbAstcColorProfile->setItemData(1, 1); // LDR sRGBA
@@ -112,7 +112,7 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 				break;
 
 			case HYTEXTURE_DXT:
-				if(texInfo.m_uiFormatParam2 == 1)
+				if(texInfo.m_uiFormatParam2 == 5)
 					ui->cmbDxtType->setCurrentIndex(0);
 				else
 					ui->cmbDxtType->setCurrentIndex(1);
