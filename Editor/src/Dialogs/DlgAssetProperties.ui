@@ -62,7 +62,7 @@
           <item>
            <widget class="QStackedWidget" name="stackedFormatOptions">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_3">
              <layout class="QFormLayout" name="formLayout_2">
@@ -77,12 +77,12 @@
                <widget class="QComboBox" name="cmbUncompressedColorChannels">
                 <item>
                  <property name="text">
-                  <string>RGB</string>
+                  <string>RGBA</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>RGBA</string>
+                  <string>RGB</string>
                  </property>
                 </item>
                </widget>

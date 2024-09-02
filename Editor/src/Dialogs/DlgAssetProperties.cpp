@@ -26,8 +26,8 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 
 	// Assign values to each combobox entry
 	// Uncompressed
-	ui->cmbUncompressedColorChannels->setItemData(0, 3); // RGB
-	ui->cmbUncompressedColorChannels->setItemData(1, 4); // RGBA
+	ui->cmbUncompressedColorChannels->setItemData(0, 4); // RGBA
+	ui->cmbUncompressedColorChannels->setItemData(1, 3); // RGB
 	ui->cmbUncompressedFileType->setItemData(0, HyTextureInfo::UNCOMPRESSEDFILE_PNG);
 	// DXT
 	ui->cmbDxtType->setItemData(0, 5); // DXT 5 (RGBA)
@@ -107,7 +107,10 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 			switch(texInfo.GetFormat())
 			{
 			case HYTEXTURE_Uncompressed:
-				ui->cmbUncompressedColorChannels->setCurrentIndex(ui->cmbUncompressedColorChannels->findData(QVariant(texInfo.m_uiFormatParam1)));
+				if(texInfo.m_uiFormatParam1 == 4)
+					ui->cmbUncompressedColorChannels->setCurrentIndex(0);
+				else
+					ui->cmbUncompressedColorChannels->setCurrentIndex(1);
 				ui->cmbUncompressedFileType->setCurrentIndex(ui->cmbUncompressedFileType->findData(QVariant(texInfo.m_uiFormatParam2)));
 				break;
 
