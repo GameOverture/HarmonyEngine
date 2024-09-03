@@ -19,34 +19,33 @@ class HyRackMeter : public HyLabel
 protected:
 	enum RackMeterAttributes
 	{
-		RACKMETERATTRIB_IsSpinDigits = 1 << 22,
-		RACKMETERATTRIB_IsMoney = 1 << 23,
+		RACKMETERATTRIB_IsSpinDigits	= 1 << 22,
+		RACKMETERATTRIB_IsMoney			= 1 << 23,
 
-		RACKMETERATTRIB_NEXTFLAG = 1 << 24
+		RACKMETERATTRIB_NEXTFLAG		= 1 << 24
 	};
 	static_assert((int)RACKMETERATTRIB_IsSpinDigits == (int)LABELATTRIB_NEXTFLAG, "HyRackMeter is not matching with base classes attrib flags");
 
+	int64								m_iCurValue = 0;
+	int64								m_iPrevValue = 0;
+	int64								m_iTargetValue = 0;
 
-	int64					m_iCurValue = 0;
-	int64					m_iPrevValue = 0;
-	int64					m_iTargetValue = 0;
+	float								m_fRackingDuration = 1.0f;
+	float								m_fElapsedTimeRack = 0.0f;
 
-	float					m_fRackingDuration = 1.0f;
-	float					m_fElapsedTimeRack = 0.0f;
-
-	HyNumberFormat			m_NumberFormat;
-	uint32					m_uiDenomination = 1;
+	HyNumberFormat						m_NumberFormat;
+	uint32								m_uiDenomination = 1;
 
 	// Spin digits member variables
-	double					m_dTotalDistance = 0.0f;
-	double					m_dPrevDistance = 0.0;
-	float					m_fThresholdDist = 0.0f;
+	double								m_dTotalDistance = 0.0f;
+	double								m_dPrevDistance = 0.0;
+	float								m_fThresholdDist = 0.0f;
 
 	class SpinText : public HyEntity2d
 	{
 	public:
-		HyText2d			m_SpinText_Shown;
-		HyText2d			m_SpinText_Padded;
+		HyText2d						m_SpinText_Shown;
+		HyText2d						m_SpinText_Padded;
 
 		SpinText(HyEntity2d *pParent) :
 			HyEntity2d(pParent)
@@ -80,12 +79,12 @@ public:
 	void OffsetValue(int64 iOffsetAmt, float fRackDuration);
 
 	void Slam();
-	bool IsRacking();
+	bool IsRacking() const;
 
-	bool IsShowAsCash();
+	bool IsShowAsCash() const;
 	virtual void ShowAsCash(bool bShow);
 
-	bool IsSpinningMeter();
+	bool IsSpinningMeter() const;
 	void SetAsSpinningMeter(bool bSet);
 
 	HyNumberFormat GetNumFormat() const;

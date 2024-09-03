@@ -85,12 +85,12 @@ void HyRackMeter::Slam()
 	SetValue(m_iTargetValue, 0.0f);
 }
 
-bool HyRackMeter::IsRacking()
+bool HyRackMeter::IsRacking() const
 {
 	return m_iCurValue != m_iTargetValue;
 }
 
-bool HyRackMeter::IsShowAsCash()
+bool HyRackMeter::IsShowAsCash() const
 {
 	return m_uiAttribs & RACKMETERATTRIB_IsMoney;
 }
@@ -105,7 +105,7 @@ bool HyRackMeter::IsShowAsCash()
 	SetAssembleNeeded();
 }
 
-bool HyRackMeter::IsSpinningMeter()
+bool HyRackMeter::IsSpinningMeter() const
 {
 	return m_uiAttribs & RACKMETERATTRIB_IsSpinDigits;
 }
@@ -115,14 +115,7 @@ void HyRackMeter::SetAsSpinningMeter(bool bSet)
 	if(bSet)
 	{
 		m_uiAttribs |= RACKMETERATTRIB_IsSpinDigits;
-
-		uint32 uiWidth;
-		if(m_Text.IsScaleBox())
-			uiWidth = static_cast<uint32>(m_Text.GetTextBoxDimensions().x);
-		else
-			uiWidth = 5000;// static_cast<uint32>(m_Text.GetWidth());
-
-		m_SpinText.SetScissor(HyRect(uiWidth, static_cast<uint32>(GetSpinHeightThreshold())));
+		m_SpinText.SetScissor(HyRect(GetWidth(), static_cast<uint32>(GetSpinHeightThreshold())));
 	}
 	else
 		m_uiAttribs &= ~RACKMETERATTRIB_IsSpinDigits;
@@ -168,7 +161,6 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 		return;
 
 	m_fElapsedTimeRack = HyMath::Clamp(m_fElapsedTimeRack + HyEngine::DeltaTime(), 0.0f, m_fRackingDuration);
-
 	if(m_fElapsedTimeRack == m_fRackingDuration)
 	{
 		Slam();
@@ -182,10 +174,10 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 		if(iCurPennies != m_iCurValue)
 		{
 			m_iCurValue = iCurPennies;
-			SetAssembleNeeded(); //FormatDigits();
+			SetAssembleNeeded();
 		}
 	}
-	else	// Spinning (analog) digits
+	else // Spinning (analog) digits
 	{
 		float fThreshold = GetSpinHeightThreshold();
 
