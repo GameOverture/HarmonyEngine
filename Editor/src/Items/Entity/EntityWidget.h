@@ -91,6 +91,8 @@ private Q_SLOTS:
 
 	void on_actionOrderChildrenUp_triggered();
 	void on_actionOrderChildrenDown_triggered();
+	
+	void on_actionReplaceItems_triggered();
 	void on_actionRemoveItems_triggered();
 
 	void on_actionConvertShape_triggered();

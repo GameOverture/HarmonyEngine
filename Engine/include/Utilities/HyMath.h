@@ -334,7 +334,7 @@ public:
 		m_uiG(iGreen & 0xFF),
 		m_uiB(iBlue & 0xFF)
 	{ }
-	HyColor(uint32 uiColor) : // 24-bit color, does not initialize alpha channel (which is set to 0xFF)
+	HyColor(uint32 uiColor) : // 24-bit color ctor, does not initialize alpha channel (which is set to 0xFF)
 		m_uiA(0xFF),
 		m_uiR((uiColor >> 16) & 0xFF),
 		m_uiG((uiColor >> 8) & 0xFF),

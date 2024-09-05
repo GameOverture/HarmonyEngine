@@ -707,6 +707,18 @@
     <string>Removes the selected entity items while also copying them to the clipboard</string>
    </property>
   </action>
+  <action name="actionReplaceItems">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/atlas-replaceFrame.png</normaloff>:/icons16x16/atlas-replaceFrame.png</iconset>
+   </property>
+   <property name="text">
+    <string>Replace Item(s)</string>
+   </property>
+   <property name="toolTip">
+    <string>Replace selected items with another existing item of same type</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

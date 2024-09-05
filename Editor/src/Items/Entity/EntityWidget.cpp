@@ -294,6 +294,7 @@ EntityWidget::~EntityWidget()
 		m_ContextMenu.addAction(ui->actionCopyEntityItems);
 		m_ContextMenu.addAction(ui->actionPasteEntityItems);
 		m_ContextMenu.addSeparator();
+		m_ContextMenu.addAction(ui->actionReplaceItems);
 		m_ContextMenu.addAction(ui->actionRemoveItems);
 	}
 
@@ -834,6 +835,13 @@ void EntityWidget::on_actionOrderChildrenDown_triggered()
 
 	QUndoCommand *pCmd = new EntityUndoCmd_OrderChildren(m_ItemRef, selectedItemDataList, curIndexList, newIndexList, false);
 	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionReplaceItems_triggered()
+{
+	QModelIndexList selectedIndices = GetSelectedItems();
+
+
 }
 
 void EntityWidget::on_actionRemoveItems_triggered()

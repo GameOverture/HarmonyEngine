@@ -170,7 +170,7 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 					if(pGlyph)
 					{
 						fLargestLineAscender = HyMath::Max(fLargestLineAscender, static_cast<float>(pGlyph->iOFFSET_Y));
-						fLargestLineDescender = HyMath::Min(fLargestLineDescender, static_cast<float>(pGlyph->iOFFSET_Y - pGlyph->uiHEIGHT)); // NOTE: Descenders are stored as negative values
+						fLargestLineDescender = HyMath::Min(fLargestLineDescender, static_cast<float>(pGlyph->iOFFSET_Y) - static_cast<float>(pGlyph->uiHEIGHT)); // NOTE: Descenders are stored as negative values
 					}
 				}
 			}
@@ -253,7 +253,7 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 				pNewSprite->pos.Offset(-vOffset);
 
 				// Also offset the sprite down by the descender amount, because at the moment they're sitting on the 'baseline'
-				//pNewSprite->pos.Offset(0.0f, fLargestLineDescender);
+				pNewSprite->pos.Offset(0.0f, fLargestLineDescender);
 			}
 
 			uiCurFmtIndex++;
