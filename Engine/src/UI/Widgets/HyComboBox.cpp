@@ -246,6 +246,9 @@ void HyComboBox::ResetExpandedTimeout()
 			if((m_uiAttribs & COMBOBOXATTRIB_IsExpandMouseDwn) == 0 && HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft))
 				m_uiAttribs |= COMBOBOXATTRIB_IsExpandMouseDwn;
 
+			if(IsMouseHover())
+				ResetExpandedTimeout();
+
 			m_fElapsedExpandedTime += HyEngine::DeltaTime();
 			if(((m_uiAttribs & COMBOBOXATTRIB_IsExpandMouseDwn) && HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft) == false) ||
 				(m_fExpandedTimeout != 0.0f && m_fElapsedExpandedTime >= m_fExpandedTimeout))
