@@ -217,92 +217,92 @@ void AuxAssetInspector::OnAudioBufferFinished()
 {
 	int iPixelWidth = 1000;// ui->audioGfxView->width();
 
-	struct SoundPixelGroup
-	{
-		float		m_fChannel1Peak = 0.0f;
-		float		m_fChannel1Rms = 0.0f;
-		
-		float		m_fChannel2Peak = 0.0f;
-		float		m_fChannel2Rms = 0.0f;
-	};
-	QList<SoundPixelGroup> soundPixelGroupsList;
+	//struct SoundPixelGroup
+	//{
+	//	float		m_fChannel1Peak = 0.0f;
+	//	float		m_fChannel1Rms = 0.0f;
+	//	
+	//	float		m_fChannel2Peak = 0.0f;
+	//	float		m_fChannel2Rms = 0.0f;
+	//};
+	//QList<SoundPixelGroup> soundPixelGroupsList;
 
-	for(QAudioBuffer audBuff : m_AudioBuffers)
-	{
-		QAudioFormat audioFormat = audBuff.format();
-		int iNumChannels = audioFormat.channelCount();
-		int iNumSamplePulls = audBuff.sampleCount() / iNumChannels;
-		int iNumFrames = audBuff.frameCount();
+	//for(QAudioBuffer audBuff : m_AudioBuffers)
+	//{
+	//	QAudioFormat audioFormat = audBuff.format();
+	//	int iNumChannels = audioFormat.channelCount();
+	//	int iNumSamplePulls = audBuff.sampleCount() / iNumChannels;
+	//	int iNumFrames = audBuff.frameCount();
 
-		int iNumSamplesPerPixel = iNumFrames / iPixelWidth;
+	//	int iNumSamplesPerPixel = iNumFrames / iPixelWidth;
 
-		float fSampleDiv;
-		switch(audioFormat.sampleSize())
-		{
-		case 8:
-			if(audioFormat.sampleType() == QAudioFormat::UnSignedInt)
-				fSampleDiv = 255.0f;
-			else
-				fSampleDiv = 127.0f;
-			break;
+	//	float fSampleDiv;
+	//	switch(audioFormat.sampleSize())
+	//	{
+	//	case 8:
+	//		if(audioFormat.sampleType() == QAudioFormat::UnSignedInt)
+	//			fSampleDiv = 255.0f;
+	//		else
+	//			fSampleDiv = 127.0f;
+	//		break;
 
-		case 16:
-			if(audioFormat.sampleType() == QAudioFormat::UnSignedInt)
-				fSampleDiv = 65535.0f;
-			else
-				fSampleDiv = 32767.0f;
-			break;
+	//	case 16:
+	//		if(audioFormat.sampleType() == QAudioFormat::UnSignedInt)
+	//			fSampleDiv = 65535.0f;
+	//		else
+	//			fSampleDiv = 32767.0f;
+	//		break;
 
-		case 32:
-			if(audioFormat.sampleType() == QAudioFormat::UnSignedInt)
-				fSampleDiv = 4294967295.0f;
-			else if(audioFormat.sampleType() == QAudioFormat::SignedInt)
-				fSampleDiv = 2147483647.0f;
-			else if(audioFormat.sampleType() == QAudioFormat::Float)
-				fSampleDiv = 1.0f;
-			break;
-		}
+	//	case 32:
+	//		if(audioFormat.sampleType() == QAudioFormat::UnSignedInt)
+	//			fSampleDiv = 4294967295.0f;
+	//		else if(audioFormat.sampleType() == QAudioFormat::SignedInt)
+	//			fSampleDiv = 2147483647.0f;
+	//		else if(audioFormat.sampleType() == QAudioFormat::Float)
+	//			fSampleDiv = 1.0f;
+	//		break;
+	//	}
 
-		const qint16 *data = audBuff.constData<qint16>();
-		for(int iSamplePull = 0; iSamplePull < iNumSamplePulls; iSamplePull += iNumSamplesPerPixel)
-		{
-			SoundPixelGroup soundPixelGroup;
-			if(iNumChannels == 1)
-			{
-				for(int iSample = 0; iSample < iNumSamplesPerPixel; ++iSample)
-				{
-					float fSample = static_cast<float>(data[iSamplePull + iSample]);
-					fSample /= fSampleDiv;
+	//	const qint16 *data = audBuff.constData<qint16>();
+	//	for(int iSamplePull = 0; iSamplePull < iNumSamplePulls; iSamplePull += iNumSamplesPerPixel)
+	//	{
+	//		SoundPixelGroup soundPixelGroup;
+	//		if(iNumChannels == 1)
+	//		{
+	//			for(int iSample = 0; iSample < iNumSamplesPerPixel; ++iSample)
+	//			{
+	//				float fSample = static_cast<float>(data[iSamplePull + iSample]);
+	//				fSample /= fSampleDiv;
 
-					soundPixelGroup.m_fChannel1Peak = HyMath::Max(soundPixelGroup.m_fChannel1Peak, fSample);
-					soundPixelGroup.m_fChannel1Rms += fSample * fSample;
-				}
-				soundPixelGroup.m_fChannel1Rms = sqrt(soundPixelGroup.m_fChannel1Rms / iNumSamplesPerPixel);
-			}
-			else if(iNumChannels == 2)
-			{
-				for(int iSample = 0; iSample < iNumSamplesPerPixel; ++iSample)
-				{
-					float fSample1 = static_cast<float>(data[iSamplePull + iSample * 2]);
-					fSample1 /= fSampleDiv;
-					
-					soundPixelGroup.m_fChannel1Peak = HyMath::Max(soundPixelGroup.m_fChannel1Peak, fSample1);
-					soundPixelGroup.m_fChannel1Rms += fSample1 * fSample1;
+	//				soundPixelGroup.m_fChannel1Peak = HyMath::Max(soundPixelGroup.m_fChannel1Peak, fSample);
+	//				soundPixelGroup.m_fChannel1Rms += fSample * fSample;
+	//			}
+	//			soundPixelGroup.m_fChannel1Rms = sqrt(soundPixelGroup.m_fChannel1Rms / iNumSamplesPerPixel);
+	//		}
+	//		else if(iNumChannels == 2)
+	//		{
+	//			for(int iSample = 0; iSample < iNumSamplesPerPixel; ++iSample)
+	//			{
+	//				float fSample1 = static_cast<float>(data[iSamplePull + iSample * 2]);
+	//				fSample1 /= fSampleDiv;
+	//				
+	//				soundPixelGroup.m_fChannel1Peak = HyMath::Max(soundPixelGroup.m_fChannel1Peak, fSample1);
+	//				soundPixelGroup.m_fChannel1Rms += fSample1 * fSample1;
 
-					float fSample2 = static_cast<float>(data[iSamplePull + iSample * 2 + 1]);
-					fSample2 /= fSampleDiv;
+	//				float fSample2 = static_cast<float>(data[iSamplePull + iSample * 2 + 1]);
+	//				fSample2 /= fSampleDiv;
 
-					soundPixelGroup.m_fChannel2Peak = HyMath::Max(soundPixelGroup.m_fChannel2Peak, fSample2);
-					soundPixelGroup.m_fChannel2Rms += fSample2 * fSample2;
-				}
-				soundPixelGroup.m_fChannel1Rms = sqrt(soundPixelGroup.m_fChannel1Rms / iNumSamplesPerPixel);
-				soundPixelGroup.m_fChannel2Rms = sqrt(soundPixelGroup.m_fChannel2Rms / iNumSamplesPerPixel);
-			}
+	//				soundPixelGroup.m_fChannel2Peak = HyMath::Max(soundPixelGroup.m_fChannel2Peak, fSample2);
+	//				soundPixelGroup.m_fChannel2Rms += fSample2 * fSample2;
+	//			}
+	//			soundPixelGroup.m_fChannel1Rms = sqrt(soundPixelGroup.m_fChannel1Rms / iNumSamplesPerPixel);
+	//			soundPixelGroup.m_fChannel2Rms = sqrt(soundPixelGroup.m_fChannel2Rms / iNumSamplesPerPixel);
+	//		}
 
-			soundPixelGroupsList.push_back(soundPixelGroup);
-		}
-		
-	} // for(m_AudioBuffers)
+	//		soundPixelGroupsList.push_back(soundPixelGroup);
+	//	}
+	//	
+	//} // for(m_AudioBuffers)
 
 	//m_AudioGfxScene.setSceneRect(0, 0, iPixelWidth, 500);
 	//for(int i = 0; i < iPixelWidth; ++i)
