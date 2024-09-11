@@ -10,7 +10,7 @@
 #ifndef ENTITYDRAWITEM_H
 #define ENTITYDRAWITEM_H
 
-#include "IDrawItem.h"
+#include "IDrawExItem.h"
 
 class EntityDraw;
 class EntityTreeItemData;
@@ -108,6 +108,8 @@ class EntityDrawItem : public IDrawExItem
 	EntityTreeItemData *							m_pEntityTreeItemData;
 	IHyBody2d *										m_pChild;
 
+	ShapeCtrl										m_ShapeCtrl;
+
 public:
 	EntityDrawItem(Project &projectRef, EntityTreeItemData *pModelItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent);
 	virtual ~EntityDrawItem();
@@ -116,6 +118,7 @@ public:
 	virtual bool IsSelected() override;
 
 	EntityTreeItemData *GetEntityTreeItemData() const;
+	ShapeCtrl &GetShapeCtrl();
 
 	// This draw visual has all the current extrapolated data set for the current frame
 	QJsonValue ExtractPropertyData(QString sCategory, QString sPropertyName);

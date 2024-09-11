@@ -187,8 +187,8 @@
 	sm_EditorColors[EDITORCOLOR_Shape] = HyColor::DarkMagenta;
 	sm_EditorColors[EDITORCOLOR_ShapeGrabPointOutline] = HyColor::White;
 	sm_EditorColors[EDITORCOLOR_ShapeGrabPointFill] = HyColor::Red;
-	sm_EditorColors[EDITORCOLOR_ShapeGrabPointSelectedOutline] = HyColor::White;
-	sm_EditorColors[EDITORCOLOR_ShapeGrabPointSelectedFill] = HyColor::Blue.Lighten();
+	sm_EditorColors[EDITORCOLOR_ShapeGrabPointSelectedOutline] = HyColor::Red;
+	sm_EditorColors[EDITORCOLOR_ShapeGrabPointSelectedFill] = HyColor::Red;
 	sm_EditorColors[EDITORCOLOR_DopeSheet] = HyColor::PanelWidget;
 	sm_EditorColors[EDITORCOLOR_DopeSheetTimeline] = HyColor::PanelContainer;
 	sm_EditorColors[EDITORCOLOR_DopeSheetNotch] = HyColor::FrameWidget;

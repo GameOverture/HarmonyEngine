@@ -18,7 +18,6 @@ class IDrawExItem
 {
 protected:
 	TransformCtrl							m_Transform;
-	ShapeCtrl								m_ShapeCtrl;
 
 public:
 	IDrawExItem(HyEntity2d *pParent);
@@ -28,7 +27,6 @@ public:
 	virtual bool IsSelected() = 0;
 
 	TransformCtrl &GetTransformCtrl();
-	ShapeCtrl &GetShapeCtrl();
 
 	bool IsMouseInBounds();
 

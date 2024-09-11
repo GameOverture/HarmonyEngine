@@ -110,6 +110,7 @@ public:
 	DrawAction GetCurAction() const;
 	bool IsActionTransforming() const;
 	bool SetAction(DrawAction eHyAction);
+	DrawAction GetBackgroundAction() const;
 	bool SetBackgroundAction(DrawAction eHyAction);
 	void ClearAction();
 	void ClearBackgroundAction();

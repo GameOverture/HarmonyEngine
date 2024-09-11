@@ -17,7 +17,8 @@
 EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
 	IDrawExItem(pEntityDraw),
 	m_pEntityTreeItemData(pEntityTreeItemData),
-	m_pChild(nullptr)
+	m_pChild(nullptr),
+	m_ShapeCtrl(pEntityDraw)
 {
 	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
 	TreeModelItemData *pReferencedItemData = projectRef.FindItemData(referencedItemUuid);
@@ -114,6 +115,11 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 {
 	return m_pEntityTreeItemData;
+}
+
+ShapeCtrl &EntityDrawItem::GetShapeCtrl()
+{
+	return m_ShapeCtrl;
 }
 
 // NOTE: The listed 4 functions below share logic that process all item properties. Any updates should reflect to all of them

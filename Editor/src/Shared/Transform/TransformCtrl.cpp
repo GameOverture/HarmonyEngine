@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "TransformCtrl.h"
-#include "IDrawItem.h"
+#include "IDrawExItem.h"
 
 TransformCtrl::TransformCtrl(HyEntity2d *pParent) :
 	HyEntity2d(pParent),

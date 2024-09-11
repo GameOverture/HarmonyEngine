@@ -23,7 +23,8 @@ class EntityDraw : public IDrawEx
 	bool									m_bPlayingPreview;
 
 	bool									m_bIsShapeAddPrimitive; // True when primitive, false when bounding volume shape
-	EntityDrawItem *						m_pCurVertexEditItem;
+
+	HyPrimitive2d							m_ShapeEditModeWindowOutline;
 
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
@@ -38,6 +39,7 @@ public:
 	virtual void OnMousePressEvent(QMouseEvent *pEvent) override;
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) override;
 
+	bool IsSemEnabled() const;
 	bool IsActionSemIdle() const;
 	bool IsActionSemTransforming() const;
 
@@ -45,6 +47,8 @@ public:
 	bool SetAsShapeAdd(EditorShape eShape, bool bAsPrimitive);
 	void SetAsShapeEditMode();
 	void ActivateVemOnNextJsonMeta();
+
+	EntityDrawItem *GetCurShapeEditItem() const;
 
 	void RequestClearShapeEdit();
 	void ClearShapeEdit();

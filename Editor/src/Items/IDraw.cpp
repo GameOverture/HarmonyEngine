@@ -172,6 +172,11 @@ bool IDraw::SetAction(DrawAction eHyAction)
 	return true;
 }
 
+DrawAction IDraw::GetBackgroundAction() const
+{
+	return m_eBackgroundDrawAction;
+}
+
 bool IDraw::SetBackgroundAction(DrawAction eHyAction)
 {
 	if(SetAction(eHyAction) == false)

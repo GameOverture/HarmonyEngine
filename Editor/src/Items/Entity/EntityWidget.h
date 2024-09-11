@@ -67,6 +67,7 @@ private Q_SLOTS:
 	void OnKeyE();
 	void OnKeyShiftQ();
 	void OnKeyShiftE();
+	void OnKeyF();
 
 	void OnContextMenu(const QPoint &pos);
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);

@@ -12,7 +12,7 @@
 
 #include "Global.h"
 #include "IDraw.h"
-#include "IDrawItem.h"
+#include "IDrawExItem.h"
 
 struct SnapCandidates
 {

@@ -241,8 +241,8 @@ if(Qt5_DIR)
 		src/Shared/IMimeData.h
 		src/Shared/Transform/GrabPoint.cpp
 		src/Shared/Transform/GrabPoint.h
-		src/Shared/Transform/IDrawItem.cpp
-		src/Shared/Transform/IDrawItem.h
+		src/Shared/Transform/IDrawExItem.cpp
+		src/Shared/Transform/IDrawExItem.h
 		src/Shared/Transform/ShapeCtrl.cpp
 		src/Shared/Transform/ShapeCtrl.h
 		src/Shared/Transform/TransformCtrl.cpp

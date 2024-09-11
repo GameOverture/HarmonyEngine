@@ -109,14 +109,14 @@
          <property name="bottomMargin">
           <number>2</number>
          </property>
-         <item row="1" column="0">
+         <item row="4" column="0">
           <widget class="QLabel" name="lblAddPrimitive">
            <property name="text">
             <string>Add Primitive</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="4" column="1">
           <layout class="QHBoxLayout" name="lytAddPrimitiveShape">
            <item>
             <widget class="QToolButton" name="btnAddPrimitiveBox">
@@ -193,14 +193,14 @@
            </item>
           </layout>
          </item>
-         <item row="2" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="lblAddShape">
            <property name="text">
             <string>Add Bounding Volume</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="5" column="1">
           <layout class="QHBoxLayout" name="lytAddBoundingShape">
            <item>
             <widget class="QToolButton" name="btnAddShapeBox">
@@ -277,17 +277,17 @@
            </item>
           </layout>
          </item>
-         <item row="3" column="0">
+         <item row="2" column="0">
           <widget class="QLabel" name="label">
            <property name="text">
-            <string>Vertex Edit Mode</string>
+            <string>Shape Edit Mode</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QToolButton" name="btnVertexEditMode">
+         <item row="2" column="1">
+          <widget class="QCheckBox" name="chkShapeEditMode">
            <property name="text">
-            <string>...</string>
+            <string/>
            </property>
           </widget>
          </item>

@@ -8,11 +8,10 @@
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Global.h"
-#include "IDrawItem.h"
+#include "IDrawExItem.h"
 
 IDrawExItem::IDrawExItem(HyEntity2d *pParent) :
-	m_Transform(pParent),
-	m_ShapeCtrl(pParent)
+	m_Transform(pParent)
 {
 	HideTransformCtrl();
 }
@@ -24,11 +23,6 @@ IDrawExItem::IDrawExItem(HyEntity2d *pParent) :
 TransformCtrl &IDrawExItem::GetTransformCtrl()
 {
 	return m_Transform;
-}
-
-ShapeCtrl &IDrawExItem::GetShapeCtrl()
-{
-	return m_ShapeCtrl;
 }
 
 bool IDrawExItem::IsMouseInBounds()
@@ -48,7 +42,7 @@ void IDrawExItem::RefreshTransform(HyCamera2d *pCamera)
 	ExtractTransform(boundingShape, mtxShapeTransform);
 
 	m_Transform.WrapTo(boundingShape, mtxShapeTransform, pCamera);
-	GetShapeCtrl().DeserializeOutline(pCamera);
+	//GetShapeCtrl().DeserializeOutline(pCamera);
 }
 
 void IDrawExItem::ShowTransformCtrl(bool bShowGrabPoints)

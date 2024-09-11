@@ -80,7 +80,8 @@ public:
 	void Cmd_RenameItem(EntityTreeItemData *pItemData, QString sNewName);
 
 	void ToggleShapeAdd(EditorShape eShapeType, bool bAsPrimitive);
-	void ToggleShapeEditMode(bool bEnable);
+	void ToggleShapeEditMode();
+	void SetShapeEditMode(bool bEnable);
 	void ClearShapeEdit();
 
 	QString GenerateCodeName(QString sDesiredName) const;

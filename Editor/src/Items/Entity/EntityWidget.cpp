@@ -63,9 +63,6 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->btnAddShapeChain->setDefaultAction(ui->actionAddLineChainShape);
 	ui->btnAddShapeLoop->setDefaultAction(ui->actionAddLineLoopShape);
 
-	//m_AddShapeActionGroup.addAction(ui->actionVertexEditMode);
-	ui->btnVertexEditMode->setDefaultAction(ui->actionVertexEditMode);
-
 	ui->btnAddChild->setDefaultAction(ui->actionAddChildren);
 
 	ui->btnOrderUp->setDefaultAction(ui->actionOrderChildrenUp);
@@ -121,6 +118,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	new QShortcut(QKeySequence(Qt::Key_E), this, SLOT(OnKeyE()));
 	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Q), this, SLOT(OnKeyShiftQ()));
 	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_E), this, SLOT(OnKeyShiftE()));
+	new QShortcut(QKeySequence(Qt::Key_F), this, SLOT(OnKeyF()));
 
 	UpdateActions();
 }
@@ -489,7 +487,7 @@ void EntityWidget::CheckShapeAddBtn(EditorShape eShapeType, bool bAsPrimitive)
 
 void EntityWidget::CheckVertexEditMode(bool bCheck)
 {
-	ui->btnVertexEditMode->setChecked(bCheck);
+	ui->chkShapeEditMode->setChecked(bCheck);
 }
 
 void EntityWidget::UncheckAll()
@@ -595,6 +593,11 @@ void EntityWidget::OnKeyShiftE()
 
 	AuxDopeSheet *pAuxDopeSheet = static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet));
 	pAuxDopeSheet->EnsureSelectedFrameVisible();
+}
+
+void EntityWidget::OnKeyF()
+{
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeEditMode();
 }
 
 void EntityWidget::OnContextMenu(const QPoint &pos)
@@ -746,7 +749,7 @@ void EntityWidget::on_actionAddLineLoopShape_triggered()
 
 void EntityWidget::on_actionVertexEditMode_toggled(bool bChecked)
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeEditMode(bChecked);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeEditMode(bChecked);
 }
 
 void EntityWidget::on_actionOrderChildrenUp_triggered()

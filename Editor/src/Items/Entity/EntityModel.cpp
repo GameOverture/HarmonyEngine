@@ -437,7 +437,12 @@ void EntityModel::ToggleShapeAdd(EditorShape eShapeType, bool bAsPrimitive)
 	}
 }
 
-void EntityModel::ToggleShapeEditMode(bool bEnable)
+void EntityModel::ToggleShapeEditMode()
+{
+	SetShapeEditMode(!m_bVertexEditMode);
+}
+
+void EntityModel::SetShapeEditMode(bool bEnable)
 {
 	m_bVertexEditMode = bEnable;
 
@@ -447,17 +452,40 @@ void EntityModel::ToggleShapeEditMode(bool bEnable)
 		MainWindow::ClearStatus();
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
-	if(pWidget)
-		pWidget->CheckVertexEditMode(m_bVertexEditMode);
-
 	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pEntityDraw)
+	if(pWidget == nullptr || pEntityDraw == nullptr)
 	{
-		if(m_bVertexEditMode)
-			pEntityDraw->SetAsShapeEditMode();
-		else
-			pEntityDraw->ClearShapeEdit();
+		HyGuiLog("EntityModel::SetShapeEditMode() - pWidget or pEntityDraw is nullptr", LOGTYPE_Error);
+		return;
 	}
+
+	if(m_bVertexEditMode)
+	{
+		// Deselect all items that are not shapes
+		QModelIndexList selectedIndexList = pWidget->GetSelectedItems();
+		for(QModelIndex index : selectedIndexList)
+		{
+			EntityTreeItemData *pTreeItemData = m_TreeModel.data(index, Qt::UserRole).value<EntityTreeItemData *>();
+			if(pTreeItemData->GetType() != ITEM_Primitive && pTreeItemData->GetType() != ITEM_BoundingVolume)
+				pWidget->RequestSelectedItemChange(pTreeItemData, QItemSelectionModel::Deselect);
+		}
+
+		pEntityDraw->SetAsShapeEditMode();
+	}
+	else
+	{
+		// Deselect all bounding volume items
+		QModelIndexList selectedIndexList = pWidget->GetSelectedItems();
+		for(QModelIndex index : selectedIndexList)
+		{
+			EntityTreeItemData *pTreeItemData = m_TreeModel.data(index, Qt::UserRole).value<EntityTreeItemData *>();
+			if(pTreeItemData->GetType() == ITEM_BoundingVolume)
+				pWidget->RequestSelectedItemChange(pTreeItemData, QItemSelectionModel::Deselect);
+		}
+
+		pEntityDraw->ClearShapeEdit();
+	}
+	pWidget->CheckVertexEditMode(m_bVertexEditMode);
 }
 
 void EntityModel::ClearShapeEdit()
