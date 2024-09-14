@@ -18,7 +18,6 @@
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDrawEx(pProjItem, initFileDataRef),
 	m_RootEntity(this),
-	m_bActivateVemOnNextJsonMeta(false),
 	m_bPlayingPreview(false),
 	m_bIsShapeAddPrimitive(false),
 	m_ShapeEditModeWindowOutline(this)
@@ -356,11 +355,6 @@ void EntityDraw::SetAsShapeEditMode(bool bEnable)
 	}
 }
 
-void EntityDraw::ActivateVemOnNextJsonMeta()
-{
-	m_bActivateVemOnNextJsonMeta = true;
-}
-
 EntityDrawItem *EntityDraw::GetCurShapeEditItem() const
 {
 	if(IsSemEnabled() && m_SelectedItemList.size() == 1)
@@ -514,6 +508,9 @@ void EntityDraw::SetExtrapolatedProperties()
 				EntityDrawItem *pOldDrawItem = pDrawItem;
 				pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), pEntityTreeItemData, this, &m_RootEntity);
 
+				if(pOldDrawItem == m_pCurHoverItem)
+					ClearHover();
+
 				delete pOldDrawItem;
 				pEntityTreeItemData->SetReallocateDrawItem(false);
 			}
@@ -529,25 +526,19 @@ void EntityDraw::SetExtrapolatedProperties()
 	}
 	// Delete all the remaining stale items
 	for(auto pStaleItem : staleItemList)
+	{
+		if(pStaleItem == m_pCurHoverItem)
+			ClearHover();
+
 		delete pStaleItem;
+	}
 	staleItemList.clear();
 
 	SetExtrapolatedProperties();
 
-	if(m_bActivateVemOnNextJsonMeta)
-	{
-		for(IDrawExItem *pSelectedItemDraw : m_SelectedItemList)
-			pSelectedItemDraw->HideTransformCtrl();
-
-		static_cast<EntityModel *>(m_pProjItem->GetModel())->SetShapeEditMode(true);
-		m_bActivateVemOnNextJsonMeta = false;
-	}
-	else
-	{
-		bool bShowGrabPoints = m_SelectedItemList.size() == 1;
-		for(IDrawExItem *pSelectedItemDraw : m_SelectedItemList)
-			pSelectedItemDraw->ShowTransformCtrl(bShowGrabPoints);
-	}
+	bool bShowGrabPoints = m_SelectedItemList.size() == 1;
+	for(IDrawExItem *pSelectedItemDraw : m_SelectedItemList)
+		pSelectedItemDraw->ShowTransformCtrl(bShowGrabPoints);
 
 	RefreshTransforms();
 }

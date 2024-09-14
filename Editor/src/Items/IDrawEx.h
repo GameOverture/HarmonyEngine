@@ -88,6 +88,7 @@ public:
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) override;
 
 	void RefreshTransforms();
+	void ClearHover();
 
 protected:
 	virtual void OnResizeRenderer() = 0;

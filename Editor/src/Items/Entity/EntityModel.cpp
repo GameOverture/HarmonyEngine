@@ -229,9 +229,7 @@ EntityTreeItemData *EntityModel::Cmd_CreateNewShape(int iStateIndex, int iFrameI
 	if(pWidget)
 		pWidget->RequestSelectedItems(QList<QUuid>() << pTreeItemData->GetThisUuid());
 
-	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pEntDraw)
-		pEntDraw->ActivateVemOnNextJsonMeta();
+	SetShapeEditMode(true);
 
 	return pTreeItemData;
 }
@@ -365,11 +363,13 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 	if(iRow < 0)
 		return iRow;
 
-	//SetShapeEditMode(false);
-
 	// Pop all the key frames associated with this item
 	for(IStateData *pStateData : m_StateList)
 		static_cast<EntityStateData *>(pStateData)->GetDopeSheetScene().PopAllKeyFrames(pItem, true);
+
+	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntDraw)
+		pEntDraw->ClearHover(); // Flushes out potentially deleted IDrawEx::m_pCurHoverItem
 
 	return iRow;
 }
@@ -384,6 +384,10 @@ bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
 	// Re-add all the key frames associated with this item
 	for(IStateData *pStateData : m_StateList)
 		static_cast<EntityStateData *>(pStateData)->GetDopeSheetScene().PushAllKeyFrames(pNodeItem, true);
+
+	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntDraw)
+		pEntDraw->ClearHover(); // Flushes out potentially deleted IDrawEx::m_pCurHoverItem
 
 	return true;
 }

@@ -500,9 +500,7 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(QString sText, ProjectItemData 
 	if(pWidget)
 		pWidget->RequestSelectedItems(QList<QUuid>() << m_pShapeItemData->GetThisUuid());
 
-	EntityDraw *pDraw = static_cast<EntityDraw *>(m_EntityItemRef.GetDraw());
-	if(pDraw)
-		pDraw->ActivateVemOnNextJsonMeta();
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->SetShapeEditMode(true);
 }
 
 /*virtual*/ void EntityUndoCmd_ShapeData::undo() /*override*/
@@ -514,9 +512,7 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(QString sText, ProjectItemData 
 	if(pWidget)
 		pWidget->RequestSelectedItems(QList<QUuid>() << m_pShapeItemData->GetThisUuid());
 
-	EntityDraw *pDraw = static_cast<EntityDraw *>(m_EntityItemRef.GetDraw());
-	if(pDraw)
-		pDraw->ActivateVemOnNextJsonMeta();
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->SetShapeEditMode(true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

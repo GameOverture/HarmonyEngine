@@ -19,7 +19,6 @@ class EntityDraw : public IDrawEx
 {
 	HyEntity2d 								m_RootEntity;
 
-	bool									m_bActivateVemOnNextJsonMeta;
 	bool									m_bPlayingPreview;
 
 	bool									m_bIsShapeAddPrimitive; // True when primitive, false when bounding volume shape
@@ -46,7 +45,6 @@ public:
 	EditorShape GetShapeAddType() const;
 	bool SetAsShapeAdd(EditorShape eShape, bool bAsPrimitive);
 	void SetAsShapeEditMode(bool bEnable);
-	void ActivateVemOnNextJsonMeta();
 
 	EntityDrawItem *GetCurShapeEditItem() const;
 

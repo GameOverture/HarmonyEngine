@@ -285,6 +285,12 @@ void IDrawEx::RefreshTransforms()
 		pItemDraw->RefreshTransform(m_pCamera);
 }
 
+void IDrawEx::ClearHover()
+{
+	m_pCurHoverItem = nullptr;
+	m_eCurHoverGrabPoint = TransformCtrl::GRAB_None;
+}
+
 /*virtual*/ void IDrawEx::OnCameraUpdated() /*override*/
 {
 	RefreshTransforms();
