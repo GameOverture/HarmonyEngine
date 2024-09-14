@@ -38,7 +38,7 @@ class EntityModel : public IModel
 	Q_OBJECT
 
 	EntityTreeModel											m_TreeModel;
-	bool													m_bVertexEditMode;
+	bool													m_bShapeEditMode;	// If true, the user is currently editing child shapes' vertices/data (primitive or bounding volumes)
 
 	// This 'AuxWidgetsModel' is used to map (QDataWidgetMapper) to the widgets in AuxDopeSheet. It also contains the data for the widgets
 	class AuxWidgetsModel : public QAbstractTableModel
@@ -80,9 +80,9 @@ public:
 	void Cmd_RenameItem(EntityTreeItemData *pItemData, QString sNewName);
 
 	void ToggleShapeAdd(EditorShape eShapeType, bool bAsPrimitive);
+	bool IsShapeEditMode() const;
 	void ToggleShapeEditMode();
 	void SetShapeEditMode(bool bEnable);
-	void ClearShapeEdit();
 
 	QString GenerateCodeName(QString sDesiredName) const;
 

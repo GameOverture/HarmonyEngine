@@ -143,6 +143,7 @@ bool IDraw::SetAction(DrawAction eHyAction)
 	case HYACTION_EntityAddShapeDrag:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 	
 	case HYACTION_EntitySem:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
+	case HYACTION_EntitySemHoverItem:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;
 	case HYACTION_EntitySemHoverTranslate:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
 	case HYACTION_EntitySemHoverAddVertex:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 	case HYACTION_EntitySemHoverGrabVertex:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;

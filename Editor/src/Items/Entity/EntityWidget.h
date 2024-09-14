@@ -50,7 +50,7 @@ public:
 	void SetExtrapolatedProperties();
 
 	void CheckShapeAddBtn(EditorShape eShapeType, bool bAsPrimitive);
-	void CheckVertexEditMode(bool bCheck);
+	void SetAsShapeEditMode(bool bEnableSem);
 	void UncheckAll();
 
 protected:

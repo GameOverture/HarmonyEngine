@@ -306,6 +306,7 @@ EntityWidget::~EntityWidget()
 		ui->actionVertexEditMode->setEnabled(false);
 	}
 
+	ui->nodeTree->model()->dataChanged(ui->nodeTree->model()->index(0, 0), ui->nodeTree->model()->index(ui->nodeTree->model()->rowCount() - 1, 1));
 	ui->nodeTree->repaint();
 }
 
@@ -360,9 +361,9 @@ void EntityWidget::RequestSelectedItems(QList<QUuid> uuidList)
 void EntityWidget::RequestSelectedItemChange(EntityTreeItemData *pTreeItemData, QItemSelectionModel::SelectionFlags flags)
 {
 	EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
-	QModelIndex modelIndex = entityTreeModelRef.FindIndex<EntityTreeItemData *>(pTreeItemData, 0);
 
-	ui->nodeTree->selectionModel()->select(modelIndex, flags);
+	ui->nodeTree->selectionModel()->select(entityTreeModelRef.FindIndex<EntityTreeItemData *>(pTreeItemData, EntityTreeModel::COLUMN_CodeName), flags);
+	ui->nodeTree->selectionModel()->select(entityTreeModelRef.FindIndex<EntityTreeItemData *>(pTreeItemData, EntityTreeModel::COLUMN_ItemPath), flags);
 }
 
 void EntityWidget::SetExtrapolatedProperties()
@@ -485,9 +486,25 @@ void EntityWidget::CheckShapeAddBtn(EditorShape eShapeType, bool bAsPrimitive)
 	}
 }
 
-void EntityWidget::CheckVertexEditMode(bool bCheck)
+void EntityWidget::SetAsShapeEditMode(bool bEnableSem)
 {
-	ui->chkShapeEditMode->setChecked(bCheck);
+	ui->chkShapeEditMode->setChecked(bEnableSem);
+	ui->nodeTree->update();
+
+	if(bEnableSem == false)
+		UncheckAll();
+
+	// Check if any selected item is still able to be selected
+	QModelIndexList selectedIndexes = GetSelectedItems();
+	QList<QUuid> uuidList;
+	for(const QModelIndex &index : selectedIndexes)
+	{
+		EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pEntItemData->IsSelected())
+			uuidList.append(pEntItemData->GetUuid());
+	}
+
+	RequestSelectedItems(uuidList);
 }
 
 void EntityWidget::UncheckAll()

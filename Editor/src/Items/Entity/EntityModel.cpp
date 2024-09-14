@@ -131,7 +131,7 @@ EntityModel::AuxWidgetsModel::AuxWidgetsModel(EntityModel &entityModelRef, int i
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
 	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this),
-	m_bVertexEditMode(false),
+	m_bShapeEditMode(false),
 	m_AuxWidgetsModel(*this, itemFileDataRef.m_Meta["framesPerSecond"].toInt(60), itemFileDataRef.m_Meta["autoInitialize"].toBool(true))
 {
 	// The EntityTreeModel ('m_TreeModel') was initialized first so that all the EntityTreeItemData's exist.
@@ -365,7 +365,7 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 	if(iRow < 0)
 		return iRow;
 
-	ClearShapeEdit();
+	//SetShapeEditMode(false);
 
 	// Pop all the key frames associated with this item
 	for(IStateData *pStateData : m_StateList)
@@ -432,21 +432,25 @@ void EntityModel::ToggleShapeAdd(EditorShape eShapeType, bool bAsPrimitive)
 	else
 	{
 		pWidget->UncheckAll();
+		pEntDraw->SetAsShapeEditMode(false);
 		MainWindow::ClearStatus();
-		pEntDraw->ClearShapeEdit();
 	}
+}
+
+bool EntityModel::IsShapeEditMode() const
+{
+	return m_bShapeEditMode;
 }
 
 void EntityModel::ToggleShapeEditMode()
 {
-	SetShapeEditMode(!m_bVertexEditMode);
+	SetShapeEditMode(!m_bShapeEditMode);
 }
 
 void EntityModel::SetShapeEditMode(bool bEnable)
 {
-	m_bVertexEditMode = bEnable;
-
-	if(m_bVertexEditMode)
+	m_bShapeEditMode = bEnable;
+	if(m_bShapeEditMode)
 		MainWindow::SetStatus("Shape Edit Mode", 0);
 	else
 		MainWindow::ClearStatus();
@@ -459,44 +463,13 @@ void EntityModel::SetShapeEditMode(bool bEnable)
 		return;
 	}
 
-	if(m_bVertexEditMode)
-	{
-		// Deselect all items that are not shapes
-		QModelIndexList selectedIndexList = pWidget->GetSelectedItems();
-		for(QModelIndex index : selectedIndexList)
-		{
-			EntityTreeItemData *pTreeItemData = m_TreeModel.data(index, Qt::UserRole).value<EntityTreeItemData *>();
-			if(pTreeItemData->GetType() != ITEM_Primitive && pTreeItemData->GetType() != ITEM_BoundingVolume)
-				pWidget->RequestSelectedItemChange(pTreeItemData, QItemSelectionModel::Deselect);
-		}
+	m_TreeModel.RefreshSelectedItems();
 
-		pEntityDraw->SetAsShapeEditMode();
-	}
-	else
-	{
-		// Deselect all bounding volume items
-		QModelIndexList selectedIndexList = pWidget->GetSelectedItems();
-		for(QModelIndex index : selectedIndexList)
-		{
-			EntityTreeItemData *pTreeItemData = m_TreeModel.data(index, Qt::UserRole).value<EntityTreeItemData *>();
-			if(pTreeItemData->GetType() == ITEM_BoundingVolume)
-				pWidget->RequestSelectedItemChange(pTreeItemData, QItemSelectionModel::Deselect);
-		}
+	pWidget->SetAsShapeEditMode(m_bShapeEditMode);
+	pEntityDraw->SetAsShapeEditMode(m_bShapeEditMode);
 
-		pEntityDraw->ClearShapeEdit();
-	}
-	pWidget->CheckVertexEditMode(m_bVertexEditMode);
-}
-
-void EntityModel::ClearShapeEdit()
-{
-	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
-	if(pWidget)
-		pWidget->UncheckAll();
-
-	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pEntityDraw)
-		pEntityDraw->ClearShapeEdit();
+	pWidget->UpdateActions();
+	pEntityDraw->ApplyJsonData();
 }
 
 QString EntityModel::GenerateCodeName(QString sDesiredName) const

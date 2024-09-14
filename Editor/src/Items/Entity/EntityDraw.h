@@ -45,13 +45,12 @@ public:
 
 	EditorShape GetShapeAddType() const;
 	bool SetAsShapeAdd(EditorShape eShape, bool bAsPrimitive);
-	void SetAsShapeEditMode();
+	void SetAsShapeEditMode(bool bEnable);
 	void ActivateVemOnNextJsonMeta();
 
 	EntityDrawItem *GetCurShapeEditItem() const;
 
 	void RequestClearShapeEdit();
-	void ClearShapeEdit();
 
 	void SetExtrapolatedProperties();
 

@@ -219,13 +219,13 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 
 				for(IDrawExItem *pItem : m_ItemList)
 				{
-					if(pItem->GetTransformCtrl().IsContained(marqueeAabb, m_pCamera))
+					if(pItem->GetTransformCtrl().IsContained(marqueeAabb, m_pCamera) && pItem->IsSelectable())
 						affectedItemList << pItem;
 				}
 
 				m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
 			}
-			else if(m_pCurHoverItem) // This covers the resolution of "Special Case" in DoMousePress
+			else if(m_pCurHoverItem && m_pCurHoverItem->IsSelectable()) // This covers the resolution of "Special Case" in DoMousePress
 				affectedItemList << m_pCurHoverItem;
 
 			if(m_bSelectionHandled == false)
@@ -318,7 +318,7 @@ void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 		m_pCurHoverItem = nullptr;
 		for(int32 i = m_ItemList.size() - 1; i >= 0; --i) // iterate backwards to prioritize selecting items with higher display order
 		{
-			if(m_ItemList[i]->IsMouseInBounds())
+			if(m_ItemList[i]->IsMouseInBounds() && m_ItemList[i]->IsSelectable())
 			{
 				m_pCurHoverItem = m_ItemList[i];
 
@@ -345,6 +345,8 @@ void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 			m_eCurHoverGrabPoint = transformCtrlRef.IsMouseOverGrabPoint();
 			if(SetTransformHoverActionViaGrabPoint(m_eCurHoverGrabPoint, transformCtrlRef.GetCachedRotation()))
 				m_pCurHoverItem = m_SelectedItemList[0]; // Override whatever might be above this item, because we're hovering over a grab point
+			else
+				ClearAction();
 		}
 	}
 }

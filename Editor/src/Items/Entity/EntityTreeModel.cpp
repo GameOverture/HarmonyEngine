@@ -53,6 +53,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, EntityItemDe
 	m_pPropertiesModel(nullptr),
 	m_eDeclarationType(eDeclarationType),
 	m_ReferencedItemUuid(uuidOfReferencedItem),
+	m_bIsLocked(false),
 	m_bIsSelected(false),
 	m_bIsDopeExpanded(true),
 	m_bReallocateDrawItem(false)
@@ -73,7 +74,8 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject 
 	m_sPromotedEntityType(descObj["promotedEntityType"].toString()),
 	m_eDeclarationType(HyGlobal::GetEntityDeclType(descObj["declarationType"].toString())),
 	m_ReferencedItemUuid(descObj["itemUUID"].toString()),
-	m_bIsSelected(descObj["isSelected"].toBool()),
+	m_bIsLocked(descObj["isLocked"].toBool(false)),
+	m_bIsSelected(descObj["isSelected"].toBool(false)),
 	m_bIsDopeExpanded(descObj["isDopeExpanded"].toBool(true)),
 	m_bReallocateDrawItem(false)
 {
@@ -87,6 +89,25 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject 
 /*virtual*/ EntityTreeItemData::~EntityTreeItemData()
 {
 	delete m_pPropertiesModel;
+}
+
+bool EntityTreeItemData::IsSelectable() const
+{
+	if(m_eTYPE == ENTTYPE_ArrayFolder)
+		return true;
+
+	if(m_eTYPE == ENTTYPE_BvFolder)
+		return false;
+
+	return m_bIsLocked == false &&
+		   (m_EntityModelRef.IsShapeEditMode() && (m_eTYPE == ITEM_Primitive || m_eTYPE == ITEM_BoundingVolume)) ||
+		   (m_EntityModelRef.IsShapeEditMode() == false && m_eTYPE != ITEM_BoundingVolume);
+}
+
+void EntityTreeItemData::SetLocked(bool bIsLocked)
+{
+	m_bIsLocked = bIsLocked;
+	m_bIsSelected = IsSelectable() ? m_bIsSelected : false;
 }
 
 EntityItemType EntityTreeItemData::GetEntType() const
@@ -174,7 +195,7 @@ bool EntityTreeItemData::IsSelected() const
 
 void EntityTreeItemData::SetSelected(bool bIsSelected)
 {
-	m_bIsSelected = bIsSelected;
+	m_bIsSelected = IsSelectable() ? bIsSelected : false;
 }
 
 bool EntityTreeItemData::IsDopeExpanded() const
@@ -235,6 +256,7 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 	childObjRef.insert("promotedEntityType", m_sPromotedEntityType);
 	childObjRef.insert("declarationType", ENTITYITEMDECLARATIONTYPE_STRINGS[m_eDeclarationType]);
 	childObjRef.insert("itemUUID", m_ReferencedItemUuid.toString(QUuid::WithoutBraces));
+	childObjRef.insert("isLocked", m_bIsLocked);
 	childObjRef.insert("isSelected", m_bIsSelected);
 	childObjRef.insert("isDopeExpanded", m_bIsDopeExpanded);
 }
@@ -703,6 +725,17 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 	return true;
 }
 
+void EntityTreeModel::RefreshSelectedItems()
+{
+	QModelIndexList itemIndexList = GetAllIndices();
+	for(int i = 0; i < itemIndexList.size(); ++i)
+	{
+		EntityTreeItemData *pItem = data(itemIndexList[i], Qt::UserRole).value<EntityTreeItemData *>();
+		if(pItem->IsSelected() && pItem->IsSelectable() == false)
+			pItem->SetSelected(false);
+	}
+}
+
 EntityTreeItemData *EntityTreeModel::Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow /*= -1*/)
 {
 	// Generate a unique code name for this new item
@@ -994,7 +1027,16 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 
 /*virtual*/ Qt::ItemFlags EntityTreeModel::flags(const QModelIndex &indexRef) const /*override*/
 {
-	return QAbstractItemModel::flags(indexRef);
+	EntityTreeItemData *pItem = GetItem(indexRef)->data(0).value<EntityTreeItemData *>();
+
+	Qt::ItemFlags returnFlags = Qt::NoItemFlags;
+	if(pItem->IsSelectable())
+		returnFlags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+	
+	if(pItem->GetEntType() == ENTTYPE_BvFolder)
+		returnFlags |= Qt::ItemIsEnabled;
+	
+	return returnFlags;
 }
 
 /*virtual*/ void EntityTreeModel::OnTreeModelItemRemoved(TreeModelItem *pTreeItem) /*override*/

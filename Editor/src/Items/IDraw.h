@@ -46,6 +46,7 @@ enum DrawAction
 	HYACTION_EntityAddShapeDrag,			// User is mouse dragging to create the new shape
 
 	HYACTION_EntitySem,						// Default/Blank state of Shape Edit Mode (SEM) - This action is set using SetBackgroundAction() until the mode is toggled off
+	HYACTION_EntitySemHoverItem,
 	HYACTION_EntitySemHoverTranslate,		// Translates all vertices of the shape
 	HYACTION_EntitySemHoverAddVertex,		// When holding CTRL, shows cross-hair to add a new vertex
 	HYACTION_EntitySemHoverGrabVertex,		// Hovering over a vertex to grab and move it

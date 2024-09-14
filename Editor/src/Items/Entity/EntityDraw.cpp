@@ -105,6 +105,23 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	}
 	else if((IsActionSemIdle() || GetCurAction() == HYACTION_EntitySemInvalid) && pCurVertexEditItem)
 	{
+		m_pCurHoverItem = nullptr;
+		for(int32 i = m_ItemList.size() - 1; i >= 0; --i) // iterate backwards to prioritize selecting items with higher display order
+		{
+			if(m_ItemList[i]->IsMouseInBounds() && m_ItemList[i]->IsSelectable())
+			{
+				m_pCurHoverItem = m_ItemList[i];
+
+				if(m_SelectedItemList.contains(m_pCurHoverItem) == false)
+					SetAction(HYACTION_EntitySemHoverItem);
+
+				break;
+			}
+		}
+		if(GetCurAction() == HYACTION_EntitySemHoverItem && m_pCurHoverItem == nullptr)
+			ClearAction();
+
+
 		DrawAction eTrySemHoverAction = pCurVertexEditItem->GetShapeCtrl().GetMouseSemHoverAction(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), false);
 		if(eTrySemHoverAction == HYACTION_EntitySem)
 			ClearAction();
@@ -302,20 +319,40 @@ bool EntityDraw::SetAsShapeAdd(EditorShape eShape, bool bAsPrimitive)
 	return false;
 }
 
-void EntityDraw::SetAsShapeEditMode()
+void EntityDraw::SetAsShapeEditMode(bool bEnable)
 {
-	if(SetBackgroundAction(HYACTION_EntitySem))
+	if(bEnable)
 	{
-		EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
+		if(SetBackgroundAction(HYACTION_EntitySem))
+		{
+			EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
 
+			if(pCurVertexEditItem)
+			{
+				pCurVertexEditItem = static_cast<EntityDrawItem *>(m_SelectedItemList[0]);
+				pCurVertexEditItem->HideTransformCtrl();
+				pCurVertexEditItem->GetShapeCtrl().EnableVertexEditMode();
+			}
+
+			m_ShapeEditModeWindowOutline.SetVisible(true);
+		}
+	}
+	else
+	{
+		m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+
+		EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
 		if(pCurVertexEditItem)
 		{
-			pCurVertexEditItem = static_cast<EntityDrawItem *>(m_SelectedItemList[0]);
-			pCurVertexEditItem->HideTransformCtrl();
-			pCurVertexEditItem->GetShapeCtrl().EnableVertexEditMode();
+			pCurVertexEditItem->ShowTransformCtrl(true);
+			pCurVertexEditItem->GetShapeCtrl().ClearVertexEditMode();
 		}
 
-		m_ShapeEditModeWindowOutline.SetVisible(true);
+		ClearAction();
+		if(m_eBackgroundDrawAction == HYACTION_EntitySem)
+			ClearBackgroundAction();
+
+		m_ShapeEditModeWindowOutline.SetVisible(false);
 	}
 }
 
@@ -334,25 +371,7 @@ EntityDrawItem *EntityDraw::GetCurShapeEditItem() const
 
 void EntityDraw::RequestClearShapeEdit()
 {
-	static_cast<EntityModel *>(m_pProjItem->GetModel())->ClearShapeEdit();
-}
-
-void EntityDraw::ClearShapeEdit()
-{
-	m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
-
-	EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
-	if(pCurVertexEditItem)
-	{
-		pCurVertexEditItem->ShowTransformCtrl(true);
-		pCurVertexEditItem->GetShapeCtrl().ClearVertexEditMode();
-	}
-
-	ClearAction();
-	if(m_eBackgroundDrawAction == HYACTION_EntitySem)
-		ClearBackgroundAction();
-
-	m_ShapeEditModeWindowOutline.SetVisible(false);
+	static_cast<EntityModel *>(m_pProjItem->GetModel())->SetShapeEditMode(false);
 }
 
 void EntityDraw::SetExtrapolatedProperties()
@@ -465,7 +484,8 @@ void EntityDraw::SetExtrapolatedProperties()
 		QJsonObject descObj = descObjList[i];
 		ItemType eType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
 		QUuid uuid(descObj["UUID"].toString());
-		bool bSelected = descObj["isSelected"].toBool();
+		//bool bIsLocked = descObj["isLocked"].toBool();
+		//bool bSelected = descObj["isSelected"].toBool();
 
 		EntityDrawItem *pDrawItem = nullptr;
 		for(IDrawExItem *pStaleItem : staleItemList)
@@ -502,7 +522,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		m_ItemList.push_back(pDrawItem);
 		m_RootEntity.ChildAppend(*pDrawItem->GetHyNode());
 
-		if(bSelected)
+		if(pDrawItem->GetEntityTreeItemData()->IsSelected() && pDrawItem->GetEntityTreeItemData()->IsSelectable())
 			m_SelectedItemList.push_back(pDrawItem);
 		else
 			pDrawItem->HideTransformCtrl();

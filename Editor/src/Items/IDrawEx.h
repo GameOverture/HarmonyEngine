@@ -44,7 +44,7 @@ protected:
 	QList<IDrawExItem *>					m_ItemList;			// Items MUST be dynamically allocated
 	QList<IDrawExItem *>					m_SelectedItemList;
 
-	ShapeCtrl								m_DragShape;		// Used for marquee selects and initially adding new shapes
+	ShapeCtrl								m_DragShape;		// Used for marquee selects (or creating new shapes in EntityDraw)
 
 	// Multi transform used when 'm_SelectedItemList' contains more than 1 item. It wraps around all selected items.
 	TransformCtrl							m_MultiTransform;

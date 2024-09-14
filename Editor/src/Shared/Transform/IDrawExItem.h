@@ -23,6 +23,7 @@ public:
 	IDrawExItem(HyEntity2d *pParent);
 	virtual ~IDrawExItem();
 
+	virtual bool IsSelectable() const { return true; }
 	virtual IHyBody2d *GetHyNode() = 0;
 	virtual bool IsSelected() = 0;
 

@@ -114,6 +114,7 @@ public:
 	EntityDrawItem(Project &projectRef, EntityTreeItemData *pModelItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent);
 	virtual ~EntityDrawItem();
 
+	virtual bool IsSelectable() const override;
 	virtual IHyBody2d *GetHyNode() override;
 	virtual bool IsSelected() override;
 

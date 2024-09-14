@@ -67,6 +67,7 @@ class EntityTreeItemData : public TreeModelItemData
 
 	QUuid												m_ReferencedItemUuid;
 
+	bool												m_bIsLocked;			// Whether this item is locked and cannot be selected
 	bool												m_bIsSelected;			// Whether this item is considered selected. Applicable to in all views (Harmony, Node List, Dope Sheet, etc)
 	bool												m_bIsDopeExpanded;		// True when this item is expanded and showing all its property keyframes on each row. False shows a collapsed, single row with all its keyframes
 	
@@ -76,6 +77,9 @@ public:
 	EntityTreeItemData(EntityModel &entityModelRef, EntityItemDeclarationType eDeclarationType, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfReferencedItem, QUuid uuidOfThis);
 	EntityTreeItemData(EntityModel &entityModelRef, QJsonObject descObj, bool bIsArrayItem);
 	virtual ~EntityTreeItemData();
+
+	bool IsSelectable() const;
+	void SetLocked(bool bIsLocked);
 
 	EntityItemType GetEntType() const;
 	QString GetHyNodeTypeName(bool bIncludeNamespace) const;
@@ -116,6 +120,7 @@ class EntityTreeModel : public ITreeModel
 
 	EntityModel &										m_ModelRef;
 
+public:
 	enum ColumnType
 	{
 		COLUMN_CodeName = 0,
@@ -141,6 +146,8 @@ public:
 	EntityTreeItemData *FindTreeItemData(QUuid uuid) const;
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
+
+	void RefreshSelectedItems();
 
 private: // These functions should only be called by EntityModel's Cmd_ functions
 	EntityTreeItemData *Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);

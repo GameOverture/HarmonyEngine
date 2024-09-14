@@ -99,6 +99,11 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 	delete m_pChild;
 }
 
+/*virtual*/ bool EntityDrawItem::IsSelectable() const /*override*/
+{
+	return m_pEntityTreeItemData->IsSelectable();
+}
+
 /*virtual*/ IHyBody2d *EntityDrawItem::GetHyNode() /*override*/
 {
 	if(m_pEntityTreeItemData->GetType() == ITEM_Primitive || m_pEntityTreeItemData->GetType() == ITEM_BoundingVolume)
