@@ -365,7 +365,8 @@ void IDraw::UpdateDrawStatus()
 	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
 	if(m_GuideMap.empty() == false)
 	{
-		const int iSELECT_RADIUS = 2;
+		const int iSELECT_RADIUS = HYNUM_ZOOMLEVELS - (m_pCamera->SetZoomLevel());
+
 		bool bIsOverGuide = false;
 		for(auto iter = m_GuideMap.begin(); iter != m_GuideMap.end(); ++iter)
 		{
