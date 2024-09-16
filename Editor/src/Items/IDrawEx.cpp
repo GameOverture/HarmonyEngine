@@ -351,7 +351,7 @@ void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 			m_eCurHoverGrabPoint = transformCtrlRef.IsMouseOverGrabPoint();
 			if(SetTransformHoverActionViaGrabPoint(m_eCurHoverGrabPoint, transformCtrlRef.GetCachedRotation()))
 				m_pCurHoverItem = m_SelectedItemList[0]; // Override whatever might be above this item, because we're hovering over a grab point
-			else
+			else if(m_eDrawAction == HYACTION_HoverScale || m_eDrawAction == HYACTION_HoverRotate)
 				ClearAction();
 		}
 	}

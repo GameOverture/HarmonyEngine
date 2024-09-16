@@ -102,7 +102,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
 		m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptWorldMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
 	}
-	else if((IsActionSemIdle() || GetCurAction() == HYACTION_EntitySemInvalid) && pCurVertexEditItem)
+	else if((IsActionSemIdle() || GetCurAction() == HYACTION_EntitySemInvalid))
 	{
 		m_pCurHoverItem = nullptr;
 		for(int32 i = m_ItemList.size() - 1; i >= 0; --i) // iterate backwards to prioritize selecting items with higher display order
@@ -121,11 +121,14 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			ClearAction();
 
 
-		DrawAction eTrySemHoverAction = pCurVertexEditItem->GetShapeCtrl().GetMouseSemHoverAction(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), false);
-		if(eTrySemHoverAction == HYACTION_EntitySem)
-			ClearAction();
+		if(pCurVertexEditItem)
+		{
+			DrawAction eTrySemHoverAction = pCurVertexEditItem->GetShapeCtrl().GetMouseSemHoverAction(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), false);
+			if(eTrySemHoverAction == HYACTION_EntitySem)
+				ClearAction();
 
-		SetAction(eTrySemHoverAction);
+			SetAction(eTrySemHoverAction);
+		}
 	}
 	else if(IsActionSemTransforming() && pCurVertexEditItem)
 	{
@@ -139,44 +142,46 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	if(pEvent->button() == Qt::LeftButton)
 	{
-		EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
-
 		if(GetCurAction() == HYACTION_EntityAddShape)
 		{
 			//m_PressTimer.InitStart(0.5f); // No timer, must drag a minimal amount
 			SetAction(HYACTION_EntityAddShapePending);
 		}
-		else if(IsActionSemIdle() && pCurVertexEditItem)
+		else
 		{
-			DrawAction eSemAction = pCurVertexEditItem->GetShapeCtrl().GetMouseSemHoverAction(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), true);
-			if(eSemAction == HYACTION_EntitySem)
+			EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
+			if(pCurVertexEditItem)
 			{
-				pCurVertexEditItem->GetShapeCtrl().UnselectAllVemVerts();
-				SetAction(HYACTION_EntitySemMarquee);
-			}
-			else
-			{
-				// Convert the hover action to the transform action
-				switch(eSemAction)
+				DrawAction eSemAction = pCurVertexEditItem->GetShapeCtrl().GetMouseSemHoverAction(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), true);
+				if(eSemAction == HYACTION_EntitySem)
 				{
-				case HYACTION_EntitySemHoverTranslate:			eSemAction = HYACTION_EntitySemTranslating; break;
-				case HYACTION_EntitySemHoverAddVertex:			eSemAction = HYACTION_EntitySemAddingVertex; break;
-				case HYACTION_EntitySemHoverGrabVertex:			eSemAction = HYACTION_EntitySemTranslateVertex; break;
-				case HYACTION_EntitySemHoverRadiusHorizontal:	eSemAction = HYACTION_EntitySemRadiusHorizontal; break;
-				case HYACTION_EntitySemHoverRadiusVertical:		eSemAction = HYACTION_EntitySemRadiusVertical; break;
-				
-				case HYACTION_EntitySemInvalid:
-					break;
-
-				default:
-					HyGuiLog("EntityDraw::OnMousePressEvent - Invalid eSemHoverAction", LOGTYPE_Error);
+					pCurVertexEditItem->GetShapeCtrl().UnselectAllVemVerts();
+					SetAction(HYACTION_EntitySemMarquee);
 				}
+				else
+				{
+					// Convert the hover action to the transform action
+					switch(eSemAction)
+					{
+					case HYACTION_EntitySemHoverTranslate:			eSemAction = HYACTION_EntitySemTranslating; break;
+					case HYACTION_EntitySemHoverAddVertex:			eSemAction = HYACTION_EntitySemAddingVertex; break;
+					case HYACTION_EntitySemHoverGrabVertex:			eSemAction = HYACTION_EntitySemTranslateVertex; break;
+					case HYACTION_EntitySemHoverRadiusHorizontal:	eSemAction = HYACTION_EntitySemRadiusHorizontal; break;
+					case HYACTION_EntitySemHoverRadiusVertical:		eSemAction = HYACTION_EntitySemRadiusVertical; break;
 
-				if(SetAction(eSemAction))
-					pCurVertexEditItem->GetShapeCtrl().TransformSemVerts(GetCurAction(), m_ptDragStart, m_ptDragStart, m_pCamera);
+					case HYACTION_EntitySemInvalid:
+						break;
 
-				//m_PressTimer.InitStart(0.5f);
-				//m_eDragState = DRAGSTATE_Pending;
+					default:
+						HyGuiLog("EntityDraw::OnMousePressEvent - Invalid eSemHoverAction", LOGTYPE_Error);
+					}
+
+					if(SetAction(eSemAction))
+						pCurVertexEditItem->GetShapeCtrl().TransformSemVerts(GetCurAction(), m_ptDragStart, m_ptDragStart, m_pCamera);
+
+					//m_PressTimer.InitStart(0.5f);
+					//m_eDragState = DRAGSTATE_Pending;
+				}
 			}
 		}
 	}
@@ -282,6 +287,7 @@ bool EntityDraw::IsSemEnabled() const
 bool EntityDraw::IsActionSemIdle() const
 {
 	return m_eDrawAction == HYACTION_EntitySem ||
+		   m_eDrawAction == HYACTION_EntitySemHoverItem ||
 		   m_eDrawAction == HYACTION_EntitySemHoverTranslate ||
 		   m_eDrawAction == HYACTION_EntitySemHoverAddVertex ||
 		   m_eDrawAction == HYACTION_EntitySemHoverGrabVertex ||
