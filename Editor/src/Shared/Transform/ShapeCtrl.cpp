@@ -461,14 +461,14 @@ void ShapeCtrl::EnableVertexEditMode()
 	UnselectAllVemVerts();
 }
 
-DrawAction ShapeCtrl::GetMouseSemHoverAction(bool bCtrlMod, bool bShiftMod, bool bSelectVert)
+SemState ShapeCtrl::GetMouseSemHoverAction(bool bCtrlMod, bool bShiftMod, bool bSelectVert)
 {
 	if(bCtrlMod && m_eShape != SHAPE_None && m_eShape != SHAPE_Box && m_eShape != SHAPE_Circle && m_eShape != SHAPE_LineSegment)
 	{
 		if(m_eShape == SHAPE_Polygon && m_VertexGrabPointList.count() >= b2_maxPolygonVertices)
-			return HYACTION_EntitySemInvalid;
+			return SEMSTATE_Invalid;
 		
-		return HYACTION_EntitySemHoverAddVertex;
+		return SEMSTATE_Add;
 	}
 
 	// Get selected grab points
@@ -492,13 +492,13 @@ DrawAction ShapeCtrl::GetMouseSemHoverAction(bool bCtrlMod, bool bShiftMod, bool
 		}
 
 		if(HyMath::TestPointAABB(selectedVertsArea, HyEngine::Input().GetMousePos()))
-			return HYACTION_EntitySemHoverTranslate;
+			return SEMSTATE_Translate;
 	}
 
 	switch(m_eShape)
 	{
 	case SHAPE_None:
-		return HYACTION_EntitySem;
+		return SEMSTATE_None;
 
 	case SHAPE_Box:
 	case SHAPE_Polygon:
@@ -511,7 +511,7 @@ DrawAction ShapeCtrl::GetMouseSemHoverAction(bool bCtrlMod, bool bShiftMod, bool
 			{
 				if(bSelectVert)
 					pGrabPt->SetSelected(true);
-				return HYACTION_EntitySemHoverGrabVertex;
+				return SEMSTATE_GrabPoint;
 			}
 		}
 		break;
@@ -525,15 +525,15 @@ DrawAction ShapeCtrl::GetMouseSemHoverAction(bool bCtrlMod, bool bShiftMod, bool
 					m_VertexGrabPointList[i]->SetSelected(true);
 
 				if(i == 0)
-					return HYACTION_EntitySemHoverTranslate;
+					return SEMSTATE_Translate;
 
-				return i & 1 ? HYACTION_EntitySemHoverRadiusHorizontal : HYACTION_EntitySemHoverRadiusVertical;
+				return i & 1 ? SEMSTATE_RadiusHorizontal : SEMSTATE_RadiusVertical;
 			}
 		}
 		break;
 	}
 
-	return HYACTION_EntitySem;
+	return SEMSTATE_None;
 }
 
 void ShapeCtrl::SelectVemVerts(b2AABB selectionAabb, HyCamera2d *pCamera)
@@ -547,7 +547,7 @@ void ShapeCtrl::SelectVemVerts(b2AABB selectionAabb, HyCamera2d *pCamera)
 	}
 }
 
-void ShapeCtrl::TransformSemVerts(DrawAction eAction, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera)
+void ShapeCtrl::TransformSemVerts(SemState eSemState, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera)
 {
 	// Calculate mouse drag (vTranslate) in camera coordinates
 	pCamera->ProjectToCamera(ptStartPos, ptStartPos);
@@ -556,10 +556,10 @@ void ShapeCtrl::TransformSemVerts(DrawAction eAction, glm::vec2 ptStartPos, glm:
 
 	// Apply the transform based on the action
 	DeserializeOutline(pCamera);
-	switch(eAction)
+	switch(eSemState)
 	{
-	case HYACTION_EntitySemTranslating:
-	case HYACTION_EntitySemTranslateVertex: {
+	case SEMSTATE_Translate:
+	case SEMSTATE_GrabPoint: {
 		// Get currently selected grab points
 		QList<GrabPoint *> selectedGrabPtList;
 		for(GrabPoint *pGrabPt : m_VertexGrabPointList)
@@ -656,13 +656,13 @@ void ShapeCtrl::TransformSemVerts(DrawAction eAction, glm::vec2 ptStartPos, glm:
 		break; }
 
 	//////////////////////////////////////////////////////////////////////////
-	case HYACTION_EntitySemRadiusHorizontal:
-	case HYACTION_EntitySemRadiusVertical:
+	case SEMSTATE_RadiusHorizontal:
+	case SEMSTATE_RadiusVertical:
 		m_Outline.SetAsCircle(m_VertexGrabPointList[0]->pos.Get(), glm::distance(m_VertexGrabPointList[0]->pos.Get(), ptDragPos));
 		break;
 
 	//////////////////////////////////////////////////////////////////////////
-	case HYACTION_EntitySemAddingVertex: {
+	case SEMSTATE_Add: {
 		std::vector<glm::vec2> vertList;
 		for(GrabPoint *pGrabPt : m_VertexGrabPointList)
 			vertList.push_back(pGrabPt->pos.Get());

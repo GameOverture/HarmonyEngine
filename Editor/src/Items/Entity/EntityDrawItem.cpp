@@ -738,7 +738,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 						color = HyColor::White;
 						if(propsObj.contains("Body") && propsObj["Body"].toObject().contains("Color Tint"))
 						{
-							QJsonArray colorArray = propsObj["Color Tint"].toArray();
+							QJsonArray colorArray = propsObj["Body"].toObject()["Color Tint"].toArray();
 							color = HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt());
 						}
 					}

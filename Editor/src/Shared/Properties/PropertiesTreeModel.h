@@ -45,7 +45,7 @@ enum PropertiesType
 	PROPERTIESTYPE_ComboBoxString,	// delegateBuilder [QStringList] = QComboBox's selection list
 	PROPERTIESTYPE_StatesComboBox,	// delegateBuilder [QUuid] = The ProjectItemData's UUID that contains the states
 	PROPERTIESTYPE_Slider,
-	PROPERTIESTYPE_Color,
+	PROPERTIESTYPE_Color,			// NOTE: Internally uses QVariant like `PROPERTIESTYPE_ivec3`
 	PROPERTIESTYPE_SpriteFrames,	// delegateBuilder [QUuid] = The ProjectItemData's UUID that contains the sprite frames
 };
 

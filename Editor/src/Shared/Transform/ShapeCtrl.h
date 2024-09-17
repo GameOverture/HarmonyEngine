@@ -14,6 +14,19 @@
 #include "GrabPoint.h"
 #include "IDraw.h"
 
+enum SemState
+{
+	SEMSTATE_Invalid = -2,
+	SEMSTATE_None = -1,
+
+	SEMSTATE_Translate = 0,
+	SEMSTATE_GrabPoint,
+	SEMSTATE_RadiusHorizontal,
+	SEMSTATE_RadiusVertical,
+	SEMSTATE_Add,
+	SEMSTATE_RemoveSelected
+};
+
 class ShapeCtrl
 {
 protected:
@@ -49,9 +62,9 @@ public:
 
 	bool IsVemEnabled() const;
 	void EnableVertexEditMode();
-	DrawAction GetMouseSemHoverAction(bool bCtrlMod, bool bShiftMod, bool bSelectVert);
+	SemState GetMouseSemHoverAction(bool bCtrlMod, bool bShiftMod, bool bSelectVert);
 	void SelectVemVerts(b2AABB selectionAabb, HyCamera2d *pCamera);
-	void TransformSemVerts(DrawAction eAction, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
+	void TransformSemVerts(SemState eSemState, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
 	bool RemoveSelectedVerts();
 	QString SerializeVemVerts(HyCamera2d *pCamera);
 	void UnselectAllVemVerts();

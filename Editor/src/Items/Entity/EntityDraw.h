@@ -39,8 +39,8 @@ public:
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) override;
 
 	bool IsSemEnabled() const;
-	bool IsActionSemIdle() const;
-	bool IsActionSemTransforming() const;
+	//bool IsActionSemIdle() const;
+	//bool IsActionSemTransforming() const;
 
 	EditorShape GetShapeAddType() const;
 	bool SetAsShapeAdd(EditorShape eShape, bool bAsPrimitive);

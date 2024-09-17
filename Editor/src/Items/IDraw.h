@@ -45,23 +45,23 @@ enum DrawAction
 	HYACTION_EntityAddShapePending,
 	HYACTION_EntityAddShapeDrag,			// User is mouse dragging to create the new shape
 
-	HYACTION_EntitySem,						// Default/Blank state of Shape Edit Mode (SEM) - This action is set using SetBackgroundAction() until the mode is toggled off
-	HYACTION_EntitySemHoverItem,
-	HYACTION_EntitySemHoverTranslate,		// Translates all vertices of the shape
-	HYACTION_EntitySemHoverAddVertex,		// When holding CTRL, shows cross-hair to add a new vertex
-	HYACTION_EntitySemHoverGrabVertex,		// Hovering over a vertex to grab and move it
-	HYACTION_EntitySemHoverRadiusHorizontal,// Circle Shape's horizontal radius grab vertex
-	HYACTION_EntitySemHoverRadiusVertical,	// Circle Shape's vertical radius grab vertex
+	//HYACTION_EntitySem,						// Default/Blank state of Shape Edit Mode (SEM) - This action is set using SetBackgroundAction() until the mode is toggled off
+	//HYACTION_EntitySemHoverItem,
+	//HYACTION_EntitySemHoverTranslate,		// Translates all vertices of the shape
+	//HYACTION_EntitySemHoverAddVertex,		// When holding CTRL, shows cross-hair to add a new vertex
+	//HYACTION_EntitySemHoverGrabVertex,		// Hovering over a vertex to grab and move it
+	//HYACTION_EntitySemHoverRadiusHorizontal,// Circle Shape's horizontal radius grab vertex
+	//HYACTION_EntitySemHoverRadiusVertical,	// Circle Shape's vertical radius grab vertex
 
-	HYACTION_EntitySemMarquee,
+	//HYACTION_EntitySemMarquee,
 
-	HYACTION_EntitySemTranslating,
-	HYACTION_EntitySemAddingVertex,
-	HYACTION_EntitySemTranslateVertex,
-	HYACTION_EntitySemRadiusHorizontal,
-	HYACTION_EntitySemRadiusVertical,
-	
-	HYACTION_EntitySemInvalid,				// Indicates an invalid SEM action taking place (trying to add too many vertices to polygon, invalid vertex placement, etc)
+	//HYACTION_EntitySemTranslating,
+	//HYACTION_EntitySemAddingVertex,
+	//HYACTION_EntitySemTranslateVertex,
+	//HYACTION_EntitySemRadiusHorizontal,
+	//HYACTION_EntitySemRadiusVertical,
+	//
+	//HYACTION_EntitySemInvalid,				// Indicates an invalid SEM action taking place (trying to add too many vertices to polygon, invalid vertex placement, etc)
 
 	// High Priority Basic Actions:
 	HYACTION_Forbidden,						// Disable and prevents any other actions from occurring, but still allows camera panning

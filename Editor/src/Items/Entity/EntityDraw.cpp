@@ -14,6 +14,7 @@
 #include "EntityUndoCmds.h"
 
 #include <QKeyEvent>
+#include <QApplication>
 
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDrawEx(pProjItem, initFileDataRef),
@@ -47,7 +48,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	if(pEvent->key() == Qt::Key_Backspace) // Qt::Key_Delete isn't being passed to this callback
 	{
 		EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
-		if(IsActionSemIdle() && pCurVertexEditItem)
+		if(pCurVertexEditItem)
 		{
 			if(pCurVertexEditItem->GetShapeCtrl().RemoveSelectedVerts() == false)
 				return;
@@ -94,46 +95,46 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	{
 		m_DragShape.SetAsDrag(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), m_ptDragStart, ptCurMousePos, m_pCamera);
 	}
-	else if(GetCurAction() == HYACTION_EntitySemMarquee)
-	{
-		glm::vec2 ptWorldMousePos;
-		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
+	//else if(GetCurAction() == HYACTION_EntitySemMarquee)
+	//{
+	//	glm::vec2 ptWorldMousePos;
+	//	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
 
-		m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
-		m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptWorldMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
-	}
-	else if((IsActionSemIdle() || GetCurAction() == HYACTION_EntitySemInvalid))
-	{
-		m_pCurHoverItem = nullptr;
-		for(int32 i = m_ItemList.size() - 1; i >= 0; --i) // iterate backwards to prioritize selecting items with higher display order
-		{
-			if(m_ItemList[i]->IsMouseInBounds() && m_ItemList[i]->IsSelectable())
-			{
-				m_pCurHoverItem = m_ItemList[i];
+	//	m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
+	//	m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptWorldMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
+	//}
+	//else if((IsActionSemIdle() || GetCurAction() == HYACTION_EntitySemInvalid))
+	//{
+	//	m_pCurHoverItem = nullptr;
+	//	for(int32 i = m_ItemList.size() - 1; i >= 0; --i) // iterate backwards to prioritize selecting items with higher display order
+	//	{
+	//		if(m_ItemList[i]->IsMouseInBounds() && m_ItemList[i]->IsSelectable())
+	//		{
+	//			m_pCurHoverItem = m_ItemList[i];
 
-				if(m_SelectedItemList.contains(m_pCurHoverItem) == false)
-					SetAction(HYACTION_EntitySemHoverItem);
+	//			if(m_SelectedItemList.contains(m_pCurHoverItem) == false)
+	//				SetAction(HYACTION_EntitySemHoverItem);
 
-				break;
-			}
-		}
-		if(GetCurAction() == HYACTION_EntitySemHoverItem && m_pCurHoverItem == nullptr)
-			ClearAction();
+	//			break;
+	//		}
+	//	}
+	//	if(GetCurAction() == HYACTION_EntitySemHoverItem && m_pCurHoverItem == nullptr)
+	//		ClearAction();
 
 
-		if(pCurVertexEditItem)
-		{
-			DrawAction eTrySemHoverAction = pCurVertexEditItem->GetShapeCtrl().GetMouseSemHoverAction(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), false);
-			if(eTrySemHoverAction == HYACTION_EntitySem)
-				ClearAction();
+	//	if(pCurVertexEditItem)
+	//	{
+	//		DrawAction eTrySemHoverAction = pCurVertexEditItem->GetShapeCtrl().GetMouseSemHoverAction(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), false);
+	//		if(eTrySemHoverAction == HYACTION_EntitySem)
+	//			ClearAction();
 
-			SetAction(eTrySemHoverAction);
-		}
-	}
-	else if(IsActionSemTransforming() && pCurVertexEditItem)
-	{
-		pCurVertexEditItem->GetShapeCtrl().TransformSemVerts(GetCurAction(), m_ptDragStart, ptCurMousePos, m_pCamera);
-	}
+	//		SetAction(eTrySemHoverAction);
+	//	}
+	//}
+	//else if(IsActionSemTransforming() && pCurVertexEditItem)
+	//{
+	//	pCurVertexEditItem->GetShapeCtrl().TransformSemVerts(GetCurAction(), m_ptDragStart, ptCurMousePos, m_pCamera);
+	//}
 }
 
 /*virtual*/ void EntityDraw::OnMousePressEvent(QMouseEvent *pEvent) /*override*/
@@ -152,43 +153,40 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
 			if(pCurVertexEditItem)
 			{
-				DrawAction eSemAction = pCurVertexEditItem->GetShapeCtrl().GetMouseSemHoverAction(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), true);
-				if(eSemAction == HYACTION_EntitySem)
-				{
-					pCurVertexEditItem->GetShapeCtrl().UnselectAllVemVerts();
-					SetAction(HYACTION_EntitySemMarquee);
-				}
-				else
-				{
-					// Convert the hover action to the transform action
-					switch(eSemAction)
-					{
-					case HYACTION_EntitySemHoverTranslate:			eSemAction = HYACTION_EntitySemTranslating; break;
-					case HYACTION_EntitySemHoverAddVertex:			eSemAction = HYACTION_EntitySemAddingVertex; break;
-					case HYACTION_EntitySemHoverGrabVertex:			eSemAction = HYACTION_EntitySemTranslateVertex; break;
-					case HYACTION_EntitySemHoverRadiusHorizontal:	eSemAction = HYACTION_EntitySemRadiusHorizontal; break;
-					case HYACTION_EntitySemHoverRadiusVertical:		eSemAction = HYACTION_EntitySemRadiusVertical; break;
+				SemState eSemState = pCurVertexEditItem->GetShapeCtrl().GetMouseSemHoverAction(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), true);
+				//if(eSemAction == HYACTION_EntitySem)
+				//{
+				//	pCurVertexEditItem->GetShapeCtrl().UnselectAllVemVerts();
+				//	SetAction(HYACTION_EntitySemMarquee);
+				//}
+				//else
+				//{
+				//	// Convert the hover action to the transform action
+				//	switch(eSemAction)
+				//	{
+				//	case HYACTION_EntitySemHoverTranslate:			eSemAction = HYACTION_EntitySemTranslating; break;
+				//	case HYACTION_EntitySemHoverAddVertex:			eSemAction = HYACTION_EntitySemAddingVertex; break;
+				//	case HYACTION_EntitySemHoverGrabVertex:			eSemAction = HYACTION_EntitySemTranslateVertex; break;
+				//	case HYACTION_EntitySemHoverRadiusHorizontal:	eSemAction = HYACTION_EntitySemRadiusHorizontal; break;
+				//	case HYACTION_EntitySemHoverRadiusVertical:		eSemAction = HYACTION_EntitySemRadiusVertical; break;
 
-					case HYACTION_EntitySemInvalid:
-						break;
+				//	case HYACTION_EntitySemInvalid:
+				//		break;
 
-					default:
-						HyGuiLog("EntityDraw::OnMousePressEvent - Invalid eSemHoverAction", LOGTYPE_Error);
-					}
+				//	default:
+				//		HyGuiLog("EntityDraw::OnMousePressEvent - Invalid eSemHoverAction", LOGTYPE_Error);
+				//	}
 
-					if(SetAction(eSemAction))
-						pCurVertexEditItem->GetShapeCtrl().TransformSemVerts(GetCurAction(), m_ptDragStart, m_ptDragStart, m_pCamera);
-
-					//m_PressTimer.InitStart(0.5f);
-					//m_eDragState = DRAGSTATE_Pending;
-				}
+				//	if(SetAction(eSemAction))
+				//		pCurVertexEditItem->GetShapeCtrl().TransformSemVerts(GetCurAction(), m_ptDragStart, m_ptDragStart, m_pCamera);
+				//}
 			}
 		}
 	}
 	else if(pEvent->button() == Qt::RightButton)
 	{
-		if(IsActionSemIdle() || IsActionSemTransforming())
-			RequestClearShapeEdit();
+		//if(IsActionSemIdle() || IsActionSemTransforming())
+		//	RequestClearShapeEdit();
 	}
 }
 
@@ -215,94 +213,94 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			ClearAction();
 		}
 	}
-	else if(GetCurAction() == HYACTION_EntitySemMarquee)
-	{
-		b2AABB marqueeAabb;
-		HyShape2d tmpShape;
-		m_DragShape.GetPrimitive().CalcLocalBoundingShape(tmpShape);
-		tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
+	//else if(GetCurAction() == HYACTION_EntitySemMarquee)
+	//{
+	//	b2AABB marqueeAabb;
+	//	HyShape2d tmpShape;
+	//	m_DragShape.GetPrimitive().CalcLocalBoundingShape(tmpShape);
+	//	tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
 
-		if(pCurVertexEditItem)
-		{
-			if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier) == false)
-				pCurVertexEditItem->GetShapeCtrl().UnselectAllVemVerts();
-			pCurVertexEditItem->GetShapeCtrl().SelectVemVerts(marqueeAabb, m_pCamera);
-		}
-		else
-		{
-			// TODO: Select all shapes within the marquee
-		}
+	//	if(pCurVertexEditItem)
+	//	{
+	//		if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier) == false)
+	//			pCurVertexEditItem->GetShapeCtrl().UnselectAllVemVerts();
+	//		pCurVertexEditItem->GetShapeCtrl().SelectVemVerts(marqueeAabb, m_pCamera);
+	//	}
+	//	else
+	//	{
+	//		// TODO: Select all shapes within the marquee
+	//	}
 
-		m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
-		ClearAction();
-	}
-	else if(IsActionSemTransforming() && pCurVertexEditItem)
-	{
-		EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pCurVertexEditItem->GetEntityTreeItemData()->GetThisUuid());
+	//	m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+	//	ClearAction();
+	//}
+	//else if(IsActionSemTransforming() && pCurVertexEditItem)
+	//{
+	//	EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pCurVertexEditItem->GetEntityTreeItemData()->GetThisUuid());
 
-		int iStateIndex = 0;
-		int iFrameIndex = 0;
-		if(m_pProjItem->GetWidget() == nullptr)
-			HyGuiLog("EntityDraw::OnMouseReleaseEvent - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
-		else
-		{
-			iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
-			iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
-		}
+	//	int iStateIndex = 0;
+	//	int iFrameIndex = 0;
+	//	if(m_pProjItem->GetWidget() == nullptr)
+	//		HyGuiLog("EntityDraw::OnMouseReleaseEvent - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
+	//	else
+	//	{
+	//		iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
+	//		iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
+	//	}
 
-		QString sUndoText;
-		switch(GetCurAction())
-		{
-		case HYACTION_EntitySemTranslating:
-		case HYACTION_EntitySemTranslateVertex:
-			sUndoText = "Translate vert(s) on " % pTreeItemData->GetCodeName();
-			break;
-		
-		case HYACTION_EntitySemRadiusHorizontal:
-		case HYACTION_EntitySemRadiusVertical:
-			sUndoText = "Adjust circle radius on " % pTreeItemData->GetCodeName();
-			break;
+	//	QString sUndoText;
+	//	switch(GetCurAction())
+	//	{
+	//	case HYACTION_EntitySemTranslating:
+	//	case HYACTION_EntitySemTranslateVertex:
+	//		sUndoText = "Translate vert(s) on " % pTreeItemData->GetCodeName();
+	//		break;
+	//	
+	//	case HYACTION_EntitySemRadiusHorizontal:
+	//	case HYACTION_EntitySemRadiusVertical:
+	//		sUndoText = "Adjust circle radius on " % pTreeItemData->GetCodeName();
+	//		break;
 
-		case HYACTION_EntitySemAddingVertex:
-			sUndoText = "Add vertex to " % pTreeItemData->GetCodeName();
-			break;
+	//	case HYACTION_EntitySemAddingVertex:
+	//		sUndoText = "Add vertex to " % pTreeItemData->GetCodeName();
+	//		break;
 
-		default:
-			HyGuiLog("EntityDraw::OnMouseReleaseEvent - Invalid GetCurAction()", LOGTYPE_Error);
-			break;
-		}
+	//	default:
+	//		HyGuiLog("EntityDraw::OnMouseReleaseEvent - Invalid GetCurAction()", LOGTYPE_Error);
+	//		break;
+	//	}
 
-		QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
-		m_pProjItem->GetUndoStack()->push(pCmd);
+	//	QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
+	//	m_pProjItem->GetUndoStack()->push(pCmd);
 
-		ClearAction();
-	}
+	//	ClearAction();
+	//}
 }
 
 bool EntityDraw::IsSemEnabled() const
 {
-	return GetBackgroundAction() == HYACTION_EntitySem;
+	return m_ShapeEditModeWindowOutline.IsVisible();
 }
 
-bool EntityDraw::IsActionSemIdle() const
-{
-	return m_eDrawAction == HYACTION_EntitySem ||
-		   m_eDrawAction == HYACTION_EntitySemHoverItem ||
-		   m_eDrawAction == HYACTION_EntitySemHoverTranslate ||
-		   m_eDrawAction == HYACTION_EntitySemHoverAddVertex ||
-		   m_eDrawAction == HYACTION_EntitySemHoverGrabVertex ||
-		   m_eDrawAction == HYACTION_EntitySemHoverRadiusHorizontal ||
-		   m_eDrawAction == HYACTION_EntitySemHoverRadiusVertical;
-}
-
-bool EntityDraw::IsActionSemTransforming() const
-{
-	return m_eDrawAction == HYACTION_EntitySemTranslating ||
-		   m_eDrawAction == HYACTION_EntitySemAddingVertex ||
-		   m_eDrawAction == HYACTION_EntitySemTranslateVertex ||
-		   m_eDrawAction == HYACTION_EntitySemRadiusHorizontal ||
-		   m_eDrawAction == HYACTION_EntitySemRadiusVertical;
-}
+//bool EntityDraw::IsActionSemIdle() const
+//{
+//	return m_eDrawAction == HYACTION_EntitySem ||
+//		   m_eDrawAction == HYACTION_EntitySemHoverItem ||
+//		   m_eDrawAction == HYACTION_EntitySemHoverTranslate ||
+//		   m_eDrawAction == HYACTION_EntitySemHoverAddVertex ||
+//		   m_eDrawAction == HYACTION_EntitySemHoverGrabVertex ||
+//		   m_eDrawAction == HYACTION_EntitySemHoverRadiusHorizontal ||
+//		   m_eDrawAction == HYACTION_EntitySemHoverRadiusVertical;
+//}
+//
+//bool EntityDraw::IsActionSemTransforming() const
+//{
+//	return m_eDrawAction == HYACTION_EntitySemTranslating ||
+//		   m_eDrawAction == HYACTION_EntitySemAddingVertex ||
+//		   m_eDrawAction == HYACTION_EntitySemTranslateVertex ||
+//		   m_eDrawAction == HYACTION_EntitySemRadiusHorizontal ||
+//		   m_eDrawAction == HYACTION_EntitySemRadiusVertical;
+//}
 
 EditorShape EntityDraw::GetShapeAddType() const
 {
@@ -328,7 +326,7 @@ void EntityDraw::SetAsShapeEditMode(bool bEnable)
 {
 	if(bEnable)
 	{
-		if(SetBackgroundAction(HYACTION_EntitySem))
+		//if(SetBackgroundAction(HYACTION_EntitySem))
 		{
 			EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
 
@@ -353,12 +351,15 @@ void EntityDraw::SetAsShapeEditMode(bool bEnable)
 			pCurVertexEditItem->GetShapeCtrl().ClearVertexEditMode();
 		}
 
-		ClearAction();
-		if(m_eBackgroundDrawAction == HYACTION_EntitySem)
-			ClearBackgroundAction();
+		//ClearAction();
+		//if(m_eBackgroundDrawAction == HYACTION_EntitySem)
+		//	ClearBackgroundAction();
 
 		m_ShapeEditModeWindowOutline.SetVisible(false);
 	}
+
+	DoMouseMove(QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ControlModifier),
+				QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 }
 
 EntityDrawItem *EntityDraw::GetCurShapeEditItem() const
@@ -525,10 +526,17 @@ void EntityDraw::SetExtrapolatedProperties()
 		m_ItemList.push_back(pDrawItem);
 		m_RootEntity.ChildAppend(*pDrawItem->GetHyNode());
 
+
+		if(IsSemEnabled())
+
+
 		if(pDrawItem->GetEntityTreeItemData()->IsSelected() && pDrawItem->GetEntityTreeItemData()->IsSelectable())
 			m_SelectedItemList.push_back(pDrawItem);
 		else
+		{
 			pDrawItem->HideTransformCtrl();
+			pDrawItem->
+		}
 	}
 	// Delete all the remaining stale items
 	for(auto pStaleItem : staleItemList)
