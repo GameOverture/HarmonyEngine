@@ -527,15 +527,17 @@ void EntityDraw::SetExtrapolatedProperties()
 		m_RootEntity.ChildAppend(*pDrawItem->GetHyNode());
 
 
-		if(IsSemEnabled())
+		//if(IsSemEnabled())
+		//	asdf;
 
+		// TODO: START HERE - When SEM is enabled, do proper selection
 
 		if(pDrawItem->GetEntityTreeItemData()->IsSelected() && pDrawItem->GetEntityTreeItemData()->IsSelectable())
 			m_SelectedItemList.push_back(pDrawItem);
 		else
 		{
 			pDrawItem->HideTransformCtrl();
-			pDrawItem->
+			//pDrawItem->GetShapeCtrl().
 		}
 	}
 	// Delete all the remaining stale items
