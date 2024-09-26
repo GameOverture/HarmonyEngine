@@ -73,6 +73,7 @@ void HyRackMeter::SetValue(int64 iValue, float fRackDuration)
 	}
 
 	SetAssembleNeeded();
+	Assemble();
 }
 
 void HyRackMeter::OffsetValue(int64 iOffsetAmt, float fRackDuration)
@@ -265,6 +266,7 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 
 			m_SpinText.m_SpinText_Padded.pos.Y(m_SpinText.m_SpinText_Shown.pos.Y() - fThreshold);
 
+			// Find and assign `uiCharIndexForScissor` value
 			for(; uiCharIndexForScissor > 0; --uiCharIndexForScissor)
 			{
 				uint32 uiCharCode = m_Text.GetCharacterCode(uiCharIndexForScissor);
@@ -284,6 +286,7 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 
 			m_SpinText.m_SpinText_Padded.pos.Y(m_SpinText.m_SpinText_Shown.pos.Y() + fThreshold);
 
+			// Find and assign `uiCharIndexForScissor` value
 			for(; uiCharIndexForScissor > 0; --uiCharIndexForScissor)
 			{
 				uint32 uiCharCode = m_Text.GetCharacterCode(uiCharIndexForScissor);
