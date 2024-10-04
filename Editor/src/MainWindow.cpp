@@ -286,7 +286,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	ui->tabWidgetAssetManager->addTab(pProject->GetSourceWidget(), QIcon(":/icons16x16/code.png"), "Source");
 	ui->tabWidgetAssetManager->addTab(pProject->GetAtlasWidget(), QIcon(":/icons16x16/atlas-file.png"), "Atlases");
 	//ui->tabWidgetAssetManager->addTab(pProject->GetGltfWidget(), HyGlobal::ItemIcon(ITEM_Prefab, SUBICON_None), "Prefabs");
-	ui->tabWidgetAssetManager->addTab(pProject->GetAudioWidget(), HyGlobal::ItemIcon(ITEM_Audio, SUBICON_None), "Audio");
+	ui->tabWidgetAssetManager->addTab(pProject->GetAudioWidget(), QIcon(":/icons16x16/audio-manager.png"), "Audio");
 
 	// Restore asset manager widgets to their previous state
 	QSettings settings(pProject->GetUserAbsPath(), QSettings::IniFormat);

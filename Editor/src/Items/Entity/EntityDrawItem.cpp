@@ -99,6 +99,11 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 	delete m_pChild;
 }
 
+EntityDraw &EntityDrawItem::GetEntityDraw()
+{
+	return static_cast<EntityDraw &>(*m_pEntityTreeItemData->GetEntityModel().GetItem().GetDraw());
+}
+
 /*virtual*/ bool EntityDrawItem::IsSelectable() const /*override*/
 {
 	return m_pEntityTreeItemData->IsSelectable();
@@ -107,7 +112,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 /*virtual*/ IHyBody2d *EntityDrawItem::GetHyNode() /*override*/
 {
 	if(m_pEntityTreeItemData->GetType() == ITEM_Primitive || m_pEntityTreeItemData->GetType() == ITEM_BoundingVolume)
-		return &m_ShapeCtrl.GetPrimitive();
+		return &m_ShapeCtrl.GetPrimitive(true);
 
 	return m_pChild;
 }
@@ -115,6 +120,12 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 /*virtual*/ bool EntityDrawItem::IsSelected() /*override*/
 {
 	return m_pEntityTreeItemData->IsSelected();
+}
+
+/*virtual*/ void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera) /*override*/
+{
+	IDrawExItem::RefreshTransform(pCamera);
+	GetShapeCtrl().DeserializeOutline(pCamera);
 }
 
 EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const

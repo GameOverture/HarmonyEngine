@@ -214,7 +214,7 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 			{
 				b2AABB marqueeAabb;
 				HyShape2d tmpShape;
-				m_DragShape.GetPrimitive().CalcLocalBoundingShape(tmpShape);
+				m_DragShape.GetPrimitive(true).CalcLocalBoundingShape(tmpShape);
 				tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
 
 				for(IDrawExItem *pItem : m_ItemList)

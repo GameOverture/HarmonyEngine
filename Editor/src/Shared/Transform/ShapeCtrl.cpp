@@ -42,25 +42,16 @@ ShapeCtrl::ShapeCtrl(const ShapeCtrl &copyRef) :
 
 void ShapeCtrl::Setup(EditorShape eShape, HyColor color, float fBvAlpha, float fOutlineAlpha)
 {
-	if(eShape == SHAPE_None)
+	m_eShape = eShape;
+	
+	if(m_eShape == SHAPE_None)
 	{
 		m_BoundingVolume.SetAsNothing();
 		m_Outline.SetAsNothing();
 	}
-	//else if(m_eShape != SHAPE_None && m_eShape != eShape)
-	//	ConvertTo(eShape);
-
-	m_eShape = eShape;
 
 	m_BoundingVolume.SetTint(color);
-	//if(color != ENTCOLOR_Shape)
-	{
-		if(color.IsDark())
-			color = color.Lighten();
-		else
-			color = color.Darken();
-	}
-	m_Outline.SetTint(color);
+	m_Outline.SetTint(color.IsDark() ? color.Lighten() : color.Darken());
 
 	if(fBvAlpha == 0.0f)
 	{
@@ -90,9 +81,12 @@ EditorShape ShapeCtrl::GetShapeType() const
 	return m_eShape;
 }
 
-HyPrimitive2d &ShapeCtrl::GetPrimitive()
+HyPrimitive2d &ShapeCtrl::GetPrimitive(bool bTransformed)
 {
-	return m_BoundingVolume;
+	if(bTransformed)
+		return m_BoundingVolume;
+	else
+		return m_Outline;
 }
 
 void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera)

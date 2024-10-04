@@ -635,6 +635,12 @@ void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const 
 		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(selIndex, Qt::UserRole).value<EntityTreeItemData *>();
 		if(pCurItemData == nullptr)
 			continue;
+
+		if(pCurItemData->GetEntType() == ENTTYPE_ArrayItem)
+		{
+			QModelIndex parentIndex = ui->nodeTree->model()->parent(selIndex);
+			ui->nodeTree->expand(parentIndex);
+		}
 		
 		selectedItemDataList.push_back(pCurItemData);
 

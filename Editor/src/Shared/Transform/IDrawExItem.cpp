@@ -42,7 +42,6 @@ void IDrawExItem::RefreshTransform(HyCamera2d *pCamera)
 	ExtractTransform(boundingShape, mtxShapeTransform);
 
 	m_Transform.WrapTo(boundingShape, mtxShapeTransform, pCamera);
-	//GetShapeCtrl().DeserializeOutline(pCamera);
 }
 
 void IDrawExItem::ShowTransformCtrl(bool bShowGrabPoints)

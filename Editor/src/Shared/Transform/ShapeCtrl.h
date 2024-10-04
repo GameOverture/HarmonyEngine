@@ -32,11 +32,11 @@ class ShapeCtrl
 protected:
 	EditorShape					m_eShape;
 
-	HyPrimitive2d				m_BoundingVolume;	// Uses world/camera coordinates
-	HyPrimitive2d				m_Outline;			// Uses window coordinates (unaffected by zoom)
+	HyPrimitive2d				m_BoundingVolume;	// This shape represents how the item's transformation is applied. Uses world/camera coordinates
+	HyPrimitive2d				m_Outline;			// This shape represents the raw data in the form of an outline unaffected by camera zoom. Uses window coordinates
 
 	QList<float>				m_DeserializedFloatList;
-	QList<GrabPoint *>			m_VertexGrabPointList;
+	QList<GrabPoint *>			m_VertexGrabPointList;	// GrabPoint's use world/camera coordinates
 
 	bool						m_bIsVem;
 
@@ -48,7 +48,7 @@ public:
 	void Setup(EditorShape eShape, HyColor color, float fBvAlpha, float fOutlineAlpha); // Alphas of 0.0f just get their SetVisible(false)
 
 	EditorShape GetShapeType() const;
-	HyPrimitive2d &GetPrimitive();
+	HyPrimitive2d &GetPrimitive(bool bTransformed);
 
 	void SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos, HyCamera2d *pCamera);
 	void SetAsText(HyText2d *pTextNode, bool bShowOutline, HyCamera2d *pCamera);

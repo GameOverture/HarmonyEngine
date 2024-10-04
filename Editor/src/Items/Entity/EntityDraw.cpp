@@ -488,6 +488,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		//bool bIsLocked = descObj["isLocked"].toBool();
 		//bool bSelected = descObj["isSelected"].toBool();
 
+		// Try to find the draw item within 'staleItemList'
 		EntityDrawItem *pDrawItem = nullptr;
 		for(IDrawExItem *pStaleItem : staleItemList)
 		{
@@ -498,12 +499,13 @@ void EntityDraw::SetExtrapolatedProperties()
 				break;
 			}
 		}
-		if(pDrawItem == nullptr)
+		
+		if(pDrawItem == nullptr) // Not found within 'staleItemList', allocate new
 		{
 			EntityTreeItemData *pEntityTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(uuid);
 			pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), pEntityTreeItemData, this, &m_RootEntity);
 		}
-		else
+		else // Found within 'staleItemList'
 		{
 			staleItemList.removeOne(pDrawItem);
 
@@ -523,24 +525,17 @@ void EntityDraw::SetExtrapolatedProperties()
 			}
 		}
 
-		m_ItemList.push_back(pDrawItem);
-		m_RootEntity.ChildAppend(*pDrawItem->GetHyNode());
-
-
-		//if(IsSemEnabled())
-		//	asdf;
-
+		m_ItemList.push_back(pDrawItem); // Repopulate 'm_ItemList' with the valid existing or new draw items
+		
 		// TODO: START HERE - When SEM is enabled, do proper selection
+		m_RootEntity.ChildAppend(*pDrawItem->GetHyNode()); // Reinsert the draw item in the `descObjList` order
 
+		// Repopulate `m_SelectedItemList` if draw item is valid to select
 		if(pDrawItem->GetEntityTreeItemData()->IsSelected() && pDrawItem->GetEntityTreeItemData()->IsSelectable())
 			m_SelectedItemList.push_back(pDrawItem);
-		else
-		{
-			pDrawItem->HideTransformCtrl();
-			//pDrawItem->GetShapeCtrl().
-		}
 	}
-	// Delete all the remaining stale items
+
+	// Delete all the remaining stale items (no longer used draw items)
 	for(auto pStaleItem : staleItemList)
 	{
 		if(pStaleItem == m_pCurHoverItem)
@@ -550,11 +545,28 @@ void EntityDraw::SetExtrapolatedProperties()
 	}
 	staleItemList.clear();
 
+	// EXTRAPOLATE ALL ITEMS' PROPERTIES TO THE CURRENT FRAME IN DOPESHEET
 	SetExtrapolatedProperties();
 
-	bool bShowGrabPoints = m_SelectedItemList.size() == 1;
+	// Based on mode and `m_SelectedItemList`, show/hide transform and shape edit ctrls
+	EntityDrawItem *pSemItem = GetCurShapeEditItem();
+	for(IDrawExItem *pItem : m_ItemList)
+	{
+		EntityDrawItem *pDrawItem = static_cast<EntityDrawItem *>(pItem);
+
+		pDrawItem->HideTransformCtrl();
+		if(pSemItem)
+		{
+			if(pSemItem == pDrawItem)
+				pDrawItem->GetShapeCtrl().EnableVertexEditMode();
+			else
+				pDrawItem->GetShapeCtrl().ClearVertexEditMode();
+		}
+		else // Shape Edit Mode item is nullptr - allow transform selections
+			pDrawItem->GetShapeCtrl().ClearVertexEditMode();
+	}
 	for(IDrawExItem *pSelectedItemDraw : m_SelectedItemList)
-		pSelectedItemDraw->ShowTransformCtrl(bShowGrabPoints);
+		pSelectedItemDraw->ShowTransformCtrl(m_SelectedItemList.size() == 1 && pSemItem == nullptr);
 
 	RefreshTransforms();
 }

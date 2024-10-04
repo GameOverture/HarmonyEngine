@@ -73,7 +73,7 @@ void HyRackMeter::SetValue(int64 iValue, float fRackDuration)
 	}
 
 	SetAssembleNeeded();
-	Assemble();
+	Assemble(); // Do a full Assemble() right now in order to position the spin text's padded symbols, as HyRackMeter::Update() assumes they are already in place
 }
 
 void HyRackMeter::OffsetValue(int64 iOffsetAmt, float fRackDuration)

@@ -269,5 +269,7 @@
         <file>icons16x16/time-stopwatch.png</file>
         <file>icons16x16/time-stopwatchDelete.png</file>
         <file>icons16x16/sprite-deleteAll.png</file>
+        <file>icons16x16/audio-manager.png</file>
+        <file>icons16x16/sync-folder.png</file>
     </qresource>
 </RCC>

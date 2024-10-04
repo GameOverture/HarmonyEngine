@@ -31,7 +31,7 @@ public:
 
 	bool IsMouseInBounds();
 
-	void RefreshTransform(HyCamera2d *pCamera);
+	virtual void RefreshTransform(HyCamera2d *pCamera);
 
 	void ShowTransformCtrl(bool bShowGrabPoints);
 	void HideTransformCtrl();
