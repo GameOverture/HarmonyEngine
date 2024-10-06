@@ -118,6 +118,7 @@ private Q_SLOTS:
 	void on_actionGenerateAsset_triggered();
 	void on_actionImportAssets_triggered();
 	void on_actionImportDirectory_triggered();
+	void on_actionSyncFilterAssets_triggered();
 	void on_actionAddFilter_triggered();
 	void on_actionImportTileSheet_triggered();
 

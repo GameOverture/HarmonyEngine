@@ -206,6 +206,9 @@ if(Qt5_DIR)
 		src/Dialogs/DlgSnappingSettings.cpp
 		src/Dialogs/DlgSnappingSettings.h
 		src/Dialogs/DlgSnappingSettings.ui
+		src/Dialogs/DlgSyncAssets.cpp
+		src/Dialogs/DlgSyncAssets.h
+		src/Dialogs/DlgSyncAssets.ui
 		src/Dialogs/DlgTabCycle.cpp
 		src/Dialogs/DlgTabCycle.h
 		src/Dialogs/DlgTabCycle.ui

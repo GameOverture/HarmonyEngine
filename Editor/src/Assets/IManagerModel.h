@@ -86,7 +86,7 @@ public:
 	QList<IAssetItemData *> FindByChecksum(quint32 uiChecksum);
 	bool DoesAssetExist(quint32 uiChecksum);
 
-	TreeModelItemData *CreateNewFilter(QString sName, TreeModelItemData *pParent);
+	TreeModelItemData *CreateNewFilter(QString sName, TreeModelItemData *pParent, bool bSaveMeta);
 
 	void CreateNewBank(QString sName);
 	void RemoveBank(quint32 uiBankId);

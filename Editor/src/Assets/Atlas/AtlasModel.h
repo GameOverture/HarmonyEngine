@@ -14,6 +14,7 @@
 
 #include "AtlasFrame.h"
 
+// TODO: Rename to AtlasManager
 class AtlasModel : public IManagerModel
 {
 	Q_OBJECT

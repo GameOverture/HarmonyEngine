@@ -22,6 +22,7 @@
 #include "MainWindow.h"
 #include "AuxAssetInspector.h"
 #include "DlgAssetProperties.h"
+#include "DlgSyncAssets.h"
 #include "DlgImportTileSheet.h"
 #include "SourceModel.h"
 #include "SourceFile.h"
@@ -291,6 +292,7 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	ui->btnCreateFilter->setDefaultAction(ui->actionAddFilter);
 	ui->btnImportAssets->setDefaultAction(ui->actionImportAssets);
 	ui->btnImportDir->setDefaultAction(ui->actionImportDirectory);
+	ui->btnSyncFilterAssets->setDefaultAction(ui->actionSyncFilterAssets);
 
 	ui->btnDeleteAssets->setDefaultAction(ui->actionDeleteAssets);
 	ui->btnReplaceAssets->setDefaultAction(ui->actionReplaceAssets);
@@ -1016,7 +1018,7 @@ void ManagerWidget::on_actionImportDirectory_triggered()
 	{
 		// Dig recursively through this directory and grab all the image files (while creating filters that resemble the folder structure they're stored in)
 		QDir dirEntry(sDirs[iDirIndex]);
-		TreeModelItemData *pCurFilter = m_pModel->CreateNewFilter(dirEntry.dirName(), pImportParent);
+		TreeModelItemData *pCurFilter = m_pModel->CreateNewFilter(dirEntry.dirName(), pImportParent, false);
 
 		QStack<QPair<QFileInfoList, TreeModelItemData *>> dirStack;
 		dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(dirEntry.entryInfoList(), pCurFilter));
@@ -1032,7 +1034,7 @@ void ManagerWidget::on_actionImportDirectory_triggered()
 				if(info.isDir() && info.fileName() != ".." && info.fileName() != ".")
 				{
 					QDir subDir(info.filePath());
-					dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(subDir.entryInfoList(), m_pModel->CreateNewFilter(subDir.dirName(), curDir.second)));
+					dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(subDir.entryInfoList(), m_pModel->CreateNewFilter(subDir.dirName(), curDir.second, false)));
 				}
 				else
 				{
@@ -1057,6 +1059,24 @@ void ManagerWidget::on_actionImportDirectory_triggered()
 							  correspondingUuidList);
 }
 
+void ManagerWidget::on_actionSyncFilterAssets_triggered()
+{
+	TreeModelItemData *pSyncFilterRoot = nullptr;
+	if(m_bUseContextMenuSelection)
+	{
+		pSyncFilterRoot = m_pContextMenuSelection;
+		m_bUseContextMenuSelection = false;
+	}
+	else
+		pSyncFilterRoot = GetSelected();
+
+	DlgSyncAssets *pDlg = new DlgSyncAssets(*m_pModel, pSyncFilterRoot);
+	if(pDlg->exec() == QDialog::Accepted)
+	{
+		
+	}
+}
+
 void ManagerWidget::on_actionAddFilter_triggered()
 {
 	DlgInputName *pDlg = new DlgInputName("Enter Atlas Group Filter Name", "New Filter", HyGlobal::FreeFormValidator(), nullptr, nullptr);
@@ -1074,7 +1094,7 @@ void ManagerWidget::on_actionAddFilter_triggered()
 			pFirstSelected = GetSelected();
 
 		TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected);
-		pNewFilter = m_pModel->CreateNewFilter(pDlg->GetName(), pParent);
+		pNewFilter = m_pModel->CreateNewFilter(pDlg->GetName(), pParent, true);
 	}
 
 	delete pDlg;

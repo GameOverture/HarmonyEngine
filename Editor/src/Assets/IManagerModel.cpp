@@ -283,8 +283,6 @@ void IManagerModel::RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeMo
 	// This must be called after the removal of the TreeModelItems or it'll crash within GetItemsRecursively()
 	OnRemoveAssets(sRemovedFilterPaths, assetsList);
 	FlushRepack();
-
-	//SaveMeta();
 }
 
 bool IManagerModel::GetAffectedItems(QList<IAssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const
@@ -578,7 +576,7 @@ bool IManagerModel::DoesAssetExist(quint32 uiChecksum)
 	return m_AssetChecksumMap.contains(uiChecksum);
 }
 
-TreeModelItemData *IManagerModel::CreateNewFilter(QString sName, TreeModelItemData *pParent)
+TreeModelItemData *IManagerModel::CreateNewFilter(QString sName, TreeModelItemData *pParent, bool bSaveMeta)
 {
 	TreeModelItem *pTreeParent = pParent ? GetItem(FindIndex<TreeModelItemData *>(pParent, 0)) : nullptr;
 	TreeModelItemData *pNewFilterData = new TreeModelItemData(ITEM_Filter, QUuid(), sName);

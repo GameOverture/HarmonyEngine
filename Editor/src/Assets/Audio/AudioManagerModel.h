@@ -37,6 +37,7 @@ public:
 	virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 };
 
+// TODO: Rename to AudioManager
 class AudioManagerModel : public IManagerModel
 {
 	Q_OBJECT

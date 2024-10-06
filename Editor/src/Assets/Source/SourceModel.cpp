@@ -382,7 +382,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 				if(info.isDir())// && info.fileName() != ".." && info.fileName() != ".")
 				{
 					QDir subDir(info.filePath());
-					dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(subDir.entryInfoList(), CreateNewFilter(subDir.dirName(), curDir.second)));
+					dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(subDir.entryInfoList(), CreateNewFilter(subDir.dirName(), curDir.second, false)));
 				}
 				else
 				{

@@ -16,6 +16,7 @@ class WgtCodeEditor;
 class SourceFile;
 class EntityModel;
 
+// TODO: Rename to SourceManager
 class SourceModel : public IManagerModel
 {
 	Q_OBJECT
