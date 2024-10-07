@@ -25,11 +25,10 @@ class DlgSyncAssets : public QDialog
 
 	IManagerModel &			m_AssManRef;
 	TreeModelItemData *		m_pSyncFilterRoot;
-
-
+	quint32					m_uiBankId;
 
 public:
-	explicit DlgSyncAssets(IManagerModel &assetManagerRef, TreeModelItemData *pSyncFilterRoot, QWidget *pParent = nullptr);
+	explicit DlgSyncAssets(IManagerModel &assetManagerRef, TreeModelItemData *pSyncFilterRoot, quint32 uiBankId, QWidget *pParent = nullptr);
 	~DlgSyncAssets();
 
 private Q_SLOTS:

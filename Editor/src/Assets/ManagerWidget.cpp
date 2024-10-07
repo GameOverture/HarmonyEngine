@@ -1070,7 +1070,7 @@ void ManagerWidget::on_actionSyncFilterAssets_triggered()
 	else
 		pSyncFilterRoot = GetSelected();
 
-	DlgSyncAssets *pDlg = new DlgSyncAssets(*m_pModel, pSyncFilterRoot);
+	DlgSyncAssets *pDlg = new DlgSyncAssets(*m_pModel, pSyncFilterRoot, m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()));
 	if(pDlg->exec() == QDialog::Accepted)
 	{
 		
