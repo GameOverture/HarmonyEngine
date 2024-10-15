@@ -21,24 +21,23 @@ class IImportThread : public QThread
 	Q_OBJECT
 
 protected:
-	IManagerModel &				m_ManagerModelRef;
+	IManagerModel &					m_ManagerModelRef;
 
-	QStringList					m_sImportAssetList;
-	quint32						m_uiBankId;
-	QList<TreeModelItemData *>	m_CorrespondingParentList;
-	QList<QUuid>				m_CorrespondingUuidList;
+	QStringList						m_sImportAssetList;
+	quint32							m_uiBankId;
+	QVector<TreeModelItemData *>	m_CorrespondingParentList;
+	QVector<QUuid>					m_CorrespondingUuidList;
 
 public:
-	IImportThread(IManagerModel &managerModelRef, QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
+	IImportThread(IManagerModel &managerModelRef, QStringList sImportAssetList, quint32 uiBankId, QVector<TreeModelItemData *> correspondingParentList, QVector<QUuid> correspondingUuidList);
 	virtual ~IImportThread();
 
 	virtual void run() override;
-	virtual QString OnRun() = 0; // Must call RegisterAsset() on each asset. Should emit ImportUpdate() throughout OnRun. Allocate newly imported assets to 'm_NewlyImportedAssetList'. If sCancelReason is empty, then the import was successful
+	virtual bool OnRun(QString &sReportOut) = 0; // Must call RegisterAsset() on each asset. Should emit ImportUpdate() throughout OnRun. Allocate newly imported assets to 'm_NewlyImportedAssetList'. Optionally write to sReport if abnormality, returns whether import has occured or entirely canceled
 
 Q_SIGNALS:
 	void ImportUpdate(int iLoadedBlocks, int iTotalBlocks);
-	void ImportCanceled(QString sMsg);
-	void ImportIsFinished();
+	void ImportIsFinished(bool bImportOccured, QString sMsg);
 };
 
 #endif // IImportThread_H

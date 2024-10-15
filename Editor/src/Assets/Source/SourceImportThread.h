@@ -17,10 +17,10 @@ class SourceImportThread : public IImportThread
 	Q_OBJECT
 
 public:
-	SourceImportThread(IManagerModel &managerModelRef, QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
+	SourceImportThread(IManagerModel &managerModelRef, QStringList sImportAssetList, quint32 uiBankId, QVector<TreeModelItemData *> correspondingParentList, QVector<QUuid> correspondingUuidList);
 	virtual ~SourceImportThread();
 
-	virtual QString OnRun() override;
+	virtual bool OnRun(QString &sReportOut) override;
 };
 
 #endif // SourceImportThread_H

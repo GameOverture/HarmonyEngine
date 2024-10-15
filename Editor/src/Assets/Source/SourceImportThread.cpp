@@ -12,7 +12,7 @@
 #include "SourceModel.h"
 #include "SourceFile.h"
 
-SourceImportThread::SourceImportThread(IManagerModel &managerModelRef, QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList) :
+SourceImportThread::SourceImportThread(IManagerModel &managerModelRef, QStringList sImportAssetList, quint32 uiBankId, QVector<TreeModelItemData *> correspondingParentList, QVector<QUuid> correspondingUuidList) :
 	IImportThread(managerModelRef, sImportAssetList, uiBankId, correspondingParentList, correspondingUuidList)
 {
 }
@@ -21,27 +21,31 @@ SourceImportThread::SourceImportThread(IManagerModel &managerModelRef, QStringLi
 {
 }
 
-/*virtual*/ QString SourceImportThread::OnRun() /*override*/
+/*virtual*/ bool SourceImportThread::OnRun(QString &sReportOut) /*override*/
 {
 	SourceModel &sourceModelRef = static_cast<SourceModel &>(m_ManagerModelRef);
 
-	// Error check all the imported assets before adding them, and cancel entire import if any fail
-	for(int i = 0; i < m_sImportAssetList.size(); ++i)
-	{
-		QFileInfo fileInfo(m_sImportAssetList[i]);
-		if(fileInfo.exists() == false)
-			return QString("Could not find imported file: " % m_sImportAssetList[i]);
+	QStringList sErrorList;
 
-		quint32 uiChecksum = sourceModelRef.ComputeFileChecksum(sourceModelRef.AssembleFilter(m_CorrespondingParentList[i], true), fileInfo.fileName());
-		auto srcFilesInFilter = sourceModelRef.FindByChecksum(uiChecksum);
-		if(srcFilesInFilter.isEmpty() == false)
-			return QString("A file with the name: " % fileInfo.fileName() % "\nalready exists in this location.");
-	}
+	const int iEMIT_THROTTLE = m_sImportAssetList.size() / 100;
 
 	// Passed error check: proceed with import
 	for(int i = 0; i < m_sImportAssetList.size(); ++i)
 	{
+		// Error check the imported assets before adding them
 		QFileInfo origFileInfo(m_sImportAssetList[i]);
+		if(origFileInfo.exists() == false)
+		{
+			sErrorList.append("Could not find imported file: " % m_sImportAssetList[i]);
+			continue;
+		}
+		auto srcFilesInFilter = sourceModelRef.FindByChecksum(sourceModelRef.ComputeFileChecksum(sourceModelRef.AssembleFilter(m_CorrespondingParentList[i], true), origFileInfo.fileName()));
+		if(srcFilesInFilter.isEmpty() == false)
+		{
+			sErrorList.append("A file with the name: " % origFileInfo.fileName() % "\nalready exists in this location.");
+			continue;
+		}
+
 		QString sNewFilterPath = sourceModelRef.AssembleFilter(m_CorrespondingParentList[i], true);
 		QString sNewFileName = origFileInfo.fileName();
 
@@ -57,7 +61,7 @@ SourceImportThread::SourceImportThread(IManagerModel &managerModelRef, QStringLi
 		{
 			if(QFile::copy(origFileInfo.absoluteFilePath(), sNewFilePath) == false)
 			{
-				HyGuiLog("QFile::copy failed: " % origFileInfo.absoluteFilePath() % " -> " % sNewFilePath, LOGTYPE_Error);
+				sErrorList.append("QFile::copy failed: " % origFileInfo.absoluteFilePath() % " -> " % sNewFilePath);
 				continue;
 			}
 		}
@@ -66,13 +70,21 @@ SourceImportThread::SourceImportThread(IManagerModel &managerModelRef, QStringLi
 		if(sourceModelRef.m_ImportBaseClassList.size() > i)
 			sBaseClass = sourceModelRef.m_ImportBaseClassList[i];
 
-		quint32 uiChecksum = sourceModelRef.ComputeFileChecksum(sNewFilterPath, sNewFileName);
-		SourceFile *pNewFile = new SourceFile(sourceModelRef, m_CorrespondingUuidList[i], sBaseClass, uiChecksum, sNewFileName, 0);
+		SourceFile *pNewFile = new SourceFile(sourceModelRef, m_CorrespondingUuidList[i], sBaseClass, sourceModelRef.ComputeFileChecksum(sNewFilterPath, sNewFileName), sNewFileName, 0);
 		sourceModelRef.m_ImportedAssetList.append(pNewFile);
 		sourceModelRef.RegisterAsset(pNewFile);
 
-		Q_EMIT ImportUpdate(i + 1, m_sImportAssetList.size());
+		if(iEMIT_THROTTLE == 0 || (i % iEMIT_THROTTLE) == 0)
+			Q_EMIT ImportUpdate(i + 1, m_sImportAssetList.size());
 	}
 
-	return ""; // No error; Successful Import into Asset Manager's 'm_ImportedAssetList'
+	sReportOut.clear();
+	if(sErrorList.empty() == false)
+	{
+		sReportOut = "The following errors occurred during import:\n";
+		for(int i = 0; i < sErrorList.size(); ++i)
+			sReportOut += sErrorList[i] % "\n";
+	}
+
+	return sourceModelRef.m_ImportedAssetList.empty() == false;
 }

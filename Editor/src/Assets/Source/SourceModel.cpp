@@ -66,8 +66,8 @@ bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 	if(sImportList.empty())
 		return true;
 
-	QList<TreeModelItemData *> correspondingParentList;
-	QList<QUuid> correspondingUuidList;
+	QVector<TreeModelItemData *> correspondingParentList;
+	QVector<QUuid> correspondingUuidList;
 	for(int i = 0; i < sImportList.size(); ++i)
 	{
 		correspondingParentList << m_pEntityFolderItem;
@@ -361,8 +361,8 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 		// If asset list is empty try importing (refreshing) everything in m_MetaDir (source) directory.
 		// If this is also empty, then generate a brand new project
 		QStringList sImportList;
-		QList<TreeModelItemData *> correspondingParentList;
-		QList<QUuid> correspondingUuidList;
+		QVector<TreeModelItemData *> correspondingParentList;
+		QVector<QUuid> correspondingUuidList;
 
 		// Dig recursively through m_MetaDir and grab all the source files (while creating filters that resemble the folder structure they're stored in)
 		QDir dirEntry(m_MetaDir);
@@ -465,8 +465,8 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 		m_ImportBaseClassList.clear();
 
 		QStringList sImportList;
-		QList<TreeModelItemData *> correspondingParentList;
-		QList<QUuid> correspondingUuidList;
+		QVector<TreeModelItemData *> correspondingParentList;
+		QVector<QUuid> correspondingUuidList;
 
 		TreeModelItemData *pParentLocation = FindTreeItemFilter(data(indexDestination, Qt::UserRole).value<TreeModelItemData *>());
 

@@ -969,8 +969,8 @@ void ManagerWidget::on_actionImportAssets_triggered()
 
 	TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected);
 
-	QList<TreeModelItemData *> correspondingParentList;
-	QList<QUuid> correspondingUuidList;
+	QVector<TreeModelItemData *> correspondingParentList;
+	QVector<QUuid> correspondingUuidList;
 	for(int i = 0; i < sImportList.size(); ++i)
 	{
 		correspondingParentList.append(pParent);
@@ -1009,8 +1009,8 @@ void ManagerWidget::on_actionImportDirectory_triggered()
 
 	// Store all the specified imported image paths and their corresponding parent tree items they should be inserted into
 	QStringList sImportList;
-	QList<TreeModelItemData *> correspondingParentList;
-	QList<QUuid> correspondingUuidList;
+	QVector<TreeModelItemData *> correspondingParentList;
+	QVector<QUuid> correspondingUuidList;
 
 	// Loop through all the specified import directories
 	QStringList sDirs = dlg.selectedFiles();

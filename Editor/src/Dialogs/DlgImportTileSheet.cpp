@@ -74,8 +74,8 @@ void DlgImportTileSheet::on_buttonBox_accepted()
 
 	TreeModelItemData *pParent = m_ProjectRef.GetAtlasModel().FindTreeItemFilter(pFirstSelected);
 
-	QList<TreeModelItemData *> correspondingParentList;
-	QList<QUuid> correspondingUuidList;
+	QVector<TreeModelItemData *> correspondingParentList;
+	QVector<QUuid> correspondingUuidList;
 	for(int i = 0; i < sImageImportList.size(); ++i)
 	{
 		correspondingParentList.append(pParent);

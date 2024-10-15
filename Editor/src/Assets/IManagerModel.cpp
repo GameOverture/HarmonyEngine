@@ -167,7 +167,7 @@ void IManagerModel::GenerateAssetsDlg(const QModelIndex &indexDestination)
 	OnGenerateAssetsDlg(indexDestination);
 }
 
-bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList)
+bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, QVector<TreeModelItemData *> correspondingParentList, QVector<QUuid> correspondingUuidList)
 {
 	if(correspondingParentList.size() != sImportList.size())
 	{
@@ -202,7 +202,6 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, Q
 
 	connect(pImportThread, &QThread::finished, pImportThread, &QObject::deleteLater);
 	connect(pImportThread, &IImportThread::ImportUpdate, this, &IManagerModel::OnImportAssetsUpdate);
-	connect(pImportThread, &IImportThread::ImportCanceled, this, &IManagerModel::OnImportAssetsCanceled);
 	connect(pImportThread, &IImportThread::ImportIsFinished, this, &IManagerModel::OnImportAssetsFinished);
 	MainWindow::SetLoading(LOADINGTYPE_ImportAssets, 0, 0);
 	pImportThread->start();
@@ -582,7 +581,9 @@ TreeModelItemData *IManagerModel::CreateNewFilter(QString sName, TreeModelItemDa
 	TreeModelItemData *pNewFilterData = new TreeModelItemData(ITEM_Filter, QUuid(), sName);
 	if(InsertTreeItem(m_ProjectRef, pNewFilterData, pTreeParent))
 	{
-		SaveMeta();
+		if(bSaveMeta)
+			SaveMeta();
+
 		return pNewFilterData;
 	}
 
@@ -1124,27 +1125,23 @@ LoadingType IManagerModel::GetLoadingType() const
 	MainWindow::SetLoading(LOADINGTYPE_ImportAssets, iAssetsLoaded, iTotalAssets);
 }
 
-void IManagerModel::OnImportAssetsCanceled(QString sMsg)
+/*slot*/ void IManagerModel::OnImportAssetsFinished(bool bImportOccured, QString sMsg)
 {
-	m_ImportedAssetList.clear();
-	m_ImportedCorrespondingParentList.clear();
+	if(bImportOccured)
+	{
+		for(int i = 0; i < m_ImportedAssetList.size(); ++i)
+			InsertTreeItem(m_ProjectRef, m_ImportedAssetList[i], GetItem(FindIndex<TreeModelItemData *>(m_ImportedCorrespondingParentList[i], 0)));
 
-	MainWindow::ClearLoading(LOADINGTYPE_ImportAssets);
-	HyGuiLog(sMsg, LOGTYPE_Warning);
-}
-
-/*slot*/ void IManagerModel::OnImportAssetsFinished()
-{
-	for(int i = 0; i < m_ImportedAssetList.size(); ++i)
-		InsertTreeItem(m_ProjectRef, m_ImportedAssetList[i], GetItem(FindIndex<TreeModelItemData *>(m_ImportedCorrespondingParentList[i], 0)));
+		FlushRepack();
+		SaveMeta();
+	}
 
 	m_ImportedAssetList.clear();
 	m_ImportedCorrespondingParentList.clear();
-
-	FlushRepack();
-	SaveMeta();
-
 	MainWindow::ClearLoading(LOADINGTYPE_ImportAssets);
+
+	if(sMsg.isEmpty() == false)
+		HyGuiLog(sMsg, LOGTYPE_Warning);
 }
 
 /*slot*/ void IManagerModel::OnRepackUpdate(int iBlocksLoaded, int iTotalBlocks)

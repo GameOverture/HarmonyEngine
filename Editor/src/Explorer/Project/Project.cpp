@@ -612,9 +612,9 @@ bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType
 	// Copy all valid assets to temp directory, then import them in with corresponding filter and UUID list
 	QDir metaTempDir = HyGlobal::PrepTempDir(*this, HYGUIPATH_TEMPSUBDIR_PasteAssets);
 
-	QStringList					importAssetList;
-	QList<TreeModelItemData *>	correspondingParentList;
-	QList<QUuid>				correspondingUuidList;
+	QStringList						importAssetList;
+	QVector<TreeModelItemData *>	correspondingParentList;
+	QVector<QUuid>					correspondingUuidList;
 
 	if(eAssetType == ASSETMAN_Source)
 		static_cast<SourceModel *>(pManager)->m_ImportBaseClassList.clear();

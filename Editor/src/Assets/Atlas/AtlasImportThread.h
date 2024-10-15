@@ -17,10 +17,10 @@ class AtlasImportThread : public IImportThread
 	Q_OBJECT
 
 public:
-	AtlasImportThread(IManagerModel &managerModelRef, QStringList sImportAssetList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
+	AtlasImportThread(IManagerModel &managerModelRef, QStringList sImportAssetList, quint32 uiBankId, QVector<TreeModelItemData *> correspondingParentList, QVector<QUuid> correspondingUuidList);
 	virtual ~AtlasImportThread();
 
-	virtual QString OnRun() override;
+	virtual bool OnRun(QString &sReportOut) override;
 };
 
 #endif // AtlasImportThread_H

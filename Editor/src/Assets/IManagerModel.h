@@ -39,8 +39,8 @@ protected:
 
 	QMap<quint32, QList<IAssetItemData *> >			m_AssetChecksumMap;
 
-	QList<TreeModelItemData *>						m_ImportedCorrespondingParentList;
-	QList<IAssetItemData *>							m_ImportedAssetList;
+	QVector<TreeModelItemData *>					m_ImportedCorrespondingParentList;
+	QVector<IAssetItemData *>						m_ImportedAssetList;
 
 	QMap<BankData *, QSet<IAssetItemData *>>		m_RepackAffectedAssetsMap;
 	QList<ProjectItemData *>						m_RepackAffectedItemList; // Keep track of any linked/referenced items as they will need to be re-saved after asset repacking
@@ -66,7 +66,7 @@ public:
 	QList<IAssetItemData *> GetBankAssets(uint uiBankIndex);
 
 	void GenerateAssetsDlg(const QModelIndex &indexDestination);
-	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, QList<TreeModelItemData *> correspondingParentList, QList<QUuid> correspondingUuidList);
+	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, QVector<TreeModelItemData *> correspondingParentList, QVector<QUuid> correspondingUuidList);
 	void RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeModelItemData *> filtersList, bool bAskToConfirm);
 	bool GetAffectedItems(QList<IAssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const; // Returns false if any affected items are not saved and should not proceed with asset repack
 	void ReplaceAssets(QList<IAssetItemData *> assetsList, bool bWithNewAssets);
@@ -139,8 +139,7 @@ private:
 
 protected Q_SLOTS:
 	void OnImportAssetsUpdate(int iAssetsLoaded, int iTotalAssets);
-	void OnImportAssetsCanceled(QString sMsg);
-	void OnImportAssetsFinished();
+	void OnImportAssetsFinished(bool bImportOccured, QString sMsg);
 	void OnRepackUpdate(int iBlocksLoaded, int iTotalBlocks);
 	void OnRepackFinished();
 };
