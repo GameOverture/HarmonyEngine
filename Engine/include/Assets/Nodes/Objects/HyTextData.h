@@ -95,25 +95,25 @@ class HyTextData : public IHyNodeData
 
 	struct FontState
 	{
-		const uint32				uiNUM_LAYERS;
-		const float					fLINE_HEIGHT;
-		const float					fLINE_ASCENDER;
-		const float					fLINE_DESCENDER;
-		const float					fLEFT_SIDE_NUDGE_AMT;
+		const uint32				m_uiNUM_LAYERS;
+		const float					m_fLINE_HEIGHT;
+		const float					m_fLINE_ASCENDER;
+		const float					m_fLINE_DESCENDER;
+		const float					m_fLEFT_SIDE_NUDGE_AMT;
 
 		struct Layer
 		{
-			const HyColor			DEFAULT_TOP_COLOR;
-			const HyColor			DEFAULT_BOT_COLOR;
-			const Typeface &		TYPEFACE_REF;
+			const HyColor			m_DEFAULT_TOP_COLOR;
+			const HyColor			m_DEFAULT_BOT_COLOR;
+			const Typeface &		m_TYPEFACE_REF;
 
 			Layer(float fTopR, float fTopG, float fTopB, float fBotR, float fBotG, float fBotB, Typeface &typefaceRef) :
-				DEFAULT_TOP_COLOR(fTopR, fTopG, fTopB),
-				DEFAULT_BOT_COLOR(fBotR, fBotG, fBotB),
-				TYPEFACE_REF(typefaceRef)
+				m_DEFAULT_TOP_COLOR(fTopR, fTopG, fTopB),
+				m_DEFAULT_BOT_COLOR(fBotR, fBotG, fBotB),
+				m_TYPEFACE_REF(typefaceRef)
 			{ }
 		};
-		Layer *						pLayers;
+		Layer *						m_pLayers;
 
 		FontState(Typeface *pTypefaces, float fLineGap, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, HyJsonArray layersArray);
 		~FontState();
@@ -125,7 +125,7 @@ public:
 	virtual ~HyTextData();
 
 	uint32 GetNumLayers(uint32 uiStateIndex) const;
-	const HyTextGlyph *GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const;
+	const HyTextGlyph *GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const; // Returns nullptr if glyph doesn't exist or invalid params
 	HyColor GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const;
 	HyFileAtlas *GetAtlas() const;
 	float GetLineHeight(uint32 uiStateIndex) const;

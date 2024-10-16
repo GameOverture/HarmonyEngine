@@ -14,16 +14,17 @@
 #include "Diagnostics/Console/IHyConsole.h"
 
 HyTextData::FontState::FontState(Typeface *pTypefaces, float fLineHeight, float fLineAcender, float fLineDescender, float fLeftSideNudgeAmt, HyJsonArray layersArray) :
-	fLINE_HEIGHT(fLineHeight),
-	fLINE_ASCENDER(fLineAcender),
-	fLINE_DESCENDER(fLineDescender),
-	fLEFT_SIDE_NUDGE_AMT(fLeftSideNudgeAmt),
-	uiNUM_LAYERS(layersArray.Size())
+	m_fLINE_HEIGHT(fLineHeight),
+	m_fLINE_ASCENDER(fLineAcender),
+	m_fLINE_DESCENDER(fLineDescender),
+	m_fLEFT_SIDE_NUDGE_AMT(fLeftSideNudgeAmt),
+	m_uiNUM_LAYERS(layersArray.Size()),
+	m_pLayers(nullptr)
 {
-	pLayers = reinterpret_cast<Layer *>(HY_NEW unsigned char[sizeof(Layer) * uiNUM_LAYERS]);
-	Layer *pLayerWriteLocation = pLayers;
+	m_pLayers = reinterpret_cast<Layer *>(HY_NEW unsigned char[sizeof(Layer) * m_uiNUM_LAYERS]);
+	Layer *pLayerWriteLocation = m_pLayers;
 
-	for(uint32 i = 0; i < uiNUM_LAYERS; ++i, ++pLayerWriteLocation)
+	for(uint32 i = 0; i < m_uiNUM_LAYERS; ++i, ++pLayerWriteLocation)
 	{
 		HyJsonObj layerObj = layersArray[i].GetObject();
 		new (pLayerWriteLocation)Layer(layerObj["topR"].GetFloat(),
@@ -38,7 +39,7 @@ HyTextData::FontState::FontState(Typeface *pTypefaces, float fLineHeight, float 
 
 HyTextData::FontState::~FontState()
 {
-	unsigned char *pLayerBuffer = reinterpret_cast<unsigned char *>(pLayers);
+	unsigned char *pLayerBuffer = reinterpret_cast<unsigned char *>(m_pLayers);
 	delete[] pLayerBuffer;
 }
 
@@ -175,28 +176,31 @@ HyTextData::~HyTextData(void)
 
 uint32 HyTextData::GetNumLayers(uint32 uiStateIndex) const
 {
-	return m_pFontStates[uiStateIndex].uiNUM_LAYERS;
+	return m_pFontStates[uiStateIndex].m_uiNUM_LAYERS;
 }
 
 const HyTextGlyph *HyTextData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex, uint32 uiUtf32Code) const
 {
+	if(uiStateIndex >= m_uiNumStates || m_pFontStates[uiStateIndex].m_pLayers == nullptr || uiLayerIndex >= m_pFontStates[uiStateIndex].m_uiNUM_LAYERS)
+		return nullptr;
+
 	// Special case: No-Break Space CodePoint: 160
 	if(uiUtf32Code == 160)
 		uiUtf32Code = 32; // Use standard space (no breaks should occur because it should act as a regular character from this point)
 
-	auto iter = m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(uiUtf32Code);
-	if(iter == m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end())
+	auto iter = m_pFontStates[uiStateIndex].m_pLayers[uiLayerIndex].m_TYPEFACE_REF.find(uiUtf32Code);
+	if(iter == m_pFontStates[uiStateIndex].m_pLayers[uiLayerIndex].m_TYPEFACE_REF.end())
 	{
 		HyLogDebug("Missing glyph code " << uiUtf32Code << " in Text instance: " << GetPath());
 
 		// Instead return Unicode Character 'REPLACEMENT CHARACTER' (U+FFFD) which should always be available
-		iter = m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.find(65533);
-		if(iter == m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].TYPEFACE_REF.end())
+		iter = m_pFontStates[uiStateIndex].m_pLayers[uiLayerIndex].m_TYPEFACE_REF.find(65533);
+		if(iter == m_pFontStates[uiStateIndex].m_pLayers[uiLayerIndex].m_TYPEFACE_REF.end())
 		{
 //#ifndef HY_PLATFORM_GUI
 //			HyError("Could not retrieve Unicode Character 'REPLACEMENT CHARACTER' (U+FFFD) which should always be available");
 //#endif
-			return nullptr; // Returning nullptr here causes glitched out sprites and other corruption. Fatal error.
+			return nullptr;
 		}
 	}
 
@@ -206,9 +210,9 @@ const HyTextGlyph *HyTextData::GetGlyph(uint32 uiStateIndex, uint32 uiLayerIndex
 HyColor HyTextData::GetDefaultColor(uint32 uiStateIndex, uint32 uiLayerIndex, bool bTop) const
 {
 	if(bTop)
-		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].DEFAULT_TOP_COLOR;
+		return m_pFontStates[uiStateIndex].m_pLayers[uiLayerIndex].m_DEFAULT_TOP_COLOR;
 	else
-		return m_pFontStates[uiStateIndex].pLayers[uiLayerIndex].DEFAULT_BOT_COLOR;
+		return m_pFontStates[uiStateIndex].m_pLayers[uiLayerIndex].m_DEFAULT_BOT_COLOR;
 }
 
 HyFileAtlas *HyTextData::GetAtlas() const
@@ -218,23 +222,23 @@ HyFileAtlas *HyTextData::GetAtlas() const
 
 float HyTextData::GetLineHeight(uint32 uiStateIndex) const
 {
-	return m_pFontStates[uiStateIndex].fLINE_HEIGHT;
+	return m_pFontStates[uiStateIndex].m_fLINE_HEIGHT;
 }
 
 float HyTextData::GetLineAscender(uint32 uiStateIndex) const
 {
-	return m_pFontStates[uiStateIndex].fLINE_ASCENDER;
+	return m_pFontStates[uiStateIndex].m_fLINE_ASCENDER;
 }
 
 float HyTextData::GetLineDescender(uint32 uiStateIndex) const
 {
-	return m_pFontStates[uiStateIndex].fLINE_DESCENDER;
+	return m_pFontStates[uiStateIndex].m_fLINE_DESCENDER;
 }
 
 float HyTextData::GetLeftSideNudgeAmt(uint32 uiStateIndex) const
 {
 	if(m_pFontStates)
-		return m_pFontStates[uiStateIndex].fLEFT_SIDE_NUDGE_AMT;
+		return m_pFontStates[uiStateIndex].m_fLEFT_SIDE_NUDGE_AMT;
 
 	return 0.0f;
 }

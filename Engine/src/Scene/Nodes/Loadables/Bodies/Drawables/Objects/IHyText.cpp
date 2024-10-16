@@ -589,6 +589,8 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetCursorPos()
 				return glm::vec2();
 		}
 		const HyTextGlyph *pGlyph = pData->GetGlyph(this->m_uiState, 0, uiUtf32Code);
+		if(pGlyph == nullptr)
+			return glm::vec2();
 
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - uiLastCharOffset, pData->GetNumLayers(this->m_uiState), 0);
 
@@ -1396,9 +1398,10 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphScaleKerning()
 {
 	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
+	if(uiNUM_LAYERS == 0)
+		return;
 
 	float fGlyphScaleKerningAccum = 0.0f;
-
 	for(uint32 uiIndex = 0; uiIndex < m_uiNumValidCharacters; ++uiIndex)
 	{
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiIndex, uiNUM_LAYERS, 0);

@@ -63,6 +63,7 @@ void TextDraw::SetTextState(uint uiStateIndex)
 	#undef GetObject
 	m_Text.GuiOverrideData<HyTextData>(itemDataDoc.GetObject());
 	m_Text.GetShaderUniforms().SetTexHandle(0, m_hTexture);
+
 	SetPreviewText();
 }
 
@@ -72,6 +73,9 @@ void TextDraw::SetTextState(uint uiStateIndex)
 
 void TextDraw::SetPreviewText()
 {
+	if(m_pProjItem->GetWidget())
+		m_Text.SetState(m_pProjItem->GetWidget()->GetCurStateIndex());
+
 	QVariant propValue = static_cast<TextModel *>(m_pProjItem->GetModel())->GetFontManager().GetGlyphsModel()->FindPropertyValue("Uses Glyphs", TEXTPROP_AdditionalSyms);
 	QString sAdditionalGlyphs = propValue.toString();
 
