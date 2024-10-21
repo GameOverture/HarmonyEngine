@@ -631,18 +631,93 @@ void HyShape2d::SetSensor(bool bIsSensor)
 }
 
 bool HyShape2d::TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &ptTestPoint) const
-{
-	bool bIsCollide = false;
-	
+{	
 	// CloneTransform applies scaling
 	b2Shape *pTransformedSelf = CloneTransform(mtxSelfTransform);
 	if(pTransformedSelf)
 	{
-		bIsCollide = pTransformedSelf->TestPoint(b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f)), b2Vec2(ptTestPoint.x, ptTestPoint.y));
+		bool bIsCollide = false;
+
+		// Ideally use Box2d to TestPoint, but the line shapes aren't supported so 
+		switch(pTransformedSelf->GetType())
+		{
+		case b2Shape::e_circle:
+		case b2Shape::e_polygon:
+			bIsCollide = pTransformedSelf->TestPoint(b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f)), b2Vec2(ptTestPoint.x, ptTestPoint.y));
+			break;
+		
+		case b2Shape::e_edge: {
+			b2AABB aabb;
+			aabb.lowerBound.Set(static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex1.x, static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex1.y);
+			aabb.upperBound.Set(static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex1.x, static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex1.y);
+			if(static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.x < aabb.lowerBound.x)
+				aabb.lowerBound.x = static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.x;
+			if(static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.y < aabb.lowerBound.y)
+				aabb.lowerBound.y = static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.y;
+			if(static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.x > aabb.upperBound.x)
+				aabb.upperBound.x = static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.x;
+			if(static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.y > aabb.upperBound.y)
+				aabb.upperBound.y = static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.y;
+
+			// If the AABB is flat, inflate it by 5 pixel radius
+			if(aabb.lowerBound.x == aabb.upperBound.x)
+			{
+				aabb.lowerBound.x -= 5.0f;
+				aabb.upperBound.x += 5.0f;
+			}
+			if(aabb.lowerBound.y == aabb.upperBound.y)
+			{
+				aabb.lowerBound.y -= 5.0f;
+				aabb.upperBound.y += 5.0f;
+			}
+
+			bIsCollide = HyMath::TestPointAABB(aabb, ptTestPoint);
+			break; }
+
+		case b2Shape::e_chain: {
+			b2AABB aabb;
+			HyMath::InvalidateAABB(aabb);
+			for(int32 i = 0; i < static_cast<b2ChainShape *>(pTransformedSelf)->m_count; ++i)
+			{
+				if(aabb.IsValid() == false)
+				{
+					aabb.lowerBound.Set(static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].x, static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].y);
+					aabb.upperBound.Set(static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].x, static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].y);
+				}
+				else
+				{
+					if(static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].x < aabb.lowerBound.x)
+						aabb.lowerBound.x = static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].x;
+					else if(static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].x > aabb.upperBound.x)
+						aabb.upperBound.x = static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].x;
+
+					if(static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].y < aabb.lowerBound.y)
+						aabb.lowerBound.y = static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].y;
+					else if(static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].y > aabb.upperBound.y)
+						aabb.upperBound.y = static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].y;
+				}
+			}
+			// If the AABB is flat, inflate it by 5 pixel radius
+			if(aabb.lowerBound.x == aabb.upperBound.x)
+			{
+				aabb.lowerBound.x -= 5.0f;
+				aabb.upperBound.x += 5.0f;
+			}
+			if(aabb.lowerBound.y == aabb.upperBound.y)
+			{
+				aabb.lowerBound.y -= 5.0f;
+				aabb.upperBound.y += 5.0f;
+			}
+			
+			bIsCollide = HyMath::TestPointAABB(aabb, ptTestPoint);
+			break; }
+		}
+
 		delete pTransformedSelf;
+		return bIsCollide;
 	}
 
-	return bIsCollide;
+	return false;
 }
 
 //bool HyShape2d::IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const
