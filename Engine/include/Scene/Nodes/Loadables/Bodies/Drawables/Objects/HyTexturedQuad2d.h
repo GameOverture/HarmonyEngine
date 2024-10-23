@@ -55,9 +55,15 @@ protected:
 	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
 
-private: // Hide inherited Init() and Uninit() functionality, since we overload them with different parameters
+private:
+	// Hide inherited Init() and Uninit() functionality, since we overload them with different parameters
 	using IHyLoadable2d::Init;
 	using IHyLoadable2d::Uninit;
+
+	// Hide any State functionality, as there is only one state
+	using IHyLoadable::GetState;
+	using IHyLoadable::SetState;
+	using IHyLoadable::GetNumStates;
 };
 
 #endif /* HyTexturedQuad2d_h__ */

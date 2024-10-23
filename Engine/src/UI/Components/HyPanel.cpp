@@ -99,13 +99,23 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 
 	case HYTYPE_Sprite: // 'NodeItem' panel
 		m_pNodeItem = HY_NEW HySprite2d(initRef.m_NodePath, this);
+		if(m_uiState != 0)
+		{
+			if(m_pNodeItem->SetState(m_uiState) == false)
+				m_uiState = 0;
+		}
 
-		HySetVec(m_vSizeHint, static_cast<HySprite2d *>(m_pNodeItem)->GetStateWidth(0, 1.0f), static_cast<HySprite2d *>(m_pNodeItem)->GetStateHeight(0, 1.0f));
+		HySetVec(m_vSizeHint, static_cast<HySprite2d *>(m_pNodeItem)->GetStateWidth(m_uiState, 1.0f), static_cast<HySprite2d *>(m_pNodeItem)->GetStateHeight(m_uiState, 1.0f));
 		m_vSizeActual = m_vSizeHint;
 		break;
 	
 	case HYTYPE_Spine: // 'NodeItem' panel
 		m_pNodeItem = HY_NEW HySpine2d(initRef.m_NodePath, this);
+		if(m_uiState != 0)
+		{
+			if(m_pNodeItem->SetState(m_uiState) == false)
+				m_uiState = 0;
+		}
 
 		HySetVec(m_vSizeHint, m_pNodeItem->GetWidth(1.0f), m_pNodeItem->GetHeight(1.0f));
 		m_vSizeActual = m_vSizeHint;
@@ -177,8 +187,6 @@ HyPanelInit HyPanel::CloneInit()
 
 /*virtual*/ bool HyPanel::SetState(uint32 uiStateIndex) /*override*/
 {
-	m_uiState = uiStateIndex;
-
 	if(IsNode())
 	{
 		if(m_pNodeItem->SetState(uiStateIndex))
@@ -189,6 +197,7 @@ HyPanelInit HyPanel::CloneInit()
 			else
 				HySetVec(m_vSizeHint, m_pNodeItem->GetWidth(1.0f), m_pNodeItem->GetHeight(1.0f));
 
+			m_uiState = uiStateIndex;
 			return true;
 		}
 
@@ -234,6 +243,7 @@ HyPanelInit HyPanel::CloneInit()
 			return false;
 		}
 
+		m_uiState = uiStateIndex;
 		return true;
 	}
 
