@@ -114,10 +114,7 @@ bool HyRackMeter::IsSpinningMeter() const
 void HyRackMeter::SetAsSpinningMeter(bool bSet)
 {
 	if(bSet)
-	{
 		m_uiAttribs |= RACKMETERATTRIB_IsSpinDigits;
-		m_SpinText.SetScissor(HyRect(GetWidth(), static_cast<uint32>(GetSpinHeightThreshold())));
-	}
 	else
 		m_uiAttribs &= ~RACKMETERATTRIB_IsSpinDigits;
 
@@ -331,6 +328,11 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 	}
 
 	m_SpinText.SetVisible(m_Text.IsVisible() && IsSpinningMeter());
+
+	if(IsSpinningMeter())
+		m_SpinText.SetScissor(HyRect(GetWidth(), static_cast<uint32>(GetSpinHeightThreshold())));
+	else
+		m_SpinText.ClearScissor(true);
 }
 
 float HyRackMeter::GetSpinHeightThreshold()
