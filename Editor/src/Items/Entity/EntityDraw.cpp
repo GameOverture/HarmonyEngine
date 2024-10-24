@@ -566,7 +566,7 @@ void EntityDraw::SetExtrapolatedProperties()
 			pDrawItem->GetShapeCtrl().ClearVertexEditMode();
 	}
 	for(IDrawExItem *pSelectedItemDraw : m_SelectedItemList)
-		pSelectedItemDraw->ShowTransformCtrl(m_SelectedItemList.size() == 1 && pSemItem == nullptr);
+		pSelectedItemDraw->ShowTransformCtrl(m_SelectedItemList.size() == 1);
 
 	RefreshTransforms();
 }
