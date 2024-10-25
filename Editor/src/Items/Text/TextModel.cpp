@@ -141,14 +141,14 @@ void TextModel::SetRuntimeAtlasDirty()
 	// Apply newly generated font sub-atlas
 	if(m_pAtlasFrame)
 	{
-		if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, true) == false)
+		if(m_ItemRef.GetProject().GetAtlasModel().ReplaceFrame(m_pAtlasFrame, m_ItemRef.GetName(false), fontAtlasImage, ITEM_Text) == false)
 		{
 			HyGuiLog("Cannot ReplaceFrame text sub-atlas for " % m_ItemRef.GetName(true), LOGTYPE_Error);
 			return false;
 		}
 	}
 	else
-		m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasBankIndex, true);
+		m_pAtlasFrame = m_ItemRef.GetProject().GetAtlasModel().GenerateFrame(&m_ItemRef, m_ItemRef.GetName(false), fontAtlasImage, uiAtlasBankIndex, ITEM_Text);
 
 	if(m_pAtlasFrame)
 		m_FontManager.SetAtlasGroup(m_pAtlasFrame->GetBankId());

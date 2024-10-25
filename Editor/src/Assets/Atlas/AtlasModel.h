@@ -39,8 +39,8 @@ public:
 
 	AtlasFrame *FindFrame(quint32 uiChecksum, quint32 uiBankId) const;
 	AtlasFrame *FindFrame(const QUuid &itemUuidRef, quint32 uiBankId) const;
-	AtlasFrame *GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, bool bIsSubAtlas);
-	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, bool bIsSubAtlas);
+	AtlasFrame *GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, ItemType eSubAtlasType);
+	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, ItemType eSubAtlasType);
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
@@ -65,7 +65,7 @@ protected:
 	void AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSet);
 
 private:
-	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiBankIndex, bool bIsSubAtlas, QUuid uuid);
+	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiBankIndex, ItemType eSubAtlasType, QUuid uuid);
 };
 
 #endif // ATLASMODEL_H

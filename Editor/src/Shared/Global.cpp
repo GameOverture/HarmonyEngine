@@ -365,6 +365,9 @@
 
 /*static*/ ItemType HyGlobal::GetTypeFromString(QString sType)
 {
+	if(sType.isEmpty())
+		return ITEM_None;
+
 	QStringList sTypeList = GetTypeNameList();
 	for(int i = 0; i < sTypeList.size(); ++i)
 	{

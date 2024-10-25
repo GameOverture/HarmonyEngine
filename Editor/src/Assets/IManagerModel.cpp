@@ -332,7 +332,7 @@ void IManagerModel::ReplaceAssets(QList<IAssetItemData *> assetsList, bool bWith
 		// Make sure no sub-atlases are being replaced
 		for(IAssetItemData *pAsset : assetsList)
 		{
-			if(pAsset->GetType() == ITEM_AtlasFrame && static_cast<AtlasFrame *>(pAsset)->IsSubAtlas())
+			if(pAsset->GetType() == ITEM_AtlasFrame && static_cast<AtlasFrame *>(pAsset)->GetSubAtlasType() != ITEM_None)
 			{
 				QString sDependant;
 				if(pAsset->GetDependants().empty() == false && pAsset->GetDependants()[0]->IsProjectItem())
@@ -792,7 +792,12 @@ void IManagerModel::SaveRuntime()
 				if(pAsset->GetErrors() != 0)
 					return QVariant(pItemData->GetIcon(SUBICON_Warning));
 				else if(m_eASSET_TYPE == ASSETMAN_Atlases)
-					return QVariant(static_cast<AtlasFrame *>(pAsset)->GetThumbnail());
+				{
+					if(static_cast<AtlasFrame *>(pAsset)->GetSubAtlasType() == ITEM_None)
+						return QVariant(static_cast<AtlasFrame *>(pAsset)->GetThumbnail());
+					else
+						return HyGlobal::ItemIcon(static_cast<AtlasFrame *>(pAsset)->GetSubAtlasType(), SUBICON_None);
+				}
 				else if(m_eASSET_TYPE == ASSETMAN_Source)
 					return static_cast<SourceFile *>(pAsset)->GetSourceIcon();
 			}

@@ -718,7 +718,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 		
 		switch(eItemType)
 		{
-		case ITEM_Unknown:	// 'ITEM_Unknown' is passed for the main entity root node
+		case ITEM_None:		// 'ITEM_None' is passed for the main entity root node
 		case ITEM_Entity:	// 'ITEM_Entity' is passed when this is a sub-entity (NOTE: sub-entity timeline events are handled above)
 			break;
 

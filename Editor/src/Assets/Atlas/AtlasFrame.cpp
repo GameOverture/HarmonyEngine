@@ -13,7 +13,7 @@
 #include "SpineModel.h"
 
 AtlasFrame::AtlasFrame(IManagerModel &modelRef,
-					   bool bIsSubAtlas,
+					   ItemType eSubAtlasType,
 					   QUuid uuid,
 					   quint32 uiChecksum,
 					   quint32 uiBankId,
@@ -30,7 +30,7 @@ AtlasFrame::AtlasFrame(IManagerModel &modelRef,
 					   int iTextureIndex,
 					   uint uiErrors) :
 	IAssetItemData(modelRef, ITEM_AtlasFrame, uuid, uiChecksum, uiBankId, sName, ".png", uiErrors),
-	m_bIsSubAtlas(bIsSubAtlas),
+	m_eSubAtlasType(eSubAtlasType),
 	m_uiWidth(uiW),
 	m_uiHeight(uiH),
 	m_uiCropLeft(uiCropLeft),
@@ -48,9 +48,9 @@ AtlasFrame::~AtlasFrame()
 {
 }
 
-bool AtlasFrame::IsSubAtlas() const
+ItemType AtlasFrame::GetSubAtlasType() const
 {
-	return m_bIsSubAtlas;
+	return m_eSubAtlasType;
 }
 
 QSize AtlasFrame::GetSize() const
@@ -189,9 +189,15 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, quint16 uiX, quint16 ui
 		SetError(ASSETERROR_CouldNotPack);
 }
 
-void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, bool bIsSubAtlas, QDir metaDir)
+void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, ItemType eSubAtlasType, QDir metaDir)
 {
-	m_bIsSubAtlas = bIsSubAtlas;
+	if(eSubAtlasType == ITEM_Unknown) // NOTE: ITEM_None is valid
+	{
+		HyGuiLog("AtlasFrame::ReplaceImage() - eSubAtlasType is ITEM_Unknown", LOGTYPE_Error);
+		return;
+	}
+
+	m_eSubAtlasType = eSubAtlasType;
 	m_sName = sName;
 
 	m_uiChecksum = uiChecksum;
@@ -202,7 +208,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	m_uiHeight = newImage.height();
 
 	QRect rAlphaCrop; 
-	if(m_bIsSubAtlas == false)
+	if(m_eSubAtlasType == ITEM_None)
 		rAlphaCrop = HyGlobal::AlphaCropImage(newImage);
 	else // 'sub-atlases' should not be cropping their alpha because they rely on their own UV coordinates
 		rAlphaCrop = QRect(0, 0, newImage.width(), newImage.height());
@@ -228,7 +234,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 
 /*virtual*/ void AtlasFrame::InsertUniqueJson(QJsonObject &frameObj) /*override*/
 {
-	frameObj.insert("isSubAtlas", QJsonValue(m_bIsSubAtlas));
+	frameObj.insert("subAtlasType", QJsonValue(HyGlobal::ItemName(m_eSubAtlasType, false)));
 	frameObj.insert("width", QJsonValue(GetSize().width()));
 	frameObj.insert("height", QJsonValue(GetSize().height()));
 	frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));

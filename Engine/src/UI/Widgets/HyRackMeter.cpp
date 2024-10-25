@@ -329,8 +329,8 @@ void HyRackMeter::SetDenomination(uint32 uiDenom)
 
 	m_SpinText.SetVisible(m_Text.IsVisible() && IsSpinningMeter());
 
-	if (IsSpinningMeter())
-		m_SpinText.SetScissor(HyRect(/*GetWidth()*/99999, m_Text.GetHeight()));
+	if(IsSpinningMeter())
+		m_SpinText.SetScissor(HyRect(99999, m_Text.GetHeight())); // TODO: Get better values without creating an infinite loop
 	else
 		m_SpinText.ClearScissor(true);
 }

@@ -38,7 +38,7 @@ AtlasImportThread::AtlasImportThread(IManagerModel &managerModelRef, QStringList
 		if(atlasModelRef.IsImageValid(tempImage, m_uiBankId))
 		{
 			// ImportImage calls RegisterAsset()
-			atlasModelRef.m_ImportedAssetList.append(atlasModelRef.ImportImage(fileInfo.baseName(), tempImage, m_uiBankId, false, m_CorrespondingUuidList[i]));
+			atlasModelRef.m_ImportedAssetList.append(atlasModelRef.ImportImage(fileInfo.baseName(), tempImage, m_uiBankId, ITEM_None, m_CorrespondingUuidList[i]));
 
 			if(iEMIT_THROTTLE == 0 || (i % iEMIT_THROTTLE) == 0)
 				Q_EMIT ImportUpdate(i + 1, m_sImportAssetList.size());

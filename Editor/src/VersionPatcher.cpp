@@ -218,8 +218,12 @@
 			Patch_15to16(metaAtlasDoc, dataAtlasDoc);
 			[[fallthrough]];
 		case 16:
+			HyGuiLog("Patching project files: version 16 -> 17", LOGTYPE_Info);
+			Patch_16to17(metaAtlasDoc);
+			[[fallthrough]];
+		case 17:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 16, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 17, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -1435,6 +1439,33 @@
 	}
 	metaAtlasObj.insert("assets", metaAssetsArray);
 
+	metaAtlasDocRef.setObject(metaAtlasObj);
+}
+
+/*static*/ void VersionPatcher::Patch_16to17(QJsonDocument &metaAtlasDocRef)
+{
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
+	QJsonArray metaAssetsArray = metaAtlasObj["assets"].toArray();
+
+	for(int iMetaAssetIndex = 0; iMetaAssetIndex < metaAssetsArray.size(); ++iMetaAssetIndex)
+	{
+		QJsonObject metaAssetObj = metaAssetsArray[iMetaAssetIndex].toObject();
+		
+		// Upgrading 'isSubAtlas' (bool) to be 'subAtlasType' (string); ITEM_None is serialized as empty string ""
+		if(metaAssetObj.contains("isSubAtlas"))
+		{
+			if(metaAssetObj["isSubAtlas"].toBool())
+				metaAssetObj.insert("subAtlasType", QString("Text")); // The only sub-atlas at this point in time is "Text"
+			else
+				metaAssetObj.insert("subAtlasType", "");
+			
+			metaAssetObj.remove("isSubAtlas");
+		}
+
+		metaAssetsArray.replace(iMetaAssetIndex, metaAssetObj);
+	}
+
+	metaAtlasObj.insert("assets", metaAssetsArray);
 	metaAtlasDocRef.setObject(metaAtlasObj);
 }
 

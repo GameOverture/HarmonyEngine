@@ -391,7 +391,7 @@ void EntityDraw::SetExtrapolatedProperties()
 	ExtrapolateProperties(&m_RootEntity,
 						  nullptr,
 						  false,
-						  ITEM_Unknown, // 'ITEM_Unknown' indicates this is the root
+						  ITEM_None, // 'ITEM_None' indicates this is the root
 						  fFRAME_DURATION,
 						  0,
 						  iDESTINATION_FRAME,

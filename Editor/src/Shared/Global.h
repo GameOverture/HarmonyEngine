@@ -41,7 +41,7 @@ class Project;
 #define HySrcEntityFilter "_hy_"
 #define HySrcEntityNamespace "hy"
 
-#define HYGUI_FILE_VERSION 16
+#define HYGUI_FILE_VERSION 17
 
 #define DISPLAYORDER_SnapGuide		99999999
 #define DISPLAYORDER_TransformCtrl	9999999
@@ -51,7 +51,8 @@ class Project;
 
 enum ItemType
 {
-	ITEM_Unknown = -1,
+	ITEM_Unknown = -2,
+	ITEM_None = -1,
 
 	// Project items
 	ITEM_Project,
@@ -411,7 +412,7 @@ public:
 	static bool IsItemType_Project(ItemType eType);
 	static bool IsItemType_Asset(ItemType eType);
 
-	static const QString ItemName(ItemType eItem, bool bPlural)			{ return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
+	static const QString ItemName(ItemType eItem, bool bPlural)			{ if(eItem == ITEM_None) return QString(); return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
 	static const QString AssetName(AssetManagerType eAsset)				{ return sm_AssetNames[eAsset]; }
 	static const QString ShapeName(EditorShape eShape)					{ return sm_ShapeNames[eShape]; }
 	static const QString TweenFuncName(TweenFuncType eTween)			{ return sm_TweenFuncNames[eTween]; }

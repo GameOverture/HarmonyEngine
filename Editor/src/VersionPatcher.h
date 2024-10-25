@@ -24,6 +24,7 @@ private:
 	static void Patch_13to14(QJsonDocument &metaAtlasDocRef, const QJsonDocument &dataAtlasDocRef); // Adding 'textureSizes' array to each meta atlas bank. Also adding 'cropUnusedSpace', 'squareTexturesOnly', 'aggressiveResizing', and 'minimumFillRate' packing settings
 	static void Patch_14to15(QJsonDocument &dataItemsDocRef, const QJsonDocument &metaItemsDocRef, QJsonDocument &metaAudioDocRef, QJsonDocument &dataAudioDocRef); // Adding 'bankId' wherever only an audio checksum was used; Renaming 'group' -> 'category'; Renaming "playList" -> "playlist"
 	static void Patch_15to16(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef); // Within 'dataAtlasDocRef', adding 'cropMask' and changing [top,left,right,bottom] to 'frameMask' for each asset. THEN within 'metaAtlasDocRef', update all assets' 'cropRight' and 'cropBottom' to be margins, not stored QRect
+	static void Patch_16to17(QJsonDocument &metaAtlasDocRef); // Upgrading 'isSubAtlas' (bool) to be 'subAtlasType' (string); ITEM_None is serialized as empty string ""
 
 	static void RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta);
 };
