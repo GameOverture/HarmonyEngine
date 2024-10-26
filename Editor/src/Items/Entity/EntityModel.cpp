@@ -690,6 +690,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 		case ITEM_Text:
 		case ITEM_Spine:
 		case ITEM_Sprite:
+		case ITEM_TileMap:
 			if(pReferencedItemData == nullptr || pReferencedItemData->IsProjectItem() == false)
 				HyGuiLog("EntityModel::GenerateSrc_MemberInitializerList() - Could not find referenced project item for: " % pItem->GetCodeName(), LOGTYPE_Error);
 			else

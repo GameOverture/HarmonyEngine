@@ -73,6 +73,7 @@
      <addaction name="actionNewPrefix"/>
      <addaction name="separator"/>
      <addaction name="actionNewSprite"/>
+     <addaction name="actionNewTileMap"/>
      <addaction name="actionNewText"/>
      <addaction name="actionNewParticle"/>
      <addaction name="actionNewSpine"/>
@@ -892,6 +893,24 @@
    </property>
    <property name="toolTip">
     <string>Open the snapping settings dialog</string>
+   </property>
+  </action>
+  <action name="actionNewTileMap">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/TileMap-New.png</normaloff>:/icons16x16/items/TileMap-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>New Tile Map</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new tile map item in the currently selected project</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N, Ctrl+M</string>
    </property>
   </action>
  </widget>

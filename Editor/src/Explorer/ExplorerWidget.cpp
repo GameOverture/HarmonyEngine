@@ -118,6 +118,9 @@ bool ExplorerProxyModel::IsTypeFiltered(ItemType eType) const
 	case ITEM_Sprite:
 		return (m_uiFilterFlags & ITEMFILTER_Sprite) != 0;
 
+	case ITEM_TileMap:
+		return (m_uiFilterFlags & ITEMFILTER_TileMap) != 0;
+
 	case ITEM_Entity:
 		return (m_uiFilterFlags & ITEMFILTER_Entity) != 0;
 
@@ -211,6 +214,7 @@ ExplorerWidget::ExplorerWidget(QWidget *pParent) :
 
 	ui->btnFilterAll->setDefaultAction(ui->actionFilterAll);
 	ui->btnFilterSprite->setDefaultAction(ui->actionFilterSprite);
+	ui->btnFilterTileMap->setDefaultAction(ui->actionFilterTileMap);
 	ui->btnFilterText->setDefaultAction(ui->actionFilterText);
 	ui->btnFilterSpine->setDefaultAction(ui->actionFilterSpine);
 	ui->btnFilterAudio->setDefaultAction(ui->actionFilterAudio);
@@ -357,6 +361,11 @@ void ExplorerWidget::OnFilterUpdate()
 		ui->lblActiveFilter->setText("Show Only " + HyGlobal::ItemName(ITEM_Sprite, true));
 		uiFilter |= ITEMFILTER_Sprite;
 	}
+	else if(ui->btnFilterTileMap->isChecked())
+	{
+		ui->lblActiveFilter->setVisible(true);
+		ui->lblActiveFilter->setText("Show Only " + HyGlobal::ItemName(ITEM_TileMap, true));
+	}
 	else if(ui->btnFilterText->isChecked())
 	{
 		ui->lblActiveFilter->setVisible(true);
@@ -404,6 +413,7 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 		case ITEM_Text:
 		case ITEM_Spine:
 		case ITEM_Sprite:
+		case ITEM_TileMap:
 		case ITEM_Source:
 		case ITEM_Header:
 		case ITEM_Entity:
@@ -514,6 +524,7 @@ void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 	case ITEM_Text:
 	case ITEM_Spine:
 	case ITEM_Sprite:
+	case ITEM_TileMap:
 	case ITEM_Source:
 	case ITEM_Header:
 	case ITEM_Entity:
@@ -553,6 +564,7 @@ void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 		case ITEM_Text:
 		case ITEM_Spine:
 		case ITEM_Sprite:
+		case ITEM_TileMap:
 		case ITEM_Source:
 		case ITEM_Header:
 		case ITEM_Entity:

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TileMapWidget</class>
+ <widget class="QWidget" name="TileMapWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>379</width>
+    <height>561</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3"/>
+  <action name="actionAlignLeft">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/sprite-alignLeft.png</normaloff>:/icons16x16/sprite-alignLeft.png</iconset>
+   </property>
+   <property name="text">
+    <string>Align Left</string>
+   </property>
+   <property name="toolTip">
+    <string>Aligns the sprite's left side to its origin</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Left</string>
+   </property>
+  </action>
+  <action name="actionAlignRight">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/sprite-alignRight.png</normaloff>:/icons16x16/sprite-alignRight.png</iconset>
+   </property>
+   <property name="text">
+    <string>Align Right</string>
+   </property>
+   <property name="toolTip">
+    <string>Aligns the sprite's right side to its origin</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Right</string>
+   </property>
+  </action>
+  <action name="actionAlignUp">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/sprite-alignUp.png</normaloff>:/icons16x16/sprite-alignUp.png</iconset>
+   </property>
+   <property name="text">
+    <string>Align Up</string>
+   </property>
+   <property name="toolTip">
+    <string>Aligns the sprite's top side to its origin</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Up</string>
+   </property>
+  </action>
+  <action name="actionAlignDown">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/sprite-alignBottom.Image.png</normaloff>:/icons16x16/sprite-alignBottom.Image.png</iconset>
+   </property>
+   <property name="text">
+    <string>Align Down</string>
+   </property>
+   <property name="toolTip">
+    <string>Aligns the sprite's bottom side to its origin</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Down</string>
+   </property>
+  </action>
+  <action name="actionAlignCenterVertical">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/sprite-alignVertCenter.png</normaloff>:/icons16x16/sprite-alignVertCenter.png</iconset>
+   </property>
+   <property name="text">
+    <string>Align Center Vertical</string>
+   </property>
+   <property name="toolTip">
+    <string>Centers the sprite vertically to its origin</string>
+   </property>
+  </action>
+  <action name="actionAlignCenterHorizontal">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/sprite-alignHorzCenter.png</normaloff>:/icons16x16/sprite-alignHorzCenter.png</iconset>
+   </property>
+   <property name="text">
+    <string>Align Center Horizontal</string>
+   </property>
+   <property name="toolTip">
+    <string>Centers the sprite horizontally to its origin</string>
+   </property>
+  </action>
+  <action name="actionApplyToAll">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/sprite-applyToAll.png</normaloff>:/icons16x16/sprite-applyToAll.png</iconset>
+   </property>
+   <property name="text">
+    <string>Apply to all</string>
+   </property>
+   <property name="toolTip">
+    <string>Applys alignment to all frames in sprite state</string>
+   </property>
+  </action>
+  <action name="actionPlay">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/media-play.png</normaloff>:/icons16x16/media-play.png</iconset>
+   </property>
+   <property name="text">
+    <string>Play</string>
+   </property>
+   <property name="toolTip">
+    <string>Preview the sprite's animation</string>
+   </property>
+  </action>
+  <action name="actionFirstFrame">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/media-rewind.png</normaloff>:/icons16x16/media-rewind.png</iconset>
+   </property>
+   <property name="text">
+    <string>First Frame</string>
+   </property>
+   <property name="toolTip">
+    <string>Selects the first frame of this sprite's animation</string>
+   </property>
+  </action>
+  <action name="actionLastFrame">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/media-forward.png</normaloff>:/icons16x16/media-forward.png</iconset>
+   </property>
+   <property name="text">
+    <string>Last Frame</string>
+   </property>
+   <property name="toolTip">
+    <string>Selects the last frame of this sprite's animation</string>
+   </property>
+  </action>
+  <action name="actionOrderFrameDownwards">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Frame &amp;Downwards</string>
+   </property>
+   <property name="toolTip">
+    <string>Shift the selected frame to be played later in the sequence</string>
+   </property>
+  </action>
+  <action name="actionOrderFrameUpwards">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Order Frame &amp;Upwards</string>
+   </property>
+   <property name="toolTip">
+    <string>Shift the selected frame to be played earlier in the sequence</string>
+   </property>
+  </action>
+  <action name="actionRemoveFrames">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Frames</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes the selected frame</string>
+   </property>
+   <property name="shortcut">
+    <string>Del, Backspace</string>
+   </property>
+  </action>
+  <action name="actionImportFrames">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import &amp;Frames</string>
+   </property>
+   <property name="toolTip">
+    <string>Import the selected frames from the Atlas Manager</string>
+   </property>
+  </action>
+  <action name="actionRemoveAllFrames">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/sprite-deleteAll.png</normaloff>:/icons16x16/sprite-deleteAll.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove All Frames</string>
+   </property>
+   <property name="toolTip">
+    <string>Removes all the frames in the current state</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../../../data/HyEditor.qrc"/>
+ </resources>
+ <connections/>
+</ui>

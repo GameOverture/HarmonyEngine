@@ -827,6 +827,11 @@ void MainWindow::on_actionNewSprite_triggered()
 	NewItem(ITEM_Sprite);
 }
 
+void MainWindow::on_actionNewTileMap_triggered()
+{
+	NewItem(ITEM_TileMap);
+}
+
 void MainWindow::on_actionNewSpine_triggered()
 {
 	NewItem(ITEM_Spine);

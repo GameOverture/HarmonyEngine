@@ -51,6 +51,7 @@
 	sm_sItemNames[ITEM_Text] = "Text";
 	sm_sItemNames[ITEM_Spine] = "Spine";
 	sm_sItemNames[ITEM_Sprite] = "Sprite";
+	sm_sItemNames[ITEM_TileMap] = "TileMap";
 	sm_sItemNames[ITEM_Shader] = "Shader";
 	sm_sItemNames[ITEM_Prefab] = "Prefab";
 	sm_sItemNames[ITEM_Entity] = "Entity";
@@ -71,6 +72,7 @@
 	sm_sItemNamesPlural[ITEM_Text] = "Texts";
 	sm_sItemNamesPlural[ITEM_Spine] = "Spine";
 	sm_sItemNamesPlural[ITEM_Sprite] = "Sprites";
+	sm_sItemNamesPlural[ITEM_TileMap] = "TileMaps";
 	sm_sItemNamesPlural[ITEM_Shader] = "Shaders";
     sm_sItemNamesPlural[ITEM_Prefab] = "Prefabs";
 	sm_sItemNamesPlural[ITEM_Entity] = "Entities";
@@ -238,6 +240,7 @@
 	list.append(ITEM_Text);
 	list.append(ITEM_Spine);
 	list.append(ITEM_Sprite);
+	list.append(ITEM_TileMap);
 	list.append(ITEM_Shader);
 	list.append(ITEM_Prefab);
 	list.append(ITEM_Entity);
@@ -264,6 +267,7 @@
 	list.append(ITEM_Text);
 	list.append(ITEM_Spine);
 	list.append(ITEM_Sprite);
+	list.append(ITEM_TileMap);
 	list.append(ITEM_Shader);
 	list.append(ITEM_Prefab);
 	list.append(ITEM_Entity);

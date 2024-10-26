@@ -70,6 +70,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QToolButton" name="btnFilterTileMap">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="btnFilterText">
        <property name="text">
         <string>...</string>
@@ -337,6 +344,21 @@
    </property>
    <property name="toolTip">
     <string>Show only Entity project items</string>
+   </property>
+  </action>
+  <action name="actionFilterTileMap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/TileMap.png</normaloff>:/icons16x16/items/TileMap.png</iconset>
+   </property>
+   <property name="text">
+    <string>Filter TileMaps</string>
+   </property>
+   <property name="toolTip">
+    <string>Show only TileMap project items</string>
    </property>
   </action>
  </widget>

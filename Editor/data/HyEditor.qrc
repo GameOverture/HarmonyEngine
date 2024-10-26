@@ -271,5 +271,14 @@
         <file>icons16x16/sprite-deleteAll.png</file>
         <file>icons16x16/audio-manager.png</file>
         <file>icons16x16/sync-folder.png</file>
+        <file>icons16x16/items/TileMap.png</file>
+        <file>icons16x16/items/TileMap-Close.png</file>
+        <file>icons16x16/items/TileMap-Delete.png</file>
+        <file>icons16x16/items/TileMap-Dirty.png</file>
+        <file>icons16x16/items/TileMap-New.png</file>
+        <file>icons16x16/items/TileMap-Open.png</file>
+        <file>icons16x16/items/TileMap-Pending.png</file>
+        <file>icons16x16/items/TileMap-Settings.png</file>
+        <file>icons16x16/items/TileMap-Warning.png</file>
     </qresource>
 </RCC>

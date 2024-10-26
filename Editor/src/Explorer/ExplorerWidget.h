@@ -34,12 +34,13 @@ class ProjectItemData;
 enum ExplorerItemFilterFlags
 {
 	ITEMFILTER_Sprite	= 1 << 0,
-	ITEMFILTER_Text		= 1 << 1,
-	ITEMFILTER_Spine	= 1 << 2,
-	ITEMFILTER_Audio	= 1 << 3,
-	ITEMFILTER_Entity	= 1 << 4,
+	ITEMFILTER_TileMap	= 1 << 1,
+	ITEMFILTER_Text		= 1 << 2,
+	ITEMFILTER_Spine	= 1 << 3,
+	ITEMFILTER_Audio	= 1 << 4,
+	ITEMFILTER_Entity	= 1 << 5,
 
-	ITEMFILTER_All = (ITEMFILTER_Sprite | ITEMFILTER_Text | ITEMFILTER_Spine | ITEMFILTER_Audio | ITEMFILTER_Entity)
+	ITEMFILTER_All = (ITEMFILTER_Sprite | ITEMFILTER_TileMap | ITEMFILTER_Text | ITEMFILTER_Spine | ITEMFILTER_Audio | ITEMFILTER_Entity)
 };
 
 class ExplorerProxyModel : public QSortFilterProxyModel

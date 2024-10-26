@@ -130,6 +130,15 @@ if(Qt5_DIR)
 		src/Items/Text/SubWidgets/TextFontManager.h
 		src/Items/Text/SubWidgets/TextLayersModel.h
 		src/Items/Text/SubWidgets/TextLayersWidget.h
+		src/Items/TileMap/TileMapDraw.cpp
+		src/Items/TileMap/TileMapModels.cpp
+		src/Items/TileMap/TileMapUndoCmds.cpp
+		src/Items/TileMap/TileMapWidget.cpp
+		src/Items/TileMap/TileMapDraw.h
+		src/Items/TileMap/TileMapModels.h
+		src/Items/TileMap/TileMapUndoCmds.h
+		src/Items/TileMap/TileMapWidget.h
+		src/Items/TileMap/TileMapWidget.ui
 		src/Items/Entity/EntityDopeSheetScene.cpp
 		src/Items/Entity/EntityDopeSheetScene.h
 		src/Items/Entity/EntityDopeSheetView.cpp
@@ -331,6 +340,7 @@ if(Qt5_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets/Audio")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Sprite")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/TileMap")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Text")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Spine")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Prefab")

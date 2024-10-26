@@ -16,6 +16,7 @@
 #include "GlobalUndoCmds.h"
 #include "DlgInputName.h"
 #include "SpriteModels.h"
+#include "TileMapModels.h"
 #include "TextModel.h"
 #include "EntityModel.h"
 #include "PrefabModel.h"
@@ -138,6 +139,9 @@ void IWidget::OnRemoveStateTriggered()
 	case ITEM_Sprite:
 		pCmd = new UndoCmd_RemoveState<SpriteStateData>("Remove Sprite State", m_ItemRef, uiWidget->cmbStates->currentIndex());
 		break;
+	case ITEM_TileMap:
+		pCmd = new UndoCmd_RemoveState<TileMapStateData>("Remove TileMap State", m_ItemRef, uiWidget->cmbStates->currentIndex());
+		break;
 	case ITEM_Text:
 		pCmd = new UndoCmd_RemoveState<TextStateData>("Remove Text State", m_ItemRef, uiWidget->cmbStates->currentIndex());
 		break;
@@ -193,6 +197,9 @@ void IWidget::AppendState(int iCopyFromState)
 	{
 	case ITEM_Sprite:
 		pCmd = new UndoCmd_AddState<SpriteStateData>(sText, m_ItemRef, iCopyFromState);
+		break;
+	case ITEM_TileMap:
+		pCmd = new UndoCmd_AddState<TileMapStateData>(sText, m_ItemRef, iCopyFromState);
 		break;
 	case ITEM_Text:
 		pCmd = new UndoCmd_AddState<TextStateData>(sText, m_ItemRef, iCopyFromState);
