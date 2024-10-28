@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>668</width>
-    <height>560</height>
+    <height>584</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -287,7 +287,7 @@
         <enum>QTabWidget::South</enum>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tabOutputLog">
         <attribute name="title">
@@ -339,6 +339,28 @@
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="tabTileSet">
+        <attribute name="title">
+         <string>TileSet Editor</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_10">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="AuxTileSet" name="widget" native="true"/>
+         </item>
+        </layout>
+       </widget>
        <widget class="QWidget" name="tabDopeSheet">
         <attribute name="title">
          <string>Entity Dope Sheet</string>
@@ -364,7 +386,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab">
+       <widget class="QWidget" name="tabShaderEditor">
         <attribute name="title">
          <string>Shader Editor</string>
         </attribute>
@@ -950,6 +972,12 @@
    <class>HarmonyStatusBar</class>
    <extends>QWidget</extends>
    <header>MainWindow.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>AuxTileSet</class>
+   <extends>QWidget</extends>
+   <header>AuxTileSet.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

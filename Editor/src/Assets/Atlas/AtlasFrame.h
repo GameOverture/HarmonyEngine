@@ -22,6 +22,7 @@ class AtlasFrame : public IAssetItemData
 {
 	Q_OBJECT
 
+protected:
 	ItemType							m_eSubAtlasType;
 
 	quint16								m_uiWidth;
@@ -41,7 +42,8 @@ class AtlasFrame : public IAssetItemData
 	QIcon								m_Thumbnail;
 
 public:
-	AtlasFrame(IManagerModel &modelRef,
+	AtlasFrame(ItemType eThisAssetType, // Might be either ITEM_AtlasFrame or ITEM_AtlasTileSet
+			   IManagerModel &modelRef,
 			   ItemType eSubAtlasType,
 			   QUuid uuid,
 			   quint32 uiChecksum,
@@ -90,6 +92,7 @@ public:
 	void ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImage, ItemType eSubAtlasType, QDir metaDir);
 
 	virtual QString GetPropertyInfo() override;
+	virtual QString OnReplaceAllowed() override;
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
 };
 

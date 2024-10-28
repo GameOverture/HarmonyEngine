@@ -71,6 +71,7 @@ enum ItemType
 	// Asset items
 	ITEM_Filter,
 	ITEM_AtlasFrame,
+	ITEM_AtlasTileSet,
 	ITEM_SoundClip,
 	ITEM_Source,
 	ITEM_Header,
@@ -105,6 +106,7 @@ enum AuxTab
 {
 	AUXTAB_Log = 0,			// Always visible
 	AUXTAB_AssetInspector,	// Visible when Asset Manager Docking Window is visible
+	AUXTAB_TileSet,			// Only visible when a single TileSet is selected in the Asset Manager
 	AUXTAB_DopeSheet,		// Only visible when an Entity is the current item opened
 	AUXTAB_ShaderEditor		// Only visible when a Shader is the current item opened
 };

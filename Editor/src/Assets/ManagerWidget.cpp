@@ -23,7 +23,6 @@
 #include "AuxAssetInspector.h"
 #include "DlgAssetProperties.h"
 #include "DlgSyncAssets.h"
-#include "DlgImportTileSheet.h"
 #include "SourceModel.h"
 #include "SourceFile.h"
 #include "AssetMimeData.h"
@@ -586,7 +585,7 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 		contextMenu.addAction(ui->actionImportAssets);
 		contextMenu.addAction(ui->actionImportDirectory);
 		if(m_pModel->GetAssetType() == ASSETMAN_Atlases)
-			contextMenu.addAction(ui->actionImportTileSheet);
+			contextMenu.addAction(ui->actionCreateTileSet);
 
 		contextMenu.addAction(ui->actionAddFilter);
 		if(selectedFiltersList.empty() == false)
@@ -658,7 +657,7 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 		contextMenu.addAction(ui->actionImportAssets);
 		contextMenu.addAction(ui->actionImportDirectory);
 		if(m_pModel->GetAssetType() == ASSETMAN_Atlases)
-			contextMenu.addAction(ui->actionImportTileSheet);
+			contextMenu.addAction(ui->actionCreateTileSet);
 		contextMenu.addAction(ui->actionAddFilter);
 
 		// Check if any selected assets are 'generated' from their project item. If so, prevent delete/replace
@@ -703,6 +702,11 @@ void ManagerWidget::on_assetTree_pressed(const QModelIndex &index)
 	ui->actionReplaceAssets->setEnabled(iNumSelected != 0);
 
 	static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_AssetInspector))->SetFocusedAssets(m_pModel->GetAssetType(), selectedAssetsList);
+
+	if(iNumSelected == 1 && selectedFiltersList.empty() && selectedAssetsList[0]->GetType() == ITEM_AtlasTileSet)
+		MainWindow::FocusAuxWidget(AUXTAB_TileSet);
+	else
+		MainWindow::HideAuxWidget(AUXTAB_TileSet);
 }
 
 void ManagerWidget::on_assetTree_doubleClicked(const QModelIndex &index)
@@ -1100,10 +1104,38 @@ void ManagerWidget::on_actionAddFilter_triggered()
 	delete pDlg;
 }
 
-void ManagerWidget::on_actionImportTileSheet_triggered()
+void ManagerWidget::on_actionCreateTileSet_triggered()
 {
-	DlgImportTileSheet dlgImportTileSheet(*Harmony::GetProject(), this);
-	dlgImportTileSheet.exec();
+	if(m_pModel->GetAssetType() != ASSETMAN_Atlases)
+	{
+		HyGuiLog("ManagerWidget::on_actionCreateTileSet_triggered() - Asset type is not Atlases", LOGTYPE_Error);
+		return;
+	}
+
+	uint uiBankId = static_cast<IManagerModel *>(static_cast<ManagerProxyModel *>(ui->assetTree->model())->sourceModel())->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex());
+
+	TreeModelItemData *pParentTreeItem = nullptr;
+	if(m_bUseContextMenuSelection)
+	{
+		pParentTreeItem = m_pContextMenuSelection;
+		m_bUseContextMenuSelection = false;
+	}
+	else
+		pParentTreeItem = GetSelected();
+
+	pParentTreeItem = m_pModel->FindTreeItemFilter(pParentTreeItem);
+
+	DlgInputName dlgInputName("Enter TileSet Name", "New TileSet", HyGlobal::FileNameValidator(), nullptr, nullptr);
+	if(dlgInputName.exec() == QDialog::Accepted)
+	{
+		QString sName = dlgInputName.GetName();
+		AtlasModel *pAtlasModel = static_cast<AtlasModel *>(m_pModel);
+		AtlasTileSet *pNewTileSet = pAtlasModel->GenerateTileSet(sName, pParentTreeItem, uiBankId);
+		QModelIndex tileSetIndex = pAtlasModel->FindIndex<AtlasTileSet *>(pNewTileSet, 0);
+
+		ui->assetTree->expand(tileSetIndex);
+		//ui->assetTree->selectionModel()->select(tileSetIndex, QItemSelectionModel::ClearAndSelect);
+	}
 }
 
 void ManagerWidget::on_chkShowAllBanks_clicked()

@@ -280,5 +280,14 @@
         <file>icons16x16/items/TileMap-Pending.png</file>
         <file>icons16x16/items/TileMap-Settings.png</file>
         <file>icons16x16/items/TileMap-Warning.png</file>
+        <file>icons16x16/items/AtlasTileSet.png</file>
+        <file>icons16x16/items/AtlasTileSet-Close.png</file>
+        <file>icons16x16/items/AtlasTileSet-Delete.png</file>
+        <file>icons16x16/items/AtlasTileSet-Dirty.png</file>
+        <file>icons16x16/items/AtlasTileSet-New.png</file>
+        <file>icons16x16/items/AtlasTileSet-Open.png</file>
+        <file>icons16x16/items/AtlasTileSet-Pending.png</file>
+        <file>icons16x16/items/AtlasTileSet-Settings.png</file>
+        <file>icons16x16/items/AtlasTileSet-Warning.png</file>
     </qresource>
 </RCC>

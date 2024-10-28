@@ -500,7 +500,13 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 /*static*/ void MainWindow::FocusAuxWidget(AuxTab eTabIndex)
 {
+	sm_pInstance->ui->tabWidgetAux->setTabVisible(eTabIndex, true);
 	sm_pInstance->ui->tabWidgetAux->setCurrentIndex(eTabIndex);
+}
+
+/*static*/ void MainWindow::HideAuxWidget(AuxTab eTabIndex)
+{
+	sm_pInstance->ui->tabWidgetAux->setTabVisible(eTabIndex, false);
 }
 
 /*static*/ void MainWindow::SetStatus(const QString &sMessage, int iTimeoutMs)

@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "AtlasModel.h"
 #include "AtlasDraw.h"
+#include "AtlasTileSet.h"
 #include "Project.h"
 #include "AtlasRepackThread.h"
 #include "MainWindow.h"
@@ -21,7 +22,8 @@
 #include <QMimeData>
 
 AtlasModel::AtlasModel(Project &projRef) :
-	IManagerModel(projRef, ASSETMAN_Atlases)
+	IManagerModel(projRef, ASSETMAN_Atlases),
+	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0)
 {
 
 }
@@ -165,6 +167,29 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	return true;
 }
 
+AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pParentTreeItemData, quint32 uiBankId)
+{
+	AtlasTileSet *pNewTileSet = new AtlasTileSet(*this,
+												 QUuid::createUuid(),
+												 0,
+												 uiBankId,
+												 sName,
+												 m_DefaultTextureInfo,
+												 0,
+												 0,
+												 -1,
+												-1,
+												-1,
+												0);
+
+	RegisterAsset(pNewTileSet);
+
+	TreeModelItem *pTreeParent = pParentTreeItemData ? GetItem(FindIndex<TreeModelItemData *>(pParentTreeItemData, 0)) : nullptr;
+	InsertTreeItem(m_ProjectRef, pNewTileSet, pTreeParent);
+
+	return pNewTileSet;
+}
+
 /*virtual*/ QString AtlasModel::OnBankInfo(uint uiBankIndex) /*override*/
 {
 	QString sInfo = "Num Textures: " % QString::number(GetNumTextures(uiBankIndex)) % " | " %
@@ -251,29 +276,49 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 
 /*virtual*/ IAssetItemData *AtlasModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
-	//// NOTE: Using 2 QPoint constructor which stores differently than if passed 4 scalars
-	//QRect rAlphaCrop(QPoint(metaObj["cropLeft"].toInt(), metaObj["cropTop"].toInt()),
-	//				 QPoint(metaObj["cropRight"].toInt(), metaObj["cropBottom"].toInt()));
+	ItemType eAssetItemType = HyGlobal::GetTypeFromString(metaObj["itemType"].toString());
+	if(eAssetItemType == ITEM_AtlasFrame)
+	{
+		AtlasFrame *pNewFrame = new AtlasFrame(eAssetItemType,
+											   *this,
+											   HyGlobal::GetTypeFromString(metaObj["subAtlasType"].toString()),
+											   QUuid(metaObj["assetUUID"].toString()),
+											   JSONOBJ_TOINT(metaObj, "checksum"),
+											   JSONOBJ_TOINT(metaObj, "bankId"),
+											   metaObj["name"].toString(),
+											   metaObj["cropLeft"].toInt(),
+											   metaObj["cropTop"].toInt(),
+											   metaObj["cropRight"].toInt(),
+											   metaObj["cropBottom"].toInt(),
+											   HyTextureInfo(JSONOBJ_TOINT(metaObj, "textureInfo")),
+											   metaObj["width"].toInt(),
+											   metaObj["height"].toInt(),
+											   metaObj["x"].toInt(),
+											   metaObj["y"].toInt(),
+											   metaObj["textureIndex"].toInt(),
+											   metaObj["errors"].toInt(0));
 
-	AtlasFrame *pNewFrame = new AtlasFrame(*this,
-										   HyGlobal::GetTypeFromString(metaObj["subAtlasType"].toString()),
-										   QUuid(metaObj["assetUUID"].toString()),
-										   JSONOBJ_TOINT(metaObj, "checksum"),
-										   JSONOBJ_TOINT(metaObj, "bankId"),
-										   metaObj["name"].toString(),
-										   metaObj["cropLeft"].toInt(),
-										   metaObj["cropTop"].toInt(),
-										   metaObj["cropRight"].toInt(),
-										   metaObj["cropBottom"].toInt(),
-										   HyTextureInfo(JSONOBJ_TOINT(metaObj, "textureInfo")),
-										   metaObj["width"].toInt(),
-										   metaObj["height"].toInt(),
-										   metaObj["x"].toInt(),
-										   metaObj["y"].toInt(),
-										   metaObj["textureIndex"].toInt(),
-										   metaObj["errors"].toInt(0));
+		return pNewFrame;
+	}
+	else if(eAssetItemType == ITEM_AtlasTileSet)
+	{
+		AtlasTileSet *pNewTileSet = new AtlasTileSet(*this,
+													 QUuid(metaObj["assetUUID"].toString()),
+													 JSONOBJ_TOINT(metaObj, "checksum"),
+													 JSONOBJ_TOINT(metaObj, "bankId"),
+													 metaObj["name"].toString(),
+													 HyTextureInfo(JSONOBJ_TOINT(metaObj, "textureInfo")),
+													 metaObj["width"].toInt(),
+													 metaObj["height"].toInt(),
+													 metaObj["x"].toInt(),
+													 metaObj["y"].toInt(),
+													 metaObj["textureIndex"].toInt(),
+													 metaObj["errors"].toInt(0));
+		return pNewTileSet;
+	}
 
-	return pNewFrame;
+	HyGuiLog("AtlasModel::OnAllocateAssetData() - Unknown asset type: " % metaObj["itemType"].toString(), LOGTYPE_Error);
+	return nullptr;
 }
 
 /*virtual*/ void AtlasModel::OnGenerateAssetsDlg(const QModelIndex &indexDestination) /*override*/
@@ -593,8 +638,8 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiB
 	quint16 uiCropRight = newImage.width() - (rAlphaCrop.left() + rAlphaCrop.width());
 	quint16 uiCropBottom = newImage.height() - (rAlphaCrop.top() + rAlphaCrop.height());
 
-	HyTextureInfo info(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0);
-	AtlasFrame *pNewAsset = new AtlasFrame(*this,
+	AtlasFrame *pNewAsset = new AtlasFrame(ITEM_AtlasFrame,
+											*this,
 											eSubAtlasType,
 											uuid,
 											uiChecksum,
@@ -604,7 +649,7 @@ AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiB
 											uiCropTop,
 											uiCropRight,
 											uiCropBottom,
-											info,
+											m_DefaultTextureInfo,
 											newImage.width(),
 											newImage.height(),
 											-1,

@@ -46,6 +46,11 @@ SourceFile::~SourceFile()
 	return QString();
 }
 
+/*virtual*/ QString SourceFile::OnReplaceAllowed() /*override*/
+{
+	return QString();
+}
+
 /*virtual*/ void SourceFile::InsertUniqueJson(QJsonObject &frameObj) /*override*/
 {
 	frameObj.insert("baseClass", QJsonValue(m_sBaseClass));

@@ -12,7 +12,8 @@
 #include "IManagerModel.h"
 #include "SpineModel.h"
 
-AtlasFrame::AtlasFrame(IManagerModel &modelRef,
+AtlasFrame::AtlasFrame(ItemType eThisAssetType, // Might be either ITEM_AtlasFrame or ITEM_AtlasTileSet
+					   IManagerModel &modelRef,
 					   ItemType eSubAtlasType,
 					   QUuid uuid,
 					   quint32 uiChecksum,
@@ -29,7 +30,7 @@ AtlasFrame::AtlasFrame(IManagerModel &modelRef,
 					   quint16 uiY,
 					   int iTextureIndex,
 					   uint uiErrors) :
-	IAssetItemData(modelRef, ITEM_AtlasFrame, uuid, uiChecksum, uiBankId, sName, ".png", uiErrors),
+	IAssetItemData(modelRef, eThisAssetType, uuid, uiChecksum, uiBankId, sName, ".png", uiErrors),
 	m_eSubAtlasType(eSubAtlasType),
 	m_uiWidth(uiW),
 	m_uiHeight(uiH),
@@ -230,6 +231,25 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 /*virtual*/ QString AtlasFrame::GetPropertyInfo() /*override*/
 {
 	return QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(m_TexInfo.m_uiFormat)).c_str()) % " | " % QString(HyAssets::GetTextureFilteringName(static_cast<HyTextureFiltering>(m_TexInfo.m_uiFiltering)).c_str());
+}
+
+/*virtual*/ QString AtlasFrame::OnReplaceAllowed() /*override*/
+{
+	if(GetSubAtlasType() != ITEM_None)
+	{
+		QString sDependant;
+		if(GetDependants().empty() == false && GetDependants()[0]->IsProjectItem())
+			sDependant = static_cast<ProjectItemData *>(GetDependants()[0])->GetName(true);
+		QString sMessage;
+		if(sDependant.isEmpty() == false)
+			sMessage = "'" % GetName() % "' asset cannot be replaced because it is a sub-atlas of item:\n\n" % sDependant;
+		else
+			sMessage = "'" % GetName() % "' asset cannot be replaced because it is a sub-atlas";
+		
+		return sMessage;
+	}
+
+	return "";
 }
 
 /*virtual*/ void AtlasFrame::InsertUniqueJson(QJsonObject &frameObj) /*override*/

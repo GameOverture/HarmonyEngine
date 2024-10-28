@@ -159,6 +159,11 @@ void SoundClip::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader 
 	return sInfo;
 }
 
+/*virtual*/ QString SoundClip::OnReplaceAllowed() /*override*/
+{
+	return QString();
+}
+
 /*virtual*/ void SoundClip::InsertUniqueJson(QJsonObject &frameObj) /*override*/
 {
 	QJsonObject wavHeaderObj;

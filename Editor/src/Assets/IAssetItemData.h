@@ -51,15 +51,14 @@ public:
 	bool DeleteMetaFile();
 
 	virtual QString GetPropertyInfo() = 0;
+	virtual QString OnReplaceAllowed() = 0; // Returns an empty string if this asset can be replaced, otherwise returns a message explaining why it can't be replaced
+	virtual void InsertUniqueJson(QJsonObject &assetObj) = 0;
 
 	void SetError(AssetErrorType eError);
 	void ClearError(AssetErrorType eError);
 	uint GetErrors();
 
 	void GetJsonObj(QJsonObject &assetObj);
-
-protected:
-	virtual void InsertUniqueJson(QJsonObject &assetObj) = 0;
 };
 
 #endif // IASSETITEMDATA_H

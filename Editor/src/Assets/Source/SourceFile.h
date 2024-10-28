@@ -38,6 +38,7 @@ public:
 
 	virtual QString ConstructMetaFileName() const override;
 	virtual QString GetPropertyInfo() override;
+	virtual QString OnReplaceAllowed() override;
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
 
 	void AddCodeEditor(WgtCodeEditor *pCodeEditor);

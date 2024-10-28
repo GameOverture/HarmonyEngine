@@ -98,6 +98,7 @@ public:
 
 	static QWidget *GetAuxWidget(AuxTab eTabIndex);
 	static void FocusAuxWidget(AuxTab eTabIndex);
+	static void HideAuxWidget(AuxTab eTabIndex);
 
 	static void SetStatus(const QString &sMessage, int iTimeoutMs);
 	static void SetTempStatus(const QString &sMessage);

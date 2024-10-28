@@ -332,14 +332,10 @@ void IManagerModel::ReplaceAssets(QList<IAssetItemData *> assetsList, bool bWith
 		// Make sure no sub-atlases are being replaced
 		for(IAssetItemData *pAsset : assetsList)
 		{
-			if(pAsset->GetType() == ITEM_AtlasFrame && static_cast<AtlasFrame *>(pAsset)->GetSubAtlasType() != ITEM_None)
+			QString sReplaceResult = pAsset->OnReplaceAllowed();
+			if(sReplaceResult.isEmpty() == false)
 			{
-				QString sDependant;
-				if(pAsset->GetDependants().empty() == false && pAsset->GetDependants()[0]->IsProjectItem())
-					sDependant = static_cast<ProjectItemData *>(pAsset->GetDependants()[0])->GetName(true);
-				QString sMessage = "'" % pAsset->GetName() % "' asset cannot be replaced because it is a sub-atlas of item:\n\n" % sDependant;
-				HyGuiLog(sMessage, LOGTYPE_Warning);
-
+				HyGuiLog(sReplaceResult, LOGTYPE_Warning);
 				return;
 			}
 		}

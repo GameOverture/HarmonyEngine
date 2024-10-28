@@ -383,16 +383,16 @@
     <string>Add a new file to project</string>
    </property>
   </action>
-  <action name="actionImportTileSheet">
+  <action name="actionCreateTileSet">
    <property name="icon">
     <iconset resource="../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/Tools-ImportTileSheet.png</normaloff>:/icons16x16/Tools-ImportTileSheet.png</iconset>
+     <normaloff>:/icons16x16/items/AtlasTileSet-New.png</normaloff>:/icons16x16/items/AtlasTileSet-New.png</iconset>
    </property>
    <property name="text">
-    <string>Import Tile Sheet</string>
+    <string>Create New TileSet</string>
    </property>
    <property name="toolTip">
-    <string>Automatically slice an assembled grid of sprites from a single image</string>
+    <string>TileSets are a group of image tiles to create a game's layout and are used by TileMaps</string>
    </property>
   </action>
   <action name="actionOpenBankExplorer">

@@ -75,6 +75,8 @@ if(Qt5_DIR)
 		src/Assets/Atlas/AtlasPacker.h
 		src/Assets/Atlas/AtlasRepackThread.cpp
 		src/Assets/Atlas/AtlasRepackThread.h
+		src/Assets/Atlas/AtlasTileSet.cpp
+		src/Assets/Atlas/AtlasTileSet.h
 		src/Assets/Audio/AudioAssetsWidget.cpp
 		src/Assets/Audio/AudioAssetsWidget.h
 		src/Assets/Audio/AudioAssetsWidget.ui
@@ -285,9 +287,9 @@ if(Qt5_DIR)
 		src/Widget/Auxiliary/AuxShaderEditor.cpp
 		src/Widget/Auxiliary/AuxShaderEditor.h
 		src/Widget/Auxiliary/AuxShaderEditor.ui
-		src/Widget/Auxiliary/AuxToolBox.cpp
-		src/Widget/Auxiliary/AuxToolBox.h
-		src/Widget/Auxiliary/AuxToolBox.ui
+		src/Widget/Auxiliary/AuxTileSet.cpp
+		src/Widget/Auxiliary/AuxTileSet.h
+		src/Widget/Auxiliary/AuxTileSet.ui
 		src/Widget/WgtAudioCategory.cpp
 		src/Widget/WgtAudioCategory.h
 		src/Widget/WgtAudioCategory.ui
