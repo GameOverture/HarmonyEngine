@@ -143,6 +143,8 @@ void SpriteDraw::SetFrame(quint32 uiStateIndex, quint32 uiFrameIndex)
 
 	m_pSpriteDrawItem->OnApplyJsonData(itemDataDocRef, pWidget->IsPlayingAnim());
 	SetFrame(static_cast<HySprite2d *>(m_pSpriteDrawItem->GetHyNode())->GetState(), static_cast<HySprite2d *>(m_pSpriteDrawItem->GetHyNode())->GetFrame());
+
+	RefreshTransforms();
 }
 
 /*virtual*/ void SpriteDraw::OnResizeRenderer() /*override*/
