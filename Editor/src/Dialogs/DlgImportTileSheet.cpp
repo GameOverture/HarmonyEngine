@@ -31,7 +31,6 @@ DlgImportTileSheet::DlgImportTileSheet(Project &projectRef, QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	ui->txtTilePrefix->setValidator(HyGlobal::FreeFormValidator());
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
 
 	ErrorCheck();
@@ -53,7 +52,7 @@ void DlgImportTileSheet::on_buttonBox_accepted()
 	uint uiPixmapIndex = 0;
 	for(auto pPixmap : m_TilePixmaps)
 	{
-		QString sMetaName = ui->txtTilePrefix->text();
+		QString sMetaName;// = ui->txtTilePrefix->text();
 		sprintf(szBuffer, "%05u.png", uiPixmapIndex);
 		sMetaName += szBuffer;
 		
