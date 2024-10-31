@@ -485,6 +485,8 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		return sm_pInstance->ui->outputLog;
 	case AUXTAB_AssetInspector:
 		return sm_pInstance->ui->assetInspector;
+	case AUXTAB_TileSet:
+		return sm_pInstance->ui->tileSetEditor;
 	case AUXTAB_DopeSheet:
 		return sm_pInstance->ui->dopeSheet;
 	case AUXTAB_ShaderEditor:

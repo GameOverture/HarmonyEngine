@@ -10,6 +10,8 @@
 #ifndef DlgImportTileSheet_H
 #define DlgImportTileSheet_H
 
+#include "AtlasTileSet.h"
+
 #include <QDialog>
 
 namespace Ui {
@@ -20,30 +22,40 @@ class DlgImportTileSheet : public QDialog
 {
 	Q_OBJECT
 
-	Project &				m_ProjectRef;
+	const QSize				m_DEFAULT_TILE_SIZE;
+	AtlasTileSet &			m_TileSetRef;
+
+
 	QPixmap *				m_pOrigPixmap;
 	QVector<QPixmap *>		m_TilePixmaps;
 	QPixmap *				m_pPreviewPixmap;
 
+	bool					m_bIsShowingTileSheet;
+
 public:
-	explicit DlgImportTileSheet(Project &projectRef, QWidget *parent = 0);
+	explicit DlgImportTileSheet(AtlasTileSet &tileSetRef, QWidget *parent = 0);
 	~DlgImportTileSheet();
 
 private Q_SLOTS:
 
-	void on_buttonBox_accepted();
+	void on_radTileSheet_toggled(bool bChecked);
+	void on_radTileImages_toggled(bool bChecked);
 
 	void on_btnImageBrowse_clicked();
 
-	void on_sbGridX_valueChanged(int iArg);
-	void on_sbGridY_valueChanged(int iArg);
+	void on_sbTileSizeX_valueChanged(int iArg);
+	void on_sbTileSizeY_valueChanged(int iArg);
 	void on_sbOffsetX_valueChanged(int iArg);
 	void on_sbOffsetY_valueChanged(int iArg);
 	void on_sbPaddingX_valueChanged(int iArg);
 	void on_sbPaddingY_valueChanged(int iArg);
 
+	void on_buttonBox_accepted();
+
 private:
 	Ui::DlgImportTileSheet *ui;
+
+	void SetWidgets(bool bTileSheet);
 
 	void AssemblePixmaps();
 

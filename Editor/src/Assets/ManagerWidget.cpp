@@ -21,6 +21,7 @@
 #include "PrefabModel.h"
 #include "MainWindow.h"
 #include "AuxAssetInspector.h"
+#include "AuxTileSet.h"
 #include "DlgAssetProperties.h"
 #include "DlgSyncAssets.h"
 #include "SourceModel.h"
@@ -704,7 +705,10 @@ void ManagerWidget::on_assetTree_pressed(const QModelIndex &index)
 	static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_AssetInspector))->SetFocusedAssets(m_pModel->GetAssetType(), selectedAssetsList);
 
 	if(iNumSelected == 1 && selectedFiltersList.empty() && selectedAssetsList[0]->GetType() == ITEM_AtlasTileSet)
+	{
+		static_cast<AuxTileSet *>(MainWindow::GetAuxWidget(AUXTAB_TileSet))->Init(static_cast<AtlasTileSet *>(selectedAssetsList[0]));
 		MainWindow::FocusAuxWidget(AUXTAB_TileSet);
+	}
 	else
 		MainWindow::HideAuxWidget(AUXTAB_TileSet);
 }

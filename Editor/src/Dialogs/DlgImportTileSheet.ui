@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Import New Tile Sheet</string>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -45,6 +45,13 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <widget class="QLabel" name="lblInput">
+       <property name="text">
+        <string>Input Image</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLineEdit" name="txtImagePath">
        <property name="readOnly">
         <bool>true</bool>
@@ -61,7 +68,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="grpSlicingOptions">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -93,7 +100,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="sbGridX">
+       <widget class="QSpinBox" name="sbTileSizeX">
         <property name="minimumSize">
          <size>
           <width>50</width>
@@ -119,7 +126,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="sbGridY">
+       <widget class="QSpinBox" name="sbTileSizeY">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>

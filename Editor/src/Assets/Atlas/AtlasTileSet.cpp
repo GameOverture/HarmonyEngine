@@ -20,14 +20,21 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 					   quint16 uiH,
 					   quint16 uiX,
 					   quint16 uiY,
+					   QSize tileSize,
 					   int iTextureIndex,
 					   uint uiErrors) :
-	AtlasFrame(ITEM_AtlasTileSet, modelRef, ITEM_AtlasTileSet, uuid, uiChecksum, uiBankId, sName, 0, 0, 0, 0, texInfo, uiW, uiH, uiX, uiY, iTextureIndex, uiErrors)
+	AtlasFrame(ITEM_AtlasTileSet, modelRef, ITEM_AtlasTileSet, uuid, uiChecksum, uiBankId, sName, 0, 0, 0, 0, texInfo, uiW, uiH, uiX, uiY, iTextureIndex, uiErrors),
+	m_TileSize(tileSize)
 {
 }
 
 AtlasTileSet::~AtlasTileSet()
 {
+}
+
+QSize AtlasTileSet::GetTileSize() const
+{
+	return m_TileSize;
 }
 
 /*virtual*/ void AtlasTileSet::InsertUniqueJson(QJsonObject &frameObj) /*override*/
@@ -38,6 +45,10 @@ AtlasTileSet::~AtlasTileSet()
 	frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));
 	frameObj.insert("x", QJsonValue(GetX()));
 	frameObj.insert("y", QJsonValue(GetY()));
+
+	frameObj.insert("tileWidth", QJsonValue(m_TileSize.width()));
+	frameObj.insert("tileHeight", QJsonValue(m_TileSize.height()));
+
 	frameObj.insert("cropLeft", QJsonValue(m_uiCropLeft));// GetCrop().left()));
 	frameObj.insert("cropTop", QJsonValue(m_uiCropTop));//GetCrop().top()));
 	frameObj.insert("cropRight", QJsonValue(m_uiCropRight));//GetCrop().right()));

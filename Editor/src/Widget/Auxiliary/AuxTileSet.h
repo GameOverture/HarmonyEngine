@@ -13,8 +13,7 @@
 #include <QWidget>
 #include <QDataWidgetMapper>
 
-class EntityTreeItemData;
-class EntityStateData;
+class AtlasTileSet;
 
 namespace Ui {
 class AuxTileSet;
@@ -24,11 +23,13 @@ class AuxTileSet : public QWidget
 {
 	Q_OBJECT
 
+	AtlasTileSet *			m_pTileSet;
+
 public:
 	explicit AuxTileSet(QWidget *pParent = nullptr);
 	virtual ~AuxTileSet();
 
-	//void Init(AtlasTileSet *pTileSet);
+	void Init(AtlasTileSet *pTileSet);
 
 private:
 	Ui::AuxTileSet *ui;

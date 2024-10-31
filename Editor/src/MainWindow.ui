@@ -357,7 +357,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="AuxTileSet" name="widget" native="true"/>
+          <widget class="AuxTileSet" name="tileSetEditor" native="true"/>
          </item>
         </layout>
        </widget>

@@ -21,6 +21,8 @@ class AtlasTileSet : public AtlasFrame
 {
 	Q_OBJECT
 
+	QSize			m_TileSize;
+
 public:
 	AtlasTileSet(IManagerModel &modelRef,
 			   QUuid uuid,
@@ -29,9 +31,12 @@ public:
 			   QString sName,
 			   HyTextureInfo texInfo,
 			   quint16 uiW, quint16 uiH, quint16 uiX, quint16 uiY,
+			   QSize tileSize,
 			   int iTextureIndex,
 			   uint uiErrors);
 	~AtlasTileSet();
+
+	QSize GetTileSize() const;
 
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
 };

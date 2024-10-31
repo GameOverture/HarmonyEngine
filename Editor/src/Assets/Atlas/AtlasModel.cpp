@@ -179,6 +179,7 @@ AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pPar
 												 0,
 												 -1,
 												-1,
+												QSize(32, 32),
 												-1,
 												0);
 
@@ -312,6 +313,7 @@ AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pPar
 													 metaObj["height"].toInt(),
 													 metaObj["x"].toInt(),
 													 metaObj["y"].toInt(),
+													 QSize(metaObj["tileWidth"].toInt(), metaObj["tileHeight"].toInt()),
 													 metaObj["textureIndex"].toInt(),
 													 metaObj["errors"].toInt(0));
 		return pNewTileSet;

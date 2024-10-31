@@ -12,11 +12,13 @@
 #include "MainWindow.h"
 #include "ui_AuxTileSet.h"
 
+#include "AtlasTileSet.h"
 #include "DlgImportTileSheet.h"
 
 AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
-	ui(new Ui::AuxTileSet)
+	ui(new Ui::AuxTileSet),
+	m_pTileSet(nullptr)
 {
 	ui->setupUi(this);
 
@@ -29,8 +31,16 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	delete ui;
 }
 
+void AuxTileSet::Init(AtlasTileSet *pTileSet)
+{
+	m_pTileSet = pTileSet;
+}
+
 void AuxTileSet::on_actionImportTileSheet_triggered()
 {
-	DlgImportTileSheet dlgImportTileSheet(*Harmony::GetProject(), this);
+	if(m_pTileSet == nullptr)
+		return;
+
+	DlgImportTileSheet dlgImportTileSheet(*m_pTileSet, this);
 	dlgImportTileSheet.exec();
 }

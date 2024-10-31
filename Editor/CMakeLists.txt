@@ -77,6 +77,8 @@ if(Qt5_DIR)
 		src/Assets/Atlas/AtlasRepackThread.h
 		src/Assets/Atlas/AtlasTileSet.cpp
 		src/Assets/Atlas/AtlasTileSet.h
+		src/Assets/Atlas/AtlasTileSetScene.cpp
+		src/Assets/Atlas/AtlasTileSetScene.h
 		src/Assets/Audio/AudioAssetsWidget.cpp
 		src/Assets/Audio/AudioAssetsWidget.h
 		src/Assets/Audio/AudioAssetsWidget.ui
