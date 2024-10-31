@@ -233,6 +233,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 				sClassCtorSignature = "HyEntity2d *pParent = nullptr";
 				sContents.replace("%HY_MEMBERVARIABLES%", pEntityModel->GenerateSrc_MemberVariables());
 				sContents.replace("%HY_ACCESSORDECL%", pEntityModel->GenerateSrc_AccessorDecl());
+				sContents.replace("%HY_CALLBACKSDECL%", pEntityModel->GenerateSrc_CallbacksDecl());
 				break;
 
 			case TEMPLATE_EntityCpp:

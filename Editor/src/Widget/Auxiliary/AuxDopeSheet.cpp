@@ -107,29 +107,29 @@ QMenu *AuxDopeSheet::AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pCon
 		pNewMenu->addAction(pCreateCallback);
 
 		// Rename Callback(s)
-		QStringList sCallbackList = pScene->GetCallbackList(iContextFrameIndex);
-		for(QString sCallback : sCallbackList)
+		QList<QString *> callbackList = pScene->GetCallbackList(iContextFrameIndex);
+		for(const QString *pCallback : callbackList)
 		{
 			QAction *pRenameCallback = new QAction(QIcon(":/icons16x16/callback-rename.png"),
-												   "Rename '" % sCallback % "'");
+												   "Rename '" % *pCallback % "'");
 			QJsonObject dataObj;
 			dataObj.insert("contextAction", CONTEXTACTION_CallbackRename);
 			dataObj.insert("frame", iContextFrameIndex);
-			dataObj.insert("contextData", sCallback);
+			dataObj.insert("contextData", *pCallback);
 			pRenameCallback->setData(QVariant(dataObj));
 			pRenameCallback->setToolTip("Rename the callback function set at the currently selected frame");
 			pNewMenu->addAction(pRenameCallback);
 		}
 
 		// Delete Callback(s)
-		for(QString sCallback : sCallbackList)
+		for(const QString *pCallback : callbackList)
 		{
 			QAction *pDeleteCallback = new QAction(QIcon(":/icons16x16/callback-delete.png"),
-												   "Delete '" % sCallback % "'");
+												   "Delete '" % *pCallback % "'");
 			QJsonObject dataObj;
 			dataObj.insert("contextAction", CONTEXTACTION_CallbackDelete);
 			dataObj.insert("frame", iContextFrameIndex);
-			dataObj.insert("contextData", sCallback);
+			dataObj.insert("contextData", *pCallback);
 			pDeleteCallback->setData(QVariant(dataObj));
 			pDeleteCallback->setToolTip("Removes the callback function at the currently selected frame");
 			pNewMenu->addAction(pDeleteCallback);
@@ -560,11 +560,18 @@ void AuxDopeSheet::OnEventActionTriggered(QAction *pEventAction)
 			sTitle = "Create New Callback";
 		}
 
-		DlgInputName dlg(sTitle, sDefaultName, HyGlobal::CodeNameValidator(), [&](QString sName) -> QString {
-			if(GetEntityStateModel()->GetDopeSheetScene().GetCallbackList(iFrameIndex).contains(sName))
-				return "This frame (" % QString::number(iFrameIndex) % ") already has this callback function";
+		std::function<QString(QString)> fpErrorCheckFunc = [&](QString sName) -> QString {
+			QList<QString *> &existingCallbackListRef = static_cast<EntityModel &>(GetEntityStateModel()->GetModel()).GetCallbacksList();
+			QString *pStringRef = nullptr;
+			for(int i = 0; i < existingCallbackListRef.size(); ++i)
+			{
+				if(existingCallbackListRef[i]->compare(sName) == 0)
+					return "A callback already exists with this name";
+			}
 			return "";
-			});
+		};
+
+		DlgInputName dlg(sTitle, sDefaultName, HyGlobal::CodeNameValidator(), fpErrorCheckFunc);
 		if(dlg.exec() == QDialog::Accepted)
 		{
 			if(eActionType == CONTEXTACTION_CallbackCreate)

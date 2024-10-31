@@ -55,6 +55,9 @@ class EntityModel : public IModel
 	};
 	AuxWidgetsModel											m_AuxWidgetsModel;
 
+
+	QList<QString *>										m_CallbacksList;	// All callbacks (aka QString) is referenced from this list. 'EntityDopeSheetScene' will create and modify its state's callbacks using this list.
+
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
@@ -62,6 +65,8 @@ public:
 	EntityTreeModel &GetTreeModel();
 
 	QAbstractItemModel *GetAuxWidgetsModel();
+
+	QList<QString *> &GetCallbacksList();
 
 	int GetFinalFrameIndex(int iStateIndex) const;
 	int GetFramesPerSecond() const;
@@ -91,6 +96,7 @@ public:
 	QString GenerateSrc_MemberVariables() const;
 	QString GenerateSrc_AccessorDecl() const;
 	QString GenerateSrc_AccessorDefinition(QString sClassName) const;
+	QString GenerateSrc_CallbacksDecl() const;
 	QString GenerateSrc_MemberInitializerList() const;
 	QString GenerateSrc_Ctor() const;
 	QString GenerateSrc_SetStateImpl() const;

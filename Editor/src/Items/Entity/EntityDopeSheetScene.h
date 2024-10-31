@@ -196,7 +196,7 @@ class EntityDopeSheetScene : public QGraphicsScene
 	// These maps store the sole location of the property data for the entire entity
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_KeyFramesMap;			// Store properties and tween values
 	QMap<EntityTreeItemData *, QMap<int, QJsonObject>>								m_PoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added with UNDO
-	QMap<int, QStringList>															m_CallbackMap;			// KEY: frame index, VALUE: a list of strings that are the callback name(s)
+	QMap<int, QList<QString *>>														m_CallbacksMap;			// KEY: frame index, VALUE: a list of strings that are the callback name(s)
 
 	// These maps store the visual graphics items that correspond to the above maps
 	QMap<KeyFrameKey, GraphicsKeyFrameItem *>										m_KeyFramesGfxRectMap;
@@ -227,7 +227,7 @@ public:
 	int GetFinalFrame() const;
 
 	const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &GetKeyFramesMap() const;
-	const QMap<int, QStringList> &GetCallbackMap() const;
+	const QMap<int, QList<QString *>> &GetCallbacksMap() const;
 
 	bool ContainsKeyFrameProperty(KeyFrameKey tupleKey) const;
 	bool ContainsKeyFrameTween(KeyFrameKey tupleKey) const;
@@ -271,7 +271,7 @@ public:
 	QJsonArray SerializeCallbacks() const;
 	bool SetCallback(int iFrameIndex, QString sCallback);
 	bool RemoveCallback(int iFrameIndex, QString sCallback);
-	QStringList GetCallbackList(int iFrameIndex) const;
+	QList<QString *> GetCallbackList(int iFrameIndex) const;
 	bool RenameCallback(int iFrameIndex, QString sOldCallback, QString sNewCallback);
 
 	void NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems);

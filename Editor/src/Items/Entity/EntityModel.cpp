@@ -137,6 +137,20 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	// The EntityTreeModel ('m_TreeModel') was initialized first so that all the EntityTreeItemData's exist.
 	// InitStates will look them up using their UUID when initializing its Key Frames map within the state's DopeSheetScene
 	InitStates<EntityStateData>(itemFileDataRef);
+
+	//// Initialize the callbacks list by calling EntityDopeSheetScene::SetCallback() for all the callbacks found in "stateArray"
+	//// NOTE: EntityDopeSheetScene::SetCallback() will update *this 'm_CallbacksList'
+	//QJsonArray stateArray = itemFileDataRef.m_Meta["stateArray"].toArray();
+	//for(int i = 0; i < stateArray.size(); ++i)
+	//{
+	//	QJsonObject stateObj = stateArray[i].toObject();
+	//	QJsonArray callbacksArray = stateObj["callbacks"].toArray();
+	//	for(int j = 0; j < callbacksArray.size(); ++j)
+	//	{
+	//		QJsonObject callbackObj = callbacksArray[j].toObject();
+	//		
+	//	}
+	//}
 }
 
 /*virtual*/ EntityModel::~EntityModel()
@@ -151,6 +165,11 @@ EntityTreeModel &EntityModel::GetTreeModel()
 QAbstractItemModel *EntityModel::GetAuxWidgetsModel()
 {
 	return &m_AuxWidgetsModel;
+}
+
+QList<QString *> &EntityModel::GetCallbacksList()
+{
+	return m_CallbacksList;
 }
 
 int EntityModel::GetFinalFrameIndex(int iStateIndex) const
@@ -648,6 +667,15 @@ QString EntityModel::GenerateSrc_AccessorDefinition(QString sClassName) const
 	return sSrc;
 }
 
+QString EntityModel::GenerateSrc_CallbacksDecl() const
+{
+	QString sSrc;
+	for(QString *pCallback : m_CallbacksList)
+		sSrc += "\n\tvirtual void " + *pCallback + "() { }";
+
+	return sSrc;
+}
+
 QString EntityModel::GenerateSrc_MemberInitializerList() const
 {
 	QString sSrc = " :\n\tHyEntity2d(pParent)";
@@ -762,7 +790,7 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 		sSrc += "default:\n\t\t\t\tbreak;\n\n\t\t\t";
 
 		QMap<int, QMap<EntityTreeItemData *, QJsonObject>> propertiesMapByFrame = entDopeSheetSceneRef.GetKeyFrameMapPropertiesByFrame();
-		const QMap<int, QStringList> &callbacksMap = entDopeSheetSceneRef.GetCallbackMap();
+		const QMap<int, QList<QString *>> &callbacksMap = entDopeSheetSceneRef.GetCallbacksMap();
 
 		QList<int> callbacksFrameIndexList = callbacksMap.keys();
 		QList<int> frameList = propertiesMapByFrame.keys();
@@ -788,9 +816,9 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 			// 2: Callbacks
 			if(callbacksFrameIndexList.contains(iFrameIndex))
 			{
-				QStringList sCallbacks = callbacksMap[iFrameIndex];
-				for(QString &sCallback : sCallbacks)
-					sSrc += sCallback + "();\n\t\t\t\t";
+				QList<QString *> sCallbacks = callbacksMap[iFrameIndex];
+				for(const QString *pCallback : sCallbacks)
+					sSrc += *pCallback + "();\n\t\t\t\t";
 			}
 
 			// 3: Root Entity Timeline Events
@@ -1229,6 +1257,11 @@ QString EntityModel::GenerateSrc_TimelineAdvance() const
 		}
 	}
 	itemSpecificFileDataOut.m_Meta.insert("descShapeList", shapeArray);
+
+	//QJsonArray callbacksArray;
+	//for(QString sCallback : m_CallbacksList)
+	//	callbacksArray.append(sCallback);
+	//itemSpecificFileDataOut.m_Meta.insert("callbacksList", callbacksArray);
 }
 
 /*virtual*/ void EntityModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/

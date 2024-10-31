@@ -283,9 +283,9 @@ const QMap<EntityTreeItemData *, QMap<int, QJsonObject>> &EntityDopeSheetScene::
 	return m_KeyFramesMap;
 }
 
-const QMap<int, QStringList> &EntityDopeSheetScene::GetCallbackMap() const
+const QMap<int, QList<QString *>> &EntityDopeSheetScene::GetCallbacksMap() const
 {
-	return m_CallbackMap;
+	return m_CallbacksMap;
 }
 
 bool EntityDopeSheetScene::ContainsKeyFrameProperty(KeyFrameKey tupleKey) const
@@ -1207,14 +1207,18 @@ void EntityDopeSheetScene::PushAllKeyFrames(EntityTreeItemData *pItemData, bool 
 QJsonArray EntityDopeSheetScene::SerializeCallbacks() const
 {
 	QJsonArray callbackArray;
-	for(auto iter = m_CallbackMap.begin(); iter != m_CallbackMap.end(); ++iter)
+	for(QMap<int, QList<QString *>>::const_iterator iter = m_CallbacksMap.begin(); iter != m_CallbacksMap.end(); ++iter)
 	{
 		QJsonObject callbackObj;
 		callbackObj.insert("frame", iter.key());
+		const QList<QString *> &callbackListRef = iter.value();
 
 		QJsonArray functionsArray;
-		for(int i = 0; i < iter.value().size(); ++i)
-			functionsArray.append(iter.value()[i]);
+		for(int i = 0; i < callbackListRef.size(); ++i)
+		{
+			QString sCallback = *callbackListRef[i];
+			functionsArray.append(sCallback);
+		}
 		callbackObj.insert("functions", functionsArray);
 		callbackArray.append(callbackObj);
 	}
@@ -1223,18 +1227,34 @@ QJsonArray EntityDopeSheetScene::SerializeCallbacks() const
 
 bool EntityDopeSheetScene::SetCallback(int iFrameIndex, QString sCallback)
 {
-	if(m_CallbackMap.contains(iFrameIndex))
+	QList<QString *> &existingCallbackListRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCallbacksList();
+	QString *pStringRef = nullptr;
+	for(int i = 0; i < existingCallbackListRef.size(); ++i)
 	{
-		if(m_CallbackMap[iFrameIndex].contains(sCallback))
+		if(existingCallbackListRef[i]->compare(sCallback) == 0)
+		{
+			pStringRef = existingCallbackListRef[i];
+			break;
+		}
+	}
+	if(pStringRef == nullptr)
+	{
+		pStringRef = new QString(sCallback);
+		existingCallbackListRef.append(pStringRef);
+	}
+
+	if(m_CallbacksMap.contains(iFrameIndex))
+	{
+		if(m_CallbacksMap[iFrameIndex].contains(pStringRef))
 		{
 			HyGuiLog("EntityDopeSheetScene::SetCallback() - '" % sCallback % "' already exists for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
 			return false;
 		}
 	}
 	else
-		m_CallbackMap.insert(iFrameIndex, QStringList());
+		m_CallbacksMap.insert(iFrameIndex, QList<QString *>());
 
-	m_CallbackMap[iFrameIndex].append(sCallback);
+	m_CallbacksMap[iFrameIndex].append(pStringRef);
 	update();
 
 	return true;
@@ -1242,9 +1262,25 @@ bool EntityDopeSheetScene::SetCallback(int iFrameIndex, QString sCallback)
 
 bool EntityDopeSheetScene::RemoveCallback(int iFrameIndex, QString sCallback)
 {
-	if(m_CallbackMap.contains(iFrameIndex) && m_CallbackMap[iFrameIndex].contains(sCallback))
+	QList<QString *> &existingCallbackListRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCallbacksList();
+	QString *pStringRef = nullptr;
+	for(int i = 0; i < existingCallbackListRef.size(); ++i)
 	{
-		m_CallbackMap[iFrameIndex].removeOne(sCallback);
+		if(existingCallbackListRef[i]->compare(sCallback) == 0)
+		{
+			pStringRef = existingCallbackListRef[i];
+			break;
+		}
+	}
+	if(pStringRef == nullptr)
+	{
+		HyGuiLog("EntityDopeSheetScene::RemoveCallback() - '" % sCallback % "' not found in existing callback list", LOGTYPE_Error);
+		return false;
+	}
+
+	if(m_CallbacksMap.contains(iFrameIndex) && m_CallbacksMap[iFrameIndex].contains(pStringRef))
+	{
+		m_CallbacksMap[iFrameIndex].removeOne(pStringRef);
 		update();
 		
 		return true;
@@ -1254,28 +1290,42 @@ bool EntityDopeSheetScene::RemoveCallback(int iFrameIndex, QString sCallback)
 	return false;
 }
 
-QStringList EntityDopeSheetScene::GetCallbackList(int iFrameIndex) const
+QList<QString *> EntityDopeSheetScene::GetCallbackList(int iFrameIndex) const
 {
-	if(m_CallbackMap.contains(iFrameIndex))
-		return m_CallbackMap[iFrameIndex];
+	if(m_CallbacksMap.contains(iFrameIndex))
+		return m_CallbacksMap[iFrameIndex];
 	
-	return QStringList();
+	return QList<QString *>();
 }
 
 bool EntityDopeSheetScene::RenameCallback(int iFrameIndex, QString sOldCallback, QString sNewCallback)
 {
-	if(m_CallbackMap.contains(iFrameIndex))
+	QList<QString *> &existingCallbackListRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCallbacksList();
+	QString *pStringRef = nullptr;
+	for(int i = 0; i < existingCallbackListRef.size(); ++i)
 	{
-		int iCallbackIndex = m_CallbackMap[iFrameIndex].indexOf(sOldCallback);
-		if(iCallbackIndex >= 0)
+		if(existingCallbackListRef[i]->compare(sOldCallback) == 0)
 		{
-			m_CallbackMap[iFrameIndex][iCallbackIndex] = sNewCallback;
-			return true;
+			pStringRef = existingCallbackListRef[i];
+			break;
 		}
 	}
-	
-	HyGuiLog("EntityDopeSheetScene::RenameCallback() - No callback '" % sOldCallback % "' found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
-	return false;
+	if(pStringRef == nullptr)
+	{
+		HyGuiLog("EntityDopeSheetScene::RenameCallback() - '" % sOldCallback % "' not found in existing callback list", LOGTYPE_Error);
+		return false;
+	}
+	if(m_CallbacksMap.contains(iFrameIndex) == false || m_CallbacksMap[iFrameIndex].contains(pStringRef) == false)
+	{
+		HyGuiLog("EntityDopeSheetScene::RenameCallback() - No callback '" % sOldCallback % "' found for frame index: " % QString::number(iFrameIndex), LOGTYPE_Error);
+		return false;
+	}
+
+	// Passed checks, do the rename
+	*pStringRef = sNewCallback;
+
+	update();
+	return true;
 }
 
 void EntityDopeSheetScene::NudgeKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, int iNudgeAmount, bool bRefreshGfxItems)
@@ -1512,7 +1562,7 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 	} // for each 'EntityTreeItemData'
 
 	// Also check events to ensure the final frame is accurate
-	for(int iCallbackFrameIndex : m_CallbackMap.keys())
+	for(int iCallbackFrameIndex : m_CallbacksMap.keys())
 	{
 		if(m_iFinalFrame < iCallbackFrameIndex)
 			m_iFinalFrame = iCallbackFrameIndex;
