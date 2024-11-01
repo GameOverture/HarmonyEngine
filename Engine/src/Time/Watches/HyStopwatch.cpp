@@ -24,6 +24,17 @@ void HyStopwatch::Start()
 	m_bIsRunning = true;
 }
 
+void HyStopwatch::Resume()
+{
+	m_bIsRunning = true;
+}
+
+void HyStopwatch::ResetStart()
+{
+	Reset();
+	Start();
+}
+
 void HyStopwatch::Pause()
 {
 	m_bIsRunning = false;

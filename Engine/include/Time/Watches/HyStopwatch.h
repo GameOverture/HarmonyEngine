@@ -18,7 +18,8 @@ public:
 	HyStopwatch(void);
 	virtual ~HyStopwatch(void);
 
-	void Start();
+	void Start(); void Resume(); // Synonymous functions
+	void ResetStart();
 	void Pause();
 
 	void Reset();
