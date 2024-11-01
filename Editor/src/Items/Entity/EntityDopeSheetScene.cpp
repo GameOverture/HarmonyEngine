@@ -1255,7 +1255,7 @@ bool EntityDopeSheetScene::SetCallback(int iFrameIndex, QString sCallback)
 		m_CallbacksMap.insert(iFrameIndex, QList<QString *>());
 
 	m_CallbacksMap[iFrameIndex].append(pStringRef);
-	update();
+	RefreshAllGfxItems();
 
 	return true;
 }

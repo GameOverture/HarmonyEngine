@@ -41,10 +41,10 @@ public:
 
 	bool IsTimelineFinished() const;
 	%HY_ACCESSORDECL%
-	%HY_CALLBACKSDECL%
 
 protected:
 	virtual void Update() override;
+	%HY_CALLBACKSDECL%
 };
 
 } // '%HY_NAMESPACE%' namespace
