@@ -18,8 +18,6 @@
 
 class IHyNode;
 
-using HyAnimFinishedCallback = std::function<void(IHyNode *)>;
-
 class HyAnimFloat
 {
 	friend class IHyNode;
@@ -35,7 +33,7 @@ class HyAnimFloat
 	bool							m_bAddedToOwnerUpdate;
 
 	HyTweenFunc						m_fpAnimFunc;
-	HyAnimFinishedCallback			m_fpAnimFinishedFunc;
+	std::function<void(IHyNode *)>	m_fpAnimFinishedFunc;
 
 	bool (HyAnimFloat::*m_fpBehaviorUpdate)(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const;
 
@@ -52,10 +50,10 @@ public:
 
 	// Procedural transformation functions
 	bool IsAnimating() const;
-	void Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
-	void TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTweenFunc = HyTween::Linear, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
+	void Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc = HyTween::Linear, float fDeferStart = 0.0f, std::function<void(IHyNode *)> fpFinishedCallback = NullFinishedCallback);
+	void TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTweenFunc = HyTween::Linear, float fDeferStart = 0.0f, std::function<void(IHyNode *)> fpFinishedCallback = NullFinishedCallback);
 
-	void Proc(float fSeconds, std::function<float(float)> fpProcFunc, float fDeferStart = 0.0f, HyAnimFinishedCallback fpFinishedCallback = NullFinishedCallback);
+	void Proc(float fSeconds, std::function<float(float)> fpProcFunc, float fDeferStart = 0.0f, std::function<void(IHyNode *)> fpFinishedCallback = NullFinishedCallback);
 
 	void Updater(std::function<float(float)> fpUpdaterFunc);
 

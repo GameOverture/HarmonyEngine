@@ -337,13 +337,10 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 	{
 		if(GetScene()->GetCallbackList(iFrameIndex).empty() == false)
 		{
-			pPainter->translate(fX, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f));
-			pPainter->setPen(Qt::NoPen);
-			pPainter->setBrush(HyGlobal::ConvertHyColor(HyColor::Orange));
-
-			pPainter->rotate(45.0);
-			pPainter->drawRect(CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER * -0.5, CALLBACK_DIAMETER, CALLBACK_DIAMETER);
-			pPainter->resetTransform();
+			QSize iconSize(16, 16);
+			QIcon pauseIcon(":/icons16x16/callback.png");
+			QPoint pt = QPoint(fX - (iconSize.width() / 2) + 1.0f, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f) - iconSize.width());
+			pPainter->drawPixmap(pt, pauseIcon.pixmap(iconSize.width(), iconSize.height()));
 		}
 
 		EntityTreeItemData *pRootTreeItemData = static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetRootTreeItemData();

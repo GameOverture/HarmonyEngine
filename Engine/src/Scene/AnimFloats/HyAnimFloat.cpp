@@ -76,7 +76,7 @@ bool HyAnimFloat::IsAnimating() const
 	return m_bAddedToOwnerUpdate;
 }
 
-void HyAnimFloat::Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= NullFinishedCallback*/)
+void HyAnimFloat::Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, std::function<void(IHyNode *)> fpFinishedCallback /*= NullFinishedCallback*/)
 {
 	if(fSeconds <= 0.0f)
 	{
@@ -101,7 +101,7 @@ void HyAnimFloat::Tween(float fTo, float fSeconds, HyTweenFunc fpTweenFunc /*= H
 	m_OwnerRef.InsertActiveAnimFloat(this);
 }
 
-void HyAnimFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTweenFunc /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= NullFinishedCallback*/)
+void HyAnimFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTweenFunc /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, std::function<void(IHyNode *)> fpFinishedCallback /*= NullFinishedCallback*/)
 {
 	if(fSeconds <= 0.0f)
 	{
@@ -126,7 +126,7 @@ void HyAnimFloat::TweenOffset(float fOffsetAmt, float fSeconds, HyTweenFunc fpTw
 	m_OwnerRef.InsertActiveAnimFloat(this);
 }
 
-void HyAnimFloat::Proc(float fSeconds, std::function<float(float)> fpProcFunc, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= NullFinishedCallback*/)
+void HyAnimFloat::Proc(float fSeconds, std::function<float(float)> fpProcFunc, float fDeferStart /*= 0.0f*/, std::function<void(IHyNode *)> fpFinishedCallback /*= NullFinishedCallback*/)
 {
 	// Even if duration is instant, we still need to invoke the proc func once. Do so safely by ensuring m_fDuration isn't 0.0
 	if(fSeconds <= 0.0f)
@@ -359,7 +359,7 @@ bool HyAnimFloat::UpdateFloat()
 		// Store the callback in a temp func pointer and clear 'm_fpBehaviorUpdate' with StopAnim().
 		// When invoking the temp callback, if it happens to set 'm_fpBehaviorUpdate' again, it will stay 
 		// assigned and not be removed from m_OwnerRef's update
-		HyAnimFinishedCallback tmpTweenFinishedFunc = m_fpAnimFinishedFunc;
+		std::function<void(IHyNode *)> tmpTweenFinishedFunc = m_fpAnimFinishedFunc;
 
 		StopAnim();
 		tmpTweenFinishedFunc(&m_OwnerRef);

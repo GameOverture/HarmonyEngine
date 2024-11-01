@@ -242,21 +242,21 @@ void HyAnimVec3::Offset(const HyAnimVec3 &srcVec)
 	m_AnimFloatList[2].Offset(srcVec[2]);
 }
 
-void HyAnimVec3::Tween(float fX, float fY, float fZ, float fSeconds, HyTweenFunc fpEase /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullTweenCallback*/)
+void HyAnimVec3::Tween(float fX, float fY, float fZ, float fSeconds, HyTweenFunc fpEase /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, std::function<void(IHyNode *)> fpFinishedCallback /*= HyAnimFloat::NullTweenCallback*/)
 {
 	m_AnimFloatList[0].Tween(fX, fSeconds, fpEase, fDeferStart, fpFinishedCallback);
 	m_AnimFloatList[1].Tween(fY, fSeconds, fpEase, fDeferStart);
 	m_AnimFloatList[2].Tween(fZ, fSeconds, fpEase, fDeferStart);
 }
 
-void HyAnimVec3::TweenOffset(float fOffsetX, float fOffsetY, float fOffsetZ, float fSeconds, HyTweenFunc fpEase /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullTweenCallback*/)
+void HyAnimVec3::TweenOffset(float fOffsetX, float fOffsetY, float fOffsetZ, float fSeconds, HyTweenFunc fpEase /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, std::function<void(IHyNode *)> fpFinishedCallback /*= HyAnimFloat::NullTweenCallback*/)
 {
 	m_AnimFloatList[0].TweenOffset(fOffsetX, fSeconds, fpEase, fDeferStart, fpFinishedCallback);
 	m_AnimFloatList[1].TweenOffset(fOffsetY, fSeconds, fpEase, fDeferStart);
 	m_AnimFloatList[2].TweenOffset(fOffsetZ, fSeconds, fpEase, fDeferStart);
 }
 
-void HyAnimVec3::Bezier(const glm::vec3 &pt1, const glm::vec3 &pt2, const glm::vec3 &pt3, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullFinishedCallback*/)
+void HyAnimVec3::Bezier(const glm::vec3 &pt1, const glm::vec3 &pt2, const glm::vec3 &pt3, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, std::function<void(IHyNode *)> fpFinishedCallback /*= HyAnimFloat::NullFinishedCallback*/)
 {
 	// Quadratic Bezier
 	m_AnimFloatList[0].Proc(fSeconds, [=](float fRatio) { fRatio = fpTween(fRatio); auto p = ((1-fRatio) * (1-fRatio)) * pt1 + 2 * (1-fRatio) * fRatio * pt2 + fRatio * fRatio * pt3; return p.x; }, fDeferStart, fpFinishedCallback);
@@ -264,7 +264,7 @@ void HyAnimVec3::Bezier(const glm::vec3 &pt1, const glm::vec3 &pt2, const glm::v
 	m_AnimFloatList[2].Proc(fSeconds, [=](float fRatio) { fRatio = fpTween(fRatio); auto p = ((1-fRatio) * (1-fRatio)) * pt1 + 2 * (1-fRatio) * fRatio * pt2 + fRatio * fRatio * pt3; return p.z; }, fDeferStart);
 }
 
-void HyAnimVec3::Bezier(const glm::vec3 &pt1, const glm::vec3 &pt2, const glm::vec3 &pt3, const glm::vec3 &pt4, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, HyAnimFinishedCallback fpFinishedCallback /*= HyAnimFloat::NullFinishedCallback*/)
+void HyAnimVec3::Bezier(const glm::vec3 &pt1, const glm::vec3 &pt2, const glm::vec3 &pt3, const glm::vec3 &pt4, float fSeconds, HyTweenFunc fpTween /*= HyTween::Linear*/, float fDeferStart /*= 0.0f*/, std::function<void(IHyNode *)> fpFinishedCallback /*= HyAnimFloat::NullFinishedCallback*/)
 {
 	// Cubic Bezier
 	m_AnimFloatList[0].Proc(fSeconds, [=](float fRatio) { fRatio = fpTween(fRatio); auto p = ((1-fRatio) * (1-fRatio) * (1-fRatio)) * pt1 + 3 * fRatio * ((1-fRatio) * (1-fRatio)) * pt2 + 3 * (fRatio * fRatio) * (1-fRatio) * pt3 + (fRatio * fRatio * fRatio) * pt4; return p.x; }, fDeferStart, fpFinishedCallback);

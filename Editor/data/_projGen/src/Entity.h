@@ -25,23 +25,24 @@ protected:
 public:
 	%HY_CLASS%(%HY_CLASSCTORSIG%);
 	virtual ~%HY_CLASS%();
-	
+
 	using IHyLoadable::GetState;
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual uint32 GetNumStates() override;
-	
+
 	float GetTimelineFrameDuration() const;
 	uint32 GetTimelineFrame() const;
-	
+
 	void SetTimelineFrame(uint32 uiFrameIndex);
 	void ExtrapolateTimelineFrame(uint32 uiFrameIndex);
-	
+
 	bool IsTimelinePaused() const;
 	void SetTimelinePause(bool bPause);
-	
+
 	bool IsTimelineFinished() const;
 	%HY_ACCESSORDECL%
 	%HY_CALLBACKSDECL%
+
 protected:
 	virtual void Update() override;
 };
