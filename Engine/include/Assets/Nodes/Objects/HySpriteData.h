@@ -65,12 +65,12 @@ public:
 		AnimState(bool bLoop, bool bReverse, bool bBounce, float fDuration, HyFilesManifest &requiredAtlasIndicesRef, HyJsonArray frameArray, HyAssets &assetsRef);
 		~AnimState();
 
-		const HySpriteFrame &GetFrame(uint32 uiFrameIndex) const;
+		const HySpriteFrame *GetFrame(uint32 uiFrameIndex) const;
 	};
 	AnimState *				m_pAnimStates;
 
 	const AnimState &GetState(uint32 uiAnimStateIndex) const;
-	const HySpriteFrame &GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const;
+	const HySpriteFrame *GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const;
 };
 
 #endif /* HySpriteData_h__ */

@@ -247,8 +247,8 @@ void IHySprite<NODETYPE, ENTTYPE>::SetFrame(uint32 uiFrameIndex)
 
 	m_AnimCtrlAttribList[this->m_uiState] &= ~ANIMCTRLATTRIB_Finished;
 
-	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
-	this->m_ShaderUniforms.SetTexHandle(0, UpdatedFrameRef.GetGfxApiHandle());
+	const HySpriteFrame *pUpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	this->m_ShaderUniforms.SetTexHandle(0, pUpdatedFrameRef->GetGfxApiHandle());
 	
 	this->SetDirty(this->DIRTY_SceneAABB);
 }
@@ -301,7 +301,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetAnimDurationAt(uint32 uiFrameIndex)
 	
 	float fDuration = 0.0f;
 	for(uint32 i = 0; i <= uiFrameIndex; ++i)
-		fDuration += static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, i).fDURATION;
+		fDuration += static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, i)->fDURATION;
 	
 	return fDuration;
 }
@@ -311,9 +311,9 @@ void IHySprite<NODETYPE, ENTTYPE>::AdvanceAnim(float fDeltaTime)
 {
 	m_fElapsedFrameTime += (fDeltaTime * m_fAnimPlayRate);
 
-	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	const HySpriteFrame *pFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	uint8 &uiAnimCtrlRef = m_AnimCtrlAttribList[this->m_uiState];
-	while(m_fElapsedFrameTime >= frameRef.fDURATION && frameRef.fDURATION > 0.0f)
+	while(m_fElapsedFrameTime >= pFrameRef->fDURATION && pFrameRef->fDURATION > 0.0f)
 	{
 		int32 iNumFrames = GetNumFrames();
 		int32 iNextFrameIndex = static_cast<int32>(m_uiCurFrame);
@@ -413,14 +413,15 @@ void IHySprite<NODETYPE, ENTTYPE>::AdvanceAnim(float fDeltaTime)
 			this->SetDirty(this->DIRTY_SceneAABB);
 		}
 
-		m_fElapsedFrameTime -= frameRef.fDURATION;
+		m_fElapsedFrameTime -= pFrameRef->fDURATION;
 
 		if(bInvokeCallback)
 			OnInvokeCallback(this->m_uiState);
+
+		pFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
 	}
 
-	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
-	this->m_ShaderUniforms.SetTexHandle(0, UpdatedFrameRef.GetGfxApiHandle());
+	this->m_ShaderUniforms.SetTexHandle(0, pFrameRef->GetGfxApiHandle());
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -452,11 +453,11 @@ float IHySprite<NODETYPE, ENTTYPE>::GetFrameWidth(uint32 uiStateIndex, uint32 ui
 		return 0.0f;
 	}
 
-	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(uiStateIndex, uiFrameIndex);
-	if(frameRef.pAtlas == nullptr)
+	const HySpriteFrame *pFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(uiStateIndex, uiFrameIndex);
+	if(pFrameRef->pAtlas == nullptr)
 		return 0.0f;
 
-	return (frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth()) * fPercent;
+	return (pFrameRef->rSRC_RECT.Width() * pFrameRef->pAtlas->GetWidth()) * fPercent;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -476,11 +477,11 @@ float IHySprite<NODETYPE, ENTTYPE>::GetFrameHeight(uint32 uiStateIndex, uint32 u
 		return 0.0f;
 	}
 
-	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(uiStateIndex, uiFrameIndex);
-	if(frameRef.pAtlas == nullptr)
+	const HySpriteFrame *pFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(uiStateIndex, uiFrameIndex);
+	if(pFrameRef->pAtlas == nullptr)
 		return 0.0f;
 
-	return (frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight()) * fPercent;
+	return (pFrameRef->rSRC_RECT.Height() * pFrameRef->pAtlas->GetHeight()) * fPercent;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -489,7 +490,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateWidth(uint32 uiStateIndex, float fPe
 	const HySpriteData *pData = static_cast<const HySpriteData *>(this->AcquireData());
 	if(pData == nullptr ||
 	   uiStateIndex >= pData->GetNumStates() ||
-	   pData->GetFrame(uiStateIndex, 0).pAtlas == nullptr)
+	   pData->GetFrame(uiStateIndex, 0)->pAtlas == nullptr)
 	{
 		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetStateMaxWidth invoked on invalid data");
 		return 0.0f;
@@ -498,8 +499,8 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateWidth(uint32 uiStateIndex, float fPe
 	float fMaxWidth = 0.0f;
 	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
 	{
-		const HySpriteFrame &frameRef = pData->GetFrame(uiStateIndex, i);
-		float fFrameWidth = (frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth()) * fPercent;
+		const HySpriteFrame *pFrameRef = pData->GetFrame(uiStateIndex, i);
+		float fFrameWidth = (pFrameRef->rSRC_RECT.Width() * pFrameRef->pAtlas->GetWidth()) * fPercent;
 		if(fMaxWidth < fFrameWidth)
 			fMaxWidth = fFrameWidth;
 	}
@@ -513,7 +514,7 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateHeight(uint32 uiStateIndex, float fP
 	const HySpriteData *pData = static_cast<const HySpriteData *>(this->AcquireData());
 	if(pData == nullptr ||
 	   uiStateIndex >= pData->GetNumStates() ||
-	   pData->GetFrame(uiStateIndex, 0).pAtlas == nullptr)
+	   pData->GetFrame(uiStateIndex, 0)->pAtlas == nullptr)
 	{
 		HyLogDebug("IHySprite<NODETYPE, ENTTYPE>::GetStateMaxHeight invoked on invalid data");
 		return 0.0f;
@@ -522,8 +523,8 @@ float IHySprite<NODETYPE, ENTTYPE>::GetStateHeight(uint32 uiStateIndex, float fP
 	float fMaxHeight = 0.0f;
 	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
 	{
-		const HySpriteFrame &frameRef = pData->GetFrame(uiStateIndex, i);
-		float fFrameHeight = (frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight()) * fPercent;
+		const HySpriteFrame *pFrameRef = pData->GetFrame(uiStateIndex, i);
+		float fFrameHeight = (pFrameRef->rSRC_RECT.Height() * pFrameRef->pAtlas->GetHeight()) * fPercent;
 		if(fMaxHeight < fFrameHeight)
 			fMaxHeight = fFrameHeight;
 	}
@@ -542,8 +543,8 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetCurFrameOffset()
 		return glm::ivec2(0);
 	}
 
-	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
-	return frameRef.vOFFSET;
+	const HySpriteFrame *pFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	return pFrameRef->vOFFSET;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -560,11 +561,11 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetStateOffset(uint32 uiStateIndex)
 	glm::ivec2 vMaxOffset(0, 0);
 	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
 	{
-		const HySpriteFrame &frameRef = pData->GetFrame(uiStateIndex, i);
-		if(abs(vMaxOffset.x) < abs(frameRef.vOFFSET.x))
-			vMaxOffset.x = frameRef.vOFFSET.x;
-		if(abs(vMaxOffset.y) < abs(frameRef.vOFFSET.y))
-			vMaxOffset.y = frameRef.vOFFSET.y;
+		const HySpriteFrame *pFrameRef = pData->GetFrame(uiStateIndex, i);
+		if(abs(vMaxOffset.x) < abs(pFrameRef->vOFFSET.x))
+			vMaxOffset.x = pFrameRef->vOFFSET.x;
+		if(abs(vMaxOffset.y) < abs(pFrameRef->vOFFSET.y))
+			vMaxOffset.y = pFrameRef->vOFFSET.y;
 	}
 	
 	return vMaxOffset;
@@ -626,8 +627,8 @@ template<typename NODETYPE, typename ENTTYPE>
 
 	m_AnimCtrlAttribList[this->m_uiState] &= ~ANIMCTRLATTRIB_Finished;
 
-	const HySpriteFrame &UpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
-	this->m_ShaderUniforms.SetTexHandle(0, UpdatedFrameRef.GetGfxApiHandle());
+	const HySpriteFrame *pUpdatedFrameRef = static_cast<const HySpriteData *>(this->UncheckedGetData())->GetFrame(this->m_uiState, m_uiCurFrame);
+	this->m_ShaderUniforms.SetTexHandle(0, pUpdatedFrameRef->GetGfxApiHandle());
 
 	this->SetDirty(this->DIRTY_SceneAABB);
 	return true;
@@ -669,7 +670,7 @@ template<typename NODETYPE, typename ENTTYPE>
 		if(stateRef.m_bREVERSE)
 			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Reverse;
 
-		if(stateRef.m_uiNUMFRAMES == 0 || stateRef.GetFrame(0).IsAtlasValid() == false)
+		if(stateRef.m_uiNUMFRAMES == 0 || stateRef.GetFrame(0)->IsAtlasValid() == false)
 			m_AnimCtrlAttribList[i] |= ANIMCTRLATTRIB_Invalid;
 		else
 			m_AnimCtrlAttribList[i] &= ~ANIMCTRLATTRIB_Invalid;

@@ -62,18 +62,18 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 	float fHalfWidth = GetFrameWidth(0.5f);
 	float fHalfHeight = GetFrameHeight(0.5f);
 
-	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
-	glm::vec2 ptBoxCenter(frameRef.vOFFSET.x + fHalfWidth, frameRef.vOFFSET.y + fHalfHeight);
+	const HySpriteFrame *pFrameRef = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
+	glm::vec2 ptBoxCenter(pFrameRef->vOFFSET.x + fHalfWidth, pFrameRef->vOFFSET.y + fHalfHeight);
 
 	if((m_AnimCtrlAttribList[m_uiState] & ANIMCTRLATTRIB_BoundsIncludeAlphaCrop) != 0)
 	{
 		glm::vec2 ptBotLeft = ptBoxCenter - glm::vec2(fHalfWidth, fHalfHeight);
 		glm::vec2 ptTopRight = ptBoxCenter + glm::vec2(fHalfWidth, fHalfHeight);
 
-		ptBotLeft.x -= frameRef.rCROP_MARGINS.left;
-		ptBotLeft.y -= frameRef.rCROP_MARGINS.bottom;
-		ptTopRight.x += frameRef.rCROP_MARGINS.right;
-		ptTopRight.y += frameRef.rCROP_MARGINS.top;
+		ptBotLeft.x -= pFrameRef->rCROP_MARGINS.left;
+		ptBotLeft.y -= pFrameRef->rCROP_MARGINS.bottom;
+		ptTopRight.x += pFrameRef->rCROP_MARGINS.right;
+		ptTopRight.y += pFrameRef->rCROP_MARGINS.top;
 
 		fHalfWidth = (ptTopRight.x - ptBotLeft.x) * 0.5f;
 		fHalfHeight = (ptTopRight.y - ptBotLeft.y) * 0.5f;
@@ -129,12 +129,12 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 
 /*virtual*/ bool HySprite2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
 {
-	const HySpriteFrame &frameRef = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
+	const HySpriteFrame *pFrameRef = static_cast<const HySpriteData *>(UncheckedGetData())->GetFrame(m_uiState, m_uiCurFrame);
 
-	glm::vec2 vSize(frameRef.rSRC_RECT.Width() * frameRef.pAtlas->GetWidth(), frameRef.rSRC_RECT.Height() * frameRef.pAtlas->GetHeight());
+	glm::vec2 vSize(pFrameRef->rSRC_RECT.Width() * pFrameRef->pAtlas->GetWidth(), pFrameRef->rSRC_RECT.Height() * pFrameRef->pAtlas->GetHeight());
 	vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
 
-	glm::vec2 vOffset(frameRef.vOFFSET.x, frameRef.vOFFSET.y);
+	glm::vec2 vOffset(pFrameRef->vOFFSET.x, pFrameRef->vOFFSET.y);
 	vertexBufferRef.AppendData2d(&vOffset, sizeof(glm::vec2));
 
 	vertexBufferRef.AppendData2d(&CalculateTopTint(fExtrapolatePercent), sizeof(glm::vec3));
@@ -148,20 +148,20 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 
 	glm::vec2 vUV;
 
-	vUV.x = frameRef.rSRC_RECT.right;//1.0f;
-	vUV.y = frameRef.rSRC_RECT.top;//1.0f;
+	vUV.x = pFrameRef->rSRC_RECT.right;//1.0f;
+	vUV.y = pFrameRef->rSRC_RECT.top;//1.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 
-	vUV.x = frameRef.rSRC_RECT.left;//0.0f;
-	vUV.y = frameRef.rSRC_RECT.top;//1.0f;
+	vUV.x = pFrameRef->rSRC_RECT.left;//0.0f;
+	vUV.y = pFrameRef->rSRC_RECT.top;//1.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 
-	vUV.x = frameRef.rSRC_RECT.right;//1.0f;
-	vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
+	vUV.x = pFrameRef->rSRC_RECT.right;//1.0f;
+	vUV.y = pFrameRef->rSRC_RECT.bottom;//0.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 
-	vUV.x = frameRef.rSRC_RECT.left;//0.0f;
-	vUV.y = frameRef.rSRC_RECT.bottom;//0.0f;
+	vUV.x = pFrameRef->rSRC_RECT.left;//0.0f;
+	vUV.y = pFrameRef->rSRC_RECT.bottom;//0.0f;
 	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
 
 	vertexBufferRef.AppendData2d(&GetSceneTransform(fExtrapolatePercent), sizeof(glm::mat4));

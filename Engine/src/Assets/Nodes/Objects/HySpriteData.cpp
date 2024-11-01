@@ -64,7 +64,7 @@ const HySpriteData::AnimState &HySpriteData::GetState(uint32 uiAnimStateIndex) c
 	return m_pAnimStates[uiAnimStateIndex];
 }
 
-const HySpriteFrame &HySpriteData::GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const
+const HySpriteFrame *HySpriteData::GetFrame(uint32 uiAnimStateIndex, uint32 uiFrameIndex) const
 {
 	return m_pAnimStates[uiAnimStateIndex].GetFrame(uiFrameIndex);
 }
@@ -122,7 +122,7 @@ HySpriteData::AnimState::~AnimState()
 	pSpriteFramesBuffer = NULL;
 }
 
-const HySpriteFrame &HySpriteData::AnimState::GetFrame(uint32 uiFrameIndex) const
+const HySpriteFrame *HySpriteData::AnimState::GetFrame(uint32 uiFrameIndex) const
 {
-	return m_pFrames[uiFrameIndex];
+	return &m_pFrames[uiFrameIndex];
 }
