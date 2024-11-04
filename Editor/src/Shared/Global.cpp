@@ -58,7 +58,7 @@
 	sm_sItemNames[ITEM_Entity3d] = "Entity3d";
 	sm_sItemNames[ITEM_Filter] = "Filter";
 	sm_sItemNames[ITEM_AtlasFrame] = "AtlasFrame";
-	sm_sItemNames[ITEM_AtlasTileSet] = "AtlasTileSet";
+	sm_sItemNames[ITEM_AtlasTileSet] = "TileSet";
 	sm_sItemNames[ITEM_SoundClip] = "SoundClip";
 	sm_sItemNames[ITEM_Source] = "Source";
 	sm_sItemNames[ITEM_Header] = "Header";
@@ -80,7 +80,7 @@
 	sm_sItemNamesPlural[ITEM_Entity3d] = "Entities3d";
 	sm_sItemNamesPlural[ITEM_Filter] = "Filters";
 	sm_sItemNamesPlural[ITEM_AtlasFrame] = "AtlasFrames";
-	sm_sItemNamesPlural[ITEM_AtlasTileSet] = "AtlasTileSets";
+	sm_sItemNamesPlural[ITEM_AtlasTileSet] = "TileSets";
 	sm_sItemNamesPlural[ITEM_SoundClip] = "SoundClips";
 	sm_sItemNamesPlural[ITEM_Source] = "Source";
 	sm_sItemNamesPlural[ITEM_Header] = "Headers";

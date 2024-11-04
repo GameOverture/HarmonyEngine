@@ -95,45 +95,42 @@
 	QString sDataItemsPath = dataDir.absoluteFilePath(QString(HYGUIPATH_ItemsFileName) % HYGUIPATH_DataExt);
 	QString sMetaSourcePath = metaSourceDir.absoluteFilePath(HyGlobal::AssetName(ASSETMAN_Source) % HYGUIPATH_MetaExt);
 	QString sMetaAtlasesPath = metaAtlasDir.absoluteFilePath(HyGlobal::AssetName(ASSETMAN_Atlases) % HYGUIPATH_MetaExt);
+	QString sMetaTileSetsPath = metaAtlasDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt);
 	QString sDataAtlasesPath = dataAtlasDir.absoluteFilePath(HyGlobal::AssetName(ASSETMAN_Atlases) % HYGUIPATH_DataExt);
 	QString sMetaAudioPath = metaAudioDir.absoluteFilePath(HyGlobal::AssetName(ASSETMAN_Audio) % HYGUIPATH_MetaExt);
 	QString sDataAudioPath = dataAudioDir.absoluteFilePath(HyGlobal::AssetName(ASSETMAN_Audio) % HYGUIPATH_DataExt);
+	if(iFileVersion <= 2) // Versions <= 2 used old filenames
+	{
+		sMetaItemsPath = metaDir.absoluteFilePath("data.hygui");
+		sDataItemsPath = dataDir.absoluteFilePath("data.json");
+		sMetaAtlasesPath = metaAtlasDir.absoluteFilePath("atlas.hygui");
+		sDataAtlasesPath = dataAtlasDir.absoluteFilePath("atlas.json");
+	}
 
 	// Get files' versions and acquire each QJsonDocument to be sent into the patching functions
 	QJsonDocument metaItemsDoc;
 	QJsonDocument dataItemsDoc;
 	QJsonDocument metaSourceDoc;
 	QJsonDocument metaAtlasDoc;
+	QJsonDocument metaTileSetsDoc;
 	QJsonDocument dataAtlasDoc;
 	QJsonDocument metaAudioDoc;
 	QJsonDocument dataAudioDoc;
-	int uiMetaItemsVersion = -1;
-	int uiDataItemsVersion = -1;
+	int uiMetaItemsVersion = GetFileVersion(sMetaItemsPath, metaItemsDoc, true);
+	int uiDataItemsVersion = GetFileVersion(sDataItemsPath, dataItemsDoc, false);
 	int uiMetaSourceVersion = GetFileVersion(sMetaSourcePath, metaSourceDoc, true);
-	int uiMetaAtlasVersion = -1;
-	int uiDataAtlasVersion = -1;
+	int uiMetaAtlasVersion = GetFileVersion(sMetaAtlasesPath, metaAtlasDoc, true);
+	int uiMetaTileSetsVersion = GetFileVersion(sMetaTileSetsPath, metaTileSetsDoc, true);
+	int uiDataAtlasVersion = GetFileVersion(sDataAtlasesPath, dataAtlasDoc, false);
 	int uiMetaAudioVersion = GetFileVersion(sMetaAudioPath, metaAudioDoc, true);
 	int uiDataAudioVersion = GetFileVersion(sDataAudioPath, dataAudioDoc, false);
-	if(iFileVersion <= 2) // Versions <= 2 used old filenames
-	{
-		uiMetaItemsVersion = GetFileVersion(metaDir.absoluteFilePath("data.hygui"), metaItemsDoc, true);
-		uiDataItemsVersion = GetFileVersion(dataDir.absoluteFilePath("data.json"), dataItemsDoc, false);
-		uiMetaAtlasVersion = GetFileVersion(metaAtlasDir.absoluteFilePath("atlas.hygui"), metaAtlasDoc, true);
-		uiDataAtlasVersion = GetFileVersion(dataAtlasDir.absoluteFilePath("atlas.json"), dataAtlasDoc, false);
-	}
-	else
-	{
-		uiMetaItemsVersion = GetFileVersion(sMetaItemsPath, metaItemsDoc, true);
-		uiDataItemsVersion = GetFileVersion(sDataItemsPath, dataItemsDoc, false);
-		uiMetaAtlasVersion = GetFileVersion(sMetaAtlasesPath, metaAtlasDoc, true);
-		uiDataAtlasVersion = GetFileVersion(sDataAtlasesPath, dataAtlasDoc, false);
-	}
 	
 	// -1 means file is missing (or didn't open)
 	if((iFileVersion != uiMetaItemsVersion && uiMetaItemsVersion != -1) ||
 	   (iFileVersion != uiDataItemsVersion && uiDataItemsVersion != -1) ||
 	   (iFileVersion != uiMetaSourceVersion && uiMetaSourceVersion != -1) ||
 	   (iFileVersion != uiMetaAtlasVersion && uiMetaAtlasVersion != -1) ||
+	   (iFileVersion != uiMetaTileSetsVersion && uiMetaTileSetsVersion != -1) ||
 	   (iFileVersion != uiDataAtlasVersion && uiDataAtlasVersion != -1) ||
 	   (iFileVersion != uiMetaAudioVersion && uiMetaAudioVersion != -1) ||
 	   (iFileVersion != uiDataAudioVersion && uiDataAudioVersion != -1))
@@ -234,6 +231,7 @@
 		RewriteFile(sDataItemsPath, dataItemsDoc, false);
 		RewriteFile(sMetaSourcePath, metaSourceDoc, true);
 		RewriteFile(sMetaAtlasesPath, metaAtlasDoc, true);
+		RewriteFile(sMetaTileSetsPath, metaTileSetsDoc, true);
 		RewriteFile(sDataAtlasesPath, dataAtlasDoc, false);
 		RewriteFile(sMetaAudioPath, metaAudioDoc, true);
 		RewriteFile(sDataAudioPath, dataAudioDoc, false);
@@ -1472,7 +1470,7 @@
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)
 {
 	QFile dataFile(sFilePath);
-	if(dataFile.exists() == false) // Don't create files that don't exist. That is handled by the the respective asset/manager/etc class
+	if(dataFile.exists() == false) // IMPORTANT: Don't create files that don't exist. That is handled by the the respective asset/manager/etc class
 		return;
 
 	QJsonObject obj = fileDocRef.object();

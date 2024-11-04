@@ -77,8 +77,10 @@ if(Qt5_DIR)
 		src/Assets/Atlas/AtlasRepackThread.h
 		src/Assets/Atlas/AtlasTileSet.cpp
 		src/Assets/Atlas/AtlasTileSet.h
-		src/Assets/Atlas/AtlasTileSetScene.cpp
-		src/Assets/Atlas/AtlasTileSetScene.h
+		src/Assets/Atlas/TileSet/TileData.cpp
+		src/Assets/Atlas/TileSet/TileData.h
+		src/Assets/Atlas/TileSet/TileSetScene.cpp
+		src/Assets/Atlas/TileSet/TileSetScene.h
 		src/Assets/Audio/AudioAssetsWidget.cpp
 		src/Assets/Audio/AudioAssetsWidget.h
 		src/Assets/Audio/AudioAssetsWidget.ui
@@ -341,6 +343,7 @@ if(Qt5_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets/Source")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets/Atlas")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets/Atlas/TileSet")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets/Audio")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Sprite")

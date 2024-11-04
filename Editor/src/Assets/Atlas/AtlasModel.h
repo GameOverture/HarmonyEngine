@@ -23,8 +23,10 @@ class AtlasModel : public IManagerModel
 	friend class AtlasImportThread;
 
 	QMap<BankData *, QSet<int>>			m_RepackTexIndicesMap;	// This exists to keep track of affected texture indices. When deleting a large number of frames where they encompass the entire texture, the repack will delete the frames before clearing out the affected textures. This caused those textures to be left behind
-
+	
 	HyTextureInfo						m_DefaultTextureInfo;
+	
+	FileDataPair						m_TileSetsDataPair;
 
 public:
 	AtlasModel(Project &projRef);
@@ -46,6 +48,7 @@ public:
 	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, ItemType eSubAtlasType);
 
 	AtlasTileSet *GenerateTileSet(QString sName, TreeModelItemData *pParentTreeItemData, quint32 uiBankId);
+	void SaveTileSets();
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;

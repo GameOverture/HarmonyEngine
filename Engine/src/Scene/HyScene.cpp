@@ -210,7 +210,7 @@ void HyScene::AddNode_PhysBody(HyEntity2d *pEntity)
 	pEntity->SyncPhysicsFixtures();
 }
 
-void HyScene::RemoveNode_PhysBody(HyEntity2d *pEntity)
+void HyScene::RemoveNode_PhysBody(HyEntity2d *pEntity) // TODO: Change this to be a 'HyPhysicsCtrl2d'
 {
 	HyAssert(pEntity && pEntity->physics.m_pBody, "HyScene::RemoveNode_PhysBody was passed a null HyEntity2d or it had a null b2Body");
 

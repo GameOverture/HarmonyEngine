@@ -179,7 +179,6 @@ AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pPar
 												 0,
 												 -1,
 												-1,
-												QSize(32, 32),
 												-1,
 												0);
 
@@ -189,6 +188,78 @@ AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pPar
 	InsertTreeItem(m_ProjectRef, pNewTileSet, pTreeParent);
 
 	return pNewTileSet;
+}
+
+void AtlasModel::SaveTileSets()
+{
+	QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));
+	if(!tileSetMetaFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+		HyGuiLog("Couldn't open TileSet meta file for writing", LOGTYPE_Error);
+	else
+	{
+		m_TileSetsDataPair.m_Meta
+
+		GetLatestFileData(m_ItemFileData);
+
+		// Register the item's file data into the project
+		QString sUuid =  // I temTypeName = HyGlobal::ItemName(eType, true);
+		if(m_ProjectFileData.m_Data.contains(sItemTypeName) == false) {
+			HyGuiLog("Project::SaveItemData could not find item type: " % sItemTypeName, LOGTYPE_Error);
+		}
+
+		QJsonObject metaItemTypeObj = m_ProjectFileData.m_Meta[sItemTypeName].toObject();
+		metaItemTypeObj.remove(sPath);
+		metaItemTypeObj.insert(sPath, itemFileDataRef.m_Meta);
+		m_ProjectFileData.m_Meta.remove(sItemTypeName);
+		m_ProjectFileData.m_Meta.insert(sItemTypeName, metaItemTypeObj);
+
+		QJsonObject dataItemTypeObj = m_ProjectFileData.m_Data[sItemTypeName].toObject();
+		dataItemTypeObj.remove(sPath);
+		dataItemTypeObj.insert(sPath, itemFileDataRef.m_Data);
+		m_ProjectFileData.m_Data.remove(sItemTypeName);
+		m_ProjectFileData.m_Data.insert(sItemTypeName, dataItemTypeObj);
+
+		QFile metaFile(GetMetaAbsPath() % HYGUIPATH_ItemsFileName % HYGUIPATH_MetaExt);
+		if(metaFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+			HyGuiLog(QString("Couldn't open ") % HYGUIPATH_ItemsFileName % HYGUIPATH_MetaExt % " for writing: " % metaFile.errorString(), LOGTYPE_Error);
+		else
+		{
+			m_ProjectFileData.m_Meta.insert("$fileVersion", HYGUI_FILE_VERSION);
+
+			QJsonDocument metaDoc;
+			metaDoc.setObject(m_ProjectFileData.m_Meta);
+
+#ifdef HYGUI_UseBinaryMetaFiles
+			qint64 iBytesWritten = metaFile.write(metaDoc.toBinaryData());
+#else
+			qint64 iBytesWritten = metaFile.write(metaDoc.toJson());
+#endif
+			if(0 == iBytesWritten || -1 == iBytesWritten) {
+				HyGuiLog("Could not write to meta data file: " % metaFile.errorString(), LOGTYPE_Error);
+			}
+
+			metaFile.close();
+		}
+
+
+
+
+
+
+
+		QJsonDocument tileSetsDoc(settingsObj);
+
+#ifdef HYGUI_UseBinaryMetaFiles
+		qint64 iBytesWritten = settingsFile.write(settingsDoc.toBinaryData());
+#else
+		qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
+#endif
+		if(0 == iBytesWritten || -1 == iBytesWritten) {
+			HyGuiLog("Could not write to meta file: " % settingsFile.errorString(), LOGTYPE_Error);
+		}
+
+		settingsFile.close();
+	}
 }
 
 /*virtual*/ QString AtlasModel::OnBankInfo(uint uiBankIndex) /*override*/
@@ -313,7 +384,6 @@ AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pPar
 													 metaObj["height"].toInt(),
 													 metaObj["x"].toInt(),
 													 metaObj["y"].toInt(),
-													 QSize(metaObj["tileWidth"].toInt(), metaObj["tileHeight"].toInt()),
 													 metaObj["textureIndex"].toInt(),
 													 metaObj["errors"].toInt(0));
 		return pNewTileSet;
@@ -528,6 +598,10 @@ AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pPar
 
 /*virtual*/ void AtlasModel::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
 {
+	// Just ensure TileSet.meta file exists - don't try to save over an existing one
+	QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));
+	if(tileSetMetaFile.exists() == false)
+		SaveTileSets();
 }
 
 /*virtual*/ QJsonObject AtlasModel::GetSaveJson() /*override*/

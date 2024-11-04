@@ -81,8 +81,8 @@ public:
 	static void AddEntNode_Assemble(HyEntity2d *pEntity);
 	static void RemoveEntNode_Assemble(HyEntity2d *pEntity);
 
-	void AddNode_PhysBody(HyEntity2d *pEntity);
-	void RemoveNode_PhysBody(HyEntity2d *pEntity);
+	void AddNode_PhysBody(HyEntity2d *pEntity);			// TODO: Change this to be a 'HyPhysicsCtrl2d' (for TileMap items)
+	void RemoveNode_PhysBody(HyEntity2d *pEntity);		// TODO: Change this to be a 'HyPhysicsCtrl2d' (for TileMap items)
 	bool IsPhysicsUpdating() const;
 	void SetPhysicsDrawClass(HyBox2dDraw *pBox2dDraw);
 

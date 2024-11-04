@@ -1,5 +1,5 @@
 /**************************************************************************
- *	AtlasTileSetScene.cpp
+ *	TileSetScene.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2024 Jason Knobler
@@ -8,13 +8,13 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "AtlasTileSetScene.h"
+#include "TileSetScene.h"
 
-AtlasTileSetScene::AtlasTileSetScene() :
+TileSetScene::TileSetScene() :
 	QGraphicsScene()
 {
 }
 
-/*virtual*/ AtlasTileSetScene::~AtlasTileSetScene()
+/*virtual*/ TileSetScene::~TileSetScene()
 {
 }

@@ -23,7 +23,8 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	ui->setupUi(this);
 
 	ui->btnImportTileSheet->setDefaultAction(ui->actionImportTileSheet);
-	ui->btnImportTiles->setDefaultAction(ui->actionImportTiles);
+
+	ui->splitter->setSizes(QList<int>() << 140 << width() - 140);
 }
 
 /*virtual*/ AuxTileSet::~AuxTileSet()
@@ -34,6 +35,8 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 void AuxTileSet::Init(AtlasTileSet *pTileSet)
 {
 	m_pTileSet = pTileSet;
+	ui->lblName->setText(m_pTileSet->GetName());
+	ui->lblInfo->setText(m_pTileSet->GetTileSetInfo());
 }
 
 void AuxTileSet::on_actionImportTileSheet_triggered()
