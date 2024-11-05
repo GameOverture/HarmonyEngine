@@ -10,6 +10,8 @@
 #ifndef TILEDATA_H
 #define TILEDATA_H
 
+#include "AtlasTileSet.h"
+
 #include <QWidget>
 #include <QSet>
 #include <QJsonObject>

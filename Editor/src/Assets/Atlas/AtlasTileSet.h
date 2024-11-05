@@ -10,8 +10,8 @@
 #ifndef ATLASTILESET_H
 #define ATLASTILESET_H
 
+#include "Global.h"
 #include "AtlasFrame.h"
-#include "TileData.h"
 
 #include <QWidget>
 #include <QSet>
@@ -20,6 +20,8 @@
 
 using AutoTileHandle = uint32_t;
 using PhysicsLayerHandle = uint32_t;
+
+struct TileData;
 
 class AtlasTileSet : public AtlasFrame
 {
@@ -56,7 +58,7 @@ class AtlasTileSet : public AtlasFrame
 	};
 	QList<PhysicsLayer>			m_PhysicsLayerList;
 
-	QMap<QPoint, TileData>		m_TileMap;		// QPoint key is the user/meta location, not the atlas
+	QMap<QPoint, TileData *>	m_TileMap;		// QPoint key is the user/meta location, not the atlas
 
 public:
 	AtlasTileSet(IManagerModel &modelRef,
