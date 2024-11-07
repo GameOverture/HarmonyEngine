@@ -21,7 +21,8 @@ public:
 	ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef);
 	virtual ~ProjectItemMimeData();
 
-	static void RegenUuids(Project *pDestProject, QByteArray &jsonDataOut);
+	// If from another project, OR eDropAction is COPY, it will modify 'jsonDataOut' and regenerate all UUIDs
+	static void RegenUuids(Project *pDestProject, Qt::DropAction eDropAction, QByteArray &jsonDataOut);
 };
 
 #endif // ProjectItemMimeData_H

@@ -91,6 +91,7 @@ private:
 	Ui::ExplorerWidget *ui;
 
 	void OnFilterUpdate();
+	void OnClickedItem(ExplorerItemData *pItemClicked);
 	
 private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);

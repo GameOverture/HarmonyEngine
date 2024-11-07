@@ -124,7 +124,7 @@ public:
 	void AddDirtyItems(IManagerModel *pDirtyManager, QList<ProjectItemData *> dirtyProjItemList);
 	void ReloadHarmony();
 
-	bool PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType);
+	bool PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType, int &iNumImportedAssetsOut);
 
 	//void SetAudioModel(QJsonObject audioObj);
 

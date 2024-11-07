@@ -31,7 +31,7 @@ public:
 	Project &GetProject() const;
 	
 	virtual QString GetName(bool bWithPrefix) const;
-	QString GetPrefix() const;
+	QString GetPrefix() const; // If this item is a Prefix, it will NOT include itself. Use GetName(true) instead.
 
 	void Rename(QString sNewName);
 	void Rename(QString sNewPrefix, QString sNewName);

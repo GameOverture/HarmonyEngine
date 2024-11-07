@@ -31,11 +31,10 @@ public:
 
 	Project *AddProject(const QString sNewProjectFilePath);
 	ExplorerItemData *AddItem(Project *pProj, ItemType eNewItemType, const QString sPrefix, const QString sName, FileDataPair initItemFileData, bool bIsPendingSave);
+	bool AddMimeItem(const ProjectItemMimeData *pProjMimeData, Qt::DropAction eDropAction, const QModelIndex &parentRef); // LinkAction will be treated as CopyAction, but preserving the prefix destination from which it came
 	bool RemoveItem(ExplorerItemData *pItem);
 
 	QString AssemblePrefix(ExplorerItemData *pItem) const;
-
-	bool PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const QModelIndex &indexRef);
 
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;

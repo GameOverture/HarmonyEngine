@@ -581,8 +581,9 @@ void Project::ReloadHarmony()
 	Harmony::Reload(this);
 }
 
-bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType)
+bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType, int &iNumImportedAssetsOut)
 {
+	iNumImportedAssetsOut = 0;
 	if(assetArrayRef.count() == 0)
 		return true;
 
@@ -640,6 +641,7 @@ bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType
 		}
 	}
 
+	iNumImportedAssetsOut = importAssetList.size();
 	pManager->ImportNewAssets(importAssetList, uiBankId, correspondingParentList, correspondingUuidList);
 
 	return true;

@@ -376,9 +376,61 @@ void ExplorerWidget::OnFilterUpdate()
 	static_cast<ExplorerProxyModel *>(ui->treeView->model())->FilterByType(uiFilter);
 }
 
+void ExplorerWidget::OnClickedItem(ExplorerItemData *pItemClicked)
+{
+	bool bValidItem = (pItemClicked != nullptr);
+	FINDACTION("actionNewPrefix")->setEnabled(bValidItem);
+	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
+	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
+	FINDACTION("actionNewText")->setEnabled(bValidItem);
+	FINDACTION("actionNewSprite")->setEnabled(bValidItem);
+	FINDACTION("actionNewSpine")->setEnabled(bValidItem);
+	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
+	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
+	FINDACTION("actionNewEntity")->setEnabled(bValidItem);
+	FINDACTION("actionNewPrefab")->setEnabled(bValidItem);
+	FINDACTION("actionNewEntity3d")->setEnabled(bValidItem);
+	FINDACTION("actionBuildSettings")->setEnabled(bValidItem);
+	FINDACTION("actionNewBuild")->setEnabled(bValidItem);
+
+	if(pItemClicked)
+	{
+		switch(pItemClicked->GetType())
+		{
+		case ITEM_Audio:
+		case ITEM_Particles:
+		case ITEM_Text:
+		case ITEM_Spine:
+		case ITEM_Sprite:
+		case ITEM_TileMap:
+		case ITEM_Source:
+		case ITEM_Header:
+		case ITEM_Entity:
+			ui->actionCopyItem->setEnabled(true);
+			break;
+		default:
+			ui->actionCopyItem->setEnabled(false);
+			break;
+		}
+	}
+
+	QClipboard *pClipboard = QApplication::clipboard();
+	const QMimeData *pMimeData = pClipboard->mimeData();
+	ui->actionPasteItem->setEnabled(pMimeData && pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)));
+
+	if(Harmony::GetProject() == nullptr && bValidItem)
+		Harmony::SetProject(&pItemClicked->GetProject());
+
+	IWidget *pItemProperties = MainWindow::GetItemProperties();
+	if(pItemProperties)
+		pItemProperties->UpdateActions();
+}
+
 void ExplorerWidget::OnContextMenu(const QPoint &pos)
 {
 	ExplorerItemData *pContextExplorerItem = GetSelected();
+	OnClickedItem(pContextExplorerItem);
+
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
 	GetSelected(selectedItems, selectedPrefixes, true);
 
@@ -540,52 +592,7 @@ void ExplorerWidget::on_treeView_doubleClicked(QModelIndex index)
 void ExplorerWidget::on_treeView_clicked(QModelIndex index)
 {
 	ExplorerItemData *pCurSelected = ui->treeView->model()->data(index, Qt::UserRole).value<ExplorerItemData *>();
-	bool bValidItem = (pCurSelected != nullptr);
-	FINDACTION("actionNewPrefix")->setEnabled(bValidItem);
-	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
-	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
-	FINDACTION("actionNewText")->setEnabled(bValidItem);
-	FINDACTION("actionNewSprite")->setEnabled(bValidItem);
-	FINDACTION("actionNewSpine")->setEnabled(bValidItem);
-	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
-	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
-	FINDACTION("actionNewEntity")->setEnabled(bValidItem);
-	FINDACTION("actionNewPrefab")->setEnabled(bValidItem);
-	FINDACTION("actionNewEntity3d")->setEnabled(bValidItem);
-	FINDACTION("actionBuildSettings")->setEnabled(bValidItem);
-	FINDACTION("actionNewBuild")->setEnabled(bValidItem);
-
-	if(pCurSelected)
-	{
-		switch(pCurSelected->GetType())
-		{
-		case ITEM_Audio:
-		case ITEM_Particles:
-		case ITEM_Text:
-		case ITEM_Spine:
-		case ITEM_Sprite:
-		case ITEM_TileMap:
-		case ITEM_Source:
-		case ITEM_Header:
-		case ITEM_Entity:
-			ui->actionCopyItem->setEnabled(true);
-			break;
-		default:
-			ui->actionCopyItem->setEnabled(false);
-			break;
-		}
-	}
-
-	QClipboard *pClipboard = QApplication::clipboard();
-	const QMimeData *pMimeData = pClipboard->mimeData();
-	ui->actionPasteItem->setEnabled(pMimeData && pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)));
-	
-	if(Harmony::GetProject() == nullptr && bValidItem)
-		Harmony::SetProject(&pCurSelected->GetProject());
-
-	IWidget *pItemProperties = MainWindow::GetItemProperties();
-	if(pItemProperties)
-		pItemProperties->UpdateActions();
+	OnClickedItem(pCurSelected);
 }
 
 void ExplorerWidget::on_actionRename_triggered()
@@ -717,8 +724,8 @@ void ExplorerWidget::on_actionPasteItem_triggered()
 		QModelIndex curIndex = static_cast<ExplorerProxyModel *>(ui->treeView->model())->mapToSource(ui->treeView->selectionModel()->currentIndex());
 		if(curIndex.isValid())
 		{
-			if(GetExplorerModel()->PasteItemSrc(static_cast<const ProjectItemMimeData *>(pMimeData), curIndex) == false)
-				HyGuiLog("ExplorerModel::PasteItemSrc returned false", LOGTYPE_Error);
+			if(GetExplorerModel()->AddMimeItem(static_cast<const ProjectItemMimeData *>(pMimeData), Qt::CopyAction, curIndex) == false)
+				HyGuiLog("ExplorerModel::AddMimeItem returned false", LOGTYPE_Error);
 		}
 	}
 }
