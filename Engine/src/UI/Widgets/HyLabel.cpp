@@ -470,7 +470,10 @@ bool HyLabel::IsMonospacedDigits() const
 	if((m_uiAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
 		if(m_Panel.IsAutoSize())
-			HySetVec(m_vSizeHint, static_cast<int32>(GetTextWidth() + m_TextMargins.left + m_TextMargins.right), static_cast<int32>(GetTextHeight()));
+		{
+			HySetVec(m_vSizeHint, static_cast<int32>(m_Text.GetWidth(1.0f) + m_TextMargins.left + m_TextMargins.right),
+								  static_cast<int32>(m_Text.GetHeight(1.0f)) + m_TextMargins.top + m_TextMargins.bottom);
+		}
 		else
 			m_vSizeHint = m_Panel.GetPanelSizeHint();
 	}
@@ -569,19 +572,18 @@ bool HyLabel::IsMonospacedDigits() const
 	{
 		m_Text.SetAlignment(m_eStackedAlignment);
 
-		//glm::ivec2 vUiSizeHint = GetSizeHint();
-		glm::vec2 vPanelDimensions(m_Panel.GetWidth(m_Panel.scale.GetX()), m_Panel.GetHeight(m_Panel.scale.GetY())); // TODO: Test if Panel entity itself ever gets scaled (its internal node type might), but remove it from here
+		glm::vec2 vPanelDimensions(m_Panel.GetWidth(), m_Panel.GetHeight());
 		glm::ivec2 vPanelOffset = m_Panel.GetBotLeftOffset();
 
 		// Position text to bottom left of 'm_TextMargins'
-		m_Text.pos.Set(m_Panel.GetFrameStrokeSize() + ((m_TextMargins.left * (1.0f/*vPanelDimensions.x / vUiSizeHint.x*/)) - vPanelOffset.x),
-			m_Panel.GetFrameStrokeSize() + ((m_TextMargins.bottom * (1.0f/*vPanelDimensions.y / vUiSizeHint.y*/)) - vPanelOffset.y));
+		m_Text.pos.Set(m_Panel.GetFrameStrokeSize() + (m_TextMargins.left - vPanelOffset.x),
+					   m_Panel.GetFrameStrokeSize() + (m_TextMargins.bottom - vPanelOffset.y));
 
 		float fLineOffsetX = 0.0f;	// If *this is 'LABELATTRIB_StackedTextUseLine' determine how much to offset m_Text's position (not needed for scale boxes)
 		if(m_eStackedAlignment == HYALIGN_Center)
-			fLineOffsetX = (vPanelDimensions.x * 0.5f) - ((m_TextMargins.left + m_TextMargins.right) * (1.0f/*vPanelDimensions.x / vUiSizeHint.x*/));
+			fLineOffsetX = (vPanelDimensions.x * 0.5f) - ((m_TextMargins.left + m_TextMargins.right));
 		else if(m_eStackedAlignment == HYALIGN_Right)
-			fLineOffsetX = vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (1.0f/*vPanelDimensions.x / vUiSizeHint.x*/));
+			fLineOffsetX = vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right));
 
 		// Set text type/size
 		HyTextType eStackedTextType = static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
@@ -593,7 +595,7 @@ bool HyLabel::IsMonospacedDigits() const
 			case HYTEXT_Line: {
 				m_Text.SetAsLine();
 				float fLineOffsetY = 0.0f;
-				float fVerticalSpace = vPanelDimensions.y - ((m_TextMargins.top + m_TextMargins.bottom) * (1.0f/*vPanelDimensions.y / vUiSizeHint.y*/)) - (m_Panel.GetFrameStrokeSize() * 2);
+				float fVerticalSpace = vPanelDimensions.y - ((m_TextMargins.top + m_TextMargins.bottom)) - (m_Panel.GetFrameStrokeSize() * 2);
 				float fTextHeight = m_Text.GetLineBreakHeight(m_Text.scale.Y());
 				if(fVerticalSpace > fTextHeight)
 					fLineOffsetY = (fVerticalSpace - fTextHeight) * 0.5f;
@@ -601,17 +603,17 @@ bool HyLabel::IsMonospacedDigits() const
 				break; }
 
 			case HYTEXT_ScaleBox:
-				m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (1.0f/*vPanelDimensions.x / vUiSizeHint.x*/)) - (m_Panel.GetFrameStrokeSize() * 2),
-					vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (1.0f/*vPanelDimensions.y / vUiSizeHint.y*/)) - (m_Panel.GetFrameStrokeSize() * 2), true);
+				m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right)) - (m_Panel.GetFrameStrokeSize() * 2),
+					vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top)) - (m_Panel.GetFrameStrokeSize() * 2), true);
 				break;
 
 			case HYTEXT_Box:
-				m_Text.SetAsBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (1.0f/*vPanelDimensions.x / vUiSizeHint.x*/)) - (m_Panel.GetFrameStrokeSize() * 2),
-					vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top) * (1.0f/*vPanelDimensions.y / vUiSizeHint.y*/)) - (m_Panel.GetFrameStrokeSize() * 2), true);
+				m_Text.SetAsBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right)) - (m_Panel.GetFrameStrokeSize() * 2),
+					vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top)) - (m_Panel.GetFrameStrokeSize() * 2), true);
 				break;
 
 			case HYTEXT_Column:
-				m_Text.SetAsColumn(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right) * (1.0f/*vPanelDimensions.x / vUiSizeHint.x*/)) - (m_Panel.GetFrameStrokeSize() * 2));
+				m_Text.SetAsColumn(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right)) - (m_Panel.GetFrameStrokeSize() * 2));
 				break;
 
 			case HYTEXT_Vertical:
@@ -638,22 +640,22 @@ bool HyLabel::IsMonospacedDigits() const
 {
 	if((m_uiAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
-		if(m_Panel.IsAutoSize())
+		if(m_Panel.IsAutoSize() && m_Text.GetUtf8String().empty() == false)
 		{
-			glm::vec2 vTextSize(GetTextWidth() + m_TextMargins.left + m_TextMargins.right,
-								GetTextHeight() + m_TextMargins.top + m_TextMargins.bottom);
+			glm::ivec2 vTextSizeHint = GetSizeHint();
+			if((vTextSizeHint.x != uiNewWidth || vTextSizeHint.y != uiNewHeight) &&
+			   (vTextSizeHint.x != 0.0f && vTextSizeHint.y != 0.0f))
+			{
+				float fScaleX = uiNewWidth / vTextSizeHint.x;
+				float fScaleY = uiNewHeight / vTextSizeHint.y;
+				m_Text.scale.SetAll(HyMath::Min(fScaleX, fScaleY));
 
-			float fScaleX = uiNewWidth / vTextSize.x;
-			float fScaleY = uiNewHeight / vTextSize.y;
-			m_Text.scale.SetAll(HyMath::Min(fScaleX, fScaleY));
-
-			uiNewWidth = static_cast<uint32>(GetTextWidth());
-			uiNewHeight = static_cast<uint32>(GetTextHeight());
-
-			m_Panel.SetSize(uiNewWidth, uiNewHeight);
+				uiNewWidth = static_cast<uint32>(GetTextWidth());
+				uiNewHeight = static_cast<uint32>(GetTextHeight());
+			}
 		}
-		else
-			m_Panel.SetSize(uiNewWidth, uiNewHeight);
+		
+		m_Panel.SetSize(uiNewWidth, uiNewHeight);
 	}
 	else // Side-by-side
 	{

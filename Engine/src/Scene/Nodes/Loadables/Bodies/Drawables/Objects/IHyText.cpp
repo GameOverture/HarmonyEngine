@@ -148,6 +148,9 @@ void IHyText<NODETYPE, ENTTYPE>::SetText(const std::stringstream &ssUtf8Text)
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ float IHyText<NODETYPE, ENTTYPE>::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
+	if(m_vBoxDimensions.x != 0.0f)
+		return m_vBoxDimensions.x * fPercent;
+
 	CalculateGlyphInfos();
 	return m_fUsedPixelWidth * fPercent;
 }
@@ -155,6 +158,9 @@ template<typename NODETYPE, typename ENTTYPE>
 template<typename NODETYPE, typename ENTTYPE>
 /*virtual*/ float IHyText<NODETYPE, ENTTYPE>::GetHeight(float fPercent /*= 1.0f*/) /*override*/
 {
+	if(m_vBoxDimensions.y != 0.0f)
+		return m_vBoxDimensions.y * fPercent;
+
 	CalculateGlyphInfos();
 	return m_fUsedPixelHeight * fPercent;
 }

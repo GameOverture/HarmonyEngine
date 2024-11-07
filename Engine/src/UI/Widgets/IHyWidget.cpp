@@ -298,6 +298,11 @@ void IHyWidget::SetAsHighlighted(bool bIsHighlighted)
 	}
 }
 
+/*virtual*/ void IHyWidget::OnSetSizeHint() /*override*/
+{
+	m_vSizeHint = m_Panel.GetPanelSizeHint();
+}
+
 void IHyWidget::TakeKeyboardFocus()
 {
 	HyAssert(IsKeyboardFocusAllowed(), "IHyWidget::TakeKeyboardFocus was invoked when keyboard focus is NOT allowed");

@@ -97,6 +97,8 @@ protected:
 	virtual void OnMouseUp() override final;
 	virtual void OnMouseClicked() override final;
 
+	virtual void OnSetSizeHint() override;			// Sets the preferred size of *this into 'm_vSizeHint
+
 	virtual void OnUiTextInput(std::string sNewText) { }
 	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) { }
 	virtual void OnUiMouseEnter() { }
