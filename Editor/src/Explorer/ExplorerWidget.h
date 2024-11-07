@@ -96,6 +96,9 @@ private:
 private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);
 
+	//void OnKeyCtrlC();
+	//void OnKeyCtrlV();
+
 	void on_actionFilterAll_triggered();
 	void on_actionFilterSprite_triggered();
 	void on_actionFilterText_triggered();

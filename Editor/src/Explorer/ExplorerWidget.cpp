@@ -230,6 +230,9 @@ ExplorerWidget::ExplorerWidget(QWidget *pParent) :
 	// TODO: Load from settings
 	ui->actionFilterAll->setChecked(true);
 	ui->lblActiveFilter->setVisible(false);
+
+	//new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_C), this, SLOT(OnKeyCtrlC()));
+	//new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_V), this, SLOT(OnKeyCtrlV()));
 }
 
 ExplorerWidget::~ExplorerWidget()
@@ -525,6 +528,18 @@ void ExplorerWidget::OnContextMenu(const QPoint &pos)
 
 	FINDACTION("actionCloseProject")->setEnabled(bPreserveCloseProjectEnabled);
 }
+
+//void ExplorerWidget::OnKeyCtrlC()
+//{
+//	if(ui->actionCopyItem->isEnabled())
+//		ui->actionCopyItem->trigger();
+//}
+//
+//void ExplorerWidget::OnKeyCtrlV()
+//{
+//	if(ui->actionPasteItem->isEnabled())
+//		ui->actionPasteItem->trigger();
+//}
 
 void ExplorerWidget::on_actionFilterAll_triggered()
 {

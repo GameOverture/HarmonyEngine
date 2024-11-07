@@ -175,15 +175,28 @@ ExplorerItemData *ExplorerModel::AddItem(Project *pProj, ItemType eNewItemType, 
 bool ExplorerModel::AddMimeItem(const ProjectItemMimeData *pProjMimeData, Qt::DropAction eDropAction, const QModelIndex &parentRef)
 {
 	// Error check parameters
-	if(eDropAction != Qt::CopyAction && eDropAction != Qt::MoveAction && eDropAction != Qt::LinkAction) // LinkAction will be treated as CopyAction, but preserving the prefix destination from which it came
-	{
-		HyGuiLog("ExplorerModel::AddMimeItem was passed an invalid Qt::DropAction", LOGTYPE_Error);
-		return false;
-	}
 	TreeModelItem *pDestTreeItem = FindPrefixTreeItem(parentRef);
 	if(pDestTreeItem == nullptr)
 	{
 		HyGuiLog("ExplorerModel::AddMimeItem failed to get the TreeModelItem from index that was passed in", LOGTYPE_Error);
+		return false;
+	}
+	switch(eDropAction)
+	{
+	case Qt::CopyAction:
+		HyGuiLog("Pasting items...", LOGTYPE_Normal);
+		break;
+
+	case Qt::MoveAction:
+		HyGuiLog("Moving items...", LOGTYPE_Normal);
+		break;
+
+	case Qt::LinkAction:
+		HyGuiLog("Linking items...", LOGTYPE_Normal);
+		break;
+
+	default:
+		HyGuiLog("ExplorerModel::AddMimeItem was passed an invalid Qt::DropAction", LOGTYPE_Error);
 		return false;
 	}
 
@@ -198,7 +211,7 @@ bool ExplorerModel::AddMimeItem(const ProjectItemMimeData *pProjMimeData, Qt::Dr
 	QJsonArray pasteArray = pasteDoc.array();
 	
 	QJsonArray assetManagerImportList[NUM_ASSETMANTYPES];
-	bool bNewItemsImported = false;
+	bool bNewItemsCreated = false;
 	for(int iPasteIndex = 0; iPasteIndex < pasteArray.size(); ++iPasteIndex)
 	{
 		QJsonObject pasteObj = pasteArray[iPasteIndex].toObject();
@@ -256,9 +269,9 @@ bool ExplorerModel::AddMimeItem(const ProjectItemMimeData *pProjMimeData, Qt::Dr
 				if(QFile::exists(sAbsDestPath) == false)
 				{
 					if(QFile::copy(sAbsFilePath, sAbsDestPath))
-						HyGuiLog("Paste imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
+						HyGuiLog("Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
 					else
-						HyGuiLog("Paste failed to imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Error);
+						HyGuiLog("Failed to import font: " % pasteFontFileInfo.fileName(), LOGTYPE_Error);
 				}
 			}
 			if(fontArray.empty() == false)
@@ -295,7 +308,8 @@ bool ExplorerModel::AddMimeItem(const ProjectItemMimeData *pProjMimeData, Qt::Dr
 																					initFileItemData,
 																					false));
 		pDestProject->AddDirtyItems(nullptr, QList<ProjectItemData *>() << pImportedProjItem);
-		bNewItemsImported = true;
+		HyGuiLog(HyGlobal::ItemName(ePasteItemType, false) % " Created: " % pImportedProjItem->GetName(true), LOGTYPE_Normal);
+		bNewItemsCreated = true;
 
 		for(int iAssetType = 0; iAssetType < NUM_ASSETMANTYPES; ++iAssetType)
 		{
@@ -322,7 +336,7 @@ bool ExplorerModel::AddMimeItem(const ProjectItemMimeData *pProjMimeData, Qt::Dr
 	}
 
 	// If no assets are being imported, then we can save any newly imported dirty project items now
-	if(bNewItemsImported && bNewAssetsImported == false)
+	if(bNewItemsCreated && bNewAssetsImported == false)
 		pDestProject->ReloadHarmony();
 
 	return true;
