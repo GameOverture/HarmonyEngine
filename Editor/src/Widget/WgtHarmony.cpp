@@ -94,15 +94,9 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	case QSurfaceFormat::CoreProfile: glProfile = "Core Profile"; break;
 	case QSurfaceFormat::CompatibilityProfile: glProfile = "Compatibility Profile"; break;
 	}
+	//HyGuiLog(glType % "(" % glProfile % ")", LOGTYPE_Normal);
 
-	HyGuiLog("Initializing OpenGL", LOGTYPE_Title);
-	HyGuiLog(glType % "(" % glProfile % ")", LOGTYPE_Normal);
-
-	// TODO: Get glGetString to work with 'glad'
-	//HyGuiLog("Vendor: " % QString(reinterpret_cast<const char *>(glGetString(GL_VENDOR))), LOGTYPE_Normal);
-	//HyGuiLog("Renderer: " % QString(reinterpret_cast<const char *>(glGetString(GL_RENDERER))), LOGTYPE_Normal);
-	//HyGuiLog("Version: " % QString(reinterpret_cast<const char *>(glGetString(GL_VERSION))), LOGTYPE_Normal);
-	//HyGuiLog("GLSL: " % QString(reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION))), LOGTYPE_Normal);
+	HyGuiLog("Reloading Harmony", LOGTYPE_Title);
 
 	HarmonyInit initStruct;
 	initStruct.sGameName = m_pProject->GetTitle().toStdString();

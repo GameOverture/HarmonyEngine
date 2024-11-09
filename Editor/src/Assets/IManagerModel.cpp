@@ -169,11 +169,15 @@ void IManagerModel::GenerateAssetsDlg(const QModelIndex &indexDestination)
 
 bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, QVector<TreeModelItemData *> correspondingParentList, QVector<QUuid> correspondingUuidList)
 {
-	if(correspondingParentList.size() != sImportList.size())
+	if(correspondingParentList.size() != sImportList.size() || correspondingUuidList.size() != sImportList.size())
 	{
-		HyGuiLog("AtlasModel::ImportImages was passed a correspondingParentList that isn't the same size as the sImportImgList", LOGTYPE_Error);
+		HyGuiLog("AtlasModel::ImportNewAssets was passed a correspondingParentList/correspondingUuidList that isn't the same size as the sImportList", LOGTYPE_Error);
 		return false;
 	}
+	
+	// If there are no assets to import, then we're done
+	if(sImportList.isEmpty())
+		return true;
 
 	m_ImportedCorrespondingParentList = correspondingParentList;
 

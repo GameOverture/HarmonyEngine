@@ -76,7 +76,8 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 /*virtual*/ ProjectItemMimeData::~ProjectItemMimeData()
 { }
 
-/*static*/ void ProjectItemMimeData::RegenUuids(Project *pDestProject, QByteArray &jsonDataOut)
+// If from another project, OR eDropAction is COPY, it will modify 'jsonDataOut' and regenerate all UUIDs
+/*static*/ void ProjectItemMimeData::RegenUuids(Project *pDestProject, Qt::DropAction eDropAction, QByteArray &jsonDataOut)
 {
 	QMap<QString, QString> uuidReplacementMap;
 
@@ -87,7 +88,7 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 	{
 		QJsonObject itemObj = rootArray[i].toObject();
 
-		if(itemObj["project"].toString().toLower() == pDestProject->GetAbsPath().toLower())
+		if(eDropAction != Qt::CopyAction && itemObj["project"].toString().toLower() == pDestProject->GetAbsPath().toLower())
 			continue;
 
 		if(itemObj["isPrefix"].toBool() == false)

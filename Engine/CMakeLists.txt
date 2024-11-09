@@ -273,7 +273,7 @@ set(HYENGINE_HEADER_FILES
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.h
 	include/Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h
 	include/Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h
-	include/Scene/Nodes/Loadables/Bodies/Objects/HyEntityLeaf2d.h
+	include/Scene/Nodes/Loadables/Bodies/Objects/HyEntityWrapper2d.h
 	include/Scene/Nodes/Loadables/Bodies/Objects/HyPhysicsGrid2d.h
 	include/Scene/Nodes/Loadables/Objects/IHyAudio.h
 	include/Scene/Nodes/Loadables/Objects/HyAudio2d.h

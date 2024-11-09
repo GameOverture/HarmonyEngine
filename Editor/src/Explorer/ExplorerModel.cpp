@@ -139,80 +139,86 @@ ExplorerItemData *ExplorerModel::AddItem(Project *pProj, ItemType eNewItemType, 
 		}
 	}
 
+	// Ensure the name is unique at its destination 'pCurTreeItem'
+	QString sUniqueName = sName;
+	int iConflictCount = 0;
+	bool bConflicts = false;
+	do 
+	{
+		bConflicts = false;
+
+		for(int i = 0; i < pCurTreeItem->GetNumChildren(); ++i)
+		{
+			ExplorerItemData *pChildItem = pCurTreeItem->GetChild(i)->data(0).value<ExplorerItemData *>();
+			if(QString::compare(sUniqueName, pChildItem->GetName(false), Qt::CaseInsensitive) == 0)
+			{
+				bConflicts = true;
+				
+				sUniqueName = sName;
+				sUniqueName += "_Copy";
+				if(iConflictCount++ > 0)
+					sUniqueName += QString::number(iConflictCount);
+			}
+		}
+	} while(bConflicts);
+
 	ExplorerItemData *pNewItem = nullptr;
 	if(eNewItemType == ITEM_Prefix)
-		pNewItem = new ExplorerItemData(*pProj, ITEM_Prefix, QUuid(), sName);
+		pNewItem = new ExplorerItemData(*pProj, ITEM_Prefix, QUuid(), sUniqueName);
 	else
-	{
-		pNewItem = new ProjectItemData(*pProj, eNewItemType, sName, initItemFileData, bIsPendingSave);
-		//m_ItemUuidMap[static_cast<ProjectItemData *>(pNewItem)->GetUuid()] = static_cast<ProjectItemData *>(pNewItem);
-	}
+		pNewItem = new ProjectItemData(*pProj, eNewItemType, sUniqueName, initItemFileData, bIsPendingSave);
 
 	InsertTreeItem(*pProj, pNewItem, pCurTreeItem);
 	return pNewItem;
 }
 
-bool ExplorerModel::RemoveItem(ExplorerItemData *pItem)
+bool ExplorerModel::AddMimeItem(const ProjectItemMimeData *pProjMimeData, Qt::DropAction eDropAction, const QModelIndex &parentRef)
 {
-	QModelIndex index = FindIndex<ExplorerItemData *>(pItem, 0);
-	return removeRow(index.row(), index.parent());
-}
-
-QString ExplorerModel::AssemblePrefix(ExplorerItemData *pItem) const
-{
-	QStringList sPrefixParts;
-
-	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItemData *>(pItem, 0))->GetParent();
-	while(pTreeItem && pTreeItem != m_pRootItem)
-	{
-		ExplorerItemData *pItem = pTreeItem->data(0).value<ExplorerItemData *>();
-		if(pItem->GetType() == ITEM_Prefix)
-			sPrefixParts.prepend(pItem->GetName(false));
-
-		pTreeItem = pTreeItem->GetParent();
-	}
-
-	QString sPrefix;
-	for(int i = 0; i < sPrefixParts.size(); ++i)
-	{
-		sPrefix += sPrefixParts[i];
-		sPrefix += "/";
-	}
-
-	return sPrefix;
-}
-
-bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const QModelIndex &indexRef)
-{
-	// Error check destination index 'indexRef'
-	TreeModelItem *pDestTreeItem = FindPrefixTreeItem(indexRef);
+	// Error check parameters
+	TreeModelItem *pDestTreeItem = FindPrefixTreeItem(parentRef);
 	if(pDestTreeItem == nullptr)
 	{
-		HyGuiLog("ExplorerModel::PasteItemSrc failed to get the TreeModelItem from index that was passed in", LOGTYPE_Error);
+		HyGuiLog("ExplorerModel::AddMimeItem failed to get the TreeModelItem from index that was passed in", LOGTYPE_Error);
+		return false;
+	}
+	switch(eDropAction)
+	{
+	case Qt::CopyAction:
+		HyGuiLog("Pasting items...", LOGTYPE_Normal);
+		break;
+
+	case Qt::MoveAction:
+		HyGuiLog("Moving items...", LOGTYPE_Normal);
+		break;
+
+	case Qt::LinkAction:
+		HyGuiLog("Linking items...", LOGTYPE_Normal);
+		break;
+
+	default:
+		HyGuiLog("ExplorerModel::AddMimeItem was passed an invalid Qt::DropAction", LOGTYPE_Error);
 		return false;
 	}
 
 	ExplorerItemData *pDestItem = pDestTreeItem->data(0).value<ExplorerItemData *>();
-
-	// Destination is known, get project information
 	Project *pDestProject = &pDestItem->GetProject();
 
 	QByteArray jsonData = pProjMimeData->data(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems));
-	ProjectItemMimeData::RegenUuids(pDestProject, jsonData); // If pasting from another project, it will modify 'jsonData' and regenerate all UUIDs
+	ProjectItemMimeData::RegenUuids(pDestProject, eDropAction, jsonData); // If from another project, OR eDropAction is COPY, it will modify 'jsonDataOut' and regenerate all UUIDs
 
 	// Parse 'pProjMimeData' for paste information
 	QJsonDocument pasteDoc = QJsonDocument::fromJson(jsonData);
 	QJsonArray pasteArray = pasteDoc.array();
+	
 	QJsonArray assetManagerImportList[NUM_ASSETMANTYPES];
-
+	bool bNewItemsCreated = false;
 	for(int iPasteIndex = 0; iPasteIndex < pasteArray.size(); ++iPasteIndex)
 	{
 		QJsonObject pasteObj = pasteArray[iPasteIndex].toObject();
-
 		ItemType ePasteItemType = HyGlobal::GetTypeFromString(pasteObj["type"].toString());
 
-		// If paste item is already in the destination project, just simply move it to new location
-		if(pasteObj["project"].toString().toLower() == pDestProject->GetAbsPath().toLower())
+		// If MoveAction AND if paste item is already in the destination project, just simply move it to new location
+		if(eDropAction == Qt::MoveAction && pasteObj["project"].toString().toLower() == pDestProject->GetAbsPath().toLower())
 		{
 			QString sItemPath = pasteObj["name"].toString();
 			QModelIndex sourceIndex = FindIndexByItemPath(pDestProject, sItemPath, ePasteItemType);
@@ -244,7 +250,7 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 		// TODO: if it's a prefix, grab all the items within it and import them?
 		if(pasteObj["isPrefix"].toBool())
 			continue;
-		
+
 		// Import any missing fonts (.ttf)
 		if(pasteObj.contains("fonts"))
 		{
@@ -263,9 +269,9 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 				if(QFile::exists(sAbsDestPath) == false)
 				{
 					if(QFile::copy(sAbsFilePath, sAbsDestPath))
-						HyGuiLog("Paste imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
+						HyGuiLog("Imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Normal);
 					else
-						HyGuiLog("Paste failed to imported font: " % pasteFontFileInfo.fileName(), LOGTYPE_Error);
+						HyGuiLog("Failed to import font: " % pasteFontFileInfo.fileName(), LOGTYPE_Error);
 				}
 			}
 			if(fontArray.empty() == false)
@@ -288,17 +294,23 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 			sName = sItemPath.right(sItemPath.length() - iSplitIndex - 1);
 		}
 
+		// Only preserve the sPrefix if eDropAction is LINK. Otherwise use the destination item's prefix
+		if(eDropAction != Qt::LinkAction)
+			sPrefix = pDestItem->GetName(true);
+
 		FileDataPair initFileItemData;
 		initFileItemData.m_Meta = pasteObj["metaObj"].toObject();
 		initFileItemData.m_Data = pasteObj["dataObj"].toObject();
 		ProjectItemData *pImportedProjItem = static_cast<ProjectItemData *>(AddItem(pDestProject,
-																			ePasteItemType,
-																			sPrefix,
-																			sName,
-																			initFileItemData,
-																			false));
+																					ePasteItemType,
+																					sPrefix,
+																					sName, // NOTE: AddItem() ensures unique name
+																					initFileItemData,
+																					false));
 		pDestProject->AddDirtyItems(nullptr, QList<ProjectItemData *>() << pImportedProjItem);
-		
+		HyGuiLog(HyGlobal::ItemName(ePasteItemType, false) % " Created: " % pImportedProjItem->GetName(true), LOGTYPE_Normal);
+		bNewItemsCreated = true;
+
 		for(int iAssetType = 0; iAssetType < NUM_ASSETMANTYPES; ++iAssetType)
 		{
 			QJsonArray assetArray = pasteObj[HyGlobal::AssetName(static_cast<AssetManagerType>(iAssetType))].toArray();
@@ -311,15 +323,53 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 	}
 
 	// Finally import any assets that were part of the paste item - Once packing has finished 'pImportedProjItem' will be saved in the OnRepackFinished() callback
+	bool bNewAssetsImported = false;
 	for(int iAssetType = 0; iAssetType < NUM_ASSETMANTYPES; ++iAssetType)
 	{
 		AssetManagerType eAssetType = static_cast<AssetManagerType>(iAssetType);
 
-		if(pDestProject->PasteAssets(assetManagerImportList[eAssetType], eAssetType) == false)
+		int iNumAssetsImported = 0;
+		if(pDestProject->PasteAssets(assetManagerImportList[eAssetType], eAssetType, iNumAssetsImported) == false)
 			HyGuiLog("Paste failed to import assets of type: " % HyGlobal::AssetName(eAssetType), LOGTYPE_Error);
+		else if(iNumAssetsImported > 0)
+			bNewAssetsImported = true;
 	}
 
+	// If no assets are being imported, then we can save any newly imported dirty project items now
+	if(bNewItemsCreated && bNewAssetsImported == false)
+		pDestProject->ReloadHarmony();
+
 	return true;
+}
+
+bool ExplorerModel::RemoveItem(ExplorerItemData *pItem)
+{
+	QModelIndex index = FindIndex<ExplorerItemData *>(pItem, 0);
+	return removeRow(index.row(), index.parent());
+}
+
+QString ExplorerModel::AssemblePrefix(ExplorerItemData *pItem) const
+{
+	QStringList sPrefixParts;
+
+	TreeModelItem *pTreeItem = GetItem(FindIndex<ExplorerItemData *>(pItem, 0))->GetParent();
+	while(pTreeItem && pTreeItem != m_pRootItem)
+	{
+		ExplorerItemData *pItem = pTreeItem->data(0).value<ExplorerItemData *>();
+		if(pItem->GetType() == ITEM_Prefix)
+			sPrefixParts.prepend(pItem->GetName(false));
+
+		pTreeItem = pTreeItem->GetParent();
+	}
+
+	QString sPrefix;
+	for(int i = 0; i < sPrefixParts.size(); ++i)
+	{
+		sPrefix += sPrefixParts[i];
+		sPrefix += "/";
+	}
+
+	return sPrefix;
 }
 
 /*virtual*/ QVariant ExplorerModel::data(const QModelIndex &indexRef, int iRole /*= Qt::DisplayRole*/) const /*override*/
@@ -440,9 +490,9 @@ bool ExplorerModel::PasteItemSrc(const ProjectItemMimeData *pProjMimeData, const
 		return true;
 	
 	if(eAction == Qt::MoveAction && pData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_ProjectItems)))
-		return PasteItemSrc(static_cast<const ProjectItemMimeData *>(pData), parentRef);
+		return AddMimeItem(static_cast<const ProjectItemMimeData *>(pData), eAction, parentRef);
 
-	HyGuiLog("dropMimeData isn't MOVEACTION", LOGTYPE_Normal);
+	HyGuiLog("dropMimeData isn't MOVEACTION", LOGTYPE_Error);
 	return false;
 }
 

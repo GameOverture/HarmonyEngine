@@ -37,7 +37,7 @@ Project &ExplorerItemData::GetProject() const
 	return bWithPrefix ? GetPrefix() % m_sName : m_sName;
 }
 
-QString ExplorerItemData::GetPrefix() const
+QString ExplorerItemData::GetPrefix() const // If this item is a Prefix, it will NOT include itself. Use GetName(true) instead.
 {
 	return MainWindow::GetExplorerModel().AssemblePrefix(const_cast<ExplorerItemData *>(this));
 }

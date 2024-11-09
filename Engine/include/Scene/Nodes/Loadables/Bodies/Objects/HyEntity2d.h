@@ -91,7 +91,7 @@ public:
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// CHILDREN NODES
 	void ChildAppend(IHyNode2d &childRef);
-	void ChildPrepend(IHyNode2d &childRef);
+	virtual void ChildPrepend(IHyNode2d &childRef);
 	virtual bool ChildInsert(IHyNode2d &insertBefore, IHyNode2d &childRef);
 	bool ChildExists(IHyNode2d &childRef);
 	virtual bool ChildRemove(IHyNode2d *pChild);
