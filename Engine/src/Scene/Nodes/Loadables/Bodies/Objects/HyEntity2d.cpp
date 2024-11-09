@@ -313,7 +313,7 @@ void HyEntity2d::ChildAppend(IHyNode2d &childRef)
 	SetNewChildAttributes(childRef);
 }
 
-void HyEntity2d::ChildPrepend(IHyNode2d &childRef)
+/*virtual*/ void HyEntity2d::ChildPrepend(IHyNode2d &childRef)
 {
 	HyAssert(&childRef != this, "HyEntity2d::ChildPrepend was passed a child that was itself!");
 
