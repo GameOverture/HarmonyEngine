@@ -35,7 +35,7 @@ protected:
 
 		ENTITYATTRIB_NEXTFLAG				= 1 << 7,
 	};
-	uint32									m_uiAttribs;
+	uint32									m_uiAttribs;			// TODO: Rename this to 'm_uiEntityAttribs'
 
 public:
 	HyPhysicsCtrl2d							physics;				// Optional physics component

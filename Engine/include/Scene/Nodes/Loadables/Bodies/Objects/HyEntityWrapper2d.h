@@ -25,15 +25,13 @@ public:
 		HyEntity2d(pParent),
 		m_Leaf(HyNodePath(), this),
 		m_iLeafIndex(0)
-	{
-	}
+	{ }
 
 	HyEntityWrapper2d(const HyNodePath &leafNodePath, HyEntity2d *pParent = nullptr) :
 		HyEntity2d(pParent),
 		m_Leaf(leafNodePath, this),
 		m_iLeafIndex(0)
-	{
-	}
+	{ }
 
 	HyEntityWrapper2d(const char *szLeafPrefix, const char *szLeafName, HyEntity2d *pParent = nullptr) :
 		HyEntity2d(pParent),
@@ -152,7 +150,7 @@ public:
 			if(&m_Leaf == m_ChildList[0])
 				newParent.ChildAppend(*m_ChildList[1]);
 			else
-				newParent.ChildAppend(*m_ChildList[0]);
+				newParent.ChildPrepend(*m_ChildList[0]);
 		}
 		m_iLeafIndex = 0;
 	}
