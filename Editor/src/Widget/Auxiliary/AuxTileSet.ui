@@ -46,6 +46,22 @@
           </widget>
          </item>
          <item>
+          <widget class="QLabel" name="lblIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="../../../data/HyEditor.qrc">:/icons16x16/items/TileSet.png</pixmap>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="lblName">
            <property name="font">
             <font>

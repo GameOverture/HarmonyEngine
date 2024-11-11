@@ -94,8 +94,8 @@ public:
 	uint GetBankIndexFromBankId(quint32 uiBankId) const;
 	quint32 GetBankIdFromBankIndex(uint uiBankIndex) const;
 
-	void SaveMeta();
-	void SaveRuntime(); // Saves meta, outputs runtime manifest
+	void SaveMeta();	// Assets only needed by the editor
+	void SaveData();	// Assets required by the game (runtime manifests)
 
 	virtual QVariant data(const QModelIndex &indexRef, int iRole = Qt::DisplayRole) const override;
 	virtual Qt::ItemFlags flags(const QModelIndex& indexRef) const override;
@@ -131,7 +131,7 @@ protected:
 	virtual void OnFlushRepack() = 0;
 
 	virtual void OnSaveMeta(QJsonObject &metaObjRef) = 0;
-	virtual QJsonObject GetSaveJson() = 0;
+	virtual void OnSaveData(QJsonObject &dataObjRef) = 0;
 
 private:
 	IAssetItemData *CreateAssetTreeItem(QString sPrefix, QString sName, QJsonObject metaObj);

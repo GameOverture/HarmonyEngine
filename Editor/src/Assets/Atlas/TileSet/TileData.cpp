@@ -10,51 +10,95 @@
 #include "Global.h"
 #include "TileData.h"
 
-QDataStream &operator<<(QDataStream &, const TileData::TilePhysics &)
-{
-}
 
-QDataStream &operator>>(QDataStream &, TileData::TilePhysics &)
-{
-}
 
-// DATA FORMAT (data segment, internal to AtlasTileSet):
-// [int] AtlasIndex
-// [QPoint] Offset
-// [int] AnimFrame
-// [int] Probability
-// 
-// [int] Size of AutoTileMap
-// [int, uint8_t]...[int, uint8_t]...etc...
-// 
-// [TileData::TilePhysics] Tile Physics struct (is serializable)
-QDataStream &operator<<(QDataStream &leftSide, const TileData &rightSide)
+TileData::TileData(const QJsonObject &tileDataObj)
 {
-	leftSide << rightSide.m_iAtlasIndex;
-	leftSide << rightSide.m_Offset;
-	leftSide << rightSide.m_iAnimFrame;
-	leftSide << rightSide.m_iProbability;
+	m_iAtlasIndex = tileDataObj["AtlasIndex"].toInt();
+	m_TextureOffset = QPoint(tileDataObj["TextureOffsetX"].toInt(), tileDataObj["TextureOffsetY"].toInt());
+	m_bIsFlippedHorz = tileDataObj["IsFlippedHorz"].toBool();
+	m_bIsFlippedVert = tileDataObj["IsFlippedVert"].toBool();
+	m_bIsRotated = tileDataObj["IsRotated"].toBool();
 
-	leftSide << rightSide.m_AutoTileMap.size();
-	for(auto iter = rightSide.m_AutoTileMap.begin(); iter != rightSide.m_AutoTileMap.end(); ++iter)
+
+	// TODO
+	m_iAnimFrame = tileDataObj["AnimFrame"].toInt();
+
+
+
+	m_iProbability = tileDataObj["Probability"].toInt();
+
+	QJsonArray autoTileArray = tileDataObj["AutoTileMap"].toArray();
+	for(int i = 0; i < autoTileArray.size(); ++i)
 	{
-		leftSide << iter.key();
-		leftSide << iter.value();
+		QJsonObject autoTileObj = autoTileArray[i].toObject();
+		m_AutoTileMap[autoTileObj["AutoTileHandle"].toInt()] = autoTileObj["PeeringBits"].toInt();
 	}
 
-	leftSide << rightSide.m_TilePhysics;
-
-	return leftSide;
+	QJsonArray VertexArray = tileDataObj["VertexMap"].toArray();
+	for(int i = 0; i < VertexArray.size(); ++i)
+	{
+		QJsonObject vertexObj = VertexArray[i].toObject();
+		PhysicsLayerHandle layerHandle = vertexObj["LayerHandle"].toInt();
+		QJsonArray polygonArray = vertexObj["PolygonList"].toArray();
+		QList<QList<QPoint>> vertexList;
+		for(int iPolygonIndex = 0; iPolygonIndex < polygonArray.size(); ++iPolygonIndex)
+		{
+			QJsonArray pointArray = polygonArray[iPolygonIndex].toArray();
+			QList<QPoint> pointList;
+			for(int k = 0; k < pointArray.size(); ++k)
+			{
+				QJsonObject pointObj = pointArray[k].toObject();
+				pointList.push_back(QPoint(pointObj["x"].toInt(), pointObj["y"].toInt()));
+			}
+			vertexList.push_back(pointList);
+		}
+		m_VertexMap[layerHandle] = vertexList;
+	}
 }
 
-QDataStream &operator>>(QDataStream &leftSide, TileData &rightSide)
+void TileData::GetTileData(QJsonObject &tileDataObjOut)
 {
-	leftSide >> rightSide.m_iAtlasIndex;
-	leftSide >> rightSide.m_Offset;
-	leftSide >> rightSide.m_iAnimFrame;
-	leftSide >> rightSide.m_iProbability;
-	leftSide >> rightSide.m_AutoTileMap;
-	leftSide >> rightSide.m_PhysicsVertList;
+	tileDataObjOut["AtlasIndex"] = m_iAtlasIndex;
+	tileDataObjOut["TextureOffsetX"] = m_TextureOffset.x();
+	tileDataObjOut["TextureOffsetY"] = m_TextureOffset.y();
+	tileDataObjOut["IsFlippedHorz"] = m_bIsFlippedHorz;
+	tileDataObjOut["IsFlippedVert"] = m_bIsFlippedVert;
+	tileDataObjOut["IsRotated"] = m_bIsRotated;
+	
+	// TODO
+	tileDataObjOut["AnimFrame"] = m_iAnimFrame;
 
-	return leftSide;
+	tileDataObjOut["Probability"] = m_iProbability;
+	QJsonArray autoTileArray;
+	for(auto it = m_AutoTileMap.begin(); it != m_AutoTileMap.end(); ++it)
+	{
+		QJsonObject autoTileObj;
+		autoTileObj["AutoTileHandle"] = static_cast<int>(it.key());
+		autoTileObj["PeeringBits"] = it.value();
+		autoTileArray.push_back(autoTileObj);
+	}
+	tileDataObjOut["AutoTileMap"] = autoTileArray;
+	QJsonArray VertexArray;
+	for(auto it = m_VertexMap.begin(); it != m_VertexMap.end(); ++it)
+	{
+		QJsonObject vertexObj;
+		vertexObj["LayerHandle"] = static_cast<int>(it.key());
+		QJsonArray polygonArray;
+		for(int iPolygonIndex = 0; iPolygonIndex < it.value().size(); ++iPolygonIndex)
+		{
+			QJsonArray pointArray;
+			for(int k = 0; k < it.value()[iPolygonIndex].size(); ++k)
+			{
+				QJsonObject pointObj;
+				pointObj["x"] = it.value()[iPolygonIndex][k].x();
+				pointObj["y"] = it.value()[iPolygonIndex][k].y();
+				pointArray.push_back(pointObj);
+			}
+			polygonArray.push_back(pointArray);
+		}
+		vertexObj["PolygonList"] = polygonArray;
+		VertexArray.push_back(vertexObj);
+	}
+	tileDataObjOut["VertexMap"] = VertexArray;
 }

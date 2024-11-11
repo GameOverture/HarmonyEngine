@@ -386,7 +386,7 @@
   <action name="actionCreateTileSet">
    <property name="icon">
     <iconset resource="../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/items/AtlasTileSet-New.png</normaloff>:/icons16x16/items/AtlasTileSet-New.png</iconset>
+     <normaloff>:/icons16x16/items/TileSet-New.png</normaloff>:/icons16x16/items/TileSet-New.png</iconset>
    </property>
    <property name="text">
     <string>Create New TileSet</string>

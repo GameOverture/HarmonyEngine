@@ -121,7 +121,6 @@
     <property name="title">
      <string>&amp;Project</string>
     </property>
-    <action name=""/>
     <addaction name="actionProjectSettings"/>
     <addaction name="separator"/>
     <addaction name="actionBuildSettings"/>

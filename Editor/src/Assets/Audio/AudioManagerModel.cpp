@@ -161,7 +161,10 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	// Create data runtime file if one doesn't exist
 	QFile runtimeFile(m_DataDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt));
 	if(runtimeFile.exists() == false)
-		SaveRuntime();
+	{
+		SaveMeta();
+		SaveData();
+	}
 
 	// Initialize audio categories
 	if(runtimeFile.exists() == false)
@@ -354,7 +357,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	metaObjRef.insert("nextCategoryId", static_cast<qint64>(m_uiNextCategoryId));
 }
 
-/*virtual*/ QJsonObject AudioManagerModel::GetSaveJson() /*override*/
+/*virtual*/ void AudioManagerModel::OnSaveData(QJsonObject &dataObjRef) /*override*/
 {
 	QJsonArray bankArray;
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
@@ -391,12 +394,8 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 		groupArray.append(groupObj);
 	}
 
-	QJsonObject atlasInfoObj;
-	atlasInfoObj.insert("$fileVersion", HYGUI_FILE_VERSION);
-	atlasInfoObj.insert("banks", bankArray);
-	atlasInfoObj.insert("categories", groupArray);
-
-	return atlasInfoObj;
+	dataObjRef.insert("banks", bankArray);
+	dataObjRef.insert("categories", groupArray);
 }
 
 SoundClip *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, QUuid uuid, const WaveHeader &wavHeaderRef)

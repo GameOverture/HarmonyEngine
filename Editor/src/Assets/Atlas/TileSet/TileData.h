@@ -22,17 +22,15 @@
 //       ROWS = static_cast<int>(std::ceil(static_cast<double>(n) / columns))
 struct TileData
 {
-	// Render Buffer Data:
 	int												m_iAtlasIndex;			// Row major order: (Y * NumColumns) + X
-	QPoint											m_Offset;
+	QPoint											m_TextureOffset;
 
-	enum TileAnimType
-	{
-		TILEANIM_None = -1,
-	};
+	bool 											m_bIsFlippedHorz;
+	bool 											m_bIsFlippedVert;
+	bool 											m_bIsRotated;			// Transpose
+
 	int												m_iAnimFrame;			// -1 indicates no animation (frames are laid out in row major order in the atlas). NOTE: A tile on the atlas may only be apart of one animation
 
-	// Meta Data:
 	int												m_iProbability;
 
 	enum AutoTilePeeringBit
@@ -48,7 +46,10 @@ struct TileData
 	};
 	QMap<AutoTileHandle, uint8_t>					m_AutoTileMap;
 
-	QMap<PhysicsLayerHandle, QList<QList<QPoint>>>	m_PhysicsVertMap;
+	QMap<PhysicsLayerHandle, QList<QList<QPoint>>>	m_VertexMap;
+
+	TileData(const QJsonObject &tileDataObj);
+	void GetTileData(QJsonObject &tileDataObjOut);
 };
 
 #endif // TILEDATA_H

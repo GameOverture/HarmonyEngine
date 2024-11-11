@@ -1201,7 +1201,7 @@ void MainWindow::NewItem(ItemType eItem)
 															 pDlg->GetPrefix(),
 															 pDlg->GetName(),
 															 HyGlobal::GenerateNewItemFileData(pDlg->GetImportFile()),
-															 true);//pDlg->GetImportFile().isEmpty()); // Blank items are pending save
+															 true);
 
 		if(pNewItem->IsProjectItem())
 		{

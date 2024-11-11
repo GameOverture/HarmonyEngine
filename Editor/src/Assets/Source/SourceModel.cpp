@@ -733,8 +733,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	file.close();
 }
 
-/*virtual*/ QJsonObject SourceModel::GetSaveJson() /*override*/
+/*virtual*/ void SourceModel::OnSaveData(QJsonObject &dataObjRef) /*override*/
 {
 	// This function doesn't make sense with m_bHasRuntimeMantifest == false
-	return QJsonObject();
 }

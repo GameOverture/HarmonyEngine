@@ -59,7 +59,7 @@ protected:
 	virtual void OnFlushRepack() override;
 
 	virtual void OnSaveMeta(QJsonObject &metaObjRef) override;
-	virtual QJsonObject GetSaveJson() override;
+	virtual void OnSaveData(QJsonObject &dataObjRef) override;
 };
 
 #endif // SOURCEMODEL_H

@@ -48,7 +48,7 @@ public:
 	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, ItemType eSubAtlasType);
 
 	AtlasTileSet *GenerateTileSet(QString sName, TreeModelItemData *pParentTreeItemData, quint32 uiBankId);
-	void SaveTileSets();
+	void SaveTileSet(QUuid tileSetUuid, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
@@ -68,7 +68,7 @@ protected:
 	virtual void OnFlushRepack() override;
 
 	virtual void OnSaveMeta(QJsonObject &metaObjRef) override;
-	virtual QJsonObject GetSaveJson() override;
+	virtual void OnSaveData(QJsonObject &dataObjRef) override;
 
 	void AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSet);
 

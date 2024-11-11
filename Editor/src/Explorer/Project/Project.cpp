@@ -576,7 +576,10 @@ void Project::ReloadHarmony()
 
 	QList<IManagerModel *> dirtyManagerList = m_DirtyManagerSet.values();
 	for(int i = 0; i < dirtyManagerList.size(); ++i)
-		dirtyManagerList[i]->SaveRuntime();
+	{
+		dirtyManagerList[i]->SaveMeta();
+		dirtyManagerList[i]->SaveData();
+	}
 
 	Harmony::Reload(this);
 }

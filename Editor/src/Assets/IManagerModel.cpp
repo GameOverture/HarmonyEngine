@@ -14,6 +14,7 @@
 #include "MainWindow.h"
 #include "ManagerWidget.h"
 #include "ProjectItemData.h"
+#include "AtlasTileSet.h"
 #include "AssetMimeData.h"
 #include "AtlasImportThread.h"
 #include "AudioImportThread.h"
@@ -710,12 +711,15 @@ void IManagerModel::SaveMeta()
 	}
 }
 
-void IManagerModel::SaveRuntime()
+void IManagerModel::SaveData() // Assets required by the game (runtime manifests)
 {
-	SaveMeta();
+	QJsonObject runtimeDataObj;
+	runtimeDataObj.insert("$fileVersion", HYGUI_FILE_VERSION);
+
+	OnSaveData(runtimeDataObj);
 
 	QJsonDocument runtimeDoc;
-	runtimeDoc.setObject(GetSaveJson());
+	runtimeDoc.setObject(runtimeDataObj);
 
 	QFile runtimeFile(m_DataDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt));
 	if(runtimeFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
@@ -796,7 +800,12 @@ void IManagerModel::SaveRuntime()
 					if(static_cast<AtlasFrame *>(pAsset)->GetSubAtlasType() == ITEM_None)
 						return QVariant(static_cast<AtlasFrame *>(pAsset)->GetThumbnail());
 					else
+					{
+						if(pAsset->GetType() == ITEM_AtlasTileSet)
+							return static_cast<AtlasTileSet *>(pAsset)->GetTileSetIcon();
+						
 						return HyGlobal::ItemIcon(static_cast<AtlasFrame *>(pAsset)->GetSubAtlasType(), SUBICON_None);
+					}
 				}
 				else if(m_eASSET_TYPE == ASSETMAN_Source)
 					return static_cast<SourceFile *>(pAsset)->GetSourceIcon();

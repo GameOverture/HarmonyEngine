@@ -280,14 +280,14 @@
         <file>icons16x16/items/TileMap-Pending.png</file>
         <file>icons16x16/items/TileMap-Settings.png</file>
         <file>icons16x16/items/TileMap-Warning.png</file>
-        <file>icons16x16/items/AtlasTileSet.png</file>
-        <file>icons16x16/items/AtlasTileSet-Close.png</file>
-        <file>icons16x16/items/AtlasTileSet-Delete.png</file>
-        <file>icons16x16/items/AtlasTileSet-Dirty.png</file>
-        <file>icons16x16/items/AtlasTileSet-New.png</file>
-        <file>icons16x16/items/AtlasTileSet-Open.png</file>
-        <file>icons16x16/items/AtlasTileSet-Pending.png</file>
-        <file>icons16x16/items/AtlasTileSet-Settings.png</file>
-        <file>icons16x16/items/AtlasTileSet-Warning.png</file>
+        <file>icons16x16/items/TileSet.png</file>
+        <file>icons16x16/items/TileSet-Close.png</file>
+        <file>icons16x16/items/TileSet-Delete.png</file>
+        <file>icons16x16/items/TileSet-Dirty.png</file>
+        <file>icons16x16/items/TileSet-New.png</file>
+        <file>icons16x16/items/TileSet-Open.png</file>
+        <file>icons16x16/items/TileSet-Pending.png</file>
+        <file>icons16x16/items/TileSet-Settings.png</file>
+        <file>icons16x16/items/TileSet-Warning.png</file>
     </qresource>
 </RCC>

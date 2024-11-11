@@ -78,8 +78,8 @@ class Project : public ExplorerItemData
 
 	QMap<QUuid, TreeModelItemData *>					m_ItemDataUuidMap;		// Lookup map to help find tree item data pointers
 
-	QSet<IManagerModel *>								m_DirtyManagerSet;		// Dirty managers that need to SaveRuntime() during ReloadHarmony()
-	QSet<ProjectItemData *>								m_DirtyProjItemSet;		// Dirty items that need to be resaved during ReloadHarmony()
+	QSet<IManagerModel *>								m_DirtyManagerSet;		// Dirty managers that need to SaveMeta() & SaveData() before a ReloadHarmony()
+	QSet<ProjectItemData *>								m_DirtyProjItemSet;		// Dirty items that need to be resaved before a ReloadHarmony()
 
 	bool												m_bHasError;
 	bool												m_bExplorerModelLoaded;

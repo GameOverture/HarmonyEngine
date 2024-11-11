@@ -16,7 +16,7 @@
 #include <QWidget>
 #include <QSet>
 #include <QJsonObject>
-#include <QDataStream>
+#include <QUndoStack>
 
 using AutoTileHandle = uint32_t;
 using PhysicsLayerHandle = uint32_t;
@@ -27,15 +27,15 @@ class AtlasTileSet : public AtlasFrame
 {
 	Q_OBJECT
 
-	FileDataPair				m_FileDataPair;
+	FileDataPair				m_TileSetDataPair;				// The currently 'saved to disk' data of the TileSet
 	bool						m_bExistencePendingSave;
-	//QUndoStack *				m_pUndoStack;
-	//QAction *					m_pActionUndo;
-	//QAction *					m_pActionRedo;
+	QUndoStack *				m_pUndoStack;
+	QAction *					m_pActionUndo;
+	QAction *					m_pActionRedo;
 
 	QSize						m_TileSize;
 
-	struct Autotile
+	struct AutoTile
 	{
 		AutoTileHandle			m_hId;
 		enum Type
@@ -46,19 +46,67 @@ class AtlasTileSet : public AtlasFrame
 		};
 		int						m_iType;
 		QString					m_sName;
-		QColor					m_Color;
+		HyColor					m_Color;
+
+		AutoTile(const QJsonObject &initObj)
+		{
+			m_hId = initObj["id"].toInt();
+			m_iType = initObj["type"].toInt();
+			m_sName = initObj["name"].toString();
+			m_Color = HyColor(initObj["color"].toVariant().toLongLong());
+		}
 	};
-	QList<Autotile>				m_AutotileList;
+	QList<AutoTile>				m_AutotileList;
 
 	struct PhysicsLayer
 	{
 		PhysicsLayerHandle		m_hId;
 		QString					m_sName;
-		QColor					m_Color;
+		HyColor					m_Color;
+
+		PhysicsLayer(const QJsonObject &initObj)
+		{
+			m_hId = initObj["id"].toInt();
+			m_sName = initObj["name"].toString();
+			m_Color = HyColor(initObj["color"].toVariant().toLongLong());
+		}
 	};
 	QList<PhysicsLayer>			m_PhysicsLayerList;
 
-	QMap<QPoint, TileData *>	m_TileMap;		// QPoint key is the user/meta location, not the atlas
+	//struct TileAnimation
+	//{
+	//	quint32					m_uiId;
+	//	QString					m_sName;
+	//	HyColor					m_Color;
+
+	//	TileData *m_pStartTile;
+	//};
+
+	// Row major order: (Y * NumColumns) + X
+	struct MetaLocation
+	{
+		int iX;
+		int iY;
+
+		MetaLocation(int x, int y) : iX(x), iY(y) { }
+		bool operator==(const MetaLocation &rhs) const
+		{
+			return iX == rhs.iX && iY == rhs.iY;
+		}
+		bool operator!=(const MetaLocation &rhs) const
+		{
+			return this->operator==(rhs) == false;
+		}
+		bool operator<(const MetaLocation &rhs) const
+		{
+			if(iX < rhs.iX)
+				return true;
+			else if(iX == rhs.iX)
+				return iY < rhs.iY;
+			return false;
+		}
+	};
+	QMap<MetaLocation, TileData *>	m_TileDataMap;		// QPoint key is the user/meta location, not the atlas. TileData * may be an AlternateTile
 
 public:
 	AtlasTileSet(IManagerModel &modelRef,
@@ -69,7 +117,7 @@ public:
 				 HyTextureInfo texInfo,
 				 quint16 uiW, quint16 uiH, quint16 uiX, quint16 uiY,
 				 int iTextureIndex,
-				 const FileDataPair &initFileDataRef,
+				 const FileDataPair &tileSetDataPair,
 				 bool bIsPendingSave,
 				 uint uiErrors);
 	~AtlasTileSet();
@@ -77,6 +125,7 @@ public:
 	int GetNumTiles() const;
 	QSize GetTileSize() const;
 	QString GetTileSetInfo() const;
+	QIcon GetTileSetIcon() const;
 
 	void GetLatestFileData(FileDataPair &fileDataPairOut) const;
 	void GetSavedFileData(FileDataPair &fileDataPairOut) const;
@@ -86,6 +135,10 @@ public:
 	void DiscardChanges();
 
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
+
+private Q_SLOTS:
+	void on_undoStack_cleanChanged(bool bClean);
+	void on_undoStack_indexChanged(int iIndex);
 };
 
 #endif // ATLASTILESET_H

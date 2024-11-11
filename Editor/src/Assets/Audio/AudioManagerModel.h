@@ -79,7 +79,7 @@ protected:
 	virtual void OnFlushRepack() override;
 
 	virtual void OnSaveMeta(QJsonObject &metaObjRef) override;
-	virtual QJsonObject GetSaveJson() override;
+	virtual void OnSaveData(QJsonObject &dataObjRef) override;
 
 private:
 	SoundClip *ImportSound(QString sFilePath, quint32 uiBankIndex, QUuid uuid, const WaveHeader &wavHeaderRef);
