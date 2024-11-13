@@ -10,6 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/HyBarMeter.h"
 #include "Diagnostics/Console/IHyConsole.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
 
 HyBarMeter::HyBarMeter(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
@@ -282,7 +283,11 @@ void HyBarMeter::SetNumFormat(HyNumberFormat format)
 		m_Bar.SetStencil(nullptr);
 	else
 	{
-		m_BarMask.SetAsBox(HyRect(m_Bar.GetWidth(), m_Bar.GetHeight()));
+		glm::ivec2 vSpriteOffset(0.0f, 0.0f);
+		if(m_Bar.IsNode() && m_Bar.GetNode()->GetType() == HYTYPE_Sprite)
+			vSpriteOffset = static_cast<HySprite2d *>(m_Bar.GetNode())->GetCurFrameOffset();
+
+		m_BarMask.SetAsBox(HyRect(m_Bar.GetWidth() + vSpriteOffset.x, m_Bar.GetHeight() + vSpriteOffset.x));
 		m_BarMask.SetVisible(false);
 		m_BarStencil.AddMask(m_BarMask);
 		
