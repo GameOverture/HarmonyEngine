@@ -65,7 +65,7 @@ bool IHyCamera<NODETYPE>::IsCameraShake()
 }
 
 template<typename NODETYPE>
-void IHyCamera<NODETYPE>::CameraShake(float fRadius)
+void IHyCamera<NODETYPE>::CameraShake(float fRadius, float fDurationMod)
 {
 	if(IsCameraShake() == false)
 		HySetVec(m_ptCameraShakeCenter, NODETYPE::pos.Get());
@@ -73,6 +73,10 @@ void IHyCamera<NODETYPE>::CameraShake(float fRadius)
 	fRadius = HyMath::Max(fRadius, 2.5f);
 
 	m_fCameraShakeRadius = fRadius;
+
+	fDurationMod = HyMath::Clamp(fDurationMod, 0.0f, 0.99f);
+	m_fCameraShakeDurationMod = 0.9f + (fDurationMod * 0.1f);
+
 	m_fCameraShakeAngle = HyRand::Range(0.0f, 360.0f);
 }
 
@@ -118,7 +122,7 @@ template<typename NODETYPE>
 
 	if(IsCameraShake())
 	{
-		m_fCameraShakeRadius *= 0.9f;
+		m_fCameraShakeRadius *= m_fCameraShakeDurationMod;//0.9f;
 		if(m_fCameraShakeRadius <= 2.0f)
 		{
 			// End camera shake

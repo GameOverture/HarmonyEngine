@@ -150,7 +150,7 @@ ExplorerItemData *ExplorerModel::AddItem(Project *pProj, ItemType eNewItemType, 
 		for(int i = 0; i < pCurTreeItem->GetNumChildren(); ++i)
 		{
 			ExplorerItemData *pChildItem = pCurTreeItem->GetChild(i)->data(0).value<ExplorerItemData *>();
-			if(QString::compare(sUniqueName, pChildItem->GetName(false), Qt::CaseInsensitive) == 0)
+			if(eNewItemType == pChildItem->GetType() && QString::compare(sUniqueName, pChildItem->GetName(false), Qt::CaseInsensitive) == 0)
 			{
 				bConflicts = true;
 				
