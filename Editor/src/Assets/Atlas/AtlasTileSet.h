@@ -12,6 +12,7 @@
 
 #include "Global.h"
 #include "AtlasFrame.h"
+#include "TileSetScene.h"
 
 #include <QWidget>
 #include <QSet>
@@ -29,9 +30,12 @@ class AtlasTileSet : public AtlasFrame
 
 	FileDataPair				m_TileSetDataPair;				// The currently 'saved to disk' data of the TileSet
 	bool						m_bExistencePendingSave;
+	
 	QUndoStack *				m_pUndoStack;
 	QAction *					m_pActionUndo;
 	QAction *					m_pActionRedo;
+	
+	TileSetScene				m_GfxScene;
 
 	QSize						m_TileSize;
 
@@ -124,8 +128,11 @@ public:
 
 	int GetNumTiles() const;
 	QSize GetTileSize() const;
+	void SetTileSize(QSize size);
 	QString GetTileSetInfo() const;
 	QIcon GetTileSetIcon() const;
+
+	TileSetScene *GetGfxScene();
 
 	void GetLatestFileData(FileDataPair &fileDataPairOut) const;
 	void GetSavedFileData(FileDataPair &fileDataPairOut) const;

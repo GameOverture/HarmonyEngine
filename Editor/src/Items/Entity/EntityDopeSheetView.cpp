@@ -144,7 +144,7 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 	delete pNewMenu;
 }
 
-/*virtual*/ void EntityDopeSheetView::drawBackground(QPainter *painter, const QRectF &rect) /*override*/
+/*virtual*/ void EntityDopeSheetView::drawBackground(QPainter *pPainter, const QRectF &rect) /*override*/
 {
 	//////////////////////////////////////////////////////////////////////////
 	// DRAW CURRENT FRAME INDICATOR
@@ -156,8 +156,8 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 
 	if(fPosX >= fPOSX_DRAW_THRESHOLD && fPosX < (rect.x() + rect.width()))
 	{
-		painter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetCurFrameIndicator));
-		painter->drawLine(fPosX, rect.y(), fPosX, rect.y() + rect.height());
+		pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetCurFrameIndicator));
+		pPainter->drawLine(fPosX, rect.y(), fPosX, rect.y() + rect.height());
 	}
 }
 

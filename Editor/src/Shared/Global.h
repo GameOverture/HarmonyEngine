@@ -43,6 +43,8 @@ class Project;
 
 #define HYGUI_FILE_VERSION 17
 
+#define MAX_INT_RANGE 16777215						// Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
+
 #define DISPLAYORDER_SnapGuide		99999999
 #define DISPLAYORDER_TransformCtrl	9999999
 //#define HYGUI_UseBinaryMetaFiles

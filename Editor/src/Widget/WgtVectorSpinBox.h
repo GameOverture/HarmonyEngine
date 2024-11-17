@@ -62,7 +62,16 @@ public:
 	void Init(SpinBoxType eSpinBoxType, QVariant minValue, QVariant maxValue); // Required when using default ctor
 
 	QVariant GetValue();
+
+public Q_SLOTS:
 	void SetValue(QVariant data);
+	
+protected Q_SLOTS:
+	void OnValueChanged(int iValue);
+	void OnValueChanged(double dValue);
+
+Q_SIGNALS:
+	void ValueChanged(QVariant newValue);
 
 protected:
 	virtual void focusInEvent(QFocusEvent *pEvent) override;

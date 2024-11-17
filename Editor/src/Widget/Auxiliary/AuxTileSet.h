@@ -23,7 +23,11 @@ class AuxTileSet : public QWidget
 {
 	Q_OBJECT
 
-	AtlasTileSet *			m_pTileSet;
+	AtlasTileSet *								m_pTileSet;
+
+	bool										m_bIsImportingTileSheet;
+	QPixmap *									m_pImportTileSheetPixmap;
+	
 
 public:
 	explicit AuxTileSet(QWidget *pParent = nullptr);
@@ -34,8 +38,21 @@ public:
 private:
 	Ui::AuxTileSet *ui;
 
+	void SetImportWidgets();
+	void SliceSheetPixmaps();
+	void ErrorCheckImport();
+
 private Q_SLOTS:
-	void on_actionImportTileSheet_triggered();
+	void on_radTileSheet_toggled(bool bChecked);
+	void on_radTileImages_toggled(bool bChecked);
+
+	void on_btnImageBrowse_clicked();
+
+	void OnTileSizeChanged(QVariant newSize);
+	void OnStartOffsetChanged(QVariant newOffset);
+	void OnPaddingChanged(QVariant newPadding);
+
+	void on_btnConfirmAddRemove_clicked();
 
 };
 

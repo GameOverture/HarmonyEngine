@@ -26,21 +26,26 @@ const int g_iDefaultTileSize = 32;
 
 DlgImportTileSheet::DlgImportTileSheet(AtlasTileSet &tileSetRef, QWidget *parent) :
 	QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-	m_DEFAULT_TILE_SIZE(tileSetRef.GetTileSize()),
+	m_DefaultTileSize(tileSetRef.GetTileSize()),
 	m_TileSetRef(tileSetRef),
 	m_pOrigPixmap(nullptr),
-	m_pPreviewPixmap(nullptr),
 	ui(new Ui::DlgImportTileSheet)
 {
 	ui->setupUi(this);
-
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
-	ui->sbTileSizeX->setValue(m_DEFAULT_TILE_SIZE.width());
-	ui->sbTileSizeY->setValue(m_DEFAULT_TILE_SIZE.height());
+
+	if(m_DefaultTileSize.isValid() == false)
+	{
+		m_DefaultTileSize.setWidth(g_iDefaultTileSize);
+		m_DefaultTileSize.setHeight(g_iDefaultTileSize);
+	}
+	ui->sbTileSizeX->setValue(m_DefaultTileSize.width());
+	ui->sbTileSizeY->setValue(m_DefaultTileSize.height());
 
 	ErrorCheck();
 
 	setWindowTitle(tileSetRef.GetName() % " - Import/Replace Tiles"); // NOTE: This needs to be after ui->setupUi
+	SetWidgets(ui->radTileSheet->isChecked());
 }
 
 DlgImportTileSheet::~DlgImportTileSheet()
@@ -86,11 +91,23 @@ void DlgImportTileSheet::on_btnImageBrowse_clicked()
 	if(sImportImgList.empty())
 		return;
 
-	ui->txtImagePath->setText(sImportImgList[0]);
-	
-	if(m_pOrigPixmap)
+	if(m_bIsShowingTileSheet)
+	{
+		ui->txtImagePath->setText(sImportImgList[0]);
+
 		delete m_pOrigPixmap;
-	m_pOrigPixmap = new QPixmap(sImportImgList[0]);
+		m_pOrigPixmap = new QPixmap(sImportImgList[0]);
+	}
+	else // Individual Tiles
+	{
+		QString sImgPaths;
+		for(auto sImgPath : sImportImgList)
+		{
+			sImgPaths += sImgPath % ";";
+			m_TilePixmaps.push_back(new QPixmap(sImgPath));
+		}
+		ui->txtImagePath->setText(sImgPaths);
+	}
 
 	AssemblePixmaps();
 	ErrorCheck();
@@ -181,8 +198,8 @@ void DlgImportTileSheet::SetWidgets(bool bTileSheet)
 		return;
 
 	bool bHasPendingInfo = ui->txtImagePath->text().isEmpty() == false ||
-						   ui->sbTileSizeX->value() != m_DEFAULT_TILE_SIZE.width() ||
-						   ui->sbTileSizeY->value() != m_DEFAULT_TILE_SIZE.height() ||
+						   ui->sbTileSizeX->value() != m_DefaultTileSize.width() ||
+						   ui->sbTileSizeY->value() != m_DefaultTileSize.height() ||
 						   ui->sbOffsetX->value() != 0 ||
 						   ui->sbOffsetY->value() != 0 ||
 						   ui->sbPaddingX->value() != 0 ||
@@ -204,6 +221,7 @@ void DlgImportTileSheet::SetWidgets(bool bTileSheet)
 	m_bIsShowingTileSheet = bTileSheet;
 
 	ui->grpSlicingOptions->setVisible(m_bIsShowingTileSheet);
+	ui->grpSlicingOptions->setEnabled(m_bIsShowingTileSheet);
 	ui->lblInput->setText(bTileSheet ? "Tile Sheet Image Path" : "Individual Image Paths");
 
 	ui->txtImagePath->clear();
@@ -215,8 +233,6 @@ void DlgImportTileSheet::AssemblePixmaps()
 {
 	if(m_pPreviewPixmap)
 		delete m_pPreviewPixmap;
-
-	ui->lblImage->setText("<Select Image>");
 
 	if(m_pOrigPixmap == nullptr || ui->sbTileSizeX->value() == 0 || ui->sbTileSizeY->value() == 0)
 		return;
@@ -290,9 +306,6 @@ void DlgImportTileSheet::AssemblePixmaps()
 		}
 	}
 	painter.end();
-
-	ui->lblImage->clear();
-	ui->lblImage->setPixmap(*m_pPreviewPixmap);
 }
 
 void DlgImportTileSheet::ErrorCheck()

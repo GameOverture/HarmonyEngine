@@ -269,7 +269,7 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 void EntityTreeItemData::InitalizePropertyModel()
 {
 	// Default ranges
-	const int iRANGE = 16777215;        // Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
+	const int iRANGE = MAX_INT_RANGE;        // Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
 	const double fRANGE = 16777215.0f;
 	const double dRANGE = 16777215.0;
 

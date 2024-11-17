@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>880</width>
-    <height>296</height>
+    <width>656</width>
+    <height>415</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -46,35 +46,6 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="lblIcon">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="pixmap">
-            <pixmap resource="../../../data/HyEditor.qrc">:/icons16x16/items/TileSet.png</pixmap>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="lblName">
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>&lt;Name&gt;</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QLabel" name="lblInfo">
            <property name="text">
             <string>&lt;Info&gt;</string>
@@ -82,7 +53,28 @@
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="btnImportTileSheet">
+          <widget class="QToolButton" name="toolButton">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnUndo">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnRedo">
            <property name="text">
             <string>...</string>
            </property>
@@ -91,7 +83,181 @@
         </layout>
        </item>
        <item>
-        <widget class="QTreeView" name="treeView"/>
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="tabAddRemove">
+          <attribute name="icon">
+           <iconset resource="../../../data/HyEditor.qrc">
+            <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+          </attribute>
+          <attribute name="title">
+           <string>Add/Remove Tiles</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QRadioButton" name="radTileSheet">
+               <property name="text">
+                <string>Tile Sheet Image</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radTileImages">
+               <property name="text">
+                <string>Individual Tile Images</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QLineEdit" name="txtImagePath">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnImageBrowse">
+               <property name="text">
+                <string>Browse..</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="Line" name="line_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="grpSlicingOptions">
+             <property name="title">
+              <string>Slicing Options</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_2">
+                <property name="toolTip">
+                 <string>The size of each tile within the tile sheet. The TileSet will use the largest tiles' size for all tiles</string>
+                </property>
+                <property name="text">
+                 <string>Tile Size</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_5">
+                <property name="toolTip">
+                 <string>The margins on the tile sheet's top left edges where the tiles begin</string>
+                </property>
+                <property name="text">
+                 <string>Start Offset</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="toolTip">
+                 <string>The separation between each tile on the sheet in pixels</string>
+                </property>
+                <property name="text">
+                 <string>Padding</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="WgtVectorSpinBox" name="vsbTileSize" native="true"/>
+              </item>
+              <item row="1" column="1">
+               <widget class="WgtVectorSpinBox" name="vsbStartOffset" native="true"/>
+              </item>
+              <item row="2" column="1">
+               <widget class="WgtVectorSpinBox" name="vsbPadding" native="true"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblError">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::AutoText</enum>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnConfirmAddRemove">
+             <property name="text">
+              <string>Confirm</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tabProperties">
+          <attribute name="icon">
+           <iconset resource="../../../data/HyEditor.qrc">
+            <normaloff>:/icons16x16/items/TileSet-Settings.png</normaloff>:/icons16x16/items/TileSet-Settings.png</iconset>
+          </attribute>
+          <attribute name="title">
+           <string>Properties</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QTreeView" name="treeView"/>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -99,19 +265,51 @@
     </widget>
    </item>
   </layout>
-  <action name="actionImportTileSheet">
+  <action name="actionUndo">
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+     <normaloff>:/icons16x16/edit-undo.png</normaloff>:/icons16x16/edit-undo.png</iconset>
    </property>
    <property name="text">
-    <string>Import Tile Sheet</string>
+    <string>Undo</string>
    </property>
    <property name="toolTip">
-    <string>Automatically slice an assembled grid of tiles from a single image</string>
+    <string>Undo last TileSet property modification</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/edit-redo.png</normaloff>:/icons16x16/edit-redo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="toolTip">
+    <string>Redo the last undo'ed TileSet property modification</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/file-save.png</normaloff>:/icons16x16/file-save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save TileSet</string>
+   </property>
+   <property name="toolTip">
+    <string>Save the TileSet and write to both meta and runtime data</string>
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WgtVectorSpinBox</class>
+   <extends>QWidget</extends>
+   <header>WgtVectorSpinBox.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../../data/HyEditor.qrc"/>
  </resources>

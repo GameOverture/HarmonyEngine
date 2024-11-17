@@ -22,7 +22,7 @@ class DlgImportTileSheet : public QDialog
 {
 	Q_OBJECT
 
-	const QSize				m_DEFAULT_TILE_SIZE;
+	QSize					m_DefaultTileSize;
 	AtlasTileSet &			m_TileSetRef;
 
 

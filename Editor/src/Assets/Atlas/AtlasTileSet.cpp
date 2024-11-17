@@ -92,6 +92,11 @@ QSize AtlasTileSet::GetTileSize() const
 	return m_TileSize;
 }
 
+void AtlasTileSet::SetTileSize(QSize size)
+{
+	m_TileSize = size;
+}
+
 QString AtlasTileSet::GetTileSetInfo() const
 {
 	QString sInfo;
@@ -104,6 +109,11 @@ QString AtlasTileSet::GetTileSetInfo() const
 	}
 
 	return sInfo;
+}
+
+TileSetScene *AtlasTileSet::GetGfxScene()
+{
+	return &m_GfxScene;
 }
 
 QIcon AtlasTileSet::GetTileSetIcon() const

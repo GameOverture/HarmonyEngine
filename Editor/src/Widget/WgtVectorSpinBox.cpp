@@ -43,6 +43,9 @@ void WgtVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVarian
 		ui->intSpinBoxX->setMaximum(maxValue.toInt());
 		ui->intSpinBoxY->setMaximum(maxValue.toInt());
 
+		connect(ui->intSpinBoxX, SIGNAL(valueChanged(int)), this, SLOT(OnValueChanged(int)));
+		connect(ui->intSpinBoxY, SIGNAL(valueChanged(int)), this, SLOT(OnValueChanged(int)));
+
 		ui->intSpinBoxX->setFocus();
 		ui->intSpinBoxX->selectAll();
 		break;
@@ -52,6 +55,9 @@ void WgtVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVarian
 		ui->doubleSpinBoxY->setMinimum(minValue.toDouble());
 		ui->doubleSpinBoxX->setMaximum(maxValue.toDouble());
 		ui->doubleSpinBoxY->setMaximum(maxValue.toDouble());
+
+		connect(ui->doubleSpinBoxX, SIGNAL(valueChanged(double)), this, SLOT(OnValueChanged(double)));
+		connect(ui->doubleSpinBoxY, SIGNAL(valueChanged(double)), this, SLOT(OnValueChanged(double)));
 
 		ui->doubleSpinBoxX->setFocus();
 		ui->doubleSpinBoxX->selectAll();
@@ -65,6 +71,10 @@ void WgtVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVarian
 		ui->intSpinBox3dY->setMaximum(maxValue.toInt());
 		ui->intSpinBox3dZ->setMaximum(maxValue.toInt());
 
+		connect(ui->intSpinBox3dX, SIGNAL(valueChanged(int)), this, SLOT(OnValueChanged(int)));
+		connect(ui->intSpinBox3dY, SIGNAL(valueChanged(int)), this, SLOT(OnValueChanged(int)));
+		connect(ui->intSpinBox3dZ, SIGNAL(valueChanged(int)), this, SLOT(OnValueChanged(int)));
+
 		ui->intSpinBox3dX->setFocus();
 		ui->intSpinBox3dX->selectAll();
 		break;
@@ -76,6 +86,10 @@ void WgtVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVarian
 		ui->doubleSpinBox3dX->setMaximum(maxValue.toDouble());
 		ui->doubleSpinBox3dY->setMaximum(maxValue.toDouble());
 		ui->doubleSpinBox3dZ->setMaximum(maxValue.toDouble());
+
+		connect(ui->doubleSpinBox3dX, SIGNAL(valueChanged(double)), this, SLOT(OnValueChanged(double)));
+		connect(ui->doubleSpinBox3dY, SIGNAL(valueChanged(double)), this, SLOT(OnValueChanged(double)));
+		connect(ui->doubleSpinBox3dZ, SIGNAL(valueChanged(double)), this, SLOT(OnValueChanged(double)));
 
 		ui->doubleSpinBox3dX->setFocus();
 		ui->doubleSpinBox3dX->selectAll();
@@ -91,6 +105,11 @@ void WgtVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVarian
 		ui->intSpinBox4dZ->setMaximum(maxValue.toInt());
 		ui->intSpinBox4dW->setMaximum(maxValue.toInt());
 
+		connect(ui->intSpinBox4dX, SIGNAL(valueChanged(int)), this, SLOT(OnValueChanged(int)));
+		connect(ui->intSpinBox4dY, SIGNAL(valueChanged(int)), this, SLOT(OnValueChanged(int)));
+		connect(ui->intSpinBox4dZ, SIGNAL(valueChanged(int)), this, SLOT(OnValueChanged(int)));
+		connect(ui->intSpinBox4dW, SIGNAL(valueChanged(int)), this, SLOT(OnValueChanged(int)));
+
 		ui->intSpinBox4dX->setFocus();
 		ui->intSpinBox4dX->selectAll();
 		break;
@@ -104,6 +123,11 @@ void WgtVectorSpinBox::Init(SpinBoxType eSpinBoxType, QVariant minValue, QVarian
 		ui->doubleSpinBox4dY->setMaximum(maxValue.toDouble());
 		ui->doubleSpinBox4dZ->setMaximum(maxValue.toDouble());
 		ui->doubleSpinBox4dW->setMaximum(maxValue.toDouble());
+
+		connect(ui->doubleSpinBox4dX, SIGNAL(valueChanged(double)), this, SLOT(OnValueChanged(double)));
+		connect(ui->doubleSpinBox4dY, SIGNAL(valueChanged(double)), this, SLOT(OnValueChanged(double)));
+		connect(ui->doubleSpinBox4dZ, SIGNAL(valueChanged(double)), this, SLOT(OnValueChanged(double)));
+		connect(ui->doubleSpinBox4dW, SIGNAL(valueChanged(double)), this, SLOT(OnValueChanged(double)));
 
 		ui->doubleSpinBox4dX->setFocus();
 		ui->doubleSpinBox4dX->selectAll();
@@ -148,28 +172,53 @@ void WgtVectorSpinBox::SetValue(QVariant data)
 	switch(ui->stackedWidget->currentIndex())
 	{
 	case SPINBOXTYPE_Int2d:
+		if(data.type() != QVariant::Point)
+		{
+			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QPoint", LOGTYPE_Error);
+			return;
+		}
 		ui->intSpinBoxX->setValue(data.toPoint().x());
 		ui->intSpinBoxY->setValue(data.toPoint().y());
 		break;
 
 	case SPINBOXTYPE_Double2d:
+		if(data.type() != QVariant::PointF)
+		{
+			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QPointF", LOGTYPE_Error);
+			return;
+		}
 		ui->doubleSpinBoxX->setValue(data.toPointF().x());
 		ui->doubleSpinBoxY->setValue(data.toPointF().y());
 		break;
 
 	case SPINBOXTYPE_Int3d:
+		if(data.type() != QVariant::Rect)
+		{
+			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QRect", LOGTYPE_Error);
+			return;
+		}
 		ui->intSpinBox3dX->setValue(data.toRect().left());
 		ui->intSpinBox3dY->setValue(data.toRect().top());
 		ui->intSpinBox3dZ->setValue(data.toRect().width());
 		break;
 
 	case SPINBOXTYPE_Double3d:
+		if(data.type() != QVariant::RectF)
+		{
+			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QRectF", LOGTYPE_Error);
+			return;
+		}
 		ui->doubleSpinBox3dX->setValue(data.toRectF().left());
 		ui->doubleSpinBox3dY->setValue(data.toRectF().top());
 		ui->doubleSpinBox3dZ->setValue(data.toRectF().width());
 		break;
 
 	case SPINBOXTYPE_Int4d:
+		if(data.type() != QVariant::Rect)
+		{
+			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QRect", LOGTYPE_Error);
+			return;
+		}
 		ui->intSpinBox4dX->setValue(data.toRect().left());
 		ui->intSpinBox4dY->setValue(data.toRect().top());
 		ui->intSpinBox4dZ->setValue(data.toRect().width());
@@ -177,12 +226,31 @@ void WgtVectorSpinBox::SetValue(QVariant data)
 		break;
 
 	case SPINBOXTYPE_Double4d:
+		if(data.type() != QVariant::RectF)
+		{
+			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QRectF", LOGTYPE_Error);
+			return;
+		}
 		ui->doubleSpinBox4dX->setValue(data.toRectF().left());
 		ui->doubleSpinBox4dY->setValue(data.toRectF().top());
 		ui->doubleSpinBox4dZ->setValue(data.toRectF().width());
 		ui->doubleSpinBox4dW->setValue(data.toRectF().height());
 		break;
 	}
+
+	Q_EMIT ValueChanged(data);
+}
+
+void WgtVectorSpinBox::OnValueChanged(int iValue)
+{
+	QVariant data = GetValue();
+	Q_EMIT ValueChanged(data);
+}
+
+void WgtVectorSpinBox::OnValueChanged(double dValue)
+{
+	QVariant data = GetValue();
+	Q_EMIT ValueChanged(data);
 }
 
 /*virtual*/ void WgtVectorSpinBox::focusInEvent(QFocusEvent *pEvent) /*override*/

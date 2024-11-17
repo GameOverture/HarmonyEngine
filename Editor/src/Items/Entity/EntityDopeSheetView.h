@@ -68,7 +68,7 @@ public:
 protected:
 	virtual void contextMenuEvent(QContextMenuEvent *pEvent) override;
 
-	virtual void drawBackground(QPainter *painter, const QRectF &rect) override;
+	virtual void drawBackground(QPainter *pPainter, const QRectF &rect) override;
 	virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
 
 	virtual bool event(QEvent *pEvent) override;

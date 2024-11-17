@@ -807,6 +807,7 @@ void ManagerWidget::on_actionRename_triggered()
 			}
 			else
 			{
+				// TODO: THIS IS WRONG!!!!!!!!!!!!
 				QFileInfo srcFileInfo(static_cast<SourceFile *>(pItemToBeRenamed)->GetAbsMetaFilePath());
 				if(QFile::exists(srcFileInfo.absoluteDir().filePath(sNewName)))
 					return QString("A file with this name already exists");
