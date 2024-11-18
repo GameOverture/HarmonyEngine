@@ -95,14 +95,43 @@ public:
 		return true;
 	}
 
-	void InitLeaf(const HyNodePath &nodePath)
+	void InitLeaf(const HyNodePath &nodePath) // DEPRECATED: legacy function name
 	{
 		m_FusedNode.Init(nodePath, this);
 	}
 
-	void InitLeaf(const char *szLeafPrefix, const char *szLeafName)
+	void InitLeaf(const char *szLeafPrefix, const char *szLeafName) // DEPRECATED: legacy function name
 	{
 		m_FusedNode.Init(szLeafPrefix, szLeafName, this);
+	}
+
+	virtual void Init(const HyNodePath &nodePath, HyEntity2d *pParent) override
+	{
+		m_FusedNode.Init(nodePath, this);
+
+		if(m_pParent != pParent)
+		{
+			if(pParent != nullptr)
+				pParent->ChildAppend(*this);
+			else
+				ParentDetach();
+		}
+	}
+	virtual void Init(const char *szPrefix, const char *szName, HyEntity2d *pParent) override
+	{
+		m_FusedNode.Init(HyNodePath(szPrefix, szName), this);
+
+		if(m_pParent != pParent)
+		{
+			if(pParent != nullptr)
+				pParent->ChildAppend(*this);
+			else
+				ParentDetach();
+		}
+	}
+	virtual void Uninit()
+	{
+		m_FusedNode.Uninit();
 	}
 
 	virtual bool IsLoadDataValid() override

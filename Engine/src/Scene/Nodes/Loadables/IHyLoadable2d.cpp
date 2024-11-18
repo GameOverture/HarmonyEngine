@@ -56,7 +56,7 @@ IHyLoadable2d &IHyLoadable2d::operator=(IHyLoadable2d &&donor)
 	return *this;
 }
 
-void IHyLoadable2d::Init(const HyNodePath &nodePath, HyEntity2d *pParent)
+/*virtual*/ void IHyLoadable2d::Init(const HyNodePath &nodePath, HyEntity2d *pParent)
 {
 	IHyLoadable::_Reinitialize(nodePath);
 
@@ -69,12 +69,12 @@ void IHyLoadable2d::Init(const HyNodePath &nodePath, HyEntity2d *pParent)
 	}
 }
 
-void IHyLoadable2d::Init(const char *szPrefix, const char *szName, HyEntity2d *pParent)
+/*virtual*/ void IHyLoadable2d::Init(const char *szPrefix, const char *szName, HyEntity2d *pParent)
 {
 	Init(HyNodePath(szPrefix, szName), pParent);
 }
 
-void IHyLoadable2d::Uninit()
+/*virtual*/ void IHyLoadable2d::Uninit()
 {
 	Unload();
 	Init("", "", m_pParent);

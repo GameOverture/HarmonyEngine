@@ -26,9 +26,9 @@ public:
 	IHyLoadable2d &operator=(const IHyLoadable2d &rhs);
 	IHyLoadable2d &operator=(IHyLoadable2d &&donor);
 
-	void Init(const HyNodePath &nodePath, HyEntity2d *pParent);
-	void Init(const char *szPrefix, const char *szName, HyEntity2d *pParent);
-	void Uninit();
+	virtual void Init(const HyNodePath &nodePath, HyEntity2d *pParent);
+	virtual void Init(const char *szPrefix, const char *szName, HyEntity2d *pParent);
+	virtual void Uninit();
 
 protected:
 	virtual void Update() override;
