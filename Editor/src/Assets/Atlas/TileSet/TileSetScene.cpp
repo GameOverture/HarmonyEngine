@@ -15,6 +15,7 @@ TileSetScene::TileSetScene() :
 	QGraphicsScene(),
 	m_eSceneType(SCENETYPE_Importing)
 {
+	addItem(&m_ImportLabel);
 }
 
 /*virtual*/ TileSetScene::~TileSetScene()
@@ -23,7 +24,7 @@ TileSetScene::TileSetScene() :
 
 void TileSetScene::Setup(AtlasTileSet *pTileSet)
 {
-	
+	m_ImportLabel.setVisible(false);
 }
 
 int TileSetScene::GetNumImportPixmaps() const
@@ -50,11 +51,15 @@ void TileSetScene::ConstructImportScene(QPoint vTileSize, int iNumColumns, int i
 {
 	m_eSceneType = SCENETYPE_Importing;
 
-	int iSpacingAmt = 2;
+	int iSpacingAmt = 5;
 
 	QPoint ptCurPos;
 	ptCurPos.setX(iSpacingAmt);
 	ptCurPos.setY(iSpacingAmt);
+
+	m_ImportLabel.setVisible(true);
+	m_ImportLabel.setPlainText("Importing Tiles:");
+	ptCurPos.setY(ptCurPos.y() + vTileSize.y() + iSpacingAmt);
 
 	int iPixmapIndex = 0;
 	for(int i = 0; i < iNumRows; ++i)

@@ -33,8 +33,11 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	ui->vsbTileSize->Init(SPINBOXTYPE_Int2d, 1, MAX_INT_RANGE);
 	ui->vsbStartOffset->Init(SPINBOXTYPE_Int2d, 0, MAX_INT_RANGE);
 	ui->vsbPadding->Init(SPINBOXTYPE_Int2d, 0, MAX_INT_RANGE);
+	ui->grpSlicingOptions->setVisible(false);
 
 	ui->splitter->setSizes(QList<int>() << 140 << width() - 140);
+
+	
 
 	connect(ui->vsbTileSize, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnTileSizeChanged(QVariant)));
 	connect(ui->vsbStartOffset, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnStartOffsetChanged(QVariant)));
@@ -84,9 +87,7 @@ void AuxTileSet::SetImportWidgets()
 
 	// Switching widgets
 	m_bIsImportingTileSheet = bTileSheet;
-
-	ui->grpSlicingOptions->setVisible(m_bIsImportingTileSheet);
-	ui->grpSlicingOptions->setEnabled(m_bIsImportingTileSheet);
+	ui->grpSlicingOptions->setVisible(false);
 
 	ui->txtImagePath->clear();
 
@@ -101,6 +102,8 @@ void AuxTileSet::SliceSheetPixmaps()
 
 	if(m_pImportTileSheetPixmap == nullptr || vTileSize.x() == 0 || vTileSize.y() == 0)
 		return;
+
+	ui->grpSlicingOptions->setVisible(true);
 
 	TileSetScene *pGfxScene = m_pTileSet->GetGfxScene();
 	pGfxScene->RemoveImportPixmaps();
@@ -146,32 +149,32 @@ void AuxTileSet::ErrorCheckImport()
 		{
 			if(QFile::exists(ui->txtImagePath->text()) == false)
 			{
-				ui->lblError->setText("Error: Invalid file path");
+				ui->lblError->setText("Invalid file path");
 				bIsError = true;
 				break;
 			}
 
 			if(m_pImportTileSheetPixmap == nullptr)
 			{
-				ui->lblError->setText("Error: Invalid tile sheet image");
+				ui->lblError->setText("Invalid tile sheet image");
+				bIsError = true;
+				break;
+			}
+
+			if(ui->vsbTileSize->GetValue().toPoint().x() == 0 || ui->vsbTileSize->GetValue().toPoint().y() == 0)
+			{
+				ui->lblError->setText("Invalid tile size");
+				bIsError = true;
+				break;
+			}
+
+			if(m_pTileSet->GetGfxScene()->GetNumImportPixmaps() == 0)
+			{
+				ui->lblError->setText("Invalid slicing options");
 				bIsError = true;
 				break;
 			}
 		}
-		
-		if(ui->vsbTileSize->GetValue().toPoint().x() == 0 || ui->vsbTileSize->GetValue().toPoint().y() == 0)
-		{
-			ui->lblError->setText("Error: Invalid tile size");
-			bIsError = true;
-			break;
-		}
-
-		//if(m_pPreviewPixmap == nullptr)
-		//{
-		//	ui->lblError->setText("Error: Invalid slicing options");
-		//	bIsError = true;
-		//	break;
-		//}
 
 	} while(false);
 

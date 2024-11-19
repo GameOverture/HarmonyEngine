@@ -19,6 +19,7 @@ class TileSetScene : public QGraphicsScene
 {
 	Q_OBJECT
 
+	QGraphicsTextItem					m_ImportLabel;
 	QVector<QGraphicsPixmapItem *>		m_ImportTilePixmapList;
 
 public:
