@@ -20,8 +20,7 @@ HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 	m_fExpandedTimeout(0.0f),
 	m_ExpandAnimVec(*this, 0)
 {
-	SetButtonClickedCallback(OnComboBoxClickedCallback, this);
-	//m_Shape.SetAsBox(HyRect(GetWidth(), GetHeight()));
+	SetButtonClickedCallback([this](HyButton *pThis) { ToggleExpanded(); });
 }
 
 HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
@@ -33,8 +32,7 @@ HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	m_fExpandedTimeout(0.0f),
 	m_ExpandAnimVec(*this, 0)
 {
-	SetButtonClickedCallback(OnComboBoxClickedCallback, this);
-	//m_Shape.SetAsBox(HyRect(GetWidth(), GetHeight()));
+	SetButtonClickedCallback([this](HyButton *pThis) { ToggleExpanded(); });
 }
 
 HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
@@ -46,8 +44,7 @@ HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	m_fExpandedTimeout(0.0f),
 	m_ExpandAnimVec(*this, 0)
 {
-	SetButtonClickedCallback(OnComboBoxClickedCallback, this);
-	//m_Shape.SetAsBox(HyRect(GetWidth(), GetHeight()));
+	SetButtonClickedCallback([this](HyButton *pThis) { ToggleExpanded(); });
 }
 
 /*virtual*/ HyComboBox::~HyComboBox()
@@ -55,15 +52,15 @@ HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	ClearSubButtons();
 }
 
-uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, const HyNodePath &audioNodePath /*= HyNodePath()*/)
+uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, std::function<void(HyButton *)> fpCallBack, const HyNodePath &audioNodePath /*= HyNodePath()*/)
 {
-	return InsertSubButton(panelInit, textNodePath, HyMargins<float>(), fpCallBack, pParam, audioNodePath);
+	return InsertSubButton(panelInit, textNodePath, HyMargins<float>(), fpCallBack, audioNodePath);
 }
 
-uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, const HyNodePath &audioNodePath /*= HyNodePath()*/)
+uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, std::function<void(HyButton *)> fpCallBack, const HyNodePath &audioNodePath /*= HyNodePath()*/)
 {
 	HyButton *pNewBtn = HY_NEW HyButton(panelInit, textNodePath, textMargins, this);
-	pNewBtn->SetButtonClickedCallback(fpCallBack, pParam, audioNodePath);
+	pNewBtn->SetButtonClickedCallback(fpCallBack, audioNodePath);
 	pNewBtn->SetAsEnabled(false);
 	pNewBtn->pos.Set(pNewBtn->GetPosOffset());
 	pNewBtn->alpha.Set(0.0f);
@@ -279,10 +276,4 @@ void HyComboBox::ResetExpandedTimeout()
 		}
 		break; }
 	}
-}
-
-/*static*/ void HyComboBox::OnComboBoxClickedCallback(HyButton *pBtn, void *pData)
-{
-	HyComboBox *pThis = static_cast<HyComboBox *>(pData);
-	pThis->ToggleExpanded();
 }

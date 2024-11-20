@@ -20,8 +20,7 @@ protected:
 	HyPrimitive2d									m_CheckMarkStroke;
 	HyPrimitive2d									m_CheckMarkFill;
 
-	std::function<void(HyRadioButton *, void *)>	m_fpOnCheckedChanged;
-	void *											m_pCheckedChangedParam;
+	std::function<void(HyRadioButton *)>			m_fpOnCheckedChanged;
 
 public:
 	HyRadioButton(HyEntity2d *pParent = nullptr);
@@ -30,7 +29,7 @@ public:
 	HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
 	virtual ~HyRadioButton();
 
-	void SetCheckedChangedCallback(std::function<void(HyRadioButton *, void *)> fpCallback, void *pParam = nullptr);
+	void SetCheckedChangedCallback(std::function<void(HyRadioButton *)> fpCallback);
 
 protected:
 	virtual void OnAssemble() override;

@@ -63,8 +63,7 @@ HySlider::HySlider(HyEntity2d *pParent /*= nullptr*/) :
 	m_BarStroke(this),
 	m_BarFill(this),
 	m_ptSliderCenter(0.0f, 0.0f),
-	m_fpOnValueChanged(nullptr),
-	m_pValueChangedParam(nullptr)
+	m_fpOnValueChanged(nullptr)
 {
 	RegisterAssembleEntity();
 }
@@ -80,8 +79,7 @@ HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nul
 	m_BarStroke(this),
 	m_BarFill(this),
 	m_ptSliderCenter(0.0f, 0.0f),
-	m_fpOnValueChanged(nullptr),
-	m_pValueChangedParam(nullptr)
+	m_fpOnValueChanged(nullptr)
 {
 	RegisterAssembleEntity();
 	Setup(sliderInitRef);
@@ -143,7 +141,7 @@ void HySlider::SetValue(int64 iValue)
 
 	SetAssembleNeeded();
 	if(m_fpOnValueChanged)
-		m_fpOnValueChanged(this, m_pValueChangedParam);
+		m_fpOnValueChanged(this);
 }
 
 int64 HySlider::GetMin() const
@@ -219,10 +217,9 @@ void HySlider::SetBarColors(HyColor posColor, HyColor negColor, HyColor strokeCo
 	m_BarFill.m_BarNeg.SetTint(negColor, negColor.Darken());
 }
 
-void HySlider::SetValueChangedCallback(std::function<void(HySlider *, void *)> fpCallback, void *pParam /*= nullptr*/)
+void HySlider::SetValueChangedCallback(std::function<void(HySlider *)> fpCallback)
 {
 	m_fpOnValueChanged = fpCallback;
-	m_pValueChangedParam = pParam;
 }
 
 /*virtual*/ void HySlider::Update() /*override*/

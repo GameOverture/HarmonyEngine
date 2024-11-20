@@ -16,7 +16,6 @@
 
 class HyButton;
 class HyButtonGroup;
-typedef std::function<void(HyButton *, void *)> HyButtonClickedCallback;
 
 class HyButton : public HyLabel
 {
@@ -33,10 +32,9 @@ protected:
 	};
 	static_assert((int)BTNATTRIB_IsKbDownState == (int)LABELATTRIB_NEXTFLAG, "HyButton is not matching with base classes attrib flags");
 
-	HyButtonGroup *					m_pButtonGroup;
-	HyButtonClickedCallback			m_fpBtnClickedCallback;
-	void *							m_pBtnClickedParam;
-	HyAudio2d						m_ClickedSound;
+	HyButtonGroup *						m_pButtonGroup;
+	std::function<void(HyButton *)>		m_fpBtnClickedCallback;
+	HyAudio2d							m_ClickedSound;
 
 public:
 	HyButton(HyEntity2d *pParent = nullptr);
@@ -52,7 +50,7 @@ public:
 	bool IsChecked() const;
 	void SetChecked(bool bChecked);
 
-	void SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam = nullptr, const HyNodePath &audioNodePath = HyNodePath());
+	void SetButtonClickedCallback(std::function<void(HyButton *)> fpCallBack, const HyNodePath &audioNodePath = HyNodePath());
 	void InvokeButtonClicked();
 
 protected:

@@ -20,8 +20,7 @@ protected:
 	HyPrimitive2d								m_CheckMarkStroke;
 	HyPrimitive2d								m_CheckMarkFill;
 
-	std::function<void(HyCheckBox *, void *)>	m_fpOnCheckedChanged;
-	void *										m_pCheckedChangedParam;
+	std::function<void(HyCheckBox *)>			m_fpOnCheckedChanged;
 
 public:
 	HyCheckBox(HyEntity2d *pParent = nullptr);
@@ -30,7 +29,7 @@ public:
 	HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
 	virtual ~HyCheckBox();
 
-	void SetCheckedChangedCallback(std::function<void(HyCheckBox *, void *)> fpCallback, void *pParam = nullptr);
+	void SetCheckedChangedCallback(std::function<void(HyCheckBox *)> fpCallback);
 
 protected:
 	virtual void OnAssemble() override;

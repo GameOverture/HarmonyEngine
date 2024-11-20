@@ -47,10 +47,9 @@ HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 {
 }
 
-void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void *)> fpCallback, void *pParam /*= nullptr*/)
+void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *)> fpCallback)
 {
 	m_fpOnCheckedChanged = fpCallback;
-	m_pCheckedChangedParam = pParam;
 }
 
 
@@ -75,7 +74,7 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *, void
 /*virtual*/ void HyCheckBox::OnSetChecked(bool bChecked) /*override*/
 {
 	if(m_fpOnCheckedChanged)
-		m_fpOnCheckedChanged(this, m_pCheckedChangedParam);
+		m_fpOnCheckedChanged(this);
 
 	if(bChecked)
 	{

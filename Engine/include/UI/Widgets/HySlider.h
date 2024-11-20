@@ -52,8 +52,7 @@ protected:
 
 	glm::vec2								m_ptSliderCenter;
 
-	std::function<void(HySlider *, void *)>	m_fpOnValueChanged;
-	void *									m_pValueChangedParam;
+	std::function<void(HySlider *)>			m_fpOnValueChanged;
 
 public:
 	HySlider(HyEntity2d *pParent = nullptr);
@@ -79,7 +78,7 @@ public:
 
 	void SetBarColors(HyColor posColor, HyColor negColor, HyColor strokeColor);
 
-	void SetValueChangedCallback(std::function<void(HySlider *, void *)> fpCallback, void *pParam = nullptr);
+	void SetValueChangedCallback(std::function<void(HySlider *)> fpCallback);
 
 protected:
 	virtual void Update() override;

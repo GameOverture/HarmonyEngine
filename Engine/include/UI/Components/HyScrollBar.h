@@ -102,8 +102,6 @@ public:
 protected:
 	virtual void OnUpdate() override;
 
-	static void OnArrowBtnPressed(HyButton *pBtn, void *pData);
-
 private:
 	void InvokeOnScrollCallback();
 };

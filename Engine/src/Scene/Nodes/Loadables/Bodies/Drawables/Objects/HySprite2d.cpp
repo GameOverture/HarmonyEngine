@@ -85,7 +85,7 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 	shapeOut.SetAsBox(HyRect(fHalfWidth, fHalfHeight, ptBoxCenter, 0.0f));
 }
 
-void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack /*= HySprite2d::NullAnimCallback*/)
+void HySprite2d::SetAnimCallback(uint32 uiStateIndex, std::function<void(HySprite2d *)> fpAnimFinishedCallBack /*= HySprite2d::NullAnimCallback*/)
 {
 	if(AcquireData() == nullptr || uiStateIndex >= static_cast<const HySpriteData *>(UncheckedGetData())->GetNumStates())
 	{
@@ -97,10 +97,10 @@ void HySprite2d::SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCall
 		return;
 	}
 
-	if(callBack == nullptr)
+	if(fpAnimFinishedCallBack == nullptr)
 		m_AnimCallbackList[uiStateIndex] = NullAnimCallback;
 	else
-		m_AnimCallbackList[uiStateIndex] = callBack;
+		m_AnimCallbackList[uiStateIndex] = fpAnimFinishedCallBack;
 }
 
 /*virtual*/ void HySprite2d::OnInvokeCallback(uint32 uiStateIndex) /*override*/

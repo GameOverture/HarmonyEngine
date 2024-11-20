@@ -15,12 +15,11 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.h"
 
 class HySprite2d;
-typedef std::function<void(HySprite2d *pSelf)> HySprite2dAnimFinishedCallback;
 
 class HySprite2d : public IHySprite<IHyDrawable2d, HyEntity2d>
 {
 	// Optional callback invoked upon anim completion/loop
-	std::vector<HySprite2dAnimFinishedCallback>			m_AnimCallbackList;
+	std::vector<std::function<void(HySprite2d *)>>			m_AnimCallbackList;
 
 public:
 	HySprite2d(HyEntity2d *pParent = nullptr);
@@ -39,7 +38,7 @@ public:
 	//
 	// Leaving default arguments will clear any currently assigned call back.
 	//--------------------------------------------------------------------------------------
-	void SetAnimCallback(uint32 uiStateIndex, HySprite2dAnimFinishedCallback callBack = HySprite2d::NullAnimCallback);
+	void SetAnimCallback(uint32 uiStateIndex, std::function<void(HySprite2d *)> fpAnimFinishedCallBack = HySprite2d::NullAnimCallback);
 
 protected:
 	virtual void OnInvokeCallback(uint32 uiStateIndex) override;

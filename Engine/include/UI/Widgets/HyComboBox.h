@@ -52,8 +52,8 @@ public:
 	HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
 	virtual ~HyComboBox();
 
-	uint32 InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyButtonClickedCallback fpCallBack, void *pParam = nullptr, const HyNodePath &audioNodePath = HyNodePath());
-	uint32 InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyButtonClickedCallback fpCallBack, void *pParam = nullptr, const HyNodePath &audioNodePath = HyNodePath());
+	uint32 InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, std::function<void(HyButton *)> fpCallBack, const HyNodePath &audioNodePath = HyNodePath());
+	uint32 InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, std::function<void(HyButton *)> fpCallBack, const HyNodePath &audioNodePath = HyNodePath());
 	void SetSubButtonEnabled(uint32 uiSubBtnIndex, bool bEnabled);
 	void RemoveSubButton(uint32 uiSubBtnIndex);
 	void ClearSubButtons();
@@ -69,8 +69,6 @@ public:
 
 protected:
 	virtual void Update() override;
-
-	static void OnComboBoxClickedCallback(HyButton *pBtn, void *pData);
 };
 
 #endif /* HyComboBox_h__ */

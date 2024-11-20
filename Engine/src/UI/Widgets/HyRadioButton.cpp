@@ -15,8 +15,7 @@ HyRadioButton::HyRadioButton(HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this),
-	m_fpOnCheckedChanged(nullptr),
-	m_pCheckedChangedParam(nullptr)
+	m_fpOnCheckedChanged(nullptr)
 {
 	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
 	SetAsSideBySide();
@@ -26,8 +25,7 @@ HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, HyEntity2d *pParent /
 	HyButton(panelInit, pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this),
-	m_fpOnCheckedChanged(nullptr),
-	m_pCheckedChangedParam(nullptr)
+	m_fpOnCheckedChanged(nullptr)
 {
 	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
 	SetAsSideBySide();
@@ -37,8 +35,7 @@ HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &tex
 	HyButton(panelInit, textNodePath, pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this),
-	m_fpOnCheckedChanged(nullptr),
-	m_pCheckedChangedParam(nullptr)
+	m_fpOnCheckedChanged(nullptr)
 {
 	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
 	SetAsSideBySide();
@@ -48,8 +45,7 @@ HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &tex
 	HyButton(panelInit, textNodePath, textMargins, pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this),
-	m_fpOnCheckedChanged(nullptr),
-	m_pCheckedChangedParam(nullptr)
+	m_fpOnCheckedChanged(nullptr)
 {
 	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
 	SetAsSideBySide();
@@ -59,10 +55,9 @@ HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &tex
 {
 }
 
-void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *, void *)> fpCallback, void *pParam /*= nullptr*/)
+void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *)> fpCallback)
 {
 	m_fpOnCheckedChanged = fpCallback;
-	m_pCheckedChangedParam = pParam;
 }
 
 /*virtual*/ void HyRadioButton::OnAssemble() /*override*/
@@ -86,7 +81,7 @@ void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *
 /*virtual*/ void HyRadioButton::OnSetChecked(bool bChecked) /*override*/
 {
 	if(m_fpOnCheckedChanged)
-		m_fpOnCheckedChanged(this, m_pCheckedChangedParam);
+		m_fpOnCheckedChanged(this);
 
 	if(bChecked)
 	{

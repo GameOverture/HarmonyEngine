@@ -15,8 +15,7 @@
 HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_pButtonGroup(nullptr),
-	m_fpBtnClickedCallback(nullptr),
-	m_pBtnClickedParam(nullptr)
+	m_fpBtnClickedCallback(nullptr)
 {
 	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
 	SetKeyboardFocusAllowed(true);
@@ -27,8 +26,7 @@ HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 HyButton::HyButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(panelInit, pParent),
 	m_pButtonGroup(nullptr),
-	m_fpBtnClickedCallback(nullptr),
-	m_pBtnClickedParam(nullptr)
+	m_fpBtnClickedCallback(nullptr)
 {
 	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
 	SetKeyboardFocusAllowed(true);
@@ -39,8 +37,7 @@ HyButton::HyButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr
 HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(panelInit, textNodePath, pParent),
 	m_pButtonGroup(nullptr),
-	m_fpBtnClickedCallback(nullptr),
-	m_pBtnClickedParam(nullptr)
+	m_fpBtnClickedCallback(nullptr)
 {
 	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
 	SetKeyboardFocusAllowed(true);
@@ -51,8 +48,7 @@ HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath,
 HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(panelInit, textNodePath, textMargins, pParent),
 	m_pButtonGroup(nullptr),
-	m_fpBtnClickedCallback(nullptr),
-	m_pBtnClickedParam(nullptr)
+	m_fpBtnClickedCallback(nullptr)
 {
 	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
 	SetKeyboardFocusAllowed(true);
@@ -109,10 +105,9 @@ void HyButton::SetChecked(bool bChecked)
 	OnSetChecked(bChecked);
 }
 
-void HyButton::SetButtonClickedCallback(HyButtonClickedCallback fpCallBack, void *pParam /*= nullptr*/, const HyNodePath &audioNodePath /*= HyNodePath()*/)
+void HyButton::SetButtonClickedCallback(std::function<void(HyButton *)> fpCallBack, const HyNodePath &audioNodePath /*= HyNodePath()*/)
 {
 	m_fpBtnClickedCallback = fpCallBack;
-	m_pBtnClickedParam = pParam;
 	m_ClickedSound.Init(audioNodePath, this);
 }
 
@@ -124,7 +119,7 @@ void HyButton::InvokeButtonClicked()
 /*virtual*/ void HyButton::OnUiMouseClicked() /*override*/
 {
 	if(m_fpBtnClickedCallback)
-		m_fpBtnClickedCallback(this, m_pBtnClickedParam);
+		m_fpBtnClickedCallback(this);
 
 	if(m_ClickedSound.IsLoadDataValid() && m_ClickedSound.IsLoaded())
 		m_ClickedSound.PlayOneShot(true);

@@ -240,9 +240,18 @@ HyScrollBar::HyScrollBar(HyOrientation eOrientation, uint32 uiDiameter, HyEntity
 	m_fpCallback(nullptr),
 	m_pCallbackData(nullptr)
 {
-	m_PosBtn.SetButtonClickedCallback(OnArrowBtnPressed, this);
+	m_PosBtn.SetButtonClickedCallback([this](HyButton *pPosBtn)
+		{
+			m_AnimScrollPos.Offset(m_fLineScrollAmt);
+			InvokeOnScrollCallback();
+		});
 	m_PosBtn.SetAsEnabled(true);
-	m_NegBtn.SetButtonClickedCallback(OnArrowBtnPressed, this);
+
+	m_NegBtn.SetButtonClickedCallback([this](HyButton *pPosBtn)
+		{
+			m_AnimScrollPos.Offset(-m_fLineScrollAmt);
+			InvokeOnScrollCallback();
+		});
 	m_NegBtn.SetAsEnabled(true);
 }
 
@@ -375,18 +384,6 @@ void HyScrollBar::ScrollTo(float fPos)
 {
 	if(m_AnimScrollPos.IsAnimating())
 		InvokeOnScrollCallback();
-}
-
-/*static*/ void HyScrollBar::OnArrowBtnPressed(HyButton *pBtn, void *pData)
-{
-	HyScrollBar *pThis = static_cast<HyScrollBar *>(pData);
-
-	if(pBtn == &pThis->m_PosBtn)
-		pThis->m_AnimScrollPos.Offset(pThis->m_fLineScrollAmt);
-	else // pBtn == &pThis->m_NegBtn
-		pThis->m_AnimScrollPos.Offset(-pThis->m_fLineScrollAmt);
-
-	pThis->InvokeOnScrollCallback();
 }
 
 void HyScrollBar::InvokeOnScrollCallback()
