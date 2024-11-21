@@ -19,7 +19,9 @@ class TileSetScene : public QGraphicsScene
 {
 	Q_OBJECT
 
-	QGraphicsTextItem					m_ImportLabel;
+	QGraphicsRectItem					m_ImportRect;				// This encompasses the entire import scene
+	QGraphicsTextItem					m_ImportLabel;				// Main label/title of the import scene
+	QVector<QGraphicsRectItem *>		m_ImportTileRectList;
 	QVector<QGraphicsPixmapItem *>		m_ImportTilePixmapList;
 
 public:
