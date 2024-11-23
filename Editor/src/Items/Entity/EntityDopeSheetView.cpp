@@ -21,29 +21,20 @@
 #include <QMouseEvent>
 
 EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
-	QGraphicsView(pParent),
+	CommonGfxView(pParent),
 	m_pAuxDopeSheet(nullptr),
 	m_pStateData(nullptr),
 	m_pMouseHoverItem(nullptr),
 	m_bHoveringExpandArrow(false),
 	m_bTimeLineMouseDown(false),
 	m_bLeftSideDirty(false),
-	m_fZoom(1.0f),
 	m_eDragState(DRAGSTATE_None),
 	m_ptDragStart(0.0f, 0.0f),
 	m_iDragFrame(-1),
 	m_pGfxDragTweenKnobItem(nullptr),
-	m_pContextClickItem(nullptr),
-	m_PanTimer(this),
-	m_uiPanFlags(0)
+	m_pContextClickItem(nullptr)
 {
-	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 	setDragMode(QGraphicsView::RubberBandDrag);
-
-	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	
-	connect(&m_PanTimer, SIGNAL(timeout()), this, SLOT(OnPanTimer()));
 }
 
 /*virtual*/ EntityDopeSheetView::~EntityDopeSheetView()
@@ -70,11 +61,6 @@ void EntityDopeSheetView::SetScene(AuxDopeSheet *pAuxDopeSheet, EntityStateData 
 		horizontalScrollBar()->setValue(ptScrollPos.x());
 		verticalScrollBar()->setValue(ptScrollPos.y());
 	}
-}
-
-float EntityDopeSheetView::GetZoom() const
-{
-	return m_fZoom;
 }
 
 EntityTreeItemData *EntityDopeSheetView::GetContextClickItem()
@@ -170,7 +156,7 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 	{
 		QPointF ptSceneDragStart = mapToScene(m_ptDragStart);
 		int iFrameOffset = m_iDragFrame - GetNearestFrame(ptSceneDragStart.x());
-		qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * m_fZoom;
+		qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * GetZoom();
 
 		QList<QGraphicsItem *> itemList = items();
 		QAbstractGraphicsShapeItem *pGfxItem = nullptr; // Just need one item to get the pen and brush
@@ -382,7 +368,7 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 	};
 
 	int iFrameIndex = 0;
-	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * m_fZoom;
+	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * GetZoom();
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
 	const qreal fPOSX_DRAW_THRESHOLD = rect.x() + TIMELINE_LEFT_MARGIN;
@@ -450,69 +436,9 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 	}
 }
 
-/*virtual*/ bool EntityDopeSheetView::event(QEvent *pEvent) /*override*/
-{
-	if(pEvent->type() == QEvent::HoverEnter || pEvent->type() == QEvent::HoverLeave)
-	{
-		m_MouseScenePos.setX(0.0f);
-		m_MouseScenePos.setY(0.0f);
-		update();
-
-		if(pEvent->type() == QEvent::HoverEnter)
-			setFocus();
-		else if(pEvent->type() == QEvent::HoverLeave)
-		{
-			m_uiPanFlags = 0;
-			clearFocus();
-		}
-	}
-
-	return QGraphicsView::event(pEvent);
-}
-
-/*virtual*/ void EntityDopeSheetView::keyPressEvent(QKeyEvent *pEvent) /*override*/
-{
-	if(pEvent->key() == Qt::Key_A)
-	{
-		m_uiPanFlags |= PAN_LEFT;
-		if(m_PanTimer.isActive() == false)
-			m_PanTimer.start(16);
-	}
-	else if(pEvent->key() == Qt::Key_D)
-	{
-		m_uiPanFlags |= PAN_RIGHT;
-		if(m_PanTimer.isActive() == false)
-			m_PanTimer.start(16);
-	}
-	else if(pEvent->key() == Qt::Key_W)
-	{
-		m_uiPanFlags |= PAN_UP;
-		if(m_PanTimer.isActive() == false)
-			m_PanTimer.start(16);
-	}
-	else if(pEvent->key() == Qt::Key_S)
-	{
-		m_uiPanFlags |= PAN_DOWN;
-		if(m_PanTimer.isActive() == false)
-			m_PanTimer.start(16);
-	}
-}
-
-/*virtual*/ void EntityDopeSheetView::keyReleaseEvent(QKeyEvent *pEvent) /*override*/
-{
-	if(pEvent->key() == Qt::Key_A)
-		m_uiPanFlags &= ~PAN_LEFT;
-	else if(pEvent->key() == Qt::Key_D)
-		m_uiPanFlags &= ~PAN_RIGHT;
-	else if(pEvent->key() == Qt::Key_W)
-		m_uiPanFlags &= ~PAN_UP;
-	else if(pEvent->key() == Qt::Key_S)
-		m_uiPanFlags &= ~PAN_DOWN;
-}
-
 /*virtual*/ void EntityDopeSheetView::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {
-	m_MouseScenePos = mapToScene(pEvent->pos());
+	CommonGfxView::mouseMoveEvent(pEvent);
 
 	if(m_bTimeLineMouseDown)
 	{
@@ -557,8 +483,6 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 
 	if(rubberBandRect().isNull() == false)
 		update();
-	
-	QGraphicsView::mouseMoveEvent(pEvent);
 }
 
 /*virtual*/ void EntityDopeSheetView::mousePressEvent(QMouseEvent *pEvent) /*override*/
@@ -695,35 +619,8 @@ QList<EntityTreeItemData *> EntityDopeSheetView::GetItems() const
 
 int EntityDopeSheetView::GetNearestFrame(qreal fScenePosX) const
 {
-	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * m_fZoom;
+	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * GetZoom();
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
 	return ((fScenePosX - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
-}
-
-void EntityDopeSheetView::OnPanTimer()
-{
-	if(m_uiPanFlags & PAN_LEFT)
-		m_PanLocomotion.GoLeft();
-	if(m_uiPanFlags & PAN_RIGHT)
-		m_PanLocomotion.GoRight();
-	if(m_uiPanFlags & PAN_UP)
-		m_PanLocomotion.GoUp();
-	if(m_uiPanFlags & PAN_DOWN)
-		m_PanLocomotion.GoDown();
-
-	m_PanLocomotion.Update();
-
-	if(m_PanLocomotion.IsMoving())
-	{
-		horizontalScrollBar()->setValue(horizontalScrollBar()->value() + m_PanLocomotion.GetVelocity().x);
-		verticalScrollBar()->setValue(verticalScrollBar()->value() + (m_PanLocomotion.GetVelocity().y * -1.0f));
-
-		if(horizontalScrollBar()->value() == horizontalScrollBar()->minimum() || horizontalScrollBar()->value() == horizontalScrollBar()->maximum())
-			m_PanLocomotion.StopX();
-		if(verticalScrollBar()->value() == verticalScrollBar()->minimum() || verticalScrollBar()->value() == verticalScrollBar()->maximum())
-			m_PanLocomotion.StopY();
-	}
-	else
-		m_PanTimer.stop();
 }

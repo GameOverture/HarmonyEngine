@@ -73,7 +73,7 @@ void TileSetScene::ConstructImportScene(QPoint vTileSize, int iNumColumns, int i
 
 	m_ImportLabel.setPos(borderMargins.left, borderMargins.top);
 	m_ImportLabel.setVisible(true);
-	m_ImportLabel.setFont(QFont("Arial", 14));
+	m_ImportLabel.setFont(QFont("Arial", 12));
 	m_ImportLabel.setDefaultTextColor(QColor(255, 255, 255));
 	m_ImportLabel.setPlainText("Importing Tiles:");
 	ptCurPos.setY(ptCurPos.y() + iTitleHeight);

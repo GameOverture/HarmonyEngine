@@ -65,7 +65,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="AuxAssetInspectorGfxView" name="atlasesGfxView"/>
+        <widget class="CommonGfxView" name="atlasesGfxView"/>
        </item>
       </layout>
      </widget>
@@ -141,7 +141,7 @@
         </layout>
        </item>
        <item>
-        <widget class="AuxAssetInspectorGfxView" name="audioGfxView"/>
+        <widget class="CommonGfxView" name="audioGfxView"/>
        </item>
       </layout>
      </widget>
@@ -157,9 +157,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>AuxAssetInspectorGfxView</class>
+   <class>CommonGfxView</class>
    <extends>QGraphicsView</extends>
-   <header>AuxAssetInspector.h</header>
+   <header location="global">CommonGfxView.h</header>
   </customwidget>
  </customwidgets>
  <resources>

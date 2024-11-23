@@ -34,6 +34,7 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	ui->vsbStartOffset->Init(SPINBOXTYPE_Int2d, 0, MAX_INT_RANGE);
 	ui->vsbPadding->Init(SPINBOXTYPE_Int2d, 0, MAX_INT_RANGE);
 	ui->grpSlicingOptions->setVisible(false);
+	ui->grpImportSide->setVisible(false);
 
 	ui->splitter->setSizes(QList<int>() << 140 << width() - 140);
 
@@ -88,6 +89,7 @@ void AuxTileSet::SetImportWidgets()
 	// Switching widgets
 	m_bIsImportingTileSheet = bTileSheet;
 	ui->grpSlicingOptions->setVisible(false);
+	ui->grpImportSide->setVisible(false);
 
 	ui->txtImagePath->clear();
 
@@ -104,6 +106,7 @@ void AuxTileSet::SliceSheetPixmaps()
 		return;
 
 	ui->grpSlicingOptions->setVisible(true);
+	ui->grpImportSide->setVisible(true);
 
 	TileSetScene *pGfxScene = m_pTileSet->GetGfxScene();
 	pGfxScene->RemoveImportPixmaps();

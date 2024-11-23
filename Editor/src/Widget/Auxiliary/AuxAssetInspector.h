@@ -29,26 +29,6 @@ namespace Ui {
 class AuxAssetInspector;
 }
 
-class AuxAssetInspectorGfxView : public QGraphicsView
-{
-	Q_OBJECT
-
-public:
-	AuxAssetInspectorGfxView(QWidget *pParent = nullptr) :
-		QGraphicsView(pParent)
-	{ }
-
-protected:
-	virtual void wheelEvent(QWheelEvent *pEvent) override
-	{
-		if(pEvent->angleDelta().y() > 0)
-			scale(1.1, 1.1);
-		else
-			scale(0.9, 0.9);
-		pEvent->accept();
-	}
-};
-
 class AuxAssetInspector : public QWidget
 {
 	Q_OBJECT

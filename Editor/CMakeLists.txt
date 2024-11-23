@@ -251,6 +251,8 @@ if(Qt5_DIR)
 		src/Harmony/HarmonyWidget.cpp
 		src/Harmony/HarmonyWidget.h
 		src/Harmony/HarmonyWidget.ui
+		src/Shared/Gfx/CommonGfxView.cpp
+		src/Shared/Gfx/CommonGfxView.h
 		src/Shared/Global.cpp
 		src/Shared/Global.h
 		src/Shared/GlobalUndoCmds.h
@@ -361,6 +363,7 @@ if(Qt5_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer/Project")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Gfx/")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Manager")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Properties")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Transform")

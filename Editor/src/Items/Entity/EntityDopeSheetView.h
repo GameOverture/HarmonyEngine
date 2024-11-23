@@ -10,6 +10,8 @@
 #ifndef ENTITYDOPESHEETVIEW_H
 #define ENTITYDOPESHEETVIEW_H
 
+#include "CommonGfxView.h"
+
 #include <QGraphicsView>
 #include <QTimer>
 
@@ -19,21 +21,18 @@ class EntityTreeItemData;
 class EntityDopeSheetScene;
 class GraphicsTweenKnobItem;
 
-class EntityDopeSheetView : public QGraphicsView
+class EntityDopeSheetView : public CommonGfxView
 {
 	Q_OBJECT
 
 	AuxDopeSheet *				m_pAuxDopeSheet;
 	EntityStateData *			m_pStateData;
 
-	QPointF						m_MouseScenePos;
 	EntityTreeItemData *		m_pMouseHoverItem;
 	bool						m_bHoveringExpandArrow;
 
 	bool						m_bTimeLineMouseDown;
 	bool						m_bLeftSideDirty;
-
-	float						m_fZoom;
 
 	enum DragState
 	{
@@ -48,18 +47,12 @@ class EntityDopeSheetView : public QGraphicsView
 
 	EntityTreeItemData *		m_pContextClickItem;
 
-	QTimer						m_PanTimer;
-	uint32						m_uiPanFlags;
-	HyLocomotion2d				m_PanLocomotion;
-
 public:
 	EntityDopeSheetView(QWidget *pParent = nullptr);
 	virtual ~EntityDopeSheetView();
 
 	EntityDopeSheetScene *GetScene() const;
 	void SetScene(AuxDopeSheet *pAuxDopeSheet, EntityStateData *pStateData);
-
-	float GetZoom() const;
 
 	EntityTreeItemData *GetContextClickItem();
 
@@ -70,11 +63,6 @@ protected:
 
 	virtual void drawBackground(QPainter *pPainter, const QRectF &rect) override;
 	virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
-
-	virtual bool event(QEvent *pEvent) override;
-
-	virtual void keyPressEvent(QKeyEvent *pEvent) override;
-	virtual void keyReleaseEvent(QKeyEvent *pEvent) override;
 
 	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
 	virtual void mousePressEvent(QMouseEvent *pEvent) override;
@@ -88,9 +76,6 @@ private:
 	QList<EntityTreeItemData *> GetItems() const;
 
 	int GetNearestFrame(qreal fScenePosX) const;
-
-private Q_SLOTS:
-	void OnPanTimer();
 };
 
 #endif // ENTITYDOPESHEETVIEW_H

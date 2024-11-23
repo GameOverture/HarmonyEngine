@@ -144,6 +144,12 @@
            </item>
            <item>
             <widget class="QGroupBox" name="grpSlicingOptions">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="title">
               <string>Slicing Options</string>
              </property>
@@ -186,6 +192,46 @@
               </item>
               <item row="2" column="1">
                <widget class="WgtVectorSpinBox" name="vsbPadding" native="true"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="grpImportSide">
+             <property name="title">
+              <string>Append New Tiles</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="2" column="2">
+               <widget class="QRadioButton" name="radImportRight">
+                <property name="text">
+                 <string>Right</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QRadioButton" name="radImportLeft">
+                <property name="text">
+                 <string>Left</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QRadioButton" name="radImportTop">
+                <property name="text">
+                 <string>Top</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QRadioButton" name="radImportBottom">
+                <property name="text">
+                 <string>Bottom</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -261,7 +307,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGraphicsView" name="graphicsView"/>
+     <widget class="CommonGfxView" name="graphicsView"/>
     </widget>
    </item>
   </layout>
@@ -308,6 +354,11 @@
    <extends>QWidget</extends>
    <header>WgtVectorSpinBox.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CommonGfxView</class>
+   <extends>QGraphicsView</extends>
+   <header>CommonGfxView.h</header>
   </customwidget>
  </customwidgets>
  <resources>
