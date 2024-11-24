@@ -112,6 +112,10 @@ class AtlasTileSet : public AtlasFrame
 	};
 	QMap<MetaLocation, TileData *>	m_TileDataMap;		// QPoint key is the user/meta location, not the atlas. TileData * may be an AlternateTile
 
+	bool							m_bSubAtlasDirty;	// When saved, the intermediate sub-atlas will be saved into the project's atlas manager
+
+
+
 public:
 	AtlasTileSet(IManagerModel &modelRef,
 				 QUuid uuid,
@@ -133,6 +137,12 @@ public:
 	QIcon GetTileSetIcon() const;
 
 	TileSetScene *GetGfxScene();
+
+	// Cmd functions are the only functions that change the data (via Undo/Redo)
+	QVector<int> Cmd_AppendTiles(QSize vTileSize, const QVector<QPixmap> &pixmapList, Qt::Edge eAppendEdge);
+	void Cmd_RemoveTiles(QVector<int> atlasIndexList);
+
+	QUndoStack *GetUndoStack();
 
 	void GetLatestFileData(FileDataPair &fileDataPairOut) const;
 	void GetSavedFileData(FileDataPair &fileDataPairOut) const;

@@ -81,6 +81,8 @@ if(Qt5_DIR)
 		src/Assets/Atlas/TileSet/TileData.h
 		src/Assets/Atlas/TileSet/TileSetScene.cpp
 		src/Assets/Atlas/TileSet/TileSetScene.h
+		src/Assets/Atlas/TileSet/TileSetUndoCmds.cpp
+		src/Assets/Atlas/TileSet/TileSetUndoCmds.h
 		src/Assets/Audio/AudioAssetsWidget.cpp
 		src/Assets/Audio/AudioAssetsWidget.h
 		src/Assets/Audio/AudioAssetsWidget.ui

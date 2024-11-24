@@ -23,6 +23,7 @@ class TileSetScene : public QGraphicsScene
 	QGraphicsTextItem					m_ImportLabel;				// Main label/title of the import scene
 	QVector<QGraphicsRectItem *>		m_ImportTileRectList;
 	QVector<QGraphicsPixmapItem *>		m_ImportTilePixmapList;
+	QSize								m_vImportTileSize;
 
 public:
 	enum SceneType
@@ -39,10 +40,13 @@ public:
 	void Setup(AtlasTileSet *pTileSet);
 
 	int GetNumImportPixmaps() const;
+	QVector<QGraphicsPixmapItem *> &GetImportPixmapList();
+	QSize GetImportTileSize() const;
 
 	void RemoveImportPixmaps();
 	void AddImportPixmap(QPixmap pixmap);
-	void ConstructImportScene(QPoint vTileSize, int iNumColumns, int iNumRows);
+	void ConstructImportScene();
+	void ConstructImportScene(int iNumColumns, int iNumRows);
 };
 
 #endif // TILESETSCENE_H

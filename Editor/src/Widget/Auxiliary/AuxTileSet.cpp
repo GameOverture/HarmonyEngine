@@ -13,7 +13,7 @@
 #include "ui_AuxTileSet.h"
 
 #include "AtlasTileSet.h"
-#include "DlgImportTileSheet.h"
+#include "TileSetUndoCmds.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -106,7 +106,7 @@ void AuxTileSet::SliceSheetPixmaps()
 		return;
 
 	ui->grpSlicingOptions->setVisible(true);
-	ui->grpImportSide->setVisible(true);
+	ui->grpImportSide->setVisible(m_pTileSet->GetNumTiles() > 0);
 
 	TileSetScene *pGfxScene = m_pTileSet->GetGfxScene();
 	pGfxScene->RemoveImportPixmaps();
@@ -140,7 +140,7 @@ void AuxTileSet::SliceSheetPixmaps()
 	if(iNumColumns == 0 || iNumRows == 0)
 		return;
 
-	pGfxScene->ConstructImportScene(vTileSize, iNumColumns, iNumRows);
+	pGfxScene->ConstructImportScene(iNumColumns, iNumRows);
 }
 
 void AuxTileSet::ErrorCheckImport()
@@ -238,13 +238,42 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 		TileSetScene *pGfxScene = m_pTileSet->GetGfxScene();
 		pGfxScene->RemoveImportPixmaps();
 
+		QVector<QImage *> vImportImages;
+
 		QString sImgPaths;
 		for(auto sImgPath : sImportImgList)
 		{
 			sImgPaths += sImgPath % ";";
-			pGfxScene->AddImportPixmap(QPixmap(sImgPath));
+			vImportImages.push_back(new QImage(sImgPath));
 		}
 		ui->txtImagePath->setText(sImgPaths);
+
+		// Determine the largest image size
+		QSize maxSize;
+		for(auto pImg : vImportImages)
+		{
+			if(pImg->width() > maxSize.width())
+				maxSize.setWidth(pImg->width());
+			if(pImg->height() > maxSize.height())
+				maxSize.setHeight(pImg->height());
+		}
+
+		// Copy image into pixmap, but ensure it has maxSize dimensions, and is centered
+		for(QImage *pImg : vImportImages)
+		{
+			QPixmap pixmap(maxSize);
+			pixmap.fill(Qt::transparent);
+			QPainter painter(&pixmap);
+			painter.drawImage((maxSize.width() - pImg->width()) / 2, (maxSize.height() - pImg->height()) / 2, *pImg);
+			painter.end();
+
+			pGfxScene->AddImportPixmap(pixmap);
+		}
+
+		for(auto pImg : vImportImages)
+			delete pImg;
+
+		pGfxScene->ConstructImportScene();
 	}
 
 	ErrorCheckImport();
@@ -270,8 +299,14 @@ void AuxTileSet::OnPaddingChanged(QVariant newPadding)
 
 void AuxTileSet::on_btnConfirmAddRemove_clicked()
 {
-	if(QMessageBox::Yes != QMessageBox::question(MainWindow::GetInstance(), "Confirm Batch Import", "Do you want to import '" % QString::number(m_pTileSet->GetGfxScene()->GetNumImportPixmaps()) % "' images?", QMessageBox::Yes, QMessageBox::No))
+	if(QMessageBox::Yes != QMessageBox::question(MainWindow::GetInstance(), "Confirm TileSet Modification", "Do you want to import '" % QString::number(m_pTileSet->GetGfxScene()->GetNumImportPixmaps()) % "' new tiles?", QMessageBox::Yes, QMessageBox::No))
 		return;
+
+	QVector<QGraphicsPixmapItem *> gfxPixmapList = m_pTileSet->GetGfxScene()->GetImportPixmapList();
+	QSize vImportTileSize = m_pTileSet->GetGfxScene()->GetImportTileSize();
+
+	TileSetUndoCmd_ManipTiles *pUndoCmd = new TileSetUndoCmd_ManipTiles(*m_pTileSet, gfxPixmapList, vImportTileSize);
+	m_pTileSet->GetUndoStack()->push(pUndoCmd);
 
 	//QDir tempDir = HyGlobal::PrepTempDir(m_ProjectRef, HYGUIPATH_TEMPSUBDIR_ImportTileSheet);
 

@@ -116,6 +116,33 @@ TileSetScene *AtlasTileSet::GetGfxScene()
 	return &m_GfxScene;
 }
 
+QVector<int> AtlasTileSet::Cmd_AppendTiles(QSize vTileSize, const QVector<QPixmap> &pixmapList, Qt::Edge eAppendEdge)
+{
+	if(m_TileSize != vTileSize)
+	{
+		if(m_TileSize.width() < vTileSize.width())
+			m_TileSize.setWidth(vTileSize.width());
+		if(m_TileSize.height() < vTileSize.height())
+			m_TileSize.setHeight(vTileSize.height());
+	}
+
+	//m_TileDataMap
+
+	QVector<int> appendIndexList;
+	// TODO:
+
+	return appendIndexList;
+}
+
+void AtlasTileSet::Cmd_RemoveTiles(QVector<int> atlasIndexList)
+{
+}
+
+QUndoStack *AtlasTileSet::GetUndoStack()
+{
+	return m_pUndoStack;
+}
+
 QIcon AtlasTileSet::GetTileSetIcon() const
 {
 	SubIcon eSubIcon = SUBICON_None;
