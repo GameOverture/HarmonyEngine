@@ -16,6 +16,7 @@
 
 #include <QWidget>
 #include <QToolBar>
+#include <QElapsedTimer>
 
 namespace Ui {
 class EntityWidget;
@@ -34,6 +35,8 @@ class EntityWidget : public IWidget
 
 	QTimer *							m_pPreviewUpdateTimer;
 	QList<QUuid>						m_PreviewSelectedItemsList; // Used to restore what selected items were after previewing ends
+	QElapsedTimer						m_PreviewElapsedTimer;
+	int									m_iPreviewStartingFrame;
 
 public:
 	explicit EntityWidget(ProjectItemData &itemRef, QWidget *pParent = nullptr);

@@ -112,6 +112,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	m_pPreviewUpdateTimer = new QTimer(this);
 	connect(m_pPreviewUpdateTimer, SIGNAL(timeout()), this, SLOT(OnPreviewUpdate()));
 	m_pPreviewUpdateTimer->setInterval(1000 / 60);
+	m_iPreviewStartingFrame = 0;
 
 	new QShortcut(QKeySequence(Qt::Key_Space), this, SLOT(OnKeySpace()));
 	new QShortcut(QKeySequence(Qt::Key_Q), this, SLOT(OnKeyQ()));
@@ -573,6 +574,8 @@ void EntityWidget::OnKeySpace()
 		// Clear selection and start preview update timer
 		RequestSelectedItems(QList<QUuid>());
 		m_pPreviewUpdateTimer->start();
+		m_PreviewElapsedTimer.start();
+		m_iPreviewStartingFrame = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().GetCurrentFrame();
 	}
 }
 
@@ -1096,10 +1099,18 @@ void EntityWidget::OnPreviewUpdate()
 		return;
 	}
 
-	iCurFrame++;
-	entityDopeSheetSceneRef.SetCurrentFrame(iCurFrame);
-	
-	// Have the graphics view scroll while previewing
-	AuxDopeSheet *pAuxDopeSheet = static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet));
-	pAuxDopeSheet->EnsureSelectedFrameVisible();
+
+	// Using the elapsed time and 'm_iPreviewStartingFrame', set the current frame
+	int iFPS = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetFramesPerSecond();
+	qint64 iElapsedMs = m_PreviewElapsedTimer.elapsed();
+
+	int iCurrentFrame = m_iPreviewStartingFrame + (iElapsedMs * iFPS) / 1000;
+	if(iCurFrame != iCurrentFrame)
+	{
+		entityDopeSheetSceneRef.SetCurrentFrame(iCurrentFrame);
+
+		// Have the graphics view scroll while previewing
+		AuxDopeSheet *pAuxDopeSheet = static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet));
+		pAuxDopeSheet->EnsureSelectedFrameVisible();
+	}
 }
