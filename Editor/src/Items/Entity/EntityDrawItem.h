@@ -70,7 +70,7 @@ struct TweenInfo
 		}
 	}
 
-	QVariant Extrapolate(int iFrameIndex, float fFrameDuration)
+	void ExtrapolateIntoNode(IHyLoadable2d *pThisHyNode, int iFrameIndex, float fFrameDuration)
 	{
 		float fElapsedTime = (iFrameIndex - m_iStartFrame) * fFrameDuration;
 		fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, m_fDuration);
@@ -98,7 +98,31 @@ struct TweenInfo
 			break;
 		}
 
-		return extrapolatedValue;
+		// Apply the extrapolated value to pThisHyNode
+		switch(m_eTWEEN_PROPERTY)
+		{
+		case TWEENPROP_Position:
+			pThisHyNode->pos.SetX(static_cast<float>(extrapolatedValue.toPointF().x()));
+			pThisHyNode->pos.SetY(static_cast<float>(extrapolatedValue.toPointF().y()));
+			break;
+
+		case TWEENPROP_Rotation:
+			pThisHyNode->rot.Set(extrapolatedValue.toDouble());
+			break;
+
+		case TWEENPROP_Scale:
+			pThisHyNode->scale.SetX(static_cast<float>(extrapolatedValue.toPointF().x()));
+			pThisHyNode->scale.SetY(static_cast<float>(extrapolatedValue.toPointF().y()));
+			break;
+
+		case TWEENPROP_Alpha:
+			static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(extrapolatedValue.toDouble());
+			break;
+
+		default:
+			HyGuiLog("TweenInfo::Extrapolate() - Unhandled tween property", LOGTYPE_Error);
+			break;
+		}
 	}
 };
 

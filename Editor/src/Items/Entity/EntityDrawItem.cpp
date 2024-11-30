@@ -559,49 +559,32 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 	// To determine the sprite's animation frame that should be presented, whenever a property that might affect
 	// what frame the sprite's animation could be on, calculate 'spriteLastKnownAnimInfo' up to that point.
 	// Once all properties have been processed, extrapolate the remaining time up to the Entity's 'iCURRENT_FRAME'
-	enum {
-		SPRITE_SpriteFrame = 0,	// Sprite's frame (-1 indicates it hasn't been set, and should be HYANIMCTRL_Reset)
-		SPRITE_EntityFrame,
-		SPRITE_BouncePhase,		// A boolean whether animation is in the "bounce phase"
-		SPRITE_Paused			// A boolean whether animation is paused
+	struct LastKnownSpriteInfo
+	{
+		int m_iEntityFrame;
+		int m_iSpriteFrame;		// Sprite's frame (-1 indicates it hasn't been set, and should be HYANIMCTRL_Reset)
+		bool m_bBouncePhase;	// A boolean whether animation is in the "bounce phase"
+		bool m_bPaused;			// A boolean whether animation is paused
+		LastKnownSpriteInfo() :
+			m_iEntityFrame(0),
+			m_iSpriteFrame(-1),
+			m_bBouncePhase(false),
+			m_bPaused(false) { }
+
+		LastKnownSpriteInfo(int iEntityFrame, int iSpriteFrame, bool bBouncePhase, bool bPaused) :
+			m_iEntityFrame(iEntityFrame),
+			m_iSpriteFrame(iSpriteFrame),
+			m_bBouncePhase(bBouncePhase),
+			m_bPaused(bPaused) { }
 	};
-	std::tuple<int, int, bool, bool> spriteLastKnownAnimInfo(-1, 0, false, false);
-
-	// Tween Special Case:
-	// To determine the tween's current value, store the info that kicked it off, and extrapolate the based on Entity's 'iCURRENT_FRAME'
-	TweenInfo tweenInfo[NUM_TWEENPROPS] = { TWEENPROP_Position, TWEENPROP_Rotation, TWEENPROP_Scale, TWEENPROP_Alpha };
-	std::function<void(int, int)> fpApplyTween = [&](int iTweenProp, int iFrameIndex)
-		{
-			QVariant extrapolatedValue = tweenInfo[iTweenProp].Extrapolate(iFrameIndex, fFRAME_DURATION);
-			switch(iTweenProp)
-			{
-			case TWEENPROP_Position:
-				pThisHyNode->pos.SetX(static_cast<float>(extrapolatedValue.toPointF().x()));
-				pThisHyNode->pos.SetY(static_cast<float>(extrapolatedValue.toPointF().y()));
-				break;
-
-			case TWEENPROP_Rotation:
-				pThisHyNode->rot.Set(extrapolatedValue.toDouble());
-				break;
-
-			case TWEENPROP_Scale:
-				pThisHyNode->scale.SetX(static_cast<float>(extrapolatedValue.toPointF().x()));
-				pThisHyNode->scale.SetY(static_cast<float>(extrapolatedValue.toPointF().y()));
-				break;
-
-			case TWEENPROP_Alpha:
-				static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(extrapolatedValue.toDouble());
-				break;
-
-			default:
-				HyGuiLog("ExtrapolateProperties() - Unhandled tween property (fpApplyTween)", LOGTYPE_Error);
-				break;
-			}
-		};
+	LastKnownSpriteInfo spriteLastKnownAnimInfo;
 
 	if(eItemType == ITEM_Sprite)
 		static_cast<HySprite2d *>(pThisHyNode)->SetAnimPause(true); // We always pause the animation because it is set manually by extrapolating what frame it should be, and don't want time passing to affect it.
 
+	// Tween Special Case:
+	// To determine the tweens' current values, store the info that kicked it off, and extrapolate the based on Entity's 'iCURRENT_FRAME'
+	TweenInfo tweenInfo[NUM_TWEENPROPS] = { TWEENPROP_Position, TWEENPROP_Rotation, TWEENPROP_Scale, TWEENPROP_Alpha };
 
 	for(int iFrame : keyFrameMapRef.keys())
 	{
@@ -624,7 +607,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 				if(HyGlobal::IsItemType_Asset(eItemType) == false && commonObj.contains("State"))
 				{
 					if(pThisHyNode->SetState(commonObj["State"].toInt()) && eItemType == ITEM_Sprite)
-						spriteLastKnownAnimInfo = std::make_tuple(-1, iFrame, false, std::get<SPRITE_Paused>(spriteLastKnownAnimInfo));
+						spriteLastKnownAnimInfo = LastKnownSpriteInfo(iFrame, -1, false, spriteLastKnownAnimInfo.m_bPaused);
 				}
 				if(commonObj.contains("Update During Paused"))
 					pThisHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
@@ -686,9 +669,13 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 				{
 					// If a tween is already active, then we need to extrapolate the tween's value to the current frame before replacing it
 					if(tweenInfo[iTweenProp].IsActive())
-						fpApplyTween(iTweenProp, iFrame);
+						tweenInfo[iTweenProp].ExtrapolateIntoNode(pThisHyNode, iFrame, fFRAME_DURATION);
 
-					QVariant startValue;
+
+					// TODO: THIS IS WRONG! You cannot use pThisHyNode's current values. Need to store last good known value for each tween property, and it needs to work between states!
+					QVariant startValue; 
+					
+
 					switch(iTweenProp)
 					{
 					case TWEENPROP_Position:
@@ -843,21 +830,21 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 			if(propsObj.contains("Sprite"))
 			{
 				// Set the sprite to the last known anim info, and let it "naturally" AdvanceAnim() to frame 'iFrame'
-				if(std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo) == -1)
+				if(spriteLastKnownAnimInfo.m_iSpriteFrame == -1)
 					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(HYANIMCTRL_Reset);
 				else
 				{
-					static_cast<HySprite2d *>(pThisHyNode)->SetFrame(std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo));
-					static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(std::get<SPRITE_BouncePhase>(spriteLastKnownAnimInfo));
+					static_cast<HySprite2d *>(pThisHyNode)->SetFrame(spriteLastKnownAnimInfo.m_iSpriteFrame);
+					static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(spriteLastKnownAnimInfo.m_bBouncePhase);
 				}
 
-				if(std::get<SPRITE_Paused>(spriteLastKnownAnimInfo) == false)
-					static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFrame - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
+				if(spriteLastKnownAnimInfo.m_bPaused == false)
+					static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFrame - spriteLastKnownAnimInfo.m_iEntityFrame) * fFRAME_DURATION);
 
 				// Update the last known anim info after AdvanceAnim()
-				std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo) = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
-				std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo) = iFrame;
-				std::get<SPRITE_BouncePhase>(spriteLastKnownAnimInfo) = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
+				spriteLastKnownAnimInfo.m_iSpriteFrame = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
+				spriteLastKnownAnimInfo.m_iEntityFrame = iFrame;
+				spriteLastKnownAnimInfo.m_bBouncePhase = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
 
 				QJsonObject spriteObj = propsObj["Sprite"].toObject();
 				if(spriteObj.contains("Frame"))
@@ -873,7 +860,11 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 
 				// Store whether the animation is paused, so we don't AdvanceAnim()
 				if(spriteObj.contains("Anim Pause"))
-					std::get<SPRITE_Paused>(spriteLastKnownAnimInfo) = spriteObj["Anim Pause"].toBool();
+					spriteLastKnownAnimInfo.m_bPaused = spriteObj["Anim Pause"].toBool();
+
+				// Update again to get the above properties of this frame
+				spriteLastKnownAnimInfo.m_iSpriteFrame = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
+				spriteLastKnownAnimInfo.m_bBouncePhase = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
 			}
 			break;
 
@@ -895,22 +886,22 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 	// SPRITE ANIMS
 	if(eItemType == ITEM_Sprite)
 	{
-		if(std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo) == -1)
+		if(spriteLastKnownAnimInfo.m_iSpriteFrame == -1)
 			static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(HYANIMCTRL_Reset);
 		else
 		{
-			static_cast<HySprite2d *>(pThisHyNode)->SetFrame(std::get<SPRITE_SpriteFrame>(spriteLastKnownAnimInfo));
-			static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(std::get<SPRITE_BouncePhase>(spriteLastKnownAnimInfo));
+			static_cast<HySprite2d *>(pThisHyNode)->SetFrame(spriteLastKnownAnimInfo.m_iSpriteFrame);
+			static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(spriteLastKnownAnimInfo.m_bBouncePhase);
 		}
 
-		if(std::get<SPRITE_Paused>(spriteLastKnownAnimInfo) == false)
-			static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iDESTINATION_FRAME - std::get<SPRITE_EntityFrame>(spriteLastKnownAnimInfo)) * fFRAME_DURATION);
+		if(spriteLastKnownAnimInfo.m_bPaused == false)
+			static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iDESTINATION_FRAME - spriteLastKnownAnimInfo.m_iEntityFrame) * fFRAME_DURATION);
 	}
 
 	// TWEENS
 	for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
 	{
 		if(tweenInfo[iTweenProp].IsActive())
-			fpApplyTween(iTweenProp, iDESTINATION_FRAME);
+			tweenInfo[iTweenProp].ExtrapolateIntoNode(pThisHyNode, iDESTINATION_FRAME, fFRAME_DURATION);
 	}
 }
