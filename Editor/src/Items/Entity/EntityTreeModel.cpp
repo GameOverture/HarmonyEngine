@@ -56,7 +56,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, EntityItemDe
 	m_bIsLocked(false),
 	m_bIsSelected(false),
 	m_bIsDopeExpanded(true),
-	m_bReallocateDrawItem(false)
+	m_PreviewComponent()
 {
 	QVariant ptrVariant;
 	ptrVariant.setValue<TreeModelItemData *>(this);
@@ -77,7 +77,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject 
 	m_bIsLocked(descObj["isLocked"].toBool(false)),
 	m_bIsSelected(descObj["isSelected"].toBool(false)),
 	m_bIsDopeExpanded(descObj["isDopeExpanded"].toBool(true)),
-	m_bReallocateDrawItem(false)
+	m_PreviewComponent()
 {
 	QVariant ptrVariant;
 	ptrVariant.setValue<TreeModelItemData *>(this);
@@ -210,12 +210,17 @@ void EntityTreeItemData::SetDopeExpanded(bool bIsDopeExpanded)
 
 bool EntityTreeItemData::IsReallocateDrawItem() const
 {
-	return m_bReallocateDrawItem;
+	return m_PreviewComponent.m_bReallocateDrawItem;
 }
 
 void EntityTreeItemData::SetReallocateDrawItem(bool bReallocateDrawItem)
 {
-	m_bReallocateDrawItem = bReallocateDrawItem;
+	m_PreviewComponent.m_bReallocateDrawItem = bReallocateDrawItem;
+}
+
+EntityPreviewComponent &EntityTreeItemData::GetPreviewComponent()
+{
+	return m_PreviewComponent;
 }
 
 int EntityTreeItemData::GetArrayIndex() const
@@ -378,6 +383,14 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Text", "Alignment", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAlignmentNameList()[HYALIGN_Left], "The alignment of the text", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAlignmentNameList());
 		m_pPropertiesModel->AppendProperty("Text", "Monospaced Digits", PROPERTIESTYPE_bool, false, "Check to use monospaced digits, which ensures all digits use the same width", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Text", "Text Indent", PROPERTIESTYPE_int, 0, "The number of pixels to indent the text", PROPERTIESACCESS_ToggleUnchecked, 0, iRANGE, 1);
+		break;
+
+	case ITEM_Audio:
+		m_pPropertiesModel->AppendCategory("Audio", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		//m_pPropertiesModel->AppendProperty("Audio", "Play List Mode", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAudioPlayListModeList()[HYPLAYLIST_Shuffle], "The method by which the next audio asset is chosen when played", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAudioPlayListModeList());
+		//m_pPropertiesModel->AppendProperty("Audio", "Play", 
+		m_pPropertiesModel->AppendProperty("Audio", "Volume", PROPERTIESTYPE_double, 1.0, "The volume of the audio", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.01);
+		m_pPropertiesModel->AppendProperty("Audio", "Pitch", PROPERTIESTYPE_double, 1.0, "The pitch of the audio", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.01);
 		break;
 
 	default:

@@ -30,19 +30,11 @@ AudioStateData::AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair s
 
 	if(dataPlayListArray.size() != dependeeList.size())
 		HyGuiLog("AudioStateData::AudioStateData() failed to acquire all the stored audio assets", LOGTYPE_Error);
-
-	// NOTE: This 'sPlayListModeList' order must be preserved as it is saved as an index
-	QStringList sPlayListModeList;
-	sPlayListModeList << QObject::tr("Shuffle");
-	sPlayListModeList << QObject::tr("Weighted");
-	sPlayListModeList << QObject::tr("Sequential (Local)");
-	sPlayListModeList << QObject::tr("Sequential (Global)");
-
 	
 	const int iRANGE = 16777215;	// Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
 
 	m_PropertiesModel.AppendCategory("Play List");
-	m_PropertiesModel.AppendProperty("Play List", "Mode", PROPERTIESTYPE_ComboBoxInt, stateFileData.m_Data["playlistMode"].toInt(0), "The method by which the next audio asset is chosen when this item is played", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), QString(), QString(), sPlayListModeList);
+	m_PropertiesModel.AppendProperty("Play List", "Mode", PROPERTIESTYPE_ComboBoxInt, stateFileData.m_Data["playlistMode"].toInt(0), "The method by which the next audio asset is chosen when this item is played", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), QString(), QString(), HyGlobal::GetAudioPlayListModeList());
 
 	m_PropertiesModel.AppendCategory("Mixing");
 	m_PropertiesModel.AppendProperty("Mixing", "Volume", PROPERTIESTYPE_double, stateFileData.m_Data["volume"].toDouble(1.0), "Volume modifier [0.0 to 1.0] applied to source volume", PROPERTIESACCESS_Mutable, 0.0, 1.0, 0.1, QString(), QString(), 4);

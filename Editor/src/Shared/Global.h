@@ -373,6 +373,7 @@ class HyGlobal
 	static QString														sm_sSubIconNames[NUM_SUBICONS];
 	static QString														sm_sTextTypeNames[HYNUM_TEXTTYPES];
 	static QString														sm_sAlignmentNames[HYNUM_ALIGNMENTS];
+	static QString														sm_sAudioPlayLists[HYNUM_PLAYLISTS];
 
 	static QIcon														sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
 	static QIcon														sm_TweenPropIcons[NUM_TWEENPROPS];
@@ -413,6 +414,7 @@ public:
 	static HyTextType GetTextTypeFromString(QString sTextType);
 	static QStringList GetAlignmentNameList();
 	static HyAlignment GetAlignmentFromString(QString sAlignment);
+	static QStringList GetAudioPlayListModeList();
 
 	static bool IsItemType_Project(ItemType eType);
 	static bool IsItemType_Asset(ItemType eType);

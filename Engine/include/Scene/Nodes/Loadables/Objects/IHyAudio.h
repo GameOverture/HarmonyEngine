@@ -78,6 +78,8 @@ public:
 
 	int32 GetLoops() const;
 	void SetLoops(int32 iLoops);
+	int32 GetPriority() const;
+	void SetPriority(int32 iPriority);
 	bool IsPlaying() const;	// Does not return true for playing OneShots
 	void PlayOneShot(bool bUseCurrentSettings /*= true*/);
 	void Play();

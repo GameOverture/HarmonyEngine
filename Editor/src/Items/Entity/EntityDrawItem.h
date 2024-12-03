@@ -16,116 +16,6 @@ class EntityDraw;
 class EntityTreeItemData;
 class EntityDopeSheetScene;
 
-struct TweenInfo
-{
-	const TweenProperty								m_eTWEEN_PROPERTY;
-	int												m_iStartFrame;
-	QVariant										m_Start;
-	QVariant										m_Destination;
-	float											m_fDuration;
-	TweenFuncType									m_eTweenFunc;
-
-	TweenInfo(TweenProperty eTweenProp) :
-		m_eTWEEN_PROPERTY(eTweenProp)
-	{
-		Clear();
-	}
-
-	bool IsActive() const
-	{
-		return m_iStartFrame != -1;
-	}
-
-	void Clear()
-	{
-		m_iStartFrame = -1;
-		m_Start.clear();
-		m_Destination.clear();
-		m_fDuration = 0.0f;
-		m_eTweenFunc = TWEENFUNC_Unknown;
-	}
-
-	void Set(int iStartFrame, const QJsonObject &tweenObj, QVariant startValue)
-	{
-		m_iStartFrame = iStartFrame;
-		m_fDuration = tweenObj["Duration"].toDouble();
-		m_eTweenFunc = HyGlobal::GetTweenFuncFromString(tweenObj["Tween Type"].toString());
-		m_Start = startValue;
-		switch(m_eTWEEN_PROPERTY)
-		{
-		case TWEENPROP_Position:
-		case TWEENPROP_Scale: {
-			QJsonArray destinationArray = tweenObj["Destination"].toArray();
-			m_Destination = QPointF(destinationArray[0].toDouble(), destinationArray[1].toDouble());
-			break; }
-
-		case TWEENPROP_Rotation:
-		case TWEENPROP_Alpha:
-			m_Destination = tweenObj["Destination"].toDouble();
-			break;
-
-		default:
-			HyGuiLog("TweenInfo::Set() - Unhandled tween property", LOGTYPE_Error);
-			break;
-		}
-	}
-
-	void ExtrapolateIntoNode(IHyLoadable2d *pThisHyNode, int iFrameIndex, float fFrameDuration)
-	{
-		float fElapsedTime = (iFrameIndex - m_iStartFrame) * fFrameDuration;
-		fElapsedTime = HyMath::Clamp(fElapsedTime, 0.0f, m_fDuration);
-		HyTweenFunc fpTweenFunc = HyGlobal::GetTweenFunc(m_eTweenFunc);
-		float fRatio = (m_fDuration > 0.0f) ? fpTweenFunc(fElapsedTime / m_fDuration) : 1.0f;
-
-		QVariant extrapolatedValue;
-		switch(m_eTWEEN_PROPERTY)
-		{
-		case TWEENPROP_Position:
-		case TWEENPROP_Scale: {
-			QPointF ptStart = m_Start.toPointF();
-			QPointF ptDest = m_Destination.toPointF();
-			extrapolatedValue = QPointF(static_cast<float>(ptStart.x() + (ptDest.x() - ptStart.x()) * fRatio),
-										static_cast<float>(ptStart.y() + (ptDest.y() - ptStart.y()) * fRatio));
-			break; }
-
-		case TWEENPROP_Rotation:
-		case TWEENPROP_Alpha:
-			extrapolatedValue = m_Start.toDouble() + (m_Destination.toDouble() - m_Start.toDouble()) * fRatio;
-			break;
-
-		default:
-			HyGuiLog("TweenInfo::Extrapolate() - Unhandled tween property", LOGTYPE_Error);
-			break;
-		}
-
-		// Apply the extrapolated value to pThisHyNode
-		switch(m_eTWEEN_PROPERTY)
-		{
-		case TWEENPROP_Position:
-			pThisHyNode->pos.SetX(static_cast<float>(extrapolatedValue.toPointF().x()));
-			pThisHyNode->pos.SetY(static_cast<float>(extrapolatedValue.toPointF().y()));
-			break;
-
-		case TWEENPROP_Rotation:
-			pThisHyNode->rot.Set(extrapolatedValue.toDouble());
-			break;
-
-		case TWEENPROP_Scale:
-			pThisHyNode->scale.SetX(static_cast<float>(extrapolatedValue.toPointF().x()));
-			pThisHyNode->scale.SetY(static_cast<float>(extrapolatedValue.toPointF().y()));
-			break;
-
-		case TWEENPROP_Alpha:
-			static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(extrapolatedValue.toDouble());
-			break;
-
-		default:
-			HyGuiLog("TweenInfo::Extrapolate() - Unhandled tween property", LOGTYPE_Error);
-			break;
-		}
-	}
-};
-
 // NOTE: this class does not keep its state when removed, it is deleted (should not be passed to UndoCmd's)
 class EntityDrawItem : public IDrawExItem
 {
@@ -155,10 +45,24 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+struct EntityPreviewComponent;
+
 // Child entities of the root entity are these SubEntity objects
 class SubEntity : public HyEntity2d
 {
-	QList<QPair<IHyLoadable2d *, ItemType>>			m_ChildTypeList;
+	struct ChildInfo
+	{
+		IHyLoadable2d *								m_pChild;
+		ItemType									m_eItemType;
+		EntityPreviewComponent *					m_pPreviewComponent;
+		ChildInfo(IHyLoadable2d *pChild, ItemType eItemType, EntityPreviewComponent *pPreviewComponent) :
+			m_pChild(pChild),
+			m_eItemType(eItemType),
+			m_pPreviewComponent(pPreviewComponent)
+		{ }
+	};
+	QList<ChildInfo>								m_ChildInfoList;
+	//QList<QPair<IHyLoadable2d *, ItemType>>			m_ChildTypeList;
 
 	struct StateInfo
 	{
@@ -182,7 +86,7 @@ public:
 	virtual ~SubEntity();
 	void CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj);
 
-	void Extrapolate(const QMap<int, QJsonObject> &propMapRef, bool bIsSelected, float fFrameDuration, int iMainDestinationFrame, HyCamera2d *pCamera);
+	void Extrapolate(const QMap<int, QJsonObject> &propMapRef, EntityPreviewComponent &previewComponentRef, bool bIsSelected, float fFrameDuration, int iMainDestinationFrame, HyCamera2d *pCamera);
 
 	void MergeRootProperties(QMap<int, QJsonObject> &mergeMapOut);
 
@@ -199,6 +103,6 @@ private:
 };
 
 
-void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iSTART_FRAME, const int iDESTINATION_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, HyCamera2d *pCamera);
+void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iSTART_FRAME, const int iDESTINATION_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, EntityPreviewComponent &previewComponentRef, HyCamera2d *pCamera);
 
 #endif // ENTITYDRAWITEM_H

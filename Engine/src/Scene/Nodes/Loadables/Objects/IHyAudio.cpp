@@ -130,6 +130,19 @@ void IHyAudio<NODETYPE, ENTTYPE>::SetLoops(int32 iLoops)
 }
 
 template<typename NODETYPE, typename ENTTYPE>
+int32 IHyAudio<NODETYPE, ENTTYPE>::GetPriority() const
+{
+	HyLogError("IHyAudio::GetPriority() not implemented");
+	return 0;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+void IHyAudio<NODETYPE, ENTTYPE>::SetPriority(int32 iPriority)
+{
+	HyLogError("IHyAudio::SetPriority() not implemented");
+}
+
+template<typename NODETYPE, typename ENTTYPE>
 bool IHyAudio<NODETYPE, ENTTYPE>::IsPlaying() const
 {
 	return 0 == (m_uiCueFlags & ((1 << HYSOUNDCUE_Stop) | (1 << HYSOUNDCUE_Pause))) && HyEngine::Audio().IsPlaying(m_hUNIQUE_ID);

@@ -23,6 +23,7 @@
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
 /*static*/ QString HyGlobal::sm_sTextTypeNames[HYNUM_TEXTTYPES];
 /*static*/ QString HyGlobal::sm_sAlignmentNames[HYNUM_ALIGNMENTS];
+/*static*/ QString HyGlobal::sm_sAudioPlayLists[HYNUM_PLAYLISTS];
 
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
 /*static*/ QIcon HyGlobal::sm_TweenPropIcons[NUM_TWEENPROPS];
@@ -169,6 +170,11 @@
 	sm_sAlignmentNames[HYALIGN_Center] = "Center";
 	sm_sAlignmentNames[HYALIGN_Right] = "Right";
 	sm_sAlignmentNames[HYALIGN_Justify] = "Justify";
+
+	sm_sAudioPlayLists[HYPLAYLIST_Shuffle] = "Shuffle";
+	sm_sAudioPlayLists[HYPLAYLIST_Weighted] = "Weighted";
+	sm_sAudioPlayLists[HYPLAYLIST_SequentialLocal] = "Sequential (Local)";
+	sm_sAudioPlayLists[HYPLAYLIST_SequentialGlobal] = "Sequential (Global)";
 
 	sm_EditorColors[EDITORCOLOR_Origin] = HyColor::White;
 	sm_EditorColors[EDITORCOLOR_OriginStroke] = HyColor::Black;
@@ -532,6 +538,15 @@
 	}
 
 	return HYALIGN_Unknown;
+}
+
+/*static*/ QStringList HyGlobal::GetAudioPlayListModeList()
+{
+	QStringList list;
+	for(int i = 0; i < HYNUM_PLAYLISTS; ++i)
+		list.append(sm_sAudioPlayLists[i]);
+	
+	return list;
 }
 
 /*static*/ bool HyGlobal::IsItemType_Project(ItemType eType)

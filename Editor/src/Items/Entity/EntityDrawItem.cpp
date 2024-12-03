@@ -310,12 +310,13 @@ SubEntity::SubEntity(Project &projectRef, QUuid subEntityUuid, const QJsonArray 
 }
 /*virtual*/ SubEntity::~SubEntity()
 {
-	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
+	for(ChildInfo &childInfo : m_ChildInfoList)
 	{
-		if(childTypePair.first == this)
+		if(childInfo.m_pChild == this)
 			continue;
 
-		delete childTypePair.first;
+		delete childInfo.m_pChild;
+		delete childInfo.m_pPreviewComponent;
 	}
 }
 void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj)
@@ -408,13 +409,14 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 		HyGuiLog("SubEntity ctor - unhandled child node type: " % HyGlobal::ItemName(eItemType, false), LOGTYPE_Error);
 		break;
 	}
-	m_ChildTypeList.append(QPair<IHyLoadable2d *, ItemType>(pNewChild, eItemType));
+
+	m_ChildInfoList.append(ChildInfo(pNewChild, eItemType, new EntityPreviewComponent()));
 	uuidChildMapRef.insert(QUuid(childObj["UUID"].toString()), pNewChild);
 
 	pNewChild->Load();
 }
 
-void SubEntity::Extrapolate(const QMap<int, QJsonObject> &propMapRef, bool bIsSelected, float fFrameDuration, int iMainDestinationFrame, HyCamera2d *pCamera)
+void SubEntity::Extrapolate(const QMap<int, QJsonObject> &propMapRef, EntityPreviewComponent &previewComponentRef, bool bIsSelected, float fFrameDuration, int iMainDestinationFrame, HyCamera2d *pCamera)
 {
 	m_bSubTimelinePaused = false;
 	m_iElapsedTimelineFrames = 0;
@@ -438,6 +440,7 @@ void SubEntity::Extrapolate(const QMap<int, QJsonObject> &propMapRef, bool bIsSe
 							  m_iElapsedTimelineFrames, // Starting frame to extrapolate from
 							  m_iElapsedTimelineFrames + m_iRemainingTimelineFrames,
 							  mergedMap,
+							  previewComponentRef,
 							  pCamera);
 
 	} while(m_bSubTimelineDirty);
@@ -534,8 +537,10 @@ bool SubEntity::TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, H
 void SubEntity::ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStateIndex, HyCamera2d *pCamera)
 {
 	const QMap<IHyNode2d *, QMap<int, QJsonObject>> &childPropMapRef = m_StateInfoList[uiStateIndex].m_ChildPropertiesMap;
-	for(QPair<IHyLoadable2d *, ItemType> &childTypePair : m_ChildTypeList)
-		ExtrapolateProperties(childTypePair.first, nullptr, false, childTypePair.second, 1.0f / 60, m_iSubTimelineStartFrame, m_iSubTimelineStartFrame + iNumFramesDuration, childPropMapRef[childTypePair.first], pCamera);
+
+
+	for(ChildInfo &childInfoRef : m_ChildInfoList)
+		ExtrapolateProperties(childInfoRef.m_pChild, nullptr, false, childInfoRef.m_eItemType, 1.0f / 60, m_iSubTimelineStartFrame, m_iSubTimelineStartFrame + iNumFramesDuration, childPropMapRef[childInfoRef.m_pChild], *childInfoRef.m_pPreviewComponent, pCamera);
 }
 // SubEntity
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -553,38 +558,11 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 						   const int iSTART_FRAME,
 						   const int iDESTINATION_FRAME,
 						   const QMap<int, QJsonObject> &keyFrameMapRef,
+						   EntityPreviewComponent &previewComponentRef,
 						   HyCamera2d *pCamera)
 {
-	// Sprite Special Case:
-	// To determine the sprite's animation frame that should be presented, whenever a property that might affect
-	// what frame the sprite's animation could be on, calculate 'spriteLastKnownAnimInfo' up to that point.
-	// Once all properties have been processed, extrapolate the remaining time up to the Entity's 'iCURRENT_FRAME'
-	struct LastKnownSpriteInfo
-	{
-		int m_iEntityFrame;
-		int m_iSpriteFrame;		// Sprite's frame (-1 indicates it hasn't been set, and should be HYANIMCTRL_Reset)
-		bool m_bBouncePhase;	// A boolean whether animation is in the "bounce phase"
-		bool m_bPaused;			// A boolean whether animation is paused
-		LastKnownSpriteInfo() :
-			m_iEntityFrame(0),
-			m_iSpriteFrame(-1),
-			m_bBouncePhase(false),
-			m_bPaused(false) { }
-
-		LastKnownSpriteInfo(int iEntityFrame, int iSpriteFrame, bool bBouncePhase, bool bPaused) :
-			m_iEntityFrame(iEntityFrame),
-			m_iSpriteFrame(iSpriteFrame),
-			m_bBouncePhase(bBouncePhase),
-			m_bPaused(bPaused) { }
-	};
-	LastKnownSpriteInfo spriteLastKnownAnimInfo;
-
 	if(eItemType == ITEM_Sprite)
 		static_cast<HySprite2d *>(pThisHyNode)->SetAnimPause(true); // We always pause the animation because it is set manually by extrapolating what frame it should be, and don't want time passing to affect it.
-
-	// Tween Special Case:
-	// To determine the tweens' current values, store the info that kicked it off, and extrapolate the based on Entity's 'iCURRENT_FRAME'
-	TweenInfo tweenInfo[NUM_TWEENPROPS] = { TWEENPROP_Position, TWEENPROP_Rotation, TWEENPROP_Scale, TWEENPROP_Alpha };
 
 	for(int iFrame : keyFrameMapRef.keys())
 	{
@@ -607,7 +585,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 				if(HyGlobal::IsItemType_Asset(eItemType) == false && commonObj.contains("State"))
 				{
 					if(pThisHyNode->SetState(commonObj["State"].toInt()) && eItemType == ITEM_Sprite)
-						spriteLastKnownAnimInfo = LastKnownSpriteInfo(iFrame, -1, false, spriteLastKnownAnimInfo.m_bPaused);
+						previewComponentRef.m_SpriteInfo = EntityPreviewComponent::LastKnownSpriteInfo(iFrame, -1, false, previewComponentRef.m_SpriteInfo.m_bPaused);
 				}
 				if(commonObj.contains("Update During Paused"))
 					pThisHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
@@ -622,18 +600,18 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 				{
 					QJsonArray posArray = transformObj["Position"].toArray();
 					pThisHyNode->pos.Set(glm::vec2(posArray[0].toDouble(), posArray[1].toDouble()));
-					tweenInfo[TWEENPROP_Position].Clear();
+					previewComponentRef.m_TweenInfo[TWEENPROP_Position].Clear();
 				}
 				if(transformObj.contains("Rotation"))
 				{
 					pThisHyNode->rot.Set(transformObj["Rotation"].toDouble());
-					tweenInfo[TWEENPROP_Rotation].Clear();
+					previewComponentRef.m_TweenInfo[TWEENPROP_Rotation].Clear();
 				}
 				if(transformObj.contains("Scale"))
 				{
 					QJsonArray scaleArray = transformObj["Scale"].toArray();
 					pThisHyNode->scale.Set(glm::vec2(scaleArray[0].toDouble(), scaleArray[1].toDouble()));
-					tweenInfo[TWEENPROP_Scale].Clear();
+					previewComponentRef.m_TweenInfo[TWEENPROP_Scale].Clear();
 				}
 			}
 
@@ -652,7 +630,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 					if(bodyObj.contains("Alpha"))
 					{
 						static_cast<IHyBody2d *>(pThisHyNode)->alpha.Set(bodyObj["Alpha"].toDouble());
-						tweenInfo[TWEENPROP_Alpha].Clear();
+						previewComponentRef.m_TweenInfo[TWEENPROP_Alpha].Clear();
 					}
 					if(bodyObj.contains("Override Display Order"))
 						static_cast<IHyBody2d *>(pThisHyNode)->SetDisplayOrder(bodyObj["Override Display Order"].toInt());
@@ -668,12 +646,13 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 				if(propsObj.contains(sCategory))
 				{
 					// If a tween is already active, then we need to extrapolate the tween's value to the current frame before replacing it
-					if(tweenInfo[iTweenProp].IsActive())
-						tweenInfo[iTweenProp].ExtrapolateIntoNode(pThisHyNode, iFrame, fFRAME_DURATION);
+					if(previewComponentRef.m_TweenInfo[iTweenProp].IsActive())
+						previewComponentRef.m_TweenInfo[iTweenProp].ExtrapolateIntoNode(pThisHyNode, iFrame, fFRAME_DURATION);
 
 
 					// TODO: THIS IS WRONG! You cannot use pThisHyNode's current values. Need to store last good known value for each tween property, and it needs to work between states!
-					QVariant startValue; 
+					QVariant startValue;
+
 					
 
 					switch(iTweenProp)
@@ -697,7 +676,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 					}
 
 					QJsonObject tweenObj = propsObj[sCategory].toObject();
-					tweenInfo[iTweenProp].Set(iFrame, tweenObj, startValue);
+					previewComponentRef.m_TweenInfo[iTweenProp].Set(iFrame, tweenObj, startValue);
 				}
 			}
 		}
@@ -830,21 +809,21 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 			if(propsObj.contains("Sprite"))
 			{
 				// Set the sprite to the last known anim info, and let it "naturally" AdvanceAnim() to frame 'iFrame'
-				if(spriteLastKnownAnimInfo.m_iSpriteFrame == -1)
+				if(previewComponentRef.m_SpriteInfo.m_iSpriteFrame == -1)
 					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(HYANIMCTRL_Reset);
 				else
 				{
-					static_cast<HySprite2d *>(pThisHyNode)->SetFrame(spriteLastKnownAnimInfo.m_iSpriteFrame);
-					static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(spriteLastKnownAnimInfo.m_bBouncePhase);
+					static_cast<HySprite2d *>(pThisHyNode)->SetFrame(previewComponentRef.m_SpriteInfo.m_iSpriteFrame);
+					static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(previewComponentRef.m_SpriteInfo.m_bBouncePhase);
 				}
 
-				if(spriteLastKnownAnimInfo.m_bPaused == false)
-					static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFrame - spriteLastKnownAnimInfo.m_iEntityFrame) * fFRAME_DURATION);
+				if(previewComponentRef.m_SpriteInfo.m_bPaused == false)
+					static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iFrame - previewComponentRef.m_SpriteInfo.m_iEntityFrame) * fFRAME_DURATION);
 
 				// Update the last known anim info after AdvanceAnim()
-				spriteLastKnownAnimInfo.m_iSpriteFrame = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
-				spriteLastKnownAnimInfo.m_iEntityFrame = iFrame;
-				spriteLastKnownAnimInfo.m_bBouncePhase = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
+				previewComponentRef.m_SpriteInfo.m_iSpriteFrame = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
+				previewComponentRef.m_SpriteInfo.m_iEntityFrame = iFrame;
+				previewComponentRef.m_SpriteInfo.m_bBouncePhase = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
 
 				QJsonObject spriteObj = propsObj["Sprite"].toObject();
 				if(spriteObj.contains("Frame"))
@@ -860,11 +839,11 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 
 				// Store whether the animation is paused, so we don't AdvanceAnim()
 				if(spriteObj.contains("Anim Pause"))
-					spriteLastKnownAnimInfo.m_bPaused = spriteObj["Anim Pause"].toBool();
+					previewComponentRef.m_SpriteInfo.m_bPaused = spriteObj["Anim Pause"].toBool();
 
 				// Update again to get the above properties of this frame
-				spriteLastKnownAnimInfo.m_iSpriteFrame = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
-				spriteLastKnownAnimInfo.m_bBouncePhase = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
+				previewComponentRef.m_SpriteInfo.m_iSpriteFrame = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
+				previewComponentRef.m_SpriteInfo.m_bBouncePhase = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
 			}
 			break;
 
@@ -886,22 +865,22 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 	// SPRITE ANIMS
 	if(eItemType == ITEM_Sprite)
 	{
-		if(spriteLastKnownAnimInfo.m_iSpriteFrame == -1)
+		if(previewComponentRef.m_SpriteInfo.m_iSpriteFrame == -1)
 			static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(HYANIMCTRL_Reset);
 		else
 		{
-			static_cast<HySprite2d *>(pThisHyNode)->SetFrame(spriteLastKnownAnimInfo.m_iSpriteFrame);
-			static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(spriteLastKnownAnimInfo.m_bBouncePhase);
+			static_cast<HySprite2d *>(pThisHyNode)->SetFrame(previewComponentRef.m_SpriteInfo.m_iSpriteFrame);
+			static_cast<HySprite2d *>(pThisHyNode)->SetAnimInBouncePhase(previewComponentRef.m_SpriteInfo.m_bBouncePhase);
 		}
 
-		if(spriteLastKnownAnimInfo.m_bPaused == false)
-			static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iDESTINATION_FRAME - spriteLastKnownAnimInfo.m_iEntityFrame) * fFRAME_DURATION);
+		if(previewComponentRef.m_SpriteInfo.m_bPaused == false)
+			static_cast<HySprite2d *>(pThisHyNode)->AdvanceAnim((iDESTINATION_FRAME - previewComponentRef.m_SpriteInfo.m_iEntityFrame) * fFRAME_DURATION);
 	}
 
 	// TWEENS
 	for(int iTweenProp = 0; iTweenProp < NUM_TWEENPROPS; ++iTweenProp)
 	{
-		if(tweenInfo[iTweenProp].IsActive())
-			tweenInfo[iTweenProp].ExtrapolateIntoNode(pThisHyNode, iDESTINATION_FRAME, fFRAME_DURATION);
+		if(previewComponentRef.m_TweenInfo[iTweenProp].IsActive())
+			previewComponentRef.m_TweenInfo[iTweenProp].ExtrapolateIntoNode(pThisHyNode, iDESTINATION_FRAME, fFRAME_DURATION);
 	}
 }

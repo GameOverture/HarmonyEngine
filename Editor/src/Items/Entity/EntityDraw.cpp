@@ -396,6 +396,7 @@ void EntityDraw::SetExtrapolatedProperties()
 						  0,
 						  iDESTINATION_FRAME,
 						  entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData],
+						  pRootTreeItemData->GetPreviewComponent(),
 						  m_pCamera);
 
 	// Set the extrapolated properties for all the children items
@@ -412,6 +413,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		{
 			const QMap<int, QJsonObject> &mergedMapRef = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
 			static_cast<SubEntity *>(pEntDrawItem->GetHyNode())->Extrapolate(mergedMapRef,
+																			pEntityTreeItemData->GetPreviewComponent(),
 																			pEntityTreeItemData->IsSelected(),
 																			fFRAME_DURATION,
 																			iDESTINATION_FRAME,
@@ -427,6 +429,7 @@ void EntityDraw::SetExtrapolatedProperties()
 								  0,
 								  iDESTINATION_FRAME,
 								  entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData],
+								  pEntityTreeItemData->GetPreviewComponent(),
 								  m_pCamera);
 		}
 	}

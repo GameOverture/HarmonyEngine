@@ -69,6 +69,10 @@ protected:
 	virtual void mouseDoubleClickEvent(QMouseEvent *pEvent) override;
 	virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;
 
+
+	// TODO: Remove once fixed
+	virtual void wheelEvent(QWheelEvent *pEvent) override { QGraphicsView::wheelEvent(pEvent); };
+
 private:
 	void DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor textColor);
 	void DrawCurrentFrameIndicator(QPainter *pPainter, qreal fPosX, qreal fPosY);
