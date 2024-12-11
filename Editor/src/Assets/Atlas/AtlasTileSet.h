@@ -133,6 +133,10 @@ public:
 	int GetNumTiles() const;
 	QSize GetTileSize() const;
 	void SetTileSize(QSize size);
+	int GetNumCols() const;
+	int GetNumRows() const;
+
+
 	QString GetTileSetInfo() const;
 	QIcon GetTileSetIcon() const;
 

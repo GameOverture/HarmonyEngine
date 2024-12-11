@@ -11,6 +11,9 @@
 #include "AtlasTileSet.h"
 #include "AtlasModel.h"
 #include "TileData.h"
+#include "AtlasPacker.h"
+
+#include <QPainter>
 
 AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 						   QUuid uuid,
@@ -97,6 +100,19 @@ void AtlasTileSet::SetTileSize(QSize size)
 	m_TileSize = size;
 }
 
+
+// NOTE: TileSet atlases are always "square"
+int AtlasTileSet::GetNumCols() const
+{
+	return static_cast<int>(std::floor(std::sqrt(GetNumTiles())));
+}
+
+// NOTE: TileSet atlases are always "square"
+int AtlasTileSet::GetNumRows() const
+{
+	return static_cast<int>(std::ceil(static_cast<double>(GetNumTiles()) / GetNumCols()));
+}
+
 QString AtlasTileSet::GetTileSetInfo() const
 {
 	QString sInfo;
@@ -126,11 +142,36 @@ QVector<int> AtlasTileSet::Cmd_AppendTiles(QSize vTileSize, const QVector<QPixma
 			m_TileSize.setHeight(vTileSize.height());
 	}
 
-	//m_TileDataMap
-
 	QVector<int> appendIndexList;
-	// TODO:
-	//start_here;
+	
+	QList<TileData *> tileListSorted = m_TileDataMap.values();
+	std::sort(tileListSorted.begin(), tileListSorted.end(),
+		[](const TileData *pLhs, const TileData *pRhs) -> bool
+		{
+			return pLhs->m_iAtlasIndex < pRhs->m_iAtlasIndex;
+		});
+	
+	QSize textureSize(GetNumCols() * GetTileSize().width(), GetNumRows() * GetTileSize().height());
+
+	QImage newTexture(textureSize.width(), textureSize.height(), QImage::Format_ARGB32);
+	newTexture.fill(Qt::transparent);
+
+	QPainter p(&newTexture);
+
+	// Iterate through all the tiles and draw them to the blank newTexture
+	for(int i = 0; i < tileListSorted.size(); ++i)
+	{
+		TileData *pTileData = tileListSorted[i];
+
+		QPoint pos(textureSize.width() * (i / GetNumCols()), textureSize.height() * (i % GetNumCols()));
+		
+		// TODO: START HERE!
+		//p.drawImage(pos.x(), pos.y(), QImage(packFrameRef.path), packFrameRef.crop.x(), packFrameRef.crop.y(), packFrameRef.crop.width(), packFrameRef.crop.height());
+	}
+
+	QImage *pTexture = static_cast<QImage *>(p.device());
+	if(false == pTexture->save(GetAbsMetaFilePath()))
+		HyGuiLog("AtlasTileSet::Cmd_AppendTiles failed to generate a PNG sub-atlas", LOGTYPE_Error);
 
 	return appendIndexList;
 }
