@@ -11,6 +11,9 @@
 #include "AtlasTileSet.h"
 #include "AtlasModel.h"
 #include "TileData.h"
+#include "AtlasPacker.h"
+
+#include <QPainter>
 
 AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 						   QUuid uuid,
@@ -97,6 +100,19 @@ void AtlasTileSet::SetTileSize(QSize size)
 	m_TileSize = size;
 }
 
+
+// NOTE: TileSet atlases are always "square"
+int AtlasTileSet::GetNumCols() const
+{
+	return static_cast<int>(std::floor(std::sqrt(GetNumTiles())));
+}
+
+// NOTE: TileSet atlases are always "square"
+int AtlasTileSet::GetNumRows() const
+{
+	return static_cast<int>(std::ceil(static_cast<double>(GetNumTiles()) / GetNumCols()));
+}
+
 QString AtlasTileSet::GetTileSetInfo() const
 {
 	QString sInfo;
@@ -126,10 +142,146 @@ QVector<int> AtlasTileSet::Cmd_AppendTiles(QSize vTileSize, const QVector<QPixma
 			m_TileSize.setHeight(vTileSize.height());
 	}
 
-	//m_TileDataMap
-
 	QVector<int> appendIndexList;
-	// TODO:
+	
+	QList<TileData *> tileListSorted = m_TileDataMap.values();
+	std::sort(tileListSorted.begin(), tileListSorted.end(),
+		[](const TileData *pLhs, const TileData *pRhs) -> bool
+		{
+			return pLhs->m_iAtlasIndex < pRhs->m_iAtlasIndex;
+		});
+	
+	QSize textureSize(GetNumCols() * GetTileSize().width(), GetNumRows() * GetTileSize().height());
+
+	QImage newTexture(textureSize.width(), textureSize.height(), QImage::Format_ARGB32);
+	newTexture.fill(Qt::transparent);
+
+	QPainter p(&newTexture);
+
+	// Iterate through all the tiles and draw them to the blank newTexture
+	for(int i = 0; i < tileListSorted.size(); ++i)
+	{
+		TileData *pTileData = tileListSorted[i];
+
+		QPoint pos(textureSize.width() * (i / GetNumCols()), textureSize.height() * (i % GetNumCols()));
+		p.drawImage(pos.x(), pos.y(), QImage(packFrameRef.path), packFrameRef.crop.x(), packFrameRef.crop.y(), packFrameRef.crop.width(), packFrameRef.crop.height());
+	}
+
+	QImage *pTexture = static_cast<QImage *>(p.device());
+	QDir runtimeBankDir(pBankData->m_sAbsPath);
+
+	switch(texInfo.GetFormat())
+	{
+	case HYTEXTURE_Uncompressed:
+		// Param1: num channels
+		// Param2: disk file type (PNG, ...)
+		switch(texInfo.m_uiFormatParam2)
+		{
+		case HyTextureInfo::UNCOMPRESSEDFILE_PNG:
+			if(false == pTexture->save(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % texInfo.GetFileExt().c_str())))
+				HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a PNG atlas", LOGTYPE_Error);
+			break;
+
+		default:
+			HyGuiLog("AtlasModel::ConstructAtlasTexture unknown uncompressed file type", LOGTYPE_Error);
+			break;
+		}
+		break;
+
+	case HYTEXTURE_DXT: {
+		// Param1: num channels
+		// Param2: DXT format (1,3,5)
+		QImage imgProperlyFormatted = pTexture->convertToFormat(texInfo.m_uiFormatParam1 == 4 ? QImage::Format_RGBA8888 : QImage::Format_RGB888);
+		if(0 == SOIL_save_image_quality(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % texInfo.GetFileExt().c_str()).toStdString().c_str(),
+			SOIL_SAVE_TYPE_DDS,
+			imgProperlyFormatted.width(),
+			imgProperlyFormatted.height(),
+			texInfo.m_uiFormatParam1,
+			imgProperlyFormatted.bits(),
+			0))
+		{
+			HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a DTX5 atlas", LOGTYPE_Error);
+		}
+		break; }
+
+	case HYTEXTURE_ASTC: {
+		// Param1: Block Size index (4x4 -> 12x12)
+		// Param2: Color Profile (LDR linear, LDR sRGB, HDR RGB, HDR RGBA)
+		QString sProgramPath = MainWindow::EngineSrcLocation() % HYGUIPATH_AstcEncDir;
+#if defined(Q_OS_WIN)
+		sProgramPath += "win/astcenc-sse2.exe";
+#elif defined(Q_OS_LINUX)
+		sProgramPath += "linux/astcenc-sse2";
+#else
+		HyGuiLog("ASTC Encoder not found for this platform", LOGTYPE_Error);
+#endif
+
+		QStringList sArgList;
+		switch(texInfo.m_uiFormatParam2)
+		{
+		case 0: sArgList << "-cl"; break; // LDR linear
+		case 1: sArgList << "-cs"; break; // LDR sRGB
+		case 2: sArgList << "-ch"; break; // HDR RGB
+		case 3: sArgList << "-cH"; break; // HDR RGBA
+		default:
+			HyGuiLog("Invalid ASTC Encoder color profile", LOGTYPE_Error);
+			break;
+		}
+
+		// Create temp PNG file to be used
+		QString sTempTexturePath = runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".png");
+		QString sAstcTexturePath = runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % texInfo.GetFileExt().c_str());
+		pTexture->save(sTempTexturePath);
+
+		sArgList << sTempTexturePath;
+		sArgList << sAstcTexturePath;
+
+		switch(texInfo.m_uiFormatParam1)
+		{
+		case 0:  sArgList << "4x4"; break;   // 8.00 bpp
+		case 1:  sArgList << "5x4"; break;   // 6.40 bpp
+		case 2:  sArgList << "5x5"; break;   // 5.12 bpp
+		case 3:  sArgList << "6x5"; break;   // 4.27 bpp
+		case 4:  sArgList << "6x6"; break;   // 3.56 bpp
+		case 5:  sArgList << "8x5"; break;   // 3.20 bpp
+		case 6:  sArgList << "8x6"; break;   // 2.67 bpp
+		case 7:  sArgList << "10x5"; break;  // 2.56 bpp
+		case 8:  sArgList << "10x6"; break;  // 2.13 bpp
+		case 9:  sArgList << "8x8"; break;   // 2.00 bpp
+		case 10: sArgList << "10x8"; break;  // 1.60 bpp
+		case 11: sArgList << "10x10"; break; // 1.28 bpp
+		case 12: sArgList << "12x10"; break; // 1.07 bpp
+		case 13: sArgList << "12x12"; break; // 0.89 bpp
+		default:
+			HyGuiLog("Invalid ASTC Encoder block footprint", LOGTYPE_Error);
+			break;
+		}
+
+		sArgList << "-thorough";
+
+		QProcess astcEncProcess;
+		astcEncProcess.start(sProgramPath, sArgList);
+		if(!astcEncProcess.waitForStarted())
+			HyGuiLog("ASTC Encoder failed to start", LOGTYPE_Error);
+		else
+		{
+			if(!astcEncProcess.waitForFinished(-1))
+				HyGuiLog("ASTC Encoder failed while encoding", LOGTYPE_Error);
+		}
+
+		// Remove the temp texture
+		if(false == QFile::remove(sTempTexturePath))
+			HyGuiLog("Could not remove temp PNG texture when encoding into ASTC: " % sTempTexturePath, LOGTYPE_Warning);
+		break; }
+
+	default:
+		HyGuiLog("AtlasModel::ConstructAtlasTexture tried to create an unsupported texture type: " % QString::number(texInfo.GetFormat()), LOGTYPE_Error);
+		break;
+	}
+
+	return textureSize;
+
+
 
 	return appendIndexList;
 }
