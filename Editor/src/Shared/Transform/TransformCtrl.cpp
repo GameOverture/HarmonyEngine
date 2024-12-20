@@ -51,6 +51,11 @@ TransformCtrl::TransformCtrl(HyEntity2d *pParent) :
 		delete m_GrabPoints[i];
 }
 
+bool TransformCtrl::IsValid() const
+{
+	return m_BoundingVolume.GetShapeType() != HYSHAPE_Nothing;
+}
+
 void TransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera)
 {
 	if(boundingShape.IsValidShape() == false)
@@ -264,7 +269,10 @@ void TransformCtrl::Hide()
 
 void TransformCtrl::GetCentroid(glm::vec2 &ptCenterOut) const
 {
-	m_BoundingVolume.GetCentroid(ptCenterOut);
+	if(IsValid())
+		m_BoundingVolume.GetCentroid(ptCenterOut);
+	else
+		HyGuiLog("TransformCtrl::GetCentroid() called on invalid bounding volume", LOGTYPE_Error);
 }
 
 glm::vec2 TransformCtrl::GetGrabPointWorldPos(GrabPointType eGrabPoint, HyCamera2d *pCamera) const

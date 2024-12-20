@@ -52,6 +52,8 @@ public:
 	TransformCtrl(HyEntity2d *pParent);
 	virtual ~TransformCtrl();
 
+	bool IsValid() const;
+
 	void WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera);
 	void WrapTo(QList<IDrawExItem *> itemDrawList, HyCamera2d *pCamera);
 

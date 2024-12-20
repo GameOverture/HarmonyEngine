@@ -770,7 +770,7 @@ void IDrawEx::GetSnapCandidateList(SnapCandidates &snapCandidatesOut)
 		{
 			for(IDrawExItem *pItem : m_ItemList)
 			{
-				if(pItem->IsSelected() == false)
+				if(pItem->IsSelected() == false && pItem->GetTransformCtrl().IsValid())
 				{
 					glm::vec2 ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(TransformCtrl::GRAB_BotLeft, m_pCamera);
 					snapCandidatesOut.m_HorzSet.insert(ptGrabPt.y);
