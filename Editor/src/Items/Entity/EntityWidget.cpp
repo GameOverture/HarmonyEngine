@@ -363,8 +363,12 @@ void EntityWidget::RequestSelectedItemChange(EntityTreeItemData *pTreeItemData, 
 {
 	EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
 
-	ui->nodeTree->selectionModel()->select(entityTreeModelRef.FindIndex<EntityTreeItemData *>(pTreeItemData, EntityTreeModel::COLUMN_CodeName), flags);
-	ui->nodeTree->selectionModel()->select(entityTreeModelRef.FindIndex<EntityTreeItemData *>(pTreeItemData, EntityTreeModel::COLUMN_ItemPath), flags);
+	QModelIndex index = entityTreeModelRef.FindIndex<EntityTreeItemData *>(pTreeItemData, EntityTreeModel::COLUMN_CodeName);
+	ui->nodeTree->selectionModel()->select(index, flags);
+	
+	index = index.sibling(index.row(), EntityTreeModel::COLUMN_ItemPath); // Using 'index', get the next column over
+	flags = QItemSelectionModel::Select;
+	ui->nodeTree->selectionModel()->select(index, flags);
 }
 
 void EntityWidget::SetExtrapolatedProperties()
