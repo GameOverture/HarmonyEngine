@@ -28,7 +28,7 @@ twitter_username: Game_Overture
 github_username:  GameOverture
 
 # Build settings
-theme: midnight
+theme: jekyll-theme-midnight
 plugins:
   - jekyll-feed
 
