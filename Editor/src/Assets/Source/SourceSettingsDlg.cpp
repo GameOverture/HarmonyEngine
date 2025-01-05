@@ -43,7 +43,7 @@ SourceSettingsDlg::SourceSettingsDlg(const Project &projectRef, QJsonObject sett
 			HyGuiLog("SourceSettingsDlg could not derive absolute dependency path", LOGTYPE_Error);
 
 		WgtSrcDependency *pNewWgtSrcDep = new WgtSrcDependency(this);
-		pNewWgtSrcDep->Set(depObj["ProjectName"].toString(), metaDir.absolutePath());
+		pNewWgtSrcDep->Set(depObj["ProjectName"].toString(), metaDir.absolutePath(), depObj["Options"].toString());
 
 		m_SrcDependencyList.append(pNewWgtSrcDep);
 		ui->lytDependencies->addWidget(pNewWgtSrcDep);
@@ -119,6 +119,7 @@ void SourceSettingsDlg::UpdateMetaObj(QJsonObject &metaObjRef) const
 		QJsonObject srcDepObj;
 		srcDepObj.insert("RelPath", metaDir.relativeFilePath(srcDep->GetAbsPath()));
 		srcDepObj.insert("ProjectName", srcDep->GetProjectName());
+		srcDepObj.insert("Options", srcDep->GetOptions());
 
 		srcDependsArray.append(srcDepObj);
 	}

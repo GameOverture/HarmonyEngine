@@ -31,8 +31,9 @@ public:
 
 	QString GetProjectName() const;
 	QString GetAbsPath() const;
+	QString GetOptions() const;
 
-	void Set(QString sProjectName, QString sDependAbsPath);
+	void Set(QString sProjectName, QString sDependAbsPath, QString sOptions);
 
 	void Refresh();
 

@@ -39,10 +39,16 @@ QString WgtSrcDependency::GetAbsPath() const
 	return m_sAbsSrcDepPath;
 }
 
-void WgtSrcDependency::Set(QString sProjectName, QString sDependAbsPath)
+QString WgtSrcDependency::GetOptions() const
+{
+	return ui->txtOptions->toPlainText();
+}
+
+void WgtSrcDependency::Set(QString sProjectName, QString sDependAbsPath, QString sOptions)
 {
 	ui->txtProjectName->setText(sProjectName);
 	m_sAbsSrcDepPath = sDependAbsPath;
+	ui->txtOptions->setPlainText(sOptions);
 
 	Refresh();
 }

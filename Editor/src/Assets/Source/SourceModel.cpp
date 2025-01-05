@@ -697,6 +697,9 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	{
 		QJsonObject srcDepObj = srcDep.toObject();
 
+		sDependAdd += srcDepObj["Options"].toString();
+		sDependAdd += "\n";
+
 		sDependAdd += "add_subdirectory(\"";
 		sDependAdd += srcDepObj["RelPath"].toString();
 		sDependAdd += "\" \"";
@@ -707,7 +710,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 		sDependAdd += srcDepObj["ProjectName"].toString();
 		sDependAdd += "\" PROPERTIES FOLDER \"";
 		sDependAdd += m_ProjectRef.GetName();
-		sDependAdd += " Libs\")\n";
+		sDependAdd += " Libs\")\n\n";
 	}
 	sContents.replace("%HY_DEPENDENCIES_ADD%", sDependAdd);
 
