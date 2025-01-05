@@ -32,6 +32,7 @@ public:
 	void SetCheckedChangedCallback(std::function<void(HyCheckBox *)> fpCallback);
 
 protected:
+	virtual void OnSetup() override;
 	virtual void OnAssemble() override;
 
 	virtual void OnUiMouseClicked() override;

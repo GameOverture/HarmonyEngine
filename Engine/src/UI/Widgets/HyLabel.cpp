@@ -144,6 +144,7 @@ void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath
 	}
 
 	SetAssembleNeeded();
+	OnSetup();
 }
 
 HyNodePath HyLabel::GetTextNodePath() const
