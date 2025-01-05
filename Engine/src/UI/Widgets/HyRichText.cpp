@@ -372,5 +372,5 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 
 	// Inform everwhere that *this has been updated
 	SetDirty(IHyNode::DIRTY_SceneAABB);
-	SetSizeAndLayoutDirty();
+	//SetSizeAndLayoutDirty();
 }

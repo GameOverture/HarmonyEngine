@@ -70,6 +70,8 @@ void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *
 		m_CheckMarkStroke.SetAsCircle(fRadius);
 		m_CheckMarkFill.SetAsCircle(fRadius - m_Panel.GetFrameStrokeSize());
 	}
+
+	OnSetChecked(IsChecked());
 }
 
 /*virtual*/ void HyRadioButton::OnUiMouseClicked() /*override*/

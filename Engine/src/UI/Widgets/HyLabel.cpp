@@ -495,7 +495,7 @@ bool HyLabel::IsMonospacedDigits() const
 
 /*virtual*/ void HyLabel::OnAssemble() /*override*/
 {
-	SetSizeAndLayoutDirty();
+	//SetSizeAndLayoutDirty();
 
 	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
 	{
@@ -633,7 +633,7 @@ bool HyLabel::IsMonospacedDigits() const
 
 	// Inform everwhere that *this has been updated
 	SetDirty(IHyNode::DIRTY_SceneAABB);
-	SetSizeAndLayoutDirty();
+	//SetSizeAndLayoutDirty();
 }
 
 /*virtual*/ glm::ivec2 HyLabel::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/

@@ -63,6 +63,8 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *)> fpC
 		m_CheckMarkStroke.SetAsCircle(fRadius);
 		m_CheckMarkFill.SetAsCircle(fRadius - m_Panel.GetFrameStrokeSize());
 	}
+
+	OnSetChecked(IsChecked());
 }
 
 /*virtual*/ void HyCheckBox::OnUiMouseClicked() /*override*/

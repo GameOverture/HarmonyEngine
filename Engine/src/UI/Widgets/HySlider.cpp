@@ -338,7 +338,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *)> fpCallbac
 	m_BarFill.m_BarNeg.pos.GetAnimFloat(eOrientation) = fLocalSliderPos;
 	m_BarFill.m_BarNeg.scale.GetAnimFloat(eOrientation) = m_fLength - fLocalSliderPos;
 
-	SetSizeAndLayoutDirty();
+	//SetSizeAndLayoutDirty();
 }
 
 /*virtual*/ glm::vec2 HySlider::GetPosOffset() /*override*/
