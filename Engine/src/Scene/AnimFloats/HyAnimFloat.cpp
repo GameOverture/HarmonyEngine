@@ -147,7 +147,7 @@ void HyAnimFloat::Updater(std::function<float(float)> fpUpdaterFunc)
 	m_fpAnimFunc = fpUpdaterFunc;
 	m_fElapsedTime = 0.0f;
 	m_fpBehaviorUpdate = &HyAnimFloat::_Updater;
-	m_fpAnimFinishedFunc = nullptr;
+	m_fpAnimFinishedFunc = NullFinishedCallback;
 
 	m_OwnerRef.InsertActiveAnimFloat(this);
 }
@@ -164,7 +164,7 @@ void HyAnimFloat::Displace(float fMagnitude)
 		m_fpAnimFunc = nullptr;
 		m_fElapsedTime = 0.0f;
 		m_fpBehaviorUpdate = &HyAnimFloat::_Displace;
-		m_fpAnimFinishedFunc = nullptr;
+		m_fpAnimFinishedFunc = NullFinishedCallback;
 
 		m_OwnerRef.InsertActiveAnimFloat(this);
 	}

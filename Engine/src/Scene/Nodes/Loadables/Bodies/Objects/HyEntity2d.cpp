@@ -16,6 +16,7 @@
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyBody2d(HYTYPE_Entity, HyNodePath(), pParent),
 	m_uiAttribs(0),
+	m_fpDeferFinishedFunc(nullptr),
 	physics(*this)
 {
 }
@@ -24,6 +25,7 @@ HyEntity2d::HyEntity2d(HyEntity2d &&donor) noexcept :
 	IHyBody2d(std::move(donor)),
 	m_ChildList(std::move(donor.m_ChildList)),
 	m_uiAttribs(std::move(donor.m_uiAttribs)),
+	m_fpDeferFinishedFunc(std::move(donor.m_fpDeferFinishedFunc)),
 	physics(*this)
 {
 }
@@ -588,6 +590,12 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 		sm_pHyAssets->SetEntityLoaded(this);
 }
 
+void HyEntity2d::Defer(float fTime, std::function<void(HyEntity2d *)> fpFunc)
+{
+	m_fDeferAmt = fTime;
+	m_fpDeferFinishedFunc = fpFunc;
+}
+
 bool HyEntity2d::IsRegisteredAssembleEntity() const
 {
 	return (m_uiAttribs & ENTITYATTRIB_IsRegisteredAssemble);
@@ -645,6 +653,17 @@ void HyEntity2d::Assemble()
 /*virtual*/ void HyEntity2d::Update() /*override*/
 {
 	IHyBody2d::Update();
+
+	if(m_fpDeferFinishedFunc)
+	{
+		m_fDeferAmt -= HyEngine::DeltaTime();
+		if(m_fDeferAmt <= 0.0f)
+		{
+			m_fpDeferFinishedFunc(this);
+			m_fpDeferFinishedFunc = nullptr;
+			m_fDeferAmt = 0.0f;
+		}
+	}
 
 	if(IsMouseInputEnabled())
 	{

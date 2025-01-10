@@ -37,6 +37,9 @@ protected:
 	};
 	uint32									m_uiAttribs;			// TODO: Rename this to 'm_uiEntityAttribs'
 
+	float									m_fDeferAmt;
+	std::function<void(HyEntity2d *)>		m_fpDeferFinishedFunc;
+
 public:
 	HyPhysicsCtrl2d							physics;				// Optional physics component
 
@@ -125,6 +128,9 @@ public:
 	// LOAD/UNLOAD ALL CHILDREN
 	virtual void Load() override;
 	virtual void Unload() override;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	void Defer(float fTime, std::function<void(HyEntity2d *)> fpFunc);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// OPTIONAL ASSEMBLE (post-update) STEP
