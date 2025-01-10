@@ -17,6 +17,7 @@
 #include <iomanip>
 #include <filesystem>
 #include <cwctype>
+#include <regex>
 
 /*static*/ HyStorage HyIO::SessionStorage(true);
 /*static*/ HyStorage HyIO::LocalStorage(false);
@@ -563,6 +564,24 @@
 	}
 
 	return ssDecoded.str();
+}
+
+/*static*/ std::string HyIO::HtmlDecode(std::string sString)
+{
+	// Remove all HTML tags
+	sString = std::regex_replace(sString, std::regex("<[^>]*>"), "");
+
+	// Replace all HTML entities
+	sString = std::regex_replace(sString, std::regex("&quot;"), "\"");
+	sString = std::regex_replace(sString, std::regex("&amp;"), "&");
+	sString = std::regex_replace(sString, std::regex("&lt;"), "<");
+	sString = std::regex_replace(sString, std::regex("&gt;"), ">");
+	sString = std::regex_replace(sString, std::regex("&nbsp;"), " ");
+	sString = std::regex_replace(sString, std::regex("&copy;"), "(c)");
+	sString = std::regex_replace(sString, std::regex("&reg;"), "(r)");
+	sString = std::regex_replace(sString, std::regex("&trade;"), "(tm)");
+
+	return sString;
 }
 
 /*static*/ bool HyIO::SaveImage_DTX5(const char *szFilename, int iWidth, int iHeight, const unsigned char *const pUncompressedPixelData)

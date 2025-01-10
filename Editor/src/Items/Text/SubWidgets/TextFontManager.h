@@ -65,7 +65,7 @@ class TextFontManager
 			m_pTextureFont = texture_font_new_from_file(pFtglAtlas, fSize, sFontFilePath.toStdString().c_str());
 			if(m_pTextureFont == nullptr)
 			{
-				HyGuiLog("Could not create freetype font from: " % sFontFilePath, LOGTYPE_Error);
+				HyGuiLog("Could not create freetype font from: " % sFontFilePath, LOGTYPE_Warning);
 				return;
 			}
 

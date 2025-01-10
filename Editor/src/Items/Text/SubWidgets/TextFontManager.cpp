@@ -312,7 +312,7 @@ void TextFontManager::SetFont(TextLayerHandle hLayer, QString sFontName)
 	}
 	if(iFontIndex < 0)
 	{
-		HyGuiLog("TextFontManager::SetFont failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
+		//HyGuiLog("TextFontManager::SetFont failed to create preview font. Error code: " % QString::number(iFontIndex), LOGTYPE_Error);
 		return;
 	}
 
@@ -539,6 +539,8 @@ int TextFontManager::CreatePreviewFont(QString sFontName, rendermode_t eRenderMo
 		fSize,
 		fOutlineThickness,
 		eRenderMode);
+	if(pNewPreviewFont->GetTextureFont() == nullptr)
+		return TEXTFONTERROR_FontNotFound;
 
 	if(pNewPreviewFont->GetMissedGlyphs() > 0)
 	{
@@ -620,7 +622,7 @@ void TextFontManager::RegenFontArray()
 		bool bFontUsed = false;
 		for(auto iterLayer = m_LayerMap.begin(); iterLayer != m_LayerMap.end(); ++iterLayer)
 		{
-			if(iterLayer.value()->m_iFontIndex == iFontIndex)
+			if(iterLayer.value()->m_iFontIndex == iFontIndex && m_PreviewFontList[iFontIndex]->GetTextureFont() != nullptr)
 			{
 				iterLayer.value()->m_fLineHeight = m_PreviewFontList[iFontIndex]->GetTextureFont()->height;
 				iterLayer.value()->m_fLineAscender = m_PreviewFontList[iFontIndex]->GetTextureFont()->ascender;
@@ -667,6 +669,8 @@ void TextFontManager::RegenFontArray()
 	for(int i = 0; i < m_PreviewFontList.count(); ++i)
 	{
 		texture_font_t *pFtglFont = m_PreviewFontList[i]->GetTextureFont();
+		if(pFtglFont == nullptr)
+			continue;
 
 		QJsonObject stageObj;
 		QFileInfo fontFileInfo(pFtglFont->filename);

@@ -50,6 +50,8 @@ public:
 	static std::string UrlEncode(std::string sString);
 	static std::string UrlDecode(std::string sString);
 
+	static std::string HtmlDecode(std::string sString);
+
 	static bool SaveImage_DTX5(const char *szFilename, int iWidth, int iHeight, const unsigned char *const pUncompressedPixelData);
 	static bool SaveImage_DTX1(const char *szFilename, int iWidth, int iHeight, const unsigned char *const pUncompressedPixelData);
 };

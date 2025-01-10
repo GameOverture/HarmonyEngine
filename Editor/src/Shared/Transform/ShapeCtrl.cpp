@@ -236,6 +236,9 @@ QString ShapeCtrl::Serialize()
 	HyShape2d shape;
 	m_BoundingVolume.CalcLocalBoundingShape(shape);
 
+	if(shape.GetB2Shape() == nullptr)
+		return "";
+
 	QList<float> floatList;
 	switch(m_eShape)
 	{
@@ -291,6 +294,9 @@ QString ShapeCtrl::Serialize()
 
 void ShapeCtrl::Deserialize(QString sData, HyCamera2d *pCamera)
 {
+	if(sData.isEmpty())
+		return;
+
 	QStringList sFloatList = sData.split(',', Qt::SkipEmptyParts);
 
 	m_DeserializedFloatList.clear();
