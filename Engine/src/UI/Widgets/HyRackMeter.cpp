@@ -43,7 +43,7 @@ HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNod
 {
 }
 
-int64 HyRackMeter::GetValue()
+int64 HyRackMeter::GetValue() const
 {
 	return m_iTargetValue;
 }

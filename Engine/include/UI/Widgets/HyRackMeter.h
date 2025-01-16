@@ -74,7 +74,7 @@ public:
 	HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
 	virtual ~HyRackMeter();
 
-	int64 GetValue();
+	int64 GetValue() const;
 	void SetValue(int64 iValue, float fRackDuration);
 	void OffsetValue(int64 iOffsetAmt, float fRackDuration);
 
