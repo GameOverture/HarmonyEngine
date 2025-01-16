@@ -450,6 +450,7 @@ public:
 	static const HyColor Black;
 	static const HyColor Red;
 	static const HyColor DarkRed;
+	static const HyColor Pink;
 	static const HyColor Green;
 	static const HyColor DarkGreen;
 	static const HyColor Blue;

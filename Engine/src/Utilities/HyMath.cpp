@@ -14,6 +14,7 @@ const HyColor HyColor::White(0xffffff);
 const HyColor HyColor::Black(0x000000);
 const HyColor HyColor::Red(0xff0000);
 const HyColor HyColor::DarkRed(0x800000);
+const HyColor HyColor::Pink(0xff49ce);
 const HyColor HyColor::Green(0xff00);
 const HyColor HyColor::DarkGreen(0x008000);
 const HyColor HyColor::Blue(0xff);
