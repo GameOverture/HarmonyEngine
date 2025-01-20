@@ -596,6 +596,11 @@ void HyEntity2d::Defer(float fTime, std::function<void(HyEntity2d *)> fpFunc)
 	m_fpDeferFinishedFunc = fpFunc;
 }
 
+bool HyEntity2d::IsDeferring() const
+{
+	return m_fpDeferFinishedFunc != nullptr;
+}
+
 bool HyEntity2d::IsRegisteredAssembleEntity() const
 {
 	return (m_uiAttribs & ENTITYATTRIB_IsRegisteredAssemble);

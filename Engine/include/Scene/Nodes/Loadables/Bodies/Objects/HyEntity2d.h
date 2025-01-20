@@ -76,6 +76,7 @@ public:
 	virtual void ClearStencil(bool bUseParentStencil) override;
 	void ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren);
 
+	// TODO: Rename this to UseSceneCoordinates
 	virtual void UseCameraCoordinates() override;
 	void UseCameraCoordinates(bool bOverrideExplicitChildren);
 
@@ -131,6 +132,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void Defer(float fTime, std::function<void(HyEntity2d *)> fpFunc);
+	bool IsDeferring() const;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// OPTIONAL ASSEMBLE (post-update) STEP

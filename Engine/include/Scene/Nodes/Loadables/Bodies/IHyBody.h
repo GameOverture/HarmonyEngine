@@ -41,7 +41,7 @@ public:
 	virtual void ClearStencil(bool bUseParentStencil);
 
 	int32 GetCoordinateSystem() const;
-	virtual void UseCameraCoordinates();
+	virtual void UseCameraCoordinates(); // TODO: Rename this to UseSceneCoordinates
 	virtual void UseWindowCoordinates(int32 iWindowIndex = 0);
 
 	// Synonym for UseCameraCoordinates() & UseWindowCoordinates()
