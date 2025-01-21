@@ -24,6 +24,9 @@ public:
 
 	bool IsRunning() const;
 	double TimeElapsed() const;
+
+	void SetElapsedTime(double dSeconds);
+	void OffsetElapsedTime(double dSeconds);
 	
 	virtual std::string ToString() const = 0;
 

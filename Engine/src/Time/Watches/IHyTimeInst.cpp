@@ -34,6 +34,18 @@ double IHyTimeInst::TimeElapsed() const
 	return m_dElapsedTime;
 }
 
+void IHyTimeInst::SetElapsedTime(double dSeconds)
+{
+	m_dElapsedTime = dSeconds;
+}
+
+void IHyTimeInst::OffsetElapsedTime(double dSeconds)
+{
+	m_dElapsedTime += dSeconds;
+	if(m_dElapsedTime < 0.0)
+		m_dElapsedTime = 0.0;
+}
+
 void IHyTimeInst::Update(double dDelta)
 {
 	m_dElapsedTime += dDelta;
