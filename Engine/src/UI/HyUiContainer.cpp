@@ -465,6 +465,24 @@ bool HyUiContainer::RemoveLayout(HyLayoutHandle hLayout)
 	return false;
 }
 
+int32 HyUiContainer::GetDefaultWidgetSpacing() const
+{
+	return m_iDefaultWidgetSpacing;
+}
+
+void HyUiContainer::SetDefaultWidgetSpacing(int32 iSpacing, bool bSetRootLayout)
+{
+	m_iDefaultWidgetSpacing = iSpacing;
+	if(bSetRootLayout)
+	{
+		m_RootLayout.SetMargins(m_RootLayout.GetMargins().left,
+								m_RootLayout.GetMargins().bottom,
+								m_RootLayout.GetMargins().right,
+								m_RootLayout.GetMargins().top,
+								m_iDefaultWidgetSpacing);
+	}
+}
+
 void HyUiContainer::ClearItems()
 {
 	IHyWidget *pFocusedWidget = GetFocusedWidget();

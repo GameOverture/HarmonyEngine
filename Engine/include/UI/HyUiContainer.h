@@ -98,6 +98,9 @@ public:
 	bool SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 	bool SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 	bool RemoveLayout(HyLayoutHandle hLayout);
+
+	int32 GetDefaultWidgetSpacing() const;
+	void SetDefaultWidgetSpacing(int32 iSpacing, bool bSetRootLayout);
 	
 	void ClearItems();
 
