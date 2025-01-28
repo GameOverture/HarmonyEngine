@@ -33,7 +33,7 @@ public:
 		m_iFusedNodeChildIndex(0)
 	{ }
 
-	HyEntityWrapper2d(const char *szLeafPrefix, const char *szLeafName, HyEntity2d *pParent = nullptr) :
+	HyEntityWrapper2d(const char *szLeafPrefix, const char *szLeafName, HyEntity2d *pParent) :
 		HyEntity2d(pParent),
 		m_iFusedNodeChildIndex(0)
 	{

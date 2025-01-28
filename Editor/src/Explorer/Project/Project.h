@@ -20,6 +20,7 @@
 #include <QQueue>
 #include <QJsonObject>
 #include <QStandardItemModel>
+#include <QFileSystemWatcher>
 
 // Forward declaration
 class SourceModel;
@@ -80,6 +81,8 @@ class Project : public ExplorerItemData
 
 	QSet<IManagerModel *>								m_DirtyManagerSet;		// Dirty managers that need to SaveMeta() & SaveData() before a ReloadHarmony()
 	QSet<ProjectItemData *>								m_DirtyProjItemSet;		// Dirty items that need to be resaved before a ReloadHarmony()
+
+	QFileSystemWatcher									m_OpenFileWatcher;		// Watches for source control pulls, which require reloading the project (otherwise saving in current state would overwrite and lose those changes)
 
 	bool												m_bHasError;
 	bool												m_bExplorerModelLoaded;
@@ -195,7 +198,7 @@ private:
 	void WriteGameData();
 	void WriteMetaData();
 
-	bool LoadDataObj(QString sFilePath, QJsonObject &dataObjRef);	// Return 'true' if the data obj should save to disk
+	bool LoadDataObj(QString sFilePath, QJsonObject &dataObjRef);	// Return 'true' if the data obj needs to save to disk
 	void DeleteItemInDataObj(ItemType eType, QString sPath, QJsonObject &dataObjRef);
 	void RenameItemInDataObj(ItemType eType, QString sOldPath, QString sNewPath, QJsonObject &dataObjRef);
 	void RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObject &dataObjRef);

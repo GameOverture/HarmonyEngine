@@ -277,8 +277,8 @@ void WgtCodeEditor::OnFileChanged(const QString &sFilePath)
 		QFileInfo openFileInfo(openFileRef.m_pSourceFile->GetAbsMetaFilePath());
 		if(changedFileInfo == openFileInfo)
 		{
-			int iDlgReturn = QMessageBox::question(nullptr, "File Changed", "The file " % changedFileInfo.fileName() % " has changed on disk. Do you want to reload it?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
-			if(iDlgReturn == QMessageBox::Yes)
+			//int iDlgReturn = QMessageBox::question(nullptr, "File Changed", "The file " % changedFileInfo.fileName() % " has changed on disk. Do you want to reload it?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+			//if(iDlgReturn == QMessageBox::Yes)
 				Reload(openFileRef.m_pSourceFile);
 			
 			bFoundInOpenList = true;

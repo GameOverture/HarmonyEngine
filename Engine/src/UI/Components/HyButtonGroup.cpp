@@ -127,6 +127,7 @@ bool HyButtonGroup::RemoveButton(HyButton &buttonRef)
 		{
 			int32 iDeletedBtnId = iter->first;
 			m_ButtonMap.erase(iter);
+			buttonRef.m_pButtonGroup = nullptr;
 
 			// If this deleted button was the 'exclusive checked button', Find a new button to be the exclusive checked button
 			if(iDeletedBtnId == m_iExclusiveCheckedId)

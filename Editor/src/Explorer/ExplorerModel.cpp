@@ -342,6 +342,8 @@ bool ExplorerModel::AddMimeItem(const ProjectItemMimeData *pProjMimeData, Qt::Dr
 	return true;
 }
 
+
+
 bool ExplorerModel::RemoveItem(ExplorerItemData *pItem)
 {
 	QModelIndex index = FindIndex<ExplorerItemData *>(pItem, 0);

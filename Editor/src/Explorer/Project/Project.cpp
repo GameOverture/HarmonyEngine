@@ -185,6 +185,8 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 		m_FontListModel.appendRow(pFontItem);
 	}
 
+	QObject::connect(&m_OpenFileWatcher, SIGNAL(fileChanged(const QString &)), this, SLOT(OnFileChanged(const QString &)));
+
 	ScanMetaFontDir();
 	HyGlobal::CleanAllTempDirs(*this);
 }
@@ -810,6 +812,7 @@ void Project::DeleteItemData(ItemType eType, QString sPath, bool bWriteToDisk)
 	}
 }
 
+// Return 'true' if the data obj needs to save to disk
 bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
 {
 	QFile dataFile(sFilePath);
@@ -817,7 +820,7 @@ bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
 	{
 		if(!dataFile.open(QIODevice::ReadOnly))
 		{
-			HyGuiLog("Project::LoadExplorerModel() could not open " % m_sName % "'s " % QFileInfo(sFilePath).fileName() % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
+			HyGuiLog("Project::LoadDataObj() could not open " % m_sName % "'s " % QFileInfo(sFilePath).fileName() % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
 			m_bHasError = true;
 			return false; // Don't write with invalid object
 		}

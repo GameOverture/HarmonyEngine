@@ -58,6 +58,8 @@ HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath,
 
 /*virtual*/ HyButton::~HyButton()
 {
+	if(m_pButtonGroup)
+		m_pButtonGroup->RemoveButton(*this);
 }
 
 /*virtual*/ bool HyButton::IsDepressed() const /*override*/

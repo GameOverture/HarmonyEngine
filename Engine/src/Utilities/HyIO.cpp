@@ -488,8 +488,17 @@
 /*static*/ void HyIO::WriteTextFile(const char *szFilePath, const char *szContentBuffer)
 {
 	std::ofstream outfile(szFilePath);
+	// Error check
+	if(outfile.fail())
+	{
+		HyLogError("HyIO::WriteTextFile - Failed to open file: " << szFilePath);
+		outfile.close();
+		return;
+	}
+
 	outfile.write(szContentBuffer, strlen(szContentBuffer));
 	outfile.close();
+	HyLog("HyIO::WriteTextFile - Wrote " << strlen(szContentBuffer) << " bytes to " << szFilePath);
 }
 
 /*static*/ std::string HyIO::UrlEncode(std::string sStr)
