@@ -28,7 +28,7 @@ public:
 
 	SpriteFrame(AtlasFrame *pFrame) :
 		m_pFrame(pFrame),
-		m_vOffset(0, 0),
+		m_vOffset(m_pFrame->GetSize().width() * -0.5f, m_pFrame->GetSize().height() * -0.5f),
 		m_fDuration(1.0f / 30.0f)
 	{ }
 };
