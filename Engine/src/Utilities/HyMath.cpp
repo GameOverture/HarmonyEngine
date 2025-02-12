@@ -22,7 +22,7 @@ const HyColor HyColor::DarkBlue(0x000080);
 const HyColor HyColor::Cyan(0xffff);
 const HyColor HyColor::DarkCyan(0x008080);
 const HyColor HyColor::Magenta(0xff00ff);
-const HyColor HyColor::DarkMagenta(0x800080);
+const HyColor HyColor::Purple(0x811CF6);
 const HyColor HyColor::Yellow(0xffff00);
 const HyColor HyColor::DarkYellow(0x808000);
 const HyColor HyColor::Gray(0xa0a0a4);

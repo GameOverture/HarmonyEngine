@@ -458,7 +458,7 @@ public:
 	static const HyColor Cyan;
 	static const HyColor DarkCyan; // Teal
 	static const HyColor Magenta;
-	static const HyColor DarkMagenta; // Purple
+	static const HyColor Purple;
 	static const HyColor Yellow;
 	static const HyColor DarkYellow;
 	static const HyColor Gray;
