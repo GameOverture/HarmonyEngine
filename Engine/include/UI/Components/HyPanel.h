@@ -37,7 +37,8 @@ struct HyPanelInit
 	HyPanelInit(uint32 uiWidth, uint32 uiHeight);
 
 	// Constructs a 'NodeItem' panel. The widget may use the node's width/height to size itself or it's ignored if nodePath is invalid
-	HyPanelInit(HyType eBodyType, const HyNodePath &nodePath);
+	HyPanelInit(HyType eNodeType, const HyNodePath &nodePath);
+	HyPanelInit(HyType eNodeType, const HyNodePath &nodePath, uint32 uiWidth, uint32 uiHeight);
 
 	// Constructs a 'Primitive' panel. Default HyColor values of 0xDEADBEEF will be set to a default color determined by the widget
 	// Passing '0' for width/height will try to auto-size based on the widget if applicable (or it will be hidden)
@@ -48,6 +49,8 @@ struct HyPanelInit
 // Not exposed because IHyWidget's handles modifications. IHyWidget's may have multiple HyPanel's, but they all have one main one 'm_Panel'
 class HyPanel : public HyEntity2d
 {
+	HyType						m_eNodeType;
+
 	glm::ivec2					m_vSizeHint;	// When BV or Primitive, holds the specified size this panel should be
 	glm::ivec2					m_vSizeActual;	// The current size of this panel, potentially after scaling, etc.
 
@@ -76,8 +79,15 @@ class HyPanel : public HyEntity2d
 			m_bIsContainer(false)
 		{ }
 	};
-	PrimParts *					m_pPrimParts;	// Only dynamically allocated when 'Primitive' panel type. Otherwise nullptr
-	IHyBody2d *					m_pNodeItem;	// Only dynamically allocated when 'NodeItem' panel type. Otherwise nullptr
+	union PanelData
+	{
+		PrimParts *				m_pPrimParts;	// Only dynamically allocated when 'Primitive' panel type. Otherwise nullptr
+		IHyBody2d *				m_pNodeItem;	// Only dynamically allocated when 'NodeItem' panel type. Otherwise nullptr
+		HyShape2d *				m_pBoundingVolumeShape;
+		PanelData() : m_pPrimParts(nullptr)
+		{ }
+	};
+	PanelData					m_PanelData;
 
 public:
 	HyPanel(HyEntity2d *pParent);
@@ -100,6 +110,7 @@ public:
 	void SetSizeDimension(int32 iDimensionIndex, uint32 uiSize);	// This is for widgets who programmatically choose between vertical or horizontal sizing
 
 	bool IsBoundingVolume() const;
+	HyShape2d *GetBvShape() const;
 
 	bool IsNode() const;
 	IHyBody2d *GetNode();
@@ -114,6 +125,8 @@ public:
 
 protected:
 	void ConstructPrimitives();
+
+	void DeleteData();
 };
 
 #endif /* HyPanel_h__ */

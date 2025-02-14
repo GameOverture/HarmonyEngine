@@ -38,6 +38,7 @@
 #include "UI/Widgets/HyCheckBox.h"
 #include "UI/Widgets/HyRadioButton.h"
 #include "UI/Widgets/HyComboBox.h"
+#include "UI/Widgets/HyDividerLine.h"
 #include "UI/Widgets/HyLineEdit.h"
 #include "UI/Widgets/HyRackMeter.h"
 #include "UI/Widgets/HyBarMeter.h"

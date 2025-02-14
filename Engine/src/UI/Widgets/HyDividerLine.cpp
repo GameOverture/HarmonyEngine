@@ -21,6 +21,8 @@ HyDividerLine::HyDividerLine(HyOrientation eOrientation, float fThickness, HyCol
 		m_Panel.Setup(HyPanelInit(0, 1, fThickness, eColor, eColor));
 	else
 		m_Panel.Setup(HyPanelInit(1, 0, fThickness, eColor, eColor));
+
+	m_SizePolicies[GetOrientation()] = HYSIZEPOLICY_Expanding;
 }
 
 /*virtual*/ HyDividerLine::~HyDividerLine()
@@ -52,4 +54,20 @@ void HyDividerLine::SetThickness(float fThickness)
 
 /*virtual*/ void HyDividerLine::OnAssemble() /*override*/
 {
+}
+
+/*virtual*/ glm::vec2 HyDividerLine::GetPosOffset() /*override*/
+{
+	return glm::vec2(0.0f);
+}
+
+/*virtual*/ void HyDividerLine::OnSetSizeHint() /*override*/
+{
+	m_vSizeHint = m_Panel.GetPanelSizeHint();
+}
+
+/*virtual*/ glm::ivec2 HyDividerLine::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
+{
+	m_Panel.SetSize(uiNewWidth, uiNewHeight);
+	return glm::ivec2(uiNewWidth, uiNewHeight);
 }

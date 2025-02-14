@@ -162,7 +162,7 @@ void WgtCodeEditor::Reload(SourceFile *pSrcFile)
 				openFileRef.m_pCodeEditor->document()->setModified(false);
 			}
 			else
-				HyGuiLog("WgtCodeEditor::Reload failed to open file: " % openFileRef.m_pSourceFile->GetAbsMetaFilePath(), LOGTYPE_Error);
+				HyGuiLog("WgtCodeEditor::Reload failed to open file: " % openFileRef.m_pSourceFile->GetAbsMetaFilePath(), LOGTYPE_Debug);
 
 			break;
 		}

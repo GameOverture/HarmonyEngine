@@ -500,6 +500,7 @@ bool HyEntity2d::ShapeRemove(HyShape2d &childShapeRef)
 	if(physics.m_pBody == nullptr)
 		return false;
 
+	bool bFixtureRemoved = false;
 	for(b2Fixture *pFixture = physics.m_pBody->GetFixtureList(); pFixture != nullptr; pFixture = pFixture->GetNext())
 	{
 		HyShape2d *pShape = reinterpret_cast<HyShape2d *>(pFixture->GetUserData().pointer);
@@ -507,7 +508,18 @@ bool HyEntity2d::ShapeRemove(HyShape2d &childShapeRef)
 		{
 			physics.m_pBody->DestroyFixture(pFixture);
 			childShapeRef.m_pFixture = nullptr;
-			return true;
+			bFixtureRemoved = true;
+		}
+	}
+	if(bFixtureRemoved == false)
+		HyLogError("HyEntity2d::ShapeRemove failed to find fixture to remove");
+
+	for(auto iter = m_ShapeList.begin(); iter != m_ShapeList.end(); ++iter)
+	{
+		if(*iter == &childShapeRef)
+		{
+			m_ShapeList.erase(iter);
+			return bFixtureRemoved;
 		}
 	}
 

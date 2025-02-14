@@ -203,7 +203,8 @@ void HyFileAtlas::DeletePixelData()
 			memcpy(m_pGfxApiPixelBuffer, m_pPixelData, m_uiPixelDataSize);
 		}
 
-		HyAssert(m_pPixelData != nullptr, "HyFileAtlas failed to load image data");
+		if(m_pPixelData == nullptr)
+			HyLogError("HyFileAtlas failed to load image data: " << sAtlasFilePath);
 	}
 
 	m_Mutex_PixelData.unlock();
@@ -214,8 +215,10 @@ void HyFileAtlas::DeletePixelData()
 	m_Mutex_PixelData.lock();
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		HyAssert(m_iWidth > 0 && m_iHeight > 0, "HyFileAtlas::OnRenderThread() - Texture dimensions are invalid");
-		m_hTextureHandle = rendererRef.AddTexture(m_TextureInfo, m_iWidth, m_iHeight, m_pPixelData, m_uiPixelDataSize, m_hGfxApiPbo);
+		if(m_iWidth > 0 && m_iHeight > 0)
+			m_hTextureHandle = rendererRef.AddTexture(m_TextureInfo, m_iWidth, m_iHeight, m_pPixelData, m_uiPixelDataSize, m_hGfxApiPbo);
+		else
+			HyLogError("HyFileAtlas::OnRenderThread() - Texture was invalid");
 		DeletePixelData();
 	}
 	else // GetLoadableState() == HYLOADSTATE_Discarded

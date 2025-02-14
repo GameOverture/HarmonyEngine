@@ -127,6 +127,10 @@ void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath
 void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins)
 {
 	m_Panel.Setup(panelInit);
+
+	if(m_Panel.IsBoundingVolume() && m_Panel.GetBvShape())
+		ShapeAppend(*m_Panel.GetBvShape());
+
 	m_Text.Init(textNodePath, this);
 	m_TextMargins = textMargins;
 

@@ -194,7 +194,7 @@
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointFill] = HyColor::Blue.Lighten();
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointSelectedOutline] = HyColor::White;
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointSelectedFill] = HyColor::Blue.Lighten();
-	sm_EditorColors[EDITORCOLOR_Shape] = HyColor::DarkMagenta;
+	sm_EditorColors[EDITORCOLOR_Shape] = HyColor::Purple;
 	sm_EditorColors[EDITORCOLOR_ShapeGrabPointOutline] = HyColor::White;
 	sm_EditorColors[EDITORCOLOR_ShapeGrabPointFill] = HyColor::Red;
 	sm_EditorColors[EDITORCOLOR_ShapeGrabPointSelectedOutline] = HyColor::Red;

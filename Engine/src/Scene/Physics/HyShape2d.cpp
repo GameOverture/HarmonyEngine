@@ -43,6 +43,9 @@ HyShape2d::HyShape2d(const HyShape2d &copyRef) :
 
 /*virtual*/ HyShape2d::~HyShape2d()
 {
+	if(m_pParent)
+		m_pParent->ShapeRemove(*this);
+
 	delete m_pShape;
 	delete m_pInit;
 }

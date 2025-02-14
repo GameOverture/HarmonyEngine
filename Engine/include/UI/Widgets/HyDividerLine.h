@@ -15,6 +15,8 @@
 
 class HyDividerLine : public IHyWidget
 {
+	HyPrimitive2d							m_Line;
+
 protected:
 	enum WidgetAttributes
 	{
@@ -38,6 +40,10 @@ public:
 protected:
 	virtual void OnAssemble() override;
 	//virtual void OnPanelUpdated() { }				// Invoked whenever m_Panel is modified
+
+	virtual glm::vec2 GetPosOffset() override;										// What offset is needed to get *this oriented to its bottom left
+	virtual void OnSetSizeHint() override;											// Sets the preferred size of *this into 'm_vSizeHint'
+	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;	// Returns the size *this was actually set to (which may be different than what's passed in due to constraints)
 };
 
 #endif /* HyDividerLine_h__ */
