@@ -136,7 +136,13 @@ void HyLayout::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, 
 {
 	m_Margins.Set(iLeft, iBottom, iRight, iTop);
 	m_iWidgetSpacing = iWidgetSpacing;
-	
+	SetLayoutDirty();
+}
+
+void HyLayout::SetMargins(const HyMargins<int16> &newMargins, int32 iWidgetSpacing)
+{
+	m_Margins = newMargins;
+	m_iWidgetSpacing = iWidgetSpacing;
 	SetLayoutDirty();
 }
 

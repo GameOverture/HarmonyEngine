@@ -258,6 +258,29 @@ IHyWidget *HyUiContainer::FocusNextWidget(bool bForwardDirection)
 	return pNewFocusedWidget;
 }
 
+glm::vec2 HyUiContainer::GetWidgetPos(IHyWidget &widgetRef)
+{
+	glm::vec2 vPos = widgetRef.pos.Get();
+
+	for(auto iter = m_SubLayoutMap.begin(); iter != m_SubLayoutMap.end(); ++iter)
+	{
+		if(iter->second->ChildExists(widgetRef))
+		{
+			HyEntity2d *pCurLayout = iter->second;
+			
+			// Add together each "parent" layout
+			// Propagate upward if this is nested in another layout
+			while(pCurLayout && (pCurLayout->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+			{
+				vPos += pCurLayout->pos.Get();
+				pCurLayout = pCurLayout->ParentGet();
+			}
+		}
+	}
+	
+	return vPos;
+}
+
 bool HyUiContainer::InsertWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto /*= HY_UNUSED_HANDLE*/)
 {
 	bool bSuccess = false;

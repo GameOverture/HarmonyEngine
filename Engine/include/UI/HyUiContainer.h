@@ -84,6 +84,7 @@ public:
 	void SetInputAllowed(bool bEnable);
 	IHyWidget *GetFocusedWidget();
 	IHyWidget *FocusNextWidget(bool bForwardDirection);
+	glm::vec2 GetWidgetPos(IHyWidget &widgetRef);
 
 	bool InsertWidget(IHyWidget &widgetRef, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 	bool RemoveWidget(IHyWidget &widgetRef);

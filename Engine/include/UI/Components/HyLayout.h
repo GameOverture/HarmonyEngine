@@ -54,6 +54,7 @@ public:
 
 	const HyMargins<int16> &GetMargins() const;
 	void SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, int32 iWidgetSpacing);
+	void SetMargins(const HyMargins<int16> &newMargins, int32 iWidgetSpacing);
 	int32 GetWidgetSpacing();
 
 	bool IsLayoutDirty() const;
