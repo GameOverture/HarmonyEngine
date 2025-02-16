@@ -18,7 +18,7 @@
 struct HySpriteFrame
 {
 	HyFileAtlas *				pAtlas;
-	const HyMargins<float>		rSRC_RECT;
+	const HyUvCoord				rSRC_RECT;
 	const HyMargins<uint16>		rCROP_MARGINS;
 	const glm::ivec2			vOFFSET;
 	const float					fDURATION;

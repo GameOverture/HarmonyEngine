@@ -173,11 +173,22 @@ float IHyText<NODETYPE, ENTTYPE>::GetLineBreakHeight(float fPercent /*= 1.0f*/)
 		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetLineHeight invoked on null data");
 		return 0.0f;
 	}
-
 	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 	float fLineHeight = pData->GetLineHeight(this->m_uiState);
-
 	return fLineHeight * fPercent;
+}
+
+template<typename NODETYPE, typename ENTTYPE>
+float IHyText<NODETYPE, ENTTYPE>::GetLineAscender(float fPercent /*= 1.0f*/)
+{
+	if(this->AcquireData() == nullptr)
+	{
+		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetAscender invoked on null data");
+		return 0.0f;
+	}
+	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
+	float fAscender = pData->GetLineAscender(this->m_uiState);
+	return fAscender * fPercent;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -188,10 +199,8 @@ float IHyText<NODETYPE, ENTTYPE>::GetLineDescender(float fPercent /*= 1.0f*/)
 		HyLogDebug("IHyText<NODETYPE, ENTTYPE>::GetDescender invoked on null data");
 		return 0.0f;
 	}
-
 	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 	float fDescender = pData->GetLineDescender(this->m_uiState);
-
 	return fDescender * fPercent;
 }
 

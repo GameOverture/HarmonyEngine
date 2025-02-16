@@ -275,6 +275,7 @@ glm::vec2 HyUiContainer::GetWidgetPos(IHyWidget &widgetRef)
 				vPos += pCurLayout->pos.Get();
 				pCurLayout = pCurLayout->ParentGet();
 			}
+			break;
 		}
 	}
 	
@@ -644,7 +645,7 @@ void HyUiContainer::OnRootLayoutUpdate()
 		// NOTE: Using the layout's size hint (instead of '0') may be inaccurate if other dimension is being resized
 		if(m_bUseHorzBar && m_RootLayout.GetSizeHint().x > iNewWidth)
 		{
-			iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
+			//iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
 			iNewHeight -= m_HorzBar.GetDiameter();
 			iNewWidth = 0;
 		}
@@ -653,7 +654,7 @@ void HyUiContainer::OnRootLayoutUpdate()
 		{
 			if(iNewWidth != 0)
 			{
-				iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
+				//iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
 				iNewWidth -= m_VertBar.GetDiameter();
 			}
 			iNewHeight = 0;

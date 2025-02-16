@@ -194,6 +194,56 @@ bool HyLayout::IsWidgetInputAllowed()
 	return false;
 }
 
+#ifdef HY_USE_LAYOUT_DEBUG_BOXES
+void HyLayout::ShowDebugBox(bool bShow)
+{
+	m_DebugBoxBoarder.alpha.Set(bShow ? 1.0f : 0.0f);
+	m_DebugBoxMargins.alpha.Set(bShow ? 1.0f : 0.0f);
+}
+
+/*virtual*/ void HyLayout::OnUpdate() /*override*/
+{
+	const glm::mat4 &mtxSceneRef = GetSceneTransform(0.0f);
+	glm::vec3 vScale(1.0f);
+	glm::quat quatRot;
+	glm::vec3 ptTranslation;
+	glm::vec3 vSkew;
+	glm::vec4 vPerspective;
+	glm::decompose(mtxSceneRef, vScale, quatRot, ptTranslation, vSkew, vPerspective);
+
+	m_DebugBoxBoarder.pos.Set(ptTranslation);
+	m_DebugBoxBoarder.rot.Set(glm::degrees(glm::atan(mtxSceneRef[0][1], mtxSceneRef[0][0])));
+	m_DebugBoxBoarder.scale.Set(vScale);
+	m_DebugBoxBoarder.UseWindowCoordinates(GetCoordinateSystem());
+	m_DebugBoxBoarder.SetDisplayOrder(GetDisplayOrder() + 1);
+	m_DebugBoxBoarder.SetVisible(IsVisible() && (GetInternalFlags() & EXPLICIT_ParentsVisible));
+
+	if(m_Margins.left == 0 && m_Margins.right == 0 && m_Margins.top == 0 && m_Margins.bottom == 0)
+		m_DebugBoxMargins.SetVisible(false);
+	else
+	{
+		m_DebugBoxMargins.pos.Set(ptTranslation);
+		m_DebugBoxMargins.pos.Offset(m_Margins.left, m_Margins.bottom);
+		m_DebugBoxMargins.rot.Set(glm::degrees(glm::atan(mtxSceneRef[0][1], mtxSceneRef[0][0])));
+		m_DebugBoxMargins.scale.Set(vScale);
+		m_DebugBoxMargins.UseWindowCoordinates(GetCoordinateSystem());
+		m_DebugBoxMargins.SetDisplayOrder(GetDisplayOrder() + 1);
+		m_DebugBoxMargins.SetVisible(IsVisible() && (GetInternalFlags() & EXPLICIT_ParentsVisible));
+	}
+}
+
+void HyLayout::OnSetDebugBox()
+{
+	m_DebugBoxBoarder.SetTint(HyColor::Blue);
+	m_DebugBoxBoarder.SetWireframe(true);
+	m_DebugBoxBoarder.SetAsBox(GetWidth(), GetHeight());
+
+	m_DebugBoxMargins.SetTint(HyColor::Cyan);
+	m_DebugBoxMargins.SetWireframe(true);
+	m_DebugBoxMargins.SetAsBox(GetWidth() - m_Margins.left - m_Margins.right, GetHeight() - m_Margins.bottom - m_Margins.top);
+}
+#endif
+
 /*virtual*/ void HyLayout::OnSetSizeHint() /*override*/
 {
 	HySetVec(m_vMinSize, m_Margins.left + m_Margins.right, m_Margins.bottom + m_Margins.top);
@@ -356,6 +406,16 @@ bool HyLayout::IsWidgetInputAllowed()
 
 	m_vActualSize[eOrientation] = static_cast<int32>(ptCurPos[eOrientation] - GetWidgetSpacing());
 	m_vActualSize[eInverseOrien] = vTargetSize[eInverseOrien];
+
+	if(vTargetSize[eOrientation] > m_vActualSize[eOrientation])
+		m_vActualSize[eOrientation] = vTargetSize[eOrientation];
+	if(vTargetSize[eInverseOrien] > m_vActualSize[eInverseOrien])
+		m_vActualSize[eInverseOrien] = vTargetSize[eInverseOrien];
+	
+#ifdef HY_USE_LAYOUT_DEBUG_BOXES
+	OnSetDebugBox();
+#endif
+
 	return m_vActualSize;
 }
 

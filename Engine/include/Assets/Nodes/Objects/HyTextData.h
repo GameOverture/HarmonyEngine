@@ -58,7 +58,7 @@ struct HyTextGlyph
 	const float					fADVANCE_X;
 	const float					fADVANCE_Y;
 
-	const HyMargins<float>		rSRC_RECT;
+	const HyUvCoord				rSRC_RECT;
 
 	HyTextGlyph(uint32 uiWidth,
 				uint32 uiHeight,

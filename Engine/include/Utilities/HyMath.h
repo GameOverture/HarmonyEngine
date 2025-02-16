@@ -149,7 +149,6 @@ public:
 	}
 };
 
-// Useful for storing margins or UV texture coordinates
 template<typename T>
 struct HyMargins
 {
@@ -180,22 +179,60 @@ struct HyMargins
 		return s.str();
 	}
 
-	T Width() const
-	{
-		return right - left;
-	}
-
-	T Height() const
-	{
-		return abs(bottom - top);
-	}
-
 	void Set(T tLeft, T tBottom, T tRight, T tTop)
 	{
 		left = tLeft;
 		top = tTop;
 		right = tRight;
 		bottom = tBottom;
+	}
+};
+
+struct HyUvCoord
+{
+	float left;
+	float bottom;
+	float right;
+	float top;
+
+	HyUvCoord() : left(0), bottom(0), right(0), top(0)
+	{ }
+
+	HyUvCoord(float fLeft, float fBottom, float fRight, float fTop) : left(fLeft), bottom(fBottom), right(fRight), top(fTop)
+	{ }
+
+	HyUvCoord &operator=(const HyUvCoord &rhs)
+	{
+		left = rhs.left;
+		bottom = rhs.bottom;
+		right = rhs.right;
+		top = rhs.top;
+		return *this;
+	}
+
+	std::string ToString() const
+	{
+		std::ostringstream s;
+		s << "(L:" << left << ", T:" << top << ", R:" << right << ", B:" << bottom << ")";
+		return s.str();
+	}
+
+	float Width() const
+	{
+		return right - left;
+	}
+
+	float Height() const
+	{
+		return abs(bottom - top);
+	}
+
+	void Set(float fLeft, float fBottom, float fRight, float fTop)
+	{
+		left = fLeft;
+		top = fTop;
+		right = fRight;
+		bottom = fBottom;
 	}
 };
 

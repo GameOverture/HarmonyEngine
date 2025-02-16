@@ -162,7 +162,7 @@ IHyFile *HyAssets::GetFileWithAsset(HyFileType eFileType, uint32 uiAssetChecksum
 	switch(eFileType)
 	{
 	case HYFILE_Atlas: {
-		HyMargins<float> tmp;
+		HyUvCoord tmp;
 		uint64 uiCropMask = 0;
 		for(uint32 i = 0; i < m_FilesMap[HYFILE_Atlas].m_uiNumFiles; ++i)
 		{
@@ -198,7 +198,7 @@ void HyAssets::SetAuxiliaryFile(HyAuxiliaryFileHandle hHandle, IHyFile *pFile)
 	m_AuxiliaryFileMap.insert({ hHandle, pFile });
 }
 
-HyFileAtlas *HyAssets::GetAtlas(uint32 uiChecksum, uint32 uiBankId, HyMargins<float> &UVRectOut, uint64 &uiCropMaskOut)
+HyFileAtlas *HyAssets::GetAtlas(uint32 uiChecksum, uint32 uiBankId, HyUvCoord &UVRectOut, uint64 &uiCropMaskOut)
 {
 	for(uint32 i = 0; i < m_FilesMap[HYFILE_Atlas].m_uiNumFiles; ++i)
 	{

@@ -103,7 +103,7 @@ public:
 	IHyFile *GetAuxiliaryFile(HyAuxiliaryFileHandle hHandle);
 	void SetAuxiliaryFile(HyAuxiliaryFileHandle hHandle, IHyFile *pFile);
 
-	HyFileAtlas *GetAtlas(uint32 uiChecksum, uint32 uiBankId, HyMargins<float> &UVRectOut, uint64 &uiCropMaskOut);
+	HyFileAtlas *GetAtlas(uint32 uiChecksum, uint32 uiBankId, HyUvCoord &UVRectOut, uint64 &uiCropMaskOut);
 	uint32 GetNumAtlases();
 	HyFilesManifest *GetLoadedAtlases();
 

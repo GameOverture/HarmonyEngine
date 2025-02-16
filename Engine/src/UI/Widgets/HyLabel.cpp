@@ -619,6 +619,7 @@ bool HyLabel::IsMonospacedDigits() const
 
 			case HYTEXT_Column:
 				m_Text.SetAsColumn(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right)) - (m_Panel.GetFrameStrokeSize() * 2));
+				m_Text.pos.Offset(0.0f, m_Panel.GetHeight() - m_Text.GetLineAscender(1.0f));
 				break;
 
 			case HYTEXT_Vertical:

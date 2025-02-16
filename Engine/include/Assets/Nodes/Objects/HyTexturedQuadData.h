@@ -18,7 +18,7 @@
 class HyTexturedQuadData : public IHyNodeData
 {
 	HyFileAtlas *				m_pAtlas;
-	HyMargins<float>			m_UvCoords;
+	HyUvCoord					m_UvCoords;
 	uint64						m_uiCropMask;
 
 	HyAuxiliaryFileHandle		m_eAuxiliaryFileHandle;
@@ -30,7 +30,7 @@ public:
 
 	virtual IHyFile *GetAuxiliaryFile() const override;
 	HyFileAtlas *GetAtlas() const;
-	const HyMargins<float> &GetUvCoords() const;
+	const HyUvCoord &GetUvCoords() const;
 	uint64 GetCropMask() const;
 };
 

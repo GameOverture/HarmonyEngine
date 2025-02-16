@@ -43,7 +43,7 @@ HyWindow &IHyCamera<NODETYPE>::GetWindow()
 }
 
 template<typename NODETYPE>
-const HyMargins<float> &IHyCamera<NODETYPE>::GetViewport() const
+const HyUvCoord &IHyCamera<NODETYPE>::GetViewport() const
 {
 	return m_ViewportRect;
 }

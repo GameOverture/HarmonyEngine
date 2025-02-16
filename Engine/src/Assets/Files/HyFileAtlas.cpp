@@ -93,7 +93,7 @@ HyTextureHandle HyFileAtlas::GetTextureHandle() const
 	return m_hTextureHandle;
 }
 
-bool HyFileAtlas::GetUvRect(uint32 uiChecksum, HyMargins<float> &UVRectOut, uint64 &cropMaskOut) const
+bool HyFileAtlas::GetUvRect(uint32 uiChecksum, HyUvCoord &UVRectOut, uint64 &cropMaskOut) const
 {
 	float fTexWidth = static_cast<float>(m_iWidth);
 	float fTexHeight = static_cast<float>(m_iHeight);

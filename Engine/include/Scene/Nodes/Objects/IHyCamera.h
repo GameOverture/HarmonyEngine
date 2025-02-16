@@ -26,7 +26,7 @@ class IHyCamera : public NODETYPE
 
 protected:
 	HyWindow *			m_pWindowPtr;
-	HyMargins<float>	m_ViewportRect;	// Values are [0.0-1.0] representing percentages
+	HyUvCoord			m_ViewportRect;	// Values are [0.0-1.0] representing percentages
 
 	uint32				m_uiCullMaskBit;
 
@@ -43,7 +43,7 @@ protected:
 
 public:
 	HyWindow &GetWindow();
-	const HyMargins<float> &GetViewport() const;
+	const HyUvCoord &GetViewport() const;
 
 	// All values are [0.0 - 1.0] representing percentages of the entire window this camera belongs to
 	void SetViewport(float fNormalizedPosX, float fNormalizedPosY, float fNormalizedWidth, float fNormalizedHeight);
