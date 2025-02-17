@@ -350,6 +350,11 @@ void HyLabel::SetText(const std::stringstream &ssUtf8Text)
 	SetAssembleNeeded();
 }
 
+uint32 HyLabel::GetNumTextStates()
+{
+	return m_Text.GetNumStates();
+}
+
 uint32 HyLabel::GetTextState() const
 {
 	return m_Text.GetState();

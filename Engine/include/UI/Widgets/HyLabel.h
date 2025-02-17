@@ -83,6 +83,7 @@ public:
 	virtual std::string GetUtf8String() const;
 	void SetText(const std::stringstream &ssUtf8Text);
 	virtual void SetText(const std::string &sUtf8Text);
+	uint32 GetNumTextStates();
 	uint32 GetTextState() const;
 	virtual void SetTextState(uint32 uiStateIndex);
 
