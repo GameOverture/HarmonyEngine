@@ -677,8 +677,11 @@ void HyEntity2d::Assemble()
 		if(m_fDeferAmt <= 0.0f)
 		{
 			m_fpDeferFinishedFunc(this);
-			m_fpDeferFinishedFunc = nullptr;
-			m_fDeferAmt = 0.0f;
+			if(m_fDeferAmt <= 0.0f) // NOTE: Must recheck in case the 'm_fpDeferFinishedFunc' callback set a new Defer()
+			{
+				m_fpDeferFinishedFunc = nullptr;
+				m_fDeferAmt = 0.0f;
+			}
 		}
 	}
 
