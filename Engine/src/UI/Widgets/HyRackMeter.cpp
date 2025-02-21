@@ -48,6 +48,11 @@ int64 HyRackMeter::GetValue() const
 	return m_iTargetValue;
 }
 
+int64 HyRackMeter::GetCurrentValue() const
+{
+	return m_iCurValue;
+}
+
 void HyRackMeter::SetValue(int64 iValue, float fRackDuration)
 {
 	m_iTargetValue = iValue;

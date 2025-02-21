@@ -49,6 +49,7 @@ public:
 
 	bool IsButton() const;
 
+	virtual uint32 GetState() const override;
 	virtual bool SetState(uint32 uiStateIndex) override;	// If used, this turns off using "panel states"
 	virtual uint32 GetNumStates() override;
 

@@ -276,7 +276,7 @@ public:
 	static glm::vec2 PerpendicularCounterClockwise(const glm::vec2 &vDirVector);
 	static glm::ivec2 PerpendicularCounterClockwise(const glm::ivec2 &vDirVector);
 
-	static float AngleFromVector(const glm::vec2 &vDirVector);
+	static float AngleFromVector(const glm::vec2 &vDirVector); // Caution: Operationally expensive
 	static glm::vec2 ClosestPointOnRay(const glm::vec2 &ptRayStart, const glm::vec2 &vNormalizedRayDir, const glm::vec2 &ptTestPoint);
 
 	// Normalizes a value to an arbitrary range. The value wraps when going below min range or above max range.

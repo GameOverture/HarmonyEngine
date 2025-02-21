@@ -195,6 +195,11 @@ HyPanelInit HyPanel::CloneInit()
 	return init;
 }
 
+/*virtual*/ uint32 HyPanel::GetState() const /*override*/
+{
+	return IHyLoadable::GetState();
+}
+
 /*virtual*/ bool HyPanel::SetState(uint32 uiStateIndex) /*override*/
 {
 	if(IsNode())

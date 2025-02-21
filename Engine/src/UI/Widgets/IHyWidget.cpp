@@ -29,6 +29,14 @@ bool IHyWidget::IsButton() const
 	return (m_uiAttribs & WIDGETATTRIB_IsTypeButton) != 0;
 }
 
+/*virtual*/ uint32 IHyWidget::GetState() const /*override*/
+{
+	if(IsUsingPanelStates())
+		return m_ePanelState;
+	else
+		return m_Panel.GetState();
+}
+
 /*virtual*/ bool IHyWidget::SetState(uint32 uiStateIndex) /*override*/
 {
 	if(IHyLoadable::SetState(uiStateIndex) == false || m_Panel.SetState(uiStateIndex) == false)

@@ -235,6 +235,7 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 	return glm::ivec2(-vDirVector.y, vDirVector.x);
 }
 
+// Caution: Operationally expensive
 /*static*/ float HyMath::AngleFromVector(const glm::vec2 &vDirVector)
 {
 	glm::vec2 vNormalizedDirVector = glm::normalize(vDirVector);

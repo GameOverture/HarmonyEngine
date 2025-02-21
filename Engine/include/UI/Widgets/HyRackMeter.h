@@ -75,6 +75,7 @@ public:
 	virtual ~HyRackMeter();
 
 	int64 GetValue() const;
+	int64 GetCurrentValue() const;
 	void SetValue(int64 iValue, float fRackDuration);
 	void OffsetValue(int64 iOffsetAmt, float fRackDuration);
 
