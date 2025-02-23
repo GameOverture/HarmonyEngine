@@ -36,16 +36,16 @@
       <item>
        <layout class="QHBoxLayout" name="ChildrenToolbar">
         <item>
-         <widget class="QLabel" name="lblAddChildren">
+         <widget class="QToolButton" name="btnAddChild">
           <property name="text">
-           <string>Add Selected Project Explorer Items</string>
+           <string>...</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="btnAddChild">
+         <widget class="QLabel" name="lblAddChildren">
           <property name="text">
-           <string>...</string>
+           <string>Add Selected Project Items</string>
           </property>
          </widget>
         </item>
@@ -71,6 +71,20 @@
         </item>
         <item>
          <widget class="QToolButton" name="btnOrderDown">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnReplace">
           <property name="text">
            <string>...</string>
           </property>

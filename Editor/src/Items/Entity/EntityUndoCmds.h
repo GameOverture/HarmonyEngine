@@ -235,6 +235,23 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class EntityUndoCmd_ReplaceItems : public QUndoCommand
+{
+	ProjectItemData &				m_ProjItemRef;
+	QList<EntityTreeItemData *>		m_ReplaceItemList;
+
+	QList<QUuid>					m_OriginalItemUuidList;
+
+public:
+	EntityUndoCmd_ReplaceItems(ProjectItemData &projItemRef, QList<EntityTreeItemData *> replaceItemList, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_ReplaceItems();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_PasteKeyFrames : public QUndoCommand
 {
 	EntityDopeSheetScene &							m_DopeSheetSceneRef;

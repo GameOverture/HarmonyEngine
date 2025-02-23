@@ -230,6 +230,7 @@ public:
 
 	const QUuid &GetThisUuid() const;
 	const QUuid &GetReferencedItemUuid() const;
+	void SetReferencedItemUuid(QUuid uuidOfReferencedItem);
 
 	bool IsPromotedEntity() const;
 	EntityItemDeclarationType GetDeclarationType() const;

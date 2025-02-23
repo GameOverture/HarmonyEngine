@@ -93,10 +93,10 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject 
 
 bool EntityTreeItemData::IsSelectable() const
 {
-	if(m_eTYPE == ENTTYPE_ArrayFolder)
+	if(m_eEntType == ENTTYPE_ArrayFolder)
 		return true;
 
-	if(m_eTYPE == ENTTYPE_BvFolder)
+	if(m_eEntType == ENTTYPE_BvFolder)
 		return false;
 
 	return m_bIsLocked == false &&
@@ -166,6 +166,11 @@ const QUuid &EntityTreeItemData::GetThisUuid() const
 const QUuid &EntityTreeItemData::GetReferencedItemUuid() const
 {
 	return m_ReferencedItemUuid;
+}
+
+void EntityTreeItemData::SetReferencedItemUuid(QUuid uuidOfReferencedItem)
+{
+	m_ReferencedItemUuid = uuidOfReferencedItem;
 }
 
 bool EntityTreeItemData::IsPromotedEntity() const

@@ -711,6 +711,41 @@ EntityUndoCmd_PackToArray::EntityUndoCmd_PackToArray(ProjectItemData &entityItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EntityUndoCmd_ReplaceItems::EntityUndoCmd_ReplaceItems(ProjectItemData &projItemRef, QList<EntityTreeItemData *> replaceItemList, QUndoCommand *pParent /*= nullptr*/) :
+	m_ProjItemRef(projItemRef),
+	m_ReplaceItemList(replaceItemList)
+{
+	setText("Replace items");
+
+	for(EntityTreeItemData *pItem : m_ReplaceItemList)
+		m_OriginalItemUuidList.push_back(pItem->GetReferencedItemUuid());
+}
+
+/*virtual*/ EntityUndoCmd_ReplaceItems::~EntityUndoCmd_ReplaceItems()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_ReplaceItems::redo() /*override*/
+{
+	QList<QUuid> replaceItemUuidList;
+	for(EntityTreeItemData *pItem : m_ReplaceItemList)
+	{
+		pItem->SetReferencedItemUuid(m_ProjItemRef.GetUuid());
+		pItem->SetReallocateDrawItem(true);
+	}
+}
+
+/*virtual*/ void EntityUndoCmd_ReplaceItems::undo() /*override*/
+{
+	for(int i = 0; i < m_ReplaceItemList.size(); ++i)
+	{
+		m_ReplaceItemList[i]->SetReferencedItemUuid(m_OriginalItemUuidList[i]);
+		m_ReplaceItemList[i]->SetReallocateDrawItem(true);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene &entityDopeSheetSceneRef, QList<QPair<EntityTreeItemData *, QJsonArray>> pasteKeyFramesPairList, int iStartFrameIndex, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_DopeSheetSceneRef(entityDopeSheetSceneRef),

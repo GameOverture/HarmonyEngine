@@ -67,6 +67,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 
 	ui->btnOrderUp->setDefaultAction(ui->actionOrderChildrenUp);
 	ui->btnOrderDown->setDefaultAction(ui->actionOrderChildrenDown);
+	ui->btnReplace->setDefaultAction(ui->actionReplaceItems);
 	ui->btnRemove->setDefaultAction(ui->actionRemoveItems);
 
 	ui->nodeTree->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -149,19 +150,45 @@ EntityWidget::~EntityWidget()
 	MainWindow::GetExplorerWidget().GetSelected(selectedItems, selectedPrefixes, true);
 	bool bEnableAddNodeBtn = false;
 	
+	ItemType eSelectedSingleItemType = ITEM_Unknown;
+	int iNumValidItems = 0;
 	for(auto pItem : selectedItems)
 	{
 		if(pTreeModel->IsItemValid(pItem, false))
 		{
+			if(eSelectedSingleItemType != ITEM_None)
+			{
+				if(eSelectedSingleItemType == ITEM_Unknown)
+					eSelectedSingleItemType = pItem->GetType();
+				else if(eSelectedSingleItemType != pItem->GetType())
+					eSelectedSingleItemType = ITEM_None;
+			}
+
+			iNumValidItems++;
 			bEnableAddNodeBtn = true;
-			break;
 		}
 	}
 	ui->actionAddChildren->setEnabled(bEnableAddNodeBtn);
+	if(iNumValidItems != 1)
+		eSelectedSingleItemType = ITEM_None;
 
 	// Manage currently selected items in the item tree
 	bool bEnableVemMode = false;
 	QModelIndexList selectedIndices = GetSelectedItems();
+
+	if(eSelectedSingleItemType != ITEM_None && eSelectedSingleItemType != ITEM_Unknown)
+	{
+		for(const QModelIndex &index : selectedIndices)
+		{
+			EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+			if(eSelectedSingleItemType != pCurItemData->GetType())
+			{
+				eSelectedSingleItemType = ITEM_None;
+				break;
+			}
+		}
+	}
+	ui->actionReplaceItems->setEnabled(selectedIndices.empty() == false && eSelectedSingleItemType != ITEM_None && eSelectedSingleItemType != ITEM_Unknown);
 
 	m_ContextMenu.clear();
 
@@ -872,9 +899,57 @@ void EntityWidget::on_actionOrderChildrenDown_triggered()
 
 void EntityWidget::on_actionReplaceItems_triggered()
 {
+	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
+
+	QList<ProjectItemData *> selectedExplorerItems; QList<ExplorerItemData *> selectedExplorerPrefixes;
+	MainWindow::GetExplorerWidget().GetSelected(selectedExplorerItems, selectedExplorerPrefixes, true);
+
+	ProjectItemData *pReplaceItem = nullptr;
+	ItemType eSelectedSingleItemType = ITEM_Unknown;
+	int iNumValidItems = 0;
+	for(auto pItem : selectedExplorerItems)
+	{
+		if(pTreeModel->IsItemValid(pItem, false))
+		{
+			if(eSelectedSingleItemType != ITEM_None)
+			{
+				if(eSelectedSingleItemType == ITEM_Unknown)
+					eSelectedSingleItemType = pItem->GetType();
+				else if(eSelectedSingleItemType != pItem->GetType())
+					eSelectedSingleItemType = ITEM_None;
+			}
+
+			pReplaceItem = pItem;
+			iNumValidItems++;
+		}
+	}
+	if(iNumValidItems != 1 || pReplaceItem == nullptr)
+		eSelectedSingleItemType = ITEM_None;
+	if(eSelectedSingleItemType == ITEM_None || eSelectedSingleItemType == ITEM_Unknown)
+	{
+		HyGuiLog("EntityWidget::on_actionReplaceItems_triggered() - Only one valid item can be selected to replace the current selection.", LOGTYPE_Error);
+		return;
+	}
+
+	QList<EntityTreeItemData *> replaceItemList;
 	QModelIndexList selectedIndices = GetSelectedItems();
+	for(const QModelIndex &index : selectedIndices)
+	{
+		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pCurItemData->GetEntType() == ENTTYPE_Item || pCurItemData->GetEntType() == ENTTYPE_ArrayItem)
+		{
+			if(eSelectedSingleItemType != pCurItemData->GetType())
+			{
+				HyGuiLog("EntityWidget::on_actionReplaceItems_triggered() - All selected items must be of the same type to replace them.", LOGTYPE_Error);
+				return;
+			}
 
+			replaceItemList.push_back(pCurItemData);
+		}
+	}
 
+	QUndoCommand *pCmd = new EntityUndoCmd_ReplaceItems(*pReplaceItem, replaceItemList);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionRemoveItems_triggered()
