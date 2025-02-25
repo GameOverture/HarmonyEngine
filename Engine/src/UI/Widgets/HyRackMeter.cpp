@@ -55,6 +55,9 @@ int64 HyRackMeter::GetCurrentValue() const
 
 void HyRackMeter::SetValue(int64 iValue, float fRackDuration)
 {
+	if(m_iCurValue == iValue && m_iTargetValue == iValue)
+		return;
+
 	m_iTargetValue = iValue;
 
 	m_fRackingDuration = fRackDuration;
@@ -144,6 +147,9 @@ uint32 HyRackMeter::GetDenomination() const
 
 void HyRackMeter::SetDenomination(uint32 uiDenom)
 {
+	if(m_uiDenomination == uiDenom)
+		return;
+
 	m_uiDenomination = uiDenom;
 	SetAssembleNeeded();
 }

@@ -562,10 +562,21 @@ glm::ivec2 IHySprite<NODETYPE, ENTTYPE>::GetStateOffset(uint32 uiStateIndex)
 	for(uint32 i = 0; i < pData->GetState(uiStateIndex).m_uiNUMFRAMES; ++i)
 	{
 		const HySpriteFrame *pFrameRef = pData->GetFrame(uiStateIndex, i);
-		if(abs(vMaxOffset.x) < abs(pFrameRef->vOFFSET.x))
-			vMaxOffset.x = pFrameRef->vOFFSET.x;
-		if(abs(vMaxOffset.y) < abs(pFrameRef->vOFFSET.y))
-			vMaxOffset.y = pFrameRef->vOFFSET.y;
+
+		if((m_AnimCtrlAttribList[m_uiState] & ANIMCTRLATTRIB_BoundsIncludeAlphaCrop) != 0)
+		{
+			if(abs(vMaxOffset.x) < abs(pFrameRef->vOFFSET.x - pFrameRef->rCROP_MARGINS.left))
+				vMaxOffset.x = pFrameRef->vOFFSET.x;
+			if(abs(vMaxOffset.y) < abs(pFrameRef->vOFFSET.y - pFrameRef->rCROP_MARGINS.bottom))
+				vMaxOffset.y = pFrameRef->vOFFSET.y;
+		}
+		else
+		{
+			if(abs(vMaxOffset.x) < abs(pFrameRef->vOFFSET.x))
+				vMaxOffset.x = pFrameRef->vOFFSET.x;
+			if(abs(vMaxOffset.y) < abs(pFrameRef->vOFFSET.y))
+				vMaxOffset.y = pFrameRef->vOFFSET.y;
+		}
 	}
 	
 	return vMaxOffset;

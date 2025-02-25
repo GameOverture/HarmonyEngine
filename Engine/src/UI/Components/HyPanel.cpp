@@ -113,6 +113,7 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 
 	case HYTYPE_Sprite: // 'NodeItem' panel
 		m_PanelData.m_pNodeItem = HY_NEW HySprite2d(initRef.m_NodePath, this);
+		static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->SetAllBoundsIncludeAlphaCrop(true);
 		if(m_uiState != 0)
 		{
 			if(m_PanelData.m_pNodeItem->SetState(m_uiState) == false)
@@ -282,7 +283,12 @@ HyPanelInit HyPanel::CloneInit()
 /*virtual*/ float HyPanel::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
 	if(IsNode() && IsAutoSize())
-		return m_PanelData.m_pNodeItem->GetWidth(m_PanelData.m_pNodeItem->scale.X()) * fPercent;
+	{
+		if(m_PanelData.m_pNodeItem->GetType() == HYTYPE_Sprite)
+			return static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateWidth(m_PanelData.m_pNodeItem->GetState(), 1.0f);
+		else
+			return m_PanelData.m_pNodeItem->GetWidth(m_PanelData.m_pNodeItem->scale.X()) * fPercent;
+	}
 	
 	return m_vSizeActual.x * fPercent;
 }
@@ -290,7 +296,12 @@ HyPanelInit HyPanel::CloneInit()
 /*virtual*/ float HyPanel::GetHeight(float fPercent /*= 1.0f*/) /*override*/
 {
 	if(IsNode() && IsAutoSize())
-		return m_PanelData.m_pNodeItem->GetHeight(m_PanelData.m_pNodeItem->scale.Y()) * fPercent;
+	{
+		if(m_PanelData.m_pNodeItem->GetType() == HYTYPE_Sprite)
+			return static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateHeight(m_PanelData.m_pNodeItem->GetState(), 1.0f);
+		else
+			return m_PanelData.m_pNodeItem->GetHeight(m_PanelData.m_pNodeItem->scale.Y()) * fPercent;
+	}
 
 	return m_vSizeActual.y * fPercent;
 }
@@ -311,7 +322,12 @@ bool HyPanel::IsAutoSize() const
 glm::ivec2 HyPanel::GetPanelSizeHint() const
 {
 	if(IsNode() && IsAutoSize())
-		return glm::ivec2(m_PanelData.m_pNodeItem->GetWidth(1.0f), m_PanelData.m_pNodeItem->GetHeight(1.0f));
+	{
+		if(m_PanelData.m_pNodeItem->GetType() == HYTYPE_Sprite)
+			return glm::ivec2(static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateWidth(m_PanelData.m_pNodeItem->GetState(), 1.0f), static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateHeight(m_PanelData.m_pNodeItem->GetState(), 1.0f));
+		else
+			return glm::ivec2(m_PanelData.m_pNodeItem->GetWidth(1.0f), m_PanelData.m_pNodeItem->GetHeight(1.0f));
+	}
 
 	return m_vSizeHint;
 }
@@ -322,26 +338,28 @@ void HyPanel::SetSize(uint32 uiWidth, uint32 uiHeight)
 
 	if(IsNode())
 	{
+		float fCurWidth = 0.0f;
+		float fCurHeight = 0.0f;
+		if(m_PanelData.m_pNodeItem->GetType() == HYTYPE_Sprite)
+		{
+			fCurWidth = static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateWidth(m_PanelData.m_pNodeItem->GetState(), 1.0f);
+			fCurHeight = static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateHeight(m_PanelData.m_pNodeItem->GetState(), 1.0f);
+		}
+		else
+		{
+			fCurWidth = m_PanelData.m_pNodeItem->GetWidth(1.0f);
+			fCurHeight = m_PanelData.m_pNodeItem->GetHeight(1.0f);
+		}
+
 		if(IsAutoSize())
 		{
-			float fCurWidth = m_PanelData.m_pNodeItem->GetWidth(1.0f);
-			float fCurHeight = m_PanelData.m_pNodeItem->GetHeight(1.0f);
-
 			m_PanelData.m_pNodeItem->scale.Set(uiWidth / fCurWidth, uiHeight / fCurHeight);
 		}
 		else
 		{
 			m_PanelData.m_pNodeItem->scale.SetAll(1.0f);
-			float fScale = std::min(uiWidth / m_PanelData.m_pNodeItem->GetWidth(), uiHeight / m_PanelData.m_pNodeItem->GetHeight());
+			float fScale = std::min(uiWidth / fCurWidth, uiHeight / fCurHeight);
 			m_PanelData.m_pNodeItem->scale.SetAll(fScale);
-
-			if(m_PanelData.m_pNodeItem->GetType() == HYTYPE_Sprite)
-			{
-				glm::ivec2 vOffset = static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateOffset(m_PanelData.m_pNodeItem->GetState());
-				//m_pNodeItem->pos.SetX(-vOffset.x + ((m_vSizeHint.x - m_pNodeItem->GetWidth(m_pNodeItem->scale.GetX())) * 0.5f));
-				//		return glm::vec2(-(vOffset.x * m_pNodeItem->scale.GetX()), -(vOffset.y * m_pNodeItem->scale.GetY()));
-				//		//m_pNodeItem->pos.Set(-vOffset);
-			}
 		}
 	}
 	else if(IsPrimitive())
@@ -419,13 +437,12 @@ glm::vec2 HyPanel::GetBotLeftOffset()
 {
 	if(IsNode() && m_PanelData.m_pNodeItem->IsLoadDataValid() && m_PanelData.m_pNodeItem->GetType() == HYTYPE_Sprite)
 	{
-		//glm::vec2 vPanelDimensions = size.Get();
+		//const HySpriteData *pPanelData = static_cast<const HySpriteData *>(m_PanelData.m_pNodeItem->AcquireData());
+		//const HySpriteFrame *pFrameRef = pPanelData->GetFrame(m_PanelData.m_pNodeItem->GetState(), static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetFrame());
+		//return -glm::vec2(pFrameRef->vOFFSET.x * m_PanelData.m_pNodeItem->scale.X(), pFrameRef->vOFFSET.y * m_PanelData.m_pNodeItem->scale.Y());
 
-		const HySpriteData *pPanelData = static_cast<const HySpriteData *>(m_PanelData.m_pNodeItem->AcquireData());
-		const HySpriteFrame *pFrameRef = pPanelData->GetFrame(m_PanelData.m_pNodeItem->GetState(), static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetFrame());
-
-		return -glm::vec2(pFrameRef->vOFFSET.x * m_PanelData.m_pNodeItem->scale.X(), pFrameRef->vOFFSET.y * m_PanelData.m_pNodeItem->scale.Y());
-		//return -glm::vec2(pFrameRef->vOFFSET.x * (vPanelDimensions.x / vUiSizeHint.x), pFrameRef->vOFFSET.y * (vPanelDimensions.y / vUiSizeHint.y));
+		glm::ivec2 vStateOffset = static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateOffset(m_PanelData.m_pNodeItem->GetState());
+		return -glm::vec2(vStateOffset.x * m_PanelData.m_pNodeItem->scale.X(), vStateOffset.y * m_PanelData.m_pNodeItem->scale.Y());
 	}
 	return glm::vec2(0.0f, 0.0f);
 }

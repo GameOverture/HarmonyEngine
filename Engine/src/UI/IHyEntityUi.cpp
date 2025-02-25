@@ -44,6 +44,9 @@ HySizePolicy IHyEntityUi::GetVerticalPolicy()
 
 void IHyEntityUi::SetSizePolicy(HySizePolicy eHorizPolicy, HySizePolicy eVertPolicy)
 {
+	if(m_SizePolicies[HYORIENT_Horizontal] == eHorizPolicy && m_SizePolicies[HYORIENT_Vertical] == eVertPolicy)
+		return;
+
 	m_SizePolicies[HYORIENT_Horizontal] = eHorizPolicy;
 	m_SizePolicies[HYORIENT_Vertical] = eVertPolicy;
 	SetSizeAndLayoutDirty();
@@ -51,12 +54,18 @@ void IHyEntityUi::SetSizePolicy(HySizePolicy eHorizPolicy, HySizePolicy eVertPol
 
 void IHyEntityUi::SetHorizontalPolicy(HySizePolicy ePolicy)
 {
+	if(m_SizePolicies[HYORIENT_Horizontal] == ePolicy)
+		return;
+
 	m_SizePolicies[HYORIENT_Horizontal] = ePolicy;
 	SetSizeAndLayoutDirty();
 }
 
 void IHyEntityUi::SetVerticalPolicy(HySizePolicy ePolicy)
 {
+	if(m_SizePolicies[HYORIENT_Vertical] == ePolicy)
+		return;
+
 	m_SizePolicies[HYORIENT_Vertical] = ePolicy;
 	SetSizeAndLayoutDirty();
 }
@@ -68,6 +77,9 @@ bool IHyEntityUi::IsLockedProportions() const
 
 void IHyEntityUi::SetLockedProportions(bool bLockProportions)
 {
+	if(m_bLockProportions == bLockProportions)
+		return;
+
 	m_bLockProportions = bLockProportions;
 	SetSizeAndLayoutDirty();
 }
@@ -92,6 +104,9 @@ glm::ivec2 IHyEntityUi::GetMinSize()
 
 void IHyEntityUi::SetMinSize(uint32 uiMinSizeX, uint32 uiMinSizeY)
 {
+	if(m_vMinSize.x == uiMinSizeX && m_vMinSize.y == uiMinSizeY)
+		return;
+
 	HySetVec(m_vMinSize, uiMinSizeX, uiMinSizeY);
 	SetSizeAndLayoutDirty();
 }
@@ -116,6 +131,9 @@ glm::ivec2 IHyEntityUi::GetMaxSize()
 
 void IHyEntityUi::SetMaxSize(uint32 uiMaxSizeX, uint32 uiMaxSizeY)
 {
+	if(m_vMaxSize.x == uiMaxSizeX && m_vMaxSize.y == uiMaxSizeY)
+		return;
+
 	HySetVec(m_vMaxSize, uiMaxSizeX, uiMaxSizeY);
 	SetSizeAndLayoutDirty();
 }
