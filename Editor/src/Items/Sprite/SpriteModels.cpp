@@ -297,7 +297,7 @@ SpriteStateData::SpriteStateData(int iStateIndex, IModel &modelRef, FileDataPair
 		Cmd_AddFrame(static_cast<AtlasFrame *>(requestedAtlasFramesList[i]));
 
 	if(dataFrameArray.size() != requestedAtlasFramesList.size())
-		HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames", LOGTYPE_Error);
+		HyGuiLog("SpriteStatesModel::AppendState() failed to acquire all the stored frames for: " + m_ModelRef.GetItem().GetName(true), LOGTYPE_Error);
 
 	for(int i = 0; i < requestedAtlasFramesList.size(); ++i)
 	{
