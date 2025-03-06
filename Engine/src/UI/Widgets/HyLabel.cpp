@@ -126,6 +126,15 @@ void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath
 
 void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins)
 {
+	if(m_Panel.IsBoundingVolume() && m_Panel.GetBvShape())
+	{
+		for(HyShape2d *pShape : m_ShapeList)
+		{
+			if(pShape == m_Panel.GetBvShape())
+				ShapeRemove(*m_Panel.GetBvShape());
+		}
+	}
+
 	m_Panel.Setup(panelInit);
 
 	if(m_Panel.IsBoundingVolume() && m_Panel.GetBvShape())
