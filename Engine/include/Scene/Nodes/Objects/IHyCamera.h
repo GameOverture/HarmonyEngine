@@ -50,9 +50,7 @@ public:
 	void SetViewport(float fNormalizedPosX, float fNormalizedPosY, float fNormalizedWidth, float fNormalizedHeight);
 
 	bool IsCameraShake();
-
-	// fRadius: 20.0f=Small, 100.0f=Large; fDurationMod: expects a value between 0.0 and 1.0
-	void CameraShake(float fRadius, float fDurationMod);
+	void CameraShake(float fIntensity, float fDuration);
 
 	// Values greater than 1.0 are zoomed in (2.0 == 200%)
 	virtual float GetZoom() const = 0;
