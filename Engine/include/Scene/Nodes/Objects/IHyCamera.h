@@ -30,10 +30,11 @@ protected:
 
 	uint32				m_uiCullMaskBit;
 
-	float				m_fCameraShakeRadius;
-	float				m_fCameraShakeDurationMod;
-	float				m_fCameraShakeAngle;
 	glm::vec3			m_ptCameraShakeCenter;
+	float				m_fCameraShakeAngle;
+	float				m_fCameraShakeIntensity;
+	float				m_fCameraShakeDuration;
+	float				m_fCameraShakeElapsedTime;
 
 protected:
 	IHyCamera(HyWindow *pWindow);
@@ -60,6 +61,7 @@ public:
 	HyZoomLevel SetZoomLevel();	// Takes the current zoom and sets it to the closest zoom level. Returns the chosen zoom level
 
 protected:
+	//virtual void SetDirty(uint32 uiDirtyFlags) override;
 	virtual void Update() override;
 
 private:

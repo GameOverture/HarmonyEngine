@@ -13,6 +13,7 @@
 #include "Utilities/HyRand.h"
 #include "Scene/Nodes/IHyNode2d.h"
 #include "Scene/Nodes/IHyNode3d.h"
+#include "HyEngine.h"
 
 class HyWindow;
 class HyScene;
@@ -23,9 +24,11 @@ IHyCamera<NODETYPE>::IHyCamera(HyWindow *pWindow) :
 	NODETYPE(HYTYPE_Camera, nullptr),
 	m_pWindowPtr(pWindow),
 	m_uiCullMaskBit(0),
-	m_fCameraShakeRadius(0.0f),
+	m_ptCameraShakeCenter(0.0f),
 	m_fCameraShakeAngle(0.0f),
-	m_ptCameraShakeCenter(0.0f)
+	m_fCameraShakeIntensity(0.0f),
+	m_fCameraShakeDuration(0.0f),
+	m_fCameraShakeElapsedTime(0.0f)
 {
 	m_ViewportRect.left = m_ViewportRect.bottom = 0.0f;
 	m_ViewportRect.right = m_ViewportRect.top = 1.0f;
@@ -61,23 +64,19 @@ void IHyCamera<NODETYPE>::SetViewport(float fNormalizedPosX, float fNormalizedPo
 template<typename NODETYPE>
 bool IHyCamera<NODETYPE>::IsCameraShake()
 {
-	return m_fCameraShakeRadius > 0.0f;
+	return m_fCameraShakeDuration > 0.0f;
 }
 
 template<typename NODETYPE>
-void IHyCamera<NODETYPE>::CameraShake(float fRadius, float fDurationMod)
+void IHyCamera<NODETYPE>::CameraShake(float fIntensity, float fDuration)
 {
 	if(IsCameraShake() == false)
 		HySetVec(m_ptCameraShakeCenter, NODETYPE::pos.Get());
 
-	fRadius = HyMath::Max(fRadius, 2.5f);
-
-	m_fCameraShakeRadius = fRadius;
-
-	fDurationMod = HyMath::Clamp(fDurationMod, 0.0f, 0.99f);
-	m_fCameraShakeDurationMod = 0.9f + (fDurationMod * 0.1f);
-
-	m_fCameraShakeAngle = HyRand::Range(0.0f, 360.0f);
+	m_fCameraShakeAngle = HyRand::Range(0.0f, 359.0f);
+	m_fCameraShakeIntensity = fIntensity;
+	m_fCameraShakeDuration = fDuration;
+	m_fCameraShakeElapsedTime = 0.0f;
 }
 
 template<typename NODETYPE>
@@ -115,6 +114,15 @@ HyZoomLevel IHyCamera<NODETYPE>::SetZoomLevel()
 	return static_cast<HyZoomLevel>(iZoomIndex);
 }
 
+//template<typename NODETYPE>
+///*virtual*/ void IHyCamera<NODETYPE>::SetDirty(uint32 uiDirtyFlags) /*override*/
+//{
+//	NODETYPE::SetDirty(uiDirtyFlags);
+//
+//	if((uiDirtyFlags & DIRTY_Transform) != 0 && IsCameraShake())
+//		HySetVec(m_ptCameraShakeCenter, NODETYPE::pos.Get());
+//}
+
 template<typename NODETYPE>
 /*virtual*/ void IHyCamera<NODETYPE>::Update() /*override*/
 {
@@ -122,18 +130,27 @@ template<typename NODETYPE>
 
 	if(IsCameraShake())
 	{
-		m_fCameraShakeRadius *= m_fCameraShakeDurationMod;//0.9f;
-		if(m_fCameraShakeRadius <= 2.0f)
+		m_fCameraShakeElapsedTime += HyEngine::DeltaTime();
+		if(m_fCameraShakeElapsedTime >= m_fCameraShakeDuration)
 		{
 			// End camera shake
-			m_fCameraShakeRadius = 0.0f;
 			NODETYPE::pos.Set(m_ptCameraShakeCenter);
+			m_fCameraShakeAngle = 0.0f;
+			m_fCameraShakeIntensity = 0.0f;
+			m_fCameraShakeDuration = 0.0f;
+			m_fCameraShakeElapsedTime = 0.0f;
 		}
 		else
 		{
-			m_fCameraShakeAngle += (180.0f - m_fCameraShakeRadius) + HyRand::Range(0.0f, 60.0f); // Adjust angle 
-			glm::vec3 vOffset(sin(m_fCameraShakeAngle) * m_fCameraShakeRadius , cos(m_fCameraShakeAngle) * m_fCameraShakeRadius, 0.0f); // Create offset 2d vector
-			NODETYPE::pos.Set(m_ptCameraShakeCenter + vOffset); // Set center of viewport
+			// TODO: Implement different shake types: Perlin Noise, Sin (sinusoidal) Wave, etc.
+			float fCurIntensity = m_fCameraShakeIntensity * (1.0f - (m_fCameraShakeElapsedTime / m_fCameraShakeDuration));
+			m_fCameraShakeAngle += (180.0f - m_fCameraShakeAngle) + HyRand::Range(0.0f, 60.0f); // Adjust angle
+
+			// Create offset 2d vector
+			glm::vec3 vOffset(sin(m_fCameraShakeAngle) * fCurIntensity,
+							  cos(m_fCameraShakeAngle) * fCurIntensity, 0.0f);
+			
+			NODETYPE::pos.Set(m_ptCameraShakeCenter + vOffset);
 		}
 	}
 }
