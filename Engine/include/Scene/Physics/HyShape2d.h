@@ -56,38 +56,38 @@ public:
 
 	void SetAsNothing();
 
-	void SetAsB2Shape(const b2Shape *pShape);
+	void SetAsB2Shape(const b2Shape *pShape, const b2FixtureDef *pPhysicsInit = nullptr);
 
 	// Set as an isolated edge.
-	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2);
-	void SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2);
+	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const b2FixtureDef *pPhysicsInit = nullptr);
+	void SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2, const b2FixtureDef *pPhysicsInit = nullptr);
 
 	// Set as a line loop. This automatically connects last vertex to the first.
 	// Passed in parameters are copied, and understood to be local coordinates
-	void SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts);
-	void SetAsLineLoop(const std::vector<glm::vec2> &verticesList);
+	void SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts, const b2FixtureDef *pPhysicsInit = nullptr);
+	void SetAsLineLoop(const std::vector<glm::vec2> &verticesList, const b2FixtureDef *pPhysicsInit = nullptr);
 
 	// Set as a line chain with isolated end vertices. Passed in parameters are 
 	// copied, and understood to be local coordinates
-	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts);
-	void SetAsLineChain(const std::vector<glm::vec2> &verticesList);
+	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts, const b2FixtureDef *pPhysicsInit = nullptr);
+	void SetAsLineChain(const std::vector<glm::vec2> &verticesList, const b2FixtureDef *pPhysicsInit = nullptr);
 
 	// Set as a circle with the specified center and radius
-	bool SetAsCircle(float fRadius);
-	bool SetAsCircle(const glm::vec2 &ptCenter, float fRadius);
-	bool SetAsCircle(const b2Vec2& center, float fRadius);
+	bool SetAsCircle(float fRadius, const b2FixtureDef *pPhysicsInit = nullptr);
+	bool SetAsCircle(const glm::vec2 &ptCenter, float fRadius, const b2FixtureDef *pPhysicsInit = nullptr);
+	bool SetAsCircle(const b2Vec2& center, float fRadius, const b2FixtureDef *pPhysicsInit = nullptr);
 
 	// Set as a convex hull from the given array of local points.
 	// uiCount must be in the range [3, b2_maxPolygonVertices].
 	// The points may be re-ordered, even if they form a convex polygon
 	// Collinear points are handled but not removed. Collinear points
 	// may lead to poor stacking behavior in physics simulation.
-	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount);
-	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount);
-	void SetAsPolygon(const std::vector<glm::vec2> &verticesList);
+	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount, const b2FixtureDef *pPhysicsInit = nullptr);
+	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount, const b2FixtureDef *pPhysicsInit = nullptr);
+	void SetAsPolygon(const std::vector<glm::vec2> &verticesList, const b2FixtureDef *pPhysicsInit = nullptr);
 
-	bool SetAsBox(float fWidth, float fHeight); // Build vertices to represent an axis-aligned box, bottom left corner at 0,0
-	bool SetAsBox(const HyRect &rect);			// Build vertices to represent an oriented box
+	bool SetAsBox(float fWidth, float fHeight, const b2FixtureDef *pPhysicsInit = nullptr); // Build vertices to represent an axis-aligned box, bottom left corner at 0,0
+	bool SetAsBox(const HyRect &rect, const b2FixtureDef *pPhysicsInit = nullptr);			// Build vertices to represent an oriented box
 
 	// Applies when attached to a physics body
 	bool IsFixtureAllowed() const;

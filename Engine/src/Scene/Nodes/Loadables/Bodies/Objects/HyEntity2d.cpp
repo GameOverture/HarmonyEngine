@@ -920,7 +920,12 @@ void HyEntity2d::SyncPhysicsFixtures()
 		if(pShape->IsFixtureDirty())
 		{
 			if(pShape->IsValidShape() && pShape->IsFixtureAllowed())
+			{
 				pShape->CreateFixture(physics.m_pBody);
+
+				if(pShape->GetDensity() == 0.0f && physics.m_pBody->GetType() == b2_dynamicBody)
+					HyLogError("HyEntity2d::SyncPhysicsFixtures - Attempting to create a fixture with zero density on a dynamic body");
+			}
 			else
 				pShape->DestroyFixture();
 		}

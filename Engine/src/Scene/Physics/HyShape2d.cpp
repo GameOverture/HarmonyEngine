@@ -230,7 +230,7 @@ void HyShape2d::SetAsNothing()
 	ShapeChanged();
 }
 
-void HyShape2d::SetAsB2Shape(const b2Shape *pShape)
+void HyShape2d::SetAsB2Shape(const b2Shape *pShape, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
 	if(m_pShape == pShape)
 		return;
@@ -289,15 +289,18 @@ void HyShape2d::SetAsB2Shape(const b2Shape *pShape)
 		break;
 	}
 
+	if(pPhysicsInit)
+		Setup(*pPhysicsInit);
+
 	ShapeChanged();
 }
 
-void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
+void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
-	SetAsLineSegment(b2Vec2(pt1.x, pt1.y), b2Vec2(pt2.x, pt2.y));
+	SetAsLineSegment(b2Vec2(pt1.x, pt1.y), b2Vec2(pt2.x, pt2.y), pPhysicsInit);
 }
 
-void HyShape2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2)
+void HyShape2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
 	m_eType = HYSHAPE_LineSegment;
 
@@ -305,10 +308,13 @@ void HyShape2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2)
 	m_pShape = HY_NEW b2EdgeShape();
 	static_cast<b2EdgeShape *>(m_pShape)->SetTwoSided(pt1, pt2);
 
+	if(pPhysicsInit)
+		Setup(*pPhysicsInit);
+
 	ShapeChanged();
 }
 
-void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
+void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
 	HyAssert(uiNumVerts >= 3, "HyShape2d::SetAsLineLoop - not enough verts. Must be >= 3");
 	m_eType = HYSHAPE_LineChain;
@@ -321,15 +327,18 @@ void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	m_pShape = HY_NEW b2ChainShape();
 	static_cast<b2ChainShape *>(m_pShape)->CreateLoop(&vertList[0], uiNumVerts);
 
+	if(pPhysicsInit)
+		Setup(*pPhysicsInit);
+
 	ShapeChanged();
 }
 
-void HyShape2d::SetAsLineLoop(const std::vector<glm::vec2> &verticesList)
+void HyShape2d::SetAsLineLoop(const std::vector<glm::vec2> &verticesList, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
-	SetAsLineLoop(verticesList.data(), static_cast<uint32>(verticesList.size()));
+	SetAsLineLoop(verticesList.data(), static_cast<uint32>(verticesList.size()), pPhysicsInit);
 }
 
-void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
+void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
 	HyAssert(uiNumVerts >= 2, "HyShape2d::SetAsLineChain - not enough verts. Must be >= 2");
 	m_eType = HYSHAPE_LineChain;
@@ -342,25 +351,28 @@ void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts)
 	m_pShape = HY_NEW b2ChainShape();
 	static_cast<b2ChainShape *>(m_pShape)->CreateChain(&vertList[0], uiNumVerts, b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f));
 
+	if(pPhysicsInit)
+		Setup(*pPhysicsInit);
+
 	ShapeChanged();
 }
 
-void HyShape2d::SetAsLineChain(const std::vector<glm::vec2> &verticesList)
+void HyShape2d::SetAsLineChain(const std::vector<glm::vec2> &verticesList, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
-	SetAsLineChain(verticesList.data(), static_cast<uint32>(verticesList.size()));
+	SetAsLineChain(verticesList.data(), static_cast<uint32>(verticesList.size()), pPhysicsInit);
 }
 
-bool HyShape2d::SetAsCircle(float fRadius)
+bool HyShape2d::SetAsCircle(float fRadius, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
-	return SetAsCircle(glm::vec2(0.0f, 0.0f), fRadius);
+	return SetAsCircle(glm::vec2(0.0f, 0.0f), fRadius, pPhysicsInit);
 }
 
-bool HyShape2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius)
+bool HyShape2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
-	return SetAsCircle(b2Vec2(ptCenter.x, ptCenter.y), fRadius);
+	return SetAsCircle(b2Vec2(ptCenter.x, ptCenter.y), fRadius, pPhysicsInit);
 }
 
-bool HyShape2d::SetAsCircle(const b2Vec2& center, float fRadius)
+bool HyShape2d::SetAsCircle(const b2Vec2& center, float fRadius, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
 	if(fRadius < FloatSlop)
 	{
@@ -375,21 +387,24 @@ bool HyShape2d::SetAsCircle(const b2Vec2& center, float fRadius)
 	static_cast<b2CircleShape *>(m_pShape)->m_p = center;
 	static_cast<b2CircleShape *>(m_pShape)->m_radius = fRadius;
 
+	if(pPhysicsInit)
+		Setup(*pPhysicsInit);
+
 	ShapeChanged();
 
 	return true;
 }
 
-void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount)
+void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
 	std::vector<b2Vec2> vertList;
 	for(uint32 i = 0; i < uiCount; ++i)
 		vertList.push_back(b2Vec2(pPointArray[i].x, pPointArray[i].y));
 
-	SetAsPolygon(vertList.data(), static_cast<uint32>(vertList.size()));
+	SetAsPolygon(vertList.data(), static_cast<uint32>(vertList.size()), pPhysicsInit);
 }
 
-void HyShape2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount)
+void HyShape2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
 	HyAssert(uiCount <= b2_maxPolygonVertices, "HyShape2d::SetAsPolygon took too many vertices. Max is " << uiCount);
 
@@ -399,20 +414,23 @@ void HyShape2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount)
 	m_pShape = HY_NEW b2PolygonShape();
 	static_cast<b2PolygonShape *>(m_pShape)->Set(pPointArray, uiCount);
 
+	if(pPhysicsInit)
+		Setup(*pPhysicsInit);
+
 	ShapeChanged();
 }
 
-void HyShape2d::SetAsPolygon(const std::vector<glm::vec2> &verticesList)
+void HyShape2d::SetAsPolygon(const std::vector<glm::vec2> &verticesList, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
 	SetAsPolygon(verticesList.data(), static_cast<uint32>(verticesList.size()));
 }
 
-bool HyShape2d::SetAsBox(float fWidth, float fHeight)
+bool HyShape2d::SetAsBox(float fWidth, float fHeight, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
 	return SetAsBox(HyRect(fWidth, fHeight));
 }
 
-bool HyShape2d::SetAsBox(const HyRect &rect)
+bool HyShape2d::SetAsBox(const HyRect &rect, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
 {
 	if(rect.GetWidth() < FloatSlop || rect.GetHeight() < FloatSlop)
 	{
@@ -428,6 +446,9 @@ bool HyShape2d::SetAsBox(const HyRect &rect)
 													  rect.GetHeight() * 0.5f,
 													  b2Vec2(rect.GetCenter().x, rect.GetCenter().y),
 													  glm::radians(rect.GetRotation()));
+
+	if(pPhysicsInit)
+		Setup(*pPhysicsInit);
 
 	ShapeChanged();
 	return true;
