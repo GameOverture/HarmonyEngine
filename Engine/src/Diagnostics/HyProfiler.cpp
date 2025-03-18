@@ -59,6 +59,8 @@ void HyProfiler::SetShowFlags(uint32 uiDiagFlags)
 
 	ClearItems();
 
+	InsertSpacer(HYSIZEPOLICY_Fixed, 50);
+
 	m_txtFps.SetVisible(m_uiShowFlags & HYDIAG_Fps);
 	if(m_uiShowFlags & HYDIAG_Fps)
 		InsertWidget(m_txtFps);
