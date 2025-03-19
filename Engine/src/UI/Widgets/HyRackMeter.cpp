@@ -89,6 +89,11 @@ void HyRackMeter::OffsetValue(int64 iOffsetAmt, float fRackDuration)
 	SetValue(m_iTargetValue + iOffsetAmt, fRackDuration);
 }
 
+void HyRackMeter::SetTextVisible(bool bSet)
+{
+	m_Text.SetVisible(bSet);
+}
+
 void HyRackMeter::Slam()
 {
 	SetValue(m_iTargetValue, 0.0f);
