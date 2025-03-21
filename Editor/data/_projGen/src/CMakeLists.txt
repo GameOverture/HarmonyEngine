@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.11)
 project(%HY_PROJECTNAME%)
 
 set(REL_PROJ_PATH "%HY_RELPROJPATH%")
