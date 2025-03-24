@@ -497,6 +497,7 @@ public:
 	static const HyColor Magenta;
 	static const HyColor Purple;
 	static const HyColor Yellow;
+	static const HyColor Gold;
 	static const HyColor DarkYellow;
 	static const HyColor Gray;
 	static const HyColor DarkGray;
