@@ -40,8 +40,7 @@ protected:
 
 public:
 	HyLineEdit(HyEntity2d *pParent = nullptr);
-	HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
-	HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
+	HyLineEdit(const HyUiPanelInit &initRef, const HyUiTextInit &textInit, HyEntity2d *pParent = nullptr);
 	virtual ~HyLineEdit();
 
 	virtual void SetText(const std::string &sUtf8Text) override;

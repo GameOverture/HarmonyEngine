@@ -28,7 +28,7 @@ class HyToolButton : public HyButton
 	HyPrimitive2d			m_X2;
 
 public:
-	HyToolButton(HyToolButtonType eToolBtnType, const HyPanelInit &panelInit, HyEntity2d *pParent = nullptr);
+	HyToolButton(HyToolButtonType eToolBtnType, const HyUiPanelInit &panelInit, HyEntity2d *pParent = nullptr);
 	virtual ~HyToolButton();
 };
 

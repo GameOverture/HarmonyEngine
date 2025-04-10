@@ -56,13 +56,13 @@ protected:
 
 public:
 	HySlider(HyEntity2d *pParent = nullptr);
-	HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent = nullptr);
+	HySlider(const HyUiPanelInit &sliderInitRef, HyEntity2d *pParent = nullptr);
 	virtual ~HySlider();
 
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
 
-	void Setup(const HyPanelInit &sliderInitRef);
+	void Setup(const HyUiPanelInit &sliderInitRef);
 
 	int64 GetNumTicks() const;
 	int64 GetValue() const;

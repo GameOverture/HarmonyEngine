@@ -11,7 +11,7 @@
 #include "UI/Components/HyToolButton.h"
 #include "HyEngine.h"
 
-HyToolButton::HyToolButton(HyToolButtonType eToolBtnType, const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
+HyToolButton::HyToolButton(HyToolButtonType eToolBtnType, const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, pParent),
 	m_X1(this),
 	m_X2(this)

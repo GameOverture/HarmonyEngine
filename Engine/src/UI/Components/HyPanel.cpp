@@ -16,7 +16,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h"
 
 // Constructs a 'BoundingVolume' panel with 0 width/height
-HyPanelInit::HyPanelInit() :
+HyUiPanelInit::HyUiPanelInit() :
 	m_eNodeType(HYTYPE_Entity),
 	m_uiWidth(0),
 	m_uiHeight(0),
@@ -29,7 +29,7 @@ HyPanelInit::HyPanelInit() :
 }
 
 // Constructs a 'BoundingVolume' panel
-HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight) :
+HyUiPanelInit::HyUiPanelInit(uint32 uiWidth, uint32 uiHeight) :
 	m_eNodeType(HYTYPE_Entity),
 	m_uiWidth(uiWidth),
 	m_uiHeight(uiHeight),
@@ -42,7 +42,7 @@ HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight) :
 }
 
 // Constructs a 'NodeItem' panel
-HyPanelInit::HyPanelInit(HyType eNodeType, const HyNodePath &nodePath) :
+HyUiPanelInit::HyUiPanelInit(HyType eNodeType, const HyNodePath &nodePath) :
 	m_eNodeType(eNodeType),
 	m_uiWidth(0), // TBD by loading the node
 	m_uiHeight(0),// TBD by loading the node
@@ -52,10 +52,10 @@ HyPanelInit::HyPanelInit(HyType eNodeType, const HyNodePath &nodePath) :
 	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
 	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF))
 {
-	HyAssert(m_eNodeType != HYTYPE_Entity && m_eNodeType != HYTYPE_Primitive, "HyPanelInit::HyPanelInit(eNodeType, nodePath) 'NodeItem' panels cannot be of type 'Entity'");
+	HyAssert(m_eNodeType != HYTYPE_Entity && m_eNodeType != HYTYPE_Primitive, "HyUiPanelInit::HyUiPanelInit(eNodeType, nodePath) 'NodeItem' panels cannot be of type 'Entity'");
 }
 
-HyPanelInit::HyPanelInit(HyType eNodeType, const HyNodePath &nodePath, uint32 uiWidth, uint32 uiHeight) :
+HyUiPanelInit::HyUiPanelInit(HyType eNodeType, const HyNodePath &nodePath, uint32 uiWidth, uint32 uiHeight) :
 	m_eNodeType(eNodeType),
 	m_uiWidth(uiWidth),
 	m_uiHeight(uiHeight),
@@ -65,11 +65,11 @@ HyPanelInit::HyPanelInit(HyType eNodeType, const HyNodePath &nodePath, uint32 ui
 	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
 	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF))
 {
-	HyAssert(m_eNodeType != HYTYPE_Entity && m_eNodeType != HYTYPE_Primitive, "HyPanelInit::HyPanelInit(eNodeType, nodePath, uint32 uiWidth, uint32 uiHeight) 'NodeItem' panels cannot be of type 'Entity'");
+	HyAssert(m_eNodeType != HYTYPE_Entity && m_eNodeType != HYTYPE_Primitive, "HyPanelInit::HyUiPanelInit(eNodeType, nodePath, uint32 uiWidth, uint32 uiHeight) 'NodeItem' panels cannot be of type 'Entity'");
 }
 
 // Constructs an 'Primitive' panel. Colors of HyColor(0,0,0,0) will be set to a default color determined by the panel's usage
-HyPanelInit::HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor /*= HyColor(0,0,0,0)*/, HyColor frameColor /*= HyColor(0,0,0,0)*/, HyColor tertiaryColor /*= HyColor(0, 0, 0, 0)*/) :
+HyUiPanelInit::HyUiPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor /*= HyColor(0,0,0,0)*/, HyColor frameColor /*= HyColor(0,0,0,0)*/, HyColor tertiaryColor /*= HyColor(0, 0, 0, 0)*/) :
 	m_eNodeType(HYTYPE_Primitive),
 	m_uiWidth(uiWidth),
 	m_uiHeight(uiHeight),
@@ -93,7 +93,7 @@ HyPanel::HyPanel(HyEntity2d *pParent) :
 	DeleteData();
 }
 
-void HyPanel::Setup(const HyPanelInit &initRef)
+void HyPanel::Setup(const HyUiPanelInit &initRef)
 {
 	DeleteData(); // Delete any previous data
 	
@@ -169,9 +169,9 @@ void HyPanel::Setup(const HyPanelInit &initRef)
 	}
 }
 
-HyPanelInit HyPanel::CloneInit()
+HyUiPanelInit HyPanel::CloneInit()
 {
-	HyPanelInit init;
+	HyUiPanelInit init;
 	if(IsBoundingVolume())
 	{
 		init.m_eNodeType = HYTYPE_Entity;

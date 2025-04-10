@@ -18,22 +18,8 @@ HyRackMeter::HyRackMeter(HyEntity2d *pParent /*= nullptr*/) :
 	SetMonospacedDigits(true);
 }
 
-HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(panelInit, pParent),
-	m_SpinText(this)
-{
-	SetMonospacedDigits(true);
-}
-
-HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(panelInit, textNodePath, pParent),
-	m_SpinText(this)
-{
-	SetMonospacedDigits(true);
-}
-
-HyRackMeter::HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(panelInit, textNodePath, textMargins, pParent),
+HyRackMeter::HyRackMeter(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(panelInit, textInit, pParent),
 	m_SpinText(this)
 {
 	SetMonospacedDigits(true);

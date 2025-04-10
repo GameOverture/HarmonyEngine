@@ -40,9 +40,8 @@ protected:
 
 public:
 	HyLabel(HyEntity2d *pParent = nullptr);
-	HyLabel(const HyPanelInit &panelInit, HyEntity2d *pParent = nullptr);
-	HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
-	HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
+	HyLabel(const HyUiPanelInit &panelInit, HyEntity2d *pParent = nullptr);
+	HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent = nullptr);
 	virtual ~HyLabel();
 
 	virtual float GetWidth(float fPercent = 1.0f) override;
@@ -52,9 +51,8 @@ public:
 
 	virtual bool IsLoadDataValid() override;
 
-	void Setup(const HyPanelInit &panelInit);
-	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath);
-	void Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins);
+	void Setup(const HyUiPanelInit &panelInit);
+	void Setup(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit);
 	
 	HyNodePath GetTextNodePath() const;
 	HyTextType GetTextType() const;

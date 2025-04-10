@@ -18,7 +18,7 @@ std::vector<HyUiContainer *> HyUiContainer::sm_pContainerList;
 HySpacerHandle HyUiContainer::sm_hSpacerHandleCounter = 1;
 HyLayoutHandle HyUiContainer::sm_hLayoutHandleCounter = 1;
 
-HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
+HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyUiPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
 	//m_Shape(this),
 	m_bInputAllowed(true),

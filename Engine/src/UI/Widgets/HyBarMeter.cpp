@@ -25,7 +25,7 @@ HyBarMeter::HyBarMeter(HyEntity2d *pParent /*= nullptr*/) :
 	m_NumberFormat.SetFractionPrecision(0, 1);
 }
 
-HyBarMeter::HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, HyEntity2d *pParent /*= nullptr*/) :
+HyBarMeter::HyBarMeter(const HyUiPanelInit &panelInit, const HyUiPanelInit &barInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_iMinimum(0),
 	m_iMaximum(0),
@@ -39,7 +39,7 @@ HyBarMeter::HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit,
 	Setup(panelInit, barInit);
 }
 
-HyBarMeter::HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
+HyBarMeter::HyBarMeter(const HyUiPanelInit &panelInit, const HyUiPanelInit &barInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_iMinimum(0),
 	m_iMaximum(0),
@@ -50,22 +50,36 @@ HyBarMeter::HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit,
 	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
 	m_NumberFormat.SetFractionPrecision(0, 1);
-	Setup(panelInit, barInit, textNodePath, HyMargins<float>());
+	Setup(panelInit, barInit, textInit);
 }
 
-HyBarMeter::HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(pParent),
-	m_iMinimum(0),
-	m_iMaximum(0),
-	m_iValue(0),
-	m_BarMask(this),
-	m_Bar(this),
-	m_fBarProgressAmt(0.0f),
-	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
-{
-	m_NumberFormat.SetFractionPrecision(0, 1);
-	Setup(panelInit, barInit, textNodePath, textMargins);
-}
+//HyBarMeter::HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
+//	HyLabel(pParent),
+//	m_iMinimum(0),
+//	m_iMaximum(0),
+//	m_iValue(0),
+//	m_BarMask(this),
+//	m_Bar(this),
+//	m_fBarProgressAmt(0.0f),
+//	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
+//{
+//	m_NumberFormat.SetFractionPrecision(0, 1);
+//	Setup(panelInit, barInit, textNodePath, HyMargins<float>());
+//}
+//
+//HyBarMeter::HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
+//	HyLabel(pParent),
+//	m_iMinimum(0),
+//	m_iMaximum(0),
+//	m_iValue(0),
+//	m_BarMask(this),
+//	m_Bar(this),
+//	m_fBarProgressAmt(0.0f),
+//	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
+//{
+//	m_NumberFormat.SetFractionPrecision(0, 1);
+//	Setup(panelInit, barInit, textNodePath, textMargins);
+//}
 
 /*virtual*/ HyBarMeter::~HyBarMeter()
 {
@@ -81,22 +95,16 @@ HyBarMeter::HyBarMeter(const HyPanelInit &panelInit, const HyPanelInit &barInit,
 	HyLabel::SetText(sUtf8Text);
 }
 
-void HyBarMeter::Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit)
+void HyBarMeter::Setup(const HyUiPanelInit &panelInit, const HyUiPanelInit &barInit)
 {
 	m_Bar.Setup(barInit);
 	HyLabel::Setup(panelInit);
 }
 
-void HyBarMeter::Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath)
+void HyBarMeter::Setup(const HyUiPanelInit &panelInit, const HyUiPanelInit &barInit, const HyUiTextInit &textInit)
 {
 	m_Bar.Setup(barInit);
-	HyLabel::Setup(panelInit, textNodePath);
-}
-
-void HyBarMeter::Setup(const HyPanelInit &panelInit, const HyPanelInit &barInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins)
-{
-	m_Bar.Setup(barInit);
-	HyLabel::Setup(panelInit, textNodePath, textMargins);
+	HyLabel::Setup(panelInit, textInit);
 }
 
 glm::vec2 HyBarMeter::GetBarOffset() const

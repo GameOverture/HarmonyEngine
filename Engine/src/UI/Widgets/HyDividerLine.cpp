@@ -18,9 +18,9 @@ HyDividerLine::HyDividerLine(HyOrientation eOrientation, float fThickness, HyCol
 {
 	SetOrientation(eOrientation);
 	if(GetOrientation() == HYORIENT_Horizontal)
-		m_Panel.Setup(HyPanelInit(0, 1, fThickness, eColor, eColor));
+		m_Panel.Setup(HyUiPanelInit(0, 1, fThickness, eColor, eColor));
 	else
-		m_Panel.Setup(HyPanelInit(1, 0, fThickness, eColor, eColor));
+		m_Panel.Setup(HyUiPanelInit(1, 0, fThickness, eColor, eColor));
 
 	m_SizePolicies[GetOrientation()] = HYSIZEPOLICY_Expanding;
 }

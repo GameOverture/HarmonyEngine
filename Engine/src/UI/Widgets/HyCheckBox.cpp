@@ -19,7 +19,7 @@ HyCheckBox::HyCheckBox(HyEntity2d *pParent /*= nullptr*/) :
 	SetAsSideBySide();
 }
 
-HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
+HyCheckBox::HyCheckBox(const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
@@ -27,16 +27,8 @@ HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nul
 	SetAsSideBySide();
 }
 
-HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
-	HyButton(panelInit, textNodePath, pParent),
-	m_CheckMarkStroke(this),
-	m_CheckMarkFill(this)
-{
-	SetAsSideBySide();
-}
-
-HyCheckBox::HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
-	HyButton(panelInit, textNodePath, textMargins, pParent),
+HyCheckBox::HyCheckBox(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
+	HyButton(panelInit, textInit, pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this)
 {

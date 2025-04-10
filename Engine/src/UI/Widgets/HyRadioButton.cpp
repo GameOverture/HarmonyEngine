@@ -21,7 +21,7 @@ HyRadioButton::HyRadioButton(HyEntity2d *pParent /*= nullptr*/) :
 	SetAsSideBySide();
 }
 
-HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
+HyRadioButton::HyRadioButton(const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this),
@@ -31,18 +31,8 @@ HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, HyEntity2d *pParent /
 	SetAsSideBySide();
 }
 
-HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
-	HyButton(panelInit, textNodePath, pParent),
-	m_CheckMarkStroke(this),
-	m_CheckMarkFill(this),
-	m_fpOnCheckedChanged(nullptr)
-{
-	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
-	SetAsSideBySide();
-}
-
-HyRadioButton::HyRadioButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
-	HyButton(panelInit, textNodePath, textMargins, pParent),
+HyRadioButton::HyRadioButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
+	HyButton(panelInit, textInit, pParent),
 	m_CheckMarkStroke(this),
 	m_CheckMarkFill(this),
 	m_fpOnCheckedChanged(nullptr)

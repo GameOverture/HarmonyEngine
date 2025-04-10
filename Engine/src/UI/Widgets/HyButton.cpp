@@ -23,7 +23,7 @@ HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 	UsePanelStates();
 }
 
-HyButton::HyButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
+HyButton::HyButton(const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(panelInit, pParent),
 	m_pButtonGroup(nullptr),
 	m_fpBtnClickedCallback(nullptr)
@@ -34,8 +34,8 @@ HyButton::HyButton(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr
 	UsePanelStates();
 }
 
-HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(panelInit, textNodePath, pParent),
+HyButton::HyButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(panelInit, textInit, pParent),
 	m_pButtonGroup(nullptr),
 	m_fpBtnClickedCallback(nullptr)
 {
@@ -45,16 +45,27 @@ HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath,
 	UsePanelStates();
 }
 
-HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(panelInit, textNodePath, textMargins, pParent),
-	m_pButtonGroup(nullptr),
-	m_fpBtnClickedCallback(nullptr)
-{
-	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
-	SetKeyboardFocusAllowed(true);
-	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
-	UsePanelStates();
-}
+//HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
+//	HyLabel(panelInit, textNodePath, pParent),
+//	m_pButtonGroup(nullptr),
+//	m_fpBtnClickedCallback(nullptr)
+//{
+//	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
+//	SetKeyboardFocusAllowed(true);
+//	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
+//	UsePanelStates();
+//}
+//
+//HyButton::HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
+//	HyLabel(panelInit, textNodePath, textMargins, pParent),
+//	m_pButtonGroup(nullptr),
+//	m_fpBtnClickedCallback(nullptr)
+//{
+//	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
+//	SetKeyboardFocusAllowed(true);
+//	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
+//	UsePanelStates();
+//}
 
 /*virtual*/ HyButton::~HyButton()
 {

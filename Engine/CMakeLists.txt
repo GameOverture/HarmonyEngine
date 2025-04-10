@@ -174,6 +174,8 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Components/HyPanel.cpp
 	src/UI/Components/HyScrollBar.cpp
 	src/UI/Components/HySpacer.cpp
+	src/UI/Dialogs/HyRadioDialog.cpp
+	src/UI/Dialogs/IHyDialog.cpp
 	src/UI/Localization/HyLocale.cpp
 	src/UI/Localization/HyNumberFormat.cpp
 	src/UI/Localization/HyTranslateTable.cpp
@@ -312,6 +314,8 @@ set(HYENGINE_HEADER_FILES
 	include/UI/Components/HyPanel.h
 	include/UI/Components/HyScrollBar.h
 	include/UI/Components/HySpacer.h
+	include/UI/Dialogs/HyRadioDialog.h
+	include/UI/Dialogs/IHyDialog.h
 	include/UI/Localization/HyLocale.h
 	include/UI/Localization/HyNumpunct.h
 	include/UI/Localization/HyNumberFormat.h

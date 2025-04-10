@@ -38,9 +38,8 @@ protected:
 
 public:
 	HyButton(HyEntity2d *pParent = nullptr);
-	HyButton(const HyPanelInit &panelInit, HyEntity2d *pParent = nullptr);
-	HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
-	HyButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
+	HyButton(const HyUiPanelInit &panelInit, HyEntity2d *pParent = nullptr);
+	HyButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent = nullptr);
 	virtual ~HyButton();
 
 	virtual bool IsDepressed() const override;

@@ -23,20 +23,8 @@ HyRichLabel::HyRichLabel(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-HyRichLabel::HyRichLabel(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(panelInit, pParent),
-	m_vTextDimensions(0.0f)
-{
-}
-
-HyRichLabel::HyRichLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(panelInit, textNodePath, pParent),
-	m_vTextDimensions(0.0f)
-{
-}
-
-HyRichLabel::HyRichLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(panelInit, textNodePath, textMargins, pParent),
+HyRichLabel::HyRichLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(panelInit, textInit, pParent),
 	m_vTextDimensions(0.0f)
 {
 }

@@ -44,39 +44,8 @@ HyLineEdit::HyLineEdit(HyEntity2d *pParent /*= nullptr*/) :
 	UsePanelStates();
 }
 
-HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(initRef, textNodePath, pParent),
-	m_uiCursorIndex(0),
-	m_uiSelectionIndex(0),
-	m_Selection(this),
-	m_Cursor(this),
-	m_fpOnSubmit(nullptr)
-{
-	m_Selection.alpha.Set(0.5f);
-	ChildInsert(m_Text, m_Selection);
-	ChildAppend(m_Cursor);
-
-	SetAlignment(HYALIGN_Left);
-	SetAsLine();
-
-	SetCursor(GetCursorIndex(), GetSelectionIndex());
-
-	m_BlinkTimer.SetExpiredCallback(
-		[this]()
-		{
-			m_Cursor.SetVisible(!m_Cursor.IsVisible());
-			m_BlinkTimer.InitStart(HYLINEEDIT_BLINKDUR);
-		});
-	m_BlinkTimer.Init(HYLINEEDIT_BLINKDUR);
-
-	SetKeyboardFocusAllowed(true);
-	SetMouseHoverCursor(HYMOUSECURSOR_IBeam);
-
-	UsePanelStates();
-}
-
-HyLineEdit::HyLineEdit(const HyPanelInit &initRef, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
-	HyLabel(initRef, textNodePath, textMargins, pParent),
+HyLineEdit::HyLineEdit(const HyUiPanelInit &initRef, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
+	HyLabel(initRef, textInit, pParent),
 	m_uiCursorIndex(0),
 	m_uiSelectionIndex(0),
 	m_Selection(this),

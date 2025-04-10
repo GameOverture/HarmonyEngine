@@ -24,9 +24,8 @@ protected:
 
 public:
 	HyCheckBox(HyEntity2d *pParent = nullptr);
-	HyCheckBox(const HyPanelInit &panelInit, HyEntity2d *pParent = nullptr);
-	HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
-	HyCheckBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
+	HyCheckBox(const HyUiPanelInit &panelInit, HyEntity2d *pParent = nullptr);
+	HyCheckBox(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent = nullptr);
 	virtual ~HyCheckBox();
 
 	void SetCheckedChangedCallback(std::function<void(HyCheckBox *)> fpCallback);

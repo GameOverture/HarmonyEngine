@@ -68,7 +68,7 @@ HySlider::HySlider(HyEntity2d *pParent /*= nullptr*/) :
 	RegisterAssembleEntity();
 }
 
-HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nullptr*/) :
+HySlider::HySlider(const HyUiPanelInit &sliderInitRef, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_iMin(0),
 	m_iMax(100),
@@ -103,7 +103,7 @@ HySlider::HySlider(const HyPanelInit &sliderInitRef, HyEntity2d *pParent /*= nul
 	return m_vSizeHint.y * fPercent;
 }
 
-void HySlider::Setup(const HyPanelInit &sliderInitRef)
+void HySlider::Setup(const HyUiPanelInit &sliderInitRef)
 {
 	m_Panel.Setup(sliderInitRef);
 	SetBarColors(m_Panel.GetTertiaryColor(), m_Panel.GetFrameColor(), m_Panel.GetFrameColor());

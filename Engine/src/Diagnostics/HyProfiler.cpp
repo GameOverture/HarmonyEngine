@@ -14,7 +14,7 @@
 #define HY_DIAGNOSTICS_DISPLAYORDER 0x7FFFFF00
 
 HyProfiler::HyProfiler() :
-	HyUiContainer(HYORIENT_Vertical, HyPanelInit()),
+	HyUiContainer(HYORIENT_Vertical, HyUiPanelInit()),
 	m_dFrameTime_Low(9999.0),
 	m_dFrameTime_High(0.0),
 	m_dFrameTime_Cumulative(0.0),
@@ -36,19 +36,19 @@ HyProfiler::HyProfiler() :
 
 void HyProfiler::InitText(const HyNodePath &nodePath, uint32 uiTextState)
 {
-	m_txtFps.Setup(HyPanelInit(), nodePath);
+	m_txtFps.Setup(HyUiPanelInit(), HyUiTextInit(nodePath));
 	m_txtFps.SetTextState(uiTextState);
 
-	m_txtFrameTimes.Setup(HyPanelInit(), nodePath);
+	m_txtFrameTimes.Setup(HyUiPanelInit(), HyUiTextInit(nodePath));
 	m_txtFrameTimes.SetTextState(uiTextState);
 
-	m_txtMouse.Setup(HyPanelInit(), nodePath);
+	m_txtMouse.Setup(HyUiPanelInit(), HyUiTextInit(nodePath));
 	m_txtMouse.SetTextState(uiTextState);
 
-	m_txtMouseWorld.Setup(HyPanelInit(), nodePath);
+	m_txtMouseWorld.Setup(HyUiPanelInit(), HyUiTextInit(nodePath));
 	m_txtMouseWorld.SetTextState(uiTextState);
 
-	m_txtMouseBtns.Setup(HyPanelInit(), nodePath);
+	m_txtMouseBtns.Setup(HyUiPanelInit(), HyUiTextInit(nodePath));
 	m_txtMouseBtns.SetTextState(uiTextState);
 }
 

@@ -16,7 +16,20 @@
 #include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
-struct HyPanelInit
+struct HyUiTextInit
+{
+	HyNodePath					m_NodePath;
+	HyMargins<float>			m_Margins;
+
+	HyUiTextInit() : m_NodePath(HyNodePath()), m_Margins(0.0f, 0.0f, 0.0f, 0.0f)
+	{ }
+	HyUiTextInit(const HyNodePath &textNodePath) : m_NodePath(textNodePath), m_Margins(0.0f, 0.0f, 0.0f, 0.0f)
+	{ }
+	HyUiTextInit(const HyNodePath &textNodePath, const HyMargins<float> &textMargins) : m_NodePath(textNodePath), m_Margins(textMargins)
+	{ }
+};
+
+struct HyUiPanelInit
 {
 	HyType						m_eNodeType;
 
@@ -31,18 +44,18 @@ struct HyPanelInit
 	HyColor						m_TertiaryColor;
 
 	// Constructs a 'BoundingVolume' panel with 0 width/height. The widget will ignore this panel and not use it for sizing
-	HyPanelInit();
+	HyUiPanelInit();
 
 	// Constructs a 'BoundingVolume' panel. A bounding volume is not visible, but the widget will use it to size itself or it's ignored if either width/height is 0
-	HyPanelInit(uint32 uiWidth, uint32 uiHeight);
+	HyUiPanelInit(uint32 uiWidth, uint32 uiHeight);
 
 	// Constructs a 'NodeItem' panel. The widget may use the node's width/height to size itself or it's ignored if nodePath is invalid
-	HyPanelInit(HyType eNodeType, const HyNodePath &nodePath);
-	HyPanelInit(HyType eNodeType, const HyNodePath &nodePath, uint32 uiWidth, uint32 uiHeight);
+	HyUiPanelInit(HyType eNodeType, const HyNodePath &nodePath);
+	HyUiPanelInit(HyType eNodeType, const HyNodePath &nodePath, uint32 uiWidth, uint32 uiHeight);
 
 	// Constructs a 'Primitive' panel. Default HyColor values of 0xDEADBEEF will be set to a default color determined by the widget
 	// Passing '0' for width/height will try to auto-size based on the widget if applicable (or it will be hidden)
-	HyPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0xDE,0xAD,0xBE,0xEF), HyColor frameColor = HyColor(0xDE, 0xAD, 0xBE, 0xEF), HyColor tertiaryColor = HyColor(0xDE, 0xAD, 0xBE, 0xEF));
+	HyUiPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0xDE,0xAD,0xBE,0xEF), HyColor frameColor = HyColor(0xDE, 0xAD, 0xBE, 0xEF), HyColor tertiaryColor = HyColor(0xDE, 0xAD, 0xBE, 0xEF));
 };
 
 // Internal class component of UI widgets. Is a visual representation of single panel.
@@ -68,7 +81,7 @@ class HyPanel : public HyEntity2d
 
 		bool					m_bIsContainer; // TODO: Construct panels differently?
 
-		PrimParts(const HyPanelInit &initRef, HyPanel *pParent) :
+		PrimParts(const HyUiPanelInit &initRef, HyPanel *pParent) :
 			m_uiFrameSize(initRef.m_uiFrameSize),
 			m_PanelColor(initRef.m_PanelColor),
 			m_FrameColor(initRef.m_FrameColor),
@@ -93,8 +106,8 @@ public:
 	HyPanel(HyEntity2d *pParent);
 	virtual ~HyPanel();
 
-	void Setup(const HyPanelInit &initRef);
-	HyPanelInit CloneInit(); // Uses currently set properties of this panel to create an equivalent HyPanelInit struct
+	void Setup(const HyUiPanelInit &initRef);
+	HyUiPanelInit CloneInit(); // Uses currently set properties of this panel to create an equivalent HyPanelInit struct
 
 	virtual uint32 GetState() const override;
 	virtual bool SetState(uint32 uiStateIndex) override;

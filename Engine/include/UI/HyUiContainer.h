@@ -64,7 +64,7 @@ protected:
 	HyScrollBar								m_HorzBar;
 
 public:
-	HyUiContainer(HyOrientation eRootLayoutDirection, const HyPanelInit &initRef, HyEntity2d *pParent = nullptr);
+	HyUiContainer(HyOrientation eRootLayoutDirection, const HyUiPanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~HyUiContainer();
 
 	static bool IsModalActive();

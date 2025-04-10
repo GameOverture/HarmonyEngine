@@ -23,20 +23,8 @@ HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 	SetButtonClickedCallback([this](HyButton *pThis) { ToggleExpanded(); });
 }
 
-HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
-	HyButton(panelInit, textNodePath, pParent),
-	m_Shape(this),
-	m_SubBtnPanel(this),
-	m_fSubBtnSpacing(5.0f),
-	m_fElapsedExpandedTime(0.0f),
-	m_fExpandedTimeout(0.0f),
-	m_ExpandAnimVec(*this, 0)
-{
-	SetButtonClickedCallback([this](HyButton *pThis) { ToggleExpanded(); });
-}
-
-HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
-	HyButton(panelInit, textNodePath, textMargins, pParent),
+HyComboBox::HyComboBox(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
+	HyButton(panelInit, textInit, pParent),
 	m_Shape(this),
 	m_SubBtnPanel(this),
 	m_fSubBtnSpacing(5.0f),
@@ -52,14 +40,9 @@ HyComboBox::HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodeP
 	ClearSubButtons();
 }
 
-uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, std::function<void(HyButton *)> fpCallBack, const HyNodePath &audioNodePath /*= HyNodePath()*/)
+uint32 HyComboBox::InsertSubButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, std::function<void(HyButton *)> fpCallBack, const HyNodePath &audioNodePath /*= HyNodePath()*/)
 {
-	return InsertSubButton(panelInit, textNodePath, HyMargins<float>(), fpCallBack, audioNodePath);
-}
-
-uint32 HyComboBox::InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, std::function<void(HyButton *)> fpCallBack, const HyNodePath &audioNodePath /*= HyNodePath()*/)
-{
-	HyButton *pNewBtn = HY_NEW HyButton(panelInit, textNodePath, textMargins, this);
+	HyButton *pNewBtn = HY_NEW HyButton(panelInit, textInit, this);
 	pNewBtn->SetButtonClickedCallback(fpCallBack, audioNodePath);
 	pNewBtn->SetAsEnabled(false);
 	pNewBtn->pos.Set(pNewBtn->GetPosOffset());
@@ -110,7 +93,7 @@ void HyComboBox::ClearSubButtons()
 	m_SubBtnEnabledMap.clear();
 }
 
-void HyComboBox::SetExpandPanel(const HyPanelInit &panelInit, HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate)
+void HyComboBox::SetExpandPanel(const HyUiPanelInit &panelInit, HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate)
 {
 	m_SubBtnPanel.Setup(panelInit);
 

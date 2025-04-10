@@ -22,7 +22,7 @@ HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	m_uiAttribs |= LABELATTRIB_Vertical;
 }
 
-HyLabel::HyLabel(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_eStackedAlignment(HYALIGN_Center),
 	m_iSideBySidePadding(0)
@@ -32,10 +32,10 @@ HyLabel::HyLabel(const HyPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/
 	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
 	m_uiAttribs |= LABELATTRIB_Vertical;
 
-	Setup(panelInit, HyNodePath(), HyMargins<float>());
+	Setup(panelInit, HyUiTextInit());
 }
 
-HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent /*= nullptr*/) :
+HyLabel::HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_eStackedAlignment(HYALIGN_Center),
 	m_iSideBySidePadding(0)
@@ -45,20 +45,7 @@ HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, H
 	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
 	m_uiAttribs |= LABELATTRIB_Vertical;
 
-	Setup(panelInit, textNodePath, HyMargins<float>());
-}
-
-HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent /*= nullptr*/) :
-	IHyWidget(pParent),
-	m_eStackedAlignment(HYALIGN_Center),
-	m_iSideBySidePadding(0)
-{
-	RegisterAssembleEntity();
-
-	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
-	m_uiAttribs |= LABELATTRIB_Vertical;
-
-	Setup(panelInit, textNodePath, textMargins);
+	Setup(panelInit, textInit);
 }
 
 /*virtual*/ HyLabel::~HyLabel()
@@ -114,17 +101,12 @@ HyLabel::HyLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, c
 		   m_Text.IsLoadDataValid();
 }
 
-void HyLabel::Setup(const HyPanelInit &panelInit)
+void HyLabel::Setup(const HyUiPanelInit &panelInit)
 {
-	Setup(panelInit, m_Text.GetPath(), m_TextMargins);
+	Setup(panelInit, HyUiTextInit(m_Text.GetPath(), m_TextMargins));
 }
 
-void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath)
-{
-	Setup(panelInit, textNodePath, m_TextMargins);
-}
-
-void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins)
+void HyLabel::Setup(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit)
 {
 	if(m_Panel.IsBoundingVolume() && m_Panel.GetBvShape())
 	{
@@ -140,8 +122,8 @@ void HyLabel::Setup(const HyPanelInit &panelInit, const HyNodePath &textNodePath
 	if(m_Panel.IsBoundingVolume() && m_Panel.GetBvShape())
 		ShapeAppend(*m_Panel.GetBvShape());
 
-	m_Text.Init(textNodePath, this);
-	m_TextMargins = textMargins;
+	m_Text.Init(textInit.m_NodePath, this);
+	m_TextMargins = textInit.m_Margins;
 
 	SetAsEnabled(IsEnabled());
 
@@ -224,7 +206,7 @@ void HyLabel::SetAsColumn(float fWidth)
 
 	if(m_Panel.GetWidth() != fWidth)
 	{
-		HyPanelInit panelInit = m_Panel.CloneInit();
+		HyUiPanelInit panelInit = m_Panel.CloneInit();
 		panelInit.m_uiWidth = fWidth;
 		m_Panel.Setup(panelInit);
 		//OnPanelUpdated();
@@ -257,7 +239,7 @@ void HyLabel::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= f
 
 	if(m_Panel.GetWidth() != fWidth || m_Panel.GetHeight() != fHeight)
 	{
-		HyPanelInit panelInit = m_Panel.CloneInit();
+		HyUiPanelInit panelInit = m_Panel.CloneInit();
 		panelInit.m_uiWidth = fWidth;
 		panelInit.m_uiHeight = fHeight;
 		m_Panel.Setup(panelInit);
@@ -285,7 +267,7 @@ void HyLabel::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically 
 
 	if(m_Panel.GetWidth() != fWidth || m_Panel.GetHeight() != fHeight)
 	{
-		HyPanelInit panelInit = m_Panel.CloneInit();
+		HyUiPanelInit panelInit = m_Panel.CloneInit();
 		panelInit.m_uiWidth = fWidth;
 		panelInit.m_uiHeight = fHeight;
 		m_Panel.Setup(panelInit);

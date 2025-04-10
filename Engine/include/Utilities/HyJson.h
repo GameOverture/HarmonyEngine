@@ -14,6 +14,7 @@
 #include "vendor/rapidjson/writer.h"
 #include "vendor/rapidjson/prettywriter.h"
 #include "vendor/rapidjson/stringbuffer.h"
+#include "vendor/rapidjson/ostreamwrapper.h"
 typedef rapidjson::Document HyJsonDoc;
 typedef rapidjson::Value HyJsonValue;
 typedef rapidjson::GenericArray<false, rapidjson::Value> HyJsonArray;

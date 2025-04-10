@@ -23,9 +23,7 @@ protected:
 
 public:
 	HyRichLabel(HyEntity2d *pParent = nullptr);
-	HyRichLabel(const HyPanelInit &panelInit, HyEntity2d *pParent = nullptr);
-	HyRichLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
-	HyRichLabel(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
+	HyRichLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent = nullptr);
 	virtual ~HyRichLabel();
 
 	virtual float GetTextWidth(float fPercent = 1.0f) override;		// Includes formatted sprites

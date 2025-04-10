@@ -69,9 +69,7 @@ protected:
 
 public:
 	HyRackMeter(HyEntity2d *pParent = nullptr);
-	HyRackMeter(const HyPanelInit &panelInit, HyEntity2d *pParent = nullptr);
-	HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
-	HyRackMeter(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
+	HyRackMeter(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent = nullptr);
 	virtual ~HyRackMeter();
 
 	int64 GetValue() const;

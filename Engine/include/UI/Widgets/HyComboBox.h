@@ -48,17 +48,15 @@ protected:
 
 public:
 	HyComboBox(HyEntity2d *pParent = nullptr);
-	HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, HyEntity2d *pParent = nullptr);
-	HyComboBox(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, HyEntity2d *pParent = nullptr);
+	HyComboBox(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent = nullptr);
 	virtual ~HyComboBox();
 
-	uint32 InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, std::function<void(HyButton *)> fpCallBack, const HyNodePath &audioNodePath = HyNodePath());
-	uint32 InsertSubButton(const HyPanelInit &panelInit, const HyNodePath &textNodePath, const HyMargins<float> &textMargins, std::function<void(HyButton *)> fpCallBack, const HyNodePath &audioNodePath = HyNodePath());
+	uint32 InsertSubButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, std::function<void(HyButton *)> fpCallBack, const HyNodePath &audioNodePath = HyNodePath());
 	void SetSubButtonEnabled(uint32 uiSubBtnIndex, bool bEnabled);
 	void RemoveSubButton(uint32 uiSubBtnIndex);
 	void ClearSubButtons();
 
-	void SetExpandPanel(const HyPanelInit &panelInit, HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate);
+	void SetExpandPanel(const HyUiPanelInit &panelInit, HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate);
 
 	bool IsExpanded() const;
 	bool IsTransition() const;
