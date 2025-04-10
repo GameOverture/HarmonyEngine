@@ -38,8 +38,11 @@ class IHyDialog : public HyUiContainer
 	};
 
 public:
-	IHyDialog(std::string sTitle, HyOrientation eRootLayoutDirection, const HyUiPanelInit &panelInitRef, const HyUiPanelInit &buttonPanelInitRef, const HyUiTextInit &buttonTextInitRef, uint32_t uiButtonFlags = (HYDLGFLAG_Ok | HYDLGFLAG_Cancel), HyEntity2d *pParent = nullptr);
+	IHyDialog(std::string sTitle, const HyUiPanelInit &panelInitRef, const HyUiPanelInit &buttonPanelInitRef, const HyUiTextInit &buttonTextInitRef, uint32_t uiButtonFlags = (HYDLGFLAG_Ok | HYDLGFLAG_Cancel), HyEntity2d *pParent = nullptr);
 	virtual ~IHyDialog();
+
+protected:
+	void InsertButtonList();
 };
 
 #endif /* IHyDialog_h__ */

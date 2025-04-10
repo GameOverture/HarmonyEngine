@@ -10,8 +10,8 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/Dialogs/IHyDialog.h"
 
-IHyDialog::IHyDialog(std::string sTitle, HyOrientation eRootLayoutDirection, const HyUiPanelInit &panelInitRef, const HyUiPanelInit &buttonPanelInitRef, const HyUiTextInit &buttonTextInitRef, uint32_t uiButtonFlags /*= (HYDLGFLAG_Ok | HYDLGFLAG_Cancel)*/, HyEntity2d *pParent /*= nullptr*/) :
-	HyUiContainer(eRootLayoutDirection, panelInitRef, pParent)
+IHyDialog::IHyDialog(std::string sTitle, const HyUiPanelInit &panelInitRef, const HyUiPanelInit &buttonPanelInitRef, const HyUiTextInit &buttonTextInitRef, uint32_t uiButtonFlags /*= (HYDLGFLAG_Ok | HYDLGFLAG_Cancel)*/, HyEntity2d *pParent /*= nullptr*/) :
+	HyUiContainer(HYORIENT_Vertical, panelInitRef, pParent)
 {
 	HyButton *pNewBtn = nullptr;
 	if(uiButtonFlags & HYDLGFLAG_Ok)
@@ -54,4 +54,12 @@ IHyDialog::IHyDialog(std::string sTitle, HyOrientation eRootLayoutDirection, con
 
 /*virtual*/ IHyDialog::~IHyDialog()
 {
+}
+
+void IHyDialog::InsertButtonList()
+{
+	HyLayoutHandle hButtonBox = InsertLayout(HYORIENT_Horizontal);
+	InsertSpacer(HYSIZEPOLICY_Expanding, 0, hButtonBox);
+	for(HyButton *pBtn : m_ButtonList)
+		InsertWidget(*pBtn, hButtonBox);
 }

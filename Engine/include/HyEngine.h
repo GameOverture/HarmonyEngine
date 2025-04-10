@@ -34,6 +34,7 @@
 #include "Threading/IHyThreadClass.h"
 #include "Time/HyTime.h"
 #include "UI/HyUiContainer.h"
+#include "UI/Dialogs/HyRadioDialog.h"
 #include "UI/Widgets/HyButton.h"
 #include "UI/Widgets/HyCheckBox.h"
 #include "UI/Widgets/HyRadioButton.h"

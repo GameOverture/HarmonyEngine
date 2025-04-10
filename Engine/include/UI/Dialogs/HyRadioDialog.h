@@ -17,10 +17,15 @@
 class HyRadioDialog : public IHyDialog
 {
 	std::vector<HyRadioButton *>	m_RadioList;
+	HyUiPanelInit					m_ButtonPanelInit;
+	HyUiTextInit					m_ButtonTextInitRef;
 
 public:
 	HyRadioDialog(std::string sTitle, std::vector<std::string> sRadioList, const HyUiPanelInit &panelInitRef, const HyUiPanelInit &buttonPanelInitRef, const HyUiTextInit &buttonTextInitRef, HyEntity2d *pParent = nullptr);
 	virtual ~HyRadioDialog();
+
+	void SetRadioList(std::vector<std::string> sRadioList);
+	void SetRadioList(std::vector<std::string> sRadioList, const HyUiPanelInit &buttonPanelInitRef, const HyUiTextInit &buttonTextInitRef);
 };
 
 #endif /* HyRadioDialog_h__ */
