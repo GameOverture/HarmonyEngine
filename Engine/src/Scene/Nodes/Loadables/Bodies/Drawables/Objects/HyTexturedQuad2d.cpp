@@ -24,9 +24,12 @@ HyTexturedQuad2d::HyTexturedQuad2d(HyEntity2d *pParent /*= nullptr*/) :
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(const HyNodePath &nodePath, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_TexturedQuad, nodePath, pParent)
+	IHyDrawable2d(HYTYPE_TexturedQuad, HyNodePath(), pParent)
 {
 	m_ShaderUniforms.SetNumTexUnits(1);
+
+	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTexture(HyIO::CleanPath(nodePath.GetPath().c_str()), HyTextureInfo());
+	m_NodePath.Set(hTexQuadHandle.first, hTexQuadHandle.second);
 }
 
 HyTexturedQuad2d::HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent /*= nullptr*/) :

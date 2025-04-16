@@ -138,8 +138,6 @@ void HyPanel::Setup(const HyUiPanelInit &initRef)
 	
 	case HYTYPE_TexturedQuad: // 'NodeItem' panel
 		m_PanelData.m_pNodeItem = HY_NEW HyTexturedQuad2d(initRef.m_NodePath, this);
-		if(initRef.m_uiWidth != 0 && initRef.m_uiHeight != 0)
-			m_PanelData.m_pNodeItem->scale.Set(initRef.m_uiWidth / m_PanelData.m_pNodeItem->GetWidth(), initRef.m_uiHeight / m_PanelData.m_pNodeItem->GetHeight());
 		break;
 
 	case HYTYPE_Primitive: // 'Primitive' panel
@@ -445,6 +443,12 @@ glm::vec2 HyPanel::GetBotLeftOffset()
 		return -glm::vec2(vStateOffset.x * m_PanelData.m_pNodeItem->scale.X(), vStateOffset.y * m_PanelData.m_pNodeItem->scale.Y());
 	}
 	return glm::vec2(0.0f, 0.0f);
+}
+
+/*virtual*/ void HyPanel::OnLoaded() /*override*/
+{
+	if(IsAutoSize() == false && IsNode() && m_PanelData.m_pNodeItem->GetType() == HYTYPE_TexturedQuad)
+		m_PanelData.m_pNodeItem->scale.Set(m_vSizeHint.x / m_PanelData.m_pNodeItem->GetWidth(), m_vSizeHint.y / m_PanelData.m_pNodeItem->GetHeight());
 }
 
 void HyPanel::ConstructPrimitives()

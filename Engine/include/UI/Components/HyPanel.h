@@ -138,6 +138,8 @@ public:
 	glm::vec2 GetBotLeftOffset();
 
 protected:
+	virtual void OnLoaded() override;
+
 	void ConstructPrimitives();
 
 	void DeleteData();
