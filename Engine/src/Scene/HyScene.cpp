@@ -34,20 +34,24 @@ HyScene::HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audio
 	m_fPpmInverse(1.0f / fPixelsPerMeter),
 	m_iPhysVelocityIterations(8),
 	m_iPhysPositionIterations(3),
-	m_ContactListener(*this),
 	m_pCurBox2dDraw(nullptr),
-	m_b2World(b2Vec2(vGravity2d.x, vGravity2d.y)),
 	m_bPhysUpdating(false)
 {
 	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	IHyNode::sm_pScene = this;
 
-	m_b2World.SetContactListener(&m_ContactListener);
+	b2WorldDef worldDef = b2DefaultWorldDef();
+	worldDef.gravity = { vGravity2d.x, vGravity2d.y };
+	m_hWorld = b2CreateWorld(&worldDef);
+	//m_b2World.SetContactListener(&m_ContactListener);
 	m_b2World.SetDestructionListener(&m_DestructListener);
 }
 
 HyScene::~HyScene(void)
 {
+	b2DestroyWorld(m_hWorld);
+	m_hWorld = b2_nullWorldId;
+
 	IHyNode::sm_pScene = nullptr;
 }
 
@@ -175,15 +179,15 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 	}
 }
 
-void HyScene::AddNode_PhysBody(HyEntity2d *pEntity)
+void HyScene::AddNode_PhysBody(HyPhysicsCtrl2d *pPhysCtrl2d)
 {
-	HyAssert(pEntity, "HyScene::AddNode_PhysBody was passed a null HyEntity2d *");
+	HyAssert(pPhysCtrl2d, "HyScene::AddNode_PhysBody was passed a null HyPhysicsCtrl2d *");
 
 	const glm::mat4 &mtxSceneRef = pEntity->GetSceneTransform(0.0f);
 	glm::vec3 ptTranslation = mtxSceneRef[3];
 	glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
 
-	if(pEntity->physics.m_pBody)
+	if(b2Shape_IsValid(pPhysCtrl2d->m_hBody)  pEntity->physics.m_pBody)
 	{
 		if(pEntity->physics.m_pBody->IsEnabled() == false)
 		{
@@ -195,12 +199,31 @@ void HyScene::AddNode_PhysBody(HyEntity2d *pEntity)
 	}
 
 	if(pEntity->physics.m_pInit == nullptr)
+	{
 		pEntity->physics.m_pInit = HY_NEW b2BodyDef();
+		*pEntity->physics.m_pInit = b2DefaultBodyDef();
+	}
 	pEntity->physics.m_pInit->position.x = ptTranslation.x * m_fPpmInverse;
 	pEntity->physics.m_pInit->position.y = ptTranslation.y * m_fPpmInverse;
-	pEntity->physics.m_pInit->angle = vRotations.z;
-	pEntity->physics.m_pInit->enabled = true;
-	pEntity->physics.m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(pEntity);
+	pEntity->physics.m_pInit->rotation = b2MakeRot(vRotations.z);
+	pEntity->physics.m_pInit->isEnabled = true;
+	pEntity->physics.m_pInit->userData = pEntity;
+
+
+
+
+	b2BodyDef bodyDef = b2DefaultBodyDef();
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.position = { 0.0f, 4.0f };
+
+
+	b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
+
+
+
+
+
+
 
 	pEntity->physics.m_pBody = m_b2World.CreateBody(pEntity->physics.m_pInit);
 	delete pEntity->physics.m_pInit;
@@ -210,7 +233,7 @@ void HyScene::AddNode_PhysBody(HyEntity2d *pEntity)
 	pEntity->SyncPhysicsFixtures();
 }
 
-void HyScene::RemoveNode_PhysBody(HyEntity2d *pEntity) // TODO: Change this to be a 'HyPhysicsCtrl2d'
+void HyScene::RemoveNode_PhysBody(HyPhysicsCtrl2d *pPhysCtrl2d)
 {
 	HyAssert(pEntity && pEntity->physics.m_pBody, "HyScene::RemoveNode_PhysBody was passed a null HyEntity2d or it had a null b2Body");
 

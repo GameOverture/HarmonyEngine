@@ -177,7 +177,8 @@ enum HyShapeType
 	HYSHAPE_Circle = 0,
 	HYSHAPE_LineSegment,
 	HYSHAPE_Polygon,
-	HYSHAPE_LineChain
+	HYSHAPE_LineChain,
+	HYSHAPE_Capsule
 };
 
 enum HyLoadState

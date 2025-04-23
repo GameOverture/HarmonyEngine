@@ -44,7 +44,7 @@ IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 
 IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
 	IHyNode(copyRef),
-	m_pParent(copyRef.m_pParent),
+	m_pParent(nullptr),
 	m_mtxCached(copyRef.m_mtxCached),
 	m_fRotation(copyRef.m_fRotation),
 	pos(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
@@ -60,6 +60,9 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
 	rot_pivot = copyRef.rot_pivot;
 	scale = copyRef.scale;
 	scale_pivot = copyRef.scale_pivot;
+
+	if(copyRef.m_pParent)
+		copyRef.m_pParent->ChildAppend(*this);
 }
 
 IHyNode2d::IHyNode2d(IHyNode2d &&donor) noexcept :

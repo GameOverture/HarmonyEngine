@@ -49,7 +49,6 @@ public:
 
 	// Set as an isolated edge.
 	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2);
-	void SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2);
 
 	// Set as a line loop. This automatically connects last vertex to the first.
 	// Passed in parameters are copied, and understood to be local coordinates
@@ -64,7 +63,6 @@ public:
 	// Set as a circle with the specified center and radius
 	void SetAsCircle(float fRadius);
 	void SetAsCircle(const glm::vec2 &ptCenter, float fRadius);
-	void SetAsCircle(const b2Vec2 &center, float fRadius);
 
 	// Set as a convex hull from the given array of local points.
 	// uiCount must be in the range [3, b2_maxPolygonVertices].
@@ -73,10 +71,11 @@ public:
 	// may lead to poor stacking behavior in physics simulation.
 	void SetAsPolygon(const std::vector<glm::vec2> &verticesList);
 	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount);
-	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount);
 
 	void SetAsBox(float fWidth, float fHeight);	// Axis-aligned box, bottom left corner at 0,0
 	void SetAsBox(const HyRect &rect);			// Represent an oriented box
+
+	void SetAsCapsule(const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius);
 
 	uint32 GetNumVerts() const;
 	const glm::vec2 *GetVerts() const;

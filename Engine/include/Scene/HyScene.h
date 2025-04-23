@@ -51,10 +51,10 @@ class HyScene
 	float												m_fPpmInverse;
 	int32												m_iPhysVelocityIterations;
 	int32												m_iPhysPositionIterations;
-	HyBox2dContactListener								m_ContactListener;
-	HyBox2dDestructListener								m_DestructListener;
+	//HyBox2dContactListener								m_ContactListener;
+	//HyBox2dDestructListener								m_DestructListener;
 	HyBox2dDraw *										m_pCurBox2dDraw;
-	b2World												m_b2World;
+	b2WorldId											m_hWorld;
 	bool												m_bPhysUpdating;
 
 public:
@@ -81,8 +81,8 @@ public:
 	static void AddEntNode_Assemble(HyEntity2d *pEntity);
 	static void RemoveEntNode_Assemble(HyEntity2d *pEntity);
 
-	void AddNode_PhysBody(HyEntity2d *pEntity);			// TODO: Change this to be a 'HyPhysicsCtrl2d' (for TileMap items)
-	void RemoveNode_PhysBody(HyEntity2d *pEntity);		// TODO: Change this to be a 'HyPhysicsCtrl2d' (for TileMap items)
+	void AddNode_PhysBody(HyPhysicsCtrl2d *pPhysCtrl2d); // Will accept already added physics nodes and enable them
+	void RemoveNode_PhysBody(HyPhysicsCtrl2d *pPhysCtrl2d);
 	bool IsPhysicsUpdating() const;
 	void SetPhysicsDrawClass(HyBox2dDraw *pBox2dDraw);
 

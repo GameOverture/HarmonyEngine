@@ -179,6 +179,12 @@ void HyPrimitive2d::SetAsBox(const HyRect &rect)
 	AssembleData();
 }
 
+void HyPrimitive2d::SetAsCapsule(const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius)
+{
+	m_Shape.SetAsCapsule(pt1, pt2, fRadius);
+	AssembleData();
+}
+
 uint32 HyPrimitive2d::GetNumVerts() const
 {
 	return m_uiNumVerts;
