@@ -48,8 +48,6 @@ void HyPhysicsCtrl2d::Activate()
 			m_EntityRef.SyncPhysicsShapes();
 			b2Body_Enable(m_hBody);
 		}
-
-		return;
 	}
 	else
 	{
@@ -66,6 +64,9 @@ void HyPhysicsCtrl2d::Activate()
 
 		m_hBody = b2CreateBody(IHyNode::sm_pScene->GetPhysicsWorld(), m_pInit);
 		m_EntityRef.SyncPhysicsShapes();
+
+		if(b2Body_IsEnabled(m_hBody) == false)
+			b2Body_Enable(m_hBody);
 	}
 }
 
