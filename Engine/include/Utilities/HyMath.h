@@ -270,6 +270,7 @@ public:
 	static glm::ivec2 LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNewWidth, int32 iNewHeight);
 	static void InvalidateAABB(b2AABB &aabbOut);
 	static bool TestPointAABB(const b2AABB &aabb, const glm::vec2 &pt);
+	static bool TestOverlapAABB(const b2AABB &a, const b2AABB &b);
 
 	static glm::vec2 PerpendicularClockwise(const glm::vec2 &vDirVector);
 	static glm::ivec2 PerpendicularClockwise(const glm::ivec2 &vDirVector);

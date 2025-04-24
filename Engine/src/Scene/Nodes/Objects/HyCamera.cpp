@@ -61,8 +61,8 @@ void HyCamera2d::CalcWorldViewBounds(b2AABB &aabbOut) const
 	float fHalfWidth = ((m_pWindowPtr->GetFramebufferSize().x * m_ViewportRect.Width()) * 0.5f) * scale.X();
 	float fHalfHeight = ((m_pWindowPtr->GetFramebufferSize().y * m_ViewportRect.Height()) * 0.5f) * scale.Y();
 
-	aabbOut.lowerBound.Set(pos.X() - fHalfWidth, pos.Y() - fHalfHeight);
-	aabbOut.upperBound.Set(pos.X() + fHalfWidth, pos.Y() + fHalfHeight);
+	aabbOut.lowerBound = { pos.X() - fHalfWidth, pos.Y() - fHalfHeight };
+	aabbOut.upperBound = { pos.X() + fHalfWidth, pos.Y() + fHalfHeight };
 }
 
 void HyCamera2d::ProjectToCamera(const glm::vec2 &ptWorldPos, glm::vec2 &ptCameraCoordinateOut) const

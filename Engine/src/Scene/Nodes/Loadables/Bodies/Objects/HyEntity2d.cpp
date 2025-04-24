@@ -247,18 +247,18 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 		glm::mat4 localMtx;
 		m_ChildList[i]->GetLocalTransform(localMtx, 0.0f);
 
-		if(localAABB.IsValid() == false)
+		if(b2IsValidAABB(localAABB) == false)
 			shapeOut.ComputeAABB(localAABB, localMtx);
 		else
 		{
 			b2AABB tmpAABB;
 			shapeOut.ComputeAABB(tmpAABB, localMtx);
-			localAABB.Combine(tmpAABB);
+			localAABB = b2AABB_Union(localAABB, tmpAABB);
 		}
 	}
 
-	if(localAABB.IsValid())
-		shapeOut.SetAsBox(HyRect(localAABB.GetExtents().x, localAABB.GetExtents().y, glm::vec2(localAABB.GetCenter().x, localAABB.GetCenter().y), 0.0f));
+	if(b2IsValidAABB(localAABB))
+		shapeOut.SetAsBox(HyRect(b2AABB_Extents(localAABB).x, b2AABB_Extents(localAABB).y, glm::vec2(b2AABB_Center(localAABB).x, b2AABB_Center(localAABB).y), 0.0f));
 	else
 		shapeOut.SetAsNothing();
 }
@@ -270,15 +270,15 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	{
 		if(0 == (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody) ||
 			static_cast<IHyBody2d *>(m_ChildList[i])->IsLoadDataValid() == false ||
-			static_cast<IHyBody2d *>(m_ChildList[i])->GetSceneAABB().IsValid() == false)
+			b2IsValidAABB(static_cast<IHyBody2d *>(m_ChildList[i])->GetSceneAABB()) == false)
 		{
 			continue;
 		}
 
-		if(m_SceneAABB.IsValid() == false)
+		if(b2IsValidAABB(m_SceneAABB) == false)
 			m_SceneAABB = static_cast<IHyBody2d *>(m_ChildList[i])->GetSceneAABB();
 		else
-			m_SceneAABB.Combine(static_cast<IHyBody2d *>(m_ChildList[i])->GetSceneAABB());
+			m_SceneAABB = b2AABB_Union(m_SceneAABB, static_cast<IHyBody2d *>(m_ChildList[i])->GetSceneAABB());
 	}
 
 	return m_SceneAABB;
@@ -291,7 +291,7 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	
 	b2AABB aabb;
 	shape.ComputeAABB(aabb, glm::mat4(1.0f));
-	return (aabb.GetExtents().x * 2.0f) * fPercent;
+	return (b2AABB_Extents(aabb).x * 2.0f) * fPercent;
 }
 
 /*virtual*/ float HyEntity2d::GetHeight(float fPercent /*= 1.0f*/) /*override*/
@@ -301,7 +301,7 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 	
 	b2AABB aabb;
 	shape.ComputeAABB(aabb, glm::mat4(1.0f));
-	return (aabb.GetExtents().y * 2.0f) * fPercent;
+	return (b2AABB_Extents(aabb).y * 2.0f) * fPercent;
 }
 
 void HyEntity2d::ChildAppend(IHyNode2d &childRef)
@@ -481,45 +481,38 @@ void HyEntity2d::ShapeAppend(HyShape2d &shapeRef)
 	shapeRef.ParentDetach();
 	m_ShapeList.push_back(&shapeRef);
 
-	SyncPhysicsFixtures();
-
-	//// A Box2d Body needs to exist in order to create/attach fixtures.
-	//// HyScene::AddNode_PhysBody() will create a m_pBody when one doesn't exist
-	//if(physics.m_pBody == nullptr)
-	//	IHyNode::sm_pScene->AddNode_PhysBody(this, false);
-
-	// ... and then set the density so it doesn't affect the previous body
-	//shapeRef.SetDensity(fDensity);
-
-	// Finally register the connection between the body and fixture (shape)
-	
+	SyncPhysicsShapes();
 }
 
 bool HyEntity2d::ShapeRemove(HyShape2d &childShapeRef)
 {
-	if(physics.m_pBody == nullptr)
-		return false;
-
-	bool bFixtureRemoved = false;
-	for(b2Fixture *pFixture = physics.m_pBody->GetFixtureList(); pFixture != nullptr; pFixture = pFixture->GetNext())
+	bool bPhysShapeRemoved = false;
+	if(physics.IsActivated())
 	{
-		HyShape2d *pShape = reinterpret_cast<HyShape2d *>(pFixture->GetUserData().pointer);
-		if(pShape == &childShapeRef)
+		std::vector<b2ShapeId> shapeList(m_ShapeList.size());
+		int iNumAttachedShapes = b2Body_GetShapes(physics.GetHandle(), shapeList.data(), static_cast<int>(shapeList.size()));
+		for(int i = 0; i < iNumAttachedShapes; ++i)
 		{
-			physics.m_pBody->DestroyFixture(pFixture);
-			childShapeRef.m_pFixture = nullptr;
-			bFixtureRemoved = true;
+			b2ShapeId shapeId = shapeList[i];
+			HyShape2d *pShape = reinterpret_cast<HyShape2d *>(b2Shape_GetUserData(shapeId));
+			if(pShape == &childShapeRef)
+			{
+				pShape->PhysicsRemove(true);
+				bPhysShapeRemoved = true;
+			}
 		}
+		if(bPhysShapeRemoved == false)
+			HyLogError("HyEntity2d::ShapeRemove failed to find physics shape to remove");
 	}
-	if(bFixtureRemoved == false)
-		HyLogError("HyEntity2d::ShapeRemove failed to find fixture to remove");
+	else
+		bPhysShapeRemoved = true;
 
 	for(auto iter = m_ShapeList.begin(); iter != m_ShapeList.end(); ++iter)
 	{
 		if(*iter == &childShapeRef)
 		{
 			m_ShapeList.erase(iter);
-			return bFixtureRemoved;
+			return bPhysShapeRemoved;
 		}
 	}
 
@@ -661,7 +654,7 @@ void HyEntity2d::Assemble()
 
 	// If this body is actively being simulated by Box2d, and has a dirty transform
 	// AND this isn't coming from the Scene updating physics normally
-	if(physics.m_pBody && (uiDirtyFlags & DIRTY_Transform) && sm_pScene->IsPhysicsUpdating() == false)
+	if(physics.IsActivated() && (uiDirtyFlags & DIRTY_Transform) && sm_pScene->IsPhysicsUpdating() == false)
 	{
 		SyncPhysicsBody();
 	}
@@ -899,7 +892,7 @@ bool HyEntity2d::CalcMouseInBounds()
 		for(int32 i = 0; i < m_ShapeList.size(); ++i)
 		{
 			HyShape2d *pHyShape = m_ShapeList[i];
-			if(pHyShape->TestPoint(GetSceneTransform(0.0f), ptMouseInSceneCoords))
+			if(pHyShape->TestPoint(ptMouseInSceneCoords, GetSceneTransform(0.0f)))
 				return true;
 		}
 	}
@@ -909,32 +902,30 @@ bool HyEntity2d::CalcMouseInBounds()
 	return false;
 }
 
-void HyEntity2d::SyncPhysicsFixtures()
+void HyEntity2d::SyncPhysicsShapes()
 {
-	if(physics.m_pBody == nullptr)
+	if(B2_IS_NULL(physics.GetHandle()))
 		return;
 
 	for(int32 i = 0; i < m_ShapeList.size(); ++i)
 	{
 		HyShape2d *pShape = m_ShapeList[i];
-		if(pShape->IsFixtureDirty())
+		if(pShape->IsPhysicsDirty())
 		{
-			if(pShape->IsValidShape() && pShape->IsFixtureAllowed())
+			if(pShape->IsValidShape() && pShape->IsPhysicsAllowed())
 			{
-				pShape->CreateFixture(physics.m_hBody);
-
-				if(pShape->GetDensity() == 0.0f && physics.m_pBody->GetType() == b2_dynamicBody)
-					HyLogError("HyEntity2d::SyncPhysicsFixtures - Attempting to create a fixture with zero density on a dynamic body");
+				HyAssert(false == (physics.GetType() == HYBODY_Dynamic && pShape->GetDensity() == 0.0f), "HyEntity2d::SyncPhysicsFixtures - Attempting to create a fixture with zero density on a dynamic body");
+				pShape->PhysicsAttach();
 			}
 			else
-				pShape->DestroyFixture();
+				pShape->PhysicsRemove(true);
 		}
 	}
 }
 
 void HyEntity2d::SyncPhysicsBody()
 {
-	HyAssert(physics.m_pBody, "HyEntity2d::SyncPhysicsBody invoked with null physics body");
+	HyAssert(B2_IS_NON_NULL(physics.GetHandle()), "HyEntity2d::SyncPhysicsBody invoked with null physics body");
 
 	// TODO: SCALE NOT SUPPORTED - If scale is different, modify all shapes in fixtures (cannot change num of vertices in shape says Box2d)
 	const glm::mat4 &mtxSceneRef = GetSceneTransform(0.0f);
@@ -942,8 +933,8 @@ void HyEntity2d::SyncPhysicsBody()
 	glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
 
 	float fPpmInverse = sm_pScene->GetPpmInverse();
-	physics.m_pBody->SetTransform(b2Vec2(ptTranslation.x * fPpmInverse, ptTranslation.y * fPpmInverse), vRotations.z);
-	physics.m_pBody->SetAwake(true);
+	b2Body_SetTransform(physics.GetHandle(), { ptTranslation.x * fPpmInverse, ptTranslation.y * fPpmInverse }, b2MakeRot(vRotations.z));
+	b2Body_SetAwake(physics.GetHandle(), true);
 }
 
 /*friend*/ void HyNodeCtorAppend(HyEntity2d *pEntity, IHyNode2d *pChildNode)

@@ -40,8 +40,12 @@ class HyShape2d
 		ChainData		chain;
 	}											m_Data;		// NOTE: This shape is stored in pixel units like everything else. It is converted to pixel-per-meters when sent to Box2d
 
+	union PhysicsHandle
+	{
+		b2ShapeId		shape;
+		b2ChainId		chain;
+	}											m_hPhysics;
 	bool 										m_bPhysicsAllowed;
-	b2ShapeId									m_hPhysicsShape;
 	b2ShapeDef *								m_pPhysicsInit;
 	bool										m_bPhysicsDirty;
 
@@ -62,16 +66,11 @@ public:
 	glm::vec2 ComputeSize() const;
 	void GetCentroid(glm::vec2 &ptCentroidOut) const;
 	float CalcArea() const; // Returns the area in meters squared
-	
-	//b2ShapeId GetB2Shape() const;
-	//b2ShapeId ClonePpmShape(float fPpmInverse) const;
 
 	void ParentDetach();
 	HyEntity2d *ParentGet() const;
 
 	void SetAsNothing();
-
-	//void SetAsB2Shape(b2ShapeId hShape, const b2ShapeDef *pPhysicsInit = nullptr);
 
 	// Set as an isolated edge/line. When used in a physics simulation, these segments have double sided collision
 	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const b2ShapeDef *pPhysicsInit = nullptr);
@@ -117,21 +116,26 @@ public:
 	bool IsSensor() const;
 
 	bool TestPoint(const glm::vec2 &ptTestPoint, const glm::mat4 &mtxSelfTransform) const;
+	b2CastOutput TestRay(const glm::vec2 &ptStart, const glm::vec2 &vDirection, const glm::mat4 &mtxSelfTransform) const;
 	//bool IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const;
 
 	bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const;
 
 protected:
 	void ClearShapeData();
-
-	void CreateFixture(b2BodyId hBody);
-	void DestroyFixture();
 	
 	void ShapeChanged();
-	bool IsPhysicsDirty();
+
+	bool IsPhysicsRegistered() const;
+	bool IsPhysicsDirty() const;
+	void PhysicsAttach();
+	void PhysicsRemove(bool bUpdateBodyMass);
+
+	bool ComputeChainAabb(b2AABB &aabbOut, const ShapeData &shapeData) const;
 
 	// NOTE: Assumes 'shapeDataOut' starts as zeroed-out ShapeData. Will newly dynamically allocate for chain types
 	bool TransformShapeData(ShapeData &shapeDataOut, const glm::mat4 &mtxTransform) const;
+	bool TransformShapeData(ShapeData &shapeDataOut, float fPpmInverse) const;
 };
 
 #endif /* HyShape2d_h__ */

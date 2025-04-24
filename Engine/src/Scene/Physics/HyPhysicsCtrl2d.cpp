@@ -13,6 +13,7 @@
 #include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyPhysicsGrid2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 
 HyPhysicsCtrl2d::HyPhysicsCtrl2d(HyEntity2d &entityRef) :
 	m_EntityRef(entityRef),
@@ -25,13 +26,47 @@ HyPhysicsCtrl2d::~HyPhysicsCtrl2d()
 {
 	delete m_pInit;
 
-	if(B2_IS_NON_NULL(m_hBody))
-		IHyBody2d::sm_pScene->RemoveNode_PhysBody(this);
+	if(b2Body_IsValid(m_hBody))
+	{
+		b2DestroyBody(m_hBody);
+		m_hBody = b2_nullBodyId;
+	}
+}
+
+b2BodyId HyPhysicsCtrl2d::GetHandle() const
+{
+	return m_hBody;
 }
 
 void HyPhysicsCtrl2d::Activate()
 {
-	IHyBody2d::sm_pScene->AddNode_PhysBody(this);
+	if(b2Body_IsValid(m_hBody))
+	{
+		if(b2Body_IsEnabled(m_hBody) == false)
+		{
+			m_EntityRef.SyncPhysicsBody();
+			m_EntityRef.SyncPhysicsShapes();
+			b2Body_Enable(m_hBody);
+		}
+
+		return;
+	}
+	else
+	{
+		if(m_pInit == nullptr)
+			Setup(b2DefaultBodyDef());
+
+		const glm::mat4 &mtxSceneRef = m_EntityRef.GetSceneTransform(0.0f);
+		glm::vec3 ptTranslation = mtxSceneRef[3];
+		glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
+
+		m_pInit->position.x = ptTranslation.x * IHyNode::sm_pScene->GetPpmInverse();
+		m_pInit->position.y = ptTranslation.y * IHyNode::sm_pScene->GetPpmInverse();
+		m_pInit->rotation = b2MakeRot(vRotations.z);
+
+		m_hBody = b2CreateBody(IHyNode::sm_pScene->GetPhysicsWorld(), m_pInit);
+		m_EntityRef.SyncPhysicsShapes();
+	}
 }
 
 void HyPhysicsCtrl2d::Deactivate()
@@ -528,89 +563,3 @@ float HyPhysicsCtrl2d::GetRotInertia() const
 	HyLogWarning("HyPhysicsCtrl2d::GetInertia invoked before physics component was set active");
 	return 0.0f;
 }
-
-//// Should only be invoked by the parent HyPhysicsGrid2d
-//void HyPhysicsCtrl2d::Update()
-//{
-//	// 'm_pBox2d' is guarenteed to be valid if Update() is invoked (via HyPhysicsGrid2d)
-//	HyAssert(m_pBox2d, "HyPhysicsCtrl2d::Update() - m_pBox2d was null");
-//	HyAssert(m_NodeRef.ParentGet(), "HyPhysicsCtrl2d::Update() - Node's parent is null"); // Node's parent must exist
-//	HyAssert(m_NodeRef.ParentGet()->GetInternalFlags() & IHyNode::NODETYPE_IsPhysicsGrid, "HyPhysicsCtrl2d::Update() - Node's parent isn't a physics grid"); // and also be the HyPhysicsGrid2d that invoked this
-//
-//	if(m_pBox2d->m_pBody->GetType() != b2_staticBody && m_bEnabled)
-//	{
-//		// If any HyAnimFloat controlling the position or rotation are not animating, reset the below lambda that will have the b2Body set them respectively
-//		if(m_NodeRef.pos.IsAnimating() == false)
-//		{
-//			auto fpUpdaterPosX = [&](float fElapsedTime) {
-//				return (m_pBox2d->m_pBody->GetPosition().x * static_cast<HyPhysicsGrid2d *>(m_NodeRef.ParentGet())->GetPixelsPerMeter());
-//			};
-//			auto fpUpdaterPosY = [&](float fElapsedTime) {
-//				return (m_pBox2d->m_pBody->GetPosition().y * static_cast<HyPhysicsGrid2d *>(m_NodeRef.ParentGet())->GetPixelsPerMeter());
-//			};
-//
-//			m_NodeRef.pos.GetAnimFloat(0).Updater(fpUpdaterPosX);
-//			m_NodeRef.pos.GetAnimFloat(1).Updater(fpUpdaterPosY);
-//		}
-//		if(m_NodeRef.rot.IsAnimating() == false)
-//		{
-//			m_NodeRef.rot.Updater([&](float fElapsedTime) {
-//				return glm::degrees(m_pBox2d->m_pBody->GetAngle());
-//				});
-//		}
-//	}
-//}
-
-//
-//std::unique_ptr<HyPhysicsCtrl2d> HyPhysicsCtrl2d::PhysAddCollider(const HyShape2d &shapeRef, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
-//{
-//	if(m_pPhysicsBody == nullptr || shapeRef.IsValidShape() == false)
-//		return nullptr;
-//
-//	b2Shape *pPpmShape = shapeRef.ClonePpmShape(static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse());
-//	std::unique_ptr<HyPhysicsCtrl2d> pCollider = std::make_unique<HyPhysicsCtrl2d>(m_pPhysicsBody, pPpmShape, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
-//	delete pPpmShape;
-//
-//	return pCollider;
-//}
-//
-//std::unique_ptr<HyPhysicsCtrl2d> HyPhysicsCtrl2d::PhysAddCircleCollider(float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
-//{
-//	return PhysAddCircleCollider(glm::vec2(0.0f, 0.0), fRadius, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
-//}
-//
-//std::unique_ptr<HyPhysicsCtrl2d> HyPhysicsCtrl2d::PhysAddCircleCollider(const glm::vec2 &ptCenter, float fRadius, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
-//{
-//	if(m_pPhysicsBody == nullptr || fRadius <= 0.0f)
-//		return nullptr;
-//
-//	float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
-//	b2CircleShape circleShape;
-//	circleShape.m_p.x = ptCenter.x * fPpmInverse;
-//	circleShape.m_p.y = ptCenter.y * fPpmInverse;
-//	circleShape.m_radius = fRadius * fPpmInverse;
-//	return std::make_unique<HyPhysicsCtrl2d>(m_pPhysicsBody, &circleShape, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
-//}
-//
-//std::unique_ptr<HyPhysicsCtrl2d> HyPhysicsCtrl2d::PhysAddLineChainCollider(const glm::vec2 *pVerts, uint32 uiNumVerts, float fDensity, float fFriction, float fRestitution, bool bIsSensor, b2Filter collideFilter)
-//{
-//	if(m_pPhysicsBody == nullptr || pVerts == nullptr || uiNumVerts == 0)
-//		return nullptr;
-//
-//	float fPpmInverse = static_cast<HyPhysicsGrid2d *>(m_pPhysicsBody->GetWorld())->GetPpmInverse();
-//	std::vector<b2Vec2> vertList;
-//	for(uint32 i = 0; i < uiNumVerts; ++i)
-//		vertList.emplace_back(pVerts[i].x * fPpmInverse, pVerts[i].y * fPpmInverse);
-//
-//	b2ChainShape chainShape;
-//	chainShape.CreateChain(vertList.data(), uiNumVerts);
-//	return std::make_unique<HyPhysicsCtrl2d>(m_pPhysicsBody, &chainShape, fDensity, fFriction, fRestitution, bIsSensor, collideFilter);
-//}
-//
-//void HyPhysicsCtrl2d::PhysDestroyCollider(std::unique_ptr<HyPhysicsCtrl2d> pCollider)
-//{
-//	if(m_pPhysicsBody)
-//		m_pPhysicsBody->DestroyFixture(pCollider->GetFixture());
-//
-//	pCollider.release();
-//}

@@ -327,7 +327,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *)> fpCallbac
 	float fLocalSliderPos = m_fLength * (static_cast<float>(m_iValue - m_iMin) / static_cast<float>(m_iMax - m_iMin));
 	m_Panel.pos.GetAnimFloat(eOrientation) = fLocalSliderPos - m_Panel.GetSizeDimension(eOrientation, 0.5f);
 
-	auto ptCenter = m_Panel.GetSceneAABB().GetCenter();
+	auto ptCenter = b2AABB_Center(m_Panel.GetSceneAABB());
 	HySetVec(m_ptSliderCenter, ptCenter.x, ptCenter.y);
 
 	m_BarStroke.m_BarPos.scale.GetAnimFloat(eOrientation) = fLocalSliderPos;

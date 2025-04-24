@@ -16,6 +16,7 @@
 class HyEntity2d : public IHyBody2d
 {
 	friend class HyScene;
+	friend class HyPhysicsCtrl2d;
 
 protected:
 	std::vector<IHyNode2d *>				m_ChildList;
@@ -41,7 +42,7 @@ protected:
 	std::function<void(HyEntity2d *)>		m_fpDeferFinishedFunc;
 
 public:
-	HyPhysicsCtrl2d							physics;				// Optional physics component
+	HyPhysicsCtrl2d							physics;				// Optional physics component (Rename to HyPhysicsBody2d)
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);
@@ -157,8 +158,8 @@ protected:
 
 	bool CalcMouseInBounds();
 
-	void SyncPhysicsFixtures();
-	void SyncPhysicsBody();
+	void SyncPhysicsShapes();	// 
+	void SyncPhysicsBody();		// Tell physics simulation to take current transformation
 
 	// Optional user overrides below
 	virtual void OnUpdate() { }
@@ -182,5 +183,6 @@ private: // Hide inherited functionality that doesn't exist for entities
 	using IHyLoadable2d::Init;
 	using IHyLoadable2d::Uninit;
 };
+typedef HyEntity2d HyEntity;
 
 #endif /* HyEntity2d_h__ */

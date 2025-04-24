@@ -205,15 +205,20 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 
 /*static*/ void HyMath::InvalidateAABB(b2AABB &aabbOut)
 {
-	aabbOut.lowerBound.Set(1.0f, 1.0f);
-	aabbOut.upperBound.Set(-1.0f, -1.0f);
+	aabbOut.lowerBound = { 1.0f, 1.0f };
+	aabbOut.upperBound = { -1.0f, -1.0f };
 }
 
 /*static*/ bool HyMath::TestPointAABB(const b2AABB &aabb, const glm::vec2 &pt)
 {
-	return (aabb.IsValid() &&
+	return (b2IsValidAABB(aabb) &&
 		pt.x >= aabb.lowerBound.x && pt.y >= aabb.lowerBound.y &&
 		pt.x <= aabb.upperBound.x && pt.y <= aabb.upperBound.y);
+}
+
+/*static*/ bool HyMath::TestOverlapAABB(const b2AABB &a, const b2AABB &b)
+{
+	return !(b.lowerBound.x > a.upperBound.x || b.lowerBound.y > a.upperBound.y || a.lowerBound.x > b.upperBound.x || a.lowerBound.y > b.upperBound.y);
 }
 
 /*static*/ glm::vec2 HyMath::PerpendicularClockwise(const glm::vec2 &vDirVector)

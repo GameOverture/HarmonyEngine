@@ -49,8 +49,7 @@ class HyScene
 	// Collision/Physics
 	float												m_fPixelsPerMeter;
 	float												m_fPpmInverse;
-	int32												m_iPhysVelocityIterations;
-	int32												m_iPhysPositionIterations;
+	int32												m_iPhysSubSteps;
 	//HyBox2dContactListener								m_ContactListener;
 	//HyBox2dDestructListener								m_DestructListener;
 	HyBox2dDraw *										m_pCurBox2dDraw;
@@ -61,6 +60,7 @@ public:
 	HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef);
 	~HyScene(void);
 
+	b2WorldId GetPhysicsWorld() const;
 	float GetPixelsPerMeter();
 	float GetPpmInverse();
 
@@ -81,8 +81,6 @@ public:
 	static void AddEntNode_Assemble(HyEntity2d *pEntity);
 	static void RemoveEntNode_Assemble(HyEntity2d *pEntity);
 
-	void AddNode_PhysBody(HyPhysicsCtrl2d *pPhysCtrl2d); // Will accept already added physics nodes and enable them
-	void RemoveNode_PhysBody(HyPhysicsCtrl2d *pPhysCtrl2d);
 	bool IsPhysicsUpdating() const;
 	void SetPhysicsDrawClass(HyBox2dDraw *pBox2dDraw);
 
