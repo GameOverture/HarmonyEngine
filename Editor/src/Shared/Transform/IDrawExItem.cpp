@@ -32,7 +32,7 @@ bool IDrawExItem::IsMouseInBounds()
 	ExtractTransform(boundingShape, transformMtx);
 
 	glm::vec2 ptWorldMousePos;
-	return HyEngine::Input().GetWorldMousePos(ptWorldMousePos) && boundingShape.TestPoint(transformMtx, ptWorldMousePos);
+	return HyEngine::Input().GetWorldMousePos(ptWorldMousePos) && boundingShape.TestPoint(ptWorldMousePos, transformMtx);
 }
 
 void IDrawExItem::RefreshTransform(HyCamera2d *pCamera)

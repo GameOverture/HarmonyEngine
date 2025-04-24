@@ -164,14 +164,14 @@ void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDrag
 		std::vector<glm::vec2> vertList;
 		vertList.push_back(ptStartPos);
 		vertList.push_back(ptDragPos);
-		m_BoundingVolume.SetAsLineChain(vertList);
+		m_BoundingVolume.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
 
 		pCamera->ProjectToCamera(ptStartPos, ptStartPos);
 		pCamera->ProjectToCamera(ptDragPos, ptDragPos);
 		vertList.clear();
 		vertList.push_back(ptStartPos);
 		vertList.push_back(ptDragPos);
-		m_Outline.SetAsLineChain(vertList);
+		m_Outline.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
 		break; }
 
 	default:
@@ -236,7 +236,7 @@ QString ShapeCtrl::Serialize()
 	HyShape2d shape;
 	m_BoundingVolume.CalcLocalBoundingShape(shape);
 
-	if(shape.GetB2Shape() == nullptr)
+	if(shape.IsValidShape() == false)
 		return "";
 
 	QList<float> floatList;
@@ -246,39 +246,35 @@ QString ShapeCtrl::Serialize()
 		break;
 
 	case SHAPE_Polygon:
-	case SHAPE_Box: {
-		const b2PolygonShape *pPolyShape = static_cast<const b2PolygonShape *>(shape.GetB2Shape());
-		for(int i = 0; i < pPolyShape->m_count; ++i)
+	case SHAPE_Box:
+		for(int i = 0; i < shape.GetAsPolygon().count; ++i)
 		{
-			floatList.push_back(pPolyShape->m_vertices[i].x);
-			floatList.push_back(pPolyShape->m_vertices[i].y);
+			floatList.push_back(shape.GetAsPolygon().vertices[i].x);
+			floatList.push_back(shape.GetAsPolygon().vertices[i].y);
 		}
-		break; }
+		break;
 
-	case SHAPE_Circle: {
-		const b2CircleShape *pCircleShape = static_cast<const b2CircleShape *>(shape.GetB2Shape());
-		floatList.push_back(pCircleShape->m_p.x);
-		floatList.push_back(pCircleShape->m_p.y);
-		floatList.push_back(pCircleShape->m_radius);
-		break; }
+	case SHAPE_Circle:
+		floatList.push_back(shape.GetAsCircle().center.x);
+		floatList.push_back(shape.GetAsCircle().center.y);
+		floatList.push_back(shape.GetAsCircle().radius);
+		break;
 
-	case SHAPE_LineSegment: {
-		const b2EdgeShape *pLineSegment = static_cast<const b2EdgeShape *>(shape.GetB2Shape());
-		floatList.push_back(pLineSegment->m_vertex1.x);
-		floatList.push_back(pLineSegment->m_vertex1.y);
-		floatList.push_back(pLineSegment->m_vertex2.x);
-		floatList.push_back(pLineSegment->m_vertex2.y);
-		break; }
+	case SHAPE_LineSegment:
+		floatList.push_back(shape.GetAsSegment().point1.x);
+		floatList.push_back(shape.GetAsSegment().point1.y);
+		floatList.push_back(shape.GetAsSegment().point2.x);
+		floatList.push_back(shape.GetAsSegment().point2.y);
+		break;
 
 	case SHAPE_LineChain:
-	case SHAPE_LineLoop: {
-		const b2ChainShape *pChainShape = static_cast<const b2ChainShape *>(shape.GetB2Shape());
-		for(int i = 0; i < pChainShape->m_count; ++i)
+	case SHAPE_LineLoop:
+		for(int i = 0; i < shape.GetAsChain().iCount; ++i)
 		{
-			floatList.push_back(pChainShape->m_vertices[i].x);
-			floatList.push_back(pChainShape->m_vertices[i].y);
+			floatList.push_back(shape.GetAsChain().pPointList[i].x);
+			floatList.push_back(shape.GetAsChain().pPointList[i].y);
 		}
-		break; }
+		break;
 	}
 
 	QString sSerializedData;
@@ -340,7 +336,7 @@ void ShapeCtrl::Deserialize(QString sData, HyCamera2d *pCamera)
 		for(int i = 0; i < m_DeserializedFloatList.size(); i += 2)
 			vertList.push_back(glm::vec2(m_DeserializedFloatList[i], m_DeserializedFloatList[i + 1]));
 
-		m_BoundingVolume.SetAsLineChain(vertList);
+		m_BoundingVolume.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
 		break; }
 	}
 
@@ -435,7 +431,7 @@ void ShapeCtrl::DeserializeOutline(HyCamera2d *pCamera)
 			m_VertexGrabPointList[iGrabPtCountIndex]->pos.Set(ptCameraPos);
 		}
 
-		m_Outline.SetAsLineChain(vertList);
+		m_Outline.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
 		break; }
 	}
 
@@ -465,7 +461,7 @@ SemState ShapeCtrl::GetMouseSemHoverAction(bool bCtrlMod, bool bShiftMod, bool b
 {
 	if(bCtrlMod && m_eShape != SHAPE_None && m_eShape != SHAPE_Box && m_eShape != SHAPE_Circle && m_eShape != SHAPE_LineSegment)
 	{
-		if(m_eShape == SHAPE_Polygon && m_VertexGrabPointList.count() >= b2_maxPolygonVertices)
+		if(m_eShape == SHAPE_Polygon && m_VertexGrabPointList.count() >= B2_MAX_POLYGON_VERTICES)
 			return SEMSTATE_Invalid;
 		
 		return SEMSTATE_Add;
@@ -485,10 +481,10 @@ SemState ShapeCtrl::GetMouseSemHoverAction(bool bCtrlMod, bool bShiftMod, bool b
 		HyMath::InvalidateAABB(selectedVertsArea);
 		for(GrabPoint *pSelectedPt : selectedGrabPtList)
 		{
-			if(selectedVertsArea.IsValid() == false)
+			if(b2IsValidAABB(selectedVertsArea) == false)
 				selectedVertsArea = pSelectedPt->GetSceneAABB();
 			else
-				selectedVertsArea.Combine(pSelectedPt->GetSceneAABB());
+				selectedVertsArea = b2AABB_Union(selectedVertsArea, pSelectedPt->GetSceneAABB());
 		}
 
 		if(HyMath::TestPointAABB(selectedVertsArea, HyEngine::Input().GetMousePos()))
@@ -640,13 +636,13 @@ void ShapeCtrl::TransformSemVerts(SemState eSemState, glm::vec2 ptStartPos, glm:
 
 		case SHAPE_LineChain:
 		case SHAPE_LineLoop:
-			m_Outline.SetAsLineChain(vertList);
+			m_Outline.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
 			break;
 
 		case SHAPE_Circle: {
 			HyShape2d tmpShape;
 			m_Outline.CalcLocalBoundingShape(tmpShape);
-			m_Outline.SetAsCircle(vertList[0], tmpShape.GetB2Shape()->m_radius);
+			m_Outline.SetAsCircle(vertList[0], tmpShape.GetAsCircle().radius);
 			break; }
 
 		default:
@@ -734,7 +730,7 @@ void ShapeCtrl::TransformSemVerts(SemState eSemState, glm::vec2 ptStartPos, glm:
 			else
 				vertList.push_back(ptDragPos);
 
-			m_Outline.SetAsLineChain(vertList);
+			m_Outline.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
 			break; }
 
 		case SHAPE_Box:
@@ -768,7 +764,7 @@ bool ShapeCtrl::RemoveSelectedVerts()
 	if(m_eShape == SHAPE_Polygon)
 		m_Outline.SetAsPolygon(vertList);
 	else if(m_eShape == SHAPE_LineChain || m_eShape == SHAPE_LineLoop)
-		m_Outline.SetAsLineChain(vertList);
+		m_Outline.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
 	else
 	{
 		HyGuiLog("ShapeCtrl::TransformVemVerts - VEMACTION_Add invalid shape type", LOGTYPE_Error);
@@ -790,34 +786,29 @@ QString ShapeCtrl::SerializeVemVerts(HyCamera2d *pCamera)
 		break;
 
 	case SHAPE_Polygon:
-	case SHAPE_Box: {
-		const b2PolygonShape *pPolyShape = static_cast<const b2PolygonShape *>(shape.GetB2Shape());
-		for(int i = 0; i < pPolyShape->m_count; ++i)
+	case SHAPE_Box:
+		for(int i = 0; i < shape.GetAsPolygon().count; ++i)
 		{
-			glm::vec2 ptVert(pPolyShape->m_vertices[i].x, pPolyShape->m_vertices[i].y);
+			glm::vec2 ptVert(shape.GetAsPolygon().vertices[i].x, shape.GetAsPolygon().vertices[i].y);
 			pCamera->ProjectToWorld(ptVert, ptVert);
 
 			floatList.push_back(ptVert.x);
 			floatList.push_back(ptVert.y);
 		}
-		break; }
+		break;
 
 	case SHAPE_Circle: {
-		const b2CircleShape *pCircleShape = static_cast<const b2CircleShape *>(shape.GetB2Shape());
-
-		glm::vec2 ptCenter(pCircleShape->m_p.x, pCircleShape->m_p.y);
+		glm::vec2 ptCenter(shape.GetAsCircle().center.x, shape.GetAsCircle().center.y);
 		pCamera->ProjectToWorld(ptCenter, ptCenter);
 
 		floatList.push_back(ptCenter.x);
 		floatList.push_back(ptCenter.y);
-		floatList.push_back(pCircleShape->m_radius / pCamera->GetZoom());
+		floatList.push_back(shape.GetAsCircle().radius / pCamera->GetZoom());
 		break; }
 
 	case SHAPE_LineSegment: {
-		const b2EdgeShape *pLineSegment = static_cast<const b2EdgeShape *>(shape.GetB2Shape());
-
-		glm::vec2 ptVert1(pLineSegment->m_vertex1.x, pLineSegment->m_vertex1.y);
-		glm::vec2 ptVert2(pLineSegment->m_vertex2.x, pLineSegment->m_vertex2.y);
+		glm::vec2 ptVert1(shape.GetAsSegment().point1.x, shape.GetAsSegment().point1.y);
+		glm::vec2 ptVert2(shape.GetAsSegment().point2.x, shape.GetAsSegment().point2.y);
 		pCamera->ProjectToWorld(ptVert1, ptVert1);
 		pCamera->ProjectToWorld(ptVert2, ptVert2);
 
@@ -828,17 +819,16 @@ QString ShapeCtrl::SerializeVemVerts(HyCamera2d *pCamera)
 		break; }
 
 	case SHAPE_LineChain:
-	case SHAPE_LineLoop: {
-		const b2ChainShape *pChainShape = static_cast<const b2ChainShape *>(shape.GetB2Shape());
-		for(int i = 0; i < pChainShape->m_count; ++i)
+	case SHAPE_LineLoop:
+		for(int i = 0; i < shape.GetAsChain().iCount; ++i)
 		{
-			glm::vec2 ptVert(pChainShape->m_vertices[i].x, pChainShape->m_vertices[i].y);
+			glm::vec2 ptVert(shape.GetAsChain().pPointList[i]);
 			pCamera->ProjectToWorld(ptVert, ptVert);
 
 			floatList.push_back(ptVert.x);
 			floatList.push_back(ptVert.y);
 		}
-		break; }
+		break;
 	}
 
 	QString sSerializedData;

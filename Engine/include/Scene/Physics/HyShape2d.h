@@ -15,6 +15,13 @@
 class HyEntity2d;
 class HyRect;
 
+struct HyChainData
+{
+	glm::vec2 *		pPointList; // Dynamically allocated
+	int				iCount;
+	bool			bLoop;		// If true, pPointList/iCount is guaranteed to not include the "final" point (a repeat of the first point)
+};
+
 class HyShape2d
 {
 	friend class HyEntity2d;
@@ -25,19 +32,13 @@ class HyShape2d
 	HyEntity2d *								m_pParent;
 
 	HyShapeType									m_eType;
-	struct ChainData
-	{
-		glm::vec2 *		pPointList; // Dynamically allocated
-		int				iCount;
-		bool			bLoop; // If true, pPointList/iCount is guaranteed to not include the "final" point (a repeat of the first point)
-	};
 	union ShapeData
 	{
 		b2Capsule		capsule;
 		b2Circle		circle;
 		b2Polygon		polygon;
 		b2Segment		segment;
-		ChainData		chain;
+		HyChainData		chain;
 	}											m_Data;		// NOTE: This shape is stored in pixel units like everything else. It is converted to pixel-per-meters when sent to Box2d
 
 	union PhysicsHandle
@@ -60,6 +61,11 @@ public:
 
 	HyShapeType GetType() const;
 	bool IsValidShape() const;
+	const b2Circle &GetAsCircle() const;
+	const b2Segment &GetAsSegment() const;
+	const b2Polygon &GetAsPolygon() const;
+	const HyChainData &GetAsChain() const;
+	const b2Capsule &GetAsCapsule() const;
 
 	void TransformSelf(const glm::mat4 &mtxTransform);
 
@@ -111,8 +117,8 @@ public:
 	void SetFriction(float fFriction);
 	float GetRestitution() const;
 	void SetRestitution(float fRestitution);
-	b2Filter GetFilter() const;
-	void SetFilter(const b2Filter &filter);
+	b2Filter GetFilter() const; // If this shape is a chain, it will return the filter for the first edge
+	void SetFilter(const b2Filter &filter); // WARNING: This function is potentially expensive if this shape is a line chain and its parent entity has already been physics.Activate()
 	bool IsSensor() const;
 
 	bool TestPoint(const glm::vec2 &ptTestPoint, const glm::mat4 &mtxSelfTransform) const;

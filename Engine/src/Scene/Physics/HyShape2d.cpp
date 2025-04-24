@@ -92,6 +92,56 @@ bool HyShape2d::IsValidShape() const
 	return m_eType != HYSHAPE_Nothing;
 }
 
+const b2Circle &HyShape2d::GetAsCircle() const
+{
+	if(m_eType != HYSHAPE_Circle)
+	{
+		HyLogError("HyShape2d::GetAsCircle() - Shape is not a circle.");
+		return b2Circle() = {};
+	}
+	return m_Data.circle;
+}
+
+const b2Segment &HyShape2d::GetAsSegment() const
+{
+	if(m_eType != HYSHAPE_LineSegment)
+	{
+		HyLogError("HyShape2d::GetAsSegment() - Shape is not a line segment.");
+		return b2Segment() = {};
+	}
+	return m_Data.segment;
+}
+
+const b2Polygon &HyShape2d::GetAsPolygon() const
+{
+	if(m_eType != HYSHAPE_Polygon)
+	{
+		HyLogError("HyShape2d::GetAsPolygon() - Shape is not a polygon.");
+		return b2Polygon() = {};
+	}
+	return m_Data.polygon;
+}
+
+const HyChainData &HyShape2d::GetAsChain() const
+{
+	if(m_eType != HYSHAPE_LineChain)
+	{
+		HyLogError("HyShape2d::GetAsChain() - Shape is not a line chain.");
+		return HyChainData() = {};
+	}
+	return m_Data.chain;
+}
+
+const b2Capsule &HyShape2d::GetAsCapsule() const
+{
+	if(m_eType != HYSHAPE_Capsule)
+	{
+		HyLogError("HyShape2d::GetAsCapsule() - Shape is not a capsule.");
+		return b2Capsule() = {};
+	}
+	return m_Data.capsule;
+}
+
 void HyShape2d::TransformSelf(const glm::mat4 &mtxTransform)
 {
 	ShapeData shapeData = { };
@@ -499,8 +549,7 @@ b2Filter HyShape2d::GetFilter() const
 			return b2Shape_GetFilter(m_hPhysics.shape);
 		else
 		{
-			// NOTE: Box2d API doesn't have this function yet, use the first segment instead
-			//return b2Chain_GetFilter(m_hPhysics.chain);
+			// NOTE: Box2d API doesn't have 'b2Chain_GetFilter' function, query the first segment instead
 
 			b2ShapeId hSegment = b2_nullShapeId;
 			if(1 == b2Chain_GetSegments(m_hPhysics.chain, &hSegment, 1))
@@ -515,6 +564,7 @@ b2Filter HyShape2d::GetFilter() const
 		return b2DefaultShapeDef().filter;
 }
 
+// WARNING: This function is potentially expensive if this shape is a line chain and its parent entity has already been physics.Activate()
 void HyShape2d::SetFilter(const b2Filter &filter)
 {
 	if(IsPhysicsRegistered())
@@ -523,8 +573,8 @@ void HyShape2d::SetFilter(const b2Filter &filter)
 			b2Shape_SetFilter(m_hPhysics.shape, filter);
 		else
 		{
-			// NOTE: Box2d API doesn't have this function yet, set all the segments directly instead
-			//b2Chain_SetFilter(m_hPhysics.chain, filter);
+			// NOTE: Box2d API doesn't have 'b2Chain_SetFilter' function to dissuade users from not using b2ChainDef
+			// Set all the segments directly instead
 
 			int iNumSegments = b2Chain_GetSegmentCount(m_hPhysics.chain);
 			b2ShapeId *pSegmentHandles = HY_NEW b2ShapeId[iNumSegments];

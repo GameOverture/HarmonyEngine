@@ -167,12 +167,12 @@ void TransformCtrl::WrapTo(QList<IDrawExItem *> itemDrawList, HyCamera2d *pCamer
 		b2AABB itemAabb;
 		pItemShape->ComputeAABB(itemAabb, mtxItemTransform);
 
-		if(combinedAabb.IsValid() == false)
+		if(b2IsValidAABB(combinedAabb) == false)
 			combinedAabb = itemAabb;
 		else
-			combinedAabb.Combine(itemAabb);
+			combinedAabb = b2AABB_Union(combinedAabb, itemAabb);
 	}
-	HySetVec(ptRotPivot, combinedAabb.GetCenter().x, combinedAabb.GetCenter().y, 0.0f);
+	HySetVec(ptRotPivot, b2AABB_Center(combinedAabb).x, b2AABB_Center(combinedAabb).y, 0.0f);
 
 	//// Recalculate 'combinedAabb' but transform each item with a rotation matrix ('ptRotPivot' and by 'm_fCachedRotation' degrees)
 	//HyMath::InvalidateAABB(combinedAabb);
@@ -228,7 +228,7 @@ void TransformCtrl::WrapTo(QList<IDrawExItem *> itemDrawList, HyCamera2d *pCamer
 
 	// Using 'combinedAabb' create an OBB in 'boundingShape', then rotate it back by the previous rotation compensation
 	// Cannot use SetAsPolygon() because Box2d wields the vertices in an odd order
-	boundingShape.SetAsBox(HyRect(combinedAabb.GetExtents().x, combinedAabb.GetExtents().y, ptRotPivot, 0.0f));
+	boundingShape.SetAsBox(HyRect(b2AABB_Extents(combinedAabb).x, b2AABB_Extents(combinedAabb).y, ptRotPivot, 0.0f));
 
 	//glm::mat4 mtxRotateCompensate(1.0f);
 	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot);
@@ -301,7 +301,7 @@ bool TransformCtrl::IsMouseOverBoundingVolume()
 	HyShape2d tmpShape;
 	m_BoundingVolume.CalcLocalBoundingShape(tmpShape);
 	
-	return tmpShape.TestPoint(m_BoundingVolume.GetSceneTransform(0.0f), ptWorldMousePos);
+	return tmpShape.TestPoint(ptWorldMousePos, m_BoundingVolume.GetSceneTransform(0.0f));
 }
 
 TransformCtrl::GrabPointType TransformCtrl::IsMouseOverGrabPoint()
@@ -316,7 +316,7 @@ TransformCtrl::GrabPointType TransformCtrl::IsMouseOverGrabPoint()
 	{
 		HyShape2d tmpShape;
 		m_GrabPoints[i]->GetLocalBoundingShape(tmpShape);
-		if(tmpShape.TestPoint(m_GrabPoints[i]->GetSceneTransform(0.0f), ptWorldMousePos))
+		if(tmpShape.TestPoint(ptWorldMousePos, m_GrabPoints[i]->GetSceneTransform(0.0f)))
 			return static_cast<GrabPointType>(i);
 	}
 
