@@ -480,6 +480,7 @@ void HyEntity2d::ShapeAppend(HyShape2d &shapeRef)
 
 	shapeRef.ParentDetach();
 	m_ShapeList.push_back(&shapeRef);
+	shapeRef.m_pParent = this;
 
 	SyncPhysicsShapes();
 }
@@ -512,6 +513,7 @@ bool HyEntity2d::ShapeRemove(HyShape2d &childShapeRef)
 		if(*iter == &childShapeRef)
 		{
 			m_ShapeList.erase(iter);
+			childShapeRef.m_pParent = nullptr;
 			return bPhysShapeRemoved;
 		}
 	}
