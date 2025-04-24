@@ -177,7 +177,8 @@ enum HyShapeType
 	HYSHAPE_Circle = 0,
 	HYSHAPE_LineSegment,
 	HYSHAPE_Polygon,
-	HYSHAPE_LineChain
+	HYSHAPE_LineChain,
+	HYSHAPE_Capsule
 };
 
 enum HyLoadState
@@ -331,10 +332,10 @@ enum HyDiagFlag
 	HYDIAG_PhysShapes		= 1 << 7,
 	HYDIAG_PhysJoints		= 1 << 8,
 	HYDIAG_PhysAabb			= 1 << 9,
-	HYDIAG_PhysPairs		= 1 << 10,	// Pairs within the broad-phase (objects close to each other or colliding)
+	HYDIAG_PhysContacts		= 1 << 10,	// Pairs within the broad-phase (objects close to each other or colliding)
 	HYDIAG_PhysCenterOfMass	= 1 << 11,
-	HYDIAG_PHYSICS			= (HYDIAG_PhysShapes | HYDIAG_PhysJoints | HYDIAG_PhysPairs),
-	HYDIAG_PHYSICS_ALL		= (HYDIAG_PhysShapes | HYDIAG_PhysJoints | HYDIAG_PhysAabb | HYDIAG_PhysPairs | HYDIAG_PhysCenterOfMass),
+	HYDIAG_PHYSICS			= (HYDIAG_PhysShapes | HYDIAG_PhysJoints | HYDIAG_PhysContacts),
+	HYDIAG_PHYSICS_ALL		= (HYDIAG_PhysShapes | HYDIAG_PhysJoints | HYDIAG_PhysAabb | HYDIAG_PhysContacts | HYDIAG_PhysCenterOfMass),
 	
 	HYDIAG_ALL				= (HYDIAG_FRAMERATE | HYDIAG_GRAPH | HYDIAG_INPUT | HYDIAG_PHYSICS_ALL)
 };

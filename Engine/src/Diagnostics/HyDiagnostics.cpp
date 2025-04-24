@@ -132,24 +132,13 @@ void HyDiagnostics::Init(const char *szTextPrefix, const char *szTextName, uint3
 
 void HyDiagnostics::Show(uint32 uiDiagFlags)
 {
-	if(uiDiagFlags & HYDIAG_PHYSICS)
+	if(uiDiagFlags & HYDIAG_PHYSICS_ALL)
 	{
-		uint32 uiBox2dFlags = 0;
-		if(uiDiagFlags & HYDIAG_PhysShapes)
-			uiBox2dFlags |= b2Draw::e_shapeBit;
-		if(uiDiagFlags & HYDIAG_PhysJoints)
-			uiBox2dFlags |= b2Draw::e_jointBit;
-		if(uiDiagFlags & HYDIAG_PhysAabb)
-			uiBox2dFlags |= b2Draw::e_aabbBit;
-		if(uiDiagFlags & HYDIAG_PhysPairs)
-			uiBox2dFlags |= b2Draw::e_pairBit;
-		if(uiDiagFlags & HYDIAG_PhysCenterOfMass)
-			uiBox2dFlags |= b2Draw::e_centerOfMassBit;
-
-		m_pBox2dDraw->SetFlags(uiBox2dFlags);
+		uint32 uiBox2dFlags = uiDiagFlags & HYDIAG_PHYSICS_ALL;
+		m_pBox2dDraw->SetShowFlags(uiBox2dFlags);
 	}
 	else
-		m_pBox2dDraw->SetFlags(0);
+		m_pBox2dDraw->SetShowFlags(0);
 
 	if(uiDiagFlags & (HYDIAG_FRAMERATE | HYDIAG_GRAPH | HYDIAG_INPUT))
 	{

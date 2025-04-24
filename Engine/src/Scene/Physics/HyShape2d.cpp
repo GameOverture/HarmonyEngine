@@ -14,29 +14,29 @@
 #include "Diagnostics/Console/IHyConsole.h"
 #include "Utilities/HyMath.h"
 
-const float HyShape2d::FloatSlop = b2_linearSlop;
+const float HyShape2d::FloatSlop = 0.005f;
 
 HyShape2d::HyShape2d(HyEntity2d *pParent /*= nullptr*/) :
-	m_eType(HYSHAPE_Nothing),
 	m_pParent(nullptr),
-	m_pShape(nullptr),
-	m_bIsFixtureAllowed(true),
-	m_pInit(nullptr),
-	m_pFixture(nullptr),
-	m_bFixtureDirty(false)
+	m_eType(HYSHAPE_Nothing),
+	m_Data({}),
+	m_hPhysics({}),
+	m_bPhysicsAllowed(true),
+	m_pPhysicsInit(nullptr),
+	m_bPhysicsDirty(false)
 {
 	if(pParent)
 		pParent->ShapeAppend(*this);
 }
 
 HyShape2d::HyShape2d(const HyShape2d &copyRef) : 
-	m_eType(HYSHAPE_Nothing),
 	m_pParent(nullptr),
-	m_pShape(nullptr),
-	m_bIsFixtureAllowed(true),
-	m_pInit(nullptr),
-	m_pFixture(nullptr),
-	m_bFixtureDirty(false)
+	m_eType(HYSHAPE_Nothing),
+	m_Data({}),
+	m_hPhysics({}),
+	m_bPhysicsAllowed(copyRef.m_bPhysicsAllowed),
+	m_pPhysicsInit(nullptr),
+	m_bPhysicsDirty(false)
 {
 	*this = copyRef;
 }
@@ -46,13 +46,39 @@ HyShape2d::HyShape2d(const HyShape2d &copyRef) :
 	if(m_pParent)
 		m_pParent->ShapeRemove(*this);
 
-	delete m_pShape;
-	delete m_pInit;
+	if(m_eType != HYSHAPE_LineChain)
+	{
+		if(b2Shape_IsValid(m_hPhysics.shape))
+			b2DestroyShape(m_hPhysics.shape, true);
+	}
+	else
+	{
+		if(b2Chain_IsValid(m_hPhysics.chain))
+			b2DestroyChain(m_hPhysics.chain);
+	}
+
+	delete m_pPhysicsInit;
 }
 
 const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 {
-	SetAsB2Shape(rhs.m_pShape);
+	ClearShapeData();
+	if(rhs.m_eType == HYSHAPE_LineChain)
+	{
+		m_Data.chain.pPointList = HY_NEW glm::vec2[rhs.m_Data.chain.iCount];
+		m_Data.chain.iCount = rhs.m_Data.chain.iCount;
+		m_Data.chain.bLoop = rhs.m_Data.chain.bLoop;
+	}
+	else
+		m_Data = rhs.m_Data;
+
+	m_eType = rhs.m_eType;
+	m_bPhysicsAllowed = rhs.m_bPhysicsAllowed;
+
+	if(rhs.m_pParent)
+		rhs.m_pParent->ShapeAppend(*this);
+
+	ShapeChanged();
 	return *this;
 }
 
@@ -63,7 +89,21 @@ HyShapeType HyShape2d::GetType() const
 
 bool HyShape2d::IsValidShape() const
 {
-	return m_pShape != nullptr && m_eType != HYSHAPE_Nothing;
+	return m_eType != HYSHAPE_Nothing;
+}
+
+void HyShape2d::TransformSelf(const glm::mat4 &mtxTransform)
+{
+	ShapeData shapeData = { };
+	if(TransformShapeData(shapeData, mtxTransform))
+	{
+		HyShapeType ePreserveType = m_eType;
+		ClearShapeData();
+
+		m_Data = shapeData;
+		m_eType = ePreserveType;
+		ShapeChanged();
+	}
 }
 
 glm::vec2 HyShape2d::ComputeSize() const
@@ -71,7 +111,8 @@ glm::vec2 HyShape2d::ComputeSize() const
 	b2AABB aabb;
 	ComputeAABB(aabb, glm::mat4(1.0f));
 
-	return glm::vec2(aabb.GetExtents().x, aabb.GetExtents().y) * 2.0f;
+	b2Vec2 vExtents = b2AABB_Extents(aabb);
+	return glm::vec2(vExtents.x, vExtents.y) * 2.0f;
 }
 
 void HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
@@ -79,17 +120,18 @@ void HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
 	switch(m_eType)
 	{
 	case HYSHAPE_Circle:
-		ptCentroidOut.x = static_cast<b2CircleShape *>(m_pShape)->m_p.x;
-		ptCentroidOut.y = static_cast<b2CircleShape *>(m_pShape)->m_p.y;
+		ptCentroidOut.x = m_Data.circle.center.x;
+		ptCentroidOut.y = m_Data.circle.center.y;
 		break;
 
 	case HYSHAPE_Polygon:
-		ptCentroidOut.x = static_cast<b2PolygonShape *>(m_pShape)->m_centroid.x;
-		ptCentroidOut.y = static_cast<b2PolygonShape *>(m_pShape)->m_centroid.y;
+		ptCentroidOut.x = m_Data.polygon.centroid.x;
+		ptCentroidOut.y = m_Data.polygon.centroid.y;
 		break;
 
 	default:
-		HyError("HyShape2d::GetCentoid() - Unsupported shape type: " << m_eType);
+		HyLogWarning("HyShape2d::GetCentoid() - Unsupported shape type: " << m_eType);
+		break;
 	}
 }
 
@@ -106,17 +148,17 @@ float HyShape2d::CalcArea() const
 		break;
 
 	case HYSHAPE_Circle: {
-		float fRadius = static_cast<b2CircleShape *>(m_pShape)->m_radius;
-		fArea = b2_pi * (fRadius * fRadius);
+		float fRadius = m_Data.circle.radius;
+		fArea = glm::pi<float>() * (fRadius * fRadius);
 		break; }
 
 	case HYSHAPE_Polygon: {
 		// Get a reference point for forming triangles.
 		// Use the first vertex to reduce round-off errors.
-		auto &verticesRef = static_cast<b2PolygonShape *>(m_pShape)->m_vertices;
+		auto &verticesRef = m_Data.polygon.vertices;
 		b2Vec2 s = verticesRef[0];
 
-		int32 iNumVerts = static_cast<b2PolygonShape *>(m_pShape)->m_count;
+		int32 iNumVerts = m_Data.polygon.count;
 		for(int32 i = 0; i < iNumVerts; ++i)
 		{
 			// Triangle vertices.
@@ -132,76 +174,6 @@ float HyShape2d::CalcArea() const
 	return fArea;
 }
 
-const b2Shape *HyShape2d::GetB2Shape() const
-{
-	return m_pShape;
-}
-
-b2Shape *HyShape2d::ClonePpmShape(float fPpmInverse) const
-{
-	b2Shape *pCloneB2Shape = nullptr;
-	std::vector<b2Vec2> vertList;
-
-	switch(m_eType)
-	{
-	case HYSHAPE_LineSegment:
-		pCloneB2Shape = HY_NEW b2EdgeShape();
-		vertList.emplace_back(static_cast<b2EdgeShape *>(m_pShape)->m_vertex1.x * fPpmInverse,
-							  static_cast<b2EdgeShape *>(m_pShape)->m_vertex1.y * fPpmInverse);
-		vertList.emplace_back(static_cast<b2EdgeShape *>(m_pShape)->m_vertex2.x * fPpmInverse,
-							  static_cast<b2EdgeShape *>(m_pShape)->m_vertex2.y * fPpmInverse);
-
-		static_cast<b2EdgeShape *>(pCloneB2Shape)->SetTwoSided(vertList[0], vertList[1]);
-		break;
-
-	case HYSHAPE_LineChain:
-		pCloneB2Shape = HY_NEW b2ChainShape();
-		for(int32 i = 0; i < static_cast<b2ChainShape *>(m_pShape)->m_count; ++i)
-		{
-			vertList.emplace_back(static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].x * fPpmInverse,
-				static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].y * fPpmInverse);
-		}
-
-		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateChain(vertList.data(), static_cast<b2ChainShape *>(m_pShape)->m_count, b2Vec2(0, 0), b2Vec2(0, 0));
-		break;
-
-	//case HYSHAPE_LineLoop:
-	//	pCloneB2Shape = HY_NEW b2ChainShape();
-	//	for(int32 i = 0; i < static_cast<b2ChainShape *>(m_pShape)->m_count - 1; ++i) // minus 1 to account for the CreateLoop auto connecting
-	//	{
-	//		vertList.emplace_back(static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].x * fPpmInverse,
-	//							  static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].y * fPpmInverse);
-	//	}
-
-	//	static_cast<b2ChainShape *>(pCloneB2Shape)->CreateLoop(vertList.data(), static_cast<b2ChainShape *>(m_pShape)->m_count - 1);
-	//	break;
-
-	case HYSHAPE_Circle:
-		pCloneB2Shape = HY_NEW b2CircleShape();
-		static_cast<b2CircleShape *>(pCloneB2Shape)->m_p.Set(static_cast<b2CircleShape *>(m_pShape)->m_p.x * fPpmInverse,
-															 static_cast<b2CircleShape *>(m_pShape)->m_p.y * fPpmInverse);
-		static_cast<b2CircleShape *>(pCloneB2Shape)->m_radius = static_cast<b2CircleShape *>(m_pShape)->m_radius * fPpmInverse;
-		break;
-
-	case HYSHAPE_Polygon:
-		pCloneB2Shape = HY_NEW b2PolygonShape();
-		for(int32 i = 0; i < static_cast<b2PolygonShape *>(m_pShape)->m_count; ++i)
-		{
-			vertList.emplace_back(static_cast<b2PolygonShape *>(m_pShape)->m_vertices[i].x * fPpmInverse,
-								  static_cast<b2PolygonShape *>(m_pShape)->m_vertices[i].y * fPpmInverse);
-		}
-
-		static_cast<b2PolygonShape *>(pCloneB2Shape)->Set(vertList.data(), static_cast<b2PolygonShape *>(m_pShape)->m_count);
-		break;
-
-	default:
-		HyError("Unhandled shape type used in HyShape2d::ClonePpmShape");
-		break;
-	}
-
-	return pCloneB2Shape;
-}
-
 void HyShape2d::ParentDetach()
 {
 	HyEntity2d *pParent = ParentGet();
@@ -214,99 +186,21 @@ void HyShape2d::ParentDetach()
 HyEntity2d *HyShape2d::ParentGet() const
 {
 	return m_pParent;
-	//if(m_pFixture)
-	//	return reinterpret_cast<HyEntity2d *>(m_pFixture->GetBody()->GetUserData().pointer);
-
-	//return nullptr;
 }
 
 void HyShape2d::SetAsNothing()
 {
-	m_eType = HYSHAPE_Nothing;
-
-	delete m_pShape;
-	m_pShape = nullptr;
-
+	ClearShapeData();
 	ShapeChanged();
 }
 
-void HyShape2d::SetAsB2Shape(const b2Shape *pShape, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
+void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const b2ShapeDef *pPhysicsInit /*= nullptr*/)
 {
-	if(m_pShape == pShape)
-		return;
-
-	if(pShape == nullptr)
-	{
-		SetAsNothing();
-		return;
-	}
-
-	delete m_pShape;
-	m_pShape = nullptr;
-
-	switch(pShape->GetType())// rhs.GetType())
-	{
-	case b2Shape::e_circle: {
-		m_eType = HYSHAPE_Circle;
-		const b2CircleShape *pRhsCircleShape = static_cast<const b2CircleShape *>(pShape);
-		m_pShape = HY_NEW b2CircleShape(*pRhsCircleShape);
-		break; }
-
-	case b2Shape::e_edge: {
-		m_eType = HYSHAPE_LineSegment;
-		const b2EdgeShape *pRhsEdgeShape = static_cast<const b2EdgeShape *>(pShape);
-		m_pShape = HY_NEW b2EdgeShape(*pRhsEdgeShape);
-		break; }
-
-	case b2Shape::e_polygon: {
-		m_eType = HYSHAPE_Polygon;
-		const b2PolygonShape *pRhsPolygonShape = static_cast<const b2PolygonShape *>(pShape);
-		m_pShape = HY_NEW b2PolygonShape(*pRhsPolygonShape);
-		break; }
-
-	//case HYSHAPE_LineLoop: {
-	//	m_eType = HYSHAPE_LineLoop;
-
-	//	b2ChainShape *pRhsChainShape = static_cast<b2ChainShape *>(rhs.m_pShape);
-	//	m_pShape = HY_NEW b2ChainShape(); // NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
-
-	//	static_cast<b2ChainShape *>(m_pShape)->m_vertices = nullptr;
-	//	static_cast<b2ChainShape *>(m_pShape)->CreateLoop(pRhsChainShape->m_vertices, pRhsChainShape->m_count - 1); // minus 1 to account for the CreateLoop auto connecting
-	//} break;
-
-	case b2Shape::e_chain: {
-		m_eType = HYSHAPE_LineChain;
-		const b2ChainShape *pRhsChainShape = static_cast<const b2ChainShape *>(pShape);
-
-		// NOTE: Box2d doesn't have a proper copy constructor for b2ChainShape as it uses its own dynamic memory
-		m_pShape = HY_NEW b2ChainShape();
-		static_cast<b2ChainShape *>(m_pShape)->m_vertices = nullptr;
-		static_cast<b2ChainShape *>(m_pShape)->CreateChain(pRhsChainShape->m_vertices, pRhsChainShape->m_count, b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f));
-		break; }
-
-	default:
-		// Unknown shape type (uninitialized IHyNode objects)
-		break;
-	}
-
-	if(pPhysicsInit)
-		Setup(*pPhysicsInit);
-
-	ShapeChanged();
-}
-
-void HyShape2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
-{
-	SetAsLineSegment(b2Vec2(pt1.x, pt1.y), b2Vec2(pt2.x, pt2.y), pPhysicsInit);
-}
-
-void HyShape2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
-{
+	ClearShapeData();
 	m_eType = HYSHAPE_LineSegment;
 
-	delete m_pShape;
-	m_pShape = HY_NEW b2EdgeShape();
-	static_cast<b2EdgeShape *>(m_pShape)->SetTwoSided(pt1, pt2);
+	m_Data.segment.point1 = { pt1.x, pt1.y };
+	m_Data.segment.point2 = { pt2.x, pt2.y };
 
 	if(pPhysicsInit)
 		Setup(*pPhysicsInit);
@@ -314,18 +208,20 @@ void HyShape2d::SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2, const b2F
 	ShapeChanged();
 }
 
-void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
+void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoop, const b2ShapeDef *pPhysicsInit /*= nullptr*/)
 {
+	if(bLoop && pVertices[0] == pVertices[uiNumVerts - 1])
+		uiNumVerts--; // Correct the vert list to not include the redundant final loop point
 	HyAssert(uiNumVerts >= 3, "HyShape2d::SetAsLineLoop - not enough verts. Must be >= 3");
+
+	ClearShapeData();
 	m_eType = HYSHAPE_LineChain;
 
-	std::vector<b2Vec2> vertList;
+	m_Data.chain.pPointList = HY_NEW glm::vec2[uiNumVerts];
 	for(uint32 i = 0; i < uiNumVerts; ++i)
-		vertList.push_back(b2Vec2(pVertices[i].x, pVertices[i].y));
-
-	delete m_pShape;
-	m_pShape = HY_NEW b2ChainShape();
-	static_cast<b2ChainShape *>(m_pShape)->CreateLoop(&vertList[0], uiNumVerts);
+		m_Data.chain.pPointList[i] = pVertices[i];
+	m_Data.chain.iCount = uiNumVerts;
+	m_Data.chain.bLoop = bLoop;
 
 	if(pPhysicsInit)
 		Setup(*pPhysicsInit);
@@ -333,119 +229,101 @@ void HyShape2d::SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts, con
 	ShapeChanged();
 }
 
-void HyShape2d::SetAsLineLoop(const std::vector<glm::vec2> &verticesList, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
+void HyShape2d::SetAsLineChain(const std::vector<glm::vec2> &verticesList, bool bLoop, const b2ShapeDef *pPhysicsInit /*= nullptr*/)
 {
-	SetAsLineLoop(verticesList.data(), static_cast<uint32>(verticesList.size()), pPhysicsInit);
+	SetAsLineChain(verticesList.data(), verticesList.size(), bLoop, pPhysicsInit);
 }
 
-void HyShape2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
-{
-	HyAssert(uiNumVerts >= 2, "HyShape2d::SetAsLineChain - not enough verts. Must be >= 2");
-	m_eType = HYSHAPE_LineChain;
-
-	std::vector<b2Vec2> vertList;
-	for(uint32 i = 0; i < uiNumVerts; ++i)
-		vertList.push_back(b2Vec2(pVertices[i].x, pVertices[i].y));
-
-	delete m_pShape;
-	m_pShape = HY_NEW b2ChainShape();
-	static_cast<b2ChainShape *>(m_pShape)->CreateChain(&vertList[0], uiNumVerts, b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f));
-
-	if(pPhysicsInit)
-		Setup(*pPhysicsInit);
-
-	ShapeChanged();
-}
-
-void HyShape2d::SetAsLineChain(const std::vector<glm::vec2> &verticesList, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
-{
-	SetAsLineChain(verticesList.data(), static_cast<uint32>(verticesList.size()), pPhysicsInit);
-}
-
-bool HyShape2d::SetAsCircle(float fRadius, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
+bool HyShape2d::SetAsCircle(float fRadius, const b2ShapeDef *pPhysicsInit /*= nullptr*/)
 {
 	return SetAsCircle(glm::vec2(0.0f, 0.0f), fRadius, pPhysicsInit);
 }
 
-bool HyShape2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
-{
-	return SetAsCircle(b2Vec2(ptCenter.x, ptCenter.y), fRadius, pPhysicsInit);
-}
-
-bool HyShape2d::SetAsCircle(const b2Vec2& center, float fRadius, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
+bool HyShape2d::SetAsCircle(const glm::vec2 &ptCenter, float fRadius, const b2ShapeDef *pPhysicsInit /*= nullptr*/)
 {
 	if(fRadius < FloatSlop)
-	{
-		SetAsNothing();
 		return false;
-	}
 
+	ClearShapeData();
 	m_eType = HYSHAPE_Circle;
 
-	delete m_pShape;
-	m_pShape = HY_NEW b2CircleShape();
-	static_cast<b2CircleShape *>(m_pShape)->m_p = center;
-	static_cast<b2CircleShape *>(m_pShape)->m_radius = fRadius;
+	m_Data.circle.center = { ptCenter.x, ptCenter.y };
+	m_Data.circle.radius = fRadius;
 
 	if(pPhysicsInit)
 		Setup(*pPhysicsInit);
 
 	ShapeChanged();
-
 	return true;
 }
 
-void HyShape2d::SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
+bool HyShape2d::SetAsPolygon(const glm::vec2 *pVertices, uint32 uiCount, const b2ShapeDef *pPhysicsInit /*= nullptr*/)
 {
-	std::vector<b2Vec2> vertList;
-	for(uint32 i = 0; i < uiCount; ++i)
-		vertList.push_back(b2Vec2(pPointArray[i].x, pPointArray[i].y));
+	HyAssert(uiCount <= B2_MAX_POLYGON_VERTICES, "HyShape2d::SetAsPolygon took too many vertices (" << uiCount << "). Max is " << B2_MAX_POLYGON_VERTICES);
+	b2Vec2 b2Verts[B2_MAX_POLYGON_VERTICES];
+	for(int i = 0; i < uiCount; ++i)
+	{
+		b2Verts[i].x = pVertices[i].x;
+		b2Verts[i].y = pVertices[i].y;
+	}
 
-	SetAsPolygon(vertList.data(), static_cast<uint32>(vertList.size()), pPhysicsInit);
-}
+	b2Hull hull = b2ComputeHull(b2Verts, static_cast<int>(uiCount));
+	if(hull.count == 0)
+		return false;
 
-void HyShape2d::SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
-{
-	HyAssert(uiCount <= b2_maxPolygonVertices, "HyShape2d::SetAsPolygon took too many vertices. Max is " << uiCount);
-
+	ClearShapeData();
 	m_eType = HYSHAPE_Polygon;
 
-	delete m_pShape;
-	m_pShape = HY_NEW b2PolygonShape();
-	static_cast<b2PolygonShape *>(m_pShape)->Set(pPointArray, uiCount);
+	m_Data.polygon = b2MakePolygon(&hull, 0.0f);
 
 	if(pPhysicsInit)
 		Setup(*pPhysicsInit);
 
 	ShapeChanged();
+	return true;
 }
 
-void HyShape2d::SetAsPolygon(const std::vector<glm::vec2> &verticesList, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
+bool HyShape2d::SetAsPolygon(const std::vector<glm::vec2> &verticesList, const b2ShapeDef *pPhysicsInit /*= nullptr*/)
 {
-	SetAsPolygon(verticesList.data(), static_cast<uint32>(verticesList.size()));
+	return SetAsPolygon(verticesList.data(), static_cast<uint32>(verticesList.size()));
 }
 
-bool HyShape2d::SetAsBox(float fWidth, float fHeight, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
+bool HyShape2d::SetAsBox(float fWidth, float fHeight, const b2ShapeDef *pPhysicsInit /*= nullptr*/)
 {
 	return SetAsBox(HyRect(fWidth, fHeight));
 }
 
-bool HyShape2d::SetAsBox(const HyRect &rect, const b2FixtureDef *pPhysicsInit /*= nullptr*/)
+bool HyShape2d::SetAsBox(const HyRect &rect, const b2ShapeDef *pPhysicsInit /*= nullptr*/)
 {
 	if(rect.GetWidth() < FloatSlop || rect.GetHeight() < FloatSlop)
-	{
-		SetAsNothing();
 		return false;
-	}
 
+	ClearShapeData();
 	m_eType = HYSHAPE_Polygon;
 
-	delete m_pShape;
-	m_pShape = HY_NEW b2PolygonShape();
-	static_cast<b2PolygonShape *>(m_pShape)->SetAsBox(rect.GetWidth() * 0.5f,
-													  rect.GetHeight() * 0.5f,
-													  b2Vec2(rect.GetCenter().x, rect.GetCenter().y),
-													  glm::radians(rect.GetRotation()));
+	if(rect.GetCenter().x == 0.0f && rect.GetCenter().y == 0.0f && rect.GetRotation() == 0.0f)
+		m_Data.polygon = b2MakeBox(rect.GetWidth(0.5f), rect.GetHeight(0.5f));
+	else
+		m_Data.polygon = b2MakeOffsetBox(rect.GetWidth(0.5f), rect.GetHeight(0.5f), { rect.GetCenter().x, rect.GetCenter().y }, b2MakeRot(glm::radians(rect.GetRotation())));
+
+	if(pPhysicsInit)
+		Setup(*pPhysicsInit);
+
+	ShapeChanged();
+	return true;
+}
+
+bool HyShape2d::SetAsCapsule(const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, const b2ShapeDef *pPhysicsInit /*= nullptr*/)
+{
+	if(fRadius < FloatSlop || glm::distance(pt1, pt2) < FloatSlop)
+		return false;
+
+	ClearShapeData();
+	m_eType = HYSHAPE_Capsule;
+
+	m_Data.capsule.center1 = { pt1.x, pt1.y };
+	m_Data.capsule.center2 = { pt2.x, pt2.y };
+	m_Data.capsule.radius = fRadius;
 
 	if(pPhysicsInit)
 		Setup(*pPhysicsInit);
@@ -462,286 +340,276 @@ bool HyShape2d::SetAsBox(const HyRect &rect, const b2FixtureDef *pPhysicsInit /*
 //m_pInit->m_FixtureDef.filter = filter;
 //m_pInit->m_FixtureDef.userData.pointer = reinterpret_cast<uintptr_t>(&m_NodeRef);
 
-bool HyShape2d::IsFixtureAllowed() const
+bool HyShape2d::IsPhysicsAllowed() const
 {
-	return m_bIsFixtureAllowed;
+	return m_bPhysicsAllowed;
 }
 
-void HyShape2d::SetFixtureAllowed(bool bIsFixtureAllowed)
+void HyShape2d::SetPhysicsAllowed(bool bIsPhysicsAllowed)
 {
-	m_bIsFixtureAllowed = bIsFixtureAllowed;
+	m_bPhysicsAllowed = bIsPhysicsAllowed;
 	ShapeChanged();
 }
 
-void HyShape2d::Setup(const b2FixtureDef &fixtureDefRef)
+void HyShape2d::Setup(const b2ShapeDef &shapeDefRef)
 {
-	if(m_pFixture)
-	{
-		m_pFixture->SetDensity(fixtureDefRef.density);
-		m_pFixture->SetFilterData(fixtureDefRef.filter);
-		m_pFixture->SetFriction(fixtureDefRef.friction);
-		m_pFixture->SetSensor(fixtureDefRef.isSensor);
-		m_pFixture->SetRestitution(fixtureDefRef.restitution);
-		m_pFixture->SetRestitutionThreshold(fixtureDefRef.restitutionThreshold);
+	HyAssert(shapeDefRef.internalValue != 0, "HyShape2d::Setup() - Invalid b2ShapeDef. Must be initalized with b2DefaultShapeDef()");
 
-		m_pFixture->GetBody()->ResetMassData();
+	if(IsPhysicsRegistered())
+	{
+		if(m_eType != HYSHAPE_LineChain)
+		{
+			if(shapeDefRef.isSensor != b2Shape_IsSensor(m_hPhysics.shape))
+				HyLogWarning("HyShape2d::Setup() - Already simulated shape cannot change to/from a sensor <-> solid");
+
+			b2Shape_SetFilter(m_hPhysics.shape, shapeDefRef.filter);
+			b2Shape_SetFriction(m_hPhysics.shape, shapeDefRef.material.friction);
+			b2Shape_SetRestitution(m_hPhysics.shape, shapeDefRef.material.restitution);
+			//b2World_SetRestitutionThreshold(m_hPhysics.shape, );
+			b2Shape_SetDensity(m_hPhysics.shape, shapeDefRef.density, true);
+		}
+		else
+		{
+			b2Chain_SetFriction(m_hPhysics.chain, shapeDefRef.material.friction);
+			b2Chain_SetRestitution(m_hPhysics.chain, shapeDefRef.material.restitution);
+		}
 	}
 	else
 	{
-		if(m_pInit == nullptr)
-			m_pInit = HY_NEW b2FixtureDef();
+		if(m_pPhysicsInit == nullptr)
+		{
+			m_pPhysicsInit = HY_NEW b2ShapeDef();
+			*m_pPhysicsInit = b2DefaultShapeDef();
+		}
 
-		m_pInit->density = fixtureDefRef.density;
-		m_pInit->filter = fixtureDefRef.filter;
-		m_pInit->friction = fixtureDefRef.friction;
-		m_pInit->isSensor = fixtureDefRef.isSensor;
-		m_pInit->restitution = fixtureDefRef.restitution;
-		m_pInit->restitutionThreshold = fixtureDefRef.restitutionThreshold;
-		m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(this);
+		*m_pPhysicsInit = shapeDefRef;
+		m_pPhysicsInit->userData = this;
 	}
 }
 
 float HyShape2d::GetDensity() const
 {
-	if(m_pFixture)
-		return m_pFixture->GetDensity();
-	else if(m_pInit)
-		return m_pInit->density;
+	if(IsPhysicsRegistered() && m_eType != HYSHAPE_LineChain)
+		return b2Shape_GetDensity(m_hPhysics.shape);
+	else if(m_pPhysicsInit)
+		return m_pPhysicsInit->density;
 	else
-		return b2FixtureDef().density;
+		return b2DefaultShapeDef().density;
 }
 
-void HyShape2d::SetDensity(float fDensity)
+void HyShape2d::SetDensity(float fDensity, bool bUpdateBodyMass /*= true*/)
 {
-	if(m_pFixture)
-	{
-		m_pFixture->SetDensity(fDensity);
-		m_pFixture->GetBody()->ResetMassData();
-	}
-	else if(m_pInit)
-		m_pInit->density = fDensity;
+	if(IsPhysicsRegistered() && m_eType != HYSHAPE_LineChain)
+		b2Shape_SetDensity(m_hPhysics.shape, fDensity, bUpdateBodyMass);
+	else if(m_pPhysicsInit)
+		m_pPhysicsInit->density = fDensity;
 	else
 	{
-		m_pInit = HY_NEW b2FixtureDef();
-		m_pInit->density = fDensity;
+		b2ShapeDef def = b2DefaultShapeDef();
+		def.density = fDensity;
+		Setup(def);
 	}
 }
 
-void HyShape2d::SetDensityInKg(float fWeightKg)
+void HyShape2d::SetDensityInKg(float fWeightKg, bool bUpdateBodyMass /*= true*/)
 {
 	if(IsValidShape() == false || fWeightKg < 0.0f)
 		fWeightKg = 0.0f;
 
 	float fAreaMetersSq = CalcArea();
 	if(fAreaMetersSq <= 0.0f)
-		SetDensity(0.0f);
+		SetDensity(0.0f, bUpdateBodyMass);
 	else
-		SetDensity(fWeightKg / fAreaMetersSq);
+		SetDensity(fWeightKg / fAreaMetersSq, bUpdateBodyMass);
 }
 
 float HyShape2d::GetFriction() const
 {
-	if(m_pFixture)
-		return m_pFixture->GetFriction();
-	else if(m_pInit)
-		return m_pInit->friction;
+	if(IsPhysicsRegistered())
+	{
+		if(m_eType != HYSHAPE_LineChain)
+			return b2Shape_GetFriction(m_hPhysics.shape);
+		else
+			return b2Chain_GetFriction(m_hPhysics.chain);
+	}
+	else if(m_pPhysicsInit)
+		return m_pPhysicsInit->material.friction;
 	else
-		return b2FixtureDef().friction;
+		return b2DefaultShapeDef().material.friction;
 }
 
 void HyShape2d::SetFriction(float fFriction)
 {
-	if(m_pFixture)
-		m_pFixture->SetFriction(fFriction);
-	else if(m_pInit)
-		m_pInit->friction = fFriction;
+	if(IsPhysicsRegistered())
+	{
+		if(m_eType != HYSHAPE_LineChain)
+			b2Shape_SetFriction(m_hPhysics.shape, fFriction);
+		else
+			b2Chain_SetFriction(m_hPhysics.chain, fFriction);
+	}
+	else if(m_pPhysicsInit)
+		m_pPhysicsInit->material.friction = fFriction;
 	else
 	{
-		m_pInit = HY_NEW b2FixtureDef();
-		m_pInit->friction = fFriction;
+		b2ShapeDef def = b2DefaultShapeDef();
+		def.material.friction = fFriction;
+		Setup(def);
 	}
 }
 
 float HyShape2d::GetRestitution() const
 {
-	if(m_pFixture)
-		return m_pFixture->GetRestitution();
-	else if(m_pInit)
-		return m_pInit->restitution;
+	if(IsPhysicsRegistered())
+	{
+		if(m_eType != HYSHAPE_LineChain)
+			return b2Shape_GetRestitution(m_hPhysics.shape);
+		else
+			return b2Chain_GetRestitution(m_hPhysics.chain);
+	}
+	else if(m_pPhysicsInit)
+		return m_pPhysicsInit->material.restitution;
 	else
-		return b2FixtureDef().restitution;
+		return b2DefaultShapeDef().material.restitution;
 }
 
 void HyShape2d::SetRestitution(float fRestitution)
 {
-	if(m_pFixture)
-		m_pFixture->SetRestitution(fRestitution);
-	else if(m_pInit)
-		m_pInit->restitution = fRestitution;
-	else
+	if(IsPhysicsRegistered())
 	{
-		m_pInit = HY_NEW b2FixtureDef();
-		m_pInit->restitution = fRestitution;
+		if(m_eType != HYSHAPE_LineChain)
+			b2Shape_SetRestitution(m_hPhysics.shape, fRestitution);
+		else
+			b2Chain_SetRestitution(m_hPhysics.chain, fRestitution);
 	}
-}
-
-float HyShape2d::GetRestitutionThreshold() const
-{
-	if(m_pFixture)
-		return m_pFixture->GetRestitutionThreshold();
-	else if(m_pInit)
-		return m_pInit->restitutionThreshold;
-	else
-		return b2FixtureDef().restitutionThreshold;
-}
-
-void HyShape2d::SetRestitutionThreshold(float fRestitutionThreshold)
-{
-	if(m_pFixture)
-		m_pFixture->SetRestitutionThreshold(fRestitutionThreshold);
-	else if(m_pInit)
-		m_pInit->restitutionThreshold = fRestitutionThreshold;
+	else if(m_pPhysicsInit)
+		m_pPhysicsInit->material.restitution = fRestitution;
 	else
 	{
-		m_pInit = HY_NEW b2FixtureDef();
-		m_pInit->restitutionThreshold = fRestitutionThreshold;
+		b2ShapeDef def = b2DefaultShapeDef();
+		def.material.restitution = fRestitution;
+		Setup(def);
 	}
 }
 
 b2Filter HyShape2d::GetFilter() const
 {
-	if(m_pFixture)
-		return m_pFixture->GetFilterData();
-	else if(m_pInit)
-		return m_pInit->filter;
+	if(IsPhysicsRegistered())
+	{
+		if(m_eType != HYSHAPE_LineChain)
+			return b2Shape_GetFilter(m_hPhysics.shape);
+		else
+		{
+			// NOTE: Box2d API doesn't have this function yet, use the first segment instead
+			//return b2Chain_GetFilter(m_hPhysics.chain);
+
+			b2ShapeId hSegment = b2_nullShapeId;
+			if(1 == b2Chain_GetSegments(m_hPhysics.chain, &hSegment, 1))
+				return b2Shape_GetFilter(hSegment);
+			else
+				return b2DefaultFilter();
+		}
+	}
+	else if(m_pPhysicsInit)
+		return m_pPhysicsInit->filter;
 	else
-		return b2Filter();
+		return b2DefaultShapeDef().filter;
 }
 
 void HyShape2d::SetFilter(const b2Filter &filter)
 {
-	if(m_pFixture)
-		m_pFixture->SetFilterData(filter);
-	else if(m_pInit)
-		m_pInit->filter = filter;
+	if(IsPhysicsRegistered())
+	{
+		if(m_eType != HYSHAPE_LineChain)
+			b2Shape_SetFilter(m_hPhysics.shape, filter);
+		else
+		{
+			// NOTE: Box2d API doesn't have this function yet, set all the segments directly instead
+			//b2Chain_SetFilter(m_hPhysics.chain, filter);
+
+			int iNumSegments = b2Chain_GetSegmentCount(m_hPhysics.chain);
+			b2ShapeId *pSegmentHandles = HY_NEW b2ShapeId[iNumSegments];
+			if(iNumSegments == b2Chain_GetSegments(m_hPhysics.chain, pSegmentHandles, iNumSegments))
+			{
+				for(int i = 0; i < iNumSegments; ++i)
+					b2Shape_SetFilter(pSegmentHandles[i], filter);
+			}
+			delete[] pSegmentHandles;
+		}
+	}
+	else if(m_pPhysicsInit)
+		m_pPhysicsInit->filter = filter;
 	else
 	{
-		m_pInit = HY_NEW b2FixtureDef();
-		m_pInit->filter = filter;
+		b2ShapeDef def = b2DefaultShapeDef();
+		def.filter = filter;
+		Setup(def);
 	}
 }
 
 bool HyShape2d::IsSensor() const
 {
-	if(m_pFixture)
-		return m_pFixture->IsSensor();
-	else if(m_pInit)
-		return m_pInit->isSensor;
+	if(m_eType == HYSHAPE_LineChain)
+		return false;
+
+	if(IsPhysicsRegistered())
+		return b2Shape_IsSensor(m_hPhysics.shape);
+	else if(m_pPhysicsInit)
+		return m_pPhysicsInit->isSensor;
 	else
-		return b2FixtureDef().isSensor;
+		return b2DefaultShapeDef().isSensor;
 }
 
-void HyShape2d::SetSensor(bool bIsSensor)
+bool HyShape2d::TestPoint(const glm::vec2 &ptTestPoint, const glm::mat4 &mtxSelfTransform) const
 {
-	if(m_pFixture)
-		m_pFixture->SetSensor(bIsSensor);
-	else if(m_pInit)
-		m_pInit->isSensor = bIsSensor;
-	else
-	{
-		m_pInit = HY_NEW b2FixtureDef();
-		m_pInit->isSensor = bIsSensor;
-	}
-}
-
-bool HyShape2d::TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &ptTestPoint) const
-{	
-	// CloneTransform applies scaling
-	b2Shape *pTransformedSelf = CloneTransform(mtxSelfTransform);
-	if(pTransformedSelf)
+	ShapeData shapeData = {};
+	if(TransformShapeData(shapeData, mtxSelfTransform))
 	{
 		bool bIsCollide = false;
 
-		// Ideally use Box2d to TestPoint, but the line shapes aren't supported so 
-		switch(pTransformedSelf->GetType())
+		// Ideally use Box2d to TestPoint if supported (line shapes need own implementation)
+		switch(m_eType)
 		{
-		case b2Shape::e_circle:
-		case b2Shape::e_polygon:
-			bIsCollide = pTransformedSelf->TestPoint(b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f)), b2Vec2(ptTestPoint.x, ptTestPoint.y));
+		case HYSHAPE_Circle:
+			return b2PointInCircle({ ptTestPoint.x, ptTestPoint.y }, &shapeData.circle);
+
+		case HYSHAPE_LineSegment: {
+			glm::vec2 pt1(shapeData.segment.point1.x, shapeData.segment.point1.y);
+			glm::vec2 pt2(shapeData.segment.point2.x, shapeData.segment.point2.y);
+			glm::vec2 ptCenter = pt1 + ((pt2 - pt1) * 0.5f);
+			float fRadians = std::atan2(pt2.y - pt1.y, pt2.x - pt1.x);
+
+			b2Polygon tmpBox = b2MakeOffsetBox(0.5f * glm::distance(pt1, pt2),
+											   4.0f,
+											   { ptCenter.x, ptCenter.y },
+											   b2MakeRot(fRadians));
+
+			return b2PointInPolygon({ ptTestPoint.x, ptTestPoint.y }, &tmpBox); }
+
+		case HYSHAPE_Polygon:
+			return b2PointInPolygon({ ptTestPoint.x, ptTestPoint.y }, &shapeData.polygon);
+
+		case HYSHAPE_LineChain: {
+			b2AABB aabb;
+			ComputeChainAabb(aabb, shapeData);
+			delete[] shapeData.chain.pPointList;
+			return HyMath::TestPointAABB(aabb, ptTestPoint); }
+				
+		case HYSHAPE_Capsule:
+			return b2PointInCapsule({ ptTestPoint.x, ptTestPoint.y }, &shapeData.capsule);
+
+		default:
+			HyError("HyShape2d::TransformShapeData() - Unhandled shape type: " << m_eType);
 			break;
-		
-		case b2Shape::e_edge: {
-			b2AABB aabb;
-			aabb.lowerBound.Set(static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex1.x, static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex1.y);
-			aabb.upperBound.Set(static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex1.x, static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex1.y);
-			if(static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.x < aabb.lowerBound.x)
-				aabb.lowerBound.x = static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.x;
-			if(static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.y < aabb.lowerBound.y)
-				aabb.lowerBound.y = static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.y;
-			if(static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.x > aabb.upperBound.x)
-				aabb.upperBound.x = static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.x;
-			if(static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.y > aabb.upperBound.y)
-				aabb.upperBound.y = static_cast<b2EdgeShape *>(pTransformedSelf)->m_vertex2.y;
-
-			// If the AABB is flat, inflate it by 5 pixel radius
-			if(aabb.lowerBound.x == aabb.upperBound.x)
-			{
-				aabb.lowerBound.x -= 5.0f;
-				aabb.upperBound.x += 5.0f;
-			}
-			if(aabb.lowerBound.y == aabb.upperBound.y)
-			{
-				aabb.lowerBound.y -= 5.0f;
-				aabb.upperBound.y += 5.0f;
-			}
-
-			bIsCollide = HyMath::TestPointAABB(aabb, ptTestPoint);
-			break; }
-
-		case b2Shape::e_chain: {
-			b2AABB aabb;
-			HyMath::InvalidateAABB(aabb);
-			for(int32 i = 0; i < static_cast<b2ChainShape *>(pTransformedSelf)->m_count; ++i)
-			{
-				if(aabb.IsValid() == false)
-				{
-					aabb.lowerBound.Set(static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].x, static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].y);
-					aabb.upperBound.Set(static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].x, static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].y);
-				}
-				else
-				{
-					if(static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].x < aabb.lowerBound.x)
-						aabb.lowerBound.x = static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].x;
-					else if(static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].x > aabb.upperBound.x)
-						aabb.upperBound.x = static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].x;
-
-					if(static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].y < aabb.lowerBound.y)
-						aabb.lowerBound.y = static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].y;
-					else if(static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].y > aabb.upperBound.y)
-						aabb.upperBound.y = static_cast<b2ChainShape *>(pTransformedSelf)->m_vertices[i].y;
-				}
-			}
-			// If the AABB is flat, inflate it by 5 pixel radius
-			if(aabb.lowerBound.x == aabb.upperBound.x)
-			{
-				aabb.lowerBound.x -= 5.0f;
-				aabb.upperBound.x += 5.0f;
-			}
-			if(aabb.lowerBound.y == aabb.upperBound.y)
-			{
-				aabb.lowerBound.y -= 5.0f;
-				aabb.upperBound.y += 5.0f;
-			}
-			
-			bIsCollide = HyMath::TestPointAABB(aabb, ptTestPoint);
-			break; }
 		}
-
-		delete pTransformedSelf;
-		return bIsCollide;
 	}
 
 	return false;
+}
+
+b2CastOutput HyShape2d::TestRay(const glm::vec2 &ptStart, const glm::vec2 &vDirection, const glm::mat4 &mtxSelfTransform) const
+{
+	HyError("HyShape2d::TestRay - Not implemented");
+	return b2CastOutput() = {};
 }
 
 //bool HyShape2d::IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const
@@ -832,28 +700,31 @@ bool HyShape2d::TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &pt
 
 bool HyShape2d::ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const
 {
-	// CloneTransform applies scaling
-	b2Shape *pTransformedSelf = CloneTransform(mtxTransform);
-	if(pTransformedSelf)
+	ShapeData shapeData = {};
+	if(TransformShapeData(shapeData, mtxTransform))
 	{
-		if(m_eType == HYSHAPE_LineChain)
+		switch(m_eType)
 		{
-			for(int i = 0; i < static_cast<b2ChainShape *>(pTransformedSelf)->m_count; ++i)
-			{
-				if(i == 0)
-					pTransformedSelf->ComputeAABB(&aabbOut, b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f)), i);
-				else
-				{
-					b2AABB tmpAabb;
-					pTransformedSelf->ComputeAABB(&tmpAabb, b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f)), i);
-					aabbOut.Combine(tmpAabb);
-				}
-			}
+		case HYSHAPE_Circle:
+			aabbOut = b2ComputeCircleAABB(&shapeData.circle, b2Transform_identity);
+			break;
+		case HYSHAPE_LineSegment:
+			aabbOut = b2ComputeSegmentAABB(&shapeData.segment, b2Transform_identity);
+			break;
+		case HYSHAPE_Polygon:
+			aabbOut = b2ComputePolygonAABB(&shapeData.polygon, b2Transform_identity);
+			break;
+		case HYSHAPE_LineChain:
+			ComputeChainAabb(aabbOut, shapeData);
+			delete[] shapeData.chain.pPointList;
+			break;
+		case HYSHAPE_Capsule:
+			aabbOut = b2ComputeCapsuleAABB(&shapeData.capsule, b2Transform_identity);
+			break;
+		default:
+			HyError("HyShape2d::ComputeAABB() - Unhandled shape type: " << m_eType);
+			return false;
 		}
-		else
-			pTransformedSelf->ComputeAABB(&aabbOut, b2Transform(b2Vec2(0.0f, 0.0f), b2Rot(0.0f)), 0);
-
-		delete pTransformedSelf;
 
 		return true;
 	}
@@ -861,130 +732,270 @@ bool HyShape2d::ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) cons
 	return false;
 }
 
-b2Shape *HyShape2d::CloneTransform(const glm::mat4 &mtxTransform) const
+void HyShape2d::ClearShapeData()
 {
-	float fScaleX = glm::length(glm::vec3(mtxTransform[0][0], mtxTransform[0][1], mtxTransform[0][2]));
-	float fScaleY = glm::length(glm::vec3(mtxTransform[1][0], mtxTransform[1][1], mtxTransform[1][2]));
-	if(fScaleX < FloatSlop || fScaleY < FloatSlop || std::isnan(mtxTransform[3].x) || std::isnan(mtxTransform[3].y)) // TODO: Trace down why sometimes the position vector of the transform is NaN. This causes a mostly harmless assert() in b2PolygonShape::Set() (Doing isNan check in GetLocalTransform() will breakpoint)
-		return nullptr;
+	PhysicsRemove(true);
 
-	b2Shape *pCloneB2Shape = nullptr;
-	std::vector<glm::vec4> vertList;
-	std::vector<b2Vec2> b2VertList;
+	if(m_eType == HYSHAPE_LineChain)
+		delete[] m_Data.chain.pPointList;
 
-	switch(m_eType)
-	{
-	case HYSHAPE_LineSegment:
-		pCloneB2Shape = HY_NEW b2EdgeShape();
-
-		vertList.emplace_back(static_cast<b2EdgeShape *>(m_pShape)->m_vertex1.x, static_cast<b2EdgeShape *>(m_pShape)->m_vertex1.y, 0.0f, 1.0f);
-		vertList.emplace_back(static_cast<b2EdgeShape *>(m_pShape)->m_vertex2.x, static_cast<b2EdgeShape *>(m_pShape)->m_vertex2.y, 0.0f, 1.0f);
-
-		vertList[0] = mtxTransform * vertList[0];
-		vertList[1] = mtxTransform * vertList[1];
-
-		static_cast<b2EdgeShape *>(pCloneB2Shape)->SetTwoSided(b2Vec2(vertList[0].x, vertList[0].y), b2Vec2(vertList[1].x, vertList[1].y));
-		break;
-
-	case HYSHAPE_LineChain:
-		pCloneB2Shape = HY_NEW b2ChainShape();
-		for(int32 i = 0; i < static_cast<b2ChainShape *>(m_pShape)->m_count; ++i)
-		{
-			vertList.emplace_back(static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].x,
-								  static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].y, 0.0f, 1.0f);
-			vertList[i] = mtxTransform * vertList[i];
-			b2VertList.emplace_back(vertList[i].x, vertList[i].y);
-		}
-
-		static_cast<b2ChainShape *>(pCloneB2Shape)->CreateChain(b2VertList.data(), static_cast<b2ChainShape *>(m_pShape)->m_count, b2Vec2(0.0f, 0.0f), b2Vec2(0.0f, 0.0f));
-		break;
-
-	//case HYSHAPE_LineLoop:
-	//	pCloneB2Shape = HY_NEW b2ChainShape();
-	//	for(int32 i = 0; i < static_cast<b2ChainShape *>(m_pShape)->m_count - 1; ++i)  // minus 1 to account for the CreateLoop auto connecting
-	//	{
-	//		vertList.emplace_back(static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].x,
-	//							  static_cast<b2ChainShape *>(m_pShape)->m_vertices[i].y, 0.0f, 1.0f);
-	//		vertList[i] = mtxTransform * vertList[i];
-	//		b2VertList.emplace_back(vertList[i].x, vertList[i].y);
-	//	}
-
-	//	static_cast<b2ChainShape *>(pCloneB2Shape)->CreateLoop(b2VertList.data(), static_cast<b2ChainShape *>(m_pShape)->m_count - 1);
-	//	break;
-
-	case HYSHAPE_Circle: {
-		pCloneB2Shape = HY_NEW b2CircleShape();
-
-		vertList.emplace_back(static_cast<b2CircleShape *>(m_pShape)->m_p.x, static_cast<b2CircleShape *>(m_pShape)->m_p.y, 0.0f, 1.0f);
-
-		vertList[0] = mtxTransform * vertList[0];
-		static_cast<b2CircleShape *>(pCloneB2Shape)->m_p.Set(vertList[0].x, vertList[0].y);
-		static_cast<b2CircleShape *>(pCloneB2Shape)->m_radius = static_cast<b2CircleShape *>(m_pShape)->m_radius * HyMath::Max(fScaleX, fScaleY);
-		break; }
-
-	case HYSHAPE_Polygon:
-		pCloneB2Shape = HY_NEW b2PolygonShape();
-		for(int32 i = 0; i < static_cast<b2PolygonShape *>(m_pShape)->m_count; ++i)
-		{
-			vertList.emplace_back(static_cast<b2PolygonShape *>(m_pShape)->m_vertices[i].x,
-								  static_cast<b2PolygonShape *>(m_pShape)->m_vertices[i].y, 0.0f, 1.0f);
-			vertList[i] = mtxTransform * vertList[i];
-			b2VertList.emplace_back(vertList[i].x, vertList[i].y);
-		}
-
-		static_cast<b2PolygonShape *>(pCloneB2Shape)->Set(b2VertList.data(), static_cast<b2PolygonShape *>(m_pShape)->m_count);
-		break;
-
-	default:
-		break;
-	}
-
-	return pCloneB2Shape;
-}
-
-void HyShape2d::TransformSelf(const glm::mat4 &mtxTransform)
-{
-	b2Shape *pCloneShape = CloneTransform(mtxTransform);
-	SetAsB2Shape(pCloneShape);
-	delete pCloneShape;
-}
-
-void HyShape2d::CreateFixture(b2Body *pBody)
-{
-	DestroyFixture();
-
-	if(m_pInit == nullptr)
-		m_pInit = HY_NEW b2FixtureDef();
-
-	m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(this);
-	m_pInit->shape = ClonePpmShape(IHyNode::sm_pScene->GetPpmInverse());
-	m_pFixture = pBody->CreateFixture(m_pInit);
-	delete m_pInit->shape;
-
-	delete m_pInit;
-	m_pInit = nullptr;
-
-	m_bFixtureDirty = false;
-}
-
-void HyShape2d::DestroyFixture()
-{
-	if(m_pFixture == nullptr)
-		return;
-	
-	b2Body *pBody = m_pFixture->GetBody();
-	pBody->DestroyFixture(m_pFixture);
-	m_pFixture = nullptr;
-
-	m_bFixtureDirty = false;
+	m_Data = {};
+	m_eType = HYSHAPE_Nothing;
 }
 
 void HyShape2d::ShapeChanged()
 {
-	m_bFixtureDirty = true;
+	m_bPhysicsDirty = true;
 }
 
-bool HyShape2d::IsFixtureDirty()
+bool HyShape2d::IsPhysicsRegistered() const
 {
-	return m_bFixtureDirty;
+	if(m_eType != HYSHAPE_LineChain)
+		return B2_IS_NON_NULL(m_hPhysics.shape);
+	else
+		return B2_IS_NON_NULL(m_hPhysics.chain);
+}
+
+bool HyShape2d::IsPhysicsDirty() const
+{
+	return m_bPhysicsDirty;
+}
+
+void HyShape2d::PhysicsAttach()
+{
+	PhysicsRemove(false);
+
+	if(m_pPhysicsInit == nullptr)
+	{
+		m_pPhysicsInit = HY_NEW b2ShapeDef();
+		*m_pPhysicsInit = b2DefaultShapeDef();
+	}
+	m_pPhysicsInit->userData = this;
+
+	// Create Box2d "geometry" of this shape that uses pixel-per-meters
+	ShapeData shapeData = { };
+	if(TransformShapeData(shapeData, IHyNode::sm_pScene->GetPpmInverse()))
+	{
+		switch(m_eType)
+		{
+		case HYSHAPE_Circle:
+			m_hPhysics = {};
+			m_hPhysics.shape = b2CreateCircleShape(m_pParent->physics.GetHandle(), m_pPhysicsInit, &shapeData.circle);
+			break;
+		case HYSHAPE_LineSegment:
+			m_hPhysics = {};
+			m_hPhysics.shape = b2CreateSegmentShape(m_pParent->physics.GetHandle(), m_pPhysicsInit, &shapeData.segment);
+			break;
+		case HYSHAPE_Polygon:
+			m_hPhysics = {};
+			m_hPhysics.shape = b2CreatePolygonShape(m_pParent->physics.GetHandle(), m_pPhysicsInit, &shapeData.polygon);
+			break;
+		case HYSHAPE_LineChain: {
+			std::vector<b2Vec2> pointList;
+			pointList.reserve(shapeData.chain.iCount);
+			for(int i = 0; i < shapeData.chain.iCount; ++i)
+				pointList.push_back({ shapeData.chain.pPointList[i].x, shapeData.chain.pPointList[i].y });
+
+			b2ChainDef chainDef = b2DefaultChainDef();
+			chainDef.points = pointList.data();
+			chainDef.count = shapeData.chain.iCount;
+			chainDef.isLoop = shapeData.chain.bLoop;
+
+			chainDef.filter = m_pPhysicsInit->filter;
+			chainDef.enableSensorEvents = m_pPhysicsInit->enableSensorEvents;
+			chainDef.materialCount = 1;
+			chainDef.materials = &m_pPhysicsInit->material;
+			chainDef.userData = this;
+
+			m_hPhysics = {};
+			m_hPhysics.chain = b2CreateChain(m_pParent->physics.GetHandle(), &chainDef);
+
+			delete[] shapeData.chain.pPointList;
+			break; }
+		case HYSHAPE_Capsule:
+			m_hPhysics = {};
+			m_hPhysics.shape = b2CreateCapsuleShape(m_pParent->physics.GetHandle(), m_pPhysicsInit, &shapeData.capsule);
+			break;
+		default:
+			HyError("HyShape2d::PhysicsAttach() - Unhandled shape type: " << m_eType);
+			break;
+		}
+	}
+
+	m_bPhysicsDirty = false;
+}
+
+void HyShape2d::PhysicsRemove(bool bUpdateBodyMass)
+{
+	if(IsPhysicsRegistered() == false)
+		return;
+
+	if(m_eType != HYSHAPE_LineChain)
+		b2DestroyShape(m_hPhysics.shape, bUpdateBodyMass);
+	else
+		b2DestroyChain(m_hPhysics.chain);
+
+	m_hPhysics = {};
+	m_bPhysicsDirty = false;
+}
+
+bool HyShape2d::ComputeChainAabb(b2AABB &aabbOut, const ShapeData &shapeData) const
+{
+	HyMath::InvalidateAABB(aabbOut);
+	for(int32 i = 0; i < shapeData.chain.iCount; ++i)
+	{
+		if(b2IsValidAABB(aabbOut) == false)
+		{
+			aabbOut.lowerBound = { shapeData.chain.pPointList[i].x, shapeData.chain.pPointList[i].y };
+			aabbOut.upperBound = { shapeData.chain.pPointList[i].x, shapeData.chain.pPointList[i].y };
+		}
+		else
+		{
+			if(shapeData.chain.pPointList[i].x < aabbOut.lowerBound.x)
+				aabbOut.lowerBound.x = shapeData.chain.pPointList[i].x;
+			else if(shapeData.chain.pPointList[i].x > aabbOut.upperBound.x)
+				aabbOut.upperBound.x = shapeData.chain.pPointList[i].x;
+
+			if(shapeData.chain.pPointList[i].y < aabbOut.lowerBound.y)
+				aabbOut.lowerBound.y = shapeData.chain.pPointList[i].y;
+			else if(shapeData.chain.pPointList[i].y > aabbOut.upperBound.y)
+				aabbOut.upperBound.y = shapeData.chain.pPointList[i].y;
+		}
+	}
+	// If the AABB is flat, inflate it by 5 pixel radius
+	if(aabbOut.lowerBound.x == aabbOut.upperBound.x)
+	{
+		aabbOut.lowerBound.x -= 5.0f;
+		aabbOut.upperBound.x += 5.0f;
+	}
+	if(aabbOut.lowerBound.y == aabbOut.upperBound.y)
+	{
+		aabbOut.lowerBound.y -= 5.0f;
+		aabbOut.upperBound.y += 5.0f;
+	}
+
+	return true;
+}
+
+// NOTE: Assumes 'shapeDataOut' starts as zeroed-out ShapeData. Will newly dynamically allocate for chain types
+bool HyShape2d::TransformShapeData(ShapeData &shapeDataOut, const glm::mat4 &mtxTransform) const
+{
+	float fScaleX = glm::length(glm::vec3(mtxTransform[0][0], mtxTransform[0][1], mtxTransform[0][2]));
+	float fScaleY = glm::length(glm::vec3(mtxTransform[1][0], mtxTransform[1][1], mtxTransform[1][2]));
+	if(fScaleX < FloatSlop || fScaleY < FloatSlop || std::isnan(mtxTransform[3].x) || std::isnan(mtxTransform[3].y)) // TODO: Trace down why sometimes the position vector of the transform is NaN. This causes a mostly harmless assert() in b2PolygonShape::Set() (Doing isNan check in GetLocalTransform() will break)
+		return false;
+
+	std::vector<glm::vec4> vertList;
+	switch(m_eType)
+	{
+	case HYSHAPE_Nothing:
+		return false;
+
+	case HYSHAPE_Circle:
+		vertList.emplace_back(m_Data.circle.center.x, m_Data.circle.center.y, 0.0f, 1.0f);
+		vertList[0] = mtxTransform * vertList[0];
+
+		shapeDataOut.circle.center = { vertList[0].x, vertList[0].y };
+		shapeDataOut.circle.radius = m_Data.circle.radius * HyMath::Max(fScaleX, fScaleY);
+		break;
+
+	case HYSHAPE_LineSegment:
+		vertList.emplace_back(m_Data.segment.point1.x, m_Data.segment.point1.y, 0.0f, 1.0f);
+		vertList.emplace_back(m_Data.segment.point2.x, m_Data.segment.point2.y, 0.0f, 1.0f);
+		vertList[0] = mtxTransform * vertList[0];
+		vertList[1] = mtxTransform * vertList[1];
+
+		shapeDataOut.segment.point1 = { vertList[0].x, vertList[0].y };
+		shapeDataOut.segment.point2 = { vertList[1].x, vertList[1].y };
+		break;
+
+	case HYSHAPE_Polygon:
+		shapeDataOut.polygon = m_Data.polygon;
+		for(int32 i = 0; i < m_Data.polygon.count; ++i)
+		{
+			vertList.emplace_back(m_Data.polygon.vertices[i].x, m_Data.polygon.vertices[i].y, 0.0f, 1.0f);
+			vertList[i] = mtxTransform * vertList[i];
+			shapeDataOut.polygon.vertices[i] = { vertList[i].x, vertList[i].y };
+		}
+		break;
+
+	case HYSHAPE_LineChain:
+		shapeDataOut.chain.pPointList = HY_NEW glm::vec2[m_Data.chain.iCount];
+		for(int32 i = 0; i < m_Data.chain.iCount; ++i)
+		{
+			vertList.emplace_back(m_Data.chain.pPointList[i].x, m_Data.chain.pPointList[i].y, 0.0f, 1.0f);
+			vertList[i] = mtxTransform * vertList[i];
+			shapeDataOut.chain.pPointList[i] = { vertList[i].x, vertList[i].y };
+		}
+		shapeDataOut.chain.iCount = m_Data.chain.iCount;
+		shapeDataOut.chain.bLoop = m_Data.chain.bLoop;
+		break;
+
+	case HYSHAPE_Capsule:
+		vertList.emplace_back(m_Data.capsule.center1.x, m_Data.capsule.center1.y, 0.0f, 1.0f);
+		vertList.emplace_back(m_Data.capsule.center2.x, m_Data.capsule.center2.y, 0.0f, 1.0f);
+		vertList[0] = mtxTransform * vertList[0];
+		vertList[1] = mtxTransform * vertList[1];
+
+		shapeDataOut.capsule.center1 = { vertList[0].x, vertList[0].y };
+		shapeDataOut.capsule.center2 = { vertList[1].x, vertList[1].y };
+		shapeDataOut.capsule.radius = m_Data.capsule.radius * HyMath::Max(fScaleX, fScaleY);
+		break;
+
+	default:
+		HyError("HyShape2d::TransformShapeData() - Unhandled shape type: " << m_eType);
+		return false;
+	}
+
+	return true;
+}
+
+bool HyShape2d::TransformShapeData(ShapeData &shapeDataOut, float fPpmInverse) const
+{
+	if(fPpmInverse <= 0.0f)
+		return false;
+
+	std::vector<b2Vec2> vertList;
+	switch(m_eType)
+	{
+	case HYSHAPE_Nothing:
+		return false;
+
+	case HYSHAPE_Circle:
+		shapeDataOut.circle.center = { m_Data.circle.center.x * fPpmInverse, m_Data.circle.center.y * fPpmInverse };
+		shapeDataOut.circle.radius = m_Data.circle.radius * fPpmInverse;
+		break;
+
+	case HYSHAPE_LineSegment:
+		shapeDataOut.segment.point1 = { m_Data.segment.point1.x * fPpmInverse, m_Data.segment.point1.y * fPpmInverse };
+		shapeDataOut.segment.point2 = { m_Data.segment.point2.x * fPpmInverse, m_Data.segment.point2.y * fPpmInverse };
+		break;
+			
+	case HYSHAPE_Polygon:
+		shapeDataOut.polygon = m_Data.polygon;
+		for(int32 i = 0; i < m_Data.polygon.count; ++i)
+			shapeDataOut.polygon.vertices[i] = { m_Data.polygon.vertices[i].x * fPpmInverse, m_Data.polygon.vertices[i].y * fPpmInverse };
+		break;
+			
+	case HYSHAPE_LineChain:
+		shapeDataOut.chain.pPointList = HY_NEW glm::vec2[m_Data.chain.iCount];
+		for(int32 i = 0; i < m_Data.chain.iCount; ++i)
+			shapeDataOut.chain.pPointList[i] = { m_Data.chain.pPointList[i].x * fPpmInverse, m_Data.chain.pPointList[i].y * fPpmInverse };
+		
+		shapeDataOut.chain.iCount = m_Data.chain.iCount;
+		shapeDataOut.chain.bLoop = m_Data.chain.bLoop;
+		break;
+			
+	case HYSHAPE_Capsule:
+		shapeDataOut.capsule.center1 = { vertList[0].x * fPpmInverse, vertList[0].y * fPpmInverse };
+		shapeDataOut.capsule.center2 = { vertList[1].x * fPpmInverse, vertList[1].y * fPpmInverse };
+		shapeDataOut.capsule.radius = m_Data.capsule.radius * fPpmInverse;
+		break;
+
+	default:
+		HyError("HyShape2d::TransformShapeData() - Unhandled shape type: " << m_eType);
+		return false;
+	}
+
+	return true;
 }

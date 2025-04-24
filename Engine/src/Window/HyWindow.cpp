@@ -439,8 +439,8 @@ bool HyWindow::ProjectToWindow2d(const glm::vec2 &ptWorldPos, glm::vec2 &ptWindo
 			float fFbHeight = (viewportRect.Height() * GetFramebufferSize().y);
 
 			glm::vec2 ptNormalized;
-			ptNormalized.x = (ptWorldPos.x - aabbWorld.lowerBound.x) / (aabbWorld.GetExtents().x * 2.0f);
-			ptNormalized.y = (ptWorldPos.y - aabbWorld.lowerBound.y) / (aabbWorld.GetExtents().y * 2.0f);
+			ptNormalized.x = (ptWorldPos.x - aabbWorld.lowerBound.x) / (b2AABB_Extents(aabbWorld).x * 2.0f);
+			ptNormalized.y = (ptWorldPos.y - aabbWorld.lowerBound.y) / (b2AABB_Extents(aabbWorld).y * 2.0f);
 
 			ptWindowCoordinateOut.x = (viewportRect.left * GetFramebufferSize().x) + (ptNormalized.x * fFbWidth);
 			ptWindowCoordinateOut.y = (viewportRect.bottom * GetFramebufferSize().y) + (ptNormalized.y * fFbHeight);

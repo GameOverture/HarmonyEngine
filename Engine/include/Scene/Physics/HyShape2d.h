@@ -22,15 +22,32 @@ class HyShape2d
 	friend class HyPhysicsCtrl2d;
 	friend class HyBox2dDestructListener;
 
-	HyShapeType									m_eType;
 	HyEntity2d *								m_pParent;
 
-	b2Shape *									m_pShape;
+	HyShapeType									m_eType;
+	struct ChainData
+	{
+		glm::vec2 *		pPointList; // Dynamically allocated
+		int				iCount;
+		bool			bLoop; // If true, pPointList/iCount is guaranteed to not include the "final" point (a repeat of the first point)
+	};
+	union ShapeData
+	{
+		b2Capsule		capsule;
+		b2Circle		circle;
+		b2Polygon		polygon;
+		b2Segment		segment;
+		ChainData		chain;
+	}											m_Data;		// NOTE: This shape is stored in pixel units like everything else. It is converted to pixel-per-meters when sent to Box2d
 
-	bool 										m_bIsFixtureAllowed;
-	b2FixtureDef *								m_pInit;
-	b2Fixture *									m_pFixture;
-	bool										m_bFixtureDirty;
+	union PhysicsHandle
+	{
+		b2ShapeId		shape;
+		b2ChainId		chain;
+	}											m_hPhysics;
+	bool 										m_bPhysicsAllowed;
+	b2ShapeDef *								m_pPhysicsInit;
+	bool										m_bPhysicsDirty;
 
 public:
 	static const float							FloatSlop;
@@ -44,83 +61,81 @@ public:
 	HyShapeType GetType() const;
 	bool IsValidShape() const;
 
+	void TransformSelf(const glm::mat4 &mtxTransform);
+
 	glm::vec2 ComputeSize() const;
 	void GetCentroid(glm::vec2 &ptCentroidOut) const;
 	float CalcArea() const; // Returns the area in meters squared
-	
-	const b2Shape *GetB2Shape() const;
-	b2Shape *ClonePpmShape(float fPpmInverse) const;
 
 	void ParentDetach();
 	HyEntity2d *ParentGet() const;
 
 	void SetAsNothing();
 
-	void SetAsB2Shape(const b2Shape *pShape, const b2FixtureDef *pPhysicsInit = nullptr);
+	// Set as an isolated edge/line. When used in a physics simulation, these segments have double sided collision
+	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const b2ShapeDef *pPhysicsInit = nullptr);
 
-	// Set as an isolated edge.
-	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const b2FixtureDef *pPhysicsInit = nullptr);
-	void SetAsLineSegment(const b2Vec2 &pt1, const b2Vec2 &pt2, const b2FixtureDef *pPhysicsInit = nullptr);
-
-	// Set as a line loop. This automatically connects last vertex to the first.
-	// Passed in parameters are copied, and understood to be local coordinates
-	void SetAsLineLoop(const glm::vec2 *pVertices, uint32 uiNumVerts, const b2FixtureDef *pPhysicsInit = nullptr);
-	void SetAsLineLoop(const std::vector<glm::vec2> &verticesList, const b2FixtureDef *pPhysicsInit = nullptr);
-
-	// Set as a line chain with isolated end vertices. Passed in parameters are 
-	// copied, and understood to be local coordinates
-	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts, const b2FixtureDef *pPhysicsInit = nullptr);
-	void SetAsLineChain(const std::vector<glm::vec2> &verticesList, const b2FixtureDef *pPhysicsInit = nullptr);
+	// A series of line segments chained to gether. 'bLoop' is whether to automatically connects last vertex to the first.
+	// Passed in parameters are copied, and understood to be local coordinates.
+	// When used in a physics simulation, the line chain only has right-side collision.
+	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoop, const b2ShapeDef *pPhysicsInit = nullptr);
+	void SetAsLineChain(const std::vector<glm::vec2> &verticesList, bool bLoop, const b2ShapeDef *pPhysicsInit = nullptr);
 
 	// Set as a circle with the specified center and radius
-	bool SetAsCircle(float fRadius, const b2FixtureDef *pPhysicsInit = nullptr);
-	bool SetAsCircle(const glm::vec2 &ptCenter, float fRadius, const b2FixtureDef *pPhysicsInit = nullptr);
-	bool SetAsCircle(const b2Vec2& center, float fRadius, const b2FixtureDef *pPhysicsInit = nullptr);
+	bool SetAsCircle(float fRadius, const b2ShapeDef *pPhysicsInit = nullptr);
+	bool SetAsCircle(const glm::vec2 &ptCenter, float fRadius, const b2ShapeDef *pPhysicsInit = nullptr);
 
 	// Set as a convex hull from the given array of local points.
 	// uiCount must be in the range [3, b2_maxPolygonVertices].
 	// The points may be re-ordered, even if they form a convex polygon
 	// Collinear points are handled but not removed. Collinear points
 	// may lead to poor stacking behavior in physics simulation.
-	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount, const b2FixtureDef *pPhysicsInit = nullptr);
-	void SetAsPolygon(const b2Vec2 *pPointArray, uint32 uiCount, const b2FixtureDef *pPhysicsInit = nullptr);
-	void SetAsPolygon(const std::vector<glm::vec2> &verticesList, const b2FixtureDef *pPhysicsInit = nullptr);
+	bool SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount, const b2ShapeDef *pPhysicsInit = nullptr);
+	bool SetAsPolygon(const std::vector<glm::vec2> &verticesList, const b2ShapeDef *pPhysicsInit = nullptr);
+	// TODO: Support rounded polygons
 
-	bool SetAsBox(float fWidth, float fHeight, const b2FixtureDef *pPhysicsInit = nullptr); // Build vertices to represent an axis-aligned box, bottom left corner at 0,0
-	bool SetAsBox(const HyRect &rect, const b2FixtureDef *pPhysicsInit = nullptr);			// Build vertices to represent an oriented box
+	bool SetAsBox(float fWidth, float fHeight, const b2ShapeDef *pPhysicsInit = nullptr); // Build vertices to represent an axis-aligned box, bottom left corner at 0,0
+	bool SetAsBox(const HyRect &rect, const b2ShapeDef *pPhysicsInit = nullptr);			// Build vertices to represent an oriented box
+	// TODO: Support rounded boxes
+
+	bool SetAsCapsule(const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, const b2ShapeDef *pPhysicsInit = nullptr);
 
 	// Applies when attached to a physics body
-	bool IsFixtureAllowed() const;
-	void SetFixtureAllowed(bool bIsFixtureAllowed);	// The parent entity will ignore/remove this shape if 'bIsFixtureAllowed' == false
-	void Setup(const b2FixtureDef &fixtureDefRef);
+	bool IsPhysicsAllowed() const;
+	void SetPhysicsAllowed(bool bIsPhysicsAllowed);	// Whether the parent entity will use this shape for physics simulation
+	void Setup(const b2ShapeDef &fixtureDefRef);
 	float GetDensity() const;
-	void SetDensity(float fDensity); // Usually in kg / m ^ 2.
-	void SetDensityInKg(float fWeightKg); // Sets the density using the "weight" of currently set shape
+	void SetDensity(float fDensity, bool bUpdateBodyMass = true); // Usually in kg / m ^ 2.
+	void SetDensityInKg(float fWeightKg, bool bUpdateBodyMass = true); // Sets the density using the "weight" of currently set shape
 	float GetFriction() const;
 	void SetFriction(float fFriction);
 	float GetRestitution() const;
 	void SetRestitution(float fRestitution);
-	float GetRestitutionThreshold() const;
-	void SetRestitutionThreshold(float fRestitutionThreshold);
 	b2Filter GetFilter() const;
 	void SetFilter(const b2Filter &filter);
 	bool IsSensor() const;
-	void SetSensor(bool bIsSensor);
 
-	bool TestPoint(const glm::mat4 &mtxSelfTransform, const glm::vec2 &ptTestPoint) const;
+	bool TestPoint(const glm::vec2 &ptTestPoint, const glm::mat4 &mtxSelfTransform) const;
+	b2CastOutput TestRay(const glm::vec2 &ptStart, const glm::vec2 &vDirection, const glm::mat4 &mtxSelfTransform) const;
 	//bool IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const;
 
 	bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const;
 
-	b2Shape *CloneTransform(const glm::mat4 &mtxTransform) const;
-	void TransformSelf(const glm::mat4 &mtxTransform);
-
 protected:
-	void CreateFixture(b2Body *pBody);
-	void DestroyFixture();
+	void ClearShapeData();
 	
 	void ShapeChanged();
-	bool IsFixtureDirty();
+
+	bool IsPhysicsRegistered() const;
+	bool IsPhysicsDirty() const;
+	void PhysicsAttach();
+	void PhysicsRemove(bool bUpdateBodyMass);
+
+	bool ComputeChainAabb(b2AABB &aabbOut, const ShapeData &shapeData) const;
+
+	// NOTE: Assumes 'shapeDataOut' starts as zeroed-out ShapeData. Will newly dynamically allocate for chain types
+	bool TransformShapeData(ShapeData &shapeDataOut, const glm::mat4 &mtxTransform) const;
+	bool TransformShapeData(ShapeData &shapeDataOut, float fPpmInverse) const;
 };
 
 #endif /* HyShape2d_h__ */

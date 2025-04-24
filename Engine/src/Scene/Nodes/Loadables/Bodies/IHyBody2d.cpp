@@ -212,8 +212,8 @@ int32 IHyBody2d::GetDisplayOrder() const
 float IHyBody2d::GetSceneHeight()
 {
 	const b2AABB &aabbRef = GetSceneAABB();
-	if(aabbRef.IsValid())
-		return aabbRef.GetExtents().y * 2.0f;
+	if(b2IsValidAABB(aabbRef))
+		return b2AABB_Extents(aabbRef).y * 2.0f;
 
 	return 0.0f;
 }
@@ -221,8 +221,8 @@ float IHyBody2d::GetSceneHeight()
 float IHyBody2d::GetSceneWidth()
 {
 	const b2AABB &aabbRef = GetSceneAABB();
-	if(aabbRef.IsValid())
-		return aabbRef.GetExtents().x * 2.0f;
+	if(b2IsValidAABB(aabbRef))
+		return b2AABB_Extents(aabbRef).x * 2.0f;
 
 	return 0.0f;
 }

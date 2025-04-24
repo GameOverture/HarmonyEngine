@@ -2,6 +2,8 @@
 # BUILD EXTRAS:  HYBUILD_SPINE, HYBUILD_RAPIDJSON, HYBUILD_ICU
 
 add_subdirectory(vendor/box2d)
+set_target_properties(box2d PROPERTIES FOLDER "Engine Libs")
+
 add_subdirectory(vendor/soil2)
 
 if(HYBUILD_SPINE)

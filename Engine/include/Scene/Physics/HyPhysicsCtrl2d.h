@@ -17,16 +17,18 @@ class HyEntity2d;
 
 class HyPhysicsCtrl2d
 {
-	friend class HyScene;
 	friend class HyEntity2d;
+	friend class HyScene;
 
 	HyEntity2d &				m_EntityRef;
 	b2BodyDef *					m_pInit;					// Dynamically allocated when physics simulation is getting initialized. Simulation will then start when Activate() is invoked. It is more optimal to initalize before calling Activate().
-	b2Body *					m_pBody;					// A pointer to the concrete value in HyScene::m_NodeMap_Collision, nullptr otherwise
+	b2BodyId					m_hBody;					// A handle to a Box2d Body. The concrete value in HyScene::m_NodeMap_Collision, nullptr otherwise
 
 public:
 	HyPhysicsCtrl2d(HyEntity2d &entityRef);
 	~HyPhysicsCtrl2d();
+
+	b2BodyId GetHandle() const;
 
 	void Activate();										// Enables physics simulation when invoked. It is more optimal to initalize values and append shapes to this entity before calling Activate().
 	void Deactivate();										// Disables physics simulation when invoked. This does not delete the body/fixtures under the hood in Box2d
@@ -88,11 +90,11 @@ public:
 	float GetAngularDamping() const;
 	void SetAngularDamping(float fAngularDamping);
 
-	glm::vec2 GetSceneCenterMass() const;
-	glm::vec2 GetLocalCenterMass() const;
+	//glm::vec2 GetSceneCenterMass() const;
+	//glm::vec2 GetLocalCenterMass() const;
 
 	float GetMass() const;
-	float GetInertia() const;
+	float GetRotInertia() const;
 };
 
 #endif /* HyPhysicsCtrl2d_h__ */

@@ -137,14 +137,14 @@ void HyScrollBar::PageControl::SetColor(HyColor color)
 		
 		if(pScrollBar->GetOrientation() == HYORIENT_Vertical)
 		{
-			if(ptMousePos.y >= sliderAABB.GetCenter().y)
+			if(ptMousePos.y >= b2AABB_Center(sliderAABB).y)
 				pScrollBar->DoPageScroll(-1);
 			else
 				pScrollBar->DoPageScroll(1);
 		}
 		else // HYORIENT_Horizontal
 		{
-			if(ptMousePos.x >= sliderAABB.GetCenter().x)
+			if(ptMousePos.x >= b2AABB_Center(sliderAABB).x)
 				pScrollBar->DoPageScroll(1);
 			else
 				pScrollBar->DoPageScroll(-1);

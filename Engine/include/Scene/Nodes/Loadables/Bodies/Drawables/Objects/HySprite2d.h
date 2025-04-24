@@ -49,5 +49,6 @@ protected:
 	
 	static void NullAnimCallback(HySprite2d *pSelf) { }
 };
+typedef HySprite2d HySprite;
 
 #endif /* HySprite2d_h__ */

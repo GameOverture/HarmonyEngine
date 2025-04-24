@@ -32,23 +32,31 @@ HyScene::HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audio
 	m_bPauseGame(false),
 	m_fPixelsPerMeter(fPixelsPerMeter),
 	m_fPpmInverse(1.0f / fPixelsPerMeter),
-	m_iPhysVelocityIterations(8),
-	m_iPhysPositionIterations(3),
-	m_ContactListener(*this),
+	m_iPhysSubSteps(4),
 	m_pCurBox2dDraw(nullptr),
-	m_b2World(b2Vec2(vGravity2d.x, vGravity2d.y)),
 	m_bPhysUpdating(false)
 {
 	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	IHyNode::sm_pScene = this;
 
-	m_b2World.SetContactListener(&m_ContactListener);
-	m_b2World.SetDestructionListener(&m_DestructListener);
+	b2WorldDef worldDef = b2DefaultWorldDef();
+	worldDef.gravity = { vGravity2d.x, vGravity2d.y };
+	m_hWorld = b2CreateWorld(&worldDef);
+	//m_b2World.SetContactListener(&m_ContactListener);
+	//m_b2World.SetDestructionListener(&m_DestructListener);
 }
 
 HyScene::~HyScene(void)
 {
+	b2DestroyWorld(m_hWorld);
+	m_hWorld = b2_nullWorldId;
+
 	IHyNode::sm_pScene = nullptr;
+}
+
+b2WorldId HyScene::GetPhysicsWorld() const
+{
+	return m_hWorld;
 }
 
 float HyScene::GetPixelsPerMeter()
@@ -175,49 +183,6 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 	}
 }
 
-void HyScene::AddNode_PhysBody(HyEntity2d *pEntity)
-{
-	HyAssert(pEntity, "HyScene::AddNode_PhysBody was passed a null HyEntity2d *");
-
-	const glm::mat4 &mtxSceneRef = pEntity->GetSceneTransform(0.0f);
-	glm::vec3 ptTranslation = mtxSceneRef[3];
-	glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
-
-	if(pEntity->physics.m_pBody)
-	{
-		if(pEntity->physics.m_pBody->IsEnabled() == false)
-		{
-			pEntity->SyncPhysicsBody();
-			pEntity->SyncPhysicsFixtures(); // Is this needed?
-			pEntity->physics.m_pBody->SetEnabled(true);
-		}
-		return;
-	}
-
-	if(pEntity->physics.m_pInit == nullptr)
-		pEntity->physics.m_pInit = HY_NEW b2BodyDef();
-	pEntity->physics.m_pInit->position.x = ptTranslation.x * m_fPpmInverse;
-	pEntity->physics.m_pInit->position.y = ptTranslation.y * m_fPpmInverse;
-	pEntity->physics.m_pInit->angle = vRotations.z;
-	pEntity->physics.m_pInit->enabled = true;
-	pEntity->physics.m_pInit->userData.pointer = reinterpret_cast<uintptr_t>(pEntity);
-
-	pEntity->physics.m_pBody = m_b2World.CreateBody(pEntity->physics.m_pInit);
-	delete pEntity->physics.m_pInit;
-	pEntity->physics.m_pInit = nullptr;
-
-	// Physics body now exists for this entity, add all its shapes as fixtures
-	pEntity->SyncPhysicsFixtures();
-}
-
-void HyScene::RemoveNode_PhysBody(HyEntity2d *pEntity) // TODO: Change this to be a 'HyPhysicsCtrl2d'
-{
-	HyAssert(pEntity && pEntity->physics.m_pBody, "HyScene::RemoveNode_PhysBody was passed a null HyEntity2d or it had a null b2Body");
-
-	m_b2World.DestroyBody(pEntity->physics.m_pBody);
-	pEntity->physics.m_pBody = nullptr;
-}
-
 bool HyScene::IsPhysicsUpdating() const
 {
 	return m_bPhysUpdating;
@@ -226,7 +191,6 @@ bool HyScene::IsPhysicsUpdating() const
 void HyScene::SetPhysicsDrawClass(HyBox2dDraw *pBox2dDraw)
 {
 	m_pCurBox2dDraw = pBox2dDraw;
-	m_b2World.SetDebugDraw(m_pCurBox2dDraw);
 }
 
 void HyScene::ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType)
@@ -257,32 +221,27 @@ void HyScene::UpdateNodes()
 	m_AudioCoreRef.Update();
 
 	// Box2d - Collision & Physics
-	m_b2World.Step(HyEngine::DeltaTime(), m_iPhysVelocityIterations, m_iPhysPositionIterations);
+	b2World_Step(m_hWorld, HyEngine::DeltaTime(), m_iPhysSubSteps);
 	
 	if(m_pCurBox2dDraw)
 	{
 		m_pCurBox2dDraw->BeginFrame();
-		m_b2World.DebugDraw();
+		b2World_Draw(m_hWorld, m_pCurBox2dDraw->GetDrawPtr());
 		m_pCurBox2dDraw->EndFrame();
 	}
 
 	m_bPhysUpdating = true;
-	b2Body *pBody = m_b2World.GetBodyList();
-	while(pBody)
+	b2BodyEvents bodyEvents = b2World_GetBodyEvents(m_hWorld);
+	for(int i = 0; i < bodyEvents.moveCount; ++i)
 	{
-		if(pBody->GetType() != b2_staticBody && pBody->IsEnabled())
-		{
-			HyEntity2d *pEntNode = reinterpret_cast<HyEntity2d *>(pBody->GetUserData().pointer);
-			const glm::mat4 &mtxSceneRef = pEntNode->GetSceneTransform(0.0f);
-			glm::vec3 ptTranslation = mtxSceneRef[3];
-			glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
+		HyEntity2d *pEntNode = reinterpret_cast<HyEntity2d *>(bodyEvents.moveEvents[i].userData);
+		const glm::mat4 &mtxSceneRef = pEntNode->GetSceneTransform(0.0f);
+		glm::vec3 ptTranslation = mtxSceneRef[3];
+		glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxSceneRef));
 
-			pEntNode->pos.Offset(pBody->GetPosition().x * GetPixelsPerMeter() - ptTranslation.x,
-								  pBody->GetPosition().y * GetPixelsPerMeter() - ptTranslation.y);
-			pEntNode->rot.Offset(glm::degrees(pBody->GetAngle() - vRotations.z));
-		}
-		
-		pBody = pBody->GetNext();
+		pEntNode->pos.Offset(bodyEvents.moveEvents[i].transform.p.x * GetPixelsPerMeter() - ptTranslation.x,
+							 bodyEvents.moveEvents[i].transform.p.y * GetPixelsPerMeter() - ptTranslation.y);
+		pEntNode->rot.Offset(glm::degrees(b2Rot_GetAngle(bodyEvents.moveEvents[i].transform.q) - vRotations.z));
 	}
 	m_bPhysUpdating = false;
 }
@@ -379,7 +338,7 @@ bool HyScene::CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &
 		while(iter.IsEnd() == false)
 		{
 			iter.Get()->CalcWorldViewBounds(worldAABB);
-			if(b2TestOverlap(worldAABB, instanceRef.GetSceneAABB()))
+			if(HyMath::TestOverlapAABB(worldAABB, instanceRef.GetSceneAABB()))
 				uiCameraMaskOut |= (1 << iBit);
 
 			iBit++;

@@ -16,8 +16,10 @@
 
 class HyPhysicsGrid2d;
 
-class HyBox2dDraw : public HyEntity2d, public b2Draw
+class HyBox2dDraw : public HyEntity2d
 {
+	b2DebugDraw					m_DebugDraw;
+
 	float						m_fPixelsPerMeter;
 	std::vector<HyPrimitive2d>	m_DrawList;
 
@@ -27,29 +29,20 @@ public:
 	HyBox2dDraw(float fPixelsPerMeter);
 	virtual ~HyBox2dDraw(void);
 
+	b2DebugDraw *GetDrawPtr();
+	void SetShowFlags(uint32 uiDiagFlags);
+
 	void BeginFrame();
 
-	// Draw a closed polygon provided in CCW order.
-	virtual void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
-
-	// Draw a solid closed polygon provided in CCW order.
-	virtual void DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override;
-
-	// Draw a circle.
-	virtual void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override;
-
-	// Draw a solid circle.
-	virtual void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override;
-
-	// Draw a line segment.
-	virtual void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) override;
-
-	// Draw a transform. Choose your own length scale.
-	// @param xf a transform.
-	virtual void DrawTransform(const b2Transform& xf) override;
-
-	// Draw a point.
-	virtual void DrawPoint(const b2Vec2& p, float size, const b2Color& color) override;
+	void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, b2HexColor color); // Draw a closed polygon provided in CCW order.
+	void DrawSolidPolygon(b2Transform transform, const b2Vec2 *vertices, int32_t vertexCount, float radius, b2HexColor color); // Draw a solid closed polygon provided in CCW order.
+	void DrawCircle(const b2Vec2& center, float radius, b2HexColor color);
+	void DrawSolidCircle(b2Transform transform, b2Vec2 center, float radius, b2HexColor color);
+	void DrawSolidCapsule(b2Vec2 p1, b2Vec2 p2, float radius, b2HexColor color);
+	void DrawSegment(const b2Vec2& p1, const b2Vec2& p2, b2HexColor color);
+	void DrawTransform(const b2Transform& xf);
+	void DrawPoint(const b2Vec2& p, float size, b2HexColor color);
+	void DrawString(b2Vec2 p, const char *s, b2HexColor color);
 
 	void EndFrame();
 };
