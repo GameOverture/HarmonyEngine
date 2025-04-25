@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyBox2dDraw.h
+ *	HyPhysicsDraw.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2022 Jason Knobler
@@ -7,16 +7,14 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HyBox2dDraw_h__
-#define HyBox2dDraw_h__
+#ifndef HyPhysicsDraw_h__
+#define HyPhysicsDraw_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
-class HyPhysicsGrid2d;
-
-class HyBox2dDraw : public HyEntity2d
+class HyPhysicsDraw : public HyEntity2d
 {
 	b2DebugDraw					m_DebugDraw;
 
@@ -26,8 +24,8 @@ class HyBox2dDraw : public HyEntity2d
 	int32						m_iDrawIndex;
 
 public:
-	HyBox2dDraw(float fPixelsPerMeter);
-	virtual ~HyBox2dDraw(void);
+	HyPhysicsDraw(float fPixelsPerMeter);
+	virtual ~HyPhysicsDraw(void);
 
 	b2DebugDraw *GetDrawPtr();
 	void SetShowFlags(uint32 uiDiagFlags);
@@ -47,4 +45,4 @@ public:
 	void EndFrame();
 };
 
-#endif /* HyBox2dDraw_h__ */
+#endif /* HyPhysicsDraw_h__ */

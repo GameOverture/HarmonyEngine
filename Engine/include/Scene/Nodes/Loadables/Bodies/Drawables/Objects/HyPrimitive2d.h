@@ -12,8 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
-
-class HyAtlasGroupData;
+#include "Scene/Physics/HyShape2d.h"
 
 class HyPrimitive2d : public IHyDrawable2d
 {

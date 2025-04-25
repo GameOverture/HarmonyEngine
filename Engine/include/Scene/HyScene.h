@@ -12,8 +12,6 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Audio/HyAudioCore.h"
-#include "Scene/Physics/HyBox2dContactListener.h"
-#include "Scene/Physics/HyBox2dDestructListener.h"
 
 // Forward declarations
 class IHyNode;
@@ -27,7 +25,7 @@ class IHyDrawable2d;
 class IHyDrawable3d;
 class HyWindow;
 class IHyRenderer;
-class HyBox2dDraw;
+class HyPhysicsDraw;
 
 class HyScene
 {
@@ -49,12 +47,10 @@ class HyScene
 	// Collision/Physics
 	float												m_fPixelsPerMeter;
 	float												m_fPpmInverse;
-	int32												m_iPhysSubSteps;
-	//HyBox2dContactListener								m_ContactListener;
-	//HyBox2dDestructListener								m_DestructListener;
-	HyBox2dDraw *										m_pCurBox2dDraw;
-	b2WorldId											m_hWorld;
-	bool												m_bPhysUpdating;
+	int32												m_iPhysicsSubSteps;
+	HyPhysicsDraw *										m_pPhysicsDraw;
+	b2WorldId											m_hPhysicsWorld;
+	bool												m_bPhysicsUpdating;
 
 public:
 	HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audioCoreRef, std::vector<HyWindow *> &WindowListRef);
@@ -82,7 +78,7 @@ public:
 	static void RemoveEntNode_Assemble(HyEntity2d *pEntity);
 
 	bool IsPhysicsUpdating() const;
-	void SetPhysicsDrawClass(HyBox2dDraw *pBox2dDraw);
+	void SetPhysicsDrawClass(HyPhysicsDraw *pPhysicsDraw);
 
 	void ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType);
 

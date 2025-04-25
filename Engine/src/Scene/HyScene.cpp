@@ -32,31 +32,29 @@ HyScene::HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audio
 	m_bPauseGame(false),
 	m_fPixelsPerMeter(fPixelsPerMeter),
 	m_fPpmInverse(1.0f / fPixelsPerMeter),
-	m_iPhysSubSteps(4),
-	m_pCurBox2dDraw(nullptr),
-	m_bPhysUpdating(false)
+	m_iPhysicsSubSteps(4),
+	m_pPhysicsDraw(nullptr),
+	m_bPhysicsUpdating(false)
 {
 	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	IHyNode::sm_pScene = this;
 
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	worldDef.gravity = { vGravity2d.x, vGravity2d.y };
-	m_hWorld = b2CreateWorld(&worldDef);
-	//m_b2World.SetContactListener(&m_ContactListener);
-	//m_b2World.SetDestructionListener(&m_DestructListener);
+	m_hPhysicsWorld = b2CreateWorld(&worldDef);
 }
 
 HyScene::~HyScene(void)
 {
-	b2DestroyWorld(m_hWorld);
-	m_hWorld = b2_nullWorldId;
+	b2DestroyWorld(m_hPhysicsWorld);
+	m_hPhysicsWorld = b2_nullWorldId;
 
 	IHyNode::sm_pScene = nullptr;
 }
 
 b2WorldId HyScene::GetPhysicsWorld() const
 {
-	return m_hWorld;
+	return m_hPhysicsWorld;
 }
 
 float HyScene::GetPixelsPerMeter()
@@ -185,12 +183,12 @@ void HyScene::CopyAllLoadedNodes(std::vector<IHyLoadable *> &nodeListOut)
 
 bool HyScene::IsPhysicsUpdating() const
 {
-	return m_bPhysUpdating;
+	return m_bPhysicsUpdating;
 }
 
-void HyScene::SetPhysicsDrawClass(HyBox2dDraw *pBox2dDraw)
+void HyScene::SetPhysicsDrawClass(HyPhysicsDraw *pPhysicsDraw)
 {
-	m_pCurBox2dDraw = pBox2dDraw;
+	m_pPhysicsDraw = pPhysicsDraw;
 }
 
 void HyScene::ProcessAudioCue(IHyNode *pNode, HySoundCue eCueType)
@@ -221,17 +219,17 @@ void HyScene::UpdateNodes()
 	m_AudioCoreRef.Update();
 
 	// Box2d - Collision & Physics
-	b2World_Step(m_hWorld, HyEngine::DeltaTime(), m_iPhysSubSteps);
+	b2World_Step(m_hPhysicsWorld, HyEngine::DeltaTime(), m_iPhysicsSubSteps);
 	
-	if(m_pCurBox2dDraw)
+	if(m_pPhysicsDraw)
 	{
-		m_pCurBox2dDraw->BeginFrame();
-		b2World_Draw(m_hWorld, m_pCurBox2dDraw->GetDrawPtr());
-		m_pCurBox2dDraw->EndFrame();
+		m_pPhysicsDraw->BeginFrame();
+		b2World_Draw(m_hPhysicsWorld, m_pPhysicsDraw->GetDrawPtr());
+		m_pPhysicsDraw->EndFrame();
 	}
 
-	m_bPhysUpdating = true;
-	b2BodyEvents bodyEvents = b2World_GetBodyEvents(m_hWorld);
+	m_bPhysicsUpdating = true;
+	b2BodyEvents bodyEvents = b2World_GetBodyEvents(m_hPhysicsWorld);
 	for(int i = 0; i < bodyEvents.moveCount; ++i)
 	{
 		HyEntity2d *pEntNode = reinterpret_cast<HyEntity2d *>(bodyEvents.moveEvents[i].userData);
@@ -243,7 +241,7 @@ void HyScene::UpdateNodes()
 							 bodyEvents.moveEvents[i].transform.p.y * GetPixelsPerMeter() - ptTranslation.y);
 		pEntNode->rot.Offset(glm::degrees(b2Rot_GetAngle(bodyEvents.moveEvents[i].transform.q) - vRotations.z));
 	}
-	m_bPhysUpdating = false;
+	m_bPhysicsUpdating = false;
 }
 
 // RENDER STATE BUFFER

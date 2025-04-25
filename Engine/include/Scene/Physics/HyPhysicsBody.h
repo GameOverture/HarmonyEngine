@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyPhysicsCtrl2d.h
+*	HyPhysicsBody.h
 *	
 *	Harmony Engine
 *	Copyright (c) 2022 Jason Knobler
@@ -7,32 +7,28 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HyPhysicsCtrl2d_h__
-#define HyPhysicsCtrl2d_h__
+#ifndef HyPhysicsBody_h__
+#define HyPhysicsBody_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Physics/HyShape2d.h"
 
 class HyEntity2d;
 
-class HyPhysicsCtrl2d
+class HyPhysicsBody
 {
 	friend class HyEntity2d;
 	friend class HyScene;
 
 	HyEntity2d &				m_EntityRef;
-	b2BodyDef *					m_pInit;					// Dynamically allocated when physics simulation is getting initialized. Simulation will then start when Activate() is invoked. It is more optimal to initalize before calling Activate().
-	b2BodyId					m_hBody;					// A handle to a Box2d Body. The concrete value in HyScene::m_NodeMap_Collision, nullptr otherwise
+	b2BodyDef *					m_pInit;		// Dynamically allocated when physics simulation is getting initialized. Simulation will then start when Activate() is invoked. It is more optimal to initalize before calling Activate().
+	b2BodyId					m_hBody;		// A handle to a Box2d Body. The concrete value in HyScene::m_NodeMap_Collision, nullptr otherwise
 
 public:
-	HyPhysicsCtrl2d(HyEntity2d &entityRef);
-	~HyPhysicsCtrl2d();
+	HyPhysicsBody(HyEntity2d &entityRef);
+	~HyPhysicsBody();
 
 	b2BodyId GetHandle() const;
-
-	void Activate();										// Enables physics simulation when invoked. It is more optimal to initalize values and append shapes to this entity before calling Activate().
-	void Deactivate();										// Disables physics simulation when invoked. This does not delete the body/fixtures under the hood in Box2d
-	bool IsActivated() const;
 
 	void Setup(const b2BodyDef &bodyDef);
 	void Setup(HyBodyType eType,
@@ -90,11 +86,16 @@ public:
 	float GetAngularDamping() const;
 	void SetAngularDamping(float fAngularDamping);
 
-	//glm::vec2 GetSceneCenterMass() const;
-	//glm::vec2 GetLocalCenterMass() const;
+	glm::vec2 GetSceneCenterMass() const;
+	glm::vec2 GetLocalCenterMass() const;
 
 	float GetMass() const;
 	float GetRotInertia() const;
+
+	void Activate();										// Enables physics simulation when invoked. It is more optimal to initalize values and append shapes to this entity before calling Activate().
+	void Deactivate();										// Disables physics simulation when invoked. This does not delete the body/fixtures under the hood in Box2d
+	bool IsActivated() const;
+	void Destroy(bool bClearInitCache);
 };
 
-#endif /* HyPhysicsCtrl2d_h__ */
+#endif /* HyPhysicsBody_h__ */

@@ -12,7 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Diagnostics/HyProfiler.h"
-#include "Scene/Physics/HyBox2dDraw.h"
+#include "Scene/Physics/HyPhysicsDraw.h"
 
 struct HarmonyInit;
 class HyAssets;
@@ -56,7 +56,7 @@ class HyDiagnostics
 	std::function<void()>				m_fpBeginRenderPrep;
 	std::function<void()>				m_fpBeginRender;
 
-	HyBox2dDraw *						m_pBox2dDraw;
+	HyPhysicsDraw *						m_pPhysicsDraw;
 
 public:
 	HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef);

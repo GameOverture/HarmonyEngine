@@ -15,7 +15,6 @@
 #include "Scene/Nodes/Loadables/IHyLoadable2d.h"
 #include "Scene/Nodes/Loadables/Bodies/IHyBody.h"
 #include "Scene/AnimFloats/HyAnimVec3.h"
-#include "Scene/Physics/HyPhysicsCtrl2d.h"
 
 class IHyBody2d : public IHyLoadable2d, public IHyBody
 {

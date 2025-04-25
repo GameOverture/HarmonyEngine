@@ -40,7 +40,7 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 	m_fpBeginUpdate(nullptr),
 	m_fpBeginRenderPrep(nullptr),
 	m_fpBeginRender(nullptr),
-	m_pBox2dDraw(nullptr)
+	m_pPhysicsDraw(nullptr)
 {
 #if defined(HY_COMPILER_MSVC)
 	m_sCompiler = "MSVC";
@@ -102,8 +102,8 @@ HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyA
 	}
 #endif
 
-	m_pBox2dDraw = HY_NEW HyBox2dDraw(m_SceneRef.GetPixelsPerMeter());
-	m_SceneRef.SetPhysicsDrawClass(m_pBox2dDraw);
+	m_pPhysicsDraw = HY_NEW HyPhysicsDraw(m_SceneRef.GetPixelsPerMeter());
+	m_SceneRef.SetPhysicsDrawClass(m_pPhysicsDraw);
 
 	// This is required to initialize profiler function pointers
 	Show(HYDIAG_NONE);
@@ -114,7 +114,7 @@ HyDiagnostics::~HyDiagnostics()
 	delete m_pProfiler;
 
 	m_SceneRef.SetPhysicsDrawClass(nullptr);
-	delete m_pBox2dDraw;
+	delete m_pPhysicsDraw;
 }
 
 void HyDiagnostics::Init(const HyNodePath &textNodePath, uint32 uiTextState)
@@ -135,10 +135,10 @@ void HyDiagnostics::Show(uint32 uiDiagFlags)
 	if(uiDiagFlags & HYDIAG_PHYSICS_ALL)
 	{
 		uint32 uiBox2dFlags = uiDiagFlags & HYDIAG_PHYSICS_ALL;
-		m_pBox2dDraw->SetShowFlags(uiBox2dFlags);
+		m_pPhysicsDraw->SetShowFlags(uiBox2dFlags);
 	}
 	else
-		m_pBox2dDraw->SetShowFlags(0);
+		m_pPhysicsDraw->SetShowFlags(0);
 
 	if(uiDiagFlags & (HYDIAG_FRAMERATE | HYDIAG_GRAPH | HYDIAG_INPUT))
 	{

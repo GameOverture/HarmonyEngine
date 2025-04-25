@@ -12,11 +12,12 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
+#include "Scene/Physics/HyPhysicsBody.h"
 
 class HyEntity2d : public IHyBody2d
 {
 	friend class HyScene;
-	friend class HyPhysicsCtrl2d;
+	friend class HyPhysicsBody;
 
 protected:
 	std::vector<IHyNode2d *>				m_ChildList;
@@ -42,7 +43,7 @@ protected:
 	std::function<void(HyEntity2d *)>		m_fpDeferFinishedFunc;
 
 public:
-	HyPhysicsCtrl2d							physics;				// Optional physics component (Rename to HyPhysicsBody2d)
+	HyPhysicsBody							physics;				// Optional physics component
 
 public:
 	HyEntity2d(HyEntity2d *pParent = nullptr);

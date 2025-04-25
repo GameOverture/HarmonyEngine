@@ -145,11 +145,8 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Loadables/Objects/IHyAudio.cpp
 	src/Scene/Nodes/Objects/HyCamera.cpp
 	src/Scene/Nodes/Objects/IHyCamera.cpp
-	src/Scene/Physics/HyBox2dContactListener.cpp
-	src/Scene/Physics/HyBox2dDestructListener.cpp
-	src/Scene/Physics/HyBox2dDraw.cpp
-	src/Scene/Physics/HyPhysicsCtrl2d.cpp
-	src/Scene/Physics/HyPhysicsDebug2d.cpp
+	src/Scene/Physics/HyPhysicsBody.cpp
+	src/Scene/Physics/HyPhysicsDraw.cpp
 	src/Scene/Physics/HyShape2d.cpp
 	src/Threading/IHyThreadClass.cpp
 	src/Time/HyTime.cpp
@@ -285,11 +282,8 @@ set(HYENGINE_HEADER_FILES
 	include/Scene/Nodes/Loadables/Objects/HyAudio3d.h
 	include/Scene/Nodes/Objects/HyCamera.h
 	include/Scene/Nodes/Objects/IHyCamera.h
-	include/Scene/Physics/HyBox2dContactListener.h
-	include/Scene/Physics/HyBox2dDestructListener.h
-	include/Scene/Physics/HyBox2dDraw.h
-	include/Scene/Physics/HyPhysicsCtrl2d.h
-	include/Scene/Physics/HyPhysicsDebug2d.h
+	include/Scene/Physics/HyPhysicsBody.h
+	include/Scene/Physics/HyPhysicsDraw.h
 	include/Scene/Physics/HyShape2d.h
 	include/Threading/IHyThreadClass.h
 	include/Time/HyTime.h

@@ -38,7 +38,10 @@ HyEntity2d::~HyEntity2d(void)
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 
-	physics.Deactivate();
+	physics.Destroy(true); // Destroy physics body first to detach all shapes more efficiently
+	while(m_ShapeList.empty() == false)
+		m_ShapeList[m_ShapeList.size() - 1]->ParentDetach();
+
 	ClearScissor(true);
 }
 

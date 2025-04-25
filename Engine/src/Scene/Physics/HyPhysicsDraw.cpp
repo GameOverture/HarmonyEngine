@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyBox2dDraw.cpp
+ *	HyPhysicsDraw.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2022 Jason Knobler
@@ -8,56 +8,56 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Scene/Physics/HyBox2dDraw.h"
+#include "Scene/Physics/HyPhysicsDraw.h"
 
 #define HYDISPLAYORDER_BOX2DDRAW 99999999
 
 void DrawPolygonFcn(const b2Vec2 *vertices, int vertexCount, b2HexColor color, void *context)
 {
-	static_cast<HyBox2dDraw *>(context)->DrawPolygon(vertices, vertexCount, color);
+	static_cast<HyPhysicsDraw *>(context)->DrawPolygon(vertices, vertexCount, color);
 }
 
 void DrawSolidPolygonFcn(b2Transform transform, const b2Vec2 *vertices, int vertexCount, float radius, b2HexColor color, void *context)
 {
-	static_cast<HyBox2dDraw *>(context)->DrawSolidPolygon(transform, vertices, vertexCount, radius, color);
+	static_cast<HyPhysicsDraw *>(context)->DrawSolidPolygon(transform, vertices, vertexCount, radius, color);
 }
 
 void DrawCircleFcn(b2Vec2 center, float radius, b2HexColor color, void *context)
 {
-	static_cast<HyBox2dDraw *>(context)->DrawCircle(center, radius, color);
+	static_cast<HyPhysicsDraw *>(context)->DrawCircle(center, radius, color);
 }
 
 void DrawSolidCircleFcn(b2Transform transform, float radius, b2HexColor color, void *context)
 {
-	static_cast<HyBox2dDraw *>(context)->DrawSolidCircle(transform, b2Vec2_zero, radius, color);
+	static_cast<HyPhysicsDraw *>(context)->DrawSolidCircle(transform, b2Vec2_zero, radius, color);
 }
 
 void DrawSolidCapsuleFcn(b2Vec2 p1, b2Vec2 p2, float radius, b2HexColor color, void *context)
 {
-	static_cast<HyBox2dDraw *>(context)->DrawSolidCapsule(p1, p2, radius, color);
+	static_cast<HyPhysicsDraw *>(context)->DrawSolidCapsule(p1, p2, radius, color);
 }
 
 void DrawSegmentFcn(b2Vec2 p1, b2Vec2 p2, b2HexColor color, void *context)
 {
-	static_cast<HyBox2dDraw *>(context)->DrawSegment(p1, p2, color);
+	static_cast<HyPhysicsDraw *>(context)->DrawSegment(p1, p2, color);
 }
 
 void DrawTransformFcn(b2Transform transform, void *context)
 {
-	static_cast<HyBox2dDraw *>(context)->DrawTransform(transform);
+	static_cast<HyPhysicsDraw *>(context)->DrawTransform(transform);
 }
 
 void DrawPointFcn(b2Vec2 p, float size, b2HexColor color, void *context)
 {
-	static_cast<HyBox2dDraw *>(context)->DrawPoint(p, size, color);
+	static_cast<HyPhysicsDraw *>(context)->DrawPoint(p, size, color);
 }
 
 void DrawStringFcn(b2Vec2 p, const char *s, b2HexColor color, void *context)
 {
-	static_cast<HyBox2dDraw *>(context)->DrawString(p, s, color);
+	static_cast<HyPhysicsDraw *>(context)->DrawString(p, s, color);
 }
 
-HyBox2dDraw::HyBox2dDraw(float fPixelsPerMeter) :
+HyPhysicsDraw::HyPhysicsDraw(float fPixelsPerMeter) :
 	HyEntity2d(nullptr),
 	m_fPixelsPerMeter(fPixelsPerMeter),
 	m_iDrawIndex(0)
@@ -77,16 +77,16 @@ HyBox2dDraw::HyBox2dDraw(float fPixelsPerMeter) :
 	SetDisplayOrder(HYDISPLAYORDER_BOX2DDRAW);
 }
 
-HyBox2dDraw::~HyBox2dDraw(void)
+HyPhysicsDraw::~HyPhysicsDraw(void)
 {
 }
 
-b2DebugDraw *HyBox2dDraw::GetDrawPtr()
+b2DebugDraw *HyPhysicsDraw::GetDrawPtr()
 {
 	return &m_DebugDraw;
 }
 
-void HyBox2dDraw::SetShowFlags(uint32 uiDiagFlags)
+void HyPhysicsDraw::SetShowFlags(uint32 uiDiagFlags)
 {
 	m_DebugDraw.drawShapes = (uiDiagFlags & HYDIAG_PhysShapes);
 	m_DebugDraw.drawJoints = (uiDiagFlags & HYDIAG_PhysJoints);
@@ -95,12 +95,12 @@ void HyBox2dDraw::SetShowFlags(uint32 uiDiagFlags)
 	m_DebugDraw.drawMass = (uiDiagFlags & HYDIAG_PhysCenterOfMass);
 }
 
-void HyBox2dDraw::BeginFrame()
+void HyPhysicsDraw::BeginFrame()
 {
 	m_iDrawIndex = 0;
 }
 
-void HyBox2dDraw::DrawPolygon(const b2Vec2 *vertices, int32 vertexCount, b2HexColor color)
+void HyPhysicsDraw::DrawPolygon(const b2Vec2 *vertices, int32 vertexCount, b2HexColor color)
 {
 	while(m_iDrawIndex >= m_DrawList.size())
 		m_DrawList.emplace_back(this);
@@ -117,7 +117,7 @@ void HyBox2dDraw::DrawPolygon(const b2Vec2 *vertices, int32 vertexCount, b2HexCo
 	m_iDrawIndex++;
 }
 
-void HyBox2dDraw::DrawSolidPolygon(b2Transform transform, const b2Vec2 *vertices, int32_t vertexCount, float radius, b2HexColor color)
+void HyPhysicsDraw::DrawSolidPolygon(b2Transform transform, const b2Vec2 *vertices, int32_t vertexCount, float radius, b2HexColor color)
 {
 	while(m_iDrawIndex >= m_DrawList.size())
 		m_DrawList.emplace_back(this);
@@ -134,7 +134,7 @@ void HyBox2dDraw::DrawSolidPolygon(b2Transform transform, const b2Vec2 *vertices
 	m_iDrawIndex++;
 }
 
-void HyBox2dDraw::DrawCircle(const b2Vec2 &center, float radius, b2HexColor color)
+void HyPhysicsDraw::DrawCircle(const b2Vec2 &center, float radius, b2HexColor color)
 {
 	while(m_iDrawIndex >= m_DrawList.size())
 		m_DrawList.emplace_back(this);
@@ -149,7 +149,7 @@ void HyBox2dDraw::DrawCircle(const b2Vec2 &center, float radius, b2HexColor colo
 	m_iDrawIndex++;
 }
 
-void HyBox2dDraw::DrawSolidCircle(b2Transform transform, b2Vec2 center, float radius, b2HexColor color)
+void HyPhysicsDraw::DrawSolidCircle(b2Transform transform, b2Vec2 center, float radius, b2HexColor color)
 {
 	while(m_iDrawIndex >= m_DrawList.size())
 		m_DrawList.emplace_back(this);
@@ -164,11 +164,11 @@ void HyBox2dDraw::DrawSolidCircle(b2Transform transform, b2Vec2 center, float ra
 	m_iDrawIndex++;
 }
 
-void HyBox2dDraw::DrawSolidCapsule(b2Vec2 p1, b2Vec2 p2, float radius, b2HexColor color)
+void HyPhysicsDraw::DrawSolidCapsule(b2Vec2 p1, b2Vec2 p2, float radius, b2HexColor color)
 {
 }
 
-void HyBox2dDraw::DrawSegment(const b2Vec2 &p1, const b2Vec2 &p2, b2HexColor color)
+void HyPhysicsDraw::DrawSegment(const b2Vec2 &p1, const b2Vec2 &p2, b2HexColor color)
 {
 	while(m_iDrawIndex >= m_DrawList.size())
 		m_DrawList.emplace_back(this);
@@ -183,19 +183,19 @@ void HyBox2dDraw::DrawSegment(const b2Vec2 &p1, const b2Vec2 &p2, b2HexColor col
 	m_iDrawIndex++;
 }
 
-void HyBox2dDraw::DrawTransform(const b2Transform &xf)
+void HyPhysicsDraw::DrawTransform(const b2Transform &xf)
 {
 }
 
-void HyBox2dDraw::DrawPoint(const b2Vec2 &p, float size, b2HexColor color)
+void HyPhysicsDraw::DrawPoint(const b2Vec2 &p, float size, b2HexColor color)
 {
 }
 
-void HyBox2dDraw::DrawString(b2Vec2 p, const char *s, b2HexColor color)
+void HyPhysicsDraw::DrawString(b2Vec2 p, const char *s, b2HexColor color)
 {
 }
 
-void HyBox2dDraw::EndFrame()
+void HyPhysicsDraw::EndFrame()
 {
 	for(int32 i = m_iDrawIndex; i < m_DrawList.size(); ++i)
 		m_DrawList[i].SetVisible(false);
