@@ -406,7 +406,7 @@ bool HyAnimFloat::_Updater(float fDeltaTime, float &fElapsedTimeOut, float &fVal
 bool HyAnimFloat::_Displace(float fDeltaTime, float &fElapsedTimeOut, float &fValueOut, uint32 &uiDirtyFlagsOut) const
 {
 	fElapsedTimeOut += fDeltaTime;
-	fValueOut *= (m_fStart * fDeltaTime);
+	fValueOut += (m_fStart * fDeltaTime);
 	uiDirtyFlagsOut = m_uiDIRTY_FLAGS;
 
 	return false;
