@@ -15,7 +15,7 @@
 
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyBody2d(HYTYPE_Entity, HyNodePath(), pParent),
-	m_uiAttribs(0),
+	m_uiEntityAttribs(0),
 	m_fpDeferFinishedFunc(nullptr),
 	physics(*this)
 {
@@ -24,7 +24,7 @@ HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 HyEntity2d::HyEntity2d(HyEntity2d &&donor) noexcept :
 	IHyBody2d(std::move(donor)),
 	m_ChildList(std::move(donor.m_ChildList)),
-	m_uiAttribs(std::move(donor.m_uiAttribs)),
+	m_uiEntityAttribs(std::move(donor.m_uiEntityAttribs)),
 	m_fpDeferFinishedFunc(std::move(donor.m_fpDeferFinishedFunc)),
 	physics(*this)
 {
@@ -50,7 +50,7 @@ HyEntity2d &HyEntity2d::operator=(HyEntity2d &&donor) noexcept
 	IHyBody2d::operator=(std::move(donor));
 
 	m_ChildList = std::move(donor.m_ChildList);
-	m_uiAttribs = std::move(donor.m_uiAttribs);
+	m_uiEntityAttribs = std::move(donor.m_uiEntityAttribs);
 
 	return *this;
 }
@@ -431,7 +431,7 @@ std::vector<IHyNode2d *> HyEntity2d::FindChildren(std::function<bool(IHyNode2d *
 
 bool HyEntity2d::IsMouseInputEnabled() const
 {
-	return (m_uiAttribs & ENTITYATTRIB_MouseInputEnabled) != 0;
+	return (m_uiEntityAttribs & ENTITYATTRIB_MouseInputEnabled) != 0;
 }
 
 void HyEntity2d::SetMouseInput(bool bEnable)
@@ -444,11 +444,11 @@ void HyEntity2d::SetMouseInput(bool bEnable)
 
 void HyEntity2d::EnableMouseInput()
 {
-	m_uiAttribs |= ENTITYATTRIB_MouseInputEnabled;
+	m_uiEntityAttribs |= ENTITYATTRIB_MouseInputEnabled;
 
 	if(CalcMouseInBounds())
 	{
-		m_uiAttribs |= ENTITYATTRIB_MouseInputHover;
+		m_uiEntityAttribs |= ENTITYATTRIB_MouseInputHover;
 		OnMouseEnter();
 	}
 }
@@ -460,20 +460,20 @@ void HyEntity2d::DisableMouseInput()
 	if(IsMouseDown())
 		OnMouseUp();
 	
-	m_uiAttribs &= ~(ENTITYATTRIB_MouseInputEnabled | ENTITYATTRIB_MouseInputHover | ENTITYATTRIB_MouseInputDown | ENTITYATTRIB_MouseInputInvalid);
+	m_uiEntityAttribs &= ~(ENTITYATTRIB_MouseInputEnabled | ENTITYATTRIB_MouseInputHover | ENTITYATTRIB_MouseInputDown | ENTITYATTRIB_MouseInputInvalid);
 }
 
 bool HyEntity2d::IsMouseHover()
 {
 	if(IsMouseInputEnabled())
-		return (m_uiAttribs & ENTITYATTRIB_MouseInputHover) != 0;
+		return (m_uiEntityAttribs & ENTITYATTRIB_MouseInputHover) != 0;
 	else
 		return CalcMouseInBounds();
 }
 
 bool HyEntity2d::IsMouseDown() const
 {
-	return (m_uiAttribs & ENTITYATTRIB_MouseInputDown) != 0;
+	return (m_uiEntityAttribs & ENTITYATTRIB_MouseInputDown) != 0;
 }
 
 void HyEntity2d::ShapeAppend(HyShape2d &shapeRef)
@@ -537,15 +537,15 @@ HyShape2d *HyEntity2d::ShapeGet(uint32 uiIndex)
 
 bool HyEntity2d::IsReverseDisplayOrder() const
 {
-	return (m_uiAttribs & ENTITYATTRIB_ReverseDisplayOrder);
+	return (m_uiEntityAttribs & ENTITYATTRIB_ReverseDisplayOrder);
 }
 
 void HyEntity2d::ReverseDisplayOrder(bool bReverse)
 {
 	if(bReverse)
-		m_uiAttribs |= ENTITYATTRIB_ReverseDisplayOrder;
+		m_uiEntityAttribs |= ENTITYATTRIB_ReverseDisplayOrder;
 	else
-		m_uiAttribs &= ~ENTITYATTRIB_ReverseDisplayOrder;
+		m_uiEntityAttribs &= ~ENTITYATTRIB_ReverseDisplayOrder;
 
 	SetDisplayOrder(m_iDisplayOrder, false);
 }
@@ -554,7 +554,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 {
 	int32 iOrderValue = m_iDisplayOrder + 1;
 
-	if((m_uiAttribs & ENTITYATTRIB_ReverseDisplayOrder) == 0)
+	if((m_uiEntityAttribs & ENTITYATTRIB_ReverseDisplayOrder) == 0)
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
@@ -613,7 +613,7 @@ bool HyEntity2d::IsDeferring() const
 
 bool HyEntity2d::IsRegisteredAssembleEntity() const
 {
-	return (m_uiAttribs & ENTITYATTRIB_IsRegisteredAssemble);
+	return (m_uiEntityAttribs & ENTITYATTRIB_IsRegisteredAssemble);
 }
 
 void HyEntity2d::RegisterAssembleEntity(bool bRegister /*= true*/)
@@ -622,7 +622,7 @@ void HyEntity2d::RegisterAssembleEntity(bool bRegister /*= true*/)
 	{
 		if(IsRegisteredAssembleEntity() == false)
 		{
-			m_uiAttribs |= ENTITYATTRIB_IsRegisteredAssemble;
+			m_uiEntityAttribs |= ENTITYATTRIB_IsRegisteredAssemble;
 			HyScene::AddEntNode_Assemble(this);
 		}
 	}
@@ -630,7 +630,7 @@ void HyEntity2d::RegisterAssembleEntity(bool bRegister /*= true*/)
 	{
 		if(IsRegisteredAssembleEntity())
 		{
-			m_uiAttribs &= ~ENTITYATTRIB_IsRegisteredAssemble;
+			m_uiEntityAttribs &= ~ENTITYATTRIB_IsRegisteredAssemble;
 			HyScene::RemoveEntNode_Assemble(this);
 		}
 	}
@@ -638,16 +638,16 @@ void HyEntity2d::RegisterAssembleEntity(bool bRegister /*= true*/)
 
 void HyEntity2d::SetAssembleNeeded()
 {
-	m_uiAttribs |= ENTITYATTRIB_AssembleNeeded;
+	m_uiEntityAttribs |= ENTITYATTRIB_AssembleNeeded;
 }
 
 void HyEntity2d::Assemble()
 {
-	if((m_uiAttribs & ENTITYATTRIB_AssembleNeeded) == 0)
+	if((m_uiEntityAttribs & ENTITYATTRIB_AssembleNeeded) == 0)
 		return;
 
 	OnAssemble();
-	m_uiAttribs &= ~ENTITYATTRIB_AssembleNeeded;
+	m_uiEntityAttribs &= ~ENTITYATTRIB_AssembleNeeded;
 }
 
 /*virtual*/ void HyEntity2d::SetDirty(uint32 uiDirtyFlags)
@@ -692,14 +692,14 @@ void HyEntity2d::Assemble()
 		{
 			if(bMouseInBounds)
 			{
-				m_uiAttribs |= ENTITYATTRIB_MouseInputHover;
+				m_uiEntityAttribs |= ENTITYATTRIB_MouseInputHover;
 				OnMouseEnter();
 	
 				if(bLeftClickDown)
 				{
-					if((m_uiAttribs & (ENTITYATTRIB_MouseInputInvalid | ENTITYATTRIB_MouseInputDown)) == 0)
+					if((m_uiEntityAttribs & (ENTITYATTRIB_MouseInputInvalid | ENTITYATTRIB_MouseInputDown)) == 0)
 					{
-						m_uiAttribs |= ENTITYATTRIB_MouseInputDown;
+						m_uiEntityAttribs |= ENTITYATTRIB_MouseInputDown;
 						OnMouseDown();
 					}
 				}
@@ -707,21 +707,21 @@ void HyEntity2d::Assemble()
 				{
 					if(IsMouseDown())
 					{
-						m_uiAttribs &= ~(ENTITYATTRIB_MouseInputDown | ENTITYATTRIB_MouseInputInvalid);
+						m_uiEntityAttribs &= ~(ENTITYATTRIB_MouseInputDown | ENTITYATTRIB_MouseInputInvalid);
 						OnMouseUp();
 						OnMouseClicked();
 					}
 
-					m_uiAttribs &= ~(ENTITYATTRIB_MouseInputDown | ENTITYATTRIB_MouseInputInvalid);
+					m_uiEntityAttribs &= ~(ENTITYATTRIB_MouseInputDown | ENTITYATTRIB_MouseInputInvalid);
 				}
 			}
 			else
 			{
 				if(bLeftClickDown && IsMouseDown() == false && HyEngine::Input().IsUsingTouchScreen() == false)
-					m_uiAttribs |= ENTITYATTRIB_MouseInputInvalid;
+					m_uiEntityAttribs |= ENTITYATTRIB_MouseInputInvalid;
 				else if(bLeftClickDown == false && IsMouseDown())
 				{
-					m_uiAttribs &= ~(ENTITYATTRIB_MouseInputDown | ENTITYATTRIB_MouseInputInvalid);
+					m_uiEntityAttribs &= ~(ENTITYATTRIB_MouseInputDown | ENTITYATTRIB_MouseInputInvalid);
 					OnMouseUp();
 				}
 			}
@@ -732,9 +732,9 @@ void HyEntity2d::Assemble()
 			{
 				if(bLeftClickDown)
 				{
-					if((m_uiAttribs & (ENTITYATTRIB_MouseInputInvalid | ENTITYATTRIB_MouseInputDown)) == 0)
+					if((m_uiEntityAttribs & (ENTITYATTRIB_MouseInputInvalid | ENTITYATTRIB_MouseInputDown)) == 0)
 					{
-						m_uiAttribs |= ENTITYATTRIB_MouseInputDown;
+						m_uiEntityAttribs |= ENTITYATTRIB_MouseInputDown;
 						OnMouseDown();
 					}
 				}
@@ -742,24 +742,24 @@ void HyEntity2d::Assemble()
 				{
 					if(IsMouseDown())
 					{
-						m_uiAttribs &= ~ENTITYATTRIB_MouseInputDown;
+						m_uiEntityAttribs &= ~ENTITYATTRIB_MouseInputDown;
 						OnMouseUp();
 						OnMouseClicked();
 					}
 
-					m_uiAttribs &= ~ENTITYATTRIB_MouseInputInvalid;
+					m_uiEntityAttribs &= ~ENTITYATTRIB_MouseInputInvalid;
 				}
 			}
 			else // Left bounds
 			{
-				m_uiAttribs &= ~ENTITYATTRIB_MouseInputHover;
+				m_uiEntityAttribs &= ~ENTITYATTRIB_MouseInputHover;
 				OnMouseLeave();
 
 				if(bLeftClickDown && IsMouseDown() == false && HyEngine::Input().IsUsingTouchScreen() == false)
-					m_uiAttribs |= ENTITYATTRIB_MouseInputInvalid;
+					m_uiEntityAttribs |= ENTITYATTRIB_MouseInputInvalid;
 				else if(bLeftClickDown == false && IsMouseDown())
 				{
-					m_uiAttribs &= ~(ENTITYATTRIB_MouseInputDown | ENTITYATTRIB_MouseInputInvalid);
+					m_uiEntityAttribs &= ~(ENTITYATTRIB_MouseInputDown | ENTITYATTRIB_MouseInputInvalid);
 					OnMouseUp();
 				}
 			}

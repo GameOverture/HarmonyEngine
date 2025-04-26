@@ -321,7 +321,7 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 				pDrawable->pos.Offset(m_TextMargins.left, m_Panel.GetHeight() - m_TextMargins.top - fLargestLineAscender);
 			}
 
-			if(m_uiAttribs & LABELATTRIB_Vertical)
+			if(m_uiEntityAttribs & LABELATTRIB_Vertical)
 				pDrawable->pos.Offset(0.0f, (fDesiredHeight - fLineHeight) * -0.5f);
 		}
 		break; }

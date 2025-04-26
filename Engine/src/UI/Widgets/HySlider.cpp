@@ -117,7 +117,7 @@ void HySlider::Setup(const HyUiPanelInit &sliderInitRef)
 
 int64 HySlider::GetNumTicks() const
 {
-	if(m_uiAttribs & SLIDERATTRIB_UseStepList)
+	if(m_uiEntityAttribs & SLIDERATTRIB_UseStepList)
 		return static_cast<uint32>(m_StepList.size());
 
 	int64 iNumSteps = abs(m_iMax - m_iMin) / m_iStep;
@@ -165,7 +165,7 @@ void HySlider::SetRange(int64 iMin, int64 iMax, int32 iStepAmt)
 		m_iMax = iMax;
 	}
 
-	m_uiAttribs &= ~SLIDERATTRIB_UseStepList;
+	m_uiEntityAttribs &= ~SLIDERATTRIB_UseStepList;
 	m_iStep = (iStepAmt <= 0 || iStepAmt > static_cast<int32>(m_iMax - m_iMin)) ? 1 : iStepAmt;
 	
 	SetAssembleNeeded();
@@ -177,7 +177,7 @@ void HySlider::SetRange(const std::vector<int64> &stepList)
 	if(stepList.empty())
 		return;
 
-	m_uiAttribs |= SLIDERATTRIB_UseStepList;
+	m_uiEntityAttribs |= SLIDERATTRIB_UseStepList;
 	m_StepList = stepList;
 	std::sort(m_StepList.begin(), m_StepList.end());
 
@@ -194,15 +194,15 @@ void HySlider::SetRange(const std::vector<int64> &stepList)
 
 HyOrientation HySlider::GetOrientation() const
 {
-	return (m_uiAttribs & SLIDERATTRIB_IsVertical) ? HYORIENT_Vertical : HYORIENT_Horizontal;
+	return (m_uiEntityAttribs & SLIDERATTRIB_IsVertical) ? HYORIENT_Vertical : HYORIENT_Horizontal;
 }
 
 void HySlider::SetOrientation(HyOrientation eOrien)
 {
 	if(eOrien == HYORIENT_Horizontal)
-		m_uiAttribs &= ~SLIDERATTRIB_IsVertical;
+		m_uiEntityAttribs &= ~SLIDERATTRIB_IsVertical;
 	else
-		m_uiAttribs |= SLIDERATTRIB_IsVertical;
+		m_uiEntityAttribs |= SLIDERATTRIB_IsVertical;
 
 	SetAssembleNeeded();
 }
@@ -226,11 +226,11 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *)> fpCallbac
 {
 	IHyWidget::Update();
 
-	if(m_uiAttribs & SLIDERATTRIB_IsDragging)
+	if(m_uiEntityAttribs & SLIDERATTRIB_IsDragging)
 	{
 		if(HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft) == false)
 		{
-			m_uiAttribs &= ~SLIDERATTRIB_IsDragging;
+			m_uiEntityAttribs &= ~SLIDERATTRIB_IsDragging;
 			return;
 		}
 
@@ -255,7 +255,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *)> fpCallbac
 		int64 iNewValue = 0;
 		if(iNumThresholds != 0)
 		{
-			if(m_uiAttribs & SLIDERATTRIB_UseStepList)
+			if(m_uiEntityAttribs & SLIDERATTRIB_UseStepList)
 			{
 				int32 iCurIndex = 0;
 				for(int32 i = 0; i < static_cast<int32>(m_StepList.size()); ++i)
@@ -300,7 +300,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *)> fpCallbac
 	m_BarFill.DoAssembly(eOrientation, fBarThickness, m_fLength, m_fStrokeAmt);
 
 	// Now position the slider on the bar at the proper location based on current values
-	if(m_uiAttribs & SLIDERATTRIB_UseStepList)
+	if(m_uiEntityAttribs & SLIDERATTRIB_UseStepList)
 	{
 		auto iter = std::find(m_StepList.begin(), m_StepList.end(), m_iValue);
 		if(iter == m_StepList.end())
@@ -371,7 +371,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *)> fpCallbac
 
 /*virtual*/ void HySlider::OnUiMouseDown() /*override*/
 {
-	m_uiAttribs |= SLIDERATTRIB_IsDragging;
+	m_uiEntityAttribs |= SLIDERATTRIB_IsDragging;
 }
 
 float HySlider::GetBarThickness()

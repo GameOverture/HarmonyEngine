@@ -37,7 +37,7 @@ protected:
 
 		ENTITYATTRIB_NEXTFLAG				= 1 << 7,
 	};
-	uint32									m_uiAttribs;			// TODO: Rename this to 'm_uiEntityAttribs'
+	uint32									m_uiEntityAttribs;		// TODO: Combine with m_uiFlags into a single uint64_t flag set
 
 	float									m_fDeferAmt;
 	std::function<void(HyEntity2d *)>		m_fpDeferFinishedFunc;

@@ -26,7 +26,7 @@ IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 
 bool IHyWidget::IsButton() const
 {
-	return (m_uiAttribs & WIDGETATTRIB_IsTypeButton) != 0;
+	return (m_uiEntityAttribs & WIDGETATTRIB_IsTypeButton) != 0;
 }
 
 /*virtual*/ uint32 IHyWidget::GetState() const /*override*/
@@ -109,24 +109,24 @@ bool IHyWidget::IsInputAllowed() const
 
 bool IHyWidget::IsEnabled() const
 {
-	return (m_uiAttribs & WIDGETATTRIB_IsDisabled) == 0;
+	return (m_uiEntityAttribs & WIDGETATTRIB_IsDisabled) == 0;
 }
 
 bool IHyWidget::IsHideDisabled() const
 {
-	return (m_uiAttribs & WIDGETATTRIB_HideDisabled) != 0;
+	return (m_uiEntityAttribs & WIDGETATTRIB_HideDisabled) != 0;
 }
 
 void IHyWidget::SetHideDisabled(bool bIsHideDisabled)
 {
 	if(bIsHideDisabled)
 	{
-		m_uiAttribs |= WIDGETATTRIB_HideDisabled;
+		m_uiEntityAttribs |= WIDGETATTRIB_HideDisabled;
 		SetTint(HyColor::White);
 	}
 	else
 	{
-		m_uiAttribs &= ~WIDGETATTRIB_HideDisabled;
+		m_uiEntityAttribs &= ~WIDGETATTRIB_HideDisabled;
 		SetAsEnabled(IsEnabled());
 	}
 }
@@ -135,7 +135,7 @@ void IHyWidget::SetAsEnabled(bool bEnabled)
 {
 	if(bEnabled)
 	{
-		m_uiAttribs &= ~WIDGETATTRIB_IsDisabled;
+		m_uiEntityAttribs &= ~WIDGETATTRIB_IsDisabled;
 		topColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
 		botColor.Tween(1.0f, 1.0f, 1.0f, 0.25f);
 
@@ -143,7 +143,7 @@ void IHyWidget::SetAsEnabled(bool bEnabled)
 	}
 	else
 	{
-		m_uiAttribs |= WIDGETATTRIB_IsDisabled;
+		m_uiEntityAttribs |= WIDGETATTRIB_IsDisabled;
 
 		if(IsHideDisabled() == false)
 		{
@@ -159,20 +159,20 @@ void IHyWidget::SetAsEnabled(bool bEnabled)
 
 bool IHyWidget::IsKeyboardFocus() const
 {
-	return (m_uiAttribs & WIDGETATTRIB_IsKeyboardFocus);
+	return (m_uiEntityAttribs & WIDGETATTRIB_IsKeyboardFocus);
 }
 
 bool IHyWidget::IsKeyboardFocusAllowed() const
 {
-	return (m_uiAttribs & WIDGETATTRIB_KeyboardFocusAllowed);
+	return (m_uiEntityAttribs & WIDGETATTRIB_KeyboardFocusAllowed);
 }
 
 void IHyWidget::SetKeyboardFocusAllowed(bool bEnabled)
 {
 	if(bEnabled)
-		m_uiAttribs |= WIDGETATTRIB_KeyboardFocusAllowed;
+		m_uiEntityAttribs |= WIDGETATTRIB_KeyboardFocusAllowed;
 	else
-		m_uiAttribs &= ~WIDGETATTRIB_KeyboardFocusAllowed;
+		m_uiEntityAttribs &= ~WIDGETATTRIB_KeyboardFocusAllowed;
 }
 
 bool IHyWidget::RequestKeyboardFocus()
@@ -185,30 +185,30 @@ bool IHyWidget::RequestKeyboardFocus()
 
 bool IHyWidget::IsHideDownState() const
 {
-	return (m_uiAttribs & WIDGETATTRIB_HideDownState) != 0;
+	return (m_uiEntityAttribs & WIDGETATTRIB_HideDownState) != 0;
 }
 
 void IHyWidget::SetHideDownState(bool bIsHideDownState)
 {
 	if(bIsHideDownState)
-		m_uiAttribs |= WIDGETATTRIB_HideDownState;
+		m_uiEntityAttribs |= WIDGETATTRIB_HideDownState;
 	else
-		m_uiAttribs &= ~WIDGETATTRIB_HideDownState;
+		m_uiEntityAttribs &= ~WIDGETATTRIB_HideDownState;
 
 	ApplyPanelState();
 }
 
 bool IHyWidget::IsHideMouseHoverState() const
 {
-	return (m_uiAttribs & WIDGETATTRIB_HideMouseHoverState) != 0 || HyEngine::Input().IsUsingTouchScreen();
+	return (m_uiEntityAttribs & WIDGETATTRIB_HideMouseHoverState) != 0 || HyEngine::Input().IsUsingTouchScreen();
 }
 
 void IHyWidget::SetHideMouseHoverState(bool bIsHideHoverState)
 {
 	if(bIsHideHoverState)
-		m_uiAttribs |= WIDGETATTRIB_HideMouseHoverState;
+		m_uiEntityAttribs |= WIDGETATTRIB_HideMouseHoverState;
 	else
-		m_uiAttribs &= ~WIDGETATTRIB_HideMouseHoverState;
+		m_uiEntityAttribs &= ~WIDGETATTRIB_HideMouseHoverState;
 
 	ApplyPanelState();
 }
@@ -225,20 +225,20 @@ void IHyWidget::SetMouseHoverCursor(HyMouseCursor eMouseCursor)
 
 bool IHyWidget::IsHighlighted() const
 {
-	return (m_uiAttribs & (WIDGETATTRIB_IsHighlighted | WIDGETATTRIB_IsKeyboardFocus)) != 0;
+	return (m_uiEntityAttribs & (WIDGETATTRIB_IsHighlighted | WIDGETATTRIB_IsKeyboardFocus)) != 0;
 }
 
 bool IHyWidget::IsHideHighlightedState() const
 {
-	return (m_uiAttribs & WIDGETATTRIB_HideHighlightedState) != 0;
+	return (m_uiEntityAttribs & WIDGETATTRIB_HideHighlightedState) != 0;
 }
 
 void IHyWidget::SetHideHighlightedState(bool bIsHideHighlightedState)
 {
 	if(bIsHideHighlightedState)
-		m_uiAttribs |= WIDGETATTRIB_HideHighlightedState;
+		m_uiEntityAttribs |= WIDGETATTRIB_HideHighlightedState;
 	else
-		m_uiAttribs &= ~WIDGETATTRIB_HideHighlightedState;
+		m_uiEntityAttribs &= ~WIDGETATTRIB_HideHighlightedState;
 
 	ApplyPanelState();
 }
@@ -246,9 +246,9 @@ void IHyWidget::SetHideHighlightedState(bool bIsHideHighlightedState)
 void IHyWidget::SetAsHighlighted(bool bIsHighlighted)
 {
 	if(bIsHighlighted)
-		m_uiAttribs |= WIDGETATTRIB_IsHighlighted;
+		m_uiEntityAttribs |= WIDGETATTRIB_IsHighlighted;
 	else
-		m_uiAttribs &= ~WIDGETATTRIB_IsHighlighted;
+		m_uiEntityAttribs &= ~WIDGETATTRIB_IsHighlighted;
 
 	ApplyPanelState();
 }
@@ -315,7 +315,7 @@ void IHyWidget::TakeKeyboardFocus()
 {
 	HyAssert(IsKeyboardFocusAllowed(), "IHyWidget::TakeKeyboardFocus was invoked when keyboard focus is NOT allowed");
 	
-	m_uiAttribs |= WIDGETATTRIB_IsKeyboardFocus;
+	m_uiEntityAttribs |= WIDGETATTRIB_IsKeyboardFocus;
 	OnTakeKeyboardFocus();
 
 	ApplyPanelState();
@@ -323,7 +323,7 @@ void IHyWidget::TakeKeyboardFocus()
 
 void IHyWidget::RelinquishKeyboardFocus()
 {
-	m_uiAttribs &= ~WIDGETATTRIB_IsKeyboardFocus;
+	m_uiEntityAttribs &= ~WIDGETATTRIB_IsKeyboardFocus;
 	OnRelinquishKeyboardFocus();
 
 	ApplyPanelState();

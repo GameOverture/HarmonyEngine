@@ -17,7 +17,7 @@ HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 	m_pButtonGroup(nullptr),
 	m_fpBtnClickedCallback(nullptr)
 {
-	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
+	m_uiEntityAttribs |= WIDGETATTRIB_IsTypeButton;
 	SetKeyboardFocusAllowed(true);
 	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
 	UsePanelStates();
@@ -28,7 +28,7 @@ HyButton::HyButton(const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullp
 	m_pButtonGroup(nullptr),
 	m_fpBtnClickedCallback(nullptr)
 {
-	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
+	m_uiEntityAttribs |= WIDGETATTRIB_IsTypeButton;
 	SetKeyboardFocusAllowed(true);
 	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
 	UsePanelStates();
@@ -39,7 +39,7 @@ HyButton::HyButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit,
 	m_pButtonGroup(nullptr),
 	m_fpBtnClickedCallback(nullptr)
 {
-	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
+	m_uiEntityAttribs |= WIDGETATTRIB_IsTypeButton;
 	SetKeyboardFocusAllowed(true);
 	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
 	UsePanelStates();
@@ -50,7 +50,7 @@ HyButton::HyButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit,
 //	m_pButtonGroup(nullptr),
 //	m_fpBtnClickedCallback(nullptr)
 //{
-//	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
+//	m_uiEntityAttribs |= WIDGETATTRIB_IsTypeButton;
 //	SetKeyboardFocusAllowed(true);
 //	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
 //	UsePanelStates();
@@ -61,7 +61,7 @@ HyButton::HyButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit,
 //	m_pButtonGroup(nullptr),
 //	m_fpBtnClickedCallback(nullptr)
 //{
-//	m_uiAttribs |= WIDGETATTRIB_IsTypeButton;
+//	m_uiEntityAttribs |= WIDGETATTRIB_IsTypeButton;
 //	SetKeyboardFocusAllowed(true);
 //	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
 //	UsePanelStates();
@@ -75,7 +75,7 @@ HyButton::HyButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit,
 
 /*virtual*/ bool HyButton::IsDepressed() const /*override*/
 {
-	return IHyWidget::IsDepressed() || (m_uiAttribs & BTNATTRIB_IsKbDownState) != 0;
+	return IHyWidget::IsDepressed() || (m_uiEntityAttribs & BTNATTRIB_IsKbDownState) != 0;
 }
 
 HyButtonGroup *HyButton::GetButtonGroup() const
@@ -85,12 +85,12 @@ HyButtonGroup *HyButton::GetButtonGroup() const
 
 bool HyButton::IsAutoExclusive() const
 {
-	return (m_uiAttribs & BTNATTRIB_IsAutoExclusive) != 0;
+	return (m_uiEntityAttribs & BTNATTRIB_IsAutoExclusive) != 0;
 }
 
 bool HyButton::IsChecked() const
 {
-	return m_uiAttribs & BTNATTRIB_IsChecked;
+	return m_uiEntityAttribs & BTNATTRIB_IsChecked;
 }
 
 void HyButton::SetChecked(bool bChecked)
@@ -99,17 +99,17 @@ void HyButton::SetChecked(bool bChecked)
 		return;
 
 	if(bChecked)
-		m_uiAttribs |= BTNATTRIB_IsChecked;
+		m_uiEntityAttribs |= BTNATTRIB_IsChecked;
 	else
-		m_uiAttribs &= ~BTNATTRIB_IsChecked;
+		m_uiEntityAttribs &= ~BTNATTRIB_IsChecked;
 
 	if(m_pButtonGroup && m_pButtonGroup->ProcessButtonChecked(*this, bChecked) == false)
 	{
 		// Undo the change
 		if(!bChecked)
-			m_uiAttribs |= BTNATTRIB_IsChecked;
+			m_uiEntityAttribs |= BTNATTRIB_IsChecked;
 		else
-			m_uiAttribs &= ~BTNATTRIB_IsChecked;
+			m_uiEntityAttribs &= ~BTNATTRIB_IsChecked;
 
 		return;
 	}
@@ -140,9 +140,9 @@ void HyButton::InvokeButtonClicked()
 
 /*virtual*/ void HyButton::OnRelinquishKeyboardFocus() /*override*/
 {
-	if((m_uiAttribs & BTNATTRIB_IsKbDownState) != 0)
+	if((m_uiEntityAttribs & BTNATTRIB_IsKbDownState) != 0)
 	{
-		m_uiAttribs &= ~BTNATTRIB_IsKbDownState;
+		m_uiEntityAttribs &= ~BTNATTRIB_IsKbDownState;
 		ApplyPanelState();
 	}
 }
@@ -151,14 +151,14 @@ void HyButton::InvokeButtonClicked()
 {
 	if(eBtn == HYKEY_Space || eBtn == HYKEY_Enter)
 	{
-		if(eBtnState == HYBTN_Press && (m_uiAttribs & BTNATTRIB_IsKbDownState) == 0)
+		if(eBtnState == HYBTN_Press && (m_uiEntityAttribs & BTNATTRIB_IsKbDownState) == 0)
 		{
-			m_uiAttribs |= BTNATTRIB_IsKbDownState;
+			m_uiEntityAttribs |= BTNATTRIB_IsKbDownState;
 			ApplyPanelState();
 		}
-		else if(eBtnState == HYBTN_Release && (m_uiAttribs & BTNATTRIB_IsKbDownState) != 0)
+		else if(eBtnState == HYBTN_Release && (m_uiEntityAttribs & BTNATTRIB_IsKbDownState) != 0)
 		{
-			m_uiAttribs &= ~BTNATTRIB_IsKbDownState;
+			m_uiEntityAttribs &= ~BTNATTRIB_IsKbDownState;
 			ApplyPanelState();
 
 			if(IsDepressed() == false)

@@ -31,15 +31,15 @@ HyDividerLine::HyDividerLine(HyOrientation eOrientation, float fThickness, HyCol
 
 HyOrientation HyDividerLine::GetOrientation() const
 {
-	return m_uiAttribs & DIVIDERLINEATTRIB_IsHorizontal ? HYORIENT_Horizontal : HYORIENT_Vertical;
+	return m_uiEntityAttribs & DIVIDERLINEATTRIB_IsHorizontal ? HYORIENT_Horizontal : HYORIENT_Vertical;
 }
 
 void HyDividerLine::SetOrientation(HyOrientation eOrientation)
 {
 	if(eOrientation == HYORIENT_Horizontal)
-		m_uiAttribs |= DIVIDERLINEATTRIB_IsHorizontal;
+		m_uiEntityAttribs |= DIVIDERLINEATTRIB_IsHorizontal;
 	else
-		m_uiAttribs &= ~DIVIDERLINEATTRIB_IsHorizontal;
+		m_uiEntityAttribs &= ~DIVIDERLINEATTRIB_IsHorizontal;
 }
 
 float HyDividerLine::GetThickness() const

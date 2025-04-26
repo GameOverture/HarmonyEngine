@@ -87,30 +87,30 @@ bool HyRackMeter::IsRacking() const
 
 bool HyRackMeter::IsShowAsCash() const
 {
-	return m_uiAttribs & RACKMETERATTRIB_IsMoney;
+	return m_uiEntityAttribs & RACKMETERATTRIB_IsMoney;
 }
 
 /*virtual*/ void HyRackMeter::ShowAsCash(bool bShow)
 {
 	if(bShow)
-		m_uiAttribs |= RACKMETERATTRIB_IsMoney;
+		m_uiEntityAttribs |= RACKMETERATTRIB_IsMoney;
 	else
-		m_uiAttribs &= ~RACKMETERATTRIB_IsMoney;
+		m_uiEntityAttribs &= ~RACKMETERATTRIB_IsMoney;
 
 	SetAssembleNeeded();
 }
 
 bool HyRackMeter::IsSpinningMeter() const
 {
-	return m_uiAttribs & RACKMETERATTRIB_IsSpinDigits;
+	return m_uiEntityAttribs & RACKMETERATTRIB_IsSpinDigits;
 }
 
 void HyRackMeter::SetAsSpinningMeter(bool bSet)
 {
 	if(bSet)
-		m_uiAttribs |= RACKMETERATTRIB_IsSpinDigits;
+		m_uiEntityAttribs |= RACKMETERATTRIB_IsSpinDigits;
 	else
-		m_uiAttribs &= ~RACKMETERATTRIB_IsSpinDigits;
+		m_uiEntityAttribs &= ~RACKMETERATTRIB_IsSpinDigits;
 
 	SetAssembleNeeded();
 }

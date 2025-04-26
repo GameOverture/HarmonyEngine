@@ -89,18 +89,18 @@ HyLineEdit::HyLineEdit(const HyUiPanelInit &initRef, const HyUiTextInit &textIni
 
 bool HyLineEdit::IsInputValidated() const
 {
-	return (m_uiAttribs & LINEEDITATTRIB_UseValidator) != 0;
+	return (m_uiEntityAttribs & LINEEDITATTRIB_UseValidator) != 0;
 }
 
 void HyLineEdit::SetInputValidator(const std::regex &regEx)
 {
-	m_uiAttribs |= LINEEDITATTRIB_UseValidator;
+	m_uiEntityAttribs |= LINEEDITATTRIB_UseValidator;
 	m_InputValidator = regEx;
 }
 
 void HyLineEdit::ClearInputValidator()
 {
-	m_uiAttribs &= ~LINEEDITATTRIB_UseValidator;
+	m_uiEntityAttribs &= ~LINEEDITATTRIB_UseValidator;
 }
 
 bool HyLineEdit::IsCursorShown() const

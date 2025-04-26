@@ -77,7 +77,7 @@ protected:
 	std::vector<HyAnimFloat *>		m_ActiveAnimFloatsList;
 
 #ifdef HY_ENABLE_USER_TAGS
-	int64_t							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
+	int64_t							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the application wants (tracking, unique ID, etc.)
 #endif
 
 public:

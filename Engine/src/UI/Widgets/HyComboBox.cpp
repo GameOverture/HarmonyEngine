@@ -98,29 +98,29 @@ void HyComboBox::SetExpandPanel(const HyUiPanelInit &panelInit, HyOrientation eO
 	m_SubBtnPanel.Setup(panelInit);
 
 	if(eOrientation == HYORIENT_Horizontal)
-		m_uiAttribs |= COMBOBOXATTRIB_IsHorzExpand;
+		m_uiEntityAttribs |= COMBOBOXATTRIB_IsHorzExpand;
 	else
-		m_uiAttribs &= ~COMBOBOXATTRIB_IsHorzExpand;
+		m_uiEntityAttribs &= ~COMBOBOXATTRIB_IsHorzExpand;
 
 	if(bPositiveDirection)
-		m_uiAttribs |= COMBOBOXATTRIB_IsPositiveExpand;
+		m_uiEntityAttribs |= COMBOBOXATTRIB_IsPositiveExpand;
 	else
-		m_uiAttribs &= ~COMBOBOXATTRIB_IsPositiveExpand;
+		m_uiEntityAttribs &= ~COMBOBOXATTRIB_IsPositiveExpand;
 
 	if(bAnimate)
-		m_uiAttribs &= ~COMBOBOXATTRIB_IsInstantExpand;
+		m_uiEntityAttribs &= ~COMBOBOXATTRIB_IsInstantExpand;
 	else
-		m_uiAttribs |= COMBOBOXATTRIB_IsInstantExpand;
+		m_uiEntityAttribs |= COMBOBOXATTRIB_IsInstantExpand;
 }
 
 bool HyComboBox::IsExpanded() const
 {
-	return m_uiAttribs & COMBOBOXATTRIB_IsExpanded;
+	return m_uiEntityAttribs & COMBOBOXATTRIB_IsExpanded;
 }
 
 bool HyComboBox::IsTransition() const
 {
-	return m_uiAttribs & COMBOBOXATTRIB_IsTransition;
+	return m_uiEntityAttribs & COMBOBOXATTRIB_IsTransition;
 }
 
 void HyComboBox::ToggleExpanded()
@@ -133,15 +133,15 @@ void HyComboBox::ToggleExpanded()
 	if(IsExpanded() == false) // Is collapsed
 	{
 		glm::vec2 ptTweenDest(0.0f, 0.0f);
-		int32 iExpandIndex = (m_uiAttribs & COMBOBOXATTRIB_IsHorzExpand) ? 0 : 1;
-		int32 iExpandDir = (m_uiAttribs & COMBOBOXATTRIB_IsPositiveExpand) ? 1 : -1;
+		int32 iExpandIndex = (m_uiEntityAttribs & COMBOBOXATTRIB_IsHorzExpand) ? 0 : 1;
+		int32 iExpandDir = (m_uiEntityAttribs & COMBOBOXATTRIB_IsPositiveExpand) ? 1 : -1;
 
 		ptTweenDest[iExpandIndex] += (GetSizeHint()[iExpandIndex] + m_fSubBtnSpacing) * iExpandDir;
 		for(uint32 i = 0; i < static_cast<uint32>(m_SubBtnList.size()); ++i)
 		{
 			HyButton *pSubBtn = m_SubBtnList[i];
 			glm::vec2 vOffset = pSubBtn->GetPosOffset();
-			if(m_uiAttribs & COMBOBOXATTRIB_IsInstantExpand)
+			if(m_uiEntityAttribs & COMBOBOXATTRIB_IsInstantExpand)
 			{
 				pSubBtn->pos.Set(ptTweenDest[0] + vOffset.x, ptTweenDest[1] + vOffset.y);
 				pSubBtn->alpha.Set(1.0f);
@@ -155,7 +155,7 @@ void HyComboBox::ToggleExpanded()
 			ptTweenDest[iExpandIndex] += (pSubBtn->GetSizeHint()[iExpandIndex] + m_fSubBtnSpacing) * iExpandDir;
 		}
 
-		if(m_uiAttribs & COMBOBOXATTRIB_IsInstantExpand)
+		if(m_uiEntityAttribs & COMBOBOXATTRIB_IsInstantExpand)
 			m_SubBtnPanel.SetSize(static_cast<uint32>(ptTweenDest[0]), static_cast<uint32>(ptTweenDest[1]));
 		else
 		{
@@ -176,7 +176,7 @@ void HyComboBox::ToggleExpanded()
 		}
 	}
 	
-	m_uiAttribs |= COMBOBOXATTRIB_IsTransition;
+	m_uiEntityAttribs |= COMBOBOXATTRIB_IsTransition;
 }
 
 void HyComboBox::SetExpandedTimeout(float fTimeoutDuration)
@@ -196,7 +196,7 @@ void HyComboBox::ResetExpandedTimeout()
 	if(m_ExpandAnimVec.IsAnimating())
 		m_SubBtnPanel.SetSize(static_cast<uint32>(m_ExpandAnimVec.X()), static_cast<uint32>(m_ExpandAnimVec.Y()));
 
-	switch(m_uiAttribs & COMBOBOXATTRIB_STATEMASK)
+	switch(m_uiEntityAttribs & COMBOBOXATTRIB_STATEMASK)
 	{
 	case 0:
 		break;
@@ -212,28 +212,28 @@ void HyComboBox::ResetExpandedTimeout()
 			}
 		}
 		if(bAllFinished)
-			m_uiAttribs &= ~COMBOBOXATTRIB_STATEMASK;
+			m_uiEntityAttribs &= ~COMBOBOXATTRIB_STATEMASK;
 		break; }
 
 	case COMBOBOXATTRIB_IsExpanded:
-		if(m_uiAttribs & COMBOBOXATTRIB_NeedsRetracting)
+		if(m_uiEntityAttribs & COMBOBOXATTRIB_NeedsRetracting)
 		{
 			ToggleExpanded();
-			m_uiAttribs &= ~COMBOBOXATTRIB_NeedsRetracting;
+			m_uiEntityAttribs &= ~COMBOBOXATTRIB_NeedsRetracting;
 		}
 		else
 		{
-			if((m_uiAttribs & COMBOBOXATTRIB_IsExpandMouseDwn) == 0 && HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft))
-				m_uiAttribs |= COMBOBOXATTRIB_IsExpandMouseDwn;
+			if((m_uiEntityAttribs & COMBOBOXATTRIB_IsExpandMouseDwn) == 0 && HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft))
+				m_uiEntityAttribs |= COMBOBOXATTRIB_IsExpandMouseDwn;
 
 			if(IsMouseHover())
 				ResetExpandedTimeout();
 
 			m_fElapsedExpandedTime += HyEngine::DeltaTime();
-			if(((m_uiAttribs & COMBOBOXATTRIB_IsExpandMouseDwn) && HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft) == false) ||
+			if(((m_uiEntityAttribs & COMBOBOXATTRIB_IsExpandMouseDwn) && HyEngine::Input().IsMouseBtnDown(HYMOUSE_BtnLeft) == false) ||
 				(m_fExpandedTimeout != 0.0f && m_fElapsedExpandedTime >= m_fExpandedTimeout))
 			{
-				m_uiAttribs |= COMBOBOXATTRIB_NeedsRetracting;
+				m_uiEntityAttribs |= COMBOBOXATTRIB_NeedsRetracting;
 			}
 		}
 		break;
@@ -254,8 +254,8 @@ void HyComboBox::ResetExpandedTimeout()
 				m_SubBtnList[i]->SetAsEnabled(m_SubBtnEnabledMap[m_SubBtnList[i]]);
 
 			ResetExpandedTimeout();
-			m_uiAttribs &= ~(COMBOBOXATTRIB_IsTransition | COMBOBOXATTRIB_IsExpandMouseDwn);
-			m_uiAttribs |= COMBOBOXATTRIB_IsExpanded;
+			m_uiEntityAttribs &= ~(COMBOBOXATTRIB_IsTransition | COMBOBOXATTRIB_IsExpandMouseDwn);
+			m_uiEntityAttribs |= COMBOBOXATTRIB_IsExpanded;
 		}
 		break; }
 	}

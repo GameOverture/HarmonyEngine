@@ -88,9 +88,9 @@ HyBarMeter::HyBarMeter(const HyUiPanelInit &panelInit, const HyUiPanelInit &barI
 /*virtual*/ void HyBarMeter::SetText(const std::string &sUtf8Text) /*override*/
 {
 	if(sUtf8Text.empty())
-		m_uiAttribs &= ~BARMETERATTRIB_IsTextOverride;
+		m_uiEntityAttribs &= ~BARMETERATTRIB_IsTextOverride;
 	else
-		m_uiAttribs |= BARMETERATTRIB_IsTextOverride;
+		m_uiEntityAttribs |= BARMETERATTRIB_IsTextOverride;
 
 	HyLabel::SetText(sUtf8Text);
 }
@@ -132,47 +132,47 @@ bool HyBarMeter::SetBarState(uint32 uiStateIndex)
 
 bool HyBarMeter::IsVertical() const
 {
-	return (m_uiAttribs & BARMETERATTRIB_IsVertical) != 0;
+	return (m_uiEntityAttribs & BARMETERATTRIB_IsVertical) != 0;
 }
 
 void HyBarMeter::SetVertical(bool bIsVertical)
 {
 	if(bIsVertical)
-		m_uiAttribs |= BARMETERATTRIB_IsVertical;
+		m_uiEntityAttribs |= BARMETERATTRIB_IsVertical;
 	else
-		m_uiAttribs &= ~BARMETERATTRIB_IsVertical;
+		m_uiEntityAttribs &= ~BARMETERATTRIB_IsVertical;
 
 	SetAssembleNeeded();
 }
 
 bool HyBarMeter::IsInverted() const
 {
-	return (m_uiAttribs & BARMETERATTRIB_IsInverted) != 0;
+	return (m_uiEntityAttribs & BARMETERATTRIB_IsInverted) != 0;
 }
 
 void HyBarMeter::SetInverted(bool bIsInverted)
 {
 	if(bIsInverted)
-		m_uiAttribs |= BARMETERATTRIB_IsInverted;
+		m_uiEntityAttribs |= BARMETERATTRIB_IsInverted;
 	else
-		m_uiAttribs &= ~BARMETERATTRIB_IsInverted;
+		m_uiEntityAttribs &= ~BARMETERATTRIB_IsInverted;
 
 	SetAssembleNeeded();
 }
 
 bool HyBarMeter::IsBarStretched() const
 {
-	return (m_uiAttribs & BARMETERATTRIB_IsBarStretched) != 0;
+	return (m_uiEntityAttribs & BARMETERATTRIB_IsBarStretched) != 0;
 }
 
 void HyBarMeter::SetBarStreteched(bool bIsBarStretched)
 {
 	if(bIsBarStretched)
-		m_uiAttribs |= BARMETERATTRIB_IsBarStretched;
+		m_uiEntityAttribs |= BARMETERATTRIB_IsBarStretched;
 	else
 	{
 		m_Bar.scale.Set(1.0f, 1.0f);
-		m_uiAttribs &= ~BARMETERATTRIB_IsBarStretched;
+		m_uiEntityAttribs &= ~BARMETERATTRIB_IsBarStretched;
 	}
 
 	SetAssembleNeeded();
@@ -180,7 +180,7 @@ void HyBarMeter::SetBarStreteched(bool bIsBarStretched)
 
 bool HyBarMeter::IsBarUnderPanel() const
 {
-	return (m_uiAttribs & BARMETERATTRIB_IsBarUnderPanel) != 0;
+	return (m_uiEntityAttribs & BARMETERATTRIB_IsBarUnderPanel) != 0;
 }
 
 void HyBarMeter::SetBarUnderPanel(bool bIsBarUnderPanel)
@@ -189,13 +189,13 @@ void HyBarMeter::SetBarUnderPanel(bool bIsBarUnderPanel)
 	{
 		ChildRemove(&m_Bar);
 		ChildInsert(m_Panel, m_Bar);
-		m_uiAttribs |= BARMETERATTRIB_IsBarUnderPanel;
+		m_uiEntityAttribs |= BARMETERATTRIB_IsBarUnderPanel;
 	}
 	else if(bIsBarUnderPanel == false && IsBarUnderPanel())
 	{
 		ChildRemove(&m_Bar);
 		ChildInsert(m_Text, m_Bar);
-		m_uiAttribs &= ~BARMETERATTRIB_IsBarUnderPanel;
+		m_uiEntityAttribs &= ~BARMETERATTRIB_IsBarUnderPanel;
 	}
 	else
 		return;
@@ -316,8 +316,8 @@ void HyBarMeter::AdjustProgress(float fDuration)
 	if(fProgress != m_BarProgressAmt.GetAnimDestination())
 		m_BarProgressAmt.Tween(fProgress, fDuration, HyTween::QuadInOut, 0.0f, [this](IHyNode *pThis) { ApplyProgress(); });
 
-	if((m_uiAttribs & BARMETERATTRIB_IsTextOverride) == 0)
-		HyLabel::SetText(HyLocale::Percent_Format(fProgress * 100.0, m_NumberFormat)); // NOTE: Don't use this class's SetText() so m_uiAttribs doesn't get set
+	if((m_uiEntityAttribs & BARMETERATTRIB_IsTextOverride) == 0)
+		HyLabel::SetText(HyLocale::Percent_Format(fProgress * 100.0, m_NumberFormat)); // NOTE: Don't use this class's SetText() so m_uiEntityAttribs doesn't get set
 }
 
 void HyBarMeter::ApplyProgress()

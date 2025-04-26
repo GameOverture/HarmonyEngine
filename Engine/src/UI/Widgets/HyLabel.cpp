@@ -18,8 +18,8 @@ HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 {
 	RegisterAssembleEntity();
 
-	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
-	m_uiAttribs |= LABELATTRIB_Vertical;
+	m_uiEntityAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
+	m_uiEntityAttribs |= LABELATTRIB_Vertical;
 }
 
 HyLabel::HyLabel(const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
@@ -29,8 +29,8 @@ HyLabel::HyLabel(const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullptr
 {
 	RegisterAssembleEntity();
 
-	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
-	m_uiAttribs |= LABELATTRIB_Vertical;
+	m_uiEntityAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
+	m_uiEntityAttribs |= LABELATTRIB_Vertical;
 
 	Setup(panelInit, HyUiTextInit());
 }
@@ -42,8 +42,8 @@ HyLabel::HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, H
 {
 	RegisterAssembleEntity();
 
-	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
-	m_uiAttribs |= LABELATTRIB_Vertical;
+	m_uiEntityAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
+	m_uiEntityAttribs |= LABELATTRIB_Vertical;
 
 	Setup(panelInit, textInit);
 }
@@ -56,9 +56,9 @@ HyLabel::HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, H
 {
 	Assemble();
 
-	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
+	if(m_uiEntityAttribs & LABELATTRIB_IsSideBySide)
 	{
-		if((m_uiAttribs & LABELATTRIB_Vertical) == 0)
+		if((m_uiEntityAttribs & LABELATTRIB_Vertical) == 0)
 			return (m_Panel.GetWidth() + GetTextWidth() + m_iSideBySidePadding) * fPercent;
 		else
 			return HyMath::Max(m_Panel.GetWidth(), GetTextWidth()) * fPercent;
@@ -71,9 +71,9 @@ HyLabel::HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, H
 {
 	Assemble();
 
-	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
+	if(m_uiEntityAttribs & LABELATTRIB_IsSideBySide)
 	{
-		if(m_uiAttribs & LABELATTRIB_Vertical)
+		if(m_uiEntityAttribs & LABELATTRIB_Vertical)
 			return (m_Panel.GetHeight() + GetTextHeight() + m_iSideBySidePadding) * fPercent;
 		else
 			return HyMath::Max(m_Panel.GetHeight(), GetTextHeight()) * fPercent;
@@ -131,8 +131,8 @@ void HyLabel::Setup(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit
 	{
 	case HYTEXT_Line:		SetAsLine(); break;
 	case HYTEXT_Column:		SetAsColumn(GetWidth()); break;
-	case HYTEXT_Box:		SetAsBox(GetWidth(), GetHeight(), m_uiAttribs & LABELATTRIB_Vertical, m_uiAttribs & LABELATTRIB_BoxUseScissorOrSbsTextFirst); break;
-	case HYTEXT_ScaleBox:	SetAsScaleBox(GetWidth(), GetHeight(), m_uiAttribs & LABELATTRIB_Vertical); break;
+	case HYTEXT_Box:		SetAsBox(GetWidth(), GetHeight(), m_uiEntityAttribs & LABELATTRIB_Vertical, m_uiEntityAttribs & LABELATTRIB_BoxUseScissorOrSbsTextFirst); break;
+	case HYTEXT_ScaleBox:	SetAsScaleBox(GetWidth(), GetHeight(), m_uiEntityAttribs & LABELATTRIB_Vertical); break;
 	default:
 		HyLogError("HyRichText::Setup() - Unhandled text type: " << GetTextType());
 		break;
@@ -149,45 +149,45 @@ HyNodePath HyLabel::GetTextNodePath() const
 
 HyTextType HyLabel::GetTextType() const
 {
-	return static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
+	return static_cast<HyTextType>((m_uiEntityAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
 }
 
 bool HyLabel::IsLine() const
 {
-	return IsSideBySide() == false && HYTEXT_Line == static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
+	return IsSideBySide() == false && HYTEXT_Line == static_cast<HyTextType>((m_uiEntityAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
 }
 
 bool HyLabel::IsColumn() const
 {
-	return IsSideBySide() == false && HYTEXT_Column == static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
+	return IsSideBySide() == false && HYTEXT_Column == static_cast<HyTextType>((m_uiEntityAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
 }
 
 bool HyLabel::IsBox() const
 {
-	return IsSideBySide() == false && HYTEXT_Box == static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
+	return IsSideBySide() == false && HYTEXT_Box == static_cast<HyTextType>((m_uiEntityAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
 }
 
 bool HyLabel::IsScaleBox() const
 {
-	return IsSideBySide() == false && HYTEXT_ScaleBox == static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
+	return IsSideBySide() == false && HYTEXT_ScaleBox == static_cast<HyTextType>((m_uiEntityAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
 }
 
 bool HyLabel::IsVertical() const
 {
-	return IsSideBySide() == false && HYTEXT_Vertical == static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
+	return IsSideBySide() == false && HYTEXT_Vertical == static_cast<HyTextType>((m_uiEntityAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
 }
 
 bool HyLabel::IsSideBySide() const
 {
-	return (m_uiAttribs & LABELATTRIB_IsSideBySide) != 0;
+	return (m_uiEntityAttribs & LABELATTRIB_IsSideBySide) != 0;
 }
 
 void HyLabel::SetAsLine()
 {
-	m_uiAttribs &= ~LABELATTRIB_IsSideBySide;
+	m_uiEntityAttribs &= ~LABELATTRIB_IsSideBySide;
 
-	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;
-	m_uiAttribs |= (HYTEXT_Line << LABELATTRIB_StackedTextTypeOffset);
+	m_uiEntityAttribs &= ~LABELATTRIB_StackedTextTypeMask;
+	m_uiEntityAttribs |= (HYTEXT_Line << LABELATTRIB_StackedTextTypeOffset);
 
 	SetAssembleNeeded();
 }
@@ -199,10 +199,10 @@ void HyLabel::SetAsColumn()
 
 void HyLabel::SetAsColumn(float fWidth)
 {
-	m_uiAttribs &= ~LABELATTRIB_IsSideBySide;
+	m_uiEntityAttribs &= ~LABELATTRIB_IsSideBySide;
 
-	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;
-	m_uiAttribs |= (HYTEXT_Column << LABELATTRIB_StackedTextTypeOffset);
+	m_uiEntityAttribs &= ~LABELATTRIB_StackedTextTypeMask;
+	m_uiEntityAttribs |= (HYTEXT_Column << LABELATTRIB_StackedTextTypeOffset);
 
 	if(m_Panel.GetWidth() != fWidth)
 	{
@@ -222,20 +222,20 @@ void HyLabel::SetAsBox(bool bCenterVertically /*= false*/, bool bUseScissor /*= 
 
 void HyLabel::SetAsBox(float fWidth, float fHeight, bool bCenterVertically /*= false*/, bool bUseScissor /*= true*/)
 {
-	m_uiAttribs &= ~LABELATTRIB_IsSideBySide;
+	m_uiEntityAttribs &= ~LABELATTRIB_IsSideBySide;
 
-	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;
-	m_uiAttribs |= (HYTEXT_Box << LABELATTRIB_StackedTextTypeOffset);
+	m_uiEntityAttribs &= ~LABELATTRIB_StackedTextTypeMask;
+	m_uiEntityAttribs |= (HYTEXT_Box << LABELATTRIB_StackedTextTypeOffset);
 
 	if(bCenterVertically)
-		m_uiAttribs |= LABELATTRIB_Vertical;
+		m_uiEntityAttribs |= LABELATTRIB_Vertical;
 	else
-		m_uiAttribs &= ~LABELATTRIB_Vertical;
+		m_uiEntityAttribs &= ~LABELATTRIB_Vertical;
 
 	if(bUseScissor)
-		m_uiAttribs |= LABELATTRIB_BoxUseScissorOrSbsTextFirst;
+		m_uiEntityAttribs |= LABELATTRIB_BoxUseScissorOrSbsTextFirst;
 	else
-		m_uiAttribs &= ~LABELATTRIB_BoxUseScissorOrSbsTextFirst;
+		m_uiEntityAttribs &= ~LABELATTRIB_BoxUseScissorOrSbsTextFirst;
 
 	if(m_Panel.GetWidth() != fWidth || m_Panel.GetHeight() != fHeight)
 	{
@@ -255,15 +255,15 @@ void HyLabel::SetAsScaleBox(bool bCenterVertically /*= true*/)
 
 void HyLabel::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically /*= true*/)
 {
-	m_uiAttribs &= ~LABELATTRIB_IsSideBySide;
+	m_uiEntityAttribs &= ~LABELATTRIB_IsSideBySide;
 
-	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;
-	m_uiAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
+	m_uiEntityAttribs &= ~LABELATTRIB_StackedTextTypeMask;
+	m_uiEntityAttribs |= (HYTEXT_ScaleBox << LABELATTRIB_StackedTextTypeOffset);
 
 	if(bCenterVertically)
-		m_uiAttribs |= LABELATTRIB_Vertical;
+		m_uiEntityAttribs |= LABELATTRIB_Vertical;
 	else
-		m_uiAttribs &= ~LABELATTRIB_Vertical;
+		m_uiEntityAttribs &= ~LABELATTRIB_Vertical;
 
 	if(m_Panel.GetWidth() != fWidth || m_Panel.GetHeight() != fHeight)
 	{
@@ -278,28 +278,28 @@ void HyLabel::SetAsScaleBox(float fWidth, float fHeight, bool bCenterVertically 
 
 void HyLabel::SetAsVertical()
 {
-	m_uiAttribs &= ~LABELATTRIB_IsSideBySide;
+	m_uiEntityAttribs &= ~LABELATTRIB_IsSideBySide;
 
-	m_uiAttribs &= ~LABELATTRIB_StackedTextTypeMask;
-	m_uiAttribs |= (HYTEXT_Vertical << LABELATTRIB_StackedTextTypeOffset);
+	m_uiEntityAttribs &= ~LABELATTRIB_StackedTextTypeMask;
+	m_uiEntityAttribs |= (HYTEXT_Vertical << LABELATTRIB_StackedTextTypeOffset);
 
 	SetAssembleNeeded();
 }
 
 void HyLabel::SetAsSideBySide(bool bPanelBeforeText /*= true*/, int32 iPadding /*= 5*/, HyOrientation eOrientation /*= HYORIENT_Horizontal*/)
 {
-	m_uiAttribs |= LABELATTRIB_IsSideBySide;
+	m_uiEntityAttribs |= LABELATTRIB_IsSideBySide;
 	if(bPanelBeforeText)
-		m_uiAttribs &= ~LABELATTRIB_BoxUseScissorOrSbsTextFirst;
+		m_uiEntityAttribs &= ~LABELATTRIB_BoxUseScissorOrSbsTextFirst;
 	else
-		m_uiAttribs |= LABELATTRIB_BoxUseScissorOrSbsTextFirst;
+		m_uiEntityAttribs |= LABELATTRIB_BoxUseScissorOrSbsTextFirst;
 
 	m_iSideBySidePadding = iPadding;
 
 	if(eOrientation == HYORIENT_Horizontal)
-		m_uiAttribs &= ~LABELATTRIB_Vertical;
+		m_uiEntityAttribs &= ~LABELATTRIB_Vertical;
 	else
-		m_uiAttribs |= LABELATTRIB_Vertical;
+		m_uiEntityAttribs |= LABELATTRIB_Vertical;
 
 	SetAssembleNeeded();
 }
@@ -455,7 +455,7 @@ bool HyLabel::IsMonospacedDigits() const
 
 /*virtual*/ glm::vec2 HyLabel::GetPosOffset() /*override*/
 {
-	if((m_uiAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
+	if((m_uiEntityAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
 		Assemble();
 		return m_Panel.GetBotLeftOffset();
@@ -468,7 +468,7 @@ bool HyLabel::IsMonospacedDigits() const
 {
 	HySetVec(m_vSizeHint, 0, 0);
 
-	if((m_uiAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
+	if((m_uiEntityAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
 		if(m_Panel.IsAutoSize())
 		{
@@ -481,7 +481,7 @@ bool HyLabel::IsMonospacedDigits() const
 	else // Side-by-side
 	{
 		glm::vec2 vPanelSizeHint = m_Panel.GetPanelSizeHint();
-		if(m_uiAttribs & LABELATTRIB_Vertical)
+		if(m_uiEntityAttribs & LABELATTRIB_Vertical)
 		{
 			m_vSizeHint.x = static_cast<int32>(HyMath::Max(vPanelSizeHint.x, GetTextWidth()));
 			m_vSizeHint.y = static_cast<int32>(vPanelSizeHint.y + m_iSideBySidePadding + GetTextHeight());
@@ -498,7 +498,7 @@ bool HyLabel::IsMonospacedDigits() const
 {
 	//SetSizeAndLayoutDirty();
 
-	if(m_uiAttribs & LABELATTRIB_IsSideBySide)
+	if(m_uiEntityAttribs & LABELATTRIB_IsSideBySide)
 	{
 		m_Text.SetAsLine();
 
@@ -511,9 +511,9 @@ bool HyLabel::IsMonospacedDigits() const
 		glm::vec2 vSecondSize;
 		glm::vec2 vSecondOffset;
 
-		if(m_uiAttribs & LABELATTRIB_BoxUseScissorOrSbsTextFirst)
+		if(m_uiEntityAttribs & LABELATTRIB_BoxUseScissorOrSbsTextFirst)
 		{
-			if(m_uiAttribs & LABELATTRIB_Vertical)
+			if(m_uiEntityAttribs & LABELATTRIB_Vertical)
 				m_Text.SetAlignment(HYALIGN_Center);
 			else
 				m_Text.SetAlignment(HYALIGN_Right);
@@ -528,7 +528,7 @@ bool HyLabel::IsMonospacedDigits() const
 		}
 		else
 		{
-			if(m_uiAttribs & LABELATTRIB_Vertical)
+			if(m_uiEntityAttribs & LABELATTRIB_Vertical)
 				m_Text.SetAlignment(HYALIGN_Center);
 			else
 				m_Text.SetAlignment(HYALIGN_Left);
@@ -546,7 +546,7 @@ bool HyLabel::IsMonospacedDigits() const
 		pFirst->pos.Set(-vFirstOffset);
 		pSecond->pos.Set(-vSecondOffset);
 
-		if(m_uiAttribs & LABELATTRIB_Vertical)
+		if(m_uiEntityAttribs & LABELATTRIB_Vertical)
 		{
 			if(vFirstSize.x >= vSecondSize.x)
 			{
@@ -587,7 +587,7 @@ bool HyLabel::IsMonospacedDigits() const
 			fLineOffsetX = vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right));
 
 		// Set text type/size
-		HyTextType eStackedTextType = static_cast<HyTextType>((m_uiAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
+		HyTextType eStackedTextType = static_cast<HyTextType>((m_uiEntityAttribs & LABELATTRIB_StackedTextTypeMask) >> LABELATTRIB_StackedTextTypeOffset);
 
 		if(vPanelDimensions.x != 0.0f && vPanelDimensions.y != 0.0f)
 		{
@@ -640,7 +640,7 @@ bool HyLabel::IsMonospacedDigits() const
 
 /*virtual*/ glm::ivec2 HyLabel::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
 {
-	if((m_uiAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
+	if((m_uiEntityAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
 	{
 		if(m_Panel.IsAutoSize() && m_Text.GetUtf8String().empty() == false)
 		{
@@ -666,7 +666,7 @@ bool HyLabel::IsMonospacedDigits() const
 		glm::ivec2 vTextSizeHint(GetTextWidth(), GetTextHeight());
 
 		glm::ivec2 vNewPanelSize, vNewTextSize;
-		if(m_uiAttribs & LABELATTRIB_Vertical)
+		if(m_uiEntityAttribs & LABELATTRIB_Vertical)
 		{
 			vSizeHint.y -= m_iSideBySidePadding;
 

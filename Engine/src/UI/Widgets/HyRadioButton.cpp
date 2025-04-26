@@ -17,7 +17,7 @@ HyRadioButton::HyRadioButton(HyEntity2d *pParent /*= nullptr*/) :
 	m_CheckMarkFill(this),
 	m_fpOnCheckedChanged(nullptr)
 {
-	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
+	m_uiEntityAttribs |= BTNATTRIB_IsAutoExclusive;
 	SetAsSideBySide();
 }
 
@@ -27,7 +27,7 @@ HyRadioButton::HyRadioButton(const HyUiPanelInit &panelInit, HyEntity2d *pParent
 	m_CheckMarkFill(this),
 	m_fpOnCheckedChanged(nullptr)
 {
-	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
+	m_uiEntityAttribs |= BTNATTRIB_IsAutoExclusive;
 	SetAsSideBySide();
 }
 
@@ -37,7 +37,7 @@ HyRadioButton::HyRadioButton(const HyUiPanelInit &panelInit, const HyUiTextInit 
 	m_CheckMarkFill(this),
 	m_fpOnCheckedChanged(nullptr)
 {
-	m_uiAttribs |= BTNATTRIB_IsAutoExclusive;
+	m_uiEntityAttribs |= BTNATTRIB_IsAutoExclusive;
 	SetAsSideBySide();
 }
 
