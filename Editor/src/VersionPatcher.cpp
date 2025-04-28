@@ -1460,6 +1460,8 @@
 			metaAssetObj.remove("isSubAtlas");
 		}
 
+		metaAssetObj.insert("itemType", QString("AtlasFrame")); // At this point in time, there are no other types than AtlasFrame (no tile sets)
+
 		metaAssetsArray.replace(iMetaAssetIndex, metaAssetObj);
 	}
 
