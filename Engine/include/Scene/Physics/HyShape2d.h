@@ -50,6 +50,10 @@ class HyShape2d
 	b2ShapeDef *								m_pPhysicsInit;
 	bool										m_bPhysicsDirty;
 
+	// Physics Collisions
+	float										m_fMaxPush;			// Setting this to FLT_MAX makes it as rigid as possible. Lower values can make the plane collision soft. Usually in meters.
+	bool										m_bClipVelocity;	// Indicates if b2ClipVector should clip against this plane. Should be false for soft collision.
+
 public:
 	static const float							FloatSlop;
 
@@ -126,6 +130,11 @@ public:
 	//bool IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const;
 
 	bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const;
+
+	// Setting this to FLT_MAX makes the plane as rigid as possible. Lower values can make the plane collision soft. Usually in meters.
+	void SetSoftCollision(float fMaxPush);
+	void SetHardCollision();
+	void GetCollisionInfo(float &fPushLimitOut, bool &bClipVelocityOut) const;
 
 protected:
 	void ClearShapeData();

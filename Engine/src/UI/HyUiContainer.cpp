@@ -673,7 +673,7 @@ void HyUiContainer::OnRootLayoutUpdate()
 		int32 iScissorWidth = static_cast<int32>(m_Panel.GetWidth(m_Panel.scale.X())) - (iScissorMargin * 2) - (static_cast<int32>(bVertBarShown) * m_VertBar.GetDiameter());
 		int32 iScissorHeight = static_cast<int32>(m_Panel.GetHeight(m_Panel.scale.Y())) - (iScissorMargin * 2) - (static_cast<int32>(bHorzBarShown) * m_HorzBar.GetDiameter());
 		if(iScissorWidth > 0 && iScissorHeight > 0)
-			SetScissor(HyRect(iScissorMargin, iScissorMargin, iScissorWidth, iScissorHeight));
+			SetScissor(HyRect(static_cast<float>(iScissorMargin), static_cast<float>(iScissorMargin), static_cast<float>(iScissorWidth), static_cast<float>(iScissorHeight)));
 		else
 			ClearScissor(true);
 	}

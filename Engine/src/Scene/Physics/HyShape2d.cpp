@@ -23,7 +23,9 @@ HyShape2d::HyShape2d(HyEntity2d *pParent /*= nullptr*/) :
 	m_hPhysics({}),
 	m_bPhysicsAllowed(true),
 	m_pPhysicsInit(nullptr),
-	m_bPhysicsDirty(false)
+	m_bPhysicsDirty(false),
+	m_fMaxPush(FLT_MAX),
+	m_bClipVelocity(true)
 {
 	if(pParent)
 		pParent->ShapeAppend(*this);
@@ -36,7 +38,9 @@ HyShape2d::HyShape2d(const HyShape2d &copyRef) :
 	m_hPhysics({}),
 	m_bPhysicsAllowed(copyRef.m_bPhysicsAllowed),
 	m_pPhysicsInit(nullptr),
-	m_bPhysicsDirty(false)
+	m_bPhysicsDirty(false),
+	m_fMaxPush(copyRef.m_fMaxPush),
+	m_bClipVelocity(copyRef.m_bClipVelocity)
 {
 	*this = copyRef;
 }
@@ -77,6 +81,9 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 
 	if(rhs.m_pParent)
 		rhs.m_pParent->ShapeAppend(*this);
+
+	m_fMaxPush = rhs.m_fMaxPush;
+	m_bClipVelocity = rhs.m_bClipVelocity;
 
 	ShapeChanged();
 	return *this;
@@ -780,6 +787,24 @@ bool HyShape2d::ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) cons
 	}
 
 	return false;
+}
+
+void HyShape2d::SetSoftCollision(float fMaxPush)
+{
+	m_fMaxPush = fMaxPush;
+	m_bClipVelocity = false;
+}
+
+void HyShape2d::SetHardCollision()
+{
+	m_fMaxPush = FLT_MAX;
+	m_bClipVelocity = true;
+}
+
+void HyShape2d::GetCollisionInfo(float &fPushLimitOut, bool &bClipVelocityOut) const
+{
+	fPushLimitOut = m_fMaxPush;
+	bClipVelocityOut = m_bClipVelocity;
 }
 
 void HyShape2d::ClearShapeData()

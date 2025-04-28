@@ -21,11 +21,11 @@ HyToolButton::HyToolButton(HyToolButtonType eToolBtnType, const HyUiPanelInit &p
 	{
 	case HYTOOLBTN_Close: {
 		m_X1.SetAsLineSegment(glm::vec2(-fGlyphRadius, -fGlyphRadius), glm::vec2(fGlyphRadius, fGlyphRadius));
-		m_X1.SetLineThickness(m_Panel.GetFrameStrokeSize());
+		m_X1.SetLineThickness(static_cast<float>(m_Panel.GetFrameStrokeSize()));
 		m_X1.pos.Offset(fGlyphRadius * 2, fGlyphRadius * 2);
 
 		m_X2.SetAsLineSegment(glm::vec2(-fGlyphRadius, fGlyphRadius), glm::vec2(fGlyphRadius, -fGlyphRadius));
-		m_X2.SetLineThickness(m_Panel.GetFrameStrokeSize());
+		m_X2.SetLineThickness(static_cast<float>(m_Panel.GetFrameStrokeSize()));
 		m_X2.pos.Offset(fGlyphRadius * 2, fGlyphRadius * 2);
 		break; }
 

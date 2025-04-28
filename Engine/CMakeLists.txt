@@ -137,6 +137,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySpine.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.cpp
+	src/Scene/Nodes/Loadables/Bodies/Objects/HyActor2d.cpp
 	src/Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.cpp
 	src/Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.cpp
 	src/Scene/Nodes/Loadables/Bodies/Objects/HyPhysicsGrid2d.cpp
@@ -273,6 +274,7 @@ set(HYENGINE_HEADER_FILES
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.h
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySpine.h
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.h
+	include/Scene/Nodes/Loadables/Bodies/Objects/HyActor2d.h
 	include/Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h
 	include/Scene/Nodes/Loadables/Bodies/Objects/HyEntity3d.h
 	include/Scene/Nodes/Loadables/Bodies/Objects/HyEntityWrapper2d.h

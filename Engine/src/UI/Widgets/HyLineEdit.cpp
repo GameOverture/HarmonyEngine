@@ -84,7 +84,7 @@ HyLineEdit::HyLineEdit(const HyUiPanelInit &initRef, const HyUiTextInit &textIni
 	HyLabel::SetText(sUtf8Text);
 
 	if(m_uiCursorIndex > HyIO::Utf8Length(sUtf8Text))
-		SetCursor(HyIO::Utf8Length(sUtf8Text));
+		SetCursor(static_cast<uint32>(HyIO::Utf8Length(sUtf8Text)));
 }
 
 bool HyLineEdit::IsInputValidated() const

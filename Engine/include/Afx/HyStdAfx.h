@@ -95,6 +95,13 @@ enum HyBodyType
 };
 static_assert((int)HYBODY_Static == (int)b2_staticBody && (int)HYBODY_Kinematic == (int)b2_kinematicBody && (int)HYBODY_Dynamic == (int)b2_dynamicBody, "Harmony and Box2d types don't match!");
 
+enum HyCollisionCategory
+{
+	HYCOLLISION_Default			= 1 << 0,
+	HYCOLLISION_Actor			= 1 << 1,
+	HYCOLLISION_Dynamic			= 1 << 2,
+};
+
 enum HyZoomLevel
 {
 	HYZOOM_6 = 0,	// 6.25%

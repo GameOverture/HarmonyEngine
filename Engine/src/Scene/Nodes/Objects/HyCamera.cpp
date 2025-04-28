@@ -87,7 +87,7 @@ void HyCamera2d::ProjectToWorld(const glm::vec2 &ptCameraCoordinate, glm::vec2 &
 {
 	IHyCamera<IHyNode2d>::Update();
 
-	m_PanLocomotion.Update();
+	m_PanLocomotion.UpdateSimple();
 	if(IsPanning())
 		pos.Offset(m_PanLocomotion.GetVelocity());
 }

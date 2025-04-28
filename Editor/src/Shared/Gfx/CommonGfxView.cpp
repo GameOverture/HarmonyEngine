@@ -123,7 +123,7 @@ void CommonGfxView::OnPanTimer()
 	if(m_uiPanFlags & PAN_DOWN)
 		m_PanLocomotion.GoDown();
 
-	m_PanLocomotion.Update();
+	m_PanLocomotion.UpdateSimple();
 
 	if(m_PanLocomotion.IsMoving())
 	{

@@ -45,12 +45,12 @@ void HyScrollBar::PageControl::SetMetrics(HyOrientation eOrientation, uint32 uiL
 
 	if(eOrientation == HYORIENT_Vertical)
 	{
-		m_Panel.SetAsBox(static_cast<int32>(m_uiDiameter), static_cast<int32>(uiLength));
+		m_Panel.SetAsBox(static_cast<float>(m_uiDiameter), static_cast<float>(uiLength));
 		m_Slider.SetAsBox(static_cast<float>(m_uiDiameter) * 0.5f, (uiLength - (m_uiDiameter * 2)) * fSliderPercent);
 	}
 	else
 	{
-		m_Panel.SetAsBox(static_cast<int32>(uiLength), static_cast<int32>(m_uiDiameter));
+		m_Panel.SetAsBox(static_cast<float>(uiLength), static_cast<float>(m_uiDiameter));
 		m_Slider.SetAsBox((uiLength - (m_uiDiameter * 2)) * fSliderPercent, static_cast<float>(m_uiDiameter) /** 0.5f*/);
 	}
 }
@@ -183,7 +183,7 @@ void HyScrollBar::Button::SetColor(HyColor color)
 
 void HyScrollBar::Button::SetMetrics(HyOrientation eOrientation, bool bPositive, uint32 uiDiameter)
 {
-	m_Panel.SetAsBox(static_cast<int32>(uiDiameter), static_cast<int32>(uiDiameter));
+	m_Panel.SetAsBox(static_cast<float>(uiDiameter), static_cast<float>(uiDiameter));
 
 	if(eOrientation == HYORIENT_Vertical)
 	{
