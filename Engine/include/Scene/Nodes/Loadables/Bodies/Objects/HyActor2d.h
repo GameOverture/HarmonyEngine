@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
+#include "Scene/Physics/Fixtures/HyShape2d.h"
 #include "Utilities/HyLocomotion.h"
 
 class HyActor2d : public HyEntity2d

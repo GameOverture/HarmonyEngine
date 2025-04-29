@@ -14,6 +14,8 @@
 #include "Scene/Nodes/Loadables/Bodies/IHyBody2d.h"
 #include "Scene/Physics/HyPhysicsBody.h"
 
+class IHyFixture2d;
+
 class HyEntity2d : public IHyBody2d
 {
 	friend class HyScene;
@@ -21,7 +23,7 @@ class HyEntity2d : public IHyBody2d
 
 protected:
 	std::vector<IHyNode2d *>				m_ChildList;
-	std::vector<HyShape2d *>				m_ShapeList;
+	std::vector<IHyFixture2d *>				m_FixtureList;
 
 	enum EntityAttributes
 	{
@@ -116,10 +118,10 @@ public:
 	bool IsMouseHover();
 	bool IsMouseDown() const;
 
-	void ShapeAppend(HyShape2d &shapeRef);
-	bool ShapeRemove(HyShape2d &shapeRef);
-	uint32 ShapeCount() const;
-	HyShape2d *ShapeGet(uint32 uiIndex);
+	void FixtureAppend(IHyFixture2d &fixtureRef);
+	bool FixtureRemove(IHyFixture2d &fixtureRef);
+	uint32 FixtureCount() const;
+	IHyFixture2d *FixtureGet(uint32 uiIndex);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// DISPLAY ORDER
@@ -159,7 +161,7 @@ protected:
 
 	bool CalcMouseInBounds();
 
-	void SyncPhysicsShapes();	// 
+	void SyncPhysicsFixtures();
 	void SyncPhysicsBody();		// Tell physics simulation to take current transformation
 
 	// Optional user overrides below

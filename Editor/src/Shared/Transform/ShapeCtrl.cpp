@@ -236,7 +236,7 @@ QString ShapeCtrl::Serialize()
 	HyShape2d shape;
 	m_BoundingVolume.CalcLocalBoundingShape(shape);
 
-	if(shape.IsValidShape() == false)
+	if(shape.IsValid() == false)
 		return "";
 
 	QList<float> floatList;
@@ -268,13 +268,17 @@ QString ShapeCtrl::Serialize()
 		break;
 
 	case SHAPE_LineChain:
-	case SHAPE_LineLoop:
-		for(int i = 0; i < shape.GetAsChain().iCount; ++i)
+	case SHAPE_LineLoop: {
+		const HyChainData *pChainData = m_BoundingVolume.GetChainData();
+		if(pChainData == nullptr)
+			break;
+
+		for(int i = 0; i < pChainData->iCount; ++i)
 		{
-			floatList.push_back(shape.GetAsChain().pPointList[i].x);
-			floatList.push_back(shape.GetAsChain().pPointList[i].y);
+			floatList.push_back(pChainData->pPointList[i].x);
+			floatList.push_back(pChainData->pPointList[i].y);
 		}
-		break;
+		break; }
 	}
 
 	QString sSerializedData;
@@ -819,16 +823,20 @@ QString ShapeCtrl::SerializeVemVerts(HyCamera2d *pCamera)
 		break; }
 
 	case SHAPE_LineChain:
-	case SHAPE_LineLoop:
-		for(int i = 0; i < shape.GetAsChain().iCount; ++i)
+	case SHAPE_LineLoop: {
+		const HyChainData *pChainData = m_Outline.GetChainData();
+		if(pChainData == nullptr)
+			break;
+
+		for(int i = 0; i < pChainData->iCount; ++i)
 		{
-			glm::vec2 ptVert(shape.GetAsChain().pPointList[i]);
+			glm::vec2 ptVert(pChainData->pPointList[i]);
 			pCamera->ProjectToWorld(ptVert, ptVert);
 
 			floatList.push_back(ptVert.x);
 			floatList.push_back(ptVert.y);
 		}
-		break;
+		break; }
 	}
 
 	QString sSerializedData;

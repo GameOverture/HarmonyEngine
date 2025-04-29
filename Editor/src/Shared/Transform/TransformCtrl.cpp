@@ -53,12 +53,12 @@ TransformCtrl::TransformCtrl(HyEntity2d *pParent) :
 
 bool TransformCtrl::IsValid() const
 {
-	return m_BoundingVolume.GetShapeType() != HYSHAPE_Nothing;
+	return m_BoundingVolume.GetShapeType() != HYFIXTURE_Nothing;
 }
 
 void TransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera)
 {
-	if(boundingShape.IsValidShape() == false)
+	if(boundingShape.IsValid() == false)
 		return;
 
 	b2AABB aabb;
@@ -158,7 +158,7 @@ void TransformCtrl::WrapTo(QList<IDrawExItem *> itemDrawList, HyCamera2d *pCamer
 		HyShape2d *pItemShape = new HyShape2d();
 		glm::mat4 mtxItemTransform;
 		pDrawItem->ExtractTransform(*pItemShape, mtxItemTransform);
-		if(pItemShape->IsValidShape() == false)
+		if(pItemShape->IsValid() == false)
 		{
 			delete pItemShape;
 			continue;

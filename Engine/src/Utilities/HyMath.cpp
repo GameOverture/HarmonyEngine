@@ -10,6 +10,8 @@
 #include "Afx/HyStdAfx.h"
 #include "Utilities/HyMath.h"
 
+const float HyMath::FloatSlop = 0.005f;
+
 const HyColor HyColor::White(0xffffff);
 const HyColor HyColor::Black(0x000000);
 const HyColor HyColor::Red(0xff0000);

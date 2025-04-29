@@ -11,7 +11,6 @@
 #define HyPhysicsBody_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Physics/HyShape2d.h"
 
 class HyEntity2d;
 

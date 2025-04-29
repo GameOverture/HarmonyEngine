@@ -529,7 +529,7 @@ void HyPhysicsBody::Activate()
 		if(b2Body_IsEnabled(m_hBody) == false)
 		{
 			m_EntityRef.SyncPhysicsBody();
-			m_EntityRef.SyncPhysicsShapes();
+			m_EntityRef.SyncPhysicsFixtures();
 			b2Body_Enable(m_hBody);
 		}
 	}
@@ -547,7 +547,7 @@ void HyPhysicsBody::Activate()
 		m_pInit->rotation = b2MakeRot(vRotations.z);
 
 		m_hBody = b2CreateBody(IHyNode::sm_pScene->GetPhysicsWorld(), m_pInit);
-		m_EntityRef.SyncPhysicsShapes();
+		m_EntityRef.SyncPhysicsFixtures();
 
 		if(b2Body_IsEnabled(m_hBody) == false)
 			b2Body_Enable(m_hBody);

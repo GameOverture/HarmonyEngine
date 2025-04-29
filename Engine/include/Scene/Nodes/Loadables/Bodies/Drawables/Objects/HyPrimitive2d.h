@@ -12,7 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
-#include "Scene/Physics/HyShape2d.h"
+#include "Scene/Physics/Fixtures/HyShape2d.h"
+#include "Scene/Physics/Fixtures/HyChain2d.h"
 
 class HyPrimitive2d : public IHyDrawable2d
 {
@@ -28,6 +29,7 @@ protected:
 	bool			m_bUpdateShaderUniforms;
 
 	HyShape2d		m_Shape;
+	HyChainData *	m_pChainData;
 
 public:
 	HyPrimitive2d(HyEntity2d *pParent = nullptr);
@@ -40,7 +42,7 @@ public:
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
 
-	HyShapeType GetShapeType() const;
+	HyFixtureType GetShapeType() const;
 
 	void SetAsNothing();
 
@@ -49,7 +51,7 @@ public:
 	// Set as an isolated edge.
 	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2);
 
-	// A series of line segments chained to gether. 'bLoop' is whether to automatically connects last vertex to the first.
+	// A series of line segments chained together. 'bLoop' is whether to automatically connects last vertex to the first.
 	// Passed in parameters are copied, and understood to be local coordinates.
 	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoop);
 	void SetAsLineChain(const std::vector<glm::vec2> &verticesList, bool bLoop);
@@ -72,6 +74,8 @@ public:
 	// TODO: Support rounded boxes
 
 	void SetAsCapsule(const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius);
+
+	const HyChainData *GetChainData() const;
 
 	uint32 GetNumVerts() const;
 	const glm::vec2 *GetVerts() const;
@@ -99,8 +103,7 @@ protected:
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
 
 private:
-	virtual void Load() override;
-
+	void ClearChainData();
 	void ClearVertexData();
 	void AssembleData();
 

@@ -148,7 +148,9 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Objects/IHyCamera.cpp
 	src/Scene/Physics/HyPhysicsBody.cpp
 	src/Scene/Physics/HyPhysicsDraw.cpp
-	src/Scene/Physics/HyShape2d.cpp
+	src/Scene/Physics/Fixtures/HyChain2d.cpp
+	src/Scene/Physics/Fixtures/HyShape2d.cpp
+	src/Scene/Physics/Fixtures/IHyFixture2d.cpp
 	src/Threading/IHyThreadClass.cpp
 	src/Time/HyTime.cpp
 	src/Time/Watches/HyStopwatch.cpp
@@ -286,7 +288,9 @@ set(HYENGINE_HEADER_FILES
 	include/Scene/Nodes/Objects/IHyCamera.h
 	include/Scene/Physics/HyPhysicsBody.h
 	include/Scene/Physics/HyPhysicsDraw.h
-	include/Scene/Physics/HyShape2d.h
+	include/Scene/Physics/Fixtures/HyChain2d.h
+	include/Scene/Physics/Fixtures/HyShape2d.h
+	include/Scene/Physics/Fixtures/IHyFixture2d.h
 	include/Threading/IHyThreadClass.h
 	include/Time/HyTime.h
 	include/Time/Watches/HyStopwatch.h

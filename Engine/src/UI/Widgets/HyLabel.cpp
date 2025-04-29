@@ -110,17 +110,17 @@ void HyLabel::Setup(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit
 {
 	if(m_Panel.IsBoundingVolume() && m_Panel.GetBvShape())
 	{
-		for(HyShape2d *pShape : m_ShapeList)
+		for(IHyFixture2d *pFixture : m_FixtureList)
 		{
-			if(pShape == m_Panel.GetBvShape())
-				ShapeRemove(*m_Panel.GetBvShape());
+			if(pFixture == m_Panel.GetBvShape())
+				FixtureRemove(*m_Panel.GetBvShape());
 		}
 	}
 
 	m_Panel.Setup(panelInit);
 
 	if(m_Panel.IsBoundingVolume() && m_Panel.GetBvShape())
-		ShapeAppend(*m_Panel.GetBvShape());
+		FixtureAppend(*m_Panel.GetBvShape());
 
 	m_Text.Init(textInit.m_NodePath, this);
 	m_TextMargins = textInit.m_Margins;

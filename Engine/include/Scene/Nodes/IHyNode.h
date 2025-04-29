@@ -20,7 +20,7 @@ class IHyNode
 	friend class HyScene;
 	friend class HyAnimFloat;
 	friend class IHyBody;
-	friend class HyShape2d;
+	friend class HyChain2d;
 	friend class HyEntity2d;
 	friend class HyPhysicsCtrl2d;
 

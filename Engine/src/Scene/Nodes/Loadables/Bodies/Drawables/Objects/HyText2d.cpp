@@ -59,7 +59,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	float fHalfWidth = GetWidth(0.5f);
 	float fHalfHeight = GetHeight(0.5f);
 
-	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
+	if(fHalfWidth <= HyMath::FloatSlop || fHalfHeight <= HyMath::FloatSlop)
 		return;
 
 	glm::vec2 ptCenter(ptBotLeft.x + fHalfWidth, ptBotLeft.y + fHalfHeight);

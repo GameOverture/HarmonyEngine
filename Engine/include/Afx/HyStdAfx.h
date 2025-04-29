@@ -177,15 +177,15 @@ enum HyPlaylistMode
 };
 static_assert(HYNUM_PLAYLISTS <= 8, "HyPlayListMode enum cannot exceed '8' entries because it's stored using '3' bits in struct AudioStateAttribs");
 
-enum HyShapeType
+enum HyFixtureType
 {
-	HYSHAPE_Nothing = -1,
+	HYFIXTURE_Nothing = -1,
 
-	HYSHAPE_Circle = 0,
-	HYSHAPE_LineSegment,
-	HYSHAPE_Polygon,
-	HYSHAPE_LineChain,
-	HYSHAPE_Capsule
+	HYFIXTURE_Circle = 0,
+	HYFIXTURE_LineSegment,
+	HYFIXTURE_Polygon,
+	HYFIXTURE_Capsule,
+	HYFIXTURE_LineChain
 };
 
 enum HyLoadState

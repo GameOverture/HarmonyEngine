@@ -11,85 +11,45 @@
 #define HyShape2d_h__
 
 #include "Afx/HyStdAfx.h"
+#include "Scene/Physics/Fixtures/IHyFixture2d.h"
 
 class HyEntity2d;
 class HyRect;
 
-struct HyChainData
+class HyShape2d : public IHyFixture2d
 {
-	glm::vec2 *		pPointList; // Dynamically allocated
-	int				iCount;
-	bool			bLoop;		// If true, pPointList/iCount is guaranteed to not include the "final" point (a repeat of the first point)
-};
-
-class HyShape2d
-{
-	friend class HyEntity2d;
-	friend class HyPrimitive2d;
-	friend class HyPhysicsCtrl2d;
-	friend class HyBox2dDestructListener;
-
-	HyEntity2d *								m_pParent;
-
-	HyShapeType									m_eType;
 	union ShapeData
 	{
-		b2Capsule		capsule;
 		b2Circle		circle;
-		b2Polygon		polygon;
 		b2Segment		segment;
-		HyChainData		chain;
+		b2Polygon		polygon;
+		b2Capsule		capsule;
 	}											m_Data;		// NOTE: This shape is stored in pixel units like everything else. It is converted to pixel-per-meters when sent to Box2d
-
-	union PhysicsHandle
-	{
-		b2ShapeId		shape;
-		b2ChainId		chain;
-	}											m_hPhysics;
-	bool 										m_bPhysicsAllowed;
+	
+	b2ShapeId									m_hPhysics;
 	b2ShapeDef *								m_pPhysicsInit;
-	bool										m_bPhysicsDirty;
-
-	// Physics Collisions
-	float										m_fMaxPush;			// Setting this to FLT_MAX makes it as rigid as possible. Lower values can make the plane collision soft. Usually in meters.
-	bool										m_bClipVelocity;	// Indicates if b2ClipVector should clip against this plane. Should be false for soft collision.
 
 public:
-	static const float							FloatSlop;
-
 	HyShape2d(HyEntity2d *pParent = nullptr);
 	HyShape2d(const HyShape2d &copyRef);
 	virtual ~HyShape2d();
 
 	const HyShape2d &operator=(const HyShape2d &rhs);
 
-	HyShapeType GetType() const;
-	bool IsValidShape() const;
 	const b2Circle &GetAsCircle() const;
 	const b2Segment &GetAsSegment() const;
 	const b2Polygon &GetAsPolygon() const;
-	const HyChainData &GetAsChain() const;
 	const b2Capsule &GetAsCapsule() const;
 
-	void TransformSelf(const glm::mat4 &mtxTransform);
+	virtual void TransformSelf(const glm::mat4 &mtxTransform) override;
 
-	glm::vec2 ComputeSize() const;
-	void GetCentroid(glm::vec2 &ptCentroidOut) const;
+	bool GetCentroid(glm::vec2 &ptCentroidOut) const;
 	float CalcArea() const; // Returns the area in meters squared
-
-	void ParentDetach();
-	HyEntity2d *ParentGet() const;
 
 	void SetAsNothing();
 
 	// Set as an isolated edge/line. When used in a physics simulation, these segments have double sided collision
 	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const b2ShapeDef *pPhysicsInit = nullptr);
-
-	// A series of line segments chained to gether. 'bLoop' is whether to automatically connects last vertex to the first.
-	// Passed in parameters are copied, and understood to be local coordinates.
-	// When used in a physics simulation, the line chain only has right-side collision.
-	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoop, const b2ShapeDef *pPhysicsInit = nullptr);
-	void SetAsLineChain(const std::vector<glm::vec2> &verticesList, bool bLoop, const b2ShapeDef *pPhysicsInit = nullptr);
 
 	// Set as a circle with the specified center and radius
 	bool SetAsCircle(float fRadius, const b2ShapeDef *pPhysicsInit = nullptr);
@@ -111,9 +71,7 @@ public:
 	bool SetAsCapsule(const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, const b2ShapeDef *pPhysicsInit = nullptr);
 
 	// Applies when attached to a physics body
-	bool IsPhysicsAllowed() const;
-	void SetPhysicsAllowed(bool bIsPhysicsAllowed);	// Whether the parent entity will use this shape for physics simulation
-	void Setup(const b2ShapeDef &fixtureDefRef);
+	void Setup(const b2ShapeDef &shapeDefRef);
 	float GetDensity() const;
 	void SetDensity(float fDensity, bool bUpdateBodyMass = true); // Usually in kg / m ^ 2.
 	void SetDensityInKg(float fWeightKg, bool bUpdateBodyMass = true); // Sets the density using the "weight" of currently set shape
@@ -125,30 +83,22 @@ public:
 	void SetFilter(const b2Filter &filter); // WARNING: This function is potentially expensive if this shape is a line chain and its parent entity has already been physics.Activate()
 	bool IsSensor() const;
 
-	bool TestPoint(const glm::vec2 &ptTestPoint, const glm::mat4 &mtxSelfTransform) const;
-	b2CastOutput TestRay(const glm::vec2 &ptStart, const glm::vec2 &vDirection, const glm::mat4 &mtxSelfTransform) const;
+	virtual bool TestPoint(const glm::vec2 &ptTestPoint, const glm::mat4 &mtxSelfTransform) const override;
+	virtual b2CastOutput TestRay(const glm::vec2 &ptStart, const glm::vec2 &vDirection, const glm::mat4 &mtxSelfTransform) const override;
 	//bool IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const;
 
-	bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const;
-
-	// Setting this to FLT_MAX makes the plane as rigid as possible. Lower values can make the plane collision soft. Usually in meters.
-	void SetSoftCollision(float fMaxPush);
-	void SetHardCollision();
-	void GetCollisionInfo(float &fPushLimitOut, bool &bClipVelocityOut) const;
+	virtual bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const override;
 
 protected:
 	void ClearShapeData();
-	
 	void ShapeChanged();
 
 	bool IsPhysicsRegistered() const;
-	bool IsPhysicsDirty() const;
-	void PhysicsAttach();
-	void PhysicsRemove(bool bUpdateBodyMass);
+	bool IsPhysicsInitialized() const;
+	virtual void PhysicsAttach() override;
+	virtual void PhysicsRemove(bool bUpdateBodyMass) override;
 
-	bool ComputeChainAabb(b2AABB &aabbOut, const ShapeData &shapeData) const;
-
-	// NOTE: Assumes 'shapeDataOut' starts as zeroed-out ShapeData. Will newly dynamically allocate for chain types
+	// NOTE: Assumes 'shapeDataOut' starts as zeroed-out ShapeData
 	bool TransformShapeData(ShapeData &shapeDataOut, const glm::mat4 &mtxTransform) const;
 	bool TransformShapeData(ShapeData &shapeDataOut, float fPpmInverse) const;
 };

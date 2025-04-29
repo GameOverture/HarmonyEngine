@@ -8,8 +8,9 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Scene/HyScene.h"
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
+#include "Scene/Physics/Fixtures/IHyFixture2d.h"
 #include "Renderer/Effects/HyStencil.h"
 #include "HyEngine.h"
 
@@ -38,9 +39,9 @@ HyEntity2d::~HyEntity2d(void)
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 
+	while(m_FixtureList.empty() == false)
+		m_FixtureList[m_FixtureList.size() - 1]->ParentDetach();
 	physics.Destroy(true); // Destroy physics body first to detach all shapes more efficiently
-	while(m_ShapeList.empty() == false)
-		m_ShapeList[m_ShapeList.size() - 1]->ParentDetach();
 
 	ClearScissor(true);
 }
@@ -476,63 +477,66 @@ bool HyEntity2d::IsMouseDown() const
 	return (m_uiEntityAttribs & ENTITYATTRIB_MouseInputDown) != 0;
 }
 
-void HyEntity2d::ShapeAppend(HyShape2d &shapeRef)
+void HyEntity2d::FixtureAppend(IHyFixture2d &fixtureRef)
 {
-	if(this == shapeRef.ParentGet())
+	if(this == fixtureRef.ParentGet())
 		return;
 
-	shapeRef.ParentDetach();
-	m_ShapeList.push_back(&shapeRef);
-	shapeRef.m_pParent = this;
+	fixtureRef.ParentDetach();
+	m_FixtureList.push_back(&fixtureRef);
+	fixtureRef.m_pParent = this;
 
-	SyncPhysicsShapes();
+	SyncPhysicsFixtures();
 }
 
-bool HyEntity2d::ShapeRemove(HyShape2d &childShapeRef)
+bool HyEntity2d::FixtureRemove(IHyFixture2d &childFixtureRef)
 {
-	bool bPhysShapeRemoved = false;
-	if(physics.IsActivated())
-	{
-		std::vector<b2ShapeId> shapeList(m_ShapeList.size());
-		int iNumAttachedShapes = b2Body_GetShapes(physics.GetHandle(), shapeList.data(), static_cast<int>(shapeList.size()));
-		for(int i = 0; i < iNumAttachedShapes; ++i)
-		{
-			b2ShapeId shapeId = shapeList[i];
-			HyShape2d *pShape = reinterpret_cast<HyShape2d *>(b2Shape_GetUserData(shapeId));
-			if(pShape == &childShapeRef)
-			{
-				pShape->PhysicsRemove(true);
-				bPhysShapeRemoved = true;
-			}
-		}
-		if(bPhysShapeRemoved == false)
-			HyLogError("HyEntity2d::ShapeRemove failed to find physics shape to remove");
-	}
-	else
-		bPhysShapeRemoved = true;
+	//bool bPhysShapeRemoved = false;
+	//if(physics.IsActivated())
+	//{
+	//	std::vector<b2ShapeId> shapeList(m_FixtureList.size());
+	//	int iNumAttachedShapes = b2Body_GetShapes(physics.GetHandle(), shapeList.data(), static_cast<int>(shapeList.size()));
+	//	for(int i = 0; i < iNumAttachedShapes; ++i)
+	//	{
+	//		b2ShapeId shapeId = shapeList[i];
+	//		HyShape2d *pShape = reinterpret_cast<HyShape2d *>(b2Shape_GetUserData(shapeId));
+	//		if(pShape == &childFixtureRef)
+	//		{
+	//			pShape->PhysicsRemove(true);
+	//			bPhysShapeRemoved = true;
+	//		}
+	//	}
+	//	if(bPhysShapeRemoved == false)
+	//		HyLogError("HyEntity2d::ShapeRemove failed to find physics shape to remove");
+	//}
+	//else
+	//	bPhysShapeRemoved = true;
 
-	for(auto iter = m_ShapeList.begin(); iter != m_ShapeList.end(); ++iter)
+	for(auto iter = m_FixtureList.begin(); iter != m_FixtureList.end(); ++iter)
 	{
-		if(*iter == &childShapeRef)
+		if(*iter == &childFixtureRef)
 		{
-			m_ShapeList.erase(iter);
-			childShapeRef.m_pParent = nullptr;
-			return bPhysShapeRemoved;
+			// Fixture found as a child, now also remove it from the physics simulation
+			childFixtureRef.PhysicsRemove(true);
+
+			m_FixtureList.erase(iter);
+			childFixtureRef.m_pParent = nullptr;
+			return true;// bPhysShapeRemoved;
 		}
 	}
 
 	return false;
 }
 
-uint32 HyEntity2d::ShapeCount() const
+uint32 HyEntity2d::FixtureCount() const
 {
-	return static_cast<uint32>(m_ShapeList.size());
+	return static_cast<uint32>(m_FixtureList.size());
 }
 
-HyShape2d *HyEntity2d::ShapeGet(uint32 uiIndex)
+IHyFixture2d *HyEntity2d::FixtureGet(uint32 uiIndex)
 {
-	HyAssert(uiIndex < static_cast<uint32>(m_ShapeList.size()), "HyEntity2d::ShapeGet passed an invalid index");
-	return m_ShapeList[uiIndex];
+	HyAssert(uiIndex < static_cast<uint32>(m_FixtureList.size()), "HyEntity2d::FixtureGet passed an invalid index");
+	return m_FixtureList[uiIndex];
 }
 
 bool HyEntity2d::IsReverseDisplayOrder() const
@@ -892,12 +896,12 @@ bool HyEntity2d::CalcMouseInBounds()
 			return false;
 	}
 
-	if(ShapeCount() > 0)
+	if(FixtureCount() > 0)
 	{
-		for(int32 i = 0; i < m_ShapeList.size(); ++i)
+		for(int32 i = 0; i < m_FixtureList.size(); ++i)
 		{
-			HyShape2d *pHyShape = m_ShapeList[i];
-			if(pHyShape->TestPoint(ptMouseInSceneCoords, GetSceneTransform(0.0f)))
+			IHyFixture2d *pFixture = m_FixtureList[i];
+			if(pFixture->TestPoint(ptMouseInSceneCoords, GetSceneTransform(0.0f)))
 				return true;
 		}
 	}
@@ -907,23 +911,26 @@ bool HyEntity2d::CalcMouseInBounds()
 	return false;
 }
 
-void HyEntity2d::SyncPhysicsShapes()
+void HyEntity2d::SyncPhysicsFixtures()
 {
 	if(B2_IS_NULL(physics.GetHandle()))
 		return;
 
-	for(int32 i = 0; i < m_ShapeList.size(); ++i)
+	for(int32 i = 0; i < m_FixtureList.size(); ++i)
 	{
-		HyShape2d *pShape = m_ShapeList[i];
-		if(pShape->IsPhysicsDirty())
+		IHyFixture2d *pFixture = m_FixtureList[i];
+		if(pFixture->IsPhysicsDirty())
 		{
-			if(pShape->IsValidShape() && pShape->IsPhysicsAllowed())
+			if(pFixture->IsValid() && pFixture->IsPhysicsAllowed())
 			{
-				HyAssert(false == (physics.GetType() == HYBODY_Dynamic && pShape->GetDensity() == 0.0f), "HyEntity2d::SyncPhysicsFixtures - Attempting to create a fixture with zero density on a dynamic body");
-				pShape->PhysicsAttach();
+				if(pFixture->GetType() != HYFIXTURE_LineChain)
+				{
+					HyAssert(false == (physics.GetType() == HYBODY_Dynamic && static_cast<HyShape2d *>(pFixture)->GetDensity() == 0.0f), "HyEntity2d::SyncPhysicsFixtures - Attempting to create a fixture with zero density on a dynamic body");
+				}
+				pFixture->PhysicsAttach();
 			}
 			else
-				pShape->PhysicsRemove(true);
+				pFixture->PhysicsRemove(true);
 		}
 	}
 }

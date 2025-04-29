@@ -239,6 +239,8 @@ struct HyUvCoord
 class HyMath
 {
 public:
+	static const float							FloatSlop;
+
 	template <typename T>
 	static T Clamp(const T &value, const T &low, const T &high)
 	{

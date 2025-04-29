@@ -10,6 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
+#include "Scene/Physics/Fixtures/HyShape2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
 #include "Assets/Nodes/Objects/HySpriteData.h"
 #include "Assets/Files/HyFileAtlas.h"
@@ -80,8 +81,9 @@ const HySprite2d &HySprite2d::operator=(const HySprite2d &rhs)
 		ptBoxCenter = ptBotLeft + glm::vec2(fHalfWidth, fHalfHeight);
 	}
 
-	if(fHalfWidth <= HyShape2d::FloatSlop || fHalfHeight <= HyShape2d::FloatSlop)
+	if(fHalfWidth <= HyMath::FloatSlop || fHalfHeight <= HyMath::FloatSlop)
 		return;
+
 	shapeOut.SetAsBox(HyRect(fHalfWidth, fHalfHeight, ptBoxCenter, 0.0f));
 }
 

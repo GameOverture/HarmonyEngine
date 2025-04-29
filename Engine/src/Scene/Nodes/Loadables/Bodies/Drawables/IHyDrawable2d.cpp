@@ -68,7 +68,7 @@ IHyDrawable2d &IHyDrawable2d::operator=(IHyDrawable2d &&donor) noexcept
 		// Sets 'm_SceneAABB' to a scene transformed, conforming AABB around the visible portion of *this
 		HyShape2d shape;
 		CalcLocalBoundingShape(shape);
-		if(shape.IsValidShape())
+		if(shape.IsValid())
 			shape.ComputeAABB(m_SceneAABB, GetSceneTransform(0.0f));
 
 		ClearDirty(DIRTY_SceneAABB);
