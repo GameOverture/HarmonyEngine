@@ -80,6 +80,17 @@ enum ItemType
 	// Entity items
 	ITEM_BoundingVolume,
 	ITEM_Physics,
+	// UI widgets
+	ITEM_UiLabel,
+	ITEM_UiButton,
+	ITEM_UiRackMeter,
+	ITEM_UiBarMeter,
+	ITEM_UiCheckBox,
+	ITEM_UiRadioButton,
+	ITEM_UiTextField,
+	ITEM_UiTextArea,
+	ITEM_UiComboBox,
+	ITEM_UiSlider,
 
 	NUM_ITEMTYPES
 };

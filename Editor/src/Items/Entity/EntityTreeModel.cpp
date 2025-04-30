@@ -398,6 +398,8 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Audio", "Pitch", PROPERTIESTYPE_double, 1.0, "The pitch of the audio", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.01);
 		break;
 
+	// TODO: Add all the UI widgets
+
 	default:
 		HyGuiLog(QString("EntityTreeItem::InitalizePropertiesTree - unsupported type: ") % QString::number(GetType()), LOGTYPE_Error);
 		break;

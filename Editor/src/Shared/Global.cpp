@@ -65,6 +65,16 @@
 	sm_sItemNames[ITEM_Header] = "Header";
 	sm_sItemNames[ITEM_BoundingVolume] = "BoundingVolume";
 	sm_sItemNames[ITEM_Physics] = "Physics";
+	sm_sItemNames[ITEM_UiLabel] = "Label";
+	sm_sItemNames[ITEM_UiButton] = "Button";
+	sm_sItemNames[ITEM_UiRackMeter] = "RackMeter";
+	sm_sItemNames[ITEM_UiBarMeter] = "BarMeter";
+	sm_sItemNames[ITEM_UiCheckBox] = "CheckBox";
+	sm_sItemNames[ITEM_UiRadioButton] = "RadioButton";
+	sm_sItemNames[ITEM_UiTextField] = "TextField";
+	sm_sItemNames[ITEM_UiTextArea] = "TextArea";
+	sm_sItemNames[ITEM_UiComboBox] = "ComboBox";
+	sm_sItemNames[ITEM_UiSlider] = "Slider";
 
 	sm_sItemNamesPlural[ITEM_Project] = "Projects";
 	sm_sItemNamesPlural[ITEM_Prefix] = "Prefixes";
@@ -87,6 +97,16 @@
 	sm_sItemNamesPlural[ITEM_Header] = "Headers";
 	sm_sItemNamesPlural[ITEM_BoundingVolume] = "BoundingVolumes";
 	sm_sItemNamesPlural[ITEM_Physics] = "Physics";
+	sm_sItemNamesPlural[ITEM_UiLabel] = "Labels";
+	sm_sItemNamesPlural[ITEM_UiButton] = "Buttons";
+	sm_sItemNamesPlural[ITEM_UiRackMeter] = "RackMeters";
+	sm_sItemNamesPlural[ITEM_UiBarMeter] = "BarMeters";
+	sm_sItemNamesPlural[ITEM_UiCheckBox] = "CheckBoxes";
+	sm_sItemNamesPlural[ITEM_UiRadioButton] = "RadioButtons";
+	sm_sItemNamesPlural[ITEM_UiTextField] = "TextFields";
+	sm_sItemNamesPlural[ITEM_UiTextArea] = "TextAreas";
+	sm_sItemNamesPlural[ITEM_UiComboBox] = "ComboBoxes";
+	sm_sItemNamesPlural[ITEM_UiSlider] = "Sliders";
 
 	sm_AssetNames[ASSETMAN_Source] = "Source";
 	sm_AssetNames[ASSETMAN_Atlases] = "Atlases";
@@ -261,6 +281,16 @@
 	list.append(ITEM_Header);
 	list.append(ITEM_BoundingVolume);
 	list.append(ITEM_Physics);
+	list.append(ITEM_UiLabel);
+	list.append(ITEM_UiButton);
+	list.append(ITEM_UiRackMeter);
+	list.append(ITEM_UiBarMeter);
+	list.append(ITEM_UiCheckBox);
+	list.append(ITEM_UiRadioButton);
+	list.append(ITEM_UiTextField);
+	list.append(ITEM_UiTextArea);
+	list.append(ITEM_UiComboBox);
+	list.append(ITEM_UiSlider);
 
 	if(list.size() != NUM_ITEMTYPES)
 		HyGuiLog("HyGlobal::GetTypeList missing a type!", LOGTYPE_Error);

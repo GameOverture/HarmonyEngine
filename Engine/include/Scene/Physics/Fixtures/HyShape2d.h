@@ -36,10 +36,10 @@ public:
 
 	const HyShape2d &operator=(const HyShape2d &rhs);
 
-	const b2Circle &GetAsCircle() const;
-	const b2Segment &GetAsSegment() const;
-	const b2Polygon &GetAsPolygon() const;
-	const b2Capsule &GetAsCapsule() const;
+	b2Circle GetAsCircle() const;
+	b2Segment GetAsSegment() const;
+	b2Polygon GetAsPolygon() const;
+	b2Capsule GetAsCapsule() const;
 
 	virtual void TransformSelf(const glm::mat4 &mtxTransform) override;
 

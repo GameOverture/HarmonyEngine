@@ -59,7 +59,7 @@ const HyShape2d &HyShape2d::operator=(const HyShape2d &rhs)
 	return *this;
 }
 
-const b2Circle &HyShape2d::GetAsCircle() const
+b2Circle HyShape2d::GetAsCircle() const
 {
 	if(m_eType != HYFIXTURE_Circle)
 	{
@@ -69,7 +69,7 @@ const b2Circle &HyShape2d::GetAsCircle() const
 	return m_Data.circle;
 }
 
-const b2Segment &HyShape2d::GetAsSegment() const
+b2Segment HyShape2d::GetAsSegment() const
 {
 	if(m_eType != HYFIXTURE_LineSegment)
 	{
@@ -79,7 +79,7 @@ const b2Segment &HyShape2d::GetAsSegment() const
 	return m_Data.segment;
 }
 
-const b2Polygon &HyShape2d::GetAsPolygon() const
+b2Polygon HyShape2d::GetAsPolygon() const
 {
 	if(m_eType != HYFIXTURE_Polygon)
 	{
@@ -89,7 +89,7 @@ const b2Polygon &HyShape2d::GetAsPolygon() const
 	return m_Data.polygon;
 }
 
-const b2Capsule &HyShape2d::GetAsCapsule() const
+b2Capsule HyShape2d::GetAsCapsule() const
 {
 	if(m_eType != HYFIXTURE_Capsule)
 	{
