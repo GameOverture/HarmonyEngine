@@ -610,7 +610,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		EntityDrawItem *pEntDrawItem = static_cast<EntityDrawItem *>(pDrawItem);
 
 		// This updates the preview of a shape (its 'outline') when being transformed
-		if(pEntDrawItem->GetEntityTreeItemData()->GetType() == ITEM_BoundingVolume)
+		if(pEntDrawItem->GetEntityTreeItemData()->GetType() == ITEM_FixtureShape || pEntDrawItem->GetEntityTreeItemData()->GetType() == ITEM_FixtureChain)
 			pEntDrawItem->GetShapeCtrl().Setup(pEntDrawItem->GetShapeCtrl().GetShapeType(), HyGlobal::GetEditorColor(EDITORCOLOR_Shape), 0.7f, 0.0f);
 
 		newTransformList.push_back(pEntDrawItem->GetHyNode()->GetSceneTransform(0.0f));

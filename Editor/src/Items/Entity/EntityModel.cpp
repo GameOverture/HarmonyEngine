@@ -709,7 +709,8 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 		switch(pItem->GetType())
 		{
 		case ITEM_Primitive:
-		case ITEM_BoundingVolume:
+		case ITEM_FixtureShape:
+		case ITEM_FixtureChain:
 		case ITEM_Entity:
 			sInitialization = "(this)";
 			break;

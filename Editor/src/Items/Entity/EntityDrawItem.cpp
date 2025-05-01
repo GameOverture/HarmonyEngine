@@ -111,7 +111,7 @@ EntityDraw &EntityDrawItem::GetEntityDraw()
 
 /*virtual*/ IHyBody2d *EntityDrawItem::GetHyNode() /*override*/
 {
-	if(m_pEntityTreeItemData->GetType() == ITEM_Primitive || m_pEntityTreeItemData->GetType() == ITEM_BoundingVolume)
+	if(m_pEntityTreeItemData->GetType() == ITEM_Primitive || m_pEntityTreeItemData->GetType() == ITEM_FixtureShape || m_pEntityTreeItemData->GetType() == ITEM_FixtureChain)
 		return &m_ShapeCtrl.GetPrimitive(true);
 
 	return m_pChild;
@@ -576,7 +576,7 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 		const QJsonObject &propsObj = keyFrameMapRef[iFrame];
 
 		// Parse all and only the potential categories of the 'eItemType' type, and set the values to 'pHyNode'
-		if(eItemType != ITEM_BoundingVolume)
+		if(eItemType != ITEM_FixtureShape && eItemType != ITEM_FixtureChain)
 		{
 			if(propsObj.contains("Common"))
 			{
@@ -699,15 +699,16 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 			}
 		}
 		[[fallthrough]];
-		case ITEM_BoundingVolume: {
+		case ITEM_FixtureShape:
+		case ITEM_FixtureChain: {
 			if(pShapeCtrl && propsObj.contains("Shape"))
 			{
 				QJsonObject shapeObj = propsObj["Shape"].toObject();
 				if(shapeObj.contains("Type") && shapeObj.contains("Data"))
 				{
 					EditorShape eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
-					float fBvAlpha = (eItemType == ITEM_BoundingVolume) ? 0.0f : 1.0f;
-					float fOutlineAlpha = (eItemType == ITEM_BoundingVolume || bIsSelected) ? 1.0f : 0.0f;
+					float fBvAlpha = (eItemType == ITEM_FixtureShape || eItemType == ITEM_FixtureChain) ? 0.0f : 1.0f;
+					float fOutlineAlpha = ((eItemType == ITEM_FixtureShape || eItemType == ITEM_FixtureChain) || bIsSelected) ? 1.0f : 0.0f;
 
 					HyColor color = HyGlobal::GetEditorColor(EDITORCOLOR_Shape);
 					if(eItemType == ITEM_Primitive)

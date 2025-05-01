@@ -259,7 +259,7 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 			pDestinationParent = entTreeModelRef.GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
 		else
 		{
-			if(m_SelectedItemDataList[i]->GetType() == ITEM_BoundingVolume)
+			if(m_SelectedItemDataList[i]->GetType() == ITEM_FixtureShape || m_SelectedItemDataList[i]->GetType() == ITEM_FixtureChain)
 				pDestinationParent = entTreeModelRef.GetBvFolderTreeItemData();
 			else
 				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
@@ -282,7 +282,7 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 			pDestinationParent = entTreeModelRef.GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
 		else
 		{
-			if(m_SelectedItemDataList[i]->GetType() == ITEM_BoundingVolume)
+			if(m_SelectedItemDataList[i]->GetType() == ITEM_FixtureShape || m_SelectedItemDataList[i]->GetType() == ITEM_FixtureChain)
 				pDestinationParent = entTreeModelRef.GetBvFolderTreeItemData();
 			else
 				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
@@ -331,7 +331,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	m_CreatedKeyFrameList.clear();
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
-		if(m_AffectedItemDataList[i]->GetType() != ITEM_BoundingVolume)
+		if(m_AffectedItemDataList[i]->GetType() != ITEM_FixtureShape && m_AffectedItemDataList[i]->GetType() != ITEM_FixtureChain)
 		{
 			glm::decompose(m_NewTransformList[i], vNewScale, quatRot, ptNewTranslation, vSkew, vPerspective);
 			double dNewRotation = glm::degrees(glm::atan(m_NewTransformList[i][0][1], m_NewTransformList[i][0][0]));
@@ -412,7 +412,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	QList<QUuid> affectedItemUuidList;
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
-		if(m_AffectedItemDataList[i]->GetType() != ITEM_BoundingVolume)
+		if(m_AffectedItemDataList[i]->GetType() != ITEM_FixtureShape && m_AffectedItemDataList[i]->GetType() != ITEM_FixtureChain)
 		{
 			glm::decompose(m_OldTransformList[i], vOldScale, quatRot, ptOldTranslation, vSkew, vPerspective);
 			double dOldRotation = glm::degrees(glm::atan(m_OldTransformList[i][0][1], m_OldTransformList[i][0][0]));
@@ -523,10 +523,12 @@ EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityIt
 	m_pPrevShapeItemData(pShapeItemData),
 	m_iPoppedIndex(-1)
 {
-	if(m_pPrevShapeItemData->GetType() == ITEM_BoundingVolume)
-		setText("Convert shape to Primitive");
+	if(m_pPrevShapeItemData->GetType() == ITEM_FixtureShape)
+		setText("Convert Fixture Shape to Primitive");
+	else if(m_pPrevShapeItemData->GetType() == ITEM_Primitive)
+		setText("Convert Primitive to Fixture Shape");
 	else
-		setText("Convert shape to Bounding Volume");
+		HyGuiLog("EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape() - Wrong type", LOGTYPE_Error);
 }
 
 /*virtual*/ EntityUndoCmd_ConvertShape::~EntityUndoCmd_ConvertShape()
@@ -541,7 +543,12 @@ EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityIt
 	{
 		QJsonObject descObj;
 		m_pPrevShapeItemData->InsertJsonInfo_Desc(descObj);
-		descObj["Type"] = m_pPrevShapeItemData->GetType() == ITEM_BoundingVolume ? HyGlobal::ItemName(ITEM_Primitive, false) : HyGlobal::ItemName(ITEM_BoundingVolume, false);
+
+		if(m_pPrevShapeItemData->GetType() == ITEM_FixtureShape)
+			descObj["Type"] = HyGlobal::ItemName(ITEM_Primitive, false);
+		else
+			descObj["Type"] = HyGlobal::ItemName(ITEM_FixtureShape, false);
+
 		m_pNewShapeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingItem(descObj, m_pPrevShapeItemData->GetEntType() == ENTTYPE_ArrayItem, -1);
 	}
 	else

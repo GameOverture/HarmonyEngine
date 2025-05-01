@@ -45,16 +45,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="btnAddPrimitivePolygon">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QToolButton" name="btnAddPrimitiveSegment">
             <property name="text">
              <string>...</string>
@@ -65,7 +55,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="btnAddPrimitiveChain">
+           <widget class="QToolButton" name="btnAddPrimitivePolygon">
             <property name="text">
              <string>...</string>
             </property>
@@ -75,7 +65,17 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="btnAddPrimitiveLoop">
+           <widget class="QToolButton" name="btnAddPrimitiveCapsule">
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnAddPrimitiveChain">
             <property name="text">
              <string>...</string>
             </property>
@@ -162,16 +162,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="btnAddShapePolygon">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QToolButton" name="btnAddShapeSegment">
             <property name="text">
              <string>...</string>
@@ -182,7 +172,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="btnAddShapeChain">
+           <widget class="QToolButton" name="btnAddShapePolygon">
             <property name="text">
              <string>...</string>
             </property>
@@ -192,7 +182,17 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="btnAddShapeLoop">
+           <widget class="QToolButton" name="btnAddShapeCapsule">
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnAddShapeChain">
             <property name="text">
              <string>...</string>
             </property>
@@ -602,19 +602,19 @@
     <string>Adds a child primitive to the entity, set as a line chain</string>
    </property>
   </action>
-  <action name="actionAddLineLoopPrimitive">
+  <action name="actionAddCapsulePrimitive">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/shapes/primitive_lineLoop.png</normaloff>:/icons16x16/shapes/primitive_lineLoop.png</iconset>
+     <normaloff>:/icons16x16/shapes/primitive_capsule.png</normaloff>:/icons16x16/shapes/primitive_capsule.png</iconset>
    </property>
    <property name="text">
-    <string>Add Line Loop Primitive</string>
+    <string>Add Capsule Primitive</string>
    </property>
    <property name="toolTip">
-    <string>Adds a child primitive to the entity, set as a line loop</string>
+    <string>Adds a child primitive to the entity, set as a capsule</string>
    </property>
   </action>
   <action name="actionAddBoxShape">
@@ -629,7 +629,7 @@
     <string>Add Box Shape</string>
    </property>
    <property name="toolTip">
-    <string>Adds a shape bounding volume to the entity, set as a box</string>
+    <string>Adds a Box fixture shape to the entity</string>
    </property>
   </action>
   <action name="actionAddCircleShape">
@@ -644,7 +644,7 @@
     <string>Add Circle Shape</string>
    </property>
    <property name="toolTip">
-    <string>Adds a shape bounding volume to the entity, set as a circle</string>
+    <string>Adds a circle fixture shape to the entity</string>
    </property>
   </action>
   <action name="actionAddPolygonShape">
@@ -659,7 +659,7 @@
     <string>Add Polygon Shape</string>
    </property>
    <property name="toolTip">
-    <string>Adds a shape bounding volume to the entity, set as a polygon</string>
+    <string>Adds a polygon fixture shape to the entity</string>
    </property>
   </action>
   <action name="actionAddSegmentShape">
@@ -674,7 +674,7 @@
     <string>Add Line Segment Shape</string>
    </property>
    <property name="toolTip">
-    <string>Adds a shape bounding volume to the entity, set as a line segment</string>
+    <string>Adds a line segment fixture shape to the entity</string>
    </property>
   </action>
   <action name="actionAddLineChainShape">
@@ -689,22 +689,22 @@
     <string>Add Line Chain Shape</string>
    </property>
    <property name="toolTip">
-    <string>Adds a shape bounding volume to the entity, set as a line chain</string>
+    <string>Adds a chain fixture to the entity</string>
    </property>
   </action>
-  <action name="actionAddLineLoopShape">
+  <action name="actionAddCapsuleShape">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/shapes/shapes_lineLoop.png</normaloff>:/icons16x16/shapes/shapes_lineLoop.png</iconset>
+     <normaloff>:/icons16x16/shapes/shapes_capsule.png</normaloff>:/icons16x16/shapes/shapes_capsule.png</iconset>
    </property>
    <property name="text">
-    <string>Add Line Loop Shape</string>
+    <string>Add Capsule Shape</string>
    </property>
    <property name="toolTip">
-    <string>Adds a shape bounding volume to the entity, set as a line loop</string>
+    <string>Adds a capsule shape fixture to the entity</string>
    </property>
   </action>
   <action name="actionVertexEditMode">

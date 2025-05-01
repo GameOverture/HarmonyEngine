@@ -63,8 +63,8 @@
 	sm_sItemNames[ITEM_SoundClip] = "SoundClip";
 	sm_sItemNames[ITEM_Source] = "Source";
 	sm_sItemNames[ITEM_Header] = "Header";
-	sm_sItemNames[ITEM_BoundingVolume] = "BoundingVolume";
-	sm_sItemNames[ITEM_Physics] = "Physics";
+	sm_sItemNames[ITEM_FixtureShape] = "Shape";
+	sm_sItemNames[ITEM_FixtureChain] = "Chain";
 	sm_sItemNames[ITEM_UiLabel] = "Label";
 	sm_sItemNames[ITEM_UiButton] = "Button";
 	sm_sItemNames[ITEM_UiRackMeter] = "RackMeter";
@@ -95,8 +95,8 @@
 	sm_sItemNamesPlural[ITEM_SoundClip] = "SoundClips";
 	sm_sItemNamesPlural[ITEM_Source] = "Source";
 	sm_sItemNamesPlural[ITEM_Header] = "Headers";
-	sm_sItemNamesPlural[ITEM_BoundingVolume] = "BoundingVolumes";
-	sm_sItemNamesPlural[ITEM_Physics] = "Physics";
+	sm_sItemNamesPlural[ITEM_FixtureShape] = "Shapes";
+	sm_sItemNamesPlural[ITEM_FixtureChain] = "Chains";
 	sm_sItemNamesPlural[ITEM_UiLabel] = "Labels";
 	sm_sItemNamesPlural[ITEM_UiButton] = "Buttons";
 	sm_sItemNamesPlural[ITEM_UiRackMeter] = "RackMeters";
@@ -116,10 +116,10 @@
 	sm_ShapeNames[SHAPE_None] = "None";
 	sm_ShapeNames[SHAPE_Box] = "Box";
 	sm_ShapeNames[SHAPE_Circle] = "Circle";
+	sm_ShapeNames[SHAPE_LineSegment] = "Segment";
 	sm_ShapeNames[SHAPE_Polygon] = "Polygon";
-	sm_ShapeNames[SHAPE_LineSegment] = "Line Segment";
-	sm_ShapeNames[SHAPE_LineChain] = "Line Chain";
-	sm_ShapeNames[SHAPE_LineLoop] = "Line Loop";
+	sm_ShapeNames[SHAPE_Capsule] = "Capsule";
+	sm_ShapeNames[SHAPE_LineChain] = "Chain";
 
 	sm_TweenFuncNames[TWEENFUNC_Linear] = "Linear";
 	sm_TweenFuncNames[TWEENFUNC_QuadIn] = "QuadIn";
@@ -279,8 +279,8 @@
 	list.append(ITEM_SoundClip);
 	list.append(ITEM_Source);
 	list.append(ITEM_Header);
-	list.append(ITEM_BoundingVolume);
-	list.append(ITEM_Physics);
+	list.append(ITEM_FixtureShape);
+	list.append(ITEM_FixtureChain);
 	list.append(ITEM_UiLabel);
 	list.append(ITEM_UiButton);
 	list.append(ITEM_UiRackMeter);
@@ -333,10 +333,10 @@
 	list.append(SHAPE_None);
 	list.append(SHAPE_Box);
 	list.append(SHAPE_Circle);
-	list.append(SHAPE_Polygon);
 	list.append(SHAPE_LineSegment);
+	list.append(SHAPE_Polygon);
+	list.append(SHAPE_Capsule);
 	list.append(SHAPE_LineChain);
-	list.append(SHAPE_LineLoop);
 
 	if(list.size() != NUM_SHAPES)
 		HyGuiLog("HyGlobal::GetShapeList missing a type!", LOGTYPE_Error);

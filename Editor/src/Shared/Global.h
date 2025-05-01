@@ -78,8 +78,8 @@ enum ItemType
 	ITEM_Source,
 	ITEM_Header,
 	// Entity items
-	ITEM_BoundingVolume,
-	ITEM_Physics,
+	ITEM_FixtureShape,
+	ITEM_FixtureChain,
 	// UI widgets
 	ITEM_UiLabel,
 	ITEM_UiButton,
@@ -199,12 +199,13 @@ enum MimeType
 enum EditorShape
 {
 	SHAPE_None = 0,
+	
 	SHAPE_Box,
 	SHAPE_Circle,
-	SHAPE_Polygon,
 	SHAPE_LineSegment,
+	SHAPE_Polygon,
+	SHAPE_Capsule,
 	SHAPE_LineChain,
-	SHAPE_LineLoop,
 
 	NUM_SHAPES
 };

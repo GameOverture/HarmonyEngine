@@ -100,8 +100,8 @@ bool EntityTreeItemData::IsSelectable() const
 		return false;
 
 	return m_bIsLocked == false &&
-		   (m_EntityModelRef.IsShapeEditMode() && (m_eTYPE == ITEM_Primitive || m_eTYPE == ITEM_BoundingVolume)) ||
-		   (m_EntityModelRef.IsShapeEditMode() == false && m_eTYPE != ITEM_BoundingVolume);
+		   (m_EntityModelRef.IsShapeEditMode() && (m_eTYPE == ITEM_Primitive || m_eTYPE == ITEM_FixtureShape || m_eTYPE == ITEM_FixtureChain)) ||
+		   (m_EntityModelRef.IsShapeEditMode() == false && m_eTYPE != ITEM_FixtureShape && m_eTYPE != ITEM_FixtureChain);
 }
 
 void EntityTreeItemData::SetLocked(bool bIsLocked)
@@ -125,8 +125,8 @@ QString EntityTreeItemData::GetHyNodeTypeName(bool bIncludeNamespace) const
 	case ITEM_Spine:			return "HySpine2d";
 	case ITEM_Sprite:			return "HySprite2d";
 	case ITEM_AtlasFrame:		return "HyTexturedQuad2d";
-	case ITEM_BoundingVolume:	return "HyShape2d";
-
+	case ITEM_FixtureShape: 	return "HyShape2d";
+	case ITEM_FixtureChain: 	return "HyChain2d";
 	case ITEM_Entity: {
 		if(m_sPromotedEntityType.isEmpty() == false)
 			return m_sPromotedEntityType;
@@ -285,7 +285,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 
 	const bool bIsBody = GetType() != ITEM_Audio;
 
-	if(GetType() != ITEM_BoundingVolume)
+	if(GetType() != ITEM_FixtureShape && GetType() != ITEM_FixtureChain)
 	{
 		if(GetEntType() == ENTTYPE_Root || GetType() == ITEM_Entity)
 		{
@@ -351,7 +351,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", PROPERTIESACCESS_ReadOnly);
 		break;
 
-	case ITEM_BoundingVolume:
+	case ITEM_FixtureShape:
 		m_pPropertiesModel->AppendCategory("Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
 		m_pPropertiesModel->AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
 		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", PROPERTIESACCESS_ReadOnly);
@@ -359,8 +359,19 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Fixture", "Density", PROPERTIESTYPE_double, 0.0, "Usually in kg / m^2. A shape should have a non-zero density when the entity's physics is dynamic", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Restitution", PROPERTIESTYPE_double, 0.0, "The restitution (elasticity) usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
-		m_pPropertiesModel->AppendProperty("Fixture", "Restitution Threshold", PROPERTIESTYPE_double, 1.0, "Restitution velocity threshold, usually in m/s. Collisions above this speed have restitution applied (will bounce)", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Sensor", PROPERTIESTYPE_bool, Qt::Unchecked, "A sensor shape collects contact information but never generates a collision response", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Category Mask", PROPERTIESTYPE_int, 0x0001, "The collision category bits for this shape. Normally you would just set one bit", PROPERTIESACCESS_ToggleUnchecked, 0, 0xFFFF, 1, QString(), QString(), QVariant());
+		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Collision Mask", PROPERTIESTYPE_int, 0xFFFF, "The collision mask bits. This states the categories that this shape would accept for collision", PROPERTIESACCESS_ToggleUnchecked, 0, 0xFFFF, 1, QString(), QString(), QVariant());
+		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", PROPERTIESACCESS_ToggleUnchecked, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
+		break;
+
+	case ITEM_FixtureChain:
+		m_pPropertiesModel->AppendCategory("Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
+		m_pPropertiesModel->AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
+		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", PROPERTIESACCESS_ReadOnly);
+		m_pPropertiesModel->AppendCategory("Fixture", QVariant(), true, "Become a fixture used in physics simulations and collision");
+		m_pPropertiesModel->AppendProperty("Fixture", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
+		m_pPropertiesModel->AppendProperty("Fixture", "Restitution", PROPERTIESTYPE_double, 0.0, "The restitution (elasticity) usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Category Mask", PROPERTIESTYPE_int, 0x0001, "The collision category bits for this shape. Normally you would just set one bit", PROPERTIESACCESS_ToggleUnchecked, 0, 0xFFFF, 1, QString(), QString(), QVariant());
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Collision Mask", PROPERTIESTYPE_int, 0xFFFF, "The collision mask bits. This states the categories that this shape would accept for collision", PROPERTIESACCESS_ToggleUnchecked, 0, 0xFFFF, 1, QString(), QString(), QVariant());
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", PROPERTIESACCESS_ToggleUnchecked, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
@@ -406,7 +417,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	}
 
 	// TWEENS - Make sure these Category names match HyGlobal's sm_TweenPropNames
-	if(GetType() != ITEM_BoundingVolume)
+	if(GetType() != ITEM_FixtureShape && GetType() != ITEM_FixtureChain)
 	{
 		m_pPropertiesModel->AppendCategory("Tween Position", QVariant(), true, "Start a positional tween from the currently selected frame");
 		m_pPropertiesModel->AppendProperty("Tween Position", "Destination", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "The target destination for the tween to reach", PROPERTIESACCESS_Mutable, -fRANGE, fRANGE, 1.0, "[", "]");
@@ -535,7 +546,7 @@ TreeModelItem *EntityTreeModel::GetArrayFolderTreeItem(EntityTreeItemData *pArra
 		return nullptr;
 	}
 
-	TreeModelItem *pParentFolderItem = (pArrayItem->GetType() == ITEM_BoundingVolume) ? GetBvFolderTreeItem() : GetRootTreeItem();
+	TreeModelItem *pParentFolderItem = (pArrayItem->GetType() == ITEM_FixtureShape || pArrayItem->GetType() == ITEM_FixtureChain) ? GetBvFolderTreeItem() : GetRootTreeItem();
 	for(int i = 0; i < pParentFolderItem->GetNumChildren(); ++i)
 	{
 		EntityTreeItemData *pSubItem = pParentFolderItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
@@ -555,7 +566,7 @@ EntityTreeItemData *EntityTreeModel::GetArrayFolderTreeItemData(EntityTreeItemDa
 		return nullptr;
 	}
 
-	TreeModelItem *pParentFolderItem = (pArrayItem->GetType() == ITEM_BoundingVolume) ? GetBvFolderTreeItem() : GetRootTreeItem();
+	TreeModelItem *pParentFolderItem = (pArrayItem->GetType() == ITEM_FixtureShape || pArrayItem->GetType() == ITEM_FixtureChain) ? GetBvFolderTreeItem() : GetRootTreeItem();
 	for(int i = 0; i < pParentFolderItem->GetNumChildren(); ++i)
 	{
 		EntityTreeItemData *pSubItem = pParentFolderItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
@@ -853,7 +864,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descO
 		sCodeName = GenerateCodeName(sCodeName);
 
 	TreeModelItem *pParentTreeItem = nullptr;
-	if(eGuiType != ITEM_BoundingVolume)
+	if(eGuiType != ITEM_FixtureShape && eGuiType != ITEM_FixtureChain)
 		pParentTreeItem = GetRootTreeItem();
 	else
 		pParentTreeItem = GetBvFolderTreeItem();
@@ -880,7 +891,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocShapeTreeItem(EditorShape eShape, 
 	else
 		pParentTreeItem = GetBvFolderTreeItem();
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, bIsPrimitive ? ITEM_Primitive : ITEM_BoundingVolume, ENTTYPE_Item, QUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, bIsPrimitive ? ITEM_Primitive : (eShape == SHAPE_LineChain ? ITEM_FixtureChain : ITEM_FixtureShape), ENTTYPE_Item, QUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 
 	return pNewItem;
@@ -892,7 +903,7 @@ bool EntityTreeModel::Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow)
 	//QString sCodeName = GenerateCodeName(pItem->GetCodeName());
 
 	TreeModelItem *pParentTreeItem = nullptr;
-	if(pItem->GetType() != ITEM_BoundingVolume)
+	if(pItem->GetType() != ITEM_FixtureShape && pItem->GetType() != ITEM_FixtureChain)
 		pParentTreeItem = GetRootTreeItem();
 	else
 		pParentTreeItem = GetBvFolderTreeItem();
@@ -1000,7 +1011,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 			if(pItem->GetEntType() == ENTTYPE_ArrayFolder)
 				return HyGlobal::ItemIcon(pItem->GetType(), SUBICON_Open);
 
-			if(pItem->GetType() == ITEM_Primitive || pItem->GetType() == ITEM_BoundingVolume)
+			if(pItem->GetType() == ITEM_Primitive || pItem->GetType() == ITEM_FixtureShape || pItem->GetType() == ITEM_FixtureChain)
 			{
 				QIcon icon;
 				QString sIconUrl = ":/icons16x16/shapes/" % QString(pItem->GetType() == ITEM_Primitive ? "primitive_" : "shapes_");
@@ -1019,10 +1030,10 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 					
 				case SHAPE_Box:			sIconUrl += "box.png"; break;
 				case SHAPE_Circle:		sIconUrl += "circle.png"; break;
-				case SHAPE_Polygon:		sIconUrl += "polygon.png"; break;
 				case SHAPE_LineSegment:	sIconUrl += "lineSeg.png"; break;
+				case SHAPE_Polygon:		sIconUrl += "polygon.png"; break;
+				case SHAPE_Capsule:		sIconUrl += "capsule.png"; break;
 				case SHAPE_LineChain:	sIconUrl += "lineChain.png"; break;
-				case SHAPE_LineLoop:	sIconUrl += "lineLoop.png"; break;
 				}
 
 				icon.addFile(sIconUrl);

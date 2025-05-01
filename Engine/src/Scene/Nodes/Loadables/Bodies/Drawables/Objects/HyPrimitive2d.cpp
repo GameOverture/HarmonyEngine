@@ -148,6 +148,12 @@ void HyPrimitive2d::SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2)
 
 void HyPrimitive2d::SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoop)
 {
+	if(uiNumVerts < 4)
+	{
+		HyLogWarning("HyPrimitive2d::SetAsLineChain() failed - Line chains must be initialized with at least 4 vertices");
+		return;
+	}
+
 	ClearChainData();
 	m_Shape.SetAsNothing();
 

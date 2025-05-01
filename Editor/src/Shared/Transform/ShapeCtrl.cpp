@@ -131,6 +131,13 @@ void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDrag
 		m_Outline.SetAsCircle(ptWindowCenter, glm::distance(ptWindowCenter, ptWindowUpperBound));
 		break;
 
+	case SHAPE_LineSegment:
+		m_BoundingVolume.SetAsLineSegment(ptStartPos, ptDragPos);
+		pCamera->ProjectToCamera(ptStartPos, ptStartPos);
+		pCamera->ProjectToCamera(ptDragPos, ptDragPos);
+		m_Outline.SetAsLineSegment(ptStartPos, ptDragPos);
+		break;
+
 	case SHAPE_Polygon: {
 		glm::vec2 ptVertList[6];
 		float fRadius = glm::distance(ptCenter, ptUpperBound);
@@ -152,26 +159,35 @@ void ShapeCtrl::SetAsDrag(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDrag
 		m_Outline.SetAsPolygon(ptVertList, 6);
 		break; }
 
-	case SHAPE_LineSegment:
-		m_BoundingVolume.SetAsLineSegment(ptStartPos, ptDragPos);
-		pCamera->ProjectToCamera(ptStartPos, ptStartPos);
-		pCamera->ProjectToCamera(ptDragPos, ptDragPos);
-		m_Outline.SetAsLineSegment(ptStartPos, ptDragPos);
-		break;
+	case SHAPE_Capsule: {
+		glm::vec2 pt1, pt2;
+		pt1.x = ptCenter.x;
+		pt1.y = ptLowerBound.y;
+		pt2.x = ptCenter.x;
+		pt2.y = ptUpperBound.y;
+		float fRadius = 0.5f * glm::distance(pt1, pt2);
+		m_BoundingVolume.SetAsCapsule(pt1, pt2, fRadius);
 
-	case SHAPE_LineLoop:
+		pt1.x = ptWindowCenter.x;
+		pt1.y = ptWindowLowerBound.y;
+		pt2.x = ptWindowCenter.x;
+		pt2.y = ptWindowUpperBound.y;
+		fRadius = 0.5f * glm::distance(pt1, pt2);
+		m_Outline.SetAsCapsule(pt1, pt2, fRadius);
+		break; }
+
 	case SHAPE_LineChain: {
 		std::vector<glm::vec2> vertList;
 		vertList.push_back(ptStartPos);
 		vertList.push_back(ptDragPos);
-		m_BoundingVolume.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
+		m_BoundingVolume.SetAsLineChain(vertList, false);// m_eShape == SHAPE_LineLoop); // TODO: Loop property needed
 
 		pCamera->ProjectToCamera(ptStartPos, ptStartPos);
 		pCamera->ProjectToCamera(ptDragPos, ptDragPos);
 		vertList.clear();
 		vertList.push_back(ptStartPos);
 		vertList.push_back(ptDragPos);
-		m_Outline.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
+		m_Outline.SetAsLineChain(vertList, false);// m_eShape == SHAPE_LineLoop);
 		break; }
 
 	default:
@@ -267,8 +283,15 @@ QString ShapeCtrl::Serialize()
 		floatList.push_back(shape.GetAsSegment().point2.y);
 		break;
 
-	case SHAPE_LineChain:
-	case SHAPE_LineLoop: {
+	case SHAPE_Capsule:
+		floatList.push_back(shape.GetAsCapsule().center1.x);
+		floatList.push_back(shape.GetAsCapsule().center1.y);
+		floatList.push_back(shape.GetAsCapsule().center2.x);
+		floatList.push_back(shape.GetAsCapsule().center2.y);
+		floatList.push_back(shape.GetAsCapsule().radius);
+		break;
+
+	case SHAPE_LineChain: {
 		const HyChainData *pChainData = m_BoundingVolume.GetChainData();
 		if(pChainData == nullptr)
 			break;
@@ -334,13 +357,19 @@ void ShapeCtrl::Deserialize(QString sData, HyCamera2d *pCamera)
 		m_BoundingVolume.SetAsLineSegment(ptOne, ptTwo);
 		break; }
 
-	case SHAPE_LineChain:
-	case SHAPE_LineLoop: {
+	case SHAPE_Capsule: {
+		glm::vec2 pt1(m_DeserializedFloatList[0], m_DeserializedFloatList[1]);
+		glm::vec2 pt2(m_DeserializedFloatList[2], m_DeserializedFloatList[3]);
+		float fRadius = m_DeserializedFloatList[4];
+		m_BoundingVolume.SetAsCapsule(pt1, pt2, fRadius);
+		break; }
+
+	case SHAPE_LineChain: {
 		std::vector<glm::vec2> vertList;
 		for(int i = 0; i < m_DeserializedFloatList.size(); i += 2)
 			vertList.push_back(glm::vec2(m_DeserializedFloatList[i], m_DeserializedFloatList[i + 1]));
 
-		m_BoundingVolume.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
+		m_BoundingVolume.SetAsLineChain(vertList, false);// m_eShape == SHAPE_LineLoop);
 		break; }
 	}
 
@@ -418,8 +447,24 @@ void ShapeCtrl::DeserializeOutline(HyCamera2d *pCamera)
 		m_Outline.SetAsLineSegment(ptOne, ptTwo);
 		break; }
 
-	case SHAPE_LineChain:
-	case SHAPE_LineLoop: {
+	case SHAPE_Capsule: {
+		SetVertexGrabPointListSize(3);
+
+		glm::vec2 ptOne(m_DeserializedFloatList[0], m_DeserializedFloatList[1]);
+		pCamera->ProjectToCamera(ptOne, ptOne);
+		glm::vec2 ptTwo(m_DeserializedFloatList[2], m_DeserializedFloatList[3]);
+		pCamera->ProjectToCamera(ptTwo, ptTwo);
+
+		float fRadius = m_DeserializedFloatList[4] * pCamera->GetZoom();
+
+		m_VertexGrabPointList[0]->pos.Set(ptOne);
+		m_VertexGrabPointList[1]->pos.Set(ptTwo);
+		m_VertexGrabPointList[2]->pos.Set(ptTwo + (glm::normalize(ptTwo - ptOne) * fRadius));
+
+		m_Outline.SetAsLineSegment(ptOne, ptTwo);
+		break; }
+
+	case SHAPE_LineChain: {
 		if(m_DeserializedFloatList.size() & 1)
 			HyGuiLog("ShapeCtrl::RefreshOutline was a LineChain/LineLoop with an odd number of serialized floats", LOGTYPE_Error);
 		SetVertexGrabPointListSize(m_DeserializedFloatList.size() / 2);
@@ -435,7 +480,7 @@ void ShapeCtrl::DeserializeOutline(HyCamera2d *pCamera)
 			m_VertexGrabPointList[iGrabPtCountIndex]->pos.Set(ptCameraPos);
 		}
 
-		m_Outline.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
+		m_Outline.SetAsLineChain(vertList, false);// m_eShape == SHAPE_LineLoop);
 		break; }
 	}
 
@@ -501,10 +546,10 @@ SemState ShapeCtrl::GetMouseSemHoverAction(bool bCtrlMod, bool bShiftMod, bool b
 		return SEMSTATE_None;
 
 	case SHAPE_Box:
-	case SHAPE_Polygon:
 	case SHAPE_LineSegment:
+	case SHAPE_Polygon:
+	case SHAPE_Capsule:
 	case SHAPE_LineChain:
-	case SHAPE_LineLoop:
 		for(GrabPoint *pGrabPt : m_VertexGrabPointList)
 		{
 			if(pGrabPt->IsMouseHover())
@@ -638,9 +683,14 @@ void ShapeCtrl::TransformSemVerts(SemState eSemState, glm::vec2 ptStartPos, glm:
 			m_Outline.SetAsLineSegment(vertList[0], vertList[1]);
 			break;
 
+		case SHAPE_Capsule: {
+			HyShape2d tmpShape;
+			m_Outline.CalcLocalBoundingShape(tmpShape);
+			m_Outline.SetAsCapsule(vertList[0], vertList[1], tmpShape.GetAsCapsule().radius);
+			break; }
+
 		case SHAPE_LineChain:
-		case SHAPE_LineLoop:
-			m_Outline.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
+			m_Outline.SetAsLineChain(vertList, false);// m_eShape == SHAPE_LineLoop);
 			break;
 
 		case SHAPE_Circle: {
@@ -691,8 +741,7 @@ void ShapeCtrl::TransformSemVerts(SemState eSemState, glm::vec2 ptStartPos, glm:
 			m_Outline.SetAsPolygon(vertList);
 			break; }
 
-		case SHAPE_LineChain:
-		case SHAPE_LineLoop: {
+		case SHAPE_LineChain: {
 			bool bPrepend = false;
 			bool bUseClosestEnd = true;
 
@@ -734,12 +783,13 @@ void ShapeCtrl::TransformSemVerts(SemState eSemState, glm::vec2 ptStartPos, glm:
 			else
 				vertList.push_back(ptDragPos);
 
-			m_Outline.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
+			m_Outline.SetAsLineChain(vertList, false);// m_eShape == SHAPE_LineLoop);
 			break; }
 
 		case SHAPE_Box:
 		case SHAPE_Circle:
 		case SHAPE_LineSegment:
+		case SHAPE_Capsule:
 		default:
 			HyGuiLog("ShapeCtrl::TransformVemVerts - VEMACTION_Add invalid shape type", LOGTYPE_Error);
 		}
@@ -767,8 +817,8 @@ bool ShapeCtrl::RemoveSelectedVerts()
 
 	if(m_eShape == SHAPE_Polygon)
 		m_Outline.SetAsPolygon(vertList);
-	else if(m_eShape == SHAPE_LineChain || m_eShape == SHAPE_LineLoop)
-		m_Outline.SetAsLineChain(vertList, m_eShape == SHAPE_LineLoop);
+	else if(m_eShape == SHAPE_LineChain)
+		m_Outline.SetAsLineChain(vertList, false);// m_eShape == SHAPE_LineLoop);
 	else
 	{
 		HyGuiLog("ShapeCtrl::TransformVemVerts - VEMACTION_Add invalid shape type", LOGTYPE_Error);
@@ -822,8 +872,20 @@ QString ShapeCtrl::SerializeVemVerts(HyCamera2d *pCamera)
 		floatList.push_back(ptVert2.y);
 		break; }
 
-	case SHAPE_LineChain:
-	case SHAPE_LineLoop: {
+	case SHAPE_Capsule: {
+		glm::vec2 ptVert1(shape.GetAsCapsule().center1.x, shape.GetAsCapsule().center1.y);
+		glm::vec2 ptVert2(shape.GetAsCapsule().center2.x, shape.GetAsCapsule().center2.y);
+		pCamera->ProjectToWorld(ptVert1, ptVert1);
+		pCamera->ProjectToWorld(ptVert2, ptVert2);
+
+		floatList.push_back(ptVert1.x);
+		floatList.push_back(ptVert1.y);
+		floatList.push_back(ptVert2.x);
+		floatList.push_back(ptVert2.y);
+		floatList.push_back(shape.GetAsCapsule().radius / pCamera->GetZoom());
+		break; }
+
+	case SHAPE_LineChain: {
 		const HyChainData *pChainData = m_Outline.GetChainData();
 		if(pChainData == nullptr)
 			break;
@@ -896,8 +958,11 @@ void ShapeCtrl::ClearVertexEditMode()
 		sSrc += sCodeName + "SetAsLineSegment(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f));" + sNewLine;
 		break;
 
+	case SHAPE_Capsule:
+		sSrc += sCodeName + "SetAsCapsule(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f), " + sFloatList[2] + "f);" + sNewLine;
+		break;
+
 	case SHAPE_LineChain:
-	case SHAPE_LineLoop:
 		sSrc += "vertList.clear();" + sNewLine;
 		for(int i = 0; i < sFloatList.size(); i += 2)
 			sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;

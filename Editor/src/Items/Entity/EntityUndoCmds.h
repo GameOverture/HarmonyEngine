@@ -161,7 +161,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// NOTE: Converts shape to/from Primitive and Bounding Volume, not between shape types
+// NOTE: Converts to/from Primitive and Fixture Shapes, does not work with Fixture Chains
 class EntityUndoCmd_ConvertShape : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;

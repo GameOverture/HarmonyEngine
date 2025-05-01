@@ -72,8 +72,15 @@ const HyChainData &HyChain2d::GetData() const
 void HyChain2d::SetData(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoop, const b2ChainDef *pPhysicsInit /*= nullptr*/)
 {
 	if(bLoop && pVertices[0] == pVertices[uiNumVerts - 1])
+	{
+		HyLogWarning("HyChain2d::SetData() - Removing redundant final vertex in chain loop");
 		uiNumVerts--; // Correct the vert list to not include the redundant final loop point
-	HyAssert(uiNumVerts >= 3, "HyChain2d::SetData() - not enough verts. Must be >= 3");
+	}
+	if(uiNumVerts < 4)
+	{
+		HyLogWarning("HyChain2d::SetData() failed - Line chains must be initialized with at least 4 vertices");
+		return;
+	}
 
 	ClearShapeData();
 	m_eType = HYFIXTURE_LineChain;

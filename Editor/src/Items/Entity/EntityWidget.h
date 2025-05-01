@@ -82,14 +82,14 @@ private Q_SLOTS:
 	void on_actionAddPolygonPrimitive_triggered();
 	void on_actionAddSegmentPrimitive_triggered();
 	void on_actionAddLineChainPrimitive_triggered();
-	void on_actionAddLineLoopPrimitive_triggered();
+	void on_actionAddCapsulePrimitive_triggered();
 
 	void on_actionAddBoxShape_triggered();
 	void on_actionAddCircleShape_triggered();
 	void on_actionAddPolygonShape_triggered();
 	void on_actionAddSegmentShape_triggered();
 	void on_actionAddLineChainShape_triggered();
-	void on_actionAddLineLoopShape_triggered();
+	void on_actionAddCapsuleShape_triggered();
 
 	void on_actionVertexEditMode_toggled(bool bChecked);
 

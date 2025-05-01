@@ -42,26 +42,26 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	m_AddShapeActionGroup.addAction(ui->actionAddPolygonPrimitive);
 	m_AddShapeActionGroup.addAction(ui->actionAddSegmentPrimitive);
 	m_AddShapeActionGroup.addAction(ui->actionAddLineChainPrimitive);
-	m_AddShapeActionGroup.addAction(ui->actionAddLineLoopPrimitive);
+	m_AddShapeActionGroup.addAction(ui->actionAddCapsulePrimitive);
 	ui->btnAddPrimitiveBox->setDefaultAction(ui->actionAddBoxPrimitive);
 	ui->btnAddPrimitiveCircle->setDefaultAction(ui->actionAddCirclePrimitive);
 	ui->btnAddPrimitivePolygon->setDefaultAction(ui->actionAddPolygonPrimitive);
 	ui->btnAddPrimitiveSegment->setDefaultAction(ui->actionAddSegmentPrimitive);
 	ui->btnAddPrimitiveChain->setDefaultAction(ui->actionAddLineChainPrimitive);
-	ui->btnAddPrimitiveLoop->setDefaultAction(ui->actionAddLineLoopPrimitive);
+	ui->btnAddPrimitiveCapsule->setDefaultAction(ui->actionAddCapsulePrimitive);
 
 	m_AddShapeActionGroup.addAction(ui->actionAddBoxShape);
 	m_AddShapeActionGroup.addAction(ui->actionAddCircleShape);
 	m_AddShapeActionGroup.addAction(ui->actionAddPolygonShape);
 	m_AddShapeActionGroup.addAction(ui->actionAddSegmentShape);
 	m_AddShapeActionGroup.addAction(ui->actionAddLineChainShape);
-	m_AddShapeActionGroup.addAction(ui->actionAddLineLoopShape);
+	m_AddShapeActionGroup.addAction(ui->actionAddCapsuleShape);
 	ui->btnAddShapeBox->setDefaultAction(ui->actionAddBoxShape);
 	ui->btnAddShapeCircle->setDefaultAction(ui->actionAddCircleShape);
 	ui->btnAddShapePolygon->setDefaultAction(ui->actionAddPolygonShape);
 	ui->btnAddShapeSegment->setDefaultAction(ui->actionAddSegmentShape);
 	ui->btnAddShapeChain->setDefaultAction(ui->actionAddLineChainShape);
-	ui->btnAddShapeLoop->setDefaultAction(ui->actionAddLineLoopShape);
+	ui->btnAddShapeCapsule->setDefaultAction(ui->actionAddCapsuleShape);
 
 	ui->btnAddChild->setDefaultAction(ui->actionAddChildren);
 
@@ -227,7 +227,7 @@ EntityWidget::~EntityWidget()
 	else
 	{
 		EntityTreeItemData *pFirstItemData = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>();
-		bEnableVemMode = selectedIndices.size() == 1 && (pFirstItemData->GetType() == ITEM_Primitive || pFirstItemData->GetType() == ITEM_BoundingVolume || pFirstItemData->GetType() == ITEM_Text);
+		bEnableVemMode = selectedIndices.size() == 1 && (pFirstItemData->GetType() == ITEM_Primitive || pFirstItemData->GetType() == ITEM_FixtureShape || pFirstItemData->GetType() == ITEM_FixtureChain || pFirstItemData->GetType() == ITEM_Text);
 
 		bool bRootOrBvFolder = false;
 		bool bSelectedHaveSameParent = true;
@@ -253,12 +253,14 @@ EntityWidget::~EntityWidget()
 		ui->actionOrderChildrenUp->setEnabled(bSelectedHaveSameParent);
 		ui->actionOrderChildrenDown->setEnabled(bSelectedHaveSameParent);
 
-		if(bRootOrBvFolder == false && selectedIndices.size() == 1 && (eType == ITEM_Primitive || eType == ITEM_BoundingVolume))
+		if(bRootOrBvFolder == false && selectedIndices.size() == 1 && (eType == ITEM_Primitive || eType == ITEM_FixtureShape)) // NOTE: Chain is supported here
 		{
 			ui->actionConvertShape->setEnabled(true);
 			if(eType == ITEM_Primitive)
 			{
-				ui->actionConvertShape->setIcon(HyGlobal::ItemIcon(ITEM_BoundingVolume, SUBICON_None));
+
+
+				ui->actionConvertShape->setIcon(HyGlobal::ItemIcon(ITEM_FixtureShape, SUBICON_None));
 				ui->actionConvertShape->setText("Convert Shape to Bounding Volume");
 			}
 			else
@@ -488,13 +490,6 @@ void EntityWidget::CheckShapeAddBtn(EditorShape eShapeType, bool bAsPrimitive)
 			ui->btnAddShapeCircle->setChecked(true);
 		break;
 
-	case SHAPE_Polygon:
-		if(bAsPrimitive)
-			ui->btnAddPrimitivePolygon->setChecked(true);
-		else
-			ui->btnAddShapePolygon->setChecked(true);
-		break;
-
 	case SHAPE_LineSegment:
 		if(bAsPrimitive)
 			ui->btnAddPrimitiveSegment->setChecked(true);
@@ -502,18 +497,25 @@ void EntityWidget::CheckShapeAddBtn(EditorShape eShapeType, bool bAsPrimitive)
 			ui->btnAddShapeSegment->setChecked(true);
 		break;
 
+	case SHAPE_Polygon:
+		if(bAsPrimitive)
+			ui->btnAddPrimitivePolygon->setChecked(true);
+		else
+			ui->btnAddShapePolygon->setChecked(true);
+		break;
+
+	case SHAPE_Capsule:
+		if(bAsPrimitive)
+			ui->btnAddPrimitiveCapsule->setChecked(true);
+		else
+			ui->btnAddShapeCapsule->setChecked(true);
+		break;
+
 	case SHAPE_LineChain:
 		if(bAsPrimitive)
 			ui->btnAddPrimitiveChain->setChecked(true);
 		else
 			ui->btnAddShapeChain->setChecked(true);
-		break;
-
-	case SHAPE_LineLoop:
-		if(bAsPrimitive)
-			ui->btnAddPrimitiveLoop->setChecked(true);
-		else
-			ui->btnAddShapeLoop->setChecked(true);
 		break;
 	}
 }
@@ -769,9 +771,9 @@ void EntityWidget::on_actionAddLineChainPrimitive_triggered()
 	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineChain, true);
 }
 
-void EntityWidget::on_actionAddLineLoopPrimitive_triggered()
+void EntityWidget::on_actionAddCapsulePrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineLoop, true);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Capsule, true);
 }
 
 void EntityWidget::on_actionAddBoxShape_triggered()
@@ -799,9 +801,9 @@ void EntityWidget::on_actionAddLineChainShape_triggered()
 	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineChain, false);
 }
 
-void EntityWidget::on_actionAddLineLoopShape_triggered()
+void EntityWidget::on_actionAddCapsuleShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineLoop, false);
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Capsule, false);
 }
 
 void EntityWidget::on_actionVertexEditMode_toggled(bool bChecked)
@@ -984,7 +986,7 @@ void EntityWidget::on_actionConvertShape_triggered()
 		return;
 	}
 	EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(selectedIndexList[0], Qt::UserRole).value<EntityTreeItemData *>();
-	if(pCurItemData->GetType() != ITEM_Primitive && pCurItemData->GetType() != ITEM_BoundingVolume)
+	if(pCurItemData->GetType() != ITEM_Primitive && pCurItemData->GetType() != ITEM_FixtureShape) // NOTE: Chain fixture not supported here
 	{
 		HyGuiLog("EntityWidget::on_actionConvertShape_triggered was invoked with improper selection type", LOGTYPE_Error);
 		return;
