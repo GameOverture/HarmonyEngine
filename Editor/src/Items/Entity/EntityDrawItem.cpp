@@ -82,10 +82,47 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 			case ITEM_Audio:
 			case ITEM_SoundClip:
 			default:
-				HyGuiLog("EntityDrawItem ctor - unhandled gui item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
+				HyGuiLog("EntityDrawItem ctor - unhandled project item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 				break;
 			}
 		}
+	}
+	else if(HyGlobal::IsItemType_Widget(m_pEntityTreeItemData->GetType()))
+	{
+		switch(m_pEntityTreeItemData->GetType())
+		{
+		case ITEM_UiLabel:
+			m_pChild = new HyLabel(pParent);
+			break;
+		case ITEM_UiRichLabel:
+			m_pChild = new HyRichLabel(pParent);
+			break;
+		case ITEM_UiButton:
+			m_pChild = new HyButton(pParent);
+			break;
+		case ITEM_UiRackMeter:
+			m_pChild = new HyRackMeter(pParent);
+			break;
+		case ITEM_UiBarMeter:
+			m_pChild = new HyBarMeter(pParent);
+			break;
+		case ITEM_UiCheckBox:
+			m_pChild = new HyCheckBox(pParent);
+			break;
+		case ITEM_UiRadioButton:
+			m_pChild = new HyRadioButton(pParent);
+			break;
+		case ITEM_UiTextField:
+			m_pChild = new HyTextField(pParent);
+			break;
+		case ITEM_UiComboBox:
+			m_pChild = new HyComboBox(pParent);
+			break;
+
+		default:
+			HyGuiLog("EntityDrawItem ctor - unhandled widget item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
+			break;
+		};
 	}
 
 	if(m_pChild)
@@ -148,6 +185,8 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 	IHyBody2d *pThisHyNode = GetHyNode();
 	if(pThisHyNode == nullptr)
 		return QJsonValue();
+
+	// TODO: Use conditional checks against the item type instead of testing every string compare
 
 	if(sCategory == "Timeline")
 	{
@@ -233,6 +272,10 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 			return QJsonValue(static_cast<HyText2d *>(pThisHyNode)->IsMonospacedDigits());
 		if(sPropertyName == "Text Indent")
 			return QJsonValue(static_cast<int>(static_cast<HyText2d *>(pThisHyNode)->GetTextIndent()));
+	}
+	else if(sCategory == "Label")
+	{
+		//asdf;
 	}
 
 	return QJsonValue();

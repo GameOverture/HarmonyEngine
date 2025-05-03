@@ -271,6 +271,10 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			static_cast<QSlider *>(pReturnWidget)->setValue(propDefRef.defaultData.toInt());
 		break; }
 
+	case PROPERTIESTYPE_UiPanel:
+		//asdf;
+		break;
+
 	default:
 		HyGuiLog("PropertiesDelegate::createEditor not implemented for type: " % QString::number(propDefRef.eType), LOGTYPE_Error);
 		break;

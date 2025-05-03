@@ -69,6 +69,67 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EntityUndoCmd_AddWidget::EntityUndoCmd_AddWidget(ProjectItemData &entityItemRef, ItemType eWidgetType, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_eWidgetType(eWidgetType),
+	m_pWidgetTreeItemData(nullptr)
+{
+	setText("Add New " % HyGlobal::ItemName(m_eWidgetType, false) % " Widget");
+}
+
+/*virtual*/ EntityUndoCmd_AddWidget::~EntityUndoCmd_AddWidget()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_AddWidget::redo() /*override*/
+{
+	if(m_pWidgetTreeItemData == nullptr)
+		m_pWidgetTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewWidget(m_eWidgetType, -1);
+	else
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pWidgetTreeItemData, -1);
+}
+
+/*virtual*/ void EntityUndoCmd_AddWidget::undo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pWidgetTreeItemData);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_AddNewShape::EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, QString sData, bool bIsPrimitive, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_eShape(eShape),
+	m_sData(sData),
+	m_bIsPrimitive(bIsPrimitive),
+	m_iIndex(iRowIndex),
+	m_pShapeTreeItemData(nullptr)
+{
+	setText("Add New " % HyGlobal::ShapeName(m_eShape) % (m_bIsPrimitive ? "Primitive" : "") % " Shape");
+}
+
+/*virtual*/ EntityUndoCmd_AddNewShape::~EntityUndoCmd_AddNewShape()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_AddNewShape::redo() /*override*/
+{
+	if(m_pShapeTreeItemData == nullptr)
+	{
+		int iStateIndex = m_EntityItemRef.GetWidget()->GetCurStateIndex();
+		int iFrameIndex = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
+		m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewShape(iStateIndex, iFrameIndex, m_eShape, m_sData, m_bIsPrimitive, m_iIndex);
+	}
+	else
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pShapeTreeItemData, m_iIndex);
+}
+
+/*virtual*/ void EntityUndoCmd_AddNewShape::undo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pShapeTreeItemData);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_AddAssets::EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef, QList<IAssetItemData *> assetItemList, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_AssetList(assetItemList)
@@ -193,40 +254,6 @@ EntityUndoCmd_PasteItems::EntityUndoCmd_PasteItems(ProjectItemData &entityItemRe
 {
 	for(EntityTreeItemData *pItem : m_PastedItemList)
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pItem);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-EntityUndoCmd_AddNewShape::EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, QString sData, bool bIsPrimitive, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
-	m_EntityItemRef(entityItemRef),
-	m_eShape(eShape),
-	m_sData(sData),
-	m_bIsPrimitive(bIsPrimitive),
-	m_iIndex(iRowIndex),
-	m_pShapeTreeItemData(nullptr)
-{
-	setText("Add New " % HyGlobal::ShapeName(m_eShape) % (m_bIsPrimitive ? "Primitive" : "") % " Shape");
-}
-
-/*virtual*/ EntityUndoCmd_AddNewShape::~EntityUndoCmd_AddNewShape()
-{
-}
-
-/*virtual*/ void EntityUndoCmd_AddNewShape::redo() /*override*/
-{
-	if(m_pShapeTreeItemData == nullptr)
-	{
-		int iStateIndex = m_EntityItemRef.GetWidget()->GetCurStateIndex();
-		int iFrameIndex = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
-		m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewShape(iStateIndex, iFrameIndex, m_eShape, m_sData, m_bIsPrimitive, m_iIndex);
-	}
-	else
-		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pShapeTreeItemData, m_iIndex);
-}
-
-/*virtual*/ void EntityUndoCmd_AddNewShape::undo() /*override*/
-{
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pShapeTreeItemData);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

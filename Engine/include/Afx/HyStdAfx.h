@@ -185,6 +185,7 @@ enum HyFixtureType
 	HYFIXTURE_LineSegment,
 	HYFIXTURE_Polygon,
 	HYFIXTURE_Capsule,
+
 	HYFIXTURE_LineChain
 };
 

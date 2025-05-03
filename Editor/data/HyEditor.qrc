@@ -341,15 +341,6 @@
         <file>icons16x16/items/Slider-Pending.png</file>
         <file>icons16x16/items/Slider-Settings.png</file>
         <file>icons16x16/items/Slider-Warning.png</file>
-        <file>icons16x16/items/TextArea.png</file>
-        <file>icons16x16/items/TextArea-Close.png</file>
-        <file>icons16x16/items/TextArea-Delete.png</file>
-        <file>icons16x16/items/TextArea-Dirty.png</file>
-        <file>icons16x16/items/TextArea-New.png</file>
-        <file>icons16x16/items/TextArea-Open.png</file>
-        <file>icons16x16/items/TextArea-Pending.png</file>
-        <file>icons16x16/items/TextArea-Settings.png</file>
-        <file>icons16x16/items/TextArea-Warning.png</file>
         <file>icons16x16/items/TextField.png</file>
         <file>icons16x16/items/TextField-Close.png</file>
         <file>icons16x16/items/TextField-Delete.png</file>
@@ -379,5 +370,14 @@
         <file>icons16x16/items/Shape-Pending.png</file>
         <file>icons16x16/items/Shape-Settings.png</file>
         <file>icons16x16/items/Shape-Warning.png</file>
+        <file>icons16x16/items/RichLabel.png</file>
+        <file>icons16x16/items/RichLabel-Close.png</file>
+        <file>icons16x16/items/RichLabel-Delete.png</file>
+        <file>icons16x16/items/RichLabel-Dirty.png</file>
+        <file>icons16x16/items/RichLabel-New.png</file>
+        <file>icons16x16/items/RichLabel-Open.png</file>
+        <file>icons16x16/items/RichLabel-Pending.png</file>
+        <file>icons16x16/items/RichLabel-Settings.png</file>
+        <file>icons16x16/items/RichLabel-Warning.png</file>
     </qresource>
 </RCC>

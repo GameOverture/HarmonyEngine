@@ -600,7 +600,7 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 			const PropertiesDef propDef = GetDefinition(sCategory, sProperty);
 
 			QVariant propValue;
-			bool bIsProceduralObj = false;
+			bool bIsProceduralObj = false; // TODO: Procedural values allow the user to use RNG, ranges, or sequences to set as values instead of hard-coding
 			if(categoryObj[sProperty].isObject())
 			{
 				propValue = categoryObj[sProperty].toObject();
@@ -679,6 +679,13 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 
 				case PROPERTIESTYPE_LineEdit:
 					propValue = categoryObj[sProperty].toString();
+					break;
+
+				case PROPERTIESTYPE_UiPanel:
+					//asdf;
+					break;
+
+				case PROPERTIESTYPE_UiText:
 					break;
 
 				default:

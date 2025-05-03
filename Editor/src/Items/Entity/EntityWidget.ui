@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
+    <width>349</width>
     <height>565</height>
    </rect>
   </property>
@@ -99,23 +99,13 @@
           </item>
          </layout>
         </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="lblAddChildren">
-          <property name="toolTip">
-           <string>Add the currently selected items in Project Explorer</string>
-          </property>
-          <property name="text">
-           <string>Add Project Items</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="0">
          <widget class="QLabel" name="lblAddShape">
           <property name="toolTip">
            <string>Fixtures are invisible shapes used as bounding volumes, collision, or sensors</string>
           </property>
           <property name="text">
-           <string>Add Fixture</string>
+           <string>Create Fixture</string>
           </property>
          </widget>
         </item>
@@ -125,7 +115,7 @@
            <string>Add a customizable prebuilt entity that behaves like a UI widget/control</string>
           </property>
           <property name="text">
-           <string>Add UI Widget</string>
+           <string>Create UI Widget</string>
           </property>
          </widget>
         </item>
@@ -135,7 +125,7 @@
            <string>Primitives are visually rendered shapes that are cosmedic only</string>
           </property>
           <property name="text">
-           <string>Add Primitive</string>
+           <string>Create Primitive</string>
           </property>
          </widget>
         </item>
@@ -216,17 +206,17 @@
           </item>
          </layout>
         </item>
-        <item row="4" column="1">
-         <widget class="QToolButton" name="btnAddChild">
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="QToolButton" name="btnAddLabel">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnAddRichLabel">
             <property name="text">
              <string>...</string>
             </property>
@@ -285,14 +275,7 @@
         <item row="1" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QToolButton" name="btnAddLineEdit">
-            <property name="text">
-             <string>...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="btnAddRichText">
+           <widget class="QToolButton" name="btnAddTextField">
             <property name="text">
              <string>...</string>
             </property>
@@ -345,16 +328,19 @@
       <item>
        <layout class="QHBoxLayout" name="ChildrenToolbar">
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="lblAddChildren">
+          <property name="toolTip">
+           <string>Add the currently selected items in Project Explorer</string>
+          </property>
           <property name="text">
-           <string>Shape Edit Mode</string>
+           <string>Add Selected Items</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="chkShapeEditMode">
+         <widget class="QToolButton" name="btnAddChild">
           <property name="text">
-           <string/>
+           <string>...</string>
           </property>
          </widget>
         </item>
@@ -410,6 +396,24 @@
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="chkSetConstructor">
+       <property name="text">
+        <string>Set Constructor Properties</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkShapeEditMode">
+       <property name="text">
+        <string>Edit Mode</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="lytPropertiesHeader">
@@ -831,6 +835,126 @@
    </property>
    <property name="toolTip">
     <string>Replace selected items with another existing item of same type</string>
+   </property>
+  </action>
+  <action name="actionAddLabel">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Label.png</normaloff>:/icons16x16/items/Label.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Label</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a Label UI widget to the entity</string>
+   </property>
+  </action>
+  <action name="actionAddButton">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Button.png</normaloff>:/icons16x16/items/Button.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Button</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a Button UI widget to the entity</string>
+   </property>
+  </action>
+  <action name="actionAddRackMeter">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/RackMeter.png</normaloff>:/icons16x16/items/RackMeter.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Rack Meter</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a Rack Meter UI widget to the entity</string>
+   </property>
+  </action>
+  <action name="actionAddBarMeter">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/BarMeter.png</normaloff>:/icons16x16/items/BarMeter.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Bar Meter</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a Bar Meter UI widget to the entity</string>
+   </property>
+  </action>
+  <action name="actionAddCheckBox">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/CheckBox.png</normaloff>:/icons16x16/items/CheckBox.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Check Box</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a Check Box UI widget to the entity</string>
+   </property>
+  </action>
+  <action name="actionAddRadioButton">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/RadioButton.png</normaloff>:/icons16x16/items/RadioButton.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Radio Button</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a Radio Button UI widget to the entity</string>
+   </property>
+  </action>
+  <action name="actionAddTextField">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/TextField.png</normaloff>:/icons16x16/items/TextField.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Text Field</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a Text Field UI widget to the entity</string>
+   </property>
+  </action>
+  <action name="actionAddRichLabel">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/RichLabel.png</normaloff>:/icons16x16/items/RichLabel.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Rich Label</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a Rich Label UI widget to the entity</string>
+   </property>
+  </action>
+  <action name="actionAddComboBox">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/ComboBox.png</normaloff>:/icons16x16/items/ComboBox.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Combo Box</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a Combo Box UI widget to the entity</string>
+   </property>
+  </action>
+  <action name="actionAddSlider">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Slider.png</normaloff>:/icons16x16/items/Slider.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Slider</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a Slider UI widget to the entity</string>
    </property>
   </action>
  </widget>

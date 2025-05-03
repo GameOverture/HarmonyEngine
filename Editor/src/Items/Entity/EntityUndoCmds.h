@@ -33,6 +33,42 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class EntityUndoCmd_AddWidget : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	ItemType						m_eWidgetType;
+	EntityTreeItemData *			m_pWidgetTreeItemData;
+
+public:
+	EntityUndoCmd_AddWidget(ProjectItemData &entityItemRef, ItemType eWidgetType, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddWidget();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_AddNewShape : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	EditorShape						m_eShape;
+	QString							m_sData;
+	bool							m_bIsPrimitive;
+	int32							m_iIndex;
+
+	EntityTreeItemData *			m_pShapeTreeItemData;
+
+public:
+	EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, QString sData, bool bIsPrimitive, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddNewShape();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_AddAssets : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
@@ -75,26 +111,6 @@ class EntityUndoCmd_PasteItems : public QUndoCommand
 public:
 	EntityUndoCmd_PasteItems(ProjectItemData &entityItemRef, QJsonObject pasteMimeObject, EntityTreeItemData *pArrayFolder, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_PasteItems();
-
-	virtual void redo() override;
-	virtual void undo() override;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class EntityUndoCmd_AddNewShape : public QUndoCommand
-{
-	ProjectItemData &				m_EntityItemRef;
-	EditorShape						m_eShape;
-	QString							m_sData;
-	bool							m_bIsPrimitive;
-	int32							m_iIndex;
-	
-	EntityTreeItemData *			m_pShapeTreeItemData;
-
-public:
-	EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, QString sData, bool bIsPrimitive, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_AddNewShape();
 
 	virtual void redo() override;
 	virtual void undo() override;

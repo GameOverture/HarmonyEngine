@@ -76,6 +76,17 @@ private Q_SLOTS:
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void OnCollapsedNode(const QModelIndex &indexRef);
 	void on_actionAddChildren_triggered();
+
+	void on_actionAddLabel_triggered();
+	void on_actionAddRichLabel_triggered();
+	void on_actionAddButton_triggered();
+	void on_actionAddRackMeter_triggered();
+	void on_actionAddBarMeter_triggered();
+	void on_actionAddCheckBox_triggered();
+	void on_actionAddRadioButton_triggered();
+	void on_actionAddTextField_triggered();
+	void on_actionAddComboBox_triggered();
+	void on_actionAddSlider_triggered();
 	
 	void on_actionAddBoxPrimitive_triggered();
 	void on_actionAddCirclePrimitive_triggered();

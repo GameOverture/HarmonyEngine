@@ -238,6 +238,19 @@ EntityTreeItemData *EntityModel::Cmd_AddExistingItem(QJsonObject descObj, bool b
 	return pTreeItemData;
 }
 
+EntityTreeItemData *EntityModel::Cmd_CreateNewWidget(ItemType eWidgetType, int iRow)
+{
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocWidgetTreeItem(eWidgetType, "m_", iRow);
+	//static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(eShape)), false);
+	//static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Data", QJsonValue(sData), true);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(QList<QUuid>() << pTreeItemData->GetThisUuid());
+
+	return pTreeItemData;
+}
+
 EntityTreeItemData *EntityModel::Cmd_CreateNewShape(int iStateIndex, int iFrameIndex, EditorShape eShape, QString sData, bool bIsPrimitive, int iRow)
 {
 	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocShapeTreeItem(eShape, sData, bIsPrimitive, "m_", iRow);

@@ -164,11 +164,11 @@ set(HYENGINE_SOURCE_FILES
 	src/UI/Widgets/HyComboBox.cpp
 	src/UI/Widgets/HyDividerLine.cpp
 	src/UI/Widgets/HyLabel.cpp
-	src/UI/Widgets/HyLineEdit.cpp
 	src/UI/Widgets/HyRackMeter.cpp
 	src/UI/Widgets/HyRadioButton.cpp
 	src/UI/Widgets/HyRichText.cpp
 	src/UI/Widgets/HySlider.cpp
+	src/UI/Widgets/HyTextField.cpp
 	src/UI/Widgets/IHyWidget.cpp
 	src/UI/Components/HyButtonGroup.cpp
 	src/UI/Components/HyToolButton.cpp
@@ -304,11 +304,11 @@ set(HYENGINE_HEADER_FILES
 	include/UI/Widgets/HyComboBox.h
 	include/UI/Widgets/HyDividerLine.h
 	include/UI/Widgets/HyLabel.h
-	include/UI/Widgets/HyLineEdit.h
 	include/UI/Widgets/HyRackMeter.h
 	include/UI/Widgets/HyRadioButton.h
 	include/UI/Widgets/HyRichText.h
 	include/UI/Widgets/HySlider.h
+	include/UI/Widgets/HyTextField.h
 	include/UI/Widgets/IHyWidget.h
 	include/UI/Components/HyButtonGroup.h
 	include/UI/Components/HyToolButton.h

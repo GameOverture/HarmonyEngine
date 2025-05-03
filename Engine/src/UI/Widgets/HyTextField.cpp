@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyLineEdit.cpp
+*	HyTextField.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
@@ -8,12 +8,12 @@
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "UI/Widgets/HyLineEdit.h"
+#include "UI/Widgets/HyTextField.h"
 #include "HyEngine.h"
 
 #define HYLINEEDIT_BLINKDUR 0.5f
 
-HyLineEdit::HyLineEdit(HyEntity2d *pParent /*= nullptr*/) :
+HyTextField::HyTextField(HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(pParent),
 	m_uiCursorIndex(0),
 	m_uiSelectionIndex(0),
@@ -44,7 +44,7 @@ HyLineEdit::HyLineEdit(HyEntity2d *pParent /*= nullptr*/) :
 	UsePanelStates();
 }
 
-HyLineEdit::HyLineEdit(const HyUiPanelInit &initRef, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
+HyTextField::HyTextField(const HyUiPanelInit &initRef, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyLabel(initRef, textInit, pParent),
 	m_uiCursorIndex(0),
 	m_uiSelectionIndex(0),
@@ -75,11 +75,11 @@ HyLineEdit::HyLineEdit(const HyUiPanelInit &initRef, const HyUiTextInit &textIni
 	UsePanelStates();
 }
 
-/*virtual*/ HyLineEdit::~HyLineEdit()
+/*virtual*/ HyTextField::~HyTextField()
 {
 }
 
-/*virtual*/ void HyLineEdit::SetText(const std::string &sUtf8Text) /*override*/
+/*virtual*/ void HyTextField::SetText(const std::string &sUtf8Text) /*override*/
 {
 	HyLabel::SetText(sUtf8Text);
 
@@ -87,38 +87,38 @@ HyLineEdit::HyLineEdit(const HyUiPanelInit &initRef, const HyUiTextInit &textIni
 		SetCursor(static_cast<uint32>(HyIO::Utf8Length(sUtf8Text)));
 }
 
-bool HyLineEdit::IsInputValidated() const
+bool HyTextField::IsInputValidated() const
 {
-	return (m_uiEntityAttribs & LINEEDITATTRIB_UseValidator) != 0;
+	return (m_uiEntityAttribs & TEXTFIELDATTRIB_UseValidator) != 0;
 }
 
-void HyLineEdit::SetInputValidator(const std::regex &regEx)
+void HyTextField::SetInputValidator(const std::regex &regEx)
 {
-	m_uiEntityAttribs |= LINEEDITATTRIB_UseValidator;
+	m_uiEntityAttribs |= TEXTFIELDATTRIB_UseValidator;
 	m_InputValidator = regEx;
 }
 
-void HyLineEdit::ClearInputValidator()
+void HyTextField::ClearInputValidator()
 {
-	m_uiEntityAttribs &= ~LINEEDITATTRIB_UseValidator;
+	m_uiEntityAttribs &= ~TEXTFIELDATTRIB_UseValidator;
 }
 
-bool HyLineEdit::IsCursorShown() const
+bool HyTextField::IsCursorShown() const
 {
 	return m_BlinkTimer.IsRunning();
 }
 
-uint32 HyLineEdit::GetCursorIndex() const
+uint32 HyTextField::GetCursorIndex() const
 {
 	return m_uiCursorIndex;
 }
 
-uint32 HyLineEdit::GetSelectionIndex() const
+uint32 HyTextField::GetSelectionIndex() const
 {
 	return m_uiSelectionIndex;
 }
 
-void HyLineEdit::GetSelection(uint32 &uiStartIndexOut, uint32 &uiEndIndexOut) const
+void HyTextField::GetSelection(uint32 &uiStartIndexOut, uint32 &uiEndIndexOut) const
 {
 	if(GetCursorIndex() < GetSelectionIndex())
 	{
@@ -132,12 +132,12 @@ void HyLineEdit::GetSelection(uint32 &uiStartIndexOut, uint32 &uiEndIndexOut) co
 	}
 }
 
-void HyLineEdit::SetCursor(uint32 uiCharIndex)
+void HyTextField::SetCursor(uint32 uiCharIndex)
 {
 	SetCursor(uiCharIndex, uiCharIndex);
 }
 
-void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
+void HyTextField::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 {
 	m_uiCursorIndex = uiCharIndex;
 	m_uiSelectionIndex = uiSelectionIndex;
@@ -182,18 +182,18 @@ void HyLineEdit::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 	}
 }
 
-void HyLineEdit::SetOnSubmit(std::function<void(HyLineEdit *)> fpOnSubmit)
+void HyTextField::SetOnSubmit(std::function<void(HyTextField *)> fpOnSubmit)
 {
 	m_fpOnSubmit = fpOnSubmit;
 }
 
-void HyLineEdit::Submit()
+void HyTextField::Submit()
 {
 	if(m_fpOnSubmit != nullptr)
 		m_fpOnSubmit(this);
 }
 
-/*virtual*/ void HyLineEdit::OnUiTextInput(std::string sNewUtf8Text) /*override*/
+/*virtual*/ void HyTextField::OnUiTextInput(std::string sNewUtf8Text) /*override*/
 {
 	if(IsInputValidated())
 	{
@@ -237,7 +237,7 @@ void HyLineEdit::Submit()
 	SetCursor(iNewCursorIndex);
 }
 
-/*virtual*/ void HyLineEdit::OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) /*override*/
+/*virtual*/ void HyTextField::OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) /*override*/
 {
 	if(eBtnState == HYBTN_Release)
 		return;
@@ -341,7 +341,7 @@ void HyLineEdit::Submit()
 	SetText(m_Text.GetUtf8String()); // Ensure HyLabel is informed of m_Text changing
 }
 
-/*virtual*/ void HyLineEdit::OnTakeKeyboardFocus() /*override*/
+/*virtual*/ void HyTextField::OnTakeKeyboardFocus() /*override*/
 {
 	HyEngine::Input().StartTextInput();
 
@@ -349,7 +349,7 @@ void HyLineEdit::Submit()
 	SetCursor(static_cast<int32>(m_Text.GetUtf8String().length()));
 }
 
-/*virtual*/ void HyLineEdit::OnRelinquishKeyboardFocus() /*override*/
+/*virtual*/ void HyTextField::OnRelinquishKeyboardFocus() /*override*/
 {
 	HyEngine::Input().StopTextInput();
 	m_BlinkTimer.Reset();
@@ -358,7 +358,7 @@ void HyLineEdit::Submit()
 	m_Cursor.SetVisible(false);
 }
 
-/*virtual*/ void HyLineEdit::OnPanelUpdated() /*override*/
+/*virtual*/ void HyTextField::OnPanelUpdated() /*override*/
 {
 	HyLabel::OnPanelUpdated();
 
@@ -366,7 +366,7 @@ void HyLineEdit::Submit()
 	m_Selection.SetTint(m_Panel.GetPanelColor().IsDark() ? HyColor::White : HyColor::Black);
 }
 
-void HyLineEdit::MoveCursor(int32 iOffset, bool bSelection)
+void HyTextField::MoveCursor(int32 iOffset, bool bSelection)
 {
 	int32 iNewCursorIndex = GetCursorIndex() + iOffset;
 	if(iNewCursorIndex < 0)

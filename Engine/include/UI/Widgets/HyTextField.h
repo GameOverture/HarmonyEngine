@@ -1,5 +1,5 @@
 /**************************************************************************
-*	HyLineEdit.h
+*	HyTextField.h
 *
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
@@ -7,8 +7,8 @@
 *	Harmony License:
 *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef HyLineEdit_h__
-#define HyLineEdit_h__
+#ifndef HyTextField_h__
+#define HyTextField_h__
 
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/HyLabel.h"
@@ -16,16 +16,16 @@
 
 #include <regex>
 
-class HyLineEdit : public HyLabel
+class HyTextField : public HyLabel
 {
 protected:
-	enum LineEditAttributes
+	enum TextFieldAttributes
 	{
-		LINEEDITATTRIB_UseValidator = 1 << 22,
+		TEXTFIELDATTRIB_UseValidator = 1 << 22,
 		
-		LINEEDITATTRIB_NEXTFLAG = 1 << 23
+		TEXTFIELDATTRIB_NEXTFLAG = 1 << 23
 	};
-	static_assert((int)LINEEDITATTRIB_UseValidator == (int)LABELATTRIB_NEXTFLAG, "HyLineEdit is not matching with base classes attrib flags");
+	static_assert((int)TEXTFIELDATTRIB_UseValidator == (int)LABELATTRIB_NEXTFLAG, "HyTextField is not matching with base classes attrib flags");
 
 	std::regex							m_InputValidator;
 
@@ -36,12 +36,12 @@ protected:
 	HyPrimitive2d						m_Cursor;				// Shows a standard vertical line draw with a primitive
 	HyTimer								m_BlinkTimer;
 
-	std::function<void(HyLineEdit *)>	m_fpOnSubmit;			// Called when the user presses enter, or invokes Submit()
+	std::function<void(HyTextField *)>	m_fpOnSubmit;			// Called when the user presses enter, or invokes Submit()
 
 public:
-	HyLineEdit(HyEntity2d *pParent = nullptr);
-	HyLineEdit(const HyUiPanelInit &initRef, const HyUiTextInit &textInit, HyEntity2d *pParent = nullptr);
-	virtual ~HyLineEdit();
+	HyTextField(HyEntity2d *pParent = nullptr);
+	HyTextField(const HyUiPanelInit &initRef, const HyUiTextInit &textInit, HyEntity2d *pParent = nullptr);
+	virtual ~HyTextField();
 
 	virtual void SetText(const std::string &sUtf8Text) override;
 
@@ -57,7 +57,7 @@ public:
 	void SetCursor(uint32 uiCharIndex);
 	void SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex);
 
-	void SetOnSubmit(std::function<void(HyLineEdit *)> fpOnSubmit);
+	void SetOnSubmit(std::function<void(HyTextField *)> fpOnSubmit);
 	void Submit();
 
 protected:
@@ -77,4 +77,4 @@ protected:
 
 };
 
-#endif /* HyLineEdit_h__ */
+#endif /* HyTextField_h__ */

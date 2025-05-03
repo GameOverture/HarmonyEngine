@@ -47,6 +47,8 @@ enum PropertiesType
 	PROPERTIESTYPE_Slider,
 	PROPERTIESTYPE_Color,			// NOTE: Internally uses QVariant like `PROPERTIESTYPE_ivec3`
 	PROPERTIESTYPE_SpriteFrames,	// delegateBuilder [QUuid] = The ProjectItemData's UUID that contains the sprite frames
+	PROPERTIESTYPE_UiPanel,
+	PROPERTIESTYPE_UiText,
 };
 
 enum PropertiesAccessType

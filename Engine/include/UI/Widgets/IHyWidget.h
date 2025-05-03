@@ -40,7 +40,7 @@ protected:
 	static_assert((int)WIDGETATTRIB_HideDisabled == (int)ENTITYATTRIB_NEXTFLAG, "IHyWidget is not matching with base classes attrib flags");
 
 	HyMouseCursor							m_eHoverCursor;	// When mouse hovers over *this, change to a specified cursor
-	HyPanelState							m_ePanelState;	// When 'WIDGETATTRIB_IsCustomPanelState' is NOT enabled, this is the current state of the panel
+	HyPanelState							m_ePanelState;	// When set to anything but 'HYPANELSTATE_NotUsed', this is the current state of the panel
 	HyPanel									m_Panel;		// A rectangular width/height that is typically a visible graphic background (or main part) of the widget
 
 public:

@@ -37,6 +37,17 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	GetBelowStatesLayout()->addItem(ui->verticalLayout);
 	GetAboveStatesLayout()->addWidget(ui->grpNodes);
 
+	ui->btnAddLabel->setDefaultAction(ui->actionAddLabel);
+	ui->btnAddRichLabel->setDefaultAction(ui->actionAddRichLabel);
+	ui->btnAddButton->setDefaultAction(ui->actionAddButton);
+	ui->btnAddRackMeter->setDefaultAction(ui->actionAddRackMeter);
+	ui->btnAddBarMeter->setDefaultAction(ui->actionAddBarMeter);
+	ui->btnAddCheckBox->setDefaultAction(ui->actionAddCheckBox);
+	ui->btnAddRadioButton->setDefaultAction(ui->actionAddRadioButton);
+	ui->btnAddTextField->setDefaultAction(ui->actionAddTextField);
+	ui->btnAddComboBox->setDefaultAction(ui->actionAddComboBox);
+	ui->btnAddSlider->setDefaultAction(ui->actionAddSlider);
+
 	m_AddShapeActionGroup.addAction(ui->actionAddBoxPrimitive);
 	m_AddShapeActionGroup.addAction(ui->actionAddCirclePrimitive);
 	m_AddShapeActionGroup.addAction(ui->actionAddPolygonPrimitive);
@@ -743,6 +754,66 @@ void EntityWidget::on_actionAddChildren_triggered()
 		validItemList.push_back(pItem);
 	}
 	QUndoCommand *pCmd = new EntityUndoCmd_AddChildren(m_ItemRef, validItemList);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddLabel_triggered()
+{
+	QUndoCommand *pCmd = new EntityUndoCmd_AddWidget(m_ItemRef, ITEM_UiLabel);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddRichLabel_triggered()
+{
+	QUndoCommand *pCmd = new EntityUndoCmd_AddWidget(m_ItemRef, ITEM_UiRichLabel);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddButton_triggered()
+{
+	QUndoCommand *pCmd = new EntityUndoCmd_AddWidget(m_ItemRef, ITEM_UiButton);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddRackMeter_triggered()
+{
+	QUndoCommand *pCmd = new EntityUndoCmd_AddWidget(m_ItemRef, ITEM_UiRackMeter);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddBarMeter_triggered()
+{
+	QUndoCommand *pCmd = new EntityUndoCmd_AddWidget(m_ItemRef, ITEM_UiBarMeter);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddCheckBox_triggered()
+{
+	QUndoCommand *pCmd = new EntityUndoCmd_AddWidget(m_ItemRef, ITEM_UiCheckBox);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddRadioButton_triggered()
+{
+	QUndoCommand *pCmd = new EntityUndoCmd_AddWidget(m_ItemRef, ITEM_UiRadioButton);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddTextField_triggered()
+{
+	QUndoCommand *pCmd = new EntityUndoCmd_AddWidget(m_ItemRef, ITEM_UiTextField);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddComboBox_triggered()
+{
+	QUndoCommand *pCmd = new EntityUndoCmd_AddWidget(m_ItemRef, ITEM_UiComboBox);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddSlider_triggered()
+{
+	QUndoCommand *pCmd = new EntityUndoCmd_AddWidget(m_ItemRef, ITEM_UiSlider);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 

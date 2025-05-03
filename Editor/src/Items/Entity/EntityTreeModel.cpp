@@ -409,7 +409,19 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Audio", "Pitch", PROPERTIESTYPE_double, 1.0, "The pitch of the audio", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.01);
 		break;
 
-	// TODO: Add all the UI widgets
+	case ITEM_UiLabel:
+	case ITEM_UiRichLabel:
+	case ITEM_UiButton:
+	case ITEM_UiRackMeter:
+	case ITEM_UiBarMeter:
+	case ITEM_UiCheckBox:
+	case ITEM_UiRadioButton:
+	case ITEM_UiTextField:
+	case ITEM_UiComboBox:
+	case ITEM_UiSlider:
+		m_pPropertiesModel->AppendCategory("Widget", QVariant(), false, "UI centric type of entity");
+		//m_pPropertiesModel->AppendProperty("Widget", "Main Panel", PROPERTIESTYPE_UiPanel, QVariant(), "The main visual background portion of the widget",
+		break;
 
 	default:
 		HyGuiLog(QString("EntityTreeItem::InitalizePropertiesTree - unsupported type: ") % QString::number(GetType()), LOGTYPE_Error);
@@ -875,6 +887,18 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descO
 
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, descObj, bIsArrayItem);
 	iRow = (iRow < 0 || (bIsArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
+	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
+
+	return pNewItem;
+}
+
+EntityTreeItemData *EntityTreeModel::Cmd_AllocWidgetTreeItem(ItemType eWidgetType, QString sCodeNamePrefix, int iRow /*= -1*/)
+{
+	// Generate a unique code name for this new widget
+	QString sCodeName = GenerateCodeName(sCodeNamePrefix + HyGlobal::ItemName(eWidgetType, false));
+
+	TreeModelItem *pParentTreeItem = GetRootTreeItem();
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, eWidgetType, ENTTYPE_Item, QUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 
 	return pNewItem;

@@ -66,13 +66,13 @@
 	sm_sItemNames[ITEM_FixtureShape] = "Shape";
 	sm_sItemNames[ITEM_FixtureChain] = "Chain";
 	sm_sItemNames[ITEM_UiLabel] = "Label";
+	sm_sItemNames[ITEM_UiRichLabel] = "RichLabel";
 	sm_sItemNames[ITEM_UiButton] = "Button";
 	sm_sItemNames[ITEM_UiRackMeter] = "RackMeter";
 	sm_sItemNames[ITEM_UiBarMeter] = "BarMeter";
 	sm_sItemNames[ITEM_UiCheckBox] = "CheckBox";
 	sm_sItemNames[ITEM_UiRadioButton] = "RadioButton";
 	sm_sItemNames[ITEM_UiTextField] = "TextField";
-	sm_sItemNames[ITEM_UiTextArea] = "TextArea";
 	sm_sItemNames[ITEM_UiComboBox] = "ComboBox";
 	sm_sItemNames[ITEM_UiSlider] = "Slider";
 
@@ -98,13 +98,13 @@
 	sm_sItemNamesPlural[ITEM_FixtureShape] = "Shapes";
 	sm_sItemNamesPlural[ITEM_FixtureChain] = "Chains";
 	sm_sItemNamesPlural[ITEM_UiLabel] = "Labels";
+	sm_sItemNamesPlural[ITEM_UiRichLabel] = "RichLabels";
 	sm_sItemNamesPlural[ITEM_UiButton] = "Buttons";
 	sm_sItemNamesPlural[ITEM_UiRackMeter] = "RackMeters";
 	sm_sItemNamesPlural[ITEM_UiBarMeter] = "BarMeters";
 	sm_sItemNamesPlural[ITEM_UiCheckBox] = "CheckBoxes";
 	sm_sItemNamesPlural[ITEM_UiRadioButton] = "RadioButtons";
 	sm_sItemNamesPlural[ITEM_UiTextField] = "TextFields";
-	sm_sItemNamesPlural[ITEM_UiTextArea] = "TextAreas";
 	sm_sItemNamesPlural[ITEM_UiComboBox] = "ComboBoxes";
 	sm_sItemNamesPlural[ITEM_UiSlider] = "Sliders";
 
@@ -282,13 +282,13 @@
 	list.append(ITEM_FixtureShape);
 	list.append(ITEM_FixtureChain);
 	list.append(ITEM_UiLabel);
+	list.append(ITEM_UiRichLabel);
 	list.append(ITEM_UiButton);
 	list.append(ITEM_UiRackMeter);
 	list.append(ITEM_UiBarMeter);
 	list.append(ITEM_UiCheckBox);
 	list.append(ITEM_UiRadioButton);
 	list.append(ITEM_UiTextField);
-	list.append(ITEM_UiTextArea);
 	list.append(ITEM_UiComboBox);
 	list.append(ITEM_UiSlider);
 
@@ -323,6 +323,23 @@
 	list.append(ITEM_SoundClip);
 	list.append(ITEM_Source);
 	list.append(ITEM_Header);
+
+	return list;
+}
+
+/*static*/ QList<ItemType> HyGlobal::GetItemTypeList_Widget()
+{
+	QList<ItemType> list;
+	list.append(ITEM_UiLabel);
+	list.append(ITEM_UiRichLabel);
+	list.append(ITEM_UiButton);
+	list.append(ITEM_UiRackMeter);
+	list.append(ITEM_UiBarMeter);
+	list.append(ITEM_UiCheckBox);
+	list.append(ITEM_UiRadioButton);
+	list.append(ITEM_UiTextField);
+	list.append(ITEM_UiComboBox);
+	list.append(ITEM_UiSlider);
 
 	return list;
 }
@@ -589,6 +606,12 @@
 {
 	QList<ItemType> assetItemList = GetItemTypeList_Asset();
 	return assetItemList.contains(eType);
+}
+
+/*static*/ bool HyGlobal::IsItemType_Widget(ItemType eType)
+{
+	QList<ItemType> widgetItemList = GetItemTypeList_Widget();
+	return widgetItemList.contains(eType);
 }
 
 /*static*/ const QString HyGlobal::ItemExt(ItemType eItem)
