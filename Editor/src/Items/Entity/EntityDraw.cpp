@@ -383,21 +383,25 @@ void EntityDraw::SetExtrapolatedProperties()
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(m_pProjItem->GetWidget()->GetCurStateIndex()))->GetDopeSheetScene();
 
 	const float fFRAME_DURATION = 1.0f / static_cast<EntityModel &>(entityDopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond();
-	const int iDESTINATION_FRAME = entityDopeSheetSceneRef.GetCurrentFrame();
+	const int iDESTINATION_FRAME = entityDopeSheetSceneRef.IsCtor() ? -1 : entityDopeSheetSceneRef.GetCurrentFrame();
 
 	// Set the extrapolated properties for the 'm_RootEntity' item
 	EntityTreeItemData *pRootTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().GetRootTreeItemData();
 
+	QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetCtorKeyFramesMap();
+	QMap<int, QJsonObject> ctorFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData];
+	ctorFrameMap[-1] = ctorKeyFrameMapRef[pRootTreeItemData];
+
 	ExtrapolateProperties(&m_RootEntity,
-						  nullptr,
-						  false,
-						  ITEM_None, // 'ITEM_None' indicates this is the root
-						  fFRAME_DURATION,
-						  0,
-						  iDESTINATION_FRAME,
-						  entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData],
-						  pRootTreeItemData->GetPreviewComponent(),
-						  m_pCamera);
+							nullptr,
+							false,
+							ITEM_None, // 'ITEM_None' indicates this is the root
+							fFRAME_DURATION,
+							-1,
+							iDESTINATION_FRAME,
+							ctorFrameMap,
+							pRootTreeItemData->GetPreviewComponent(),
+							m_pCamera);
 
 	// Set the extrapolated properties for all the children items
 	for(IDrawExItem *pDrawItem : m_ItemList)
@@ -411,8 +415,11 @@ void EntityDraw::SetExtrapolatedProperties()
 
 		if(eItemType == ITEM_Entity) // Sub-entity
 		{
-			const QMap<int, QJsonObject> &mergedMapRef = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
-			static_cast<SubEntity *>(pEntDrawItem->GetHyNode())->Extrapolate(mergedMapRef,
+			QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetCtorKeyFramesMap();
+			QMap<int, QJsonObject> ctorFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
+			ctorFrameMap[-1] = ctorKeyFrameMapRef[pEntityTreeItemData];
+
+			static_cast<SubEntity *>(pEntDrawItem->GetHyNode())->Extrapolate(ctorFrameMap,
 																			pEntityTreeItemData->GetPreviewComponent(),
 																			pEntityTreeItemData->IsSelected(),
 																			fFRAME_DURATION,
@@ -421,16 +428,20 @@ void EntityDraw::SetExtrapolatedProperties()
 		}
 		else
 		{
+			QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetCtorKeyFramesMap();
+			QMap<int, QJsonObject> ctorFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
+			ctorFrameMap[-1] = ctorKeyFrameMapRef[pEntityTreeItemData];
+
 			ExtrapolateProperties(pEntDrawItem->GetHyNode(),
-								  &pEntDrawItem->GetShapeCtrl(),
-								  pEntityTreeItemData->IsSelected(),
-								  eItemType,
-								  fFRAME_DURATION,
-								  0,
-								  iDESTINATION_FRAME,
-								  entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData],
-								  pEntityTreeItemData->GetPreviewComponent(),
-								  m_pCamera);
+									&pEntDrawItem->GetShapeCtrl(),
+									pEntityTreeItemData->IsSelected(),
+									eItemType,
+									fFRAME_DURATION,
+									-1,
+									iDESTINATION_FRAME,
+									ctorFrameMap,
+									pEntityTreeItemData->GetPreviewComponent(),
+									m_pCamera);
 		}
 	}
 
@@ -512,7 +523,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		{
 			staleItemList.removeOne(pDrawItem);
 
-			if(pDrawItem->GetEntityTreeItemData()->IsReallocateDrawItem())
+			if(pDrawItem->GetEntityTreeItemData()->IsReallocateDrawItem() || static_cast<EntityModel *>(m_pProjItem->GetModel())->IsCtor())
 			{
 				EntityTreeItemData *pEntityTreeItemData = pDrawItem->GetEntityTreeItemData();
 				
@@ -626,7 +637,9 @@ void EntityDraw::SetExtrapolatedProperties()
 	else
 	{
 		iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
-		iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
+
+		EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene();
+		iFrameIndex = dopeSheetSceneRef.IsCtor() ? -1 : dopeSheetSceneRef.GetCurrentFrame();
 	}
 
 	// Transferring the children in 'm_ActiveTransform' back into 'm_RootEntity' will be done automatically in OnApplyJsonMeta()

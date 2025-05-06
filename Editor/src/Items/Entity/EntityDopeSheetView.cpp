@@ -107,7 +107,7 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 			if(pEntItemData->IsDopeExpanded())
 			{
 				QList<QPair<QString, QString>> propList;
-				propList = GetScene()->GetUniquePropertiesList(pEntItemData, true);
+				propList = GetScene()->GetUniquePropertiesList(pEntItemData, true, m_pStateData->GetIndex() == 0);
 
 				for(QPair<QString, QString> &propPair : propList)
 				{
@@ -138,9 +138,13 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 	const qreal fPOSX_DRAW_THRESHOLD = rect.x() + TIMELINE_LEFT_MARGIN;
 	int iHorzScrollAmt = horizontalScrollBar()->value();
 	qreal fPosX = fPOSX_DRAW_THRESHOLD - iHorzScrollAmt;
-	fPosX += (GetScene()->GetCurrentFrame() * TIMELINE_NOTCH_SUBLINES_WIDTH);
 
-	if(fPosX >= fPOSX_DRAW_THRESHOLD && fPosX < (rect.x() + rect.width()))
+	if(GetScene()->IsCtor())
+		fPosX += (-1 * TIMELINE_NOTCH_SUBLINES_WIDTH);
+	else
+		fPosX += (GetScene()->GetCurrentFrame() * TIMELINE_NOTCH_SUBLINES_WIDTH);
+
+	if(fPosX >= (fPOSX_DRAW_THRESHOLD - TIMELINE_NOTCH_SUBLINES_WIDTH) && fPosX < (rect.x() + rect.width()))
 	{
 		pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetCurFrameIndicator));
 		pPainter->drawLine(fPosX, rect.y(), fPosX, rect.y() + rect.height());
@@ -219,7 +223,7 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 		{
 			textColor = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetTextSelected);
 
-			propList = GetScene()->GetUniquePropertiesList(pEntItemData, true);
+			propList = GetScene()->GetUniquePropertiesList(pEntItemData, true, m_pStateData->GetIndex() == 0);
 			iNumRows += propList.size();
 		}
 
@@ -371,18 +375,27 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * GetZoom();
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
-	const qreal fPOSX_DRAW_THRESHOLD = rect.x() + TIMELINE_LEFT_MARGIN;
+	qreal fPOSX_DRAW_THRESHOLD = rect.x() + TIMELINE_LEFT_MARGIN;
+
+	// Draw ctor
+	if(m_pStateData->GetIndex() == 0)
+	{
+		iFrameIndex = -1;
+		fPOSX_DRAW_THRESHOLD -= fSubLineSpacing;
+	}
 
 	int iHorzScrollAmt = horizontalScrollBar()->value();
 	qreal fPosX = fPOSX_DRAW_THRESHOLD - iHorzScrollAmt;
+
 	while(fPosX < rect.x() + rect.width())
 	{
+ctor_to_frame0:
 		// Main Notch Line
-		if(fPosX >= fPOSX_DRAW_THRESHOLD)
+		if(fPosX >= fPOSX_DRAW_THRESHOLD - TIMELINE_NOTCH_SUBLINES_WIDTH) // NOTE: minus TIMELINE_NOTCH_SUBLINES_WIDTH to include possible Ctor
 		{
 			HyColor color = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetNotch);
 
-			if(GetScene()->GetCurrentFrame() == iFrameIndex)
+			if((GetScene()->GetCurrentFrame() == iFrameIndex && GetScene()->IsCtor() == false) || (iFrameIndex == -1 && GetScene()->IsCtor()))
 			{
 				color = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetCurFrameIndicator);
 				DrawCurrentFrameIndicator(pPainter, fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT);
@@ -396,10 +409,17 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 			// Main Notch Keyframe Text
 			const float fTextWidth = pPainter->fontMetrics().horizontalAdvance(QString::number(iFrameIndex));
 			QRectF textRect(fPosX - (fTextWidth * 0.5f), rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_MAINLINE_HEIGHT - 20.0f, fTextWidth, 20.0f);
-			DrawShadowText(pPainter, textRect, QString::number(iFrameIndex), color);
+			DrawShadowText(pPainter, textRect, iFrameIndex >= 0 ? QString::number(iFrameIndex) : "C", color);
 
 			// Draw timeline events
 			fpPaintEvent(iFrameIndex, fPosX);
+
+			if(iFrameIndex == -1)
+			{
+				iFrameIndex++;
+				fPosX += fSubLineSpacing;
+				goto ctor_to_frame0;
+			}
 		}
 
 		// Sub Notch Lines
@@ -410,7 +430,7 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 			if(fPosX >= fPOSX_DRAW_THRESHOLD)
 			{
 				int iCurSubNotchFrame = (iFrameIndex + 1) + i;
-				if(GetScene()->GetCurrentFrame() == iCurSubNotchFrame)
+				if(GetScene()->GetCurrentFrame() == iCurSubNotchFrame && GetScene()->IsCtor() == false)
 				{
 					pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetCurFrameIndicator));
 
@@ -442,13 +462,15 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 
 	if(m_bTimeLineMouseDown)
 	{
-		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
-		if(m_pAuxDopeSheet)
-			m_pAuxDopeSheet->UpdateWidgets();
+		if(static_cast<EntityModel &>(m_pStateData->GetModel()).IsCtor() == false)
+		{
+			GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
+			if(m_pAuxDopeSheet)
+				m_pAuxDopeSheet->UpdateWidgets();
 
-		// If 'm_MouseScenePos' is out of view, then scroll the view
-		ensureVisible(m_MouseScenePos.x(), m_MouseScenePos.y(), 1, 1, 0, 0);
-
+			// If 'm_MouseScenePos' is out of view, then scroll the view
+			ensureVisible(m_MouseScenePos.x(), m_MouseScenePos.y(), 1, 1, 0, 0);
+		}
 
 		pEvent->accept();
 	}
@@ -511,12 +533,15 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 	}
 	else if(pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f && pEvent->pos().y() < TIMELINE_HEIGHT)
 	{
-		m_MouseScenePos = mapToScene(pEvent->pos());
+		if(static_cast<EntityModel &>(m_pStateData->GetModel()).IsCtor() == false)
+		{
+			m_MouseScenePos = mapToScene(pEvent->pos());
 
-		m_bTimeLineMouseDown = true;
-		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
-		if(m_pAuxDopeSheet)
-			m_pAuxDopeSheet->UpdateWidgets();
+			m_bTimeLineMouseDown = true;
+			GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
+			if(m_pAuxDopeSheet)
+				m_pAuxDopeSheet->UpdateWidgets();
+		}
 
 		pEvent->accept();
 	}
@@ -569,7 +594,7 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 		EntityUndoCmd_NudgeSelectedKeyFrames *pCmd = new EntityUndoCmd_NudgeSelectedKeyFrames(m_pStateData->GetDopeSheetScene(), GetNearestFrame(m_MouseScenePos.x()) - GetNearestFrame(ptSceneDragStart.x()));
 		m_pStateData->GetModel().GetItem().GetUndoStack()->push(pCmd);
 	}
-	else if(rubberBandRect().isNull() && pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f)
+	else if(rubberBandRect().isNull() && pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f && static_cast<EntityModel &>(m_pStateData->GetModel()).IsCtor() == false)
 		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
 
 	m_pGfxDragTweenKnobItem = nullptr;

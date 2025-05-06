@@ -122,7 +122,9 @@ private Q_SLOTS:
 	void on_actionCopyEntityItems_triggered();
 	void on_actionPasteEntityItems_triggered();
 
-	void OnPreviewUpdate();
+	void on_chkSetConstructor_clicked();
+
+	void OnPreviewUpdate(); // Update callback when playing preview (spacebar)
 
 private:
 	Ui::EntityWidget *ui;

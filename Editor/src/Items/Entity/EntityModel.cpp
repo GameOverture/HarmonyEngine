@@ -132,7 +132,9 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	IModel(itemRef, itemFileDataRef),
 	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this),
 	m_bShapeEditMode(false),
-	m_AuxWidgetsModel(*this, itemFileDataRef.m_Meta["framesPerSecond"].toInt(60), itemFileDataRef.m_Meta["autoInitialize"].toBool(true))
+	m_AuxWidgetsModel(*this, itemFileDataRef.m_Meta["framesPerSecond"].toInt(60), itemFileDataRef.m_Meta["autoInitialize"].toBool(true)),
+	m_bCtor(false),
+	m_iCtorRestoreState(0)
 {
 	// The EntityTreeModel ('m_TreeModel') was initialized first so that all the EntityTreeItemData's exist.
 	// InitStates will look them up using their UUID when initializing its Key Frames map within the state's DopeSheetScene
@@ -165,6 +167,40 @@ EntityTreeModel &EntityModel::GetTreeModel()
 QAbstractItemModel *EntityModel::GetAuxWidgetsModel()
 {
 	return &m_AuxWidgetsModel;
+}
+
+bool EntityModel::IsCtor() const
+{
+	return m_bCtor;
+}
+
+void EntityModel::SetCtor(bool bCtor)
+{
+	m_bCtor = bCtor;
+
+	if(m_bCtor)
+	{
+		m_iCtorRestoreState = m_ItemRef.GetWidget()->GetCurStateIndex();
+
+		m_ItemRef.GetWidget()->FocusState(0, -1);
+		static_cast<EntityStateData *>(GetStateData(0))->GetDopeSheetScene().SetCtor(true);
+	}
+	else
+	{
+		m_ItemRef.GetWidget()->FocusState(m_iCtorRestoreState, -1);
+		static_cast<EntityStateData *>(GetStateData(0))->GetDopeSheetScene().SetCtor(false);
+	}
+
+}
+
+QMap<EntityTreeItemData *, QJsonObject> &EntityModel::GetCtorKeyFramesMap()
+{
+	return m_CtorKeyFramesMap;
+}
+
+QList<QString *> &EntityModel::GetCtorCallbacksList()
+{
+	return m_CtorCallbacksList;
 }
 
 QList<QString *> &EntityModel::GetCallbacksList()

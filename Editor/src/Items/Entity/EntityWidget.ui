@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>349</width>
+    <width>314</width>
     <height>565</height>
    </rect>
   </property>
@@ -24,6 +24,9 @@
        <layout class="QGridLayout" name="gridLayout">
         <item row="2" column="1">
          <layout class="QHBoxLayout" name="lytAddPrimitiveShape">
+          <property name="spacing">
+           <number>1</number>
+          </property>
           <item>
            <widget class="QToolButton" name="btnAddPrimitiveBox">
             <property name="text">
@@ -131,6 +134,9 @@
         </item>
         <item row="3" column="1">
          <layout class="QHBoxLayout" name="lytAddBoundingShape">
+          <property name="spacing">
+           <number>1</number>
+          </property>
           <item>
            <widget class="QToolButton" name="btnAddShapeBox">
             <property name="text">
@@ -208,6 +214,9 @@
         </item>
         <item row="0" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="spacing">
+           <number>1</number>
+          </property>
           <item>
            <widget class="QToolButton" name="btnAddLabel">
             <property name="text">
@@ -274,6 +283,9 @@
         </item>
         <item row="1" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="spacing">
+           <number>1</number>
+          </property>
           <item>
            <widget class="QToolButton" name="btnAddTextField">
             <property name="text">
@@ -398,24 +410,6 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QCheckBox" name="chkSetConstructor">
-       <property name="text">
-        <string>Set Constructor Properties</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="chkShapeEditMode">
-       <property name="text">
-        <string>Edit Mode</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="lytPropertiesHeader">
      <item>
       <spacer name="horizontalSpacer_4">
@@ -472,6 +466,24 @@
         </size>
        </property>
       </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="chkSetConstructor">
+       <property name="text">
+        <string>Set Constructor Properties</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkShapeEditMode">
+       <property name="text">
+        <string>Edit Mode</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

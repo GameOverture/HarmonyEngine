@@ -24,7 +24,7 @@
 #define TIMELINE_CURRENTFRAME_TRIANGLE_WIDTH 8.0f
 #define TIMELINE_CURRENTFRAME_TRIANGLE_HEIGHT 8.0f
 
-#define ITEMS_WIDTH (TIMELINE_LEFT_MARGIN - 5.0f)
+#define ITEMS_WIDTH (TIMELINE_LEFT_MARGIN - 20.0f)
 #define ITEMS_LEFT_AUXMARGIN 22.0f // Includes the "Aux" vertical titlebar + the visible margin (approx 1px)
 #define ITEMS_EXPAND_ARROW 20.0f // The dopesheet item property expand/collapse arrow's width
 #define ITEMS_LINE_HEIGHT 22.0f
@@ -221,6 +221,8 @@ public:
 	QPoint GetScrollPos() const;
 	void SetScrollPos(QPoint scrollPos);
 
+	bool IsCtor() const;
+	void SetCtor(bool bCtor);
 	int GetCurrentFrame() const;
 	void SetCurrentFrame(int iFrameIndex);
 
@@ -242,8 +244,9 @@ public:
 	int DetermineEmptyTimeFromFrame(int iFrameIndex) const; // Returns the number of empty frames from the given frame index. Returns -1 when there is no limit
 
 	// 'm_KeyFrameMap' must be fully updated before using this function
-	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps) const; // This is mainly useful for rendering the dope sheet. 'bCollapseTweenProps' will combine tween properties into a single entry (the regular category/property name)
+	QList<QPair<QString, QString>> GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps, bool bIncludeConstructor) const; // This is mainly useful for rendering the dope sheet. 'bCollapseTweenProps' will combine tween properties into a single entry (the regular category/property name)
 
+	//QJsonObject SerializeCtor(EntityTreeItemData *pItemData) const; // This QJsonObject layout is for "descChildList"->"ctor" and holds "props"
 	QJsonArray SerializeAllKeyFrames(EntityTreeItemData *pItemData) const; // This QJsonArray layout will mimic the "stateArray"->"keyFrames"->"<GUID>" array in the Items.meta file
 	QJsonObject SerializeSelectedKeyFrames(int &iNumFramesOut) const; // All selected items (INCLUDING m_iSelectionPivotFrame/m_bPivotLessThan "empty frames") This QJsonObject layout will mimic the "stateArray"->"keyFrames" object in the Items.meta file
 	QJsonObject GetCurrentFrameProperties(EntityTreeItemData *pItemData) const;
@@ -288,6 +291,8 @@ public:
 
 protected:
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent) override;
+
+	void AllocKeyFrames(EntityTreeItemData *pCurItemData, float fPosY, const QList<QPair<QString, QString>> &uniquePropList, const QJsonObject &propsObj, int iFrameIndex);
 };
 
 #endif // ENTITYDOPESHEETSCENE_H

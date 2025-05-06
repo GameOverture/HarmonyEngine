@@ -453,7 +453,13 @@ void EntityWidget::SetExtrapolatedProperties()
 		ui->lblSelectedItemIcon->setVisible(true);
 		ui->lblSelectedItemIcon->setPixmap(selectedItemsDataList[0]->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
 		ui->lblSelectedItemText->setVisible(true);
-		ui->lblSelectedItemText->setText(selectedItemsDataList[0]->GetCodeName() % " Properties [Frame " % QString::number(entityDopeSheetSceneRef.GetCurrentFrame()) % "]");
+
+		QString sProp;
+		if(entityDopeSheetSceneRef.IsCtor())
+			sProp = "Constructor";
+		else
+			sProp = "Frame " % QString::number(entityDopeSheetSceneRef.GetCurrentFrame());
+		ui->lblSelectedItemText->setText(selectedItemsDataList[0]->GetCodeName() % " Properties [" % sProp % "]");
 	}
 	else // Multiple selection
 	{
@@ -477,7 +483,13 @@ void EntityWidget::SetExtrapolatedProperties()
 
 		ui->lblSelectedItemIcon->setVisible(false);
 		ui->lblSelectedItemText->setVisible(true);
-		ui->lblSelectedItemText->setText("Multiple items selected [Frame " % QString::number(entityDopeSheetSceneRef.GetCurrentFrame()) % "]");
+
+		QString sProp;
+		if(entityDopeSheetSceneRef.IsCtor())
+			sProp = "Constructor";
+		else
+			sProp = "Frame " % QString::number(entityDopeSheetSceneRef.GetCurrentFrame());
+		ui->lblSelectedItemText->setText("Multiple items selected [" % sProp % "]");
 	}
 	
 	ui->propertyTree->resizeColumnToContents(0);
@@ -1240,6 +1252,11 @@ void EntityWidget::on_actionPasteEntityItems_triggered()
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
+void EntityWidget::on_chkSetConstructor_clicked()
+{
+	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetCtor(ui->chkSetConstructor->isChecked());
+}
+
 void EntityWidget::OnPreviewUpdate()
 {
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
@@ -1250,7 +1267,6 @@ void EntityWidget::OnPreviewUpdate()
 		StopPreview();
 		return;
 	}
-
 
 	// Using the elapsed time and 'm_iPreviewStartingFrame', set the current frame
 	int iFPS = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetFramesPerSecond();

@@ -269,6 +269,10 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 	childObjRef.insert("isLocked", m_bIsLocked);
 	childObjRef.insert("isSelected", m_bIsSelected);
 	childObjRef.insert("isDopeExpanded", m_bIsDopeExpanded);
+	if(m_EntityModelRef.GetCtorKeyFramesMap().contains(this))
+		childObjRef.insert("ctor", m_EntityModelRef.GetCtorKeyFramesMap()[this]);
+	else
+		childObjRef.insert("ctor", QJsonObject());
 }
 
 // NOTE: The listed 4 functions below share logic that process all item properties. Any updates should reflect to all of them

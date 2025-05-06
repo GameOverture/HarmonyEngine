@@ -55,6 +55,13 @@ class EntityModel : public IModel
 	};
 	AuxWidgetsModel											m_AuxWidgetsModel;
 
+	bool													m_bCtor;					// When true, "Set Constructor Mode" is on and the state is set to '0' and frame set to 'C' aka -1
+	int														m_iCtorRestoreState;
+	
+	// These maps store the CONSTRUCTOR property data for the entire entity
+	QMap<EntityTreeItemData *, QJsonObject>					m_CtorKeyFramesMap;			// Store properties and tween values
+	QMap<EntityTreeItemData *, QJsonObject>					m_CtorPoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added with UNDO
+	QList<QString *>										m_CtorCallbacksList;		// a list of strings that are the callback name(s) - still referenced from 'm_CallbacksList'
 
 	QList<QString *>										m_CallbacksList;	// All callbacks (aka QString) is referenced from this list. 'EntityDopeSheetScene' will create and modify its state's callbacks using this list.
 
@@ -66,6 +73,10 @@ public:
 
 	QAbstractItemModel *GetAuxWidgetsModel();
 
+	bool IsCtor() const;
+	void SetCtor(bool bCtor);
+	QMap<EntityTreeItemData *, QJsonObject> &GetCtorKeyFramesMap();
+	QList<QString *> &GetCtorCallbacksList();
 	QList<QString *> &GetCallbacksList();
 
 	int GetFinalFrameIndex(int iStateIndex) const;
@@ -76,6 +87,7 @@ public:
 	QList<EntityTreeItemData *> Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow);
 	QList<EntityTreeItemData *> Cmd_CreateNewAssets(QList<IAssetItemData *> assetItemList, int iRow);
 	EntityTreeItemData *Cmd_AddExistingItem(QJsonObject descObj, bool bIsArrayItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
+	EntityTreeItemData *Cmd_CreateNewWidget(ItemType eWidgetType, int iRow);
 	EntityTreeItemData *Cmd_CreateNewShape(int iStateIndex, int iFrameIndex, EditorShape eShape, QString sData, bool bIsPrimitive, int iRow);
 	QList<EntityTreeItemData *> Cmd_AddNewPasteItems(QJsonObject mimeObject, EntityTreeItemData *pArrayFolder);
 	QList<EntityTreeItemData *> Cmd_CreateNewArray(QList<EntityTreeItemData *> itemDataList, QString sArrayName, int iArrayFolderRow); // It is assumed that the items within 'itemDataList' have been removed/popped prior

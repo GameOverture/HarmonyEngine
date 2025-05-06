@@ -253,15 +253,49 @@ void EntityDopeSheetScene::SetScrollPos(QPoint scrollPos)
 	m_ScrollPos = scrollPos;
 }
 
+bool EntityDopeSheetScene::IsCtor() const
+{
+	return static_cast<EntityModel &>(m_pEntStateData->GetModel()).IsCtor();
+}
+
+void EntityDopeSheetScene::SetCtor(bool bCtor)
+{
+	if(bCtor)
+	{
+		m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (-1 * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
+		update();
+
+		IWidget *pWidget = m_pEntStateData->GetModel().GetItem().GetWidget();
+		if(pWidget)
+			static_cast<EntityWidget *>(pWidget)->SetExtrapolatedProperties();
+
+		IDraw *pDraw = m_pEntStateData->GetModel().GetItem().GetDraw();
+		if(pDraw)
+			static_cast<EntityDraw *>(pDraw)->SetExtrapolatedProperties();
+	}
+	else
+		SetCurrentFrame(m_iCurrentFrame);
+}
+
 int EntityDopeSheetScene::GetCurrentFrame() const
 {
 	return m_iCurrentFrame;
 }
 
-void EntityDopeSheetScene::SetCurrentFrame(int iFrame)
+void EntityDopeSheetScene::SetCurrentFrame(int iFrameIndex)
 {
-	m_iCurrentFrame = HyMath::Max(iFrame, 0);
-	m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (m_iCurrentFrame * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
+	//if(iFrameIndex == -1 && m_pEntStateData->GetIndex() == 0)
+	//{
+	//	SetCtor(true);
+	//	m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (-1 * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
+	//	return;
+	//}
+	//else
+	{
+		m_iCurrentFrame = HyMath::Max(iFrameIndex, 0);
+		m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (m_iCurrentFrame * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
+	}
+
 	update();
 
 	IWidget *pWidget = m_pEntStateData->GetModel().GetItem().GetWidget();
@@ -452,6 +486,9 @@ QList<ContextTweenData> EntityDopeSheetScene::DetermineIfContextQuickTween() con
 
 int EntityDopeSheetScene::DetermineEmptyTimeFromFrame(int iFrameIndex) const
 {
+	if(iFrameIndex < 0)
+		HyGuiLog("EntityDopeSheetScene::DetermineEmptyTimeFromFrame() passed negative value", LOGTYPE_Error);
+
 	int iEmptyFrames = 0;
 
 	// Check the m_*GfxRectMaps for empty time because it's easier to check for existing TweenKnobs (end of tweens)
@@ -489,13 +526,18 @@ int EntityDopeSheetScene::DetermineEmptyTimeFromFrame(int iFrameIndex) const
 }
 
 // NOTE: Tween properties are represented by a single property keyframe
-QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps) const
+QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps, bool bIncludeConstructor) const
 {
 	QSet<QPair<QString, QString>> uniquePropertiesSet;
 	if(m_KeyFramesMap.contains(pItemData) == false)
 		return QList<QPair<QString, QString>>();
 
 	QList<QJsonObject> propsObjList = m_KeyFramesMap[pItemData].values();
+
+	QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
+	if(bIncludeConstructor && ctorKeyFrameMapRef.contains(pItemData))
+		propsObjList.prepend(ctorKeyFrameMapRef[pItemData]);
+
 	for(QJsonObject propsObj : propsObjList)
 	{
 		QStringList sCategoryList = propsObj.keys();
@@ -538,6 +580,16 @@ QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(Ent
 
 	return uniquePropertiesList;
 }
+
+//QJsonObject EntityDopeSheetScene::SerializeCtor(EntityTreeItemData *pItemData) const
+//{
+//	const auto &ctorKeyFrameMap = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
+//
+//	if(ctorKeyFrameMap.contains(pItemData) == false)
+//		return QJsonObject();
+//
+//	return ctorKeyFrameMap[pItemData];
+//}
 
 QJsonArray EntityDopeSheetScene::SerializeAllKeyFrames(EntityTreeItemData *pItemData) const
 {
@@ -718,6 +770,15 @@ QJsonObject EntityDopeSheetScene::SerializeSelectedKeyFrames(int &iNumFramesOut)
 
 QJsonObject EntityDopeSheetScene::GetCurrentFrameProperties(EntityTreeItemData *pItemData) const
 {
+	if(static_cast<EntityModel &>(m_pEntStateData->GetModel()).IsCtor())
+	{
+		QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
+		if(ctorKeyFrameMapRef.contains(pItemData) == false)
+			return QJsonObject();
+
+		return ctorKeyFrameMapRef[pItemData];
+	}
+
 	if(m_KeyFramesMap.contains(pItemData) == false)
 		return QJsonObject();
 
@@ -731,6 +792,20 @@ QJsonObject EntityDopeSheetScene::GetCurrentFrameProperties(EntityTreeItemData *
 
 QJsonValue EntityDopeSheetScene::GetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const
 {
+	if(iFrameIndex == -1) // Indicates getting a ctor property
+	{
+		if(static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap().contains(pItemData) == false)
+			return QJsonValue();
+
+		QJsonObject ctorObj = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap()[pItemData];
+		if(ctorObj.contains(sCategoryName) == false)
+			return QJsonValue();
+		if(ctorObj[sCategoryName].toObject().contains(sPropName) == false)
+			return QJsonValue();
+
+		return ctorObj[sCategoryName].toObject()[sPropName];
+	}
+
 	if(m_KeyFramesMap.contains(pItemData) == false)
 		return QJsonValue();
 
@@ -807,6 +882,12 @@ QMap<int, QMap<EntityTreeItemData *, QJsonObject>> EntityDopeSheetScene::GetKeyF
 
 void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj)
 {
+	if(iFrameIndex < 0)
+	{
+		HyGuiLog("EntityDopeSheetScene::SetKeyFrameProperties() passed negative frame - ctor not implemented", LOGTYPE_Error);
+		return;
+	}
+
 	QJsonObject curPropsObj = m_KeyFramesMap[pItemData][iFrameIndex];
 
 	if(curPropsObj.empty() && propsObj.empty())
@@ -844,31 +925,57 @@ void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, 
 QJsonValue EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, QJsonValue jsonValue, bool bRefreshGfxItems)
 {
 	bool bIsKeyFrameOverwritten = true;
-
-	if(m_KeyFramesMap.contains(pItemData) == false)
-		m_KeyFramesMap.insert(pItemData, QMap<int, QJsonObject>());
-
-	QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
-	if(itemKeyFrameMapRef.contains(iFrameIndex) == false)
-		itemKeyFrameMapRef.insert(iFrameIndex, QJsonObject());
-
-	QJsonObject &keyFrameObjRef = itemKeyFrameMapRef[iFrameIndex];
-	if(keyFrameObjRef.contains(sCategoryName) == false)
-	{
-		keyFrameObjRef.insert(sCategoryName, QJsonObject());
-		bIsKeyFrameOverwritten = false;
-	}
-	else if(keyFrameObjRef[sCategoryName].toObject().contains(sPropName) == false)
-		bIsKeyFrameOverwritten = false;
-
 	QJsonValue overwrittenValueOut;
-	if(bIsKeyFrameOverwritten)
-		overwrittenValueOut = keyFrameObjRef[sCategoryName].toObject()[sPropName];
 
-	QJsonObject categoryObj = keyFrameObjRef[sCategoryName].toObject();
-	categoryObj.insert(sPropName, jsonValue);
+	if(iFrameIndex == -1) // Indicates set/use ctor
+	{
+		QMap<EntityTreeItemData *, QJsonObject> &ctorMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
+		if(ctorMapRef.contains(pItemData) == false)
+			ctorMapRef.insert(pItemData, QJsonObject());
 
-	keyFrameObjRef.insert(sCategoryName, categoryObj);
+		QJsonObject &keyFrameObjRef = ctorMapRef[pItemData];
+		if(keyFrameObjRef.contains(sCategoryName) == false)
+		{
+			keyFrameObjRef.insert(sCategoryName, QJsonObject());
+			bIsKeyFrameOverwritten = false;
+		}
+		else if(keyFrameObjRef[sCategoryName].toObject().contains(sPropName) == false)
+			bIsKeyFrameOverwritten = false;
+
+		if(bIsKeyFrameOverwritten)
+			overwrittenValueOut = keyFrameObjRef[sCategoryName].toObject()[sPropName];
+
+		QJsonObject categoryObj = keyFrameObjRef[sCategoryName].toObject();
+		categoryObj.insert(sPropName, jsonValue);
+
+		keyFrameObjRef.insert(sCategoryName, categoryObj);
+	}
+	else // Normal keyframe map
+	{
+		if(m_KeyFramesMap.contains(pItemData) == false)
+			m_KeyFramesMap.insert(pItemData, QMap<int, QJsonObject>());
+
+		QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
+		if(itemKeyFrameMapRef.contains(iFrameIndex) == false)
+			itemKeyFrameMapRef.insert(iFrameIndex, QJsonObject());
+
+		QJsonObject &keyFrameObjRef = itemKeyFrameMapRef[iFrameIndex];
+		if(keyFrameObjRef.contains(sCategoryName) == false)
+		{
+			keyFrameObjRef.insert(sCategoryName, QJsonObject());
+			bIsKeyFrameOverwritten = false;
+		}
+		else if(keyFrameObjRef[sCategoryName].toObject().contains(sPropName) == false)
+			bIsKeyFrameOverwritten = false;
+
+		if(bIsKeyFrameOverwritten)
+			overwrittenValueOut = keyFrameObjRef[sCategoryName].toObject()[sPropName];
+
+		QJsonObject categoryObj = keyFrameObjRef[sCategoryName].toObject();
+		categoryObj.insert(sPropName, jsonValue);
+
+		keyFrameObjRef.insert(sCategoryName, categoryObj);
+	}
 
 	if(bRefreshGfxItems)
 		RefreshAllGfxItems();
@@ -878,10 +985,23 @@ QJsonValue EntityDopeSheetScene::SetKeyFrameProperty(EntityTreeItemData *pItemDa
 
 void EntityDopeSheetScene::RemoveKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, bool bRefreshGfxItems)
 {
-	if(m_KeyFramesMap.contains(pItemData) == false || m_KeyFramesMap[pItemData].contains(iFrameIndex) == false)
-		return;
+	QJsonObject keyFrameObjCopy;
+	if(iFrameIndex == -1) // Indicates set/use ctor
+	{
+		QMap<EntityTreeItemData *, QJsonObject> &ctorMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
+		if(ctorMapRef.contains(pItemData) == false)
+			return;
 
-	QJsonObject keyFrameObjCopy = m_KeyFramesMap[pItemData][iFrameIndex];
+		keyFrameObjCopy = ctorMapRef[pItemData];
+	}
+	else // Normal keyframe map
+	{
+		if(m_KeyFramesMap.contains(pItemData) == false || m_KeyFramesMap[pItemData].contains(iFrameIndex) == false)
+			return;
+
+		keyFrameObjCopy = m_KeyFramesMap[pItemData][iFrameIndex];
+	}
+
 	for(auto iterCategory = keyFrameObjCopy.begin(); iterCategory != keyFrameObjCopy.end(); ++iterCategory)
 	{
 		QString sCategoryName = iterCategory.key();
@@ -894,35 +1014,69 @@ void EntityDopeSheetScene::RemoveKeyFrameProperties(EntityTreeItemData *pItemDat
 
 void EntityDopeSheetScene::RemoveKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName, bool bRefreshGfxItems)
 {
-	if(m_KeyFramesMap.contains(pItemData) == false || m_KeyFramesMap[pItemData].contains(iFrameIndex) == false)
-		return;
-
-	QJsonObject &keyFrameObjRef = m_KeyFramesMap[pItemData][iFrameIndex];
-	if(keyFrameObjRef.empty())
+	if(iFrameIndex == -1) // Indicates set/use ctor
 	{
-		m_KeyFramesMap[pItemData].remove(iFrameIndex);
-		pItemData->SetReallocateDrawItem(true);
-		return;
+		QMap<EntityTreeItemData *, QJsonObject> &ctorMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
+		
+		if(ctorMapRef.contains(pItemData) == false)
+			return;
+
+		QJsonObject &ctorObjRef = ctorMapRef[pItemData];
+		if(ctorObjRef.empty())
+		{
+			pItemData->SetReallocateDrawItem(true);
+			return;
+		}
+
+		if(ctorObjRef.contains(sCategoryName) == false)
+		{
+			pItemData->SetReallocateDrawItem(true);
+			return;
+		}
+
+		QJsonObject categoryObj = ctorObjRef[sCategoryName].toObject();
+		categoryObj.remove(sPropName);
+
+		if(categoryObj.isEmpty()) // Cleanup the empty category as it no longer contains any properties
+			ctorObjRef.remove(sCategoryName);
+		else
+			ctorObjRef.insert(sCategoryName, categoryObj);
 	}
-
-	if(keyFrameObjRef.contains(sCategoryName) == false)
-		return;
-
-	QJsonObject categoryObj = keyFrameObjRef[sCategoryName].toObject();
-	categoryObj.remove(sPropName);
-
-	if(categoryObj.isEmpty())
+	else // Normal keyframe map
 	{
-		keyFrameObjRef.remove(sCategoryName);
-		if(keyFrameObjRef.isEmpty())
+		if(m_KeyFramesMap.contains(pItemData) == false || m_KeyFramesMap[pItemData].contains(iFrameIndex) == false)
+			return;
+
+		QJsonObject &keyFrameObjRef = m_KeyFramesMap[pItemData][iFrameIndex];
+		if(keyFrameObjRef.empty())
 		{
 			m_KeyFramesMap[pItemData].remove(iFrameIndex);
-			if(m_KeyFramesMap[pItemData].isEmpty())
-				m_KeyFramesMap.remove(pItemData);
+			pItemData->SetReallocateDrawItem(true);
+			return;
 		}
+
+		if(keyFrameObjRef.contains(sCategoryName) == false)
+		{
+			pItemData->SetReallocateDrawItem(true);
+			return;
+		}
+
+		QJsonObject categoryObj = keyFrameObjRef[sCategoryName].toObject();
+		categoryObj.remove(sPropName);
+
+		if(categoryObj.isEmpty()) // Cleanup the empty category as it no longer contains any properties
+		{
+			keyFrameObjRef.remove(sCategoryName);
+			if(keyFrameObjRef.isEmpty()) // Cleanup the entire frame as it no longer contains any categories
+			{
+				m_KeyFramesMap[pItemData].remove(iFrameIndex);
+				if(m_KeyFramesMap[pItemData].isEmpty())
+					m_KeyFramesMap.remove(pItemData);
+			}
+		}
+		else
+			keyFrameObjRef.insert(sCategoryName, categoryObj);
 	}
-	else
-		keyFrameObjRef.insert(sCategoryName, categoryObj);
 
 	pItemData->SetReallocateDrawItem(true);
 
@@ -966,6 +1120,12 @@ void EntityDopeSheetScene::RemoveKeyFrameTween(EntityTreeItemData *pItemData, in
 QList<QPair<EntityTreeItemData *, QJsonArray>> EntityDopeSheetScene::PasteSerializedKeyFrames(QList<QPair<EntityTreeItemData *, QJsonArray>> pasteKeyFramesPairList, int iStartFrameIndex)
 {
 	QList<QPair<EntityTreeItemData *, QJsonArray>> overwrittenKeyFramesPairList;
+
+	if(iStartFrameIndex < 0)
+	{
+		HyGuiLog("EntityDopeSheetScene::PasteSerializedKeyFrames() passed negative frame - ctor not implemented", LOGTYPE_Error);
+		return overwrittenKeyFramesPairList;
+	}
 
 	for(QPair<EntityTreeItemData *, QJsonArray> &pair : pasteKeyFramesPairList)
 	{
@@ -1046,6 +1206,12 @@ QList<QPair<EntityTreeItemData *, QJsonArray>> EntityDopeSheetScene::PasteSerial
 
 void EntityDopeSheetScene::UnpasteSerializedKeyFrames(QList<QPair<EntityTreeItemData *, QJsonArray>> unpasteKeyFramesPairList, QList<QPair<EntityTreeItemData *, QJsonArray>> overwrittenKeyFramesPairList, int iStartFrameIndex)
 {
+	if(iStartFrameIndex < 0)
+	{
+		HyGuiLog("EntityDopeSheetScene::UnpasteSerializedKeyFrames() passed negative frame - ctor not implemented", LOGTYPE_Error);
+		return;
+	}
+
 	//if(m_KeyFramesMap.contains(pItemData) == false)
 	//	return;
 
@@ -1292,6 +1458,8 @@ bool EntityDopeSheetScene::RemoveCallback(int iFrameIndex, QString sCallback)
 
 QList<QString *> EntityDopeSheetScene::GetCallbackList(int iFrameIndex) const
 {
+	if(iFrameIndex < 0)
+		return static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorCallbacksList();
 	if(m_CallbacksMap.contains(iFrameIndex))
 		return m_CallbacksMap[iFrameIndex];
 	
@@ -1449,6 +1617,8 @@ QList<EntityTreeItemData *> EntityDopeSheetScene::GetItemsFromSelectedFrames() c
 
 void EntityDopeSheetScene::RefreshAllGfxItems()
 {
+	bool bIncludeCtor = m_pEntStateData->GetIndex() == 0;
+
 	// Gather all the entity items (root, children, shapes) into one list 'itemList'
 	QList<EntityTreeItemData *> entireItemList, shapeList;
 	static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetTreeModel().GetTreeItemData(entireItemList, shapeList);
@@ -1462,94 +1632,29 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 	for(EntityTreeItemData *pCurItemData : entireItemList)
 	{
 		// 'uniquePropList' will contain every row of key frames for this item, across all frames (tweens are collapsed to their regular category/property)
-		QList<QPair<QString, QString>> uniquePropList = GetUniquePropertiesList(pCurItemData, true);
+		QList<QPair<QString, QString>> uniquePropList = GetUniquePropertiesList(pCurItemData, true, bIncludeCtor);
 
 		// - If NOT expanded, draw all the key frames in one row (its name row)
 		// - If expanded, skip the name row and then draw each property in its own row
 		if(pCurItemData->IsDopeExpanded())
 			fPosY += ITEMS_LINE_HEIGHT; // skip the name row
 
+		if(bIncludeCtor)
+		{
+			QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
+			if(ctorKeyFrameMapRef.contains(pCurItemData))
+				AllocKeyFrames(pCurItemData, fPosY, uniquePropList, ctorKeyFrameMapRef[pCurItemData], -1);
+		}
+
 		if(m_KeyFramesMap.contains(pCurItemData))
 		{
-			QList<TweenProperty> tweenPropList = HyGlobal::GetTweenPropList();
 			const QMap<int, QJsonObject> &keyFrameMapRef = m_KeyFramesMap[pCurItemData];
 			for(int iFrameIndex : keyFrameMapRef.keys())
 			{
 				if(m_iFinalFrame < iFrameIndex)
 					m_iFinalFrame = iFrameIndex;
 
-				const float fITEM_START_POSY = fPosY;
-				QJsonObject propsObj = keyFrameMapRef[iFrameIndex];
-
-				// Iterate through 'uniquePropList' and draw a QGraphicsRectItem for each property found in 'propsObj'
-				for(auto &propPair : uniquePropList)
-				{
-					bool bPropKeyFrame = propsObj.contains(propPair.first) && propsObj[propPair.first].toObject().contains(propPair.second);
-					
-					bool bTweenKeyFrame = std::any_of(tweenPropList.begin(), tweenPropList.end(), [&](TweenProperty eTweenProp) {
-						QPair<QString, QString> tweenPair = HyGlobal::ConvertTweenPropToRegularPropPair(eTweenProp);
-						return (propPair == tweenPair && propsObj.contains("Tween " % HyGlobal::TweenPropName(eTweenProp)));
-					});
-
-					if(bPropKeyFrame == false && bTweenKeyFrame == false)
-					{
-						if(pCurItemData->IsDopeExpanded())
-							fPosY += ITEMS_LINE_HEIGHT;
-						continue;
-					}
-
-					// IMPORTANT NOTE: std::make_tuple() crashes in Release if you try to construct the string directly in the function call
-					QString sPropString = propPair.first % "/" % propPair.second;
-					KeyFrameKey gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, sPropString);
-
-					qreal fPosX = TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f;
-					
-					// Add or update the GraphicsKeyFrameItem's
-					if(bPropKeyFrame)
-					{
-						if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
-						{
-							GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(gfxRectMapKey, false);
-							pNewGfxRectItem->setPos(fPosX, fPosY);
-
-							m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
-							addItem(pNewGfxRectItem);
-						}
-						else
-							m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(fPosX, fPosY);
-					}
-					if(bTweenKeyFrame)
-					{
-						if(m_TweenGfxRectMap.contains(gfxRectMapKey) == false)
-						{
-							fPosX += (bPropKeyFrame ? (KEYFRAME_WIDTH + 1.0f) : 0.0f);
-							GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(gfxRectMapKey, true);
-							pNewGfxRectItem->setPos(fPosX, fPosY);
-
-							m_TweenGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
-							addItem(pNewGfxRectItem);
-						}
-						else
-							m_TweenGfxRectMap[gfxRectMapKey]->setPos(fPosX + (bPropKeyFrame ? (KEYFRAME_WIDTH + 1.0f) : 0.0f), fPosY);
-
-						// Calculate the dash-line "Duration"
-						double dDuration = GetKeyFrameProperty(pCurItemData, iFrameIndex, "Tween " % propPair.second, "Duration").toDouble();
-						int iNumFrames = (dDuration * static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetFramesPerSecond());
-						qreal fLineLength = iNumFrames * TIMELINE_NOTCH_SUBLINES_WIDTH;
-						if(bPropKeyFrame)
-							fLineLength -= (KEYFRAME_WIDTH + 1.0f);
-
-						m_TweenGfxRectMap[gfxRectMapKey]->SetTweenLineLength(fLineLength, iNumFrames);
-
-						if(m_iFinalFrame < (iFrameIndex + iNumFrames))
-							m_iFinalFrame = (iFrameIndex + iNumFrames);
-					}
-
-					if(pCurItemData->IsDopeExpanded())
-						fPosY += ITEMS_LINE_HEIGHT;
-				}
-
-				fPosY = fITEM_START_POSY;
+				AllocKeyFrames(pCurItemData, fPosY, uniquePropList, keyFrameMapRef[iFrameIndex], iFrameIndex);
 			}
 		}
 
@@ -1578,4 +1683,77 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 		pMouseEvent->accept();
 	else
 		QGraphicsScene::mousePressEvent(pMouseEvent);
+}
+
+void EntityDopeSheetScene::AllocKeyFrames(EntityTreeItemData *pCurItemData, float fPosY, const QList<QPair<QString, QString>> &uniquePropList, const QJsonObject &propsObj, int iFrameIndex)
+{
+	QList<TweenProperty> tweenPropList = HyGlobal::GetTweenPropList();
+
+	// Iterate through 'uniquePropList' and draw a QGraphicsRectItem for each property found in 'propsObj'
+	for(auto &propPair : uniquePropList)
+	{
+		bool bPropKeyFrame = propsObj.contains(propPair.first) && propsObj[propPair.first].toObject().contains(propPair.second);
+
+		bool bTweenKeyFrame = std::any_of(tweenPropList.begin(), tweenPropList.end(), [&](TweenProperty eTweenProp) {
+			QPair<QString, QString> tweenPair = HyGlobal::ConvertTweenPropToRegularPropPair(eTweenProp);
+			return (propPair == tweenPair && propsObj.contains("Tween " % HyGlobal::TweenPropName(eTweenProp)));
+			});
+
+		if(bPropKeyFrame == false && bTweenKeyFrame == false)
+		{
+			if(pCurItemData->IsDopeExpanded())
+				fPosY += ITEMS_LINE_HEIGHT;
+			continue;
+		}
+
+		// IMPORTANT NOTE: std::make_tuple() crashes in Release if you try to construct the string directly in the function call
+		QString sPropString = propPair.first % "/" % propPair.second;
+		KeyFrameKey gfxRectMapKey = std::make_tuple(pCurItemData, iFrameIndex, sPropString);
+
+		qreal fPosX = TIMELINE_LEFT_MARGIN + (iFrameIndex * TIMELINE_NOTCH_SUBLINES_WIDTH) - 2.0f;
+
+		// Add or update the GraphicsKeyFrameItem's
+		if(bPropKeyFrame)
+		{
+			if(m_KeyFramesGfxRectMap.contains(gfxRectMapKey) == false)
+			{
+				GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(gfxRectMapKey, false);
+				pNewGfxRectItem->setPos(fPosX, fPosY);
+
+				m_KeyFramesGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
+				addItem(pNewGfxRectItem);
+			}
+			else
+				m_KeyFramesGfxRectMap[gfxRectMapKey]->setPos(fPosX, fPosY);
+		}
+		if(bTweenKeyFrame)
+		{
+			if(m_TweenGfxRectMap.contains(gfxRectMapKey) == false)
+			{
+				fPosX += (bPropKeyFrame ? (KEYFRAME_WIDTH + 1.0f) : 0.0f);
+				GraphicsKeyFrameItem *pNewGfxRectItem = new GraphicsKeyFrameItem(gfxRectMapKey, true);
+				pNewGfxRectItem->setPos(fPosX, fPosY);
+
+				m_TweenGfxRectMap[gfxRectMapKey] = pNewGfxRectItem;
+				addItem(pNewGfxRectItem);
+			}
+			else
+				m_TweenGfxRectMap[gfxRectMapKey]->setPos(fPosX + (bPropKeyFrame ? (KEYFRAME_WIDTH + 1.0f) : 0.0f), fPosY);
+
+			// Calculate the dash-line "Duration"
+			double dDuration = GetKeyFrameProperty(pCurItemData, iFrameIndex, "Tween " % propPair.second, "Duration").toDouble();
+			int iNumFrames = (dDuration * static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetFramesPerSecond());
+			qreal fLineLength = iNumFrames * TIMELINE_NOTCH_SUBLINES_WIDTH;
+			if(bPropKeyFrame)
+				fLineLength -= (KEYFRAME_WIDTH + 1.0f);
+
+			m_TweenGfxRectMap[gfxRectMapKey]->SetTweenLineLength(fLineLength, iNumFrames);
+
+			if(m_iFinalFrame < (iFrameIndex + iNumFrames))
+				m_iFinalFrame = (iFrameIndex + iNumFrames);
+		}
+
+		if(pCurItemData->IsDopeExpanded())
+			fPosY += ITEMS_LINE_HEIGHT;
+	}
 }
