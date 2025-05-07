@@ -130,11 +130,11 @@ EntityModel::AuxWidgetsModel::AuxWidgetsModel(EntityModel &entityModelRef, int i
 
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
+	m_bCtor(false),
+	m_iCtorRestoreState(0),
 	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this),
 	m_bShapeEditMode(false),
-	m_AuxWidgetsModel(*this, itemFileDataRef.m_Meta["framesPerSecond"].toInt(60), itemFileDataRef.m_Meta["autoInitialize"].toBool(true)),
-	m_bCtor(false),
-	m_iCtorRestoreState(0)
+	m_AuxWidgetsModel(*this, itemFileDataRef.m_Meta["framesPerSecond"].toInt(60), itemFileDataRef.m_Meta["autoInitialize"].toBool(true))
 {
 	// The EntityTreeModel ('m_TreeModel') was initialized first so that all the EntityTreeItemData's exist.
 	// InitStates will look them up using their UUID when initializing its Key Frames map within the state's DopeSheetScene
@@ -270,6 +270,10 @@ EntityTreeItemData *EntityModel::Cmd_AddExistingItem(QJsonObject descObj, bool b
 	QUuid uuidToRegister(descObj["itemUUID"].toString());
 	if(uuidToRegister.isNull() == false)
 		m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, QList<QUuid>() << uuidToRegister);
+
+	// Ctor
+	if(descObj.contains("ctor"))
+		m_CtorKeyFramesMap[pTreeItemData] = descObj["ctor"].toObject();
 
 	return pTreeItemData;
 }
@@ -814,7 +818,52 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 
 QString EntityModel::GenerateSrc_Ctor() const
 {
-	return "SetState(0);";
+	QString sSrc;
+
+	// CALL IN THIS ORDER:
+	// 1: Standard Properties
+	for(auto iter = m_CtorKeyFramesMap.begin(); iter != m_CtorKeyFramesMap.end(); ++iter)
+		sSrc += GenerateSrc_SetProperties(iter.key(), iter.value(), "\n\t");
+
+	// 2: Callbacks
+	for(const QString *pCallback : m_CtorCallbacksList)
+		sSrc += *pCallback + "();\n\t";
+
+	// 3: Root Entity Timeline Events - Needs to be invoked in this order: Pause, SetState, SetFrame
+	QString sTimeLineFrameSrc;
+	if(m_CtorKeyFramesMap.contains(m_TreeModel.GetRootTreeItemData()))
+	{
+		bool bStateExplicitlySet = false;
+		QJsonObject rootPropsObj = m_CtorKeyFramesMap[m_TreeModel.GetRootTreeItemData()];
+		for(QString sCategoryName : rootPropsObj.keys())
+		{
+			if(sCategoryName == "Timeline")
+			{
+				QJsonObject timelineObj = rootPropsObj["Timeline"].toObject();
+
+				if(timelineObj.contains("Pause"))
+					sSrc += "SetTimelinePause(" + QString(timelineObj["Pause"].toBool() ? "true" : "false") + ");" + "\n\t";
+
+				if(timelineObj.contains("State"))
+				{
+					sSrc += "SetState(" + QString::number(timelineObj["State"].toInt()) + ");" + "\n\t";
+					bStateExplicitlySet = true;
+				}
+
+				if(timelineObj.contains("Frame"))
+					sTimeLineFrameSrc += "SetTimelineFrame(" + QString::number(timelineObj["Frame"].toInt()) + ");" + "\n\t";
+			}
+		}
+
+		if(bStateExplicitlySet == false)
+			sSrc += "SetState(0);";
+	}
+	else
+		sSrc += "SetState(0);";
+
+	sSrc += sTimeLineFrameSrc;
+	
+	return sSrc;
 }
 
 // NOTE: The listed 4 functions below share logic that process all item properties. Any updates should reflect to all of them
@@ -850,7 +899,7 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 		frameSet.unite(frameList.toSet());
 		frameList = frameSet.toList();
 
-		std::sort(frameList.begin(), frameList.end()); // Then sort by frame index
+		std::sort(frameList.begin(), frameList.end()); // Then sort by frame index (they're unsorted because of the combine and toList())
 		for(int iFrameIndex : frameList)
 		{
 			sSrc += "case " + QString::number(iFrameIndex) + ":\n\t\t\t\t";
@@ -871,7 +920,7 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 					sSrc += *pCallback + "();\n\t\t\t\t";
 			}
 
-			// 3: Root Entity Timeline Events
+			// 3: Root Entity Timeline Events - Needs to be invoked in this order: Pause, SetState, SetFrame
 			if(propertiesMapByFrame.contains(iFrameIndex) && propertiesMapByFrame[iFrameIndex].contains(m_TreeModel.GetRootTreeItemData()))
 			{
 				QJsonObject rootPropsObj = propertiesMapByFrame[iFrameIndex][m_TreeModel.GetRootTreeItemData()];
@@ -884,11 +933,11 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 						if(timelineObj.contains("Pause"))
 							sSrc += "SetTimelinePause(" + QString(timelineObj["Pause"].toBool() ? "true" : "false") + ");" + "\n\t\t\t\t";
 
-						if(timelineObj.contains("Frame"))
-							sSrc += "SetTimelineFrame(" + QString::number(timelineObj["Frame"].toInt()) + ");" + "\n\t\t\t\t";
-
 						if(timelineObj.contains("State"))
 							sSrc += "SetState(" + QString::number(timelineObj["State"].toInt()) + ");" + "\n\t\t\t\t";
+
+						if(timelineObj.contains("Frame"))
+							sSrc += "SetTimelineFrame(" + QString::number(timelineObj["Frame"].toInt()) + ");" + "\n\t\t\t\t";
 					}
 				}
 			}

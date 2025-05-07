@@ -37,6 +37,15 @@ class EntityModel : public IModel
 {
 	Q_OBJECT
 
+	bool													m_bCtor;					// When true, "Set Constructor Mode" is on and the state is set to '0' and frame set to 'C' aka -1
+	int														m_iCtorRestoreState;
+
+	// These maps store the CONSTRUCTOR property data for the entire entity
+	// HACK: These m_Ctor* member variables are declared before 'm_TreeModel' because its constructor needs to use/initialize these maps
+	QMap<EntityTreeItemData *, QJsonObject>					m_CtorKeyFramesMap;			// Store properties and tween values
+	QMap<EntityTreeItemData *, QJsonObject>					m_CtorPoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added with UNDO
+	QList<QString *>										m_CtorCallbacksList;		// a list of strings that are the callback name(s) - still referenced from 'm_CallbacksList'
+
 	EntityTreeModel											m_TreeModel;
 	bool													m_bShapeEditMode;	// If true, the user is currently editing child shapes' vertices/data (primitive or bounding volumes)
 
@@ -54,14 +63,6 @@ class EntityModel : public IModel
 		virtual bool setData(const QModelIndex &modelIndex, const QVariant &value, int role = Qt::EditRole) override;
 	};
 	AuxWidgetsModel											m_AuxWidgetsModel;
-
-	bool													m_bCtor;					// When true, "Set Constructor Mode" is on and the state is set to '0' and frame set to 'C' aka -1
-	int														m_iCtorRestoreState;
-	
-	// These maps store the CONSTRUCTOR property data for the entire entity
-	QMap<EntityTreeItemData *, QJsonObject>					m_CtorKeyFramesMap;			// Store properties and tween values
-	QMap<EntityTreeItemData *, QJsonObject>					m_CtorPoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added with UNDO
-	QList<QString *>										m_CtorCallbacksList;		// a list of strings that are the callback name(s) - still referenced from 'm_CallbacksList'
 
 	QList<QString *>										m_CallbacksList;	// All callbacks (aka QString) is referenced from this list. 'EntityDopeSheetScene' will create and modify its state's callbacks using this list.
 
