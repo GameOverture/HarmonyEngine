@@ -142,6 +142,8 @@ QString EntityTreeItemData::GetHyNodeTypeName(bool bIncludeNamespace) const
 			return pReferencedItemData->GetName(false);
 	}
 
+	case ITEM_UiLabel:			return "HyLabel";
+
 	case ITEM_SoundClip:
 	case ITEM_Prefab:
 	case ITEM_Particles:
@@ -424,9 +426,9 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_UiComboBox:
 	case ITEM_UiSlider:
 		m_pPropertiesModel->AppendCategory("Widget", QVariant(), false, "UI centric type of entity");
-		m_pPropertiesModel->AppendProperty("Widget", "Panel", PROPERTIESTYPE_UiPanel, QVariant(), "The main visual background portion of this widget", PROPERTIESACCESS_Mutable);
-		m_pPropertiesModel->AppendProperty("Widget", "Text", PROPERTIESTYPE_ComboBoxItems, QVariant(), "The text node/font used on this widget", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), QString(), QString(), ITEM_Text);
-		m_pPropertiesModel->AppendProperty("Widget", "Text Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The text margins typically used within the main panel of this widget");
+		m_pPropertiesModel->AppendProperty("Widget", "Panel", PROPERTIESTYPE_UiPanel, QVariant(), "The main visual background portion of this widget", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Widget", "Text Font", PROPERTIESTYPE_ComboBoxItems, QVariant(), "The text node/font used on this widget", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), ITEM_Text);
+		m_pPropertiesModel->AppendProperty("Widget", "Text Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The text margins typically used within the main panel of this widget", PROPERTIESACCESS_ToggleUnchecked);
 		break;
 
 	default:

@@ -219,7 +219,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		QList<ProjectItemData *> validItemList;
 		for(auto iter = projItemMapRef.keyValueBegin(); iter != projItemMapRef.keyValueEnd(); ++iter)
 		{
-			if(iter->second->GetType() == eItemType)
+			if(iter->second->GetType() == eItemType && iter->second->IsProjectItem())
 				validItemList.append(static_cast<ProjectItemData *>(iter->second));
 		}
 		std::sort(validItemList.begin(), validItemList.end(),

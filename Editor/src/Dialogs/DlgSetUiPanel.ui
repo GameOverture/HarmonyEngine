@@ -73,7 +73,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="WgtVectorSpinBox" name="boundingVolumeSize" native="true"/>
+           <widget class="WgtVectorSpinBox" name="vsbBoundingVolumeSize" native="true"/>
           </item>
          </layout>
         </widget>
@@ -96,7 +96,7 @@
      <widget class="QWidget" name="pagePrimitive">
       <layout class="QFormLayout" name="formLayout">
        <item row="1" column="1">
-        <widget class="WgtVectorSpinBox" name="primSize" native="true"/>
+        <widget class="WgtVectorSpinBox" name="vsbPrimSize" native="true"/>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label">
@@ -180,7 +180,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="WgtVectorSpinBox" name="nodeSize" native="true"/>
+           <widget class="WgtVectorSpinBox" name="vsbNodeSize" native="true"/>
           </item>
          </layout>
         </widget>

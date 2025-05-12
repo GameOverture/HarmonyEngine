@@ -765,6 +765,16 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 		case ITEM_FixtureShape:
 		case ITEM_FixtureChain:
 		case ITEM_Entity:
+		case ITEM_UiLabel:
+		case ITEM_UiRichLabel:
+		case ITEM_UiButton:
+		case ITEM_UiRackMeter:
+		case ITEM_UiBarMeter:
+		case ITEM_UiCheckBox:
+		case ITEM_UiRadioButton:
+		case ITEM_UiTextField:
+		case ITEM_UiComboBox:
+		case ITEM_UiSlider:
 			sInitialization = "(this)";
 			break;
 
@@ -1194,6 +1204,41 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 				sSrc += sCodeName + "SetMonospacedDigits(" + (textObj["Monospaced Digits"].toBool() ? "true" : "false") + ");" + sNewLine;
 			if(textObj.contains("Text Indent"))
 				sSrc += sCodeName + "SetTextIndent(" + QString::number(textObj["Text Indent"].toInt()) + ");" + sNewLine;
+		}
+		else if(sCategoryName == "Widget")
+		{
+			QJsonObject widgetObj = propObj["Widget"].toObject();
+			if(widgetObj.contains("Panel"))
+			{
+				QJsonObject panelObj = widgetObj["Panel"].toObject();
+
+				QString sPanelParams;
+				ItemType eType = HyGlobal::GetTypeFromString(panelObj["nodeType"].toString());
+				if(eType == ITEM_Entity)
+					sPanelParams = QString::number(panelObj["width"].toInt()) + ", " + QString::number(panelObj["height"].toInt());
+				else if(eType == ITEM_Primitive)
+					sPanelParams = QString::number(panelObj["width"].toInt()) + ", " + QString::number(panelObj["height"].toInt()) + ", " + QString::number(panelObj["frameSize"].toInt()) + ", HyColor(" + QString::number(panelObj["panelColor"].toInt()) + "), HyColor(" + QString::number(panelObj["frameColor"].toInt()) + "), HyColor(" + QString::number(panelObj["tertiaryColor"].toInt()) + "))";
+				else
+				{
+					QUuid panelUuid(panelObj["nodeUuid"].toString());
+					TreeModelItemData *pItemData = m_ItemRef.GetProject().FindItemData(panelUuid);
+					if(pItemData && pItemData->IsProjectItem())
+					{
+						switch(eType)
+						{
+						case ITEM_Sprite:	sPanelParams = "HYTYPE_Sprite, HyNodePath(" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + ")"; break;
+						case ITEM_Spine:	sPanelParams = "HYTYPE_Spine, HyNodePath(" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + ")"; break;
+
+						default:
+							HyGuiLog("EntityModel::GenerateSrc_SetProperties() - Unhandled panel node type", LOGTYPE_Error);
+							break;
+						}
+					}
+				}
+
+				sSrc += sCodeName + "Setup(HyUiPanelInit(" + sPanelParams + "));" + sNewLine;
+			}
+			
 		}
 		else if(sCategoryName == "Tween Position")
 		{

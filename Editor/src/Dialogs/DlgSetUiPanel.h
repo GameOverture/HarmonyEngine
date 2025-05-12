@@ -24,6 +24,13 @@ class DlgSetUiPanel : public QDialog
 	HyUiPanelInit		m_Init;
 	QUuid				m_SelectedNodeUuid;
 
+	enum StackedPage
+	{
+		PAGE_BoundingVolume = 0,
+		PAGE_Primitive,
+		PAGE_Node
+	};
+
 public:
 	explicit DlgSetUiPanel(Project &projectRef, QString sTitle, HyUiPanelInit &init, QUuid selectedNodeUuid, QWidget *parent = 0);
 	~DlgSetUiPanel();
@@ -35,6 +42,12 @@ protected:
 	void SyncWidgets();
 
 private Q_SLOTS:
+	void on_radBoundingVolume_toggled(bool bChecked);
+	void on_radPrimitive_toggled(bool bChecked);
+	void on_radNode_toggled(bool bChecked);
+
+	void OnSizeChanged(QVariant newSize);
+
 	void on_sbPrimFrame_valueChanged(int arg1);
 	void on_primPanelColor_clicked();
 

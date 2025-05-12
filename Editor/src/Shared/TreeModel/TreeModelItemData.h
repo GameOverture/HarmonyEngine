@@ -24,6 +24,9 @@ protected:
 	const QUuid										m_UUID;
 	QString											m_sName;
 
+	bool											m_bIsProjectItem;
+	bool											m_bIsAssetItem;
+
 	// Dependant References : int = count
 	QMap<TreeModelItemData *, int>					m_DependantMap;		// What ItemDatas rely on 'this'
 	QMap<TreeModelItemData *, int>					m_DependeeMap;		// What ItemDatas 'this' relies on

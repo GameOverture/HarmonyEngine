@@ -44,8 +44,8 @@ HyUiPanelInit::HyUiPanelInit(uint32 uiWidth, uint32 uiHeight) :
 // Constructs a 'NodeItem' panel
 HyUiPanelInit::HyUiPanelInit(HyType eNodeType, const HyNodePath &nodePath) :
 	m_eNodeType(eNodeType),
-	m_uiWidth(0), // TBD by loading the node
-	m_uiHeight(0),// TBD by loading the node
+	m_uiWidth(0),
+	m_uiHeight(0),
 	m_NodePath(nodePath),
 	m_uiFrameSize(0),
 	m_PanelColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),

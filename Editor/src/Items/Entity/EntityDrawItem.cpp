@@ -925,7 +925,7 @@ void ExtrapolateProperties(Project &projectRef,
 
 					QUuid nodeUuid(panelObj["nodeUuid"].toString());
 					TreeModelItemData *pItemData = projectRef.FindItemData(nodeUuid);
-					if(pItemData->IsProjectItem())
+					if(pItemData && pItemData->IsProjectItem())
 					{
 						ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pItemData);
 
@@ -939,11 +939,15 @@ void ExtrapolateProperties(Project &projectRef,
 						static_cast<HyLabel *>(pThisHyNode)->GuiOverrideNodeData(panelInit.m_eNodeType, itemDataDoc.GetObject(), true);
 					}
 				}
-				if(widgetObj.contains("Text"))
+				if(widgetObj.contains("Text Font"))
 				{
 					QJsonObject panelObj = widgetObj["Text"].toObject();
 					//HyUiTextInit textInit = panelObj;
 					//static_cast<HyLabel *>(pThisHyNode)->Setup(textInit);
+				}
+				else if(widgetObj.contains("Text Margins"))
+				{
+
 				}
 			}
 			break;

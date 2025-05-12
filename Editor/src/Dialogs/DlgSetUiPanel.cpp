@@ -23,9 +23,16 @@ DlgSetUiPanel::DlgSetUiPanel(Project &projectRef, QString sTitle, HyUiPanelInit 
 	ui->setupUi(this);
 	setWindowTitle(sTitle);
 
-	ui->boundingVolumeSize->Init(SPINBOXTYPE_Double2d, static_cast<float>(-MAX_INT_RANGE), static_cast<float>(MAX_INT_RANGE));
-	ui->primSize->Init(SPINBOXTYPE_Double2d, static_cast<float>(-MAX_INT_RANGE), static_cast<float>(MAX_INT_RANGE));
-	ui->nodeSize->Init(SPINBOXTYPE_Double2d, static_cast<float>(-MAX_INT_RANGE), static_cast<float>(MAX_INT_RANGE));
+
+	ui->vsbBoundingVolumeSize->Init(SPINBOXTYPE_Double2d, static_cast<float>(-MAX_INT_RANGE), static_cast<float>(MAX_INT_RANGE));
+	connect(ui->vsbBoundingVolumeSize, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnSizeChanged(QVariant)));
+	ui->vsbPrimSize->Init(SPINBOXTYPE_Double2d, static_cast<float>(-MAX_INT_RANGE), static_cast<float>(MAX_INT_RANGE));
+	connect(ui->vsbPrimSize, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnSizeChanged(QVariant)));
+	ui->vsbNodeSize->Init(SPINBOXTYPE_Double2d, static_cast<float>(-MAX_INT_RANGE), static_cast<float>(MAX_INT_RANGE));
+	connect(ui->vsbNodeSize, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnSizeChanged(QVariant)));
+
+	if(m_Init.m_eNodeType == HYTYPE_Unknown)
+		m_Init.m_eNodeType = HYTYPE_Primitive;
 
 	SyncNodeComboBox();
 	SyncWidgets();
@@ -58,7 +65,7 @@ void DlgSetUiPanel::SyncNodeComboBox()
 	QList<ProjectItemData *> validItemList;
 	for(auto iter = projItemMapRef.keyValueBegin(); iter != projItemMapRef.keyValueEnd(); ++iter)
 	{
-		if(iter->second->GetType() == ITEM_Sprite || iter->second->GetType() == ITEM_Spine)
+		if(iter->second->IsProjectItem() && (iter->second->GetType() == ITEM_Sprite || iter->second->GetType() == ITEM_Spine))
 			validItemList.append(static_cast<ProjectItemData *>(iter->second));
 	}
 	if(validItemList.empty() == false)
@@ -82,24 +89,72 @@ void DlgSetUiPanel::SyncNodeComboBox()
 
 void DlgSetUiPanel::SyncWidgets()
 {
+	if(m_Init.m_eNodeType == HYTYPE_Entity)
+		ui->stackedWidget->setCurrentIndex(PAGE_BoundingVolume);
+	else if(m_Init.m_eNodeType == HYTYPE_Primitive)
+		ui->stackedWidget->setCurrentIndex(PAGE_Primitive);
+	else
+		ui->stackedWidget->setCurrentIndex(PAGE_Node);
+
 	QVariant size = QPointF(m_Init.m_uiWidth, m_Init.m_uiHeight);
 
 	if(ui->grpBoundingVolumeSetSize->isChecked())
-		ui->boundingVolumeSize->SetValue(size);
+		ui->vsbBoundingVolumeSize->SetValue(size);
 	else
-		ui->boundingVolumeSize->SetValue(QPointF(0.0f, 0.0f));
+		ui->vsbBoundingVolumeSize->SetValue(QPointF(0.0f, 0.0f));
 
+	ui->vsbPrimSize->SetValue(size);
 	ui->sbPrimFrame->setValue(static_cast<int>(m_Init.m_uiFrameSize));
 	ui->primPanelColor->setStyleSheet(QString("background-color: rgb(") % QString::number(m_Init.m_PanelColor.GetRed()) % ", " % QString::number(m_Init.m_PanelColor.GetGreen()) % ", " % QString::number(m_Init.m_PanelColor.GetBlue()) % ");");
 	ui->primFrameColor->setStyleSheet(QString("background-color: rgb(") % QString::number(m_Init.m_FrameColor.GetRed()) % ", " % QString::number(m_Init.m_FrameColor.GetGreen()) % ", " % QString::number(m_Init.m_FrameColor.GetBlue()) % ");");
 	ui->primTertiaryColor->setStyleSheet(QString("background-color: rgb(") % QString::number(m_Init.m_TertiaryColor.GetRed()) % ", " % QString::number(m_Init.m_TertiaryColor.GetGreen()) % ", " % QString::number(m_Init.m_TertiaryColor.GetBlue()) % ");");
 
 	if(ui->grpNodeSetSize->isChecked())
-		ui->nodeSize->SetValue(size);
+		ui->vsbNodeSize->SetValue(size);
 	else
-		ui->nodeSize->SetValue(QPointF(0.0f, 0.0f));
+		ui->vsbNodeSize->SetValue(QPointF(0.0f, 0.0f));
 
 	ui->cmbNode->setCurrentIndex(ui->cmbNode->findData(m_SelectedNodeUuid));
+}
+
+void DlgSetUiPanel::on_radBoundingVolume_toggled(bool bChecked)
+{
+	if(bChecked)
+	{
+		m_Init.m_eNodeType = HYTYPE_Entity;
+		ui->stackedWidget->setCurrentIndex(PAGE_BoundingVolume);
+	}
+}
+
+void DlgSetUiPanel::on_radPrimitive_toggled(bool bChecked)
+{
+	if(bChecked)
+	{
+		m_Init.m_eNodeType = HYTYPE_Primitive;
+		ui->stackedWidget->setCurrentIndex(PAGE_Primitive);
+	}
+}
+
+void DlgSetUiPanel::on_radNode_toggled(bool bChecked)
+{
+	if(bChecked)
+	{
+		m_Init.m_eNodeType = HYTYPE_Unknown;
+
+		const QMap<QUuid, TreeModelItemData *> &projItemMapRef = m_ProjectRef.GetItemMap();
+		if(projItemMapRef.contains(ui->cmbNode->currentData().value<QUuid>()))
+			m_Init.m_eNodeType = HyGlobal::ConvertItemType(projItemMapRef[ui->cmbNode->currentData().value<QUuid>()]->GetType());
+		else
+			HyGuiLog("No valid node items found", LOGTYPE_Warning);
+
+		ui->stackedWidget->setCurrentIndex(PAGE_Node);
+	}
+}
+
+void DlgSetUiPanel::OnSizeChanged(QVariant newSize)
+{
+	m_Init.m_uiWidth = newSize.toPointF().x();
+	m_Init.m_uiHeight = newSize.toPointF().y();
 }
 
 void DlgSetUiPanel::on_sbPrimFrame_valueChanged(int arg1)
@@ -109,5 +164,4 @@ void DlgSetUiPanel::on_sbPrimFrame_valueChanged(int arg1)
 
 void DlgSetUiPanel::on_primPanelColor_clicked()
 {
-	
 }
