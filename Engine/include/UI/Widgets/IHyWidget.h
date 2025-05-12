@@ -91,6 +91,10 @@ public:
 
 	virtual bool IsDepressed() const;				// Derived classes may override this if more than just mouse down is considered 'depressed' (e.g. button taking keyboard input like space/enter)
 
+#ifdef HY_PLATFORM_GUI
+	void GuiOverrideNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName = true);
+#endif
+
 protected:
 	virtual void OnMouseEnter() override final;
 	virtual void OnMouseLeave() override final;

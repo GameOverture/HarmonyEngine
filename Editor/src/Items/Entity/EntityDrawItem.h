@@ -50,6 +50,8 @@ struct EntityPreviewComponent;
 // Child entities of the root entity are these SubEntity objects
 class SubEntity : public HyEntity2d
 {
+	Project &										m_ProjectRef;
+
 	struct ChildInfo
 	{
 		IHyLoadable2d *								m_pChild;
@@ -84,7 +86,7 @@ class SubEntity : public HyEntity2d
 public:
 	SubEntity(Project &projectRef, QUuid subEntityUuid, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent);
 	virtual ~SubEntity();
-	void CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj);
+	void CtorInitJsonObj(QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj);
 
 	void Extrapolate(const QMap<int, QJsonObject> &propMapRef, EntityPreviewComponent &previewComponentRef, bool bIsSelected, float fFrameDuration, int iMainDestinationFrame, HyCamera2d *pCamera);
 
@@ -103,6 +105,6 @@ private:
 };
 
 
-void ExtrapolateProperties(IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iSTART_FRAME, const int iDESTINATION_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, EntityPreviewComponent &previewComponentRef, HyCamera2d *pCamera);
+void ExtrapolateProperties(Project &projectRef, IHyLoadable2d *pThisHyNode, ShapeCtrl *pShapeCtrl, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iSTART_FRAME, const int iDESTINATION_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, EntityPreviewComponent &previewComponentRef, HyCamera2d *pCamera);
 
 #endif // ENTITYDRAWITEM_H

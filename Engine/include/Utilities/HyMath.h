@@ -438,10 +438,10 @@ public:
 	glm::vec4 GetAsVec4() const {
 		return glm::vec4(GetRedF(), GetGreenF(), GetBlueF(), GetAlphaF());
 	}
-
 	glm::vec3 GetAsVec3() const {
 		return glm::vec3(GetRedF(), GetGreenF(), GetBlueF());
 	}
+
 	HyColor Shade(int32 iPercent) const
 	{
 		int32 R = m_uiR;

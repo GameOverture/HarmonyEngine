@@ -52,7 +52,11 @@ public:
 	virtual bool IsLoadDataValid() override;
 
 	void Setup(const HyUiPanelInit &panelInit);
+	void Setup(const HyUiTextInit &textInit);
 	void Setup(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit);
+
+	HyMargins<float> GetTextMargins() const;
+	void SetTextMargins(HyMargins<float> margins);
 	
 	HyNodePath GetTextNodePath() const;
 	HyTextType GetTextType() const;

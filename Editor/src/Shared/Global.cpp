@@ -952,6 +952,42 @@
 	return QColor(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
 }
 
+/*static*/ HyType HyGlobal::ConvertItemType(ItemType eType)
+{
+	switch(eType)
+	{
+	case ITEM_Audio:		return HYTYPE_Audio;
+	case ITEM_Particles:	return HYTYPE_Particles;
+	case ITEM_Sprite:		return HYTYPE_Sprite;
+	case ITEM_Spine:		return HYTYPE_Spine;
+	case ITEM_AtlasFrame:	return HYTYPE_TexturedQuad;
+	case ITEM_Primitive:	return HYTYPE_Primitive;
+	case ITEM_Text:			return HYTYPE_Text;
+	case ITEM_Prefab:		return HYTYPE_Prefab;
+	case ITEM_Entity:		return HYTYPE_Entity;
+	}
+
+	return HYTYPE_Unknown;
+}
+
+/*static*/ ItemType HyGlobal::ConvertHyType(HyType eType)
+{
+	switch(eType)
+	{
+	case HYTYPE_Audio:			return ITEM_Audio;
+	case HYTYPE_Particles:		return ITEM_Particles;
+	case HYTYPE_Sprite:			return ITEM_Sprite;
+	case HYTYPE_Spine:			return ITEM_Spine;
+	case HYTYPE_TexturedQuad:	return ITEM_AtlasFrame;
+	case HYTYPE_Primitive:		return ITEM_Primitive;
+	case HYTYPE_Text:			return ITEM_Text;
+	case HYTYPE_Prefab:			return ITEM_Prefab;
+	case HYTYPE_Entity:			return ITEM_Entity;
+	}
+
+	return ITEM_Unknown;
+}
+
 /*static*/ EntityItemDeclarationType HyGlobal::GetEntityDeclType(QString sType)
 {
 	for(int i = 0; i < NUM_ENTDECLTYPES; ++i)

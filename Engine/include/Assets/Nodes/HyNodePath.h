@@ -40,6 +40,7 @@ public:
 	bool Set(const char *szPrefix, const char *szName); // Project Set
 	bool Set(uint32 uiChecksum, uint32 uiBankId); // Auxiliary Set
 
+	void Clear();
 	bool IsValid() const;
 	bool IsAuxiliary() const;
 };

@@ -282,8 +282,9 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-SubEntity::SubEntity(Project &projectRef, QUuid subEntityUuid, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent) :
+SubEntity::SubEntity(Project &projRef, QUuid subEntityUuid, const QJsonArray &descArray, const QJsonArray &stateArray, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
+	m_ProjectRef(projRef),
 	m_bSubTimelinePaused(false),
 	m_iSubTimelineStartFrame(0),
 	m_iSubTimelineRemainingFrames(0),
@@ -298,7 +299,7 @@ SubEntity::SubEntity(Project &projectRef, QUuid subEntityUuid, const QJsonArray 
 		if(descArray[i].isObject())
 		{
 			QJsonObject childObj = descArray[i].toObject();
-			CtorInitJsonObj(projectRef, uuidChildMap, childObj);
+			CtorInitJsonObj(uuidChildMap, childObj);
 		}
 		else // isArray()
 		{
@@ -306,7 +307,7 @@ SubEntity::SubEntity(Project &projectRef, QUuid subEntityUuid, const QJsonArray 
 			for(int i = 0; i < childArray.size(); ++i)
 			{
 				QJsonObject childObj = childArray[i].toObject();
-				CtorInitJsonObj(projectRef, uuidChildMap, childObj);
+				CtorInitJsonObj(uuidChildMap, childObj);
 			}
 		}
 	}
@@ -362,7 +363,7 @@ SubEntity::SubEntity(Project &projectRef, QUuid subEntityUuid, const QJsonArray 
 		delete childInfo.m_pPreviewComponent;
 	}
 }
-void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj)
+void SubEntity::CtorInitJsonObj(QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, const QJsonObject &childObj)
 {
 	ItemType eItemType = HyGlobal::GetTypeFromString(childObj["itemType"].toString());
 	IHyLoadable2d *pNewChild = nullptr;
@@ -386,7 +387,7 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 	case ITEM_Text: {
 		pNewChild = new HyText2d("", HY_GUI_DATAOVERRIDE, this);
 
-		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+		TreeModelItemData *pReferencedItemData = m_ProjectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
 		FileDataPair fileDataPair;
 		static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
 		QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
@@ -400,7 +401,7 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 	case ITEM_Spine: {
 		pNewChild = new HySpine2d("", HY_GUI_DATAOVERRIDE, this);
 
-		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+		TreeModelItemData *pReferencedItemData = m_ProjectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
 		FileDataPair fileDataPair;
 		static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
 		QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
@@ -414,7 +415,7 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 	case ITEM_Sprite: {
 		pNewChild = new HySprite2d("", HY_GUI_DATAOVERRIDE, this);
 
-		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+		TreeModelItemData *pReferencedItemData = m_ProjectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
 		FileDataPair fileDataPair;
 		static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
 		QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
@@ -430,10 +431,10 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 		break;
 
 	case ITEM_Entity: {
-		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+		TreeModelItemData *pReferencedItemData = m_ProjectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
 		FileDataPair fileDataPair;
 		static_cast<ProjectItemData *>(pReferencedItemData)->GetSavedFileData(fileDataPair);
-		pNewChild = new SubEntity(projectRef,
+		pNewChild = new SubEntity(m_ProjectRef,
 			//fileDataPair.m_Meta["framesPerSecond"].toInt(),
 			QUuid(fileDataPair.m_Meta["UUID"].toString()),
 			fileDataPair.m_Meta["descChildList"].toArray(),
@@ -442,7 +443,7 @@ void SubEntity::CtorInitJsonObj(Project &projectRef, QMap<QUuid, IHyLoadable2d *
 		break; }
 
 	case ITEM_AtlasFrame: {
-		TreeModelItemData *pReferencedItemData = projectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
+		TreeModelItemData *pReferencedItemData = m_ProjectRef.FindItemData(QUuid(childObj["itemUUID"].toString()));
 		pNewChild = new HyTexturedQuad2d(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum(),
 			static_cast<IAssetItemData *>(pReferencedItemData)->GetBankId(),
 			this);
@@ -475,7 +476,8 @@ void SubEntity::Extrapolate(const QMap<int, QJsonObject> &propMapRef, EntityPrev
 
 		// NOTE: ExtrapolateProperties may invoke `this::TimelineEvent()` and exit early.
 		//       If so, it will set `m_bSubTimelineDirty` to true in order to re-merge the properties and then continue the extrapolation
-		ExtrapolateProperties(this,
+		ExtrapolateProperties(m_ProjectRef,
+							  this,
 							  nullptr,
 							  bIsSelected,
 							  ITEM_Entity,
@@ -583,7 +585,7 @@ void SubEntity::ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStat
 
 
 	for(ChildInfo &childInfoRef : m_ChildInfoList)
-		ExtrapolateProperties(childInfoRef.m_pChild, nullptr, false, childInfoRef.m_eItemType, 1.0f / 60, m_iSubTimelineStartFrame, m_iSubTimelineStartFrame + iNumFramesDuration, childPropMapRef[childInfoRef.m_pChild], *childInfoRef.m_pPreviewComponent, pCamera);
+		ExtrapolateProperties(m_ProjectRef, childInfoRef.m_pChild, nullptr, false, childInfoRef.m_eItemType, 1.0f / 60, m_iSubTimelineStartFrame, m_iSubTimelineStartFrame + iNumFramesDuration, childPropMapRef[childInfoRef.m_pChild], *childInfoRef.m_pPreviewComponent, pCamera);
 }
 // SubEntity
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -593,7 +595,8 @@ void SubEntity::ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStat
 //             - EntityModel::GenerateSrc_SetStateImpl
 //             - EntityDrawItem::ExtractPropertyData
 //             - ExtrapolateProperties
-void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
+void ExtrapolateProperties(Project &projectRef,
+						   IHyLoadable2d *pThisHyNode,
 						   ShapeCtrl *pShapeCtrl,
 						   bool bIsSelected,
 						   ItemType eItemType,
@@ -891,15 +894,69 @@ void ExtrapolateProperties(IHyLoadable2d *pThisHyNode,
 			}
 			break;
 
+		case ITEM_UiLabel:
+		case ITEM_UiRichLabel:
+		case ITEM_UiButton:
+		case ITEM_UiRackMeter:
+		case ITEM_UiBarMeter:
+		case ITEM_UiCheckBox:
+		case ITEM_UiRadioButton:
+		case ITEM_UiTextField:
+		case ITEM_UiComboBox:
+		case ITEM_UiSlider:
+			if(propsObj.contains("Widget"))
+			{
+				QJsonObject widgetObj = propsObj["Widget"].toObject();
+
+				if(widgetObj.contains("Panel"))
+				{
+					QJsonObject panelObj = widgetObj["Panel"].toObject();
+					
+					HyUiPanelInit panelInit;
+					panelInit.m_eNodeType = HyGlobal::ConvertItemType(HyGlobal::GetTypeFromString(panelObj["nodeType"].toString()));
+					panelInit.m_uiWidth = panelObj["width"].toInt(0);
+					panelInit.m_uiHeight = panelObj["height"].toInt(0);
+					panelInit.m_NodePath.Set("");
+					panelInit.m_uiFrameSize = panelObj["frameSize"].toInt();
+					panelInit.m_PanelColor = HyColor(panelObj["panelColor"].toInt());
+					panelInit.m_FrameColor = HyColor(panelObj["frameColor"].toInt());
+					panelInit.m_TertiaryColor = HyColor(panelObj["tertiaryColor"].toInt());
+					static_cast<HyLabel *>(pThisHyNode)->Setup(panelInit);
+
+					QUuid nodeUuid(panelObj["nodeUuid"].toString());
+					TreeModelItemData *pItemData = projectRef.FindItemData(nodeUuid);
+					if(pItemData->IsProjectItem())
+					{
+						ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pItemData);
+
+						FileDataPair fileDataPair;
+						pReferencedProjItemData->GetSavedFileData(fileDataPair);
+
+						QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+						HyJsonDoc itemDataDoc;
+						if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+							HyGuiLog("EntityDrawItem ctor - failed to parse its file data", LOGTYPE_Error);
+						static_cast<HyLabel *>(pThisHyNode)->GuiOverrideNodeData(panelInit.m_eNodeType, itemDataDoc.GetObject(), true);
+					}
+				}
+				if(widgetObj.contains("Text"))
+				{
+					QJsonObject panelObj = widgetObj["Text"].toObject();
+					//HyUiTextInit textInit = panelObj;
+					//static_cast<HyLabel *>(pThisHyNode)->Setup(textInit);
+				}
+			}
+			break;
+
 		default:
-			HyGuiLog(QString("EntityDrawItem::RefreshJson - unsupported type: ") % HyGlobal::ItemName(eItemType, false), LOGTYPE_Error);
+			HyGuiLog(QString("ExtrapolateProperties() - unsupported type: ") % HyGlobal::ItemName(eItemType, false), LOGTYPE_Error);
 			break;
 		}
 
 		// Lastly, if this is a sub-entity, determine if the timeline is changing based on properties this frame
 		if(eItemType == ITEM_Entity &&
-		   propsObj.contains("Timeline") &&
-		   static_cast<SubEntity *>(pThisHyNode)->TimelineEvent(iFrame, propsObj["Timeline"].toObject(), pCamera))
+			propsObj.contains("Timeline") &&
+			static_cast<SubEntity *>(pThisHyNode)->TimelineEvent(iFrame, propsObj["Timeline"].toObject(), pCamera))
 		{
 			return; // This indicates we need to re-extrapolate, from this point on but with a newly merged sub-entity's timeline
 		}

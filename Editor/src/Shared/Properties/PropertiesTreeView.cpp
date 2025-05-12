@@ -17,6 +17,7 @@
 #include "PropertiesUndoCmd.h"
 #include "Project.h"
 #include "DlgColorPicker.h"
+#include "DlgSetUiPanel.h"
 
 #include <QPainter>
 #include <QHeaderView>
@@ -208,6 +209,30 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			static_cast<QComboBox *>(pReturnWidget)->setCurrentIndex(propDefRef.defaultData.toInt());
 		break;
 
+	case PROPERTIESTYPE_ComboBoxItems: {
+		pReturnWidget = new QComboBox(pParent);
+		connect(static_cast<QComboBox *>(pReturnWidget), SIGNAL(currentIndexChanged(int)), this, SLOT(OnComboBoxEditorSubmit(int)));
+
+		ItemType eItemType = static_cast<ItemType>(propDefRef.delegateBuilder.toInt());
+		PropertiesTreeModel *pModel = static_cast<PropertiesTreeModel *>(m_pTableView->model());
+		const QMap<QUuid, TreeModelItemData *> &projItemMapRef = pModel->GetOwner().GetProject().GetItemMap();
+		QList<ProjectItemData *> validItemList;
+		for(auto iter = projItemMapRef.keyValueBegin(); iter != projItemMapRef.keyValueEnd(); ++iter)
+		{
+			if(iter->second->GetType() == eItemType)
+				validItemList.append(static_cast<ProjectItemData *>(iter->second));
+		}
+		std::sort(validItemList.begin(), validItemList.end(),
+			[](const ProjectItemData *pOne, const ProjectItemData *pTwo)
+			{
+				return pOne->GetName(true) < pTwo->GetName(true);
+			});
+
+		static_cast<QComboBox *>(pReturnWidget)->clear();
+		for(ProjectItemData *pItem : validItemList)
+			static_cast<QComboBox *>(pReturnWidget)->addItem(pItem->GetIcon(SUBICON_None), pItem->GetName(true), pItem->GetUuid());
+		break; }
+
 	case PROPERTIESTYPE_StatesComboBox: {
 		pReturnWidget = new QComboBox(pParent);
 		connect(static_cast<QComboBox *>(pReturnWidget), SIGNAL(currentIndexChanged(int)), this, SLOT(OnComboBoxEditorSubmit(int)));
@@ -234,7 +259,10 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break;
 
 	case PROPERTIESTYPE_Color: {
+		const QVariant &origValue = pPropertiesTreeModel->GetIndexValue(index);
+
 		QColor topColor, botColor;
+		botColor = topColor = QColor(origValue.toRect().left(), origValue.toRect().top(), origValue.toRect().width());
 		DlgColorPicker *pDlg = new DlgColorPicker("Choose Color", topColor, botColor, pParent);
 		if(pDlg->exec() == QDialog::Accepted)
 		{
@@ -245,8 +273,6 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 				newColor = pDlg->GetVgTopColor(); // NOTE: Only getting top color!!
 
 			QVariant newValue = QRect(newColor.red(), newColor.green(), newColor.blue(), newColor.alpha());
-
-			const QVariant &origValue = pPropertiesTreeModel->GetIndexValue(index);
 			if(origValue != newValue)
 			{
 				QUndoCommand *pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
@@ -271,9 +297,32 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			static_cast<QSlider *>(pReturnWidget)->setValue(propDefRef.defaultData.toInt());
 		break; }
 
-	case PROPERTIESTYPE_UiPanel:
-		//asdf;
-		break;
+	case PROPERTIESTYPE_UiPanel: {
+		const QVariant &origValue = pPropertiesTreeModel->GetIndexValue(index);
+		QJsonObject panelObj = origValue.toJsonObject();
+
+		HyUiPanelInit init;
+		init.m_eNodeType = HyGlobal::ConvertItemType(HyGlobal::GetTypeFromString(panelObj["nodeType"].toString()));
+		init.m_uiWidth = panelObj["width"].toInt();
+		init.m_uiHeight = panelObj["height"].toInt();
+		init.m_NodePath.Clear();
+		init.m_uiFrameSize = panelObj["frameSize"].toInt();
+		init.m_PanelColor = panelObj["panelColor"].toVariant().toUInt();
+		init.m_FrameColor = panelObj["frameColor"].toVariant().toUInt();
+		init.m_TertiaryColor = panelObj["tertiaryColor"].toVariant().toUInt();
+
+		Project &projectRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetOwner().GetProject();
+		DlgSetUiPanel *pDlg = new DlgSetUiPanel(projectRef, "Setup Widget Panel", init, QUuid(panelObj["nodeUuid"].toString()), pParent);
+		if(pDlg->exec() == QDialog::Accepted)
+		{
+			QVariant newValue = pDlg->GetSerializedPanelInit();
+			if(origValue != newValue)
+			{
+				QUndoCommand *pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
+				pPropertiesTreeModel->GetOwner().GetUndoStack()->push(pUndoCmd);
+			}
+		}
+		break; }
 
 	default:
 		HyGuiLog("PropertiesDelegate::createEditor not implemented for type: " % QString::number(propDefRef.eType), LOGTYPE_Error);
@@ -326,6 +375,10 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		case PROPERTIESTYPE_StatesComboBox:
 			static_cast<QComboBox *>(pEditor)->setCurrentIndex(propValue.toInt());
 			break;
+		case PROPERTIESTYPE_ComboBoxItems:
+			static_cast<QComboBox *>(pEditor)->setCurrentIndex(static_cast<QComboBox *>(pEditor)->findData(propValue.value<QUuid>()));
+			break;
+
 		case PROPERTIESTYPE_Slider:
 		case PROPERTIESTYPE_SpriteFrames:
 			static_cast<QSlider *>(pEditor)->setValue(propValue.toInt());
@@ -373,6 +426,9 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	case PROPERTIESTYPE_ComboBoxInt:
 	case PROPERTIESTYPE_StatesComboBox:
 		newValue = QVariant(static_cast<QComboBox *>(pEditor)->currentIndex());
+		break;
+	case PROPERTIESTYPE_ComboBoxItems:
+		newValue = static_cast<QComboBox *>(pEditor)->currentData();
 		break;
 	case PROPERTIESTYPE_Slider:
 	case PROPERTIESTYPE_SpriteFrames:

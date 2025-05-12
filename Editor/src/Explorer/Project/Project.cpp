@@ -1005,6 +1005,11 @@ bool Project::DoesItemExist(ItemType eType, QString sPath) const
 	return false;
 }
 
+const QMap<QUuid, TreeModelItemData *> &Project::GetItemMap() const
+{
+	return m_ItemDataUuidMap;
+}
+
 void Project::SaveUserData() const
 {
 	// Save asset manager widgets expanded/selected state

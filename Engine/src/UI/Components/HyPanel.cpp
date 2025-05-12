@@ -132,8 +132,10 @@ void HyPanel::Setup(const HyUiPanelInit &initRef)
 			if(m_PanelData.m_pNodeItem->SetState(m_uiState) == false)
 				m_uiState = 0;
 		}
-		if(initRef.m_uiWidth != 0 && initRef.m_uiHeight != 0)
-			m_PanelData.m_pNodeItem->scale.Set(initRef.m_uiWidth / m_PanelData.m_pNodeItem->GetWidth(), initRef.m_uiHeight / m_PanelData.m_pNodeItem->GetHeight());
+		if(IsAutoSize())
+			HySetVec(m_vSizeActual, m_PanelData.m_pNodeItem->GetWidth(), m_PanelData.m_pNodeItem->GetHeight());
+		else
+			SetSize(m_vSizeHint.x, m_vSizeHint.y);
 		break;
 	
 	case HYTYPE_TexturedQuad: // 'NodeItem' panel
@@ -169,7 +171,7 @@ void HyPanel::Setup(const HyUiPanelInit &initRef)
 
 HyUiPanelInit HyPanel::CloneInit()
 {
-	HyUiPanelInit init;
+	HyUiPanelInit init = {};
 	if(IsBoundingVolume())
 	{
 		init.m_eNodeType = HYTYPE_Entity;
@@ -349,15 +351,18 @@ void HyPanel::SetSize(uint32 uiWidth, uint32 uiHeight)
 			fCurHeight = m_PanelData.m_pNodeItem->GetHeight(1.0f);
 		}
 
-		if(IsAutoSize())
+		if(fCurWidth != 0.0f && fCurHeight != 0.0f)
 		{
-			m_PanelData.m_pNodeItem->scale.Set(uiWidth / fCurWidth, uiHeight / fCurHeight);
-		}
-		else
-		{
-			m_PanelData.m_pNodeItem->scale.SetAll(1.0f);
-			float fScale = std::min(uiWidth / fCurWidth, uiHeight / fCurHeight);
-			m_PanelData.m_pNodeItem->scale.SetAll(fScale);
+			if(IsAutoSize())
+			{
+				m_PanelData.m_pNodeItem->scale.Set(uiWidth / fCurWidth, uiHeight / fCurHeight);
+			}
+			else
+			{
+				m_PanelData.m_pNodeItem->scale.SetAll(1.0f);
+				float fScale = std::min(uiWidth / fCurWidth, uiHeight / fCurHeight);
+				m_PanelData.m_pNodeItem->scale.SetAll(fScale);
+			}
 		}
 	}
 	else if(IsPrimitive())
@@ -444,6 +449,44 @@ glm::vec2 HyPanel::GetBotLeftOffset()
 	}
 	return glm::vec2(0.0f, 0.0f);
 }
+
+#ifdef HY_PLATFORM_GUI
+void HyPanel::GuiOverrideNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName /*= true*/)
+{
+	DeleteData();
+	if(eNodeType == HYTYPE_Sprite)
+	{
+		m_PanelData.m_pNodeItem = HY_NEW HySprite2d("", HY_GUI_DATAOVERRIDE, this);
+		static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GuiOverrideData<HySpriteData>(itemDataObj, bUseGuiOverrideName);
+		static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->SetAllBoundsIncludeAlphaCrop(true);
+		if(m_uiState != 0)
+		{
+			if(m_PanelData.m_pNodeItem->SetState(m_uiState) == false)
+				m_uiState = 0;
+		}
+		if(IsAutoSize())
+			HySetVec(m_vSizeActual, static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateWidth(m_uiState, 1.0f), static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateHeight(m_uiState, 1.0f));
+		else
+			SetSize(m_vSizeHint.x, m_vSizeHint.y);
+	}
+	else if(eNodeType == HYTYPE_Spine)
+	{
+		m_PanelData.m_pNodeItem = HY_NEW HySpine2d("", HY_GUI_DATAOVERRIDE, this);
+		static_cast<HySpine2d *>(m_PanelData.m_pNodeItem)->GuiOverrideData<HySpineData>(itemDataObj, bUseGuiOverrideName);
+		if(m_uiState != 0)
+		{
+			if(m_PanelData.m_pNodeItem->SetState(m_uiState) == false)
+				m_uiState = 0;
+		}
+		if(IsAutoSize())
+			HySetVec(m_vSizeActual, m_PanelData.m_pNodeItem->GetWidth(), m_PanelData.m_pNodeItem->GetHeight());
+		else
+			SetSize(m_vSizeHint.x, m_vSizeHint.y);
+	}
+	else
+		HyLogError("HyPanel::GuiOverrideNodeData() - unsupported type: " << eNodeType);
+}
+#endif
 
 /*virtual*/ void HyPanel::OnLoaded() /*override*/
 {

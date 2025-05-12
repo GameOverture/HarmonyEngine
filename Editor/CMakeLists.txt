@@ -220,6 +220,9 @@ if(Qt5_DIR)
 		src/Dialogs/DlgSetEngineLocation.cpp
 		src/Dialogs/DlgSetEngineLocation.h
 		src/Dialogs/DlgSetEngineLocation.ui
+		src/Dialogs/DlgSetUiPanel.cpp
+		src/Dialogs/DlgSetUiPanel.h
+		src/Dialogs/DlgSetUiPanel.ui
 		src/Dialogs/DlgSnappingSettings.cpp
 		src/Dialogs/DlgSnappingSettings.h
 		src/Dialogs/DlgSnappingSettings.ui

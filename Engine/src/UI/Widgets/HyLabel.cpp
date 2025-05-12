@@ -103,11 +103,6 @@ HyLabel::HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, H
 
 void HyLabel::Setup(const HyUiPanelInit &panelInit)
 {
-	Setup(panelInit, HyUiTextInit(m_Text.GetPath(), m_TextMargins));
-}
-
-void HyLabel::Setup(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit)
-{
 	if(m_Panel.IsBoundingVolume() && m_Panel.GetBvShape())
 	{
 		for(IHyFixture2d *pFixture : m_FixtureList)
@@ -122,10 +117,35 @@ void HyLabel::Setup(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit
 	if(m_Panel.IsBoundingVolume() && m_Panel.GetBvShape())
 		FixtureAppend(*m_Panel.GetBvShape());
 
+	SetAsEnabled(IsEnabled());
+	SetAssembleNeeded();
+	OnSetup();
+}
+
+void HyLabel::Setup(const HyUiTextInit &textInit)
+{
 	m_Text.Init(textInit.m_NodePath, this);
-	m_TextMargins = textInit.m_Margins;
+	SetTextMargins(textInit.m_Margins);
 
 	SetAsEnabled(IsEnabled());
+	SetAssembleNeeded();
+	OnSetup();
+}
+
+void HyLabel::Setup(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit)
+{
+	Setup(panelInit);
+	Setup(textInit);
+}
+
+HyMargins<float> HyLabel::GetTextMargins() const
+{
+	return m_TextMargins;
+}
+
+void HyLabel::SetTextMargins(HyMargins<float> margins)
+{
+	m_TextMargins = margins;
 
 	switch(GetTextType())
 	{
@@ -134,12 +154,11 @@ void HyLabel::Setup(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit
 	case HYTEXT_Box:		SetAsBox(GetWidth(), GetHeight(), m_uiEntityAttribs & LABELATTRIB_Vertical, m_uiEntityAttribs & LABELATTRIB_BoxUseScissorOrSbsTextFirst); break;
 	case HYTEXT_ScaleBox:	SetAsScaleBox(GetWidth(), GetHeight(), m_uiEntityAttribs & LABELATTRIB_Vertical); break;
 	default:
-		HyLogError("HyRichText::Setup() - Unhandled text type: " << GetTextType());
+		HyLogError("HyLabel::Setup() - Unhandled text type: " << GetTextType());
 		break;
 	}
 
 	SetAssembleNeeded();
-	OnSetup();
 }
 
 HyNodePath HyLabel::GetTextNodePath() const

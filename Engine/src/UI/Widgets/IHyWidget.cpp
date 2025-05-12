@@ -258,6 +258,13 @@ void IHyWidget::SetAsHighlighted(bool bIsHighlighted)
 	return IsMouseDown();
 }
 
+#ifdef HY_PLATFORM_GUI
+void IHyWidget::GuiOverrideNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName /*= true*/)
+{
+	m_Panel.GuiOverrideNodeData(eNodeType, itemDataObj, bUseGuiOverrideName);
+}
+#endif
+
 /*virtual*/ void IHyWidget::OnMouseEnter() /*override final*/
 {
 	if(IsInputAllowed())

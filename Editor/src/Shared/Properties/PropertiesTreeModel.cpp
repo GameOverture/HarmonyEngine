@@ -601,7 +601,7 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 
 			QVariant propValue;
 			bool bIsProceduralObj = false; // TODO: Procedural values allow the user to use RNG, ranges, or sequences to set as values instead of hard-coding
-			if(categoryObj[sProperty].isObject())
+			if(categoryObj[sProperty].isObject() && categoryObj[sProperty].toObject().contains("procValType"))
 			{
 				propValue = categoryObj[sProperty].toObject();
 				bIsProceduralObj = true;
@@ -630,6 +630,10 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 				case PROPERTIESTYPE_Slider:
 				case PROPERTIESTYPE_SpriteFrames:
 					propValue = categoryObj[sProperty].toInt();
+					break;
+
+				case PROPERTIESTYPE_ComboBoxItems:
+					propValue = QUuid(categoryObj[sProperty].toString());
 					break;
 
 				case PROPERTIESTYPE_int64:
@@ -682,10 +686,7 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 					break;
 
 				case PROPERTIESTYPE_UiPanel:
-					//asdf;
-					break;
-
-				case PROPERTIESTYPE_UiText:
+					propValue = categoryObj[sProperty].toObject();
 					break;
 
 				default:
@@ -935,6 +936,9 @@ void PropertiesTreeModel::ResetValues()
 	case PROPERTIESTYPE_SpriteFrames:
 		return QVariant(valueRef.toInt());
 
+	case PROPERTIESTYPE_ComboBoxItems:
+		return QVariant(QUuid(valueRef.toString()));
+
 	case PROPERTIESTYPE_int64:
 		return QVariant(valueRef.toVariant().toLongLong());
 
@@ -975,6 +979,9 @@ void PropertiesTreeModel::ResetValues()
 	case PROPERTIESTYPE_LineEdit:
 		return QVariant(valueRef.toString());
 
+	case PROPERTIESTYPE_UiPanel:
+		return QVariant(valueRef.toObject());
+
 	default:
 		HyGuiLog("Unhandled PropertiesTreeModel::ConvertJsonToVariant property type: " % QString::number(ePropType), LOGTYPE_Error);
 		break;
@@ -999,6 +1006,9 @@ void PropertiesTreeModel::ResetValues()
 	case PROPERTIESTYPE_StatesComboBox:
 	case PROPERTIESTYPE_SpriteFrames:
 		return QJsonValue(valueRef.toInt());
+
+	case PROPERTIESTYPE_ComboBoxItems:
+		return QJsonValue(valueRef.value<QUuid>().toString(QUuid::WithoutBraces));
 
 	case PROPERTIESTYPE_int64:
 		return QJsonValue(valueRef.toLongLong());
@@ -1027,6 +1037,9 @@ void PropertiesTreeModel::ResetValues()
 
 	case PROPERTIESTYPE_LineEdit:
 		return QJsonValue(valueRef.toString());
+
+	case PROPERTIESTYPE_UiPanel:
+		return QJsonValue(valueRef.toJsonObject());
 
 	default:
 		HyGuiLog("Unhandled PropertiesTreeModel::ConvertVariantToJson property type: " % QString::number(ePropType), LOGTYPE_Error);
@@ -1109,6 +1122,9 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 	case PROPERTIESTYPE_ComboBoxInt:
 		sRetStr += propDefRef.delegateBuilder.toStringList()[treeItemValue.toInt()];
 		break;
+	case PROPERTIESTYPE_ComboBoxItems:
+		sRetStr += treeItemValue.toString();
+		break;
 	case PROPERTIESTYPE_StatesComboBox: {
 		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(m_OwnerRef.GetProject().FindItemData(propDefRef.delegateBuilder.toUuid()));
 		if(pProjItem)
@@ -1126,6 +1142,10 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 		break; }
 	case PROPERTIESTYPE_Root:
 	case PROPERTIESTYPE_Category:
+		break;
+
+	case PROPERTIESTYPE_UiPanel:
+		sRetStr += "Panel";
 		break;
 
 	default:

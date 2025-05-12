@@ -137,6 +137,10 @@ public:
 
 	glm::vec2 GetBotLeftOffset();
 
+#ifdef HY_PLATFORM_GUI
+	void GuiOverrideNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName = true);
+#endif
+
 protected:
 	virtual void OnLoaded() override;
 

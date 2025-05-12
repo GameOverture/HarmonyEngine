@@ -150,6 +150,12 @@ bool HyNodePath::Set(uint32 uiChecksum, uint32 uiBankId)
 	return m_uiHash1 != 0;
 }
 
+void HyNodePath::Clear()
+{
+	m_sPath.clear();
+	m_uiHash1 = m_uiHash2 = 0;
+}
+
 bool HyNodePath::IsValid() const
 {
 	return m_uiHash1 != 0 || m_uiHash2 != 0;

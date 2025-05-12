@@ -345,7 +345,7 @@
            <string>Add the currently selected items in Project Explorer</string>
           </property>
           <property name="text">
-           <string>Add Selected Items</string>
+           <string>Add Project Items</string>
           </property>
          </widget>
         </item>

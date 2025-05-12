@@ -392,7 +392,8 @@ void EntityDraw::SetExtrapolatedProperties()
 	QMap<int, QJsonObject> ctorFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData];
 	ctorFrameMap[-1] = ctorKeyFrameMapRef[pRootTreeItemData];
 
-	ExtrapolateProperties(&m_RootEntity,
+	ExtrapolateProperties(m_pProjItem->GetProject(),
+							&m_RootEntity,
 							nullptr,
 							false,
 							ITEM_None, // 'ITEM_None' indicates this is the root
@@ -432,7 +433,8 @@ void EntityDraw::SetExtrapolatedProperties()
 			QMap<int, QJsonObject> ctorFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
 			ctorFrameMap[-1] = ctorKeyFrameMapRef[pEntityTreeItemData];
 
-			ExtrapolateProperties(pEntDrawItem->GetHyNode(),
+			ExtrapolateProperties(m_pProjItem->GetProject(),
+									pEntDrawItem->GetHyNode(),
 									&pEntDrawItem->GetShapeCtrl(),
 									pEntityTreeItemData->IsSelected(),
 									eItemType,

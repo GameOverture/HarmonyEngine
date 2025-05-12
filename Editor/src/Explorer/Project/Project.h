@@ -156,6 +156,7 @@ public:
 	QString RenamePrefix(QString sOldPath, QString sNewPath);
 
 	bool DoesItemExist(ItemType eType, QString sPath) const;
+	const QMap<QUuid, TreeModelItemData *> &GetItemMap() const;
 
 	void SaveUserData() const;
 

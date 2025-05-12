@@ -483,6 +483,8 @@ public:
 	static void OpenFileInExplorer(QString sFilePath);
 
 	static QColor ConvertHyColor(HyColor color);
+	static HyType ConvertItemType(ItemType eType);
+	static ItemType ConvertHyType(HyType eType);
 
 	static EntityItemDeclarationType GetEntityDeclType(QString sType);
 
