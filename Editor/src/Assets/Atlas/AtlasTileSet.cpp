@@ -212,7 +212,7 @@ void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 		autotileObj["id"] = QJsonValue(static_cast<int>(m_AutotileList[i].m_hId));
 		autotileObj["type"] = QJsonValue(m_AutotileList[i].m_iType);
 		autotileObj["name"] = QJsonValue(m_AutotileList[i].m_sName);
-		autotileObj["color"] = QJsonValue(static_cast<qint64>(m_AutotileList[i].m_Color.GetAsRGBA()));
+		autotileObj["color"] = QJsonValue(static_cast<qint64>(m_AutotileList[i].m_Color.GetAsHexCode()));
 		autotileArray.append(autotileObj);
 	}
 	fileDataPairOut.m_Meta["autoTiles"] = autotileArray;
@@ -223,7 +223,7 @@ void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 		QJsonObject physicsLayerObj;
 		physicsLayerObj["id"] = QJsonValue(static_cast<int>(m_PhysicsLayerList[i].m_hId));
 		physicsLayerObj["name"] = QJsonValue(m_PhysicsLayerList[i].m_sName);
-		physicsLayerObj["color"] = QJsonValue(static_cast<qint64>(m_PhysicsLayerList[i].m_Color.GetAsRGBA()));
+		physicsLayerObj["color"] = QJsonValue(static_cast<qint64>(m_PhysicsLayerList[i].m_Color.GetAsHexCode()));
 		physicsLayerArray.append(physicsLayerObj);
 	}
 	fileDataPairOut.m_Meta["physicsLayers"] = physicsLayerArray;

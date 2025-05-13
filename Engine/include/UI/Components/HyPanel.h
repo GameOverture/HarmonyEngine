@@ -53,9 +53,9 @@ struct HyUiPanelInit
 	HyUiPanelInit(HyType eNodeType, const HyNodePath &nodePath);
 	HyUiPanelInit(HyType eNodeType, const HyNodePath &nodePath, uint32 uiWidth, uint32 uiHeight);
 
-	// Constructs a 'Primitive' panel. Default HyColor values of 0xDEADBEEF will be set to a default color determined by the widget
+	// Constructs a 'Primitive' panel. Default HyColor values of 0xDEADBE will be set to a default color determined by the widget
 	// Passing '0' for width/height will try to auto-size based on the widget if applicable (or it will be hidden)
-	HyUiPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0xDE,0xAD,0xBE,0xEF), HyColor frameColor = HyColor(0xDE, 0xAD, 0xBE, 0xEF), HyColor tertiaryColor = HyColor(0xDE, 0xAD, 0xBE, 0xEF));
+	HyUiPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0xDE,0xAD,0xBE), HyColor frameColor = HyColor(0xDE,0xAD,0xBE), HyColor tertiaryColor = HyColor(0xDE,0xAD,0xBE));
 };
 
 // Internal class component of UI widgets. Is a visual representation of single panel.

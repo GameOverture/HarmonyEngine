@@ -198,8 +198,8 @@
 
 	sm_EditorColors[EDITORCOLOR_Origin] = HyColor::White;
 	sm_EditorColors[EDITORCOLOR_OriginStroke] = HyColor::Black;
-	sm_EditorColors[EDITORCOLOR_GridColor1] = HyColor(106, 105, 113, 255);
-	sm_EditorColors[EDITORCOLOR_GridColor2] = HyColor(93, 93, 97, 255);
+	sm_EditorColors[EDITORCOLOR_GridColor1] = HyColor(106, 105, 113);
+	sm_EditorColors[EDITORCOLOR_GridColor2] = HyColor(93, 93, 97);
 	sm_EditorColors[EDITORCOLOR_GridOverlay] = HyColor::Black;
 	sm_EditorColors[EDITORCOLOR_Rulers] = HyColor::PanelContainer;
 	sm_EditorColors[EDITORCOLOR_RulersNotch] = HyColor::FrameWidget;
@@ -947,9 +947,14 @@
 #endif
 }
 
+/*static*/ HyColor HyGlobal::ConvertQColor(QColor color)
+{
+	return HyColor(static_cast<float>(color.redF()), static_cast<float>(color.greenF()), static_cast<float>(color.blueF()));
+}
+
 /*static*/ QColor HyGlobal::ConvertHyColor(HyColor color)
 {
-	return QColor(color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
+	return QColor(color.GetRed(), color.GetGreen(), color.GetBlue());
 }
 
 /*static*/ HyType HyGlobal::ConvertItemType(ItemType eType)

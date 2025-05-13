@@ -12,6 +12,8 @@
 
 #include <QDialog>
 
+class QButton;
+
 namespace Ui {
 class DlgSetUiPanel;
 }
@@ -49,10 +51,14 @@ private Q_SLOTS:
 	void OnSizeChanged(QVariant newSize);
 
 	void on_sbPrimFrame_valueChanged(int arg1);
-	void on_primPanelColor_clicked();
+	void on_btnPanelColor_clicked();
+	void on_btnFrameColor_clicked();
+	void on_btnTertiaryColor_clicked();
 
 private:
 	Ui::DlgSetUiPanel *ui;
+
+	HyColor SetPrimColor(HyColor startingColor, QPushButton *pButton, bool bShowDialog);
 };
 
 #endif // DLGSETUIPANEL_H

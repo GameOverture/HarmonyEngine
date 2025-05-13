@@ -22,9 +22,9 @@ HyUiPanelInit::HyUiPanelInit() :
 	m_uiHeight(0),
 	m_NodePath(),
 	m_uiFrameSize(0),
-	m_PanelColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
-	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
-	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF))
+	m_PanelColor(HyColor(0xDE, 0xAD, 0xBE)),
+	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE)),
+	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE))
 {
 }
 
@@ -35,9 +35,9 @@ HyUiPanelInit::HyUiPanelInit(uint32 uiWidth, uint32 uiHeight) :
 	m_uiHeight(uiHeight),
 	m_NodePath(),
 	m_uiFrameSize(0),
-	m_PanelColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
-	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
-	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF))
+	m_PanelColor(HyColor(0xDE, 0xAD, 0xBE)),
+	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE)),
+	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE))
 {
 }
 
@@ -48,9 +48,9 @@ HyUiPanelInit::HyUiPanelInit(HyType eNodeType, const HyNodePath &nodePath) :
 	m_uiHeight(0),
 	m_NodePath(nodePath),
 	m_uiFrameSize(0),
-	m_PanelColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
-	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
-	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF))
+	m_PanelColor(HyColor(0xDE, 0xAD, 0xBE)),
+	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE)),
+	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE))
 {
 	HyAssert(m_eNodeType != HYTYPE_Entity && m_eNodeType != HYTYPE_Primitive, "HyUiPanelInit::HyUiPanelInit(eNodeType, nodePath) 'NodeItem' panels cannot be of type 'Entity'");
 }
@@ -61,9 +61,9 @@ HyUiPanelInit::HyUiPanelInit(HyType eNodeType, const HyNodePath &nodePath, uint3
 	m_uiHeight(uiHeight),
 	m_NodePath(nodePath),
 	m_uiFrameSize(0),
-	m_PanelColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
-	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF)),
-	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE, 0xEF))
+	m_PanelColor(HyColor(0xDE, 0xAD, 0xBE)),
+	m_FrameColor(HyColor(0xDE, 0xAD, 0xBE)),
+	m_TertiaryColor(HyColor(0xDE, 0xAD, 0xBE))
 {
 	HyAssert(m_eNodeType != HYTYPE_Entity && m_eNodeType != HYTYPE_Primitive, "HyPanelInit::HyUiPanelInit(eNodeType, nodePath, uint32 uiWidth, uint32 uiHeight) 'NodeItem' panels cannot be of type 'Entity'");
 }
@@ -146,20 +146,17 @@ void HyPanel::Setup(const HyUiPanelInit &initRef)
 		m_PanelData.m_pPrimParts = HY_NEW PrimParts(initRef, this);
 
 		// If a PrimPart's color's RGBA is 0xDEADBEEF, then reassign it to a default color
-		if(m_PanelData.m_pPrimParts->m_PanelColor.GetAsRGBA() == 0xDEADBEEF)
+		if(m_PanelData.m_pPrimParts->m_PanelColor == HyColor::_InternalUse)
 			m_PanelData.m_pPrimParts->m_PanelColor = m_PanelData.m_pPrimParts->m_bIsContainer ? HyColor::PanelContainer : HyColor::PanelWidget;
-		if(m_PanelData.m_pPrimParts->m_FrameColor.GetAsRGBA() == 0xDEADBEEF)
+		if(m_PanelData.m_pPrimParts->m_FrameColor == HyColor::_InternalUse)
 			m_PanelData.m_pPrimParts->m_FrameColor = m_PanelData.m_pPrimParts->m_bIsContainer ? HyColor::FrameContainer : HyColor::FrameWidget;
-		if(m_PanelData.m_pPrimParts->m_TertiaryColor.GetAsRGBA() == 0xDEADBEEF)
+		if(m_PanelData.m_pPrimParts->m_TertiaryColor == HyColor::_InternalUse)
 			m_PanelData.m_pPrimParts->m_TertiaryColor = HyColor::Orange;
 
 		ConstructPrimitives();
 		m_PanelData.m_pPrimParts->m_Body.SetTint(m_PanelData.m_pPrimParts->m_PanelColor);
-		m_PanelData.m_pPrimParts->m_Body.alpha.Set(m_PanelData.m_pPrimParts->m_PanelColor.GetAlphaF());
 		m_PanelData.m_pPrimParts->m_Frame1.SetTint(m_PanelData.m_pPrimParts->m_FrameColor);
-		m_PanelData.m_pPrimParts->m_Frame1.alpha.Set(m_PanelData.m_pPrimParts->m_FrameColor.GetAlphaF());
 		m_PanelData.m_pPrimParts->m_Frame2.SetTint(m_PanelData.m_pPrimParts->m_TertiaryColor);
-		m_PanelData.m_pPrimParts->m_Frame2.alpha.Set(m_PanelData.m_pPrimParts->m_TertiaryColor.GetAlphaF());
 		SetState(HYPANELSTATE_Idle);
 		break;
 
@@ -417,7 +414,7 @@ HyColor HyPanel::GetPanelColor() const
 	if(IsPrimitive())
 		return HyColor(m_PanelData.m_pPrimParts->m_Body.topColor.X(), m_PanelData.m_pPrimParts->m_Body.topColor.Y(), m_PanelData.m_pPrimParts->m_Body.topColor.Z());
 	else
-		return HyColor::Transparent;
+		return HyColor::Black;
 }
 
 HyColor HyPanel::GetFrameColor() const
@@ -425,7 +422,7 @@ HyColor HyPanel::GetFrameColor() const
 	if(IsPrimitive())
 		return HyColor(m_PanelData.m_pPrimParts->m_Frame1.topColor.X(), m_PanelData.m_pPrimParts->m_Frame1.topColor.Y(), m_PanelData.m_pPrimParts->m_Frame1.topColor.Z());
 	else
-		return HyColor::Transparent;
+		return HyColor::Black;
 }
 
 HyColor HyPanel::GetTertiaryColor() const
@@ -433,7 +430,7 @@ HyColor HyPanel::GetTertiaryColor() const
 	if(IsPrimitive())
 		return m_PanelData.m_pPrimParts->m_TertiaryColor;
 	else
-		return HyColor::Transparent;
+		return HyColor::Black;
 }
 
 glm::vec2 HyPanel::GetBotLeftOffset()

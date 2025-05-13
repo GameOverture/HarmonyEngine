@@ -354,34 +354,30 @@ public:
 	static float TweenProgress(float fStart, float fEnd, float fElaspedTime, float fFullDuration, HyTweenFunc fpTweenFunc = HyTween::Linear);
 };
 
+// 24-bit color
 class HyColor
 {
-	uint8		m_uiA;
 	uint8		m_uiR;
 	uint8		m_uiG;
 	uint8		m_uiB;
 
 public:
 	HyColor() :
-		m_uiA(0xFF),
 		m_uiR(0x00),
 		m_uiG(0x00),
 		m_uiB(0x00)
 	{ }
-	HyColor(int32 iRed, int32 iGreen, int32 iBlue, int32 iAlpha = 0xFF) :
-		m_uiA(iAlpha & 0xFF),
+	HyColor(int32 iRed, int32 iGreen, int32 iBlue) :
 		m_uiR(iRed & 0xFF),
 		m_uiG(iGreen & 0xFF),
 		m_uiB(iBlue & 0xFF)
 	{ }
-	HyColor(uint32 uiColor) : // 24-bit color ctor, does not initialize alpha channel (which is set to 0xFF)
-		m_uiA(0xFF),
-		m_uiR((uiColor >> 16) & 0xFF),
-		m_uiG((uiColor >> 8) & 0xFF),
-		m_uiB(uiColor & 0xFF)
+	HyColor(uint32 uiHexCode) : // 24-bit hex code color as 0xRRGGBB - does not initialize alpha channel (which is set to 0xFF)
+		m_uiR((uiHexCode >> 16) & 0xFF),
+		m_uiG((uiHexCode >> 8) & 0xFF),
+		m_uiB(uiHexCode & 0xFF)
 	{ }
-	HyColor(float fRed, float fGreen, float fBlue, float fAlpha = 1.0f) :
-		m_uiA(static_cast<uint8>(255.0f * HyMath::Clamp(fAlpha, 0.0f, 1.0f))),
+	HyColor(float fRed, float fGreen, float fBlue) :
 		m_uiR(static_cast<uint8>(255.0f * HyMath::Clamp(fRed, 0.0f, 1.0f))),
 		m_uiG(static_cast<uint8>(255.0f * HyMath::Clamp(fGreen, 0.0f, 1.0f))),
 		m_uiB(static_cast<uint8>(255.0f * HyMath::Clamp(fBlue, 0.0f, 1.0f)))
@@ -389,7 +385,7 @@ public:
 
 	bool operator==(const HyColor &rhs)
 	{
-		return m_uiR == rhs.m_uiR && m_uiG == rhs.m_uiG && m_uiB == rhs.m_uiB && m_uiA == rhs.m_uiA;
+		return m_uiR == rhs.m_uiR && m_uiG == rhs.m_uiG && m_uiB == rhs.m_uiB;
 	}
 
 	bool operator!=(const HyColor &rhs)
@@ -397,14 +393,12 @@ public:
 		return !(*this == rhs);
 	}
 
-	uint32 GetAsRGBA() const {
-		return (m_uiR << 24) | (m_uiG << 16) | (m_uiB << 8) | m_uiA; // Returned as uint32 mask: RGBA
-	}
-	uint32 GetAsARGB() const {
-		return (m_uiA << 24) | (m_uiR << 16) | (m_uiG << 8) | m_uiB; // Returned as uint32 mask: ARGB
-	}
-	uint32 GetAsABGR() const {
-		return (m_uiA << 24) | (m_uiB << 16) | (m_uiG << 8) | m_uiR; // Returned as uint32 mask: ABGR
+	uint32 GetAsHexCode() const {
+#if defined(HY_ENDIAN_LITTLE)
+		return (m_uiR << 16) | (m_uiG << 8) | m_uiB; // Returned as uint32 mask: as 0xRRGGBB
+#else
+		return (m_uiB << 16) | (m_uiG << 8) | m_uiR; // Returned as uint32 mask: as 0xRRGGBB
+#endif
 	}
 
 	uint8 GetRed() const {
@@ -428,15 +422,8 @@ public:
 		return m_uiB / 255.0f;
 	}
 
-	uint8 GetAlpha() const {
-		return m_uiA;
-	}
-	float GetAlphaF() const {
-		return m_uiA / 255.0f;
-	}
-
 	glm::vec4 GetAsVec4() const {
-		return glm::vec4(GetRedF(), GetGreenF(), GetBlueF(), GetAlphaF());
+		return glm::vec4(GetRedF(), GetGreenF(), GetBlueF(), 1.0f);
 	}
 	glm::vec3 GetAsVec3() const {
 		return glm::vec3(GetRedF(), GetGreenF(), GetBlueF());
@@ -463,7 +450,7 @@ public:
 		G = HyMath::Clamp(G, 0, 255);
 		B = HyMath::Clamp(B, 0, 255);
 
-		return HyColor(R, G, B, m_uiA);
+		return HyColor(R, G, B);
 	}
 	HyColor Lighten() const
 	{
@@ -507,11 +494,11 @@ public:
 	static const HyColor LightGray;
 	static const HyColor Orange;
 	static const HyColor Brown;
-	static const HyColor Transparent;
 	static const HyColor PanelContainer;
 	static const HyColor FrameContainer;
 	static const HyColor PanelWidget;
 	static const HyColor FrameWidget;
+	static const HyColor _InternalUse;
 };
 typedef HyColor HyColour;
 

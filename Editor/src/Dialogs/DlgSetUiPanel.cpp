@@ -11,7 +11,8 @@
 #include "DlgSetUiPanel.h"
 #include "ui_DlgSetUiPanel.h"
 #include "Project.h"
-//#include "TreeModelItemData.h"
+
+#include <QColorDialog>
 
 DlgSetUiPanel::DlgSetUiPanel(Project &projectRef, QString sTitle, HyUiPanelInit &init, QUuid selectedNodeUuid, QWidget *parent /*= nullptr*/) :
 	QDialog(parent),
@@ -51,9 +52,9 @@ QVariant DlgSetUiPanel::GetSerializedPanelInit() const
 	serializedObj.insert("height", QJsonValue(static_cast<qint64>(m_Init.m_uiHeight)));
 	serializedObj.insert("nodeUuid", m_SelectedNodeUuid.toString(QUuid::WithoutBraces));
 	serializedObj.insert("frameSize", QJsonValue(static_cast<qint64>(m_Init.m_uiFrameSize)));
-	serializedObj.insert("panelColor", QJsonValue(static_cast<qint64>(m_Init.m_PanelColor.GetAsRGBA())));
-	serializedObj.insert("frameColor", QJsonValue(static_cast<qint64>(m_Init.m_FrameColor.GetAsRGBA())));
-	serializedObj.insert("tertiaryColor", QJsonValue(static_cast<qint64>(m_Init.m_TertiaryColor.GetAsRGBA())));
+	serializedObj.insert("panelColor", QJsonValue(static_cast<qint64>(m_Init.m_PanelColor.GetAsHexCode())));
+	serializedObj.insert("frameColor", QJsonValue(static_cast<qint64>(m_Init.m_FrameColor.GetAsHexCode())));
+	serializedObj.insert("tertiaryColor", QJsonValue(static_cast<qint64>(m_Init.m_TertiaryColor.GetAsHexCode())));
 
 	return QVariant(serializedObj);
 }
@@ -105,9 +106,10 @@ void DlgSetUiPanel::SyncWidgets()
 
 	ui->vsbPrimSize->SetValue(size);
 	ui->sbPrimFrame->setValue(static_cast<int>(m_Init.m_uiFrameSize));
-	ui->primPanelColor->setStyleSheet(QString("background-color: rgb(") % QString::number(m_Init.m_PanelColor.GetRed()) % ", " % QString::number(m_Init.m_PanelColor.GetGreen()) % ", " % QString::number(m_Init.m_PanelColor.GetBlue()) % ");");
-	ui->primFrameColor->setStyleSheet(QString("background-color: rgb(") % QString::number(m_Init.m_FrameColor.GetRed()) % ", " % QString::number(m_Init.m_FrameColor.GetGreen()) % ", " % QString::number(m_Init.m_FrameColor.GetBlue()) % ");");
-	ui->primTertiaryColor->setStyleSheet(QString("background-color: rgb(") % QString::number(m_Init.m_TertiaryColor.GetRed()) % ", " % QString::number(m_Init.m_TertiaryColor.GetGreen()) % ", " % QString::number(m_Init.m_TertiaryColor.GetBlue()) % ");");
+
+	SetPrimColor(m_Init.m_PanelColor, ui->btnPanelColor, false);
+	SetPrimColor(m_Init.m_FrameColor, ui->btnFrameColor, false);
+	SetPrimColor(m_Init.m_TertiaryColor, ui->btnTertiaryColor, false);
 
 	if(ui->grpNodeSetSize->isChecked())
 		ui->vsbNodeSize->SetValue(size);
@@ -162,6 +164,54 @@ void DlgSetUiPanel::on_sbPrimFrame_valueChanged(int arg1)
 	m_Init.m_uiFrameSize = ui->sbPrimFrame->value();
 }
 
-void DlgSetUiPanel::on_primPanelColor_clicked()
+void DlgSetUiPanel::on_btnPanelColor_clicked()
 {
+	m_Init.m_PanelColor = SetPrimColor(m_Init.m_PanelColor, ui->btnPanelColor, true);
+}
+
+void DlgSetUiPanel::on_btnFrameColor_clicked()
+{
+	m_Init.m_FrameColor = SetPrimColor(m_Init.m_FrameColor, ui->btnFrameColor, true);
+}
+
+void DlgSetUiPanel::on_btnTertiaryColor_clicked()
+{
+	m_Init.m_TertiaryColor = SetPrimColor(m_Init.m_TertiaryColor, ui->btnTertiaryColor, true);
+}
+
+HyColor DlgSetUiPanel::SetPrimColor(HyColor startingColor, QPushButton *pButton, bool bShowDialog)
+{
+	QColor color = HyGlobal::ConvertHyColor(startingColor);
+
+	if(bShowDialog)
+	{
+		QColorDialog *pDlg = new QColorDialog(color, this);
+		if(pDlg->exec() == QDialog::Accepted)
+			color = pDlg->currentColor();
+		delete pDlg;
+	}
+
+	if(color.isValid())
+	{
+		// Override the current stylesheet
+		QString sStyleSheet = "QPushButton { background-color: rgb(";
+		sStyleSheet += QString::number(color.red());
+		sStyleSheet += ", ";
+		sStyleSheet += QString::number(color.green());
+		sStyleSheet += ", ";
+		sStyleSheet += QString::number(color.blue());
+		sStyleSheet += "); }";
+		pButton->setStyleSheet(sStyleSheet);
+
+		// This is required for a blank stylesheet (Corpy NT6)
+		QPalette pal = pButton->palette();
+		pal.setColor(QPalette::Button, color);
+		pButton->setAutoFillBackground(true);
+		pButton->setPalette(pal);
+
+		// Refresh the widget and redraw
+		pButton->update();
+	}
+
+	return HyGlobal::ConvertQColor(color);
 }

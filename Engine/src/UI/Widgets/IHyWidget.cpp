@@ -84,6 +84,16 @@ void IHyWidget::SetPanelVisible(bool bVisible)
 	m_Panel.SetVisible(bVisible);
 }
 
+float IHyWidget::GetPanelAlpha() const
+{
+	return m_Panel.alpha.Get();
+}
+
+void IHyWidget::SetPanelAlpha(float fAlpha)
+{
+	m_Panel.alpha.Set(fAlpha);
+}
+
 bool IHyWidget::IsPanelBoundingVolume() const
 {
 	return m_Panel.IsBoundingVolume();

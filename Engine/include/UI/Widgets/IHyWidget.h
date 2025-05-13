@@ -59,6 +59,8 @@ public:
 
 	bool IsPanelVisible() const;
 	void SetPanelVisible(bool bVisible);
+	float GetPanelAlpha() const;
+	void SetPanelAlpha(float fAlpha);
 
 	bool IsPanelBoundingVolume() const;
 	bool IsPanelNode() const;

@@ -467,7 +467,7 @@ std::pair<HyColor, HyColor> IHyText<NODETYPE, ENTTYPE>::GetLayerColor(uint32 uiS
 			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::GetLayerColor invoked on null data");
 		else
 			HyLogWarning("IHyText<NODETYPE, ENTTYPE>::GetLayerColor() was passed invalid 'uiStateIndex' or 'uiLayerIndex'");
-		return std::pair<HyColor, HyColor>(HyColor(0, 0, 0, 0), HyColor(0, 0, 0, 0));
+		return std::pair<HyColor, HyColor>(HyColor(0, 0, 0), HyColor(0, 0, 0));
 	}
 
 	return std::pair<HyColor, HyColor>(m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->topClr, m_StateColors[uiStateIndex]->m_LayerColors[uiLayerIndex]->botClr);
@@ -946,21 +946,19 @@ template<typename NODETYPE, typename ENTTYPE>
 						{
 							float fProgress = pTweenData->m_fpActiveTweenFunc(pTweenData->m_fElapsedTime / pTweenData->m_fDuration);
 
-							glm::vec4 startClr(pTweenData->m_TopStartClr.GetRedF(), pTweenData->m_TopStartClr.GetGreenF(), pTweenData->m_TopStartClr.GetBlueF(), pTweenData->m_TopStartClr.GetAlphaF());
-							glm::vec4 targetClr(pTweenData->m_TopTargetClr.GetRedF(), pTweenData->m_TopTargetClr.GetGreenF(), pTweenData->m_TopTargetClr.GetBlueF(), pTweenData->m_TopTargetClr.GetAlphaF());
+							glm::vec4 startClr = pTweenData->m_TopStartClr.GetAsVec4();// (pTweenData->m_TopStartClr.GetRedF(), pTweenData->m_TopStartClr.GetGreenF(), pTweenData->m_TopStartClr.GetBlueF(), pTweenData->m_TopStartClr.GetAlphaF());
+							glm::vec4 targetClr = pTweenData->m_TopTargetClr.GetAsVec4();// (pTweenData->m_TopTargetClr.GetRedF(), pTweenData->m_TopTargetClr.GetGreenF(), pTweenData->m_TopTargetClr.GetBlueF(), pTweenData->m_TopTargetClr.GetAlphaF());
 							float fRed = startClr.r + (targetClr.r - startClr.r) * fProgress;
 							float fGreen = startClr.g + (targetClr.g - startClr.g) * fProgress;
 							float fBlue = startClr.b + (targetClr.b - startClr.b) * fProgress;
-							float fAlpha = startClr.a + (targetClr.a - startClr.a) * fProgress;
-							m_StateColors[i]->m_LayerColors[j]->topClr = HyColor(fRed, fGreen, fBlue, fAlpha);
+							m_StateColors[i]->m_LayerColors[j]->topClr = HyColor(fRed, fGreen, fBlue);
 
-							HySetVec(startClr, pTweenData->m_BotStartClr.GetRedF(), pTweenData->m_BotStartClr.GetGreenF(), pTweenData->m_BotStartClr.GetBlueF(), pTweenData->m_BotStartClr.GetAlphaF());
-							HySetVec(targetClr, pTweenData->m_BotTargetClr.GetRedF(), pTweenData->m_BotTargetClr.GetGreenF(), pTweenData->m_BotTargetClr.GetBlueF(), pTweenData->m_BotTargetClr.GetAlphaF());
+							HySetVec(startClr,  pTweenData->m_BotStartClr.GetRedF(), pTweenData->m_BotStartClr.GetGreenF(), pTweenData->m_BotStartClr.GetBlueF(), 1.0f);
+							HySetVec(targetClr, pTweenData->m_BotTargetClr.GetRedF(), pTweenData->m_BotTargetClr.GetGreenF(), pTweenData->m_BotTargetClr.GetBlueF(), 1.0f);
 							fRed = startClr.r + (targetClr.r - startClr.r) * fProgress;
 							fGreen = startClr.g + (targetClr.g - startClr.g) * fProgress;
 							fBlue = startClr.b + (targetClr.b - startClr.b) * fProgress;
-							fAlpha = startClr.a + (targetClr.a - startClr.a) * fProgress;
-							m_StateColors[i]->m_LayerColors[j]->botClr = HyColor(fRed, fGreen, fBlue, fAlpha);
+							m_StateColors[i]->m_LayerColors[j]->botClr = HyColor(fRed, fGreen, fBlue);
 
 							bContinueTweening = true;
 						}

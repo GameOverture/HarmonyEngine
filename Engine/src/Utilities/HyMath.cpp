@@ -33,11 +33,11 @@ const HyColor HyColor::DarkGray(0x222222);
 const HyColor HyColor::LightGray(0xc0c0c0);
 const HyColor HyColor::Orange(0xFA5A0A);
 const HyColor HyColor::Brown(0x802600);
-const HyColor HyColor::Transparent(0.0f, 0.0f, 0.0f, 0.0f);
 const HyColor HyColor::PanelContainer(0x2D2D2D);
 const HyColor HyColor::FrameContainer(0x202020);// 0x3F3F46);
 const HyColor HyColor::PanelWidget(0x3F3F46);
 const HyColor HyColor::FrameWidget(0x777777);
+const HyColor HyColor::_InternalUse(0xDEADBE);
 
 void HySetVec(glm::vec2 &vecOut, float fX, float fY)
 {
