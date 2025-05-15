@@ -115,6 +115,10 @@ public:
 
 	virtual glm::vec2 GetPosOffset() override;
 
+#ifdef HY_PLATFORM_GUI
+	void GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrideName = true);
+#endif
+
 protected:
 	virtual void OnSetup() { }				// Optional override. This may call SetAssembleNeeded() as its dirty flag will already be set
 	virtual void OnAssemble() override;

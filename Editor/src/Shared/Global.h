@@ -382,6 +382,7 @@ class HyGlobal
 	static QString														sm_ShapeNames[NUM_SHAPES];
 	static QString														sm_TweenFuncNames[NUM_TWEENFUNCS];
 	static QString														sm_TweenPropNames[NUM_TWEENPROPS];
+	static QString														sm_SizePolicyNames[HYNUM_SIZEPOLICIES];
 	static QString														sm_sSubIconNames[NUM_SUBICONS];
 	static QString														sm_sTextTypeNames[HYNUM_TEXTTYPES];
 	static QString														sm_sAlignmentNames[HYNUM_ALIGNMENTS];
@@ -423,6 +424,8 @@ public:
 	static TweenProperty GetTweenPropFromString(QString sTweenProp);
 	static QStringList GetTweenPropNameList();
 	static HyTweenFunc GetTweenFunc(TweenFuncType eTween);
+	static QStringList GetSizePolicyNameList();
+	static HySizePolicy GetSizePolicyFromString(QString sSizePolicy);
 	static QStringList GetTextTypeNameList();
 	static HyTextType GetTextTypeFromString(QString sTextType);
 	static QStringList GetAlignmentNameList();
@@ -438,6 +441,7 @@ public:
 	static const QString ShapeName(EditorShape eShape)					{ return sm_ShapeNames[eShape]; }
 	static const QString TweenFuncName(TweenFuncType eTween)			{ return sm_TweenFuncNames[eTween]; }
 	static const QString TweenPropName(TweenProperty eTweenProp)		{ return sm_TweenPropNames[eTweenProp]; }
+	static const QString SizePolicyName(HySizePolicy eSizePolicy)		{ return sm_SizePolicyNames[eSizePolicy]; }
 	static const QIcon TweenPropIcon(TweenProperty eTweenProp)			{ return sm_TweenPropIcons[eTweenProp]; }
 	static const QString ItemExt(ItemType eItem);
 	static const QIcon ItemIcon(ItemType eItm, SubIcon eSubIcon)		{ return sm_ItemIcons[eItm][eSubIcon]; }

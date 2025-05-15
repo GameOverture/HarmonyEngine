@@ -318,7 +318,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		if(bIsBody)
 		{
 			m_pPropertiesModel->AppendCategory("Body");
-			m_pPropertiesModel->AppendProperty("Body", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty("Body", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets rendered", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Body", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this item with", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Body", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.05);
 			m_pPropertiesModel->AppendProperty("Body", "Override Display Order", PROPERTIESTYPE_int, 0, "Higher display orders get drawn above other items with less. Undefined ordering when equal", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
@@ -401,6 +401,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendCategory("Text", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
 		m_pPropertiesModel->AppendProperty("Text", "Text", PROPERTIESTYPE_LineEdit, "Text123", "What UTF-8 string to be displayed", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Text", "Style", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTextTypeNameList()[HYTEXT_Line], "The style of how the text is shown", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTextTypeNameList());
+		// TODO: Custom Text Style widget
 		m_pPropertiesModel->AppendProperty("Text", "Style Dimensions", PROPERTIESTYPE_vec2, QPointF(200.0f, 50.0f), "Text box size used when required by the style (like ScaleBox or Column)", PROPERTIESACCESS_ToggleUnchecked, 0.0f, fRANGE, 1.0f);
 		m_pPropertiesModel->AppendProperty("Text", "Alignment", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAlignmentNameList()[HYALIGN_Left], "The alignment of the text", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAlignmentNameList());
 		m_pPropertiesModel->AppendProperty("Text", "Monospaced Digits", PROPERTIESTYPE_bool, false, "Check to use monospaced digits, which ensures all digits use the same width", PROPERTIESACCESS_ToggleUnchecked);
@@ -409,8 +410,8 @@ void EntityTreeItemData::InitalizePropertyModel()
 
 	case ITEM_Audio:
 		m_pPropertiesModel->AppendCategory("Audio", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
-		//m_pPropertiesModel->AppendProperty("Audio", "Play List Mode", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAudioPlayListModeList()[HYPLAYLIST_Shuffle], "The method by which the next audio asset is chosen when played", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAudioPlayListModeList());
-		//m_pPropertiesModel->AppendProperty("Audio", "Play", 
+		// TODO: m_pPropertiesModel->AppendProperty("Audio", "Play List Mode", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAudioPlayListModeList()[HYPLAYLIST_Shuffle], "The method by which the next audio asset is chosen when played", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAudioPlayListModeList());
+		// TODO: m_pPropertiesModel->AppendProperty("Audio", "Play", 
 		m_pPropertiesModel->AppendProperty("Audio", "Volume", PROPERTIESTYPE_double, 1.0, "The volume of the audio", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.01);
 		m_pPropertiesModel->AppendProperty("Audio", "Pitch", PROPERTIESTYPE_double, 1.0, "The pitch of the audio", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.01);
 		break;
@@ -423,12 +424,91 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_UiCheckBox:
 	case ITEM_UiRadioButton:
 	case ITEM_UiTextField:
-	case ITEM_UiComboBox:
+	case ITEM_UiComboBox: // TODO: Implement custom properties to populate combobox
 	case ITEM_UiSlider:
-		m_pPropertiesModel->AppendCategory("Widget", QVariant(), false, "UI centric type of entity");
-		m_pPropertiesModel->AppendProperty("Widget", "Panel", PROPERTIESTYPE_UiPanel, QVariant(), "The main visual background portion of this widget", PROPERTIESACCESS_ToggleUnchecked);
-		m_pPropertiesModel->AppendProperty("Widget", "Text Font", PROPERTIESTYPE_ComboBoxItems, QVariant(), "The text node/font used on this widget", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), ITEM_Text);
-		m_pPropertiesModel->AppendProperty("Widget", "Text Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The text margins typically used within the main panel of this widget", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendCategory("Widget", QVariant(), false, "Widgets are a 'user interface' type of entity");
+		m_pPropertiesModel->AppendProperty("Widget", "Enabled", PROPERTIESTYPE_bool, Qt::Checked, "Use to disable or reenable a widget", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Widget", "KB Focus Allowed", PROPERTIESTYPE_bool, Qt::Checked, "Allow this widget to be the target of keyboard input", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Widget", "Highlighted", PROPERTIESTYPE_bool, Qt::Unchecked, "Whether to specify to the widget that it is highlighted", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Widget", "Hide Disabled", PROPERTIESTYPE_bool, Qt::Checked, "Whether to not show and visually indicate if disabled", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Widget", "Hide Hover State", PROPERTIESTYPE_bool, Qt::Checked, "Whether to not show and visually indicate a mouse 'hover state' when available", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Widget", "Hide Down State", PROPERTIESTYPE_bool, Qt::Checked, "Whether to not show and visually indicate a mouse 'down state' when available", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Widget", "Hide Highlighted", PROPERTIESTYPE_bool, Qt::Checked, "Whether to not show and visually indicate when the widget is considered 'highlighted'", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Widget", "Horizontal Policy", PROPERTIESTYPE_ComboBoxString, HyGlobal::SizePolicyName(HYSIZEPOLICY_Fixed), "Hints to the widget on how it should size its horizontal dimension", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), HyGlobal::GetSizePolicyNameList());
+		m_pPropertiesModel->AppendProperty("Widget", "Vertical Policy", PROPERTIESTYPE_ComboBoxString, HyGlobal::SizePolicyName(HYSIZEPOLICY_Fixed), "Hints to the widget on how it should size its vertical dimension", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), HyGlobal::GetSizePolicyNameList());
+		m_pPropertiesModel->AppendProperty("Widget", "Lock Proportions", PROPERTIESTYPE_bool, Qt::Unchecked, "Keeps the widget's aspect ratio when resizing", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Widget", "Min Size", PROPERTIESTYPE_ivec2, QPoint(0, 0), "The widget's minimum size it'll use when resizing", PROPERTIESACCESS_ToggleUnchecked, 0, MAX_INT_RANGE, 1, "[", "]");
+		m_pPropertiesModel->AppendProperty("Widget", "Max Size", PROPERTIESTYPE_ivec2, QPoint(MAX_INT_RANGE, MAX_INT_RANGE), "The widget's maximum size it'll use when resizing", PROPERTIESACCESS_ToggleUnchecked, 0, MAX_INT_RANGE, 1, "[", "]");
+
+		m_pPropertiesModel->AppendCategory("Panel", QVariant(), false, "The main visual background portion of this widget");
+		m_pPropertiesModel->AppendProperty("Panel", "Setup", PROPERTIESTYPE_UiPanel, QVariant(), "Initializes and setup the main panel of this widget", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Panel", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Panel", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.05);
+		if(GetType() == ITEM_UiBarMeter)
+		{
+			m_pPropertiesModel->AppendProperty("Panel", "Bar Setup", PROPERTIESTYPE_UiPanel, QVariant(), "Initializes and setup the inner bar of this Bar Meter", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty("Panel", "Bar Offset", PROPERTIESTYPE_ivec2, QPoint(0, 0), "The inner bar's positional offset from the main panel", PROPERTIESACCESS_ToggleUnchecked);
+			// TODO: bool SetBarState(uint32 uiStateIndex);
+			m_pPropertiesModel->AppendProperty("Panel", "Bar Vertical", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the bar will grow vertically instead of rightward, horizontally", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty("Panel", "Bar Inverted", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the bar will grow from right to left or bottom to top", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty("Panel", "Bar Stretched", PROPERTIESTYPE_bool, Qt::Unchecked, "When set and the 'Bar Setup' is a Node item, the bar node will be scaled to fit the range of the progress bar. Otherwise, the bar is stenciled/cropped to fit the range (default)", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty("Panel", "Bar Under Panel", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the bar will be drawn under the main panel instead of over it. Only useful if main panel is a node item with transparent center", PROPERTIESACCESS_ToggleUnchecked);
+		}
+
+		if(GetType() != ITEM_UiSlider) // AKA all widgets derived from Label
+		{
+			m_pPropertiesModel->AppendCategory("Label", QVariant(), false, "The main text used in this widget");
+
+			if(GetType() == ITEM_UiRackMeter)
+			{
+				m_pPropertiesModel->AppendProperty("Label", "Set Value", PROPERTIESTYPE_int64, 0, "The numerical value represented in the rack meter", PROPERTIESACCESS_ToggleUnchecked);
+				// TODO: m_pPropertiesModel->AppendProperty("Label", "Rack Value", PROPERTIESTYPE_int64, 0, "The numerical value represented in the rack meter", PROPERTIESACCESS_ToggleUnchecked);
+			}
+			else
+			{
+				m_pPropertiesModel->AppendProperty("Label", "Text", PROPERTIESTYPE_LineEdit, "Text123", "What UTF-8 string to be displayed on the label", PROPERTIESACCESS_ToggleUnchecked);
+
+				if(GetType() == ITEM_UiTextField)
+					m_pPropertiesModel->AppendProperty("Label", "Input Validator", PROPERTIESTYPE_LineEdit, "", "A case-sensitive regex that checks and permits only valid keyboard input", PROPERTIESACCESS_ToggleUnchecked);
+			}
+			m_pPropertiesModel->AppendProperty("Label", "Font", PROPERTIESTYPE_ComboBoxItems, QVariant(), "The specified project Text item used on this widget", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), ITEM_Text);
+			m_pPropertiesModel->AppendProperty("Label", "Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The text's margins within the main panel of this widget", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty("Label", "Style", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTextTypeNameList()[HYTEXT_Line], "The style of how the text is shown", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTextTypeNameList());
+			// TODO: m_pPropertiesModel->AppendProperty("Label", "Text State", PROPERTIESTYPE_StatesComboBox, 0, "The text's state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
+			// TODO: virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor);
+			m_pPropertiesModel->AppendProperty("Label", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this widget's main text gets rendered", PROPERTIESACCESS_ToggleUnchecked);
+			// TODO: void SetAsSideBySide(bool bPanelBeforeText = true, int32 iPadding = 5, HyOrientation eOrientation = HYORIENT_Horizontal);	// Show the panel and text side by side specified accordingly to the arguments passed
+			m_pPropertiesModel->AppendProperty("Label", "Alignment", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAlignmentNameList()[HYALIGN_Left], "The alignment of the text", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAlignmentNameList());
+			m_pPropertiesModel->AppendProperty("Label", "Monospaced Digits", PROPERTIESTYPE_bool, false, "Check to use monospaced digits, which ensures all digits use the same width", PROPERTIESACCESS_ToggleUnchecked);
+			if(GetType() == ITEM_UiRackMeter)
+			{
+				m_pPropertiesModel->AppendProperty("Label", "Show As Cash", PROPERTIESTYPE_bool, false, "Check to format the text as currency/money", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Label", "Spinning Digits", PROPERTIESTYPE_bool, false, "Check to have digits spin when racking to new values", PROPERTIESACCESS_ToggleUnchecked);
+				// TODO: SetNumFormat(HyNumberFormat format);
+				// TODO: SetDenomination(uint32 uiDenom);
+			}
+			else if(GetType() == ITEM_UiButton || GetType() == ITEM_UiCheckBox || GetType() == ITEM_UiRadioButton)
+			{
+				m_pPropertiesModel->AppendCategory("Button", QVariant(), false, "A button is a label that can be depressed");
+				m_pPropertiesModel->AppendProperty("Button", "Checked", PROPERTIESTYPE_bool, Qt::Unchecked, "Sets this button as 'checked'", PROPERTIESACCESS_ToggleUnchecked);
+			}
+			else if(GetType() == ITEM_UiBarMeter)
+			{
+				m_pPropertiesModel->AppendCategory("Bar Meter", QVariant(), false, "Bar meter useful for things like a health bar or progress bar");
+				m_pPropertiesModel->AppendProperty("Bar Meter", "Min Value", PROPERTIESTYPE_int, 0, "The minimum, clamped value that indicates the bar is empty", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
+				m_pPropertiesModel->AppendProperty("Bar Meter", "Max Value", PROPERTIESTYPE_int, 0, "The maximum, clamped value that indicates the bar is full", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
+				m_pPropertiesModel->AppendProperty("Bar Meter", "Value", PROPERTIESTYPE_int, 0, "The current bar meter's value, clamped to the Min and Max values", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
+				// TODO: SetNumFormat(HyNumberFormat format);
+			}
+		}
+		else // Is ITEM_UiSlider
+		{
+			m_pPropertiesModel->AppendCategory("Slider", QVariant(), false, "Bar meter useful for things like a health bar or progress bar");
+			// TODO: m_pPropertiesModel->AppendProperty("Slider", "Set Range", PROPERTIESTYPE_UiSliderRange, 0, "Set the value range, or specify each value step along the slider", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty("Slider", "Value", PROPERTIESTYPE_int, 0, "The current slider value, clamped or corrected to a value appropriate from 'Set Range'", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
+			m_pPropertiesModel->AppendProperty("Slider", "Vertical", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the slider will be vertical instead of horizontal", PROPERTIESACCESS_ToggleUnchecked);
+			// TODO: SetBarColors(HyColor posColor, HyColor negColor, HyColor strokeColor);
+		}
 		break;
 
 	default:

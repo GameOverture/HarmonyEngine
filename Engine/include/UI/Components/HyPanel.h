@@ -107,7 +107,7 @@ public:
 	virtual ~HyPanel();
 
 	void Setup(const HyUiPanelInit &initRef);
-	HyUiPanelInit CloneInit(); // Uses currently set properties of this panel to create an equivalent HyPanelInit struct
+	HyUiPanelInit CloneInit() const; // Uses currently set properties of this panel to create an equivalent HyPanelInit struct
 
 	virtual uint32 GetState() const override;
 	virtual bool SetState(uint32 uiStateIndex) override;

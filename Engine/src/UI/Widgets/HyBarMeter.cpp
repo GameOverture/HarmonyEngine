@@ -107,6 +107,15 @@ void HyBarMeter::Setup(const HyUiPanelInit &panelInit, const HyUiPanelInit &barI
 	HyLabel::Setup(panelInit, textInit);
 }
 
+void HyBarMeter::SetupBar(const HyUiPanelInit &barInit)
+{
+	m_Bar.Setup(barInit);
+	
+	SetAsEnabled(IsEnabled());
+	SetAssembleNeeded();
+	OnSetup();
+}
+
 glm::vec2 HyBarMeter::GetBarOffset() const
 {
 	return m_vBarOffset;
@@ -201,6 +210,16 @@ void HyBarMeter::SetBarUnderPanel(bool bIsBarUnderPanel)
 		return;
 }
 
+int32 HyBarMeter::GetMinimum() const
+{
+	return m_iMinimum;
+}
+
+int32 HyBarMeter::GetMaximum() const
+{
+	return m_iMaximum;
+}
+
 void HyBarMeter::SetMinimum(int32 iMinimum)
 {
 	if(m_iMinimum == iMinimum)
@@ -233,6 +252,11 @@ void HyBarMeter::SetRange(int32 iMinimum, int32 iMaximum)
 	AdjustProgress(0.0f);
 }
 
+int32 HyBarMeter::GetValue() const
+{
+	return m_iValue;
+}
+
 void HyBarMeter::SetValue(int32 iValue, float fAdjustDuration)
 {
 	if(m_iValue == iValue)
@@ -252,6 +276,18 @@ void HyBarMeter::SetNumFormat(HyNumberFormat format)
 	m_NumberFormat = format;
 	AdjustProgress(0.0f);
 }
+
+HyUiPanelInit HyBarMeter::CloneBarPanelInit() const
+{
+	return m_Bar.CloneInit();
+}
+
+#ifdef HY_PLATFORM_GUI
+void HyBarMeter::GuiOverrideBarNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName /*= true*/)
+{
+	m_Panel.GuiOverrideNodeData(eNodeType, itemDataObj, bUseGuiOverrideName);
+}
+#endif
 
 /*virtual*/ void HyBarMeter::Update() /*override*/
 {

@@ -483,6 +483,13 @@ bool HyLabel::IsMonospacedDigits() const
 	return glm::vec2(0.0f, 0.0f);
 }
 
+#ifdef HY_PLATFORM_GUI
+void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrideName /*= true*/)
+{
+	m_Text.GuiOverrideData<HyTextData>(itemDataObj, bUseGuiOverrideName);
+}
+#endif
+
 /*virtual*/ void HyLabel::OnSetSizeHint() /*override*/
 {
 	HySetVec(m_vSizeHint, 0, 0);

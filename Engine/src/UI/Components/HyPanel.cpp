@@ -166,7 +166,7 @@ void HyPanel::Setup(const HyUiPanelInit &initRef)
 	}
 }
 
-HyUiPanelInit HyPanel::CloneInit()
+HyUiPanelInit HyPanel::CloneInit() const
 {
 	HyUiPanelInit init = {};
 	if(IsBoundingVolume())

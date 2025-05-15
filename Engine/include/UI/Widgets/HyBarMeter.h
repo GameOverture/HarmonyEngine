@@ -22,7 +22,6 @@ protected:
 		BARMETERATTRIB_IsVertical		= 1 << 22,	// If set, the bar will grow vertically instead of horizontally
 		BARMETERATTRIB_IsInverted		= 1 << 23,	// If set, the bar will grow from right to left or bottom to top
 		BARMETERATTRIB_IsBarStretched	= 1 << 24,	// If set and the bar is a Node item, the bar node will be scaled to fit the range of the progress bar. Otherwise, the bar is stenciled/cropped to fit the range (default)
-		
 		BARMETERATTRIB_IsBarUnderPanel	= 1 << 25,	// If set, the bar will be drawn under the panel instead of over it. Only useful if panel is a node item with transparent center
 		BARMETERATTRIB_IsTextOverride	= 1 << 26,	// This is set by this class, and indicates that the text is being overridden by the user SetText(), and should not update to the percentage
 		
@@ -55,6 +54,7 @@ public:
 
 	void Setup(const HyUiPanelInit &panelInit, const HyUiPanelInit &barInit);
 	void Setup(const HyUiPanelInit &panelInit, const HyUiPanelInit &barInit, const HyUiTextInit &textInit);
+	void SetupBar(const HyUiPanelInit &barInit);
 
 	glm::vec2 GetBarOffset() const;
 	void SetBarOffset(const glm::ivec2 &barOffset);
@@ -73,13 +73,23 @@ public:
 	bool IsBarUnderPanel() const;
 	void SetBarUnderPanel(bool bIsBarUnderPanel);
 
+	int32 GetMinimum() const;
+	int32 GetMaximum() const;
 	void SetMinimum(int32 iMinimum);
 	void SetMaximum(int32 iMaximum);
 	void SetRange(int32 iMinimum, int32 iMaximum);
+
+	int32 GetValue() const;
 	void SetValue(int32 iValue, float fAdjustDuration);
 
 	HyNumberFormat GetNumFormat() const;
 	void SetNumFormat(HyNumberFormat format);
+
+	HyUiPanelInit CloneBarPanelInit() const;
+
+#ifdef HY_PLATFORM_GUI
+	void GuiOverrideBarNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName = true);
+#endif
 
 protected:
 	virtual void Update() override;

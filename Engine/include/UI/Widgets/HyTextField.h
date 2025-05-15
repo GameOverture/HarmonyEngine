@@ -27,6 +27,7 @@ protected:
 	};
 	static_assert((int)TEXTFIELDATTRIB_UseValidator == (int)LABELATTRIB_NEXTFLAG, "HyTextField is not matching with base classes attrib flags");
 
+	std::string							m_sValidationRegEx;
 	std::regex							m_InputValidator;
 
 	uint32								m_uiCursorIndex;		// Cursor index in full UTF-8 characters
@@ -46,7 +47,8 @@ public:
 	virtual void SetText(const std::string &sUtf8Text) override;
 
 	bool IsInputValidated() const;
-	void SetInputValidator(const std::regex &regEx);
+	std::string GetInputValidator() const;
+	void SetInputValidator(std::string sRegEx, bool bCaseSensitive);
 	void ClearInputValidator();
 
 	bool IsCursorShown() const;

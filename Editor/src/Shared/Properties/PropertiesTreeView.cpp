@@ -315,7 +315,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		DlgSetUiPanel *pDlg = new DlgSetUiPanel(projectRef, "Setup Widget Panel", init, QUuid(panelObj["nodeUuid"].toString()), pParent);
 		if(pDlg->exec() == QDialog::Accepted)
 		{
-			QVariant newValue = pDlg->GetSerializedPanelInit();
+			QVariant newValue = DlgSetUiPanel::SerializePanelInit(pDlg->GetPanelInit(), pDlg->GetNodeUuid());
 			if(origValue != newValue)
 			{
 				QUndoCommand *pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);

@@ -12,6 +12,7 @@
 #include "EntityModel.h"
 #include "EntityDraw.h"
 #include "EntityDopeSheetScene.h"
+#include "DlgSetUiPanel.h"
 #include "MainWindow.h"
 
 EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
@@ -273,9 +274,110 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 		if(sPropertyName == "Text Indent")
 			return QJsonValue(static_cast<int>(static_cast<HyText2d *>(pThisHyNode)->GetTextIndent()));
 	}
+	else if(sCategory == "Widget")
+	{
+		if(sPropertyName == "Enabled")
+			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsEnabled());
+		if(sPropertyName == "KB Focus Allowed")
+			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsKeyboardFocusAllowed());
+		if(sPropertyName == "Highlighted")
+			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsHighlighted());
+		if(sPropertyName == "Hide Disabled")
+			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsHideDisabled());
+		if(sPropertyName == "Hide Hover State")
+			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsHideMouseHoverState());
+		if(sPropertyName == "Hide Down State")
+			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsHideDownState());
+		if(sPropertyName == "Hide Highlighted")
+			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsHideHighlightedState());
+		if(sPropertyName == "Horizontal Policy")
+			return QJsonValue(HyGlobal::SizePolicyName(static_cast<IHyWidget *>(pThisHyNode)->GetHorizontalPolicy()));
+		if(sPropertyName == "Vertical Policy")
+			return QJsonValue(HyGlobal::SizePolicyName(static_cast<IHyWidget *>(pThisHyNode)->GetVerticalPolicy()));
+		if(sPropertyName == "Lock Proportions")
+			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsLockedProportions());
+		if(sPropertyName == "Min Size")
+		{
+			glm::ivec2 vMinSize = static_cast<IHyWidget *>(pThisHyNode)->GetMinSize();
+			return QJsonValue(QJsonArray({ QJsonValue(vMinSize.x), QJsonValue(vMinSize.y) }));
+		}
+		if(sPropertyName == "Max Size")
+		{
+			glm::ivec2 vMaxSize = static_cast<IHyWidget *>(pThisHyNode)->GetMaxSize();
+			return QJsonValue(QJsonArray({ QJsonValue(vMaxSize.x), QJsonValue(vMaxSize.y) }));
+		}
+	}
+	else if(sCategory == "Panel")
+	{
+		if(sPropertyName == "Setup")
+			return QJsonValue(DlgSetUiPanel::SerializePanelInit(static_cast<IHyWidget *>(pThisHyNode)->ClonePanelInit(), m_pEntityTreeItemData->GetPreviewComponent().m_CurrentWidgetPanelNodeUuid).toJsonObject());
+		if(sPropertyName == "Visible")
+			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsPanelVisible());
+		if(sPropertyName == "Alpha")
+			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->PanelAlpha().Get());
+		if(sPropertyName == "Bar Setup")
+			return QJsonValue(DlgSetUiPanel::SerializePanelInit(static_cast<HyBarMeter *>(pThisHyNode)->CloneBarPanelInit(), m_pEntityTreeItemData->GetPreviewComponent().m_CurrentWidgetBarPanelNodeUuid).toJsonObject());
+		if(sPropertyName == "Bar Offset")
+		{
+			glm::vec2 vBarOffset = static_cast<HyBarMeter *>(pThisHyNode)->GetBarOffset();
+			return QJsonValue(QJsonArray({ QJsonValue(vBarOffset.x), QJsonValue(vBarOffset.y) }));
+		}
+		if(sPropertyName == "Bar Vertical")
+			return QJsonValue(static_cast<HyBarMeter *>(pThisHyNode)->IsVertical());
+		if(sPropertyName == "Bar Inverted")
+			return QJsonValue(static_cast<HyBarMeter *>(pThisHyNode)->IsInverted());
+		if(sPropertyName == "Bar Stretched")
+			return QJsonValue(static_cast<HyBarMeter *>(pThisHyNode)->IsBarStretched());
+		if(sPropertyName == "Bar Under Panel")
+			return QJsonValue(static_cast<HyBarMeter *>(pThisHyNode)->IsBarUnderPanel());
+	}
 	else if(sCategory == "Label")
 	{
-		//asdf;
+		if(sPropertyName == "Set Value")
+			return QJsonValue(static_cast<HyRackMeter *>(pThisHyNode)->GetValue());
+		if(sPropertyName == "Text")
+			return QJsonValue(QString::fromUtf8(static_cast<HyLabel *>(pThisHyNode)->GetUtf8String().c_str()));
+		if(sPropertyName == "Input Validator")
+			return QJsonValue(QString::fromUtf8(static_cast<HyTextField *>(pThisHyNode)->GetInputValidator().c_str()));
+		if(sPropertyName == "Font")
+			return QJsonValue(m_pEntityTreeItemData->GetPreviewComponent().m_CurrentWidgetTextNodeUuid.toString(QUuid::WithoutBraces));
+		if(sPropertyName == "Margins") {
+			HyMargins<float> margins = static_cast<HyLabel *>(pThisHyNode)->GetTextMargins();
+			return QJsonValue(QJsonArray({ margins.left, margins.bottom, margins.right, margins.top }));
+		}
+		if(sPropertyName == "Style")
+			return QJsonValue(HyGlobal::GetTextTypeNameList()[static_cast<HyLabel *>(pThisHyNode)->GetTextType()]);		
+		if(sPropertyName == "Visible")
+			return QJsonValue(static_cast<HyLabel *>(pThisHyNode)->IsTextVisible());
+		if(sPropertyName == "Alignment")
+			return QJsonValue(QString(HyGlobal::GetAlignmentNameList()[static_cast<HyLabel *>(pThisHyNode)->GetAlignment()]));
+		if(sPropertyName == "Monospaced Digits")
+			return QJsonValue(static_cast<HyLabel *>(pThisHyNode)->IsMonospacedDigits());
+		if(sPropertyName == "Show As Cash")
+			return QJsonValue(static_cast<HyRackMeter *>(pThisHyNode)->IsShowAsCash());
+		if(sPropertyName == "Spinning Digits")
+			return QJsonValue(static_cast<HyRackMeter *>(pThisHyNode)->IsSpinningMeter());
+	}
+	else if(sCategory == "Button")
+	{
+		if(sPropertyName == "Checked")
+			return QJsonValue(static_cast<HyButton *>(pThisHyNode)->IsChecked());
+	}
+	else if(sCategory == "Bar Meter")
+	{
+		if(sPropertyName == "Min Value")
+			return QJsonValue(static_cast<HyBarMeter *>(pThisHyNode)->GetMinimum());
+		if(sPropertyName == "Max Value")
+			return QJsonValue(static_cast<HyBarMeter *>(pThisHyNode)->GetMaximum());
+		if(sPropertyName == "Value")
+			return QJsonValue(static_cast<HyBarMeter *>(pThisHyNode)->GetValue());
+	}
+	else if(sCategory == "Slider")
+	{
+		if(sPropertyName == "Value")
+			return QJsonValue(static_cast<HySlider *>(pThisHyNode)->GetValue());
+		if(sPropertyName == "Vertical")
+			return QJsonValue(static_cast<HySlider *>(pThisHyNode)->GetOrientation() == HYORIENT_Vertical);
 	}
 
 	return QJsonValue();
@@ -908,23 +1010,58 @@ void ExtrapolateProperties(Project &projectRef,
 			{
 				QJsonObject widgetObj = propsObj["Widget"].toObject();
 
-				if(widgetObj.contains("Panel"))
+				if(widgetObj.contains("Enabled"))
+					static_cast<IHyWidget *>(pThisHyNode)->SetAsEnabled(widgetObj["Enabled"].toBool());
+				if(widgetObj.contains("KB Focus Allowed"))
+					static_cast<IHyWidget *>(pThisHyNode)->SetKeyboardFocusAllowed(widgetObj["KB Focus Allowed"].toBool());
+				if(widgetObj.contains("Highlighted"))
+					static_cast<IHyWidget *>(pThisHyNode)->SetAsHighlighted(widgetObj["Highlighted"].toBool());
+				if(widgetObj.contains("Hide Disabled"))
+					static_cast<IHyWidget *>(pThisHyNode)->SetHideDisabled(widgetObj["Hide Disabled"].toBool());
+				if(widgetObj.contains("Hide Hover State"))
+					static_cast<IHyWidget *>(pThisHyNode)->SetHideMouseHoverState(widgetObj["Hide Hover State"].toBool());
+				if(widgetObj.contains("Hide Down State"))
+					static_cast<IHyWidget *>(pThisHyNode)->SetHideDownState(widgetObj["Hide Down State"].toBool());
+				if(widgetObj.contains("Hide Highlighted"))
+					static_cast<IHyWidget *>(pThisHyNode)->SetHideHighlightedState(widgetObj["Hide Highlighted"].toBool());
+				if(widgetObj.contains("Horizontal Policy"))
+					static_cast<IHyWidget *>(pThisHyNode)->SetHorizontalPolicy(HyGlobal::GetSizePolicyFromString(widgetObj["Horizontal Policy"].toString()));
+				if(widgetObj.contains("Vertical Policy"))
+					static_cast<IHyWidget *>(pThisHyNode)->SetVerticalPolicy(HyGlobal::GetSizePolicyFromString(widgetObj["Vertical Policy"].toString()));
+				if(widgetObj.contains("Lock Proportions"))
+					static_cast<IHyWidget *>(pThisHyNode)->SetLockedProportions(widgetObj["Lock Proportions"].toBool());
+				if(widgetObj.contains("Min Size"))
 				{
-					QJsonObject panelObj = widgetObj["Panel"].toObject();
-					
+					QJsonArray minSizeArray = widgetObj["Min Size"].toArray();
+					static_cast<IHyWidget *>(pThisHyNode)->SetMinSize(minSizeArray[0].toInt(), minSizeArray[1].toInt());
+				}
+				if(widgetObj.contains("Max Size"))
+				{
+					QJsonArray maxSizeArray = widgetObj["Max Size"].toArray();
+					static_cast<IHyWidget *>(pThisHyNode)->SetMaxSize(maxSizeArray[0].toInt(), maxSizeArray[1].toInt());
+				}
+			}
+			if(propsObj.contains("Panel"))
+			{
+				QJsonObject panelObj = propsObj["Panel"].toObject();
+
+				if(panelObj.contains("Setup"))
+				{
+					QJsonObject setupObj = panelObj["Setup"].toObject();
+
 					HyUiPanelInit panelInit;
-					panelInit.m_eNodeType = HyGlobal::ConvertItemType(HyGlobal::GetTypeFromString(panelObj["nodeType"].toString()));
-					panelInit.m_uiWidth = panelObj["width"].toInt(0);
-					panelInit.m_uiHeight = panelObj["height"].toInt(0);
+					panelInit.m_eNodeType = HyGlobal::ConvertItemType(HyGlobal::GetTypeFromString(setupObj["nodeType"].toString()));
+					panelInit.m_uiWidth = setupObj["width"].toInt(0);
+					panelInit.m_uiHeight = setupObj["height"].toInt(0);
 					panelInit.m_NodePath.Set("");
-					panelInit.m_uiFrameSize = panelObj["frameSize"].toInt();
-					panelInit.m_PanelColor = HyColor(panelObj["panelColor"].toInt());
-					panelInit.m_FrameColor = HyColor(panelObj["frameColor"].toInt());
-					panelInit.m_TertiaryColor = HyColor(panelObj["tertiaryColor"].toInt());
+					panelInit.m_uiFrameSize = setupObj["frameSize"].toInt();
+					panelInit.m_PanelColor = HyColor(setupObj["panelColor"].toInt());
+					panelInit.m_FrameColor = HyColor(setupObj["frameColor"].toInt());
+					panelInit.m_TertiaryColor = HyColor(setupObj["tertiaryColor"].toInt());
 					static_cast<HyLabel *>(pThisHyNode)->Setup(panelInit);
 
-					QUuid nodeUuid(panelObj["nodeUuid"].toString());
-					TreeModelItemData *pItemData = projectRef.FindItemData(nodeUuid);
+					previewComponentRef.m_CurrentWidgetPanelNodeUuid = QUuid(setupObj["nodeUuid"].toString());
+					TreeModelItemData *pItemData = projectRef.FindItemData(previewComponentRef.m_CurrentWidgetPanelNodeUuid);
 					if(pItemData && pItemData->IsProjectItem())
 					{
 						ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pItemData);
@@ -935,20 +1072,157 @@ void ExtrapolateProperties(Project &projectRef,
 						QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
 						HyJsonDoc itemDataDoc;
 						if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-							HyGuiLog("EntityDrawItem ctor - failed to parse its file data", LOGTYPE_Error);
+							HyGuiLog("ExtrapolateProperties() - failed to parse HyPanel node file data", LOGTYPE_Error);
 						static_cast<HyLabel *>(pThisHyNode)->GuiOverrideNodeData(panelInit.m_eNodeType, itemDataDoc.GetObject(), true);
 					}
 				}
-				if(widgetObj.contains("Text Font"))
+				if(panelObj.contains("Visible"))
+					static_cast<IHyWidget *>(pThisHyNode)->SetPanelVisible(panelObj["Visible"].toBool());
+				if(panelObj.contains("Alpha"))
+					static_cast<IHyWidget *>(pThisHyNode)->PanelAlpha().Set(panelObj["Alpha"].toDouble());
+				if(panelObj.contains("Bar Setup"))
 				{
-					QJsonObject panelObj = widgetObj["Text"].toObject();
-					//HyUiTextInit textInit = panelObj;
-					//static_cast<HyLabel *>(pThisHyNode)->Setup(textInit);
-				}
-				else if(widgetObj.contains("Text Margins"))
-				{
+					QJsonObject barSetupObj = panelObj["Bar Setup"].toObject();
 
+					HyUiPanelInit barPanelInit;
+					barPanelInit.m_eNodeType = HyGlobal::ConvertItemType(HyGlobal::GetTypeFromString(barSetupObj["nodeType"].toString()));
+					barPanelInit.m_uiWidth = barSetupObj["width"].toInt(0);
+					barPanelInit.m_uiHeight = barSetupObj["height"].toInt(0);
+					barPanelInit.m_NodePath.Set("");
+					barPanelInit.m_uiFrameSize = barSetupObj["frameSize"].toInt();
+					barPanelInit.m_PanelColor = HyColor(barSetupObj["panelColor"].toInt());
+					barPanelInit.m_FrameColor = HyColor(barSetupObj["frameColor"].toInt());
+					barPanelInit.m_TertiaryColor = HyColor(barSetupObj["tertiaryColor"].toInt());
+					static_cast<HyBarMeter *>(pThisHyNode)->SetupBar(barPanelInit);
+
+					previewComponentRef.m_CurrentWidgetBarPanelNodeUuid = QUuid(barSetupObj["nodeUuid"].toString());
+					TreeModelItemData *pBarItemData = projectRef.FindItemData(previewComponentRef.m_CurrentWidgetBarPanelNodeUuid);
+					if(pBarItemData && pBarItemData->IsProjectItem())
+					{
+						ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pBarItemData);
+
+						FileDataPair fileDataPair;
+						pReferencedProjItemData->GetSavedFileData(fileDataPair);
+
+						QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+						HyJsonDoc itemDataDoc;
+						if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+							HyGuiLog("ExtrapolateProperties() - HyBarMeter failed to parse its panel node file data", LOGTYPE_Error);
+						static_cast<HyBarMeter *>(pThisHyNode)->GuiOverrideBarNodeData(barPanelInit.m_eNodeType, itemDataDoc.GetObject(), true);
+					}
 				}
+				if(panelObj.contains("Bar Offset"))
+				{
+					QJsonArray barOffsetArray = panelObj["Bar Offset"].toArray();
+					static_cast<HyBarMeter *>(pThisHyNode)->SetBarOffset(barOffsetArray[0].toInt(), barOffsetArray[1].toInt());
+				}
+				if(panelObj.contains("Bar Vertical"))
+					static_cast<HyBarMeter *>(pThisHyNode)->SetVertical(panelObj["Bar Vertical"].toBool());
+				if(panelObj.contains("Bar Inverted"))
+					static_cast<HyBarMeter *>(pThisHyNode)->SetInverted(panelObj["Bar Inverted"].toBool());
+				if(panelObj.contains("Bar Stretched"))
+					static_cast<HyBarMeter *>(pThisHyNode)->SetBarStreteched(panelObj["Bar Stretched"].toBool());
+				if(panelObj.contains("Bar Under Panel"))
+					static_cast<HyBarMeter *>(pThisHyNode)->SetBarUnderPanel(panelObj["Bar Under Panel"].toBool());
+			}
+			if(propsObj.contains("Label"))
+			{
+				QJsonObject labelObj = propsObj["Label"].toObject();
+
+				if(labelObj.contains("Set Value"))
+					static_cast<HyRackMeter *>(pThisHyNode)->SetValue(labelObj["Set Value"].toInt(), 0.0f);
+				if(labelObj.contains("Text"))
+					static_cast<HyLabel *>(pThisHyNode)->SetText(labelObj["Text"].toString().toStdString());
+				if(labelObj.contains("Font"))
+				{
+					previewComponentRef.m_CurrentWidgetTextNodeUuid = QUuid(labelObj["Font"].toString());
+					TreeModelItemData *pTextItemData = projectRef.FindItemData(previewComponentRef.m_CurrentWidgetTextNodeUuid);
+					if(pTextItemData && pTextItemData->IsProjectItem())
+					{
+						ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pTextItemData);
+
+						FileDataPair fileDataPair;
+						pReferencedProjItemData->GetSavedFileData(fileDataPair);
+
+						QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+						HyJsonDoc itemDataDoc;
+						if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+							HyGuiLog("ExtrapolateProperties() - Label failed to parse its text node file data", LOGTYPE_Error);
+						static_cast<HyLabel *>(pThisHyNode)->GuiOverrideTextNodeData(itemDataDoc.GetObject(), true);
+					}
+				}
+				if(labelObj.contains("Margins"))
+				{
+					QJsonArray marginArray = labelObj["Margins"].toArray();
+					static_cast<HyLabel *>(pThisHyNode)->SetTextMargins(HyMargins<float>(marginArray[0].toDouble(), marginArray[1].toDouble(), marginArray[2].toDouble(), marginArray[3].toDouble()));
+				}
+				if(labelObj.contains("Style"))
+				{
+					HyTextType eTextStyle = HyGlobal::GetTextTypeFromString(labelObj["Style"].toString());
+					switch(eTextStyle)
+					{
+					case HYTEXT_Line:
+						if(static_cast<HyLabel *>(pThisHyNode)->IsLine() == false)
+							static_cast<HyLabel *>(pThisHyNode)->SetAsLine();
+						break;
+
+					case HYTEXT_Vertical:
+						if(static_cast<HyLabel *>(pThisHyNode)->IsVertical() == false)
+							static_cast<HyLabel *>(pThisHyNode)->SetAsVertical();
+						break;
+
+					case HYTEXT_Column:
+						if(static_cast<HyLabel *>(pThisHyNode)->IsColumn() == false)
+							static_cast<HyLabel *>(pThisHyNode)->SetAsColumn();
+						break;
+
+					case HYTEXT_Box:
+						if(static_cast<HyLabel *>(pThisHyNode)->IsBox() == false)
+							static_cast<HyLabel *>(pThisHyNode)->SetAsBox(); // TODO: Add ability to set vertical alignment
+						break;
+
+					case HYTEXT_ScaleBox:
+						if(static_cast<HyLabel *>(pThisHyNode)->IsScaleBox() == false)
+							static_cast<HyLabel *>(pThisHyNode)->SetAsScaleBox(); // TODO: Add ability to set vertical alignment
+						break;
+					}
+				}
+				if(labelObj.contains("Visible"))
+					static_cast<HyLabel *>(pThisHyNode)->SetTextVisible(labelObj["Visible"].toBool());
+				if(labelObj.contains("Alignment"))
+					static_cast<HyLabel *>(pThisHyNode)->SetAlignment(HyGlobal::GetAlignmentFromString(labelObj["Alignment"].toString()));
+				if(labelObj.contains("Monospaced Digits"))
+					static_cast<HyLabel *>(pThisHyNode)->SetMonospacedDigits(labelObj["Monospaced Digits"].toBool());
+				if(labelObj.contains("Show As Cash"))
+					static_cast<HyRackMeter *>(pThisHyNode)->ShowAsCash(labelObj["Show As Cash"].toBool());
+				if(labelObj.contains("Spinning Digits"))
+					static_cast<HyRackMeter *>(pThisHyNode)->SetAsSpinningMeter(labelObj["Spinning Digits"].toBool());				
+			}
+			if(propsObj.contains("Button"))
+			{
+				QJsonObject buttonObj = propsObj["Button"].toObject();
+				if(buttonObj.contains("Checked"))
+					static_cast<HyButton *>(pThisHyNode)->SetChecked(buttonObj["Checked"].toBool());
+			}
+			if(propsObj.contains("Bar Meter"))
+			{
+				QJsonObject barMeterObj = propsObj["Bar Meter"].toObject();
+
+				if(barMeterObj.contains("Min Value"))
+					static_cast<HyBarMeter *>(pThisHyNode)->SetMinimum(barMeterObj["Min Value"].toInt());
+				if(barMeterObj.contains("Max Value"))
+					static_cast<HyBarMeter *>(pThisHyNode)->SetMaximum(barMeterObj["Max Value"].toInt());
+				if(barMeterObj.contains("Value"))
+					static_cast<HyBarMeter *>(pThisHyNode)->SetValue(barMeterObj["Value"].toInt(), 0.0f);
+			}
+			if(propsObj.contains("Slider"))
+			{
+				QJsonObject sliderObj = propsObj["Slider"].toObject();
+
+				if(sliderObj.contains("Value"))
+					static_cast<HySlider *>(pThisHyNode)->SetValue(sliderObj["Value"].toInt());
+				if(sliderObj.contains("Vertical"))
+					static_cast<HySlider *>(pThisHyNode)->SetOrientation(sliderObj["Vertical"].toBool() ? HYORIENT_Vertical : HYORIENT_Horizontal);
 			}
 			break;
 

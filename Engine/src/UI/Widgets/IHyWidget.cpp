@@ -84,14 +84,9 @@ void IHyWidget::SetPanelVisible(bool bVisible)
 	m_Panel.SetVisible(bVisible);
 }
 
-float IHyWidget::GetPanelAlpha() const
+HyAnimFloat &IHyWidget::PanelAlpha()
 {
-	return m_Panel.alpha.Get();
-}
-
-void IHyWidget::SetPanelAlpha(float fAlpha)
-{
-	m_Panel.alpha.Set(fAlpha);
+	return m_Panel.alpha;
 }
 
 bool IHyWidget::IsPanelBoundingVolume() const
@@ -107,6 +102,11 @@ bool IHyWidget::IsPanelNode() const
 IHyBody2d *IHyWidget::GetPanelNode()
 {
 	return m_Panel.GetNode();
+}
+
+HyUiPanelInit IHyWidget::ClonePanelInit() const
+{
+	return m_Panel.CloneInit();
 }
 
 bool IHyWidget::IsInputAllowed() const

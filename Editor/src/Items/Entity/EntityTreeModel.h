@@ -186,6 +186,10 @@ struct EntityPreviewComponent
 	// Tween Special Case:
 	// To determine the tweens' current values, store the info that kicked it off, and extrapolate based on Entity's 'iCURRENT_FRAME'
 	TweenInfo										m_TweenInfo[NUM_TWEENPROPS] = { TWEENPROP_Position, TWEENPROP_Rotation, TWEENPROP_Scale, TWEENPROP_Alpha };
+
+	QUuid											m_CurrentWidgetPanelNodeUuid;		// Only used when this draw item is a UI widget and its panel uses a project node
+	QUuid											m_CurrentWidgetTextNodeUuid;		// Only used when this draw item is a UI widget
+	QUuid											m_CurrentWidgetBarPanelNodeUuid;	// Only used when this draw item is a UI BarMeter Widget, and its bar panel uses a project node
 };
 
 enum EntityItemType

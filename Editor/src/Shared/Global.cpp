@@ -20,6 +20,7 @@
 /*static*/ QString HyGlobal::sm_ShapeNames[NUM_SHAPES];
 /*static*/ QString HyGlobal::sm_TweenFuncNames[NUM_TWEENFUNCS];
 /*static*/ QString HyGlobal::sm_TweenPropNames[NUM_TWEENPROPS];
+/*static*/ QString HyGlobal::sm_SizePolicyNames[HYNUM_SIZEPOLICIES];
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
 /*static*/ QString HyGlobal::sm_sTextTypeNames[HYNUM_TEXTTYPES];
 /*static*/ QString HyGlobal::sm_sAlignmentNames[HYNUM_ALIGNMENTS];
@@ -154,6 +155,11 @@
 	sm_TweenPropNames[TWEENPROP_Rotation] = "Rotation";
 	sm_TweenPropNames[TWEENPROP_Scale] = "Scale";
 	sm_TweenPropNames[TWEENPROP_Alpha] = "Alpha";
+
+	sm_SizePolicyNames[HYSIZEPOLICY_Fixed] = "Fixed";
+	sm_SizePolicyNames[HYSIZEPOLICY_Expanding] = "Expanding";
+	sm_SizePolicyNames[HYSIZEPOLICY_Shrinkable] = "Shrinkable";
+	sm_SizePolicyNames[HYSIZEPOLICY_Flexible] = "Flexible";
 
 	sm_sSubIconNames[SUBICON_None] = "";
 	sm_sSubIconNames[SUBICON_New] = "-New";
@@ -544,6 +550,26 @@
 		list.append(TweenPropName(tweenPropList[i]));
 
 	return list;
+}
+
+/*static*/ QStringList HyGlobal::GetSizePolicyNameList()
+{
+	QStringList list;
+	for(int i = 0; i < HYNUM_SIZEPOLICIES; ++i)
+		list.append(sm_SizePolicyNames[i]);
+
+	return list;
+}
+
+/*static*/ HySizePolicy HyGlobal::GetSizePolicyFromString(QString sSizePolicy)
+{
+	for(int i = 0; i < HYNUM_SIZEPOLICIES; ++i)
+	{
+		if(sSizePolicy.compare(sm_SizePolicyNames[i], Qt::CaseInsensitive) == 0)
+			return static_cast<HySizePolicy>(i);
+	}
+
+	return HYSIZEPOLICY_Unknown;
 }
 
 /*static*/ QStringList HyGlobal::GetTextTypeNameList()

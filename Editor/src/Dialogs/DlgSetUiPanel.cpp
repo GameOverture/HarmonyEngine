@@ -44,17 +44,27 @@ DlgSetUiPanel::~DlgSetUiPanel()
 	delete ui;
 }
 
-QVariant DlgSetUiPanel::GetSerializedPanelInit() const
+HyUiPanelInit DlgSetUiPanel::GetPanelInit()
+{
+	return m_Init;
+}
+
+QUuid DlgSetUiPanel::GetNodeUuid()
+{
+	return m_SelectedNodeUuid;
+}
+
+/*static*/ QVariant DlgSetUiPanel::SerializePanelInit(const HyUiPanelInit &init, QUuid selectedNodeUuid)
 {
 	QJsonObject serializedObj;
-	serializedObj.insert("nodeType", HyGlobal::ItemName(HyGlobal::ConvertHyType(m_Init.m_eNodeType), false));
-	serializedObj.insert("width", QJsonValue(static_cast<qint64>(m_Init.m_uiWidth)));
-	serializedObj.insert("height", QJsonValue(static_cast<qint64>(m_Init.m_uiHeight)));
-	serializedObj.insert("nodeUuid", m_SelectedNodeUuid.toString(QUuid::WithoutBraces));
-	serializedObj.insert("frameSize", QJsonValue(static_cast<qint64>(m_Init.m_uiFrameSize)));
-	serializedObj.insert("panelColor", QJsonValue(static_cast<qint64>(m_Init.m_PanelColor.GetAsHexCode())));
-	serializedObj.insert("frameColor", QJsonValue(static_cast<qint64>(m_Init.m_FrameColor.GetAsHexCode())));
-	serializedObj.insert("tertiaryColor", QJsonValue(static_cast<qint64>(m_Init.m_TertiaryColor.GetAsHexCode())));
+	serializedObj.insert("nodeType", HyGlobal::ItemName(HyGlobal::ConvertHyType(init.m_eNodeType), false));
+	serializedObj.insert("width", QJsonValue(static_cast<qint64>(init.m_uiWidth)));
+	serializedObj.insert("height", QJsonValue(static_cast<qint64>(init.m_uiHeight)));
+	serializedObj.insert("nodeUuid", selectedNodeUuid.toString(QUuid::WithoutBraces));
+	serializedObj.insert("frameSize", QJsonValue(static_cast<qint64>(init.m_uiFrameSize)));
+	serializedObj.insert("panelColor", QJsonValue(static_cast<qint64>(init.m_PanelColor.GetAsHexCode())));
+	serializedObj.insert("frameColor", QJsonValue(static_cast<qint64>(init.m_FrameColor.GetAsHexCode())));
+	serializedObj.insert("tertiaryColor", QJsonValue(static_cast<qint64>(init.m_TertiaryColor.GetAsHexCode())));
 
 	return QVariant(serializedObj);
 }
@@ -177,6 +187,11 @@ void DlgSetUiPanel::on_btnFrameColor_clicked()
 void DlgSetUiPanel::on_btnTertiaryColor_clicked()
 {
 	m_Init.m_TertiaryColor = SetPrimColor(m_Init.m_TertiaryColor, ui->btnTertiaryColor, true);
+}
+
+void DlgSetUiPanel::on_cmbNode_currentIndexChanged(int index)
+{
+	m_SelectedNodeUuid = ui->cmbNode->currentData().toUuid();
 }
 
 HyColor DlgSetUiPanel::SetPrimColor(HyColor startingColor, QPushButton *pButton, bool bShowDialog)

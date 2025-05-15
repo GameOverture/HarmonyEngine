@@ -92,10 +92,21 @@ bool HyTextField::IsInputValidated() const
 	return (m_uiEntityAttribs & TEXTFIELDATTRIB_UseValidator) != 0;
 }
 
-void HyTextField::SetInputValidator(const std::regex &regEx)
+std::string HyTextField::GetInputValidator() const
 {
+	return m_sValidationRegEx;
+}
+
+void HyTextField::SetInputValidator(std::string sRegEx, bool bCaseSensitive)
+{
+	m_sValidationRegEx = sRegEx;
+
+	std::regex_constants::syntax_option_type typeFlags = std::regex_constants::optimize;
+	if(bCaseSensitive)
+		typeFlags |= std::regex_constants::icase;
+
+	m_InputValidator = std::regex(m_sValidationRegEx, typeFlags);
 	m_uiEntityAttribs |= TEXTFIELDATTRIB_UseValidator;
-	m_InputValidator = regEx;
 }
 
 void HyTextField::ClearInputValidator()

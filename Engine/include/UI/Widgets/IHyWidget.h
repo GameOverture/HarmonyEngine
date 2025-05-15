@@ -59,12 +59,12 @@ public:
 
 	bool IsPanelVisible() const;
 	void SetPanelVisible(bool bVisible);
-	float GetPanelAlpha() const;
-	void SetPanelAlpha(float fAlpha);
+	HyAnimFloat &PanelAlpha();
 
 	bool IsPanelBoundingVolume() const;
 	bool IsPanelNode() const;
 	IHyBody2d *GetPanelNode();
+	HyUiPanelInit ClonePanelInit() const;
 
 	bool IsInputAllowed() const;							// Checks itself and the container it's inserted in if input is allowed
 

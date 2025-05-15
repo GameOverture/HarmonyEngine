@@ -36,8 +36,11 @@ class DlgSetUiPanel : public QDialog
 public:
 	explicit DlgSetUiPanel(Project &projectRef, QString sTitle, HyUiPanelInit &init, QUuid selectedNodeUuid, QWidget *parent = 0);
 	~DlgSetUiPanel();
+
+	HyUiPanelInit GetPanelInit();
+	QUuid GetNodeUuid();
 	
-	QVariant GetSerializedPanelInit() const;
+	static QVariant SerializePanelInit(const HyUiPanelInit &init, QUuid selectedNodeUuid);
 
 protected:
 	void SyncNodeComboBox();
@@ -54,6 +57,8 @@ private Q_SLOTS:
 	void on_btnPanelColor_clicked();
 	void on_btnFrameColor_clicked();
 	void on_btnTertiaryColor_clicked();
+
+	void on_cmbNode_currentIndexChanged(int index);
 
 private:
 	Ui::DlgSetUiPanel *ui;
