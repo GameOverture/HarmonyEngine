@@ -216,6 +216,14 @@ enum HyAudioFormat
 	HYNUM_AUDIOFORMATS
 };
 
+enum HyBlendMode
+{
+	HYBLENDMODE_Normal = 0,
+	HYBLENDMODE_Additive,
+	HYBLENDMODE_Multiply,
+	HYBLENDMODE_Screen
+};
+
 enum HyRenderMode
 {
 	HYRENDERMODE_Unknown = -1,
@@ -231,6 +239,7 @@ enum HyShaderProgramDefaults
 {
 	HYSHADERPROG_QuadBatch = 1,
 	HYSHADERPROG_Primitive,
+	HYSHADERPROG_Spine,
 	HYSHADERPROG_Lines2d,
 };
 
@@ -265,7 +274,8 @@ enum class HyShaderVariable : uint32
 	dvec3,
 	dvec4,
 	mat3,
-	mat4
+	mat4,
+	color // 4 uint8 RGBA - becomes a vec4 in shader
 };
 
 enum HyWindowMode

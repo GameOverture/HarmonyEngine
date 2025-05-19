@@ -12,8 +12,8 @@
 
 #include "Afx/HyStdAfx.h"
 
-#define HY_VERTEX_BUFFER_SIZE_2D ((1024 * 1024) * 4) // 4MB
 #define HY_VERTEX_BUFFER_SIZE ((1024 * 1024) * 4) // 4MB
+#define HY_INDEX_BUFFER_SIZE ((1024 * 1024) * 1) // 1MB
 
 class IHyRenderer;
 
@@ -27,12 +27,13 @@ class HyVertexBuffer
 		uint8 * const						m_pBUFFER;
 		uint8 *								m_pCurWritePosition;
 
-		Buffer(bool bIs2d) :	m_hGfxApiHandle(HY_UNUSED_HANDLE),
-								m_pBUFFER(HY_NEW uint8[bIs2d ? HY_VERTEX_BUFFER_SIZE_2D : HY_VERTEX_BUFFER_SIZE]),
-								m_pCurWritePosition(m_pBUFFER)
+		Buffer(size_t uiNumBytes) :
+			m_hGfxApiHandle(HY_UNUSED_HANDLE),
+			m_pBUFFER(HY_NEW uint8[uiNumBytes]),
+			m_pCurWritePosition(m_pBUFFER)
 		{
 		#ifdef HY_DEBUG
-			memset(m_pBUFFER, 0, bIs2d ? HY_VERTEX_BUFFER_SIZE_2D : HY_VERTEX_BUFFER_SIZE);
+			memset(m_pBUFFER, 0, uiNumBytes);
 		#endif
 		}
 
@@ -41,27 +42,34 @@ class HyVertexBuffer
 			delete[] m_pBUFFER;
 		}
 	};
-
-	Buffer									m_Buffer2d;	// This get cleared every frame
-	//std::vector<Buffer>						m_StaticBufferList;	// Somewhat persistent data
+	Buffer									m_Buffer2d;
+	Buffer									m_Indices;
 
 public:
 	HyVertexBuffer(IHyRenderer &rendererRef);
 	~HyVertexBuffer();
 
-	void Initialize2d();	// Should be invoked once IHyRenderer::GenerateVertexBuffer() is valid
-	void Reset2d();
-	uint32 GetNumUsedBytes2d();
-	uint32 GetGfxApiHandle2d();
-	void AppendData2d(const void *pData, uint32 uiSize);
-	uint8 * const GetData2d();
+	void Initialize();	// Should be invoked once IHyRenderer::GenerateVertexBuffer() is valid
+	void Reset();
+	uint32 GetNumUsedVertexBytes();
+	uint32 GetNumUsedIndicesBytes();
+	uint32 GetVertexApiHandle();
+	uint32 GetIndicesApiHandle();
+	void AppendVertexData(const void *pData, uint32 uiSize);
+	void AppendIndicesData(const uint16_t *pData, int32 iNumIndices);
+	uint8 * const GetVertexData();
+	uint8 *const GetIndicesData();
 
 	//HyVertexBufferHandle AddDataWithHandle(const uint8 *pData, uint32 uiSize);
 	//uint32 GetByteOffset(HyVertexBufferHandle hHandle);
 };
 
-#if HY_VERTEX_BUFFER_SIZE_2D > ((1024 * 1024) * 16) || HY_VERTEX_BUFFER_SIZE > ((1024 * 1024) * 16) // 16MB
+#if HY_VERTEX_BUFFER_SIZE > ((1024 * 1024) * 16) // 16MB
 	#error "HY_VERTEX_BUFFER_SIZE is larger than 16MB. Only 3 bytes is used to map byte offsets"
+#endif
+
+#if HY_INDEX_BUFFER_SIZE > ((1024 * 1024) * 16) // 16MB
+#error "HY_INDEX_BUFFER_SIZE is larger than 16MB. Only 3 bytes is used to map byte offsets"
 #endif
 
 #endif /* HyVertexBuffer_h__ */

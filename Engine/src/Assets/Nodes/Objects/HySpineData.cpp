@@ -38,7 +38,7 @@ HySpineTextureLoader::HySpineTextureLoader(std::vector<HySpineAtlas> &subAtlasLi
 
 		if(strcmp(sSubAtlasName.c_str(), sFileName.c_str()) == 0)
 		{
-			page.setRendererObject(reinterpret_cast<void *>(&m_SubAtlasListRef[i])); // Store the sub-atlas index. The void *'s value (aka address) is essentially the integer index
+			page.texture = reinterpret_cast<void *>(&m_SubAtlasListRef[i]); // Store the sub-atlas index. The void *'s value (aka address) is essentially the integer index
 			return;
 		}
 	}
@@ -48,6 +48,7 @@ HySpineTextureLoader::HySpineTextureLoader(std::vector<HySpineAtlas> &subAtlasLi
 
 /*virtual*/ void HySpineTextureLoader::unload(void *pTexture) /*override*/
 {
+	HyLogError("Spine HySpineTextureLoader::unload() not implemented");
 }
 #endif
 
@@ -60,7 +61,6 @@ HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAs
 #endif
 {
 #ifdef HY_USE_SPINE
-
 	bool bIsUsingTempFiles = false;
 	std::string sDataDir = assetsRef.GetDataDir() + HYASSETS_SpineDir;
 	if(itemDataObj.HasMember("usingTempFiles"))
@@ -81,7 +81,7 @@ HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAs
 		HyUvCoord rSubAtlasUVRect;
 		uint64 uiCropMask = 0;
 
-		if(bIsUsingTempFiles == false)
+		if(bIsUsingTempFiles == false) // The spine atlas is a sub-atlas packed into the project's texture assets
 		{
 			HyFileAtlas *pAtlas = assetsRef.GetAtlas(atlasObj["checksum"].GetUint(), atlasObj["bankId"].GetUint(), rSubAtlasUVRect, uiCropMask);
 			HyAssert(pAtlas, "HySpineData atlas was not found with checksum: " << atlasObj["checksum"].GetUint());
@@ -89,7 +89,7 @@ HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAs
 			m_RequiredFiles[HYFILE_Atlas].Set(pAtlas->GetManifestIndex());
 			m_SubAtlasList.push_back(HySpineAtlas(sName, pAtlas, rSubAtlasUVRect.left, rSubAtlasUVRect.top, rSubAtlasUVRect.right, rSubAtlasUVRect.bottom));
 		}
-		else // Using GUI temp files
+		else // Using GUI temp files for atlases
 		{
 			uint32 uiAtlasWidth = static_cast<uint32>(HyMath::Max(0, atlasObj["subAtlasWidth"].GetInt()));
 			uint32 uiAtlasHeight = static_cast<uint32>(HyMath::Max(0, atlasObj["subAtlasHeight"].GetInt()));

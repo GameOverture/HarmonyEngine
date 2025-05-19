@@ -210,9 +210,10 @@ int32 HyTexturedQuad2d::GetEntireTextureHeight()
 	return true;
 }
 
-/*virtual*/ void HyTexturedQuad2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
+/*virtual*/ void HyTexturedQuad2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, HyBlendMode &eBlendModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
 {
 	eRenderModeOut = HYRENDERMODE_TriangleStrip;
+	eBlendModeOut = HYBLENDMODE_Normal;
 	uiNumInstancesOut = 1;
 	uiNumVerticesPerInstOut = 4;
 	bIsBatchable = true;
@@ -223,36 +224,36 @@ int32 HyTexturedQuad2d::GetEntireTextureHeight()
 	const HyTexturedQuadData *pData = static_cast<const HyTexturedQuadData *>(UncheckedGetData());
 	glm::vec2 vSize(m_UvCoords.Width() * pData->GetAtlas()->GetWidth(), m_UvCoords.Height() * pData->GetAtlas()->GetHeight());
 
-	vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
+	vertexBufferRef.AppendVertexData(&vSize, sizeof(glm::vec2));
 
 	glm::vec2 vOffset(0.0f, 0.0f);
-	vertexBufferRef.AppendData2d(&vOffset, sizeof(glm::vec2));
+	vertexBufferRef.AppendVertexData(&vOffset, sizeof(glm::vec2));
 
-	vertexBufferRef.AppendData2d(&CalculateTopTint(fExtrapolatePercent), sizeof(glm::vec3));
+	vertexBufferRef.AppendVertexData(&CalculateTopTint(fExtrapolatePercent), sizeof(glm::vec3));
 
 	float fAlpha = CalculateAlpha(fExtrapolatePercent);
-	vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
-	vertexBufferRef.AppendData2d(&CalculateBotTint(fExtrapolatePercent), sizeof(glm::vec3));
-	vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
+	vertexBufferRef.AppendVertexData(&fAlpha, sizeof(float));
+	vertexBufferRef.AppendVertexData(&CalculateBotTint(fExtrapolatePercent), sizeof(glm::vec3));
+	vertexBufferRef.AppendVertexData(&fAlpha, sizeof(float));
 
 	glm::vec2 vUV;
 	vUV.x = m_UvCoords.right;//1.0f;
 	vUV.y = m_UvCoords.top;//1.0f;
-	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+	vertexBufferRef.AppendVertexData(&vUV, sizeof(glm::vec2));
 	
 	vUV.x = m_UvCoords.left;//0.0f;
 	vUV.y = m_UvCoords.top;//1.0f;
-	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+	vertexBufferRef.AppendVertexData(&vUV, sizeof(glm::vec2));
 	
 	vUV.x = m_UvCoords.right;//1.0f;
 	vUV.y = m_UvCoords.bottom;//0.0f;
-	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+	vertexBufferRef.AppendVertexData(&vUV, sizeof(glm::vec2));
 
 	vUV.x = m_UvCoords.left;//0.0f;
 	vUV.y = m_UvCoords.bottom;//0.0f;
-	vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+	vertexBufferRef.AppendVertexData(&vUV, sizeof(glm::vec2));
 
-	vertexBufferRef.AppendData2d(&GetSceneTransform(fExtrapolatePercent), sizeof(glm::mat4));
+	vertexBufferRef.AppendVertexData(&GetSceneTransform(fExtrapolatePercent), sizeof(glm::mat4));
 
 	return true;
 }

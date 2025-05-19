@@ -54,17 +54,20 @@ void HyRenderBuffer::Reset()
 void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, HyCameraMask uiCameraMask, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent)
 {
 	HyRenderMode eRenderMode = HYRENDERMODE_Unknown;
+	HyBlendMode eBlendMode = HYBLENDMODE_Normal;
 	uint32 uiNumInstances = 0, uiNumVerticesPerInstance = 0;
 	bool bIsBatchable = false;
 	uint32 uiStageIndex = 0;
 	do
 	{
-		instanceRef.PrepRenderStage(uiStageIndex, eRenderMode, uiNumInstances, uiNumVerticesPerInstance, bIsBatchable);
+		instanceRef.PrepRenderStage(uiStageIndex, eRenderMode, eBlendMode, uiNumInstances, uiNumVerticesPerInstance, bIsBatchable);
 
 		State *pRenderState = new (m_pCurWritePosition)State(uiId,
 															 uiCameraMask,
-															 vertexBufferRef.GetNumUsedBytes2d(), // Gets current offset into vertex buffer
+															 vertexBufferRef.GetNumUsedVertexBytes(), // Gets current offset into vertex buffer
+															 vertexBufferRef.GetNumUsedIndicesBytes(),// Gets current offset into index buffer
 															 eRenderMode,
+															 eBlendMode,
 															 instanceRef.GetShaderHandle(),
 															 instanceRef.GetScissorHandle(),
 															 instanceRef.GetStencilHandle(),// (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
@@ -158,6 +161,7 @@ void HyRenderBuffer::AppendExData(HyShaderUniforms &shaderUniformRef)
 		case HyShaderVariable::dvec4:		uiDataSize = sizeof(glm::dvec4);	break;
 		case HyShaderVariable::mat3:		uiDataSize = sizeof(glm::mat3);		break;
 		case HyShaderVariable::mat4:		uiDataSize = sizeof(glm::mat4);		break;
+		case HyShaderVariable::color:		uiDataSize = (sizeof(uint8_t) * 4);	break; // 4 uint8 RGBA
 		}
 		memcpy(m_pCurWritePosition, shaderUniformRef.GetData(i), uiDataSize);
 		m_pCurWritePosition += uiDataSize;

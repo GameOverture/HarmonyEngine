@@ -109,7 +109,7 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 
 	for(int i = 0; i < 6; ++i)
 	{
-		vertexBufferRef.AppendData2d(&m_pVertBuffer[i], sizeof(glm::vec2));
+		vertexBufferRef.AppendVertexData(&m_pVertBuffer[i], sizeof(glm::vec2));
 		//*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pVertBuffer[i];
 		//pRefDataWritePos += sizeof(glm::vec2);
 
@@ -139,7 +139,7 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 			break;
 		}
 
-		vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+		vertexBufferRef.AppendVertexData(&vUV, sizeof(glm::vec2));
 		//*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
 		//pRefDataWritePos += sizeof(glm::vec2);
 	}

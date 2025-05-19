@@ -51,6 +51,7 @@ protected:
 	// Built-in shaders
 	HyShader *										m_pShaderQuadBatch;
 	HyShader *										m_pShaderPrimitive;
+	HyShader *										m_pShaderSpine;
 
 public:
 	IHyRenderer(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagnostics &diagnosticsRef);
@@ -87,6 +88,7 @@ public:
 	//virtual uint32 AddTextureArray(const HyTextureInfo &infoRef, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
 	virtual uint32 GenerateVertexBuffer() = 0;	// Returns the graphics API handle to a new vertex buffer in the form of a uint32
+	virtual uint32 GenerateIndexBuffer() = 0;
 	virtual uint8 *GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) = 0;
 
 	virtual void GetTextureSize(uint32 uiTextureHandle, uint32 &uiWidthOut, uint32 &uiHeightOut) = 0;

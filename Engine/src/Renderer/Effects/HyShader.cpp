@@ -130,6 +130,7 @@ void HyShader::Finalize()
 		case HyShaderVariable::dvec4:		m_uiStride += sizeof(glm::dvec4);	break;
 		case HyShaderVariable::mat3:		m_uiStride += sizeof(glm::mat3);	break;
 		case HyShaderVariable::mat4:		m_uiStride += sizeof(glm::mat4);	break;
+		case HyShaderVariable::color:		m_uiStride += (sizeof(uint8_t) * 4);break; // 4 uint8 RGBA - becomes a vec4 in shader
 		}
 	}
 

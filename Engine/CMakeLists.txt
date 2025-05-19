@@ -9,6 +9,7 @@ add_subdirectory(vendor/soil2)
 if(HYBUILD_SPINE)
 	add_subdirectory(extras/Spine/spine-cpp)
 	set_target_properties(spine-cpp PROPERTIES FOLDER "Engine Libs")
+	set_target_properties(spine-cpp-lite PROPERTIES FOLDER "Engine Libs")
 endif()
 
 if(HYBUILD_RAPIDJSON)
@@ -105,6 +106,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Networking/IHyNetworkClass.cpp
 	src/Networking/IHyNetworking.cpp
 	src/Renderer/IHyRenderer.cpp
+	src/Renderer/Components/HyMeshBuffer.cpp
 	src/Renderer/Components/HyRenderBuffer.cpp
 	src/Renderer/Components/HyShaderUniforms.cpp
 	src/Renderer/Components/HyVertexBuffer.cpp
@@ -242,6 +244,7 @@ set(HYENGINE_HEADER_FILES
 	include/Networking/IHyNetworkClass.h
 	include/Networking/IHyNetworking.h
 	include/Renderer/IHyRenderer.h
+	include/Renderer/Components/HyMeshBuffer.h
 	include/Renderer/Components/HyRenderBuffer.h
 	include/Renderer/Components/HyShaderUniforms.h
 	include/Renderer/Components/HyVertexBuffer.h

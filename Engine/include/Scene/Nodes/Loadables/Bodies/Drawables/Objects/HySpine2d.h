@@ -21,9 +21,11 @@ class HySpine2d : public IHyDrawable2d
 	spine::Skeleton *				m_pSkeleton;
 	spine::AnimationState *			m_pAnimationState;
 	spine::SkeletonBounds *			m_pSkeletonBounds;
-#endif
+	b2AABB							m_SkeletonBoundsAabb;	// Need to store my own AABB because spine::SkeletonBounds doesn't expose it.
 
-	uint32							m_uiStartingSlotIndex;
+	static spine::SkeletonRenderer	sm_Renderer;			// Used in the HyRenderBuffer::AppendRenderState do/while loop
+	spine::RenderCommand *			m_pRenderCmd;			// Used in the HyRenderBuffer::AppendRenderState do/while loop
+#endif
 
 public:
 	HySpine2d(HyEntity2d *pParent = nullptr);
@@ -47,11 +49,12 @@ public:
 
 
 protected:
+	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
 	virtual bool OnIsValidToRender() override;
 	virtual void OnDataAcquired() override;
 	virtual void OnLoadedUpdate() override;
 
-	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
+	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, HyBlendMode &eBlendModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
 };
 

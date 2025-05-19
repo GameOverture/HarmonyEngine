@@ -332,9 +332,10 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 	}
 }
 
-/*virtual*/ void HyPrimitive2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
+/*virtual*/ void HyPrimitive2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, HyBlendMode &eBlendModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
 {
 	eRenderModeOut = m_eRenderMode;
+	eBlendModeOut = HYBLENDMODE_Normal;
 	uiNumInstancesOut = 1;
 	uiNumVerticesPerInstOut = GetNumVerts();
 	bIsBatchable = false;
@@ -342,7 +343,7 @@ void HyPrimitive2d::SetNumCircleSegments(uint32 uiNumSegments)
 
 /*virtual*/ bool HyPrimitive2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
 {
-	vertexBufferRef.AppendData2d(m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
+	vertexBufferRef.AppendVertexData(m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
 	return true;
 }
 

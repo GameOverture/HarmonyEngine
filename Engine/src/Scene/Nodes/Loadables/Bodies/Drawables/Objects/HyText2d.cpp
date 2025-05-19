@@ -140,9 +140,10 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 #endif
 }
 
-/*virtual*/ void HyText2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
+/*virtual*/ void HyText2d::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, HyBlendMode &eBlendModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
 {
 	eRenderModeOut = HYRENDERMODE_TriangleStrip;
+	eBlendModeOut = HYBLENDMODE_Normal;
 	uiNumInstancesOut = GetNumRenderQuads();
 	uiNumVerticesPerInstOut = 4;
 	bIsBatchable = true;
@@ -183,41 +184,41 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 			vSize *= m_pGlyphInfos[uiGlyphOffsetIndex].fScale;
 			vOffset += m_pGlyphInfos[uiGlyphOffsetIndex].vScaleKerning + m_pGlyphInfos[uiGlyphOffsetIndex].vUserKerning;
 
-			vertexBufferRef.AppendData2d(&vSize, sizeof(glm::vec2));
-			vertexBufferRef.AppendData2d(&vOffset, sizeof(glm::vec2));
+			vertexBufferRef.AppendVertexData(&vSize, sizeof(glm::vec2));
+			vertexBufferRef.AppendVertexData(&vOffset, sizeof(glm::vec2));
 
 			glm::vec3 vTopColor = m_StateColors[m_uiState]->m_LayerColors[i]->topClr.GetAsVec3();
 			vTopColor *= CalculateTopTint(fExtrapolatePercent);
-			vertexBufferRef.AppendData2d(&vTopColor, sizeof(glm::vec3));
+			vertexBufferRef.AppendVertexData(&vTopColor, sizeof(glm::vec3));
 
 			float fAlpha = CalculateAlpha(fExtrapolatePercent) * m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
-			vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
+			vertexBufferRef.AppendVertexData(&fAlpha, sizeof(float));
 
 			glm::vec3 vBotColor = m_StateColors[m_uiState]->m_LayerColors[i]->botClr.GetAsVec3();
 			vBotColor *= CalculateBotTint(fExtrapolatePercent);
-			vertexBufferRef.AppendData2d(&vBotColor, sizeof(glm::vec3));
+			vertexBufferRef.AppendVertexData(&vBotColor, sizeof(glm::vec3));
 
-			vertexBufferRef.AppendData2d(&fAlpha, sizeof(float));
+			vertexBufferRef.AppendVertexData(&fAlpha, sizeof(float));
 
 			glm::vec2 vUV;
 
 			vUV.x = pGlyphRef->rSRC_RECT.right;//1.0f;
 			vUV.y = pGlyphRef->rSRC_RECT.top;//1.0f;
-			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+			vertexBufferRef.AppendVertexData(&vUV, sizeof(glm::vec2));
 
 			vUV.x = pGlyphRef->rSRC_RECT.left;//0.0f;
 			vUV.y = pGlyphRef->rSRC_RECT.top;//1.0f;
-			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+			vertexBufferRef.AppendVertexData(&vUV, sizeof(glm::vec2));
 
 			vUV.x = pGlyphRef->rSRC_RECT.right;//1.0f;
 			vUV.y = pGlyphRef->rSRC_RECT.bottom;//0.0f;
-			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+			vertexBufferRef.AppendVertexData(&vUV, sizeof(glm::vec2));
 
 			vUV.x = pGlyphRef->rSRC_RECT.left;//0.0f;
 			vUV.y = pGlyphRef->rSRC_RECT.bottom;//0.0f;
-			vertexBufferRef.AppendData2d(&vUV, sizeof(glm::vec2));
+			vertexBufferRef.AppendVertexData(&vUV, sizeof(glm::vec2));
 
-			vertexBufferRef.AppendData2d(&mtxTransformRef, sizeof(glm::mat4));
+			vertexBufferRef.AppendVertexData(&mtxTransformRef, sizeof(glm::mat4));
 		}
 	}
 

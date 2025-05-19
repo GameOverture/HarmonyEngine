@@ -155,7 +155,7 @@ HyOpenGL::HyOpenGL(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagn
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);		// 4-byte pixel alignment
 
-	m_VertexBuffer.Initialize2d();				// vertex buffer for 2D scene nodes
+	m_VertexBuffer.Initialize();				// Sets up vertex and index buffers (VBO and IBO)
 
 	GLint iMaxTextureSize = 0;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &iMaxTextureSize);
@@ -256,11 +256,18 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::Begin_2d()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer.GetGfxApiHandle2d());
+	glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer.GetVertexApiHandle());
 	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBindBuffer");
-
-	glBufferData(GL_ARRAY_BUFFER, m_VertexBuffer.GetNumUsedBytes2d(), m_VertexBuffer.GetData2d(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_VertexBuffer.GetNumUsedVertexBytes(), m_VertexBuffer.GetVertexData(), GL_DYNAMIC_DRAW);
 	HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBufferData");
+
+	if(m_VertexBuffer.GetNumUsedIndicesBytes() > 0)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VertexBuffer.GetIndicesApiHandle());
+		HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBindBuffer");
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_VertexBuffer.GetNumUsedIndicesBytes(), m_VertexBuffer.GetIndicesData(), GL_DYNAMIC_DRAW);
+		HyErrorCheck_OpenGL("HyOpenGL:Begin_2d", "glBufferData");
+	}
 
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
@@ -402,6 +409,14 @@ HyOpenGL::~HyOpenGL(void)
 			pShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
 			break;
 
+		case HYSHADERPROG_Spine:
+			pShader->SetSourceCode(szHYSPINE_VERTEXSHADER, HYSHADER_Vertex);
+			pShader->AddVertexAttribute("attr_Pos", HyShaderVariable::vec2, false, 0);
+			pShader->AddVertexAttribute("attr_TexCoord", HyShaderVariable::vec2, false, 0);
+			pShader->AddVertexAttribute("attr_LightColor", HyShaderVariable::color, true, 0);
+			//pShader->AddVertexAttribute("attr_DarkColor", HyShaderVariable::color, true, 0);
+			break;
+
 		case HYSHADERPROG_Lines2d:
 			pShader->SetSourceCode(szHYLINES2D_VERTEXSHADER, HYSHADER_Vertex);
 			pShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
@@ -425,6 +440,10 @@ HyOpenGL::~HyOpenGL(void)
 
 		case HYSHADERPROG_Primitive:
 			pShader->SetSourceCode(szHYPRIMATIVE_FRAGMENTSHADER, HYSHADER_Fragment);
+			break;
+
+		case HYSHADERPROG_Spine:
+			pShader->SetSourceCode(szHYSPINE_FRAGMENTSHADER, HYSHADER_Fragment);
 			break;
 
 		case HYSHADERPROG_Lines2d:
@@ -536,7 +555,10 @@ HyOpenGL::~HyOpenGL(void)
 		//BindVao(this);
 		GLuint uiVao = m_VaoMapList[m_pCurWindow->GetIndex()][pShader->GetHandle()];
 		glBindVertexArray(uiVao);
-		HyErrorCheck_OpenGL("HyOpenGLShader::Use", "glBindVertexArray");
+		HyErrorCheck_OpenGL("HyOpenGL::UploadShader", "glBindVertexArray");
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VertexBuffer.GetIndicesApiHandle()); // Associate the main IBO with this VAO
+		HyErrorCheck_OpenGL("HyOpenGL::UploadShader", "glBindBuffer");
 
 #ifndef HY_PLATFORM_BROWSER // emscripten also compiled with ARB when I used glew.h
 		#define hyVertexAttribDivisor glVertexAttribDivisorARB
@@ -892,6 +914,14 @@ HyOpenGL::~HyOpenGL(void)
 	return hVBO;
 }
 
+/*virtual*/ uint32 HyOpenGL::GenerateIndexBuffer() /*override*/
+{
+	GLuint hIBO;
+	glGenBuffers(1, &hIBO);
+	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glGenBuffers");
+	return hIBO;
+}
+
 /*virtual*/ uint8 *HyOpenGL::GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) /*override*/
 {
 //	hPboOut = 0;
@@ -1244,6 +1274,12 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniformMatrix4fv");
 			pExBuffer += sizeof(glm::mat4);
 			break;
+			
+		case HyShaderVariable::color:
+			glUniform1ui(iUniLocation, *reinterpret_cast<uint32 *>(pExBuffer));
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniform1ui");
+			pExBuffer += sizeof(uint32);
+			break;
 		}
 	}
 
@@ -1348,12 +1384,57 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 			uiOffset += sizeof(glm::vec4);
 			break;
 
+		case HyShaderVariable::color:
+			glVertexAttribPointer(uiLocation, 4, GL_UNSIGNED_BYTE, GL_TRUE, pShader->GetStride(), reinterpret_cast<void *>(uiStartOffset + uiOffset));
+			break;
+
 		default:
 			HyError("Unsupported HyShaderVariable '" << static_cast<int>(shaderVertexAttribListRef[i].eVarType) << "' for this platform");
 			break;
 		}
 
 		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glVertexAttribPointer[" << static_cast<int>(shaderVertexAttribListRef[i].eVarType) << "]");
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// BLENDING
+	// A blend mode, see https://en.esotericsoftware.com/spine-slots#Blending
+	// Encodes the OpenGL source and destination blend function for both premultiplied and
+	// non-premultiplied alpha blending.
+	// 
+	//typedef struct {
+	//	unsigned int source_color;
+	//	unsigned int source_color_pma;
+	//	unsigned int dest_color;
+	//	unsigned int source_alpha;
+	//} blend_mode_t;
+	///// The 4 supported blend modes SPINE_BLEND_MODE_NORMAL, SPINE_BLEND_MODE_ADDITIVE, SPINE_BLEND_MODE_MULTIPLY,
+	///// and SPINE_BLEND_MODE_SCREEN, expressed as OpenGL blend functions.
+	//blend_mode_t blend_modes[] = {
+	//		{(unsigned int)GL_SRC_ALPHA, (unsigned int)GL_ONE, (unsigned int)GL_ONE_MINUS_SRC_ALPHA, (unsigned int)GL_ONE},
+	//		{(unsigned int)GL_SRC_ALPHA, (unsigned int)GL_ONE, (unsigned int)GL_ONE, (unsigned int)GL_ONE},
+	//		{(unsigned int)GL_DST_COLOR, (unsigned int)GL_DST_COLOR, (unsigned int)GL_ONE_MINUS_SRC_ALPHA, (unsigned int)GL_ONE_MINUS_SRC_ALPHA},
+	//		{(unsigned int)GL_ONE, (unsigned int)GL_ONE, (unsigned int)GL_ONE_MINUS_SRC_COLOR, (unsigned int)GL_ONE_MINUS_SRC_COLOR} };
+	//glBlendFuncSeparate(bPremultipliedAlpha ? (GLenum)blend_mode.source_color_pma : (GLenum)blend_mode.source_color, (GLenum)blend_mode.dest_color, (GLenum)blend_mode.source_alpha, (GLenum)blend_mode.dest_color);
+
+
+	bool bPremultipliedAlpha = false;
+	switch(pRenderState->m_eBLEND_MODE)
+	{
+	case HYBLENDMODE_Normal:
+		glBlendFuncSeparate(bPremultipliedAlpha ? GL_ONE : GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glBlendEquation(GL_FUNC_ADD);
+		break;
+	case HYBLENDMODE_Additive:
+		glBlendFuncSeparate(bPremultipliedAlpha ? GL_ONE : GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE);
+		break;
+	case HYBLENDMODE_Multiply:
+		glBlendFuncSeparate(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+	case HYBLENDMODE_Screen:
+		glBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
+		break;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1373,8 +1454,16 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Everything is prepared, do the drawing
-	glDrawArraysInstanced(eDrawMode, 0, pRenderState->m_uiNUM_VERTS_PER_INSTANCE, pRenderState->m_uiNumInstances);
-	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDrawArraysInstanced");
+	if(pRenderState->m_uiNumInstances != 0)
+	{
+		glDrawArraysInstanced(eDrawMode, 0, pRenderState->m_uiNUM_VERTS_PER_INSTANCE, pRenderState->m_uiNumInstances);
+		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDrawArraysInstanced");
+	}
+	else
+	{
+		glDrawElements(eDrawMode, pRenderState->m_uiNUM_VERTS_PER_INSTANCE, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(pRenderState->m_uiINDICES_OFFSET));
+		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDrawElements");
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Reset OpenGL states

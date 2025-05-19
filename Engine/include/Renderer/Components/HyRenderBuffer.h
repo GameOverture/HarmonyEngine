@@ -37,14 +37,16 @@ public:
 		const uint32							m_uiID;							// Used for debugging
 		const uint32							m_uiCAMERA_MASK;
 		const uint32							m_uiDATA_OFFSET;				// Offset into vertex buffer
+		const uint32							m_uiINDICES_OFFSET;				// Offset into indices buffer
 		const HyRenderMode						m_eRENDER_MODE;
+		const HyBlendMode						m_eBLEND_MODE;
 		const HyShaderHandle					m_hSHADER;
 		const HyStencilHandle					m_hSCISSOR_STENCIL;
 		const HyStencilHandle					m_hSTENCIL;
 		const int32								m_iCOORDINATE_SYSTEM;			// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
 		
-		uint32									m_uiNumInstances;
-		const uint32							m_uiNUM_VERTS_PER_INSTANCE;		// Or total number of vertices if single instance
+		uint32									m_uiNumInstances;				// Used with 'glDrawArraysInstanced'. When '0' is passed, render with glDrawElements instead
+		const uint32							m_uiNUM_VERTS_PER_INSTANCE;		// Or total number of vertices or indices if single instance
 
 																				//                  uint32       uint32 uint32    uint32       HY_SHADER_UNIFORM_NAME_LENGTH       uint32   XXX
 		uint32									m_uiExDataSize;					// Buffer Layout:   [NumTexUnits][Tex 0][Tex 1]...[NumUniforms][Uniform Name for next var/val pair][varType][varValue]...
@@ -52,16 +54,20 @@ public:
 		State(uint32 uiId,
 			uint32 uiCameraMask,
 			uint32 uiDataOffset,
+			uint32 uiIndicesOffset,
 			HyRenderMode eRenderMode,
+			HyBlendMode eBlendMode,
 			HyShaderHandle hShader,
 			HyStencilHandle hScissorStencil,
 			HyStencilHandle hStencil,
-			int32 iCoordinateSystem,
+			int16 iCoordinateSystem,
 			uint32 uiNumInstances,
 			uint32 uiNumVerticesPerInstance) :	m_uiID(uiId),
 												m_uiCAMERA_MASK(uiCameraMask),
 												m_uiDATA_OFFSET(uiDataOffset),
+												m_uiINDICES_OFFSET(uiIndicesOffset),
 												m_eRENDER_MODE(eRenderMode),
+												m_eBLEND_MODE(eBlendMode),
 												m_hSHADER(hShader),
 												m_hSCISSOR_STENCIL(hScissorStencil),
 												m_hSTENCIL(hStencil),
@@ -77,6 +83,7 @@ public:
 		{
 			return m_uiCAMERA_MASK == rhs.m_uiCAMERA_MASK &&
 				   //m_uiDATA_OFFSET == rhs.m_uiDATA_OFFSET && // Don't check
+				   //m_uiINDICES_OFFSET == rhs.m_uiINDICES_OFFSET && // Don't check
 				   m_eRENDER_MODE == rhs.m_eRENDER_MODE &&
 				   m_hSHADER == rhs.m_hSHADER &&
 				   m_hSCISSOR_STENCIL == rhs.m_hSCISSOR_STENCIL &&

@@ -44,6 +44,21 @@ struct HySpineAtlas
 		else
 			return m_hGfxApiHandle;
 	}
+
+	struct UVRect {
+		float u_min; // left
+		float v_min; // bottom
+		float u_max; // right
+		float v_max; // top
+	};
+
+	glm::vec2 ConvertUVs(const glm::vec2 &uv) const
+	{
+		glm::vec2 uvOut;
+		uvOut.x = uv.x * (m_rSRC_RECT.right - m_rSRC_RECT.left) + m_rSRC_RECT.left;
+		uvOut.y = uv.y * (m_rSRC_RECT.bottom - m_rSRC_RECT.top) + m_rSRC_RECT.top;
+		return uvOut;
+	}
 };
 
 #ifdef HY_USE_SPINE // Custom engine class extensions to assist spine-cpp with loading
@@ -65,7 +80,7 @@ class HySpineData : public IHyNodeData
 #ifdef HY_USE_SPINE
 	spine::Atlas *					m_pAtlasData;
 	spine::SkeletonData *			m_pSkeletonData;
-	spine::AnimationStateData *		m_pAnimStateData;
+	spine::AnimationStateData *		m_pAnimStateData; // Crossfade times set in the editor
 #endif
 
 public:

@@ -26,7 +26,8 @@ IHyRenderer::IHyRenderer(int32 iVSync, std::vector<HyWindow *> &windowListRef, H
 	m_VertexBuffer(*this),
 	m_pCurWindow(nullptr),
 	m_pShaderQuadBatch(HY_NEW HyShader(HYSHADERPROG_QuadBatch)),
-	m_pShaderPrimitive(HY_NEW HyShader(HYSHADERPROG_Primitive))
+	m_pShaderPrimitive(HY_NEW HyShader(HYSHADERPROG_Primitive)),
+	m_pShaderSpine(HY_NEW HyShader(HYSHADERPROG_Spine))
 {
 	HyAssert(sm_pInstance == nullptr, "IHyRenderer ctor called twice");
 	sm_pInstance = this;
@@ -34,6 +35,7 @@ IHyRenderer::IHyRenderer(int32 iVSync, std::vector<HyWindow *> &windowListRef, H
 	// Built-in shaders
 	m_pShaderQuadBatch->Finalize();
 	m_pShaderPrimitive->Finalize();
+	m_pShaderSpine->Finalize();
 }
 
 IHyRenderer::~IHyRenderer(void)
@@ -61,7 +63,7 @@ void IHyRenderer::PrepareBuffers(float fExtrapolatePercent)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Init everything to beginning of buffers
 	m_RenderBuffer.Reset();
-	m_VertexBuffer.Reset2d();
+	m_VertexBuffer.Reset();
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Write internal render states first, used by things like HyStencil
@@ -130,11 +132,13 @@ HyShaderHandle IHyRenderer::GetDefaultShaderHandle(HyType eType)
 	case HYTYPE_Sprite:
 	case HYTYPE_TexturedQuad:
 	case HYTYPE_Text:
-	case HYTYPE_Spine:
 		return m_pShaderQuadBatch->GetHandle();
 
 	case HYTYPE_Primitive:
 		return m_pShaderPrimitive->GetHandle();
+	
+	case HYTYPE_Spine:
+		return m_pShaderSpine->GetHandle();
 
 	case HYTYPE_Prefab:
 		return HYTYPE_Unknown; // TODO: write proper shader

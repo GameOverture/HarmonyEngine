@@ -13,7 +13,8 @@
 
 HyVertexBuffer::HyVertexBuffer(IHyRenderer &rendererRef) :
 	m_RendererRef(rendererRef),
-	m_Buffer2d(true)
+	m_Buffer2d(HY_VERTEX_BUFFER_SIZE),
+	m_Indices(HY_INDEX_BUFFER_SIZE)
 {
 	//m_StaticBufferList.emplace_back(false);
 }
@@ -22,36 +23,61 @@ HyVertexBuffer::~HyVertexBuffer()
 {
 }
 
-void HyVertexBuffer::Initialize2d()
+void HyVertexBuffer::Initialize()
 {
 	m_Buffer2d.m_hGfxApiHandle = m_RendererRef.GenerateVertexBuffer();
+	m_Indices.m_hGfxApiHandle = m_RendererRef.GenerateIndexBuffer();
 }
 
-void HyVertexBuffer::Reset2d()
+void HyVertexBuffer::Reset()
 {
 	m_Buffer2d.m_pCurWritePosition = m_Buffer2d.m_pBUFFER;
+	m_Indices.m_pCurWritePosition = m_Indices.m_pBUFFER;
 }
 
-uint32 HyVertexBuffer::GetNumUsedBytes2d()
+uint32 HyVertexBuffer::GetNumUsedVertexBytes()
 {
 	return static_cast<uint32>(m_Buffer2d.m_pCurWritePosition - m_Buffer2d.m_pBUFFER);
 }
 
-uint32 HyVertexBuffer::GetGfxApiHandle2d()
+uint32 HyVertexBuffer::GetNumUsedIndicesBytes()
+{
+	return static_cast<uint32>(m_Indices.m_pCurWritePosition - m_Indices.m_pBUFFER);
+}
+
+uint32 HyVertexBuffer::GetVertexApiHandle()
 {
 	return m_Buffer2d.m_hGfxApiHandle;
 }
 
-void HyVertexBuffer::AppendData2d(const void *pData, uint32 uiSize)
+uint32 HyVertexBuffer::GetIndicesApiHandle()
 {
-	HyAssert((static_cast<uint32>(m_Buffer2d.m_pCurWritePosition - m_Buffer2d.m_pBUFFER) + uiSize) < HY_VERTEX_BUFFER_SIZE_2D, "HyVertexBuffer::AppendData2d() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE_2D'");
+	return m_Indices.m_hGfxApiHandle;
+}
+
+void HyVertexBuffer::AppendVertexData(const void *pData, uint32 uiSize)
+{
+	HyAssert((static_cast<uint32>(m_Buffer2d.m_pCurWritePosition - m_Buffer2d.m_pBUFFER) + uiSize) < HY_VERTEX_BUFFER_SIZE, "HyVertexBuffer::AppendVertexData() has written passed its vertex bounds! Embiggen 'HY_VERTEX_BUFFER_SIZE'");
 	memcpy(m_Buffer2d.m_pCurWritePosition, pData, uiSize);
 	m_Buffer2d.m_pCurWritePosition += uiSize;
 }
 
-uint8 * const HyVertexBuffer::GetData2d()
+void HyVertexBuffer::AppendIndicesData(const uint16_t *pData, int32 iNumIndices)
+{
+	size_t uiSize = sizeof(uint16_t) * iNumIndices;
+	HyAssert((static_cast<uint32>(m_Indices.m_pCurWritePosition - m_Indices.m_pBUFFER) + uiSize) < HY_INDEX_BUFFER_SIZE, "HyVertexBuffer::AppendIndicesData() has written passed its vertex bounds! Embiggen 'HY_INDEX_BUFFER_SIZE'");
+	memcpy(m_Indices.m_pCurWritePosition, pData, uiSize);
+	m_Indices.m_pCurWritePosition += uiSize;
+}
+
+uint8 * const HyVertexBuffer::GetVertexData()
 {
 	return m_Buffer2d.m_pBUFFER;
+}
+
+uint8 *const HyVertexBuffer::GetIndicesData()
+{
+	return m_Indices.m_pBUFFER;
 }
 
 //HyVertexBufferHandle HyVertexBuffer::AddDataWithHandle(const uint8 *pData, uint32 uiSize)

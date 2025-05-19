@@ -408,6 +408,7 @@ void HyShaderUniforms::Set(const char *szName, bool bVal)
 //		case dvec4:		uiDataSize = sizeof(glm::dvec4);	break;
 //		case mat3:		uiDataSize = sizeof(glm::mat3);		break;
 //		case mat4:		uiDataSize = sizeof(glm::mat4);		break;
+//		case color:		uiDataSize = (sizeof(uint8_t) * 4);	break; // 4 uint8 RGBA
 //		}
 //		memcpy(pWritePositionRef, m_UniformList[i].GetData(), uiDataSize);
 //		pWritePositionRef += uiDataSize;

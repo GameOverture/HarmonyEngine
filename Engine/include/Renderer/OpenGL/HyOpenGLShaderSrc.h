@@ -135,6 +135,63 @@ void main()
 )src";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SPINE
+const char *const szHYSPINE_VERTEXSHADER = R"src(
+#version 140
+uniform mat4					u_mtxTransform;
+uniform mat4					u_mtxWorldToCamera;
+uniform mat4					u_mtxCameraToClip;
+
+//#version 330 core
+//layout (location = 0) in vec2 attr_Pos;
+//layout (location = 1) in vec2 attr_TexCoord;
+//layout (location = 2) in vec4 attr_LightColor;
+//layout (location = 3) in vec4 attr_DarkColor;
+
+attribute vec2 attr_Pos;
+attribute vec2 attr_TexCoord;
+attribute vec4 attr_LightColor;
+//attribute vec4 attr_DarkColor;
+
+smooth out vec2 texCoord;
+smooth out vec4 lightColor;
+//smooth out vec4 darkColor;
+
+void main()
+{
+	texCoord = attr_TexCoord;
+	lightColor = attr_LightColor;
+	//darkColor = attr_DarkColor;
+
+	vec4 vPos = vec4(attr_Pos, 0.0, 1.0);
+
+	vPos = u_mtxTransform * vPos;
+	vPos = u_mtxWorldToCamera * vPos;
+	gl_Position = u_mtxCameraToClip * vPos;
+}
+)src";
+//-------------------------------------------------------------------------------------------------------------------------------------------------
+const char *const szHYSPINE_FRAGMENTSHADER = R"src(
+#version 140
+in vec2 texCoord;
+in vec4 lightColor;
+//in vec4 darkColor;
+
+out vec4			out_vColor;
+
+uniform sampler2D	u_Tex;
+
+void main()
+{
+	vec4 texColor = texture(u_Tex, texCoord);
+	float alpha = texColor.a;// * lightColor.a;
+	out_vColor.a = alpha;
+	//out_vColor.rgb = ((texColor.a - 1.0) * darkColor.a + 1.0 - texColor.rgb) * darkColor.rgb + texColor.rgb * lightColor.rgb;
+	out_vColor.rgb = texColor.rgb * lightColor.rgb;
+}
+)src";
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CIRCLE
 const char *const szHYCIRCLE_VERTEXSHADER = R"src(
 #version 140
