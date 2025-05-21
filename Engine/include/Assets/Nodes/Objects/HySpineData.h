@@ -75,9 +75,8 @@ struct HySpineAtlas
 
 class HySpineData : public IHyNodeData
 {
-	HySpineTextureLoader			m_SpineTextureLoader;
-
 #ifdef HY_USE_SPINE
+	HySpineTextureLoader			m_SpineTextureLoader;
 	spine::Atlas *					m_pAtlasData;
 	spine::SkeletonData *			m_pSkeletonData;
 	spine::AnimationStateData *		m_pAnimStateData; // Crossfade times set in the editor

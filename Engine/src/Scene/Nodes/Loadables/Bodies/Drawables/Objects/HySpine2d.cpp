@@ -253,6 +253,7 @@ spine::TrackEntry *HySpine2d::GetCurrentTrack(size_t uiTrackIndex)
 
 /*virtual*/ void HySpine2d::SetDirty(uint32 uiDirtyFlags) /*override*/
 {
+#ifdef HY_USE_SPINE
 	if(m_pSkeleton)
 	{
 		if(uiDirtyFlags & DIRTY_Transform)
@@ -263,6 +264,7 @@ spine::TrackEntry *HySpine2d::GetCurrentTrack(size_t uiTrackIndex)
 			m_pSkeleton->getRootBone()->setRotation(rot.Get());
 		}
 	}
+#endif
 
 	IHyDrawable2d::SetDirty(uiDirtyFlags);
 }

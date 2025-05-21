@@ -163,7 +163,11 @@ HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAs
 
 HyTextureHandle HySpineData::GetTexHandle(uint32 uiAtlasIndex) const
 {
+#ifdef HY_USE_SPINE
 	return m_SpineTextureLoader.m_SubAtlasList[uiAtlasIndex].GetTexHandle();
+#else
+	return HY_UNUSED_HANDLE;
+#endif
 }
 
 #ifdef HY_USE_SPINE

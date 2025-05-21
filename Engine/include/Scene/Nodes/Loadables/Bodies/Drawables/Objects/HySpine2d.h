@@ -17,11 +17,12 @@
 
 class HySpine2d : public IHyDrawable2d
 {
+	HyRect							m_LocalBoundingRect;
+
 #ifdef HY_USE_SPINE
 	spine::Skeleton *				m_pSkeleton;
 	spine::AnimationState *			m_pAnimationState;
 	spine::SkeletonBounds *			m_pSkeletonBounds;
-	HyRect							m_LocalBoundingRect;
 
 	static spine::SkeletonRenderer	sm_Renderer;			// Used in the HyRenderBuffer::AppendRenderState do/while loop
 	spine::RenderCommand *			m_pRenderCmd;			// Used in the HyRenderBuffer::AppendRenderState do/while loop
