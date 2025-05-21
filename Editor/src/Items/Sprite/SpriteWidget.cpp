@@ -47,7 +47,7 @@ SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	ui->btnFirstFrame->setDefaultAction(ui->actionFirstFrame);
 	ui->btnLastFrame->setDefaultAction(ui->actionLastFrame);
 
-	//ui->framesView->setModel(static_cast<SpriteModel *>(m_ItemRef.GetModel())->GetStateData(0)->pFramesModel);
+	// NOTE: ui->framesView's model gets set in OnFocusState()
 	ui->framesView->setItemDelegate(new WidgetSpriteDelegate(&m_ItemRef, ui->framesView, this));
 	QItemSelectionModel *pSelModel = ui->framesView->selectionModel();
 	connect(pSelModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),

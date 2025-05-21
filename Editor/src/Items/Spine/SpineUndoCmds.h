@@ -11,9 +11,9 @@
 #define SPINEUNDOCMDS_H
 
 #include <QUndoCommand>
+#include <QTableView>
 
 class ProjectItemData;
-class ExplorerItemData;
 
 class SpineUndoCmd_AddNewCrossFade : public QUndoCommand
 {
@@ -26,6 +26,25 @@ class SpineUndoCmd_AddNewCrossFade : public QUndoCommand
 public:
 	SpineUndoCmd_AddNewCrossFade(ProjectItemData &spineItemRef, QString sAnimOne, QString sAnimTwo, float fMixValue, QUndoCommand *pParent = nullptr);
 	virtual ~SpineUndoCmd_AddNewCrossFade();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class SpineUndoCmd_ModifyCrossFade : public QUndoCommand
+{
+	ProjectItemData &				m_SpineItemRef;
+
+	QTableView *					m_pTableView;
+	QModelIndex						m_Index;
+	QVariant						m_NewData;
+	QVariant						m_OldData;
+
+public:
+	SpineUndoCmd_ModifyCrossFade(ProjectItemData &spineItemRef, QTableView *pTableView, QModelIndex index, QVariant newData, QUndoCommand *pParent = nullptr);
+	virtual ~SpineUndoCmd_ModifyCrossFade();
 
 	virtual void redo() override;
 	virtual void undo() override;

@@ -142,14 +142,17 @@ SpineCrossFade *SpineCrossFadeModel::GetCrossFadeAt(int iIndex)
 	if(role == Qt::TextAlignmentRole && index.column() == COLUMN_Mix)
 		return Qt::AlignCenter;
 
-	if(role == Qt::DisplayRole || role == Qt::EditRole)
+	if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole)
 	{
 		switch(index.column())
 		{
 		case COLUMN_AnimOne:
 			return pCrossFade->m_sAnimOne;
 		case COLUMN_Mix:
-			return QString::number(pCrossFade->m_fMixValue, 'g', 3) % ((role == Qt::DisplayRole) ? "sec" : "");
+			if(role == Qt::UserRole)
+				return pCrossFade->m_fMixValue;
+			else
+				return QString::number(pCrossFade->m_fMixValue, 'g', 3) % ((role == Qt::DisplayRole) ? "sec" : "");
 		case COLUMN_AnimTwo:
 			return pCrossFade->m_sAnimTwo;
 		}
@@ -421,37 +424,31 @@ SpineCrossFadeModel &SpineModel::GetCrossFadeModel()
 	return m_CrossFadeModel;
 }
 
-bool SpineModel::GetNextCrossFadeAnims(QString &sAnimOneOut, QString &sAnimTwoOut, float &fMixValueOut)
+bool SpineModel::GetNextCrossFadeAnims(QList<QPair<QString, QString>> &crossFadePairListOut)
 {
 	spine::Vector<spine::Animation *> &animListRef = m_pSkeletonData->getAnimations();
 	if(animListRef.size() < 2)
 		return false;
 
 	// Get all the permutation of two animations in 'animListRef'
-	QList<QPair<QString, QString>> animPairList;
+	
 	for(int i = 0; i < animListRef.size(); ++i)
 	{
 		for(int j = i + 1; j < animListRef.size(); ++j)
 		{
-			animPairList.append(QPair<QString, QString>(animListRef[i]->getName().buffer(), animListRef[j]->getName().buffer()));
-			animPairList.append(QPair<QString, QString>(animListRef[j]->getName().buffer(), animListRef[i]->getName().buffer()));
+			crossFadePairListOut.append(QPair<QString, QString>(animListRef[i]->getName().buffer(), animListRef[j]->getName().buffer()));
+			crossFadePairListOut.append(QPair<QString, QString>(animListRef[j]->getName().buffer(), animListRef[i]->getName().buffer()));
 		}
 	}
 
-	// Out of every permutation in 'animPairList', get the first two that aren't already in the 'm_CrossFadeModel'
+	// Out of every permutation in 'crossFadePairListOut', don't include any that are already in the 'm_CrossFadeModel'
 	int iNumCrossFades = m_CrossFadeModel.rowCount();
 	for(int i = 0; i < iNumCrossFades; ++i)
 	{
 		SpineCrossFade *pCrossFade = m_CrossFadeModel.GetCrossFadeAt(i);
-		animPairList.removeOne(QPair<QString, QString>(pCrossFade->m_sAnimOne, pCrossFade->m_sAnimTwo));
+		crossFadePairListOut.removeOne(QPair<QString, QString>(pCrossFade->m_sAnimOne, pCrossFade->m_sAnimTwo));
 	}
-
-	if(animPairList.empty())
-		return false;
 	
-	sAnimOneOut = animPairList[0].first;
-	sAnimTwoOut = animPairList[0].second;
-	fMixValueOut = m_pDefaultMixMapper->GetValue();
 	return true;
 }
 

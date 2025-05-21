@@ -114,7 +114,7 @@ public:
 	DoubleSpinBoxMapper *GetDefaultMixMapper();
 	SpineCrossFadeModel &GetCrossFadeModel();
 
-	bool GetNextCrossFadeAnims(QString &sAnimOneOut, QString &sAnimTwoOut, float &fMixValueOut);
+	bool GetNextCrossFadeAnims(QList<QPair<QString, QString>> &crossFadePairListOut);
 
 	virtual void OnPopState(int iPoppedStateIndex) override;
 	virtual bool OnPrepSave() override;

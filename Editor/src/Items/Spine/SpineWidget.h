@@ -16,6 +16,36 @@
 #include <QTableView>
 #include "ui_SpineWidget.h"
 
+#include <QStyledItemDelegate>
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//class SpineCrossFadesTableView : public QTableView
+//{
+//	Q_OBJECT
+//
+//public:
+//	SpineCrossFadesTableView(QWidget *pParent = 0);
+//
+//protected:
+//	virtual void resizeEvent(QResizeEvent *pResizeEvent);
+//};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class SpineCrossFadesDelegate : public QStyledItemDelegate
+{
+	Q_OBJECT
+
+	ProjectItemData *m_pItem;
+	QTableView *m_pTableView;
+
+public:
+	SpineCrossFadesDelegate(ProjectItemData *pItem, QTableView *pTableView, QObject *pParent = 0);
+
+	virtual QWidget *createEditor(QWidget *pParent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+	virtual void setEditorData(QWidget *pEditor, const QModelIndex &index) const;
+	virtual void setModelData(QWidget *pEditor, QAbstractItemModel *pModel, const QModelIndex &index) const;
+	virtual void updateEditorGeometry(QWidget *pEditor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class SpineWidget : public IWidget
 {
 	Q_OBJECT
@@ -30,6 +60,7 @@ public:
 
 private Q_SLOTS:
 	void on_sbDefaultMix_valueChanged(double dValue);
+	void on_mixTableView_selectionChanged(const QItemSelection &newSelection, const QItemSelection &oldSelection);
 	void on_btnAddMix_clicked();
 
 	void on_actionAddMix_triggered();

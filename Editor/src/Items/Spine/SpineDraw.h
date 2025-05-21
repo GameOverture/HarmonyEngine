@@ -11,6 +11,7 @@
 #define SPINEDRAW_H
 
 #include "IDraw.h"
+#include "SpineModel.h"
 
 class SpineDraw : public IDraw
 {
@@ -23,6 +24,8 @@ public:
 
 	virtual void OnApplyJsonData(HyJsonDoc &itemDataDocRef) override;
 	virtual void OnResizeRenderer() override;
+
+	void SetCrossFadePreview(SpineCrossFade *pCrossFade);
 };
 
 #endif // SPINEDRAW_H

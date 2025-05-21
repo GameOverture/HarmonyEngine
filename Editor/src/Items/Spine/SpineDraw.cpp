@@ -69,3 +69,9 @@ SpineDraw::~SpineDraw()
 /*virtual*/ void SpineDraw::OnResizeRenderer() /*override*/
 {
 }
+
+void SpineDraw::SetCrossFadePreview(SpineCrossFade *pCrossFade)
+{
+	m_Spine.SetAnimation(0, m_Spine.GetAnim(pCrossFade->m_sAnimOne.toStdString()), false);
+	m_Spine.AddAnimation(0, m_Spine.GetAnim(pCrossFade->m_sAnimTwo.toStdString()), false, 0.0f);
+}
