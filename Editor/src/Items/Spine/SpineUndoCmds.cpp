@@ -12,72 +12,29 @@
 #include "SpineModel.h"
 #include "SpineWidget.h"
 
-SpineUndoCmds::SpineUndoCmds(SpineCmd eCMD, ProjectItemData &spineItemRef, QList<QVariant> parameterList, QUndoCommand *pParent /*= nullptr*/) :
+SpineUndoCmd_AddNewCrossFade::SpineUndoCmd_AddNewCrossFade(ProjectItemData &spineItemRef, QString sAnimOne, QString sAnimTwo, float fMixValue, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
-	m_eCMD(eCMD),
-	m_ParameterList(parameterList),
 	m_SpineItemRef(spineItemRef),
-	m_iStateIndex(-1)
+	m_sAnimOne(sAnimOne),
+	m_sAnimTwo(sAnimTwo),
+	m_fMixValue(fMixValue)
 {
+	setText("Add New Mix");
+
 	if(m_SpineItemRef.GetType() != ITEM_Spine)
-		HyGuiLog("SpineUndoCmds recieved wrong type: " % QString::number(m_SpineItemRef.GetType()) , LOGTYPE_Error);
-
-	switch(m_eCMD)
-	{
-	case SPINECMD_AddNewChildren:
-		setText("Add New Child Node(s)");
-		break;
-
-	case SPINECMD_AddPrimitive:
-		setText("Add Primitive");
-		break;
-	}
-
-	if(spineItemRef.GetWidget())
-		m_iStateIndex = spineItemRef.GetWidget()->GetCurStateIndex();
+		HyGuiLog("SpineUndoCmd_AddNewCrossFade recieved wrong item type: " % QString::number(m_SpineItemRef.GetType()) , LOGTYPE_Error);
 }
 
-/*virtual*/ SpineUndoCmds::~SpineUndoCmds()
+/*virtual*/ SpineUndoCmd_AddNewCrossFade::~SpineUndoCmd_AddNewCrossFade()
 {
 }
 
-/*virtual*/ void SpineUndoCmds::redo() /*override*/
+/*virtual*/ void SpineUndoCmd_AddNewCrossFade::redo() /*override*/
 {
-	switch(m_eCMD)
-	{
-	case SPINECMD_AddNewChildren: {
-		//QList<TreeModelItemData *> itemList;
-		//for(auto param : m_ParameterList)
-		//{
-		//	if(static_cast<SpineModel *>(m_SpineItemRef.GetModel())->GetNodeTreeModel().IsItemValid(param.value<TreeModelItemData *>(), true))
-		//		itemList.push_back(param.value<TreeModelItemData *>());
-		//}
-
-		//static_cast<SpineModel *>(m_SpineItemRef.GetModel())->AddNewChildren(itemList);
-		break; }
-
-	case SPINECMD_AddPrimitive:
-		break;
-	}
-
-	m_SpineItemRef.FocusWidgetState(m_iStateIndex, -1);
+	static_cast<SpineModel *>(m_SpineItemRef.GetModel())->Cmd_AppendMix(m_sAnimOne, m_sAnimTwo, m_fMixValue);
 }
 
-/*virtual*/ void SpineUndoCmds::undo() /*override*/
+/*virtual*/ void SpineUndoCmd_AddNewCrossFade::undo() /*override*/
 {
-	switch(m_eCMD)
-	{
-	case SPINECMD_AddNewChildren: {
-		//for(auto param : m_ParameterList)
-		//{
-		//	if(static_cast<SpineModel *>(m_SpineItemRef.GetModel())->GetNodeTreeModel().IsItemValid(param.value<TreeModelItemData *>(), true))
-		//		static_cast<SpineModel *>(m_SpineItemRef.GetModel())->RemoveChild(param.value<TreeModelItemData *>());
-		//}
-		break; }
-
-	case SPINECMD_AddPrimitive:
-		break;
-	}
-
-	m_SpineItemRef.FocusWidgetState(m_iStateIndex, -1);
+	static_cast<SpineModel *>(m_SpineItemRef.GetModel())->Cmd_RemoveMix(m_sAnimOne, m_sAnimTwo);
 }

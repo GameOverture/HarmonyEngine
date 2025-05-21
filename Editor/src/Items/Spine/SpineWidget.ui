@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>246</width>
+    <width>340</width>
     <height>490</height>
    </rect>
   </property>
@@ -15,83 +15,157 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2"/>
+    <widget class="QGroupBox" name="grpAnimationMixing">
+     <property name="title">
+      <string>Animation Mixing (crossfade)</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Default Mix Time</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="sbDefaultMix"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTableView" name="mixTableView">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QToolButton" name="btnAddMix">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnOrderMixUp">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnOrderMixDown">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnRemoveMix">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="lytMainVerticalLayout">
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
   </layout>
-  <action name="actionAddFill">
+  <action name="actionAddMix">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+   </property>
    <property name="text">
-    <string>Add Fill</string>
+    <string>Add Mix</string>
    </property>
    <property name="toolTip">
-    <string>Append a fill layer</string>
+    <string>Mix (crossfade) between two specified animations</string>
    </property>
   </action>
-  <action name="actionAddSDF">
-   <property name="text">
-    <string>Add SDF</string>
-   </property>
-   <property name="toolTip">
-    <string>Add a signed distance field layer</string>
-   </property>
-  </action>
-  <action name="actionAddEdge">
-   <property name="text">
-    <string>Add Outline</string>
-   </property>
-   <property name="toolTip">
-    <string>Add a standard outline</string>
-   </property>
-  </action>
-  <action name="actionAddEdgeFill">
-   <property name="text">
-    <string>Add Fill+Outline</string>
-   </property>
-   <property name="toolTip">
-    <string>Adds a standard outline that is filled in</string>
-   </property>
-  </action>
-  <action name="actionAddInner">
-   <property name="text">
-    <string>Add Inner</string>
-   </property>
-   <property name="toolTip">
-    <string>Adds an inner outline</string>
-   </property>
-  </action>
-  <action name="actionRemoveLayer">
+  <action name="actionRemoveMix">
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
-    <string>Remove Layer</string>
+    <string>Remove Mix</string>
    </property>
    <property name="toolTip">
-    <string>Removes the selected text layer</string>
+    <string>Removes the selected mix</string>
    </property>
   </action>
-  <action name="actionOrderLayerUp">
+  <action name="actionOrderMixUp">
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-up.png</normaloff>:/icons16x16/generic-up.png</iconset>
    </property>
    <property name="text">
-    <string>Order Layer Up</string>
+    <string>Order Mix Up</string>
    </property>
    <property name="toolTip">
-    <string>Shifts the currently selected text layer upwards (earlier in render)</string>
+    <string>Organize this list moving the selected Mix upward</string>
    </property>
   </action>
-  <action name="actionOrderLayerDown">
+  <action name="actionOrderMixDown">
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/generic-down.png</normaloff>:/icons16x16/generic-down.png</iconset>
    </property>
    <property name="text">
-    <string>Order Layer Down</string>
+    <string>Order Mix Down</string>
    </property>
    <property name="toolTip">
-    <string>Shifts the currently selected text layer downwards (later in render)</string>
+    <string>Organize this list moving the selected Mix downward</string>
    </property>
   </action>
  </widget>

@@ -462,12 +462,13 @@ class UndoCmd_DoubleSpinBox : public QUndoCommand
 	double                  m_dOld;
 
 public:
-	UndoCmd_DoubleSpinBox(QString sText, ProjectItemData &itemRef, DoubleSpinBoxMapper *pMapper, int iStateIndex, double dNew, double dOld, QUndoCommand *pParent = 0) :    QUndoCommand(pParent),
-																																										m_ItemRef(itemRef),
-																																										m_pMapper(pMapper),
-																																										m_iStateIndex(iStateIndex),
-																																										m_dNew(dNew),
-																																										m_dOld(dOld)
+	UndoCmd_DoubleSpinBox(QString sText, ProjectItemData &itemRef, DoubleSpinBoxMapper *pMapper, int iStateIndex, double dNew, QUndoCommand *pParent = 0) :
+		QUndoCommand(pParent),
+		m_ItemRef(itemRef),
+		m_pMapper(pMapper),
+		m_iStateIndex(iStateIndex),
+		m_dNew(dNew),
+		m_dOld(pMapper->GetValue())
 	{
 		setText(sText);
 	}

@@ -64,10 +64,10 @@ struct HySpineAtlas
 #ifdef HY_USE_SPINE // Custom engine class extensions to assist spine-cpp with loading
 	class HySpineTextureLoader : public spine::TextureLoader
 	{
-		std::vector<HySpineAtlas> &	m_SubAtlasListRef;
-
 	public:
-		HySpineTextureLoader(std::vector<HySpineAtlas> &subAtlasListRef);
+		std::vector<HySpineAtlas> m_SubAtlasList;
+
+		HySpineTextureLoader();
 		virtual void load(spine::AtlasPage &page, const spine::String &path) override;
 		virtual void unload(void *pTexture) override;
 	};
@@ -75,7 +75,7 @@ struct HySpineAtlas
 
 class HySpineData : public IHyNodeData
 {
-	std::vector<HySpineAtlas>		m_SubAtlasList;
+	HySpineTextureLoader			m_SpineTextureLoader;
 
 #ifdef HY_USE_SPINE
 	spine::Atlas *					m_pAtlasData;
@@ -83,14 +83,19 @@ class HySpineData : public IHyNodeData
 	spine::AnimationStateData *		m_pAnimStateData; // Crossfade times set in the editor
 #endif
 
+	struct StateData
+	{
+		// Animation Setup
+
+
+		// Skin Setup
+	};
+
 public:
 	HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HySpineData();
 
-	HyTextureHandle GetTexHandle(uint32 uiAtlasIndex) const
-	{
-		return m_SubAtlasList[uiAtlasIndex].GetTexHandle();
-	}
+	HyTextureHandle GetTexHandle(uint32 uiAtlasIndex) const;
 
 #ifdef HY_USE_SPINE
 	spine::SkeletonData *GetSkeletonData() const;

@@ -28,8 +28,17 @@ public:
 	virtual void OnUpdateActions() override;
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
+private Q_SLOTS:
+	void on_sbDefaultMix_valueChanged(double dValue);
+	void on_btnAddMix_clicked();
+
+	void on_actionAddMix_triggered();
+	void on_actionRemoveMix_triggered();
+	void on_actionOrderMixUp_triggered();
+	void on_actionOrderMixDown_triggered();
+
 private:
-	Ui::SpineWidget ui;
+	Ui::SpineWidget *ui;
 };
 
 #endif // SPINEWIDGET_H

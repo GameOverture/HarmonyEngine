@@ -21,7 +21,7 @@ class HySpine2d : public IHyDrawable2d
 	spine::Skeleton *				m_pSkeleton;
 	spine::AnimationState *			m_pAnimationState;
 	spine::SkeletonBounds *			m_pSkeletonBounds;
-	b2AABB							m_SkeletonBoundsAabb;	// Need to store my own AABB because spine::SkeletonBounds doesn't expose it.
+	HyRect							m_LocalBoundingRect;
 
 	static spine::SkeletonRenderer	sm_Renderer;			// Used in the HyRenderBuffer::AppendRenderState do/while loop
 	spine::RenderCommand *			m_pRenderCmd;			// Used in the HyRenderBuffer::AppendRenderState do/while loop
@@ -41,14 +41,62 @@ public:
 	virtual float GetHeight(float fPercent) override;
 
 	virtual bool SetState(uint32 uiStateIndex) override;
-
-	uint32 GetNumSlots();
-
 	virtual bool IsLoadDataValid() override;
 
+#ifdef HY_USE_SPINE
+	spine::Animation *GetAnim(int iIndex);
+	spine::Animation *GetAnim(std::string sAnimName);
 
+	// Spine Animation API
+	
+	// Removes all animations from all tracks, leaving skeletons in their previous pose.
+	// It may be desired to use SetEmptyAnimations(float) to mix the skeletons back to the setup pose,
+	// rather than leaving them in their previous pose.
+	void ClearTracks();
+
+	// Removes all animations from the tracks, leaving skeletons in their previous pose.
+	// It may be desired to use SetEmptyAnimations(float) to mix the skeletons back to the setup pose,
+	// rather than leaving them in their previous pose.
+	void ClearTrack(size_t uiTrackIndex);
+
+	// Sets the current animation for a track, discarding any queued animations.
+	// 'bLoop' If true, the animation will repeat.
+	// If false, it will not, instead its last frame is applied if played beyond its duration.
+	// In either case TrackEntry.TrackEnd determines when the track is cleared.
+	// 
+	// @return a track entry to allow further customization of animation playback. References to the track entry must not be kept after AnimationState.Dispose.
+	spine::TrackEntry *SetAnimation(size_t uiTrackIndex, spine::Animation *pAnimation, bool bLoop);
+
+	// Adds an animation to be played delay seconds after the current or last queued animation
+	// for a track. If the track is empty, it is equivalent to calling setAnimation.
+	// @param delay
+	// Seconds to begin this animation after the start of the previous animation. May be <= 0 to use the animation
+	// duration of the previous track minus any mix duration plus the negative delay.
+	// @return a track entry to allow further customization of animation playback. References to the track entry must not be kept after AnimationState.Dispose
+	spine::TrackEntry *AddAnimation(size_t uiTrackIndex, spine::Animation *pAnimation, bool bLoop, float fDelay);
+
+	/// Sets an empty animation for a track, discarding any queued animations, and mixes to it over the specified mix duration.
+	spine::TrackEntry *SetEmptyAnimation(size_t uiTrackIndex, float fMixDuration);
+
+	/// Adds an empty animation to be played after the current or last queued animation for a track, and mixes to it over the
+	/// specified mix duration.
+	/// @return
+	/// A track entry to allow further customization of animation playback. References to the track entry must not be kept after AnimationState.Dispose.
+	/// @param trackIndex Track number.
+	/// @param fMixDuration Mix duration.
+	/// @param delay Seconds to begin this animation after the start of the previous animation. May be &lt;= 0 to use the animation
+	/// duration of the previous track minus any mix duration plus the negative delay.
+	spine::TrackEntry *AddEmptyAnimation(size_t uiTrackIndex, float fMixDuration, float fDelay);
+
+	/// Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix duration.
+	void SetEmptyAnimations(float fMixDuration);
+
+	// @return The track entry for the animation currently playing on the track, or nullptr if no animation is currently playing.
+	spine::TrackEntry *GetCurrentTrack(size_t uiTrackIndex);
+#endif
 
 protected:
+	virtual void SetDirty(uint32 uiDirtyFlags) override;
 	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
 	virtual bool OnIsValidToRender() override;
 	virtual void OnDataAcquired() override;

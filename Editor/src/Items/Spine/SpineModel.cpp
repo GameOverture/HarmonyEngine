@@ -16,26 +16,217 @@
 
 #include <QImage>
 
+
+SpineCrossFadeModel::SpineCrossFadeModel(QObject *parent) :
+	QAbstractTableModel(parent)
+{
+}
+
+// Returns the index the crossfade was inserted to
+void SpineCrossFadeModel::AddNew(QString sAnimOne, QString sAnimTwo, float fMix)
+{
+	int iInsertIndex = m_CrossFadeList.count();
+
+	beginInsertRows(QModelIndex(), iInsertIndex, iInsertIndex);
+	m_CrossFadeList.insert(iInsertIndex, new SpineCrossFade(sAnimOne, sAnimTwo, fMix));
+	endInsertRows();
+}
+
+void SpineCrossFadeModel::InsertExisting(SpineCrossFade *pCrossFade)
+{
+	for(auto iter = m_RemovedCrossFadeList.begin(); iter != m_RemovedCrossFadeList.end(); ++iter)
+	{
+		if(iter->second == pCrossFade)
+		{
+			beginInsertRows(QModelIndex(), iter->first, iter->first);
+			m_CrossFadeList.insert(iter->first, pCrossFade);
+			endInsertRows();
+			m_RemovedCrossFadeList.erase(iter);
+			return;
+		}
+	}
+}
+
+void SpineCrossFadeModel::Remove(SpineCrossFade *pCrossFade)
+{
+	for(int i = 0; i < m_CrossFadeList.count(); ++i)
+	{
+		// NOTE: Don't delete this SpineCrossFade as the remove may be 'undone'
+		if(m_CrossFadeList[i] == pCrossFade)
+		{
+			m_RemovedCrossFadeList.push_back(QPair<int, SpineCrossFade *>(i, m_CrossFadeList[i]));
+
+			beginRemoveRows(QModelIndex(), i, i);
+			m_CrossFadeList.removeAt(i);
+			endRemoveRows();
+			break;
+		}
+	}
+}
+
+void SpineCrossFadeModel::MoveRowUp(int iIndex)
+{
+	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
+		return;
+
+	m_CrossFadeList.swapItemsAt(iIndex, iIndex - 1);
+	endMoveRows();
+}
+
+void SpineCrossFadeModel::MoveRowDown(int iIndex)
+{
+	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt logic deems it so
+		return;
+
+	m_CrossFadeList.swapItemsAt(iIndex, iIndex + 1);
+	endMoveRows();
+}
+
+void SpineCrossFadeModel::SetAnimOne(int iIndex, QString sAnimOne)
+{
+	m_CrossFadeList[iIndex]->m_sAnimOne = sAnimOne;
+	dataChanged(createIndex(iIndex, COLUMN_AnimOne), createIndex(iIndex, COLUMN_AnimTwo));
+}
+
+void SpineCrossFadeModel::SetMix(int iIndex, float fMix)
+{
+	m_CrossFadeList[iIndex]->m_fMixValue += fMix;
+	dataChanged(createIndex(iIndex, COLUMN_AnimOne), createIndex(iIndex, COLUMN_AnimTwo));
+}
+
+void SpineCrossFadeModel::SetAnimTwo(int iIndex, QString sAnimTwo)
+{
+	m_CrossFadeList[iIndex]->m_sAnimTwo = sAnimTwo;
+	dataChanged(createIndex(iIndex, COLUMN_AnimOne), createIndex(iIndex, COLUMN_AnimTwo));
+}
+
+QJsonArray SpineCrossFadeModel::GetCrossFadeInfo()
+{
+	QJsonArray framesArray;
+
+	for(int i = 0; i < m_CrossFadeList.count(); ++i)
+	{
+		QJsonObject frameObj;
+		frameObj.insert("animOne", QJsonValue(m_CrossFadeList[i]->m_sAnimOne));
+		frameObj.insert("mix", QJsonValue(static_cast<double>(m_CrossFadeList[i]->m_fMixValue)));
+		frameObj.insert("animTwo", QJsonValue(m_CrossFadeList[i]->m_sAnimTwo));
+
+		framesArray.append(frameObj);
+	}
+
+	return framesArray;
+}
+
+SpineCrossFade *SpineCrossFadeModel::GetCrossFadeAt(int iIndex)
+{
+	if(iIndex < 0)
+		return nullptr;
+
+	return m_CrossFadeList[iIndex];
+}
+
+/*virtual*/ int SpineCrossFadeModel::rowCount(const QModelIndex & /*parent*/) const
+{
+	return m_CrossFadeList.count();
+}
+
+/*virtual*/ int SpineCrossFadeModel::columnCount(const QModelIndex & /*parent*/) const
+{
+	return NUMCOLUMNS;
+}
+
+/*virtual*/ QVariant SpineCrossFadeModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
+{
+	SpineCrossFade *pCrossFade = m_CrossFadeList[index.row()];
+
+	if(role == Qt::TextAlignmentRole && index.column() == COLUMN_Mix)
+		return Qt::AlignCenter;
+
+	if(role == Qt::DisplayRole || role == Qt::EditRole)
+	{
+		switch(index.column())
+		{
+		case COLUMN_AnimOne:
+			return pCrossFade->m_sAnimOne;
+		case COLUMN_Mix:
+			return QString::number(pCrossFade->m_fMixValue, 'g', 3) % ((role == Qt::DisplayRole) ? "sec" : "");
+		case COLUMN_AnimTwo:
+			return pCrossFade->m_sAnimTwo;
+		}
+	}
+
+	return QVariant();
+}
+
+/*virtual*/ QVariant SpineCrossFadeModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
+{
+	if(role == Qt::DisplayRole)
+	{
+		if(orientation == Qt::Horizontal)
+		{
+			switch(iIndex)
+			{
+			case COLUMN_AnimOne:
+				return QString("Animation One");
+			case COLUMN_Mix:
+				return QString("Mix");
+			case COLUMN_AnimTwo:
+				return QString("Animation Two");
+			}
+		}
+		else
+			return QString::number(iIndex);
+	}
+
+	return QVariant();
+}
+
+/*virtual*/ bool SpineCrossFadeModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
+{
+	HyGuiLog("SpineCrossFadeModel::setData was invoked", LOGTYPE_Error);
+
+	SpineCrossFade *pCrossFade = m_CrossFadeList[index.row()];
+
+	if(role == Qt::EditRole)
+	{
+		switch(index.column())
+		{
+		case COLUMN_AnimOne:
+			pCrossFade->m_sAnimOne = value.toString();
+			break;
+		case COLUMN_Mix:
+			pCrossFade->m_fMixValue = value.toDouble();
+			break;
+		case COLUMN_AnimTwo:
+			pCrossFade->m_sAnimTwo = value.toString();
+			break;
+		}
+	}
+
+	QVector<int> vRolesChanged;
+	vRolesChanged.append(role);
+	dataChanged(index, index, vRolesChanged);
+
+	return true;
+}
+
+/*virtual*/ Qt::ItemFlags SpineCrossFadeModel::flags(const QModelIndex &index) const
+{
+	//if(index.column() == COLUMN_Frame)
+	//	return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+	//else
+		return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+}
+
+
+
 SpineStateData::SpineStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData)
 {
-	if(stateFileData.m_Data.contains("crossFades"))
-	{
-		QJsonObject crossFadesObj = stateFileData.m_Data["crossFades"].toObject();
-		for(auto sKey : crossFadesObj.keys())
-			m_CrossFadeMap.insert(sKey, crossFadesObj.value(sKey).toDouble());
-	}
-	else
-		stateFileData.m_Data.insert("crossFades", QJsonObject());
 }
 
 /*virtual*/ SpineStateData::~SpineStateData()
 {
-}
-
-const QMap<QString, double> &SpineStateData::GetCrossFadeMap() const
-{
-	return m_CrossFadeMap;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +235,8 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 	IModel(itemRef, itemFileDataRef),
 	m_bIsBinaryRuntime(false),
 	m_fScale(1.0f),
-	m_fDefaultMix(0.0f),
+	m_pDefaultMixMapper(nullptr),
+	m_CrossFadeModel(this),
 #ifdef HY_USE_SPINE
 	m_pAtlasData(nullptr),
 	m_pSkeletonData(nullptr),
@@ -52,6 +244,9 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 #endif
 	m_bUsingTempFiles(true)
 {
+	m_pDefaultMixMapper = new DoubleSpinBoxMapper(this);
+	m_pDefaultMixMapper->SetValue(itemFileDataRef.m_Data["defaultMix"].toDouble(0.2));
+
 	QString sUuidName = GetUuid().toString(QUuid::WithoutBraces);
 
 	// "newImport" indicates that this item is brand new and should setup its meta/data accordingly
@@ -168,37 +363,96 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 		m_bUsingTempFiles = false;
 	}
 
-	AcquireSpineData();
-
-	FileDataPair newFileDataPair = itemFileDataRef;
-	if(newFileDataPair.m_Data.contains("stateArray") == false || newFileDataPair.m_Meta.contains("stateArray"))
+	if(itemFileDataRef.m_Data.contains("crossFades"))
 	{
-		uint32 uiNumStates = 0;
-#ifdef HY_USE_SPINE
-		uiNumStates = static_cast<uint32>(m_pSkeletonData->getAnimations().size());
-#endif
-
-		QJsonArray metaStateArray;
-		QJsonArray dataStateArray;
-		for(uint32 i = 0; i < uiNumStates; ++i)
+		QJsonArray crossFadesArray = itemFileDataRef.m_Data["crossFades"].toArray();
+		for(int i = 0; i < crossFadesArray.size(); ++i)
 		{
-			FileDataPair stateFileData;
-			InsertStateSpecificData(i, stateFileData);
+			QJsonObject crossFadeObj = crossFadesArray[i].toObject();
+			QString sAnimOne = crossFadeObj["animOne"].toString();
+			QString sAnimTwo = crossFadeObj["animTwo"].toString();
+			float fMixValue = static_cast<float>(crossFadeObj["mix"].toDouble());
 
-			metaStateArray.append(stateFileData.m_Meta);
-			dataStateArray.append(stateFileData.m_Data);
+			m_CrossFadeModel.AddNew(sAnimOne, sAnimTwo, fMixValue);
 		}
-		
-		newFileDataPair.m_Meta["stateArray"] = metaStateArray;
-		newFileDataPair.m_Data["stateArray"] = dataStateArray;
 	}
 
+	AcquireSpineData();
+
+//	FileDataPair newFileDataPair = itemFileDataRef;
+//	if(newFileDataPair.m_Data.contains("stateArray") == false || newFileDataPair.m_Meta.contains("stateArray"))
+//	{
+//		uint32 uiNumStates = 0;
+//#ifdef HY_USE_SPINE
+//		uiNumStates = static_cast<uint32>(m_pSkeletonData->getAnimations().size());
+//#endif
+//
+//		QJsonArray metaStateArray;
+//		QJsonArray dataStateArray;
+//		for(uint32 i = 0; i < uiNumStates; ++i)
+//		{
+//			FileDataPair stateFileData;
+//			InsertStateSpecificData(i, stateFileData);
+//
+//			metaStateArray.append(stateFileData.m_Meta);
+//			dataStateArray.append(stateFileData.m_Data);
+//		}
+//		
+//		newFileDataPair.m_Meta["stateArray"] = metaStateArray;
+//		newFileDataPair.m_Data["stateArray"] = dataStateArray;
+//	}
+
 	// Only checks for "stateArray" within itemFileDataRef.m_Meta/m_Data and initializes states
-	InitStates<SpineStateData>(newFileDataPair);
+	InitStates<SpineStateData>(itemFileDataRef);
 }
 
 /*virtual*/ SpineModel::~SpineModel()
 {
+	delete m_pDefaultMixMapper;
+}
+
+DoubleSpinBoxMapper *SpineModel::GetDefaultMixMapper()
+{
+	return m_pDefaultMixMapper;
+}
+
+SpineCrossFadeModel &SpineModel::GetCrossFadeModel()
+{
+	return m_CrossFadeModel;
+}
+
+bool SpineModel::GetNextCrossFadeAnims(QString &sAnimOneOut, QString &sAnimTwoOut, float &fMixValueOut)
+{
+	spine::Vector<spine::Animation *> &animListRef = m_pSkeletonData->getAnimations();
+	if(animListRef.size() < 2)
+		return false;
+
+	// Get all the permutation of two animations in 'animListRef'
+	QList<QPair<QString, QString>> animPairList;
+	for(int i = 0; i < animListRef.size(); ++i)
+	{
+		for(int j = i + 1; j < animListRef.size(); ++j)
+		{
+			animPairList.append(QPair<QString, QString>(animListRef[i]->getName().buffer(), animListRef[j]->getName().buffer()));
+			animPairList.append(QPair<QString, QString>(animListRef[j]->getName().buffer(), animListRef[i]->getName().buffer()));
+		}
+	}
+
+	// Out of every permutation in 'animPairList', get the first two that aren't already in the 'm_CrossFadeModel'
+	int iNumCrossFades = m_CrossFadeModel.rowCount();
+	for(int i = 0; i < iNumCrossFades; ++i)
+	{
+		SpineCrossFade *pCrossFade = m_CrossFadeModel.GetCrossFadeAt(i);
+		animPairList.removeOne(QPair<QString, QString>(pCrossFade->m_sAnimOne, pCrossFade->m_sAnimTwo));
+	}
+
+	if(animPairList.empty())
+		return false;
+	
+	sAnimOneOut = animPairList[0].first;
+	sAnimTwoOut = animPairList[0].second;
+	fMixValueOut = m_pDefaultMixMapper->GetValue();
+	return true;
 }
 
 /*virtual*/ void SpineModel::OnPopState(int iPoppedStateIndex) /*override*/
@@ -322,7 +576,10 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 	itemSpecificFileDataOut.m_Data.insert("UUID", GetUuid().toString(QUuid::WithoutBraces));
 	itemSpecificFileDataOut.m_Data.insert("isBinary", m_bIsBinaryRuntime);
 	itemSpecificFileDataOut.m_Data.insert("scale", m_fScale);
-	itemSpecificFileDataOut.m_Data.insert("defaultMix", m_fDefaultMix);
+	itemSpecificFileDataOut.m_Data.insert("defaultMix", m_pDefaultMixMapper->GetValue());
+
+	QJsonArray crossFadeArray = m_CrossFadeModel.GetCrossFadeInfo();
+	itemSpecificFileDataOut.m_Data.insert("crossFades", crossFadeArray);
 
 #ifdef HY_USE_SPINE
 	if(m_SubAtlasList.size() != m_pAtlasData->getPages().size())
@@ -355,20 +612,6 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 
 /*virtual*/ void SpineModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
 {
-#ifdef HY_USE_SPINE
-	spine::Animation *pSpineAnim = m_pSkeletonData->getAnimations()[uiIndex];
-	stateFileDataOut.m_Meta.insert("name", pSpineAnim->getName().buffer());
-	
-	QJsonObject crossFadesObj;
-	if(uiIndex < m_StateList.size())
-	{
-		auto &crossFadeMap = static_cast<SpineStateData *>(m_StateList[uiIndex])->GetCrossFadeMap();
-		for(QString sKey : crossFadeMap.keys())
-			crossFadesObj.insert(sKey, crossFadeMap[sKey]);
-	}
-
-	stateFileDataOut.m_Data.insert("crossFades", crossFadesObj);
-#endif
 }
 
 /*virtual*/ void SpineModel::OnItemDeleted() /*override*/
@@ -470,18 +713,37 @@ void SpineModel::RewriteAtlasFile(AtlasFrame *pUpdatedFrame, QSize fullAtlasSize
 	}
 }
 
+void SpineModel::Cmd_AppendMix(const QString &sAnimOne, const QString &sAnimTwo, float fMixValue)
+{
+	m_CrossFadeModel.AddNew(sAnimOne, sAnimTwo, fMixValue);
+}
+
+void SpineModel::Cmd_RemoveMix(const QString &sAnimOne, const QString &sAnimTwo)
+{
+	int iNumCrossFades = m_CrossFadeModel.rowCount();
+	SpineCrossFade *pCrossFade = nullptr;
+	for(int i = 0; i < iNumCrossFades; ++i)
+	{
+		pCrossFade = m_CrossFadeModel.GetCrossFadeAt(i);
+		if(pCrossFade->m_sAnimOne == sAnimOne && pCrossFade->m_sAnimTwo == sAnimTwo)
+			break;
+	}
+
+	m_CrossFadeModel.Remove(pCrossFade);
+}
+
 void SpineModel::AcquireSpineData()
 {
 #ifdef HY_USE_SPINE
 	delete m_pAtlasData;
 	delete m_pSkeletonData;
-	delete m_pAnimStateData;
 	
 	m_pAtlasData = HY_NEW spine::Atlas(m_AtlasFileInfo.absoluteFilePath().toStdString().c_str(), nullptr, false);
 
 	if(m_bIsBinaryRuntime)
 	{
 		spine::SkeletonBinary binParser(m_pAtlasData);
+		binParser.setScale(m_fScale);
 		m_pSkeletonData = binParser.readSkeletonDataFile(m_SkeletonFileInfo.absoluteFilePath().toStdString().c_str());
 		if(m_pSkeletonData == nullptr)
 			HyGuiLog("HySpineData binary load failed: " % QString(binParser.getError().buffer()), LOGTYPE_Error);
@@ -489,11 +751,25 @@ void SpineModel::AcquireSpineData()
 	else
 	{
 		spine::SkeletonJson jsonParser(m_pAtlasData);
+		jsonParser.setScale(m_fScale);
 		m_pSkeletonData = jsonParser.readSkeletonDataFile(m_SkeletonFileInfo.absoluteFilePath().toStdString().c_str());
 		if(m_pSkeletonData == nullptr)
 			HyGuiLog("HySpineData json load failed: " % QString(jsonParser.getError().buffer()), LOGTYPE_Error);
 	}
 
-	m_pAnimStateData = HY_NEW spine::AnimationStateData(m_pSkeletonData);
+	RegenAnimationStateData();
 #endif
+}
+
+void SpineModel::RegenAnimationStateData()
+{
+	if(m_pAnimStateData == nullptr)
+		m_pAnimStateData = HY_NEW spine::AnimationStateData(m_pSkeletonData);
+	else
+		m_pAnimStateData->clear();
+	
+	spine::Vector<spine::Animation *> &animListRef = m_pSkeletonData->getAnimations();
+	
+	m_pAnimStateData->setDefaultMix(m_pDefaultMixMapper->GetValue());
+	//m_pAnimStateData->setMix(
 }

@@ -20,8 +20,7 @@ spine::SpineExtension *spine::getDefaultExtension() {
 	return HY_NEW spine::DefaultSpineExtension();
 }
 
-HySpineTextureLoader::HySpineTextureLoader(std::vector<HySpineAtlas> &subAtlasListRef) :
-	m_SubAtlasListRef(subAtlasListRef)
+HySpineTextureLoader::HySpineTextureLoader()
 {
 }
 
@@ -30,15 +29,15 @@ HySpineTextureLoader::HySpineTextureLoader(std::vector<HySpineAtlas> &subAtlasLi
 	std::string sFileName = HyIO::GetFileNameFromPath(path.buffer());
 	HyIO::MakeLowercase(sFileName); // Make lowercase for easier compare
 
-	uint32 uiNumAtlases = m_SubAtlasListRef.size();
+	uint32 uiNumAtlases = m_SubAtlasList.size();
 	for(uint32 i = 0; i < uiNumAtlases; ++i)
 	{
-		std::string sSubAtlasName = m_SubAtlasListRef[i].m_sName;
+		std::string sSubAtlasName = m_SubAtlasList[i].m_sName;
 		std::transform(sSubAtlasName.begin(), sSubAtlasName.end(), sSubAtlasName.begin(), ::tolower); // Make lowercase for easier compare
 
 		if(strcmp(sSubAtlasName.c_str(), sFileName.c_str()) == 0)
 		{
-			page.texture = reinterpret_cast<void *>(&m_SubAtlasListRef[i]); // Store the sub-atlas index. The void *'s value (aka address) is essentially the integer index
+			page.texture = reinterpret_cast<void *>(&m_SubAtlasList[i]); // Store the sub-atlas index. The void *'s value (aka address) is essentially the integer index
 			return;
 		}
 	}
@@ -87,7 +86,7 @@ HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAs
 			HyAssert(pAtlas, "HySpineData atlas was not found with checksum: " << atlasObj["checksum"].GetUint());
 
 			m_RequiredFiles[HYFILE_Atlas].Set(pAtlas->GetManifestIndex());
-			m_SubAtlasList.push_back(HySpineAtlas(sName, pAtlas, rSubAtlasUVRect.left, rSubAtlasUVRect.top, rSubAtlasUVRect.right, rSubAtlasUVRect.bottom));
+			m_SpineTextureLoader.m_SubAtlasList.push_back(HySpineAtlas(sName, pAtlas, rSubAtlasUVRect.left, rSubAtlasUVRect.top, rSubAtlasUVRect.right, rSubAtlasUVRect.bottom));
 		}
 		else // Using GUI temp files for atlases
 		{
@@ -96,7 +95,7 @@ HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAs
 
 			HyJsonArray guiTexturesArray = itemDataObj["guiTextures"].GetArray();
 			HyTextureHandle hGfxApiHandle = guiTexturesArray[i].GetUint();
-			m_SubAtlasList.push_back(HySpineAtlas(sName, hGfxApiHandle));
+			m_SpineTextureLoader.m_SubAtlasList.push_back(HySpineAtlas(sName, hGfxApiHandle));
 		}
 	}
 
@@ -110,8 +109,7 @@ HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAs
 	//std::vector<char> atlasFile;
 	//HyIO::ReadTextFile(sAtlasFilePath.c_str(), atlasFile);
 	
-	HySpineTextureLoader texLoader(m_SubAtlasList);
-	m_pAtlasData = HY_NEW spine::Atlas(sAtlasFilePath.c_str(), &texLoader, true);
+	m_pAtlasData = HY_NEW spine::Atlas(sAtlasFilePath.c_str(), &m_SpineTextureLoader, true);
 
 	// Skeleton ---------------------------------------------------------------------
 	float fScale = itemDataObj["scale"].GetFloat();
@@ -140,28 +138,32 @@ HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAs
 	m_pAnimStateData = HY_NEW spine::AnimationStateData(m_pSkeletonData);
 	m_pAnimStateData->setDefaultMix(itemDataObj["defaultMix"].GetFloat()); // Set the default mix time between any pair of animations that isn't specified below (in seconds)
 
+	HyJsonArray crossFadesArray = itemDataObj["crossFades"].GetArray();
+	int iNumCrossFades = crossFadesArray.Size();
+	for(int i = 0; i < iNumCrossFades; ++i)
+	{
+		HyJsonObj crossFadesObj = crossFadesArray[i].GetObject();
+		m_pAnimStateData->setMix(crossFadesObj["animOne"].GetString(), crossFadesObj["animTwo"].GetString(), crossFadesObj["mix"].GetFloat());
+	}
+
+	// States ------------------------------------------------------------------
 	HyJsonArray stateArray = itemDataObj["stateArray"].GetArray();
 	m_uiNumStates = stateArray.Size();
-	HyAssert(m_uiNumStates == m_pSkeletonData->getAnimations().size(), "Spine JSON data did not match # of states with spine skeleton file");
-	for(uint32 i = 0; i < m_uiNumStates; ++i)
-	{
-		HyJsonObj stateObj = stateArray[i].GetObject();
-		HyJsonObj crossFadesObj = stateObj["crossFades"].GetObject();
-
-		const auto &sStateName = m_pSkeletonData->getAnimations()[i]->getName();
-		for(auto iter = crossFadesObj.begin(); iter != crossFadesObj.end(); ++iter)
-			m_pAnimStateData->setMix(sStateName, iter->name.GetString(), iter->value.GetFloat());
-	}
 #endif
 }
 
 /*virtual*/ HySpineData::~HySpineData()
 {
 #ifdef HY_USE_SPINE
-	delete m_pAtlasData;
-	delete m_pSkeletonData;
 	delete m_pAnimStateData;
+	delete m_pSkeletonData;
+	delete m_pAtlasData;
 #endif
+}
+
+HyTextureHandle HySpineData::GetTexHandle(uint32 uiAtlasIndex) const
+{
+	return m_SpineTextureLoader.m_SubAtlasList[uiAtlasIndex].GetTexHandle();
 }
 
 #ifdef HY_USE_SPINE

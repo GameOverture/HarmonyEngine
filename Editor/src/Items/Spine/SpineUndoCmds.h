@@ -15,22 +15,17 @@
 class ProjectItemData;
 class ExplorerItemData;
 
-enum SpineCmd
+class SpineUndoCmd_AddNewCrossFade : public QUndoCommand
 {
-	SPINECMD_AddNewChildren = 0,
-	SPINECMD_AddPrimitive,
-};
+	ProjectItemData &				m_SpineItemRef;
 
-class SpineUndoCmds : public QUndoCommand
-{
-	const SpineCmd		m_eCMD;
-	ProjectItemData &	m_SpineItemRef;
-	QList<QVariant>		m_ParameterList;
-	int					m_iStateIndex;
+	QString 						m_sAnimOne;
+	QString 						m_sAnimTwo;
+	float							m_fMixValue;
 
 public:
-	SpineUndoCmds(SpineCmd eCMD, ProjectItemData &spineItemRef, QList<QVariant> parameterList, QUndoCommand *pParent = nullptr);
-	virtual ~SpineUndoCmds();
+	SpineUndoCmd_AddNewCrossFade(ProjectItemData &spineItemRef, QString sAnimOne, QString sAnimTwo, float fMixValue, QUndoCommand *pParent = nullptr);
+	virtual ~SpineUndoCmd_AddNewCrossFade();
 
 	virtual void redo() override;
 	virtual void undo() override;

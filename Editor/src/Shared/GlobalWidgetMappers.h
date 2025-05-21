@@ -123,6 +123,8 @@ public:
 
 	void AddSpinBoxMapping(QDoubleSpinBox *pSpinBox)
 	{
+		clearMapping();
+		
 		pSpinBox->blockSignals(true);
 
 		addMapping(pSpinBox, 0);
@@ -145,8 +147,14 @@ public:
 
 	void SetValue(double dValue)
 	{
+		if(mappedWidgetAt(0))
+			mappedWidgetAt(0)->blockSignals(true);
+	
 		static_cast<ModelDoubleSpinBox *>(model())->SetValue(dValue);
 		setCurrentIndex(0);
+
+		if(mappedWidgetAt(0))
+			mappedWidgetAt(0)->blockSignals(false);
 	}
 };
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
