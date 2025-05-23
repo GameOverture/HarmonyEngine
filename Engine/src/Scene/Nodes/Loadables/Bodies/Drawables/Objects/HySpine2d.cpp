@@ -267,7 +267,11 @@ spine::TrackEntry *HySpine2d::GetCurrentTrack(size_t uiTrackIndex)
 
 /*virtual*/ bool HySpine2d::OnIsValidToRender() /*override*/
 {
+#ifdef HY_USE_SPINE
 	return m_pSkeleton != nullptr;
+#else
+	return false;
+#endif
 }
 
 /*virtual*/ void HySpine2d::OnDataAcquired() /*override*/
