@@ -106,7 +106,8 @@ IHyDrawable2d &IHyDrawable2d::operator=(IHyDrawable2d &&donor) noexcept
 template<typename HYDATATYPE>
 void IHyDrawable2d::GuiOverrideData(HyJsonObj itemDataObj, bool bUseGuiOverrideName /*= true*/)
 {
-	// TODO: THREAD SAFETY FIX! Ensure HarmonyWidget::paintGL() doesn't invoke m_pHyEngine->Update() while we delete/reallocate 'm_pData'
+	// TODO: Determine if below is fixed with IDraw::IsPaintAllowed()
+	//       THREAD SAFETY FIX! Ensure HarmonyWidget::paintGL() doesn't invoke m_pHyEngine->Update() while we delete/reallocate 'm_pData'
 	delete m_pData;
 	m_pData = HY_NEW HYDATATYPE(HyNodePath(bUseGuiOverrideName ? HY_GUI_DATAOVERRIDE : ""), itemDataObj, *IHyLoadable::sm_pHyAssets);
 	OnDataAcquired();

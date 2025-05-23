@@ -105,3 +105,31 @@ SpineUndoCmd_ModifyCrossFade::SpineUndoCmd_ModifyCrossFade(ProjectItemData &spin
 
 	m_pTableView->selectRow(m_Index.row());
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+SpineUndoCmd_SkinsChanged::SpineUndoCmd_SkinsChanged(ProjectItemData &spineItemRef, int iState, QStringList sNewSkinsList, QStringList sOldSkinsList, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_SpineItemRef(spineItemRef),
+	m_iState(iState),
+	m_sNewSkinsList(sNewSkinsList),
+	m_sOldSkinsList(sOldSkinsList)
+{
+	setText("Modify skins on State " % QString::number(m_iState));
+}
+
+/*virtual*/ SpineUndoCmd_SkinsChanged::~SpineUndoCmd_SkinsChanged()
+{
+}
+
+/*virtual*/ void SpineUndoCmd_SkinsChanged::redo() /*override*/
+{
+	static_cast<SpineStateData *>(m_SpineItemRef.GetModel()->GetStateData(m_iState))->Cmd_SetEnabledSkins(m_sNewSkinsList);
+	m_SpineItemRef.FocusWidgetState(m_iState, -1);
+}
+
+/*virtual*/ void SpineUndoCmd_SkinsChanged::undo() /*override*/
+{
+	static_cast<SpineStateData *>(m_SpineItemRef.GetModel()->GetStateData(m_iState))->Cmd_SetEnabledSkins(m_sOldSkinsList);
+	m_SpineItemRef.FocusWidgetState(m_iState, -1);
+}

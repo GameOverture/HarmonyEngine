@@ -84,11 +84,12 @@ class HySpineData : public IHyNodeData
 
 	struct StateData
 	{
+#ifdef HY_USE_SPINE
+		spine::Skin *				m_pSkin;
+#endif
 		// Animation Setup
-
-
-		// Skin Setup
 	};
+	std::vector<StateData>			m_StateDataList;
 
 public:
 	HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAssets &assetsRef);
@@ -99,13 +100,9 @@ public:
 #ifdef HY_USE_SPINE
 	spine::SkeletonData *GetSkeletonData() const;
 	spine::AnimationStateData *GetAnimationStateData() const;
+	spine::Skin *GetSkinState(uint32 uiStateIndex) const;
 #endif
 
-	// Sets every combination of animation blend to this amount
-	void AnimInitBlend(float fInterpDur);
-
-	void AnimInitBlend(const char *szAnimFrom, const char *szAnimTo, float fInterpDur);
-	void AnimInitBlend(uint32 uiAnimIdFrom, uint32 uiAnimIdTo, float fInterpDur);
 };
 
 #endif /* HySpineData_h__ */

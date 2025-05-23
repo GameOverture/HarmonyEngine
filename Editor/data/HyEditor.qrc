@@ -379,5 +379,6 @@
         <file>icons16x16/items/RichLabel-Pending.png</file>
         <file>icons16x16/items/RichLabel-Settings.png</file>
         <file>icons16x16/items/RichLabel-Warning.png</file>
+        <file>icons16x16/spine-skin.png</file>
     </qresource>
 </RCC>

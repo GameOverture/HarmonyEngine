@@ -149,6 +149,25 @@ HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAs
 	// States ------------------------------------------------------------------
 	HyJsonArray stateArray = itemDataObj["stateArray"].GetArray();
 	m_uiNumStates = stateArray.Size();
+	m_StateDataList.resize(m_uiNumStates);
+	for(uint32 i = 0; i < m_uiNumStates; ++i)
+	{
+		HyJsonObj stateObj = stateArray[i].GetObject();
+		HyJsonArray enabledSkinsArray = stateObj["enabledSkins"].GetArray();
+
+		std::string sName = "State " + std::to_string(i);
+		m_StateDataList[i].m_pSkin = HY_NEW spine::Skin(sName.c_str());
+
+		int iNumEnabledSkins = enabledSkinsArray.Size();
+		for(int j = 0; j < iNumEnabledSkins; ++j)
+		{
+			spine::Skin *pSkin = m_pSkeletonData->findSkin(enabledSkinsArray[j].GetString());
+			if(pSkin)
+				m_StateDataList[i].m_pSkin->addSkin(pSkin);
+			else
+				HyLogError("HySpineData::HySpineData() - Unable to find skin: " << enabledSkinsArray[j].GetString());
+		}
+	}
 #endif
 }
 
@@ -158,6 +177,9 @@ HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAs
 	delete m_pAnimStateData;
 	delete m_pSkeletonData;
 	delete m_pAtlasData;
+
+	for(uint32 i = 0; i < m_uiNumStates; ++i)
+		delete m_StateDataList[i].m_pSkin;
 #endif
 }
 
@@ -180,30 +202,10 @@ spine::AnimationStateData *HySpineData::GetAnimationStateData() const
 {
 	return m_pAnimStateData;
 }
-#endif
 
-//
-//HySpine2dData::~HySpine2dData()
-//{
-//	//spSkeletonData_dispose(m_SpineSkeletonData);
-//	//spAtlas_dispose(m_SpineAtlasData);
-//}
-//
-//// Below functions are invoked within the Spine API and expect to be overloaded
-//void _spAtlasPage_createTexture(spAtlasPage* self, const char* path)
-//{
-//	// THIS IS INVOKED FROM THE LOAD THREAD from any IData::DoLoad()
-//
-//	// TODO: Convert 'path' to Atlas texture index
-//	uint32 uiTextureIndex = 0;
-//}
-//
-//void _spAtlasPage_disposeTexture(spAtlasPage* self)
-//{
-//}
-//
-//char* _spUtil_readFile(const char* path, int* length)
-//{
-//	// The returned data is freed within the spine API
-//	return HyReadTextFile(path, length);
-//}
+spine::Skin *HySpineData::GetSkinState(uint32 uiStateIndex) const
+{
+	HyAssert(uiStateIndex < m_uiNumStates, "HySpineData::GetEnabledSkinList() - Invalid state index: " << uiStateIndex);
+	return m_StateDataList[uiStateIndex].m_pSkin;
+}
+#endif

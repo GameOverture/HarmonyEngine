@@ -180,7 +180,10 @@ SpineWidget::~SpineWidget()
 
 /*virtual*/ void SpineWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
 {
-	SpineDraw *pDraw = static_cast<SpineDraw *>(m_ItemRef.GetDraw());
+	SpineStateData *pCurStateData = static_cast<SpineStateData *>(static_cast<SpineModel *>(m_ItemRef.GetModel())->GetStateData(iStateIndex));
+	ui->skinTreeView->setModel(&pCurStateData->GetSkinTreeModel());
+
+	//SpineDraw *pDraw = static_cast<SpineDraw *>(m_ItemRef.GetDraw());
 }
 
 void SpineWidget::on_sbDefaultMix_valueChanged(double dValue)

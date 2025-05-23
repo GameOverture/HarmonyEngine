@@ -16,220 +16,30 @@
 
 #include <QImage>
 
-
-SpineCrossFadeModel::SpineCrossFadeModel(QObject *parent) :
-	QAbstractTableModel(parent)
-{
-}
-
-// Returns the index the crossfade was inserted to
-void SpineCrossFadeModel::AddNew(QString sAnimOne, QString sAnimTwo, float fMix)
-{
-	int iInsertIndex = m_CrossFadeList.count();
-
-	beginInsertRows(QModelIndex(), iInsertIndex, iInsertIndex);
-	m_CrossFadeList.insert(iInsertIndex, new SpineCrossFade(sAnimOne, sAnimTwo, fMix));
-	endInsertRows();
-}
-
-void SpineCrossFadeModel::InsertExisting(SpineCrossFade *pCrossFade)
-{
-	for(auto iter = m_RemovedCrossFadeList.begin(); iter != m_RemovedCrossFadeList.end(); ++iter)
-	{
-		if(iter->second == pCrossFade)
-		{
-			beginInsertRows(QModelIndex(), iter->first, iter->first);
-			m_CrossFadeList.insert(iter->first, pCrossFade);
-			endInsertRows();
-			m_RemovedCrossFadeList.erase(iter);
-			return;
-		}
-	}
-}
-
-void SpineCrossFadeModel::Remove(SpineCrossFade *pCrossFade)
-{
-	for(int i = 0; i < m_CrossFadeList.count(); ++i)
-	{
-		// NOTE: Don't delete this SpineCrossFade as the remove may be 'undone'
-		if(m_CrossFadeList[i] == pCrossFade)
-		{
-			m_RemovedCrossFadeList.push_back(QPair<int, SpineCrossFade *>(i, m_CrossFadeList[i]));
-
-			beginRemoveRows(QModelIndex(), i, i);
-			m_CrossFadeList.removeAt(i);
-			endRemoveRows();
-			break;
-		}
-	}
-}
-
-void SpineCrossFadeModel::MoveRowUp(int iIndex)
-{
-	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex - 1) == false)
-		return;
-
-	m_CrossFadeList.swapItemsAt(iIndex, iIndex - 1);
-	endMoveRows();
-}
-
-void SpineCrossFadeModel::MoveRowDown(int iIndex)
-{
-	if(beginMoveRows(QModelIndex(), iIndex, iIndex, QModelIndex(), iIndex + 2) == false)    // + 2 is here because Qt logic deems it so
-		return;
-
-	m_CrossFadeList.swapItemsAt(iIndex, iIndex + 1);
-	endMoveRows();
-}
-
-void SpineCrossFadeModel::SetAnimOne(int iIndex, QString sAnimOne)
-{
-	m_CrossFadeList[iIndex]->m_sAnimOne = sAnimOne;
-	dataChanged(createIndex(iIndex, COLUMN_AnimOne), createIndex(iIndex, COLUMN_AnimTwo));
-}
-
-void SpineCrossFadeModel::SetMix(int iIndex, float fMix)
-{
-	m_CrossFadeList[iIndex]->m_fMixValue += fMix;
-	dataChanged(createIndex(iIndex, COLUMN_AnimOne), createIndex(iIndex, COLUMN_AnimTwo));
-}
-
-void SpineCrossFadeModel::SetAnimTwo(int iIndex, QString sAnimTwo)
-{
-	m_CrossFadeList[iIndex]->m_sAnimTwo = sAnimTwo;
-	dataChanged(createIndex(iIndex, COLUMN_AnimOne), createIndex(iIndex, COLUMN_AnimTwo));
-}
-
-QJsonArray SpineCrossFadeModel::GetCrossFadeInfo()
-{
-	QJsonArray framesArray;
-
-	for(int i = 0; i < m_CrossFadeList.count(); ++i)
-	{
-		QJsonObject frameObj;
-		frameObj.insert("animOne", QJsonValue(m_CrossFadeList[i]->m_sAnimOne));
-		frameObj.insert("mix", QJsonValue(static_cast<double>(m_CrossFadeList[i]->m_fMixValue)));
-		frameObj.insert("animTwo", QJsonValue(m_CrossFadeList[i]->m_sAnimTwo));
-
-		framesArray.append(frameObj);
-	}
-
-	return framesArray;
-}
-
-SpineCrossFade *SpineCrossFadeModel::GetCrossFadeAt(int iIndex)
-{
-	if(iIndex < 0)
-		return nullptr;
-
-	return m_CrossFadeList[iIndex];
-}
-
-/*virtual*/ int SpineCrossFadeModel::rowCount(const QModelIndex & /*parent*/) const
-{
-	return m_CrossFadeList.count();
-}
-
-/*virtual*/ int SpineCrossFadeModel::columnCount(const QModelIndex & /*parent*/) const
-{
-	return NUMCOLUMNS;
-}
-
-/*virtual*/ QVariant SpineCrossFadeModel::data(const QModelIndex &index, int role /*= Qt::DisplayRole*/) const
-{
-	SpineCrossFade *pCrossFade = m_CrossFadeList[index.row()];
-
-	if(role == Qt::TextAlignmentRole && index.column() == COLUMN_Mix)
-		return Qt::AlignCenter;
-
-	if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole)
-	{
-		switch(index.column())
-		{
-		case COLUMN_AnimOne:
-			return pCrossFade->m_sAnimOne;
-		case COLUMN_Mix:
-			if(role == Qt::UserRole)
-				return pCrossFade->m_fMixValue;
-			else
-				return QString::number(pCrossFade->m_fMixValue, 'g', 3) % ((role == Qt::DisplayRole) ? "sec" : "");
-		case COLUMN_AnimTwo:
-			return pCrossFade->m_sAnimTwo;
-		}
-	}
-
-	return QVariant();
-}
-
-/*virtual*/ QVariant SpineCrossFadeModel::headerData(int iIndex, Qt::Orientation orientation, int role /*= Qt::DisplayRole*/) const
-{
-	if(role == Qt::DisplayRole)
-	{
-		if(orientation == Qt::Horizontal)
-		{
-			switch(iIndex)
-			{
-			case COLUMN_AnimOne:
-				return QString("Animation One");
-			case COLUMN_Mix:
-				return QString("Mix");
-			case COLUMN_AnimTwo:
-				return QString("Animation Two");
-			}
-		}
-		else
-			return QString::number(iIndex);
-	}
-
-	return QVariant();
-}
-
-/*virtual*/ bool SpineCrossFadeModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
-{
-	HyGuiLog("SpineCrossFadeModel::setData was invoked", LOGTYPE_Error);
-
-	SpineCrossFade *pCrossFade = m_CrossFadeList[index.row()];
-
-	if(role == Qt::EditRole)
-	{
-		switch(index.column())
-		{
-		case COLUMN_AnimOne:
-			pCrossFade->m_sAnimOne = value.toString();
-			break;
-		case COLUMN_Mix:
-			pCrossFade->m_fMixValue = value.toDouble();
-			break;
-		case COLUMN_AnimTwo:
-			pCrossFade->m_sAnimTwo = value.toString();
-			break;
-		}
-	}
-
-	QVector<int> vRolesChanged;
-	vRolesChanged.append(role);
-	dataChanged(index, index, vRolesChanged);
-
-	return true;
-}
-
-/*virtual*/ Qt::ItemFlags SpineCrossFadeModel::flags(const QModelIndex &index) const
-{
-	//if(index.column() == COLUMN_Frame)
-	//	return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-	//else
-		return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
-}
-
-
-
 SpineStateData::SpineStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
-	IStateData(iStateIndex, modelRef, stateFileData)
+	IStateData(iStateIndex, modelRef, stateFileData),
+	m_SkinTreeModel(*this, static_cast<SpineModel &>(GetModel()).GetSkins(), &GetModel())
 {
+	QStringList sEnabledSkinList;
+	QJsonArray enabledSkinsArray = stateFileData.m_Data["enabledSkins"].toArray();
+	for (int i = 0; i < enabledSkinsArray.size(); ++i)
+		sEnabledSkinList.append(enabledSkinsArray[i].toString());
+	
+	m_SkinTreeModel.Cmd_SetEnabledSkins(sEnabledSkinList);
 }
 
 /*virtual*/ SpineStateData::~SpineStateData()
 {
+}
+
+SpineSkinTreeModel &SpineStateData::GetSkinTreeModel()
+{
+	return m_SkinTreeModel;
+}
+
+void SpineStateData::Cmd_SetEnabledSkins(QStringList sEnabledSkinList) // Sets the 'm_SkinTreeModel' without invoking undo/redo command
+{
+	m_SkinTreeModel.Cmd_SetEnabledSkins(sEnabledSkinList);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -381,31 +191,6 @@ SpineModel::SpineModel(ProjectItemData &itemRef, const FileDataPair &itemFileDat
 	}
 
 	AcquireSpineData();
-
-//	FileDataPair newFileDataPair = itemFileDataRef;
-//	if(newFileDataPair.m_Data.contains("stateArray") == false || newFileDataPair.m_Meta.contains("stateArray"))
-//	{
-//		uint32 uiNumStates = 0;
-//#ifdef HY_USE_SPINE
-//		uiNumStates = static_cast<uint32>(m_pSkeletonData->getAnimations().size());
-//#endif
-//
-//		QJsonArray metaStateArray;
-//		QJsonArray dataStateArray;
-//		for(uint32 i = 0; i < uiNumStates; ++i)
-//		{
-//			FileDataPair stateFileData;
-//			InsertStateSpecificData(i, stateFileData);
-//
-//			metaStateArray.append(stateFileData.m_Meta);
-//			dataStateArray.append(stateFileData.m_Data);
-//		}
-//		
-//		newFileDataPair.m_Meta["stateArray"] = metaStateArray;
-//		newFileDataPair.m_Data["stateArray"] = dataStateArray;
-//	}
-
-	// Only checks for "stateArray" within itemFileDataRef.m_Meta/m_Data and initializes states
 	InitStates<SpineStateData>(itemFileDataRef);
 }
 
@@ -609,6 +394,11 @@ bool SpineModel::GetNextCrossFadeAnims(QList<QPair<QString, QString>> &crossFade
 
 /*virtual*/ void SpineModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
 {
+	QStringList sEnabledSkinList = static_cast<SpineStateData *>(m_StateList[uiIndex])->GetSkinTreeModel().GetEnabledSkinList();
+	QJsonArray enabledSkinArray;
+	for(const QString &sEnabledSkin : sEnabledSkinList)
+		enabledSkinArray.append(sEnabledSkin);
+	stateFileDataOut.m_Data.insert("enabledSkins", enabledSkinArray);
 }
 
 /*virtual*/ void SpineModel::OnItemDeleted() /*override*/
@@ -630,85 +420,100 @@ const QList<SpineSubAtlas> &SpineModel::GetSubAtlasList() const
 	return m_SubAtlasList;
 }
 
-// Bake the sub-atlas offset
-void SpineModel::RewriteAtlasFile(AtlasFrame *pUpdatedFrame, QSize fullAtlasSize)
+QStringList SpineModel::GetSkins() const
 {
-	for(int i = 0; i < m_SubAtlasList.size(); ++i)
+	QStringList sSkinPathList;
+
+#ifdef HY_USE_SPINE
+	if(m_pSkeletonData)
 	{
-		if(m_SubAtlasList[i].m_pAtlasFrame == nullptr) // Only change runtime files, not temp
-			continue;
-
-		if(pUpdatedFrame == m_SubAtlasList[i].m_pAtlasFrame)
-		{
-			QFile atlasFile(m_AtlasFileInfo.absoluteFilePath());
-			if(!atlasFile.open(QIODevice::ReadOnly | QIODevice::Text))
-				return;
-
-			QStringList sFileContents;
-
-			// Read contents
-			QTextStream in(&atlasFile);
-			while(!in.atEnd())
-				sFileContents.push_back(in.readLine());
-			atlasFile.close();
-
-			// Write (modified) contents
-			if(!atlasFile.open(QIODevice::WriteOnly | QIODevice::Text))
-				return;
-			QTextStream out(&atlasFile);
-
-			// Determine the sub-atlas associated with 'pUpdatedFrame'
-			SpineSubAtlas *pAssociatedSubAtlas = nullptr;
-			for(auto &subAtlasRef : m_SubAtlasList)
-			{
-				if(subAtlasRef.m_pAtlasFrame == pUpdatedFrame)
-				{
-					pAssociatedSubAtlas = &subAtlasRef;
-					break;
-				}
-			}
-
-			bool bSubAtlasActive = false;
-			for(auto sLine : sFileContents)
-			{
-				for(auto &subAtlasRef : m_SubAtlasList)
-				{
-					if(sLine.compare(subAtlasRef.m_ImageFileInfo.fileName()) == 0)
-					{
-						bSubAtlasActive = (pAssociatedSubAtlas == &subAtlasRef);
-						break;
-					}
-				}
-
-				if(bSubAtlasActive)
-				{
-					if(sLine.startsWith("size:"))
-						sLine = "size:" % QString::number(fullAtlasSize.width()) % "," % QString::number(fullAtlasSize.height());
-					else if(sLine.startsWith("bounds:"))
-					{
-						QStringList sBoundsSplitList = sLine.split(':');
-						sBoundsSplitList = sBoundsSplitList[1].split(',');
-
-						sLine = "bounds:";
-						int iX = sBoundsSplitList[0].toInt() + pAssociatedSubAtlas->m_pAtlasFrame->GetX();
-						int iY = sBoundsSplitList[1].toInt() + pAssociatedSubAtlas->m_pAtlasFrame->GetY();
-
-						sLine += QString::number(iX);
-						sLine += ",";
-						sLine += QString::number(iY);
-						sLine += ",";
-						sLine += sBoundsSplitList[2];
-						sLine += ",";
-						sLine += sBoundsSplitList[3];
-					}
-				}
-
-				out << sLine << "\n";
-			}
-			atlasFile.close();
-		}
+		spine::Vector<spine::Skin *> &skinListRef = m_pSkeletonData->getSkins();
+		for(int i = 0; i < skinListRef.size(); ++i)
+			sSkinPathList.push_back(QString(skinListRef[i]->getName().buffer()));
 	}
+#endif
+	return sSkinPathList;
 }
+
+//// Bake the sub-atlas offset
+//void SpineModel::RewriteAtlasFile(AtlasFrame *pUpdatedFrame, QSize fullAtlasSize)
+//{
+//	for(int i = 0; i < m_SubAtlasList.size(); ++i)
+//	{
+//		if(m_SubAtlasList[i].m_pAtlasFrame == nullptr) // Only change runtime files, not temp
+//			continue;
+//
+//		if(pUpdatedFrame == m_SubAtlasList[i].m_pAtlasFrame)
+//		{
+//			QFile atlasFile(m_AtlasFileInfo.absoluteFilePath());
+//			if(!atlasFile.open(QIODevice::ReadOnly | QIODevice::Text))
+//				return;
+//
+//			QStringList sFileContents;
+//
+//			// Read contents
+//			QTextStream in(&atlasFile);
+//			while(!in.atEnd())
+//				sFileContents.push_back(in.readLine());
+//			atlasFile.close();
+//
+//			// Write (modified) contents
+//			if(!atlasFile.open(QIODevice::WriteOnly | QIODevice::Text))
+//				return;
+//			QTextStream out(&atlasFile);
+//
+//			// Determine the sub-atlas associated with 'pUpdatedFrame'
+//			SpineSubAtlas *pAssociatedSubAtlas = nullptr;
+//			for(auto &subAtlasRef : m_SubAtlasList)
+//			{
+//				if(subAtlasRef.m_pAtlasFrame == pUpdatedFrame)
+//				{
+//					pAssociatedSubAtlas = &subAtlasRef;
+//					break;
+//				}
+//			}
+//
+//			bool bSubAtlasActive = false;
+//			for(auto sLine : sFileContents)
+//			{
+//				for(auto &subAtlasRef : m_SubAtlasList)
+//				{
+//					if(sLine.compare(subAtlasRef.m_ImageFileInfo.fileName()) == 0)
+//					{
+//						bSubAtlasActive = (pAssociatedSubAtlas == &subAtlasRef);
+//						break;
+//					}
+//				}
+//
+//				if(bSubAtlasActive)
+//				{
+//					if(sLine.startsWith("size:"))
+//						sLine = "size:" % QString::number(fullAtlasSize.width()) % "," % QString::number(fullAtlasSize.height());
+//					else if(sLine.startsWith("bounds:"))
+//					{
+//						QStringList sBoundsSplitList = sLine.split(':');
+//						sBoundsSplitList = sBoundsSplitList[1].split(',');
+//
+//						sLine = "bounds:";
+//						int iX = sBoundsSplitList[0].toInt() + pAssociatedSubAtlas->m_pAtlasFrame->GetX();
+//						int iY = sBoundsSplitList[1].toInt() + pAssociatedSubAtlas->m_pAtlasFrame->GetY();
+//
+//						sLine += QString::number(iX);
+//						sLine += ",";
+//						sLine += QString::number(iY);
+//						sLine += ",";
+//						sLine += sBoundsSplitList[2];
+//						sLine += ",";
+//						sLine += sBoundsSplitList[3];
+//					}
+//				}
+//
+//				out << sLine << "\n";
+//			}
+//			atlasFile.close();
+//		}
+//	}
+//}
 
 void SpineModel::Cmd_AppendMix(const QString &sAnimOne, const QString &sAnimTwo, float fMixValue)
 {

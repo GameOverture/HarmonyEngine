@@ -79,6 +79,8 @@ class IDraw : public HyEntity2d
 	friend class UndoCmd_RemoveGuide;
 	friend class UndoCmd_MoveGuide;
 
+	static bool											sm_bIsPaintAllowed;
+
 protected:
 	ProjectItemData *									m_pProjItem;
 	HyCamera2d *										m_pCamera;
@@ -101,6 +103,8 @@ private:
 public:
 	IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~IDraw();
+
+	static bool IsPaintAllowed();
 
 	ProjectItemData *GetProjItemData();
 

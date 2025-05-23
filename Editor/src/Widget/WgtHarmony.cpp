@@ -106,7 +106,7 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 
 /*virtual*/ void WgtHarmony::paintGL() /*override*/
 {
-	if(sm_bHarmonyLoaded && m_pProject)
+	if(sm_bHarmonyLoaded && m_pProject && IDraw::IsPaintAllowed())
 	{
 		if(m_pHyEngine->Update() == false)
 			HyGuiLog("Harmony Gfx requested exit program.", LOGTYPE_Info);

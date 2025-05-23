@@ -116,25 +116,15 @@ const HySpine2d &HySpine2d::operator=(const HySpine2d &rhs)
 	if(this->m_uiState == uiStateIndex || IHyLoadable::SetState(uiStateIndex) == false)
 		return this->m_uiState == uiStateIndex; // Return true if the state is already set, otherwise return false because IHyLoadable::SetState() failed
 
+	const HySpineData *pData = static_cast<const HySpineData *>(this->AcquireData());
+	if(pData == nullptr)
+		return false;
+
 #ifdef HY_USE_SPINE
+	m_pSkeleton->setSkin(pData->GetSkinState(m_uiState));
+	m_pSkeleton->setSlotsToSetupPose();
+
 	// Setup Animations
-	if(m_pAnimationState)
-	{
-		const HySpineData *pData = static_cast<const HySpineData *>(this->AcquireData());
-		if(m_pAnimationState && pData)
-		{
-			
-			pData->GetSkeletonData()->getAnimations();
-
-			m_pAnimationState->addAnimation(0, pData->GetSkeletonData()->getAnimations()[uiStateIndex], true, 0.0f);
-
-			
-
-
-		}
-	}
-
-	// Setup Skins
 #endif
 
 	return true;
@@ -277,7 +267,7 @@ spine::TrackEntry *HySpine2d::GetCurrentTrack(size_t uiTrackIndex)
 
 /*virtual*/ bool HySpine2d::OnIsValidToRender() /*override*/
 {
-	return true;
+	return m_pSkeleton != nullptr;
 }
 
 /*virtual*/ void HySpine2d::OnDataAcquired() /*override*/
@@ -287,13 +277,14 @@ spine::TrackEntry *HySpine2d::GetCurrentTrack(size_t uiTrackIndex)
 #ifdef HY_USE_SPINE
 	m_pSkeleton = HY_NEW spine::Skeleton(pData->GetSkeletonData());
 	m_pAnimationState = HY_NEW spine::AnimationState(pData->GetAnimationStateData());
-	//m_pAnimationState->setListener(
-	//	[](spine::AnimationState *pState, spine::EventType eType, spine::TrackEntry *pEntry, spine::Event *pEvent)
-	//	{
-
-	//	});
 	m_pSkeletonBounds = HY_NEW spine::SkeletonBounds();
+
+	if(m_uiState >= pData->GetNumStates())
+		m_uiState = 0;
+	m_pSkeleton->setSkin(pData->GetSkinState(m_uiState));
+	m_pSkeleton->setSlotsToSetupPose();
 #endif
+
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
@@ -347,6 +338,8 @@ spine::TrackEntry *HySpine2d::GetCurrentTrack(size_t uiTrackIndex)
 /*virtual*/ bool HySpine2d::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
 {
 #ifdef HY_USE_SPINE
+	if(m_pRenderCmd == nullptr)
+		return true;
 	float *positions = m_pRenderCmd->positions;
 	float *uvs = m_pRenderCmd->uvs;
 	uint32_t *colors = m_pRenderCmd->colors;

@@ -26,6 +26,7 @@
 #define KEY_PanLeft Qt::Key_A
 #define KEY_PanRight Qt::Key_D
 
+/*static*/ bool IDraw::sm_bIsPaintAllowed = true;
 const QString g_sZoomLevels[HYNUM_ZOOMLEVELS] = { "6.25%","12.5%", "25%",  "33.33%","50%", "75%","100%","200%","300%","400%","500%","600%","800%","1200%","1600%" };
 
 IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
@@ -70,6 +71,11 @@ IDraw::IDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 {
 	for(HyPrimitive2d *pGuide : m_GuideMap.values())
 		delete pGuide;
+}
+
+/*static*/ bool IDraw::IsPaintAllowed()
+{
+	return sm_bIsPaintAllowed;
 }
 
 ProjectItemData *IDraw::GetProjItemData()
@@ -230,6 +236,8 @@ void IDraw::ApplyJsonData()
 	if(m_pProjItem == nullptr)
 		return;
 
+	sm_bIsPaintAllowed = false;
+
 	FileDataPair itemFileData;
 	m_pProjItem->GetLatestFileData(itemFileData);
 
@@ -244,6 +252,8 @@ void IDraw::ApplyJsonData()
 
 		OnApplyJsonData(itemDataDoc);
 	}
+
+	sm_bIsPaintAllowed = true;
 }
 
 void IDraw::Show()

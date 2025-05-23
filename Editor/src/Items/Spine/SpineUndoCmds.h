@@ -50,4 +50,22 @@ public:
 	virtual void undo() override;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class SpineUndoCmd_SkinsChanged : public QUndoCommand
+{
+	ProjectItemData &				m_SpineItemRef;
+	int								m_iState;
+
+	QStringList						m_sNewSkinsList;
+	QStringList						m_sOldSkinsList;
+
+public:
+	SpineUndoCmd_SkinsChanged(ProjectItemData &spineItemRef, int iState, QStringList sNewSkinsList, QStringList sOldSkinsList, QUndoCommand *pParent = nullptr);
+	virtual ~SpineUndoCmd_SkinsChanged();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
 #endif // SPINEUNDOCMDS_H

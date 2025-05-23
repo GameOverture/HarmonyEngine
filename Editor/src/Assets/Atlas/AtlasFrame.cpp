@@ -171,20 +171,20 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, quint16 uiX, quint16 ui
 	{
 		ClearError(ASSETERROR_CouldNotPack);
 		
-		// If this is a 'Spine' type, it means it is a Sub-Atlas that was just packed into a larger texture.
-		// Update the corresponding .atlas file
-		if(m_eTYPE == ITEM_Spine)
-		{
-			QList<TreeModelItemData *> dependantList = GetDependants();
-			for(auto iter = dependantList.begin(); iter != dependantList.end(); ++iter) // There should only be '1' dependency
-			{
-				if((*iter)->IsProjectItem() == false)
-					continue;
+		//// If this is a 'Spine' type, it means it is a Sub-Atlas that was just packed into a larger texture.
+		//// Update the corresponding .atlas file
+		//if(m_eTYPE == ITEM_Spine)
+		//{
+		//	QList<TreeModelItemData *> dependantList = GetDependants();
+		//	for(auto iter = dependantList.begin(); iter != dependantList.end(); ++iter) // There should only be '1' dependency
+		//	{
+		//		if((*iter)->IsProjectItem() == false)
+		//			continue;
 
-				ProjectItemData *pProjItem = static_cast<ProjectItemData *>(*iter);
-				static_cast<SpineModel *>(pProjItem->GetModel())->RewriteAtlasFile(this, textureSize);
-			}
-		}
+		//		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(*iter);
+		//		static_cast<SpineModel *>(pProjItem->GetModel())->RewriteAtlasFile(this, textureSize);
+		//	}
+		//}
 	}
 	else
 		SetError(ASSETERROR_CouldNotPack);

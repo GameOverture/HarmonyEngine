@@ -103,10 +103,14 @@ if(Qt5_DIR)
 		src/Items/IWidget.cpp
 		src/Items/IWidget.h
 		src/Items/IWidget.ui
+		src/Items/Spine/SpineCrossFadeModel.cpp
+		src/Items/Spine/SpineCrossFadeModel.h
 		src/Items/Spine/SpineDraw.cpp
 		src/Items/Spine/SpineDraw.h
 		src/Items/Spine/SpineModel.cpp
 		src/Items/Spine/SpineModel.h
+		src/Items/Spine/SpineSkinTreeModel.cpp
+		src/Items/Spine/SpineSkinTreeModel.h
 		src/Items/Spine/SpineUndoCmds.cpp
 		src/Items/Spine/SpineUndoCmds.h
 		src/Items/Spine/SpineWidget.cpp
