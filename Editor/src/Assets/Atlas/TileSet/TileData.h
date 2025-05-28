@@ -17,12 +17,13 @@
 #include <QJsonObject>
 #include <QDataStream>
 
-// NOTE: TileSet atlases are always "square"
-//       COLUMNS = static_cast<int>(std::floor(std::sqrt(n)))
-//       ROWS = static_cast<int>(std::ceil(static_cast<double>(n) / columns))
-struct TileData
+// Atlas Indices are row-major order
+// TileSet texture sub-atlas' rows and columns is made based on the total # of tiles
+//     COLUMNS = static_cast<int>(std::floor(std::sqrt(n)))
+//     ROWS    = static_cast<int>(std::ceil(static_cast<double>(n) / columns))
+class TileData
 {
-	int												m_iAtlasIndex;			// Row major order: (Y * NumColumns) + X
+	QPixmap											m_TilePixmap;
 	QPoint											m_TextureOffset;
 
 	bool 											m_bIsFlippedHorz;
@@ -48,8 +49,12 @@ struct TileData
 
 	QMap<PhysicsLayerHandle, QList<QList<QPoint>>>	m_VertexMap;
 
-	TileData(const QJsonObject &tileDataObj);
-	void GetTileData(QJsonObject &tileDataObjOut);
+public:
+	TileData(QPixmap tilePixmap);
+	TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap);
+	
+	QJsonObject GetTileData() const;
+	QPixmap GetPixmap() const;
 };
 
 #endif // TILEDATA_H

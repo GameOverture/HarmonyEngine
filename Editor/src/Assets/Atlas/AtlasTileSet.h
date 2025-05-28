@@ -22,7 +22,10 @@
 using AutoTileHandle = uint32_t;
 using PhysicsLayerHandle = uint32_t;
 
-struct TileData;
+#define NUM_COLS_TILESET(numTiles) static_cast<int>(std::floor(std::sqrt(numTiles)))
+#define NUM_ROWS_TILESET(numTiles) static_cast<int>(std::ceil(static_cast<double>(numTiles) / NUM_COLS_TILESET(numTiles)))
+
+class TileData;
 
 class AtlasTileSet : public AtlasFrame
 {
@@ -82,37 +85,37 @@ class AtlasTileSet : public AtlasFrame
 	//	quint32					m_uiId;
 	//	QString					m_sName;
 	//	HyColor					m_Color;
-
 	//	TileData *m_pStartTile;
 	//};
 
-	// Row major order: (Y * NumColumns) + X
-	struct MetaLocation
-	{
-		int iX;
-		int iY;
 
-		MetaLocation(int x, int y) : iX(x), iY(y) { }
-		bool operator==(const MetaLocation &rhs) const
-		{
-			return iX == rhs.iX && iY == rhs.iY;
-		}
-		bool operator!=(const MetaLocation &rhs) const
-		{
-			return this->operator==(rhs) == false;
-		}
-		bool operator<(const MetaLocation &rhs) const
-		{
-			if(iX < rhs.iX)
-				return true;
-			else if(iX == rhs.iX)
-				return iY < rhs.iY;
-			return false;
-		}
-	};
-	QMap<MetaLocation, TileData *>	m_TileDataMap;		// QPoint key is the user/meta location, not the atlas. TileData * may be an AlternateTile
+	QList<TileData *>				m_TileDataList;			// List of all TileData objects in this tile set, including AlternateTiles. It's ordered by the index in the sub-atlas texture
+	//QList<QPair<int, TileData *>>	m_RemovedTileDataList;	// List of TileData objects that have been removed from the tile set, and not deleted. This is used for undo/redo operations.
 
-	bool							m_bSubAtlasDirty;	// When saved, the intermediate sub-atlas will be saved into the project's atlas manager
+	//struct MetaLocation
+	//{
+	//	int iX;
+	//	int iY;
+	//	MetaLocation(int x, int y) : iX(x), iY(y) { }
+	//	bool operator==(const MetaLocation &rhs) const
+	//	{
+	//		return iX == rhs.iX && iY == rhs.iY;
+	//	}
+	//	bool operator!=(const MetaLocation &rhs) const
+	//	{
+	//		return this->operator==(rhs) == false;
+	//	}
+	//	bool operator<(const MetaLocation &rhs) const
+	//	{
+	//		// TODO: This seems wrong, should check Y first?
+	//		if(iX < rhs.iX)
+	//			return true;
+	//		else if(iX == rhs.iX)
+	//			return iY < rhs.iY;
+	//		return false;
+	//	}
+	//};
+	//QMap<MetaLocation, TileData *>	m_MetaTileDataMap;	// QPoint key is the user/meta location, not the atlas
 
 
 
@@ -133,9 +136,6 @@ public:
 	int GetNumTiles() const;
 	QSize GetTileSize() const;
 	void SetTileSize(QSize size);
-	int GetNumCols() const;
-	int GetNumRows() const;
-
 
 	QString GetTileSetInfo() const;
 	QIcon GetTileSetIcon() const;
@@ -143,10 +143,13 @@ public:
 	TileSetScene *GetGfxScene();
 
 	// Cmd functions are the only functions that change the data (via Undo/Redo)
-	QVector<int> Cmd_AppendTiles(QSize vTileSize, const QVector<QPixmap> &pixmapList, Qt::Edge eAppendEdge);
-	void Cmd_RemoveTiles(QVector<int> atlasIndexList);
+	QList<QPair<int, TileData *>> Cmd_AppendNewTiles(QSize vTileSize, const QVector<QPixmap> &pixmapList, Qt::Edge eAppendEdge);
+	QList<QPair<int, TileData *>> Cmd_RemoveTiles(QVector<TileData *> tileDataList);
+	void Cmd_ReaddTiles(QList<QPair<int, TileData *>> tileDataList);
 
 	QUndoStack *GetUndoStack();
+	QAction *GetUndoAction();
+	QAction *GetRedoAction();
 
 	void GetLatestFileData(FileDataPair &fileDataPairOut) const;
 	void GetSavedFileData(FileDataPair &fileDataPairOut) const;
@@ -156,6 +159,9 @@ public:
 	void DiscardChanges();
 
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
+
+protected:
+	void RegenerateSubAtlas(); // Assumes m_TileDataList is up to date. This will regenerate the sub-atlas texture and update each TileData
 
 private Q_SLOTS:
 	void on_undoStack_cleanChanged(bool bClean);

@@ -59,6 +59,9 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 		m_pTileSet->SetTileSize(QSize(g_iDefaultTileSize, g_iDefaultTileSize));
 	ui->vsbTileSize->SetValue(QPoint(m_pTileSet->GetTileSize().width(), m_pTileSet->GetTileSize().height()));
 
+	ui->btnUndo->setDefaultAction(m_pTileSet->GetUndoAction());
+	ui->btnRedo->setDefaultAction(m_pTileSet->GetRedoAction());
+
 	SetImportWidgets();
 	ui->graphicsView->setScene(m_pTileSet->GetGfxScene());
 }
@@ -66,32 +69,31 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 void AuxTileSet::SetImportWidgets()
 {
 	bool bTileSheet = ui->radTileSheet->isChecked();
-	if(m_bIsImportingTileSheet == bTileSheet)
-		return;
-
-	bool bHasPendingInfo = ui->txtImagePath->text().isEmpty() == false ||
-						   ui->vsbTileSize->GetValue() != m_pTileSet->GetTileSize() ||
-						   ui->vsbStartOffset->GetValue() != QPoint(0, 0) ||
-						   ui->vsbPadding->GetValue() != QPoint(0, 0);
-
-	if(bHasPendingInfo)
+	if(m_bIsImportingTileSheet != bTileSheet)
 	{
-		if(QMessageBox::No == QMessageBox::question(MainWindow::GetInstance(), "Pending Changes", "Switching to " % QString(bTileSheet ? "'Tile Sheet Image'" : "'Individual Tile Images'") % " will lose your changes. Do you want to continue?", QMessageBox::Yes, QMessageBox::No))
+		bool bHasPendingInfo = ui->txtImagePath->text().isEmpty() == false ||
+			ui->vsbTileSize->GetValue() != m_pTileSet->GetTileSize() ||
+			ui->vsbStartOffset->GetValue() != QPoint(0, 0) ||
+			ui->vsbPadding->GetValue() != QPoint(0, 0);
+
+		if(bHasPendingInfo)
 		{
-			if(bTileSheet)
-				ui->radTileSheet->setChecked(false);
-			else
-				ui->radTileImages->setChecked(false);
-			return;
+			if(QMessageBox::No == QMessageBox::question(MainWindow::GetInstance(), "Pending Changes", "Switching to " % QString(bTileSheet ? "'Tile Sheet Image'" : "'Individual Tile Images'") % " will lose your changes. Do you want to continue?", QMessageBox::Yes, QMessageBox::No))
+			{
+				if(bTileSheet)
+					ui->radTileSheet->setChecked(false);
+				else
+					ui->radTileImages->setChecked(false);
+				return;
+			}
+
+			ui->txtImagePath->clear();
 		}
 	}
 
 	// Switching widgets
 	m_bIsImportingTileSheet = bTileSheet;
-	ui->grpSlicingOptions->setVisible(false);
-	ui->grpImportSide->setVisible(false);
-
-	ui->txtImagePath->clear();
+	ui->grpSlicingOptions->setVisible(m_bIsImportingTileSheet);
 
 	ErrorCheckImport();
 }
@@ -182,7 +184,7 @@ void AuxTileSet::ErrorCheckImport()
 	} while(false);
 
 	ui->lblError->setVisible(bIsError);
-	ui->btnConfirmAddRemove->setEnabled(!bIsError);
+	ui->btnConfirmAdd->setEnabled(!bIsError);
 }
 
 
@@ -297,7 +299,7 @@ void AuxTileSet::OnPaddingChanged(QVariant newPadding)
 	ErrorCheckImport();
 }
 
-void AuxTileSet::on_btnConfirmAddRemove_clicked()
+void AuxTileSet::on_btnConfirmAdd_clicked()
 {
 	if(QMessageBox::Yes != QMessageBox::question(MainWindow::GetInstance(), "Confirm TileSet Modification", "Do you want to import '" % QString::number(m_pTileSet->GetGfxScene()->GetNumImportPixmaps()) % "' new tiles?", QMessageBox::Yes, QMessageBox::No))
 		return;
@@ -305,7 +307,17 @@ void AuxTileSet::on_btnConfirmAddRemove_clicked()
 	QVector<QGraphicsPixmapItem *> gfxPixmapList = m_pTileSet->GetGfxScene()->GetImportPixmapList();
 	QSize vImportTileSize = m_pTileSet->GetGfxScene()->GetImportTileSize();
 
-	TileSetUndoCmd_ManipTiles *pUndoCmd = new TileSetUndoCmd_ManipTiles(*m_pTileSet, gfxPixmapList, vImportTileSize);
+	Qt::Edge eAppendEdge;
+	if(ui->radImportTop->isChecked())
+		eAppendEdge = Qt::TopEdge;
+	else if(ui->radImportLeft->isChecked())
+		eAppendEdge = Qt::LeftEdge;
+	else if(ui->radImportRight->isChecked())
+		eAppendEdge = Qt::RightEdge;
+	else
+		eAppendEdge = Qt::BottomEdge;
+
+	TileSetUndoCmd_AppendTiles *pUndoCmd = new TileSetUndoCmd_AppendTiles(*m_pTileSet, gfxPixmapList, vImportTileSize, eAppendEdge);
 	m_pTileSet->GetUndoStack()->push(pUndoCmd);
 
 	//QDir tempDir = HyGlobal::PrepTempDir(m_ProjectRef, HYGUIPATH_TEMPSUBDIR_ImportTileSheet);

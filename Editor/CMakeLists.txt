@@ -224,6 +224,9 @@ if(Qt5_DIR)
 		src/Dialogs/DlgSetEngineLocation.cpp
 		src/Dialogs/DlgSetEngineLocation.h
 		src/Dialogs/DlgSetEngineLocation.ui
+		src/Dialogs/DlgSetSpineAnims.cpp
+		src/Dialogs/DlgSetSpineAnims.h
+		src/Dialogs/DlgSetSpineAnims.ui
 		src/Dialogs/DlgSetUiPanel.cpp
 		src/Dialogs/DlgSetUiPanel.h
 		src/Dialogs/DlgSetUiPanel.ui
@@ -316,6 +319,9 @@ if(Qt5_DIR)
 		src/Widget/WgtMakeRelDir.cpp
 		src/Widget/WgtMakeRelDir.h
 		src/Widget/WgtMakeRelDir.ui
+		src/Widget/WgtSpineAnims.cpp
+		src/Widget/WgtSpineAnims.h
+		src/Widget/WgtSpineAnims.ui
 		src/Widget/WgtSrcDependency.cpp
 		src/Widget/WgtSrcDependency.h
 		src/Widget/WgtSrcDependency.ui

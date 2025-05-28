@@ -12,10 +12,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TileSetUndoCmd_ManipTiles::TileSetUndoCmd_ManipTiles(AtlasTileSet &tileSetItemRef, QVector<QGraphicsPixmapItem *> pixmapList, QSize vTileSizes, QUndoCommand *pParent /*= nullptr*/) :
+TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItemRef, QVector<QGraphicsPixmapItem *> pixmapList, QSize vTileSize, Qt::Edge eAppendEdge, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
+	m_eAppendEdge(eAppendEdge),
 	m_TileSetRef(tileSetItemRef),
-	m_TileSizes(vTileSizes)
+	m_TileSizes(vTileSize)
 {
 	setText("Add " % QString::number(pixmapList.size()) % " Tiles");
 
@@ -24,18 +25,28 @@ TileSetUndoCmd_ManipTiles::TileSetUndoCmd_ManipTiles(AtlasTileSet &tileSetItemRe
 		m_PixmapList.append(pPixmap->pixmap());
 }
 
-/*virtual*/ TileSetUndoCmd_ManipTiles::~TileSetUndoCmd_ManipTiles()
+/*virtual*/ TileSetUndoCmd_AppendTiles::~TileSetUndoCmd_AppendTiles()
 {
 }
 
-/*virtual*/ void TileSetUndoCmd_ManipTiles::redo() /*override*/
+/*virtual*/ void TileSetUndoCmd_AppendTiles::redo() /*override*/
 {
-	m_AppendedTilesAtlasIndexList = m_TileSetRef.Cmd_AppendTiles(m_TileSizes, m_PixmapList, Qt::BottomEdge);
+	if(m_AppendedTilesAtlasIndexList.empty())
+		m_AppendedTilesAtlasIndexList = m_TileSetRef.Cmd_AppendNewTiles(m_TileSizes, m_PixmapList, m_eAppendEdge);
+	else
+		m_TileSetRef.Cmd_ReaddTiles(m_AppendedTilesAtlasIndexList);
 }
 
-/*virtual*/ void TileSetUndoCmd_ManipTiles::undo() /*override*/
+/*virtual*/ void TileSetUndoCmd_AppendTiles::undo() /*override*/
 {
-	m_TileSetRef.Cmd_RemoveTiles(m_AppendedTilesAtlasIndexList);
+	QVector<TileData *> removeTileList;
+	for(const auto &pair : m_AppendedTilesAtlasIndexList)
+	{
+		if(pair.second)
+			removeTileList.append(pair.second);
+	}
+
+	m_AppendedTilesAtlasIndexList = m_TileSetRef.Cmd_RemoveTiles(removeTileList);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -10,24 +10,26 @@
 #include "Global.h"
 #include "TileData.h"
 
-
-
-TileData::TileData(const QJsonObject &tileDataObj)
+TileData::TileData(QPixmap tilePixmap) :
+	m_TilePixmap(tilePixmap),
+	m_TextureOffset(0, 0),
+	m_bIsFlippedHorz(false),
+	m_bIsFlippedVert(false),
+	m_bIsRotated(false),
+	m_iAnimFrame(0),
+	m_iProbability(100)
 {
-	m_iAtlasIndex = tileDataObj["AtlasIndex"].toInt();
-	m_TextureOffset = QPoint(tileDataObj["TextureOffsetX"].toInt(), tileDataObj["TextureOffsetY"].toInt());
-	m_bIsFlippedHorz = tileDataObj["IsFlippedHorz"].toBool();
-	m_bIsFlippedVert = tileDataObj["IsFlippedVert"].toBool();
-	m_bIsRotated = tileDataObj["IsRotated"].toBool();
+}
 
-
-	// TODO
-	m_iAnimFrame = tileDataObj["AnimFrame"].toInt();
-
-
-
-	m_iProbability = tileDataObj["Probability"].toInt();
-
+TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
+	m_TilePixmap(tilePixmap),
+	m_TextureOffset(QPoint(tileDataObj["TextureOffsetX"].toInt(), tileDataObj["TextureOffsetY"].toInt())),
+	m_bIsFlippedHorz(tileDataObj["IsFlippedHorz"].toBool()),
+	m_bIsFlippedVert(tileDataObj["IsFlippedVert"].toBool()),
+	m_bIsRotated(tileDataObj["IsRotated"].toBool()),
+	m_iAnimFrame(tileDataObj["AnimFrame"].toInt()),
+	m_iProbability(tileDataObj["Probability"].toInt())
+{
 	QJsonArray autoTileArray = tileDataObj["AutoTileMap"].toArray();
 	for(int i = 0; i < autoTileArray.size(); ++i)
 	{
@@ -57,9 +59,10 @@ TileData::TileData(const QJsonObject &tileDataObj)
 	}
 }
 
-void TileData::GetTileData(QJsonObject &tileDataObjOut)
+QJsonObject TileData::GetTileData() const
 {
-	tileDataObjOut["AtlasIndex"] = m_iAtlasIndex;
+	QJsonObject tileDataObjOut;
+
 	tileDataObjOut["TextureOffsetX"] = m_TextureOffset.x();
 	tileDataObjOut["TextureOffsetY"] = m_TextureOffset.y();
 	tileDataObjOut["IsFlippedHorz"] = m_bIsFlippedHorz;
@@ -101,4 +104,11 @@ void TileData::GetTileData(QJsonObject &tileDataObjOut)
 		VertexArray.push_back(vertexObj);
 	}
 	tileDataObjOut["VertexMap"] = VertexArray;
+
+	return tileDataObjOut;
+}
+
+QPixmap TileData::GetPixmap() const
+{
+	return m_TilePixmap;
 }

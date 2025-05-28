@@ -159,6 +159,16 @@ spine::Animation *HySpine2d::GetAnim(std::string sAnimName)
 	return pData->GetSkeletonData()->findAnimation(sAnimName.c_str());
 }
 
+spine::TrackEntry *HySpine2d::GetCurrentTrack(size_t uiTrackIndex)
+{
+	if(m_pAnimationState == nullptr)
+	{
+		HyLogWarning("HySpine2d::GetCurrentTrack() - Animation state is null");
+		return nullptr;
+	}
+	return m_pAnimationState->getCurrent(uiTrackIndex);
+}
+
 void HySpine2d::ClearTracks()
 {
 	if(m_pAnimationState == nullptr)
@@ -179,24 +189,14 @@ void HySpine2d::ClearTrack(size_t uiTrackIndex)
 	m_pAnimationState->clearTrack(uiTrackIndex);
 }
 
-spine::TrackEntry *HySpine2d::SetAnimation(size_t uiTrackIndex, spine::Animation *pAnimation, bool bLoop)
+void HySpine2d::SetEmptyAnimations(float fMixDuration)
 {
 	if(m_pAnimationState == nullptr)
 	{
-		HyLogWarning("HySpine2d::SetAnimation() - Animation state is null");
-		return nullptr;
+		HyLogWarning("HySpine2d::SetEmptyAnimations() - Animation state is null");
+		return;
 	}
-	return m_pAnimationState->setAnimation(uiTrackIndex, pAnimation, bLoop);
-}
-
-spine::TrackEntry *HySpine2d::AddAnimation(size_t uiTrackIndex, spine::Animation *pAnimation, bool bLoop, float fDelay)
-{
-	if(m_pAnimationState == nullptr)
-	{
-		HyLogWarning("HySpine2d::AddAnimation() - Animation state is null");
-		return nullptr;
-	}
-	return m_pAnimationState->addAnimation(uiTrackIndex, pAnimation, bLoop, fDelay);
+	m_pAnimationState->setEmptyAnimations(fMixDuration);
 }
 
 spine::TrackEntry *HySpine2d::SetEmptyAnimation(size_t uiTrackIndex, float fMixDuration)
@@ -219,27 +219,47 @@ spine::TrackEntry *HySpine2d::AddEmptyAnimation(size_t uiTrackIndex, float fMixD
 	return m_pAnimationState->addEmptyAnimation(uiTrackIndex, fMixDuration, fDelay);
 }
 
-void HySpine2d::SetEmptyAnimations(float fMixDuration)
+spine::TrackEntry *HySpine2d::SetAnimation(size_t uiTrackIndex, spine::Animation *pAnimation, bool bLoop)
 {
 	if(m_pAnimationState == nullptr)
 	{
-		HyLogWarning("HySpine2d::SetEmptyAnimations() - Animation state is null");
-		return;
-	}
-	m_pAnimationState->setEmptyAnimations(fMixDuration);
-}
-
-spine::TrackEntry *HySpine2d::GetCurrentTrack(size_t uiTrackIndex)
-{
-	if(m_pAnimationState == nullptr)
-	{
-		HyLogWarning("HySpine2d::GetCurrentTrack() - Animation state is null");
+		HyLogWarning("HySpine2d::SetAnimation() - Animation state is null");
 		return nullptr;
 	}
-	return m_pAnimationState->getCurrent(uiTrackIndex);
+	return m_pAnimationState->setAnimation(uiTrackIndex, pAnimation, bLoop);
+}
+
+spine::TrackEntry *HySpine2d::AddAnimation(size_t uiTrackIndex, spine::Animation *pAnimation, bool bLoop, float fDelay)
+{
+	if(m_pAnimationState == nullptr)
+	{
+		HyLogWarning("HySpine2d::AddAnimation() - Animation state is null");
+		return nullptr;
+	}
+	return m_pAnimationState->addAnimation(uiTrackIndex, pAnimation, bLoop, fDelay);
 }
 #endif // #ifdef HY_USE_SPINE
 
+float HySpine2d::GetAnimRate() const
+{
+#ifdef HY_USE_SPINE
+	if(m_pAnimationState)
+		return m_pAnimationState->getTimeScale();
+	else
+		HyLogWarning("HySpine2d::GetAnimRate() - Animation state is null");
+#endif
+	return 1.0f;
+}
+
+void HySpine2d::SetAnimRate(float fPlayRate)
+{
+#ifdef HY_USE_SPINE
+	if(m_pAnimationState)
+		m_pAnimationState->setTimeScale(fPlayRate);
+	else
+		HyLogWarning("HySpine2d::SetAnimRate() - Animation state is null");
+#endif
+}
 
 /*virtual*/ void HySpine2d::SetDirty(uint32 uiDirtyFlags) /*override*/
 {

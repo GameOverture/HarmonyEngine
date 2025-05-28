@@ -15,18 +15,19 @@
 #include <QUndoCommand>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class TileSetUndoCmd_ManipTiles : public QUndoCommand
+class TileSetUndoCmd_AppendTiles : public QUndoCommand
 {
 	AtlasTileSet &					m_TileSetRef;
 
+	Qt::Edge						m_eAppendEdge;
 	QSize							m_TileSizes;
 	QVector<QPixmap>				m_PixmapList;
 
-	QVector<int>					m_AppendedTilesAtlasIndexList;
+	QList<QPair<int, TileData *>>	m_AppendedTilesAtlasIndexList;
 
 public:
-	TileSetUndoCmd_ManipTiles(AtlasTileSet &tileSetItemRef, QVector<QGraphicsPixmapItem *> pixmapList, QSize vTileSizes, QUndoCommand *pParent = nullptr);
-	virtual ~TileSetUndoCmd_ManipTiles();
+	TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItemRef, QVector<QGraphicsPixmapItem *> pixmapList, QSize vTileSize, Qt::Edge eAppendEdge, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_AppendTiles();
 
 	virtual void redo() override;
 	virtual void undo() override;

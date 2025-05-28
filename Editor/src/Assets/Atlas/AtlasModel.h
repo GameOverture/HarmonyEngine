@@ -26,7 +26,7 @@ class AtlasModel : public IManagerModel
 	
 	HyTextureInfo						m_DefaultTextureInfo;
 	
-	FileDataPair						m_TileSetsDataPair;
+	FileDataPair						m_TileSetsDataPair;		// Holds the contents of TileSets.meta and TileSets.data
 
 public:
 	AtlasModel(Project &projRef);
@@ -49,6 +49,7 @@ public:
 
 	AtlasTileSet *GenerateTileSet(QString sName, TreeModelItemData *pParentTreeItemData, quint32 uiBankId);
 	void SaveTileSet(QUuid tileSetUuid, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
+	void WriteTileSetsToDisk();
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;

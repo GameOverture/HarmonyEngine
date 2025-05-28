@@ -52,7 +52,7 @@ private Q_SLOTS:
 	void OnStartOffsetChanged(QVariant newOffset);
 	void OnPaddingChanged(QVariant newPadding);
 
-	void on_btnConfirmAddRemove_clicked();
+	void on_btnConfirmAdd_clicked();
 
 };
 

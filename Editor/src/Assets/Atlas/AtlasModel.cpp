@@ -25,7 +25,12 @@ AtlasModel::AtlasModel(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Atlases),
 	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0)
 {
+	QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));
+	if(!tileSetMetaFile.open(QIODevice::ReadOnly | QIODevice::Text))
+		HyGuiLog("Failed to open tile set meta file: " + tileSetMetaFile.fileName(), LOGTYPE_Error);
 
+	QJsonDocument tileSetMetaDoc = QJsonDocument::fromJson(tileSetMetaFile.readAll());
+	m_TileSetsDataPair.m_Meta = tileSetMetaDoc.object();
 }
 
 /*virtual*/ AtlasModel::~AtlasModel()
@@ -200,30 +205,33 @@ void AtlasModel::SaveTileSet(QUuid tileSetUuid, const FileDataPair &tileSetFileD
 		
 	if(bWriteToDisk)
 	{
-		// Save Meta Data
-		QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));
-		if(!tileSetMetaFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-			HyGuiLog("Couldn't open TileSet meta file for writing: " % tileSetMetaFile.errorString(), LOGTYPE_Error);
-		else
-		{
-			m_TileSetsDataPair.m_Meta.insert("$fileVersion", HYGUI_FILE_VERSION);
+		WriteTileSetsToDisk();
+		FlushRepack();
+	}
+}
 
-			QJsonDocument metaDoc;
-			metaDoc.setObject(m_TileSetsDataPair.m_Meta);
+void AtlasModel::WriteTileSetsToDisk()
+{
+	// Save Meta Data
+	QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));
+	if(!tileSetMetaFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+		HyGuiLog("Couldn't open TileSet meta file for writing: " % tileSetMetaFile.errorString(), LOGTYPE_Error);
+	else
+	{
+		m_TileSetsDataPair.m_Meta.insert("$fileVersion", HYGUI_FILE_VERSION);
 
-#ifdef HYGUI_UseBinaryMetaFiles
-			qint64 iBytesWritten = tileSetMetaFile.write(metaDoc.toBinaryData());
-#else
-			qint64 iBytesWritten = tileSetMetaFile.write(metaDoc.toJson());
-#endif
-			if(0 == iBytesWritten || -1 == iBytesWritten)
-				HyGuiLog("Could not write to meta data file: " % tileSetMetaFile.errorString(), LOGTYPE_Error);
+		QJsonDocument metaDoc;
+		metaDoc.setObject(m_TileSetsDataPair.m_Meta);
 
-			tileSetMetaFile.close();
-		}
+//#ifdef HYGUI_UseBinaryMetaFiles
+//		qint64 iBytesWritten = tileSetMetaFile.write(metaDoc.toBinaryData());
+//#else
+		qint64 iBytesWritten = tileSetMetaFile.write(metaDoc.toJson());
+//#endif
+		if(0 == iBytesWritten || -1 == iBytesWritten)
+			HyGuiLog("Could not write to meta data file: " % tileSetMetaFile.errorString(), LOGTYPE_Error);
 
-		// TODO: Determine if we want to separate tilesets from atlas manifest
-		SaveData();
+		tileSetMetaFile.close();
 	}
 }
 
@@ -380,6 +388,16 @@ void AtlasModel::SaveTileSet(QUuid tileSetUuid, const FileDataPair &tileSetFileD
 	for(int i = 0; i < assetList.count(); ++i)
 	{
 		AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[i]);
+
+		if(pFrame->GetSubAtlasType() == ITEM_AtlasTileSet)
+		{
+			QString sTileSetUuid = pFrame->GetUuid().toString(QUuid::WithoutBraces);
+			m_TileSetsDataPair.m_Data.remove(sTileSetUuid);
+			m_TileSetsDataPair.m_Meta.remove(sTileSetUuid);
+
+			WriteTileSetsToDisk();
+		}
+
 		repackTexIndexMap[m_BanksModel.GetBank(GetBankIndexFromBankId(pFrame->GetBankId()))].insert(pFrame->GetTextureIndex());
 
 		DeleteAsset(pFrame);

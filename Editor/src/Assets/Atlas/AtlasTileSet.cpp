@@ -72,12 +72,36 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 		}
 
 		QJsonArray tileArray = m_TileSetDataPair.m_Meta["tileData"].toArray();
-		for(int i = 0; i < tileArray.size(); ++i)
+
+		// Slice the pixmaps from the sub-atlas. The row-order of the pixmaps is aligned with m_TileDataList
+		QVector<QPixmap> pixmapList;
+		QImage subAtlas(GetAbsMetaFilePath());
+		if(subAtlas.isNull() == false && tileArray.size() > 0)
 		{
-			QJsonObject tileObj = tileArray[i].toObject();
-			MetaLocation key(tileObj["metaX"].toInt(), tileObj["metaY"].toInt());
-			m_TileDataMap[key] = new TileData(tileObj);
+			const int iNUM_COLS = NUM_COLS_TILESET(tileArray.size());
+			const int iNUM_ROWS = NUM_ROWS_TILESET(tileArray.size());
+			
+			int iIndex = 0;
+			for(int iRow = 0; iRow < iNUM_ROWS; ++iRow)
+			{
+				for(int iCol = 0; iCol < iNUM_COLS; ++iCol)
+				{
+					if(iIndex >= tileArray.size())
+						break; // No more tiles to process
+
+					QRect tileRect(iCol * m_TileSize.width(), iRow * m_TileSize.height(), m_TileSize.width(), m_TileSize.height());
+					QPixmap tilePixmap = QPixmap::fromImage(subAtlas.copy(tileRect));
+					pixmapList.append(tilePixmap);
+					++iIndex;
+				}
+
+				if(iIndex >= tileArray.size())
+					break; // No more tiles to process
+			}
 		}
+
+		for(int i = 0; i < tileArray.size(); ++i)
+			m_TileDataList.push_back(new TileData(tileArray[i].toObject(), pixmapList[i]));
 	}
 }
 
@@ -87,7 +111,7 @@ AtlasTileSet::~AtlasTileSet()
 
 int AtlasTileSet::GetNumTiles() const
 {
-	return m_TileDataMap.count();
+	return m_TileDataList.size();
 }
 
 QSize AtlasTileSet::GetTileSize() const
@@ -98,19 +122,6 @@ QSize AtlasTileSet::GetTileSize() const
 void AtlasTileSet::SetTileSize(QSize size)
 {
 	m_TileSize = size;
-}
-
-
-// NOTE: TileSet atlases are always "square"
-int AtlasTileSet::GetNumCols() const
-{
-	return static_cast<int>(std::floor(std::sqrt(GetNumTiles())));
-}
-
-// NOTE: TileSet atlases are always "square"
-int AtlasTileSet::GetNumRows() const
-{
-	return static_cast<int>(std::ceil(static_cast<double>(GetNumTiles()) / GetNumCols()));
 }
 
 QString AtlasTileSet::GetTileSetInfo() const
@@ -132,8 +143,9 @@ TileSetScene *AtlasTileSet::GetGfxScene()
 	return &m_GfxScene;
 }
 
-QVector<int> AtlasTileSet::Cmd_AppendTiles(QSize vTileSize, const QVector<QPixmap> &pixmapList, Qt::Edge eAppendEdge)
+QList<QPair<int, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vTileSize, const QVector<QPixmap> &newPixmapList, Qt::Edge eAppendEdge)
 {
+	// Update size if necessary
 	if(m_TileSize != vTileSize)
 	{
 		if(m_TileSize.width() < vTileSize.width())
@@ -142,47 +154,71 @@ QVector<int> AtlasTileSet::Cmd_AppendTiles(QSize vTileSize, const QVector<QPixma
 			m_TileSize.setHeight(vTileSize.height());
 	}
 
-	QVector<int> appendIndexList;
-	
-	QList<TileData *> tileListSorted = m_TileDataMap.values();
-	std::sort(tileListSorted.begin(), tileListSorted.end(),
-		[](const TileData *pLhs, const TileData *pRhs) -> bool
-		{
-			return pLhs->m_iAtlasIndex < pRhs->m_iAtlasIndex;
-		});
-	
-	QSize textureSize(GetNumCols() * GetTileSize().width(), GetNumRows() * GetTileSize().height());
-
-	QImage newTexture(textureSize.width(), textureSize.height(), QImage::Format_ARGB32);
-	newTexture.fill(Qt::transparent);
-
-	QPainter p(&newTexture);
-
-	// Iterate through all the tiles and draw them to the blank newTexture
-	for(int i = 0; i < tileListSorted.size(); ++i)
+	m_TileDataList.reserve(m_TileDataList.size() + newPixmapList.size());
+	QList<QPair<int, TileData *>> newTileDataList;
+	for(int i = 0; i < newPixmapList.size(); ++i)
 	{
-		TileData *pTileData = tileListSorted[i];
-
-		QPoint pos(textureSize.width() * (i / GetNumCols()), textureSize.height() * (i % GetNumCols()));
-		
-		// TODO: START HERE!
-		//p.drawImage(pos.x(), pos.y(), QImage(packFrameRef.path), packFrameRef.crop.x(), packFrameRef.crop.y(), packFrameRef.crop.width(), packFrameRef.crop.height());
+		TileData *pTileData = new TileData(newPixmapList[i]);
+		int iIndex = m_TileDataList.size();
+		m_TileDataList.push_back(pTileData);
+		newTileDataList.push_back(QPair<int, TileData *>(iIndex, pTileData));
 	}
 
-	QImage *pTexture = static_cast<QImage *>(p.device());
-	if(false == pTexture->save(GetAbsMetaFilePath()))
-		HyGuiLog("AtlasTileSet::Cmd_AppendTiles failed to generate a PNG sub-atlas", LOGTYPE_Error);
-
-	return appendIndexList;
+	RegenerateSubAtlas();
+	return newTileDataList;
 }
 
-void AtlasTileSet::Cmd_RemoveTiles(QVector<int> atlasIndexList)
+QList<QPair<int, TileData *>> AtlasTileSet::Cmd_RemoveTiles(QVector<TileData *> tileDataList)
 {
+	QList<QPair<int, TileData *>> removedTileDataList;
+	removedTileDataList.reserve(tileDataList.size());
+	for(int i = 0; i < m_TileDataList.size(); ++i)
+	{
+		for(int j = 0; j < tileDataList.size(); ++j)
+		{
+			if(m_TileDataList[i] == tileDataList[j])
+			{
+				removedTileDataList.push_back(QPair<int, TileData *>(i, m_TileDataList[i]));
+				break;
+			}
+		}
+	}
+
+	for(TileData *pTileData : tileDataList)
+	{
+		auto it = std::find(m_TileDataList.begin(), m_TileDataList.end(), pTileData);
+		if(it != m_TileDataList.end())
+			m_TileDataList.erase(it);
+	}
+
+	RegenerateSubAtlas();
+	return removedTileDataList;
+}
+
+void AtlasTileSet::Cmd_ReaddTiles(QList<QPair<int, TileData *>> tileDataList)
+{
+	for(const QPair<int, TileData *> &pair : tileDataList)
+	{
+		m_TileDataList.insert(pair.first, pair.second);
+		//m_RemovedTileDataList.removeOne(pair);
+	}
+
+	RegenerateSubAtlas();
 }
 
 QUndoStack *AtlasTileSet::GetUndoStack()
 {
 	return m_pUndoStack;
+}
+
+QAction *AtlasTileSet::GetUndoAction()
+{
+	return m_pActionUndo;
+}
+
+QAction *AtlasTileSet::GetRedoAction()
+{
+	return m_pActionRedo;
 }
 
 QIcon AtlasTileSet::GetTileSetIcon() const
@@ -229,13 +265,9 @@ void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 	fileDataPairOut.m_Meta["physicsLayers"] = physicsLayerArray;
 
 	QJsonArray tileArray;
-	for(QMap<MetaLocation, TileData *>::const_iterator iter = m_TileDataMap.begin(); iter != m_TileDataMap.end(); ++iter)
-	{
-		QJsonObject tileObj;
-		tileObj["metaX"] = QJsonValue(iter.key().iX);
-		tileObj["metaY"] = QJsonValue(iter.key().iY);
-		iter.value()->GetTileData(tileObj);
-	}
+	for(TileData *pTileData : m_TileDataList)
+		tileArray.append(pTileData->GetTileData());
+	
 	fileDataPairOut.m_Meta["tileData"] = tileArray;
 }
 
@@ -246,11 +278,11 @@ void AtlasTileSet::GetSavedFileData(FileDataPair &itemFileDataOut) const
 
 bool AtlasTileSet::Save(bool bWriteToDisk)
 {
-	GetLatestFileData(m_TileSetDataPair);
-	static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetDataPair, bWriteToDisk);
-
 	m_bExistencePendingSave = false;
 	m_pUndoStack->setClean();
+
+	GetLatestFileData(m_TileSetDataPair);
+	static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetDataPair, bWriteToDisk);
 
 	//if(bWriteToDisk)
 	//{
@@ -287,6 +319,33 @@ void AtlasTileSet::DiscardChanges()
 	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TexInfo.GetBucketId())));
 	frameObj.insert("x", QJsonValue(GetX()));
 	frameObj.insert("y", QJsonValue(GetY()));
+}
+
+void AtlasTileSet::RegenerateSubAtlas()
+{
+	// Create a texture with a size that will accommodate all the existing, and newly appended tiles
+	const int iNUM_COLS = NUM_COLS_TILESET(m_TileDataList.size());
+	const int iNUM_ROWS = NUM_ROWS_TILESET(m_TileDataList.size());
+	QSize textureSize(iNUM_COLS * m_TileSize.width(), iNUM_ROWS * m_TileSize.height());
+
+	QImage newTexture(textureSize.width(), textureSize.height(), QImage::Format_ARGB32);
+	newTexture.fill(Qt::transparent);
+
+	// Iterate through all the tiles and draw them to the blank newTexture
+	QPainter p(&newTexture);
+	for(int i = 0; i < m_TileDataList.size(); ++i)
+	{
+		int iCol = i % iNUM_COLS;
+		int iRow = i / iNUM_COLS;
+		QPoint pos(m_TileSize.width() * iCol, m_TileSize.height() * iRow);
+		p.drawPixmap(pos.x(), pos.y(), m_TileDataList[i]->GetPixmap());
+	}
+
+	if(static_cast<AtlasModel &>(m_ModelRef).ReplaceFrame(this, GetName(), newTexture, ITEM_AtlasTileSet) == false)
+		HyGuiLog("AtlasModel::ReplaceFrame failed for tile set sub-atlas: " % GetName(), LOGTYPE_Error);
+
+	// TODO: Determine if this needs to be user initiated
+	Save(true);
 }
 
 void AtlasTileSet::on_undoStack_cleanChanged(bool bClean)

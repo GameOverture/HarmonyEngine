@@ -548,15 +548,18 @@ bool IManagerModel::RemoveLookup(IAssetItemData *pAsset)
 		}
 	}
 
-	auto iter = m_AssetChecksumMap.find(pAsset->GetChecksum());
-	if(iter == m_AssetChecksumMap.end())
-		HyGuiLog("IManagerModel::RemoveLookup could not find asset with checksum: " % QString::number(pAsset->GetChecksum()), LOGTYPE_Error);
-
-	iter.value().removeOne(pAsset);
-	if(iter.value().size() == 0)
+	if(pAsset->GetChecksum() != 0)
 	{
-		m_AssetChecksumMap.remove(pAsset->GetChecksum());
-		return true;
+		auto iter = m_AssetChecksumMap.find(pAsset->GetChecksum());
+		if(iter == m_AssetChecksumMap.end())
+			HyGuiLog("IManagerModel::RemoveLookup could not find asset with checksum: " % QString::number(pAsset->GetChecksum()), LOGTYPE_Error);
+
+		iter.value().removeOne(pAsset);
+		if(iter.value().size() == 0)
+		{
+			m_AssetChecksumMap.remove(pAsset->GetChecksum());
+			return true;
+		}
 	}
 
 	return false;
@@ -1029,16 +1032,19 @@ void IManagerModel::RegisterAsset(IAssetItemData *pAsset)
 	}
 
 	uint32 uiChecksum = pAsset->GetChecksum();
-	if(m_AssetChecksumMap.contains(uiChecksum))
+	if(uiChecksum != 0)
 	{
-		m_AssetChecksumMap.find(uiChecksum).value().append(pAsset);
-		HyGuiLog("'" % pAsset->GetName() % "' is a duplicate of '" % m_AssetChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_AssetChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Debug);
-	}
-	else
-	{
-		QList<IAssetItemData *> newFrameList;
-		newFrameList.append(pAsset);
-		m_AssetChecksumMap[uiChecksum] = newFrameList;
+		if(m_AssetChecksumMap.contains(uiChecksum))
+		{
+			m_AssetChecksumMap.find(uiChecksum).value().append(pAsset);
+			HyGuiLog("'" % pAsset->GetName() % "' is a duplicate of '" % m_AssetChecksumMap.find(uiChecksum).value()[0]->GetName() % "' with the checksum: " % QString::number(uiChecksum) % " totaling: " % QString::number(m_AssetChecksumMap.find(uiChecksum).value().size()), LOGTYPE_Debug);
+		}
+		else
+		{
+			QList<IAssetItemData *> newFrameList;
+			newFrameList.append(pAsset);
+			m_AssetChecksumMap[uiChecksum] = newFrameList;
+		}
 	}
 }
 
