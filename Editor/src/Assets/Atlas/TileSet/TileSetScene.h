@@ -15,38 +15,44 @@
 
 class AtlasTileSet;
 
+enum TileSetMode
+{
+	TILESETMODE_Importing,
+	TILESETMODE_TileSet
+};
 class TileSetScene : public QGraphicsScene
 {
 	Q_OBJECT
 
+	AtlasTileSet &						m_TileSetRef;
+
+	TileSetMode							m_eMode;
+	QGraphicsItemGroup *				m_pModeImportGroup;
+	QGraphicsItemGroup *				m_pModeTileSetGroup;
+
 	QGraphicsRectItem					m_ImportRect;				// A dash-line box that encompasses the entire import scene
 	QGraphicsTextItem					m_ImportLabel;				// Main label/title of the import scene
-	QVector<QGraphicsRectItem *>		m_ImportTileRectList;
-	QVector<QGraphicsPixmapItem *>		m_ImportTilePixmapList;
+
+	QMap<QPoint, QPair<QGraphicsRectItem *, QGraphicsPixmapItem *>>	m_ImportTileMap;
 	QSize								m_vImportTileSize;
 
-public:
-	enum SceneType
-	{
-		SCENETYPE_Importing,
-		SCENETYPE_TileSet
-	};
-	SceneType							m_eSceneType;
+	QVector<QGraphicsPixmapItem *>		m_TileSetPixmapItem;		// The tile set pixmap item that is displayed in the tiles scene
 
 public:
-	TileSetScene();
+	TileSetScene(AtlasTileSet &tileSetRef);
 	~TileSetScene();
 
-	void Setup(AtlasTileSet *pTileSet);
+	void SetDisplayMode(TileSetMode eMode);
 
 	int GetNumImportPixmaps() const;
-	QVector<QGraphicsPixmapItem *> &GetImportPixmapList();
 	QSize GetImportTileSize() const;
+	QMap<QPoint, QPixmap> AssembleImportMap();
 
-	void RemoveImportPixmaps();
-	void AddImportPixmap(QPixmap pixmap);
-	void ConstructImportScene();
-	void ConstructImportScene(int iNumColumns, int iNumRows);
+	void ClearImport();
+	void AddImport(QPoint ptGridPos, QPixmap pixmap);
+	void SyncImport();
+
+	void SyncTileSet(); // Slow, deletes/reallocates all graphics items
 };
 
 #endif // TILESETSCENE_H

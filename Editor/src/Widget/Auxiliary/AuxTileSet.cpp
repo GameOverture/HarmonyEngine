@@ -52,6 +52,9 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 
 void AuxTileSet::Init(AtlasTileSet *pTileSet)
 {
+	if(m_pTileSet == pTileSet)
+		return;
+
 	m_pTileSet = pTileSet;
 	ui->lblInfo->setText(m_pTileSet->GetTileSetInfo());
 
@@ -63,7 +66,14 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 	ui->btnRedo->setDefaultAction(m_pTileSet->GetRedoAction());
 
 	SetImportWidgets();
+
+	if(m_pTileSet->GetNumTiles() == 0)
+		ui->tabWidget->setCurrentIndex(TAB_AddTiles);
+	else
+		ui->tabWidget->setCurrentIndex(TAB_Properties);
+
 	ui->graphicsView->setScene(m_pTileSet->GetGfxScene());
+
 }
 
 void AuxTileSet::SetImportWidgets()
@@ -111,38 +121,36 @@ void AuxTileSet::SliceSheetPixmaps()
 	ui->grpImportSide->setVisible(m_pTileSet->GetNumTiles() > 0);
 
 	TileSetScene *pGfxScene = m_pTileSet->GetGfxScene();
-	pGfxScene->RemoveImportPixmaps();
+	pGfxScene->ClearImport();
 
 	QPoint ptCurPos(vStartOffset.x() + vPadding.x(),
 					vStartOffset.y() + vPadding.y());
 
-	bool bCountColumns = true;
-	int iNumColumns = 0;
-	int iNumRows = 0;
+	QPoint ptGridPos(0, 0);
 	while(vTileSize.y() <= m_pImportTileSheetPixmap->height() - ptCurPos.y() + 1)
 	{
-		iNumRows++;
-
 		while(vTileSize.x() <= m_pImportTileSheetPixmap->width() - ptCurPos.x() + 1)
 		{
 			QRect tileRect(ptCurPos.x(), ptCurPos.y(), vTileSize.x(), vTileSize.y());
-			pGfxScene->AddImportPixmap(m_pImportTileSheetPixmap->copy(tileRect));
+			QPixmap tilePixmap = m_pImportTileSheetPixmap->copy(tileRect);
+
+			if(IsPixmapAllTransparent(tilePixmap) == false)
+			{
+				(ptCurPos.x() / vTileSize.x(), ptCurPos.y() / vTileSize.y());
+				pGfxScene->AddImport(ptGridPos, tilePixmap);
+			}
 
 			ptCurPos.setX(ptCurPos.x() + vTileSize.x() + vPadding.x());
-
-			if(bCountColumns)
-				iNumColumns++;
+			ptGridPos.setX(ptGridPos.x() + 1);
 		}
-		bCountColumns = false;
 
 		ptCurPos.setX(vStartOffset.x() + vPadding.x());
 		ptCurPos.setY(ptCurPos.y() + vTileSize.y() + vPadding.y());
+		ptGridPos.setX(0);
+		ptGridPos.setY(ptGridPos.y() + 1);
 	}
 
-	if(iNumColumns == 0 || iNumRows == 0)
-		return;
-
-	pGfxScene->ConstructImportScene(iNumColumns, iNumRows);
+	pGfxScene->SyncImport();
 }
 
 void AuxTileSet::ErrorCheckImport()
@@ -187,6 +195,32 @@ void AuxTileSet::ErrorCheckImport()
 	ui->btnConfirmAdd->setEnabled(!bIsError);
 }
 
+bool AuxTileSet::IsPixmapAllTransparent(const QPixmap &pixmap)
+{
+	QImage image = pixmap.toImage();
+	if(image.isNull())
+		return true; // Consider a null QPixmap as transparent
+
+	for(int y = 0; y < image.height(); ++y)
+	{
+		for(int x = 0; x < image.width(); ++x)
+		{
+			QColor color = image.pixelColor(x, y);
+			if(color.alpha() > 0)
+				return false; // Found a non-transparent pixel
+		}
+	}
+
+	return true; // All pixels are transparent
+}
+
+void AuxTileSet::on_tabWidget_currentChanged(int iIndex)
+{
+	if(m_pTileSet == nullptr)
+		return;
+
+	m_pTileSet->GetGfxScene()->SetDisplayMode(static_cast<TileSetMode>(iIndex));
+}
 
 void AuxTileSet::on_radTileSheet_toggled(bool bChecked)
 {
@@ -238,7 +272,7 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 	else // Individual Tiles
 	{
 		TileSetScene *pGfxScene = m_pTileSet->GetGfxScene();
-		pGfxScene->RemoveImportPixmaps();
+		pGfxScene->ClearImport();
 
 		QVector<QImage *> vImportImages;
 
@@ -260,7 +294,8 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 				maxSize.setHeight(pImg->height());
 		}
 
-		// Copy image into pixmap, but ensure it has maxSize dimensions, and is centered
+		int iNUM_COLS = NUM_COLS_TILESET(vImportImages.size());
+		int iIndex = 0;
 		for(QImage *pImg : vImportImages)
 		{
 			QPixmap pixmap(maxSize);
@@ -269,13 +304,14 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 			painter.drawImage((maxSize.width() - pImg->width()) / 2, (maxSize.height() - pImg->height()) / 2, *pImg);
 			painter.end();
 
-			pGfxScene->AddImportPixmap(pixmap);
+			pGfxScene->AddImport(QPoint(iIndex % iNUM_COLS, iIndex / iNUM_COLS), pixmap);
+			iIndex++;
 		}
 
 		for(auto pImg : vImportImages)
 			delete pImg;
 
-		pGfxScene->ConstructImportScene();
+		pGfxScene->SyncImport();
 	}
 
 	ErrorCheckImport();
@@ -304,9 +340,8 @@ void AuxTileSet::on_btnConfirmAdd_clicked()
 	if(QMessageBox::Yes != QMessageBox::question(MainWindow::GetInstance(), "Confirm TileSet Modification", "Do you want to import '" % QString::number(m_pTileSet->GetGfxScene()->GetNumImportPixmaps()) % "' new tiles?", QMessageBox::Yes, QMessageBox::No))
 		return;
 
-	QVector<QGraphicsPixmapItem *> gfxPixmapList = m_pTileSet->GetGfxScene()->GetImportPixmapList();
+	QMap<QPoint, QPixmap> importMap = m_pTileSet->GetGfxScene()->AssembleImportMap();
 	QSize vImportTileSize = m_pTileSet->GetGfxScene()->GetImportTileSize();
-
 	Qt::Edge eAppendEdge;
 	if(ui->radImportTop->isChecked())
 		eAppendEdge = Qt::TopEdge;
@@ -317,7 +352,7 @@ void AuxTileSet::on_btnConfirmAdd_clicked()
 	else
 		eAppendEdge = Qt::BottomEdge;
 
-	TileSetUndoCmd_AppendTiles *pUndoCmd = new TileSetUndoCmd_AppendTiles(*m_pTileSet, gfxPixmapList, vImportTileSize, eAppendEdge);
+	TileSetUndoCmd_AppendTiles *pUndoCmd = new TileSetUndoCmd_AppendTiles(*m_pTileSet, importMap, vImportTileSize, eAppendEdge);
 	m_pTileSet->GetUndoStack()->push(pUndoCmd);
 
 	//QDir tempDir = HyGlobal::PrepTempDir(m_ProjectRef, HYGUIPATH_TEMPSUBDIR_ImportTileSheet);

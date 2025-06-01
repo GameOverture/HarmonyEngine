@@ -15,6 +15,14 @@
 
 #include <QPainter>
 
+bool operator<(const QPoint &a, const QPoint &b)
+{
+	if(a.x() != b.x())
+		return a.x() < b.x();
+	else
+		return a.y() < b.y();
+}
+
 AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 						   QUuid uuid,
 						   quint32 uiChecksum,
@@ -31,7 +39,8 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 						   uint uiErrors) :
 	AtlasFrame(ITEM_AtlasTileSet, modelRef, ITEM_AtlasTileSet, uuid, uiChecksum, uiBankId, sName, 0, 0, 0, 0, texInfo, uiW, uiH, uiX, uiY, iTextureIndex, uiErrors),
 	m_TileSetDataPair(tileSetDataPair),
-	m_bExistencePendingSave(bIsPendingSave)
+	m_bExistencePendingSave(bIsPendingSave),
+	m_GfxScene(*this)
 {
 	m_pUndoStack = new QUndoStack(this);
 	m_pActionUndo = m_pUndoStack->createUndoAction(nullptr, "&Undo");
@@ -79,30 +88,29 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 		if(subAtlas.isNull() == false && tileArray.size() > 0)
 		{
 			const int iNUM_COLS = NUM_COLS_TILESET(tileArray.size());
-			const int iNUM_ROWS = NUM_ROWS_TILESET(tileArray.size());
-			
-			int iIndex = 0;
-			for(int iRow = 0; iRow < iNUM_ROWS; ++iRow)
+			//const int iNUM_ROWS = NUM_ROWS_TILESET(tileArray.size(), iNUM_COLS);
+
+			for(int index = 0; index < tileArray.size(); ++index)
 			{
-				for(int iCol = 0; iCol < iNUM_COLS; ++iCol)
-				{
-					if(iIndex >= tileArray.size())
-						break; // No more tiles to process
+				int iCol = index % iNUM_COLS;
+				int iRow = index / iNUM_COLS;
 
-					QRect tileRect(iCol * m_TileSize.width(), iRow * m_TileSize.height(), m_TileSize.width(), m_TileSize.height());
-					QPixmap tilePixmap = QPixmap::fromImage(subAtlas.copy(tileRect));
-					pixmapList.append(tilePixmap);
-					++iIndex;
-				}
-
-				if(iIndex >= tileArray.size())
-					break; // No more tiles to process
+				QRect tileRect(iCol * m_TileSize.width(), iRow * m_TileSize.height(), m_TileSize.width(), m_TileSize.height());
+				QPixmap tilePixmap = QPixmap::fromImage(subAtlas.copy(tileRect));
+				pixmapList.append(tilePixmap);
 			}
 		}
 
 		for(int i = 0; i < tileArray.size(); ++i)
-			m_TileDataList.push_back(new TileData(tileArray[i].toObject(), pixmapList[i]));
+		{
+			QJsonObject tileObj = tileArray[i].toObject();
+			QJsonArray gridPosArray = tileObj["gridPos"].toArray();
+			QPoint ptGridPos(gridPosArray[0].toInt(), gridPosArray[1].toInt());
+			m_TileDataMap.insert(ptGridPos, new TileData(tileObj, pixmapList[i]));
+		}
 	}
+
+	m_GfxScene.SyncTileSet();
 }
 
 AtlasTileSet::~AtlasTileSet()
@@ -111,7 +119,7 @@ AtlasTileSet::~AtlasTileSet()
 
 int AtlasTileSet::GetNumTiles() const
 {
-	return m_TileDataList.size();
+	return m_TileDataMap.size();
 }
 
 QSize AtlasTileSet::GetTileSize() const
@@ -138,13 +146,23 @@ QString AtlasTileSet::GetTileSetInfo() const
 	return sInfo;
 }
 
+QMap<QPoint, TileData *> AtlasTileSet::GetTileDataMap() const
+{
+	return m_TileDataMap;
+}
+
 TileSetScene *AtlasTileSet::GetGfxScene()
 {
 	return &m_GfxScene;
 }
 
-QList<QPair<int, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vTileSize, const QVector<QPixmap> &newPixmapList, Qt::Edge eAppendEdge)
+QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vTileSize, const QMap<QPoint, QPixmap> &importBatchMap, Qt::Edge eAppendEdge)
 {
+	QList<QPair<QPoint, TileData *>> newTileDataList;
+
+	if(importBatchMap.isEmpty())
+		return newTileDataList;
+
 	// Update size if necessary
 	if(m_TileSize != vTileSize)
 	{
@@ -154,54 +172,86 @@ QList<QPair<int, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vTileSize, 
 			m_TileSize.setHeight(vTileSize.height());
 	}
 
-	m_TileDataList.reserve(m_TileDataList.size() + newPixmapList.size());
-	QList<QPair<int, TileData *>> newTileDataList;
-	for(int i = 0; i < newPixmapList.size(); ++i)
+	// Get bounding box of import batch
+	int minX = INT_MAX, maxX = INT_MIN, minY = INT_MAX, maxY = INT_MIN;
+	for(const QPoint &pt : importBatchMap.keys())
 	{
-		TileData *pTileData = new TileData(newPixmapList[i]);
-		int iIndex = m_TileDataList.size();
-		m_TileDataList.push_back(pTileData);
-		newTileDataList.push_back(QPair<int, TileData *>(iIndex, pTileData));
+		minX = HyMath::Min(minX, pt.x());
+		maxX = HyMath::Max(maxX, pt.x());
+		minY = HyMath::Min(minY, pt.y());
+		maxY = HyMath::Max(maxY, pt.y());
+	}
+	QSize importSize(maxX - minX + 1, maxY - minY + 1);
+
+	// Get bounding box of existing grid
+	int existMinX = 0, existMaxX = 0, existMinY = 0, existMaxY = 0;
+	for(const QPoint &pt : m_TileDataMap.keys())
+	{
+		existMinX = HyMath::Min(existMinX, pt.x());
+		existMaxX = HyMath::Max(existMaxX, pt.x());
+		existMinY = HyMath::Min(existMinY, pt.y());
+		existMaxY = HyMath::Max(existMaxY, pt.y());
+	}
+
+	QPoint vOffset;
+	switch(eAppendEdge)
+	{
+	case Qt::TopEdge:
+		vOffset = QPoint(existMinX, existMinY - importSize.height());
+		break;
+	case Qt::LeftEdge:
+		vOffset = QPoint(existMinX - importSize.width(), existMinY);
+		break;
+	case Qt::RightEdge:
+		vOffset = QPoint(existMaxX + 1, existMinY); // shift to right of current max X
+		break;
+	case Qt::BottomEdge:
+		vOffset = QPoint(existMinX, existMaxY + 1);
+		break;
+	}
+
+	// Insert each tile at new position
+	for(auto it = importBatchMap.begin(); it != importBatchMap.end(); ++it)
+	{
+		TileData *pTileData = new TileData(it.value());
+
+		QPoint newGridPos = it.key() + vOffset;
+		m_TileDataMap.insert(newGridPos, pTileData);
+		newTileDataList.push_back(QPair<QPoint, TileData *>(newGridPos, pTileData));
 	}
 
 	RegenerateSubAtlas();
 	return newTileDataList;
 }
 
-QList<QPair<int, TileData *>> AtlasTileSet::Cmd_RemoveTiles(QVector<TileData *> tileDataList)
+QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_RemoveTiles(QVector<TileData *> tileDataList)
 {
-	QList<QPair<int, TileData *>> removedTileDataList;
+	QList<QPair<QPoint, TileData *>> removedTileDataList;
 	removedTileDataList.reserve(tileDataList.size());
-	for(int i = 0; i < m_TileDataList.size(); ++i)
+	for(TileData *pTileData : tileDataList)
 	{
-		for(int j = 0; j < tileDataList.size(); ++j)
+		for(auto it = m_TileDataMap.begin(); it != m_TileDataMap.end(); ++it)
 		{
-			if(m_TileDataList[i] == tileDataList[j])
+			if(it.value() == pTileData)
 			{
-				removedTileDataList.push_back(QPair<int, TileData *>(i, m_TileDataList[i]));
+				removedTileDataList.push_back(QPair<QPoint, TileData *>(it.key(), pTileData));
 				break;
 			}
 		}
 	}
 
-	for(TileData *pTileData : tileDataList)
-	{
-		auto it = std::find(m_TileDataList.begin(), m_TileDataList.end(), pTileData);
-		if(it != m_TileDataList.end())
-			m_TileDataList.erase(it);
-	}
+	// Remove tiles from map
+	for(const QPair<QPoint, TileData *> &pair : removedTileDataList)
+		m_TileDataMap.remove(pair.first);
 
 	RegenerateSubAtlas();
 	return removedTileDataList;
 }
 
-void AtlasTileSet::Cmd_ReaddTiles(QList<QPair<int, TileData *>> tileDataList)
+void AtlasTileSet::Cmd_ReaddTiles(QList<QPair<QPoint, TileData *>> tileDataList)
 {
-	for(const QPair<int, TileData *> &pair : tileDataList)
-	{
-		m_TileDataList.insert(pair.first, pair.second);
-		//m_RemovedTileDataList.removeOne(pair);
-	}
+	for(const QPair<QPoint, TileData *> &pair : tileDataList)
+		m_TileDataMap.insert(pair.first, pair.second);
 
 	RegenerateSubAtlas();
 }
@@ -265,9 +315,12 @@ void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 	fileDataPairOut.m_Meta["physicsLayers"] = physicsLayerArray;
 
 	QJsonArray tileArray;
-	for(TileData *pTileData : m_TileDataList)
-		tileArray.append(pTileData->GetTileData());
-	
+	for(QMap<QPoint, TileData *>::const_iterator iter = m_TileDataMap.constBegin(); iter != m_TileDataMap.constEnd(); ++iter)
+	{
+		QJsonObject tileObj = iter.value()->GetTileData();
+		tileObj["gridPos"] = QJsonArray() << QJsonValue(iter.key().x()) << QJsonValue(iter.key().y());
+		tileArray.append(tileObj);
+	}
 	fileDataPairOut.m_Meta["tileData"] = tileArray;
 }
 
@@ -324,25 +377,43 @@ void AtlasTileSet::DiscardChanges()
 void AtlasTileSet::RegenerateSubAtlas()
 {
 	// Create a texture with a size that will accommodate all the existing, and newly appended tiles
-	const int iNUM_COLS = NUM_COLS_TILESET(m_TileDataList.size());
-	const int iNUM_ROWS = NUM_ROWS_TILESET(m_TileDataList.size());
-	QSize textureSize(iNUM_COLS * m_TileSize.width(), iNUM_ROWS * m_TileSize.height());
+	const int iNUM_COLS = NUM_COLS_TILESET(m_TileDataMap.size());
+	const int iNUM_ROWS = NUM_ROWS_TILESET(m_TileDataMap.size(), iNUM_COLS);
 
-	QImage newTexture(textureSize.width(), textureSize.height(), QImage::Format_ARGB32);
+	QImage newTexture(iNUM_COLS * m_TileSize.width(), iNUM_ROWS * m_TileSize.height(), QImage::Format_ARGB32);
 	newTexture.fill(Qt::transparent);
 
 	// Iterate through all the tiles and draw them to the blank newTexture
 	QPainter p(&newTexture);
-	for(int i = 0; i < m_TileDataList.size(); ++i)
+	int index = 0;
+	for(auto it = m_TileDataMap.begin(); it != m_TileDataMap.end(); ++it, ++index)
 	{
-		int iCol = i % iNUM_COLS;
-		int iRow = i / iNUM_COLS;
-		QPoint pos(m_TileSize.width() * iCol, m_TileSize.height() * iRow);
-		p.drawPixmap(pos.x(), pos.y(), m_TileDataList[i]->GetPixmap());
+		const TileData *pTile = it.value();
+		if(pTile == nullptr)
+			continue;
+
+		int iCol = index % iNUM_COLS;
+		int iRow = index / iNUM_COLS;
+
+		QPoint destPos(iCol * m_TileSize.width(), iRow * m_TileSize.height());
+		// If the pixmap's dimensions are smaller than the tile size, we need to center it
+		if(pTile->GetPixmap().width() < m_TileSize.width() || pTile->GetPixmap().height() < m_TileSize.height())
+		{
+			destPos.setX(destPos.x() + (m_TileSize.width() - pTile->GetPixmap().width()) / 2);
+			destPos.setY(destPos.y() + (m_TileSize.height() - pTile->GetPixmap().height()) / 2);
+		}
+		// Then apply the user specified texture offset property
+		QPoint vOffset = pTile->GetTextureOffset();
+		destPos += vOffset;
+		
+		p.drawPixmap(destPos, pTile->GetPixmap());
 	}
+	p.end();
 
 	if(static_cast<AtlasModel &>(m_ModelRef).ReplaceFrame(this, GetName(), newTexture, ITEM_AtlasTileSet) == false)
 		HyGuiLog("AtlasModel::ReplaceFrame failed for tile set sub-atlas: " % GetName(), LOGTYPE_Error);
+
+	m_GfxScene.SyncTileSet();
 
 	// TODO: Determine if this needs to be user initiated
 	Save(true);

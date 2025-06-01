@@ -23,7 +23,9 @@ using AutoTileHandle = uint32_t;
 using PhysicsLayerHandle = uint32_t;
 
 #define NUM_COLS_TILESET(numTiles) static_cast<int>(std::floor(std::sqrt(numTiles)))
-#define NUM_ROWS_TILESET(numTiles) static_cast<int>(std::ceil(static_cast<double>(numTiles) / NUM_COLS_TILESET(numTiles)))
+#define NUM_ROWS_TILESET(numTiles, numCols) (static_cast<int>(numTiles) + static_cast<int>(numCols) - 1) / static_cast<int>(numCols);
+
+bool operator<(const QPoint &a, const QPoint &b);
 
 class TileData;
 
@@ -88,36 +90,7 @@ class AtlasTileSet : public AtlasFrame
 	//	TileData *m_pStartTile;
 	//};
 
-
-	QList<TileData *>				m_TileDataList;			// List of all TileData objects in this tile set, including AlternateTiles. It's ordered by the index in the sub-atlas texture
-	//QList<QPair<int, TileData *>>	m_RemovedTileDataList;	// List of TileData objects that have been removed from the tile set, and not deleted. This is used for undo/redo operations.
-
-	//struct MetaLocation
-	//{
-	//	int iX;
-	//	int iY;
-	//	MetaLocation(int x, int y) : iX(x), iY(y) { }
-	//	bool operator==(const MetaLocation &rhs) const
-	//	{
-	//		return iX == rhs.iX && iY == rhs.iY;
-	//	}
-	//	bool operator!=(const MetaLocation &rhs) const
-	//	{
-	//		return this->operator==(rhs) == false;
-	//	}
-	//	bool operator<(const MetaLocation &rhs) const
-	//	{
-	//		// TODO: This seems wrong, should check Y first?
-	//		if(iX < rhs.iX)
-	//			return true;
-	//		else if(iX == rhs.iX)
-	//			return iY < rhs.iY;
-	//		return false;
-	//	}
-	//};
-	//QMap<MetaLocation, TileData *>	m_MetaTileDataMap;	// QPoint key is the user/meta location, not the atlas
-
-
+	QMap<QPoint, TileData *>				m_TileDataMap;			// Map of all imported TileData objects in this tile set. Each key is a grid meta-location that is presented to the user, and not its location on the sub-atlas texture
 
 public:
 	AtlasTileSet(IManagerModel &modelRef,
@@ -140,12 +113,14 @@ public:
 	QString GetTileSetInfo() const;
 	QIcon GetTileSetIcon() const;
 
+	QMap<QPoint, TileData *> GetTileDataMap() const;
+
 	TileSetScene *GetGfxScene();
 
 	// Cmd functions are the only functions that change the data (via Undo/Redo)
-	QList<QPair<int, TileData *>> Cmd_AppendNewTiles(QSize vTileSize, const QVector<QPixmap> &pixmapList, Qt::Edge eAppendEdge);
-	QList<QPair<int, TileData *>> Cmd_RemoveTiles(QVector<TileData *> tileDataList);
-	void Cmd_ReaddTiles(QList<QPair<int, TileData *>> tileDataList);
+	QList<QPair<QPoint, TileData *>> Cmd_AppendNewTiles(QSize vTileSize, const QMap<QPoint, QPixmap> &importBatchMap, Qt::Edge eAppendEdge);
+	QList<QPair<QPoint, TileData *>> Cmd_RemoveTiles(QVector<TileData *> tileDataList);
+	void Cmd_ReaddTiles(QList<QPair<QPoint, TileData *>> tileDataList);
 
 	QUndoStack *GetUndoStack();
 	QAction *GetUndoAction();

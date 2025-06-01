@@ -27,7 +27,12 @@ class AuxTileSet : public QWidget
 
 	bool										m_bIsImportingTileSheet;
 	QPixmap *									m_pImportTileSheetPixmap;
-	
+
+	enum TabIndex
+	{
+		TAB_AddTiles = 0,
+		TAB_Properties
+	};
 
 public:
 	explicit AuxTileSet(QWidget *pParent = nullptr);
@@ -42,7 +47,11 @@ private:
 	void SliceSheetPixmaps();
 	void ErrorCheckImport();
 
+	bool IsPixmapAllTransparent(const QPixmap &pixmap);
+
 private Q_SLOTS:
+	void on_tabWidget_currentChanged(int iIndex);
+
 	void on_radTileSheet_toggled(bool bChecked);
 	void on_radTileImages_toggled(bool bChecked);
 
@@ -53,7 +62,6 @@ private Q_SLOTS:
 	void OnPaddingChanged(QVariant newPadding);
 
 	void on_btnConfirmAdd_clicked();
-
 };
 
 #endif // WIDGETOUTPUTLOG_H

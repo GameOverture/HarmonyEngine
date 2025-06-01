@@ -17,16 +17,16 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TileSetUndoCmd_AppendTiles : public QUndoCommand
 {
-	AtlasTileSet &					m_TileSetRef;
+	AtlasTileSet &						m_TileSetRef;
 
-	Qt::Edge						m_eAppendEdge;
-	QSize							m_TileSizes;
-	QVector<QPixmap>				m_PixmapList;
+	Qt::Edge							m_eAppendEdge;
+	QSize								m_TileSize;
+	QMap<QPoint, QPixmap>				m_PixmapMap;
 
-	QList<QPair<int, TileData *>>	m_AppendedTilesAtlasIndexList;
+	QList<QPair<QPoint, TileData *>>	m_AppendedTilesList;
 
 public:
-	TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItemRef, QVector<QGraphicsPixmapItem *> pixmapList, QSize vTileSize, Qt::Edge eAppendEdge, QUndoCommand *pParent = nullptr);
+	TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItemRef, const QMap<QPoint, QPixmap> &pixmapMapRef, QSize vTileSize, Qt::Edge eAppendEdge, QUndoCommand *pParent = nullptr);
 	virtual ~TileSetUndoCmd_AppendTiles();
 
 	virtual void redo() override;

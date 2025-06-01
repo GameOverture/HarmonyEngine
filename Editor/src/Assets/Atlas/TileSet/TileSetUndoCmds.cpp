@@ -12,17 +12,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItemRef, QVector<QGraphicsPixmapItem *> pixmapList, QSize vTileSize, Qt::Edge eAppendEdge, QUndoCommand *pParent /*= nullptr*/) :
+TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItemRef, const QMap<QPoint, QPixmap> &pixmapMapRef, QSize vTileSize, Qt::Edge eAppendEdge, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_eAppendEdge(eAppendEdge),
 	m_TileSetRef(tileSetItemRef),
-	m_TileSizes(vTileSize)
+	m_TileSize(vTileSize),
+	m_PixmapMap(pixmapMapRef)
 {
-	setText("Add " % QString::number(pixmapList.size()) % " Tiles");
-
-	m_PixmapList.reserve(pixmapList.size());
-	for(auto pPixmap : pixmapList)
-		m_PixmapList.append(pPixmap->pixmap());
+	setText("Add " % QString::number(m_PixmapMap.size()) % " Tiles");
 }
 
 /*virtual*/ TileSetUndoCmd_AppendTiles::~TileSetUndoCmd_AppendTiles()
@@ -31,22 +28,22 @@ TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItem
 
 /*virtual*/ void TileSetUndoCmd_AppendTiles::redo() /*override*/
 {
-	if(m_AppendedTilesAtlasIndexList.empty())
-		m_AppendedTilesAtlasIndexList = m_TileSetRef.Cmd_AppendNewTiles(m_TileSizes, m_PixmapList, m_eAppendEdge);
+	if(m_AppendedTilesList.empty())
+		m_AppendedTilesList = m_TileSetRef.Cmd_AppendNewTiles(m_TileSize, m_PixmapMap, m_eAppendEdge);
 	else
-		m_TileSetRef.Cmd_ReaddTiles(m_AppendedTilesAtlasIndexList);
+		m_TileSetRef.Cmd_ReaddTiles(m_AppendedTilesList);
 }
 
 /*virtual*/ void TileSetUndoCmd_AppendTiles::undo() /*override*/
 {
 	QVector<TileData *> removeTileList;
-	for(const auto &pair : m_AppendedTilesAtlasIndexList)
+	for(const auto &pair : m_AppendedTilesList)
 	{
 		if(pair.second)
 			removeTileList.append(pair.second);
 	}
 
-	m_AppendedTilesAtlasIndexList = m_TileSetRef.Cmd_RemoveTiles(removeTileList);
+	m_AppendedTilesList = m_TileSetRef.Cmd_RemoveTiles(removeTileList);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -59,6 +59,41 @@ TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 	}
 }
 
+TileData::TileData(const TileData &other) :
+	m_TilePixmap(other.m_TilePixmap),
+	m_TextureOffset(other.m_TextureOffset),
+	m_bIsFlippedHorz(other.m_bIsFlippedHorz),
+	m_bIsFlippedVert(other.m_bIsFlippedVert),
+	m_bIsRotated(other.m_bIsRotated),
+	m_iAnimFrame(other.m_iAnimFrame),
+	m_iProbability(other.m_iProbability),
+	m_AutoTileMap(other.m_AutoTileMap),
+	m_VertexMap(other.m_VertexMap)
+{
+}
+
+TileData &TileData::operator=(const TileData &other)
+{
+	if(this == &other)
+		return *this;
+	
+	m_TilePixmap = other.m_TilePixmap;
+	m_TextureOffset = other.m_TextureOffset;
+	m_bIsFlippedHorz = other.m_bIsFlippedHorz;
+	m_bIsFlippedVert = other.m_bIsFlippedVert;
+	m_bIsRotated = other.m_bIsRotated;
+	m_iAnimFrame = other.m_iAnimFrame;
+	m_iProbability = other.m_iProbability;
+	m_AutoTileMap = other.m_AutoTileMap;
+	m_VertexMap = other.m_VertexMap;
+
+	return *this;
+}
+
+TileData::~TileData()
+{
+}
+
 QJsonObject TileData::GetTileData() const
 {
 	QJsonObject tileDataObjOut;
@@ -106,6 +141,11 @@ QJsonObject TileData::GetTileData() const
 	tileDataObjOut["VertexMap"] = VertexArray;
 
 	return tileDataObjOut;
+}
+
+QPoint TileData::GetTextureOffset() const
+{
+	return m_TextureOffset;
 }
 
 QPixmap TileData::GetPixmap() const

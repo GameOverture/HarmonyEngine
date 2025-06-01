@@ -10,32 +10,45 @@
 #include "Global.h"
 #include "TileSetScene.h"
 #include "AtlasTileSet.h"
+#include "TileData.h"
 
-TileSetScene::TileSetScene() :
+TileSetScene::TileSetScene(AtlasTileSet &tileSetRef) :
 	QGraphicsScene(),
-	m_eSceneType(SCENETYPE_Importing),
+	m_TileSetRef(tileSetRef),
+	m_eMode(TILESETMODE_Importing),
+	m_pModeImportGroup(new QGraphicsItemGroup()),
+	m_pModeTileSetGroup(new QGraphicsItemGroup()),
 	m_vImportTileSize(0, 0)
 {
-	addItem(&m_ImportLabel);
+	addItem(m_pModeImportGroup);
+	addItem(m_pModeTileSetGroup);
 }
 
 /*virtual*/ TileSetScene::~TileSetScene()
 {
+	for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
+	{
+		m_pModeImportGroup->removeFromGroup(iter.value().first);
+		m_pModeImportGroup->removeFromGroup(iter.value().second);
+		delete iter.value().first;
+		delete iter.value().second;
+	}
+	m_ImportTileMap.clear();
 }
 
-void TileSetScene::Setup(AtlasTileSet *pTileSet)
+void TileSetScene::SetDisplayMode(TileSetMode eMode)
 {
-	m_ImportLabel.setVisible(false);
+	if(m_eMode == eMode)
+		return;
+
+	m_eMode = eMode;
+	m_pModeImportGroup->setVisible(m_eMode == TILESETMODE_Importing);
+	m_pModeTileSetGroup->setVisible(m_eMode == TILESETMODE_TileSet);
 }
 
 int TileSetScene::GetNumImportPixmaps() const
 {
-	return m_ImportTilePixmapList.size();
-}
-
-QVector<QGraphicsPixmapItem *> &TileSetScene::GetImportPixmapList()
-{
-	return m_ImportTilePixmapList;
+	return m_ImportTileMap.size();
 }
 
 QSize TileSetScene::GetImportTileSize() const
@@ -43,57 +56,72 @@ QSize TileSetScene::GetImportTileSize() const
 	return m_vImportTileSize;
 }
 
-void TileSetScene::RemoveImportPixmaps()
+QMap<QPoint, QPixmap> TileSetScene::AssembleImportMap()
 {
-	for(auto pPixmap : m_ImportTilePixmapList)
+	QMap<QPoint, QPixmap> importPixmapList;
+	for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
+		importPixmapList.insert(iter.key(), iter.value().second->pixmap());
+
+	return importPixmapList;
+}
+
+void TileSetScene::ClearImport()
+{
+	for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
 	{
-		removeItem(pPixmap);
-		delete pPixmap;
+		m_pModeImportGroup->removeFromGroup(iter.value().first); // removeFromGroup() leaves a dangling pointer, so delete it
+		delete iter.value().first;
+		m_pModeImportGroup->removeFromGroup(iter.value().second); // removeFromGroup() leaves a dangling pointer, so delete it
+		delete iter.value().second;
 	}
-	m_ImportTilePixmapList.clear();
+	m_ImportTileMap.clear();
 	m_vImportTileSize = QSize(0, 0);
 }
 
-void TileSetScene::AddImportPixmap(QPixmap pixmap)
+void TileSetScene::AddImport(QPoint ptGridPos, QPixmap pixmap)
 {
-	m_ImportTilePixmapList.append(addPixmap(pixmap));
-
 	if(m_vImportTileSize.width() < pixmap.width())
 		m_vImportTileSize.setWidth(pixmap.width());
 	if(m_vImportTileSize.height() < pixmap.height())
 		m_vImportTileSize.setHeight(pixmap.height());
+
+	QPoint ptCurPos(ptGridPos.x() * m_vImportTileSize.width(), ptGridPos.y() * m_vImportTileSize.height());
+
+	QGraphicsRectItem *pNewGfxRectItem = new QGraphicsRectItem(ptCurPos.x(), ptCurPos.y(), m_vImportTileSize.width() + 1, m_vImportTileSize.height() + 1);
+	pNewGfxRectItem->setPen(QPen(QBrush(QColor(0, 0, 0)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+	m_pModeImportGroup->addToGroup(pNewGfxRectItem);
+
+	QGraphicsPixmapItem *pNewGfxPixmapItem = new QGraphicsPixmapItem(pixmap);
+	ptCurPos += QPoint(1, 1);
+	pNewGfxPixmapItem->setPos(ptCurPos);
+	m_pModeImportGroup->addToGroup(pNewGfxPixmapItem);
+
+	m_ImportTileMap.insert(ptGridPos, QPair<QGraphicsRectItem *, QGraphicsPixmapItem *>(pNewGfxRectItem, pNewGfxPixmapItem));
 }
 
-void TileSetScene::ConstructImportScene()
+void TileSetScene::SyncImport()
 {
-	// NOTE: TileSet atlases are always "square"
-	//       COLUMNS = static_cast<int>(std::floor(std::sqrt(n)))
-	//       ROWS = static_cast<int>(std::ceil(static_cast<double>(n) / columns))
-	int iColumns = static_cast<int>(std::floor(std::sqrt(m_ImportTilePixmapList.size())));
-	int iRows = static_cast<int>(std::ceil(static_cast<double>(m_ImportTilePixmapList.size()) / iColumns));
-
-	ConstructImportScene(iColumns, iRows);
-}
-
-void TileSetScene::ConstructImportScene(int iNumColumns, int iNumRows)
-{
-	m_eSceneType = SCENETYPE_Importing;
-
-	for(auto pTileRectGfxItem : m_ImportTileRectList)
-	{
-		removeItem(pTileRectGfxItem);
-		delete pTileRectGfxItem;
-	}
-	m_ImportTileRectList.clear();
+	m_pModeImportGroup->addToGroup(&m_ImportLabel);
 
 	HyMargins<int> borderMargins(10, 10, 10, 3);
 	int iSpacingAmt = 5;
 	int iTitleHeight = 30;
 
+	int minX = INT_MAX, maxX = INT_MIN, minY = INT_MAX, maxY = INT_MIN;
+	for(const QPoint &pt : m_ImportTileMap.keys())
+	{
+		minX = HyMath::Min(minX, pt.x());
+		maxX = HyMath::Max(maxX, pt.x());
+		minY = HyMath::Min(minY, pt.y());
+		maxY = HyMath::Max(maxY, pt.y());
+	}
+	int iNumColumns = maxX - minX + 1;
+	int iNumRows = maxY - minY + 1;
+
 	m_ImportRect.setPen(QPen(QBrush(QColor(255, 255, 255)), 1.0f, Qt::DashLine));
 	m_ImportRect.setRect(0, 0, iNumColumns * m_vImportTileSize.width() + borderMargins.left + borderMargins.right + (iNumColumns - 1) * iSpacingAmt,
 							   borderMargins.top + iTitleHeight + (iNumRows * m_vImportTileSize.height()) + ((iNumRows - 1) * iSpacingAmt) + borderMargins.bottom);
-	addItem(&m_ImportRect);
+	m_pModeImportGroup->addToGroup(&m_ImportRect);
 
 	QPoint ptCurPos;
 	ptCurPos.setX(borderMargins.left);
@@ -106,21 +134,49 @@ void TileSetScene::ConstructImportScene(int iNumColumns, int iNumRows)
 	m_ImportLabel.setPlainText("Importing Tiles:");
 	ptCurPos.setY(ptCurPos.y() + iTitleHeight);
 
-	QPoint ptTileStartPos = ptCurPos;
-	int iPixmapIndex = 0;
-	for(int i = 0; i < iNumRows; ++i)
+	//QPoint ptTileStartPos = ptCurPos;
+	//int iPixmapIndex = 0;
+	//for(int i = 0; i < iNumRows; ++i)
+	//{
+	//	for(int j = 0; j < iNumColumns; ++j, ++iPixmapIndex)
+	//	{
+	//		QGraphicsRectItem *pNewGfxRectItem = new QGraphicsRectItem(ptCurPos.x(), ptCurPos.y(), m_vImportTileSize.width() + 1, m_vImportTileSize.height() + 1);
+	//		pNewGfxRectItem->setPen(QPen(QBrush(QColor(0, 0, 0)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+	//		m_pModeImportGroup->addToGroup(pNewGfxRectItem);
+	//		m_ImportTileRectList.append(pNewGfxRectItem);
+
+	//		ptCurPos += QPoint(1, 1);
+	//		m_ImportTilePixmapList[iPixmapIndex]->setPos(ptCurPos);
+	//		ptCurPos -= QPoint(1, 1);
+
+	//		ptCurPos.setX(ptCurPos.x() + m_vImportTileSize.width() + iSpacingAmt);
+	//	}
+
+	//	ptCurPos.setX(ptTileStartPos.x());
+	//	ptCurPos.setY(ptCurPos.y() + m_vImportTileSize.height() + iSpacingAmt);
+	//}
+}
+
+void TileSetScene::SyncTileSet()
+{
+	for(auto pTilePixmapGfxItem : m_TileSetPixmapItem)
 	{
-		for(int j = 0; j < iNumColumns; ++j, ++iPixmapIndex)
-		{
-			m_ImportTileRectList.append(addRect(ptCurPos.x(), ptCurPos.y(), m_vImportTileSize.width() + 1, m_vImportTileSize.height() + 1, QPen(QBrush(QColor(0, 0, 0)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)));
-			ptCurPos += QPoint(1, 1);
-			m_ImportTilePixmapList[iPixmapIndex]->setPos(ptCurPos);
-			ptCurPos -= QPoint(1, 1);
+		m_pModeTileSetGroup->removeFromGroup(pTilePixmapGfxItem); // removeFromGroup() leaves a dangling pointer, so delete it
+		delete pTilePixmapGfxItem;
+	}
+	m_TileSetPixmapItem.clear();
 
-			ptCurPos.setX(ptCurPos.x() + m_vImportTileSize.width() + iSpacingAmt);
-		}
+	QSize vTileSize = m_TileSetRef.GetTileSize();
+	QMap<QPoint, TileData *> tileDataMap = m_TileSetRef.GetTileDataMap();
 
-		ptCurPos.setX(ptTileStartPos.x());
-		ptCurPos.setY(ptCurPos.y() + m_vImportTileSize.height() + iSpacingAmt);
+	for(auto it = tileDataMap.begin(); it != tileDataMap.end(); ++it)
+	{
+		TileData *pTileData = it.value();
+		if(pTileData == nullptr)
+			continue;
+		QGraphicsPixmapItem *pNewPixmapItem = new QGraphicsPixmapItem(pTileData->GetPixmap());
+		pNewPixmapItem->setPos(it.key().x() * vTileSize.width(), it.key().y() * vTileSize.height());
+		m_pModeTileSetGroup->addToGroup(pNewPixmapItem);
+		m_TileSetPixmapItem.append(pNewPixmapItem);
 	}
 }

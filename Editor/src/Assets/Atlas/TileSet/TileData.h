@@ -52,8 +52,12 @@ class TileData
 public:
 	TileData(QPixmap tilePixmap);
 	TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap);
+	TileData(const TileData &other);
+	TileData &operator=(const TileData &other);
+	~TileData();
 	
 	QJsonObject GetTileData() const;
+	QPoint GetTextureOffset() const;
 	QPixmap GetPixmap() const;
 };
 
