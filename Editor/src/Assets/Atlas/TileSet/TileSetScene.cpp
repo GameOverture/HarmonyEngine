@@ -11,13 +11,14 @@
 #include "TileSetScene.h"
 #include "AtlasTileSet.h"
 #include "TileData.h"
+#include "TileGfxItem.h"
 
-TileSetScene::TileSetScene(AtlasTileSet &tileSetRef) :
+TileSetScene::TileSetScene() :
 	QGraphicsScene(),
-	m_TileSetRef(tileSetRef),
+	m_pTileSet(nullptr),
 	m_eMode(TILESETMODE_Importing),
-	m_pModeImportGroup(new QGraphicsItemGroup()),
-	m_pModeTileSetGroup(new QGraphicsItemGroup()),
+	m_pModeImportGroup(new TileSetGroupItem()),
+	m_pModeTileSetGroup(new TileSetGroupItem()),
 	m_vImportTileSize(0, 0)
 {
 	addItem(m_pModeImportGroup);
@@ -36,14 +37,19 @@ TileSetScene::TileSetScene(AtlasTileSet &tileSetRef) :
 	m_ImportTileMap.clear();
 }
 
+void TileSetScene::Initialize(AtlasTileSet *pTileSet)
+{
+	m_pTileSet = pTileSet;
+	SyncTileSet();
+	SetDisplayMode(m_eMode);
+}
+
 void TileSetScene::SetDisplayMode(TileSetMode eMode)
 {
-	if(m_eMode == eMode)
-		return;
-
 	m_eMode = eMode;
 	m_pModeImportGroup->setVisible(m_eMode == TILESETMODE_Importing);
 	m_pModeTileSetGroup->setVisible(m_eMode == TILESETMODE_TileSet);
+	update();
 }
 
 int TileSetScene::GetNumImportPixmaps() const
@@ -92,8 +98,6 @@ void TileSetScene::AddImport(QPoint ptGridPos, QPixmap pixmap)
 	m_pModeImportGroup->addToGroup(pNewGfxRectItem);
 
 	QGraphicsPixmapItem *pNewGfxPixmapItem = new QGraphicsPixmapItem(pixmap);
-	ptCurPos += QPoint(1, 1);
-	pNewGfxPixmapItem->setPos(ptCurPos);
 	m_pModeImportGroup->addToGroup(pNewGfxPixmapItem);
 
 	m_ImportTileMap.insert(ptGridPos, QPair<QGraphicsRectItem *, QGraphicsPixmapItem *>(pNewGfxRectItem, pNewGfxPixmapItem));
@@ -132,7 +136,18 @@ void TileSetScene::SyncImport()
 	m_ImportLabel.setFont(QFont("Arial", 12));
 	m_ImportLabel.setDefaultTextColor(QColor(255, 255, 255));
 	m_ImportLabel.setPlainText("Importing Tiles:");
-	ptCurPos.setY(ptCurPos.y() + iTitleHeight);
+	//ptCurPos.setY(ptCurPos.y() + iTitleHeight);
+
+	for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
+	{
+		QPoint ptTilePos = iter.key();
+		ptCurPos.setX(borderMargins.left + (ptTilePos.x() * (m_vImportTileSize.width() + iSpacingAmt)));
+		ptCurPos.setY(borderMargins.top + iTitleHeight + (ptTilePos.y() * (m_vImportTileSize.height() + iSpacingAmt)));
+		iter.value().first->setRect(ptCurPos.x(), ptCurPos.y(), m_vImportTileSize.width() + 1, m_vImportTileSize.height() + 1);
+
+		ptCurPos = QPoint(ptCurPos.x() + 1, ptCurPos.y() + 1); // offset by 1 pixel to avoid overlap with rect
+		iter.value().second->setPos(ptCurPos);
+	}
 
 	//QPoint ptTileStartPos = ptCurPos;
 	//int iPixmapIndex = 0;
@@ -159,6 +174,12 @@ void TileSetScene::SyncImport()
 
 void TileSetScene::SyncTileSet()
 {
+	if(m_pTileSet == nullptr)
+	{
+		HyGuiLog("TileSetScene::SyncTileSet() - m_pTileSet is null, invoke TileSetScene::Initialize() first", LOGTYPE_Error);
+		return;
+	}
+
 	for(auto pTilePixmapGfxItem : m_TileSetPixmapItem)
 	{
 		m_pModeTileSetGroup->removeFromGroup(pTilePixmapGfxItem); // removeFromGroup() leaves a dangling pointer, so delete it
@@ -166,16 +187,25 @@ void TileSetScene::SyncTileSet()
 	}
 	m_TileSetPixmapItem.clear();
 
-	QSize vTileSize = m_TileSetRef.GetTileSize();
-	QMap<QPoint, TileData *> tileDataMap = m_TileSetRef.GetTileDataMap();
+	QMap<QPoint, TileData *> tileDataMap = m_pTileSet->GetTileDataMap();
 
 	for(auto it = tileDataMap.begin(); it != tileDataMap.end(); ++it)
 	{
 		TileData *pTileData = it.value();
 		if(pTileData == nullptr)
 			continue;
-		QGraphicsPixmapItem *pNewPixmapItem = new QGraphicsPixmapItem(pTileData->GetPixmap());
+		TileGfxItem *pNewPixmapItem = new TileGfxItem(pTileData->GetPixmap());
+		QSizeF vTileSize = pNewPixmapItem->boundingRect().size();
+
 		pNewPixmapItem->setPos(it.key().x() * vTileSize.width(), it.key().y() * vTileSize.height());
+		// Allow mouse input on graphics item
+		pNewPixmapItem->setAcceptHoverEvents(true);
+		pNewPixmapItem->setAcceptTouchEvents(true);
+		pNewPixmapItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+		pNewPixmapItem->setFlag(QGraphicsItem::ItemIsMovable, true);
+		pNewPixmapItem->setFlag(QGraphicsItem::ItemIsFocusable, true);
+		pNewPixmapItem->setFlag(QGraphicsItem::ItemSendsScenePositionChanges, true);
+
 		m_pModeTileSetGroup->addToGroup(pNewPixmapItem);
 		m_TileSetPixmapItem.append(pNewPixmapItem);
 	}

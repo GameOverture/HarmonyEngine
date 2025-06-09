@@ -79,10 +79,14 @@ if(Qt5_DIR)
 		src/Assets/Atlas/AtlasTileSet.h
 		src/Assets/Atlas/TileSet/TileData.cpp
 		src/Assets/Atlas/TileSet/TileData.h
+		src/Assets/Atlas/TileSet/TileGfxItem.cpp
+		src/Assets/Atlas/TileSet/TileGfxItem.h
 		src/Assets/Atlas/TileSet/TileSetScene.cpp
 		src/Assets/Atlas/TileSet/TileSetScene.h
 		src/Assets/Atlas/TileSet/TileSetUndoCmds.cpp
 		src/Assets/Atlas/TileSet/TileSetUndoCmds.h
+		src/Assets/Atlas/TileSet/TileSetView.cpp
+		src/Assets/Atlas/TileSet/TileSetView.h
 		src/Assets/Audio/AudioAssetsWidget.cpp
 		src/Assets/Audio/AudioAssetsWidget.h
 		src/Assets/Audio/AudioAssetsWidget.ui

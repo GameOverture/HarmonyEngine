@@ -26,11 +26,25 @@ AtlasModel::AtlasModel(Project &projRef) :
 	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0)
 {
 	QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));
-	if(!tileSetMetaFile.open(QIODevice::ReadOnly | QIODevice::Text))
-		HyGuiLog("Failed to open tile set meta file: " + tileSetMetaFile.fileName(), LOGTYPE_Error);
+	QFile tileSetDataFile(m_DataDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_DataExt));
+	if(tileSetMetaFile.exists() == false && tileSetDataFile.exists() == false)
+		WriteTileSetsToDisk();
 
-	QJsonDocument tileSetMetaDoc = QJsonDocument::fromJson(tileSetMetaFile.readAll());
-	m_TileSetsDataPair.m_Meta = tileSetMetaDoc.object();
+	if(tileSetMetaFile.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		QJsonDocument tileSetMetaDoc = QJsonDocument::fromJson(tileSetMetaFile.readAll());
+		m_TileSetsDataPair.m_Meta = tileSetMetaDoc.object();
+	}
+	else
+		HyGuiLog("Failed to create or open tile set meta file: " + tileSetMetaFile.fileName(), LOGTYPE_Error);
+
+	if(tileSetDataFile.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		QJsonDocument tileSetDataDoc = QJsonDocument::fromJson(tileSetDataFile.readAll());
+		m_TileSetsDataPair.m_Data = tileSetDataDoc.object();
+	}
+	else
+		HyGuiLog("Failed to create or open tile set data file: " + tileSetDataFile.fileName(), LOGTYPE_Error);
 }
 
 /*virtual*/ AtlasModel::~AtlasModel()
@@ -232,6 +246,22 @@ void AtlasModel::WriteTileSetsToDisk()
 			HyGuiLog("Could not write to meta data file: " % tileSetMetaFile.errorString(), LOGTYPE_Error);
 
 		tileSetMetaFile.close();
+	}
+
+	// Save Runtime Data
+	QFile tileSetDataFile(m_DataDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_DataExt));
+	if(!tileSetDataFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+		HyGuiLog("Couldn't open TileSet data file for writing: " % tileSetDataFile.errorString(), LOGTYPE_Error);
+	else
+	{
+		m_TileSetsDataPair.m_Data.insert("$fileVersion", HYGUI_FILE_VERSION);
+
+		QJsonDocument dataDoc;
+		dataDoc.setObject(m_TileSetsDataPair.m_Data);
+		qint64 iBytesWritten = tileSetDataFile.write(dataDoc.toJson());
+		if(0 == iBytesWritten || -1 == iBytesWritten)
+			HyGuiLog("Could not write to data file: " % tileSetDataFile.errorString(), LOGTYPE_Error);
+		tileSetDataFile.close();
 	}
 }
 

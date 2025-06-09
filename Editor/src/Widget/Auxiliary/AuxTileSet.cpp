@@ -38,8 +38,6 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 
 	ui->splitter->setSizes(QList<int>() << 140 << width() - 140);
 
-	
-
 	connect(ui->vsbTileSize, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnTileSizeChanged(QVariant)));
 	connect(ui->vsbStartOffset, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnStartOffsetChanged(QVariant)));
 	connect(ui->vsbPadding, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnPaddingChanged(QVariant)));
@@ -56,14 +54,18 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 		return;
 
 	m_pTileSet = pTileSet;
-	ui->lblInfo->setText(m_pTileSet->GetTileSetInfo());
+	RefreshInfo();
 
 	if(m_pTileSet->GetTileSize().isValid() == false)
 		m_pTileSet->SetTileSize(QSize(g_iDefaultTileSize, g_iDefaultTileSize));
 	ui->vsbTileSize->SetValue(QPoint(m_pTileSet->GetTileSize().width(), m_pTileSet->GetTileSize().height()));
 
+	ui->btnSave->setDefaultAction(m_pTileSet->GetSaveAction());
 	ui->btnUndo->setDefaultAction(m_pTileSet->GetUndoAction());
 	ui->btnRedo->setDefaultAction(m_pTileSet->GetRedoAction());
+
+	connect(m_pTileSet->GetUndoStack(), SIGNAL(cleanChanged(bool)), this, SLOT(on_undoStack_cleanChanged(bool)));
+	connect(m_pTileSet->GetUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(on_undoStack_indexChanged(int)));
 
 	SetImportWidgets();
 
@@ -73,7 +75,20 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 		ui->tabWidget->setCurrentIndex(TAB_Properties);
 
 	ui->graphicsView->setScene(m_pTileSet->GetGfxScene());
+	
+	// Allow the graphicsView take mouse input
+}
 
+AtlasTileSet *AuxTileSet::GetTileSet() const
+{
+	return m_pTileSet;
+}
+
+void AuxTileSet::RefreshInfo()
+{
+	ui->lblIcon->setPixmap( m_pTileSet->GetTileSetIcon().pixmap(QSize(16,16)));
+	ui->lblName->setText(m_pTileSet->GetName());
+	ui->lblInfo->setText(m_pTileSet->GetTileSetInfo());
 }
 
 void AuxTileSet::SetImportWidgets()
@@ -104,6 +119,9 @@ void AuxTileSet::SetImportWidgets()
 	// Switching widgets
 	m_bIsImportingTileSheet = bTileSheet;
 	ui->grpSlicingOptions->setVisible(m_bIsImportingTileSheet);
+
+	m_pTileSet->GetGfxScene()->ClearImport();
+	m_pTileSet->GetGfxScene()->SetDisplayMode(TILESETMODE_Importing);
 
 	ErrorCheckImport();
 }
@@ -212,6 +230,23 @@ bool AuxTileSet::IsPixmapAllTransparent(const QPixmap &pixmap)
 	}
 
 	return true; // All pixels are transparent
+}
+
+void AuxTileSet::on_undoStack_cleanChanged(bool bClean)
+{
+	RefreshInfo();
+}
+
+void AuxTileSet::on_undoStack_indexChanged(int iIndex)
+{
+	RefreshInfo();
+}
+
+void AuxTileSet::on_actionSave_triggered()
+{
+
+
+	RefreshInfo();
 }
 
 void AuxTileSet::on_tabWidget_currentChanged(int iIndex)

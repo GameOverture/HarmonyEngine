@@ -39,24 +39,27 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 						   uint uiErrors) :
 	AtlasFrame(ITEM_AtlasTileSet, modelRef, ITEM_AtlasTileSet, uuid, uiChecksum, uiBankId, sName, 0, 0, 0, 0, texInfo, uiW, uiH, uiX, uiY, iTextureIndex, uiErrors),
 	m_TileSetDataPair(tileSetDataPair),
-	m_bExistencePendingSave(bIsPendingSave),
-	m_GfxScene(*this)
+	m_bExistencePendingSave(bIsPendingSave)
 {
+	m_ActionSave.setIcon(QIcon(":/icons16x16/file-save.png"));
+	m_ActionSave.setShortcuts(QKeySequence::Save);
+	m_ActionSave.setShortcutContext(Qt::WidgetShortcut);
+	m_ActionSave.setToolTip("Save Tile Set and pack into Atlas manager");
+	m_ActionSave.setObjectName("Save");
+	QObject::connect(&m_ActionSave, &QAction::triggered, this, &AtlasTileSet::on_actionSave_triggered);
+
 	m_pUndoStack = new QUndoStack(this);
 	m_pActionUndo = m_pUndoStack->createUndoAction(nullptr, "&Undo");
 	m_pActionUndo->setIcon(QIcon(":/icons16x16/edit-undo.png"));
 	m_pActionUndo->setShortcuts(QKeySequence::Undo);
-	m_pActionUndo->setShortcutContext(Qt::ApplicationShortcut);
+	m_pActionUndo->setShortcutContext(Qt::WidgetShortcut);
 	m_pActionUndo->setObjectName("Undo");
 
 	m_pActionRedo = m_pUndoStack->createRedoAction(nullptr, "&Redo");
 	m_pActionRedo->setIcon(QIcon(":/icons16x16/edit-redo.png"));
 	m_pActionRedo->setShortcuts(QKeySequence::Redo);
-	m_pActionRedo->setShortcutContext(Qt::ApplicationShortcut);
+	m_pActionRedo->setShortcutContext(Qt::WidgetShortcut);
 	m_pActionRedo->setObjectName("Redo");
-
-	connect(m_pUndoStack, SIGNAL(cleanChanged(bool)), this, SLOT(on_undoStack_cleanChanged(bool)));
-	connect(m_pUndoStack, SIGNAL(indexChanged(int)), this, SLOT(on_undoStack_indexChanged(int)));
 
 	if(m_TileSetDataPair.m_Meta.empty() == false)
 	{
@@ -110,11 +113,15 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 		}
 	}
 
-	m_GfxScene.SyncTileSet();
+	m_GfxScene.Initialize(this);
 }
 
 AtlasTileSet::~AtlasTileSet()
 {
+	for(auto it = m_TileDataMap.begin(); it != m_TileDataMap.end(); ++it)
+		delete it.value();
+
+	delete m_pUndoStack;
 }
 
 int AtlasTileSet::GetNumTiles() const
@@ -261,6 +268,11 @@ QUndoStack *AtlasTileSet::GetUndoStack()
 	return m_pUndoStack;
 }
 
+QAction *AtlasTileSet::GetSaveAction()
+{
+	return &m_ActionSave;
+}
+
 QAction *AtlasTileSet::GetUndoAction()
 {
 	return m_pActionUndo;
@@ -337,14 +349,6 @@ bool AtlasTileSet::Save(bool bWriteToDisk)
 	GetLatestFileData(m_TileSetDataPair);
 	static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetDataPair, bWriteToDisk);
 
-	//if(bWriteToDisk)
-	//{
-	//	if(m_pWidget)
-	//		m_pWidget->update();
-	//	MainWindow::GetExplorerWidget().update();
-	//	MainWindow::GetAuxWidget(AUXTAB_DopeSheet)->update();
-	//}
-
 	return true;
 }
 
@@ -419,41 +423,7 @@ void AtlasTileSet::RegenerateSubAtlas()
 	Save(true);
 }
 
-void AtlasTileSet::on_undoStack_cleanChanged(bool bClean)
+void AtlasTileSet::on_actionSave_triggered()
 {
-	//ProjectTabBar *pTabBar = m_pProject->GetTabBar();
-	//for(int i = 0; i < pTabBar->count(); ++i)
-	//{
-	//	if(pTabBar->tabData(i).value<ProjectItemData *>() == this)
-	//	{
-	//		if(bClean)
-	//		{
-	//			pTabBar->setTabText(i, GetName(false));
-	//			pTabBar->setTabIcon(i, GetIcon(SUBICON_None));
-	//		}
-	//		else
-	//		{
-	//			pTabBar->setTabText(i, GetName(false) + "*");
-	//			pTabBar->setTabIcon(i, GetIcon(SUBICON_Dirty));
-	//		}
 
-	//		QModelIndex index = MainWindow::GetExplorerModel().FindIndex<ProjectItemData *>(this, 0);
-	//		MainWindow::GetExplorerModel().dataChanged(index, index, QVector<int>() << Qt::DecorationRole);
-
-	//		break;
-	//	}
-	//}
-
-	//m_pProject->ApplySaveEnables();
-}
-
-void AtlasTileSet::on_undoStack_indexChanged(int iIndex)
-{
-	//if(m_pDraw == nullptr || m_pWidget == nullptr)
-	//	return;
-
-	//m_pDraw->OnUndoStackIndexChanged(iIndex);
-	//m_pDraw->ApplyJsonData();
-
-	//m_pWidget->UpdateActions();
 }

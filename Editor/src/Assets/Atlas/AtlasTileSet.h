@@ -37,6 +37,7 @@ class AtlasTileSet : public AtlasFrame
 	bool						m_bExistencePendingSave;
 	
 	QUndoStack *				m_pUndoStack;
+	QAction						m_ActionSave;
 	QAction *					m_pActionUndo;
 	QAction *					m_pActionRedo;
 	
@@ -122,6 +123,7 @@ public:
 	QList<QPair<QPoint, TileData *>> Cmd_RemoveTiles(QVector<TileData *> tileDataList);
 	void Cmd_ReaddTiles(QList<QPair<QPoint, TileData *>> tileDataList);
 
+	QAction *GetSaveAction();
 	QUndoStack *GetUndoStack();
 	QAction *GetUndoAction();
 	QAction *GetRedoAction();
@@ -139,8 +141,7 @@ protected:
 	void RegenerateSubAtlas(); // Assumes m_TileDataList is up to date. This will regenerate the sub-atlas texture and update each TileData
 
 private Q_SLOTS:
-	void on_undoStack_cleanChanged(bool bClean);
-	void on_undoStack_indexChanged(int iIndex);
+	void on_actionSave_triggered();
 };
 
 #endif // ATLASTILESET_H
