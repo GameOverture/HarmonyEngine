@@ -72,6 +72,8 @@ SpineDraw::~SpineDraw()
 
 void SpineDraw::SetCrossFadePreview(SpineCrossFade *pCrossFade)
 {
+#ifdef HY_USE_SPINE
 	m_Spine.SetAnimation(0, m_Spine.GetAnim(pCrossFade->m_sAnimOne.toStdString()), false);
 	m_Spine.AddAnimation(0, m_Spine.GetAnim(pCrossFade->m_sAnimTwo.toStdString()), false, 0.0f);
+#endif
 }

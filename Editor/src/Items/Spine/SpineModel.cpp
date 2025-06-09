@@ -211,6 +211,7 @@ SpineCrossFadeModel &SpineModel::GetCrossFadeModel()
 
 bool SpineModel::GetNextCrossFadeAnims(QList<QPair<QString, QString>> &crossFadePairListOut)
 {
+#ifdef HY_USE_SPINE
 	spine::Vector<spine::Animation *> &animListRef = m_pSkeletonData->getAnimations();
 	if(animListRef.size() < 2)
 		return false;
@@ -235,6 +236,9 @@ bool SpineModel::GetNextCrossFadeAnims(QList<QPair<QString, QString>> &crossFade
 	}
 	
 	return true;
+#else
+	return false;
+#endif
 }
 
 /*virtual*/ void SpineModel::OnPopState(int iPoppedStateIndex) /*override*/
@@ -565,6 +569,7 @@ void SpineModel::AcquireSpineData()
 
 void SpineModel::RegenAnimationStateData()
 {
+#ifdef HY_USE_SPINE
 	if(m_pAnimStateData == nullptr)
 		m_pAnimStateData = HY_NEW spine::AnimationStateData(m_pSkeletonData);
 	else
@@ -574,4 +579,5 @@ void SpineModel::RegenAnimationStateData()
 	
 	m_pAnimStateData->setDefaultMix(m_pDefaultMixMapper->GetValue());
 	//m_pAnimStateData->setMix(
+#endif
 }
