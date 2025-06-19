@@ -210,3 +210,25 @@ void TileSetScene::SyncTileSet()
 		m_TileSetPixmapItem.append(pNewPixmapItem);
 	}
 }
+
+void TileSetScene::OnMarqueeRelease(QPoint ptStartDrag, QPoint ptEndDrag)
+{
+	if(m_eMode == TILESETMODE_Importing)
+	{
+		QPointF ptTopLeft, ptBotRight;
+		ptTopLeft.setX(HyMath::Min(ptStartDrag.x(), ptEndDrag.x()));
+		ptTopLeft.setY(HyMath::Min(ptStartDrag.y(), ptEndDrag.y()));
+		ptBotRight.setX(HyMath::Max(ptStartDrag.x(), ptEndDrag.x()));
+		ptBotRight.setY(HyMath::Max(ptStartDrag.y(), ptEndDrag.y()));
+
+		QRectF sceneRect(ptTopLeft, ptBotRight);
+		// Determine which tiles were selected and toggle their import or not
+		for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
+		{
+			if(iter->first->boundingRect().contains(sceneRect))
+			{
+				//iter->
+			}
+		}
+	}
+}

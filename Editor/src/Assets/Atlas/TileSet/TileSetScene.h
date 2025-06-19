@@ -14,7 +14,6 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
 
-
 class AtlasTileSet;
 class TileGfxItem;
 
@@ -71,6 +70,8 @@ public:
 	void SyncImport();
 
 	void SyncTileSet(); // Slow, deletes/reallocates all graphics items
+
+	void OnMarqueeRelease(QPoint ptStartDrag, QPoint ptEndDrag);
 };
 
 #endif // TILESETSCENE_H

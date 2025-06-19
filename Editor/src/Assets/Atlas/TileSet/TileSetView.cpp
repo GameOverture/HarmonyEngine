@@ -113,6 +113,11 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 	if(DRAGSTATE_Dragging == m_eDragState)
 	{
 		QPointF ptSceneDragStart = mapToScene(m_ptDragStart);
+
+		// TODO: Start here!
+		//GetScene()->OnMarqueeRelease(m_ptDragStart, pEvent);
+
+
 		//TileSetUndoCmd_DropTiles *pCmd = new TileSetUndoCmd_DropTiles();
 		//m_pAuxTileSet->GetTileSet()->GetUndoStack()->push(pCmd);
 	}
