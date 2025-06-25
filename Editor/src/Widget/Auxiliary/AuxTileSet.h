@@ -27,6 +27,7 @@ class AuxTileSet : public QWidget
 
 	bool										m_bIsImportingTileSheet;
 	QPixmap *									m_pImportTileSheetPixmap;
+	QPolygonF									m_ImportPolygon;
 
 	enum TabIndex
 	{
@@ -65,6 +66,7 @@ private Q_SLOTS:
 	void on_btnImageBrowse_clicked();
 
 	void OnTileSizeChanged(QVariant newSize);
+	void OnTextureRegionChanged(QVariant newSize);
 	void OnStartOffsetChanged(QVariant newOffset);
 	void OnPaddingChanged(QVariant newPadding);
 

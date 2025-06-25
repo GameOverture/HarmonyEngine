@@ -17,10 +17,6 @@
 #include <QJsonObject>
 #include <QDataStream>
 
-// Atlas Indices are row-major order
-// TileSet texture sub-atlas' rows and columns is made based on the total # of tiles
-//     COLUMNS = static_cast<int>(std::floor(std::sqrt(n)))
-//     ROWS    = static_cast<int>(std::ceil(static_cast<double>(n) / columns))
 class TileData
 {
 	QPixmap											m_TilePixmap;

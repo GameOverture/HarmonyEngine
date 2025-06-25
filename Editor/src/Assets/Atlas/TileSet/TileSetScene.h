@@ -48,7 +48,24 @@ class TileSetScene : public QGraphicsScene
 
 	QGraphicsRectItem												m_ImportRect;		// A dash-line box that encompasses the entire import scene
 	QGraphicsTextItem												m_ImportLabel;		// Main label/title of the import scene
-	QMap<QPoint, QPair<QGraphicsRectItem *, QGraphicsPixmapItem *>>	m_ImportTileMap;
+	struct ImportTileItem
+	{
+		QGraphicsRectItem *											m_pRectItem;
+		QGraphicsPixmapItem *										m_pPixmapItem;
+		QGraphicsPolygonItem *										m_pOutlineItem;		// This is the outline of the tile as it sits in a grid, especially helpful for isometric and hexagon
+
+		//ImportTileItem() :
+		//	m_pRectItem(nullptr),
+		//	m_pPixmapItem(nullptr),
+		//	m_pOutlineItem(nullptr)
+		//{ }
+		ImportTileItem(QGraphicsRectItem *pRect, QGraphicsPixmapItem *pPixmap, QGraphicsPolygonItem *pOutline) :
+			m_pRectItem(pRect),
+			m_pPixmapItem(pPixmap),
+			m_pOutlineItem(pOutline)
+		{ }
+	};
+	QMap<QPoint, ImportTileItem>									m_ImportTileMap;
 	QSize															m_vImportTileSize;
 
 	QVector<TileGfxItem *>											m_TileSetPixmapItem;// The tile set pixmap item that is displayed in the tiles scene
@@ -66,7 +83,7 @@ public:
 	QMap<QPoint, QPixmap> AssembleImportMap();
 
 	void ClearImport();
-	void AddImport(QPoint ptGridPos, QPixmap pixmap);
+	void AddImport(const QPolygonF &outlinePolygon, QPoint ptGridPos, QPixmap pixmap);
 	void SyncImport();
 
 	void SyncTileSet(); // Slow, deletes/reallocates all graphics items

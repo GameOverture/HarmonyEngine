@@ -43,7 +43,10 @@ class AtlasTileSet : public AtlasFrame
 	
 	TileSetScene				m_GfxScene;
 
-	QSize						m_TileSize;
+	TileSetType					m_eTileType;
+	QSize						m_RegionSize;					// The size of the atlas cutout dimensions (not necessarily the size of the tile)
+	QSize						m_TileSize;						// User specified size that is used in conjunction with m_eTileType to create m_TilePolygon
+	QPolygonF					m_TilePolygon;					// Represents the actual tile, that is able to be arranged in a TileMap (grid)
 
 	struct AutoTile
 	{
@@ -91,7 +94,12 @@ class AtlasTileSet : public AtlasFrame
 	//	TileData *m_pStartTile;
 	//};
 
-	QMap<QPoint, TileData *>				m_TileDataMap;			// Map of all imported TileData objects in this tile set. Each key is a grid meta-location that is presented to the user, and not its location on the sub-atlas texture
+	// Map of all imported TileData objects in this tile set. Each key is a grid meta-location that is presented to the user, and not its location on the sub-atlas texture
+	// Atlas Indices are row-major order
+	// TileSet texture sub-atlas' rows and columns is made based on the total # of tiles
+	//     COLUMNS = static_cast<int>(std::floor(std::sqrt(n)))
+	//     ROWS    = static_cast<int>(std::ceil(static_cast<double>(n) / columns))
+	QMap<QPoint, TileData *>	m_TileDataMap;
 
 public:
 	AtlasTileSet(IManagerModel &modelRef,
@@ -108,8 +116,18 @@ public:
 	~AtlasTileSet();
 
 	int GetNumTiles() const;
+	
+	TileSetType GetTileType() const;
+	void SetTileType(TileSetType eTileSetType);
+
+	QSize GetAtlasRegionSize() const;
+	void SetAtlasRegionSize(QSize size);
+
 	QSize GetTileSize() const;
 	void SetTileSize(QSize size);
+
+	QPolygonF GetTilePolygon() const;
+	void SetTilePolygon(const QPolygonF &polygonRef);
 
 	QString GetTileSetInfo() const;
 	QIcon GetTileSetIcon() const;
@@ -119,7 +137,7 @@ public:
 	TileSetScene *GetGfxScene();
 
 	// Cmd functions are the only functions that change the data (via Undo/Redo)
-	QList<QPair<QPoint, TileData *>> Cmd_AppendNewTiles(QSize vTileSize, const QMap<QPoint, QPixmap> &importBatchMap, Qt::Edge eAppendEdge);
+	QList<QPair<QPoint, TileData *>> Cmd_AppendNewTiles(QSize vRegionSize, const QMap<QPoint, QPixmap> &importBatchMap, Qt::Edge eAppendEdge);
 	QList<QPair<QPoint, TileData *>> Cmd_RemoveTiles(QVector<TileData *> tileDataList);
 	void Cmd_ReaddTiles(QList<QPair<QPoint, TileData *>> tileDataList);
 

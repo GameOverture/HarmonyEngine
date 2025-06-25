@@ -6,14 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>656</width>
+    <width>841</width>
     <height>415</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout_7">
+   <property name="spacing">
+    <number>2</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -27,6 +30,149 @@
     <number>0</number>
    </property>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="lblIcon">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../../../data/HyEditor.qrc">:/icons16x16/items/TileSet.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblName">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>19</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line">
+       <property name="minimumSize">
+        <size>
+         <width>20</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Tile Shape</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cmbTileShape"/>
+     </item>
+     <item>
+      <widget class="WgtVectorSpinBox" name="vsbTileSize" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>19</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_5">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblInfo">
+       <property name="text">
+        <string>&lt;Info&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnSave">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnUndo">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnRedo">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -34,89 +180,20 @@
      <widget class="QWidget" name="verticalLayoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="spacing">
-          <number>2</number>
-         </property>
-         <item>
-          <widget class="Line" name="line">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="lblIcon">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="pixmap">
-            <pixmap resource="../../../data/HyEditor.qrc">:/icons16x16/items/TileSet.png</pixmap>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="lblName">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="lblInfo">
-           <property name="text">
-            <string>&lt;Info&gt;</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="btnSave">
-           <property name="text">
-            <string>...</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="Line" name="line_2">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="btnUndo">
-           <property name="text">
-            <string>...</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="btnRedo">
-           <property name="text">
-            <string>...</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
         <widget class="QTabWidget" name="tabWidget">
+         <property name="tabShape">
+          <enum>QTabWidget::Triangular</enum>
+         </property>
          <property name="currentIndex">
           <number>1</number>
          </property>
-         <widget class="QWidget" name="tabAddRemove">
+         <widget class="QWidget" name="tabImport">
           <attribute name="icon">
            <iconset resource="../../../data/HyEditor.qrc">
             <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
           </attribute>
           <attribute name="title">
-           <string>Add/Remove Tiles</string>
+           <string>Import New Tiles</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
@@ -183,7 +260,7 @@
                  <string>The size of each tile within the tile sheet. The TileSet will use the largest tiles' size for all tiles</string>
                 </property>
                 <property name="text">
-                 <string>Tile Size</string>
+                 <string>Texture Region</string>
                 </property>
                </widget>
               </item>
@@ -207,14 +284,14 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <widget class="WgtVectorSpinBox" name="vsbTileSize" native="true"/>
-              </item>
               <item row="1" column="1">
                <widget class="WgtVectorSpinBox" name="vsbStartOffset" native="true"/>
               </item>
               <item row="2" column="1">
                <widget class="WgtVectorSpinBox" name="vsbPadding" native="true"/>
+              </item>
+              <item row="0" column="1">
+               <widget class="WgtVectorSpinBox" name="vsbTextureRegion" native="true"/>
               </item>
              </layout>
             </widget>
@@ -300,13 +377,13 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="tabProperties">
+         <widget class="QWidget" name="tabSetup">
           <attribute name="icon">
            <iconset resource="../../../data/HyEditor.qrc">
             <normaloff>:/icons16x16/items/TileSet-Settings.png</normaloff>:/icons16x16/items/TileSet-Settings.png</iconset>
           </attribute>
           <attribute name="title">
-           <string>Properties</string>
+           <string>Setup</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <property name="leftMargin">
@@ -330,7 +407,16 @@
        </item>
       </layout>
      </widget>
-     <widget class="TileSetView" name="graphicsView"/>
+     <widget class="QWidget" name="verticalLayoutWidget_2">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="spacing">
+        <number>2</number>
+       </property>
+       <item>
+        <widget class="TileSetView" name="graphicsView"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

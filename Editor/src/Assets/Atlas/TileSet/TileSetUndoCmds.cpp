@@ -12,11 +12,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItemRef, const QMap<QPoint, QPixmap> &pixmapMapRef, QSize vTileSize, Qt::Edge eAppendEdge, QUndoCommand *pParent /*= nullptr*/) :
+TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItemRef, const QMap<QPoint, QPixmap> &pixmapMapRef, QSize vRegionSize, Qt::Edge eAppendEdge, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_eAppendEdge(eAppendEdge),
 	m_TileSetRef(tileSetItemRef),
-	m_TileSize(vTileSize),
+	m_RegionSize(vRegionSize),
 	m_PixmapMap(pixmapMapRef)
 {
 	setText("Add " % QString::number(m_PixmapMap.size()) % " Tiles");
@@ -29,7 +29,7 @@ TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItem
 /*virtual*/ void TileSetUndoCmd_AppendTiles::redo() /*override*/
 {
 	if(m_AppendedTilesList.empty())
-		m_AppendedTilesList = m_TileSetRef.Cmd_AppendNewTiles(m_TileSize, m_PixmapMap, m_eAppendEdge);
+		m_AppendedTilesList = m_TileSetRef.Cmd_AppendNewTiles(m_RegionSize, m_PixmapMap, m_eAppendEdge);
 	else
 		m_TileSetRef.Cmd_ReaddTiles(m_AppendedTilesList);
 }

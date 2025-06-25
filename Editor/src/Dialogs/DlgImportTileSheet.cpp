@@ -22,11 +22,11 @@
 #include <QPainter>
 #include <QMessageBox>
 
-const int g_iDefaultTileSize = 32;
+const int g_iDEFAULT_TILE_SIZE = 32;
 
 DlgImportTileSheet::DlgImportTileSheet(AtlasTileSet &tileSetRef, QWidget *parent) :
 	QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-	m_DefaultTileSize(tileSetRef.GetTileSize()),
+	m_DefaultTileSize(tileSetRef.GetAtlasRegionSize()),
 	m_TileSetRef(tileSetRef),
 	m_pOrigPixmap(nullptr),
 	ui(new Ui::DlgImportTileSheet)
@@ -36,8 +36,8 @@ DlgImportTileSheet::DlgImportTileSheet(AtlasTileSet &tileSetRef, QWidget *parent
 
 	if(m_DefaultTileSize.isValid() == false)
 	{
-		m_DefaultTileSize.setWidth(g_iDefaultTileSize);
-		m_DefaultTileSize.setHeight(g_iDefaultTileSize);
+		m_DefaultTileSize.setWidth(g_iDEFAULT_TILE_SIZE);
+		m_DefaultTileSize.setHeight(g_iDEFAULT_TILE_SIZE);
 	}
 	ui->sbTileSizeX->setValue(m_DefaultTileSize.width());
 	ui->sbTileSizeY->setValue(m_DefaultTileSize.height());

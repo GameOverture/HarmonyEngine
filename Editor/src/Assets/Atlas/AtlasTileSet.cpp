@@ -39,7 +39,8 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 						   uint uiErrors) :
 	AtlasFrame(ITEM_AtlasTileSet, modelRef, ITEM_AtlasTileSet, uuid, uiChecksum, uiBankId, sName, 0, 0, 0, 0, texInfo, uiW, uiH, uiX, uiY, iTextureIndex, uiErrors),
 	m_TileSetDataPair(tileSetDataPair),
-	m_bExistencePendingSave(bIsPendingSave)
+	m_bExistencePendingSave(bIsPendingSave),
+	m_eTileType(TILESETTYPE_Unknown)
 {
 	m_ActionSave.setIcon(QIcon(":/icons16x16/file-save.png"));
 	m_ActionSave.setShortcuts(QKeySequence::Save);
@@ -61,11 +62,24 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 	m_pActionRedo->setShortcutContext(Qt::WidgetShortcut);
 	m_pActionRedo->setObjectName("Redo");
 
+	// Initialize AtlasTileSet members with 'm_TileSetDataPair' meta data
 	if(m_TileSetDataPair.m_Meta.empty() == false)
 	{
-		// Initialize AtlasTileSet members with 'm_TileSetDataPair' meta data
+		m_eTileType = HyGlobal::GetTileSetTypeFromString(m_TileSetDataPair.m_Meta["tileType"].toString());
+
+		QJsonArray atlasRegionSizeArray = m_TileSetDataPair.m_Meta["regionSize"].toArray();
+		m_RegionSize = QSize(atlasRegionSizeArray[0].toInt(), atlasRegionSizeArray[1].toInt());
+
 		QJsonArray tileSizeArray = m_TileSetDataPair.m_Meta["tileSize"].toArray();
 		m_TileSize = QSize(tileSizeArray[0].toInt(), tileSizeArray[1].toInt());
+
+		m_TilePolygon.clear();
+		QJsonArray tilePolygonArray = m_TileSetDataPair.m_Meta["tilePolygon"].toArray();
+		for(int iVertIndex = 0; iVertIndex < tilePolygonArray.size(); iVertIndex += 2)
+		{
+			QPointF ptVert(tilePolygonArray[iVertIndex].toDouble(), tilePolygonArray[iVertIndex + 1].toDouble());
+			m_TilePolygon << ptVert;
+		}
 
 		QJsonArray autotileArray = m_TileSetDataPair.m_Meta["autoTiles"].toArray();
 		m_AutotileList.reserve(autotileArray.size());
@@ -98,7 +112,7 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 				int iCol = index % iNUM_COLS;
 				int iRow = index / iNUM_COLS;
 
-				QRect tileRect(iCol * m_TileSize.width(), iRow * m_TileSize.height(), m_TileSize.width(), m_TileSize.height());
+				QRect tileRect(iCol * m_RegionSize.width(), iRow * m_RegionSize.height(), m_RegionSize.width(), m_RegionSize.height());
 				QPixmap tilePixmap = QPixmap::fromImage(subAtlas.copy(tileRect));
 				pixmapList.append(tilePixmap);
 			}
@@ -129,6 +143,26 @@ int AtlasTileSet::GetNumTiles() const
 	return m_TileDataMap.size();
 }
 
+TileSetType AtlasTileSet::GetTileType() const
+{
+	return m_eTileType;
+}
+
+void AtlasTileSet::SetTileType(TileSetType eTileSetType)
+{
+	m_eTileType = eTileSetType;
+}
+
+QSize AtlasTileSet::GetAtlasRegionSize() const
+{
+	return m_RegionSize;
+}
+
+void AtlasTileSet::SetAtlasRegionSize(QSize size)
+{
+	m_RegionSize = size;
+}
+
 QSize AtlasTileSet::GetTileSize() const
 {
 	return m_TileSize;
@@ -139,6 +173,16 @@ void AtlasTileSet::SetTileSize(QSize size)
 	m_TileSize = size;
 }
 
+QPolygonF AtlasTileSet::GetTilePolygon() const
+{
+	return m_TilePolygon;
+}
+
+void AtlasTileSet::SetTilePolygon(const QPolygonF &polygonRef)
+{
+	m_TilePolygon = polygonRef;
+}
+
 QString AtlasTileSet::GetTileSetInfo() const
 {
 	QString sInfo;
@@ -146,8 +190,11 @@ QString AtlasTileSet::GetTileSetInfo() const
 		sInfo += "Empty";
 	else
 	{
+		QSize subAtlasSize = GetSize();
+		sInfo += "Sub-Atlas ";
+		sInfo += QString::number(subAtlasSize.width()) + "x" + QString::number(subAtlasSize.height()) + " | ";
 		sInfo += QString::number(GetNumTiles()) + " Tiles (";
-		sInfo += QString::number(m_TileSize.width()) + "x" + QString::number(m_TileSize.height()) + ")";
+		sInfo += QString::number(m_RegionSize.width()) + "x" + QString::number(m_RegionSize.height()) + ")";
 	}
 
 	return sInfo;
@@ -163,20 +210,23 @@ TileSetScene *AtlasTileSet::GetGfxScene()
 	return &m_GfxScene;
 }
 
-QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vTileSize, const QMap<QPoint, QPixmap> &importBatchMap, Qt::Edge eAppendEdge)
+QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vRegionSize, const QMap<QPoint, QPixmap> &importBatchMap, Qt::Edge eAppendEdge)
 {
 	QList<QPair<QPoint, TileData *>> newTileDataList;
 
 	if(importBatchMap.isEmpty())
 		return newTileDataList;
 
-	// Update size if necessary
-	if(m_TileSize != vTileSize)
+	if(m_eTileType == TILESETTYPE_Unknown || m_TilePolygon.isEmpty())
+		HyGuiLog("AtlasTileSet::Cmd_AppendNewTiles() was invoked while not fully initialized", LOGTYPE_Error);
+
+	// Update region size if necessary (may only grow in size)
+	if(m_RegionSize != vRegionSize)
 	{
-		if(m_TileSize.width() < vTileSize.width())
-			m_TileSize.setWidth(vTileSize.width());
-		if(m_TileSize.height() < vTileSize.height())
-			m_TileSize.setHeight(vTileSize.height());
+		if(m_RegionSize.width() < vRegionSize.width())
+			m_RegionSize.setWidth(vRegionSize.width());
+		if(m_RegionSize.height() < vRegionSize.height())
+			m_RegionSize.setHeight(vRegionSize.height());
 	}
 
 	// Get bounding box of import batch
@@ -298,10 +348,21 @@ QIcon AtlasTileSet::GetTileSetIcon() const
 
 void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 {
+	// Get current member data and write to fileDataPairOut
 	fileDataPairOut = m_TileSetDataPair;
 
-	// Get current member data and write to fileDataPairOut
+	fileDataPairOut.m_Meta["tileType"] = HyGlobal::TileSetTypeName(m_eTileType);
+	fileDataPairOut.m_Meta["regionSize"] = QJsonArray() << QJsonValue(m_RegionSize.width()) << QJsonValue(m_RegionSize.height());
+
 	fileDataPairOut.m_Meta["tileSize"] = QJsonArray() << QJsonValue(m_TileSize.width()) << QJsonValue(m_TileSize.height());
+
+	QJsonArray tilePolygonArray;
+	for(int i = 0; i < m_TilePolygon.size(); ++i)
+	{
+		tilePolygonArray << m_TilePolygon[i].x();
+		tilePolygonArray << m_TilePolygon[i].y();
+	}
+	fileDataPairOut.m_Meta["tilePolygon"] = tilePolygonArray;
 
 	QJsonArray autotileArray;
 	for(int i = 0; i < m_AutotileList.size(); ++i)
@@ -384,7 +445,7 @@ void AtlasTileSet::RegenerateSubAtlas()
 	const int iNUM_COLS = NUM_COLS_TILESET(m_TileDataMap.size());
 	const int iNUM_ROWS = NUM_ROWS_TILESET(m_TileDataMap.size(), iNUM_COLS);
 
-	QImage newTexture(iNUM_COLS * m_TileSize.width(), iNUM_ROWS * m_TileSize.height(), QImage::Format_ARGB32);
+	QImage newTexture(iNUM_COLS * m_RegionSize.width(), iNUM_ROWS * m_RegionSize.height(), QImage::Format_ARGB32);
 	newTexture.fill(Qt::transparent);
 
 	// Iterate through all the tiles and draw them to the blank newTexture
@@ -399,12 +460,12 @@ void AtlasTileSet::RegenerateSubAtlas()
 		int iCol = index % iNUM_COLS;
 		int iRow = index / iNUM_COLS;
 
-		QPoint destPos(iCol * m_TileSize.width(), iRow * m_TileSize.height());
+		QPoint destPos(iCol * m_RegionSize.width(), iRow * m_RegionSize.height());
 		// If the pixmap's dimensions are smaller than the tile size, we need to center it
-		if(pTile->GetPixmap().width() < m_TileSize.width() || pTile->GetPixmap().height() < m_TileSize.height())
+		if(pTile->GetPixmap().width() < m_RegionSize.width() || pTile->GetPixmap().height() < m_RegionSize.height())
 		{
-			destPos.setX(destPos.x() + (m_TileSize.width() - pTile->GetPixmap().width()) / 2);
-			destPos.setY(destPos.y() + (m_TileSize.height() - pTile->GetPixmap().height()) / 2);
+			destPos.setX(destPos.x() + (m_RegionSize.width() - pTile->GetPixmap().width()) / 2);
+			destPos.setY(destPos.y() + (m_RegionSize.height() - pTile->GetPixmap().height()) / 2);
 		}
 		// Then apply the user specified texture offset property
 		QPoint vOffset = pTile->GetTextureOffset();

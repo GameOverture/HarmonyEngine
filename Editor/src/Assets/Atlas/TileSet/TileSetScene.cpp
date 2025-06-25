@@ -29,10 +29,12 @@ TileSetScene::TileSetScene() :
 {
 	for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
 	{
-		m_pModeImportGroup->removeFromGroup(iter.value().first);
-		m_pModeImportGroup->removeFromGroup(iter.value().second);
-		delete iter.value().first;
-		delete iter.value().second;
+		m_pModeImportGroup->removeFromGroup(iter.value().m_pRectItem);
+		m_pModeImportGroup->removeFromGroup(iter.value().m_pPixmapItem);
+		m_pModeImportGroup->removeFromGroup(iter.value().m_pOutlineItem);
+		delete iter.value().m_pRectItem;
+		delete iter.value().m_pPixmapItem;
+		delete iter.value().m_pOutlineItem;
 	}
 	m_ImportTileMap.clear();
 }
@@ -66,7 +68,7 @@ QMap<QPoint, QPixmap> TileSetScene::AssembleImportMap()
 {
 	QMap<QPoint, QPixmap> importPixmapList;
 	for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
-		importPixmapList.insert(iter.key(), iter.value().second->pixmap());
+		importPixmapList.insert(iter.key(), iter.value().m_pPixmapItem->pixmap());
 
 	return importPixmapList;
 }
@@ -75,16 +77,18 @@ void TileSetScene::ClearImport()
 {
 	for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
 	{
-		m_pModeImportGroup->removeFromGroup(iter.value().first); // removeFromGroup() leaves a dangling pointer, so delete it
-		delete iter.value().first;
-		m_pModeImportGroup->removeFromGroup(iter.value().second); // removeFromGroup() leaves a dangling pointer, so delete it
-		delete iter.value().second;
+		m_pModeImportGroup->removeFromGroup(iter.value().m_pRectItem); // removeFromGroup() leaves a dangling pointer, so delete it
+		delete iter.value().m_pRectItem;
+		m_pModeImportGroup->removeFromGroup(iter.value().m_pPixmapItem); // removeFromGroup() leaves a dangling pointer, so delete it
+		delete iter.value().m_pPixmapItem;
+		m_pModeImportGroup->removeFromGroup(iter.value().m_pOutlineItem); // removeFromGroup() leaves a dangling pointer, so delete it
+		delete iter.value().m_pOutlineItem;
 	}
 	m_ImportTileMap.clear();
 	m_vImportTileSize = QSize(0, 0);
 }
 
-void TileSetScene::AddImport(QPoint ptGridPos, QPixmap pixmap)
+void TileSetScene::AddImport(const QPolygonF &outlinePolygon, QPoint ptGridPos, QPixmap pixmap)
 {
 	if(m_vImportTileSize.width() < pixmap.width())
 		m_vImportTileSize.setWidth(pixmap.width());
@@ -100,11 +104,14 @@ void TileSetScene::AddImport(QPoint ptGridPos, QPixmap pixmap)
 	QGraphicsPixmapItem *pNewGfxPixmapItem = new QGraphicsPixmapItem(pixmap);
 	m_pModeImportGroup->addToGroup(pNewGfxPixmapItem);
 
-	m_ImportTileMap.insert(ptGridPos, QPair<QGraphicsRectItem *, QGraphicsPixmapItem *>(pNewGfxRectItem, pNewGfxPixmapItem));
+	QGraphicsPolygonItem *pNewOutlineItem = new QGraphicsPolygonItem(outlinePolygon);
+	m_ImportTileMap.insert(ptGridPos, ImportTileItem(pNewGfxRectItem, pNewGfxPixmapItem, pNewOutlineItem));
 }
 
 void TileSetScene::SyncImport()
 {
+	TileSetType eTileType = m_pTileSet->GetTileType();
+
 	m_pModeImportGroup->addToGroup(&m_ImportLabel);
 
 	HyMargins<int> borderMargins(10, 10, 10, 3);
@@ -143,10 +150,12 @@ void TileSetScene::SyncImport()
 		QPoint ptTilePos = iter.key();
 		ptCurPos.setX(borderMargins.left + (ptTilePos.x() * (m_vImportTileSize.width() + iSpacingAmt)));
 		ptCurPos.setY(borderMargins.top + iTitleHeight + (ptTilePos.y() * (m_vImportTileSize.height() + iSpacingAmt)));
-		iter.value().first->setRect(ptCurPos.x(), ptCurPos.y(), m_vImportTileSize.width() + 1, m_vImportTileSize.height() + 1);
+		iter.value().m_pRectItem->setRect(ptCurPos.x(), ptCurPos.y(), m_vImportTileSize.width() + 2, m_vImportTileSize.height() + 2);
 
-		ptCurPos = QPoint(ptCurPos.x() + 1, ptCurPos.y() + 1); // offset by 1 pixel to avoid overlap with rect
-		iter.value().second->setPos(ptCurPos);
+		ptCurPos = QPoint(ptCurPos.x() + 2, ptCurPos.y() + 2); // offset by 2 pixels to avoid overlap with rect and outline (1px each)
+		iter.value().m_pPixmapItem->setPos(ptCurPos);
+
+		iter.value().m_pOutlineItem->setPos(ptCurPos.x() + 1, ptCurPos.y() + 1);
 	}
 
 	//QPoint ptTileStartPos = ptCurPos;
@@ -225,7 +234,7 @@ void TileSetScene::OnMarqueeRelease(QPoint ptStartDrag, QPoint ptEndDrag)
 		// Determine which tiles were selected and toggle their import or not
 		for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
 		{
-			if(iter->first->boundingRect().contains(sceneRect))
+			if(iter->m_pRectItem->boundingRect().contains(sceneRect))
 			{
 				//iter->
 			}

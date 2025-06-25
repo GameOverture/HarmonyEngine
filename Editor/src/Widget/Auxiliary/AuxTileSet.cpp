@@ -31,14 +31,22 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
 
 	ui->vsbTileSize->Init(SPINBOXTYPE_Int2d, 1, MAX_INT_RANGE);
+
+	ui->vsbTextureRegion->Init(SPINBOXTYPE_Int2d, 1, MAX_INT_RANGE);
 	ui->vsbStartOffset->Init(SPINBOXTYPE_Int2d, 0, MAX_INT_RANGE);
 	ui->vsbPadding->Init(SPINBOXTYPE_Int2d, 0, MAX_INT_RANGE);
 	ui->grpSlicingOptions->setVisible(false);
 	ui->grpImportSide->setVisible(false);
 
+	QList<TileSetType> eTileSetTypeList = HyGlobal::GetTileSetTypeList();
+	for(TileSetType eTileSetType : eTileSetTypeList)
+		ui->cmbTileShape->addItem(HyGlobal::TileSetTypeName(eTileSetType), eTileSetType);
+
 	ui->splitter->setSizes(QList<int>() << 140 << width() - 140);
 
 	connect(ui->vsbTileSize, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnTileSizeChanged(QVariant)));
+
+	connect(ui->vsbTextureRegion, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnTextureRegionChanged(QVariant)));
 	connect(ui->vsbStartOffset, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnStartOffsetChanged(QVariant)));
 	connect(ui->vsbPadding, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnPaddingChanged(QVariant)));
 }
@@ -56,9 +64,18 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 	m_pTileSet = pTileSet;
 	RefreshInfo();
 
+	if(m_pTileSet->GetTileType() == TILESETTYPE_Unknown)
+		ui->cmbTileShape->setCurrentIndex(0);
+	else
+		ui->cmbTileShape->setCurrentIndex(m_pTileSet->GetTileType());
+
+	if(m_pTileSet->GetAtlasRegionSize().isValid() == false)
+		m_pTileSet->SetAtlasRegionSize(QSize(g_iDefaultTileSize, g_iDefaultTileSize));
 	if(m_pTileSet->GetTileSize().isValid() == false)
 		m_pTileSet->SetTileSize(QSize(g_iDefaultTileSize, g_iDefaultTileSize));
+	
 	ui->vsbTileSize->SetValue(QPoint(m_pTileSet->GetTileSize().width(), m_pTileSet->GetTileSize().height()));
+	ui->vsbTextureRegion->SetValue(QPoint(m_pTileSet->GetAtlasRegionSize().width(), m_pTileSet->GetAtlasRegionSize().height()));
 
 	ui->btnSave->setDefaultAction(m_pTileSet->GetSaveAction());
 	ui->btnUndo->setDefaultAction(m_pTileSet->GetUndoAction());
@@ -97,7 +114,7 @@ void AuxTileSet::SetImportWidgets()
 	if(m_bIsImportingTileSheet != bTileSheet)
 	{
 		bool bHasPendingInfo = ui->txtImagePath->text().isEmpty() == false ||
-			ui->vsbTileSize->GetValue() != m_pTileSet->GetTileSize() ||
+			ui->vsbTextureRegion->GetValue() != m_pTileSet->GetAtlasRegionSize() ||
 			ui->vsbStartOffset->GetValue() != QPoint(0, 0) ||
 			ui->vsbPadding->GetValue() != QPoint(0, 0);
 
@@ -116,6 +133,10 @@ void AuxTileSet::SetImportWidgets()
 		}
 	}
 
+	ui->vsbTextureRegion->SetValue(m_pTileSet->GetAtlasRegionSize());
+	ui->vsbStartOffset->SetValue(QPoint(0, 0));
+	ui->vsbPadding->SetValue(QPoint(0, 0));
+
 	// Switching widgets
 	m_bIsImportingTileSheet = bTileSheet;
 	ui->grpSlicingOptions->setVisible(m_bIsImportingTileSheet);
@@ -128,11 +149,11 @@ void AuxTileSet::SetImportWidgets()
 
 void AuxTileSet::SliceSheetPixmaps()
 {
-	QPoint vTileSize = ui->vsbTileSize->GetValue().toPoint();
+	QPoint vRegionSize = ui->vsbTextureRegion->GetValue().toPoint();
 	QPoint vStartOffset = ui->vsbStartOffset->GetValue().toPoint();
 	QPoint vPadding = ui->vsbPadding->GetValue().toPoint();
 
-	if(m_pImportTileSheetPixmap == nullptr || vTileSize.x() == 0 || vTileSize.y() == 0)
+	if(m_pImportTileSheetPixmap == nullptr || vRegionSize.x() == 0 || vRegionSize.y() == 0)
 		return;
 
 	ui->grpSlicingOptions->setVisible(true);
@@ -145,25 +166,25 @@ void AuxTileSet::SliceSheetPixmaps()
 					vStartOffset.y() + vPadding.y());
 
 	QPoint ptGridPos(0, 0);
-	while(vTileSize.y() <= m_pImportTileSheetPixmap->height() - ptCurPos.y() + 1)
+	while(vRegionSize.y() <= m_pImportTileSheetPixmap->height() - ptCurPos.y() + 1)
 	{
-		while(vTileSize.x() <= m_pImportTileSheetPixmap->width() - ptCurPos.x() + 1)
+		while(vRegionSize.x() <= m_pImportTileSheetPixmap->width() - ptCurPos.x() + 1)
 		{
-			QRect tileRect(ptCurPos.x(), ptCurPos.y(), vTileSize.x(), vTileSize.y());
+			QRect tileRect(ptCurPos.x(), ptCurPos.y(), vRegionSize.x(), vRegionSize.y());
 			QPixmap tilePixmap = m_pImportTileSheetPixmap->copy(tileRect);
 
 			if(IsPixmapAllTransparent(tilePixmap) == false)
 			{
-				(ptCurPos.x() / vTileSize.x(), ptCurPos.y() / vTileSize.y());
-				pGfxScene->AddImport(ptGridPos, tilePixmap);
+				(ptCurPos.x() / vRegionSize.x(), ptCurPos.y() / vRegionSize.y());
+				pGfxScene->AddImport(m_pTileSet->GetTilePolygon(), ptGridPos, tilePixmap);
 			}
 
-			ptCurPos.setX(ptCurPos.x() + vTileSize.x() + vPadding.x());
+			ptCurPos.setX(ptCurPos.x() + vRegionSize.x() + vPadding.x());
 			ptGridPos.setX(ptGridPos.x() + 1);
 		}
 
 		ptCurPos.setX(vStartOffset.x() + vPadding.x());
-		ptCurPos.setY(ptCurPos.y() + vTileSize.y() + vPadding.y());
+		ptCurPos.setY(ptCurPos.y() + vRegionSize.y() + vPadding.y());
 		ptGridPos.setX(0);
 		ptGridPos.setY(ptGridPos.y() + 1);
 	}
@@ -295,6 +316,12 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 	if(sImportImgList.empty())
 		return;
 
+	// Initializing Tile Type
+	if(m_pTileSet->GetTileType() == TILESETTYPE_Unknown)
+	{
+		m_ImportPolygon;
+	}
+
 	if(m_bIsImportingTileSheet)
 	{
 		ui->txtImagePath->setText(sImportImgList[0]);
@@ -339,7 +366,7 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 			painter.drawImage((maxSize.width() - pImg->width()) / 2, (maxSize.height() - pImg->height()) / 2, *pImg);
 			painter.end();
 
-			pGfxScene->AddImport(QPoint(iIndex % iNUM_COLS, iIndex / iNUM_COLS), pixmap);
+			pGfxScene->AddImport(m_pTileSet->GetTilePolygon(), QPoint(iIndex % iNUM_COLS, iIndex / iNUM_COLS), pixmap);
 			iIndex++;
 		}
 
@@ -353,6 +380,12 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 }
 
 void AuxTileSet::OnTileSizeChanged(QVariant newSize)
+{
+	SliceSheetPixmaps();
+	ErrorCheckImport();
+}
+
+void AuxTileSet::OnTextureRegionChanged(QVariant newOffset)
 {
 	SliceSheetPixmaps();
 	ErrorCheckImport();
@@ -386,6 +419,16 @@ void AuxTileSet::on_btnConfirmAdd_clicked()
 		eAppendEdge = Qt::RightEdge;
 	else
 		eAppendEdge = Qt::BottomEdge;
+
+	if(m_pTileSet->GetTileType() == TILESETTYPE_Unknown)
+		m_pTileSet->SetTileType(static_cast<TileSetType>(ui->cmbTileShape->currentIndex()));
+
+	if(m_pTileSet->GetTilePolygon().isEmpty())
+	{
+		m_pTileSet->SetTilePolygon(m_ImportPolygon);
+		if(m_pTileSet->GetTilePolygon().isEmpty())
+			HyGuiLog("AuxTileSet::on_btnConfirmAdd_clicked() Set invalid tile polygon with import", LOGTYPE_Error);
+	}
 
 	TileSetUndoCmd_AppendTiles *pUndoCmd = new TileSetUndoCmd_AppendTiles(*m_pTileSet, importMap, vImportTileSize, eAppendEdge);
 	m_pTileSet->GetUndoStack()->push(pUndoCmd);

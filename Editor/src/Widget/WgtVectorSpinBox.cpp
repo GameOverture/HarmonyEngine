@@ -172,23 +172,41 @@ void WgtVectorSpinBox::SetValue(QVariant data)
 	switch(ui->stackedWidget->currentIndex())
 	{
 	case SPINBOXTYPE_Int2d:
-		if(data.type() != QVariant::Point)
+		if(data.type() != QVariant::Point && data.type() != QVariant::Size)
 		{
-			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QPoint", LOGTYPE_Error);
+			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QPoint or QSize", LOGTYPE_Error);
 			return;
 		}
-		ui->intSpinBoxX->setValue(data.toPoint().x());
-		ui->intSpinBoxY->setValue(data.toPoint().y());
+
+		if(data.type() == QVariant::Point)
+		{
+			ui->intSpinBoxX->setValue(data.toPoint().x());
+			ui->intSpinBoxY->setValue(data.toPoint().y());
+		}
+		else if(data.type() == QVariant::Size)
+		{
+			ui->intSpinBoxX->setValue(data.toPoint().x());
+			ui->intSpinBoxY->setValue(data.toPoint().y());
+		}
 		break;
 
 	case SPINBOXTYPE_Double2d:
-		if(data.type() != QVariant::PointF)
+		if(data.type() != QVariant::PointF && data.type() != QVariant::SizeF)
 		{
-			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QPointF", LOGTYPE_Error);
+			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QPointF or QSizeF", LOGTYPE_Error);
 			return;
 		}
-		ui->doubleSpinBoxX->setValue(data.toPointF().x());
-		ui->doubleSpinBoxY->setValue(data.toPointF().y());
+
+		if(data.type() == QVariant::PointF)
+		{
+			ui->doubleSpinBoxX->setValue(data.toPointF().x());
+			ui->doubleSpinBoxY->setValue(data.toPointF().y());
+		}
+		else if(data.type() == QVariant::SizeF)
+		{
+			ui->doubleSpinBoxX->setValue(data.toSizeF().width());
+			ui->doubleSpinBoxY->setValue(data.toSizeF().height());
+		}
 		break;
 
 	case SPINBOXTYPE_Int3d:
