@@ -32,13 +32,13 @@ TileSetUndoCmd_TileSize::TileSetUndoCmd_TileSize(AtlasTileSet &tileSetItemRef, A
 /*virtual*/ void TileSetUndoCmd_TileSize::redo() /*override*/
 {
 	m_TileSetRef.SetTileSize(m_NewSize);
-	m_AuxTileSetRef.SetTileSizeWidgets(m_NewSize);
+	m_AuxTileSetRef.CmdSet_TileSizeWidgets(m_NewSize);
 }
 
 /*virtual*/ void TileSetUndoCmd_TileSize::undo() /*override*/
 {
 	m_TileSetRef.SetTileSize(m_OldSize);
-	m_AuxTileSetRef.SetTileSizeWidgets(m_OldSize);
+	m_AuxTileSetRef.CmdSet_TileSizeWidgets(m_OldSize);
 }
 
 /*virtual*/ int TileSetUndoCmd_TileSize::id() const /*override*/
@@ -49,13 +49,60 @@ TileSetUndoCmd_TileSize::TileSetUndoCmd_TileSize(AtlasTileSet &tileSetItemRef, A
 /*virtual*/ bool TileSetUndoCmd_TileSize::mergeWith(const QUndoCommand *pOtherCmd) /*override*/
 {
 	//TileSetUndoCmd_TileSize *pOtherTileSizeCmd = dynamic_cast<TileSetUndoCmd_TileSize *>(const_cast<QUndoCommand *>(pOtherCmd));
-	const TileSetUndoCmd_TileSize *pOtherTileSizeCmd = static_cast<const TileSetUndoCmd_TileSize *>(pOtherCmd); // This is faster, and safe as long as I always use unique MERGABLEUNDOCMD's for each ID
+	const TileSetUndoCmd_TileSize *pOtherTileSizeCmd = static_cast<const TileSetUndoCmd_TileSize *>(pOtherCmd); // This is faster than dynamic_cast, and safe as long as I always use unique MERGABLEUNDOCMD's for each ID
 	if(pOtherTileSizeCmd && (&pOtherTileSizeCmd->m_TileSetRef == &m_TileSetRef))
 	{
 		m_NewSize = pOtherTileSizeCmd->m_NewSize;
 		return true;
 	}
 
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TileSetUndoCmd_TileOffset::TileSetUndoCmd_TileOffset(AtlasTileSet &tileSetItemRef, AuxTileSet &auxTileSetRef, QPoint newTileOffset, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_TileSetRef(tileSetItemRef),
+	m_AuxTileSetRef(auxTileSetRef),
+	m_OldOffset(tileSetItemRef.GetTileOffset()),
+	m_NewOffset(newTileOffset)
+{
+	if(m_OldOffset == m_NewOffset)
+		HyGuiLog("TileSetUndoCmd_TileOffset() - Old offset is the same as new offset, no need to create command.", LOGTYPE_Error);
+	
+	setText("Change Tile Offset");
+}
+
+/*virtual*/ TileSetUndoCmd_TileOffset::~TileSetUndoCmd_TileOffset()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_TileOffset::redo() /*override*/
+{
+	m_TileSetRef.SetTileOffset(m_NewOffset);
+	m_AuxTileSetRef.CmdSet_TileOffsetWidgets(m_NewOffset);
+}
+
+/*virtual*/ void TileSetUndoCmd_TileOffset::undo() /*override*/
+{
+	m_TileSetRef.SetTileOffset(m_OldOffset);
+	m_AuxTileSetRef.CmdSet_TileOffsetWidgets(m_OldOffset);
+}
+
+/*virtual*/ int TileSetUndoCmd_TileOffset::id() const /*override*/
+{
+	return MERGABLEUNDOCMD_TileOffset;
+}
+
+/*virtual*/ bool TileSetUndoCmd_TileOffset::mergeWith(const QUndoCommand *pOtherCmd) /*override*/
+{
+	const TileSetUndoCmd_TileOffset *pOtherTileOffsetCmd = static_cast<const TileSetUndoCmd_TileOffset *>(pOtherCmd); // This is faster than dynamic_cast, and safe as long as I always use unique MERGABLEUNDOCMD's for each ID
+	if(pOtherTileOffsetCmd && (&pOtherTileOffsetCmd->m_TileSetRef == &m_TileSetRef))
+	{
+		m_NewOffset = pOtherTileOffsetCmd->m_NewOffset;
+		return true;
+	}
 	return false;
 }
 
@@ -81,13 +128,13 @@ TileSetUndoCmd_TileShape::TileSetUndoCmd_TileShape(AtlasTileSet &tileSetItemRef,
 /*virtual*/ void TileSetUndoCmd_TileShape::redo() /*override*/
 {
 	m_TileSetRef.SetTileShape(m_eNewShape);
-	m_AuxTileSetRef.SetTileShapeWidget(m_eNewShape);
+	m_AuxTileSetRef.CmdSet_TileShapeWidget(m_eNewShape);
 }
 
 /*virtual*/ void TileSetUndoCmd_TileShape::undo() /*override*/
 {
 	m_TileSetRef.SetTileShape(m_eOldShape);
-	m_AuxTileSetRef.SetTileShapeWidget(m_eOldShape);
+	m_AuxTileSetRef.CmdSet_TileShapeWidget(m_eOldShape);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

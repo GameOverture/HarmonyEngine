@@ -73,6 +73,9 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 		QJsonArray tileSizeArray = m_TileSetDataPair.m_Meta["tileSize"].toArray();
 		m_TileSize = QSize(tileSizeArray[0].toInt(), tileSizeArray[1].toInt());
 
+		QJsonArray tileOffsetArray = m_TileSetDataPair.m_Meta["tileOffset"].toArray();
+		m_TileOffset = QPoint(tileOffsetArray[0].toInt(), tileOffsetArray[1].toInt());
+
 		UpdateTilePolygon();
 
 		QJsonArray autotileArray = m_TileSetDataPair.m_Meta["autoTiles"].toArray();
@@ -167,6 +170,16 @@ void AtlasTileSet::SetTileSize(QSize size)
 {
 	m_TileSize = size;
 	UpdateTilePolygon();
+}
+
+QPoint AtlasTileSet::GetTileOffset() const
+{
+	return m_TileOffset;
+}
+
+void AtlasTileSet::SetTileOffset(QPoint offset)
+{
+	m_TileOffset = offset;
 }
 
 QPolygonF AtlasTileSet::GetTilePolygon() const
@@ -350,6 +363,7 @@ void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 	fileDataPairOut.m_Meta["tileShape"] = HyGlobal::TileSetShapeName(m_eTileShape);
 	fileDataPairOut.m_Meta["regionSize"] = QJsonArray() << QJsonValue(m_RegionSize.width()) << QJsonValue(m_RegionSize.height());
 	fileDataPairOut.m_Meta["tileSize"] = QJsonArray() << QJsonValue(m_TileSize.width()) << QJsonValue(m_TileSize.height());
+	fileDataPairOut.m_Meta["tileOffset"] = QJsonArray() << QJsonValue(m_TileOffset.x()) << QJsonValue(m_TileOffset.y());
 
 	QJsonArray autotileArray;
 	for(int i = 0; i < m_AutotileList.size(); ++i)
@@ -430,39 +444,41 @@ void AtlasTileSet::UpdateTilePolygon()
 {
 	m_TilePolygon.clear();
 	
+	// NOTE: m_TilePolygon is a shape centered around the origin (0, 0)
 	switch(m_eTileShape)
 	{
 	case TILESETSHAPE_Square:
 	case TILESETSHAPE_HalfOffsetSquare:
-		m_TilePolygon << QPoint(0, 0)
-					  << QPoint(m_TileSize.width(), 0)
-					  << QPoint(m_TileSize.width(), m_TileSize.height())
-					  << QPoint(0, m_TileSize.height());
+		// Center the square polygon around the origin
+		m_TilePolygon << QPoint(-m_TileSize.width() / 2, -m_TileSize.height() / 2)
+					  << QPoint(m_TileSize.width() / 2, -m_TileSize.height() / 2)
+					  << QPoint(m_TileSize.width() / 2, m_TileSize.height() / 2)
+					  << QPoint(-m_TileSize.width() / 2, m_TileSize.height() / 2);
 		break;
 		
 	case TILESETSHAPE_Isometric:
-		m_TilePolygon << QPoint(0, m_TileSize.height() / 2)
+		m_TilePolygon << QPoint(0, -m_TileSize.height() / 2)
 					  << QPoint(m_TileSize.width() / 2, 0)
-					  << QPoint(m_TileSize.width(), m_TileSize.height() / 2)
-					  << QPoint(m_TileSize.width() / 2, m_TileSize.height());
+					  << QPoint(0, m_TileSize.height() / 2)
+					  << QPoint(-m_TileSize.width() / 2, 0);
 		break;
 
 	case TILESETSHAPE_HexagonPointTop:
-		m_TilePolygon << QPoint(m_TileSize.width() / 2, 0)
-					  << QPoint(m_TileSize.width(), m_TileSize.height() / 4)
-					  << QPoint(m_TileSize.width(), m_TileSize.height() * 3 / 4)
-					  << QPoint(m_TileSize.width() / 2, m_TileSize.height())
-					  << QPoint(0, m_TileSize.height() * 3 / 4)
-					  << QPoint(0, m_TileSize.height() / 4);
+		m_TilePolygon << QPoint(0, -m_TileSize.height() / 2)
+					  << QPoint(m_TileSize.width() / 2, -m_TileSize.height() / 4)
+					  << QPoint(m_TileSize.width() / 2, m_TileSize.height() / 4)
+					  << QPoint(0, m_TileSize.height() / 2)
+					  << QPoint(-m_TileSize.width() / 2, m_TileSize.height() / 4)
+					  << QPoint(-m_TileSize.width() / 2, -m_TileSize.height() / 4);
 		break;
 		
 	case TILESETSHAPE_HexagonFlatTop:
-		m_TilePolygon << QPoint(m_TileSize.width() / 4, 0)
-					  << QPoint(m_TileSize.width() * 3 / 4, 0)
-					  << QPoint(m_TileSize.width(), m_TileSize.height() / 2)
-					  << QPoint(m_TileSize.width() * 3 / 4, m_TileSize.height())
-					  << QPoint(m_TileSize.width() / 4, m_TileSize.height())
-					  << QPoint(0, m_TileSize.height() / 2);
+		m_TilePolygon << QPoint(-m_TileSize.width() / 4, -m_TileSize.height() / 2)
+					  << QPoint(m_TileSize.width() / 4, -m_TileSize.height() / 2)
+					  << QPoint(m_TileSize.width() / 2, 0)
+					  << QPoint(m_TileSize.width() / 4, m_TileSize.height() / 2)
+					  << QPoint(-m_TileSize.width() / 4, m_TileSize.height() / 2)
+					  << QPoint(-m_TileSize.width() / 2, 0);
 		break;
 
 	case TILESETSHAPE_Unknown:

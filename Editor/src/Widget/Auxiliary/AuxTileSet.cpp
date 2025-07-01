@@ -31,6 +31,7 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
 
 	ui->vsbTileSize->Init(SPINBOXTYPE_Int2d, 1, MAX_INT_RANGE);
+	ui->vsbTileOffset->Init(SPINBOXTYPE_Int2d, -MAX_INT_RANGE, MAX_INT_RANGE);
 
 	ui->vsbTextureRegion->Init(SPINBOXTYPE_Int2d, 1, MAX_INT_RANGE);
 	ui->vsbStartOffset->Init(SPINBOXTYPE_Int2d, 0, MAX_INT_RANGE);
@@ -45,6 +46,7 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	ui->splitter->setSizes(QList<int>() << 140 << width() - 140);
 
 	connect(ui->vsbTileSize, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnTileSizeChanged(QVariant)));
+	connect(ui->vsbTileOffset, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnTileOffsetChanged(QVariant)));
 
 	connect(ui->vsbTextureRegion, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnTextureRegionChanged(QVariant)));
 	connect(ui->vsbStartOffset, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnStartOffsetChanged(QVariant)));
@@ -68,8 +70,9 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 	if(m_pTileSet->GetTileSize().isValid() == false)
 		m_pTileSet->SetTileSize(QSize(g_iDefaultTileSize, g_iDefaultTileSize));
 	
-	SetTileShapeWidget(m_pTileSet->GetTileShape());
-	SetTileSizeWidgets(m_pTileSet->GetTileSize());
+	CmdSet_TileShapeWidget(m_pTileSet->GetTileShape());
+	CmdSet_TileSizeWidgets(m_pTileSet->GetTileSize());
+	CmdSet_TileOffsetWidgets(m_pTileSet->GetTileOffset());
 
 	ui->vsbTextureRegion->SetValue(QPoint(m_pTileSet->GetAtlasRegionSize().width(), m_pTileSet->GetAtlasRegionSize().height()));
 
@@ -93,7 +96,7 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 		on_tabWidget_currentChanged(TAB_Properties);
 	}
 
-	ui->graphicsView->setScene(m_pTileSet->GetGfxScene());
+	ui->graphicsView->SetScene(this, m_pTileSet->GetGfxScene());
 	
 	RefreshInfo();
 }
@@ -103,7 +106,7 @@ AtlasTileSet *AuxTileSet::GetTileSet() const
 	return m_pTileSet;
 }
 
-void AuxTileSet::SetTileShapeWidget(TileSetShape eTileShape)
+void AuxTileSet::CmdSet_TileShapeWidget(TileSetShape eTileShape)
 {
 	ui->cmbTileShape->blockSignals(true);
 	if(eTileShape == TILESETSHAPE_Unknown)
@@ -113,11 +116,18 @@ void AuxTileSet::SetTileShapeWidget(TileSetShape eTileShape)
 	ui->cmbTileShape->blockSignals(false);
 }
 
-void AuxTileSet::SetTileSizeWidgets(QSize tileSize)
+void AuxTileSet::CmdSet_TileSizeWidgets(QSize tileSize)
 {
 	ui->vsbTileSize->blockSignals(true);
 	ui->vsbTileSize->SetValue(QPoint(tileSize.width(), tileSize.height()));
 	ui->vsbTileSize->blockSignals(false);
+}
+
+void AuxTileSet::CmdSet_TileOffsetWidgets(QPoint tileOffset)
+{
+	ui->vsbTileOffset->blockSignals(true);
+	ui->vsbTileOffset->SetValue(tileOffset);
+	ui->vsbTileOffset->blockSignals(false);
 }
 
 void AuxTileSet::RefreshInfo()
@@ -432,6 +442,21 @@ void AuxTileSet::OnTileSizeChanged(QVariant newSize)
 	else
 		m_pTileSet->GetGfxScene()->SyncTileSet();
 	
+	ErrorCheckImport();
+}
+
+void AuxTileSet::OnTileOffsetChanged(QVariant newOffset)
+{
+	QPoint vOffset(newOffset.toPoint().x(), newOffset.toPoint().y());
+	if(m_pTileSet->GetTileOffset() == vOffset)
+		return;
+
+	TileSetUndoCmd_TileOffset *pCmd = new TileSetUndoCmd_TileOffset(*m_pTileSet, *this, vOffset);
+	m_pTileSet->GetUndoStack()->push(pCmd); // This will attempt to merge the command
+	if(m_bIsImportingTileSheet)
+		m_pTileSet->GetGfxScene()->SyncImport();
+	else
+		m_pTileSet->GetGfxScene()->SyncTileSet();
 	ErrorCheckImport();
 }
 

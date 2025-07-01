@@ -42,8 +42,9 @@ public:
 	void Init(AtlasTileSet *pTileSet);
 	AtlasTileSet *GetTileSet() const;
 
-	void SetTileShapeWidget(TileSetShape eTileShape);
-	void SetTileSizeWidgets(QSize tileSize); // Blocks the WgtVectorSpinBox::SetValue signal
+	void CmdSet_TileShapeWidget(TileSetShape eTileShape);	// Blocks the WgtVectorSpinBox::SetValue signal
+	void CmdSet_TileSizeWidgets(QSize tileSize);			// Blocks the WgtVectorSpinBox::SetValue signal
+	void CmdSet_TileOffsetWidgets(QPoint tileOffset);		// Blocks the WgtVectorSpinBox::SetValue signal
 
 	void RefreshInfo();
 	void UpdateSelection();
@@ -71,6 +72,7 @@ private Q_SLOTS:
 
 	void on_cmbTileShape_currentIndexChanged(int iIndex);
 	void OnTileSizeChanged(QVariant newSize);
+	void OnTileOffsetChanged(QVariant newOffset);
 
 	void OnTextureRegionChanged(QVariant newSize);
 	void OnStartOffsetChanged(QVariant newOffset);

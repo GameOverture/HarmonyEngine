@@ -43,9 +43,10 @@ class AtlasTileSet : public AtlasFrame
 	
 	TileSetScene				m_GfxScene;
 
-	TileSetShape					m_eTileShape;
+	TileSetShape				m_eTileShape;
 	QSize						m_RegionSize;					// The size of the atlas cutout dimensions (not necessarily the size of the tile)
 	QSize						m_TileSize;						// User specified size that is used in conjunction with m_eTileType to create m_TilePolygon
+	QPoint						m_TileOffset;
 	QPolygonF					m_TilePolygon;					// Represents the actual tile, that is able to be arranged in a TileMap (grid)
 
 	struct AutoTile
@@ -125,6 +126,9 @@ public:
 
 	QSize GetTileSize() const;
 	void SetTileSize(QSize size);
+
+	QPoint GetTileOffset() const;
+	void SetTileOffset(QPoint offset);
 
 	QPolygonF GetTilePolygon() const;
 	void SetTilePolygon(const QPolygonF &polygonRef);

@@ -15,12 +15,26 @@
 
 #include <QUndoCommand>
 
-
- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class TileSetUndoCmd_TileSize : public QUndoCommand
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TileSetUndoCmd_TileShape : public QUndoCommand
 {
 	AtlasTileSet &						m_TileSetRef;
 	AuxTileSet &						m_AuxTileSetRef;
+	TileSetShape							m_eOldShape;
+	TileSetShape							m_eNewShape;
+
+public:
+	TileSetUndoCmd_TileShape(AtlasTileSet &tileSetItemRef, AuxTileSet &auxTileSetRef, TileSetShape eNewShape, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_TileShape();
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TileSetUndoCmd_TileSize : public QUndoCommand
+{
+	AtlasTileSet &m_TileSetRef;
+	AuxTileSet &m_AuxTileSetRef;
 
 	QSize								m_OldSize;
 	QSize								m_NewSize;
@@ -36,18 +50,22 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-class TileSetUndoCmd_TileShape : public QUndoCommand
+class TileSetUndoCmd_TileOffset : public QUndoCommand
 {
 	AtlasTileSet &						m_TileSetRef;
 	AuxTileSet &						m_AuxTileSetRef;
-	TileSetShape							m_eOldShape;
-	TileSetShape							m_eNewShape;
+
+	QPoint								m_OldOffset;
+	QPoint								m_NewOffset;
 
 public:
-	TileSetUndoCmd_TileShape(AtlasTileSet &tileSetItemRef, AuxTileSet &auxTileSetRef, TileSetShape eNewShape, QUndoCommand *pParent = nullptr);
-	virtual ~TileSetUndoCmd_TileShape();
+	TileSetUndoCmd_TileOffset(AtlasTileSet &tileSetItemRef, AuxTileSet &auxTileSetRef, QPoint newTileOffset, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_TileOffset();
+
 	virtual void redo() override;
 	virtual void undo() override;
+	virtual int id() const override;
+	virtual bool mergeWith(const QUndoCommand *pOtherCmd) override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

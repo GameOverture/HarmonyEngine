@@ -278,7 +278,8 @@ enum TweenProperty
 
 enum MergableUndoCmd
 {
-	MERGABLEUNDOCMD_TileSize = 1
+	MERGABLEUNDOCMD_TileSize = 1,
+	MERGABLEUNDOCMD_TileOffset = 2,
 };
 
 enum SnappingSetting

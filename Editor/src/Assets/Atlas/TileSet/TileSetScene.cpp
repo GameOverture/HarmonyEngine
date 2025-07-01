@@ -34,10 +34,10 @@ TileSetScene::TileSetScene() :
 	{
 		m_pModeImportGroup->removeFromGroup(iter.value().m_pRectItem);
 		m_pModeImportGroup->removeFromGroup(iter.value().m_pPixmapItem);
-		m_pModeImportGroup->removeFromGroup(iter.value().m_pOutlineItem);
+		m_pModeImportGroup->removeFromGroup(iter.value().m_pShapeItem);
 		delete iter.value().m_pRectItem;
 		delete iter.value().m_pPixmapItem;
-		delete iter.value().m_pOutlineItem;
+		delete iter.value().m_pShapeItem;
 	}
 	m_ImportTileMap.clear();
 }
@@ -95,8 +95,8 @@ void TileSetScene::ClearImport()
 		delete iter.value().m_pRectItem;
 		m_pModeImportGroup->removeFromGroup(iter.value().m_pPixmapItem); // removeFromGroup() leaves a dangling pointer, so delete it
 		delete iter.value().m_pPixmapItem;
-		m_pModeImportGroup->removeFromGroup(iter.value().m_pOutlineItem); // removeFromGroup() leaves a dangling pointer, so delete it
-		delete iter.value().m_pOutlineItem;
+		m_pModeImportGroup->removeFromGroup(iter.value().m_pShapeItem); // removeFromGroup() leaves a dangling pointer, so delete it
+		delete iter.value().m_pShapeItem;
 	}
 	m_ImportTileMap.clear();
 	m_vImportRegionSize = QSize(0, 0);
@@ -113,15 +113,17 @@ void TileSetScene::AddImport(const QPolygonF &outlinePolygon, QPoint ptGridPos, 
 
 	QGraphicsRectItem *pNewGfxRectItem = new QGraphicsRectItem(0.0f, 0.0f, m_vImportRegionSize.width() + 1, m_vImportRegionSize.height() + 1);
 	pNewGfxRectItem->setPos(ptCurPos.x(), ptCurPos.y());
-	pNewGfxRectItem->setPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Orange)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+	pNewGfxRectItem->setPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Green)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
 	m_pModeImportGroup->addToGroup(pNewGfxRectItem);
 
 	QGraphicsPixmapItem *pNewGfxPixmapItem = new QGraphicsPixmapItem(pixmap);
 	m_pModeImportGroup->addToGroup(pNewGfxPixmapItem);
 
-	QGraphicsPolygonItem *pNewOutlineItem = new QGraphicsPolygonItem(outlinePolygon);
+	QGraphicsPolygonItem *pNewShapeItem = new QGraphicsPolygonItem(outlinePolygon);
+	pNewShapeItem->setPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Orange)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+	m_pModeImportGroup->addToGroup(pNewShapeItem);
 	
-	ImportTileItem tileItem(pNewGfxRectItem, pNewGfxPixmapItem, pNewOutlineItem);
+	ImportTileItem tileItem(pNewGfxRectItem, pNewGfxPixmapItem, pNewShapeItem);
 	tileItem.SetSelected(bDefaultSelected);
 	m_ImportTileMap.insert(ptGridPos, tileItem);
 }
@@ -163,7 +165,9 @@ void TileSetScene::SyncImport()
 		ptCurPos = QPoint(ptCurPos.x() + 2, ptCurPos.y() + 2); // offset by 2 pixels to avoid overlap with rect and outline (1px each)
 		iter.value().m_pPixmapItem->setPos(ptCurPos);
 
-		iter.value().m_pOutlineItem->setPos(ptCurPos.x() + 1, ptCurPos.y() + 1);
+		iter.value().m_pShapeItem->setPolygon(m_pTileSet->GetTilePolygon());
+		QPointF ptOffset(m_pTileSet->GetTileOffset());
+		iter.value().m_pShapeItem->setPos(ptCurPos.x() + (m_vImportRegionSize.width() / 2) + ptOffset.x(), ptCurPos.y() + (m_vImportRegionSize.height() / 2) + ptOffset.y());
 	}
 
 	int iNumColumns = maxX - minX + 1;

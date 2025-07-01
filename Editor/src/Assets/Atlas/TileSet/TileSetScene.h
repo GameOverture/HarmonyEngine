@@ -53,13 +53,13 @@ class TileSetScene : public QGraphicsScene
 		bool														m_bSelected;
 		QGraphicsRectItem *											m_pRectItem;
 		QGraphicsPixmapItem *										m_pPixmapItem;
-		QGraphicsPolygonItem *										m_pOutlineItem;		// This is the outline of the tile as it sits in a grid, especially helpful for isometric and hexagon
+		QGraphicsPolygonItem *										m_pShapeItem;		// This is the shape outline of the tile as it sits in a grid, especially helpful for isometric and hexagon
 
-		ImportTileItem(QGraphicsRectItem *pRect, QGraphicsPixmapItem *pPixmap, QGraphicsPolygonItem *pOutline) :
+		ImportTileItem(QGraphicsRectItem *pRect, QGraphicsPixmapItem *pPixmap, QGraphicsPolygonItem *pShape) :
 			m_bSelected(true),
 			m_pRectItem(pRect),
 			m_pPixmapItem(pPixmap),
-			m_pOutlineItem(pOutline)
+			m_pShapeItem(pShape)
 		{ }
 
 		void SetSelected(bool bSelected)
