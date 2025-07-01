@@ -11,8 +11,44 @@
 #define TILESETUNDOCMDS_H
 
 #include "AtlasTileSet.h"
+#include "AuxTileSet.h"
 
 #include <QUndoCommand>
+
+
+ ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TileSetUndoCmd_TileSize : public QUndoCommand
+{
+	AtlasTileSet &						m_TileSetRef;
+	AuxTileSet &						m_AuxTileSetRef;
+
+	QSize								m_OldSize;
+	QSize								m_NewSize;
+
+public:
+	TileSetUndoCmd_TileSize(AtlasTileSet &tileSetItemRef, AuxTileSet &auxTileSetRef, QSize newTileSize, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_TileSize();
+
+	virtual void redo() override;
+	virtual void undo() override;
+	virtual int id() const override;
+	virtual bool mergeWith(const QUndoCommand *pOtherCmd) override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TileSetUndoCmd_TileShape : public QUndoCommand
+{
+	AtlasTileSet &						m_TileSetRef;
+	AuxTileSet &						m_AuxTileSetRef;
+	TileSetShape							m_eOldShape;
+	TileSetShape							m_eNewShape;
+
+public:
+	TileSetUndoCmd_TileShape(AtlasTileSet &tileSetItemRef, AuxTileSet &auxTileSetRef, TileSetShape eNewShape, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_TileShape();
+	virtual void redo() override;
+	virtual void undo() override;
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TileSetUndoCmd_AppendTiles : public QUndoCommand

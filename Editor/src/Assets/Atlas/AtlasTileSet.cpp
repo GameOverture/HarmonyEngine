@@ -40,7 +40,7 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 	AtlasFrame(ITEM_AtlasTileSet, modelRef, ITEM_AtlasTileSet, uuid, uiChecksum, uiBankId, sName, 0, 0, 0, 0, texInfo, uiW, uiH, uiX, uiY, iTextureIndex, uiErrors),
 	m_TileSetDataPair(tileSetDataPair),
 	m_bExistencePendingSave(bIsPendingSave),
-	m_eTileType(TILESETTYPE_Unknown)
+	m_eTileShape(TILESETSHAPE_Unknown)
 {
 	m_ActionSave.setIcon(QIcon(":/icons16x16/file-save.png"));
 	m_ActionSave.setShortcuts(QKeySequence::Save);
@@ -65,7 +65,7 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 	// Initialize AtlasTileSet members with 'm_TileSetDataPair' meta data
 	if(m_TileSetDataPair.m_Meta.empty() == false)
 	{
-		m_eTileType = HyGlobal::GetTileSetTypeFromString(m_TileSetDataPair.m_Meta["tileType"].toString());
+		m_eTileShape = HyGlobal::GetTileSetShapeFromString(m_TileSetDataPair.m_Meta["tileShape"].toString());
 
 		QJsonArray atlasRegionSizeArray = m_TileSetDataPair.m_Meta["regionSize"].toArray();
 		m_RegionSize = QSize(atlasRegionSizeArray[0].toInt(), atlasRegionSizeArray[1].toInt());
@@ -73,13 +73,7 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 		QJsonArray tileSizeArray = m_TileSetDataPair.m_Meta["tileSize"].toArray();
 		m_TileSize = QSize(tileSizeArray[0].toInt(), tileSizeArray[1].toInt());
 
-		m_TilePolygon.clear();
-		QJsonArray tilePolygonArray = m_TileSetDataPair.m_Meta["tilePolygon"].toArray();
-		for(int iVertIndex = 0; iVertIndex < tilePolygonArray.size(); iVertIndex += 2)
-		{
-			QPointF ptVert(tilePolygonArray[iVertIndex].toDouble(), tilePolygonArray[iVertIndex + 1].toDouble());
-			m_TilePolygon << ptVert;
-		}
+		UpdateTilePolygon();
 
 		QJsonArray autotileArray = m_TileSetDataPair.m_Meta["autoTiles"].toArray();
 		m_AutotileList.reserve(autotileArray.size());
@@ -143,14 +137,15 @@ int AtlasTileSet::GetNumTiles() const
 	return m_TileDataMap.size();
 }
 
-TileSetType AtlasTileSet::GetTileType() const
+TileSetShape AtlasTileSet::GetTileShape() const
 {
-	return m_eTileType;
+	return m_eTileShape;
 }
 
-void AtlasTileSet::SetTileType(TileSetType eTileSetType)
+void AtlasTileSet::SetTileShape(TileSetShape eTileSetShape)
 {
-	m_eTileType = eTileSetType;
+	m_eTileShape = eTileSetShape;
+	UpdateTilePolygon();
 }
 
 QSize AtlasTileSet::GetAtlasRegionSize() const
@@ -171,6 +166,7 @@ QSize AtlasTileSet::GetTileSize() const
 void AtlasTileSet::SetTileSize(QSize size)
 {
 	m_TileSize = size;
+	UpdateTilePolygon();
 }
 
 QPolygonF AtlasTileSet::GetTilePolygon() const
@@ -217,7 +213,7 @@ QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vRegionS
 	if(importBatchMap.isEmpty())
 		return newTileDataList;
 
-	if(m_eTileType == TILESETTYPE_Unknown || m_TilePolygon.isEmpty())
+	if(m_eTileShape == TILESETSHAPE_Unknown || m_TilePolygon.isEmpty())
 		HyGuiLog("AtlasTileSet::Cmd_AppendNewTiles() was invoked while not fully initialized", LOGTYPE_Error);
 
 	// Update region size if necessary (may only grow in size)
@@ -351,18 +347,9 @@ void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 	// Get current member data and write to fileDataPairOut
 	fileDataPairOut = m_TileSetDataPair;
 
-	fileDataPairOut.m_Meta["tileType"] = HyGlobal::TileSetTypeName(m_eTileType);
+	fileDataPairOut.m_Meta["tileShape"] = HyGlobal::TileSetShapeName(m_eTileShape);
 	fileDataPairOut.m_Meta["regionSize"] = QJsonArray() << QJsonValue(m_RegionSize.width()) << QJsonValue(m_RegionSize.height());
-
 	fileDataPairOut.m_Meta["tileSize"] = QJsonArray() << QJsonValue(m_TileSize.width()) << QJsonValue(m_TileSize.height());
-
-	QJsonArray tilePolygonArray;
-	for(int i = 0; i < m_TilePolygon.size(); ++i)
-	{
-		tilePolygonArray << m_TilePolygon[i].x();
-		tilePolygonArray << m_TilePolygon[i].y();
-	}
-	fileDataPairOut.m_Meta["tilePolygon"] = tilePolygonArray;
 
 	QJsonArray autotileArray;
 	for(int i = 0; i < m_AutotileList.size(); ++i)
@@ -437,6 +424,52 @@ void AtlasTileSet::DiscardChanges()
 	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TexInfo.GetBucketId())));
 	frameObj.insert("x", QJsonValue(GetX()));
 	frameObj.insert("y", QJsonValue(GetY()));
+}
+
+void AtlasTileSet::UpdateTilePolygon()
+{
+	m_TilePolygon.clear();
+	
+	switch(m_eTileShape)
+	{
+	case TILESETSHAPE_Square:
+	case TILESETSHAPE_HalfOffsetSquare:
+		m_TilePolygon << QPoint(0, 0)
+					  << QPoint(m_TileSize.width(), 0)
+					  << QPoint(m_TileSize.width(), m_TileSize.height())
+					  << QPoint(0, m_TileSize.height());
+		break;
+		
+	case TILESETSHAPE_Isometric:
+		m_TilePolygon << QPoint(0, m_TileSize.height() / 2)
+					  << QPoint(m_TileSize.width() / 2, 0)
+					  << QPoint(m_TileSize.width(), m_TileSize.height() / 2)
+					  << QPoint(m_TileSize.width() / 2, m_TileSize.height());
+		break;
+
+	case TILESETSHAPE_HexagonPointTop:
+		m_TilePolygon << QPoint(m_TileSize.width() / 2, 0)
+					  << QPoint(m_TileSize.width(), m_TileSize.height() / 4)
+					  << QPoint(m_TileSize.width(), m_TileSize.height() * 3 / 4)
+					  << QPoint(m_TileSize.width() / 2, m_TileSize.height())
+					  << QPoint(0, m_TileSize.height() * 3 / 4)
+					  << QPoint(0, m_TileSize.height() / 4);
+		break;
+		
+	case TILESETSHAPE_HexagonFlatTop:
+		m_TilePolygon << QPoint(m_TileSize.width() / 4, 0)
+					  << QPoint(m_TileSize.width() * 3 / 4, 0)
+					  << QPoint(m_TileSize.width(), m_TileSize.height() / 2)
+					  << QPoint(m_TileSize.width() * 3 / 4, m_TileSize.height())
+					  << QPoint(m_TileSize.width() / 4, m_TileSize.height())
+					  << QPoint(0, m_TileSize.height() / 2);
+		break;
+
+	case TILESETSHAPE_Unknown:
+	default:
+		HyGuiLog("AtlasTileSet::UpdateTilePolygon() - Unknown tile shape", LOGTYPE_Error);
+		return;
+	}
 }
 
 void AtlasTileSet::RegenerateSubAtlas()

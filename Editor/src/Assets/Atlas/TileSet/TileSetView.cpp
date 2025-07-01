@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "TileSetView.h"
 #include "TileSetScene.h"
+#include "AuxTileSet.h"
 
 #include <QPainter>
 #include <QScrollBar>
@@ -88,11 +89,11 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 
 /*virtual*/ void TileSetView::mousePressEvent(QMouseEvent *pEvent) /*override*/
 {
-	if(pEvent->button() != Qt::LeftButton)
-	{
-		QGraphicsView::mousePressEvent(pEvent);
-		return;
-	}
+	//if(pEvent->button() != Qt::LeftButton)
+	//{
+	//	QGraphicsView::mousePressEvent(pEvent);
+	//	return;
+	//}
 
 	QGraphicsItem *pItemUnderMouse = itemAt(pEvent->pos());
 	if(pItemUnderMouse)
@@ -112,14 +113,16 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 {
 	if(DRAGSTATE_Dragging == m_eDragState)
 	{
-		QPointF ptSceneDragStart = mapToScene(m_ptDragStart);
-
-		// TODO: Start here!
-		//GetScene()->OnMarqueeRelease(m_ptDragStart, pEvent);
-
-
-		//TileSetUndoCmd_DropTiles *pCmd = new TileSetUndoCmd_DropTiles();
-		//m_pAuxTileSet->GetTileSet()->GetUndoStack()->push(pCmd);
+		GetScene()->OnMarqueeRelease(pEvent->button(), mapToScene(m_ptDragStart), mapToScene(pEvent->pos()));
+		m_pAuxTileSet->UpdateSelection();
+	}
+	else if(DRAGSTATE_InitialPress == m_eDragState)
+	{
+		QPoint ptOffset = pEvent->pos();
+		ptOffset.setX(ptOffset.x() + 1);
+		ptOffset.setY(ptOffset.y() + 1);
+		GetScene()->OnMarqueeRelease(pEvent->button(), mapToScene(pEvent->pos()), mapToScene(ptOffset));
+		m_pAuxTileSet->UpdateSelection();
 	}
 
 	m_eDragState = DRAGSTATE_None;

@@ -43,7 +43,7 @@ class AtlasTileSet : public AtlasFrame
 	
 	TileSetScene				m_GfxScene;
 
-	TileSetType					m_eTileType;
+	TileSetShape					m_eTileShape;
 	QSize						m_RegionSize;					// The size of the atlas cutout dimensions (not necessarily the size of the tile)
 	QSize						m_TileSize;						// User specified size that is used in conjunction with m_eTileType to create m_TilePolygon
 	QPolygonF					m_TilePolygon;					// Represents the actual tile, that is able to be arranged in a TileMap (grid)
@@ -117,8 +117,8 @@ public:
 
 	int GetNumTiles() const;
 	
-	TileSetType GetTileType() const;
-	void SetTileType(TileSetType eTileSetType);
+	TileSetShape GetTileShape() const;
+	void SetTileShape(TileSetShape eTileSetShape);
 
 	QSize GetAtlasRegionSize() const;
 	void SetAtlasRegionSize(QSize size);
@@ -156,6 +156,7 @@ public:
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
 
 protected:
+	void UpdateTilePolygon();
 	void RegenerateSubAtlas(); // Assumes m_TileDataList is up to date. This will regenerate the sub-atlas texture and update each TileData
 
 private Q_SLOTS:

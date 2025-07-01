@@ -196,17 +196,17 @@ enum MimeType
 	NUM_MIMETYPES
 };
 
-enum TileSetType
+enum TileSetShape
 {
-	TILESETTYPE_Unknown = -1,
+	TILESETSHAPE_Unknown = -1,
 
-	TILESETTYPE_Square = 0,
-	TILESETTYPE_Isometric,
-	TILESETTYPE_HalfOffsetSquare,
-	TILESETTYPE_HexagonPointTop,
-	TILESETTYPE_HexagonFlatTop,
+	TILESETSHAPE_Square = 0,
+	TILESETSHAPE_Isometric,
+	TILESETSHAPE_HalfOffsetSquare,
+	TILESETSHAPE_HexagonPointTop,
+	TILESETSHAPE_HexagonFlatTop,
 
-	NUM_TILESETTYPES
+	NUM_TILESETSHAPES
 };
 
 enum EditorShape
@@ -274,6 +274,11 @@ enum TweenProperty
 	//TWEENPROP_Pitch,
 
 	NUM_TWEENPROPS
+};
+
+enum MergableUndoCmd
+{
+	MERGABLEUNDOCMD_TileSize = 1
 };
 
 enum SnappingSetting
@@ -392,7 +397,7 @@ class HyGlobal
 	static QString														sm_sItemNames[NUM_ITEMTYPES];
 	static QString														sm_sItemNamesPlural[NUM_ITEMTYPES];
 	static QString														sm_AssetNames[NUM_ASSETMANTYPES];
-	static QString														sm_TileSetTypeNames[NUM_TILESETTYPES];
+	static QString														sm_TileSetShapeNames[NUM_TILESETSHAPES];
 	static QString														sm_ShapeNames[NUM_SHAPES];
 	static QString														sm_TweenFuncNames[NUM_TWEENFUNCS];
 	static QString														sm_TweenPropNames[NUM_TWEENPROPS];
@@ -426,14 +431,14 @@ public:
 	static QList<ItemType> GetItemTypeList_Project();
 	static QList<ItemType> GetItemTypeList_Asset();
 	static QList<ItemType> GetItemTypeList_Widget();
-	static QList<TileSetType> GetTileSetTypeList();
+	static QList<TileSetShape> GetTileSetTypeList();
 	static QList<EditorShape> GetShapeList();
 	static QList<TweenFuncType> GetTweenFuncList();
 	static QList<TweenProperty> GetTweenPropList();
 	static QStringList GetTypeNameList();
 	static ItemType GetTypeFromString(QString sType);
-	static QStringList GetTileSetTypeNameList();
-	static TileSetType GetTileSetTypeFromString(QString sTileSet);
+	static QStringList GetTileSetShapeNameList();
+	static TileSetShape GetTileSetShapeFromString(QString sTileSet);
 	static QStringList GetShapeNameList();
 	static EditorShape GetShapeFromString(QString sShape);
 	static QStringList GetTweenFuncNameList();
@@ -455,7 +460,7 @@ public:
 
 	static const QString ItemName(ItemType eItem, bool bPlural)			{ if(eItem == ITEM_None) return QString(); return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
 	static const QString AssetName(AssetManagerType eAsset)				{ return sm_AssetNames[eAsset]; }
-	static const QString TileSetTypeName(TileSetType eTileSetType)		{ return sm_TileSetTypeNames[eTileSetType]; }
+	static const QString TileSetShapeName(TileSetShape eTileSetType)	{ return sm_TileSetShapeNames[eTileSetType]; }
 	static const QString ShapeName(EditorShape eShape)					{ return sm_ShapeNames[eShape]; }
 	static const QString TweenFuncName(TweenFuncType eTween)			{ return sm_TweenFuncNames[eTween]; }
 	static const QString TweenPropName(TweenProperty eTweenProp)		{ return sm_TweenPropNames[eTweenProp]; }

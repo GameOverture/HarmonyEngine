@@ -42,7 +42,11 @@ public:
 	void Init(AtlasTileSet *pTileSet);
 	AtlasTileSet *GetTileSet() const;
 
+	void SetTileShapeWidget(TileSetShape eTileShape);
+	void SetTileSizeWidgets(QSize tileSize); // Blocks the WgtVectorSpinBox::SetValue signal
+
 	void RefreshInfo();
+	void UpdateSelection();
 
 private:
 	Ui::AuxTileSet *ui;
@@ -65,7 +69,9 @@ private Q_SLOTS:
 
 	void on_btnImageBrowse_clicked();
 
+	void on_cmbTileShape_currentIndexChanged(int iIndex);
 	void OnTileSizeChanged(QVariant newSize);
+
 	void OnTextureRegionChanged(QVariant newSize);
 	void OnStartOffsetChanged(QVariant newOffset);
 	void OnPaddingChanged(QVariant newPadding);

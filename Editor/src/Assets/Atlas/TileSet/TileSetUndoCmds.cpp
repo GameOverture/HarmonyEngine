@@ -12,6 +12,86 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+TileSetUndoCmd_TileSize::TileSetUndoCmd_TileSize(AtlasTileSet &tileSetItemRef, AuxTileSet &auxTileSetRef, QSize newTileSize, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_TileSetRef(tileSetItemRef),
+	m_AuxTileSetRef(auxTileSetRef),
+	m_OldSize(tileSetItemRef.GetTileSize()),
+	m_NewSize(newTileSize)
+{
+	if(m_OldSize == m_NewSize)
+		HyGuiLog("TileSetUndoCmd_TileSize() - Old size is the same as new size, no need to create command.", LOGTYPE_Error);
+
+	setText("Change Tile Size");
+}
+
+/*virtual*/ TileSetUndoCmd_TileSize::~TileSetUndoCmd_TileSize()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_TileSize::redo() /*override*/
+{
+	m_TileSetRef.SetTileSize(m_NewSize);
+	m_AuxTileSetRef.SetTileSizeWidgets(m_NewSize);
+}
+
+/*virtual*/ void TileSetUndoCmd_TileSize::undo() /*override*/
+{
+	m_TileSetRef.SetTileSize(m_OldSize);
+	m_AuxTileSetRef.SetTileSizeWidgets(m_OldSize);
+}
+
+/*virtual*/ int TileSetUndoCmd_TileSize::id() const /*override*/
+{
+	return MERGABLEUNDOCMD_TileSize;
+}
+
+/*virtual*/ bool TileSetUndoCmd_TileSize::mergeWith(const QUndoCommand *pOtherCmd) /*override*/
+{
+	//TileSetUndoCmd_TileSize *pOtherTileSizeCmd = dynamic_cast<TileSetUndoCmd_TileSize *>(const_cast<QUndoCommand *>(pOtherCmd));
+	const TileSetUndoCmd_TileSize *pOtherTileSizeCmd = static_cast<const TileSetUndoCmd_TileSize *>(pOtherCmd); // This is faster, and safe as long as I always use unique MERGABLEUNDOCMD's for each ID
+	if(pOtherTileSizeCmd && (&pOtherTileSizeCmd->m_TileSetRef == &m_TileSetRef))
+	{
+		m_NewSize = pOtherTileSizeCmd->m_NewSize;
+		return true;
+	}
+
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TileSetUndoCmd_TileShape::TileSetUndoCmd_TileShape(AtlasTileSet &tileSetItemRef, AuxTileSet &auxTileSetRef, TileSetShape eNewShape, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_TileSetRef(tileSetItemRef),
+	m_AuxTileSetRef(auxTileSetRef),
+	m_eOldShape(tileSetItemRef.GetTileShape()),
+	m_eNewShape(eNewShape)
+{
+	if(m_eOldShape == m_eNewShape)
+		HyGuiLog("TileSetUndoCmd_TileShape() - Old shape is the same as new shape, no need to create command.", LOGTYPE_Error);
+	
+	setText("Change Tile Shape");
+}
+
+/*virtual*/ TileSetUndoCmd_TileShape::~TileSetUndoCmd_TileShape()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_TileShape::redo() /*override*/
+{
+	m_TileSetRef.SetTileShape(m_eNewShape);
+	m_AuxTileSetRef.SetTileShapeWidget(m_eNewShape);
+}
+
+/*virtual*/ void TileSetUndoCmd_TileShape::undo() /*override*/
+{
+	m_TileSetRef.SetTileShape(m_eOldShape);
+	m_AuxTileSetRef.SetTileShapeWidget(m_eOldShape);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItemRef, const QMap<QPoint, QPixmap> &pixmapMapRef, QSize vRegionSize, Qt::Edge eAppendEdge, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_eAppendEdge(eAppendEdge),

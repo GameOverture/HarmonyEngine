@@ -17,7 +17,7 @@
 /*static*/ QString HyGlobal::sm_sItemNames[NUM_ITEMTYPES];
 /*static*/ QString HyGlobal::sm_sItemNamesPlural[NUM_ITEMTYPES];
 /*static*/ QString HyGlobal::sm_AssetNames[NUM_ASSETMANTYPES];
-/*static*/ QString HyGlobal::sm_TileSetTypeNames[NUM_TILESETTYPES];
+/*static*/ QString HyGlobal::sm_TileSetShapeNames[NUM_TILESETSHAPES];
 /*static*/ QString HyGlobal::sm_ShapeNames[NUM_SHAPES];
 /*static*/ QString HyGlobal::sm_TweenFuncNames[NUM_TWEENFUNCS];
 /*static*/ QString HyGlobal::sm_TweenPropNames[NUM_TWEENPROPS];
@@ -115,11 +115,11 @@
 	sm_AssetNames[ASSETMAN_Prefabs] = "Prefabs";
 	sm_AssetNames[ASSETMAN_Audio] = "Audio";
 
-	sm_TileSetTypeNames[TILESETTYPE_Square] = "Square";
-	sm_TileSetTypeNames[TILESETTYPE_Isometric] = "Isometric";
-	sm_TileSetTypeNames[TILESETTYPE_HalfOffsetSquare] = "Half-Offset Square";
-	sm_TileSetTypeNames[TILESETTYPE_HexagonPointTop] = "Hexagon Point-Top";
-	sm_TileSetTypeNames[TILESETTYPE_HexagonFlatTop] = "Hexagon Flat-Top";
+	sm_TileSetShapeNames[TILESETSHAPE_Square] = "Square";
+	sm_TileSetShapeNames[TILESETSHAPE_Isometric] = "Isometric";
+	sm_TileSetShapeNames[TILESETSHAPE_HalfOffsetSquare] = "Half-Offset Square";
+	sm_TileSetShapeNames[TILESETSHAPE_HexagonPointTop] = "Hexagon Point-Top";
+	sm_TileSetShapeNames[TILESETSHAPE_HexagonFlatTop] = "Hexagon Flat-Top";
 
 	sm_ShapeNames[SHAPE_None] = "None";
 	sm_ShapeNames[SHAPE_Box] = "Box";
@@ -357,16 +357,16 @@
 	return list;
 }
 
-/*static*/ QList<TileSetType> HyGlobal::GetTileSetTypeList()
+/*static*/ QList<TileSetShape> HyGlobal::GetTileSetTypeList()
 {
-	QList<TileSetType> list;
-	list.append(TILESETTYPE_Square);
-	list.append(TILESETTYPE_Isometric);
-	list.append(TILESETTYPE_HalfOffsetSquare);
-	list.append(TILESETTYPE_HexagonPointTop);
-	list.append(TILESETTYPE_HexagonFlatTop);
+	QList<TileSetShape> list;
+	list.append(TILESETSHAPE_Square);
+	list.append(TILESETSHAPE_Isometric);
+	list.append(TILESETSHAPE_HalfOffsetSquare);
+	list.append(TILESETSHAPE_HexagonPointTop);
+	list.append(TILESETSHAPE_HexagonFlatTop);
 
-	if(list.size() != NUM_TILESETTYPES)
+	if(list.size() != NUM_TILESETSHAPES)
 		HyGuiLog("HyGlobal::GetTileSetTypeList missing a type!", LOGTYPE_Error);
 
 	return list;
@@ -467,26 +467,26 @@
 	return ITEM_Unknown;
 }
 
-/*static*/ QStringList HyGlobal::GetTileSetTypeNameList()
+/*static*/ QStringList HyGlobal::GetTileSetShapeNameList()
 {
-	QList<TileSetType> tileSetTypeList = GetTileSetTypeList();
+	QList<TileSetShape> tileSetTypeList = GetTileSetTypeList();
 
 	QStringList list;
 	for(int i = 0; i < tileSetTypeList.size(); ++i)
-		list.append(TileSetTypeName(tileSetTypeList[i]));
+		list.append(TileSetShapeName(tileSetTypeList[i]));
 
 	return list;
 }
 
-/*static*/ TileSetType HyGlobal::GetTileSetTypeFromString(QString sTileSet)
+/*static*/ TileSetShape HyGlobal::GetTileSetShapeFromString(QString sTileSet)
 {
-	for(int i = 0; i < NUM_TILESETTYPES; ++i)
+	for(int i = 0; i < NUM_TILESETSHAPES; ++i)
 	{
-		if(sTileSet.compare(TileSetTypeName(static_cast<TileSetType>(i)), Qt::CaseInsensitive) == 0)
-			return static_cast<TileSetType>(i);
+		if(sTileSet.compare(TileSetShapeName(static_cast<TileSetShape>(i)), Qt::CaseInsensitive) == 0)
+			return static_cast<TileSetShape>(i);
 	}
 
-	return TILESETTYPE_Unknown;
+	return TILESETSHAPE_Unknown;
 }
 
 /*static*/ QStringList HyGlobal::GetShapeNameList()

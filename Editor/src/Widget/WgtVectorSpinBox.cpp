@@ -185,8 +185,8 @@ void WgtVectorSpinBox::SetValue(QVariant data)
 		}
 		else if(data.type() == QVariant::Size)
 		{
-			ui->intSpinBoxX->setValue(data.toPoint().x());
-			ui->intSpinBoxY->setValue(data.toPoint().y());
+			ui->intSpinBoxX->setValue(data.toSize().width());
+			ui->intSpinBoxY->setValue(data.toSize().height());
 		}
 		break;
 
