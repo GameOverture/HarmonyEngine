@@ -24,6 +24,8 @@ class CommonGfxView : public QGraphicsView
 	Q_OBJECT
 
 protected:
+	QString						m_sStatusLabel;		// Optional Top-Left text string drawn on the foreground
+
 	QPointF						m_MouseScenePos;
 
 	QTimer						m_PanTimer;
@@ -34,10 +36,15 @@ public:
 	CommonGfxView(QWidget *pParent = nullptr);
 	virtual ~CommonGfxView();
 
+	QString GetStatusLabel() const;
+	void SetStatusLabel(const QString &sStatusLabel);
+
 	float GetZoom() const;
 
 protected:
 	virtual bool event(QEvent *pEvent) override;
+
+	virtual void paintEvent(QPaintEvent *pEvent) override;
 
 	virtual void keyPressEvent(QKeyEvent *pEvent) override;
 	virtual void keyReleaseEvent(QKeyEvent *pEvent) override;

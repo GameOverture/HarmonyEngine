@@ -315,7 +315,9 @@ void AuxTileSet::on_tabWidget_currentChanged(int iIndex)
 	if(m_pTileSet == nullptr)
 		return;
 
-	m_pTileSet->GetGfxScene()->SetDisplayMode(static_cast<TileSetMode>(iIndex));
+	TileSetMode eTileSetMode = static_cast<TileSetMode>(iIndex);
+	ui->graphicsView->SetStatusLabel(eTileSetMode == TILESETMODE_Importing ? "Importing Tiles" : "Setup TileSet");
+	m_pTileSet->GetGfxScene()->SetDisplayMode(eTileSetMode);
 }
 
 void AuxTileSet::on_radTileSheet_toggled(bool bChecked)

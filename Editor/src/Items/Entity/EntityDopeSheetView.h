@@ -62,7 +62,7 @@ protected:
 	virtual void contextMenuEvent(QContextMenuEvent *pEvent) override;
 
 	virtual void drawBackground(QPainter *pPainter, const QRectF &rect) override;
-	virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
+	virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override; // TODO: drawForeground() is used incorrectly - implement overlays for QGraphicsView by reimplementing paintEvent(), calling the base implementation and simply rendering on top of the viewport contents with QPainter
 
 	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
 	virtual void mousePressEvent(QMouseEvent *pEvent) override;

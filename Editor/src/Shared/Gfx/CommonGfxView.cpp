@@ -32,6 +32,20 @@ CommonGfxView::CommonGfxView(QWidget *pParent /*= nullptr*/) :
 {
 }
 
+QString CommonGfxView::GetStatusLabel() const
+{
+	return m_sStatusLabel;
+}
+
+void CommonGfxView::SetStatusLabel(const QString &sStatusLabel)
+{
+	if(m_sStatusLabel != sStatusLabel)
+	{
+		m_sStatusLabel = sStatusLabel;
+		update();
+	}
+}
+
 float CommonGfxView::GetZoom() const
 {
 	return transform().m11();
@@ -55,6 +69,37 @@ float CommonGfxView::GetZoom() const
 	}
 
 	return QGraphicsView::event(pEvent);
+}
+
+/*virtual*/ void CommonGfxView::paintEvent(QPaintEvent *pEvent) /*override*/
+{
+	QGraphicsView::paintEvent(pEvent); // Paint scene normally
+
+	if(m_sStatusLabel.isEmpty())
+		return;
+
+	// Now draw the overlay text
+	const int iMARGIN = 5;
+
+	QPainter painter(viewport());
+	painter.setRenderHint(QPainter::TextAntialiasing);
+
+	QFont font = painter.font();
+	font.setPointSize(10);
+	painter.setFont(font);
+
+	// Draw semi-transparent black background
+	QRectF bgRect = painter.boundingRect(QRectF(), Qt::AlignLeft | Qt::AlignTop, m_sStatusLabel).marginsAdded(QMarginsF(iMARGIN, iMARGIN, iMARGIN, iMARGIN));
+	bgRect.moveTo(0, 0);
+
+	painter.setBrush(QColor(0, 0, 0, 120));
+	painter.setPen(Qt::NoPen);
+	painter.drawRect(bgRect);
+	// Draw label on the rect
+	painter.setPen(Qt::white);
+	painter.setBrush(Qt::NoBrush);
+	bgRect = bgRect.marginsRemoved(QMarginsF(iMARGIN, iMARGIN, iMARGIN, iMARGIN));
+	painter.drawText(bgRect, Qt::AlignLeft | Qt::AlignTop, m_sStatusLabel);
 }
 
 /*virtual*/ void CommonGfxView::keyPressEvent(QKeyEvent *pEvent) /*override*/

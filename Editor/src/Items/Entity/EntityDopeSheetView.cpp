@@ -151,6 +151,7 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 	}
 }
 
+// TODO: drawForeground() is used incorrectly - implement overlays for QGraphicsView by reimplementing paintEvent(), calling the base implementation and simply rendering on top of the viewport contents with QPainter
 /*virtual*/ void EntityDopeSheetView::drawForeground(QPainter *pPainter, const QRectF &rect) /*override*/
 {
 	//////////////////////////////////////////////////////////////////////////

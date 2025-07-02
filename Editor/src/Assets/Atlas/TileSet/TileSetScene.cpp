@@ -56,6 +56,7 @@ void TileSetScene::SetDisplayMode(TileSetMode eMode)
 	m_eMode = eMode;
 	m_pModeImportGroup->setVisible(m_eMode == TILESETMODE_Importing);
 	m_pModeTileSetGroup->setVisible(m_eMode == TILESETMODE_TileSet);
+	
 	update();
 }
 
@@ -132,21 +133,12 @@ void TileSetScene::SyncImport()
 {
 	TileSetShape eTileType = m_pTileSet->GetTileShape();
 
-	m_pModeImportGroup->addToGroup(&m_ImportLabel);
-
 	HyMargins<int> borderMargins(10, 10, 10, 3);
 	int iSpacingAmt = 5;
-	int iTitleHeight = 30;
 
 	QPoint ptCurPos;
 	ptCurPos.setX(borderMargins.left);
 	ptCurPos.setY(borderMargins.top);
-
-	m_ImportLabel.setPos(borderMargins.left, borderMargins.top);
-	m_ImportLabel.setVisible(true);
-	m_ImportLabel.setFont(QFont("Arial", 12));
-	m_ImportLabel.setDefaultTextColor(QColor(255, 255, 255));
-	m_ImportLabel.setPlainText("Importing Tiles:");
 
 	int minX = INT_MAX, maxX = INT_MIN, minY = INT_MAX, maxY = INT_MIN;
 	for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
@@ -158,23 +150,23 @@ void TileSetScene::SyncImport()
 		maxY = HyMath::Max(maxY, ptTilePos.y());
 
 		ptCurPos.setX(borderMargins.left + (ptTilePos.x() * (m_vImportRegionSize.width() + iSpacingAmt)));
-		ptCurPos.setY(borderMargins.top + iTitleHeight + (ptTilePos.y() * (m_vImportRegionSize.height() + iSpacingAmt)));
-		iter.value().m_pRectItem->setRect(0.0f, 0.0f, m_vImportRegionSize.width() + 2, m_vImportRegionSize.height() + 2);
+		ptCurPos.setY(borderMargins.top + iSpacingAmt + (ptTilePos.y() * (m_vImportRegionSize.height() + iSpacingAmt)));
+		iter.value().m_pRectItem->setRect(0.0f, 0.0f, m_vImportRegionSize.width(), m_vImportRegionSize.height());
 		iter.value().m_pRectItem->setPos(ptCurPos.x(), ptCurPos.y());
 
-		ptCurPos = QPoint(ptCurPos.x() + 2, ptCurPos.y() + 2); // offset by 2 pixels to avoid overlap with rect and outline (1px each)
+		ptCurPos = QPoint(ptCurPos.x(), ptCurPos.y()); // offset by 2 pixels to avoid overlap with rect and outline (1px each)
 		iter.value().m_pPixmapItem->setPos(ptCurPos);
 
 		iter.value().m_pShapeItem->setPolygon(m_pTileSet->GetTilePolygon());
 		QPointF ptOffset(m_pTileSet->GetTileOffset());
-		iter.value().m_pShapeItem->setPos(ptCurPos.x() + (m_vImportRegionSize.width() / 2) + ptOffset.x(), ptCurPos.y() + (m_vImportRegionSize.height() / 2) + ptOffset.y());
+		iter.value().m_pShapeItem->setPos(ptCurPos.x() + (m_vImportRegionSize.width() * 0.5f) + ptOffset.x(), ptCurPos.y() + (m_vImportRegionSize.height() * 0.5f) + ptOffset.y());
 	}
 
 	int iNumColumns = maxX - minX + 1;
 	int iNumRows = maxY - minY + 1;
 	m_BoundsRect.setRect(0, 0,
 						 iNumColumns * m_vImportRegionSize.width() + borderMargins.left + borderMargins.right + (iNumColumns - 1) * iSpacingAmt,
-						 borderMargins.top + iTitleHeight + (iNumRows * m_vImportRegionSize.height()) + ((iNumRows - 1) * iSpacingAmt) + borderMargins.bottom);
+						 borderMargins.top + (iSpacingAmt * 2) + (iNumRows * m_vImportRegionSize.height()) + ((iNumRows - 1) * iSpacingAmt) + borderMargins.bottom);
 
 	const float fMargins = 1420.0f;
 	QRectF sceneRect(-fMargins, -fMargins, m_BoundsRect.rect().width() + (fMargins * 2.0f), m_BoundsRect.rect().height() + (fMargins * 2.0f));

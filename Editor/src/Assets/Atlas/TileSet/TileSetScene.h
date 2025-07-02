@@ -47,7 +47,6 @@ class TileSetScene : public QGraphicsScene
 	TileSetGroupItem *												m_pModeTileSetGroup;
 
 	QGraphicsRectItem												m_BoundsRect;		// A dash-line box that encompasses the entire import scene
-	QGraphicsTextItem												m_ImportLabel;		// Main label/title of the import scene
 	struct ImportTileItem
 	{
 		bool														m_bSelected;
@@ -65,8 +64,10 @@ class TileSetScene : public QGraphicsScene
 		void SetSelected(bool bSelected)
 		{
 			m_bSelected = bSelected;
+
 			HyColor selectedColor = m_bSelected ? HyColor::Orange : HyColor::Black;
 			m_pRectItem->setPen(QPen(QBrush(HyGlobal::ConvertHyColor(selectedColor)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+			m_pShapeItem->setVisible(m_bSelected);
 		}
 	};
 	QMap<QPoint, ImportTileItem>									m_ImportTileMap;
