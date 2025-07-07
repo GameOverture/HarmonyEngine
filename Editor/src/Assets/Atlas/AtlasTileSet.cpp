@@ -55,7 +55,6 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 	m_pActionUndo->setShortcuts(QKeySequence::Undo);
 	m_pActionUndo->setShortcutContext(Qt::WidgetShortcut);
 	m_pActionUndo->setObjectName("Undo");
-
 	m_pActionRedo = m_pUndoStack->createRedoAction(nullptr, "&Redo");
 	m_pActionRedo->setIcon(QIcon(":/icons16x16/edit-redo.png"));
 	m_pActionRedo->setShortcuts(QKeySequence::Redo);

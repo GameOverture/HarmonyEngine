@@ -275,6 +275,9 @@ if(Qt5_DIR)
 		src/Shared/GlobalWidgetMappers.h
 		src/Shared/IMimeData.cpp
 		src/Shared/IMimeData.h
+		src/Shared/AppendWidget/WgtAppendContainer.cpp
+		src/Shared/AppendWidget/WgtAppendContainer.h
+		src/Shared/AppendWidget/WgtAppendContainer.ui
 		src/Shared/Transform/GrabPoint.cpp
 		src/Shared/Transform/GrabPoint.h
 		src/Shared/Transform/IDrawExItem.cpp

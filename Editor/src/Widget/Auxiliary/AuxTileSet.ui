@@ -7,16 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>841</width>
-    <height>415</height>
+    <height>354</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_7">
-   <property name="spacing">
-    <number>2</number>
-   </property>
+  <layout class="QVBoxLayout" name="verticalLayout_6">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -442,7 +439,109 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QTreeView" name="treeView"/>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <property name="leftMargin">
+              <number>6</number>
+             </property>
+             <property name="topMargin">
+              <number>6</number>
+             </property>
+             <property name="rightMargin">
+              <number>6</number>
+             </property>
+             <property name="bottomMargin">
+              <number>6</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <item>
+                <spacer name="horizontalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>0 Selected Tiles</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="btnReplaceTiles">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="btnRemoveTiles">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QToolBox" name="toolBox">
+               <property name="currentIndex">
+                <number>0</number>
+               </property>
+               <widget class="QWidget" name="pgAnimation">
+                <property name="geometry">
+                 <rect>
+                  <x>0</x>
+                  <y>0</y>
+                  <width>403</width>
+                  <height>141</height>
+                 </rect>
+                </property>
+                <attribute name="icon">
+                 <iconset resource="../../../data/HyEditor.qrc">
+                  <normaloff>:/icons16x16/media-play.png</normaloff>:/icons16x16/media-play.png</iconset>
+                </attribute>
+                <attribute name="label">
+                 <string>Animation</string>
+                </attribute>
+               </widget>
+               <widget class="QWidget" name="pgAutotile">
+                <attribute name="icon">
+                 <iconset resource="../../../data/HyEditor.qrc">
+                  <normaloff>:/icons16x16/tileset-autotile.png</normaloff>:/icons16x16/tileset-autotile.png</iconset>
+                </attribute>
+                <attribute name="label">
+                 <string>Autotile</string>
+                </attribute>
+               </widget>
+               <widget class="QWidget" name="pgCollision">
+                <attribute name="icon">
+                 <iconset resource="../../../data/HyEditor.qrc">
+                  <normaloff>:/icons16x16/showGrid-Origin.png</normaloff>:/icons16x16/showGrid-Origin.png</iconset>
+                </attribute>
+                <attribute name="label">
+                 <string>Collision</string>
+                </attribute>
+               </widget>
+               <widget class="QWidget" name="pgCustom">
+                <attribute name="icon">
+                 <iconset resource="../../../data/HyEditor.qrc">
+                  <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
+                </attribute>
+                <attribute name="label">
+                 <string>Custom Data</string>
+                </attribute>
+               </widget>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -463,28 +562,28 @@
     </widget>
    </item>
   </layout>
-  <action name="actionUndo">
+  <action name="actionReplaceTiles">
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/edit-undo.png</normaloff>:/icons16x16/edit-undo.png</iconset>
+     <normaloff>:/icons16x16/atlas-replaceFrame.png</normaloff>:/icons16x16/atlas-replaceFrame.png</iconset>
    </property>
    <property name="text">
-    <string>Undo</string>
+    <string>Replace Tiles</string>
    </property>
    <property name="toolTip">
-    <string>Undo last TileSet property modification</string>
+    <string>Replace all selected tiles with newly imported tiles</string>
    </property>
   </action>
-  <action name="actionRedo">
+  <action name="actionRemoveTiles">
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/edit-redo.png</normaloff>:/icons16x16/edit-redo.png</iconset>
+     <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
-    <string>Redo</string>
+    <string>Remove Tiles</string>
    </property>
    <property name="toolTip">
-    <string>Redo the last undo'ed TileSet property modification</string>
+    <string>Remove all selected tiles from this tile set</string>
    </property>
   </action>
  </widget>

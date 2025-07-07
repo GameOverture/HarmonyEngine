@@ -21,8 +21,6 @@ IAssetItemData::IAssetItemData(IManagerModel &modelRef, ItemType eType, QUuid uu
 {
 	if(HyGlobal::IsItemType_Asset(m_eTYPE) == false)
 		HyGuiLog("IAssetItemData::IAssetItemData() was passed a type that wasn't an 'asset'", LOGTYPE_Error);
-
-	m_bIsAssetItem = true;
 }
 
 AssetManagerType IAssetItemData::GetAssetManagerType() const
