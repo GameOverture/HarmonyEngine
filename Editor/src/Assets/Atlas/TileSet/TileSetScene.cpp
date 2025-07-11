@@ -13,6 +13,10 @@
 #include "TileData.h"
 #include "TileGfxItem.h"
 
+const HyMargins<int> g_borderMargins(10, 10, 10, 3);
+const int g_iSpacingAmt = 5;
+const float g_fSceneMargins = 1420.0f;
+
 TileSetScene::TileSetScene() :
 	QGraphicsScene(),
 	m_pTileSet(nullptr),
@@ -24,8 +28,9 @@ TileSetScene::TileSetScene() :
 	addItem(m_pModeImportGroup);
 	addItem(m_pModeTileSetGroup);
 
-	m_BoundsRect.setPen(QPen(QBrush(QColor(255, 255, 255)), 1.0f, Qt::DashLine));
-	addItem(&m_BoundsRect);
+	m_ImportBoundsRect.setPen(QPen(QBrush(QColor(255, 255, 255)), 1.0f, Qt::DashLine));
+	m_ImportBoundsRect.setVisible(false);
+	m_pModeImportGroup->addToGroup(&m_ImportBoundsRect);
 }
 
 /*virtual*/ TileSetScene::~TileSetScene()
@@ -101,6 +106,7 @@ void TileSetScene::ClearImport()
 	}
 	m_ImportTileMap.clear();
 	m_vImportRegionSize = QSize(0, 0);
+	m_ImportBoundsRect.setVisible(false);
 }
 
 void TileSetScene::AddImport(const QPolygonF &outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected)
@@ -133,12 +139,9 @@ void TileSetScene::SyncImport()
 {
 	TileSetShape eTileType = m_pTileSet->GetTileShape();
 
-	HyMargins<int> borderMargins(10, 10, 10, 3);
-	int iSpacingAmt = 5;
-
 	QPoint ptCurPos;
-	ptCurPos.setX(borderMargins.left);
-	ptCurPos.setY(borderMargins.top);
+	ptCurPos.setX(g_borderMargins.left);
+	ptCurPos.setY(g_borderMargins.top);
 
 	int minX = INT_MAX, maxX = INT_MIN, minY = INT_MAX, maxY = INT_MIN;
 	for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
@@ -149,8 +152,8 @@ void TileSetScene::SyncImport()
 		minY = HyMath::Min(minY, ptTilePos.y());
 		maxY = HyMath::Max(maxY, ptTilePos.y());
 
-		ptCurPos.setX(borderMargins.left + (ptTilePos.x() * (m_vImportRegionSize.width() + iSpacingAmt)));
-		ptCurPos.setY(borderMargins.top + iSpacingAmt + (ptTilePos.y() * (m_vImportRegionSize.height() + iSpacingAmt)));
+		ptCurPos.setX(g_borderMargins.left + (ptTilePos.x() * (m_vImportRegionSize.width() + g_iSpacingAmt)));
+		ptCurPos.setY(g_borderMargins.top + g_iSpacingAmt + (ptTilePos.y() * (m_vImportRegionSize.height() + g_iSpacingAmt)));
 		iter.value().m_pRectItem->setRect(0.0f, 0.0f, m_vImportRegionSize.width(), m_vImportRegionSize.height());
 		iter.value().m_pRectItem->setPos(ptCurPos.x(), ptCurPos.y());
 
@@ -164,12 +167,12 @@ void TileSetScene::SyncImport()
 
 	int iNumColumns = maxX - minX + 1;
 	int iNumRows = maxY - minY + 1;
-	m_BoundsRect.setRect(0, 0,
-						 iNumColumns * m_vImportRegionSize.width() + borderMargins.left + borderMargins.right + (iNumColumns - 1) * iSpacingAmt,
-						 borderMargins.top + (iSpacingAmt * 2) + (iNumRows * m_vImportRegionSize.height()) + ((iNumRows - 1) * iSpacingAmt) + borderMargins.bottom);
+	m_ImportBoundsRect.setRect(0, 0,
+						 iNumColumns * m_vImportRegionSize.width() + g_borderMargins.left + g_borderMargins.right + (iNumColumns - 1) * g_iSpacingAmt,
+						 g_borderMargins.top + (g_iSpacingAmt * 2) + (iNumRows * m_vImportRegionSize.height()) + ((iNumRows - 1) * g_iSpacingAmt) + g_borderMargins.bottom);
+	m_ImportBoundsRect.setVisible(true);
 
-	const float fMargins = 1420.0f;
-	QRectF sceneRect(-fMargins, -fMargins, m_BoundsRect.rect().width() + (fMargins * 2.0f), m_BoundsRect.rect().height() + (fMargins * 2.0f));
+	QRectF sceneRect(-g_fSceneMargins, -g_fSceneMargins, m_ImportBoundsRect.rect().width() + (g_fSceneMargins * 2.0f), m_ImportBoundsRect.rect().height() + (g_fSceneMargins * 2.0f));
 	setSceneRect(sceneRect);
 }
 
@@ -189,19 +192,25 @@ void TileSetScene::SyncTileSet()
 	m_TileSetPixmapItem.clear();
 
 	QMap<QPoint, TileData *> tileDataMap = m_pTileSet->GetTileDataMap();
+	QSizeF vRegionSize = m_pTileSet->GetAtlasRegionSize();
 
+	int minX = INT_MAX, maxX = INT_MIN, minY = INT_MAX, maxY = INT_MIN;
 	for(auto it = tileDataMap.begin(); it != tileDataMap.end(); ++it)
 	{
+		QPoint ptTilePos = it.key();
+		minX = HyMath::Min(minX, ptTilePos.x());
+		maxX = HyMath::Max(maxX, ptTilePos.x());
+		minY = HyMath::Min(minY, ptTilePos.y());
+		maxY = HyMath::Max(maxY, ptTilePos.y());
+
 		TileData *pTileData = it.value();
 		if(pTileData == nullptr)
 			continue;
+		
 		TileGfxItem *pNewPixmapItem = new TileGfxItem(pTileData->GetPixmap());
-		QSizeF vTileSize = pNewPixmapItem->boundingRect().size();
-
-		pNewPixmapItem->setPos(it.key().x() * vTileSize.width(), it.key().y() * vTileSize.height());
-		// Allow mouse input on graphics item
-		pNewPixmapItem->setAcceptHoverEvents(true);
-		pNewPixmapItem->setAcceptTouchEvents(true);
+		pNewPixmapItem->setPos(it.key().x() * vRegionSize.width(), it.key().y() * vRegionSize.height());
+		pNewPixmapItem->setAcceptHoverEvents(true); // Allow mouse input on graphics item
+		pNewPixmapItem->setAcceptTouchEvents(true); // Allow mouse input on graphics item
 		pNewPixmapItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
 		pNewPixmapItem->setFlag(QGraphicsItem::ItemIsMovable, true);
 		pNewPixmapItem->setFlag(QGraphicsItem::ItemIsFocusable, true);
@@ -210,6 +219,15 @@ void TileSetScene::SyncTileSet()
 		m_pModeTileSetGroup->addToGroup(pNewPixmapItem);
 		m_TileSetPixmapItem.append(pNewPixmapItem);
 	}
+
+	int iNumColumns = maxX - minX + 1;
+	int iNumRows = maxY - minY + 1;
+	QRectF boundsRect(0, 0,
+					  iNumColumns * vRegionSize.width() + g_borderMargins.left + g_borderMargins.right + (iNumColumns - 1) * g_iSpacingAmt,
+					  g_borderMargins.top + (g_iSpacingAmt * 2) + (iNumRows * vRegionSize.height()) + ((iNumRows - 1) * g_iSpacingAmt) + g_borderMargins.bottom);
+
+	QRectF sceneRect(-g_fSceneMargins, -g_fSceneMargins, boundsRect.width() + (g_fSceneMargins * 2.0f), boundsRect.height() + (g_fSceneMargins * 2.0f));
+	setSceneRect(sceneRect);
 }
 
 void TileSetScene::OnMarqueeRelease(Qt::MouseButton eMouseBtn, QPointF ptStartDrag, QPointF ptEndDrag)

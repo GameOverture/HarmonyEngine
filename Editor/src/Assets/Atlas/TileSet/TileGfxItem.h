@@ -26,20 +26,22 @@ class TileGfxItem : public QGraphicsPixmapItem
 			setRect(-iPADDING, -iPADDING, vPixmapSize.width() + (iPADDING * 2), vPixmapSize.height() + (iPADDING * 2));
 			setPen(QPen(Qt::DashLine));
 			setBrush(Qt::NoBrush);
-			setFlags(QGraphicsItem::ItemIsSelectable |
-				QGraphicsItem::ItemIsMovable |
-				QGraphicsItem::ItemSendsGeometryChanges);
+			//setFlags(QGraphicsItem::ItemIsSelectable |
+			//	QGraphicsItem::ItemIsMovable |
+			//	QGraphicsItem::ItemSendsGeometryChanges);
+			setVisible(false);
 			setAcceptHoverEvents(true);
 		}
 
 	protected:
 		void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override {
-			setPen(QPen(Qt::red));
+			setPen(QPen(Qt::black));
+			setVisible(true);
 			QGraphicsRectItem::hoverEnterEvent(event);
 		}
 
 		void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override {
-			setPen(QPen(Qt::DashLine));
+			setVisible(false);
 			QGraphicsRectItem::hoverLeaveEvent(event);
 		}
 	};

@@ -512,7 +512,7 @@ ctor_to_frame0:
 {	
 	if(pEvent->button() != Qt::LeftButton)
 	{
-		QGraphicsView::mousePressEvent(pEvent);
+		CommonGfxView::mousePressEvent(pEvent);
 		return;
 	}
 
@@ -566,8 +566,8 @@ ctor_to_frame0:
 		//if(pItemUnderMouse == nullptr || pItemUnderMouse->data(GFXDATAKEY_Type).toInt() != GFXITEM_TweenKnob)
 		{
 			GetScene()->ClearSelectionPivot();
-			// TODO: Swap control and shift modifiers when QGraphicsView takes the wheel
-			QGraphicsView::mousePressEvent(pEvent);
+			
+			CommonGfxView::mousePressEvent(pEvent);
 		}
 	}
 
@@ -582,7 +582,7 @@ ctor_to_frame0:
 		GetScene()->RefreshAllGfxItems();
 	}
 
-	QGraphicsView::mouseDoubleClickEvent(pEvent);
+	CommonGfxView::mouseDoubleClickEvent(pEvent);
 }
 
 /*virtual*/ void EntityDopeSheetView::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/
@@ -595,14 +595,19 @@ ctor_to_frame0:
 		EntityUndoCmd_NudgeSelectedKeyFrames *pCmd = new EntityUndoCmd_NudgeSelectedKeyFrames(m_pStateData->GetDopeSheetScene(), GetNearestFrame(m_MouseScenePos.x()) - GetNearestFrame(ptSceneDragStart.x()));
 		m_pStateData->GetModel().GetItem().GetUndoStack()->push(pCmd);
 	}
-	else if(rubberBandRect().isNull() && pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f && static_cast<EntityModel &>(m_pStateData->GetModel()).IsCtor() == false)
+	else if(m_bMiddleMousePanning == false &&
+			rubberBandRect().isNull() &&
+			pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f &&
+			static_cast<EntityModel &>(m_pStateData->GetModel()).IsCtor() == false)
+	{
 		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
+	}
 
 	m_pGfxDragTweenKnobItem = nullptr;
 	m_eDragState = DRAGSTATE_None;
 
 	update();
-	QGraphicsView::mouseReleaseEvent(pEvent);
+	CommonGfxView::mouseReleaseEvent(pEvent);
 
 	if(m_pAuxDopeSheet)
 		m_pAuxDopeSheet->UpdateWidgets();

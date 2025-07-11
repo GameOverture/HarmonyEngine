@@ -89,45 +89,38 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 
 /*virtual*/ void TileSetView::mousePressEvent(QMouseEvent *pEvent) /*override*/
 {
-	//if(pEvent->button() != Qt::LeftButton)
-	//{
-	//	QGraphicsView::mousePressEvent(pEvent);
-	//	return;
-	//}
-
-	QGraphicsItem *pItemUnderMouse = itemAt(pEvent->pos());
-	if(pItemUnderMouse)
+	if(m_bMiddleMousePanning == false)
 	{
 		m_eDragState = DRAGSTATE_InitialPress;
 		m_ptDragStart = pEvent->pos();
-		
-		pItemUnderMouse->setSelected(true);
 	}
 
-	// TODO: Swap control and shift modifiers when QGraphicsView takes the wheel
-	QGraphicsView::mousePressEvent(pEvent);
+	CommonGfxView::mousePressEvent(pEvent);
 	update();
 }
 
 /*virtual*/ void TileSetView::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/
 {
-	if(DRAGSTATE_Dragging == m_eDragState)
+	if(m_bMiddleMousePanning == false)
 	{
-		GetScene()->OnMarqueeRelease(pEvent->button(), mapToScene(m_ptDragStart), mapToScene(pEvent->pos()));
-		m_pAuxTileSet->UpdateSelection();
-	}
-	else if(DRAGSTATE_InitialPress == m_eDragState)
-	{
-		QPoint ptOffset = pEvent->pos();
-		ptOffset.setX(ptOffset.x() + 1);
-		ptOffset.setY(ptOffset.y() + 1);
-		GetScene()->OnMarqueeRelease(pEvent->button(), mapToScene(pEvent->pos()), mapToScene(ptOffset));
-		m_pAuxTileSet->UpdateSelection();
+		if(DRAGSTATE_Dragging == m_eDragState)
+		{
+			GetScene()->OnMarqueeRelease(pEvent->button(), mapToScene(m_ptDragStart), mapToScene(pEvent->pos()));
+			m_pAuxTileSet->UpdateSelection();
+		}
+		else if(DRAGSTATE_InitialPress == m_eDragState)
+		{
+			QPoint ptOffset = pEvent->pos();
+			ptOffset.setX(ptOffset.x() + 1);
+			ptOffset.setY(ptOffset.y() + 1);
+			GetScene()->OnMarqueeRelease(pEvent->button(), mapToScene(pEvent->pos()), mapToScene(ptOffset));
+			m_pAuxTileSet->UpdateSelection();
+		}
 	}
 
 	m_eDragState = DRAGSTATE_None;
 
-	QGraphicsView::mouseReleaseEvent(pEvent);
+	CommonGfxView::mouseReleaseEvent(pEvent);
 	update();
 }
 

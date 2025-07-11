@@ -316,7 +316,7 @@ void AuxTileSet::on_tabWidget_currentChanged(int iIndex)
 		return;
 
 	TileSetMode eTileSetMode = static_cast<TileSetMode>(iIndex);
-	ui->graphicsView->SetStatusLabel(eTileSetMode == TILESETMODE_Importing ? "Importing Tiles" : "Setup TileSet");
+	ui->graphicsView->SetStatusLabel(eTileSetMode == TILESETMODE_Importing ? "Importing new tiles..." : "Setting up TileSet...");
 	m_pTileSet->GetGfxScene()->SetDisplayMode(eTileSetMode);
 }
 

@@ -13,7 +13,7 @@
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 
-const int iTILE_PADDING = 5;
+const int iTILE_PADDING = 0;
 
 TileGfxItem::TileGfxItem(const QPixmap &pixmap, QGraphicsItem *pParent /*= nullptr*/) :
 	QGraphicsPixmapItem(pixmap, pParent),
@@ -29,7 +29,7 @@ TileGfxItem::TileGfxItem(const QPixmap &pixmap, QGraphicsItem *pParent /*= nullp
 	m_pGfxRectItem->setBrush(Qt::NoBrush);
 
 	//m_pGfxRectItem->setZValue(0.1f);
-	m_pGfxRectItem->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
+	//m_pGfxRectItem->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
 	m_pGfxRectItem->setAcceptHoverEvents(true);
 }
 

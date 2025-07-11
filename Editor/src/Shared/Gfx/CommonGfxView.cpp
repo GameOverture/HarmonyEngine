@@ -18,7 +18,8 @@
 CommonGfxView::CommonGfxView(QWidget *pParent /*= nullptr*/) :
 	QGraphicsView(pParent),
 	m_PanTimer(this),
-	m_uiPanFlags(0)
+	m_uiPanFlags(0),
+	m_bMiddleMousePanning(false)
 {
 	setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
@@ -104,6 +105,9 @@ float CommonGfxView::GetZoom() const
 
 /*virtual*/ void CommonGfxView::keyPressEvent(QKeyEvent *pEvent) /*override*/
 {
+	if(m_bMiddleMousePanning)
+		return;
+
 	if(pEvent->key() == Qt::Key_A)
 	{
 		m_uiPanFlags |= PAN_LEFT;
@@ -144,8 +148,36 @@ float CommonGfxView::GetZoom() const
 
 /*virtual*/ void CommonGfxView::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {
+	if(m_bMiddleMousePanning && m_MouseScenePos.isNull() == false)
+	{
+		QPointF vMovement = mapToScene(pEvent->pos()) - m_MouseScenePos.toPoint();
+		horizontalScrollBar()->setValue(horizontalScrollBar()->value() + (vMovement.x() * -1.0f));
+		verticalScrollBar()->setValue(verticalScrollBar()->value() + (vMovement.y() * -1.0f));
+	}
+
 	m_MouseScenePos = mapToScene(pEvent->pos());
 	QGraphicsView::mouseMoveEvent(pEvent);
+}
+
+/*virtual*/ void CommonGfxView::mousePressEvent(QMouseEvent *pEvent) /*override*/
+{
+	// If middle mouse button is pressed, start panning
+	if(pEvent->button() == Qt::MiddleButton)
+	{
+		m_bMiddleMousePanning = true;
+		m_PanTimer.stop();
+		m_uiPanFlags = 0;
+	}
+
+	// TODO: Swap control and shift modifiers when QGraphicsView takes the wheel
+	if(m_bMiddleMousePanning == false)
+		QGraphicsView::mousePressEvent(pEvent);
+}
+
+/*virtual*/ void CommonGfxView::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/
+{
+	m_bMiddleMousePanning = false;
+	QGraphicsView::mouseReleaseEvent(pEvent);
 }
 
 /*virtual*/ void CommonGfxView::wheelEvent(QWheelEvent *pEvent) /*override*/

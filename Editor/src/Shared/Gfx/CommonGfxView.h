@@ -31,6 +31,7 @@ protected:
 	QTimer						m_PanTimer;
 	uint32						m_uiPanFlags;
 	HyLocomotion2d				m_PanLocomotion;
+	bool						m_bMiddleMousePanning;
 
 public:
 	CommonGfxView(QWidget *pParent = nullptr);
@@ -50,6 +51,8 @@ protected:
 	virtual void keyReleaseEvent(QKeyEvent *pEvent) override;
 
 	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
+	virtual void mousePressEvent(QMouseEvent *pEvent) override;
+	virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;
 	virtual void wheelEvent(QWheelEvent *pEvent) override;
 
 private Q_SLOTS:

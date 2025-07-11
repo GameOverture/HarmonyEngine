@@ -46,7 +46,6 @@ class TileSetScene : public QGraphicsScene
 	TileSetGroupItem *												m_pModeImportGroup;
 	TileSetGroupItem *												m_pModeTileSetGroup;
 
-	QGraphicsRectItem												m_BoundsRect;		// A dash-line box that encompasses the entire import scene
 	struct ImportTileItem
 	{
 		bool														m_bSelected;
@@ -72,6 +71,7 @@ class TileSetScene : public QGraphicsScene
 	};
 	QMap<QPoint, ImportTileItem>									m_ImportTileMap;
 	QSize															m_vImportRegionSize;
+	QGraphicsRectItem												m_ImportBoundsRect;		// A dash-line box that encompasses the entire import scene
 
 	QVector<TileGfxItem *>											m_TileSetPixmapItem;// The tile set pixmap item that is displayed in the tiles scene
 
