@@ -74,6 +74,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 
 	ui->explorer->SetModel(m_ExplorerModel);
 	
+	// ExplorerWidget::OnClickedItem() is responsible for enabling these actions
 	ui->explorer->addAction(ui->actionProjectSettings);
 	ui->explorer->addAction(ui->actionCloseProject);
 	ui->explorer->addAction(ui->actionCopy);
@@ -83,6 +84,7 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionNewParticle);
 	ui->explorer->addAction(ui->actionNewText);
 	ui->explorer->addAction(ui->actionNewSprite);
+	ui->explorer->addAction(ui->actionNewTileMap);
 	ui->explorer->addAction(ui->actionNewSpine);
 	ui->explorer->addAction(ui->actionNewEntity);
 	ui->explorer->addAction(ui->actionNewPrefab);

@@ -387,6 +387,7 @@ void ExplorerWidget::OnClickedItem(ExplorerItemData *pItemClicked)
 	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
 	FINDACTION("actionNewText")->setEnabled(bValidItem);
 	FINDACTION("actionNewSprite")->setEnabled(bValidItem);
+	FINDACTION("actionNewTileMap")->setEnabled(bValidItem);
 	FINDACTION("actionNewSpine")->setEnabled(bValidItem);
 	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
 	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
