@@ -47,13 +47,17 @@ The Harmony Engine consists of two main projects
 
 ## Installation 
 
-1. Clone this repository
-2. Download and execute the [CMake Installer](https://cmake.org/download/). Make sure to set the PATH variable during installation
-3. Run a pre-built Harmony Editor or compile it from source
-
-### Compiling the Editor
-- Compiling the editor **requires Qt - Only version 5.15.0 has been tested**, open-source version
-- When installing Qt6, under the selected Qt version, you must also select "Additional Libraries" -> Qt Multimedia
+1. Clone this repository and navigate inside
+    - Initialize the submodules `git submodule update --init --recursive`
+2. CMake is used internally by the Harmony Editor to manage the project and build process. Download and execute the [CMake Installer](https://cmake.org/download/)
+    - Make sure to add the PATH environment variable during installation
+3. Run a pre-built Release of the Harmony Editor, or compile it from source
+#### Compiling the Editor from source
+- Compiling the editor **requires Qt6 - Only version 6.9.3 has been tested**
+- Download Qt for open source use: [https://www.qt.io/download-qt-installer-oss](https://www.qt.io/download-qt-installer-oss)
+    - Note Visual Studio 2022 support requires 'Custom Installation' during the Installation Options
+        - Select 'MSVC 2022 64-bit' under the version of Qt6 you're installing
+        - Must include "Additional Libraries" -> Qt Multimedia
 - Using CMake, choose one of the two methods below:
 ```
 -- GUI TOOL ---------------------------------------------------------------------------------------------
@@ -66,7 +70,7 @@ Press "Configure" button and confirm creating the build directory
 In the next dialog, choose which IDE to generate in first combo box
 
 Fill in the value for variable Qt5_DIR. Specify cmake Qt5 directory:
--Example-  C:/Qt/5.15.0/msvc2017_64/lib/cmake/Qt5
+-Example-  C:\Qt\6.9.3\msvc2022_64\lib\cmake\Qt6
   
 Press "Configure" again until all red options disappear
 Press "Generate" once
