@@ -369,8 +369,6 @@ QAction *FindAction(QList<QAction *> list, QString sName);
 
 #define JSONOBJ_TOINT(obj, key) obj.value(key).toVariant().toLongLong()
 
-char *QStringToCharPtr(QString sString);
-
 QString PointToQString(QPointF ptPoint);
 QPointF StringToPoint(QString sPoint);
 QByteArray JsonValueToSrc(QJsonValue value);
@@ -416,12 +414,12 @@ class HyGlobal
 
 	static QString														sm_Themes[NUM_THEMES];
 
-	static QRegExpValidator *											sm_pCodeNameValidator;
-	static QRegExpValidator *											sm_pFreeFormValidator;
-	static QRegExpValidator *											sm_pFileNameValidator;
-	static QRegExpValidator *											sm_pFilePathValidator;
-	static QRegExpValidator *											sm_pNumbersValidator;
-	static QRegExpValidator *											sm_pVector2dValidator;
+	static QRegularExpressionValidator *								sm_pCodeNameValidator;
+	static QRegularExpressionValidator *								sm_pFreeFormValidator;
+	static QRegularExpressionValidator *								sm_pFileNameValidator;
+	static QRegularExpressionValidator *								sm_pFilePathValidator;
+	static QRegularExpressionValidator *								sm_pNumbersValidator;
+	static QRegularExpressionValidator *								sm_pVector2dValidator;
 
 	static QString														sm_ErrorStrings[NUM_ASSETERRORS];
 
@@ -475,12 +473,12 @@ public:
 	static const QString MimeTypeString(MimeType eMimeType)				{ return sm_MimeTypes[eMimeType]; }
 	static const QString ThemeString(Theme eTheme)						{ return sm_Themes[eTheme]; }
 
-	static const QRegExpValidator *CodeNameValidator()					{ return sm_pCodeNameValidator; }
-	static const QRegExpValidator *FreeFormValidator()					{ return sm_pFreeFormValidator; }
-	static const QRegExpValidator *FileNameValidator()					{ return sm_pFileNameValidator; }
-	static const QRegExpValidator *FilePathValidator()					{ return sm_pFilePathValidator; }
-	static const QRegExpValidator *NumbersValidator()					{ return sm_pNumbersValidator; }
-	static const QRegExpValidator *Vector2dValidator()					{ return sm_pVector2dValidator; }
+	static const QRegularExpressionValidator *CodeNameValidator()		{ return sm_pCodeNameValidator; }
+	static const QRegularExpressionValidator *FreeFormValidator()		{ return sm_pFreeFormValidator; }
+	static const QRegularExpressionValidator *FileNameValidator()		{ return sm_pFileNameValidator; }
+	static const QRegularExpressionValidator *FilePathValidator()		{ return sm_pFilePathValidator; }
+	static const QRegularExpressionValidator *NumbersValidator()		{ return sm_pNumbersValidator; }
+	static const QRegularExpressionValidator *Vector2dValidator()		{ return sm_pVector2dValidator; }
 
 	static const QString GetGuiFrameErrors(uint uiErrorFlags);
 

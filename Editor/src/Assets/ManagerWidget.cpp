@@ -82,7 +82,7 @@ void ManagerProxyModel::FilterByBankIndex(int iBankIndex)
 		//if(pItemData->GetText().isEmpty() == false && pItemData->GetText()[0] == HyGuiInternalCharIndicator)
 		//	return false;
 
-		QRegExp searchFilter = filterRegExp();
+		QRegularExpression searchFilter = filterRegularExpression();
 
 		if(pItemData->GetType() == ITEM_Filter)
 		{
@@ -158,7 +158,7 @@ ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 		{
 			QJsonObject assetObj = assetsArray[i].toObject();
 
-			TreeModelItemData *pFoundAsset = projRef.FindItemData(assetObj["assetUUID"].toString());
+			TreeModelItemData *pFoundAsset = projRef.FindItemData(QUuid(assetObj["assetUUID"].toString()));
 			if(pFoundAsset)
 				srcFileList.push_back(static_cast<SourceFile *>(pFoundAsset));
 		}
@@ -199,7 +199,7 @@ ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 		{
 			QJsonObject assetObj = assetsArray[i].toObject();
 
-			TreeModelItemData *pFoundAsset = projRef.FindItemData(assetObj["assetUUID"].toString());
+			TreeModelItemData *pFoundAsset = projRef.FindItemData(QUuid(assetObj["assetUUID"].toString()));
 			if(pFoundAsset)
 				srcFileList.push_back(static_cast<SourceFile *>(pFoundAsset));
 		}
@@ -539,7 +539,7 @@ void ManagerWidget::GetSelected(QList<IAssetItemData *> &selectedAssetsOut, QLis
 	}
 }
 
-/*virtual*/ void ManagerWidget::enterEvent(QEvent *pEvent) /*override*/
+/*virtual*/ void ManagerWidget::enterEvent(QEnterEvent*pEvent) /*override*/
 {
 	QWidget::enterEvent(pEvent);
 }

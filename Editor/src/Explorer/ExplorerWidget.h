@@ -18,6 +18,7 @@
 #include <QMenu>
 #include <QThread>
 #include <QSortFilterProxyModel>
+#include <QActionGroup>
 
 #include <vector>
 using std::vector;

@@ -1,12 +1,15 @@
 # BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL2, HYBUILD_SDL_NET, HYBUILD_STATIC
 # BUILD EXTRAS:  HYBUILD_SPINE, HYBUILD_RAPIDJSON, HYBUILD_ICU
 
+message(STATUS "Adding Vendor: Box2d")
 add_subdirectory(vendor/box2d)
 set_target_properties(box2d PROPERTIES FOLDER "Engine Libs")
 
+message(STATUS "Adding Vendor: soil2")
 add_subdirectory(vendor/soil2)
 
 if(HYBUILD_SPINE)
+	message(STATUS "Adding Vendor: spine-cpp")
 	add_subdirectory(extras/Spine/spine-cpp)
 	set_target_properties(spine-cpp PROPERTIES FOLDER "Engine Libs")
 	set_target_properties(spine-cpp-lite PROPERTIES FOLDER "Engine Libs")
@@ -17,11 +20,13 @@ if(HYBUILD_RAPIDJSON)
 else() #nlohmann_json
 	# If you only include this third party in PRIVATE source files, you do not need to install it when your main project gets installed.
 	set(JSON_Install OFF CACHE INTERNAL "")
+	message(STATUS "Adding Vendor: json")
 	add_subdirectory(vendor/json)
 endif()
 
 # Emscripten provides its own ports of SDL, GLFW, and GLEW
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
+	message(STATUS "Adding Vendor: glad")
 	add_subdirectory(vendor/glad)
 	
 	# Qt provides its own implementation of SDL/GLFW facilities
@@ -36,6 +41,7 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 			set(GLFW_BUILD_TESTS, OFF)
 			set(GLFW_BUILD_DOCS, OFF)
 			set(GLFW_INSTALL, OFF)
+			message(STATUS "Adding Vendor: glfw")
 			add_subdirectory(vendor/glfw)
 			set_target_properties(glfw PROPERTIES FOLDER "Engine Libs/GLFW3")
 			set_target_properties(update_mappings PROPERTIES FOLDER "Engine Libs/GLFW3")
@@ -53,6 +59,7 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 				list(APPEND EXTRA_LIBS vcruntime) # prevents memset issue in vcruntime.dll
 			endif()
 			
+			message(STATUS "Adding Vendor: SDL")
 			add_subdirectory(vendor/SDL)
 			include_directories(vendor/SDL/include)
 			set_target_properties(SDL2main PROPERTIES FOLDER "Engine Libs")
@@ -61,6 +68,7 @@ if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
 
 			# Optional SDL2 extensions
 			if(HYBUILD_SDL_NET)
+				message(STATUS "Adding Vendor: SDL_net")
 				add_subdirectory(vendor/SDL_net)
 			endif()
 		endif()

@@ -144,7 +144,7 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 //	return QWidget::event(pEvent);
 //}
 
-/*virtual*/ void WgtHarmony::enterEvent(QEvent *pEvent) /*override*/
+/*virtual*/ void WgtHarmony::enterEvent(QEnterEvent*pEvent) /*override*/
 {
 	this->setFocus();
 	static_cast<HarmonyWidget *>(parent())->ShowRulerMouse(true);
@@ -253,7 +253,7 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 		{
 			QJsonObject assetObj = assetsArray[i].toObject();
 
-			TreeModelItemData *pFoundAsset = m_pProject->FindItemData(assetObj["assetUUID"].toString());
+			TreeModelItemData *pFoundAsset = m_pProject->FindItemData(QUuid(assetObj["assetUUID"].toString()));
 			if(pFoundAsset)
 				assetsList.push_back(static_cast<SoundClip *>(pFoundAsset));
 		}
@@ -274,7 +274,7 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 		{
 			QJsonObject assetObj = assetsArray[i].toObject();
 
-			TreeModelItemData *pFoundAsset = m_pProject->FindItemData(assetObj["assetUUID"].toString());
+			TreeModelItemData *pFoundAsset = m_pProject->FindItemData(QUuid(assetObj["assetUUID"].toString()));
 			if(pFoundAsset)
 				frameList.push_back(static_cast<AtlasFrame *>(pFoundAsset));
 		}

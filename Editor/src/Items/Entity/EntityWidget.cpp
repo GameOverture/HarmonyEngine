@@ -1146,7 +1146,7 @@ void EntityWidget::on_actionDuplicateToArray_triggered()
 	EntityTreeItemData *pEntTreeItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
 	
 	QString sDlgTitle = "Duplicate " % pEntTreeItemData->GetCodeName() % " into array of " % HyGlobal::ItemName(pEntTreeItemData->GetType(), false) % " elements";
-	DlgInputNumber dlg(sDlgTitle, "Size", HyGlobal::ItemIcon(pEntTreeItemData->GetType(), SUBICON_New), 1, 1, 0x0FFFFFFF, nullptr, nullptr);
+	DlgInputNumber dlg(sDlgTitle, "Size", HyGlobal::ItemIcon(pEntTreeItemData->GetType(), SUBICON_New), 1, 1, 0x0FFFFFFF, nullptr);
 	if(dlg.exec() == QDialog::Accepted)
 	{
 		QUndoCommand *pCmd = new EntityUndoCmd_DuplicateToArray(m_ItemRef, pEntTreeItemData, dlg.GetValue());

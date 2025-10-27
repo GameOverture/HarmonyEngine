@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QApplication a(argc, argv);
 
-	qRegisterMetaTypeStreamOperators<TreeModelItemData *>("TreeModelItemData *");
+	//qRegisterMetaTypeStreamOperators<TreeModelItemData *>("TreeModelItemData *");
 
 	HyGlobal::Initialize();
 

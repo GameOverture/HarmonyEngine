@@ -16,7 +16,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QAudioDecoder>
-#include <QAudioDeviceInfo>
 #include <QMimeData>
 
 AudioCategoriesModel::AudioCategoriesModel()
@@ -63,7 +62,7 @@ int AudioCategoriesModel::GetIndex(quint32 uiId) const
 		return Qt::AlignLeft;
 
 	if(role == Qt::DisplayRole || role == Qt::EditRole)
-		return QString::number(index.row()) % " - " % m_CategoryList[index.row()].first;
+		return QVariant(QString::number(index.row()) % " - " % m_CategoryList[index.row()].first);
 
 	return QVariant();
 }
@@ -77,11 +76,11 @@ AudioManagerModel::AudioManagerModel(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Audio),
 	m_uiNextCategoryId(2) // Defaults are SFX:0, Music:1
 {
-	m_DesiredRawFormat.setChannelCount(2);
-	m_DesiredRawFormat.setCodec("audio/wav"); // also consider "audio/x-raw" or "audio/pcm"
-	m_DesiredRawFormat.setSampleType(QAudioFormat::SignedInt);
-	m_DesiredRawFormat.setSampleSize(16);
-	m_DesiredRawFormat.setSampleRate(HY_DEFAULT_SAMPLE_RATE);
+	//m_DesiredRawFormat.setChannelCount(2);
+	//m_DesiredRawFormat.setCodec("audio/wav"); // also consider "audio/x-raw" or "audio/pcm"
+	//m_DesiredRawFormat.setSampleType(QAudioFormat::SignedInt);
+	//m_DesiredRawFormat.setSampleSize(16);
+	//m_DesiredRawFormat.setSampleRate(HY_DEFAULT_SAMPLE_RATE);
 }
 
 /*virtual*/ AudioManagerModel::~AudioManagerModel()

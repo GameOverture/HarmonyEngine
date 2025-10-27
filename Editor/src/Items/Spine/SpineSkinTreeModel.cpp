@@ -218,7 +218,7 @@ QVariant SpineSkinTreeModel::headerData(int iSection, Qt::Orientation orientatio
 
 	SpineSkinTreeItem *pItem = static_cast<SpineSkinTreeItem *>(index.internalPointer());
 	if(pItem->childCount() > 0)
-		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
+		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsUserTristate;
 	else
 		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
 }

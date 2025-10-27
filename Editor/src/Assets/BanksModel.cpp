@@ -72,7 +72,7 @@ int BanksModel::GetIndex(BankData *pData) const
 		return Qt::AlignLeft;
 
 	if(role == Qt::DisplayRole || role == Qt::EditRole)
-		return "Bank: " % QString::number(GetIndex(m_BankList[index.row()])) % " - " % m_BankList[index.row()]->m_MetaObj["bankName"].toString();
+		return QVariant("Bank: " % QString::number(GetIndex(m_BankList[index.row()])) % " - " % m_BankList[index.row()]->m_MetaObj["bankName"].toString());
 
 	return QVariant();
 }

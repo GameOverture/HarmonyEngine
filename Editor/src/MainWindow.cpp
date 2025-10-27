@@ -65,9 +65,9 @@ MainWindow::MainWindow(QWidget *pParent) :
 	SetCurrentProject(nullptr);
 
 	connect(ui->menu_View, SIGNAL(aboutToShow), this, SLOT(on_menu_View_aboutToShow));
-	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Tab), this, SLOT(OnCtrlTab()));
-	new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Tab), this, SLOT(OnCtrlShiftTab()));
-	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_F4), this, SLOT(OnCtrlF4()));
+	new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab), this, SLOT(OnCtrlTab()));
+	new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab), this, SLOT(OnCtrlShiftTab()));
+	new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F4), this, SLOT(OnCtrlF4()));
 
 	HyGuiLog(HyEditorToolName, LOGTYPE_Title);
 	HyGuiLog("Initializing...", LOGTYPE_Normal);

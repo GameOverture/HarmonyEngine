@@ -108,7 +108,7 @@ void WgtCodeEditor::Open(SourceFile *pSrcFile)
 	openFileRef.m_pSourceFile = pSrcFile;
 	
 	openFileRef.m_pCodeEditor = new QCodeEditor();
-	openFileRef.m_pCodeEditor->setTabStopWidth(openFileRef.m_pCodeEditor->fontMetrics().horizontalAdvance(' ') * 4);
+	openFileRef.m_pCodeEditor->setTabStopDistance(openFileRef.m_pCodeEditor->fontMetrics().horizontalAdvance(' ') * 4);
 	openFileRef.m_pCodeEditor->setTabReplace(false);
 	openFileRef.m_pCodeEditor->setSyntaxStyle(sm_ThemeStyleMap[MainWindow::GetTheme()]);
 

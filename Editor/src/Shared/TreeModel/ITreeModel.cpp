@@ -57,7 +57,7 @@ bool ITreeModel::InsertTreeItem(Project &projectRef, TreeModelItemData *pNewItem
 	}
 
 	QVariant v;
-	v.setValue<TreeModelItemData *>(pNewItemData);
+	v.setValue(pNewItemData);
 	if(setData(index(iRow, 0, parentIndex), v, Qt::UserRole) == false)
 		HyGuiLog("IManagerModel::InsertNewItem() - setData failed", LOGTYPE_Error);
 

@@ -67,7 +67,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, EntityItemDe
 }
 
 EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject descObj, bool bIsArrayItem) :
-	TreeModelItemData(HyGlobal::GetTypeFromString(descObj["itemType"].toString()), descObj["UUID"].toString(), descObj["codeName"].toString()),
+	TreeModelItemData(HyGlobal::GetTypeFromString(descObj["itemType"].toString()), QUuid(descObj["UUID"].toString()), descObj["codeName"].toString()),
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(bIsArrayItem ? ENTTYPE_ArrayItem : ENTTYPE_Item),
 	m_pPropertiesModel(nullptr),
@@ -562,7 +562,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 	}
 	EntityTreeItemData *pThisEntityItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sEntityCodeName, ITEM_Entity, ENTTYPE_Root, QUuid(fileMetaObj["UUID"].toString()), QUuid(fileMetaObj["UUID"].toString()));
 	QVariant v;
-	v.setValue<EntityTreeItemData *>(pThisEntityItem);
+	v.setValue(pThisEntityItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
 	{
 		if(setData(index(0, iCol, QModelIndex()), v, Qt::UserRole) == false)
@@ -577,7 +577,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 	}
 	EntityTreeItemData *pShapeFolderItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "Bounding Volumes", ITEM_Prefix, ENTTYPE_BvFolder, QUuid(), QUuid());
 	QVariant shapeData;
-	shapeData.setValue<EntityTreeItemData *>(pShapeFolderItem);
+	shapeData.setValue(pShapeFolderItem);
 	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
 	{
 		if(setData(index(1, iCol, QModelIndex()), shapeData, Qt::UserRole) == false)
@@ -1088,11 +1088,11 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 		if(indexRef.column() == COLUMN_CodeName)
 		{
 			if(pItem->GetEntType() == ENTTYPE_ArrayFolder)
-				return pItem->GetCodeName() % "[" % QString::number(pTreeItem->GetNumChildren()) % "]";
+				return QVariant(pItem->GetCodeName() % "[" % QString::number(pTreeItem->GetNumChildren()) % "]");
 			else if(pItem->GetEntType() == ENTTYPE_ArrayItem)
-				return "[" % QString::number(pTreeItem->GetIndex()) % "] - " % pItem->GetThisUuid().toString(QUuid::StringFormat::WithoutBraces).split('-')[0];
+				return QVariant("[" % QString::number(pTreeItem->GetIndex()) % "] - " % pItem->GetThisUuid().toString(QUuid::StringFormat::WithoutBraces).split('-')[0]);
 			else
-				return pItem->GetCodeName();
+				return QVariant(pItem->GetCodeName());
 		}
 		else // COLUMN_ItemPath
 		{
@@ -1195,7 +1195,7 @@ QString EntityTreeModel::GenerateCodeName(QString sDesiredName) const
 	// Use 'HyGlobal::CodeNameValidator()' (QRegExpValidator) to make sure 'sDesiredName' is valid
 	int pos = 0;
 	if(HyGlobal::CodeNameValidator()->validate(sDesiredName, pos) != QValidator::Acceptable)
-		sDesiredName.remove(QRegExp("[^a-zA-Z0-9_]"));
+		sDesiredName.remove(QRegularExpression("[^a-zA-Z0-9_]"));
 
 	if(sDesiredName.isEmpty())
 		sDesiredName = "unnamed";
@@ -1263,12 +1263,12 @@ bool EntityTreeModel::FindOrCreateArrayFolder(TreeModelItem *&pParentTreeItemOut
 		if(insertRow(iArrayFolderRow, parentIndex) == false)
 		{
 			HyGuiLog("EntityTreeModel::FindOrCreateArrayFolder - ArrayFolder insertRow failed", LOGTYPE_Error);
-			return nullptr;
+			return false;
 		}
 		// Allocate and store the new array folder item in the tree model
 		EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, eItemType, ENTTYPE_ArrayFolder, QUuid(), QUuid());
 		QVariant v;
-		v.setValue<EntityTreeItemData *>(pNewItem);
+		v.setValue(pNewItem);
 		for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
 		{
 			if(setData(index(iArrayFolderRow, iCol, parentIndex), v, Qt::UserRole) == false)

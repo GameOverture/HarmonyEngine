@@ -33,7 +33,7 @@ public:
 	virtual QStringList formats() const override;
 
 protected:
-	virtual QVariant retrieveData(const QString &sMimeType, QVariant::Type type) const override;
+	virtual QVariant retrieveData(const QString &sMimeType, QMetaType type) const override;
 
 	QJsonArray MakeAssetJsonArray(Project &projRef, QList<TreeModelItemData *> assetList, AssetManagerType eAssetType);
 };

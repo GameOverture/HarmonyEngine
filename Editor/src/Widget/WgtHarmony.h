@@ -70,7 +70,7 @@ protected:
 	//virtual bool event(QEvent *pEvent) override;
 
 	// QWidget overrides
-	virtual void enterEvent(QEvent *pEvent) override;
+	virtual void enterEvent(QEnterEvent *pEvent) override;
 	virtual void leaveEvent(QEvent *pEvent) override;
 	virtual void dragEnterEvent(QDragEnterEvent *pEvent) override;
 	virtual void dropEvent(QDropEvent *pEvent) override;

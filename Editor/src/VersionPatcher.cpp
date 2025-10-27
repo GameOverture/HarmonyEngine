@@ -140,7 +140,7 @@
 	}
 	if(iFileVersion > HYGUI_FILE_VERSION)
 	{
-		HyGuiLog("File versions (" % QString(iFileVersion) % ") are from a future editor and may not be compatible.\nCurrent Editor file version: " % QString::number(HYGUI_FILE_VERSION), LOGTYPE_Error);
+		HyGuiLog("File versions (" % QString::number(iFileVersion) % ") are from a future editor and may not be compatible.\nCurrent Editor file version: " % QString::number(HYGUI_FILE_VERSION), LOGTYPE_Error);
 		return false;
 	}
 

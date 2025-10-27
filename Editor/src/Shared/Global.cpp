@@ -35,12 +35,12 @@
 
 /*static*/ QString HyGlobal::sm_Themes[NUM_THEMES];
 
-/*static*/ QRegExpValidator *HyGlobal::sm_pCodeNameValidator = nullptr;
-/*static*/ QRegExpValidator *HyGlobal::sm_pFreeFormValidator = nullptr;
-/*static*/ QRegExpValidator *HyGlobal::sm_pFileNameValidator = nullptr;
-/*static*/ QRegExpValidator *HyGlobal::sm_pFilePathValidator = nullptr;
-/*static*/ QRegExpValidator *HyGlobal::sm_pNumbersValidator  = nullptr;
-/*static*/ QRegExpValidator *HyGlobal::sm_pVector2dValidator = nullptr;
+/*static*/ QRegularExpressionValidator *HyGlobal::sm_pCodeNameValidator = nullptr;
+/*static*/ QRegularExpressionValidator *HyGlobal::sm_pFreeFormValidator = nullptr;
+/*static*/ QRegularExpressionValidator *HyGlobal::sm_pFileNameValidator = nullptr;
+/*static*/ QRegularExpressionValidator *HyGlobal::sm_pFilePathValidator = nullptr;
+/*static*/ QRegularExpressionValidator *HyGlobal::sm_pNumbersValidator  = nullptr;
+/*static*/ QRegularExpressionValidator *HyGlobal::sm_pVector2dValidator = nullptr;
 
 /*static*/ QString HyGlobal::sm_ErrorStrings[NUM_ASSETERRORS];
 
@@ -258,12 +258,12 @@
 	sm_Themes[THEME_Lappy486] = "Lappy 486";
 	sm_Themes[THEME_Compe] = "Compe";
 
-	sm_pCodeNameValidator = new QRegExpValidator(QRegExp("^[A-Za-z_]+[A-Za-z0-9_]*$"));					// Can't begin with number. Alphanumberic and underscore only.
-	sm_pFreeFormValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|_\\-\\s]*"));				// Alphanumeric and valid filename symbols. Allows whitespace.
-	sm_pFileNameValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\.\\(\\)|_\\-]*"));				// Alphanumeric and valid filename symbols. Allows periods '.'
-	sm_pFilePathValidator = new QRegExpValidator(QRegExp("[A-Za-z0-9\\(\\)|/_\\-]*"));					// Alphanumeric and valid filename symbols. Allows forward slashes.
-	sm_pNumbersValidator  = new QRegExpValidator(QRegExp("[0-9]*"));									// Numbers only
-	sm_pVector2dValidator = new QRegExpValidator(QRegExp("\\([0-9]*\\.?[0-9]*,[0-9]*\\.?[0-9]*\\)"));	// When user needs to input values for a 2d vector
+	sm_pCodeNameValidator = new QRegularExpressionValidator(QRegularExpression("^[A-Za-z_]+[A-Za-z0-9_]*$"));				// Can't begin with number. Alphanumberic and underscore only.
+	sm_pFreeFormValidator = new QRegularExpressionValidator(QRegularExpression("[A-Za-z0-9\\(\\)|_\\-\\s]*"));				// Alphanumeric and valid filename symbols. Allows whitespace.
+	sm_pFileNameValidator = new QRegularExpressionValidator(QRegularExpression("[A-Za-z0-9\\.\\(\\)|_\\-]*"));				// Alphanumeric and valid filename symbols. Allows periods '.'
+	sm_pFilePathValidator = new QRegularExpressionValidator(QRegularExpression("[A-Za-z0-9\\(\\)|/_\\-]*"));				// Alphanumeric and valid filename symbols. Allows forward slashes.
+	sm_pNumbersValidator  = new QRegularExpressionValidator(QRegularExpression("[0-9]*"));									// Numbers only
+	sm_pVector2dValidator = new QRegularExpressionValidator(QRegularExpression("\\([0-9]*\\.?[0-9]*,[0-9]*\\.?[0-9]*\\)"));	// When user needs to input values for a 2d vector
 
 	sm_ErrorStrings[ASSETERROR_CannotFindMetaFile] = "Cannot find source meta-image";
 	sm_ErrorStrings[ASSETERROR_CouldNotPack] = "Could not pack this frame in atlas";
@@ -1129,13 +1129,6 @@ QAction *FindAction(QList<QAction *> list, QString sName)
 	}
 	
 	return nullptr;
-}
-
-char *QStringToCharPtr(QString sString)
-{
-	QByteArray ba;
-	ba.append(sString);
-	return ba.data();
 }
 
 QString PointToQString(QPointF ptPoint)

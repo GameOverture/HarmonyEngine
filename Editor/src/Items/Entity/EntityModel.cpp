@@ -905,9 +905,9 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 		QList<int> frameList = propertiesMapByFrame.keys();
 
 		// Combine and remove duplicates
-		QSet<int> frameSet = callbacksFrameIndexList.toSet();
-		frameSet.unite(frameList.toSet());
-		frameList = frameSet.toList();
+		QSet<int> frameSet(callbacksFrameIndexList.begin(), callbacksFrameIndexList.end());
+		frameSet.unite(QSet<int>(frameList.begin(), frameList.end()));
+		frameList = QList<int>(frameSet.begin(), frameSet.end());
 
 		std::sort(frameList.begin(), frameList.end()); // Then sort by frame index (they're unsorted because of the combine and toList())
 		for(int iFrameIndex : frameList)

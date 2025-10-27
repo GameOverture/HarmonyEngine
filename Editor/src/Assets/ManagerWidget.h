@@ -93,7 +93,7 @@ public:
 	void GetSelected(QList<IAssetItemData *> &selectedAssetsOut, QList<TreeModelItemData *> &selectedFiltersOut, bool bSortAlphabetically);
 
 protected:
-	virtual void enterEvent(QEvent *pEvent) override;
+	virtual void enterEvent(QEnterEvent *pEvent) override;
 	virtual void leaveEvent(QEvent *pEvent) override;
 	virtual void resizeEvent(QResizeEvent *event) override;
 

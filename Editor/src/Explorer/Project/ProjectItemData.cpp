@@ -42,7 +42,7 @@ ProjectItemData::ProjectItemData(Project &projRef,
 						 const QString sName,
 						 const FileDataPair &initItemFileDataRef,
 						 bool bIsPendingSave) :
-	ExplorerItemData(projRef, eType, initItemFileDataRef.m_Meta["UUID"].toString(), sName),
+	ExplorerItemData(projRef, eType, QUuid(initItemFileDataRef.m_Meta["UUID"].toString()), sName),
 	m_ItemFileData(initItemFileDataRef),
 	m_bExistencePendingSave(bIsPendingSave),
 	m_pModel(nullptr),

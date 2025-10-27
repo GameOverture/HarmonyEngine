@@ -44,7 +44,7 @@ class AudioManagerModel : public IManagerModel
 
 	friend class AudioImportThread;
 
-	QAudioFormat							m_DesiredRawFormat;
+	//QAudioFormat							m_DesiredRawFormat;
 	AudioCategoriesModel					m_AudioCategoriesModel;
 	quint32									m_uiNextCategoryId;
 

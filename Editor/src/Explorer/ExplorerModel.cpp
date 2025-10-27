@@ -429,7 +429,7 @@ QString ExplorerModel::AssemblePrefix(ExplorerItemData *pItem) const
 	if(indexRef.isValid() == false || pItem == nullptr)
 		return QAbstractItemModel::flags(indexRef);
 
-	return QAbstractItemModel::flags(indexRef) | Qt::ItemIsDropEnabled | (pItem->GetType() == ITEM_Project ? 0 : Qt::ItemIsDragEnabled);
+	return Qt::ItemFlags(QAbstractItemModel::flags(indexRef) | Qt::ItemIsDropEnabled | (pItem->GetType() == ITEM_Project ? 0 : Qt::ItemIsDragEnabled));
 }
 
 /*virtual*/ Qt::DropActions ExplorerModel::supportedDragActions() const /*override*/

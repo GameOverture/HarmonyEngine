@@ -629,7 +629,7 @@ bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType
 	{
 		QJsonObject assetObj = assetArrayRef[i].toObject();
 
-		if(FindItemData(assetObj["assetUUID"].toString()) == nullptr)
+		if(FindItemData(QUuid(assetObj["assetUUID"].toString())) == nullptr)
 		{
 			QFileInfo assetFileInfo(assetObj["uri"].toString());
 

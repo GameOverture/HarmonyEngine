@@ -1005,8 +1005,8 @@ void EntityDopeSheetScene::RemoveKeyFrameProperties(EntityTreeItemData *pItemDat
 	for(auto iterCategory = keyFrameObjCopy.begin(); iterCategory != keyFrameObjCopy.end(); ++iterCategory)
 	{
 		QString sCategoryName = iterCategory.key();
-		QJsonObject &categoryObjRef = iterCategory.value().toObject();
-		QStringList sPropList = categoryObjRef.keys();
+		QJsonObject categoryObj = iterCategory.value().toObject();
+		QStringList sPropList = categoryObj.keys();
 		for(int i = 0; i < sPropList.size(); ++i)
 			RemoveKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, sPropList[i], bRefreshGfxItems && (i == (sPropList.size()-1)));
 	}

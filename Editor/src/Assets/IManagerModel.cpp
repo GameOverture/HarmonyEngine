@@ -975,7 +975,7 @@ void IManagerModel::SaveData() // Assets required by the game (runtime manifests
 			}
 			else
 			{
-				pItemData = m_ProjectRef.FindItemData(assetObj["assetUUID"].toString());
+				pItemData = m_ProjectRef.FindItemData(QUuid(assetObj["assetUUID"].toString()));
 				if(pItemData == nullptr)
 				{
 					HyGuiLog("IManagerModel::dropMimeData - could not find by UUID: " % assetObj["assetUUID"].toString(), LOGTYPE_Warning);

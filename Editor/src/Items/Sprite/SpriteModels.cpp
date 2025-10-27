@@ -194,11 +194,11 @@ SpriteFrame *SpriteFramesModel::GetFrameAt(int iIndex)
 		case COLUMN_Frame:
 			return pFrame->m_pFrame->GetName();
 		case COLUMN_OffsetX:
-			return QString::number(pFrame->m_vOffset.x());
+			return QVariant(QString::number(pFrame->m_vOffset.x()));
 		case COLUMN_OffsetY:
-			return QString::number(pFrame->m_vOffset.y());
+			return QVariant(QString::number(pFrame->m_vOffset.y()));
 		case COLUMN_Duration:
-			return QString::number(pFrame->m_fDuration, 'g', 3) % ((role == Qt::DisplayRole) ? " sec" : "");
+			return QVariant(QString::number(pFrame->m_fDuration, 'g', 3) % ((role == Qt::DisplayRole) ? " sec" : ""));
 		}
 	}
 

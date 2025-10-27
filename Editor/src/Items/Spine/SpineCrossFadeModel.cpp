@@ -145,7 +145,7 @@ SpineCrossFade *SpineCrossFadeModel::GetCrossFadeAt(int iIndex)
 			if(role == Qt::UserRole)
 				return QVariant(pCrossFade->m_fMixValue);
 			else
-				return QString::number(pCrossFade->m_fMixValue, 'g', 3) % ((role == Qt::DisplayRole) ? " sec" : "");
+				return QVariant(QString::number(pCrossFade->m_fMixValue, 'g', 3) % ((role == Qt::DisplayRole) ? " sec" : ""));
 		case COLUMN_AnimTwo:
 			return pCrossFade->m_sAnimTwo;
 		}

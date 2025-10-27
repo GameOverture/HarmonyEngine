@@ -41,11 +41,8 @@ MimeType IMimeData::GetMimeType() const
 	return sFormatList;
 }
 
-/*virtual*/ QVariant IMimeData::retrieveData(const QString &sMimeType, QVariant::Type type) const /*override*/
+/*virtual*/ QVariant IMimeData::retrieveData(const QString &sMimeType, QMetaType type) const /*override*/
 {
-	if(type != QVariant::UserType && type != QVariant::ByteArray && type != QVariant::String)
-		return QVariant();
-
 	if(hasFormat(sMimeType))
 		return QVariant(m_Data);
 

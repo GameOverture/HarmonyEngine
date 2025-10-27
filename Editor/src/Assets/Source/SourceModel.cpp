@@ -21,7 +21,6 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QMimeData>
-#include <QTextCodec>
 
 SourceModel::SourceModel(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Source),

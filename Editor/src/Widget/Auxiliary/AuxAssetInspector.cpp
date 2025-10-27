@@ -129,13 +129,11 @@ void AuxAssetInspector::SetFocusedAssets(AssetManagerType eAssetManager, const Q
 			QAudioFormat audioFormat;
 			audioFormat.setSampleRate(m_pCurAudioAsset->GetWaveHeader().SamplesPerSec);
 			audioFormat.setChannelCount(m_pCurAudioAsset->GetWaveHeader().NumOfChan);
-			audioFormat.setSampleSize(m_pCurAudioAsset->GetWaveHeader().BitsPerSample);
-			audioFormat.setCodec("audio/pcm");
-			audioFormat.setByteOrder(QAudioFormat::LittleEndian);
-			audioFormat.setSampleType(QAudioFormat::SignedInt);
+			audioFormat.setSampleRate(m_pCurAudioAsset->GetWaveHeader().BitsPerSample);
+			audioFormat.setSampleFormat(QAudioFormat::SampleFormat::Int32);
 
 			m_AudioDecoder.setAudioFormat(audioFormat);
-			m_AudioDecoder.setSourceFilename(m_pCurAudioAsset->GetAbsMetaFilePath());
+			m_AudioDecoder.setSource(m_pCurAudioAsset->GetAbsMetaFilePath());
 			m_AudioDecoder.start();
 		}
 		break;
@@ -370,7 +368,7 @@ void AuxAssetInspector::on_btnPlay_clicked()
 	if(m_pCurAudioAsset == nullptr)
 		return;
 
-	m_pMediaPlayer->setMedia(QUrl::fromLocalFile(m_pCurAudioAsset->GetAbsMetaFilePath()));
-	m_pMediaPlayer->setVolume(50);
+	m_pMediaPlayer->setSource(QUrl::fromLocalFile(m_pCurAudioAsset->GetAbsMetaFilePath()));
+	//m_pMediaPlayer->setAudioOutput( setVolume(50);
 	m_pMediaPlayer->play();
 }

@@ -17,6 +17,7 @@
 #include <QWidget>
 #include <QToolBar>
 #include <QElapsedTimer>
+#include <QActionGroup>
 
 namespace Ui {
 class EntityWidget;

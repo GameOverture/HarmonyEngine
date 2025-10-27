@@ -57,23 +57,23 @@ void HarmonyConnection::Write(HyPacketType eType, quint32 uiSize, void *pData)
 
 void HarmonyConnection::WriteReloadPacket(QStringList &sPaths)
 {
-	if(m_Socket.isOpen() == false)
-		return;
-	
-	quint32 id = QTime::currentTime().msecsSinceStartOfDay();
-	Write(HYPACKET_ReloadStart, sizeof(quint32), &id);
-	
-	for(int i = 0; i < sPaths.size(); ++i)
-	{
-		QByteArray testBuffer;
-		testBuffer.append(reinterpret_cast<const char *>(&id), sizeof(quint32));
-		testBuffer.append(sPaths[i]);
-		quint32 uiSize = sPaths[i].length() + sizeof(quint32) + 1;  // +1 is for null terminator
-		
-		Write(HYPACKET_ReloadItem, uiSize, testBuffer.data());
-	}
-	
-	Write(HYPACKET_ReloadEnd, 4, &id);
+	//if(m_Socket.isOpen() == false)
+	//	return;
+	//
+	//quint32 id = QTime::currentTime().msecsSinceStartOfDay();
+	//Write(HYPACKET_ReloadStart, sizeof(quint32), &id);
+	//
+	//for(int i = 0; i < sPaths.size(); ++i)
+	//{
+	//	QByteArray testBuffer;
+	//	testBuffer.append(reinterpret_cast<const char *>(&id), sizeof(quint32));
+	//	testBuffer.append(sPaths[i]);
+	//	quint32 uiSize = sPaths[i].length() + sizeof(quint32) + 1;  // +1 is for null terminator
+	//	
+	//	Write(HYPACKET_ReloadItem, uiSize, testBuffer.data());
+	//}
+	//
+	//Write(HYPACKET_ReloadEnd, 4, &id);
 }
 
 void HarmonyConnection::OnHostFound()

@@ -60,7 +60,7 @@ ExplorerProxyModel::ExplorerProxyModel(QObject *pParent /*= nullptr*/) :
 		if(pItemData->GetType() == ITEM_Project)
 			return true;
 
-		QRegExp searchFilter = filterRegExp();
+		QRegularExpression searchFilter = filterRegularExpression();
 		if(pItemData->GetType() == ITEM_Prefix)
 		{
 			QList<TreeModelItemData *> itemsInFilterList = static_cast<ExplorerModel *>(sourceModel())->GetItemsRecursively(index);
@@ -247,7 +247,7 @@ void ExplorerWidget::SetModel(ExplorerModel &modelRef)
 	pProxyModel->setSourceModel(&modelRef);
 
 	// Don't display anything that starts with '+'
-	pProxyModel->setFilterRegExp(QRegExp("^[^+]*$", Qt::CaseInsensitive));
+	pProxyModel->setFilterRegularExpression(QRegularExpression("^[^+]*$", QRegularExpression::PatternOption::CaseInsensitiveOption));
 	pProxyModel->setFilterKeyColumn(0);
 
 	ui->treeView->setModel(pProxyModel);
