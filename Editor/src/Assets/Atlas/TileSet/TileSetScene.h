@@ -15,12 +15,12 @@
 #include <QGraphicsSceneMouseEvent>
 
 class AtlasTileSet;
-class TileGfxItem;
+class TileSetGfxItem;
 
 enum TileSetMode
 {
 	TILESETMODE_Importing,
-	TILESETMODE_TileSet
+	TILESETMODE_Setup
 };
 
 class TileSetGroupItem : public QGraphicsItemGroup {
@@ -46,34 +46,11 @@ class TileSetScene : public QGraphicsScene
 	TileSetGroupItem *												m_pModeImportGroup;
 	TileSetGroupItem *												m_pModeTileSetGroup;
 
-	struct ImportTileItem
-	{
-		bool														m_bSelected;
-		QGraphicsRectItem *											m_pRectItem;
-		QGraphicsPixmapItem *										m_pPixmapItem;
-		QGraphicsPolygonItem *										m_pShapeItem;		// This is the shape outline of the tile as it sits in a grid, especially helpful for isometric and hexagon
-
-		ImportTileItem(QGraphicsRectItem *pRect, QGraphicsPixmapItem *pPixmap, QGraphicsPolygonItem *pShape) :
-			m_bSelected(true),
-			m_pRectItem(pRect),
-			m_pPixmapItem(pPixmap),
-			m_pShapeItem(pShape)
-		{ }
-
-		void SetSelected(bool bSelected)
-		{
-			m_bSelected = bSelected;
-
-			HyColor selectedColor = m_bSelected ? HyColor::Orange : HyColor::Black;
-			m_pRectItem->setPen(QPen(QBrush(HyGlobal::ConvertHyColor(selectedColor)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-			m_pShapeItem->setVisible(m_bSelected);
-		}
-	};
-	QMap<QPoint, ImportTileItem>									m_ImportTileMap;
+	QMap<QPoint, TileSetGfxItem*>									m_ImportTileMap;
 	QSize															m_vImportRegionSize;
 	QGraphicsRectItem												m_ImportBoundsRect;		// A dash-line box that encompasses the entire import scene
 
-	QVector<TileGfxItem *>											m_TileSetPixmapItem;// The tile set pixmap item that is displayed in the tiles scene
+	QVector<TileSetGfxItem*>											m_TileSetPixmapItem;// The tile set pixmap item that is displayed in the tiles scene
 
 public:
 	TileSetScene();
@@ -87,13 +64,15 @@ public:
 	QSize GetImportRegionSize() const;
 	QMap<QPoint, QPixmap> AssembleImportMap();
 
+	void OnMarqueeRelease(Qt::MouseButton eMouseBtn, QPointF ptStartDrag, QPointF ptEndDrag);
+
+	// IMPORT
 	void ClearImport();
 	void AddImport(const QPolygonF &outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
 	void SyncImport();
 
+	// SETUP
 	void SyncTileSet(); // Slow, deletes/reallocates all graphics items
-
-	void OnMarqueeRelease(Qt::MouseButton eMouseBtn, QPointF ptStartDrag, QPointF ptEndDrag);
 };
 
 #endif // TILESETSCENE_H

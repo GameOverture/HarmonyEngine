@@ -38,9 +38,11 @@ SourceSettingsDlg::SourceSettingsDlg(const Project &projectRef, QJsonObject sett
 	{
 		QJsonObject depObj = dependsArray[i].toObject();
 
-		QDir metaDir(m_ProjectRef.GetSourceAbsPath());
-		if(metaDir.cd(depObj["RelPath"].toString()) == false)
-			HyGuiLog("SourceSettingsDlg could not derive absolute dependency path", LOGTYPE_Error);
+		QString sSrcPath = m_ProjectRef.GetSourceAbsPath();
+		QDir metaDir(sSrcPath);
+		QString sRelPath = depObj["RelPath"].toString();
+		if(metaDir.cd(sRelPath) == false)
+			HyGuiLog(m_ProjectRef.GetName(false) % " could not resolve source dependency path for: " % sRelPath, LOGTYPE_Error);
 
 		WgtSrcDependency *pNewWgtSrcDep = new WgtSrcDependency(this);
 		pNewWgtSrcDep->Set(depObj["ProjectName"].toString(), metaDir.absolutePath(), depObj["Options"].toString());

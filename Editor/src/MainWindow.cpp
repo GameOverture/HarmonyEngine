@@ -50,6 +50,9 @@ MainWindow::MainWindow(QWidget *pParent) :
 	m_eTheme(THEME_Decemberween),
 	m_Settings(HyOrganizationName, HyEditorToolName)
 {
+	// TODO: Create a borderless window style and implement custom window dragging/resizing, and titlebar buttons within the menu bar area
+	//setWindowFlag(Qt::FramelessWindowHint);
+
 	ui->setupUi(this);
 	sm_pInstance = this;
 

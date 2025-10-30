@@ -85,8 +85,8 @@ if(Qt6_DIR)
 		src/Assets/Atlas/AtlasTileSet.h
 		src/Assets/Atlas/TileSet/TileData.cpp
 		src/Assets/Atlas/TileSet/TileData.h
-		src/Assets/Atlas/TileSet/TileGfxItem.cpp
-		src/Assets/Atlas/TileSet/TileGfxItem.h
+		src/Assets/Atlas/TileSet/TileSetGfxItem.cpp
+		src/Assets/Atlas/TileSet/TileSetGfxItem.h
 		src/Assets/Atlas/TileSet/TileSetScene.cpp
 		src/Assets/Atlas/TileSet/TileSetScene.h
 		src/Assets/Atlas/TileSet/TileSetUndoCmds.cpp
