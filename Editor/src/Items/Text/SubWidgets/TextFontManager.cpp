@@ -628,7 +628,7 @@ void TextFontManager::RegenFontArray()
 				iterLayer.value()->m_fLineAscender = m_PreviewFontList[iFontIndex]->GetTextureFont()->ascender;
 				iterLayer.value()->m_fLineDescender = m_PreviewFontList[iFontIndex]->GetTextureFont()->descender;
 
-				for(int j = 0; j < sGlyphList.count(); ++j)
+				for(int j = 0; j < sGlyphList.length(); ++j)
 				{
 					// NOTE: Assumes LITTLE ENDIAN
 					QString sSingleChar = sGlyphList[j];
@@ -681,7 +681,7 @@ void TextFontManager::RegenFontArray()
 		stageObj.insert("outlineThickness", pFtglFont->outline_thickness);
 
 		QJsonArray glyphsArray;
-		for(int j = 0; j < sAvailGlyphs.count(); ++j)
+		for(int j = 0; j < sAvailGlyphs.length(); ++j)
 		{
 			// NOTE: Assumes LITTLE ENDIAN
 			QString sSingleChar = sAvailGlyphs[j];

@@ -129,8 +129,8 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	new QShortcut(QKeySequence(Qt::Key_Space), this, SLOT(OnKeySpace()));
 	new QShortcut(QKeySequence(Qt::Key_Q), this, SLOT(OnKeyQ()));
 	new QShortcut(QKeySequence(Qt::Key_E), this, SLOT(OnKeyE()));
-	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Q), this, SLOT(OnKeyShiftQ()));
-	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_E), this, SLOT(OnKeyShiftE()));
+	new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_Q), this, SLOT(OnKeyShiftQ()));
+	new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_E), this, SLOT(OnKeyShiftE()));
 	new QShortcut(QKeySequence(Qt::Key_F), this, SLOT(OnKeyF()));
 
 	UpdateActions();

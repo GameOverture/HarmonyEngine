@@ -62,7 +62,6 @@ private Q_SLOTS:
 	void on_undoStack_cleanChanged(bool bClean);
 	void on_undoStack_indexChanged(int iIndex);
 
-	void on_actionSave_triggered();
 	void on_tabWidget_currentChanged(int iIndex);
 
 	void on_radTileSheet_toggled(bool bChecked);

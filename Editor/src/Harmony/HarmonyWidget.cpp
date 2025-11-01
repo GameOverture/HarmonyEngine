@@ -87,7 +87,7 @@ void HarmonyWidget::OnRulerMouseMoveEvent(HyOrientation eOrientation, QMouseEven
 	if(HyEngine::IsInitialized() == false)
 		return;
 
-	QPointF ptCurMousePos = pEvent->localPos();
+	QPointF ptCurMousePos = pEvent->position();
 	if(eOrientation == HYORIENT_Horizontal)
 		HyEngine::Input().SetWidgetMousePos(glm::vec2(ptCurMousePos.x(), ptCurMousePos.y() - RULER_WIDTH));
 	else
@@ -99,7 +99,7 @@ void HarmonyWidget::OnWgtMouseMoveEvent(IDraw *pDrawItem, QMouseEvent *pEvent)
 	if(HyEngine::IsInitialized() == false)
 		return;
 
-	QPointF ptCurMousePos = pEvent->localPos();
+	QPointF ptCurMousePos = pEvent->position();
 	HyEngine::Input().SetWidgetMousePos(glm::vec2(ptCurMousePos.x(), ptCurMousePos.y()));
 
 	RefreshRulers();

@@ -10,7 +10,8 @@
 #include "Global.h"
 #include "TileData.h"
 
-TileData::TileData(QPixmap tilePixmap) :
+TileData::TileData(QPoint metaGridPos, QPixmap tilePixmap) :
+	m_MetaGridPos(metaGridPos),
 	m_TilePixmap(tilePixmap),
 	m_TextureOffset(0, 0),
 	m_bIsFlippedHorz(false),
@@ -22,6 +23,7 @@ TileData::TileData(QPixmap tilePixmap) :
 }
 
 TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
+	m_MetaGridPos(QPoint(tileDataObj["MetaGridPosX"].toInt(), tileDataObj["MetaGridPosY"].toInt())),
 	m_TilePixmap(tilePixmap),
 	m_TextureOffset(QPoint(tileDataObj["TextureOffsetX"].toInt(), tileDataObj["TextureOffsetY"].toInt())),
 	m_bIsFlippedHorz(tileDataObj["IsFlippedHorz"].toBool()),
@@ -94,10 +96,17 @@ TileData::~TileData()
 {
 }
 
+QPoint TileData::GetMetaGridPos() const
+{
+	return m_MetaGridPos;
+}
+
 QJsonObject TileData::GetTileData() const
 {
 	QJsonObject tileDataObjOut;
 
+	tileDataObjOut["MetaGridPosX"] = m_MetaGridPos.x();
+	tileDataObjOut["MetaGridPosY"] = m_MetaGridPos.y();
 	tileDataObjOut["TextureOffsetX"] = m_TextureOffset.x();
 	tileDataObjOut["TextureOffsetY"] = m_TextureOffset.y();
 	tileDataObjOut["IsFlippedHorz"] = m_bIsFlippedHorz;

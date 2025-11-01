@@ -31,13 +31,11 @@ TileSetUndoCmd_TileSize::TileSetUndoCmd_TileSize(AtlasTileSet &tileSetItemRef, A
 
 /*virtual*/ void TileSetUndoCmd_TileSize::redo() /*override*/
 {
-	m_TileSetRef.SetTileSize(m_NewSize);
 	m_AuxTileSetRef.CmdSet_TileSizeWidgets(m_NewSize);
 }
 
 /*virtual*/ void TileSetUndoCmd_TileSize::undo() /*override*/
 {
-	m_TileSetRef.SetTileSize(m_OldSize);
 	m_AuxTileSetRef.CmdSet_TileSizeWidgets(m_OldSize);
 }
 
@@ -80,13 +78,11 @@ TileSetUndoCmd_TileOffset::TileSetUndoCmd_TileOffset(AtlasTileSet &tileSetItemRe
 
 /*virtual*/ void TileSetUndoCmd_TileOffset::redo() /*override*/
 {
-	m_TileSetRef.SetTileOffset(m_NewOffset);
 	m_AuxTileSetRef.CmdSet_TileOffsetWidgets(m_NewOffset);
 }
 
 /*virtual*/ void TileSetUndoCmd_TileOffset::undo() /*override*/
 {
-	m_TileSetRef.SetTileOffset(m_OldOffset);
 	m_AuxTileSetRef.CmdSet_TileOffsetWidgets(m_OldOffset);
 }
 
@@ -108,11 +104,10 @@ TileSetUndoCmd_TileOffset::TileSetUndoCmd_TileOffset(AtlasTileSet &tileSetItemRe
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TileSetUndoCmd_TileShape::TileSetUndoCmd_TileShape(AtlasTileSet &tileSetItemRef, AuxTileSet &auxTileSetRef, TileSetShape eNewShape, QUndoCommand *pParent /*= nullptr*/) :
+TileSetUndoCmd_TileShape::TileSetUndoCmd_TileShape(AuxTileSet &auxTileSetRef, TileSetShape eCurShape, TileSetShape eNewShape, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
-	m_TileSetRef(tileSetItemRef),
 	m_AuxTileSetRef(auxTileSetRef),
-	m_eOldShape(tileSetItemRef.GetTileShape()),
+	m_eOldShape(eCurShape),
 	m_eNewShape(eNewShape)
 {
 	if(m_eOldShape == m_eNewShape)
@@ -127,13 +122,11 @@ TileSetUndoCmd_TileShape::TileSetUndoCmd_TileShape(AtlasTileSet &tileSetItemRef,
 
 /*virtual*/ void TileSetUndoCmd_TileShape::redo() /*override*/
 {
-	m_TileSetRef.SetTileShape(m_eNewShape);
 	m_AuxTileSetRef.CmdSet_TileShapeWidget(m_eNewShape);
 }
 
 /*virtual*/ void TileSetUndoCmd_TileShape::undo() /*override*/
 {
-	m_TileSetRef.SetTileShape(m_eOldShape);
 	m_AuxTileSetRef.CmdSet_TileShapeWidget(m_eOldShape);
 }
 

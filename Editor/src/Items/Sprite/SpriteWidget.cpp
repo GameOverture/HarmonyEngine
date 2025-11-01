@@ -57,8 +57,8 @@ SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	new QShortcut(QKeySequence(Qt::Key_Q), this, SLOT(on_actionFirstFrame_triggered()));
 	new QShortcut(QKeySequence(Qt::Key_E), this, SLOT(on_actionLastFrame_triggered()));
 
-	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_Q), this, SLOT(OnKeyShiftQ()));
-	new QShortcut(QKeySequence(Qt::SHIFT + Qt::Key_E), this, SLOT(OnKeyShiftE()));
+	new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_Q), this, SLOT(OnKeyShiftQ()));
+	new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_E), this, SLOT(OnKeyShiftE()));
 }
 
 /*virtual*/ SpriteWidget::~SpriteWidget()

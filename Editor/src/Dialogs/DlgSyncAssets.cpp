@@ -321,6 +321,7 @@ bool DlgSyncAssets::SyncDir(QDir syncSubDir, QMap<TreeModelItem *, TreeModelItem
 
 	// Cannot find a matching existing filter
 	ACTIONS_CreateFilterList << sSyncFilterPath;
+	return false;
 }
 
 TreeModelItem *DlgSyncAssets::FindFileContents(QFileInfo currentSyncFile, const QMap<TreeModelItem *, TreeModelItemData *> &staleItemsMap)

@@ -19,22 +19,21 @@ class AtlasTileSet;
 class TileSetGfxItem : public QGraphicsItem
 {
 	bool								m_bSelected;
+
+	QPen								m_SelectedPen;
+	QPen								m_SelectedHoverPen;
+	QPen								m_UnselectedPen;
+	QPen								m_UnselectedHoverPen;
+	QPen								m_ShapePen;
+
 	QGraphicsRectItem *					m_pRectItem;
 	QGraphicsPixmapItem *				m_pPixmapItem;
 	QGraphicsPolygonItem *				m_pShapeItem;		// This is the shape outline of the tile as it sits in a grid, especially helpful for isometric and hexagon
 
 public:
-	TileSetGfxItem(QPointF ptCurPos, QSize vSize, const QPixmap& pixmapRef, const QPolygonF& outlinePolygon);
+	TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon);
 	~TileSetGfxItem();
 
-	//void SetSelected(bool bSelected)
-	//{
-	//	m_bSelected = bSelected;
-
-	//	HyColor selectedColor = m_bSelected ? HyColor::Orange : HyColor::Black;
-	//	m_pRectItem->setPen(QPen(QBrush(HyGlobal::ConvertHyColor(selectedColor)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-	//	m_pShapeItem->setVisible(m_bSelected);
-	//}
 
 	//class SelectionRectItem : public QGraphicsRectItem {
 	//public:
@@ -54,14 +53,7 @@ public:
 	//	}
 
 	//protected:
-	//	void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override {
-	//		setPen(QPen(HyGlobal::ConvertHyColor(HyColor::White), 1.0f, Qt::PenStyle::SolidLine));
-	//		QGraphicsRectItem::hoverEnterEvent(event);
-	//	}
 
-	//	void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override {
-	//		setPen(QPen(HyGlobal::ConvertHyColor(HyColor::Orange), 1.0f, Qt::PenStyle::SolidLine));
-	//		QGraphicsRectItem::hoverLeaveEvent(event);
 	//	}
 	//};
 	//SelectionRectItem *		m_pGfxRectItem;
@@ -70,30 +62,19 @@ public:
 	void SetSelected(bool bSelected);
 
 	QPointF GetPos() const;
-	void SetPos(QPointF ptNewPos, QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon)
-	{
-		m_pShapeItem->setPos(ptNewPos);
+	void SetPos(QPointF ptNewPos, QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon);
 
-		m_pRectItem->setRect(0.0f, 0.0f, regionSize.width(), regionSize.height());
-		m_pRectItem->setPos(ptNewPos);
-
-		m_pPixmapItem->setPos(ptNewPos);
-
-		m_pShapeItem->setPolygon(outlinePolygon);
-		m_pShapeItem->setPos(ptNewPos.x() + (regionSize.width() * 0.5f) + vOffset.x(), ptNewPos.y() + (regionSize.height() * 0.5f) + vOffset.y());
-	}
-
-	const QPixmap& GetPixmap() const;
+	QPixmap GetPixmap() const;
 
 	virtual QRectF boundingRect() const override;
-	virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+	virtual void paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) override;
+	//virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
+	//virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
 	//virtual QVariant itemChange(GraphicsItemChange eChange, const QVariant &value) override;
 	//virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 	//virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
 	//virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 	//virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
-
-	
 };
 
 #endif // TILEGFXITEM_H

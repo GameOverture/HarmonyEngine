@@ -16,6 +16,7 @@
 
 class AtlasTileSet;
 class TileSetGfxItem;
+class TileData;
 
 enum TileSetMode
 {
@@ -23,38 +24,37 @@ enum TileSetMode
 	TILESETMODE_Setup
 };
 
-class TileSetGroupItem : public QGraphicsItemGroup {
+class TileSetGfxItemGroup : public QGraphicsItemGroup {
 public:
-	TileSetGroupItem(QGraphicsItem *parent = nullptr)
-		: QGraphicsItemGroup(parent) {
+	TileSetGfxItemGroup(QGraphicsItem *parent = nullptr) :
+		QGraphicsItemGroup(parent)
+	{
 		setHandlesChildEvents(false);
 		setAcceptedMouseButtons(Qt::AllButtons);
 	}
 protected:
-	void mousePressEvent(QGraphicsSceneMouseEvent *pEvent) override {
-		pEvent->ignore(); // Pass the event to child items
-	}
+	void mousePressEvent(QGraphicsSceneMouseEvent *pEvent) override { pEvent->ignore(); } // Pass the event to child items
 };
 
 class TileSetScene : public QGraphicsScene
 {
 	Q_OBJECT
 
+	TileSetMode														m_eMode;
 	AtlasTileSet *													m_pTileSet;
 
-	TileSetMode														m_eMode;
-	TileSetGroupItem *												m_pModeImportGroup;
-	TileSetGroupItem *												m_pModeTileSetGroup;
+	QMap<TileData*, TileSetGfxItem*>								m_SetupTileMap;			// Keys are pointing to Actual concrete tiles from AtlasTileSet::m_TileDataMap
+	TileSetGfxItemGroup*											m_pModeSetupGroup;
 
-	QMap<QPoint, TileSetGfxItem*>									m_ImportTileMap;
+	QMap<QPoint, TileSetGfxItem*>									m_ImportTileMap;		// Pending import tiles
+	TileSetGfxItemGroup*											m_pModeImportGroup;
 	QSize															m_vImportRegionSize;
-	QGraphicsRectItem												m_ImportBoundsRect;		// A dash-line box that encompasses the entire import scene
 
-	QVector<TileSetGfxItem*>											m_TileSetPixmapItem;// The tile set pixmap item that is displayed in the tiles scene
+	QGraphicsRectItem												m_BorderBoundsRect;		// A dash-line box that encompasses the working-portion of the tile set (import or setup)
 
 public:
 	TileSetScene();
-	~TileSetScene();
+	virtual ~TileSetScene();
 
 	void Initialize(AtlasTileSet *pTileSet);
 
@@ -66,13 +66,14 @@ public:
 
 	void OnMarqueeRelease(Qt::MouseButton eMouseBtn, QPointF ptStartDrag, QPointF ptEndDrag);
 
-	// IMPORT
-	void ClearImport();
-	void AddImport(const QPolygonF &outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
-	void SyncImport();
+	void AddTile(TileSetMode eMode, TileData* pTileData, const QPolygonF& outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
+	void RefreshTiles(); // Syncronizes the graphics items to match the data of m_pTileSet and current import tiles
 
-	// SETUP
-	void SyncTileSet(); // Slow, deletes/reallocates all graphics items
+	void ClearImportTiles();
+	void ClearSetupTiles();
+
+private:
+	void SetGfxItemTilePos(TileSetGfxItem* pGfxItem, QPoint ptGridPos);
 };
 
 #endif // TILESETSCENE_H

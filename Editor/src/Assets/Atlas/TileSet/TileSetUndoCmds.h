@@ -18,13 +18,12 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TileSetUndoCmd_TileShape : public QUndoCommand
 {
-	AtlasTileSet &						m_TileSetRef;
 	AuxTileSet &						m_AuxTileSetRef;
-	TileSetShape							m_eOldShape;
-	TileSetShape							m_eNewShape;
+	TileSetShape						m_eOldShape;
+	TileSetShape						m_eNewShape;
 
 public:
-	TileSetUndoCmd_TileShape(AtlasTileSet &tileSetItemRef, AuxTileSet &auxTileSetRef, TileSetShape eNewShape, QUndoCommand *pParent = nullptr);
+	TileSetUndoCmd_TileShape(AuxTileSet &auxTileSetRef, TileSetShape eCurShape, TileSetShape eNewShape, QUndoCommand *pParent = nullptr);
 	virtual ~TileSetUndoCmd_TileShape();
 	virtual void redo() override;
 	virtual void undo() override;

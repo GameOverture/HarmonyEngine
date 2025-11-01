@@ -355,7 +355,7 @@ void IDraw::UpdateDrawStatus()
 
 /*virtual*/ void IDraw::OnMouseMoveEvent(QMouseEvent *pEvent)
 {
-	QPointF ptCurMousePos = pEvent->localPos();
+	QPointF ptCurMousePos = pEvent->position();
 
 	if(GetCurAction() == HYACTION_Pan)
 	{
@@ -410,7 +410,7 @@ void IDraw::UpdateDrawStatus()
 	if(pEvent->button() == Qt::MiddleButton)
 	{
 		if(SetAction(HYACTION_Pan))
-			m_ptOldMousePos = pEvent->localPos();
+			m_ptOldMousePos = pEvent->position();
 	}
 
 	// If hovering over an existing guide, then "select" it by removing it, and starting SetPendingGuide()

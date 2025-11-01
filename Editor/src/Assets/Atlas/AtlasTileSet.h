@@ -24,6 +24,7 @@ using PhysicsLayerHandle = uint32_t;
 
 #define NUM_COLS_TILESET(numTiles) static_cast<int>(std::floor(std::sqrt(numTiles)))
 #define NUM_ROWS_TILESET(numTiles, numCols) (static_cast<int>(numTiles) + static_cast<int>(numCols) - 1) / static_cast<int>(numCols);
+#define TILESET_TILE_PADDING 2 // Padding between tiles in the sub-atlas texture to avoid texture bleeding
 
 bool operator<(const QPoint &a, const QPoint &b);
 
@@ -35,6 +36,7 @@ class AtlasTileSet : public AtlasFrame
 
 	FileDataPair				m_TileSetDataPair;				// The currently 'saved to disk' data of the TileSet
 	bool						m_bExistencePendingSave;
+	bool						m_bSubAtlasDirty;
 	
 	QUndoStack *				m_pUndoStack;
 	QAction						m_ActionSave;
@@ -95,12 +97,12 @@ class AtlasTileSet : public AtlasFrame
 	//	TileData *m_pStartTile;
 	//};
 
-	// Map of all imported TileData objects in this tile set. Each key is a grid meta-location that is presented to the user, and not its location on the sub-atlas texture
+	// Map of all imported TileData objects in this tile set
 	// Atlas Indices are row-major order
 	// TileSet texture sub-atlas' rows and columns is made based on the total # of tiles
 	//     COLUMNS = static_cast<int>(std::floor(std::sqrt(n)))
 	//     ROWS    = static_cast<int>(std::ceil(static_cast<double>(n) / columns))
-	QMap<QPoint, TileData *>	m_TileDataMap;
+	QVector<TileData *>	m_TileDataList;
 
 public:
 	AtlasTileSet(IManagerModel &modelRef,
@@ -136,7 +138,7 @@ public:
 	QString GetTileSetInfo() const;
 	QIcon GetTileSetIcon() const;
 
-	QMap<QPoint, TileData *> GetTileDataMap() const;
+	QVector<TileData *> GetTileDataList() const;
 
 	TileSetScene *GetGfxScene();
 
@@ -161,7 +163,7 @@ public:
 
 protected:
 	void UpdateTilePolygon();
-	void RegenerateSubAtlas(); // Assumes m_TileDataList is up to date. This will regenerate the sub-atlas texture and update each TileData
+	void RegenerateSubAtlas(); // Assumes m_TileDataList is up to date. This will regenerate the sub-atlas texture and into the atlas manager
 
 private Q_SLOTS:
 	void on_actionSave_triggered();

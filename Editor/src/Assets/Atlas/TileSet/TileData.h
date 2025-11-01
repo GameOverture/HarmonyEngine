@@ -19,6 +19,8 @@
 
 class TileData
 {
+	QPoint											m_MetaGridPos;			// The user defined position in the grid when setting up the TileSet - and not its location on the sub-atlas texture
+
 	QPixmap											m_TilePixmap;
 	QPoint											m_TextureOffset;
 
@@ -46,12 +48,13 @@ class TileData
 	QMap<PhysicsLayerHandle, QList<QList<QPoint>>>	m_VertexMap;
 
 public:
-	TileData(QPixmap tilePixmap);
+	TileData(QPoint metaGridPos, QPixmap tilePixmap);
 	TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap);
 	TileData(const TileData &other);
 	TileData &operator=(const TileData &other);
 	~TileData();
-	
+
+	QPoint GetMetaGridPos() const;
 	QJsonObject GetTileData() const;
 	QPoint GetTextureOffset() const;
 	QPixmap GetPixmap() const;

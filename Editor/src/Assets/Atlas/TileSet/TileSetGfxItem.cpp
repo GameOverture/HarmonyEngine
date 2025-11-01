@@ -15,27 +15,30 @@
 
 const int iTILE_PADDING = 0;
 
-TileSetGfxItem::TileSetGfxItem(QPointF ptCurPos, QSize vSize, const QPixmap& pixmapRef, const QPolygonF& outlinePolygon) :
+TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon) :
 	QGraphicsItem(nullptr),
+	m_SelectedPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Orange)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)),
+	m_SelectedHoverPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::White)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)),
+	m_UnselectedPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Black)), 1.0f, Qt::DashLine, Qt::SquareCap, Qt::MiterJoin)),
+	m_UnselectedHoverPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::White)), 1.0f, Qt::DashLine, Qt::SquareCap, Qt::MiterJoin)),
+	m_ShapePen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Orange)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)),
 	m_bSelected(true),
 	m_pRectItem(nullptr),
 	m_pPixmapItem(nullptr),
 	m_pShapeItem(nullptr)
 {
-	m_pRectItem = new QGraphicsRectItem(0.0f, 0.0f, vSize.width() + 1, vSize.height() + 1);
-	m_pRectItem->setPos(ptCurPos.x(), ptCurPos.y());
-	m_pRectItem->setPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Green)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+	m_pRectItem = new QGraphicsRectItem(0.0f, 0.0f, pixmapRef.width() + 1, pixmapRef.height() + 1);
+	m_pRectItem->setPen(m_SelectedPen);
 	m_pRectItem->setParentItem(this);
 
 	m_pPixmapItem = new QGraphicsPixmapItem(pixmapRef);
 	m_pPixmapItem->setParentItem(this);
 
 	m_pShapeItem = new QGraphicsPolygonItem(outlinePolygon);
-	m_pShapeItem->setPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Orange)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+	m_pShapeItem->setPen(m_ShapePen);
 	m_pShapeItem->setParentItem(this);
 
-	//// Have this item pass through mouse events to the child m_pGfxRectItem
-	//setAcceptHoverEvents(false);
+	setAcceptHoverEvents(true);
 	//setAcceptedMouseButtons(Qt::NoButton);
 }
 
@@ -54,6 +57,13 @@ bool TileSetGfxItem::IsSelected() const
 void TileSetGfxItem::SetSelected(bool bSelected)
 {
 	m_bSelected = bSelected;
+
+	if(m_bSelected)
+		m_pRectItem->setPen(m_SelectedPen);
+	else
+		m_pRectItem->setPen(m_UnselectedPen);
+
+	m_pShapeItem->setVisible(m_bSelected);
 }
 
 QPointF TileSetGfxItem::GetPos() const
@@ -61,7 +71,18 @@ QPointF TileSetGfxItem::GetPos() const
 	return m_pRectItem->pos();
 }
 
-const QPixmap& TileSetGfxItem::GetPixmap() const
+void TileSetGfxItem::SetPos(QPointF ptNewPos, QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon)
+{
+	m_pRectItem->setRect(0.0f, 0.0f, regionSize.width(), regionSize.height());
+	m_pRectItem->setPos(ptNewPos);
+
+	m_pPixmapItem->setPos(ptNewPos);
+
+	m_pShapeItem->setPolygon(outlinePolygon);
+	m_pShapeItem->setPos(ptNewPos.x() + (regionSize.width() * 0.5f) + vOffset.x(), ptNewPos.y() + (regionSize.height() * 0.5f) + vOffset.y());
+}
+
+QPixmap TileSetGfxItem::GetPixmap() const
 {
 	return m_pPixmapItem->pixmap();
 }
@@ -71,7 +92,7 @@ const QPixmap& TileSetGfxItem::GetPixmap() const
 	return m_pRectItem->boundingRect().adjusted(-iTILE_PADDING, -iTILE_PADDING, iTILE_PADDING, iTILE_PADDING); // Adjust for selection border
 }
 
-/*virtual*/ void TileSetGfxItem::paint(QPainter *pPainter, const QStyleOptionGraphicsItem *option, QWidget *widget) /*override*/
+/*virtual*/ void TileSetGfxItem::paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) /*override*/
 {
 	//QGraphicsPixmapItem::paint(pPainter, option, widget);
 	//if(IsSelected())
@@ -80,6 +101,16 @@ const QPixmap& TileSetGfxItem::GetPixmap() const
 	//	pPainter->drawRect(boundingRect());
 	//}
 }
+
+///*virtual*/ void TileSetGfxItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event) /*override*/
+//{
+//	m_pRectItem->setPen(m_bSelected ? m_SelectedHoverPen : m_UnselectedHoverPen);
+//}
+//
+///*virtual*/ void TileSetGfxItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event) /*override*/
+//{
+//	m_pRectItem->setPen(m_bSelected ? m_SelectedPen : m_UnselectedPen);
+//}
 
 ///*virtual*/ QVariant TileGfxItem::itemChange(GraphicsItemChange eChange, const QVariant &value) /*override*/
 //{
