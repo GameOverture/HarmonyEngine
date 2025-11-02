@@ -44,13 +44,14 @@ class TileSetScene : public QGraphicsScene
 	AtlasTileSet *													m_pTileSet;
 
 	QMap<TileData*, TileSetGfxItem*>								m_SetupTileMap;			// Keys are pointing to Actual concrete tiles from AtlasTileSet::m_TileDataMap
+	QGraphicsRectItem												m_SetupBorderRect;		// A dash-line box that encompasses the working-portion of the 'setup' tiles
 	TileSetGfxItemGroup*											m_pModeSetupGroup;
 
 	QMap<QPoint, TileSetGfxItem*>									m_ImportTileMap;		// Pending import tiles
+	QGraphicsRectItem												m_ImportBorderRect;		// A dash-line box that encompasses the working-portion of the 'import' tiles
 	TileSetGfxItemGroup*											m_pModeImportGroup;
 	QSize															m_vImportRegionSize;
 
-	QGraphicsRectItem												m_BorderBoundsRect;		// A dash-line box that encompasses the working-portion of the tile set (import or setup)
 
 public:
 	TileSetScene();
@@ -64,7 +65,7 @@ public:
 	QSize GetImportRegionSize() const;
 	QMap<QPoint, QPixmap> AssembleImportMap();
 
-	void OnMarqueeRelease(Qt::MouseButton eMouseBtn, QPointF ptStartDrag, QPointF ptEndDrag);
+	void OnMarqueeRelease(Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag);
 
 	void AddTile(TileSetMode eMode, TileData* pTileData, const QPolygonF& outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
 	void RefreshTiles(); // Syncronizes the graphics items to match the data of m_pTileSet and current import tiles

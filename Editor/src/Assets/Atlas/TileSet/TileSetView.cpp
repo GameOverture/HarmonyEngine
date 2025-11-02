@@ -103,9 +103,10 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 {
 	if(m_bMiddleMousePanning == false)
 	{
+		bool bShiftHeld = (pEvent->modifiers() & Qt::ShiftModifier);
 		if(DRAGSTATE_Dragging == m_eDragState)
 		{
-			GetScene()->OnMarqueeRelease(pEvent->button(), mapToScene(m_ptDragStart), mapToScene(pEvent->pos()));
+			GetScene()->OnMarqueeRelease(pEvent->button(), bShiftHeld, mapToScene(m_ptDragStart), mapToScene(pEvent->pos()));
 			m_pAuxTileSet->UpdateSelection();
 		}
 		else if(DRAGSTATE_InitialPress == m_eDragState)
@@ -113,7 +114,7 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 			QPoint ptOffset = pEvent->pos();
 			ptOffset.setX(ptOffset.x() + 1);
 			ptOffset.setY(ptOffset.y() + 1);
-			GetScene()->OnMarqueeRelease(pEvent->button(), mapToScene(pEvent->pos()), mapToScene(ptOffset));
+			GetScene()->OnMarqueeRelease(pEvent->button(), bShiftHeld, mapToScene(pEvent->pos()), mapToScene(ptOffset));
 			m_pAuxTileSet->UpdateSelection();
 		}
 	}

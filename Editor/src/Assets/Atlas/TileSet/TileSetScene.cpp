@@ -13,7 +13,7 @@
 #include "TileData.h"
 #include "TileSetGfxItem.h"
 
-const HyMargins<int> g_borderMargins(10, 10, 10, 3);
+const HyMargins<int> g_borderMargins(16, 16, 16, 16);
 const int g_iSpacingAmt = 5;
 const float g_fSceneMargins = 1420.0f;
 
@@ -25,15 +25,17 @@ TileSetScene::TileSetScene() :
 	m_pModeImportGroup(new TileSetGfxItemGroup()),
 	m_vImportRegionSize(0, 0)
 {
-	m_pModeSetupGroup->setAcceptHoverEvents(true);
 	addItem(m_pModeSetupGroup);
+	m_pModeSetupGroup->setAcceptHoverEvents(true);
+	m_pModeSetupGroup->addToGroup(&m_SetupBorderRect);
+	m_SetupBorderRect.setPen(QPen(QBrush(QColor(255, 255, 255)), 2.0f, Qt::DashLine));
+	m_SetupBorderRect.setVisible(false);
 
-	m_pModeImportGroup->setAcceptHoverEvents(true);
 	addItem(m_pModeImportGroup);
-
-	m_BorderBoundsRect.setPen(QPen(QBrush(QColor(255, 255, 255)), 1.0f, Qt::DashLine));
-	m_BorderBoundsRect.setVisible(false);
-	addItem(&m_BorderBoundsRect);
+	m_pModeImportGroup->setAcceptHoverEvents(true);
+	m_pModeImportGroup->addToGroup(&m_ImportBorderRect);
+	m_ImportBorderRect.setPen(QPen(QBrush(QColor(255, 255, 255)), 2.0f, Qt::DashLine));
+	m_ImportBorderRect.setVisible(false);
 }
 
 /*virtual*/ TileSetScene::~TileSetScene()
@@ -54,8 +56,8 @@ void TileSetScene::Initialize(AtlasTileSet *pTileSet)
 	for(int i = 0; i < tileDataList.size(); ++i)
 		AddTile(TILESETMODE_Setup, tileDataList[i], m_pTileSet->GetTilePolygon(), tileDataList[i]->GetMetaGridPos(), tileDataList[i]->GetPixmap(), false);
 
-	SetDisplayMode(m_eMode);
 	RefreshTiles();
+	SetDisplayMode(m_eMode);
 }
 
 void TileSetScene::SetDisplayMode(TileSetMode eMode)
@@ -64,6 +66,11 @@ void TileSetScene::SetDisplayMode(TileSetMode eMode)
 	m_pModeSetupGroup->setVisible(m_eMode == TILESETMODE_Setup); // TODO: Show setup tiles while importing, attached to the import edge (semi-transparent)
 	m_pModeImportGroup->setVisible(m_eMode == TILESETMODE_Importing);
 	
+	if (m_eMode == TILESETMODE_Setup)
+		setFocusItem(m_pModeSetupGroup);
+	else
+		setFocusItem(m_pModeImportGroup);
+
 	update();
 }
 
@@ -95,7 +102,7 @@ QMap<QPoint, QPixmap> TileSetScene::AssembleImportMap()
 	return importPixmapList;
 }
 
-void TileSetScene::OnMarqueeRelease(Qt::MouseButton eMouseBtn, QPointF ptStartDrag, QPointF ptEndDrag)
+void TileSetScene::OnMarqueeRelease(Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag)
 {
 	QPointF ptTopLeft, ptBotRight;
 	ptTopLeft.setX(HyMath::Min(ptStartDrag.x(), ptEndDrag.x()));
@@ -121,6 +128,8 @@ void TileSetScene::OnMarqueeRelease(Qt::MouseButton eMouseBtn, QPointF ptStartDr
 			QRectF testRect(iter.value()->GetPos(), QSizeF(m_pTileSet->GetAtlasRegionSize()));
 			if (sceneRect.intersects(testRect))
 				iter.value()->SetSelected(eMouseBtn == Qt::LeftButton);
+			else if(bShiftHeld == false)
+				iter.value()->SetSelected(false);
 		}
 		break;
 	}
@@ -153,51 +162,62 @@ void TileSetScene::AddTile(TileSetMode eMode, TileData *pTileData, const QPolygo
 
 void TileSetScene::RefreshTiles()
 {
-	QPoint ptCurPos;
-	ptCurPos.setX(g_borderMargins.left);
-	ptCurPos.setY(g_borderMargins.top);
-
-	int minX = INT_MAX, maxX = INT_MIN, minY = INT_MAX, maxY = INT_MIN;
+	// SETUP ------------------------------------------------------------------------------------------------------------------------
+	int iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
+	int iTileSpacingWidth = m_pTileSet->GetAtlasRegionSize().width() + g_iSpacingAmt;
+	int iTileSpacingHeight = m_pTileSet->GetAtlasRegionSize().height() + g_iSpacingAmt;
 	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
 	{
 		QPoint ptGridPos = iter.key()->GetMetaGridPos();
-		minX = HyMath::Min(minX, ptGridPos.x());
-		maxX = HyMath::Max(maxX, ptGridPos.x());
-		minY = HyMath::Min(minY, ptGridPos.y());
-		maxY = HyMath::Max(maxY, ptGridPos.y());
+		iMinGridX = HyMath::Min(iMinGridX, ptGridPos.x());
+		iMaxGridX = HyMath::Max(iMaxGridX, ptGridPos.x());
+		iMinGridY = HyMath::Min(iMinGridY, ptGridPos.y());
+		iMaxGridY = HyMath::Max(iMaxGridY, ptGridPos.y());
 
-		int iTileSpacingWidth = m_pTileSet->GetAtlasRegionSize().width() + g_iSpacingAmt;
-		int iTileSpacingHeight = m_pTileSet->GetAtlasRegionSize().height() + g_iSpacingAmt;
-		ptCurPos.setX(g_borderMargins.left + (ptGridPos.x() * iTileSpacingWidth));
-		ptCurPos.setY(g_borderMargins.top + (ptGridPos.y() * iTileSpacingHeight));
+		QPoint ptCurPos;
+		ptCurPos.setX(ptGridPos.x() * iTileSpacingWidth);
+		ptCurPos.setY(ptGridPos.y() * iTileSpacingHeight);
 
 		iter.value()->SetPos(ptCurPos, m_pTileSet->GetAtlasRegionSize(), m_pTileSet->GetTileOffset(), m_pTileSet->GetTilePolygon());
 	}
 
+	int iNumColumns = fabs(iMaxGridX - iMinGridX + 1);
+	int iNumRows = fabs(iMaxGridY - iMinGridY + 1);
+	m_SetupBorderRect.setRect(iMinGridX * iTileSpacingWidth - g_borderMargins.left,
+							  iMinGridY * iTileSpacingHeight - g_borderMargins.top,
+							  iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right - g_iSpacingAmt,
+							  iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom - g_iSpacingAmt);
+	m_SetupBorderRect.setVisible(m_SetupTileMap.empty() == false);
+
+	// IMPORT ------------------------------------------------------------------------------------------------------------------------
+	iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
+	iTileSpacingWidth = m_vImportRegionSize.width() + g_iSpacingAmt;
+	iTileSpacingHeight = m_vImportRegionSize.height() + g_iSpacingAmt;
 	for (auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
 	{
-		QPoint ptTilePos = iter.key();
-		minX = HyMath::Min(minX, ptTilePos.x());
-		maxX = HyMath::Max(maxX, ptTilePos.x());
-		minY = HyMath::Min(minY, ptTilePos.y());
-		maxY = HyMath::Max(maxY, ptTilePos.y());
+		QPoint ptGridPos = iter.key();
+		iMinGridX = HyMath::Min(iMinGridX, ptGridPos.x());
+		iMaxGridX = HyMath::Max(iMaxGridX, ptGridPos.x());
+		iMinGridY = HyMath::Min(iMinGridY, ptGridPos.y());
+		iMaxGridY = HyMath::Max(iMaxGridY, ptGridPos.y());
 
-		ptCurPos.setX(g_borderMargins.left + (ptTilePos.x() * (m_vImportRegionSize.width() + g_iSpacingAmt)));
-		ptCurPos.setY(g_borderMargins.top + (ptTilePos.y() * (m_vImportRegionSize.height() + g_iSpacingAmt)));
+		QPoint ptCurPos;
+		ptCurPos.setX(ptGridPos.x() * iTileSpacingWidth);
+		ptCurPos.setY(ptGridPos.y() * iTileSpacingHeight);
 
 		iter.value()->SetPos(ptCurPos, m_vImportRegionSize, m_pTileSet->GetTileOffset(), m_pTileSet->GetTilePolygon());
 	}
 
-	int iNumColumns = maxX - minX + 1;
-	int iNumRows = maxY - minY + 1;
+	iNumColumns = fabs(iMaxGridX - iMinGridX + 1);
+	iNumRows = fabs(iMaxGridY - iMinGridY + 1);
+	m_ImportBorderRect.setRect(iMinGridX * iTileSpacingWidth - g_borderMargins.left,
+							   iMinGridY * iTileSpacingHeight - g_borderMargins.top,
+							   iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right - g_iSpacingAmt,
+							   iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom - g_iSpacingAmt);
+	m_ImportBorderRect.setVisible(m_ImportTileMap.empty() == false);
 
-	m_BorderBoundsRect.setRect(0, 0,
-		iNumColumns * m_vImportRegionSize.width() + g_borderMargins.left + g_borderMargins.right + (iNumColumns - 1) * g_iSpacingAmt,
-		g_borderMargins.top + (g_iSpacingAmt * 2) + (iNumRows * m_vImportRegionSize.height()) + ((iNumRows - 1) * g_iSpacingAmt) + g_borderMargins.bottom);
-	m_BorderBoundsRect.setVisible(true);
-
-	//QRectF sceneRect(-g_fSceneMargins, -g_fSceneMargins, m_ImportBoundsRect.rect().width() + (g_fSceneMargins * 2.0f), m_ImportBoundsRect.rect().height() + (g_fSceneMargins * 2.0f));
-	//setSceneRect(sceneRect);
+	QRectF sceneRect(-g_fSceneMargins, -g_fSceneMargins, g_fSceneMargins * 2.0f, g_fSceneMargins * 2.0f);
+	setSceneRect(sceneRect);
 }
 
 void TileSetScene::ClearImportTiles()
