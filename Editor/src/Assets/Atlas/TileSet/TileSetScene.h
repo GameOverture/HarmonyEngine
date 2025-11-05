@@ -47,6 +47,9 @@ class TileSetScene : public QGraphicsScene
 	QGraphicsRectItem												m_SetupBorderRect;		// A dash-line box that encompasses the working-portion of the 'setup' tiles
 	TileSetGfxItemGroup*											m_pModeSetupGroup;
 
+	QPointF															m_vSortingStartMousePos;
+	QMap<TileSetGfxItem*, QPointF>									m_SortingInitialPosMap;
+
 	QMap<QPoint, TileSetGfxItem*>									m_ImportTileMap;		// Pending import tiles
 	QGraphicsRectItem												m_ImportBorderRect;		// A dash-line box that encompasses the working-portion of the 'import' tiles
 	TileSetGfxItemGroup*											m_pModeImportGroup;
@@ -59,22 +62,32 @@ public:
 
 	void Initialize(AtlasTileSet *pTileSet);
 
+	TileSetMode GetDisplayMode() const;
 	void SetDisplayMode(TileSetMode eMode);
+	
+	QPointF GetFocusPt() const;
 
 	int GetNumImportPixmaps() const;
 	QSize GetImportRegionSize() const;
 	QMap<QPoint, QPixmap> AssembleImportMap();
 
 	void OnMarqueeRelease(Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag);
+	void ClearSetupSelection();
+
+	TileSetGfxItem* GetSetupTileAt(QPointF ptScenePos) const;
 
 	void AddTile(TileSetMode eMode, TileData* pTileData, const QPolygonF& outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
-	void RefreshTiles(); // Syncronizes the graphics items to match the data of m_pTileSet and current import tiles
+	void RefreshTiles(Qt::Edge eImportAppendEdge); // Syncronizes the graphics items to match the data of m_pTileSet and current import tiles
 
 	void ClearImportTiles();
 	void ClearSetupTiles();
 
-private:
-	void SetGfxItemTilePos(TileSetGfxItem* pGfxItem, QPoint ptGridPos);
+	void OnSortingTilesMousePress(QPointF ptMouseScenePos);
+	void OnSortingTilesMouseMove(QPointF ptMouseScenePos);
+	void OnSortingTilesMouseRelease(QPointF ptMouseScenePos);
+
+//private:
+//	void SetGfxItemTilePos(TileSetGfxItem* pGfxItem, QPoint ptGridPos);
 };
 
 #endif // TILESETSCENE_H

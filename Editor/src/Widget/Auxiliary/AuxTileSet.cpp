@@ -97,6 +97,7 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 	}
 
 	ui->graphicsView->SetScene(this, m_pTileSet->GetGfxScene());
+	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt());
 	
 	RefreshInfo();
 }
@@ -115,7 +116,7 @@ void AuxTileSet::CmdSet_TileShapeWidget(TileSetShape eTileShape)
 		ui->cmbTileShape->setCurrentIndex(eTileShape);
 
 	m_pTileSet->SetTileShape(eTileShape);
-	m_pTileSet->GetGfxScene()->RefreshTiles();
+	m_pTileSet->GetGfxScene()->RefreshTiles(GetImportEdge());
 
 	ui->cmbTileShape->blockSignals(false);
 }
@@ -126,7 +127,7 @@ void AuxTileSet::CmdSet_TileSizeWidgets(QSize tileSize)
 	ui->vsbTileSize->SetValue(QPoint(tileSize.width(), tileSize.height()));
 
 	m_pTileSet->SetTileSize(tileSize);
-	m_pTileSet->GetGfxScene()->RefreshTiles();
+	m_pTileSet->GetGfxScene()->RefreshTiles(GetImportEdge());
 
 	ui->vsbTileSize->blockSignals(false);
 }
@@ -137,7 +138,7 @@ void AuxTileSet::CmdSet_TileOffsetWidgets(QPoint tileOffset)
 	ui->vsbTileOffset->SetValue(tileOffset);
 
 	m_pTileSet->SetTileOffset(tileOffset);
-	m_pTileSet->GetGfxScene()->RefreshTiles();
+	m_pTileSet->GetGfxScene()->RefreshTiles(GetImportEdge());
 
 	ui->vsbTileOffset->blockSignals(false);
 }
@@ -149,10 +150,25 @@ void AuxTileSet::RefreshInfo()
 	ui->lblInfo->setText(m_pTileSet->GetTileSetInfo());
 }
 
-void AuxTileSet::UpdateSelection()
+void AuxTileSet::UpdateImportSelection()
 {
 	ui->btnConfirmAdd->setText("Import " % QString::number(m_pTileSet->GetGfxScene()->GetNumImportPixmaps()) % " Tiles");
 	ErrorCheckImport();
+}
+
+Qt::Edge AuxTileSet::GetImportEdge() const
+{
+	Qt::Edge eImportEdge = Qt::BottomEdge;
+	if (ui->radImportBottom->isChecked())
+		eImportEdge = Qt::BottomEdge;
+	else if (ui->radImportTop->isChecked())
+		eImportEdge = Qt::TopEdge;
+	else if (ui->radImportLeft->isChecked())
+		eImportEdge = Qt::LeftEdge;
+	else if (ui->radImportRight->isChecked())
+		eImportEdge = Qt::RightEdge;
+
+	return eImportEdge;
 }
 
 void AuxTileSet::SetImportWidgets()
@@ -190,6 +206,7 @@ void AuxTileSet::SetImportWidgets()
 
 	m_pTileSet->GetGfxScene()->ClearImportTiles();
 	m_pTileSet->GetGfxScene()->SetDisplayMode(TILESETMODE_Importing);
+	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt());
 
 	ErrorCheckImport();
 }
@@ -232,7 +249,7 @@ void AuxTileSet::SliceSheetPixmaps()
 		ptGridPos.setY(ptGridPos.y() + 1);
 	}
 
-	pGfxScene->RefreshTiles();
+	pGfxScene->RefreshTiles(GetImportEdge());
 }
 
 void AuxTileSet::ErrorCheckImport()
@@ -323,6 +340,7 @@ void AuxTileSet::on_tabWidget_currentChanged(int iIndex)
 	TileSetMode eTileSetMode = static_cast<TileSetMode>(iIndex);
 	ui->graphicsView->SetStatusLabel(eTileSetMode == TILESETMODE_Importing ? "Import New Tiles" : "Setup");
 	m_pTileSet->GetGfxScene()->SetDisplayMode(eTileSetMode);
+	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt());
 }
 
 void AuxTileSet::on_radTileSheet_toggled(bool bChecked)
@@ -414,7 +432,7 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 		for(auto pImg : vImportImages)
 			delete pImg;
 
-		pGfxScene->RefreshTiles();
+		pGfxScene->RefreshTiles(GetImportEdge());
 	}
 
 	ErrorCheckImport();

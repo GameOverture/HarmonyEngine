@@ -18,11 +18,11 @@ const int iTILE_PADDING = 0;
 TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon) :
 	QGraphicsItem(nullptr),
 	m_SelectedPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Orange)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)),
-	m_SelectedHoverPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::White)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)),
 	m_UnselectedPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Black)), 1.0f, Qt::DashLine, Qt::SquareCap, Qt::MiterJoin)),
-	m_UnselectedHoverPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::White)), 1.0f, Qt::DashLine, Qt::SquareCap, Qt::MiterJoin)),
+	m_DraggedPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::White)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)),
 	m_ShapePen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Orange)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)),
 	m_bSelected(true),
+	m_bDragged(false),
 	m_pRectItem(nullptr),
 	m_pPixmapItem(nullptr),
 	m_pShapeItem(nullptr)
@@ -42,11 +42,20 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	//setAcceptedMouseButtons(Qt::NoButton);
 }
 
-TileSetGfxItem::~TileSetGfxItem()
+/*virtual*/ TileSetGfxItem::~TileSetGfxItem()
 {
 	delete m_pRectItem;
 	delete m_pPixmapItem;
 	delete m_pShapeItem;
+}
+
+void TileSetGfxItem::Setup(QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon)
+{
+	m_pRectItem->setRect(0.0f, 0.0f, regionSize.width(), regionSize.height());
+
+	m_pShapeItem->setPolygon(outlinePolygon);
+	m_pShapeItem->setPos((regionSize.width() * 0.5f) + vOffset.x(),
+						 (regionSize.height() * 0.5f) + vOffset.y());
 }
 
 bool TileSetGfxItem::IsSelected() const
@@ -66,20 +75,24 @@ void TileSetGfxItem::SetSelected(bool bSelected)
 	m_pShapeItem->setVisible(m_bSelected);
 }
 
-QPointF TileSetGfxItem::GetPos() const
+void TileSetGfxItem::SetAsDragged(bool bDragged)
 {
-	return m_pRectItem->pos();
-}
+	m_bDragged = bDragged;
 
-void TileSetGfxItem::SetPos(QPointF ptNewPos, QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon)
-{
-	m_pRectItem->setRect(0.0f, 0.0f, regionSize.width(), regionSize.height());
-	m_pRectItem->setPos(ptNewPos);
+	if (m_bDragged)
+	{
+		m_pRectItem->setPen(m_DraggedPen);
+		setOpacity(0.5f);
+	}
+	else
+	{
+		if(m_bSelected)
+			m_pRectItem->setPen(m_SelectedPen);
+		else
+			m_pRectItem->setPen(m_UnselectedPen);
 
-	m_pPixmapItem->setPos(ptNewPos);
-
-	m_pShapeItem->setPolygon(outlinePolygon);
-	m_pShapeItem->setPos(ptNewPos.x() + (regionSize.width() * 0.5f) + vOffset.x(), ptNewPos.y() + (regionSize.height() * 0.5f) + vOffset.y());
+		setOpacity(1.0f);
+	}
 }
 
 QPixmap TileSetGfxItem::GetPixmap() const

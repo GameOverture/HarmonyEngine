@@ -47,10 +47,12 @@ public:
 	void CmdSet_TileOffsetWidgets(QPoint tileOffset);		// Blocks the WgtVectorSpinBox::SetValue signal
 
 	void RefreshInfo();
-	void UpdateSelection();
+	void UpdateImportSelection();
 
 private:
 	Ui::AuxTileSet *ui;
+
+	Qt::Edge GetImportEdge() const;
 
 	void SetImportWidgets();
 	void SliceSheetPixmaps();

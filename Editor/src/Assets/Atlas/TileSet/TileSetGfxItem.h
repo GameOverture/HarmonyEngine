@@ -19,11 +19,11 @@ class AtlasTileSet;
 class TileSetGfxItem : public QGraphicsItem
 {
 	bool								m_bSelected;
+	bool								m_bDragged;
 
 	QPen								m_SelectedPen;
-	QPen								m_SelectedHoverPen;
 	QPen								m_UnselectedPen;
-	QPen								m_UnselectedHoverPen;
+	QPen								m_DraggedPen;
 	QPen								m_ShapePen;
 
 	QGraphicsRectItem *					m_pRectItem;
@@ -32,37 +32,14 @@ class TileSetGfxItem : public QGraphicsItem
 
 public:
 	TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon);
-	~TileSetGfxItem();
+	virtual ~TileSetGfxItem();
 
-
-	//class SelectionRectItem : public QGraphicsRectItem {
-	//public:
-	//	SelectionRectItem(const int iPADDING, TileGfxItem *pParent = nullptr) :
-	//		QGraphicsRectItem(pParent)
-	//	{
-	//		QSize vPixmapSize = pParent->pixmap().size();
-	//		setRect(-iPADDING, -iPADDING, vPixmapSize.width() + (iPADDING * 2), vPixmapSize.height() + (iPADDING * 2));
-	//		setPen(QPen(HyGlobal::ConvertHyColor(HyColor::Orange), 1.0f, Qt::PenStyle::SolidLine));
-	//		setBrush(Qt::NoBrush);
-
-	//		//setFlags(QGraphicsItem::ItemIsSelectable |
-	//		//	QGraphicsItem::ItemIsMovable |
-	//		//	QGraphicsItem::ItemSendsGeometryChanges);
-	//		setVisible(false);
-	//		setAcceptHoverEvents(true);
-	//	}
-
-	//protected:
-
-	//	}
-	//};
-	//SelectionRectItem *		m_pGfxRectItem;
+	void Setup(QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon);
 
 	bool IsSelected() const;
 	void SetSelected(bool bSelected);
-
-	QPointF GetPos() const;
-	void SetPos(QPointF ptNewPos, QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon);
+	
+	void SetAsDragged(bool bDragged);
 
 	QPixmap GetPixmap() const;
 

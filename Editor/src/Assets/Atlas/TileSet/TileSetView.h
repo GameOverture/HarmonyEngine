@@ -25,7 +25,8 @@ class TileSetView : public CommonGfxView
 	{
 		DRAGSTATE_None,
 		DRAGSTATE_InitialPress,
-		DRAGSTATE_Dragging,
+		DRAGSTATE_MarqueeSelect,
+		DRAGSTATE_SortingTiles
 	};
 	DragState					m_eDragState;
 	QPoint						m_ptDragStart; // In View Coordinates

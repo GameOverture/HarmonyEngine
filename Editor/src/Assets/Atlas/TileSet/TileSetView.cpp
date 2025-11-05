@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "TileSetView.h"
 #include "TileSetScene.h"
+#include "TileSetGfxItem.h"
 #include "AuxTileSet.h"
 
 #include <QPainter>
@@ -69,22 +70,53 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 {
 	CommonGfxView::mouseMoveEvent(pEvent);
 
-	if(DRAGSTATE_Dragging == m_eDragState)
+	switch (m_eDragState)
 	{
-		update();
-	}
-	else if(DRAGSTATE_InitialPress == m_eDragState)
-	{
-		QPointF dragDelta = pEvent->pos() - m_ptDragStart;
-		if(dragDelta.manhattanLength() >= 3)
-		{
-			m_eDragState = DRAGSTATE_Dragging;
-		}
-		update();
-	}
+	case DRAGSTATE_None:
+	case DRAGSTATE_MarqueeSelect:
+		break;
 
-	if(rubberBandRect().isNull() == false)
-		update();
+	case DRAGSTATE_InitialPress: {
+		QPointF dragDelta = pEvent->pos() - m_ptDragStart;
+		if (dragDelta.manhattanLength() >= 3)
+		{
+			if (GetScene()->GetDisplayMode() == TILESETMODE_Setup)
+			{
+				TileSetGfxItem* pHoveredSetupItem = GetScene()->GetSetupTileAt(mapToScene(m_ptDragStart));
+				if ((pEvent->modifiers() & Qt::ShiftModifier) == 0 && pHoveredSetupItem)
+				{
+					if (pHoveredSetupItem->IsSelected() == false)
+					{
+						GetScene()->ClearSetupSelection();
+						pHoveredSetupItem->SetSelected(true);
+					}
+
+					setDragMode(QGraphicsView::NoDrag);
+					GetScene()->OnSortingTilesMousePress(mapToScene(pEvent->pos()));
+					m_eDragState = DRAGSTATE_SortingTiles;
+				}
+				else
+				{
+					setDragMode(QGraphicsView::RubberBandDrag);
+					m_eDragState = DRAGSTATE_MarqueeSelect;
+				}
+			}
+			else
+			{
+				setDragMode(QGraphicsView::RubberBandDrag);
+				m_eDragState = DRAGSTATE_MarqueeSelect;
+			}
+		}
+		break; }
+	
+	case DRAGSTATE_SortingTiles:
+		GetScene()->OnSortingTilesMouseMove(mapToScene(pEvent->pos()));
+		break;
+	}
+	update();
+
+	//if(rubberBandRect().isNull() == false)
+	//	update();
 }
 
 /*virtual*/ void TileSetView::mousePressEvent(QMouseEvent *pEvent) /*override*/
@@ -93,6 +125,8 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 	{
 		m_eDragState = DRAGSTATE_InitialPress;
 		m_ptDragStart = pEvent->pos();
+
+		setDragMode(QGraphicsView::RubberBandDrag);
 	}
 
 	CommonGfxView::mousePressEvent(pEvent);
@@ -104,21 +138,26 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 	if(m_bMiddleMousePanning == false)
 	{
 		bool bShiftHeld = (pEvent->modifiers() & Qt::ShiftModifier);
-		if(DRAGSTATE_Dragging == m_eDragState)
+		switch (m_eDragState)
 		{
-			GetScene()->OnMarqueeRelease(pEvent->button(), bShiftHeld, mapToScene(m_ptDragStart), mapToScene(pEvent->pos()));
-			m_pAuxTileSet->UpdateSelection();
-		}
-		else if(DRAGSTATE_InitialPress == m_eDragState)
-		{
-			QPoint ptOffset = pEvent->pos();
+		case DRAGSTATE_None:
+			break;
+		case DRAGSTATE_InitialPress: {
+			QPoint ptOffset = m_ptDragStart;
 			ptOffset.setX(ptOffset.x() + 1);
 			ptOffset.setY(ptOffset.y() + 1);
 			GetScene()->OnMarqueeRelease(pEvent->button(), bShiftHeld, mapToScene(pEvent->pos()), mapToScene(ptOffset));
-			m_pAuxTileSet->UpdateSelection();
+			break; }
+		case DRAGSTATE_MarqueeSelect:
+			GetScene()->OnMarqueeRelease(pEvent->button(), bShiftHeld, mapToScene(m_ptDragStart), mapToScene(pEvent->pos()));
+			break;
+		case DRAGSTATE_SortingTiles:
+			GetScene()->OnSortingTilesMouseRelease(mapToScene(pEvent->pos()));
+			break;
 		}
 	}
 
+	m_pAuxTileSet->UpdateImportSelection();
 	m_eDragState = DRAGSTATE_None;
 
 	CommonGfxView::mouseReleaseEvent(pEvent);
