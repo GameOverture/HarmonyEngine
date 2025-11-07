@@ -52,8 +52,6 @@ public:
 private:
 	Ui::AuxTileSet *ui;
 
-	Qt::Edge GetImportEdge() const;
-
 	void SetImportWidgets();
 	void SliceSheetPixmaps();
 	void ErrorCheckImport();
@@ -78,6 +76,12 @@ private Q_SLOTS:
 	void OnTextureRegionChanged(QVariant newSize);
 	void OnStartOffsetChanged(QVariant newOffset);
 	void OnPaddingChanged(QVariant newPadding);
+
+	void on_radImportBottom_toggled(bool bChecked);
+	void on_radImportTop_toggled(bool bChecked);
+	void on_radImportLeft_toggled(bool bChecked);
+	void on_radImportRight_toggled(bool bChecked);
+
 
 	void on_btnConfirmAdd_clicked();
 };

@@ -23,8 +23,9 @@ TileSetScene::TileSetScene() :
 	m_pTileSet(nullptr),
 	m_pModeSetupGroup(new TileSetGfxItemGroup()),
 	m_pModeImportGroup(new TileSetGfxItemGroup()),
-	m_vSortingStartMousePos(0, 0),
-	m_vImportRegionSize(0, 0)
+	m_vDraggingStartMousePos(0, 0),
+	m_vImportRegionSize(0, 0),
+	m_eImportAppendEdge(Qt::BottomEdge)
 {
 	addItem(m_pModeSetupGroup);
 	m_pModeSetupGroup->setAcceptHoverEvents(true);
@@ -60,7 +61,7 @@ void TileSetScene::Initialize(AtlasTileSet *pTileSet)
 	for(int i = 0; i < tileDataList.size(); ++i)
 		AddTile(TILESETMODE_Setup, tileDataList[i], m_pTileSet->GetTilePolygon(), tileDataList[i]->GetMetaGridPos(), tileDataList[i]->GetPixmap(), false);
 
-	RefreshTiles(Qt::BottomEdge);
+	RefreshTiles();
 	SetDisplayMode(m_eMode);
 }
 
@@ -119,6 +120,11 @@ QMap<QPoint, QPixmap> TileSetScene::AssembleImportMap()
 	}
 
 	return importPixmapList;
+}
+
+void TileSetScene::SetImportAppendEdge(Qt::Edge eEdge)
+{
+	m_eImportAppendEdge = eEdge;
 }
 
 void TileSetScene::OnMarqueeRelease(Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag)
@@ -196,7 +202,7 @@ void TileSetScene::AddTile(TileSetMode eMode, TileData *pTileData, const QPolygo
 	}
 }
 
-void TileSetScene::RefreshTiles(Qt::Edge eImportAppendEdge)
+void TileSetScene::RefreshTiles(QPointF vDragDelta /*= QPointF()*/)
 {
 	// SETUP ------------------------------------------------------------------------------------------------------------------------
 	int iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
@@ -204,7 +210,22 @@ void TileSetScene::RefreshTiles(Qt::Edge eImportAppendEdge)
 	int iTileSpacingHeight = m_pTileSet->GetAtlasRegionSize().height() + g_iSpacingAmt;
 	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
 	{
-		QPoint ptGridPos = iter.key()->GetMetaGridPos();
+		iter.value()->Refresh(m_pTileSet->GetAtlasRegionSize(), m_pTileSet->GetTileOffset(), m_pTileSet->GetTilePolygon());
+
+		QPoint ptGridPos;
+		if(vDragDelta.isNull())
+			ptGridPos = iter.key()->GetMetaGridPos();
+		else // Selected tiles are being dragged
+		{
+			//if (iter.value()->IsSelected())
+			//{
+			//	iter.value()->setPos(iter.value()->GetDraggingInitialPos() + vDragDelta);
+			//	continue;
+			//}
+			
+			ptGridPos = iter.value()->GetDraggingGridPos();
+		}
+
 		iMinGridX = HyMath::Min(iMinGridX, ptGridPos.x());
 		iMaxGridX = HyMath::Max(iMaxGridX, ptGridPos.x());
 		iMinGridY = HyMath::Min(iMinGridY, ptGridPos.y());
@@ -214,7 +235,6 @@ void TileSetScene::RefreshTiles(Qt::Edge eImportAppendEdge)
 		ptCurPos.setX(ptGridPos.x() * iTileSpacingWidth);
 		ptCurPos.setY(ptGridPos.y() * iTileSpacingHeight);
 
-		iter.value()->Setup(m_pTileSet->GetAtlasRegionSize(), m_pTileSet->GetTileOffset(), m_pTileSet->GetTilePolygon());
 		iter.value()->setPos(ptCurPos);
 	}
 
@@ -224,7 +244,7 @@ void TileSetScene::RefreshTiles(Qt::Edge eImportAppendEdge)
 							  iMinGridY * iTileSpacingHeight - g_borderMargins.top,
 							  iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right - g_iSpacingAmt,
 							  iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom - g_iSpacingAmt);
-	m_SetupBorderRect.setVisible(m_SetupTileMap.empty() == false);
+	m_SetupBorderRect.setVisible(m_SetupTileMap.empty() == false && vDragDelta.isNull());
 
 	// IMPORT ------------------------------------------------------------------------------------------------------------------------
 	iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
@@ -242,7 +262,7 @@ void TileSetScene::RefreshTiles(Qt::Edge eImportAppendEdge)
 		ptCurPos.setX(ptGridPos.x() * iTileSpacingWidth);
 		ptCurPos.setY(ptGridPos.y() * iTileSpacingHeight);
 
-		iter.value()->Setup(m_vImportRegionSize, m_pTileSet->GetTileOffset(), m_pTileSet->GetTilePolygon());
+		iter.value()->Refresh(m_vImportRegionSize, m_pTileSet->GetTileOffset(), m_pTileSet->GetTilePolygon());
 		iter.value()->setPos(ptCurPos);
 	}
 
@@ -259,9 +279,9 @@ void TileSetScene::RefreshTiles(Qt::Edge eImportAppendEdge)
 	{
 		m_ImportBorderRect.setVisible(true);
 
-		// Position the m_pModeImportGroup against the m_pModeSetupGroup's 'eImportAppendEdge'
+		// Position the m_pModeImportGroup against the m_pModeSetupGroup's 'm_eImportAppendEdge'
 		QPointF ptImportGroupPos;
-		switch (eImportAppendEdge)
+		switch (m_eImportAppendEdge)
 		{
 		case Qt::TopEdge:
 			ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
@@ -305,47 +325,227 @@ void TileSetScene::ClearSetupTiles()
 	m_SetupTileMap.clear();
 }
 
-void TileSetScene::OnSortingTilesMousePress(QPointF ptMouseScenePos)
+void TileSetScene::OnDraggingTilesMousePress(QPointF ptMouseScenePos)
 {
-	m_vSortingStartMousePos = ptMouseScenePos;
+	m_vDraggingStartMousePos = ptMouseScenePos;
 
-	m_SortingInitialPosMap.clear();
 	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
 	{
-		if (iter.value()->IsSelected())
-		{
-			iter.value()->SetAsDragged(true);
-			m_SortingInitialPosMap.insert(iter.value(), iter.value()->scenePos());
-		}
+		iter.value()->SetDraggingInitialPos(iter.value()->scenePos());
+		iter.value()->SetDraggingGridPos(iter.key()->GetMetaGridPos());
+		iter.value()->SetAsDragged(iter.value()->IsSelected());
 	}
 
-	OnSortingTilesMouseMove(ptMouseScenePos);
+	OnDraggingTilesMouseMove(ptMouseScenePos);
 }
 
-void TileSetScene::OnSortingTilesMouseMove(QPointF ptMouseScenePos)
+void TileSetScene::OnDraggingTilesMouseMove(QPointF ptMouseScenePos)
 {
-	QPointF vDelta = ptMouseScenePos - m_vSortingStartMousePos;
+	// TODO: Fix vDeltaGrid calculation to account for tile spacing properly
+	//TileSetGfxItem* pHoveredSetupItem = GetSetupTileAt(m_vDraggingStartMousePos);
 
-	int iTileSpacingWidth = m_pTileSet->GetAtlasRegionSize().width() + g_iSpacingAmt;
-	int iTileSpacingHeight = m_pTileSet->GetAtlasRegionSize().height() + g_iSpacingAmt;
-	QPoint vGridDelta = vDelta.toPoint();
-	vGridDelta.setX(vGridDelta.x() / iTileSpacingWidth);
-	vGridDelta.setY(vGridDelta.y() / iTileSpacingHeight);
 
-	for (auto iter = m_SortingInitialPosMap.begin(); iter != m_SortingInitialPosMap.end(); ++iter)
-		iter.key()->setPos(iter.value() + vDelta);
+	QPointF vDelta = ptMouseScenePos - m_vDraggingStartMousePos;
+
+	QPoint vDeltaGrid = vDelta.toPoint();
+	vDeltaGrid.setX(vDeltaGrid.x() / (m_pTileSet->GetAtlasRegionSize().width() + g_iSpacingAmt));
+	vDeltaGrid.setY(vDeltaGrid.y() / (m_pTileSet->GetAtlasRegionSize().height() + g_iSpacingAmt));
+	DisplaceTiles(vDeltaGrid);
+
+	RefreshTiles(vDelta);
 }
 
-void TileSetScene::OnSortingTilesMouseRelease(QPointF ptMouseScenePos)
+void TileSetScene::OnDraggingTilesMouseRelease(QPointF ptMouseScenePos)
 {
 	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
 		iter.value()->SetAsDragged(false);
 }
 
-//void TileSetScene::SetGfxItemTilePos(TileSetGfxItem* pGfxItem, QPoint ptGridPos)
-//{
-//	QPointF ptCurPos;
-//	ptCurPos.setX(g_borderMargins.left + (ptGridPos.x() * (m_pTileSet->GetAtlasRegionSize().width() + g_iSpacingAmt)));
-//	ptCurPos.setY(g_borderMargins.top + g_iSpacingAmt + (ptGridPos.y() * (m_pTileSet->GetAtlasRegionSize().height() + g_iSpacingAmt)));
-//	pGfxItem->SetPos(ptCurPos, m_pTileSet->GetAtlasRegionSize(), m_pTileSet->GetTileOffset(), m_pTileSet->GetTilePolygon());
-//}
+void TileSetScene::DisplaceTiles(QPoint vGridDelta)
+{
+	// Reset all tiles to their original grid positions
+	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
+		iter.value()->SetDraggingGridPos(iter.key()->GetMetaGridPos());
+
+	if (vGridDelta.isNull())
+		return;
+
+	// Gather selected tiles (the tiles being dragged)
+	QSet<TileSetGfxItem*> selectedTilesSet;
+	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
+	{
+		if (iter.value()->IsSelected())
+			selectedTilesSet.insert(iter.value());
+	}
+
+	// Determine what collisions will occur from moving selected tiles to their new destinations
+	QMap<TileData*, TileSetGfxItem*> displacedTileMap;
+	for (auto iter = selectedTilesSet.begin(); iter != selectedTilesSet.end(); ++iter)
+	{
+		QPoint ptDestinationTileGridPos = (*iter)->GetDraggingGridPos() + vGridDelta;
+			
+		// See if any unselected tile is colliding with this selected tile at its new position
+		for (auto testIter = m_SetupTileMap.begin(); testIter != m_SetupTileMap.end(); ++testIter)
+		{
+			if (testIter.value()->IsSelected() == false)
+			{
+				if (testIter.value()->GetDraggingGridPos() == ptDestinationTileGridPos)
+				{
+					displacedTileMap[testIter.key()] = testIter.value();
+					break;
+				}
+			}
+		}
+
+		// Update the selected tile's dragging grid pos
+		(*iter)->SetDraggingGridPos(ptDestinationTileGridPos);
+	}
+
+	enum DisplaceDirection
+	{
+		DIR_Up,
+		DIR_Right,
+		DIR_Down,
+		DIR_Left,
+
+		NUM_DIRECTIONS
+	};
+	QPoint directionVectors[NUM_DIRECTIONS] = { QPoint(0, -1), QPoint(1, 0), QPoint(0, 1), QPoint(-1, 0) };
+	
+	HyGuiLog("Number of displaced tiles: " % QString::number(displacedTileMap.size()), LOGTYPE_Info);
+
+	// For each tile in displacedTileMap, determine the best direction to displace/cascade that makes the least impact
+	// Skip over any selected tiles and animation tile positions since they are locked in place
+	for(auto iter = displacedTileMap.begin(); iter != displacedTileMap.end(); ++iter)
+	{
+		int iDirectionImpact[NUM_DIRECTIONS] = { 0, 0, 0, 0 };
+		for(int i = 0; i < NUM_DIRECTIONS; ++i)
+		{
+			QPoint ptTestGridPos = iter.value()->GetDraggingGridPos();
+			ptTestGridPos += directionVectors[i];
+
+			while (true)
+			{
+				bool bCollisionFound = false;
+				for (auto testIter = m_SetupTileMap.begin(); testIter != m_SetupTileMap.end(); ++testIter)
+				{
+					if (testIter.value() == iter.value())
+						continue;
+
+					if (testIter.value()->GetDraggingGridPos() == ptTestGridPos)
+					{
+						ptTestGridPos += directionVectors[i];
+
+						if (false == testIter.value()->IsSelected()) // TODO: Also test for animation tiles to skip over
+							iDirectionImpact[i]++;
+
+						bCollisionFound = true;
+						break;
+					}
+				}
+				if (bCollisionFound == false)
+					break;
+			}
+		}
+		DisplaceDirection eBestDir = static_cast<DisplaceDirection>(0);
+		int iImpact = iDirectionImpact[0];
+		for (int i = 1; i < NUM_DIRECTIONS; ++i)
+		{
+			if (iDirectionImpact[i] < iImpact)
+			{
+				iImpact = iDirectionImpact[i];
+				eBestDir = static_cast<DisplaceDirection>(i);
+			}
+		}
+
+		// Move this tile in the best direction, skipping over any selected tiles and animation tile positions
+		// Also cascade any newly displaced tiles in the best direction along the way while preserving their original order
+		QPair<TileData*, TileSetGfxItem*> curTile(iter.key(), iter.value());
+		QPoint ptTestGridPos = curTile.second->GetDraggingGridPos();
+		while (true)
+		{
+			ptTestGridPos += directionVectors[eBestDir];
+
+			// First check if this a skipped-over position collides with any other tile
+			// TODO: Also test for animation tiles to skip over
+			bool bSkipGridSpot = false;
+			for (auto skipIter = selectedTilesSet.begin(); skipIter != selectedTilesSet.end(); ++skipIter)
+			{
+				if ((*skipIter)->GetDraggingGridPos() == ptTestGridPos)
+				{
+					bSkipGridSpot = true;
+					break;
+				}
+			}
+			if (bSkipGridSpot)
+				continue;
+
+			// This is not a skipped-over position, so test for collisions
+			bool bCollisionFound = false;
+			for (auto testIter = m_SetupTileMap.begin(); testIter != m_SetupTileMap.end(); ++testIter)
+			{
+				if (testIter.value() == curTile.second || testIter.value()->IsSelected()) // TODO: Also test for animation tiles to skip over
+					continue;
+
+				if (testIter.value()->GetDraggingGridPos() == ptTestGridPos)
+				{
+					bCollisionFound = true;
+					
+					// Determine which tile should continue the displacement cascade (based on original order)
+					// Set the tile's DraggingGridPos that isn't continuing
+					switch (eBestDir)
+					{
+					case DIR_Up:
+						if (testIter.key()->GetMetaGridPos().y() < curTile.first->GetMetaGridPos().y())
+						{
+							curTile.second->SetDraggingGridPos(ptTestGridPos);
+							curTile = QPair<TileData*, TileSetGfxItem*>(testIter.key(), testIter.value());
+							ptTestGridPos = curTile.second->GetDraggingGridPos();
+						}
+						else
+							testIter.value()->SetDraggingGridPos(ptTestGridPos);
+						break;
+					case DIR_Right:
+						if (testIter.key()->GetMetaGridPos().x() > curTile.first->GetMetaGridPos().x())
+						{
+							curTile.second->SetDraggingGridPos(ptTestGridPos);
+							curTile = QPair<TileData*, TileSetGfxItem*>(testIter.key(), testIter.value());
+							ptTestGridPos = curTile.second->GetDraggingGridPos();
+						}
+						else
+							testIter.value()->SetDraggingGridPos(ptTestGridPos);
+						break;
+					case DIR_Down:
+						if (testIter.key()->GetMetaGridPos().y() > curTile.first->GetMetaGridPos().y())
+						{
+							curTile.second->SetDraggingGridPos(ptTestGridPos);
+							curTile = QPair<TileData*, TileSetGfxItem*>(testIter.key(), testIter.value());
+							ptTestGridPos = curTile.second->GetDraggingGridPos();
+						}
+						else
+							testIter.value()->SetDraggingGridPos(ptTestGridPos);
+						break;
+					case DIR_Left:
+						if (testIter.key()->GetMetaGridPos().x() < curTile.first->GetMetaGridPos().x())
+						{
+							curTile.second->SetDraggingGridPos(ptTestGridPos);
+							curTile = QPair<TileData*, TileSetGfxItem*>(testIter.key(), testIter.value());
+							ptTestGridPos = curTile.second->GetDraggingGridPos();
+						}
+						else
+							testIter.value()->SetDraggingGridPos(ptTestGridPos);
+						break;
+					}
+
+					break;
+				}
+			}
+
+			if(bCollisionFound == false)
+			{
+				curTile.second->SetDraggingGridPos(ptTestGridPos);
+				break;
+			}
+		}
+	}
+}

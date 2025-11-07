@@ -25,7 +25,9 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	m_bDragged(false),
 	m_pRectItem(nullptr),
 	m_pPixmapItem(nullptr),
-	m_pShapeItem(nullptr)
+	m_pShapeItem(nullptr),
+	m_ptDraggingInitialPos(0.0f, 0.0f),
+	m_ptDraggingGridPos(0, 0)
 {
 	m_pRectItem = new QGraphicsRectItem(0.0f, 0.0f, pixmapRef.width() + 1, pixmapRef.height() + 1);
 	m_pRectItem->setPen(m_SelectedPen);
@@ -49,7 +51,7 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	delete m_pShapeItem;
 }
 
-void TileSetGfxItem::Setup(QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon)
+void TileSetGfxItem::Refresh(QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon)
 {
 	m_pRectItem->setRect(0.0f, 0.0f, regionSize.width(), regionSize.height());
 
@@ -86,13 +88,33 @@ void TileSetGfxItem::SetAsDragged(bool bDragged)
 	}
 	else
 	{
-		if(m_bSelected)
+		if (m_bSelected)
 			m_pRectItem->setPen(m_SelectedPen);
 		else
 			m_pRectItem->setPen(m_UnselectedPen);
 
 		setOpacity(1.0f);
 	}
+}
+
+QPointF TileSetGfxItem::GetDraggingInitialPos() const
+{
+	return m_ptDraggingInitialPos;
+}
+
+void TileSetGfxItem::SetDraggingInitialPos(QPointF ptInitialPos)
+{
+	m_ptDraggingInitialPos = ptInitialPos;
+}
+
+QPoint TileSetGfxItem::GetDraggingGridPos() const
+{
+	return m_ptDraggingGridPos;
+}
+
+void TileSetGfxItem::SetDraggingGridPos(QPoint ptGridPos)
+{
+	m_ptDraggingGridPos = ptGridPos;
 }
 
 QPixmap TileSetGfxItem::GetPixmap() const

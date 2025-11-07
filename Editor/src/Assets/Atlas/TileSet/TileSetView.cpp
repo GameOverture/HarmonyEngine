@@ -22,8 +22,7 @@ TileSetView::TileSetView(QWidget *pParent /*= nullptr*/) :
 	CommonGfxView(pParent),
 	m_pAuxTileSet(nullptr),
 	m_eDragState(DRAGSTATE_None),
-	m_ptDragStart(0.0f, 0.0f),
-	m_iDragFrame(-1)
+	m_ptDragStart(0.0f, 0.0f)
 {
 	setDragMode(QGraphicsView::RubberBandDrag);
 }
@@ -92,8 +91,8 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 					}
 
 					setDragMode(QGraphicsView::NoDrag);
-					GetScene()->OnSortingTilesMousePress(mapToScene(pEvent->pos()));
-					m_eDragState = DRAGSTATE_SortingTiles;
+					GetScene()->OnDraggingTilesMousePress(mapToScene(pEvent->pos()));
+					m_eDragState = DRAGSTATE_DraggingSelection;
 				}
 				else
 				{
@@ -109,8 +108,8 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 		}
 		break; }
 	
-	case DRAGSTATE_SortingTiles:
-		GetScene()->OnSortingTilesMouseMove(mapToScene(pEvent->pos()));
+	case DRAGSTATE_DraggingSelection:
+		GetScene()->OnDraggingTilesMouseMove(mapToScene(pEvent->pos()));
 		break;
 	}
 	update();
@@ -151,8 +150,8 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 		case DRAGSTATE_MarqueeSelect:
 			GetScene()->OnMarqueeRelease(pEvent->button(), bShiftHeld, mapToScene(m_ptDragStart), mapToScene(pEvent->pos()));
 			break;
-		case DRAGSTATE_SortingTiles:
-			GetScene()->OnSortingTilesMouseRelease(mapToScene(pEvent->pos()));
+		case DRAGSTATE_DraggingSelection:
+			GetScene()->OnDraggingTilesMouseRelease(mapToScene(pEvent->pos()));
 			break;
 		}
 	}

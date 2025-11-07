@@ -300,7 +300,7 @@ QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vRegionS
 
 	GetGfxScene()->ClearImportTiles();
 	GetGfxScene()->SetDisplayMode(TILESETMODE_Setup);
-	GetGfxScene()->RefreshTiles(eAppendEdge);
+	GetGfxScene()->RefreshTiles();
 
 	m_bSubAtlasDirty = true;
 	return newTileDataList;

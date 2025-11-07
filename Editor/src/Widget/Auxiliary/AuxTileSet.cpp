@@ -116,7 +116,7 @@ void AuxTileSet::CmdSet_TileShapeWidget(TileSetShape eTileShape)
 		ui->cmbTileShape->setCurrentIndex(eTileShape);
 
 	m_pTileSet->SetTileShape(eTileShape);
-	m_pTileSet->GetGfxScene()->RefreshTiles(GetImportEdge());
+	m_pTileSet->GetGfxScene()->RefreshTiles();
 
 	ui->cmbTileShape->blockSignals(false);
 }
@@ -127,7 +127,7 @@ void AuxTileSet::CmdSet_TileSizeWidgets(QSize tileSize)
 	ui->vsbTileSize->SetValue(QPoint(tileSize.width(), tileSize.height()));
 
 	m_pTileSet->SetTileSize(tileSize);
-	m_pTileSet->GetGfxScene()->RefreshTiles(GetImportEdge());
+	m_pTileSet->GetGfxScene()->RefreshTiles();
 
 	ui->vsbTileSize->blockSignals(false);
 }
@@ -138,7 +138,7 @@ void AuxTileSet::CmdSet_TileOffsetWidgets(QPoint tileOffset)
 	ui->vsbTileOffset->SetValue(tileOffset);
 
 	m_pTileSet->SetTileOffset(tileOffset);
-	m_pTileSet->GetGfxScene()->RefreshTiles(GetImportEdge());
+	m_pTileSet->GetGfxScene()->RefreshTiles();
 
 	ui->vsbTileOffset->blockSignals(false);
 }
@@ -154,21 +154,6 @@ void AuxTileSet::UpdateImportSelection()
 {
 	ui->btnConfirmAdd->setText("Import " % QString::number(m_pTileSet->GetGfxScene()->GetNumImportPixmaps()) % " Tiles");
 	ErrorCheckImport();
-}
-
-Qt::Edge AuxTileSet::GetImportEdge() const
-{
-	Qt::Edge eImportEdge = Qt::BottomEdge;
-	if (ui->radImportBottom->isChecked())
-		eImportEdge = Qt::BottomEdge;
-	else if (ui->radImportTop->isChecked())
-		eImportEdge = Qt::TopEdge;
-	else if (ui->radImportLeft->isChecked())
-		eImportEdge = Qt::LeftEdge;
-	else if (ui->radImportRight->isChecked())
-		eImportEdge = Qt::RightEdge;
-
-	return eImportEdge;
 }
 
 void AuxTileSet::SetImportWidgets()
@@ -249,7 +234,7 @@ void AuxTileSet::SliceSheetPixmaps()
 		ptGridPos.setY(ptGridPos.y() + 1);
 	}
 
-	pGfxScene->RefreshTiles(GetImportEdge());
+	pGfxScene->RefreshTiles();
 }
 
 void AuxTileSet::ErrorCheckImport()
@@ -432,7 +417,7 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 		for(auto pImg : vImportImages)
 			delete pImg;
 
-		pGfxScene->RefreshTiles(GetImportEdge());
+		pGfxScene->RefreshTiles();
 	}
 
 	ErrorCheckImport();
@@ -489,6 +474,30 @@ void AuxTileSet::OnPaddingChanged(QVariant newPadding)
 {
 	SliceSheetPixmaps();
 	ErrorCheckImport();
+}
+
+void AuxTileSet::on_radImportBottom_toggled(bool bChecked)
+{
+	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::BottomEdge);
+	m_pTileSet->GetGfxScene()->RefreshTiles();
+}
+
+void AuxTileSet::on_radImportTop_toggled(bool bChecked)
+{
+	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::TopEdge);
+	m_pTileSet->GetGfxScene()->RefreshTiles();
+}
+
+void AuxTileSet::on_radImportLeft_toggled(bool bChecked)
+{
+	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::LeftEdge);
+	m_pTileSet->GetGfxScene()->RefreshTiles();
+}
+
+void AuxTileSet::on_radImportRight_toggled(bool bChecked)
+{
+	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::RightEdge);
+	m_pTileSet->GetGfxScene()->RefreshTiles();
 }
 
 void AuxTileSet::on_btnConfirmAdd_clicked()

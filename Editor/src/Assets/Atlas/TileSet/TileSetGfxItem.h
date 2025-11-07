@@ -28,18 +28,27 @@ class TileSetGfxItem : public QGraphicsItem
 
 	QGraphicsRectItem *					m_pRectItem;
 	QGraphicsPixmapItem *				m_pPixmapItem;
-	QGraphicsPolygonItem *				m_pShapeItem;		// This is the shape outline of the tile as it sits in a grid, especially helpful for isometric and hexagon
+	QGraphicsPolygonItem *				m_pShapeItem;				// This is the shape outline of the tile as it sits in a grid, especially helpful for isometric and hexagon
+
+	QPointF								m_ptDraggingInitialPos;		// The scene positions of this tile when starting a arranging operation
+	QPoint								m_ptDraggingGridPos;		// A temp variable used during arranging of tiles in the scene
 
 public:
 	TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon);
 	virtual ~TileSetGfxItem();
 
-	void Setup(QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon);
+	void Refresh(QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon);
 
 	bool IsSelected() const;
 	void SetSelected(bool bSelected);
 	
 	void SetAsDragged(bool bDragged);
+
+	QPointF GetDraggingInitialPos() const;
+	void SetDraggingInitialPos(QPointF ptInitialPos);
+
+	QPoint GetDraggingGridPos() const;
+	void SetDraggingGridPos(QPoint ptGridPos);
 
 	QPixmap GetPixmap() const;
 

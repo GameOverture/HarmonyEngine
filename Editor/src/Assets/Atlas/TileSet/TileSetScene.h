@@ -47,14 +47,14 @@ class TileSetScene : public QGraphicsScene
 	QGraphicsRectItem												m_SetupBorderRect;		// A dash-line box that encompasses the working-portion of the 'setup' tiles
 	TileSetGfxItemGroup*											m_pModeSetupGroup;
 
-	QPointF															m_vSortingStartMousePos;
-	QMap<TileSetGfxItem*, QPointF>									m_SortingInitialPosMap;
+	QPointF															m_vDraggingStartMousePos;
 
 	QMap<QPoint, TileSetGfxItem*>									m_ImportTileMap;		// Pending import tiles
 	QGraphicsRectItem												m_ImportBorderRect;		// A dash-line box that encompasses the working-portion of the 'import' tiles
 	TileSetGfxItemGroup*											m_pModeImportGroup;
 	QSize															m_vImportRegionSize;
 
+	Qt::Edge														m_eImportAppendEdge;
 
 public:
 	TileSetScene();
@@ -71,23 +71,30 @@ public:
 	QSize GetImportRegionSize() const;
 	QMap<QPoint, QPixmap> AssembleImportMap();
 
+	void SetImportAppendEdge(Qt::Edge eEdge);
+
 	void OnMarqueeRelease(Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag);
 	void ClearSetupSelection();
 
 	TileSetGfxItem* GetSetupTileAt(QPointF ptScenePos) const;
 
 	void AddTile(TileSetMode eMode, TileData* pTileData, const QPolygonF& outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
-	void RefreshTiles(Qt::Edge eImportAppendEdge); // Syncronizes the graphics items to match the data of m_pTileSet and current import tiles
+	
+	// Syncronizes the graphics items to match the data of m_pTileSet and current import tiles
+	// Also repositions tiles during sorting operations
+	void RefreshTiles(QPointF vDragDelta = QPointF());
 
 	void ClearImportTiles();
 	void ClearSetupTiles();
 
-	void OnSortingTilesMousePress(QPointF ptMouseScenePos);
-	void OnSortingTilesMouseMove(QPointF ptMouseScenePos);
-	void OnSortingTilesMouseRelease(QPointF ptMouseScenePos);
+	void OnDraggingTilesMousePress(QPointF ptMouseScenePos);
+	void OnDraggingTilesMouseMove(QPointF ptMouseScenePos);
+	void OnDraggingTilesMouseRelease(QPointF ptMouseScenePos);
 
-//private:
-//	void SetGfxItemTilePos(TileSetGfxItem* pGfxItem, QPoint ptGridPos);
+private:
+	// Used during a drag operation, displace unselected tiles by the given grid delta
+	// and assign their temp 'TileSetGfxItem::m_ptDraggingGridPos'
+	void DisplaceTiles(QPoint vGridDelta);
 };
 
 #endif // TILESETSCENE_H

@@ -26,11 +26,10 @@ class TileSetView : public CommonGfxView
 		DRAGSTATE_None,
 		DRAGSTATE_InitialPress,
 		DRAGSTATE_MarqueeSelect,
-		DRAGSTATE_SortingTiles
+		DRAGSTATE_DraggingSelection
 	};
 	DragState					m_eDragState;
 	QPoint						m_ptDragStart; // In View Coordinates
-	int							m_iDragFrame;
 
 public:
 	TileSetView(QWidget *pParent = nullptr);
