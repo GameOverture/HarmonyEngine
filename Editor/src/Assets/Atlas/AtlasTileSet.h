@@ -146,6 +146,7 @@ public:
 	QList<QPair<QPoint, TileData *>> Cmd_AppendNewTiles(QSize vRegionSize, const QMap<QPoint, QPixmap> &importBatchMap, Qt::Edge eAppendEdge);
 	QList<QPair<QPoint, TileData *>> Cmd_RemoveTiles(QVector<TileData *> tileDataList);
 	void Cmd_ReaddTiles(QList<QPair<QPoint, TileData *>> tileDataList);
+	void Cmd_MoveTiles(QList<TileData*> tileDataList, QList<QPoint> newGridPosList);
 
 	QAction *GetSaveAction();
 	QUndoStack *GetUndoStack();

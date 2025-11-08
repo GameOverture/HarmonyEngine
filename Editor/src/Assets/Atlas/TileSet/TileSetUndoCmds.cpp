@@ -168,6 +168,34 @@ TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItem
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+TileSetUndoCmd_MoveTiles::TileSetUndoCmd_MoveTiles(AtlasTileSet& tileSetItemRef, QList<TileData*> affectedTileList, QList<QPoint> oldGridPosList, QList<QPoint> newGridPosList, QUndoCommand* pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_TileSetRef(tileSetItemRef),
+	m_AffectedTileList(affectedTileList),
+	m_OldGridPosList(oldGridPosList),
+	m_NewGridPosList(newGridPosList)
+{
+	if(m_AffectedTileList.size() != m_OldGridPosList.size() || m_AffectedTileList.size() != m_NewGridPosList.size())
+		HyGuiLog("TileSetUndoCmd_MoveTiles() - Affected tile list size does not match old/new grid position list size.", LOGTYPE_Error);
+
+	setText("Move " % QString::number(m_AffectedTileList.size()) % " Tiles");
+}
+
+/*virtual*/ TileSetUndoCmd_MoveTiles::~TileSetUndoCmd_MoveTiles()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_MoveTiles::redo() /*override*/
+{
+	m_TileSetRef.Cmd_MoveTiles(m_AffectedTileList, m_NewGridPosList);
+}
+
+/*virtual*/ void TileSetUndoCmd_MoveTiles::undo() /*override*/
+{
+	m_TileSetRef.Cmd_MoveTiles(m_AffectedTileList, m_OldGridPosList);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //TileSetUndoCmd_RemoveTiles::TileSetUndoCmd_RemoveTiles(AtlasTileSet &tileSetItemRef, QUndoCommand *pParent /*= nullptr*/) :
 //	QUndoCommand(pParent),
 //	m_TileSetRef(tileSetItemRef)

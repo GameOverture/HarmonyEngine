@@ -326,6 +326,7 @@ QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_RemoveTiles(QVector<TileData 
 	for(const QPair<QPoint, TileData *> &pair : removedTileDataList)
 		m_TileDataList.removeOne(pair.second);
 
+	m_GfxScene.RefreshTiles();
 	m_bSubAtlasDirty = true;
 	return removedTileDataList;
 }
@@ -335,7 +336,17 @@ void AtlasTileSet::Cmd_ReaddTiles(QList<QPair<QPoint, TileData *>> tileDataList)
 	for(const QPair<QPoint, TileData *> &pair : tileDataList)
 		m_TileDataList.append(pair.second);
 
+	m_GfxScene.RefreshTiles();
 	m_bSubAtlasDirty = true;
+}
+
+void AtlasTileSet::Cmd_MoveTiles(QList<TileData*> tileDataList, QList<QPoint> newGridPosList)
+{
+	for(int i = 0; i < tileDataList.size(); ++i)
+		tileDataList[i]->SetMetaGridPos(newGridPosList[i]);
+
+	m_GfxScene.RefreshTiles();
+	//m_bSubAtlasDirty = true;
 }
 
 QUndoStack *AtlasTileSet::GetUndoStack()

@@ -85,7 +85,21 @@ public:
 	virtual void redo() override;
 	virtual void undo() override;
 };
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TileSetUndoCmd_MoveTiles : public QUndoCommand
+{
+	AtlasTileSet &					m_TileSetRef;
+	QList<TileData*>				m_AffectedTileList;
+	QList<QPoint>					m_OldGridPosList;
+	QList<QPoint>					m_NewGridPosList;
 
+public:
+	TileSetUndoCmd_MoveTiles(AtlasTileSet &tileSetItemRef, QList<TileData*> affectedTileList, QList<QPoint> oldGridPosList, QList<QPoint> newGridPosList, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_MoveTiles();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //class TileSetUndoCmd_RemoveTiles : public QUndoCommand
 //{
@@ -99,17 +113,6 @@ public:
 //	virtual void undo() override;
 //};
 //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//class TileSetUndoCmd_SortTiles : public QUndoCommand
-//{
-//	AtlasTileSet &					m_TileSetRef;
-//
-//public:
-//	TileSetUndoCmd_SortTiles(AtlasTileSet &tileSetItemRef, QUndoCommand *pParent = nullptr);
-//	virtual ~TileSetUndoCmd_SortTiles();
-//
-//	virtual void redo() override;
-//	virtual void undo() override;
-//};
+
 
 #endif // TILESETUNDOCMDS_H

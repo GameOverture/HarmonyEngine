@@ -55,6 +55,8 @@ public:
 	~TileData();
 
 	QPoint GetMetaGridPos() const;
+	void SetMetaGridPos(QPoint metaGridPos);
+
 	QJsonObject GetTileData() const;
 	QPoint GetTextureOffset() const;
 	QPixmap GetPixmap() const;

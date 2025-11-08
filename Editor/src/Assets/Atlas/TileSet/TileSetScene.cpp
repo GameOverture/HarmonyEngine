@@ -12,6 +12,7 @@
 #include "AtlasTileSet.h"
 #include "TileData.h"
 #include "TileSetGfxItem.h"
+#include "TileSetUndoCmds.h"
 
 const HyMargins<int> g_borderMargins(16, 16, 16, 16);
 const int g_iSpacingAmt = 5;
@@ -357,8 +358,23 @@ void TileSetScene::OnDraggingTilesMouseMove(QPointF ptMouseScenePos)
 
 void TileSetScene::OnDraggingTilesMouseRelease(QPointF ptMouseScenePos)
 {
+	QList<TileData*> affectedTileList;
+	QList<QPoint> oldGridPosList;
+	QList<QPoint> newGridPosList;
 	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
+	{
 		iter.value()->SetAsDragged(false);
+
+		if(iter.value()->GetDraggingGridPos() != iter.key()->GetMetaGridPos())
+		{
+			affectedTileList.append(iter.key());
+			oldGridPosList.append(iter.key()->GetMetaGridPos());
+			newGridPosList.append(iter.value()->GetDraggingGridPos());
+		}
+	}
+
+	TileSetUndoCmd_MoveTiles* pMoveCmd = new TileSetUndoCmd_MoveTiles(*m_pTileSet, affectedTileList, oldGridPosList, newGridPosList);
+	m_pTileSet->GetUndoStack()->push(pMoveCmd);
 }
 
 void TileSetScene::DisplaceTiles(QPoint vGridDelta)

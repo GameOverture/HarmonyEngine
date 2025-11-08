@@ -101,6 +101,11 @@ QPoint TileData::GetMetaGridPos() const
 	return m_MetaGridPos;
 }
 
+void TileData::SetMetaGridPos(QPoint metaGridPos)
+{
+	m_MetaGridPos = metaGridPos;
+}
+
 QJsonObject TileData::GetTileData() const
 {
 	QJsonObject tileDataObjOut;
