@@ -6,426 +6,210 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>841</width>
-    <height>354</height>
+    <width>858</width>
+    <height>477</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_6">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <property name="leftMargin">
     <number>0</number>
    </property>
    <property name="topMargin">
     <number>0</number>
    </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
    <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <property name="spacing">
-      <number>2</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="lblIcon">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap resource="../../../data/HyEditor.qrc">:/icons16x16/items/TileSet.png</pixmap>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="lblName">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>19</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Line" name="line">
-       <property name="minimumSize">
-        <size>
-         <width>20</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnSave">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Line" name="line_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnUndo">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnRedo">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Line" name="line_3">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Shape</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="cmbTileShape"/>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Size</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="WgtVectorSpinBox" name="vsbTileSize" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>19</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Offset</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="WgtVectorSpinBox" name="vsbTileOffset" native="true">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>19</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="Line" name="line_5">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="lblInfo">
-       <property name="text">
-        <string>&lt;Info&gt;</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
     <widget class="QSplitter" name="splitter">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <widget class="QWidget" name="verticalLayoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>2</number>
+       </property>
        <item>
-        <widget class="QTabWidget" name="tabWidget">
-         <property name="tabShape">
-          <enum>QTabWidget::Triangular</enum>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>2</number>
          </property>
+         <item>
+          <widget class="QLabel" name="lblIcon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="../../../data/HyEditor.qrc">:/icons16x16/items/TileSet.png</pixmap>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblName">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>19</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line_5">
+           <property name="orientation">
+            <enum>Qt::Orientation::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnSave">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line_2">
+           <property name="orientation">
+            <enum>Qt::Orientation::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnUndo">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnRedo">
+           <property name="text">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblInfo">
+           <property name="text">
+            <string>&lt;Info&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Shape</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cmbTileShape"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Size</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="WgtVectorSpinBox" name="vsbTileSize" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>19</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line_3">
+           <property name="orientation">
+            <enum>Qt::Orientation::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Offset</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="WgtVectorSpinBox" name="vsbTileOffset" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>19</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QStackedWidget" name="setupStackedWidget">
          <property name="currentIndex">
           <number>1</number>
          </property>
-         <widget class="QWidget" name="tabImport">
-          <attribute name="icon">
-           <iconset resource="../../../data/HyEditor.qrc">
-            <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
-          </attribute>
-          <attribute name="title">
-           <string>Import New Tiles</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <item>
-              <widget class="QRadioButton" name="radTileSheet">
-               <property name="text">
-                <string>Tile Sheet Image</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QRadioButton" name="radTileImages">
-               <property name="text">
-                <string>Individual Tile Images</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QLineEdit" name="txtImagePath">
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="btnImageBrowse">
-               <property name="text">
-                <string>Browse..</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="Line" name="line_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="grpSlicingOptions">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="title">
-              <string>Slicing Options</string>
-             </property>
-             <layout class="QFormLayout" name="formLayout">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_2">
-                <property name="toolTip">
-                 <string>The size of each tile within the tile sheet. The TileSet will use the largest tiles' size for all tiles</string>
-                </property>
-                <property name="text">
-                 <string>Texture Region</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_5">
-                <property name="toolTip">
-                 <string>The margins on the tile sheet's top left edges where the tiles begin</string>
-                </property>
-                <property name="text">
-                 <string>Start Offset</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_8">
-                <property name="toolTip">
-                 <string>The separation between each tile on the sheet in pixels</string>
-                </property>
-                <property name="text">
-                 <string>Padding</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="WgtVectorSpinBox" name="vsbStartOffset" native="true"/>
-              </item>
-              <item row="2" column="1">
-               <widget class="WgtVectorSpinBox" name="vsbPadding" native="true"/>
-              </item>
-              <item row="0" column="1">
-               <widget class="WgtVectorSpinBox" name="vsbTextureRegion" native="true"/>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="grpImportSide">
-             <property name="title">
-              <string>Append New Tiles</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout">
-              <item row="2" column="2">
-               <widget class="QRadioButton" name="radImportRight">
-                <property name="text">
-                 <string>Right</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QRadioButton" name="radImportLeft">
-                <property name="text">
-                 <string>Left</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QRadioButton" name="radImportTop">
-                <property name="text">
-                 <string>Top</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QRadioButton" name="radImportBottom">
-                <property name="text">
-                 <string>Bottom</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblError">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="textFormat">
-              <enum>Qt::AutoText</enum>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btnConfirmAdd">
-             <property name="text">
-              <string>Confirm</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="tabSetup">
-          <attribute name="icon">
-           <iconset resource="../../../data/HyEditor.qrc">
-            <normaloff>:/icons16x16/items/TileSet-Settings.png</normaloff>:/icons16x16/items/TileSet-Settings.png</iconset>
-          </attribute>
-          <attribute name="title">
-           <string>Setup</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
+         <widget class="QWidget" name="setupStackedWidgetPage1" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_8">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -439,121 +223,309 @@
             <number>0</number>
            </property>
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_5">
-             <property name="leftMargin">
-              <number>6</number>
+            <widget class="QScrollArea" name="scrollAreaImport">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
              </property>
-             <property name="topMargin">
-              <number>6</number>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
              </property>
-             <property name="rightMargin">
-              <number>6</number>
+             <property name="sizeAdjustPolicy">
+              <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContentsOnFirstShow</enum>
              </property>
-             <property name="bottomMargin">
-              <number>6</number>
+             <property name="widgetResizable">
+              <bool>true</bool>
              </property>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <widget class="QWidget" name="scrollAreaWidgetContents">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>470</width>
+                <height>418</height>
+               </rect>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_9">
                <item>
-                <spacer name="horizontalSpacer_2">
+                <layout class="QHBoxLayout" name="horizontalLayout_4">
+                 <item>
+                  <widget class="QRadioButton" name="radTileSheet">
+                   <property name="text">
+                    <string>Tile Sheet</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QRadioButton" name="radTileImages">
+                   <property name="text">
+                    <string>Individual Images</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <item>
+                  <widget class="QLineEdit" name="txtImagePath">
+                   <property name="readOnly">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btnImageBrowse">
+                   <property name="text">
+                    <string>Browse..</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="grpSlicingOptions">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="title">
+                  <string>Slicing Options</string>
+                 </property>
+                 <layout class="QFormLayout" name="formLayout">
+                  <property name="verticalSpacing">
+                   <number>3</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>2</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_2">
+                    <property name="toolTip">
+                     <string>The size of each tile within the tile sheet. The TileSet will use the largest tiles' size for all tiles</string>
+                    </property>
+                    <property name="text">
+                     <string>Texture Region</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="WgtVectorSpinBox" name="vsbTextureRegion" native="true"/>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_5">
+                    <property name="toolTip">
+                     <string>The margins on the tile sheet's top left edges where the tiles begin</string>
+                    </property>
+                    <property name="text">
+                     <string>Start Offset</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="WgtVectorSpinBox" name="vsbStartOffset" native="true"/>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_8">
+                    <property name="toolTip">
+                     <string>The separation between each tile on the sheet in pixels</string>
+                    </property>
+                    <property name="text">
+                     <string>Padding</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="WgtVectorSpinBox" name="vsbPadding" native="true"/>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="grpImportSide">
+                 <property name="title">
+                  <string>Append New Tiles</string>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout">
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>4</number>
+                  </property>
+                  <item row="2" column="1">
+                   <widget class="QRadioButton" name="radImportLeft">
+                    <property name="text">
+                     <string>Left</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="3">
+                   <widget class="QRadioButton" name="radImportRight">
+                    <property name="text">
+                     <string>Right</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="QRadioButton" name="radImportBottom">
+                    <property name="text">
+                     <string>Bottom</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QRadioButton" name="radImportTop">
+                    <property name="text">
+                     <string>Top</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer">
                  <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
+                  <enum>Qt::Orientation::Vertical</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
-                   <width>40</width>
-                   <height>20</height>
+                   <width>20</width>
+                   <height>6</height>
                   </size>
                  </property>
                 </spacer>
                </item>
                <item>
-                <widget class="QLabel" name="label_6">
-                 <property name="text">
-                  <string>0 Selected Tiles</string>
+                <widget class="Line" name="line_4">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="btnReplaceTiles">
+                <widget class="QLabel" name="lblError">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="text">
-                  <string>...</string>
+                  <string/>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::TextFormat::AutoText</enum>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QToolButton" name="btnRemoveTiles">
+                <widget class="QPushButton" name="btnConfirmAdd">
                  <property name="text">
-                  <string>...</string>
+                  <string>Confirm</string>
                  </property>
                 </widget>
                </item>
               </layout>
+             </widget>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="setupStackedWidgetPage2" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
              </item>
              <item>
-              <widget class="QToolBox" name="toolBox">
-               <property name="currentIndex">
-                <number>0</number>
+              <widget class="QLabel" name="lblArrangeSelectedTiles">
+               <property name="text">
+                <string>0 Selected Tiles</string>
                </property>
-               <widget class="QWidget" name="pgAnimation">
-                <property name="geometry">
-                 <rect>
-                  <x>0</x>
-                  <y>0</y>
-                  <width>403</width>
-                  <height>141</height>
-                 </rect>
-                </property>
-                <attribute name="icon">
-                 <iconset resource="../../../data/HyEditor.qrc">
-                  <normaloff>:/icons16x16/media-play.png</normaloff>:/icons16x16/media-play.png</iconset>
-                </attribute>
-                <attribute name="label">
-                 <string>Animation</string>
-                </attribute>
-               </widget>
-               <widget class="QWidget" name="pgAutotile">
-                <attribute name="icon">
-                 <iconset resource="../../../data/HyEditor.qrc">
-                  <normaloff>:/icons16x16/tileset-autotile.png</normaloff>:/icons16x16/tileset-autotile.png</iconset>
-                </attribute>
-                <attribute name="label">
-                 <string>Autotile</string>
-                </attribute>
-               </widget>
-               <widget class="QWidget" name="pgCollision">
-                <attribute name="icon">
-                 <iconset resource="../../../data/HyEditor.qrc">
-                  <normaloff>:/icons16x16/showGrid-Origin.png</normaloff>:/icons16x16/showGrid-Origin.png</iconset>
-                </attribute>
-                <attribute name="label">
-                 <string>Collision</string>
-                </attribute>
-               </widget>
-               <widget class="QWidget" name="pgCustom">
-                <attribute name="icon">
-                 <iconset resource="../../../data/HyEditor.qrc">
-                  <normaloff>:/icons16x16/generic-rename.png</normaloff>:/icons16x16/generic-rename.png</iconset>
-                </attribute>
-                <attribute name="label">
-                 <string>Custom Data</string>
-                </attribute>
-               </widget>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="btnReplaceTiles">
+               <property name="text">
+                <string>...</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="btnDeleteTiles">
+               <property name="text">
+                <string>...</string>
+               </property>
               </widget>
              </item>
             </layout>
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="setupStackedWidgetPage3" native="true"/>
+         <widget class="QWidget" name="setupStackedWidgetPage4" native="true"/>
+         <widget class="QWidget" name="setupStackedWidgetPage5" native="true"/>
+         <widget class="QWidget" name="setupStackedWidgetPage6" native="true"/>
         </widget>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="verticalLayoutWidget_2">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="spacing">
-        <number>2</number>
+        <number>0</number>
        </property>
+       <item>
+        <widget class="QFrame" name="tabFrame">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Shape::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="TileSetView" name="graphicsView"/>
        </item>

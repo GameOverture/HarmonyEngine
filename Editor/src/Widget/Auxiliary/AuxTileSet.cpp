@@ -28,6 +28,17 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	m_pImportTileSheetPixmap(nullptr)
 {
 	ui->setupUi(this);
+	
+	m_pTabBar = new QTabBar(ui->tabFrame);
+	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/generic-add.png")), tr("Import"));
+	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/tileset-arrange.png")), tr("Arrange"));
+	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/media-play.png")), tr("Animation"));
+	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/tileset-autotile.png")), tr("Autotile"));
+	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/collision.png")), tr("Collision"));
+	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/generic-rename.png")), tr("Custom Data"));
+	connect(m_pTabBar, SIGNAL(currentChanged(int)), this, SLOT(OnTabBarChanged(int)));
+	ui->tabFrame->resize(m_pTabBar->sizeHint().width(), ui->tabFrame->height());
+
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
 
 	ui->vsbTileSize->Init(SPINBOXTYPE_Int2d, 1, MAX_INT_RANGE);
@@ -43,7 +54,9 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	for(TileSetShape eTileSetType : eTileSetTypeList)
 		ui->cmbTileShape->addItem(HyGlobal::TileSetShapeName(eTileSetType), eTileSetType);
 
-	ui->splitter->setSizes(QList<int>() << 140 << width() - 140);
+	ui->splitter->setSizes(QList<int>() << 100 << width() - 100);
+	ui->splitter->setCollapsible(0, false);
+	ui->splitter->setCollapsible(1, false);
 
 	connect(ui->vsbTileSize, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnTileSizeChanged(QVariant)));
 	connect(ui->vsbTileOffset, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnTileOffsetChanged(QVariant)));
@@ -64,6 +77,8 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 		return;
 
 	m_pTileSet = pTileSet;
+	if(m_pTileSet == nullptr)
+		return;
 	
 	if(m_pTileSet->GetAtlasRegionSize().isValid() == false)
 		m_pTileSet->SetAtlasRegionSize(QSize(g_iDefaultTileSize, g_iDefaultTileSize));
@@ -86,18 +101,12 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 	SetImportWidgets();
 
 	if(m_pTileSet->GetNumTiles() == 0)
-	{
-		ui->tabWidget->setCurrentIndex(TAB_AddTiles);
-		on_tabWidget_currentChanged(TAB_AddTiles);
-	}
+		m_pTabBar->setCurrentIndex(TILESETPAGE_Import);
 	else
-	{
-		ui->tabWidget->setCurrentIndex(TAB_Properties);
-		on_tabWidget_currentChanged(TAB_Properties);
-	}
-
+		m_pTabBar->setCurrentIndex(TILESETPAGE_Arrange);
+	
 	ui->graphicsView->SetScene(this, m_pTileSet->GetGfxScene());
-	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt());
+	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(GetCurrentPage()));
 	
 	RefreshInfo();
 }
@@ -105,6 +114,11 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 AtlasTileSet *AuxTileSet::GetTileSet() const
 {
 	return m_pTileSet;
+}
+
+TileSetPage AuxTileSet::GetCurrentPage() const
+{
+	return static_cast<TileSetPage>(ui->setupStackedWidget->currentIndex());
 }
 
 void AuxTileSet::CmdSet_TileShapeWidget(TileSetShape eTileShape)
@@ -150,8 +164,16 @@ void AuxTileSet::RefreshInfo()
 	ui->lblInfo->setText(m_pTileSet->GetTileSetInfo());
 }
 
-void AuxTileSet::UpdateImportSelection()
+void AuxTileSet::UpdateSelection()
 {
+	int iNumSetupSelected = m_pTileSet->GetGfxScene()->GetNumSetupSelected();
+	if(iNumSetupSelected == 1)
+		ui->lblArrangeSelectedTiles->setText(QString::number(iNumSetupSelected) % " Selected Tile");
+	else
+		ui->lblArrangeSelectedTiles->setText(QString::number(iNumSetupSelected) % " Selected Tiles");
+	ui->actionReplaceTiles->setEnabled(iNumSetupSelected > 0);
+	ui->actionRemoveTiles->setEnabled(iNumSetupSelected > 0);
+
 	ui->btnConfirmAdd->setText("Import " % QString::number(m_pTileSet->GetGfxScene()->GetNumImportPixmaps()) % " Tiles");
 	ErrorCheckImport();
 }
@@ -189,9 +211,11 @@ void AuxTileSet::SetImportWidgets()
 	m_bIsImportingTileSheet = bTileSheet;
 	ui->grpSlicingOptions->setVisible(m_bIsImportingTileSheet);
 
+	if(GetCurrentPage() != TILESETPAGE_Import)
+		HyGuiLog("AuxTileSet::SetImportWidgets called while not on Import page", LOGTYPE_Error);
 	m_pTileSet->GetGfxScene()->ClearImportTiles();
-	m_pTileSet->GetGfxScene()->SetDisplayMode(TILESETMODE_Importing);
-	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt());
+	m_pTileSet->GetGfxScene()->OnTileSetPageChange(GetCurrentPage());
+	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(GetCurrentPage()));
 
 	ErrorCheckImport();
 }
@@ -206,7 +230,6 @@ void AuxTileSet::SliceSheetPixmaps()
 		return;
 
 	ui->grpSlicingOptions->setVisible(true);
-	ui->grpImportSide->setVisible(m_pTileSet->GetNumTiles() > 0);
 
 	TileSetScene *pGfxScene = m_pTileSet->GetGfxScene();
 	pGfxScene->ClearImportTiles();
@@ -222,7 +245,7 @@ void AuxTileSet::SliceSheetPixmaps()
 			QRect tileRect(ptCurPos.x(), ptCurPos.y(), vRegionSize.x(), vRegionSize.y());
 			QPixmap tilePixmap = m_pImportTileSheetPixmap->copy(tileRect);
 
-			pGfxScene->AddTile(TILESETMODE_Importing, nullptr, m_pTileSet->GetTilePolygon(), ptGridPos, tilePixmap, IsPixmapAllTransparent(tilePixmap) == false);
+			pGfxScene->AddTile(true, nullptr, m_pTileSet->GetTilePolygon(), ptGridPos, tilePixmap, IsPixmapAllTransparent(tilePixmap) == false);
 
 			ptCurPos.setX(ptCurPos.x() + vRegionSize.x() + vPadding.x());
 			ptGridPos.setX(ptGridPos.x() + 1);
@@ -317,17 +340,6 @@ void AuxTileSet::on_undoStack_indexChanged(int iIndex)
 	RefreshInfo();
 }
 
-void AuxTileSet::on_tabWidget_currentChanged(int iIndex)
-{
-	if(m_pTileSet == nullptr)
-		return;
-
-	TileSetMode eTileSetMode = static_cast<TileSetMode>(iIndex);
-	ui->graphicsView->SetStatusLabel(eTileSetMode == TILESETMODE_Importing ? "Import New Tiles" : "Setup");
-	m_pTileSet->GetGfxScene()->SetDisplayMode(eTileSetMode);
-	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt());
-}
-
 void AuxTileSet::on_radTileSheet_toggled(bool bChecked)
 {
 	SetImportWidgets();
@@ -410,7 +422,7 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 			painter.drawImage((maxSize.width() - pImg->width()) / 2, (maxSize.height() - pImg->height()) / 2, *pImg);
 			painter.end();
 
-			pGfxScene->AddTile(TILESETMODE_Importing, nullptr, m_pTileSet->GetTilePolygon(), QPoint(iIndex % iNUM_COLS, iIndex / iNUM_COLS), pixmap, IsPixmapAllTransparent(pixmap) == false);
+			pGfxScene->AddTile(true, nullptr, m_pTileSet->GetTilePolygon(), QPoint(iIndex % iNUM_COLS, iIndex / iNUM_COLS), pixmap, IsPixmapAllTransparent(pixmap) == false);
 			iIndex++;
 		}
 
@@ -564,4 +576,43 @@ void AuxTileSet::on_btnConfirmAdd_clicked()
 	//}
 
 	//m_ProjectRef.GetAtlasModel().ImportNewAssets(sImageImportList, uiBankId, correspondingParentList, correspondingUuidList);
+}
+
+void AuxTileSet::OnTabBarChanged(int iIndex)
+{
+	if(m_pTileSet == nullptr)
+		return;
+
+	ui->setupStackedWidget->setCurrentIndex(iIndex);
+
+	m_pTileSet->GetGfxScene()->ClearSetupSelection();
+
+	switch (iIndex)
+	{
+	case TILESETPAGE_Import:
+		ui->graphicsView->SetStatusLabel("Import New Tiles");
+		ui->grpImportSide->setVisible(m_pTileSet->GetNumTiles() > 0);
+		break;
+	case TILESETPAGE_Arrange:
+		ui->graphicsView->SetStatusLabel("Arrange, Replace, Delete");
+		break;
+	case TILESETPAGE_Animation:
+		ui->graphicsView->SetStatusLabel("Animation Setup");
+		break;
+	case TILESETPAGE_Autotile:
+		ui->graphicsView->SetStatusLabel("Autotile Setup");
+		break;
+	case TILESETPAGE_Collision:
+		ui->graphicsView->SetStatusLabel("Collision Setup");
+		break;
+	case TILESETPAGE_CustomData:
+		ui->graphicsView->SetStatusLabel("Custom Data Setup");
+		break;
+	default:
+		HyGuiLog("AuxTileSet::on_setupToolBox_currentChanged - Unknown TileSetPage index: " % QString::number(iIndex), LOGTYPE_Error);
+		break;
+	}
+
+	m_pTileSet->GetGfxScene()->OnTileSetPageChange(static_cast<TileSetPage>(iIndex));
+	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(static_cast<TileSetPage>(iIndex)));
 }

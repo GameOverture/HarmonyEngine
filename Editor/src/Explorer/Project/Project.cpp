@@ -703,11 +703,6 @@ ProjectItemData *Project::GetCurrentOpenItem()
 	return m_pCurOpenItem;
 }
 
-ProjectDraw *Project::GetProjDraw()
-{
-	return m_pDraw;
-}
-
 void Project::SetRenderSize(int iWidth, int iHeight)
 {
 	if(m_pTabBar && m_pTabBar->count() != 0)

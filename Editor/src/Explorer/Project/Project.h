@@ -138,7 +138,6 @@ public:
 	ProjectItemData *GetCurrentOpenItem();
 
 	// ProjectDraw functions
-	ProjectDraw *GetProjDraw();
 	void SetRenderSize(int iWidth, int iHeight);
 	
 	void ShowGridBackground(bool bShow);

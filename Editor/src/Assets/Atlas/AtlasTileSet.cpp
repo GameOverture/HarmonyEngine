@@ -295,11 +295,11 @@ QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vRegionS
 		m_TileDataList.append(pTileData);
 		newTileDataList.push_back(QPair<QPoint, TileData *>(newGridPos, pTileData));
 
-		GetGfxScene()->AddTile(TILESETMODE_Setup, pTileData, GetTilePolygon(), pTileData->GetMetaGridPos(), pTileData->GetPixmap(), false);
+		GetGfxScene()->AddTile(false, pTileData, GetTilePolygon(), pTileData->GetMetaGridPos(), pTileData->GetPixmap(), false);
 	}
 
 	GetGfxScene()->ClearImportTiles();
-	GetGfxScene()->SetDisplayMode(TILESETMODE_Setup);
+	GetGfxScene()->OnTileSetPageChange(TILESETPAGE_Arrange);
 	GetGfxScene()->RefreshTiles();
 
 	m_bSubAtlasDirty = true;

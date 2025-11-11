@@ -13,16 +13,11 @@
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
+#include "AuxTileSet.h"
 
 class AtlasTileSet;
 class TileSetGfxItem;
 class TileData;
-
-enum TileSetMode
-{
-	TILESETMODE_Importing,
-	TILESETMODE_Setup
-};
 
 class TileSetGfxItemGroup : public QGraphicsItemGroup {
 public:
@@ -40,14 +35,13 @@ class TileSetScene : public QGraphicsScene
 {
 	Q_OBJECT
 
-	TileSetMode														m_eMode;
 	AtlasTileSet *													m_pTileSet;
 
 	QMap<TileData*, TileSetGfxItem*>								m_SetupTileMap;			// Keys are pointing to Actual concrete tiles from AtlasTileSet::m_TileDataMap
 	QGraphicsRectItem												m_SetupBorderRect;		// A dash-line box that encompasses the working-portion of the 'setup' tiles
 	TileSetGfxItemGroup*											m_pModeSetupGroup;
 
-	QPointF															m_vDraggingStartMousePos;
+	QPointF															m_vArrangingStartMousePos;
 
 	QMap<QPoint, TileSetGfxItem*>									m_ImportTileMap;		// Pending import tiles
 	QGraphicsRectItem												m_ImportBorderRect;		// A dash-line box that encompasses the working-portion of the 'import' tiles
@@ -62,23 +56,23 @@ public:
 
 	void Initialize(AtlasTileSet *pTileSet);
 
-	TileSetMode GetDisplayMode() const;
-	void SetDisplayMode(TileSetMode eMode);
+	void OnTileSetPageChange(TileSetPage ePage);
 	
-	QPointF GetFocusPt() const;
+	QPointF GetFocusPt(TileSetPage ePage) const;
 
 	int GetNumImportPixmaps() const;
 	QSize GetImportRegionSize() const;
 	QMap<QPoint, QPixmap> AssembleImportMap();
-
 	void SetImportAppendEdge(Qt::Edge eEdge);
 
-	void OnMarqueeRelease(Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag);
+	int GetNumSetupSelected() const;
+
+	void OnMarqueeRelease(TileSetPage ePage, Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag);
 	void ClearSetupSelection();
 
 	TileSetGfxItem* GetSetupTileAt(QPointF ptScenePos) const;
 
-	void AddTile(TileSetMode eMode, TileData* pTileData, const QPolygonF& outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
+	void AddTile(bool bImportTile, TileData* pTileData, const QPolygonF& outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
 	
 	// Syncronizes the graphics items to match the data of m_pTileSet and current import tiles
 	// Also repositions tiles during sorting operations
@@ -87,9 +81,9 @@ public:
 	void ClearImportTiles();
 	void ClearSetupTiles();
 
-	void OnDraggingTilesMousePress(QPointF ptMouseScenePos);
-	void OnDraggingTilesMouseMove(QPointF ptMouseScenePos);
-	void OnDraggingTilesMouseRelease(QPointF ptMouseScenePos);
+	void OnArrangingTilesMousePress(QPointF ptMouseScenePos);
+	void OnArrangingTilesMouseMove(QPointF ptMouseScenePos);
+	void OnArrangingTilesMouseRelease(QPointF ptMouseScenePos);
 
 private:
 	// Used during a drag operation, displace unselected tiles by the given grid delta

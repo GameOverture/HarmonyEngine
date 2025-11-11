@@ -381,5 +381,7 @@
         <file>icons16x16/items/RichLabel-Warning.png</file>
         <file>icons16x16/spine-skin.png</file>
         <file>icons16x16/tileset-autotile.png</file>
+        <file>icons16x16/tileset-arrange.png</file>
+        <file>icons16x16/collision.png</file>
     </qresource>
 </RCC>
