@@ -66,6 +66,7 @@ public:
 	void SetImportAppendEdge(Qt::Edge eEdge);
 
 	int GetNumSetupSelected() const;
+	QMap<TileData *, TileSetGfxItem *> GetSelectedSetupTiles() const;
 
 	void OnMarqueeRelease(TileSetPage ePage, Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag);
 	void ClearSetupSelection();
@@ -74,7 +75,8 @@ public:
 
 	void AddTile(bool bImportTile, TileData* pTileData, const QPolygonF& outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
 	
-	// Syncronizes the graphics items to match the data of m_pTileSet and current import tiles
+	// Sync m_pTileSet's 'AtlasTileSet::m_TileDataList' with m_SetupTileMap
+	// Sets graphics items to match the data of m_pTileSet and current import tiles
 	// Also repositions tiles during sorting operations
 	void RefreshTiles(QPointF vDragDelta = QPointF());
 
@@ -83,7 +85,7 @@ public:
 
 	void OnArrangingTilesMousePress(QPointF ptMouseScenePos);
 	void OnArrangingTilesMouseMove(QPointF ptMouseScenePos);
-	void OnArrangingTilesMouseRelease(QPointF ptMouseScenePos);
+	void OnArrangingTilesMouseRelease(AuxTileSet &auxTileSetRef, QPointF ptMouseScenePos);
 
 private:
 	// Used during a drag operation, displace unselected tiles by the given grid delta

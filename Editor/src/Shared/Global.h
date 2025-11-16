@@ -209,6 +209,13 @@ enum TileSetShape
 	NUM_TILESETSHAPES
 };
 
+enum TileSetWgtType
+{
+	TILESETWGT_Animation,
+	TILESETWGT_TerrainSet,
+	TILESETWGT_Terrain
+};
+
 enum EditorShape
 {
 	SHAPE_None = 0,
@@ -280,6 +287,9 @@ enum MergableUndoCmd
 {
 	MERGABLEUNDOCMD_TileSize = 1,
 	MERGABLEUNDOCMD_TileOffset = 2,
+	MERGABLEUNDOCMD_TileSetAnimColumn = 3,
+	MERGABLEUNDOCMD_TileSetAnimNumFrames = 4,
+	MERGABLEUNDOCMD_TileSetAnimFrameRate = 5
 };
 
 enum SnappingSetting

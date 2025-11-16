@@ -16,7 +16,7 @@
 
 const HyMargins<int> g_borderMargins(16, 16, 16, 16);
 const int g_iSpacingAmt = 5;
-const float g_fSceneMargins = 1420.0f;
+const float g_fSceneMargins = 3000.0f;
 
 TileSetScene::TileSetScene() :
 	QGraphicsScene(),
@@ -149,6 +149,17 @@ int TileSetScene::GetNumSetupSelected() const
 	return iNumSetupTiles;
 }
 
+QMap<TileData *, TileSetGfxItem *> TileSetScene::GetSelectedSetupTiles() const
+{
+	QMap<TileData*, TileSetGfxItem*> selectedTileMap;
+	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
+	{
+		if (iter.value()->IsSelected())
+			selectedTileMap.insert(iter.key(), iter.value());
+	}
+	return selectedTileMap;
+}
+
 void TileSetScene::OnMarqueeRelease(TileSetPage ePage, Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag)
 {
 	QPointF ptTopLeft, ptBotRight;
@@ -230,6 +241,30 @@ void TileSetScene::AddTile(bool bImportTile, TileData *pTileData, const QPolygon
 
 void TileSetScene::RefreshTiles(QPointF vDragDelta /*= QPointF()*/)
 {
+	// Sync m_pTileSet's 'AtlasTileSet::m_TileDataList' with m_SetupTileMap
+	// Either add or remove TileData entries as needed
+	QVector<TileData *> tileDataList = m_pTileSet->GetTileDataList();
+	for (int i = 0; i < tileDataList.size(); ++i)
+	{
+		if (m_SetupTileMap.contains(tileDataList[i]) == false)
+		{
+			// TileData exists in TileSet but not in Scene, so add it
+			AddTile(false, tileDataList[i], m_pTileSet->GetTilePolygon(), tileDataList[i]->GetMetaGridPos(), tileDataList[i]->GetPixmap(), false);
+		}
+	}
+	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); )
+	{
+		if (tileDataList.contains(iter.key()) == false)
+		{
+			// TileData exists in Scene but not in TileSet, so remove it
+			m_pModeSetupGroup->removeFromGroup(iter.value());
+			delete iter.value();
+			iter = m_SetupTileMap.erase(iter);
+		}
+		else
+			++iter;
+	}
+
 	// SETUP ------------------------------------------------------------------------------------------------------------------------
 	int iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
 	int iTileSpacingWidth = m_pTileSet->GetAtlasRegionSize().width() + g_iSpacingAmt;
@@ -305,28 +340,31 @@ void TileSetScene::RefreshTiles(QPointF vDragDelta /*= QPointF()*/)
 	{
 		m_ImportBorderRect.setVisible(true);
 
-		// Position the m_pModeImportGroup against the m_pModeSetupGroup's 'm_eImportAppendEdge'
-		QPointF ptImportGroupPos;
-		switch (m_eImportAppendEdge)
+		if (m_SetupBorderRect.isVisible())
 		{
-		case Qt::TopEdge:
-			ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
-			ptImportGroupPos.setY(m_SetupBorderRect.rect().top() - g_borderMargins.bottom - m_ImportBorderRect.rect().height());
-			break;
-		case Qt::BottomEdge:
-			ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
-			ptImportGroupPos.setY(m_SetupBorderRect.rect().bottom() + g_borderMargins.top);
-			break;
-		case Qt::LeftEdge:
-			ptImportGroupPos.setX(m_SetupBorderRect.rect().left() - g_borderMargins.right - m_ImportBorderRect.rect().width());
-			ptImportGroupPos.setY(m_SetupBorderRect.rect().center().y() - m_ImportBorderRect.rect().height() / 2.0f);
-			break;
-		case Qt::RightEdge:
-			ptImportGroupPos.setX(m_SetupBorderRect.rect().right() + g_borderMargins.left);
-			ptImportGroupPos.setY(m_SetupBorderRect.rect().center().y() - m_ImportBorderRect.rect().height() / 2.0f);
-			break;
+			// Position the m_pModeImportGroup against the m_pModeSetupGroup's 'm_eImportAppendEdge'
+			QPointF ptImportGroupPos;
+			switch (m_eImportAppendEdge)
+			{
+			case Qt::TopEdge:
+				ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
+				ptImportGroupPos.setY(m_SetupBorderRect.rect().top() - g_borderMargins.bottom - m_ImportBorderRect.rect().height());
+				break;
+			case Qt::BottomEdge:
+				ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
+				ptImportGroupPos.setY(m_SetupBorderRect.rect().bottom() + g_borderMargins.top);
+				break;
+			case Qt::LeftEdge:
+				ptImportGroupPos.setX(m_SetupBorderRect.rect().left() - g_borderMargins.right - m_ImportBorderRect.rect().width());
+				ptImportGroupPos.setY(m_SetupBorderRect.rect().center().y() - m_ImportBorderRect.rect().height() / 2.0f);
+				break;
+			case Qt::RightEdge:
+				ptImportGroupPos.setX(m_SetupBorderRect.rect().right() + g_borderMargins.left);
+				ptImportGroupPos.setY(m_SetupBorderRect.rect().center().y() - m_ImportBorderRect.rect().height() / 2.0f);
+				break;
+			}
+			m_pModeImportGroup->setPos(ptImportGroupPos);
 		}
-		m_pModeImportGroup->setPos(ptImportGroupPos);
 	}
 }
 
@@ -377,7 +415,7 @@ void TileSetScene::OnArrangingTilesMouseMove(QPointF ptMouseScenePos)
 	RefreshTiles(vDelta);
 }
 
-void TileSetScene::OnArrangingTilesMouseRelease(QPointF ptMouseScenePos)
+void TileSetScene::OnArrangingTilesMouseRelease(AuxTileSet &auxTileSetRef, QPointF ptMouseScenePos)
 {
 	QList<TileData*> affectedTileList;
 	QList<QPoint> oldGridPosList;
@@ -394,7 +432,7 @@ void TileSetScene::OnArrangingTilesMouseRelease(QPointF ptMouseScenePos)
 		}
 	}
 
-	TileSetUndoCmd_MoveTiles* pMoveCmd = new TileSetUndoCmd_MoveTiles(*m_pTileSet, affectedTileList, oldGridPosList, newGridPosList);
+	TileSetUndoCmd_MoveTiles* pMoveCmd = new TileSetUndoCmd_MoveTiles(auxTileSetRef, affectedTileList, oldGridPosList, newGridPosList);
 	m_pTileSet->GetUndoStack()->push(pMoveCmd);
 }
 

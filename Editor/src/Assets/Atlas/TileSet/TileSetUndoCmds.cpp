@@ -9,6 +9,8 @@
  *************************************************************************/
 #include "Global.h"
 #include "TileSetUndoCmds.h"
+#include "TileData.h"
+#include "WgtTileSetAnimation.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -132,10 +134,10 @@ TileSetUndoCmd_TileShape::TileSetUndoCmd_TileShape(AuxTileSet &auxTileSetRef, Ti
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItemRef, const QMap<QPoint, QPixmap> &pixmapMapRef, QSize vRegionSize, Qt::Edge eAppendEdge, QUndoCommand *pParent /*= nullptr*/) :
+TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AuxTileSet &auxTileSetRef, const QMap<QPoint, QPixmap> &pixmapMapRef, QSize vRegionSize, Qt::Edge eAppendEdge, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
+	m_AuxTileSetRef(auxTileSetRef),
 	m_eAppendEdge(eAppendEdge),
-	m_TileSetRef(tileSetItemRef),
 	m_RegionSize(vRegionSize),
 	m_PixmapMap(pixmapMapRef)
 {
@@ -147,11 +149,14 @@ TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItem
 }
 
 /*virtual*/ void TileSetUndoCmd_AppendTiles::redo() /*override*/
-{
+{	
 	if(m_AppendedTilesList.empty())
-		m_AppendedTilesList = m_TileSetRef.Cmd_AppendNewTiles(m_RegionSize, m_PixmapMap, m_eAppendEdge);
+		m_AppendedTilesList = m_AuxTileSetRef.GetTileSet()->Cmd_AppendNewTiles(m_RegionSize, m_PixmapMap, m_eAppendEdge);
 	else
-		m_TileSetRef.Cmd_ReaddTiles(m_AppendedTilesList);
+		m_AuxTileSetRef.GetTileSet()->Cmd_ReaddTiles(m_AppendedTilesList);
+
+	if(m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Arrange)
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
 }
 
 /*virtual*/ void TileSetUndoCmd_AppendTiles::undo() /*override*/
@@ -163,14 +168,17 @@ TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItem
 			removeTileList.append(pair.second);
 	}
 
-	m_AppendedTilesList = m_TileSetRef.Cmd_RemoveTiles(removeTileList);
+	m_AppendedTilesList = m_AuxTileSetRef.GetTileSet()->Cmd_RemoveTiles(removeTileList);
+
+	if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Arrange)
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TileSetUndoCmd_MoveTiles::TileSetUndoCmd_MoveTiles(AtlasTileSet& tileSetItemRef, QList<TileData*> affectedTileList, QList<QPoint> oldGridPosList, QList<QPoint> newGridPosList, QUndoCommand* pParent /*= nullptr*/) :
+TileSetUndoCmd_MoveTiles::TileSetUndoCmd_MoveTiles(AuxTileSet &auxTileSetRef, QList<TileData*> affectedTileList, QList<QPoint> oldGridPosList, QList<QPoint> newGridPosList, QUndoCommand* pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
-	m_TileSetRef(tileSetItemRef),
+	m_AuxTileSetRef(auxTileSetRef),
 	m_AffectedTileList(affectedTileList),
 	m_OldGridPosList(oldGridPosList),
 	m_NewGridPosList(newGridPosList)
@@ -187,34 +195,295 @@ TileSetUndoCmd_MoveTiles::TileSetUndoCmd_MoveTiles(AtlasTileSet& tileSetItemRef,
 
 /*virtual*/ void TileSetUndoCmd_MoveTiles::redo() /*override*/
 {
-	m_TileSetRef.Cmd_MoveTiles(m_AffectedTileList, m_NewGridPosList);
+	m_AuxTileSetRef.GetTileSet()->Cmd_MoveTiles(m_AffectedTileList, m_NewGridPosList);
+	if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Arrange)
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
 }
 
 /*virtual*/ void TileSetUndoCmd_MoveTiles::undo() /*override*/
 {
-	m_TileSetRef.Cmd_MoveTiles(m_AffectedTileList, m_OldGridPosList);
+	m_AuxTileSetRef.GetTileSet()->Cmd_MoveTiles(m_AffectedTileList, m_OldGridPosList);
+	if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Arrange)
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//TileSetUndoCmd_RemoveTiles::TileSetUndoCmd_RemoveTiles(AtlasTileSet &tileSetItemRef, QUndoCommand *pParent /*= nullptr*/) :
-//	QUndoCommand(pParent),
-//	m_TileSetRef(tileSetItemRef)
-//{
-//	setText("Remove " % QString::number(m_FrameList.size()) % " Frames from State " % QString::number(iStateIndex));
-//}
-//
-///*virtual*/ TileSetUndoCmd_RemoveTiles::~TileSetUndoCmd_RemoveTiles()
-//{ }
-//
-///*virtual*/ void TileSetUndoCmd_RemoveTiles::redo() /*override*/
-//{
-//	static_cast<SpriteModel *>(m_SpriteItemRef.GetModel())->Cmd_RemoveFrames(m_iStateIndex, m_FrameList);
-//	m_SpriteItemRef.FocusWidgetState(m_iStateIndex, -1);
-//}
-//
-///*virtual*/ void TileSetUndoCmd_RemoveTiles::undo() /*override*/
-//{
-//	QVariant focusSubState = static_cast<SpriteModel *>(m_SpriteItemRef.GetModel())->Cmd_AddFrames(m_iStateIndex, m_FrameList);
-//	m_SpriteItemRef.FocusWidgetState(m_iStateIndex, focusSubState);
-//}
+TileSetUndoCmd_RemoveTiles::TileSetUndoCmd_RemoveTiles(AuxTileSet &auxTileSetRef, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_AuxTileSetRef(auxTileSetRef)
+{
+	m_TilesMap = m_AuxTileSetRef.GetTileSet()->GetGfxScene()->GetSelectedSetupTiles();
 
+	setText("Remove " % QString::number(m_TilesMap.size()) % " Tiles");
+}
+
+/*virtual*/ TileSetUndoCmd_RemoveTiles::~TileSetUndoCmd_RemoveTiles()
+{ }
+
+/*virtual*/ void TileSetUndoCmd_RemoveTiles::redo() /*override*/
+{
+	m_AuxTileSetRef.GetTileSet()->Cmd_RemoveTiles(m_TilesMap.keys());
+	if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Arrange)
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
+}
+
+/*virtual*/ void TileSetUndoCmd_RemoveTiles::undo() /*override*/
+{
+	QList<QPair<QPoint, TileData *>> tileDataList;
+	tileDataList.reserve(m_TilesMap.size());
+	for (TileData *pTileData : m_TilesMap.keys())
+		tileDataList.append(QPair<QPoint, TileData *>(pTileData->GetMetaGridPos(), pTileData));
+	
+	m_AuxTileSetRef.GetTileSet()->Cmd_ReaddTiles(tileDataList);
+	if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Arrange)
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TileSetUndoCmd_AddWgtItem::TileSetUndoCmd_AddWgtItem(AuxTileSet &auxTileSetRef, TileSetWgtType eType, QJsonObject itemDataObj, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_AuxTileSetRef(auxTileSetRef),
+	m_eType(eType),
+	m_ItemDataObj(itemDataObj)
+{
+	switch (m_eType)
+	{
+	case TILESETWGT_Animation:
+		setText("Add Animation");
+		break;
+	case TILESETWGT_TerrainSet:
+		setText("Add Terrain Set");
+		break;
+	case TILESETWGT_Terrain:
+		setText("Add Terrain");
+		break;
+			
+	default:
+		HyGuiLog("TileSetUndoCmd_AddWgtItem() - Unknown TileSetWgtType.", LOGTYPE_Error);
+		break;
+	}
+}
+
+/*virtual*/ TileSetUndoCmd_AddWgtItem::~TileSetUndoCmd_AddWgtItem()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_AddWgtItem::redo() /*override*/
+{
+	m_AuxTileSetRef.CmdSet_AllocateWgtItem(m_eType, m_ItemDataObj);
+
+	switch (m_eType)
+	{
+	case TILESETWGT_Animation:
+		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Animation)
+			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
+		break;
+	case TILESETWGT_TerrainSet:
+	case TILESETWGT_Terrain:
+		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Autotile)
+			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+		break;
+
+	default:
+		HyGuiLog("TileSetUndoCmd_AddWgtItem::redo() - Unknown TileSetWgtType.", LOGTYPE_Error);
+		break;
+	}
+}
+
+/*virtual*/ void TileSetUndoCmd_AddWgtItem::undo() /*override*/
+{
+	QUuid uuid(m_ItemDataObj["UUID"].toString());
+	m_AuxTileSetRef.CmdSet_DeleteWgtItem(uuid);
+
+	switch (m_eType)
+	{
+	case TILESETWGT_Animation:
+		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Animation)
+			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
+		break;
+	case TILESETWGT_TerrainSet:
+	case TILESETWGT_Terrain:
+		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Autotile)
+			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+		break;
+
+	default:
+		HyGuiLog("TileSetUndoCmd_AddWgtItem::redo() - Unknown TileSetWgtType.", LOGTYPE_Error);
+		break;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TileSetUndoCmd_RemoveWgtItem::TileSetUndoCmd_RemoveWgtItem(AuxTileSet &auxTileSetRef, QUuid uuid, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_AuxTileSetRef(auxTileSetRef)
+{
+	IWgtTileSetItem *pWgtItem = m_AuxTileSetRef.FindWgtItem(uuid);
+	if (pWgtItem == nullptr)
+	{
+		HyGuiLog("TileSetUndoCmd_RemoveWgtItem() - Could not find IWgtTileSetItem with given UUID.", LOGTYPE_Error);
+		return;
+	}
+
+	m_eRemovedType = pWgtItem->GetWgtType();
+	m_RemovedItemDataObj = m_AuxTileSetRef.GetTileSet()->GetJsonItem(uuid);
+	switch (m_eRemovedType)
+	{
+	case TILESETWGT_Animation:
+		setText("Remove Animation");
+		break;
+	case TILESETWGT_TerrainSet:
+		setText("Remove Terrain Set");
+		break;
+	case TILESETWGT_Terrain:
+		setText("Remove Terrain");
+		break;
+
+	default:
+		HyGuiLog("TileSetUndoCmd_RemoveWgtItem() - Unknown TileSetWgtType.", LOGTYPE_Error);
+		break;
+	}
+}
+
+/*virtual*/ TileSetUndoCmd_RemoveWgtItem::~TileSetUndoCmd_RemoveWgtItem()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_RemoveWgtItem::redo() /*override*/
+{
+	m_AuxTileSetRef.CmdSet_DeleteWgtItem(QUuid(m_RemovedItemDataObj["UUID"].toString()));
+
+	switch (m_eRemovedType)
+	{
+	case TILESETWGT_Animation:
+		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Animation)
+			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
+		break;
+	case TILESETWGT_TerrainSet:
+	case TILESETWGT_Terrain:
+		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Autotile)
+			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+		break;
+
+	default:
+		HyGuiLog("TileSetUndoCmd_RemoveWgtItem::redo() - Unknown TileSetWgtType.", LOGTYPE_Error);
+		break;
+	}
+}
+
+/*virtual*/ void TileSetUndoCmd_RemoveWgtItem::undo() /*override*/
+{
+	m_AuxTileSetRef.CmdSet_AllocateWgtItem(m_eRemovedType, m_RemovedItemDataObj);
+
+	switch (m_eRemovedType)
+	{
+	case TILESETWGT_Animation:
+		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Animation)
+			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
+		break;
+	case TILESETWGT_TerrainSet:
+	case TILESETWGT_Terrain:
+		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Autotile)
+			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+		break;
+
+	default:
+		HyGuiLog("TileSetUndoCmd_RemoveWgtItem::redo() - Unknown TileSetWgtType.", LOGTYPE_Error);
+		break;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TileSetUndoCmd_OrderWgtItem::TileSetUndoCmd_OrderWgtItem(AuxTileSet &auxTileSetRef, QUuid uuid, int iOldIndex, int iNewIndex, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_AuxTileSetRef(auxTileSetRef),
+	m_Uuid(uuid),
+	m_iOldIndex(iOldIndex),
+	m_iNewIndex(iNewIndex)
+{
+	if(m_iOldIndex == m_iNewIndex)
+		HyGuiLog("TileSetUndoCmd_OrderWgtItem() - Old index is the same as new index, no need to create command.", LOGTYPE_Error);
+	
+	IWgtTileSetItem *pWgtItem = m_AuxTileSetRef.FindWgtItem(m_Uuid);
+	if (pWgtItem == nullptr)
+	{
+		HyGuiLog("TileSetUndoCmd_OrderWgtItem() - Could not find IWgtTileSetItem with given UUID.", LOGTYPE_Error);
+		return;
+	}
+	switch (pWgtItem->GetWgtType())
+	{
+	case TILESETWGT_Animation:
+		setText("Reorder Animation");
+		break;
+	case TILESETWGT_TerrainSet:
+		setText("Reorder Terrain Set");
+		break;
+	case TILESETWGT_Terrain:
+		setText("Reorder Terrain");
+		break;
+	
+	default:
+		HyGuiLog("TileSetUndoCmd_OrderWgtItem() - Unknown TileSetWgtType.", LOGTYPE_Error);
+		break;
+	}
+}
+
+/*virtual*/ TileSetUndoCmd_OrderWgtItem::~TileSetUndoCmd_OrderWgtItem()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_OrderWgtItem::redo() /*override*/
+{
+	m_AuxTileSetRef.CmdSet_OrderWgtItem(m_Uuid, m_iNewIndex);
+}
+
+/*virtual*/ void TileSetUndoCmd_OrderWgtItem::undo() /*override*/
+{
+	m_AuxTileSetRef.CmdSet_OrderWgtItem(m_Uuid, m_iOldIndex);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TileSetUndoCmd_ModifyWgtItem::TileSetUndoCmd_ModifyWgtItem(AuxTileSet &auxTileSetRef, QString sUndoText, int iMergeId, QUuid uuid, QJsonObject oldItemDataObj, QJsonObject newItemDataObj, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_AuxTileSetRef(auxTileSetRef),
+	m_iMergeId(iMergeId),
+	m_Uuid(uuid),
+	m_OldItemDataObj(oldItemDataObj),
+	m_NewItemDataObj(newItemDataObj)
+{
+	setText(sUndoText);
+}
+
+/*virtual*/ TileSetUndoCmd_ModifyWgtItem::~TileSetUndoCmd_ModifyWgtItem()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_ModifyWgtItem::redo() /*override*/
+{
+	m_AuxTileSetRef.CmdSet_ModifyWgtItem(m_Uuid, m_NewItemDataObj);
+}
+
+/*virtual*/ void TileSetUndoCmd_ModifyWgtItem::undo() /*override*/
+{
+	m_AuxTileSetRef.CmdSet_ModifyWgtItem(m_Uuid, m_OldItemDataObj);
+}
+
+/*virtual*/ int TileSetUndoCmd_ModifyWgtItem::id() const /*override*/
+{
+	return m_iMergeId;
+}
+
+/*virtual*/ bool TileSetUndoCmd_ModifyWgtItem::mergeWith(const QUndoCommand *pOtherCmd) /*override*/
+{
+	const TileSetUndoCmd_ModifyWgtItem *pOtherModifyCmd = static_cast<const TileSetUndoCmd_ModifyWgtItem *>(pOtherCmd);
+	if(pOtherModifyCmd && (pOtherModifyCmd->m_Uuid == m_Uuid) && (pOtherModifyCmd->m_iMergeId == m_iMergeId))
+	{
+		m_NewItemDataObj = pOtherModifyCmd->m_NewItemDataObj;
+		return true;
+	}
+	return false;
+}

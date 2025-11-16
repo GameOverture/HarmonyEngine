@@ -83,6 +83,8 @@ if(Qt6_DIR)
 		src/Assets/Atlas/AtlasRepackThread.h
 		src/Assets/Atlas/AtlasTileSet.cpp
 		src/Assets/Atlas/AtlasTileSet.h
+		src/Assets/Atlas/TileSet/IWgtTileSetItem.cpp
+		src/Assets/Atlas/TileSet/IWgtTileSetItem.h
 		src/Assets/Atlas/TileSet/TileData.cpp
 		src/Assets/Atlas/TileSet/TileData.h
 		src/Assets/Atlas/TileSet/TileSetGfxItem.cpp
@@ -93,6 +95,12 @@ if(Qt6_DIR)
 		src/Assets/Atlas/TileSet/TileSetUndoCmds.h
 		src/Assets/Atlas/TileSet/TileSetView.cpp
 		src/Assets/Atlas/TileSet/TileSetView.h
+		src/Assets/Atlas/TileSet/WgtTileSetAnimation.cpp
+		src/Assets/Atlas/TileSet/WgtTileSetAnimation.h
+		src/Assets/Atlas/TileSet/WgtTileSetAnimation.ui
+		src/Assets/Atlas/TileSet/WgtTileSetTerrainSet.cpp
+		src/Assets/Atlas/TileSet/WgtTileSetTerrainSet.h
+		src/Assets/Atlas/TileSet/WgtTileSetTerrainSet.ui
 		src/Assets/Audio/AudioAssetsWidget.cpp
 		src/Assets/Audio/AudioAssetsWidget.h
 		src/Assets/Audio/AudioAssetsWidget.ui

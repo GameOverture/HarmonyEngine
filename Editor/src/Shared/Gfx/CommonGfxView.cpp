@@ -25,6 +25,8 @@ CommonGfxView::CommonGfxView(QWidget *pParent /*= nullptr*/) :
 
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+	connect(&m_StatusLabelTimer, SIGNAL(timeour()), this, SLOT(OnStatusLabelTimer()));
 	
 	connect(&m_PanTimer, SIGNAL(timeout()), this, SLOT(OnPanTimer()));
 }
@@ -38,13 +40,18 @@ QString CommonGfxView::GetStatusLabel() const
 	return m_sStatusLabel;
 }
 
-void CommonGfxView::SetStatusLabel(const QString &sStatusLabel)
+void CommonGfxView::SetStatusLabel(const QString &sStatusLabel, int iMillisecondDuration /*= 0*/)
 {
 	if(m_sStatusLabel != sStatusLabel)
 	{
 		m_sStatusLabel = sStatusLabel;
 		update();
 	}
+
+	if (iMillisecondDuration == 0)
+		m_StatusLabelTimer.stop();
+	else
+		m_StatusLabelTimer.start(iMillisecondDuration);
 }
 
 float CommonGfxView::GetZoom() const
@@ -187,6 +194,11 @@ float CommonGfxView::GetZoom() const
 	else
 		scale(0.9, 0.9);
 	pEvent->accept();
+}
+
+void CommonGfxView::OnStatusLabelTimer()
+{
+	SetStatusLabel(QString());
 }
 
 void CommonGfxView::OnPanTimer()

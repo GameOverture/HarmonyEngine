@@ -78,12 +78,20 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 
 		UpdateTilePolygon();
 
-		QJsonArray autotileArray = m_TileSetDataPair.m_Meta["autoTiles"].toArray();
-		m_AutotileList.reserve(autotileArray.size());
-		for (int i = 0; i < autotileArray.size(); ++i)
+		QJsonArray animationArray = m_TileSetDataPair.m_Meta["animations"].toArray();
+		m_AnimationList.reserve(animationArray.size());
+		for (int i = 0; i < animationArray.size(); ++i)
 		{
-			QJsonObject autotileObj = autotileArray[i].toObject();
-			m_AutotileList.push_back(AutoTile(autotileObj));
+			QJsonObject animationObj = animationArray[i].toObject();
+			m_AnimationList.push_back(Animation(animationObj));
+		}
+
+		QJsonArray terrainSetArray = m_TileSetDataPair.m_Meta["terrainSets"].toArray();
+		m_TerrainSetList.reserve(terrainSetArray.size());
+		for (int i = 0; i < terrainSetArray.size(); ++i)
+		{
+			QJsonObject terrainSetObj = terrainSetArray[i].toObject();
+			m_TerrainSetList.push_back(TerrainSet(terrainSetObj));
 		}
 
 		QJsonArray physicsLayerArray = m_TileSetDataPair.m_Meta["physicsLayers"].toArray();
@@ -217,6 +225,78 @@ QString AtlasTileSet::GetTileSetInfo() const
 	return sInfo;
 }
 
+/*static*/ QJsonObject AtlasTileSet::GenerateNewAnimationJsonObject(QString sName, HyColor color)
+{
+	Animation anim(sName, color);
+	return anim.ToJsonObject();
+}
+
+/*static*/ QJsonObject AtlasTileSet::GenerateNewTerrainSetJsonObject()
+{
+	TerrainSet terrainSet;
+	return terrainSet.ToJsonObject();
+}
+
+/*static*/ QJsonObject AtlasTileSet::GenerateNewTerrainJsonObject(QUuid terrainSetUuid, QString sName, HyColor color)
+{
+	TerrainSet::Terrain terrain(terrainSetUuid, sName, color);
+	return terrain.ToJsonObject();
+}
+
+/*static*/ QJsonObject AtlasTileSet::GenerateNewPhysicsLayerJsonObject(QString sName, HyColor color)
+{
+	PhysicsLayer physicsLayer(sName, color);
+	return physicsLayer.ToJsonObject();
+}
+
+QVector<QJsonObject> AtlasTileSet::GetAnimations() const
+{
+	QVector<QJsonObject> animationObjList;
+	animationObjList.reserve(m_AnimationList.size());
+	for (const Animation &animation : m_AnimationList)
+		animationObjList.push_back(animation.ToJsonObject());
+	return animationObjList;
+}
+
+QVector<QJsonObject> AtlasTileSet::GetTerrainSets() const
+{
+	QVector<QJsonObject> terrainSetObjList;
+	terrainSetObjList.reserve(m_TerrainSetList.size());
+	for (const TerrainSet &terrainSet : m_TerrainSetList)
+		terrainSetObjList.push_back(terrainSet.ToJsonObject());
+	return terrainSetObjList;
+}
+
+QVector<QJsonObject> AtlasTileSet::GetPhysicsLayers() const
+{
+	QVector<QJsonObject> physicsLayerObjList;
+	physicsLayerObjList.reserve(m_PhysicsLayerList.size());
+	for (const PhysicsLayer &physicsLayer : m_PhysicsLayerList)
+		physicsLayerObjList.push_back(physicsLayer.ToJsonObject());
+	return physicsLayerObjList;
+}
+
+QJsonObject AtlasTileSet::GetJsonItem(QUuid uuid) const
+{
+	for (const Animation &animation : m_AnimationList)
+	{
+		if (animation.m_uuid == uuid)
+			return animation.ToJsonObject();
+	}
+	for (const TerrainSet &terrainSet : m_TerrainSetList)
+	{
+		if (terrainSet.m_uuid == uuid)
+			return terrainSet.ToJsonObject();
+	}
+	for (const PhysicsLayer &physicsLayer : m_PhysicsLayerList)
+	{
+		if (physicsLayer.m_uuid == uuid)
+			return physicsLayer.ToJsonObject();
+	}
+	HyGuiLog("AtlasTileSet::GetJsonItem() could not find item with UUID: " + uuid.toString(), LOGTYPE_Error);
+	return QJsonObject();
+}
+
 QVector<TileData *> AtlasTileSet::GetTileDataList() const
 {
 	return m_TileDataList;
@@ -225,6 +305,36 @@ QVector<TileData *> AtlasTileSet::GetTileDataList() const
 TileSetScene *AtlasTileSet::GetGfxScene()
 {
 	return &m_GfxScene;
+}
+
+void AtlasTileSet::Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj)
+{
+	for (Animation &animation : m_AnimationList)
+	{
+		if (animation.m_uuid == uuid)
+		{
+			animation = Animation(itemDataObj);
+			return;
+		}
+	}
+	for (TerrainSet &terrainSet : m_TerrainSetList)
+	{
+		if (terrainSet.m_uuid == uuid)
+		{
+			terrainSet = TerrainSet(itemDataObj);
+			return;
+		}
+	}
+	for (PhysicsLayer &physicsLayer : m_PhysicsLayerList)
+	{
+		if (physicsLayer.m_uuid == uuid)
+		{
+			physicsLayer = PhysicsLayer(itemDataObj);
+			return;
+		}
+	}
+
+	HyGuiLog("AtlasTileSet::SetJsonItem() could not find item with UUID: " + uuid.toString(), LOGTYPE_Error);
 }
 
 QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vRegionSize, const QMap<QPoint, QPixmap> &importBatchMap, Qt::Edge eAppendEdge)
@@ -392,25 +502,26 @@ void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 	fileDataPairOut.m_Meta["tileSize"] = QJsonArray() << QJsonValue(m_TileSize.width()) << QJsonValue(m_TileSize.height());
 	fileDataPairOut.m_Meta["tileOffset"] = QJsonArray() << QJsonValue(m_TileOffset.x()) << QJsonValue(m_TileOffset.y());
 
-	QJsonArray autotileArray;
-	for(int i = 0; i < m_AutotileList.size(); ++i)
+	QJsonArray animationArray;
+	for(int i = 0; i < m_AnimationList.size(); ++i)
 	{
-		QJsonObject autotileObj;
-		autotileObj["id"] = QJsonValue(static_cast<int>(m_AutotileList[i].m_hId));
-		autotileObj["type"] = QJsonValue(m_AutotileList[i].m_iType);
-		autotileObj["name"] = QJsonValue(m_AutotileList[i].m_sName);
-		autotileObj["color"] = QJsonValue(static_cast<qint64>(m_AutotileList[i].m_Color.GetAsHexCode()));
-		autotileArray.append(autotileObj);
+		QJsonObject animationObj = m_AnimationList[i].ToJsonObject();
+		animationArray.append(animationObj);
 	}
-	fileDataPairOut.m_Meta["autoTiles"] = autotileArray;
+	fileDataPairOut.m_Meta["animations"] = animationArray;
+
+	QJsonArray terrainSetArray;
+	for(int i = 0; i < m_TerrainSetList.size(); ++i)
+	{
+		QJsonObject terrainSetObj = m_TerrainSetList[i].ToJsonObject();
+		terrainSetArray.append(terrainSetObj);
+	}
+	fileDataPairOut.m_Meta["terrainSets"] = terrainSetArray;
 
 	QJsonArray physicsLayerArray;
 	for(int i = 0; i < m_PhysicsLayerList.size(); ++i)
 	{
-		QJsonObject physicsLayerObj;
-		physicsLayerObj["id"] = QJsonValue(static_cast<int>(m_PhysicsLayerList[i].m_hId));
-		physicsLayerObj["name"] = QJsonValue(m_PhysicsLayerList[i].m_sName);
-		physicsLayerObj["color"] = QJsonValue(static_cast<qint64>(m_PhysicsLayerList[i].m_Color.GetAsHexCode()));
+		QJsonObject physicsLayerObj = m_PhysicsLayerList[i].ToJsonObject();
 		physicsLayerArray.append(physicsLayerObj);
 	}
 	fileDataPairOut.m_Meta["physicsLayers"] = physicsLayerArray;

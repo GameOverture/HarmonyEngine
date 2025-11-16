@@ -28,24 +28,31 @@ class TileData
 	bool 											m_bIsFlippedVert;
 	bool 											m_bIsRotated;			// Transpose
 
-	int												m_iAnimFrame;			// -1 indicates no animation (frames are laid out in row major order in the atlas). NOTE: A tile on the atlas may only be apart of one animation
-
 	int												m_iProbability;
 
-	enum AutoTilePeeringBit
+	QUuid											m_TerrainUuid;		// The terrain autotile "center bit" assigned as
+	enum AutotilePeeringBit
 	{
-		AUTOBIT_TopLeft								= 1 << 0,
-		AUTOBIT_Top									= 1 << 1,
-		AUTOBIT_TopRight							= 1 << 2,
-		AUTOBIT_Left								= 1 << 3,
-		AUTOBIT_Right								= 1 << 4,
-		AUTOBIT_BottomLeft							= 1 << 5,
-		AUTOBIT_Bottom								= 1 << 6,
-		AUTOBIT_BottomRight							= 1 << 7
+		AUTOBIT_RightCorner			= 1 << 0,		// Hexagon-flat, Isometric
+		AUTOBIT_RightSide			= 1 << 1,		// Hexagon-pointed, Square
+		AUTOBIT_BottomRightSide		= 1 << 2,		// Hexagon-flat, Hexagon-pointed, Isometric
+		AUTOBIT_BottomRightCorner	= 1 << 3,		// Hexagon-flat, Hexagon-pointed, Square
+		AUTOBIT_BottomSide			= 1 << 4,		// Hexagon-flat, Square
+		AUTOBIT_BottomCorner		= 1 << 5,		// Hexagon-pointed, Isometric
+		AUTOBIT_BottomLeftSide		= 1 << 6,		// Hexagon-flat, Hexagon-pointed, Isometric
+		AUTOBIT_BottomLeftCorner	= 1 << 7,		// Hexagon-flat, Hexagon-pointed, Square
+		AUTOBIT_LeftCorner			= 1 << 8,		// Hexagon-flat, Isometric
+		AUTOBIT_LeftSide			= 1 << 9,		// Hexagon-pointed, Square
+		AUTOBIT_TopLeftSide			= 1 << 10,		// Hexagon-flat, Hexagon-pointed, Isometric
+		AUTOBIT_TopLeftCorner		= 1 << 11,		// Hexagon-flat, Hexagon-pointed, Square
+		AUTOBIT_TopCorner			= 1 << 12, 		// Hexagon-pointed, Isometric
+		AUTOBIT_TopSide				= 1 << 13,		// Hexagon-flat, Square
+		AUTOBIT_TopRightSide		= 1 << 14,		// Hexagon-flat, Hexagon-pointed, Isometric
+		AUTOBIT_TopRightCorner		= 1 << 15,		// Hexagon-flat, Hexagon-pointed, Square
 	};
-	QMap<AutoTileHandle, uint8_t>					m_AutoTileMap;
+	QMap<QUuid, uint16_t>							m_AutoTileMap;
 
-	QMap<PhysicsLayerHandle, QList<QList<QPoint>>>	m_VertexMap;
+	QMap<QUuid, QList<QList<QPoint>>>				m_VertexMap;
 
 public:
 	TileData(QPoint metaGridPos, QPixmap tilePixmap);

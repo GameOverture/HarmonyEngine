@@ -14,6 +14,9 @@
 #include <QDataWidgetMapper>
 
 class AtlasTileSet;
+class IWgtTileSetItem;
+class WgtTileSetAnimation;
+class WgtTileSetTerrainSet;
 
 namespace Ui {
 class AuxTileSet;
@@ -41,6 +44,9 @@ class AuxTileSet : public QWidget
 	QPixmap *									m_pImportTileSheetPixmap;
 	QPolygonF									m_ImportPolygon;
 
+	QList<WgtTileSetAnimation *>				m_AnimationList;
+	QList<WgtTileSetTerrainSet *>				m_TerrainSetList;
+
 public:
 	explicit AuxTileSet(QWidget *pParent = nullptr);
 	virtual ~AuxTileSet();
@@ -49,6 +55,7 @@ public:
 	AtlasTileSet *GetTileSet() const;
 
 	TileSetPage GetCurrentPage() const;
+	void SetCurrentPage(TileSetPage ePage);
 
 	void CmdSet_TileShapeWidget(TileSetShape eTileShape);	// Blocks the WgtVectorSpinBox::SetValue signal
 	void CmdSet_TileSizeWidgets(QSize tileSize);			// Blocks the WgtVectorSpinBox::SetValue signal
@@ -56,6 +63,14 @@ public:
 
 	void RefreshInfo();
 	void UpdateSelection();
+
+	IWgtTileSetItem *FindWgtItem(QUuid uuid) const;
+	int GetWgtItemIndex(QUuid uuid) const;
+	void CmdSet_AllocateWgtItem(TileSetWgtType eType, QJsonObject data);
+	void CmdSet_DeleteWgtItem(QUuid uuid);
+	void CmdSet_OrderWgtItem(QUuid uuid, int newIndex);
+	void CmdSet_ModifyWgtItem(QUuid uuid, QJsonObject newData);
+	void MakeSelectionChange(IWgtTileSetItem *pItem);
 
 private:
 	Ui::AuxTileSet *ui;
@@ -87,8 +102,13 @@ private Q_SLOTS:
 	void on_radImportTop_toggled(bool bChecked);
 	void on_radImportLeft_toggled(bool bChecked);
 	void on_radImportRight_toggled(bool bChecked);
-
 	void on_btnConfirmAdd_clicked();
+
+	void on_actionRemoveTiles_triggered();
+	void on_actionReplaceTiles_triggered();
+
+	void on_btnAddAnimation_clicked();
+	void on_btnAddTerrainSet_clicked();
 
 	void OnTabBarChanged(int iIndex);
 };

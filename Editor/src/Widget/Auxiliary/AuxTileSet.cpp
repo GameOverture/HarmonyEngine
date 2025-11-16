@@ -14,6 +14,8 @@
 
 #include "AtlasTileSet.h"
 #include "TileSetUndoCmds.h"
+#include "WgtTileSetAnimation.h"
+#include "WgtTileSetTerrainSet.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -64,6 +66,9 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	connect(ui->vsbTextureRegion, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnTextureRegionChanged(QVariant)));
 	connect(ui->vsbStartOffset, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnStartOffsetChanged(QVariant)));
 	connect(ui->vsbPadding, SIGNAL(ValueChanged(QVariant)), this, SLOT(OnPaddingChanged(QVariant)));
+
+	ui->btnReplaceTiles->setDefaultAction(ui->actionReplaceTiles);
+	ui->btnDeleteTiles->setDefaultAction(ui->actionRemoveTiles);
 }
 
 /*virtual*/ AuxTileSet::~AuxTileSet()
@@ -100,15 +105,34 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 
 	SetImportWidgets();
 
+	for(WgtTileSetAnimation *pAnim : m_AnimationList)
+		delete pAnim;
+	m_AnimationList.clear();
+	QVector<QJsonObject> animObjList = m_pTileSet->GetAnimations();
+	for(QJsonObject animObj : animObjList)
+		CmdSet_AllocateWgtItem(TILESETWGT_Animation, animObj);
+
+	for (WgtTileSetTerrainSet *pTerrain : m_TerrainSetList)
+		delete pTerrain;
+	m_TerrainSetList.clear();
+	QVector<QJsonObject> terrainSetObjList = m_pTileSet->GetTerrainSets();
+	for (QJsonObject terrainSetObj : terrainSetObjList)
+		CmdSet_AllocateWgtItem(TILESETWGT_TerrainSet, terrainSetObj);
+
+	// TODO: physics here
+	
+
 	if(m_pTileSet->GetNumTiles() == 0)
 		m_pTabBar->setCurrentIndex(TILESETPAGE_Import);
 	else
 		m_pTabBar->setCurrentIndex(TILESETPAGE_Arrange);
+	OnTabBarChanged(m_pTabBar->currentIndex());
 	
 	ui->graphicsView->SetScene(this, m_pTileSet->GetGfxScene());
 	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(GetCurrentPage()));
 	
 	RefreshInfo();
+	UpdateSelection();
 }
 
 AtlasTileSet *AuxTileSet::GetTileSet() const
@@ -119,6 +143,15 @@ AtlasTileSet *AuxTileSet::GetTileSet() const
 TileSetPage AuxTileSet::GetCurrentPage() const
 {
 	return static_cast<TileSetPage>(ui->setupStackedWidget->currentIndex());
+}
+
+//m_pTileSet->GetGfxScene()->GetFocusPt(ePage)
+
+void AuxTileSet::SetCurrentPage(TileSetPage ePage)
+{
+	ui->setupStackedWidget->setCurrentIndex(static_cast<int>(ePage));
+	m_pTileSet->GetGfxScene()->OnTileSetPageChange(ePage);
+	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(ePage));
 }
 
 void AuxTileSet::CmdSet_TileShapeWidget(TileSetShape eTileShape)
@@ -162,6 +195,8 @@ void AuxTileSet::RefreshInfo()
 	ui->lblIcon->setPixmap(m_pTileSet->GetTileSetIcon().pixmap(QSize(16,16)));
 	ui->lblName->setText(m_pTileSet->GetName());
 	ui->lblInfo->setText(m_pTileSet->GetTileSetInfo());
+
+	m_pTileSet->GetSaveAction()->setEnabled(m_pTileSet->IsSaveClean() == false);
 }
 
 void AuxTileSet::UpdateSelection()
@@ -178,15 +213,235 @@ void AuxTileSet::UpdateSelection()
 	ErrorCheckImport();
 }
 
+IWgtTileSetItem *AuxTileSet::FindWgtItem(QUuid uuid) const
+{
+	for (WgtTileSetAnimation *pAnimationWidget : m_AnimationList)
+	{
+		if (pAnimationWidget->GetUuid() == uuid)
+			return pAnimationWidget;
+	}
+	for (WgtTileSetTerrainSet *pTerrainSetWidget : m_TerrainSetList)
+	{
+		if (pTerrainSetWidget->GetUuid() == uuid)
+			return pTerrainSetWidget;
+
+		QList<WgtTileSetTerrain *> terrains = pTerrainSetWidget->GetTerrains();
+		for (WgtTileSetTerrain *pTerrainWidget : terrains)
+		{
+			if (pTerrainWidget->GetUuid() == uuid)
+				return pTerrainWidget;
+		}
+	}
+	return nullptr;
+}
+
+int AuxTileSet::GetWgtItemIndex(QUuid uuid) const
+{
+	for (int i = 0; i < m_AnimationList.size(); ++i)
+	{
+		WgtTileSetAnimation *pAnimationWidget = m_AnimationList[i];
+		if (pAnimationWidget->GetUuid() == uuid)
+			return i;
+	}
+	for (int i = 0; i < m_TerrainSetList.size(); ++i)
+	{
+		WgtTileSetTerrainSet *pTerrainWidget = m_TerrainSetList[i];
+		if (pTerrainWidget->GetUuid() == uuid)
+			return i;
+		QList<WgtTileSetTerrain *> terrains = pTerrainWidget->GetTerrains();
+		for (int j = 0; j < terrains.size(); ++j)
+		{
+			WgtTileSetTerrain *pTerrainSubWidget = terrains[j];
+			if (pTerrainSubWidget->GetUuid() == uuid)
+				return j;
+		}
+	}
+
+	HyGuiLog("AuxTileSet::GetWgtItemIndex: Widget with specified UUID not found!", LOGTYPE_Error);
+	return -1;
+}
+
+void AuxTileSet::CmdSet_AllocateWgtItem(TileSetWgtType eType, QJsonObject data)
+{
+	if(data.contains("UUID") == false)
+	{
+		HyGuiLog("AuxTileSet::CmdSet_AddWgtItem: Widget data missing UUID!", LOGTYPE_Error);
+		return;
+	}
+	if(FindWgtItem(QUuid(data.value("UUID").toString())) != nullptr)
+	{
+		HyGuiLog("AuxTileSet::CmdSet_AddWgtItem: Widget with same UUID already exists!", LOGTYPE_Error);
+		return;
+	}
+
+	switch (eType)
+	{
+	case TILESETWGT_Animation: {
+		WgtTileSetAnimation *pNewAnim = new WgtTileSetAnimation(this, data);
+		ui->lytAnimations->addWidget(pNewAnim);
+		m_AnimationList.append(pNewAnim);
+		MakeSelectionChange(pNewAnim);
+		break; }
+
+	case TILESETWGT_TerrainSet: {
+		WgtTileSetTerrainSet *pNewTerrainSet = new WgtTileSetTerrainSet(this, data);
+		ui->lytTerrainSets->addWidget(pNewTerrainSet);
+		m_TerrainSetList.append(pNewTerrainSet);
+		MakeSelectionChange(pNewTerrainSet);
+		break; }
+
+	case TILESETWGT_Terrain: {
+		WgtTileSetTerrainSet *pParentTerrain = static_cast<WgtTileSetTerrainSet *>(FindWgtItem(QUuid(data.value("terrainSetUUID").toString())));
+		if (pParentTerrain == nullptr)
+		{
+			HyGuiLog("AuxTileSet::CmdSet_AddWgtItem: Terrain's parent TerrainSet widget not found!", LOGTYPE_Error);
+			return;
+		}
+		pParentTerrain->CmdSet_AllocTerrain(data);
+		break; }
+
+	default:
+		HyGuiLog("AuxTileSet::CmdSet_AddWgtItem: Unknown TileSetWgtType!", LOGTYPE_Error);
+		return;
+	}
+}
+
+void AuxTileSet::CmdSet_DeleteWgtItem(QUuid uuid)
+{
+	for (int i = 0; i < m_AnimationList.size(); ++i)
+	{
+		WgtTileSetAnimation *pAnimationWidget = m_AnimationList[i];
+		if (pAnimationWidget->GetUuid() == uuid)
+		{
+			ui->lytAnimations->removeWidget(pAnimationWidget);
+			m_AnimationList.removeAt(i);
+			delete pAnimationWidget;
+			return;
+		}
+	}
+	for (int i = 0; i < m_TerrainSetList.size(); ++i)
+	{
+		WgtTileSetTerrainSet *pTerrainWidget = m_TerrainSetList[i];
+		if (pTerrainWidget->GetUuid() == uuid)
+		{
+			ui->lytTerrainSets->removeWidget(pTerrainWidget);
+			m_TerrainSetList.removeAt(i);
+			delete pTerrainWidget;
+			return;
+		}
+
+		QList<WgtTileSetTerrain *> terrains = pTerrainWidget->GetTerrains();
+		for (int j = 0; j < terrains.size(); ++j)
+		{
+			WgtTileSetTerrain *pTerrainSubWidget = terrains[j];
+			if (pTerrainSubWidget->GetUuid() == uuid)
+			{
+				pTerrainWidget->CmdSet_DeleteTerrain(uuid);
+				return;
+			}
+		}
+	}
+
+	HyGuiLog("AuxTileSet::CmdSet_DeleteWgtItem: Widget with specified UUID not found!", LOGTYPE_Error);
+}
+
+void AuxTileSet::CmdSet_OrderWgtItem(QUuid uuid, int newIndex)
+{
+	for (int i = 0; i < m_AnimationList.size(); ++i)
+	{
+		WgtTileSetAnimation *pAnimationWidget = m_AnimationList[i];
+		if (pAnimationWidget->GetUuid() == uuid)
+		{
+			ui->lytAnimations->removeWidget(pAnimationWidget);
+			m_AnimationList.removeAt(i);
+			ui->lytAnimations->insertWidget(newIndex, pAnimationWidget);
+			m_AnimationList.insert(newIndex, pAnimationWidget);
+
+			pAnimationWidget->SetOrderBtns(newIndex > 0, newIndex < m_AnimationList.size() - 1);
+			return;
+		}
+	}
+	for (int i = 0; i < m_TerrainSetList.size(); ++i)
+	{
+		WgtTileSetTerrainSet *pTerrainWidget = m_TerrainSetList[i];
+		if (pTerrainWidget->GetUuid() == uuid)
+		{
+			ui->lytTerrainSets->removeWidget(pTerrainWidget);
+			m_TerrainSetList.removeAt(i);
+			ui->lytTerrainSets->insertWidget(newIndex, pTerrainWidget);
+			m_TerrainSetList.insert(newIndex, pTerrainWidget);
+
+			pTerrainWidget->SetOrderBtns(newIndex > 0, newIndex < m_TerrainSetList.size() - 1);
+			return;
+		}
+
+		QList<WgtTileSetTerrain *> terrains = pTerrainWidget->GetTerrains();
+		for (WgtTileSetTerrain *pTerrainSubWidget : terrains)
+		{
+			if (pTerrainSubWidget->GetUuid() == uuid)
+			{
+				pTerrainWidget->CmdSet_OrderTerrain(uuid, newIndex);
+				return;
+			}
+		}
+	}
+	HyGuiLog("AuxTileSet::CmdSet_OrderWgtItem: Widget with specified UUID not found!", LOGTYPE_Error);
+}
+
+void AuxTileSet::CmdSet_ModifyWgtItem(QUuid uuid, QJsonObject newData)
+{
+	GetTileSet()->Cmd_SetJsonItem(uuid, newData);
+	
+	IWgtTileSetItem *pItem = FindWgtItem(uuid);
+	pItem->Init(newData);
+}
+
+void AuxTileSet::MakeSelectionChange(IWgtTileSetItem *pItem)
+{
+	switch (pItem->GetWgtType())
+	{
+	case TILESETWGT_Animation:
+		for (WgtTileSetAnimation *pAnimationWidget : m_AnimationList)
+			pAnimationWidget->SetSelected(pItem == pAnimationWidget);
+		break;
+	case TILESETWGT_TerrainSet:
+		for (WgtTileSetTerrainSet *pTerrainSetWidget : m_TerrainSetList)
+			pTerrainSetWidget->SetSelected(pItem == pTerrainSetWidget);
+		break;
+	case TILESETWGT_Terrain:
+		for (WgtTileSetTerrainSet *pTerrainSetWidget : m_TerrainSetList)
+		{
+			QList<WgtTileSetTerrain *> terrainList = pTerrainSetWidget->GetTerrains();
+			for (WgtTileSetTerrain *pTerrainWidget : terrainList)
+			{
+				if (pItem == pTerrainWidget)
+				{
+					for (WgtTileSetTerrainSet *pTestTerrainSetWidget : m_TerrainSetList)
+						pTerrainSetWidget->SetSelected(pTerrainSetWidget == pTestTerrainSetWidget);
+
+					pTerrainSetWidget->SetSelected(true);
+				}
+				else
+					pTerrainSetWidget->SetSelected(false);
+			}
+		}
+		break;
+
+	default:
+		HyGuiLog("AuxTileSet::MakeSelectionChange: Unknown GetWgtType!", LOGTYPE_Error);
+		break;
+	}
+}
+
 void AuxTileSet::SetImportWidgets()
 {
 	bool bTileSheet = ui->radTileSheet->isChecked();
 	if(m_bIsImportingTileSheet != bTileSheet)
 	{
-		bool bHasPendingInfo = ui->txtImagePath->text().isEmpty() == false ||
-			ui->vsbTextureRegion->GetValue() != m_pTileSet->GetAtlasRegionSize() ||
-			ui->vsbStartOffset->GetValue() != m_pTileSet->GetTileOffset() ||
-			ui->vsbPadding->GetValue() != QPoint(0, 0);
+		bool bHasPendingInfo = ui->txtImagePath->text().isEmpty() == false;/* ||
+			ui->vsbTextureRegion->GetValue().toSize() != m_pTileSet->GetAtlasRegionSize() ||
+			ui->vsbStartOffset->GetValue().toPoint() != m_pTileSet->GetTileOffset() ||
+			ui->vsbPadding->GetValue().toPoint() != QPoint(0, 0);*/
 
 		if(bHasPendingInfo)
 		{
@@ -211,8 +466,6 @@ void AuxTileSet::SetImportWidgets()
 	m_bIsImportingTileSheet = bTileSheet;
 	ui->grpSlicingOptions->setVisible(m_bIsImportingTileSheet);
 
-	if(GetCurrentPage() != TILESETPAGE_Import)
-		HyGuiLog("AuxTileSet::SetImportWidgets called while not on Import page", LOGTYPE_Error);
 	m_pTileSet->GetGfxScene()->ClearImportTiles();
 	m_pTileSet->GetGfxScene()->OnTileSetPageChange(GetCurrentPage());
 	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(GetCurrentPage()));
@@ -432,6 +685,8 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 		pGfxScene->RefreshTiles();
 	}
 
+	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(GetCurrentPage()));
+
 	ErrorCheckImport();
 }
 
@@ -537,7 +792,7 @@ void AuxTileSet::on_btnConfirmAdd_clicked()
 	else
 		eAppendEdge = Qt::BottomEdge;
 
-	TileSetUndoCmd_AppendTiles *pUndoCmd = new TileSetUndoCmd_AppendTiles(*m_pTileSet, importMap, vImportRegionSize, eAppendEdge);
+	TileSetUndoCmd_AppendTiles *pUndoCmd = new TileSetUndoCmd_AppendTiles(*this, importMap, vImportRegionSize, eAppendEdge);
 	m_pTileSet->GetUndoStack()->push(pUndoCmd);
 
 	//QDir tempDir = HyGlobal::PrepTempDir(m_ProjectRef, HYGUIPATH_TEMPSUBDIR_ImportTileSheet);
@@ -578,6 +833,37 @@ void AuxTileSet::on_btnConfirmAdd_clicked()
 	//m_ProjectRef.GetAtlasModel().ImportNewAssets(sImageImportList, uiBankId, correspondingParentList, correspondingUuidList);
 }
 
+void AuxTileSet::on_actionRemoveTiles_triggered()
+{
+	TileSetUndoCmd_RemoveTiles *pNewCmd = new TileSetUndoCmd_RemoveTiles(*this);
+	m_pTileSet->GetUndoStack()->push(pNewCmd);
+}
+
+void AuxTileSet::on_actionReplaceTiles_triggered()
+{
+}
+
+void AuxTileSet::on_btnAddAnimation_clicked()
+{
+	QString sAnimName = "Animation ";
+	sAnimName += QString::number(m_AnimationList.size() + 1);
+	HyColor color = HyColor::Blue;
+	QJsonObject animObj = AtlasTileSet::GenerateNewAnimationJsonObject(sAnimName, color);
+
+	TileSetUndoCmd_AddWgtItem *pNewCmd = new TileSetUndoCmd_AddWgtItem(*this, TILESETWGT_Animation, animObj);
+	m_pTileSet->GetUndoStack()->push(pNewCmd);
+}
+
+void AuxTileSet::on_btnAddTerrainSet_clicked()
+{
+	QJsonObject initObj = AtlasTileSet::GenerateNewTerrainSetJsonObject();
+
+	WgtTileSetTerrainSet *pNewTerrainSet = new WgtTileSetTerrainSet(this, initObj);
+	ui->lytTerrainSets->addWidget(pNewTerrainSet);
+	m_TerrainSetList.append(pNewTerrainSet);
+	MakeSelectionChange(pNewTerrainSet);
+}
+
 void AuxTileSet::OnTabBarChanged(int iIndex)
 {
 	if(m_pTileSet == nullptr)
@@ -590,23 +876,23 @@ void AuxTileSet::OnTabBarChanged(int iIndex)
 	switch (iIndex)
 	{
 	case TILESETPAGE_Import:
-		ui->graphicsView->SetStatusLabel("Import New Tiles");
+		ui->graphicsView->SetStatusLabel("Importing New Tiles...");
 		ui->grpImportSide->setVisible(m_pTileSet->GetNumTiles() > 0);
 		break;
 	case TILESETPAGE_Arrange:
-		ui->graphicsView->SetStatusLabel("Arrange, Replace, Delete");
+		ui->graphicsView->SetStatusLabel("Arrange, Replace, Delete", 2000);
 		break;
 	case TILESETPAGE_Animation:
-		ui->graphicsView->SetStatusLabel("Animation Setup");
+		ui->graphicsView->SetStatusLabel("Animation Setup", 2000);
 		break;
 	case TILESETPAGE_Autotile:
-		ui->graphicsView->SetStatusLabel("Autotile Setup");
+		ui->graphicsView->SetStatusLabel("Autotile Setup", 2000);
 		break;
 	case TILESETPAGE_Collision:
-		ui->graphicsView->SetStatusLabel("Collision Setup");
+		ui->graphicsView->SetStatusLabel("Collision Setup", 2000);
 		break;
 	case TILESETPAGE_CustomData:
-		ui->graphicsView->SetStatusLabel("Custom Data Setup");
+		ui->graphicsView->SetStatusLabel("Custom Data Setup", 2000);
 		break;
 	default:
 		HyGuiLog("AuxTileSet::on_setupToolBox_currentChanged - Unknown TileSetPage index: " % QString::number(iIndex), LOGTYPE_Error);

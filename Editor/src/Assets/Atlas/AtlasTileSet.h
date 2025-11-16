@@ -19,9 +19,6 @@
 #include <QJsonObject>
 #include <QUndoStack>
 
-using AutoTileHandle = uint32_t;
-using PhysicsLayerHandle = uint32_t;
-
 #define NUM_COLS_TILESET(numTiles) static_cast<int>(std::floor(std::sqrt(numTiles)))
 #define NUM_ROWS_TILESET(numTiles, numCols) (static_cast<int>(numTiles) + static_cast<int>(numCols) - 1) / static_cast<int>(numCols);
 #define TILESET_TILE_PADDING 2 // Padding between tiles in the sub-atlas texture to avoid texture bleeding
@@ -51,58 +48,173 @@ class AtlasTileSet : public AtlasFrame
 	QPoint						m_TileOffset;
 	QPolygonF					m_TilePolygon;					// Represents the actual tile, that is able to be arranged in a TileMap (grid)
 
-	struct AutoTile
+	struct Animation
 	{
-		AutoTileHandle			m_hId;
+		QUuid					m_uuid;
+		QString					m_sName;
+		HyColor					m_Color;
+		QPoint					m_ptStartGridPos;
+		int						m_iNumColumns;
+		int						m_iNumFrames;
+		float					m_fFrameDuration; // In seconds
+		bool					m_bStartAtRandomFrame;
+
+		Animation(QString sName, HyColor color) :
+			m_uuid(QUuid::createUuid()),
+			m_sName(sName),
+			m_Color(color),
+			m_ptStartGridPos(0, 0),
+			m_iNumColumns(0),
+			m_iNumFrames(0),
+			m_fFrameDuration(0.1f),
+			m_bStartAtRandomFrame(false)
+		{
+		}
+		Animation(const QJsonObject &initObj)
+		{
+			m_uuid = QUuid(initObj["UUID"].toString());
+			m_sName = initObj["name"].toString();
+			m_Color = HyColor(initObj["color"].toVariant().toLongLong());
+			m_ptStartGridPos = QPoint(initObj["startX"].toInt(), initObj["startY"].toInt());
+			m_iNumColumns = initObj["numColumns"].toInt();
+			m_iNumFrames = initObj["numFrames"].toInt();
+			m_fFrameDuration = static_cast<float>(initObj["frameDuration"].toDouble());
+			m_bStartAtRandomFrame = initObj["startAtRandomFrame"].toBool();
+		}
+
+		QJsonObject ToJsonObject() const
+		{
+			QJsonObject animationObj;
+			animationObj["UUID"] = m_uuid.toString(QUuid::WithoutBraces);
+			animationObj["name"] = m_sName;
+			animationObj["color"] = static_cast<qint64>(m_Color.GetAsHexCode());
+			animationObj["startX"] = m_ptStartGridPos.x();
+			animationObj["startY"] = m_ptStartGridPos.y();
+			animationObj["numColumns"] = m_iNumColumns;
+			animationObj["numFrames"] = m_iNumFrames;
+			animationObj["frameDuration"] = static_cast<double>(m_fFrameDuration);
+			animationObj["startAtRandomFrame"] = m_bStartAtRandomFrame;
+			return animationObj;
+		}
+	};
+	QList<Animation>				m_AnimationList;
+
+	struct TerrainSet
+	{
+		QUuid					m_uuid;
 		enum Type
 		{
+			// NOTE: This order is hardcoded in WgtTileSetTerrain's combo box, make adjustments there if this changes
 			AUTOTILE_MatchCornerSides,
 			AUTOTILE_MatchCorner,
 			AUTOTILE_MatchSides
 		};
 		int						m_iType;
-		QString					m_sName;
-		HyColor					m_Color;
 
-		AutoTile(const QJsonObject &initObj)
+		struct Terrain
 		{
-			m_hId = initObj["id"].toInt();
+			QUuid				m_uuid;
+			QUuid				m_TerrainSetUuid;
+			QString				m_sName;
+			HyColor				m_Color;
+
+			Terrain(QUuid terrainSetUuid, QString sName, HyColor color) :
+				m_uuid(QUuid::createUuid()),
+				m_TerrainSetUuid(terrainSetUuid),
+				m_sName(sName),
+				m_Color(color)
+			{
+			}
+			Terrain(QJsonObject &initObj)
+			{
+				m_uuid = QUuid(initObj["UUID"].toString());
+				m_TerrainSetUuid = QUuid(initObj["terrainSetUUID"].toString());
+				m_sName = initObj["name"].toString();
+				m_Color = HyColor(initObj["color"].toVariant().toLongLong());
+			}
+
+			QJsonObject ToJsonObject() const
+			{
+				QJsonObject terrainObj;
+				terrainObj["UUID"] = m_uuid.toString(QUuid::WithoutBraces);
+				terrainObj["terrainSetUUID"] = m_TerrainSetUuid.toString(QUuid::WithoutBraces);
+				terrainObj["name"] = m_sName;
+				terrainObj["color"] = static_cast<qint64>(m_Color.GetAsHexCode());
+				return terrainObj;
+			}
+		};
+		QList<Terrain>			m_TerrainList;
+
+		TerrainSet() :
+			m_uuid(QUuid::createUuid()),
+			m_iType(AUTOTILE_MatchCornerSides)
+		{
+		}
+		TerrainSet(const QJsonObject &initObj)
+		{
+			m_uuid = QUuid(initObj["UUID"].toString());
 			m_iType = initObj["type"].toInt();
-			m_sName = initObj["name"].toString();
-			m_Color = HyColor(initObj["color"].toVariant().toLongLong());
+			
+			QJsonArray terrainArray = initObj["terrains"].toArray();
+			for(QJsonValue terrainVal : terrainArray)
+			{
+				QJsonObject terrainObj = terrainVal.toObject();
+				Terrain newTerrain(terrainObj);
+				m_TerrainList.push_back(newTerrain);
+			}
+		}
+
+		QJsonObject ToJsonObject() const
+		{
+			QJsonObject terrainSetObj;
+			terrainSetObj["UUID"] = m_uuid.toString(QUuid::WithoutBraces);
+			terrainSetObj["type"] = m_iType;
+			QJsonArray terrainArray;
+			for(const Terrain &terrainRef : m_TerrainList)
+				terrainArray.append(terrainRef.ToJsonObject());
+			terrainSetObj["terrains"] = terrainArray;
+			return terrainSetObj;
 		}
 	};
-	QList<AutoTile>				m_AutotileList;
+	QList<TerrainSet>				m_TerrainSetList;
 
 	struct PhysicsLayer
 	{
-		PhysicsLayerHandle		m_hId;
+		QUuid					m_uuid;
 		QString					m_sName;
 		HyColor					m_Color;
 
+		PhysicsLayer(QString sName, HyColor color) :
+			m_uuid(QUuid::createUuid()),
+			m_sName(sName),
+			m_Color(color)
+		{
+		}
+
 		PhysicsLayer(const QJsonObject &initObj)
 		{
-			m_hId = initObj["id"].toInt();
+			m_uuid = QUuid(initObj["UUID"].toString());
 			m_sName = initObj["name"].toString();
 			m_Color = HyColor(initObj["color"].toVariant().toLongLong());
 		}
+
+		QJsonObject ToJsonObject() const
+		{
+			QJsonObject physicsLayerObj;
+			physicsLayerObj["UUID"] = m_uuid.toString(QUuid::WithoutBraces);
+			physicsLayerObj["name"] = m_sName;
+			physicsLayerObj["color"] = static_cast<qint64>(m_Color.GetAsHexCode());
+			return physicsLayerObj;
+		}
 	};
 	QList<PhysicsLayer>			m_PhysicsLayerList;
-
-	//struct TileAnimation
-	//{
-	//	quint32					m_uiId;
-	//	QString					m_sName;
-	//	HyColor					m_Color;
-	//	TileData *m_pStartTile;
-	//};
 
 	// Map of all imported TileData objects in this tile set
 	// Atlas Indices are row-major order
 	// TileSet texture sub-atlas' rows and columns is made based on the total # of tiles
 	//     COLUMNS = static_cast<int>(std::floor(std::sqrt(n)))
 	//     ROWS    = static_cast<int>(std::ceil(static_cast<double>(n) / columns))
-	QVector<TileData *>	m_TileDataList;
+	QVector<TileData *>			m_TileDataList;
 
 public:
 	AtlasTileSet(IManagerModel &modelRef,
@@ -138,11 +250,21 @@ public:
 	QString GetTileSetInfo() const;
 	QIcon GetTileSetIcon() const;
 
+	static QJsonObject GenerateNewAnimationJsonObject(QString sName, HyColor color);
+	static QJsonObject GenerateNewTerrainSetJsonObject();
+	static QJsonObject GenerateNewTerrainJsonObject(QUuid terrainSetUuid, QString sName, HyColor color);
+	static QJsonObject GenerateNewPhysicsLayerJsonObject(QString sName, HyColor color);
+	QVector<QJsonObject> GetAnimations() const;
+	QVector<QJsonObject> GetTerrainSets() const;
+	QVector<QJsonObject> GetPhysicsLayers() const;
+	QJsonObject GetJsonItem(QUuid uuid) const;
+
 	QVector<TileData *> GetTileDataList() const;
 
 	TileSetScene *GetGfxScene();
 
 	// Cmd functions are the only functions that change the data (via Undo/Redo)
+	void Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj);
 	QList<QPair<QPoint, TileData *>> Cmd_AppendNewTiles(QSize vRegionSize, const QMap<QPoint, QPixmap> &importBatchMap, Qt::Edge eAppendEdge);
 	QList<QPair<QPoint, TileData *>> Cmd_RemoveTiles(QVector<TileData *> tileDataList);
 	void Cmd_ReaddTiles(QList<QPair<QPoint, TileData *>> tileDataList);

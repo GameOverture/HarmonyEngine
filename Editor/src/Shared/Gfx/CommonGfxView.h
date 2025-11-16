@@ -25,6 +25,7 @@ class CommonGfxView : public QGraphicsView
 
 protected:
 	QString						m_sStatusLabel;		// Optional Top-Left text string drawn on the foreground
+	QTimer						m_StatusLabelTimer;
 
 	QPointF						m_MouseScenePos;
 
@@ -38,7 +39,7 @@ public:
 	virtual ~CommonGfxView();
 
 	QString GetStatusLabel() const;
-	void SetStatusLabel(const QString &sStatusLabel);
+	void SetStatusLabel(const QString &sStatusLabel, int iMillisecondDuration = 0.0f); // 0.0f indicates forever
 
 	float GetZoom() const;
 
@@ -56,6 +57,7 @@ protected:
 	virtual void wheelEvent(QWheelEvent *pEvent) override;
 
 private Q_SLOTS:
+	void OnStatusLabelTimer();
 	void OnPanTimer();
 };
 

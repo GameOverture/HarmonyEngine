@@ -122,6 +122,8 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 
 /*virtual*/ void TileSetView::mousePressEvent(QMouseEvent *pEvent) /*override*/
 {
+	CommonGfxView::mousePressEvent(pEvent);
+
 	if(m_bMiddleMousePanning == false)
 	{
 		switch (m_pAuxTileSet->GetCurrentPage())
@@ -150,7 +152,7 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 		setDragMode(QGraphicsView::RubberBandDrag);
 	}
 
-	CommonGfxView::mousePressEvent(pEvent);
+	
 	update();
 }
 
@@ -173,7 +175,7 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 			GetScene()->OnMarqueeRelease(m_pAuxTileSet->GetCurrentPage(), pEvent->button(), bShiftHeld, mapToScene(m_ptDragStart), mapToScene(pEvent->pos()));
 			break;
 		case DRAGSTATE_ArrangingSelection:
-			GetScene()->OnArrangingTilesMouseRelease(mapToScene(pEvent->pos()));
+			GetScene()->OnArrangingTilesMouseRelease(*m_pAuxTileSet, mapToScene(pEvent->pos()));
 			break;
 		}
 	}

@@ -70,7 +70,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TileSetUndoCmd_AppendTiles : public QUndoCommand
 {
-	AtlasTileSet &						m_TileSetRef;
+	AuxTileSet &						m_AuxTileSetRef;
 
 	Qt::Edge							m_eAppendEdge;
 	QSize								m_RegionSize;
@@ -79,7 +79,7 @@ class TileSetUndoCmd_AppendTiles : public QUndoCommand
 	QList<QPair<QPoint, TileData *>>	m_AppendedTilesList;
 
 public:
-	TileSetUndoCmd_AppendTiles(AtlasTileSet &tileSetItemRef, const QMap<QPoint, QPixmap> &pixmapMapRef, QSize vRegionSize, Qt::Edge eAppendEdge, QUndoCommand *pParent = nullptr);
+	TileSetUndoCmd_AppendTiles(AuxTileSet &auxTileSetRef, const QMap<QPoint, QPixmap> &pixmapMapRef, QSize vRegionSize, Qt::Edge eAppendEdge, QUndoCommand *pParent = nullptr);
 	virtual ~TileSetUndoCmd_AppendTiles();
 
 	virtual void redo() override;
@@ -88,31 +88,92 @@ public:
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class TileSetUndoCmd_MoveTiles : public QUndoCommand
 {
-	AtlasTileSet &					m_TileSetRef;
+	AuxTileSet &					m_AuxTileSetRef;
+
 	QList<TileData*>				m_AffectedTileList;
 	QList<QPoint>					m_OldGridPosList;
 	QList<QPoint>					m_NewGridPosList;
 
 public:
-	TileSetUndoCmd_MoveTiles(AtlasTileSet &tileSetItemRef, QList<TileData*> affectedTileList, QList<QPoint> oldGridPosList, QList<QPoint> newGridPosList, QUndoCommand *pParent = nullptr);
+	TileSetUndoCmd_MoveTiles(AuxTileSet &auxTileSetRef, QList<TileData*> affectedTileList, QList<QPoint> oldGridPosList, QList<QPoint> newGridPosList, QUndoCommand *pParent = nullptr);
 	virtual ~TileSetUndoCmd_MoveTiles();
 
 	virtual void redo() override;
 	virtual void undo() override;
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//class TileSetUndoCmd_RemoveTiles : public QUndoCommand
-//{
-//	AtlasTileSet &					m_TileSetRef;
-//
-//public:
-//	TileSetUndoCmd_RemoveTiles(AtlasTileSet &tileSetItemRef, QUndoCommand *pParent = nullptr);
-//	virtual ~TileSetUndoCmd_RemoveTiles();
-//
-//	virtual void redo() override;
-//	virtual void undo() override;
-//};
-//
+class TileSetUndoCmd_RemoveTiles : public QUndoCommand
+{
+	AuxTileSet &						m_AuxTileSetRef;
+	QMap<TileData *, TileSetGfxItem *>	m_TilesMap;
 
+public:
+	TileSetUndoCmd_RemoveTiles(AuxTileSet &auxTileSetRef, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_RemoveTiles();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TileSetUndoCmd_AddWgtItem : public QUndoCommand
+{
+	AuxTileSet &						m_AuxTileSetRef;
+	TileSetWgtType						m_eType;
+	QJsonObject							m_ItemDataObj;
+
+public:
+	TileSetUndoCmd_AddWgtItem(AuxTileSet &auxTileSetRef, TileSetWgtType eType, QJsonObject itemDataObj, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_AddWgtItem();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TileSetUndoCmd_RemoveWgtItem : public QUndoCommand
+{
+	AuxTileSet &						m_AuxTileSetRef;
+	TileSetWgtType						m_eRemovedType;
+	QJsonObject							m_RemovedItemDataObj;
+
+public:
+	TileSetUndoCmd_RemoveWgtItem(AuxTileSet &auxTileSetRef, QUuid uuid, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_RemoveWgtItem();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TileSetUndoCmd_OrderWgtItem : public QUndoCommand
+{
+	AuxTileSet &						m_AuxTileSetRef;
+	QUuid								m_Uuid;
+	int									m_iOldIndex;
+	int									m_iNewIndex;
+
+public:
+	TileSetUndoCmd_OrderWgtItem(AuxTileSet &auxTileSetRef, QUuid uuid, int iOldIndex, int iNewIndex, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_OrderWgtItem();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TileSetUndoCmd_ModifyWgtItem : public QUndoCommand
+{
+	AuxTileSet &						m_AuxTileSetRef;
+	int									m_iMergeId;
+	QUuid								m_Uuid;
+	QJsonObject							m_OldItemDataObj;
+	QJsonObject							m_NewItemDataObj;
+
+public:
+	TileSetUndoCmd_ModifyWgtItem(AuxTileSet &auxTileSetRef, QString sUndoText, int iMergeId, QUuid uuid, QJsonObject oldItemDataObj, QJsonObject newItemDataObj, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_ModifyWgtItem();
+	
+	virtual void redo() override;
+	virtual void undo() override;
+	virtual int id() const override;
+	virtual bool mergeWith(const QUndoCommand *pOtherCmd) override;
+};
 
 #endif // TILESETUNDOCMDS_H

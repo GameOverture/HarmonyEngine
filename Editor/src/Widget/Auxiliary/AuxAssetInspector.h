@@ -71,7 +71,7 @@ private Q_SLOTS:
 	void OnAudioBufferReady();
 	void OnAudioBufferFinished();
 	void OnPanTimer();
-
+	
 	void on_btnPlay_clicked();
 };
 
