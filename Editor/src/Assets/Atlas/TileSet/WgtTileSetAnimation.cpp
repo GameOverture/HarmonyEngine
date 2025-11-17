@@ -43,6 +43,15 @@ WgtTileSetAnimation::~WgtTileSetAnimation()
 	ui->sbFrameRate->setValue(static_cast<float>(serializedObj["frameDuration"].toDouble(0.0333)));
 	ui->chkStartRandom->setChecked(serializedObj["startAtRandomFrame"].toBool());
 
+	if (ui->sbNumFrames->value() == 0)
+	{
+		ui->sbColumns->setValue(0);
+		ui->sbColumns->setEnabled(false);
+		ui->sbNumFrames->setEnabled(false);
+	}
+	ui->lblNumFrames->setEnabled(ui->sbNumFrames->value() != 0);
+	ui->lblColumns->setEnabled(ui->sbColumns->value() != 0);
+
 	m_SerializedJsonObj = serializedObj;
 }
 

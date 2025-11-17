@@ -154,7 +154,7 @@
       <item row="2" column="3">
        <layout class="QFormLayout" name="formLayout">
         <item row="0" column="0">
-         <widget class="QLabel" name="label_5">
+         <widget class="QLabel" name="lblColumns">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -164,7 +164,7 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="label_4">
+         <widget class="QLabel" name="lblNumFrames">
           <property name="text">
            <string>Num Frames</string>
           </property>
