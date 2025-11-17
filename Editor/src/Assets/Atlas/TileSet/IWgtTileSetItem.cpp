@@ -19,6 +19,7 @@ IWgtTileSetItem::IWgtTileSetItem(TileSetWgtType eWgtType, QJsonObject initObj, A
 	m_eWGT_TYPE(eWgtType),
 	m_SerializedJsonObj(initObj),
 	m_Uuid(QUuid(initObj["UUID"].toString())),
+	m_bIsInitializing(false),
 	m_pAuxTileSet(pAuxTileSet),
 	m_bIsSelected(false)
 {
@@ -26,6 +27,15 @@ IWgtTileSetItem::IWgtTileSetItem(TileSetWgtType eWgtType, QJsonObject initObj, A
 
 IWgtTileSetItem::~IWgtTileSetItem()
 {
+}
+
+void IWgtTileSetItem::Init(QJsonObject serializedObj)
+{
+	m_bIsInitializing = true;
+	blockSignals(true);
+	OnInit(serializedObj);
+	blockSignals(false);
+	m_bIsInitializing = false;
 }
 
 TileSetWgtType IWgtTileSetItem::GetWgtType() const
@@ -87,6 +97,9 @@ void IWgtTileSetItem::OnModifyWidget(QString sUndoText, int iMergeId)
 	QJsonObject oldItemDataObj = m_SerializedJsonObj;
 	QJsonObject newItemDataObj = SerializeCurrentWidgets();
 
-	TileSetUndoCmd_ModifyWgtItem *pNewCmd = new TileSetUndoCmd_ModifyWgtItem(*m_pAuxTileSet, sUndoText, iMergeId, m_Uuid, oldItemDataObj, newItemDataObj);
-	m_pAuxTileSet->GetTileSet()->GetUndoStack()->push(pNewCmd);
+	if (m_bIsInitializing == false)
+	{
+		TileSetUndoCmd_ModifyWgtItem *pNewCmd = new TileSetUndoCmd_ModifyWgtItem(*m_pAuxTileSet, sUndoText, iMergeId, m_Uuid, oldItemDataObj, newItemDataObj);
+		m_pAuxTileSet->GetTileSet()->GetUndoStack()->push(pNewCmd);
+	}
 }

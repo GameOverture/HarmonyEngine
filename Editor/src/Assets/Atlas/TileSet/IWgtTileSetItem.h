@@ -27,6 +27,8 @@ protected:
 	QJsonObject				m_SerializedJsonObj;
 	QUuid					m_Uuid;
 
+	bool					m_bIsInitializing; // Prevents Modify UndoCmds from being created
+
 	AuxTileSet *			m_pAuxTileSet;
 	bool 					m_bIsSelected;
 
@@ -34,7 +36,8 @@ public:
 	IWgtTileSetItem(TileSetWgtType eWgtType, QJsonObject initObj, AuxTileSet *pAuxTileSet, QWidget *pParent = nullptr);
 	virtual ~IWgtTileSetItem();
 
-	virtual void Init(QJsonObject serializedObj) = 0;
+	void Init(QJsonObject serializedObj);
+	virtual void OnInit(QJsonObject serializedObj) = 0;
 
 	TileSetWgtType GetWgtType() const;
 	QUuid GetUuid() const;

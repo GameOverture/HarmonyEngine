@@ -34,7 +34,7 @@ WgtTileSetAnimation::~WgtTileSetAnimation()
 	delete ui;
 }
 
-/*virtual*/ void WgtTileSetAnimation::Init(QJsonObject serializedObj) /*override*/
+/*virtual*/ void WgtTileSetAnimation::OnInit(QJsonObject serializedObj) /*override*/
 {
 	ui->txtName->setText(serializedObj["name"].toString());
 	HyColor color(serializedObj["color"].toVariant().toLongLong());

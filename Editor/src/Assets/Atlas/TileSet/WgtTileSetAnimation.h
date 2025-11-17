@@ -27,7 +27,7 @@ public:
 	WgtTileSetAnimation(AuxTileSet *pAuxTileSet, QJsonObject initObj, QWidget *pParent = nullptr);
 	virtual ~WgtTileSetAnimation();
 	
-	virtual void Init(QJsonObject serializedObj) override;
+	virtual void OnInit(QJsonObject serializedObj) override;
 	virtual QJsonObject SerializeCurrentWidgets() override;
 
 	void SetOrderBtns(bool bUpEnabled, bool bDownEnabled);

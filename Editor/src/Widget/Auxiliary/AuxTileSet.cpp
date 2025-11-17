@@ -280,6 +280,7 @@ void AuxTileSet::CmdSet_AllocateWgtItem(TileSetWgtType eType, QJsonObject data)
 		WgtTileSetAnimation *pNewAnim = new WgtTileSetAnimation(this, data);
 		ui->lytAnimations->addWidget(pNewAnim);
 		m_AnimationList.append(pNewAnim);
+		pNewAnim->SetOrderBtns(m_AnimationList.size() > 1, false);
 		MakeSelectionChange(pNewAnim);
 		break; }
 
@@ -287,6 +288,7 @@ void AuxTileSet::CmdSet_AllocateWgtItem(TileSetWgtType eType, QJsonObject data)
 		WgtTileSetTerrainSet *pNewTerrainSet = new WgtTileSetTerrainSet(this, data);
 		ui->lytTerrainSets->addWidget(pNewTerrainSet);
 		m_TerrainSetList.append(pNewTerrainSet);
+		pNewTerrainSet->SetOrderBtns(m_TerrainSetList.size() > 1, false);
 		MakeSelectionChange(pNewTerrainSet);
 		break; }
 
@@ -408,24 +410,12 @@ void AuxTileSet::MakeSelectionChange(IWgtTileSetItem *pItem)
 		for (WgtTileSetTerrainSet *pTerrainSetWidget : m_TerrainSetList)
 			pTerrainSetWidget->SetSelected(pItem == pTerrainSetWidget);
 		break;
-	case TILESETWGT_Terrain:
-		for (WgtTileSetTerrainSet *pTerrainSetWidget : m_TerrainSetList)
-		{
-			QList<WgtTileSetTerrain *> terrainList = pTerrainSetWidget->GetTerrains();
-			for (WgtTileSetTerrain *pTerrainWidget : terrainList)
-			{
-				if (pItem == pTerrainWidget)
-				{
-					for (WgtTileSetTerrainSet *pTestTerrainSetWidget : m_TerrainSetList)
-						pTerrainSetWidget->SetSelected(pTerrainSetWidget == pTestTerrainSetWidget);
-
-					pTerrainSetWidget->SetSelected(true);
-				}
-				else
-					pTerrainSetWidget->SetSelected(false);
-			}
-		}
-		break;
+	case TILESETWGT_Terrain: {
+		WgtTileSetTerrainSet *pTerrainSetWidget = static_cast<WgtTileSetTerrain *>(pItem)->GetParentTerrainSet();
+		QList<WgtTileSetTerrain *> terrainList = pTerrainSetWidget->GetTerrains();
+		for (WgtTileSetTerrain *pTerrainWidget : terrainList)
+			pTerrainWidget->SetSelected(pItem == pTerrainWidget);
+		break; }
 
 	default:
 		HyGuiLog("AuxTileSet::MakeSelectionChange: Unknown GetWgtType!", LOGTYPE_Error);

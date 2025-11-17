@@ -37,7 +37,7 @@ public:
 	WgtTileSetTerrainSet(AuxTileSet *pAuxTileSet, QJsonObject initDataObj, QWidget* pParent = nullptr);
 	virtual ~WgtTileSetTerrainSet();
 
-	virtual void Init(QJsonObject serializedObj) override;
+	virtual void OnInit(QJsonObject serializedObj) override;
 	virtual QJsonObject SerializeCurrentWidgets() override;
 
 	void CmdSet_AllocTerrain(QJsonObject initDataObj);
@@ -49,7 +49,9 @@ public:
 	void SetOrderBtns(bool bUpEnabled, bool bDownEnabled);
 
 protected:
+	virtual bool eventFilter(QObject *pWatched, QEvent *pEvent) override;
 	virtual QFrame *GetBorderFrame() const override;
+
 
 private Q_SLOTS:
 	void on_actionDelete_triggered();
@@ -60,16 +62,16 @@ private Q_SLOTS:
 
 class WgtTileSetTerrain : public IWgtTileSetItem
 {
-	WgtTileSetTerrainSet *m_pParentTerrainSet;
-	QFrame *m_pBorderFrame;
+	WgtTileSetTerrainSet *		m_pParentTerrainSet;
+	QFrame *					m_pBorderFrame;
 
-	QLabel *m_pLblName;
-	QLineEdit *m_pTxtName;
-	QPushButton *m_pBtnColor;
-	QSpacerItem *m_pSpacer;
-	QToolButton *m_pBtnMoveUp;
-	QToolButton *m_pBtnMoveDown;
-	QToolButton *m_pBtnDelete;
+	QLabel *					m_pLblName;
+	QLineEdit *					m_pTxtName;
+	QPushButton *				m_pBtnColor;
+	QSpacerItem *				m_pSpacer;
+	QToolButton *				m_pBtnMoveUp;
+	QToolButton *				m_pBtnMoveDown;
+	QToolButton *				m_pBtnDelete;
 
 public:
 	WgtTileSetTerrain(AuxTileSet *pAuxTileSet, WgtTileSetTerrainSet *pParentTerrainSet, QJsonObject initDataObj, QWidget *pParent = nullptr) :
@@ -113,7 +115,12 @@ public:
 	}
 	virtual ~WgtTileSetTerrain() {}
 
-	virtual void Init(QJsonObject serializedObj) override
+	WgtTileSetTerrainSet *GetParentTerrainSet()
+	{
+		return m_pParentTerrainSet;
+	}
+
+	virtual void OnInit(QJsonObject serializedObj) override
 	{
 		m_pTxtName->setText(serializedObj["name"].toString());
 		HyColor color(serializedObj["color"].toVariant().toLongLong());

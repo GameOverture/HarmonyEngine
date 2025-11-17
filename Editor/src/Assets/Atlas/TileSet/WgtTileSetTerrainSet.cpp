@@ -13,6 +13,7 @@
 #include "AuxTileSet.h"
 #include "TileSetUndoCmds.h"
 
+#include <QMouseEvent>
 #include <QPushButton>
 
 WgtTileSetTerrainSet::WgtTileSetTerrainSet(AuxTileSet *pAuxTileSet, QJsonObject initDataObj, QWidget *pParent /*= nullptr*/) :
@@ -33,7 +34,7 @@ WgtTileSetTerrainSet::~WgtTileSetTerrainSet()
 	delete ui;
 }
 
-/*virtual*/ void WgtTileSetTerrainSet::Init(QJsonObject serializedObj) /*override*/
+/*virtual*/ void WgtTileSetTerrainSet::OnInit(QJsonObject serializedObj) /*override*/
 {
 	// Delete any existing terrains first
 	for (WgtTileSetTerrain *pTerrain : m_TerrainList)
@@ -119,6 +120,27 @@ void WgtTileSetTerrainSet::SetOrderBtns(bool bUpEnabled, bool bDownEnabled)
 {
 	ui->btnUpward->setEnabled(bUpEnabled);
 	ui->btnDownward->setEnabled(bDownEnabled);
+}
+
+/*virtual*/ bool WgtTileSetTerrainSet::eventFilter(QObject *pWatched, QEvent *pEvent) /*override*/
+{
+	if (pEvent->type() == QEvent::MouseButtonPress)
+	{
+		QMouseEvent *pMouseEvent = static_cast<QMouseEvent *>(pEvent);
+		if (pMouseEvent->button() == Qt::LeftButton || pMouseEvent->button() == Qt::RightButton)
+		{
+			for (WgtTileSetTerrain *pTerrain : m_TerrainList)
+			{
+				// Convert mouse pos to terrain widget coords
+				QPoint posInTerrain = mapTo(ui->frmBorder, pMouseEvent->pos());
+				posInTerrain = ui->frmBorder->mapTo(pTerrain, posInTerrain);
+				if(pTerrain->rect().contains(posInTerrain) && pTerrain->IsSelected() == false)
+					m_pAuxTileSet->MakeSelectionChange(pTerrain);
+			}
+		}
+	}
+
+	return IWgtTileSetItem::eventFilter(pWatched, pEvent);
 }
 
 /*virtual*/ QFrame *WgtTileSetTerrainSet::GetBorderFrame() const /*override*/
