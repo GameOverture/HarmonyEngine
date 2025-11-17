@@ -13,6 +13,7 @@
 #include "TileSetUndoCmds.h"
 
 #include <QMouseEvent>
+#include <QPushButton>
 
 IWgtTileSetItem::IWgtTileSetItem(TileSetWgtType eWgtType, QJsonObject initObj, AuxTileSet *pAuxTileSet, QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
@@ -102,4 +103,11 @@ void IWgtTileSetItem::OnModifyWidget(QString sUndoText, int iMergeId)
 		TileSetUndoCmd_ModifyWgtItem *pNewCmd = new TileSetUndoCmd_ModifyWgtItem(*m_pAuxTileSet, sUndoText, iMergeId, m_Uuid, oldItemDataObj, newItemDataObj);
 		m_pAuxTileSet->GetTileSet()->GetUndoStack()->push(pNewCmd);
 	}
+}
+
+void IWgtTileSetItem::SetButtonColor(QPushButton *pBtn, HyColor color)
+{
+	pBtn->setFlat(true);
+	pBtn->setStyleSheet("QPushButton { background-color: #" + QString::number(color.GetAsHexCode(), 16).rightJustified(6, '0') + "; border: 1px solid black; }"
+						"QPushButton::hover { border: 2px solid black; }");
 }

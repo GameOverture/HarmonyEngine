@@ -66,7 +66,7 @@ class AtlasTileSet : public AtlasFrame
 			m_ptStartGridPos(0, 0),
 			m_iNumColumns(0),
 			m_iNumFrames(0),
-			m_fFrameDuration(0.1f),
+			m_fFrameDuration(0.0333f),
 			m_bStartAtRandomFrame(false)
 		{
 		}
@@ -125,7 +125,7 @@ class AtlasTileSet : public AtlasFrame
 				m_Color(color)
 			{
 			}
-			Terrain(QJsonObject &initObj)
+			Terrain(const QJsonObject &initObj)
 			{
 				m_uuid = QUuid(initObj["UUID"].toString());
 				m_TerrainSetUuid = QUuid(initObj["terrainSetUUID"].toString());
@@ -264,6 +264,7 @@ public:
 	TileSetScene *GetGfxScene();
 
 	// Cmd functions are the only functions that change the data (via Undo/Redo)
+	void Cmd_AllocateJsonItem(TileSetWgtType eType, QJsonObject data);
 	void Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj);
 	QList<QPair<QPoint, TileData *>> Cmd_AppendNewTiles(QSize vRegionSize, const QMap<QPoint, QPixmap> &importBatchMap, Qt::Edge eAppendEdge);
 	QList<QPair<QPoint, TileData *>> Cmd_RemoveTiles(QVector<TileData *> tileDataList);

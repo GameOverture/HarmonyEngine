@@ -53,6 +53,7 @@ protected:
 	virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
 	void OnModifyWidget(QString sUndoText, int iMergeId);
+	void SetButtonColor(QPushButton *pBtn, HyColor color);
 };
 
 #endif // IWgtTileSetItem_H

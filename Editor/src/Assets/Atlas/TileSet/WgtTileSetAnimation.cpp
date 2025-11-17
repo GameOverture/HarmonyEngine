@@ -37,11 +37,10 @@ WgtTileSetAnimation::~WgtTileSetAnimation()
 /*virtual*/ void WgtTileSetAnimation::OnInit(QJsonObject serializedObj) /*override*/
 {
 	ui->txtName->setText(serializedObj["name"].toString());
-	HyColor color(serializedObj["color"].toVariant().toLongLong());
-	ui->btnColor->setPalette(QPalette(QColor(color.GetRed(), color.GetGreen(), color.GetBlue())));
+	SetButtonColor(ui->btnColor, HyColor(serializedObj["color"].toVariant().toLongLong()));
 	ui->sbColumns->setValue(serializedObj["numColumns"].toInt());
 	ui->sbNumFrames->setValue(serializedObj["numFrames"].toInt());
-	ui->sbFrameRate->setValue(1.0f / static_cast<float>(serializedObj["frameDuration"].toDouble(1.0)));
+	ui->sbFrameRate->setValue(static_cast<float>(serializedObj["frameDuration"].toDouble(0.0333)));
 	ui->chkStartRandom->setChecked(serializedObj["startAtRandomFrame"].toBool());
 
 	m_SerializedJsonObj = serializedObj;
@@ -57,7 +56,7 @@ WgtTileSetAnimation::~WgtTileSetAnimation()
 	m_SerializedJsonObj["color"] = static_cast<qint64>(btnColor.GetAsHexCode());
 	m_SerializedJsonObj["numColumns"] = ui->sbColumns->value();
 	m_SerializedJsonObj["numFrames"] = ui->sbNumFrames->value();
-	m_SerializedJsonObj["frameDuration"] = 1.0f / ui->sbFrameRate->value();
+	m_SerializedJsonObj["frameDuration"] = ui->sbFrameRate->value();
 	m_SerializedJsonObj["startAtRandomFrame"] = ui->chkStartRandom->isChecked();
 
 	return m_SerializedJsonObj;
@@ -94,7 +93,7 @@ void WgtTileSetAnimation::on_actionDownward_triggered()
 	m_pAuxTileSet->GetTileSet()->GetUndoStack()->push(pNewCmd);
 }
 
-void WgtTileSetAnimation::on_txtName_textEdited(const QString &newText)
+void WgtTileSetAnimation::on_txtName_editingFinished()
 {
 	OnModifyWidget("Animation Name", -1);
 }
@@ -119,6 +118,31 @@ void WgtTileSetAnimation::on_sbColumns_valueChanged(int iNewValue)
 void WgtTileSetAnimation::on_sbNumFrames_valueChanged(int iNewValue)
 {
 	OnModifyWidget("Animation Frames", MERGABLEUNDOCMD_TileSetAnimNumFrames);
+}
+
+void WgtTileSetAnimation::on_btnHz10_clicked()
+{
+	ui->sbFrameRate->setValue(1.0 / 10.0);
+}
+
+void WgtTileSetAnimation::on_btnHz20_clicked()
+{
+	ui->sbFrameRate->setValue(1.0 / 20.0);
+}
+
+void WgtTileSetAnimation::on_btnHz30_clicked()
+{
+	ui->sbFrameRate->setValue(1.0 / 30.0);
+}
+
+void WgtTileSetAnimation::on_btnHz40_clicked()
+{
+	ui->sbFrameRate->setValue(1.0 / 40.0);
+}
+
+void WgtTileSetAnimation::on_btnHz60_clicked()
+{
+	ui->sbFrameRate->setValue(1.0 / 60.0);
 }
 
 void WgtTileSetAnimation::on_sbFrameRate_valueChanged(double dNewValue)

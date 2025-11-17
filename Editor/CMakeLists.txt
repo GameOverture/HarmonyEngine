@@ -98,6 +98,9 @@ if(Qt6_DIR)
 		src/Assets/Atlas/TileSet/WgtTileSetAnimation.cpp
 		src/Assets/Atlas/TileSet/WgtTileSetAnimation.h
 		src/Assets/Atlas/TileSet/WgtTileSetAnimation.ui
+		src/Assets/Atlas/TileSet/WgtTileSetTerrain.cpp
+		src/Assets/Atlas/TileSet/WgtTileSetTerrain.h
+		src/Assets/Atlas/TileSet/WgtTileSetTerrain.ui
 		src/Assets/Atlas/TileSet/WgtTileSetTerrainSet.cpp
 		src/Assets/Atlas/TileSet/WgtTileSetTerrainSet.h
 		src/Assets/Atlas/TileSet/WgtTileSetTerrainSet.ui

@@ -16,6 +16,7 @@
 #include "TileSetUndoCmds.h"
 #include "WgtTileSetAnimation.h"
 #include "WgtTileSetTerrainSet.h"
+#include "WgtTileSetTerrain.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -281,6 +282,7 @@ void AuxTileSet::CmdSet_AllocateWgtItem(TileSetWgtType eType, QJsonObject data)
 		ui->lytAnimations->addWidget(pNewAnim);
 		m_AnimationList.append(pNewAnim);
 		pNewAnim->SetOrderBtns(m_AnimationList.size() > 1, false);
+		m_pTileSet->Cmd_AllocateJsonItem(eType, data);
 		MakeSelectionChange(pNewAnim);
 		break; }
 
@@ -289,6 +291,7 @@ void AuxTileSet::CmdSet_AllocateWgtItem(TileSetWgtType eType, QJsonObject data)
 		ui->lytTerrainSets->addWidget(pNewTerrainSet);
 		m_TerrainSetList.append(pNewTerrainSet);
 		pNewTerrainSet->SetOrderBtns(m_TerrainSetList.size() > 1, false);
+		m_pTileSet->Cmd_AllocateJsonItem(eType, data);
 		MakeSelectionChange(pNewTerrainSet);
 		break; }
 
@@ -300,6 +303,7 @@ void AuxTileSet::CmdSet_AllocateWgtItem(TileSetWgtType eType, QJsonObject data)
 			return;
 		}
 		pParentTerrain->CmdSet_AllocTerrain(data);
+		m_pTileSet->Cmd_AllocateJsonItem(eType, data);
 		break; }
 
 	default:
@@ -848,10 +852,8 @@ void AuxTileSet::on_btnAddTerrainSet_clicked()
 {
 	QJsonObject initObj = AtlasTileSet::GenerateNewTerrainSetJsonObject();
 
-	WgtTileSetTerrainSet *pNewTerrainSet = new WgtTileSetTerrainSet(this, initObj);
-	ui->lytTerrainSets->addWidget(pNewTerrainSet);
-	m_TerrainSetList.append(pNewTerrainSet);
-	MakeSelectionChange(pNewTerrainSet);
+	TileSetUndoCmd_AddWgtItem *pNewCmd = new TileSetUndoCmd_AddWgtItem(*this, TILESETWGT_TerrainSet, initObj);
+	m_pTileSet->GetUndoStack()->push(pNewCmd);
 }
 
 void AuxTileSet::OnTabBarChanged(int iIndex)

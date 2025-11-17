@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>386</width>
-    <height>153</height>
+    <width>418</width>
+    <height>139</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -68,6 +68,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QToolButton" name="btnHz40">
+          <property name="text">
+           <string>40</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QToolButton" name="btnHz60">
           <property name="text">
            <string>60</string>
@@ -76,6 +83,9 @@
         </item>
         <item>
          <widget class="QDoubleSpinBox" name="sbFrameRate">
+          <property name="decimals">
+           <number>3</number>
+          </property>
           <property name="singleStep">
            <double>0.010000000000000</double>
           </property>

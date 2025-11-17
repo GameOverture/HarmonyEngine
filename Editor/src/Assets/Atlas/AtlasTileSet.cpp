@@ -307,29 +307,70 @@ TileSetScene *AtlasTileSet::GetGfxScene()
 	return &m_GfxScene;
 }
 
+void AtlasTileSet::Cmd_AllocateJsonItem(TileSetWgtType eType, QJsonObject data)
+{
+	switch (eType)
+	{
+	case TILESETWGT_Animation:
+		m_AnimationList.push_back(Animation(data));
+		break;
+	case TILESETWGT_TerrainSet:
+		m_TerrainSetList.push_back(TerrainSet(data));
+		break;
+	case TILESETWGT_Terrain: {
+		QUuid terrainSetUuid = QUuid(data["terrainSetUUID"].toString());
+		bool bFound = false;
+		for (TerrainSet &terrainSet : m_TerrainSetList)
+		{
+			if (terrainSet.m_uuid == terrainSetUuid)
+			{
+				terrainSet.m_TerrainList.push_back(TerrainSet::Terrain(data));
+				bFound = true;
+				break;
+			}
+		}
+		if (bFound == false)
+			HyGuiLog("AtlasTileSet::Cmd_AllocateJsonItem() could not find Terrain Set with UUID: " + terrainSetUuid.toString(), LOGTYPE_Error);
+		break; }
+
+	default:
+		HyGuiLog("AtlasTileSet::Cmd_AllocateJsonItem() received unknown TileSetWgtType: " + QString::number(static_cast<int>(eType)), LOGTYPE_Error);
+		break;
+	}
+}
+
 void AtlasTileSet::Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj)
 {
-	for (Animation &animation : m_AnimationList)
+	for (Animation &animationRef : m_AnimationList)
 	{
-		if (animation.m_uuid == uuid)
+		if (animationRef.m_uuid == uuid)
 		{
-			animation = Animation(itemDataObj);
+			animationRef = Animation(itemDataObj);
 			return;
 		}
 	}
-	for (TerrainSet &terrainSet : m_TerrainSetList)
+	for (TerrainSet &terrainSetRef : m_TerrainSetList)
 	{
-		if (terrainSet.m_uuid == uuid)
+		if (terrainSetRef.m_uuid == uuid)
 		{
-			terrainSet = TerrainSet(itemDataObj);
+			terrainSetRef = TerrainSet(itemDataObj);
 			return;
 		}
-	}
-	for (PhysicsLayer &physicsLayer : m_PhysicsLayerList)
-	{
-		if (physicsLayer.m_uuid == uuid)
+		// Check for Terrain within TerrainSet
+		for (TerrainSet::Terrain &terrainRef : terrainSetRef.m_TerrainList)
 		{
-			physicsLayer = PhysicsLayer(itemDataObj);
+			if (terrainRef.m_uuid == uuid)
+			{
+				terrainRef = TerrainSet::Terrain(itemDataObj);
+				return;
+			}
+		}
+	}
+	for (PhysicsLayer &physicsLayerRef : m_PhysicsLayerList)
+	{
+		if (physicsLayerRef.m_uuid == uuid)
+		{
+			physicsLayerRef = PhysicsLayer(itemDataObj);
 			return;
 		}
 	}

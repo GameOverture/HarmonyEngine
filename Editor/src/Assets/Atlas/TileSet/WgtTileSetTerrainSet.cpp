@@ -12,6 +12,7 @@
 #include "ui_WgtTileSetTerrainSet.h"
 #include "AuxTileSet.h"
 #include "TileSetUndoCmds.h"
+#include "WgtTileSetTerrain.h"
 
 #include <QMouseEvent>
 #include <QPushButton>
@@ -166,6 +167,11 @@ void WgtTileSetTerrainSet::on_actionDownward_triggered()
 	int iCurrentIndex = m_pAuxTileSet->GetWgtItemIndex(m_Uuid);
 	TileSetUndoCmd_OrderWgtItem *pNewCmd = new TileSetUndoCmd_OrderWgtItem(*m_pAuxTileSet, m_Uuid, iCurrentIndex, iCurrentIndex + 1);
 	m_pAuxTileSet->GetTileSet()->GetUndoStack()->push(pNewCmd);
+}
+
+void WgtTileSetTerrainSet::on_cmbTerrainSetMode_currentIndexChanged(int iNewIndex)
+{
+	OnModifyWidget("Terrain Set Mode Change", -1);
 }
 
 void WgtTileSetTerrainSet::on_btnAddTerrain_clicked()

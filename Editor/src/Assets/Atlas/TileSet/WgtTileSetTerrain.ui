@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WgtTileSetTerrainSet</class>
- <widget class="QWidget" name="WgtTileSetTerrainSet">
+ <class>WgtTileSetTerrain</class>
+ <widget class="QWidget" name="WgtTileSetTerrain">
   <property name="modal" stdset="0">
    <bool>false</bool>
   </property>
@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>323</width>
-    <height>232</height>
+    <width>361</width>
+    <height>46</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,6 +26,18 @@
    <bool>false</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QFrame" name="frmBorder">
      <property name="frameShape">
@@ -38,7 +50,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="lblTerrain">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -46,34 +58,32 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Mode</string>
+           <string>Terrain 0</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="cmbTerrainSetMode">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <widget class="QLineEdit" name="txtName"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnColor">
+          <property name="text">
+           <string/>
           </property>
-          <item>
-           <property name="text">
-            <string>Match Corners and Sides</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Match Corners</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Match Sides</string>
-           </property>
-          </item>
          </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <widget class="QToolButton" name="btnUpward">
@@ -98,38 +108,6 @@
         </item>
        </layout>
       </item>
-      <item>
-       <widget class="QFrame" name="frmTerrains">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::Shape::Box</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Shadow::Raised</enum>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <layout class="QVBoxLayout" name="lytTerrains"/>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnAddTerrain">
-           <property name="text">
-            <string>Add Terrain</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../../../data/HyEditor.qrc">
-             <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -140,7 +118,7 @@
      <normaloff>:/icons16x16/edit-delete.png</normaloff>:/icons16x16/edit-delete.png</iconset>
    </property>
    <property name="text">
-    <string>Delete Terrain Set</string>
+    <string>Delete Terrain</string>
    </property>
    <property name="toolTip">
     <string>Removes the Terrain Set from the TileSet</string>
@@ -155,7 +133,7 @@
     <string>Order Upward</string>
    </property>
    <property name="toolTip">
-    <string>Sorts this terrain set upward in the list</string>
+    <string>Sorts this terrain upward in the list</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
@@ -170,7 +148,7 @@
     <string>Order Doward</string>
    </property>
    <property name="toolTip">
-    <string>Sorts this terrain set downward in the list</string>
+    <string>Sorts this terrain downward in the list</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
