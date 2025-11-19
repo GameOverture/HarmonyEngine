@@ -33,6 +33,8 @@ class TileSetGfxItem : public QGraphicsItem
 	QPointF								m_ptDraggingInitialPos;		// The scene positions of this tile when starting a arranging operation
 	QPoint								m_ptDraggingGridPos;		// A temp variable used during arranging of tiles in the scene
 
+	QGraphicsRectItem *					m_pAnimationRectItem;		// Optional rectangle drawn around the tile when it is part of an animation
+
 public:
 	TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon);
 	virtual ~TileSetGfxItem();
@@ -54,6 +56,9 @@ public:
 
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) override;
+
+	void SetAnimation(bool bShow, HyColor color);
+
 	//virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
 	//virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
 	//virtual QVariant itemChange(GraphicsItemChange eChange, const QVariant &value) override;

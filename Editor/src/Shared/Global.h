@@ -211,6 +211,8 @@ enum TileSetShape
 
 enum TileSetWgtType
 {
+	TILESETWGT_None = -1,
+
 	TILESETWGT_Animation,
 	TILESETWGT_TerrainSet,
 	TILESETWGT_Terrain

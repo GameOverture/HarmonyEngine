@@ -29,6 +29,11 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	m_ptDraggingInitialPos(0.0f, 0.0f),
 	m_ptDraggingGridPos(0, 0)
 {
+	m_pAnimationRectItem = new QGraphicsRectItem(0.0f, 0.0f, pixmapRef.width() + 1, pixmapRef.height() + 1);
+	m_pAnimationRectItem->setPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Yellow)), 2.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+	m_pAnimationRectItem->setVisible(false);
+	m_pAnimationRectItem->setParentItem(this);
+
 	m_pRectItem = new QGraphicsRectItem(0.0f, 0.0f, pixmapRef.width() + 1, pixmapRef.height() + 1);
 	m_pRectItem->setPen(m_SelectedPen);
 	m_pRectItem->setParentItem(this);
@@ -135,6 +140,12 @@ QPixmap TileSetGfxItem::GetPixmap() const
 	//	pPainter->setPen(Qt::DashLine);
 	//	pPainter->drawRect(boundingRect());
 	//}
+}
+
+void TileSetGfxItem::SetAnimation(bool bShow, HyColor color)
+{
+	m_pAnimationRectItem->setBrush(HyGlobal::ConvertHyColor(color));
+	m_pAnimationRectItem->setVisible(bShow);
 }
 
 ///*virtual*/ void TileSetGfxItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event) /*override*/

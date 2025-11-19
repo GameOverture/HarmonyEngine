@@ -427,6 +427,27 @@ void AuxTileSet::MakeSelectionChange(IWgtTileSetItem *pItem)
 	}
 }
 
+void AuxTileSet::SetPainting_Animation(QUuid animUuid)
+{
+	IWgtTileSetItem *pWgtItem = FindWgtItem(animUuid);
+	if(pWgtItem == nullptr)
+	{
+		HyGuiLog("AuxTileSet::SetPainting_Animation() - TileSet Item not found", LOGTYPE_Error);
+		return;
+	}
+	if(pWgtItem->GetWgtType() != TILESETWGT_Animation)
+	{
+		HyGuiLog("AuxTileSet::SetPainting_Animation() - Wrong TileSet Item", LOGTYPE_Error);
+		return;
+	}
+
+	WgtTileSetAnimation *pAnimItem = static_cast<WgtTileSetAnimation *>(pWgtItem);
+	pAnimItem->GetUuid();
+
+	ui->graphicsView->SetStatusLabel(pAnimItem->GetName() + " - Select Animation Frames");
+
+}
+
 void AuxTileSet::SetImportWidgets()
 {
 	bool bTileSheet = ui->radTileSheet->isChecked();

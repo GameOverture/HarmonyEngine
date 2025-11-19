@@ -23,6 +23,8 @@ class WgtTileSetAnimation : public IWgtTileSetItem
 
 	Ui::WgtTileSetAnimation *		ui;
 
+	bool							m_bPaintingTiles;
+
 public:
 	WgtTileSetAnimation(AuxTileSet *pAuxTileSet, QJsonObject initObj, QWidget *pParent = nullptr);
 	virtual ~WgtTileSetAnimation();
@@ -31,6 +33,8 @@ public:
 	virtual QJsonObject SerializeCurrentWidgets() override;
 
 	void SetOrderBtns(bool bUpEnabled, bool bDownEnabled);
+
+	QString GetName() const;
 
 protected:
 	virtual QFrame *GetBorderFrame() const override;
@@ -41,6 +45,7 @@ private Q_SLOTS:
 	void on_actionDownward_triggered();
 	void on_txtName_editingFinished();
 	void on_btnColor_clicked();
+	void on_btnFramePreview_clicked();
 	void on_sbColumns_valueChanged(int iNewValue);
 	void on_sbNumFrames_valueChanged(int iNewValue);
 	void on_btnHz10_clicked();

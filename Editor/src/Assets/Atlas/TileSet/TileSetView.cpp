@@ -12,6 +12,8 @@
 #include "TileSetScene.h"
 #include "TileSetGfxItem.h"
 #include "AuxTileSet.h"
+#include "IWgtTileSetItem.h"
+#include "WgtTileSetAnimation.h"
 
 #include <QPainter>
 #include <QScrollBar>
@@ -178,6 +180,16 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 			GetScene()->OnArrangingTilesMouseRelease(*m_pAuxTileSet, mapToScene(pEvent->pos()));
 			break;
 		}
+	}
+
+	if(m_ePaintingType == TILESETWGT_Animation)
+	{
+		// Apply all selected tiles to the animation being painted
+		GetScene()->GetSelectedSetupTiles()
+
+		// Reset painting mode
+		ClearStatusLabel();
+		m_ePaintingType = TILESETWGT_None;
 	}
 
 	m_pAuxTileSet->UpdateSelection();

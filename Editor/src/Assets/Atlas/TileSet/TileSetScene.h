@@ -47,7 +47,6 @@ class TileSetScene : public QGraphicsScene
 	QGraphicsRectItem												m_ImportBorderRect;		// A dash-line box that encompasses the working-portion of the 'import' tiles
 	TileSetGfxItemGroup*											m_pModeImportGroup;
 	QSize															m_vImportRegionSize;
-
 	Qt::Edge														m_eImportAppendEdge;
 
 public:

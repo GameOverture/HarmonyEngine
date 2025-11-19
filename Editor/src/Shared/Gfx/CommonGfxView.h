@@ -10,6 +10,7 @@
 #ifndef COMMONGFXVIEW_H
 #define COMMONGFXVIEW_H
 
+#include "Global.h"
 #include <QGraphicsView>
 #include <QTimer>
 

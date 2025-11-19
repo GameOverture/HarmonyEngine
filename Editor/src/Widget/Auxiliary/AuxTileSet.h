@@ -72,6 +72,8 @@ public:
 	void CmdSet_ModifyWgtItem(QUuid uuid, QJsonObject newData);
 	void MakeSelectionChange(IWgtTileSetItem *pItem);
 
+	void SetPainting_Animation(QUuid animUuid);
+
 private:
 	Ui::AuxTileSet *ui;
 

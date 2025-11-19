@@ -18,7 +18,8 @@
 
 WgtTileSetAnimation::WgtTileSetAnimation(AuxTileSet *pAuxTileSet, QJsonObject initObj, QWidget *pParent /*= nullptr*/) :
 	IWgtTileSetItem(TILESETWGT_Animation, initObj, pAuxTileSet, pParent),
-	ui(new Ui::WgtTileSetAnimation)
+	ui(new Ui::WgtTileSetAnimation),
+	m_bPaintingTiles(false)
 {
 	ui->setupUi(this);
 
@@ -77,6 +78,11 @@ void WgtTileSetAnimation::SetOrderBtns(bool bUpEnabled, bool bDownEnabled)
 	ui->actionDownward->setEnabled(bDownEnabled);
 }
 
+QString WgtTileSetAnimation::GetName() const
+{
+	return m_SerializedJsonObj["name"].toString();
+}
+
 /*virtual*/ QFrame *WgtTileSetAnimation::GetBorderFrame() const /*override*/
 {
 	return ui->frmBorder;
@@ -116,6 +122,22 @@ void WgtTileSetAnimation::on_btnColor_clicked()
 		QColor newColor = colorDlg.selectedColor();
 		ui->btnColor->setPalette(QPalette(newColor));
 		OnModifyWidget("Animation Color", -1);
+	}
+}
+
+void  WgtTileSetAnimation::on_btnFramePreview_clicked()
+{
+	if(m_bPaintingTiles == false)
+	{
+		ui->btnFramePreview->setText("Select Tiles...");
+		m_bPaintingTiles = true;
+
+		m_pAuxTileSet->SetPainting_Animation(m_Uuid);
+	}
+	else
+	{
+		QMap<TileData *, TileSetGfxItem *> selectedTilesMap = m_pAuxTileSet->GetTileSet()->GetGfxScene()->GetSelectedSetupTiles();
+
 	}
 }
 
