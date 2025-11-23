@@ -34,8 +34,8 @@
 
 class Project;
 
-#define HyOrganizationName "Game Overture"
-#define HyEditorToolName "Harmony Editor Tool"
+#define HyOrganizationName "Harmony Engine"
+#define HyEditorToolName "HyEditor"
 #define HyGuiInternalCharIndicator '+'
 
 #define HySrcEntityFilter "_hy_"

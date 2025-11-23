@@ -18,7 +18,7 @@
 IWgtTileSetItem::IWgtTileSetItem(TileSetWgtType eWgtType, QJsonObject initObj, AuxTileSet *pAuxTileSet, QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	m_eWGT_TYPE(eWgtType),
-	m_SerializedJsonObj(initObj),
+	m_CachedJsonObj(initObj),
 	m_Uuid(QUuid(initObj["UUID"].toString())),
 	m_bIsInitializing(false),
 	m_pAuxTileSet(pAuxTileSet),
@@ -35,6 +35,7 @@ void IWgtTileSetItem::Init(QJsonObject serializedObj)
 	m_bIsInitializing = true;
 	blockSignals(true);
 	OnInit(serializedObj);
+	m_CachedJsonObj = serializedObj;
 	blockSignals(false);
 	m_bIsInitializing = false;
 }
@@ -95,8 +96,8 @@ void IWgtTileSetItem::SetSelected(bool bSelected)
 
 void IWgtTileSetItem::OnModifyWidget(QString sUndoText, int iMergeId)
 {
-	QJsonObject oldItemDataObj = m_SerializedJsonObj;
-	QJsonObject newItemDataObj = SerializeCurrentWidgets();
+	QJsonObject oldItemDataObj = m_CachedJsonObj;
+	m_CachedJsonObj = SerializeCurrentWidgets();
 
 	if (m_bIsInitializing)
 		return;
@@ -107,31 +108,31 @@ void IWgtTileSetItem::OnModifyWidget(QString sUndoText, int iMergeId)
 	QString sNewValue;
 	for (QString sKey : oldItemDataObj.keys())
 	{
-		if (newItemDataObj.contains(sKey) == false)
+		if (m_CachedJsonObj.contains(sKey) == false)
 			HyGuiLog("IWgtTileSetItem::OnModifyWidget: Key '" + sKey + "' missing from new item data object!", LOGTYPE_Error);
 		else
 		{
 			QJsonValueRef oldValueRef = oldItemDataObj[sKey];
-			QJsonValueRef newValueRef = newItemDataObj[sKey];
+			QJsonValueRef newValueRef = m_CachedJsonObj[sKey];
 			if (oldValueRef.type() != newValueRef.type())
 				HyGuiLog("IWgtTileSetItem::OnModifyWidget: Key '" + sKey + "' type mismatch!", LOGTYPE_Error);
 			
-			switch (oldItemDataObj[sKey].type())
+			switch (oldValueRef.type())
 			{
 			case QJsonValue::Type::Bool:
-				sOldValue = oldItemDataObj[sKey].toBool() ? "true" : "false";
-				sNewValue = newItemDataObj[sKey].toBool() ? "true" : "false";
+				sOldValue = oldValueRef.toBool() ? "true" : "false";
+				sNewValue = newValueRef.toBool() ? "true" : "false";
 				bDifferenceFound = sOldValue != sNewValue;
 				break;
 			case QJsonValue::Type::Double:
-				sOldValue = QString::number(oldItemDataObj[sKey].toDouble());
-				sNewValue = QString::number(newItemDataObj[sKey].toDouble());
-				bDifferenceFound = qAbs(oldItemDataObj[sKey].toDouble() - newItemDataObj[sKey].toDouble()) > 0.001; // Compare doubles with a tolerance
+				sOldValue = QString::number(oldValueRef.toDouble());
+				sNewValue = QString::number(newValueRef.toDouble());
+				bDifferenceFound = qAbs(oldValueRef.toDouble() - newValueRef.toDouble()) > 0.001; // Compare doubles with a tolerance
 				break;
 	
 			case QJsonValue::Type::String:
-				sOldValue = oldItemDataObj[sKey].toString();
-				sNewValue = newItemDataObj[sKey].toString();
+				sOldValue = oldValueRef.toString();
+				sNewValue = newValueRef.toString();
 				bDifferenceFound = sOldValue != sNewValue;
 				break;
 
@@ -141,7 +142,7 @@ void IWgtTileSetItem::OnModifyWidget(QString sUndoText, int iMergeId)
 			}
 		}
 	}
-	for (QString sKey : newItemDataObj.keys())
+	for (QString sKey : m_CachedJsonObj.keys())
 	{
 		if (oldItemDataObj.contains(sKey) == false)
 			HyGuiLog("IWgtTileSetItem::OnModifyWidget: Key '" + sKey + "' missing from old item data object!", LOGTYPE_Error);
@@ -151,7 +152,7 @@ void IWgtTileSetItem::OnModifyWidget(QString sUndoText, int iMergeId)
 
 	if(sOldValue.isEmpty() == false && sNewValue.isEmpty() == false)
 		sUndoText += " (" + sOldValue + " -> " + sNewValue + ")";
-	TileSetUndoCmd_ModifyWgtItem *pNewCmd = new TileSetUndoCmd_ModifyWgtItem(*m_pAuxTileSet, sUndoText, iMergeId, m_Uuid, oldItemDataObj, newItemDataObj);
+	TileSetUndoCmd_ModifyWgtItem *pNewCmd = new TileSetUndoCmd_ModifyWgtItem(*m_pAuxTileSet, sUndoText, iMergeId, m_Uuid, oldItemDataObj, m_CachedJsonObj);
 	m_pAuxTileSet->GetTileSet()->GetUndoStack()->push(pNewCmd);
 }
 

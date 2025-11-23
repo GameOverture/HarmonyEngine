@@ -52,20 +52,20 @@ WgtTileSetTerrainSet::~WgtTileSetTerrainSet()
 		QJsonObject terrainObj = terrainVal.toObject();
 		CmdSet_AllocTerrain(terrainObj);
 	}
-
-	m_SerializedJsonObj = serializedObj;
 }
 
 /*virtual*/ QJsonObject WgtTileSetTerrainSet::SerializeCurrentWidgets() /*override*/
 {
-	m_SerializedJsonObj["UUID"] = m_Uuid.toString();
-	m_SerializedJsonObj["terrainSetMode"] = ui->cmbTerrainSetMode->currentIndex();
+	QJsonObject serializedJsonObj;
+
+	serializedJsonObj["UUID"] = m_Uuid.toString();
+	serializedJsonObj["terrainSetMode"] = ui->cmbTerrainSetMode->currentIndex();
 	QJsonArray terrainsArray;
 	for (WgtTileSetTerrain *pTerrain : m_TerrainList)
 		terrainsArray.append(pTerrain->SerializeCurrentWidgets());
-	m_SerializedJsonObj["terrains"] = terrainsArray;
+	serializedJsonObj["terrains"] = terrainsArray;
 
-	return m_SerializedJsonObj;
+	return serializedJsonObj;
 }
 
 void WgtTileSetTerrainSet::CmdSet_AllocTerrain(QJsonObject initDataObj)

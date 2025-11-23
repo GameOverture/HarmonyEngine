@@ -56,26 +56,26 @@ WgtTileSetAnimation::~WgtTileSetAnimation()
 
 	ui->lblNumFrames->setEnabled(m_FrameList.size() != 0);
 	ui->lblNumFrames->setText("Num Frames: " + QString::number(m_FrameList.size()));
-
-	m_SerializedJsonObj = serializedObj;
 }
 
 /*virtual*/ QJsonObject WgtTileSetAnimation::SerializeCurrentWidgets() /*override*/
 {
-	m_SerializedJsonObj["UUID"] = m_Uuid.toString(QUuid::WithoutBraces);
-	m_SerializedJsonObj["name"] = ui->txtName->text();
+	QJsonObject serializedJsonObj;
+
+	serializedJsonObj["UUID"] = m_Uuid.toString(QUuid::WithoutBraces);
+	serializedJsonObj["name"] = ui->txtName->text();
 	HyColor btnColor(ui->btnColor->palette().button().color().red(),
 					 ui->btnColor->palette().button().color().green(),
 					 ui->btnColor->palette().button().color().blue());
-	m_SerializedJsonObj["color"] = static_cast<qint64>(btnColor.GetAsHexCode());
+	serializedJsonObj["color"] = static_cast<qint64>(btnColor.GetAsHexCode());
 	QJsonArray framesArray;
 	for(TileData *pFrameTileData : m_FrameList)
 		framesArray.append(pFrameTileData->GetUuid().toString(QUuid::WithoutBraces));
-	m_SerializedJsonObj["frames"] = framesArray;
-	m_SerializedJsonObj["frameDuration"] = ui->sbFrameRate->value();
-	m_SerializedJsonObj["startAtRandomFrame"] = ui->chkStartRandom->isChecked();
+	serializedJsonObj["frames"] = framesArray;
+	serializedJsonObj["frameDuration"] = ui->sbFrameRate->value();
+	serializedJsonObj["startAtRandomFrame"] = ui->chkStartRandom->isChecked();
 
-	return m_SerializedJsonObj;
+	return serializedJsonObj;
 }
 
 void WgtTileSetAnimation::SetOrderBtns(bool bUpEnabled, bool bDownEnabled)
@@ -86,7 +86,7 @@ void WgtTileSetAnimation::SetOrderBtns(bool bUpEnabled, bool bDownEnabled)
 
 QString WgtTileSetAnimation::GetName() const
 {
-	return m_SerializedJsonObj["name"].toString();
+	return ui->txtName->text();
 }
 
 bool WgtTileSetAnimation::IsPaintingTiles() const
@@ -148,13 +148,28 @@ void  WgtTileSetAnimation::on_btnFramePreview_clicked()
 	else
 	{
 		QMap<TileData *, TileSetGfxItem *> selectedTilesMap = m_pAuxTileSet->GetTileSet()->GetGfxScene()->GetSelectedSetupTiles();
+		QList<TileData *> selectedTileDataList = selectedTilesMap.keys();
 
-
-		//start_here;
-
-		for(TileData *pTileData : selectedTilesMap.keys())
+		// Determine if selectedTileDataList differs from m_FrameList
+		bool bListsDiffer = false;
+		if(selectedTileDataList.size() != m_FrameList.size())
+			bListsDiffer = true;
+		else
 		{
-
+			for(int i = 0; i < selectedTileDataList.size(); ++i)
+			{
+				if(selectedTileDataList[i] != m_FrameList[i])
+				{
+					bListsDiffer = true;
+					break;
+				}
+			}
+		}
+		
+		if(bListsDiffer)
+		{
+			m_FrameList = selectedTileDataList;
+			OnModifyWidget("Animation Frames", -1);
 		}
 
 		m_bPaintingTiles = false;

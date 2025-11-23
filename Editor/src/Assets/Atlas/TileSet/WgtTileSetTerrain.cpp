@@ -41,21 +41,21 @@ WgtTileSetTerrainSet *WgtTileSetTerrain::GetParentTerrainSet()
 {
 	ui->txtName->setText(serializedObj["name"].toString());
 	SetButtonColor(ui->btnColor, HyColor(serializedObj["color"].toVariant().toLongLong()));
-
-	m_SerializedJsonObj = serializedObj;
 }
 
 /*virtual*/ QJsonObject WgtTileSetTerrain::SerializeCurrentWidgets() /*override*/
 {
-	m_SerializedJsonObj["UUID"] = m_Uuid.toString();
-	m_SerializedJsonObj["terrainSetUUID"] = m_pParentTerrainSet->GetUuid().toString();
-	m_SerializedJsonObj["name"] = ui->txtName->text();
+	QJsonObject serializedJsonObj;
+
+	serializedJsonObj["UUID"] = m_Uuid.toString();
+	serializedJsonObj["terrainSetUUID"] = m_pParentTerrainSet->GetUuid().toString();
+	serializedJsonObj["name"] = ui->txtName->text();
 	HyColor btnColor(ui->btnColor->palette().button().color().red(),
 					 ui->btnColor->palette().button().color().green(),
 					 ui->btnColor->palette().button().color().blue());
-	m_SerializedJsonObj["color"] = static_cast<qint64>(btnColor.GetAsHexCode());
+	serializedJsonObj["color"] = static_cast<qint64>(btnColor.GetAsHexCode());
 
-	return m_SerializedJsonObj;
+	return serializedJsonObj;
 }
 
 void WgtTileSetTerrain::SetOrderBtns(bool bUpEnabled, bool bDownEnabled)

@@ -24,7 +24,9 @@ class IWgtTileSetItem : public QWidget
 	
 protected:
 	const TileSetWgtType	m_eWGT_TYPE;
-	QJsonObject				m_SerializedJsonObj;
+private:
+	QJsonObject				m_CachedJsonObj;	// Used to store any "before" state for whenever a change occurs (undo cmds)
+protected:
 	QUuid					m_Uuid;
 
 	bool					m_bIsInitializing; // Prevents Modify UndoCmds from being created
