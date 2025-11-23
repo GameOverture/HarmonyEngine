@@ -182,17 +182,7 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 		}
 	}
 
-	if(m_ePaintingType == TILESETWGT_Animation)
-	{
-		// Apply all selected tiles to the animation being painted
-		GetScene()->GetSelectedSetupTiles()
-
-		// Reset painting mode
-		ClearStatusLabel();
-		m_ePaintingType = TILESETWGT_None;
-	}
-
-	m_pAuxTileSet->UpdateSelection();
+	m_pAuxTileSet->UpdateGfxItemSelection();
 	m_eDragState = DRAGSTATE_None;
 
 	CommonGfxView::mouseReleaseEvent(pEvent);

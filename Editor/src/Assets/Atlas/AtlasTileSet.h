@@ -53,9 +53,7 @@ class AtlasTileSet : public AtlasFrame
 		QUuid					m_uuid;
 		QString					m_sName;
 		HyColor					m_Color;
-		QPoint					m_ptStartGridPos;
-		int						m_iNumColumns;
-		int						m_iNumFrames;
+		QList<QUuid>			m_TileFrameList;
 		float					m_fFrameDuration; // In seconds
 		bool					m_bStartAtRandomFrame;
 
@@ -63,9 +61,6 @@ class AtlasTileSet : public AtlasFrame
 			m_uuid(QUuid::createUuid()),
 			m_sName(sName),
 			m_Color(color),
-			m_ptStartGridPos(0, 0),
-			m_iNumColumns(0),
-			m_iNumFrames(0),
 			m_fFrameDuration(0.0333f),
 			m_bStartAtRandomFrame(false)
 		{
@@ -75,9 +70,11 @@ class AtlasTileSet : public AtlasFrame
 			m_uuid = QUuid(initObj["UUID"].toString());
 			m_sName = initObj["name"].toString();
 			m_Color = HyColor(initObj["color"].toVariant().toLongLong());
-			m_ptStartGridPos = QPoint(initObj["startX"].toInt(), initObj["startY"].toInt());
-			m_iNumColumns = initObj["numColumns"].toInt();
-			m_iNumFrames = initObj["numFrames"].toInt();
+
+			QJsonArray frameArray = initObj["frames"].toArray();
+			for(QJsonValue frameVal : frameArray)
+				m_TileFrameList.push_back(QUuid(frameVal.toString()));
+
 			m_fFrameDuration = static_cast<float>(initObj["frameDuration"].toDouble());
 			m_bStartAtRandomFrame = initObj["startAtRandomFrame"].toBool();
 		}
@@ -88,10 +85,12 @@ class AtlasTileSet : public AtlasFrame
 			animationObj["UUID"] = m_uuid.toString(QUuid::WithoutBraces);
 			animationObj["name"] = m_sName;
 			animationObj["color"] = static_cast<qint64>(m_Color.GetAsHexCode());
-			animationObj["startX"] = m_ptStartGridPos.x();
-			animationObj["startY"] = m_ptStartGridPos.y();
-			animationObj["numColumns"] = m_iNumColumns;
-			animationObj["numFrames"] = m_iNumFrames;
+
+			QJsonArray frameArray;
+			for(const QUuid &frameUuidRef : m_TileFrameList)
+				frameArray.append(frameUuidRef.toString(QUuid::WithoutBraces));
+			animationObj["frames"] = frameArray;
+
 			animationObj["frameDuration"] = static_cast<double>(m_fFrameDuration);
 			animationObj["startAtRandomFrame"] = m_bStartAtRandomFrame;
 			return animationObj;
@@ -259,6 +258,7 @@ public:
 	QVector<QJsonObject> GetPhysicsLayers() const;
 	QJsonObject GetJsonItem(QUuid uuid) const;
 
+	TileData *FindTileData(QUuid uuid) const;
 	QVector<TileData *> GetTileDataList() const;
 
 	TileSetScene *GetGfxScene();

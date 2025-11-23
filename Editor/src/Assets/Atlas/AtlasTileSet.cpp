@@ -297,6 +297,16 @@ QJsonObject AtlasTileSet::GetJsonItem(QUuid uuid) const
 	return QJsonObject();
 }
 
+TileData *AtlasTileSet::FindTileData(QUuid uuid) const
+{
+	for (TileData *pTileData : m_TileDataList)
+	{
+		if (pTileData->GetUuid() == uuid)
+			return pTileData;
+	}
+	return nullptr;
+}
+
 QVector<TileData *> AtlasTileSet::GetTileDataList() const
 {
 	return m_TileDataList;

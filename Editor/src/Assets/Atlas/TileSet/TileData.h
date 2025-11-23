@@ -19,6 +19,7 @@
 
 class TileData
 {
+	QUuid											m_Uuid;
 	QPoint											m_MetaGridPos;			// The user defined position in the grid when setting up the TileSet - and not its location on the sub-atlas texture
 
 	QPixmap											m_TilePixmap;
@@ -60,6 +61,8 @@ public:
 	TileData(const TileData &other);
 	TileData &operator=(const TileData &other);
 	~TileData();
+
+	QUuid GetUuid() const;
 
 	QPoint GetMetaGridPos() const;
 	void SetMetaGridPos(QPoint metaGridPos);

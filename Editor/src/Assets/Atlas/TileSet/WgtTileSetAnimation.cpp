@@ -11,6 +11,7 @@
 #include "WgtTileSetAnimation.h"
 #include "ui_WgtTileSetAnimation.h"
 #include "AuxTileSet.h"
+#include "TileData.h"
 #include "TileSetUndoCmds.h"
 
 #include <QPushButton>
@@ -39,19 +40,22 @@ WgtTileSetAnimation::~WgtTileSetAnimation()
 {
 	ui->txtName->setText(serializedObj["name"].toString());
 	SetButtonColor(ui->btnColor, HyColor(serializedObj["color"].toVariant().toLongLong()));
-	ui->sbColumns->setValue(serializedObj["numColumns"].toInt());
-	ui->sbNumFrames->setValue(serializedObj["numFrames"].toInt());
+	QJsonArray framesArray = serializedObj["frames"].toArray();
+	for(QJsonValue frameVal : framesArray)
+	{
+		QString sTileDataUuid = frameVal.toString();
+		TileData *pTileData = m_pAuxTileSet->GetTileSet()->FindTileData(QUuid(sTileDataUuid));
+		if(pTileData)
+			m_FrameList.append(pTileData);
+		else
+			HyGuiLog("WgtTileSetAnimation::OnInit: Could not find TileData for frame UUID " + sTileDataUuid, LOGTYPE_Error);
+	}
+	
 	ui->sbFrameRate->setValue(static_cast<float>(serializedObj["frameDuration"].toDouble(0.0333)));
 	ui->chkStartRandom->setChecked(serializedObj["startAtRandomFrame"].toBool());
 
-	if (ui->sbNumFrames->value() == 0)
-	{
-		ui->sbColumns->setValue(0);
-		ui->sbColumns->setEnabled(false);
-		ui->sbNumFrames->setEnabled(false);
-	}
-	ui->lblNumFrames->setEnabled(ui->sbNumFrames->value() != 0);
-	ui->lblColumns->setEnabled(ui->sbColumns->value() != 0);
+	ui->lblNumFrames->setEnabled(m_FrameList.size() != 0);
+	ui->lblNumFrames->setText("Num Frames: " + QString::number(m_FrameList.size()));
 
 	m_SerializedJsonObj = serializedObj;
 }
@@ -64,8 +68,10 @@ WgtTileSetAnimation::~WgtTileSetAnimation()
 					 ui->btnColor->palette().button().color().green(),
 					 ui->btnColor->palette().button().color().blue());
 	m_SerializedJsonObj["color"] = static_cast<qint64>(btnColor.GetAsHexCode());
-	m_SerializedJsonObj["numColumns"] = ui->sbColumns->value();
-	m_SerializedJsonObj["numFrames"] = ui->sbNumFrames->value();
+	QJsonArray framesArray;
+	for(TileData *pFrameTileData : m_FrameList)
+		framesArray.append(pFrameTileData->GetUuid().toString(QUuid::WithoutBraces));
+	m_SerializedJsonObj["frames"] = framesArray;
 	m_SerializedJsonObj["frameDuration"] = ui->sbFrameRate->value();
 	m_SerializedJsonObj["startAtRandomFrame"] = ui->chkStartRandom->isChecked();
 
@@ -81,6 +87,11 @@ void WgtTileSetAnimation::SetOrderBtns(bool bUpEnabled, bool bDownEnabled)
 QString WgtTileSetAnimation::GetName() const
 {
 	return m_SerializedJsonObj["name"].toString();
+}
+
+bool WgtTileSetAnimation::IsPaintingTiles() const
+{
+	return m_bPaintingTiles;
 }
 
 /*virtual*/ QFrame *WgtTileSetAnimation::GetBorderFrame() const /*override*/
@@ -138,6 +149,15 @@ void  WgtTileSetAnimation::on_btnFramePreview_clicked()
 	{
 		QMap<TileData *, TileSetGfxItem *> selectedTilesMap = m_pAuxTileSet->GetTileSet()->GetGfxScene()->GetSelectedSetupTiles();
 
+
+		//start_here;
+
+		for(TileData *pTileData : selectedTilesMap.keys())
+		{
+
+		}
+
+		m_bPaintingTiles = false;
 	}
 }
 

@@ -11,6 +11,7 @@
 #include "TileData.h"
 
 TileData::TileData(QPoint metaGridPos, QPixmap tilePixmap) :
+	m_Uuid(QUuid::createUuid()),
 	m_MetaGridPos(metaGridPos),
 	m_TilePixmap(tilePixmap),
 	m_TextureOffset(0, 0),
@@ -22,6 +23,7 @@ TileData::TileData(QPoint metaGridPos, QPixmap tilePixmap) :
 }
 
 TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
+	m_Uuid(QUuid(tileDataObj["UUID"].toString())),
 	m_MetaGridPos(QPoint(tileDataObj["MetaGridPosX"].toInt(), tileDataObj["MetaGridPosY"].toInt())),
 	m_TilePixmap(tilePixmap),
 	m_TextureOffset(QPoint(tileDataObj["TextureOffsetX"].toInt(), tileDataObj["TextureOffsetY"].toInt())),
@@ -92,6 +94,11 @@ TileData::~TileData()
 {
 }
 
+QUuid TileData::GetUuid() const
+{
+	return m_Uuid;
+}
+
 QPoint TileData::GetMetaGridPos() const
 {
 	return m_MetaGridPos;
@@ -106,6 +113,7 @@ QJsonObject TileData::GetTileData() const
 {
 	QJsonObject tileDataObjOut;
 
+	tileDataObjOut["UUID"] = m_Uuid.toString(QUuid::WithoutBraces);
 	tileDataObjOut["MetaGridPosX"] = m_MetaGridPos.x();
 	tileDataObjOut["MetaGridPosY"] = m_MetaGridPos.y();
 	tileDataObjOut["TextureOffsetX"] = m_TextureOffset.x();

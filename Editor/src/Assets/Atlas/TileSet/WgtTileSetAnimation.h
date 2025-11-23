@@ -17,6 +17,8 @@ namespace Ui {
 class WgtTileSetAnimation;
 }
 
+class TileData;
+
 class WgtTileSetAnimation : public IWgtTileSetItem
 {
 	Q_OBJECT
@@ -24,6 +26,7 @@ class WgtTileSetAnimation : public IWgtTileSetItem
 	Ui::WgtTileSetAnimation *		ui;
 
 	bool							m_bPaintingTiles;
+	QList<TileData *>				m_FrameList;
 
 public:
 	WgtTileSetAnimation(AuxTileSet *pAuxTileSet, QJsonObject initObj, QWidget *pParent = nullptr);
@@ -35,6 +38,7 @@ public:
 	void SetOrderBtns(bool bUpEnabled, bool bDownEnabled);
 
 	QString GetName() const;
+	bool IsPaintingTiles() const;
 
 protected:
 	virtual QFrame *GetBorderFrame() const override;

@@ -47,6 +47,8 @@ class AuxTileSet : public QWidget
 	QList<WgtTileSetAnimation *>				m_AnimationList;
 	QList<WgtTileSetTerrainSet *>				m_TerrainSetList;
 
+	IWgtTileSetItem *							m_pSelectedWgtItem;
+
 public:
 	explicit AuxTileSet(QWidget *pParent = nullptr);
 	virtual ~AuxTileSet();
@@ -62,7 +64,7 @@ public:
 	void CmdSet_TileOffsetWidgets(QPoint tileOffset);		// Blocks the WgtVectorSpinBox::SetValue signal
 
 	void RefreshInfo();
-	void UpdateSelection();
+	void UpdateGfxItemSelection();
 
 	IWgtTileSetItem *FindWgtItem(QUuid uuid) const;
 	int GetWgtItemIndex(QUuid uuid) const;
