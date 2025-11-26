@@ -1,5 +1,5 @@
-# BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL2, HYBUILD_SDL_NET, HYBUILD_STATIC
-# BUILD EXTRAS:  HYBUILD_SPINE, HYBUILD_RAPIDJSON, HYBUILD_ICU
+# BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL2, HYBUILD_SDL_NET, HYBUILD_NLOHMANN_JSON, HYBUILD_STATIC
+# BUILD EXTRAS:  HYBUILD_SPINE, HYBUILD_ICU
 
 message(STATUS "Adding Vendor: Box2d")
 add_subdirectory(vendor/box2d)
@@ -15,9 +15,7 @@ if(HYBUILD_SPINE)
 	set_target_properties(spine-cpp-lite PROPERTIES FOLDER "Engine Libs")
 endif()
 
-if(HYBUILD_RAPIDJSON)
-	
-else() #nlohmann_json
+if(HYBUILD_NLOHMANN_JSON)
 	# If you only include this third party in PRIVATE source files, you do not need to install it when your main project gets installed.
 	set(JSON_Install OFF CACHE INTERNAL "")
 	message(STATUS "Adding Vendor: json")
@@ -359,9 +357,7 @@ if(HYBUILD_SPINE)
 	target_link_libraries(HyEngine PUBLIC spine-cpp)
 endif()
 
-if(HYBUILD_RAPIDJSON)
-	
-else() #nlohmann_json
+if(HYBUILD_NLOHMANN_JSON)
 	target_link_libraries(HyEngine PRIVATE nlohmann_json::nlohmann_json)
 endif()
 
