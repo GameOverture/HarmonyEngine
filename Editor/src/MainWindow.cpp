@@ -792,7 +792,7 @@ void MainWindow::on_actionProjectSettings_triggered()
 		return;
 
 	DlgProjectSettings dlg(*pProj, this);
-	if(dlg.exec() == QDialog::Accepted && dlg.HasSettingsChanged())
+	if(dlg.exec() == QDialog::Accepted)// && dlg.HasSettingsChanged())
 		pProj->SaveSettingsObj(dlg.SerializeWidgets());
 }
 

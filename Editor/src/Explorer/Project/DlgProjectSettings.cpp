@@ -161,11 +161,15 @@ QJsonObject DlgProjectSettings::SerializeWidgets()
 	return settingsObj;
 }
 
-bool DlgProjectSettings::HasSettingsChanged()
-{
-	QJsonObject curWidgetsObj = SerializeWidgets();
-	return curWidgetsObj !=	m_ProjectRef.GetSettingsObj();
-}
+//bool DlgProjectSettings::HasSettingsChanged()
+//{
+//	QJsonObject serializedObj = SerializeWidgets();
+//	QJsonObject curWidgetsObj = m_ProjectRef.GetSettingsObj();
+//
+//	QJsonDocument serializedDoc(serializedObj);
+//	QJsonDocument curWidgetsDoc(curWidgetsObj);
+//	return strcmp(serializedDoc.toJson().data(), curWidgetsDoc.toJson().data()) != 0;
+//}
 
 void DlgProjectSettings::RemoveWindowInfo(WgtWindowInfo *pWindowInfo)
 {

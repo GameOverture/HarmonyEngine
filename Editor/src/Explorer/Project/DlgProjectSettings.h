@@ -35,7 +35,7 @@ public:
 	~DlgProjectSettings();
 
 	QJsonObject SerializeWidgets();
-	bool HasSettingsChanged();
+	//bool HasSettingsChanged();
 
 	void RemoveWindowInfo(WgtWindowInfo *pWindowInfo);
 

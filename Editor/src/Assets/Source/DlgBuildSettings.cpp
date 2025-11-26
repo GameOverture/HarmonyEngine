@@ -24,9 +24,27 @@ DlgBuildSettings::DlgBuildSettings(const Project &projectRef, QJsonObject settin
 
 	ui->txtOutputName->setText(settingsObj["OutputName"].toString());
 
-	ui->grpSdl2->setChecked(settingsObj["UseSdl2"].toBool());
+	if(settingsObj["UseSdl2"].toBool())
+	{
+		ui->radSdl2->setChecked(true);
+		ui->radGlfw->setChecked(false);
+		ui->chkUseSdlAudio->setEnabled(true);
+		ui->chkUseSdlNet->setEnabled(true);
+	}
+	else
+	{
+		ui->radSdl2->setChecked(false);
+		ui->radGlfw->setChecked(true);
+		ui->chkUseSdlAudio->setEnabled(false);
+		ui->chkUseSdlNet->setEnabled(false);
+	}
 	ui->chkUseSdlAudio->setChecked(settingsObj["UseSdlAudio"].toBool());
 	ui->chkUseSdlNet->setChecked(settingsObj["UseSdlNet"].toBool());
+
+	if(settingsObj.contains("UseNlohmannJson") && settingsObj["UseNlohmannJson"].toBool())
+		ui->radNlohmann->setChecked(true);
+	else
+		ui->radRapidJson->setChecked(true);
 
 	ui->chkUseSpine->setChecked(settingsObj["UseSpine"].toBool());
 	ui->chkUseIcu->setChecked(settingsObj["UseIcu"].toBool());
@@ -105,9 +123,11 @@ void DlgBuildSettings::UpdateMetaObj(QJsonObject &metaObjRef) const
 {
 	metaObjRef.insert("OutputName", ui->txtOutputName->text());
 
-	metaObjRef.insert("UseSdl2", ui->grpSdl2->isChecked());
-	metaObjRef.insert("UseSdlAudio", ui->grpSdl2->isChecked() && ui->chkUseSdlAudio->isChecked());
-	metaObjRef.insert("UseSdlNet", ui->grpSdl2->isChecked() && ui->chkUseSdlNet->isChecked());
+	metaObjRef.insert("UseSdl2", ui->radSdl2->isChecked());
+	metaObjRef.insert("UseSdlAudio", ui->radSdl2->isChecked() && ui->chkUseSdlAudio->isChecked());
+	metaObjRef.insert("UseSdlNet", ui->radSdl2->isChecked() && ui->chkUseSdlNet->isChecked());
+
+	metaObjRef.insert("UseNlohmannJson", ui->radNlohmann->isChecked());
 
 	metaObjRef.insert("UseSpine", ui->chkUseSpine->isChecked());
 	metaObjRef.insert("UseIcu", ui->chkUseIcu->isChecked());

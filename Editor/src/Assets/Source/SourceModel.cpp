@@ -441,6 +441,8 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	newMetaBankObjRef["UseSdl2"] = false;
 	newMetaBankObjRef["UseSdlAudio"] = false;
 	newMetaBankObjRef["UseSdlNet"] = false;
+	newMetaBankObjRef["UseNlohmannJson"] = false;
+	newMetaBankObjRef["UseSpine"] = false;
 	newMetaBankObjRef["UseIcu"] = false;
 	newMetaBankObjRef["EmscriptenCcall"] = "";
 }
@@ -644,6 +646,12 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 		sContents.replace("%HY_USESDLNET%", "set(HYBUILD_SDL_NET ON)");
 	else
 		sContents.replace("%HY_USESDLNET%", "set(HYBUILD_SDL_NET OFF)");
+
+	// nlohmann json
+	if(pSourceBank->m_MetaObj["UseNlohmannJson"].toBool())
+		sContents.replace("%HY_USENLOHMANNJSON%", "set(HYBUILD_NLOHMANN_JSON ON)");
+	else
+		sContents.replace("%HY_USENLOHMANNJSON%", "set(HYBUILD_NLOHMANN_JSON OFF)");
 
 	// Spine
 	if(pSourceBank->m_MetaObj["UseSpine"].toBool())

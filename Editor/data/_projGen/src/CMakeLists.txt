@@ -25,6 +25,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 %HY_USESDL2%
 %HY_USESDLAUDIO%
 %HY_USESDLNET%
+%HY_USENLOHMANNJSON%
 option(HYBUILD_DebugEmscripten "Use a Debug build configuration when targeting web browsers" OFF)
 option(HYBUILD_STATIC "Statically link all dependencies into the executable" OFF)
 
