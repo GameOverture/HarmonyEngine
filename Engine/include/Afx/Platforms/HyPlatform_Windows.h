@@ -24,7 +24,6 @@
 
 #define NOMINMAX			// This undefines the macros MIN and MAX which are specified in the windows headers. Use the stl versions instead.
 
-#define HY_MAXWINDOWS 6
 #define HY_ENDIAN_LITTLE	// All x86 and x86-64 machines are little-endian.
 
 #if defined(HY_DEBUG) && defined(HY_COMPILER_MSVC) && !defined(HY_USE_SPINE)

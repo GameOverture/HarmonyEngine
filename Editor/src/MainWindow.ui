@@ -125,7 +125,6 @@
     <addaction name="separator"/>
     <addaction name="actionBuildSettings"/>
     <addaction name="actionNewBuild"/>
-    <addaction name="actionNewPackage"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
@@ -158,7 +157,7 @@
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidgetExplorer">
    <property name="allowedAreas">
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+    <set>Qt::DockWidgetArea::BottomDockWidgetArea|Qt::DockWidgetArea::LeftDockWidgetArea|Qt::DockWidgetArea::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
     <string>Project Explorer</string>
@@ -187,11 +186,8 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="dockWidgetProperties">
-   <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
-   </property>
    <property name="allowedAreas">
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+    <set>Qt::DockWidgetArea::BottomDockWidgetArea|Qt::DockWidgetArea::LeftDockWidgetArea|Qt::DockWidgetArea::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
     <string>Item Properties</string>
@@ -255,7 +251,7 @@
     <bool>false</bool>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetFeatureMask</set>
+    <set>QDockWidget::DockWidgetFeature::DockWidgetFeatureMask</set>
    </property>
    <property name="windowTitle">
     <string>Aux</string>
@@ -283,7 +279,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidgetAux">
        <property name="tabPosition">
-        <enum>QTabWidget::South</enum>
+        <enum>QTabWidget::TabPosition::South</enum>
        </property>
        <property name="currentIndex">
         <number>2</number>
@@ -637,6 +633,9 @@
    <property name="toolTip">
     <string>Create a new build for the currently active project</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+B</string>
+   </property>
   </action>
   <action name="actionAbout">
    <property name="text">
@@ -762,21 +761,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+N, Ctrl+T</string>
-   </property>
-  </action>
-  <action name="actionNewPackage">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/package-x-generic.png</normaloff>:/icons16x16/package-x-generic.png</iconset>
-   </property>
-   <property name="text">
-    <string>Package Project</string>
-   </property>
-   <property name="toolTip">
-    <string>Package the currently active project into a runnable executable</string>
    </property>
   </action>
   <action name="actionOpenIde">

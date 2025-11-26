@@ -57,6 +57,12 @@ if(Qt6_DIR)
 		src/Assets/ManagerWidget.cpp
 		src/Assets/ManagerWidget.h
 		src/Assets/ManagerWidget.ui
+		src/Assets/Source/DlgBuildSettings.cpp
+		src/Assets/Source/DlgBuildSettings.h
+		src/Assets/Source/DlgBuildSettings.ui
+		src/Assets/Source/DlgNewBuild.cpp
+		src/Assets/Source/DlgNewBuild.h
+		src/Assets/Source/DlgNewBuild.ui
 		src/Assets/Source/SourceFile.cpp
 		src/Assets/Source/SourceFile.h
 		src/Assets/Source/SourceModel.cpp
@@ -66,9 +72,9 @@ if(Qt6_DIR)
 		src/Assets/Source/SourceGenFileDlg.ui
 		src/Assets/Source/SourceImportThread.cpp
 		src/Assets/Source/SourceImportThread.h
-		src/Assets/Source/SourceSettingsDlg.cpp
-		src/Assets/Source/SourceSettingsDlg.h
-		src/Assets/Source/SourceSettingsDlg.ui
+		src/Assets/Source/WgtSrcDependency.cpp
+		src/Assets/Source/WgtSrcDependency.h
+		src/Assets/Source/WgtSrcDependency.ui
 		src/Assets/Atlas/AtlasDraw.cpp
 		src/Assets/Atlas/AtlasDraw.h
 		src/Assets/Atlas/AtlasFrame.cpp
@@ -227,21 +233,6 @@ if(Qt6_DIR)
 		src/Dialogs/DlgInputNumber.cpp
 		src/Dialogs/DlgInputNumber.h
 		src/Dialogs/DlgInputNumber.ui
-		src/Dialogs/DlgNewBuild.cpp
-		src/Dialogs/DlgNewBuild.h
-		src/Dialogs/DlgNewBuild.ui
-		src/Dialogs/DlgNewItem.cpp
-		src/Dialogs/DlgNewItem.h
-		src/Dialogs/DlgNewItem.ui
-		src/Dialogs/DlgNewPackage.cpp
-		src/Dialogs/DlgNewPackage.h
-		src/Dialogs/DlgNewPackage.ui
-		src/Dialogs/DlgNewProject.cpp
-		src/Dialogs/DlgNewProject.h
-		src/Dialogs/DlgNewProject.ui
-		src/Dialogs/DlgProjectSettings.cpp
-		src/Dialogs/DlgProjectSettings.h
-		src/Dialogs/DlgProjectSettings.ui
 		src/Dialogs/DlgSetEngineLocation.cpp
 		src/Dialogs/DlgSetEngineLocation.h
 		src/Dialogs/DlgSetEngineLocation.ui
@@ -260,6 +251,9 @@ if(Qt6_DIR)
 		src/Dialogs/DlgTabCycle.cpp
 		src/Dialogs/DlgTabCycle.h
 		src/Dialogs/DlgTabCycle.ui
+		src/Explorer/DlgNewProject.cpp
+		src/Explorer/DlgNewProject.h
+		src/Explorer/DlgNewProject.ui
 		src/Explorer/ExplorerItemData.cpp
 		src/Explorer/ExplorerModel.cpp
 		src/Explorer/ExplorerWidget.cpp
@@ -267,6 +261,12 @@ if(Qt6_DIR)
 		src/Explorer/ExplorerModel.h
 		src/Explorer/ExplorerWidget.h
 		src/Explorer/ExplorerWidget.ui
+		src/Explorer/Project/DlgNewProjectItem.cpp
+		src/Explorer/Project/DlgNewProjectItem.h
+		src/Explorer/Project/DlgNewProjectItem.ui
+		src/Explorer/Project/DlgProjectSettings.cpp
+		src/Explorer/Project/DlgProjectSettings.h
+		src/Explorer/Project/DlgProjectSettings.ui
 		src/Explorer/Project/Project.cpp
 		src/Explorer/Project/ProjectDraw.cpp
 		src/Explorer/Project/ProjectItemData.cpp
@@ -275,6 +275,9 @@ if(Qt6_DIR)
 		src/Explorer/Project/ProjectDraw.h
 		src/Explorer/Project/ProjectItemData.h
 		src/Explorer/Project/ProjectItemMimeData.h
+		src/Explorer/Project/WgtWindowInfo.cpp
+		src/Explorer/Project/WgtWindowInfo.h
+		src/Explorer/Project/WgtWindowInfo.ui
 		src/Harmony/Harmony.cpp
 		src/Harmony/HarmonyConnection.cpp
 		src/Harmony/Harmony.h
@@ -346,9 +349,6 @@ if(Qt6_DIR)
 		src/Widget/WgtSpineAnims.cpp
 		src/Widget/WgtSpineAnims.h
 		src/Widget/WgtSpineAnims.ui
-		src/Widget/WgtSrcDependency.cpp
-		src/Widget/WgtSrcDependency.h
-		src/Widget/WgtSrcDependency.ui
 		src/Widget/WgtVectorSpinBox.cpp
 		src/Widget/WgtVectorSpinBox.h
 		src/Widget/WgtVectorSpinBox.ui

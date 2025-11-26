@@ -1,5 +1,5 @@
 /**************************************************************************
- *	SourceSettingsDlg.cpp
+ *	DlgBuildSettings.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2021 Jason Knobler
@@ -8,15 +8,15 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "SourceSettingsDlg.h"
-#include "ui_SourceSettingsDlg.h"
+#include "DlgBuildSettings.h"
+#include "ui_DlgBuildSettings.h"
 #include "WgtSrcDependency.h"
 
 #include <QPushButton>
 
-SourceSettingsDlg::SourceSettingsDlg(const Project &projectRef, QJsonObject settingsObj, QWidget *pParent /*= nullptr*/) :
+DlgBuildSettings::DlgBuildSettings(const Project &projectRef, QJsonObject settingsObj, QWidget *pParent /*= nullptr*/) :
 	QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-	ui(new Ui::SourceSettingsDlg),
+	ui(new Ui::DlgBuildSettings),
 	m_ProjectRef(projectRef),
 	m_bIsError(false)
 {
@@ -49,14 +49,14 @@ SourceSettingsDlg::SourceSettingsDlg(const Project &projectRef, QJsonObject sett
 
 		m_SrcDependencyList.append(pNewWgtSrcDep);
 		ui->lytDependencies->addWidget(pNewWgtSrcDep);
-		connect(pNewWgtSrcDep, &WgtSrcDependency::OnDirty, this, &SourceSettingsDlg::ErrorCheck);
+		connect(pNewWgtSrcDep, &WgtSrcDependency::OnDirty, this, &DlgBuildSettings::ErrorCheck);
 	}
 
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
 	Refresh();
 }
 
-SourceSettingsDlg::~SourceSettingsDlg()
+DlgBuildSettings::~DlgBuildSettings()
 {
 	for(int i = 0; i < m_SrcDependencyList.count(); ++i)
 		delete m_SrcDependencyList[i];
@@ -64,12 +64,12 @@ SourceSettingsDlg::~SourceSettingsDlg()
 	delete ui;
 }
 
-QString SourceSettingsDlg::GetProjectDir() const
+QString DlgBuildSettings::GetProjectDir() const
 {
 	return m_ProjectRef.GetDirPath();
 }
 
-void SourceSettingsDlg::RemoveSrcDep(WgtSrcDependency *pRemoved)
+void DlgBuildSettings::RemoveSrcDep(WgtSrcDependency *pRemoved)
 {
 	for(int i = 0; i < m_SrcDependencyList.count(); ++i)
 	{
@@ -82,7 +82,7 @@ void SourceSettingsDlg::RemoveSrcDep(WgtSrcDependency *pRemoved)
 	Refresh();
 }
 
-void SourceSettingsDlg::Refresh()
+void DlgBuildSettings::Refresh()
 {
 	if(ui->lytDependencies->count() != m_SrcDependencyList.count())
 	{
@@ -101,7 +101,7 @@ void SourceSettingsDlg::Refresh()
 	ErrorCheck();
 }
 
-void SourceSettingsDlg::UpdateMetaObj(QJsonObject &metaObjRef) const
+void DlgBuildSettings::UpdateMetaObj(QJsonObject &metaObjRef) const
 {
 	metaObjRef.insert("OutputName", ui->txtOutputName->text());
 
@@ -128,22 +128,22 @@ void SourceSettingsDlg::UpdateMetaObj(QJsonObject &metaObjRef) const
 	metaObjRef.insert("SrcDepends", srcDependsArray);
 }
 
-bool SourceSettingsDlg::IsError() const
+bool DlgBuildSettings::IsError() const
 {
 	return m_bIsError;
 }
 
-QString SourceSettingsDlg::GetError() const
+QString DlgBuildSettings::GetError() const
 {
 	return ui->lblError->text();
 }
 
-void SourceSettingsDlg::on_txtOutputName_textChanged(const QString &arg1)
+void DlgBuildSettings::on_txtOutputName_textChanged(const QString &arg1)
 {
 	ErrorCheck();
 }
 
-void SourceSettingsDlg::ErrorCheck()
+void DlgBuildSettings::ErrorCheck()
 {
 	m_bIsError = false;
 	do
@@ -173,11 +173,11 @@ void SourceSettingsDlg::ErrorCheck()
 	ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!m_bIsError);
 }
 
-void SourceSettingsDlg::on_btnAddDependency_clicked()
+void DlgBuildSettings::on_btnAddDependency_clicked()
 {
 	m_SrcDependencyList.append(new WgtSrcDependency(this));
 	ui->lytDependencies->addWidget(m_SrcDependencyList[m_SrcDependencyList.count() - 1]);
-	connect(m_SrcDependencyList[m_SrcDependencyList.count() - 1], &WgtSrcDependency::OnDirty, this, &SourceSettingsDlg::ErrorCheck);
+	connect(m_SrcDependencyList[m_SrcDependencyList.count() - 1], &WgtSrcDependency::OnDirty, this, &DlgBuildSettings::ErrorCheck);
 
 	Refresh();
 }

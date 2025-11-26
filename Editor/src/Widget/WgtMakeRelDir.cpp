@@ -25,9 +25,10 @@ WgtMakeRelDir::~WgtMakeRelDir()
 	delete ui;
 }
 
-void WgtMakeRelDir::Setup(QString sTitle, QString sDefaultName, QString sAbsProjectPath, QString sDefaultRelativePath /*= ""*/, QString sDirNameLabel /*= ""*/)
+void WgtMakeRelDir::Setup(QString sTitle, QString sDefaultName, QString sAbsProjectPath, QString sDefaultRelativePath, bool bMustBeEmptyFolder)
 {
 	m_sTitle = sTitle;
+	m_bMustBeEmptyFolder = bMustBeEmptyFolder;
 
 	ui->txtDirName->blockSignals(true);
 	{
@@ -42,14 +43,16 @@ void WgtMakeRelDir::Setup(QString sTitle, QString sDefaultName, QString sAbsProj
 	if(sDefaultRelativePath.isEmpty() && m_sAbsParentDirPath.isEmpty())
 		m_sAbsParentDirPath = m_sAbsProjPath;
 	else
-		m_sAbsParentDirPath = m_sAbsProjPath % sDefaultRelativePath;
+	{
+		m_sAbsParentDirPath = QDir(m_sAbsProjPath).absoluteFilePath(sDefaultRelativePath);
+		// Go up one level to the parent directory
+		QDir dir(m_sAbsParentDirPath);
+		if(dir.cdUp())
+			m_sAbsParentDirPath = dir.absolutePath();
+	}
 
 	ui->lblRelative->setText(m_sTitle % " relative location:");
-
-	if(sDirNameLabel.isEmpty())
-		ui->lblDirName->setText(m_sTitle % " dir name:");
-	else
-		ui->lblDirName->setText(sDirNameLabel);
+	ui->lblDirName->setText(m_sTitle % " dir name:");
 
 	Refresh();
 }
@@ -87,12 +90,15 @@ QString WgtMakeRelDir::GetError()
 			break;
 		}
 
-		QDir parentDir(m_sAbsParentDirPath);
-		QDir newDir(parentDir.absolutePath() + "/" + ui->txtDirName->text());
-		if(parentDir.exists() && newDir.exists() && newDir.isEmpty() == false)
+		if(m_bMustBeEmptyFolder)
 		{
-			sError = "Error: " % m_sTitle % " directory does not point to an empty folder.";
-			break;
+			QDir parentDir(m_sAbsParentDirPath);
+			QDir newDir(parentDir.absolutePath() + "/" + ui->txtDirName->text());
+			if(parentDir.exists() && newDir.exists() && newDir.isEmpty() == false)
+			{
+				sError = "Error: " % m_sTitle % " directory does not point to an empty folder.";
+				break;
+			}
 		}
 		
 	} while(false);

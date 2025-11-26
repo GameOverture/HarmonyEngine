@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DlgNewItem</class>
- <widget class="QDialog" name="DlgNewItem">
+ <class>DlgNewProjectItem</class>
+ <widget class="QDialog" name="DlgNewProjectItem">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -146,7 +146,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>DlgNewItem</receiver>
+   <receiver>DlgNewProjectItem</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -162,7 +162,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>DlgNewItem</receiver>
+   <receiver>DlgNewProjectItem</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -17,7 +17,7 @@ HyEngine *HyEngine::sm_pInstance = nullptr;
 HyEngine::HyEngine(const HarmonyInit &initStruct) :
 	m_Init(initStruct),
 	m_Console(m_Init.bUseConsole, m_Init.consoleInfo),
-	m_WindowManager(*this, m_Init.uiNumWindows, m_Init.bShowCursor, m_Init.windowInfo),
+	m_WindowManager(*this, m_Init.windowInfoList, m_Init.bShowCursor),
 	m_Input(m_Init.uiNumInputMaps, m_WindowManager.GetWindowList()),
 	m_Audio(m_Input),
 	m_Scene(m_Init.vGravity2d, m_Init.fPixelsPerMeter, m_Audio, m_WindowManager.GetWindowList()),
@@ -145,7 +145,7 @@ bool HyEngine::PollPlatformApi()
 #endif
 
 #ifdef HY_USE_GLFW
-	for(uint32 i = 0; i < m_Init.uiNumWindows; ++i)
+	for(uint32 i = 0; i < m_Init.windowInfoList.size(); ++i)
 	{
 		if(glfwWindowShouldClose(HyEngine::Window(i).GetInterop()))
 			return false;

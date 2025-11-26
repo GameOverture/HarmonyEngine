@@ -1,5 +1,5 @@
 /**************************************************************************
- *	DlgNewItem.h
+ *	DlgNewProjectItem.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -16,10 +16,10 @@
 #include <QDialog>
 
 namespace Ui {
-class DlgNewItem;
+class DlgNewProjectItem;
 }
 
-class DlgNewItem : public QDialog
+class DlgNewProjectItem : public QDialog
 {
 	Q_OBJECT
 
@@ -28,8 +28,8 @@ class DlgNewItem : public QDialog
 	QStringList			m_PrefixStringList;
 
 public:
-	explicit DlgNewItem(Project *pItemProject, ItemType eItem, QString sDefaultPrefix, QWidget *parent);
-	~DlgNewItem();
+	explicit DlgNewProjectItem(Project *pItemProject, ItemType eItem, QString sDefaultPrefix, QWidget *parent);
+	~DlgNewProjectItem();
 	
 	QString GetName();
 	QString GetPrefix();
@@ -51,7 +51,7 @@ private Q_SLOTS:
 	void on_txtImport_textChanged(const QString &arg1);
 
 private:
-	Ui::DlgNewItem *ui;
+	Ui::DlgNewProjectItem *ui;
 
 	void ErrorCheck();
 };

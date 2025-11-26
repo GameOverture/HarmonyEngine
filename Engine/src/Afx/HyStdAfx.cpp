@@ -108,16 +108,14 @@ HarmonyInit::HarmonyInit()
 	uiNumInputMaps = 1;
 	bShowCursor = true;
 
-	uiNumWindows = 1;
-	for(uint32 i = 0; i < HY_MAXWINDOWS; ++i)
-	{
-		windowInfo[i].sName = "Window: " + std::to_string(i);
-		windowInfo[i].eMode = HYWINDOW_WindowedFixed;
-		windowInfo[i].vSize.x = 1280;
-		windowInfo[i].vSize.y = 756;
-		windowInfo[i].ptLocation.x = i * windowInfo[i].vSize.x;
-		windowInfo[i].ptLocation.y = 80;
-	}
+	HyWindowInfo windowInfoDefault;
+	windowInfoDefault.sName = "Untitled";
+	windowInfoDefault.eMode = HYWINDOW_WindowedFixed;
+	windowInfoDefault.vSize.x = 1280;
+	windowInfoDefault.vSize.y = 756;
+	windowInfoDefault.ptLocation.x = 80;
+	windowInfoDefault.ptLocation.y = 80;
+	windowInfoList.push_back(windowInfoDefault);
 
 	vGravity2d = glm::vec2(0.0f, -10.0);
 	fPixelsPerMeter = 50.0f;
@@ -206,26 +204,26 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	else
 		fPixelsPerMeter = defaultVals.fPixelsPerMeter;
 
-	uiNumWindows = defaultVals.uiNumWindows;
-	for(uint32 i = 0; i < HY_MAXWINDOWS; ++i)
-		windowInfo[i] = defaultVals.windowInfo[i];
-
 	if(projDoc.HasMember("WindowInfo"))
 	{
 		HyJsonArray windowInfoArray = projDoc["WindowInfo"].GetArray();
-		uiNumWindows = windowInfoArray.Size();
-		for(uint32 i = 0; i < uiNumWindows; ++i)
+		int uiNumWindows = windowInfoArray.Size();
+		for(int32 i = 0; i < uiNumWindows; ++i)
 		{
 			HyJsonObj windowInfoObj = windowInfoArray[i].GetObject();
 
-			windowInfo[i].sName = windowInfoObj["Name"].GetString();
-			windowInfo[i].eMode = static_cast<HyWindowMode>(windowInfoObj["Type"].GetInt());
-			windowInfo[i].vSize.x = windowInfoObj["ResolutionX"].GetInt();
-			windowInfo[i].vSize.y = windowInfoObj["ResolutionY"].GetInt();
-			windowInfo[i].ptLocation.x = windowInfoObj["LocationX"].GetInt();
-			windowInfo[i].ptLocation.y = windowInfoObj["LocationY"].GetInt();
+			HyWindowInfo winInfo;
+			winInfo.sName = windowInfoObj["Name"].GetString();
+			winInfo.eMode = static_cast<HyWindowMode>(windowInfoObj["Type"].GetInt());
+			winInfo.vSize.x = windowInfoObj["ResolutionX"].GetInt();
+			winInfo.vSize.y = windowInfoObj["ResolutionY"].GetInt();
+			winInfo.ptLocation.x = windowInfoObj["LocationX"].GetInt();
+			winInfo.ptLocation.y = windowInfoObj["LocationY"].GetInt();
+			windowInfoList.push_back(winInfo);
 		}
 	}
+	else
+		windowInfoList = defaultVals.windowInfoList;
 
 	bUseConsole = defaultVals.bUseConsole;
 	consoleInfo = defaultVals.consoleInfo;

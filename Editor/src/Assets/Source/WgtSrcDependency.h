@@ -16,17 +16,17 @@ namespace Ui {
 class WgtSrcDependency;
 }
 
-class SourceSettingsDlg;
+class DlgBuildSettings;
 
 class WgtSrcDependency : public QWidget
 {
 	Q_OBJECT
 
-	SourceSettingsDlg *		m_pParentDlg;
+	DlgBuildSettings *		m_pParentDlg;
 	QString					m_sAbsSrcDepPath;
 	
 public:
-	explicit WgtSrcDependency(SourceSettingsDlg *pParentDlg, QWidget *pParent = nullptr);
+	explicit WgtSrcDependency(DlgBuildSettings *pParentDlg, QWidget *pParent = nullptr);
 	virtual ~WgtSrcDependency();
 
 	QString GetProjectName() const;

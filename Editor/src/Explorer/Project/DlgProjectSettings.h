@@ -20,6 +20,7 @@ class DlgProjectSettings;
 }
 
 class Project;
+class WgtWindowInfo;
 
 class DlgProjectSettings : public QDialog
 {
@@ -27,15 +28,20 @@ class DlgProjectSettings : public QDialog
 
 	Project &				m_ProjectRef;
 
+	QList<WgtWindowInfo *>	m_WindowInfoList;
+
 public:
 	explicit DlgProjectSettings(Project &projectRef, QWidget *parent = 0);
 	~DlgProjectSettings();
 
+	QJsonObject SerializeWidgets();
 	bool HasSettingsChanged();
-	QJsonObject GetNewSettingsObj();
+
+	void RemoveWindowInfo(WgtWindowInfo *pWindowInfo);
 
 private Q_SLOTS:
-	void on_buttonBox_accepted();
+	void on_btnAddWindow_pressed();
+	void on_txtTitle_textChanged(const QString &arg1);
 
 private:
 	Ui::DlgProjectSettings *ui;

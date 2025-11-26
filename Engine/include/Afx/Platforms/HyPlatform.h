@@ -61,10 +61,6 @@ HY_INLINE uint32 HyInternal_EndianSwap32__(uint32 var)
 #error HyPlatform.h: Could not determine build platform.
 #endif
 
-#ifndef HY_MAXWINDOWS
-#error HY_MAXWINDOWS hasn't been defined by the platform
-#endif
-
 #ifndef HyAssert
 #error HyPlatform.h: HyAssert is not defined!
 #endif

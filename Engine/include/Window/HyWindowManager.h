@@ -20,7 +20,7 @@ class HyWindowManager
 	std::vector<HyWindow *>				m_WindowList;
 
 public:
-	HyWindowManager(HyEngine &engineRef, uint32 uiNumWindows, bool bShowCursor, const HyWindowInfo windowInfos[HY_MAXWINDOWS]);
+	HyWindowManager(HyEngine &engineRef, const std::vector<HyWindowInfo> &windowInfoList, bool bShowCursor);
 	~HyWindowManager();
 
 	std::vector<HyWindow *> &GetWindowList();

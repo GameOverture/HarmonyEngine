@@ -99,7 +99,7 @@ void HyChain2d::SetData(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoo
 
 void HyChain2d::SetData(const std::vector<glm::vec2> &verticesList, bool bLoop, const b2ChainDef *pPhysicsInit /*= nullptr*/)
 {
-	SetData(verticesList.data(), verticesList.size(), bLoop, pPhysicsInit);
+	SetData(verticesList.data(), static_cast<uint32>(verticesList.size()), bLoop, pPhysicsInit);
 }
 
 /*virtual*/ void HyChain2d::TransformSelf(const glm::mat4 &mtxTransform) /*override*/
@@ -157,7 +157,7 @@ void HyChain2d::Setup(const b2ChainDef &chainDefRef)
 		delete[] m_pMaterials;
 		m_pMaterials = HY_NEW b2SurfaceMaterial[chainDefRef.materialCount];
 		m_iMaterialCount = chainDefRef.materialCount;
-		for(uint32 i = 0; i < m_iMaterialCount; ++i)
+		for(int32 i = 0; i < m_iMaterialCount; ++i)
 			m_pMaterials[i] = chainDefRef.materials[i];
 
 		m_pPhysicsInit->count = m_iMaterialCount;
@@ -168,7 +168,7 @@ void HyChain2d::Setup(const b2ChainDef &chainDefRef)
 		{
 			std::vector<glm::vec2> pointList;
 			pointList.reserve(chainDefRef.count);
-			for(uint32 i = 0; i < chainDefRef.count; ++i)
+			for(int32 i = 0; i < chainDefRef.count; ++i)
 				pointList.push_back(glm::vec2(chainDefRef.points[i].x, chainDefRef.points[i].y));
 
 			SetData(pointList, chainDefRef.isLoop, nullptr);

@@ -14,9 +14,8 @@
 #include "Project.h"
 #include "DlgSetEngineLocation.h"
 #include "DlgNewProject.h"
-#include "DlgNewItem.h"
+#include "DlgNewProjectItem.h"
 #include "DlgNewBuild.h"
-#include "DlgNewPackage.h"
 #include "DlgInputName.h"
 #include "DlgProjectSettings.h"
 #include "DlgSnappingSettings.h"
@@ -794,7 +793,7 @@ void MainWindow::on_actionProjectSettings_triggered()
 
 	DlgProjectSettings dlg(*pProj, this);
 	if(dlg.exec() == QDialog::Accepted && dlg.HasSettingsChanged())
-		pProj->SaveSettingsObj(dlg.GetNewSettingsObj());
+		pProj->SaveSettingsObj(dlg.SerializeWidgets());
 }
 
 void MainWindow::on_actionOpenFolderExplorer_triggered()
@@ -1051,28 +1050,6 @@ void MainWindow::on_actionNewBuild_triggered()
 //	QDesktopServices::openUrl(QUrl(ideFileInfoList[0].absoluteFilePath()));
 }
 
-void MainWindow::on_actionNewPackage_triggered()
-{
-	if(Harmony::GetProject() == nullptr)
-	{
-		HyGuiLog("on_actionNewPackage_triggered invoked with no loaded project", LOGTYPE_Error);
-		return;
-	}
-
-	DlgNewPackage *pDlg = new DlgNewPackage(*Harmony::GetProject(), this);
-	if(pDlg->exec() == QDialog::Accepted)
-	{
-		QProcess *pBuildProcess = new QProcess(this);
-		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(OnProcessStdOut()));
-		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardError()), this, SLOT(OnProcessErrorOut()));
-
-		QString sProc = pDlg->GetProc();
-		QStringList sArgList = pDlg->GetProcOptions();
-		pBuildProcess->start(sProc, sArgList);
-	}
-	delete pDlg;
-}
-
 void MainWindow::on_actionChangeHarmonyLocation_triggered()
 {
 	QDir engineDir(m_Settings.value("engineLocation").toString());
@@ -1198,7 +1175,7 @@ void MainWindow::NewItem(ItemType eItem)
 	if(sDefaultPrefix.isEmpty() == false && sDefaultPrefix[sDefaultPrefix.size() - 1] == '/')
 		sDefaultPrefix = sDefaultPrefix.left(sDefaultPrefix.size() - 1);
 
-	DlgNewItem *pDlg = new DlgNewItem(Harmony::GetProject(), eItem, sDefaultPrefix, this);
+	DlgNewProjectItem *pDlg = new DlgNewProjectItem(Harmony::GetProject(), eItem, sDefaultPrefix, this);
 	if(pDlg->exec())
 	{
 		ExplorerItemData *pNewItem = m_ExplorerModel.AddItem(pProj,

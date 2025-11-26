@@ -17,7 +17,6 @@
 	#include <SDL.h>
 #endif
 
-#define HY_MAXWINDOWS 6
 #define HY_ENDIAN_LITTLE // All x86 and x86-64 machines are little-endian.
 
 #define HY_NEW new

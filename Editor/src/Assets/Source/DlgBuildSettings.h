@@ -1,5 +1,5 @@
 /**************************************************************************
- *	SourceSettingsDlg.h
+ *	DlgBuildSettings.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2021 Jason Knobler
@@ -7,8 +7,8 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef SourceSettingsDlg_H
-#define SourceSettingsDlg_H
+#ifndef DlgBuildSettings_H
+#define DlgBuildSettings_H
 
 #include "Global.h"
 #include "Project.h"
@@ -16,24 +16,24 @@
 #include <QDialog>
 
 namespace Ui {
-class SourceSettingsDlg;
+class DlgBuildSettings;
 }
 
 class WgtSrcDependency;
 
-class SourceSettingsDlg : public QDialog
+class DlgBuildSettings : public QDialog
 {
 	Q_OBJECT
 
-	Ui::SourceSettingsDlg *		ui;
+	Ui::DlgBuildSettings *		ui;
 
 	const Project &				m_ProjectRef;
 	QList<WgtSrcDependency *>	m_SrcDependencyList;
 	bool						m_bIsError;
 
 public:
-	SourceSettingsDlg(const Project &projectRef, QJsonObject settingsObj, QWidget *pParent = nullptr);
-	virtual ~SourceSettingsDlg();
+	DlgBuildSettings(const Project &projectRef, QJsonObject settingsObj, QWidget *pParent = nullptr);
+	virtual ~DlgBuildSettings();
 
 	QString GetProjectDir() const;
 	
@@ -55,4 +55,4 @@ private:
 	void ErrorCheck();
 };
 
-#endif // SourceSettingsDlg_H
+#endif // DlgBuildSettings_H

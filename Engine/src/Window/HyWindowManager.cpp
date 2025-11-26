@@ -19,7 +19,7 @@ void HyGlfw_ErrorCallback(int iError, const char *szDescription)
 }
 #endif
 
-HyWindowManager::HyWindowManager(HyEngine &engineRef, uint32 uiNumWindows, bool bShowCursor, const HyWindowInfo windowInfos[HY_MAXWINDOWS]) :
+HyWindowManager::HyWindowManager(HyEngine &engineRef, const std::vector<HyWindowInfo> &windowInfoList, bool bShowCursor) :
 	m_EngineRef(engineRef)
 {
 #ifdef HY_USE_GLFW
@@ -48,10 +48,10 @@ HyWindowManager::HyWindowManager(HyEngine &engineRef, uint32 uiNumWindows, bool 
 	#endif
 #endif
 
-	HyAssert(uiNumWindows >= 1, "HyWindowManager was constructed with 0 windows");
-	HyLog("HyWindowManager creating '" << uiNumWindows << "' window(s)");
-	for(uint32 i = 0; i < uiNumWindows; ++i)
-		m_WindowList.push_back(HY_NEW HyWindow(i, *this, windowInfos[i], bShowCursor, i != 0 ? m_WindowList[0]->GetInterop() : nullptr));
+	HyAssert(windowInfoList.size() >= 1, "HyWindowManager was constructed with 0 windows");
+	HyLog("HyWindowManager creating '" << windowInfoList.size() << "' window(s)");
+	for(uint32 i = 0; i < windowInfoList.size(); ++i)
+		m_WindowList.push_back(HY_NEW HyWindow(i, *this, windowInfoList[i], bShowCursor, i != 0 ? m_WindowList[0]->GetInterop() : nullptr));
 }
 
 HyWindowManager::~HyWindowManager()

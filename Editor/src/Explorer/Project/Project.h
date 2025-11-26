@@ -99,7 +99,7 @@ public:
 	bool HasError() const;
 	
 	QJsonObject GetSettingsObj() const;
-	void SaveSettingsObj(const QJsonObject newSettingsObj);
+	void SaveSettingsObj(QJsonObject newSettingsObj);
 
 	QString GetDirPath() const;
 	QString GetTitle() const;

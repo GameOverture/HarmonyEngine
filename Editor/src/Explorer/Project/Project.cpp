@@ -20,7 +20,7 @@
 #include "GlobalUndoCmds.h"
 #include "IAssetItemData.h"
 #include "TextModel.h" // For Project::ReloadHarmony() hack
-#include "SourceSettingsDlg.h"
+#include "DlgBuildSettings.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -151,7 +151,7 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	m_pSourceModel->Init();
 	if(bFilesPatched)
 		m_pSourceModel->SaveMeta();
-	SourceSettingsDlg *pDlg = new SourceSettingsDlg(*this, static_cast<BanksModel *>(m_pSourceModel->GetBanksModel())->GetBank(0)->m_MetaObj);
+	DlgBuildSettings *pDlg = new DlgBuildSettings(*this, static_cast<BanksModel *>(m_pSourceModel->GetBanksModel())->GetBank(0)->m_MetaObj);
 	if(pDlg->IsError())
 		HyGuiLog("Project " % GetName(false) % " has invalid build settings.\n\n" % pDlg->GetError() % "\n\nPlease activate project, and resolve in Build -> Build Settings", LOGTYPE_Error);
 	delete pDlg;
@@ -412,8 +412,9 @@ QJsonObject Project::GetSettingsObj() const
 	return m_SettingsObj;
 }
 
-void Project::SaveSettingsObj(const QJsonObject newSettingsObj)
+void Project::SaveSettingsObj(QJsonObject newSettingsObj)
 {
+	newSettingsObj.insert("$fileVersion", HYGUI_FILE_VERSION);
 	m_SettingsObj = newSettingsObj;
 
 	QFile settingsFile(GetAbsPath());
@@ -426,6 +427,7 @@ void Project::SaveSettingsObj(const QJsonObject newSettingsObj)
 	{
 		QJsonDocument settingsDoc;
 		settingsDoc.setObject(m_SettingsObj);
+
 		qint64 iBytesWritten = settingsFile.write(settingsDoc.toJson());
 		if(0 == iBytesWritten || -1 == iBytesWritten)
 		{

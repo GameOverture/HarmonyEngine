@@ -9,13 +9,13 @@
  *************************************************************************/
 #include "Global.h"
 #include "WgtSrcDependency.h"
-#include "SourceSettingsDlg.h"
+#include "DlgBuildSettings.h"
 #include "ui_WgtSrcDependency.h"
 #include "DlgNewProject.h"
 
 #include <QFileDialog>
 
-WgtSrcDependency::WgtSrcDependency(SourceSettingsDlg *pParentDlg, QWidget *pParent /*= nullptr*/) :
+WgtSrcDependency::WgtSrcDependency(DlgBuildSettings *pParentDlg, QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::WgtSrcDependency),
 	m_pParentDlg(pParentDlg)

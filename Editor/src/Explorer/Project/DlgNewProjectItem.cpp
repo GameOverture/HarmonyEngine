@@ -1,5 +1,5 @@
 /**************************************************************************
- *	DlgNewItem.cpp
+ *	DlgNewProjectItem.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2016 Jason Knobler
@@ -8,8 +8,8 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "DlgNewItem.h"
-#include "ui_DlgNewItem.h"
+#include "DlgNewProjectItem.h"
+#include "ui_DlgNewProjectItem.h"
 #include "ExplorerModel.h"
 #include "MainWindow.h"
 
@@ -18,14 +18,14 @@
 #include <QPushButton>
 #include <QFileDialog>
 
-DlgNewItem::DlgNewItem(Project *pItemProject, ItemType eItem, QString sDefaultPrefix, QWidget *parent) :
+DlgNewProjectItem::DlgNewProjectItem(Project *pItemProject, ItemType eItem, QString sDefaultPrefix, QWidget *parent) :
 	QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-	ui(new Ui::DlgNewItem),
+	ui(new Ui::DlgNewProjectItem),
 	m_pItemProject(pItemProject),
 	m_eItemType(eItem)
 {
 	if(m_pItemProject == nullptr)
-		HyGuiLog("DlgNewItem::DlgNewItem was given a Project * that was nullptr", LOGTYPE_Error);
+		HyGuiLog("DlgNewProjectItem::DlgNewProjectItem was given a Project * that was nullptr", LOGTYPE_Error);
 
 	ui->setupUi(this);
 
@@ -64,17 +64,17 @@ DlgNewItem::DlgNewItem(Project *pItemProject, ItemType eItem, QString sDefaultPr
 	ErrorCheck();
 }
 
-DlgNewItem::~DlgNewItem()
+DlgNewProjectItem::~DlgNewProjectItem()
 {
 	delete ui;
 }
 
-QString DlgNewItem::GetName()
+QString DlgNewProjectItem::GetName()
 {
 	return ui->txtName->text();
 }
 
-QString DlgNewItem::GetPrefix()
+QString DlgNewProjectItem::GetPrefix()
 {
 	if(ui->chkNewPrefix->isChecked())
 		return QString(HyIO::CleanPath(ui->txtPrefix->text().toStdString()).c_str());
@@ -82,7 +82,7 @@ QString DlgNewItem::GetPrefix()
 		return ui->cmbPrefixList->currentIndex() == 0 ? QString() : ui->cmbPrefixList->currentText();
 }
 
-QString DlgNewItem::GetImportFile()
+QString DlgNewProjectItem::GetImportFile()
 {
 	if(ui->grpImport->isHidden() == false)
 		return ui->txtImport->text();
@@ -90,7 +90,7 @@ QString DlgNewItem::GetImportFile()
 		return QString();
 }
 
-void DlgNewItem::on_chkNewPrefix_stateChanged(int arg1)
+void DlgNewProjectItem::on_chkNewPrefix_stateChanged(int arg1)
 {
 	if(arg1 == Qt::Checked)
 	{
@@ -112,22 +112,22 @@ void DlgNewItem::on_chkNewPrefix_stateChanged(int arg1)
 	ErrorCheck();
 }
 
-void DlgNewItem::on_txtName_textChanged(const QString &arg1)
+void DlgNewProjectItem::on_txtName_textChanged(const QString &arg1)
 {
 	ErrorCheck();
 }
 
-void DlgNewItem::on_txtPrefix_textChanged(const QString &arg1)
+void DlgNewProjectItem::on_txtPrefix_textChanged(const QString &arg1)
 {
 	ErrorCheck();
 }
 
-void DlgNewItem::on_cmbPrefixList_currentIndexChanged(const QString &arg1)
+void DlgNewProjectItem::on_cmbPrefixList_currentIndexChanged(const QString &arg1)
 {
 	ErrorCheck();
 }
 
-void DlgNewItem::ErrorCheck()
+void DlgNewProjectItem::ErrorCheck()
 {
 	QString sPrefix = GetPrefix();
 	if(sPrefix.endsWith('/', Qt::CaseInsensitive) == false)
@@ -211,11 +211,11 @@ void DlgNewItem::ErrorCheck()
 	ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!bIsError);
 }
 
-void DlgNewItem::on_buttonBox_accepted()
+void DlgNewProjectItem::on_buttonBox_accepted()
 {
 }
 
-void DlgNewItem::on_btnImportBrowse_clicked()
+void DlgNewProjectItem::on_btnImportBrowse_clicked()
 {
 	QFileDialog dlg(this);
 	dlg.setFileMode(QFileDialog::ExistingFile);
@@ -240,7 +240,7 @@ void DlgNewItem::on_btnImportBrowse_clicked()
 	}
 	else
 	{
-		HyGuiLog("DlgNewItem has unknown import type", LOGTYPE_Error);
+		HyGuiLog("DlgNewProjectItem has unknown import type", LOGTYPE_Error);
 	}
 	QString sImportFile = QFileDialog::getOpenFileName(this,
 													   sCaption,
@@ -252,7 +252,7 @@ void DlgNewItem::on_btnImportBrowse_clicked()
 		ui->txtImport->setText(sImportFile);
 }
 
-void DlgNewItem::on_txtImport_textChanged(const QString &arg1)
+void DlgNewProjectItem::on_txtImport_textChanged(const QString &arg1)
 {
 	ErrorCheck();
 }

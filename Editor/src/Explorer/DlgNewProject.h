@@ -41,6 +41,7 @@ private Q_SLOTS:
 	void on_txtGameLocation_textChanged(const QString &arg1);
 
 	void on_txtTitleName_textChanged(const QString &arg1);
+	void on_txtCodeName_textChanged(const QString &arg1);
 
 	void on_chkCreateGameDir_clicked();
 

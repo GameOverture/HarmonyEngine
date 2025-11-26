@@ -139,11 +139,11 @@ void DlgNewProject::on_buttonBox_accepted()
 	QJsonArray windowInfoArray;
 	QJsonObject windowInfoObj;
 	windowInfoObj.insert("Name", ui->txtTitleName->text());
-	windowInfoObj.insert("Type", hyInit.windowInfo[0].eMode);
-	windowInfoObj.insert("ResolutionX", hyInit.windowInfo[0].vSize.x);
-	windowInfoObj.insert("ResolutionY", hyInit.windowInfo[0].vSize.y);
-	windowInfoObj.insert("LocationX", hyInit.windowInfo[0].ptLocation.x);
-	windowInfoObj.insert("LocationY", hyInit.windowInfo[0].ptLocation.y);
+	windowInfoObj.insert("Type", hyInit.windowInfoList[0].eMode);
+	windowInfoObj.insert("ResolutionX", hyInit.windowInfoList[0].vSize.x);
+	windowInfoObj.insert("ResolutionY", hyInit.windowInfoList[0].vSize.y);
+	windowInfoObj.insert("LocationX", hyInit.windowInfoList[0].ptLocation.x);
+	windowInfoObj.insert("LocationY", hyInit.windowInfoList[0].ptLocation.y);
 	windowInfoArray.append(windowInfoObj);
 	jsonObj.insert("WindowInfo", windowInfoArray);
 
@@ -187,7 +187,7 @@ void DlgNewProject::on_buttonBox_accepted()
 
 void DlgNewProject::on_btnBrowse_clicked()
 {
-	QFileDialog *pDlg = new QFileDialog(this, "Choose the \"root\" location of the game project where the game project file will appear");
+	QFileDialog *pDlg = new QFileDialog(this, "Choose the location of the game project");
 	pDlg->setFileMode(QFileDialog::Directory);
 	pDlg->setOption(QFileDialog::ShowDirsOnly, true);
 
@@ -222,6 +222,11 @@ void DlgNewProject::on_txtTitleName_textChanged(const QString &arg1)
 	UpdateProjectDir();
 }
 
+void DlgNewProject::on_txtCodeName_textChanged(const QString &arg1)
+{
+	UpdateProjectDir();
+}
+
 void DlgNewProject::on_chkCreateGameDir_clicked()
 {
 	UpdateProjectDir();
@@ -229,10 +234,10 @@ void DlgNewProject::on_chkCreateGameDir_clicked()
 
 void DlgNewProject::UpdateProjectDir()
 {
-	ui->wgtDataDir->Setup("Assets", "data", GetProjDirPath());
-	ui->wgtMetaDir->Setup("Meta-Data", "meta", GetProjDirPath());
-	ui->wgtSourceDir->Setup("Source Code", "Source", GetProjDirPath(), "meta");
-	ui->wgtBuildDir->Setup("Build", "build", GetProjDirPath());
+	ui->wgtDataDir->Setup("Assets", "data", GetProjDirPath(), QString(), true);
+	ui->wgtMetaDir->Setup("Meta-Data", "meta", GetProjDirPath(), QString(), true);
+	ui->wgtSourceDir->Setup("Source Code", "Source", GetProjDirPath(), "meta", true);
+	ui->wgtBuildDir->Setup("Build", "build", GetProjDirPath(), QString(), true);
 }
 
 void DlgNewProject::ErrorCheck()

@@ -26,7 +26,6 @@
 
 //#define HY_USE_GLEW
 
-#define HY_MAXWINDOWS 1
 #define HY_ENDIAN_LITTLE
 
 #define HY_NEW new

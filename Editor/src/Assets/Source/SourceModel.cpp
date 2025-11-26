@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "SourceModel.h"
 #include "SourceFile.h"
-#include "SourceSettingsDlg.h"
+#include "DlgBuildSettings.h"
 #include "SourceGenFileDlg.h"
 #include "Project.h"
 #include "EntityModel.h"
@@ -126,7 +126,7 @@ QStringList SourceModel::GetEditorEntityList() const
 	}
 
 	bool bAccepted = false;
-	SourceSettingsDlg *pDlg = new SourceSettingsDlg(m_ProjectRef, m_BanksModel.GetBank(uiBankIndex)->m_MetaObj);
+	DlgBuildSettings *pDlg = new DlgBuildSettings(m_ProjectRef, m_BanksModel.GetBank(uiBankIndex)->m_MetaObj);
 	if(QDialog::Accepted == pDlg->exec())
 	{
 		pDlg->UpdateMetaObj(m_BanksModel.GetBank(uiBankIndex)->m_MetaObj);
