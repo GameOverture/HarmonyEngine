@@ -262,22 +262,10 @@ bool HyEngine::PollPlatformApi()
 	return sm_pInstance->m_Init;
 }
 
-/*static*/ float HyEngine::DeltaTime()
+/*static*/ std::string HyEngine::DateTime()
 {
-	HyAssert(sm_pInstance != nullptr, "HyEngine::DeltaTime() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Time.GetUpdateDelta();
-}
-
-/*static*/ double HyEngine::DeltaTimeD()
-{
-	HyAssert(sm_pInstance != nullptr, "HyEngine::DeltaTimeD() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Time.GetUpdateDeltaDbl();
-}
-
-/*static*/ void HyEngine::PauseGame(bool bPause)
-{
-	HyAssert(sm_pInstance != nullptr, "HyEngine::PauseGame() was invoked before engine has been initialized.");
-	sm_pInstance->m_Scene.SetPause(bPause);
+	HyAssert(sm_pInstance != nullptr, "HyEngine::DateTime() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Time.GetDateTime();
 }
 
 /*static*/ uint32 HyEngine::NumWindows()
@@ -292,28 +280,40 @@ bool HyEngine::PollPlatformApi()
 	return sm_pInstance->m_WindowManager.GetWindow(uiWindowIndex);
 }
 
-/*static*/ HyInput &HyEngine::Input()
+/*static*/ float HyEngine::DeltaTime()
 {
-	HyAssert(sm_pInstance != nullptr, "HyEngine::Input() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Input;
+	HyAssert(sm_pInstance != nullptr, "HyEngine::DeltaTime() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Time.GetUpdateDelta();
 }
 
-/*static*/ HyRendererInterop &HyEngine::Renderer()
+/*static*/ double HyEngine::DeltaTimeD()
 {
-	HyAssert(sm_pInstance != nullptr, "HyEngine::Renderer() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Renderer;
-}
-
-/*static*/ HyAudioCore &HyEngine::Audio()
-{
-	HyAssert(sm_pInstance != nullptr, "HyEngine::Audio() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Audio;
+	HyAssert(sm_pInstance != nullptr, "HyEngine::DeltaTimeD() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Time.GetUpdateDeltaDbl();
 }
 
 /*static*/ void HyEngine::LoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut)
 {
 	HyAssert(sm_pInstance != nullptr, "HyEngine::LoadingStatus() was invoked before engine has been initialized.");
 	return sm_pInstance->m_Assets.GetNodeLoadingStatus(uiNumQueuedOut, uiTotalOut);
+}
+
+/*static*/ void HyEngine::PauseGame(bool bPause)
+{
+	HyAssert(sm_pInstance != nullptr, "HyEngine::PauseGame() was invoked before engine has been initialized.");
+	sm_pInstance->m_Scene.SetPause(bPause);
+}
+
+/*static*/ HyInput &HyEngine::Input()
+{
+	HyAssert(sm_pInstance != nullptr, "HyEngine::Input() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Input;
+}
+
+/*static*/ HyAudioCore &HyEngine::Audio()
+{
+	HyAssert(sm_pInstance != nullptr, "HyEngine::Audio() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Audio;
 }
 
 /*static*/ HyDiagnostics &HyEngine::Diagnostics()
@@ -326,12 +326,6 @@ bool HyEngine::PollPlatformApi()
 {
 	HyAssert(sm_pInstance != nullptr, "HyEngine::DefaultShaderHandle() was invoked before engine has been initialized.");
 	return sm_pInstance->m_Renderer.GetDefaultShaderHandle(eType);
-}
-
-/*static*/ std::string HyEngine::DateTime()
-{
-	HyAssert(sm_pInstance != nullptr, "HyEngine::DateTime() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Time.GetDateTime();
 }
 
 /*static*/ std::string HyEngine::DataDir()

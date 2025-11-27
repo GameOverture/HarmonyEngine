@@ -98,18 +98,17 @@ private:
 public:
 	static bool IsInitialized();
 	static const HarmonyInit &InitValues();
-	static float DeltaTime();
-	static double DeltaTimeD();
-	static void PauseGame(bool bPause);
+	static std::string DateTime();
 	static uint32 NumWindows();
 	static HyWindow &Window(uint32 uiWindowIndex = 0);
-	static HyInput &Input();
-	static HyRendererInterop &Renderer();
-	static HyAudioCore &Audio();
+	static float DeltaTime();
+	static double DeltaTimeD();
 	static void LoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut);
+	static void PauseGame(bool bPause);
+	static HyInput &Input();
+	static HyAudioCore &Audio();
 	static HyDiagnostics &Diagnostics();
 	static HyShaderHandle DefaultShaderHandle(HyType eType);
-	static std::string DateTime();
 	static std::string DataDir();
 	static HyTextureQuadHandle CreateTexture(std::string sFilePath, HyTextureInfo textureInfo);
 	static HyAudioHandle CreateAudio(std::string sFilePath, bool bIsStreaming = false, int32 iInstanceLimit = 0, int32 iCategoryId = 0);
