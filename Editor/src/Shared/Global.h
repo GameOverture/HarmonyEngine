@@ -354,7 +354,31 @@ enum Theme
 	NUM_THEMES
 };
 
-//#define HYTREEWIDGETITEM_IsFilter				"HyTreeFilter"
+enum BuildType
+{
+	BUILD_Unknown = -1,
+
+	BUILD_Desktop = 0,
+	BUILD_Browser
+};
+
+//enum PlatformType
+//{
+//	PLAT_Desktop = 0,
+//	PLAT_Browser
+//};
+
+enum EntityItemDeclarationType
+{
+	ENTDECLTYPE_Unknown = -1,
+
+	ENTDECLTYPE_Static = 0,
+	ENTDECLTYPE_Dynamic,
+	ENTDECLTYPE_DynamicLeaked,
+
+	NUM_ENTDECLTYPES
+};
+const QString ENTITYITEMDECLARATIONTYPE_STRINGS[NUM_ENTDECLTYPES] = { "Static", "Dynamic", "DynamicLeaked" };
 
 #define HYGUIPATH_TempDir						"temp/"
 #define HYGUIPATH_TEMPSUBDIR_ImportTileSheet	"TileSheets"
@@ -368,6 +392,7 @@ enum Theme
 #define HYGUIPATH_MetaExt						".meta"
 #define HYGUIPATH_DataExt						".data"
 #define HYGUIPATH_UserExt						".user"
+#define HYGUIPATH_BuildExt						".build"
 
 #define HYMETA_FontsDir							"Fonts/"
 
@@ -390,18 +415,6 @@ struct FileDataPair
 	QJsonObject	m_Data;
 	QJsonObject	m_Meta;
 };
-
-enum EntityItemDeclarationType
-{
-	ENTDECLTYPE_Unknown = -1,
-
-	ENTDECLTYPE_Static = 0,
-	ENTDECLTYPE_Dynamic,
-	ENTDECLTYPE_DynamicLeaked,
-
-	NUM_ENTDECLTYPES
-};
-const QString ENTITYITEMDECLARATIONTYPE_STRINGS[NUM_ENTDECLTYPES] = { "Static", "Dynamic", "DynamicLeaked" };
 
 class HyGlobal
 {

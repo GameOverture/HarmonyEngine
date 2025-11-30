@@ -119,9 +119,6 @@ private Q_SLOTS:
 	void OnCtrlShiftTab();
 	void OnCtrlF4();
 
-	void OnProcessStdOut();
-	void OnProcessErrorOut();
-
 	void on_tabWidgetAssetManager_currentChanged(int iIndex);
 	void on_tabWidgetAux_currentChanged(int iIndex);
 
@@ -153,9 +150,6 @@ private Q_SLOTS:
 	void on_actionShowGridOrigin_triggered();
 	void on_actionShowGridOverlay_triggered();
 	void on_actionSnappingSettings_triggered();
-	
-	void on_actionBuildSettings_triggered();
-	void on_actionNewBuild_triggered();
 
 	void on_actionChangeHarmonyLocation_triggered();
 	void on_actionConnect_triggered();
@@ -177,7 +171,6 @@ private:
 	void SerializeColors(const QByteArray &serializedColors);
 
 	void NewItem(ItemType eItem);
-	void RefreshBuildMenu();
 	void SaveSettings();
 	void SelectTheme(Theme eTheme);
 };

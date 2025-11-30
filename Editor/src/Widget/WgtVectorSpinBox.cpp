@@ -172,18 +172,18 @@ void WgtVectorSpinBox::SetValue(QVariant data)
 	switch(ui->stackedWidget->currentIndex())
 	{
 	case SPINBOXTYPE_Int2d:
-		if(data.type() != QVariant::Point && data.type() != QVariant::Size)
+		if(data.typeId() != QMetaType::Type::QPoint && data.typeId() != QMetaType::Type::QSize)
 		{
 			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QPoint or QSize", LOGTYPE_Error);
 			return;
 		}
 
-		if(data.type() == QVariant::Point)
+		if(data.typeId() == QMetaType::Type::QPoint)
 		{
 			ui->intSpinBoxX->setValue(data.toPoint().x());
 			ui->intSpinBoxY->setValue(data.toPoint().y());
 		}
-		else if(data.type() == QVariant::Size)
+		else if(data.typeId() == QMetaType::Type::QSize)
 		{
 			ui->intSpinBoxX->setValue(data.toSize().width());
 			ui->intSpinBoxY->setValue(data.toSize().height());
@@ -191,18 +191,18 @@ void WgtVectorSpinBox::SetValue(QVariant data)
 		break;
 
 	case SPINBOXTYPE_Double2d:
-		if(data.type() != QVariant::PointF && data.type() != QVariant::SizeF)
+		if(data.typeId() != QMetaType::Type::QPointF && data.typeId() != QMetaType::Type::QSizeF)
 		{
 			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QPointF or QSizeF", LOGTYPE_Error);
 			return;
 		}
 
-		if(data.type() == QVariant::PointF)
+		if(data.typeId() == QMetaType::Type::QPointF)
 		{
 			ui->doubleSpinBoxX->setValue(data.toPointF().x());
 			ui->doubleSpinBoxY->setValue(data.toPointF().y());
 		}
-		else if(data.type() == QVariant::SizeF)
+		else if(data.typeId() == QMetaType::Type::QSizeF)
 		{
 			ui->doubleSpinBoxX->setValue(data.toSizeF().width());
 			ui->doubleSpinBoxY->setValue(data.toSizeF().height());
@@ -210,7 +210,7 @@ void WgtVectorSpinBox::SetValue(QVariant data)
 		break;
 
 	case SPINBOXTYPE_Int3d:
-		if(data.type() != QVariant::Rect)
+		if(data.typeId() != QMetaType::Type::QRect)
 		{
 			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QRect", LOGTYPE_Error);
 			return;
@@ -221,7 +221,7 @@ void WgtVectorSpinBox::SetValue(QVariant data)
 		break;
 
 	case SPINBOXTYPE_Double3d:
-		if(data.type() != QVariant::RectF)
+		if(data.typeId() != QMetaType::Type::QRectF)
 		{
 			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QRectF", LOGTYPE_Error);
 			return;
@@ -232,7 +232,7 @@ void WgtVectorSpinBox::SetValue(QVariant data)
 		break;
 
 	case SPINBOXTYPE_Int4d:
-		if(data.type() != QVariant::Rect)
+		if(data.typeId() != QMetaType::Type::QRect)
 		{
 			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QRect", LOGTYPE_Error);
 			return;
@@ -244,7 +244,7 @@ void WgtVectorSpinBox::SetValue(QVariant data)
 		break;
 
 	case SPINBOXTYPE_Double4d:
-		if(data.type() != QVariant::RectF)
+		if(data.typeId() != QMetaType::Type::QRectF)
 		{
 			HyGuiLog("WgtVectorSpinBox::SetValue() data type is not a QRectF", LOGTYPE_Error);
 			return;

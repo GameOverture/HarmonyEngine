@@ -98,18 +98,12 @@
      <string>&amp;View</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menu_Tool">
-    <property name="title">
-     <string>&amp;Tools</string>
-    </property>
-    <addaction name="actionChangeHarmonyLocation"/>
-    <addaction name="separator"/>
-    <addaction name="actionConnect"/>
-   </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionChangeHarmonyLocation"/>
+    <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menu_Edit">
@@ -117,20 +111,9 @@
      <string>&amp;Edit</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menu_Project">
-    <property name="title">
-     <string>&amp;Project</string>
-    </property>
-    <addaction name="actionProjectSettings"/>
-    <addaction name="separator"/>
-    <addaction name="actionBuildSettings"/>
-    <addaction name="actionNewBuild"/>
-   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menu_View"/>
-   <addaction name="menu_Project"/>
-   <addaction name="menu_Tool"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -619,24 +602,6 @@
     <string>F5</string>
    </property>
   </action>
-  <action name="actionNewBuild">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/items/Build-New.png</normaloff>:/icons16x16/items/Build-New.png</iconset>
-   </property>
-   <property name="text">
-    <string>New Build</string>
-   </property>
-   <property name="toolTip">
-    <string>Create a new build for the currently active project</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+B</string>
-   </property>
-  </action>
   <action name="actionAbout">
    <property name="text">
     <string>&amp;About</string>
@@ -800,21 +765,6 @@
    </property>
    <property name="text">
     <string>Open Containing Folder In Explorer</string>
-   </property>
-  </action>
-  <action name="actionBuildSettings">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/items/Build-Settings.png</normaloff>:/icons16x16/items/Build-Settings.png</iconset>
-   </property>
-   <property name="text">
-    <string>Build Settings</string>
-   </property>
-   <property name="toolTip">
-    <string>Change build settings for currently active project</string>
    </property>
   </action>
   <action name="actionShowGridOverlay">

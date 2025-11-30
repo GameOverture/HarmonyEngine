@@ -24,6 +24,9 @@ class ManagerWidget;
 class IManagerModel;
 class IAssetItemData;
 class TreeModelItemData;
+class QGroupBox;
+class QToolButton;
+class QComboBox;
 
 class ManagerProxyModel : public QSortFilterProxyModel
 {
@@ -62,10 +65,26 @@ class ManagerWidget : public QWidget
 	TreeModelItemData *			m_pContextMenuSelection;
 	bool						m_bUseContextMenuSelection;
 
-	// Only used with Source Manager
-	QLabel *					m_pBuildLabel;
-	QToolButton *				m_pNewBuildBtn;
-	QToolButton *				m_pBuildSettingsBtn;
+	// Only used with Code Manager
+	struct CodeWidgets
+	{
+		QGroupBox *				m_pGrp;
+		QToolButton *			m_pSettingsBtn;
+		QFrame *				m_pDividerLine;
+		QToolButton *			m_pNewBtn;
+		QComboBox *				m_pCmb;
+		QToolButton *			m_pOpenBtn;
+		QToolButton *			m_pPackageBtn;
+		QToolButton *			m_pDeleteBtn;
+
+		QLabel *				m_pLblInfo;
+
+		CodeWidgets(ManagerWidget *pManagerWidget, Ui::ManagerWidget *pUi);
+		void AssembleComboBox();
+		void RefreshInfo();
+		QString GetCurrentBuildUrl() const;
+	};
+	CodeWidgets *				m_pCodeWidgets;
 
 public:
 	explicit ManagerWidget(QWidget *pParent = nullptr);
@@ -77,6 +96,9 @@ public:
 	int GetSelectedBankIndex() const;
 	void SetSelectedBankIndex(int iBankIndex);
 
+	int GetSelectedBuildIndex() const;
+	void SetSelectedBuildIndex(int iBuildIndex);
+
 	bool IsShowAllBanksChecked() const;
 	void SetShowAllBanksChecked(bool bShowAllBanks);
 
@@ -84,8 +106,6 @@ public:
 
 	QStringList GetExpandedFilters();
 	void RestoreExpandedState(QStringList expandedFilterList);
-
-	void SetSettingsAction(QString sBuildLabel, QAction *pNewBuildAction, QAction *pBuildSettingsAction);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// NOTE: ExplorerWidget::GetSelected are synonymous functions - all fixes/enhancements should be copied over until refactored into a base class
@@ -125,9 +145,21 @@ private Q_SLOTS:
 	void on_chkShowAllBanks_clicked();
 
 	void on_txtSearch_textChanged(const QString &text);
+
+	void on_actionBuildSettings_triggered();
+	void on_actionNewBuild_triggered();
+	void on_actionOpenBuild_triggered();
+	void on_actionPackageBuild_triggered();
+	void on_actionDeleteBuild_triggered();
+
+	void OnBuildIndex(int iIndex);
 	
 private:
 	Ui::ManagerWidget *ui;
+
+private Q_SLOTS:
+	void OnProcessStdOut();
+	void OnProcessErrorOut();
 };
 
 #endif // ManagerWidget_H

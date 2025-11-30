@@ -15,7 +15,6 @@
 #include "DlgSetEngineLocation.h"
 #include "DlgNewProject.h"
 #include "DlgNewProjectItem.h"
-#include "DlgNewBuild.h"
 #include "DlgInputName.h"
 #include "DlgProjectSettings.h"
 #include "DlgSnappingSettings.h"
@@ -34,11 +33,9 @@
 #include <QVBoxLayout>
 #include <QTcpSocket>
 #include <QMessageBox>
-#include <QDesktopServices>
 #include <QDate>
 #include <QLabel>
 #include <QShortcut>
-#include <QProcess>
 
 /*static*/ MainWindow *MainWindow::sm_pInstance = nullptr;
 
@@ -95,8 +92,6 @@ MainWindow::MainWindow(QWidget *pParent) :
 	ui->explorer->addAction(ui->actionPaste);
 	ui->explorer->addAction(ui->actionRemove);
 	ui->explorer->addAction(ui->actionRename);
-	ui->explorer->addAction(ui->actionBuildSettings);
-	ui->explorer->addAction(ui->actionNewBuild);
 	ui->explorer->addAction(ui->actionActivateProject);
 	ui->explorer->addAction(ui->actionOpenFolderExplorer);
 	
@@ -285,9 +280,9 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		pProject->GetTabBar()->setParent(ui->stackedTabWidgets);
 	}
 
-	// Project manager widgets
+	// Asset manager types
 	ui->tabWidgetAssetManager->clear();
-	ui->tabWidgetAssetManager->addTab(pProject->GetSourceWidget(), QIcon(":/icons16x16/code.png"), "Source");
+	ui->tabWidgetAssetManager->addTab(pProject->GetSourceWidget(), QIcon(":/icons16x16/code.png"), "Code");
 	ui->tabWidgetAssetManager->addTab(pProject->GetAtlasWidget(), QIcon(":/icons16x16/atlas-file.png"), "Atlases");
 	//ui->tabWidgetAssetManager->addTab(pProject->GetGltfWidget(), HyGlobal::ItemIcon(ITEM_Prefab, SUBICON_None), "Prefabs");
 	ui->tabWidgetAssetManager->addTab(pProject->GetAudioWidget(), QIcon(":/icons16x16/audio-manager.png"), "Audio");
@@ -301,6 +296,8 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 		QStringList expandedSourceList = settings.value(HyGlobal::AssetName(ASSETMAN_Source)).toStringList();
 		pProject->GetSourceWidget()->RestoreExpandedState(expandedSourceList);
+		int iBuildIndex = settings.value(HyGlobal::AssetName(ASSETMAN_Source) + "BuildIndex").toInt();
+		pProject->GetSourceWidget()->SetSelectedBuildIndex(iBuildIndex);
 
 		int iAtlasBankIndex = settings.value(HyGlobal::AssetName(ASSETMAN_Atlases) + "BankIndex").toInt();
 		pProject->GetAtlasWidget()->SetSelectedBankIndex(iAtlasBankIndex);
@@ -327,8 +324,6 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		pProject->SetSnappingSettings(settings.value("SnappingSettings", QVariant(static_cast<uint>(SNAPSETTING_DefaultSettings))).toUInt(), false);
 	}
 	settings.endGroup();
-
-	RefreshBuildMenu();
 }
 
 /*static*/ Theme MainWindow::GetTheme()
@@ -678,18 +673,6 @@ void MainWindow::OnCtrlF4()
 		CloseItem(pCurProject->GetCurrentOpenItem());
 }
 
-void MainWindow::OnProcessStdOut()
-{
-	QProcess *p = (QProcess *)sender();
-	HyGuiLog(p->readAllStandardOutput(), LOGTYPE_Normal);
-}
-
-void MainWindow::OnProcessErrorOut()
-{
-	QProcess *p = (QProcess *)sender();
-	HyGuiLog(p->readAllStandardError(), LOGTYPE_Info);
-}
-
 void MainWindow::on_tabWidgetAssetManager_currentChanged(int iIndex)
 {
 	if(Harmony::GetProject() == nullptr)
@@ -971,85 +954,6 @@ void MainWindow::on_actionSnappingSettings_triggered()
 	delete pNewDlg;
 }
 
-void MainWindow::on_actionBuildSettings_triggered()
-{
-	if(Harmony::GetProject() == nullptr)
-	{
-		HyGuiLog("on_actionBuildSettings_triggered invoked with no loaded project", LOGTYPE_Error);
-		return;
-	}
-
-	Harmony::GetProject()->GetSourceModel().OnBankSettingsDlg(0);
-}
-
-void MainWindow::on_actionNewBuild_triggered()
-{
-	if(Harmony::GetProject() == nullptr)
-	{
-		HyGuiLog("on_actionNewBuild_triggered invoked with no loaded project", LOGTYPE_Error);
-		return;
-	}
-
-	DlgNewBuild *pDlg = new DlgNewBuild(*Harmony::GetProject(), this);
-	if(pDlg->exec() == QDialog::Accepted)
-	{
-		// TODO: FILE IO FAILS TO DELETE AND IMMEDIATELY CREATE!
-		QString sBuildPath = Harmony::GetProject()->GetBuildAbsPath();
-		QDir rootBuildDir(sBuildPath);
-		QDir buildDir(pDlg->GetAbsBuildDir());
-		if(rootBuildDir.exists())
-		{
-			if(buildDir.exists())
-			{
-				QFileInfoList tempFileInfoList = buildDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
-				if(tempFileInfoList.isEmpty() == false &&
-					QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Clean existing build", "Do you want to generate a new IDE and override existing build?", QMessageBox::Yes, QMessageBox::No))
-				{
-					buildDir.removeRecursively();
-					QThread::sleep(2);
-				}
-			}
-		}
-		else if(false == rootBuildDir.mkpath("."))
-		{
-			HyGuiLog("Could not create root build directory", LOGTYPE_Error);
-			return;
-		}
-
-		QProcess *pBuildProcess = new QProcess(this);
-		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(OnProcessStdOut()));
-		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardError()), this, SLOT(OnProcessErrorOut()));
-
-		connect(pBuildProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-			[=](int exitCode, QProcess::ExitStatus exitStatus) { RefreshBuildMenu(); QMessageBox::information(nullptr, "Build Complete", "Build '" % buildDir.dirName() % "' has completed."); });
-
-		QString sProc = pDlg->GetProc();
-		QStringList sArgList = pDlg->GetProcOptions();
-		pBuildProcess->start(sProc, sArgList);
-	}
-	delete pDlg;
-
-	//Harmony::GetProject()->RunCMakeGui();
-
-//	QStringList sFilterList;
-//
-//#if defined(Q_OS_WIN)
-//	sFilterList << "*.sln";
-//#endif
-//
-//	QDir srcDir(Harmony::GetProject()->GetSourceAbsPath());
-//	srcDir.setNameFilters(sFilterList);
-//	QFileInfoList ideFileInfoList = srcDir.entryInfoList();
-//
-//	if(ideFileInfoList.empty())
-//	{
-//		HyGuiLog("Could not find appropriate IDE file to launch", LOGTYPE_Error);
-//		return;
-//	}
-//
-//	QDesktopServices::openUrl(QUrl(ideFileInfoList[0].absoluteFilePath()));
-}
-
 void MainWindow::on_actionChangeHarmonyLocation_triggered()
 {
 	QDir engineDir(m_Settings.value("engineLocation").toString());
@@ -1081,8 +985,6 @@ void MainWindow::on_actionConnect_triggered()
 
 	//m_pDebugConnection->Connect();
 }
-
-
 
 void MainWindow::on_actionAbout_triggered()
 {
@@ -1193,68 +1095,6 @@ void MainWindow::NewItem(ItemType eItem)
 	}
 
 	delete pDlg;
-}
-
-void MainWindow::RefreshBuildMenu()
-{
-	// Clean out existing actionOpenIde's
-	ui->menu_Project->clear();
-	ui->menu_Project->addAction(ui->actionProjectSettings);
-	ui->menu_Project->addSeparator();
-	ui->menu_Project->addAction(ui->actionBuildSettings);
-	ui->menu_Project->addAction(ui->actionNewBuild);
-
-	if(Harmony::GetProject() == nullptr)
-		return;
-
-	QMenu *pBuildsMenu = nullptr;
-	Project *pProject = Harmony::GetProject();
-	QString sAbsBuildDir = pProject->GetBuildAbsPath();
-	QDir buildDir(sAbsBuildDir);
-	QStringList buildDirList = buildDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-	if(buildDirList.empty() == false)
-	{
-		ui->menu_Project->addSeparator();
-
-		for(auto sDirName : buildDirList)
-		{
-			QDir dir(buildDir.absolutePath() % "/" % sDirName);
-			QFileInfoList buildFileInfoList = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-
-			QString sBestAbsFilePath = dir.absolutePath();
-			bool bIdeFileFound = false;
-			for(auto fileInfo : buildFileInfoList)
-			{
-				// Look for .sln (Visual Studio)
-				if(fileInfo.suffix().compare("sln", Qt::CaseInsensitive) == 0)
-				{
-					sBestAbsFilePath = fileInfo.absoluteFilePath();
-					bIdeFileFound = true;
-					break;
-				}
-				// TODO: scan for other popular IDE's
-			}
-
-			// Setup the action and its trigger
-			if(pBuildsMenu == nullptr)
-				pBuildsMenu = ui->menu_Project->addMenu(QIcon(":/icons16x16/items/Build-Open.png"), "Builds");
-
-			QAction *pActionOpenIde = new QAction(pBuildsMenu);
-			pActionOpenIde->setText(sDirName);
-			pActionOpenIde->setIcon(QIcon(":/icons16x16/code.png"));
-			if(bIdeFileFound)
-				connect(pBuildsMenu, &QMenu::triggered, this, [this, sBestAbsFilePath]() { QDesktopServices::openUrl(QUrl(sBestAbsFilePath)); });
-			else // Couldn't determine the exact IDE file, so just open the build directory in explorer
-				connect(pBuildsMenu, &QMenu::triggered, this, [this, sBestAbsFilePath]() { HyGlobal::OpenFileInExplorer(sBestAbsFilePath); });
-
-			pBuildsMenu->addAction(pActionOpenIde);
-		}
-	}
-
-	pProject->GetSourceWidget()->SetSettingsAction(pProject->GetTitle() % " Build Settings:", ui->actionNewBuild, ui->actionBuildSettings);
-
-	//ui->menu_Build->addSeparator();
-	//ui->menu_Build->addAction(ui->actionNewPackage);
 }
 
 void MainWindow::SaveSettings()

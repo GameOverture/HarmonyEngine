@@ -1016,6 +1016,7 @@ void Project::SaveUserData() const
 		settings.setValue("TabIndex", MainWindow::GetAssetManagerTabIndex());
 
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Source), m_pSourceWidget->GetExpandedFilters());
+		settings.setValue(HyGlobal::AssetName(ASSETMAN_Source) + "BuildIndex", m_pSourceWidget->GetSelectedBuildIndex());
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Atlases), m_pAtlasWidget->GetExpandedFilters());
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Atlases) + "BankIndex", m_pAtlasWidget->GetSelectedBankIndex());
 		settings.setValue(HyGlobal::AssetName(ASSETMAN_Atlases) + "ShowAllBanks", m_pAtlasWidget->IsShowAllBanksChecked());

@@ -81,7 +81,7 @@ DlgNewBuild::DlgNewBuild(Project &projectRef, QWidget *parent) :
 	}
 
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
-	ui->stackedWidget->setCurrentIndex(PLAT_Desktop);
+	ui->stackedWidget->setCurrentIndex(BUILD_Desktop);
 
 	ErrorCheck();
 }
@@ -89,6 +89,16 @@ DlgNewBuild::DlgNewBuild(Project &projectRef, QWidget *parent) :
 DlgNewBuild::~DlgNewBuild()
 {
 	delete ui;
+}
+
+BuildType DlgNewBuild::GetBuildType() const
+{
+	if(ui->radDesktop->isChecked())
+		return BUILD_Desktop;
+	else if(ui->radBrowser->isChecked())
+		return BUILD_Browser;
+
+	return BUILD_Unknown;
 }
 
 QString DlgNewBuild::GetAbsBuildDir() const
@@ -157,14 +167,14 @@ void DlgNewBuild::on_buttonBox_accepted()
 
 void DlgNewBuild::on_radDesktop_clicked()
 {
-	ui->stackedWidget->setCurrentIndex(PLAT_Desktop);
+	ui->stackedWidget->setCurrentIndex(BUILD_Desktop);
 	ui->txtBuildName->setText("Desktop");
 	ErrorCheck();
 }
 
 void DlgNewBuild::on_radBrowser_clicked()
 {
-	ui->stackedWidget->setCurrentIndex(PLAT_Browser);
+	ui->stackedWidget->setCurrentIndex(BUILD_Browser);
 	ui->txtBuildName->setText("Browser");
 	ErrorCheck();
 }
@@ -245,7 +255,7 @@ void DlgNewBuild::ErrorCheck()
 			break;
 		}
 
-		if(ui->stackedWidget->currentIndex() == PLAT_Browser)
+		if(ui->stackedWidget->currentIndex() == BUILD_Browser)
 		{
 			QDir sdkDir(ui->txtEmscriptenSdk->text());
 			if(sdkDir.exists() == false)

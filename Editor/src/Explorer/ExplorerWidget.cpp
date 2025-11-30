@@ -383,8 +383,6 @@ void ExplorerWidget::OnClickedItem(ExplorerItemData *pItemClicked)
 {
 	bool bValidItem = (pItemClicked != nullptr);
 	FINDACTION("actionNewPrefix")->setEnabled(bValidItem);
-	FINDACTION("actionNewAudio")->setEnabled(bValidItem);
-	FINDACTION("actionNewParticle")->setEnabled(bValidItem);
 	FINDACTION("actionNewText")->setEnabled(bValidItem);
 	FINDACTION("actionNewSprite")->setEnabled(bValidItem);
 	FINDACTION("actionNewTileMap")->setEnabled(bValidItem);
@@ -394,8 +392,6 @@ void ExplorerWidget::OnClickedItem(ExplorerItemData *pItemClicked)
 	FINDACTION("actionNewEntity")->setEnabled(bValidItem);
 	FINDACTION("actionNewPrefab")->setEnabled(bValidItem);
 	FINDACTION("actionNewEntity3d")->setEnabled(bValidItem);
-	FINDACTION("actionBuildSettings")->setEnabled(bValidItem);
-	FINDACTION("actionNewBuild")->setEnabled(bValidItem);
 
 	if(pItemClicked)
 	{

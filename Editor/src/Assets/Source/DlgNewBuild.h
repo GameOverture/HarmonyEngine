@@ -24,16 +24,11 @@ class DlgNewBuild : public QDialog
 	QString					m_sCMakeHelp;
 	bool					m_bCMakeFound;
 
-	enum PlatformPage
-	{
-		PLAT_Desktop = 0,
-		PLAT_Browser
-	};
-
 public:
 	explicit DlgNewBuild(Project &projectRef, QWidget *parent = 0);
 	~DlgNewBuild();
 
+	BuildType GetBuildType() const;
 	QString GetAbsBuildDir() const;
 
 	QString GetProc() const;

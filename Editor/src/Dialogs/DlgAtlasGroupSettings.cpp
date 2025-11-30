@@ -20,6 +20,7 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObjec
 	m_InitialPackerSettingsObj(packerSettingsObj)
 {
 	ui->setupUi(this);
+	setWindowIcon(QIcon(":/icons16x16/atlas-file.png"));
 
 	ui->txtName->setText(m_InitialPackerSettingsObj["bankName"].toString());
 

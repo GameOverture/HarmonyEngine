@@ -27,12 +27,15 @@
 #include "SourceModel.h"
 #include "SourceFile.h"
 #include "AssetMimeData.h"
+#include "DlgNewBuild.h"
 
 #include <QUndoCommand>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDrag>
 #include <QMouseEvent>
+#include <QDesktopServices>
+#include <QProcess>
 
 ManagerProxyModel::ManagerProxyModel(QObject *pParent /*= nullptr*/) :
 	QSortFilterProxyModel(pParent),
@@ -115,6 +118,140 @@ void ManagerProxyModel::FilterByBankIndex(int iBankIndex)
 
 	return false;
 }
+
+ManagerWidget::CodeWidgets::CodeWidgets(ManagerWidget *pManagerWidget, Ui::ManagerWidget *pUi) :
+	m_pGrp(nullptr),
+	m_pSettingsBtn(nullptr),
+	m_pNewBtn(nullptr),
+	m_pCmb(nullptr),
+	m_pOpenBtn(nullptr),
+	m_pDeleteBtn(nullptr)
+{
+	// Setup Group Box build member widgets
+	m_pGrp = new QGroupBox("Build", pManagerWidget);
+	m_pGrp->setLayout(new QVBoxLayout());
+	// Set top and bottom margins to 2 pixels
+	m_pGrp->layout()->setContentsMargins(2, 2, 2, 4);
+	m_pGrp->layout()->setSpacing(4);
+
+	QHBoxLayout *pTopRow = new QHBoxLayout();
+	pTopRow->setSpacing(2);
+	m_pGrp->layout()->addItem(pTopRow);
+	//
+	m_pSettingsBtn = new QToolButton(pManagerWidget);
+	m_pSettingsBtn->setDefaultAction(pUi->actionBuildSettings);
+	pTopRow->addWidget(m_pSettingsBtn);
+	//
+	m_pDividerLine = new QFrame(pManagerWidget);
+	m_pDividerLine->setFrameShape(QFrame::VLine);
+	m_pDividerLine->setFrameShadow(QFrame::Sunken);
+	pTopRow->addWidget(m_pDividerLine);
+	//
+	m_pNewBtn = new QToolButton(pManagerWidget);
+	m_pNewBtn->setDefaultAction(pUi->actionNewBuild);
+	pTopRow->addWidget(m_pNewBtn);
+	//
+	m_pCmb = new QComboBox(pManagerWidget);
+	pTopRow->addWidget(m_pCmb);
+	//
+	m_pOpenBtn = new QToolButton(pManagerWidget);
+	m_pOpenBtn->setDefaultAction(pUi->actionOpenBuild);
+	pTopRow->addWidget(m_pOpenBtn);
+	//
+	m_pPackageBtn = new QToolButton(pManagerWidget);
+	m_pPackageBtn->setDefaultAction(pUi->actionPackageBuild);
+	pTopRow->addWidget(m_pPackageBtn);
+	//
+	m_pDeleteBtn = new QToolButton(pManagerWidget);
+	m_pDeleteBtn->setDefaultAction(pUi->actionDeleteBuild);
+	pTopRow->addWidget(m_pDeleteBtn);
+
+	QHBoxLayout *pBotRow = new QHBoxLayout();
+	m_pGrp->layout()->addItem(pBotRow);
+
+	m_pLblInfo = new QLabel(pManagerWidget);
+	m_pLblInfo->setText("No Builds Found");
+	pBotRow->addWidget(m_pLblInfo);
+	pBotRow->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
+	pUi->verticalLayout->insertWidget(0, m_pGrp);
+
+	AssembleComboBox();
+}
+
+void ManagerWidget::CodeWidgets::AssembleComboBox()
+{
+	m_pCmb->clear();
+	if(Harmony::GetProject() == nullptr)
+		return;
+
+	// Populate the build combo box
+	QDir buildDir(Harmony::GetProject()->GetBuildAbsPath());
+	QStringList buildDirList = buildDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+
+	for(auto sDirName : buildDirList)
+	{
+		QDir dir(buildDir.absolutePath() % "/" % sDirName);
+
+		// Open sDirName.hybuild to read build json settings
+		QFile buildFile(dir.absolutePath() % "/" % sDirName % HYGUIPATH_BuildExt);
+		if(buildFile.open(QIODevice::ReadOnly | QIODevice::Text))
+		{
+			QJsonDocument jsonDoc = QJsonDocument::fromJson(buildFile.readAll());
+			if(jsonDoc.isObject())
+			{
+				// Read and process the build settings from jsonObj
+				QJsonObject jsonObj = jsonDoc.object();
+				switch(static_cast<BuildType>(jsonObj["type"].toInt()))
+				{
+				case BUILD_Desktop:
+					m_pCmb->addItem(QIcon(":/icons16x16/Build-Desktop.png"), sDirName, QVariant(jsonObj));
+					break;
+
+				case BUILD_Browser:
+					m_pCmb->addItem(QIcon(":/icons16x16/Build-Browser.png"), sDirName, QVariant(jsonObj));
+					break;
+
+				default:
+					HyGuiLog("Unknown build type completed", LOGTYPE_Error);
+					break;
+				}
+			}
+		}
+		else
+			HyGuiLog("Failed to open build file: " % buildFile.fileName(), LOGTYPE_Error);
+	}
+
+	m_pOpenBtn->defaultAction()->setEnabled(m_pCmb->count() > 0);
+	m_pDeleteBtn->defaultAction()->setEnabled(m_pCmb->count() > 0);
+}
+
+void ManagerWidget::CodeWidgets::RefreshInfo()
+{
+	if(m_pCmb->currentIndex() < 0)
+	{
+		m_pLblInfo->setText("No Builds Found");
+		return;
+	}
+	QJsonObject jsonObj = m_pCmb->currentData().toJsonObject();
+	QFileInfo fileInfo(jsonObj["path"].toString());
+
+	if(Harmony::GetProject())
+	{
+		QDir buildDir(Harmony::GetProject()->GetDirPath());// GetBuildAbsPath());
+		m_pLblInfo->setText(buildDir.relativeFilePath(fileInfo.absoluteFilePath()));
+	}
+}
+
+QString ManagerWidget::CodeWidgets::GetCurrentBuildUrl() const
+{
+	if(m_pCmb->currentIndex() < 0)
+		return QString();
+	QJsonObject jsonObj = m_pCmb->currentData().toJsonObject();
+	return jsonObj["path"].toString();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 	QTreeView(pParent)
@@ -226,12 +363,15 @@ ManagerTreeView::ManagerTreeView(QWidget *pParent /*= nullptr*/) :
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 ManagerWidget::ManagerWidget(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::ManagerWidget),
 	m_pModel(nullptr),
 	m_pContextMenuSelection(nullptr),
-	m_bUseContextMenuSelection(false)
+	m_bUseContextMenuSelection(false),
+	m_pCodeWidgets(nullptr)
 {
 	ui->setupUi(this);
 
@@ -245,9 +385,7 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	m_pModel(pModel),
 	m_pContextMenuSelection(nullptr),
 	m_bUseContextMenuSelection(false),
-	m_pBuildLabel(nullptr),
-	m_pNewBuildBtn(nullptr),
-	m_pBuildSettingsBtn(nullptr)
+	m_pCodeWidgets(nullptr)
 {
 	ui->setupUi(this);
 
@@ -292,27 +430,17 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	ui->btnCreateFilter->setDefaultAction(ui->actionAddFilter);
 	ui->btnImportAssets->setDefaultAction(ui->actionImportAssets);
 	ui->btnImportDir->setDefaultAction(ui->actionImportDirectory);
-	ui->btnSyncFilterAssets->setDefaultAction(ui->actionSyncFilterAssets);
+	//ui->btnSyncFilterAssets->setDefaultAction(ui->actionSyncFilterAssets);
 
 	ui->btnDeleteAssets->setDefaultAction(ui->actionDeleteAssets);
 	ui->btnReplaceAssets->setDefaultAction(ui->actionReplaceAssets);
 
-	// Only Source Asset Manager is capable of generating new assets
 	if(m_pModel->GetAssetType() != ASSETMAN_Source)
-		ui->btnGenerateAsset->hide();
-	else
+		ui->btnGenerateAsset->hide(); // Only Source Asset Manager is capable of generating new assets
+	else // Code Assets
 	{
-		// Programmatically add a tool button that opens build settings
-		m_pBuildLabel = new QLabel("Build Settings:", this);
-		m_pNewBuildBtn = new QToolButton(this);
-		m_pBuildSettingsBtn = new QToolButton(this);
-
-		QHBoxLayout *pSettingsLayout = new QHBoxLayout();
-		pSettingsLayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-		pSettingsLayout->addWidget(m_pBuildLabel);
-		pSettingsLayout->addWidget(m_pNewBuildBtn);
-		pSettingsLayout->addWidget(m_pBuildSettingsBtn);
-		ui->verticalLayout->insertLayout(0, pSettingsLayout);
+		m_pCodeWidgets = new CodeWidgets(this, ui);
+		QObject::connect(m_pCodeWidgets->m_pCmb, SIGNAL(currentIndexChanged(int)), this, SLOT(OnBuildIndex(int)));
 		
 		// Change text and tool tips of Source Manager to make more sense
 		ui->actionGenerateAsset->setText("Add New File(s)");
@@ -371,6 +499,23 @@ void ManagerWidget::SetSelectedBankIndex(int iBankIndex)
 	RefreshInfo();
 }
 
+int ManagerWidget::GetSelectedBuildIndex() const
+{
+	if(m_pCodeWidgets)
+		return m_pCodeWidgets->m_pCmb->currentIndex();
+
+	return -1;
+}
+
+void ManagerWidget::SetSelectedBuildIndex(int iBuildIndex)
+{
+	if(m_pCodeWidgets)
+	{
+		m_pCodeWidgets->m_pCmb->setCurrentIndex(iBuildIndex);
+		RefreshInfo();
+	}
+}
+
 bool ManagerWidget::IsShowAllBanksChecked() const
 {
 	return ui->chkShowAllBanks->isChecked();
@@ -410,6 +555,9 @@ void ManagerWidget::RefreshInfo()
 
 		static_cast<ManagerProxyModel *>(ui->assetTree->model())->FilterByBankIndex(iBankIndex);
 	}
+
+	if(m_pCodeWidgets)
+		m_pCodeWidgets->RefreshInfo();
 }
 
 QStringList ManagerWidget::GetExpandedFilters()
@@ -454,16 +602,6 @@ void ManagerWidget::RestoreExpandedState(QStringList expandedFilterList)
 		QModelIndex proxyIndex = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapFromSource(srcIndex);
 		ui->assetTree->setExpanded(proxyIndex, bIsExpanded);
 	}
-}
-
-void ManagerWidget::SetSettingsAction(QString sBuildLabel, QAction *pNewBuildAction, QAction *pBuildSettingsAction)
-{
-	if(m_pBuildLabel)
-		m_pBuildLabel->setText(sBuildLabel);
-	if(m_pNewBuildBtn)
-		m_pNewBuildBtn->setDefaultAction(pNewBuildAction);
-	if(m_pBuildSettingsBtn)
-		m_pBuildSettingsBtn->setDefaultAction(pBuildSettingsAction);
 }
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -898,6 +1036,8 @@ void ManagerWidget::on_actionAddBank_triggered()
 		// This is a way of confirming user wants to create the bank. If canceled, the newly created empty bank is removed
 		if(m_pModel->OnBankSettingsDlg(ui->cmbBanks->count() - 1) == false)
 			on_actionRemoveBank_triggered();
+
+		RefreshInfo();
 	}
 
 	delete pDlg;
@@ -1162,4 +1302,168 @@ void ManagerWidget::on_txtSearch_textChanged(const QString &text)
 	//			ui->assetTree->expand(srcIndex);
 	//	}
 	//}
+}
+
+void ManagerWidget::on_actionBuildSettings_triggered()
+{
+	if(Harmony::GetProject() == nullptr)
+	{
+		HyGuiLog("on_actionBuildSettings_triggered invoked with no loaded project", LOGTYPE_Error);
+		return;
+	}
+
+	Harmony::GetProject()->GetSourceModel().OnBankSettingsDlg(0);
+}
+
+void ManagerWidget::on_actionNewBuild_triggered()
+{
+	if(Harmony::GetProject() == nullptr)
+	{
+		HyGuiLog("on_actionNewBuild_triggered invoked with no loaded project", LOGTYPE_Error);
+		return;
+	}
+
+	DlgNewBuild *pDlg = new DlgNewBuild(*Harmony::GetProject(), this);
+	if(pDlg->exec() == QDialog::Accepted)
+	{
+		BuildType eBuildType = pDlg->GetBuildType();
+		
+		QString sBuildPath = Harmony::GetProject()->GetBuildAbsPath();
+		QDir rootBuildDir(sBuildPath);
+		QDir buildDir(pDlg->GetAbsBuildDir());
+		if(rootBuildDir.exists())
+		{
+			if(buildDir.exists())
+			{
+				QFileInfoList tempFileInfoList = buildDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
+				if(tempFileInfoList.isEmpty() == false &&
+					QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Clean existing build", "Do you want to generate a new IDE and override existing build?", QMessageBox::Yes, QMessageBox::No))
+				{
+					buildDir.removeRecursively();
+					QThread::sleep(2);
+				}
+			}
+		}
+		else if(false == rootBuildDir.mkpath("."))
+		{
+			HyGuiLog("Could not create root build directory", LOGTYPE_Error);
+			return;
+		}
+
+		
+
+		QProcess *pBuildProcess = new QProcess(this);
+		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(OnProcessStdOut()));
+		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardError()), this, SLOT(OnProcessErrorOut()));
+		QObject::connect(pBuildProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+			[this, eBuildType, buildDir](int exitCode, QProcess::ExitStatus exitStatus)
+			{
+				QFileInfoList buildFileInfoList = buildDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+
+				QString sDirName = buildDir.dirName();
+				QString sBestAbsFilePath = buildDir.absolutePath();
+				
+				switch(eBuildType)
+				{
+				case BUILD_Desktop:
+					for(auto fileInfo : buildFileInfoList)
+					{
+						if(fileInfo.suffix().compare("sln", Qt::CaseInsensitive) == 0) // Look for .sln (Visual Studio)
+						{
+							sBestAbsFilePath = fileInfo.absoluteFilePath();
+							break;
+						}
+						// TODO: scan for other popular IDE's
+					}
+					break;
+
+				case BUILD_Browser:
+					break;
+
+				default:
+					HyGuiLog("Unknown build type completed", LOGTYPE_Error);
+					break;
+				}
+
+				// Write the build JSON file
+				QJsonObject jsonObj;
+				jsonObj["type"] = static_cast<int>(eBuildType);
+				jsonObj["name"] = sDirName;
+				jsonObj["path"] = sBestAbsFilePath;
+
+				QFile jsonFile(buildDir.filePath(sDirName % HYGUIPATH_BuildExt));
+				if(jsonFile.open(QIODevice::WriteOnly))
+				{
+					if(jsonFile.write(QJsonDocument(jsonObj).toJson()) == -1)
+						HyGuiLog("Could not write build JSON file", LOGTYPE_Error);
+					jsonFile.close();
+				}
+				else
+					HyGuiLog("Could not create build JSON file", LOGTYPE_Error);
+
+				m_pCodeWidgets->AssembleComboBox();
+				m_pCodeWidgets->m_pCmb->setCurrentIndex(m_pCodeWidgets->m_pCmb->findText(sDirName));
+				QMessageBox::information(nullptr, "Build Complete", "Build '" % buildDir.dirName() % "' has completed.");
+			});
+
+		QString sProc = pDlg->GetProc();
+		QStringList sArgList = pDlg->GetProcOptions();
+		pBuildProcess->start(sProc, sArgList);
+	}
+	delete pDlg;
+}
+
+void ManagerWidget::on_actionOpenBuild_triggered()
+{
+	if(Harmony::GetProject() == nullptr)
+	{
+		HyGuiLog("on_actionOpenBuild_triggered invoked with no loaded project", LOGTYPE_Error);
+		return;
+	}
+	if(m_pCodeWidgets == nullptr)
+	{
+		HyGuiLog("Build widgets not initialized", LOGTYPE_Error);
+		return;
+	}
+
+	QDesktopServices::openUrl(QUrl(m_pCodeWidgets->GetCurrentBuildUrl()));
+
+	//if(bIdeFileFound)
+	//	connect(pBuildsMenu, &QMenu::triggered, this, [this, sBestAbsFilePath]() { QDesktopServices::openUrl(QUrl(sBestAbsFilePath)); });
+	//else // Couldn't determine the exact IDE file, so just open the build directory in explorer
+	//	connect(pBuildsMenu, &QMenu::triggered, this, [this, sBestAbsFilePath]() { HyGlobal::OpenFileInExplorer(sBestAbsFilePath); });
+	//QDir buildDir(Harmony::GetProject()->GetBuildAbsPath());
+	//if(buildDir.exists() == false)
+	//{
+	//	HyGuiLog("Build directory does not exist", LOGTYPE_Error);
+	//	return;
+	//}
+	//HyGlobal::OpenFileInExplorer(buildDir.absolutePath());
+}
+
+void ManagerWidget::on_actionPackageBuild_triggered()
+{
+	// TODO: Implement dialog and packaging process
+}
+
+void ManagerWidget::on_actionDeleteBuild_triggered()
+{
+
+}
+
+void ManagerWidget::OnBuildIndex(int iIndex)
+{
+	RefreshInfo();
+}
+
+void ManagerWidget::OnProcessStdOut()
+{
+	QProcess *p = (QProcess *)sender();
+	HyGuiLog(p->readAllStandardOutput(), LOGTYPE_Normal);
+}
+
+void ManagerWidget::OnProcessErrorOut()
+{
+	QProcess *p = (QProcess *)sender();
+	HyGuiLog(p->readAllStandardError(), LOGTYPE_Info);
 }

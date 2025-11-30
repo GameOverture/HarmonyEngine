@@ -22,6 +22,8 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 	ui(new Ui::DlgAssetProperties)
 {
 	ui->setupUi(this);
+
+	setWindowIcon(HyGlobal::AssetIcon(pManagerModel->GetAssetType(), SUBICON_Settings));
 	ui->stackedAssetType->setCurrentIndex(pManagerModel->GetAssetType());
 
 	// Assign values to each combobox entry
