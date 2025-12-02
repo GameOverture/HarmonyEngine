@@ -63,6 +63,9 @@ if(Qt6_DIR)
 		src/Assets/Source/DlgNewBuild.cpp
 		src/Assets/Source/DlgNewBuild.h
 		src/Assets/Source/DlgNewBuild.ui
+		src/Assets/Source/DlgPackageBuild.cpp
+		src/Assets/Source/DlgPackageBuild.h
+		src/Assets/Source/DlgPackageBuild.ui
 		src/Assets/Source/SourceFile.cpp
 		src/Assets/Source/SourceFile.h
 		src/Assets/Source/SourceModel.cpp

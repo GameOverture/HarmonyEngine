@@ -81,7 +81,6 @@ DlgNewBuild::DlgNewBuild(Project &projectRef, QWidget *parent) :
 	}
 
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
-	ui->stackedWidget->setCurrentIndex(BUILD_Desktop);
 
 	ErrorCheck();
 }
@@ -91,68 +90,20 @@ DlgNewBuild::~DlgNewBuild()
 	delete ui;
 }
 
-BuildType DlgNewBuild::GetBuildType() const
-{
-	if(ui->radDesktop->isChecked())
-		return BUILD_Desktop;
-	else if(ui->radBrowser->isChecked())
-		return BUILD_Browser;
-
-	return BUILD_Unknown;
-}
-
 QString DlgNewBuild::GetAbsBuildDir() const
 {
 	return m_ProjectRef.GetBuildAbsPath() % ui->txtBuildName->text();
 }
 
-QString DlgNewBuild::GetProc() const
-{
-	if(ui->radDesktop->isChecked())
-		return "cmake";
-	else if(ui->radBrowser->isChecked())
-	{
-#ifdef Q_OS_WIN
-		return MainWindow::EngineSrcLocation() % HYGUIPATH_EditorDataDir % "embuild.bat";
-#else
-		HyGuiLog("DlgNewBuild::GetProc() not implemented on this platform", LOGTYPE_Error);
-#endif
-	}
-
-	return QString();
-}
-
 QStringList DlgNewBuild::GetProcOptions() const
 {
-	if(ui->radDesktop->isChecked())
-	{
-		return QStringList()	<< "-G"
-								<< ui->cmbCMake->currentText()
-								<< ui->txtCMakeOptions->text().split(' ', Qt::SkipEmptyParts)
-								<< "-S"
-								<< m_ProjectRef.GetSourceAbsPath()
-								<< "-B"
-								<< GetAbsBuildDir();
-	}
-	else if(ui->radBrowser->isChecked())
-	{
-		QDir buildDir(GetAbsBuildDir());
-		QString sFormattedPath = buildDir.absolutePath();
-#ifdef Q_OS_WIN
-		sFormattedPath.replace("/", "\\");	// batch file requires Windows native directory separators
-#endif
-
-		QString sCMakeCmds = "";
-		if(ui->chkBrowserDebug->isChecked())
-			sCMakeCmds += "-DHYBUILD_DebugEmscripten"; // Batch files replace '=' with space if you don't use quotes
-
-		return QStringList()	<< sFormattedPath
-								<< QDir::cleanPath(ui->txtEmscriptenSdk->text())
-								<< QDir::cleanPath(buildDir.relativeFilePath(m_ProjectRef.GetSourceAbsPath()))
-								<< sCMakeCmds;
-	}
-
-	return QStringList();
+	return QStringList()	<< "-G"
+							<< ui->cmbCMake->currentText()
+							<< ui->txtCMakeOptions->text().split(' ', Qt::SkipEmptyParts)
+							<< "-S"
+							<< m_ProjectRef.GetSourceAbsPath()
+							<< "-B"
+							<< GetAbsBuildDir();
 }
 
 void DlgNewBuild::on_txtBuildName_textChanged(const QString &arg1)
@@ -163,20 +114,6 @@ void DlgNewBuild::on_txtBuildName_textChanged(const QString &arg1)
 void DlgNewBuild::on_buttonBox_accepted()
 {
 	
-}
-
-void DlgNewBuild::on_radDesktop_clicked()
-{
-	ui->stackedWidget->setCurrentIndex(BUILD_Desktop);
-	ui->txtBuildName->setText("Desktop");
-	ErrorCheck();
-}
-
-void DlgNewBuild::on_radBrowser_clicked()
-{
-	ui->stackedWidget->setCurrentIndex(BUILD_Browser);
-	ui->txtBuildName->setText("Browser");
-	ErrorCheck();
 }
 
 void DlgNewBuild::on_radCMake_clicked()
@@ -212,29 +149,6 @@ void DlgNewBuild::on_btnCMakeHelp_clicked()
 	QMessageBox::information(this, "CMake Help", m_sCMakeHelp, QMessageBox::Ok);
 }
 
-void DlgNewBuild::on_txtEmscriptenSdk_textChanged(const QString &arg1)
-{
-	ErrorCheck();
-}
-
-void DlgNewBuild::on_btnEmscriptenSdkBrowse_clicked()
-{
-	QFileDialog *pDlg = new QFileDialog(this, "Choose the \"root\" location of the Emscripten SDK");
-	pDlg->setFileMode(QFileDialog::Directory);
-	pDlg->setOption(QFileDialog::ShowDirsOnly, true);
-	pDlg->setViewMode(QFileDialog::Detail);
-	pDlg->setWindowModality(Qt::ApplicationModal);
-	pDlg->setModal(true);
-
-	if(pDlg->exec() == QDialog::Accepted)
-	{
-		QString sDir = pDlg->selectedFiles()[0];
-		ui->txtEmscriptenSdk->setText(sDir);
-	}
-
-	ErrorCheck();
-}
-
 void DlgNewBuild::ErrorCheck()
 {
 	bool bIsError = false;
@@ -253,26 +167,6 @@ void DlgNewBuild::ErrorCheck()
 			ui->lblError->setText("Build directory already exists");
 			bIsError = true;
 			break;
-		}
-
-		if(ui->stackedWidget->currentIndex() == BUILD_Browser)
-		{
-			QDir sdkDir(ui->txtEmscriptenSdk->text());
-			if(sdkDir.exists() == false)
-			{
-				ui->lblError->setText("Error: Emscripten SDK location doesn't exist");
-				bIsError = true;
-				break;
-			}
-
-			if(!sdkDir.exists("emsdk.py") ||
-				!sdkDir.exists("emsdk_env.sh") ||
-				!sdkDir.exists("emcmdprompt.bat"))
-			{
-				ui->lblError->setText("Error: Emscripten SDK location is not valid");
-				bIsError = true;
-				break;
-			}
 		}
 
 	} while(false);

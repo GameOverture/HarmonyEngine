@@ -28,6 +28,7 @@
 #include "SourceFile.h"
 #include "AssetMimeData.h"
 #include "DlgNewBuild.h"
+#include "DlgPackageBuild.h"
 
 #include <QUndoCommand>
 #include <QMessageBox>
@@ -193,7 +194,7 @@ void ManagerWidget::CodeWidgets::AssembleComboBox()
 	{
 		QDir dir(buildDir.absolutePath() % "/" % sDirName);
 
-		// Open sDirName.hybuild to read build json settings
+		// Open sDirName.build to read build json settings
 		QFile buildFile(dir.absolutePath() % "/" % sDirName % HYGUIPATH_BuildExt);
 		if(buildFile.open(QIODevice::ReadOnly | QIODevice::Text))
 		{
@@ -202,20 +203,22 @@ void ManagerWidget::CodeWidgets::AssembleComboBox()
 			{
 				// Read and process the build settings from jsonObj
 				QJsonObject jsonObj = jsonDoc.object();
-				switch(static_cast<BuildType>(jsonObj["type"].toInt()))
-				{
-				case BUILD_Desktop:
-					m_pCmb->addItem(QIcon(":/icons16x16/Build-Desktop.png"), sDirName, QVariant(jsonObj));
-					break;
+				m_pCmb->addItem(QIcon(":/icons16x16/Build-Desktop.png"), sDirName, QVariant(jsonObj));
 
-				case BUILD_Browser:
-					m_pCmb->addItem(QIcon(":/icons16x16/Build-Browser.png"), sDirName, QVariant(jsonObj));
-					break;
+				//switch(static_cast<BuildType>(jsonObj["type"].toInt()))
+				//{
+				//case BUILD_Desktop:
+				//	m_pCmb->addItem(QIcon(":/icons16x16/Build-Desktop.png"), sDirName, QVariant(jsonObj));
+				//	break;
 
-				default:
-					HyGuiLog("Unknown build type completed", LOGTYPE_Error);
-					break;
-				}
+				//case BUILD_Browser:
+				//	m_pCmb->addItem(QIcon(":/icons16x16/Build-Browser.png"), sDirName, QVariant(jsonObj));
+				//	break;
+
+				//default:
+				//	HyGuiLog("Unknown build type completed", LOGTYPE_Error);
+				//	break;
+				//}
 			}
 		}
 		else
@@ -1097,6 +1100,8 @@ void ManagerWidget::on_actionImportAssets_triggered()
 	dlg.setModal(true);
 
 	QStringList sFilterList;
+	if(m_pModel->GetAssetType() == ASSETMAN_Source)
+		sFilterList += "Code(*.cpp *.c *.h *.hpp *.cxx)";
 	for(int i = 0; i < m_pModel->GetSupportedFileExtList().size(); ++i)
 		sFilterList += "*" % m_pModel->GetSupportedFileExtList()[i];
 	sFilterList += "*.*";
@@ -1326,23 +1331,13 @@ void ManagerWidget::on_actionNewBuild_triggered()
 	DlgNewBuild *pDlg = new DlgNewBuild(*Harmony::GetProject(), this);
 	if(pDlg->exec() == QDialog::Accepted)
 	{
-		BuildType eBuildType = pDlg->GetBuildType();
-		
 		QString sBuildPath = Harmony::GetProject()->GetBuildAbsPath();
 		QDir rootBuildDir(sBuildPath);
 		QDir buildDir(pDlg->GetAbsBuildDir());
 		if(rootBuildDir.exists())
 		{
 			if(buildDir.exists())
-			{
-				QFileInfoList tempFileInfoList = buildDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
-				if(tempFileInfoList.isEmpty() == false &&
-					QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Clean existing build", "Do you want to generate a new IDE and override existing build?", QMessageBox::Yes, QMessageBox::No))
-				{
-					buildDir.removeRecursively();
-					QThread::sleep(2);
-				}
-			}
+				HyGuiLog("Build directory already exists", LOGTYPE_Error);
 		}
 		else if(false == rootBuildDir.mkpath("."))
 		{
@@ -1350,44 +1345,30 @@ void ManagerWidget::on_actionNewBuild_triggered()
 			return;
 		}
 
-		
-
 		QProcess *pBuildProcess = new QProcess(this);
 		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(OnProcessStdOut()));
 		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardError()), this, SLOT(OnProcessErrorOut()));
 		QObject::connect(pBuildProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-			[this, eBuildType, buildDir](int exitCode, QProcess::ExitStatus exitStatus)
+			[this, buildDir](int exitCode, QProcess::ExitStatus exitStatus)
 			{
 				QFileInfoList buildFileInfoList = buildDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 
 				QString sDirName = buildDir.dirName();
 				QString sBestAbsFilePath = buildDir.absolutePath();
 				
-				switch(eBuildType)
+				for(auto fileInfo : buildFileInfoList)
 				{
-				case BUILD_Desktop:
-					for(auto fileInfo : buildFileInfoList)
+					if(fileInfo.suffix().compare("sln", Qt::CaseInsensitive) == 0) // Look for .sln (Visual Studio)
 					{
-						if(fileInfo.suffix().compare("sln", Qt::CaseInsensitive) == 0) // Look for .sln (Visual Studio)
-						{
-							sBestAbsFilePath = fileInfo.absoluteFilePath();
-							break;
-						}
-						// TODO: scan for other popular IDE's
+						sBestAbsFilePath = fileInfo.absoluteFilePath();
+						break;
 					}
-					break;
-
-				case BUILD_Browser:
-					break;
-
-				default:
-					HyGuiLog("Unknown build type completed", LOGTYPE_Error);
-					break;
+					// TODO: scan for other popular IDE's
 				}
 
 				// Write the build JSON file
 				QJsonObject jsonObj;
-				jsonObj["type"] = static_cast<int>(eBuildType);
+				jsonObj["type"] = 0; // NOTE: For potential future use
 				jsonObj["name"] = sDirName;
 				jsonObj["path"] = sBestAbsFilePath;
 
@@ -1406,9 +1387,8 @@ void ManagerWidget::on_actionNewBuild_triggered()
 				QMessageBox::information(nullptr, "Build Complete", "Build '" % buildDir.dirName() % "' has completed.");
 			});
 
-		QString sProc = pDlg->GetProc();
 		QStringList sArgList = pDlg->GetProcOptions();
-		pBuildProcess->start(sProc, sArgList);
+		pBuildProcess->start("cmake", sArgList);
 	}
 	delete pDlg;
 }
@@ -1443,12 +1423,56 @@ void ManagerWidget::on_actionOpenBuild_triggered()
 
 void ManagerWidget::on_actionPackageBuild_triggered()
 {
-	// TODO: Implement dialog and packaging process
+	if(Harmony::GetProject() == nullptr)
+	{
+		HyGuiLog("on_actionPackageBuild_triggered invoked with no loaded project", LOGTYPE_Error);
+		return;
+	}
+
+	DlgPackageBuild *pDlg = new DlgPackageBuild(*Harmony::GetProject(), this);
+	if(pDlg->exec() == QDialog::Accepted)
+	{
+		QDir packageDir(pDlg->GetAbsPackageDir());
+		if(false == packageDir.mkpath("."))
+		{
+			HyGuiLog("Could not create package directory", LOGTYPE_Error);
+			return;
+		}
+
+		QProcess *pBuildProcess = new QProcess(this);
+		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(OnProcessStdOut()));
+		QObject::connect(pBuildProcess, SIGNAL(readyReadStandardError()), this, SLOT(OnProcessErrorOut()));
+		QObject::connect(pBuildProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+			[this, packageDir](int exitCode, QProcess::ExitStatus exitStatus)
+			{
+				QMessageBox::information(nullptr, "Package Complete", "Package '" % packageDir.dirName() % "' has completed.");
+				HyGlobal::OpenFileInExplorer(packageDir.absolutePath());
+			});
+
+		QString sProc = pDlg->GetProc();
+		QStringList sArgList = pDlg->GetProcOptions();
+		pBuildProcess->start(sProc, sArgList);
+	}
+	delete pDlg;
 }
 
 void ManagerWidget::on_actionDeleteBuild_triggered()
 {
+	QString sBuildPath = Harmony::GetProject()->GetBuildAbsPath() % m_pCodeWidgets->m_pCmb->currentText();
+	QDir buildDir(sBuildPath);
+	if(buildDir.exists())
+	{
+		QFileInfoList tempFileInfoList = buildDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
+		if(tempFileInfoList.isEmpty() == false &&
+			QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Delete existing build", "Do you want to delete build: " % buildDir.dirName() % "?", QMessageBox::Yes, QMessageBox::No))
+		{
+			buildDir.removeRecursively();
+			QThread::sleep(2);
 
+			if(m_pCodeWidgets)
+				m_pCodeWidgets->AssembleComboBox();
+		}
+	}
 }
 
 void ManagerWidget::OnBuildIndex(int iIndex)

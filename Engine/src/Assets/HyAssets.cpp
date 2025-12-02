@@ -70,11 +70,11 @@ const tData *HyAssets::Factory<tData>::GetData(const HyNodePath &nodePath) const
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-HyAssets::HyAssets(HyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataDirPath) :
+HyAssets::HyAssets(HyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataPath) :
 	IHyThreadClass(HYTHREAD_Lowest),
 	m_AudioCoreRef(audioCoreRef),
 	m_SceneRef(sceneRef),
-	m_sDATADIR(HyIO::CleanPath(sDataDirPath.c_str(), "/")),
+	m_sDATAPATH(HyIO::CleanPath(sDataPath.c_str(), "/")),
 	m_bInitialized(false),
 	m_uiLoadingCountTotal(0)
 {
@@ -129,9 +129,9 @@ HyAudioCore &HyAssets::GetAudioCore() const
 	return m_AudioCoreRef;
 }
 
-const std::string &HyAssets::GetDataDir()
+const std::string &HyAssets::GetDataPath()
 {
-	return m_sDATADIR;
+	return m_sDATAPATH;
 }
 
 bool HyAssets::IsInitialized()
@@ -701,11 +701,11 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 	switch(eFileType)
 	{
 	case HYFILE_Atlas:
-		sManifestFilePath = m_sDATADIR + HYASSETS_AtlasDir + HYASSETS_AtlasFile;
+		sManifestFilePath = m_sDATAPATH + HYASSETS_AtlasDir + HYASSETS_AtlasFile;
 		break;
 
 	case HYFILE_AudioBank:
-		sManifestFilePath = m_sDATADIR + HYASSETS_AudioDir + HYASSETS_AudioFile;
+		sManifestFilePath = m_sDATAPATH + HYASSETS_AudioDir + HYASSETS_AudioFile;
 		break;
 
 	default:
@@ -796,7 +796,7 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 
 			uint32 uiBankId = bankObj["bankId"].GetUint();
 
-			std::string sBankFilePath = GetDataDir() + HYASSETS_AudioDir;
+			std::string sBankFilePath = GetDataPath() + HYASSETS_AudioDir;
 			sprintf(szTmpBuffer, "%05d", uiBankId);
 			sBankFilePath += szTmpBuffer;
 

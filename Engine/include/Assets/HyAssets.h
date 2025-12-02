@@ -48,7 +48,7 @@ class HyAssets : public IHyThreadClass
 {
 	HyAudioCore &												m_AudioCoreRef;
 	HyScene &													m_SceneRef;
-	const std::string											m_sDATADIR;
+	const std::string											m_sDATAPATH;
 	std::atomic<bool>											m_bInitialized;
 
 	struct FilesMap {
@@ -91,11 +91,11 @@ class HyAssets : public IHyThreadClass
 	uint32														m_uiLoadingCountTotal;	// Used to determine best guess at % loaded of all queued assets [0.0 - 1.0]
 
 public:
-	HyAssets(HyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataDirPath);
+	HyAssets(HyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDataPath);
 	virtual ~HyAssets();
 
 	HyAudioCore &GetAudioCore() const;
-	const std::string &GetDataDir();
+	const std::string &GetDataPath();
 	bool IsInitialized();
 
 	IHyFile *GetFile(HyFileType eFileType, uint32 uiManifestIndex);

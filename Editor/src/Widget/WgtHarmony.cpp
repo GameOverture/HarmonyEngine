@@ -100,7 +100,7 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 
 	HarmonyInit initStruct;
 	initStruct.sGameName = m_pProject->GetTitle().toStdString();
-	initStruct.sDataDir = m_pProject->GetAssetsAbsPath().toStdString();
+	initStruct.sDataPath = m_pProject->GetAssetsAbsPath().toStdString();
 	m_pHyEngine = new GuiHyEngine(initStruct, m_pProject);
 }
 

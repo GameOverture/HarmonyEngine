@@ -354,19 +354,13 @@ enum Theme
 	NUM_THEMES
 };
 
-enum BuildType
+enum PackageType
 {
-	BUILD_Unknown = -1,
+	PACKAGE_Unknown = -1,
 
-	BUILD_Desktop = 0,
-	BUILD_Browser
+	PACKAGE_Desktop = 0,
+	PACKAGE_Browser
 };
-
-//enum PlatformType
-//{
-//	PLAT_Desktop = 0,
-//	PLAT_Browser
-//};
 
 enum EntityItemDeclarationType
 {

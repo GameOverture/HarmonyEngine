@@ -102,7 +102,7 @@ HarmonyInit::HarmonyInit()
 	sProjectDir = ".";
 
 	sGameName = "Untitled Game";
-	sDataDir = "data";
+	sDataPath = "data";
 	uiUpdatesPerSec = 0;
 	iVSync = 1;
 	uiNumInputMaps = 1;
@@ -144,34 +144,34 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	}
 	HyAssert(projDoc.IsObject(), "HarmonyInit parsed a json file that wasn't an object");
 
-	if(projDoc.HasMember("AdjustWorkingDirectory"))
-	{
-		sProjectDir = projDoc["AdjustWorkingDirectory"].GetString();
-		sHyProjFileName = sProjectDir + "/" + sHyProjFileName;
-		sHyProjFileName = HyIO::CleanPath(sHyProjFileName.c_str(), ".hyproj");
+	//if(projDoc.HasMember("AdjustWorkingDirectory"))
+	//{
+	//	sProjectDir = projDoc["AdjustWorkingDirectory"].GetString();
+	//	sHyProjFileName = sProjectDir + "/" + sHyProjFileName;
+	//	sHyProjFileName = HyIO::CleanPath(sHyProjFileName.c_str(), ".hyproj");
 
-		std::vector<char> trueProjFileContents;
-		HyIO::ReadTextFile(sHyProjFileName.c_str(), trueProjFileContents);
-		if(projDoc.ParseInsitu(trueProjFileContents.data()).HasParseError())
-		{
-			HyError("HarmonyInit's AdjustWorkingDirectory had JSON parsing error: " << rapidjson::GetParseErrorFunc(projDoc.GetParseError()));
-			return;
-		}
-		HyAssert(projDoc.IsObject(), "HarmonyInit's AdjustWorkingDirectory parsed a json file that wasn't an object");
+	//	std::vector<char> trueProjFileContents;
+	//	HyIO::ReadTextFile(sHyProjFileName.c_str(), trueProjFileContents);
+	//	if(projDoc.ParseInsitu(trueProjFileContents.data()).HasParseError())
+	//	{
+	//		HyError("HarmonyInit's AdjustWorkingDirectory had JSON parsing error: " << rapidjson::GetParseErrorFunc(projDoc.GetParseError()));
+	//		return;
+	//	}
+	//	HyAssert(projDoc.IsObject(), "HarmonyInit's AdjustWorkingDirectory parsed a json file that wasn't an object");
 
-		sDataDir = sProjectDir + "/";
-		sDataDir += projDoc["DataPath"].GetString();
-	}
-	else
+	//	sDataDir = sProjectDir + "/";
+	//	sDataDir += projDoc["DataPath"].GetString();
+	//}
+	//else
 	{
 		sProjectDir = ".";
-		sDataDir = projDoc["DataPath"].GetString();
+		sDataPath = projDoc["DataPath"].GetString();
 	}
 	sProjectDir = HyIO::CleanPath(sProjectDir.c_str(), "/");
-	sDataDir = HyIO::CleanPath(sDataDir.c_str(), "/");
+	sDataPath = HyIO::CleanPath(sDataPath.c_str(), "/");
 
 	HarmonyInit defaultVals;
-	
+
 	if(projDoc.HasMember("Title"))
 		sGameName = projDoc["Title"].GetString();
 	else

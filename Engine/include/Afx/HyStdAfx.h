@@ -439,7 +439,7 @@ struct HarmonyInit
 	std::string					sProjectDir;
 
 	std::string					sGameName;
-	std::string					sDataDir;
+	std::string					sDataPath;			// a directory path when loose assets are used, or file path when packed assets are used (without the extension)
 	std::vector<HyWindowInfo>	windowInfoList;
 	uint32						uiUpdatesPerSec;
 	int32						iVSync;

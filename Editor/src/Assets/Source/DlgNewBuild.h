@@ -28,10 +28,8 @@ public:
 	explicit DlgNewBuild(Project &projectRef, QWidget *parent = 0);
 	~DlgNewBuild();
 
-	BuildType GetBuildType() const;
 	QString GetAbsBuildDir() const;
 
-	QString GetProc() const;
 	QStringList GetProcOptions() const;
 
 private Q_SLOTS:
@@ -40,18 +38,12 @@ private Q_SLOTS:
 
 	void on_buttonBox_accepted();
 
-	void on_radDesktop_clicked();
-	void on_radBrowser_clicked();
-
 	void on_radCMake_clicked();
 	void on_radCMakeGui_clicked();
 
 	void on_cmbCMake_currentIndexChanged(int iIndex);
 
 	void on_btnCMakeHelp_clicked();
-
-	void on_txtEmscriptenSdk_textChanged(const QString &arg1);
-	void on_btnEmscriptenSdkBrowse_clicked();
 
 private:
 	Ui::DlgNewBuild *ui;

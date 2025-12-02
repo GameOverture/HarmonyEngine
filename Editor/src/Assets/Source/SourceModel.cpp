@@ -141,7 +141,7 @@ QStringList SourceModel::GetEditorEntityList() const
 
 /*virtual*/ QStringList SourceModel::GetSupportedFileExtList() const /*override*/
 {
-	return QStringList() << ".cpp" << ".h"; // TODO: Add shader file types eventually
+	return QStringList() << ".cpp" << ".c" << ".h" << ".hpp" << ".cxx";
 }
 
 quint32 SourceModel::ComputeFileChecksum(QString sFilterPath, QString sFileName) const
