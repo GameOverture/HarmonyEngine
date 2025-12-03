@@ -565,7 +565,7 @@
     <string>Add a new particle effect in the currently selected project</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+N, Ctrl+P</string>
+    <string>Ctrl+N, Ctrl+F</string>
    </property>
   </action>
   <action name="actionNewAudio">
@@ -681,6 +681,9 @@
    </property>
    <property name="toolTip">
     <string>Add a new prefab from an imported 3d asset</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N, Ctrl+P</string>
    </property>
   </action>
   <action name="actionNewPrefix">

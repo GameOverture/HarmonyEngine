@@ -1467,7 +1467,6 @@ void ManagerWidget::on_actionDeleteBuild_triggered()
 			QMessageBox::Yes == QMessageBox::question(MainWindow::GetInstance(), "Delete existing build", "Do you want to delete build: " % buildDir.dirName() % "?", QMessageBox::Yes, QMessageBox::No))
 		{
 			buildDir.removeRecursively();
-			QThread::sleep(2);
 
 			if(m_pCodeWidgets)
 				m_pCodeWidgets->AssembleComboBox();

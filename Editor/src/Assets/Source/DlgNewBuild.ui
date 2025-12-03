@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>405</width>
-    <height>226</height>
+    <height>199</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,27 +38,7 @@
       <string>CMake</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="radCMake">
-        <property name="text">
-         <string notr="true">Use Generator:</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QRadioButton" name="radCMakeGui">
-        <property name="text">
-         <string>Launch GUI</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
+      <item row="1" column="2">
        <widget class="QLineEdit" name="txtCMakeOptions">
         <property name="font">
          <font>
@@ -67,25 +47,32 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="lblCMakeOptions">
-        <property name="text">
-         <string>With Options:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
+      <item row="1" column="3">
        <widget class="QPushButton" name="btnCMakeHelp">
         <property name="text">
          <string>Help</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2">
+      <item row="1" column="0">
+       <widget class="QLabel" name="lblCMakeOptions">
+        <property name="text">
+         <string>With Options</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="2">
        <widget class="QComboBox" name="cmbCMake"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Use Generator</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
