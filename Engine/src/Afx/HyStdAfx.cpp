@@ -97,7 +97,7 @@ uint32 HyTextureInfo::GetBucketId() const
 	return m_uiFiltering | (m_uiFormat << 8) | (m_uiFormatParam1 << 16) | (m_uiFormatParam2 << 24);
 }
 
-HarmonyInit::HarmonyInit()
+HyInit::HyInit()
 {
 	sProjectDir = ".";
 
@@ -129,7 +129,7 @@ HarmonyInit::HarmonyInit()
 	consoleInfo.ptLocation.y = 256;
 }
 
-HarmonyInit::HarmonyInit(std::string sHyProjFileName)
+HyInit::HyInit(std::string sHyProjFileName)
 {
 	sHyProjFileName = HyIO::CleanPath(sHyProjFileName.c_str(), ".hyproj");
 
@@ -139,10 +139,10 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	HyJsonDoc projDoc;
 	if(projDoc.ParseInsitu(sProjFileContents.data()).HasParseError())
 	{
-		HyError("HarmonyInit had JSON parsing error: " << rapidjson::GetParseErrorFunc(projDoc.GetParseError()));
+		HyError("HyInit had JSON parsing error: " << rapidjson::GetParseErrorFunc(projDoc.GetParseError()));
 		return;
 	}
-	HyAssert(projDoc.IsObject(), "HarmonyInit parsed a json file that wasn't an object");
+	HyAssert(projDoc.IsObject(), "HyInit parsed a json file that wasn't an object");
 
 	//if(projDoc.HasMember("AdjustWorkingDirectory"))
 	//{
@@ -154,10 +154,10 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	//	HyIO::ReadTextFile(sHyProjFileName.c_str(), trueProjFileContents);
 	//	if(projDoc.ParseInsitu(trueProjFileContents.data()).HasParseError())
 	//	{
-	//		HyError("HarmonyInit's AdjustWorkingDirectory had JSON parsing error: " << rapidjson::GetParseErrorFunc(projDoc.GetParseError()));
+	//		HyError("HyInit's AdjustWorkingDirectory had JSON parsing error: " << rapidjson::GetParseErrorFunc(projDoc.GetParseError()));
 	//		return;
 	//	}
-	//	HyAssert(projDoc.IsObject(), "HarmonyInit's AdjustWorkingDirectory parsed a json file that wasn't an object");
+	//	HyAssert(projDoc.IsObject(), "HyInit's AdjustWorkingDirectory parsed a json file that wasn't an object");
 
 	//	sDataDir = sProjectDir + "/";
 	//	sDataDir += projDoc["DataPath"].GetString();
@@ -170,7 +170,7 @@ HarmonyInit::HarmonyInit(std::string sHyProjFileName)
 	sProjectDir = HyIO::CleanPath(sProjectDir.c_str(), "/");
 	sDataPath = HyIO::CleanPath(sDataPath.c_str(), "/");
 
-	HarmonyInit defaultVals;
+	HyInit defaultVals;
 
 	if(projDoc.HasMember("Title"))
 		sGameName = projDoc["Title"].GetString();

@@ -98,7 +98,7 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 
 	HyGuiLog("Reloading Harmony", LOGTYPE_Title);
 
-	HarmonyInit initStruct;
+	HyInit initStruct;
 	initStruct.sGameName = m_pProject->GetTitle().toStdString();
 	initStruct.sDataPath = m_pProject->GetAssetsAbsPath().toStdString();
 	m_pHyEngine = new GuiHyEngine(initStruct, m_pProject);

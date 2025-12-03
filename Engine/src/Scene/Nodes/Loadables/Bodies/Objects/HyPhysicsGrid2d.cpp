@@ -23,7 +23,7 @@
 //{
 //	m_uiFlags |= NODETYPE_IsPhysicsGrid;
 //
-//	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
+//	HyAssert(m_fPixelsPerMeter > 0.0f, "HyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 //	//m_b2World.SetContactListener(&m_ContactListener);
 //
 //	//m_DebugDraw.SetFlags(0xff);

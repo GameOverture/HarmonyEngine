@@ -434,7 +434,7 @@ struct HyWindowInfo
 };
 
 // Client supplies these initialization parameters to the engine
-struct HarmonyInit
+struct HyInit
 {
 	std::string					sProjectDir;
 
@@ -450,8 +450,8 @@ struct HarmonyInit
 	bool						bUseConsole;
 	HyWindowInfo				consoleInfo;
 
-	HarmonyInit();
-	HarmonyInit(std::string sHyProjFileName);
+	HyInit();
+	HyInit(std::string sHyProjFileName);
 };
 
 #endif // HyStdAfx_h__

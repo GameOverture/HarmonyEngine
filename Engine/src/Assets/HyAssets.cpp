@@ -624,7 +624,7 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// ITEMS
 #ifndef HY_PLATFORM_GUI
-	std::string sGameDataFilePath(m_sDATADIR);
+	std::string sGameDataFilePath(m_sDATAPATH);
 	sGameDataFilePath += HYASSETS_DataFile;
 	std::vector<char> sGameDataFileContents;
 	HyIO::ReadTextFile(sGameDataFilePath.c_str(), sGameDataFileContents);

@@ -189,6 +189,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 	sContents.replace("%HY_FILENAME%", sFileName);
 	sContents.replace("%HY_CLASS%", sClassName);
 	sContents.replace("%HY_PROJECTNAME%", m_ProjectRef.GetName());
+	sContents.replace("%HY_TITLE%", m_ProjectRef.GetTitle());
 
 	QString sBaseClassDecl;
 	QString sClassCtorSignature;
@@ -201,10 +202,6 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 		{
 			switch(eTemplate)
 			{
-			case TEMPLATE_Main:
-				sContents.replace("%HY_TITLE%", m_ProjectRef.GetTitle());
-				break;
-
 			case TEMPLATE_ClassH:
 				if(sBaseClass == "HyEntity2d" || sBaseClass == "HyEntity3d")
 					sContents.replace("%HY_INCLUDES%", "");

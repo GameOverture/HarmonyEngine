@@ -29,7 +29,7 @@ DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :
 	ui->vsbConsoleLocation->Init(SPINBOXTYPE_Int2d, -16384, 16384);
 
 	QJsonObject projSettingsObj = m_ProjectRef.GetSettingsObj();
-	HarmonyInit defaultVals;
+	HyInit defaultVals;
 
 	if(projSettingsObj.contains("Title"))
 		ui->txtTitleName->setText(projSettingsObj["Title"].toString());

@@ -14,7 +14,7 @@
 
 HyEngine *HyEngine::sm_pInstance = nullptr;
 
-HyEngine::HyEngine(const HarmonyInit &initStruct) :
+HyEngine::HyEngine(const HyInit &initStruct) :
 	m_Init(initStruct),
 	m_Console(m_Init.bUseConsole, m_Init.consoleInfo),
 	m_WindowManager(*this, m_Init.windowInfoList, m_Init.bShowCursor),
@@ -256,7 +256,7 @@ bool HyEngine::PollPlatformApi()
 	return sm_pInstance != nullptr;
 }
 
-/*static*/ const HarmonyInit &HyEngine::InitValues()
+/*static*/ const HyInit &HyEngine::InitValues()
 {
 	HyAssert(sm_pInstance != nullptr, "HyEngine::InitValues() was invoked before engine has been initialized.");
 	return sm_pInstance->m_Init;

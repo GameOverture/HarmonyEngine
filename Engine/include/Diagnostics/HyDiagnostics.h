@@ -14,7 +14,7 @@
 #include "Diagnostics/HyProfiler.h"
 #include "Scene/Physics/HyPhysicsDraw.h"
 
-struct HarmonyInit;
+struct HyInit;
 class HyAssets;
 class HyScene;
 class HyTime;
@@ -24,7 +24,7 @@ class HyDiagnostics
 	friend class HyEngine;
 	friend class IHyRenderer;
 
-	const HarmonyInit &					m_InitStructRef;
+	const HyInit &					m_InitStructRef;
 	HyTime &							m_TimeRef;
 	HyAssets &							m_AssetsRef;
 	HyScene &							m_SceneRef;
@@ -59,7 +59,7 @@ class HyDiagnostics
 	HyPhysicsDraw *						m_pPhysicsDraw;
 
 public:
-	HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef);
+	HyDiagnostics(const HyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef);
 	~HyDiagnostics();
 
 	void Init(const HyNodePath &textNodePath, uint32 uiTextState);

@@ -116,7 +116,7 @@ void DlgNewProject::on_buttonBox_accepted()
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// Generate HyProj file. Insert the minimum required fields for it.
 	// The project's DlgProjectSettings will fill in the rest of the defaults
-	HarmonyInit hyInit; // Use default values of struct;
+	HyInit hyInit; // Use default values of struct;
 	QJsonObject jsonObj;
 	jsonObj.insert("$fileVersion", HYGUI_FILE_VERSION);
 	jsonObj.insert("Title", ui->txtTitleName->text());

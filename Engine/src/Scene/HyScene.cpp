@@ -36,7 +36,7 @@ HyScene::HyScene(glm::vec2 vGravity2d, float fPixelsPerMeter, HyAudioCore &audio
 	m_pPhysicsDraw(nullptr),
 	m_bPhysicsUpdating(false)
 {
-	HyAssert(m_fPixelsPerMeter > 0.0f, "HarmonyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
+	HyAssert(m_fPixelsPerMeter > 0.0f, "HyInit's 'fPixelsPerMeter' cannot be <= 0.0f");
 	IHyNode::sm_pScene = this;
 
 	b2WorldDef worldDef = b2DefaultWorldDef();

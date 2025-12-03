@@ -13,7 +13,7 @@
 //--------------------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
-	HarmonyInit initStruct("%HY_PROJECTNAME%.hyproj");
+	HyInit initStruct("%HY_PROJECTNAME%.hyproj");
 
 	// Emscripten requires all initial memory to be on the heap (above 'initStruct' is copied internally)
 	// and the main() function to exit in order for its artificial 'update loop' to work correctly in the browser

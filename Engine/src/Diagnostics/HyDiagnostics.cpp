@@ -16,7 +16,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 #include "HyEngine.h"
 
-HyDiagnostics::HyDiagnostics(const HarmonyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef) :
+HyDiagnostics::HyDiagnostics(const HyInit &initStruct, HyTime &timeRef, HyAssets &assetsRef, HyScene &sceneRef) :
 	m_InitStructRef(initStruct),
 	m_TimeRef(timeRef),
 	m_AssetsRef(assetsRef),
@@ -339,7 +339,7 @@ void HyDiagnostics::BootMessage()
 	HyLog("");
 	HyLogTitle(sGameTitle << "\n\t" << m_TimeRef.GetDateTime());
 	HyLog("Compiler:         " << m_sCompiler);
-	HyLog("Data Dir:         " << m_InitStructRef.sDataDir);
+	HyLog("Data Dir:         " << m_InitStructRef.sDataPath);
 	HyLog("Num Input Maps:   " << m_InitStructRef.uiNumInputMaps);
 
 	HyLogSection("Platform");

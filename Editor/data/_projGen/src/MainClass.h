@@ -13,7 +13,7 @@ class %HY_CLASS% : public HyEngine
 	};
 
 public:
-	%HY_CLASS%(HarmonyInit &initStruct);
+	%HY_CLASS%(HyInit &initStruct);
 	virtual ~%HY_CLASS%();
 
 	virtual bool OnUpdate() override;

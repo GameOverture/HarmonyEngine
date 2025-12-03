@@ -58,7 +58,7 @@ class HyEngine
 	static HyEngine *			sm_pInstance;
 
 	// The order of these member declarations matter as some are used to initialize each other
-	const HarmonyInit			m_Init;
+	const HyInit			m_Init;
 	HyConsoleInterop			m_Console;
 	HyWindowManager				m_WindowManager;
 	HyInput						m_Input;
@@ -71,7 +71,7 @@ class HyEngine
 	HyRendererInterop			m_Renderer;
 
 public:
-	HyEngine(const HarmonyInit &initStruct);
+	HyEngine(const HyInit &initStruct);
 	~HyEngine();
 
 	HyRendererInterop &GetRenderer();
@@ -97,7 +97,7 @@ private:
 
 public:
 	static bool IsInitialized();
-	static const HarmonyInit &InitValues();
+	static const HyInit &InitValues();
 	static std::string DateTime();
 	static uint32 NumWindows();
 	static HyWindow &Window(uint32 uiWindowIndex = 0);

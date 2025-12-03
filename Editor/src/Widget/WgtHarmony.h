@@ -28,7 +28,7 @@ class WgtHarmony : public QOpenGLWidget//, protected QOpenGLFunctions
 		Project *				m_pProject;
 
 	public:
-		GuiHyEngine(HarmonyInit &initStruct, Project *pProject) :
+		GuiHyEngine(HyInit &initStruct, Project *pProject) :
 			HyEngine(initStruct),
 			m_pProject(pProject)
 		{
