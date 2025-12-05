@@ -111,8 +111,7 @@ hero.scale.Tween(1.5f, 1.5f, 2.5f);
   
 ## Documentation
 
-lol
-
+https://hyengine.org/docs/
   
 ## License
 
