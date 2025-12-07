@@ -163,11 +163,6 @@ QList<IAssetItemData *> IManagerModel::GetBankAssets(uint uiBankIndex)
 	return m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
 }
 
-void IManagerModel::GenerateAssetsDlg(const QModelIndex &indexDestination)
-{
-	OnGenerateAssetsDlg(indexDestination);
-}
-
 bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, QVector<TreeModelItemData *> correspondingParentList, QVector<QUuid> correspondingUuidList)
 {
 	if(correspondingParentList.size() != sImportList.size() || correspondingUuidList.size() != sImportList.size())

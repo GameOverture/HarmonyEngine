@@ -430,6 +430,47 @@ std::vector<IHyNode2d *> HyEntity2d::FindChildren(std::function<bool(IHyNode2d *
 	return foundList;
 }
 
+void HyEntity2d::FixtureAppend(IHyFixture2d &fixtureRef)
+{
+	if(this == fixtureRef.ParentGet())
+		return;
+
+	fixtureRef.ParentDetach();
+	m_FixtureList.push_back(&fixtureRef);
+	fixtureRef.m_pParent = this;
+
+	SyncPhysicsFixtures();
+}
+
+bool HyEntity2d::FixtureRemove(IHyFixture2d &childFixtureRef)
+{
+	for(auto iter = m_FixtureList.begin(); iter != m_FixtureList.end(); ++iter)
+	{
+		if(*iter == &childFixtureRef)
+		{
+			// Fixture found as a child, now also remove it from the physics simulation
+			childFixtureRef.PhysicsRemove(true);
+
+			m_FixtureList.erase(iter);
+			childFixtureRef.m_pParent = nullptr;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+uint32 HyEntity2d::FixtureCount() const
+{
+	return static_cast<uint32>(m_FixtureList.size());
+}
+
+IHyFixture2d *HyEntity2d::FixtureGet(uint32 uiIndex)
+{
+	HyAssert(uiIndex < static_cast<uint32>(m_FixtureList.size()), "HyEntity2d::FixtureGet passed an invalid index");
+	return m_FixtureList[uiIndex];
+}
+
 bool HyEntity2d::IsMouseInputEnabled() const
 {
 	return (m_uiEntityAttribs & ENTITYATTRIB_MouseInputEnabled) != 0;
@@ -475,68 +516,6 @@ bool HyEntity2d::IsMouseHover()
 bool HyEntity2d::IsMouseDown() const
 {
 	return (m_uiEntityAttribs & ENTITYATTRIB_MouseInputDown) != 0;
-}
-
-void HyEntity2d::FixtureAppend(IHyFixture2d &fixtureRef)
-{
-	if(this == fixtureRef.ParentGet())
-		return;
-
-	fixtureRef.ParentDetach();
-	m_FixtureList.push_back(&fixtureRef);
-	fixtureRef.m_pParent = this;
-
-	SyncPhysicsFixtures();
-}
-
-bool HyEntity2d::FixtureRemove(IHyFixture2d &childFixtureRef)
-{
-	//bool bPhysShapeRemoved = false;
-	//if(physics.IsActivated())
-	//{
-	//	std::vector<b2ShapeId> shapeList(m_FixtureList.size());
-	//	int iNumAttachedShapes = b2Body_GetShapes(physics.GetHandle(), shapeList.data(), static_cast<int>(shapeList.size()));
-	//	for(int i = 0; i < iNumAttachedShapes; ++i)
-	//	{
-	//		b2ShapeId shapeId = shapeList[i];
-	//		HyShape2d *pShape = reinterpret_cast<HyShape2d *>(b2Shape_GetUserData(shapeId));
-	//		if(pShape == &childFixtureRef)
-	//		{
-	//			pShape->PhysicsRemove(true);
-	//			bPhysShapeRemoved = true;
-	//		}
-	//	}
-	//	if(bPhysShapeRemoved == false)
-	//		HyLogError("HyEntity2d::ShapeRemove failed to find physics shape to remove");
-	//}
-	//else
-	//	bPhysShapeRemoved = true;
-
-	for(auto iter = m_FixtureList.begin(); iter != m_FixtureList.end(); ++iter)
-	{
-		if(*iter == &childFixtureRef)
-		{
-			// Fixture found as a child, now also remove it from the physics simulation
-			childFixtureRef.PhysicsRemove(true);
-
-			m_FixtureList.erase(iter);
-			childFixtureRef.m_pParent = nullptr;
-			return true;// bPhysShapeRemoved;
-		}
-	}
-
-	return false;
-}
-
-uint32 HyEntity2d::FixtureCount() const
-{
-	return static_cast<uint32>(m_FixtureList.size());
-}
-
-IHyFixture2d *HyEntity2d::FixtureGet(uint32 uiIndex)
-{
-	HyAssert(uiIndex < static_cast<uint32>(m_FixtureList.size()), "HyEntity2d::FixtureGet passed an invalid index");
-	return m_FixtureList[uiIndex];
 }
 
 bool HyEntity2d::IsReverseDisplayOrder() const

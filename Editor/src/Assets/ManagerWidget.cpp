@@ -392,6 +392,33 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 {
 	ui->setupUi(this);
 
+	switch(m_pModel->GetAssetType())
+	{
+	case ASSETMAN_Source: {
+		QToolButton *pBtnAddClassFiles = new QToolButton(this);
+		pBtnAddClassFiles->setDefaultAction(ui->actionAddClassFiles);
+		ui->lytBottomToolBar->insertWidget(0, pBtnAddClassFiles);
+		break; }
+
+	case ASSETMAN_Atlases: {
+		QToolButton *pBtnCreateTileSet = new QToolButton(this);
+		pBtnCreateTileSet->setDefaultAction(ui->actionCreateTileSet);
+		ui->lytBottomToolBar->insertWidget(0, pBtnCreateTileSet);
+
+		QToolButton *pBtnSliceSpriteSheet = new QToolButton(this);
+		pBtnSliceSpriteSheet->setDefaultAction(ui->actionSliceSpriteSheet);
+		ui->lytBottomToolBar->insertWidget(0, pBtnSliceSpriteSheet);
+		break; }
+
+	case ASSETMAN_Audio:
+		break;
+
+	default:
+		HyGuiLog("ManagerWidget::ManagerWidget() unknown asset manager type", LOGTYPE_Error);
+		break;
+	}
+
+
 	if(m_pModel->IsSingleBank())
 	{
 		ui->grpBank->hide();
@@ -415,7 +442,6 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	connect(ui->assetTree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
 
 	// Setup Actions
-	ui->actionGenerateAsset->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_New));
 	ui->actionImportAssets->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_None));
 	ui->actionImportDirectory->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_Open));
 	//ui->actionDeleteAssets->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_Delete)); // Uses standard delete icon
@@ -429,7 +455,6 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	ui->btnOpenExplorer->setDefaultAction(ui->actionOpenBankExplorer);
 	ui->btnBankSettings->setDefaultAction(ui->actionBankSettings);
 
-	ui->btnGenerateAsset->setDefaultAction(ui->actionGenerateAsset);
 	ui->btnCreateFilter->setDefaultAction(ui->actionAddFilter);
 	ui->btnImportAssets->setDefaultAction(ui->actionImportAssets);
 	ui->btnImportDir->setDefaultAction(ui->actionImportDirectory);
@@ -438,16 +463,12 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	ui->btnDeleteAssets->setDefaultAction(ui->actionDeleteAssets);
 	ui->btnReplaceAssets->setDefaultAction(ui->actionReplaceAssets);
 
-	if(m_pModel->GetAssetType() != ASSETMAN_Source)
-		ui->btnGenerateAsset->hide(); // Only Source Asset Manager is capable of generating new assets
-	else // Code Assets
+	if(m_pModel->GetAssetType() == ASSETMAN_Source) // Code Assets
 	{
 		m_pCodeWidgets = new CodeWidgets(this, ui);
 		QObject::connect(m_pCodeWidgets->m_pCmb, SIGNAL(currentIndexChanged(int)), this, SLOT(OnBuildIndex(int)));
 		
 		// Change text and tool tips of Source Manager to make more sense
-		ui->actionGenerateAsset->setText("Add New File(s)");
-		ui->actionGenerateAsset->setToolTip("Add new files to this project. Such as a class, header, or source");
 		ui->actionImportAssets->setText("Add Existing File(s)");
 		ui->actionImportAssets->setToolTip("Add existing file(s) to this project");
 		ui->actionImportDirectory->setText("Add Existing Directory");
@@ -719,17 +740,28 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 	QModelIndex index = ui->assetTree->indexAt(pos);
 	if(index.isValid() == false || selectedAssetsList.empty())
 	{
-		if(m_pModel->GetAssetType() == ASSETMAN_Source)
+		switch(m_pModel->GetAssetType())
 		{
-			contextMenu.addAction(ui->actionGenerateAsset);
-			contextMenu.addSeparator();
-		}
-		contextMenu.addAction(ui->actionImportAssets);
-		contextMenu.addAction(ui->actionImportDirectory);
-		if(m_pModel->GetAssetType() == ASSETMAN_Atlases)
+		case ASSETMAN_Source:
+			contextMenu.addAction(ui->actionAddClassFiles);
+			break;
+
+		case ASSETMAN_Atlases:
+			contextMenu.addAction(ui->actionSliceSpriteSheet);
 			contextMenu.addAction(ui->actionCreateTileSet);
+			break;
+
+		case ASSETMAN_Audio:
+			break;
+
+		default:
+			HyGuiLog("ManagerWidget::OnContextMenu() unknown asset manager type", LOGTYPE_Error);
+			break;
+		}
 
 		contextMenu.addAction(ui->actionAddFilter);
+		contextMenu.addAction(ui->actionImportAssets);
+		contextMenu.addAction(ui->actionImportDirectory);
 		if(selectedFiltersList.empty() == false)
 		{
 			contextMenu.addSeparator();
@@ -760,8 +792,8 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 		}
 
 		contextMenu.addAction(ui->actionOpenAssetExplorer);
-		contextMenu.addAction(ui->actionGenerateAsset);
 		contextMenu.addSeparator();
+		contextMenu.addAction(ui->actionAddClassFiles);
 		contextMenu.addAction(ui->actionImportAssets);
 		contextMenu.addAction(ui->actionImportDirectory);
 		contextMenu.addAction(ui->actionAddFilter);
@@ -793,13 +825,25 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 			connect(&bankMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_actionBankTransfer_triggered(QAction*)));
 
 			contextMenu.addMenu(&bankMenu);
+			contextMenu.addSeparator();
 		}
 
-		contextMenu.addSeparator();
+		switch(m_pModel->GetAssetType())
+		{
+		case ASSETMAN_Atlases:
+			contextMenu.addAction(ui->actionSliceSpriteSheet);
+			contextMenu.addAction(ui->actionCreateTileSet);
+			break;
+
+		case ASSETMAN_Audio:
+			break;
+
+		default:
+			HyGuiLog("ManagerWidget::OnContextMenu() unknown asset manager type", LOGTYPE_Error);
+			break;
+		}
 		contextMenu.addAction(ui->actionImportAssets);
 		contextMenu.addAction(ui->actionImportDirectory);
-		if(m_pModel->GetAssetType() == ASSETMAN_Atlases)
-			contextMenu.addAction(ui->actionCreateTileSet);
 		contextMenu.addAction(ui->actionAddFilter);
 
 		// Check if any selected assets are 'generated' from their project item. If so, prevent delete/replace
@@ -1085,10 +1129,26 @@ void ManagerWidget::on_actionBankTransfer_triggered(QAction *pAction)
 	m_pModel->TransferAssets(selectedAssetsList, uiNewBankId);
 }
 
-void ManagerWidget::on_actionGenerateAsset_triggered()
+void ManagerWidget::on_actionAddClassFiles_triggered()
 {
+	if(m_pModel->GetAssetType() != ASSETMAN_Source)
+	{
+		HyGuiLog("ManagerWidget::on_actionAddClassFiles_triggered() - Not a Source Asset Manager", LOGTYPE_Error);
+		return;
+	}
 	QModelIndex curIndex = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapToSource(ui->assetTree->selectionModel()->currentIndex());
-	m_pModel->GenerateAssetsDlg(curIndex);
+	static_cast<SourceModel *>(m_pModel)->OnAddClass(curIndex);
+}
+
+void ManagerWidget::on_actionSliceSpriteSheet_triggered()
+{
+	if(m_pModel->GetAssetType() != ASSETMAN_Atlases)
+	{
+		HyGuiLog("ManagerWidget::on_actionSliceSpriteSheet_triggered() - Not an Atlas Asset Manager", LOGTYPE_Error);
+		return;
+	}
+	QModelIndex curIndex = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapToSource(ui->assetTree->selectionModel()->currentIndex());
+	static_cast<AtlasModel *>(m_pModel)->OnSliceSprite(curIndex);
 }
 
 void ManagerWidget::on_actionImportAssets_triggered()

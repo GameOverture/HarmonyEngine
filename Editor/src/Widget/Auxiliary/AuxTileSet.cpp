@@ -29,7 +29,8 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	ui(new Ui::AuxTileSet),
 	m_pTileSet(nullptr),
 	m_bIsImportingTileSheet(true),
-	m_pImportTileSheetPixmap(nullptr)
+	m_pImportTileSheetPixmap(nullptr),
+	m_pSelectedWgtItem(nullptr)
 {
 	ui->setupUi(this);
 	

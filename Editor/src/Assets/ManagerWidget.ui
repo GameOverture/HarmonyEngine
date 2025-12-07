@@ -178,14 +178,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
-     <item>
-      <widget class="QToolButton" name="btnGenerateAsset">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
+    <layout class="QHBoxLayout" name="lytBottomToolBar">
      <item>
       <widget class="QToolButton" name="btnCreateFilter">
        <property name="text">
@@ -364,18 +357,6 @@
     <string>Configure all selected assets' properties</string>
    </property>
   </action>
-  <action name="actionGenerateAsset">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/icons16x16/items/Atlas-New.png</normaloff>:/icons16x16/items/Atlas-New.png</iconset>
-   </property>
-   <property name="text">
-    <string>Generate Asset</string>
-   </property>
-   <property name="toolTip">
-    <string>Add a new file to project</string>
-   </property>
-  </action>
   <action name="actionCreateTileSet">
    <property name="icon">
     <iconset resource="../../data/HyEditor.qrc">
@@ -500,6 +481,36 @@
    </property>
    <property name="toolTip">
     <string>Create a redistributable package of this game, using this build</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionSliceSpriteSheet">
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/slice-sprite-sheet.png</normaloff>:/icons16x16/slice-sprite-sheet.png</iconset>
+   </property>
+   <property name="text">
+    <string>Import Sprite Sheet(s)</string>
+   </property>
+   <property name="toolTip">
+    <string>Batch import sprite sheets with similar frame sizes</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionAddClassFiles">
+   <property name="icon">
+    <iconset resource="../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/items/Source-New.png</normaloff>:/icons16x16/items/Source-New.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Class Files</string>
+   </property>
+   <property name="toolTip">
+    <string>Add C++ class files to the project</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

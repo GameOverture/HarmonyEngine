@@ -110,6 +110,13 @@ public:
 	std::vector<IHyNode2d *> FindChildren(std::function<bool(IHyNode2d *)> func);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// FIXTURES
+	void FixtureAppend(IHyFixture2d &fixtureRef);
+	bool FixtureRemove(IHyFixture2d &fixtureRef);
+	uint32 FixtureCount() const;
+	IHyFixture2d *FixtureGet(uint32 uiIndex);
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// MOUSE INPUT & SHAPES (hitboxes and/or collision)
 	bool IsMouseInputEnabled() const;
 	void SetMouseInput(bool bEnable);
@@ -117,11 +124,6 @@ public:
 	void DisableMouseInput();
 	bool IsMouseHover();
 	bool IsMouseDown() const;
-
-	void FixtureAppend(IHyFixture2d &fixtureRef);
-	bool FixtureRemove(IHyFixture2d &fixtureRef);
-	uint32 FixtureCount() const;
-	IHyFixture2d *FixtureGet(uint32 uiIndex);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// DISPLAY ORDER

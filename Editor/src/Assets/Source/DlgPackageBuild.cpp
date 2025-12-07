@@ -49,7 +49,7 @@ PackageType DlgPackageBuild::GetPackageType() const
 
 QString DlgPackageBuild::GetAbsPackageDir() const
 {
-	return m_ProjectRef.GetDirPath() % "bin/" % ui->txtDirName->text() % "/";
+	return m_ProjectRef.GetDirPath() % "bin/" % ui->txtPackageName->text() % "/";
 }
 
 QString DlgPackageBuild::GetProc() const
@@ -141,7 +141,7 @@ void DlgPackageBuild::ErrorCheck()
 	bool bIsError = false;
 	do
 	{
-		if(ui->txtDirName->text().isEmpty())
+		if(ui->txtPackageName->text().isEmpty())
 		{
 			ui->lblError->setText("Package output directory name cannot be blank");
 			bIsError = true;

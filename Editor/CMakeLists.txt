@@ -57,6 +57,9 @@ if(Qt6_DIR)
 		src/Assets/ManagerWidget.cpp
 		src/Assets/ManagerWidget.h
 		src/Assets/ManagerWidget.ui
+		src/Assets/Source/DlgAddClassFiles.cpp
+		src/Assets/Source/DlgAddClassFiles.h
+		src/Assets/Source/DlgAddClassFiles.ui
 		src/Assets/Source/DlgBuildSettings.cpp
 		src/Assets/Source/DlgBuildSettings.h
 		src/Assets/Source/DlgBuildSettings.ui
@@ -70,9 +73,6 @@ if(Qt6_DIR)
 		src/Assets/Source/SourceFile.h
 		src/Assets/Source/SourceModel.cpp
 		src/Assets/Source/SourceModel.h
-		src/Assets/Source/SourceGenFileDlg.cpp
-		src/Assets/Source/SourceGenFileDlg.h
-		src/Assets/Source/SourceGenFileDlg.ui
 		src/Assets/Source/SourceImportThread.cpp
 		src/Assets/Source/SourceImportThread.h
 		src/Assets/Source/WgtSrcDependency.cpp
@@ -92,6 +92,9 @@ if(Qt6_DIR)
 		src/Assets/Atlas/AtlasRepackThread.h
 		src/Assets/Atlas/AtlasTileSet.cpp
 		src/Assets/Atlas/AtlasTileSet.h
+		src/Assets/Atlas/DlgSliceSpriteSheet.cpp
+		src/Assets/Atlas/DlgSliceSpriteSheet.h
+		src/Assets/Atlas/DlgSliceSpriteSheet.ui
 		src/Assets/Atlas/TileSet/IWgtTileSetItem.cpp
 		src/Assets/Atlas/TileSet/IWgtTileSetItem.h
 		src/Assets/Atlas/TileSet/TileData.cpp
@@ -227,9 +230,6 @@ if(Qt6_DIR)
 		src/Dialogs/DlgColorPicker.cpp
 		src/Dialogs/DlgColorPicker.h
 		src/Dialogs/DlgColorPicker.ui
-		src/Dialogs/DlgImportTileSheet.cpp
-		src/Dialogs/DlgImportTileSheet.h
-		src/Dialogs/DlgImportTileSheet.ui
 		src/Dialogs/DlgInputName.cpp
 		src/Dialogs/DlgInputName.h
 		src/Dialogs/DlgInputName.ui

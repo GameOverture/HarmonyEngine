@@ -70,7 +70,6 @@ protected:
 
 	virtual IAssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
 
-	virtual void OnGenerateAssetsDlg(const QModelIndex &indexDestination) override;
 	virtual bool OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) override; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) override;
 	virtual bool OnUpdateAssets(QList<IAssetItemData *> assetList) override;

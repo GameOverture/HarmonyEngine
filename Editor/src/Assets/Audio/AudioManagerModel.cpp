@@ -234,10 +234,6 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	return pNewFrame;
 }
 
-/*virtual*/ void AudioManagerModel::OnGenerateAssetsDlg(const QModelIndex &indexDestination) /*override*/
-{
-}
-
 /*virtual*/ bool AudioManagerModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/
 {
 	QSet<BankData *> affectedBankSet;

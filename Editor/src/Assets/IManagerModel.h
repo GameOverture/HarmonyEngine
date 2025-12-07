@@ -65,7 +65,6 @@ public:
 	void SetBankSettings(uint uiBankIndex, QJsonObject newSettingsObj);
 	QList<IAssetItemData *> GetBankAssets(uint uiBankIndex);
 
-	void GenerateAssetsDlg(const QModelIndex &indexDestination);
 	bool ImportNewAssets(QStringList sImportList, quint32 uiBankId, QVector<TreeModelItemData *> correspondingParentList, QVector<QUuid> correspondingUuidList);
 	void RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeModelItemData *> filtersList, bool bAskToConfirm);
 	bool GetAffectedItems(QList<IAssetItemData *> assetsList, QList<ProjectItemData *> &affectedItemListOut) const; // Returns false if any affected items are not saved and should not proceed with asset repack
@@ -122,7 +121,6 @@ protected:
 
 	virtual IAssetItemData *OnAllocateAssetData(QJsonObject metaObj) = 0;
 
-	virtual void OnGenerateAssetsDlg(const QModelIndex &indexDestination) = 0;
 	virtual bool OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) = 0; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) = 0;
 	virtual bool OnUpdateAssets(QList<IAssetItemData *> assetList) = 0;

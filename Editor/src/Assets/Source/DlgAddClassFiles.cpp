@@ -1,5 +1,5 @@
 /**************************************************************************
- *	SourceGenFileDlg.cpp
+ *	DlgAddClassFiles.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2021 Jason Knobler
@@ -8,14 +8,14 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "SourceGenFileDlg.h"
-#include "ui_SourceGenFileDlg.h"
+#include "DlgAddClassFiles.h"
+#include "ui_DlgAddClassFiles.h"
 
 #include <QPushButton>
 
-SourceGenFileDlg::SourceGenFileDlg(QStringList sEditorEntityList, QWidget *pParent /*= nullptr*/) :
+DlgAddClassFiles::DlgAddClassFiles(QStringList sEditorEntityList, QWidget *pParent /*= nullptr*/) :
 	QDialog(pParent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-	ui(new Ui::SourceGenFileDlg)
+	ui(new Ui::DlgAddClassFiles)
 {
 	ui->setupUi(this);
 
@@ -32,27 +32,27 @@ SourceGenFileDlg::SourceGenFileDlg(QStringList sEditorEntityList, QWidget *pPare
 	ErrorCheck();
 }
 
-SourceGenFileDlg::~SourceGenFileDlg()
+DlgAddClassFiles::~DlgAddClassFiles()
 {
 	delete ui;
 }
 
-QString SourceGenFileDlg::GetCodeClassName() const
+QString DlgAddClassFiles::GetCodeClassName() const
 {
 	return ui->txtClassName->text();
 }
 
-QString SourceGenFileDlg::GetHeaderFileName() const
+QString DlgAddClassFiles::GetHeaderFileName() const
 {
 	return ui->txtHFile->text();
 }
 
-QString SourceGenFileDlg::GetCppFileName() const
+QString DlgAddClassFiles::GetCppFileName() const
 {
 	return ui->txtCppFile->text();
 }
 
-QString SourceGenFileDlg::GetBaseClassName() const
+QString DlgAddClassFiles::GetBaseClassName() const
 {
 	if(ui->radBaseSpecify->isChecked())
 		return ui->txtBaseClass->text();
@@ -60,12 +60,12 @@ QString SourceGenFileDlg::GetBaseClassName() const
 		return "hy::" + ui->editorEntitiesList->currentItem()->text();
 }
 
-bool SourceGenFileDlg::IsEntityBaseClass() const
+bool DlgAddClassFiles::IsEntityBaseClass() const
 {
 	return ui->chkHyEntityBaseClass->isChecked();
 }
 
-void SourceGenFileDlg::on_txtClassName_textChanged(const QString &arg1)
+void DlgAddClassFiles::on_txtClassName_textChanged(const QString &arg1)
 {
 	QString sFixedForClass = arg1;
 	HyGlobal::FileNameValidator()->fixup(sFixedForClass);
@@ -80,17 +80,17 @@ void SourceGenFileDlg::on_txtClassName_textChanged(const QString &arg1)
 	ErrorCheck();
 }
 
-void SourceGenFileDlg::on_txtHFile_textChanged(const QString &arg1)
+void DlgAddClassFiles::on_txtHFile_textChanged(const QString &arg1)
 {
 	ErrorCheck();
 }
 
-void SourceGenFileDlg::on_txtCppFile_textChanged(const QString &arg1)
+void DlgAddClassFiles::on_txtCppFile_textChanged(const QString &arg1)
 {
 	ErrorCheck();
 }
 
-void SourceGenFileDlg::on_txtBaseClass_textChanged(const QString &arg1)
+void DlgAddClassFiles::on_txtBaseClass_textChanged(const QString &arg1)
 {
 	if(ui->txtBaseClass->text().isEmpty())
 		ui->chkHyEntityBaseClass->setEnabled(false);
@@ -100,7 +100,7 @@ void SourceGenFileDlg::on_txtBaseClass_textChanged(const QString &arg1)
 	ErrorCheck();
 }
 
-void SourceGenFileDlg::on_radBaseSpecify_toggled(bool bChecked)
+void DlgAddClassFiles::on_radBaseSpecify_toggled(bool bChecked)
 {
 	ui->txtBaseClass->setEnabled(bChecked);
 	ui->chkHyEntityBaseClass->setEnabled(bChecked);
@@ -108,7 +108,7 @@ void SourceGenFileDlg::on_radBaseSpecify_toggled(bool bChecked)
 	ErrorCheck();
 }
 
-void SourceGenFileDlg::on_radBaseEditor_toggled(bool bChecked)
+void DlgAddClassFiles::on_radBaseEditor_toggled(bool bChecked)
 {
 	ui->txtBaseClass->setEnabled(!bChecked);
 	ui->chkHyEntityBaseClass->setEnabled(!bChecked);
@@ -116,12 +116,12 @@ void SourceGenFileDlg::on_radBaseEditor_toggled(bool bChecked)
 	ErrorCheck();
 }
 
-void SourceGenFileDlg::on_editorEntitiesList_itemSelectionChanged()
+void DlgAddClassFiles::on_editorEntitiesList_itemSelectionChanged()
 {
 	ErrorCheck();
 }
 
-void SourceGenFileDlg::ErrorCheck()
+void DlgAddClassFiles::ErrorCheck()
 {
 	bool bIsError = false;
 	do

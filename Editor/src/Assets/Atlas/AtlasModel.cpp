@@ -15,6 +15,7 @@
 #include "AtlasRepackThread.h"
 #include "MainWindow.h"
 #include "DlgAtlasGroupSettings.h"
+#include "DlgSliceSpriteSheet.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -265,6 +266,14 @@ void AtlasModel::WriteTileSetsToDisk()
 	}
 }
 
+void AtlasModel::OnSliceSprite(const QModelIndex &indexDestination)
+{
+	DlgSliceSpriteSheet *pDlg = new DlgSliceSpriteSheet();
+	if(QDialog::Accepted == pDlg->exec())
+	{
+	}
+}
+
 /*virtual*/ QString AtlasModel::OnBankInfo(uint uiBankIndex) /*override*/
 {
 	QString sInfo = "Num Textures: " % QString::number(GetNumTextures(uiBankIndex)) % " | " %
@@ -406,10 +415,6 @@ void AtlasModel::WriteTileSetsToDisk()
 
 	HyGuiLog("AtlasModel::OnAllocateAssetData() - Unknown asset type: " % metaObj["itemType"].toString(), LOGTYPE_Error);
 	return nullptr;
-}
-
-/*virtual*/ void AtlasModel::OnGenerateAssetsDlg(const QModelIndex &indexDestination) /*override*/
-{
 }
 
 /*virtual*/ bool AtlasModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/

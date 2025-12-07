@@ -58,7 +58,7 @@ class HyEngine
 	static HyEngine *			sm_pInstance;
 
 	// The order of these member declarations matter as some are used to initialize each other
-	const HyInit			m_Init;
+	const HyInit				m_Init;
 	HyConsoleInterop			m_Console;
 	HyWindowManager				m_WindowManager;
 	HyInput						m_Input;

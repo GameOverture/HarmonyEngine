@@ -11,7 +11,7 @@
 #include "SourceModel.h"
 #include "SourceFile.h"
 #include "DlgBuildSettings.h"
-#include "SourceGenFileDlg.h"
+#include "DlgAddClassFiles.h"
 #include "Project.h"
 #include "EntityModel.h"
 #include "WgtCodeEditor.h"
@@ -142,6 +142,39 @@ QStringList SourceModel::GetEditorEntityList() const
 /*virtual*/ QStringList SourceModel::GetSupportedFileExtList() const /*override*/
 {
 	return QStringList() << ".cpp" << ".c" << ".h" << ".hpp" << ".cxx";
+}
+
+void SourceModel::OnAddClass(const QModelIndex &indexDestination)
+{
+	DlgAddClassFiles *pDlg = new DlgAddClassFiles(GetEditorEntityList());
+	if(QDialog::Accepted == pDlg->exec())
+	{
+		m_ImportBaseClassList.clear();
+
+		QStringList sImportList;
+		QVector<TreeModelItemData *> correspondingParentList;
+		QVector<QUuid> correspondingUuidList;
+
+		TreeModelItemData *pParentLocation = FindTreeItemFilter(data(indexDestination, Qt::UserRole).value<TreeModelItemData *>());
+
+		sImportList << GenerateSrcFile(TEMPLATE_ClassCpp, indexDestination, pDlg->GetCodeClassName(), pDlg->GetCppFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass(), nullptr);
+		correspondingParentList << pParentLocation;
+		correspondingUuidList << QUuid::createUuid();
+		m_ImportBaseClassList.push_back(pDlg->GetBaseClassName());
+
+		sImportList << GenerateSrcFile(TEMPLATE_ClassH, indexDestination, pDlg->GetCodeClassName(), pDlg->GetHeaderFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass(), nullptr);
+		correspondingParentList << pParentLocation;
+		correspondingUuidList << QUuid::createUuid();
+		m_ImportBaseClassList.push_back(pDlg->GetBaseClassName());
+
+		ImportNewAssets(sImportList,
+			0,
+			correspondingParentList,
+			correspondingUuidList);
+
+		SaveMeta();
+	}
+	delete pDlg;
 }
 
 quint32 SourceModel::ComputeFileChecksum(QString sFilterPath, QString sFileName) const
@@ -454,39 +487,6 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 										  metaObj["errors"].toInt(0));
 
 	return pNewFile;
-}
-
-/*virtual*/ void SourceModel::OnGenerateAssetsDlg(const QModelIndex &indexDestination) /*override*/
-{
-	SourceGenFileDlg *pDlg = new SourceGenFileDlg(GetEditorEntityList());
-	if(QDialog::Accepted == pDlg->exec())
-	{
-		m_ImportBaseClassList.clear();
-
-		QStringList sImportList;
-		QVector<TreeModelItemData *> correspondingParentList;
-		QVector<QUuid> correspondingUuidList;
-
-		TreeModelItemData *pParentLocation = FindTreeItemFilter(data(indexDestination, Qt::UserRole).value<TreeModelItemData *>());
-
-		sImportList << GenerateSrcFile(TEMPLATE_ClassCpp, indexDestination, pDlg->GetCodeClassName(), pDlg->GetCppFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass(), nullptr);
-		correspondingParentList << pParentLocation;
-		correspondingUuidList << QUuid::createUuid();
-		m_ImportBaseClassList.push_back(pDlg->GetBaseClassName());
-
-		sImportList << GenerateSrcFile(TEMPLATE_ClassH, indexDestination, pDlg->GetCodeClassName(), pDlg->GetHeaderFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass(), nullptr);
-		correspondingParentList << pParentLocation;
-		correspondingUuidList << QUuid::createUuid();
-		m_ImportBaseClassList.push_back(pDlg->GetBaseClassName());
-		
-		ImportNewAssets(sImportList,
-						0,
-						correspondingParentList,
-						correspondingUuidList);
-
-		SaveMeta();
-	}
-	delete pDlg;
 }
 
 /*virtual*/ bool SourceModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/

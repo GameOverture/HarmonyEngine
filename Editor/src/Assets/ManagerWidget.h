@@ -135,7 +135,8 @@ private Q_SLOTS:
 	void on_actionOpenBankExplorer_triggered();
 	void on_actionRemoveBank_triggered();
 	void on_actionBankTransfer_triggered(QAction *pAction);
-	void on_actionGenerateAsset_triggered();
+	void on_actionAddClassFiles_triggered();
+	void on_actionSliceSpriteSheet_triggered();
 	void on_actionImportAssets_triggered();
 	void on_actionImportDirectory_triggered();
 	void on_actionSyncFilterAssets_triggered();

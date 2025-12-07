@@ -50,6 +50,8 @@ public:
 	AtlasTileSet *GenerateTileSet(QString sName, TreeModelItemData *pParentTreeItemData, quint32 uiBankId);
 	void SaveTileSet(QUuid tileSetUuid, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
 	void WriteTileSetsToDisk();
+
+	void OnSliceSprite(const QModelIndex &indexDestination);
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
@@ -60,7 +62,6 @@ protected:
 	virtual void OnCreateNewBank(QJsonObject &newMetaBankObjRef) override;
 	virtual IAssetItemData *OnAllocateAssetData(QJsonObject metaObj) override;
 
-	virtual void OnGenerateAssetsDlg(const QModelIndex &indexDestination) override;
 	virtual bool OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) override; // Must call DeleteAsset() on each asset
 	virtual bool OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) override;
 	virtual bool OnUpdateAssets(QList<IAssetItemData *> assetList) override;

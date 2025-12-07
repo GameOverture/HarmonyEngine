@@ -1,5 +1,5 @@
 /**************************************************************************
- *	SourceGenFileDlg.h
+ *	DlgAddClassFiles.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2021 Jason Knobler
@@ -7,8 +7,8 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef SourceGenFileDlg_H
-#define SourceGenFileDlg_H
+#ifndef DlgAddClassFiles_H
+#define DlgAddClassFiles_H
 
 #include "Global.h"
 #include "Project.h"
@@ -16,18 +16,18 @@
 #include <QDialog>
 
 namespace Ui {
-class SourceGenFileDlg;
+class DlgAddClassFiles;
 }
 
-class SourceGenFileDlg : public QDialog
+class DlgAddClassFiles : public QDialog
 {
 	Q_OBJECT
 
-	Ui::SourceGenFileDlg *		ui;
+	Ui::DlgAddClassFiles *		ui;
 
 public:
-	SourceGenFileDlg(QStringList sEditorEntityList, QWidget *pParent = nullptr);
-	virtual ~SourceGenFileDlg();
+	DlgAddClassFiles(QStringList sEditorEntityList, QWidget *pParent = nullptr);
+	virtual ~DlgAddClassFiles();
 
 	QString GetCodeClassName() const;
 	QString GetHeaderFileName() const;
@@ -50,4 +50,4 @@ private:
 	void ErrorCheck();
 };
 
-#endif // SourceGenFileDlg_H
+#endif // DlgAddClassFiles_H

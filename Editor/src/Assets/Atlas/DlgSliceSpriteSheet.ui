@@ -1,58 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DlgImportTileSheet</class>
- <widget class="QDialog" name="DlgImportTileSheet">
+ <class>DlgSliceSpriteSheet</class>
+ <widget class="QDialog" name="DlgSliceSpriteSheet">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>628</width>
-    <height>767</height>
+    <width>645</width>
+    <height>543</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string/>
+   <string>Import Sprite Sheet(s)</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../../../data/HyEditor.qrc">
+    <normaloff>:/icons16x16/slice-sprite-sheet.png</normaloff>:/icons16x16/slice-sprite-sheet.png</iconset>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QRadioButton" name="radTileSheet">
-       <property name="text">
-        <string>Import Tile Sheet Image</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="radTileImages">
-       <property name="text">
-        <string>Import Individual Tile Images</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="Line" name="line_4">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="lblInput">
        <property name="text">
-        <string>Input Image</string>
+        <string>Input Image(s)</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="txtImagePath">
+      <widget class="QLineEdit" name="txtImportPaths">
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -68,10 +47,52 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="grpSlicingOptions">
-     <property name="enabled">
-      <bool>false</bool>
+    <widget class="Line" name="line_5">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>Main filter name</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_12">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../../../data/HyEditor.qrc">:/icons16x16/items/Filter.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txtMainFilter"/>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkCreateSubFilters">
+       <property name="text">
+        <string>Create sub-filter for every sprite sheet image</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../data/HyEditor.qrc">
+         <normaloff>:/icons16x16/items/Filter-New.png</normaloff>:/icons16x16/items/Filter-New.png</iconset>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grpSlicingOptions">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
@@ -153,7 +174,7 @@
       <item>
        <widget class="Line" name="line">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
        </widget>
       </item>
@@ -222,7 +243,7 @@
       <item>
        <widget class="Line" name="line_2">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
        </widget>
       </item>
@@ -291,7 +312,7 @@
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -305,45 +326,164 @@
     </widget>
    </item>
    <item>
-    <widget class="QGraphicsView" name="graphicsView"/>
-   </item>
-   <item>
-    <widget class="QLabel" name="lblError">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
+    <widget class="Line" name="line_4">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Frames' base name</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txtAssetsBaseName"/>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblPreview">
+       <property name="text">
+        <string>Import Sheet 1 of 1</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnPreviewBack">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnPreviewNext">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="CommonGfxView" name="graphicsView"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QCheckBox" name="chkCreateSprite">
+       <property name="text">
+        <string>Create new Sprite Item from import</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../data/HyEditor.qrc">
+         <normaloff>:/icons16x16/items/Sprite-New.png</normaloff>:/icons16x16/items/Sprite-New.png</iconset>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QLabel" name="lblError">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::TextFormat::AutoText</enum>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
+  <action name="actionPreviewBack">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-left.png</normaloff>:/icons16x16/generic-left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Preview Back</string>
+   </property>
+   <property name="toolTip">
+    <string>Preview previous image to be imported</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionPreviewNext">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-right.png</normaloff>:/icons16x16/generic-right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Preview Next</string>
+   </property>
+   <property name="toolTip">
+    <string>Preview next image to be imported</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
  </widget>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>CommonGfxView</class>
+   <extends>QGraphicsView</extends>
+   <header>CommonGfxView.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../data/HyEditor.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>DlgImportTileSheet</receiver>
+   <receiver>DlgSliceSpriteSheet</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -359,7 +499,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>DlgImportTileSheet</receiver>
+   <receiver>DlgSliceSpriteSheet</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
