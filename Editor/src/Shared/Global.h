@@ -375,7 +375,7 @@ enum EntityItemDeclarationType
 const QString ENTITYITEMDECLARATIONTYPE_STRINGS[NUM_ENTDECLTYPES] = { "Static", "Dynamic", "DynamicLeaked" };
 
 #define HYGUIPATH_TempDir						"temp/"
-#define HYGUIPATH_TEMPSUBDIR_ImportTileSheet	"TileSheets"
+#define HYGUIPATH_TEMPSUBDIR_SpriteSheets		"SpriteSheets"
 #define HYGUIPATH_TEMPSUBDIR_PasteAssets		"PasteAssets"
 
 #define HYGUIPATH_EditorDataDir					"Editor/data/"

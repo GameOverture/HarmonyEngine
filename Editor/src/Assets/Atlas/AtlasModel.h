@@ -51,7 +51,7 @@ public:
 	void SaveTileSet(QUuid tileSetUuid, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
 	void WriteTileSetsToDisk();
 
-	void OnSliceSprite(const QModelIndex &indexDestination);
+	void OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *pFirstSelection);
 	
 	virtual QString OnBankInfo(uint uiBankIndex) override;
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;

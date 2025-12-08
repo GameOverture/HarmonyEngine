@@ -65,6 +65,43 @@ void DlgSliceSpriteSheet::Clear()
 	m_iCurrentSheetIndex = 0;
 }
 
+QDir DlgSliceSpriteSheet::DumpToTempDir()
+{
+	if(Harmony::GetProject() == nullptr)
+	{
+		HyGuiLog("DlgSliceSpriteSheet::DumpToTempDir() - No project loaded", LOGTYPE_Error);
+		return QDir();
+	}
+
+	QDir rootTempDir = HyGlobal::PrepTempDir(*Harmony::GetProject(), HYGUIPATH_TEMPSUBDIR_SpriteSheets);
+	if(false == rootTempDir.mkdir(ui->txtMainFilter->text()))
+		HyGuiLog("DlgSliceSpriteSheet::DumpToTempDir - Could not make root temp directory", LOGTYPE_Error);
+	if(false == rootTempDir.cd(ui->txtMainFilter->text()))
+		HyGuiLog("DlgSliceSpriteSheet::DumpToTempDir - Could not change to root temp directory", LOGTYPE_Error);
+
+	for(int iSheetIndex = 0; iSheetIndex < m_SheetList.size(); ++iSheetIndex)
+	{
+		QDir tempDir = rootTempDir;
+		if(ui->chkCreateSubFilters->isChecked())
+		{
+			if(false == tempDir.mkdir(m_SheetList[iSheetIndex].sBaseAssetName))
+				HyGuiLog("DlgSliceSpriteSheet::DumpToTempDir - Could not make sheet sub-directory", LOGTYPE_Error);
+			if(false == tempDir.cd(m_SheetList[iSheetIndex].sBaseAssetName))
+				HyGuiLog("DlgSliceSpriteSheet::DumpToTempDir - Could not change to sheet sub-directory", LOGTYPE_Error);
+		}
+
+		Sheet &sheetRef = m_SheetList[iSheetIndex];
+		for(int iFrameIndex = 0; iFrameIndex < sheetRef.framePixmapList.size(); ++iFrameIndex)
+		{
+			QString sMetaName = sheetRef.sBaseAssetName;
+			sMetaName += QString("_%1.png").arg(iFrameIndex, 3, 10, QChar('0'));
+			sheetRef.framePixmapList[iFrameIndex].save(tempDir.absoluteFilePath(sMetaName));
+		}
+	}
+
+	return rootTempDir;
+}
+
 void DlgSliceSpriteSheet::on_btnImageBrowse_clicked()
 {
 	QFileDialog dlg(this);
@@ -102,7 +139,8 @@ void DlgSliceSpriteSheet::on_btnImageBrowse_clicked()
 		ui->chkCreateSubFilters->hide();
 	}
 
-	AssemblePixmaps(m_iCurrentSheetIndex);
+	AssemblePixmaps();
+	SetPreviewIndex(0);
 	ErrorCheck();
 }
 
@@ -113,37 +151,43 @@ void DlgSliceSpriteSheet::on_txtMainFilter_textChanged(const QString &arg1)
 
 void DlgSliceSpriteSheet::on_sbTileSizeX_valueChanged(int iArg)
 {
-	AssemblePixmaps(m_iCurrentSheetIndex);
+	AssemblePixmaps();
+	SetPreviewIndex(m_iCurrentSheetIndex);
 	ErrorCheck();
 }
 
 void DlgSliceSpriteSheet::on_sbTileSizeY_valueChanged(int iArg)
 {
-	AssemblePixmaps(m_iCurrentSheetIndex);
+	AssemblePixmaps();
+	SetPreviewIndex(m_iCurrentSheetIndex);
 	ErrorCheck();
 }
 
 void DlgSliceSpriteSheet::on_sbOffsetX_valueChanged(int iArg)
 {
-	AssemblePixmaps(m_iCurrentSheetIndex);
+	AssemblePixmaps();
+	SetPreviewIndex(m_iCurrentSheetIndex);
 	ErrorCheck();
 }
 
 void DlgSliceSpriteSheet::on_sbOffsetY_valueChanged(int iArg)
 {
-	AssemblePixmaps(m_iCurrentSheetIndex);
+	AssemblePixmaps();
+	SetPreviewIndex(m_iCurrentSheetIndex);
 	ErrorCheck();
 }
 
 void DlgSliceSpriteSheet::on_sbPaddingX_valueChanged(int iArg)
 {
-	AssemblePixmaps(m_iCurrentSheetIndex);
+	AssemblePixmaps();
+	SetPreviewIndex(m_iCurrentSheetIndex);
 	ErrorCheck();
 }
 
 void DlgSliceSpriteSheet::on_sbPaddingY_valueChanged(int iArg)
 {
-	AssemblePixmaps(m_iCurrentSheetIndex);
+	AssemblePixmaps();
+	SetPreviewIndex(m_iCurrentSheetIndex);
 	ErrorCheck();
 }
 
@@ -160,7 +204,7 @@ void DlgSliceSpriteSheet::on_actionPreviewNext_triggered()
 		HyGuiLog("DlgSliceSpriteSheet::on_actionPreviewNext_triggered() - Already at last sprite sheet", LOGTYPE_Error);
 		return;
 	}
-	AssemblePixmaps(m_iCurrentSheetIndex + 1);
+	SetPreviewIndex(m_iCurrentSheetIndex + 1);
 	ErrorCheck();
 }
 
@@ -171,7 +215,7 @@ void DlgSliceSpriteSheet::on_actionPreviewBack_triggered()
 		HyGuiLog("DlgSliceSpriteSheet::on_actionPreviewBack_triggered() - Already at first sprite sheet", LOGTYPE_Error);
 		return;
 	}
-	AssemblePixmaps(m_iCurrentSheetIndex - 1);
+	SetPreviewIndex(m_iCurrentSheetIndex - 1);
 	ErrorCheck();
 }
 
@@ -181,9 +225,9 @@ void DlgSliceSpriteSheet::on_buttonBox_accepted()
 	int iNumImages = 0;
 	for(int i = 0; i < iNumSheets; ++i)
 		iNumImages += m_SheetList[i].framePixmapList.size();
-	if(iNumSheets == 0 || iNumImages == 0)
+	if(iNumImages == 0)
 	{
-		HyGuiLog("DlgSliceSpriteSheet::on_buttonBox_accepted() - No images to import", LOGTYPE_Error);
+		HyGuiLog("DlgSliceSpriteSheet::on_buttonBox_accepted - No images to import", LOGTYPE_Error);
 		return;
 	}
 
@@ -197,62 +241,79 @@ void DlgSliceSpriteSheet::on_buttonBox_accepted()
 		if(QMessageBox::Yes != QMessageBox::question(MainWindow::GetInstance(), "Confirm Import", "Do you want to import " % QString::number(iNumImages) % " images from " % QString::number(iNumSheets) % " sprite sheets?", QMessageBox::Yes, QMessageBox::No))
 			return;
 	}
-	
 
-
-	//QDir tempDir = HyGlobal::PrepTempDir(m_ProjectRef, HYGUIPATH_TEMPSUBDIR_ImportTileSheet);
-
-	//char szBuffer[16];
-	//uint uiPixmapIndex = 0;
-	//for(auto pPixmap : m_TilePixmaps)
-	//{
-	//	QString sMetaName;// = ui->txtTilePrefix->text();
-	//	sprintf(szBuffer, "%05u.png", uiPixmapIndex);
-	//	sMetaName += szBuffer;
-
-	//	pPixmap->save(tempDir.absoluteFilePath(sMetaName));
-	//	uiPixmapIndex++;
-	//}
-
-	//QFileInfoList imageFileList = tempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-	//QStringList sImageImportList;
-	//for(auto fileInfo : imageFileList)
-	//	sImageImportList << fileInfo.absoluteFilePath();
-
-	//quint32 uiBankId = m_ProjectRef.GetAtlasWidget() ? m_ProjectRef.GetAtlasWidget()->GetSelectedBankId() : 0;
-
-	//TreeModelItemData *pFirstSelected = nullptr;
-	//if(m_ProjectRef.GetAtlasWidget())
-	//	pFirstSelected = m_ProjectRef.GetAtlasWidget()->GetSelected();
-
-	//TreeModelItemData *pParent = m_ProjectRef.GetAtlasModel().FindTreeItemFilter(pFirstSelected);
-
-	//QVector<TreeModelItemData *> correspondingParentList;
-	//QVector<QUuid> correspondingUuidList;
-	//for(int i = 0; i < sImageImportList.size(); ++i)
-	//{
-	//	correspondingParentList.append(pParent);
-	//	correspondingUuidList.append(QUuid::createUuid());
-	//}
-
-	//m_ProjectRef.GetAtlasModel().ImportNewAssets(sImageImportList, uiBankId, correspondingParentList, correspondingUuidList);
+	// Proceed with import
+	accept();
 }
 
-void DlgSliceSpriteSheet::AssemblePixmaps(int iSheetIndex)
+void DlgSliceSpriteSheet::AssemblePixmaps()
 {
 	if(m_SheetList.empty())
 	{
+		ui->grpSlicingOptions->setEnabled(false);
 		ui->txtAssetsBaseName->setText("");
 		ui->txtAssetsBaseName->setEnabled(false);
 		ui->lblPreview->hide();
+		ui->lblNumFrames->hide();
 		return;
 	}
 
-	if(iSheetIndex >= m_SheetList.count() || iSheetIndex < 0)
+	for(int iSheetIndex = 0; iSheetIndex < m_SheetList.size(); ++iSheetIndex)
 	{
-		HyGuiLog("DlgSliceSpriteSheet::AssemblePixmaps() - Invalid sheet index specified", LOGTYPE_Error);
-		return;
+		Sheet &curSheet = m_SheetList[iSheetIndex];
+		curSheet.framePixmapList.clear();
+
+		if(ui->sbTileSizeX->value() == 0 || ui->sbTileSizeY->value() == 0)
+			continue;
+
+		QPoint ptCurPos(ui->sbOffsetX->value() + ui->sbPaddingX->value(),
+						ui->sbOffsetY->value() + ui->sbPaddingY->value());
+
+		QPainter painter;
+		painter.setOpacity(0.0f);
+		bool bCountColumns = true;
+		int iNumColumns = 0;
+		int iNumRows = 0;
+		while(ui->sbTileSizeY->value() <= curSheet.sheetPixmap.height() - ptCurPos.y() + 1)
+		{
+			iNumRows++;
+
+			while(ui->sbTileSizeX->value() <= curSheet.sheetPixmap.width() - ptCurPos.x() + 1)
+			{
+				curSheet.framePixmapList.emplace(curSheet.framePixmapList.end(), ui->sbTileSizeX->value(), ui->sbTileSizeY->value());
+				QPixmap &pixmapRef = curSheet.framePixmapList.begin()[curSheet.framePixmapList.size() - 1];
+
+				pixmapRef.fill(QColor(Qt::transparent));
+				painter.begin(&pixmapRef);
+				{
+					QRect curRect(ptCurPos.x(), ptCurPos.y(), ui->sbTileSizeX->value(), ui->sbTileSizeY->value());
+					painter.drawPixmap(QPoint(0, 0), curSheet.sheetPixmap, curRect);
+				}
+				painter.end();
+
+				ptCurPos.setX(ptCurPos.x() + ui->sbTileSizeX->value() + ui->sbPaddingX->value());
+
+				if(bCountColumns)
+					iNumColumns++;
+			}
+			bCountColumns = false;
+
+			ptCurPos.setX(ui->sbOffsetX->value() + ui->sbPaddingX->value());
+			ptCurPos.setY(ptCurPos.y() + ui->sbTileSizeY->value() + ui->sbPaddingY->value());
+		}
 	}
+
+	int iTotalFrames = 0;
+	for(const Sheet &sheetRef : m_SheetList)
+		iTotalFrames += sheetRef.framePixmapList.size();
+	ui->lblNumFrames->show();
+	ui->lblNumFrames->setText(QString("Total Frames: %1").arg(iTotalFrames));
+}
+
+void DlgSliceSpriteSheet::SetPreviewIndex(int iSheetIndex)
+{
+	if(iSheetIndex >= m_SheetList.count() || iSheetIndex < 0)
+		return;
 
 	m_iCurrentSheetIndex = iSheetIndex;
 	ui->lblPreview->show();
@@ -261,41 +322,25 @@ void DlgSliceSpriteSheet::AssemblePixmaps(int iSheetIndex)
 	ui->actionPreviewBack->setEnabled(m_iCurrentSheetIndex > 0);
 	ui->actionPreviewNext->setEnabled(m_iCurrentSheetIndex < m_SheetList.size() - 1);
 
-	Sheet &curSheet = m_SheetList[m_iCurrentSheetIndex];
-	ui->txtAssetsBaseName->setEnabled(true);
-	ui->txtAssetsBaseName->setText(curSheet.sBaseAssetName);
-	curSheet.framePixmapList.clear();
 
-	if(ui->sbTileSizeX->value() == 0 || ui->sbTileSizeY->value() == 0)
-		return;
+	delete m_pPreviewPixmapItem;
+	m_pPreviewPixmapItem = nullptr;
+	delete m_pPreviewPixmap;
+	m_pPreviewPixmap = nullptr;
 
 	QPoint ptCurPos(ui->sbOffsetX->value() + ui->sbPaddingX->value(),
-					ui->sbOffsetY->value() + ui->sbPaddingY->value());
-
-	QPainter painter;
-	painter.setOpacity(0.0f);
+		ui->sbOffsetY->value() + ui->sbPaddingY->value());
 	bool bCountColumns = true;
 	int iNumColumns = 0;
 	int iNumRows = 0;
+	Sheet &curSheet = m_SheetList[m_iCurrentSheetIndex];
 	while(ui->sbTileSizeY->value() <= curSheet.sheetPixmap.height() - ptCurPos.y() + 1)
 	{
 		iNumRows++;
 
 		while(ui->sbTileSizeX->value() <= curSheet.sheetPixmap.width() - ptCurPos.x() + 1)
 		{
-			curSheet.framePixmapList.emplace(curSheet.framePixmapList.end(), ui->sbTileSizeX->value(), ui->sbTileSizeY->value());
-			QPixmap &pixmapRef = curSheet.framePixmapList.begin()[curSheet.framePixmapList.size() - 1];
-
-			pixmapRef.fill(QColor(Qt::transparent));
-			painter.begin(&pixmapRef);
-			{
-				QRect curRect(ptCurPos.x(), ptCurPos.y(), ui->sbTileSizeX->value(), ui->sbTileSizeY->value());
-				painter.drawPixmap(QPoint(0, 0), curSheet.sheetPixmap, curRect);
-			}
-			painter.end();
-
 			ptCurPos.setX(ptCurPos.x() + ui->sbTileSizeX->value() + ui->sbPaddingX->value());
-
 			if(bCountColumns)
 				iNumColumns++;
 		}
@@ -304,24 +349,23 @@ void DlgSliceSpriteSheet::AssemblePixmaps(int iSheetIndex)
 		ptCurPos.setX(ui->sbOffsetX->value() + ui->sbPaddingX->value());
 		ptCurPos.setY(ptCurPos.y() + ui->sbTileSizeY->value() + ui->sbPaddingY->value());
 	}
-
-	delete m_pPreviewPixmapItem;
-	m_pPreviewPixmapItem = nullptr;
-	delete m_pPreviewPixmap;
-	m_pPreviewPixmap = nullptr;
-
 	if(iNumColumns == 0 || iNumRows == 0)
 		return;
-	
+
+	ui->grpSlicingOptions->setEnabled(true);
+	ui->txtAssetsBaseName->setEnabled(true);
+	ui->txtAssetsBaseName->setText(curSheet.sBaseAssetName);
+
 	int iSpacingAmt = 2;
-	m_pPreviewPixmap = new QPixmap((ui->sbTileSizeX->value() * iNumColumns) + (iSpacingAmt * (iNumColumns+1)),
-								   (ui->sbTileSizeY->value() * iNumRows) + (iSpacingAmt * (iNumRows+1)));
+	m_pPreviewPixmap = new QPixmap((ui->sbTileSizeX->value() * iNumColumns) + (iSpacingAmt * (iNumColumns + 1)),
+		(ui->sbTileSizeY->value() * iNumRows) + (iSpacingAmt * (iNumRows + 1)));
 	m_pPreviewPixmap->fill(QColor("black"));
 
 	ptCurPos.setX(iSpacingAmt);
 	ptCurPos.setY(iSpacingAmt);
 
 	int iPixmapIndex = 0;
+	QPainter painter;
 	painter.begin(m_pPreviewPixmap);
 	{
 		for(int i = 0; i < iNumRows; ++i)

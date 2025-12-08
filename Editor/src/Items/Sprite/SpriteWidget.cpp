@@ -35,6 +35,7 @@ SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	// Remove and re-add the main layout that holds everything. This makes the Qt Designer (.ui) files work with the base class 'IWidget'. Otherwise it jumbles them together.
 	layout()->removeItem(ui->verticalLayout);
 	GetBelowStatesLayout()->addItem(ui->verticalLayout);
+	GetAboveStatesLayout()->addItem(ui->lytGenerateStates);
 	
 	ui->btnAddFrames->setDefaultAction(ui->actionImportFrames);
 	ui->btnRemoveFrame->setDefaultAction(ui->actionRemoveFrames);

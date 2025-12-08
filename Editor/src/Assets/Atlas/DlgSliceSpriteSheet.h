@@ -50,6 +50,8 @@ public:
 
 	void Clear();
 
+	QDir DumpToTempDir();
+
 private Q_SLOTS:
 	void on_btnImageBrowse_clicked();
 
@@ -71,7 +73,8 @@ private Q_SLOTS:
 private:
 	Ui::DlgSliceSpriteSheet *ui;
 
-	void AssemblePixmaps(int iSheetIndex);
+	void AssemblePixmaps();
+	void SetPreviewIndex(int iSheetIndex);
 
 	void ErrorCheck();
 };

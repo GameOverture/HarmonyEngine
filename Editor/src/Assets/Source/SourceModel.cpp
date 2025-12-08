@@ -144,7 +144,7 @@ QStringList SourceModel::GetEditorEntityList() const
 	return QStringList() << ".cpp" << ".c" << ".h" << ".hpp" << ".cxx";
 }
 
-void SourceModel::OnAddClass(const QModelIndex &indexDestination)
+void SourceModel::OnAddClass(TreeModelItemData *pFirstSelected)
 {
 	DlgAddClassFiles *pDlg = new DlgAddClassFiles(GetEditorEntityList());
 	if(QDialog::Accepted == pDlg->exec())
@@ -155,7 +155,8 @@ void SourceModel::OnAddClass(const QModelIndex &indexDestination)
 		QVector<TreeModelItemData *> correspondingParentList;
 		QVector<QUuid> correspondingUuidList;
 
-		TreeModelItemData *pParentLocation = FindTreeItemFilter(data(indexDestination, Qt::UserRole).value<TreeModelItemData *>());
+		TreeModelItemData *pParentLocation = FindTreeItemFilter(pFirstSelected);
+		QModelIndex indexDestination = FindIndex<TreeModelItemData *>(pParentLocation, 0);
 
 		sImportList << GenerateSrcFile(TEMPLATE_ClassCpp, indexDestination, pDlg->GetCodeClassName(), pDlg->GetCppFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass(), nullptr);
 		correspondingParentList << pParentLocation;

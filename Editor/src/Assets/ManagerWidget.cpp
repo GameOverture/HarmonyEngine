@@ -1136,8 +1136,17 @@ void ManagerWidget::on_actionAddClassFiles_triggered()
 		HyGuiLog("ManagerWidget::on_actionAddClassFiles_triggered() - Not a Source Asset Manager", LOGTYPE_Error);
 		return;
 	}
-	QModelIndex curIndex = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapToSource(ui->assetTree->selectionModel()->currentIndex());
-	static_cast<SourceModel *>(m_pModel)->OnAddClass(curIndex);
+	
+	TreeModelItemData *pFirstSelected = nullptr;
+	if(m_bUseContextMenuSelection)
+	{
+		pFirstSelected = m_pContextMenuSelection;
+		m_bUseContextMenuSelection = false;
+	}
+	else
+		pFirstSelected = GetSelected();
+
+	static_cast<SourceModel *>(m_pModel)->OnAddClass(pFirstSelected);
 }
 
 void ManagerWidget::on_actionSliceSpriteSheet_triggered()
@@ -1147,8 +1156,17 @@ void ManagerWidget::on_actionSliceSpriteSheet_triggered()
 		HyGuiLog("ManagerWidget::on_actionSliceSpriteSheet_triggered() - Not an Atlas Asset Manager", LOGTYPE_Error);
 		return;
 	}
-	QModelIndex curIndex = static_cast<ManagerProxyModel *>(ui->assetTree->model())->mapToSource(ui->assetTree->selectionModel()->currentIndex());
-	static_cast<AtlasModel *>(m_pModel)->OnSliceSprite(curIndex);
+
+	TreeModelItemData *pFirstSelected = nullptr;
+	if(m_bUseContextMenuSelection)
+	{
+		pFirstSelected = m_pContextMenuSelection;
+		m_bUseContextMenuSelection = false;
+	}
+	else
+		pFirstSelected = GetSelected();
+
+	static_cast<AtlasModel *>(m_pModel)->OnSliceSprite(m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()), pFirstSelected);
 }
 
 void ManagerWidget::on_actionImportAssets_triggered()

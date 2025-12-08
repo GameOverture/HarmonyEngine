@@ -389,18 +389,24 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QCheckBox" name="chkCreateSprite">
+      <widget class="QLabel" name="lblNumFrames">
        <property name="text">
-        <string>Create new Sprite Item from import</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../../data/HyEditor.qrc">
-         <normaloff>:/icons16x16/items/Sprite-New.png</normaloff>:/icons16x16/items/Sprite-New.png</iconset>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
+        <string>Total number of Frames: 0</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -480,22 +486,6 @@
   <include location="../../../data/HyEditor.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>DlgSliceSpriteSheet</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>

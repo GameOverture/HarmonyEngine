@@ -39,7 +39,7 @@ public:
 	virtual bool OnBankSettingsDlg(uint uiBankIndex) override;
 	virtual QStringList GetSupportedFileExtList() const override;
 
-	void OnAddClass(const QModelIndex &indexDestination);
+	void OnAddClass(TreeModelItemData *pFirstSelected);
 
 protected:
 	quint32 ComputeFileChecksum(QString sFilterPath, QString sFileName) const;

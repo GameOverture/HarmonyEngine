@@ -266,11 +266,66 @@ void AtlasModel::WriteTileSetsToDisk()
 	}
 }
 
-void AtlasModel::OnSliceSprite(const QModelIndex &indexDestination)
+void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *pFirstSelected)
 {
 	DlgSliceSpriteSheet *pDlg = new DlgSliceSpriteSheet();
 	if(QDialog::Accepted == pDlg->exec())
 	{
+		QDir tempDumpDir = pDlg->DumpToTempDir();
+
+		// Assemble a call to asset manager's directory import
+
+		// The 'pImportParent' will be the root point for all new AtlasTreeItem insertions (both filters and images)
+		TreeModelItemData *pImportParent = FindTreeItemFilter(pFirstSelected);
+		if(pImportParent)
+			HyGuiLog("Sprite Sheet import destination: " % AssembleFilter(pImportParent, true), LOGTYPE_Normal);
+		else
+			HyGuiLog("Sprite Sheet import destination: (root)", LOGTYPE_Normal);
+
+		// Store all the specified imported image paths and their corresponding parent tree items they should be inserted into
+		QStringList sImportList;
+		QVector<TreeModelItemData *> correspondingParentList;
+		QVector<QUuid> correspondingUuidList;
+		
+		// Dig recursively through tempDumpDir directory and grab all the image files (while creating filters that resemble the folder structure they're stored in)
+		TreeModelItemData *pCurFilter = CreateNewFilter(tempDumpDir.dirName(), pImportParent, false);
+
+		QStack<QPair<QFileInfoList, TreeModelItemData *>> dirStack;
+		dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(tempDumpDir.entryInfoList(), pCurFilter));
+
+		while(dirStack.isEmpty() == false)
+		{
+			QPair<QFileInfoList, TreeModelItemData *> curDir = dirStack.pop();
+			QFileInfoList list = curDir.first;
+
+			for(int i = 0; i < list.count(); i++)
+			{
+				QFileInfo info = list[i];
+				if(info.isDir() && info.fileName() != ".." && info.fileName() != ".")
+				{
+					QDir subDir(info.filePath());
+					dirStack.push(QPair<QFileInfoList, TreeModelItemData *>(subDir.entryInfoList(), CreateNewFilter(subDir.dirName(), curDir.second, false)));
+				}
+				else
+				{
+					for(auto sExt : GetSupportedFileExtList())
+					{
+						if(QString('.' % info.suffix()).compare(sExt, Qt::CaseInsensitive) == 0)
+						{
+							sImportList.push_back(info.filePath());
+							correspondingParentList.push_back(curDir.second);
+							correspondingUuidList.append(QUuid::createUuid());
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		ImportNewAssets(sImportList,
+						uiDestinationBankId,
+						correspondingParentList,
+						correspondingUuidList);
 	}
 }
 
