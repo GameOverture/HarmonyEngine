@@ -15,6 +15,7 @@
 #include "DlgInputName.h"
 #include "SpriteDraw.h"
 #include "ManagerWidget.h"
+#include "MainWindow.h"
 
 #include <QFile>
 #include <QJsonDocument>
@@ -22,6 +23,7 @@
 #include <QJsonArray>
 #include <QAction>
 #include <QShortcut>
+#include <QMessageBox>
 
 SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	IWidget(itemRef, pParent),
@@ -99,6 +101,39 @@ SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	ui->actionOrderFrameUpwards->setEnabled(ui->framesView->currentIndex().row() != 0 && iCurNumFrames > 1);
 	ui->actionOrderFrameDownwards->setEnabled(ui->framesView->currentIndex().row() != iCurNumFrames - 1 && iCurNumFrames > 1);
 	ui->actionRemoveFrames->setEnabled(bFrameIsSelected);
+
+	ManagerWidget *pAtlasManagerWidget = m_ItemRef.GetProject().GetAtlasWidget();
+	if(pAtlasManagerWidget)
+	{
+		TreeModelItemData *pRootSelected = pAtlasManagerWidget->GetSelected();
+
+		if(pRootSelected && pRootSelected->GetType() == ITEM_Filter)
+		{
+			ui->lblGenerateStates->setText(pRootSelected->GetText());
+			
+			int iNumStates = 0; // Count the number of first-level child filters under 'pRootFilter'
+			QList<TreeModelItemData *> itemDataList = pAtlasManagerWidget->GetItemsRecursively(pRootSelected);
+			for(TreeModelItemData *pItemData : itemDataList)
+			{
+				if(pItemData->GetType() == ITEM_Filter && pAtlasManagerWidget->GetModel().FindTreeItemFilter(pItemData, false) == pRootSelected)
+					++iNumStates;
+			}
+			if(iNumStates == 0)
+				iNumStates = 1; // Single filter, single state
+
+			ui->btnGenerateStates->setText("Append " % QString::number(iNumStates) % " States");
+			ui->btnGenerateStates->setEnabled(true);
+		}
+		else
+		{
+			ui->lblGenerateStates->setText("<none selected>");
+
+			ui->btnGenerateStates->setText("Append States");
+			ui->btnGenerateStates->setEnabled(false);
+		}
+
+		ui->actionImportFrames->setEnabled(pRootSelected != nullptr);
+	}
 }
 
 /*virtual*/ void SpriteWidget::OnFocusState(int iStateIndex, QVariant subState) /*override*/
@@ -471,5 +506,48 @@ void SpriteWidget::on_btnHz60_clicked()
 void SpriteWidget::on_sbFrameRate_valueChanged(double dValue)
 {
 	QUndoCommand *pCmd = new SpriteUndoCmd_DurationFrame(ui->framesView, -1, dValue);
+	GetItem().GetUndoStack()->push(pCmd);
+}
+
+void SpriteWidget::on_btnGenerateStates_clicked()
+{
+	ManagerWidget *pAtlasManagerWidget = m_ItemRef.GetProject().GetAtlasWidget();
+
+	TreeModelItemData *pRootSelected = pAtlasManagerWidget->GetSelected();
+	if(pRootSelected == nullptr || pRootSelected->GetType() != ITEM_Filter)
+		HyGuiLog("SpriteWidget::on_btnGenerateStates_clicked() - No valid filter selected", LOGTYPE_Error);
+
+	QList<TreeModelItemData *> itemDataList = pAtlasManagerWidget->GetItemsRecursively(pRootSelected);
+
+	QList<TreeModelItemData *> filterList;
+	for(TreeModelItemData *pItemData : itemDataList)
+	{
+		if(pItemData->GetType() == ITEM_Filter && pAtlasManagerWidget->GetModel().FindTreeItemFilter(pItemData, false) == pRootSelected)
+			filterList.append(pItemData);
+	}
+	if(filterList.empty())
+		filterList.append(pRootSelected); // Single filter, single state
+
+	QMap<QString, QList<AtlasFrame *>> importMap; // Key = Filter/State Name, Value = List of Frames
+	for(TreeModelItemData *pItemData : itemDataList)
+	{
+		if(pItemData->GetType() == ITEM_AtlasFrame)
+		{
+			TreeModelItemData *pParentFilter = pAtlasManagerWidget->GetModel().FindTreeItemFilter(pItemData, true);
+			for(TreeModelItemData *pFilter : filterList)
+			{
+				if(pFilter == pParentFilter)
+					importMap[pFilter->GetText()].append(static_cast<AtlasFrame *>(pItemData));
+			}
+		}
+	}
+
+	int iNumFrames = 0;
+	for(QList<AtlasFrame *> frameList : importMap)
+		iNumFrames += frameList.size();
+	if(QMessageBox::Yes != QMessageBox::question(MainWindow::GetInstance(), "Confirm Generating Sprite States", "Do you want to append " % QString::number(importMap.keys().size()) % " new states with a total of " % QString::number(iNumFrames) % " frames to the sprite?", QMessageBox::Yes | QMessageBox::No))
+		return;
+
+	SpriteUndoCmd_GenerateStates *pCmd = new SpriteUndoCmd_GenerateStates(m_ItemRef, importMap);
 	GetItem().GetUndoStack()->push(pCmd);
 }

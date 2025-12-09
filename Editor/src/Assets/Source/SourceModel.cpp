@@ -155,7 +155,7 @@ void SourceModel::OnAddClass(TreeModelItemData *pFirstSelected)
 		QVector<TreeModelItemData *> correspondingParentList;
 		QVector<QUuid> correspondingUuidList;
 
-		TreeModelItemData *pParentLocation = FindTreeItemFilter(pFirstSelected);
+		TreeModelItemData *pParentLocation = FindTreeItemFilter(pFirstSelected, true);
 		QModelIndex indexDestination = FindIndex<TreeModelItemData *>(pParentLocation, 0);
 
 		sImportList << GenerateSrcFile(TEMPLATE_ClassCpp, indexDestination, pDlg->GetCodeClassName(), pDlg->GetCppFileName(), pDlg->GetBaseClassName(), pDlg->IsEntityBaseClass(), nullptr);

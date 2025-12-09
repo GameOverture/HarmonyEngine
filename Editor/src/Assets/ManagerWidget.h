@@ -112,6 +112,8 @@ public:
 	TreeModelItemData *GetSelected();
 	void GetSelected(QList<IAssetItemData *> &selectedAssetsOut, QList<TreeModelItemData *> &selectedFiltersOut, bool bSortAlphabetically);
 
+	QList<TreeModelItemData *> GetItemsRecursively(TreeModelItemData *pRootItemData) const; // Returned list includes the item at indexRef
+
 protected:
 	virtual void enterEvent(QEnterEvent *pEvent) override;
 	virtual void leaveEvent(QEvent *pEvent) override;
@@ -119,6 +121,7 @@ protected:
 
 private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);
+	void OnAssetTreeSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
 
 	void on_assetTree_pressed(const QModelIndex &index);
 	void on_assetTree_doubleClicked(const QModelIndex &index);

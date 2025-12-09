@@ -85,7 +85,7 @@ SpriteUndoCmd_OrderFrame::SpriteUndoCmd_OrderFrame(SpriteTableView *pSpriteTable
 {
 }
 
-void SpriteUndoCmd_OrderFrame::redo()
+/*virtual*/ void SpriteUndoCmd_OrderFrame::redo() /*override*/
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 	
@@ -106,7 +106,7 @@ void SpriteUndoCmd_OrderFrame::redo()
 	m_pSpriteTableView->selectRow(m_iFrameIndexDest);
 }
 
-void SpriteUndoCmd_OrderFrame::undo()
+/*virtual*/ void SpriteUndoCmd_OrderFrame::undo() /*override*/
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 	
@@ -157,7 +157,7 @@ SpriteUndoCmd_PositionFrame::SpriteUndoCmd_PositionFrame(SpriteTableView *pSprit
 {
 }
 
-void SpriteUndoCmd_PositionFrame::redo()
+/*virtual*/ void SpriteUndoCmd_PositionFrame::redo() /*override*/
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -175,7 +175,7 @@ void SpriteUndoCmd_PositionFrame::redo()
 	// TODO: replace this with ProjectItem::FocusWidgetState
 }
 
-void SpriteUndoCmd_PositionFrame::undo()
+/*virtual*/ void SpriteUndoCmd_PositionFrame::undo() /*override*/
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -220,7 +220,7 @@ SpriteUndoCmd_SetXFrame::SpriteUndoCmd_SetXFrame(SpriteTableView *pSpriteTableVi
 {
 }
 
-void SpriteUndoCmd_SetXFrame::redo()
+/*virtual*/ void SpriteUndoCmd_SetXFrame::redo() /*override*/
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -240,7 +240,7 @@ void SpriteUndoCmd_SetXFrame::redo()
 	}
 }
 
-void SpriteUndoCmd_SetXFrame::undo()
+/*virtual*/ void SpriteUndoCmd_SetXFrame::undo() /*override*/
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -283,7 +283,7 @@ SpriteUndoCmd_SetYFrame::SpriteUndoCmd_SetYFrame(SpriteTableView *pSpriteTableVi
 {
 }
 
-void SpriteUndoCmd_SetYFrame::redo()
+/*virtual*/ void SpriteUndoCmd_SetYFrame::redo() /*override*/
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -303,7 +303,7 @@ void SpriteUndoCmd_SetYFrame::redo()
 	}
 }
 
-void SpriteUndoCmd_SetYFrame::undo()
+/*virtual*/ void SpriteUndoCmd_SetYFrame::undo() /*override*/
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -343,7 +343,7 @@ SpriteUndoCmd_DurationFrame::SpriteUndoCmd_DurationFrame(SpriteTableView *pSprit
 {
 }
 
-void SpriteUndoCmd_DurationFrame::redo()
+/*virtual*/ void SpriteUndoCmd_DurationFrame::redo() /*override*/
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -359,7 +359,7 @@ void SpriteUndoCmd_DurationFrame::redo()
 	}
 }
 
-void SpriteUndoCmd_DurationFrame::undo()
+/*virtual*/ void SpriteUndoCmd_DurationFrame::undo() /*override*/
 {
 	SpriteFramesModel *pSpriteFramesModel = static_cast<SpriteFramesModel *>(m_pSpriteTableView->model());
 
@@ -373,4 +373,41 @@ void SpriteUndoCmd_DurationFrame::undo()
 		pSpriteFramesModel->DurationFrame(m_iFrameIndex, m_OriginalDurationList[0]);
 		m_pSpriteTableView->selectRow(m_iFrameIndex);
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+SpriteUndoCmd_GenerateStates::SpriteUndoCmd_GenerateStates(ProjectItemData &spriteItemRef, QMap<QString, QList<AtlasFrame *>> importMap, QUndoCommand *pParent /*= 0*/) :
+	QUndoCommand(pParent),
+	m_SpriteItemRef(spriteItemRef),
+	m_ImportMap(importMap)
+{
+	setText("Generate States from Asset Filter");
+}
+
+/*virtual*/ SpriteUndoCmd_GenerateStates::~SpriteUndoCmd_GenerateStates()
+{
+
+}
+
+/*virtual*/ void SpriteUndoCmd_GenerateStates::redo() /*override*/
+{
+	int iIndex = 0;
+	for(QString sStateName : m_ImportMap.keys())
+	{
+		FileDataPair fileDataPair;
+		fileDataPair.m_Meta.insert("name", QJsonValue(sStateName));
+
+		iIndex = m_SpriteItemRef.GetModel()->AppendState<SpriteStateData>(fileDataPair);
+		QVariant focusSubState = static_cast<SpriteModel *>(m_SpriteItemRef.GetModel())->Cmd_AddFrames(iIndex, m_ImportMap[sStateName]);
+	}
+	
+	m_SpriteItemRef.FocusWidgetState(iIndex, -1);
+}
+
+/*virtual*/ void SpriteUndoCmd_GenerateStates::undo() /*override*/
+{
+	for(int i = 0; i < m_ImportMap.keys().size(); ++i)
+		m_SpriteItemRef.GetModel()->PopState(m_SpriteItemRef.GetModel()->GetNumStates() - 1);
+
+	m_SpriteItemRef.FocusWidgetState(m_SpriteItemRef.GetModel()->GetNumStates() - 1, -1);
 }

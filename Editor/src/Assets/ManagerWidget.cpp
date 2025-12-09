@@ -440,6 +440,7 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	ui->assetTree->setSortingEnabled(true);
 	ui->assetTree->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->assetTree, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(OnContextMenu(const QPoint&)));
+	connect(ui->assetTree->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(OnAssetTreeSelectionChanged(const QModelIndex &, const QModelIndex &)));
 
 	// Setup Actions
 	ui->actionImportAssets->setIcon(HyGlobal::AssetIcon(m_pModel->GetAssetType(), SUBICON_None));
@@ -701,6 +702,12 @@ void ManagerWidget::GetSelected(QList<IAssetItemData *> &selectedAssetsOut, QLis
 	}
 }
 
+QList<TreeModelItemData *> ManagerWidget::GetItemsRecursively(TreeModelItemData *pRootItemData) const
+{
+	QModelIndex index = m_pModel->FindIndex<TreeModelItemData *>(pRootItemData, 0);
+	return m_pModel->GetItemsRecursively(index);
+}
+
 /*virtual*/ void ManagerWidget::enterEvent(QEnterEvent*pEvent) /*override*/
 {
 	QWidget::enterEvent(pEvent);
@@ -877,6 +884,14 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 		delete actionAtlasGrpMoveList[i];
 }
 
+void ManagerWidget::OnAssetTreeSelectionChanged(const QModelIndex &current, const QModelIndex &previous)
+{
+	// Call `IWidget::OnUpdateActions()` on the currently open project item
+	ProjectItemData *pCurrentOpenItem = m_pModel->GetProjOwner().GetCurrentOpenItem();
+	if(pCurrentOpenItem && pCurrentOpenItem->GetWidget())
+		pCurrentOpenItem->GetWidget()->OnUpdateActions();
+}
+
 void ManagerWidget::on_assetTree_pressed(const QModelIndex &index)
 {
 	QList<IAssetItemData *> selectedAssetsList; QList<TreeModelItemData *> selectedFiltersList;
@@ -1021,7 +1036,7 @@ void ManagerWidget::on_actionRename_triggered()
 				// Ask to rename old corresponding TreeModelItemData in same filter/directory (.h <-> .cpp) to new name
 				SourceFile *pRenamedSrcFile = static_cast<SourceFile *>(pItemToBeRenamed);
 
-				TreeModelItemData *pFilter = m_pModel->FindTreeItemFilter(pItemToBeRenamed);
+				TreeModelItemData *pFilter = m_pModel->FindTreeItemFilter(pItemToBeRenamed, true);
 				QList<TreeModelItemData *> itemList = m_pModel->GetItemsRecursively(m_pModel->FindIndex<TreeModelItemData *>(pFilter, 0));
 
 				if(pRenamedSrcFile->GetMetaFileExt() == ".h")
@@ -1199,7 +1214,7 @@ void ManagerWidget::on_actionImportAssets_triggered()
 	else
 		pFirstSelected = GetSelected();
 
-	TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected);
+	TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected, true);
 
 	QVector<TreeModelItemData *> correspondingParentList;
 	QVector<QUuid> correspondingUuidList;
@@ -1237,7 +1252,7 @@ void ManagerWidget::on_actionImportDirectory_triggered()
 		pFirstSelected = GetSelected();
 
 	// The 'pImportParent' will be the root point for all new AtlasTreeItem insertions (both filters and images)
-	TreeModelItemData *pImportParent = m_pModel->FindTreeItemFilter(pFirstSelected);
+	TreeModelItemData *pImportParent = m_pModel->FindTreeItemFilter(pFirstSelected, true);
 
 	// Store all the specified imported image paths and their corresponding parent tree items they should be inserted into
 	QStringList sImportList;
@@ -1325,7 +1340,7 @@ void ManagerWidget::on_actionAddFilter_triggered()
 		else
 			pFirstSelected = GetSelected();
 
-		TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected);
+		TreeModelItemData *pParent = m_pModel->FindTreeItemFilter(pFirstSelected, true);
 		pNewFilter = m_pModel->CreateNewFilter(pDlg->GetName(), pParent, true);
 	}
 
@@ -1351,7 +1366,7 @@ void ManagerWidget::on_actionCreateTileSet_triggered()
 	else
 		pParentTreeItem = GetSelected();
 
-	pParentTreeItem = m_pModel->FindTreeItemFilter(pParentTreeItem);
+	pParentTreeItem = m_pModel->FindTreeItemFilter(pParentTreeItem, true);
 
 	DlgInputName dlgInputName("Enter TileSet Name", "New TileSet", HyGlobal::FileNameValidator(), nullptr, nullptr);
 	if(dlgInputName.exec() == QDialog::Accepted)

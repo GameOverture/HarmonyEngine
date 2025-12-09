@@ -105,6 +105,8 @@ private Q_SLOTS:
 
 	void on_sbFrameRate_valueChanged(double dValue);
 
+	void on_btnGenerateStates_clicked();
+
 private:
 	Ui::SpriteWidget *ui;
 };

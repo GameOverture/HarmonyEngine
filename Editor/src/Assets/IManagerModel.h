@@ -78,7 +78,7 @@ public:
 	void FlushRepack();
 
 	QString AssembleFilter(const TreeModelItemData *pAsset, bool bIncludeSelfIfFilter) const;
-	TreeModelItemData *FindTreeItemFilter(TreeModelItemData *pItem) const;
+	TreeModelItemData *FindTreeItemFilter(TreeModelItemData *pItem, bool bFindSelfIfFilter) const;
 	TreeModelItemData *ReturnFilter(QString sFilterPath, bool bCreateNonExistingFilter = true);
 
 	bool RemoveLookup(IAssetItemData *pAsset); // Returns true if no remaining duplicates exist

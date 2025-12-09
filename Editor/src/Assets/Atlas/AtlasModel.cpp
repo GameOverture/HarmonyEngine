@@ -276,7 +276,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 		// Assemble a call to asset manager's directory import
 
 		// The 'pImportParent' will be the root point for all new AtlasTreeItem insertions (both filters and images)
-		TreeModelItemData *pImportParent = FindTreeItemFilter(pFirstSelected);
+		TreeModelItemData *pImportParent = FindTreeItemFilter(pFirstSelected, true);
 		if(pImportParent)
 			HyGuiLog("Sprite Sheet import destination: " % AssembleFilter(pImportParent, true), LOGTYPE_Normal);
 		else

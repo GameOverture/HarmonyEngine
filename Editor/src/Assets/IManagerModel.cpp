@@ -474,12 +474,12 @@ QString IManagerModel::AssembleFilter(const TreeModelItemData *pAsset, bool bInc
 	return sPrefix;
 }
 
-TreeModelItemData *IManagerModel::FindTreeItemFilter(TreeModelItemData *pItem) const
+TreeModelItemData *IManagerModel::FindTreeItemFilter(TreeModelItemData *pItem, bool bFindSelfIfFilter) const
 {
 	if(pItem == nullptr)
 		return nullptr;
 
-	if(pItem->GetType() == ITEM_Filter)
+	if(bFindSelfIfFilter && pItem->GetType() == ITEM_Filter)
 		return pItem;
 
 	TreeModelItem *pTreeItem = GetItem(FindIndex<TreeModelItemData *>(pItem, 0));
@@ -932,7 +932,7 @@ void IManagerModel::SaveData() // Assets required by the game (runtime manifests
 
 	// Error check destination index 'indexRef'
 	TreeModelItem *pDropItem = GetItem(parentRef);
-	TreeModelItemData *pDestFilter = FindTreeItemFilter(pDropItem->data(0).value<TreeModelItemData *>());
+	TreeModelItemData *pDestFilter = FindTreeItemFilter(pDropItem->data(0).value<TreeModelItemData *>(), true);
 	TreeModelItem *pDestFilterTreeItem = GetItem(FindIndex<TreeModelItemData *>(pDestFilter, 0));
 
 	// Parse 'sSrc' for paste information

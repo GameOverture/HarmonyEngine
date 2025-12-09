@@ -60,8 +60,8 @@ public:
 	SpriteUndoCmd_OrderFrame(SpriteTableView *pSpriteTableView, int iFrameIndex, int iFrameIndexDestination, QUndoCommand *pParent = 0);
 	virtual ~SpriteUndoCmd_OrderFrame();
 
-	void redo() override;
-	void undo() override;
+	virtual void redo() override;
+	virtual void undo() override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,8 +76,8 @@ public:
 	SpriteUndoCmd_PositionFrame(SpriteTableView *pSpriteTableView, int iIndex, QPoint ptNewPos, bool bApplyAsOffset, QUndoCommand *pParent = 0);
 	virtual ~SpriteUndoCmd_PositionFrame();
 
-	void redo() override;
-	void undo() override;
+	virtual void redo() override;
+	virtual void undo() override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,8 +92,8 @@ public:
 	SpriteUndoCmd_SetXFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent = 0);
 	virtual ~SpriteUndoCmd_SetXFrame();
 
-	void redo() override;
-	void undo() override;
+	virtual void redo() override;
+	virtual void undo() override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,8 +108,8 @@ public:
 	SpriteUndoCmd_SetYFrame(SpriteTableView *pSpriteTableView, int iIndex, QList<int> newOffsetList, QUndoCommand *pParent = 0);
 	virtual ~SpriteUndoCmd_SetYFrame();
 
-	void redo() override;
-	void undo() override;
+	virtual void redo() override;
+	virtual void undo() override;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,8 +124,22 @@ public:
 	SpriteUndoCmd_DurationFrame(SpriteTableView *pSpriteTableView, int iIndex, float fDuration, QUndoCommand *pParent = 0);
 	virtual ~SpriteUndoCmd_DurationFrame();
 
-	void redo() override;
-	void undo() override;
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class SpriteUndoCmd_GenerateStates : public QUndoCommand
+{
+	ProjectItemData &					m_SpriteItemRef;
+	QMap<QString, QList<AtlasFrame *>>	m_ImportMap;
+
+public:
+	SpriteUndoCmd_GenerateStates(ProjectItemData &spriteItemRef, QMap<QString, QList<AtlasFrame *>> importMap, QUndoCommand *pParent = 0);
+	virtual ~SpriteUndoCmd_GenerateStates();
+
+	virtual void redo() override;
+	virtual void undo() override;
 };
 
 #endif // SPRITEUNDOCMDS_H

@@ -17,16 +17,50 @@
    <item>
     <layout class="QHBoxLayout" name="lytGenerateStates">
      <item>
-      <widget class="QLabel" name="lblGenerateStates">
+      <widget class="QLabel" name="label">
        <property name="text">
         <string>Generate States from filter:</string>
        </property>
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="lblFilterIcon">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../../../data/HyEditor.qrc">:/icons16x16/items/Filter.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblGenerateStates">
+       <property name="text">
+        <string>&lt;none selected&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QPushButton" name="btnGenerateStates">
        <property name="text">
         <string>Append States</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../data/HyEditor.qrc">
+         <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
        </property>
       </widget>
      </item>
