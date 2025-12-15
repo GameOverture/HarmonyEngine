@@ -96,7 +96,7 @@ class AtlasTileSet : public AtlasFrame
 			return animationObj;
 		}
 	};
-	QList<Animation>				m_AnimationList;
+	QList<Animation>			m_AnimationList;
 
 	struct TerrainSet
 	{
@@ -175,7 +175,7 @@ class AtlasTileSet : public AtlasFrame
 			return terrainSetObj;
 		}
 	};
-	QList<TerrainSet>				m_TerrainSetList;
+	QList<TerrainSet>			m_TerrainSetList;
 
 	struct PhysicsLayer
 	{
@@ -264,12 +264,13 @@ public:
 	TileSetScene *GetGfxScene();
 
 	// Cmd functions are the only functions that change the data (via Undo/Redo)
-	void Cmd_AllocateJsonItem(TileSetWgtType eType, QJsonObject data);
-	void Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj);
 	QList<QPair<QPoint, TileData *>> Cmd_AppendNewTiles(QSize vRegionSize, const QMap<QPoint, QPixmap> &importBatchMap, Qt::Edge eAppendEdge);
 	QList<QPair<QPoint, TileData *>> Cmd_RemoveTiles(QVector<TileData *> tileDataList);
 	void Cmd_ReaddTiles(QList<QPair<QPoint, TileData *>> tileDataList);
 	void Cmd_MoveTiles(QList<TileData*> tileDataList, QList<QPoint> newGridPosList);
+	void Cmd_AllocateJsonItem(TileSetWgtType eType, QJsonObject data);
+	void Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj);
+	void Cmd_RemoveJsonItem(QUuid uuid);
 
 	QAction *GetSaveAction();
 	QUndoStack *GetUndoStack();

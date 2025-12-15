@@ -73,8 +73,8 @@
      <addaction name="actionNewPrefix"/>
      <addaction name="separator"/>
      <addaction name="actionNewSprite"/>
-     <addaction name="actionNewTileMap"/>
      <addaction name="actionNewText"/>
+     <addaction name="actionNewTileMap"/>
      <addaction name="actionNewParticle"/>
      <addaction name="actionNewSpine"/>
      <addaction name="actionNewPrefab"/>

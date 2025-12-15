@@ -93,8 +93,11 @@ void IManagerModel::Init()
 
 			// Check to see if the actual meta asset exists on disk
 			QString sFilePath = m_MetaDir.absoluteFilePath(pAssetData->ConstructMetaFileName());
-			if(QFile::exists(sFilePath) == false)
+			if(QFile::exists(sFilePath) == false &&
+				(pAssetData->GetType() != ITEM_AtlasTileSet || static_cast<AtlasTileSet *>(pAssetData)->GetNumTiles() > 0)) // It's ok for an AtlasTileSet with 0 tiles to not have a meta file
+			{
 				pAssetData->SetError(ASSETERROR_CannotFindMetaFile);
+			}
 			else
 				pAssetData->ClearError(ASSETERROR_CannotFindMetaFile);
 		}

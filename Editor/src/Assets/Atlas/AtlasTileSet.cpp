@@ -287,6 +287,12 @@ QJsonObject AtlasTileSet::GetJsonItem(QUuid uuid) const
 	{
 		if (terrainSet.m_uuid == uuid)
 			return terrainSet.ToJsonObject();
+
+		for(const TerrainSet::Terrain &terrain : terrainSet.m_TerrainList)
+		{
+			if(terrain.m_uuid == uuid)
+				return terrain.ToJsonObject();
+		}
 	}
 	for (const PhysicsLayer &physicsLayer : m_PhysicsLayerList)
 	{
@@ -315,77 +321,6 @@ QVector<TileData *> AtlasTileSet::GetTileDataList() const
 TileSetScene *AtlasTileSet::GetGfxScene()
 {
 	return &m_GfxScene;
-}
-
-void AtlasTileSet::Cmd_AllocateJsonItem(TileSetWgtType eType, QJsonObject data)
-{
-	switch (eType)
-	{
-	case TILESETWGT_Animation:
-		m_AnimationList.push_back(Animation(data));
-		break;
-	case TILESETWGT_TerrainSet:
-		m_TerrainSetList.push_back(TerrainSet(data));
-		break;
-	case TILESETWGT_Terrain: {
-		QUuid terrainSetUuid = QUuid(data["terrainSetUUID"].toString());
-		bool bFound = false;
-		for (TerrainSet &terrainSet : m_TerrainSetList)
-		{
-			if (terrainSet.m_uuid == terrainSetUuid)
-			{
-				terrainSet.m_TerrainList.push_back(TerrainSet::Terrain(data));
-				bFound = true;
-				break;
-			}
-		}
-		if (bFound == false)
-			HyGuiLog("AtlasTileSet::Cmd_AllocateJsonItem() could not find Terrain Set with UUID: " + terrainSetUuid.toString(), LOGTYPE_Error);
-		break; }
-
-	default:
-		HyGuiLog("AtlasTileSet::Cmd_AllocateJsonItem() received unknown TileSetWgtType: " + QString::number(static_cast<int>(eType)), LOGTYPE_Error);
-		break;
-	}
-}
-
-void AtlasTileSet::Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj)
-{
-	for (Animation &animationRef : m_AnimationList)
-	{
-		if (animationRef.m_uuid == uuid)
-		{
-			animationRef = Animation(itemDataObj);
-			return;
-		}
-	}
-	for (TerrainSet &terrainSetRef : m_TerrainSetList)
-	{
-		if (terrainSetRef.m_uuid == uuid)
-		{
-			terrainSetRef = TerrainSet(itemDataObj);
-			return;
-		}
-		// Check for Terrain within TerrainSet
-		for (TerrainSet::Terrain &terrainRef : terrainSetRef.m_TerrainList)
-		{
-			if (terrainRef.m_uuid == uuid)
-			{
-				terrainRef = TerrainSet::Terrain(itemDataObj);
-				return;
-			}
-		}
-	}
-	for (PhysicsLayer &physicsLayerRef : m_PhysicsLayerList)
-	{
-		if (physicsLayerRef.m_uuid == uuid)
-		{
-			physicsLayerRef = PhysicsLayer(itemDataObj);
-			return;
-		}
-	}
-
-	HyGuiLog("AtlasTileSet::SetJsonItem() could not find item with UUID: " + uuid.toString(), LOGTYPE_Error);
 }
 
 QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vRegionSize, const QMap<QPoint, QPixmap> &importBatchMap, Qt::Edge eAppendEdge)
@@ -510,6 +445,116 @@ void AtlasTileSet::Cmd_MoveTiles(QList<TileData*> tileDataList, QList<QPoint> ne
 	//m_bSubAtlasDirty = true;
 }
 
+void AtlasTileSet::Cmd_AllocateJsonItem(TileSetWgtType eType, QJsonObject data)
+{
+	switch(eType)
+	{
+	case TILESETWGT_Animation:
+		m_AnimationList.push_back(Animation(data));
+		break;
+	case TILESETWGT_TerrainSet:
+		m_TerrainSetList.push_back(TerrainSet(data));
+		break;
+	case TILESETWGT_Terrain: {
+		QUuid terrainSetUuid = QUuid(data["terrainSetUUID"].toString());
+		bool bFound = false;
+		for(TerrainSet &terrainSet : m_TerrainSetList)
+		{
+			if(terrainSet.m_uuid == terrainSetUuid)
+			{
+				terrainSet.m_TerrainList.push_back(TerrainSet::Terrain(data));
+				bFound = true;
+				break;
+			}
+		}
+		if(bFound == false)
+			HyGuiLog("AtlasTileSet::Cmd_AllocateJsonItem() could not find Terrain Set with UUID: " + terrainSetUuid.toString(), LOGTYPE_Error);
+		break;
+	}
+
+	default:
+		HyGuiLog("AtlasTileSet::Cmd_AllocateJsonItem() received unknown TileSetWgtType: " + QString::number(static_cast<int>(eType)), LOGTYPE_Error);
+		break;
+	}
+}
+
+void AtlasTileSet::Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj)
+{
+	for(Animation &animationRef : m_AnimationList)
+	{
+		if(animationRef.m_uuid == uuid)
+		{
+			animationRef = Animation(itemDataObj);
+			return;
+		}
+	}
+	for(TerrainSet &terrainSetRef : m_TerrainSetList)
+	{
+		if(terrainSetRef.m_uuid == uuid)
+		{
+			terrainSetRef = TerrainSet(itemDataObj);
+			return;
+		}
+		// Check for Terrain within TerrainSet
+		for(TerrainSet::Terrain &terrainRef : terrainSetRef.m_TerrainList)
+		{
+			if(terrainRef.m_uuid == uuid)
+			{
+				terrainRef = TerrainSet::Terrain(itemDataObj);
+				return;
+			}
+		}
+	}
+	for(PhysicsLayer &physicsLayerRef : m_PhysicsLayerList)
+	{
+		if(physicsLayerRef.m_uuid == uuid)
+		{
+			physicsLayerRef = PhysicsLayer(itemDataObj);
+			return;
+		}
+	}
+
+	HyGuiLog("AtlasTileSet::SetJsonItem() could not find item with UUID: " + uuid.toString(), LOGTYPE_Error);
+}
+
+void AtlasTileSet::Cmd_RemoveJsonItem(QUuid uuid)
+{
+	for(int i = 0; i < m_AnimationList.size(); ++i)
+	{
+		if(m_AnimationList[i].m_uuid == uuid)
+		{
+			m_AnimationList.removeAt(i);
+			return;
+		}
+	}
+	for(int i = 0; i < m_TerrainSetList.size(); ++i)
+	{
+		if(m_TerrainSetList[i].m_uuid == uuid)
+		{
+			m_TerrainSetList.removeAt(i);
+			return;
+		}
+		// Check for Terrain within TerrainSet
+		for(int j = 0; j < m_TerrainSetList[i].m_TerrainList.size(); ++j)
+		{
+			if(m_TerrainSetList[i].m_TerrainList[j].m_uuid == uuid)
+			{
+				m_TerrainSetList[i].m_TerrainList.removeAt(j);
+				return;
+			}
+		}
+	}
+	for(int i = 0; i < m_PhysicsLayerList.size(); ++i)
+	{
+		if(m_PhysicsLayerList[i].m_uuid == uuid)
+		{
+			m_PhysicsLayerList.removeAt(i);
+			return;
+		}
+	}
+	HyGuiLog("AtlasTileSet::Cmd_RemoveJsonItem() could not find item with UUID: " + uuid.toString(), LOGTYPE_Error);
+}
+
 QUndoStack *AtlasTileSet::GetUndoStack()
 {
 	return m_pUndoStack;
@@ -545,8 +590,8 @@ QIcon AtlasTileSet::GetTileSetIcon() const
 
 void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 {
-	// Get current member data and write to fileDataPairOut
-	fileDataPairOut = m_TileSetDataPair;
+	// Start with blank
+	fileDataPairOut = FileDataPair();
 
 	fileDataPairOut.m_Meta["tileShape"] = HyGlobal::TileSetShapeName(m_eTileShape);
 	fileDataPairOut.m_Meta["regionSize"] = QJsonArray() << QJsonValue(m_RegionSize.width()) << QJsonValue(m_RegionSize.height());
@@ -679,6 +724,9 @@ void AtlasTileSet::UpdateTilePolygon()
 
 void AtlasTileSet::RegenerateSubAtlas()
 {
+	if(m_TileDataList.isEmpty())
+		return;
+
 	// Create a texture with a size that will accommodate all the existing, and newly appended tiles
 	const int iNUM_COLS = NUM_COLS_TILESET(m_TileDataList.size());
 	const int iNUM_ROWS = NUM_ROWS_TILESET(m_TileDataList.size(), iNUM_COLS);

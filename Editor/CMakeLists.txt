@@ -1,4 +1,3 @@
-#set(Qt6_DIR C:/Soft/Qt/5.12.0/msvc2017_64/lib/cmake/Qt5)
 set(Qt6_DIR "" CACHE PATH "Specify cmake Qt6 directory. Ex. C:/Qt/<version>/msvc2022_64/lib/cmake/Qt6")
 
 if(Qt6_DIR)
@@ -13,6 +12,8 @@ if(Qt6_DIR)
 	target_include_directories(freetype-gl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Engine/vendor/glad/include")
 	target_include_directories(freetype-gl PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/vendor/freetype2/include")
 	target_link_libraries(freetype-gl PUBLIC freetype)
+	
+	set(BUILD_TESTING OFF)
 	
 	message(STATUS "Adding Vendor: ogg")
 	add_subdirectory(vendor/ogg)

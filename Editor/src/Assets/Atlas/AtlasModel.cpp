@@ -16,6 +16,7 @@
 #include "MainWindow.h"
 #include "DlgAtlasGroupSettings.h"
 #include "DlgSliceSpriteSheet.h"
+#include "AuxAssetInspector.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -481,12 +482,16 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 
 		if(pFrame->GetSubAtlasType() == ITEM_AtlasTileSet)
 		{
+			MainWindow::HideAuxWidget(AUXTAB_TileSet);
+
 			QString sTileSetUuid = pFrame->GetUuid().toString(QUuid::WithoutBraces);
 			m_TileSetsDataPair.m_Data.remove(sTileSetUuid);
 			m_TileSetsDataPair.m_Meta.remove(sTileSetUuid);
 
 			WriteTileSetsToDisk();
 		}
+
+		static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_AssetInspector))->Clear(ASSETMAN_Atlases);
 
 		repackTexIndexMap[m_BanksModel.GetBank(GetBankIndexFromBankId(pFrame->GetBankId()))].insert(pFrame->GetTextureIndex());
 

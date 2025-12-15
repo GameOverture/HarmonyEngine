@@ -271,7 +271,8 @@ TileSetUndoCmd_AddWgtItem::TileSetUndoCmd_AddWgtItem(AuxTileSet &auxTileSetRef, 
 
 /*virtual*/ void TileSetUndoCmd_AddWgtItem::redo() /*override*/
 {
-	m_AuxTileSetRef.CmdSet_AllocateWgtItem(m_eType, m_ItemDataObj);
+	m_AuxTileSetRef.CmdSet_CreateWgtItem(m_eType, m_ItemDataObj);
+	m_AuxTileSetRef.GetTileSet()->Cmd_AllocateJsonItem(m_eType, m_ItemDataObj);
 
 	switch (m_eType)
 	{
@@ -375,7 +376,8 @@ TileSetUndoCmd_RemoveWgtItem::TileSetUndoCmd_RemoveWgtItem(AuxTileSet &auxTileSe
 
 /*virtual*/ void TileSetUndoCmd_RemoveWgtItem::undo() /*override*/
 {
-	m_AuxTileSetRef.CmdSet_AllocateWgtItem(m_eRemovedType, m_RemovedItemDataObj);
+	m_AuxTileSetRef.CmdSet_CreateWgtItem(m_eRemovedType, m_RemovedItemDataObj);
+	m_AuxTileSetRef.GetTileSet()->Cmd_AllocateJsonItem(m_eRemovedType, m_RemovedItemDataObj);
 
 	switch (m_eRemovedType)
 	{

@@ -140,6 +140,9 @@ void IWgtTileSetItem::OnModifyWidget(QString sUndoText, int iMergeId)
 				bDifferenceFound = true;
 				break;
 			}
+
+			if(bDifferenceFound)
+				break;
 		}
 	}
 	for (QString sKey : m_CachedJsonObj.keys())

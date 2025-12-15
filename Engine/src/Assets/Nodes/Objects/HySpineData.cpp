@@ -61,7 +61,7 @@ HySpineData::HySpineData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAs
 {
 #ifdef HY_USE_SPINE
 	bool bIsUsingTempFiles = false;
-	std::string sDataDir = assetsRef.GetDataDir() + HYASSETS_SpineDir;
+	std::string sDataDir = assetsRef.GetDataPath() + HYASSETS_SpineDir;
 	if(itemDataObj.HasMember("usingTempFiles"))
 	{
 		bIsUsingTempFiles = true;

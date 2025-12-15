@@ -39,6 +39,7 @@ class AuxTileSet : public QWidget
 	QTabBar *									m_pTabBar;
 
 	AtlasTileSet *								m_pTileSet;
+	IWgtTileSetItem *							m_pSelectedWgtItem;
 
 	bool										m_bIsImportingTileSheet;
 	QPixmap *									m_pImportTileSheetPixmap;
@@ -46,8 +47,6 @@ class AuxTileSet : public QWidget
 
 	QList<WgtTileSetAnimation *>				m_AnimationList;
 	QList<WgtTileSetTerrainSet *>				m_TerrainSetList;
-
-	IWgtTileSetItem *							m_pSelectedWgtItem;
 
 public:
 	explicit AuxTileSet(QWidget *pParent = nullptr);
@@ -68,7 +67,7 @@ public:
 
 	IWgtTileSetItem *FindWgtItem(QUuid uuid) const;
 	int GetWgtItemIndex(QUuid uuid) const;
-	void CmdSet_AllocateWgtItem(TileSetWgtType eType, QJsonObject data);
+	void CmdSet_CreateWgtItem(TileSetWgtType eType, QJsonObject data);
 	void CmdSet_DeleteWgtItem(QUuid uuid);
 	void CmdSet_OrderWgtItem(QUuid uuid, int newIndex);
 	void CmdSet_ModifyWgtItem(QUuid uuid, QJsonObject newData);

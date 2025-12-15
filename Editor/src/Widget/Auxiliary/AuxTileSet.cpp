@@ -28,9 +28,9 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::AuxTileSet),
 	m_pTileSet(nullptr),
+	m_pSelectedWgtItem(nullptr),
 	m_bIsImportingTileSheet(true),
-	m_pImportTileSheetPixmap(nullptr),
-	m_pSelectedWgtItem(nullptr)
+	m_pImportTileSheetPixmap(nullptr)
 {
 	ui->setupUi(this);
 	
@@ -85,6 +85,7 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 		return;
 
 	m_pTileSet = pTileSet;
+	m_pSelectedWgtItem = nullptr;
 	if(m_pTileSet == nullptr)
 		return;
 	
@@ -113,14 +114,14 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 	m_AnimationList.clear();
 	QVector<QJsonObject> animObjList = m_pTileSet->GetAnimations();
 	for(QJsonObject animObj : animObjList)
-		CmdSet_AllocateWgtItem(TILESETWGT_Animation, animObj);
+		CmdSet_CreateWgtItem(TILESETWGT_Animation, animObj);
 
 	for (WgtTileSetTerrainSet *pTerrain : m_TerrainSetList)
 		delete pTerrain;
 	m_TerrainSetList.clear();
 	QVector<QJsonObject> terrainSetObjList = m_pTileSet->GetTerrainSets();
 	for (QJsonObject terrainSetObj : terrainSetObjList)
-		CmdSet_AllocateWgtItem(TILESETWGT_TerrainSet, terrainSetObj);
+		CmdSet_CreateWgtItem(TILESETWGT_TerrainSet, terrainSetObj);
 
 	// TODO: physics here
 	
@@ -344,7 +345,7 @@ int AuxTileSet::GetWgtItemIndex(QUuid uuid) const
 	return -1;
 }
 
-void AuxTileSet::CmdSet_AllocateWgtItem(TileSetWgtType eType, QJsonObject data)
+void AuxTileSet::CmdSet_CreateWgtItem(TileSetWgtType eType, QJsonObject data)
 {
 	if(data.contains("UUID") == false)
 	{
@@ -364,7 +365,7 @@ void AuxTileSet::CmdSet_AllocateWgtItem(TileSetWgtType eType, QJsonObject data)
 		ui->lytAnimations->addWidget(pNewAnim);
 		m_AnimationList.append(pNewAnim);
 		pNewAnim->SetOrderBtns(m_AnimationList.size() > 1, false);
-		m_pTileSet->Cmd_AllocateJsonItem(eType, data);
+		
 		MakeSelectionChange(pNewAnim);
 		break; }
 
@@ -373,7 +374,7 @@ void AuxTileSet::CmdSet_AllocateWgtItem(TileSetWgtType eType, QJsonObject data)
 		ui->lytTerrainSets->addWidget(pNewTerrainSet);
 		m_TerrainSetList.append(pNewTerrainSet);
 		pNewTerrainSet->SetOrderBtns(m_TerrainSetList.size() > 1, false);
-		m_pTileSet->Cmd_AllocateJsonItem(eType, data);
+		
 		MakeSelectionChange(pNewTerrainSet);
 		break; }
 
@@ -384,8 +385,8 @@ void AuxTileSet::CmdSet_AllocateWgtItem(TileSetWgtType eType, QJsonObject data)
 			HyGuiLog("AuxTileSet::CmdSet_AddWgtItem: Terrain's parent TerrainSet widget not found!", LOGTYPE_Error);
 			return;
 		}
+
 		pParentTerrain->CmdSet_AllocTerrain(data);
-		m_pTileSet->Cmd_AllocateJsonItem(eType, data);
 		break; }
 
 	default:
@@ -404,6 +405,7 @@ void AuxTileSet::CmdSet_DeleteWgtItem(QUuid uuid)
 			ui->lytAnimations->removeWidget(pAnimationWidget);
 			m_AnimationList.removeAt(i);
 			delete pAnimationWidget;
+			m_pTileSet->Cmd_RemoveJsonItem(uuid);
 			return;
 		}
 	}
@@ -415,6 +417,7 @@ void AuxTileSet::CmdSet_DeleteWgtItem(QUuid uuid)
 			ui->lytTerrainSets->removeWidget(pTerrainWidget);
 			m_TerrainSetList.removeAt(i);
 			delete pTerrainWidget;
+			m_pTileSet->Cmd_RemoveJsonItem(uuid);
 			return;
 		}
 
@@ -425,6 +428,7 @@ void AuxTileSet::CmdSet_DeleteWgtItem(QUuid uuid)
 			if (pTerrainSubWidget->GetUuid() == uuid)
 			{
 				pTerrainWidget->CmdSet_DeleteTerrain(uuid);
+				m_pTileSet->Cmd_RemoveJsonItem(uuid);
 				return;
 			}
 		}
