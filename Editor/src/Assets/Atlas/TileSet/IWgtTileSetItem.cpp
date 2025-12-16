@@ -63,7 +63,7 @@ void IWgtTileSetItem::SetSelected(bool bSelected)
 	if (m_bIsSelected)
 	{
 		pBorderFrame->setFrameStyle(QFrame::Box | QFrame::Raised);
-		pBorderFrame->setLineWidth(2);
+		pBorderFrame->setLineWidth(1);
 		pBorderFrame->setEnabled(true);
 	}
 	else

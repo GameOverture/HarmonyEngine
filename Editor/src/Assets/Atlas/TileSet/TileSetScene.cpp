@@ -60,27 +60,23 @@ void TileSetScene::Initialize(AtlasTileSet *pTileSet)
 	for(int i = 0; i < tileDataList.size(); ++i)
 		AddTile(false, tileDataList[i], m_pTileSet->GetTilePolygon(), tileDataList[i]->GetMetaGridPos(), tileDataList[i]->GetPixmap(), false);
 
-	RefreshTiles();
 	OnTileSetPageChange(m_pTileSet->GetNumTiles() > 0 ? TILESETPAGE_Arrange : TILESETPAGE_Import);
 }
 
 void TileSetScene::OnTileSetPageChange(TileSetPage ePage)
 {
-	switch (ePage)
+	if(ePage == TILESETPAGE_Import)
 	{
-	case TILESETPAGE_Import:
 		m_pModeSetupGroup->setOpacity(0.42f);
 		m_pModeImportGroup->setVisible(true);
-		break;
-	case TILESETPAGE_Arrange:
-	case TILESETPAGE_Animation:
-	case TILESETPAGE_Autotile:
-	case TILESETPAGE_Collision:
-	case TILESETPAGE_CustomData:
+	}
+	else
+	{
 		m_pModeSetupGroup->setOpacity(1.0f);
 		m_pModeImportGroup->setVisible(false);
-		break;
 	}
+
+	RefreshSetupTiles(ePage);
 }
 
 QPointF TileSetScene::GetFocusPt(TileSetPage ePage) const
@@ -239,7 +235,69 @@ void TileSetScene::AddTile(bool bImportTile, TileData *pTileData, const QPolygon
 	}
 }
 
-void TileSetScene::RefreshTiles(QPointF vDragDelta /*= QPointF()*/)
+void TileSetScene::RefreshImportTiles()
+{
+	int iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
+	int iTileSpacingWidth = m_vImportRegionSize.width() + g_iSpacingAmt;
+	int iTileSpacingHeight = m_vImportRegionSize.height() + g_iSpacingAmt;
+	for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
+	{
+		QPoint ptGridPos = iter.key();
+		iMinGridX = HyMath::Min(iMinGridX, ptGridPos.x());
+		iMaxGridX = HyMath::Max(iMaxGridX, ptGridPos.x());
+		iMinGridY = HyMath::Min(iMinGridY, ptGridPos.y());
+		iMaxGridY = HyMath::Max(iMaxGridY, ptGridPos.y());
+
+		QPoint ptCurPos;
+		ptCurPos.setX(ptGridPos.x() * iTileSpacingWidth);
+		ptCurPos.setY(ptGridPos.y() * iTileSpacingHeight);
+
+		iter.value()->Refresh(m_vImportRegionSize, m_pTileSet, TILESETPAGE_Import, nullptr);
+		iter.value()->setPos(ptCurPos);
+	}
+
+	int iNumColumns = fabs(iMaxGridX - iMinGridX + 1);
+	int iNumRows = fabs(iMaxGridY - iMinGridY + 1);
+	m_ImportBorderRect.setRect(iMinGridX * iTileSpacingWidth - g_borderMargins.left,
+		iMinGridY * iTileSpacingHeight - g_borderMargins.top,
+		iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right - g_iSpacingAmt,
+		iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom - g_iSpacingAmt);
+
+	if(m_ImportTileMap.empty())
+		m_ImportBorderRect.setVisible(false);
+	else
+	{
+		m_ImportBorderRect.setVisible(true);
+
+		if(m_SetupBorderRect.isVisible())
+		{
+			// Position the m_pModeImportGroup against the m_pModeSetupGroup's 'm_eImportAppendEdge'
+			QPointF ptImportGroupPos;
+			switch(m_eImportAppendEdge)
+			{
+			case Qt::TopEdge:
+				ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
+				ptImportGroupPos.setY(m_SetupBorderRect.rect().top() - g_borderMargins.bottom - m_ImportBorderRect.rect().height());
+				break;
+			case Qt::BottomEdge:
+				ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
+				ptImportGroupPos.setY(m_SetupBorderRect.rect().bottom() + g_borderMargins.top);
+				break;
+			case Qt::LeftEdge:
+				ptImportGroupPos.setX(m_SetupBorderRect.rect().left() - g_borderMargins.right - m_ImportBorderRect.rect().width());
+				ptImportGroupPos.setY(m_SetupBorderRect.rect().center().y() - m_ImportBorderRect.rect().height() / 2.0f);
+				break;
+			case Qt::RightEdge:
+				ptImportGroupPos.setX(m_SetupBorderRect.rect().right() + g_borderMargins.left);
+				ptImportGroupPos.setY(m_SetupBorderRect.rect().center().y() - m_ImportBorderRect.rect().height() / 2.0f);
+				break;
+			}
+			m_pModeImportGroup->setPos(ptImportGroupPos);
+		}
+	}
+}
+
+void TileSetScene::RefreshSetupTiles(TileSetPage ePage, QPointF vDragDelta /*= QPointF()*/)
 {
 	// Sync m_pTileSet's 'AtlasTileSet::m_TileDataList' with m_SetupTileMap
 	// Either add or remove TileData entries as needed
@@ -265,13 +323,13 @@ void TileSetScene::RefreshTiles(QPointF vDragDelta /*= QPointF()*/)
 			++iter;
 	}
 
-	// SETUP ------------------------------------------------------------------------------------------------------------------------
+	// Refresh all tiles and reposition them
 	int iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
 	int iTileSpacingWidth = m_pTileSet->GetAtlasRegionSize().width() + g_iSpacingAmt;
 	int iTileSpacingHeight = m_pTileSet->GetAtlasRegionSize().height() + g_iSpacingAmt;
 	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
 	{
-		iter.value()->Refresh(m_pTileSet->GetAtlasRegionSize(), m_pTileSet->GetTileOffset(), m_pTileSet->GetTilePolygon());
+		iter.value()->Refresh(m_pTileSet->GetAtlasRegionSize(), m_pTileSet, ePage, iter.key());
 
 		QPoint ptGridPos;
 		if(vDragDelta.isNull())
@@ -306,66 +364,6 @@ void TileSetScene::RefreshTiles(QPointF vDragDelta /*= QPointF()*/)
 							  iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right - g_iSpacingAmt,
 							  iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom - g_iSpacingAmt);
 	m_SetupBorderRect.setVisible(m_SetupTileMap.empty() == false && vDragDelta.isNull());
-
-	// IMPORT ------------------------------------------------------------------------------------------------------------------------
-	iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
-	iTileSpacingWidth = m_vImportRegionSize.width() + g_iSpacingAmt;
-	iTileSpacingHeight = m_vImportRegionSize.height() + g_iSpacingAmt;
-	for (auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
-	{
-		QPoint ptGridPos = iter.key();
-		iMinGridX = HyMath::Min(iMinGridX, ptGridPos.x());
-		iMaxGridX = HyMath::Max(iMaxGridX, ptGridPos.x());
-		iMinGridY = HyMath::Min(iMinGridY, ptGridPos.y());
-		iMaxGridY = HyMath::Max(iMaxGridY, ptGridPos.y());
-
-		QPoint ptCurPos;
-		ptCurPos.setX(ptGridPos.x() * iTileSpacingWidth);
-		ptCurPos.setY(ptGridPos.y() * iTileSpacingHeight);
-
-		iter.value()->Refresh(m_vImportRegionSize, m_pTileSet->GetTileOffset(), m_pTileSet->GetTilePolygon());
-		iter.value()->setPos(ptCurPos);
-	}
-
-	iNumColumns = fabs(iMaxGridX - iMinGridX + 1);
-	iNumRows = fabs(iMaxGridY - iMinGridY + 1);
-	m_ImportBorderRect.setRect(iMinGridX * iTileSpacingWidth - g_borderMargins.left,
-							   iMinGridY * iTileSpacingHeight - g_borderMargins.top,
-							   iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right - g_iSpacingAmt,
-							   iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom - g_iSpacingAmt);
-
-	if(m_ImportTileMap.empty())
-		m_ImportBorderRect.setVisible(false);
-	else
-	{
-		m_ImportBorderRect.setVisible(true);
-
-		if (m_SetupBorderRect.isVisible())
-		{
-			// Position the m_pModeImportGroup against the m_pModeSetupGroup's 'm_eImportAppendEdge'
-			QPointF ptImportGroupPos;
-			switch (m_eImportAppendEdge)
-			{
-			case Qt::TopEdge:
-				ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
-				ptImportGroupPos.setY(m_SetupBorderRect.rect().top() - g_borderMargins.bottom - m_ImportBorderRect.rect().height());
-				break;
-			case Qt::BottomEdge:
-				ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
-				ptImportGroupPos.setY(m_SetupBorderRect.rect().bottom() + g_borderMargins.top);
-				break;
-			case Qt::LeftEdge:
-				ptImportGroupPos.setX(m_SetupBorderRect.rect().left() - g_borderMargins.right - m_ImportBorderRect.rect().width());
-				ptImportGroupPos.setY(m_SetupBorderRect.rect().center().y() - m_ImportBorderRect.rect().height() / 2.0f);
-				break;
-			case Qt::RightEdge:
-				ptImportGroupPos.setX(m_SetupBorderRect.rect().right() + g_borderMargins.left);
-				ptImportGroupPos.setY(m_SetupBorderRect.rect().center().y() - m_ImportBorderRect.rect().height() / 2.0f);
-				break;
-			}
-			m_pModeImportGroup->setPos(ptImportGroupPos);
-		}
-	}
 }
 
 void TileSetScene::ClearImportTiles()
@@ -412,7 +410,7 @@ void TileSetScene::OnArrangingTilesMouseMove(QPointF ptMouseScenePos)
 	vDeltaGrid.setY(vDeltaGrid.y() / (m_pTileSet->GetAtlasRegionSize().height() + g_iSpacingAmt));
 	DisplaceTiles(vDeltaGrid);
 
-	RefreshTiles(vDelta);
+	RefreshSetupTiles(TILESETPAGE_Arrange, vDelta);
 }
 
 void TileSetScene::OnArrangingTilesMouseRelease(AuxTileSet &auxTileSetRef, QPointF ptMouseScenePos)

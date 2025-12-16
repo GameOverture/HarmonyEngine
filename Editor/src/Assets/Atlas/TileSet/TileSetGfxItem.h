@@ -11,10 +11,13 @@
 #define TILEGFXITEM_H
 
 #include "Global.h"
+#include "AuxTileSet.h"
+
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 
 class AtlasTileSet;
+class TileData;
 
 class TileSetGfxItem : public QGraphicsItem
 {
@@ -28,27 +31,27 @@ class TileSetGfxItem : public QGraphicsItem
 
 	QGraphicsRectItem *					m_pRectItem;
 	QGraphicsPixmapItem *				m_pPixmapItem;
-	QGraphicsPolygonItem *				m_pShapeItem;				// This is the shape outline of the tile as it sits in a grid, especially helpful for isometric and hexagon
+	QGraphicsPolygonItem *				m_pShapeItem;				// This is the shape outline of the tile as it sits in a grid, especially helpful for isometric and hexagon, or when the tile size is not the full texture region size
 
 	QPointF								m_ptDraggingInitialPos;		// The scene positions of this tile when starting a arranging operation
 	QPoint								m_ptDraggingGridPos;		// A temp variable used during arranging of tiles in the scene
 
 	QGraphicsRectItem *					m_pAnimationRectItem;		// Optional rectangle drawn around the tile when it is part of an animation
 
+	QGraphicsPolygonItem *				m_pAutoTileParts[17];		// 
+
 public:
 	TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon);
 	virtual ~TileSetGfxItem();
 
-	void Refresh(QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon);
+	void Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPage ePage, TileData *pTileData);
 
 	bool IsSelected() const;
 	void SetSelected(bool bSelected);
 	
 	void SetAsDragged(bool bDragged);
-
 	QPointF GetDraggingInitialPos() const;
 	void SetDraggingInitialPos(QPointF ptInitialPos);
-
 	QPoint GetDraggingGridPos() const;
 	void SetDraggingGridPos(QPoint ptGridPos);
 

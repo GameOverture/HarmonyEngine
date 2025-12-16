@@ -37,15 +37,15 @@ class TileSetScene : public QGraphicsScene
 
 	AtlasTileSet *													m_pTileSet;
 
-	QMap<TileData*, TileSetGfxItem*>								m_SetupTileMap;			// Keys are pointing to Actual concrete tiles from AtlasTileSet::m_TileDataMap
+	QMap<TileData *, TileSetGfxItem *>								m_SetupTileMap;			// Keys are pointing to Actual concrete tiles from AtlasTileSet::m_TileDataMap
 	QGraphicsRectItem												m_SetupBorderRect;		// A dash-line box that encompasses the working-portion of the 'setup' tiles
-	TileSetGfxItemGroup*											m_pModeSetupGroup;
+	TileSetGfxItemGroup *											m_pModeSetupGroup;
 
 	QPointF															m_vArrangingStartMousePos;
 
-	QMap<QPoint, TileSetGfxItem*>									m_ImportTileMap;		// Pending import tiles
+	QMap<QPoint, TileSetGfxItem *>									m_ImportTileMap;		// Pending import tiles
 	QGraphicsRectItem												m_ImportBorderRect;		// A dash-line box that encompasses the working-portion of the 'import' tiles
-	TileSetGfxItemGroup*											m_pModeImportGroup;
+	TileSetGfxItemGroup *											m_pModeImportGroup;
 	QSize															m_vImportRegionSize;
 	Qt::Edge														m_eImportAppendEdge;
 
@@ -70,14 +70,17 @@ public:
 	void OnMarqueeRelease(TileSetPage ePage, Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag);
 	void ClearSetupSelection();
 
-	TileSetGfxItem* GetSetupTileAt(QPointF ptScenePos) const;
+	TileSetGfxItem *GetSetupTileAt(QPointF ptScenePos) const;
 
-	void AddTile(bool bImportTile, TileData* pTileData, const QPolygonF& outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
+	void AddTile(bool bImportTile, TileData *pTileData, const QPolygonF &outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
 	
+	void RefreshImportTiles();
+
 	// Sync m_pTileSet's 'AtlasTileSet::m_TileDataList' with m_SetupTileMap
 	// Sets graphics items to match the data of m_pTileSet and current import tiles
 	// Also repositions tiles during sorting operations
-	void RefreshTiles(QPointF vDragDelta = QPointF());
+	void RefreshSetupTiles(TileSetPage ePage, QPointF vDragDelta = QPointF());
+
 
 	void ClearImportTiles();
 	void ClearSetupTiles();

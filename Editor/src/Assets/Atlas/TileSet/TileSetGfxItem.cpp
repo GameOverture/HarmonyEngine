@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "TileSetGfxItem.h"
+#include "AtlasTileSet.h"
 
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
@@ -45,6 +46,8 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	m_pShapeItem->setPen(m_ShapePen);
 	m_pShapeItem->setParentItem(this);
 
+
+
 	setAcceptHoverEvents(true);
 	//setAcceptedMouseButtons(Qt::NoButton);
 }
@@ -56,13 +59,28 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	delete m_pShapeItem;
 }
 
-void TileSetGfxItem::Refresh(QSize regionSize, QPointF vOffset, const QPolygonF& outlinePolygon)
+void TileSetGfxItem::Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPage ePage, TileData *pTileData)
 {
 	m_pRectItem->setRect(0.0f, 0.0f, regionSize.width(), regionSize.height());
-
-	m_pShapeItem->setPolygon(outlinePolygon);
+	m_pShapeItem->setPolygon(pTileSet->GetTilePolygon());
+	QPointF vOffset = pTileSet->GetTileOffset();
 	m_pShapeItem->setPos((regionSize.width() * 0.5f) + vOffset.x(),
 						 (regionSize.height() * 0.5f) + vOffset.y());
+
+	switch(ePage)
+	{
+	case TILESETPAGE_Import:
+	case TILESETPAGE_Arrange:
+	case TILESETPAGE_Animation:
+	case TILESETPAGE_Autotile:
+	case TILESETPAGE_Collision:
+	case TILESETPAGE_CustomData:
+		break;
+
+	default:
+		HyGuiLog("TileSetGfxItem::Refresh: Unhandled TileSetPage enum value!", LOGTYPE_Error);
+		break;
+	}
 }
 
 bool TileSetGfxItem::IsSelected() const

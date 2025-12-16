@@ -203,7 +203,8 @@ void AuxTileSet::CmdSet_TileShapeWidget(TileSetShape eTileShape)
 		ui->cmbTileShape->setCurrentIndex(eTileShape);
 
 	m_pTileSet->SetTileShape(eTileShape);
-	m_pTileSet->GetGfxScene()->RefreshTiles();
+	m_pTileSet->GetGfxScene()->RefreshImportTiles();
+	m_pTileSet->GetGfxScene()->RefreshSetupTiles(GetCurrentPage());
 
 	ui->cmbTileShape->blockSignals(false);
 }
@@ -214,7 +215,8 @@ void AuxTileSet::CmdSet_TileSizeWidgets(QSize tileSize)
 	ui->vsbTileSize->SetValue(QPoint(tileSize.width(), tileSize.height()));
 
 	m_pTileSet->SetTileSize(tileSize);
-	m_pTileSet->GetGfxScene()->RefreshTiles();
+	m_pTileSet->GetGfxScene()->RefreshImportTiles();
+	m_pTileSet->GetGfxScene()->RefreshSetupTiles(GetCurrentPage());
 
 	ui->vsbTileSize->blockSignals(false);
 }
@@ -225,7 +227,8 @@ void AuxTileSet::CmdSet_TileOffsetWidgets(QPoint tileOffset)
 	ui->vsbTileOffset->SetValue(tileOffset);
 
 	m_pTileSet->SetTileOffset(tileOffset);
-	m_pTileSet->GetGfxScene()->RefreshTiles();
+	m_pTileSet->GetGfxScene()->RefreshImportTiles();
+	m_pTileSet->GetGfxScene()->RefreshSetupTiles(GetCurrentPage());
 
 	ui->vsbTileOffset->blockSignals(false);
 }
@@ -613,7 +616,7 @@ void AuxTileSet::SliceSheetPixmaps()
 		ptGridPos.setY(ptGridPos.y() + 1);
 	}
 
-	pGfxScene->RefreshTiles();
+	pGfxScene->RefreshImportTiles();
 }
 
 void AuxTileSet::ErrorCheckImport()
@@ -785,7 +788,7 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 		for(auto pImg : vImportImages)
 			delete pImg;
 
-		pGfxScene->RefreshTiles();
+		pGfxScene->RefreshImportTiles();
 	}
 
 	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(GetCurrentPage()));
@@ -849,25 +852,25 @@ void AuxTileSet::OnPaddingChanged(QVariant newPadding)
 void AuxTileSet::on_radImportBottom_toggled(bool bChecked)
 {
 	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::BottomEdge);
-	m_pTileSet->GetGfxScene()->RefreshTiles();
+	m_pTileSet->GetGfxScene()->RefreshImportTiles();
 }
 
 void AuxTileSet::on_radImportTop_toggled(bool bChecked)
 {
 	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::TopEdge);
-	m_pTileSet->GetGfxScene()->RefreshTiles();
+	m_pTileSet->GetGfxScene()->RefreshImportTiles();
 }
 
 void AuxTileSet::on_radImportLeft_toggled(bool bChecked)
 {
 	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::LeftEdge);
-	m_pTileSet->GetGfxScene()->RefreshTiles();
+	m_pTileSet->GetGfxScene()->RefreshImportTiles();
 }
 
 void AuxTileSet::on_radImportRight_toggled(bool bChecked)
 {
 	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::RightEdge);
-	m_pTileSet->GetGfxScene()->RefreshTiles();
+	m_pTileSet->GetGfxScene()->RefreshImportTiles();
 }
 
 void AuxTileSet::on_btnConfirmAdd_clicked()
