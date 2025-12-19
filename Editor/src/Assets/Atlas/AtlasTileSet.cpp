@@ -110,8 +110,6 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 		if (subAtlas.isNull() == false && tileArray.size() > 0)
 		{
 			const int iNUM_COLS = NUM_COLS_TILESET(tileArray.size());
-			//const int iNUM_ROWS = NUM_ROWS_TILESET(tileArray.size(), iNUM_COLS);
-
 			for (int index = 0; index < tileArray.size(); ++index)
 			{
 				int iCol = index % iNUM_COLS;
@@ -124,12 +122,18 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 				QPixmap tilePixmap = QPixmap::fromImage(subAtlas.copy(tileRect));
 				pixmapList.append(tilePixmap);
 			}
+
+			for (int i = 0; i < tileArray.size(); ++i)
+			{
+				QJsonObject tileObj = tileArray[i].toObject();
+				m_TileDataList.append(new TileData(tileObj, pixmapList[i]));
+			}
 		}
 
-		for (int i = 0; i < tileArray.size(); ++i)
+		if(m_TileDataList.size() != tileArray.size())
 		{
-			QJsonObject tileObj = tileArray[i].toObject();
-			m_TileDataList.append(new TileData(tileObj, pixmapList[i]));
+			SetError(ASSETERROR_CannotFindMetaFile);
+			HyGuiLog("AtlasTileSet::AtlasTileSet() - Tile data count mismatch for TileSet: " + GetName(), LOGTYPE_Error);
 		}
 
 		m_bSubAtlasDirty = false;
@@ -216,10 +220,25 @@ QString AtlasTileSet::GetTileSetInfo() const
 	else
 	{
 		QSize subAtlasSize = GetSize();
-		sInfo += "Sub-Atlas ";
-		sInfo += QString::number(subAtlasSize.width()) + "x" + QString::number(subAtlasSize.height()) + " | ";
-		sInfo += QString::number(GetNumTiles()) + " Tiles (";
-		sInfo += QString::number(m_RegionSize.width()) + "x" + QString::number(m_RegionSize.height()) + ")";
+		if(m_TileDataList.size() > 0 && (subAtlasSize.width() == 0 || subAtlasSize.height() == 0))
+		{
+			int iNumCols = NUM_COLS_TILESET(m_TileDataList.size());
+			int iNumRows = NUM_ROWS_TILESET(m_TileDataList.size(), iNumCols);
+			subAtlasSize.setWidth((m_RegionSize.width() + TILESET_TILE_PADDING) * iNumCols);
+			subAtlasSize.setHeight((m_RegionSize.height() + TILESET_TILE_PADDING) * iNumRows);
+
+			sInfo += "Sub-Atlas (unsaved) ";
+			sInfo += QString::number(subAtlasSize.width()) + "x" + QString::number(subAtlasSize.height()) + " | ";
+			sInfo += QString::number(GetNumTiles()) + " Tiles (";
+			sInfo += QString::number(m_RegionSize.width()) + "x" + QString::number(m_RegionSize.height()) + ")";
+		}
+		else
+		{
+			sInfo += "Sub-Atlas ";
+			sInfo += QString::number(subAtlasSize.width()) + "x" + QString::number(subAtlasSize.height()) + " | ";
+			sInfo += QString::number(GetNumTiles()) + " Tiles (";
+			sInfo += QString::number(m_RegionSize.width()) + "x" + QString::number(m_RegionSize.height()) + ")";
+		}
 	}
 
 	return sInfo;
@@ -301,6 +320,41 @@ QJsonObject AtlasTileSet::GetJsonItem(QUuid uuid) const
 	}
 	HyGuiLog("AtlasTileSet::GetJsonItem() could not find item with UUID: " + uuid.toString(), LOGTYPE_Error);
 	return QJsonObject();
+}
+
+HyColor AtlasTileSet::GetAnimationColor(QUuid animationUuid) const
+{
+	for(const Animation &animationRef : m_AnimationList)
+	{
+		if(animationRef.m_uuid == animationUuid)
+			return animationRef.m_Color;
+	}
+	HyGuiLog("AtlasTileSet::GetAnimationColor() could not find Animation with UUID: " + animationUuid.toString(), LOGTYPE_Error);
+	return HyColor::Black;
+}
+
+AutoTileType AtlasTileSet::GetTerrainSetType(QUuid terrainSetUuid) const
+{
+	for(const TerrainSet &terrainSetRef : m_TerrainSetList)
+	{
+		if(terrainSetRef.m_uuid == terrainSetUuid)
+			return terrainSetRef.m_eType;
+	}
+	return AUTOTILETYPE_Unknown;
+}
+
+HyColor AtlasTileSet::GetTerrainColor(QUuid terrainUuid) const
+{
+	for(const TerrainSet &terrainSetRef : m_TerrainSetList)
+	{
+		for(const TerrainSet::Terrain &terrainRef : terrainSetRef.m_TerrainList)
+		{
+			if(terrainRef.m_uuid == terrainUuid)
+				return terrainRef.m_Color;
+		}
+	}
+	HyGuiLog("AtlasTileSet::GetTerrainColor() could not find Terrain with UUID: " + terrainUuid.toString(), LOGTYPE_Error);
+	return HyColor::Black;
 }
 
 TileData *AtlasTileSet::FindTileData(QUuid uuid) const
@@ -637,11 +691,14 @@ void AtlasTileSet::GetSavedFileData(FileDataPair &itemFileDataOut) const
 
 bool AtlasTileSet::Save(bool bWriteToDisk)
 {
+	if(RegenerateSubAtlas() == false)
+		return false;
+
 	m_bExistencePendingSave = false;
 	m_pUndoStack->setClean();
 
 	GetLatestFileData(m_TileSetDataPair);
-	RegenerateSubAtlas();
+	
 	static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetDataPair, bWriteToDisk);
 
 	return true;
@@ -721,10 +778,10 @@ void AtlasTileSet::UpdateTilePolygon()
 	}
 }
 
-void AtlasTileSet::RegenerateSubAtlas()
+bool AtlasTileSet::RegenerateSubAtlas()
 {
 	if(m_TileDataList.isEmpty())
-		return;
+		return true;
 
 	// Create a texture with a size that will accommodate all the existing, and newly appended tiles
 	const int iNUM_COLS = NUM_COLS_TILESET(m_TileDataList.size());
@@ -761,7 +818,12 @@ void AtlasTileSet::RegenerateSubAtlas()
 	p.end();
 
 	if(static_cast<AtlasModel &>(m_ModelRef).ReplaceFrame(this, GetName(), newTexture, ITEM_AtlasTileSet) == false)
-		HyGuiLog("AtlasModel::ReplaceFrame failed for tile set sub-atlas: " % GetName(), LOGTYPE_Error);
+	{
+		HyGuiLog("AtlasModel::ReplaceFrame failed (or can't fit in main atlases) for tile set sub-atlas: " % GetName(), LOGTYPE_Error);
+		return false;
+	}
+
+	return true;
 }
 
 void AtlasTileSet::on_actionSave_triggered()

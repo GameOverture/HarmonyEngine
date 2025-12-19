@@ -26,7 +26,8 @@ class TileSetView : public CommonGfxView
 		DRAGSTATE_None,
 		DRAGSTATE_InitialPress,
 		DRAGSTATE_MarqueeSelect,
-		DRAGSTATE_ArrangingSelection
+		DRAGSTATE_ArrangingSelection,
+		DRAGSTATE_Painting
 	};
 	DragState					m_eDragState;
 	QPoint						m_ptDragStart; // In View Coordinates
@@ -44,8 +45,8 @@ protected:
 	//virtual void drawBackground(QPainter *pPainter, const QRectF &rect) override;
 	//virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
 
-	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
 	virtual void mousePressEvent(QMouseEvent *pEvent) override;
+	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
 	virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;
 
 private:

@@ -17,6 +17,8 @@ class AtlasTileSet;
 class IWgtTileSetItem;
 class WgtTileSetAnimation;
 class WgtTileSetTerrainSet;
+class WgtTileSetTerrain;
+class TileData;
 
 namespace Ui {
 class AuxTileSet;
@@ -39,7 +41,9 @@ class AuxTileSet : public QWidget
 	QTabBar *									m_pTabBar;
 
 	AtlasTileSet *								m_pTileSet;
-	IWgtTileSetItem *							m_pSelectedWgtItem;
+	WgtTileSetAnimation *						m_pSelectedAnimationWgt;
+	WgtTileSetTerrainSet *						m_pSelectedTerrainSetWgt;
+	WgtTileSetTerrain *							m_pSelectedTerrainWgt;
 
 	bool										m_bIsImportingTileSheet;
 	QPixmap *									m_pImportTileSheetPixmap;
@@ -58,6 +62,10 @@ public:
 	TileSetPage GetCurrentPage() const;
 	void SetCurrentPage(TileSetPage ePage);
 
+	QUuid GetSelectedAnimation() const;
+	QUuid GetSelectedTerrainSet() const;
+	QUuid GetSelectedTerrain() const;
+
 	void CmdSet_TileShapeWidget(TileSetShape eTileShape);	// Blocks the WgtVectorSpinBox::SetValue signal
 	void CmdSet_TileSizeWidgets(QSize tileSize);			// Blocks the WgtVectorSpinBox::SetValue signal
 	void CmdSet_TileOffsetWidgets(QPoint tileOffset);		// Blocks the WgtVectorSpinBox::SetValue signal
@@ -72,6 +80,8 @@ public:
 	void CmdSet_OrderWgtItem(QUuid uuid, int newIndex);
 	void CmdSet_ModifyWgtItem(QUuid uuid, QJsonObject newData);
 	void MakeSelectionChange(IWgtTileSetItem *pItem);
+
+	void CmdSet_ApplyTerrainSet(QList<TileData *> tileDataList, QList<QUuid> terrainSetUuidList);
 
 	void SetPainting_Animation(QUuid animUuid);
 

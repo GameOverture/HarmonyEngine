@@ -28,7 +28,9 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::AuxTileSet),
 	m_pTileSet(nullptr),
-	m_pSelectedWgtItem(nullptr),
+	m_pSelectedAnimationWgt(nullptr),
+	m_pSelectedTerrainSetWgt(nullptr),
+	m_pSelectedTerrainWgt(nullptr),
 	m_bIsImportingTileSheet(true),
 	m_pImportTileSheetPixmap(nullptr)
 {
@@ -85,7 +87,10 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 		return;
 
 	m_pTileSet = pTileSet;
-	m_pSelectedWgtItem = nullptr;
+	m_pSelectedAnimationWgt = nullptr;
+	m_pSelectedTerrainSetWgt = nullptr;
+	m_pSelectedTerrainWgt = nullptr;
+
 	if(m_pTileSet == nullptr)
 		return;
 	
@@ -194,6 +199,27 @@ void AuxTileSet::SetCurrentPage(TileSetPage ePage)
 	}
 }
 
+QUuid AuxTileSet::GetSelectedAnimation() const
+{
+	if(m_pSelectedAnimationWgt)
+		return m_pSelectedAnimationWgt->GetUuid();
+	return QUuid();
+}
+
+QUuid AuxTileSet::GetSelectedTerrainSet() const
+{
+	if(m_pSelectedTerrainSetWgt)
+		return m_pSelectedTerrainSetWgt->GetUuid();
+	return QUuid();
+}
+
+QUuid AuxTileSet::GetSelectedTerrain() const
+{
+	if(m_pSelectedTerrainWgt)
+		return m_pSelectedTerrainWgt->GetUuid();
+	return QUuid();
+}
+
 void AuxTileSet::CmdSet_TileShapeWidget(TileSetShape eTileShape)
 {
 	ui->cmbTileShape->blockSignals(true);
@@ -254,50 +280,6 @@ void AuxTileSet::UpdateGfxItemSelection()
 		ui->lblArrangeSelectedTiles->setText(QString::number(iNumSetupSelected) % " Selected Tiles");
 	ui->actionReplaceTiles->setEnabled(iNumSetupSelected > 0);
 	ui->actionRemoveTiles->setEnabled(iNumSetupSelected > 0);
-
-	if (m_pSelectedWgtItem)
-	{
-		switch(m_pSelectedWgtItem->GetWgtType())
-		{
-		case TILESETWGT_Animation: {
-			//start_here;
-
-			//WgtTileSetAnimation *pAnimWgt = static_cast<WgtTileSetAnimation *>(m_pSelectedWgtItem);
-			//if(pAnimWgt->IsPaintingTiles())
-			//{
-			//	QMap<TileData *, TileSetGfxItem *> selectedTilesMap = m_pTileSet->GetGfxScene()->GetSelectedSetupTiles();
-			//	for(TileData *pTileData : selectedTilesMap.keys())
-			//	{
-			//		if(pTileData->IsAssignedToAnimation(pAnimWgt->GetUuid()) == false)
-			//		{
-			//			// Keep painting mode
-			//			return;
-			//		}
-			//	}
-
-			//	// Apply all selected tiles to the animation being painted
-			//	GetScene()->ApplySelectedTilesToAnimation(pAnimWgt->GetUuid());
-			//	// Keep painting mode
-			//	return;
-			//}
-			//// Apply all selected tiles to the animation being painted
-			//GetScene()->GetSelectedSetupTiles()
-
-			//	// Reset painting mode
-			//	ClearStatusLabel();
-			//m_ePaintingType = TILESETWGT_None;
-			break; }
-
-		case TILESETWGT_Terrain:
-			break;
-		case TILESETWGT_TerrainSet:
-			break;
-
-		default:
-			HyGuiLog("AuxTileSet::UpdateGfxItemSelection: Unknown TileSetWgtType!", LOGTYPE_Error);
-			return;
-		}
-	}
 }
 
 IWgtTileSetItem *AuxTileSet::FindWgtItem(QUuid uuid) const
@@ -493,29 +475,44 @@ void AuxTileSet::CmdSet_ModifyWgtItem(QUuid uuid, QJsonObject newData)
 
 void AuxTileSet::MakeSelectionChange(IWgtTileSetItem *pItem)
 {
-	m_pSelectedWgtItem = pItem;
-
-	switch (m_pSelectedWgtItem->GetWgtType())
+	switch (pItem->GetWgtType())
 	{
 	case TILESETWGT_Animation:
+		m_pSelectedAnimationWgt = static_cast<WgtTileSetAnimation *>(pItem);
+
 		for (WgtTileSetAnimation *pAnimationWidget : m_AnimationList)
-			pAnimationWidget->SetSelected(m_pSelectedWgtItem == pAnimationWidget);
+			pAnimationWidget->SetSelected(m_pSelectedAnimationWgt == pAnimationWidget);
 		break;
 	case TILESETWGT_TerrainSet:
+		m_pSelectedTerrainSetWgt = static_cast<WgtTileSetTerrainSet *>(pItem);
+
 		for (WgtTileSetTerrainSet *pTerrainSetWidget : m_TerrainSetList)
-			pTerrainSetWidget->SetSelected(m_pSelectedWgtItem == pTerrainSetWidget);
+			pTerrainSetWidget->SetSelected(m_pSelectedTerrainSetWgt == pTerrainSetWidget);
 		break;
 	case TILESETWGT_Terrain: {
-		WgtTileSetTerrainSet *pTerrainSetWidget = static_cast<WgtTileSetTerrain *>(m_pSelectedWgtItem)->GetParentTerrainSet();
+		m_pSelectedTerrainWgt = static_cast<WgtTileSetTerrain *>(pItem);
+
+		WgtTileSetTerrainSet *pTerrainSetWidget = static_cast<WgtTileSetTerrain *>(m_pSelectedTerrainWgt)->GetParentTerrainSet();
 		QList<WgtTileSetTerrain *> terrainList = pTerrainSetWidget->GetTerrains();
 		for (WgtTileSetTerrain *pTerrainWidget : terrainList)
-			pTerrainWidget->SetSelected(m_pSelectedWgtItem == pTerrainWidget);
+			pTerrainWidget->SetSelected(m_pSelectedTerrainWgt == pTerrainWidget);
 		break; }
 
 	default:
 		HyGuiLog("AuxTileSet::MakeSelectionChange: Unknown GetWgtType!", LOGTYPE_Error);
 		break;
 	}
+}
+
+void AuxTileSet::CmdSet_ApplyTerrainSet(QList<TileData *> tileDataList, QList<QUuid> terrainSetUuidList)
+{
+	for(int i = 0; i < tileDataList.size(); ++i)
+	{
+		tileDataList[i]->SetTerrainSet(terrainSetUuidList[i]);
+		m_pTileSet->GetGfxScene()->OnTerrainSetApplied(tileDataList[i]);
+	}
+
+	m_pTileSet->GetGfxScene()->RefreshSetupTiles(GetCurrentPage());
 }
 
 void AuxTileSet::SetPainting_Animation(QUuid animUuid)
@@ -885,6 +882,8 @@ void AuxTileSet::on_btnConfirmAdd_clicked()
 		if(QMessageBox::Yes != QMessageBox::question(MainWindow::GetInstance(), "Atlas Region Size Increasing!", "New atlas region size is " % QString::number(vImportRegionSize.width()) % "x" % QString::number(vImportRegionSize.height()) % ". Increasing the atlas region size affects all existing tiles in this TileSet. Do you want to continue?", QMessageBox::Yes, QMessageBox::No))
 			return;
 	}
+
+	// TODO: Do a check to see if the resulting sub-atlas is larger than all Atlas manager banks can handle, and ask to proceed or cancel
 
 	QMap<QPoint, QPixmap> importMap = m_pTileSet->GetGfxScene()->AssembleImportMap();
 	

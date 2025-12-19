@@ -16,7 +16,7 @@
 
 const HyMargins<int> g_borderMargins(16, 16, 16, 16);
 const int g_iSpacingAmt = 5;
-const float g_fSceneMargins = 3000.0f;
+const float g_fSceneMargins = 7000.0f;
 
 TileSetScene::TileSetScene() :
 	QGraphicsScene(),
@@ -38,6 +38,15 @@ TileSetScene::TileSetScene() :
 	m_pModeImportGroup->addToGroup(&m_ImportBorderRect);
 	m_ImportBorderRect.setPen(QPen(QBrush(QColor(255, 255, 255)), 2.0f, Qt::DashLine));
 	m_ImportBorderRect.setVisible(false);
+
+	m_pHoverAutoTilePartItem = new QGraphicsPolygonItem();
+	m_pModeSetupGroup->addToGroup(m_pHoverAutoTilePartItem);
+	m_pHoverAutoTilePartItem->setBrush(QBrush(QColor(255, 255, 255)));
+	m_pHoverAutoTilePartItem->setPen(QPen(Qt::NoPen));
+	m_pHoverAutoTilePartItem->setOpacity(0.5f);
+	m_pHoverAutoTilePartItem->setZValue(9999.0f);
+	m_pHoverAutoTilePartItem->hide();
+
 
 	QRectF sceneRect(-g_fSceneMargins, -g_fSceneMargins, g_fSceneMargins * 2.0f, g_fSceneMargins * 2.0f);
 	setSceneRect(sceneRect);
@@ -134,6 +143,13 @@ void TileSetScene::SetImportAppendEdge(Qt::Edge eEdge)
 	m_eImportAppendEdge = eEdge;
 }
 
+TileSetGfxItem *TileSetScene::GetGfxTile(TileData *pTileData) const
+{
+	if (m_SetupTileMap.contains(pTileData))
+		return m_SetupTileMap.value(pTileData);
+	return nullptr;
+}
+
 int TileSetScene::GetNumSetupSelected() const
 {
 	int iNumSetupTiles = 0;
@@ -156,7 +172,19 @@ QMap<TileData *, TileSetGfxItem *> TileSetScene::GetSelectedSetupTiles() const
 	return selectedTileMap;
 }
 
-void TileSetScene::OnMarqueeRelease(TileSetPage ePage, Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag)
+TileData *TileSetScene::IsPointInTile(QPointF ptScenePos) const
+{
+	for(auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
+	{
+		QRectF testRect(iter.value()->boundingRect());
+		testRect.translate(iter.value()->scenePos());
+		if(testRect.contains(ptScenePos))
+			return iter.key();
+	}
+	return nullptr;
+}
+
+void TileSetScene::OnMarqueeRelease(AuxTileSet &auxTileSetRef, Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag)
 {
 	QPointF ptTopLeft, ptBotRight;
 	ptTopLeft.setX(HyMath::Min(ptStartDrag.x(), ptEndDrag.x()));
@@ -165,30 +193,56 @@ void TileSetScene::OnMarqueeRelease(TileSetPage ePage, Qt::MouseButton eMouseBtn
 	ptBotRight.setY(HyMath::Max(ptStartDrag.y(), ptEndDrag.y()));
 	QRectF sceneRect(ptTopLeft, ptBotRight);
 
-	switch (ePage)
+	switch (auxTileSetRef.GetCurrentPage())
 	{
 	case TILESETPAGE_Import:
 		for (auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
 		{
-			QRectF testRect(iter.value()->scenePos(), QSizeF(m_pTileSet->GetAtlasRegionSize()));
+			QRectF testRect(iter.value()->boundingRect());
+			testRect.translate(iter.value()->scenePos());
 			if (sceneRect.intersects(testRect))
 				iter.value()->SetSelected(eMouseBtn == Qt::LeftButton);
 		}
 		break;
 
 	case TILESETPAGE_Arrange:
-	case TILESETPAGE_Animation:
-	case TILESETPAGE_Autotile:
-	case TILESETPAGE_Collision:
-	case TILESETPAGE_CustomData:
 		for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
 		{
-			QRectF testRect(iter.value()->scenePos(), QSizeF(m_pTileSet->GetAtlasRegionSize()));
+			QRectF testRect(iter.value()->boundingRect());
+			testRect.translate(iter.value()->scenePos());
 			if (sceneRect.intersects(testRect))
 				iter.value()->SetSelected(eMouseBtn == Qt::LeftButton);
 			else if(bShiftHeld == false)
 				iter.value()->SetSelected(false);
 		}
+		break;
+
+	case TILESETPAGE_Animation:
+		break;
+
+	case TILESETPAGE_Autotile: {
+		QUuid selectedTerrainSetUuid = auxTileSetRef.GetSelectedTerrainSet();
+		if(selectedTerrainSetUuid.isNull() == false)
+		{
+			QList<TileData *> affectedTileList;
+			for(auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
+			{
+				QRectF testRect(iter.value()->boundingRect());
+				testRect.translate(iter.value()->scenePos());
+				if(sceneRect.intersects(testRect))
+				{
+					if(iter.key()->GetTerrainSet() != selectedTerrainSetUuid)
+						affectedTileList.append(iter.key());
+				}
+			}
+			
+			TileSetUndoCmd_ApplyTerrainSet *pTerrainSetCmd = new TileSetUndoCmd_ApplyTerrainSet(auxTileSetRef, affectedTileList, selectedTerrainSetUuid);
+			m_pTileSet->GetUndoStack()->push(pTerrainSetCmd);
+		}
+		break; }
+
+	case TILESETPAGE_Collision:
+	case TILESETPAGE_CustomData:
 		break;
 	}
 }
@@ -197,17 +251,6 @@ void TileSetScene::ClearSetupSelection()
 {
 	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
 		iter.value()->SetSelected(false);
-}
-
-TileSetGfxItem* TileSetScene::GetSetupTileAt(QPointF ptScenePos) const
-{
-	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
-	{
-		QRectF testRect(iter.value()->scenePos(), QSizeF(m_pTileSet->GetAtlasRegionSize()));
-		if (testRect.contains(ptScenePos))
-			return iter.value();
-	}
-	return nullptr;
 }
 
 void TileSetScene::AddTile(bool bImportTile, TileData *pTileData, const QPolygonF& outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected)
@@ -432,6 +475,102 @@ void TileSetScene::OnArrangingTilesMouseRelease(AuxTileSet &auxTileSetRef, QPoin
 
 	TileSetUndoCmd_MoveTiles* pMoveCmd = new TileSetUndoCmd_MoveTiles(auxTileSetRef, affectedTileList, oldGridPosList, newGridPosList);
 	m_pTileSet->GetUndoStack()->push(pMoveCmd);
+}
+
+void TileSetScene::HoverAutoTilePartAt(QPointF ptScenePos)
+{
+	// Highlight auto-tile parts under mouse (if it's an enabled tile)
+	TileData *pTile = IsPointInTile(ptScenePos);
+	if(pTile == nullptr || pTile->GetTerrainSet().isNull())
+		return;
+
+	m_pHoverAutoTilePartItem->hide();
+
+	TileSetGfxItem *pGfxTile = m_SetupTileMap[pTile];
+	QPointF ptTileLocalPos = ptScenePos - pGfxTile->scenePos();
+	QGraphicsPolygonItem *pGfxAutoTilePart = pGfxTile->GetAutoTilePartAt(ptTileLocalPos);
+	if(pGfxAutoTilePart)
+	{
+		m_pHoverAutoTilePartItem->setPolygon(pGfxAutoTilePart->polygon());
+		m_pHoverAutoTilePartItem->setPos(pGfxAutoTilePart->scenePos());
+		m_pHoverAutoTilePartItem->show();
+	}
+}
+
+void TileSetScene::OnTerrainSetApplied(TileData *pTileData)
+{
+	if(m_SetupTileMap.contains(pTileData))
+	{
+		m_SetupTileMap[pTileData]->AllocateAutoTileParts(m_pTileSet, m_pTileSet->GetTerrainSetType(pTileData->GetTerrainSet()), m_pTileSet->GetTileShape());
+		m_SetupTileMap[pTileData]->Refresh(m_pTileSet->GetAtlasRegionSize(), m_pTileSet, TILESETPAGE_Autotile, pTileData);
+	}
+}
+
+void TileSetScene::StartPaintStroke()
+{
+	m_PaintStrokeAnimationList.clear();
+	m_PaintStrokeAutoTilePartList.clear();
+}
+
+void TileSetScene::OnPaintingStroke(AuxTileSet &auxTileSetRef, QPointF ptScenePos, bool bLeftClick)
+{
+	TileData *pTile = IsPointInTile(ptScenePos);
+	if(pTile == nullptr)
+		return;
+
+	if(auxTileSetRef.GetCurrentPage() == TILESETPAGE_Animation)
+	{
+		QUuid animUuid = auxTileSetRef.GetSelectedAnimation();
+		if(animUuid.isNull()) // Only paint if an animation is selected
+			return;
+
+		TileSetGfxItem *pGfxTile = m_SetupTileMap[pTile];
+		pGfxTile->SetAnimation(bLeftClick, m_pTileSet->GetAnimationColor(animUuid));
+
+		m_PaintStrokeAnimationList.push_back(pTile);
+	}
+	else if(auxTileSetRef.GetCurrentPage() == TILESETPAGE_Autotile)
+	{
+		if(pTile->GetTerrainSet().isNull()) // Only paint if tile is enabled for auto-tiling
+			return;
+
+		QUuid terrainUuid = auxTileSetRef.GetSelectedTerrain();
+		if(terrainUuid.isNull())
+			return;
+		
+		TileSetGfxItem *pGfxTile = m_SetupTileMap[pTile];
+		QPointF ptTileLocalPos = ptScenePos - pGfxTile->scenePos();
+		QGraphicsPolygonItem *pGfxAutoTilePart = pGfxTile->GetAutoTilePartAt(ptTileLocalPos);
+		if(pGfxAutoTilePart)
+		{
+			pGfxAutoTilePart->setBrush(QBrush(HyGlobal::ConvertHyColor(m_pTileSet->GetTerrainColor(terrainUuid))));
+			m_PaintStrokeAutoTilePartList.push_back(pGfxAutoTilePart);
+		}
+	}
+	else
+		HyGuiLog("TileSetScene::OnPaintingStroke() - Painting stroke on unsupported TileSetPage", LOGTYPE_Error);
+}
+
+void TileSetScene::OnPaintStrokeRelease(AuxTileSet &auxTileSetRef)
+{
+	if(auxTileSetRef.GetCurrentPage() == TILESETPAGE_Animation)
+	{
+		if(m_PaintStrokeAnimationList.empty())
+			return;
+
+		//TileSetUndoCmd_PaintAnimation *pPaintAnimCmd = new TileSetUndoCmd_PaintAnimation(auxTileSetRef, m_PaintStrokeAnimationList);
+		//m_pTileSet->GetUndoStack()->push(pPaintAnimCmd);
+	}
+	else if(auxTileSetRef.GetCurrentPage() == TILESETPAGE_Autotile)
+	{
+		if(m_PaintStrokeAutoTilePartList.empty())
+			return;
+
+		//TileSetUndoCmd_PaintAutoTileParts *pPaintAutoTilePartsCmd = new TileSetUndoCmd_PaintAutoTileParts(auxTileSetRef, m_PaintStrokeAutoTilePartList);
+		//m_pTileSet->GetUndoStack()->push(pPaintAutoTilePartsCmd);
+	}
+	else
+		HyGuiLog("TileSetScene::OnPaintStrokeRelease() - Releasing paint stroke on unsupported TileSetPage", LOGTYPE_Error);
 }
 
 void TileSetScene::DisplaceTiles(QPoint vGridDelta)

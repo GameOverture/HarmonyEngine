@@ -149,6 +149,7 @@ class TileSetUndoCmd_OrderWgtItem : public QUndoCommand
 	QUuid								m_Uuid;
 	int									m_iOldIndex;
 	int									m_iNewIndex;
+	TileSetPage							m_ePage;
 
 public:
 	TileSetUndoCmd_OrderWgtItem(AuxTileSet &auxTileSetRef, QUuid uuid, int iOldIndex, int iNewIndex, QUndoCommand *pParent = nullptr);
@@ -165,6 +166,7 @@ class TileSetUndoCmd_ModifyWgtItem : public QUndoCommand
 	QUuid								m_Uuid;
 	QJsonObject							m_OldItemDataObj;
 	QJsonObject							m_NewItemDataObj;
+	TileSetPage							m_ePage;
 
 public:
 	TileSetUndoCmd_ModifyWgtItem(AuxTileSet &auxTileSetRef, QString sUndoText, int iMergeId, QUuid uuid, QJsonObject oldItemDataObj, QJsonObject newItemDataObj, QUndoCommand *pParent = nullptr);
@@ -174,6 +176,21 @@ public:
 	virtual void undo() override;
 	virtual int id() const override;
 	virtual bool mergeWith(const QUndoCommand *pOtherCmd) override;
+};
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TileSetUndoCmd_ApplyTerrainSet : public QUndoCommand
+{
+	AuxTileSet &						m_AuxTileSetRef;
+	QList<TileData*>					m_AffectedTileList;
+	QList<QUuid>						m_OldTerrainSetUuidList;
+	QUuid								m_NewTerrainSetUuid;
+
+public:
+	TileSetUndoCmd_ApplyTerrainSet(AuxTileSet &auxTileSetRef, QList<TileData *> affectedTileList, QUuid newTerrainSetUuid);
+	virtual ~TileSetUndoCmd_ApplyTerrainSet();
+
+	virtual void redo() override;
+	virtual void undo() override;
 };
 
 #endif // TILESETUNDOCMDS_H

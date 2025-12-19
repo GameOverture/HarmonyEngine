@@ -419,12 +419,15 @@ TileSetUndoCmd_OrderWgtItem::TileSetUndoCmd_OrderWgtItem(AuxTileSet &auxTileSetR
 	{
 	case TILESETWGT_Animation:
 		setText("Reorder Animation");
+		m_ePage = TILESETPAGE_Animation;
 		break;
 	case TILESETWGT_TerrainSet:
 		setText("Reorder Terrain Set");
+		m_ePage = TILESETPAGE_Autotile;
 		break;
 	case TILESETWGT_Terrain:
 		setText("Reorder Terrain");
+		m_ePage = TILESETPAGE_Autotile;
 		break;
 	
 	default:
@@ -440,11 +443,13 @@ TileSetUndoCmd_OrderWgtItem::TileSetUndoCmd_OrderWgtItem(AuxTileSet &auxTileSetR
 /*virtual*/ void TileSetUndoCmd_OrderWgtItem::redo() /*override*/
 {
 	m_AuxTileSetRef.CmdSet_OrderWgtItem(m_Uuid, m_iNewIndex);
+	m_AuxTileSetRef.SetCurrentPage(m_ePage);
 }
 
 /*virtual*/ void TileSetUndoCmd_OrderWgtItem::undo() /*override*/
 {
 	m_AuxTileSetRef.CmdSet_OrderWgtItem(m_Uuid, m_iOldIndex);
+	m_AuxTileSetRef.SetCurrentPage(m_ePage);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -458,6 +463,29 @@ TileSetUndoCmd_ModifyWgtItem::TileSetUndoCmd_ModifyWgtItem(AuxTileSet &auxTileSe
 	m_NewItemDataObj(newItemDataObj)
 {
 	setText(sUndoText);
+
+	IWgtTileSetItem *pWgtItem = m_AuxTileSetRef.FindWgtItem(m_Uuid);
+	if (pWgtItem == nullptr)
+	{
+		HyGuiLog("TileSetUndoCmd_ModifyWgtItem() - Could not find IWgtTileSetItem with given UUID.", LOGTYPE_Error);
+		return;
+	}
+	switch (pWgtItem->GetWgtType())
+	{
+	case TILESETWGT_Animation:
+		m_ePage = TILESETPAGE_Animation;
+		break;
+	case TILESETWGT_TerrainSet:
+		m_ePage = TILESETPAGE_Autotile;
+		break;
+	case TILESETWGT_Terrain:
+		m_ePage = TILESETPAGE_Autotile;
+		break;
+	
+	default:
+		HyGuiLog("TileSetUndoCmd_ModifyWgtItem() - Unknown TileSetWgtType.", LOGTYPE_Error);
+		break;
+	}
 }
 
 /*virtual*/ TileSetUndoCmd_ModifyWgtItem::~TileSetUndoCmd_ModifyWgtItem()
@@ -467,11 +495,13 @@ TileSetUndoCmd_ModifyWgtItem::TileSetUndoCmd_ModifyWgtItem(AuxTileSet &auxTileSe
 /*virtual*/ void TileSetUndoCmd_ModifyWgtItem::redo() /*override*/
 {
 	m_AuxTileSetRef.CmdSet_ModifyWgtItem(m_Uuid, m_NewItemDataObj);
+	m_AuxTileSetRef.SetCurrentPage(m_ePage);
 }
 
 /*virtual*/ void TileSetUndoCmd_ModifyWgtItem::undo() /*override*/
 {
 	m_AuxTileSetRef.CmdSet_ModifyWgtItem(m_Uuid, m_OldItemDataObj);
+	m_AuxTileSetRef.SetCurrentPage(m_ePage);
 }
 
 /*virtual*/ int TileSetUndoCmd_ModifyWgtItem::id() const /*override*/
@@ -488,4 +518,35 @@ TileSetUndoCmd_ModifyWgtItem::TileSetUndoCmd_ModifyWgtItem(AuxTileSet &auxTileSe
 		return true;
 	}
 	return false;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TileSetUndoCmd_ApplyTerrainSet::TileSetUndoCmd_ApplyTerrainSet(AuxTileSet &auxTileSetRef, QList<TileData *> affectedTileList, QUuid newTerrainSetUuid) :
+	QUndoCommand(),
+	m_AuxTileSetRef(auxTileSetRef),
+	m_AffectedTileList(affectedTileList),
+	m_NewTerrainSetUuid(newTerrainSetUuid)
+{
+	setText("Apply Terrain Set to " % QString::number(m_AffectedTileList.size()) % " Tiles");
+
+	for(TileData *pTile : m_AffectedTileList)
+		m_OldTerrainSetUuidList.append(pTile->GetTerrainSet());
+}
+
+/*virtual*/ TileSetUndoCmd_ApplyTerrainSet::~TileSetUndoCmd_ApplyTerrainSet()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_ApplyTerrainSet::redo() /*override*/
+{
+	QList<QUuid> newTerrainSetList;
+	newTerrainSetList.fill(m_NewTerrainSetUuid, m_AffectedTileList.size());
+	m_AuxTileSetRef.CmdSet_ApplyTerrainSet(m_AffectedTileList, newTerrainSetList);
+	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+}
+
+/*virtual*/ void TileSetUndoCmd_ApplyTerrainSet::undo() /*override*/
+{
+	m_AuxTileSetRef.CmdSet_ApplyTerrainSet(m_AffectedTileList, m_OldTerrainSetUuidList);
+	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
 }

@@ -218,6 +218,41 @@ enum TileSetWgtType
 	TILESETWGT_Terrain
 };
 
+enum AutoTileType
+{
+	AUTOTILETYPE_Unknown = -1,
+
+	// NOTE: This order is hardcoded in WgtTileSetTerrain's combo box, make adjustments there if this changes
+	AUTOTILETYPE_MatchCornerSides = 0,
+	AUTOTILETYPE_MatchCorner,
+	AUTOTILETYPE_MatchSides
+};
+
+enum TileSetAutoTilePart
+{
+	AUTOTILEPART_Unknown = -1,
+
+	AUTOTILEPART_Center = 0,
+	AUTOTILEPART_RightCorner,		// Hexagon-flat, Isometric
+	AUTOTILEPART_RightSide,			// Hexagon-pointed, Square
+	AUTOTILEPART_BottomRightSide,	// Hexagon-flat, Hexagon-pointed, Isometric
+	AUTOTILEPART_BottomRightCorner,	// Hexagon-flat, Hexagon-pointed, Square
+	AUTOTILEPART_BottomSide,		// Hexagon-flat, Square
+	AUTOTILEPART_BottomCorner,		// Hexagon-pointed, Isometric
+	AUTOTILEPART_BottomLeftSide,	// Hexagon-flat, Hexagon-pointed, Isometric
+	AUTOTILEPART_BottomLeftCorner,	// Hexagon-flat, Hexagon-pointed, Square
+	AUTOTILEPART_LeftCorner,		// Hexagon-flat, Isometric
+	AUTOTILEPART_LeftSide,			// Hexagon-pointed, Square
+	AUTOTILEPART_TopLeftSide,		// Hexagon-flat, Hexagon-pointed, Isometric
+	AUTOTILEPART_TopLeftCorner,		// Hexagon-flat, Hexagon-pointed, Square
+	AUTOTILEPART_TopCorner, 		// Hexagon-pointed, Isometric
+	AUTOTILEPART_TopSide,			// Hexagon-flat, Square
+	AUTOTILEPART_TopRightSide,		// Hexagon-flat, Hexagon-pointed, Isometric
+	AUTOTILEPART_TopRightCorner,	// Hexagon-flat, Hexagon-pointed, Square
+
+	NUM_AUTOTILEPARTS
+};
+
 enum EditorShape
 {
 	SHAPE_None = 0,

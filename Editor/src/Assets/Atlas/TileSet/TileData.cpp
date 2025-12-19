@@ -10,6 +10,8 @@
 #include "Global.h"
 #include "TileData.h"
 
+#include <QBitArray>
+
 TileData::TileData(QPoint metaGridPos, QPixmap tilePixmap) :
 	m_Uuid(QUuid::createUuid()),
 	m_MetaGridPos(metaGridPos),
@@ -68,7 +70,8 @@ TileData::TileData(const TileData &other) :
 	m_bIsFlippedVert(other.m_bIsFlippedVert),
 	m_bIsRotated(other.m_bIsRotated),
 	m_iProbability(other.m_iProbability),
-	m_AutoTileMap(other.m_AutoTileMap),
+	m_TerrainSetUuid(other.m_TerrainSetUuid),
+	m_TerrainMap(other.m_TerrainMap),
 	m_VertexMap(other.m_VertexMap)
 {
 }
@@ -84,7 +87,8 @@ TileData &TileData::operator=(const TileData &other)
 	m_bIsFlippedVert = other.m_bIsFlippedVert;
 	m_bIsRotated = other.m_bIsRotated;
 	m_iProbability = other.m_iProbability;
-	m_AutoTileMap = other.m_AutoTileMap;
+	m_TerrainSetUuid = other.m_TerrainSetUuid;
+	m_TerrainMap = other.m_TerrainMap;
 	m_VertexMap = other.m_VertexMap;
 
 	return *this;
@@ -167,4 +171,61 @@ QPoint TileData::GetTextureOffset() const
 QPixmap TileData::GetPixmap() const
 {
 	return m_TilePixmap;
+}
+
+QUuid TileData::GetTerrainSet() const
+{
+	return m_TerrainSetUuid;
+}
+
+void TileData::SetTerrainSet(QUuid terrainSetUuid)
+{
+	if(m_TerrainSetUuid == terrainSetUuid)
+		return;
+
+	m_TerrainSetUuid = terrainSetUuid;
+	m_TerrainMap.clear();
+}
+
+QUuid TileData::GetTerrain(TileSetAutoTilePart ePart) const
+{
+	for(auto it = m_TerrainMap.begin(); it != m_TerrainMap.end(); ++it)
+	{
+		if(it.value().testBit(static_cast<int>(ePart)))
+			return it.key();
+	}
+	
+	return QUuid(); // Indicates no terrain assigned
+}
+
+void TileData::SetTerrain(QUuid terrainUuid, TileSetAutoTilePart ePart)
+{
+	ClearTerrain(ePart);
+
+	if(m_TerrainMap.contains(terrainUuid))
+		m_TerrainMap[terrainUuid].setBit(static_cast<int>(ePart), true);
+	else
+	{
+		QBitArray bitArray(NUM_AUTOTILEPARTS, false);
+		bitArray.setBit(static_cast<int>(ePart), true);
+		m_TerrainMap[terrainUuid] = bitArray;
+	}
+}
+
+void TileData::ClearTerrain(TileSetAutoTilePart ePart)
+{
+	for(auto it = m_TerrainMap.begin(); it != m_TerrainMap.end();)
+	{
+		if(it.value().testBit(static_cast<int>(ePart)))
+		{
+			it.value().setBit(static_cast<int>(ePart), false);
+			// If no more bits are set, remove the entry altogether
+			if(it.value().count(true) == 0)
+				it = m_TerrainMap.erase(it);
+			else
+				++it;
+		}
+		else
+			++it;
+	}
 }

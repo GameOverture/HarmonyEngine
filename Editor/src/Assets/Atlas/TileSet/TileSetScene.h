@@ -49,6 +49,11 @@ class TileSetScene : public QGraphicsScene
 	QSize															m_vImportRegionSize;
 	Qt::Edge														m_eImportAppendEdge;
 
+	QList<TileData *>												m_PaintStrokeAnimationList;
+
+	QGraphicsPolygonItem *											m_pHoverAutoTilePartItem;
+	QList<QGraphicsPolygonItem *>									m_PaintStrokeAutoTilePartList;
+
 public:
 	TileSetScene();
 	virtual ~TileSetScene();
@@ -64,13 +69,13 @@ public:
 	QMap<QPoint, QPixmap> AssembleImportMap();
 	void SetImportAppendEdge(Qt::Edge eEdge);
 
+	TileSetGfxItem *GetGfxTile(TileData *pTileData) const;
 	int GetNumSetupSelected() const;
 	QMap<TileData *, TileSetGfxItem *> GetSelectedSetupTiles() const;
 
-	void OnMarqueeRelease(TileSetPage ePage, Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag);
+	TileData *IsPointInTile(QPointF ptScenePos) const;
+	void OnMarqueeRelease(AuxTileSet &auxTileSetRef, Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag);
 	void ClearSetupSelection();
-
-	TileSetGfxItem *GetSetupTileAt(QPointF ptScenePos) const;
 
 	void AddTile(bool bImportTile, TileData *pTileData, const QPolygonF &outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
 	
@@ -88,6 +93,13 @@ public:
 	void OnArrangingTilesMousePress(QPointF ptMouseScenePos);
 	void OnArrangingTilesMouseMove(QPointF ptMouseScenePos);
 	void OnArrangingTilesMouseRelease(AuxTileSet &auxTileSetRef, QPointF ptMouseScenePos);
+
+	void HoverAutoTilePartAt(QPointF ptScenePos);
+	void OnTerrainSetApplied(TileData *pTileData);
+
+	void StartPaintStroke();
+	void OnPaintingStroke(AuxTileSet &auxTileSetRef, QPointF ptScenePos, bool bLeftClick);
+	void OnPaintStrokeRelease(AuxTileSet &auxTileSetRef);
 
 private:
 	// Used during a drag operation, displace unselected tiles by the given grid delta

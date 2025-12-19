@@ -101,14 +101,7 @@ class AtlasTileSet : public AtlasFrame
 	struct TerrainSet
 	{
 		QUuid					m_uuid;
-		enum Type
-		{
-			// NOTE: This order is hardcoded in WgtTileSetTerrain's combo box, make adjustments there if this changes
-			AUTOTILE_MatchCornerSides,
-			AUTOTILE_MatchCorner,
-			AUTOTILE_MatchSides
-		};
-		int						m_iType;
+		AutoTileType			m_eType;
 
 		struct Terrain
 		{
@@ -146,13 +139,13 @@ class AtlasTileSet : public AtlasFrame
 
 		TerrainSet() :
 			m_uuid(QUuid::createUuid()),
-			m_iType(AUTOTILE_MatchCornerSides)
+			m_eType(AUTOTILETYPE_MatchCornerSides)
 		{
 		}
 		TerrainSet(const QJsonObject &initObj)
 		{
 			m_uuid = QUuid(initObj["UUID"].toString());
-			m_iType = initObj["type"].toInt();
+			m_eType = static_cast<AutoTileType>(initObj["type"].toInt());
 			
 			QJsonArray terrainArray = initObj["terrains"].toArray();
 			for(QJsonValue terrainVal : terrainArray)
@@ -167,7 +160,7 @@ class AtlasTileSet : public AtlasFrame
 		{
 			QJsonObject terrainSetObj;
 			terrainSetObj["UUID"] = m_uuid.toString(QUuid::WithoutBraces);
-			terrainSetObj["type"] = m_iType;
+			terrainSetObj["type"] = static_cast<int>(m_eType);
 			QJsonArray terrainArray;
 			for(const Terrain &terrainRef : m_TerrainList)
 				terrainArray.append(terrainRef.ToJsonObject());
@@ -257,6 +250,9 @@ public:
 	QVector<QJsonObject> GetTerrainSets() const;
 	QVector<QJsonObject> GetPhysicsLayers() const;
 	QJsonObject GetJsonItem(QUuid uuid) const;
+	HyColor GetAnimationColor(QUuid animationUuid) const;
+	AutoTileType GetTerrainSetType(QUuid terrainSetUuid) const;
+	HyColor GetTerrainColor(QUuid terrainUuid) const;
 
 	TileData *FindTileData(QUuid uuid) const;
 	QVector<TileData *> GetTileDataList() const;
@@ -288,7 +284,7 @@ public:
 
 protected:
 	void UpdateTilePolygon();
-	void RegenerateSubAtlas(); // Assumes m_TileDataList is up to date. This will regenerate the sub-atlas texture and into the atlas manager
+	bool RegenerateSubAtlas(); // Assumes m_TileDataList is up to date. This will regenerate the sub-atlas texture and into the atlas manager
 
 private Q_SLOTS:
 	void on_actionSave_triggered();

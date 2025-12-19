@@ -14,6 +14,7 @@
 #include "AuxTileSet.h"
 #include "IWgtTileSetItem.h"
 #include "WgtTileSetAnimation.h"
+#include "TileData.h"
 
 #include <QPainter>
 #include <QScrollBar>
@@ -67,6 +68,54 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 //{
 //}
 
+/*virtual*/ void TileSetView::mousePressEvent(QMouseEvent *pEvent) /*override*/
+{
+	CommonGfxView::mousePressEvent(pEvent);
+
+	if(m_bMiddleMousePanning == false)
+	{
+		switch (m_pAuxTileSet->GetCurrentPage())
+		{
+		case TILESETPAGE_Import:
+		case TILESETPAGE_Arrange:
+			m_eDragState = DRAGSTATE_InitialPress;
+			m_ptDragStart = pEvent->pos();
+			setDragMode(QGraphicsView::RubberBandDrag);
+			break;
+
+		case TILESETPAGE_Animation:
+			break;
+
+		case TILESETPAGE_Autotile: {
+			TileData *pTile = GetScene()->IsPointInTile(mapToScene(pEvent->pos()));
+			if(pTile && pTile->GetTerrainSet().isNull() == false)
+			{
+				m_eDragState = DRAGSTATE_Painting;
+				GetScene()->StartPaintStroke();
+				setDragMode(QGraphicsView::NoDrag);
+			}
+			else
+			{
+				m_eDragState = DRAGSTATE_InitialPress;
+				setDragMode(QGraphicsView::RubberBandDrag);
+			}
+			m_ptDragStart = pEvent->pos();
+			break; }
+
+		case TILESETPAGE_Collision:
+			break;
+		case TILESETPAGE_CustomData:
+			break;
+
+		default:
+			HyGuiLog("TileSetView::mousePressEvent - Unknown TileSet page!", LOGTYPE_Error);
+			break;
+		}
+	}
+
+	update();
+}
+
 /*virtual*/ void TileSetView::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
 {
 	CommonGfxView::mouseMoveEvent(pEvent);
@@ -74,6 +123,10 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 	switch (m_eDragState)
 	{
 	case DRAGSTATE_None:
+		if(m_pAuxTileSet->GetCurrentPage() == TILESETPAGE_Autotile)
+			GetScene()->HoverAutoTilePartAt(mapToScene(pEvent->pos()));
+		break;
+
 	case DRAGSTATE_MarqueeSelect:
 		break;
 
@@ -89,7 +142,7 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 				break;
 
 			case TILESETPAGE_Arrange:
-				TileSetGfxItem* pHoveredSetupItem = GetScene()->GetSetupTileAt(mapToScene(m_ptDragStart));
+				TileSetGfxItem *pHoveredSetupItem = GetScene()->GetGfxTile(GetScene()->IsPointInTile(mapToScene(m_ptDragStart)));
 				if ((pEvent->modifiers() & Qt::ShiftModifier) == 0 && pHoveredSetupItem)
 				{
 					if (pHoveredSetupItem->IsSelected() == false)
@@ -115,45 +168,11 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 	case DRAGSTATE_ArrangingSelection:
 		GetScene()->OnArrangingTilesMouseMove(mapToScene(pEvent->pos()));
 		break;
+
+	case DRAGSTATE_Painting:
+		GetScene()->OnPaintingStroke(*m_pAuxTileSet, mapToScene(pEvent->pos()), m_pAuxTileSet->GetCurrentPage());
+		break;
 	}
-	update();
-
-	//if(rubberBandRect().isNull() == false)
-	//	update();
-}
-
-/*virtual*/ void TileSetView::mousePressEvent(QMouseEvent *pEvent) /*override*/
-{
-	CommonGfxView::mousePressEvent(pEvent);
-
-	if(m_bMiddleMousePanning == false)
-	{
-		switch (m_pAuxTileSet->GetCurrentPage())
-		{
-		case TILESETPAGE_Import:
-			break;
-		case TILESETPAGE_Arrange:
-			break;
-		case TILESETPAGE_Animation:
-			break;
-		case TILESETPAGE_Autotile:
-			break;
-		case TILESETPAGE_Collision:
-			break;
-		case TILESETPAGE_CustomData:
-			break;
-
-		default:
-			HyGuiLog("TileSetView::mousePressEvent - Unknown TileSet page!", LOGTYPE_Error);
-			break;
-		}
-
-		m_eDragState = DRAGSTATE_InitialPress;
-		m_ptDragStart = pEvent->pos();
-
-		setDragMode(QGraphicsView::RubberBandDrag);
-	}
-
 	
 	update();
 }
@@ -171,13 +190,17 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 			QPoint ptOffset = m_ptDragStart;
 			ptOffset.setX(ptOffset.x() + 1);
 			ptOffset.setY(ptOffset.y() + 1);
-			GetScene()->OnMarqueeRelease(m_pAuxTileSet->GetCurrentPage(), pEvent->button(), bShiftHeld, mapToScene(pEvent->pos()), mapToScene(ptOffset));
+			GetScene()->OnMarqueeRelease(*m_pAuxTileSet, pEvent->button(), bShiftHeld, mapToScene(m_ptDragStart), mapToScene(ptOffset));
 			break; }
 		case DRAGSTATE_MarqueeSelect:
-			GetScene()->OnMarqueeRelease(m_pAuxTileSet->GetCurrentPage(), pEvent->button(), bShiftHeld, mapToScene(m_ptDragStart), mapToScene(pEvent->pos()));
+			GetScene()->OnMarqueeRelease(*m_pAuxTileSet, pEvent->button(), bShiftHeld, mapToScene(m_ptDragStart), mapToScene(pEvent->pos()));
 			break;
 		case DRAGSTATE_ArrangingSelection:
 			GetScene()->OnArrangingTilesMouseRelease(*m_pAuxTileSet, mapToScene(pEvent->pos()));
+			break;
+
+		case DRAGSTATE_Painting:
+			GetScene()->OnPaintStrokeRelease(*m_pAuxTileSet);
 			break;
 		}
 	}

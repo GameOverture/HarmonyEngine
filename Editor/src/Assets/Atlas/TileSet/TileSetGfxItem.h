@@ -38,7 +38,7 @@ class TileSetGfxItem : public QGraphicsItem
 
 	QGraphicsRectItem *					m_pAnimationRectItem;		// Optional rectangle drawn around the tile when it is part of an animation
 
-	QGraphicsPolygonItem *				m_pAutoTileParts[17];		// 
+	QGraphicsPolygonItem *				m_pTerrainParts[NUM_AUTOTILEPARTS];
 
 public:
 	TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon);
@@ -62,13 +62,11 @@ public:
 
 	void SetAnimation(bool bShow, HyColor color);
 
-	//virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
-	//virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
-	//virtual QVariant itemChange(GraphicsItemChange eChange, const QVariant &value) override;
-	//virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
-	//virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
-	//virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
-	//virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+	void AllocateAutoTileParts(AtlasTileSet *pTileSet, AutoTileType eAutoTileType, TileSetShape eTileSetShape);
+	QGraphicsPolygonItem *GetAutoTilePartAt(QPointF ptLocalPos);
+
+private:
+	QPolygonF AssembleAutoTilePolygon(AutoTileType eAutoTileType, TileSetShape eTileSetShape, TileSetAutoTilePart ePart);
 };
 
 #endif // TILEGFXITEM_H
