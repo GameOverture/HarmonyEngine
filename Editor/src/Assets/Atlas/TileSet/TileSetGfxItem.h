@@ -11,7 +11,6 @@
 #define TILEGFXITEM_H
 
 #include "Global.h"
-#include "AuxTileSet.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
@@ -63,7 +62,7 @@ public:
 	void SetAnimation(bool bShow, HyColor color);
 
 	void AllocateAutoTileParts(AtlasTileSet *pTileSet, AutoTileType eAutoTileType, TileSetShape eTileSetShape);
-	QGraphicsPolygonItem *GetAutoTilePartAt(QPointF ptLocalPos);
+	QGraphicsPolygonItem *GetAutoTilePartAt(QPointF ptLocalPos, TileSetAutoTilePart &ePartOut);
 
 private:
 	QPolygonF AssembleAutoTilePolygon(AutoTileType eAutoTileType, TileSetShape eTileSetShape, TileSetAutoTilePart ePart);

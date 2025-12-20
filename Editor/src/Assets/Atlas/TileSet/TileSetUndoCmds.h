@@ -11,7 +11,6 @@
 #define TILESETUNDOCMDS_H
 
 #include "AtlasTileSet.h"
-#include "AuxTileSet.h"
 
 #include <QUndoCommand>
 
@@ -186,11 +185,43 @@ class TileSetUndoCmd_ApplyTerrainSet : public QUndoCommand
 	QUuid								m_NewTerrainSetUuid;
 
 public:
-	TileSetUndoCmd_ApplyTerrainSet(AuxTileSet &auxTileSetRef, QList<TileData *> affectedTileList, QUuid newTerrainSetUuid);
+	TileSetUndoCmd_ApplyTerrainSet(AuxTileSet &auxTileSetRef, QList<TileData *> affectedTileList, QUuid newTerrainSetUuid, QUndoCommand *pParent = nullptr);
 	virtual ~TileSetUndoCmd_ApplyTerrainSet();
 
 	virtual void redo() override;
 	virtual void undo() override;
 };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TileSetUndoCmd_PaintAnimation : public QUndoCommand
+{
+	AuxTileSet &						m_AuxTileSetRef;
+	QUuid								m_AnimationUuid;
+	bool								m_bLeftClick;
+	QList<TileData *>					m_PaintedMap;
+	QList<QUuid>						m_OriginalAnimationMap;
+
+public:
+	TileSetUndoCmd_PaintAnimation(AuxTileSet &auxTileSetRef, bool bLeftClick, QList<TileData *> paintedTiles, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_PaintAnimation();
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class TileSetUndoCmd_PaintAutoTileParts : public QUndoCommand
+{
+	AuxTileSet &										m_AuxTileSetRef;
+	QUuid												m_TerrainUuid;
+	bool												m_bLeftClick;
+	QMap<TileData *, QBitArray>							m_PaintedPartsMap;
+	QList<QPair<TileData *, QMap<QUuid, QBitArray>>>	m_OriginalTerrainMap;
+
+public:
+	TileSetUndoCmd_PaintAutoTileParts(AuxTileSet &auxTileSetRef, bool bLeftClick, QMap<TileData *, QBitArray> paintedParts, QUndoCommand *pParent = nullptr);
+	virtual ~TileSetUndoCmd_PaintAutoTileParts();
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
 
 #endif // TILESETUNDOCMDS_H

@@ -215,14 +215,18 @@ void TileSetGfxItem::AllocateAutoTileParts(AtlasTileSet *pTileSet, AutoTileType 
 	}
 }
 
-QGraphicsPolygonItem *TileSetGfxItem::GetAutoTilePartAt(QPointF ptLocalPos)
+QGraphicsPolygonItem *TileSetGfxItem::GetAutoTilePartAt(QPointF ptLocalPos, TileSetAutoTilePart &ePartOut)
 {
 	for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
 	{
 		if(m_pTerrainParts[i]->contains(ptLocalPos))
+		{
+			ePartOut = static_cast<TileSetAutoTilePart>(i);
 			return m_pTerrainParts[i];
+		}
 	}
 
+	ePartOut = AUTOTILEPART_Unknown;
 	return nullptr;
 }
 

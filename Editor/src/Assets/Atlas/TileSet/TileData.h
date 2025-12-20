@@ -34,25 +34,6 @@ class TileData
 	QUuid											m_AnimationUuid;
 
 	QUuid											m_TerrainSetUuid;		// The Terrain Set assigned to this tile
-	//enum AutotilePeeringBit
-	//{
-	//	AUTOBIT_RightCorner			= 1 << 0,		// Hexagon-flat, Isometric
-	//	AUTOBIT_RightSide			= 1 << 1,		// Hexagon-pointed, Square
-	//	AUTOBIT_BottomRightSide		= 1 << 2,		// Hexagon-flat, Hexagon-pointed, Isometric
-	//	AUTOBIT_BottomRightCorner	= 1 << 3,		// Hexagon-flat, Hexagon-pointed, Square
-	//	AUTOBIT_BottomSide			= 1 << 4,		// Hexagon-flat, Square
-	//	AUTOBIT_BottomCorner		= 1 << 5,		// Hexagon-pointed, Isometric
-	//	AUTOBIT_BottomLeftSide		= 1 << 6,		// Hexagon-flat, Hexagon-pointed, Isometric
-	//	AUTOBIT_BottomLeftCorner	= 1 << 7,		// Hexagon-flat, Hexagon-pointed, Square
-	//	AUTOBIT_LeftCorner			= 1 << 8,		// Hexagon-flat, Isometric
-	//	AUTOBIT_LeftSide			= 1 << 9,		// Hexagon-pointed, Square
-	//	AUTOBIT_TopLeftSide			= 1 << 10,		// Hexagon-flat, Hexagon-pointed, Isometric
-	//	AUTOBIT_TopLeftCorner		= 1 << 11,		// Hexagon-flat, Hexagon-pointed, Square
-	//	AUTOBIT_TopCorner			= 1 << 12, 		// Hexagon-pointed, Isometric
-	//	AUTOBIT_TopSide				= 1 << 13,		// Hexagon-flat, Square
-	//	AUTOBIT_TopRightSide		= 1 << 14,		// Hexagon-flat, Hexagon-pointed, Isometric
-	//	AUTOBIT_TopRightCorner		= 1 << 15,		// Hexagon-flat, Hexagon-pointed, Square
-	//};
 	QMap<QUuid, QBitArray>							m_TerrainMap;			// Key: Terrain Uuid (NOT TERRAIN SET), Value: QBitArray(NUM_AUTOTILEPARTS)
 
 	QMap<QUuid, QList<QList<QPoint>>>				m_VertexMap;
@@ -73,11 +54,16 @@ public:
 	QPoint GetTextureOffset() const;
 	QPixmap GetPixmap() const;
 
+	QUuid GetAnimation() const;
+	void SetAnimation(QUuid animationUuid);
+
 	QUuid GetTerrainSet() const;
 	void SetTerrainSet(QUuid terrainSetUuid);
 	QUuid GetTerrain(TileSetAutoTilePart ePart) const;
 	void SetTerrain(QUuid terrainUuid, TileSetAutoTilePart ePart);
 	void ClearTerrain(TileSetAutoTilePart ePart);
+	const QMap<QUuid, QBitArray> &GetTerrainMap() const;
+	void SetTerrainMap(const QMap<QUuid, QBitArray> &terrainMap);
 };
 
 #endif // TILEDATA_H

@@ -81,7 +81,7 @@ void IWgtTileSetItem::SetSelected(bool bSelected)
 	if (event->type() == QEvent::MouseButtonPress)
 	{
 		QMouseEvent* pMouseEvent = static_cast<QMouseEvent*>(event);
-		if (pMouseEvent->button() == Qt::LeftButton || pMouseEvent->button() == Qt::RightButton)
+		if (pMouseEvent->buttons() & (Qt::LeftButton | Qt::RightButton))
 		{
 			if (IsSelected() == false)
 			{

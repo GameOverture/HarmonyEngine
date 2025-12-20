@@ -173,6 +173,16 @@ QPixmap TileData::GetPixmap() const
 	return m_TilePixmap;
 }
 
+QUuid TileData::GetAnimation() const
+{
+	return m_AnimationUuid;
+}
+
+void TileData::SetAnimation(QUuid animationUuid)
+{
+	m_AnimationUuid = animationUuid;
+}
+
 QUuid TileData::GetTerrainSet() const
 {
 	return m_TerrainSetUuid;
@@ -228,4 +238,14 @@ void TileData::ClearTerrain(TileSetAutoTilePart ePart)
 		else
 			++it;
 	}
+}
+
+const QMap<QUuid, QBitArray> &TileData::GetTerrainMap() const
+{
+	return m_TerrainMap;
+}
+
+void TileData::SetTerrainMap(const QMap<QUuid, QBitArray> &terrainMap)
+{
+	m_TerrainMap = terrainMap;
 }

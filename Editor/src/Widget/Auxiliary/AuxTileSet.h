@@ -24,16 +24,6 @@ namespace Ui {
 class AuxTileSet;
 }
 
-enum TileSetPage
-{
-	TILESETPAGE_Import,
-	TILESETPAGE_Arrange,
-	TILESETPAGE_Animation,
-	TILESETPAGE_Autotile,
-	TILESETPAGE_Collision,
-	TILESETPAGE_CustomData
-};
-
 class AuxTileSet : public QWidget
 {
 	Q_OBJECT

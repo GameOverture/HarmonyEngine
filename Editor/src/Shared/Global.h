@@ -209,6 +209,16 @@ enum TileSetShape
 	NUM_TILESETSHAPES
 };
 
+enum TileSetPage
+{
+	TILESETPAGE_Import,
+	TILESETPAGE_Arrange,
+	TILESETPAGE_Animation,
+	TILESETPAGE_Autotile,
+	TILESETPAGE_Collision,
+	TILESETPAGE_CustomData
+};
+
 enum TileSetWgtType
 {
 	TILESETWGT_None = -1,

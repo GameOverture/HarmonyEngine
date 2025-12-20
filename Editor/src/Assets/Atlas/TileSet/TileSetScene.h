@@ -13,9 +13,9 @@
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 #include <QGraphicsSceneMouseEvent>
-#include "AuxTileSet.h"
 
 class AtlasTileSet;
+class AuxTileSet;
 class TileSetGfxItem;
 class TileData;
 
@@ -52,7 +52,7 @@ class TileSetScene : public QGraphicsScene
 	QList<TileData *>												m_PaintStrokeAnimationList;
 
 	QGraphicsPolygonItem *											m_pHoverAutoTilePartItem;
-	QList<QGraphicsPolygonItem *>									m_PaintStrokeAutoTilePartList;
+	QMap<TileData *, QBitArray>										m_PaintStrokeAutoTilePartMap;
 
 public:
 	TileSetScene();
@@ -60,9 +60,10 @@ public:
 
 	void Initialize(AtlasTileSet *pTileSet);
 
+	QGraphicsRectItem &GetGfxBorderRect();
+	QGraphicsRectItem &GetGfxImportBorderRect();
+
 	void OnTileSetPageChange(TileSetPage ePage);
-	
-	QPointF GetFocusPt(TileSetPage ePage) const;
 
 	int GetNumImportPixmaps() const;
 	QSize GetImportRegionSize() const;
@@ -98,8 +99,8 @@ public:
 	void OnTerrainSetApplied(TileData *pTileData);
 
 	void StartPaintStroke();
-	void OnPaintingStroke(AuxTileSet &auxTileSetRef, QPointF ptScenePos, bool bLeftClick);
-	void OnPaintStrokeRelease(AuxTileSet &auxTileSetRef);
+	void OnPaintingStroke(AuxTileSet &auxTileSetRef, QPointF ptScenePos, Qt::MouseButtons uiMouseFlags); 
+	void OnPaintStrokeRelease(AuxTileSet &auxTileSetRef, Qt::MouseButton eMouseBtn);
 
 private:
 	// Used during a drag operation, displace unselected tiles by the given grid delta

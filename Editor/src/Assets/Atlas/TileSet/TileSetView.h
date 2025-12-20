@@ -11,6 +11,7 @@
 #define TILESETVIEW_H
 
 #include "CommonGfxView.h"
+#include "AuxTileSet.h"
 
 class AuxTileSet;
 class TileSetScene;
@@ -39,8 +40,12 @@ public:
 	TileSetScene *GetScene() const;
 	void SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene);
 
+	void ResetCamera(TileSetPage ePage);
+
 protected:
 	virtual void contextMenuEvent(QContextMenuEvent *pEvent) override;
+
+	virtual void showEvent(QShowEvent *pEvent) override;
 
 	//virtual void drawBackground(QPainter *pPainter, const QRectF &rect) override;
 	//virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;

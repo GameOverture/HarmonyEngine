@@ -45,6 +45,24 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 	setScene(pTileSetScene);
 }
 
+void TileSetView::ResetCamera(TileSetPage ePage)
+{
+	if(GetScene() == nullptr)
+		return;
+
+	QPointF ptTopLeft;
+	if(ePage == TILESETPAGE_Import)
+		ptTopLeft = GetScene()->GetGfxImportBorderRect().scenePos();
+	else
+		ptTopLeft = GetScene()->GetGfxBorderRect().scenePos();
+
+	ptTopLeft -= QPointF(32, 32);
+
+	QSize vViewPortSize = viewport()->size();
+	fitInView(QRectF(ptTopLeft, ptTopLeft + QPointF(vViewPortSize.width(), vViewPortSize.height())), Qt::KeepAspectRatio);
+	scale(1.0f, 1.0f);
+}
+
 /*virtual*/ void TileSetView::contextMenuEvent(QContextMenuEvent *pEvent) /*override*/
 {
 	if(m_pAuxTileSet == nullptr)
@@ -58,6 +76,16 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 	//pNewMenu->exec(pEvent->globalPos());
 	//delete pNewMenu;
 	CommonGfxView::contextMenuEvent(pEvent);
+}
+
+/*virtual*/ void TileSetView::showEvent(QShowEvent *pEvent) /*override*/
+{
+	if(m_pAuxTileSet->GetTileSet()->GetNumTiles() == 0)
+		ResetCamera(TILESETPAGE_Import);
+	else
+		ResetCamera(TILESETPAGE_Arrange);
+
+	QGraphicsView::showEvent(pEvent);
 }
 
 ///*virtual*/ void TileSetView::drawBackground(QPainter *pPainter, const QRectF &rect) /*override*/
@@ -92,6 +120,7 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 			{
 				m_eDragState = DRAGSTATE_Painting;
 				GetScene()->StartPaintStroke();
+				GetScene()->OnPaintingStroke(*m_pAuxTileSet, mapToScene(pEvent->pos()), pEvent->buttons());
 				setDragMode(QGraphicsView::NoDrag);
 			}
 			else
@@ -137,6 +166,8 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 			switch (m_pAuxTileSet->GetCurrentPage())
 			{
 			case TILESETPAGE_Import:
+			case TILESETPAGE_Animation:
+			case TILESETPAGE_Autotile:
 				setDragMode(QGraphicsView::RubberBandDrag);
 				m_eDragState = DRAGSTATE_MarqueeSelect;
 				break;
@@ -170,7 +201,7 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 		break;
 
 	case DRAGSTATE_Painting:
-		GetScene()->OnPaintingStroke(*m_pAuxTileSet, mapToScene(pEvent->pos()), m_pAuxTileSet->GetCurrentPage());
+		GetScene()->OnPaintingStroke(*m_pAuxTileSet, mapToScene(pEvent->pos()), pEvent->buttons());
 		break;
 	}
 	
@@ -200,7 +231,7 @@ void TileSetView::SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene)
 			break;
 
 		case DRAGSTATE_Painting:
-			GetScene()->OnPaintStrokeRelease(*m_pAuxTileSet);
+			GetScene()->OnPaintStrokeRelease(*m_pAuxTileSet, pEvent->button());
 			break;
 		}
 	}

@@ -21,6 +21,7 @@
 
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QGraphicsRectItem>
 
 const int g_iDefaultTileSize = 32;
 
@@ -130,15 +131,14 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 
 	// TODO: physics here
 	
+	ui->graphicsView->SetScene(this, m_pTileSet->GetGfxScene());
 
 	if(m_pTileSet->GetNumTiles() == 0)
 		m_pTabBar->setCurrentIndex(TILESETPAGE_Import);
 	else
 		m_pTabBar->setCurrentIndex(TILESETPAGE_Arrange);
+
 	OnTabBarChanged(m_pTabBar->currentIndex());
-	
-	ui->graphicsView->SetScene(this, m_pTileSet->GetGfxScene());
-	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(GetCurrentPage()));
 	
 	RefreshInfo();
 	UpdateGfxItemSelection();
@@ -154,13 +154,10 @@ TileSetPage AuxTileSet::GetCurrentPage() const
 	return static_cast<TileSetPage>(ui->setupStackedWidget->currentIndex());
 }
 
-//m_pTileSet->GetGfxScene()->GetFocusPt(ePage)
-
 void AuxTileSet::SetCurrentPage(TileSetPage ePage)
 {
 	ui->setupStackedWidget->setCurrentIndex(static_cast<int>(ePage));
 	m_pTileSet->GetGfxScene()->OnTileSetPageChange(ePage);
-	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(ePage));
 
 	switch (ePage)
 	{
@@ -571,7 +568,7 @@ void AuxTileSet::SetImportWidgets()
 
 	m_pTileSet->GetGfxScene()->ClearImportTiles();
 	m_pTileSet->GetGfxScene()->OnTileSetPageChange(GetCurrentPage());
-	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(GetCurrentPage()));
+	ui->graphicsView->ResetCamera(TILESETPAGE_Arrange);
 
 	ErrorCheckImport();
 }
@@ -788,7 +785,7 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 		pGfxScene->RefreshImportTiles();
 	}
 
-	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(GetCurrentPage()));
+	ui->graphicsView->ResetCamera(TILESETPAGE_Import);
 
 	ErrorCheckImport();
 }
@@ -1003,5 +1000,4 @@ void AuxTileSet::OnTabBarChanged(int iIndex)
 	}
 
 	m_pTileSet->GetGfxScene()->OnTileSetPageChange(static_cast<TileSetPage>(iIndex));
-	ui->graphicsView->centerOn(m_pTileSet->GetGfxScene()->GetFocusPt(static_cast<TileSetPage>(iIndex)));
 }

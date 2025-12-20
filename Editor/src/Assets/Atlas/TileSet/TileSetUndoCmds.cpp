@@ -9,8 +9,11 @@
  *************************************************************************/
 #include "Global.h"
 #include "TileSetUndoCmds.h"
+#include "AuxTileSet.h"
 #include "TileData.h"
 #include "WgtTileSetAnimation.h"
+
+#include <QBitArray>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -521,8 +524,8 @@ TileSetUndoCmd_ModifyWgtItem::TileSetUndoCmd_ModifyWgtItem(AuxTileSet &auxTileSe
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-TileSetUndoCmd_ApplyTerrainSet::TileSetUndoCmd_ApplyTerrainSet(AuxTileSet &auxTileSetRef, QList<TileData *> affectedTileList, QUuid newTerrainSetUuid) :
-	QUndoCommand(),
+TileSetUndoCmd_ApplyTerrainSet::TileSetUndoCmd_ApplyTerrainSet(AuxTileSet &auxTileSetRef, QList<TileData *> affectedTileList, QUuid newTerrainSetUuid, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
 	m_AuxTileSetRef(auxTileSetRef),
 	m_AffectedTileList(affectedTileList),
 	m_NewTerrainSetUuid(newTerrainSetUuid)
@@ -549,4 +552,97 @@ TileSetUndoCmd_ApplyTerrainSet::TileSetUndoCmd_ApplyTerrainSet(AuxTileSet &auxTi
 {
 	m_AuxTileSetRef.CmdSet_ApplyTerrainSet(m_AffectedTileList, m_OldTerrainSetUuidList);
 	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TileSetUndoCmd_PaintAnimation::TileSetUndoCmd_PaintAnimation(AuxTileSet &auxTileSetRef, bool bLeftClick, QList<TileData *> paintedTiles, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_AuxTileSetRef(auxTileSetRef),
+	m_AnimationUuid(auxTileSetRef.GetSelectedAnimation()),
+	m_bLeftClick(bLeftClick),
+	m_PaintedMap(paintedTiles)
+{
+	if(m_AnimationUuid.isNull())
+		HyGuiLog("TileSetUndoCmd_PaintAnimation() - No animation selected, cannot paint animation.", LOGTYPE_Error);
+
+	if(m_bLeftClick)
+		setText("Assign Tiles to Animation");
+	else
+		setText("Remove Tiles from Animation");
+
+	// Copy current existing animation maps for undo
+	for(TileData *pTileData : m_PaintedMap)
+		m_OriginalAnimationMap.append(pTileData->GetAnimation());
+}
+
+/*virtual*/ TileSetUndoCmd_PaintAnimation::~TileSetUndoCmd_PaintAnimation()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_PaintAnimation::redo() /*override*/
+{
+	for(TileData *pTileData : m_PaintedMap)
+	{
+		if(m_bLeftClick)
+			pTileData->SetAnimation(m_AnimationUuid);
+		else
+			pTileData->SetAnimation(QUuid());
+	}
+}
+
+/*virtual*/ void TileSetUndoCmd_PaintAnimation::undo() /*override*/
+{
+	for(int i = 0; i < m_PaintedMap.size(); ++i)
+		m_PaintedMap[i]->SetAnimation(m_OriginalAnimationMap[i]);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+TileSetUndoCmd_PaintAutoTileParts::TileSetUndoCmd_PaintAutoTileParts(AuxTileSet &auxTileSetRef, bool bLeftClick, QMap<TileData *, QBitArray> paintedParts, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_AuxTileSetRef(auxTileSetRef),
+	m_TerrainUuid(auxTileSetRef.GetSelectedTerrain()),
+	m_bLeftClick(bLeftClick),
+	m_PaintedPartsMap(paintedParts)
+{
+	if(m_TerrainUuid.isNull())
+		HyGuiLog("TileSetUndoCmd_PaintAutoTileParts() - No terrain selected, cannot paint autotile parts.", LOGTYPE_Error);
+
+	setText("Paint Terrain Parts");
+
+	// Copy current existing terrain maps for undo
+	for(TileData *pTileData : m_PaintedPartsMap.keys())
+		m_OriginalTerrainMap.push_back(QPair<TileData *, QMap<QUuid, QBitArray>>(pTileData, pTileData->GetTerrainMap()));
+}
+
+/*virtual*/ TileSetUndoCmd_PaintAutoTileParts::~TileSetUndoCmd_PaintAutoTileParts()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_PaintAutoTileParts::redo() /*override*/
+{
+	for(QMap<TileData *, QBitArray>::iterator iter = m_PaintedPartsMap.begin(); iter != m_PaintedPartsMap.end(); ++iter)
+	{
+		for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
+		{
+			if(iter.value().testBit(i))
+			{
+				if(m_bLeftClick)
+					iter.key()->SetTerrain(m_TerrainUuid, static_cast<TileSetAutoTilePart>(i));
+				else
+					iter.key()->ClearTerrain(static_cast<TileSetAutoTilePart>(i));
+			}
+		}
+	}
+
+	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshSetupTiles(m_AuxTileSetRef.GetCurrentPage());
+}
+
+/*virtual*/ void TileSetUndoCmd_PaintAutoTileParts::undo() /*override*/
+{
+	for(QPair<TileData *, QMap<QUuid, QBitArray>> &cachedPair : m_OriginalTerrainMap)
+		cachedPair.first->SetTerrainMap(cachedPair.second);
+
+	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshSetupTiles(m_AuxTileSetRef.GetCurrentPage());
 }

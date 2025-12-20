@@ -8,13 +8,16 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
+#include "AuxTileSet.h"
 #include "TileSetScene.h"
 #include "AtlasTileSet.h"
 #include "TileData.h"
 #include "TileSetGfxItem.h"
 #include "TileSetUndoCmds.h"
 
-const HyMargins<int> g_borderMargins(16, 16, 16, 16);
+#include <QBitArray>
+
+const HyMargins<int> g_borderMargins(5, 5, 5, 5);
 const int g_iSpacingAmt = 5;
 const float g_fSceneMargins = 7000.0f;
 
@@ -36,7 +39,7 @@ TileSetScene::TileSetScene() :
 	addItem(m_pModeImportGroup);
 	m_pModeImportGroup->setAcceptHoverEvents(true);
 	m_pModeImportGroup->addToGroup(&m_ImportBorderRect);
-	m_ImportBorderRect.setPen(QPen(QBrush(QColor(255, 255, 255)), 2.0f, Qt::DashLine));
+	m_ImportBorderRect.setPen(QPen(QBrush(QColor(0, 255, 0)), 2.0f, Qt::DashLine));
 	m_ImportBorderRect.setVisible(false);
 
 	m_pHoverAutoTilePartItem = new QGraphicsPolygonItem();
@@ -72,6 +75,16 @@ void TileSetScene::Initialize(AtlasTileSet *pTileSet)
 	OnTileSetPageChange(m_pTileSet->GetNumTiles() > 0 ? TILESETPAGE_Arrange : TILESETPAGE_Import);
 }
 
+QGraphicsRectItem &TileSetScene::GetGfxBorderRect()
+{
+	return m_SetupBorderRect;
+}
+
+QGraphicsRectItem &TileSetScene::GetGfxImportBorderRect()
+{
+	return m_ImportBorderRect;
+}
+
 void TileSetScene::OnTileSetPageChange(TileSetPage ePage)
 {
 	if(ePage == TILESETPAGE_Import)
@@ -86,28 +99,6 @@ void TileSetScene::OnTileSetPageChange(TileSetPage ePage)
 	}
 
 	RefreshSetupTiles(ePage);
-}
-
-QPointF TileSetScene::GetFocusPt(TileSetPage ePage) const
-{
-	switch (ePage)
-	{
-	case TILESETPAGE_Import:
-		return m_ImportBorderRect.rect().center();
-
-	case TILESETPAGE_Arrange:
-	case TILESETPAGE_Animation:
-	case TILESETPAGE_Autotile:
-	case TILESETPAGE_Collision:
-	case TILESETPAGE_CustomData:
-		return m_SetupBorderRect.rect().center();
-	
-	default:
-		HyGuiLog("TileSetScene::GetFocusPt() - Unhandled TileSetPage enum value", LOGTYPE_Error);
-		break;
-	}
-
-	return QPointF(0, 0);
 }
 
 int TileSetScene::GetNumImportPixmaps() const
@@ -301,10 +292,10 @@ void TileSetScene::RefreshImportTiles()
 
 	int iNumColumns = fabs(iMaxGridX - iMinGridX + 1);
 	int iNumRows = fabs(iMaxGridY - iMinGridY + 1);
-	m_ImportBorderRect.setRect(iMinGridX * iTileSpacingWidth - g_borderMargins.left,
-		iMinGridY * iTileSpacingHeight - g_borderMargins.top,
-		iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right - g_iSpacingAmt,
-		iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom - g_iSpacingAmt);
+	m_ImportBorderRect.setRect(iMinGridX * iTileSpacingWidth - g_borderMargins.left - (iTileSpacingWidth / 2),
+							   iMinGridY * iTileSpacingHeight - g_borderMargins.top - (iTileSpacingHeight / 2),
+							   iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right - g_iSpacingAmt,
+							   iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom - g_iSpacingAmt);
 
 	if(m_ImportTileMap.empty())
 		m_ImportBorderRect.setVisible(false);
@@ -402,8 +393,8 @@ void TileSetScene::RefreshSetupTiles(TileSetPage ePage, QPointF vDragDelta /*= Q
 
 	int iNumColumns = fabs(iMaxGridX - iMinGridX + 1);
 	int iNumRows = fabs(iMaxGridY - iMinGridY + 1);
-	m_SetupBorderRect.setRect(iMinGridX * iTileSpacingWidth - g_borderMargins.left,
-							  iMinGridY * iTileSpacingHeight - g_borderMargins.top,
+	m_SetupBorderRect.setRect(iMinGridX * iTileSpacingWidth - g_borderMargins.left - (iTileSpacingWidth / 2),
+							  iMinGridY * iTileSpacingHeight - g_borderMargins.top - (iTileSpacingHeight / 2),
 							  iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right - g_iSpacingAmt,
 							  iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom - g_iSpacingAmt);
 	m_SetupBorderRect.setVisible(m_SetupTileMap.empty() == false && vDragDelta.isNull());
@@ -479,16 +470,18 @@ void TileSetScene::OnArrangingTilesMouseRelease(AuxTileSet &auxTileSetRef, QPoin
 
 void TileSetScene::HoverAutoTilePartAt(QPointF ptScenePos)
 {
+	m_pHoverAutoTilePartItem->hide();
+
 	// Highlight auto-tile parts under mouse (if it's an enabled tile)
 	TileData *pTile = IsPointInTile(ptScenePos);
 	if(pTile == nullptr || pTile->GetTerrainSet().isNull())
 		return;
 
-	m_pHoverAutoTilePartItem->hide();
-
 	TileSetGfxItem *pGfxTile = m_SetupTileMap[pTile];
 	QPointF ptTileLocalPos = ptScenePos - pGfxTile->scenePos();
-	QGraphicsPolygonItem *pGfxAutoTilePart = pGfxTile->GetAutoTilePartAt(ptTileLocalPos);
+
+	TileSetAutoTilePart ePart = AUTOTILEPART_Unknown;
+	QGraphicsPolygonItem *pGfxAutoTilePart = pGfxTile->GetAutoTilePartAt(ptTileLocalPos, ePart);
 	if(pGfxAutoTilePart)
 	{
 		m_pHoverAutoTilePartItem->setPolygon(pGfxAutoTilePart->polygon());
@@ -508,11 +501,13 @@ void TileSetScene::OnTerrainSetApplied(TileData *pTileData)
 
 void TileSetScene::StartPaintStroke()
 {
+	m_pHoverAutoTilePartItem->hide();
+
 	m_PaintStrokeAnimationList.clear();
-	m_PaintStrokeAutoTilePartList.clear();
+	m_PaintStrokeAutoTilePartMap.clear();
 }
 
-void TileSetScene::OnPaintingStroke(AuxTileSet &auxTileSetRef, QPointF ptScenePos, bool bLeftClick)
+void TileSetScene::OnPaintingStroke(AuxTileSet &auxTileSetRef, QPointF ptScenePos, Qt::MouseButtons uiMouseFlags)
 {
 	TileData *pTile = IsPointInTile(ptScenePos);
 	if(pTile == nullptr)
@@ -525,7 +520,7 @@ void TileSetScene::OnPaintingStroke(AuxTileSet &auxTileSetRef, QPointF ptScenePo
 			return;
 
 		TileSetGfxItem *pGfxTile = m_SetupTileMap[pTile];
-		pGfxTile->SetAnimation(bLeftClick, m_pTileSet->GetAnimationColor(animUuid));
+		pGfxTile->SetAnimation(uiMouseFlags & Qt::LeftButton, m_pTileSet->GetAnimationColor(animUuid));
 
 		m_PaintStrokeAnimationList.push_back(pTile);
 	}
@@ -540,34 +535,45 @@ void TileSetScene::OnPaintingStroke(AuxTileSet &auxTileSetRef, QPointF ptScenePo
 		
 		TileSetGfxItem *pGfxTile = m_SetupTileMap[pTile];
 		QPointF ptTileLocalPos = ptScenePos - pGfxTile->scenePos();
-		QGraphicsPolygonItem *pGfxAutoTilePart = pGfxTile->GetAutoTilePartAt(ptTileLocalPos);
+
+		TileSetAutoTilePart ePart = AUTOTILEPART_Unknown;
+		QGraphicsPolygonItem *pGfxAutoTilePart = pGfxTile->GetAutoTilePartAt(ptTileLocalPos, ePart);
 		if(pGfxAutoTilePart)
 		{
-			pGfxAutoTilePart->setBrush(QBrush(HyGlobal::ConvertHyColor(m_pTileSet->GetTerrainColor(terrainUuid))));
-			m_PaintStrokeAutoTilePartList.push_back(pGfxAutoTilePart);
+			if(uiMouseFlags & Qt::LeftButton)
+			{
+				pGfxAutoTilePart->setBrush(QBrush(HyGlobal::ConvertHyColor(m_pTileSet->GetTerrainColor(terrainUuid))));
+				pGfxAutoTilePart->show();
+			}
+			else if(uiMouseFlags & Qt::RightButton)
+				pGfxAutoTilePart->hide();
+			
+			if(m_PaintStrokeAutoTilePartMap.contains(pTile) == false)
+				m_PaintStrokeAutoTilePartMap[pTile] = QBitArray(NUM_AUTOTILEPARTS);
+			m_PaintStrokeAutoTilePartMap[pTile].setBit(static_cast<int>(ePart));
 		}
 	}
 	else
 		HyGuiLog("TileSetScene::OnPaintingStroke() - Painting stroke on unsupported TileSetPage", LOGTYPE_Error);
 }
 
-void TileSetScene::OnPaintStrokeRelease(AuxTileSet &auxTileSetRef)
+void TileSetScene::OnPaintStrokeRelease(AuxTileSet &auxTileSetRef, Qt::MouseButton eMouseBtn)
 {
 	if(auxTileSetRef.GetCurrentPage() == TILESETPAGE_Animation)
 	{
 		if(m_PaintStrokeAnimationList.empty())
 			return;
 
-		//TileSetUndoCmd_PaintAnimation *pPaintAnimCmd = new TileSetUndoCmd_PaintAnimation(auxTileSetRef, m_PaintStrokeAnimationList);
-		//m_pTileSet->GetUndoStack()->push(pPaintAnimCmd);
+		TileSetUndoCmd_PaintAnimation *pPaintAnimCmd = new TileSetUndoCmd_PaintAnimation(auxTileSetRef, eMouseBtn == Qt::LeftButton, m_PaintStrokeAnimationList);
+		m_pTileSet->GetUndoStack()->push(pPaintAnimCmd);
 	}
 	else if(auxTileSetRef.GetCurrentPage() == TILESETPAGE_Autotile)
 	{
-		if(m_PaintStrokeAutoTilePartList.empty())
+		if(m_PaintStrokeAutoTilePartMap.empty())
 			return;
 
-		//TileSetUndoCmd_PaintAutoTileParts *pPaintAutoTilePartsCmd = new TileSetUndoCmd_PaintAutoTileParts(auxTileSetRef, m_PaintStrokeAutoTilePartList);
-		//m_pTileSet->GetUndoStack()->push(pPaintAutoTilePartsCmd);
+		TileSetUndoCmd_PaintAutoTileParts *pPaintAutoTilePartsCmd = new TileSetUndoCmd_PaintAutoTileParts(auxTileSetRef, eMouseBtn == Qt::LeftButton, m_PaintStrokeAutoTilePartMap);
+		m_pTileSet->GetUndoStack()->push(pPaintAutoTilePartsCmd);
 	}
 	else
 		HyGuiLog("TileSetScene::OnPaintStrokeRelease() - Releasing paint stroke on unsupported TileSetPage", LOGTYPE_Error);

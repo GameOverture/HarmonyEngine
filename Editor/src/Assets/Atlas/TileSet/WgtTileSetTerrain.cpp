@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "WgtTileSetTerrain.h"
 #include "ui_WgtTileSetTerrain.h"
+#include "AuxTileSet.h"
 #include "TileSetUndoCmds.h"
 #include "WgtTileSetTerrainSet.h"
 
