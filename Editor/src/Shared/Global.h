@@ -234,21 +234,21 @@ enum TileSetAutoTilePart
 
 	AUTOTILEPART_Center = 0,
 	AUTOTILEPART_RightCorner,		// Hexagon-flat, Isometric
-	AUTOTILEPART_RightSide,			// Hexagon-pointed, Square
+	AUTOTILEPART_RightSide,			// Hexagon-pointed, Square, Half-offset-square
 	AUTOTILEPART_BottomRightSide,	// Hexagon-flat, Hexagon-pointed, Isometric
-	AUTOTILEPART_BottomRightCorner,	// Hexagon-flat, Hexagon-pointed, Square
-	AUTOTILEPART_BottomSide,		// Hexagon-flat, Square
+	AUTOTILEPART_BottomRightCorner,	// Hexagon-flat, Hexagon-pointed, Square, Half-offset-square
+	AUTOTILEPART_BottomSide,		// Hexagon-flat, Square, Half-offset-square
 	AUTOTILEPART_BottomCorner,		// Hexagon-pointed, Isometric
 	AUTOTILEPART_BottomLeftSide,	// Hexagon-flat, Hexagon-pointed, Isometric
-	AUTOTILEPART_BottomLeftCorner,	// Hexagon-flat, Hexagon-pointed, Square
+	AUTOTILEPART_BottomLeftCorner,	// Hexagon-flat, Hexagon-pointed, Square, Half-offset-square
 	AUTOTILEPART_LeftCorner,		// Hexagon-flat, Isometric
-	AUTOTILEPART_LeftSide,			// Hexagon-pointed, Square
+	AUTOTILEPART_LeftSide,			// Hexagon-pointed, Square, Half-offset-square
 	AUTOTILEPART_TopLeftSide,		// Hexagon-flat, Hexagon-pointed, Isometric
-	AUTOTILEPART_TopLeftCorner,		// Hexagon-flat, Hexagon-pointed, Square
+	AUTOTILEPART_TopLeftCorner,		// Hexagon-flat, Hexagon-pointed, Square, Half-offset-square
 	AUTOTILEPART_TopCorner, 		// Hexagon-pointed, Isometric
-	AUTOTILEPART_TopSide,			// Hexagon-flat, Square
+	AUTOTILEPART_TopSide,			// Hexagon-flat, Square, Half-offset-square
 	AUTOTILEPART_TopRightSide,		// Hexagon-flat, Hexagon-pointed, Isometric
-	AUTOTILEPART_TopRightCorner,	// Hexagon-flat, Hexagon-pointed, Square
+	AUTOTILEPART_TopRightCorner,	// Hexagon-flat, Hexagon-pointed, Square, Half-offset-square
 
 	NUM_AUTOTILEPARTS
 };

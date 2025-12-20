@@ -228,113 +228,827 @@ QGraphicsPolygonItem *TileSetGfxItem::GetAutoTilePartAt(QPointF ptLocalPos)
 
 QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, TileSetShape eTileSetShape, TileSetAutoTilePart ePart)
 {
-	bool bHasCorners = false;
-	bool bHasSides = false;
-	switch(eAutoTileType)
-	{
-	case AUTOTILETYPE_MatchCornerSides:
-		bHasCorners = bHasSides = true;
-		break;
-	case AUTOTILETYPE_MatchCorner:
-		bHasCorners = true;
-		break;
-	case AUTOTILETYPE_MatchSides:
-		bHasSides = true;
-		break;
-	default:
-		HyGuiLog("TileSetGfxItem::AssembleAutoTilePolygon: Unhandled AutoTileType enum value!", LOGTYPE_Error);
-		return QPolygonF();
-	}
-
+	// `mainShape` has a clockwise winding order, with the first vertex at the center top (or top-left corner if shape is square or flat-top hexagon)
 	QPolygonF mainShape = m_pShapeItem->polygon();
-	// Half the size of `mainShape`, which is centered around (0,0)
+	
+	QPolygonF halfShape = mainShape;
+	for(QPointF ptVert : halfShape)
+		ptVert *= 0.5f;
 
-	QPointF vHalfSize(mainShape.boundingRect().width() * 0.5f, mainShape.boundingRect().height() * 0.5f);
+	if(ePart == AUTOTILEPART_Center)
+		return halfShape;
+
+	// Midway point (50%)
+	std::function<QPointF(const QPointF &, const QPointF &)> fpMidway =
+		[](const QPointF &a, const QPointF &b) -> QPointF {
+			return QPointF((a.x() + b.x()) * 0.5, (a.y() + b.y()) * 0.5);
+		};
+	// 1/3rd of the way from a to b
+	std::function<QPointF(const QPointF &, const QPointF &)> fpOneThird =
+		[](const QPointF &a, const QPointF &b) -> QPointF {
+			return QPointF(a.x() + (b.x() - a.x()) / 3.0, a.y() + (b.y() - a.y()) / 3.0);
+		};
+	// 2/3rd of the way from a to b
+	std::function<QPointF(const QPointF &, const QPointF &)> fpTwoThird =
+		[](const QPointF &a, const QPointF &b) -> QPointF {
+			return QPointF(a.x() + 2.0 * (b.x() - a.x()) / 3.0, a.y() + 2.0 * (b.y() - a.y()) / 3.0);
+		};
+
+	// The `halfShape` sits inside the center of the full polygon `mainShape`.
+	// Make a polygon `partPolygon`, that is the area between `halfShape` and `mainShape` based on which part is being requested.
+	// Assemble using the vertices of both polygons and the above lambda functions to create the new polygon.
+	// `partPolygon` will not overlap with `halfShape` and also fits exactly within `mainShape`.
 	QPolygonF partPolygon;
-	switch(eTileSetShape)
+	switch(ePart)
 	{
-	case TILESETSHAPE_Square:
-		switch(ePart)
+	case AUTOTILEPART_RightCorner:		// Hexagon-flat, Isometric
+		if(eTileSetShape == TILESETSHAPE_Isometric)
 		{
-		case AUTOTILEPART_Center:
-			partPolygon = QPolygonF() << QPointF(-vHalfSize.x() * 0.5f, -vHalfSize.y() * 0.5f)
-				<< QPointF(vHalfSize.x() * 0.5f, -vHalfSize.y() * 0.5f)
-				<< QPointF(vHalfSize.x() * 0.5f, vHalfSize.y() * 0.5f)
-				<< QPointF(-vHalfSize.x() * 0.5f, vHalfSize.y() * 0.5f);
-			break;
-		case AUTOTILEPART_RightSide:
-			if(!bHasSides)
-				break;
-			partPolygon = QPolygonF() << QPointF(0.0f, -vHalfSize.y())
-				<< QPointF(vHalfSize.x(), -vHalfSize.y())
-				<< QPointF(vHalfSize.x(), vHalfSize.y())
-				<< QPointF(0.0f, vHalfSize.y());
-			break;
-		case AUTOTILEPART_BottomRightCorner:
-			if(!bHasCorners)
-				break;
-			partPolygon = QPolygonF() << QPointF(0.0f, 0.0f)
-				<< QPointF(vHalfSize.x(), 0.0f)
-				<< QPointF(vHalfSize.x(), vHalfSize.y())
-				<< QPointF(0.0f, vHalfSize.y());
-			break;
-		case AUTOTILEPART_BottomSide:
-			if(!bHasSides)
-				break;
-			partPolygon = QPolygonF() << QPointF(-vHalfSize.x(), 0.0f)
-				<< QPointF(vHalfSize.x(), 0.0f)
-				<< QPointF(vHalfSize.x(), vHalfSize.y())
-				<< QPointF(-vHalfSize.x(), vHalfSize.y());
-			break;
-
-		case AUTOTILEPART_BottomLeftCorner:
-			if(!bHasCorners)
-				break;
-			partPolygon = QPolygonF() << QPointF(-vHalfSize.x(), 0.0f)
-				<< QPointF(0.0f, 0.0f)
-				<< QPointF(0.0f, vHalfSize.y())
-				<< QPointF(-vHalfSize.x(), vHalfSize.y());
-			break;
-		case AUTOTILEPART_LeftSide:
-			if(!bHasSides)
-				break;
-			partPolygon = QPolygonF() << QPointF(-vHalfSize.x(), -vHalfSize.y())
-				<< QPointF(0.0f, -vHalfSize.y())
-				<< QPointF(0.0f, vHalfSize.y())
-				<< QPointF(-vHalfSize.x(), vHalfSize.y());
-			break;
-		case AUTOTILEPART_TopLeftCorner:
-			if(!bHasCorners)
-				break;
-			partPolygon = QPolygonF() << QPointF(-vHalfSize.x(), -vHalfSize.y())
-				<< QPointF(0.0f, -vHalfSize.y())
-				<< QPointF(0.0f, 0.0f)
-				<< QPointF(-vHalfSize.x(), 0.0f);
-			break;
-		case AUTOTILEPART_TopSide:
-			if(!bHasSides)
-				break;
-			partPolygon = QPolygonF() << QPointF(-vHalfSize.x(), -vHalfSize.y())
-				<< QPointF(vHalfSize.x(), -vHalfSize.y())
-				<< QPointF(vHalfSize.x(), 0.0f)
-				<< QPointF(-vHalfSize.x(), 0.0f);
-			break;
-		case AUTOTILEPART_TopRightCorner:
-			if(!bHasCorners)
-				break;
-			partPolygon = QPolygonF() << QPointF(0.0f, -vHalfSize.y())
-				<< QPointF(vHalfSize.x(), -vHalfSize.y())
-				<< QPointF(vHalfSize.x(), 0.0f)
-				<< QPointF(0.0f, 0.0f);
-			break;
-		default:
-			return QPolygonF();
-			break;
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(mainShape[0], mainShape[1])
+							<< mainShape[1]
+							<< fpMidway(mainShape[1], mainShape[2])
+							<< fpMidway(halfShape[1], halfShape[2])
+							<< halfShape[1]
+							<< fpMidway(halfShape[0], halfShape[1]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(mainShape[0], mainShape[1])
+							<< mainShape[1]
+							<< fpOneThird(mainShape[1], mainShape[2])
+							<< halfShape[1];
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(mainShape[1], mainShape[2])
+							<< mainShape[2]
+							<< fpMidway(mainShape[2], mainShape[3])
+							<< fpMidway(halfShape[2], halfShape[3])
+							<< halfShape[2]
+							<< fpMidway(halfShape[1], halfShape[2]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(mainShape[1], mainShape[2])
+							<< mainShape[2]
+							<< fpOneThird(mainShape[2], mainShape[3])
+							<< fpOneThird(halfShape[2], halfShape[3])
+							<< halfShape[2]
+							<< fpTwoThird(halfShape[1], halfShape[2]);
+			}
 		}
 		break;
 
-	default:
-		HyGuiLog("TileSetGfxItem::AssembleAutoTilePolygon: Unhandled TileSetShape enum value!", LOGTYPE_Error);
+	case AUTOTILEPART_RightSide:		// Hexagon-pointed, Square, Half-offset-square
+		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[0]
+							<< mainShape[1]
+							<< halfShape[1]
+							<< halfShape[0];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(mainShape[0], mainShape[1])
+							<< mainShape[1]
+							<< fpOneThird(mainShape[1], mainShape[2])
+							<< halfShape[1];
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << halfShape[1]
+							<< mainShape[1]
+							<< mainShape[2]
+							<< halfShape[2];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(halfShape[1], halfShape[2])
+							<< fpOneThird(mainShape[1], mainShape[2])
+							<< fpTwoThird(mainShape[1], mainShape[2])
+							<< fpTwoThird(halfShape[1], halfShape[2]);
+			}
+		}
+		break;
+
+	case AUTOTILEPART_BottomRightSide:		// Hexagon-flat, Hexagon-pointed, Isometric
+		if(eTileSetShape == TILESETSHAPE_Isometric)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << halfShape[1]
+							<< mainShape[1]
+							<< mainShape[2]
+							<< halfShape[2];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << halfShape[1]
+							<< fpOneThird(mainShape[1], mainShape[2])
+							<< fpTwoThird(mainShape[1], mainShape[2])
+							<< halfShape[2];
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << halfShape[2]
+							<< mainShape[2]
+							<< mainShape[3]
+							<< halfShape[3];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(halfShape[2], halfShape[3])
+							<< fpOneThird(mainShape[2], mainShape[3])
+							<< fpTwoThird(mainShape[2], mainShape[3])
+							<< fpTwoThird(halfShape[2], halfShape[3]);
+			}
+		}
+		else if(eAutoTileType == TILESETSHAPE_HexagonPointTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << halfShape[2]
+							<< mainShape[2]
+							<< mainShape[3]
+							<< halfShape[3];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(halfShape[2], halfShape[3])
+							<< fpOneThird(mainShape[2], mainShape[3])
+							<< fpTwoThird(mainShape[2], mainShape[3])
+							<< fpTwoThird(halfShape[2], halfShape[3]);
+			}
+		}
+		break;
+
+	case AUTOTILEPART_BottomRightCorner:	// Hexagon-flat, Hexagon-pointed, Square, Half-offset-square
+		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(halfShape[1], halfShape[2])
+							<< fpMidway(mainShape[1], mainShape[2])
+							<< mainShape[2]
+							<< fpMidway(mainShape[2], mainShape[3])
+							<< fpMidway(halfShape[2], halfShape[3])
+							<< halfShape[2];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << halfShape[2]
+							<< fpTwoThird(mainShape[1], mainShape[2])
+							<< mainShape[2]
+							<< fpOneThird(mainShape[2], mainShape[3]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(halfShape[2], halfShape[3])
+							<< fpMidway(mainShape[2], mainShape[3])
+							<< mainShape[3]
+							<< fpMidway(mainShape[3], mainShape[4])
+							<< fpMidway(halfShape[3], halfShape[4])
+							<< halfShape[3];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(halfShape[2], halfShape[3])
+							<< fpOneThird(mainShape[2], mainShape[3])
+							<< fpTwoThird(mainShape[2], mainShape[3])
+							<< fpTwoThird(halfShape[2], halfShape[3]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(halfShape[1], halfShape[2])
+							<< fpMidway(mainShape[1], mainShape[2])
+							<< mainShape[2]
+							<< fpMidway(mainShape[2], mainShape[3])
+							<< fpMidway(halfShape[2], halfShape[3])
+							<< halfShape[2];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(halfShape[1], halfShape[2])
+							<< fpTwoThird(mainShape[1], mainShape[2])
+							<< mainShape[2]
+							<< fpOneThird(mainShape[2], mainShape[3])
+							<< fpOneThird(halfShape[2], halfShape[3])
+							<< halfShape[2];
+			}
+		}
+		break;
+
+	case AUTOTILEPART_BottomSide:			// Hexagon-flat, Square, Half-offset-square
+		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << halfShape[3]
+							<< halfShape[2]
+							<< mainShape[2]
+							<< mainShape[3];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << halfShape[3]
+							<< halfShape[2]
+							<< fpOneThird(mainShape[2], mainShape[3])
+							<< fpTwoThird(mainShape[2], mainShape[3]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[0]
+							<< mainShape[1]
+							<< halfShape[1]
+							<< halfShape[0];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(halfShape[3], halfShape[4])
+							<< fpOneThird(halfShape[3], halfShape[4])
+							<< fpOneThird(mainShape[3], mainShape[4])
+							<< fpTwoThird(mainShape[4], mainShape[4]);
+			}
+		}
+		break;
+
+	case AUTOTILEPART_BottomCorner:			// Hexagon-pointed, Isometric
+		if(eTileSetShape == TILESETSHAPE_Isometric)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(halfShape[2], halfShape[3])
+							<< halfShape[2]
+							<< fpMidway(halfShape[1], halfShape[2])
+							<< fpMidway(mainShape[1], mainShape[2])
+							<< mainShape[2]
+							<< fpMidway(mainShape[2], mainShape[3]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << halfShape[2]
+							<< fpTwoThird(mainShape[1], mainShape[2])
+							<< mainShape[2]
+							<< fpOneThird(mainShape[2], mainShape[3]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(halfShape[3], halfShape[4])
+							<< halfShape[3]
+							<< fpMidway(halfShape[2], halfShape[3])
+							<< fpMidway(mainShape[2], mainShape[3])
+							<< mainShape[3]
+							<< fpMidway(mainShape[3], mainShape[4]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(halfShape[3], halfShape[4])
+							<< halfShape[3]
+							<< fpTwoThird(halfShape[2], halfShape[3])
+							<< fpTwoThird(mainShape[2], mainShape[3])
+							<< mainShape[3]
+							<< fpOneThird(mainShape[3], mainShape[4]);
+			}
+		}
+		break;
+
+	case AUTOTILEPART_BottomLeftSide:		// Hexagon-flat, Hexagon-pointed, Isometric
+		if(eTileSetShape == TILESETSHAPE_Isometric)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[3]
+							<< halfShape[3]
+							<< halfShape[2]
+							<< mainShape[2];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << halfShape[3]
+							<< halfShape[2]
+							<< fpOneThird(mainShape[2], mainShape[3])
+							<< fpTwoThird(mainShape[2], mainShape[3]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[5]
+							<< halfShape[5]
+							<< halfShape[4]
+							<< mainShape[4];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(mainShape[4], mainShape[5])
+							<< fpTwoThird(halfShape[4], halfShape[5])
+							<< fpOneThird(halfShape[4], halfShape[5])
+							<< fpOneThird(mainShape[4], mainShape[5]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[4]
+							<< halfShape[4]
+							<< halfShape[3]
+							<< mainShape[3];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(halfShape[3], halfShape[4])
+							<< fpOneThird(halfShape[3], halfShape[4])
+							<< fpOneThird(mainShape[3], mainShape[4])
+							<< fpTwoThird(mainShape[3], mainShape[4]);
+			}
+		}
+		break;
+
+	case AUTOTILEPART_BottomLeftCorner:		// Hexagon-flat, Hexagon-pointed, Square, Half-offset-square
+		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(mainShape[3], mainShape[0])
+							<< fpMidway(halfShape[3], halfShape[0])
+							<< halfShape[3]
+							<< fpMidway(halfShape[2], halfShape[3])
+							<< fpMidway(mainShape[2], mainShape[3])
+							<< mainShape[3];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(mainShape[3], mainShape[0])
+							<< halfShape[3]
+							<< fpTwoThird(mainShape[2], mainShape[3])
+							<< mainShape[3];
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(halfShape[4], halfShape[5])
+							<< halfShape[4]
+							<< fpMidway(halfShape[3], halfShape[4])
+							<< fpMidway(mainShape[3], mainShape[4])
+							<< mainShape[4]
+							<< fpMidway(mainShape[4], mainShape[5]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(halfShape[4], halfShape[5])
+							<< halfShape[4]
+							<< fpTwoThird(halfShape[3], halfShape[4])
+							<< fpTwoThird(mainShape[3], mainShape[4])
+							<< mainShape[4]
+							<< fpOneThird(mainShape[4], mainShape[5]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(mainShape[4], mainShape[5])
+							<< fpMidway(halfShape[4], halfShape[5])
+							<< halfShape[4]
+							<< fpMidway(halfShape[3], halfShape[4])
+							<< fpMidway(mainShape[3], mainShape[4])
+							<< mainShape[4];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(mainShape[4], mainShape[5])
+							<< fpOneThird(halfShape[4], halfShape[5])
+							<< halfShape[4]
+							<< fpTwoThird(halfShape[3], halfShape[4])
+							<< fpTwoThird(mainShape[3], mainShape[4])
+							<< mainShape[4];
+			}
+		}
+		break;
+
+	case AUTOTILEPART_LeftCorner:			// Hexagon-flat, Isometric
+		if(eTileSetShape == TILESETSHAPE_Isometric)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(mainShape[3], mainShape[0])
+							<< fpMidway(halfShape[3], halfShape[0])
+							<< halfShape[3]
+							<< fpMidway(halfShape[2], halfShape[3])
+							<< fpMidway(mainShape[2], mainShape[3])
+							<< mainShape[3];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(mainShape[3], mainShape[0])
+							<< halfShape[3]
+							<< fpTwoThird(mainShape[2], mainShape[3])
+							<< mainShape[3];
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(mainShape[5], mainShape[0])
+							<< fpMidway(halfShape[5], halfShape[0])
+							<< halfShape[5]
+							<< fpMidway(halfShape[4], halfShape[5])
+							<< fpMidway(mainShape[4], mainShape[5])
+							<< mainShape[5];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(mainShape[5], mainShape[0])
+							<< fpOneThird(halfShape[5], halfShape[0])
+							<< halfShape[5]
+							<< fpTwoThird(halfShape[4], halfShape[5])
+							<< fpTwoThird(mainShape[4], mainShape[5])
+							<< mainShape[5];
+			}
+		}
+		break;
+
+	case AUTOTILEPART_LeftSide:				// Hexagon-pointed, Square, Half-offset-square
+		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[0]
+							<< halfShape[0]
+							<< halfShape[3]
+							<< mainShape[3];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(mainShape[3], mainShape[0])
+							<< halfShape[0]
+							<< halfShape[3]
+							<< fpOneThird(mainShape[3], mainShape[0]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[5]
+							<< halfShape[5]
+							<< halfShape[4]
+							<< mainShape[4];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(mainShape[4], mainShape[5])
+							<< fpTwoThird(halfShape[4], halfShape[5])
+							<< fpOneThird(halfShape[4], halfShape[5])
+							<< fpOneThird(mainShape[4], mainShape[5]);
+			}
+		}
+		break;
+
+	case AUTOTILEPART_TopLeftSide:			// Hexagon-flat, Hexagon-pointed, Isometric
+		if(eTileSetShape == TILESETSHAPE_Isometric)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[0]
+							<< halfShape[0]
+							<< halfShape[3]
+							<< mainShape[3];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(mainShape[3], mainShape[0])
+							<< halfShape[0]
+							<< halfShape[3]
+							<< fpOneThird(mainShape[3], mainShape[0]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[0]
+							<< halfShape[0]
+							<< halfShape[5]
+							<< mainShape[5];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(mainShape[5], mainShape[0])
+							<< fpTwoThird(halfShape[5], halfShape[0])
+							<< fpOneThird(halfShape[5], halfShape[0])
+							<< fpOneThird(mainShape[5], mainShape[0]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[0]
+							<< halfShape[0]
+							<< halfShape[5]
+							<< mainShape[5];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(mainShape[5], mainShape[0])
+							<< fpTwoThird(halfShape[5], halfShape[0])
+							<< fpOneThird(halfShape[5], halfShape[0])
+							<< fpOneThird(mainShape[5], mainShape[0]);
+			}
+		}
+		break;
+
+	case AUTOTILEPART_TopLeftCorner:		// Hexagon-flat, Hexagon-pointed, Square, Half-offset-square
+		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << mainShape[0]
+							<< fpMidway(mainShape[0], mainShape[1])
+							<< fpMidway(halfShape[0], halfShape[1])
+							<< halfShape[0]
+							<< fpMidway(halfShape[3], halfShape[0])
+							<< fpMidway(mainShape[3], mainShape[0]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << mainShape[0]
+							<< fpOneThird(mainShape[0], mainShape[1])
+							<< halfShape[0]
+							<< fpTwoThird(halfShape[3], halfShape[0]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << mainShape[0]
+							<< fpMidway(mainShape[0], mainShape[1])
+							<< fpMidway(halfShape[0], halfShape[1])
+							<< halfShape[0]
+							<< fpMidway(halfShape[5], halfShape[0])
+							<< fpMidway(mainShape[5], mainShape[0]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << mainShape[0]
+							<< fpOneThird(mainShape[0], mainShape[1])
+							<< fpOneThird(halfShape[0], halfShape[1])
+							<< halfShape[0]
+							<< fpTwoThird(halfShape[5], halfShape[0])
+							<< fpTwoThird(mainShape[5], mainShape[0]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << mainShape[5]
+							<< fpMidway(mainShape[5], mainShape[0])
+							<< fpMidway(halfShape[5], halfShape[0])
+							<< halfShape[5]
+							<< fpMidway(halfShape[4], halfShape[5])
+							<< fpMidway(mainShape[4], mainShape[5]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << mainShape[5]
+							<< fpOneThird(mainShape[5], mainShape[0])
+							<< fpOneThird(halfShape[5], halfShape[0])
+							<< halfShape[5]
+							<< fpTwoThird(halfShape[4], halfShape[5])
+							<< fpTwoThird(mainShape[4], mainShape[5]);
+			}
+		}
+		break;
+
+	case AUTOTILEPART_TopCorner:			// Hexagon-pointed, Isometric
+		if(eTileSetShape == TILESETSHAPE_Isometric)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << mainShape[0]
+							<< fpMidway(mainShape[0], mainShape[1])
+							<< fpMidway(halfShape[0], halfShape[1])
+							<< halfShape[0]
+							<< fpMidway(halfShape[3], halfShape[0])
+							<< fpMidway(mainShape[3], mainShape[0]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << mainShape[0]
+							<< fpOneThird(mainShape[0], mainShape[1])
+							<< halfShape[0]
+							<< fpTwoThird(mainShape[3], mainShape[0]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << mainShape[0]
+							<< fpMidway(mainShape[0], mainShape[1])
+							<< fpMidway(halfShape[0], halfShape[1])
+							<< halfShape[0]
+							<< fpMidway(halfShape[5], halfShape[0])
+							<< fpMidway(mainShape[5], mainShape[0]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << mainShape[0]
+							<< fpOneThird(mainShape[0], mainShape[1])
+							<< fpOneThird(halfShape[0], halfShape[1])
+							<< halfShape[0]
+							<< fpTwoThird(halfShape[5], halfShape[0])
+							<< fpTwoThird(mainShape[5], mainShape[0]);
+			}
+		}
+		break;
+
+	case AUTOTILEPART_TopSide:				// Hexagon-flat, Square, Half-offset-square
+		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[0]
+							<< mainShape[1]
+							<< halfShape[1]
+							<< halfShape[0];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(mainShape[0], mainShape[1])
+							<< fpTwoThird(mainShape[0], mainShape[1])
+							<< halfShape[1]
+							<< halfShape[0];
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[0]
+							<< mainShape[1]
+							<< halfShape[1]
+							<< halfShape[0];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(mainShape[0], mainShape[1])
+							<< fpTwoThird(mainShape[0], mainShape[1])
+							<< fpTwoThird(halfShape[0], halfShape[1])
+							<< fpOneThird(halfShape[0], halfShape[1]);
+			}
+		}
+		break;
+
+	case AUTOTILEPART_TopRightSide:			// Hexagon-flat, Hexagon-pointed, Isometric
+		if(eTileSetShape == TILESETSHAPE_Isometric)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[0]
+							<< mainShape[1]
+							<< halfShape[1]
+							<< halfShape[0];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(mainShape[0], mainShape[1])
+							<< fpTwoThird(mainShape[0], mainShape[1])
+							<< halfShape[1]
+							<< halfShape[0];
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[1]
+							<< mainShape[2]
+							<< halfShape[2]
+							<< halfShape[1];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(mainShape[1], mainShape[2])
+							<< fpTwoThird(mainShape[1], mainShape[2])
+							<< fpTwoThird(halfShape[1], halfShape[2])
+							<< fpOneThird(halfShape[1], halfShape[2]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchSides)
+			{
+				partPolygon << mainShape[0]
+							<< mainShape[1]
+							<< halfShape[1]
+							<< halfShape[0];
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpOneThird(mainShape[0], mainShape[1])
+							<< fpTwoThird(mainShape[0], mainShape[1])
+							<< fpTwoThird(halfShape[0], halfShape[1])
+							<< fpOneThird(halfShape[0], halfShape[1]);
+			}
+		}
+		break;
+
+	case AUTOTILEPART_TopRightCorner:		// Hexagon-flat, Hexagon-pointed, Square, Half-offset-square
+		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(mainShape[0], mainShape[1])
+							<< mainShape[1]
+							<< fpMidway(mainShape[1], mainShape[2])
+							<< fpMidway(halfShape[1], halfShape[2])
+							<< halfShape[1]
+							<< fpMidway(halfShape[0], halfShape[1]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(mainShape[0], mainShape[1])
+							<< mainShape[1]
+							<< fpOneThird(mainShape[1], mainShape[2])
+							<< halfShape[1];
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(mainShape[0], mainShape[1])
+							<< mainShape[1]
+							<< fpMidway(mainShape[1], mainShape[2])
+							<< fpMidway(halfShape[1], halfShape[2])
+							<< halfShape[1]
+							<< fpMidway(halfShape[0], halfShape[1]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(mainShape[0], mainShape[1])
+							<< mainShape[1]
+							<< fpOneThird(mainShape[1], mainShape[2])
+							<< fpOneThird(halfShape[1], halfShape[2])
+							<< halfShape[1]
+							<< fpTwoThird(halfShape[0], halfShape[1]);
+			}
+		}
+		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
+		{
+			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
+			{
+				partPolygon << fpMidway(mainShape[0], mainShape[1])
+							<< mainShape[1]
+							<< fpMidway(mainShape[1], mainShape[2])
+							<< fpMidway(halfShape[1], halfShape[2])
+							<< halfShape[1]
+							<< fpMidway(halfShape[0], halfShape[1]);
+			}
+			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
+			{
+				partPolygon << fpTwoThird(mainShape[0], mainShape[1])
+							<< mainShape[1]
+							<< fpOneThird(mainShape[1], mainShape[2])
+							<< fpOneThird(halfShape[1], halfShape[2])
+							<< halfShape[1]
+							<< fpTwoThird(halfShape[0], halfShape[1]);
+			}
+		}
 		break;
 	}
 
