@@ -145,7 +145,7 @@ class AtlasTileSet : public AtlasFrame
 		TerrainSet(const QJsonObject &initObj)
 		{
 			m_uuid = QUuid(initObj["UUID"].toString());
-			m_eType = static_cast<AutoTileType>(initObj["type"].toInt());
+			m_eType = static_cast<AutoTileType>(initObj["terrainSetMode"].toInt());
 			
 			QJsonArray terrainArray = initObj["terrains"].toArray();
 			for(QJsonValue terrainVal : terrainArray)
@@ -160,7 +160,7 @@ class AtlasTileSet : public AtlasFrame
 		{
 			QJsonObject terrainSetObj;
 			terrainSetObj["UUID"] = m_uuid.toString(QUuid::WithoutBraces);
-			terrainSetObj["type"] = static_cast<int>(m_eType);
+			terrainSetObj["terrainSetMode"] = static_cast<int>(m_eType);
 			QJsonArray terrainArray;
 			for(const Terrain &terrainRef : m_TerrainList)
 				terrainArray.append(terrainRef.ToJsonObject());

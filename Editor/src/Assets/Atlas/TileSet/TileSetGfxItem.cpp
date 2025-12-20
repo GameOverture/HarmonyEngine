@@ -232,8 +232,8 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 	QPolygonF mainShape = m_pShapeItem->polygon();
 	
 	QPolygonF halfShape = mainShape;
-	for(QPointF ptVert : halfShape)
-		ptVert *= 0.5f;
+	for(QPointF &ptVert : halfShape)
+		ptVert *= 0.333f;
 
 	if(ePart == AUTOTILEPART_Center)
 		return halfShape;
@@ -309,17 +309,17 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 		{
 			if(eAutoTileType == AUTOTILETYPE_MatchSides)
 			{
-				partPolygon << mainShape[0]
+				partPolygon << halfShape[1]
 							<< mainShape[1]
-							<< halfShape[1]
-							<< halfShape[0];
+							<< mainShape[2]
+							<< halfShape[2];
 			}
 			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
 			{
-				partPolygon << fpTwoThird(mainShape[0], mainShape[1])
-							<< mainShape[1]
+				partPolygon << halfShape[1]
 							<< fpOneThird(mainShape[1], mainShape[2])
-							<< halfShape[1];
+							<< fpTwoThird(mainShape[1], mainShape[2])
+							<< halfShape[2];
 			}
 		}
 		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
@@ -376,7 +376,7 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 							<< fpTwoThird(halfShape[2], halfShape[3]);
 			}
 		}
-		else if(eAutoTileType == TILESETSHAPE_HexagonPointTop)
+		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
 		{
 			if(eAutoTileType == AUTOTILETYPE_MatchSides)
 			{
@@ -428,10 +428,12 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 			}
 			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
 			{
-				partPolygon << fpOneThird(halfShape[2], halfShape[3])
-							<< fpOneThird(mainShape[2], mainShape[3])
+				partPolygon << fpTwoThird(halfShape[2], halfShape[3])
 							<< fpTwoThird(mainShape[2], mainShape[3])
-							<< fpTwoThird(halfShape[2], halfShape[3]);
+							<< mainShape[3]
+							<< fpOneThird(mainShape[3], mainShape[4])
+							<< fpOneThird(halfShape[3], halfShape[4])
+							<< halfShape[3];
 			}
 		}
 		else if(eTileSetShape == TILESETSHAPE_HexagonPointTop)
@@ -479,17 +481,17 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 		{
 			if(eAutoTileType == AUTOTILETYPE_MatchSides)
 			{
-				partPolygon << mainShape[0]
-							<< mainShape[1]
-							<< halfShape[1]
-							<< halfShape[0];
+				partPolygon << halfShape[4]
+							<< halfShape[3]
+							<< mainShape[3]
+							<< mainShape[4];
 			}
 			else if(eAutoTileType == AUTOTILETYPE_MatchCornerSides)
 			{
 				partPolygon << fpTwoThird(halfShape[3], halfShape[4])
 							<< fpOneThird(halfShape[3], halfShape[4])
 							<< fpOneThird(mainShape[3], mainShape[4])
-							<< fpTwoThird(mainShape[4], mainShape[4]);
+							<< fpTwoThird(mainShape[3], mainShape[4]);
 			}
 		}
 		break;
@@ -806,7 +808,7 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 				partPolygon << mainShape[0]
 							<< fpOneThird(mainShape[0], mainShape[1])
 							<< halfShape[0]
-							<< fpTwoThird(halfShape[3], halfShape[0]);
+							<< fpTwoThird(mainShape[3], mainShape[0]);
 			}
 		}
 		else if(eTileSetShape == TILESETSHAPE_HexagonFlatTop)
