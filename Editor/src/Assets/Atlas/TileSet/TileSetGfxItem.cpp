@@ -16,6 +16,7 @@
 #include <QGraphicsSceneMouseEvent>
 
 const int iTILE_PADDING = 0;
+const float fUNSELECTED_OPACITY = 0.4f;
 
 TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon) :
 	QGraphicsItem(nullptr),
@@ -72,6 +73,8 @@ void TileSetGfxItem::Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPa
 	m_pShapeItem->setPolygon(pTileSet->GetTilePolygon());
 	m_pShapeItem->setPos(pTileSet->GetTileOffset());
 
+	m_pAnimationRectItem->hide();
+
 	if(m_pTerrainParts[0])
 	{
 		for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
@@ -88,13 +91,22 @@ void TileSetGfxItem::Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPa
 		break;
 
 	case TILESETPAGE_Animation:
+		if(pTileData->GetAnimation().isNull())
+		{
+			SetAnimation(false, HyColor::Black);
+			setOpacity(fUNSELECTED_OPACITY);
+			break;
+		}
+		else
+			SetAnimation(true, pTileSet->GetAnimationColor(pTileData->GetAnimation()));
+
 		break;
 
 	case TILESETPAGE_Autotile:
 		if(pTileSet->GetTerrainSetType(pTileData->GetTerrainSet()) == AUTOTILETYPE_Unknown ||
 		   pTileSet->GetTileShape() == TILESETSHAPE_Unknown)
 		{
-			setOpacity(0.4f); // Darken *this (QGraphicsItem)
+			setOpacity(fUNSELECTED_OPACITY);
 			break;
 		}
 

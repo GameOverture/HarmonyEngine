@@ -209,27 +209,34 @@ void TileSetScene::OnMarqueeRelease(AuxTileSet &auxTileSetRef, Qt::MouseButton e
 		break;
 
 	case TILESETPAGE_Animation:
+		for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
+		{
+			QRectF testRect(iter.value()->boundingRect());
+			testRect.translate(iter.value()->scenePos());
+			if (sceneRect.intersects(testRect))
+				m_PaintStrokeAnimationList.append(iter.key());
+		}
 		break;
 
 	case TILESETPAGE_Autotile: {
-		QUuid selectedTerrainSetUuid = auxTileSetRef.GetSelectedTerrainSet();
-		if(selectedTerrainSetUuid.isNull() == false)
+		QUuid selectedTerrainSetUuid;
+		if(eMouseBtn == Qt::LeftButton)
+			selectedTerrainSetUuid = auxTileSetRef.GetSelectedTerrainSet();
+	
+		QList<TileData *> affectedTileList;
+		for(auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
 		{
-			QList<TileData *> affectedTileList;
-			for(auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
+			QRectF testRect(iter.value()->boundingRect());
+			testRect.translate(iter.value()->scenePos());
+			if(sceneRect.intersects(testRect))
 			{
-				QRectF testRect(iter.value()->boundingRect());
-				testRect.translate(iter.value()->scenePos());
-				if(sceneRect.intersects(testRect))
-				{
-					if(iter.key()->GetTerrainSet() != selectedTerrainSetUuid)
-						affectedTileList.append(iter.key());
-				}
+				if(iter.key()->GetTerrainSet() != selectedTerrainSetUuid)
+					affectedTileList.append(iter.key());
 			}
-			
-			TileSetUndoCmd_ApplyTerrainSet *pTerrainSetCmd = new TileSetUndoCmd_ApplyTerrainSet(auxTileSetRef, affectedTileList, selectedTerrainSetUuid);
-			m_pTileSet->GetUndoStack()->push(pTerrainSetCmd);
 		}
+
+		TileSetUndoCmd_ApplyTerrainSet *pTerrainSetCmd = new TileSetUndoCmd_ApplyTerrainSet(auxTileSetRef, affectedTileList, selectedTerrainSetUuid);
+		m_pTileSet->GetUndoStack()->push(pTerrainSetCmd);
 		break; }
 
 	case TILESETPAGE_Collision:

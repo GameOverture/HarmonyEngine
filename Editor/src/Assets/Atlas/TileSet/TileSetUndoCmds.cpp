@@ -588,12 +588,18 @@ TileSetUndoCmd_PaintAnimation::TileSetUndoCmd_PaintAnimation(AuxTileSet &auxTile
 		else
 			pTileData->SetAnimation(QUuid());
 	}
+
+	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshSetupTiles(m_AuxTileSetRef.GetCurrentPage());
 }
 
 /*virtual*/ void TileSetUndoCmd_PaintAnimation::undo() /*override*/
 {
 	for(int i = 0; i < m_PaintedMap.size(); ++i)
 		m_PaintedMap[i]->SetAnimation(m_OriginalAnimationMap[i]);
+
+	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshSetupTiles(m_AuxTileSetRef.GetCurrentPage());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

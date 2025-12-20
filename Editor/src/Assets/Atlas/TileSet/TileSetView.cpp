@@ -112,6 +112,10 @@ void TileSetView::ResetCamera(TileSetPage ePage)
 			break;
 
 		case TILESETPAGE_Animation:
+			m_eDragState = DRAGSTATE_Painting;
+			GetScene()->StartPaintStroke();
+			GetScene()->OnPaintingStroke(*m_pAuxTileSet, mapToScene(pEvent->pos()), pEvent->buttons());
+			setDragMode(QGraphicsView::NoDrag);
 			break;
 
 		case TILESETPAGE_Autotile: {

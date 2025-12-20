@@ -156,6 +156,7 @@ TileSetPage AuxTileSet::GetCurrentPage() const
 
 void AuxTileSet::SetCurrentPage(TileSetPage ePage)
 {
+	m_pTabBar->setCurrentIndex(static_cast<int>(ePage));
 	ui->setupStackedWidget->setCurrentIndex(static_cast<int>(ePage));
 	m_pTileSet->GetGfxScene()->OnTileSetPageChange(ePage);
 
