@@ -111,6 +111,9 @@ if(Qt6_DIR)
 		src/Assets/Atlas/TileSet/WgtTileSetAnimation.cpp
 		src/Assets/Atlas/TileSet/WgtTileSetAnimation.h
 		src/Assets/Atlas/TileSet/WgtTileSetAnimation.ui
+		src/Assets/Atlas/TileSet/WgtTileSetCollision.cpp
+		src/Assets/Atlas/TileSet/WgtTileSetCollision.h
+		src/Assets/Atlas/TileSet/WgtTileSetCollision.ui
 		src/Assets/Atlas/TileSet/WgtTileSetTerrain.cpp
 		src/Assets/Atlas/TileSet/WgtTileSetTerrain.h
 		src/Assets/Atlas/TileSet/WgtTileSetTerrain.ui

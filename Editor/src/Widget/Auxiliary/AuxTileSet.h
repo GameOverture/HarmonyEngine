@@ -71,7 +71,7 @@ public:
 	void CmdSet_ModifyWgtItem(QUuid uuid, QJsonObject newData);
 	void MakeSelectionChange(IWgtTileSetItem *pItem);
 
-	void CmdSet_ApplyTerrainSet(QList<TileData *> tileDataList, QList<QUuid> terrainSetUuidList);
+	void CmdSet_AnimationFrames(QList<TileData *> tileDataList, QUuid animationUuid);
 
 	void SetPainting_Animation(QUuid animUuid);
 

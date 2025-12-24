@@ -72,7 +72,7 @@ void TileSetScene::Initialize(AtlasTileSet *pTileSet)
 	for(int i = 0; i < tileDataList.size(); ++i)
 		AddTile(false, tileDataList[i], m_pTileSet->GetTilePolygon(), tileDataList[i]->GetMetaGridPos(), tileDataList[i]->GetPixmap(), false);
 
-	OnTileSetPageChange(m_pTileSet->GetNumTiles() > 0 ? TILESETPAGE_Arrange : TILESETPAGE_Import);
+	RefreshTiles(m_pTileSet->GetNumTiles() > 0 ? TILESETPAGE_Arrange : TILESETPAGE_Import);
 }
 
 QGraphicsRectItem &TileSetScene::GetGfxBorderRect()
@@ -83,22 +83,6 @@ QGraphicsRectItem &TileSetScene::GetGfxBorderRect()
 QGraphicsRectItem &TileSetScene::GetGfxImportBorderRect()
 {
 	return m_ImportBorderRect;
-}
-
-void TileSetScene::OnTileSetPageChange(TileSetPage ePage)
-{
-	if(ePage == TILESETPAGE_Import)
-	{
-		m_pModeSetupGroup->setOpacity(0.42f);
-		m_pModeImportGroup->setVisible(true);
-	}
-	else
-	{
-		m_pModeSetupGroup->setOpacity(1.0f);
-		m_pModeImportGroup->setVisible(false);
-	}
-
-	RefreshSetupTiles(ePage);
 }
 
 int TileSetScene::GetNumImportPixmaps() const
@@ -278,6 +262,9 @@ void TileSetScene::AddTile(bool bImportTile, TileData *pTileData, const QPolygon
 
 void TileSetScene::RefreshImportTiles()
 {
+	m_pModeSetupGroup->setOpacity(0.42f);
+	m_pModeImportGroup->setVisible(true);
+
 	int iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
 	int iTileSpacingWidth = m_vImportRegionSize.width() + g_iSpacingAmt;
 	int iTileSpacingHeight = m_vImportRegionSize.height() + g_iSpacingAmt;
@@ -338,8 +325,16 @@ void TileSetScene::RefreshImportTiles()
 	}
 }
 
-void TileSetScene::RefreshSetupTiles(TileSetPage ePage, QPointF vDragDelta /*= QPointF()*/)
+void TileSetScene::RefreshTiles(TileSetPage ePage, QPointF vDragDelta /*= QPointF()*/)
 {
+	if(ePage == TILESETPAGE_Import)
+		RefreshImportTiles();
+	else
+	{
+		m_pModeSetupGroup->setOpacity(1.0f);
+		m_pModeImportGroup->setVisible(false);
+	}
+
 	// Sync m_pTileSet's 'AtlasTileSet::m_TileDataList' with m_SetupTileMap
 	// Either add or remove TileData entries as needed
 	QVector<TileData *> tileDataList = m_pTileSet->GetTileDataList();
@@ -451,7 +446,7 @@ void TileSetScene::OnArrangingTilesMouseMove(QPointF ptMouseScenePos)
 	vDeltaGrid.setY(vDeltaGrid.y() / (m_pTileSet->GetAtlasRegionSize().height() + g_iSpacingAmt));
 	DisplaceTiles(vDeltaGrid);
 
-	RefreshSetupTiles(TILESETPAGE_Arrange, vDelta);
+	RefreshTiles(TILESETPAGE_Arrange, vDelta);
 }
 
 void TileSetScene::OnArrangingTilesMouseRelease(AuxTileSet &auxTileSetRef, QPointF ptMouseScenePos)
@@ -494,15 +489,6 @@ void TileSetScene::HoverAutoTilePartAt(QPointF ptScenePos)
 		m_pHoverAutoTilePartItem->setPolygon(pGfxAutoTilePart->polygon());
 		m_pHoverAutoTilePartItem->setPos(pGfxAutoTilePart->scenePos());
 		m_pHoverAutoTilePartItem->show();
-	}
-}
-
-void TileSetScene::OnTerrainSetApplied(TileData *pTileData)
-{
-	if(m_SetupTileMap.contains(pTileData))
-	{
-		m_SetupTileMap[pTileData]->AllocateAutoTileParts(m_pTileSet, m_pTileSet->GetTerrainSetType(pTileData->GetTerrainSet()), m_pTileSet->GetTileShape());
-		m_SetupTileMap[pTileData]->Refresh(m_pTileSet->GetAtlasRegionSize(), m_pTileSet, TILESETPAGE_Autotile, pTileData);
 	}
 }
 

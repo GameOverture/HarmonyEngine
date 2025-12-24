@@ -53,7 +53,6 @@ class AtlasTileSet : public AtlasFrame
 		QUuid					m_uuid;
 		QString					m_sName;
 		HyColor					m_Color;
-		QList<QUuid>			m_TileFrameList;
 		float					m_fFrameDuration; // In seconds
 		bool					m_bStartAtRandomFrame;
 
@@ -70,11 +69,6 @@ class AtlasTileSet : public AtlasFrame
 			m_uuid = QUuid(initObj["UUID"].toString());
 			m_sName = initObj["name"].toString();
 			m_Color = HyColor(initObj["color"].toVariant().toLongLong());
-
-			QJsonArray frameArray = initObj["frames"].toArray();
-			for(QJsonValue frameVal : frameArray)
-				m_TileFrameList.push_back(QUuid(frameVal.toString()));
-
 			m_fFrameDuration = static_cast<float>(initObj["frameDuration"].toDouble());
 			m_bStartAtRandomFrame = initObj["startAtRandomFrame"].toBool();
 		}
@@ -85,12 +79,6 @@ class AtlasTileSet : public AtlasFrame
 			animationObj["UUID"] = m_uuid.toString(QUuid::WithoutBraces);
 			animationObj["name"] = m_sName;
 			animationObj["color"] = static_cast<qint64>(m_Color.GetAsHexCode());
-
-			QJsonArray frameArray;
-			for(const QUuid &frameUuidRef : m_TileFrameList)
-				frameArray.append(frameUuidRef.toString(QUuid::WithoutBraces));
-			animationObj["frames"] = frameArray;
-
 			animationObj["frameDuration"] = static_cast<double>(m_fFrameDuration);
 			animationObj["startAtRandomFrame"] = m_bStartAtRandomFrame;
 			return animationObj;

@@ -63,8 +63,6 @@ public:
 	QGraphicsRectItem &GetGfxBorderRect();
 	QGraphicsRectItem &GetGfxImportBorderRect();
 
-	void OnTileSetPageChange(TileSetPage ePage);
-
 	int GetNumImportPixmaps() const;
 	QSize GetImportRegionSize() const;
 	QMap<QPoint, QPixmap> AssembleImportMap();
@@ -85,7 +83,7 @@ public:
 	// Sync m_pTileSet's 'AtlasTileSet::m_TileDataList' with m_SetupTileMap
 	// Sets graphics items to match the data of m_pTileSet and current import tiles
 	// Also repositions tiles during sorting operations
-	void RefreshSetupTiles(TileSetPage ePage, QPointF vDragDelta = QPointF());
+	void RefreshTiles(TileSetPage ePage, QPointF vDragDelta = QPointF());
 
 
 	void ClearImportTiles();
@@ -96,7 +94,6 @@ public:
 	void OnArrangingTilesMouseRelease(AuxTileSet &auxTileSetRef, QPointF ptMouseScenePos);
 
 	void HoverAutoTilePartAt(QPointF ptScenePos);
-	void OnTerrainSetApplied(TileData *pTileData);
 
 	void StartPaintStroke();
 	void OnPaintingStroke(AuxTileSet &auxTileSetRef, QPointF ptScenePos, Qt::MouseButtons uiMouseFlags); 

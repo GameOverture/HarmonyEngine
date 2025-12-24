@@ -17,104 +17,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TileSetUndoCmd_TileSize::TileSetUndoCmd_TileSize(AtlasTileSet &tileSetItemRef, AuxTileSet &auxTileSetRef, QSize newTileSize, QUndoCommand *pParent /*= nullptr*/) :
-	QUndoCommand(pParent),
-	m_TileSetRef(tileSetItemRef),
-	m_AuxTileSetRef(auxTileSetRef),
-	m_OldSize(tileSetItemRef.GetTileSize()),
-	m_NewSize(newTileSize)
-{
-	if(m_OldSize == m_NewSize)
-		HyGuiLog("TileSetUndoCmd_TileSize() - Old size is the same as new size, no need to create command.", LOGTYPE_Error);
-
-	setText("Change Tile Size");
-}
-
-/*virtual*/ TileSetUndoCmd_TileSize::~TileSetUndoCmd_TileSize()
-{
-}
-
-/*virtual*/ void TileSetUndoCmd_TileSize::redo() /*override*/
-{
-	m_AuxTileSetRef.CmdSet_TileSizeWidgets(m_NewSize);
-}
-
-/*virtual*/ void TileSetUndoCmd_TileSize::undo() /*override*/
-{
-	m_AuxTileSetRef.CmdSet_TileSizeWidgets(m_OldSize);
-}
-
-/*virtual*/ int TileSetUndoCmd_TileSize::id() const /*override*/
-{
-	return MERGABLEUNDOCMD_TileSize;
-}
-
-/*virtual*/ bool TileSetUndoCmd_TileSize::mergeWith(const QUndoCommand *pOtherCmd) /*override*/
-{
-	//TileSetUndoCmd_TileSize *pOtherTileSizeCmd = dynamic_cast<TileSetUndoCmd_TileSize *>(const_cast<QUndoCommand *>(pOtherCmd));
-	const TileSetUndoCmd_TileSize *pOtherTileSizeCmd = static_cast<const TileSetUndoCmd_TileSize *>(pOtherCmd); // This is faster than dynamic_cast, and safe as long as I always use unique MERGABLEUNDOCMD's for each ID
-	if(pOtherTileSizeCmd && (&pOtherTileSizeCmd->m_TileSetRef == &m_TileSetRef))
-	{
-		m_NewSize = pOtherTileSizeCmd->m_NewSize;
-		return true;
-	}
-
-	return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-TileSetUndoCmd_TileOffset::TileSetUndoCmd_TileOffset(AtlasTileSet &tileSetItemRef, AuxTileSet &auxTileSetRef, QPoint newTileOffset, QUndoCommand *pParent /*= nullptr*/) :
-	QUndoCommand(pParent),
-	m_TileSetRef(tileSetItemRef),
-	m_AuxTileSetRef(auxTileSetRef),
-	m_OldOffset(tileSetItemRef.GetTileOffset()),
-	m_NewOffset(newTileOffset)
-{
-	if(m_OldOffset == m_NewOffset)
-		HyGuiLog("TileSetUndoCmd_TileOffset() - Old offset is the same as new offset, no need to create command.", LOGTYPE_Error);
-	
-	setText("Change Tile Offset");
-}
-
-/*virtual*/ TileSetUndoCmd_TileOffset::~TileSetUndoCmd_TileOffset()
-{
-}
-
-/*virtual*/ void TileSetUndoCmd_TileOffset::redo() /*override*/
-{
-	m_AuxTileSetRef.CmdSet_TileOffsetWidgets(m_NewOffset);
-}
-
-/*virtual*/ void TileSetUndoCmd_TileOffset::undo() /*override*/
-{
-	m_AuxTileSetRef.CmdSet_TileOffsetWidgets(m_OldOffset);
-}
-
-/*virtual*/ int TileSetUndoCmd_TileOffset::id() const /*override*/
-{
-	return MERGABLEUNDOCMD_TileOffset;
-}
-
-/*virtual*/ bool TileSetUndoCmd_TileOffset::mergeWith(const QUndoCommand *pOtherCmd) /*override*/
-{
-	const TileSetUndoCmd_TileOffset *pOtherTileOffsetCmd = static_cast<const TileSetUndoCmd_TileOffset *>(pOtherCmd); // This is faster than dynamic_cast, and safe as long as I always use unique MERGABLEUNDOCMD's for each ID
-	if(pOtherTileOffsetCmd && (&pOtherTileOffsetCmd->m_TileSetRef == &m_TileSetRef))
-	{
-		m_NewOffset = pOtherTileOffsetCmd->m_NewOffset;
-		return true;
-	}
-	return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-TileSetUndoCmd_TileShape::TileSetUndoCmd_TileShape(AuxTileSet &auxTileSetRef, TileSetShape eCurShape, TileSetShape eNewShape, QUndoCommand *pParent /*= nullptr*/) :
+TileSetUndoCmd_TileShape::TileSetUndoCmd_TileShape(AuxTileSet &auxTileSetRef, TileSetShape eNewShape, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_AuxTileSetRef(auxTileSetRef),
-	m_eOldShape(eCurShape),
 	m_eNewShape(eNewShape)
 {
+	m_eOldShape = m_AuxTileSetRef.GetTileSet()->GetTileShape();
 	if(m_eOldShape == m_eNewShape)
 		HyGuiLog("TileSetUndoCmd_TileShape() - Old shape is the same as new shape, no need to create command.", LOGTYPE_Error);
 	
@@ -128,11 +36,119 @@ TileSetUndoCmd_TileShape::TileSetUndoCmd_TileShape(AuxTileSet &auxTileSetRef, Ti
 /*virtual*/ void TileSetUndoCmd_TileShape::redo() /*override*/
 {
 	m_AuxTileSetRef.CmdSet_TileShapeWidget(m_eNewShape);
+
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles();
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef.GetCurrentPage());
 }
 
 /*virtual*/ void TileSetUndoCmd_TileShape::undo() /*override*/
 {
 	m_AuxTileSetRef.CmdSet_TileShapeWidget(m_eOldShape);
+
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles();
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef.GetCurrentPage());
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TileSetUndoCmd_TileSize::TileSetUndoCmd_TileSize(AuxTileSet &auxTileSetRef, QSize newTileSize, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_AuxTileSetRef(auxTileSetRef),
+	m_NewSize(newTileSize)
+{
+	m_OldSize = m_AuxTileSetRef.GetTileSet()->GetTileSize();
+	if(m_OldSize == m_NewSize)
+		HyGuiLog("TileSetUndoCmd_TileSize() - Old size is the same as new size, no need to create command.", LOGTYPE_Error);
+
+	setText("Change Tile Size");
+}
+
+/*virtual*/ TileSetUndoCmd_TileSize::~TileSetUndoCmd_TileSize()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_TileSize::redo() /*override*/
+{
+	m_AuxTileSetRef.CmdSet_TileSizeWidgets(m_NewSize);
+
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles();
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef.GetCurrentPage());
+}
+
+/*virtual*/ void TileSetUndoCmd_TileSize::undo() /*override*/
+{
+	m_AuxTileSetRef.CmdSet_TileSizeWidgets(m_OldSize);
+
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles();
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef.GetCurrentPage());
+}
+
+/*virtual*/ int TileSetUndoCmd_TileSize::id() const /*override*/
+{
+	return MERGABLEUNDOCMD_TileSize;
+}
+
+/*virtual*/ bool TileSetUndoCmd_TileSize::mergeWith(const QUndoCommand *pOtherCmd) /*override*/
+{
+	//TileSetUndoCmd_TileSize *pOtherTileSizeCmd = dynamic_cast<TileSetUndoCmd_TileSize *>(const_cast<QUndoCommand *>(pOtherCmd));
+	const TileSetUndoCmd_TileSize *pOtherTileSizeCmd = static_cast<const TileSetUndoCmd_TileSize *>(pOtherCmd); // This is faster than dynamic_cast, and safe as long as I always use unique MERGABLEUNDOCMD's for each ID
+	if(pOtherTileSizeCmd)// && (&pOtherTileSizeCmd->m_AuxTileSetRef->GetTileSet( m_TileSetRef == &m_TileSetRef))
+	{
+		m_NewSize = pOtherTileSizeCmd->m_NewSize;
+		return true;
+	}
+
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+TileSetUndoCmd_TileOffset::TileSetUndoCmd_TileOffset(AuxTileSet &auxTileSetRef, QPoint newTileOffset, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_AuxTileSetRef(auxTileSetRef),
+	m_NewOffset(newTileOffset)
+{
+	m_OldOffset = m_AuxTileSetRef.GetTileSet()->GetTileOffset();
+	if(m_OldOffset == m_NewOffset)
+		HyGuiLog("TileSetUndoCmd_TileOffset() - Old offset is the same as new offset, no need to create command.", LOGTYPE_Error);
+	
+	setText("Change Tile Offset");
+}
+
+/*virtual*/ TileSetUndoCmd_TileOffset::~TileSetUndoCmd_TileOffset()
+{
+}
+
+/*virtual*/ void TileSetUndoCmd_TileOffset::redo() /*override*/
+{
+	m_AuxTileSetRef.CmdSet_TileOffsetWidgets(m_NewOffset);
+
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles();
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef.GetCurrentPage());
+}
+
+/*virtual*/ void TileSetUndoCmd_TileOffset::undo() /*override*/
+{
+	m_AuxTileSetRef.CmdSet_TileOffsetWidgets(m_OldOffset);
+
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles();
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef.GetCurrentPage());
+}
+
+/*virtual*/ int TileSetUndoCmd_TileOffset::id() const /*override*/
+{
+	return MERGABLEUNDOCMD_TileOffset;
+}
+
+/*virtual*/ bool TileSetUndoCmd_TileOffset::mergeWith(const QUndoCommand *pOtherCmd) /*override*/
+{
+	const TileSetUndoCmd_TileOffset *pOtherTileOffsetCmd = static_cast<const TileSetUndoCmd_TileOffset *>(pOtherCmd); // This is faster than dynamic_cast, and safe as long as I always use unique MERGABLEUNDOCMD's for each ID
+	if(pOtherTileOffsetCmd)// && (&pOtherTileOffsetCmd->m_TileSetRef == &m_TileSetRef))
+	{
+		m_NewOffset = pOtherTileOffsetCmd->m_NewOffset;
+		return true;
+	}
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -158,8 +174,7 @@ TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AuxTileSet &auxTileSetRef
 	else
 		m_AuxTileSetRef.GetTileSet()->Cmd_ReaddTiles(m_AppendedTilesList);
 
-	if(m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Arrange)
-		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
+	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
 }
 
 /*virtual*/ void TileSetUndoCmd_AppendTiles::undo() /*override*/
@@ -173,8 +188,7 @@ TileSetUndoCmd_AppendTiles::TileSetUndoCmd_AppendTiles(AuxTileSet &auxTileSetRef
 
 	m_AppendedTilesList = m_AuxTileSetRef.GetTileSet()->Cmd_RemoveTiles(removeTileList);
 
-	if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Arrange)
-		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
+	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,15 +213,15 @@ TileSetUndoCmd_MoveTiles::TileSetUndoCmd_MoveTiles(AuxTileSet &auxTileSetRef, QL
 /*virtual*/ void TileSetUndoCmd_MoveTiles::redo() /*override*/
 {
 	m_AuxTileSetRef.GetTileSet()->Cmd_MoveTiles(m_AffectedTileList, m_NewGridPosList);
-	if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Arrange)
-		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
+	
+	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
 }
 
 /*virtual*/ void TileSetUndoCmd_MoveTiles::undo() /*override*/
 {
 	m_AuxTileSetRef.GetTileSet()->Cmd_MoveTiles(m_AffectedTileList, m_OldGridPosList);
-	if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Arrange)
-		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
+	
+	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -226,8 +240,8 @@ TileSetUndoCmd_RemoveTiles::TileSetUndoCmd_RemoveTiles(AuxTileSet &auxTileSetRef
 /*virtual*/ void TileSetUndoCmd_RemoveTiles::redo() /*override*/
 {
 	m_AuxTileSetRef.GetTileSet()->Cmd_RemoveTiles(m_TilesMap.keys());
-	if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Arrange)
-		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
+
+	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
 }
 
 /*virtual*/ void TileSetUndoCmd_RemoveTiles::undo() /*override*/
@@ -238,8 +252,8 @@ TileSetUndoCmd_RemoveTiles::TileSetUndoCmd_RemoveTiles(AuxTileSet &auxTileSetRef
 		tileDataList.append(QPair<QPoint, TileData *>(pTileData->GetMetaGridPos(), pTileData));
 	
 	m_AuxTileSetRef.GetTileSet()->Cmd_ReaddTiles(tileDataList);
-	if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Arrange)
-		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
+	
+	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Arrange);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -280,13 +294,11 @@ TileSetUndoCmd_AddWgtItem::TileSetUndoCmd_AddWgtItem(AuxTileSet &auxTileSetRef, 
 	switch (m_eType)
 	{
 	case TILESETWGT_Animation:
-		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Animation)
-			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
 		break;
 	case TILESETWGT_TerrainSet:
 	case TILESETWGT_Terrain:
-		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Autotile)
-			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
 		break;
 
 	default:
@@ -303,13 +315,11 @@ TileSetUndoCmd_AddWgtItem::TileSetUndoCmd_AddWgtItem(AuxTileSet &auxTileSetRef, 
 	switch (m_eType)
 	{
 	case TILESETWGT_Animation:
-		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Animation)
-			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
 		break;
 	case TILESETWGT_TerrainSet:
 	case TILESETWGT_Terrain:
-		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Autotile)
-			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
 		break;
 
 	default:
@@ -362,13 +372,11 @@ TileSetUndoCmd_RemoveWgtItem::TileSetUndoCmd_RemoveWgtItem(AuxTileSet &auxTileSe
 	switch (m_eRemovedType)
 	{
 	case TILESETWGT_Animation:
-		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Animation)
-			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
 		break;
 	case TILESETWGT_TerrainSet:
 	case TILESETWGT_Terrain:
-		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Autotile)
-			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
 		break;
 
 	default:
@@ -385,13 +393,11 @@ TileSetUndoCmd_RemoveWgtItem::TileSetUndoCmd_RemoveWgtItem(AuxTileSet &auxTileSe
 	switch (m_eRemovedType)
 	{
 	case TILESETWGT_Animation:
-		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Animation)
-			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
 		break;
 	case TILESETWGT_TerrainSet:
 	case TILESETWGT_Terrain:
-		if (m_AuxTileSetRef.GetCurrentPage() != TILESETPAGE_Autotile)
-			m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
 		break;
 
 	default:
@@ -544,13 +550,18 @@ TileSetUndoCmd_ApplyTerrainSet::TileSetUndoCmd_ApplyTerrainSet(AuxTileSet &auxTi
 {
 	QList<QUuid> newTerrainSetList;
 	newTerrainSetList.fill(m_NewTerrainSetUuid, m_AffectedTileList.size());
-	m_AuxTileSetRef.CmdSet_ApplyTerrainSet(m_AffectedTileList, newTerrainSetList);
+
+	for(int i = 0; i < m_AffectedTileList.size(); ++i)
+		m_AffectedTileList[i]->SetTerrainSet(newTerrainSetList[i]);
+
 	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
 }
 
 /*virtual*/ void TileSetUndoCmd_ApplyTerrainSet::undo() /*override*/
 {
-	m_AuxTileSetRef.CmdSet_ApplyTerrainSet(m_AffectedTileList, m_OldTerrainSetUuidList);
+	for(int i = 0; i < m_AffectedTileList.size(); ++i)
+		m_AffectedTileList[i]->SetTerrainSet(m_OldTerrainSetUuidList[i]);
+
 	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
 }
 
@@ -584,13 +595,12 @@ TileSetUndoCmd_PaintAnimation::TileSetUndoCmd_PaintAnimation(AuxTileSet &auxTile
 	for(TileData *pTileData : m_PaintedMap)
 	{
 		if(m_bLeftClick)
-			pTileData->SetAnimation(m_AnimationUuid);
+			m_AuxTileSetRef.CmdSet_AnimationFrames(m_PaintedMap, m_AnimationUuid);
 		else
-			pTileData->SetAnimation(QUuid());
+			m_AuxTileSetRef.CmdSet_AnimationFrames(m_PaintedMap, QUuid());
 	}
 
 	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshSetupTiles(m_AuxTileSetRef.GetCurrentPage());
 }
 
 /*virtual*/ void TileSetUndoCmd_PaintAnimation::undo() /*override*/
@@ -599,7 +609,6 @@ TileSetUndoCmd_PaintAnimation::TileSetUndoCmd_PaintAnimation(AuxTileSet &auxTile
 		m_PaintedMap[i]->SetAnimation(m_OriginalAnimationMap[i]);
 
 	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshSetupTiles(m_AuxTileSetRef.GetCurrentPage());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -641,7 +650,6 @@ TileSetUndoCmd_PaintAutoTileParts::TileSetUndoCmd_PaintAutoTileParts(AuxTileSet 
 	}
 
 	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshSetupTiles(m_AuxTileSetRef.GetCurrentPage());
 }
 
 /*virtual*/ void TileSetUndoCmd_PaintAutoTileParts::undo() /*override*/
@@ -650,5 +658,4 @@ TileSetUndoCmd_PaintAutoTileParts::TileSetUndoCmd_PaintAutoTileParts(AuxTileSet 
 		cachedPair.first->SetTerrainMap(cachedPair.second);
 
 	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshSetupTiles(m_AuxTileSetRef.GetCurrentPage());
 }

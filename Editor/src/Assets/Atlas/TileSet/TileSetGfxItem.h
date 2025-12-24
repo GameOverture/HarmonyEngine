@@ -23,6 +23,9 @@ class TileSetGfxItem : public QGraphicsItem
 	bool								m_bSelected;
 	bool								m_bDragged;
 
+	TileSetShape						m_eTileSetShape;
+	AutoTileType						m_eAutoTileType;
+
 	QPen								m_SelectedPen;
 	QPen								m_UnselectedPen;
 	QPen								m_DraggedPen;

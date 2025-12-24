@@ -26,6 +26,8 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	m_ShapePen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Orange)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)),
 	m_bSelected(true),
 	m_bDragged(false),
+	m_eTileSetShape(TILESETSHAPE_Unknown),
+	m_eAutoTileType(AUTOTILETYPE_Unknown),
 	m_pRectItem(nullptr),
 	m_pPixmapItem(nullptr),
 	m_pShapeItem(nullptr),
@@ -70,14 +72,29 @@ void TileSetGfxItem::Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPa
 	QRectF rect(regionSize.width() * -0.5f, regionSize.height() * -0.5f, regionSize.width() + 1, regionSize.height() + 1);
 
 	m_pRectItem->setRect(rect);
-	m_pShapeItem->setPolygon(pTileSet->GetTilePolygon());
+
+	bool bAutoTilePartsDirty = false;
+	if(pTileSet->GetTilePolygon() != m_pShapeItem->polygon())
+	{
+		m_pShapeItem->setPolygon(pTileSet->GetTilePolygon());
+		bAutoTilePartsDirty = true;
+	}
 	m_pShapeItem->setPos(pTileSet->GetTileOffset());
 
 	m_pAnimationRectItem->hide();
 
-	if(m_pTerrainParts[0])
+	AutoTileType eAutoTileType = pTileSet->GetTerrainSetType(pTileData->GetTerrainSet());
+	if(m_eAutoTileType != eAutoTileType)
 	{
-		for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
+		m_eAutoTileType = eAutoTileType;
+		bAutoTilePartsDirty = true;
+	}
+
+	if(m_eAutoTileType != AUTOTILETYPE_Unknown && bAutoTilePartsDirty)
+		AllocateAutoTileParts(pTileSet, m_eAutoTileType, pTileSet->GetTileShape());
+	for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
+	{
+		if(m_pTerrainParts[i])
 			m_pTerrainParts[i]->hide();
 	}
 
@@ -113,7 +130,7 @@ void TileSetGfxItem::Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPa
 		for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
 		{
 			QUuid terrainPartUuid = pTileData->GetTerrain(static_cast<TileSetAutoTilePart>(i));
-			if(terrainPartUuid.isNull())
+			if(terrainPartUuid.isNull() || m_pTerrainParts[i] == nullptr)
 				continue;
 
 			m_pTerrainParts[i]->setBrush(QBrush(HyGlobal::ConvertHyColor(pTileSet->GetTerrainColor(terrainPartUuid))));
@@ -217,11 +234,15 @@ void TileSetGfxItem::AllocateAutoTileParts(AtlasTileSet *pTileSet, AutoTileType 
 	for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
 	{
 		delete m_pTerrainParts[i];
+		QPolygonF partPolygon = AssembleAutoTilePolygon(eAutoTileType, eTileSetShape, static_cast<TileSetAutoTilePart>(i));
+		if(partPolygon.isEmpty())
+		{
+			m_pTerrainParts[i] = nullptr;
+			continue;
+		}
 		m_pTerrainParts[i] = new QGraphicsPolygonItem(this);
 		m_pTerrainParts[i]->setPen(QPen(Qt::NoPen));
 		m_pTerrainParts[i]->setPos(pTileSet->GetTileOffset());
-
-		QPolygonF partPolygon = AssembleAutoTilePolygon(eAutoTileType, eTileSetShape, static_cast<TileSetAutoTilePart>(i));
 		m_pTerrainParts[i]->setPolygon(partPolygon);
 		m_pTerrainParts[i]->hide();
 	}
@@ -231,7 +252,7 @@ QGraphicsPolygonItem *TileSetGfxItem::GetAutoTilePartAt(QPointF ptLocalPos, Tile
 {
 	for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
 	{
-		if(m_pTerrainParts[i]->contains(ptLocalPos))
+		if(m_pTerrainParts[i] && m_pTerrainParts[i]->contains(ptLocalPos))
 		{
 			ePartOut = static_cast<TileSetAutoTilePart>(i);
 			return m_pTerrainParts[i];

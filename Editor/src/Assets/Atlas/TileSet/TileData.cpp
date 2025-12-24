@@ -32,14 +32,26 @@ TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 	m_bIsFlippedHorz(tileDataObj["IsFlippedHorz"].toBool()),
 	m_bIsFlippedVert(tileDataObj["IsFlippedVert"].toBool()),
 	m_bIsRotated(tileDataObj["IsRotated"].toBool()),
-	m_iProbability(tileDataObj["Probability"].toInt())
+	m_iProbability(tileDataObj["Probability"].toInt()),
+	m_AnimationUuid(QUuid(tileDataObj["AnimationUUID"].toString())),
+	m_TerrainSetUuid(QUuid(tileDataObj["TerrainSetUUID"].toString()))
 {
-	//QJsonArray autoTileArray = tileDataObj["AutoTileMap"].toArray();
-	//for(int i = 0; i < autoTileArray.size(); ++i)
-	//{
-	//	QJsonObject autoTileObj = autoTileArray[i].toObject();
-	//	m_AutoTileMap[autoTileObj["AutoTileHandle"].toInt()] = autoTileObj["PeeringBits"].toInt();
-	//}
+	QJsonArray terrainArray = tileDataObj["TerrainMap"].toArray();
+	for(int i = 0; i < terrainArray.size(); ++i)
+	{
+		QJsonObject terrainObj = terrainArray[i].toObject();
+		QUuid terrainUuid = QUuid(terrainObj["TerrainUUID"].toString());
+		int iPartFlags = terrainObj["PeeringBits"].toInt();
+		QBitArray peeringBits;
+		for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
+		{
+			if(0 != (iPartFlags & i))
+				peeringBits.setBit(i);
+		}
+		m_TerrainMap[terrainUuid] = peeringBits;
+	}
+
+	m_VertexMap;
 
 	//QJsonArray VertexArray = tileDataObj["VertexMap"].toArray();
 	//for(int i = 0; i < VertexArray.size(); ++i)
@@ -70,6 +82,7 @@ TileData::TileData(const TileData &other) :
 	m_bIsFlippedVert(other.m_bIsFlippedVert),
 	m_bIsRotated(other.m_bIsRotated),
 	m_iProbability(other.m_iProbability),
+	m_AnimationUuid(other.m_AnimationUuid),
 	m_TerrainSetUuid(other.m_TerrainSetUuid),
 	m_TerrainMap(other.m_TerrainMap),
 	m_VertexMap(other.m_VertexMap)
@@ -87,6 +100,7 @@ TileData &TileData::operator=(const TileData &other)
 	m_bIsFlippedVert = other.m_bIsFlippedVert;
 	m_bIsRotated = other.m_bIsRotated;
 	m_iProbability = other.m_iProbability;
+	m_AnimationUuid = other.m_AnimationUuid;
 	m_TerrainSetUuid = other.m_TerrainSetUuid;
 	m_TerrainMap = other.m_TerrainMap;
 	m_VertexMap = other.m_VertexMap;
@@ -127,16 +141,22 @@ QJsonObject TileData::GetTileData() const
 	tileDataObjOut["IsRotated"] = m_bIsRotated;
 	tileDataObjOut["Probability"] = m_iProbability;
 	
-	//tileDataObjOut["AnimFrame"] = m_iAnimFrame;
-	//QJsonArray autoTileArray;
-	//for(auto it = m_AutoTileMap.begin(); it != m_AutoTileMap.end(); ++it)
-	//{
-	//	QJsonObject autoTileObj;
-	//	autoTileObj["AutoTileHandle"] = it.key().toString(QUuid::WithoutBraces);
-	//	autoTileObj["PeeringBits"] = it.value();
-	//	autoTileArray.push_back(autoTileObj);
-	//}
-	//tileDataObjOut["AutoTileMap"] = autoTileArray;
+	tileDataObjOut["AnimationUUID"] = m_AnimationUuid.toString(QUuid::WithoutBraces);
+	tileDataObjOut["TerrainSetUUID"] = m_TerrainSetUuid.toString(QUuid::WithoutBraces);
+	QJsonArray terrainMapArray;
+	for(QMap<QUuid, QBitArray>::const_iterator iter = m_TerrainMap.begin(); iter != m_TerrainMap.end(); ++iter)
+	{
+		QJsonObject terrainObj;
+		terrainObj.insert("TerrainUUID", iter.key().toString(QUuid::WithoutBraces));
+		bool bConvertResult = false;
+		int iPeeringBits = iter.value().toUInt32(QSysInfo::Endian::LittleEndian, &bConvertResult);
+		if(bConvertResult)
+			terrainObj.insert("PeeringBits", iPeeringBits);
+		else
+			HyGuiLog("Failed to convert terrain peering bits", LOGTYPE_Error);
+	}
+	tileDataObjOut["TerrainMap"] = terrainMapArray;
+
 	//QJsonArray VertexArray;
 	//for(auto it = m_VertexMap.begin(); it != m_VertexMap.end(); ++it)
 	//{

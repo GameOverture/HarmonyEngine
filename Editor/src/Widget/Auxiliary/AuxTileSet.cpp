@@ -158,43 +158,8 @@ void AuxTileSet::SetCurrentPage(TileSetPage ePage)
 {
 	m_pTabBar->setCurrentIndex(static_cast<int>(ePage));
 	ui->setupStackedWidget->setCurrentIndex(static_cast<int>(ePage));
-	m_pTileSet->GetGfxScene()->OnTileSetPageChange(ePage);
 
-	switch (ePage)
-	{
-	case TILESETPAGE_Animation:
-		for(WgtTileSetAnimation *pAnimWgt : m_AnimationList)
-		{
-			if(pAnimWgt->IsSelected())
-			{
-				MakeSelectionChange(pAnimWgt);
-				break;
-			}
-		}
-		break;
-
-	case TILESETPAGE_Autotile:
-		for (WgtTileSetTerrainSet *pTerrainSetWgt : m_TerrainSetList)
-		{
-			if (pTerrainSetWgt->IsSelected())
-			{
-				bool bTerrainSelected = false;
-				for (WgtTileSetTerrain *pTerrain : pTerrainSetWgt->GetTerrains())
-				{
-					if (pTerrain->IsSelected())
-					{
-						MakeSelectionChange(pTerrain);
-						bTerrainSelected = true;
-						break;
-					}
-				}
-				if(bTerrainSelected == false)
-					MakeSelectionChange(pTerrainSetWgt);
-				break;
-			}
-		}
-		break;
-	}
+	m_pTileSet->GetGfxScene()->RefreshTiles(ePage);
 }
 
 QUuid AuxTileSet::GetSelectedAnimation() const
@@ -227,9 +192,6 @@ void AuxTileSet::CmdSet_TileShapeWidget(TileSetShape eTileShape)
 		ui->cmbTileShape->setCurrentIndex(eTileShape);
 
 	m_pTileSet->SetTileShape(eTileShape);
-	m_pTileSet->GetGfxScene()->RefreshImportTiles();
-	m_pTileSet->GetGfxScene()->RefreshSetupTiles(GetCurrentPage());
-
 	ui->cmbTileShape->blockSignals(false);
 }
 
@@ -239,9 +201,6 @@ void AuxTileSet::CmdSet_TileSizeWidgets(QSize tileSize)
 	ui->vsbTileSize->SetValue(QPoint(tileSize.width(), tileSize.height()));
 
 	m_pTileSet->SetTileSize(tileSize);
-	m_pTileSet->GetGfxScene()->RefreshImportTiles();
-	m_pTileSet->GetGfxScene()->RefreshSetupTiles(GetCurrentPage());
-
 	ui->vsbTileSize->blockSignals(false);
 }
 
@@ -251,9 +210,6 @@ void AuxTileSet::CmdSet_TileOffsetWidgets(QPoint tileOffset)
 	ui->vsbTileOffset->SetValue(tileOffset);
 
 	m_pTileSet->SetTileOffset(tileOffset);
-	m_pTileSet->GetGfxScene()->RefreshImportTiles();
-	m_pTileSet->GetGfxScene()->RefreshSetupTiles(GetCurrentPage());
-
 	ui->vsbTileOffset->blockSignals(false);
 }
 
@@ -465,10 +421,10 @@ void AuxTileSet::CmdSet_OrderWgtItem(QUuid uuid, int newIndex)
 
 void AuxTileSet::CmdSet_ModifyWgtItem(QUuid uuid, QJsonObject newData)
 {
-	GetTileSet()->Cmd_SetJsonItem(uuid, newData);
-	
 	IWgtTileSetItem *pItem = FindWgtItem(uuid);
 	pItem->Init(newData);
+
+	GetTileSet()->Cmd_SetJsonItem(uuid, newData);
 }
 
 void AuxTileSet::MakeSelectionChange(IWgtTileSetItem *pItem)
@@ -502,15 +458,10 @@ void AuxTileSet::MakeSelectionChange(IWgtTileSetItem *pItem)
 	}
 }
 
-void AuxTileSet::CmdSet_ApplyTerrainSet(QList<TileData *> tileDataList, QList<QUuid> terrainSetUuidList)
+void AuxTileSet::CmdSet_AnimationFrames(QList<TileData *> tileDataList, QUuid animationUuid)
 {
 	for(int i = 0; i < tileDataList.size(); ++i)
-	{
-		tileDataList[i]->SetTerrainSet(terrainSetUuidList[i]);
-		m_pTileSet->GetGfxScene()->OnTerrainSetApplied(tileDataList[i]);
-	}
-
-	m_pTileSet->GetGfxScene()->RefreshSetupTiles(GetCurrentPage());
+		tileDataList[i]->SetAnimation(animationUuid);
 }
 
 void AuxTileSet::SetPainting_Animation(QUuid animUuid)
@@ -568,7 +519,7 @@ void AuxTileSet::SetImportWidgets()
 	ui->grpSlicingOptions->setVisible(m_bIsImportingTileSheet);
 
 	m_pTileSet->GetGfxScene()->ClearImportTiles();
-	m_pTileSet->GetGfxScene()->OnTileSetPageChange(GetCurrentPage());
+	m_pTileSet->GetGfxScene()->RefreshTiles(GetCurrentPage());
 	ui->graphicsView->ResetCamera(TILESETPAGE_Arrange);
 
 	ErrorCheckImport();
@@ -796,7 +747,7 @@ void AuxTileSet::on_cmbTileShape_currentIndexChanged(int iIndex)
 	if(m_pTileSet == nullptr || m_pTileSet->GetTileShape() == static_cast<TileSetShape>(iIndex))
 		return;
 
-	TileSetUndoCmd_TileShape *pCmd = new TileSetUndoCmd_TileShape(*this, m_pTileSet->GetTileShape(), static_cast<TileSetShape>(iIndex));
+	TileSetUndoCmd_TileShape *pCmd = new TileSetUndoCmd_TileShape(*this, static_cast<TileSetShape>(iIndex));
 	m_pTileSet->GetUndoStack()->push(pCmd);
 
 	ErrorCheckImport();
@@ -808,7 +759,7 @@ void AuxTileSet::OnTileSizeChanged(QVariant newSize)
 	if(m_pTileSet->GetTileSize() == vSize)
 		return;
 
-	TileSetUndoCmd_TileSize *pCmd = new TileSetUndoCmd_TileSize(*m_pTileSet, *this, vSize);
+	TileSetUndoCmd_TileSize *pCmd = new TileSetUndoCmd_TileSize(*this, vSize);
 	m_pTileSet->GetUndoStack()->push(pCmd); // This will attempt to merge the command
 	
 	ErrorCheckImport();
@@ -820,7 +771,7 @@ void AuxTileSet::OnTileOffsetChanged(QVariant newOffset)
 	if(m_pTileSet->GetTileOffset() == vOffset)
 		return;
 
-	TileSetUndoCmd_TileOffset *pCmd = new TileSetUndoCmd_TileOffset(*m_pTileSet, *this, vOffset);
+	TileSetUndoCmd_TileOffset *pCmd = new TileSetUndoCmd_TileOffset(*this, vOffset);
 	m_pTileSet->GetUndoStack()->push(pCmd); // This will attempt to merge the command
 
 	ErrorCheckImport();
@@ -1000,5 +951,5 @@ void AuxTileSet::OnTabBarChanged(int iIndex)
 		break;
 	}
 
-	m_pTileSet->GetGfxScene()->OnTileSetPageChange(static_cast<TileSetPage>(iIndex));
+	m_pTileSet->GetGfxScene()->RefreshTiles(static_cast<TileSetPage>(iIndex));
 }
