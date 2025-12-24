@@ -57,14 +57,14 @@ ProjectItemData::ProjectItemData(Project &projRef,
 	m_pUndoStack = new QUndoStack(this);
 	m_pActionUndo = m_pUndoStack->createUndoAction(nullptr, "&Undo");
 	m_pActionUndo->setIcon(QIcon(":/icons16x16/edit-undo.png"));
-	m_pActionUndo->setShortcuts(QKeySequence::Undo);
-	m_pActionUndo->setShortcutContext(Qt::ApplicationShortcut);
+	//m_pActionUndo->setShortcuts(QKeySequence::Undo);
+	//m_pActionUndo->setShortcutContext(Qt::ApplicationShortcut);
 	m_pActionUndo->setObjectName("Undo");
 
 	m_pActionRedo = m_pUndoStack->createRedoAction(nullptr, "&Redo");
 	m_pActionRedo->setIcon(QIcon(":/icons16x16/edit-redo.png"));
-	m_pActionRedo->setShortcuts(QKeySequence::Redo);
-	m_pActionRedo->setShortcutContext(Qt::ApplicationShortcut);
+	//m_pActionRedo->setShortcuts(QKeySequence::Redo);
+	//m_pActionRedo->setShortcutContext(Qt::ApplicationShortcut);
 	m_pActionRedo->setObjectName("Redo");
 
 	connect(m_pUndoStack, SIGNAL(cleanChanged(bool)), this, SLOT(on_undoStack_cleanChanged(bool)));
@@ -136,6 +136,16 @@ IDraw *ProjectItemData::GetDraw()
 QUndoStack *ProjectItemData::GetUndoStack()
 {
 	return m_pUndoStack;
+}
+
+QAction *ProjectItemData::GetUndoAction()
+{
+	return m_pActionUndo;
+}
+
+QAction *ProjectItemData::GetRedoAction()
+{
+	return m_pActionRedo;
 }
 
 void ProjectItemData::GiveMenuActions(QMenu *pMenu)

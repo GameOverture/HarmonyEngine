@@ -12,6 +12,7 @@
 #include "AtlasModel.h"
 #include "TileData.h"
 #include "AtlasPacker.h"
+#include "Project.h"
 
 #include <QPainter>
 
@@ -43,23 +44,23 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 	m_bSubAtlasDirty(bIsPendingSave),
 	m_eTileShape(TILESETSHAPE_Unknown)
 {
-	m_ActionSave.setIcon(QIcon(":/icons16x16/file-save.png"));
-	m_ActionSave.setShortcuts(QKeySequence::Save);
-	m_ActionSave.setShortcutContext(Qt::WidgetShortcut);
-	m_ActionSave.setToolTip("Save Tile Set and pack into Atlas manager");
-	m_ActionSave.setObjectName("Save");
-	QObject::connect(&m_ActionSave, &QAction::triggered, this, &AtlasTileSet::on_actionSave_triggered);
+	//m_ActionSave.setIcon(QIcon(":/icons16x16/file-save.png"));
+	////m_ActionSave.setShortcuts(QKeySequence::Save);
+	////m_ActionSave.setShortcutContext(Qt::WidgetShortcut);
+	//m_ActionSave.setToolTip("Save Tile Set and pack into Atlas manager");
+	//m_ActionSave.setObjectName("Save");
+	//QObject::connect(&m_ActionSave, &QAction::triggered, this, &AtlasTileSet::on_actionSave_triggered);
 
 	m_pUndoStack = new QUndoStack(this);
 	m_pActionUndo = m_pUndoStack->createUndoAction(nullptr, "&Undo");
 	m_pActionUndo->setIcon(QIcon(":/icons16x16/edit-undo.png"));
-	m_pActionUndo->setShortcuts(QKeySequence::Undo);
-	m_pActionUndo->setShortcutContext(Qt::WidgetShortcut);
+	//m_pActionUndo->setShortcuts(QKeySequence::Undo);
+	//m_pActionUndo->setShortcutContext(Qt::WidgetShortcut);
 	m_pActionUndo->setObjectName("Undo");
 	m_pActionRedo = m_pUndoStack->createRedoAction(nullptr, "&Redo");
 	m_pActionRedo->setIcon(QIcon(":/icons16x16/edit-redo.png"));
-	m_pActionRedo->setShortcuts(QKeySequence::Redo);
-	m_pActionRedo->setShortcutContext(Qt::WidgetShortcut);
+	//m_pActionRedo->setShortcuts(QKeySequence::Redo);
+	//m_pActionRedo->setShortcutContext(Qt::WidgetShortcut);
 	m_pActionRedo->setObjectName("Redo");
 
 	// Initialize AtlasTileSet members with 'm_TileSetDataPair' meta data
@@ -611,10 +612,10 @@ QUndoStack *AtlasTileSet::GetUndoStack()
 	return m_pUndoStack;
 }
 
-QAction *AtlasTileSet::GetSaveAction()
-{
-	return &m_ActionSave;
-}
+//QAction *AtlasTileSet::GetSaveAction()
+//{
+//	return &m_ActionSave;
+//}
 
 QAction *AtlasTileSet::GetUndoAction()
 {
@@ -691,6 +692,12 @@ bool AtlasTileSet::Save(bool bWriteToDisk)
 {
 	if(RegenerateSubAtlas() == false)
 		return false;
+
+	if(m_ModelRef.GetProjOwner().IsUnsavedOpenItems())
+	{
+		HyGuiLog("Saving the TileSet needs to modify assets and cannot do so while there are open unsaved items. Note that the TileSet Editor will take save precedence when visible.", LOGTYPE_Warning);
+		return false;
+	}
 
 	m_bExistencePendingSave = false;
 	m_pUndoStack->setClean();

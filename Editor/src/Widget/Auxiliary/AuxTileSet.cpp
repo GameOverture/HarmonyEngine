@@ -106,7 +106,7 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 
 	ui->vsbTextureRegion->SetValue(QPoint(m_pTileSet->GetAtlasRegionSize().width(), m_pTileSet->GetAtlasRegionSize().height()));
 
-	ui->btnSave->setDefaultAction(m_pTileSet->GetSaveAction());
+	ui->btnSave->setDefaultAction(MainWindow::GetSaveAction());
 	ui->btnUndo->setDefaultAction(m_pTileSet->GetUndoAction());
 	ui->btnRedo->setDefaultAction(m_pTileSet->GetRedoAction());
 
@@ -219,7 +219,7 @@ void AuxTileSet::RefreshInfo()
 	ui->lblName->setText(m_pTileSet->GetName());
 	ui->lblInfo->setText(m_pTileSet->GetTileSetInfo());
 
-	m_pTileSet->GetSaveAction()->setEnabled(m_pTileSet->IsSaveClean() == false);
+	m_pTileSet->GetProject().ApplySaveEnables();
 }
 
 void AuxTileSet::UpdateGfxItemSelection()
@@ -482,7 +482,12 @@ void AuxTileSet::SetPainting_Animation(QUuid animUuid)
 	pAnimItem->GetUuid();
 
 	ui->graphicsView->SetStatusLabel(pAnimItem->GetName() + " - Select Animation Frames");
+}
 
+/*virtual*/ void AuxTileSet::showEvent(QShowEvent *pEvent) /*override*/
+{
+	QWidget::showEvent(pEvent);
+	m_pTileSet->GetProject().ApplySaveEnables();
 }
 
 void AuxTileSet::SetImportWidgets()

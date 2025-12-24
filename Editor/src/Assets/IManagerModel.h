@@ -56,12 +56,12 @@ public:
 	QAbstractListModel *GetBanksModel();
 	bool IsSingleBank() const;
 
-	QDir GetMetaDir();
-	QDir GetDataDir();
+	QDir GetMetaDir() const;
+	QDir GetDataDir() const;
 
-	int GetNumBanks();
-	QString GetBankName(uint uiBankIndex);
-	QJsonObject GetBankSettings(uint uiBankIndex);
+	int GetNumBanks() const;
+	QString GetBankName(uint uiBankIndex) const;
+	QJsonObject GetBankSettings(uint uiBankIndex) const;
 	void SetBankSettings(uint uiBankIndex, QJsonObject newSettingsObj);
 	QList<IAssetItemData *> GetBankAssets(uint uiBankIndex);
 

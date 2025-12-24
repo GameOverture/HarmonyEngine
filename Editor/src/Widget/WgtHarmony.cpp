@@ -372,7 +372,8 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	if(pCurItem == nullptr)
 		return;
 
-	pCurItem->GetDraw()->OnKeyPressEvent(pEvent);
+	if(pCurItem->GetDraw())
+		pCurItem->GetDraw()->OnKeyPressEvent(pEvent);
 }
 
 /*virtual*/ void WgtHarmony::keyReleaseEvent(QKeyEvent *pEvent) /*override*/
@@ -384,7 +385,8 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	if(pCurItem == nullptr)
 		return;
 
-	pCurItem->GetDraw()->OnKeyReleaseEvent(pEvent);
+	if(pCurItem->GetDraw())
+		pCurItem->GetDraw()->OnKeyReleaseEvent(pEvent);
 }
 
 /*virtual*/ void WgtHarmony::wheelEvent(QWheelEvent *pEvent) /*override*/
@@ -396,7 +398,8 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	if(pCurItem == nullptr)
 		return;
 
-	pCurItem->GetDraw()->OnMouseWheelEvent(pEvent);
+	if(pCurItem->GetDraw())
+		pCurItem->GetDraw()->OnMouseWheelEvent(pEvent);
 }
 
 /*virtual*/ void WgtHarmony::mouseMoveEvent(QMouseEvent *pEvent) /*override*/
@@ -424,7 +427,8 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	if(pCurItem == nullptr)
 		return;
 
-	pCurItem->GetDraw()->OnMousePressEvent(pEvent);
+	if(pCurItem->GetDraw())
+		pCurItem->GetDraw()->OnMousePressEvent(pEvent);
 }
 
 /*virtual*/ void WgtHarmony::mouseReleaseEvent(QMouseEvent *pEvent) /*override*/
@@ -436,7 +440,8 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 	if(pCurItem == nullptr)
 		return;
 
-	pCurItem->GetDraw()->OnMouseReleaseEvent(pEvent);
+	if(pCurItem->GetDraw())
+		pCurItem->GetDraw()->OnMouseReleaseEvent(pEvent);
 }
 
 void WgtHarmony::OnBootCheck()

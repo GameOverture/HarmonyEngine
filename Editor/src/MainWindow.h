@@ -83,7 +83,8 @@ public:
 
 	static QString EngineSrcLocation();
 
-	static void ApplySaveEnables(bool bCurItemDirty, bool bAnyItemDirty);
+	static QAction *GetSaveAction();
+	static void OnApplySaveEnables(bool bCurItemDirty, bool bAnyItemDirty);
 	static void OpenItem(ProjectItemData *pItem);
 	static void CloseItem(ProjectItemData *pItem);
 
@@ -118,6 +119,8 @@ private Q_SLOTS:
 	void OnCtrlTab();
 	void OnCtrlShiftTab();
 	void OnCtrlF4();
+	void OnUndo();
+	void OnRedo();
 
 	void on_tabWidgetAssetManager_currentChanged(int iIndex);
 	void on_tabWidgetAux_currentChanged(int iIndex);

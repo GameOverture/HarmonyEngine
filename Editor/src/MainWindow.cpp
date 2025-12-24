@@ -26,6 +26,7 @@
 #include "Themes.h"
 #include "EntityModel.h"
 #include "WgtCodeEditor.h"
+#include "AtlasTileSet.h"
 
 #include <QFileDialog>
 #include <QShowEvent>
@@ -67,6 +68,9 @@ MainWindow::MainWindow(QWidget *pParent) :
 	new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab), this, SLOT(OnCtrlTab()));
 	new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab), this, SLOT(OnCtrlShiftTab()));
 	new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F4), this, SLOT(OnCtrlF4()));
+
+	new QShortcut(QKeySequence::Undo, this, SLOT(OnUndo()));
+	new QShortcut(QKeySequence::Redo, this, SLOT(OnRedo()));
 
 	HyGuiLog(HyEditorToolName, LOGTYPE_Title);
 	HyGuiLog("Initializing...", LOGTYPE_Normal);
@@ -353,7 +357,12 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	return sm_pInstance->m_sEnginePath;
 }
 
-/*static*/ void MainWindow::ApplySaveEnables(bool bCurItemDirty, bool bAnyItemDirty)
+/*static*/ QAction *MainWindow::GetSaveAction()
+{
+	return sm_pInstance->ui->actionSave;
+}
+
+/*static*/ void MainWindow::OnApplySaveEnables(bool bCurItemDirty, bool bAnyItemDirty)
 {
 	sm_pInstance->ui->actionSave->setEnabled(bCurItemDirty);
 	sm_pInstance->ui->actionSaveAll->setEnabled(bAnyItemDirty);
@@ -673,6 +682,40 @@ void MainWindow::OnCtrlF4()
 		CloseItem(pCurProject->GetCurrentOpenItem());
 }
 
+void MainWindow::OnUndo()
+{
+	// If tileSetEditor is shown, it takes precedence over the current item's undo
+	if(sm_pInstance->ui->tileSetEditor->isVisible())
+	{
+		AtlasTileSet *pTileSet = sm_pInstance->ui->tileSetEditor->GetTileSet();
+		if(pTileSet && pTileSet->GetUndoAction()->isEnabled())
+			pTileSet->GetUndoAction()->trigger();
+	}
+	else
+	{
+		ProjectItemData *pCurItem = Harmony::GetProject()->GetCurrentOpenItem();
+		if(pCurItem && pCurItem->GetUndoAction()->isEnabled())
+			pCurItem->GetUndoAction()->trigger();
+	}
+}
+
+void MainWindow::OnRedo()
+{
+	// If tileSetEditor is shown, it takes precedence over the current item's redo
+	if(sm_pInstance->ui->tileSetEditor->isVisible())
+	{
+		AtlasTileSet *pTileSet = sm_pInstance->ui->tileSetEditor->GetTileSet();
+		if(pTileSet && pTileSet->GetRedoAction()->isEnabled())
+			pTileSet->GetRedoAction()->trigger();
+	}
+	else
+	{
+		ProjectItemData *pCurItem = Harmony::GetProject()->GetCurrentOpenItem();
+		if(pCurItem && pCurItem->GetRedoAction()->isEnabled())
+			pCurItem->GetRedoAction()->trigger();
+	}
+}
+
 void MainWindow::on_tabWidgetAssetManager_currentChanged(int iIndex)
 {
 	if(Harmony::GetProject() == nullptr)
@@ -849,28 +892,42 @@ void MainWindow::on_actionNewEntity3d_triggered()
 
 void MainWindow::on_actionSave_triggered()
 {
-	Project *pCurProject = Harmony::GetProject();
-	if(pCurProject == nullptr)
+	if(sm_pInstance->ui->tileSetEditor->isVisible())
 	{
-		HyGuiLog("No valid project is active to save.", LOGTYPE_Error);
-		return;
+		AtlasTileSet *pTileSet = sm_pInstance->ui->tileSetEditor->GetTileSet();
+		if(pTileSet && pTileSet->IsSaveClean() == false)
+		{
+			if(pTileSet->Save(true))
+				HyGuiLog(pTileSet->GetName() % " tileset was saved", LOGTYPE_Normal);
+		}
+		else
+			HyGuiLog("No valid tileset is active to save, or its undo stack is not dirty.", LOGTYPE_Error);
 	}
-
-	ProjectTabBar *pTabBar = pCurProject->GetTabBar();
-	int iIndex = pTabBar->currentIndex();
-	if(iIndex < 0)
-	{
-		HyGuiLog("on_actionSave triggered with tab index of '-1'. Aborting save.", LOGTYPE_Error);
-		return;
-	}
-
-	QVariant v = pTabBar->tabData(iIndex);
-	ProjectItemData *pItem = v.value<ProjectItemData *>();
-	
-	if(pItem->Save(true))
-		HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
 	else
-		HyGuiLog(pItem->GetName(true) % " was NOT saved", LOGTYPE_Warning);
+	{
+		Project *pCurProject = Harmony::GetProject();
+		if(pCurProject == nullptr)
+		{
+			HyGuiLog("No valid project is active to save.", LOGTYPE_Error);
+			return;
+		}
+
+		ProjectTabBar *pTabBar = pCurProject->GetTabBar();
+		int iIndex = pTabBar->currentIndex();
+		if(iIndex < 0)
+		{
+			HyGuiLog("on_actionSave triggered with tab index of '-1'. Aborting save.", LOGTYPE_Error);
+			return;
+		}
+
+		QVariant v = pTabBar->tabData(iIndex);
+		ProjectItemData *pItem = v.value<ProjectItemData *>();
+
+		if(pItem->Save(true))
+			HyGuiLog(pItem->GetName(true) % " was saved", LOGTYPE_Normal);
+		else
+			HyGuiLog(pItem->GetName(true) % " was NOT saved", LOGTYPE_Warning);
+	}
 }
 
 void MainWindow::on_actionSaveAll_triggered()

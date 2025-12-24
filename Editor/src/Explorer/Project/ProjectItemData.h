@@ -54,6 +54,8 @@ public:
 	IWidget *GetWidget();
 	IDraw *GetDraw();
 	QUndoStack *GetUndoStack();
+	QAction *GetUndoAction();
+	QAction *GetRedoAction();
 	
 	void GiveMenuActions(QMenu *pMenu);
 

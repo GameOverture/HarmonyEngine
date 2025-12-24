@@ -75,6 +75,9 @@ public:
 
 	void SetPainting_Animation(QUuid animUuid);
 
+protected:
+	virtual void showEvent(QShowEvent *pEvent) override;
+
 private:
 	Ui::AuxTileSet *ui;
 

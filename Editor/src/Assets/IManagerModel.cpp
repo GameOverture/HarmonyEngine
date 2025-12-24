@@ -131,27 +131,27 @@ bool IManagerModel::IsSingleBank() const
 	return m_bIsSingleBank;
 }
 
-QDir IManagerModel::GetMetaDir()
+QDir IManagerModel::GetMetaDir() const
 {
 	return m_MetaDir;
 }
 
-QDir IManagerModel::GetDataDir()
+QDir IManagerModel::GetDataDir() const
 {
 	return m_DataDir;
 }
 
-int IManagerModel::GetNumBanks()
+int IManagerModel::GetNumBanks() const
 {
 	return m_BanksModel.rowCount();
 }
 
-QString IManagerModel::GetBankName(uint uiBankIndex)
+QString IManagerModel::GetBankName(uint uiBankIndex) const
 {
 	return m_BanksModel.GetBank(uiBankIndex)->GetName();
 }
 
-QJsonObject IManagerModel::GetBankSettings(uint uiBankIndex)
+QJsonObject IManagerModel::GetBankSettings(uint uiBankIndex) const
 {
 	return m_BanksModel.GetBank(uiBankIndex)->m_MetaObj;
 }
@@ -184,19 +184,28 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, Q
 	switch(m_eASSET_TYPE)
 	{
 		case ASSETMAN_Atlases:
+			if(m_ProjectRef.IsUnsavedOpenItems())
+			{
+				HyGuiLog("Cannot import image assets while there are open unsaved items.", LOGTYPE_Warning);
+				return false;
+			}
+
 			pImportThread = new AtlasImportThread(*this, sImportList, uiBankId, correspondingParentList, correspondingUuidList);
 			break;
 
 		case ASSETMAN_Audio:
+			if(m_ProjectRef.IsUnsavedOpenItems())
+			{
+				HyGuiLog("Cannot import audio assets while there are open unsaved items.", LOGTYPE_Warning);
+				return false;
+			}
+
 			pImportThread = new AudioImportThread(*this, sImportList, uiBankId, correspondingParentList, correspondingUuidList);
 			break;
 
 		case ASSETMAN_Source:
 			pImportThread = new SourceImportThread(*this, sImportList, uiBankId, correspondingParentList, correspondingUuidList);
 			break;
-			//QList<IAssetItemData *> returnList = OnImportAssets(sImportList, uiBankId, correspondingParentList, correspondingUuidList);
-			//OnImportAssetsFinished(returnList, correspondingParentList);
-			//return true;
 
 		default:
 			HyGuiLog("IManagerModel::ImportNewAssets() 'm_eASSET_TYPE' was unhandled", LOGTYPE_Error);
@@ -246,6 +255,11 @@ void IManagerModel::RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeMo
 				return;
 			}
 		}
+	}
+	else if(m_ProjectRef.IsUnsavedOpenItems())
+	{
+		HyGuiLog("Cannot remove assets while there are open unsaved items.", LOGTYPE_Warning);
+		return;
 	}
 
 	// No dependencies found, resume with deleting
@@ -330,6 +344,12 @@ void IManagerModel::ReplaceAssets(QList<IAssetItemData *> assetsList, bool bWith
 	if(GetAffectedItems(assetsList, m_RepackAffectedItemList) == false)
 		return;
 
+	if(m_ProjectRef.IsUnsavedOpenItems())
+	{
+		HyGuiLog("Cannot replace assets while there are open unsaved items.", LOGTYPE_Warning);
+		return;
+	}
+
 	if(bWithNewAssets)
 	{
 		// Make sure no sub-atlases are being replaced
@@ -402,6 +422,12 @@ bool IManagerModel::TransferAssets(QList<IAssetItemData *> assetsList, uint uiNe
 	if(GetAffectedItems(assetsList, m_RepackAffectedItemList) == false)
 		return false;
 
+	if(m_ProjectRef.IsUnsavedOpenItems())
+	{
+		HyGuiLog("Cannot transfer assets between banks while there are open unsaved items.", LOGTYPE_Warning);
+		return false;
+	}
+
 	bool bTransferSucceeded = OnMoveAssets(assetsList, uiNewBankId);
 	FlushRepack();
 
@@ -432,6 +458,12 @@ void IManagerModel::AddAssetsToRepack(BankData *pBankData, QSet<IAssetItemData *
 
 void IManagerModel::FlushRepack()
 {
+	if(m_ProjectRef.IsUnsavedOpenItems())
+	{
+		HyGuiLog("Save should have aborted earlier: Cannot modify assets when there are unsaved opened items.", LOGTYPE_Error);
+		return;
+	}
+
 	OnFlushRepack();
 
 	switch(m_eASSET_TYPE)

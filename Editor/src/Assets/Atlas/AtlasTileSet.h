@@ -36,7 +36,6 @@ class AtlasTileSet : public AtlasFrame
 	bool						m_bSubAtlasDirty;
 	
 	QUndoStack *				m_pUndoStack;
-	QAction						m_ActionSave;
 	QAction *					m_pActionUndo;
 	QAction *					m_pActionRedo;
 	
@@ -256,7 +255,7 @@ public:
 	void Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj);
 	void Cmd_RemoveJsonItem(QUuid uuid);
 
-	QAction *GetSaveAction();
+	//QAction *GetSaveAction();
 	QUndoStack *GetUndoStack();
 	QAction *GetUndoAction();
 	QAction *GetRedoAction();

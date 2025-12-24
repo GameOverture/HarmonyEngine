@@ -21,6 +21,7 @@
 #include "IAssetItemData.h"
 #include "TextModel.h" // For Project::ReloadHarmony() hack
 #include "DlgBuildSettings.h"
+#include "AuxTileSet.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -1201,7 +1202,14 @@ void Project::ApplySaveEnables()
 		}
 	}
 
-	MainWindow::ApplySaveEnables(bCurItemDirty, bAnyItemDirty);
+	// Override bCurItemDirty if TileSet editor is opened
+	if(MainWindow::GetAuxWidget(AUXTAB_TileSet)->isVisible())
+	{
+		AtlasTileSet *pTileSet = static_cast<AuxTileSet *>(MainWindow::GetAuxWidget(AUXTAB_TileSet))->GetTileSet();
+		bCurItemDirty = (pTileSet && pTileSet->IsSaveClean() == false);
+	}
+
+	MainWindow::OnApplySaveEnables(bCurItemDirty, bAnyItemDirty);
 }
 
 bool Project::IsUnsavedOpenItems()
