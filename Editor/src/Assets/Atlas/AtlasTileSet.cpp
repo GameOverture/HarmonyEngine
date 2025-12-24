@@ -688,10 +688,13 @@ void AtlasTileSet::GetSavedFileData(FileDataPair &itemFileDataOut) const
 	itemFileDataOut = m_TileSetDataPair;
 }
 
-bool AtlasTileSet::Save(bool bWriteToDisk)
+bool AtlasTileSet::Save()
 {
-	if(RegenerateSubAtlas() == false)
-		return false;
+	if(m_bSubAtlasDirty)
+	{
+		if(RegenerateSubAtlas() == false)
+			return false;
+	}
 
 	if(m_ModelRef.GetProjOwner().IsUnsavedOpenItems())
 	{
@@ -699,12 +702,13 @@ bool AtlasTileSet::Save(bool bWriteToDisk)
 		return false;
 	}
 
+	m_bSubAtlasDirty = false;
 	m_bExistencePendingSave = false;
 	m_pUndoStack->setClean();
 
 	GetLatestFileData(m_TileSetDataPair);
 	
-	static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetDataPair, bWriteToDisk);
+	static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetDataPair);
 
 	return true;
 }
@@ -829,9 +833,4 @@ bool AtlasTileSet::RegenerateSubAtlas()
 	}
 
 	return true;
-}
-
-void AtlasTileSet::on_actionSave_triggered()
-{
-	Save(true);
 }

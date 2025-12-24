@@ -572,6 +572,29 @@ void MainWindow::SetCurrentProject(Project *pProject)
 		return;
 	}
 
+	AtlasTileSet *pTileSet = sm_pInstance->ui->tileSetEditor->GetTileSet();
+	if(pTileSet && pTileSet->IsSaveClean() == false)
+	{
+		int iDlgReturn = QMessageBox::question(nullptr, "Save TileSet Changes", pTileSet->GetName() % " TileSet has unsaved changes. Do you want to save before closing?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+		if(iDlgReturn == QMessageBox::Save)
+		{
+			if(pTileSet->Save() == false)
+			{
+				pEvent->ignore();
+				return;
+			}
+		}
+		else if(iDlgReturn == QMessageBox::Discard)
+		{
+			//pItem->DiscardChanges();
+		}
+		else if(iDlgReturn == QMessageBox::Cancel)
+		{
+			pEvent->ignore();
+			return;
+		}
+	}
+
 	SaveSettings();
 
 	delete Harmony::GetProject();
@@ -897,7 +920,7 @@ void MainWindow::on_actionSave_triggered()
 		AtlasTileSet *pTileSet = sm_pInstance->ui->tileSetEditor->GetTileSet();
 		if(pTileSet && pTileSet->IsSaveClean() == false)
 		{
-			if(pTileSet->Save(true))
+			if(pTileSet->Save())
 				HyGuiLog(pTileSet->GetName() % " tileset was saved", LOGTYPE_Normal);
 		}
 		else

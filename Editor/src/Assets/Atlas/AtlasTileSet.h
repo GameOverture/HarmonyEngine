@@ -262,7 +262,7 @@ public:
 
 	void GetLatestFileData(FileDataPair &fileDataPairOut) const;
 	void GetSavedFileData(FileDataPair &fileDataPairOut) const;
-	bool Save(bool bWriteToDisk);
+	bool Save();
 	bool IsExistencePendingSave() const;
 	bool IsSaveClean() const;
 	void DiscardChanges();
@@ -272,9 +272,6 @@ public:
 protected:
 	void UpdateTilePolygon();
 	bool RegenerateSubAtlas(); // Assumes m_TileDataList is up to date. This will regenerate the sub-atlas texture and into the atlas manager
-
-private Q_SLOTS:
-	void on_actionSave_triggered();
 };
 
 #endif // ATLASTILESET_H

@@ -213,17 +213,14 @@ AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pPar
 	return pNewTileSet;
 }
 
-void AtlasModel::SaveTileSet(QUuid tileSetUuid, const FileDataPair &tileSetFileDataPairRef, bool bWriteToDisk)
+void AtlasModel::SaveTileSet(QUuid tileSetUuid, const FileDataPair &tileSetFileDataPairRef)
 {
 	QString sTileSetUuid = tileSetUuid.toString(QUuid::WithoutBraces);
 	m_TileSetsDataPair.m_Data.insert(sTileSetUuid, tileSetFileDataPairRef.m_Data);
 	m_TileSetsDataPair.m_Meta.insert(sTileSetUuid, tileSetFileDataPairRef.m_Meta);
-		
-	if(bWriteToDisk)
-	{
-		WriteTileSetsToDisk();
-		FlushRepack();
-	}
+
+	WriteTileSetsToDisk();
+	FlushRepack();
 }
 
 void AtlasModel::WriteTileSetsToDisk()

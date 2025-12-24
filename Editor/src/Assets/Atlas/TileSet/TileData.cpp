@@ -42,10 +42,10 @@ TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 		QJsonObject terrainObj = terrainArray[i].toObject();
 		QUuid terrainUuid = QUuid(terrainObj["TerrainUUID"].toString());
 		int iPartFlags = terrainObj["PeeringBits"].toInt();
-		QBitArray peeringBits;
+		QBitArray peeringBits(NUM_AUTOTILEPARTS, false);
 		for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
 		{
-			if(0 != (iPartFlags & i))
+			if(0 != (iPartFlags & (1 << i)))
 				peeringBits.setBit(i);
 		}
 		m_TerrainMap[terrainUuid] = peeringBits;
@@ -151,7 +151,10 @@ QJsonObject TileData::GetTileData() const
 		bool bConvertResult = false;
 		int iPeeringBits = iter.value().toUInt32(QSysInfo::Endian::LittleEndian, &bConvertResult);
 		if(bConvertResult)
+		{
 			terrainObj.insert("PeeringBits", iPeeringBits);
+			terrainMapArray.push_back(terrainObj);
+		}
 		else
 			HyGuiLog("Failed to convert terrain peering bits", LOGTYPE_Error);
 	}

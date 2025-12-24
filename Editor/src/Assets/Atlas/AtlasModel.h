@@ -48,7 +48,7 @@ public:
 	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, ItemType eSubAtlasType);
 
 	AtlasTileSet *GenerateTileSet(QString sName, TreeModelItemData *pParentTreeItemData, quint32 uiBankId);
-	void SaveTileSet(QUuid tileSetUuid, const FileDataPair &itemFileDataRef, bool bWriteToDisk);
+	void SaveTileSet(QUuid tileSetUuid, const FileDataPair &itemFileDataRef);
 	void WriteTileSetsToDisk();
 
 	void OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *pFirstSelection);

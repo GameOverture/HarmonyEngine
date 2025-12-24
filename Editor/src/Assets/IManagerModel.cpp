@@ -469,10 +469,12 @@ void IManagerModel::FlushRepack()
 	switch(m_eASSET_TYPE)
 	{
 	case ASSETMAN_Atlases:
-		StartRepackThread("Repacking Atlases", new AtlasRepackThread(m_RepackAffectedAssetsMap, m_MetaDir));
+		if(m_RepackAffectedAssetsMap.isEmpty() == false)
+			StartRepackThread("Repacking Atlases", new AtlasRepackThread(m_RepackAffectedAssetsMap, m_MetaDir));
 		break;
 	case ASSETMAN_Audio:
-		StartRepackThread("Repacking Audio", new AudioRepackThread(m_RepackAffectedAssetsMap, m_MetaDir));
+		if(m_RepackAffectedAssetsMap.isEmpty() == false)
+			StartRepackThread("Repacking Audio", new AudioRepackThread(m_RepackAffectedAssetsMap, m_MetaDir));
 		break;
 	}
 }
