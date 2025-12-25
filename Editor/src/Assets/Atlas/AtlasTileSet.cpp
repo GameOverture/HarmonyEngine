@@ -18,10 +18,10 @@
 
 bool operator<(const QPoint &a, const QPoint &b)
 {
-	if(a.x() != b.x())
-		return a.x() < b.x();
-	else
+	if(a.y() != b.y())
 		return a.y() < b.y();
+	else
+		return a.x() < b.x();
 }
 
 AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
@@ -493,7 +493,6 @@ void AtlasTileSet::Cmd_MoveTiles(QList<TileData*> tileDataList, QList<QPoint> ne
 	for(int i = 0; i < tileDataList.size(); ++i)
 		tileDataList[i]->SetMetaGridPos(newGridPosList[i]);
 
-	// TODO: Check if animations frame order has been affected, and only set dirty if so
 	m_bSubAtlasDirty = true;
 }
 
@@ -640,15 +639,20 @@ QIcon AtlasTileSet::GetTileSetIcon() const
 	return GetIcon(eSubIcon);
 }
 
-void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
+void AtlasTileSet::SetSubAtlasDirty()
+{
+	m_bSubAtlasDirty = true;
+}
+
+void AtlasTileSet::UpdateTileSetDataPair()
 {
 	// Start with blank
-	fileDataPairOut = FileDataPair();
+	m_TileSetDataPair = FileDataPair();
 
-	fileDataPairOut.m_Meta["tileShape"] = HyGlobal::TileSetShapeName(m_eTileShape);
-	fileDataPairOut.m_Meta["regionSize"] = QJsonArray() << QJsonValue(m_RegionSize.width()) << QJsonValue(m_RegionSize.height());
-	fileDataPairOut.m_Meta["tileSize"] = QJsonArray() << QJsonValue(m_TileSize.width()) << QJsonValue(m_TileSize.height());
-	fileDataPairOut.m_Meta["tileOffset"] = QJsonArray() << QJsonValue(m_TileOffset.x()) << QJsonValue(m_TileOffset.y());
+	m_TileSetDataPair.m_Meta["tileShape"] = HyGlobal::TileSetShapeName(m_eTileShape);
+	m_TileSetDataPair.m_Meta["regionSize"] = QJsonArray() << QJsonValue(m_RegionSize.width()) << QJsonValue(m_RegionSize.height());
+	m_TileSetDataPair.m_Meta["tileSize"] = QJsonArray() << QJsonValue(m_TileSize.width()) << QJsonValue(m_TileSize.height());
+	m_TileSetDataPair.m_Meta["tileOffset"] = QJsonArray() << QJsonValue(m_TileOffset.x()) << QJsonValue(m_TileOffset.y());
 
 	QJsonArray animationArray;
 	for(int i = 0; i < m_AnimationList.size(); ++i)
@@ -656,7 +660,7 @@ void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 		QJsonObject animationObj = m_AnimationList[i].ToJsonObject();
 		animationArray.append(animationObj);
 	}
-	fileDataPairOut.m_Meta["animations"] = animationArray;
+	m_TileSetDataPair.m_Meta["animations"] = animationArray;
 
 	QJsonArray terrainSetArray;
 	for(int i = 0; i < m_TerrainSetList.size(); ++i)
@@ -664,7 +668,7 @@ void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 		QJsonObject terrainSetObj = m_TerrainSetList[i].ToJsonObject();
 		terrainSetArray.append(terrainSetObj);
 	}
-	fileDataPairOut.m_Meta["terrainSets"] = terrainSetArray;
+	m_TileSetDataPair.m_Meta["terrainSets"] = terrainSetArray;
 
 	QJsonArray physicsLayerArray;
 	for(int i = 0; i < m_PhysicsLayerList.size(); ++i)
@@ -672,7 +676,7 @@ void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 		QJsonObject physicsLayerObj = m_PhysicsLayerList[i].ToJsonObject();
 		physicsLayerArray.append(physicsLayerObj);
 	}
-	fileDataPairOut.m_Meta["physicsLayers"] = physicsLayerArray;
+	m_TileSetDataPair.m_Meta["physicsLayers"] = physicsLayerArray;
 
 	QJsonArray tileArray;
 	for(QVector<TileData*>::const_iterator iter = m_TileDataList.constBegin(); iter != m_TileDataList.constEnd(); ++iter)
@@ -680,12 +684,7 @@ void AtlasTileSet::GetLatestFileData(FileDataPair &fileDataPairOut) const
 		QJsonObject tileObj = (*iter)->GetTileData();
 		tileArray.append(tileObj);
 	}
-	fileDataPairOut.m_Meta["tileData"] = tileArray;
-}
-
-void AtlasTileSet::GetSavedFileData(FileDataPair &itemFileDataOut) const
-{
-	itemFileDataOut = m_TileSetDataPair;
+	m_TileSetDataPair.m_Meta["tileData"] = tileArray;
 }
 
 bool AtlasTileSet::Save()
@@ -706,8 +705,7 @@ bool AtlasTileSet::Save()
 	m_bExistencePendingSave = false;
 	m_pUndoStack->setClean();
 
-	GetLatestFileData(m_TileSetDataPair);
-	
+	UpdateTileSetDataPair();
 	static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetDataPair);
 
 	return true;
@@ -791,6 +789,21 @@ bool AtlasTileSet::RegenerateSubAtlas()
 {
 	if(m_TileDataList.isEmpty())
 		return true;
+
+	std::sort(m_TileDataList.begin(), m_TileDataList.end(),
+		[](TileData *pA, TileData *pB)
+		{
+			QUuid animA = pA->GetAnimation();
+			QUuid animB = pB->GetAnimation();
+			if(animA.isNull() == false && animB.isNull())
+				return true;
+			else if(animA.isNull() && animB.isNull() == false)
+				return false;
+			else if(animA.isNull() == false && animB.isNull() == false && animA != animB)
+				return animA.toString(QUuid::WithoutBraces) < animB.toString(QUuid::WithoutBraces);
+
+			return pA->GetMetaGridPos() < pB->GetMetaGridPos();
+		});
 
 	// Create a texture with a size that will accommodate all the existing, and newly appended tiles
 	const int iNUM_COLS = NUM_COLS_TILESET(m_TileDataList.size());

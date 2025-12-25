@@ -176,16 +176,6 @@ void  WgtTileSetCollision::on_btnFramePreview_clicked()
 	}
 }
 
-void WgtTileSetCollision::on_sbColumns_valueChanged(int iNewValue)
-{
-	OnModifyWidget("Animation Columns", MERGABLEUNDOCMD_TileSetAnimColumn);
-}
-
-void WgtTileSetCollision::on_sbNumFrames_valueChanged(int iNewValue)
-{
-	OnModifyWidget("Animation Frames", MERGABLEUNDOCMD_TileSetAnimNumFrames);
-}
-
 void WgtTileSetCollision::on_btnHz10_clicked()
 {
 	ui->sbFrameRate->setValue(1.0 / 10.0);

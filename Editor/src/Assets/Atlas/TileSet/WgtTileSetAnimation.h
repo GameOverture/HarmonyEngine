@@ -13,6 +13,8 @@
 #include "Global.h"
 #include "IWgtTileSetItem.h"
 
+#include <QTimer>
+
 namespace Ui {
 class WgtTileSetAnimation;
 }
@@ -25,8 +27,9 @@ class WgtTileSetAnimation : public IWgtTileSetItem
 
 	Ui::WgtTileSetAnimation *		ui;
 
-	bool							m_bPaintingTiles;
-	QList<TileData *>				m_FrameList;
+	QList<TileData *>				m_PreviewFrameList;
+	QTimer *						m_pPreviewTimer;
+	int								m_iPreviewFrameIndex;
 
 public:
 	WgtTileSetAnimation(AuxTileSet *pAuxTileSet, QJsonObject initObj, QWidget *pParent = nullptr);
@@ -38,10 +41,14 @@ public:
 	void SetOrderBtns(bool bUpEnabled, bool bDownEnabled);
 
 	QString GetName() const;
-	bool IsPaintingTiles() const;
 
 protected:
 	virtual QFrame *GetBorderFrame() const override;
+
+	void RefreshPreview();
+
+protected Q_SLOTS:
+	void OnPreviewUpdate();
 
 private Q_SLOTS:
 	void on_actionDelete_triggered();
@@ -49,9 +56,6 @@ private Q_SLOTS:
 	void on_actionDownward_triggered();
 	void on_txtName_editingFinished();
 	void on_btnColor_clicked();
-	void on_btnFramePreview_clicked();
-	void on_sbColumns_valueChanged(int iNewValue);
-	void on_sbNumFrames_valueChanged(int iNewValue);
 	void on_btnHz10_clicked();
 	void on_btnHz20_clicked();
 	void on_btnHz30_clicked();

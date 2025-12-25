@@ -260,8 +260,8 @@ public:
 	QAction *GetUndoAction();
 	QAction *GetRedoAction();
 
-	void GetLatestFileData(FileDataPair &fileDataPairOut) const;
-	void GetSavedFileData(FileDataPair &fileDataPairOut) const;
+	void SetSubAtlasDirty();
+	void UpdateTileSetDataPair();
 	bool Save();
 	bool IsExistencePendingSave() const;
 	bool IsSaveClean() const;
@@ -271,7 +271,7 @@ public:
 
 protected:
 	void UpdateTilePolygon();
-	bool RegenerateSubAtlas(); // Assumes m_TileDataList is up to date. This will regenerate the sub-atlas texture and into the atlas manager
+	bool RegenerateSubAtlas(); // Sorts m_TileDataList. This will regenerate the sub-atlas texture and into the atlas manager
 };
 
 #endif // ATLASTILESET_H

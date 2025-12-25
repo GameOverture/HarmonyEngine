@@ -458,12 +458,6 @@ void AuxTileSet::MakeSelectionChange(IWgtTileSetItem *pItem)
 	}
 }
 
-void AuxTileSet::CmdSet_AnimationFrames(QList<TileData *> tileDataList, QUuid animationUuid)
-{
-	for(int i = 0; i < tileDataList.size(); ++i)
-		tileDataList[i]->SetAnimation(animationUuid);
-}
-
 void AuxTileSet::SetPainting_Animation(QUuid animUuid)
 {
 	IWgtTileSetItem *pWgtItem = FindWgtItem(animUuid);

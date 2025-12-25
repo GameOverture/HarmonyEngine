@@ -50,8 +50,6 @@ private Q_SLOTS:
 	void on_txtName_editingFinished();
 	void on_btnColor_clicked();
 	void on_btnFramePreview_clicked();
-	void on_sbColumns_valueChanged(int iNewValue);
-	void on_sbNumFrames_valueChanged(int iNewValue);
 	void on_btnHz10_clicked();
 	void on_btnHz20_clicked();
 	void on_btnHz30_clicked();

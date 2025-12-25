@@ -595,10 +595,17 @@ TileSetUndoCmd_PaintAnimation::TileSetUndoCmd_PaintAnimation(AuxTileSet &auxTile
 	for(TileData *pTileData : m_PaintedMap)
 	{
 		if(m_bLeftClick)
-			m_AuxTileSetRef.CmdSet_AnimationFrames(m_PaintedMap, m_AnimationUuid);
+		{
+			for(int i = 0; i < m_PaintedMap.size(); ++i)
+				m_PaintedMap[i]->SetAnimation(m_AnimationUuid);
+		}
 		else
-			m_AuxTileSetRef.CmdSet_AnimationFrames(m_PaintedMap, QUuid());
+		{
+			for(int i = 0; i < m_PaintedMap.size(); ++i)
+				m_PaintedMap[i]->SetAnimation(QUuid());
+		}
 	}
+	m_AuxTileSetRef.GetTileSet()->SetSubAtlasDirty();
 
 	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
 }
@@ -607,6 +614,7 @@ TileSetUndoCmd_PaintAnimation::TileSetUndoCmd_PaintAnimation(AuxTileSet &auxTile
 {
 	for(int i = 0; i < m_PaintedMap.size(); ++i)
 		m_PaintedMap[i]->SetAnimation(m_OriginalAnimationMap[i]);
+	m_AuxTileSetRef.GetTileSet()->SetSubAtlasDirty();
 
 	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
 }

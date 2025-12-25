@@ -113,7 +113,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Frames</string>
+         <string>Preview</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -168,16 +168,6 @@
       </item>
       <item row="2" column="2">
        <layout class="QHBoxLayout" name="horizontalLayout_7">
-        <item>
-         <widget class="QPushButton" name="btnFramePreview">
-          <property name="text">
-           <string>&lt;Click to Set&gt;</string>
-          </property>
-          <property name="flat">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
         <item>
          <widget class="QLabel" name="lblFramePreview">
           <property name="text">
