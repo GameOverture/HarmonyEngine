@@ -33,9 +33,9 @@ DlgCollisionFilter::DlgCollisionFilter(Project &projectRef, b2Filter initFilter,
 	ui->btnAddCategory->setDefaultAction(ui->actionAddCategory);
 	ui->btnAddMask->setDefaultAction(ui->actionAddMask);
 	ui->btnRemoveCategory->setDefaultAction(ui->actionRemoveCategories);
-	ui->btnRemoveAllCategories->setDefaultAction(ui->actionRemoveCategories);
+	ui->btnRemoveAllCategories->setDefaultAction(ui->actionRemoveAllCategories);
 	ui->btnRemoveMask->setDefaultAction(ui->actionRemoveMasks);
-	ui->btnRemoveAllMasks->setDefaultAction(ui->actionRemoveMasks);
+	ui->btnRemoveAllMasks->setDefaultAction(ui->actionRemoveAllMasks);
 
 	ui->categoryListView->setModel(m_ProjectRef.GetCollisionFilterModel());
 	ui->categoryListView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -93,6 +93,28 @@ b2Filter DlgCollisionFilter::GetB2Filter() const
 	filter.groupIndex = ui->sbGroupIndex->value();
 
 	return filter;
+}
+
+void DlgCollisionFilter::on_categoryListView_clicked(const QModelIndex &index)
+{
+	Refresh();
+}
+
+void DlgCollisionFilter::on_categoryListView_doubleClicked(const QModelIndex &index)
+{
+	Refresh();
+	ui->actionAddCategory->trigger();
+}
+
+void DlgCollisionFilter::on_maskListView_clicked(const QModelIndex &index)
+{
+	Refresh();
+}
+
+void DlgCollisionFilter::on_maskListView_doubleClicked(const QModelIndex &index)
+{
+	Refresh();
+	ui->actionAddMask->trigger();
 }
 
 void DlgCollisionFilter::on_btnAddCategory_clicked()
@@ -212,12 +234,21 @@ void DlgCollisionFilter::on_actionRenameCategory_triggered()
 	DlgInputName *pDlg = new DlgInputName("Rename Category", m_ProjectRef.GetCollisionFilterModel()->stringList()[m_iRenameSelectedIndex], HyGlobal::FreeFormValidator(), nullptr, nullptr);
 	if(pDlg->exec() == QDialog::Accepted)
 	{
-		QStringList sNewNamesList = m_ProjectRef.GetCollisionFilterModel()->stringList();
-		sNewNamesList[m_iRenameSelectedIndex] = pDlg->GetName();
-
-		m_ProjectRef.GetCollisionFilterModel()->setStringList(sNewNamesList);
+		m_ProjectRef.SetCollisionFilter(m_iRenameSelectedIndex, pDlg->GetName());
 
 		// Also update the widget views
+		for(int i = 0; i < ui->setCategoryListWidget->count(); ++i)
+		{
+			QListWidgetItem *pItem = ui->setCategoryListWidget->item(i);
+			if(pItem->data(Qt::UserRole).toInt() == m_iRenameSelectedIndex)
+				pItem->setText(pDlg->GetName());
+		}
+		for(int i = 0; i < ui->setMaskListWidget->count(); ++i)
+		{
+			QListWidgetItem *pItem = ui->setMaskListWidget->item(i);
+			if(pItem->data(Qt::UserRole).toInt() == m_iRenameSelectedIndex)
+				pItem->setText(pDlg->GetName());
+		}
 	}
 	delete pDlg;
 }

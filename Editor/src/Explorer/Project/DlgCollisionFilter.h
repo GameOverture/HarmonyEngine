@@ -34,6 +34,11 @@ public:
 	b2Filter GetB2Filter() const;
 
 protected Q_SLOTS:
+	void on_categoryListView_clicked(const QModelIndex &index);
+	void on_categoryListView_doubleClicked(const QModelIndex &index);
+	void on_maskListView_clicked(const QModelIndex &index);
+	void on_maskListView_doubleClicked(const QModelIndex &index);
+
 	void on_btnAddCategory_clicked();
 	void on_btnAddMask_clicked();
 	void on_btnRemoveCategory_clicked();

@@ -20,7 +20,7 @@
 #include <QColorDialog>
 
 WgtTileSetCollision::WgtTileSetCollision(AuxTileSet *pAuxTileSet, QJsonObject initObj, QWidget *pParent /*= nullptr*/) :
-	IWgtTileSetItem(TILESETWGT_Animation, initObj, pAuxTileSet, pParent),
+	IWgtTileSetItem(TILESETWGT_Collision, initObj, pAuxTileSet, pParent),
 	ui(new Ui::WgtTileSetCollision),
 	m_CachedB2Filter(b2DefaultFilter())
 {

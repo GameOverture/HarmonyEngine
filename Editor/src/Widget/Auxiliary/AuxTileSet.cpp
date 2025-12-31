@@ -132,7 +132,12 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 	for (QJsonObject terrainSetObj : terrainSetObjList)
 		CmdSet_CreateWgtItem(TILESETWGT_TerrainSet, terrainSetObj);
 
-	// TODO: physics here
+	for(WgtTileSetCollision *pCollision : m_CollisionList)
+		delete pCollision;
+	m_CollisionList.clear();
+	QVector<QJsonObject> collisionObjList = m_pTileSet->GetCollisionLayers();
+	for(QJsonObject collisionObj : collisionObjList)
+		CmdSet_CreateWgtItem(TILESETWGT_Collision, collisionObj);
 	
 	ui->graphicsView->SetScene(this, m_pTileSet->GetGfxScene());
 
@@ -265,6 +270,12 @@ IWgtTileSetItem *AuxTileSet::FindWgtItem(QUuid uuid) const
 				return pTerrainWidget;
 		}
 	}
+	for(WgtTileSetCollision *pCollisionWidget : m_CollisionList)
+	{
+		if(pCollisionWidget->GetUuid() == uuid)
+			return pCollisionWidget;
+	}
+
 	return nullptr;
 }
 
@@ -288,6 +299,12 @@ int AuxTileSet::GetWgtItemIndex(QUuid uuid) const
 			if (pTerrainSubWidget->GetUuid() == uuid)
 				return j;
 		}
+	}
+	for(int i = 0; i < m_CollisionList.size(); ++i)
+	{
+		WgtTileSetCollision *pCollisionWidget = m_CollisionList[i];
+		if(pCollisionWidget->GetUuid() == uuid)
+			return i;
 	}
 
 	HyGuiLog("AuxTileSet::GetWgtItemIndex: Widget with specified UUID not found!", LOGTYPE_Error);
@@ -391,6 +408,18 @@ void AuxTileSet::CmdSet_DeleteWgtItem(QUuid uuid)
 			}
 		}
 	}
+	for(int i = 0; i < m_CollisionList.size(); ++i)
+	{
+		WgtTileSetCollision *pCollisionWidget = m_CollisionList[i];
+		if (pCollisionWidget->GetUuid() == uuid)
+		{
+			ui->lytCollisions->removeWidget(pCollisionWidget);
+			m_CollisionList.removeAt(i);
+			delete pCollisionWidget;
+			m_pTileSet->Cmd_RemoveJsonItem(uuid);
+			return;
+		}
+	}
 
 	HyGuiLog("AuxTileSet::CmdSet_DeleteWgtItem: Widget with specified UUID not found!", LOGTYPE_Error);
 }
@@ -435,6 +464,21 @@ void AuxTileSet::CmdSet_OrderWgtItem(QUuid uuid, int newIndex)
 			}
 		}
 	}
+	for(int i = 0; i < m_CollisionList.size(); ++i)
+	{
+		WgtTileSetCollision *pCollisionWidget = m_CollisionList[i];
+		if (pCollisionWidget->GetUuid() == uuid)
+		{
+			ui->lytCollisions->removeWidget(pCollisionWidget);
+			m_CollisionList.removeAt(i);
+			ui->lytCollisions->insertWidget(newIndex, pCollisionWidget);
+			m_CollisionList.insert(newIndex, pCollisionWidget);
+
+			pCollisionWidget->SetOrderBtns(newIndex > 0, newIndex < m_CollisionList.size() - 1);
+			return;
+		}
+	}
+
 	HyGuiLog("AuxTileSet::CmdSet_OrderWgtItem: Widget with specified UUID not found!", LOGTYPE_Error);
 }
 
