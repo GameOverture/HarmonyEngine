@@ -95,12 +95,12 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 			m_TerrainSetList.push_back(TerrainSet(terrainSetObj));
 		}
 
-		QJsonArray physicsLayerArray = m_TileSetDataPair.m_Meta["physicsLayers"].toArray();
-		m_PhysicsLayerList.reserve(physicsLayerArray.size());
-		for (int i = 0; i < physicsLayerArray.size(); ++i)
+		QJsonArray collisionLayerArray = m_TileSetDataPair.m_Meta["collisionLayers"].toArray();
+		m_CollisionLayerList.reserve(collisionLayerArray.size());
+		for (int i = 0; i < collisionLayerArray.size(); ++i)
 		{
-			QJsonObject physicsLayerObj = physicsLayerArray[i].toObject();
-			m_PhysicsLayerList.push_back(PhysicsLayer(physicsLayerObj));
+			QJsonObject collisionObj = collisionLayerArray[i].toObject();
+			m_CollisionLayerList.push_back(CollisionLayer(collisionObj));
 		}
 
 		QJsonArray tileArray = m_TileSetDataPair.m_Meta["tileData"].toArray();
@@ -263,10 +263,10 @@ QString AtlasTileSet::GetTileSetInfo() const
 	return terrain.ToJsonObject();
 }
 
-/*static*/ QJsonObject AtlasTileSet::GenerateNewPhysicsLayerJsonObject(QString sName, HyColor color)
+/*static*/ QJsonObject AtlasTileSet::GenerateNewCollisionJsonObject()
 {
-	PhysicsLayer physicsLayer(sName, color);
-	return physicsLayer.ToJsonObject();
+	CollisionLayer collisionLayer;
+	return collisionLayer.ToJsonObject();
 }
 
 QVector<QJsonObject> AtlasTileSet::GetAnimations() const
@@ -287,13 +287,13 @@ QVector<QJsonObject> AtlasTileSet::GetTerrainSets() const
 	return terrainSetObjList;
 }
 
-QVector<QJsonObject> AtlasTileSet::GetPhysicsLayers() const
+QVector<QJsonObject> AtlasTileSet::GetCollisionLayers() const
 {
-	QVector<QJsonObject> physicsLayerObjList;
-	physicsLayerObjList.reserve(m_PhysicsLayerList.size());
-	for (const PhysicsLayer &physicsLayer : m_PhysicsLayerList)
-		physicsLayerObjList.push_back(physicsLayer.ToJsonObject());
-	return physicsLayerObjList;
+	QVector<QJsonObject> collisionObjList;
+	collisionObjList.reserve(m_CollisionLayerList.size());
+	for (const CollisionLayer &collisionLayer : m_CollisionLayerList)
+		collisionObjList.push_back(collisionLayer.ToJsonObject());
+	return collisionObjList;
 }
 
 QJsonObject AtlasTileSet::GetJsonItem(QUuid uuid) const
@@ -314,10 +314,10 @@ QJsonObject AtlasTileSet::GetJsonItem(QUuid uuid) const
 				return terrain.ToJsonObject();
 		}
 	}
-	for (const PhysicsLayer &physicsLayer : m_PhysicsLayerList)
+	for (const CollisionLayer &collisionLayer : m_CollisionLayerList)
 	{
-		if (physicsLayer.m_uuid == uuid)
-			return physicsLayer.ToJsonObject();
+		if (collisionLayer.m_uuid == uuid)
+			return collisionLayer.ToJsonObject();
 	}
 	HyGuiLog("AtlasTileSet::GetJsonItem() could not find item with UUID: " + uuid.toString(), LOGTYPE_Error);
 	return QJsonObject();
@@ -520,8 +520,10 @@ void AtlasTileSet::Cmd_AllocateJsonItem(TileSetWgtType eType, QJsonObject data)
 		}
 		if(bFound == false)
 			HyGuiLog("AtlasTileSet::Cmd_AllocateJsonItem() could not find Terrain Set with UUID: " + terrainSetUuid.toString(), LOGTYPE_Error);
+		break; }
+	case TILESETWGT_Collision:
+		m_CollisionLayerList.append(CollisionLayer(data));
 		break;
-	}
 
 	default:
 		HyGuiLog("AtlasTileSet::Cmd_AllocateJsonItem() received unknown TileSetWgtType: " + QString::number(static_cast<int>(eType)), LOGTYPE_Error);
@@ -556,11 +558,11 @@ void AtlasTileSet::Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj)
 			}
 		}
 	}
-	for(PhysicsLayer &physicsLayerRef : m_PhysicsLayerList)
+	for(CollisionLayer &collisionLayerRef : m_CollisionLayerList)
 	{
-		if(physicsLayerRef.m_uuid == uuid)
+		if(collisionLayerRef.m_uuid == uuid)
 		{
-			physicsLayerRef = PhysicsLayer(itemDataObj);
+			collisionLayerRef = CollisionLayer(itemDataObj);
 			return;
 		}
 	}
@@ -595,11 +597,11 @@ void AtlasTileSet::Cmd_RemoveJsonItem(QUuid uuid)
 			}
 		}
 	}
-	for(int i = 0; i < m_PhysicsLayerList.size(); ++i)
+	for(int i = 0; i < m_CollisionLayerList.size(); ++i)
 	{
-		if(m_PhysicsLayerList[i].m_uuid == uuid)
+		if(m_CollisionLayerList[i].m_uuid == uuid)
 		{
-			m_PhysicsLayerList.removeAt(i);
+			m_CollisionLayerList.removeAt(i);
 			return;
 		}
 	}
@@ -670,13 +672,13 @@ void AtlasTileSet::UpdateTileSetDataPair()
 	}
 	m_TileSetDataPair.m_Meta["terrainSets"] = terrainSetArray;
 
-	QJsonArray physicsLayerArray;
-	for(int i = 0; i < m_PhysicsLayerList.size(); ++i)
+	QJsonArray collisionLayerArray;
+	for(int i = 0; i < m_CollisionLayerList.size(); ++i)
 	{
-		QJsonObject physicsLayerObj = m_PhysicsLayerList[i].ToJsonObject();
-		physicsLayerArray.append(physicsLayerObj);
+		QJsonObject collisionLayerObj = m_CollisionLayerList[i].ToJsonObject();
+		collisionLayerArray.append(collisionLayerObj);
 	}
-	m_TileSetDataPair.m_Meta["physicsLayers"] = physicsLayerArray;
+	m_TileSetDataPair.m_Meta["collisionLayers"] = collisionLayerArray;
 
 	QJsonArray tileArray;
 	for(QVector<TileData*>::const_iterator iter = m_TileDataList.constBegin(); iter != m_TileDataList.constEnd(); ++iter)

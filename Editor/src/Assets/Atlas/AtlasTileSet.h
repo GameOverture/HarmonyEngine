@@ -157,36 +157,47 @@ class AtlasTileSet : public AtlasFrame
 	};
 	QList<TerrainSet>			m_TerrainSetList;
 
-	struct PhysicsLayer
+	struct CollisionLayer
 	{
 		QUuid					m_uuid;
-		QString					m_sName;
-		HyColor					m_Color;
+		b2Filter				m_Filter;
+		QUuid					m_SurfaceMaterialUuid;
+		bool					m_bIsSensor;
 
-		PhysicsLayer(QString sName, HyColor color) :
+		CollisionLayer() :
 			m_uuid(QUuid::createUuid()),
-			m_sName(sName),
-			m_Color(color)
+			m_Filter(b2DefaultFilter()),
+			m_SurfaceMaterialUuid(),
+			m_bIsSensor(false)
 		{
 		}
 
-		PhysicsLayer(const QJsonObject &initObj)
+		CollisionLayer(const QJsonObject &initObj)
 		{
 			m_uuid = QUuid(initObj["UUID"].toString());
-			m_sName = initObj["name"].toString();
-			m_Color = HyColor(initObj["color"].toVariant().toLongLong());
+			QJsonObject filterObj = initObj["filter"].toObject();
+			m_Filter.categoryBits = static_cast<uint64_t>(filterObj["categoryBits"].toVariant().toLongLong());
+			m_Filter.maskBits = static_cast<uint64_t>(filterObj["maskBits"].toVariant().toLongLong());
+			m_Filter.groupIndex = static_cast<int32>(filterObj["groupIndex"].toInt());
+			m_SurfaceMaterialUuid = QUuid(initObj["surfaceMaterialUUID"].toString());
+			m_bIsSensor = initObj["isSensor"].toBool();
 		}
 
 		QJsonObject ToJsonObject() const
 		{
-			QJsonObject physicsLayerObj;
-			physicsLayerObj["UUID"] = m_uuid.toString(QUuid::WithoutBraces);
-			physicsLayerObj["name"] = m_sName;
-			physicsLayerObj["color"] = static_cast<qint64>(m_Color.GetAsHexCode());
-			return physicsLayerObj;
+			QJsonObject collisionLayerObj;
+			collisionLayerObj.insert("UUID", m_uuid.toString(QUuid::WithoutBraces));
+			QJsonObject filterObj;
+			filterObj["categoryBits"] = static_cast<qint64>(m_Filter.categoryBits);
+			filterObj["maskBits"] = static_cast<qint64>(m_Filter.maskBits);
+			filterObj["groupIndex"] = static_cast<qint64>(m_Filter.groupIndex);
+			collisionLayerObj.insert("filter", filterObj);
+			collisionLayerObj.insert("surfaceMaterialUUID", m_SurfaceMaterialUuid.toString(QUuid::WithoutBraces));
+			collisionLayerObj.insert("isSensor", m_bIsSensor);
+			return collisionLayerObj;
 		}
 	};
-	QList<PhysicsLayer>			m_PhysicsLayerList;
+	QList<CollisionLayer>		m_CollisionLayerList;
 
 	// Map of all imported TileData objects in this tile set
 	// Atlas Indices are row-major order
@@ -232,10 +243,10 @@ public:
 	static QJsonObject GenerateNewAnimationJsonObject(QString sName, HyColor color);
 	static QJsonObject GenerateNewTerrainSetJsonObject();
 	static QJsonObject GenerateNewTerrainJsonObject(QUuid terrainSetUuid, QString sName, HyColor color);
-	static QJsonObject GenerateNewPhysicsLayerJsonObject(QString sName, HyColor color);
+	static QJsonObject GenerateNewCollisionJsonObject();
 	QVector<QJsonObject> GetAnimations() const;
 	QVector<QJsonObject> GetTerrainSets() const;
-	QVector<QJsonObject> GetPhysicsLayers() const;
+	QVector<QJsonObject> GetCollisionLayers() const;
 	QJsonObject GetJsonItem(QUuid uuid) const;
 	HyColor GetAnimationColor(QUuid animationUuid) const;
 	AutoTileType GetTerrainSetType(QUuid terrainSetUuid) const;

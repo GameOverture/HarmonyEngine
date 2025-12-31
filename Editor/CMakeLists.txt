@@ -268,12 +268,18 @@ if(Qt6_DIR)
 		src/Explorer/ExplorerModel.h
 		src/Explorer/ExplorerWidget.h
 		src/Explorer/ExplorerWidget.ui
+		src/Explorer/Project/DlgCollisionFilter.cpp
+		src/Explorer/Project/DlgCollisionFilter.h
+		src/Explorer/Project/DlgCollisionFilter.ui
 		src/Explorer/Project/DlgNewProjectItem.cpp
 		src/Explorer/Project/DlgNewProjectItem.h
 		src/Explorer/Project/DlgNewProjectItem.ui
 		src/Explorer/Project/DlgProjectSettings.cpp
 		src/Explorer/Project/DlgProjectSettings.h
 		src/Explorer/Project/DlgProjectSettings.ui
+		src/Explorer/Project/DlgSurfaceMaterials.cpp
+		src/Explorer/Project/DlgSurfaceMaterials.h
+		src/Explorer/Project/DlgSurfaceMaterials.ui
 		src/Explorer/Project/Project.cpp
 		src/Explorer/Project/ProjectDraw.cpp
 		src/Explorer/Project/ProjectItemData.cpp
@@ -282,6 +288,8 @@ if(Qt6_DIR)
 		src/Explorer/Project/ProjectDraw.h
 		src/Explorer/Project/ProjectItemData.h
 		src/Explorer/Project/ProjectItemMimeData.h
+		src/Explorer/Project/SurfaceMaterialsModel.cpp
+		src/Explorer/Project/SurfaceMaterialsModel.h
 		src/Explorer/Project/WgtWindowInfo.cpp
 		src/Explorer/Project/WgtWindowInfo.h
 		src/Explorer/Project/WgtWindowInfo.ui
@@ -296,6 +304,12 @@ if(Qt6_DIR)
 		src/Harmony/HarmonyWidget.ui
 		src/Shared/Gfx/CommonGfxView.cpp
 		src/Shared/Gfx/CommonGfxView.h
+		src/Shared/Gfx/Polygon2dModel.cpp
+		src/Shared/Gfx/Polygon2dModel.h
+		src/Shared/Gfx/Polygon2dHyView.cpp
+		src/Shared/Gfx/Polygon2dHyView.h
+		src/Shared/Gfx/Polygon2dQtView.cpp
+		src/Shared/Gfx/Polygon2dQtView.h
 		src/Shared/Global.cpp
 		src/Shared/Global.h
 		src/Shared/GlobalUndoCmds.h
@@ -360,17 +374,14 @@ if(Qt6_DIR)
 		src/Widget/WgtVectorSpinBox.h
 		src/Widget/WgtVectorSpinBox.ui
 		src/Widget/WidgetColor.cpp
-		src/Widget/WidgetGradientEditor.cpp
 		src/Widget/WidgetLiveVariable.cpp
 		src/Widget/WidgetLiveVarManager.cpp
 		src/Widget/WidgetRangedSlider.cpp
 		src/Widget/WidgetColor.h
-		src/Widget/WidgetGradientEditor.h
 		src/Widget/WidgetLiveVariable.h
 		src/Widget/WidgetLiveVarManager.h
 		src/Widget/WidgetRangedSlider.h
 		src/Widget/WidgetColor.ui
-		src/Widget/WidgetGradientEditor.ui
 		src/Widget/WidgetLiveVariable.ui
 		src/Widget/WidgetLiveVarManager.ui
 		src/Widget/WidgetRangedSlider.ui

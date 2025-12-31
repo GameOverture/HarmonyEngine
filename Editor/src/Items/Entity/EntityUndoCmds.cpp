@@ -1350,13 +1350,13 @@ EntityUndoCmd_PropertyModified::EntityUndoCmd_PropertyModified(PropertiesTreeMod
 	m_ePropTypeModified(pModel->GetIndexDefinition(index).eType),
 	m_iFrameIndex(-1)
 {
-	if(pModel->GetOwner().GetWidget() == nullptr)
+	if(pModel->GetProjItem()->GetWidget() == nullptr)
 	{
 		HyGuiLog("EntityUndoCmd_PropertyModified - EntityWidget was nullptr", LOGTYPE_Error);
 		return;
 	}
 	
-	EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(pModel->GetOwner().GetWidget()->GetCurStateData())->GetDopeSheetScene();
+	EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(pModel->GetProjItem()->GetWidget()->GetCurStateData())->GetDopeSheetScene();
 
 	if(pModel->GetSubstate().value<EntityTreeItemData *>() == nullptr) // Indicates a multi-model
 	{
@@ -1375,7 +1375,7 @@ EntityUndoCmd_PropertyModified::EntityUndoCmd_PropertyModified(PropertiesTreeMod
 	else
 		m_EntityTreeItemDataList.push_back(pModel->GetSubstate().value<EntityTreeItemData *>());
 
-	m_iStateIndex = pModel->GetOwner().GetWidget()->GetCurStateIndex();
+	m_iStateIndex = pModel->GetProjItem()->GetWidget()->GetCurStateIndex();
 	m_iFrameIndex = dopeSheetSceneRef.IsCtor() ? -1 : dopeSheetSceneRef.GetCurrentFrame();
 
 	for(EntityTreeItemData *pEntityTreeData : m_EntityTreeItemDataList)
@@ -1402,7 +1402,7 @@ EntityUndoCmd_PropertyModified::EntityUndoCmd_PropertyModified(PropertiesTreeMod
 			// Checking this item, extrapolate what the new data should be if possible
 			if(m_CatPropPair.second.isEmpty() == false) // Is NOT category (is property)
 			{
-				QList<IDrawExItem *> drawItemList = static_cast<EntityDraw *>(pModel->GetOwner().GetDraw())->GetDrawItemList();
+				QList<IDrawExItem *> drawItemList = static_cast<EntityDraw *>(pModel->GetProjItem()->GetDraw())->GetDrawItemList();
 				for(IDrawExItem *pDrawItem : drawItemList)
 				{
 					EntityDrawItem *pEntDrawItem = static_cast<EntityDrawItem *>(pDrawItem);

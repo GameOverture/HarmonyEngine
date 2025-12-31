@@ -215,7 +215,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
 		ItemType eItemType = static_cast<ItemType>(propDefRef.delegateBuilder.toInt());
 		PropertiesTreeModel *pModel = static_cast<PropertiesTreeModel *>(m_pTableView->model());
-		const QMap<QUuid, TreeModelItemData *> &projItemMapRef = pModel->GetOwner().GetProject().GetItemMap();
+		const QMap<QUuid, TreeModelItemData *> &projItemMapRef = pModel->GetProjItem()->GetProject().GetItemMap();
 		QList<ProjectItemData *> validItemList;
 		for(auto iter = projItemMapRef.keyValueBegin(); iter != projItemMapRef.keyValueEnd(); ++iter)
 		{
@@ -238,7 +238,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		connect(static_cast<QComboBox *>(pReturnWidget), SIGNAL(currentIndexChanged(int)), this, SLOT(OnComboBoxEditorSubmit(int)));
 
 		PropertiesTreeModel *pModel = static_cast<PropertiesTreeModel *>(m_pTableView->model());
-		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pModel->GetOwner().GetProject().FindItemData(propDefRef.delegateBuilder.toUuid()));
+		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pModel->GetProjItem()->GetProject().FindItemData(propDefRef.delegateBuilder.toUuid()));
 		if(pProjItem)
 			static_cast<QComboBox *>(pReturnWidget)->setModel(pProjItem->GetModel());
 		if(propDefRef.defaultData.isValid())
@@ -276,7 +276,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			if(origValue != newValue)
 			{
 				QUndoCommand *pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
-				pPropertiesTreeModel->GetOwner().GetUndoStack()->push(pUndoCmd);
+				pPropertiesTreeModel->GetProjItem()->GetUndoStack()->push(pUndoCmd);
 			}
 		}
 		break; }
@@ -286,7 +286,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		static_cast<QSlider *>(pReturnWidget)->setSingleStep(1);
 
 		PropertiesTreeModel *pModel = static_cast<PropertiesTreeModel *>(m_pTableView->model());
-		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pModel->GetOwner().GetProject().FindItemData(propDefRef.delegateBuilder.toUuid()));
+		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pModel->GetProjItem()->GetProject().FindItemData(propDefRef.delegateBuilder.toUuid()));
 		if(pProjItem)
 		{
 			int iCurrentState = pModel->FindPropertyValue("Common", "State").toInt();
@@ -311,7 +311,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		init.m_FrameColor = panelObj["frameColor"].toVariant().toUInt();
 		init.m_TertiaryColor = panelObj["tertiaryColor"].toVariant().toUInt();
 
-		Project &projectRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetOwner().GetProject();
+		Project &projectRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetProjItem()->GetProject();
 		DlgSetUiPanel *pDlg = new DlgSetUiPanel(projectRef, "Setup Widget Panel", init, QUuid(panelObj["nodeUuid"].toString()), pParent);
 		if(pDlg->exec() == QDialog::Accepted)
 		{
@@ -319,7 +319,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			if(origValue != newValue)
 			{
 				QUndoCommand *pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
-				pPropertiesTreeModel->GetOwner().GetUndoStack()->push(pUndoCmd);
+				pPropertiesTreeModel->GetProjItem()->GetUndoStack()->push(pUndoCmd);
 			}
 		}
 		break; }
@@ -444,7 +444,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	if(origValue != newValue)
 	{
 		pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
-		pPropertiesTreeModel->GetOwner().GetUndoStack()->push(pUndoCmd);
+		pPropertiesTreeModel->GetProjItem()->GetUndoStack()->push(pUndoCmd);
 	}
 
 	// Select the name column after editing to force the editor to close

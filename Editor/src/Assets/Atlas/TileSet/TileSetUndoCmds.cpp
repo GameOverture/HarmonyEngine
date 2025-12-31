@@ -275,6 +275,9 @@ TileSetUndoCmd_AddWgtItem::TileSetUndoCmd_AddWgtItem(AuxTileSet &auxTileSetRef, 
 	case TILESETWGT_Terrain:
 		setText("Add Terrain");
 		break;
+	case TILESETWGT_Collision:
+		setText("Add Collision");
+		break;
 			
 	default:
 		HyGuiLog("TileSetUndoCmd_AddWgtItem() - Unknown TileSetWgtType.", LOGTYPE_Error);
@@ -300,6 +303,9 @@ TileSetUndoCmd_AddWgtItem::TileSetUndoCmd_AddWgtItem(AuxTileSet &auxTileSetRef, 
 	case TILESETWGT_Terrain:
 		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
 		break;
+	case TILESETWGT_Collision:
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Collision);
+		break;
 
 	default:
 		HyGuiLog("TileSetUndoCmd_AddWgtItem::redo() - Unknown TileSetWgtType.", LOGTYPE_Error);
@@ -320,6 +326,9 @@ TileSetUndoCmd_AddWgtItem::TileSetUndoCmd_AddWgtItem(AuxTileSet &auxTileSetRef, 
 	case TILESETWGT_TerrainSet:
 	case TILESETWGT_Terrain:
 		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+		break;
+	case TILESETWGT_Collision:
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Collision);
 		break;
 
 	default:
@@ -354,6 +363,9 @@ TileSetUndoCmd_RemoveWgtItem::TileSetUndoCmd_RemoveWgtItem(AuxTileSet &auxTileSe
 	case TILESETWGT_Terrain:
 		setText("Remove Terrain");
 		break;
+	case TILESETWGT_Collision:
+		setText("Remove Collision");
+		break;
 
 	default:
 		HyGuiLog("TileSetUndoCmd_RemoveWgtItem() - Unknown TileSetWgtType.", LOGTYPE_Error);
@@ -378,6 +390,9 @@ TileSetUndoCmd_RemoveWgtItem::TileSetUndoCmd_RemoveWgtItem(AuxTileSet &auxTileSe
 	case TILESETWGT_Terrain:
 		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
 		break;
+	case TILESETWGT_Collision:
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Collision);
+		break;
 
 	default:
 		HyGuiLog("TileSetUndoCmd_RemoveWgtItem::redo() - Unknown TileSetWgtType.", LOGTYPE_Error);
@@ -398,6 +413,9 @@ TileSetUndoCmd_RemoveWgtItem::TileSetUndoCmd_RemoveWgtItem(AuxTileSet &auxTileSe
 	case TILESETWGT_TerrainSet:
 	case TILESETWGT_Terrain:
 		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Autotile);
+		break;
+	case TILESETWGT_Collision:
+		m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Collision);
 		break;
 
 	default:
@@ -437,6 +455,10 @@ TileSetUndoCmd_OrderWgtItem::TileSetUndoCmd_OrderWgtItem(AuxTileSet &auxTileSetR
 	case TILESETWGT_Terrain:
 		setText("Reorder Terrain");
 		m_ePage = TILESETPAGE_Autotile;
+		break;
+	case TILESETWGT_Collision:
+		setText("Reorder Collision");
+		m_ePage = TILESETPAGE_Collision;
 		break;
 	
 	default:
@@ -489,6 +511,9 @@ TileSetUndoCmd_ModifyWgtItem::TileSetUndoCmd_ModifyWgtItem(AuxTileSet &auxTileSe
 		break;
 	case TILESETWGT_Terrain:
 		m_ePage = TILESETPAGE_Autotile;
+		break;
+	case TILESETWGT_Collision:
+		m_ePage = TILESETPAGE_Collision;
 		break;
 	
 	default:

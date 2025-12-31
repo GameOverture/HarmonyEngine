@@ -13,6 +13,8 @@
 #include "AuxTileSet.h"
 #include "TileData.h"
 #include "TileSetUndoCmds.h"
+#include "DlgCollisionFilter.h"
+#include "DlgSurfaceMaterials.h"
 
 #include <QPushButton>
 #include <QColorDialog>
@@ -20,7 +22,7 @@
 WgtTileSetCollision::WgtTileSetCollision(AuxTileSet *pAuxTileSet, QJsonObject initObj, QWidget *pParent /*= nullptr*/) :
 	IWgtTileSetItem(TILESETWGT_Animation, initObj, pAuxTileSet, pParent),
 	ui(new Ui::WgtTileSetCollision),
-	m_bPaintingTiles(false)
+	m_CachedB2Filter(b2DefaultFilter())
 {
 	ui->setupUi(this);
 
@@ -38,24 +40,26 @@ WgtTileSetCollision::~WgtTileSetCollision()
 
 /*virtual*/ void WgtTileSetCollision::OnInit(QJsonObject serializedObj) /*override*/
 {
-	ui->txtName->setText(serializedObj["name"].toString());
-	SetButtonColor(ui->btnColor, HyColor(serializedObj["color"].toVariant().toLongLong()));
-	QJsonArray framesArray = serializedObj["frames"].toArray();
-	for(QJsonValue frameVal : framesArray)
-	{
-		QString sTileDataUuid = frameVal.toString();
-		TileData *pTileData = m_pAuxTileSet->GetTileSet()->FindTileData(QUuid(sTileDataUuid));
-		if(pTileData)
-			m_FrameList.append(pTileData);
-		else
-			HyGuiLog("WgtTileSetCollision::OnInit: Could not find TileData for frame UUID " + sTileDataUuid, LOGTYPE_Error);
-	}
-	
-	ui->sbFrameRate->setValue(static_cast<float>(serializedObj["frameDuration"].toDouble(0.0333)));
-	ui->chkStartRandom->setChecked(serializedObj["startAtRandomFrame"].toBool());
+	QJsonObject filterObj = serializedObj["filter"].toObject();
 
-	ui->lblNumFrames->setEnabled(m_FrameList.size() != 0);
-	ui->lblNumFrames->setText("Num Frames: " + QString::number(m_FrameList.size()));
+	m_CachedB2Filter.categoryBits = static_cast<uint64_t>(filterObj["categoryBits"].toVariant().toLongLong());
+	m_CachedB2Filter.maskBits = static_cast<uint64_t>(filterObj["maskBits"].toVariant().toLongLong());
+	m_CachedB2Filter.groupIndex = static_cast<int32>(filterObj["groupIndex"].toInt());
+
+	QString sFilterText = "Category: " + QString::number(m_CachedB2Filter.categoryBits) +
+						  " | Mask: " + QString::number(m_CachedB2Filter.maskBits) +
+						  " | Group: " + QString::number(m_CachedB2Filter.groupIndex);
+	ui->txtFilter->setText(sFilterText);
+
+	m_SurfaceMaterialUuid = QUuid(serializedObj["surfaceMaterialUUID"].toString());
+	QString sSurfaceMatName;
+	HyColor surfaceMatColor;
+	m_pAuxTileSet->GetTileSet()->GetProject().GetSurfaceMaterialInfo(m_SurfaceMaterialUuid, sSurfaceMatName, surfaceMatColor);
+
+	ui->txtMatName->setText(sSurfaceMatName);
+	SetButtonColor(ui->btnMatColor, surfaceMatColor);
+	
+	ui->chkIsSensor->setChecked(serializedObj["isSensor"].toBool());
 }
 
 /*virtual*/ QJsonObject WgtTileSetCollision::SerializeCurrentWidgets() /*override*/
@@ -63,17 +67,16 @@ WgtTileSetCollision::~WgtTileSetCollision()
 	QJsonObject serializedJsonObj;
 
 	serializedJsonObj["UUID"] = m_Uuid.toString(QUuid::WithoutBraces);
-	serializedJsonObj["name"] = ui->txtName->text();
-	HyColor btnColor(ui->btnColor->palette().button().color().red(),
-					 ui->btnColor->palette().button().color().green(),
-					 ui->btnColor->palette().button().color().blue());
-	serializedJsonObj["color"] = static_cast<qint64>(btnColor.GetAsHexCode());
-	QJsonArray framesArray;
-	for(TileData *pFrameTileData : m_FrameList)
-		framesArray.append(pFrameTileData->GetUuid().toString(QUuid::WithoutBraces));
-	serializedJsonObj["frames"] = framesArray;
-	serializedJsonObj["frameDuration"] = ui->sbFrameRate->value();
-	serializedJsonObj["startAtRandomFrame"] = ui->chkStartRandom->isChecked();
+
+	QJsonObject filterObj;
+	filterObj["categoryBits"] = static_cast<qint64>(m_CachedB2Filter.categoryBits);
+	filterObj["maskBits"] = static_cast<qint64>(m_CachedB2Filter.maskBits);
+	filterObj["groupIndex"] = static_cast<int>(m_CachedB2Filter.groupIndex);
+	serializedJsonObj["filter"] = filterObj;
+	
+	serializedJsonObj["surfaceMaterialUUID"] = m_SurfaceMaterialUuid.toString(QUuid::WithoutBraces);
+
+	serializedJsonObj["isSensor"] = ui->chkIsSensor->isChecked();
 
 	return serializedJsonObj;
 }
@@ -82,16 +85,6 @@ void WgtTileSetCollision::SetOrderBtns(bool bUpEnabled, bool bDownEnabled)
 {
 	ui->actionUpward->setEnabled(bUpEnabled);
 	ui->actionDownward->setEnabled(bDownEnabled);
-}
-
-QString WgtTileSetCollision::GetName() const
-{
-	return ui->txtName->text();
-}
-
-bool WgtTileSetCollision::IsPaintingTiles() const
-{
-	return m_bPaintingTiles;
 }
 
 /*virtual*/ QFrame *WgtTileSetCollision::GetBorderFrame() const /*override*/
@@ -121,92 +114,39 @@ void WgtTileSetCollision::on_actionDownward_triggered()
 
 void WgtTileSetCollision::on_txtName_editingFinished()
 {
-	OnModifyWidget("Animation Name", -1);
+	
 }
 
-void WgtTileSetCollision::on_btnColor_clicked()
+void WgtTileSetCollision::on_btnSetFilter_clicked()
 {
-	QColorDialog colorDlg;
-	colorDlg.setCurrentColor(ui->btnColor->palette().button().color());
-	if (colorDlg.exec() == QDialog::Accepted)
+	DlgCollisionFilter dlg(m_pAuxTileSet->GetTileSet()->GetProject(), m_CachedB2Filter);
+	if(dlg.exec() == QDialog::Accepted)
 	{
-		QColor newColor = colorDlg.selectedColor();
-		ui->btnColor->setPalette(QPalette(newColor));
-		OnModifyWidget("Animation Color", -1);
+		m_CachedB2Filter = dlg.GetB2Filter();
+		QString sFilterText = "Category: " + QString::number(m_CachedB2Filter.categoryBits) +
+							  " | Mask: " + QString::number(m_CachedB2Filter.maskBits) +
+							  " | Group: " + QString::number(m_CachedB2Filter.groupIndex);
+		ui->txtFilter->setText(sFilterText);
+		OnModifyWidget("Collision Layer Filter", -1);
 	}
 }
 
-void  WgtTileSetCollision::on_btnFramePreview_clicked()
+void WgtTileSetCollision::on_btnSetMat_clicked()
 {
-	if(m_bPaintingTiles == false)
+	DlgSurfaceMaterials dlg(*m_pAuxTileSet->GetTileSet()->GetProject().GetSurfaceMaterialsModel());
+	if(dlg.exec() == QDialog::Accepted)
 	{
-		ui->btnFramePreview->setText("Select Tiles...");
-		m_bPaintingTiles = true;
-
-		m_pAuxTileSet->SetPainting_Animation(m_Uuid);
-	}
-	else
-	{
-		QMap<TileData *, TileSetGfxItem *> selectedTilesMap = m_pAuxTileSet->GetTileSet()->GetGfxScene()->GetSelectedSetupTiles();
-		QList<TileData *> selectedTileDataList = selectedTilesMap.keys();
-
-		// Determine if selectedTileDataList differs from m_FrameList
-		bool bListsDiffer = false;
-		if(selectedTileDataList.size() != m_FrameList.size())
-			bListsDiffer = true;
-		else
-		{
-			for(int i = 0; i < selectedTileDataList.size(); ++i)
-			{
-				if(selectedTileDataList[i] != m_FrameList[i])
-				{
-					bListsDiffer = true;
-					break;
-				}
-			}
-		}
-		
-		if(bListsDiffer)
-		{
-			m_FrameList = selectedTileDataList;
-			OnModifyWidget("Animation Frames", -1);
-		}
-
-		m_bPaintingTiles = false;
+		m_SurfaceMaterialUuid = dlg.GetSelectedMaterialUuid();
+		QString sSurfaceMatName;
+		HyColor surfaceMatColor;
+		m_pAuxTileSet->GetTileSet()->GetProject().GetSurfaceMaterialInfo(m_SurfaceMaterialUuid, sSurfaceMatName, surfaceMatColor);
+		ui->txtMatName->setText(sSurfaceMatName);
+		SetButtonColor(ui->btnMatColor, surfaceMatColor);
+		OnModifyWidget("Collision Layer Surface Material", -1);
 	}
 }
 
-void WgtTileSetCollision::on_btnHz10_clicked()
+void WgtTileSetCollision::on_chkIsSensor_toggled(bool bChecked)
 {
-	ui->sbFrameRate->setValue(1.0 / 10.0);
-}
-
-void WgtTileSetCollision::on_btnHz20_clicked()
-{
-	ui->sbFrameRate->setValue(1.0 / 20.0);
-}
-
-void WgtTileSetCollision::on_btnHz30_clicked()
-{
-	ui->sbFrameRate->setValue(1.0 / 30.0);
-}
-
-void WgtTileSetCollision::on_btnHz40_clicked()
-{
-	ui->sbFrameRate->setValue(1.0 / 40.0);
-}
-
-void WgtTileSetCollision::on_btnHz60_clicked()
-{
-	ui->sbFrameRate->setValue(1.0 / 60.0);
-}
-
-void WgtTileSetCollision::on_sbFrameRate_valueChanged(double dNewValue)
-{
-	OnModifyWidget("Animation Frame Rate", MERGABLEUNDOCMD_TileSetAnimFrameRate);
-}
-
-void WgtTileSetCollision::on_chkStartRandom_toggled(bool bChecked)
-{
-	OnModifyWidget("Animation Start At Random", -1);
+	OnModifyWidget("Collision Layer Is Sensor", -1);
 }

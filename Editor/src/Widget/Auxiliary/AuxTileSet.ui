@@ -206,7 +206,7 @@
        <item>
         <widget class="QStackedWidget" name="setupStackedWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>4</number>
          </property>
          <widget class="QWidget" name="setupStackedWidgetPage1">
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -677,7 +677,50 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="setupStackedWidgetPage5"/>
+         <widget class="QWidget" name="setupStackedWidgetPage5">
+          <layout class="QVBoxLayout" name="verticalLayout_12">
+           <item>
+            <spacer name="verticalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>176</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="lytCollisions"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnAddCollision">
+             <property name="text">
+              <string>Add Collision</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../../data/HyEditor.qrc">
+               <normaloff>:/icons16x16/generic-add.png</normaloff>:/icons16x16/generic-add.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>176</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
          <widget class="QWidget" name="setupStackedWidgetPage6"/>
         </widget>
        </item>

@@ -25,7 +25,7 @@ TextLayerHandle TextFontManager::sm_hHandleCount = 0;
 
 TextFontManager::TextFontManager(ProjectItemData &itemRef, QJsonObject availGlyphsObj, QJsonArray fontArray) :
 	m_FontArray(fontArray),
-	m_GlyphsModel(itemRef, 0, TEXTGLYPHS_SubStateId, nullptr),
+	m_GlyphsModel(&itemRef, 0, TEXTGLYPHS_SubStateId, nullptr),
 	m_pPreviewAtlas(nullptr),
 	m_pPreviewAtlasPixelData(nullptr),
 	m_uiPreviewAtlasBufferSize(0),
@@ -292,7 +292,7 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 
 void TextFontManager::SetAtlasGroup(quint32 uiBankId)
 {
-	AtlasModel &atlasModelRef = m_GlyphsModel.GetOwner().GetProject().GetAtlasModel();
+	AtlasModel &atlasModelRef = m_GlyphsModel.GetProjItem()->GetProject().GetAtlasModel();
 	m_GlyphsModel.SetPropertyValue("Atlas Info", TEXTPROP_AtlasGroup, atlasModelRef.GetBankName(atlasModelRef.GetBankIndexFromBankId(uiBankId)));
 }
 
@@ -502,7 +502,7 @@ int TextFontManager::DoesFontExist(QString sFontName, rendermode_t eRenderMode, 
 
 QString TextFontManager::GetFontPathFromName(QString sFontName)
 {
-	const QStandardItemModel *pProjectFontsModel = m_GlyphsModel.GetOwner().GetProject().GetFontListModel();
+	const QStandardItemModel *pProjectFontsModel = m_GlyphsModel.GetProjItem()->GetProject().GetFontListModel();
 	int iNumFonts = pProjectFontsModel->rowCount();
 	QString sFontPath;
 	for(int i = 0; i < iNumFonts; ++i)
@@ -727,7 +727,7 @@ void TextFontManager::RegenFontArray()
 		fontArray.append(QJsonValue(stageObj));
 	}
 
-	static_cast<TextModel *>(m_GlyphsModel.GetOwner().GetModel())->SetRuntimeAtlasDirty();
+	static_cast<TextModel *>(m_GlyphsModel.GetProjItem()->GetModel())->SetRuntimeAtlasDirty();
 
 	m_FontArray = fontArray;
 }

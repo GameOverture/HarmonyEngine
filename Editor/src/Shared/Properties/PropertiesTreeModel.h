@@ -115,17 +115,17 @@ class PropertiesTreeModel : public ITreeModel
 {
 	Q_OBJECT
 
-	ProjectItemData &							m_OwnerRef;
+	ProjectItemData *							m_pProjItemData;
 	const int									m_iSTATE_INDEX;
 	const QVariant								m_iSUBSTATE;
 
 	QMap<TreeModelItem *, PropertiesDef>		m_PropertyDefMap;
 
 public:
-	explicit PropertiesTreeModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QObject *pParent = nullptr);
+	explicit PropertiesTreeModel(ProjectItemData *pProjItemData, int iStateIndex, QVariant subState, QObject *pParent = nullptr);
 	virtual ~PropertiesTreeModel();
 
-	ProjectItemData &GetOwner();
+	ProjectItemData *GetProjItem();
 	int GetStateIndex() const;
 	const QVariant &GetSubstate() const;
 
@@ -181,7 +181,7 @@ public:
 	QList<QPair<QString, QString>> GetPropertiesList() const; // Returns a list of all properties in the form of (category, property) pairs
 	void RemoveAllCategoryProperties();
 
-	QJsonObject SerializeJson();
+	QJsonObject SerializeJson() const;
 	void DeserializeJson(const QJsonObject &propertiesObj);
 
 	void ResetValues(); // Sets all values to their default values

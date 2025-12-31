@@ -15,11 +15,13 @@
 #include "ProjectItemData.h"
 #include "ExplorerItemData.h"
 #include "DlgProjectSettings.h"
+#include "SurfaceMaterialsModel.h"
 #include "IMimeData.h"
 
 #include <QQueue>
 #include <QJsonObject>
 #include <QStandardItemModel>
+#include <QStringListModel>
 #include <QFileSystemWatcher>
 
 // Forward declaration
@@ -69,6 +71,9 @@ class Project : public ExplorerItemData
 	ManagerWidget *										m_pAudioWidget;
 
 	QStandardItemModel									m_FontListModel;
+
+	QStringListModel									m_CollisionFilterModel;
+	SurfaceMaterialsModel								m_SurfaceMaterialsModel;
 
 	ProjectTabBar *										m_pTabBar;
 	ProjectItemData *									m_pCurOpenItem;
@@ -134,6 +139,12 @@ public:
 	QStandardItemModel *GetFontListModel();
 	void ScanMetaFontDir();
 
+	QStringListModel *GetCollisionFilterModel();
+	void SetCollisionFilter(int iIndex, QString sNewName);
+
+	SurfaceMaterialsModel *GetSurfaceMaterialsModel();
+	void GetSurfaceMaterialInfo(QUuid uuid, QString &sNameOut, HyColor &colorOut);
+
 	ProjectTabBar *GetTabBar();
 	ProjectItemData *GetCurrentOpenItem();
 
@@ -197,8 +208,9 @@ private:
 	QJsonObject ReadProjFile();
 	void WriteGameData();
 	void WriteMetaData();
-
-	bool LoadDataObj(QString sFilePath, QJsonObject &dataObjRef);	// Return 'true' if the data obj needs to save to disk
+	bool LoadDataObj(QString sFilePath, QJsonObject &dataObjRef);
+	bool LoadPhysicsData();
+	void WritePhysicsData();
 	void DeleteItemInDataObj(ItemType eType, QString sPath, QJsonObject &dataObjRef);
 	void RenameItemInDataObj(ItemType eType, QString sOldPath, QString sNewPath, QJsonObject &dataObjRef);
 	void RenamePrefixInDataObj(QString sOldPath, QString sNewPath, QJsonObject &dataObjRef);

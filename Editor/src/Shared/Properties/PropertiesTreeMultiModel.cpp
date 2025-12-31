@@ -11,7 +11,7 @@
 #include "PropertiesTreeMultiModel.h"
 
 PropertiesTreeMultiModel::PropertiesTreeMultiModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, const QList<PropertiesTreeModel *> &multiModelListRef, QObject *pParent /*= nullptr*/) :
-	PropertiesTreeModel(ownerRef, iStateIndex, subState, pParent)
+	PropertiesTreeModel(&ownerRef, iStateIndex, subState, pParent)
 {
 	Setup(multiModelListRef);
 }

@@ -130,7 +130,7 @@ void IModel::MoveStateBack(int iStateIndex)
 
 void IModel::MoveStateForward(int iStateIndex)
 {
-	if(beginMoveRows(QModelIndex(), iStateIndex, iStateIndex, QModelIndex(), iStateIndex + 2) == false)    // + 2 is here because Qt is retarded
+	if(beginMoveRows(QModelIndex(), iStateIndex, iStateIndex, QModelIndex(), iStateIndex + 2) == false)
 		return;
 
 	m_StateList.swapItemsAt(iStateIndex, iStateIndex + 1);

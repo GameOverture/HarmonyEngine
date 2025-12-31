@@ -253,7 +253,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef, float fExtrapolatePercent)
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Process any entities that requested a assemble step
+	// Process any entities that requested an assemble step
 	uint32 uiTotalPrepEnts = static_cast<uint32>(sm_NodeList_AssembleEnts2d.size());
 	for(uint32 i = 0; i < uiTotalPrepEnts; ++i)
 		sm_NodeList_AssembleEnts2d[i]->Assemble();

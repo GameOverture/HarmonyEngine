@@ -186,9 +186,12 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 		m_FontListModel.appendRow(pFontItem);
 	}
 
+	ScanMetaFontDir();
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	QObject::connect(&m_OpenFileWatcher, SIGNAL(fileChanged(const QString &)), this, SLOT(OnFileChanged(const QString &)));
 
-	ScanMetaFontDir();
 	HyGlobal::CleanAllTempDirs(*this);
 }
 
@@ -221,11 +224,29 @@ void Project::LoadExplorerModel()
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Initialize 'm_ProjectFileData' from the project files on disk
-	if(LoadDataObj(GetMetaAbsPath() % HYGUIPATH_ItemsFileName % HYGUIPATH_MetaExt, m_ProjectFileData.m_Meta))
+	if(LoadDataObj(GetMetaAbsPath() % HYGUIPATH_ItemsFileName % HYGUIPATH_MetaExt, m_ProjectFileData.m_Meta) == false)
 		WriteMetaData();
 
-	if(LoadDataObj(GetAssetsAbsPath() % HYASSETS_DataFile, m_ProjectFileData.m_Data))
+	if(LoadDataObj(GetAssetsAbsPath() % HYASSETS_DataFile, m_ProjectFileData.m_Data) == false)
 		WriteGameData();
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Load physics meta data
+	if(LoadPhysicsData() == false)
+	{
+		// Create default physics meta file
+		QStringList collisionFilterList;
+		for(int i = 0; i < 64; ++i)
+			collisionFilterList << "Layer " % QString::number(i + 1);
+		collisionFilterList[0] = "Static"; // These are the example defaults listed in the Box2d manual
+		collisionFilterList[1] = "Dynamic";
+		collisionFilterList[2] = "Debris";
+		collisionFilterList[3] = "Player";
+		m_CollisionFilterModel.setStringList(collisionFilterList);
+
+		WritePhysicsData();
+	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	bool bSystemFontFound = false;
@@ -696,6 +717,41 @@ void Project::ScanMetaFontDir()
 	}
 }
 
+QStringListModel *Project::GetCollisionFilterModel()
+{
+	return &m_CollisionFilterModel;
+}
+
+void Project::SetCollisionFilter(int iIndex, QString sNewName)
+{
+	if(iIndex < 0 || iIndex >= m_CollisionFilterModel.stringList().size())
+		return;
+	QStringList filterList = m_CollisionFilterModel.stringList();
+	filterList[iIndex] = sNewName;
+	m_CollisionFilterModel.setStringList(filterList);
+	WritePhysicsData();
+}
+
+SurfaceMaterialsModel *Project::GetSurfaceMaterialsModel()
+{
+	return &m_SurfaceMaterialsModel;
+}
+
+void Project::GetSurfaceMaterialInfo(QUuid uuid, QString &sNameOut, HyColor &colorOut)
+{
+	for(int i = 0; i < m_SurfaceMaterialsModel.rowCount(); ++i)
+	{
+		if(m_SurfaceMaterialsModel.GetUuid(i) == uuid)
+		{
+			m_SurfaceMaterialsModel.GetInfo(i, sNameOut, colorOut);
+			return;
+		}
+	}
+	
+	sNameOut = "Not Set";
+	colorOut = HyColor::Black;
+}
+
 ProjectTabBar *Project::GetTabBar()
 {
 	return m_pTabBar;
@@ -810,7 +866,6 @@ void Project::DeleteItemData(ItemType eType, QString sPath, bool bWriteToDisk)
 	}
 }
 
-// Return 'true' if the data obj needs to save to disk
 bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
 {
 	QFile dataFile(sFilePath);
@@ -820,7 +875,7 @@ bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
 		{
 			HyGuiLog("Project::LoadDataObj() could not open " % m_sName % "'s " % QFileInfo(sFilePath).fileName() % " file for project: " % dataFile.errorString(), LOGTYPE_Error);
 			m_bHasError = true;
-			return false; // Don't write with invalid object
+			return true; // Don't write with invalid object
 		}
 
 		QJsonDocument userDoc = QJsonDocument::fromJson(dataFile.readAll());
@@ -842,7 +897,71 @@ bool Project::LoadDataObj(QString sFilePath, QJsonObject &dataObjRef)
 		}
 	}
 
-	return dataFile.exists() == false || bTypeNotFound;
+	return !(dataFile.exists() == false || bTypeNotFound);
+}
+
+bool Project::LoadPhysicsData()
+{
+	QFile physicsMetaFile(GetMetaAbsPath() % HYGUIPATH_PhysicsFileName % HYGUIPATH_MetaExt);
+	if(physicsMetaFile.exists())
+	{
+		if(!physicsMetaFile.open(QIODevice::ReadOnly))
+		{
+			HyGuiLog("Project::LoadDataObj() could not open meta physics file for project: " % GetTitle(), LOGTYPE_Error);
+			m_bHasError = true;
+			return false;
+		}
+
+		QJsonDocument userDoc = QJsonDocument::fromJson(physicsMetaFile.readAll());
+		physicsMetaFile.close();
+
+		QJsonObject physicsObj = userDoc.object();
+		QJsonArray filtersArray = physicsObj["filters"].toArray();
+		QStringList sFilterList;
+		for(int i = 0; i < filtersArray.size(); ++i)
+			sFilterList.append(filtersArray[i].toString());
+		m_CollisionFilterModel.setStringList(sFilterList);
+
+		QJsonArray surfaceMaterialArray = physicsObj["surfaceMaterials"].toArray();
+		m_SurfaceMaterialsModel.Initialize(surfaceMaterialArray);
+
+		return true;
+	}
+
+	return false;
+}
+
+void Project::WritePhysicsData()
+{
+	QJsonObject physicsObj;
+	physicsObj.insert("$fileVersion", HYGUI_FILE_VERSION);
+
+	QJsonArray filterArray;
+	for(QString sFilterName : m_CollisionFilterModel.stringList())
+		filterArray.append(sFilterName);
+	physicsObj.insert("filters", filterArray);
+
+	QJsonArray surfaceMaterialArray = m_SurfaceMaterialsModel.Serialize();
+	physicsObj.insert("surfaceMaterials", surfaceMaterialArray);
+
+	QFile physicsMetaFile(GetMetaAbsPath() % HYGUIPATH_PhysicsFileName % HYGUIPATH_MetaExt);
+	if(physicsMetaFile.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+		HyGuiLog(QString("Couldn't open ") % HYGUIPATH_PhysicsFileName % HYGUIPATH_MetaExt % " for writing: " % physicsMetaFile.errorString(), LOGTYPE_Error);
+	else
+	{
+		QJsonDocument physicsDoc;
+		physicsDoc.setObject(physicsObj);
+#ifdef HYGUI_UseBinaryMetaFiles
+		qint64 iBytesWritten = physicsMetaFile.write(physicsDoc.toBinaryData());
+#else
+		qint64 iBytesWritten = physicsMetaFile.write(physicsDoc.toJson());
+#endif
+		if(0 == iBytesWritten || -1 == iBytesWritten) {
+			HyGuiLog("Could not write to physics meta data file: " % physicsMetaFile.errorString(), LOGTYPE_Error);
+		}
+
+		physicsMetaFile.close();
+	}
 }
 
 void Project::DeleteItemInDataObj(ItemType eType, QString sPath, QJsonObject &dataObjRef)

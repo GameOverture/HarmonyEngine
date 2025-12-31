@@ -44,7 +44,7 @@ void PrefabStateData::Refresh()
 
 PrefabModel::PrefabModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
-	m_PropertiesModel(itemRef, 0, 0, this)
+	m_PropertiesModel(&itemRef, 0, 0, this)
 {
 	//// Ensure the destination directory exists (<DataDir>/Prefabs/<prefix>/)
 	//QDir dataDir(itemRef.GetProject().GetAssetsAbsPath() % HyGlobal::ItemName(ITEM_Prefab, true));

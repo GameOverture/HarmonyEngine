@@ -51,6 +51,32 @@ class Project;
 
 #define DEFAULT_GRID_SIZE 25.0f
 
+#define HYGUIPATH_TempDir						"temp/"
+#define HYGUIPATH_TEMPSUBDIR_SpriteSheets		"SpriteSheets"
+#define HYGUIPATH_TEMPSUBDIR_PasteAssets		"PasteAssets"
+
+#define HYGUIPATH_EditorDataDir					"Editor/data/"
+#define HYGUIPATH_ProjGenDir					"Editor/data/_projGen/"
+#define HYGUIPATH_AstcEncDir					"Editor/external/astcenc/"
+
+#define HYGUIPATH_ItemsFileName					"Items"
+#define HYGUIPATH_PhysicsFileName				"Physics"
+#define HYGUIPATH_MetaExt						".meta"
+#define HYGUIPATH_DataExt						".data"
+#define HYGUIPATH_UserExt						".user"
+#define HYGUIPATH_BuildExt						".build"
+
+#define HYMETA_FontsDir							"Fonts/"
+
+#define HYMETA_ImageFilterList					{"*.png", "*.*"}
+#define HYMETA_FontFilterList					{"*.ttf", "*.otf"}
+
+#define FINDACTION(str) FindAction(this->actions(), str)
+
+#define HyGuiLog(msg, type) AuxOutputLog::Log(QString(msg), type)
+
+#define JSONOBJ_TOINT(obj, key) obj.value(key).toVariant().toLongLong()
+
 enum ItemType
 {
 	ITEM_Unknown = -2,
@@ -225,7 +251,8 @@ enum TileSetWgtType
 
 	TILESETWGT_Animation,
 	TILESETWGT_TerrainSet,
-	TILESETWGT_Terrain
+	TILESETWGT_Terrain,
+	TILESETWGT_Collision,
 };
 
 enum AutoTileType
@@ -419,32 +446,7 @@ enum EntityItemDeclarationType
 };
 const QString ENTITYITEMDECLARATIONTYPE_STRINGS[NUM_ENTDECLTYPES] = { "Static", "Dynamic", "DynamicLeaked" };
 
-#define HYGUIPATH_TempDir						"temp/"
-#define HYGUIPATH_TEMPSUBDIR_SpriteSheets		"SpriteSheets"
-#define HYGUIPATH_TEMPSUBDIR_PasteAssets		"PasteAssets"
-
-#define HYGUIPATH_EditorDataDir					"Editor/data/"
-#define HYGUIPATH_ProjGenDir					"Editor/data/_projGen/"
-#define HYGUIPATH_AstcEncDir					"Editor/external/astcenc/"
-
-#define HYGUIPATH_ItemsFileName					"Items"
-#define HYGUIPATH_MetaExt						".meta"
-#define HYGUIPATH_DataExt						".data"
-#define HYGUIPATH_UserExt						".user"
-#define HYGUIPATH_BuildExt						".build"
-
-#define HYMETA_FontsDir							"Fonts/"
-
-#define HYMETA_ImageFilterList					{"*.png", "*.*"}
-#define HYMETA_FontFilterList					{"*.ttf", "*.otf"}
-
 QAction *FindAction(QList<QAction *> list, QString sName);
-#define FINDACTION(str) FindAction(this->actions(), str)
-
-#define HyGuiLog(msg, type) AuxOutputLog::Log(QString(msg), type)
-
-#define JSONOBJ_TOINT(obj, key) obj.value(key).toVariant().toLongLong()
-
 QString PointToQString(QPointF ptPoint);
 QPointF StringToPoint(QString sPoint);
 QByteArray JsonValueToSrc(QJsonValue value);

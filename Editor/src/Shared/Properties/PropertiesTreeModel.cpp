@@ -15,9 +15,9 @@
 #include "SpriteModels.h"
 #include "MainWindow.h"
 
-PropertiesTreeModel::PropertiesTreeModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
+PropertiesTreeModel::PropertiesTreeModel(ProjectItemData *pProjItemData, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
 	ITreeModel(2, { "Property", "Value" }, pParent),
-	m_OwnerRef(ownerRef),
+	m_pProjItemData(pProjItemData),
 	m_iSTATE_INDEX(iStateIndex),
 	m_iSUBSTATE(subState)
 {
@@ -27,9 +27,9 @@ PropertiesTreeModel::PropertiesTreeModel(ProjectItemData &ownerRef, int iStateIn
 {
 }
 
-ProjectItemData &PropertiesTreeModel::GetOwner()
+ProjectItemData *PropertiesTreeModel::GetProjItem()
 {
-	return m_OwnerRef;
+	return m_pProjItemData;
 }
 
 int PropertiesTreeModel::GetStateIndex() const
@@ -538,7 +538,7 @@ void PropertiesTreeModel::RemoveAllCategoryProperties()
 	removeRows(0, m_pRootItem->GetNumChildren(), createIndex(m_pRootItem->GetIndex(), 0, m_pRootItem));
 }
 
-QJsonObject PropertiesTreeModel::SerializeJson()
+QJsonObject PropertiesTreeModel::SerializeJson() const
 {
 	QJsonObject propertiesObj;
 
@@ -739,8 +739,11 @@ void PropertiesTreeModel::ResetValues()
 		const QVariant &origValue = GetIndexValue(indexRef);
 		if(origValue != valueRef)
 		{
-			PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
-			GetOwner().GetUndoStack()->push(pUndoCmd);
+			if(m_pProjItemData)
+			{
+				PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
+				m_pProjItemData->GetUndoStack()->push(pUndoCmd);
+			}
 		}
 	}
 	else // PROPERTIESCOLUMN_Name - Indicates either case '2' or '3'
@@ -769,8 +772,11 @@ void PropertiesTreeModel::ResetValues()
 
 		if(bCheckChanged)
 		{
-			PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
-			GetOwner().GetUndoStack()->push(pUndoCmd);
+			if(m_pProjItemData)
+			{
+				PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
+				m_pProjItemData->GetUndoStack()->push(pUndoCmd);
+			}
 		}
 	}
 
@@ -1126,15 +1132,20 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 		sRetStr += treeItemValue.toString();
 		break;
 	case PROPERTIESTYPE_StatesComboBox: {
-		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(m_OwnerRef.GetProject().FindItemData(propDefRef.delegateBuilder.toUuid()));
-		if(pProjItem)
+		if(m_pProjItemData)
 		{
-			QComboBox tmpComboBox(nullptr);
-			tmpComboBox.setModel(pProjItem->GetModel());
-			sRetStr += tmpComboBox.itemText(treeItemValue.toInt());
+			ProjectItemData *pProjItem = static_cast<ProjectItemData *>(m_pProjItemData->GetProject().FindItemData(propDefRef.delegateBuilder.toUuid()));
+			if(pProjItem)
+			{
+				QComboBox tmpComboBox(nullptr);
+				tmpComboBox.setModel(pProjItem->GetModel());
+				sRetStr += tmpComboBox.itemText(treeItemValue.toInt());
+			}
+			else
+				HyGuiLog("PropertiesTreeModel::ConvertValueToString() - Project::FindItemData could not find UUID", LOGTYPE_Error);
 		}
 		else
-			HyGuiLog("PropertiesTreeModel::ConvertValueToString() - Project::FindItemData could not find UUID", LOGTYPE_Error);
+			HyGuiLog("PropertiesTreeModel::ConvertValueToString() - m_pProjItemData is null", LOGTYPE_Error);
 		break; }
 	case PROPERTIESTYPE_Color: {
 		QRect rect = treeItemValue.toRect();

@@ -121,6 +121,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Renderer/OpenGL/HyOpenGL.cpp
 	src/Scene/HyScene.cpp
 	src/Scene/AnimFloats/HyAnimFloat.cpp
+	src/Scene/AnimFloats/HyAnimVec1.cpp
 	src/Scene/AnimFloats/HyAnimVec2.cpp
 	src/Scene/AnimFloats/HyAnimVec3.cpp
 	src/Scene/AnimFloats/HyTweenFuncs.cpp
@@ -261,6 +262,7 @@ set(HYENGINE_HEADER_FILES
 	include/Renderer/OpenGL/HyOpenGLShaderSrc.h
 	include/Scene/HyScene.h
 	include/Scene/AnimFloats/HyAnimFloat.h
+	include/Scene/AnimFloats/HyAnimVec1.h
 	include/Scene/AnimFloats/HyAnimVec2.h
 	include/Scene/AnimFloats/HyAnimVec3.h
 	include/Scene/AnimFloats/HyTweenFuncs.h

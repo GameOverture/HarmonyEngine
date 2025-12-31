@@ -1,5 +1,5 @@
 /**************************************************************************
- *	TileGfxItem.cpp
+ *	Polygon2dQtView.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2025 Jason Knobler
@@ -8,7 +8,7 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "TileSetGfxItem.h"
+#include "Polygon2dQtView.h"
 #include "AtlasTileSet.h"
 #include "TileData.h"
 
@@ -18,7 +18,7 @@
 const int iTILE_PADDING = 0;
 const float fUNSELECTED_OPACITY = 0.4f;
 
-TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon) :
+Polygon2dQtView::Polygon2dQtView(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon) :
 	QGraphicsItem(nullptr),
 	m_SelectedPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::White)), 1.0f, Qt::DashLine, Qt::SquareCap, Qt::MiterJoin)),
 	m_UnselectedPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Black)), 1.0f, Qt::DashLine, Qt::SquareCap, Qt::MiterJoin)),
@@ -56,7 +56,7 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	//setAcceptedMouseButtons(Qt::NoButton);
 }
 
-/*virtual*/ TileSetGfxItem::~TileSetGfxItem()
+/*virtual*/ Polygon2dQtView::~Polygon2dQtView()
 {
 	delete m_pRectItem;
 	delete m_pPixmapItem;
@@ -66,7 +66,7 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 		delete m_pTerrainParts[i];
 }
 
-void TileSetGfxItem::Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPage ePage, TileData *pTileData)
+void Polygon2dQtView::Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPage ePage, TileData *pTileData)
 {
 	// Local origin is the center of the atlas region box
 	QRectF rect(regionSize.width() * -0.5f - 1.0f, regionSize.height() * -0.5f - 1, regionSize.width() + 2, regionSize.height() + 2);
@@ -143,17 +143,17 @@ void TileSetGfxItem::Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPa
 		break;
 
 	default:
-		HyGuiLog("TileSetGfxItem::Refresh: Unhandled TileSetPage enum value!", LOGTYPE_Error);
+		HyGuiLog("Polygon2dQtView::Refresh: Unhandled TileSetPage enum value!", LOGTYPE_Error);
 		break;
 	}
 }
 
-bool TileSetGfxItem::IsSelected() const
+bool Polygon2dQtView::IsSelected() const
 {
 	return m_bSelected;
 }
 
-void TileSetGfxItem::SetSelected(bool bSelected)
+void Polygon2dQtView::SetSelected(bool bSelected)
 {
 	m_bSelected = bSelected;
 
@@ -163,7 +163,7 @@ void TileSetGfxItem::SetSelected(bool bSelected)
 		m_pRectItem->setPen(m_UnselectedPen);
 }
 
-void TileSetGfxItem::SetAsDragged(bool bDragged)
+void Polygon2dQtView::SetAsDragged(bool bDragged)
 {
 	m_bDragged = bDragged;
 
@@ -183,37 +183,37 @@ void TileSetGfxItem::SetAsDragged(bool bDragged)
 	}
 }
 
-QPointF TileSetGfxItem::GetDraggingInitialPos() const
+QPointF Polygon2dQtView::GetDraggingInitialPos() const
 {
 	return m_ptDraggingInitialPos;
 }
 
-void TileSetGfxItem::SetDraggingInitialPos(QPointF ptInitialPos)
+void Polygon2dQtView::SetDraggingInitialPos(QPointF ptInitialPos)
 {
 	m_ptDraggingInitialPos = ptInitialPos;
 }
 
-QPoint TileSetGfxItem::GetDraggingGridPos() const
+QPoint Polygon2dQtView::GetDraggingGridPos() const
 {
 	return m_ptDraggingGridPos;
 }
 
-void TileSetGfxItem::SetDraggingGridPos(QPoint ptGridPos)
+void Polygon2dQtView::SetDraggingGridPos(QPoint ptGridPos)
 {
 	m_ptDraggingGridPos = ptGridPos;
 }
 
-QPixmap TileSetGfxItem::GetPixmap() const
+QPixmap Polygon2dQtView::GetPixmap() const
 {
 	return m_pPixmapItem->pixmap();
 }
 
-/*virtual*/ QRectF TileSetGfxItem::boundingRect() const /*override*/
+/*virtual*/ QRectF Polygon2dQtView::boundingRect() const /*override*/
 {
 	return m_pRectItem->rect();// .adjusted(-iTILE_PADDING, -iTILE_PADDING, iTILE_PADDING, iTILE_PADDING); // Adjust for selection border
 }
 
-/*virtual*/ void TileSetGfxItem::paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) /*override*/
+/*virtual*/ void Polygon2dQtView::paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) /*override*/
 {
 	//QGraphicsPixmapItem::paint(pPainter, option, widget);
 	//if(IsSelected())
@@ -223,13 +223,13 @@ QPixmap TileSetGfxItem::GetPixmap() const
 	//}
 }
 
-void TileSetGfxItem::SetAnimation(bool bShow, HyColor color)
+void Polygon2dQtView::SetAnimation(bool bShow, HyColor color)
 {
 	m_pAnimationRectItem->setBrush(HyGlobal::ConvertHyColor(color));
 	m_pAnimationRectItem->setVisible(bShow);
 }
 
-void TileSetGfxItem::AllocateAutoTileParts(AtlasTileSet *pTileSet, AutoTileType eAutoTileType, TileSetShape eTileSetShape)
+void Polygon2dQtView::AllocateAutoTileParts(AtlasTileSet *pTileSet, AutoTileType eAutoTileType, TileSetShape eTileSetShape)
 {
 	for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
 	{
@@ -248,7 +248,7 @@ void TileSetGfxItem::AllocateAutoTileParts(AtlasTileSet *pTileSet, AutoTileType 
 	}
 }
 
-QGraphicsPolygonItem *TileSetGfxItem::GetAutoTilePartAt(QPointF ptLocalPos, TileSetAutoTilePart &ePartOut)
+QGraphicsPolygonItem *Polygon2dQtView::GetAutoTilePartAt(QPointF ptLocalPos, TileSetAutoTilePart &ePartOut)
 {
 	for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
 	{
@@ -263,7 +263,7 @@ QGraphicsPolygonItem *TileSetGfxItem::GetAutoTilePartAt(QPointF ptLocalPos, Tile
 	return nullptr;
 }
 
-QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, TileSetShape eTileSetShape, TileSetAutoTilePart ePart)
+QPolygonF Polygon2dQtView::AssembleAutoTilePolygon(AutoTileType eAutoTileType, TileSetShape eTileSetShape, TileSetAutoTilePart ePart)
 {
 	// `mainShape` has a clockwise winding order, with the first vertex at the center top (or top-left corner if shape is square or flat-top hexagon)
 	QPolygonF mainShape = m_pShapeItem->polygon();

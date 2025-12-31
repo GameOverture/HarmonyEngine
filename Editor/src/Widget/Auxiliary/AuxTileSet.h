@@ -18,6 +18,7 @@ class IWgtTileSetItem;
 class WgtTileSetAnimation;
 class WgtTileSetTerrainSet;
 class WgtTileSetTerrain;
+class WgtTileSetCollision;
 class TileData;
 
 namespace Ui {
@@ -34,6 +35,7 @@ class AuxTileSet : public QWidget
 	WgtTileSetAnimation *						m_pSelectedAnimationWgt;
 	WgtTileSetTerrainSet *						m_pSelectedTerrainSetWgt;
 	WgtTileSetTerrain *							m_pSelectedTerrainWgt;
+	WgtTileSetCollision *						m_pSelectedCollisionWgt;
 
 	bool										m_bIsImportingTileSheet;
 	QPixmap *									m_pImportTileSheetPixmap;
@@ -41,6 +43,7 @@ class AuxTileSet : public QWidget
 
 	QList<WgtTileSetAnimation *>				m_AnimationList;
 	QList<WgtTileSetTerrainSet *>				m_TerrainSetList;
+	QList<WgtTileSetCollision *>				m_CollisionList;
 
 public:
 	explicit AuxTileSet(QWidget *pParent = nullptr);
@@ -55,6 +58,7 @@ public:
 	QUuid GetSelectedAnimation() const;
 	QUuid GetSelectedTerrainSet() const;
 	QUuid GetSelectedTerrain() const;
+	QUuid GetSelectedCollision() const;
 
 	void CmdSet_TileShapeWidget(TileSetShape eTileShape);	// Blocks the WgtVectorSpinBox::SetValue signal
 	void CmdSet_TileSizeWidgets(QSize tileSize);			// Blocks the WgtVectorSpinBox::SetValue signal
@@ -113,6 +117,7 @@ private Q_SLOTS:
 
 	void on_btnAddAnimation_clicked();
 	void on_btnAddTerrainSet_clicked();
+	void on_btnAddCollision_clicked();
 
 	void OnTabBarChanged(int iIndex);
 };

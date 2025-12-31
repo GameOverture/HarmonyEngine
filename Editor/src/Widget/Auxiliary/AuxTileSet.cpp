@@ -17,6 +17,7 @@
 #include "WgtTileSetAnimation.h"
 #include "WgtTileSetTerrainSet.h"
 #include "WgtTileSetTerrain.h"
+#include "WgtTileSetCollision.h"
 #include "TileData.h"
 
 #include <QMessageBox>
@@ -32,6 +33,7 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	m_pSelectedAnimationWgt(nullptr),
 	m_pSelectedTerrainSetWgt(nullptr),
 	m_pSelectedTerrainWgt(nullptr),
+	m_pSelectedCollisionWgt(nullptr),
 	m_bIsImportingTileSheet(true),
 	m_pImportTileSheetPixmap(nullptr)
 {
@@ -91,6 +93,7 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 	m_pSelectedAnimationWgt = nullptr;
 	m_pSelectedTerrainSetWgt = nullptr;
 	m_pSelectedTerrainWgt = nullptr;
+	m_pSelectedCollisionWgt = nullptr;
 
 	if(m_pTileSet == nullptr)
 		return;
@@ -180,6 +183,13 @@ QUuid AuxTileSet::GetSelectedTerrain() const
 {
 	if(m_pSelectedTerrainWgt)
 		return m_pSelectedTerrainWgt->GetUuid();
+	return QUuid();
+}
+
+QUuid AuxTileSet::GetSelectedCollision() const
+{
+	if(m_pSelectedCollisionWgt)
+		return m_pSelectedCollisionWgt->GetUuid();
 	return QUuid();
 }
 
@@ -328,6 +338,15 @@ void AuxTileSet::CmdSet_CreateWgtItem(TileSetWgtType eType, QJsonObject data)
 		pParentTerrain->CmdSet_AllocTerrain(data);
 		break; }
 
+	case TILESETWGT_Collision: {
+		WgtTileSetCollision *pNewCollision = new WgtTileSetCollision(this, data);
+		ui->lytCollisions->addWidget(pNewCollision);
+		m_CollisionList.append(pNewCollision);
+		pNewCollision->SetOrderBtns(m_CollisionList.size() > 1, false);
+		
+		MakeSelectionChange(pNewCollision);
+		break; }
+
 	default:
 		HyGuiLog("AuxTileSet::CmdSet_AddWgtItem: Unknown TileSetWgtType!", LOGTYPE_Error);
 		return;
@@ -451,6 +470,13 @@ void AuxTileSet::MakeSelectionChange(IWgtTileSetItem *pItem)
 		for (WgtTileSetTerrain *pTerrainWidget : terrainList)
 			pTerrainWidget->SetSelected(m_pSelectedTerrainWgt == pTerrainWidget);
 		break; }
+
+	case TILESETWGT_Collision:
+		m_pSelectedCollisionWgt = static_cast<WgtTileSetCollision *>(pItem);
+
+		for (WgtTileSetCollision *pCollisionWidget : m_CollisionList)
+			pCollisionWidget->SetSelected(m_pSelectedCollisionWgt == pCollisionWidget);
+		break;
 
 	default:
 		HyGuiLog("AuxTileSet::MakeSelectionChange: Unknown GetWgtType!", LOGTYPE_Error);
@@ -912,6 +938,14 @@ void AuxTileSet::on_btnAddTerrainSet_clicked()
 	QJsonObject initObj = AtlasTileSet::GenerateNewTerrainSetJsonObject();
 
 	TileSetUndoCmd_AddWgtItem *pNewCmd = new TileSetUndoCmd_AddWgtItem(*this, TILESETWGT_TerrainSet, initObj);
+	m_pTileSet->GetUndoStack()->push(pNewCmd);
+}
+
+void AuxTileSet::on_btnAddCollision_clicked()
+{
+	QJsonObject collisionObj = AtlasTileSet::GenerateNewCollisionJsonObject();
+
+	TileSetUndoCmd_AddWgtItem *pNewCmd = new TileSetUndoCmd_AddWgtItem(*this, TILESETWGT_Collision, collisionObj);
 	m_pTileSet->GetUndoStack()->push(pNewCmd);
 }
 

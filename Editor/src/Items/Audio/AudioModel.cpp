@@ -15,7 +15,7 @@
 AudioStateData::AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData),
 	m_PlayListModel(&modelRef),
-	m_PropertiesModel(modelRef.GetItem(), iStateIndex, -1, &modelRef)
+	m_PropertiesModel(&modelRef.GetItem(), iStateIndex, -1, &modelRef)
 {
 	QJsonArray metaAssetArray = stateFileData.m_Meta["assetUUIDs"].toArray();
 	QJsonArray dataPlayListArray = stateFileData.m_Data["playlist"].toArray();

@@ -18,8 +18,8 @@
 #include <QVariant>
 #include <QStack>
 
-EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
-	PropertiesTreeModel(ownerRef, iStateIndex, subState, pParent)
+EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &projItemRef, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
+	PropertiesTreeModel(&projItemRef, iStateIndex, subState, pParent)
 {
 }
 
@@ -31,8 +31,8 @@ EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &ownerRef, 
 	return new EntityUndoCmd_PropertyModified(this, index, newData);
 }
 
-EntityPropertiesTreeMultiModel::EntityPropertiesTreeMultiModel(ProjectItemData &ownerRef, int iStateIndex, QVariant subState, QList<PropertiesTreeModel *> multiModelList, QObject *pParent /*= nullptr*/) :
-	PropertiesTreeMultiModel(ownerRef, iStateIndex, subState, multiModelList, pParent)
+EntityPropertiesTreeMultiModel::EntityPropertiesTreeMultiModel(ProjectItemData &projItemRef, int iStateIndex, QVariant subState, QList<PropertiesTreeModel *> multiModelList, QObject *pParent /*= nullptr*/) :
+	PropertiesTreeMultiModel(projItemRef, iStateIndex, subState, multiModelList, pParent)
 {
 }
 

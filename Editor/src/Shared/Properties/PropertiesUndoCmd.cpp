@@ -12,7 +12,7 @@
 
 PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIndex &index, const QVariant &newData, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
-	m_ItemRef(pModel->GetOwner()),
+	m_ItemRef(*pModel->GetProjItem()),
 	m_iStateIndex(pModel->GetStateIndex()),
 	m_Substate(pModel->GetSubstate()),
 	m_pModel(pModel),
