@@ -38,6 +38,7 @@ WgtTileSetAnimation::~WgtTileSetAnimation()
 {
 	m_pPreviewTimer->stop();
 	delete m_pPreviewTimer;
+	m_pPreviewTimer = nullptr; // This is required to avoid slot calls after destruction
 
 	delete ui;
 }
@@ -109,6 +110,9 @@ void WgtTileSetAnimation::RefreshPreview()
 
 void WgtTileSetAnimation::OnPreviewUpdate()
 {
+	if(m_pPreviewTimer == nullptr) // This indicates destructor was called
+		return;
+
 	ui->lblFramePreview->setPixmap(m_PreviewFrameList[m_iPreviewFrameIndex]->GetPixmap());
 	
 	m_iPreviewFrameIndex++;

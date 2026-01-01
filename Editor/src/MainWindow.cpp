@@ -596,6 +596,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	}
 
 	SaveSettings();
+	sm_pInstance->ui->tileSetEditor->Init(nullptr);
 
 	delete Harmony::GetProject();
 	Harmony::SetProject(nullptr);

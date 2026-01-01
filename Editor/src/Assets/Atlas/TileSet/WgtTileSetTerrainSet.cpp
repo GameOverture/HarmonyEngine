@@ -32,6 +32,9 @@ WgtTileSetTerrainSet::WgtTileSetTerrainSet(AuxTileSet *pAuxTileSet, QJsonObject 
 
 WgtTileSetTerrainSet::~WgtTileSetTerrainSet()
 {
+	for(WgtTileSetTerrain *pTerrain : m_TerrainList)
+		delete pTerrain;
+
 	delete ui;
 }
 

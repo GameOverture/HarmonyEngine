@@ -81,6 +81,13 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 
 /*virtual*/ AuxTileSet::~AuxTileSet()
 {
+	for(WgtTileSetAnimation *pAnim : m_AnimationList)
+		delete pAnim;
+	for(WgtTileSetTerrainSet *pTerrainSet : m_TerrainSetList)
+		delete pTerrainSet;
+	for(WgtTileSetCollision *pCollision : m_CollisionList)
+		delete pCollision;
+
 	delete ui;
 }
 
@@ -94,6 +101,16 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 	m_pSelectedTerrainSetWgt = nullptr;
 	m_pSelectedTerrainWgt = nullptr;
 	m_pSelectedCollisionWgt = nullptr;
+
+	for(WgtTileSetAnimation *pAnim : m_AnimationList)
+		delete pAnim;
+	m_AnimationList.clear();
+	for (WgtTileSetTerrainSet *pTerrain : m_TerrainSetList)
+		delete pTerrain;
+	m_TerrainSetList.clear();
+	for(WgtTileSetCollision *pCollision : m_CollisionList)
+		delete pCollision;
+	m_CollisionList.clear();
 
 	if(m_pTileSet == nullptr)
 		return;
@@ -118,23 +135,14 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 
 	SetImportWidgets();
 
-	for(WgtTileSetAnimation *pAnim : m_AnimationList)
-		delete pAnim;
-	m_AnimationList.clear();
 	QVector<QJsonObject> animObjList = m_pTileSet->GetAnimations();
 	for(QJsonObject animObj : animObjList)
 		CmdSet_CreateWgtItem(TILESETWGT_Animation, animObj);
 
-	for (WgtTileSetTerrainSet *pTerrain : m_TerrainSetList)
-		delete pTerrain;
-	m_TerrainSetList.clear();
 	QVector<QJsonObject> terrainSetObjList = m_pTileSet->GetTerrainSets();
 	for (QJsonObject terrainSetObj : terrainSetObjList)
 		CmdSet_CreateWgtItem(TILESETWGT_TerrainSet, terrainSetObj);
 
-	for(WgtTileSetCollision *pCollision : m_CollisionList)
-		delete pCollision;
-	m_CollisionList.clear();
 	QVector<QJsonObject> collisionObjList = m_pTileSet->GetCollisionLayers();
 	for(QJsonObject collisionObj : collisionObjList)
 		CmdSet_CreateWgtItem(TILESETWGT_Collision, collisionObj);
