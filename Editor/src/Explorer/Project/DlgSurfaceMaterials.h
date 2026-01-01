@@ -32,7 +32,11 @@ public:
 	QUuid GetSelectedMaterialUuid() const;
 
 private Q_SLOTS:
-	virtual void done(int r) override;
+	void on_actionNewMat_triggered();
+	void on_actionRemoveMat_triggered();
+	void on_actionRenameMat_triggered();
+	void on_actionSortMatUp_triggered();
+	void on_actionSortMatDown_triggered();
 
 private:
 	Ui::DlgSurfaceMaterials *ui;

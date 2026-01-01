@@ -238,6 +238,9 @@ void AuxTileSet::CmdSet_TileOffsetWidgets(QPoint tileOffset)
 
 void AuxTileSet::RefreshInfo()
 {
+	if(m_pTileSet == nullptr)
+		return;
+
 	ui->lblIcon->setPixmap(m_pTileSet->GetTileSetIcon().pixmap(QSize(16,16)));
 	ui->lblName->setText(m_pTileSet->GetName());
 	ui->lblInfo->setText(m_pTileSet->GetTileSetInfo());

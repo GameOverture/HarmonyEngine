@@ -11,6 +11,7 @@
 #include "DlgSurfaceMaterials.h"
 #include "ui_DlgSurfaceMaterials.h"
 #include "SurfaceMaterialsModel.h"
+#include "DlgInputName.h"
 
 #include <QPushButton>
 
@@ -21,6 +22,12 @@ DlgSurfaceMaterials::DlgSurfaceMaterials(SurfaceMaterialsModel &surfaceModelRef,
 {
 	ui->setupUi(this);
 	setWindowIcon(QIcon(QString::fromUtf8(":/icons16x16/collision.png")));
+
+	ui->btnNewMat->setDefaultAction(ui->actionNewMat);
+	ui->btnRemoveMat->setDefaultAction(ui->actionRemoveMat);
+	ui->btnRenameMat->setDefaultAction(ui->actionRenameMat);
+	ui->btnSortMatUp->setDefaultAction(ui->actionSortMatUp);
+	ui->btnSortMatDown->setDefaultAction(ui->actionSortMatDown);
 
 	ui->listView->setModel(&m_SurfaceMaterialsModelRef);
 
@@ -40,20 +47,59 @@ QUuid DlgSurfaceMaterials::GetSelectedMaterialUuid() const
 	return QUuid();
 }
 
-/*virtual*/ void DlgSurfaceMaterials::done(int r) /*override*/
+void DlgSurfaceMaterials::on_actionNewMat_triggered()
 {
+	m_SurfaceMaterialsModelRef.AppendNewSurface();
+}
 
-	//if(r == QDialog::Accepted)
-	//{
-	//	if(bAssetsChanged && QMessageBox::Ok == QMessageBox::warning(nullptr, QString("Save asset properties?"), QString("Save asset properties? Changed assets will need to be repacked."), QMessageBox::Ok, QMessageBox::Cancel))
-	//	{
-	//		QDialog::done(r);
-	//	}
-	//	else
-	//		QDialog::done(QDialog::Rejected);
-	//}
-	
-	QDialog::done(r);
+void DlgSurfaceMaterials::on_actionRemoveMat_triggered()
+{
+	if(ui->listView->currentIndex().isValid())
+	{
+		QJsonObject surfaceMatObj = m_SurfaceMaterialsModelRef.data(ui->listView->currentIndex(), Qt::UserRole).toJsonObject();
+		if(surfaceMatObj.contains("TileSetDependants") == false)
+		{
+			HyGuiLog("DlgSurfaceMaterials::on_actionRemoveMat_triggered(): Surface material object is missing 'TileSetDependants' field!", LOGTYPE_Error);
+			return;
+		}
+
+		QJsonArray dependeeTileSetArray = surfaceMatObj["TileSetDependants"].toArray();
+		if(dependeeTileSetArray.size() > 0)
+		{
+			QStringList sDependeeList = m_SurfaceMaterialsModelRef.GetDependeeStringList(ui->listView->currentIndex().row());
+			HyGuiLog("Cannot remove surface material that is in use. It is referenced by the following: " + sDependeeList.join(", "), LOGTYPE_Warning);
+			return;
+		}
+
+		m_SurfaceMaterialsModelRef.removeRow(ui->listView->currentIndex().row());
+	}
+}
+
+void DlgSurfaceMaterials::on_actionRenameMat_triggered()
+{
+	if(ui->listView->currentIndex().isValid())
+	{
+		QString sCurName = m_SurfaceMaterialsModelRef.GetName(ui->listView->currentIndex().row());
+		DlgInputName *pDlg = new DlgInputName("Rename Surface Material", sCurName, HyGlobal::FreeFormValidator(), nullptr, nullptr);
+
+		if(pDlg->exec() == QDialog::Accepted)
+			m_SurfaceMaterialsModelRef.SetName(ui->listView->currentIndex().row(), pDlg->GetName());
+		delete pDlg;
+
+		ui->listView->edit(ui->listView->currentIndex());
+	}
+}
+
+void DlgSurfaceMaterials::on_actionSortMatUp_triggered()
+{
+	if(ui->listView->currentIndex().isValid())
+		m_SurfaceMaterialsModelRef.MoveSurfaceBack(ui->listView->currentIndex().row());
+}
+
+void DlgSurfaceMaterials::on_actionSortMatDown_triggered()
+{
+	if(ui->listView->currentIndex().isValid())
+		m_SurfaceMaterialsModelRef.MoveSurfaceForward(ui->listView->currentIndex().row());
 }
 
 void DlgSurfaceMaterials::ErrorCheck()

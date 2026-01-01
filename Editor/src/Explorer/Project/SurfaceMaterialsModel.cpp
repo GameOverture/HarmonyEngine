@@ -33,11 +33,10 @@ void SurfaceMaterialsModel::Initialize(QJsonArray initArray)
 	endResetModel();
 }
 
-int SurfaceMaterialsModel::AppendNewSurface(QUuid tileSetDependee)
+int SurfaceMaterialsModel::AppendNewSurface()
 {
-	Surface *pNewSurface = new Surface();
-	pNewSurface->m_DependeeTileSetCollisions.append(tileSetDependee);
 	beginInsertRows(QModelIndex(), m_SurfaceList.size(), m_SurfaceList.size());
+	Surface *pNewSurface = new Surface();
 	m_SurfaceList.append(pNewSurface);
 	endInsertRows();
 
@@ -130,6 +129,20 @@ void SurfaceMaterialsModel::RemoveTileSetDependee(int iIndex, QUuid tileSetDepen
 		return;
 	}
 	m_SurfaceList[iIndex]->m_DependeeTileSetCollisions.removeAll(tileSetDependee);
+}
+
+QStringList SurfaceMaterialsModel::GetDependeeStringList(int iIndex) const
+{
+	if(m_SurfaceList.size() <= iIndex || iIndex < 0)
+	{
+		HyGuiLog("SurfaceMaterialsModel::GetDependeeStringList invalid index: " + QString::number(iIndex), LOGTYPE_Error);
+		return QStringList();
+	}
+
+	QStringList dependeeList;
+	for (const QUuid &tileSetDependeeUuid : m_SurfaceList[iIndex]->m_DependeeTileSetCollisions)
+		dependeeList.append(tileSetDependeeUuid.toString(QUuid::WithoutBraces));
+	return dependeeList;
 }
 
 void SurfaceMaterialsModel::MoveSurfaceBack(int iIndex)

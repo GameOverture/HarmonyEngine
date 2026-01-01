@@ -80,7 +80,7 @@ public:
 
 	void Initialize(QJsonArray initArray);
 
-	int AppendNewSurface(QUuid tileSetDependee);
+	int AppendNewSurface();
 
 	int GetNumSurfaces() const;
 	QUuid GetUuid(int iIndex) const;
@@ -91,6 +91,7 @@ public:
 
 	void AddTileSetDependee(int iIndex, QUuid tileSetDependee);
 	void RemoveTileSetDependee(int iIndex, QUuid tileSetDependee);
+	QStringList GetDependeeStringList(int iIndex) const;
 
 	void MoveSurfaceBack(int iIndex);
 	void MoveSurfaceForward(int iIndex);
