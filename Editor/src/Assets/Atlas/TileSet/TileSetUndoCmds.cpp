@@ -37,16 +37,16 @@ TileSetUndoCmd_TileShape::TileSetUndoCmd_TileShape(AuxTileSet &auxTileSetRef, Ti
 {
 	m_AuxTileSetRef.CmdSet_TileShapeWidget(m_eNewShape);
 
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles();
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef.GetCurrentPage());
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles(m_AuxTileSetRef);
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef);
 }
 
 /*virtual*/ void TileSetUndoCmd_TileShape::undo() /*override*/
 {
 	m_AuxTileSetRef.CmdSet_TileShapeWidget(m_eOldShape);
 
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles();
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef.GetCurrentPage());
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles(m_AuxTileSetRef);
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,16 +71,16 @@ TileSetUndoCmd_TileSize::TileSetUndoCmd_TileSize(AuxTileSet &auxTileSetRef, QSiz
 {
 	m_AuxTileSetRef.CmdSet_TileSizeWidgets(m_NewSize);
 
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles();
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef.GetCurrentPage());
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles(m_AuxTileSetRef);
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef);
 }
 
 /*virtual*/ void TileSetUndoCmd_TileSize::undo() /*override*/
 {
 	m_AuxTileSetRef.CmdSet_TileSizeWidgets(m_OldSize);
 
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles();
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef.GetCurrentPage());
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles(m_AuxTileSetRef);
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef);
 }
 
 /*virtual*/ int TileSetUndoCmd_TileSize::id() const /*override*/
@@ -123,16 +123,16 @@ TileSetUndoCmd_TileOffset::TileSetUndoCmd_TileOffset(AuxTileSet &auxTileSetRef, 
 {
 	m_AuxTileSetRef.CmdSet_TileOffsetWidgets(m_NewOffset);
 
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles();
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef.GetCurrentPage());
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles(m_AuxTileSetRef);
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef);
 }
 
 /*virtual*/ void TileSetUndoCmd_TileOffset::undo() /*override*/
 {
 	m_AuxTileSetRef.CmdSet_TileOffsetWidgets(m_OldOffset);
 
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles();
-	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef.GetCurrentPage());
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshImportTiles(m_AuxTileSetRef);
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef);
 }
 
 /*virtual*/ int TileSetUndoCmd_TileOffset::id() const /*override*/

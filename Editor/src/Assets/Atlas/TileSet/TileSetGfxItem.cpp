@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "TileSetGfxItem.h"
-#include "AtlasTileSet.h"
+#include "AuxTileSet.h"
 #include "TileData.h"
 
 #include <QPainter>
@@ -66,8 +66,10 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 		delete m_pTerrainParts[i];
 }
 
-void TileSetGfxItem::Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPage ePage, TileData *pTileData)
+void TileSetGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileData *pTileData)
 {
+	AtlasTileSet *pTileSet = auxTileSetRef.GetTileSet();
+
 	// Local origin is the center of the atlas region box
 	QRectF rect(regionSize.width() * -0.5f - 1.0f, regionSize.height() * -0.5f - 1, regionSize.width() + 2, regionSize.height() + 2);
 
@@ -101,7 +103,7 @@ void TileSetGfxItem::Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPa
 	m_pShapeItem->setVisible(true);// m_bSelected);
 	setOpacity(1.0f);
 
-	switch(ePage)
+	switch(auxTileSetRef.GetCurrentPage())
 	{
 	case TILESETPAGE_Import:
 	case TILESETPAGE_Arrange:
@@ -138,7 +140,20 @@ void TileSetGfxItem::Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPa
 		}
 		break;
 
-	case TILESETPAGE_Collision:
+	case TILESETPAGE_Collision: {
+		QUuid selectedCollisionUuid = auxTileSetRef.GetSelectedCollision();
+		if(pTileData->GetCollisionList().contains(selectedCollisionUuid) == false)
+		{
+			setOpacity(fUNSELECTED_OPACITY);
+			break;
+		}
+		
+		QList<QPointF> vertexList = pTileData->GetCollisionVertices(selectedCollisionUuid);
+
+		//Polygon2dQtView
+		
+		break; }
+
 	case TILESETPAGE_CustomData:
 		break;
 

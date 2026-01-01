@@ -187,7 +187,7 @@ void TileSetView::ResetCamera(TileSetPage ePage)
 					}
 
 					setDragMode(QGraphicsView::NoDrag);
-					GetScene()->OnArrangingTilesMousePress(mapToScene(pEvent->pos()));
+					GetScene()->OnArrangingTilesMousePress(*m_pAuxTileSet, mapToScene(pEvent->pos()));
 					m_eDragState = DRAGSTATE_ArrangingSelection;
 				}
 				else
@@ -201,7 +201,7 @@ void TileSetView::ResetCamera(TileSetPage ePage)
 		break; }
 	
 	case DRAGSTATE_ArrangingSelection:
-		GetScene()->OnArrangingTilesMouseMove(mapToScene(pEvent->pos()));
+		GetScene()->OnArrangingTilesMouseMove(*m_pAuxTileSet, mapToScene(pEvent->pos()));
 		break;
 
 	case DRAGSTATE_Painting:

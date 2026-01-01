@@ -36,7 +36,7 @@ class TileData
 	QUuid											m_TerrainSetUuid;		// The Terrain Set assigned to this tile
 	QMap<QUuid, QBitArray>							m_TerrainMap;			// Key: Terrain Uuid (NOT TERRAIN SET), Value: QBitArray(NUM_AUTOTILEPARTS)
 
-	QMap<QUuid, QList<QList<QPoint>>>				m_VertexMap;
+	QMap<QUuid, QList<QPointF>>						m_CollisionMap;
 
 public:
 	TileData(QPoint metaGridPos, QPixmap tilePixmap);
@@ -64,6 +64,10 @@ public:
 	void ClearTerrain(TileSetAutoTilePart ePart);
 	const QMap<QUuid, QBitArray> &GetTerrainMap() const;
 	void SetTerrainMap(const QMap<QUuid, QBitArray> &terrainMap);
+
+	QList<QUuid> GetCollisionList() const;
+	QList<QPointF> GetCollisionVertices(QUuid uuid) const;
+	void SetCollisionVertices(QUuid uuid, const QList<QPointF> &vertexList);
 };
 
 #endif // TILEDATA_H

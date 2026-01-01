@@ -175,7 +175,7 @@ void AuxTileSet::SetCurrentPage(TileSetPage ePage)
 	m_pTabBar->setCurrentIndex(static_cast<int>(ePage));
 	ui->setupStackedWidget->setCurrentIndex(static_cast<int>(ePage));
 
-	m_pTileSet->GetGfxScene()->RefreshTiles(ePage);
+	m_pTileSet->GetGfxScene()->RefreshTiles(*this);
 }
 
 QUuid AuxTileSet::GetSelectedAnimation() const
@@ -599,7 +599,7 @@ void AuxTileSet::SetImportWidgets()
 	ui->grpSlicingOptions->setVisible(m_bIsImportingTileSheet);
 
 	m_pTileSet->GetGfxScene()->ClearImportTiles();
-	m_pTileSet->GetGfxScene()->RefreshTiles(GetCurrentPage());
+	m_pTileSet->GetGfxScene()->RefreshTiles(*this);
 	ui->graphicsView->ResetCamera(TILESETPAGE_Arrange);
 
 	ErrorCheckImport();
@@ -642,7 +642,7 @@ void AuxTileSet::SliceSheetPixmaps()
 		ptGridPos.setY(ptGridPos.y() + 1);
 	}
 
-	pGfxScene->RefreshImportTiles();
+	pGfxScene->RefreshImportTiles(*this);
 }
 
 void AuxTileSet::ErrorCheckImport()
@@ -814,7 +814,7 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 		for(auto pImg : vImportImages)
 			delete pImg;
 
-		pGfxScene->RefreshImportTiles();
+		pGfxScene->RefreshImportTiles(*this);
 	}
 
 	ui->graphicsView->ResetCamera(TILESETPAGE_Import);
@@ -878,25 +878,25 @@ void AuxTileSet::OnPaddingChanged(QVariant newPadding)
 void AuxTileSet::on_radImportBottom_toggled(bool bChecked)
 {
 	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::BottomEdge);
-	m_pTileSet->GetGfxScene()->RefreshImportTiles();
+	m_pTileSet->GetGfxScene()->RefreshImportTiles(*this);
 }
 
 void AuxTileSet::on_radImportTop_toggled(bool bChecked)
 {
 	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::TopEdge);
-	m_pTileSet->GetGfxScene()->RefreshImportTiles();
+	m_pTileSet->GetGfxScene()->RefreshImportTiles(*this);
 }
 
 void AuxTileSet::on_radImportLeft_toggled(bool bChecked)
 {
 	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::LeftEdge);
-	m_pTileSet->GetGfxScene()->RefreshImportTiles();
+	m_pTileSet->GetGfxScene()->RefreshImportTiles(*this);
 }
 
 void AuxTileSet::on_radImportRight_toggled(bool bChecked)
 {
 	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::RightEdge);
-	m_pTileSet->GetGfxScene()->RefreshImportTiles();
+	m_pTileSet->GetGfxScene()->RefreshImportTiles(*this);
 }
 
 void AuxTileSet::on_btnConfirmAdd_clicked()
@@ -1039,5 +1039,5 @@ void AuxTileSet::OnTabBarChanged(int iIndex)
 		break;
 	}
 
-	m_pTileSet->GetGfxScene()->RefreshTiles(static_cast<TileSetPage>(iIndex));
+	m_pTileSet->GetGfxScene()->RefreshTiles(*this);
 }

@@ -78,19 +78,19 @@ public:
 
 	void AddTile(bool bImportTile, TileData *pTileData, const QPolygonF &outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected);
 	
-	void RefreshImportTiles();
+	void RefreshImportTiles(AuxTileSet &auxTileSetRef);
 
 	// Sync m_pTileSet's 'AtlasTileSet::m_TileDataList' with m_SetupTileMap
 	// Sets graphics items to match the data of m_pTileSet and current import tiles
 	// Also repositions tiles during sorting operations
-	void RefreshTiles(TileSetPage ePage, QPointF vDragDelta = QPointF());
+	void RefreshTiles(AuxTileSet &auxTileSetRef, QPointF vDragDelta = QPointF());
 
 
 	void ClearImportTiles();
 	void ClearSetupTiles();
 
-	void OnArrangingTilesMousePress(QPointF ptMouseScenePos);
-	void OnArrangingTilesMouseMove(QPointF ptMouseScenePos);
+	void OnArrangingTilesMousePress(AuxTileSet &auxTileSetRef, QPointF ptMouseScenePos);
+	void OnArrangingTilesMouseMove(AuxTileSet &auxTileSetRef, QPointF ptMouseScenePos);
 	void OnArrangingTilesMouseRelease(AuxTileSet &auxTileSetRef, QPointF ptMouseScenePos);
 
 	void HoverAutoTilePartAt(QPointF ptScenePos);

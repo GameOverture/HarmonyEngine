@@ -112,11 +112,6 @@ void WgtTileSetCollision::on_actionDownward_triggered()
 	m_pAuxTileSet->GetTileSet()->GetUndoStack()->push(pNewCmd);
 }
 
-void WgtTileSetCollision::on_txtName_editingFinished()
-{
-	
-}
-
 void WgtTileSetCollision::on_btnSetFilter_clicked()
 {
 	DlgCollisionFilter dlg(m_pAuxTileSet->GetTileSet()->GetProject(), m_CachedB2Filter);

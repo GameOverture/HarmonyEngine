@@ -46,7 +46,6 @@ private Q_SLOTS:
 	void on_actionDelete_triggered();
 	void on_actionUpward_triggered();
 	void on_actionDownward_triggered();
-	void on_txtName_editingFinished();
 	void on_btnSetFilter_clicked();
 	void on_btnSetMat_clicked();
 	void on_chkIsSensor_toggled(bool bChecked);

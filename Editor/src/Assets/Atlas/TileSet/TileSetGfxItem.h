@@ -15,6 +15,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 
+class AuxTileSet;
 class AtlasTileSet;
 class TileData;
 
@@ -46,7 +47,7 @@ public:
 	TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon);
 	virtual ~TileSetGfxItem();
 
-	void Refresh(QSize regionSize, AtlasTileSet *pTileSet, TileSetPage ePage, TileData *pTileData);
+	void Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileData *pTileData);
 
 	bool IsSelected() const;
 	void SetSelected(bool bSelected);
