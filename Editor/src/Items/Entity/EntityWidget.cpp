@@ -31,11 +31,6 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 {
 	ui->setupUi(this);
 
-	m_pActionEditMode = new QWidgetAction(this);
-	m_pActionEditMode->setText("Edit Mode");
-	m_pActionEditMode->setDefaultWidget(ui->chkEditMode);
-	QObject::connect(m_pActionEditMode, SIGNAL(toggled(bool)), this, SLOT(OnActionEditModeToggle(bool)));
-
 	// Remove and re-add the main layout that holds everything. This makes the Qt Designer (.ui) files work with the base class 'IWidget'. Otherwise it jumbles them together.
 	layout()->removeItem(ui->verticalLayout);
 	GetBelowStatesLayout()->addItem(ui->verticalLayout);
@@ -135,7 +130,7 @@ EntityWidget::~EntityWidget()
 
 /*virtual*/ void EntityWidget::OnGiveMenuActions(QMenu *pMenu) /*override*/
 {
-	pMenu->addAction(m_pActionEditMode);
+	pMenu->addAction(ui->actionEditMode);
 }
 
 /*virtual*/ void EntityWidget::OnUpdateActions() /*override*/
@@ -331,11 +326,17 @@ EntityWidget::~EntityWidget()
 	SetExtrapolatedProperties();
 
 	if(bAllowEditMode)
-		m_pActionEditMode->setEnabled(true);
+	{
+		ui->chkEditMode->setEnabled(true);
+		ui->actionEditMode->setEnabled(true);
+	}
 	else
 	{
-		m_pActionEditMode->setEnabled(false);
-		m_pActionEditMode->setChecked(false);
+		ui->actionEditMode->setEnabled(false);
+		ui->actionEditMode->setChecked(false);
+
+		ui->chkEditMode->setEnabled(false);
+		ui->chkEditMode->setChecked(false);
 	}
 
 	ui->nodeTree->model()->dataChanged(ui->nodeTree->model()->index(0, 0), ui->nodeTree->model()->index(ui->nodeTree->model()->rowCount() - 1, 1));
@@ -488,7 +489,7 @@ void EntityWidget::SetExtrapolatedProperties()
 
 bool EntityWidget::IsEditMode() const
 {
-	return m_pActionEditMode->isChecked();
+	return ui->actionEditMode->isChecked();
 }
 
 void EntityWidget::SetEditMode(EntityTreeItemData *pItemToEdit)
@@ -502,15 +503,15 @@ void EntityWidget::SetEditMode(EntityTreeItemData *pItemToEdit)
 		if(pEntityDraw == nullptr)
 		{
 			HyGuiLog("EntityWidget::SetEditMode() - pEntityDraw is nullptr", LOGTYPE_Error);
-			m_pActionEditMode->setChecked(false);
+			ui->actionEditMode->setChecked(false);
 			return;
 		}
 		pEntityDraw->ApplyJsonData();
 
-		m_pActionEditMode->setChecked(true);
+		ui->actionEditMode->setChecked(true);
 	}
 	else
-		m_pActionEditMode->setChecked(false);
+		ui->actionEditMode->setChecked(false);
 }
 
 /*virtual*/ void EntityWidget::showEvent(QShowEvent *pEvent) /*override*/
@@ -616,8 +617,8 @@ void EntityWidget::OnKeyShiftE()
 
 void EntityWidget::OnKeyF()
 {
-	if(m_pActionEditMode->isEnabled())
-		m_pActionEditMode->toggle();
+	if(ui->actionEditMode->isEnabled())
+		ui->actionEditMode->toggle();
 }
 
 void EntityWidget::OnContextMenu(const QPoint &pos)
@@ -688,52 +689,6 @@ void EntityWidget::OnCollapsedNode(const QModelIndex &indexRef)
 	// Prevent Root or BvFolder from collapsing
 	if(pTreeItemData->GetEntType() == ENTTYPE_Root || pTreeItemData->GetEntType() == ENTTYPE_BvFolder)
 		ui->nodeTree->expand(indexRef);
-}
-
-void EntityWidget::OnActionEditModeToggle(bool bChecked)
-{
-	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pEntityDraw == nullptr)
-	{
-		HyGuiLog("EntityModel::SetShapeEditMode() - pEntityDraw is nullptr", LOGTYPE_Error);
-		return;
-	}
-
-	if(bChecked == false)
-	{
-		pEntityDraw->SetEditMode(false);
-		return;
-	}
-
-	QModelIndexList selectedIndices = GetSelectedItems();
-	if(selectedIndices.size() != 1)
-	{
-		HyGuiLog("Cannot enter Edit Mode with multiple or no items selected.", LOGTYPE_Error);
-		m_pActionEditMode->setChecked(false);
-		return;
-	}
-
-	EntityTreeItemData *pFirstItemData = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>();
-	if(pFirstItemData->IsEditable() == false)
-	{
-		HyGuiLog("Selected item is not editable. Cannot enter Edit Mode.", LOGTYPE_Error);
-		m_pActionEditMode->setChecked(false);
-		return;
-	}
-
-	/////////////////////////////////////
-	// TODO: DETERMINE IF THIS IS NEEEDED
-	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
-	pTreeModel->RefreshSelectedItems();
-	ui->nodeTree->update();
-	/////////////////////////////////////
-
-	
-	
-	pEntityDraw->SetEditMode(true);
-
-	UpdateActions();
-	pEntityDraw->ApplyJsonData();
 }
 
 void EntityWidget::on_actionAddChildren_triggered()
@@ -1247,6 +1202,61 @@ void EntityWidget::on_actionPasteEntityItems_triggered()
 
 	EntityUndoCmd_PasteItems *pCmd = new EntityUndoCmd_PasteItems(m_ItemRef, pastedObject, pArrayFolder);
 	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionEditMode_toggled(bool bChecked)
+{
+	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntityDraw == nullptr)
+	{
+		HyGuiLog("EntityModel::SetShapeEditMode() - pEntityDraw is nullptr", LOGTYPE_Error);
+		return;
+	}
+
+	ui->chkEditMode->setChecked(bChecked);
+
+	if(bChecked == false)
+	{
+		pEntityDraw->SetEditMode(false);
+		return;
+	}
+
+	QModelIndexList selectedIndices = GetSelectedItems();
+	if(selectedIndices.size() != 1)
+	{
+		HyGuiLog("Cannot enter Edit Mode with multiple or no items selected.", LOGTYPE_Error);
+		ui->actionEditMode->setChecked(false);
+		ui->chkEditMode->setChecked(false);
+		return;
+	}
+
+	EntityTreeItemData *pFirstItemData = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>();
+	if(pFirstItemData->IsEditable() == false)
+	{
+		HyGuiLog("Selected item is not editable. Cannot enter Edit Mode.", LOGTYPE_Error);
+		ui->actionEditMode->setChecked(false);
+		ui->chkEditMode->setChecked(false);
+		return;
+	}
+
+	/////////////////////////////////////
+	// TODO: DETERMINE IF THIS IS NEEEDED
+	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
+	pTreeModel->RefreshSelectedItems();
+	ui->nodeTree->update();
+	/////////////////////////////////////
+
+	
+	
+	pEntityDraw->SetEditMode(true);
+
+	UpdateActions();
+	pEntityDraw->ApplyJsonData();
+}
+
+void EntityWidget::on_chkEditMode_clicked()
+{
+	on_actionEditMode_toggled(ui->chkEditMode->isChecked());
 }
 
 void EntityWidget::on_chkSetConstructor_clicked()

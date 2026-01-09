@@ -62,7 +62,7 @@
              <string>...</string>
             </property>
             <property name="checkable">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -71,18 +71,12 @@
             <property name="text">
              <string>...</string>
             </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
            </widget>
           </item>
           <item>
            <widget class="QToolButton" name="btnAddPrimitiveSegment">
             <property name="text">
              <string>...</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -91,9 +85,6 @@
             <property name="text">
              <string>...</string>
             </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
            </widget>
           </item>
           <item>
@@ -101,18 +92,12 @@
             <property name="text">
              <string>...</string>
             </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
            </widget>
           </item>
           <item>
            <widget class="QToolButton" name="btnAddPrimitiveChain">
             <property name="text">
              <string>...</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -141,18 +126,12 @@
             <property name="text">
              <string>...</string>
             </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
            </widget>
           </item>
           <item>
            <widget class="QToolButton" name="btnAddShapeCircle">
             <property name="text">
              <string>...</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -161,18 +140,12 @@
             <property name="text">
              <string>...</string>
             </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
            </widget>
           </item>
           <item>
            <widget class="QToolButton" name="btnAddShapePolygon">
             <property name="text">
              <string>...</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -181,18 +154,12 @@
             <property name="text">
              <string>...</string>
             </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
            </widget>
           </item>
           <item>
            <widget class="QToolButton" name="btnAddShapeChain">
             <property name="text">
              <string>...</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -532,9 +499,6 @@
    </property>
   </action>
   <action name="actionAddBoxPrimitive">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/primitive_box.png</normaloff>:/icons16x16/shapes/primitive_box.png</iconset>
@@ -547,9 +511,6 @@
    </property>
   </action>
   <action name="actionAddCirclePrimitive">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/primitive_circle.png</normaloff>:/icons16x16/shapes/primitive_circle.png</iconset>
@@ -562,9 +523,6 @@
    </property>
   </action>
   <action name="actionAddPolygonPrimitive">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/primitive_polygon.png</normaloff>:/icons16x16/shapes/primitive_polygon.png</iconset>
@@ -577,9 +535,6 @@
    </property>
   </action>
   <action name="actionAddSegmentPrimitive">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/primitive_lineSeg.png</normaloff>:/icons16x16/shapes/primitive_lineSeg.png</iconset>
@@ -592,9 +547,6 @@
    </property>
   </action>
   <action name="actionAddLineChainPrimitive">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/primitive_lineChain.png</normaloff>:/icons16x16/shapes/primitive_lineChain.png</iconset>
@@ -607,9 +559,6 @@
    </property>
   </action>
   <action name="actionAddCapsulePrimitive">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/primitive_capsule.png</normaloff>:/icons16x16/shapes/primitive_capsule.png</iconset>
@@ -622,9 +571,6 @@
    </property>
   </action>
   <action name="actionAddBoxShape">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/shapes_box.png</normaloff>:/icons16x16/shapes/shapes_box.png</iconset>
@@ -637,9 +583,6 @@
    </property>
   </action>
   <action name="actionAddCircleShape">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/shapes_circle.png</normaloff>:/icons16x16/shapes/shapes_circle.png</iconset>
@@ -652,9 +595,6 @@
    </property>
   </action>
   <action name="actionAddPolygonShape">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/shapes_polygon.png</normaloff>:/icons16x16/shapes/shapes_polygon.png</iconset>
@@ -667,9 +607,6 @@
    </property>
   </action>
   <action name="actionAddSegmentShape">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/shapes_lineSeg.png</normaloff>:/icons16x16/shapes/shapes_lineSeg.png</iconset>
@@ -682,9 +619,6 @@
    </property>
   </action>
   <action name="actionAddLineChainShape">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/shapes_lineChain.png</normaloff>:/icons16x16/shapes/shapes_lineChain.png</iconset>
@@ -697,9 +631,6 @@
    </property>
   </action>
   <action name="actionAddCapsuleShape">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="../../../data/HyEditor.qrc">
      <normaloff>:/icons16x16/shapes/shapes_capsule.png</normaloff>:/icons16x16/shapes/shapes_capsule.png</iconset>
@@ -937,6 +868,24 @@
    </property>
    <property name="toolTip">
     <string>Add a Slider UI widget to the entity</string>
+   </property>
+  </action>
+  <action name="actionEditMode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/generic-settings.png</normaloff>:/icons16x16/generic-settings.png</iconset>
+   </property>
+   <property name="text">
+    <string>Edit Mode</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggles whether edit mode is enabled for the selected item.</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>

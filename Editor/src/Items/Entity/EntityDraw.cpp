@@ -407,15 +407,15 @@ bool EntityDraw::SetEditMode(bool bEnable)
 		return true;
 	}
 
+	if(SetAction(HYACTION_EditMode) == false)
+		return false;
+
 	EntityDrawItem *pCurEditItem = GetCurEditItem();
 	if(pCurEditItem == nullptr)
 	{
 		HyGuiLog("EntityDraw::SetEditMode - No item selected to enter Edit Mode!", LOGTYPE_Error);
 		return false;
 	}
-
-	if(SetAction(HYACTION_EditMode) == false)
-		return false;
 
 	pCurEditItem = static_cast<EntityDrawItem *>(m_SelectedItemList[0]);
 	pCurEditItem->HideTransformCtrl();

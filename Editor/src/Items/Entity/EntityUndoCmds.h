@@ -49,25 +49,6 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_AddNewShape : public QUndoCommand
-{
-	ProjectItemData &				m_EntityItemRef;
-	EditorShape						m_eShape;
-	bool							m_bIsPrimitive;
-	int32							m_iIndex;
-
-	EntityTreeItemData *			m_pShapeTreeItemData;
-
-public:
-	EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, bool bIsPrimitive, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_AddNewShape();
-
-	virtual void redo() override;
-	virtual void undo() override;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class EntityUndoCmd_AddAssets : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
@@ -149,6 +130,25 @@ class EntityUndoCmd_Transform : public QUndoCommand
 public:
 	EntityUndoCmd_Transform(ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_Transform();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_AddNewShape : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	EditorShape						m_eShape;
+	bool							m_bIsPrimitive;
+	int32							m_iIndex;
+
+	EntityTreeItemData *			m_pShapeTreeItemData;
+
+public:
+	EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, bool bIsPrimitive, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddNewShape();
 
 	virtual void redo() override;
 	virtual void undo() override;

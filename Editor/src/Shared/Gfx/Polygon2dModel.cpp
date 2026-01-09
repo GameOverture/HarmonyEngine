@@ -115,7 +115,7 @@ void Polygon2dModel::TransformSelf(glm::mat4 mtxTransform)
 
 ShapeMouseMoveResult Polygon2dModel::OnMouseMoveEvent(QPointF ptWorldMousePos)
 {
-	if(IsValidShape() == false && m_eType == SHAPE_LineChain)
+	if(IsValidShape() == false || m_eType == SHAPE_LineChain)
 	{
 		return SHAPEMOUSEMOVE_Crosshair;
 	}

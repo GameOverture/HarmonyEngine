@@ -14,7 +14,6 @@
 #include "EntityModel.h"
 #include "IWidget.h"
 
-#include <QWidgetAction>
 #include <QElapsedTimer>
 
 namespace Ui {
@@ -30,8 +29,6 @@ class EntityWidget : public IWidget
 	QMenu								m_ContextMenu;
 
 	EntityPropertiesTreeMultiModel *	m_pMultiPropModel;
-
-	QWidgetAction *						m_pActionEditMode;
 
 	QTimer *							m_pPreviewUpdateTimer;
 	QList<QUuid>						m_PreviewSelectedItemsList; // Used to restore what selected items were after previewing ends
@@ -74,7 +71,6 @@ private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void OnCollapsedNode(const QModelIndex &indexRef);
-	void OnActionEditModeToggle(bool bChecked);
 
 	void on_actionAddChildren_triggered();
 
@@ -121,6 +117,8 @@ private Q_SLOTS:
 	void on_actionCopyEntityItems_triggered();
 	void on_actionPasteEntityItems_triggered();
 
+	void on_actionEditMode_toggled(bool bChecked);
+	void on_chkEditMode_clicked();
 	void on_chkSetConstructor_clicked();
 
 	void OnPreviewUpdate(); // Update callback when playing preview (spacebar)
