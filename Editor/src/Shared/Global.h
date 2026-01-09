@@ -71,6 +71,8 @@ class Project;
 #define HYMETA_ImageFilterList					{"*.png", "*.*"}
 #define HYMETA_FontFilterList					{"*.ttf", "*.otf"}
 
+#define MANHATTAN_DRAG_THRESHOLD				3
+
 #define FINDACTION(str) FindAction(this->actions(), str)
 
 #define HyGuiLog(msg, type) AuxOutputLog::Log(QString(msg), type)
@@ -187,7 +189,7 @@ enum EditorColor
 	EDITORCOLOR_TransformGrabPointSelectedOutline,
 	EDITORCOLOR_TransformGrabPointSelectedFill,
 
-	EDITORCOLOR_Shape,
+	EDITORCOLOR_Fixture,
 	EDITORCOLOR_ShapeGrabPointOutline,
 	EDITORCOLOR_ShapeGrabPointFill,
 	EDITORCOLOR_ShapeGrabPointSelectedOutline,
@@ -578,6 +580,7 @@ public:
 	static QColor ConvertHyColor(HyColor color);
 	static HyType ConvertItemType(ItemType eType);
 	static ItemType ConvertHyType(HyType eType);
+	static HyFixtureType ConvertShapeToFixtureType(EditorShape eShape);
 
 	static EntityItemDeclarationType GetEntityDeclType(QString sType);
 

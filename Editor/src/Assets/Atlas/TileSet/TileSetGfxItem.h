@@ -18,6 +18,7 @@
 class AuxTileSet;
 class AtlasTileSet;
 class TileData;
+class Polygon2dQtView;
 
 class TileSetGfxItem : public QGraphicsItem
 {
@@ -42,6 +43,8 @@ class TileSetGfxItem : public QGraphicsItem
 	QGraphicsRectItem *					m_pAnimationRectItem;		// Optional rectangle drawn around the tile when it is part of an animation
 
 	QGraphicsPolygonItem *				m_pTerrainParts[NUM_AUTOTILEPARTS];
+
+	Polygon2dQtView *					m_pCollisionView;
 
 public:
 	TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon);

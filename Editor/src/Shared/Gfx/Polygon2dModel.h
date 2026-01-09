@@ -12,50 +12,57 @@
 
 #include "Global.h"
 
-struct CollisionPolygon
+class IPolygon2dView;
+
+enum ShapeMouseMoveResult
 {
-	struct Vertex
-	{
-		QPointF			m_ptPos;
-		bool			m_bSelected;
-	};
-	QVector<Vertex>		m_VertexList;
+	SHAPEMOUSEMOVE_Crosshair,
+	SHAPEMOUSEMOVE_Outside,
+	SHAPEMOUSEMOVE_Inside,
+	SHAPEMOUSEMOVE_AddVertex,
+	SHAPEMOUSEMOVE_HoverVertex,
+	SHAPEMOUSEMOVE_HoverSelectedVertex
 };
 
-enum PolygonClickResult
+enum ShapeMousePressResult
 {
-	POLYGONCLICKRESULT_AddVertex,
-	POLYGONCLICKRESULT_SelectVertex,
-	POLYGONCLICKRESULT_Outside,
-	POLYGONCLICKRESULT_Inside
+	SHAPEMOUSEPRESS_Outside,
+	SHAPEMOUSEPRESS_Inside,
+	SHAPEMOUSEPRESS_VertexAdded,
+	SHAPEMOUSEPRESS_VertexPressed
 };
 
 class Polygon2dModel
 {
-	QVector<CollisionPolygon::Vertex>	m_UserVertexList;
+	HyColor								m_Color;
+	EditorShape							m_eType;		// "Shape", "Type" - when serialized in property (string)
+	IHyFixture2d *						m_pData;		// "Shape", "Data" - when serialized in property (QJsonArray of floats)
+	
+	QList<QPointF>						m_VertexList;
+	QList<bool>							m_VertexSelectedList;
 
-	// Rules
-	bool								m_bIsSegments;
-	bool								m_bSimplifyVertices;	// Remove collinear points
-	bool								m_bEnforceConvexShapes;	// Split
-	bool								m_bMaxVerticesEnabled;	// B2_MAX_POLYGON_VERTICES
-
-	QVector<CollisionPolygon>			m_PolygonList; // Assemble() creates multiple CollisionPolygon if rules are violated, otherwise uses a single CollisionPolygon
+	// Track Views manually since we don't inherit from QObject
+	QList<IPolygon2dView *>				m_ViewList;
 
 public:
-	Polygon2dModel();
+	Polygon2dModel(HyColor color, EditorShape eShape = SHAPE_None, const QList<float> &floatList = QList<float>());
 	virtual ~Polygon2dModel();
 
-	QVector<CollisionPolygon> GetPolygonList() const;
+	HyColor GetColor() const;
+	EditorShape GetType() const;
+	IHyFixture2d *GetData() const;
+	const QList<QPointF> &GetVertexList() const;
 
-	PolygonClickResult OnMouseHover(QPointF ptMousePos);
-	PolygonClickResult OnMouseClick(QPointF ptMousePos, bool bLeftClick, bool bShiftPressed);
-	void OnMouseDrag(QPointF ptMousePos);
+	bool IsValidShape() const;
 
-	int OnMarqueeSelect(const QRectF &rectSelection); // Returns number of vertices selected
+	void SetColor(HyColor color);
+	void SetData(HyColor color, EditorShape eShape, const QList<float> &floatList);
 
-private:
-	void Assemble();
+	void TransformSelf(glm::mat4 mtxTransform); // NOTE: Does not update m_Outline, requires a DeserializeOutline()
+
+	ShapeMouseMoveResult OnMouseMoveEvent(QPointF ptWorldMousePos);
+	ShapeMousePressResult OnMousePressEvent(QMouseEvent *pEvent);
+	int OnMouseMarqueeReleased(QPointF ptBotLeft, QPointF ptTopRight);
 };
 
 #endif // POLYGON2DMODEL_H

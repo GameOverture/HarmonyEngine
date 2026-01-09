@@ -11,6 +11,8 @@
 #include "TileSetGfxItem.h"
 #include "AuxTileSet.h"
 #include "TileData.h"
+#include "Polygon2dModel.h"
+#include "Polygon2dQtView.h"
 
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
@@ -31,6 +33,8 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	m_pRectItem(nullptr),
 	m_pPixmapItem(nullptr),
 	m_pShapeItem(nullptr),
+	m_pAnimationRectItem(nullptr),
+	m_pCollisionView(nullptr),
 	m_ptDraggingInitialPos(0.0f, 0.0f),
 	m_ptDraggingGridPos(0, 0)
 {
@@ -52,6 +56,8 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
 		m_pTerrainParts[i] = nullptr;
 
+	m_pCollisionView = nullptr;
+
 	setAcceptHoverEvents(true);
 	//setAcceptedMouseButtons(Qt::NoButton);
 }
@@ -64,6 +70,8 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 
 	for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
 		delete m_pTerrainParts[i];
+
+	delete m_pCollisionView;
 }
 
 void TileSetGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileData *pTileData)
@@ -142,15 +150,20 @@ void TileSetGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileDa
 
 	case TILESETPAGE_Collision: {
 		QUuid selectedCollisionUuid = auxTileSetRef.GetSelectedCollision();
-		if(pTileData->GetCollisionList().contains(selectedCollisionUuid) == false)
+		if(pTileData->GetCollisionLayerList().contains(selectedCollisionUuid) == false)
 		{
 			setOpacity(fUNSELECTED_OPACITY);
 			break;
 		}
 		
-		QList<QPointF> vertexList = pTileData->GetCollisionVertices(selectedCollisionUuid);
+		if(m_pCollisionView == nullptr)
+		{
+			Polygon2dModel *pShapeModel = pTileData->GetCollisionLayerModel(selectedCollisionUuid);
+			pShapeModel->SetColor(pTileSet->GetCollisionLayerColor(selectedCollisionUuid));
 
-		//Polygon2dQtView
+			m_pCollisionView = new Polygon2dQtView(this);
+			m_pCollisionView->SetModel(pShapeModel);
+		}
 		
 		break; }
 
@@ -230,12 +243,7 @@ QPixmap TileSetGfxItem::GetPixmap() const
 
 /*virtual*/ void TileSetGfxItem::paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) /*override*/
 {
-	//QGraphicsPixmapItem::paint(pPainter, option, widget);
-	//if(IsSelected())
-	//{
-	//	pPainter->setPen(Qt::DashLine);
-	//	pPainter->drawRect(boundingRect());
-	//}
+	// Intentionally left blank since we are using child QGraphicsItems for rendering
 }
 
 void TileSetGfxItem::SetAnimation(bool bShow, HyColor color)

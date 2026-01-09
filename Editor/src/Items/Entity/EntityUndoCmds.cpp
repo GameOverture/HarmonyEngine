@@ -15,6 +15,7 @@
 #include "IAssetItemData.h"
 #include "MainWindow.h"
 #include "AuxDopeSheet.h"
+#include "Polygon2dModel.h"
 
 #include <QJsonValue>
 
@@ -87,6 +88,10 @@ EntityUndoCmd_AddWidget::EntityUndoCmd_AddWidget(ProjectItemData &entityItemRef,
 		m_pWidgetTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewWidget(m_eWidgetType, -1);
 	else
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pWidgetTreeItemData, -1);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->RequestSelectedItems(QList<QUuid>() << m_pWidgetTreeItemData->GetThisUuid());
 }
 
 /*virtual*/ void EntityUndoCmd_AddWidget::undo() /*override*/
@@ -96,15 +101,14 @@ EntityUndoCmd_AddWidget::EntityUndoCmd_AddWidget(ProjectItemData &entityItemRef,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_AddNewShape::EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, QString sData, bool bIsPrimitive, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_AddNewShape::EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, bool bIsPrimitive, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_eShape(eShape),
-	m_sData(sData),
 	m_bIsPrimitive(bIsPrimitive),
 	m_iIndex(iRowIndex),
 	m_pShapeTreeItemData(nullptr)
 {
-	setText("Add New " % HyGlobal::ShapeName(m_eShape) % (m_bIsPrimitive ? "Primitive" : "") % " Shape");
+	setText("Add New " % HyGlobal::ShapeName(m_eShape) % (m_bIsPrimitive ? "Primitive" : "Fixture") % " Shape");
 }
 
 /*virtual*/ EntityUndoCmd_AddNewShape::~EntityUndoCmd_AddNewShape()
@@ -117,10 +121,14 @@ EntityUndoCmd_AddNewShape::EntityUndoCmd_AddNewShape(ProjectItemData &entityItem
 	{
 		int iStateIndex = m_EntityItemRef.GetWidget()->GetCurStateIndex();
 		int iFrameIndex = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
-		m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewShape(iStateIndex, iFrameIndex, m_eShape, m_sData, m_bIsPrimitive, m_iIndex);
+		m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewShape(iStateIndex, iFrameIndex, m_eShape, m_bIsPrimitive, m_iIndex);
 	}
 	else
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pShapeTreeItemData, m_iIndex);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->SetEditMode(m_pShapeTreeItemData);
 }
 
 /*virtual*/ void EntityUndoCmd_AddNewShape::undo() /*override*/
@@ -354,7 +362,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
 	QList<QUuid> affectedItemUuidList;
-	m_sOldShapeDataList.clear();
+	m_OldShapeDataArrayList.clear();
 	m_CreatedKeyFrameList.clear();
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
@@ -395,21 +403,25 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 			}
 
 			m_CreatedKeyFrameList.push_back(std::make_tuple(bCreatedTranslationKeyFrame, bCreatedRotationKeyFrame, bCreatedScaleKeyFrame));
-
-			m_sOldShapeDataList.push_back(QString());
 		}
-		else // ITEM_BoundingVolume
+		else // ITEM_FixtureShape or ITEM_FixtureChain
 		{
 			QString sShapeType = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_ComboBoxString, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Type")).toString();
-			QString sShapeData = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_LineEdit, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data")).toString();
-			m_sOldShapeDataList.push_back(sShapeData);
+			QJsonArray oldShapeDataArray = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_FloatArray, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data")).toJsonArray();
+			m_OldShapeDataArrayList.append(oldShapeDataArray);
+
+			QList<float> floatList;
+			for(QJsonValue floatVal : oldShapeDataArray)
+				floatList.push_back(static_cast<float>(floatVal.toDouble()));
+			Polygon2dModel tmpShapeModel(HyColor::Black, HyGlobal::GetShapeFromString(sShapeType), floatList);
+			tmpShapeModel.TransformSelf(m_NewTransformList[i]);
+
+			std::vector<float> transformedFloatList = tmpShapeModel.GetData()->SerializeSelf();
+			QJsonArray transformedFloatArray;
+			for(float fVal : transformedFloatList)
+				transformedFloatArray.append(fVal);
 			
-			ShapeCtrl shapeCtrl(nullptr);
-			shapeCtrl.Setup(HyGlobal::GetShapeFromString(sShapeType), HyColor::White, 0.0f, 1.0f);
-			shapeCtrl.Deserialize(m_sOldShapeDataList.last(), nullptr);
-			shapeCtrl.TransformSelf(m_NewTransformList[i]);
-			
-			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", shapeCtrl.Serialize(), false);
+			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", transformedFloatArray, false);
 		}
 
 		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
@@ -483,10 +495,10 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 				}
 			}
 
-			m_sOldShapeDataList.push_back(QString());
+			m_OldShapeDataArrayList.push_back(QJsonArray()); // Blank to keep indices aligned
 		}
 		else
-			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", m_sOldShapeDataList[i], false);
+			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", m_OldShapeDataArrayList[i], false);
 
 		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
 	}
@@ -502,15 +514,21 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pShapeItemData, QString sNewData, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pShapeItemData, EditorShape eNewType, const QList<float> &newData, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_iStateIndex(iStateIndex),
 	m_iFrameIndex(iFrameIndex),
 	m_pShapeItemData(pShapeItemData),
-	m_sNewData(sNewData)
+	m_eNewType(eNewType),
+	m_NewData(newData)
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
-	m_sPrevData = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_LineEdit, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data")).toString();
+	m_eOldType = HyGlobal::GetShapeFromString(pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Type").toString());
+	
+	QJsonArray dataArray = pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data").toArray();
+	for(QJsonValue val : dataArray)
+		m_OldData.append(static_cast<float>(val.toDouble()));
+
 	setText(sText);
 }
 
@@ -521,25 +539,43 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(QString sText, ProjectItemData 
 /*virtual*/ void EntityUndoCmd_ShapeData::redo() /*override*/
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
-	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data", m_sNewData, true);
+
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(m_eNewType)), false);
+
+	QJsonArray newDataArray;
+	for(float f : m_NewData)
+		newDataArray.append(f);
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data", newDataArray, true);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
-	if(pWidget)
-		pWidget->RequestSelectedItems(QList<QUuid>() << m_pShapeItemData->GetThisUuid());
-
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->SetShapeEditMode(true);
+	if(pWidget == nullptr)
+	{
+		HyGuiLog("EntityUndoCmd_ShapeData::redo() - pWidget is nullptr", LOGTYPE_Error);
+		return;
+	}
+	pWidget->RequestSelectedItems(QList<QUuid>() << m_pShapeItemData->GetThisUuid());
+	pWidget->SetEditMode(m_pShapeItemData);
 }
 
 /*virtual*/ void EntityUndoCmd_ShapeData::undo() /*override*/
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
-	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data", m_sPrevData, true);
+
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(m_eOldType)), false);
+
+	QJsonArray oldDataArray;
+	for(float f : m_OldData)
+		oldDataArray.append(f);
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Data", oldDataArray, true);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
-	if(pWidget)
-		pWidget->RequestSelectedItems(QList<QUuid>() << m_pShapeItemData->GetThisUuid());
-
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->SetShapeEditMode(true);
+	if(pWidget == nullptr)
+	{
+		HyGuiLog("EntityUndoCmd_ShapeData::undo() - pWidget is nullptr", LOGTYPE_Error);
+		return;
+	}
+	pWidget->RequestSelectedItems(QList<QUuid>() << m_pShapeItemData->GetThisUuid());
+	pWidget->SetEditMode(m_pShapeItemData);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

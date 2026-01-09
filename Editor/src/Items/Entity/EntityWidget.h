@@ -14,10 +14,8 @@
 #include "EntityModel.h"
 #include "IWidget.h"
 
-#include <QWidget>
-#include <QToolBar>
+#include <QWidgetAction>
 #include <QElapsedTimer>
-#include <QActionGroup>
 
 namespace Ui {
 class EntityWidget;
@@ -29,10 +27,11 @@ class EntityWidget : public IWidget
 {
 	Q_OBJECT
 
-	QActionGroup						m_AddShapeActionGroup;
 	QMenu								m_ContextMenu;
 
 	EntityPropertiesTreeMultiModel *	m_pMultiPropModel;
+
+	QWidgetAction *						m_pActionEditMode;
 
 	QTimer *							m_pPreviewUpdateTimer;
 	QList<QUuid>						m_PreviewSelectedItemsList; // Used to restore what selected items were after previewing ends
@@ -53,9 +52,8 @@ public:
 
 	void SetExtrapolatedProperties();
 
-	void CheckShapeAddBtn(EditorShape eShapeType, bool bAsPrimitive);
-	void SetAsShapeEditMode(bool bEnableSem);
-	void UncheckAll();
+	bool IsEditMode() const;
+	void SetEditMode(EntityTreeItemData *pItemToEdit);
 
 protected:
 	virtual void showEvent(QShowEvent *pEvent) override;
@@ -76,6 +74,8 @@ private Q_SLOTS:
 	void OnContextMenu(const QPoint &pos);
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void OnCollapsedNode(const QModelIndex &indexRef);
+	void OnActionEditModeToggle(bool bChecked);
+
 	void on_actionAddChildren_triggered();
 
 	void on_actionAddLabel_triggered();
@@ -102,8 +102,6 @@ private Q_SLOTS:
 	void on_actionAddSegmentShape_triggered();
 	void on_actionAddLineChainShape_triggered();
 	void on_actionAddCapsuleShape_triggered();
-
-	void on_actionVertexEditMode_toggled(bool bChecked);
 
 	void on_actionOrderChildrenUp_triggered();
 	void on_actionOrderChildrenDown_triggered();

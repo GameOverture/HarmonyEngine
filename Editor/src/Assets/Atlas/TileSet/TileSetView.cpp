@@ -165,7 +165,7 @@ void TileSetView::ResetCamera(TileSetPage ePage)
 
 	case DRAGSTATE_InitialPress: {
 		QPointF dragDelta = pEvent->pos() - m_ptDragStart;
-		if (dragDelta.manhattanLength() >= 3)
+		if (dragDelta.manhattanLength() >= MANHATTAN_DRAG_THRESHOLD)
 		{
 			switch (m_pAuxTileSet->GetCurrentPage())
 			{

@@ -17,6 +17,8 @@
 #include <QJsonObject>
 #include <QDataStream>
 
+class Polygon2dModel;
+
 class TileData
 {
 	QUuid											m_Uuid;
@@ -36,7 +38,7 @@ class TileData
 	QUuid											m_TerrainSetUuid;		// The Terrain Set assigned to this tile
 	QMap<QUuid, QBitArray>							m_TerrainMap;			// Key: Terrain Uuid (NOT TERRAIN SET), Value: QBitArray(NUM_AUTOTILEPARTS)
 
-	QMap<QUuid, QList<QPointF>>						m_CollisionMap;
+	QMap<QUuid, Polygon2dModel *>					m_CollisionLayerMap;
 
 public:
 	TileData(QPoint metaGridPos, QPixmap tilePixmap);
@@ -65,9 +67,8 @@ public:
 	const QMap<QUuid, QBitArray> &GetTerrainMap() const;
 	void SetTerrainMap(const QMap<QUuid, QBitArray> &terrainMap);
 
-	QList<QUuid> GetCollisionList() const;
-	QList<QPointF> GetCollisionVertices(QUuid uuid) const;
-	void SetCollisionVertices(QUuid uuid, const QList<QPointF> &vertexList);
+	QList<QUuid> GetCollisionLayerList() const;
+	Polygon2dModel *GetCollisionLayerModel(QUuid uuid) const;
 };
 
 #endif // TILEDATA_H

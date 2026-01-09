@@ -998,7 +998,7 @@ void AuxTileSet::on_btnAddTerrainSet_clicked()
 
 void AuxTileSet::on_btnAddCollision_clicked()
 {
-	QJsonObject collisionObj = AtlasTileSet::GenerateNewCollisionJsonObject();
+	QJsonObject collisionObj = AtlasTileSet::GenerateNewCollisionJsonObject(HyGlobal::GetEditorColor(EDITORCOLOR_Fixture));
 
 	TileSetUndoCmd_AddWgtItem *pNewCmd = new TileSetUndoCmd_AddWgtItem(*this, TILESETWGT_Collision, collisionObj);
 	m_pTileSet->GetUndoStack()->push(pNewCmd);

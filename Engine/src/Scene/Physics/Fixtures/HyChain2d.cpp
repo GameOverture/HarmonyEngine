@@ -76,11 +76,11 @@ void HyChain2d::SetData(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoo
 		HyLogWarning("HyChain2d::SetData() - Removing redundant final vertex in chain loop");
 		uiNumVerts--; // Correct the vert list to not include the redundant final loop point
 	}
-	if(uiNumVerts < 4)
-	{
-		HyLogWarning("HyChain2d::SetData() failed - Line chains must be initialized with at least 4 vertices");
-		return;
-	}
+	//if(uiNumVerts < 4)
+	//{
+	//	HyLogWarning("HyChain2d::SetData() failed - Line chains must be initialized with at least 4 vertices");
+	//	return;
+	//}
 
 	ClearShapeData();
 	m_eType = HYFIXTURE_LineChain;
@@ -116,6 +116,46 @@ void HyChain2d::SetData(const std::vector<glm::vec2> &verticesList, bool bLoop, 
 		m_eType = HYFIXTURE_LineChain;
 		ShapeChanged();
 	}
+}
+
+/*virtual*/ std::vector<float> HyChain2d::SerializeSelf() const /*override*/
+{
+	std::vector<float> floatList;
+	if(IsValid() == false)
+		return floatList;
+
+	for(int i = 0; i < m_Data.iCount; ++i)
+	{
+		floatList.push_back(m_Data.pPointList[i].x);
+		floatList.push_back(m_Data.pPointList[i].y);
+	}
+
+	if(m_Data.bLoop) // Identical first and last point indicates a loop (when serializing)
+	{
+		floatList.push_back(m_Data.pPointList[0].x);
+		floatList.push_back(m_Data.pPointList[0].y);
+	}
+
+	return floatList;
+}
+
+/*virtual*/ void HyChain2d::DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) /*override*/
+{
+	if(eFixtureType != HYFIXTURE_LineChain)
+	{
+		HyLogError("HyChain2d::DeserializeSelf() - Mismatched fixture type");
+		return;
+	}
+
+	std::vector<glm::vec2> vertList;
+	for(int i = 0; i < floatList.size(); i += 2)
+		vertList.push_back(glm::vec2(floatList[i], floatList[i + 1]));
+
+	bool bLineLoop = vertList.size() >= 4 && (vertList.front() == vertList.back());
+	if(bLineLoop)
+		vertList.pop_back(); // Remove redundant final point
+
+	SetData(vertList, bLineLoop);
 }
 
 bool HyChain2d::GetCentroid(glm::vec2 &ptCentroidOut) const
@@ -423,7 +463,7 @@ bool HyChain2d::AllocChainData(HyChainData &chainDataOut, const glm::mat4 &mtxTr
 
 	float fScaleX = glm::length(glm::vec3(mtxTransform[0][0], mtxTransform[0][1], mtxTransform[0][2]));
 	float fScaleY = glm::length(glm::vec3(mtxTransform[1][0], mtxTransform[1][1], mtxTransform[1][2]));
-	if(fScaleX < FloatSlop || fScaleY < FloatSlop || std::isnan(mtxTransform[3].x) || std::isnan(mtxTransform[3].y)) // TODO: Trace down why sometimes the position vector of the transform is NaN. This causes a mostly harmless assert() in b2PolygonShape::Set() (Doing isNan check in GetLocalTransform() will break)
+	if(fScaleX < HyMath::FloatSlop || fScaleY < HyMath::FloatSlop || std::isnan(mtxTransform[3].x) || std::isnan(mtxTransform[3].y)) // TODO: Trace down why sometimes the position vector of the transform is NaN. This causes a mostly harmless assert() in b2PolygonShape::Set() (Doing isNan check in GetLocalTransform() will break)
 		return false;
 
 	std::vector<glm::vec4> vertList;

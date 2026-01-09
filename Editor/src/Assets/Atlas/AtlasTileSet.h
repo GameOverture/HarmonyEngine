@@ -160,12 +160,14 @@ class AtlasTileSet : public AtlasFrame
 	struct CollisionLayer
 	{
 		QUuid					m_uuid;
+		HyColor					m_Color;
 		b2Filter				m_Filter;
 		QUuid					m_SurfaceMaterialUuid;
 		bool					m_bIsSensor;
 
-		CollisionLayer() :
+		CollisionLayer(HyColor color) :
 			m_uuid(QUuid::createUuid()),
+			m_Color(color),
 			m_Filter(b2DefaultFilter()),
 			m_SurfaceMaterialUuid(),
 			m_bIsSensor(false)
@@ -175,6 +177,7 @@ class AtlasTileSet : public AtlasFrame
 		CollisionLayer(const QJsonObject &initObj)
 		{
 			m_uuid = QUuid(initObj["UUID"].toString());
+			m_Color = HyColor(initObj["color"].toVariant().toLongLong());
 			QJsonObject filterObj = initObj["filter"].toObject();
 			m_Filter.categoryBits = static_cast<uint64_t>(filterObj["categoryBits"].toVariant().toLongLong());
 			m_Filter.maskBits = static_cast<uint64_t>(filterObj["maskBits"].toVariant().toLongLong());
@@ -187,6 +190,7 @@ class AtlasTileSet : public AtlasFrame
 		{
 			QJsonObject collisionLayerObj;
 			collisionLayerObj.insert("UUID", m_uuid.toString(QUuid::WithoutBraces));
+			collisionLayerObj.insert("color", static_cast<qint64>(m_Color.GetAsHexCode()));
 			QJsonObject filterObj;
 			filterObj["categoryBits"] = static_cast<qint64>(m_Filter.categoryBits);
 			filterObj["maskBits"] = static_cast<qint64>(m_Filter.maskBits);
@@ -243,7 +247,7 @@ public:
 	static QJsonObject GenerateNewAnimationJsonObject(QString sName, HyColor color);
 	static QJsonObject GenerateNewTerrainSetJsonObject();
 	static QJsonObject GenerateNewTerrainJsonObject(QUuid terrainSetUuid, QString sName, HyColor color);
-	static QJsonObject GenerateNewCollisionJsonObject();
+	static QJsonObject GenerateNewCollisionJsonObject(HyColor color);
 	QVector<QJsonObject> GetAnimations() const;
 	QVector<QJsonObject> GetTerrainSets() const;
 	QVector<QJsonObject> GetCollisionLayers() const;
@@ -251,6 +255,7 @@ public:
 	HyColor GetAnimationColor(QUuid animationUuid) const;
 	AutoTileType GetTerrainSetType(QUuid terrainSetUuid) const;
 	HyColor GetTerrainColor(QUuid terrainUuid) const;
+	HyColor GetCollisionLayerColor(QUuid collisionLayerUuid) const;
 
 	TileData *FindTileData(QUuid uuid) const;
 	QVector<TileData *> GetTileDataList() const;

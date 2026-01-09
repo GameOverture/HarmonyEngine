@@ -53,14 +53,13 @@ class EntityUndoCmd_AddNewShape : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
 	EditorShape						m_eShape;
-	QString							m_sData;
 	bool							m_bIsPrimitive;
 	int32							m_iIndex;
 
 	EntityTreeItemData *			m_pShapeTreeItemData;
 
 public:
-	EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, QString sData, bool bIsPrimitive, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, bool bIsPrimitive, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_AddNewShape();
 
 	virtual void redo() override;
@@ -145,7 +144,7 @@ class EntityUndoCmd_Transform : public QUndoCommand
 	QList<glm::mat4>					m_NewTransformList;
 	QList<glm::mat4>					m_OldTransformList;
 	QList<std::tuple<bool, bool, bool>>	m_CreatedKeyFrameList; // First: Translation, Second: Rotation, Third: Scale
-	QStringList							m_sOldShapeDataList;
+	QList<QJsonArray>					m_OldShapeDataArrayList;
 
 public:
 	EntityUndoCmd_Transform(ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent = nullptr);
@@ -157,18 +156,21 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// TODO: Add shape type to this an use this UndoCmd when changing shape type
 class EntityUndoCmd_ShapeData : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
 	int								m_iStateIndex;
 	int								m_iFrameIndex;
 	EntityTreeItemData *			m_pShapeItemData;
-	QString							m_sNewData;
-	QString							m_sPrevData;
+	
+	EditorShape						m_eNewType;
+	QList<float>					m_NewData;
+
+	EditorShape						m_eOldType;
+	QList<float>					m_OldData;
 
 public:
-	EntityUndoCmd_ShapeData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pShapeItemData, QString sNewData, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_ShapeData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pShapeItemData, EditorShape eNewType, const QList<float> &newData, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_ShapeData();
 
 	virtual void redo() override;

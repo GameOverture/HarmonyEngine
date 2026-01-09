@@ -12,6 +12,7 @@
 #include "EntityWidget.h"
 #include "MainWindow.h"
 #include "EntityUndoCmds.h"
+#include "Polygon2dModel.h"
 
 #include <QKeyEvent>
 #include <QApplication>
@@ -20,14 +21,14 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	IDrawEx(pProjItem, initFileDataRef),
 	m_RootEntity(this),
 	m_bPlayingPreview(false),
-	m_bIsShapeAddPrimitive(false),
-	m_ShapeEditModeWindowOutline(this)
+	m_eEditModeState(EDITMODE_Off),
+	m_EditModeWindowOutline(this)
 {
-	m_ShapeEditModeWindowOutline.UseWindowCoordinates();
-	m_ShapeEditModeWindowOutline.SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointSelectedFill));
-	m_ShapeEditModeWindowOutline.SetWireframe(true);
-	m_ShapeEditModeWindowOutline.SetLineThickness(5.0f);
-	m_ShapeEditModeWindowOutline.SetVisible(false);
+	m_EditModeWindowOutline.UseWindowCoordinates();
+	m_EditModeWindowOutline.SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointSelectedFill));
+	m_EditModeWindowOutline.SetWireframe(true);
+	m_EditModeWindowOutline.SetLineThickness(5.0f);
+	m_EditModeWindowOutline.SetVisible(false);
 }
 
 /*virtual*/ EntityDraw::~EntityDraw()
@@ -47,28 +48,28 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	if(pEvent->key() == Qt::Key_Backspace) // Qt::Key_Delete isn't being passed to this callback
 	{
-		EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
-		if(pCurVertexEditItem)
-		{
-			if(pCurVertexEditItem->GetShapeCtrl().RemoveSelectedVerts() == false)
-				return;
+		//EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
+		//if(pCurVertexEditItem)
+		//{
+		//	if(pCurVertexEditItem->GetShapeCtrl().RemoveSelectedVerts() == false)
+		//		return;
 
-			int iStateIndex = 0;
-			int iFrameIndex = 0;
-			if(m_pProjItem->GetWidget() == nullptr)
-				HyGuiLog("EntityDraw::OnKeyPressEvent - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
-			else
-			{
-				iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
-				iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
-			}
+		//	int iStateIndex = 0;
+		//	int iFrameIndex = 0;
+		//	if(m_pProjItem->GetWidget() == nullptr)
+		//		HyGuiLog("EntityDraw::OnKeyPressEvent - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
+		//	else
+		//	{
+		//		iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
+		//		iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
+		//	}
 
-			QUuid thisUuid = pCurVertexEditItem->GetEntityTreeItemData()->GetThisUuid();
-			EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(thisUuid);
+		//	QUuid thisUuid = pCurVertexEditItem->GetEntityTreeItemData()->GetThisUuid();
+		//	EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(thisUuid);
 
-			QUndoCommand *pCmd = new EntityUndoCmd_ShapeData("Removed vertices from " % pTreeItemData->GetCodeName(), *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
-			m_pProjItem->GetUndoStack()->push(pCmd);
-		}
+		//	QUndoCommand *pCmd = new EntityUndoCmd_ShapeData("Removed vertices from " % pTreeItemData->GetCodeName(), *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData,  pCurVertexEditItem->GetShapeView().SerializeVemVerts(m_pCamera));
+		//	m_pProjItem->GetUndoStack()->push(pCmd);
+		//}
 	}
 }
 
@@ -81,112 +82,148 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDrawEx::OnMouseMoveEvent(pEvent);
 
-	glm::vec2 ptCurMousePos;
-	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
+	if(GetCurAction() != HYACTION_EditMode)
+		return;
 
-	EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
-
-	if(GetCurAction() == HYACTION_EntityAddShapePending)
+	EntityDrawItem *pCurEditItem = GetCurEditItem();
+	if(pCurEditItem == nullptr)
 	{
-		if(glm::distance(m_ptDragStart, ptCurMousePos) >= 2.0f)
-			SetAction(HYACTION_EntityAddShapeDrag);
+		HyGuiLog("EntityDraw::OnMouseMoveEvent - with null edit item!", LOGTYPE_Error);
+		return;
 	}
-	else if(GetCurAction() == HYACTION_EntityAddShapeDrag)
+	EntityTreeItemData *pTreeItemData = pCurEditItem->GetEntityTreeItemData();
+
+	switch(m_eEditModeState)
 	{
-		m_DragShape.SetAsDrag(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), m_ptDragStart, ptCurMousePos, m_pCamera);
+	case EDITMODE_Off:
+		HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_Off reached in Edit Mode!", LOGTYPE_Error);
+		break;
+
+	case EDITMODE_Idle:
+		if(pTreeItemData->GetShape2dModel())
+		{
+			Polygon2dModel *pShapeModel = pTreeItemData->GetShape2dModel();
+
+			HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
+			glm::vec2 ptCurMousePos;
+			pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
+
+			ShapeMouseMoveResult eResult = pShapeModel->OnMouseMoveEvent(QPointF(ptCurMousePos.x, ptCurMousePos.y));
+			switch(eResult)
+			{
+			case SHAPEMOUSEMOVE_Crosshair:
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor);
+				break;
+			case SHAPEMOUSEMOVE_Outside:
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor);
+				break;
+			case SHAPEMOUSEMOVE_Inside:
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor);
+				break;
+			case SHAPEMOUSEMOVE_AddVertex:
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor);
+				break;
+			case SHAPEMOUSEMOVE_HoverVertex:
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor);
+				break;
+			case SHAPEMOUSEMOVE_HoverSelectedVertex:
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor);
+				break;
+			default:
+				HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_Idle with unsupported shape mouse move result!", LOGTYPE_Error);
+				break;
+			}
+		}
+		else
+			HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_Idle with unsupported edit item type!", LOGTYPE_Error);
+		break;
+
+	case EDITMODE_OutsideMouseDown: {
+		QPointF dragDelta = QPointF(pEvent->pos()) - QPointF(m_ptDragStart.x, m_ptDragStart.y);
+		if(dragDelta.manhattanLength() >= MANHATTAN_DRAG_THRESHOLD)
+			m_eEditModeState = EDITMODE_MarqueeSelect;
+		break; }
+
+	case EDITMODE_MarqueeSelect:
+		if(pTreeItemData->GetShape2dModel())
+		{
+			Polygon2dModel *pShapeModel = pTreeItemData->GetShape2dModel();
+			
+			m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
+
+			glm::vec2 ptWorldMousePos;
+			m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
+			m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptWorldMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
+		}
+		else
+			HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_MarqueeSelect with unsupported edit item type!", LOGTYPE_Error);
+		break;
+
+	case EDITMODE_HoverMouseDown: {
+		QPointF dragDelta = QPointF(pEvent->pos()) - QPointF(m_ptDragStart.x, m_ptDragStart.y);
+		if(dragDelta.manhattanLength() >= MANHATTAN_DRAG_THRESHOLD)
+			m_eEditModeState = EDITMODE_Transforming;
+		break; }
+
+	case EDITMODE_Transforming:
+		break;
+
+	default:
+		HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown EditModeState reached!", LOGTYPE_Error);
+		break;
 	}
-	//else if(GetCurAction() == HYACTION_EntitySemMarquee)
-	//{
-	//	glm::vec2 ptWorldMousePos;
-	//	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
-
-	//	m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
-	//	m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptWorldMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
-	//}
-	//else if((IsActionSemIdle() || GetCurAction() == HYACTION_EntitySemInvalid))
-	//{
-	//	m_pCurHoverItem = nullptr;
-	//	for(int32 i = m_ItemList.size() - 1; i >= 0; --i) // iterate backwards to prioritize selecting items with higher display order
-	//	{
-	//		if(m_ItemList[i]->IsMouseInBounds() && m_ItemList[i]->IsSelectable())
-	//		{
-	//			m_pCurHoverItem = m_ItemList[i];
-
-	//			if(m_SelectedItemList.contains(m_pCurHoverItem) == false)
-	//				SetAction(HYACTION_EntitySemHoverItem);
-
-	//			break;
-	//		}
-	//	}
-	//	if(GetCurAction() == HYACTION_EntitySemHoverItem && m_pCurHoverItem == nullptr)
-	//		ClearAction();
-
-
-	//	if(pCurVertexEditItem)
-	//	{
-	//		DrawAction eTrySemHoverAction = pCurVertexEditItem->GetShapeCtrl().GetMouseSemHoverAction(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), false);
-	//		if(eTrySemHoverAction == HYACTION_EntitySem)
-	//			ClearAction();
-
-	//		SetAction(eTrySemHoverAction);
-	//	}
-	//}
-	//else if(IsActionSemTransforming() && pCurVertexEditItem)
-	//{
-	//	pCurVertexEditItem->GetShapeCtrl().TransformSemVerts(GetCurAction(), m_ptDragStart, ptCurMousePos, m_pCamera);
-	//}
 }
 
 /*virtual*/ void EntityDraw::OnMousePressEvent(QMouseEvent *pEvent) /*override*/
 {
 	IDrawEx::OnMousePressEvent(pEvent);
 
-	if(pEvent->button() == Qt::LeftButton)
+	if(GetCurAction() != HYACTION_EditMode)
+		return;
+
+	EntityDrawItem *pCurEditItem = GetCurEditItem();
+	if(pCurEditItem == nullptr)
 	{
-		if(GetCurAction() == HYACTION_EntityAddShape)
+		HyGuiLog("EntityDraw::OnMousePressEvent - with null edit item!", LOGTYPE_Error);
+		return;
+	}
+	EntityTreeItemData *pTreeItemData = pCurEditItem->GetEntityTreeItemData();
+
+	switch(m_eEditModeState)
+	{
+	case EDITMODE_Off:
+		HyGuiLog("EntityDraw::OnMousePressEvent - EDITMODE_Off reached in Edit Mode!", LOGTYPE_Error);
+		break;
+
+	case EDITMODE_Idle:
+		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), m_ptDragStart);
+		
+		if(pTreeItemData->GetShape2dModel())
 		{
-			//m_PressTimer.InitStart(0.5f); // No timer, must drag a minimal amount
-			SetAction(HYACTION_EntityAddShapePending);
-		}
-		else
-		{
-			EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
-			if(pCurVertexEditItem)
+			Polygon2dModel *pShapeModel = pTreeItemData->GetShape2dModel();
+			ShapeMousePressResult eResult = pShapeModel->OnMousePressEvent(pEvent);
+			switch(eResult)
 			{
-				SemState eSemState = pCurVertexEditItem->GetShapeCtrl().GetMouseSemHoverAction(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), true);
-				//if(eSemAction == HYACTION_EntitySem)
-				//{
-				//	pCurVertexEditItem->GetShapeCtrl().UnselectAllVemVerts();
-				//	SetAction(HYACTION_EntitySemMarquee);
-				//}
-				//else
-				//{
-				//	// Convert the hover action to the transform action
-				//	switch(eSemAction)
-				//	{
-				//	case HYACTION_EntitySemHoverTranslate:			eSemAction = HYACTION_EntitySemTranslating; break;
-				//	case HYACTION_EntitySemHoverAddVertex:			eSemAction = HYACTION_EntitySemAddingVertex; break;
-				//	case HYACTION_EntitySemHoverGrabVertex:			eSemAction = HYACTION_EntitySemTranslateVertex; break;
-				//	case HYACTION_EntitySemHoverRadiusHorizontal:	eSemAction = HYACTION_EntitySemRadiusHorizontal; break;
-				//	case HYACTION_EntitySemHoverRadiusVertical:		eSemAction = HYACTION_EntitySemRadiusVertical; break;
+			case SHAPEMOUSEPRESS_Outside:
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor);
+				m_eEditModeState = EDITMODE_OutsideMouseDown;
+				break;
 
-				//	case HYACTION_EntitySemInvalid:
-				//		break;
-
-				//	default:
-				//		HyGuiLog("EntityDraw::OnMousePressEvent - Invalid eSemHoverAction", LOGTYPE_Error);
-				//	}
-
-				//	if(SetAction(eSemAction))
-				//		pCurVertexEditItem->GetShapeCtrl().TransformSemVerts(GetCurAction(), m_ptDragStart, m_ptDragStart, m_pCamera);
-				//}
+			case SHAPEMOUSEPRESS_Inside:
+			case SHAPEMOUSEPRESS_VertexAdded:
+			case SHAPEMOUSEPRESS_VertexPressed:
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BlankCursor);
+				m_eEditModeState = EDITMODE_HoverMouseDown;
+				break;
 			}
 		}
-	}
-	else if(pEvent->button() == Qt::RightButton)
-	{
-		//if(IsActionSemIdle() || IsActionSemTransforming())
-		//	RequestClearShapeEdit();
+		else
+			HyGuiLog("EntityDraw::OnMousePressEvent - EDITMODE_Idle with unsupported edit item type!", LOGTYPE_Error);
+		break;
+
+	default:
+		HyGuiLog("EntityDraw::OnMousePressEvent - Unhandled EditModeState reached!", LOGTYPE_Error);
+		break;
 	}
 }
 
@@ -194,25 +231,64 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDrawEx::OnMouseReleaseEvent(pEvent);
 
-	EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
+	if(GetCurAction() != HYACTION_EditMode)
+		return;
 
-	if(GetCurAction() == HYACTION_EntityAddShapePending || GetCurAction() == HYACTION_EntityAddShapeDrag)
+	EntityDrawItem *pCurEditItem = GetCurEditItem();
+	if(pCurEditItem == nullptr)
 	{
-		if(GetCurAction() == HYACTION_EntityAddShapeDrag)
-		{
-			QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(*m_pProjItem,
-																m_DragShape.GetShapeType(),
-																m_DragShape.Serialize(),
-																m_bIsShapeAddPrimitive,
-																-1);
-			m_pProjItem->GetUndoStack()->push(pCmd);
-
-			if(m_pProjItem->GetWidget())
-				static_cast<EntityWidget *>(m_pProjItem->GetWidget())->UncheckAll();
-				
-			ClearAction();
-		}
+		HyGuiLog("EntityDraw::OnMousePressEvent - with null edit item!", LOGTYPE_Error);
+		return;
 	}
+	EntityTreeItemData *pTreeItemData = pCurEditItem->GetEntityTreeItemData();
+
+	switch(m_eEditModeState)
+	{
+	case EDITMODE_Off:
+		HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_Off reached in Edit Mode!", LOGTYPE_Error);
+		break;
+
+	case EDITMODE_Idle:
+		break;
+
+	case EDITMODE_HoverMouseDown:
+	case EDITMODE_MarqueeSelect:
+		if(pTreeItemData->GetShape2dModel())
+		{
+			Polygon2dModel *pShapeModel = pTreeItemData->GetShape2dModel();
+			
+
+			b2AABB marqueeAabb;
+			HyShape2d tmpShape;
+			m_DragShape.GetPrimitive(true).CalcLocalBoundingShape(tmpShape);
+			tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
+
+			pShapeModel->OnMouseMarqueeReleased(QPointF(marqueeAabb.lowerBound.x, marqueeAabb.lowerBound.y), QPointF(marqueeAabb.upperBound.x, marqueeAabb.upperBound.y));
+			m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+		}
+		break;
+
+	default:
+		HyGuiLog("EntityDraw::OnMousePressEvent - Unhandled EditModeState reached!", LOGTYPE_Error);
+		break;
+	}
+
+
+
+	//EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
+
+	//if(GetCurAction() == HYACTION_EntityAddShapePending || GetCurAction() == HYACTION_EntityAddShapeDrag)
+	//{
+	//	if(GetCurAction() == HYACTION_EntityAddShapeDrag)
+	//	{
+	//		// NOTE REmoved undocmd for adding shape here
+
+	//		if(m_pProjItem->GetWidget())
+	//			static_cast<EntityWidget *>(m_pProjItem->GetWidget())->UncheckAll();
+	//			
+	//		ClearAction();
+	//	}
+	//}
 	//else if(GetCurAction() == HYACTION_EntitySemMarquee)
 	//{
 	//	b2AABB marqueeAabb;
@@ -277,11 +353,6 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	//}
 }
 
-bool EntityDraw::IsSemEnabled() const
-{
-	return m_ShapeEditModeWindowOutline.IsVisible();
-}
-
 //bool EntityDraw::IsActionSemIdle() const
 //{
 //	return m_eDrawAction == HYACTION_EntitySem ||
@@ -302,78 +373,83 @@ bool EntityDraw::IsSemEnabled() const
 //		   m_eDrawAction == HYACTION_EntitySemRadiusVertical;
 //}
 
-EditorShape EntityDraw::GetShapeAddType() const
-{
-	return m_DragShape.GetShapeType();
-}
+//bool EntityDraw::SetAsShapeAdd(EditorShape eShape, bool bAsPrimitive)
+//{
+//	if(SetAction(HYACTION_EntityAddShape))
+//	{
+//		m_bIsShapeAddPrimitive = bAsPrimitive;
+//		OnRequestSelection(QList<IDrawExItem *>()); // Clear any selected item
+//
+//		m_DragShape.Setup(eShape, bAsPrimitive ? HyColor::White : HyGlobal::GetEditorColor(EDITORCOLOR_Fixture), 1.0f, 1.0f);
+//
+//		return true;
+//	}
+//
+//	return false;
+//}
 
-bool EntityDraw::SetAsShapeAdd(EditorShape eShape, bool bAsPrimitive)
+bool EntityDraw::SetEditMode(bool bEnable)
 {
-	if(SetAction(HYACTION_EntityAddShape))
+	if(bEnable == false)
 	{
-		m_bIsShapeAddPrimitive = bAsPrimitive;
-		OnRequestSelection(QList<IDrawExItem *>()); // Clear any selected item
+		m_eEditModeState = EDITMODE_Off;
+		if(GetCurAction() == HYACTION_EditMode)
+		{
+			EntityDrawItem *pCurEditItem = GetCurEditItem();
+			if(pCurEditItem)
+				pCurEditItem->ShowTransformCtrl(true);
 
-		m_DragShape.Setup(eShape, bAsPrimitive ? HyColor::White : HyGlobal::GetEditorColor(EDITORCOLOR_Shape), 1.0f, 1.0f);
+			ClearAction();
+			MainWindow::ClearStatus();
+		}
 
+		m_EditModeWindowOutline.SetVisible(false);
 		return true;
 	}
 
-	return false;
-}
-
-void EntityDraw::SetAsShapeEditMode(bool bEnable)
-{
-	if(bEnable)
+	EntityDrawItem *pCurEditItem = GetCurEditItem();
+	if(pCurEditItem == nullptr)
 	{
-		//if(SetBackgroundAction(HYACTION_EntitySem))
-		{
-			EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
+		HyGuiLog("EntityDraw::SetEditMode - No item selected to enter Edit Mode!", LOGTYPE_Error);
+		return false;
+	}
 
-			if(pCurVertexEditItem)
-			{
-				pCurVertexEditItem = static_cast<EntityDrawItem *>(m_SelectedItemList[0]);
-				pCurVertexEditItem->HideTransformCtrl();
-				pCurVertexEditItem->GetShapeCtrl().EnableVertexEditMode();
-			}
+	if(SetAction(HYACTION_EditMode) == false)
+		return false;
 
-			m_ShapeEditModeWindowOutline.SetVisible(true);
-		}
+	pCurEditItem = static_cast<EntityDrawItem *>(m_SelectedItemList[0]);
+	pCurEditItem->HideTransformCtrl();
+	
+	EntityTreeItemData *pTreeItemData = pCurEditItem->GetEntityTreeItemData();
+
+	// Determine which EditModeState to enter based on the shape type of the current shape
+	if(pTreeItemData->GetShape2dModel())
+	{
+		Polygon2dModel *pShapeModel = pTreeItemData->GetShape2dModel();
+		MainWindow::SetStatus("Editing " % HyGlobal::ShapeName(pShapeModel->GetType()) % " Shape - " % pTreeItemData->GetCodeName(), 0);
 	}
 	else
-	{
-		m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+		HyGuiLog("EntityDraw::SetEditMode - Unsupported edit item type!", LOGTYPE_Error);
 
-		EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
-		if(pCurVertexEditItem)
-		{
-			pCurVertexEditItem->ShowTransformCtrl(true);
-			pCurVertexEditItem->GetShapeCtrl().ClearVertexEditMode();
-		}
-
-		//ClearAction();
-		//if(m_eBackgroundDrawAction == HYACTION_EntitySem)
-		//	ClearBackgroundAction();
-
-		m_ShapeEditModeWindowOutline.SetVisible(false);
-	}
+	m_eEditModeState = EDITMODE_Idle;
+	m_EditModeWindowOutline.SetVisible(true);
 
 	DoMouseMove(QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ControlModifier),
 				QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
 }
 
-EntityDrawItem *EntityDraw::GetCurShapeEditItem() const
+EntityDrawItem *EntityDraw::GetCurEditItem() const
 {
-	if(IsSemEnabled() && m_SelectedItemList.size() == 1)
+	if(GetCurAction() == HYACTION_EditMode && m_SelectedItemList.size() == 1 && static_cast<EntityDrawItem *>(m_SelectedItemList[0])->GetEntityTreeItemData()->IsEditable())
 		return static_cast<EntityDrawItem *>(m_SelectedItemList[0]);
 
 	return nullptr;
 }
 
-void EntityDraw::RequestClearShapeEdit()
-{
-	static_cast<EntityModel *>(m_pProjItem->GetModel())->SetShapeEditMode(false);
-}
+//void EntityDraw::RequestClearShapeEdit()
+//{
+//	static_cast<EntityModel *>(m_pProjItem->GetModel())->SetShapeEditMode(false);
+//}
 
 void EntityDraw::SetExtrapolatedProperties()
 {
@@ -401,8 +477,7 @@ void EntityDraw::SetExtrapolatedProperties()
 							-1,
 							iDESTINATION_FRAME,
 							ctorFrameMap,
-							pRootTreeItemData->GetPreviewComponent(),
-							m_pCamera);
+							pRootTreeItemData->GetPreviewComponent());
 
 	// Set the extrapolated properties for all the children items
 	for(IDrawExItem *pDrawItem : m_ItemList)
@@ -421,11 +496,10 @@ void EntityDraw::SetExtrapolatedProperties()
 			ctorFrameMap[-1] = ctorKeyFrameMapRef[pEntityTreeItemData];
 
 			static_cast<SubEntity *>(pEntDrawItem->GetHyNode())->Extrapolate(ctorFrameMap,
-																			pEntityTreeItemData->GetPreviewComponent(),
-																			pEntityTreeItemData->IsSelected(),
-																			fFRAME_DURATION,
-																			iDESTINATION_FRAME,
-																			m_pCamera);
+																			 pEntityTreeItemData->GetPreviewComponent(),
+																			 pEntityTreeItemData->IsSelected(),
+																			 fFRAME_DURATION,
+																			 iDESTINATION_FRAME);
 		}
 		else
 		{
@@ -435,15 +509,14 @@ void EntityDraw::SetExtrapolatedProperties()
 
 			ExtrapolateProperties(m_pProjItem->GetProject(),
 									pEntDrawItem->GetHyNode(),
-									&pEntDrawItem->GetShapeCtrl(),
+									pEntDrawItem->GetEntityTreeItemData()->GetShape2dModel(),
 									pEntityTreeItemData->IsSelected(),
 									eItemType,
 									fFRAME_DURATION,
 									-1,
 									iDESTINATION_FRAME,
 									ctorFrameMap,
-									pEntityTreeItemData->GetPreviewComponent(),
-									m_pCamera);
+									pEntityTreeItemData->GetPreviewComponent());
 		}
 	}
 
@@ -565,22 +638,9 @@ void EntityDraw::SetExtrapolatedProperties()
 	SetExtrapolatedProperties();
 
 	// Based on mode and `m_SelectedItemList`, show/hide transform and shape edit ctrls
-	EntityDrawItem *pSemItem = GetCurShapeEditItem();
 	for(IDrawExItem *pItem : m_ItemList)
-	{
-		EntityDrawItem *pDrawItem = static_cast<EntityDrawItem *>(pItem);
+		static_cast<EntityDrawItem *>(pItem)->HideTransformCtrl();
 
-		pDrawItem->HideTransformCtrl();
-		if(pSemItem)
-		{
-			if(pSemItem == pDrawItem)
-				pDrawItem->GetShapeCtrl().EnableVertexEditMode();
-			else
-				pDrawItem->GetShapeCtrl().ClearVertexEditMode();
-		}
-		else // Shape Edit Mode item is nullptr - allow transform selections
-			pDrawItem->GetShapeCtrl().ClearVertexEditMode();
-	}
 	for(IDrawExItem *pSelectedItemDraw : m_SelectedItemList)
 		pSelectedItemDraw->ShowTransformCtrl(m_SelectedItemList.size() == 1);
 
@@ -590,7 +650,7 @@ void EntityDraw::SetExtrapolatedProperties()
 /*virtual*/ void EntityDraw::OnResizeRenderer() /*override*/
 {
 	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
-	m_ShapeEditModeWindowOutline.SetAsBox(HyRect(vWindowSize.x, vWindowSize.y));
+	m_EditModeWindowOutline.SetAsBox(HyRect(vWindowSize.x, vWindowSize.y));
 }
 
 /*virtual*/ void EntityDraw::OnRequestSelection(QList<IDrawExItem *> selectionList) /*override*/
@@ -621,10 +681,6 @@ void EntityDraw::SetExtrapolatedProperties()
 	for(IDrawExItem *pDrawItem : m_SelectedItemList)
 	{
 		EntityDrawItem *pEntDrawItem = static_cast<EntityDrawItem *>(pDrawItem);
-
-		// This updates the preview of a shape (its 'outline') when being transformed
-		if(pEntDrawItem->GetEntityTreeItemData()->GetType() == ITEM_FixtureShape || pEntDrawItem->GetEntityTreeItemData()->GetType() == ITEM_FixtureChain)
-			pEntDrawItem->GetShapeCtrl().Setup(pEntDrawItem->GetShapeCtrl().GetShapeType(), HyGlobal::GetEditorColor(EDITORCOLOR_Shape), 0.7f, 0.0f);
 
 		newTransformList.push_back(pEntDrawItem->GetHyNode()->GetSceneTransform(0.0f));
 

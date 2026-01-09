@@ -42,6 +42,8 @@ public:
 	b2Capsule GetAsCapsule() const;
 
 	virtual void TransformSelf(const glm::mat4 &mtxTransform) override;
+	virtual std::vector<float> SerializeSelf() const override;
+	virtual void DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) override;
 
 	bool GetCentroid(glm::vec2 &ptCentroidOut) const;
 	float CalcArea() const; // Returns the area in meters squared

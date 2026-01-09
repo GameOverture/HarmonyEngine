@@ -27,10 +27,14 @@
 EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 	IWidget(itemRef, pParent),
 	ui(new Ui::EntityWidget),
-	m_AddShapeActionGroup(this),
 	m_pMultiPropModel(nullptr)
 {
 	ui->setupUi(this);
+
+	m_pActionEditMode = new QWidgetAction(this);
+	m_pActionEditMode->setText("Edit Mode");
+	m_pActionEditMode->setDefaultWidget(ui->chkEditMode);
+	QObject::connect(m_pActionEditMode, SIGNAL(toggled(bool)), this, SLOT(OnActionEditModeToggle(bool)));
 
 	// Remove and re-add the main layout that holds everything. This makes the Qt Designer (.ui) files work with the base class 'IWidget'. Otherwise it jumbles them together.
 	layout()->removeItem(ui->verticalLayout);
@@ -48,12 +52,6 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->btnAddComboBox->setDefaultAction(ui->actionAddComboBox);
 	ui->btnAddSlider->setDefaultAction(ui->actionAddSlider);
 
-	m_AddShapeActionGroup.addAction(ui->actionAddBoxPrimitive);
-	m_AddShapeActionGroup.addAction(ui->actionAddCirclePrimitive);
-	m_AddShapeActionGroup.addAction(ui->actionAddPolygonPrimitive);
-	m_AddShapeActionGroup.addAction(ui->actionAddSegmentPrimitive);
-	m_AddShapeActionGroup.addAction(ui->actionAddLineChainPrimitive);
-	m_AddShapeActionGroup.addAction(ui->actionAddCapsulePrimitive);
 	ui->btnAddPrimitiveBox->setDefaultAction(ui->actionAddBoxPrimitive);
 	ui->btnAddPrimitiveCircle->setDefaultAction(ui->actionAddCirclePrimitive);
 	ui->btnAddPrimitivePolygon->setDefaultAction(ui->actionAddPolygonPrimitive);
@@ -61,12 +59,6 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->btnAddPrimitiveChain->setDefaultAction(ui->actionAddLineChainPrimitive);
 	ui->btnAddPrimitiveCapsule->setDefaultAction(ui->actionAddCapsulePrimitive);
 
-	m_AddShapeActionGroup.addAction(ui->actionAddBoxShape);
-	m_AddShapeActionGroup.addAction(ui->actionAddCircleShape);
-	m_AddShapeActionGroup.addAction(ui->actionAddPolygonShape);
-	m_AddShapeActionGroup.addAction(ui->actionAddSegmentShape);
-	m_AddShapeActionGroup.addAction(ui->actionAddLineChainShape);
-	m_AddShapeActionGroup.addAction(ui->actionAddCapsuleShape);
 	ui->btnAddShapeBox->setDefaultAction(ui->actionAddBoxShape);
 	ui->btnAddShapeCircle->setDefaultAction(ui->actionAddCircleShape);
 	ui->btnAddShapePolygon->setDefaultAction(ui->actionAddPolygonShape);
@@ -143,7 +135,7 @@ EntityWidget::~EntityWidget()
 
 /*virtual*/ void EntityWidget::OnGiveMenuActions(QMenu *pMenu) /*override*/
 {
-	pMenu->addAction(ui->actionVertexEditMode);
+	pMenu->addAction(m_pActionEditMode);
 }
 
 /*virtual*/ void EntityWidget::OnUpdateActions() /*override*/
@@ -184,7 +176,7 @@ EntityWidget::~EntityWidget()
 		eSelectedSingleItemType = ITEM_None;
 
 	// Manage currently selected items in the item tree
-	bool bEnableVemMode = false;
+	bool bAllowEditMode = false;
 	QModelIndexList selectedIndices = GetSelectedItems();
 
 	if(eSelectedSingleItemType != ITEM_None && eSelectedSingleItemType != ITEM_Unknown)
@@ -205,7 +197,7 @@ EntityWidget::~EntityWidget()
 
 	if(selectedIndices.empty())
 	{
-		bEnableVemMode = false;
+		bAllowEditMode = false;
 
 		ui->actionOrderChildrenUp->setEnabled(false);
 		ui->actionOrderChildrenDown->setEnabled(false);
@@ -227,8 +219,6 @@ EntityWidget::~EntityWidget()
 
 		ui->propertyTree->setModel(nullptr);
 
-		bEnableVemMode = false;
-
 		//// No items selected, so no properties to show
 		//ui->propertyTree->setModel(nullptr);
 		//ui->lblSelectedItemIcon->setVisible(false);
@@ -238,7 +228,8 @@ EntityWidget::~EntityWidget()
 	else
 	{
 		EntityTreeItemData *pFirstItemData = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>();
-		bEnableVemMode = selectedIndices.size() == 1 && (pFirstItemData->GetType() == ITEM_Primitive || pFirstItemData->GetType() == ITEM_FixtureShape || pFirstItemData->GetType() == ITEM_FixtureChain || pFirstItemData->GetType() == ITEM_Text);
+		
+		bAllowEditMode = selectedIndices.size() == 1 && pFirstItemData->IsEditable();
 
 		bool bRootOrBvFolder = false;
 		bool bSelectedHaveSameParent = true;
@@ -339,12 +330,12 @@ EntityWidget::~EntityWidget()
 
 	SetExtrapolatedProperties();
 
-	if(bEnableVemMode)
-		ui->actionVertexEditMode->setEnabled(true);
+	if(bAllowEditMode)
+		m_pActionEditMode->setEnabled(true);
 	else
 	{
-		ui->actionVertexEditMode->setChecked(false);
-		ui->actionVertexEditMode->setEnabled(false);
+		m_pActionEditMode->setEnabled(false);
+		m_pActionEditMode->setChecked(false);
 	}
 
 	ui->nodeTree->model()->dataChanged(ui->nodeTree->model()->index(0, 0), ui->nodeTree->model()->index(ui->nodeTree->model()->rowCount() - 1, 1));
@@ -495,79 +486,31 @@ void EntityWidget::SetExtrapolatedProperties()
 	ui->propertyTree->resizeColumnToContents(0);
 }
 
-void EntityWidget::CheckShapeAddBtn(EditorShape eShapeType, bool bAsPrimitive)
+bool EntityWidget::IsEditMode() const
 {
-	switch(eShapeType)
-	{
-	case SHAPE_Box:
-		if(bAsPrimitive)
-			ui->btnAddPrimitiveBox->setChecked(true);
-		else
-			ui->btnAddShapeBox->setChecked(true);
-		break;
-
-	case SHAPE_Circle:
-		if(bAsPrimitive)
-			ui->btnAddPrimitiveCircle->setChecked(true);
-		else
-			ui->btnAddShapeCircle->setChecked(true);
-		break;
-
-	case SHAPE_LineSegment:
-		if(bAsPrimitive)
-			ui->btnAddPrimitiveSegment->setChecked(true);
-		else
-			ui->btnAddShapeSegment->setChecked(true);
-		break;
-
-	case SHAPE_Polygon:
-		if(bAsPrimitive)
-			ui->btnAddPrimitivePolygon->setChecked(true);
-		else
-			ui->btnAddShapePolygon->setChecked(true);
-		break;
-
-	case SHAPE_Capsule:
-		if(bAsPrimitive)
-			ui->btnAddPrimitiveCapsule->setChecked(true);
-		else
-			ui->btnAddShapeCapsule->setChecked(true);
-		break;
-
-	case SHAPE_LineChain:
-		if(bAsPrimitive)
-			ui->btnAddPrimitiveChain->setChecked(true);
-		else
-			ui->btnAddShapeChain->setChecked(true);
-		break;
-	}
+	return m_pActionEditMode->isChecked();
 }
 
-void EntityWidget::SetAsShapeEditMode(bool bEnableSem)
+void EntityWidget::SetEditMode(EntityTreeItemData *pItemToEdit)
 {
-	ui->chkShapeEditMode->setChecked(bEnableSem);
-	ui->nodeTree->update();
-
-	if(bEnableSem == false)
-		UncheckAll();
-
-	// Check if any selected item is still able to be selected
-	QModelIndexList selectedIndexes = GetSelectedItems();
-	QList<QUuid> uuidList;
-	for(const QModelIndex &index : selectedIndexes)
+	if(pItemToEdit)
 	{
-		EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
-		if(pEntItemData->IsSelected())
-			uuidList.append(pEntItemData->GetUuid());
+		RequestSelectedItems(QList<QUuid>() << pItemToEdit->GetThisUuid());
+
+		// Update EntityDraw with latest selection via ApplyJsonData()
+		EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+		if(pEntityDraw == nullptr)
+		{
+			HyGuiLog("EntityWidget::SetEditMode() - pEntityDraw is nullptr", LOGTYPE_Error);
+			m_pActionEditMode->setChecked(false);
+			return;
+		}
+		pEntityDraw->ApplyJsonData();
+
+		m_pActionEditMode->setChecked(true);
 	}
-
-	RequestSelectedItems(uuidList);
-}
-
-void EntityWidget::UncheckAll()
-{
-	for(QAction *pAction : m_AddShapeActionGroup.actions())
-		pAction->setChecked(false);
+	else
+		m_pActionEditMode->setChecked(false);
 }
 
 /*virtual*/ void EntityWidget::showEvent(QShowEvent *pEvent) /*override*/
@@ -673,7 +616,8 @@ void EntityWidget::OnKeyShiftE()
 
 void EntityWidget::OnKeyF()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeEditMode();
+	if(m_pActionEditMode->isEnabled())
+		m_pActionEditMode->toggle();
 }
 
 void EntityWidget::OnContextMenu(const QPoint &pos)
@@ -744,6 +688,52 @@ void EntityWidget::OnCollapsedNode(const QModelIndex &indexRef)
 	// Prevent Root or BvFolder from collapsing
 	if(pTreeItemData->GetEntType() == ENTTYPE_Root || pTreeItemData->GetEntType() == ENTTYPE_BvFolder)
 		ui->nodeTree->expand(indexRef);
+}
+
+void EntityWidget::OnActionEditModeToggle(bool bChecked)
+{
+	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pEntityDraw == nullptr)
+	{
+		HyGuiLog("EntityModel::SetShapeEditMode() - pEntityDraw is nullptr", LOGTYPE_Error);
+		return;
+	}
+
+	if(bChecked == false)
+	{
+		pEntityDraw->SetEditMode(false);
+		return;
+	}
+
+	QModelIndexList selectedIndices = GetSelectedItems();
+	if(selectedIndices.size() != 1)
+	{
+		HyGuiLog("Cannot enter Edit Mode with multiple or no items selected.", LOGTYPE_Error);
+		m_pActionEditMode->setChecked(false);
+		return;
+	}
+
+	EntityTreeItemData *pFirstItemData = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>();
+	if(pFirstItemData->IsEditable() == false)
+	{
+		HyGuiLog("Selected item is not editable. Cannot enter Edit Mode.", LOGTYPE_Error);
+		m_pActionEditMode->setChecked(false);
+		return;
+	}
+
+	/////////////////////////////////////
+	// TODO: DETERMINE IF THIS IS NEEEDED
+	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
+	pTreeModel->RefreshSelectedItems();
+	ui->nodeTree->update();
+	/////////////////////////////////////
+
+	
+	
+	pEntityDraw->SetEditMode(true);
+
+	UpdateActions();
+	pEntityDraw->ApplyJsonData();
 }
 
 void EntityWidget::on_actionAddChildren_triggered()
@@ -831,67 +821,74 @@ void EntityWidget::on_actionAddSlider_triggered()
 
 void EntityWidget::on_actionAddBoxPrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Box, true);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Box, true);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddCirclePrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Circle, true);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Circle, true);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddPolygonPrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Polygon, true);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Polygon, true);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddSegmentPrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineSegment, true);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_LineSegment, true);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddLineChainPrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineChain, true);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_LineChain, true);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddCapsulePrimitive_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Capsule, true);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Capsule, true);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddBoxShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Box, false);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Box, false);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddCircleShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Circle, false);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Circle, false);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddPolygonShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Polygon, false);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Polygon, false);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddSegmentShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineSegment, false);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_LineSegment, false);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddLineChainShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_LineChain, false);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_LineChain, false);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddCapsuleShape_triggered()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->ToggleShapeAdd(SHAPE_Capsule, false);
-}
-
-void EntityWidget::on_actionVertexEditMode_toggled(bool bChecked)
-{
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetShapeEditMode(bChecked);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Capsule, false);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionOrderChildrenUp_triggered()

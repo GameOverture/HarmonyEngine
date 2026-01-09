@@ -144,9 +144,10 @@ bool IDraw::SetAction(DrawAction eHyAction)
 	case HYACTION_TransformingTranslate:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
 	case HYACTION_TransformingNudging:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
 
-	case HYACTION_EntityAddShape:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
-	case HYACTION_EntityAddShapePending:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
-	case HYACTION_EntityAddShapeDrag:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
+	case HYACTION_EditMode:						break; // Handled by EntityDraw
+
+	//case HYACTION_EntityAddShapePending:		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
+	//case HYACTION_EntityAddShapeDrag:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 	
 	//case HYACTION_EntitySem:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
 	//case HYACTION_EntitySemHoverItem:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;

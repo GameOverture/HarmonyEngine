@@ -31,8 +31,6 @@ class HyChain2d : public IHyFixture2d
 	int											m_iMaterialCount;
 
 public:
-	static const float							FloatSlop;
-
 	HyChain2d(HyEntity2d *pParent = nullptr);
 	HyChain2d(const HyChain2d &copyRef);
 	virtual ~HyChain2d();
@@ -44,6 +42,8 @@ public:
 	void SetData(const std::vector<glm::vec2> &verticesList, bool bLoop, const b2ChainDef *pPhysicsInit = nullptr);
 
 	virtual void TransformSelf(const glm::mat4 &mtxTransform) override;
+	virtual std::vector<float> SerializeSelf() const override;
+	virtual void DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) override;
 
 	bool GetCentroid(glm::vec2 &ptCentroidOut) const;
 

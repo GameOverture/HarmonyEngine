@@ -41,6 +41,7 @@ enum PropertiesType
 	PROPERTIESTYPE_ivec4,
 	PROPERTIESTYPE_vec4,
 	PROPERTIESTYPE_LineEdit,
+	PROPERTIESTYPE_FloatArray,		// QJsonArray of numbers (floats)
 	PROPERTIESTYPE_ComboBoxInt,		// delegateBuilder [QStringList] = QComboBox's selection list
 	PROPERTIESTYPE_ComboBoxString,	// delegateBuilder [QStringList] = QComboBox's selection list
 	PROPERTIESTYPE_ComboBoxItems,	// delegateBuilder [ItemType] = Lists all items in the project of this type

@@ -172,6 +172,11 @@ void HyPrimitive2d::SetAsLineChain(const std::vector<glm::vec2> &verticesList, b
 	SetAsLineChain(verticesList.data(), verticesList.size(), bLoop);
 }
 
+void HyPrimitive2d::SetAsLineChain(const HyChainData &chainData)
+{
+	SetAsLineChain(chainData.pPointList, chainData.iCount, chainData.bLoop);
+}
+
 void HyPrimitive2d::SetAsCircle(float fRadius)
 {
 	ClearChainData();
@@ -438,6 +443,8 @@ void HyPrimitive2d::AssembleLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices)
 	m_pVertBuffer = HY_NEW glm::vec2[m_uiNumVerts];
 
 	uint32 uiBufferIndex = 0;
+
+	// TODO: THIS NEEDS TO CHECK FOR CHAIN LOOP!!!!!!
 
 	std::vector<glm::vec2> vertList;
 	for(uint32 i = 0; i < uiNumVertices - 1; ++i)

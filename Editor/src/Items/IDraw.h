@@ -40,10 +40,12 @@ enum DrawAction
 	HYACTION_TransformingTranslate,
 	HYACTION_TransformingNudging,			// Using arrow keys to nudge selected items
 
-	// Entity Specific:
-	HYACTION_EntityAddShape,				// A new primitive or bounding volume tool icon is selected
-	HYACTION_EntityAddShapePending,
-	HYACTION_EntityAddShapeDrag,			// User is mouse dragging to create the new shape
+	HYACTION_EditMode,						// Edit Mode is active and the specifics are handled by models in the derived class
+
+	//// Entity Specific:
+	//HYACTION_EntityAddShape,				// A new primitive or bounding volume tool icon is selected
+	//HYACTION_EntityAddShapePending,
+	//HYACTION_EntityAddShapeDrag,			// User is mouse dragging to create the new shape
 
 	//HYACTION_EntitySem,						// Default/Blank state of Shape Edit Mode (SEM) - This action is set using SetBackgroundAction() until the mode is toggled off
 	//HYACTION_EntitySemHoverItem,

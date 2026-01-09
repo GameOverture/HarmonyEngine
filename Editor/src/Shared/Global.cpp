@@ -227,7 +227,7 @@
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointFill] = HyColor::Blue.Lighten();
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointSelectedOutline] = HyColor::White;
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointSelectedFill] = HyColor::Blue.Lighten();
-	sm_EditorColors[EDITORCOLOR_Shape] = HyColor::Purple;
+	sm_EditorColors[EDITORCOLOR_Fixture] = HyColor::Purple;
 	sm_EditorColors[EDITORCOLOR_ShapeGrabPointOutline] = HyColor::White;
 	sm_EditorColors[EDITORCOLOR_ShapeGrabPointFill] = HyColor::Red;
 	sm_EditorColors[EDITORCOLOR_ShapeGrabPointSelectedOutline] = HyColor::Red;
@@ -1061,6 +1061,28 @@
 	}
 
 	return ITEM_Unknown;
+}
+
+/*static*/ HyFixtureType HyGlobal::ConvertShapeToFixtureType(EditorShape eShape)
+{
+	switch(eShape)
+	{
+	case SHAPE_None:
+		return HYFIXTURE_Nothing;
+	case SHAPE_Polygon:
+	case SHAPE_Box:
+		return HYFIXTURE_Polygon;
+	case SHAPE_Circle:
+		return HYFIXTURE_Circle;
+	case SHAPE_Capsule:
+		return HYFIXTURE_Capsule;
+	case SHAPE_LineChain:
+		return HYFIXTURE_LineChain;
+	default:
+		HyGuiLog("HyGlobal::ConvertShapeToFixtureType - unhandled shape type", LOGTYPE_Error);
+		break;
+	}
+	return HYFIXTURE_Nothing;
 }
 
 /*static*/ EntityItemDeclarationType HyGlobal::GetEntityDeclType(QString sType)

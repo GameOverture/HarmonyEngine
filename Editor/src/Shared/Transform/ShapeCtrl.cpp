@@ -926,13 +926,13 @@ void ShapeCtrl::ClearVertexEditMode()
 	m_bIsVem = false;
 }
 
-/*static*/ QString ShapeCtrl::DeserializeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QString sData, QString sNewLine, uint32 &uiMaxVertListSizeOut)
+/*static*/ QString ShapeCtrl::DeserializeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QJsonArray floatArray, QString sNewLine, uint32 &uiMaxVertListSizeOut)
 {
 	QString sSrc;
 
-	QStringList sFloatList = sData.split(',', Qt::SkipEmptyParts);
-	for(int i = 0; i < sFloatList.size(); ++i)
-		sFloatList[i] = QString::number(sFloatList[i].toDouble(), 'f'); // Ensure we have a decimal point
+	QStringList sFloatList;
+	for(int i = 0; i < floatArray.size(); ++i)
+		sFloatList[i] = QString::number(floatArray[i].toDouble(), 'f'); // Ensure we have a decimal point
 
 	switch(eShapeType)
 	{

@@ -9,8 +9,10 @@
  *************************************************************************/
 #include "Global.h"
 #include "TileData.h"
+#include "Polygon2dModel.h"
 
 #include <QBitArray>
+#
 
 TileData::TileData(QPoint metaGridPos, QPixmap tilePixmap) :
 	m_Uuid(QUuid::createUuid()),
@@ -51,19 +53,17 @@ TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 		m_TerrainMap[terrainUuid] = peeringBits;
 	}
 
-	QJsonArray collisionArray = tileDataObj["CollisionMap"].toArray();
+	QJsonArray collisionArray = tileDataObj["CollisionLayerMap"].toArray();
 	for(int i = 0; i < collisionArray.size(); ++i)
 	{
 		QJsonObject collisionObj = collisionArray[i].toObject();
-		QUuid collisionUuid = QUuid(collisionObj["CollisionUUID"].toString());
-		QJsonArray pointArray = collisionObj["VertexList"].toArray();
-		QList<QPointF> vertexList;
-		for(int j = 0; j < pointArray.size(); ++j)
-		{
-			QJsonObject pointObj = pointArray[j].toObject();
-			vertexList.push_back(QPointF(pointObj["x"].toDouble(), pointObj["y"].toDouble()));
-		}
-		m_CollisionMap[collisionUuid] = vertexList;
+		QUuid collisionUuid = QUuid(collisionObj["CollisionLayerUUID"].toString());
+		QJsonArray dataArray = collisionObj["Data"].toArray();
+		QList<float> vertexList;
+		for(int j = 0; j < dataArray.size(); ++j)
+			vertexList.push_back(static_cast<float>(dataArray[j].toDouble()));
+
+		m_CollisionLayerMap[collisionUuid] = new Polygon2dModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixture), SHAPE_Polygon, vertexList); // NOTE: Color gets set later
 	}
 }
 
@@ -77,7 +77,7 @@ TileData::TileData(const TileData &other) :
 	m_AnimationUuid(other.m_AnimationUuid),
 	m_TerrainSetUuid(other.m_TerrainSetUuid),
 	m_TerrainMap(other.m_TerrainMap),
-	m_CollisionMap(other.m_CollisionMap)
+	m_CollisionLayerMap(other.m_CollisionLayerMap)
 {
 }
 
@@ -95,7 +95,7 @@ TileData &TileData::operator=(const TileData &other)
 	m_AnimationUuid = other.m_AnimationUuid;
 	m_TerrainSetUuid = other.m_TerrainSetUuid;
 	m_TerrainMap = other.m_TerrainMap;
-	m_CollisionMap = other.m_CollisionMap;
+	m_CollisionLayerMap = other.m_CollisionLayerMap;
 
 	return *this;
 }
@@ -153,22 +153,20 @@ QJsonObject TileData::GetTileData() const
 	tileDataObjOut["TerrainMap"] = terrainMapArray;
 
 	QJsonArray collisionArray;
-	for(auto it = m_CollisionMap.begin(); it != m_CollisionMap.end(); ++it)
+	for(auto it = m_CollisionLayerMap.begin(); it != m_CollisionLayerMap.end(); ++it)
 	{
 		QJsonObject collisionObj;
-		collisionObj["CollisionUUID"] = it.key().toString(QUuid::WithoutBraces);
-		QJsonArray pointArray;
-		for(int i = 0; i < it.value().size(); ++i)
-		{
-			QJsonObject pointObj;
-			pointObj["x"] = it.value()[i].x();
-			pointObj["y"] = it.value()[i].y();
-			pointArray.push_back(pointObj);
-		}
-		collisionObj["VertexList"] = pointArray;
+		collisionObj["CollisionLayerUUID"] = it.key().toString(QUuid::WithoutBraces);
+
+		QJsonArray floatArray;
+		std::vector<float> floatList = it.value()->GetData()->SerializeSelf();
+		for(int j = 0; j < floatList.size(); ++j)
+			floatArray.push_back(floatList[j]);
+		collisionObj["Data"] = floatArray;
+
 		collisionArray.push_back(collisionObj);
 	}
-	tileDataObjOut["CollisionMap"] = collisionArray;
+	tileDataObjOut["CollisionLayerMap"] = collisionArray;
 
 	return tileDataObjOut;
 }
@@ -260,17 +258,13 @@ void TileData::SetTerrainMap(const QMap<QUuid, QBitArray> &terrainMap)
 	m_TerrainMap = terrainMap;
 }
 
-QList<QUuid> TileData::GetCollisionList() const
+QList<QUuid> TileData::GetCollisionLayerList() const
 {
-	return m_CollisionMap.keys();
+	return m_CollisionLayerMap.keys();
 }
 
-QList<QPointF> TileData::GetCollisionVertices(QUuid uuid) const
+Polygon2dModel *TileData::GetCollisionLayerModel(QUuid uuid) const
 {
-	return m_CollisionMap.value(uuid);
+	return m_CollisionLayerMap.value(uuid);
 }
 
-void TileData::SetCollisionVertices(QUuid uuid, const QList<QPointF> &vertexList)
-{
-	m_CollisionMap[uuid] = vertexList;
-}

@@ -42,6 +42,8 @@ public:
 	bool IsValid() const;
 
 	virtual void TransformSelf(const glm::mat4 &mtxTransform) = 0;
+	virtual std::vector<float> SerializeSelf() const = 0;
+	virtual void DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) = 0;
 
 	glm::vec2 ComputeSize() const;
 

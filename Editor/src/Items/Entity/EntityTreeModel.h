@@ -20,6 +20,7 @@
 
 class EntityModel;
 class PropertiesUndoCmd;
+class Polygon2dModel;
 
 class EntityPropertiesTreeModel : public PropertiesTreeModel
 {
@@ -208,6 +209,7 @@ class EntityTreeItemData : public TreeModelItemData
 	EntityItemType										m_eEntType;
 
 	EntityPropertiesTreeModel *							m_pPropertiesModel;
+	Polygon2dModel *									m_pShape2dModel;		// Only allocated when this item is a shape (primitive or fixture)
 
 	QString												m_sPromotedEntityType;
 	EntityItemDeclarationType							m_eDeclarationType;
@@ -226,6 +228,7 @@ public:
 	virtual ~EntityTreeItemData();
 
 	bool IsSelectable() const;
+	bool IsEditable() const;	// This is compatible with Edit Mode
 	void SetLocked(bool bIsLocked);
 
 	EntityItemType GetEntType() const;
@@ -241,6 +244,8 @@ public:
 
 	EntityModel &GetEntityModel() const;
 	EntityPropertiesTreeModel &GetPropertiesModel() const;
+
+	Polygon2dModel *GetShape2dModel();
 
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);
@@ -304,7 +309,7 @@ private: // These functions should only be called by EntityModel's Cmd_ function
 	EntityTreeItemData *Cmd_AllocAssetTreeItem(IAssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocExistingTreeItem(QJsonObject descObj, bool bIsArrayItem, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocWidgetTreeItem(ItemType eWidgetType, QString sCodeNamePrefix, int iRow = -1);
-	EntityTreeItemData *Cmd_AllocShapeTreeItem(EditorShape eShape, QString sData, bool bIsPrimitive, QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocShapeTreeItem(EditorShape eShape, bool bIsPrimitive, QString sCodeNamePrefix, int iRow = -1);
 	bool Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow);
 	int32 Cmd_PopChild(EntityTreeItemData *pItem);
 

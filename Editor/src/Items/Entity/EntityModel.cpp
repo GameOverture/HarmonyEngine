@@ -133,7 +133,6 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	m_bCtor(false),
 	m_iCtorRestoreState(0),
 	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this),
-	m_bShapeEditMode(false),
 	m_AuxWidgetsModel(*this, itemFileDataRef.m_Meta["framesPerSecond"].toInt(60), itemFileDataRef.m_Meta["autoInitialize"].toBool(true))
 {
 	// The EntityTreeModel ('m_TreeModel') was initialized first so that all the EntityTreeItemData's exist.
@@ -284,24 +283,14 @@ EntityTreeItemData *EntityModel::Cmd_CreateNewWidget(ItemType eWidgetType, int i
 	//static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(eShape)), false);
 	//static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Data", QJsonValue(sData), true);
 
-	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
-	if(pWidget)
-		pWidget->RequestSelectedItems(QList<QUuid>() << pTreeItemData->GetThisUuid());
-
 	return pTreeItemData;
 }
 
-EntityTreeItemData *EntityModel::Cmd_CreateNewShape(int iStateIndex, int iFrameIndex, EditorShape eShape, QString sData, bool bIsPrimitive, int iRow)
+EntityTreeItemData *EntityModel::Cmd_CreateNewShape(int iStateIndex, int iFrameIndex, EditorShape eShape, bool bIsPrimitive, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocShapeTreeItem(eShape, sData, bIsPrimitive, "m_", iRow);
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocShapeTreeItem(eShape, bIsPrimitive, "m_", iRow);
 	static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(eShape)), false);
-	static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Data", QJsonValue(sData), true);
-	
-	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
-	if(pWidget)
-		pWidget->RequestSelectedItems(QList<QUuid>() << pTreeItemData->GetThisUuid());
-
-	SetShapeEditMode(true);
+	static_cast<EntityStateData *>(GetStateData(iStateIndex))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, iFrameIndex, "Shape", "Data", QJsonArray(), true);
 
 	return pTreeItemData;
 }
@@ -487,65 +476,6 @@ void EntityModel::Cmd_RenameItem(EntityTreeItemData *pItemData, QString sNewName
 	}
 	else
 		pItemData->SetText(sNewName);
-}
-
-void EntityModel::ToggleShapeAdd(EditorShape eShapeType, bool bAsPrimitive)
-{
-	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
-	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pWidget == nullptr || pEntDraw == nullptr)
-		return;
-
-	if(eShapeType != SHAPE_None && eShapeType != pEntDraw->GetShapeAddType() && pEntDraw->SetAsShapeAdd(eShapeType, bAsPrimitive))
-	{
-		pWidget->CheckShapeAddBtn(eShapeType, bAsPrimitive);
-
-		QString sStatusMsg("Creating New ");
-		sStatusMsg += bAsPrimitive ? "Primitive: " : "Shape: ";
-		sStatusMsg += HyGlobal::ShapeName(eShapeType);
-		MainWindow::SetStatus(sStatusMsg, 0);
-	}
-	else
-	{
-		pWidget->UncheckAll();
-		pEntDraw->SetAsShapeEditMode(false);
-		MainWindow::ClearStatus();
-	}
-}
-
-bool EntityModel::IsShapeEditMode() const
-{
-	return m_bShapeEditMode;
-}
-
-void EntityModel::ToggleShapeEditMode()
-{
-	SetShapeEditMode(!m_bShapeEditMode);
-}
-
-void EntityModel::SetShapeEditMode(bool bEnable)
-{
-	m_bShapeEditMode = bEnable;
-	if(m_bShapeEditMode)
-		MainWindow::SetStatus("Shape Edit Mode", 0);
-	else
-		MainWindow::ClearStatus();
-
-	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
-	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-	if(pWidget == nullptr || pEntityDraw == nullptr)
-	{
-		HyGuiLog("EntityModel::SetShapeEditMode() - pWidget or pEntityDraw is nullptr", LOGTYPE_Error);
-		return;
-	}
-
-	m_TreeModel.RefreshSelectedItems();
-
-	pWidget->SetAsShapeEditMode(m_bShapeEditMode);
-	pEntityDraw->SetAsShapeEditMode(m_bShapeEditMode);
-
-	pWidget->UpdateActions();
-	pEntityDraw->ApplyJsonData();
 }
 
 QString EntityModel::GenerateCodeName(QString sDesiredName) const
@@ -1115,7 +1045,7 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 			{
 				EditorShape eShapeType = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
 				uint32 uiMaxVertListSizeOut = 0;
-				sSrc += ShapeCtrl::DeserializeAsRuntimeCode(sCodeName, eShapeType, shapeObj["Data"].toString(), sNewLine, uiMaxVertListSizeOut);
+				sSrc += ShapeCtrl::DeserializeAsRuntimeCode(sCodeName, eShapeType, shapeObj["Data"].toArray(), sNewLine, uiMaxVertListSizeOut);
 			}
 		}
 		else if(sCategoryName == "Fixture")

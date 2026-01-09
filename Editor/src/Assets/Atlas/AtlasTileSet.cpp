@@ -263,9 +263,9 @@ QString AtlasTileSet::GetTileSetInfo() const
 	return terrain.ToJsonObject();
 }
 
-/*static*/ QJsonObject AtlasTileSet::GenerateNewCollisionJsonObject()
+/*static*/ QJsonObject AtlasTileSet::GenerateNewCollisionJsonObject(HyColor color)
 {
-	CollisionLayer collisionLayer;
+	CollisionLayer collisionLayer(color);
 	return collisionLayer.ToJsonObject();
 }
 
@@ -355,6 +355,17 @@ HyColor AtlasTileSet::GetTerrainColor(QUuid terrainUuid) const
 		}
 	}
 	HyGuiLog("AtlasTileSet::GetTerrainColor() could not find Terrain with UUID: " + terrainUuid.toString(), LOGTYPE_Error);
+	return HyColor::Black;
+}
+
+HyColor AtlasTileSet::GetCollisionLayerColor(QUuid collisionLayerUuid) const
+{
+	for(const CollisionLayer &collisionLayerRef : m_CollisionLayerList)
+	{
+		if(collisionLayerRef.m_uuid == collisionLayerUuid)
+			return collisionLayerRef.m_Color;
+	}
+	HyGuiLog("AtlasTileSet::GetCollisionLayerColor() could not find CollisionLayer with UUID: " + collisionLayerUuid.toString(), LOGTYPE_Error);
 	return HyColor::Black;
 }
 

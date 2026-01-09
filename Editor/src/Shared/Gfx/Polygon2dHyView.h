@@ -11,17 +11,27 @@
 #define POLYGON2DHYVIEW_H
 
 #include "Global.h"
-#include "Polygon2dModel.h"
+#include "IPolygon2dView.h"
 
-class Polygon2dHyView : public HyEntity2d
+class GrabPoint;
+
+class Polygon2dHyView : public IPolygon2dView
 {
-	Polygon2dModel &		m_ModelRef;
-
-	//GrabPoint
+	HyPrimitive2d				m_Fill;					// This shape represents how the item's transformation is applied. Uses world/camera coordinates
+	HyPrimitive2d				m_Outline;				// This shape represents the raw data in the form of an outline unaffected by camera zoom. Uses window coordinates
+	QList<GrabPoint *>			m_VertexGrabPointList;	// Uses window coordinates
 
 public:
-	Polygon2dHyView(Polygon2dModel &modelRef, HyEntity2d *pParent = nullptr);
+	Polygon2dHyView();
 	virtual ~Polygon2dHyView();
+
+	HyPrimitive &GetFillPrimitive();
+
+	virtual void RefreshColor() override;
+	virtual void RefreshView() override;
+
+protected:
+	void SetVertexGrabPointListSize(uint32 uiNumGrabPoints);
 };
 
 #endif // POLYGON2DHYVIEW_H

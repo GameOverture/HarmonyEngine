@@ -14,6 +14,7 @@
 #include "ExplorerModel.h"
 #include "MainWindow.h"
 #include "EntityUndoCmds.h"
+#include "Polygon2dModel.h"
 
 #include <QVariant>
 #include <QStack>
@@ -51,6 +52,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, EntityItemDe
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(eEntType),
 	m_pPropertiesModel(nullptr),
+	m_pShape2dModel(nullptr),
 	m_eDeclarationType(eDeclarationType),
 	m_ReferencedItemUuid(uuidOfReferencedItem),
 	m_bIsLocked(false),
@@ -71,6 +73,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject 
 	m_EntityModelRef(entityModelRef),
 	m_eEntType(bIsArrayItem ? ENTTYPE_ArrayItem : ENTTYPE_Item),
 	m_pPropertiesModel(nullptr),
+	m_pShape2dModel(nullptr),
 	m_sPromotedEntityType(descObj["promotedEntityType"].toString()),
 	m_eDeclarationType(HyGlobal::GetEntityDeclType(descObj["declarationType"].toString())),
 	m_ReferencedItemUuid(descObj["itemUUID"].toString()),
@@ -88,6 +91,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject 
 
 /*virtual*/ EntityTreeItemData::~EntityTreeItemData()
 {
+	delete m_pShape2dModel;
 	delete m_pPropertiesModel;
 }
 
@@ -99,9 +103,19 @@ bool EntityTreeItemData::IsSelectable() const
 	if(m_eEntType == ENTTYPE_BvFolder)
 		return false;
 
-	return m_bIsLocked == false &&
-		   (m_EntityModelRef.IsShapeEditMode() && (m_eTYPE == ITEM_Primitive || m_eTYPE == ITEM_FixtureShape || m_eTYPE == ITEM_FixtureChain)) ||
-		   (m_EntityModelRef.IsShapeEditMode() == false && m_eTYPE != ITEM_FixtureShape && m_eTYPE != ITEM_FixtureChain);
+	return m_bIsLocked == false;// &&
+		   //(m_EntityModelRef.IsEditMode() && (m_eTYPE == ITEM_Primitive || m_eTYPE == ITEM_FixtureShape || m_eTYPE == ITEM_FixtureChain)) ||
+		   //(m_EntityModelRef.IsShapeEditMode() == false && m_eTYPE != ITEM_FixtureShape && m_eTYPE != ITEM_FixtureChain);
+}
+
+bool EntityTreeItemData::IsEditable() const
+{
+	if(m_eEntType != ENTTYPE_Item && m_eEntType != ENTTYPE_ArrayItem)
+		return false;
+	if(m_eTYPE != ITEM_Primitive && m_eTYPE != ITEM_FixtureShape && m_eTYPE != ITEM_FixtureChain && m_eTYPE != ITEM_Text && HyGlobal::IsItemType_Widget(m_eTYPE) == false)
+		return false;
+
+	return m_bIsLocked == false;
 }
 
 void EntityTreeItemData::SetLocked(bool bIsLocked)
@@ -193,6 +207,11 @@ EntityModel &EntityTreeItemData::GetEntityModel() const
 EntityPropertiesTreeModel &EntityTreeItemData::GetPropertiesModel() const
 {
 	return *m_pPropertiesModel;
+}
+
+Polygon2dModel *EntityTreeItemData::GetShape2dModel()
+{
+	return m_pShape2dModel;
 }
 
 bool EntityTreeItemData::IsSelected() const
@@ -344,12 +363,14 @@ void EntityTreeItemData::InitalizePropertyModel()
 	switch(GetType())
 	{
 	case ITEM_Primitive:
+		m_pShape2dModel = new Polygon2dModel(HyColor::White);
+
 		m_pPropertiesModel->AppendCategory("Primitive", QVariant(), false, "A visible shape that can be drawn to the screen");
 		m_pPropertiesModel->AppendProperty("Primitive", "Wireframe", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to render only the wireframe of the shape type", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Primitive", "Line Thickness", PROPERTIESTYPE_double, 1.0, "When applicable, how thick to render lines", PROPERTIESACCESS_ToggleUnchecked, 1.0, 100.0, 1.0);
 		m_pPropertiesModel->AppendCategory("Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
 		m_pPropertiesModel->AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
-		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", PROPERTIESACCESS_ReadOnly);
+		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_FloatArray, "", "An array of floats representing the shape's data", PROPERTIESACCESS_ReadOnly);
 		break;
 
 	case ITEM_Audio:
@@ -395,9 +416,11 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_FixtureShape:
+		m_pShape2dModel = new Polygon2dModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixture));
+
 		m_pPropertiesModel->AppendCategory("Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
 		m_pPropertiesModel->AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
-		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", PROPERTIESACCESS_ReadOnly);
+		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_FloatArray, "", "An array of floats representing the shape's data", PROPERTIESACCESS_ReadOnly);
 		m_pPropertiesModel->AppendCategory("Fixture", QVariant(), true, "Become a fixture used in physics simulations and collision");
 		m_pPropertiesModel->AppendProperty("Fixture", "Density", PROPERTIESTYPE_double, 0.0, "Usually in kg / m^2. A shape should have a non-zero density when the entity's physics is dynamic", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
@@ -409,9 +432,11 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_FixtureChain:
+		m_pShape2dModel = new Polygon2dModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixture));
+
 		m_pPropertiesModel->AppendCategory("Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
 		m_pPropertiesModel->AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
-		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_LineEdit, "", "A string representation of the shape's data", PROPERTIESACCESS_ReadOnly);
+		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_FloatArray, "", "An array of floats representing the shape's data", PROPERTIESACCESS_ReadOnly);
 		m_pPropertiesModel->AppendCategory("Fixture", QVariant(), true, "Become a fixture used in physics simulations and collision");
 		m_pPropertiesModel->AppendProperty("Fixture", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Restitution", PROPERTIESTYPE_double, 0.0, "The restitution (elasticity) usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
@@ -996,7 +1021,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocWidgetTreeItem(ItemType eWidgetTyp
 	return pNewItem;
 }
 
-EntityTreeItemData *EntityTreeModel::Cmd_AllocShapeTreeItem(EditorShape eShape, QString sData, bool bIsPrimitive, QString sCodeNamePrefix, int iRow /*= -1*/)
+EntityTreeItemData *EntityTreeModel::Cmd_AllocShapeTreeItem(EditorShape eShape, bool bIsPrimitive, QString sCodeNamePrefix, int iRow /*= -1*/)
 {
 	// Generate a unique code name for this new item
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + (bIsPrimitive ? "Prim" : "") + HyGlobal::ShapeName(eShape).simplified().remove(' '));

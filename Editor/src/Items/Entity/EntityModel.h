@@ -47,7 +47,6 @@ class EntityModel : public IModel
 	QList<QString *>										m_CtorCallbacksList;		// a list of strings that are the callback name(s) - still referenced from 'm_CallbacksList'
 
 	EntityTreeModel											m_TreeModel;
-	bool													m_bShapeEditMode;	// If true, the user is currently editing child shapes' vertices/data (primitive or bounding volumes)
 
 	// This 'AuxWidgetsModel' is used to map (QDataWidgetMapper) to the widgets in AuxDopeSheet. It also contains the data for the widgets
 	class AuxWidgetsModel : public QAbstractTableModel
@@ -89,18 +88,13 @@ public:
 	QList<EntityTreeItemData *> Cmd_CreateNewAssets(QList<IAssetItemData *> assetItemList, int iRow);
 	EntityTreeItemData *Cmd_AddExistingItem(QJsonObject descObj, bool bIsArrayItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
 	EntityTreeItemData *Cmd_CreateNewWidget(ItemType eWidgetType, int iRow);
-	EntityTreeItemData *Cmd_CreateNewShape(int iStateIndex, int iFrameIndex, EditorShape eShape, QString sData, bool bIsPrimitive, int iRow);
+	EntityTreeItemData *Cmd_CreateNewShape(int iStateIndex, int iFrameIndex, EditorShape eShape, bool bIsPrimitive, int iRow);
 	QList<EntityTreeItemData *> Cmd_AddNewPasteItems(QJsonObject mimeObject, EntityTreeItemData *pArrayFolder);
 	QList<EntityTreeItemData *> Cmd_CreateNewArray(QList<EntityTreeItemData *> itemDataList, QString sArrayName, int iArrayFolderRow); // It is assumed that the items within 'itemDataList' have been removed/popped prior
 	void Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList);
 	int32 Cmd_RemoveTreeItem(EntityTreeItemData *pItem);
 	bool Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow);
 	void Cmd_RenameItem(EntityTreeItemData *pItemData, QString sNewName);
-
-	void ToggleShapeAdd(EditorShape eShapeType, bool bAsPrimitive);
-	bool IsShapeEditMode() const;
-	void ToggleShapeEditMode();
-	void SetShapeEditMode(bool bEnable);
 
 	QString GenerateCodeName(QString sDesiredName) const;
 

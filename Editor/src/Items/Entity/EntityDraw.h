@@ -15,15 +15,24 @@
 #include "EntityModel.h"
 #include "EntityDrawItem.h"
 
+enum EditModeState
+{
+	EDITMODE_Off = 0,
+	EDITMODE_Idle,				// Mouse cursor determined by draw models
+	EDITMODE_OutsideMouseDown,	// Click started outside of the edit item's bounds
+	EDITMODE_MarqueeSelect,		// Click-dragging a marquee select box
+	EDITMODE_HoverMouseDown,	// Click started on shape to be manipulated
+	EDITMODE_Transforming,		// Transforming (translating, rotating, scaling) the edit item
+};
+
 class EntityDraw : public IDrawEx
 {
 	HyEntity2d 								m_RootEntity;
 
 	bool									m_bPlayingPreview;
 
-	bool									m_bIsShapeAddPrimitive; // True when primitive, false when bounding volume shape
-
-	HyPrimitive2d							m_ShapeEditModeWindowOutline;
+	EditModeState							m_eEditModeState;
+	HyPrimitive2d							m_EditModeWindowOutline;
 
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
@@ -38,17 +47,10 @@ public:
 	virtual void OnMousePressEvent(QMouseEvent *pEvent) override;
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) override;
 
-	bool IsSemEnabled() const;
-	//bool IsActionSemIdle() const;
-	//bool IsActionSemTransforming() const;
+	bool SetEditMode(bool bEnable);
+	EntityDrawItem *GetCurEditItem() const;
 
-	EditorShape GetShapeAddType() const;
-	bool SetAsShapeAdd(EditorShape eShape, bool bAsPrimitive);
-	void SetAsShapeEditMode(bool bEnable);
-
-	EntityDrawItem *GetCurShapeEditItem() const;
-
-	void RequestClearShapeEdit();
+	//void RequestClearShapeEdit();
 
 	void SetExtrapolatedProperties();
 

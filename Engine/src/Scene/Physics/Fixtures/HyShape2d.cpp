@@ -113,6 +113,95 @@ b2Capsule HyShape2d::GetAsCapsule() const
 	}
 }
 
+/*virtual*/ std::vector<float> HyShape2d::SerializeSelf() const /*override*/
+{
+	std::vector<float> floatList;
+
+	switch(m_eType)
+	{
+	case HYFIXTURE_Nothing:
+		break;
+
+	case HYFIXTURE_Polygon:
+		for(int i = 0; i < m_Data.polygon.count; ++i)
+		{
+			floatList.push_back(m_Data.polygon.vertices[i].x);
+			floatList.push_back(m_Data.polygon.vertices[i].y);
+		}
+		break;
+
+	case HYFIXTURE_Circle:
+		floatList.push_back(m_Data.circle.center.x);
+		floatList.push_back(m_Data.circle.center.y);
+		floatList.push_back(m_Data.circle.radius);
+		break;
+
+	case HYFIXTURE_LineSegment:
+		floatList.push_back(m_Data.segment.point1.x);
+		floatList.push_back(m_Data.segment.point1.y);
+		floatList.push_back(m_Data.segment.point2.x);
+		floatList.push_back(m_Data.segment.point2.y);
+		break;
+
+	case HYFIXTURE_Capsule:
+		floatList.push_back(m_Data.capsule.center1.x);
+		floatList.push_back(m_Data.capsule.center1.y);
+		floatList.push_back(m_Data.capsule.center2.x);
+		floatList.push_back(m_Data.capsule.center2.y);
+		floatList.push_back(m_Data.capsule.radius);
+		break;
+
+	default:
+		HyLogWarning("HyShape2d::SerializeSelf() - Unsupported shape type: " << m_eType);
+		break;
+	}
+
+	return floatList;
+}
+
+/*virtual*/ void HyShape2d::DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) /*override*/
+{
+	switch(eFixtureType)
+	{
+	case HYFIXTURE_Nothing:
+		SetAsNothing();
+		break;
+
+	case HYFIXTURE_Polygon: {
+		std::vector<glm::vec2> vertList;
+		for(int i = 0; i < floatList.size(); i += 2)
+			vertList.push_back(glm::vec2(floatList[i], floatList[i + 1]));
+
+		SetAsPolygon(vertList);
+		break; }
+
+	case HYFIXTURE_Circle: {
+		glm::vec2 ptCenter(floatList[0], floatList[1]);
+		float fRadius = floatList[2];
+		SetAsCircle(ptCenter, fRadius);
+		break;
+	}
+
+	case HYFIXTURE_LineSegment: {
+		glm::vec2 ptOne(floatList[0], floatList[1]);
+		glm::vec2 ptTwo(floatList[2], floatList[3]);
+		SetAsLineSegment(ptOne, ptTwo);
+		break;
+	}
+
+	case HYFIXTURE_Capsule: {
+		glm::vec2 pt1(floatList[0], floatList[1]);
+		glm::vec2 pt2(floatList[2], floatList[3]);
+		float fRadius = floatList[4];
+		SetAsCapsule(pt1, pt2, fRadius);
+		break; }
+
+	default:
+		HyLogWarning("HyShape2d::DeserializeSelf() - Unsupported shape type: " << eFixtureType);
+		break;
+	}
+}
+
 bool HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
 {
 	switch(m_eType)

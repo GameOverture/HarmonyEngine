@@ -495,7 +495,7 @@ ctor_to_frame0:
 		else if(DRAGSTATE_InitialPress == m_eDragState)
 		{
 			QPointF dragDelta = pEvent->pos() - m_ptDragStart;
-			if(dragDelta.manhattanLength() >= 3)
+			if(dragDelta.manhattanLength() >= MANHATTAN_DRAG_THRESHOLD)
 			{
 				m_eDragState = DRAGSTATE_Dragging;
 				m_iDragFrame = GetNearestFrame(m_MouseScenePos.x());

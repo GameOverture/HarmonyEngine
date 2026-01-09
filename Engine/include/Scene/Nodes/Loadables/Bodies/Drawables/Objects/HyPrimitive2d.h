@@ -55,6 +55,7 @@ public:
 	// Passed in parameters are copied, and understood to be local coordinates.
 	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoop);
 	void SetAsLineChain(const std::vector<glm::vec2> &verticesList, bool bLoop);
+	void SetAsLineChain(const HyChainData &chainData);
 
 	// Set as a circle with the specified center and radius
 	void SetAsCircle(float fRadius);

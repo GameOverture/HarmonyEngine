@@ -304,6 +304,8 @@ if(Qt6_DIR)
 		src/Harmony/HarmonyWidget.ui
 		src/Shared/Gfx/CommonGfxView.cpp
 		src/Shared/Gfx/CommonGfxView.h
+		src/Shared/Gfx/IPolygon2dView.cpp
+		src/Shared/Gfx/IPolygon2dView.h
 		src/Shared/Gfx/Polygon2dModel.cpp
 		src/Shared/Gfx/Polygon2dModel.h
 		src/Shared/Gfx/Polygon2dHyView.cpp

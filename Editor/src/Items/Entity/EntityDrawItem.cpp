@@ -14,12 +14,13 @@
 #include "EntityDopeSheetScene.h"
 #include "DlgSetUiPanel.h"
 #include "MainWindow.h"
+#include "Polygon2dHyView.h"
 
 EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
 	IDrawExItem(pEntityDraw),
 	m_pEntityTreeItemData(pEntityTreeItemData),
 	m_pChild(nullptr),
-	m_ShapeCtrl(pEntityDraw)
+	m_pShapeView(nullptr)
 {
 	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
 	TreeModelItemData *pReferencedItemData = projectRef.FindItemData(referencedItemUuid);
@@ -125,16 +126,25 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 			break;
 		};
 	}
+	else if(m_pEntityTreeItemData->GetType() == ITEM_Primitive || m_pEntityTreeItemData->GetType() == ITEM_FixtureShape || m_pEntityTreeItemData->GetType() == ITEM_FixtureChain)
+	{
+		m_pShapeView = new Polygon2dHyView();
+		m_pShapeView->SetModel(m_pEntityTreeItemData->GetShape2dModel());
+
+		m_pChild = &m_pShapeView->GetFillPrimitive();
+	}
 
 	if(m_pChild)
 		m_pChild->Load();
+	else
+		HyGuiLog("EntityDrawItem ctor - m_pChild remained null for item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 
 	HideTransformCtrl();
 }
 
 /*virtual*/ EntityDrawItem::~EntityDrawItem()
 {
-	delete m_pChild;
+	//delete m_pChild;
 }
 
 EntityDraw &EntityDrawItem::GetEntityDraw()
@@ -142,17 +152,19 @@ EntityDraw &EntityDrawItem::GetEntityDraw()
 	return static_cast<EntityDraw &>(*m_pEntityTreeItemData->GetEntityModel().GetItem().GetDraw());
 }
 
-/*virtual*/ bool EntityDrawItem::IsSelectable() const /*override*/
+EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 {
-	return m_pEntityTreeItemData->IsSelectable();
+	return m_pEntityTreeItemData;
 }
 
 /*virtual*/ IHyBody2d *EntityDrawItem::GetHyNode() /*override*/
 {
-	if(m_pEntityTreeItemData->GetType() == ITEM_Primitive || m_pEntityTreeItemData->GetType() == ITEM_FixtureShape || m_pEntityTreeItemData->GetType() == ITEM_FixtureChain)
-		return &m_ShapeCtrl.GetPrimitive(true);
-
 	return m_pChild;
+}
+
+/*virtual*/ bool EntityDrawItem::IsSelectable() const /*override*/
+{
+	return m_pEntityTreeItemData->IsSelectable();
 }
 
 /*virtual*/ bool EntityDrawItem::IsSelected() /*override*/
@@ -163,17 +175,13 @@ EntityDraw &EntityDrawItem::GetEntityDraw()
 /*virtual*/ void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera) /*override*/
 {
 	IDrawExItem::RefreshTransform(pCamera);
-	GetShapeCtrl().DeserializeOutline(pCamera);
+	if(m_pShapeView)
+		m_pShapeView->RefreshView();
 }
 
-EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
+Polygon2dHyView *EntityDrawItem::GetShapeView()
 {
-	return m_pEntityTreeItemData;
-}
-
-ShapeCtrl &EntityDrawItem::GetShapeCtrl()
-{
-	return m_ShapeCtrl;
+	return m_pShapeView;
 }
 
 // NOTE: The listed 4 functions below share logic that process all item properties. Any updates should reflect to all of them
@@ -562,7 +570,7 @@ void SubEntity::CtorInitJsonObj(QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, c
 	pNewChild->Load();
 }
 
-void SubEntity::Extrapolate(const QMap<int, QJsonObject> &propMapRef, EntityPreviewComponent &previewComponentRef, bool bIsSelected, float fFrameDuration, int iMainDestinationFrame, HyCamera2d *pCamera)
+void SubEntity::Extrapolate(const QMap<int, QJsonObject> &propMapRef, EntityPreviewComponent &previewComponentRef, bool bIsSelected, float fFrameDuration, int iMainDestinationFrame)
 {
 	m_bSubTimelinePaused = false;
 	m_iElapsedTimelineFrames = 0;
@@ -587,13 +595,12 @@ void SubEntity::Extrapolate(const QMap<int, QJsonObject> &propMapRef, EntityPrev
 							  m_iElapsedTimelineFrames, // Starting frame to extrapolate from
 							  m_iElapsedTimelineFrames + m_iRemainingTimelineFrames,
 							  mergedMap,
-							  previewComponentRef,
-							  pCamera);
+							  previewComponentRef);
 
 	} while(m_bSubTimelineDirty);
 
 	if(m_iSubTimelineRemainingFrames > 0 && m_bSubTimelinePaused == false)
-		ExtrapolateChildProperties(m_iSubTimelineRemainingFrames, GetState(), pCamera);
+		ExtrapolateChildProperties(m_iSubTimelineRemainingFrames, GetState());
 }
 
 void SubEntity::MergeRootProperties(QMap<int, QJsonObject> &mergeMapOut)
@@ -645,7 +652,7 @@ int SubEntity::GetTimelineFrame() const
 {
 	return m_iSubTimelineStartFrame;
 }
-bool SubEntity::TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, HyCamera2d *pCamera)
+bool SubEntity::TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj)
 {
 	int iPrevState = GetState(); // If the state is changing, we need to extrapolate the children on the current state's timeline up to this point
 
@@ -658,7 +665,7 @@ bool SubEntity::TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, H
 		int iNumFramesPassed = iMainTimelineFrame - m_iElapsedTimelineFrames;
 
 		if(m_bSubTimelinePaused == false) // Checking if we were paused prior, NOT if we just got paused
-			ExtrapolateChildProperties(iNumFramesPassed, iPrevState, pCamera);
+			ExtrapolateChildProperties(iNumFramesPassed, iPrevState);
 
 		iNumFramesPassed += 1; // This frame has been processed, so add 1 when offsetting frame counters below
 
@@ -681,13 +688,13 @@ bool SubEntity::TimelineEvent(int iMainTimelineFrame, QJsonObject timelineObj, H
 	return m_bSubTimelineDirty;
 }
 
-void SubEntity::ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStateIndex, HyCamera2d *pCamera)
+void SubEntity::ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStateIndex)
 {
 	const QMap<IHyNode2d *, QMap<int, QJsonObject>> &childPropMapRef = m_StateInfoList[uiStateIndex].m_ChildPropertiesMap;
 
 
 	for(ChildInfo &childInfoRef : m_ChildInfoList)
-		ExtrapolateProperties(m_ProjectRef, childInfoRef.m_pChild, nullptr, false, childInfoRef.m_eItemType, 1.0f / 60, m_iSubTimelineStartFrame, m_iSubTimelineStartFrame + iNumFramesDuration, childPropMapRef[childInfoRef.m_pChild], *childInfoRef.m_pPreviewComponent, pCamera);
+		ExtrapolateProperties(m_ProjectRef, childInfoRef.m_pChild, nullptr, false, childInfoRef.m_eItemType, 1.0f / 60, m_iSubTimelineStartFrame, m_iSubTimelineStartFrame + iNumFramesDuration, childPropMapRef[childInfoRef.m_pChild], *childInfoRef.m_pPreviewComponent);
 }
 // SubEntity
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -699,15 +706,14 @@ void SubEntity::ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStat
 //             - ExtrapolateProperties
 void ExtrapolateProperties(Project &projectRef,
 						   IHyLoadable2d *pThisHyNode,
-						   ShapeCtrl *pShapeCtrl,
+						   Polygon2dModel *pShapeModel,
 						   bool bIsSelected,
 						   ItemType eItemType,
 						   const float fFRAME_DURATION,
 						   const int iSTART_FRAME,
 						   const int iDESTINATION_FRAME,
 						   const QMap<int, QJsonObject> &keyFrameMapRef,
-						   EntityPreviewComponent &previewComponentRef,
-						   HyCamera2d *pCamera)
+						   EntityPreviewComponent &previewComponentRef)
 {
 	if(eItemType == ITEM_Sprite)
 		static_cast<HySprite2d *>(pThisHyNode)->SetAnimPause(true); // We always pause the animation because it is set manually by extrapolating what frame it should be, and don't want time passing to affect it.
@@ -848,44 +854,60 @@ void ExtrapolateProperties(Project &projectRef,
 		}
 		[[fallthrough]];
 		case ITEM_FixtureShape:
-		case ITEM_FixtureChain: {
-			if(pShapeCtrl && propsObj.contains("Shape"))
+		case ITEM_FixtureChain:
+			if(pShapeModel)
 			{
-				QJsonObject shapeObj = propsObj["Shape"].toObject();
-				if(shapeObj.contains("Type") && shapeObj.contains("Data"))
+				bool bNeedRefresh = false;
+				HyColor color = pShapeModel->GetColor();
+				EditorShape eShape = pShapeModel->GetType();
+				std::vector<float> floatList;
+
+				if(eItemType == ITEM_Primitive && propsObj.contains("Body") && propsObj["Body"].toObject().contains("Color Tint"))
 				{
-					EditorShape eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
-					float fBvAlpha = (eItemType == ITEM_FixtureShape || eItemType == ITEM_FixtureChain) ? 0.0f : 1.0f;
-					float fOutlineAlpha = ((eItemType == ITEM_FixtureShape || eItemType == ITEM_FixtureChain) || bIsSelected) ? 1.0f : 0.0f;
+					QJsonArray colorArray = propsObj["Body"].toObject()["Color Tint"].toArray();
+					color = HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt());
+					bNeedRefresh = true;
+				}
 
-					HyColor color = HyGlobal::GetEditorColor(EDITORCOLOR_Shape);
-					if(eItemType == ITEM_Primitive)
+				if(propsObj.contains("Shape"))
+				{
+					QJsonObject shapeObj = propsObj["Shape"].toObject();
+
+					if(shapeObj.contains("Type"))
 					{
-						color = HyColor::White;
-						if(propsObj.contains("Body") && propsObj["Body"].toObject().contains("Color Tint"))
-						{
-							QJsonArray colorArray = propsObj["Body"].toObject()["Color Tint"].toArray();
-							color = HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt());
-						}
+						eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
+						bNeedRefresh = true;
 					}
+					if(shapeObj.contains("Data"))
+					{
+						QJsonArray floatArray = shapeObj["Type"].toArray();
+						for(QJsonValue val : floatArray)
+							floatList.push_back(static_cast<float>(val.toDouble()));
+						bNeedRefresh = true;
+					}
+				}
+				
+				if(bNeedRefresh)
+				{
+					if(floatList.empty())
+						floatList = pShapeModel->GetData()->SerializeSelf();
 
-					pShapeCtrl->Setup(eShape, color, fBvAlpha, fOutlineAlpha);
-					pShapeCtrl->Deserialize(shapeObj["Data"].toString(), pCamera);
+					pShapeModel->SetData(color, eShape, QList<float>(floatList.begin(), floatList.end()));
 				}
 			}
-
-			// "Fixture" category doesn't need to be set
-			break; }
+			else
+				HyGuiLog("ExtrapolateProperties - Missing Polygon2dModel ptr for Fixture/Primitive shape processing", LOGTYPE_Error);
+			break;
 
 		case ITEM_AtlasFrame:
 			break;
 
-		case ITEM_Text: {
-			HyText2d *pTextNode = static_cast<HyText2d *>(pThisHyNode);
-
+		case ITEM_Text:
 			if(propsObj.contains("Text"))
 			{
 				QJsonObject textObj = propsObj["Text"].toObject();
+
+				HyText2d *pTextNode = static_cast<HyText2d *>(pThisHyNode);
 
 				// Apply all text properties before the style, so the ShapeCtrl can properly calculate itself within ShapeCtrl::SetAsText()
 				if(textObj.contains("Text"))
@@ -949,9 +971,7 @@ void ExtrapolateProperties(Project &projectRef,
 					}
 				}
 			}
-			if(pShapeCtrl)
-				pShapeCtrl->SetAsText(pTextNode, bIsSelected, pCamera);
-			break; }
+			break;
 
 		case ITEM_Sprite:
 			// If the state was changed on this frame 'iFrame', it was already applied to pThisNode above in "Common", "State"
@@ -1234,7 +1254,7 @@ void ExtrapolateProperties(Project &projectRef,
 		// Lastly, if this is a sub-entity, determine if the timeline is changing based on properties this frame
 		if(eItemType == ITEM_Entity &&
 			propsObj.contains("Timeline") &&
-			static_cast<SubEntity *>(pThisHyNode)->TimelineEvent(iFrame, propsObj["Timeline"].toObject(), pCamera))
+			static_cast<SubEntity *>(pThisHyNode)->TimelineEvent(iFrame, propsObj["Timeline"].toObject()))
 		{
 			return; // This indicates we need to re-extrapolate, from this point on but with a newly merged sub-entity's timeline
 		}
