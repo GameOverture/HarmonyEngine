@@ -60,8 +60,20 @@ class Polygon2dModel
 	bool								m_bSelfIntersecting;
 	glm::vec2							m_ptSelfIntersection;
 	bool								m_bReverseWindingOrder;
+	bool								m_bLoopClosed;
 
+	int									m_iGrabPointHoverIndex;
 	int									m_iInsertVertexIndex;
+	glm::vec2							m_ptInsertVertexPos;
+
+	enum TransformType
+	{
+		TRANSFORM_None = 0,
+		TRANSFORM_TranslateAllVerts,
+		TRANSFORM_InsertNewVertex,
+		TRANSFORM_TranslateSelectedVerts
+	};
+	TransformType						m_eTransformType;
 
 	// Track Views manually since we don't inherit from QObject
 	QList<IPolygon2dView *>				m_ViewList;
@@ -84,8 +96,8 @@ public:
 	void TransformSelf(glm::mat4 mtxTransform); // NOTE: Does not update m_Outline, requires a DeserializeOutline()
 
 	ShapeMouseMoveResult OnMouseMoveEvent(QPointF ptWorldMousePos);
-	bool OnMousePressEvent(QPointF ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
-	int OnMouseMarqueeReleased(QPointF ptBotLeft, QPointF ptTopRight);
+	bool OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
+	void OnMouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF ptBotLeft, QPointF ptTopRight);
 	void OnMouseTransformDrag(QPointF ptWorldMousePos);
 	QString OnMouseTransformReleased(QPointF ptWorldMousePos); // Returns undo command description (blank if no change)
 

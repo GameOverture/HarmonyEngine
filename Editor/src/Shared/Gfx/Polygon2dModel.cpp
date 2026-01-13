@@ -13,7 +13,13 @@
 
 Polygon2dModel::Polygon2dModel(HyColor color, EditorShape eShape /*= SHAPE_None*/, const QList<float> &floatList /*= QList<float>()*/) :
 	m_eType(SHAPE_None),
-	m_iInsertVertexIndex(-1)
+	m_bSelfIntersecting(false),
+	m_ptSelfIntersection(0.0f, 0.0f),
+	m_bReverseWindingOrder(false),
+	m_bLoopClosed(false),
+	m_iGrabPointHoverIndex(-1),
+	m_iInsertVertexIndex(-1),
+	m_eTransformType(TRANSFORM_None)
 {
 	SetData(color, eShape, floatList);
 }
@@ -43,6 +49,7 @@ QList<float> Polygon2dModel::GetData() const
 		QList<float> returnList(serializedData.begin(), serializedData.end());
 		return returnList;
 	}
+
 	// SHAPE_Polygon
 	QList<float> returnList;
 	for(const GrabPointModel &grabPt : m_GrabPointList)
@@ -136,13 +143,16 @@ void Polygon2dModel::SetData(HyColor color, EditorShape eShape, const QList<floa
 		grabPointList = m_FixtureList[0]->DeserializeSelf(HyGlobal::ConvertShapeToFixtureType(m_eType), std::vector<float>(floatList.begin(), floatList.end()));
 	else
 	{
-		if(floatList.size() & 1)
-			HyGuiLog("Polygon2dModel::SetData was a polygon with an odd number of floats", LOGTYPE_Error);
+		if((floatList.size() & 1) == 0)
+			HyGuiLog("Polygon2dModel::SetData for polygon had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
 		else
 		{
-			grabPointList.reserve(floatList.size() / 2);
-			for(int i = 0; i < floatList.size(); i += 2)
+			int iNumVertFloats = floatList.size() - 1;
+			grabPointList.reserve(iNumVertFloats / 2);
+			for(int i = 0; i < iNumVertFloats; i += 2)
 				grabPointList.emplace_back(glm::vec2(floatList[i], floatList[i + 1]));
+
+			m_bLoopClosed = floatList.back() != 0.0f;
 		}
 	}
 	// Preserve existing grab points where possible (keeps selection)
@@ -225,23 +235,22 @@ void Polygon2dModel::TransformSelf(glm::mat4 mtxTransform)
 
 ShapeMouseMoveResult Polygon2dModel::OnMouseMoveEvent(QPointF ptWorldMousePos)
 {
-	bool bAllSelected = true;
-	for(const GrabPointModel &grabPtModel : m_GrabPointList)
+	m_iGrabPointHoverIndex = m_iInsertVertexIndex = -1;
+
+	for(int i = 0; i < m_GrabPointList.size(); ++i)
 	{
-		QPointF ptGrabPos = grabPtModel.GetPosition();
+		QPointF ptGrabPos = m_GrabPointList[i].GetPosition();
 
 		QRectF grabRect(ptGrabPos, QSizeF(1.0f, 1.0f));
 		grabRect = grabRect.adjusted(-GRABPOINT_SELECT_RADIUS, -GRABPOINT_SELECT_RADIUS, GRABPOINT_SELECT_RADIUS, GRABPOINT_SELECT_RADIUS);
 		if(grabRect.contains(ptWorldMousePos))
 		{
-			if(grabPtModel.IsSelected())
+			m_iGrabPointHoverIndex = i;
+			if(m_GrabPointList[i].IsSelected())
 				return SHAPEMOUSEMOVE_HoverSelectedVertex;
 			else
 				return SHAPEMOUSEMOVE_HoverVertex;
 		}
-
-		if(grabPtModel.IsSelected() == false)
-			bAllSelected = false;
 	}
 
 	if(IsValidShape() == false || m_eType == SHAPE_LineChain)
@@ -249,14 +258,43 @@ ShapeMouseMoveResult Polygon2dModel::OnMouseMoveEvent(QPointF ptWorldMousePos)
 		if(CheckIfAddVertexOnEdge(ptWorldMousePos))
 			return SHAPEMOUSEMOVE_AddVertex;
 
-		// TODO: Determine if a single edge vertex is selected, and if so, return SHAPEMOUSEMOVE_Crosshair
-		return SHAPEMOUSEMOVE_Crosshair;
+		// If only the first or last vertex in chain is selected, return SHAPEMOUSEMOVE_Crosshair to indicate appending verts
+		int iNumSelected = 0;
+		for(const GrabPointModel &grabPtModel : m_GrabPointList)
+		{
+			if(grabPtModel.IsSelected())
+				++iNumSelected;
+		}
+		if(iNumSelected == 1)
+		{
+			if(m_GrabPointList.front().IsSelected())
+			{
+				m_iInsertVertexIndex = 0;
+				HySetVec(m_ptInsertVertexPos, ptWorldMousePos.x(), ptWorldMousePos.y());
+				return SHAPEMOUSEMOVE_Crosshair;
+			}
+			else if(m_GrabPointList.back().IsSelected())
+			{
+				m_iInsertVertexIndex = m_GrabPointList.size();
+				HySetVec(m_ptInsertVertexPos, ptWorldMousePos.x(), ptWorldMousePos.y());
+				return SHAPEMOUSEMOVE_Crosshair;
+			}
+		}
+
+		return SHAPEMOUSEMOVE_Outside;
 	}
 
 	if(m_eType == SHAPE_Polygon)
 	{
 		if(CheckIfAddVertexOnEdge(ptWorldMousePos))
 			return SHAPEMOUSEMOVE_AddVertex;
+
+		if(m_GrabPointList.size() < 3 || m_bLoopClosed == false)
+		{
+			m_iInsertVertexIndex = m_GrabPointList.size();
+			HySetVec(m_ptInsertVertexPos, ptWorldMousePos.x(), ptWorldMousePos.y());
+			return SHAPEMOUSEMOVE_Crosshair;
+		}
 	}
 
 	for(IHyFixture2d *pFixture : m_FixtureList)
@@ -268,30 +306,70 @@ ShapeMouseMoveResult Polygon2dModel::OnMouseMoveEvent(QPointF ptWorldMousePos)
 	return SHAPEMOUSEMOVE_Outside;
 }
 
-bool Polygon2dModel::OnMousePressEvent(QPointF ptWorldMousePos)
+bool Polygon2dModel::OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos)
 {
+	m_eTransformType = TRANSFORM_None;
 	switch(OnMouseMoveEvent(ptWorldMousePos))
 	{
 	case SHAPEMOUSEMOVE_Outside:
 		return false; // Start a marquee select
 
 	case SHAPEMOUSEMOVE_Inside:
+		for(const GrabPointModel &grabPtModel : m_GrabPointList)
+		{
+			if(grabPtModel.IsSelected() == false)
+				return false; // Start a marquee select
+		}
+		m_eTransformType = TRANSFORM_TranslateAllVerts;
+		return true;
+
 	case SHAPEMOUSEMOVE_Crosshair:
 	case SHAPEMOUSEMOVE_AddVertex:
 		if(m_iInsertVertexIndex == -1)
 		{
+			HyGuiLog("Polygon2dModel::OnMousePressEvent - Insert vertex index was -1 on AddVertex/Crosshair", LOGTYPE_Error);
+			return false;
+		}
+		m_eTransformType = TRANSFORM_InsertNewVertex;
+		return true;
 
+	case SHAPEMOUSEMOVE_HoverVertex:
+	case SHAPEMOUSEMOVE_HoverSelectedVertex:
+		if(m_iGrabPointHoverIndex == -1)
+		{
+			HyGuiLog("Polygon2dModel::OnMousePressEvent - Hover vertex index was -1 on HoverVertex/HoverSelectedVertex", LOGTYPE_Error);
+			return false;
+		}
+
+		if(bShiftHeld)
+		{
+			if(uiButtonFlags & Qt::LeftButton)
+			{
+				m_GrabPointList[m_iGrabPointHoverIndex].SetSelected(!m_GrabPointList[m_iGrabPointHoverIndex].IsSelected());
+				m_eTransformType = TRANSFORM_TranslateSelectedVerts;
+				return true;
+			}
+			else if(uiButtonFlags & Qt::RightButton)
+			{
+				m_GrabPointList[m_iGrabPointHoverIndex].SetSelected(false);
+				return false;
+			}
 		}
 		else
 		{
-			m_GrabPointList.insert(m_iInsertVertexIndex, GrabPointModel(ptWorldMousePos));
-			m_GrabPointList[m_iInsertVertexIndex].SetSelected(true);
-			m_iInsertVertexIndex = -1;
+			if(uiButtonFlags & Qt::LeftButton)
+			{
+				m_GrabPointList[m_iGrabPointHoverIndex].SetSelected(true);
+				m_eTransformType = TRANSFORM_TranslateSelectedVerts;
+				return true;
+			}
+			else if(uiButtonFlags & Qt::RightButton)
+			{
+				m_GrabPointList[m_iGrabPointHoverIndex].SetSelected(false);
+				return false;
+			}
 		}
-		[[fallthrough]];
-	case SHAPEMOUSEMOVE_HoverVertex:
-	case SHAPEMOUSEMOVE_HoverSelectedVertex:
-		return true;
+		return false;
 
 	default:
 		HyGuiLog("Polygon2dModel::OnMousePressEvent - Unknown shape mouse move result encountered", LOGTYPE_Error);
@@ -301,9 +379,21 @@ bool Polygon2dModel::OnMousePressEvent(QPointF ptWorldMousePos)
 	return false;
 }
 
-int Polygon2dModel::OnMouseMarqueeReleased(QPointF ptBotLeft, QPointF ptTopRight)
+void Polygon2dModel::OnMouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF ptBotLeft, QPointF ptTopRight)
 {
-	return 0;
+	// Select grab points within marquee
+	for(GrabPointModel &grabPtModel : m_GrabPointList)
+	{
+		QPointF ptGrabPos = grabPtModel.GetPosition();
+		if(ptGrabPos.x() >= ptBotLeft.x() && ptGrabPos.x() <= ptTopRight.x() &&
+		   ptGrabPos.y() >= ptBotLeft.y() && ptGrabPos.y() <= ptTopRight.y())
+		{
+			if(uiButtonFlags & Qt::LeftButton)
+				grabPtModel.SetSelected(true);
+			else if(uiButtonFlags & Qt::RightButton)
+				grabPtModel.SetSelected(false);
+		}
+	}
 }
 
 void Polygon2dModel::OnMouseTransformDrag(QPointF ptWorldMousePos)
@@ -320,15 +410,14 @@ bool Polygon2dModel::CheckIfAddVertexOnEdge(QPointF ptWorldMousePos)
 	HyShape2d tmpEdgeShape;
 	for(int i = 0; i < m_GrabPointList.size(); ++i)
 	{
-		QPointF pt1 = m_GrabPointList[i].GetPosition();
-		QPointF pt2 = m_GrabPointList[(i + 1) % m_GrabPointList.size()].GetPosition();
-		tmpEdgeShape.SetAsLineSegment(
-			glm::vec2(static_cast<float>(pt1.x()), static_cast<float>(pt1.y())),
-			glm::vec2(static_cast<float>(pt2.x()), static_cast<float>(pt2.y()))
-		);
-		if(tmpEdgeShape.TestPoint(glm::vec2(static_cast<float>(ptWorldMousePos.x()), static_cast<float>(ptWorldMousePos.y())), glm::identity<glm::mat4>()));
+		glm::vec2 pt1(m_GrabPointList[i].GetPosition().x(), m_GrabPointList[i].GetPosition().y());
+		glm::vec2 pt2(m_GrabPointList[(i + 1) % m_GrabPointList.size()].GetPosition().x(), m_GrabPointList[(i + 1) % m_GrabPointList.size()].GetPosition().y());
+		tmpEdgeShape.SetAsLineSegment(pt1, pt2);
+		glm::vec2 ptTest(static_cast<float>(ptWorldMousePos.x()), static_cast<float>(ptWorldMousePos.y()));
+		if(tmpEdgeShape.TestPoint(ptTest, glm::identity<glm::mat4>()));
 		{
 			m_iInsertVertexIndex = i + 1;
+			m_ptInsertVertexPos = HyMath::ClosestPointOnSegment(pt1, pt2, ptTest);
 			return true;
 		}
 	}

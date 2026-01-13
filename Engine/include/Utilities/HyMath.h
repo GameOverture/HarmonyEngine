@@ -291,7 +291,7 @@ public:
 
 	static float AngleFromVector(const glm::vec2 &vDirVector); // Caution: Operationally expensive
 	static glm::vec2 ClosestPointOnRay(const glm::vec2 &ptRayStart, const glm::vec2 &vNormalizedRayDir, const glm::vec2 &ptTestPoint);
-	//static glm::vec2 ClosestPointOnSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &ptTestPoint);
+	static glm::vec2 ClosestPointOnSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &ptTestPoint);
 	static bool TestSegmentsOverlap(const glm::vec2 &ptSegA1, const glm::vec2 &ptSegA2, const glm::vec2 &ptSegB1, const glm::vec2 &ptSegB2, glm::vec2 &ptIntersectionOut);
 
 	// Normalizes a value to an arbitrary range. The value wraps when going below min range or above max range.

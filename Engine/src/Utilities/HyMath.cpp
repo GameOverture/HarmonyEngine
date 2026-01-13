@@ -373,10 +373,21 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 	return ptRayStart + t * vNormalizedRayDir;
 }
 
-///*static*/ glm::vec2 HyMath::ClosestPointOnSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &ptTestPoint)
-//{
-//	
-//}
+/*static*/ glm::vec2 HyMath::ClosestPointOnSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &ptTestPoint)
+{
+	glm::vec2 vDirection = pt2 - pt1;
+	float fLengthSq = glm::dot(vDirection, vDirection);
+
+	// If the segment is a point, return that point
+	if(fLengthSq == 0.0f)
+		return pt1;
+
+	// Project the test point onto the line defined by pt1 and pt2
+	float t = glm::dot(ptTestPoint - pt1, vDirection) / fLengthSq;
+	t = glm::clamp(t, 0.0f, 1.0f);
+
+	return pt1 + (t * vDirection);
+}
 
 /*static*/ bool HyMath::TestSegmentsOverlap(const glm::vec2 &ptSegA1, const glm::vec2 &ptSegA2, const glm::vec2 &ptSegB1, const glm::vec2 &ptSegB2, glm::vec2 &ptIntersectionOut)
 {

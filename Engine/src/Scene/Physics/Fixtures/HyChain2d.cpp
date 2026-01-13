@@ -129,12 +129,7 @@ void HyChain2d::SetData(const std::vector<glm::vec2> &verticesList, bool bLoop, 
 		floatList.push_back(m_Data.pPointList[i].x);
 		floatList.push_back(m_Data.pPointList[i].y);
 	}
-
-	if(m_Data.bLoop) // Identical first and last point indicates a loop (when serializing)
-	{
-		floatList.push_back(m_Data.pPointList[0].x);
-		floatList.push_back(m_Data.pPointList[0].y);
-	}
+	floatList.push_back(m_Data.bLoop ? 1.0f : 0.0f); // Final float indicates whether this chain loops to the first vertex
 
 	return floatList;
 }
@@ -149,13 +144,11 @@ void HyChain2d::SetData(const std::vector<glm::vec2> &verticesList, bool bLoop, 
 		return vertList;
 	}
 
-	for(int i = 0; i < floatList.size(); i += 2)
+	int iNumVertFloats = floatList.size() - 1;
+	for(int i = 0; i < iNumVertFloats; i += 2)
 		vertList.push_back(glm::vec2(floatList[i], floatList[i + 1]));
 
-	bool bLineLoop = vertList.size() >= 4 && (vertList.front() == vertList.back());
-	if(bLineLoop)
-		vertList.pop_back(); // Remove redundant final point
-
+	bool bLineLoop = floatList.back() != 0.0f; // Final float indicates whether this chain loops to the first vertex
 	SetData(vertList, bLineLoop);
 	return vertList;
 }

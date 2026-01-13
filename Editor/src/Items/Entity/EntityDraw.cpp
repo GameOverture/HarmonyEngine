@@ -186,7 +186,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		
 		if(pTreeItemData->GetShape2dModel())
 		{
-			bool bStartTransform = pTreeItemData->GetShape2dModel()->OnMousePressEvent(QPointF(m_ptDragStart.x, m_ptDragStart.y));
+			bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
+			bool bStartTransform = pTreeItemData->GetShape2dModel()->OnMousePressEvent(bShiftHeld, pEvent->buttons(), QPointF(m_ptDragStart.x, m_ptDragStart.y));
 			if(bStartTransform)
 			{
 				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BlankCursor);
@@ -248,7 +249,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				m_DragShape.GetPrimitive(true).CalcLocalBoundingShape(tmpShape);
 				tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
 			}
-			pTreeItemData->GetShape2dModel()->OnMouseMarqueeReleased(QPointF(marqueeAabb.lowerBound.x, marqueeAabb.lowerBound.y),
+			pTreeItemData->GetShape2dModel()->OnMouseMarqueeReleased(pEvent->buttons(),
+																	 QPointF(marqueeAabb.lowerBound.x, marqueeAabb.lowerBound.y),
 																	 QPointF(marqueeAabb.upperBound.x, marqueeAabb.upperBound.y));
 		}
 		else
