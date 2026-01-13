@@ -159,47 +159,66 @@ b2Capsule HyShape2d::GetAsCapsule() const
 	return floatList;
 }
 
-/*virtual*/ void HyShape2d::DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) /*override*/
+/*virtual*/ std::vector<glm::vec2> HyShape2d::DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) /*override*/
 {
+	std::vector<glm::vec2> vertList;
+
 	switch(eFixtureType)
 	{
 	case HYFIXTURE_Nothing:
 		SetAsNothing();
 		break;
 
-	case HYFIXTURE_Polygon: {
-		std::vector<glm::vec2> vertList;
+	case HYFIXTURE_Polygon:
+		vertList.reserve(floatList.size() / 2);
 		for(int i = 0; i < floatList.size(); i += 2)
-			vertList.push_back(glm::vec2(floatList[i], floatList[i + 1]));
+			vertList.emplace_back(glm::vec2(floatList[i], floatList[i + 1]));
 
 		SetAsPolygon(vertList);
-		break; }
-
-	case HYFIXTURE_Circle: {
-		glm::vec2 ptCenter(floatList[0], floatList[1]);
-		float fRadius = floatList[2];
-		SetAsCircle(ptCenter, fRadius);
 		break;
-	}
 
-	case HYFIXTURE_LineSegment: {
-		glm::vec2 ptOne(floatList[0], floatList[1]);
-		glm::vec2 ptTwo(floatList[2], floatList[3]);
-		SetAsLineSegment(ptOne, ptTwo);
+	case HYFIXTURE_Circle:
+		vertList.reserve(5);
+		vertList.emplace_back(floatList[0], floatList[1]);
+		SetAsCircle(vertList[0], floatList[2]);
+
+		// Also add the circumference grab points (top, right, bottom, left)
+		vertList.emplace_back(floatList[0], floatList[1] + floatList[2]); // Top
+		vertList.emplace_back(floatList[0] + floatList[2], floatList[1]); // Right
+		vertList.emplace_back(floatList[0], floatList[1] - floatList[2]); // Bottom
+		vertList.emplace_back(floatList[0] - floatList[2], floatList[1]); // Left
 		break;
-	}
+
+	case HYFIXTURE_LineSegment:
+		vertList.reserve(2);
+		vertList.emplace_back(floatList[0], floatList[1]);
+		vertList.emplace_back(floatList[2], floatList[3]);
+		
+		SetAsLineSegment(vertList[0], vertList[1]);
+		break;
 
 	case HYFIXTURE_Capsule: {
-		glm::vec2 pt1(floatList[0], floatList[1]);
-		glm::vec2 pt2(floatList[2], floatList[3]);
-		float fRadius = floatList[4];
-		SetAsCapsule(pt1, pt2, fRadius);
+		vertList.reserve(6);
+		vertList.emplace_back(floatList[0], floatList[1]);
+		vertList.emplace_back(floatList[2], floatList[3]);
+	
+		SetAsCapsule(vertList[0], vertList[1], floatList[4]);
+
+		// Also add the circumference grab points (just left and right) of both semicircles
+		b2Vec2 dir = m_Data.capsule.center2 - m_Data.capsule.center1;
+		b2Vec2 norm = b2Normalize({ -dir.y, dir.x });
+		vertList.emplace_back(m_Data.capsule.center1.x + (norm.x * m_Data.capsule.radius), m_Data.capsule.center1.y + (norm.y * m_Data.capsule.radius)); // Center1 Right
+		vertList.emplace_back(m_Data.capsule.center1.x - (norm.x * m_Data.capsule.radius), m_Data.capsule.center1.y - (norm.y * m_Data.capsule.radius)); // Center1 Left
+		vertList.emplace_back(m_Data.capsule.center2.x + (norm.x * m_Data.capsule.radius), m_Data.capsule.center2.y + (norm.y * m_Data.capsule.radius)); // Center2 Right
+		vertList.emplace_back(m_Data.capsule.center2.x - (norm.x * m_Data.capsule.radius), m_Data.capsule.center2.y - (norm.y * m_Data.capsule.radius)); // Center2 Left
 		break; }
 
 	default:
 		HyLogWarning("HyShape2d::DeserializeSelf() - Unsupported shape type: " << eFixtureType);
 		break;
 	}
+
+	return vertList;
 }
 
 bool HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
@@ -593,6 +612,96 @@ bool HyShape2d::IsSensor() const
 	return b2CastOutput() = {};
 }
 
+/*virtual*/ bool HyShape2d::IsColliding(const IHyFixture2d &testShape, b2Manifold *pManifoldOut /*= nullptr*/) const /*override*/
+{
+	if(testShape.IsValid() == false)
+		return false;
+
+	switch(m_eType)
+	{
+	case HYFIXTURE_Nothing:
+		return false;
+
+	case HYFIXTURE_LineSegment:
+		switch(testShape.GetType())
+		{
+		case HYFIXTURE_Circle:
+			if(pManifoldOut)
+			{
+				*pManifoldOut = b2CollideSegmentAndCircle(&m_Data.segment, b2Transform_identity, &static_cast<const HyShape2d &>(testShape).GetAsCircle(), b2Transform_identity);
+				return pManifoldOut->pointCount > 0;
+			}
+			else
+			{
+				b2Manifold man = b2CollideSegmentAndCircle(&m_Data.segment, b2Transform_identity, &static_cast<const HyShape2d &>(testShape).GetAsCircle(), b2Transform_identity);
+				return man.pointCount > 0;
+			}
+			break;
+
+		case HYFIXTURE_LineSegment: {
+			// Custom implementation required for line to line collision (box2d does not support)
+			glm::vec2 pt1(m_Data.segment.point1.x, m_Data.segment.point1.y);
+			glm::vec2 pt2(m_Data.segment.point2.x, m_Data.segment.point2.y);
+			glm::vec2 pt3(static_cast<const HyShape2d &>(testShape).GetAsSegment().point1.x, static_cast<const HyShape2d &>(testShape).GetAsSegment().point1.y);
+			glm::vec2 pt4(static_cast<const HyShape2d &>(testShape).GetAsSegment().point2.x, static_cast<const HyShape2d &>(testShape).GetAsSegment().point2.y);
+
+			glm::vec2 ptIntersection;
+			bool bCollide = HyMath::TestSegmentsOverlap(pt1, pt2, pt3, pt4, ptIntersection);
+			if(pManifoldOut)
+			{
+				*pManifoldOut = {};
+				pManifoldOut->pointCount = bCollide ? 1 : 0;
+				if(bCollide)
+				{
+					pManifoldOut->points[0] = {};
+					pManifoldOut->points[0].point = { ptIntersection.x, ptIntersection.y };
+					// Normal is not well defined for line to line collision, so just set to zero
+					pManifoldOut->normal = { 0.0f, 0.0f };
+					pManifoldOut->rollingImpulse = 0.0f;
+				}
+			}
+			return bCollide; }
+
+		case HYFIXTURE_Polygon:
+			if(pManifoldOut)
+			{
+				*pManifoldOut = b2CollideSegmentAndPolygon(&m_Data.segment, b2Transform_identity, &static_cast<const HyShape2d &>(testShape).GetAsPolygon(), b2Transform_identity);
+				return pManifoldOut->pointCount > 0;
+			}
+			else
+			{
+				b2Manifold man = b2CollideSegmentAndPolygon(&m_Data.segment, b2Transform_identity, &static_cast<const HyShape2d &>(testShape).GetAsPolygon(), b2Transform_identity);
+				return man.pointCount > 0;
+			}
+			break;
+
+		case HYFIXTURE_Capsule:
+			if(pManifoldOut)
+			{
+				*pManifoldOut = b2CollideSegmentAndCapsule(&m_Data.segment, b2Transform_identity, &static_cast<const HyShape2d &>(testShape).GetAsCapsule(), b2Transform_identity);
+				return pManifoldOut->pointCount > 0;
+			}
+			else
+			{
+				b2Manifold man = b2CollideSegmentAndCapsule(&m_Data.segment, b2Transform_identity, &static_cast<const HyShape2d &>(testShape).GetAsCapsule(), b2Transform_identity);
+				return man.pointCount > 0;
+			}
+			break;
+
+		default:
+			HyError("HyShape2d::IsColliding - LineSegment - Not implemented for shape type: " << testShape.GetType());
+			break;
+		}
+		break;
+
+	default:
+		HyError("HyShape2d::IsColliding - Not implemented for shape type: " << m_eType);
+		break;
+	}
+
+	return false;
+}
+
 //bool HyShape2d::IsColliding(const glm::mat4 &mtxSelfTransform, const HyShape2d &testShape, const glm::mat4 &mtxTestTransform, b2WorldManifold &worldManifoldOut) const
 //{
 //	// TODO: Account for any scaling within 'mtxSelfTransform' and 'mtxTestTransform'
@@ -777,7 +886,7 @@ void HyShape2d::PhysicsRemove(bool bUpdateBodyMass)
 	m_bPhysicsDirty = false;
 }
 
-// NOTE: Assumes 'shapeDataOut' starts as zeroed-out ShapeData. Will newly dynamically allocate for chain types
+// NOTE: Assumes 'shapeDataOut' starts as zeroed-out ShapeData.
 bool HyShape2d::TransformShapeData(ShapeData &shapeDataOut, const glm::mat4 &mtxTransform) const
 {
 	float fScaleX = glm::length(glm::vec3(mtxTransform[0][0], mtxTransform[0][1], mtxTransform[0][2]));

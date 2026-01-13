@@ -857,16 +857,17 @@ void ExtrapolateProperties(Project &projectRef,
 		case ITEM_FixtureChain:
 			if(pShapeModel)
 			{
-				bool bNeedRefresh = false;
+				bool bNeedColorRefresh = false;
+				bool bNeedFullRefresh = false;
 				HyColor color = pShapeModel->GetColor();
 				EditorShape eShape = pShapeModel->GetType();
-				std::vector<float> floatList;
+				QList<float> floatList;
 
 				if(eItemType == ITEM_Primitive && propsObj.contains("Body") && propsObj["Body"].toObject().contains("Color Tint"))
 				{
 					QJsonArray colorArray = propsObj["Body"].toObject()["Color Tint"].toArray();
 					color = HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt());
-					bNeedRefresh = true;
+					bNeedColorRefresh = true;
 				}
 
 				if(propsObj.contains("Shape"))
@@ -876,24 +877,25 @@ void ExtrapolateProperties(Project &projectRef,
 					if(shapeObj.contains("Type"))
 					{
 						eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
-						bNeedRefresh = true;
+						bNeedFullRefresh = true;
 					}
 					if(shapeObj.contains("Data"))
 					{
-						QJsonArray floatArray = shapeObj["Type"].toArray();
+						QJsonArray floatArray = shapeObj["Data"].toArray();
 						for(QJsonValue val : floatArray)
 							floatList.push_back(static_cast<float>(val.toDouble()));
-						bNeedRefresh = true;
+						bNeedFullRefresh = true;
 					}
 				}
 				
-				if(bNeedRefresh)
+				if(bNeedFullRefresh)
 				{
 					if(floatList.empty())
-						floatList = pShapeModel->GetData()->SerializeSelf();
-
-					pShapeModel->SetData(color, eShape, QList<float>(floatList.begin(), floatList.end()));
+						floatList = pShapeModel->GetData();
+					pShapeModel->SetData(color, eShape, floatList);
 				}
+				else if(bNeedColorRefresh)
+					pShapeModel->SetColor(color);
 			}
 			else
 				HyGuiLog("ExtrapolateProperties - Missing Polygon2dModel ptr for Fixture/Primitive shape processing", LOGTYPE_Error);

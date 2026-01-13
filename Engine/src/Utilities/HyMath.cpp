@@ -243,6 +243,113 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 	return glm::ivec2(-vDirVector.y, vDirVector.x);
 }
 
+/*static*/ float HyMath::CrossProduct(const glm::vec2 &vA, const glm::vec2 &vB)
+{
+	return (vA.x * vB.y) - (vA.y * vB.x);
+}
+
+/*static*/ float HyMath::WindingOrder(const glm::vec2 &ptA, const glm::vec2 &ptB, const glm::vec2 &ptC)
+{
+	return CrossProduct(ptB - ptA, ptC - ptA);
+}
+
+/*static*/ bool HyMath::IsConvexPolygon(const std::vector<glm::vec2> &ccwOrderedVertexList)
+{
+	const int iNumVerts = static_cast<int>(ccwOrderedVertexList.size());
+	if(iNumVerts < 3)
+		return false;
+
+	for(int i = 0; i < iNumVerts; ++i)
+	{
+		const glm::vec2 &pt1Ref = ccwOrderedVertexList[i];
+		const glm::vec2 &pt2Ref = ccwOrderedVertexList[(i + 1) % iNumVerts];
+		const glm::vec2 &pt3Ref = ccwOrderedVertexList[(i + 2) % iNumVerts];
+
+		if(WindingOrder(pt1Ref, pt2Ref, pt3Ref) <= 0.0f)
+			return false;
+	}
+}
+
+/*static*/ bool HyMath::TestPointTriangle(const glm::vec2 &ptA, const glm::vec2 &ptB, const glm::vec2 &ptC, const glm::vec2 &ptTest)
+{
+	float f1 = WindingOrder(ptA, ptB, ptTest);
+	float f2 = WindingOrder(ptB, ptC, ptTest);
+	float f3 = WindingOrder(ptC, ptA, ptTest);
+	return (f1 >= 0.0f && f2 >= 0.0f && f3 >= 0.0f);
+}
+
+/*static*/ bool HyMath::TestPointTriangle(const HyTriangle2d &tri, const glm::vec2 &ptTest)
+{
+	return TestPointTriangle(tri.m_ptA, tri.m_ptB, tri.m_ptC, ptTest);
+}
+
+/*static*/ std::vector<HyTriangle2d> HyMath::Triangulate(const std::vector<glm::vec2> &ccwOrderedVertexList)
+{
+	std::vector<HyTriangle2d> result;
+	
+	std::vector<int> indices(ccwOrderedVertexList.size());
+	for(int i = 0; i < (int)ccwOrderedVertexList.size(); ++i)
+		indices[i] = i;
+
+	// fpIsEar - Test for triangles with two sides being the edges of the polygon and the third one completely inside it
+	std::function<bool(int)> fpIsEar = 
+		[&indices, ccwOrderedVertexList](int i) -> bool
+		{
+			int n = static_cast<int>(indices.size());
+			int i0 = indices[(i + n - 1) % n];
+			int i1 = indices[i];
+			int i2 = indices[(i + 1) % n];
+
+			const glm::vec2 &a = ccwOrderedVertexList[i0];
+			const glm::vec2 &b = ccwOrderedVertexList[i1];
+			const glm::vec2 &c = ccwOrderedVertexList[i2];
+			if(WindingOrder(a, b, c) <= 0.0f)
+				return false; // Must be convex
+
+			for(int j = 0; j < n; ++j) // No other point inside
+			{
+				int vi = indices[j];
+				if(vi == i0 || vi == i1 || vi == i2)
+					continue;
+
+				if(TestPointTriangle(a, b, c, ccwOrderedVertexList[vi]))
+					return false;
+			}
+
+			return true;
+		};
+
+	while(indices.size() > 3)
+	{
+		bool bEarFound = false;
+		for(int i = 0; i < (int)indices.size(); ++i)
+		{
+			if(fpIsEar(i) == false)
+				continue;
+
+			int i0 = indices[(i + indices.size() - 1) % indices.size()];
+			int i1 = indices[i];
+			int i2 = indices[(i + 1) % indices.size()];
+
+			result.push_back({ ccwOrderedVertexList[i0], ccwOrderedVertexList[i1], ccwOrderedVertexList[i2] });
+
+			indices.erase(indices.begin() + i);
+			bEarFound = true;
+			break;
+		}
+
+		// Degenerate case (should not happen if polygon is simple)
+		if(bEarFound == false)
+			break;
+	}
+
+	// Final triangle
+	if(indices.size() == 3)
+		result.push_back({ ccwOrderedVertexList[indices[0]], ccwOrderedVertexList[indices[1]], ccwOrderedVertexList[indices[2]] });
+
+	return result;
+}
+
 // Caution: Operationally expensive
 /*static*/ float HyMath::AngleFromVector(const glm::vec2 &vDirVector)
 {
@@ -264,6 +371,60 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 
 	// Otherwise, the closest point is along the ray
 	return ptRayStart + t * vNormalizedRayDir;
+}
+
+///*static*/ glm::vec2 HyMath::ClosestPointOnSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &ptTestPoint)
+//{
+//	
+//}
+
+/*static*/ bool HyMath::TestSegmentsOverlap(const glm::vec2 &ptSegA1, const glm::vec2 &ptSegA2, const glm::vec2 &ptSegB1, const glm::vec2 &ptSegB2, glm::vec2 &ptIntersectionOut)
+{
+	// Calculate direction vectors for both segments
+	glm::vec2 vDirA = ptSegA2 - ptSegA1;
+	glm::vec2 vDirB = ptSegB2 - ptSegB1;
+
+	// Calculate the denominator for the intersection formula
+	float fDenom = vDirA.x * vDirB.y - vDirA.y * vDirB.x;
+
+	// If the denominator is zero, the lines are parallel or collinear
+	if(std::abs(fDenom) < HyMath::FloatSlop)
+	{
+		// Check if the segments are collinear and overlapping
+		glm::vec2 diff = ptSegA1 - ptSegB1;
+		float cross = vDirA.x * diff.y - vDirA.y * diff.x;
+
+		// If cross product is not zero, they are parallel but not collinear
+		if(std::abs(cross) > HyMath::FloatSlop)
+			return false;
+
+		// Check if segments overlap along the line
+		float t1 = (diff.x * vDirA.x + diff.y * vDirA.y) / (vDirA.x * vDirA.x + vDirA.y * vDirA.y);
+		float t2 = t1 + (vDirB.x * vDirA.x + vDirB.y * vDirA.y) / (vDirA.x * vDirA.x + vDirA.y * vDirA.y);
+
+		// Ensure the segments overlap in parameter space
+		if(t1 > 1.0f || t2 < 0.0f)
+			return false;
+
+		// Set intersection point to the midpoint of overlapping region
+		float t = std::max(0.0f, std::min(1.0f, t1));
+		ptIntersectionOut = ptSegA1 + t * vDirA;
+		return true;
+	}
+
+	// Calculate the parameters for intersection point
+	glm::vec2 diff = ptSegA1 - ptSegB1;
+	float t = (diff.x * vDirB.y - diff.y * vDirB.x) / fDenom;
+	float u = (diff.x * vDirA.y - diff.y * vDirA.x) / fDenom;
+
+	// Check if intersection point lies within both segments
+	if(t >= 0.0f && t <= 1.0f && u >= 0.0f && u <= 1.0f)
+	{
+		ptIntersectionOut = ptSegA1 + t * vDirA;
+		return true;
+	}
+
+	return false;
 }
 
 /*static*/ float HyMath::NormalizeRange(float fValue, float fMin, float fMax)

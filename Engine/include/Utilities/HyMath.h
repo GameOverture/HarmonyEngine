@@ -13,11 +13,6 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/AnimFloats/HyTweenFuncs.h"
 
-#define HY_PI 3.141592f
-
-//#define HyRadToDeg(radian) ((radian) * (180.0f / HY_PI)) // Use glm::degrees() instead
-//#define HyDegToRad(degree) ((degree) * (HY_PI / 180.0f)) // Use glm::radians() instead
-
 // maps unsigned 8 bits/channel to HYCOLOR
 #define HYCOLOR_ARGB(a,r,g,b) \
 	((uint32)((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff)))
@@ -59,6 +54,13 @@ bool HyCompareFloat(T lhs, T rhs)
 {
 	return trunc(1000. * lhs) == trunc(1000. * rhs);
 }
+
+struct HyTriangle2d
+{
+	glm::vec2	m_ptA;
+	glm::vec2	m_ptB;
+	glm::vec2	m_ptC;
+};
 
 class HyRect
 {
@@ -279,8 +281,18 @@ public:
 	static glm::vec2 PerpendicularCounterClockwise(const glm::vec2 &vDirVector);
 	static glm::ivec2 PerpendicularCounterClockwise(const glm::ivec2 &vDirVector);
 
+	static float CrossProduct(const glm::vec2 &vA, const glm::vec2 &vB);
+	static float WindingOrder(const glm::vec2 &ptA, const glm::vec2 &ptB, const glm::vec2 &ptC); // >0 = CCW, <0 = CW, 0 = Collinear
+
+	static bool IsConvexPolygon(const std::vector<glm::vec2> &ccwOrderedVertexList); // Assumes an implicitly closed, counter-clockwise winding of vertices in `ccwOrderedVertexList`
+	static bool TestPointTriangle(const glm::vec2 &ptA, const glm::vec2 &ptB, const glm::vec2 &ptC, const glm::vec2 &ptTest); // Assumes counter-clockwise order of A,B,C
+	static bool TestPointTriangle(const HyTriangle2d &tri, const glm::vec2 &ptTest);
+	static std::vector<HyTriangle2d> HyMath::Triangulate(const std::vector<glm::vec2> &ccwOrderedVertexList);
+
 	static float AngleFromVector(const glm::vec2 &vDirVector); // Caution: Operationally expensive
 	static glm::vec2 ClosestPointOnRay(const glm::vec2 &ptRayStart, const glm::vec2 &vNormalizedRayDir, const glm::vec2 &ptTestPoint);
+	//static glm::vec2 ClosestPointOnSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &ptTestPoint);
+	static bool TestSegmentsOverlap(const glm::vec2 &ptSegA1, const glm::vec2 &ptSegA2, const glm::vec2 &ptSegB1, const glm::vec2 &ptSegB2, glm::vec2 &ptIntersectionOut);
 
 	// Normalizes a value to an arbitrary range. The value wraps when going below min range or above max range.
 	static float NormalizeRange(float fValue, float fMin, float fMax);

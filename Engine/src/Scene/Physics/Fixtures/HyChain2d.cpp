@@ -139,15 +139,16 @@ void HyChain2d::SetData(const std::vector<glm::vec2> &verticesList, bool bLoop, 
 	return floatList;
 }
 
-/*virtual*/ void HyChain2d::DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) /*override*/
+/*virtual*/ std::vector<glm::vec2> HyChain2d::DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) /*override*/
 {
+	std::vector<glm::vec2> vertList;
+
 	if(eFixtureType != HYFIXTURE_LineChain)
 	{
 		HyLogError("HyChain2d::DeserializeSelf() - Mismatched fixture type");
-		return;
+		return vertList;
 	}
 
-	std::vector<glm::vec2> vertList;
 	for(int i = 0; i < floatList.size(); i += 2)
 		vertList.push_back(glm::vec2(floatList[i], floatList[i + 1]));
 
@@ -156,6 +157,7 @@ void HyChain2d::SetData(const std::vector<glm::vec2> &verticesList, bool bLoop, 
 		vertList.pop_back(); // Remove redundant final point
 
 	SetData(vertList, bLineLoop);
+	return vertList;
 }
 
 bool HyChain2d::GetCentroid(glm::vec2 &ptCentroidOut) const
@@ -342,6 +344,12 @@ void HyChain2d::SetFilter(const b2Filter &filter)
 {
 	HyError("HyChain2d::TestRay - Not implemented");
 	return b2CastOutput() = {};
+}
+
+/*virtual*/ bool HyChain2d::IsColliding(const IHyFixture2d &testShape, b2Manifold *pManifoldOut /*= nullptr*/) const /*override*/
+{
+	HyError("HyChain2d::IsColliding - Not implemented");
+	return false;
 }
 
 /*virtual*/ bool HyChain2d::ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const /*override*/

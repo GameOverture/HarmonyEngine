@@ -379,7 +379,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 			Polygon2dModel tmpShapeModel(HyColor::Black, HyGlobal::GetShapeFromString(sShapeType), floatList);
 			tmpShapeModel.TransformSelf(m_NewTransformList[i]);
 
-			std::vector<float> transformedFloatList = tmpShapeModel.GetData()->SerializeSelf();
+			QList<float> transformedFloatList = tmpShapeModel.GetData();
 			QJsonArray transformedFloatArray;
 			for(float fVal : transformedFloatList)
 				transformedFloatArray.append(fVal);

@@ -159,7 +159,7 @@ QJsonObject TileData::GetTileData() const
 		collisionObj["CollisionLayerUUID"] = it.key().toString(QUuid::WithoutBraces);
 
 		QJsonArray floatArray;
-		std::vector<float> floatList = it.value()->GetData()->SerializeSelf();
+		QList<float> floatList = it.value()->GetData();
 		for(int j = 0; j < floatList.size(); ++j)
 			floatArray.push_back(floatList[j]);
 		collisionObj["Data"] = floatArray;

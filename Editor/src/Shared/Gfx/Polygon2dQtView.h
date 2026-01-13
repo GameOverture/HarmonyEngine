@@ -21,7 +21,7 @@ class QGraphicsRectItem;
 class Polygon2dQtView : public IPolygon2dView, public QGraphicsItem
 {
 	QGraphicsPolygonItem *				m_pGfxPolygonItem;
-	QList<QGraphicsRectItem *>			m_VertexGrabPointList;
+	QList<QGraphicsRectItem *>			m_GrabPointList;
 
 public:
 	Polygon2dQtView(QGraphicsItem *pParent = nullptr);

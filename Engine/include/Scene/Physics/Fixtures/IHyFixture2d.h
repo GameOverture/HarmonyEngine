@@ -43,7 +43,7 @@ public:
 
 	virtual void TransformSelf(const glm::mat4 &mtxTransform) = 0;
 	virtual std::vector<float> SerializeSelf() const = 0;
-	virtual void DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) = 0;
+	virtual std::vector<glm::vec2> DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) = 0; // Returns vertex list of "grab points" for editing
 
 	glm::vec2 ComputeSize() const;
 
@@ -56,6 +56,7 @@ public:
 
 	virtual bool TestPoint(const glm::vec2 &ptTestPoint, const glm::mat4 &mtxSelfTransform) const = 0;
 	virtual b2CastOutput TestRay(const glm::vec2 &ptStart, const glm::vec2 &vDirection, const glm::mat4 &mtxSelfTransform) const = 0;
+	virtual bool IsColliding(const IHyFixture2d &testShape, b2Manifold *pManifoldOut = nullptr) const = 0;
 
 	virtual bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const = 0;
 

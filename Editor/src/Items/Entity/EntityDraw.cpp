@@ -93,6 +93,9 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	}
 	EntityTreeItemData *pTreeItemData = pCurEditItem->GetEntityTreeItemData();
 
+	glm::vec2 ptCurMousePos;
+	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
+
 	switch(m_eEditModeState)
 	{
 	case EDITMODE_Off:
@@ -102,33 +105,15 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	case EDITMODE_Idle:
 		if(pTreeItemData->GetShape2dModel())
 		{
-			Polygon2dModel *pShapeModel = pTreeItemData->GetShape2dModel();
-
-			HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
-			glm::vec2 ptCurMousePos;
-			pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
-
-			ShapeMouseMoveResult eResult = pShapeModel->OnMouseMoveEvent(QPointF(ptCurMousePos.x, ptCurMousePos.y));
+			ShapeMouseMoveResult eResult = pTreeItemData->GetShape2dModel()->OnMouseMoveEvent(QPointF(ptCurMousePos.x, ptCurMousePos.y));
 			switch(eResult)
 			{
-			case SHAPEMOUSEMOVE_Crosshair:
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor);
-				break;
-			case SHAPEMOUSEMOVE_Outside:
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor);
-				break;
-			case SHAPEMOUSEMOVE_Inside:
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor);
-				break;
-			case SHAPEMOUSEMOVE_AddVertex:
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor);
-				break;
-			case SHAPEMOUSEMOVE_HoverVertex:
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor);
-				break;
-			case SHAPEMOUSEMOVE_HoverSelectedVertex:
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor);
-				break;
+			case SHAPEMOUSEMOVE_Outside:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
+			case SHAPEMOUSEMOVE_Inside:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
+			case SHAPEMOUSEMOVE_Crosshair:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
+			case SHAPEMOUSEMOVE_AddVertex:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
+			case SHAPEMOUSEMOVE_HoverVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;
+			case SHAPEMOUSEMOVE_HoverSelectedVertex:	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
 			default:
 				HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_Idle with unsupported shape mouse move result!", LOGTYPE_Error);
 				break;
@@ -138,18 +123,25 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_Idle with unsupported edit item type!", LOGTYPE_Error);
 		break;
 
-	case EDITMODE_OutsideMouseDown: {
-		QPointF dragDelta = QPointF(pEvent->pos()) - QPointF(m_ptDragStart.x, m_ptDragStart.y);
+	case EDITMODE_MouseDownOutside:
+	case EDITMODE_MouseDownTransform: {
+		QPointF dragDelta = QPointF(ptCurMousePos.x, ptCurMousePos.y) - QPointF(m_ptDragStart.x, m_ptDragStart.y);
 		if(dragDelta.manhattanLength() >= MANHATTAN_DRAG_THRESHOLD)
-			m_eEditModeState = EDITMODE_MarqueeSelect;
+		{
+			if(m_eEditModeState == EDITMODE_MouseDownOutside)
+			{
+				m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
+				m_eEditModeState = EDITMODE_MouseDragMarquee;
+			}
+			else // EDITMODE_MouseDownTransform
+				m_eEditModeState = EDITMODE_MouseDragTransform;
+		}
 		break; }
 
-	case EDITMODE_MarqueeSelect:
+	case EDITMODE_MouseDragMarquee:
 		if(pTreeItemData->GetShape2dModel())
 		{
 			Polygon2dModel *pShapeModel = pTreeItemData->GetShape2dModel();
-			
-			m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
 
 			glm::vec2 ptWorldMousePos;
 			m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
@@ -159,13 +151,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_MarqueeSelect with unsupported edit item type!", LOGTYPE_Error);
 		break;
 
-	case EDITMODE_HoverMouseDown: {
-		QPointF dragDelta = QPointF(pEvent->pos()) - QPointF(m_ptDragStart.x, m_ptDragStart.y);
-		if(dragDelta.manhattanLength() >= MANHATTAN_DRAG_THRESHOLD)
-			m_eEditModeState = EDITMODE_Transforming;
-		break; }
-
-	case EDITMODE_Transforming:
+	case EDITMODE_MouseDragTransform:
 		break;
 
 	default:
@@ -200,21 +186,16 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		
 		if(pTreeItemData->GetShape2dModel())
 		{
-			Polygon2dModel *pShapeModel = pTreeItemData->GetShape2dModel();
-			ShapeMousePressResult eResult = pShapeModel->OnMousePressEvent(pEvent);
-			switch(eResult)
+			bool bStartTransform = pTreeItemData->GetShape2dModel()->OnMousePressEvent(QPointF(m_ptDragStart.x, m_ptDragStart.y));
+			if(bStartTransform)
 			{
-			case SHAPEMOUSEPRESS_Outside:
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor);
-				m_eEditModeState = EDITMODE_OutsideMouseDown;
-				break;
-
-			case SHAPEMOUSEPRESS_Inside:
-			case SHAPEMOUSEPRESS_VertexAdded:
-			case SHAPEMOUSEPRESS_VertexPressed:
 				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BlankCursor);
-				m_eEditModeState = EDITMODE_HoverMouseDown;
-				break;
+				m_eEditModeState = EDITMODE_MouseDownTransform;
+			}
+			else
+			{
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor);
+				m_eEditModeState = EDITMODE_MouseDownOutside;
 			}
 		}
 		else
@@ -247,25 +228,57 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	case EDITMODE_Off:
 		HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_Off reached in Edit Mode!", LOGTYPE_Error);
 		break;
-
 	case EDITMODE_Idle:
+		HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_Idle reached in Edit Mode!", LOGTYPE_Error);
 		break;
 
-	case EDITMODE_HoverMouseDown:
-	case EDITMODE_MarqueeSelect:
+	case EDITMODE_MouseDownOutside:
+	case EDITMODE_MouseDragMarquee:
 		if(pTreeItemData->GetShape2dModel())
 		{
-			Polygon2dModel *pShapeModel = pTreeItemData->GetShape2dModel();
-			
-
 			b2AABB marqueeAabb;
-			HyShape2d tmpShape;
-			m_DragShape.GetPrimitive(true).CalcLocalBoundingShape(tmpShape);
-			tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
-
-			pShapeModel->OnMouseMarqueeReleased(QPointF(marqueeAabb.lowerBound.x, marqueeAabb.lowerBound.y), QPointF(marqueeAabb.upperBound.x, marqueeAabb.upperBound.y));
-			m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+			if(m_eEditModeState == EDITMODE_MouseDownOutside)
+			{
+				marqueeAabb.lowerBound = { m_ptDragStart.x, m_ptDragStart.y };
+				marqueeAabb.upperBound = { m_ptDragStart.x + 1, m_ptDragStart.y + 1 };
+			}
+			else
+			{
+				HyShape2d tmpShape;
+				m_DragShape.GetPrimitive(true).CalcLocalBoundingShape(tmpShape);
+				tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
+			}
+			pTreeItemData->GetShape2dModel()->OnMouseMarqueeReleased(QPointF(marqueeAabb.lowerBound.x, marqueeAabb.lowerBound.y),
+																	 QPointF(marqueeAabb.upperBound.x, marqueeAabb.upperBound.y));
 		}
+		else
+			HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_MarqueeSelect with unsupported edit item type!", LOGTYPE_Error);
+		
+		m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+		m_eEditModeState = EDITMODE_Idle;
+		break;
+
+	case EDITMODE_MouseDownTransform:
+	case EDITMODE_MouseDragTransform:
+		if(pTreeItemData->GetShape2dModel())
+		{
+			QString sUndoText = pTreeItemData->GetShape2dModel()->OnMouseTransformReleased(QPointF(pEvent->pos()));
+			if(sUndoText.isEmpty() == false)
+			{
+				int iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
+				int iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
+				EditorShape eShapeType = pTreeItemData->GetShape2dModel()->GetType();
+				QList<float> newFloatDataList = pTreeItemData->GetShape2dModel()->GetData();
+
+				QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, eShapeType, newFloatDataList);
+				m_pProjItem->GetUndoStack()->push(pCmd);
+			}
+
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor);
+			m_eEditModeState = EDITMODE_Idle;
+		}
+		else
+			HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_Transform with unsupported edit item type!", LOGTYPE_Error);
 		break;
 
 	default:
@@ -314,15 +327,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	//{
 	//	EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(pCurVertexEditItem->GetEntityTreeItemData()->GetThisUuid());
 
-	//	int iStateIndex = 0;
-	//	int iFrameIndex = 0;
-	//	if(m_pProjItem->GetWidget() == nullptr)
-	//		HyGuiLog("EntityDraw::OnMouseReleaseEvent - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
-	//	else
-	//	{
-	//		iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
-	//		iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
-	//	}
+
 
 	//	QString sUndoText;
 	//	switch(GetCurAction())
@@ -346,8 +351,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	//		break;
 	//	}
 
-	//	QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pCurVertexEditItem->GetShapeCtrl().SerializeVemVerts(m_pCamera));
-	//	m_pProjItem->GetUndoStack()->push(pCmd);
+	//	
 
 	//	ClearAction();
 	//}

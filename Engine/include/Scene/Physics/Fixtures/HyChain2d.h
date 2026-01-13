@@ -43,7 +43,7 @@ public:
 
 	virtual void TransformSelf(const glm::mat4 &mtxTransform) override;
 	virtual std::vector<float> SerializeSelf() const override;
-	virtual void DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) override;
+	virtual std::vector<glm::vec2> DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) override;
 
 	bool GetCentroid(glm::vec2 &ptCentroidOut) const;
 
@@ -58,6 +58,7 @@ public:
 
 	virtual bool TestPoint(const glm::vec2 &ptTestPoint, const glm::mat4 &mtxSelfTransform) const override;
 	virtual b2CastOutput TestRay(const glm::vec2 &ptStart, const glm::vec2 &vDirection, const glm::mat4 &mtxSelfTransform) const override;
+	virtual bool IsColliding(const IHyFixture2d &testShape, b2Manifold *pManifoldOut = nullptr) const override;
 
 	virtual bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const override;
 

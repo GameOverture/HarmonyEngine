@@ -51,13 +51,21 @@ HyPrimitive &Polygon2dHyView::GetFillPrimitive()
 	m_Outline.SetTint(m_pModel->GetColor());
 
 	if(m_pModel->GetType() == SHAPE_LineChain)
-		m_Fill.SetAsLineChain(static_cast<HyChain2d *>(m_pModel->GetData())->GetData());
-	else
-		m_Fill.SetAsShape(*static_cast<HyShape2d *>(m_pModel->GetData()));
+		m_Fill.SetAsLineChain(static_cast<HyChain2d *>(m_pModel->GetFixture(0))->GetData());
+	else if(m_pModel->GetType() != SHAPE_Polygon)
+		m_Fill.SetAsShape(*static_cast<HyShape2d *>(m_pModel->GetFixture(0)));
+	else // SHAPE_Polygon
+	{
+		if(m_pModel->GetFixture(0))
+		{
+			// TODO: HyPrimitive2d's need to render all fixtures (complex polygons)
+			m_Fill.SetAsShape(*static_cast<HyShape2d *>(m_pModel->GetFixture(0)));
+		}
+	}
 
 	// Using 'floatList' (which are stored in world coordinates) construct the 'm_Outline' by first converting points to camera space
 	// Also update 'm_VertexGrabPointList' with the converted to camera space points
-	std::vector<float> floatList = m_pModel->GetData()->SerializeSelf();
+	QList<float> floatList = m_pModel->GetData();
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
 	switch(m_pModel->GetType())
 	{

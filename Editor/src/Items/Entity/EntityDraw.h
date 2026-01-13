@@ -18,11 +18,11 @@
 enum EditModeState
 {
 	EDITMODE_Off = 0,
-	EDITMODE_Idle,				// Mouse cursor determined by draw models
-	EDITMODE_OutsideMouseDown,	// Click started outside of the edit item's bounds
-	EDITMODE_MarqueeSelect,		// Click-dragging a marquee select box
-	EDITMODE_HoverMouseDown,	// Click started on shape to be manipulated
-	EDITMODE_Transforming,		// Transforming (translating, rotating, scaling) the edit item
+	EDITMODE_Idle,					// Mouse cursor determined by draw models
+	EDITMODE_MouseDownOutside,		// Click started outside of the edit item's bounds
+	EDITMODE_MouseDragMarquee,		// Click-dragging a marquee select box
+	EDITMODE_MouseDownTransform,			// Click started on item to be manipulated
+	EDITMODE_MouseDragTransform,	// Transforming (translating, rotating, scaling) the edit item
 };
 
 class EntityDraw : public IDrawEx
