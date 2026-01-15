@@ -38,7 +38,7 @@ Polygon2dQtView::Polygon2dQtView(QGraphicsItem *pParent /*= nullptr*/) :
 	m_pGfxPolygonItem->setPen(QPen(HyGlobal::ConvertHyColor(m_pModel->GetColor().IsDark() ? HyColor::White : HyColor::Black), 1.0f));
 }
 
-/*virtual*/ void Polygon2dQtView::RefreshView() /*override*/
+/*virtual*/ void Polygon2dQtView::RefreshView(bool bTransformPreview) /*override*/
 {
 	if(m_pModel == nullptr)
 	{
@@ -51,6 +51,10 @@ Polygon2dQtView::Polygon2dQtView(QGraphicsItem *pParent /*= nullptr*/) :
 
 	QPolygonF polygon;
 	const QList<GrabPointModel> &grabPointListRef = m_pModel->GetGrabPointList();
+}
+
+/*virtual*/ void Polygon2dQtView::OnHoverClear() /*override*/
+{
 }
 
 /*virtual*/ QRectF Polygon2dQtView::boundingRect() const /*override*/

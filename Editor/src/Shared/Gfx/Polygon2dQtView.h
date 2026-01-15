@@ -28,7 +28,9 @@ public:
 	virtual ~Polygon2dQtView();
 
 	virtual void RefreshColor() override;
-	virtual void RefreshView() override;
+	virtual void RefreshView(bool bTransformPreview) override;
+
+	virtual void OnHoverClear() override;
 
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) override;

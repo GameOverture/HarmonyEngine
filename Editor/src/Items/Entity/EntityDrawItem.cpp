@@ -131,7 +131,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 		m_pShapeView = new Polygon2dHyView();
 		m_pShapeView->SetModel(m_pEntityTreeItemData->GetShape2dModel());
 
-		m_pChild = &m_pShapeView->GetFillPrimitive();
+		m_pChild = m_pShapeView;
 	}
 
 	if(m_pChild)
@@ -176,7 +176,7 @@ EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 {
 	IDrawExItem::RefreshTransform(pCamera);
 	if(m_pShapeView)
-		m_pShapeView->RefreshView();
+		m_pShapeView->RefreshView(false);
 }
 
 Polygon2dHyView *EntityDrawItem::GetShapeView()

@@ -11,8 +11,10 @@
 #include "Polygon2dHyView.h"
 #include "GrabPoint.h"
 
-Polygon2dHyView::Polygon2dHyView()
+Polygon2dHyView::Polygon2dHyView(HyEntity2d *pParent /*= nullptr*/) :
+	HyEntity2d(pParent)
 {
+	// NOTE: m_Outline does not have a parent because it is projected to window coordinates
 	m_Outline.UseWindowCoordinates();
 	m_Outline.SetWireframe(true);
 	m_Outline.SetDisplayOrder(DISPLAYORDER_TransformCtrl - 1);
@@ -21,11 +23,18 @@ Polygon2dHyView::Polygon2dHyView()
 
 /*virtual*/ Polygon2dHyView::~Polygon2dHyView()
 {
+	ClearPrimitives();
 }
 
-HyPrimitive &Polygon2dHyView::GetFillPrimitive()
+HyPrimitive *Polygon2dHyView::GetPrimitive(int iIndex)
 {
-	return m_Fill;
+	if(iIndex < 0 || iIndex >= m_PrimList.size())
+	{
+		HyGuiLog("Polygon2dHyView::GetPrimitive index out of range", LOGTYPE_Error);
+		return nullptr;
+	}
+
+	return m_PrimList[iIndex];
 }
 
 /*virtual*/ void Polygon2dHyView::RefreshColor() /*override*/
@@ -33,38 +42,83 @@ HyPrimitive &Polygon2dHyView::GetFillPrimitive()
 	if(m_pModel == nullptr)
 		return;
 
-	m_Fill.SetTint(m_pModel->GetColor());
-	m_Outline.SetTint(m_pModel->GetColor());
+	HyColor color = m_pModel->GetColor();
+	bool bIsDark = color.IsDark();
+	for(HyPrimitive2d *pPrim : m_PrimList)
+	{
+		pPrim->SetTint(m_pModel->GetColor());
+		if(bIsDark)
+			color = color.Lighten();
+		else
+			color = color.Darken();
+	}
+	m_Outline.SetTint(bIsDark ? HyColor::White : HyColor::Black);
 }
 
-/*virtual*/ void Polygon2dHyView::RefreshView() /*override*/
+/*virtual*/ void Polygon2dHyView::RefreshView(bool bTransformPreview) /*override*/
 {
 	if(m_pModel == nullptr)
 	{
-		m_Fill.SetAsNothing();
+		ClearPrimitives();
 		m_Outline.SetAsNothing();
 		SetVertexGrabPointListSize(0);
 		return;
 	}
 
-	m_Fill.SetTint(m_pModel->GetColor());
-	m_Outline.SetTint(m_pModel->GetColor());
+	RefreshColor();
 
 	if(m_pModel->GetType() == SHAPE_LineChain)
-		m_Fill.SetAsLineChain(static_cast<HyChain2d *>(m_pModel->GetFixture(0))->GetData());
+	{
+		if(m_PrimList.size() != 1)
+		{
+			ClearPrimitives();
+			HyPrimitive2d *pNewPrim = new HyPrimitive2d(this);
+			m_PrimList.push_back(pNewPrim);
+		}
+
+		m_PrimList[0]->SetAsLineChain(static_cast<HyChain2d *>(m_pModel->GetFixture(0))->GetChainData());
+	}
 	else if(m_pModel->GetType() != SHAPE_Polygon)
-		m_Fill.SetAsShape(*static_cast<HyShape2d *>(m_pModel->GetFixture(0)));
+	{
+		if(m_PrimList.size() != 1)
+		{
+			ClearPrimitives();
+			HyPrimitive2d *pNewPrim = new HyPrimitive2d(this);
+			m_PrimList.push_back(pNewPrim);
+		}
+		m_PrimList[0]->SetAsShape(*static_cast<HyShape2d *>(m_pModel->GetFixture(0)));
+	}
 	else // SHAPE_Polygon
 	{
-		if(m_pModel->GetFixture(0))
+		int iNumFixtures = m_pModel->GetNumFixtures();
+		while(m_PrimList.size() < iNumFixtures)
 		{
-			// TODO: HyPrimitive2d's need to render all fixtures (complex polygons)
-			m_Fill.SetAsShape(*static_cast<HyShape2d *>(m_pModel->GetFixture(0)));
+			HyPrimitive2d *pNewPrim = new HyPrimitive2d(this);
+			m_PrimList.push_back(pNewPrim);
 		}
+		while(m_PrimList.size() > iNumFixtures)
+		{
+			delete m_PrimList.back();
+			m_PrimList.pop_back();
+		}
+		for(int iIndex = 0; iIndex < iNumFixtures; ++iIndex)
+			m_PrimList[iIndex]->SetAsShape(*static_cast<HyShape2d *>(m_pModel->GetFixture(iIndex)));
 	}
 
-	// Using 'floatList' (which are stored in world coordinates) construct the 'm_Outline' by first converting points to camera space
-	// Also update 'm_VertexGrabPointList' with the converted to camera space points
+	RefreshOutline();
+}
+
+/*virtual*/ void Polygon2dHyView::OnHoverClear() /*override*/
+{
+
+}
+
+// Using 'floatList' (which are stored in world coordinates) construct the 'm_Outline' by first converting points to camera space
+// Also update 'm_VertexGrabPointList' with the converted to camera space points
+void Polygon2dHyView::RefreshOutline()
+{
+	// TODO: Use model's grabpoints instead of hardcoding it here
+
 	QList<float> floatList = m_pModel->GetData();
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
 	switch(m_pModel->GetType())
@@ -75,6 +129,9 @@ HyPrimitive &Polygon2dHyView::GetFillPrimitive()
 		break;
 
 	case SHAPE_Polygon:
+		grabpoints;
+		break;
+
 	case SHAPE_Box: {
 		if(floatList.size() & 1)
 			HyGuiLog("ShapeCtrl::RefreshOutline was a box/polygon with an odd number of serialized floats", LOGTYPE_Error);
@@ -142,7 +199,7 @@ HyPrimitive &Polygon2dHyView::GetFillPrimitive()
 		break; }
 
 	case SHAPE_LineChain: {
-		if(floatList.size() & 1)
+		if(floatList.size() & 1) asdf;
 			HyGuiLog("ShapeCtrl::RefreshOutline was a LineChain/LineLoop with an odd number of serialized floats", LOGTYPE_Error);
 		SetVertexGrabPointListSize(floatList.size() / 2);
 
@@ -161,11 +218,8 @@ HyPrimitive &Polygon2dHyView::GetFillPrimitive()
 		break; }
 	}
 
-	//if(IsVemEnabled())
-	{
-		for(GrabPoint *pGrabPt : m_VertexGrabPointList)
-			pGrabPt->SetVisible(true);
-	}
+	for(GrabPoint *pGrabPt : m_VertexGrabPointList)
+		pGrabPt->SetVisible(true);
 }
 
 void Polygon2dHyView::SetVertexGrabPointListSize(uint32 uiNumGrabPoints)
@@ -182,9 +236,15 @@ void Polygon2dHyView::SetVertexGrabPointListSize(uint32 uiNumGrabPoints)
 											  HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointFill),
 											  HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointSelectedOutline),
 											  HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointSelectedFill),
-											  nullptr);
-		pNewGrabPt->SetVisible(false);
+											  this);
 		pNewGrabPt->SetDisplayOrder(DISPLAYORDER_TransformCtrl);
 		m_VertexGrabPointList.push_back(pNewGrabPt);
 	}
+}
+
+void Polygon2dHyView::ClearPrimitives()
+{
+	for(HyPrimitive2d *pPrim : m_PrimList)
+		delete pPrim;
+	m_PrimList.clear();
 }

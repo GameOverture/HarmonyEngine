@@ -64,7 +64,7 @@ const HyChain2d &HyChain2d::operator=(const HyChain2d &rhs)
 	return *this;
 }
 
-const HyChainData &HyChain2d::GetData() const
+const HyChainData &HyChain2d::GetChainData() const
 {
 	return m_Data;
 }
@@ -324,13 +324,11 @@ void HyChain2d::SetFilter(const b2Filter &filter)
 
 /*virtual*/ bool HyChain2d::TestPoint(const glm::vec2 &ptTestPoint, const glm::mat4 &mtxSelfTransform) const /*override*/
 {
-	if(IsValid() == false)
+	if(IsValid() == false || m_Data.bLoop == false)
 		return false;
 
-	b2AABB aabb;
-	ComputeAABB(aabb, mtxSelfTransform);
-
-	return HyMath::TestPointAABB(aabb, ptTestPoint);
+	// TODO: Need self transformed points and to check if within the enclosed segment loop
+	return false;
 }
 
 /*virtual*/ b2CastOutput HyChain2d::TestRay(const glm::vec2 &ptStart, const glm::vec2 &vDirection, const glm::mat4 &mtxSelfTransform) const /*override*/
@@ -354,37 +352,7 @@ void HyChain2d::SetFilter(const b2Filter &filter)
 	if(AllocChainData(chainData, mtxTransform))
 	{
 		HyMath::InvalidateAABB(aabbOut);
-		for(int32 i = 0; i < chainData.iCount; ++i)
-		{
-			if(b2IsValidAABB(aabbOut) == false)
-			{
-				aabbOut.lowerBound = { chainData.pPointList[i].x, chainData.pPointList[i].y };
-				aabbOut.upperBound = { chainData.pPointList[i].x, chainData.pPointList[i].y };
-			}
-			else
-			{
-				if(chainData.pPointList[i].x < aabbOut.lowerBound.x)
-					aabbOut.lowerBound.x = chainData.pPointList[i].x;
-				else if(chainData.pPointList[i].x > aabbOut.upperBound.x)
-					aabbOut.upperBound.x = chainData.pPointList[i].x;
-
-				if(chainData.pPointList[i].y < aabbOut.lowerBound.y)
-					aabbOut.lowerBound.y = chainData.pPointList[i].y;
-				else if(chainData.pPointList[i].y > aabbOut.upperBound.y)
-					aabbOut.upperBound.y = chainData.pPointList[i].y;
-			}
-		}
-		// If the AABB is flat, inflate it by 5 pixel radius
-		if(aabbOut.lowerBound.x == aabbOut.upperBound.x)
-		{
-			aabbOut.lowerBound.x -= 5.0f;
-			aabbOut.upperBound.x += 5.0f;
-		}
-		if(aabbOut.lowerBound.y == aabbOut.upperBound.y)
-		{
-			aabbOut.lowerBound.y -= 5.0f;
-			aabbOut.upperBound.y += 5.0f;
-		}
+		HyMath::ComputeAABB(aabbOut, chainData.pPointList, chainData.iCount);
 
 		delete[] chainData.pPointList;
 		return true;

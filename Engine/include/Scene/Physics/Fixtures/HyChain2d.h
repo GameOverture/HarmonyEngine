@@ -37,7 +37,7 @@ public:
 
 	const HyChain2d &operator=(const HyChain2d &rhs);
 
-	const HyChainData &GetData() const;
+	const HyChainData &GetChainData() const;
 	void SetData(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoop, const b2ChainDef *pPhysicsInit = nullptr);
 	void SetData(const std::vector<glm::vec2> &verticesList, bool bLoop, const b2ChainDef *pPhysicsInit = nullptr);
 

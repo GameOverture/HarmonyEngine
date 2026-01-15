@@ -26,7 +26,9 @@ public:
 	void SetModel(Polygon2dModel *pModel);
 
 	virtual void RefreshColor() = 0;
-	virtual void RefreshView() = 0;
+	virtual void RefreshView(bool bTransformPreview) = 0;
+
+	virtual void OnHoverClear() = 0;
 };
 
 #endif // IPolygon2dView_H

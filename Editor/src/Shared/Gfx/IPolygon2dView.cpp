@@ -28,5 +28,5 @@ Polygon2dModel *IPolygon2dView::GetModel() const
 void IPolygon2dView::SetModel(Polygon2dModel *pModel)
 {
 	m_pModel = pModel;
-	RefreshView();
+	RefreshView(false);
 }

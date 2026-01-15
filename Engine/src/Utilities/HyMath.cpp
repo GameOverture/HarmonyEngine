@@ -211,6 +211,44 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 	aabbOut.upperBound = { -1.0f, -1.0f };
 }
 
+/*static*/ void HyMath::ComputeAABB(b2AABB &aabbOut, const glm::vec2 *pPointList, int32 iPointCount, float fInflateFlatDimensions = 0.0f)
+{
+	for(int32 i = 0; i < iPointCount; ++i)
+	{
+		if(b2IsValidAABB(aabbOut) == false)
+		{
+			aabbOut.lowerBound = { pPointList[i].x, pPointList[i].y };
+			aabbOut.upperBound = { pPointList[i].x, pPointList[i].y };
+		}
+		else
+		{
+			if(pPointList[i].x < aabbOut.lowerBound.x)
+				aabbOut.lowerBound.x = pPointList[i].x;
+			else if(pPointList[i].x > aabbOut.upperBound.x)
+				aabbOut.upperBound.x = pPointList[i].x;
+
+			if(pPointList[i].y < aabbOut.lowerBound.y)
+				aabbOut.lowerBound.y = pPointList[i].y;
+			else if(pPointList[i].y > aabbOut.upperBound.y)
+				aabbOut.upperBound.y = pPointList[i].y;
+		}
+	}
+
+	if(fInflateFlatDimensions != 0.0f) // If the AABB is flat, inflate it by 5 pixel radius
+	{
+		if(aabbOut.lowerBound.x - aabbOut.upperBound.x <= fabs(HyMath::FloatSlop))
+		{
+			aabbOut.lowerBound.x -= fInflateFlatDimensions;
+			aabbOut.upperBound.x += fInflateFlatDimensions;
+		}
+		if(aabbOut.lowerBound.y - aabbOut.upperBound.y <= fabs(HyMath::FloatSlop))
+		{
+			aabbOut.lowerBound.y -= fInflateFlatDimensions;
+			aabbOut.upperBound.y += fInflateFlatDimensions;
+		}
+	}
+}
+
 /*static*/ bool HyMath::TestPointAABB(const b2AABB &aabb, const glm::vec2 &pt)
 {
 	return (b2IsValidAABB(aabb) &&

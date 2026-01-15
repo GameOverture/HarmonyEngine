@@ -123,6 +123,7 @@ b2Capsule HyShape2d::GetAsCapsule() const
 		break;
 
 	case HYFIXTURE_Polygon:
+		// NOTE: The final float indicating whether this is a closed polygon is not supplied here, which is unlike how HyEditor serializes polygons (and chains)
 		for(int i = 0; i < m_Data.polygon.count; ++i)
 		{
 			floatList.push_back(m_Data.polygon.vertices[i].x);
@@ -170,10 +171,11 @@ b2Capsule HyShape2d::GetAsCapsule() const
 		break;
 
 	case HYFIXTURE_Polygon:
+		// NOTE: The final float indicating whether this is a closed polygon is not supplied here, which is unlike how HyEditor serializes polygons (and chains)
+		HyAssert((floatList.size() & 1) == 0, "HyShape2d::DeserializeSelf recieved an odd number of floats to deserialize a polygon");
 		vertList.reserve(floatList.size() / 2);
 		for(int i = 0; i < floatList.size(); i += 2)
 			vertList.emplace_back(glm::vec2(floatList[i], floatList[i + 1]));
-
 		SetAsPolygon(vertList);
 		break;
 
