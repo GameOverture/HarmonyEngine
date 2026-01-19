@@ -211,7 +211,7 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 	aabbOut.upperBound = { -1.0f, -1.0f };
 }
 
-/*static*/ void HyMath::ComputeAABB(b2AABB &aabbOut, const glm::vec2 *pPointList, int32 iPointCount, float fInflateFlatDimensions = 0.0f)
+/*static*/ void HyMath::ComputeAABB(b2AABB &aabbOut, const glm::vec2 *pPointList, int32 iPointCount, float fInflateFlatDimensions /*= 0.0f*/)
 {
 	for(int32 i = 0; i < iPointCount; ++i)
 	{
@@ -306,6 +306,8 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 		if(WindingOrder(pt1Ref, pt2Ref, pt3Ref) <= 0.0f)
 			return false;
 	}
+
+	return true;
 }
 
 /*static*/ bool HyMath::TestPointTriangle(const glm::vec2 &ptA, const glm::vec2 &ptB, const glm::vec2 &ptC, const glm::vec2 &ptTest)

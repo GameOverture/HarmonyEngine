@@ -15,7 +15,7 @@
 #include "IAssetItemData.h"
 #include "MainWindow.h"
 #include "AuxDopeSheet.h"
-#include "Polygon2dModel.h"
+#include "GfxShapeModel.h"
 
 #include <QJsonValue>
 

@@ -14,7 +14,7 @@
 #include "ExplorerModel.h"
 #include "MainWindow.h"
 #include "EntityUndoCmds.h"
-#include "Polygon2dModel.h"
+#include "GfxShapeModel.h"
 
 #include <QVariant>
 #include <QStack>

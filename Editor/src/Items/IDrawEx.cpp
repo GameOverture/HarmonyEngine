@@ -17,11 +17,11 @@
 
 IDrawEx::IDrawEx(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDraw(pProjItem, initFileDataRef),
-	m_DragShape(this),
+	m_MarqueeCtrl(this),
 	m_MultiTransform(this),
 	m_fMultiTransformStartRot(0.0f),
 	m_pCurHoverItem(nullptr),
-	m_eCurHoverGrabPoint(TransformCtrl::GRAB_None),
+	m_eCurHoverGrabPoint(GfxTransformCtrl::GRAB_None),
 	m_bSelectionHandled(false),
 	m_SnapGuideHorz(this),
 	m_SnapGuideVert(this)
@@ -152,7 +152,7 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 	{
 		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), m_ptDragStart);
 
-		if(m_eCurHoverGrabPoint != TransformCtrl::GRAB_None)
+		if(m_eCurHoverGrabPoint != GfxTransformCtrl::GRAB_None)
 			BeginTransform();
 		else
 		{
@@ -214,7 +214,7 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 			{
 				b2AABB marqueeAabb;
 				HyShape2d tmpShape;
-				m_DragShape.GetPrimitive(true).CalcLocalBoundingShape(tmpShape);
+				m_MarqueeCtrl.GetFillPrimitive().CalcLocalBoundingShape(tmpShape);
 				tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
 
 				for(IDrawExItem *pItem : m_ItemList)
@@ -223,7 +223,7 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 						affectedItemList << pItem;
 				}
 
-				m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+				m_MarqueeCtrl.SetVisible(false);
 			}
 			else if(m_pCurHoverItem && m_pCurHoverItem->IsSelectable()) // This covers the resolution of "Special Case" in DoMousePress
 				affectedItemList << m_pCurHoverItem;
@@ -288,7 +288,7 @@ void IDrawEx::RefreshTransforms()
 void IDrawEx::ClearHover()
 {
 	m_pCurHoverItem = nullptr;
-	m_eCurHoverGrabPoint = TransformCtrl::GRAB_None;
+	m_eCurHoverGrabPoint = GfxTransformCtrl::GRAB_None;
 }
 
 /*virtual*/ void IDrawEx::OnCameraUpdated() /*override*/
@@ -306,8 +306,8 @@ void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 	{
 		SetAction(HYACTION_MarqueeDrag);
 
-		m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
-		m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptWorldMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
+		m_MarqueeCtrl.Setup(0.25f, 1.0f);
+		m_MarqueeCtrl.SetAsDrag(m_ptDragStart, ptWorldMousePos);
 	}
 	else if(GetCurAction() == HYACTION_Pending)
 	{
@@ -337,7 +337,7 @@ void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 		if(GetCurAction() == HYACTION_HoverItem && m_pCurHoverItem == nullptr)
 			ClearAction();
 
-		m_eCurHoverGrabPoint = TransformCtrl::GRAB_None;
+		m_eCurHoverGrabPoint = GfxTransformCtrl::GRAB_None;
 
 		if(m_MultiTransform.IsShown())
 		{
@@ -347,7 +347,7 @@ void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 
 		if(m_SelectedItemList.size() == 1)
 		{
-			TransformCtrl &transformCtrlRef = m_SelectedItemList[0]->GetTransformCtrl();
+			GfxTransformCtrl &transformCtrlRef = m_SelectedItemList[0]->GetTransformCtrl();
 			m_eCurHoverGrabPoint = transformCtrlRef.IsMouseOverGrabPoint();
 			if(SetTransformHoverActionViaGrabPoint(m_eCurHoverGrabPoint, transformCtrlRef.GetCachedRotation()))
 				m_pCurHoverItem = m_SelectedItemList[0]; // Override whatever might be above this item, because we're hovering over a grab point
@@ -357,7 +357,7 @@ void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 	}
 }
 
-bool IDrawEx::SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType eGrabPoint, float fRotation)
+bool IDrawEx::SetTransformHoverActionViaGrabPoint(GfxTransformCtrl::GrabPointType eGrabPoint, float fRotation)
 {
 	fRotation = HyMath::NormalizeRange(fRotation, 0.0f, 360.0f);
 
@@ -394,10 +394,10 @@ bool IDrawEx::SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType e
 	switch(eGrabPoint)
 	{
 	default:
-	case TransformCtrl::GRAB_None:
+	case GfxTransformCtrl::GRAB_None:
 		return false;
 
-	case TransformCtrl::GRAB_BotLeft:
+	case GfxTransformCtrl::GRAB_BotLeft:
 		if(m_eDrawAction <= HYACTION_HoverScale)
 		{
 			m_eDrawAction = HYACTION_HoverScale;
@@ -405,7 +405,7 @@ bool IDrawEx::SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType e
 			return true;
 		}
 		break;
-	case TransformCtrl::GRAB_BotRight:
+	case GfxTransformCtrl::GRAB_BotRight:
 		if(m_eDrawAction <= HYACTION_HoverScale)
 		{
 			m_eDrawAction = HYACTION_HoverScale;
@@ -413,7 +413,7 @@ bool IDrawEx::SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType e
 			return true;
 		}
 		break;
-	case TransformCtrl::GRAB_TopRight:
+	case GfxTransformCtrl::GRAB_TopRight:
 		if(m_eDrawAction <= HYACTION_HoverScale)
 		{
 			m_eDrawAction = HYACTION_HoverScale;
@@ -421,7 +421,7 @@ bool IDrawEx::SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType e
 			return true;
 		}
 		break;
-	case TransformCtrl::GRAB_TopLeft:
+	case GfxTransformCtrl::GRAB_TopLeft:
 		if(m_eDrawAction <= HYACTION_HoverScale)
 		{
 			m_eDrawAction = HYACTION_HoverScale;
@@ -429,7 +429,7 @@ bool IDrawEx::SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType e
 			return true;
 		}
 		break;
-	case TransformCtrl::GRAB_BotMid:
+	case GfxTransformCtrl::GRAB_BotMid:
 		if(m_eDrawAction <= HYACTION_HoverScale)
 		{
 			m_eDrawAction = HYACTION_HoverScale;
@@ -437,7 +437,7 @@ bool IDrawEx::SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType e
 			return true;
 		}
 		break;
-	case TransformCtrl::GRAB_MidRight:
+	case GfxTransformCtrl::GRAB_MidRight:
 		if(m_eDrawAction <= HYACTION_HoverScale)
 		{
 			m_eDrawAction = HYACTION_HoverScale;
@@ -445,7 +445,7 @@ bool IDrawEx::SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType e
 			return true;
 		}
 		break;
-	case TransformCtrl::GRAB_TopMid:
+	case GfxTransformCtrl::GRAB_TopMid:
 		if(m_eDrawAction <= HYACTION_HoverScale)
 		{
 			m_eDrawAction = HYACTION_HoverScale;
@@ -453,7 +453,7 @@ bool IDrawEx::SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType e
 			return true;
 		}
 		break;
-	case TransformCtrl::GRAB_MidLeft:
+	case GfxTransformCtrl::GRAB_MidLeft:
 		if(m_eDrawAction <= HYACTION_HoverScale)
 		{
 			m_eDrawAction = HYACTION_HoverScale;
@@ -461,7 +461,7 @@ bool IDrawEx::SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType e
 			return true;
 		}
 		break;
-	case TransformCtrl::GRAB_Rotate:
+	case GfxTransformCtrl::GRAB_Rotate:
 		return SetAction(HYACTION_HoverRotate);
 	}
 
@@ -473,7 +473,7 @@ void IDrawEx::BeginTransform()
 	if(IsActionTransforming() || m_SelectedItemList.isEmpty())
 		return;
 
-	TransformCtrl *pCurTransform = nullptr;
+	GfxTransformCtrl *pCurTransform = nullptr;
 	if(m_MultiTransform.IsShown())
 		pCurTransform = &m_MultiTransform;
 	else
@@ -486,10 +486,10 @@ void IDrawEx::BeginTransform()
 		m_pCamera->ProjectToWorld(m_ptDragCenter, m_ptDragCenter);
 
 		// Set 'm_vDragStartSize'
-		glm::vec2 ptMidRight = pCurTransform->GetGrabPointWorldPos(TransformCtrl::GRAB_MidRight, m_pCamera);
-		glm::vec2 ptMidLeft = pCurTransform->GetGrabPointWorldPos(TransformCtrl::GRAB_MidLeft, m_pCamera);
-		glm::vec2 ptTopMid = pCurTransform->GetGrabPointWorldPos(TransformCtrl::GRAB_TopMid, m_pCamera);
-		glm::vec2 ptBotMid = pCurTransform->GetGrabPointWorldPos(TransformCtrl::GRAB_BotMid, m_pCamera);
+		glm::vec2 ptMidRight = pCurTransform->GetGrabPointWorldPos(GfxTransformCtrl::GRAB_MidRight, m_pCamera);
+		glm::vec2 ptMidLeft = pCurTransform->GetGrabPointWorldPos(GfxTransformCtrl::GRAB_MidLeft, m_pCamera);
+		glm::vec2 ptTopMid = pCurTransform->GetGrabPointWorldPos(GfxTransformCtrl::GRAB_TopMid, m_pCamera);
+		glm::vec2 ptBotMid = pCurTransform->GetGrabPointWorldPos(GfxTransformCtrl::GRAB_BotMid, m_pCamera);
 		HySetVec(m_vDragStartSize, glm::distance(ptMidLeft, ptMidRight), glm::distance(ptTopMid, ptBotMid));
 	}
 
@@ -521,7 +521,7 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 	glm::vec2 ptWorldMousePos;
 	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
 
-	TransformCtrl *pCurTransform = nullptr;
+	GfxTransformCtrl *pCurTransform = nullptr;
 	if(m_MultiTransform.IsShown())
 		pCurTransform = &m_MultiTransform;
 	else
@@ -581,65 +581,65 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 
 	case HYACTION_TransformingScale: {
 		bool bUniformScale = true;
-		TransformCtrl::GrabPointType eAnchorPoint = TransformCtrl::GRAB_None;
-		TransformCtrl::GrabPointType eAnchorWidth = TransformCtrl::GRAB_None;
-		TransformCtrl::GrabPointType eAnchorHeight = TransformCtrl::GRAB_None;
+		GfxTransformCtrl::GrabPointType eAnchorPoint = GfxTransformCtrl::GRAB_None;
+		GfxTransformCtrl::GrabPointType eAnchorWidth = GfxTransformCtrl::GRAB_None;
+		GfxTransformCtrl::GrabPointType eAnchorHeight = GfxTransformCtrl::GRAB_None;
 		glm::bvec2 bScaleDimensions;
 		switch(m_eCurHoverGrabPoint)
 		{
-		case TransformCtrl::GRAB_BotLeft:
+		case GfxTransformCtrl::GRAB_BotLeft:
 			bUniformScale = true;
-			eAnchorPoint = TransformCtrl::GRAB_TopRight;
-			eAnchorWidth = TransformCtrl::GRAB_TopLeft;
-			eAnchorHeight = TransformCtrl::GRAB_BotRight;
+			eAnchorPoint = GfxTransformCtrl::GRAB_TopRight;
+			eAnchorWidth = GfxTransformCtrl::GRAB_TopLeft;
+			eAnchorHeight = GfxTransformCtrl::GRAB_BotRight;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
-		case TransformCtrl::GRAB_BotRight:
+		case GfxTransformCtrl::GRAB_BotRight:
 			bUniformScale = true;
-			eAnchorPoint = TransformCtrl::GRAB_TopLeft;
-			eAnchorWidth = TransformCtrl::GRAB_TopRight;
-			eAnchorHeight = TransformCtrl::GRAB_BotLeft;
+			eAnchorPoint = GfxTransformCtrl::GRAB_TopLeft;
+			eAnchorWidth = GfxTransformCtrl::GRAB_TopRight;
+			eAnchorHeight = GfxTransformCtrl::GRAB_BotLeft;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
-		case TransformCtrl::GRAB_TopRight:
+		case GfxTransformCtrl::GRAB_TopRight:
 			bUniformScale = true;
-			eAnchorPoint = TransformCtrl::GRAB_BotLeft;
-			eAnchorWidth = TransformCtrl::GRAB_BotRight;
-			eAnchorHeight = TransformCtrl::GRAB_TopLeft;
+			eAnchorPoint = GfxTransformCtrl::GRAB_BotLeft;
+			eAnchorWidth = GfxTransformCtrl::GRAB_BotRight;
+			eAnchorHeight = GfxTransformCtrl::GRAB_TopLeft;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
-		case TransformCtrl::GRAB_TopLeft:
+		case GfxTransformCtrl::GRAB_TopLeft:
 			bUniformScale = true;
-			eAnchorPoint = TransformCtrl::GRAB_BotRight;
-			eAnchorWidth = TransformCtrl::GRAB_BotLeft;
-			eAnchorHeight = TransformCtrl::GRAB_TopRight;
+			eAnchorPoint = GfxTransformCtrl::GRAB_BotRight;
+			eAnchorWidth = GfxTransformCtrl::GRAB_BotLeft;
+			eAnchorHeight = GfxTransformCtrl::GRAB_TopRight;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
-		case TransformCtrl::GRAB_BotMid:
+		case GfxTransformCtrl::GRAB_BotMid:
 			bUniformScale = false;
-			eAnchorPoint = TransformCtrl::GRAB_TopMid;
-			eAnchorHeight = TransformCtrl::GRAB_BotMid;
+			eAnchorPoint = GfxTransformCtrl::GRAB_TopMid;
+			eAnchorHeight = GfxTransformCtrl::GRAB_BotMid;
 			bScaleDimensions.x = false;
 			bScaleDimensions.y = true;
 			break;
-		case TransformCtrl::GRAB_MidRight:
+		case GfxTransformCtrl::GRAB_MidRight:
 			bUniformScale = false;
-			eAnchorPoint = TransformCtrl::GRAB_MidLeft;
-			eAnchorWidth = TransformCtrl::GRAB_MidRight;
+			eAnchorPoint = GfxTransformCtrl::GRAB_MidLeft;
+			eAnchorWidth = GfxTransformCtrl::GRAB_MidRight;
 			bScaleDimensions.x = true;
 			bScaleDimensions.y = false;
 			break;
-		case TransformCtrl::GRAB_TopMid:
+		case GfxTransformCtrl::GRAB_TopMid:
 			bUniformScale = false;
-			eAnchorPoint = TransformCtrl::GRAB_BotMid;
-			eAnchorHeight = TransformCtrl::GRAB_TopMid;
+			eAnchorPoint = GfxTransformCtrl::GRAB_BotMid;
+			eAnchorHeight = GfxTransformCtrl::GRAB_TopMid;
 			bScaleDimensions.x = false;
 			bScaleDimensions.y = true;
 			break;
-		case TransformCtrl::GRAB_MidLeft:
+		case GfxTransformCtrl::GRAB_MidLeft:
 			bUniformScale = false;
-			eAnchorPoint = TransformCtrl::GRAB_MidRight;
-			eAnchorWidth = TransformCtrl::GRAB_MidLeft;
+			eAnchorPoint = GfxTransformCtrl::GRAB_MidRight;
+			eAnchorWidth = GfxTransformCtrl::GRAB_MidLeft;
 			bScaleDimensions.x = true;
 			bScaleDimensions.y = false;
 			break;
@@ -772,19 +772,19 @@ void IDrawEx::GetSnapCandidateList(SnapCandidates &snapCandidatesOut)
 			{
 				if(pItem->IsSelected() == false && pItem->GetTransformCtrl().IsValid())
 				{
-					glm::vec2 ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(TransformCtrl::GRAB_BotLeft, m_pCamera);
+					glm::vec2 ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(GfxTransformCtrl::GRAB_BotLeft, m_pCamera);
 					snapCandidatesOut.m_HorzSet.insert(ptGrabPt.y);
 					snapCandidatesOut.m_VertSet.insert(ptGrabPt.x);
 
-					ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(TransformCtrl::GRAB_BotRight, m_pCamera);
+					ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(GfxTransformCtrl::GRAB_BotRight, m_pCamera);
 					snapCandidatesOut.m_HorzSet.insert(ptGrabPt.y);
 					snapCandidatesOut.m_VertSet.insert(ptGrabPt.x);
 
-					ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(TransformCtrl::GRAB_TopRight, m_pCamera);
+					ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(GfxTransformCtrl::GRAB_TopRight, m_pCamera);
 					snapCandidatesOut.m_HorzSet.insert(ptGrabPt.y);
 					snapCandidatesOut.m_VertSet.insert(ptGrabPt.x);
 
-					ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(TransformCtrl::GRAB_TopLeft, m_pCamera);
+					ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(GfxTransformCtrl::GRAB_TopLeft, m_pCamera);
 					snapCandidatesOut.m_HorzSet.insert(ptGrabPt.y);
 					snapCandidatesOut.m_VertSet.insert(ptGrabPt.x);
 
@@ -803,7 +803,7 @@ void IDrawEx::GetSnapCandidateList(SnapCandidates &snapCandidatesOut)
 	}
 }
 
-glm::vec2 IDrawEx::SnapTransform(const SnapCandidates &snapCandidatesRef, TransformCtrl *pCurTransform)
+glm::vec2 IDrawEx::SnapTransform(const SnapCandidates &snapCandidatesRef, GfxTransformCtrl *pCurTransform)
 {
 	glm::vec2 vSnapOffset(0.0f, 0.0f);
 
@@ -811,16 +811,16 @@ glm::vec2 IDrawEx::SnapTransform(const SnapCandidates &snapCandidatesRef, Transf
 	m_SnapGuideVert.SetVisible(false);
 	bool bSnappedHorz = false;
 	bool bSnappedVert = false;
-	for(int i = TransformCtrl::GRAB_BotLeft; i <= TransformCtrl::GRAB_TopLeft + 1; ++i)
+	for(int i = GfxTransformCtrl::GRAB_BotLeft; i <= GfxTransformCtrl::GRAB_TopLeft + 1; ++i)
 	{
 		glm::vec2 ptTestPoint;
-		if(i == TransformCtrl::GRAB_TopLeft + 1) // When +1 past GRAB_TopLeft, it indicates we're checking the center
+		if(i == GfxTransformCtrl::GRAB_TopLeft + 1) // When +1 past GRAB_TopLeft, it indicates we're checking the center
 		{
 			pCurTransform->GetCentroid(ptTestPoint);
 			m_pCamera->ProjectToWorld(ptTestPoint, ptTestPoint);
 		}
 		else
-			ptTestPoint = pCurTransform->GetGrabPointWorldPos(static_cast<TransformCtrl::GrabPointType>(i), m_pCamera);
+			ptTestPoint = pCurTransform->GetGrabPointWorldPos(static_cast<GfxTransformCtrl::GrabPointType>(i), m_pCamera);
 
 		if(bSnappedHorz == false)
 		{

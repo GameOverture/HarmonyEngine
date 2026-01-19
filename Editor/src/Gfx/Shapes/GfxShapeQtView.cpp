@@ -8,8 +8,8 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "Polygon2dQtView.h"
-#include "Polygon2dModel.h"
+#include "GfxShapeQtView.h"
+#include "GfxShapeModel.h"
 
 #include <QGraphicsPolygonItem>
 #include <QGraphicsRectItem>
@@ -50,10 +50,10 @@ Polygon2dQtView::Polygon2dQtView(QGraphicsItem *pParent /*= nullptr*/) :
 	m_pGfxPolygonItem->setPen(QPen(HyGlobal::ConvertHyColor(m_pModel->GetColor().IsDark() ? HyColor::White : HyColor::Black), 1.0f));
 
 	QPolygonF polygon;
-	const QList<GrabPointModel> &grabPointListRef = m_pModel->GetGrabPointList();
+	const QList<GfxGrabPointModel> &grabPointListRef = m_pModel->GetGrabPointList();
 }
 
-/*virtual*/ void Polygon2dQtView::OnHoverClear() /*override*/
+/*virtual*/ void Polygon2dQtView::OnMouseMoveIdle(ShapeMouseMoveResult eResult) /*override*/
 {
 }
 

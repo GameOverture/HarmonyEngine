@@ -11,7 +11,7 @@
 #define IPolygon2dView_H
 
 #include "Global.h"
-#include "Polygon2dModel.h"
+#include "GfxShapeModel.h"
 
 class IPolygon2dView
 {
@@ -28,7 +28,7 @@ public:
 	virtual void RefreshColor() = 0;
 	virtual void RefreshView(bool bTransformPreview) = 0;
 
-	virtual void OnHoverClear() = 0;
+	virtual void OnMouseMoveIdle(ShapeMouseMoveResult eResult) = 0;
 };
 
 #endif // IPolygon2dView_H

@@ -11,7 +11,7 @@
 #define POLYGON2DQTVIEW_H
 
 #include "Global.h"
-#include "IPolygon2dView.h"
+#include "IGfxShapeView.h"
 
 #include <QGraphicsItem>
 
@@ -30,7 +30,7 @@ public:
 	virtual void RefreshColor() override;
 	virtual void RefreshView(bool bTransformPreview) override;
 
-	virtual void OnHoverClear() override;
+	virtual void OnMouseMoveIdle(ShapeMouseMoveResult eResult) override;
 
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) override;

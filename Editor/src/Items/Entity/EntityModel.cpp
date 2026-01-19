@@ -1045,7 +1045,7 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 			{
 				EditorShape eShapeType = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
 				uint32 uiMaxVertListSizeOut = 0;
-				sSrc += ShapeCtrl::DeserializeAsRuntimeCode(sCodeName, eShapeType, shapeObj["Data"].toArray(), sNewLine, uiMaxVertListSizeOut);
+				sSrc += DeserializeAsRuntimeCode(sCodeName, eShapeType, shapeObj["Data"].toArray(), sNewLine, uiMaxVertListSizeOut);
 			}
 		}
 		else if(sCategoryName == "Fixture")
@@ -1243,6 +1243,55 @@ QString EntityModel::GenerateSrc_TimelineAdvance() const
 			}
 			pCurArray = pItem;
 		}
+	}
+
+	return sSrc;
+}
+
+QString EntityModel::DeserializeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QJsonArray floatArray, QString sNewLine, uint32 &uiMaxVertListSizeOut) const
+{
+	QString sSrc;
+
+	QStringList sFloatList;
+	for(int i = 0; i < floatArray.size(); ++i)
+		sFloatList[i] = QString::number(floatArray[i].toDouble(), 'f'); // Ensure we have a decimal point
+
+	switch(eShapeType)
+	{
+	case SHAPE_None:
+		sSrc += sCodeName + "SetAsNothing();" + sNewLine;
+		break;
+
+	case SHAPE_Polygon:
+	case SHAPE_Box:
+		sSrc += "vertList.clear();" + sNewLine;
+		for(int i = 0; i < sFloatList.size(); i += 2)
+			sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
+		sSrc += sCodeName + "SetAsPolygon(vertList);" + sNewLine;
+
+		uiMaxVertListSizeOut = HyMath::Max(uiMaxVertListSizeOut, (uint32)sFloatList.size() / 2);
+		break;
+
+	case SHAPE_Circle:
+		sSrc += sCodeName + "SetAsCircle(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), " + sFloatList[2] + "f);" + sNewLine;
+		break;
+
+	case SHAPE_LineSegment:
+		sSrc += sCodeName + "SetAsLineSegment(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f));" + sNewLine;
+		break;
+
+	case SHAPE_Capsule:
+		sSrc += sCodeName + "SetAsCapsule(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f), " + sFloatList[2] + "f);" + sNewLine;
+		break;
+
+	case SHAPE_LineChain:
+		sSrc += "vertList.clear();" + sNewLine;
+		for(int i = 0; i < sFloatList.size(); i += 2)
+			sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
+		sSrc += sCodeName + "SetAsLineChain(vertList);" + sNewLine;
+
+		uiMaxVertListSizeOut = HyMath::Max(uiMaxVertListSizeOut, (uint32)sFloatList.size() / 2);
+		break;
 	}
 
 	return sSrc;

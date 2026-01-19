@@ -11,8 +11,7 @@
 #define POLYGON2DMODEL_H
 
 #include "Global.h"
-
-#define GRABPOINT_SELECT_RADIUS		6.0f	// In world units
+#include "GfxGrabPointModel.h"
 
 class IPolygon2dView;
 
@@ -27,27 +26,6 @@ enum ShapeMouseMoveResult
 	SHAPEMOUSEMOVE_HoverCenter
 };
 
-class GrabPointModel
-{
-	QPointF				m_ptPosition;
-	bool				m_bIsSelected;
-
-public:
-	GrabPointModel() :
-		m_ptPosition(QPointF(0.0f, 0.0f)),
-		m_bIsSelected(false)
-	{ }
-	GrabPointModel(QPointF ptPosition) :
-		m_ptPosition(ptPosition),
-		m_bIsSelected(false)
-	{ }
-	~GrabPointModel() = default;
-	QPointF GetPosition() const { return m_ptPosition; }
-	bool IsSelected() const { return m_bIsSelected; }
-	void SetPosition(QPointF ptPosition) { m_ptPosition = ptPosition; }
-	void SetSelected(bool bIsSelected) { m_bIsSelected = bIsSelected; }
-};
-
 class Polygon2dModel
 {
 	HyColor								m_Color;
@@ -55,21 +33,21 @@ class Polygon2dModel
 
 	// "Shape", "Data" - when serialized in property (QJsonArray of floats)
 	QList<IHyFixture2d *>				m_FixtureList;			// This is the actual shape data used for physics/collision/rendering - usually just one fixture, but could be multiple for complex polygons
-	QList<GrabPointModel>				m_GrabPointList;		// Grab Points for editing the shape - Used to serialize data when type is SHAPE_Polygon (then assembles m_FixtureList with valid sub-polygons)
-	GrabPointModel						m_GrabPointCenter;
+	QList<GfxGrabPointModel>			m_GrabPointList;		// Grab Points for editing the shape - Used to serialize data when type is SHAPE_Polygon (then assembles m_FixtureList with valid sub-polygons)
+	GfxGrabPointModel					m_GrabPointCenter;
 	
 	// Extra validation used with LineChain and Polygon
 	bool								m_bReverseWindingOrder;
 	bool								m_bSelfIntersecting;
-	QPointF								m_ptSelfIntersection;
+	glm::vec2							m_ptSelfIntersection;
 	bool								m_bLoopClosed;
 
 	// Transform info
 	int									m_iGrabPointHoverIndex;
 	int									m_iInsertVertexIndex;
-	QPointF								m_ptInsertVertexPos;
-	QPointF								m_ptTransformStartPos;
-	QPointF								m_ptTransformDragPos;
+	glm::vec2							m_ptInsertVertexPos;
+	glm::vec2							m_ptTransformStartPos;
+	glm::vec2							m_ptTransformDragPos;
 	bool								m_bTransformShiftMod;
 	enum TransformType
 	{
@@ -101,24 +79,31 @@ public:
 
 	void TransformSelf(glm::mat4 mtxTransform);
 
+	void AddView(IPolygon2dView *pView);
+	bool RemoveView(IPolygon2dView *pView);
+
 	int GetNumFixtures() const;
 	IHyFixture2d *GetFixture(int iIndex) const;
-	const QList<GrabPointModel> &GetGrabPointList() const;
-	const GrabPointModel &GetCenterGrabPoint() const;
+	const QList<GfxGrabPointModel> &GetGrabPointList() const;
+	const GfxGrabPointModel &GetCenterGrabPoint() const;
 
-	ShapeMouseMoveResult MouseMoveEvent(QPointF ptWorldMousePos);
+	bool IsLoopClosed() const;
+
+	ShapeMouseMoveResult MouseMoveIdle(QPointF ptWorldMousePos);
 	bool MousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
 	void MouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF ptBotLeft, QPointF ptTopRight);
-	void MouseTransformDrag(bool bShiftMod, QPointF ptDragPos);
+	void MouseMoveTransform(bool bShiftMod, QPointF ptDragPos);
 	QString MouseTransformReleased(QPointF ptWorldMousePos); // Returns undo command description (blank if no change)
 
 protected:
-	ShapeMouseMoveResult OnMouseMoveEvent(QPointF ptWorldMousePos);
+	ShapeMouseMoveResult OnMouseMoveIdle(QPointF ptWorldMousePos);
 	bool OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
 
-	bool CheckIfAddVertexOnEdge(QPointF ptWorldMousePos);
-	void DoInitialTransformDrag();
+	void DoTransformInitial();
+	void DoTransformTranslateShape();
+	void DoTranslateVertexTransformDrag();
 
+	bool CheckIfAddVertexOnEdge(QPointF ptWorldMousePos);
 	bool IsShareEdge(const std::vector<glm::vec2> &a, const std::vector<glm::vec2> &b, int &a0, int &a1, int &b0, int &b1);
 	std::vector<glm::vec2> MergePolygons(const std::vector<glm::vec2> &ptA, const std::vector<glm::vec2> &ptB, int a0, int a1, int b0, int b1);
 	std::vector<std::vector<glm::vec2>> MergeTriangles(const std::vector<HyTriangle2d> &triangleList);

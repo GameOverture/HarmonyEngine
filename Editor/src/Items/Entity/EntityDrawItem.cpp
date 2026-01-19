@@ -14,7 +14,7 @@
 #include "EntityDopeSheetScene.h"
 #include "DlgSetUiPanel.h"
 #include "MainWindow.h"
-#include "Polygon2dHyView.h"
+#include "GfxShapeHyView.h"
 
 EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
 	IDrawExItem(pEntityDraw),

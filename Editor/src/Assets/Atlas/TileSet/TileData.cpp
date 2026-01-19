@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "TileData.h"
-#include "Polygon2dModel.h"
+#include "GfxShapeModel.h"
 
 #include <QBitArray>
 #
@@ -63,7 +63,7 @@ TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 		for(int j = 0; j < dataArray.size(); ++j)
 			vertexList.push_back(static_cast<float>(dataArray[j].toDouble()));
 
-		m_CollisionLayerMap[collisionUuid] = new Polygon2dModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixture), SHAPE_Polygon, vertexList); // NOTE: Color gets set later
+		m_CollisionLayerMap[collisionUuid] = new Polygon2dModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixture), SHAPE_Polygon, vertexList);
 	}
 }
 

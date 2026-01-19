@@ -11,13 +11,12 @@
 #define IDRAWEXITEM_H
 
 #include "Global.h"
-#include "TransformCtrl.h"
-#include "ShapeCtrl.h"
+#include "GfxTransformCtrl.h"
 
 class IDrawExItem
 {
 protected:
-	TransformCtrl							m_Transform;
+	GfxTransformCtrl						m_Transform;
 
 public:
 	IDrawExItem(HyEntity2d *pParent);
@@ -27,7 +26,7 @@ public:
 	virtual bool IsSelectable() const { return true; }
 	virtual bool IsSelected() = 0;
 
-	TransformCtrl &GetTransformCtrl();
+	GfxTransformCtrl &GetTransformCtrl();
 
 	bool IsMouseInBounds();
 

@@ -1,5 +1,5 @@
 /**************************************************************************
- *	TransformCtrl.h
+ *	GfxTransformCtrl.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2023 Jason Knobler
@@ -7,15 +7,16 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef TRANSFORMCTRL_H
-#define TRANSFORMCTRL_H
+#ifndef GFXTRANSFORMCTRL_H
+#define GFXTRANSFORMCTRL_H
 
 #include "Global.h"
-#include "GrabPoint.h"
 
 class IDrawExItem;
+class GfxGrabPointModel;
+class GfxGrabPointView;
 
-class TransformCtrl : public HyEntity2d
+class GfxTransformCtrl : public HyEntity2d
 {
 public:
 	enum GrabPointType
@@ -38,19 +39,18 @@ public:
 	};
 
 protected:
-	glm::vec2					m_ptGrabPos[NUM_GRABPOINTS];
-
 	HyPrimitive2d				m_BoundingVolume;
 	HyPrimitive2d				m_ExtrudeSegment;
-	GrabPoint *					m_GrabPoints[NUM_GRABPOINTS];
+	GfxGrabPointModel *			m_GrabPointModels[NUM_GRABPOINTS];
+	GfxGrabPointView *			m_GrabPointViews[NUM_GRABPOINTS];
 
 	bool						m_bIsShown;
 	bool						m_bShowGrabPoints;
 	float						m_fCachedRotation;
 
 public:
-	TransformCtrl(HyEntity2d *pParent);
-	virtual ~TransformCtrl();
+	GfxTransformCtrl(HyEntity2d *pParent);
+	virtual ~GfxTransformCtrl();
 
 	bool IsValid() const;
 
@@ -67,9 +67,9 @@ public:
 	float GetCachedRotation() const;
 
 	bool IsMouseOverBoundingVolume();
-	GrabPointType IsMouseOverGrabPoint();
+	GrabPointType IsMouseOverGrabPoint() const;
 
 	bool IsContained(const b2AABB &aabb, HyCamera2d *pCamera) const;
 };
 
-#endif // TRANSFORMCTRL_H
+#endif // GFXTRANSFORMCTRL_H

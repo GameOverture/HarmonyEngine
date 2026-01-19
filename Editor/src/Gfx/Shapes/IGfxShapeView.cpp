@@ -8,8 +8,8 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "IPolygon2dView.h"
-#include "GrabPoint.h"
+#include "IGfxShapeView.h"
+#include "GfxGrabPointView.h"
 
 IPolygon2dView::IPolygon2dView() :
 	m_pModel(nullptr)
@@ -27,6 +27,13 @@ Polygon2dModel *IPolygon2dView::GetModel() const
 
 void IPolygon2dView::SetModel(Polygon2dModel *pModel)
 {
+	if(pModel == nullptr)
+	{
+		m_pModel = nullptr;
+		m_pModel->RemoveView(this);
+		return;
+	}
+
 	m_pModel = pModel;
-	RefreshView(false);
+	m_pModel->AddView(this);
 }

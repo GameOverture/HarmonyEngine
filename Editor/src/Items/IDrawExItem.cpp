@@ -20,7 +20,7 @@ IDrawExItem::IDrawExItem(HyEntity2d *pParent) :
 {
 }
 
-TransformCtrl &IDrawExItem::GetTransformCtrl()
+GfxTransformCtrl &IDrawExItem::GetTransformCtrl()
 {
 	return m_Transform;
 }

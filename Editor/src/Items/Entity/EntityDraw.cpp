@@ -12,7 +12,7 @@
 #include "EntityWidget.h"
 #include "MainWindow.h"
 #include "EntityUndoCmds.h"
-#include "Polygon2dModel.h"
+#include "GfxShapeModel.h"
 
 #include <QKeyEvent>
 #include <QApplication>
@@ -25,7 +25,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_EditModeWindowOutline(this)
 {
 	m_EditModeWindowOutline.UseWindowCoordinates();
-	m_EditModeWindowOutline.SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointSelectedFill));
+	m_EditModeWindowOutline.SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
 	m_EditModeWindowOutline.SetWireframe(true);
 	m_EditModeWindowOutline.SetLineThickness(5.0f);
 	m_EditModeWindowOutline.SetVisible(false);
@@ -105,7 +105,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	case EDITMODE_Idle:
 		if(pTreeItemData->GetShape2dModel())
 		{
-			ShapeMouseMoveResult eResult = pTreeItemData->GetShape2dModel()->MouseMoveEvent(QPointF(ptCurMousePos.x, ptCurMousePos.y));
+			ShapeMouseMoveResult eResult = pTreeItemData->GetShape2dModel()->MouseMoveIdle(QPointF(ptCurMousePos.x, ptCurMousePos.y));
 			switch(eResult)
 			{
 			case SHAPEMOUSEMOVE_Outside:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
@@ -131,7 +131,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		{
 			if(m_eEditModeState == EDITMODE_MouseDownOutside)
 			{
-				m_DragShape.Setup(SHAPE_Box, HyGlobal::GetEditorColor(EDITORCOLOR_Marquee), 0.25f, 1.0f);
+				m_MarqueeCtrl.Setup(0.25f, 1.0f);
 				m_eEditModeState = EDITMODE_MouseDragMarquee;
 			}
 			else // EDITMODE_MouseDownTransform
@@ -142,11 +142,9 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	case EDITMODE_MouseDragMarquee:
 		if(pTreeItemData->GetShape2dModel())
 		{
-			Polygon2dModel *pShapeModel = pTreeItemData->GetShape2dModel();
-
 			glm::vec2 ptCurMousePos;
 			m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
-			m_DragShape.SetAsDrag(/*bShiftMod*/false, m_ptDragStart, ptCurMousePos, m_pCamera); // Don't do centering when holding shift and marquee selecting
+			m_MarqueeCtrl.SetAsDrag(m_ptDragStart, ptCurMousePos);
 		}
 		else
 			HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_MouseDragMarquee with unsupported edit item type!", LOGTYPE_Error);
@@ -156,7 +154,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		if(pTreeItemData->GetShape2dModel())
 		{
 			bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-			pTreeItemData->GetShape2dModel()->MouseTransformDrag(bShiftHeld, QPointF(ptCurMousePos.x, ptCurMousePos.y));
+			pTreeItemData->GetShape2dModel()->MouseMoveTransform(bShiftHeld, QPointF(ptCurMousePos.x, ptCurMousePos.y));
 		}
 		else
 			HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_MouseDragTransform with unsupported edit item type!", LOGTYPE_Error);
@@ -254,7 +252,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			else
 			{
 				HyShape2d tmpShape;
-				m_DragShape.GetPrimitive(true).CalcLocalBoundingShape(tmpShape);
+				m_MarqueeCtrl.GetFillPrimitive().CalcLocalBoundingShape(tmpShape);
 				tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
 			}
 			pTreeItemData->GetShape2dModel()->MouseMarqueeReleased(pEvent->buttons(),
@@ -264,7 +262,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		else
 			HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_MarqueeSelect with unsupported edit item type!", LOGTYPE_Error);
 		
-		m_DragShape.Setup(SHAPE_None, HyColor::White, 1.0f, 1.0f);
+		m_MarqueeCtrl.SetVisible(false);
 		break;
 
 	case EDITMODE_MouseDownTransform:
@@ -298,7 +296,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	{
 		glm::vec2 ptCurMousePos;
 		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
-		ShapeMouseMoveResult eResult = pTreeItemData->GetShape2dModel()->MouseMoveEvent(QPointF(ptCurMousePos.x, ptCurMousePos.y));
+		ShapeMouseMoveResult eResult = pTreeItemData->GetShape2dModel()->MouseMoveIdle(QPointF(ptCurMousePos.x, ptCurMousePos.y));
 		switch(eResult)
 		{
 		case SHAPEMOUSEMOVE_Outside:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
@@ -367,6 +365,8 @@ bool EntityDraw::SetEditMode(bool bEnable)
 
 	DoMouseMove(QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ControlModifier),
 				QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+
+	return true;
 }
 
 EntityDrawItem *EntityDraw::GetCurEditItem() const

@@ -11,8 +11,8 @@
 #include "TileSetGfxItem.h"
 #include "AuxTileSet.h"
 #include "TileData.h"
-#include "Polygon2dModel.h"
-#include "Polygon2dQtView.h"
+#include "GfxShapeModel.h"
+#include "GfxShapeQtView.h"
 
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>

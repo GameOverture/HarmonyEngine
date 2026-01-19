@@ -13,6 +13,7 @@
 #include "Global.h"
 #include "IDraw.h"
 #include "IDrawExItem.h"
+#include "GfxMarqueeCtrl.h"
 
 struct SnapCandidates
 {
@@ -44,15 +45,15 @@ protected:
 	QList<IDrawExItem *>					m_ItemList;			// Items MUST be dynamically allocated
 	QList<IDrawExItem *>					m_SelectedItemList;
 
-	ShapeCtrl								m_DragShape;		// Used for marquee selects (or creating new shapes in EntityDraw)
+	GfxMarqueeCtrl							m_MarqueeCtrl;
 
 	// Multi transform used when 'm_SelectedItemList' contains more than 1 item. It wraps around all selected items.
-	TransformCtrl							m_MultiTransform;
+	GfxTransformCtrl						m_MultiTransform;
 	float									m_fMultiTransformStartRot;
 
 	// Mouse hovering
 	IDrawExItem *							m_pCurHoverItem;
-	TransformCtrl::GrabPointType			m_eCurHoverGrabPoint;
+	GfxTransformCtrl::GrabPointType			m_eCurHoverGrabPoint;
 
 	// Mouse press/dragging (and arrow key nudging)
 	HyTimer									m_PressTimer;
@@ -98,14 +99,14 @@ protected:
 
 	void DoMouseMove(bool bCtrlMod, bool bShiftMod);
 
-	bool SetTransformHoverActionViaGrabPoint(TransformCtrl::GrabPointType eGrabPoint, float fRotation);
+	bool SetTransformHoverActionViaGrabPoint(GfxTransformCtrl::GrabPointType eGrabPoint, float fRotation);
 	void BeginTransform();
 
 	void DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod);
 	void DoMouseRelease_Transform();
 
 	void GetSnapCandidateList(SnapCandidates &snapCandidatesOut); // Gather snapping candidates using the snapping settings and items from m_ItemList
-	glm::vec2 SnapTransform(const SnapCandidates &snapCandidatesRef, TransformCtrl *pCurTransform);
+	glm::vec2 SnapTransform(const SnapCandidates &snapCandidatesRef, GfxTransformCtrl *pCurTransform);
 
 	virtual void OnPerformTransform() = 0;
 };

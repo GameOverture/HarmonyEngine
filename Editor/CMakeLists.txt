@@ -135,6 +135,8 @@ if(Qt6_DIR)
 		src/Items/IDraw.h
 		src/Items/IDrawEx.cpp
 		src/Items/IDrawEx.h
+		src/Items/IDrawExItem.cpp
+		src/Items/IDrawExItem.h
 		src/Items/IModel.cpp
 		src/Items/IModel.h
 		src/Items/IWidget.cpp
@@ -302,16 +304,26 @@ if(Qt6_DIR)
 		src/Harmony/HarmonyWidget.cpp
 		src/Harmony/HarmonyWidget.h
 		src/Harmony/HarmonyWidget.ui
-		src/Shared/Gfx/CommonGfxView.cpp
-		src/Shared/Gfx/CommonGfxView.h
-		src/Shared/Gfx/IPolygon2dView.cpp
-		src/Shared/Gfx/IPolygon2dView.h
-		src/Shared/Gfx/Polygon2dModel.cpp
-		src/Shared/Gfx/Polygon2dModel.h
-		src/Shared/Gfx/Polygon2dHyView.cpp
-		src/Shared/Gfx/Polygon2dHyView.h
-		src/Shared/Gfx/Polygon2dQtView.cpp
-		src/Shared/Gfx/Polygon2dQtView.h
+		src/Gfx/CommonGfxView.cpp
+		src/Gfx/CommonGfxView.h
+		src/Gfx/GfxGrabPointModel.cpp
+		src/Gfx/GfxGrabPointModel.h
+		src/Gfx/GfxGrabPointView.cpp
+		src/Gfx/GfxGrabPointView.h
+		src/Gfx/GfxMarqueeCtrl.cpp
+		src/Gfx/GfxMarqueeCtrl.h
+		src/Gfx/GfxTextModel.cpp
+		src/Gfx/GfxTextModel.h
+		src/Gfx/GfxTransformCtrl.cpp
+		src/Gfx/GfxTransformCtrl.h
+		src/Gfx/Shapes/IGfxShapeView.cpp
+		src/Gfx/Shapes/IGfxShapeView.h
+		src/Gfx/Shapes/GfxShapeModel.cpp
+		src/Gfx/Shapes/GfxShapeModel.h
+		src/Gfx/Shapes/GfxShapeHyView.cpp
+		src/Gfx/Shapes/GfxShapeHyView.h
+		src/Gfx/Shapes/GfxShapeQtView.cpp
+		src/Gfx/Shapes/GfxShapeQtView.h
 		src/Shared/Global.cpp
 		src/Shared/Global.h
 		src/Shared/GlobalUndoCmds.h
@@ -321,14 +333,6 @@ if(Qt6_DIR)
 		src/Shared/AppendWidget/WgtAppendContainer.cpp
 		src/Shared/AppendWidget/WgtAppendContainer.h
 		src/Shared/AppendWidget/WgtAppendContainer.ui
-		src/Shared/Transform/GrabPoint.cpp
-		src/Shared/Transform/GrabPoint.h
-		src/Shared/Transform/IDrawExItem.cpp
-		src/Shared/Transform/IDrawExItem.h
-		src/Shared/Transform/ShapeCtrl.cpp
-		src/Shared/Transform/ShapeCtrl.h
-		src/Shared/Transform/TransformCtrl.cpp
-		src/Shared/Transform/TransformCtrl.h
 		src/Shared/Properties/PropertiesTreeModel.cpp
 		src/Shared/Properties/PropertiesTreeModel.h
 		src/Shared/Properties/PropertiesTreeMultiModel.cpp
@@ -422,7 +426,8 @@ if(Qt6_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer/Project")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Gfx/")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx/Shapes")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Manager")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Properties")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Transform")
