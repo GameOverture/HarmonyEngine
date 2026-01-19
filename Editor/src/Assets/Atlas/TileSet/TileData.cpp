@@ -63,7 +63,7 @@ TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 		for(int j = 0; j < dataArray.size(); ++j)
 			vertexList.push_back(static_cast<float>(dataArray[j].toDouble()));
 
-		m_CollisionLayerMap[collisionUuid] = new Polygon2dModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixture), SHAPE_Polygon, vertexList);
+		m_CollisionLayerMap[collisionUuid] = new GfxShapeModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixture), SHAPE_Polygon, vertexList);
 	}
 }
 
@@ -263,7 +263,7 @@ QList<QUuid> TileData::GetCollisionLayerList() const
 	return m_CollisionLayerMap.keys();
 }
 
-Polygon2dModel *TileData::GetCollisionLayerModel(QUuid uuid) const
+GfxShapeModel *TileData::GetCollisionLayerModel(QUuid uuid) const
 {
 	return m_CollisionLayerMap.value(uuid);
 }

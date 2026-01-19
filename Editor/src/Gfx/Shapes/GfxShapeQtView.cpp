@@ -1,5 +1,5 @@
 /**************************************************************************
- *	Polygon2dQtView.cpp
+ *	GfxShapeQtView.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2025 Jason Knobler
@@ -15,21 +15,21 @@
 #include <QGraphicsRectItem>
 #include <QPen>
 
-Polygon2dQtView::Polygon2dQtView(QGraphicsItem *pParent /*= nullptr*/) :
+GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
 	QGraphicsItem(pParent),
 	m_pGfxPolygonItem(nullptr)
 {
 	m_pGfxPolygonItem = new QGraphicsPolygonItem(this);
 }
 
-/*virtual*/ Polygon2dQtView::~Polygon2dQtView()
+/*virtual*/ GfxShapeQtView::~GfxShapeQtView()
 {
 	for(int i = 0; i < m_GrabPointList.size(); ++i)
 		delete m_GrabPointList[i];
 	delete m_pGfxPolygonItem;
 }
 
-/*virtual*/ void Polygon2dQtView::RefreshColor() /*override*/
+/*virtual*/ void GfxShapeQtView::RefreshColor() /*override*/
 {
 	if(m_pModel == nullptr)
 		return;
@@ -38,7 +38,7 @@ Polygon2dQtView::Polygon2dQtView(QGraphicsItem *pParent /*= nullptr*/) :
 	m_pGfxPolygonItem->setPen(QPen(HyGlobal::ConvertHyColor(m_pModel->GetColor().IsDark() ? HyColor::White : HyColor::Black), 1.0f));
 }
 
-/*virtual*/ void Polygon2dQtView::RefreshView(bool bTransformPreview) /*override*/
+/*virtual*/ void GfxShapeQtView::RefreshView(bool bTransformPreview) /*override*/
 {
 	if(m_pModel == nullptr)
 	{
@@ -53,16 +53,16 @@ Polygon2dQtView::Polygon2dQtView(QGraphicsItem *pParent /*= nullptr*/) :
 	const QList<GfxGrabPointModel> &grabPointListRef = m_pModel->GetGrabPointList();
 }
 
-/*virtual*/ void Polygon2dQtView::OnMouseMoveIdle(ShapeMouseMoveResult eResult) /*override*/
+/*virtual*/ void GfxShapeQtView::OnMouseMoveIdle(ShapeMouseMoveResult eResult) /*override*/
 {
 }
 
-/*virtual*/ QRectF Polygon2dQtView::boundingRect() const /*override*/
+/*virtual*/ QRectF GfxShapeQtView::boundingRect() const /*override*/
 {
 	return m_pGfxPolygonItem->boundingRect().adjusted(-5, -5, 5, 5); // Adjusted for grab points
 }
 
-/*virtual*/ void Polygon2dQtView::paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) /*override*/
+/*virtual*/ void GfxShapeQtView::paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) /*override*/
 {
 	// Intentionally left blank since we are using child QGraphicsItems for rendering
 }

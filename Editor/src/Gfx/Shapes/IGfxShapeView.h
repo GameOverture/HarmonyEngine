@@ -1,5 +1,5 @@
 /**************************************************************************
- *	IPolygon2dView.h
+ *	IGfxShapeView.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2026 Jason Knobler
@@ -7,23 +7,23 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef IPolygon2dView_H
-#define IPolygon2dView_H
+#ifndef IGfxShapeView_H
+#define IGfxShapeView_H
 
 #include "Global.h"
 #include "GfxShapeModel.h"
 
-class IPolygon2dView
+class IGfxShapeView
 {
 protected:
-	Polygon2dModel *			m_pModel;
+	GfxShapeModel *			m_pModel;
 
 public:
-	IPolygon2dView();
-	virtual ~IPolygon2dView();
+	IGfxShapeView();
+	virtual ~IGfxShapeView();
 
-	Polygon2dModel *GetModel() const;
-	void SetModel(Polygon2dModel *pModel);
+	GfxShapeModel *GetModel() const;
+	void SetModel(GfxShapeModel *pModel);
 
 	virtual void RefreshColor() = 0;
 	virtual void RefreshView(bool bTransformPreview) = 0;
@@ -31,4 +31,4 @@ public:
 	virtual void OnMouseMoveIdle(ShapeMouseMoveResult eResult) = 0;
 };
 
-#endif // IPolygon2dView_H
+#endif // IGfxShapeView_H

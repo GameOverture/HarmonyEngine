@@ -11,7 +11,7 @@
 #include "GfxShapeHyView.h"
 #include "GfxGrabPointView.h"
 
-Polygon2dHyView::Polygon2dHyView(HyEntity2d *pParent /*= nullptr*/) :
+GfxShapeHyView::GfxShapeHyView(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent)
 {
 	// NOTE: m_PrimOutline does not have a parent because it is projected to window coordinates
@@ -25,24 +25,24 @@ Polygon2dHyView::Polygon2dHyView(HyEntity2d *pParent /*= nullptr*/) :
 	m_AppendSegmentLine.SetVisible(false);
 }
 
-/*virtual*/ Polygon2dHyView::~Polygon2dHyView()
+/*virtual*/ GfxShapeHyView::~GfxShapeHyView()
 {
 	ClearPrimitives();
 	ClearGrabPoints();
 }
 
-HyPrimitive *Polygon2dHyView::GetPrimitive(int iIndex)
+HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 {
 	if(iIndex < 0 || iIndex >= m_PrimList.size())
 	{
-		HyGuiLog("Polygon2dHyView::GetPrimitive index out of range", LOGTYPE_Error);
+		HyGuiLog("GfxShapeHyView::GetPrimitive index out of range", LOGTYPE_Error);
 		return nullptr;
 	}
 
 	return m_PrimList[iIndex];
 }
 
-/*virtual*/ void Polygon2dHyView::RefreshColor() /*override*/
+/*virtual*/ void GfxShapeHyView::RefreshColor() /*override*/
 {
 	if(m_pModel == nullptr)
 		return;
@@ -60,7 +60,7 @@ HyPrimitive *Polygon2dHyView::GetPrimitive(int iIndex)
 	m_PrimOutline.SetTint(bIsDark ? HyColor::White : HyColor::Black);
 }
 
-/*virtual*/ void Polygon2dHyView::RefreshView(bool bTransformPreview) /*override*/
+/*virtual*/ void GfxShapeHyView::RefreshView(bool bTransformPreview) /*override*/
 {
 	if(m_pModel == nullptr)
 	{
@@ -145,7 +145,7 @@ HyPrimitive *Polygon2dHyView::GetPrimitive(int iIndex)
 			m_PrimOutline.SetAsLineSegment(ptOne, ptTwo);
 		}
 		else
-			HyGuiLog("Polygon2dHyView::RefreshView - Unsupported shape type for primitive sync", LOGTYPE_Error);
+			HyGuiLog("GfxShapeHyView::RefreshView - Unsupported shape type for primitive sync", LOGTYPE_Error);
 	}
 	else // SHAPE_Polygon
 	{
@@ -190,7 +190,7 @@ HyPrimitive *Polygon2dHyView::GetPrimitive(int iIndex)
 		m_GrabPointViewList[i]->Sync(&grabPointModelList[i]);
 }
 
-/*virtual*/ void Polygon2dHyView::OnMouseMoveIdle(ShapeMouseMoveResult eResult) /*override*/
+/*virtual*/ void GfxShapeHyView::OnMouseMoveIdle(ShapeMouseMoveResult eResult) /*override*/
 {
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
 
@@ -201,10 +201,15 @@ HyPrimitive *Polygon2dHyView::GetPrimitive(int iIndex)
 		m_AppendSegmentLine.SetVisible(false);
 		break;
 
-	case SHAPEMOUSEMOVE_Crosshair:
+	case SHAPEMOUSEMOVE_Initial:
+		break;
+
+	case SHAPEMOUSEMOVE_AppendVertex:
 		if(m_pModel->GetType() == SHAPE_Polygon || m_pModel->GetType() == SHAPE_LineChain)
 		{
 			const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
+			if(grabPointModelList.empty())
+				break;
 
 			glm::vec2 pt1;
 			if(grabPointModelList.front().IsSelected())
@@ -220,7 +225,7 @@ HyPrimitive *Polygon2dHyView::GetPrimitive(int iIndex)
 		}
 		break;
 
-	case SHAPEMOUSEMOVE_AddVertex:
+	case SHAPEMOUSEMOVE_InsertVertex:
 		m_AppendSegmentLine.SetVisible(false);
 		break;
 
@@ -234,19 +239,19 @@ HyPrimitive *Polygon2dHyView::GetPrimitive(int iIndex)
 		break;
 
 	default:
-		HyGuiLog("Polygon2dModel::MouseMoveEvent - Unknown ShapeMouseMoveResult encountered", LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::MouseMoveEvent - Unknown ShapeMouseMoveResult encountered", LOGTYPE_Error);
 		break;
 	}
 }
 
-void Polygon2dHyView::ClearPrimitives()
+void GfxShapeHyView::ClearPrimitives()
 {
 	for(HyPrimitive2d *pPrim : m_PrimList)
 		delete pPrim;
 	m_PrimList.clear();
 }
 
-void Polygon2dHyView::ClearGrabPoints()
+void GfxShapeHyView::ClearGrabPoints()
 {
 	for(GfxGrabPointView *pGrabPtView : m_GrabPointViewList)
 		delete pGrabPtView;

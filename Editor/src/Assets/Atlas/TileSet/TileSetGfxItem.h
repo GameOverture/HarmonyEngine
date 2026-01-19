@@ -18,7 +18,7 @@
 class AuxTileSet;
 class AtlasTileSet;
 class TileData;
-class Polygon2dQtView;
+class GfxShapeQtView;
 
 class TileSetGfxItem : public QGraphicsItem
 {
@@ -44,7 +44,7 @@ class TileSetGfxItem : public QGraphicsItem
 
 	QGraphicsPolygonItem *				m_pTerrainParts[NUM_AUTOTILEPARTS];
 
-	Polygon2dQtView *					m_pCollisionView;
+	GfxShapeQtView *					m_pCollisionView;
 
 public:
 	TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon);

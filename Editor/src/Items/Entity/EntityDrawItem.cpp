@@ -128,7 +128,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 	}
 	else if(m_pEntityTreeItemData->GetType() == ITEM_Primitive || m_pEntityTreeItemData->GetType() == ITEM_FixtureShape || m_pEntityTreeItemData->GetType() == ITEM_FixtureChain)
 	{
-		m_pShapeView = new Polygon2dHyView();
+		m_pShapeView = new GfxShapeHyView();
 		m_pShapeView->SetModel(m_pEntityTreeItemData->GetShape2dModel());
 
 		m_pChild = m_pShapeView;
@@ -179,7 +179,7 @@ EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 		m_pShapeView->RefreshView(false);
 }
 
-Polygon2dHyView *EntityDrawItem::GetShapeView()
+GfxShapeHyView *EntityDrawItem::GetShapeView()
 {
 	return m_pShapeView;
 }
@@ -706,7 +706,7 @@ void SubEntity::ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStat
 //             - ExtrapolateProperties
 void ExtrapolateProperties(Project &projectRef,
 						   IHyLoadable2d *pThisHyNode,
-						   Polygon2dModel *pShapeModel,
+						   GfxShapeModel *pShapeModel,
 						   bool bIsSelected,
 						   ItemType eItemType,
 						   const float fFRAME_DURATION,
@@ -898,7 +898,7 @@ void ExtrapolateProperties(Project &projectRef,
 					pShapeModel->SetColor(color);
 			}
 			else
-				HyGuiLog("ExtrapolateProperties - Missing Polygon2dModel ptr for Fixture/Primitive shape processing", LOGTYPE_Error);
+				HyGuiLog("ExtrapolateProperties - Missing GfxShapeModel ptr for Fixture/Primitive shape processing", LOGTYPE_Error);
 			break;
 
 		case ITEM_AtlasFrame:

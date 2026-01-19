@@ -20,7 +20,7 @@
 
 class EntityModel;
 class PropertiesUndoCmd;
-class Polygon2dModel;
+class GfxShapeModel;
 
 class EntityPropertiesTreeModel : public PropertiesTreeModel
 {
@@ -209,7 +209,7 @@ class EntityTreeItemData : public TreeModelItemData
 	EntityItemType										m_eEntType;
 
 	EntityPropertiesTreeModel *							m_pPropertiesModel;
-	Polygon2dModel *									m_pShape2dModel;		// Only allocated when this item is a shape (primitive or fixture)
+	GfxShapeModel *									m_pShape2dModel;		// Only allocated when this item is a shape (primitive or fixture)
 
 	QString												m_sPromotedEntityType;
 	EntityItemDeclarationType							m_eDeclarationType;
@@ -245,7 +245,7 @@ public:
 	EntityModel &GetEntityModel() const;
 	EntityPropertiesTreeModel &GetPropertiesModel() const;
 
-	Polygon2dModel *GetShape2dModel();
+	GfxShapeModel *GetShape2dModel();
 
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);

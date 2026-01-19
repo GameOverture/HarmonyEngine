@@ -1,5 +1,5 @@
 /**************************************************************************
-*	Polygon2dModel.cpp
+*	GfxShapeModel.cpp
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2025 Jason Knobler
@@ -12,7 +12,7 @@
 #include "IGfxShapeView.h"
 #include "GfxGrabPointModel.h"
 
-Polygon2dModel::Polygon2dModel(HyColor color, EditorShape eShape /*= SHAPE_None*/, const QList<float> &floatList /*= QList<float>()*/) :
+GfxShapeModel::GfxShapeModel(HyColor color, EditorShape eShape /*= SHAPE_None*/, const QList<float> &floatList /*= QList<float>()*/) :
 	m_eType(SHAPE_None),
 	m_bSelfIntersecting(false),
 	m_ptSelfIntersection(0.0f, 0.0f),
@@ -27,12 +27,12 @@ Polygon2dModel::Polygon2dModel(HyColor color, EditorShape eShape /*= SHAPE_None*
 	SetData(color, eShape, floatList);
 }
 
-/*virtual*/ Polygon2dModel::~Polygon2dModel()
+/*virtual*/ GfxShapeModel::~GfxShapeModel()
 {
 	ClearFixtures();
 }
 
-bool Polygon2dModel::IsValidShape() const
+bool GfxShapeModel::IsValidShape() const
 {
 	if(m_eType == SHAPE_LineChain)
 	{
@@ -65,33 +65,33 @@ bool Polygon2dModel::IsValidShape() const
 		return static_cast<HyShape2d *>(m_FixtureList[0])->IsValid();
 
 	default:
-		HyGuiLog("Polygon2dModel::IsValidShape: Unknown shape type encountered", LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::IsValidShape: Unknown shape type encountered", LOGTYPE_Error);
 		break;
 	}
 
 	return false;
 }
 
-HyColor Polygon2dModel::GetColor() const
+HyColor GfxShapeModel::GetColor() const
 {
 	return m_Color;
 }
 
 
-void Polygon2dModel::SetColor(HyColor color)
+void GfxShapeModel::SetColor(HyColor color)
 {
 	m_Color = color;
 
-	for(IPolygon2dView *pView : m_ViewList)
+	for(IGfxShapeView *pView : m_ViewList)
 		pView->RefreshColor();
 }
 
-EditorShape Polygon2dModel::GetType() const
+EditorShape GfxShapeModel::GetType() const
 {
 	return m_eType;
 }
 
-void Polygon2dModel::SetType(EditorShape eNewShape)
+void GfxShapeModel::SetType(EditorShape eNewShape)
 {
 	// Convert existing data to new shape type
 	if(m_eType != eNewShape)
@@ -119,18 +119,18 @@ void Polygon2dModel::SetType(EditorShape eNewShape)
 			break;
 
 		default:
-			HyGuiLog("Polygon2dModel::SetType - Unknown shape type encountered", LOGTYPE_Error);
+			HyGuiLog("GfxShapeModel::SetType - Unknown shape type encountered", LOGTYPE_Error);
 			break;
 		}
 
 		SetData(m_Color, eNewShape, convertedDataList);
 	}
 
-	for(IPolygon2dView *pView : m_ViewList)
+	for(IGfxShapeView *pView : m_ViewList)
 		pView->RefreshView(false);
 }
 
-QList<float> Polygon2dModel::GetData() const
+QList<float> GfxShapeModel::GetData() const
 {
 	if(m_FixtureList.empty())
 		return QList<float>();
@@ -153,7 +153,7 @@ QList<float> Polygon2dModel::GetData() const
 	return returnList;
 }
 
-void Polygon2dModel::SetData(HyColor color, EditorShape eShape, const QList<float> &floatList)
+void GfxShapeModel::SetData(HyColor color, EditorShape eShape, const QList<float> &floatList)
 {
 	m_Color = color;
 
@@ -191,7 +191,7 @@ void Polygon2dModel::SetData(HyColor color, EditorShape eShape, const QList<floa
 		else // SHAPE_Polygon deserialization
 		{	
 			if((floatList.size() & 1) == 0)
-				HyGuiLog("Polygon2dModel::SetData for polygon had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
+				HyGuiLog("GfxShapeModel::SetData for polygon had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
 			else
 			{
 				int iNumVertFloats = floatList.size() - 1;
@@ -282,79 +282,79 @@ void Polygon2dModel::SetData(HyColor color, EditorShape eShape, const QList<floa
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	for(IPolygon2dView *pView : m_ViewList)
+	for(IGfxShapeView *pView : m_ViewList)
 		pView->RefreshView(false);
 }
 
-void Polygon2dModel::TransformSelf(glm::mat4 mtxTransform)
+void GfxShapeModel::TransformSelf(glm::mat4 mtxTransform)
 {
 	for(IHyFixture2d *pFixture : m_FixtureList)
 		pFixture->TransformSelf(mtxTransform);
 
-	for(IPolygon2dView *pView : m_ViewList)
+	for(IGfxShapeView *pView : m_ViewList)
 		pView->RefreshView(false);
 }
 
-void Polygon2dModel::AddView(IPolygon2dView *pView)
+void GfxShapeModel::AddView(IGfxShapeView *pView)
 {
 	if(m_ViewList.contains(pView))
 		return;
 	m_ViewList.push_back(pView);
 }
 
-bool Polygon2dModel::RemoveView(IPolygon2dView *pView)
+bool GfxShapeModel::RemoveView(IGfxShapeView *pView)
 {
 	return m_ViewList.removeOne(pView);
 }
 
-int Polygon2dModel::GetNumFixtures() const
+int GfxShapeModel::GetNumFixtures() const
 {
 	return m_FixtureList.size();
 }
 
-IHyFixture2d *Polygon2dModel::GetFixture(int iIndex) const
+IHyFixture2d *GfxShapeModel::GetFixture(int iIndex) const
 {
 	if(iIndex < 0 || iIndex >= m_FixtureList.size())
 		return nullptr;
 	return m_FixtureList[iIndex];
 }
 
-const QList<GfxGrabPointModel> &Polygon2dModel::GetGrabPointList() const
+const QList<GfxGrabPointModel> &GfxShapeModel::GetGrabPointList() const
 {
 	return m_GrabPointList;
 }
 
-const GfxGrabPointModel &Polygon2dModel::GetCenterGrabPoint() const
+const GfxGrabPointModel &GfxShapeModel::GetCenterGrabPoint() const
 {
 	return m_GrabPointCenter;
 }
 
-bool Polygon2dModel::IsLoopClosed() const
+bool GfxShapeModel::IsLoopClosed() const
 {
 	return m_bLoopClosed;
 }
 
-ShapeMouseMoveResult Polygon2dModel::MouseMoveIdle(QPointF ptWorldMousePos)
+ShapeMouseMoveResult GfxShapeModel::MouseMoveIdle(QPointF ptWorldMousePos)
 {
 	ShapeMouseMoveResult eResult = OnMouseMoveIdle(ptWorldMousePos);
 
-	for(IPolygon2dView *pView : m_ViewList)
+	for(IGfxShapeView *pView : m_ViewList)
 		pView->OnMouseMoveIdle(eResult);
 
 	return eResult;
 }
 
-bool Polygon2dModel::MousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos)
+bool GfxShapeModel::MousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos)
 {
 	bool bTransformStarted = OnMousePressEvent(bShiftHeld, uiButtonFlags, ptWorldMousePos);
 
-	for(IPolygon2dView *pView : m_ViewList)
+	for(IGfxShapeView *pView : m_ViewList)
 		pView->RefreshView(bTransformStarted);
 
 	return bTransformStarted;
 }
 
-void Polygon2dModel::MouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF ptBotLeft, QPointF ptTopRight)
+void GfxShapeModel::MouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF ptBotLeft, QPointF ptTopRight)
 {
 	// Select grab points within marquee
 	for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
@@ -370,11 +370,11 @@ void Polygon2dModel::MouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPoint
 		}
 	}
 
-	for(IPolygon2dView *pView : m_ViewList)
+	for(IGfxShapeView *pView : m_ViewList)
 		pView->RefreshView(false);
 }
 
-void Polygon2dModel::MouseMoveTransform(bool bShiftMod, QPointF ptDragPos)
+void GfxShapeModel::MouseMoveTransform(bool bShiftMod, QPointF ptDragPos)
 {
 	m_bTransformShiftMod = bShiftMod;
 	HySetVec(m_ptTransformDragPos, ptDragPos.x(), ptDragPos.y());
@@ -382,7 +382,7 @@ void Polygon2dModel::MouseMoveTransform(bool bShiftMod, QPointF ptDragPos)
 	switch(m_eTransformType)
 	{
 	case TRANSFORM_None:
-		HyGuiLog("Polygon2dModel::MouseTransformDrag - Drag called with TRANSFORM_None", LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::MouseTransformDrag - Drag called with TRANSFORM_None", LOGTYPE_Error);
 		break;
 
 	case TRANSFORM_Initial:
@@ -397,11 +397,11 @@ void Polygon2dModel::MouseMoveTransform(bool bShiftMod, QPointF ptDragPos)
 		break;
 	}
 
-	for(IPolygon2dView *pView : m_ViewList)
+	for(IGfxShapeView *pView : m_ViewList)
 		pView->RefreshView(true);
 }
 
-QString Polygon2dModel::MouseTransformReleased(QPointF ptWorldMousePos)
+QString GfxShapeModel::MouseTransformReleased(QPointF ptWorldMousePos)
 {
 		//	QString sUndoText;
 	//	switch(GetCurAction())
@@ -427,7 +427,7 @@ QString Polygon2dModel::MouseTransformReleased(QPointF ptWorldMousePos)
 	return QString();
 }
 
-ShapeMouseMoveResult Polygon2dModel::OnMouseMoveIdle(QPointF ptWorldMousePos)
+ShapeMouseMoveResult GfxShapeModel::OnMouseMoveIdle(QPointF ptWorldMousePos)
 {
 	m_iGrabPointHoverIndex = m_iInsertVertexIndex = -1;
 	m_ptInsertVertexPos = glm::vec2(0.0f, 0.0f);
@@ -448,12 +448,15 @@ ShapeMouseMoveResult Polygon2dModel::OnMouseMoveIdle(QPointF ptWorldMousePos)
 
 	if(m_eType == SHAPE_LineChain || m_eType == SHAPE_Polygon)
 	{
-		if(CheckIfAddVertexOnEdge(ptWorldMousePos))
-			return SHAPEMOUSEMOVE_AddVertex;
+		if(m_GrabPointList.empty())
+			return SHAPEMOUSEMOVE_Initial;
 
-		if(m_GrabPointList.size() < 3 || m_bLoopClosed == false)
+		if(CheckIfAddVertexOnEdge(ptWorldMousePos))
+			return SHAPEMOUSEMOVE_InsertVertex;
+
+		if(m_bLoopClosed == false)
 		{
-			// If only the first or last vertex in chain is selected, return SHAPEMOUSEMOVE_Crosshair to indicate appending verts
+			// If only the first or last vertex in chain is selected, return SHAPEMOUSEMOVE_AppendVertex to indicate appending verts to the selected end
 			int iNumSelected = 0;
 			for(const GfxGrabPointModel &grabPtModel : m_GrabPointList)
 			{
@@ -466,19 +469,19 @@ ShapeMouseMoveResult Polygon2dModel::OnMouseMoveIdle(QPointF ptWorldMousePos)
 				{
 					m_iInsertVertexIndex = 0;
 					m_ptInsertVertexPos = glm::vec2(ptWorldMousePos.x(), ptWorldMousePos.y());
-					return SHAPEMOUSEMOVE_Crosshair;
+					return SHAPEMOUSEMOVE_AppendVertex;
 				}
 				else if(m_GrabPointList.back().IsSelected())
 				{
 					m_iInsertVertexIndex = m_GrabPointList.size();
 					m_ptInsertVertexPos = glm::vec2(ptWorldMousePos.x(), ptWorldMousePos.y());
-					return SHAPEMOUSEMOVE_Crosshair;
+					return SHAPEMOUSEMOVE_AppendVertex;
 				}
 			}
 		}
 	}
 	else if(IsValidShape() == false) // Any shape besides SHAPE_LineChain || SHAPE_Polygon
-		return SHAPEMOUSEMOVE_Crosshair;
+		return SHAPEMOUSEMOVE_Initial;
 
 	for(IHyFixture2d *pFixture : m_FixtureList)
 	{
@@ -488,7 +491,7 @@ ShapeMouseMoveResult Polygon2dModel::OnMouseMoveIdle(QPointF ptWorldMousePos)
 	return SHAPEMOUSEMOVE_Outside;
 }
 
-bool Polygon2dModel::OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos)
+bool GfxShapeModel::OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos)
 {
 	HySetVec(m_ptTransformStartPos, 0.0f, 0.0f);
 	m_eTransformType = TRANSFORM_None;
@@ -508,14 +511,18 @@ bool Polygon2dModel::OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButto
 		m_eTransformType = TRANSFORM_TranslateShape;
 		return true;
 
-	case SHAPEMOUSEMOVE_Crosshair:
-	case SHAPEMOUSEMOVE_AddVertex:
+	case SHAPEMOUSEMOVE_Initial:
+		m_eTransformType = TRANSFORM_Initial;
+		break;
+
+	case SHAPEMOUSEMOVE_AppendVertex:
+	case SHAPEMOUSEMOVE_InsertVertex:
 		if(m_iInsertVertexIndex == -1)
 		{
-			HyGuiLog("Polygon2dModel::OnMousePressEvent - Insert vertex index was -1 on AddVertex/Crosshair", LOGTYPE_Error);
+			HyGuiLog("GfxShapeModel::OnMousePressEvent - Insert vertex index was -1 on AddVertex/Crosshair", LOGTYPE_Error);
 			return false;
 		}
-		m_GrabPointList.insert(m_GrabPointList.begin() + m_iInsertVertexIndex, GfxGrabPointModel(GRABPOINT_Vertex, m_ptInsertVertexPos));
+		m_GrabPointList.insert(m_GrabPointList.begin() + m_iInsertVertexIndex, GfxGrabPointModel(GRABPOINT_VertexSelected, m_ptInsertVertexPos));
 		for(int i = 0; i < m_GrabPointList.size(); ++i)
 			m_GrabPointList[i].SetSelected(false);
 		m_GrabPointList[m_iInsertVertexIndex].SetSelected(true);
@@ -528,7 +535,7 @@ bool Polygon2dModel::OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButto
 	case SHAPEMOUSEMOVE_HoverSelectedVertex:
 		if(m_iGrabPointHoverIndex == -1)
 		{
-			HyGuiLog("Polygon2dModel::OnMousePressEvent - Hover vertex index was -1 on HoverVertex/HoverSelectedVertex", LOGTYPE_Error);
+			HyGuiLog("GfxShapeModel::OnMousePressEvent - Hover vertex index was -1 on HoverVertex/HoverSelectedVertex", LOGTYPE_Error);
 			return false;
 		}
 
@@ -571,14 +578,14 @@ bool Polygon2dModel::OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButto
 		break;
 
 	default:
-		HyGuiLog("Polygon2dModel::OnMousePressEvent - Unknown shape mouse move result encountered", LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::OnMousePressEvent - Unknown shape mouse move result encountered", LOGTYPE_Error);
 		break;
 	}
 
 	return false;
 }
 
-void Polygon2dModel::DoTransformInitial()
+void GfxShapeModel::DoTransformInitial()
 {
 	glm::vec2 ptStartPos = m_ptTransformStartPos;
 	glm::vec2 ptDragPos = m_ptTransformDragPos;
@@ -625,19 +632,19 @@ void Polygon2dModel::DoTransformInitial()
 		if(m_GrabPointList.size() == 1)
 			m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, m_ptTransformDragPos));
 		if(m_GrabPointList.size() != 2)
-			HyGuiLog("Polygon2dModel::MouseTransformDrag - Polygon or LineChain initial dragging with != 2 verts", LOGTYPE_Error);
+			HyGuiLog("GfxShapeModel::MouseTransformDrag - Polygon or LineChain initial dragging with != 2 verts", LOGTYPE_Error);
 
 		m_GrabPointList[0].SetSelected(false);
 		m_GrabPointList[1].Setup(GRABPOINT_EndpointSelected, m_ptTransformDragPos);
 		break;
 
 	default:
-		HyGuiLog("Polygon2dModel::MouseTransformDrag - Initial transform called with unsupported shape type: " % QString::number(m_eType), LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::MouseTransformDrag - Initial transform called with unsupported shape type: " % QString::number(m_eType), LOGTYPE_Error);
 		break;
 	}
 }
 
-void Polygon2dModel::DoTransformTranslateShape()
+void GfxShapeModel::DoTransformTranslateShape()
 {
 	if(HyCompareFloat(m_ptTransformDragPos.x, m_ptTransformStartPos.y) && HyCompareFloat(m_ptTransformDragPos.y, m_ptTransformStartPos.y))
 		return;
@@ -657,11 +664,11 @@ void Polygon2dModel::DoTransformTranslateShape()
 	m_ptTransformStartPos = m_ptTransformDragPos;
 }
 
-void Polygon2dModel::DoTranslateVertexTransformDrag()
+void GfxShapeModel::DoTranslateVertexTransformDrag()
 {
 	if(m_eType != SHAPE_Polygon && m_eType != SHAPE_LineChain)
 	{
-		HyGuiLog("Polygon2dModel::DoTranslateVertexTransformDrag called with non-polygon/linechain shape type", LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::DoTranslateVertexTransformDrag called with non-polygon/linechain shape type", LOGTYPE_Error);
 		return;
 	}
 	if(HyCompareFloat(m_ptTransformDragPos.x, m_ptTransformStartPos.y) && HyCompareFloat(m_ptTransformDragPos.y, m_ptTransformStartPos.y))
@@ -687,11 +694,11 @@ void Polygon2dModel::DoTranslateVertexTransformDrag()
 	m_ptTransformStartPos = m_ptTransformDragPos;
 }
 
-bool Polygon2dModel::CheckIfAddVertexOnEdge(QPointF ptWorldMousePos)
+bool GfxShapeModel::CheckIfAddVertexOnEdge(QPointF ptWorldMousePos)
 {
-	if(m_eType != SHAPE_LineChain || m_eType != SHAPE_Polygon)
+	if(m_eType != SHAPE_LineChain && m_eType != SHAPE_Polygon)
 	{
-		HyGuiLog("Polygon2dModel::CheckIfAddVertexOnEdge invoked with shape that isn't a linechain or polygon", LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::CheckIfAddVertexOnEdge invoked with shape that isn't a linechain or polygon", LOGTYPE_Error);
 		return false;
 	}
 	if(m_GrabPointList.size() < 2)
@@ -718,7 +725,7 @@ bool Polygon2dModel::CheckIfAddVertexOnEdge(QPointF ptWorldMousePos)
 	return false;
 }
 
-bool Polygon2dModel::IsShareEdge(const std::vector<glm::vec2> &a, const std::vector<glm::vec2> &b, int &a0, int &a1, int &b0, int &b1)
+bool GfxShapeModel::IsShareEdge(const std::vector<glm::vec2> &a, const std::vector<glm::vec2> &b, int &a0, int &a1, int &b0, int &b1)
 {
 	for(int i = 0; i < (int)a.size(); ++i)
 	{
@@ -738,7 +745,7 @@ bool Polygon2dModel::IsShareEdge(const std::vector<glm::vec2> &a, const std::vec
 	return false;
 }
 
-std::vector<glm::vec2> Polygon2dModel::MergePolygons(const std::vector<glm::vec2> &ptA, const std::vector<glm::vec2> &ptB, int a0, int a1, int b0, int b1)
+std::vector<glm::vec2> GfxShapeModel::MergePolygons(const std::vector<glm::vec2> &ptA, const std::vector<glm::vec2> &ptB, int a0, int a1, int b0, int b1)
 {
 	std::vector<glm::vec2> out;
 
@@ -755,7 +762,7 @@ std::vector<glm::vec2> Polygon2dModel::MergePolygons(const std::vector<glm::vec2
 	return out;
 }
 
-std::vector<std::vector<glm::vec2>> Polygon2dModel::MergeTriangles(const std::vector<HyTriangle2d> &triangleList)
+std::vector<std::vector<glm::vec2>> GfxShapeModel::MergeTriangles(const std::vector<HyTriangle2d> &triangleList)
 {
 	std::vector<std::vector<glm::vec2>> polys;
 	for(const HyTriangle2d &t : triangleList)
@@ -789,14 +796,14 @@ std::vector<std::vector<glm::vec2>> Polygon2dModel::MergeTriangles(const std::ve
 	return polys;
 }
 
-void Polygon2dModel::ClearFixtures()
+void GfxShapeModel::ClearFixtures()
 {
 	for(IHyFixture2d *pFixture : m_FixtureList)
 		delete pFixture;
 	m_FixtureList.clear();
 }
 
-void Polygon2dModel::AssemblePolygonFixtures(std::vector<std::vector<glm::vec2>> subPolygonList)
+void GfxShapeModel::AssemblePolygonFixtures(std::vector<std::vector<glm::vec2>> subPolygonList)
 {
 	ClearFixtures();
 	for(std::vector<glm::vec2> &subPoly : subPolygonList)
@@ -807,7 +814,7 @@ void Polygon2dModel::AssemblePolygonFixtures(std::vector<std::vector<glm::vec2>>
 	}
 }
 
-QList<float> Polygon2dModel::ConvertedBoxData() const
+QList<float> GfxShapeModel::ConvertedBoxData() const
 {
 	HyShape2d tmpBoxShape;
 	switch(m_eType)
@@ -870,14 +877,14 @@ QList<float> Polygon2dModel::ConvertedBoxData() const
 		return QList<float>(serializedTmpBox.begin(), serializedTmpBox.end()); }
 
 	default:
-		HyGuiLog("Polygon2dModel::SetType - Unhandled conversion to Box", LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::SetType - Unhandled conversion to Box", LOGTYPE_Error);
 		break;
 	}
 	
 	return QList<float>();
 }
 
-QList<float> Polygon2dModel::ConvertedCircleData() const
+QList<float> GfxShapeModel::ConvertedCircleData() const
 {
 	QList<float> convertedDataList;
 	switch(m_eType)
@@ -953,14 +960,14 @@ QList<float> Polygon2dModel::ConvertedCircleData() const
 		break; }
 	
 	default:
-		HyGuiLog("Polygon2dModel::SetType - Unhandled conversion to Circle", LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::SetType - Unhandled conversion to Circle", LOGTYPE_Error);
 		break;
 	}
 	
 	return convertedDataList;
 }
 
-QList<float> Polygon2dModel::ConvertedLineSegmentData() const
+QList<float> GfxShapeModel::ConvertedLineSegmentData() const
 {
 	QList<float> convertedDataList;
 	switch(m_eType)
@@ -1021,14 +1028,14 @@ QList<float> Polygon2dModel::ConvertedLineSegmentData() const
 		break; }
 
 	default:
-		HyGuiLog("Polygon2dModel::SetType - Unhandled conversion to LineSegment", LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::SetType - Unhandled conversion to LineSegment", LOGTYPE_Error);
 		break;
 	}
 	
 	return convertedDataList;
 }
 
-QList<float> Polygon2dModel::ConvertedCapsuleData() const
+QList<float> GfxShapeModel::ConvertedCapsuleData() const
 {
 	QList<float> convertedDataList;
 	switch(m_eType)
@@ -1085,14 +1092,14 @@ QList<float> Polygon2dModel::ConvertedCapsuleData() const
 		}
 		break; }
 	default:
-		HyGuiLog("Polygon2dModel::SetType - Unhandled conversion to Capsule", LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::SetType - Unhandled conversion to Capsule", LOGTYPE_Error);
 		break;
 	}
 
 	return convertedDataList;
 }
 
-QList<float> Polygon2dModel::ConvertedPolygonOrLineChainData() const
+QList<float> GfxShapeModel::ConvertedPolygonOrLineChainData() const
 {
 	QList<float> convertedDataList;
 	switch(m_eType)
@@ -1170,7 +1177,7 @@ QList<float> Polygon2dModel::ConvertedPolygonOrLineChainData() const
 		}
 		break;
 	default:
-		HyGuiLog("Polygon2dModel::SetType - Unhandled conversion to Polygon/LineChain", LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::SetType - Unhandled conversion to Polygon/LineChain", LOGTYPE_Error);
 		break;
 	}
 	

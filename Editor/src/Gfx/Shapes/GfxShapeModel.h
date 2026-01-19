@@ -1,5 +1,5 @@
 /**************************************************************************
-*	Polygon2dModel.h
+*	GfxShapeModel.h
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2025 Jason Knobler
@@ -7,26 +7,27 @@
 *	Harmony Editor Tool License:
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef POLYGON2DMODEL_H
-#define POLYGON2DMODEL_H
+#ifndef GfxShapeModel_H
+#define GfxShapeModel_H
 
 #include "Global.h"
 #include "GfxGrabPointModel.h"
 
-class IPolygon2dView;
+class IGfxShapeView;
 
 enum ShapeMouseMoveResult
 {
 	SHAPEMOUSEMOVE_Outside,
 	SHAPEMOUSEMOVE_Inside,
-	SHAPEMOUSEMOVE_Crosshair,
-	SHAPEMOUSEMOVE_AddVertex,
+	SHAPEMOUSEMOVE_Initial,
+	SHAPEMOUSEMOVE_AppendVertex,
+	SHAPEMOUSEMOVE_InsertVertex,
 	SHAPEMOUSEMOVE_HoverVertex,
 	SHAPEMOUSEMOVE_HoverSelectedVertex,
 	SHAPEMOUSEMOVE_HoverCenter
 };
 
-class Polygon2dModel
+class GfxShapeModel
 {
 	HyColor								m_Color;
 	EditorShape							m_eType;				// "Shape", "Type" - when serialized in property (string)
@@ -60,11 +61,11 @@ class Polygon2dModel
 	TransformType						m_eTransformType;
 
 	// Track Views manually since we don't inherit from QObject
-	QList<IPolygon2dView *>				m_ViewList;
+	QList<IGfxShapeView *>				m_ViewList;
 
 public:
-	Polygon2dModel(HyColor color, EditorShape eShape = SHAPE_None, const QList<float> &floatList = QList<float>());
-	virtual ~Polygon2dModel();
+	GfxShapeModel(HyColor color, EditorShape eShape = SHAPE_None, const QList<float> &floatList = QList<float>());
+	virtual ~GfxShapeModel();
 
 	bool IsValidShape() const;
 
@@ -79,8 +80,8 @@ public:
 
 	void TransformSelf(glm::mat4 mtxTransform);
 
-	void AddView(IPolygon2dView *pView);
-	bool RemoveView(IPolygon2dView *pView);
+	void AddView(IGfxShapeView *pView);
+	bool RemoveView(IGfxShapeView *pView);
 
 	int GetNumFixtures() const;
 	IHyFixture2d *GetFixture(int iIndex) const;
@@ -118,4 +119,4 @@ protected:
 	QList<float> ConvertedPolygonOrLineChainData() const;
 };
 
-#endif // POLYGON2DMODEL_H
+#endif // GfxShapeModel_H

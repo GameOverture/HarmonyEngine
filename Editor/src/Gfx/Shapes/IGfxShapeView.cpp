@@ -1,5 +1,5 @@
 /**************************************************************************
- *	IPolygon2dView.cpp
+ *	IGfxShapeView.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2026 Jason Knobler
@@ -11,21 +11,21 @@
 #include "IGfxShapeView.h"
 #include "GfxGrabPointView.h"
 
-IPolygon2dView::IPolygon2dView() :
+IGfxShapeView::IGfxShapeView() :
 	m_pModel(nullptr)
 {
 }
 
-/*virtual*/ IPolygon2dView::~IPolygon2dView()
+/*virtual*/ IGfxShapeView::~IGfxShapeView()
 {
 }
 
-Polygon2dModel *IPolygon2dView::GetModel() const
+GfxShapeModel *IGfxShapeView::GetModel() const
 {
 	return m_pModel;
 }
 
-void IPolygon2dView::SetModel(Polygon2dModel *pModel)
+void IGfxShapeView::SetModel(GfxShapeModel *pModel)
 {
 	if(pModel == nullptr)
 	{
