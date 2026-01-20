@@ -182,7 +182,7 @@ void GraphicsKeyFrameItem::SelectTweenKnob(bool bSelect)
 EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObject metaFileObj) :
 	QGraphicsScene(),
 	m_pEntStateData(pStateData),
-	m_iCurrentFrame(0),
+	m_iCurrentFrame(-1),
 	m_pCurrentFrameLine(nullptr),
 	m_iSelectionPivotFrame(-1),
 	m_bPivotLessThan(false),

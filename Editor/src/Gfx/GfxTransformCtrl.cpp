@@ -304,8 +304,6 @@ GfxTransformCtrl::GrabPointType GfxTransformCtrl::IsMouseOverGrabPoint() const
 	if(m_bIsShown == false || m_bShowGrabPoints == false || HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
 		return GRAB_None;
 
-	ptWorldMousePos = HyEngine::Input().GetMousePos();
-
 	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
 	{
 		if(m_GrabPointModels[i]->TestPoint(ptWorldMousePos))

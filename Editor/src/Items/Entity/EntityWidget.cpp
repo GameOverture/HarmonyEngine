@@ -414,6 +414,9 @@ void EntityWidget::SetExtrapolatedProperties()
 		return;
 	}
 
+	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
+	ui->chkSetConstructor->setChecked(entityDopeSheetSceneRef.GetCurrentFrame() == -1);
+
 	// Get selected items only, removing any folders
 	QList<EntityTreeItemData *> selectedItemsDataList;
 	QModelIndexList selectedIndexList = GetSelectedItems();
@@ -436,7 +439,6 @@ void EntityWidget::SetExtrapolatedProperties()
 	else if(selectedItemsDataList.size() == 1)
 	{
 		PropertiesTreeModel &propModelRef = selectedItemsDataList[0]->GetPropertiesModel();
-		EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
 		QJsonObject propsObj = entityDopeSheetSceneRef.GetCurrentFrameProperties(selectedItemsDataList[0]);
 		propModelRef.ResetValues();
 		propModelRef.DeserializeJson(propsObj);
@@ -1261,8 +1263,16 @@ void EntityWidget::on_chkEditMode_clicked()
 
 void EntityWidget::on_chkSetConstructor_clicked()
 {
-	m_ItemRef.GetWidget()->FocusState(GetCurStateIndex(), -1);
-	static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().SetCurrentFrame(-1);
+	if(ui->chkSetConstructor->isChecked())
+	{
+		m_iPreviewStartingFrame = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().GetCurrentFrame();
+		if(m_iPreviewStartingFrame == -1)
+			m_iPreviewStartingFrame = 0;
+
+		static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().SetCurrentFrame(-1);
+	}
+	else
+		static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().SetCurrentFrame(m_iPreviewStartingFrame);
 }
 
 void EntityWidget::OnPreviewUpdate()

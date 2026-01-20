@@ -60,7 +60,7 @@ float GfxGrabPointModel::GetRadius() const
 
 bool GfxGrabPointModel::TestPoint(glm::vec2 ptWorld) const
 {
-	return glm::distance(m_ptPosition, ptWorld) <= GRABPOINT_SELECT_RADIUS;
+	return glm::distance(m_ptPosition, ptWorld) <= (GRABPOINT_SELECT_RADIUS * 2);
 }
 
 bool GfxGrabPointModel::IsSelected() const
