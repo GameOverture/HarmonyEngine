@@ -12,62 +12,31 @@
 
 GfxMarqueeCtrl::GfxMarqueeCtrl(HyEntity2d *pParent) :
 	HyEntity2d(pParent),
+	m_bIsActive(false),
 	m_BoundingVolume(this)
 {
-	m_BoundingVolume.SetVisible(false);
-
 	m_Outline.UseWindowCoordinates();
 	m_Outline.SetWireframe(true);
-	m_Outline.SetVisible(false);
 	m_Outline.SetDisplayOrder(DISPLAYORDER_TransformCtrl - 1);
+
+	HyColor color = HyGlobal::GetEditorColor(EDITORCOLOR_Marquee);
+	m_BoundingVolume.SetTint(color);
+	m_Outline.SetTint(color.IsDark() ? color.Lighten() : color.Darken());
 }
 
 /*virtual*/ GfxMarqueeCtrl::~GfxMarqueeCtrl()
 {
 }
 
-void GfxMarqueeCtrl::Setup(float fBvAlpha, float fOutlineAlpha)
-{
-	HyColor color = HyGlobal::GetEditorColor(EDITORCOLOR_Marquee);
-
-	m_BoundingVolume.SetTint(color);
-	m_Outline.SetTint(color.IsDark() ? color.Lighten() : color.Darken());
-
-	if(fBvAlpha == 0.0f)
-	{
-		m_BoundingVolume.SetVisible(false);
-		m_BoundingVolume.alpha.Set(0.0f);
-	}
-	else
-	{
-		m_BoundingVolume.SetVisible(true);
-		m_BoundingVolume.alpha.Tween(fBvAlpha, 0.5f);
-	}
-
-	if(fOutlineAlpha == 0.0f)
-	{
-		m_Outline.SetVisible(false);
-		m_Outline.alpha.Set(0.0f);
-	}
-	else
-	{
-		m_Outline.SetVisible(true);
-		m_Outline.alpha.Tween(fOutlineAlpha, 0.5f);
-	}
-}
-
-HyPrimitive2d &GfxMarqueeCtrl::GetFillPrimitive()
-{
-	return m_BoundingVolume;
-}
-
-HyPrimitive2d &GfxMarqueeCtrl::GetOutlinePrimitive()
-{
-	return m_Outline;
-}
-
 void GfxMarqueeCtrl::SetAsDrag(glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
+	if(m_bIsActive == false)
+	{
+		m_BoundingVolume.alpha.Set(1.0f);
+		m_BoundingVolume.alpha.Tween(0.25f, 0.5f);
+		m_bIsActive = true;
+	}
+
 	glm::vec2 ptLowerBound, ptUpperBound, ptCenter;
 	HySetVec(ptLowerBound, ptStartPos.x < ptDragPos.x ? ptStartPos.x : ptDragPos.x, ptStartPos.y < ptDragPos.y ? ptStartPos.y : ptDragPos.y);
 	HySetVec(ptUpperBound, ptStartPos.x >= ptDragPos.x ? ptStartPos.x : ptDragPos.x, ptStartPos.y >= ptDragPos.y ? ptStartPos.y : ptDragPos.y);
@@ -83,6 +52,24 @@ void GfxMarqueeCtrl::SetAsDrag(glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 	m_Outline.SetAsBox(HyRect((ptWindowUpperBound.x - ptWindowLowerBound.x) * 0.5f, (ptWindowUpperBound.y - ptWindowLowerBound.y) * 0.5f, ptWindowCenter, 0.0f));
 
 	SetVisible(true);
+}
+
+b2AABB GfxMarqueeCtrl::GetSelection()
+{
+	HyShape2d tmpShape;
+	m_BoundingVolume.CalcLocalBoundingShape(tmpShape);
+
+	b2AABB marqueeAabb;
+	tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
+	return marqueeAabb;
+}
+
+void GfxMarqueeCtrl::Hide()
+{
+	m_BoundingVolume.SetAsNothing();
+	m_Outline.SetAsNothing();
+
+	m_bIsActive = false;
 }
 
 //QString ShapeCtrl::Serialize()

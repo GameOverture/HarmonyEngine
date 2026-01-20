@@ -212,18 +212,14 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 			QList<IDrawExItem *> affectedItemList;	// Items that are getting selected or deselected
 			if(GetCurAction() == HYACTION_MarqueeStart || GetCurAction() == HYACTION_MarqueeDrag)
 			{
-				b2AABB marqueeAabb;
-				HyShape2d tmpShape;
-				m_MarqueeCtrl.GetFillPrimitive().CalcLocalBoundingShape(tmpShape);
-				tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
-
+				b2AABB marqueeAabb = m_MarqueeCtrl.GetSelection();
 				for(IDrawExItem *pItem : m_ItemList)
 				{
 					if(pItem->GetTransformCtrl().IsContained(marqueeAabb, m_pCamera) && pItem->IsSelectable())
 						affectedItemList << pItem;
 				}
 
-				m_MarqueeCtrl.SetVisible(false);
+				m_MarqueeCtrl.Hide();
 			}
 			else if(m_pCurHoverItem && m_pCurHoverItem->IsSelectable()) // This covers the resolution of "Special Case" in DoMousePress
 				affectedItemList << m_pCurHoverItem;
@@ -306,7 +302,6 @@ void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 	{
 		SetAction(HYACTION_MarqueeDrag);
 
-		m_MarqueeCtrl.Setup(0.25f, 1.0f);
 		m_MarqueeCtrl.SetAsDrag(m_ptDragStart, ptWorldMousePos);
 	}
 	else if(GetCurAction() == HYACTION_Pending)

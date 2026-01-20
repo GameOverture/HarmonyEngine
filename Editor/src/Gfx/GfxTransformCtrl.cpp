@@ -93,12 +93,12 @@ void GfxTransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShape
 		pCamera->ProjectToCamera(ptGrabPos[i], ptGrabPos[i]);
 	m_BoundingVolume.SetAsPolygon(ptGrabPos, 4);
 
-	glm::vec2 ptRotatePos = m_GrabPointModels[GRAB_Rotate]->GetPos();
-
 	glm::vec4 ptTransformPos(ptExtrudeStart.x, ptExtrudeStart.y, 0.0f, 1.0f);
 	ptTransformPos = mtxShapeTransform * ptTransformPos;
 	HySetVec(ptExtrudeStart, ptTransformPos.x, ptTransformPos.y);
 	pCamera->ProjectToCamera(ptExtrudeStart, ptExtrudeStart);
+	glm::vec2 ptRotatePos;
+	pCamera->ProjectToCamera(m_GrabPointModels[GRAB_Rotate]->GetPos(), ptRotatePos);
 	m_ExtrudeSegment.SetAsLineSegment(ptExtrudeStart, ptRotatePos);
 
 	m_fCachedRotation = HyMath::AngleFromVector(ptRotatePos - ptExtrudeStart) - 90.0f;

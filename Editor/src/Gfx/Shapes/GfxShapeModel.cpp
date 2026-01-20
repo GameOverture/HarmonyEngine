@@ -513,7 +513,7 @@ bool GfxShapeModel::OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButton
 
 	case SHAPEMOUSEMOVE_Initial:
 		m_eTransformType = TRANSFORM_Initial;
-		break;
+		return true;
 
 	case SHAPEMOUSEMOVE_AppendVertex:
 	case SHAPEMOUSEMOVE_InsertVertex:
@@ -629,6 +629,8 @@ void GfxShapeModel::DoTransformInitial()
 		break;
 	case SHAPE_Polygon:
 	case SHAPE_LineChain:
+		if(m_GrabPointList.size() == 0)
+			m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, m_ptTransformDragPos));
 		if(m_GrabPointList.size() == 1)
 			m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, m_ptTransformDragPos));
 		if(m_GrabPointList.size() != 2)

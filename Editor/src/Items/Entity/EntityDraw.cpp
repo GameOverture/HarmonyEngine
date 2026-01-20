@@ -132,7 +132,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		{
 			if(m_eEditModeState == EDITMODE_MouseDownOutside)
 			{
-				m_MarqueeCtrl.Setup(0.25f, 1.0f);
+				m_MarqueeCtrl.SetAsDrag(m_ptDragStart, ptCurMousePos);
 				m_eEditModeState = EDITMODE_MouseDragMarquee;
 			}
 			else // EDITMODE_MouseDownTransform
@@ -142,11 +142,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	case EDITMODE_MouseDragMarquee:
 		if(pTreeItemData->GetShape2dModel())
-		{
-			glm::vec2 ptCurMousePos;
-			m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
 			m_MarqueeCtrl.SetAsDrag(m_ptDragStart, ptCurMousePos);
-		}
 		else
 			HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_MouseDragMarquee with unsupported edit item type!", LOGTYPE_Error);
 		break;
@@ -251,11 +247,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				marqueeAabb.upperBound = { m_ptDragStart.x + 1, m_ptDragStart.y + 1 };
 			}
 			else
-			{
-				HyShape2d tmpShape;
-				m_MarqueeCtrl.GetFillPrimitive().CalcLocalBoundingShape(tmpShape);
-				tmpShape.ComputeAABB(marqueeAabb, glm::mat4(1.0f));
-			}
+				marqueeAabb = m_MarqueeCtrl.GetSelection();
+			
 			pTreeItemData->GetShape2dModel()->MouseMarqueeReleased(pEvent->buttons(),
 																   QPointF(marqueeAabb.lowerBound.x, marqueeAabb.lowerBound.y),
 																   QPointF(marqueeAabb.upperBound.x, marqueeAabb.upperBound.y));
@@ -263,7 +256,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		else
 			HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_MarqueeSelect with unsupported edit item type!", LOGTYPE_Error);
 		
-		m_MarqueeCtrl.SetVisible(false);
+		m_MarqueeCtrl.Hide();
 		break;
 
 	case EDITMODE_MouseDownTransform:

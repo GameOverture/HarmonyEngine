@@ -15,6 +15,8 @@
 class GfxMarqueeCtrl : public HyEntity2d
 {
 protected:
+	bool						m_bIsActive;
+
 	HyPrimitive2d				m_BoundingVolume;	// This shape represents how the item's transformation is applied. Uses world/camera coordinates
 	HyPrimitive2d				m_Outline;			// This shape represents the raw data in the form of an outline unaffected by camera zoom. Uses window coordinates
 
@@ -22,12 +24,9 @@ public:
 	GfxMarqueeCtrl(HyEntity2d *pParent);
 	virtual ~GfxMarqueeCtrl();
 
-	void Setup(float fBvAlpha, float fOutlineAlpha);
-	HyPrimitive2d &GetFillPrimitive();
-	HyPrimitive2d &GetOutlinePrimitive();
-
 	void SetAsDrag(glm::vec2 ptStartPos, glm::vec2 ptDragPos);
-	void SetAsText(HyText2d *pTextNode, bool bShowOutline, HyCamera2d *pCamera);
+	b2AABB GetSelection();
+	void Hide();
 
 	//QString Serialize();
 	//void Deserialize(QString sData, HyCamera2d *pCamera);
