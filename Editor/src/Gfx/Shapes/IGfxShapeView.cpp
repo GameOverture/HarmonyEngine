@@ -18,6 +18,8 @@ IGfxShapeView::IGfxShapeView() :
 
 /*virtual*/ IGfxShapeView::~IGfxShapeView()
 {
+	if(m_pModel)
+		m_pModel->RemoveView(this);
 }
 
 GfxShapeModel *IGfxShapeView::GetModel() const

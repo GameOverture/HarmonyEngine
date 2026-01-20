@@ -221,8 +221,6 @@ public:
 	QPoint GetScrollPos() const;
 	void SetScrollPos(QPoint scrollPos);
 
-	bool IsCtor() const;
-	void SetCtor(bool bCtor);
 	int GetCurrentFrame() const;
 	void SetCurrentFrame(int iFrameIndex);
 

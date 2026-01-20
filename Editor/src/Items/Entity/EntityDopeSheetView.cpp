@@ -107,7 +107,7 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 			if(pEntItemData->IsDopeExpanded())
 			{
 				QList<QPair<QString, QString>> propList;
-				propList = GetScene()->GetUniquePropertiesList(pEntItemData, true, m_pStateData->GetIndex() == 0);
+				propList = GetScene()->GetUniquePropertiesList(pEntItemData, true, true);
 
 				for(QPair<QString, QString> &propPair : propList)
 				{
@@ -139,10 +139,7 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 	int iHorzScrollAmt = horizontalScrollBar()->value();
 	qreal fPosX = fPOSX_DRAW_THRESHOLD - iHorzScrollAmt;
 
-	if(GetScene()->IsCtor())
-		fPosX += (-1 * TIMELINE_NOTCH_SUBLINES_WIDTH);
-	else
-		fPosX += (GetScene()->GetCurrentFrame() * TIMELINE_NOTCH_SUBLINES_WIDTH);
+	fPosX += (GetScene()->GetCurrentFrame() * TIMELINE_NOTCH_SUBLINES_WIDTH);
 
 	if(fPosX >= (fPOSX_DRAW_THRESHOLD - TIMELINE_NOTCH_SUBLINES_WIDTH) && fPosX < (rect.x() + rect.width()))
 	{
@@ -224,7 +221,7 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 		{
 			textColor = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetTextSelected);
 
-			propList = GetScene()->GetUniquePropertiesList(pEntItemData, true, m_pStateData->GetIndex() == 0);
+			propList = GetScene()->GetUniquePropertiesList(pEntItemData, true, true);
 			iNumRows += propList.size();
 		}
 
@@ -326,12 +323,15 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 
 	std::function<void(int, float)> fpPaintEvent = [&](int iFrameIndex, float fX)
 	{
-		if(GetScene()->GetCallbackList(iFrameIndex).empty() == false)
+		if(iFrameIndex >= 0)
 		{
-			QSize iconSize(16, 16);
-			QIcon pauseIcon(":/icons16x16/callback.png");
-			QPoint pt = QPoint(fX - (iconSize.width() / 2) + 1.0f, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f) - iconSize.width());
-			pPainter->drawPixmap(pt, pauseIcon.pixmap(iconSize.width(), iconSize.height()));
+			if(GetScene()->GetCallbackList(iFrameIndex).empty() == false)
+			{
+				QSize iconSize(16, 16);
+				QIcon pauseIcon(":/icons16x16/callback.png");
+				QPoint pt = QPoint(fX - (iconSize.width() / 2) + 1.0f, rect.y() + TIMELINE_HEIGHT - (CALLBACK_DIAMETER * 0.5f) - iconSize.width());
+				pPainter->drawPixmap(pt, pauseIcon.pixmap(iconSize.width(), iconSize.height()));
+			}
 		}
 
 		EntityTreeItemData *pRootTreeItemData = static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetRootTreeItemData();
@@ -379,12 +379,9 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 	qreal fPOSX_DRAW_THRESHOLD = rect.x() + TIMELINE_LEFT_MARGIN;
 
 	// Draw ctor
-	if(m_pStateData->GetIndex() == 0)
-	{
-		iFrameIndex = -1;
-		fPOSX_DRAW_THRESHOLD -= fSubLineSpacing;
-	}
-
+	iFrameIndex = -1;
+	fPOSX_DRAW_THRESHOLD -= fSubLineSpacing;
+	
 	int iHorzScrollAmt = horizontalScrollBar()->value();
 	qreal fPosX = fPOSX_DRAW_THRESHOLD - iHorzScrollAmt;
 
@@ -396,7 +393,7 @@ ctor_to_frame0:
 		{
 			HyColor color = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetNotch);
 
-			if((GetScene()->GetCurrentFrame() == iFrameIndex && GetScene()->IsCtor() == false) || (iFrameIndex == -1 && GetScene()->IsCtor()))
+			if(GetScene()->GetCurrentFrame() == iFrameIndex)
 			{
 				color = HyGlobal::GetEditorColor(EDITORCOLOR_DopeSheetCurFrameIndicator);
 				DrawCurrentFrameIndicator(pPainter, fPosX, rect.y() + TIMELINE_HEIGHT - TIMELINE_NOTCH_SUBLINES_HEIGHT);
@@ -431,7 +428,7 @@ ctor_to_frame0:
 			if(fPosX >= fPOSX_DRAW_THRESHOLD)
 			{
 				int iCurSubNotchFrame = (iFrameIndex + 1) + i;
-				if(GetScene()->GetCurrentFrame() == iCurSubNotchFrame && GetScene()->IsCtor() == false)
+				if(GetScene()->GetCurrentFrame() == iCurSubNotchFrame)
 				{
 					pPainter->setPen(HyGlobal::GetEditorQtColor(EDITORCOLOR_DopeSheetCurFrameIndicator));
 
@@ -463,15 +460,12 @@ ctor_to_frame0:
 
 	if(m_bTimeLineMouseDown)
 	{
-		if(static_cast<EntityModel &>(m_pStateData->GetModel()).IsCtor() == false)
-		{
-			GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
-			if(m_pAuxDopeSheet)
-				m_pAuxDopeSheet->UpdateWidgets();
+		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
+		if(m_pAuxDopeSheet)
+			m_pAuxDopeSheet->UpdateWidgets();
 
-			// If 'm_MouseScenePos' is out of view, then scroll the view
-			ensureVisible(m_MouseScenePos.x(), m_MouseScenePos.y(), 1, 1, 0, 0);
-		}
+		// If 'm_MouseScenePos' is out of view, then scroll the view
+		ensureVisible(m_MouseScenePos.x(), m_MouseScenePos.y(), 1, 1, 0, 0);
 
 		pEvent->accept();
 	}
@@ -534,15 +528,12 @@ ctor_to_frame0:
 	}
 	else if(pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f && pEvent->pos().y() < TIMELINE_HEIGHT)
 	{
-		if(static_cast<EntityModel &>(m_pStateData->GetModel()).IsCtor() == false)
-		{
-			m_MouseScenePos = mapToScene(pEvent->pos());
+		m_MouseScenePos = mapToScene(pEvent->pos());
 
-			m_bTimeLineMouseDown = true;
-			GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
-			if(m_pAuxDopeSheet)
-				m_pAuxDopeSheet->UpdateWidgets();
-		}
+		m_bTimeLineMouseDown = true;
+		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
+		if(m_pAuxDopeSheet)
+			m_pAuxDopeSheet->UpdateWidgets();
 
 		pEvent->accept();
 	}
@@ -597,8 +588,7 @@ ctor_to_frame0:
 	}
 	else if(m_bMiddleMousePanning == false &&
 			rubberBandRect().isNull() &&
-			pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f &&
-			static_cast<EntityModel &>(m_pStateData->GetModel()).IsCtor() == false)
+			pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f)
 	{
 		GetScene()->SetCurrentFrame(GetNearestFrame(m_MouseScenePos.x()));
 	}

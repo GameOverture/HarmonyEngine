@@ -37,14 +37,10 @@ class EntityModel : public IModel
 {
 	Q_OBJECT
 
-	bool													m_bCtor;					// When true, "Set Constructor Mode" is on and the state is set to '0' and frame set to 'C' aka -1
-	int														m_iCtorRestoreState;
-
 	// These maps store the CONSTRUCTOR property data for the entire entity
 	// HACK: These m_Ctor* member variables are declared before 'm_TreeModel' because its constructor needs to use/initialize these maps
 	QMap<EntityTreeItemData *, QJsonObject>					m_CtorKeyFramesMap;			// Store properties and tween values
 	QMap<EntityTreeItemData *, QJsonObject>					m_CtorPoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added with UNDO
-	QList<QString *>										m_CtorCallbacksList;		// a list of strings that are the callback name(s) - still referenced from 'm_CallbacksList'
 
 	EntityTreeModel											m_TreeModel;
 
@@ -73,10 +69,7 @@ public:
 
 	QAbstractItemModel *GetAuxWidgetsModel();
 
-	bool IsCtor() const;
-	void SetCtor(bool bCtor);
 	QMap<EntityTreeItemData *, QJsonObject> &GetCtorKeyFramesMap();
-	QList<QString *> &GetCtorCallbacksList();
 	QList<QString *> &GetCallbacksList();
 
 	int GetFinalFrameIndex(int iStateIndex) const;

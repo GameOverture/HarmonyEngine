@@ -144,7 +144,7 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 
 /*virtual*/ EntityDrawItem::~EntityDrawItem()
 {
-	//delete m_pChild;
+	delete m_pChild;
 }
 
 EntityDraw &EntityDrawItem::GetEntityDraw()

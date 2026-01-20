@@ -253,30 +253,6 @@ void EntityDopeSheetScene::SetScrollPos(QPoint scrollPos)
 	m_ScrollPos = scrollPos;
 }
 
-bool EntityDopeSheetScene::IsCtor() const
-{
-	return static_cast<EntityModel &>(m_pEntStateData->GetModel()).IsCtor();
-}
-
-void EntityDopeSheetScene::SetCtor(bool bCtor)
-{
-	if(bCtor)
-	{
-		m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (-1 * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
-		update();
-
-		IWidget *pWidget = m_pEntStateData->GetModel().GetItem().GetWidget();
-		if(pWidget)
-			static_cast<EntityWidget *>(pWidget)->SetExtrapolatedProperties();
-
-		IDraw *pDraw = m_pEntStateData->GetModel().GetItem().GetDraw();
-		if(pDraw)
-			static_cast<EntityDraw *>(pDraw)->SetExtrapolatedProperties();
-	}
-	else
-		SetCurrentFrame(m_iCurrentFrame);
-}
-
 int EntityDopeSheetScene::GetCurrentFrame() const
 {
 	return m_iCurrentFrame;
@@ -284,17 +260,8 @@ int EntityDopeSheetScene::GetCurrentFrame() const
 
 void EntityDopeSheetScene::SetCurrentFrame(int iFrameIndex)
 {
-	//if(iFrameIndex == -1 && m_pEntStateData->GetIndex() == 0)
-	//{
-	//	SetCtor(true);
-	//	m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (-1 * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
-	//	return;
-	//}
-	//else
-	{
-		m_iCurrentFrame = HyMath::Max(iFrameIndex, 0);
-		m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (m_iCurrentFrame * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
-	}
+	m_iCurrentFrame = HyMath::Max(iFrameIndex, -1); // -1 indicates the constructor
+	m_pCurrentFrameLine->setPos(TIMELINE_LEFT_MARGIN + (m_iCurrentFrame * TIMELINE_NOTCH_SUBLINES_WIDTH), 0.0f);
 
 	update();
 
@@ -770,7 +737,7 @@ QJsonObject EntityDopeSheetScene::SerializeSelectedKeyFrames(int &iNumFramesOut)
 
 QJsonObject EntityDopeSheetScene::GetCurrentFrameProperties(EntityTreeItemData *pItemData) const
 {
-	if(static_cast<EntityModel &>(m_pEntStateData->GetModel()).IsCtor())
+	if(m_iCurrentFrame == -1)
 	{
 		QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
 		if(ctorKeyFrameMapRef.contains(pItemData) == false)
@@ -1459,7 +1426,8 @@ bool EntityDopeSheetScene::RemoveCallback(int iFrameIndex, QString sCallback)
 QList<QString *> EntityDopeSheetScene::GetCallbackList(int iFrameIndex) const
 {
 	if(iFrameIndex < 0)
-		return static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorCallbacksList();
+		HyGuiLog("EntityDopeSheetScene::GetCallbackList() - Ctor callbacks are not allowed", LOGTYPE_Error);
+
 	if(m_CallbacksMap.contains(iFrameIndex))
 		return m_CallbacksMap[iFrameIndex];
 	
@@ -1617,7 +1585,7 @@ QList<EntityTreeItemData *> EntityDopeSheetScene::GetItemsFromSelectedFrames() c
 
 void EntityDopeSheetScene::RefreshAllGfxItems()
 {
-	bool bIncludeCtor = m_pEntStateData->GetIndex() == 0;
+	bool bIncludeCtor = true;//m_pEntStateData->GetIndex() == 0;
 
 	// Gather all the entity items (root, children, shapes) into one list 'itemList'
 	QList<EntityTreeItemData *> entireItemList, shapeList;

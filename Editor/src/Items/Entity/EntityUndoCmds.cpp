@@ -1414,7 +1414,7 @@ EntityUndoCmd_PropertyModified::EntityUndoCmd_PropertyModified(PropertiesTreeMod
 		m_EntityTreeItemDataList.push_back(pModel->GetSubstate().value<EntityTreeItemData *>());
 
 	m_iStateIndex = pModel->GetProjItem()->GetWidget()->GetCurStateIndex();
-	m_iFrameIndex = dopeSheetSceneRef.IsCtor() ? -1 : dopeSheetSceneRef.GetCurrentFrame();
+	m_iFrameIndex = dopeSheetSceneRef.GetCurrentFrame();
 
 	for(EntityTreeItemData *pEntityTreeData : m_EntityTreeItemDataList)
 	{

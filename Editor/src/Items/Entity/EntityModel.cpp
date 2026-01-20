@@ -130,8 +130,6 @@ EntityModel::AuxWidgetsModel::AuxWidgetsModel(EntityModel &entityModelRef, int i
 
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
-	m_bCtor(false),
-	m_iCtorRestoreState(0),
 	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this),
 	m_AuxWidgetsModel(*this, itemFileDataRef.m_Meta["framesPerSecond"].toInt(60), itemFileDataRef.m_Meta["autoInitialize"].toBool(true))
 {
@@ -168,38 +166,9 @@ QAbstractItemModel *EntityModel::GetAuxWidgetsModel()
 	return &m_AuxWidgetsModel;
 }
 
-bool EntityModel::IsCtor() const
-{
-	return m_bCtor;
-}
-
-void EntityModel::SetCtor(bool bCtor)
-{
-	m_bCtor = bCtor;
-
-	if(m_bCtor)
-	{
-		m_iCtorRestoreState = m_ItemRef.GetWidget()->GetCurStateIndex();
-
-		m_ItemRef.GetWidget()->FocusState(0, -1);
-		static_cast<EntityStateData *>(GetStateData(0))->GetDopeSheetScene().SetCtor(true);
-	}
-	else
-	{
-		m_ItemRef.GetWidget()->FocusState(m_iCtorRestoreState, -1);
-		static_cast<EntityStateData *>(GetStateData(0))->GetDopeSheetScene().SetCtor(false);
-	}
-
-}
-
 QMap<EntityTreeItemData *, QJsonObject> &EntityModel::GetCtorKeyFramesMap()
 {
 	return m_CtorKeyFramesMap;
-}
-
-QList<QString *> &EntityModel::GetCtorCallbacksList()
-{
-	return m_CtorCallbacksList;
 }
 
 QList<QString *> &EntityModel::GetCallbacksList()
@@ -765,11 +734,7 @@ QString EntityModel::GenerateSrc_Ctor() const
 	for(auto iter = m_CtorKeyFramesMap.begin(); iter != m_CtorKeyFramesMap.end(); ++iter)
 		sSrc += GenerateSrc_SetProperties(iter.key(), iter.value(), "\n\t");
 
-	// 2: Callbacks
-	for(const QString *pCallback : m_CtorCallbacksList)
-		sSrc += *pCallback + "();\n\t";
-
-	// 3: Root Entity Timeline Events - Needs to be invoked in this order: Pause, SetState, SetFrame
+	// 2: Root Entity Timeline Events - Needs to be invoked in this order: Pause, SetState, SetFrame
 	QString sTimeLineFrameSrc;
 	if(m_CtorKeyFramesMap.contains(m_TreeModel.GetRootTreeItemData()))
 	{

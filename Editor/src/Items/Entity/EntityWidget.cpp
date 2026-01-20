@@ -447,7 +447,7 @@ void EntityWidget::SetExtrapolatedProperties()
 		ui->lblSelectedItemText->setVisible(true);
 
 		QString sProp;
-		if(entityDopeSheetSceneRef.IsCtor())
+		if(entityDopeSheetSceneRef.GetCurrentFrame() == -1)
 			sProp = "Constructor";
 		else
 			sProp = "Frame " % QString::number(entityDopeSheetSceneRef.GetCurrentFrame());
@@ -477,7 +477,7 @@ void EntityWidget::SetExtrapolatedProperties()
 		ui->lblSelectedItemText->setVisible(true);
 
 		QString sProp;
-		if(entityDopeSheetSceneRef.IsCtor())
+		if(entityDopeSheetSceneRef.GetCurrentFrame() == -1)
 			sProp = "Constructor";
 		else
 			sProp = "Frame " % QString::number(entityDopeSheetSceneRef.GetCurrentFrame());
@@ -1261,7 +1261,8 @@ void EntityWidget::on_chkEditMode_clicked()
 
 void EntityWidget::on_chkSetConstructor_clicked()
 {
-	static_cast<EntityModel *>(m_ItemRef.GetModel())->SetCtor(ui->chkSetConstructor->isChecked());
+	m_ItemRef.GetWidget()->FocusState(GetCurStateIndex(), -1);
+	static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().SetCurrentFrame(-1);
 }
 
 void EntityWidget::OnPreviewUpdate()

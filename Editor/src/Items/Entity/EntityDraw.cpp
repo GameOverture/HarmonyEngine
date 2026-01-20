@@ -392,7 +392,7 @@ void EntityDraw::SetExtrapolatedProperties()
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(m_pProjItem->GetWidget()->GetCurStateIndex()))->GetDopeSheetScene();
 
 	const float fFRAME_DURATION = 1.0f / static_cast<EntityModel &>(entityDopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond();
-	const int iDESTINATION_FRAME = entityDopeSheetSceneRef.IsCtor() ? -1 : entityDopeSheetSceneRef.GetCurrentFrame();
+	const int iDESTINATION_FRAME = entityDopeSheetSceneRef.GetCurrentFrame();
 
 	// Set the extrapolated properties for the 'm_RootEntity' item
 	EntityTreeItemData *pRootTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().GetRootTreeItemData();
@@ -531,7 +531,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		{
 			staleItemList.removeOne(pDrawItem);
 
-			if(pDrawItem->GetEntityTreeItemData()->IsReallocateDrawItem() || static_cast<EntityModel *>(m_pProjItem->GetModel())->IsCtor())
+			if(pDrawItem->GetEntityTreeItemData()->IsReallocateDrawItem())
 			{
 				EntityTreeItemData *pEntityTreeItemData = pDrawItem->GetEntityTreeItemData();
 				
@@ -630,7 +630,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
 
 		EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene();
-		iFrameIndex = dopeSheetSceneRef.IsCtor() ? -1 : dopeSheetSceneRef.GetCurrentFrame();
+		iFrameIndex = dopeSheetSceneRef.GetCurrentFrame();
 	}
 
 	// Transferring the children in 'm_ActiveTransform' back into 'm_RootEntity' will be done automatically in OnApplyJsonMeta()
