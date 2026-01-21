@@ -701,14 +701,17 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 
 	RefreshTransforms(); // Need to refreshTransforms first here because m_ActiveTransform was updated, and pCurTransform might be used below
 
-	SnapCandidates snapCandidates;
-	GetSnapCandidateList(snapCandidates);
-	if(snapCandidates.IsEmpty() == false && GetCurAction() != HYACTION_TransformingRotation) 
+	if(GetCurAction() != HYACTION_TransformingScale)
 	{
-		glm::vec2 vSnapOffset = SnapTransform(snapCandidates, pCurTransform);
-		m_ActiveTransform.pos.Offset(vSnapOffset);
+		SnapCandidates snapCandidates;
+		GetSnapCandidateList(snapCandidates);
+		if(snapCandidates.IsEmpty() == false && GetCurAction() != HYACTION_TransformingRotation) 
+		{
+			glm::vec2 vSnapOffset = SnapTransform(snapCandidates, pCurTransform);
+			m_ActiveTransform.pos.Offset(vSnapOffset);
 
-		RefreshTransforms();
+			RefreshTransforms();
+		}
 	}
 }
 
