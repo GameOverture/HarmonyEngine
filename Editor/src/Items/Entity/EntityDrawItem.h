@@ -35,7 +35,7 @@ public:
 	virtual bool IsSelectable() const override;
 	virtual bool IsSelected() override;
 
-	virtual void RefreshTransform(HyCamera2d *pCamera) override;
+	virtual void RefreshTransform() override;
 
 	GfxShapeHyView *GetShapeView();
 

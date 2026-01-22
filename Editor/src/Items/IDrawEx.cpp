@@ -215,7 +215,7 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 				b2AABB marqueeAabb = m_MarqueeCtrl.GetSelection();
 				for(IDrawExItem *pItem : m_ItemList)
 				{
-					if(pItem->GetTransformCtrl().IsContained(marqueeAabb, m_pCamera) && pItem->IsSelectable())
+					if(pItem->GetTransformCtrl().IsContained(marqueeAabb) && pItem->IsSelectable())
 						affectedItemList << pItem;
 				}
 
@@ -264,7 +264,7 @@ void IDrawEx::RefreshTransforms()
 		{
 			m_MultiTransform.rot_pivot.Set(0.0f, 0.0f);
 			m_MultiTransform.rot.Set(0.0f);
-			m_MultiTransform.WrapTo(m_SelectedItemList, m_pCamera);
+			m_MultiTransform.WrapTo(m_SelectedItemList);
 		}
 		else if(IsActionTransforming())
 		{
@@ -278,7 +278,7 @@ void IDrawEx::RefreshTransforms()
 		m_MultiTransform.Hide();
 
 	for(IDrawExItem *pItemDraw : m_ItemList /*m_SelectedItemList*/)
-		pItemDraw->RefreshTransform(m_pCamera);
+		pItemDraw->RefreshTransform();
 }
 
 void IDrawEx::ClearHover()
@@ -481,10 +481,10 @@ void IDrawEx::BeginTransform()
 		m_pCamera->ProjectToWorld(m_ptDragCenter, m_ptDragCenter);
 
 		// Set 'm_vDragStartSize'
-		glm::vec2 ptMidRight = pCurTransform->GetGrabPointWorldPos(GfxTransformCtrl::GRAB_MidRight, m_pCamera);
-		glm::vec2 ptMidLeft = pCurTransform->GetGrabPointWorldPos(GfxTransformCtrl::GRAB_MidLeft, m_pCamera);
-		glm::vec2 ptTopMid = pCurTransform->GetGrabPointWorldPos(GfxTransformCtrl::GRAB_TopMid, m_pCamera);
-		glm::vec2 ptBotMid = pCurTransform->GetGrabPointWorldPos(GfxTransformCtrl::GRAB_BotMid, m_pCamera);
+		glm::vec2 ptMidRight = pCurTransform->GetGrabPointWorldPos(GfxTransformCtrl::GRAB_MidRight);
+		glm::vec2 ptMidLeft = pCurTransform->GetGrabPointWorldPos(GfxTransformCtrl::GRAB_MidLeft);
+		glm::vec2 ptTopMid = pCurTransform->GetGrabPointWorldPos(GfxTransformCtrl::GRAB_TopMid);
+		glm::vec2 ptBotMid = pCurTransform->GetGrabPointWorldPos(GfxTransformCtrl::GRAB_BotMid);
 		HySetVec(m_vDragStartSize, glm::distance(ptMidLeft, ptMidRight), glm::distance(ptTopMid, ptBotMid));
 	}
 
@@ -517,10 +517,14 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
 
 	GfxTransformCtrl *pCurTransform = nullptr;
+	IDrawExItem *pSingleItem = nullptr;
 	if(m_MultiTransform.IsShown())
 		pCurTransform = &m_MultiTransform;
 	else
+	{
+		pSingleItem = m_SelectedItemList[0];
 		pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
+	}
 
 	// Process the transform
 	switch(GetCurAction())
@@ -642,14 +646,12 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 			break;
 		}
 
-		glm::vec2 ptDragAnchorPoint = pCurTransform->GetGrabPointWorldPos(eAnchorPoint, m_pCamera);
-		m_ActiveTransform.scale_pivot.Set(ptDragAnchorPoint);
-		m_ActiveTransform.rot_pivot.Set(m_ptDragCenter);
+		glm::vec2 ptDragAnchorPoint = pCurTransform->GetGrabPointWorldPos(eAnchorPoint);
 
 		glm::vec2 vDesiredSize(m_vDragStartSize);
 		if(bScaleDimensions.x)
 		{
-			glm::vec2 ptAnchorWidth = pCurTransform->GetGrabPointWorldPos(eAnchorWidth, m_pCamera);
+			glm::vec2 ptAnchorWidth = pCurTransform->GetGrabPointWorldPos(eAnchorWidth);
 			if(ptAnchorWidth == ptDragAnchorPoint)
 				vDesiredSize.x = 0.01f;
 			else
@@ -660,7 +662,7 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		}
 		if(bScaleDimensions.y)
 		{
-			glm::vec2 ptAnchorHeight = pCurTransform->GetGrabPointWorldPos(eAnchorHeight, m_pCamera);
+			glm::vec2 ptAnchorHeight = pCurTransform->GetGrabPointWorldPos(eAnchorHeight);
 			if(ptAnchorHeight == ptDragAnchorPoint)
 				vDesiredSize.y = 0.01f;
 			else
@@ -686,11 +688,19 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 		if(std::isnan(vScaleAmt.x) || std::isnan(vScaleAmt.y))
 		{
 			HyGuiLog("Scaling resulted in NaN", LOGTYPE_Error);
-			int asdf = 0;
-			asdf++;
+			break;
 		}
 
-		m_ActiveTransform.scale.Set(vScaleAmt);
+		if(pSingleItem)
+		{
+			//pSingleItem->GetHyNode()->scale_pivot.Set(ptDragAnchorPoint);
+			pSingleItem->GetHyNode()->scale.Set(vScaleAmt);
+		}
+		else
+		{
+			m_ActiveTransform.scale_pivot.Set(ptDragAnchorPoint);
+			m_ActiveTransform.scale.Set(vScaleAmt);
+		}
 
 		break; }
 
@@ -770,19 +780,19 @@ void IDrawEx::GetSnapCandidateList(SnapCandidates &snapCandidatesOut)
 			{
 				if(pItem->IsSelected() == false && pItem->GetTransformCtrl().IsValid())
 				{
-					glm::vec2 ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(GfxTransformCtrl::GRAB_BotLeft, m_pCamera);
+					glm::vec2 ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(GfxTransformCtrl::GRAB_BotLeft);
 					snapCandidatesOut.m_HorzSet.insert(ptGrabPt.y);
 					snapCandidatesOut.m_VertSet.insert(ptGrabPt.x);
 
-					ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(GfxTransformCtrl::GRAB_BotRight, m_pCamera);
+					ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(GfxTransformCtrl::GRAB_BotRight);
 					snapCandidatesOut.m_HorzSet.insert(ptGrabPt.y);
 					snapCandidatesOut.m_VertSet.insert(ptGrabPt.x);
 
-					ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(GfxTransformCtrl::GRAB_TopRight, m_pCamera);
+					ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(GfxTransformCtrl::GRAB_TopRight);
 					snapCandidatesOut.m_HorzSet.insert(ptGrabPt.y);
 					snapCandidatesOut.m_VertSet.insert(ptGrabPt.x);
 
-					ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(GfxTransformCtrl::GRAB_TopLeft, m_pCamera);
+					ptGrabPt = pItem->GetTransformCtrl().GetGrabPointWorldPos(GfxTransformCtrl::GRAB_TopLeft);
 					snapCandidatesOut.m_HorzSet.insert(ptGrabPt.y);
 					snapCandidatesOut.m_VertSet.insert(ptGrabPt.x);
 
@@ -818,7 +828,7 @@ glm::vec2 IDrawEx::SnapTransform(const SnapCandidates &snapCandidatesRef, GfxTra
 			m_pCamera->ProjectToWorld(ptTestPoint, ptTestPoint);
 		}
 		else
-			ptTestPoint = pCurTransform->GetGrabPointWorldPos(static_cast<GfxTransformCtrl::GrabPointType>(i), m_pCamera);
+			ptTestPoint = pCurTransform->GetGrabPointWorldPos(static_cast<GfxTransformCtrl::GrabPointType>(i));
 
 		if(bSnappedHorz == false)
 		{

@@ -55,11 +55,12 @@ bool GfxTransformCtrl::IsValid() const
 	return m_BoundingVolume.GetShapeType() != HYFIXTURE_Nothing;
 }
 
-void GfxTransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera)
+void GfxTransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShapeTransform)
 {
 	if(boundingShape.IsValid() == false)
 		return;
 
+	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
 	glm::vec2 ptGrabPos[NUM_GRABPOINTS];
 
 	b2AABB aabb;
@@ -77,7 +78,7 @@ void GfxTransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShape
 	glm::vec2 vTopEdge = ptGrabPos[GRAB_TopRight] - ptGrabPos[GRAB_TopLeft];
 	glm::vec2 vExtrudeDir = glm::normalize(HyMath::PerpendicularCounterClockwise(vTopEdge));
 	glm::vec2 ptExtrudeStart = ptGrabPos[GRAB_TopLeft] + (vTopEdge * 0.5f);
-	ptGrabPos[GRAB_Rotate] = ptExtrudeStart + (vExtrudeDir * 50.0f); // 50px line segment length
+	ptGrabPos[GRAB_Rotate] = ptExtrudeStart + (vExtrudeDir * (42.0f * (1.0f / pCamera->GetZoom()))); // 42px line segment length
 
 	for(int i = 0; i < NUM_GRABPOINTS; ++i)
 	{
@@ -104,7 +105,7 @@ void GfxTransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShape
 	m_fCachedRotation = HyMath::AngleFromVector(ptRotatePos - ptExtrudeStart) - 90.0f;
 }
 
-void GfxTransformCtrl::WrapTo(QList<IDrawExItem *> itemDrawList, HyCamera2d *pCamera)
+void GfxTransformCtrl::WrapTo(QList<IDrawExItem *> itemDrawList)
 {
 	HyShape2d boundingShape;
 
@@ -113,7 +114,7 @@ void GfxTransformCtrl::WrapTo(QList<IDrawExItem *> itemDrawList, HyCamera2d *pCa
 		glm::mat4 mtxShapeTransform;
 
 		itemDrawList[0]->ExtractTransform(boundingShape, mtxShapeTransform);
-		WrapTo(boundingShape, mtxShapeTransform, pCamera);
+		WrapTo(boundingShape, mtxShapeTransform);
 
 		return;
 	}
@@ -234,7 +235,7 @@ void GfxTransformCtrl::WrapTo(QList<IDrawExItem *> itemDrawList, HyCamera2d *pCa
 	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot * -1.0f);
 	//
 	//boundingShape.TransformSelf(mtxRotateCompensate);
-	WrapTo(boundingShape, glm::mat4(1.0f), pCamera);
+	WrapTo(boundingShape, glm::mat4(1.0f));
 }
 
 bool GfxTransformCtrl::IsShown() const
@@ -273,7 +274,7 @@ void GfxTransformCtrl::GetCentroid(glm::vec2 &ptCenterOut) const
 		HyGuiLog("GfxTransformCtrl::GetCentroid() called on invalid bounding volume", LOGTYPE_Error);
 }
 
-glm::vec2 GfxTransformCtrl::GetGrabPointWorldPos(GrabPointType eGrabPoint, HyCamera2d *pCamera) const
+glm::vec2 GfxTransformCtrl::GetGrabPointWorldPos(GrabPointType eGrabPoint) const
 {
 	HyAssert(eGrabPoint > GRAB_None && eGrabPoint < NUM_GRABPOINTS, "GfxTransformCtrl::GetGrabPointPos invalid grab enum");
 	return m_GrabPointModels[eGrabPoint]->GetPos();
@@ -313,7 +314,7 @@ GfxTransformCtrl::GrabPointType GfxTransformCtrl::IsMouseOverGrabPoint() const
 	return GRAB_None;
 }
 
-bool GfxTransformCtrl::IsContained(const b2AABB &aabb, HyCamera2d *pCamera) const
+bool GfxTransformCtrl::IsContained(const b2AABB &aabb) const
 {
 	for(uint i = GRAB_BotLeft; i < 4; ++i)
 	{

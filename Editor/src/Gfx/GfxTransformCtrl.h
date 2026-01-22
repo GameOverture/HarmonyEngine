@@ -54,22 +54,22 @@ public:
 
 	bool IsValid() const;
 
-	void WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShapeTransform, HyCamera2d *pCamera);
-	void WrapTo(QList<IDrawExItem *> itemDrawList, HyCamera2d *pCamera);
+	void WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShapeTransform);
+	void WrapTo(QList<IDrawExItem *> itemDrawLis);
 
 	bool IsShown() const;
 	void Show(bool bShowGrabPoints);
 	void Hide();
 
 	void GetCentroid(glm::vec2 &ptCenterOut) const;
-	glm::vec2 GetGrabPointWorldPos(GrabPointType eGrabPoint, HyCamera2d *pCamera) const;
+	glm::vec2 GetGrabPointWorldPos(GrabPointType eGrabPoint) const;
 
 	float GetCachedRotation() const;
 
 	bool IsMouseOverBoundingVolume();
 	GrabPointType IsMouseOverGrabPoint() const;
 
-	bool IsContained(const b2AABB &aabb, HyCamera2d *pCamera) const;
+	bool IsContained(const b2AABB &aabb) const;
 };
 
 #endif // GFXTRANSFORMCTRL_H

@@ -35,13 +35,13 @@ bool IDrawExItem::IsMouseInBounds()
 	return HyEngine::Input().GetWorldMousePos(ptWorldMousePos) && boundingShape.TestPoint(ptWorldMousePos, transformMtx);
 }
 
-void IDrawExItem::RefreshTransform(HyCamera2d *pCamera)
+void IDrawExItem::RefreshTransform()
 {
 	HyShape2d boundingShape;
 	glm::mat4 mtxShapeTransform;
 	ExtractTransform(boundingShape, mtxShapeTransform);
 
-	m_Transform.WrapTo(boundingShape, mtxShapeTransform, pCamera);
+	m_Transform.WrapTo(boundingShape, mtxShapeTransform);
 }
 
 void IDrawExItem::ShowTransformCtrl(bool bShowGrabPoints)

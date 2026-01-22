@@ -172,9 +172,9 @@ EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 	return m_pEntityTreeItemData->IsSelected();
 }
 
-/*virtual*/ void EntityDrawItem::RefreshTransform(HyCamera2d *pCamera) /*override*/
+/*virtual*/ void EntityDrawItem::RefreshTransform() /*override*/
 {
-	IDrawExItem::RefreshTransform(pCamera);
+	IDrawExItem::RefreshTransform();
 	if(m_pShapeView)
 		m_pShapeView->RefreshView(false);
 }
