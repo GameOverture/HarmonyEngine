@@ -282,6 +282,19 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 		if(sPropertyName == "Text Indent")
 			return QJsonValue(static_cast<int>(static_cast<HyText2d *>(pThisHyNode)->GetTextIndent()));
 	}
+	else if(sCategory == "Shape")
+	{
+		if(sPropertyName == "Type")
+			return QJsonValue(HyGlobal::ShapeName(static_cast<GfxShapeHyView *>(pThisHyNode)->GetModel()->GetType()));
+		if(sPropertyName == "Data")
+		{
+			QJsonArray dataArray;
+			QList<float> floatList = m_pEntityTreeItemData->GetShape2dModel()->GetData();
+			for(float fVal : floatList)
+				dataArray.append(QJsonValue(static_cast<double>(fVal)));
+			return dataArray;
+		}
+	}
 	else if(sCategory == "Widget")
 	{
 		if(sPropertyName == "Enabled")
@@ -388,6 +401,7 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 			return QJsonValue(static_cast<HySlider *>(pThisHyNode)->GetOrientation() == HYORIENT_Vertical);
 	}
 
+	HyGuiLog("EntityDrawItem::ExtractPropertyData - unhandled property: " % sCategory % " -> " % sPropertyName, LOGTYPE_Error);
 	return QJsonValue();
 }
 

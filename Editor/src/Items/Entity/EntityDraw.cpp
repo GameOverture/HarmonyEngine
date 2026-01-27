@@ -93,8 +93,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	}
 	EntityTreeItemData *pTreeItemData = pCurEditItem->GetEntityTreeItemData();
 
-	glm::vec2 ptCurMousePos;
-	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
+	glm::vec2 ptWorldMousePos;
+	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
 
 	switch(m_eEditModeState)
 	{
@@ -105,7 +105,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	case EDITMODE_Idle:
 		if(pTreeItemData->GetShape2dModel())
 		{
-			ShapeMouseMoveResult eResult = pTreeItemData->GetShape2dModel()->MouseMoveIdle(ptCurMousePos);
+			ShapeMouseMoveResult eResult = pTreeItemData->GetShape2dModel()->MouseMoveIdle(ptWorldMousePos);
 			switch(eResult)
 			{
 			case SHAPEMOUSEMOVE_Creation:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
@@ -127,12 +127,12 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	case EDITMODE_MouseDownOutside:
 	case EDITMODE_MouseDownTransform: {
-		QPointF dragDelta = QPointF(ptCurMousePos.x, ptCurMousePos.y) - QPointF(m_ptDragStart.x, m_ptDragStart.y);
+		QPointF dragDelta = QPointF(ptWorldMousePos.x, ptWorldMousePos.y) - QPointF(m_ptDragStart.x, m_ptDragStart.y);
 		if(dragDelta.manhattanLength() >= MANHATTAN_DRAG_THRESHOLD)
 		{
 			if(m_eEditModeState == EDITMODE_MouseDownOutside)
 			{
-				m_MarqueeCtrl.SetAsDrag(m_ptDragStart, ptCurMousePos);
+				m_MarqueeCtrl.SetAsDrag(m_ptDragStart, ptWorldMousePos);
 				m_eEditModeState = EDITMODE_MouseDragMarquee;
 			}
 			else // EDITMODE_MouseDownTransform
@@ -142,7 +142,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	case EDITMODE_MouseDragMarquee:
 		if(pTreeItemData->GetShape2dModel())
-			m_MarqueeCtrl.SetAsDrag(m_ptDragStart, ptCurMousePos);
+			m_MarqueeCtrl.SetAsDrag(m_ptDragStart, ptWorldMousePos);
 		else
 			HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_MouseDragMarquee with unsupported edit item type!", LOGTYPE_Error);
 		break;
@@ -151,7 +151,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		if(pTreeItemData->GetShape2dModel())
 		{
 			bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-			pTreeItemData->GetShape2dModel()->MouseMoveTransform(bShiftHeld, m_ptDragStart, ptCurMousePos);
+			pTreeItemData->GetShape2dModel()->MouseMoveTransform(bShiftHeld, m_ptDragStart, ptWorldMousePos);
 		}
 		else
 			HyGuiLog("EntityDraw::OnMouseMoveEvent - fpDoMouseDownTransform with unsupported edit item type!", LOGTYPE_Error);

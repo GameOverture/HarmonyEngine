@@ -94,53 +94,56 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 		}
 		m_PrimList[0]->SetAsShape(*static_cast<HyShape2d *>(m_pModel->GetFixture(0)));
 
-		// Set `m_PrimOutline`
-		if(m_pModel->GetType() == SHAPE_Box)
+		if(m_PrimList[0]->GetShapeType() != HYFIXTURE_Nothing)
 		{
-			b2Vec2 *pVerts = static_cast<HyShape2d *>(m_pModel->GetFixture(0))->GetAsPolygon().vertices;
-			std::vector<glm::vec2> projectedVertList;
-			for(int i = 0; i < 4; ++i)
+			// Set `m_PrimOutline`
+			if(m_pModel->GetType() == SHAPE_Box)
 			{
-				glm::vec2 ptScreenPos;
-				pCamera->ProjectToCamera(glm::vec2(pVerts[i].x, pVerts[i].y), ptScreenPos);
-				projectedVertList.push_back(ptScreenPos);
+				b2Vec2 *pVerts = static_cast<HyShape2d *>(m_pModel->GetFixture(0))->GetAsPolygon().vertices;
+				std::vector<glm::vec2> projectedVertList;
+				for(int i = 0; i < 4; ++i)
+				{
+					glm::vec2 ptScreenPos;
+					pCamera->ProjectToCamera(glm::vec2(pVerts[i].x, pVerts[i].y), ptScreenPos);
+					projectedVertList.push_back(ptScreenPos);
+				}
+
+				m_PrimOutline.SetAsPolygon(projectedVertList);
 			}
+			else if(m_pModel->GetType() == SHAPE_Circle)
+			{
+				b2Circle circle = static_cast<HyShape2d *>(m_pModel->GetFixture(0))->GetAsCircle();
 
-			m_PrimOutline.SetAsPolygon(projectedVertList);
+				glm::vec2 ptCenter(circle.center.x, circle.center.y);
+				pCamera->ProjectToCamera(ptCenter, ptCenter);
+				float fRadius = circle.radius * pCamera->GetZoom();
+
+				m_PrimOutline.SetAsCircle(ptCenter, fRadius);
+			}
+			else if(m_pModel->GetType() == SHAPE_LineSegment)
+			{
+				b2Segment seg = static_cast<HyShape2d *>(m_pModel->GetFixture(0))->GetAsSegment();
+				glm::vec2 ptOne(seg.point1.x, seg.point1.y);
+				pCamera->ProjectToCamera(ptOne, ptOne);
+				glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
+				pCamera->ProjectToCamera(ptTwo, ptTwo);
+
+				m_PrimOutline.SetAsLineSegment(ptOne, ptTwo);
+			}
+			else if(m_pModel->GetType() == SHAPE_Capsule)
+			{
+				b2Capsule capsule = static_cast<HyShape2d *>(m_pModel->GetFixture(0))->GetAsCapsule();
+				glm::vec2 ptOne(capsule.center1.x, capsule.center1.y);
+				pCamera->ProjectToCamera(ptOne, ptOne);
+				glm::vec2 ptTwo(capsule.center2.x, capsule.center2.y);
+				pCamera->ProjectToCamera(ptTwo, ptTwo);
+				float fRadius = capsule.radius * pCamera->GetZoom();
+
+				m_PrimOutline.SetAsLineSegment(ptOne, ptTwo);
+			}
+			else
+				HyGuiLog("GfxShapeHyView::RefreshView - Unsupported shape type for primitive sync", LOGTYPE_Error);
 		}
-		else if(m_pModel->GetType() == SHAPE_Circle)
-		{
-			b2Circle circle = static_cast<HyShape2d *>(m_pModel->GetFixture(0))->GetAsCircle();
-
-			glm::vec2 ptCenter(circle.center.x, circle.center.y);
-			pCamera->ProjectToCamera(ptCenter, ptCenter);
-			float fRadius = circle.radius * pCamera->GetZoom();
-
-			m_PrimOutline.SetAsCircle(ptCenter, fRadius);
-		}
-		else if(m_pModel->GetType() == SHAPE_LineSegment)
-		{
-			b2Segment seg = static_cast<HyShape2d *>(m_pModel->GetFixture(0))->GetAsSegment();
-			glm::vec2 ptOne(seg.point1.x, seg.point1.y);
-			pCamera->ProjectToCamera(ptOne, ptOne);
-			glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
-			pCamera->ProjectToCamera(ptTwo, ptTwo);
-
-			m_PrimOutline.SetAsLineSegment(ptOne, ptTwo);
-		}
-		else if(m_pModel->GetType() == SHAPE_Capsule)
-		{
-			b2Capsule capsule = static_cast<HyShape2d *>(m_pModel->GetFixture(0))->GetAsCapsule();
-			glm::vec2 ptOne(capsule.center1.x, capsule.center1.y);
-			pCamera->ProjectToCamera(ptOne, ptOne);
-			glm::vec2 ptTwo(capsule.center2.x, capsule.center2.y);
-			pCamera->ProjectToCamera(ptTwo, ptTwo);
-			float fRadius = capsule.radius * pCamera->GetZoom();
-
-			m_PrimOutline.SetAsLineSegment(ptOne, ptTwo);
-		}
-		else
-			HyGuiLog("GfxShapeHyView::RefreshView - Unsupported shape type for primitive sync", LOGTYPE_Error);
 	}
 	else // SHAPE_Polygon
 	{

@@ -92,8 +92,6 @@ public:
 
 protected:
 	ShapeMouseMoveResult OnMouseMoveIdle(glm::vec2 ptWorldMousePos);
-	//ShapeMouseMoveResult OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
-
 	void DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos);
 
 	bool CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos);

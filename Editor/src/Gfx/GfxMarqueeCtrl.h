@@ -24,7 +24,7 @@ public:
 	GfxMarqueeCtrl(HyEntity2d *pParent);
 	virtual ~GfxMarqueeCtrl();
 
-	void SetAsDrag(glm::vec2 ptStartPos, glm::vec2 ptDragPos);
+	void SetAsDrag(glm::vec2 ptWorldStartPos, glm::vec2 ptWorldDragPos);
 	b2AABB GetSelection();
 	void Hide();
 

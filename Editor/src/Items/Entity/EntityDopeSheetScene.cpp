@@ -495,16 +495,18 @@ int EntityDopeSheetScene::DetermineEmptyTimeFromFrame(int iFrameIndex) const
 // NOTE: Tween properties are represented by a single property keyframe
 QList<QPair<QString, QString>> EntityDopeSheetScene::GetUniquePropertiesList(EntityTreeItemData *pItemData, bool bCollapseTweenProps, bool bIncludeConstructor) const
 {
-	QSet<QPair<QString, QString>> uniquePropertiesSet;
-	if(m_KeyFramesMap.contains(pItemData) == false)
-		return QList<QPair<QString, QString>>();
-
-	QList<QJsonObject> propsObjList = m_KeyFramesMap[pItemData].values();
-
 	QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
+	
+	// Assemble list of QJsonObjects
+	QList<QJsonObject> propsObjList;
+	if(m_KeyFramesMap.contains(pItemData))
+		propsObjList = m_KeyFramesMap[pItemData].values();
 	if(bIncludeConstructor && ctorKeyFrameMapRef.contains(pItemData))
 		propsObjList.prepend(ctorKeyFrameMapRef[pItemData]);
+	if(propsObjList.empty())
+		return QList<QPair<QString, QString>>();
 
+	QSet<QPair<QString, QString>> uniquePropertiesSet;
 	for(QJsonObject propsObj : propsObjList)
 	{
 		QStringList sCategoryList = propsObj.keys();
@@ -808,8 +810,19 @@ QJsonValue EntityDopeSheetScene::BasicExtrapolateKeyFrameProperty(EntityTreeItem
 			iter--; // Don't want an iterator with a greater key, so go back one
 	}
 
-	if(iter == itemKeyFrameMapRef.end())
+	if(iter == itemKeyFrameMapRef.end()) // Still not found
+	{
+		// Lastly, check ctor
+		QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
+		if(ctorKeyFrameMapRef.contains(pItemData))
+		{
+			QJsonObject ctorKeyFrameObj = ctorKeyFrameMapRef[pItemData];
+			if(ctorKeyFrameObj.contains(sCategoryName) && ctorKeyFrameObj[sCategoryName].toObject().contains(sPropName))
+				return ctorKeyFrameObj[sCategoryName].toObject()[sPropName];
+		}
+
 		return QJsonValue();
+	}
 
 	// Starting with this key frame and going backwards in time, search for the property 'sCategoryName/sPropName' and return the value
 	while(true)

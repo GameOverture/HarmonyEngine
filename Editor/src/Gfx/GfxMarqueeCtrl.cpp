@@ -28,7 +28,7 @@ GfxMarqueeCtrl::GfxMarqueeCtrl(HyEntity2d *pParent) :
 {
 }
 
-void GfxMarqueeCtrl::SetAsDrag(glm::vec2 ptStartPos, glm::vec2 ptDragPos)
+void GfxMarqueeCtrl::SetAsDrag(glm::vec2 ptWorldStartPos, glm::vec2 ptWorldDragPos)
 {
 	if(m_bIsActive == false)
 	{
@@ -38,17 +38,16 @@ void GfxMarqueeCtrl::SetAsDrag(glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 	}
 
 	glm::vec2 ptLowerBound, ptUpperBound, ptCenter;
-	HySetVec(ptLowerBound, ptStartPos.x < ptDragPos.x ? ptStartPos.x : ptDragPos.x, ptStartPos.y < ptDragPos.y ? ptStartPos.y : ptDragPos.y);
-	HySetVec(ptUpperBound, ptStartPos.x >= ptDragPos.x ? ptStartPos.x : ptDragPos.x, ptStartPos.y >= ptDragPos.y ? ptStartPos.y : ptDragPos.y);
+	HySetVec(ptLowerBound, ptWorldStartPos.x < ptWorldDragPos.x ? ptWorldStartPos.x : ptWorldDragPos.x, ptWorldStartPos.y < ptWorldDragPos.y ? ptWorldStartPos.y : ptWorldDragPos.y);
+	HySetVec(ptUpperBound, ptWorldStartPos.x >= ptWorldDragPos.x ? ptWorldStartPos.x : ptWorldDragPos.x, ptWorldStartPos.y >= ptWorldDragPos.y ? ptWorldStartPos.y : ptWorldDragPos.y);
 	ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
+	m_BoundingVolume.SetAsBox(HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f));
 
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
 	glm::vec2 ptWindowLowerBound, ptWindowUpperBound, ptWindowCenter;
 	pCamera->ProjectToCamera(ptLowerBound, ptWindowLowerBound);
 	pCamera->ProjectToCamera(ptUpperBound, ptWindowUpperBound);
 	ptWindowCenter = ptWindowLowerBound + ((ptWindowUpperBound - ptWindowLowerBound) * 0.5f);
-
-	m_BoundingVolume.SetAsBox(HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f));
 	m_Outline.SetAsBox(HyRect((ptWindowUpperBound.x - ptWindowLowerBound.x) * 0.5f, (ptWindowUpperBound.y - ptWindowLowerBound.y) * 0.5f, ptWindowCenter, 0.0f));
 
 	SetVisible(true);

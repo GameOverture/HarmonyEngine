@@ -209,7 +209,7 @@ class EntityTreeItemData : public TreeModelItemData
 	EntityItemType										m_eEntType;
 
 	EntityPropertiesTreeModel *							m_pPropertiesModel;
-	GfxShapeModel *									m_pShape2dModel;		// Only allocated when this item is a shape (primitive or fixture)
+	GfxShapeModel *										m_pShape2dModel;		// Only allocated when this item is a shape (primitive or fixture)
 
 	QString												m_sPromotedEntityType;
 	EntityItemDeclarationType							m_eDeclarationType;
