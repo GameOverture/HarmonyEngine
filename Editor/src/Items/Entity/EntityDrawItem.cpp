@@ -175,8 +175,8 @@ EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 /*virtual*/ void EntityDrawItem::RefreshTransform() /*override*/
 {
 	IDrawExItem::RefreshTransform();
-	if(m_pShapeView)
-		m_pShapeView->RefreshView(false);
+	//if(m_pShapeView)
+	//	m_pShapeView->RefreshView(false);
 }
 
 GfxShapeHyView *EntityDrawItem::GetShapeView()

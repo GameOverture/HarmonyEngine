@@ -164,20 +164,35 @@ b2Capsule HyShape2d::GetAsCapsule() const
 {
 	std::vector<glm::vec2> vertList;
 
+	if(floatList.empty())
+		return vertList;
+
 	switch(eFixtureType)
 	{
 	case HYFIXTURE_Nothing:
 		SetAsNothing();
 		break;
 
-	case HYFIXTURE_Polygon:
+	case HYFIXTURE_Polygon: {
 		// NOTE: The final float indicating whether this is a closed polygon is not supplied here, which is unlike how HyEditor serializes polygons (and chains)
-		HyAssert((floatList.size() & 1) == 0, "HyShape2d::DeserializeSelf recieved an odd number of floats to deserialize a polygon");
-		vertList.reserve(floatList.size() / 2);
+		//       If this function is invoked it is ass
+		if(floatList.size() & 1)
+		{
+			HyLogWarning("HyShape2d::DeserializeSelf recieved an odd number of floats to deserialize a polygon");
+			return vertList;
+		}
+		int iNumVerts = floatList.size() / 2;
+		if(iNumVerts > B2_MAX_POLYGON_VERTICES)
+		{
+			HyLogWarning("HyShape2d::DeserializeSelf recieved too many vertices (" << vertList.size() << ") to deserialize a polygon. Max is " << B2_MAX_POLYGON_VERTICES);
+			return vertList;
+		}
+
+		vertList.reserve(iNumVerts);
 		for(int i = 0; i < floatList.size(); i += 2)
 			vertList.emplace_back(glm::vec2(floatList[i], floatList[i + 1]));
 		SetAsPolygon(vertList);
-		break;
+		break; }
 
 	case HYFIXTURE_Circle:
 		vertList.reserve(5);

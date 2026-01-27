@@ -18,10 +18,10 @@ class GfxGrabPointView;
 class GfxShapeHyView : public IGfxShapeView, public HyEntity2d
 {
 	HyPrimitive2d				m_PrimOutline;			// This primitive is set as line chain. It forms an outline unaffected by camera zoom, using window coordinates
-	QList<HyPrimitive2d *>		m_PrimList;				// This shape represents how the item's transformation is applied. Uses world/camera coordinates. Usually just one primitive, but could be multiple for complex polygons
+	QList<HyPrimitive2d *>		m_PrimList;				// A list of primitives that represents how the shape is currently stored in data. Uses world/camera coordinates. Usually just one primitive, but could be multiple for complex polygons
 	QList<GfxGrabPointView *>	m_GrabPointViewList;	// Project to window coordinates
 
-	HyPrimitive2d				m_AppendSegmentLine;	// A red line to the crosshair cursor from the last appended vertex
+	QList<HyPrimitive2d *>		m_PrimPreviewList;		// A list of primitives used for previewing transformations before they are committed. Uses world/camera coordinates
 
 public:
 	GfxShapeHyView(HyEntity2d *pParent = nullptr);
@@ -30,13 +30,13 @@ public:
 	HyPrimitive *GetPrimitive(int iIndex);
 
 	virtual void RefreshColor() override;
-	virtual void RefreshView(bool bTransformPreview) override;
-
-	virtual void OnMouseMoveIdle(ShapeMouseMoveResult eResult) override;
+	virtual void RefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) override;
 
 protected:
 	void ClearPrimitives();
 	void ClearGrabPoints();
+
+	void ClearPreviewPrimitives();
 };
 
 #endif // GfxShapeHyView_H

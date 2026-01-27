@@ -14,15 +14,15 @@
 
 GfxShapeModel::GfxShapeModel(HyColor color, EditorShape eShape /*= SHAPE_None*/, const QList<float> &floatList /*= QList<float>()*/) :
 	m_eType(SHAPE_None),
+	m_mtxTransform(1.0f),
 	m_bSelfIntersecting(false),
 	m_ptSelfIntersection(0.0f, 0.0f),
 	m_GrabPointCenter(GRABPOINT_Center),
 	m_bReverseWindingOrder(false),
 	m_bLoopClosed(false),
-	m_iGrabPointHoverIndex(-1),
-	m_iInsertVertexIndex(-1),
-	m_bTransformShiftMod(false),
-	m_eTransformType(TRANSFORM_None)
+	m_eCurTransform(SHAPEMOUSEMOVE_None),
+	m_iVertexIndex(-1),
+	m_bTransformShiftMod(false)
 {
 	SetData(color, eShape, floatList);
 }
@@ -127,7 +127,7 @@ void GfxShapeModel::SetType(EditorShape eNewShape)
 	}
 
 	for(IGfxShapeView *pView : m_ViewList)
-		pView->RefreshView(false);
+		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
 }
 
 QList<float> GfxShapeModel::GetData() const
@@ -283,16 +283,22 @@ void GfxShapeModel::SetData(HyColor color, EditorShape eShape, const QList<float
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	for(IGfxShapeView *pView : m_ViewList)
-		pView->RefreshView(false);
+		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
 }
 
-void GfxShapeModel::TransformSelf(glm::mat4 mtxTransform)
+void GfxShapeModel::GetTransformPreview(glm::mat4 &mtxTransformOut, int &iVertexIndexOut) const
+{
+	mtxTransformOut = m_mtxTransform;
+	iVertexIndexOut = m_iVertexIndex;
+}
+
+void GfxShapeModel::TransformData(glm::mat4 mtxTransform)
 {
 	for(IHyFixture2d *pFixture : m_FixtureList)
 		pFixture->TransformSelf(mtxTransform);
 
 	for(IGfxShapeView *pView : m_ViewList)
-		pView->RefreshView(false);
+		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
 }
 
 void GfxShapeModel::AddView(IGfxShapeView *pView)
@@ -329,29 +335,75 @@ const GfxGrabPointModel &GfxShapeModel::GetCenterGrabPoint() const
 	return m_GrabPointCenter;
 }
 
+bool GfxShapeModel::IsAllGrabPointsSelected() const
+{
+	for(const GfxGrabPointModel &grabPtModel : m_GrabPointList)
+	{
+		if(grabPtModel.IsSelected() == false)
+			return false;
+	}
+	return true;
+}
+
 bool GfxShapeModel::IsLoopClosed() const
 {
 	return m_bLoopClosed;
 }
 
-ShapeMouseMoveResult GfxShapeModel::MouseMoveIdle(QPointF ptWorldMousePos)
+ShapeMouseMoveResult GfxShapeModel::MouseMoveIdle(glm::vec2 ptWorldMousePos)
 {
 	ShapeMouseMoveResult eResult = OnMouseMoveIdle(ptWorldMousePos);
 
 	for(IGfxShapeView *pView : m_ViewList)
-		pView->OnMouseMoveIdle(eResult);
+		pView->RefreshView(eResult, false);
 
 	return eResult;
 }
 
-bool GfxShapeModel::MousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos)
+ShapeMouseMoveResult GfxShapeModel::MousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos)
 {
-	bool bTransformStarted = OnMousePressEvent(bShiftHeld, uiButtonFlags, ptWorldMousePos);
+	ShapeMouseMoveResult eResult = OnMouseMoveIdle(ptWorldMousePos);
+	if(eResult == SHAPEMOUSEMOVE_AppendVertex || eResult == SHAPEMOUSEMOVE_InsertVertex)
+	{
+		if(m_iVertexIndex == -1)
+		{
+			HyGuiLog("GfxShapeModel::MousePressEvent - Insert vertex index was -1 on AddVertex/Crosshair", LOGTYPE_Error);
+			return SHAPEMOUSEMOVE_None;
+		}
+		m_GrabPointList.insert(m_GrabPointList.begin() + m_iVertexIndex, GfxGrabPointModel(GRABPOINT_VertexSelected, m_ptVertexPos));
+		for(int i = 0; i < m_GrabPointList.size(); ++i)
+			m_GrabPointList[i].SetSelected(false);
+		m_GrabPointList[m_iVertexIndex].SetSelected(true);
+	}
+	else if(eResult == SHAPEMOUSEMOVE_HoverVertex || eResult == SHAPEMOUSEMOVE_HoverSelectedVertex)
+	{
+		if(m_iVertexIndex == -1)
+		{
+			HyGuiLog("GfxShapeModel::OnMousePressEvent - Hover vertex index was -1 on HoverVertex/HoverSelectedVertex", LOGTYPE_Error);
+			return SHAPEMOUSEMOVE_None;
+		}
+
+		if(bShiftHeld)
+		{
+			if(uiButtonFlags & Qt::LeftButton)
+				m_GrabPointList[m_iVertexIndex].SetSelected(!m_GrabPointList[m_iVertexIndex].IsSelected());
+			else if(uiButtonFlags & Qt::RightButton)
+				m_GrabPointList[m_iVertexIndex].SetSelected(false);
+		}
+		else
+		{
+			if(uiButtonFlags & Qt::LeftButton)
+				m_GrabPointList[m_iVertexIndex].SetSelected(true);
+			else if(uiButtonFlags & Qt::RightButton)
+				m_GrabPointList[m_iVertexIndex].SetSelected(false);
+		}
+	}
 
 	for(IGfxShapeView *pView : m_ViewList)
-		pView->RefreshView(bTransformStarted);
+		pView->RefreshView(eResult, true);
 
-	return bTransformStarted;
+	m_eCurTransform = eResult;
+	return eResult;
 }
 
 void GfxShapeModel::MouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF ptBotLeft, QPointF ptTopRight)
@@ -371,34 +423,26 @@ void GfxShapeModel::MouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF
 	}
 
 	for(IGfxShapeView *pView : m_ViewList)
-		pView->RefreshView(false);
+		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
 }
 
-void GfxShapeModel::MouseMoveTransform(bool bShiftMod, QPointF ptDragPos)
+void GfxShapeModel::MouseMoveTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
 	m_bTransformShiftMod = bShiftMod;
-	HySetVec(m_ptTransformDragPos, ptDragPos.x(), ptDragPos.y());
 
-	switch(m_eTransformType)
+	m_mtxTransform = glm::identity<glm::mat4>();
+	if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
 	{
-	case TRANSFORM_None:
-		HyGuiLog("GfxShapeModel::MouseTransformDrag - Drag called with TRANSFORM_None", LOGTYPE_Error);
-		break;
-
-	case TRANSFORM_Initial:
-		DoTransformInitial();
-		break;
-	case TRANSFORM_TranslateShape:
-		DoTransformTranslateShape();
-		break;
-	case TRANSFORM_InsertNewVertex:
-	case TRANSFORM_TranslateVerts:
-		DoTranslateVertexTransformDrag();
-		break;
+		glm::vec2 vDelta(ptDragPos.x - ptStartPos.x,
+						 ptDragPos.y - ptStartPos.y);
+		m_mtxTransform = glm::translate(m_mtxTransform, glm::vec3(vDelta, 0.0f));
 	}
 
+	if(m_eCurTransform == SHAPEMOUSEMOVE_Creation)
+		DoTransformCreation(ptStartPos, ptDragPos);
+
 	for(IGfxShapeView *pView : m_ViewList)
-		pView->RefreshView(true);
+		pView->RefreshView(m_eCurTransform, true);
 }
 
 QString GfxShapeModel::MouseTransformReleased(QPointF ptWorldMousePos)
@@ -427,29 +471,29 @@ QString GfxShapeModel::MouseTransformReleased(QPointF ptWorldMousePos)
 	return QString();
 }
 
-ShapeMouseMoveResult GfxShapeModel::OnMouseMoveIdle(QPointF ptWorldMousePos)
+ShapeMouseMoveResult GfxShapeModel::OnMouseMoveIdle(glm::vec2 ptWorldMousePos)
 {
-	m_iGrabPointHoverIndex = m_iInsertVertexIndex = -1;
-	m_ptInsertVertexPos = glm::vec2(0.0f, 0.0f);
+	m_iVertexIndex = -1;
+	m_ptVertexPos = glm::vec2(0.0f, 0.0f);
 
 	for(int i = 0; i < m_GrabPointList.size(); ++i)
 	{
-		if(m_GrabPointList[i].TestPoint(glm::vec2(ptWorldMousePos.x(), ptWorldMousePos.y())))
+		if(m_GrabPointList[i].TestPoint(ptWorldMousePos))
 		{
-			m_iGrabPointHoverIndex = i;
+			m_iVertexIndex = i;
 			if(m_GrabPointList[i].IsSelected())
 				return SHAPEMOUSEMOVE_HoverSelectedVertex;
 			else
 				return SHAPEMOUSEMOVE_HoverVertex;
 		}
 	}
-	if(m_GrabPointCenter.TestPoint(glm::vec2(ptWorldMousePos.x(), ptWorldMousePos.y())))
+	if(m_GrabPointCenter.TestPoint(ptWorldMousePos))
 		return SHAPEMOUSEMOVE_HoverCenter;
 
 	if(m_eType == SHAPE_LineChain || m_eType == SHAPE_Polygon)
 	{
 		if(m_GrabPointList.empty())
-			return SHAPEMOUSEMOVE_Initial;
+			return SHAPEMOUSEMOVE_Creation;
 
 		if(CheckIfAddVertexOnEdge(ptWorldMousePos))
 			return SHAPEMOUSEMOVE_InsertVertex;
@@ -467,128 +511,32 @@ ShapeMouseMoveResult GfxShapeModel::OnMouseMoveIdle(QPointF ptWorldMousePos)
 			{
 				if(m_GrabPointList.front().IsSelected())
 				{
-					m_iInsertVertexIndex = 0;
-					m_ptInsertVertexPos = glm::vec2(ptWorldMousePos.x(), ptWorldMousePos.y());
+					m_iVertexIndex = 0;
+					m_ptVertexPos = ptWorldMousePos;
 					return SHAPEMOUSEMOVE_AppendVertex;
 				}
 				else if(m_GrabPointList.back().IsSelected())
 				{
-					m_iInsertVertexIndex = m_GrabPointList.size();
-					m_ptInsertVertexPos = glm::vec2(ptWorldMousePos.x(), ptWorldMousePos.y());
+					m_iVertexIndex = m_GrabPointList.size();
+					m_ptVertexPos = ptWorldMousePos;
 					return SHAPEMOUSEMOVE_AppendVertex;
 				}
 			}
 		}
 	}
 	else if(IsValidShape() == false) // Any shape besides SHAPE_LineChain || SHAPE_Polygon
-		return SHAPEMOUSEMOVE_Initial;
+		return SHAPEMOUSEMOVE_Creation;
 
 	for(IHyFixture2d *pFixture : m_FixtureList)
 	{
-		if(pFixture->TestPoint(glm::vec2(static_cast<float>(ptWorldMousePos.x()), static_cast<float>(ptWorldMousePos.y())), glm::identity<glm::mat4>()))
+		if(pFixture->TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
 			return SHAPEMOUSEMOVE_Inside;
 	}
 	return SHAPEMOUSEMOVE_Outside;
 }
 
-bool GfxShapeModel::OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos)
+void GfxShapeModel::DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
-	HySetVec(m_ptTransformStartPos, 0.0f, 0.0f);
-	m_eTransformType = TRANSFORM_None;
-
-	switch(OnMouseMoveIdle(ptWorldMousePos))
-	{
-	case SHAPEMOUSEMOVE_Outside:
-		return false; // Start a marquee select
-
-	case SHAPEMOUSEMOVE_Inside:
-		for(const GfxGrabPointModel &grabPtModel : m_GrabPointList)
-		{
-			if(grabPtModel.IsSelected() == false)
-				return false; // Start a marquee select
-		}
-		m_ptTransformStartPos = glm::vec2(ptWorldMousePos.x(), ptWorldMousePos.y());
-		m_eTransformType = TRANSFORM_TranslateShape;
-		return true;
-
-	case SHAPEMOUSEMOVE_Initial:
-		m_eTransformType = TRANSFORM_Initial;
-		return true;
-
-	case SHAPEMOUSEMOVE_AppendVertex:
-	case SHAPEMOUSEMOVE_InsertVertex:
-		if(m_iInsertVertexIndex == -1)
-		{
-			HyGuiLog("GfxShapeModel::OnMousePressEvent - Insert vertex index was -1 on AddVertex/Crosshair", LOGTYPE_Error);
-			return false;
-		}
-		m_GrabPointList.insert(m_GrabPointList.begin() + m_iInsertVertexIndex, GfxGrabPointModel(GRABPOINT_VertexSelected, m_ptInsertVertexPos));
-		for(int i = 0; i < m_GrabPointList.size(); ++i)
-			m_GrabPointList[i].SetSelected(false);
-		m_GrabPointList[m_iInsertVertexIndex].SetSelected(true);
-
-		m_ptTransformStartPos = glm::vec2(ptWorldMousePos.x(), ptWorldMousePos.y());
-		m_eTransformType = TRANSFORM_InsertNewVertex;
-		return true;
-
-	case SHAPEMOUSEMOVE_HoverVertex:
-	case SHAPEMOUSEMOVE_HoverSelectedVertex:
-		if(m_iGrabPointHoverIndex == -1)
-		{
-			HyGuiLog("GfxShapeModel::OnMousePressEvent - Hover vertex index was -1 on HoverVertex/HoverSelectedVertex", LOGTYPE_Error);
-			return false;
-		}
-
-		if(bShiftHeld)
-		{
-			if(uiButtonFlags & Qt::LeftButton)
-			{
-				m_GrabPointList[m_iGrabPointHoverIndex].SetSelected(!m_GrabPointList[m_iGrabPointHoverIndex].IsSelected());
-				m_ptTransformStartPos = glm::vec2(ptWorldMousePos.x(), ptWorldMousePos.y());
-				m_eTransformType = TRANSFORM_TranslateVerts;
-				return true;
-			}
-			else if(uiButtonFlags & Qt::RightButton)
-			{
-				m_GrabPointList[m_iGrabPointHoverIndex].SetSelected(false);
-				return false;
-			}
-		}
-		else
-		{
-			if(uiButtonFlags & Qt::LeftButton)
-			{
-				m_GrabPointList[m_iGrabPointHoverIndex].SetSelected(true);
-				m_ptTransformStartPos = glm::vec2(ptWorldMousePos.x(), ptWorldMousePos.y());
-				m_eTransformType = TRANSFORM_TranslateVerts;
-				return true;
-			}
-			else if(uiButtonFlags & Qt::RightButton)
-			{
-				m_GrabPointList[m_iGrabPointHoverIndex].SetSelected(false);
-				return false;
-			}
-		}
-		return false;
-
-	case SHAPEMOUSEMOVE_HoverCenter:
-		m_ptTransformStartPos = glm::vec2(ptWorldMousePos.x(), ptWorldMousePos.y());
-		m_eTransformType = TRANSFORM_TranslateShape;
-		return true;
-		break;
-
-	default:
-		HyGuiLog("GfxShapeModel::OnMousePressEvent - Unknown shape mouse move result encountered", LOGTYPE_Error);
-		break;
-	}
-
-	return false;
-}
-
-void GfxShapeModel::DoTransformInitial()
-{
-	glm::vec2 ptStartPos = m_ptTransformStartPos;
-	glm::vec2 ptDragPos = m_ptTransformDragPos;
 	glm::vec2 ptLowerBound, ptUpperBound, ptCenter;
 	if(m_bTransformShiftMod)
 	{
@@ -630,14 +578,14 @@ void GfxShapeModel::DoTransformInitial()
 	case SHAPE_Polygon:
 	case SHAPE_LineChain:
 		if(m_GrabPointList.size() == 0)
-			m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, m_ptTransformDragPos));
+			m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptDragPos));
 		if(m_GrabPointList.size() == 1)
-			m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, m_ptTransformDragPos));
+			m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptDragPos));
 		if(m_GrabPointList.size() != 2)
 			HyGuiLog("GfxShapeModel::MouseTransformDrag - Polygon or LineChain initial dragging with != 2 verts", LOGTYPE_Error);
 
 		m_GrabPointList[0].SetSelected(false);
-		m_GrabPointList[1].Setup(GRABPOINT_EndpointSelected, m_ptTransformDragPos);
+		m_GrabPointList[1].Setup(GRABPOINT_EndpointSelected, ptDragPos);
 		break;
 
 	default:
@@ -646,57 +594,7 @@ void GfxShapeModel::DoTransformInitial()
 	}
 }
 
-void GfxShapeModel::DoTransformTranslateShape()
-{
-	if(HyCompareFloat(m_ptTransformDragPos.x, m_ptTransformStartPos.y) && HyCompareFloat(m_ptTransformDragPos.y, m_ptTransformStartPos.y))
-		return;
-
-	glm::vec2 vDelta(m_ptTransformDragPos.x - m_ptTransformStartPos.x,
-					 m_ptTransformDragPos.y - m_ptTransformStartPos.y);
-	glm::mat4 mtxTranslate(1.0f);
-	mtxTranslate = glm::translate(mtxTranslate, glm::vec3(vDelta, 0.0f));
-
-	for(IHyFixture2d *pFixture : m_FixtureList)
-		pFixture->TransformSelf(mtxTranslate);
-	for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
-	{
-		glm::vec2 ptOldPos = grabPtModel.GetPos();
-		grabPtModel.Setup(glm::vec2(ptOldPos.x + vDelta.x, ptOldPos.y + vDelta.y));
-	}
-	m_ptTransformStartPos = m_ptTransformDragPos;
-}
-
-void GfxShapeModel::DoTranslateVertexTransformDrag()
-{
-	if(m_eType != SHAPE_Polygon && m_eType != SHAPE_LineChain)
-	{
-		HyGuiLog("GfxShapeModel::DoTranslateVertexTransformDrag called with non-polygon/linechain shape type", LOGTYPE_Error);
-		return;
-	}
-	if(HyCompareFloat(m_ptTransformDragPos.x, m_ptTransformStartPos.y) && HyCompareFloat(m_ptTransformDragPos.y, m_ptTransformStartPos.y))
-		return;
-
-	glm::vec2 vDelta(m_ptTransformDragPos.x - m_ptTransformStartPos.x,
-					 m_ptTransformDragPos.y - m_ptTransformStartPos.y);
-
-	QList<float> translatedFloatList;
-	for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
-	{
-		if(grabPtModel.IsSelected())
-		{
-			glm::vec2 ptOldPos = grabPtModel.GetPos();
-			grabPtModel.Setup(glm::vec2(ptOldPos.x + vDelta.x, ptOldPos.y + vDelta.y));
-		}
-		translatedFloatList.append(grabPtModel.GetPos().x);
-		translatedFloatList.append(grabPtModel.GetPos().y);
-	}
-	translatedFloatList.append(m_bLoopClosed ? 1.0f : 0.0f);
-
-	SetData(m_Color, m_eType, translatedFloatList); // Maybe overkill to update just the fixtures?
-	m_ptTransformStartPos = m_ptTransformDragPos;
-}
-
-bool GfxShapeModel::CheckIfAddVertexOnEdge(QPointF ptWorldMousePos)
+bool GfxShapeModel::CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos)
 {
 	if(m_eType != SHAPE_LineChain && m_eType != SHAPE_Polygon)
 	{
@@ -706,7 +604,6 @@ bool GfxShapeModel::CheckIfAddVertexOnEdge(QPointF ptWorldMousePos)
 	if(m_GrabPointList.size() < 2)
 		return false;
 
-	glm::vec2 ptTest(static_cast<float>(ptWorldMousePos.x()), static_cast<float>(ptWorldMousePos.y()));
 	HyShape2d tmpEdgeShape;
 	for(int i = 0; i < m_GrabPointList.size(); ++i)
 	{
@@ -716,10 +613,10 @@ bool GfxShapeModel::CheckIfAddVertexOnEdge(QPointF ptWorldMousePos)
 		glm::vec2 pt1 = m_GrabPointList[i].GetPos();
 		glm::vec2 pt2 = m_GrabPointList[(i + 1) % m_GrabPointList.size()].GetPos();
 		tmpEdgeShape.SetAsLineSegment(pt1, pt2);
-		if(tmpEdgeShape.TestPoint(ptTest, glm::identity<glm::mat4>()))
+		if(tmpEdgeShape.TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
 		{
-			m_iInsertVertexIndex = i + 1;
-			m_ptInsertVertexPos = HyMath::ClosestPointOnSegment(pt1, pt2, ptTest);
+			m_iVertexIndex = i + 1;
+			m_ptVertexPos = HyMath::ClosestPointOnSegment(pt1, pt2, ptWorldMousePos);
 			return true;
 		}
 	}

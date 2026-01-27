@@ -21,7 +21,7 @@ enum EditModeState
 	EDITMODE_Idle,					// Mouse cursor determined by draw models
 	EDITMODE_MouseDownOutside,		// Click started outside of the edit item's bounds
 	EDITMODE_MouseDragMarquee,		// Click-dragging a marquee select box
-	EDITMODE_MouseDownTransform,			// Click started on item to be manipulated
+	EDITMODE_MouseDownTransform,	// Click started on item to be manipulated
 	EDITMODE_MouseDragTransform,	// Transforming (translating, rotating, scaling) the edit item
 };
 

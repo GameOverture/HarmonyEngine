@@ -62,7 +62,7 @@ public:
 	void SetAsCircle(const glm::vec2 &ptCenter, float fRadius);
 
 	// Set as a convex hull from the given array of local points.
-	// uiCount must be in the range [3, b2_maxPolygonVertices].
+	// uiCount must be in the range [3, B2_MAX_POLYGON_VERTICES].
 	// The points may be re-ordered, even if they form a convex polygon
 	// Collinear points are handled but not removed. Collinear points
 	// may lead to poor stacking behavior in physics simulation.

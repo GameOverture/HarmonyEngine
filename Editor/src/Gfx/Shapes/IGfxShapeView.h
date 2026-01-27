@@ -26,9 +26,7 @@ public:
 	void SetModel(GfxShapeModel *pModel);
 
 	virtual void RefreshColor() = 0;
-	virtual void RefreshView(bool bTransformPreview) = 0;
-
-	virtual void OnMouseMoveIdle(ShapeMouseMoveResult eResult) = 0;
+	virtual void RefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) = 0;
 };
 
 #endif // IGfxShapeView_H

@@ -377,7 +377,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 			for(QJsonValue floatVal : oldShapeDataArray)
 				floatList.push_back(static_cast<float>(floatVal.toDouble()));
 			GfxShapeModel tmpShapeModel(HyColor::Black, HyGlobal::GetShapeFromString(sShapeType), floatList);
-			tmpShapeModel.TransformSelf(m_NewTransformList[i]);
+			tmpShapeModel.TransformData(m_NewTransformList[i]);
 
 			QList<float> transformedFloatList = tmpShapeModel.GetData();
 			QJsonArray transformedFloatArray;

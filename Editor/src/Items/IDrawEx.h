@@ -57,11 +57,11 @@ protected:
 
 	// Mouse press/dragging (and arrow key nudging)
 	HyTimer									m_PressTimer;
-	bool									m_bSelectionHandled; // During mouse release, this bool can signify if selection was already handled by previous logic (or if selection is not necessary)
-	glm::vec2								m_ptDragStart;
-	glm::vec2								m_ptDragCenter;
+	bool									m_bSelectionHandled;	// During mouse release, this bool can signify if selection was already handled by previous logic (or if selection is not necessary)
+	glm::vec2								m_ptDragStart;			// Scene/World space
+	glm::vec2								m_ptDragCenter;			// Scene/World space
 	glm::vec2								m_vDragStartSize;
-	QPoint									m_vNudgeTranslate;	// Used for nudging selected items with arrow keys
+	QPoint									m_vNudgeTranslate;		// Used for nudging selected items with arrow keys
 
 	// Used to help transform (translate, rotate, scale) selected items
 	HyEntity2d								m_ActiveTransform;

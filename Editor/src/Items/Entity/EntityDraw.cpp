@@ -105,12 +105,12 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	case EDITMODE_Idle:
 		if(pTreeItemData->GetShape2dModel())
 		{
-			ShapeMouseMoveResult eResult = pTreeItemData->GetShape2dModel()->MouseMoveIdle(QPointF(ptCurMousePos.x, ptCurMousePos.y));
+			ShapeMouseMoveResult eResult = pTreeItemData->GetShape2dModel()->MouseMoveIdle(ptCurMousePos);
 			switch(eResult)
 			{
+			case SHAPEMOUSEMOVE_Creation:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 			case SHAPEMOUSEMOVE_Outside:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
 			case SHAPEMOUSEMOVE_Inside:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
-			case SHAPEMOUSEMOVE_Initial:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 			case SHAPEMOUSEMOVE_AppendVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 			case SHAPEMOUSEMOVE_InsertVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 			case SHAPEMOUSEMOVE_HoverVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;
@@ -151,10 +151,10 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		if(pTreeItemData->GetShape2dModel())
 		{
 			bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-			pTreeItemData->GetShape2dModel()->MouseMoveTransform(bShiftHeld, QPointF(ptCurMousePos.x, ptCurMousePos.y));
+			pTreeItemData->GetShape2dModel()->MouseMoveTransform(bShiftHeld, m_ptDragStart, ptCurMousePos);
 		}
 		else
-			HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_MouseDragTransform with unsupported edit item type!", LOGTYPE_Error);
+			HyGuiLog("EntityDraw::OnMouseMoveEvent - fpDoMouseDownTransform with unsupported edit item type!", LOGTYPE_Error);
 		break;
 
 	default:
@@ -190,7 +190,29 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		if(pTreeItemData->GetShape2dModel())
 		{
 			bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-			bool bStartTransform = pTreeItemData->GetShape2dModel()->MousePressEvent(bShiftHeld, pEvent->buttons(), QPointF(m_ptDragStart.x, m_ptDragStart.y));
+			ShapeMouseMoveResult eResult = pTreeItemData->GetShape2dModel()->MousePressEvent(bShiftHeld, pEvent->buttons(), m_ptDragStart);
+
+			bool bStartTransform = false;
+			switch(eResult)
+			{
+			case SHAPEMOUSEMOVE_Inside:
+				bStartTransform = pTreeItemData->GetShape2dModel()->IsAllGrabPointsSelected();
+				break;
+
+			case SHAPEMOUSEMOVE_Creation:
+			case SHAPEMOUSEMOVE_AppendVertex:
+			case SHAPEMOUSEMOVE_InsertVertex:
+			case SHAPEMOUSEMOVE_HoverVertex:
+			case SHAPEMOUSEMOVE_HoverSelectedVertex:
+			case SHAPEMOUSEMOVE_HoverCenter:
+				bStartTransform = true;
+				break;
+
+			default:
+				bStartTransform = false;
+				break;
+			}
+
 			if(bStartTransform)
 			{
 				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BlankCursor);
@@ -290,12 +312,12 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	{
 		glm::vec2 ptCurMousePos;
 		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
-		ShapeMouseMoveResult eResult = pTreeItemData->GetShape2dModel()->MouseMoveIdle(QPointF(ptCurMousePos.x, ptCurMousePos.y));
+		ShapeMouseMoveResult eResult = pTreeItemData->GetShape2dModel()->MouseMoveIdle(ptCurMousePos);
 		switch(eResult)
 		{
+		case SHAPEMOUSEMOVE_Creation:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 		case SHAPEMOUSEMOVE_Outside:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor); break;
 		case SHAPEMOUSEMOVE_Inside:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
-		case SHAPEMOUSEMOVE_Initial:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 		case SHAPEMOUSEMOVE_AppendVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 		case SHAPEMOUSEMOVE_InsertVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 		case SHAPEMOUSEMOVE_HoverVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;

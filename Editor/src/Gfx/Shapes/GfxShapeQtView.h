@@ -28,9 +28,7 @@ public:
 	virtual ~GfxShapeQtView();
 
 	virtual void RefreshColor() override;
-	virtual void RefreshView(bool bTransformPreview) override;
-
-	virtual void OnMouseMoveIdle(ShapeMouseMoveResult eResult) override;
+	virtual void RefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) override;
 
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) override;

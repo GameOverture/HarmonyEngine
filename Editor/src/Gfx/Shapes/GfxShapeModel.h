@@ -17,9 +17,11 @@ class IGfxShapeView;
 
 enum ShapeMouseMoveResult
 {
+	SHAPEMOUSEMOVE_None = 0,
+
+	SHAPEMOUSEMOVE_Creation,
 	SHAPEMOUSEMOVE_Outside,
 	SHAPEMOUSEMOVE_Inside,
-	SHAPEMOUSEMOVE_Initial,
 	SHAPEMOUSEMOVE_AppendVertex,
 	SHAPEMOUSEMOVE_InsertVertex,
 	SHAPEMOUSEMOVE_HoverVertex,
@@ -44,21 +46,11 @@ class GfxShapeModel
 	bool								m_bLoopClosed;
 
 	// Transform info
-	int									m_iGrabPointHoverIndex;
-	int									m_iInsertVertexIndex;
-	glm::vec2							m_ptInsertVertexPos;
-	glm::vec2							m_ptTransformStartPos;
-	glm::vec2							m_ptTransformDragPos;
+	ShapeMouseMoveResult				m_eCurTransform;
+	glm::mat4							m_mtxTransform;			// The current transform being applied during a mouse operation
+	int									m_iVertexIndex;
+	glm::vec2							m_ptVertexPos;
 	bool								m_bTransformShiftMod;
-	enum TransformType
-	{
-		TRANSFORM_None = 0,
-		TRANSFORM_Initial,				// Shape is malformed and still being assembled
-		TRANSFORM_TranslateShape,		// Center grab point being dragged
-		TRANSFORM_InsertNewVertex,		// An edge was clicked and a new vertex is being inserted
-		TRANSFORM_TranslateVerts		// All selected vertices being translated
-	};
-	TransformType						m_eTransformType;
 
 	// Track Views manually since we don't inherit from QObject
 	QList<IGfxShapeView *>				m_ViewList;
@@ -77,8 +69,9 @@ public:
 
 	QList<float> GetData() const;
 	void SetData(HyColor color, EditorShape eShape, const QList<float> &floatList);
+	void TransformData(glm::mat4 mtxTransform);
 
-	void TransformSelf(glm::mat4 mtxTransform);
+	void GetTransformPreview(glm::mat4 &mtxTransformOut, int &iVertexIndexOut) const;
 
 	void AddView(IGfxShapeView *pView);
 	bool RemoveView(IGfxShapeView *pView);
@@ -87,24 +80,23 @@ public:
 	IHyFixture2d *GetFixture(int iIndex) const;
 	const QList<GfxGrabPointModel> &GetGrabPointList() const;
 	const GfxGrabPointModel &GetCenterGrabPoint() const;
+	bool IsAllGrabPointsSelected() const;
 
 	bool IsLoopClosed() const;
 
-	ShapeMouseMoveResult MouseMoveIdle(QPointF ptWorldMousePos);
-	bool MousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
+	ShapeMouseMoveResult MouseMoveIdle(glm::vec2 ptWorldMousePos);
+	ShapeMouseMoveResult MousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
 	void MouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF ptBotLeft, QPointF ptTopRight);
-	void MouseMoveTransform(bool bShiftMod, QPointF ptDragPos);
+	void MouseMoveTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
 	QString MouseTransformReleased(QPointF ptWorldMousePos); // Returns undo command description (blank if no change)
 
 protected:
-	ShapeMouseMoveResult OnMouseMoveIdle(QPointF ptWorldMousePos);
-	bool OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
+	ShapeMouseMoveResult OnMouseMoveIdle(glm::vec2 ptWorldMousePos);
+	//ShapeMouseMoveResult OnMousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, QPointF ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
 
-	void DoTransformInitial();
-	void DoTransformTranslateShape();
-	void DoTranslateVertexTransformDrag();
+	void DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos);
 
-	bool CheckIfAddVertexOnEdge(QPointF ptWorldMousePos);
+	bool CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos);
 	bool IsShareEdge(const std::vector<glm::vec2> &a, const std::vector<glm::vec2> &b, int &a0, int &a1, int &b0, int &b1);
 	std::vector<glm::vec2> MergePolygons(const std::vector<glm::vec2> &ptA, const std::vector<glm::vec2> &ptB, int a0, int a1, int b0, int b1);
 	std::vector<std::vector<glm::vec2>> MergeTriangles(const std::vector<HyTriangle2d> &triangleList);

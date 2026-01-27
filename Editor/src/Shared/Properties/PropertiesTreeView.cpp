@@ -188,6 +188,17 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		if(propDefRef.defaultData.isValid())
 			static_cast<QLineEdit *>(pReturnWidget)->setText(propDefRef.defaultData.toString());
 		break;
+	case PROPERTIESTYPE_FloatArray:
+		pReturnWidget = new QLineEdit(pParent);
+
+		if(propDefRef.defaultData.isValid())
+		{
+			QJsonDocument doc;
+			doc.setArray(propDefRef.defaultData.toJsonArray());
+			QString jsonString = QString::fromUtf8(doc.toJson(QJsonDocument::Compact));
+			static_cast<QLineEdit *>(pReturnWidget)->setText(jsonString);
+		}
+		break;
 
 	case PROPERTIESTYPE_ComboBoxString:
 		pReturnWidget = new QComboBox(pParent);
@@ -368,6 +379,12 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		case PROPERTIESTYPE_LineEdit:
 			static_cast<QLineEdit *>(pEditor)->setText(propValue.toString());
 			break;
+		case PROPERTIESTYPE_FloatArray: {
+			QJsonDocument doc;
+			doc.setArray(propValue.toJsonArray());
+			QString jsonString = QString::fromUtf8(doc.toJson(QJsonDocument::Compact));
+			static_cast<QLineEdit *>(pEditor)->setText(jsonString);
+			break; }
 		case PROPERTIESTYPE_ComboBoxString:
 			static_cast<QComboBox *>(pEditor)->setCurrentIndex(propDefRef.delegateBuilder.toStringList().indexOf(propValue.toString()));
 			break;
@@ -419,6 +436,9 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break;
 	case PROPERTIESTYPE_LineEdit:
 		newValue = QVariant(static_cast<QLineEdit *>(pEditor)->text());
+		break;
+	case PROPERTIESTYPE_FloatArray:
+		newValue = QVariant(QJsonDocument::fromJson(static_cast<QLineEdit *>(pEditor)->text().toUtf8()).array());
 		break;
 	case PROPERTIESTYPE_ComboBoxString:
 		newValue = QVariant(propDefRef.delegateBuilder.toStringList()[static_cast<QComboBox *>(pEditor)->currentIndex()]);

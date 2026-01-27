@@ -138,9 +138,17 @@ void HyChain2d::SetData(const std::vector<glm::vec2> &verticesList, bool bLoop, 
 {
 	std::vector<glm::vec2> vertList;
 
+	if(floatList.empty())
+		return vertList;
+
 	if(eFixtureType != HYFIXTURE_LineChain)
 	{
 		HyLogError("HyChain2d::DeserializeSelf() - Mismatched fixture type");
+		return vertList;
+	}
+	if((floatList.size() & 1) == 0)
+	{
+		HyLogWarning("HyChain2d::DeserializeSelf recieved an even number of floats to deserialize a chain");
 		return vertList;
 	}
 
