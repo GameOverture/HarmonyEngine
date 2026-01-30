@@ -437,56 +437,7 @@ void GfxMarqueeCtrl::Hide()
 //				selectedGrabPtList.push_back(pGrabPt);
 //		}
 //
-//		// Apply special cases to default functionality (Default: offset selected vertices by 'vTranslate')
-//		if(m_eShape == SHAPE_Box)
-//		{
-//			// Box has special case to lock vertices together to keep box form
-//			if(selectedGrabPtList.size() == 1)
-//			{
-//				// Find the opposite vertex by iterating over all vertices and finding the one that is furthest from selectedVert
-//				GrabPoint *pOppositeVert = m_VertexGrabPointList[0];
-//				float fMaxDistance = -1.0f;
-//				for(GrabPoint *pVert : m_VertexGrabPointList)
-//				{
-//					float fDistance = glm::distance(selectedGrabPtList[0]->pos.Get(), pVert->pos.Get());
-//					if(fDistance > fMaxDistance)
-//					{
-//						fMaxDistance = fDistance;
-//						pOppositeVert = pVert;
-//					}
-//				}
-//
-//				// Translate the selected vertex
-//				selectedGrabPtList[0]->pos.Offset(vTranslate);
-//
-//				// Update the other 2 vertices that aren't the selected or opposite
-//				for(GrabPoint *pVert : m_VertexGrabPointList)
-//				{
-//					if(pVert == selectedGrabPtList[0] || pVert == pOppositeVert)
-//						continue; // Skip the selected and opposite vertex
-//
-//					glm::vec2 ptNewPos = HyMath::ClosestPointOnRay(pOppositeVert->pos.Get(), glm::normalize(pVert->pos.Get() - pOppositeVert->pos.Get()), selectedGrabPtList[0]->pos.Get());
-//					pVert->pos.Set(ptNewPos);
-//				}
-//
-//				// Deselect all grab points because positions have been handled
-//				selectedGrabPtList.clear();
-//			}
-//			else // TODO: Better control when 2 verts selected
-//			{
-//				// Select all verts
-//				selectedGrabPtList.clear();
-//				for(GrabPoint *pGrabPt : m_VertexGrabPointList)
-//					selectedGrabPtList.push_back(pGrabPt);
-//			}
-//		}
-//		else if(m_eShape == SHAPE_Circle)
-//		{
-//			// Select all verts
-//			selectedGrabPtList.clear();
-//			for(GrabPoint *pGrabPt : m_VertexGrabPointList)
-//				selectedGrabPtList.push_back(pGrabPt);
-//		}
+
 //
 //		// any points remaining in 'selectedGrabPtList' will be translated (as default functionality)
 //		for(GrabPoint *pSelectedPt : selectedGrabPtList)

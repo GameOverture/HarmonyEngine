@@ -39,7 +39,7 @@ public:
 	const IHyFixture2d &operator=(const IHyFixture2d &rhs);
 
 	HyFixtureType GetType() const;
-	bool IsValid() const;
+	virtual bool IsValid() const;
 
 	virtual void TransformSelf(const glm::mat4 &mtxTransform) = 0;
 	virtual std::vector<float> SerializeSelf() const = 0;

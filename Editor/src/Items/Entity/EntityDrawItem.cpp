@@ -903,11 +903,7 @@ void ExtrapolateProperties(Project &projectRef,
 				}
 				
 				if(bNeedFullRefresh)
-				{
-					if(floatList.empty())
-						floatList = pShapeModel->GetData();
 					pShapeModel->SetData(color, eShape, floatList);
-				}
 				else if(bNeedColorRefresh)
 					pShapeModel->SetColor(color);
 			}

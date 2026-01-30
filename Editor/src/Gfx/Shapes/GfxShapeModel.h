@@ -24,8 +24,7 @@ enum ShapeMouseMoveResult
 	SHAPEMOUSEMOVE_Inside,
 	SHAPEMOUSEMOVE_AppendVertex,
 	SHAPEMOUSEMOVE_InsertVertex,
-	SHAPEMOUSEMOVE_HoverVertex,
-	SHAPEMOUSEMOVE_HoverSelectedVertex,
+	SHAPEMOUSEMOVE_HoverGrabPoint,
 	SHAPEMOUSEMOVE_HoverCenter
 };
 
@@ -79,8 +78,12 @@ public:
 	int GetNumFixtures() const;
 	IHyFixture2d *GetFixture(int iIndex) const;
 	const QList<GfxGrabPointModel> &GetGrabPointList() const;
+	const GfxGrabPointModel &GetGrabPoint(int iIndex) const;
 	const GfxGrabPointModel &GetCenterGrabPoint() const;
+
+	int GetNumGrabPointsSelected() const;
 	bool IsAllGrabPointsSelected() const;
+	bool IsHoverGrabPointSelected() const;
 
 	bool IsLoopClosed() const;
 
@@ -88,10 +91,11 @@ public:
 	ShapeMouseMoveResult MousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
 	void MouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF ptBotLeft, QPointF ptTopRight);
 	void MouseMoveTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
-	QString MouseTransformReleased(QPointF ptWorldMousePos); // Returns undo command description (blank if no change)
+	QString MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos); // Returns undo command description (blank if no change)
 
 protected:
 	ShapeMouseMoveResult OnMouseMoveIdle(glm::vec2 ptWorldMousePos);
+	
 	void DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos);
 
 	bool CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos);

@@ -542,7 +542,8 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(QString sText, ProjectItemData 
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
 
-	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(m_eNewType)), false);
+	if(m_eOldType != m_eNewType)
+		pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(m_eNewType)), false);
 
 	QJsonArray newDataArray;
 	for(float f : m_NewData)
@@ -563,7 +564,8 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(QString sText, ProjectItemData 
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
 
-	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(m_eOldType)), false);
+	if(m_eOldType != m_eNewType)
+		pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pShapeItemData, m_iFrameIndex, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(m_eOldType)), false);
 
 	QJsonArray oldDataArray;
 	for(float f : m_OldData)

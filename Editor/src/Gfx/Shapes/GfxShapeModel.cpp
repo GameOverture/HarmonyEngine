@@ -174,7 +174,6 @@ void GfxShapeModel::SetData(HyColor color, EditorShape eShape, const QList<float
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Assemble `m_GrabPointList`
 	std::vector<glm::vec2> grabPointList;
-
 	if(floatList.empty() == false)
 	{
 		if(m_eType != SHAPE_Polygon)
@@ -232,7 +231,20 @@ void GfxShapeModel::SetData(HyColor color, EditorShape eShape, const QList<float
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	if(m_eType == SHAPE_Polygon) // Assemble `m_FixtureList` with valid sub-polygons (convex and <= 8 vertices)
+	if(m_GrabPointList.empty())
+	{
+		if(m_eType == SHAPE_LineChain)
+		{
+			for(IHyFixture2d *pFixture : m_FixtureList)
+				static_cast<HyChain2d *>(pFixture)->ClearData();
+		}
+		else
+		{
+			for(IHyFixture2d *pFixture : m_FixtureList)
+				static_cast<HyShape2d *>(pFixture)->SetAsNothing();
+		}
+	}
+	else if(m_eType == SHAPE_Polygon) // Assemble `m_FixtureList` with valid sub-polygons (convex and <= 8 vertices)
 	{
 		std::vector<glm::vec2> ccwOrderedVertexList;
 		ccwOrderedVertexList.reserve(m_GrabPointList.size());
@@ -330,9 +342,30 @@ const QList<GfxGrabPointModel> &GfxShapeModel::GetGrabPointList() const
 	return m_GrabPointList;
 }
 
+const GfxGrabPointModel &GfxShapeModel::GetGrabPoint(int iIndex) const
+{
+	if(iIndex < 0 || iIndex >= m_GrabPointList.size())
+	{
+		HyGuiLog("GfxShapeModel::GetGrabPoint - Index out of range", LOGTYPE_Error);
+		return m_GrabPointCenter;
+	}
+	return m_GrabPointList[iIndex];
+}
+
 const GfxGrabPointModel &GfxShapeModel::GetCenterGrabPoint() const
 {
 	return m_GrabPointCenter;
+}
+
+int GfxShapeModel::GetNumGrabPointsSelected() const
+{
+	int iNumSelected = 0;
+	for(const GfxGrabPointModel &grabPtModel : m_GrabPointList)
+	{
+		if(grabPtModel.IsSelected())
+			++iNumSelected;
+	}
+	return iNumSelected;
 }
 
 bool GfxShapeModel::IsAllGrabPointsSelected() const
@@ -343,6 +376,16 @@ bool GfxShapeModel::IsAllGrabPointsSelected() const
 			return false;
 	}
 	return true;
+}
+
+bool GfxShapeModel::IsHoverGrabPointSelected() const
+{
+	if(m_iVertexIndex < 0 || m_iVertexIndex >= m_GrabPointList.size())
+	{
+		HyGuiLog("GfxShapeModel::IsHoverGrabPointSelected - Index out of range", LOGTYPE_Error);
+		return false;
+	}
+	return m_GrabPointList[m_iVertexIndex].IsSelected();
 }
 
 bool GfxShapeModel::IsLoopClosed() const
@@ -375,7 +418,7 @@ ShapeMouseMoveResult GfxShapeModel::MousePressEvent(bool bShiftHeld, Qt::MouseBu
 			m_GrabPointList[i].SetSelected(false);
 		m_GrabPointList[m_iVertexIndex].SetSelected(true);
 	}
-	else if(eResult == SHAPEMOUSEMOVE_HoverVertex || eResult == SHAPEMOUSEMOVE_HoverSelectedVertex)
+	else if(eResult == SHAPEMOUSEMOVE_HoverGrabPoint)
 	{
 		if(m_iVertexIndex == -1)
 		{
@@ -400,7 +443,7 @@ ShapeMouseMoveResult GfxShapeModel::MousePressEvent(bool bShiftHeld, Qt::MouseBu
 	}
 
 	for(IGfxShapeView *pView : m_ViewList)
-		pView->RefreshView(eResult, true);
+		pView->RefreshView(eResult, false);
 
 	m_eCurTransform = eResult;
 	return eResult;
@@ -440,34 +483,52 @@ void GfxShapeModel::MouseMoveTransform(bool bShiftMod, glm::vec2 ptStartPos, glm
 
 	if(m_eCurTransform == SHAPEMOUSEMOVE_Creation)
 		DoTransformCreation(ptStartPos, ptDragPos);
+	//else if(m_eCurTransform == SHAPEMOUSEMOVE_HoverGrabPoint)
+	//	DoTransformGrabPoint(ptStartPos, ptDragPos);
 
 	for(IGfxShapeView *pView : m_ViewList)
 		pView->RefreshView(m_eCurTransform, true);
 }
 
-QString GfxShapeModel::MouseTransformReleased(QPointF ptWorldMousePos)
+QString GfxShapeModel::MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos)
 {
-		//	QString sUndoText;
-	//	switch(GetCurAction())
-	//	{
-	//	case HYACTION_EntitySemTranslating:
-	//	case HYACTION_EntitySemTranslateVertex:
-	//		sUndoText = "Translate vert(s) on " % pTreeItemData->GetCodeName();
-	//		break;
-	//	
-	//	case HYACTION_EntitySemRadiusHorizontal:
-	//	case HYACTION_EntitySemRadiusVertical:
-	//		sUndoText = "Adjust circle radius on " % pTreeItemData->GetCodeName();
-	//		break;
+	QString sUndoText;
+	switch(m_eCurTransform)
+	{
+	case SHAPEMOUSEMOVE_None:
+	case SHAPEMOUSEMOVE_Outside:
+		break;
+	case SHAPEMOUSEMOVE_Creation:
+		sUndoText = "Create new " % HyGlobal::ShapeName(m_eType) % " shape " % sShapeCodeName;
+		break;
+	case SHAPEMOUSEMOVE_Inside:
+	case SHAPEMOUSEMOVE_HoverCenter:
+		sUndoText = "Translate shape " % sShapeCodeName;
+		break;
+	case SHAPEMOUSEMOVE_AppendVertex:
+		sUndoText = "Append vertex on " % sShapeCodeName;
+		break;
+	case SHAPEMOUSEMOVE_InsertVertex:
+		sUndoText = "Insert vertex on " % sShapeCodeName;
+		break;
+	case SHAPEMOUSEMOVE_HoverGrabPoint:
+		if(m_eType == SHAPE_Polygon || m_eType == SHAPE_LineChain || m_eType == SHAPE_LineSegment)
+			sUndoText = "Translate vert(s) on " % sShapeCodeName;
+		else if(m_eType == SHAPE_Circle)
+			sUndoText = "Adjust circle radius on " % sShapeCodeName;
+		else if(m_eType == SHAPE_Box)
+			sUndoText = "Adjust box size on " % sShapeCodeName;
+		else if(m_eType == SHAPE_Capsule)
+			sUndoText = "Adjust capsule size on " % sShapeCodeName;
+		else
+			HyGuiLog("EntityDraw::OnMouseReleaseEvent - Invalid shape type for SHAPEMOUSEMOVE_HoverGrabPoint", LOGTYPE_Error);
+		break;
 
-	//	case HYACTION_EntitySemAddingVertex:
-	//		sUndoText = "Add vertex to " % pTreeItemData->GetCodeName();
-	//		break;
+	default:
+		HyGuiLog("EntityDraw::OnMouseReleaseEvent - Invalid m_eCurTransform", LOGTYPE_Error);
+		break;
+	}
 
-	//	default:
-	//		HyGuiLog("EntityDraw::OnMouseReleaseEvent - Invalid GetCurAction()", LOGTYPE_Error);
-	//		break;
-	//	}
 	return QString();
 }
 
@@ -481,10 +542,7 @@ ShapeMouseMoveResult GfxShapeModel::OnMouseMoveIdle(glm::vec2 ptWorldMousePos)
 		if(m_GrabPointList[i].TestPoint(ptWorldMousePos))
 		{
 			m_iVertexIndex = i;
-			if(m_GrabPointList[i].IsSelected())
-				return SHAPEMOUSEMOVE_HoverSelectedVertex;
-			else
-				return SHAPEMOUSEMOVE_HoverVertex;
+			return SHAPEMOUSEMOVE_HoverGrabPoint;
 		}
 	}
 	if(m_GrabPointCenter.TestPoint(ptWorldMousePos))

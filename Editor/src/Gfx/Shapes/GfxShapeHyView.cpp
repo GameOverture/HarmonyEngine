@@ -144,6 +144,8 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 			else
 				HyGuiLog("GfxShapeHyView::RefreshView - Unsupported shape type for primitive sync", LOGTYPE_Error);
 		}
+		else
+			m_PrimOutline.SetAsNothing();
 	}
 	else // SHAPE_Polygon
 	{
@@ -282,10 +284,11 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 		m_PrimPreviewList[1]->SetAsLineSegment(ptInsertVertex, ptConnectPoint2);
 		break; }
 
-	case SHAPEMOUSEMOVE_HoverVertex:
+	case SHAPEMOUSEMOVE_HoverGrabPoint:
+		if(bMouseDown)
+			DoHoverGrabPoint();
 		break;
-	case SHAPEMOUSEMOVE_HoverSelectedVertex:
-		break;
+
 	case SHAPEMOUSEMOVE_HoverCenter:
 		if(bMouseDown)
 		{
@@ -332,4 +335,91 @@ void GfxShapeHyView::ClearPreviewPrimitives()
 	for(HyPrimitive2d *pPrim : m_PrimPreviewList)
 		delete pPrim;
 	m_PrimPreviewList.clear();
+}
+
+void GfxShapeHyView::DoHoverGrabPoint()
+{
+	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
+	glm::mat4 mtxTransform(1.0f);
+	int iVertexIndex = -1;
+	m_pModel->GetTransformPreview(mtxTransform, iVertexIndex);
+	glm::vec4 vTranslate = mtxTransform[3];
+
+	if(iVertexIndex < 0 || iVertexIndex >= grabPointModelList.size())
+	{
+		HyGuiLog("GfxShapeModel::DoHoverGrabPoint - invalid m_iVertexIndex", LOGTYPE_Error);
+		return;
+	}
+	if(m_pModel->IsHoverGrabPointSelected() == false)
+		HyGuiLog("GfxShapeModel::DoHoverGrabPoint - Hover vertex not selected on box transform", LOGTYPE_Error);
+
+	// Apply grab point drag logic based on shape type
+	switch(m_pModel->GetType())
+	{
+	case SHAPE_Box: // Lock vertices together to keep box form
+		if(m_pModel->GetNumGrabPointsSelected() == 1)
+		{
+			glm::vec2 ptVertPos = grabPointModelList[iVertexIndex].GetPos();
+
+			// Find the opposite/locked vertex by iterating over all vertices and finding the one that is farthest from iVertexIndex
+			int iLockedVertIndex = -1;
+			float fMaxDistance = -1.0f;
+			for(int i = 0; i < grabPointModelList.size(); ++i)
+			{
+				float fDistance = glm::distance(ptVertPos, grabPointModelList[i].GetPos());
+				if(fDistance > fMaxDistance)
+				{
+					fMaxDistance = fDistance;
+					iLockedVertIndex = i;
+				}
+			}
+
+			// Translate the selected vertex
+			m_GrabPointViewList[iVertexIndex]->pos.Set(ptVertPos + glm::vec2(vTranslate.x, vTranslate.y));
+
+			// Determine the lower/upper bounds based on the selected and locked vertices
+			glm::vec2 ptSelectedVert = m_GrabPointViewList[iVertexIndex]->pos.Get();
+			glm::vec2 ptLockedVert = m_GrabPointViewList[iLockedVertIndex]->pos.Get();
+			glm::vec2 ptLowerBound, ptUpperBound;
+			HySetVec(ptLowerBound, ptLockedVert.x < ptSelectedVert.x ? ptLockedVert.x : ptSelectedVert.x, ptLockedVert.y < ptSelectedVert.y ? ptLockedVert.y : ptSelectedVert.y);
+			HySetVec(ptUpperBound, ptLockedVert.x >= ptSelectedVert.x ? ptLockedVert.x : ptSelectedVert.x, ptLockedVert.y >= ptSelectedVert.y ? ptLockedVert.y : ptSelectedVert.y);
+
+			// Update the other 2 vertices that aren't the selected or locked
+			for(int i = 0; i < grabPointModelList.size(); ++i)
+			{
+				if(i == iVertexIndex || i == iLockedVertIndex)
+					continue;
+
+				glm::vec2 ptCurrentVert = m_GrabPointViewList[i]->pos.Get();
+				if(ptCurrentVert.x == ptLockedVert.x)
+					ptCurrentVert.x = ptUpperBound.x;
+				else
+					ptCurrentVert.x = ptLowerBound.x;
+				if(ptCurrentVert.y == ptLockedVert.y)
+					ptCurrentVert.y = ptUpperBound.y;
+				else
+					ptCurrentVert.y = ptLowerBound.y;
+				m_GrabPointViewList[i]->pos.Set(ptCurrentVert);
+			}
+		}
+		else // TODO: Better control when 2 verts selected
+		{
+			
+		}
+		break;
+	case SHAPE_Circle:
+		break;
+	case SHAPE_LineSegment:
+		break;
+	case SHAPE_Polygon:
+		break;
+	case SHAPE_Capsule:
+		break;
+	case SHAPE_LineChain:
+		break;
+
+	default:
+		HyGuiLog("GfxShapeModel::DoHoverGrabPoint - Unsupported shape type for grab point transform: " % QString::number(m_pModel->GetType()), LOGTYPE_Error);
+		break;
+	}
 }

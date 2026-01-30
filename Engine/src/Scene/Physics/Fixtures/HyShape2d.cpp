@@ -195,15 +195,14 @@ b2Capsule HyShape2d::GetAsCapsule() const
 		break; }
 
 	case HYFIXTURE_Circle:
-		vertList.reserve(5);
-		vertList.emplace_back(floatList[0], floatList[1]);
-		SetAsCircle(vertList[0], floatList[2]);
+		SetAsCircle(glm::vec2(floatList[0], floatList[1]), floatList[2]);
 
-		// Also add the circumference grab points (top, right, bottom, left)
-		vertList.emplace_back(floatList[0], floatList[1] + floatList[2]); // Top
-		vertList.emplace_back(floatList[0] + floatList[2], floatList[1]); // Right
-		vertList.emplace_back(floatList[0], floatList[1] - floatList[2]); // Bottom
-		vertList.emplace_back(floatList[0] - floatList[2], floatList[1]); // Left
+		// Add the circumference grab points (top, right, bottom, left)
+		vertList.reserve(4);
+		vertList.emplace_back(floatList[0]				 , floatList[1] + floatList[2]);	// Top
+		vertList.emplace_back(floatList[0] + floatList[2], floatList[1]);					// Right
+		vertList.emplace_back(floatList[0]				 , floatList[1] - floatList[2]);	// Bottom
+		vertList.emplace_back(floatList[0] - floatList[2], floatList[1]);					// Left
 		break;
 
 	case HYFIXTURE_LineSegment:

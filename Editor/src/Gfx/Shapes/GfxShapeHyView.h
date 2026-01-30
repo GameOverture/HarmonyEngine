@@ -35,8 +35,9 @@ public:
 protected:
 	void ClearPrimitives();
 	void ClearGrabPoints();
-
 	void ClearPreviewPrimitives();
+
+	void DoHoverGrabPoint();
 };
 
 #endif // GfxShapeHyView_H

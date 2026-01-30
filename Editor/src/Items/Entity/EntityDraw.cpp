@@ -113,8 +113,12 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			case SHAPEMOUSEMOVE_Inside:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
 			case SHAPEMOUSEMOVE_AppendVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 			case SHAPEMOUSEMOVE_InsertVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
-			case SHAPEMOUSEMOVE_HoverVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;
-			case SHAPEMOUSEMOVE_HoverSelectedVertex:	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
+			case SHAPEMOUSEMOVE_HoverGrabPoint:
+				if(pTreeItemData->GetShape2dModel()->IsHoverGrabPointSelected())
+					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor);
+				else
+					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor);
+				break;
 			case SHAPEMOUSEMOVE_HoverCenter:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
 			default:
 				HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_Idle with unsupported shape mouse move result!", LOGTYPE_Error);
@@ -202,8 +206,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			case SHAPEMOUSEMOVE_Creation:
 			case SHAPEMOUSEMOVE_AppendVertex:
 			case SHAPEMOUSEMOVE_InsertVertex:
-			case SHAPEMOUSEMOVE_HoverVertex:
-			case SHAPEMOUSEMOVE_HoverSelectedVertex:
+			case SHAPEMOUSEMOVE_HoverGrabPoint:
 			case SHAPEMOUSEMOVE_HoverCenter:
 				bStartTransform = true;
 				break;
@@ -259,18 +262,18 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		break;
 
 	case EDITMODE_MouseDownOutside:
-	case EDITMODE_MouseDragMarquee:
+	case EDITMODE_MouseDragMarquee: {
+		b2AABB marqueeAabb;
+		if(m_eEditModeState == EDITMODE_MouseDownOutside)
+		{
+			marqueeAabb.lowerBound = { m_ptDragStart.x, m_ptDragStart.y };
+			marqueeAabb.upperBound = { m_ptDragStart.x + 1, m_ptDragStart.y + 1 };
+		}
+		else
+			marqueeAabb = m_MarqueeCtrl.GetSelection();
+
 		if(pTreeItemData->GetShape2dModel())
 		{
-			b2AABB marqueeAabb;
-			if(m_eEditModeState == EDITMODE_MouseDownOutside)
-			{
-				marqueeAabb.lowerBound = { m_ptDragStart.x, m_ptDragStart.y };
-				marqueeAabb.upperBound = { m_ptDragStart.x + 1, m_ptDragStart.y + 1 };
-			}
-			else
-				marqueeAabb = m_MarqueeCtrl.GetSelection();
-			
 			pTreeItemData->GetShape2dModel()->MouseMarqueeReleased(pEvent->buttons(),
 																   QPointF(marqueeAabb.lowerBound.x, marqueeAabb.lowerBound.y),
 																   QPointF(marqueeAabb.upperBound.x, marqueeAabb.upperBound.y));
@@ -279,7 +282,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_MarqueeSelect with unsupported edit item type!", LOGTYPE_Error);
 		
 		m_MarqueeCtrl.Hide();
-		break;
+		break; }
 
 	case EDITMODE_MouseDownTransform:
 	case EDITMODE_MouseDragTransform:
@@ -287,7 +290,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		{
 			glm::vec2 ptCurMousePos;
 			m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
-			QString sUndoText = pTreeItemData->GetShape2dModel()->MouseTransformReleased(QPointF(ptCurMousePos.x, ptCurMousePos.y));
+			QString sUndoText = pTreeItemData->GetShape2dModel()->MouseTransformReleased(pTreeItemData->GetCodeName(), QPointF(ptCurMousePos.x, ptCurMousePos.y));
 			if(sUndoText.isEmpty() == false)
 			{
 				int iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
@@ -320,8 +323,12 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		case SHAPEMOUSEMOVE_Inside:					Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
 		case SHAPEMOUSEMOVE_AppendVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
 		case SHAPEMOUSEMOVE_InsertVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
-		case SHAPEMOUSEMOVE_HoverVertex:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor); break;
-		case SHAPEMOUSEMOVE_HoverSelectedVertex:	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
+		case SHAPEMOUSEMOVE_HoverGrabPoint:
+			if(pTreeItemData->GetShape2dModel()->IsHoverGrabPointSelected())
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor);
+			else
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::PointingHandCursor);
+			break;
 		case SHAPEMOUSEMOVE_HoverCenter:			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::SizeAllCursor); break;
 		default:
 			HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_Idle with unsupported shape mouse move result!", LOGTYPE_Error);

@@ -64,6 +64,11 @@ const HyChain2d &HyChain2d::operator=(const HyChain2d &rhs)
 	return *this;
 }
 
+/*virtual*/ bool HyChain2d::IsValid() const /*override*/
+{
+	return IHyFixture2d::IsValid() && m_Data.iCount >= 4 && m_Data.pPointList != nullptr;
+}
+
 const HyChainData &HyChain2d::GetChainData() const
 {
 	return m_Data;
@@ -71,16 +76,17 @@ const HyChainData &HyChain2d::GetChainData() const
 
 void HyChain2d::SetData(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoop, const b2ChainDef *pPhysicsInit /*= nullptr*/)
 {
+	if(uiNumVerts == 0)
+	{
+		ClearData();
+		return;
+	}
+	
 	if(bLoop && pVertices[0] == pVertices[uiNumVerts - 1])
 	{
 		HyLogWarning("HyChain2d::SetData() - Removing redundant final vertex in chain loop");
 		uiNumVerts--; // Correct the vert list to not include the redundant final loop point
 	}
-	//if(uiNumVerts < 4)
-	//{
-	//	HyLogWarning("HyChain2d::SetData() failed - Line chains must be initialized with at least 4 vertices");
-	//	return;
-	//}
 
 	ClearShapeData();
 	m_eType = HYFIXTURE_LineChain;
@@ -100,6 +106,13 @@ void HyChain2d::SetData(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoo
 void HyChain2d::SetData(const std::vector<glm::vec2> &verticesList, bool bLoop, const b2ChainDef *pPhysicsInit /*= nullptr*/)
 {
 	SetData(verticesList.data(), static_cast<uint32>(verticesList.size()), bLoop, pPhysicsInit);
+}
+
+void HyChain2d::ClearData()
+{
+	ClearShapeData();
+	m_eType = HYFIXTURE_Nothing;
+	ShapeChanged();
 }
 
 /*virtual*/ void HyChain2d::TransformSelf(const glm::mat4 &mtxTransform) /*override*/
@@ -139,7 +152,10 @@ void HyChain2d::SetData(const std::vector<glm::vec2> &verticesList, bool bLoop, 
 	std::vector<glm::vec2> vertList;
 
 	if(floatList.empty())
+	{
+		SetData(vertList, false);
 		return vertList;
+	}
 
 	if(eFixtureType != HYFIXTURE_LineChain)
 	{

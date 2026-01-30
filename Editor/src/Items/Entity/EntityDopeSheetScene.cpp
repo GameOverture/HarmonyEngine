@@ -793,47 +793,45 @@ QJsonValue EntityDopeSheetScene::GetKeyFrameProperty(EntityTreeItemData *pItemDa
 
 QJsonValue EntityDopeSheetScene::BasicExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const
 {
-	if(m_KeyFramesMap.contains(pItemData) == false)
-		return QJsonValue();
-
-	const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
-
-	// Get the closest key frame that is less than or equal to 'iFrameIndex'
-	QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.find(iFrameIndex);
-	if(iter == itemKeyFrameMapRef.end())
+	if(m_KeyFramesMap.contains(pItemData))
 	{
-		// lowerBound() - Returns an iterator pointing to the first item with key 'iFrameIndex' in the map.
-		//                If the map contains no item with key 'iFrameIndex', the function returns an iterator
-		//                to the nearest item with a greater key.
-		iter = itemKeyFrameMapRef.lowerBound(iFrameIndex);
-		if(iter != itemKeyFrameMapRef.begin())
-			iter--; // Don't want an iterator with a greater key, so go back one
-	}
+		const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
 
-	if(iter == itemKeyFrameMapRef.end()) // Still not found
-	{
-		// Lastly, check ctor
-		QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
-		if(ctorKeyFrameMapRef.contains(pItemData))
+		// Get the closest key frame that is less than or equal to 'iFrameIndex'
+		QMap<int, QJsonObject>::const_iterator iter = itemKeyFrameMapRef.find(iFrameIndex);
+		if(iter == itemKeyFrameMapRef.end())
 		{
-			QJsonObject ctorKeyFrameObj = ctorKeyFrameMapRef[pItemData];
-			if(ctorKeyFrameObj.contains(sCategoryName) && ctorKeyFrameObj[sCategoryName].toObject().contains(sPropName))
-				return ctorKeyFrameObj[sCategoryName].toObject()[sPropName];
+			// lowerBound() - Returns an iterator pointing to the first item with key 'iFrameIndex' in the map.
+			//                If the map contains no item with key 'iFrameIndex', the function returns an iterator
+			//                to the nearest item with a greater key.
+			iter = itemKeyFrameMapRef.lowerBound(iFrameIndex);
+			if(iter != itemKeyFrameMapRef.begin())
+				iter--; // Don't want an iterator with a greater key, so go back one
 		}
 
-		return QJsonValue();
+		if(iter != itemKeyFrameMapRef.end()) // Still not found
+		{
+			// Starting with this key frame and going backwards in time, search for the property 'sCategoryName/sPropName' and return the value
+			while(true)
+			{
+				QJsonObject curKeyFrameObj = iter.value();
+				if(curKeyFrameObj.contains(sCategoryName) && curKeyFrameObj[sCategoryName].toObject().contains(sPropName))
+					return curKeyFrameObj[sCategoryName].toObject()[sPropName];
+
+				if(iter == itemKeyFrameMapRef.begin())
+					break;
+				iter--;
+			}
+		}
 	}
 
-	// Starting with this key frame and going backwards in time, search for the property 'sCategoryName/sPropName' and return the value
-	while(true)
+	// Lastly, check ctor
+	QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
+	if(ctorKeyFrameMapRef.contains(pItemData))
 	{
-		QJsonObject curKeyFrameObj = iter.value();
-		if(curKeyFrameObj.contains(sCategoryName) && curKeyFrameObj[sCategoryName].toObject().contains(sPropName))
-			return curKeyFrameObj[sCategoryName].toObject()[sPropName];
-
-		if(iter == itemKeyFrameMapRef.begin())
-			break;
-		iter--;
+		QJsonObject ctorKeyFrameObj = ctorKeyFrameMapRef[pItemData];
+		if(ctorKeyFrameObj.contains(sCategoryName) && ctorKeyFrameObj[sCategoryName].toObject().contains(sPropName))
+			return ctorKeyFrameObj[sCategoryName].toObject()[sPropName];
 	}
 
 	return QJsonValue();
