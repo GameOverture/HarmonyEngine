@@ -47,19 +47,9 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->btnAddComboBox->setDefaultAction(ui->actionAddComboBox);
 	ui->btnAddSlider->setDefaultAction(ui->actionAddSlider);
 
-	ui->btnAddPrimitiveBox->setDefaultAction(ui->actionAddBoxPrimitive);
-	ui->btnAddPrimitiveCircle->setDefaultAction(ui->actionAddCirclePrimitive);
-	ui->btnAddPrimitivePolygon->setDefaultAction(ui->actionAddPolygonPrimitive);
-	ui->btnAddPrimitiveSegment->setDefaultAction(ui->actionAddSegmentPrimitive);
-	ui->btnAddPrimitiveChain->setDefaultAction(ui->actionAddLineChainPrimitive);
-	ui->btnAddPrimitiveCapsule->setDefaultAction(ui->actionAddCapsulePrimitive);
-
-	ui->btnAddShapeBox->setDefaultAction(ui->actionAddBoxShape);
-	ui->btnAddShapeCircle->setDefaultAction(ui->actionAddCircleShape);
-	ui->btnAddShapePolygon->setDefaultAction(ui->actionAddPolygonShape);
-	ui->btnAddShapeSegment->setDefaultAction(ui->actionAddSegmentShape);
-	ui->btnAddShapeChain->setDefaultAction(ui->actionAddLineChainShape);
-	ui->btnAddShapeCapsule->setDefaultAction(ui->actionAddCapsuleShape);
+	ui->btnAddPrimitive->setDefaultAction(ui->actionAddPrimitive);
+	ui->btnAddFixtureShape->setDefaultAction(ui->actionAddShape);
+	ui->btnAddFixtureChain->setDefaultAction(ui->actionAddChain);
 
 	ui->btnAddChild->setDefaultAction(ui->actionAddChildren);
 
@@ -250,26 +240,24 @@ EntityWidget::~EntityWidget()
 		ui->actionOrderChildrenUp->setEnabled(bSelectedHaveSameParent);
 		ui->actionOrderChildrenDown->setEnabled(bSelectedHaveSameParent);
 
-		if(bRootOrBvFolder == false && selectedIndices.size() == 1 && (eType == ITEM_Primitive || eType == ITEM_FixtureShape)) // NOTE: Chain is supported here
+		if(bRootOrBvFolder == false && selectedIndices.size() == 1 && (eType == ITEM_Primitive || HyGlobal::IsItemType_Fixture(eType))) // NOTE: Chain is supported here
 		{
 			ui->actionConvertShape->setEnabled(true);
 			if(eType == ITEM_Primitive)
 			{
-
-
-				ui->actionConvertShape->setIcon(HyGlobal::ItemIcon(ITEM_FixtureShape, SUBICON_None));
-				ui->actionConvertShape->setText("Convert Shape to Bounding Volume");
+				ui->actionConvertShape->setIcon(HyGlobal::ItemIcon(ITEM_ShapeFixture, SUBICON_None));
+				ui->actionConvertShape->setText("Convert Primitive to Fixture");
 			}
 			else
 			{
 				ui->actionConvertShape->setIcon(HyGlobal::ItemIcon(ITEM_Primitive, SUBICON_None));
-				ui->actionConvertShape->setText("Convert Shape to Primitive");
+				ui->actionConvertShape->setText("Convert Fixture to Primitive");
 			}
 		}
 		else
 		{
 			ui->actionConvertShape->setEnabled(false);
-			ui->actionConvertShape->setText("Convert Shape");
+			ui->actionConvertShape->setText("Convert -");
 		}
 		ui->actionRenameItem->setEnabled(bRootOrBvFolder == false && selectedIndices.size() == 1);
 		ui->actionCutEntityItems->setEnabled(bRootOrBvFolder == false);
@@ -776,75 +764,21 @@ void EntityWidget::on_actionAddSlider_triggered()
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
-void EntityWidget::on_actionAddBoxPrimitive_triggered()
+void EntityWidget::on_actionAddPrimitive_triggered()
 {
-	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Box, true);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddPrimitive(m_ItemRef);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
-void EntityWidget::on_actionAddCirclePrimitive_triggered()
+void EntityWidget::on_actionAddShape_triggered()
 {
-	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Circle, true);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddFixture(m_ItemRef, true);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
-void EntityWidget::on_actionAddPolygonPrimitive_triggered()
+void EntityWidget::on_actionAddChain_triggered()
 {
-	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Polygon, true);
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void EntityWidget::on_actionAddSegmentPrimitive_triggered()
-{
-	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_LineSegment, true);
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void EntityWidget::on_actionAddLineChainPrimitive_triggered()
-{
-	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_LineChain, true);
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void EntityWidget::on_actionAddCapsulePrimitive_triggered()
-{
-	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Capsule, true);
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void EntityWidget::on_actionAddBoxShape_triggered()
-{
-	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Box, false);
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void EntityWidget::on_actionAddCircleShape_triggered()
-{
-	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Circle, false);
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void EntityWidget::on_actionAddPolygonShape_triggered()
-{
-	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Polygon, false);
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void EntityWidget::on_actionAddSegmentShape_triggered()
-{
-	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_LineSegment, false);
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void EntityWidget::on_actionAddLineChainShape_triggered()
-{
-	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_LineChain, false);
-	m_ItemRef.GetUndoStack()->push(pCmd);
-}
-
-void EntityWidget::on_actionAddCapsuleShape_triggered()
-{
-	QUndoCommand *pCmd = new EntityUndoCmd_AddNewShape(m_ItemRef, SHAPE_Capsule, false);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddFixture(m_ItemRef, false);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
@@ -1015,22 +949,22 @@ void EntityWidget::on_actionRemoveItems_triggered()
 
 void EntityWidget::on_actionConvertShape_triggered()
 {
-	QModelIndexList selectedIndexList = GetSelectedItems();
+	//QModelIndexList selectedIndexList = GetSelectedItems();
 
-	if(selectedIndexList.size() != 1)
-	{
-		HyGuiLog("EntityWidget::on_actionConvertShape_triggered was invoked with improper selection size", LOGTYPE_Error);
-		return;
-	}
-	EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(selectedIndexList[0], Qt::UserRole).value<EntityTreeItemData *>();
-	if(pCurItemData->GetType() != ITEM_Primitive && pCurItemData->GetType() != ITEM_FixtureShape) // NOTE: Chain fixture not supported here
-	{
-		HyGuiLog("EntityWidget::on_actionConvertShape_triggered was invoked with improper selection type", LOGTYPE_Error);
-		return;
-	}
+	//if(selectedIndexList.size() != 1)
+	//{
+	//	HyGuiLog("EntityWidget::on_actionConvertShape_triggered was invoked with improper selection size", LOGTYPE_Error);
+	//	return;
+	//}
+	//EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(selectedIndexList[0], Qt::UserRole).value<EntityTreeItemData *>();
+	//if(pCurItemData->GetType() != ITEM_Primitive && pCurItemData->GetType() != ITEM_FixtureShape) // NOTE: Chain fixture not supported here
+	//{
+	//	HyGuiLog("EntityWidget::on_actionConvertShape_triggered was invoked with improper selection type", LOGTYPE_Error);
+	//	return;
+	//}
 
-	QUndoCommand *pCmd = new EntityUndoCmd_ConvertShape(m_ItemRef, pCurItemData);
-	m_ItemRef.GetUndoStack()->push(pCmd);
+	//QUndoCommand *pCmd = new EntityUndoCmd_ConvertShape(m_ItemRef, pCurItemData);
+	//m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionRenameItem_triggered()

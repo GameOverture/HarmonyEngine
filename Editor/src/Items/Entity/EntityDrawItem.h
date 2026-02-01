@@ -14,15 +14,15 @@
 
 class EntityDraw;
 class EntityTreeItemData;
-class GfxShapeHyView;
-class GfxShapeModel;
+class IGfxEditModel;
+class IGfxEditView;
 
 // NOTE: this class does not keep its state when removed, it is deleted (should not be passed to UndoCmd's)
 class EntityDrawItem : public IDrawExItem
 {
 	EntityTreeItemData *							m_pEntityTreeItemData;
 	IHyBody2d *										m_pChild;
-	GfxShapeHyView *								m_pShapeView;
+	IGfxEditView *									m_pEditView;
 
 public:
 	EntityDrawItem(Project &projectRef, EntityTreeItemData *pModelItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent);
@@ -37,7 +37,7 @@ public:
 
 	virtual void RefreshTransform() override;
 
-	GfxShapeHyView *GetShapeView();
+	IGfxEditView *GetEditView();
 
 	// This draw visual has all the current extrapolated data set for the current frame
 	QJsonValue ExtractPropertyData(QString sCategory, QString sPropertyName);
@@ -105,6 +105,6 @@ private:
 };
 
 
-void ExtrapolateProperties(Project &projectRef, IHyLoadable2d *pThisHyNode, GfxShapeModel *pShapeModel, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iSTART_FRAME, const int iDESTINATION_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, EntityPreviewComponent &previewComponentRef);
+void ExtrapolateProperties(Project &projectRef, IHyLoadable2d *pThisHyNode, IGfxEditModel *pEditModel, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iSTART_FRAME, const int iDESTINATION_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, EntityPreviewComponent &previewComponentRef);
 
 #endif // ENTITYDRAWITEM_H

@@ -11,14 +11,14 @@
 #define GfxShapeQtView_H
 
 #include "Global.h"
-#include "IGfxShapeView.h"
+#include "IGfxEditView.h"
 
 #include <QGraphicsItem>
 
 class QGraphicsPolygonItem;
 class QGraphicsRectItem;
 
-class GfxShapeQtView : public IGfxShapeView, public QGraphicsItem
+class GfxShapeQtView : public IGfxEditView, public QGraphicsItem
 {
 	QGraphicsPolygonItem *				m_pGfxPolygonItem;
 	QList<QGraphicsRectItem *>			m_GrabPointList;
@@ -28,10 +28,12 @@ public:
 	virtual ~GfxShapeQtView();
 
 	virtual void RefreshColor() override;
-	virtual void RefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) override;
 
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) override;
+	
+protected:
+	virtual void DoRefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) override;
 };
 
 #endif // GfxShapeQtView_H

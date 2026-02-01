@@ -136,18 +136,57 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_AddNewShape : public QUndoCommand
+class EntityUndoCmd_AddPrimitive : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
-	EditorShape						m_eShape;
-	bool							m_bIsPrimitive;
+	int32							m_iIndex;
+
+	EntityTreeItemData *			m_pPrimitiveTreeItemData;
+
+public:
+	EntityUndoCmd_AddPrimitive(ProjectItemData &entityItemRef, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddPrimitive();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_PrimitiveData : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	int								m_iStateIndex;
+	int								m_iFrameIndex;
+	EntityTreeItemData *			m_pPrimitiveItemData;
+	
+	QString							m_sNewType;
+	QList<float>					m_NewData;
+
+	QString							m_sOldType;
+	QList<float>					m_OldData;
+
+public:
+	EntityUndoCmd_PrimitiveData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pPrimitiveItemData, QString sNewType, const QList<float> &newData, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_PrimitiveData();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_AddFixture : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	bool							m_bIsShape;
 	int32							m_iIndex;
 
 	EntityTreeItemData *			m_pShapeTreeItemData;
 
 public:
-	EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, bool bIsPrimitive, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_AddNewShape();
+	EntityUndoCmd_AddFixture(ProjectItemData &entityItemRef, bool bIsShape, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddFixture();
 
 	virtual void redo() override;
 	virtual void undo() override;
@@ -178,21 +217,39 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// NOTE: Converts to/from Primitive and Fixture Shapes, does not work with Fixture Chains
-class EntityUndoCmd_ConvertShape : public QUndoCommand
+class EntityUndoCmd_ChainData : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
-	EntityTreeItemData *			m_pNewShapeItemData;
-	EntityTreeItemData *			m_pPrevShapeItemData;
-	int								m_iPoppedIndex;
+	EntityTreeItemData *			m_pChainItemData;
+	
+	QList<float>					m_NewData;
+	QList<float>					m_OldData;
 
 public:
-	EntityUndoCmd_ConvertShape(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_ConvertShape();
+	EntityUndoCmd_ChainData(QString sText, ProjectItemData &entityItemRef, EntityTreeItemData *pChainItemData, const QList<float> &newData, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_ChainData();
 
 	virtual void redo() override;
 	virtual void undo() override;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//// NOTE: Converts to/from Primitive and Fixture Shapes, does not work with Fixture Chains
+//class EntityUndoCmd_ConvertShape : public QUndoCommand
+//{
+//	ProjectItemData &				m_EntityItemRef;
+//	EntityTreeItemData *			m_pNewShapeItemData;
+//	EntityTreeItemData *			m_pPrevShapeItemData;
+//	int								m_iPoppedIndex;
+//
+//public:
+//	EntityUndoCmd_ConvertShape(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, QUndoCommand *pParent = nullptr);
+//	virtual ~EntityUndoCmd_ConvertShape();
+//
+//	virtual void redo() override;
+//	virtual void undo() override;
+//};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

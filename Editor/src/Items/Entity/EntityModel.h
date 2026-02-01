@@ -81,7 +81,8 @@ public:
 	QList<EntityTreeItemData *> Cmd_CreateNewAssets(QList<IAssetItemData *> assetItemList, int iRow);
 	EntityTreeItemData *Cmd_AddExistingItem(QJsonObject descObj, bool bIsArrayItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
 	EntityTreeItemData *Cmd_CreateNewWidget(ItemType eWidgetType, int iRow);
-	EntityTreeItemData *Cmd_CreateNewShape(int iStateIndex, int iFrameIndex, EditorShape eShape, bool bIsPrimitive, int iRow);
+	EntityTreeItemData *Cmd_CreateNewPrimitive(int iRow);
+	EntityTreeItemData *Cmd_CreateNewFixture(bool bIsShape, int iRow);
 	QList<EntityTreeItemData *> Cmd_AddNewPasteItems(QJsonObject mimeObject, EntityTreeItemData *pArrayFolder);
 	QList<EntityTreeItemData *> Cmd_CreateNewArray(QList<EntityTreeItemData *> itemDataList, QString sArrayName, int iArrayFolderRow); // It is assumed that the items within 'itemDataList' have been removed/popped prior
 	void Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList);
@@ -103,7 +104,8 @@ public:
 	QString GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJsonObject propObj, QString sNewLine) const;
 	QString GenerateSrc_TimelineAdvance() const; // Advance runtime by 1 frame on the timeline
 
-	QString DeserializeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QJsonArray floatArray, QString sNewLine, uint32 &uiMaxVertListSizeOut) const;
+	QString DeserializeShapeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QJsonArray floatArray, QString sNewLine) const;
+	QString DeserializeChainAsRuntimeCode(bool bIsPrimitive, QString sCodeName, QJsonArray floatArray, QString sNewLine) const;
 
 	virtual void OnPopState(int iPoppedStateIndex) override;
 	virtual bool OnPrepSave() override;

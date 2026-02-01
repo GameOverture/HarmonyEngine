@@ -85,19 +85,9 @@ private Q_SLOTS:
 	void on_actionAddComboBox_triggered();
 	void on_actionAddSlider_triggered();
 	
-	void on_actionAddBoxPrimitive_triggered();
-	void on_actionAddCirclePrimitive_triggered();
-	void on_actionAddPolygonPrimitive_triggered();
-	void on_actionAddSegmentPrimitive_triggered();
-	void on_actionAddLineChainPrimitive_triggered();
-	void on_actionAddCapsulePrimitive_triggered();
-
-	void on_actionAddBoxShape_triggered();
-	void on_actionAddCircleShape_triggered();
-	void on_actionAddPolygonShape_triggered();
-	void on_actionAddSegmentShape_triggered();
-	void on_actionAddLineChainShape_triggered();
-	void on_actionAddCapsuleShape_triggered();
+	void on_actionAddPrimitive_triggered();
+	void on_actionAddShape_triggered();
+	void on_actionAddChain_triggered();
 
 	void on_actionOrderChildrenUp_triggered();
 	void on_actionOrderChildrenDown_triggered();

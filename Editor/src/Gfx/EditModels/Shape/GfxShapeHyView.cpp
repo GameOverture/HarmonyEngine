@@ -9,10 +9,11 @@
  *************************************************************************/
 #include "Global.h"
 #include "GfxShapeHyView.h"
+#include "GfxShapeModel.h"
 #include "GfxGrabPointView.h"
 
 GfxShapeHyView::GfxShapeHyView(HyEntity2d *pParent /*= nullptr*/) :
-	HyEntity2d(pParent)
+	IGfxEditView(pParent)
 {
 	// NOTE: m_PrimOutline does not have a parent because it is projected to window coordinates
 	m_PrimOutline.UseWindowCoordinates();
@@ -23,18 +24,7 @@ GfxShapeHyView::GfxShapeHyView(HyEntity2d *pParent /*= nullptr*/) :
 /*virtual*/ GfxShapeHyView::~GfxShapeHyView()
 {
 	ClearPrimitives();
-	ClearGrabPoints();
-}
-
-HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
-{
-	if(iIndex < 0 || iIndex >= m_PrimList.size())
-	{
-		HyGuiLog("GfxShapeHyView::GetPrimitive index out of range", LOGTYPE_Error);
-		return nullptr;
-	}
-
-	return m_PrimList[iIndex];
+	ClearPreviewPrimitives();
 }
 
 /*virtual*/ void GfxShapeHyView::RefreshColor() /*override*/
@@ -55,36 +45,21 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 	m_PrimOutline.SetTint(bIsDark ? HyColor::White : HyColor::Black);
 }
 
-/*virtual*/ void GfxShapeHyView::RefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) /*override*/
+/*virtual*/ void GfxShapeHyView::DoRefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) /*override*/
 {
-	if(m_pModel == nullptr || m_pModel->GetType() == SHAPE_None)
+	if(m_pModel == nullptr || static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_None)
 	{
 		ClearPrimitives();
 		m_PrimOutline.SetAsNothing();
-		ClearGrabPoints();
+		ClearPreviewPrimitives();
 		return;
 	}
-
-	RefreshColor();
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Sync Primitives with Model
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
-	if(m_pModel->GetType() == SHAPE_LineChain)
-	{
-		ClearPrimitives();
-		
-		const HyChainData &chainDataRef = static_cast<HyChain2d *>(m_pModel->GetFixture(0))->GetChainData();
-		std::vector<glm::vec2> projectedVertList;
-		for(int i = 0; i < chainDataRef.iCount; ++i)
-		{
-			glm::vec2 ptScreenPos;
-			pCamera->ProjectToCamera(chainDataRef.pPointList[i], ptScreenPos);
-			projectedVertList.push_back(ptScreenPos);
-		}
-		m_PrimOutline.SetAsLineChain(projectedVertList, chainDataRef.bLoop);
-	}
-	else if(m_pModel->GetType() != SHAPE_Polygon)
+	
+	if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() != SHAPE_Polygon)
 	{
 		if(m_PrimList.size() != 1)
 		{
@@ -92,14 +67,14 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 			HyPrimitive2d *pNewPrim = new HyPrimitive2d(this);
 			m_PrimList.push_back(pNewPrim);
 		}
-		m_PrimList[0]->SetAsShape(*static_cast<HyShape2d *>(m_pModel->GetFixture(0)));
+		m_PrimList[0]->SetAsShape(*static_cast<GfxShapeModel *>(m_pModel)->GetFixture(0));
 
 		if(m_PrimList[0]->GetShapeType() != HYFIXTURE_Nothing)
 		{
 			// Set `m_PrimOutline`
-			if(m_pModel->GetType() == SHAPE_Box)
+			if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_Box)
 			{
-				b2Vec2 *pVerts = static_cast<HyShape2d *>(m_pModel->GetFixture(0))->GetAsPolygon().vertices;
+				b2Vec2 *pVerts = static_cast<GfxShapeModel *>(m_pModel)->GetFixture(0)->GetAsPolygon().vertices;
 				std::vector<glm::vec2> projectedVertList;
 				for(int i = 0; i < 4; ++i)
 				{
@@ -110,9 +85,9 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 
 				m_PrimOutline.SetAsPolygon(projectedVertList);
 			}
-			else if(m_pModel->GetType() == SHAPE_Circle)
+			else if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_Circle)
 			{
-				b2Circle circle = static_cast<HyShape2d *>(m_pModel->GetFixture(0))->GetAsCircle();
+				b2Circle circle = static_cast<GfxShapeModel *>(m_pModel)->GetFixture(0)->GetAsCircle();
 
 				glm::vec2 ptCenter(circle.center.x, circle.center.y);
 				pCamera->ProjectToCamera(ptCenter, ptCenter);
@@ -120,9 +95,9 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 
 				m_PrimOutline.SetAsCircle(ptCenter, fRadius);
 			}
-			else if(m_pModel->GetType() == SHAPE_LineSegment)
+			else if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_LineSegment)
 			{
-				b2Segment seg = static_cast<HyShape2d *>(m_pModel->GetFixture(0))->GetAsSegment();
+				b2Segment seg = static_cast<GfxShapeModel *>(m_pModel)->GetFixture(0)->GetAsSegment();
 				glm::vec2 ptOne(seg.point1.x, seg.point1.y);
 				pCamera->ProjectToCamera(ptOne, ptOne);
 				glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
@@ -130,9 +105,9 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 
 				m_PrimOutline.SetAsLineSegment(ptOne, ptTwo);
 			}
-			else if(m_pModel->GetType() == SHAPE_Capsule)
+			else if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_Capsule)
 			{
-				b2Capsule capsule = static_cast<HyShape2d *>(m_pModel->GetFixture(0))->GetAsCapsule();
+				b2Capsule capsule = static_cast<GfxShapeModel *>(m_pModel)->GetFixture(0)->GetAsCapsule();
 				glm::vec2 ptOne(capsule.center1.x, capsule.center1.y);
 				pCamera->ProjectToCamera(ptOne, ptOne);
 				glm::vec2 ptTwo(capsule.center2.x, capsule.center2.y);
@@ -149,7 +124,7 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 	}
 	else // SHAPE_Polygon
 	{
-		int iNumFixtures = m_pModel->GetNumFixtures();
+		int iNumFixtures = static_cast<GfxShapeModel *>(m_pModel)->GetNumFixtures();
 		while(m_PrimList.size() < iNumFixtures)
 		{
 			HyPrimitive2d *pNewPrim = new HyPrimitive2d(this);
@@ -161,7 +136,7 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 			m_PrimList.pop_back();
 		}
 		for(int iIndex = 0; iIndex < iNumFixtures; ++iIndex)
-			m_PrimList[iIndex]->SetAsShape(*static_cast<HyShape2d *>(m_pModel->GetFixture(iIndex)));
+			m_PrimList[iIndex]->SetAsShape(*static_cast<GfxShapeModel *>(m_pModel)->GetFixture(iIndex));
 
 		// Set `m_PrimOutline`
 		const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
@@ -172,26 +147,12 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 			pCamera->ProjectToCamera(grabPointModelList[i].GetPos(), ptScreenPos);
 			projectedVertList.push_back(ptScreenPos);
 		}
-		m_PrimOutline.SetAsLineChain(projectedVertList, m_pModel->IsLoopClosed());
+		m_PrimOutline.SetAsLineChain(projectedVertList, static_cast<GfxShapeModel *>(m_pModel)->IsLoopClosed());
 	}
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Sync Grab Point Views with Model
-	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
-	while(static_cast<uint32>(m_GrabPointViewList.size()) > grabPointModelList.size())
-	{
-		delete m_GrabPointViewList.back();
-		m_GrabPointViewList.pop_back();
-	}
-	while(static_cast<uint32>(m_GrabPointViewList.size()) < grabPointModelList.size())
-		m_GrabPointViewList.push_back(new GfxGrabPointView(this));
-
-	for(int i = 0; i < grabPointModelList.size(); ++i)
-		m_GrabPointViewList[i]->Sync(&grabPointModelList[i]);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Apply Transform Preview if needed
-
+	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
 	glm::mat4 mtxTransform(1.0f);
 	int iVertexIndex = -1;
 	m_pModel->GetTransformPreview(mtxTransform, iVertexIndex);
@@ -207,12 +168,12 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 		break;
 
 	case SHAPEMOUSEMOVE_AppendVertex: {
-		if(m_pModel->GetType() != SHAPE_Polygon && m_pModel->GetType() != SHAPE_LineChain)
+		if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() != SHAPE_Polygon)
 		{
 			HyGuiLog("GfxShapeHyView::RefreshView - SHAPEMOUSEMOVE_AppendVertex - called with non-polygon/linechain shape type", LOGTYPE_Error);
 			break;
 		}
-		if(m_pModel->IsLoopClosed() || grabPointModelList.empty())
+		if(static_cast<GfxShapeModel *>(m_pModel)->IsLoopClosed() || grabPointModelList.empty())
 		{
 			HyGuiLog("GfxShapeHyView::RefreshView called with closed loop (or grab points empty)", LOGTYPE_Error);
 			break;
@@ -242,7 +203,7 @@ HyPrimitive *GfxShapeHyView::GetPrimitive(int iIndex)
 		break; }
 
 	case SHAPEMOUSEMOVE_InsertVertex: {
-		if(m_pModel->GetType() != SHAPE_Polygon && m_pModel->GetType() != SHAPE_LineChain)
+		if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() != SHAPE_Polygon)
 		{
 			HyGuiLog("GfxShapeHyView::RefreshView - SHAPEMOUSEMOVE_InsertVertex - called with non-polygon/linechain shape type", LOGTYPE_Error);
 			break;
@@ -323,13 +284,6 @@ void GfxShapeHyView::ClearPrimitives()
 	m_PrimList.clear();
 }
 
-void GfxShapeHyView::ClearGrabPoints()
-{
-	for(GfxGrabPointView *pGrabPtView : m_GrabPointViewList)
-		delete pGrabPtView;
-	m_GrabPointViewList.clear();
-}
-
 void GfxShapeHyView::ClearPreviewPrimitives()
 {
 	for(HyPrimitive2d *pPrim : m_PrimPreviewList)
@@ -354,7 +308,7 @@ void GfxShapeHyView::DoHoverGrabPoint()
 		HyGuiLog("GfxShapeModel::DoHoverGrabPoint - Hover vertex not selected on box transform", LOGTYPE_Error);
 
 	// Apply grab point drag logic based on shape type
-	switch(m_pModel->GetType())
+	switch(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType())
 	{
 	case SHAPE_Box: // Lock vertices together to keep box form
 		if(m_pModel->GetNumGrabPointsSelected() == 1)
@@ -415,11 +369,9 @@ void GfxShapeHyView::DoHoverGrabPoint()
 		break;
 	case SHAPE_Capsule:
 		break;
-	case SHAPE_LineChain:
-		break;
 
 	default:
-		HyGuiLog("GfxShapeModel::DoHoverGrabPoint - Unsupported shape type for grab point transform: " % QString::number(m_pModel->GetType()), LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::DoHoverGrabPoint - Unsupported shape type for grab point transform: " % QString::number(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType()), LOGTYPE_Error);
 		break;
 	}
 }

@@ -65,8 +65,8 @@
 	sm_sItemNames[ITEM_SoundClip] = "SoundClip";
 	sm_sItemNames[ITEM_Source] = "Source";
 	sm_sItemNames[ITEM_Header] = "Header";
-	sm_sItemNames[ITEM_FixtureShape] = "Shape";
-	sm_sItemNames[ITEM_FixtureChain] = "Chain";
+	sm_sItemNames[ITEM_ShapeFixture] = "Shape";
+	sm_sItemNames[ITEM_ChainFixture] = "Chain";
 	sm_sItemNames[ITEM_UiLabel] = "Label";
 	sm_sItemNames[ITEM_UiRichLabel] = "RichLabel";
 	sm_sItemNames[ITEM_UiButton] = "Button";
@@ -97,8 +97,8 @@
 	sm_sItemNamesPlural[ITEM_SoundClip] = "SoundClips";
 	sm_sItemNamesPlural[ITEM_Source] = "Source";
 	sm_sItemNamesPlural[ITEM_Header] = "Headers";
-	sm_sItemNamesPlural[ITEM_FixtureShape] = "Shapes";
-	sm_sItemNamesPlural[ITEM_FixtureChain] = "Chains";
+	sm_sItemNamesPlural[ITEM_ShapeFixture] = "Shapes";
+	sm_sItemNamesPlural[ITEM_ChainFixture] = "Chains";
 	sm_sItemNamesPlural[ITEM_UiLabel] = "Labels";
 	sm_sItemNamesPlural[ITEM_UiRichLabel] = "RichLabels";
 	sm_sItemNamesPlural[ITEM_UiButton] = "Buttons";
@@ -127,7 +127,6 @@
 	sm_ShapeNames[SHAPE_LineSegment] = "Segment";
 	sm_ShapeNames[SHAPE_Polygon] = "Polygon";
 	sm_ShapeNames[SHAPE_Capsule] = "Capsule";
-	sm_ShapeNames[SHAPE_LineChain] = "Chain";
 
 	sm_TweenFuncNames[TWEENFUNC_Linear] = "Linear";
 	sm_TweenFuncNames[TWEENFUNC_QuadIn] = "QuadIn";
@@ -295,8 +294,8 @@
 	list.append(ITEM_SoundClip);
 	list.append(ITEM_Source);
 	list.append(ITEM_Header);
-	list.append(ITEM_FixtureShape);
-	list.append(ITEM_FixtureChain);
+	list.append(ITEM_ShapeFixture);
+	list.append(ITEM_ChainFixture);
 	list.append(ITEM_UiLabel);
 	list.append(ITEM_UiRichLabel);
 	list.append(ITEM_UiButton);
@@ -384,7 +383,6 @@
 	list.append(SHAPE_LineSegment);
 	list.append(SHAPE_Polygon);
 	list.append(SHAPE_Capsule);
-	list.append(SHAPE_LineChain);
 
 	if(list.size() != NUM_SHAPES)
 		HyGuiLog("HyGlobal::GetShapeList missing a type!", LOGTYPE_Error);
@@ -679,6 +677,11 @@
 {
 	QList<ItemType> assetItemList = GetItemTypeList_Asset();
 	return assetItemList.contains(eType);
+}
+
+/*static*/ bool HyGlobal::IsItemType_Fixture(ItemType eType)
+{
+	return (eType == ITEM_ShapeFixture || eType == ITEM_ChainFixture);
 }
 
 /*static*/ bool HyGlobal::IsItemType_Widget(ItemType eType)
@@ -1079,8 +1082,6 @@
 		return HYFIXTURE_Circle;
 	case SHAPE_Capsule:
 		return HYFIXTURE_Capsule;
-	case SHAPE_LineChain:
-		return HYFIXTURE_LineChain;
 	default:
 		HyGuiLog("HyGlobal::ConvertShapeToFixtureType - unhandled shape type", LOGTYPE_Error);
 		break;

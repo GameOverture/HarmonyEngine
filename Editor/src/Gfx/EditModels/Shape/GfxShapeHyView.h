@@ -11,15 +11,14 @@
 #define GfxShapeHyView_H
 
 #include "Global.h"
-#include "IGfxShapeView.h"
+#include "IGfxEditView.h"
 
-class GfxGrabPointView;
-
-class GfxShapeHyView : public IGfxShapeView, public HyEntity2d
+class GfxShapeHyView : public IGfxEditView
 {
+	friend class GfxPrimitiveView;
+
 	HyPrimitive2d				m_PrimOutline;			// This primitive is set as line chain. It forms an outline unaffected by camera zoom, using window coordinates
 	QList<HyPrimitive2d *>		m_PrimList;				// A list of primitives that represents how the shape is currently stored in data. Uses world/camera coordinates. Usually just one primitive, but could be multiple for complex polygons
-	QList<GfxGrabPointView *>	m_GrabPointViewList;	// Project to window coordinates
 
 	QList<HyPrimitive2d *>		m_PrimPreviewList;		// A list of primitives used for previewing transformations before they are committed. Uses world/camera coordinates
 
@@ -27,14 +26,11 @@ public:
 	GfxShapeHyView(HyEntity2d *pParent = nullptr);
 	virtual ~GfxShapeHyView();
 
-	HyPrimitive *GetPrimitive(int iIndex);
-
 	virtual void RefreshColor() override;
-	virtual void RefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) override;
 
 protected:
+	virtual void DoRefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) override;
 	void ClearPrimitives();
-	void ClearGrabPoints();
 	void ClearPreviewPrimitives();
 
 	void DoHoverGrabPoint();

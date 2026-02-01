@@ -63,7 +63,9 @@ TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 		for(int j = 0; j < dataArray.size(); ++j)
 			vertexList.push_back(static_cast<float>(dataArray[j].toDouble()));
 
-		m_CollisionLayerMap[collisionUuid] = new GfxShapeModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixture), SHAPE_Polygon, vertexList);
+		m_CollisionLayerMap[collisionUuid] = new GfxShapeModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixture));
+		m_CollisionLayerMap[collisionUuid]->SetShapeType(SHAPE_Polygon);
+		m_CollisionLayerMap[collisionUuid]->SetData(vertexList);
 	}
 }
 

@@ -43,6 +43,7 @@ public:
 
 	bool IsProjectItem() const;
 	bool IsAssetItem() const;
+	bool IsFixtureItem() const;
 
 	QList<TreeModelItemData *> GetDependants() const;
 	QList<TreeModelItemData *> GetDependees() const;

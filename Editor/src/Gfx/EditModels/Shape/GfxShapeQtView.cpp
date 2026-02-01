@@ -16,6 +16,7 @@
 #include <QPen>
 
 GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
+	IGfxEditView(nullptr),
 	QGraphicsItem(pParent),
 	m_pGfxPolygonItem(nullptr)
 {
@@ -38,7 +39,17 @@ GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
 	m_pGfxPolygonItem->setPen(QPen(HyGlobal::ConvertHyColor(m_pModel->GetColor().IsDark() ? HyColor::White : HyColor::Black), 1.0f));
 }
 
-/*virtual*/ void GfxShapeQtView::RefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) /*override*/
+/*virtual*/ QRectF GfxShapeQtView::boundingRect() const /*override*/
+{
+	return m_pGfxPolygonItem->boundingRect().adjusted(-5, -5, 5, 5); // Adjusted for grab points
+}
+
+/*virtual*/ void GfxShapeQtView::paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) /*override*/
+{
+	// Intentionally left blank since we are using child QGraphicsItems for rendering
+}
+
+/*virtual*/ void GfxShapeQtView::DoRefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) /*override*/
 {
 	if(m_pModel == nullptr)
 	{
@@ -53,12 +64,3 @@ GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
 	const QList<GfxGrabPointModel> &grabPointListRef = m_pModel->GetGrabPointList();
 }
 
-/*virtual*/ QRectF GfxShapeQtView::boundingRect() const /*override*/
-{
-	return m_pGfxPolygonItem->boundingRect().adjusted(-5, -5, 5, 5); // Adjusted for grab points
-}
-
-/*virtual*/ void GfxShapeQtView::paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) /*override*/
-{
-	// Intentionally left blank since we are using child QGraphicsItems for rendering
-}

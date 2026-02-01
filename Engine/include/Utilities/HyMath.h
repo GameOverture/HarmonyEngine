@@ -395,6 +395,11 @@ public:
 		m_uiG(static_cast<uint8>(255.0f * HyMath::Clamp(fGreen, 0.0f, 1.0f))),
 		m_uiB(static_cast<uint8>(255.0f * HyMath::Clamp(fBlue, 0.0f, 1.0f)))
 	{ }
+	HyColor(glm::vec3 vColor) :
+		m_uiR(static_cast<uint8>(255.0f * HyMath::Clamp(vColor.r, 0.0f, 1.0f))),
+		m_uiG(static_cast<uint8>(255.0f * HyMath::Clamp(vColor.g, 0.0f, 1.0f))),
+		m_uiB(static_cast<uint8>(255.0f * HyMath::Clamp(vColor.b, 0.0f, 1.0f)))
+	{ }
 
 	bool operator==(const HyColor &rhs)
 	{

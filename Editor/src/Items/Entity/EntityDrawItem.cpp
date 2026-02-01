@@ -14,13 +14,17 @@
 #include "EntityDopeSheetScene.h"
 #include "DlgSetUiPanel.h"
 #include "MainWindow.h"
+#include "GfxPrimitiveModel.h"
+#include "GfxShapeModel.h"
+#include "GfxPrimitiveView.h"
 #include "GfxShapeHyView.h"
+#include "GfxChainView.h"
 
 EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
 	IDrawExItem(pEntityDraw),
 	m_pEntityTreeItemData(pEntityTreeItemData),
 	m_pChild(nullptr),
-	m_pShapeView(nullptr)
+	m_pEditView(nullptr)
 {
 	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
 	TreeModelItemData *pReferencedItemData = projectRef.FindItemData(referencedItemUuid);
@@ -126,12 +130,22 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 			break;
 		};
 	}
-	else if(m_pEntityTreeItemData->GetType() == ITEM_Primitive || m_pEntityTreeItemData->GetType() == ITEM_FixtureShape || m_pEntityTreeItemData->GetType() == ITEM_FixtureChain)
+	else if(m_pEntityTreeItemData->GetType() == ITEM_Primitive)
 	{
-		m_pShapeView = new GfxShapeHyView();
-		m_pShapeView->SetModel(m_pEntityTreeItemData->GetShape2dModel());
+		m_pEditView = new GfxPrimitiveView();
+		
+		m_pEditView->SetModel(m_pEntityTreeItemData->GetEditModel());
+		m_pChild = m_pEditView;
+	}
+	else if(m_pEntityTreeItemData->IsFixtureItem())
+	{
+		if(m_pEntityTreeItemData->GetType() == ITEM_ShapeFixture)
+			m_pEditView = new GfxShapeHyView();
+		else
+			m_pEditView = new GfxChainView();
 
-		m_pChild = m_pShapeView;
+		m_pEditView->SetModel(m_pEntityTreeItemData->GetEditModel());
+		m_pChild = m_pEditView;
 	}
 
 	if(m_pChild)
@@ -179,9 +193,9 @@ EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 	//	m_pShapeView->RefreshView(false);
 }
 
-GfxShapeHyView *EntityDrawItem::GetShapeView()
+IGfxEditView *EntityDrawItem::GetEditView()
 {
-	return m_pShapeView;
+	return m_pEditView;
 }
 
 // NOTE: The listed 4 functions below share logic that process all item properties. Any updates should reflect to all of them
@@ -282,14 +296,23 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 		if(sPropertyName == "Text Indent")
 			return QJsonValue(static_cast<int>(static_cast<HyText2d *>(pThisHyNode)->GetTextIndent()));
 	}
-	else if(sCategory == "Shape")
+	else if(sCategory == "Primitive" || sCategory == "Shape" || sCategory == "Chain")
 	{
+		IGfxEditModel *pModel = static_cast<IGfxEditView *>(pThisHyNode)->GetModel();
+
 		if(sPropertyName == "Type")
-			return QJsonValue(HyGlobal::ShapeName(static_cast<GfxShapeHyView *>(pThisHyNode)->GetModel()->GetType()));
+		{
+			if(pThisHyNode->GetType() == ITEM_Primitive)
+				return QJsonValue(static_cast<GfxPrimitiveModel *>(pModel)->GetPrimType());
+			else if(pThisHyNode->GetType() == ITEM_ShapeFixture)
+				return QJsonValue(HyGlobal::ShapeName(static_cast<GfxShapeModel *>(pModel)->GetShapeType()));
+			else
+				HyGuiLog("EntityDrawItem::ExtractPropertyData - unhandled Type property for Fixture", LOGTYPE_Error);
+		}
 		if(sPropertyName == "Data")
 		{
 			QJsonArray dataArray;
-			QList<float> floatList = m_pEntityTreeItemData->GetShape2dModel()->GetData();
+			QList<float> floatList = m_pEntityTreeItemData->GetEditModel()->GetData();
 			for(float fVal : floatList)
 				dataArray.append(QJsonValue(static_cast<double>(fVal)));
 			return dataArray;
@@ -720,7 +743,7 @@ void SubEntity::ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStat
 //             - ExtrapolateProperties
 void ExtrapolateProperties(Project &projectRef,
 						   IHyLoadable2d *pThisHyNode,
-						   GfxShapeModel *pShapeModel,
+						   IGfxEditModel *pEditModel,
 						   bool bIsSelected,
 						   ItemType eItemType,
 						   const float fFRAME_DURATION,
@@ -744,7 +767,7 @@ void ExtrapolateProperties(Project &projectRef,
 		const QJsonObject &propsObj = keyFrameMapRef[iFrame];
 
 		// Parse all and only the potential categories of the 'eItemType' type, and set the values to 'pHyNode'
-		if(eItemType != ITEM_FixtureShape && eItemType != ITEM_FixtureChain)
+		if(HyGlobal::IsItemType_Fixture(eItemType) == false)
 		{
 			if(propsObj.contains("Common"))
 			{
@@ -847,7 +870,7 @@ void ExtrapolateProperties(Project &projectRef,
 					previewComponentRef.m_TweenInfo[iTweenProp].Set(iFrame, tweenObj, startValue);
 				}
 			}
-		}
+		} // IsFixture != true
 
 		
 		switch(eItemType)
@@ -856,7 +879,7 @@ void ExtrapolateProperties(Project &projectRef,
 		case ITEM_Entity:	// 'ITEM_Entity' is passed when this is a sub-entity (NOTE: sub-entity timeline events are handled above)
 			break;
 
-		case ITEM_Primitive: {
+		case ITEM_Primitive:
 			if(propsObj.contains("Primitive"))
 			{
 				QJsonObject primitiveObj = propsObj["Primitive"].toObject();
@@ -864,51 +887,50 @@ void ExtrapolateProperties(Project &projectRef,
 					static_cast<HyPrimitive2d *>(pThisHyNode)->SetWireframe(primitiveObj["Wireframe"].toBool());
 				if(primitiveObj.contains("Line Thickness"))
 					static_cast<HyPrimitive2d *>(pThisHyNode)->SetLineThickness(primitiveObj["Line Thickness"].toDouble());
+				if(primitiveObj.contains("Type"))
+					static_cast<GfxPrimitiveModel *>(pEditModel)->SetPrimType(primitiveObj["Type"].toString());
+				if(primitiveObj.contains("Data"))
+				{
+					QJsonArray floatArray = primitiveObj["Data"].toArray();
+					QList<float> floatList;
+					for(QJsonValue val : floatArray)
+						floatList.push_back(static_cast<float>(val.toDouble()));
+					pEditModel->SetData(floatList);
+				}
 			}
-		}
-		[[fallthrough]];
-		case ITEM_FixtureShape:
-		case ITEM_FixtureChain:
-			if(pShapeModel)
+			pEditModel->SetColor(HyColor(static_cast<IHyBody2d *>(pThisHyNode)->topColor.Get())); // Always try to sync colors
+			break;
+		
+		case ITEM_ShapeFixture:
+			if(propsObj.contains("Shape"))
 			{
-				bool bNeedColorRefresh = false;
-				bool bNeedFullRefresh = false;
-				HyColor color = pShapeModel->GetColor();
-				EditorShape eShape = pShapeModel->GetType();
-				QList<float> floatList;
-
-				if(eItemType == ITEM_Primitive && propsObj.contains("Body") && propsObj["Body"].toObject().contains("Color Tint"))
+				QJsonObject shapeObj = propsObj["Shape"].toObject();
+				if(shapeObj.contains("Type"))
+					static_cast<GfxShapeModel *>(pEditModel)->SetShapeType(HyGlobal::GetShapeFromString(shapeObj["Type"].toString()));
+				if(shapeObj.contains("Data"))
 				{
-					QJsonArray colorArray = propsObj["Body"].toObject()["Color Tint"].toArray();
-					color = HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt());
-					bNeedColorRefresh = true;
+					QJsonArray floatArray = shapeObj["Data"].toArray();
+					QList<float> floatList;
+					for(QJsonValue val : floatArray)
+						floatList.push_back(static_cast<float>(val.toDouble()));
+					pEditModel->SetData(floatList);
 				}
-
-				if(propsObj.contains("Shape"))
-				{
-					QJsonObject shapeObj = propsObj["Shape"].toObject();
-
-					if(shapeObj.contains("Type"))
-					{
-						eShape = HyGlobal::GetShapeFromString(shapeObj["Type"].toString());
-						bNeedFullRefresh = true;
-					}
-					if(shapeObj.contains("Data"))
-					{
-						QJsonArray floatArray = shapeObj["Data"].toArray();
-						for(QJsonValue val : floatArray)
-							floatList.push_back(static_cast<float>(val.toDouble()));
-						bNeedFullRefresh = true;
-					}
-				}
-				
-				if(bNeedFullRefresh)
-					pShapeModel->SetData(color, eShape, floatList);
-				else if(bNeedColorRefresh)
-					pShapeModel->SetColor(color);
 			}
-			else
-				HyGuiLog("ExtrapolateProperties - Missing GfxShapeModel ptr for Fixture/Primitive shape processing", LOGTYPE_Error);
+			break;
+
+		case ITEM_ChainFixture:
+			if(propsObj.contains("Chain"))
+			{
+				QJsonObject chainObj = propsObj["Chain"].toObject();
+				if(chainObj.contains("Data"))
+				{
+					QJsonArray floatArray = chainObj["Data"].toArray();
+					QList<float> floatList;
+					for(QJsonValue val : floatArray)
+						floatList.push_back(static_cast<float>(val.toDouble()));
+					pEditModel->SetData(floatList);
+				}
+			}
 			break;
 
 		case ITEM_AtlasFrame:

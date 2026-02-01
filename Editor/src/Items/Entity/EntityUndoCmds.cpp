@@ -257,7 +257,7 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 			pDestinationParent = entTreeModelRef.GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
 		else
 		{
-			if(m_SelectedItemDataList[i]->GetType() == ITEM_FixtureShape || m_SelectedItemDataList[i]->GetType() == ITEM_FixtureChain)
+			if(m_SelectedItemDataList[i]->IsFixtureItem())
 				pDestinationParent = entTreeModelRef.GetBvFolderTreeItemData();
 			else
 				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
@@ -280,7 +280,7 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 			pDestinationParent = entTreeModelRef.GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
 		else
 		{
-			if(m_SelectedItemDataList[i]->GetType() == ITEM_FixtureShape || m_SelectedItemDataList[i]->GetType() == ITEM_FixtureChain)
+			if(m_SelectedItemDataList[i]->IsFixtureItem())
 				pDestinationParent = entTreeModelRef.GetBvFolderTreeItemData();
 			else
 				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
@@ -329,7 +329,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	m_CreatedKeyFrameList.clear();
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
-		if(m_AffectedItemDataList[i]->GetType() != ITEM_FixtureShape && m_AffectedItemDataList[i]->GetType() != ITEM_FixtureChain)
+		if(m_AffectedItemDataList[i]->IsFixtureItem() == false)
 		{
 			glm::decompose(m_NewTransformList[i], vNewScale, quatRot, ptNewTranslation, vSkew, vPerspective);
 			double dNewRotation = glm::degrees(glm::atan(m_NewTransformList[i][0][1], m_NewTransformList[i][0][0]));
@@ -367,25 +367,25 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 
 			m_CreatedKeyFrameList.push_back(std::make_tuple(bCreatedTranslationKeyFrame, bCreatedRotationKeyFrame, bCreatedScaleKeyFrame));
 		}
-		else // ITEM_FixtureShape or ITEM_FixtureChain
-		{
-			QString sShapeType = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_ComboBoxString, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Type")).toString();
-			QJsonArray oldShapeDataArray = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_FloatArray, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data")).toJsonArray();
-			m_OldShapeDataArrayList.append(oldShapeDataArray);
+		//else // ITEM_FixtureShape or ITEM_FixtureChain
+		//{
+		//	QString sShapeType = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_ComboBoxString, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Type")).toString();
+		//	QJsonArray oldShapeDataArray = PropertiesTreeModel::ConvertJsonToVariant(PROPERTIESTYPE_FloatArray, pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data")).toJsonArray();
+		//	m_OldShapeDataArrayList.append(oldShapeDataArray);
 
-			QList<float> floatList;
-			for(QJsonValue floatVal : oldShapeDataArray)
-				floatList.push_back(static_cast<float>(floatVal.toDouble()));
-			GfxShapeModel tmpShapeModel(HyColor::Black, HyGlobal::GetShapeFromString(sShapeType), floatList);
-			tmpShapeModel.TransformData(m_NewTransformList[i]);
+		//	QList<float> floatList;
+		//	for(QJsonValue floatVal : oldShapeDataArray)
+		//		floatList.push_back(static_cast<float>(floatVal.toDouble()));
+		//	GfxShapeModel tmpShapeModel(HyColor::Black, HyGlobal::GetShapeFromString(sShapeType), floatList);
+		//	tmpShapeModel.TransformData(m_NewTransformList[i]);
 
-			QList<float> transformedFloatList = tmpShapeModel.GetData();
-			QJsonArray transformedFloatArray;
-			for(float fVal : transformedFloatList)
-				transformedFloatArray.append(fVal);
-			
-			pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", transformedFloatArray, false);
-		}
+		//	QList<float> transformedFloatList = tmpShapeModel.GetData();
+		//	QJsonArray transformedFloatArray;
+		//	for(float fVal : transformedFloatList)
+		//		transformedFloatArray.append(fVal);
+		//	
+		//	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_AffectedItemDataList[i], m_iFrameIndex, "Shape", "Data", transformedFloatArray, false);
+		//}
 
 		affectedItemUuidList << m_AffectedItemDataList[i]->GetThisUuid();
 	}
@@ -414,7 +414,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 	QList<QUuid> affectedItemUuidList;
 	for(int i = 0; i < m_AffectedItemDataList.size(); ++i)
 	{
-		if(m_AffectedItemDataList[i]->GetType() != ITEM_FixtureShape && m_AffectedItemDataList[i]->GetType() != ITEM_FixtureChain)
+		if(m_AffectedItemDataList[i]->IsFixtureItem() == false)
 		{
 			glm::decompose(m_OldTransformList[i], vOldScale, quatRot, ptOldTranslation, vSkew, vPerspective);
 			double dOldRotation = glm::degrees(glm::atan(m_OldTransformList[i][0][1], m_OldTransformList[i][0][0]));
@@ -477,28 +477,127 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_AddNewShape::EntityUndoCmd_AddNewShape(ProjectItemData &entityItemRef, EditorShape eShape, bool bIsPrimitive, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_AddPrimitive::EntityUndoCmd_AddPrimitive(ProjectItemData &entityItemRef, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
-	m_eShape(eShape),
-	m_bIsPrimitive(bIsPrimitive),
+	m_iIndex(iRowIndex),
+	m_pPrimitiveTreeItemData(nullptr)
+{
+	setText("Add New Primitive");
+}
+
+/*virtual*/ EntityUndoCmd_AddPrimitive::~EntityUndoCmd_AddPrimitive()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_AddPrimitive::redo() /*override*/
+{
+	if(m_pPrimitiveTreeItemData == nullptr)
+		m_pPrimitiveTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewPrimitive(m_iIndex);
+	else
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pPrimitiveTreeItemData, m_iIndex);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	pWidget->SetEditMode(m_pPrimitiveTreeItemData);
+}
+
+/*virtual*/ void EntityUndoCmd_AddPrimitive::undo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pPrimitiveTreeItemData);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	pWidget->SetEditMode(nullptr);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_PrimitiveData::EntityUndoCmd_PrimitiveData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pPrimitiveItemData, QString sNewType, const QList<float> &newData, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_iStateIndex(iStateIndex),
+	m_iFrameIndex(iFrameIndex),
+	m_pPrimitiveItemData(pPrimitiveItemData),
+	m_sNewType(sNewType),
+	m_NewData(newData)
+{
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
+	m_sOldType = pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_pPrimitiveItemData, m_iFrameIndex, "Primitive", "Type").toString();
+	
+	QJsonArray dataArray = pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_pPrimitiveItemData, m_iFrameIndex, "Primitive", "Data").toArray();
+	for(QJsonValue val : dataArray)
+		m_OldData.append(static_cast<float>(val.toDouble()));
+
+	setText(sText);
+}
+
+/*virtual*/ EntityUndoCmd_PrimitiveData::~EntityUndoCmd_PrimitiveData()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_PrimitiveData::redo() /*override*/
+{
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
+
+	if(m_sOldType != m_sNewType)
+		pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pPrimitiveItemData, m_iFrameIndex, "Primitive", "Type", QJsonValue(m_sNewType), false);
+
+	QJsonArray newDataArray;
+	for(float f : m_NewData)
+		newDataArray.append(f);
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pPrimitiveItemData, m_iFrameIndex, "Primitive", "Data", newDataArray, true);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget == nullptr)
+	{
+		HyGuiLog("EntityUndoCmd_PrimitiveData::redo() - pWidget is nullptr", LOGTYPE_Error);
+		return;
+	}
+	pWidget->RequestSelectedItems(QList<QUuid>() << m_pPrimitiveItemData->GetThisUuid());
+	pWidget->SetEditMode(m_pPrimitiveItemData);
+}
+
+/*virtual*/ void EntityUndoCmd_PrimitiveData::undo() /*override*/
+{
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
+
+	if(m_sOldType != m_sNewType)
+		pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pPrimitiveItemData, m_iFrameIndex, "Primitive", "Type", QJsonValue(m_sOldType), false);
+
+	QJsonArray oldDataArray;
+	for(float f : m_OldData)
+		oldDataArray.append(f);
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pPrimitiveItemData, m_iFrameIndex, "Primitive", "Data", oldDataArray, true);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget == nullptr)
+	{
+		HyGuiLog("EntityUndoCmd_PrimitiveData::undo() - pWidget is nullptr", LOGTYPE_Error);
+		return;
+	}
+	pWidget->RequestSelectedItems(QList<QUuid>() << m_pPrimitiveItemData->GetThisUuid());
+	pWidget->SetEditMode(m_pPrimitiveItemData);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_AddFixture::EntityUndoCmd_AddFixture(ProjectItemData &entityItemRef, bool bIsShape, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_bIsShape(bIsShape),
 	m_iIndex(iRowIndex),
 	m_pShapeTreeItemData(nullptr)
 {
-	setText("Add New " % HyGlobal::ShapeName(m_eShape) % (m_bIsPrimitive ? "Primitive" : "Fixture") % " Shape");
+	if(m_bIsShape)
+		setText("Add New Shape Fixture");
+	else
+		setText("Add New Chain Fixture");
 }
 
-/*virtual*/ EntityUndoCmd_AddNewShape::~EntityUndoCmd_AddNewShape()
+/*virtual*/ EntityUndoCmd_AddFixture::~EntityUndoCmd_AddFixture()
 {
 }
 
-/*virtual*/ void EntityUndoCmd_AddNewShape::redo() /*override*/
+/*virtual*/ void EntityUndoCmd_AddFixture::redo() /*override*/
 {
 	if(m_pShapeTreeItemData == nullptr)
-	{
-		int iStateIndex = m_EntityItemRef.GetWidget()->GetCurStateIndex();
-		int iFrameIndex = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
-		m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewShape(iStateIndex, iFrameIndex, m_eShape, m_bIsPrimitive, m_iIndex);
-	}
+		m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewFixture(m_bIsShape, m_iIndex);
 	else
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pShapeTreeItemData, m_iIndex);
 
@@ -506,7 +605,7 @@ EntityUndoCmd_AddNewShape::EntityUndoCmd_AddNewShape(ProjectItemData &entityItem
 	pWidget->SetEditMode(m_pShapeTreeItemData);
 }
 
-/*virtual*/ void EntityUndoCmd_AddNewShape::undo() /*override*/
+/*virtual*/ void EntityUndoCmd_AddFixture::undo() /*override*/
 {
 	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pShapeTreeItemData);
 
@@ -584,57 +683,114 @@ EntityUndoCmd_ShapeData::EntityUndoCmd_ShapeData(QString sText, ProjectItemData 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_ChainData::EntityUndoCmd_ChainData(QString sText, ProjectItemData &entityItemRef, EntityTreeItemData *pChainItemData, const QList<float> &newData, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
-	m_pNewShapeItemData(nullptr),
-	m_pPrevShapeItemData(pShapeItemData),
-	m_iPoppedIndex(-1)
+	m_pChainItemData(pChainItemData),
+	m_NewData(newData)
 {
-	if(m_pPrevShapeItemData->GetType() == ITEM_FixtureShape)
-		setText("Convert Fixture Shape to Primitive");
-	else if(m_pPrevShapeItemData->GetType() == ITEM_Primitive)
-		setText("Convert Primitive to Fixture Shape");
-	else
-		HyGuiLog("EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape() - Wrong type", LOGTYPE_Error);
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(0));
+	QJsonArray dataArray = pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_pChainItemData, -1, "Chain", "Data").toArray();
+	for(QJsonValue val : dataArray)
+		m_OldData.append(static_cast<float>(val.toDouble()));
+
+	setText(sText);
 }
 
-/*virtual*/ EntityUndoCmd_ConvertShape::~EntityUndoCmd_ConvertShape()
+/*virtual*/ EntityUndoCmd_ChainData::~EntityUndoCmd_ChainData()
 {
 }
 
-/*virtual*/ void EntityUndoCmd_ConvertShape::redo() /*override*/
+/*virtual*/ void EntityUndoCmd_ChainData::redo() /*override*/
 {
-	m_iPoppedIndex = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pPrevShapeItemData);
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(0));
 
-	if(m_pNewShapeItemData == nullptr)
+	QJsonArray newDataArray;
+	for(float f : m_NewData)
+		newDataArray.append(f);
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pChainItemData, -1, "Chain", "Data", newDataArray, true);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget == nullptr)
 	{
-		QJsonObject descObj;
-		m_pPrevShapeItemData->InsertJsonInfo_Desc(descObj);
-
-		if(m_pPrevShapeItemData->GetType() == ITEM_FixtureShape)
-			descObj["Type"] = HyGlobal::ItemName(ITEM_Primitive, false);
-		else
-			descObj["Type"] = HyGlobal::ItemName(ITEM_FixtureShape, false);
-
-		m_pNewShapeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingItem(descObj, m_pPrevShapeItemData->GetEntType() == ENTTYPE_ArrayItem, -1);
+		HyGuiLog("EntityUndoCmd_ChainData::redo() - pWidget is nullptr", LOGTYPE_Error);
+		return;
 	}
-	else
-		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pNewShapeItemData, -1);
-
-	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
-	if(pWidget)
-		pWidget->RequestSelectedItems(QList<QUuid>() << m_pNewShapeItemData->GetThisUuid());
+	pWidget->RequestSelectedItems(QList<QUuid>() << m_pChainItemData->GetThisUuid());
+	pWidget->SetEditMode(m_pChainItemData);
 }
 
-/*virtual*/ void EntityUndoCmd_ConvertShape::undo() /*override*/
+/*virtual*/ void EntityUndoCmd_ChainData::undo() /*override*/
 {
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pNewShapeItemData);
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pPrevShapeItemData, m_iPoppedIndex);
+	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(0));
+
+	QJsonArray oldDataArray;
+	for(float f : m_OldData)
+		oldDataArray.append(f);
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pChainItemData, -1, "Chain", "Data", oldDataArray, true);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
-	if(pWidget)
-		pWidget->RequestSelectedItems(QList<QUuid>() << m_pPrevShapeItemData->GetThisUuid());
+	if(pWidget == nullptr)
+	{
+		HyGuiLog("EntityUndoCmd_ChainData::undo() - pWidget is nullptr", LOGTYPE_Error);
+		return;
+	}
+	pWidget->RequestSelectedItems(QList<QUuid>() << m_pChainItemData->GetThisUuid());
+	pWidget->SetEditMode(m_pChainItemData);
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape(ProjectItemData &entityItemRef, EntityTreeItemData *pShapeItemData, QUndoCommand *pParent /*= nullptr*/) :
+//	m_EntityItemRef(entityItemRef),
+//	m_pNewShapeItemData(nullptr),
+//	m_pPrevShapeItemData(pShapeItemData),
+//	m_iPoppedIndex(-1)
+//{
+//	if(m_pPrevShapeItemData->IsFixtureItem())
+//		setText("Convert Fixture to Primitive");
+//	else if(m_pPrevShapeItemData->GetType() == ITEM_Primitive)
+//		setText("Convert Primitive to Fixture");
+//	else
+//		HyGuiLog("EntityUndoCmd_ConvertShape::EntityUndoCmd_ConvertShape() - Wrong type", LOGTYPE_Error);
+//}
+//
+///*virtual*/ EntityUndoCmd_ConvertShape::~EntityUndoCmd_ConvertShape()
+//{
+//}
+//
+///*virtual*/ void EntityUndoCmd_ConvertShape::redo() /*override*/
+//{
+//	m_iPoppedIndex = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pPrevShapeItemData);
+//
+//	if(m_pNewShapeItemData == nullptr)
+//	{
+//		QJsonObject descObj;
+//		m_pPrevShapeItemData->InsertJsonInfo_Desc(descObj);
+//
+//		if(m_pPrevShapeItemData->IsFixtureItem())
+//			descObj["Type"] = HyGlobal::ItemName(ITEM_Primitive, false);
+//		else
+//			descObj["Type"] = HyGlobal::ItemName(ITEM_FixtureShape, false);
+//
+//		m_pNewShapeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_AddExistingItem(descObj, m_pPrevShapeItemData->GetEntType() == ENTTYPE_ArrayItem, -1);
+//	}
+//	else
+//		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pNewShapeItemData, -1);
+//
+//	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+//	if(pWidget)
+//		pWidget->RequestSelectedItems(QList<QUuid>() << m_pNewShapeItemData->GetThisUuid());
+//}
+//
+///*virtual*/ void EntityUndoCmd_ConvertShape::undo() /*override*/
+//{
+//	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pNewShapeItemData);
+//	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pPrevShapeItemData, m_iPoppedIndex);
+//
+//	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+//	if(pWidget)
+//		pWidget->RequestSelectedItems(QList<QUuid>() << m_pPrevShapeItemData->GetThisUuid());
+//}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

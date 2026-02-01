@@ -9,22 +9,16 @@
 *************************************************************************/
 #include "Global.h"
 #include "GfxShapeModel.h"
-#include "IGfxShapeView.h"
-#include "GfxGrabPointModel.h"
+#include "IGfxEditView.h"
 
-GfxShapeModel::GfxShapeModel(HyColor color, EditorShape eShape /*= SHAPE_None*/, const QList<float> &floatList /*= QList<float>()*/) :
-	m_eType(SHAPE_None),
-	m_mtxTransform(1.0f),
+GfxShapeModel::GfxShapeModel(HyColor color) :
+	IGfxEditModel(EDITMODEL_Shape, color),
+	m_eShapeType(SHAPE_None),
 	m_bSelfIntersecting(false),
 	m_ptSelfIntersection(0.0f, 0.0f),
-	m_GrabPointCenter(GRABPOINT_Center),
 	m_bReverseWindingOrder(false),
-	m_bLoopClosed(false),
-	m_eCurTransform(SHAPEMOUSEMOVE_None),
-	m_iVertexIndex(-1),
-	m_bTransformShiftMod(false)
+	m_bLoopClosed(false)
 {
-	SetData(color, eShape, floatList);
 }
 
 /*virtual*/ GfxShapeModel::~GfxShapeModel()
@@ -32,18 +26,9 @@ GfxShapeModel::GfxShapeModel(HyColor color, EditorShape eShape /*= SHAPE_None*/,
 	ClearFixtures();
 }
 
-bool GfxShapeModel::IsValidShape() const
+/*virtual*/ bool GfxShapeModel::IsValidModel() const /*override*/
 {
-	if(m_eType == SHAPE_LineChain)
-	{
-		HyChain2d *pChain2d = static_cast<HyChain2d *>(m_FixtureList[0]);
-		if(pChain2d->GetChainData().iCount < 4)
-			return false;
-
-		return m_bSelfIntersecting == false;
-	}
-	
-	switch(m_eType)
+	switch(m_eShapeType)
 	{
 	case SHAPE_None:
 		return true;
@@ -51,7 +36,7 @@ bool GfxShapeModel::IsValidShape() const
 	case SHAPE_Polygon:
 		if(m_bSelfIntersecting || m_GrabPointList.size() < 3)
 			return false;
-		for(IHyFixture2d *pFixture : m_FixtureList)
+		for(HyShape2d *pFixture : m_ShapeList)
 		{
 			if(pFixture->IsValid() == false)
 				return false;
@@ -62,7 +47,7 @@ bool GfxShapeModel::IsValidShape() const
 	case SHAPE_Circle:
 	case SHAPE_LineSegment:
 	case SHAPE_Capsule:
-		return static_cast<HyShape2d *>(m_FixtureList[0])->IsValid();
+		return m_ShapeList[0]->IsValid();
 
 	default:
 		HyGuiLog("GfxShapeModel::IsValidShape: Unknown shape type encountered", LOGTYPE_Error);
@@ -72,29 +57,15 @@ bool GfxShapeModel::IsValidShape() const
 	return false;
 }
 
-HyColor GfxShapeModel::GetColor() const
+EditorShape GfxShapeModel::GetShapeType() const
 {
-	return m_Color;
+	return m_eShapeType;
 }
 
-
-void GfxShapeModel::SetColor(HyColor color)
-{
-	m_Color = color;
-
-	for(IGfxShapeView *pView : m_ViewList)
-		pView->RefreshColor();
-}
-
-EditorShape GfxShapeModel::GetType() const
-{
-	return m_eType;
-}
-
-void GfxShapeModel::SetType(EditorShape eNewShape)
+void GfxShapeModel::SetShapeType(EditorShape eNewShape)
 {
 	// Convert existing data to new shape type
-	if(m_eType != eNewShape)
+	if(m_eShapeType != eNewShape)
 	{
 		QList<float> convertedDataList;
 		switch(eNewShape)
@@ -114,7 +85,6 @@ void GfxShapeModel::SetType(EditorShape eNewShape)
 			convertedDataList = ConvertedCapsuleData();
 			break;
 		case SHAPE_Polygon:
-		case SHAPE_LineChain:
 			convertedDataList = ConvertedPolygonOrLineChainData();
 			break;
 
@@ -123,20 +93,25 @@ void GfxShapeModel::SetType(EditorShape eNewShape)
 			break;
 		}
 
-		SetData(m_Color, eNewShape, convertedDataList);
+		m_eShapeType = eNewShape;
+
+		ClearFixtures();
+		m_ShapeList.push_back(new HyShape2d());
+
+		SetData(convertedDataList);
 	}
 
-	for(IGfxShapeView *pView : m_ViewList)
+	for(IGfxEditView *pView : m_ViewList)
 		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
 }
 
-QList<float> GfxShapeModel::GetData() const
+/*virtual*/ QList<float> GfxShapeModel::GetData() const /*override*/
 {
-	if(m_FixtureList.empty())
+	if(m_ShapeList.empty())
 		return QList<float>();
-	if(m_eType != SHAPE_Polygon)
+	if(m_eShapeType != SHAPE_Polygon)
 	{
-		std::vector<float> serializedData = m_FixtureList[0]->SerializeSelf();
+		std::vector<float> serializedData = m_ShapeList[0]->SerializeSelf();
 		QList<float> returnList(serializedData.begin(), serializedData.end());
 		return returnList;
 	}
@@ -153,39 +128,23 @@ QList<float> GfxShapeModel::GetData() const
 	return returnList;
 }
 
-void GfxShapeModel::SetData(HyColor color, EditorShape eShape, const QList<float> &floatList)
+/*virtual*/ void GfxShapeModel::SetData(const QList<float> &floatList) /*override*/
 {
-	m_Color = color;
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	EditorShape ePreviouslyWasShape = m_eType;
-	if(m_eType != eShape || m_FixtureList.empty())
-	{
-		m_eType = eShape;
-
-		ClearFixtures();
-		if(m_eType == SHAPE_LineChain)
-			m_FixtureList.push_back(new HyChain2d());
-		else if(m_eType != SHAPE_Polygon)
-			m_FixtureList.push_back(new HyShape2d());
-	}
+	if(m_ShapeList.empty())
+		m_ShapeList.push_back(new HyShape2d());
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Assemble `m_GrabPointList`
 	std::vector<glm::vec2> grabPointList;
 	if(floatList.empty() == false)
 	{
-		if(m_eType != SHAPE_Polygon)
+		if(m_eShapeType != SHAPE_Polygon)
 		{
-			grabPointList = m_FixtureList[0]->DeserializeSelf(HyGlobal::ConvertShapeToFixtureType(m_eType), std::vector<float>(floatList.begin(), floatList.end()));
+			grabPointList = m_ShapeList[0]->DeserializeSelf(HyGlobal::ConvertShapeToFixtureType(m_eShapeType), std::vector<float>(floatList.begin(), floatList.end()));
 		
-			if(m_eType != SHAPE_LineChain)
-			{
-				glm::vec2 ptCentroid;
-				static_cast<HyShape2d *>(m_FixtureList[0])->GetCentroid(ptCentroid);
-				m_GrabPointCenter.Setup(ptCentroid);
-			}
+			glm::vec2 ptCentroid;
+			m_ShapeList[0]->GetCentroid(ptCentroid);
+			m_GrabPointCenter.Setup(ptCentroid);
 		}
 		else // SHAPE_Polygon deserialization
 		{	
@@ -203,26 +162,26 @@ void GfxShapeModel::SetData(HyColor color, EditorShape eShape, const QList<float
 		}
 	}
 
-	// Preserve existing grab points where possible (keeps selection)
-	if(m_eType == ePreviouslyWasShape) 
-	{
-		for(int i = 0; i < grabPointList.size(); ++i)
-		{
-			if(static_cast<int>(m_GrabPointList.size()) - 1 < i)
-				m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, grabPointList[i]));
-			else
-				m_GrabPointList[i].Setup(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
-		}
-		if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
-			m_GrabPointList.resize(grabPointList.size());
-	}
-	else
+	//// Preserve existing grab points where possible (keeps selection)
+	//if(m_eType == ePreviouslyWasShape) 
+	//{
+	//	for(int i = 0; i < grabPointList.size(); ++i)
+	//	{
+	//		if(static_cast<int>(m_GrabPointList.size()) - 1 < i)
+	//			m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, grabPointList[i]));
+	//		else
+	//			m_GrabPointList[i].Setup(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
+	//	}
+	//	if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
+	//		m_GrabPointList.resize(grabPointList.size());
+	//}
+	//else
 	{
 		m_GrabPointList.clear();
 		for(const glm::vec2 &ptGrab : grabPointList)
 			m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, ptGrab));
 	}
-	if((m_eType == SHAPE_Polygon || m_eType == SHAPE_LineChain) &&
+	if(m_eShapeType == SHAPE_Polygon &&
 		m_bLoopClosed == false &&
 		m_GrabPointList.size() > 1)
 	{
@@ -233,18 +192,10 @@ void GfxShapeModel::SetData(HyColor color, EditorShape eShape, const QList<float
 	
 	if(m_GrabPointList.empty())
 	{
-		if(m_eType == SHAPE_LineChain)
-		{
-			for(IHyFixture2d *pFixture : m_FixtureList)
-				static_cast<HyChain2d *>(pFixture)->ClearData();
-		}
-		else
-		{
-			for(IHyFixture2d *pFixture : m_FixtureList)
-				static_cast<HyShape2d *>(pFixture)->SetAsNothing();
-		}
+		for(HyShape2d *pFixture : m_ShapeList)
+			pFixture->SetAsNothing();
 	}
-	else if(m_eType == SHAPE_Polygon) // Assemble `m_FixtureList` with valid sub-polygons (convex and <= 8 vertices)
+	else if(m_eShapeType == SHAPE_Polygon) // Assemble `m_FixtureList` with valid sub-polygons (convex and <= 8 vertices)
 	{
 		std::vector<glm::vec2> ccwOrderedVertexList;
 		ccwOrderedVertexList.reserve(m_GrabPointList.size());
@@ -294,98 +245,29 @@ void GfxShapeModel::SetData(HyColor color, EditorShape eShape, const QList<float
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	for(IGfxShapeView *pView : m_ViewList)
+	for(IGfxEditView *pView : m_ViewList)
 		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
-}
-
-void GfxShapeModel::GetTransformPreview(glm::mat4 &mtxTransformOut, int &iVertexIndexOut) const
-{
-	mtxTransformOut = m_mtxTransform;
-	iVertexIndexOut = m_iVertexIndex;
 }
 
 void GfxShapeModel::TransformData(glm::mat4 mtxTransform)
 {
-	for(IHyFixture2d *pFixture : m_FixtureList)
+	for(HyShape2d *pFixture : m_ShapeList)
 		pFixture->TransformSelf(mtxTransform);
 
-	for(IGfxShapeView *pView : m_ViewList)
+	for(IGfxEditView *pView : m_ViewList)
 		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
-}
-
-void GfxShapeModel::AddView(IGfxShapeView *pView)
-{
-	if(m_ViewList.contains(pView))
-		return;
-	m_ViewList.push_back(pView);
-}
-
-bool GfxShapeModel::RemoveView(IGfxShapeView *pView)
-{
-	return m_ViewList.removeOne(pView);
 }
 
 int GfxShapeModel::GetNumFixtures() const
 {
-	return m_FixtureList.size();
+	return m_ShapeList.size();
 }
 
-IHyFixture2d *GfxShapeModel::GetFixture(int iIndex) const
+HyShape2d *GfxShapeModel::GetFixture(int iIndex) const
 {
-	if(iIndex < 0 || iIndex >= m_FixtureList.size())
+	if(iIndex < 0 || iIndex >= m_ShapeList.size())
 		return nullptr;
-	return m_FixtureList[iIndex];
-}
-
-const QList<GfxGrabPointModel> &GfxShapeModel::GetGrabPointList() const
-{
-	return m_GrabPointList;
-}
-
-const GfxGrabPointModel &GfxShapeModel::GetGrabPoint(int iIndex) const
-{
-	if(iIndex < 0 || iIndex >= m_GrabPointList.size())
-	{
-		HyGuiLog("GfxShapeModel::GetGrabPoint - Index out of range", LOGTYPE_Error);
-		return m_GrabPointCenter;
-	}
-	return m_GrabPointList[iIndex];
-}
-
-const GfxGrabPointModel &GfxShapeModel::GetCenterGrabPoint() const
-{
-	return m_GrabPointCenter;
-}
-
-int GfxShapeModel::GetNumGrabPointsSelected() const
-{
-	int iNumSelected = 0;
-	for(const GfxGrabPointModel &grabPtModel : m_GrabPointList)
-	{
-		if(grabPtModel.IsSelected())
-			++iNumSelected;
-	}
-	return iNumSelected;
-}
-
-bool GfxShapeModel::IsAllGrabPointsSelected() const
-{
-	for(const GfxGrabPointModel &grabPtModel : m_GrabPointList)
-	{
-		if(grabPtModel.IsSelected() == false)
-			return false;
-	}
-	return true;
-}
-
-bool GfxShapeModel::IsHoverGrabPointSelected() const
-{
-	if(m_iVertexIndex < 0 || m_iVertexIndex >= m_GrabPointList.size())
-	{
-		HyGuiLog("GfxShapeModel::IsHoverGrabPointSelected - Index out of range", LOGTYPE_Error);
-		return false;
-	}
-	return m_GrabPointList[m_iVertexIndex].IsSelected();
+	return m_ShapeList[iIndex];
 }
 
 bool GfxShapeModel::IsLoopClosed() const
@@ -393,104 +275,7 @@ bool GfxShapeModel::IsLoopClosed() const
 	return m_bLoopClosed;
 }
 
-ShapeMouseMoveResult GfxShapeModel::MouseMoveIdle(glm::vec2 ptWorldMousePos)
-{
-	ShapeMouseMoveResult eResult = OnMouseMoveIdle(ptWorldMousePos);
-
-	for(IGfxShapeView *pView : m_ViewList)
-		pView->RefreshView(eResult, false);
-
-	return eResult;
-}
-
-ShapeMouseMoveResult GfxShapeModel::MousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos)
-{
-	ShapeMouseMoveResult eResult = OnMouseMoveIdle(ptWorldMousePos);
-	if(eResult == SHAPEMOUSEMOVE_AppendVertex || eResult == SHAPEMOUSEMOVE_InsertVertex)
-	{
-		if(m_iVertexIndex == -1)
-		{
-			HyGuiLog("GfxShapeModel::MousePressEvent - Insert vertex index was -1 on AddVertex/Crosshair", LOGTYPE_Error);
-			return SHAPEMOUSEMOVE_None;
-		}
-		m_GrabPointList.insert(m_GrabPointList.begin() + m_iVertexIndex, GfxGrabPointModel(GRABPOINT_VertexSelected, m_ptVertexPos));
-		for(int i = 0; i < m_GrabPointList.size(); ++i)
-			m_GrabPointList[i].SetSelected(false);
-		m_GrabPointList[m_iVertexIndex].SetSelected(true);
-	}
-	else if(eResult == SHAPEMOUSEMOVE_HoverGrabPoint)
-	{
-		if(m_iVertexIndex == -1)
-		{
-			HyGuiLog("GfxShapeModel::OnMousePressEvent - Hover vertex index was -1 on HoverVertex/HoverSelectedVertex", LOGTYPE_Error);
-			return SHAPEMOUSEMOVE_None;
-		}
-
-		if(bShiftHeld)
-		{
-			if(uiButtonFlags & Qt::LeftButton)
-				m_GrabPointList[m_iVertexIndex].SetSelected(!m_GrabPointList[m_iVertexIndex].IsSelected());
-			else if(uiButtonFlags & Qt::RightButton)
-				m_GrabPointList[m_iVertexIndex].SetSelected(false);
-		}
-		else
-		{
-			if(uiButtonFlags & Qt::LeftButton)
-				m_GrabPointList[m_iVertexIndex].SetSelected(true);
-			else if(uiButtonFlags & Qt::RightButton)
-				m_GrabPointList[m_iVertexIndex].SetSelected(false);
-		}
-	}
-
-	for(IGfxShapeView *pView : m_ViewList)
-		pView->RefreshView(eResult, false);
-
-	m_eCurTransform = eResult;
-	return eResult;
-}
-
-void GfxShapeModel::MouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF ptBotLeft, QPointF ptTopRight)
-{
-	// Select grab points within marquee
-	for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
-	{
-		QPointF ptGrabPos(grabPtModel.GetPos().x, grabPtModel.GetPos().y);
-		if(ptGrabPos.x() >= ptBotLeft.x() && ptGrabPos.x() <= ptTopRight.x() &&
-		   ptGrabPos.y() >= ptBotLeft.y() && ptGrabPos.y() <= ptTopRight.y())
-		{
-			if(uiButtonFlags & Qt::LeftButton)
-				grabPtModel.SetSelected(true);
-			else if(uiButtonFlags & Qt::RightButton)
-				grabPtModel.SetSelected(false);
-		}
-	}
-
-	for(IGfxShapeView *pView : m_ViewList)
-		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
-}
-
-void GfxShapeModel::MouseMoveTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
-{
-	m_bTransformShiftMod = bShiftMod;
-
-	m_mtxTransform = glm::identity<glm::mat4>();
-	if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
-	{
-		glm::vec2 vDelta(ptDragPos.x - ptStartPos.x,
-						 ptDragPos.y - ptStartPos.y);
-		m_mtxTransform = glm::translate(m_mtxTransform, glm::vec3(vDelta, 0.0f));
-	}
-
-	if(m_eCurTransform == SHAPEMOUSEMOVE_Creation)
-		DoTransformCreation(ptStartPos, ptDragPos);
-	//else if(m_eCurTransform == SHAPEMOUSEMOVE_HoverGrabPoint)
-	//	DoTransformGrabPoint(ptStartPos, ptDragPos);
-
-	for(IGfxShapeView *pView : m_ViewList)
-		pView->RefreshView(m_eCurTransform, true);
-}
-
-QString GfxShapeModel::MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos)
+/*virtual*/ QString GfxShapeModel::MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) /*override*/
 {
 	QString sUndoText;
 	switch(m_eCurTransform)
@@ -499,7 +284,7 @@ QString GfxShapeModel::MouseTransformReleased(QString sShapeCodeName, QPointF pt
 	case SHAPEMOUSEMOVE_Outside:
 		break;
 	case SHAPEMOUSEMOVE_Creation:
-		sUndoText = "Create new " % HyGlobal::ShapeName(m_eType) % " shape " % sShapeCodeName;
+		sUndoText = "Create new " % HyGlobal::ShapeName(m_eShapeType) % " shape " % sShapeCodeName;
 		break;
 	case SHAPEMOUSEMOVE_Inside:
 	case SHAPEMOUSEMOVE_HoverCenter:
@@ -512,27 +297,27 @@ QString GfxShapeModel::MouseTransformReleased(QString sShapeCodeName, QPointF pt
 		sUndoText = "Insert vertex on " % sShapeCodeName;
 		break;
 	case SHAPEMOUSEMOVE_HoverGrabPoint:
-		if(m_eType == SHAPE_Polygon || m_eType == SHAPE_LineChain || m_eType == SHAPE_LineSegment)
+		if(m_eShapeType == SHAPE_Polygon || m_eShapeType == SHAPE_LineSegment)
 			sUndoText = "Translate vert(s) on " % sShapeCodeName;
-		else if(m_eType == SHAPE_Circle)
+		else if(m_eShapeType == SHAPE_Circle)
 			sUndoText = "Adjust circle radius on " % sShapeCodeName;
-		else if(m_eType == SHAPE_Box)
+		else if(m_eShapeType == SHAPE_Box)
 			sUndoText = "Adjust box size on " % sShapeCodeName;
-		else if(m_eType == SHAPE_Capsule)
+		else if(m_eShapeType == SHAPE_Capsule)
 			sUndoText = "Adjust capsule size on " % sShapeCodeName;
 		else
-			HyGuiLog("EntityDraw::OnMouseReleaseEvent - Invalid shape type for SHAPEMOUSEMOVE_HoverGrabPoint", LOGTYPE_Error);
+			HyGuiLog("GfxShapeModel::MouseTransformReleased - Invalid shape type for SHAPEMOUSEMOVE_HoverGrabPoint", LOGTYPE_Error);
 		break;
 
 	default:
-		HyGuiLog("EntityDraw::OnMouseReleaseEvent - Invalid m_eCurTransform", LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::MouseTransformReleased - Invalid m_eCurTransform", LOGTYPE_Error);
 		break;
 	}
 
-	return QString();
+	return sUndoText;
 }
 
-ShapeMouseMoveResult GfxShapeModel::OnMouseMoveIdle(glm::vec2 ptWorldMousePos)
+/*virtual*/ ShapeMouseMoveResult GfxShapeModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
 {
 	m_iVertexIndex = -1;
 	m_ptVertexPos = glm::vec2(0.0f, 0.0f);
@@ -548,7 +333,7 @@ ShapeMouseMoveResult GfxShapeModel::OnMouseMoveIdle(glm::vec2 ptWorldMousePos)
 	if(m_GrabPointCenter.TestPoint(ptWorldMousePos))
 		return SHAPEMOUSEMOVE_HoverCenter;
 
-	if(m_eType == SHAPE_LineChain || m_eType == SHAPE_Polygon)
+	if(m_eShapeType == SHAPE_Polygon)
 	{
 		if(m_GrabPointList.empty())
 			return SHAPEMOUSEMOVE_Creation;
@@ -582,10 +367,10 @@ ShapeMouseMoveResult GfxShapeModel::OnMouseMoveIdle(glm::vec2 ptWorldMousePos)
 			}
 		}
 	}
-	else if(IsValidShape() == false) // Any shape besides SHAPE_LineChain || SHAPE_Polygon
+	else if(IsValidModel() == false) // Any shape besides SHAPE_Polygon
 		return SHAPEMOUSEMOVE_Creation;
 
-	for(IHyFixture2d *pFixture : m_FixtureList)
+	for(HyShape2d *pFixture : m_ShapeList)
 	{
 		if(pFixture->TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
 			return SHAPEMOUSEMOVE_Inside;
@@ -613,13 +398,13 @@ void GfxShapeModel::DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPo
 		ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
 	}
 
-	switch(m_eType)
+	switch(m_eShapeType)
 	{
 	case SHAPE_Box:
-		static_cast<HyShape2d *>(m_FixtureList[0])->SetAsBox(HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f));
+		m_ShapeList[0]->SetAsBox(HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f));
 		break;
 	case SHAPE_Circle:
-		static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCircle(ptCenter, glm::distance(ptCenter, ptUpperBound));
+		m_ShapeList[0]->SetAsCircle(ptCenter, glm::distance(ptCenter, ptUpperBound));
 		break;
 	case SHAPE_Capsule: {
 		glm::vec2 pt1, pt2;
@@ -628,33 +413,32 @@ void GfxShapeModel::DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPo
 		pt2.x = ptCenter.x;
 		pt2.y = ptUpperBound.y;
 		float fRadius = 0.5f * glm::distance(pt1, pt2);
-		static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCapsule(ptStartPos, ptDragPos, fRadius);
+		m_ShapeList[0]->SetAsCapsule(ptStartPos, ptDragPos, fRadius);
 		break; }
 	case SHAPE_LineSegment:
-		static_cast<HyShape2d *>(m_FixtureList[0])->SetAsLineSegment(ptStartPos, ptDragPos);
+		m_ShapeList[0]->SetAsLineSegment(ptStartPos, ptDragPos);
 		break;
 	case SHAPE_Polygon:
-	case SHAPE_LineChain:
 		if(m_GrabPointList.size() == 0)
 			m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptDragPos));
 		if(m_GrabPointList.size() == 1)
 			m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptDragPos));
 		if(m_GrabPointList.size() != 2)
-			HyGuiLog("GfxShapeModel::MouseTransformDrag - Polygon or LineChain initial dragging with != 2 verts", LOGTYPE_Error);
+			HyGuiLog("GfxShapeModel::DoTransformCreation - Polygon or LineChain initial dragging with != 2 verts", LOGTYPE_Error);
 
 		m_GrabPointList[0].SetSelected(false);
 		m_GrabPointList[1].Setup(GRABPOINT_EndpointSelected, ptDragPos);
 		break;
 
 	default:
-		HyGuiLog("GfxShapeModel::MouseTransformDrag - Initial transform called with unsupported shape type: " % QString::number(m_eType), LOGTYPE_Error);
+		HyGuiLog("GfxShapeModel::DoTransformCreation - Initial transform called with unsupported shape type: " % QString::number(m_eShapeType), LOGTYPE_Error);
 		break;
 	}
 }
 
 bool GfxShapeModel::CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos)
 {
-	if(m_eType != SHAPE_LineChain && m_eType != SHAPE_Polygon)
+	if(m_eShapeType != SHAPE_Polygon)
 	{
 		HyGuiLog("GfxShapeModel::CheckIfAddVertexOnEdge invoked with shape that isn't a linechain or polygon", LOGTYPE_Error);
 		return false;
@@ -755,9 +539,9 @@ std::vector<std::vector<glm::vec2>> GfxShapeModel::MergeTriangles(const std::vec
 
 void GfxShapeModel::ClearFixtures()
 {
-	for(IHyFixture2d *pFixture : m_FixtureList)
+	for(HyShape2d *pFixture : m_ShapeList)
 		delete pFixture;
-	m_FixtureList.clear();
+	m_ShapeList.clear();
 }
 
 void GfxShapeModel::AssemblePolygonFixtures(std::vector<std::vector<glm::vec2>> subPolygonList)
@@ -767,23 +551,23 @@ void GfxShapeModel::AssemblePolygonFixtures(std::vector<std::vector<glm::vec2>> 
 	{
 		HyShape2d *pShape2d = new HyShape2d();
 		pShape2d->SetAsPolygon(subPoly);
-		m_FixtureList.push_back(pShape2d);
+		m_ShapeList.push_back(pShape2d);
 	}
 }
 
 QList<float> GfxShapeModel::ConvertedBoxData() const
 {
 	HyShape2d tmpBoxShape;
-	switch(m_eType)
+	switch(m_eShapeType)
 	{
 	case SHAPE_None:
 		break;
 	case SHAPE_Box:
 		return GetData();
 	case SHAPE_Circle:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Circle b2Circ = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCircle();
+			b2Circle b2Circ = m_ShapeList[0]->GetAsCircle();
 			glm::vec2 ptCenter(b2Circ.center.x, b2Circ.center.y);
 			float fRadius = b2Circ.radius;
 			tmpBoxShape.SetAsBox(HyRect(fRadius, fRadius, ptCenter, 0.0f));
@@ -792,9 +576,9 @@ QList<float> GfxShapeModel::ConvertedBoxData() const
 		}
 		break;
 	case SHAPE_LineSegment:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Segment b2LineSeg = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsSegment();
+			b2Segment b2LineSeg = m_ShapeList[0]->GetAsSegment();
 			glm::vec2 pt1(b2LineSeg.point1.x, b2LineSeg.point1.y);
 			glm::vec2 pt2(b2LineSeg.point2.x, b2LineSeg.point2.y);
 			glm::vec2 ptCenter = (pt1 + pt2) * 0.5f;
@@ -805,9 +589,9 @@ QList<float> GfxShapeModel::ConvertedBoxData() const
 		}
 		break;
 	case SHAPE_Capsule:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Capsule b2Cap = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCapsule();
+			b2Capsule b2Cap = m_ShapeList[0]->GetAsCapsule();
 			glm::vec2 pt1(b2Cap.center1.x, b2Cap.center1.y);
 			glm::vec2 pt2(b2Cap.center2.x, b2Cap.center2.y);
 			float fRadius = b2Cap.radius;
@@ -818,8 +602,7 @@ QList<float> GfxShapeModel::ConvertedBoxData() const
 			return QList<float>(serializedTmpBox.begin(), serializedTmpBox.end());
 		}
 		break;
-	case SHAPE_Polygon:
-	case SHAPE_LineChain: {
+	case SHAPE_Polygon: {
 		std::vector<glm::vec2> vertexList;
 		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
 			vertexList.push_back(grabPt.GetPos());
@@ -844,14 +627,14 @@ QList<float> GfxShapeModel::ConvertedBoxData() const
 QList<float> GfxShapeModel::ConvertedCircleData() const
 {
 	QList<float> convertedDataList;
-	switch(m_eType)
+	switch(m_eShapeType)
 	{
 	case SHAPE_None:
 		break;
 	case SHAPE_Box:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Polygon b2Poly = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsPolygon();
+			b2Polygon b2Poly = m_ShapeList[0]->GetAsPolygon();
 			glm::vec2 ptCenter(0.0f, 0.0f);
 			for(int i = 0; i < b2Poly.count; ++i)
 				ptCenter += glm::vec2(b2Poly.vertices[i].x, b2Poly.vertices[i].y);
@@ -871,9 +654,9 @@ QList<float> GfxShapeModel::ConvertedCircleData() const
 	case SHAPE_Circle:
 		return GetData();
 	case SHAPE_LineSegment:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Segment b2LineSeg = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsSegment();
+			b2Segment b2LineSeg = m_ShapeList[0]->GetAsSegment();
 			glm::vec2 pt1(b2LineSeg.point1.x, b2LineSeg.point1.y);
 			glm::vec2 pt2(b2LineSeg.point2.x, b2LineSeg.point2.y);
 			glm::vec2 ptCenter = (pt1 + pt2) * 0.5f;
@@ -884,9 +667,9 @@ QList<float> GfxShapeModel::ConvertedCircleData() const
 		}
 		break;
 	case SHAPE_Capsule:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Capsule b2Cap = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCapsule();
+			b2Capsule b2Cap = m_ShapeList[0]->GetAsCapsule();
 			glm::vec2 pt1(b2Cap.center1.x, b2Cap.center1.y);
 			glm::vec2 pt2(b2Cap.center2.x, b2Cap.center2.y);
 			glm::vec2 ptCenter = (pt1 + pt2) * 0.5f;
@@ -897,8 +680,7 @@ QList<float> GfxShapeModel::ConvertedCircleData() const
 		}
 		break;
 
-	case SHAPE_Polygon:
-	case SHAPE_LineChain: {
+	case SHAPE_Polygon: {
 		std::vector<glm::vec2> vertexList;
 		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
 			vertexList.push_back(grabPt.GetPos());
@@ -927,14 +709,14 @@ QList<float> GfxShapeModel::ConvertedCircleData() const
 QList<float> GfxShapeModel::ConvertedLineSegmentData() const
 {
 	QList<float> convertedDataList;
-	switch(m_eType)
+	switch(m_eShapeType)
 	{
 	case SHAPE_None:
 		break;
 	case SHAPE_Box:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Polygon b2Poly = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsPolygon();
+			b2Polygon b2Poly = m_ShapeList[0]->GetAsPolygon();
 			convertedDataList.append(b2Poly.vertices[0].x);
 			convertedDataList.append(b2Poly.vertices[0].y);
 			convertedDataList.append(b2Poly.vertices[2].x);
@@ -942,9 +724,9 @@ QList<float> GfxShapeModel::ConvertedLineSegmentData() const
 		}
 		break;
 	case SHAPE_Circle:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Circle b2Circ = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCircle();
+			b2Circle b2Circ = m_ShapeList[0]->GetAsCircle();
 			glm::vec2 ptCenter(b2Circ.center.x, b2Circ.center.y);
 			float fRadius = b2Circ.radius;
 			convertedDataList.append(ptCenter.x - fRadius);
@@ -956,9 +738,9 @@ QList<float> GfxShapeModel::ConvertedLineSegmentData() const
 	case SHAPE_LineSegment:
 		return GetData();
 	case SHAPE_Capsule:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Capsule b2Cap = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCapsule();
+			b2Capsule b2Cap = m_ShapeList[0]->GetAsCapsule();
 			glm::vec2 pt1(b2Cap.center1.x, b2Cap.center1.y);
 			glm::vec2 pt2(b2Cap.center2.x, b2Cap.center2.y);
 			convertedDataList.append(pt1.x);
@@ -967,8 +749,7 @@ QList<float> GfxShapeModel::ConvertedLineSegmentData() const
 			convertedDataList.append(pt2.y);
 		}
 		break;
-	case SHAPE_Polygon:
-	case SHAPE_LineChain: {
+	case SHAPE_Polygon: {
 		std::vector<glm::vec2> vertexList;
 		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
 			vertexList.push_back(grabPt.GetPos());
@@ -995,14 +776,14 @@ QList<float> GfxShapeModel::ConvertedLineSegmentData() const
 QList<float> GfxShapeModel::ConvertedCapsuleData() const
 {
 	QList<float> convertedDataList;
-	switch(m_eType)
+	switch(m_eShapeType)
 	{
 	case SHAPE_None:
 		break;
 	case SHAPE_Box:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Polygon b2Poly = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsPolygon();
+			b2Polygon b2Poly = m_ShapeList[0]->GetAsPolygon();
 			glm::vec2 pt1(b2Poly.vertices[1].x, b2Poly.vertices[1].y);
 			glm::vec2 pt2(b2Poly.vertices[3].x, b2Poly.vertices[3].y);
 			float fRadius = glm::distance(pt1, pt2) * 0.5f;
@@ -1014,9 +795,9 @@ QList<float> GfxShapeModel::ConvertedCapsuleData() const
 		}
 		break;
 	case SHAPE_Circle:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Circle b2Circ = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCircle();
+			b2Circle b2Circ = m_ShapeList[0]->GetAsCircle();
 			glm::vec2 ptCenter(b2Circ.center.x, b2Circ.center.y);
 			float fRadius = b2Circ.radius;
 			glm::vec2 pt1 = ptCenter + glm::vec2(0.0f, -fRadius);
@@ -1059,14 +840,14 @@ QList<float> GfxShapeModel::ConvertedCapsuleData() const
 QList<float> GfxShapeModel::ConvertedPolygonOrLineChainData() const
 {
 	QList<float> convertedDataList;
-	switch(m_eType)
+	switch(m_eShapeType)
 	{
 	case SHAPE_None:
 		break;
 	case SHAPE_Box:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Polygon b2Poly = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsPolygon();
+			b2Polygon b2Poly = m_ShapeList[0]->GetAsPolygon();
 			for(int i = 0; i < b2Poly.count; ++i)
 			{
 				convertedDataList.append(b2Poly.vertices[i].x);
@@ -1076,9 +857,9 @@ QList<float> GfxShapeModel::ConvertedPolygonOrLineChainData() const
 		}
 		break;
 	case SHAPE_Circle:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Circle b2Circ = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCircle();
+			b2Circle b2Circ = m_ShapeList[0]->GetAsCircle();
 			glm::vec2 ptCenter(b2Circ.center.x, b2Circ.center.y);
 			float fRadius = b2Circ.radius;
 
@@ -1098,9 +879,9 @@ QList<float> GfxShapeModel::ConvertedPolygonOrLineChainData() const
 		}
 		break;
 	case SHAPE_LineSegment:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Segment b2LineSeg = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsSegment();
+			b2Segment b2LineSeg = m_ShapeList[0]->GetAsSegment();
 			convertedDataList.append(b2LineSeg.point1.x);
 			convertedDataList.append(b2LineSeg.point1.y);
 			convertedDataList.append(b2LineSeg.point2.x);
@@ -1109,13 +890,12 @@ QList<float> GfxShapeModel::ConvertedPolygonOrLineChainData() const
 		}
 		break;
 	case SHAPE_Polygon:
-	case SHAPE_LineChain:
 		convertedDataList = GetData();
 		break;
 	case SHAPE_Capsule:
-		if(m_FixtureList[0]->IsValid())
+		if(m_ShapeList[0]->IsValid())
 		{
-			b2Capsule b2Cap = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCapsule();
+			b2Capsule b2Cap = m_ShapeList[0]->GetAsCapsule();
 			glm::vec2 pt1(b2Cap.center1.x, b2Cap.center1.y);
 			glm::vec2 pt2(b2Cap.center2.x, b2Cap.center2.y);
 			float fRadius = b2Cap.radius;

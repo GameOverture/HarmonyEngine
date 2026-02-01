@@ -106,8 +106,8 @@ enum ItemType
 	ITEM_Source,
 	ITEM_Header,
 	// Entity items
-	ITEM_FixtureShape,
-	ITEM_FixtureChain,
+	ITEM_ShapeFixture,
+	ITEM_ChainFixture,
 	// UI widgets
 	ITEM_UiLabel,
 	ITEM_UiRichLabel,
@@ -304,7 +304,6 @@ enum EditorShape
 	SHAPE_LineSegment,
 	SHAPE_Polygon,
 	SHAPE_Capsule,
-	SHAPE_LineChain,
 
 	NUM_SHAPES
 };
@@ -526,6 +525,7 @@ public:
 
 	static bool IsItemType_Project(ItemType eType);
 	static bool IsItemType_Asset(ItemType eType);
+	static bool IsItemType_Fixture(ItemType eType);
 	static bool IsItemType_Widget(ItemType eType);
 
 	static const QString ItemName(ItemType eItem, bool bPlural)			{ if(eItem == ITEM_None) return QString(); return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }

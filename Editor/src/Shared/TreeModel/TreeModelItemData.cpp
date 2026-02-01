@@ -71,6 +71,11 @@ bool TreeModelItemData::IsAssetItem() const
 	return HyGlobal::IsItemType_Asset(m_eTYPE);
 }
 
+bool TreeModelItemData::IsFixtureItem() const
+{
+	return HyGlobal::IsItemType_Fixture(m_eTYPE);
+}
+
 QList<TreeModelItemData *> TreeModelItemData::GetDependants() const
 {
 	return m_DependantMap.keys();
