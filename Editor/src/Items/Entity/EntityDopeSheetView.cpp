@@ -526,7 +526,7 @@ ctor_to_frame0:
 			pEvent->accept();
 		}
 	}
-	else if(pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f && pEvent->pos().y() < TIMELINE_HEIGHT)
+	else if(pEvent->pos().x() > ((TIMELINE_LEFT_MARGIN - 5.0f) - (TIMELINE_NOTCH_SUBLINES_WIDTH * 1.5f)) && pEvent->pos().y() < TIMELINE_HEIGHT)
 	{
 		m_MouseScenePos = mapToScene(pEvent->pos());
 
@@ -540,7 +540,7 @@ ctor_to_frame0:
 	else if(pEvent->pos().y() > TIMELINE_HEIGHT)
 	{	
 		QGraphicsItem *pItemUnderMouse = itemAt(pEvent->pos());
-		if(pEvent->pos().x() > TIMELINE_LEFT_MARGIN - 5.0f && pItemUnderMouse)
+		if(pEvent->pos().x() > ((TIMELINE_LEFT_MARGIN - 5.0f) - (TIMELINE_NOTCH_SUBLINES_WIDTH * 1.5f)) && pItemUnderMouse)
 		{
 			m_eDragState = DRAGSTATE_InitialPress;
 			m_ptDragStart = pEvent->pos();
@@ -643,5 +643,9 @@ int EntityDopeSheetView::GetNearestFrame(qreal fScenePosX) const
 	qreal fSubLineSpacing = TIMELINE_NOTCH_SUBLINES_WIDTH * GetZoom();
 	int iNumSubLines = 4; // Either 0, 1, or 4
 
-	return ((fScenePosX - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f)) / fSubLineSpacing;
+	float fDenom = ((fScenePosX - TIMELINE_LEFT_MARGIN) + (fSubLineSpacing * 0.5f));
+	if(fDenom < 0.0f)
+		return -1;
+
+	return fDenom / fSubLineSpacing;
 }

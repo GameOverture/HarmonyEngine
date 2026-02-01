@@ -1479,7 +1479,7 @@ void EntityDopeSheetScene::NudgeKeyFrameProperty(EntityTreeItemData *pItemData, 
 {
 	QJsonValue propValue = GetKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, sPropName);
 	RemoveKeyFrameProperty(pItemData, iFrameIndex, sCategoryName, sPropName, false);
-	SetKeyFrameProperty(pItemData, HyMath::Max(0, iFrameIndex + iNudgeAmount), sCategoryName, sPropName, propValue, bRefreshGfxItems);
+	SetKeyFrameProperty(pItemData, HyMath::Max(-1, iFrameIndex + iNudgeAmount), sCategoryName, sPropName, propValue, bRefreshGfxItems);
 }
 
 void EntityDopeSheetScene::NudgeKeyFrameTween(EntityTreeItemData *pItemData, int iFrameIndex, TweenProperty eTweenProp, int iNudgeAmount, bool bRefreshGfxItems)

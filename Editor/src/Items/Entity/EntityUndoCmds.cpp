@@ -1104,7 +1104,7 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 		
 			// Update 'tupleKey' to what it will be after the 'nudge' operation
 			tupleKey = std::make_tuple(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
-									   HyMath::Max(0, std::get<GFXDATAKEY_FrameIndex>(tupleKey) + m_iFrameOffset),
+									   HyMath::Max(-1, std::get<GFXDATAKEY_FrameIndex>(tupleKey) + m_iFrameOffset),
 									   std::get<GFXDATAKEY_CategoryPropString>(tupleKey));
 
 			// Check if this key frame will be overwritten by the 'nudge' operation
@@ -1212,7 +1212,7 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 		QString sCategory = std::get<GFXDATAKEY_CategoryPropString>(tupleKey).split('/')[0];
 		QString sProperty = std::get<GFXDATAKEY_CategoryPropString>(tupleKey).split('/')[1];
 		m_DopeSheetSceneRef.RemoveKeyFrameProperty(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
-												   HyMath::Max(0, std::get<GFXDATAKEY_FrameIndex>(tupleKey) + m_iFrameOffset),
+												   HyMath::Max(-1, std::get<GFXDATAKEY_FrameIndex>(tupleKey) + m_iFrameOffset),
 												   sCategory,
 												   sProperty,
 												   false);
@@ -1223,7 +1223,7 @@ EntityUndoCmd_NudgeSelectedKeyFrames::EntityUndoCmd_NudgeSelectedKeyFrames(Entit
 		TweenProperty eTweenProp = HyGlobal::GetTweenPropFromString(sProperty);
 
 		m_DopeSheetSceneRef.RemoveKeyFrameTween(std::get<GFXDATAKEY_TreeItemData>(tupleKey),
-												HyMath::Max(0, std::get<GFXDATAKEY_FrameIndex>(tupleKey) + m_iFrameOffset),
+												HyMath::Max(-1, std::get<GFXDATAKEY_FrameIndex>(tupleKey) + m_iFrameOffset),
 												eTweenProp,
 												false);
 	}
