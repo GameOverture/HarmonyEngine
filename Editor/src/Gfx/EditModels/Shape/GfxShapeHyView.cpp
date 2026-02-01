@@ -12,8 +12,9 @@
 #include "GfxShapeModel.h"
 #include "GfxGrabPointView.h"
 
-GfxShapeHyView::GfxShapeHyView(HyEntity2d *pParent /*= nullptr*/) :
-	IGfxEditView(pParent)
+GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*/) :
+	IGfxEditView(pParent),
+	m_bIsFixture(bIsFixture)
 {
 	// NOTE: m_PrimOutline does not have a parent because it is projected to window coordinates
 	m_PrimOutline.UseWindowCoordinates();
@@ -42,7 +43,22 @@ GfxShapeHyView::GfxShapeHyView(HyEntity2d *pParent /*= nullptr*/) :
 		else
 			color = color.Darken();
 	}
-	m_PrimOutline.SetTint(bIsDark ? HyColor::White : HyColor::Black);
+
+	if(m_bIsFixture)
+	{
+		m_PrimOutline.SetTint(m_pModel->GetColor());
+		m_PrimOutline.SetLineThickness(2.0f);
+		for(HyPrimitive2d *pPrim : m_PrimList)
+			pPrim->alpha.Set(0.25f);
+	}
+	else
+	{
+		m_PrimOutline.SetTint(bIsDark ? HyColor::White : HyColor::Black);
+		m_PrimOutline.SetLineThickness(1.0f);
+
+		for(HyPrimitive2d *pPrim : m_PrimList)
+			pPrim->alpha.Set(1.0f);
+	}
 }
 
 /*virtual*/ void GfxShapeHyView::DoRefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) /*override*/

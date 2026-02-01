@@ -189,8 +189,10 @@ enum EditorColor
 	EDITORCOLOR_TransformRotateGrabPointOutline,
 	EDITORCOLOR_TransformRotateGrabPointFill,
 
+	EDITORCOLOR_Widgets,
+	EDITORCOLOR_Fixtures,
+
 	EDITORCOLOR_EditMode,
-	EDITORCOLOR_Fixture,
 	EDITORCOLOR_ShapeGrabPointOutline,
 	EDITORCOLOR_ShapeGrabPointFill,
 	EDITORCOLOR_ShapeGrabPointSelectedOutline,

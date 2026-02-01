@@ -64,8 +64,8 @@ void IGfxEditView::RefreshView(ShapeMouseMoveResult eResult, bool bMouseDown)
 	else
 		ClearGrabPoints();
 
-	RefreshColor();
 	DoRefreshView(eResult, bMouseDown);
+	RefreshColor();
 }
 
 void IGfxEditView::ClearGrabPoints()

@@ -140,9 +140,9 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 	else if(m_pEntityTreeItemData->IsFixtureItem())
 	{
 		if(m_pEntityTreeItemData->GetType() == ITEM_ShapeFixture)
-			m_pEditView = new GfxShapeHyView();
+			m_pEditView = new GfxShapeHyView(true, pParent);
 		else
-			m_pEditView = new GfxChainView();
+			m_pEditView = new GfxChainView(pParent);
 
 		m_pEditView->SetModel(m_pEntityTreeItemData->GetEditModel());
 		m_pChild = m_pEditView;
@@ -178,7 +178,7 @@ EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 
 /*virtual*/ bool EntityDrawItem::IsSelectable() const /*override*/
 {
-	return m_pEntityTreeItemData->IsSelectable();
+	return m_pEntityTreeItemData->IsSelectable() && m_pEntityTreeItemData->IsFixtureItem() == false;
 }
 
 /*virtual*/ bool EntityDrawItem::IsSelected() /*override*/

@@ -12,7 +12,9 @@
 #include "GfxPrimitiveModel.h"
 
 GfxPrimitiveView::GfxPrimitiveView(HyEntity2d *pParent /*= nullptr*/) :
-	IGfxEditView(pParent)
+	IGfxEditView(pParent),
+	m_ShapeView(false, this),
+	m_ChainView(this)
 {
 }
 
