@@ -71,6 +71,7 @@ public:
 
 	void AddView(IGfxEditView *pView);
 	bool RemoveView(IGfxEditView *pView);
+	void RefreshViews(ShapeMouseMoveResult eResult, bool bMouseDown) const;
 
 	void GetTransformPreview(glm::mat4 &mtxTransformOut, int &iVertexIndexOut) const;
 

@@ -42,8 +42,8 @@ public:
 
 	void TransformData(glm::mat4 mtxTransform);
 
-	int GetNumFixtures() const;
-	HyShape2d *GetFixture(int iIndex) const;
+	int GetNumShapeFixtures() const;
+	HyShape2d *GetShapeFixture(int iIndex) const;
 
 	bool IsLoopClosed() const;
 

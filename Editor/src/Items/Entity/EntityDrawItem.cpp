@@ -141,12 +141,17 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 	{
 		if(m_pEntityTreeItemData->GetType() == ITEM_ShapeFixture)
 			m_pEditView = new GfxShapeHyView(true, pParent);
-		else
+		else if(m_pEntityTreeItemData->GetType() == ITEM_ChainFixture)
 			m_pEditView = new GfxChainView(pParent);
+		else
+			HyGuiLog("EntityDrawItem ctor - unhandled fixture item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 
 		m_pEditView->SetModel(m_pEntityTreeItemData->GetEditModel());
 		m_pChild = m_pEditView;
 	}
+
+	if(m_pEditView && m_pEditView->GetModel() == nullptr)
+		HyGuiLog("EntityDrawItem ctor - m_pEditView has no model for item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 
 	if(m_pChild)
 		m_pChild->Load();
@@ -189,8 +194,9 @@ EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 /*virtual*/ void EntityDrawItem::RefreshTransform() /*override*/
 {
 	IDrawExItem::RefreshTransform();
-	//if(m_pShapeView)
-	//	m_pShapeView->RefreshView(false);
+
+	if(m_pEditView)
+		m_pEditView->GetModel()->RefreshViews(SHAPEMOUSEMOVE_None, false);
 }
 
 IGfxEditView *EntityDrawItem::GetEditView()

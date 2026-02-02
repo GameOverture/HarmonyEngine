@@ -58,8 +58,7 @@ void GfxPrimitiveModel::SetPrimType(QString sNewType)
 		m_ShapeModel.SetShapeType(eNewShape);
 	}
 
-	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
+	RefreshViews(SHAPEMOUSEMOVE_None, false);
 }
 
 /*virtual*/ QList<float> GfxPrimitiveModel::GetData() const /*override*/
@@ -77,8 +76,7 @@ void GfxPrimitiveModel::SetPrimType(QString sNewType)
 	else
 		m_ChainModel.SetData(floatList);
 
-	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
+	RefreshViews(SHAPEMOUSEMOVE_None, false);
 }
 
 /*virtual*/ QString GfxPrimitiveModel::MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) /*override*/

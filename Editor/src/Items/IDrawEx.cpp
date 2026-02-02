@@ -277,7 +277,7 @@ void IDrawEx::RefreshTransforms()
 	else
 		m_MultiTransform.Hide();
 
-	for(IDrawExItem *pItemDraw : m_ItemList /*m_SelectedItemList*/)
+	for(IDrawExItem *pItemDraw : m_ItemList)
 		pItemDraw->RefreshTransform();
 }
 

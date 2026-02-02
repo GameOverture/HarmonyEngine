@@ -101,8 +101,7 @@ void GfxShapeModel::SetShapeType(EditorShape eNewShape)
 		SetData(convertedDataList);
 	}
 
-	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
+	RefreshViews(SHAPEMOUSEMOVE_None, false);
 }
 
 /*virtual*/ QList<float> GfxShapeModel::GetData() const /*override*/
@@ -162,25 +161,17 @@ void GfxShapeModel::SetShapeType(EditorShape eNewShape)
 		}
 	}
 
-	//// Preserve existing grab points where possible (keeps selection)
-	//if(m_eType == ePreviouslyWasShape) 
-	//{
-	//	for(int i = 0; i < grabPointList.size(); ++i)
-	//	{
-	//		if(static_cast<int>(m_GrabPointList.size()) - 1 < i)
-	//			m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, grabPointList[i]));
-	//		else
-	//			m_GrabPointList[i].Setup(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
-	//	}
-	//	if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
-	//		m_GrabPointList.resize(grabPointList.size());
-	//}
-	//else
+	// Preserve existing grab points where possible (keeps selection)
+	for(int i = 0; i < grabPointList.size(); ++i)
 	{
-		m_GrabPointList.clear();
-		for(const glm::vec2 &ptGrab : grabPointList)
-			m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, ptGrab));
+		if(static_cast<int>(m_GrabPointList.size()) - 1 < i)
+			m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, grabPointList[i]));
+		else
+			m_GrabPointList[i].Setup(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
 	}
+	if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
+		m_GrabPointList.resize(grabPointList.size());
+
 	if(m_eShapeType == SHAPE_Polygon &&
 		m_bLoopClosed == false &&
 		m_GrabPointList.size() > 1)
@@ -245,8 +236,7 @@ void GfxShapeModel::SetShapeType(EditorShape eNewShape)
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
+	RefreshViews(SHAPEMOUSEMOVE_None, false);
 }
 
 void GfxShapeModel::TransformData(glm::mat4 mtxTransform)
@@ -254,16 +244,15 @@ void GfxShapeModel::TransformData(glm::mat4 mtxTransform)
 	for(HyShape2d *pFixture : m_ShapeList)
 		pFixture->TransformSelf(mtxTransform);
 
-	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
+	RefreshViews(SHAPEMOUSEMOVE_None, false);
 }
 
-int GfxShapeModel::GetNumFixtures() const
+int GfxShapeModel::GetNumShapeFixtures() const
 {
 	return m_ShapeList.size();
 }
 
-HyShape2d *GfxShapeModel::GetFixture(int iIndex) const
+HyShape2d *GfxShapeModel::GetShapeFixture(int iIndex) const
 {
 	if(iIndex < 0 || iIndex >= m_ShapeList.size())
 		return nullptr;

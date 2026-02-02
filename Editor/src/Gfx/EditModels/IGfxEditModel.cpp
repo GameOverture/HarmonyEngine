@@ -55,6 +55,12 @@ bool IGfxEditModel::RemoveView(IGfxEditView *pView)
 	return m_ViewList.removeOne(pView);
 }
 
+void IGfxEditModel::RefreshViews(ShapeMouseMoveResult eResult, bool bMouseDown) const
+{
+	for(IGfxEditView *pView : m_ViewList)
+		pView->RefreshView(eResult, bMouseDown);
+}
+
 void IGfxEditModel::GetTransformPreview(glm::mat4 &mtxTransformOut, int &iVertexIndexOut) const
 {
 	mtxTransformOut = m_mtxTransform;
@@ -116,8 +122,8 @@ ShapeMouseMoveResult IGfxEditModel::MouseMoveIdle(glm::vec2 ptWorldMousePos)
 {
 	ShapeMouseMoveResult eResult = DoMouseMoveIdle(ptWorldMousePos);
 
-	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(eResult, false);
+	RefreshViews(eResult, false);
+	
 
 	return eResult;
 }
@@ -161,8 +167,7 @@ ShapeMouseMoveResult IGfxEditModel::MousePressEvent(bool bShiftHeld, Qt::MouseBu
 		}
 	}
 
-	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(eResult, false);
+	RefreshViews(eResult, false);
 
 	m_eCurTransform = eResult;
 	return eResult;
@@ -184,8 +189,7 @@ void IGfxEditModel::MouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF
 		}
 	}
 
-	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
+	RefreshViews(SHAPEMOUSEMOVE_None, false);
 }
 
 void IGfxEditModel::MouseMoveTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
@@ -205,6 +209,5 @@ void IGfxEditModel::MouseMoveTransform(bool bShiftMod, glm::vec2 ptStartPos, glm
 	//else if(m_eCurTransform == SHAPEMOUSEMOVE_HoverGrabPoint)
 	//	DoTransformGrabPoint(ptStartPos, ptDragPos);
 
-	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(m_eCurTransform, true);
+	RefreshViews(m_eCurTransform, true);
 }

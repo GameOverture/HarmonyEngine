@@ -25,7 +25,7 @@ GfxGrabPointModel::GfxGrabPointModel(GrabPointType eType)
 
 GfxGrabPointModel::GfxGrabPointModel(GrabPointType eType, glm::vec2 ptPosition)
 {
-	Setup(eType, m_ptPosition);
+	Setup(eType, ptPosition);
 }
 
 GfxGrabPointModel::~GfxGrabPointModel()

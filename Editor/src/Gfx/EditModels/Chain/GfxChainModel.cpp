@@ -78,16 +78,13 @@ void GfxChainModel::SetData(const QList<float> &floatList)
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
+	RefreshViews(SHAPEMOUSEMOVE_None, false);
 }
 
 void GfxChainModel::TransformData(glm::mat4 mtxTransform)
 {
 	m_Chain.TransformSelf(mtxTransform);
-
-	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(SHAPEMOUSEMOVE_None, false);
+	RefreshViews(SHAPEMOUSEMOVE_None, false);
 }
 
 const HyChain2d &GfxChainModel::GetChainFixture() const
