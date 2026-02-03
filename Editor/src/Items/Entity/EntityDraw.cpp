@@ -594,10 +594,8 @@ void EntityDraw::SetExtrapolatedProperties()
 			}
 		}
 
-		m_ItemList.push_back(pDrawItem); // Repopulate 'm_ItemList' with the valid existing or new draw items
-		
-		// TODO: START HERE - When SEM is enabled, do proper selection
-		m_RootEntity.ChildAppend(*pDrawItem->GetHyNode()); // Reinsert the draw item in the `descObjList` order
+		m_ItemList.push_back(pDrawItem);					// Repopulate 'm_ItemList' with the valid existing or new draw items
+		m_RootEntity.ChildAppend(*pDrawItem->GetHyNode());	// Reinsert each valid draw item into the m_RootEntity, to establish the correct `descObjList` display order
 
 		// Repopulate `m_SelectedItemList` if draw item is valid to select
 		if(pDrawItem->GetEntityTreeItemData()->IsSelected() && pDrawItem->GetEntityTreeItemData()->IsSelectable())

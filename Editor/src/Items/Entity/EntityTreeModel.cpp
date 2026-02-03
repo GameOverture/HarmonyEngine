@@ -649,7 +649,7 @@ EntityTreeItemData *EntityTreeModel::GetRootTreeItemData() const
 	return m_pRootItem->GetChild(0)->data(0).value<EntityTreeItemData *>();
 }
 
-TreeModelItem *EntityTreeModel::GetBvFolderTreeItem() const
+TreeModelItem *EntityTreeModel::GetFixtureFolderTreeItem() const
 {
 	if(m_pRootItem->GetNumChildren() < 2)
 		return nullptr;
@@ -657,7 +657,7 @@ TreeModelItem *EntityTreeModel::GetBvFolderTreeItem() const
 	return m_pRootItem->GetChild(1);
 }
 
-EntityTreeItemData *EntityTreeModel::GetBvFolderTreeItemData() const
+EntityTreeItemData *EntityTreeModel::GetFixtureFolderTreeItemData() const
 {
 	if(m_pRootItem->GetNumChildren() < 2)
 		return nullptr;
@@ -673,7 +673,7 @@ TreeModelItem *EntityTreeModel::GetArrayFolderTreeItem(EntityTreeItemData *pArra
 		return nullptr;
 	}
 
-	TreeModelItem *pParentFolderItem = pArrayItem->IsFixtureItem() ? GetBvFolderTreeItem() : GetRootTreeItem();
+	TreeModelItem *pParentFolderItem = pArrayItem->IsFixtureItem() ? GetFixtureFolderTreeItem() : GetRootTreeItem();
 	for(int i = 0; i < pParentFolderItem->GetNumChildren(); ++i)
 	{
 		EntityTreeItemData *pSubItem = pParentFolderItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
@@ -693,7 +693,7 @@ EntityTreeItemData *EntityTreeModel::GetArrayFolderTreeItemData(EntityTreeItemDa
 		return nullptr;
 	}
 
-	TreeModelItem *pParentFolderItem = pArrayItem->IsFixtureItem() ? GetBvFolderTreeItem() : GetRootTreeItem();
+	TreeModelItem *pParentFolderItem = pArrayItem->IsFixtureItem() ? GetFixtureFolderTreeItem() : GetRootTreeItem();
 	for(int i = 0; i < pParentFolderItem->GetNumChildren(); ++i)
 	{
 		EntityTreeItemData *pSubItem = pParentFolderItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
@@ -705,7 +705,7 @@ EntityTreeItemData *EntityTreeModel::GetArrayFolderTreeItemData(EntityTreeItemDa
 	return nullptr;
 }
 
-void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &shapeListOut) const
+void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const
 {
 	TreeModelItem *pThisEntity = GetRootTreeItem();
 	for(int i = 0; i < pThisEntity->GetNumChildren(); ++i)
@@ -727,24 +727,41 @@ void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut,
 			childListOut.push_back(pCurItem);
 	}
 
-	TreeModelItem *pThisShapesFolder = GetBvFolderTreeItem();
-	for(int i = 0; i < pThisShapesFolder->GetNumChildren(); ++i)
+	TreeModelItem *pThisFixturesFolder = GetFixtureFolderTreeItem();
+	for(int i = 0; i < pThisFixturesFolder->GetNumChildren(); ++i)
 	{
-		EntityTreeItemData *pCurShape = pThisShapesFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
-		if(pCurShape == nullptr)
+		EntityTreeItemData *pCurFixture = pThisFixturesFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		if(pCurFixture == nullptr)
 			continue;
 
-		if(pCurShape->GetEntType() == ENTTYPE_ArrayFolder)
+		if(pCurFixture->GetEntType() == ENTTYPE_ArrayFolder)
 		{
-			TreeModelItem *pArrayFolder = pThisShapesFolder->GetChild(i);
+			TreeModelItem *pArrayFolder = pThisFixturesFolder->GetChild(i);
 			for(int j = 0; j < pArrayFolder->GetNumChildren(); ++j)
 			{
 				EntityTreeItemData *pArrayItem = pArrayFolder->GetChild(j)->data(0).value<EntityTreeItemData *>();
-				shapeListOut.push_back(pArrayItem);
+				fixtureListOut.push_back(pArrayItem);
 			}
 		}
 		else
-			shapeListOut.push_back(pCurShape);
+			fixtureListOut.push_back(pCurFixture);
+	}
+}
+
+void EntityTreeModel::GetSelectedTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const
+{
+	QList<EntityTreeItemData *> childList;
+	QList<EntityTreeItemData *> fixtureList;
+	GetTreeItemData(childList, fixtureList);
+	for(EntityTreeItemData *pChildItem : childList)
+	{
+		if(pChildItem->IsSelected())
+			childListOut.push_back(pChildItem);
+	}
+	for(EntityTreeItemData *pFixtureItem : fixtureList)
+	{
+		if(pFixtureItem->IsSelected())
+			fixtureListOut.push_back(pFixtureItem);
 	}
 }
 
@@ -776,16 +793,16 @@ EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
 			return pCurItem;
 	}
 
-	TreeModelItem *pThisShapeFolder = GetBvFolderTreeItem();
-	for(int i = 0; i < pThisShapeFolder->GetNumChildren(); ++i)
+	TreeModelItem *pThisFixtureFolder = GetFixtureFolderTreeItem();
+	for(int i = 0; i < pThisFixtureFolder->GetNumChildren(); ++i)
 	{
-		EntityTreeItemData *pCurShape = pThisShapeFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		EntityTreeItemData *pCurShape = pThisFixtureFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
 		if(pCurShape == nullptr)
 			continue;
 
 		if(pCurShape->GetEntType() == ENTTYPE_ArrayFolder)
 		{
-			TreeModelItem *pArrayFolder = pThisShapeFolder->GetChild(i);
+			TreeModelItem *pArrayFolder = pThisFixtureFolder->GetChild(i);
 			for(int i = 0; i < pArrayFolder->GetNumChildren(); ++i)
 			{
 				EntityTreeItemData *pArrayItem = pArrayFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
@@ -881,17 +898,6 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 	}
 
 	return true;
-}
-
-void EntityTreeModel::RefreshSelectedItems()
-{
-	QModelIndexList itemIndexList = GetAllIndices();
-	for(int i = 0; i < itemIndexList.size(); ++i)
-	{
-		EntityTreeItemData *pItem = data(itemIndexList[i], Qt::UserRole).value<EntityTreeItemData *>();
-		if(pItem->IsSelected() && pItem->IsSelectable() == false)
-			pItem->SetSelected(false);
-	}
 }
 
 EntityTreeItemData *EntityTreeModel::Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow /*= -1*/)
@@ -994,7 +1000,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descO
 	if(HyGlobal::IsItemType_Fixture(eGuiType) == false)
 		pParentTreeItem = GetRootTreeItem();
 	else
-		pParentTreeItem = GetBvFolderTreeItem();
+		pParentTreeItem = GetFixtureFolderTreeItem();
 
 	bool bFoundArrayFolder = false;
 	if(bIsArrayItem)
@@ -1039,7 +1045,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocFixtureTreeItem(bool bIsShape, QSt
 		sCodeName = GenerateCodeName(sCodeNamePrefix + "Chain");
 
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, bIsShape ? ITEM_ShapeFixture : ITEM_ChainFixture, ENTTYPE_Item, QUuid(), QUuid::createUuid());
-	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetBvFolderTreeItem(), iRow);
+	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetFixtureFolderTreeItem(), iRow);
 
 	return pNewItem;
 }
@@ -1053,7 +1059,7 @@ bool EntityTreeModel::Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow)
 	if(pItem->IsFixtureItem() == false)
 		pParentTreeItem = GetRootTreeItem();
 	else
-		pParentTreeItem = GetBvFolderTreeItem();
+		pParentTreeItem = GetFixtureFolderTreeItem();
 
 	bool bFoundArrayFolder = false;
 	if(pItem->GetEntType() == ENTTYPE_ArrayItem)
@@ -1231,9 +1237,9 @@ QString EntityTreeModel::GenerateCodeName(QString sDesiredName) const
 		sDesiredName = "unnamed";
 
 	QList<EntityTreeItemData *> childList;
-	QList<EntityTreeItemData *> shapeList;
-	GetTreeItemData(childList, shapeList);
-	childList += shapeList; // Just combine the two since they all need to be unique
+	QList<EntityTreeItemData *> fixtureList;
+	GetTreeItemData(childList, fixtureList);
+	childList += fixtureList; // Just combine the two since they all need to be unique
 
 	uint uiConflictCount = 0;
 	bool bIsUnique = false;

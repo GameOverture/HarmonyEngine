@@ -291,18 +291,17 @@ public:
 	TreeModelItem *GetRootTreeItem() const;
 	EntityTreeItemData *GetRootTreeItemData() const;
 
-	TreeModelItem *GetBvFolderTreeItem() const;
-	EntityTreeItemData *GetBvFolderTreeItemData() const;
+	TreeModelItem *GetFixtureFolderTreeItem() const;
+	EntityTreeItemData *GetFixtureFolderTreeItemData() const;
 
 	TreeModelItem *GetArrayFolderTreeItem(EntityTreeItemData *pArrayItem) const;
 	EntityTreeItemData *GetArrayFolderTreeItemData(EntityTreeItemData *pArrayItem) const;
 
-	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &shapeListOut) const;
+	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const;
+	void GetSelectedTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const;
 	EntityTreeItemData *FindTreeItemData(QUuid uuid) const;
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
-
-	void RefreshSelectedItems();
 
 private: // These functions should only be called by EntityModel's Cmd_ functions
 	EntityTreeItemData *Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);

@@ -258,7 +258,7 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 		else
 		{
 			if(m_SelectedItemDataList[i]->IsFixtureItem())
-				pDestinationParent = entTreeModelRef.GetBvFolderTreeItemData();
+				pDestinationParent = entTreeModelRef.GetFixtureFolderTreeItemData();
 			else
 				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
 		}
@@ -281,7 +281,7 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 		else
 		{
 			if(m_SelectedItemDataList[i]->IsFixtureItem())
-				pDestinationParent = entTreeModelRef.GetBvFolderTreeItemData();
+				pDestinationParent = entTreeModelRef.GetFixtureFolderTreeItemData();
 			else
 				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
 		}

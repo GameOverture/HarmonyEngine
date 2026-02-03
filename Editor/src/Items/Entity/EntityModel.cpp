@@ -394,6 +394,32 @@ void EntityModel::Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList,
 	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 	if(pEntDraw)
 		pEntDraw->ApplyJsonData();
+
+	// Determine whether to toggle Edit Mode on or off
+	EntityWidget *pEntWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
+	QList<EntityTreeItemData *> selectedItemList, selectedFixtureList;
+	m_TreeModel.GetSelectedTreeItemData(selectedItemList, selectedFixtureList);
+	if(pEntWidget->IsEditMode() == false)
+	{
+		// If only a single draw item is selected, and it's a fixture, enable edit mode
+		if(selectedItemList.size() == 0 && selectedFixtureList.size() == 1)
+		{
+			EntityTreeItemData *pFixtureItem = selectedFixtureList[0];
+			if(pFixtureItem->IsEditable())
+				pEntWidget->SetEditMode(pFixtureItem);
+		}
+	}
+	else
+	{
+		// Turn off Edit Mode if multiple selected items, or selected item is no longer editable
+		if(selectedItemList.size() + selectedFixtureList.size() != 1)
+			pEntWidget->SetEditMode(nullptr);
+		else if((selectedItemList.size() == 1    && selectedItemList[0]->IsEditable() == false) ||
+				(selectedFixtureList.size() == 1 && selectedFixtureList[0]->IsEditable() == false))
+		{
+			pEntWidget->SetEditMode(nullptr);
+		}
+	}
 }
 
 int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)

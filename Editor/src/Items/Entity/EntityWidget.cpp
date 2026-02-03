@@ -131,7 +131,7 @@ EntityWidget::~EntityWidget()
 
 	// Root and BvFolder should always be expanded
 	ui->nodeTree->expand(pTreeModel->FindIndex<EntityTreeItemData *>(pTreeModel->GetRootTreeItemData(), 0));
-	ui->nodeTree->expand(pTreeModel->FindIndex<EntityTreeItemData *>(pTreeModel->GetBvFolderTreeItemData(), 0));
+	ui->nodeTree->expand(pTreeModel->FindIndex<EntityTreeItemData *>(pTreeModel->GetFixtureFolderTreeItemData(), 0));
 
 	// Query what items are selected in the Explorer Widget
 	QList<ProjectItemData *> selectedItems; QList<ExplorerItemData *> selectedPrefixes;
@@ -1174,15 +1174,6 @@ void EntityWidget::on_actionEditMode_toggled(bool bChecked)
 		ui->chkEditMode->setChecked(false);
 		return;
 	}
-
-	/////////////////////////////////////
-	// TODO: DETERMINE IF THIS IS NEEEDED
-	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
-	pTreeModel->RefreshSelectedItems();
-	ui->nodeTree->update();
-	/////////////////////////////////////
-
-	
 	
 	pEntityDraw->SetEditMode(true);
 
