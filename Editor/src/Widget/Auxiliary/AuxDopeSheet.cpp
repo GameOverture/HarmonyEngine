@@ -35,7 +35,7 @@ AuxDopeSheet::AuxDopeSheet(QWidget *pParent /*= nullptr*/) :
 	ui->btnLastKeyFrame->setDefaultAction(ui->actionLastKeyFrame);
 
 	ui->btnCopyKeyFrames->setDefaultAction(ui->actionCopyFrames);
-	//ui->btnPasteKeyFrames->setDefaultAction(ui->actionPasteFrames);
+	ui->btnCutKeyFrames->setDefaultAction(ui->actionCutFrames);
 	ui->btnDeleteKeyFrames->setDefaultAction(ui->actionDeleteFrames);
 
 	ui->btnTweenBreak->setDefaultAction(ui->actionBreakTween);
@@ -74,7 +74,6 @@ void AuxDopeSheet::SetEntityStateModel(EntityStateData *pEntStateData)
 	{
 		m_WidgetMapper.setModel(static_cast<EntityModel &>(pEntStateData->GetModel()).GetAuxWidgetsModel());
 		m_WidgetMapper.addMapping(ui->sbFramesPerSecond, AUXDOPEWIDGETSECTION_FramesPerSecond);
-		m_WidgetMapper.addMapping(ui->chkAutoInitialize, AUXDOPEWIDGETSECTION_AutoInitialize);
 
 		m_WidgetMapper.toFirst();
 		m_WidgetMapper.revert();
@@ -83,6 +82,9 @@ void AuxDopeSheet::SetEntityStateModel(EntityStateData *pEntStateData)
 		m_WidgetMapper.setModel(nullptr);
 
 	UpdateWidgets();
+
+	if(pEntStateData)
+		pEntStateData->GetDopeSheetScene().RefreshAllGfxItems();
 }
 
 QMenu *AuxDopeSheet::AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pContextItem, int iContextFrameIndex)
@@ -283,52 +285,51 @@ QMenu *AuxDopeSheet::AllocContextMenu(bool bOnTimeline, EntityTreeItemData *pCon
 	{
 		// Copy Frames action
 		pNewMenu->addAction(ui->actionCopyFrames);
+		pNewMenu->addAction(ui->actionCutFrames);
 
 		// Paste Frames actions
 		const QMimeData *pMimeData = QApplication::clipboard()->mimeData();
-		bool bCanPaste = pMimeData && pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames));
-
-		QAction *pPasteAction = new QAction("Paste Frames");
+		bool bCanPaste = pContextItem && pMimeData && pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames));
+		ui->actionPasteFrames->setEnabled(bCanPaste);
 		if(bCanPaste)
 		{
-			//if(bBestGuess)
-			//	pPasteAction->setText("Paste Frames (Best Guess)");
-
 			QJsonObject pasteDataObj;
-			pasteDataObj.insert("contextAction", CONTEXTACTION_Paste);
-			pPasteAction->setData(QVariant(pasteDataObj));
-			pNewMenu->addAction(pPasteAction);
+			//pasteDataObj.insert("contextAction", CONTEXTACTION_Paste);
+			//pPasteAction->setData(QVariant(pasteDataObj));
+			//pNewMenu->addAction(pPasteAction);
 
-			QAction *pPasteAtFrameAction = new QAction("Paste Frames starting at " % QString::number(iContextFrameIndex));
-			QJsonObject pasteAtFrameDataObj;
-			pasteAtFrameDataObj.insert("contextAction", CONTEXTACTION_PasteAtFrame);
-			pasteAtFrameDataObj.insert("frame", iContextFrameIndex);
-			pPasteAtFrameAction->setData(QVariant(pasteAtFrameDataObj));
-			pNewMenu->addAction(pPasteAtFrameAction);
+			//QAction *pPasteAtFrameAction = new QAction("Paste Frames starting at " % QString::number(iContextFrameIndex));
+			//QJsonObject pasteAtFrameDataObj;
+			//pasteAtFrameDataObj.insert("contextAction", CONTEXTACTION_PasteAtFrame);
+			//pasteAtFrameDataObj.insert("frame", iContextFrameIndex);
+			//pPasteAtFrameAction->setData(QVariant(pasteAtFrameDataObj));
+			//pNewMenu->addAction(pPasteAtFrameAction);
 
-			if(pContextItem)
+			//if(pContextItem)
 			{
-				QAction *pPasteIntoItemAction = new QAction("Paste Frames into " % pContextItem->GetCodeName());
-				QJsonObject pasteIntoItemDataObj;
-				pasteIntoItemDataObj.insert("contextAction", CONTEXTACTION_PasteIntoItem);
-				pasteIntoItemDataObj.insert("contextData", pContextItem->GetThisUuid().toString(QUuid::WithoutBraces));
-				pPasteIntoItemAction->setData(QVariant(pasteIntoItemDataObj));
-				pNewMenu->addAction(pPasteIntoItemAction);
+				//QAction *pPasteIntoItemAction = new QAction("Paste Frames into " % pContextItem->GetCodeName());
+				//QJsonObject pasteIntoItemDataObj;
+				//pasteIntoItemDataObj.insert("contextAction", CONTEXTACTION_PasteIntoItem);
+				//pasteIntoItemDataObj.insert("contextData", pContextItem->GetThisUuid().toString(QUuid::WithoutBraces));
+				//pPasteIntoItemAction->setData(QVariant(pasteIntoItemDataObj));
+				//pNewMenu->addAction(pPasteIntoItemAction);
 
-				QAction *pPasteIntoItemAtFrameAction = new QAction("Paste Frames onto " % pContextItem->GetCodeName() % " starting at " % QString::number(iContextFrameIndex));
+				//QAction *pPasteIntoItemAtFrameAction = new QAction("Paste Frames onto " % pContextItem->GetCodeName() % " starting at " % QString::number(iContextFrameIndex));
 				QJsonObject pasteIntoItemAtFrameDataObj;
 				pasteIntoItemAtFrameDataObj.insert("contextAction", CONTEXTACTION_PasteIntoItemAtFrame);
 				pasteIntoItemAtFrameDataObj.insert("frame", iContextFrameIndex);
 				pasteIntoItemAtFrameDataObj.insert("contextData", pContextItem->GetThisUuid().toString(QUuid::WithoutBraces));
-				pPasteIntoItemAtFrameAction->setData(QVariant(pasteIntoItemAtFrameDataObj));
-				pNewMenu->addAction(pPasteIntoItemAtFrameAction);
+				ui->actionPasteFrames->setData(QVariant(pasteIntoItemAtFrameDataObj));
+				//pPasteIntoItemAtFrameAction->setData(QVariant(pasteIntoItemAtFrameDataObj));
+				//pNewMenu->addAction(pPasteIntoItemAtFrameAction);
 			}
 		}
-		else // bCanPaste == false
-		{
-			pPasteAction->setEnabled(false);
-			pNewMenu->addAction(pPasteAction);
-		}
+		//else // bCanPaste == false
+		//{
+		//	pPasteAction->setEnabled(false);
+		//	pNewMenu->addAction(pPasteAction);
+		//}
+		pNewMenu->addAction(ui->actionPasteFrames);
 		
 		pNewMenu->addSeparator();
 		
@@ -408,7 +409,6 @@ void AuxDopeSheet::UpdateWidgets()
 	if(ui->graphicsView->scene())
 	{
 		ui->sbFramesPerSecond->setEnabled(true);
-		ui->chkAutoInitialize->setEnabled(true);
 
 		EntityDopeSheetScene &dopeSheetSceneRef = GetEntityStateModel()->GetDopeSheetScene();
 
@@ -450,24 +450,42 @@ void AuxDopeSheet::UpdateWidgets()
 		}
 		
 		QList<EntityTreeItemData *> selectedFrameItemList = ui->graphicsView->GetScene()->GetItemsFromSelectedFrames();
-		ui->actionCopyFrames->setEnabled(selectedFrameItemList.size() == 1);
+		if(selectedFrameItemList.size() == 1)
+		{
+			ui->actionCopyFrames->setEnabled(true);
+			ui->actionCopyFrames->setIcon(QIcon(":/icons16x16/edit-copy.png"));
+			ui->actionCopyFrames->setToolTip("Copy selected key frames in dope sheet to the clipboard");
 
-		const QMimeData *pMimeData = QApplication::clipboard()->mimeData();
+			ui->actionCutFrames->setEnabled(true);
+			ui->actionCutFrames->setToolTip("Cut selected key frames in dope sheet, and copy them to the clipboard");
+		}
+		else
+		{
+			ui->actionCopyFrames->setEnabled(false);
+			ui->actionCopyFrames->setIcon(QIcon(":/icons16x16/edit-copy-disabled.png"));
+			ui->actionCutFrames->setEnabled(false);
+			if(selectedFrameItemList.size() == 0)
+			{
+				ui->actionCopyFrames->setToolTip("No key frames selected");
+				ui->actionCutFrames->setToolTip("No key frames selected");
+			}
+			else
+			{
+				ui->actionCopyFrames->setToolTip("Cannot copy frames from multiple node items");
+				ui->actionCutFrames->setToolTip("Cannot cut frames from multiple node items");
+			}
+		}
 
-		bool bCanPaste = ui->graphicsView->GetContextClickItem() && pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityFrames));
-		//ui->actionPasteFrames->setEnabled(bCanPaste);
-		//ui->actionPasteOnFrame->setEnabled(bCanPaste);
+		// NOTE: Paste action isn't set (and not visible on the toolbar) because it must require a context menu item in order to paste
 
 		ui->actionDeleteFrames->setEnabled(selectedFrameItemList.size() > 0);
 	}
 	else
 	{
 		ui->sbFramesPerSecond->setEnabled(false);
-		ui->chkAutoInitialize->setEnabled(false);
 
 		ui->actionCopyFrames->setEnabled(false);
-		//ui->actionPasteFrames->setEnabled(false);
-		//ui->actionPasteOnFrame->setEnabled(false);
+		ui->actionCutFrames->setEnabled(false);
 		ui->actionDeleteFrames->setEnabled(false);
 	}
 }
@@ -785,12 +803,32 @@ void AuxDopeSheet::on_actionCopyFrames_triggered()
 		MainWindow::SetTempStatus("No frames selected to copy");
 		return;
 	}
-
 	// Copy the serialized data to the clipboard
 	EntityFrameMimeData *pFrameMimeData = new EntityFrameMimeData(serializedKeyFramesObj);
 	QApplication::clipboard()->setMimeData(pFrameMimeData);
 
 	MainWindow::SetTempStatus("Copied " % QString::number(iNumFrames) % " frame" % (iNumFrames == 1 ? "" : "s") % " to clipboard");
+}
+
+void AuxDopeSheet::on_actionCutFrames_triggered()
+{
+	// Serialize all the selected items to be copied and deleted
+	int iNumFrames = 0;
+	QJsonObject serializedKeyFramesObj = ui->graphicsView->GetScene()->SerializeSelectedKeyFrames(iNumFrames);
+	if(iNumFrames == 0)
+	{
+		MainWindow::SetTempStatus("No frames selected to cut");
+		return;
+	}
+	// Copy the serialized data to the clipboard
+	EntityFrameMimeData *pFrameMimeData = new EntityFrameMimeData(serializedKeyFramesObj);
+	QApplication::clipboard()->setMimeData(pFrameMimeData);
+
+	// Delete the selected frames
+	EntityUndoCmd_PopKeyFrames *pNewCmd = new EntityUndoCmd_PopKeyFrames(*ui->graphicsView->GetScene(), serializedKeyFramesObj);
+	GetEntityStateModel()->GetModel().GetItem().GetUndoStack()->push(pNewCmd);
+
+	MainWindow::SetTempStatus("Cut " % QString::number(iNumFrames) % " frame" % (iNumFrames == 1 ? "" : "s") % " to clipboard");
 }
 
 void AuxDopeSheet::on_actionDeleteFrames_triggered()

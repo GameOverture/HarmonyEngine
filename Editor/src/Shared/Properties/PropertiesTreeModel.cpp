@@ -617,12 +617,13 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 					propValue = categoryObj[sProperty].toBool() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
 					break;
 
-				case PROPERTIESTYPE_ComboBoxString:
-					if(propDef.delegateBuilder.toStringList().contains(categoryObj[sProperty].toString()) == false)
+				case PROPERTIESTYPE_ComboBoxString: {
+					QStringList sComboBoxStringList = propDef.delegateBuilder.toStringList();
+					if(sComboBoxStringList.contains(categoryObj[sProperty].toString()) == false)
 						HyGuiLog("PropertiesTreeModel::DeserializeJson could not resolve ComboBoxString: " % categoryObj[sProperty].toString(), LOGTYPE_Error);
 
 					propValue = categoryObj[sProperty].toString();
-					break;
+					break; }
 
 				case PROPERTIESTYPE_int:
 				case PROPERTIESTYPE_ComboBoxInt:

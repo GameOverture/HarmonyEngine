@@ -63,12 +63,12 @@ struct TweenInfo
 
 	bool IsActive() const
 	{
-		return m_iStartFrame != -1;
+		return m_iStartFrame != -2;
 	}
 
 	void Clear()
 	{
-		m_iStartFrame = -1;
+		m_iStartFrame = -2;
 		m_Start.clear();
 		m_Destination.clear();
 		m_fDuration = 0.0f;

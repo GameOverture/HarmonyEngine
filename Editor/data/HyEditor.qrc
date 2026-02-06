@@ -384,5 +384,6 @@
         <file>icons16x16/tileset-arrange.png</file>
         <file>icons16x16/collision.png</file>
         <file>icons16x16/slice-sprite-sheet.png</file>
+        <file>icons16x16/edit-copy-disabled.png</file>
     </qresource>
 </RCC>

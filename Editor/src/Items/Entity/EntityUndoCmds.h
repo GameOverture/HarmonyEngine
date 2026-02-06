@@ -480,19 +480,19 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_AutoInitialize : public QUndoCommand
-{
-	EntityModel &							m_EntityModelRef;
-	bool									m_bNewValue;
-	bool									m_bOldValue;
-
-public:
-	EntityUndoCmd_AutoInitialize(EntityModel &entityModelRef, bool bNewValue, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_AutoInitialize();
-
-	virtual void redo() override;
-	virtual void undo() override;
-};
+//class EntityUndoCmd_AutoInitialize : public QUndoCommand
+//{
+//	EntityModel &							m_EntityModelRef;
+//	bool									m_bNewValue;
+//	bool									m_bOldValue;
+//
+//public:
+//	EntityUndoCmd_AutoInitialize(EntityModel &entityModelRef, bool bNewValue, QUndoCommand *pParent = nullptr);
+//	virtual ~EntityUndoCmd_AutoInitialize();
+//
+//	virtual void redo() override;
+//	virtual void undo() override;
+//};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

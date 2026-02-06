@@ -476,7 +476,7 @@ ctor_to_frame0:
 			m_iDragFrame = GetNearestFrame(m_MouseScenePos.x());
 			update();
 		}
-		else if(pEvent->pos().x() <= TIMELINE_LEFT_MARGIN)
+		else if(pEvent->pos().x() <= ((TIMELINE_LEFT_MARGIN - 5.0f) - (TIMELINE_NOTCH_SUBLINES_WIDTH * 1.5f)))
 		{
 			m_bLeftSideDirty = true;
 			update();

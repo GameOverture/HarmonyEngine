@@ -630,7 +630,11 @@ QJsonObject EntityDopeSheetScene::SerializeSelectedKeyFrames(int &iNumFramesOut)
 					QJsonObject serializedKeyFrameObj = serializedKeyFramesArrayRef[i].toObject();
 					if(serializedKeyFrameObj["frame"].toInt() == iFrameIndex)
 					{
-						QJsonObject sceneCategoryObj = m_KeyFramesMap[pCurItemData][iFrameIndex][sCategory].toObject();
+						QJsonObject sceneCategoryObj;
+						if(iFrameIndex < 0) // Constructor key frame
+							sceneCategoryObj = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap()[pCurItemData][sCategory].toObject();
+						else
+							sceneCategoryObj = m_KeyFramesMap[pCurItemData][iFrameIndex][sCategory].toObject();
 
 						// If this category already exists, then merge the property
 						if(serializedKeyFrameObj["props"].toObject().contains(sCategory))
@@ -670,7 +674,10 @@ QJsonObject EntityDopeSheetScene::SerializeSelectedKeyFrames(int &iNumFramesOut)
 				if(bFoundFrame == false)
 				{
 					QJsonObject propertyObj;
-					propertyObj.insert(sProperty, m_KeyFramesMap[pCurItemData][iFrameIndex][sCategory].toObject()[sProperty]);
+					if(iFrameIndex < 0)
+						propertyObj.insert(sProperty, static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap()[pCurItemData][sCategory].toObject()[sProperty]);
+					else
+						propertyObj.insert(sProperty, m_KeyFramesMap[pCurItemData][iFrameIndex][sCategory].toObject()[sProperty]);
 
 					QJsonObject categoryObj;
 					categoryObj.insert(sCategory, propertyObj);
@@ -860,17 +867,19 @@ QMap<int, QMap<EntityTreeItemData *, QJsonObject>> EntityDopeSheetScene::GetKeyF
 
 void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, int iFrameIndex, QJsonObject propsObj)
 {
+	QJsonObject curPropsObj;
 	if(iFrameIndex < 0)
-	{
-		HyGuiLog("EntityDopeSheetScene::SetKeyFrameProperties() passed negative frame - ctor not implemented", LOGTYPE_Error);
-		return;
-	}
-
-	QJsonObject curPropsObj = m_KeyFramesMap[pItemData][iFrameIndex];
+		curPropsObj = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap()[pItemData];
+	else
+		curPropsObj = m_KeyFramesMap[pItemData][iFrameIndex];
 
 	if(curPropsObj.empty() && propsObj.empty())
 	{
-		m_KeyFramesMap[pItemData].remove(iFrameIndex);
+		if(iFrameIndex < 0)
+			static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap().remove(pItemData);
+		else
+			m_KeyFramesMap[pItemData].remove(iFrameIndex);
+
 		return;
 	}
 
@@ -895,7 +904,10 @@ void EntityDopeSheetScene::SetKeyFrameProperties(EntityTreeItemData *pItemData, 
 	if(curPropsObj.empty())
 		HyGuiLog("EntityDopeSheetScene::SetKeyFrameProperties() - curPropsObj is empty", LOGTYPE_Error);
 
-	m_KeyFramesMap[pItemData][iFrameIndex] = curPropsObj;
+	if(iFrameIndex < 0)
+		static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap()[pItemData] = curPropsObj;
+	else
+		m_KeyFramesMap[pItemData][iFrameIndex] = curPropsObj;
 
 	RefreshAllGfxItems();
 }
@@ -1099,19 +1111,13 @@ QList<QPair<EntityTreeItemData *, QJsonArray>> EntityDopeSheetScene::PasteSerial
 {
 	QList<QPair<EntityTreeItemData *, QJsonArray>> overwrittenKeyFramesPairList;
 
-	if(iStartFrameIndex < 0)
-	{
-		HyGuiLog("EntityDopeSheetScene::PasteSerializedKeyFrames() passed negative frame - ctor not implemented", LOGTYPE_Error);
-		return overwrittenKeyFramesPairList;
-	}
-
 	for(QPair<EntityTreeItemData *, QJsonArray> &pair : pasteKeyFramesPairList)
 	{
 		EntityTreeItemData *pItemData = pair.first;
 		QJsonArray &frameDataArray = pair.second;
 
 		int iFrameOffset = 0;
-		if(iStartFrameIndex >= 0 && frameDataArray.count() > 0)
+		if(iStartFrameIndex >= -1 && frameDataArray.count() > 0)
 		{
 			int iPasteStartFrame = frameDataArray[0].toObject()["frame"].toInt();
 			iFrameOffset = iStartFrameIndex - iPasteStartFrame;
@@ -1135,6 +1141,9 @@ QList<QPair<EntityTreeItemData *, QJsonArray>> EntityDopeSheetScene::PasteSerial
 					{
 						// If a keyframe already exists at this frame, save the properties that will be overwritten in 'overwrittenPropertiesObj'
 						int iFrameIndex = frameDataObj["frame"].toInt() + iFrameOffset;
+						if(iFrameIndex < -1)
+							HyGuiLog("EntityDopeSheetScene::PasteSerializedKeyFrames() - iFrameIndex is < -1 (invalid)", LOGTYPE_Error);
+						
 						QJsonValue overWrittenValue = SetKeyFrameProperty(pItemData, iFrameIndex, sCategory, sPropName, categoryObj[sPropName], false);
 						if(overWrittenValue.isUndefined() == false && overWrittenValue.isNull() == false)
 						{
@@ -1184,31 +1193,13 @@ QList<QPair<EntityTreeItemData *, QJsonArray>> EntityDopeSheetScene::PasteSerial
 
 void EntityDopeSheetScene::UnpasteSerializedKeyFrames(QList<QPair<EntityTreeItemData *, QJsonArray>> unpasteKeyFramesPairList, QList<QPair<EntityTreeItemData *, QJsonArray>> overwrittenKeyFramesPairList, int iStartFrameIndex)
 {
-	if(iStartFrameIndex < 0)
-	{
-		HyGuiLog("EntityDopeSheetScene::UnpasteSerializedKeyFrames() passed negative frame - ctor not implemented", LOGTYPE_Error);
-		return;
-	}
-
-	//if(m_KeyFramesMap.contains(pItemData) == false)
-	//	return;
-
-	//if(keyFrameMimeObj.size() != 1)
-	//{
-	//	HyGuiLog("EntityDopeSheetScene::UnpasteSerializedKeyFrames() - Invalid keyFrameMimeObj size", LOGTYPE_Error);
-	//	return;
-	//}
-
-	//QJsonArray frameDataArray = keyFrameMimeObj.begin()->toArray();
-
-
 	for(QPair<EntityTreeItemData *, QJsonArray> &pair : unpasteKeyFramesPairList)
 	{
 		EntityTreeItemData *pItemData = pair.first;
 		QJsonArray &frameDataArray = pair.second;
 
 		int iFrameOffset = 0;
-		if(iStartFrameIndex >= 0 && frameDataArray.count() > 0)
+		if(iStartFrameIndex >= -1 && frameDataArray.count() > 0)
 		{
 			int iPasteStartFrame = frameDataArray[0].toObject()["frame"].toInt();
 			iFrameOffset = iStartFrameIndex - iPasteStartFrame;
@@ -1234,7 +1225,21 @@ void EntityDopeSheetScene::UnpasteSerializedKeyFrames(QList<QPair<EntityTreeItem
 	if(overwrittenKeyFramesPairList.empty())
 		RefreshAllGfxItems();
 	else
-		PasteSerializedKeyFrames(overwrittenKeyFramesPairList, -1); // This happens to write the overwritten keyframes back into the model
+	{
+		// Get the first frame in the overwritten keyframes to use as the start frame for re-pasting
+		int iStartFrame = INT_MAX;
+		for(const QPair<EntityTreeItemData *, QJsonArray> &pair : overwrittenKeyFramesPairList)
+		{
+			if(pair.second.size() > 0)
+			{
+				int iFrame = pair.second[0].toObject()["frame"].toInt();
+				if(iFrame < iStartFrame)
+					iStartFrame = iFrame;
+			}
+		}
+		
+		PasteSerializedKeyFrames(overwrittenKeyFramesPairList, iStartFrame); // Write the overwritten keyframes back into the model
+	}
 }
 
 void EntityDopeSheetScene::InsertSerializedKeyFrames(QJsonObject keyFrameMimeObj)

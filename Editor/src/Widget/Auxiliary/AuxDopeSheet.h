@@ -90,6 +90,7 @@ private Q_SLOTS:
 	void on_actionCreateAlphaTween_triggered();
 
 	void on_actionCopyFrames_triggered();
+	void on_actionCutFrames_triggered();
 	void on_actionDeleteFrames_triggered();
 
 private:

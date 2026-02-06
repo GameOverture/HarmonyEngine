@@ -352,10 +352,13 @@ bool GfxShapeModel::IsLoopClosed() const
 	else if(IsValidModel() == false) // Any shape besides SHAPE_Polygon
 		return SHAPEMOUSEMOVE_Creation;
 
-	for(HyShape2d *pFixture : m_ShapeList)
+	if(IsAllGrabPointsSelected())
 	{
-		if(pFixture->TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
-			return SHAPEMOUSEMOVE_Inside;
+		for(HyShape2d *pFixture : m_ShapeList)
+		{
+			if(pFixture->TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
+				return SHAPEMOUSEMOVE_Inside;
+		}
 	}
 	return SHAPEMOUSEMOVE_Outside;
 }

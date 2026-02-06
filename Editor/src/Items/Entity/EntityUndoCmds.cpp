@@ -986,7 +986,7 @@ EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames(EntityDopeSheetScene 
 		HyGuiLog("EntityUndoCmd_PasteKeyFrames::EntityUndoCmd_PasteKeyFrames m_PasteKeyFramesPairList is empty", LOGTYPE_Error);
 
 	if(m_iStartFrameIndex < 0)
-		setText("Paste Key Frames");
+		setText("Paste Key Frames at constructor");
 	else
 		setText("Paste Key Frames at frame " % QString::number(m_iStartFrameIndex));
 }
@@ -1516,28 +1516,28 @@ EntityUndoCmd_FramesPerSecond::EntityUndoCmd_FramesPerSecond(EntityModel &entity
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_AutoInitialize::EntityUndoCmd_AutoInitialize(EntityModel &entityModelRef, bool bNewValue, QUndoCommand *pParent /*= nullptr*/) :
-	QUndoCommand(pParent),
-	m_EntityModelRef(entityModelRef),
-	m_bNewValue(bNewValue)
-{
-	setText("Toggle Auto Initialize");
-	m_bOldValue = m_EntityModelRef.IsAutoInitialize();
-}
-
-/*virtual*/ EntityUndoCmd_AutoInitialize::~EntityUndoCmd_AutoInitialize()
-{
-}
-
-/*virtual*/ void EntityUndoCmd_AutoInitialize::redo() /*override*/
-{
-	m_EntityModelRef.GetAuxWidgetsModel()->setData(m_EntityModelRef.GetAuxWidgetsModel()->index(0, AUXDOPEWIDGETSECTION_AutoInitialize), m_bNewValue, Qt::UserRole);
-}
-
-/*virtual*/ void EntityUndoCmd_AutoInitialize::undo() /*override*/
-{
-	m_EntityModelRef.GetAuxWidgetsModel()->setData(m_EntityModelRef.GetAuxWidgetsModel()->index(0, AUXDOPEWIDGETSECTION_AutoInitialize), m_bOldValue, Qt::UserRole);
-}
+//EntityUndoCmd_AutoInitialize::EntityUndoCmd_AutoInitialize(EntityModel &entityModelRef, bool bNewValue, QUndoCommand *pParent /*= nullptr*/) :
+//	QUndoCommand(pParent),
+//	m_EntityModelRef(entityModelRef),
+//	m_bNewValue(bNewValue)
+//{
+//	setText("Toggle Auto Initialize");
+//	m_bOldValue = m_EntityModelRef.IsAutoInitialize();
+//}
+//
+///*virtual*/ EntityUndoCmd_AutoInitialize::~EntityUndoCmd_AutoInitialize()
+//{
+//}
+//
+///*virtual*/ void EntityUndoCmd_AutoInitialize::redo() /*override*/
+//{
+//	m_EntityModelRef.GetAuxWidgetsModel()->setData(m_EntityModelRef.GetAuxWidgetsModel()->index(0, AUXDOPEWIDGETSECTION_AutoInitialize), m_bNewValue, Qt::UserRole);
+//}
+//
+///*virtual*/ void EntityUndoCmd_AutoInitialize::undo() /*override*/
+//{
+//	m_EntityModelRef.GetAuxWidgetsModel()->setData(m_EntityModelRef.GetAuxWidgetsModel()->index(0, AUXDOPEWIDGETSECTION_AutoInitialize), m_bOldValue, Qt::UserRole);
+//}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

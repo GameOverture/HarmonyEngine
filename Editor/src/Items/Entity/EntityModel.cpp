@@ -99,14 +99,14 @@ EntityModel::AuxWidgetsModel::AuxWidgetsModel(EntityModel &entityModelRef, int i
 			EntityUndoCmd_FramesPerSecond *pCmd = new EntityUndoCmd_FramesPerSecond(m_EntityModelRef, value.toInt());
 			m_EntityModelRef.GetItem().GetUndoStack()->push(pCmd);
 		}
-		else if(modelIndex.column() == AUXDOPEWIDGETSECTION_AutoInitialize)
-		{
-			if(m_bAutoInitialize == value.toBool())
-				return false;
+		//else if(modelIndex.column() == AUXDOPEWIDGETSECTION_AutoInitialize)
+		//{
+		//	if(m_bAutoInitialize == value.toBool())
+		//		return false;
 
-			EntityUndoCmd_AutoInitialize *pCmd = new EntityUndoCmd_AutoInitialize(m_EntityModelRef, value.toBool());
-			m_EntityModelRef.GetItem().GetUndoStack()->push(pCmd);
-		}
+		//	EntityUndoCmd_AutoInitialize *pCmd = new EntityUndoCmd_AutoInitialize(m_EntityModelRef, value.toBool());
+		//	m_EntityModelRef.GetItem().GetUndoStack()->push(pCmd);
+		//}
 
 		return false;
 	}
@@ -114,8 +114,8 @@ EntityModel::AuxWidgetsModel::AuxWidgetsModel(EntityModel &entityModelRef, int i
 	{
 		if(modelIndex.column() == AUXDOPEWIDGETSECTION_FramesPerSecond)
 			m_iFramesPerSecond = value.toInt();
-		else if(modelIndex.column() == AUXDOPEWIDGETSECTION_AutoInitialize)
-			m_bAutoInitialize = value.toBool();
+		//else if(modelIndex.column() == AUXDOPEWIDGETSECTION_AutoInitialize)
+		//	m_bAutoInitialize = value.toBool();
 		else
 			return false;
 
@@ -184,11 +184,6 @@ int EntityModel::GetFinalFrameIndex(int iStateIndex) const
 int EntityModel::GetFramesPerSecond() const
 {
 	return m_AuxWidgetsModel.data(m_AuxWidgetsModel.index(0, AUXDOPEWIDGETSECTION_FramesPerSecond), Qt::UserRole).toInt();
-}
-
-bool EntityModel::IsAutoInitialize() const
-{
-	return m_AuxWidgetsModel.data(m_AuxWidgetsModel.index(0, AUXDOPEWIDGETSECTION_AutoInitialize), Qt::UserRole).toBool();
 }
 
 QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow)
@@ -1358,7 +1353,6 @@ QString EntityModel::DeserializeChainAsRuntimeCode(bool bIsPrimitive, QString sC
 	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetRootTreeItemData()->GetCodeName());
 
 	itemSpecificFileDataOut.m_Meta.insert("framesPerSecond", GetFramesPerSecond());
-	itemSpecificFileDataOut.m_Meta.insert("autoInitialize", IsAutoInitialize());
 	
 	QList<EntityTreeItemData *> childList;
 	QList<EntityTreeItemData *> shapeList;

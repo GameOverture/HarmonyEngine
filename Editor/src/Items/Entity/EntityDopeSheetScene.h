@@ -40,7 +40,6 @@ class EntityFrameMimeData;
 enum AuxDopeWidgetsSection
 {
 	AUXDOPEWIDGETSECTION_FramesPerSecond = 0,
-	AUXDOPEWIDGETSECTION_AutoInitialize,
 
 	NUM_AUXDOPEWIDGETSECTIONS
 };

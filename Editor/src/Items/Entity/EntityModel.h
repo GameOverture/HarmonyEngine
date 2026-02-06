@@ -74,7 +74,6 @@ public:
 
 	int GetFinalFrameIndex(int iStateIndex) const;
 	int GetFramesPerSecond() const;
-	bool IsAutoInitialize() const;
 
 	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from UndoCmd's
 	QList<EntityTreeItemData *> Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow);
