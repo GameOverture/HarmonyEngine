@@ -33,7 +33,7 @@ GfxPrimitiveView::GfxPrimitiveView(HyEntity2d *pParent /*= nullptr*/) :
 		m_ChainView.RefreshColor();
 }
 
-/*virtual*/ void GfxPrimitiveView::DoRefreshView(EditModeState eEditModeState, ShapeMouseMoveResult eResult) /*override*/
+/*virtual*/ void GfxPrimitiveView::DoRefreshView(EditModeState eEditModeState, EditModeAction eResult) /*override*/
 {
 	if(static_cast<GfxPrimitiveModel *>(m_pModel)->IsShapeModel())
 		m_ShapeView.DoRefreshView(eEditModeState, eResult);

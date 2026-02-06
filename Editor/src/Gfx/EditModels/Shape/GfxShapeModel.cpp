@@ -12,7 +12,7 @@
 #include "IGfxEditView.h"
 
 GfxShapeModel::GfxShapeModel(HyColor color) :
-	IGfxEditModel(EDITMODEL_Shape, color),
+	IGfxEditModel(EDITMODETYPE_Shape, color),
 	m_eShapeType(SHAPE_None),
 	m_bSelfIntersecting(false),
 	m_ptSelfIntersection(0.0f, 0.0f),
@@ -130,7 +130,7 @@ void GfxShapeModel::TransformData(glm::mat4 mtxTransform)
 	for(HyShape2d *pFixture : m_ShapeList)
 		pFixture->TransformSelf(mtxTransform);
 
-	RefreshViews(EDITMODE_Idle, SHAPEMOUSEMOVE_None);
+	RefreshViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 
 int GfxShapeModel::GetNumShapeFixtures() const
@@ -153,25 +153,25 @@ bool GfxShapeModel::IsLoopClosed() const
 /*virtual*/ QString GfxShapeModel::MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) /*override*/
 {
 	QString sUndoText;
-	switch(m_eCurTransform)
+	switch(m_eCurAction)
 	{
-	case SHAPEMOUSEMOVE_None:
-	case SHAPEMOUSEMOVE_Outside:
+	case EDITMODEACTION_None:
+	case EDITMODEACTION_Outside:
 		break;
-	case SHAPEMOUSEMOVE_Creation:
+	case EDITMODEACTION_Creation:
 		sUndoText = "Create new " % HyGlobal::ShapeName(m_eShapeType) % " shape " % sShapeCodeName;
 		break;
-	case SHAPEMOUSEMOVE_Inside:
-	case SHAPEMOUSEMOVE_HoverCenter:
+	case EDITMODEACTION_Inside:
+	case EDITMODEACTION_HoverCenter:
 		sUndoText = "Translate shape " % sShapeCodeName;
 		break;
-	case SHAPEMOUSEMOVE_AppendVertex:
+	case EDITMODEACTION_AppendVertex:
 		sUndoText = "Append vertex on " % sShapeCodeName;
 		break;
-	case SHAPEMOUSEMOVE_InsertVertex:
+	case EDITMODEACTION_InsertVertex:
 		sUndoText = "Insert vertex on " % sShapeCodeName;
 		break;
-	case SHAPEMOUSEMOVE_HoverGrabPoint:
+	case EDITMODEACTION_HoverGrabPoint:
 		if(m_eShapeType == SHAPE_Polygon || m_eShapeType == SHAPE_LineSegment)
 			sUndoText = "Translate vert(s) on " % sShapeCodeName;
 		else if(m_eShapeType == SHAPE_Circle)
@@ -181,7 +181,7 @@ bool GfxShapeModel::IsLoopClosed() const
 		else if(m_eShapeType == SHAPE_Capsule)
 			sUndoText = "Adjust capsule size on " % sShapeCodeName;
 		else
-			HyGuiLog("GfxShapeModel::MouseTransformReleased - Invalid shape type for SHAPEMOUSEMOVE_HoverGrabPoint", LOGTYPE_Error);
+			HyGuiLog("GfxShapeModel::MouseTransformReleased - Invalid shape type for EDITMODEACTION_HoverGrabPoint", LOGTYPE_Error);
 		break;
 
 	default:
@@ -194,6 +194,8 @@ bool GfxShapeModel::IsLoopClosed() const
 
 /*virtual*/ void GfxShapeModel::DoDeserialize(const QList<float> &floatList) /*override*/
 {
+	// NOTE: GfxShapeModel::DoDeserialize assumes the m_eShapeType has already been set appropriately and will work with the data in `floatList`
+
 	if(m_ShapeList.empty())
 		m_ShapeList.push_back(new HyShape2d());
 
@@ -225,24 +227,76 @@ bool GfxShapeModel::IsLoopClosed() const
 		m_GrabPointCenter.Setup(ptCentroid);
 	}
 
-	// Preserve existing grab points where possible (keeps selection)
-	for(int i = 0; i < grabPointList.size(); ++i)
+	// grabPointList is allowed to be empty, otherwise it will have proper data for the shape type
+	if(grabPointList.empty())
+		m_GrabPointList.clear();
+	else
 	{
-		if(static_cast<int>(m_GrabPointList.size()) - 1 < i)
-			m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, grabPointList[i]));
-		else
-			m_GrabPointList[i].Setup(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
-	}
-	if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
-		m_GrabPointList.resize(grabPointList.size());
+		switch(m_eShapeType)
+		{
+		case SHAPE_None:
+			m_GrabPointList.clear();
+			break;
 
-	if(m_eShapeType == SHAPE_Polygon &&
-		m_bLoopClosed == false &&
-		m_GrabPointList.size() > 1)
-	{
-		m_GrabPointList.front().Setup(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
-		m_GrabPointList.back().Setup(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
+		case SHAPE_Box:
+			if(grabPointList.size() != 4)
+				HyGuiLog("GfxShapeModel::DoDeserialize for box did not receive 4 grab points", LOGTYPE_Error);
+			m_GrabPointList.resize(4);
+			for(int i = 0; i < 4; ++i)
+				m_GrabPointList[i].Setup(GRABPOINT_ShapeCtrlAll, grabPointList[i]);
+			break;
+
+		case SHAPE_Circle:
+			if(grabPointList.size() != 4)
+				HyGuiLog("GfxShapeModel::DoDeserialize for circle did not receive 4 grab points", LOGTYPE_Error);
+			m_GrabPointList.resize(4);
+			m_GrabPointList[0].Setup(GRABPOINT_ShapeCtrlVert, grabPointList[0]); // Top
+			m_GrabPointList[1].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[1]); // Right
+			m_GrabPointList[2].Setup(GRABPOINT_ShapeCtrlVert, grabPointList[2]); // Bottom
+			m_GrabPointList[3].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[3]); // Left
+			break;
+
+		case SHAPE_LineSegment:
+			if(grabPointList.size() != 2)
+				HyGuiLog("GfxShapeModel::DoDeserialize for line segment did not receive 2 grab points", LOGTYPE_Error);
+			m_GrabPointList.resize(2);
+			m_GrabPointList[0].Setup(GRABPOINT_ShapeCtrlAll, grabPointList[0]);
+			m_GrabPointList[1].Setup(GRABPOINT_ShapeCtrlAll, grabPointList[1]);
+			break;
+
+		case SHAPE_Polygon:
+			// Preserve existing grab points where possible (keeps selection)
+			for(int i = 0; i < grabPointList.size(); ++i)
+			{
+				if(static_cast<int>(m_GrabPointList.size()) - 1 < i)
+					m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, grabPointList[i]));
+				else
+					m_GrabPointList[i].Setup(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
+			}
+			if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
+				m_GrabPointList.resize(grabPointList.size());
+
+			if(m_bLoopClosed == false && m_GrabPointList.size() > 1)
+			{
+				m_GrabPointList.front().Setup(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
+				m_GrabPointList.back().Setup(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
+			}
+			break;
+
+		case SHAPE_Capsule:
+			if(grabPointList.size() != 6)
+				HyGuiLog("GfxShapeModel::DoDeserialize for capsule did not receive 6 grab points", LOGTYPE_Error);
+			m_GrabPointList.resize(6);
+			m_GrabPointList[0].Setup(GRABPOINT_ShapeCtrlVert, grabPointList[0]); // Pt1
+			m_GrabPointList[1].Setup(GRABPOINT_ShapeCtrlVert, grabPointList[1]); // Pt2
+			m_GrabPointList[2].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[2]); // Center1 Right
+			m_GrabPointList[3].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[3]); // Center1 Left
+			m_GrabPointList[4].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[4]); // Center2 Right
+			m_GrabPointList[5].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[5]); // Center2 Left
+			break;
+		}
 	}
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	if(m_GrabPointList.empty())
@@ -299,33 +353,33 @@ bool GfxShapeModel::IsLoopClosed() const
 	}
 }
 
-/*virtual*/ ShapeMouseMoveResult GfxShapeModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
+/*virtual*/ EditModeAction GfxShapeModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
 {
-	m_iVertexIndex = -1;
-	m_ptVertexPos = glm::vec2(0.0f, 0.0f);
+	m_iGrabPointIndex = -1;
+	m_ptGrabPointPos = glm::vec2(0.0f, 0.0f);
 
 	for(int i = 0; i < m_GrabPointList.size(); ++i)
 	{
 		if(m_GrabPointList[i].TestPoint(ptWorldMousePos))
 		{
-			m_iVertexIndex = i;
-			return SHAPEMOUSEMOVE_HoverGrabPoint;
+			m_iGrabPointIndex = i;
+			return EDITMODEACTION_HoverGrabPoint;
 		}
 	}
 	if(m_GrabPointCenter.TestPoint(ptWorldMousePos))
-		return SHAPEMOUSEMOVE_HoverCenter;
+		return EDITMODEACTION_HoverCenter;
 
 	if(m_eShapeType == SHAPE_Polygon)
 	{
 		if(m_GrabPointList.empty())
-			return SHAPEMOUSEMOVE_Creation;
+			return EDITMODEACTION_Creation;
 
 		if(CheckIfAddVertexOnEdge(ptWorldMousePos))
-			return SHAPEMOUSEMOVE_InsertVertex;
+			return EDITMODEACTION_InsertVertex;
 
 		if(m_bLoopClosed == false)
 		{
-			// If only the first or last vertex in chain is selected, return SHAPEMOUSEMOVE_AppendVertex to indicate appending verts to the selected end
+			// If only the first or last vertex in chain is selected, return EDITMODEACTION_AppendVertex to indicate appending verts to the selected end
 			int iNumSelected = 0;
 			for(const GfxGrabPointModel &grabPtModel : m_GrabPointList)
 			{
@@ -336,31 +390,29 @@ bool GfxShapeModel::IsLoopClosed() const
 			{
 				if(m_GrabPointList.front().IsSelected())
 				{
-					m_iVertexIndex = 0;
-					m_ptVertexPos = ptWorldMousePos;
-					return SHAPEMOUSEMOVE_AppendVertex;
+					m_iGrabPointIndex = 0;
+					m_ptGrabPointPos = ptWorldMousePos;
+					return EDITMODEACTION_AppendVertex;
 				}
 				else if(m_GrabPointList.back().IsSelected())
 				{
-					m_iVertexIndex = m_GrabPointList.size();
-					m_ptVertexPos = ptWorldMousePos;
-					return SHAPEMOUSEMOVE_AppendVertex;
+					m_iGrabPointIndex = m_GrabPointList.size();
+					m_ptGrabPointPos = ptWorldMousePos;
+					return EDITMODEACTION_AppendVertex;
 				}
 			}
 		}
 	}
 	else if(IsValidModel() == false) // Any shape besides SHAPE_Polygon
-		return SHAPEMOUSEMOVE_Creation;
+		return EDITMODEACTION_Creation;
 
-	if(IsAllGrabPointsSelected())
+	for(HyShape2d *pFixture : m_ShapeList)
 	{
-		for(HyShape2d *pFixture : m_ShapeList)
-		{
-			if(pFixture->TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
-				return SHAPEMOUSEMOVE_Inside;
-		}
+		if(pFixture->TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
+			return EDITMODEACTION_Inside;
 	}
-	return SHAPEMOUSEMOVE_Outside;
+	
+	return EDITMODEACTION_Outside;
 }
 
 void GfxShapeModel::DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos)
@@ -442,8 +494,8 @@ bool GfxShapeModel::CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos)
 		tmpEdgeShape.SetAsLineSegment(pt1, pt2);
 		if(tmpEdgeShape.TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
 		{
-			m_iVertexIndex = i + 1;
-			m_ptVertexPos = HyMath::ClosestPointOnSegment(pt1, pt2, ptWorldMousePos);
+			m_iGrabPointIndex = i + 1;
+			m_ptGrabPointPos = HyMath::ClosestPointOnSegment(pt1, pt2, ptWorldMousePos);
 			return true;
 		}
 	}

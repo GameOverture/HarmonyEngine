@@ -219,9 +219,9 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 		if(pEntityDraw)
 		{
 			if(pEntityDraw->GetCurEditItem() == this)
-				m_pEditView->GetModel()->RefreshViews(pEntityDraw->GetEditModeState(), SHAPEMOUSEMOVE_None);
+				m_pEditView->GetModel()->RefreshViews(pEntityDraw->GetEditModeState(), EDITMODEACTION_None);
 			else
-				m_pEditView->GetModel()->RefreshViews(EDITMODE_Off, SHAPEMOUSEMOVE_None);
+				m_pEditView->GetModel()->RefreshViews(EDITMODE_Off, EDITMODEACTION_None);
 		}
 	}
 }

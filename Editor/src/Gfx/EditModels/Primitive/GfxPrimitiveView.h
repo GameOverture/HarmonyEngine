@@ -27,7 +27,7 @@ public:
 	virtual void RefreshColor() override;
 
 protected:
-	virtual void DoRefreshView(EditModeState eEditModeState, ShapeMouseMoveResult eResult) override;
+	virtual void DoRefreshView(EditModeState eEditModeState, EditModeAction eResult) override;
 };
 
 #endif // GfxPrimitiveView_H

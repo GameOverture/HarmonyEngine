@@ -84,6 +84,9 @@ HyColor GfxGrabPointModel::GetOutlineColor() const
 	{ 
 	case GRABPOINT_Transform:			return HyGlobal::GetEditorColor(EDITORCOLOR_TransformGrabPointOutline);
 	case GRABPOINT_TransformRotate:		return HyGlobal::GetEditorColor(EDITORCOLOR_TransformRotateGrabPointOutline);
+	case GRABPOINT_ShapeCtrlAll:
+	case GRABPOINT_ShapeCtrlHorz:
+	case GRABPOINT_ShapeCtrlVert:
 	case GRABPOINT_Vertex:				return HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointOutline);
 	case GRABPOINT_VertexSelected:		return HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointSelectedOutline);
 	case GRABPOINT_Endpoint:			return HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointOutline);
@@ -105,6 +108,9 @@ HyColor GfxGrabPointModel::GetFillColor() const
 	{ 
 	case GRABPOINT_Transform:			return HyGlobal::GetEditorColor(EDITORCOLOR_TransformGrabPointFill);
 	case GRABPOINT_TransformRotate:		return HyGlobal::GetEditorColor(EDITORCOLOR_TransformRotateGrabPointFill);
+	case GRABPOINT_ShapeCtrlAll:
+	case GRABPOINT_ShapeCtrlHorz:
+	case GRABPOINT_ShapeCtrlVert:
 	case GRABPOINT_Vertex:				return HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointFill);
 	case GRABPOINT_VertexSelected:		return HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointSelectedFill);
 	case GRABPOINT_Endpoint:			return HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointFill);
@@ -117,4 +123,26 @@ HyColor GfxGrabPointModel::GetFillColor() const
 		break;
 	}
 	return HyColor();
+}
+
+Qt::CursorShape GfxGrabPointModel::GetHoverCursor() const
+{
+	switch(m_eType)
+	{ 
+	case GRABPOINT_Transform:			return Qt::ArrowCursor;
+	case GRABPOINT_TransformRotate:		return Qt::UpArrowCursor;
+	case GRABPOINT_ShapeCtrlAll:		return Qt::SizeAllCursor;
+	case GRABPOINT_ShapeCtrlHorz:		return Qt::SizeHorCursor;
+	case GRABPOINT_ShapeCtrlVert:		return Qt::SizeVerCursor;
+	case GRABPOINT_Vertex:				return Qt::PointingHandCursor;
+	case GRABPOINT_VertexSelected:		return Qt::SizeAllCursor;
+	case GRABPOINT_Endpoint:			return Qt::PointingHandCursor;
+	case GRABPOINT_EndpointSelected:	return Qt::SizeAllCursor;
+	case GRABPOINT_Center:				return Qt::SizeAllCursor;
+	
+	case GRABPOINT_Invalid:
+	default:
+		HyGuiLog("GfxGrabPointModel::GetHoverCursor called on unsupported GrabPointType: " % QString::number(m_eType), LOGTYPE_Error);
+		break;
+	}
 }

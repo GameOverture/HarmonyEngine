@@ -12,7 +12,7 @@
 #include "IGfxEditView.h"
 
 GfxPrimitiveModel::GfxPrimitiveModel() :
-	IGfxEditModel(EDITMODEL_Shape, HyColor::White),
+	IGfxEditModel(EDITMODETYPE_Shape, HyColor::White),
 	m_bIsShape(true),
 	m_ShapeModel(HyColor::White),
 	m_ChainModel(HyColor::White)
@@ -58,7 +58,7 @@ void GfxPrimitiveModel::SetPrimType(QString sNewType)
 		m_ShapeModel.SetShapeType(eNewShape);
 	}
 
-	RefreshViews(EDITMODE_Idle, SHAPEMOUSEMOVE_None);
+	RefreshViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 
 /*virtual*/ QList<float> GfxPrimitiveModel::Serialize() const /*override*/
@@ -85,7 +85,7 @@ void GfxPrimitiveModel::SetPrimType(QString sNewType)
 		m_ChainModel.DoDeserialize(floatList);
 }
 
-/*virtual*/ ShapeMouseMoveResult GfxPrimitiveModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
+/*virtual*/ EditModeAction GfxPrimitiveModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
 {
 	if(m_bIsShape)
 		return m_ShapeModel.DoMouseMoveIdle(ptWorldMousePos);

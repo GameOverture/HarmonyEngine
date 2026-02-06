@@ -12,7 +12,7 @@
 #include "IGfxEditView.h"
 
 GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QList<float>()*/) :
-	IGfxEditModel(EDITMODEL_Chain, color),
+	IGfxEditModel(EDITMODETYPE_Chain, color),
 	m_bSelfIntersecting(false),
 	m_ptSelfIntersection(0.0f, 0.0f),
 	m_bReverseWindingOrder(false),
@@ -43,7 +43,7 @@ GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QL
 void GfxChainModel::TransformData(glm::mat4 mtxTransform)
 {
 	m_Chain.TransformSelf(mtxTransform);
-	RefreshViews(EDITMODE_Idle, SHAPEMOUSEMOVE_None);
+	RefreshViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 
 const HyChain2d &GfxChainModel::GetChainFixture() const
@@ -59,25 +59,25 @@ bool GfxChainModel::IsLoopClosed() const
 /*virtual*/ QString GfxChainModel::MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) /*override*/
 {
 	QString sUndoText;
-	switch(m_eCurTransform)
+	switch(m_eCurAction)
 	{
-	case SHAPEMOUSEMOVE_None:
-	case SHAPEMOUSEMOVE_Outside:
+	case EDITMODEACTION_None:
+	case EDITMODEACTION_Outside:
 		break;
-	case SHAPEMOUSEMOVE_Creation:
+	case EDITMODEACTION_Creation:
 		sUndoText = "Create new chain fixture " % sShapeCodeName;
 		break;
-	case SHAPEMOUSEMOVE_Inside:
-	case SHAPEMOUSEMOVE_HoverCenter:
+	case EDITMODEACTION_Inside:
+	case EDITMODEACTION_HoverCenter:
 		sUndoText = "Translate chain " % sShapeCodeName;
 		break;
-	case SHAPEMOUSEMOVE_AppendVertex:
+	case EDITMODEACTION_AppendVertex:
 		sUndoText = "Append vertex on " % sShapeCodeName;
 		break;
-	case SHAPEMOUSEMOVE_InsertVertex:
+	case EDITMODEACTION_InsertVertex:
 		sUndoText = "Insert vertex on " % sShapeCodeName;
 		break;
-	case SHAPEMOUSEMOVE_HoverGrabPoint:
+	case EDITMODEACTION_HoverGrabPoint:
 		sUndoText = "Translate vert(s) on " % sShapeCodeName;
 		break;
 
@@ -127,34 +127,34 @@ bool GfxChainModel::IsLoopClosed() const
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	RefreshViews(EDITMODE_Idle, SHAPEMOUSEMOVE_None);
+	RefreshViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 
-/*virtual*/ ShapeMouseMoveResult GfxChainModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
+/*virtual*/ EditModeAction GfxChainModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
 {
-	m_iVertexIndex = -1;
-	m_ptVertexPos = glm::vec2(0.0f, 0.0f);
+	m_iGrabPointIndex = -1;
+	m_ptGrabPointPos = glm::vec2(0.0f, 0.0f);
 
 	for(int i = 0; i < m_GrabPointList.size(); ++i)
 	{
 		if(m_GrabPointList[i].TestPoint(ptWorldMousePos))
 		{
-			m_iVertexIndex = i;
-			return SHAPEMOUSEMOVE_HoverGrabPoint;
+			m_iGrabPointIndex = i;
+			return EDITMODEACTION_HoverGrabPoint;
 		}
 	}
 	if(m_GrabPointCenter.TestPoint(ptWorldMousePos))
-		return SHAPEMOUSEMOVE_HoverCenter;
+		return EDITMODEACTION_HoverCenter;
 
 	if(m_GrabPointList.empty())
-		return SHAPEMOUSEMOVE_Creation;
+		return EDITMODEACTION_Creation;
 
 	if(CheckIfAddVertexOnEdge(ptWorldMousePos))
-		return SHAPEMOUSEMOVE_InsertVertex;
+		return EDITMODEACTION_InsertVertex;
 
 	if(m_bLoopClosed == false)
 	{
-		// If only the first or last vertex in chain is selected, return SHAPEMOUSEMOVE_AppendVertex to indicate appending verts to the selected end
+		// If only the first or last vertex in chain is selected, return EDITMODEACTION_AppendVertex to indicate appending verts to the selected end
 		int iNumSelected = 0;
 		for(const GfxGrabPointModel &grabPtModel : m_GrabPointList)
 		{
@@ -165,20 +165,20 @@ bool GfxChainModel::IsLoopClosed() const
 		{
 			if(m_GrabPointList.front().IsSelected())
 			{
-				m_iVertexIndex = 0;
-				m_ptVertexPos = ptWorldMousePos;
-				return SHAPEMOUSEMOVE_AppendVertex;
+				m_iGrabPointIndex = 0;
+				m_ptGrabPointPos = ptWorldMousePos;
+				return EDITMODEACTION_AppendVertex;
 			}
 			else if(m_GrabPointList.back().IsSelected())
 			{
-				m_iVertexIndex = m_GrabPointList.size();
-				m_ptVertexPos = ptWorldMousePos;
-				return SHAPEMOUSEMOVE_AppendVertex;
+				m_iGrabPointIndex = m_GrabPointList.size();
+				m_ptGrabPointPos = ptWorldMousePos;
+				return EDITMODEACTION_AppendVertex;
 			}
 		}
 	}
 
-	return SHAPEMOUSEMOVE_Outside;
+	return EDITMODEACTION_Outside;
 }
 
 void GfxChainModel::DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos)
@@ -228,8 +228,8 @@ bool GfxChainModel::CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos)
 		tmpEdgeShape.SetAsLineSegment(pt1, pt2);
 		if(tmpEdgeShape.TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
 		{
-			m_iVertexIndex = i + 1;
-			m_ptVertexPos = HyMath::ClosestPointOnSegment(pt1, pt2, ptWorldMousePos);
+			m_iGrabPointIndex = i + 1;
+			m_ptGrabPointPos = HyMath::ClosestPointOnSegment(pt1, pt2, ptWorldMousePos);
 			return true;
 		}
 	}

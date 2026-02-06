@@ -18,10 +18,16 @@ enum GrabPointType
 	
 	GRABPOINT_Transform = 0,
 	GRABPOINT_TransformRotate,
+
 	GRABPOINT_Vertex,
 	GRABPOINT_VertexSelected,
 	GRABPOINT_Endpoint,
 	GRABPOINT_EndpointSelected,
+
+	GRABPOINT_ShapeCtrlAll,
+	GRABPOINT_ShapeCtrlHorz,
+	GRABPOINT_ShapeCtrlVert,
+
 	GRABPOINT_Center
 };
 
@@ -49,6 +55,8 @@ public:
 
 	HyColor GetOutlineColor() const;
 	HyColor GetFillColor() const;
+
+	Qt::CursorShape GetHoverCursor() const;
 };
 
 #endif // GfxGrabPointModel_H

@@ -61,7 +61,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 	}
 }
 
-/*virtual*/ void GfxShapeHyView::DoRefreshView(EditModeState eEditModeState, ShapeMouseMoveResult eResult) /*override*/
+/*virtual*/ void GfxShapeHyView::DoRefreshView(EditModeState eEditModeState, EditModeAction eResult) /*override*/
 {
 	if(m_pModel == nullptr || static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_None)
 	{
@@ -176,17 +176,17 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 
 	switch(eResult)
 	{
-	case SHAPEMOUSEMOVE_Creation:
+	case EDITMODEACTION_Creation:
 		break;
-	case SHAPEMOUSEMOVE_Outside:
+	case EDITMODEACTION_Outside:
 		break;
-	case SHAPEMOUSEMOVE_Inside:
+	case EDITMODEACTION_Inside:
 		break;
 
-	case SHAPEMOUSEMOVE_AppendVertex: {
+	case EDITMODEACTION_AppendVertex: {
 		if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() != SHAPE_Polygon)
 		{
-			HyGuiLog("GfxShapeHyView::RefreshView - SHAPEMOUSEMOVE_AppendVertex - called with non-polygon/linechain shape type", LOGTYPE_Error);
+			HyGuiLog("GfxShapeHyView::RefreshView - EDITMODEACTION_AppendVertex - called with non-polygon/linechain shape type", LOGTYPE_Error);
 			break;
 		}
 		if(static_cast<GfxShapeModel *>(m_pModel)->IsLoopClosed() || grabPointModelList.empty())
@@ -218,10 +218,10 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 		m_PrimPreviewList[0]->SetAsLineSegment(ptNewVertex, ptEndPoint);
 		break; }
 
-	case SHAPEMOUSEMOVE_InsertVertex: {
+	case EDITMODEACTION_InsertVertex: {
 		if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() != SHAPE_Polygon)
 		{
-			HyGuiLog("GfxShapeHyView::RefreshView - SHAPEMOUSEMOVE_InsertVertex - called with non-polygon/linechain shape type", LOGTYPE_Error);
+			HyGuiLog("GfxShapeHyView::RefreshView - EDITMODEACTION_InsertVertex - called with non-polygon/linechain shape type", LOGTYPE_Error);
 			break;
 		}
 		if(grabPointModelList.size() < 2)
@@ -261,12 +261,12 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 		m_PrimPreviewList[1]->SetAsLineSegment(ptInsertVertex, ptConnectPoint2);
 		break; }
 
-	case SHAPEMOUSEMOVE_HoverGrabPoint:
+	case EDITMODEACTION_HoverGrabPoint:
 		if(eEditModeState == EDITMODE_MouseDownTransform)
 			DoHoverGrabPoint(eEditModeState);
 		break;
 
-	case SHAPEMOUSEMOVE_HoverCenter:
+	case EDITMODEACTION_HoverCenter:
 		if(eEditModeState == EDITMODE_MouseDownTransform)
 		{
 			ClearPreviewPrimitives();

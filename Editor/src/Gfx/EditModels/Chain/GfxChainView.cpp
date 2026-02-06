@@ -34,7 +34,7 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 	m_PrimOutline.SetTint(m_pModel->GetColor());
 }
 
-/*virtual*/ void GfxChainView::DoRefreshView(EditModeState eEditModeState, ShapeMouseMoveResult eResult) /*override*/
+/*virtual*/ void GfxChainView::DoRefreshView(EditModeState eEditModeState, EditModeAction eResult) /*override*/
 {
 	if(m_pModel == nullptr)
 	{
@@ -67,14 +67,14 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 
 	switch(eResult)
 	{
-	case SHAPEMOUSEMOVE_Creation:
+	case EDITMODEACTION_Creation:
 		break;
-	case SHAPEMOUSEMOVE_Outside:
+	case EDITMODEACTION_Outside:
 		break;
-	case SHAPEMOUSEMOVE_Inside:
+	case EDITMODEACTION_Inside:
 		break;
 
-	case SHAPEMOUSEMOVE_AppendVertex: {
+	case EDITMODEACTION_AppendVertex: {
 		if(static_cast<GfxChainModel *>(m_pModel)->IsLoopClosed() || grabPointModelList.empty())
 		{
 			HyGuiLog("GfxChainView::RefreshView called with closed loop (or grab points empty)", LOGTYPE_Error);
@@ -104,7 +104,7 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 		m_PrimPreviewList[0]->SetAsLineSegment(ptNewVertex, ptEndPoint);
 		break; }
 
-	case SHAPEMOUSEMOVE_InsertVertex: {
+	case EDITMODEACTION_InsertVertex: {
 		
 		if(grabPointModelList.size() < 2)
 		{
@@ -143,11 +143,11 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 		m_PrimPreviewList[1]->SetAsLineSegment(ptInsertVertex, ptConnectPoint2);
 		break; }
 
-	case SHAPEMOUSEMOVE_HoverGrabPoint:
+	case EDITMODEACTION_HoverGrabPoint:
 			DoHoverGrabPoint(eEditModeState);
 		break;
 
-	case SHAPEMOUSEMOVE_HoverCenter:
+	case EDITMODEACTION_HoverCenter:
 		if(eEditModeState == EDITMODE_MouseDownTransform)
 		{
 			//ClearPreviewPrimitives();

@@ -44,7 +44,7 @@ void IGfxEditView::SetModel(IGfxEditModel *pModel)
 	m_pModel->AddView(this);
 }
 
-void IGfxEditView::RefreshView(EditModeState eEditModeState, ShapeMouseMoveResult eResult)
+void IGfxEditView::RefreshView(EditModeState eEditModeState, EditModeAction eResult)
 {
 	if(m_pModel)
 	{

@@ -43,7 +43,7 @@ public:
 
 protected:
 	virtual void DoDeserialize(const QList<float> &floatList) override;
-	virtual ShapeMouseMoveResult DoMouseMoveIdle(glm::vec2 ptWorldMousePos) override;
+	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) override;
 	virtual void DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
 
 	bool CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos);
