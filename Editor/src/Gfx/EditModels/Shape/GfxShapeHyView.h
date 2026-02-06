@@ -31,11 +31,11 @@ public:
 	virtual void RefreshColor() override;
 
 protected:
-	virtual void DoRefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) override;
+	virtual void DoRefreshView(EditModeState eEditModeState, ShapeMouseMoveResult eResult) override;
 	void ClearPrimitives();
 	void ClearPreviewPrimitives();
 
-	void DoHoverGrabPoint();
+	void DoHoverGrabPoint(EditModeState eEditModeState);
 };
 
 #endif // GfxShapeHyView_H

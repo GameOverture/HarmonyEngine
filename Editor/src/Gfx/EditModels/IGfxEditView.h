@@ -30,12 +30,12 @@ public:
 	void SetModel(IGfxEditModel *pModel);
 
 	virtual void RefreshColor() = 0;
-	void RefreshView(ShapeMouseMoveResult eResult, bool bMouseDown);
+	void RefreshView(EditModeState eEditModeState, ShapeMouseMoveResult eResult);
 
 	void ClearGrabPoints();
 
 protected:
-	virtual void DoRefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) = 0;
+	virtual void DoRefreshView(EditModeState eEditModeState, ShapeMouseMoveResult eResult) = 0;
 };
 
 #endif // IGfxEditView_H

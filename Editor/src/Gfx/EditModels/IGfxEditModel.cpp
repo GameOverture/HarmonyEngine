@@ -43,6 +43,12 @@ void IGfxEditModel::SetColor(HyColor color)
 		pView->RefreshColor();
 }
 
+void IGfxEditModel::Deserialize(const QList<float> &floatList)
+{
+	DoDeserialize(floatList);
+	RefreshViews(EDITMODE_Idle, SHAPEMOUSEMOVE_None);
+}
+
 void IGfxEditModel::AddView(IGfxEditView *pView)
 {
 	if(m_ViewList.contains(pView))
@@ -55,10 +61,10 @@ bool IGfxEditModel::RemoveView(IGfxEditView *pView)
 	return m_ViewList.removeOne(pView);
 }
 
-void IGfxEditModel::RefreshViews(ShapeMouseMoveResult eResult, bool bMouseDown) const
+void IGfxEditModel::RefreshViews(EditModeState eEditModeState, ShapeMouseMoveResult eResult) const
 {
 	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(eResult, bMouseDown);
+		pView->RefreshView(eEditModeState, eResult);
 }
 
 void IGfxEditModel::GetTransformPreview(glm::mat4 &mtxTransformOut, int &iVertexIndexOut) const
@@ -118,17 +124,21 @@ bool IGfxEditModel::IsHoverGrabPointSelected() const
 	return m_GrabPointList[m_iVertexIndex].IsSelected();
 }
 
-ShapeMouseMoveResult IGfxEditModel::MouseMoveIdle(glm::vec2 ptWorldMousePos)
+void IGfxEditModel::DeselectAllGrabPoints()
+{
+	for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
+		grabPtModel.SetSelected(false);
+}
+
+ShapeMouseMoveResult IGfxEditModel::MouseMoveIdle(EditModeState eEditModeState, glm::vec2 ptWorldMousePos)
 {
 	ShapeMouseMoveResult eResult = DoMouseMoveIdle(ptWorldMousePos);
 
-	RefreshViews(eResult, false);
-	
-
+	//RefreshViews(eEditModeState, eResult);
 	return eResult;
 }
 
-ShapeMouseMoveResult IGfxEditModel::MousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos)
+ShapeMouseMoveResult IGfxEditModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos)
 {
 	ShapeMouseMoveResult eResult = DoMouseMoveIdle(ptWorldMousePos);
 	if(eResult == SHAPEMOUSEMOVE_AppendVertex || eResult == SHAPEMOUSEMOVE_InsertVertex)
@@ -161,38 +171,42 @@ ShapeMouseMoveResult IGfxEditModel::MousePressEvent(bool bShiftHeld, Qt::MouseBu
 		else
 		{
 			if(uiButtonFlags & Qt::LeftButton)
+			{
+				for(int i = 0; i < m_GrabPointList.size(); ++i)
+					m_GrabPointList[i].SetSelected(false);
 				m_GrabPointList[m_iVertexIndex].SetSelected(true);
+			}
 			else if(uiButtonFlags & Qt::RightButton)
 				m_GrabPointList[m_iVertexIndex].SetSelected(false);
 		}
 	}
 
-	RefreshViews(eResult, false);
+	//RefreshViews(eEditModeState, eResult);
 
 	m_eCurTransform = eResult;
 	return eResult;
 }
 
-void IGfxEditModel::MouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF ptBotLeft, QPointF ptTopRight)
+void IGfxEditModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight)
 {
 	// Select grab points within marquee
 	for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
 	{
+		grabPtModel.SetSelected(false);
+
 		QPointF ptGrabPos(grabPtModel.GetPos().x, grabPtModel.GetPos().y);
 		if(ptGrabPos.x() >= ptBotLeft.x() && ptGrabPos.x() <= ptTopRight.x() &&
 		   ptGrabPos.y() >= ptBotLeft.y() && ptGrabPos.y() <= ptTopRight.y())
 		{
-			if(uiButtonFlags & Qt::LeftButton)
+			if(bLeftClick)
 				grabPtModel.SetSelected(true);
-			else if(uiButtonFlags & Qt::RightButton)
-				grabPtModel.SetSelected(false);
 		}
 	}
 
-	RefreshViews(SHAPEMOUSEMOVE_None, false);
+	RefreshViews(eEditModeState, SHAPEMOUSEMOVE_None);
 }
 
-void IGfxEditModel::MouseMoveTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
+void IGfxEditModel::MouseMoveTransform(EditModeState eEditModeState, bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
 	m_bTransformShiftMod = bShiftMod;
 
@@ -209,5 +223,5 @@ void IGfxEditModel::MouseMoveTransform(bool bShiftMod, glm::vec2 ptStartPos, glm
 	//else if(m_eCurTransform == SHAPEMOUSEMOVE_HoverGrabPoint)
 	//	DoTransformGrabPoint(ptStartPos, ptDragPos);
 
-	RefreshViews(m_eCurTransform, true);
+	//RefreshViews(eEditModeState, m_eCurTransform);
 }

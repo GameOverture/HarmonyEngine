@@ -44,7 +44,7 @@ void IGfxEditView::SetModel(IGfxEditModel *pModel)
 	m_pModel->AddView(this);
 }
 
-void IGfxEditView::RefreshView(ShapeMouseMoveResult eResult, bool bMouseDown)
+void IGfxEditView::RefreshView(EditModeState eEditModeState, ShapeMouseMoveResult eResult)
 {
 	if(m_pModel)
 	{
@@ -59,12 +59,15 @@ void IGfxEditView::RefreshView(ShapeMouseMoveResult eResult, bool bMouseDown)
 			m_GrabPointViewList.push_back(new GfxGrabPointView(this));
 
 		for(int i = 0; i < grabPointModelList.size(); ++i)
+		{
 			m_GrabPointViewList[i]->Sync(&grabPointModelList[i]);
+			m_GrabPointViewList[i]->SetVisible(eEditModeState != EDITMODE_Off);
+		}
 	}
 	else
 		ClearGrabPoints();
 
-	DoRefreshView(eResult, bMouseDown);
+	DoRefreshView(eEditModeState, eResult);
 	RefreshColor();
 }
 

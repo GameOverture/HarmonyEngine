@@ -65,7 +65,7 @@ TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 
 		m_CollisionLayerMap[collisionUuid] = new GfxShapeModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 		m_CollisionLayerMap[collisionUuid]->SetShapeType(SHAPE_Polygon);
-		m_CollisionLayerMap[collisionUuid]->SetData(vertexList);
+		m_CollisionLayerMap[collisionUuid]->Deserialize(vertexList);
 	}
 }
 
@@ -161,7 +161,7 @@ QJsonObject TileData::GetTileData() const
 		collisionObj["CollisionLayerUUID"] = it.key().toString(QUuid::WithoutBraces);
 
 		QJsonArray floatArray;
-		QList<float> floatList = it.value()->GetData();
+		QList<float> floatList = it.value()->Serialize();
 		for(int j = 0; j < floatList.size(); ++j)
 			floatArray.push_back(floatList[j]);
 		collisionObj["Data"] = floatArray;

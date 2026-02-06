@@ -34,7 +34,7 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 	m_PrimOutline.SetTint(m_pModel->GetColor());
 }
 
-/*virtual*/ void GfxChainView::DoRefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) /*override*/
+/*virtual*/ void GfxChainView::DoRefreshView(EditModeState eEditModeState, ShapeMouseMoveResult eResult) /*override*/
 {
 	if(m_pModel == nullptr)
 	{
@@ -144,12 +144,11 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 		break; }
 
 	case SHAPEMOUSEMOVE_HoverGrabPoint:
-		if(bMouseDown)
-			DoHoverGrabPoint();
+			DoHoverGrabPoint(eEditModeState);
 		break;
 
 	case SHAPEMOUSEMOVE_HoverCenter:
-		if(bMouseDown)
+		if(eEditModeState == EDITMODE_MouseDownTransform)
 		{
 			//ClearPreviewPrimitives();
 			//m_PrimPreviewList.append(new HyPrimitive2d(this));
@@ -180,7 +179,7 @@ void GfxChainView::ClearPreviewPrimitives()
 	m_PrimPreviewList.clear();
 }
 
-void GfxChainView::DoHoverGrabPoint()
+void GfxChainView::DoHoverGrabPoint(EditModeState eEditModeState)
 {
 	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
 	glm::mat4 mtxTransform(1.0f);
@@ -190,11 +189,11 @@ void GfxChainView::DoHoverGrabPoint()
 
 	if(iVertexIndex < 0 || iVertexIndex >= grabPointModelList.size())
 	{
-		HyGuiLog("GfxShapeModel::DoHoverGrabPoint - invalid m_iVertexIndex", LOGTYPE_Error);
+		HyGuiLog("GfxChainView::DoHoverGrabPoint - invalid m_iVertexIndex", LOGTYPE_Error);
 		return;
 	}
 	if(m_pModel->IsHoverGrabPointSelected() == false)
-		HyGuiLog("GfxShapeModel::DoHoverGrabPoint - Hover vertex not selected on box transform", LOGTYPE_Error);
+		HyGuiLog("GfxChainView::DoHoverGrabPoint - Hover vertex not selected on box transform", LOGTYPE_Error);
 
 	// Apply grab point drag logic based on shape type
 }

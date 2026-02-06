@@ -486,6 +486,11 @@ void EntityWidget::SetEditMode(EntityTreeItemData *pItemToEdit)
 {
 	if(pItemToEdit)
 	{
+		if(IsEditMode())
+		{
+
+		}
+
 		RequestSelectedItems(QList<QUuid>() << pItemToEdit->GetThisUuid());
 
 		// Update EntityDraw with latest selection via ApplyJsonData()
@@ -1153,7 +1158,7 @@ void EntityWidget::on_actionEditMode_toggled(bool bChecked)
 
 	if(bChecked == false)
 	{
-		pEntityDraw->SetEditMode(false);
+		pEntityDraw->OnSetEditMode(false);
 		return;
 	}
 
@@ -1175,7 +1180,7 @@ void EntityWidget::on_actionEditMode_toggled(bool bChecked)
 		return;
 	}
 	
-	pEntityDraw->SetEditMode(true);
+	pEntityDraw->OnSetEditMode(true);
 
 	UpdateActions();
 	pEntityDraw->ApplyJsonData();

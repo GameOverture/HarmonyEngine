@@ -49,7 +49,7 @@ void GfxPrimitiveModel::SetPrimType(QString sNewType)
 	if(sNewType == "Line Chain")
 	{
 		m_bIsShape = false;
-		m_ChainModel.SetData(m_ShapeModel.ConvertedPolygonOrLineChainData());
+		m_ChainModel.Deserialize(m_ShapeModel.ConvertedPolygonOrLineChainData());
 	}
 	else
 	{
@@ -58,25 +58,15 @@ void GfxPrimitiveModel::SetPrimType(QString sNewType)
 		m_ShapeModel.SetShapeType(eNewShape);
 	}
 
-	RefreshViews(SHAPEMOUSEMOVE_None, false);
+	RefreshViews(EDITMODE_Idle, SHAPEMOUSEMOVE_None);
 }
 
-/*virtual*/ QList<float> GfxPrimitiveModel::GetData() const /*override*/
+/*virtual*/ QList<float> GfxPrimitiveModel::Serialize() const /*override*/
 {
 	if(m_bIsShape)
-		return m_ShapeModel.GetData();
+		return m_ShapeModel.Serialize();
 	else
-		return m_ChainModel.GetData();
-}
-
-/*virtual*/ void GfxPrimitiveModel::SetData(const QList<float> &floatList) /*override*/
-{
-	if(m_bIsShape)
-		m_ShapeModel.SetData(floatList);
-	else
-		m_ChainModel.SetData(floatList);
-
-	RefreshViews(SHAPEMOUSEMOVE_None, false);
+		return m_ChainModel.Serialize();
 }
 
 /*virtual*/ QString GfxPrimitiveModel::MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) /*override*/
@@ -85,6 +75,14 @@ void GfxPrimitiveModel::SetPrimType(QString sNewType)
 		return m_ShapeModel.MouseTransformReleased(sShapeCodeName, ptWorldMousePos);
 	else
 		return m_ChainModel.MouseTransformReleased(sShapeCodeName, ptWorldMousePos);
+}
+
+/*virtual*/ void GfxPrimitiveModel::DoDeserialize(const QList<float> &floatList) /*override*/
+{
+	if(m_bIsShape)
+		m_ShapeModel.DoDeserialize(floatList);
+	else
+		m_ChainModel.DoDeserialize(floatList);
 }
 
 /*virtual*/ ShapeMouseMoveResult GfxPrimitiveModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/

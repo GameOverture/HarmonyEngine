@@ -64,47 +64,45 @@ EditorShape GfxShapeModel::GetShapeType() const
 
 void GfxShapeModel::SetShapeType(EditorShape eNewShape)
 {
+	if(m_eShapeType == eNewShape)
+		return;
+
 	// Convert existing data to new shape type
-	if(m_eShapeType != eNewShape)
+	QList<float> convertedDataList;
+	switch(eNewShape)
 	{
-		QList<float> convertedDataList;
-		switch(eNewShape)
-		{
-		case SHAPE_None:
-			break;
-		case SHAPE_Box:
-			convertedDataList = ConvertedBoxData();
-			break;
-		case SHAPE_Circle:
-			convertedDataList = ConvertedCircleData();
-			break;
-		case SHAPE_LineSegment:
-			convertedDataList = ConvertedLineSegmentData();
-			break;
-		case SHAPE_Capsule:
-			convertedDataList = ConvertedCapsuleData();
-			break;
-		case SHAPE_Polygon:
-			convertedDataList = ConvertedPolygonOrLineChainData();
-			break;
+	case SHAPE_None:
+		break;
+	case SHAPE_Box:
+		convertedDataList = ConvertedBoxData();
+		break;
+	case SHAPE_Circle:
+		convertedDataList = ConvertedCircleData();
+		break;
+	case SHAPE_LineSegment:
+		convertedDataList = ConvertedLineSegmentData();
+		break;
+	case SHAPE_Capsule:
+		convertedDataList = ConvertedCapsuleData();
+		break;
+	case SHAPE_Polygon:
+		convertedDataList = ConvertedPolygonOrLineChainData();
+		break;
 
-		default:
-			HyGuiLog("GfxShapeModel::SetType - Unknown shape type encountered", LOGTYPE_Error);
-			break;
-		}
-
-		m_eShapeType = eNewShape;
-
-		ClearFixtures();
-		m_ShapeList.push_back(new HyShape2d());
-
-		SetData(convertedDataList);
+	default:
+		HyGuiLog("GfxShapeModel::SetType - Unknown shape type encountered", LOGTYPE_Error);
+		break;
 	}
 
-	RefreshViews(SHAPEMOUSEMOVE_None, false);
+	m_eShapeType = eNewShape;
+
+	ClearFixtures();
+	m_ShapeList.push_back(new HyShape2d());
+
+	Deserialize(convertedDataList);
 }
 
-/*virtual*/ QList<float> GfxShapeModel::GetData() const /*override*/
+/*virtual*/ QList<float> GfxShapeModel::Serialize() const /*override*/
 {
 	if(m_ShapeList.empty())
 		return QList<float>();
@@ -127,23 +125,88 @@ void GfxShapeModel::SetShapeType(EditorShape eNewShape)
 	return returnList;
 }
 
-/*virtual*/ void GfxShapeModel::SetData(const QList<float> &floatList) /*override*/
+void GfxShapeModel::TransformData(glm::mat4 mtxTransform)
+{
+	for(HyShape2d *pFixture : m_ShapeList)
+		pFixture->TransformSelf(mtxTransform);
+
+	RefreshViews(EDITMODE_Idle, SHAPEMOUSEMOVE_None);
+}
+
+int GfxShapeModel::GetNumShapeFixtures() const
+{
+	return m_ShapeList.size();
+}
+
+HyShape2d *GfxShapeModel::GetShapeFixture(int iIndex) const
+{
+	if(iIndex < 0 || iIndex >= m_ShapeList.size())
+		return nullptr;
+	return m_ShapeList[iIndex];
+}
+
+bool GfxShapeModel::IsLoopClosed() const
+{
+	return m_bLoopClosed;
+}
+
+/*virtual*/ QString GfxShapeModel::MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) /*override*/
+{
+	QString sUndoText;
+	switch(m_eCurTransform)
+	{
+	case SHAPEMOUSEMOVE_None:
+	case SHAPEMOUSEMOVE_Outside:
+		break;
+	case SHAPEMOUSEMOVE_Creation:
+		sUndoText = "Create new " % HyGlobal::ShapeName(m_eShapeType) % " shape " % sShapeCodeName;
+		break;
+	case SHAPEMOUSEMOVE_Inside:
+	case SHAPEMOUSEMOVE_HoverCenter:
+		sUndoText = "Translate shape " % sShapeCodeName;
+		break;
+	case SHAPEMOUSEMOVE_AppendVertex:
+		sUndoText = "Append vertex on " % sShapeCodeName;
+		break;
+	case SHAPEMOUSEMOVE_InsertVertex:
+		sUndoText = "Insert vertex on " % sShapeCodeName;
+		break;
+	case SHAPEMOUSEMOVE_HoverGrabPoint:
+		if(m_eShapeType == SHAPE_Polygon || m_eShapeType == SHAPE_LineSegment)
+			sUndoText = "Translate vert(s) on " % sShapeCodeName;
+		else if(m_eShapeType == SHAPE_Circle)
+			sUndoText = "Adjust circle radius on " % sShapeCodeName;
+		else if(m_eShapeType == SHAPE_Box)
+			sUndoText = "Adjust box size on " % sShapeCodeName;
+		else if(m_eShapeType == SHAPE_Capsule)
+			sUndoText = "Adjust capsule size on " % sShapeCodeName;
+		else
+			HyGuiLog("GfxShapeModel::MouseTransformReleased - Invalid shape type for SHAPEMOUSEMOVE_HoverGrabPoint", LOGTYPE_Error);
+		break;
+
+	default:
+		HyGuiLog("GfxShapeModel::MouseTransformReleased - Invalid m_eCurTransform", LOGTYPE_Error);
+		break;
+	}
+
+	return sUndoText;
+}
+
+/*virtual*/ void GfxShapeModel::DoDeserialize(const QList<float> &floatList) /*override*/
 {
 	if(m_ShapeList.empty())
 		m_ShapeList.push_back(new HyShape2d());
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Assemble `m_GrabPointList`
+	// Assemble `m_GrabPointList` and `m_GrabPointCenter`
 	std::vector<glm::vec2> grabPointList;
 	if(floatList.empty() == false)
 	{
+		glm::vec2 ptCentroid;
 		if(m_eShapeType != SHAPE_Polygon)
 		{
 			grabPointList = m_ShapeList[0]->DeserializeSelf(HyGlobal::ConvertShapeToFixtureType(m_eShapeType), std::vector<float>(floatList.begin(), floatList.end()));
-		
-			glm::vec2 ptCentroid;
 			m_ShapeList[0]->GetCentroid(ptCentroid);
-			m_GrabPointCenter.Setup(ptCentroid);
 		}
 		else // SHAPE_Polygon deserialization
 		{	
@@ -159,6 +222,7 @@ void GfxShapeModel::SetShapeType(EditorShape eNewShape)
 				m_bLoopClosed = floatList.back() != 0.0f;
 			}
 		}
+		m_GrabPointCenter.Setup(ptCentroid);
 	}
 
 	// Preserve existing grab points where possible (keeps selection)
@@ -233,77 +297,6 @@ void GfxShapeModel::SetShapeType(EditorShape eNewShape)
 		else
 			AssemblePolygonFixtures(MergeTriangles(HyMath::Triangulate(ccwOrderedVertexList)));
 	}
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	RefreshViews(SHAPEMOUSEMOVE_None, false);
-}
-
-void GfxShapeModel::TransformData(glm::mat4 mtxTransform)
-{
-	for(HyShape2d *pFixture : m_ShapeList)
-		pFixture->TransformSelf(mtxTransform);
-
-	RefreshViews(SHAPEMOUSEMOVE_None, false);
-}
-
-int GfxShapeModel::GetNumShapeFixtures() const
-{
-	return m_ShapeList.size();
-}
-
-HyShape2d *GfxShapeModel::GetShapeFixture(int iIndex) const
-{
-	if(iIndex < 0 || iIndex >= m_ShapeList.size())
-		return nullptr;
-	return m_ShapeList[iIndex];
-}
-
-bool GfxShapeModel::IsLoopClosed() const
-{
-	return m_bLoopClosed;
-}
-
-/*virtual*/ QString GfxShapeModel::MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) /*override*/
-{
-	QString sUndoText;
-	switch(m_eCurTransform)
-	{
-	case SHAPEMOUSEMOVE_None:
-	case SHAPEMOUSEMOVE_Outside:
-		break;
-	case SHAPEMOUSEMOVE_Creation:
-		sUndoText = "Create new " % HyGlobal::ShapeName(m_eShapeType) % " shape " % sShapeCodeName;
-		break;
-	case SHAPEMOUSEMOVE_Inside:
-	case SHAPEMOUSEMOVE_HoverCenter:
-		sUndoText = "Translate shape " % sShapeCodeName;
-		break;
-	case SHAPEMOUSEMOVE_AppendVertex:
-		sUndoText = "Append vertex on " % sShapeCodeName;
-		break;
-	case SHAPEMOUSEMOVE_InsertVertex:
-		sUndoText = "Insert vertex on " % sShapeCodeName;
-		break;
-	case SHAPEMOUSEMOVE_HoverGrabPoint:
-		if(m_eShapeType == SHAPE_Polygon || m_eShapeType == SHAPE_LineSegment)
-			sUndoText = "Translate vert(s) on " % sShapeCodeName;
-		else if(m_eShapeType == SHAPE_Circle)
-			sUndoText = "Adjust circle radius on " % sShapeCodeName;
-		else if(m_eShapeType == SHAPE_Box)
-			sUndoText = "Adjust box size on " % sShapeCodeName;
-		else if(m_eShapeType == SHAPE_Capsule)
-			sUndoText = "Adjust capsule size on " % sShapeCodeName;
-		else
-			HyGuiLog("GfxShapeModel::MouseTransformReleased - Invalid shape type for SHAPEMOUSEMOVE_HoverGrabPoint", LOGTYPE_Error);
-		break;
-
-	default:
-		HyGuiLog("GfxShapeModel::MouseTransformReleased - Invalid m_eCurTransform", LOGTYPE_Error);
-		break;
-	}
-
-	return sUndoText;
 }
 
 /*virtual*/ ShapeMouseMoveResult GfxShapeModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
@@ -552,7 +545,7 @@ QList<float> GfxShapeModel::ConvertedBoxData() const
 	case SHAPE_None:
 		break;
 	case SHAPE_Box:
-		return GetData();
+		return Serialize();
 	case SHAPE_Circle:
 		if(m_ShapeList[0]->IsValid())
 		{
@@ -641,7 +634,7 @@ QList<float> GfxShapeModel::ConvertedCircleData() const
 		}
 		break;
 	case SHAPE_Circle:
-		return GetData();
+		return Serialize();
 	case SHAPE_LineSegment:
 		if(m_ShapeList[0]->IsValid())
 		{
@@ -725,7 +718,7 @@ QList<float> GfxShapeModel::ConvertedLineSegmentData() const
 		}
 		break;
 	case SHAPE_LineSegment:
-		return GetData();
+		return Serialize();
 	case SHAPE_Capsule:
 		if(m_ShapeList[0]->IsValid())
 		{
@@ -799,7 +792,7 @@ QList<float> GfxShapeModel::ConvertedCapsuleData() const
 		}
 		break;
 	case SHAPE_Capsule:
-		return GetData();
+		return Serialize();
 	case SHAPE_Polygon:
 	case SHAPE_LineSegment: {
 		std::vector<glm::vec2> vertexList;
@@ -879,7 +872,7 @@ QList<float> GfxShapeModel::ConvertedPolygonOrLineChainData() const
 		}
 		break;
 	case SHAPE_Polygon:
-		convertedDataList = GetData();
+		convertedDataList = Serialize();
 		break;
 	case SHAPE_Capsule:
 		if(m_ShapeList[0]->IsValid())

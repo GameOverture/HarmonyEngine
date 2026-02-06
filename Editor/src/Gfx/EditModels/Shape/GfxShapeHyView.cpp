@@ -61,7 +61,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 	}
 }
 
-/*virtual*/ void GfxShapeHyView::DoRefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) /*override*/
+/*virtual*/ void GfxShapeHyView::DoRefreshView(EditModeState eEditModeState, ShapeMouseMoveResult eResult) /*override*/
 {
 	if(m_pModel == nullptr || static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_None)
 	{
@@ -262,12 +262,12 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 		break; }
 
 	case SHAPEMOUSEMOVE_HoverGrabPoint:
-		if(bMouseDown)
-			DoHoverGrabPoint();
+		if(eEditModeState == EDITMODE_MouseDownTransform)
+			DoHoverGrabPoint(eEditModeState);
 		break;
 
 	case SHAPEMOUSEMOVE_HoverCenter:
-		if(bMouseDown)
+		if(eEditModeState == EDITMODE_MouseDownTransform)
 		{
 			ClearPreviewPrimitives();
 			for(HyPrimitive2d *pPrim : m_PrimList)
@@ -307,7 +307,7 @@ void GfxShapeHyView::ClearPreviewPrimitives()
 	m_PrimPreviewList.clear();
 }
 
-void GfxShapeHyView::DoHoverGrabPoint()
+void GfxShapeHyView::DoHoverGrabPoint(EditModeState eEditModeState)
 {
 	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
 	glm::mat4 mtxTransform(1.0f);
@@ -317,11 +317,11 @@ void GfxShapeHyView::DoHoverGrabPoint()
 
 	if(iVertexIndex < 0 || iVertexIndex >= grabPointModelList.size())
 	{
-		HyGuiLog("GfxShapeModel::DoHoverGrabPoint - invalid m_iVertexIndex", LOGTYPE_Error);
+		HyGuiLog("GfxShapeHyView::DoHoverGrabPoint - invalid m_iVertexIndex", LOGTYPE_Error);
 		return;
 	}
 	if(m_pModel->IsHoverGrabPointSelected() == false)
-		HyGuiLog("GfxShapeModel::DoHoverGrabPoint - Hover vertex not selected on box transform", LOGTYPE_Error);
+		HyGuiLog("GfxShapeHyView::DoHoverGrabPoint - Hover vertex not selected on box transform", LOGTYPE_Error);
 
 	// Apply grab point drag logic based on shape type
 	switch(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType())
@@ -387,7 +387,7 @@ void GfxShapeHyView::DoHoverGrabPoint()
 		break;
 
 	default:
-		HyGuiLog("GfxShapeModel::DoHoverGrabPoint - Unsupported shape type for grab point transform: " % QString::number(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType()), LOGTYPE_Error);
+		HyGuiLog("GfxShapeHyView::DoHoverGrabPoint - Unsupported shape type for grab point transform: " % QString::number(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType()), LOGTYPE_Error);
 		break;
 	}
 }

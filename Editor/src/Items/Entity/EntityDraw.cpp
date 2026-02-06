@@ -105,7 +105,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	case EDITMODE_Idle:
 		if(pTreeItemData->GetEditModel())
 		{
-			ShapeMouseMoveResult eResult = pTreeItemData->GetEditModel()->MouseMoveIdle(ptWorldMousePos);
+			ShapeMouseMoveResult eResult = pTreeItemData->GetEditModel()->MouseMoveIdle(m_eEditModeState, ptWorldMousePos);
 			switch(eResult)
 			{
 			case SHAPEMOUSEMOVE_Creation:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
@@ -155,7 +155,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		if(pTreeItemData->GetEditModel())
 		{
 			bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-			pTreeItemData->GetEditModel()->MouseMoveTransform(bShiftHeld, m_ptDragStart, ptWorldMousePos);
+			pTreeItemData->GetEditModel()->MouseMoveTransform(m_eEditModeState, bShiftHeld, m_ptDragStart, ptWorldMousePos);
 		}
 		else
 			HyGuiLog("EntityDraw::OnMouseMoveEvent - fpDoMouseDownTransform with unsupported edit item type!", LOGTYPE_Error);
@@ -194,7 +194,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		if(pTreeItemData->GetEditModel())
 		{
 			bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-			ShapeMouseMoveResult eResult = pTreeItemData->GetEditModel()->MousePressEvent(bShiftHeld, pEvent->buttons(), m_ptDragStart);
+			ShapeMouseMoveResult eResult = pTreeItemData->GetEditModel()->MousePressEvent(m_eEditModeState, bShiftHeld, pEvent->buttons(), m_ptDragStart);
 
 			bool bStartTransform = false;
 			switch(eResult)
@@ -272,11 +272,13 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		else
 			marqueeAabb = m_MarqueeCtrl.GetSelection();
 
+		bool bLeftClick = true; // TODO: Track which mouse button was released
+
 		if(pTreeItemData->GetEditModel())
 		{
-			pTreeItemData->GetEditModel()->MouseMarqueeReleased(pEvent->buttons(),
-																   QPointF(marqueeAabb.lowerBound.x, marqueeAabb.lowerBound.y),
-																   QPointF(marqueeAabb.upperBound.x, marqueeAabb.upperBound.y));
+			pTreeItemData->GetEditModel()->MouseMarqueeReleased(m_eEditModeState, bLeftClick,
+																QPointF(marqueeAabb.lowerBound.x, marqueeAabb.lowerBound.y),
+																QPointF(marqueeAabb.upperBound.x, marqueeAabb.upperBound.y));
 		}
 		else
 			HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_MarqueeSelect with unsupported edit item type!", LOGTYPE_Error);
@@ -304,7 +306,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 					else
 						sShapeType = "Line Chain";
 					
-					QUndoCommand *pCmd = new EntityUndoCmd_PrimitiveData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, sShapeType, pTreeItemData->GetEditModel()->GetData());
+					QUndoCommand *pCmd = new EntityUndoCmd_PrimitiveData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, sShapeType, pTreeItemData->GetEditModel()->Serialize());
 					m_pProjItem->GetUndoStack()->push(pCmd);
 				}
 				else
@@ -313,12 +315,12 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 					{
 					case EDITMODEL_Shape: {
 						EditorShape eShapeType = static_cast<GfxShapeModel *>(pTreeItemData->GetEditModel())->GetShapeType();
-						QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, eShapeType, pTreeItemData->GetEditModel()->GetData());
+						QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, eShapeType, pTreeItemData->GetEditModel()->Serialize());
 						m_pProjItem->GetUndoStack()->push(pCmd);
 						break; }
 
 					case EDITMODEL_Chain: {
-						QUndoCommand *pCmd = new EntityUndoCmd_ChainData(sUndoText, *m_pProjItem, pTreeItemData, pTreeItemData->GetEditModel()->GetData());
+						QUndoCommand *pCmd = new EntityUndoCmd_ChainData(sUndoText, *m_pProjItem, pTreeItemData, pTreeItemData->GetEditModel()->Serialize());
 						m_pProjItem->GetUndoStack()->push(pCmd);
 						break; }
 				
@@ -343,7 +345,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	{
 		glm::vec2 ptCurMousePos;
 		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
-		ShapeMouseMoveResult eResult = pTreeItemData->GetEditModel()->MouseMoveIdle(ptCurMousePos);
+		ShapeMouseMoveResult eResult = pTreeItemData->GetEditModel()->MouseMoveIdle(m_eEditModeState, ptCurMousePos);
 		switch(eResult)
 		{
 		case SHAPEMOUSEMOVE_Creation:				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::CrossCursor); break;
@@ -369,7 +371,12 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_eEditModeState = EDITMODE_Idle;
 }
 
-bool EntityDraw::SetEditMode(bool bEnable)
+EditModeState EntityDraw::GetEditModeState() const
+{
+	return m_eEditModeState;
+}
+
+bool EntityDraw::OnSetEditMode(bool bEnable)
 {
 	if(bEnable == false)
 	{

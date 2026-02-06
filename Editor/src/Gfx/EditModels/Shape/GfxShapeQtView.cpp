@@ -49,7 +49,7 @@ GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
 	// Intentionally left blank since we are using child QGraphicsItems for rendering
 }
 
-/*virtual*/ void GfxShapeQtView::DoRefreshView(ShapeMouseMoveResult eResult, bool bMouseDown) /*override*/
+/*virtual*/ void GfxShapeQtView::DoRefreshView(EditModeState eEditModeState, ShapeMouseMoveResult eResult) /*override*/
 {
 	if(m_pModel == nullptr)
 	{

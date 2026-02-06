@@ -18,7 +18,7 @@ GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QL
 	m_bReverseWindingOrder(false),
 	m_bLoopClosed(false)
 {
-	SetData(floatList);
+	Deserialize(floatList);
 }
 
 /*virtual*/ GfxChainModel::~GfxChainModel()
@@ -33,58 +33,17 @@ GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QL
 	return m_bSelfIntersecting == false;
 }
 
-/*virtual*/ QList<float> GfxChainModel::GetData() const /*override*/
+/*virtual*/ QList<float> GfxChainModel::Serialize() const /*override*/
 {
 	std::vector<float> serializedData = m_Chain.SerializeSelf();
 	QList<float> returnList(serializedData.begin(), serializedData.end());
 	return returnList;
 }
 
-void GfxChainModel::SetData(const QList<float> &floatList)
-{
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Assemble `m_GrabPointList`
-	std::vector<glm::vec2> grabPointList;
-	if(floatList.empty() == false)
-	{
-		grabPointList = m_Chain.DeserializeSelf(HYFIXTURE_LineChain, std::vector<float>(floatList.begin(), floatList.end()));
-		
-		// Find center point
-		glm::vec2 ptCentroid;
-		m_Chain.GetCentroid(ptCentroid);
-		m_GrabPointCenter.Setup(ptCentroid);
-	}
-
-	// Preserve existing grab points where possible (keeps selection)
-	for(int i = 0; i < grabPointList.size(); ++i)
-	{
-		if(static_cast<int>(m_GrabPointList.size()) - 1 < i)
-			m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, grabPointList[i]));
-		else
-			m_GrabPointList[i].Setup(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
-	}
-	if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
-		m_GrabPointList.resize(grabPointList.size());
-
-	if(m_bLoopClosed == false && m_GrabPointList.size() > 1)
-	{
-		m_GrabPointList.front().Setup(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
-		m_GrabPointList.back().Setup(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
-	}
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	if(m_GrabPointList.empty())
-		m_Chain.ClearData();
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	RefreshViews(SHAPEMOUSEMOVE_None, false);
-}
-
 void GfxChainModel::TransformData(glm::mat4 mtxTransform)
 {
 	m_Chain.TransformSelf(mtxTransform);
-	RefreshViews(SHAPEMOUSEMOVE_None, false);
+	RefreshViews(EDITMODE_Idle, SHAPEMOUSEMOVE_None);
 }
 
 const HyChain2d &GfxChainModel::GetChainFixture() const
@@ -128,6 +87,47 @@ bool GfxChainModel::IsLoopClosed() const
 	}
 
 	return sUndoText;
+}
+
+/*virtual*/ void GfxChainModel::DoDeserialize(const QList<float> &floatList) /*override*/
+{
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Assemble `m_GrabPointList`
+	std::vector<glm::vec2> grabPointList;
+	if(floatList.empty() == false)
+	{
+		grabPointList = m_Chain.DeserializeSelf(HYFIXTURE_LineChain, std::vector<float>(floatList.begin(), floatList.end()));
+		
+		// Find center point
+		glm::vec2 ptCentroid;
+		m_Chain.GetCentroid(ptCentroid);
+		m_GrabPointCenter.Setup(ptCentroid);
+	}
+
+	// Preserve existing grab points where possible (keeps selection)
+	for(int i = 0; i < grabPointList.size(); ++i)
+	{
+		if(static_cast<int>(m_GrabPointList.size()) - 1 < i)
+			m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, grabPointList[i]));
+		else
+			m_GrabPointList[i].Setup(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
+	}
+	if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
+		m_GrabPointList.resize(grabPointList.size());
+
+	if(m_bLoopClosed == false && m_GrabPointList.size() > 1)
+	{
+		m_GrabPointList.front().Setup(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
+		m_GrabPointList.back().Setup(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
+	}
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	if(m_GrabPointList.empty())
+		m_Chain.ClearData();
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	RefreshViews(EDITMODE_Idle, SHAPEMOUSEMOVE_None);
 }
 
 /*virtual*/ ShapeMouseMoveResult GfxChainModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/

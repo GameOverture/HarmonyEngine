@@ -31,12 +31,12 @@ public:
 	QString GetPrimType() const;
 	void SetPrimType(QString sNewShape);
 
-	virtual QList<float> GetData() const override;
-	virtual void SetData(const QList<float> &floatList) override;
+	virtual QList<float> Serialize() const override;
 
 	virtual QString MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) override; // Returns undo command description (blank if no change)
 
 protected:
+	virtual void DoDeserialize(const QList<float> &floatList) override;
 	virtual ShapeMouseMoveResult DoMouseMoveIdle(glm::vec2 ptWorldMousePos) override;
 	virtual void DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
 };

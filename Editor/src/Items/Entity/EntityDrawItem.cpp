@@ -196,7 +196,16 @@ EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
 	IDrawExItem::RefreshTransform();
 
 	if(m_pEditView)
-		m_pEditView->GetModel()->RefreshViews(SHAPEMOUSEMOVE_None, false);
+	{
+		EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_pEntityTreeItemData->GetEntityModel().GetItem().GetDraw());
+		if(pEntityDraw)
+		{
+			if(pEntityDraw->GetCurEditItem() == this)
+				m_pEditView->GetModel()->RefreshViews(pEntityDraw->GetEditModeState(), SHAPEMOUSEMOVE_None);
+			else
+				m_pEditView->GetModel()->RefreshViews(EDITMODE_Off, SHAPEMOUSEMOVE_None);
+		}
+	}
 }
 
 IGfxEditView *EntityDrawItem::GetEditView()
@@ -318,7 +327,7 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 		if(sPropertyName == "Data")
 		{
 			QJsonArray dataArray;
-			QList<float> floatList = m_pEntityTreeItemData->GetEditModel()->GetData();
+			QList<float> floatList = m_pEntityTreeItemData->GetEditModel()->Serialize();
 			for(float fVal : floatList)
 				dataArray.append(QJsonValue(static_cast<double>(fVal)));
 			return dataArray;
@@ -901,7 +910,7 @@ void ExtrapolateProperties(Project &projectRef,
 					QList<float> floatList;
 					for(QJsonValue val : floatArray)
 						floatList.push_back(static_cast<float>(val.toDouble()));
-					pEditModel->SetData(floatList);
+					pEditModel->Deserialize(floatList);
 				}
 			}
 			pEditModel->SetColor(HyColor(static_cast<IHyBody2d *>(pThisHyNode)->topColor.Get())); // Always try to sync colors
@@ -919,7 +928,7 @@ void ExtrapolateProperties(Project &projectRef,
 					QList<float> floatList;
 					for(QJsonValue val : floatArray)
 						floatList.push_back(static_cast<float>(val.toDouble()));
-					pEditModel->SetData(floatList);
+					pEditModel->Deserialize(floatList);
 				}
 			}
 			break;
@@ -934,7 +943,7 @@ void ExtrapolateProperties(Project &projectRef,
 					QList<float> floatList;
 					for(QJsonValue val : floatArray)
 						floatList.push_back(static_cast<float>(val.toDouble()));
-					pEditModel->SetData(floatList);
+					pEditModel->Deserialize(floatList);
 				}
 			}
 			break;

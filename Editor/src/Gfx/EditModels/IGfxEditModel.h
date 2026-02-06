@@ -15,6 +15,16 @@
 
 class IGfxEditView;
 
+enum EditModeState
+{
+	EDITMODE_Off = 0,
+	EDITMODE_Idle,					// Mouse cursor determined by draw models
+	EDITMODE_MouseDownOutside,		// Click started outside of the edit item's bounds
+	EDITMODE_MouseDragMarquee,		// Click-dragging a marquee select box
+	EDITMODE_MouseDownTransform,	// Click started on item to be manipulated
+	EDITMODE_MouseDragTransform,	// Transforming (translating, rotating, scaling) the edit item
+};
+
 enum EditModelType
 {
 	EDITMODEL_None = 0,
@@ -66,12 +76,12 @@ public:
 	void SetColor(HyColor color);
 
 	virtual bool IsValidModel() const = 0;
-	virtual QList<float> GetData() const = 0;
-	virtual void SetData(const QList<float> &floatList) = 0;
+	virtual QList<float> Serialize() const = 0;
+	void Deserialize(const QList<float> &floatList);
 
 	void AddView(IGfxEditView *pView);
 	bool RemoveView(IGfxEditView *pView);
-	void RefreshViews(ShapeMouseMoveResult eResult, bool bMouseDown) const;
+	void RefreshViews(EditModeState eEditModeState, ShapeMouseMoveResult eResult) const;
 
 	void GetTransformPreview(glm::mat4 &mtxTransformOut, int &iVertexIndexOut) const;
 
@@ -81,14 +91,16 @@ public:
 	int GetNumGrabPointsSelected() const;
 	bool IsAllGrabPointsSelected() const;
 	bool IsHoverGrabPointSelected() const;
+	void DeselectAllGrabPoints();
 
-	ShapeMouseMoveResult MouseMoveIdle(glm::vec2 ptWorldMousePos);
-	ShapeMouseMoveResult MousePressEvent(bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
-	void MouseMarqueeReleased(Qt::MouseButtons uiButtonFlags, QPointF ptBotLeft, QPointF ptTopRight);
-	void MouseMoveTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
+	ShapeMouseMoveResult MouseMoveIdle(EditModeState eEditModeState, glm::vec2 ptWorldMousePos);
+	ShapeMouseMoveResult MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
+	void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight);
+	void MouseMoveTransform(EditModeState eEditModeState, bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
 	virtual QString MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) = 0; // Returns undo command description (blank if no change)
 
 protected:
+	virtual void DoDeserialize(const QList<float> &floatList) = 0;
 	virtual ShapeMouseMoveResult DoMouseMoveIdle(glm::vec2 ptWorldMousePos) = 0;
 	virtual void DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos) = 0;
 };
