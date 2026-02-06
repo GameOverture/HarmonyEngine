@@ -25,12 +25,13 @@ class EntityDrawItem : public IDrawExItem
 	IGfxEditView *									m_pEditView;
 
 public:
-	EntityDrawItem(Project &projectRef, EntityTreeItemData *pModelItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent);
+	EntityDrawItem(EntityTreeItemData *pModelItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent);
 	virtual ~EntityDrawItem();
 
 	EntityDraw &GetEntityDraw();
 	EntityTreeItemData *GetEntityTreeItemData() const;
 	virtual IHyBody2d *GetHyNode() override;
+	void FlushHyNode(HyEntity2d *pParent);
 
 	virtual bool IsSelectable() const override;
 	virtual bool IsSelected() override;

@@ -20,12 +20,47 @@
 #include "GfxShapeHyView.h"
 #include "GfxChainView.h"
 
-EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
+EntityDrawItem::EntityDrawItem(EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
 	IDrawExItem(pEntityDraw),
 	m_pEntityTreeItemData(pEntityTreeItemData),
 	m_pChild(nullptr),
 	m_pEditView(nullptr)
 {
+	FlushHyNode(pParent);
+	HideTransformCtrl();
+}
+
+/*virtual*/ EntityDrawItem::~EntityDrawItem()
+{
+	if(m_pChild != m_pEditView)
+		delete m_pEditView;
+	delete m_pChild;
+}
+
+EntityDraw &EntityDrawItem::GetEntityDraw()
+{
+	return static_cast<EntityDraw &>(*m_pEntityTreeItemData->GetEntityModel().GetItem().GetDraw());
+}
+
+EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
+{
+	return m_pEntityTreeItemData;
+}
+
+/*virtual*/ IHyBody2d *EntityDrawItem::GetHyNode() /*override*/
+{
+	return m_pChild;
+}
+
+void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
+{
+	// Cache old node pointer to be deleted after reallocating (to avoid Harmony unloading and reloading assets)
+	IHyBody2d *pOldChild = m_pChild;
+	IGfxEditView *pOldEditView = m_pEditView;
+	m_pChild = m_pEditView = nullptr;
+
+	Project &projectRef = m_pEntityTreeItemData->GetEntityModel().GetItem().GetProject();
+
 	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
 	TreeModelItemData *pReferencedItemData = projectRef.FindItemData(referencedItemUuid);
 
@@ -158,27 +193,10 @@ EntityDrawItem::EntityDrawItem(Project &projectRef, EntityTreeItemData *pEntityT
 	else
 		HyGuiLog("EntityDrawItem ctor - m_pChild remained null for item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 
-	HideTransformCtrl();
-}
-
-/*virtual*/ EntityDrawItem::~EntityDrawItem()
-{
-	delete m_pChild;
-}
-
-EntityDraw &EntityDrawItem::GetEntityDraw()
-{
-	return static_cast<EntityDraw &>(*m_pEntityTreeItemData->GetEntityModel().GetItem().GetDraw());
-}
-
-EntityTreeItemData *EntityDrawItem::GetEntityTreeItemData() const
-{
-	return m_pEntityTreeItemData;
-}
-
-/*virtual*/ IHyBody2d *EntityDrawItem::GetHyNode() /*override*/
-{
-	return m_pChild;
+	// Delete the old cached nodes (if they existed)
+	if(pOldChild != pOldEditView)
+		delete pOldEditView;
+	delete pOldChild;
 }
 
 /*virtual*/ bool EntityDrawItem::IsSelectable() const /*override*/
@@ -767,6 +785,8 @@ void ExtrapolateProperties(Project &projectRef,
 						   const QMap<int, QJsonObject> &keyFrameMapRef,
 						   EntityPreviewComponent &previewComponentRef)
 {
+	// Flush pThisHyNode & pEditModel if iSTART_FRAME == -1?
+
 	if(eItemType == ITEM_Sprite)
 		static_cast<HySprite2d *>(pThisHyNode)->SetAnimPause(true); // We always pause the animation because it is set manually by extrapolating what frame it should be, and don't want time passing to affect it.
 

@@ -452,8 +452,10 @@ void EntityDraw::SetExtrapolatedProperties()
 	EntityTreeItemData *pRootTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().GetRootTreeItemData();
 
 	QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetCtorKeyFramesMap();
-	QMap<int, QJsonObject> ctorFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData];
-	ctorFrameMap[-1] = ctorKeyFrameMapRef[pRootTreeItemData];
+	QMap<int, QJsonObject> combinedFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData];
+	combinedFrameMap[-1] = ctorKeyFrameMapRef[pRootTreeItemData];
+
+	// TODO: Flush m_RootEntity's properties before extrapolating
 
 	ExtrapolateProperties(m_pProjItem->GetProject(),
 							&m_RootEntity,
@@ -463,7 +465,7 @@ void EntityDraw::SetExtrapolatedProperties()
 							fFRAME_DURATION,
 							-1,
 							iDESTINATION_FRAME,
-							ctorFrameMap,
+							combinedFrameMap,
 							pRootTreeItemData->GetPreviewComponent());
 
 	// Set the extrapolated properties for all the children items
@@ -479,10 +481,10 @@ void EntityDraw::SetExtrapolatedProperties()
 		if(eItemType == ITEM_Entity) // Sub-entity
 		{
 			QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetCtorKeyFramesMap();
-			QMap<int, QJsonObject> ctorFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
-			ctorFrameMap[-1] = ctorKeyFrameMapRef[pEntityTreeItemData];
+			QMap<int, QJsonObject> combinedFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
+			combinedFrameMap[-1] = ctorKeyFrameMapRef[pEntityTreeItemData];
 
-			static_cast<SubEntity *>(pEntDrawItem->GetHyNode())->Extrapolate(ctorFrameMap,
+			static_cast<SubEntity *>(pEntDrawItem->GetHyNode())->Extrapolate(combinedFrameMap,
 																			 pEntityTreeItemData->GetPreviewComponent(),
 																			 pEntityTreeItemData->IsSelected(),
 																			 fFRAME_DURATION,
@@ -491,8 +493,13 @@ void EntityDraw::SetExtrapolatedProperties()
 		else
 		{
 			QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetCtorKeyFramesMap();
-			QMap<int, QJsonObject> ctorFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
-			ctorFrameMap[-1] = ctorKeyFrameMapRef[pEntityTreeItemData];
+			QMap<int, QJsonObject> combinedFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
+			combinedFrameMap[-1] = ctorKeyFrameMapRef[pEntityTreeItemData];
+
+			// FlushHyNode (and clearing edit model) makes properties that aren't keyed on the timeline until later show the proper default values
+			pEntDrawItem->FlushHyNode(&m_RootEntity); 
+			if(pEntDrawItem->GetEntityTreeItemData()->GetEditModel())
+				pEntDrawItem->GetEntityTreeItemData()->GetEditModel()->Deserialize(QList<float>());
 
 			ExtrapolateProperties(m_pProjItem->GetProject(),
 									pEntDrawItem->GetHyNode(),
@@ -502,7 +509,7 @@ void EntityDraw::SetExtrapolatedProperties()
 									fFRAME_DURATION,
 									-1,
 									iDESTINATION_FRAME,
-									ctorFrameMap,
+									combinedFrameMap,
 									pEntityTreeItemData->GetPreviewComponent());
 		}
 	}
@@ -579,7 +586,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		if(pDrawItem == nullptr) // Not found within 'staleItemList', allocate new
 		{
 			EntityTreeItemData *pEntityTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(uuid);
-			pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), pEntityTreeItemData, this, &m_RootEntity);
+			pDrawItem = new EntityDrawItem(pEntityTreeItemData, this, &m_RootEntity);
 		}
 		else // Found within 'staleItemList'
 		{
@@ -591,7 +598,7 @@ void EntityDraw::SetExtrapolatedProperties()
 				
 				// Allocate first, then delete so Harmony doesn't unload the item data
 				EntityDrawItem *pOldDrawItem = pDrawItem;
-				pDrawItem = new EntityDrawItem(m_pProjItem->GetProject(), pEntityTreeItemData, this, &m_RootEntity);
+				pDrawItem = new EntityDrawItem(pEntityTreeItemData, this, &m_RootEntity);
 
 				if(pOldDrawItem == m_pCurHoverItem)
 					ClearHover();

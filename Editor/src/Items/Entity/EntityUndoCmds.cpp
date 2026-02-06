@@ -1598,15 +1598,24 @@ EntityUndoCmd_PropertyModified::EntityUndoCmd_PropertyModified(PropertiesTreeMod
 			// Checking this item, extrapolate what the new data should be if possible
 			if(m_CatPropPair.second.isEmpty() == false) // Is NOT category (is property)
 			{
-				QList<IDrawExItem *> drawItemList = static_cast<EntityDraw *>(pModel->GetProjItem()->GetDraw())->GetDrawItemList();
-				for(IDrawExItem *pDrawItem : drawItemList)
+				if(m_iFrameIndex > -1)
 				{
-					EntityDrawItem *pEntDrawItem = static_cast<EntityDrawItem *>(pDrawItem);
-					if(pEntDrawItem->GetEntityTreeItemData() == pEntityTreeData)
+					QList<IDrawExItem *> drawItemList = static_cast<EntityDraw *>(pModel->GetProjItem()->GetDraw())->GetDrawItemList();
+					for(IDrawExItem *pDrawItem : drawItemList)
 					{
-						m_OverridePropertyValueList.push_back(pEntDrawItem->ExtractPropertyData(m_CatPropPair.first, m_CatPropPair.second));
-						break;
+						EntityDrawItem *pEntDrawItem = static_cast<EntityDrawItem *>(pDrawItem);
+						if(pEntDrawItem->GetEntityTreeItemData() == pEntityTreeData)
+						{
+							m_OverridePropertyValueList.push_back(pEntDrawItem->ExtractPropertyData(m_CatPropPair.first, m_CatPropPair.second));
+							break;
+						}
 					}
+				}
+				else // This is the ctor, so just get the default property value
+				{
+					PropertiesDef propDef = m_pModel->GetDefinition(m_CatPropPair.first, m_CatPropPair.second);
+					if(propDef.IsValid())
+						m_OverridePropertyValueList.push_back(PropertiesTreeModel::ConvertVariantToJson(propDef.eType, propDef.defaultData));
 				}
 			}
 		}
