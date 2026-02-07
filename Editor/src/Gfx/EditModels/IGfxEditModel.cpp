@@ -14,9 +14,7 @@ IGfxEditModel::IGfxEditModel(EditModeType eModelType, HyColor color) :
 	m_eMODEL_TYPE(eModelType),
 	m_GrabPointCenter(GRABPOINT_Center),
 	m_eCurAction(EDITMODEACTION_None),
-	m_mtxTransform(1.0f),
-	m_iGrabPointIndex(-1),
-	m_bTransformShiftMod(false)
+	m_iGrabPointIndex(-1)
 {
 	SetColor(color);
 }
@@ -45,8 +43,8 @@ void IGfxEditModel::SetColor(HyColor color)
 
 void IGfxEditModel::Deserialize(const QList<float> &floatList)
 {
-	DoDeserialize(floatList);
-	RefreshViews(EDITMODE_Idle, EDITMODEACTION_None);
+	m_bMalformed = !DoDeserialize(floatList);
+	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 
 void IGfxEditModel::AddView(IGfxEditView *pView)
@@ -61,16 +59,10 @@ bool IGfxEditModel::RemoveView(IGfxEditView *pView)
 	return m_ViewList.removeOne(pView);
 }
 
-void IGfxEditModel::RefreshViews(EditModeState eEditModeState, EditModeAction eResult) const
+void IGfxEditModel::SyncViews(EditModeState eEditModeState, EditModeAction eResult) const
 {
 	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshView(eEditModeState, eResult);
-}
-
-void IGfxEditModel::GetTransformPreview(glm::mat4 &mtxTransformOut, int &iGrabPointIndexOut) const
-{
-	mtxTransformOut = m_mtxTransform;
-	iGrabPointIndexOut = m_iGrabPointIndex;
+		pView->SyncModel(eEditModeState, eResult);
 }
 
 const QList<GfxGrabPointModel> &IGfxEditModel::GetGrabPointList() const
@@ -151,8 +143,10 @@ Qt::CursorShape IGfxEditModel::MouseMoveIdle(EditModeState eEditModeState, glm::
 	return Qt::ArrowCursor;
 }
 
-EditModeAction IGfxEditModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos)
+bool IGfxEditModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos)
 {
+	bool bStartTransform = false;
+
 	EditModeAction eResult = DoMouseMoveIdle(ptWorldMousePos);
 	if(eResult == EDITMODEACTION_AppendVertex || eResult == EDITMODEACTION_InsertVertex)
 	{
@@ -165,6 +159,8 @@ EditModeAction IGfxEditModel::MousePressEvent(EditModeState eEditModeState, bool
 		for(int i = 0; i < m_GrabPointList.size(); ++i)
 			m_GrabPointList[i].SetSelected(false);
 		m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
+
+		bStartTransform = true;
 	}
 	else if(eResult == EDITMODEACTION_HoverGrabPoint)
 	{
@@ -192,10 +188,17 @@ EditModeAction IGfxEditModel::MousePressEvent(EditModeState eEditModeState, bool
 			else if(uiButtonFlags & Qt::RightButton)
 				m_GrabPointList[m_iGrabPointIndex].SetSelected(false);
 		}
+
+		bStartTransform = true;
 	}
+	else if(eResult == EDITMODEACTION_Creation)
+		bStartTransform = true;
+	else if(eResult == EDITMODEACTION_Inside)
+		bStartTransform = IsAllGrabPointsSelected();
 
 	m_eCurAction = eResult;
-	return eResult;
+
+	return bStartTransform;
 }
 
 void IGfxEditModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight)
@@ -214,25 +217,19 @@ void IGfxEditModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLef
 		}
 	}
 
-	RefreshViews(eEditModeState, EDITMODEACTION_None);
+	SyncViews(eEditModeState, EDITMODEACTION_None);
 }
 
-void IGfxEditModel::MouseMoveTransform(EditModeState eEditModeState, bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
+void IGfxEditModel::MouseTransform(EditModeState eEditModeState, bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
-	m_bTransformShiftMod = bShiftMod;
-
-	m_mtxTransform = glm::identity<glm::mat4>();
+	glm::vec2 vDelta(0.0f, 0.0f);
 	if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
-	{
-		glm::vec2 vDelta(ptDragPos.x - ptStartPos.x,
-						 ptDragPos.y - ptStartPos.y);
-		m_mtxTransform = glm::translate(m_mtxTransform, glm::vec3(vDelta, 0.0f));
-	}
+		HySetVec(vDelta, ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y);
 
-	if(m_eCurAction == EDITMODEACTION_Creation)
-		DoTransformCreation(ptStartPos, ptDragPos);
-	//else if(m_eCurTransform == EDITMODEACTION_HoverGrabPoint)
-	//	DoTransformGrabPoint(ptStartPos, ptDragPos);
-
-	//RefreshViews(eEditModeState, m_eCurTransform);
+	if(eEditModeState == EDITMODE_MouseDragTransform && m_eCurAction == EDITMODEACTION_Creation)
+		DoTransformCreation(bShiftMod, ptStartPos, ptDragPos);
+	
+	SyncViews(eEditModeState, m_eCurAction);
+	for(IGfxEditView *pView : m_ViewList)
+		pView->SyncPreview(eEditModeState, m_eCurAction, m_iGrabPointIndex, vDelta);
 }

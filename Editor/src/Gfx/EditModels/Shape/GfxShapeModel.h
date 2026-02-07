@@ -49,9 +49,9 @@ public:
 	virtual QString MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) override; // Returns undo command description (blank if no change)
 
 protected:
-	virtual void DoDeserialize(const QList<float> &floatList) override;
+	virtual bool DoDeserialize(const QList<float> &floatList) override;
 	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) override;
-	virtual void DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
+	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
 
 	bool CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos);
 	bool IsShareEdge(const std::vector<glm::vec2> &a, const std::vector<glm::vec2> &b, int &a0, int &a1, int &b0, int &b1);

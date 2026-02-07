@@ -38,7 +38,7 @@ public:
 protected:
 	virtual void DoDeserialize(const QList<float> &floatList) override;
 	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) override;
-	virtual void DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
+	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
 };
 
 #endif // GfxShapeModel_H

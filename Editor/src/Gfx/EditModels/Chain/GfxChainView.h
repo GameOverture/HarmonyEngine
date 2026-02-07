@@ -27,10 +27,9 @@ public:
 	virtual void RefreshColor() override;
 
 protected:
-	virtual void DoRefreshView(EditModeState eEditModeState, EditModeAction eResult) override;
+	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) override;
+	virtual void OnSyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta) override;
 	void ClearPreviewPrimitives();
-
-	void DoHoverGrabPoint(EditModeState eEditModeState);
 };
 
 #endif // GfxChainView_H

@@ -49,7 +49,7 @@ GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
 	// Intentionally left blank since we are using child QGraphicsItems for rendering
 }
 
-/*virtual*/ void GfxShapeQtView::DoRefreshView(EditModeState eEditModeState, EditModeAction eResult) /*override*/
+/*virtual*/ void GfxShapeQtView::OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) /*override*/
 {
 	if(m_pModel == nullptr)
 	{
@@ -64,3 +64,6 @@ GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
 	const QList<GfxGrabPointModel> &grabPointListRef = m_pModel->GetGrabPointList();
 }
 
+/*virtual*/ void GfxShapeQtView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
+{
+}

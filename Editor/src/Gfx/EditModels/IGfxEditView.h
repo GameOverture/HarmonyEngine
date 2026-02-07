@@ -30,12 +30,14 @@ public:
 	void SetModel(IGfxEditModel *pModel);
 
 	virtual void RefreshColor() = 0;
-	void RefreshView(EditModeState eEditModeState, EditModeAction eResult);
+	void SyncModel(EditModeState eEditModeState, EditModeAction eResult);
+	void SyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta);
 
 	void ClearGrabPoints();
 
 protected:
-	virtual void DoRefreshView(EditModeState eEditModeState, EditModeAction eResult) = 0;
+	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) = 0;
+	virtual void OnSyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta) = 0;
 };
 
 #endif // IGfxEditView_H

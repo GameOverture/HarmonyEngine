@@ -88,10 +88,15 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	EntityDrawItem *pCurEditItem = GetCurEditItem();
 	if(pCurEditItem == nullptr)
 	{
-		HyGuiLog("EntityDraw::OnMouseMoveEvent - with null edit item!", LOGTYPE_Error);
+		HyGuiLog("EntityDraw::OnMouseMoveEvent - with null edit item", LOGTYPE_Error);
 		return;
 	}
 	EntityTreeItemData *pTreeItemData = pCurEditItem->GetEntityTreeItemData();
+	if(pTreeItemData->GetEditModel() == nullptr)
+	{
+		HyGuiLog("EntityDraw::OnMouseMoveEvent - with null edit model", LOGTYPE_Error);
+		return;
+	}
 
 	glm::vec2 ptWorldMousePos;
 	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
@@ -102,15 +107,10 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_Off reached in Edit Mode!", LOGTYPE_Error);
 		break;
 
-	case EDITMODE_Idle:
-		if(pTreeItemData->GetEditModel())
-		{
-			Qt::CursorShape eCursorShape = pTreeItemData->GetEditModel()->MouseMoveIdle(m_eEditModeState, ptWorldMousePos);
-			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(eCursorShape);
-		}
-		else
-			HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_Idle with unsupported edit item type!", LOGTYPE_Error);
-		break;
+	case EDITMODE_Idle: {
+		Qt::CursorShape eCursorShape = pTreeItemData->GetEditModel()->MouseMoveIdle(m_eEditModeState, ptWorldMousePos);
+		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(eCursorShape);
+		break; }
 
 	case EDITMODE_MouseDownOutside:
 	case EDITMODE_MouseDownTransform: {
@@ -128,21 +128,13 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		break; }
 
 	case EDITMODE_MouseDragMarquee:
-		if(pTreeItemData->GetEditModel())
-			m_MarqueeCtrl.SetAsDrag(m_ptDragStart, ptWorldMousePos);
-		else
-			HyGuiLog("EntityDraw::OnMouseMoveEvent - EDITMODE_MouseDragMarquee with unsupported edit item type!", LOGTYPE_Error);
+		m_MarqueeCtrl.SetAsDrag(m_ptDragStart, ptWorldMousePos);
 		break;
 
-	case EDITMODE_MouseDragTransform:
-		if(pTreeItemData->GetEditModel())
-		{
-			bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-			pTreeItemData->GetEditModel()->MouseMoveTransform(m_eEditModeState, bShiftHeld, m_ptDragStart, ptWorldMousePos);
-		}
-		else
-			HyGuiLog("EntityDraw::OnMouseMoveEvent - fpDoMouseDownTransform with unsupported edit item type!", LOGTYPE_Error);
-		break;
+	case EDITMODE_MouseDragTransform: {
+		bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
+		pTreeItemData->GetEditModel()->MouseTransform(m_eEditModeState, bShiftHeld, m_ptDragStart, ptWorldMousePos);
+		break; }
 
 	default:
 		HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown EditModeState reached!", LOGTYPE_Error);
@@ -160,10 +152,15 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	EntityDrawItem *pCurEditItem = GetCurEditItem();
 	if(pCurEditItem == nullptr)
 	{
-		HyGuiLog("EntityDraw::OnMousePressEvent - with null edit item!", LOGTYPE_Error);
+		HyGuiLog("EntityDraw::OnMousePressEvent - with null edit item", LOGTYPE_Error);
 		return;
 	}
 	EntityTreeItemData *pTreeItemData = pCurEditItem->GetEntityTreeItemData();
+	if(pTreeItemData->GetEditModel() == nullptr)
+	{
+		HyGuiLog("EntityDraw::OnMousePressEvent - with null edit model", LOGTYPE_Error);
+		return;
+	}
 
 	switch(m_eEditModeState)
 	{
@@ -171,48 +168,22 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		HyGuiLog("EntityDraw::OnMousePressEvent - EDITMODE_Off reached in Edit Mode!", LOGTYPE_Error);
 		break;
 
-	case EDITMODE_Idle:
+	case EDITMODE_Idle: {
 		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), m_ptDragStart);
 		
-		if(pTreeItemData->GetEditModel())
+		bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
+		bool bStartTransform = pTreeItemData->GetEditModel()->MousePressEvent(m_eEditModeState, bShiftHeld, pEvent->buttons(), m_ptDragStart);
+		if(bStartTransform)
 		{
-			bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-			EditModeAction eResult = pTreeItemData->GetEditModel()->MousePressEvent(m_eEditModeState, bShiftHeld, pEvent->buttons(), m_ptDragStart);
-
-			bool bStartTransform = false;
-			switch(eResult)
-			{
-			case EDITMODEACTION_Inside:
-				bStartTransform = pTreeItemData->GetEditModel()->IsAllGrabPointsSelected();
-				break;
-
-			case EDITMODEACTION_Creation:
-			case EDITMODEACTION_AppendVertex:
-			case EDITMODEACTION_InsertVertex:
-			case EDITMODEACTION_HoverGrabPoint:
-			case EDITMODEACTION_HoverCenter:
-				bStartTransform = true;
-				break;
-
-			default:
-				bStartTransform = false;
-				break;
-			}
-
-			if(bStartTransform)
-			{
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BlankCursor);
-				m_eEditModeState = EDITMODE_MouseDownTransform;
-			}
-			else
-			{
-				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor);
-				m_eEditModeState = EDITMODE_MouseDownOutside;
-			}
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BlankCursor);
+			m_eEditModeState = EDITMODE_MouseDownTransform;
 		}
 		else
-			HyGuiLog("EntityDraw::OnMousePressEvent - EDITMODE_Idle with unsupported edit item type!", LOGTYPE_Error);
-		break;
+		{
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::ArrowCursor);
+			m_eEditModeState = EDITMODE_MouseDownOutside;
+		}
+		break; }
 
 	default:
 		HyGuiLog("EntityDraw::OnMousePressEvent - Unhandled EditModeState reached!", LOGTYPE_Error);
@@ -230,10 +201,15 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	EntityDrawItem *pCurEditItem = GetCurEditItem();
 	if(pCurEditItem == nullptr)
 	{
-		HyGuiLog("EntityDraw::OnMousePressEvent - with null edit item!", LOGTYPE_Error);
+		HyGuiLog("EntityDraw::OnMousePressEvent - with null edit item", LOGTYPE_Error);
 		return;
 	}
 	EntityTreeItemData *pTreeItemData = pCurEditItem->GetEntityTreeItemData();
+	if(pTreeItemData->GetEditModel() == nullptr)
+	{
+		HyGuiLog("EntityDraw::OnMousePressEvent - with null edit model", LOGTYPE_Error);
+		return;
+	}
 
 	switch(m_eEditModeState)
 	{
@@ -256,67 +232,55 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			marqueeAabb = m_MarqueeCtrl.GetSelection();
 
 		bool bLeftClick = true; // TODO: Track which mouse button was released
-
-		if(pTreeItemData->GetEditModel())
-		{
-			pTreeItemData->GetEditModel()->MouseMarqueeReleased(m_eEditModeState, bLeftClick,
-																QPointF(marqueeAabb.lowerBound.x, marqueeAabb.lowerBound.y),
-																QPointF(marqueeAabb.upperBound.x, marqueeAabb.upperBound.y));
-		}
-		else
-			HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_MarqueeSelect with unsupported edit item type!", LOGTYPE_Error);
-		
+		pTreeItemData->GetEditModel()->MouseMarqueeReleased(m_eEditModeState, bLeftClick,
+															QPointF(marqueeAabb.lowerBound.x, marqueeAabb.lowerBound.y),
+															QPointF(marqueeAabb.upperBound.x, marqueeAabb.upperBound.y));
 		m_MarqueeCtrl.Hide();
 		break; }
 
 	case EDITMODE_MouseDownTransform:
-	case EDITMODE_MouseDragTransform:
-		if(pTreeItemData->GetEditModel())
+	case EDITMODE_MouseDragTransform: {
+		glm::vec2 ptCurMousePos;
+		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
+		QString sUndoText = pTreeItemData->GetEditModel()->MouseTransformReleased(pTreeItemData->GetCodeName(), QPointF(ptCurMousePos.x, ptCurMousePos.y));
+		if(sUndoText.isEmpty() == false)
 		{
-			glm::vec2 ptCurMousePos;
-			m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
-			QString sUndoText = pTreeItemData->GetEditModel()->MouseTransformReleased(pTreeItemData->GetCodeName(), QPointF(ptCurMousePos.x, ptCurMousePos.y));
-			if(sUndoText.isEmpty() == false)
+			int iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
+			int iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
+				
+			if(pTreeItemData->GetType() == ITEM_Primitive)
 			{
-				int iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
-				int iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
-				
-				if(pTreeItemData->GetType() == ITEM_Primitive)
-				{
-					QString sShapeType;
-					if(pTreeItemData->GetEditModel()->GetModelType() == EDITMODETYPE_Shape)
-						sShapeType = HyGlobal::ShapeName(static_cast<GfxShapeModel *>(pTreeItemData->GetEditModel())->GetShapeType());
-					else
-						sShapeType = "Line Chain";
-					
-					QUndoCommand *pCmd = new EntityUndoCmd_PrimitiveData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, sShapeType, pTreeItemData->GetEditModel()->Serialize());
-					m_pProjItem->GetUndoStack()->push(pCmd);
-				}
+				QString sShapeType;
+				if(pTreeItemData->GetEditModel()->GetModelType() == EDITMODETYPE_Shape)
+					sShapeType = HyGlobal::ShapeName(static_cast<GfxShapeModel *>(pTreeItemData->GetEditModel())->GetShapeType());
 				else
+					sShapeType = "Line Chain";
+					
+				QUndoCommand *pCmd = new EntityUndoCmd_PrimitiveData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, sShapeType, pTreeItemData->GetEditModel()->Serialize());
+				m_pProjItem->GetUndoStack()->push(pCmd);
+			}
+			else
+			{
+				switch(pTreeItemData->GetEditModel()->GetModelType())
 				{
-					switch(pTreeItemData->GetEditModel()->GetModelType())
-					{
-					case EDITMODETYPE_Shape: {
-						EditorShape eShapeType = static_cast<GfxShapeModel *>(pTreeItemData->GetEditModel())->GetShapeType();
-						QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, eShapeType, pTreeItemData->GetEditModel()->Serialize());
-						m_pProjItem->GetUndoStack()->push(pCmd);
-						break; }
+				case EDITMODETYPE_Shape: {
+					EditorShape eShapeType = static_cast<GfxShapeModel *>(pTreeItemData->GetEditModel())->GetShapeType();
+					QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, eShapeType, pTreeItemData->GetEditModel()->Serialize());
+					m_pProjItem->GetUndoStack()->push(pCmd);
+					break; }
 
-					case EDITMODETYPE_Chain: {
-						QUndoCommand *pCmd = new EntityUndoCmd_ChainData(sUndoText, *m_pProjItem, pTreeItemData, pTreeItemData->GetEditModel()->Serialize());
-						m_pProjItem->GetUndoStack()->push(pCmd);
-						break; }
+				case EDITMODETYPE_Chain: {
+					QUndoCommand *pCmd = new EntityUndoCmd_ChainData(sUndoText, *m_pProjItem, pTreeItemData, pTreeItemData->GetEditModel()->Serialize());
+					m_pProjItem->GetUndoStack()->push(pCmd);
+					break; }
 				
-					default:
-						HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_Transform with unsupported edit model type!", LOGTYPE_Error);
-						break;
-					}
+				default:
+					HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_Transform with unsupported edit model type!", LOGTYPE_Error);
+					break;
 				}
 			}
 		}
-		else
-			HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_Transform with unsupported edit item type!", LOGTYPE_Error);
-		break;
+		break; }
 
 	default:
 		HyGuiLog("EntityDraw::OnMousePressEvent - Unhandled EditModeState reached!", LOGTYPE_Error);
@@ -324,16 +288,10 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	}
 
 	// This is to reset the cursor and edit model based on where the mouse is now that the mouse button has been released
-	if(pTreeItemData->GetEditModel())
-	{
-		glm::vec2 ptCurMousePos;
-		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
-		
-		Qt::CursorShape eCursorShape = pTreeItemData->GetEditModel()->MouseMoveIdle(m_eEditModeState, ptCurMousePos);
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(eCursorShape);
-	}
-	else
-		HyGuiLog("EntityDraw::OnMouseReleaseEvent - with unsupported edit item type!", LOGTYPE_Error);
+	glm::vec2 ptCurMousePos;
+	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
+	Qt::CursorShape eCursorShape = pTreeItemData->GetEditModel()->MouseMoveIdle(m_eEditModeState, ptCurMousePos);
+	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(eCursorShape);
 
 	m_eEditModeState = EDITMODE_Idle;
 }

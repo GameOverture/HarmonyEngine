@@ -43,7 +43,7 @@ GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QL
 void GfxChainModel::TransformData(glm::mat4 mtxTransform)
 {
 	m_Chain.TransformSelf(mtxTransform);
-	RefreshViews(EDITMODE_Idle, EDITMODEACTION_None);
+	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 
 const HyChain2d &GfxChainModel::GetChainFixture() const
@@ -124,10 +124,6 @@ bool GfxChainModel::IsLoopClosed() const
 	
 	if(m_GrabPointList.empty())
 		m_Chain.ClearData();
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	RefreshViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 
 /*virtual*/ EditModeAction GfxChainModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
@@ -181,10 +177,10 @@ bool GfxChainModel::IsLoopClosed() const
 	return EDITMODEACTION_Outside;
 }
 
-void GfxChainModel::DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos)
+void GfxChainModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
 	glm::vec2 ptLowerBound, ptUpperBound, ptCenter;
-	if(m_bTransformShiftMod)
+	if(bShiftMod)
 	{
 		ptCenter = ptStartPos;
 

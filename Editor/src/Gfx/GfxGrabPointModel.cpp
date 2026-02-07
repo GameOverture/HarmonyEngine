@@ -70,12 +70,11 @@ bool GfxGrabPointModel::IsSelected() const
 
 void GfxGrabPointModel::SetSelected(bool bIsSelected)
 {
+	// Only apply selected to a supported GrabPointType
 	if(m_eType == GRABPOINT_Vertex || m_eType == GRABPOINT_VertexSelected)
 		m_eType = bIsSelected ? GRABPOINT_VertexSelected : GRABPOINT_Vertex;
 	else if(m_eType == GRABPOINT_Endpoint || m_eType == GRABPOINT_EndpointSelected)
 		m_eType = bIsSelected ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint;
-	else
-		HyGuiLog("GfxGrabPointModel::SetSelected called on unsupported GrabPointType: " % QString::number(m_eType), LOGTYPE_Error);
 }
 
 HyColor GfxGrabPointModel::GetOutlineColor() const

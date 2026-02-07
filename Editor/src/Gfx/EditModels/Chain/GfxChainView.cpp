@@ -34,7 +34,7 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 	m_PrimOutline.SetTint(m_pModel->GetColor());
 }
 
-/*virtual*/ void GfxChainView::DoRefreshView(EditModeState eEditModeState, EditModeAction eResult) /*override*/
+/*virtual*/ void GfxChainView::OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) /*override*/
 {
 	if(m_pModel == nullptr)
 	{
@@ -55,15 +55,15 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 		pCamera->ProjectToCamera(chainDataRef.pPointList[i], ptScreenPos);
 		projectedVertList.push_back(ptScreenPos);
 	}
+
 	m_PrimOutline.SetAsLineChain(projectedVertList, chainDataRef.bLoop);
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Apply Transform Preview if needed
+}
+
+/*virtual*/ void GfxChainView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
+{
+	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
+
 	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
-	glm::mat4 mtxTransform(1.0f);
-	int iVertexIndex = -1;
-	m_pModel->GetTransformPreview(mtxTransform, iVertexIndex);
-	glm::vec4 vTranslate = mtxTransform[3];
 
 	switch(eResult)
 	{
@@ -81,10 +81,10 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 			break;
 		}
 
-		glm::vec2 ptNewVertex = grabPointModelList[iVertexIndex].GetPos();
-		ptNewVertex += glm::vec2(vTranslate.x, vTranslate.y);
+		glm::vec2 ptNewVertex = grabPointModelList[iGrabPointIndex].GetPos();
+		ptNewVertex += vDragDelta;
 		pCamera->ProjectToCamera(ptNewVertex, ptNewVertex);
-		m_GrabPointViewList[iVertexIndex]->pos.Set(ptNewVertex);
+		m_GrabPointViewList[iGrabPointIndex]->pos.Set(ptNewVertex);
 
 		glm::vec2 ptEndPoint;
 		if(grabPointModelList.front().IsSelected())
@@ -112,19 +112,19 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 			break;
 		}
 
-		glm::vec2 ptInsertVertex = grabPointModelList[iVertexIndex].GetPos();
-		ptInsertVertex += glm::vec2(vTranslate.x, vTranslate.y);
+		glm::vec2 ptInsertVertex = grabPointModelList[iGrabPointIndex].GetPos();
+		ptInsertVertex += vDragDelta;
 		pCamera->ProjectToCamera(ptInsertVertex, ptInsertVertex);
-		m_GrabPointViewList[iVertexIndex]->pos.Set(ptInsertVertex);
+		m_GrabPointViewList[iGrabPointIndex]->pos.Set(ptInsertVertex);
 
-		glm::vec2 ptConnectPoint1 = grabPointModelList[(iVertexIndex + 1) % grabPointModelList.size()].GetPos();
+		glm::vec2 ptConnectPoint1 = grabPointModelList[(iGrabPointIndex + 1) % grabPointModelList.size()].GetPos();
 		pCamera->ProjectToCamera(ptConnectPoint1, ptConnectPoint1);
 
 		glm::vec2 ptConnectPoint2;
-		if(iVertexIndex == 0)
+		if(iGrabPointIndex == 0)
 			ptConnectPoint2 = grabPointModelList[grabPointModelList.size() - 1].GetPos();
 		else
-			ptConnectPoint2 = grabPointModelList[iVertexIndex - 1].GetPos();
+			ptConnectPoint2 = grabPointModelList[iGrabPointIndex - 1].GetPos();
 		pCamera->ProjectToCamera(ptConnectPoint2, ptConnectPoint2);
 
 		if(m_PrimPreviewList.size() != 2)
@@ -143,9 +143,19 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 		m_PrimPreviewList[1]->SetAsLineSegment(ptInsertVertex, ptConnectPoint2);
 		break; }
 
-	case EDITMODEACTION_HoverGrabPoint:
-			DoHoverGrabPoint(eEditModeState);
-		break;
+	case EDITMODEACTION_HoverGrabPoint: {
+		const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
+		if(iGrabPointIndex < 0 || iGrabPointIndex >= grabPointModelList.size())
+		{
+			HyGuiLog("GfxChainView::DoHoverGrabPoint - invalid m_iGrabPointIndex", LOGTYPE_Error);
+			return;
+		}
+		if(m_pModel->IsHoverGrabPointSelected() == false)
+			HyGuiLog("GfxChainView::DoHoverGrabPoint - Hover vertex not selected on box transform", LOGTYPE_Error);
+
+		// Apply grab point drag logic based on shape type
+
+		break; }
 
 	case EDITMODEACTION_HoverCenter:
 		if(eEditModeState == EDITMODE_MouseDownTransform)
@@ -177,23 +187,4 @@ void GfxChainView::ClearPreviewPrimitives()
 	for(HyPrimitive2d *pPrim : m_PrimPreviewList)
 		delete pPrim;
 	m_PrimPreviewList.clear();
-}
-
-void GfxChainView::DoHoverGrabPoint(EditModeState eEditModeState)
-{
-	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
-	glm::mat4 mtxTransform(1.0f);
-	int iVertexIndex = -1;
-	m_pModel->GetTransformPreview(mtxTransform, iVertexIndex);
-	glm::vec4 vTranslate = mtxTransform[3];
-
-	if(iVertexIndex < 0 || iVertexIndex >= grabPointModelList.size())
-	{
-		HyGuiLog("GfxChainView::DoHoverGrabPoint - invalid m_iVertexIndex", LOGTYPE_Error);
-		return;
-	}
-	if(m_pModel->IsHoverGrabPointSelected() == false)
-		HyGuiLog("GfxChainView::DoHoverGrabPoint - Hover vertex not selected on box transform", LOGTYPE_Error);
-
-	// Apply grab point drag logic based on shape type
 }

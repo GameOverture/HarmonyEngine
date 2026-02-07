@@ -44,7 +44,7 @@ void IGfxEditView::SetModel(IGfxEditModel *pModel)
 	m_pModel->AddView(this);
 }
 
-void IGfxEditView::RefreshView(EditModeState eEditModeState, EditModeAction eResult)
+void IGfxEditView::SyncModel(EditModeState eEditModeState, EditModeAction eResult)
 {
 	if(m_pModel)
 	{
@@ -67,8 +67,13 @@ void IGfxEditView::RefreshView(EditModeState eEditModeState, EditModeAction eRes
 	else
 		ClearGrabPoints();
 
-	DoRefreshView(eEditModeState, eResult);
+	OnSyncModel(eEditModeState, eResult);
 	RefreshColor();
+}
+
+void IGfxEditView::SyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta)
+{
+	OnSyncPreview(eEditModeState, eResult, iGrabPointIndex, vDragDelta);
 }
 
 void IGfxEditView::ClearGrabPoints()

@@ -61,7 +61,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 	}
 }
 
-/*virtual*/ void GfxShapeHyView::DoRefreshView(EditModeState eEditModeState, EditModeAction eResult) /*override*/
+/*virtual*/ void GfxShapeHyView::OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) /*override*/
 {
 	if(m_pModel == nullptr || static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_None)
 	{
@@ -165,15 +165,13 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 		}
 		m_PrimOutline.SetAsLineChain(projectedVertList, static_cast<GfxShapeModel *>(m_pModel)->IsLoopClosed());
 	}
+}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Apply Transform Preview if needed
+/*virtual*/ void GfxShapeHyView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
+{
+	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
+
 	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
-	glm::mat4 mtxTransform(1.0f);
-	int iVertexIndex = -1;
-	m_pModel->GetTransformPreview(mtxTransform, iVertexIndex);
-	glm::vec4 vTranslate = mtxTransform[3];
-
 	switch(eResult)
 	{
 	case EDITMODEACTION_Creation:
@@ -195,10 +193,10 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			break;
 		}
 
-		glm::vec2 ptNewVertex = grabPointModelList[iVertexIndex].GetPos();
-		ptNewVertex += glm::vec2(vTranslate.x, vTranslate.y);
+		glm::vec2 ptNewVertex = grabPointModelList[iGrabPointIndex].GetPos();
+		ptNewVertex += vDragDelta;
 		pCamera->ProjectToCamera(ptNewVertex, ptNewVertex);
-		m_GrabPointViewList[iVertexIndex]->pos.Set(ptNewVertex);
+		m_GrabPointViewList[iGrabPointIndex]->pos.Set(ptNewVertex);
 
 		glm::vec2 ptEndPoint;
 		if(grabPointModelList.front().IsSelected())
@@ -230,19 +228,19 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			break;
 		}
 
-		glm::vec2 ptInsertVertex = grabPointModelList[iVertexIndex].GetPos();
-		ptInsertVertex += glm::vec2(vTranslate.x, vTranslate.y);
+		glm::vec2 ptInsertVertex = grabPointModelList[iGrabPointIndex].GetPos();
+		ptInsertVertex += vDragDelta;
 		pCamera->ProjectToCamera(ptInsertVertex, ptInsertVertex);
-		m_GrabPointViewList[iVertexIndex]->pos.Set(ptInsertVertex);
+		m_GrabPointViewList[iGrabPointIndex]->pos.Set(ptInsertVertex);
 
-		glm::vec2 ptConnectPoint1 = grabPointModelList[(iVertexIndex + 1) % grabPointModelList.size()].GetPos();
+		glm::vec2 ptConnectPoint1 = grabPointModelList[(iGrabPointIndex + 1) % grabPointModelList.size()].GetPos();
 		pCamera->ProjectToCamera(ptConnectPoint1, ptConnectPoint1);
 
 		glm::vec2 ptConnectPoint2;
-		if(iVertexIndex == 0)
+		if(iGrabPointIndex == 0)
 			ptConnectPoint2 = grabPointModelList[grabPointModelList.size() - 1].GetPos();
 		else
-			ptConnectPoint2 = grabPointModelList[iVertexIndex - 1].GetPos();
+			ptConnectPoint2 = grabPointModelList[iGrabPointIndex - 1].GetPos();
 		pCamera->ProjectToCamera(ptConnectPoint2, ptConnectPoint2);
 
 		if(m_PrimPreviewList.size() != 2)
@@ -262,12 +260,12 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 		break; }
 
 	case EDITMODEACTION_HoverGrabPoint:
-		if(eEditModeState == EDITMODE_MouseDownTransform)
-			DoHoverGrabPoint(eEditModeState);
+		if(eEditModeState == EDITMODE_MouseDragTransform)
+			DoGrabPointPreview(eEditModeState, eResult, iGrabPointIndex, vDragDelta);
 		break;
 
 	case EDITMODEACTION_HoverCenter:
-		if(eEditModeState == EDITMODE_MouseDownTransform)
+		if(eEditModeState == EDITMODE_MouseDragTransform)
 		{
 			ClearPreviewPrimitives();
 			for(HyPrimitive2d *pPrim : m_PrimList)
@@ -282,12 +280,13 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			{
 				HyShape2d tmpShape;
 				pPrim->CalcLocalBoundingShape(tmpShape);
+				glm::mat4 mtxTransform = glm::translate(mtxTransform, glm::vec3(vDragDelta, 0.0f));
 				tmpShape.TransformSelf(mtxTransform);
 				pPrim->SetAsShape(tmpShape);
 			}
 			
 			for(GfxGrabPointView *pGrabPtView : m_GrabPointViewList)
-				pGrabPtView->pos.Offset(vTranslate.x, vTranslate.y);
+				pGrabPtView->pos.Offset(vDragDelta);
 		}
 		break;
 	}
@@ -307,21 +306,14 @@ void GfxShapeHyView::ClearPreviewPrimitives()
 	m_PrimPreviewList.clear();
 }
 
-void GfxShapeHyView::DoHoverGrabPoint(EditModeState eEditModeState)
+void GfxShapeHyView::DoGrabPointPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta)
 {
 	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
-	glm::mat4 mtxTransform(1.0f);
-	int iVertexIndex = -1;
-	m_pModel->GetTransformPreview(mtxTransform, iVertexIndex);
-	glm::vec4 vTranslate = mtxTransform[3];
-
-	if(iVertexIndex < 0 || iVertexIndex >= grabPointModelList.size())
+	if(iGrabPointIndex < 0 || iGrabPointIndex >= grabPointModelList.size())
 	{
-		HyGuiLog("GfxShapeHyView::DoHoverGrabPoint - invalid m_iVertexIndex", LOGTYPE_Error);
+		HyGuiLog("GfxShapeHyView::DoHoverGrabPoint - invalid m_iGrabPointIndex", LOGTYPE_Error);
 		return;
 	}
-	if(m_pModel->IsHoverGrabPointSelected() == false)
-		HyGuiLog("GfxShapeHyView::DoHoverGrabPoint - Hover vertex not selected on box transform", LOGTYPE_Error);
 
 	// Apply grab point drag logic based on shape type
 	switch(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType())
@@ -329,9 +321,9 @@ void GfxShapeHyView::DoHoverGrabPoint(EditModeState eEditModeState)
 	case SHAPE_Box: // Lock vertices together to keep box form
 		if(m_pModel->GetNumGrabPointsSelected() == 1)
 		{
-			glm::vec2 ptVertPos = grabPointModelList[iVertexIndex].GetPos();
+			glm::vec2 ptVertPos = grabPointModelList[iGrabPointIndex].GetPos();
 
-			// Find the opposite/locked vertex by iterating over all vertices and finding the one that is farthest from iVertexIndex
+			// Find the opposite/locked vertex by iterating over all vertices and finding the one that is farthest from iGrabPointIndex
 			int iLockedVertIndex = -1;
 			float fMaxDistance = -1.0f;
 			for(int i = 0; i < grabPointModelList.size(); ++i)
@@ -345,10 +337,10 @@ void GfxShapeHyView::DoHoverGrabPoint(EditModeState eEditModeState)
 			}
 
 			// Translate the selected vertex
-			m_GrabPointViewList[iVertexIndex]->pos.Set(ptVertPos + glm::vec2(vTranslate.x, vTranslate.y));
+			m_GrabPointViewList[iGrabPointIndex]->pos.Set(ptVertPos + vDragDelta);
 
 			// Determine the lower/upper bounds based on the selected and locked vertices
-			glm::vec2 ptSelectedVert = m_GrabPointViewList[iVertexIndex]->pos.Get();
+			glm::vec2 ptSelectedVert = m_GrabPointViewList[iGrabPointIndex]->pos.Get();
 			glm::vec2 ptLockedVert = m_GrabPointViewList[iLockedVertIndex]->pos.Get();
 			glm::vec2 ptLowerBound, ptUpperBound;
 			HySetVec(ptLowerBound, ptLockedVert.x < ptSelectedVert.x ? ptLockedVert.x : ptSelectedVert.x, ptLockedVert.y < ptSelectedVert.y ? ptLockedVert.y : ptSelectedVert.y);
@@ -357,7 +349,7 @@ void GfxShapeHyView::DoHoverGrabPoint(EditModeState eEditModeState)
 			// Update the other 2 vertices that aren't the selected or locked
 			for(int i = 0; i < grabPointModelList.size(); ++i)
 			{
-				if(i == iVertexIndex || i == iLockedVertIndex)
+				if(i == iGrabPointIndex || i == iLockedVertIndex)
 					continue;
 
 				glm::vec2 ptCurrentVert = m_GrabPointViewList[i]->pos.Get();

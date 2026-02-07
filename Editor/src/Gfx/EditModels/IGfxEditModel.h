@@ -58,10 +58,8 @@ protected:
 
 	// Transform info
 	EditModeAction						m_eCurAction;
-	glm::mat4							m_mtxTransform;			// The current transform being applied during a mouse operation
 	int									m_iGrabPointIndex;
 	glm::vec2							m_ptGrabPointPos;
-	bool								m_bTransformShiftMod;
 
 	// Track Views manually since we don't inherit from QObject
 	QList<IGfxEditView *>				m_ViewList;
@@ -81,9 +79,7 @@ public:
 
 	void AddView(IGfxEditView *pView);
 	bool RemoveView(IGfxEditView *pView);
-	void RefreshViews(EditModeState eEditModeState, EditModeAction eResult) const;
-
-	void GetTransformPreview(glm::mat4 &mtxTransformOut, int &iGrabPointIndexOut) const;
+	void SyncViews(EditModeState eEditModeState, EditModeAction eResult) const;
 
 	const QList<GfxGrabPointModel> &GetGrabPointList() const;
 	const GfxGrabPointModel &GetGrabPoint(int iIndex) const;
@@ -94,15 +90,15 @@ public:
 	void DeselectAllGrabPoints();
 
 	Qt::CursorShape MouseMoveIdle(EditModeState eEditModeState, glm::vec2 ptWorldMousePos);
-	EditModeAction MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
+	bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
 	void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight);
-	void MouseMoveTransform(EditModeState eEditModeState, bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
+	void MouseTransform(EditModeState eEditModeState, bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
 	virtual QString MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) = 0; // Returns undo command description (blank if no change)
 
 protected:
-	virtual void DoDeserialize(const QList<float> &floatList) = 0;
+	virtual bool DoDeserialize(const QList<float> &floatList) = 0;
 	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) = 0;
-	virtual void DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos) = 0;
+	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) = 0;
 };
 
 #endif // IGfxEditModel_H

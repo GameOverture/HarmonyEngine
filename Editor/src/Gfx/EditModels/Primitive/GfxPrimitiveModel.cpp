@@ -58,7 +58,7 @@ void GfxPrimitiveModel::SetPrimType(QString sNewType)
 		m_ShapeModel.SetShapeType(eNewShape);
 	}
 
-	RefreshViews(EDITMODE_Idle, EDITMODEACTION_None);
+	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 
 /*virtual*/ QList<float> GfxPrimitiveModel::Serialize() const /*override*/
@@ -93,10 +93,10 @@ void GfxPrimitiveModel::SetPrimType(QString sNewType)
 		return m_ChainModel.DoMouseMoveIdle(ptWorldMousePos);
 }
 
-void GfxPrimitiveModel::DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos)
+void GfxPrimitiveModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
 	if(m_bIsShape)
-		return m_ShapeModel.DoTransformCreation(ptStartPos, ptDragPos);
+		return m_ShapeModel.DoTransformCreation(bShiftMod, ptStartPos, ptDragPos);
 	else
-		return m_ChainModel.DoTransformCreation(ptStartPos,ptDragPos);
+		return m_ChainModel.DoTransformCreation(bShiftMod, ptStartPos,ptDragPos);
 }

@@ -195,6 +195,11 @@ b2Capsule HyShape2d::GetAsCapsule() const
 		break; }
 
 	case HYFIXTURE_Circle:
+		if(floatList.size() != 3)
+		{
+			HyLogWarning("HyShape2d::DeserializeSelf recieved an invalid number of floats to deserialize a circle. Expected 3 (center x, center y, radius) but got " << floatList.size());
+			return vertList;
+		}
 		SetAsCircle(glm::vec2(floatList[0], floatList[1]), floatList[2]);
 
 		// Add the circumference grab points (top, right, bottom, left)
@@ -206,6 +211,11 @@ b2Capsule HyShape2d::GetAsCapsule() const
 		break;
 
 	case HYFIXTURE_LineSegment:
+		if(floatList.size() != 4)
+		{
+			HyLogWarning("HyShape2d::DeserializeSelf recieved an invalid number of floats to deserialize a line segment. Expected 4 (point1 x, point1 y, point2 x, point2 y) but got " << floatList.size());
+			return vertList;
+		}
 		vertList.reserve(2);
 		vertList.emplace_back(floatList[0], floatList[1]);
 		vertList.emplace_back(floatList[2], floatList[3]);
@@ -214,6 +224,11 @@ b2Capsule HyShape2d::GetAsCapsule() const
 		break;
 
 	case HYFIXTURE_Capsule: {
+		if(floatList.size() != 5)
+		{
+			HyLogWarning("HyShape2d::DeserializeSelf recieved an invalid number of floats to deserialize a capsule. Expected 5 (center1 x, center1 y, center2 x, center2 y, radius) but got " << floatList.size());
+			return vertList;
+		}
 		vertList.reserve(6);
 		vertList.emplace_back(floatList[0], floatList[1]);
 		vertList.emplace_back(floatList[2], floatList[3]);

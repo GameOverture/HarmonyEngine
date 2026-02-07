@@ -33,10 +33,18 @@ GfxPrimitiveView::GfxPrimitiveView(HyEntity2d *pParent /*= nullptr*/) :
 		m_ChainView.RefreshColor();
 }
 
-/*virtual*/ void GfxPrimitiveView::DoRefreshView(EditModeState eEditModeState, EditModeAction eResult) /*override*/
+/*virtual*/ void GfxPrimitiveView::OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) /*override*/
 {
 	if(static_cast<GfxPrimitiveModel *>(m_pModel)->IsShapeModel())
-		m_ShapeView.DoRefreshView(eEditModeState, eResult);
+		m_ShapeView.OnSyncModel(eEditModeState, eResult);
 	else
-		m_ChainView.DoRefreshView(eEditModeState, eResult);
+		m_ChainView.OnSyncModel(eEditModeState, eResult);
+}
+
+/*virtual*/ void GfxPrimitiveView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
+{
+	if(static_cast<GfxPrimitiveModel *>(m_pModel)->IsShapeModel())
+		m_ShapeView.OnSyncPreview(eEditModeState, eResult, iGrabPointIndex, vDragDelta);
+	else
+		m_ChainView.OnSyncPreview(eEditModeState, eResult, iGrabPointIndex, vDragDelta);
 }

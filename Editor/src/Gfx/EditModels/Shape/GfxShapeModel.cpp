@@ -130,7 +130,7 @@ void GfxShapeModel::TransformData(glm::mat4 mtxTransform)
 	for(HyShape2d *pFixture : m_ShapeList)
 		pFixture->TransformSelf(mtxTransform);
 
-	RefreshViews(EDITMODE_Idle, EDITMODEACTION_None);
+	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 
 int GfxShapeModel::GetNumShapeFixtures() const
@@ -192,10 +192,8 @@ bool GfxShapeModel::IsLoopClosed() const
 	return sUndoText;
 }
 
-/*virtual*/ void GfxShapeModel::DoDeserialize(const QList<float> &floatList) /*override*/
+/*virtual*/ bool GfxShapeModel::DoDeserialize(const QList<float> &floatList) /*override*/
 {
-	// NOTE: GfxShapeModel::DoDeserialize assumes the m_eShapeType has already been set appropriately and will work with the data in `floatList`
-
 	if(m_ShapeList.empty())
 		m_ShapeList.push_back(new HyShape2d());
 
@@ -415,10 +413,10 @@ bool GfxShapeModel::IsLoopClosed() const
 	return EDITMODEACTION_Outside;
 }
 
-void GfxShapeModel::DoTransformCreation(glm::vec2 ptStartPos, glm::vec2 ptDragPos)
+void GfxShapeModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
 	glm::vec2 ptLowerBound, ptUpperBound, ptCenter;
-	if(m_bTransformShiftMod)
+	if(bShiftMod)
 	{
 		ptCenter = ptStartPos;
 
