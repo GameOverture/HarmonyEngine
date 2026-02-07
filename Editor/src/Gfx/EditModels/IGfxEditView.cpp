@@ -10,11 +10,11 @@
 #include "Global.h"
 #include "IGfxEditView.h"
 #include "IGfxEditModel.h"
-#include "GfxGrabPointView.h"
 
 IGfxEditView::IGfxEditView(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
-	m_pModel(nullptr)
+	m_pModel(nullptr),
+	m_CenterGrabPoint(this)
 {
 }
 
@@ -44,7 +44,7 @@ void IGfxEditView::SetModel(IGfxEditModel *pModel)
 	m_pModel->AddView(this);
 }
 
-void IGfxEditView::SyncModel(EditModeState eEditModeState, EditModeAction eResult)
+void IGfxEditView::SyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction)
 {
 	if(m_pModel)
 	{
@@ -63,17 +63,23 @@ void IGfxEditView::SyncModel(EditModeState eEditModeState, EditModeAction eResul
 			m_GrabPointViewList[i]->Sync(&grabPointModelList[i]);
 			m_GrabPointViewList[i]->SetVisible(eEditModeState != EDITMODE_Off);
 		}
+
+		m_CenterGrabPoint.Sync(&m_pModel->GetCenterGrabPoint());
+		m_CenterGrabPoint.SetVisible(eEditModeState != EDITMODE_Off);
 	}
 	else
+	{
 		ClearGrabPoints();
+		ClearPreview();
+	}
 
-	OnSyncModel(eEditModeState, eResult);
-	RefreshColor();
+	OnSyncModel(eEditModeState, eEditModeAction);
+	SyncColor();
 }
 
-void IGfxEditView::SyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta)
+void IGfxEditView::SyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta)
 {
-	OnSyncPreview(eEditModeState, eResult, iGrabPointIndex, vDragDelta);
+	OnSyncPreview(eEditModeState, eEditModeAction, iGrabPointIndex, vDragDelta);
 }
 
 void IGfxEditView::ClearGrabPoints()

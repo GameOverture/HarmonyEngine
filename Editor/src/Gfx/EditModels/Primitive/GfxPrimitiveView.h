@@ -24,7 +24,8 @@ public:
 	GfxPrimitiveView(HyEntity2d *pParent = nullptr);
 	virtual ~GfxPrimitiveView();
 
-	virtual void RefreshColor() override;
+	virtual void SyncColor() override;
+	virtual void ClearPreview() override;
 
 protected:
 	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) override;

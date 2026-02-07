@@ -58,7 +58,7 @@ protected:
 
 	QString								m_sMalformedReason;		// If not empty, this edit model is considered invalid and the reason is given by this string (e.g. "Polygon has intersecting edges")
 
-	// Transform info
+	// Transform Action info
 	EditModeAction						m_eCurAction;
 	glm::vec2							m_vDragDelta;
 	int									m_iGrabPointIndex;
@@ -99,6 +99,7 @@ public:
 	
 	virtual QString GetActionText(QString sNodeCodeName) const = 0; // Returns undo command description (blank if no change)
 	virtual QList<float> GetActionSerialized() const = 0;
+	void ClearAction();
 
 protected:
 	virtual QString DoDeserialize(const QList<float> &floatList) = 0; // Returns empty string if successful, otherwise returns reason for failure (e.g. "Polygon has intersecting edges")

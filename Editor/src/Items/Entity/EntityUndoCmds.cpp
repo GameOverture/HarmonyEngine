@@ -547,13 +547,15 @@ EntityUndoCmd_AddFixture::EntityUndoCmd_AddFixture(ProjectItemData &entityItemRe
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_EditModelData::EntityUndoCmd_EditModelData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pEntityItemData, QString sCategoryName, QString sPropName, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_EditModelData::EntityUndoCmd_EditModelData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pEntityItemData, const QList<float> &newDataList, QString sCategoryName, QString sPropName, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_iStateIndex(iStateIndex),
 	m_iFrameIndex(iFrameIndex),
 	m_pEntityItemData(pEntityItemData),
 	m_sCategoryName(sCategoryName),
-	m_sPropName(sPropName)
+	m_sPropName(sPropName),
+	m_NewData(newDataList),
+	m_bHadOldData(false)
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
 	
@@ -566,7 +568,6 @@ EntityUndoCmd_EditModelData::EntityUndoCmd_EditModelData(QString sText, ProjectI
 			m_OldData.append(static_cast<float>(val.toDouble()));
 	}
 
-	m_NewData = m_pEntityItemData->GetEditModel()->GetActionSerialized();
 	setText(sText);
 }
 

@@ -180,12 +180,12 @@ class EntityUndoCmd_EditModelData : public QUndoCommand
 	QString							m_sCategoryName;
 	QString							m_sPropName;
 	
+	QList<float>					m_NewData;
 	bool							m_bHadOldData;
 	QList<float>					m_OldData;
-	QList<float>					m_NewData;
 
 public:
-	EntityUndoCmd_EditModelData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pEntityItemData, QString sCategoryName, QString sPropName, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_EditModelData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pEntityItemData, const QList<float> &newDataList, QString sCategoryName, QString sPropName, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_EditModelData();
 
 	virtual void redo() override;

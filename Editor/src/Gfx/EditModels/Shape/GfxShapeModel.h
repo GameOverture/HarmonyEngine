@@ -46,7 +46,7 @@ public:
 
 	bool IsLoopClosed() const;
 
-	virtual QString GetActionText(QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
+	virtual QString GetActionText(QString sNodeCodeName) const override;	// Returns undo command description (blank if no change)
 	virtual QList<float> GetActionSerialized() const override;
 
 protected:

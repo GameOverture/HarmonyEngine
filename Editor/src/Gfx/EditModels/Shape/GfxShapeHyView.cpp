@@ -25,10 +25,10 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 /*virtual*/ GfxShapeHyView::~GfxShapeHyView()
 {
 	ClearPrimitives();
-	ClearPreviewPrimitives();
+	ClearPreview();
 }
 
-/*virtual*/ void GfxShapeHyView::RefreshColor() /*override*/
+/*virtual*/ void GfxShapeHyView::SyncColor() /*override*/
 {
 	if(m_pModel == nullptr)
 		return;
@@ -61,13 +61,19 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 	}
 }
 
+/*virtual*/ void GfxShapeHyView::ClearPreview() /*override*/
+{
+	for(HyPrimitive2d *pPrim : m_PrimPreviewList)
+		delete pPrim;
+	m_PrimPreviewList.clear();
+}
+
 /*virtual*/ void GfxShapeHyView::OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) /*override*/
 {
 	if(m_pModel == nullptr || static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_None)
 	{
 		ClearPrimitives();
 		m_PrimOutline.SetAsNothing();
-		ClearPreviewPrimitives();
 		return;
 	}
 	
@@ -167,12 +173,12 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 	}
 }
 
-/*virtual*/ void GfxShapeHyView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
+/*virtual*/ void GfxShapeHyView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
 {
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
 
 	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
-	switch(eResult)
+	switch(eEditModeAction)
 	{
 	case EDITMODEACTION_Creation:
 		break;
@@ -192,7 +198,16 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			HyGuiLog("GfxShapeHyView::RefreshView called with closed loop (or grab points empty)", LOGTYPE_Error);
 			break;
 		}
-
+		if(m_PrimPreviewList.empty())
+		{
+			m_PrimPreviewList.append(new HyPrimitive2d(this));
+			m_PrimPreviewList[0]->UseWindowCoordinates();
+			m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
+			m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
+		}
+		if(m_PrimPreviewList.size() != 1)
+			HyGuiLog("GfxShapeHyView::RefreshView - EDITMODEACTION_AppendVertex - m_PrimPreviewList should have exactly 1 primitive", LOGTYPE_Error);
+		
 		glm::vec2 ptNewVertex = grabPointModelList[iGrabPointIndex].GetPos();
 		ptNewVertex += vDragDelta;
 		pCamera->ProjectToCamera(ptNewVertex, ptNewVertex);
@@ -204,15 +219,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 		else
 			ptEndPoint = grabPointModelList.back().GetPos();
 		pCamera->ProjectToCamera(ptEndPoint, ptEndPoint);
-
-		if(m_PrimPreviewList.size() != 1)
-		{
-			ClearPreviewPrimitives();
-			m_PrimPreviewList.append(new HyPrimitive2d(this));
-		}
-		m_PrimPreviewList[0]->UseWindowCoordinates();
-		m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-		m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
+		
 		m_PrimPreviewList[0]->SetAsLineSegment(ptNewVertex, ptEndPoint);
 		break; }
 
@@ -227,6 +234,20 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			HyGuiLog("GfxShapeHyView::RefreshView called with less than 2 grab points", LOGTYPE_Error);
 			break;
 		}
+		if(m_PrimPreviewList.empty())
+		{
+			m_PrimPreviewList.append(new HyPrimitive2d(this));
+			m_PrimPreviewList.append(new HyPrimitive2d(this));
+
+			m_PrimPreviewList[0]->UseWindowCoordinates();
+			m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
+			m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
+			m_PrimPreviewList[1]->UseWindowCoordinates();
+			m_PrimPreviewList[1]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
+			m_PrimPreviewList[1]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
+		}
+		if(m_PrimPreviewList.size() != 2)
+			HyGuiLog("GfxShapeHyView::RefreshView - EDITMODEACTION_InsertVertex - m_PrimPreviewList should have exactly 2 primitives", LOGTYPE_Error);
 
 		glm::vec2 ptInsertVertex = grabPointModelList[iGrabPointIndex].GetPos();
 		ptInsertVertex += vDragDelta;
@@ -242,32 +263,21 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 		else
 			ptConnectPoint2 = grabPointModelList[iGrabPointIndex - 1].GetPos();
 		pCamera->ProjectToCamera(ptConnectPoint2, ptConnectPoint2);
-
-		if(m_PrimPreviewList.size() != 2)
-		{
-			ClearPreviewPrimitives();
-			m_PrimPreviewList.append(new HyPrimitive2d(this));
-			m_PrimPreviewList.append(new HyPrimitive2d(this));
-		}
-		m_PrimPreviewList[0]->UseWindowCoordinates();
-		m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-		m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
+		
 		m_PrimPreviewList[0]->SetAsLineSegment(ptInsertVertex, ptConnectPoint1);
-		m_PrimPreviewList[1]->UseWindowCoordinates();
-		m_PrimPreviewList[1]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-		m_PrimPreviewList[1]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
 		m_PrimPreviewList[1]->SetAsLineSegment(ptInsertVertex, ptConnectPoint2);
 		break; }
 
 	case EDITMODEACTION_HoverGrabPoint:
 		if(eEditModeState == EDITMODE_MouseDragTransform)
-			DoGrabPointPreview(eEditModeState, eResult, iGrabPointIndex, vDragDelta);
+			DoGrabPointPreview(eEditModeState, eEditModeAction, iGrabPointIndex, vDragDelta);
 		break;
 
 	case EDITMODEACTION_HoverCenter:
 		if(eEditModeState == EDITMODE_MouseDragTransform)
 		{
-			ClearPreviewPrimitives();
+			
+
 			for(HyPrimitive2d *pPrim : m_PrimList)
 			{
 				m_PrimPreviewList.append(new HyPrimitive2d(this));
@@ -299,14 +309,7 @@ void GfxShapeHyView::ClearPrimitives()
 	m_PrimList.clear();
 }
 
-void GfxShapeHyView::ClearPreviewPrimitives()
-{
-	for(HyPrimitive2d *pPrim : m_PrimPreviewList)
-		delete pPrim;
-	m_PrimPreviewList.clear();
-}
-
-void GfxShapeHyView::DoGrabPointPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta)
+void GfxShapeHyView::DoGrabPointPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta)
 {
 	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
 	if(iGrabPointIndex < 0 || iGrabPointIndex >= grabPointModelList.size())

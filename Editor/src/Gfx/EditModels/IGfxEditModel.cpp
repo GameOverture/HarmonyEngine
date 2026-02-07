@@ -15,8 +15,10 @@ IGfxEditModel::IGfxEditModel(EditModeType eModelType, HyColor color) :
 	m_GrabPointCenter(GRABPOINT_Center),
 	m_eCurAction(EDITMODEACTION_None),
 	m_vDragDelta(0.0f, 0.0f),
-	m_iGrabPointIndex(-1)
+	m_iGrabPointIndex(-1),
+	m_ptGrabPointPos(0.0f, 0.0f)
 {
+	ClearAction();
 	SetColor(color);
 }
 
@@ -37,9 +39,8 @@ HyColor IGfxEditModel::GetColor() const
 void IGfxEditModel::SetColor(HyColor color)
 {
 	m_Color = color;
-
 	for(IGfxEditView *pView : m_ViewList)
-		pView->RefreshColor();
+		pView->SyncColor();
 }
 
 void IGfxEditModel::Deserialize(const QList<float> &floatList)
@@ -233,4 +234,14 @@ void IGfxEditModel::MouseTransform(EditModeState eEditModeState, bool bShiftMod,
 	SyncViews(eEditModeState, m_eCurAction);
 	for(IGfxEditView *pView : m_ViewList)
 		pView->SyncPreview(eEditModeState, m_eCurAction, m_iGrabPointIndex, m_vDragDelta);
+}
+
+void IGfxEditModel::ClearAction()
+{
+	m_eCurAction = EDITMODEACTION_None;
+	m_vDragDelta = glm::vec2(0.0f, 0.0f);
+	m_iGrabPointIndex = -1;
+	m_ptGrabPointPos = glm::vec2(0.0f, 0.0f);
+	for(IGfxEditView *pView : m_ViewList)
+		pView->ClearPreview();
 }

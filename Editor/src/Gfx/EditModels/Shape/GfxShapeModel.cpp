@@ -64,10 +64,7 @@ EditorShape GfxShapeModel::GetShapeType() const
 
 void GfxShapeModel::SetShapeType(EditorShape eNewShape, QList<float> floatList)
 {
-	if(m_eShapeType == eNewShape)
-		return;
-
-	if(floatList.empty() == false)
+	if(floatList.empty())
 	{
 		// Convert existing data to new shape type
 		switch(eNewShape)

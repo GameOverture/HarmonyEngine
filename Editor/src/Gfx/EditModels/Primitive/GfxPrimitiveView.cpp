@@ -22,15 +22,21 @@ GfxPrimitiveView::GfxPrimitiveView(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-/*virtual*/ void GfxPrimitiveView::RefreshColor() /*override*/
+/*virtual*/ void GfxPrimitiveView::SyncColor() /*override*/
 {
 	if(m_pModel == nullptr)
 		return;
 
 	if(static_cast<GfxPrimitiveModel *>(m_pModel)->IsShapeModel())
-		m_ShapeView.RefreshColor();
+		m_ShapeView.SyncColor();
 	else
-		m_ChainView.RefreshColor();
+		m_ChainView.SyncColor();
+}
+
+/*virtual*/ void GfxPrimitiveView::ClearPreview() /*override*/
+{
+	m_ShapeView.ClearPreview();
+	m_ChainView.ClearPreview();
 }
 
 /*virtual*/ void GfxPrimitiveView::OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) /*override*/

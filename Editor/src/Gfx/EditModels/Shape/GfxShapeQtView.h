@@ -27,14 +27,15 @@ public:
 	GfxShapeQtView(QGraphicsItem *pParent = nullptr);
 	virtual ~GfxShapeQtView();
 
-	virtual void RefreshColor() override;
+	virtual void SyncColor() override;
+	virtual void ClearPreview() override;
 
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) override;
 	
 protected:
-	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) override;
-	virtual void OnSyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta) override;
+	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) override;
+	virtual void OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) override;
 };
 
 #endif // GfxShapeQtView_H

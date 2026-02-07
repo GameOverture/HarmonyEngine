@@ -264,7 +264,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				}
 			}
 
-			QUndoCommand *pCmd = new EntityUndoCmd_EditModelData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, sCategoryName, "Data");
+			QUndoCommand *pCmd = new EntityUndoCmd_EditModelData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pTreeItemData->GetEditModel()->GetActionSerialized(), sCategoryName, "Data");
 			m_pProjItem->GetUndoStack()->push(pCmd);
 		}
 		break; }
@@ -273,6 +273,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		HyGuiLog("EntityDraw::OnMousePressEvent - Unhandled EditModeState reached!", LOGTYPE_Error);
 		break;
 	}
+
+	pTreeItemData->GetEditModel()->ClearAction();
 
 	// This is to reset the cursor and edit model based on where the mouse is now that the mouse button has been released
 	glm::vec2 ptCurMousePos;

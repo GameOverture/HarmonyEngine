@@ -23,10 +23,10 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 
 /*virtual*/ GfxChainView::~GfxChainView()
 {
-	ClearPreviewPrimitives();
+	ClearPreview();
 }
 
-/*virtual*/ void GfxChainView::RefreshColor() /*override*/
+/*virtual*/ void GfxChainView::SyncColor() /*override*/
 {
 	if(m_pModel == nullptr)
 		return;
@@ -34,12 +34,18 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 	m_PrimOutline.SetTint(m_pModel->GetColor());
 }
 
-/*virtual*/ void GfxChainView::OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) /*override*/
+/*virtual*/ void GfxChainView::ClearPreview() /*override*/
+{
+	for(HyPrimitive2d *pPrim : m_PrimPreviewList)
+		delete pPrim;
+	m_PrimPreviewList.clear();
+}
+
+/*virtual*/ void GfxChainView::OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) /*override*/
 {
 	if(m_pModel == nullptr)
 	{
 		m_PrimOutline.SetAsNothing();
-		ClearPreviewPrimitives();
 		return;
 	}
 	
@@ -59,13 +65,13 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 	m_PrimOutline.SetAsLineChain(projectedVertList, chainDataRef.bLoop);
 }
 
-/*virtual*/ void GfxChainView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
+/*virtual*/ void GfxChainView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
 {
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
 
 	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
 
-	switch(eResult)
+	switch(eEditModeAction)
 	{
 	case EDITMODEACTION_Creation:
 		break;
@@ -80,6 +86,15 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 			HyGuiLog("GfxChainView::RefreshView called with closed loop (or grab points empty)", LOGTYPE_Error);
 			break;
 		}
+		if(m_PrimPreviewList.empty())
+		{
+			m_PrimPreviewList.append(new HyPrimitive2d(this));
+			m_PrimPreviewList[0]->UseWindowCoordinates();
+			m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
+			m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
+		}
+		if(m_PrimPreviewList.size() != 1)
+			HyGuiLog("GfxChainView::RefreshView - EDITMODEACTION_AppendVertex - invalid m_PrimPreviewList size", LOGTYPE_Error);
 
 		glm::vec2 ptNewVertex = grabPointModelList[iGrabPointIndex].GetPos();
 		ptNewVertex += vDragDelta;
@@ -93,14 +108,6 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 			ptEndPoint = grabPointModelList.back().GetPos();
 		pCamera->ProjectToCamera(ptEndPoint, ptEndPoint);
 
-		if(m_PrimPreviewList.size() != 1)
-		{
-			ClearPreviewPrimitives();
-			m_PrimPreviewList.append(new HyPrimitive2d(this));
-		}
-		m_PrimPreviewList[0]->UseWindowCoordinates();
-		m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-		m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
 		m_PrimPreviewList[0]->SetAsLineSegment(ptNewVertex, ptEndPoint);
 		break; }
 
@@ -111,6 +118,20 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 			HyGuiLog("GfxChainView::RefreshView called with less than 2 grab points", LOGTYPE_Error);
 			break;
 		}
+		if(m_PrimPreviewList.empty())
+		{
+			m_PrimPreviewList.append(new HyPrimitive2d(this));
+			m_PrimPreviewList.append(new HyPrimitive2d(this));
+
+			m_PrimPreviewList[0]->UseWindowCoordinates();
+			m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
+			m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
+			m_PrimPreviewList[1]->UseWindowCoordinates();
+			m_PrimPreviewList[1]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
+			m_PrimPreviewList[1]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
+		}
+		if(m_PrimPreviewList.size() != 2)
+			HyGuiLog("GfxChainView::RefreshView - EDITMODEACTION_InsertVertex - expected m_PrimPreviewList to have exactly 2 primitives", LOGTYPE_Error);
 
 		glm::vec2 ptInsertVertex = grabPointModelList[iGrabPointIndex].GetPos();
 		ptInsertVertex += vDragDelta;
@@ -127,19 +148,7 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 			ptConnectPoint2 = grabPointModelList[iGrabPointIndex - 1].GetPos();
 		pCamera->ProjectToCamera(ptConnectPoint2, ptConnectPoint2);
 
-		if(m_PrimPreviewList.size() != 2)
-		{
-			ClearPreviewPrimitives();
-			m_PrimPreviewList.append(new HyPrimitive2d(this));
-			m_PrimPreviewList.append(new HyPrimitive2d(this));
-		}
-		m_PrimPreviewList[0]->UseWindowCoordinates();
-		m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-		m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
 		m_PrimPreviewList[0]->SetAsLineSegment(ptInsertVertex, ptConnectPoint1);
-		m_PrimPreviewList[1]->UseWindowCoordinates();
-		m_PrimPreviewList[1]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-		m_PrimPreviewList[1]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
 		m_PrimPreviewList[1]->SetAsLineSegment(ptInsertVertex, ptConnectPoint2);
 		break; }
 
@@ -180,11 +189,4 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 		}
 		break;
 	}
-}
-
-void GfxChainView::ClearPreviewPrimitives()
-{
-	for(HyPrimitive2d *pPrim : m_PrimPreviewList)
-		delete pPrim;
-	m_PrimPreviewList.clear();
 }

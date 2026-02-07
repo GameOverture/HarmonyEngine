@@ -12,8 +12,7 @@
 
 #include "Global.h"
 #include "IGfxEditModel.h"
-
-class GfxGrabPointView;
+#include "GfxGrabPointView.h"
 
 class IGfxEditView : public HyEntity2d
 {
@@ -21,6 +20,7 @@ protected:
 	IGfxEditModel *				m_pModel;
 
 	QList<GfxGrabPointView *>	m_GrabPointViewList;	// Project to window coordinates
+	GfxGrabPointView			m_CenterGrabPoint;
 
 public:
 	IGfxEditView(HyEntity2d *pParent = nullptr);
@@ -29,15 +29,16 @@ public:
 	IGfxEditModel *GetModel() const;
 	void SetModel(IGfxEditModel *pModel);
 
-	virtual void RefreshColor() = 0;
-	void SyncModel(EditModeState eEditModeState, EditModeAction eResult);
-	void SyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta);
+	virtual void SyncColor() = 0;
+	void SyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction);
+	void SyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta);
+	virtual void ClearPreview() = 0;
 
 	void ClearGrabPoints();
 
 protected:
-	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) = 0;
-	virtual void OnSyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta) = 0;
+	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) = 0;
+	virtual void OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) = 0;
 };
 
 #endif // IGfxEditView_H
