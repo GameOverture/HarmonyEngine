@@ -102,7 +102,7 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 		RefreshTransforms();
 	}
 
-	DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+	DoMouseMove(QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ControlModifier), QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::AltModifier));
 }
 
 /*virtual*/ void IDrawEx::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/
@@ -113,7 +113,7 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 		RefreshTransforms();
 
 	if(pEvent->key() == Qt::Key_Control || pEvent->key() == Qt::Key_Shift)
-		DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+		DoMouseMove(QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ControlModifier), QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::AltModifier));
 
 	if(pEvent->isAutoRepeat() == false &&
 		(pEvent->key() == Qt::Key_Left ||
@@ -138,7 +138,7 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 	if(IsCameraPanning())
 		RefreshTransforms();
 
-	DoMouseMove(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier), pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+	DoMouseMove(QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ControlModifier), QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::AltModifier));
 }
 
 /*virtual*/ void IDrawEx::OnMousePressEvent(QMouseEvent *pEvent) /*override*/
@@ -186,7 +186,7 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 						QList<IDrawExItem *> selectList;
 						selectList << m_pCurHoverItem;
 
-						if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
+						if(QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier))
 							selectList += m_SelectedItemList;
 
 						OnRequestSelection(selectList);
@@ -226,7 +226,7 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 
 			if(m_bSelectionHandled == false)
 			{
-				if(pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier) == false)
+				if(QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier) == false)
 					OnRequestSelection(affectedItemList);
 				else
 				{
@@ -290,10 +290,10 @@ void IDrawEx::ClearHover()
 /*virtual*/ void IDrawEx::OnCameraUpdated() /*override*/
 {
 	RefreshTransforms();
-	DoMouseMove(QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ControlModifier), QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+	DoMouseMove(QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ControlModifier), QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier), QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::AltModifier));
 }
 
-void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
+void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 {
 	glm::vec2 ptWorldMousePos;
 	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
@@ -312,7 +312,7 @@ void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod)
 	else if(IsActionTransforming())
 	{
 		if(GetCurAction() != HYACTION_TransformingNudging)
-			DoMouseMove_Transform(bCtrlMod, bShiftMod);
+			DoMouseMove_Transform(bCtrlMod, bShiftMod, bAltMod);
 	}
 	else
 	{
@@ -511,40 +511,57 @@ void IDrawEx::BeginTransform()
 		SetAction(HYACTION_TransformingTranslate);
 }
 
-void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
+void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 {
 	glm::vec2 ptWorldMousePos;
 	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
 
+	glm::vec2 ptItemWorldPos(0.0f, 0.0f);
 	GfxTransformCtrl *pCurTransform = nullptr;
 	IDrawExItem *pSingleItem = nullptr;
 	if(m_MultiTransform.IsShown())
+	{
 		pCurTransform = &m_MultiTransform;
+		ptItemWorldPos = m_MultiTransform.GetGrabPointWorldPos(GfxTransformCtrl::GRAB_BotLeft);
+	}
 	else
 	{
 		pSingleItem = m_SelectedItemList[0];
 		pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
+
+		glm::mat4 mtxScene = m_SelectedItemList[0]->GetHyNode()->GetSceneTransform(0.0f);
+		HySetVec(ptItemWorldPos, mtxScene[3].x, mtxScene[3].y);
 	}
 
 	// Process the transform
 	switch(GetCurAction())
 	{
-	case HYACTION_TransformingRotation:
-		m_ActiveTransform.rot_pivot.Set(m_ptDragCenter);
+	case HYACTION_TransformingRotation: {
+		float fRot = 0.0f;
+		if(bCtrlMod)
+		{
+			fRot = HyMath::AngleFromVector(ptItemWorldPos - ptWorldMousePos) - HyMath::AngleFromVector(ptItemWorldPos - m_ptDragStart);
+			m_ActiveTransform.rot_pivot.Set(ptItemWorldPos);
+		}
+		else
+		{
+			fRot = HyMath::AngleFromVector(m_ptDragCenter - ptWorldMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart);
+			m_ActiveTransform.rot_pivot.Set(m_ptDragCenter);
+		}
+
 		if(bShiftMod)
 		{
-			float fRot = HyMath::AngleFromVector(m_ptDragCenter - ptWorldMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart);
-
 			if(m_ActiveTransform.ChildCount() == 1)
 				m_ActiveTransform.ChildGet(0)->rot.Set(HyMath::RoundToNearest(m_ActiveTransform.ChildGet(0)->rot.Get(), 15.0f));
 
 			m_ActiveTransform.rot.Set(HyMath::RoundToNearest(fRot, 15.0f));
 		}
 		else
-			m_ActiveTransform.rot.Set(HyMath::Round(HyMath::AngleFromVector(m_ptDragCenter - ptWorldMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart)));
-		break;
+			m_ActiveTransform.rot.Set(HyMath::Round(fRot));
+		break; }
 
-	case HYACTION_TransformingTranslate:
+	case HYACTION_TransformingTranslate: {
+		glm::vec2 ptDestination = m_ActiveTransform.pos.Get();
 		if(bShiftMod)
 		{
 			glm::vec2 ptTarget = ptWorldMousePos;
@@ -572,11 +589,16 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 				}
 			}
 
-			m_ActiveTransform.pos.Set(HyMath::RoundVec(ptClosest - m_ptDragCenter));
+			ptDestination = HyMath::RoundVec(ptClosest - m_ptDragCenter);
 		}
 		else
-			m_ActiveTransform.pos.Set(HyMath::RoundVec(ptWorldMousePos - m_ptDragStart));
-		break;
+			ptDestination = HyMath::RoundVec(ptWorldMousePos - m_ptDragStart);
+
+		//if(bCtrlMod)
+		//	HySetVec(ptDestination, HyMath::RoundToNearest(ptDestination.x, GetPrecisionGridSize()), HyMath::RoundToNearest(ptDestination.y, GetPrecisionGridSize()));
+
+		m_ActiveTransform.pos.Set(ptDestination);
+		break; }
 
 	case HYACTION_TransformingScale: {
 		bool bUniformScale = true;
@@ -711,16 +733,28 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod)
 
 	RefreshTransforms(); // Need to refreshTransforms first here because m_ActiveTransform was updated, and pCurTransform might be used below
 
-	if(GetCurAction() != HYACTION_TransformingScale)
+	if(GetCurAction() == HYACTION_TransformingTranslate)
 	{
-		SnapCandidates snapCandidates;
-		GetSnapCandidateList(snapCandidates);
-		if(snapCandidates.IsEmpty() == false && GetCurAction() != HYACTION_TransformingRotation) 
+		if(bCtrlMod) // Override snapping when Ctrl is held (snap to precision grid)
 		{
-			glm::vec2 vSnapOffset = SnapTransform(snapCandidates, pCurTransform);
-			m_ActiveTransform.pos.Offset(vSnapOffset);
+			ptItemWorldPos = m_ActiveTransform.pos.Get() + ptItemWorldPos;
+
+			glm::vec2 vGridSnapOffset(HyMath::RoundToNearest(ptItemWorldPos.x, GetPrecisionGridSize()) - ptItemWorldPos.x, HyMath::RoundToNearest(ptItemWorldPos.y, GetPrecisionGridSize()) - ptItemWorldPos.y);
+			m_ActiveTransform.pos.Offset(vGridSnapOffset);
 
 			RefreshTransforms();
+		}
+		else
+		{
+			SnapCandidates snapCandidates;
+			GetSnapCandidateList(snapCandidates);
+			if(snapCandidates.IsEmpty() == false)
+			{
+				glm::vec2 vSnapOffset = SnapTransform(snapCandidates, pCurTransform);
+				m_ActiveTransform.pos.Offset(vSnapOffset);
+
+				RefreshTransforms();
+			}
 		}
 	}
 }
@@ -872,4 +906,10 @@ glm::vec2 IDrawEx::SnapTransform(const SnapCandidates &snapCandidatesRef, GfxTra
 	}
 
 	return vSnapOffset;
+}
+
+float IDrawEx::GetPrecisionGridSize() const
+{
+	// TODO: Make this customizable by the user
+	return 5.0f;
 }

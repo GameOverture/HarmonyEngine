@@ -97,16 +97,18 @@ protected:
 
 	virtual void OnRequestSelection(QList<IDrawExItem *> selectionList) = 0;
 
-	void DoMouseMove(bool bCtrlMod, bool bShiftMod);
+	void DoMouseMove(bool bCtrlMod, bool bShiftMod, bool bAltMod);
 
 	bool SetTransformHoverActionViaGrabPoint(GfxTransformCtrl::GrabPointType eGrabPoint, float fRotation);
 	void BeginTransform();
 
-	void DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod);
+	void DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod);
 	void DoMouseRelease_Transform();
 
 	void GetSnapCandidateList(SnapCandidates &snapCandidatesOut); // Gather snapping candidates using the snapping settings and items from m_ItemList
 	glm::vec2 SnapTransform(const SnapCandidates &snapCandidatesRef, GfxTransformCtrl *pCurTransform);
+
+	float GetPrecisionGridSize() const;
 
 	virtual void OnPerformTransform() = 0;
 };

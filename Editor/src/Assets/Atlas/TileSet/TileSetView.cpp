@@ -20,6 +20,7 @@
 #include <QScrollBar>
 #include <QGraphicsItem>
 #include <QMouseEvent>
+#include <QApplication>
 
 TileSetView::TileSetView(QWidget *pParent /*= nullptr*/) :
 	CommonGfxView(pParent),
@@ -178,7 +179,8 @@ void TileSetView::ResetCamera(TileSetPage ePage)
 
 			case TILESETPAGE_Arrange:
 				TileSetGfxItem *pHoveredSetupItem = GetScene()->GetGfxTile(GetScene()->IsPointInTile(mapToScene(m_ptDragStart)));
-				if ((pEvent->modifiers() & Qt::ShiftModifier) == 0 && pHoveredSetupItem)
+				
+				if (QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier) == false && pHoveredSetupItem)
 				{
 					if (pHoveredSetupItem->IsSelected() == false)
 					{

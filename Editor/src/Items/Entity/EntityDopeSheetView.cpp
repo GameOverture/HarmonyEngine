@@ -19,6 +19,7 @@
 #include <QScrollBar>
 #include <QGraphicsItem>
 #include <QMouseEvent>
+#include <QApplication>
 
 EntityDopeSheetView::EntityDopeSheetView(QWidget *pParent /*= nullptr*/) :
 	CommonGfxView(pParent),
@@ -519,7 +520,7 @@ ctor_to_frame0:
 		}
 		else
 		{
-			bool bShiftPressed = pEvent->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier);
+			bool bShiftPressed = QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier);
 
 			QItemSelectionModel::SelectionFlags flags = bShiftPressed ? QItemSelectionModel::Toggle : QItemSelectionModel::ClearAndSelect;
 			static_cast<EntityWidget *>(m_pStateData->GetModel().GetItem().GetWidget())->RequestSelectedItemChange(m_pMouseHoverItem, flags);

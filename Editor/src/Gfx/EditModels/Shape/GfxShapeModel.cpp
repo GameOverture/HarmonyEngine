@@ -206,15 +206,64 @@ bool GfxShapeModel::IsLoopClosed() const
 			HyGuiLog("GfxShapeModel::GetActionSerialized - EDITMODEACTION_Inside with not all grab points selected", LOGTYPE_Error);
 		[[fallthrough]];
 	case EDITMODEACTION_HoverCenter:
-		m_vDragDelta;
+		if(m_eShapeType != SHAPE_Polygon)
+		{
+			if(m_ShapeList.size() != 1)
+				HyGuiLog("GfxShapeModel::GetActionSerialized - Expected exactly one shape fixture for non-polygon shape type", LOGTYPE_Error);
+			
+			// Translate entire shape by the drag delta.
+			HyShape2d tmpShape = *m_ShapeList[0];
+			tmpShape.TransformSelf(glm::translate(glm::mat4(1.0f), glm::vec3(m_vDragDelta, 0.0f)));
+
+			std::vector<float> serializedData = tmpShape.SerializeSelf();
+			return QList<float>(serializedData.begin(), serializedData.end());
+		}
+		else // SHAPE_Polygon
+		{
+			QList<float> returnList;
+			for(const GfxGrabPointModel &grabPt : m_GrabPointList)
+			{
+				glm::vec2 ptVertex = grabPt.GetPos();
+				returnList.push_back(static_cast<float>(ptVertex.x));
+				returnList.push_back(static_cast<float>(ptVertex.y));
+			}
+
+			// Translate entire shape by the drag delta.
+			for(int i = 0; i < returnList.size(); i += 2)
+			{
+				returnList[i] += m_vDragDelta.x;
+				returnList[i + 1] += m_vDragDelta.y;
+			}
+
+			returnList.push_back(m_bLoopClosed ? 1.0f : 0.0f); // Final float indicates whether loop is closed
+			return returnList;
+		}
+		break;
 
 	case EDITMODEACTION_AppendVertex:
 	case EDITMODEACTION_InsertVertex:
-		if(m_eShapeType != SHAPE_Polygon)
-			HyGuiLog("GfxShapeModel::GetActionSerialized - EDITMODEACTION_AppendVertex/InsertVertex with non-polygon shape type", LOGTYPE_Error);
+		// Guaranteed to be SHAPE_Polygon, translate all (selected) vertices by the drag delta.
+		// AppendVertex/InsertVertex both work with EDITMODEACTION_HoverGrabPoint's SHAPE_Polygon logic, so they can share the same serialization format.
 		[[fallthrough]];
 	case EDITMODEACTION_HoverGrabPoint:
+		switch(m_eShapeType)
+		{
+		case SHAPE_Box:
 
+			break;
+		case SHAPE_Circle:
+			break;
+		case SHAPE_LineSegment:
+			break;
+		case SHAPE_Polygon:
+			break;
+		case SHAPE_Capsule:
+			break;
+
+		default:
+			HyGuiLog("GfxShapeModel::GetActionSerialized - Unknown shape type encountered", LOGTYPE_Error);
+			break;
+		}
 		break;
 
 	default:

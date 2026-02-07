@@ -99,10 +99,17 @@ bool GfxChainModel::IsLoopClosed() const
 			HyGuiLog("GfxChainModel::GetActionSerialized - EDITMODEACTION_Inside with not all grab points selected", LOGTYPE_Error);
 		[[fallthrough]];
 	case EDITMODEACTION_HoverCenter:
+		// Translate entire shape by the drag delta.
+		
 		m_vDragDelta;
+
+		
 
 	case EDITMODEACTION_AppendVertex:
 	case EDITMODEACTION_InsertVertex:
+		// Guaranteed to be SHAPE_Polygon, translate all vertices by the drag delta.
+		break;
+
 	case EDITMODEACTION_HoverGrabPoint:
 		break;
 

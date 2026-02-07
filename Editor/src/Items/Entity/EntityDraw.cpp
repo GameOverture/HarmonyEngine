@@ -332,7 +332,8 @@ bool EntityDraw::OnSetEditMode(bool bEnable)
 	m_EditModeWindowOutline.SetVisible(true);
 
 	DoMouseMove(QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ControlModifier),
-				QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier));
+				QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier),
+				QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::AltModifier));
 
 	return true;
 }
