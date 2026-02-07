@@ -14,6 +14,7 @@ IGfxEditModel::IGfxEditModel(EditModeType eModelType, HyColor color) :
 	m_eMODEL_TYPE(eModelType),
 	m_GrabPointCenter(GRABPOINT_Center),
 	m_eCurAction(EDITMODEACTION_None),
+	m_vDragDelta(0.0f, 0.0f),
 	m_iGrabPointIndex(-1)
 {
 	SetColor(color);
@@ -43,7 +44,7 @@ void IGfxEditModel::SetColor(HyColor color)
 
 void IGfxEditModel::Deserialize(const QList<float> &floatList)
 {
-	m_bMalformed = !DoDeserialize(floatList);
+	m_sMalformedReason = DoDeserialize(floatList);
 	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 
@@ -222,14 +223,14 @@ void IGfxEditModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLef
 
 void IGfxEditModel::MouseTransform(EditModeState eEditModeState, bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
-	glm::vec2 vDelta(0.0f, 0.0f);
+	HySetVec(m_vDragDelta, 0.0f, 0.0f);
 	if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
-		HySetVec(vDelta, ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y);
+		HySetVec(m_vDragDelta, ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y);
 
 	if(eEditModeState == EDITMODE_MouseDragTransform && m_eCurAction == EDITMODEACTION_Creation)
 		DoTransformCreation(bShiftMod, ptStartPos, ptDragPos);
 	
 	SyncViews(eEditModeState, m_eCurAction);
 	for(IGfxEditView *pView : m_ViewList)
-		pView->SyncPreview(eEditModeState, m_eCurAction, m_iGrabPointIndex, vDelta);
+		pView->SyncPreview(eEditModeState, m_eCurAction, m_iGrabPointIndex, m_vDragDelta);
 }

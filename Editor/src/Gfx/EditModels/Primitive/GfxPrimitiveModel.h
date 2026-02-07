@@ -29,14 +29,15 @@ public:
 	bool IsShapeModel() const;
 
 	QString GetPrimType() const;
-	void SetPrimType(QString sNewShape);
+	void SetPrimType(QString sNewShape, QList<float> floatList);
 
 	virtual QList<float> Serialize() const override;
 
-	virtual QString MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) override; // Returns undo command description (blank if no change)
+	virtual QString GetActionText(QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
+	virtual QList<float> GetActionSerialized() const override;
 
 protected:
-	virtual void DoDeserialize(const QList<float> &floatList) override;
+	virtual QString DoDeserialize(const QList<float> &floatList) override;
 	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) override;
 	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
 };

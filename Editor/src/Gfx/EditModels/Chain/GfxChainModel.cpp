@@ -14,9 +14,7 @@
 GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QList<float>()*/) :
 	IGfxEditModel(EDITMODETYPE_Chain, color),
 	m_bSelfIntersecting(false),
-	m_ptSelfIntersection(0.0f, 0.0f),
-	m_bReverseWindingOrder(false),
-	m_bLoopClosed(false)
+	m_ptSelfIntersection(0.0f, 0.0f)
 {
 	Deserialize(floatList);
 }
@@ -53,10 +51,10 @@ const HyChain2d &GfxChainModel::GetChainFixture() const
 
 bool GfxChainModel::IsLoopClosed() const
 {
-	return m_bLoopClosed;
+	return m_Chain.GetChainData().bLoop;
 }
 
-/*virtual*/ QString GfxChainModel::MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) /*override*/
+/*virtual*/ QString GfxChainModel::GetActionText(QString sNodeCodeName) const /*override*/
 {
 	QString sUndoText;
 	switch(m_eCurAction)
@@ -65,20 +63,20 @@ bool GfxChainModel::IsLoopClosed() const
 	case EDITMODEACTION_Outside:
 		break;
 	case EDITMODEACTION_Creation:
-		sUndoText = "Create new chain fixture " % sShapeCodeName;
+		sUndoText = "Create new chain fixture " % sNodeCodeName;
 		break;
 	case EDITMODEACTION_Inside:
 	case EDITMODEACTION_HoverCenter:
-		sUndoText = "Translate chain " % sShapeCodeName;
+		sUndoText = "Translate chain " % sNodeCodeName;
 		break;
 	case EDITMODEACTION_AppendVertex:
-		sUndoText = "Append vertex on " % sShapeCodeName;
+		sUndoText = "Append vertex on " % sNodeCodeName;
 		break;
 	case EDITMODEACTION_InsertVertex:
-		sUndoText = "Insert vertex on " % sShapeCodeName;
+		sUndoText = "Insert vertex on " % sNodeCodeName;
 		break;
 	case EDITMODEACTION_HoverGrabPoint:
-		sUndoText = "Translate vert(s) on " % sShapeCodeName;
+		sUndoText = "Translate vert(s) on " % sNodeCodeName;
 		break;
 
 	default:
@@ -89,14 +87,55 @@ bool GfxChainModel::IsLoopClosed() const
 	return sUndoText;
 }
 
-/*virtual*/ void GfxChainModel::DoDeserialize(const QList<float> &floatList) /*override*/
+/*virtual*/ QList<float> GfxChainModel::GetActionSerialized() const /*override*/
 {
+	switch(m_eCurAction)
+	{
+	case EDITMODEACTION_Creation:
+		return Serialize();
+
+	case EDITMODEACTION_Inside:
+		if(IsAllGrabPointsSelected() == false)
+			HyGuiLog("GfxChainModel::GetActionSerialized - EDITMODEACTION_Inside with not all grab points selected", LOGTYPE_Error);
+		[[fallthrough]];
+	case EDITMODEACTION_HoverCenter:
+		m_vDragDelta;
+
+	case EDITMODEACTION_AppendVertex:
+	case EDITMODEACTION_InsertVertex:
+	case EDITMODEACTION_HoverGrabPoint:
+		break;
+
+	default:
+		HyGuiLog("GfxChainModel::GetActionSerialized - Invalid m_eCurTransform", LOGTYPE_Error);
+		break;
+	}
+
+	return QList<float>();
+}
+
+/*virtual*/ QString GfxChainModel::DoDeserialize(const QList<float> &floatList) /*override*/
+{
+	if(floatList.empty())
+	{
+		m_GrabPointList.clear();
+		m_Chain.ClearData();
+		return "No data provided";
+	}
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Assemble `m_GrabPointList`
 	std::vector<glm::vec2> grabPointList;
 	if(floatList.empty() == false)
 	{
 		grabPointList = m_Chain.DeserializeSelf(HYFIXTURE_LineChain, std::vector<float>(floatList.begin(), floatList.end()));
+
+		if(grabPointList.empty())
+		{
+			m_GrabPointList.clear();
+			m_Chain.ClearData();
+			return "Failed to deserialize chain data";
+		}
 		
 		// Find center point
 		glm::vec2 ptCentroid;
@@ -115,7 +154,7 @@ bool GfxChainModel::IsLoopClosed() const
 	if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
 		m_GrabPointList.resize(grabPointList.size());
 
-	if(m_bLoopClosed == false && m_GrabPointList.size() > 1)
+	if(IsLoopClosed() == false && m_GrabPointList.size() > 1)
 	{
 		m_GrabPointList.front().Setup(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
 		m_GrabPointList.back().Setup(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
@@ -124,6 +163,43 @@ bool GfxChainModel::IsLoopClosed() const
 	
 	if(m_GrabPointList.empty())
 		m_Chain.ClearData();
+	else
+	{
+		std::vector<glm::vec2> vertexList;
+		vertexList.reserve(m_GrabPointList.size());
+		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
+			vertexList.emplace_back(grabPt.GetPos());
+
+		// Validate no self-intersections
+		m_bSelfIntersecting = false;
+		HySetVec(m_ptSelfIntersection, 0.0f, 0.0f);
+		glm::vec2 pt1, pt2, pt3, pt4;
+		for(int i = 0; i < vertexList.size(); ++i)
+		{
+			const glm::vec2 &pt1 = vertexList[i];
+			const glm::vec2 &pt2 = vertexList[(i + 1) % vertexList.size()];
+			for(int j = i + 2; j < vertexList.size(); ++j)
+			{
+				// Don't check adjacent edges
+				if(j == (i + 1) % vertexList.size() || (i == 0 && j == vertexList.size() - 1))
+					continue;
+
+				const glm::vec2 &pt3 = vertexList[j];
+				const glm::vec2 &pt4 = vertexList[(j + 1) % vertexList.size()];
+				m_bSelfIntersecting = HyMath::TestSegmentsOverlap(pt1, pt2, pt3, pt4, m_ptSelfIntersection);
+				if(m_bSelfIntersecting)
+					return "Chain has self-intersecting edges";
+			}
+		}
+	}
+		
+	if(m_Chain.IsValid() == false)
+	{
+		if(m_GrabPointList.size() < 4)
+			return "Chain must have at least 4 vertices";
+		else
+			return "Chain has invalid vertex data";
+	}
 }
 
 /*virtual*/ EditModeAction GfxChainModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
@@ -148,7 +224,7 @@ bool GfxChainModel::IsLoopClosed() const
 	if(CheckIfAddVertexOnEdge(ptWorldMousePos))
 		return EDITMODEACTION_InsertVertex;
 
-	if(m_bLoopClosed == false)
+	if(IsLoopClosed() == false)
 	{
 		// If only the first or last vertex in chain is selected, return EDITMODEACTION_AppendVertex to indicate appending verts to the selected end
 		int iNumSelected = 0;
@@ -216,7 +292,7 @@ bool GfxChainModel::CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos)
 	HyShape2d tmpEdgeShape;
 	for(int i = 0; i < m_GrabPointList.size(); ++i)
 	{
-		if(i == (m_GrabPointList.size() - 1) && m_bLoopClosed == false)
+		if(i == (m_GrabPointList.size() - 1) && IsLoopClosed() == false)
 			break;
 
 		glm::vec2 pt1 = m_GrabPointList[i].GetPos();

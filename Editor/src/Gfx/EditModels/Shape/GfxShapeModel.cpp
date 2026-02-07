@@ -62,36 +62,38 @@ EditorShape GfxShapeModel::GetShapeType() const
 	return m_eShapeType;
 }
 
-void GfxShapeModel::SetShapeType(EditorShape eNewShape)
+void GfxShapeModel::SetShapeType(EditorShape eNewShape, QList<float> floatList)
 {
 	if(m_eShapeType == eNewShape)
 		return;
 
-	// Convert existing data to new shape type
-	QList<float> convertedDataList;
-	switch(eNewShape)
+	if(floatList.empty() == false)
 	{
-	case SHAPE_None:
-		break;
-	case SHAPE_Box:
-		convertedDataList = ConvertedBoxData();
-		break;
-	case SHAPE_Circle:
-		convertedDataList = ConvertedCircleData();
-		break;
-	case SHAPE_LineSegment:
-		convertedDataList = ConvertedLineSegmentData();
-		break;
-	case SHAPE_Capsule:
-		convertedDataList = ConvertedCapsuleData();
-		break;
-	case SHAPE_Polygon:
-		convertedDataList = ConvertedPolygonOrLineChainData();
-		break;
+		// Convert existing data to new shape type
+		switch(eNewShape)
+		{
+		case SHAPE_None:
+			break;
+		case SHAPE_Box:
+			floatList = ConvertedBoxData();
+			break;
+		case SHAPE_Circle:
+			floatList = ConvertedCircleData();
+			break;
+		case SHAPE_LineSegment:
+			floatList = ConvertedLineSegmentData();
+			break;
+		case SHAPE_Capsule:
+			floatList = ConvertedCapsuleData();
+			break;
+		case SHAPE_Polygon:
+			floatList = ConvertedPolygonOrLineChainData();
+			break;
 
-	default:
-		HyGuiLog("GfxShapeModel::SetType - Unknown shape type encountered", LOGTYPE_Error);
-		break;
+		default:
+			HyGuiLog("GfxShapeModel::SetType - Unknown shape type encountered", LOGTYPE_Error);
+			break;
+		}
 	}
 
 	m_eShapeType = eNewShape;
@@ -99,7 +101,7 @@ void GfxShapeModel::SetShapeType(EditorShape eNewShape)
 	ClearFixtures();
 	m_ShapeList.push_back(new HyShape2d());
 
-	Deserialize(convertedDataList);
+	Deserialize(floatList);
 }
 
 /*virtual*/ QList<float> GfxShapeModel::Serialize() const /*override*/
@@ -150,7 +152,7 @@ bool GfxShapeModel::IsLoopClosed() const
 	return m_bLoopClosed;
 }
 
-/*virtual*/ QString GfxShapeModel::MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) /*override*/
+/*virtual*/ QString GfxShapeModel::GetActionText(QString sNodeCodeName) const /*override*/
 {
 	QString sUndoText;
 	switch(m_eCurAction)
@@ -159,27 +161,27 @@ bool GfxShapeModel::IsLoopClosed() const
 	case EDITMODEACTION_Outside:
 		break;
 	case EDITMODEACTION_Creation:
-		sUndoText = "Create new " % HyGlobal::ShapeName(m_eShapeType) % " shape " % sShapeCodeName;
+		sUndoText = "Create new " % HyGlobal::ShapeName(m_eShapeType) % " shape " % sNodeCodeName;
 		break;
 	case EDITMODEACTION_Inside:
 	case EDITMODEACTION_HoverCenter:
-		sUndoText = "Translate shape " % sShapeCodeName;
+		sUndoText = "Translate shape " % sNodeCodeName;
 		break;
 	case EDITMODEACTION_AppendVertex:
-		sUndoText = "Append vertex on " % sShapeCodeName;
+		sUndoText = "Append vertex on " % sNodeCodeName;
 		break;
 	case EDITMODEACTION_InsertVertex:
-		sUndoText = "Insert vertex on " % sShapeCodeName;
+		sUndoText = "Insert vertex on " % sNodeCodeName;
 		break;
 	case EDITMODEACTION_HoverGrabPoint:
 		if(m_eShapeType == SHAPE_Polygon || m_eShapeType == SHAPE_LineSegment)
-			sUndoText = "Translate vert(s) on " % sShapeCodeName;
+			sUndoText = "Translate vert(s) on " % sNodeCodeName;
 		else if(m_eShapeType == SHAPE_Circle)
-			sUndoText = "Adjust circle radius on " % sShapeCodeName;
+			sUndoText = "Adjust circle radius on " % sNodeCodeName;
 		else if(m_eShapeType == SHAPE_Box)
-			sUndoText = "Adjust box size on " % sShapeCodeName;
+			sUndoText = "Adjust box size on " % sNodeCodeName;
 		else if(m_eShapeType == SHAPE_Capsule)
-			sUndoText = "Adjust capsule size on " % sShapeCodeName;
+			sUndoText = "Adjust capsule size on " % sNodeCodeName;
 		else
 			HyGuiLog("GfxShapeModel::MouseTransformReleased - Invalid shape type for EDITMODEACTION_HoverGrabPoint", LOGTYPE_Error);
 		break;
@@ -192,7 +194,38 @@ bool GfxShapeModel::IsLoopClosed() const
 	return sUndoText;
 }
 
-/*virtual*/ bool GfxShapeModel::DoDeserialize(const QList<float> &floatList) /*override*/
+/*virtual*/ QList<float> GfxShapeModel::GetActionSerialized() const /*override*/
+{
+	switch(m_eCurAction)
+	{
+	case EDITMODEACTION_Creation:
+		return Serialize();
+
+	case EDITMODEACTION_Inside:
+		if(IsAllGrabPointsSelected() == false)
+			HyGuiLog("GfxShapeModel::GetActionSerialized - EDITMODEACTION_Inside with not all grab points selected", LOGTYPE_Error);
+		[[fallthrough]];
+	case EDITMODEACTION_HoverCenter:
+		m_vDragDelta;
+
+	case EDITMODEACTION_AppendVertex:
+	case EDITMODEACTION_InsertVertex:
+		if(m_eShapeType != SHAPE_Polygon)
+			HyGuiLog("GfxShapeModel::GetActionSerialized - EDITMODEACTION_AppendVertex/InsertVertex with non-polygon shape type", LOGTYPE_Error);
+		[[fallthrough]];
+	case EDITMODEACTION_HoverGrabPoint:
+
+		break;
+
+	default:
+		HyGuiLog("GfxShapeModel::GetActionSerialized - Invalid m_eCurTransform", LOGTYPE_Error);
+		break;
+	}
+
+	return QList<float>();
+}
+
+/*virtual*/ QString GfxShapeModel::DoDeserialize(const QList<float> &floatList) /*override*/
 {
 	if(m_ShapeList.empty())
 		m_ShapeList.push_back(new HyShape2d());
@@ -238,7 +271,8 @@ bool GfxShapeModel::IsLoopClosed() const
 
 		case SHAPE_Box:
 			if(grabPointList.size() != 4)
-				HyGuiLog("GfxShapeModel::DoDeserialize for box did not receive 4 grab points", LOGTYPE_Error);
+				return "Invalid box shape data";
+
 			m_GrabPointList.resize(4);
 			for(int i = 0; i < 4; ++i)
 				m_GrabPointList[i].Setup(GRABPOINT_ShapeCtrlAll, grabPointList[i]);
@@ -246,7 +280,8 @@ bool GfxShapeModel::IsLoopClosed() const
 
 		case SHAPE_Circle:
 			if(grabPointList.size() != 4)
-				HyGuiLog("GfxShapeModel::DoDeserialize for circle did not receive 4 grab points", LOGTYPE_Error);
+				return "Invalid circle shape data";
+
 			m_GrabPointList.resize(4);
 			m_GrabPointList[0].Setup(GRABPOINT_ShapeCtrlVert, grabPointList[0]); // Top
 			m_GrabPointList[1].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[1]); // Right
@@ -256,7 +291,8 @@ bool GfxShapeModel::IsLoopClosed() const
 
 		case SHAPE_LineSegment:
 			if(grabPointList.size() != 2)
-				HyGuiLog("GfxShapeModel::DoDeserialize for line segment did not receive 2 grab points", LOGTYPE_Error);
+				return "Invalid line segment shape data";
+
 			m_GrabPointList.resize(2);
 			m_GrabPointList[0].Setup(GRABPOINT_ShapeCtrlAll, grabPointList[0]);
 			m_GrabPointList[1].Setup(GRABPOINT_ShapeCtrlAll, grabPointList[1]);
@@ -283,7 +319,8 @@ bool GfxShapeModel::IsLoopClosed() const
 
 		case SHAPE_Capsule:
 			if(grabPointList.size() != 6)
-				HyGuiLog("GfxShapeModel::DoDeserialize for capsule did not receive 6 grab points", LOGTYPE_Error);
+				return "Invalid capsule shape data";
+
 			m_GrabPointList.resize(6);
 			m_GrabPointList[0].Setup(GRABPOINT_ShapeCtrlVert, grabPointList[0]); // Pt1
 			m_GrabPointList[1].Setup(GRABPOINT_ShapeCtrlVert, grabPointList[1]); // Pt2
@@ -301,6 +338,9 @@ bool GfxShapeModel::IsLoopClosed() const
 	{
 		for(HyShape2d *pFixture : m_ShapeList)
 			pFixture->SetAsNothing();
+
+		if(m_eShapeType != SHAPE_None)
+			return "No shape data provided";
 	}
 	else if(m_eShapeType == SHAPE_Polygon) // Assemble `m_FixtureList` with valid sub-polygons (convex and <= 8 vertices)
 	{
@@ -327,7 +367,7 @@ bool GfxShapeModel::IsLoopClosed() const
 				const glm::vec2 &pt4 = ccwOrderedVertexList[(j + 1) % ccwOrderedVertexList.size()];
 				m_bSelfIntersecting = HyMath::TestSegmentsOverlap(pt1, pt2, pt3, pt4, m_ptSelfIntersection);
 				if(m_bSelfIntersecting)
-					return;
+					return "Polygon has self-intersecting edges";
 			}
 		}
 
@@ -349,6 +389,8 @@ bool GfxShapeModel::IsLoopClosed() const
 		else
 			AssemblePolygonFixtures(MergeTriangles(HyMath::Triangulate(ccwOrderedVertexList)));
 	}
+
+	return QString();
 }
 
 /*virtual*/ EditModeAction GfxShapeModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/

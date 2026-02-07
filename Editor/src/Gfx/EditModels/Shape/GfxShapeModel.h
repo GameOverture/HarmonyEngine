@@ -35,7 +35,7 @@ public:
 	virtual bool IsValidModel() const override;
 
 	EditorShape GetShapeType() const;
-	void SetShapeType(EditorShape eNewShape);
+	void SetShapeType(EditorShape eNewShape, QList<float> floatList);
 
 	virtual QList<float> Serialize() const override;
 
@@ -46,10 +46,11 @@ public:
 
 	bool IsLoopClosed() const;
 
-	virtual QString MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) override; // Returns undo command description (blank if no change)
+	virtual QString GetActionText(QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
+	virtual QList<float> GetActionSerialized() const override;
 
 protected:
-	virtual bool DoDeserialize(const QList<float> &floatList) override;
+	virtual QString DoDeserialize(const QList<float> &floatList) override;
 	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) override;
 	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
 

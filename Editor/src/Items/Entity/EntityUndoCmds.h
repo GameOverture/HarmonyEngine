@@ -153,29 +153,6 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_PrimitiveData : public QUndoCommand
-{
-	ProjectItemData &				m_EntityItemRef;
-	int								m_iStateIndex;
-	int								m_iFrameIndex;
-	EntityTreeItemData *			m_pPrimitiveItemData;
-	
-	QString							m_sNewType;
-	QList<float>					m_NewData;
-
-	QString							m_sOldType;
-	QList<float>					m_OldData;
-
-public:
-	EntityUndoCmd_PrimitiveData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pPrimitiveItemData, QString sNewType, const QList<float> &newData, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_PrimitiveData();
-
-	virtual void redo() override;
-	virtual void undo() override;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class EntityUndoCmd_AddFixture : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
@@ -194,40 +171,22 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_ShapeData : public QUndoCommand
+class EntityUndoCmd_EditModelData : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
 	int								m_iStateIndex;
 	int								m_iFrameIndex;
-	EntityTreeItemData *			m_pShapeItemData;
+	EntityTreeItemData *			m_pEntityItemData;
+	QString							m_sCategoryName;
+	QString							m_sPropName;
 	
-	EditorShape						m_eNewType;
+	bool							m_bHadOldData;
+	QList<float>					m_OldData;
 	QList<float>					m_NewData;
 
-	EditorShape						m_eOldType;
-	QList<float>					m_OldData;
-
 public:
-	EntityUndoCmd_ShapeData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pShapeItemData, EditorShape eNewType, const QList<float> &newData, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_ShapeData();
-
-	virtual void redo() override;
-	virtual void undo() override;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class EntityUndoCmd_ChainData : public QUndoCommand
-{
-	ProjectItemData &				m_EntityItemRef;
-	EntityTreeItemData *			m_pChainItemData;
-	
-	QList<float>					m_NewData;
-	QList<float>					m_OldData;
-
-public:
-	EntityUndoCmd_ChainData(QString sText, ProjectItemData &entityItemRef, EntityTreeItemData *pChainItemData, const QList<float> &newData, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_ChainData();
+	EntityUndoCmd_EditModelData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pEntityItemData, QString sCategoryName, QString sPropName, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_EditModelData();
 
 	virtual void redo() override;
 	virtual void undo() override;

@@ -922,16 +922,18 @@ void ExtrapolateProperties(Project &projectRef,
 					static_cast<HyPrimitive2d *>(pThisHyNode)->SetWireframe(primitiveObj["Wireframe"].toBool());
 				if(primitiveObj.contains("Line Thickness"))
 					static_cast<HyPrimitive2d *>(pThisHyNode)->SetLineThickness(primitiveObj["Line Thickness"].toDouble());
-				if(primitiveObj.contains("Type"))
-					static_cast<GfxPrimitiveModel *>(pEditModel)->SetPrimType(primitiveObj["Type"].toString());
+
+				QList<float> floatList;
 				if(primitiveObj.contains("Data"))
 				{
 					QJsonArray floatArray = primitiveObj["Data"].toArray();
-					QList<float> floatList;
 					for(QJsonValue val : floatArray)
 						floatList.push_back(static_cast<float>(val.toDouble()));
-					pEditModel->Deserialize(floatList);
 				}
+				if(primitiveObj.contains("Type"))
+					static_cast<GfxPrimitiveModel *>(pEditModel)->SetPrimType(primitiveObj["Type"].toString(), floatList);
+				else if(floatList.empty() == false)
+					pEditModel->Deserialize(floatList);
 			}
 			pEditModel->SetColor(HyColor(static_cast<IHyBody2d *>(pThisHyNode)->topColor.Get())); // Always try to sync colors
 			break;
@@ -940,16 +942,18 @@ void ExtrapolateProperties(Project &projectRef,
 			if(propsObj.contains("Shape"))
 			{
 				QJsonObject shapeObj = propsObj["Shape"].toObject();
-				if(shapeObj.contains("Type"))
-					static_cast<GfxShapeModel *>(pEditModel)->SetShapeType(HyGlobal::GetShapeFromString(shapeObj["Type"].toString()));
+
+				QList<float> floatList;
 				if(shapeObj.contains("Data"))
 				{
 					QJsonArray floatArray = shapeObj["Data"].toArray();
-					QList<float> floatList;
 					for(QJsonValue val : floatArray)
 						floatList.push_back(static_cast<float>(val.toDouble()));
-					pEditModel->Deserialize(floatList);
 				}
+				if(shapeObj.contains("Type"))
+					static_cast<GfxShapeModel *>(pEditModel)->SetShapeType(HyGlobal::GetShapeFromString(shapeObj["Type"].toString()), floatList);
+				else if(floatList.empty() == false)
+					pEditModel->Deserialize(floatList);
 			}
 			break;
 

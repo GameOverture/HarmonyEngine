@@ -21,10 +21,8 @@ class GfxChainModel : public IGfxEditModel
 	HyChain2d							m_Chain;				// This is the actual shape data used for physics/collision/rendering - usually just one fixture, but could be multiple for complex polygons
 	
 	// Extra validation used with Chain
-	bool								m_bReverseWindingOrder;
 	bool								m_bSelfIntersecting;
 	glm::vec2							m_ptSelfIntersection;
-	bool								m_bLoopClosed;
 
 public:
 	GfxChainModel(HyColor color, const QList<float> &floatList = QList<float>());
@@ -39,10 +37,11 @@ public:
 	const HyChain2d &GetChainFixture() const;
 	bool IsLoopClosed() const;
 
-	virtual QString MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) override; // Returns undo command description (blank if no change)
+	virtual QString GetActionText(QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
+	virtual QList<float> GetActionSerialized() const override;
 
 protected:
-	virtual void DoDeserialize(const QList<float> &floatList) override;
+	virtual QString DoDeserialize(const QList<float> &floatList) override;
 	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) override;
 	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
 

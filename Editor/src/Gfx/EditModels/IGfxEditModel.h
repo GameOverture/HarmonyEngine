@@ -56,8 +56,11 @@ protected:
 	QList<GfxGrabPointModel>			m_GrabPointList;		// Grab Points for editing the shape - Used to serialize data when type is SHAPE_Polygon (then assembles m_FixtureList with valid sub-polygons)
 	GfxGrabPointModel					m_GrabPointCenter;
 
+	QString								m_sMalformedReason;		// If not empty, this edit model is considered invalid and the reason is given by this string (e.g. "Polygon has intersecting edges")
+
 	// Transform info
 	EditModeAction						m_eCurAction;
+	glm::vec2							m_vDragDelta;
 	int									m_iGrabPointIndex;
 	glm::vec2							m_ptGrabPointPos;
 
@@ -93,10 +96,12 @@ public:
 	bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
 	void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight);
 	void MouseTransform(EditModeState eEditModeState, bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
-	virtual QString MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) = 0; // Returns undo command description (blank if no change)
+	
+	virtual QString GetActionText(QString sNodeCodeName) const = 0; // Returns undo command description (blank if no change)
+	virtual QList<float> GetActionSerialized() const = 0;
 
 protected:
-	virtual bool DoDeserialize(const QList<float> &floatList) = 0;
+	virtual QString DoDeserialize(const QList<float> &floatList) = 0; // Returns empty string if successful, otherwise returns reason for failure (e.g. "Polygon has intersecting edges")
 	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) = 0;
 	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) = 0;
 };

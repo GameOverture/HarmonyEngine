@@ -240,45 +240,32 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	case EDITMODE_MouseDownTransform:
 	case EDITMODE_MouseDragTransform: {
-		glm::vec2 ptCurMousePos;
-		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptCurMousePos);
-		QString sUndoText = pTreeItemData->GetEditModel()->MouseTransformReleased(pTreeItemData->GetCodeName(), QPointF(ptCurMousePos.x, ptCurMousePos.y));
+		QString sUndoText = pTreeItemData->GetEditModel()->GetActionText(pTreeItemData->GetCodeName());
 		if(sUndoText.isEmpty() == false)
 		{
 			int iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
 			int iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
-				
+			QString sCategoryName;
 			if(pTreeItemData->GetType() == ITEM_Primitive)
-			{
-				QString sShapeType;
-				if(pTreeItemData->GetEditModel()->GetModelType() == EDITMODETYPE_Shape)
-					sShapeType = HyGlobal::ShapeName(static_cast<GfxShapeModel *>(pTreeItemData->GetEditModel())->GetShapeType());
-				else
-					sShapeType = "Line Chain";
-					
-				QUndoCommand *pCmd = new EntityUndoCmd_PrimitiveData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, sShapeType, pTreeItemData->GetEditModel()->Serialize());
-				m_pProjItem->GetUndoStack()->push(pCmd);
-			}
+				sCategoryName = "Primitive";
 			else
 			{
 				switch(pTreeItemData->GetEditModel()->GetModelType())
 				{
-				case EDITMODETYPE_Shape: {
-					EditorShape eShapeType = static_cast<GfxShapeModel *>(pTreeItemData->GetEditModel())->GetShapeType();
-					QUndoCommand *pCmd = new EntityUndoCmd_ShapeData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, eShapeType, pTreeItemData->GetEditModel()->Serialize());
-					m_pProjItem->GetUndoStack()->push(pCmd);
-					break; }
-
-				case EDITMODETYPE_Chain: {
-					QUndoCommand *pCmd = new EntityUndoCmd_ChainData(sUndoText, *m_pProjItem, pTreeItemData, pTreeItemData->GetEditModel()->Serialize());
-					m_pProjItem->GetUndoStack()->push(pCmd);
-					break; }
-				
+				case EDITMODETYPE_Shape:
+					sCategoryName = "Shape";
+					break;
+				case EDITMODETYPE_Chain:
+					sCategoryName = "Chain";
+					break;
 				default:
 					HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_Transform with unsupported edit model type!", LOGTYPE_Error);
 					break;
 				}
 			}
+
+			QUndoCommand *pCmd = new EntityUndoCmd_EditModelData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, sCategoryName, "Data");
+			m_pProjItem->GetUndoStack()->push(pCmd);
 		}
 		break; }
 

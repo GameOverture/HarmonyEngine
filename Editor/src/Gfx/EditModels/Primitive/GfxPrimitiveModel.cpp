@@ -44,18 +44,25 @@ QString GfxPrimitiveModel::GetPrimType() const
 		return "Line Chain";
 }
 
-void GfxPrimitiveModel::SetPrimType(QString sNewType)
+void GfxPrimitiveModel::SetPrimType(QString sNewType, QList<float> floatList)
 {
 	if(sNewType == "Line Chain")
 	{
+		if(floatList.empty())
+		{
+			if(m_bIsShape)
+				floatList = m_ShapeModel.ConvertedPolygonOrLineChainData();
+			else
+				floatList = m_ChainModel.Serialize();
+		}
 		m_bIsShape = false;
-		m_ChainModel.Deserialize(m_ShapeModel.ConvertedPolygonOrLineChainData());
+		m_ChainModel.Deserialize(floatList);
 	}
 	else
 	{
 		m_bIsShape = true;
 		EditorShape eNewShape = HyGlobal::GetShapeFromString(sNewType);
-		m_ShapeModel.SetShapeType(eNewShape);
+		m_ShapeModel.SetShapeType(eNewShape, floatList);
 	}
 
 	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
@@ -69,20 +76,28 @@ void GfxPrimitiveModel::SetPrimType(QString sNewType)
 		return m_ChainModel.Serialize();
 }
 
-/*virtual*/ QString GfxPrimitiveModel::MouseTransformReleased(QString sShapeCodeName, QPointF ptWorldMousePos) /*override*/
+/*virtual*/ QString GfxPrimitiveModel::GetActionText(QString sNodeCodeName) const /*override*/
 {
 	if(m_bIsShape)
-		return m_ShapeModel.MouseTransformReleased(sShapeCodeName, ptWorldMousePos);
+		return m_ShapeModel.GetActionText(sNodeCodeName);
 	else
-		return m_ChainModel.MouseTransformReleased(sShapeCodeName, ptWorldMousePos);
+		return m_ChainModel.GetActionText(sNodeCodeName);
 }
 
-/*virtual*/ void GfxPrimitiveModel::DoDeserialize(const QList<float> &floatList) /*override*/
+/*virtual*/ QList<float> GfxPrimitiveModel::GetActionSerialized() const /*override*/
 {
 	if(m_bIsShape)
-		m_ShapeModel.DoDeserialize(floatList);
+		return m_ShapeModel.GetActionSerialized();
 	else
-		m_ChainModel.DoDeserialize(floatList);
+		return m_ChainModel.GetActionSerialized();
+}
+
+/*virtual*/ QString GfxPrimitiveModel::DoDeserialize(const QList<float> &floatList) /*override*/
+{
+	if(m_bIsShape)
+		return m_ShapeModel.DoDeserialize(floatList);
+	else
+		return m_ChainModel.DoDeserialize(floatList);
 }
 
 /*virtual*/ EditModeAction GfxPrimitiveModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
