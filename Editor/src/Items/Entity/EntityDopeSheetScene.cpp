@@ -231,7 +231,7 @@ EntityDopeSheetScene::EntityDopeSheetScene(EntityStateData *pStateData, QJsonObj
 	m_pCurrentFrameLine->setAcceptedMouseButtons(Qt::NoButton);
 
 	RefreshAllGfxItems();
-	SetCurrentFrame(0);
+	SetCurrentFrame(m_pEntStateData->GetIndex() == 0 ? -1 : 0); // Only start in the ctor if this is state '0'
 }
 
 /*virtual*/ EntityDopeSheetScene::~EntityDopeSheetScene()
