@@ -132,6 +132,10 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 	{
 		switch(m_pEntityTreeItemData->GetType())
 		{
+		case ITEM_UiLayout:
+		case ITEM_UiSpacer:
+			m_pChild = new HyPrimitive(pParent);
+			break;
 		case ITEM_UiLabel:
 			m_pChild = new HyLabel(pParent);
 			break;
@@ -1087,6 +1091,10 @@ void ExtrapolateProperties(Project &projectRef,
 				previewComponentRef.m_SpriteInfo.m_iSpriteFrame = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
 				previewComponentRef.m_SpriteInfo.m_bBouncePhase = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
 			}
+			break;
+
+		case ITEM_UiLayout:
+		case ITEM_UiSpacer:
 			break;
 
 		case ITEM_UiLabel:

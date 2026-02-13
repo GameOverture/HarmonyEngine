@@ -27,7 +27,7 @@ public:
 	QList<PropertiesTreeModel *> GetMultiModelList();
 
 private:
-	using PropertiesTreeModel::AppendCategory;
+	using PropertiesTreeModel::InsertCategory;
 	using PropertiesTreeModel::AppendProperty;
 
 	using PropertiesTreeModel::SerializeJson;

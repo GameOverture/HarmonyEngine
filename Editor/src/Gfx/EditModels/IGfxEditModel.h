@@ -30,7 +30,8 @@ enum EditModeType
 	EDITMODETYPE_None = 0,
 	EDITMODETYPE_Shape,
 	EDITMODETYPE_Chain,
-	EDITMODETYPE_Primitive
+	EDITMODETYPE_Primitive,
+	EDITMODETYPE_Container
 };
 
 enum EditModeAction

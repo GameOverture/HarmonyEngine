@@ -2,3 +2,5 @@ base/
 decals/
 output/
 export/
+__pycache__/
+*.kra~

@@ -108,7 +108,9 @@ enum ItemType
 	// Entity items
 	ITEM_ShapeFixture,
 	ITEM_ChainFixture,
+	ITEM_UiLayout,
 	// UI widgets
+	ITEM_UiSpacer,
 	ITEM_UiLabel,
 	ITEM_UiRichLabel,
 	ITEM_UiButton,
@@ -452,6 +454,18 @@ enum EntityItemDeclarationType
 };
 const QString ENTITYITEMDECLARATIONTYPE_STRINGS[NUM_ENTDECLTYPES] = { "Static", "Dynamic", "DynamicLeaked" };
 
+enum EntityBaseClassType
+{
+	ENTBASECLASS_Unknown = -1,
+	
+	ENTBASECLASS_HyEntity2d = 0,
+	ENTBASECLASS_HyActor2d,
+	ENTBASECLASS_HyUiContainer,
+
+	NUM_ENTBASECLASSTYPES
+};
+const QString ENTITYBASECLASSTYPE_STRINGS[NUM_ENTBASECLASSTYPES] = { "HyEntity2d", "HyActor2d", "HyUiContainer" };
+
 QAction *FindAction(QList<QAction *> list, QString sName);
 QString PointToQString(QPointF ptPoint);
 QPointF StringToPoint(QString sPoint);
@@ -586,6 +600,9 @@ public:
 	static HyType ConvertItemType(ItemType eType);
 	static ItemType ConvertHyType(HyType eType);
 	static HyFixtureType ConvertShapeToFixtureType(EditorShape eShape);
+
+	static EntityBaseClassType GetEntityBaseClassType(QString sType);
+	static QString GetEntityBaseClassName(EntityBaseClassType eType);
 
 	static EntityItemDeclarationType GetEntityDeclType(QString sType);
 

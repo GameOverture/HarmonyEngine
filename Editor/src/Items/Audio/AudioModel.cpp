@@ -33,20 +33,20 @@ AudioStateData::AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair s
 	
 	const int iRANGE = 16777215;	// Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
 
-	m_PropertiesModel.AppendCategory("Play List");
+	m_PropertiesModel.InsertCategory(-1, "Play List");
 	m_PropertiesModel.AppendProperty("Play List", "Mode", PROPERTIESTYPE_ComboBoxInt, stateFileData.m_Data["playlistMode"].toInt(0), "The method by which the next audio asset is chosen when this item is played", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), QString(), QString(), HyGlobal::GetAudioPlayListModeList());
 
-	m_PropertiesModel.AppendCategory("Mixing");
+	m_PropertiesModel.InsertCategory(-1, "Mixing");
 	m_PropertiesModel.AppendProperty("Mixing", "Volume", PROPERTIESTYPE_double, stateFileData.m_Data["volume"].toDouble(1.0), "Volume modifier [0.0 to 1.0] applied to source volume", PROPERTIESACCESS_Mutable, 0.0, 1.0, 0.1, QString(), QString(), 4);
 	m_PropertiesModel.AppendProperty("Mixing", "Pitch", PROPERTIESTYPE_double, stateFileData.m_Data["pitch"].toDouble(1.0), "Pitch modifier [0.0 to 1.0] applied to source volume", PROPERTIESACCESS_Mutable, 0.0, 1.0, 0.1, QString(), QString(), 4);
 	m_PropertiesModel.AppendProperty("Mixing", "Priority", PROPERTIESTYPE_int, stateFileData.m_Data["priority"].toInt(0), "Audio assets with higher priority will take presidence over others when channels are maxed out", PROPERTIESACCESS_Mutable, -iRANGE, iRANGE, 1);
 
 	int iLoops = stateFileData.m_Data["loops"].toInt(0);
-	m_PropertiesModel.AppendCategory("Looping", QVariant(), true, "The audio asset will play for loops+1 number of times, until stopped");
+	m_PropertiesModel.InsertCategory(-1, "Looping", QVariant(), true, "The audio asset will play for loops+1 number of times, until stopped");
 	m_PropertiesModel.AppendProperty("Looping", "Num Loops", PROPERTIESTYPE_int, iLoops != 0 ? iLoops : -1, "Number of loops, -1 is infinite loops. Passing one here plays the audio asset twice (1 loop)", PROPERTIESACCESS_Mutable, -1);
 
 	int iDist = stateFileData.m_Data["maxDist"].toInt(0);
-	m_PropertiesModel.AppendCategory("Positional", QVariant(), true, "Emulates a simple 3D audio effect based on the item's position relative to the listening camera");
+	m_PropertiesModel.InsertCategory(-1, "Positional", QVariant(), true, "Emulates a simple 3D audio effect based on the item's position relative to the listening camera");
 	m_PropertiesModel.AppendProperty("Positional", "Max Distance", PROPERTIESTYPE_int, iDist != 0 ? iDist : 1, "The distance (and beyond) at which the audio asset will be played at its quietest", PROPERTIESACCESS_Mutable, 0, iRANGE, 1);
 
 	if(iLoops != 0)

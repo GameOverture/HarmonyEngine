@@ -34,6 +34,8 @@ public:
 	int32 GetActualSize() const;
 	void Setup(HySizePolicy eSizePolicy, uint32 uiSizeHint);
 
+	void SetSize(uint32 uiSizeHint);
+
 protected:
 	virtual glm::vec2 GetPosOffset() override;
 	virtual void OnSetSizeHint() override;

@@ -323,7 +323,7 @@ public:
 		pComboBox->blockSignals(true);
 
 		pComboBox->setModel(model());
-		addMapping(pComboBox, 0);
+		addMapping(pComboBox, 0, "currentIndex");
 
 		if(this->currentIndex() == -1 && static_cast<ModelComboBox *>(model())->rowCount() != 0)
 			this->SetIndex(0);

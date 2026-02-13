@@ -17,6 +17,7 @@
 #include "GfxPrimitiveModel.h"
 #include "GfxShapeModel.h"
 #include "GfxChainModel.h"
+#include "ContainerEditModel.h"
 
 #include <QVariant>
 #include <QStack>
@@ -66,14 +67,14 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, EntityItemDe
 	ptrVariant.setValue<TreeModelItemData *>(this);
 	m_pPropertiesModel = new EntityPropertiesTreeModel(entityModelRef.GetItem(), -1, ptrVariant, this);
 
-	if(m_eEntType == ENTTYPE_Root || m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_ArrayItem)
+	if(m_eEntType == ENTTYPE_Root || m_eEntType == ENTTYPE_FusedItem || m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_ArrayItem)
 		InitalizePropertyModel();
 }
 
-EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject descObj, bool bIsArrayItem) :
+EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem) :
 	TreeModelItemData(HyGlobal::GetTypeFromString(descObj["itemType"].toString()), QUuid(descObj["UUID"].toString()), descObj["codeName"].toString()),
 	m_EntityModelRef(entityModelRef),
-	m_eEntType(bIsArrayItem ? ENTTYPE_ArrayItem : ENTTYPE_Item),
+	m_eEntType(bIsArrayItem ? ENTTYPE_ArrayItem : (bIsFusedItem ? ENTTYPE_FusedItem : ENTTYPE_Item)),
 	m_pPropertiesModel(nullptr),
 	m_pEditModel(nullptr),
 	m_sPromotedEntityType(descObj["promotedEntityType"].toString()),
@@ -99,15 +100,10 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject 
 
 bool EntityTreeItemData::IsSelectable() const
 {
-	if(m_eEntType == ENTTYPE_ArrayFolder)
-		return true;
-
-	if(m_eEntType == ENTTYPE_BvFolder)
+	if(m_eEntType == ENTTYPE_FixtureFolder)
 		return false;
 
-	return m_bIsLocked == false;// &&
-		   //(m_EntityModelRef.IsEditMode() && (m_eTYPE == ITEM_Primitive || m_eTYPE == ITEM_FixtureShape || m_eTYPE == ITEM_FixtureChain)) ||
-		   //(m_EntityModelRef.IsShapeEditMode() == false && m_eTYPE != ITEM_FixtureShape && m_eTYPE != ITEM_FixtureChain);
+	return m_bIsLocked == false;
 }
 
 bool EntityTreeItemData::IsEditable() const
@@ -293,6 +289,38 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 		childObjRef.insert("ctor", QJsonObject());
 }
 
+void EntityTreeItemData::InitializeRootBaseClass(EntityBaseClassType eBaseClass)
+{
+	if(GetEntType() != ENTTYPE_Root)
+	{
+		HyGuiLog("EntityTreeItemData::InitializeRootBaseClass() can only be called on Root entities", LOGTYPE_Error);
+		return;
+	}
+
+	switch(eBaseClass)
+	{
+	case ENTBASECLASS_HyEntity2d:
+		break;
+
+	case ENTBASECLASS_HyActor2d:
+		m_pPropertiesModel->InsertCategory(0, "Actor");
+		m_pPropertiesModel->AppendProperty("Actor", "Jump", PROPERTIESTYPE_bool, Qt::Checked, "Actor attempts to perform a jump", PROPERTIESACCESS_ToggleUnchecked);
+		break;
+	case ENTBASECLASS_HyUiContainer:
+		m_pPropertiesModel->InsertCategory(0, "Panel", QVariant(), false, "The main visual background portion of this container");
+		m_pPropertiesModel->AppendProperty("Panel", "Setup", PROPERTIESTYPE_UiPanel, QVariant(), "Initializes and setup the main panel of this container", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Panel", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Panel", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.05);
+		
+		m_pPropertiesModel->InsertCategory(0, "UiContainer");
+		m_pPropertiesModel->AppendProperty("UiContainer", "Root Layout Orientation", asdf;
+		m_pPropertiesModel->AppendProperty("UiContainer", "Use Scroll Bars", PROPERTIESTYPE_bool, Qt::Checked, "", PROPERTIESACCESS_ToggleUnchecked);
+
+		m_pEditModel = new ContainerEditModel();
+		break;
+	}
+}
+
 // NOTE: The listed 4 functions below share logic that process all item properties. Any updates should reflect to all of them
 //             - EntityTreeItemData::InitalizePropertyModel
 //             - EntityModel::GenerateSrc_SetStateImpl
@@ -306,34 +334,33 @@ void EntityTreeItemData::InitalizePropertyModel()
 	const double dRANGE = 16777215.0;
 
 	const bool bIsBody = GetType() != ITEM_Audio;
-
-	if(IsFixtureItem() == false)
+	if(IsFixtureItem() == false && IsLayoutItem() == false)
 	{
 		if(GetEntType() == ENTTYPE_Root || GetType() == ITEM_Entity)
 		{
-			m_pPropertiesModel->AppendCategory("Timeline");
+			m_pPropertiesModel->InsertCategory(-1, "Timeline");
 			m_pPropertiesModel->AppendProperty("Timeline", "State", PROPERTIESTYPE_StatesComboBox, 0, "Jump to a new state after processing this frame", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 			m_pPropertiesModel->AppendProperty("Timeline", "Pause", PROPERTIESTYPE_bool, Qt::Unchecked, "Pausing the timeline will stop processing key frames, after this frame", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Timeline", "Frame", PROPERTIESTYPE_int, 0, "Jump to a different frame on the timeline, after processing this frame", PROPERTIESACCESS_ToggleUnchecked, 0, iRANGE, 1);
 		}
 		else if(IsAssetItem() == false)
 		{
-			m_pPropertiesModel->AppendCategory("Common");
+			m_pPropertiesModel->InsertCategory(-1, "Common");
 			m_pPropertiesModel->AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(GetType(), false) % "'s state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 		}
 
-		m_pPropertiesModel->AppendCategory("Common"); // Will just return 'false' if "Common" category already exists
+		m_pPropertiesModel->InsertCategory(-1, "Common"); // Will just return 'false' if "Common" category already exists
 		m_pPropertiesModel->AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 
-		m_pPropertiesModel->AppendCategory("Transformation");
+		m_pPropertiesModel->InsertCategory(-1, "Transformation");
 		m_pPropertiesModel->AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE, 1.0, "[", "]");
 		m_pPropertiesModel->AppendProperty("Transformation", "Scale", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Scale is relative to parent node", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE, 0.01, "[", "]");
 		m_pPropertiesModel->AppendProperty("Transformation", "Rotation", PROPERTIESTYPE_double, 0.0, "Rotation is relative to parent node", PROPERTIESACCESS_ToggleUnchecked, -360.0, 360.0, 0.1);
 
 		if(bIsBody)
 		{
-			m_pPropertiesModel->AppendCategory("Body");
+			m_pPropertiesModel->InsertCategory(-1, "Body");
 			m_pPropertiesModel->AppendProperty("Body", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets rendered", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Body", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this item with", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Body", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.05);
@@ -342,7 +369,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		
 		if(GetEntType() == ENTTYPE_Root)
 		{
-			m_pPropertiesModel->AppendCategory("Physics", QVariant(), true, "Optionally create a physics component that can affect the transformation of this entity");
+			m_pPropertiesModel->InsertCategory(-1, "Physics", QVariant(), true, "Optionally create a physics component that can affect the transformation of this entity");
 			m_pPropertiesModel->AppendProperty("Physics", "Activate/Deactivate", PROPERTIESTYPE_bool, Qt::Checked, "This entity will begin its physics simulation", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Physics", "Type", PROPERTIESTYPE_ComboBoxInt, 0, "A static body does not move. A kinematic body moves only by forces. A dynamic body moves by forces and collision (fully simulated)", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", QStringList() << "Static" << "Kinematic" << "Dynamic");
 			m_pPropertiesModel->AppendProperty("Physics", "Fixed Rotation", PROPERTIESTYPE_bool, Qt::Unchecked, "Prevents this body from rotating if checked. Useful for characters", PROPERTIESACCESS_ToggleUnchecked);
@@ -362,7 +389,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_Primitive: {
 		m_pEditModel = new GfxPrimitiveModel();
 
-		m_pPropertiesModel->AppendCategory("Primitive", QVariant(), false, "A visible shape that can be drawn to the screen");
+		m_pPropertiesModel->InsertCategory(-1, "Primitive", QVariant(), false, "A visible shape that can be drawn to the screen");
 		m_pPropertiesModel->AppendProperty("Primitive", "Wireframe", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to render only the wireframe of the shape type", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Primitive", "Line Thickness", PROPERTIESTYPE_double, 1.0, "When applicable, how thick to render lines", PROPERTIESACCESS_ToggleUnchecked, 1.0, 100.0, 1.0);
 
@@ -373,7 +400,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break; }
 
 	case ITEM_Audio:
-		m_pPropertiesModel->AppendCategory("Audio", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		m_pPropertiesModel->InsertCategory(-1, "Audio", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
 		// TODO: m_pPropertiesModel->AppendProperty("Audio", "Play List Mode", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAudioPlayListModeList()[HYPLAYLIST_Shuffle], "The method by which the next audio asset is chosen when played", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAudioPlayListModeList());
 		// TODO: m_pPropertiesModel->AppendProperty("Audio", "Play", 
 		m_pPropertiesModel->AppendProperty("Audio", "Volume", PROPERTIESTYPE_double, 1.0, "The volume of the audio", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.01);
@@ -381,7 +408,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_Text:
-		m_pPropertiesModel->AppendCategory("Text", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		m_pPropertiesModel->InsertCategory(-1, "Text", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
 		m_pPropertiesModel->AppendProperty("Text", "Text", PROPERTIESTYPE_LineEdit, "Text123", "What UTF-8 string to be displayed", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Text", "Style", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTextTypeNameList()[HYTEXT_Line], "The style of how the text is shown", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTextTypeNameList());
 		// TODO: Custom Text Style widget
@@ -392,11 +419,10 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_Spine:
-
 		break;
 
 	case ITEM_Sprite:
-		m_pPropertiesModel->AppendCategory("Sprite", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		m_pPropertiesModel->InsertCategory(-1, "Sprite", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
 		m_pPropertiesModel->AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 		m_pPropertiesModel->AppendProperty("Sprite", "Anim Pause", PROPERTIESTYPE_bool, false, "The current state's animation starts paused", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Sprite", "Anim Rate", PROPERTIESTYPE_double, 1.0, "The animation rate modifier", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.1);
@@ -406,7 +432,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_Entity:
-		m_pPropertiesModel->AppendCategory("Entity", QVariant(), false, "Entity is an object that controls multiple nodes and components");
+		m_pPropertiesModel->InsertCategory(-1, "Entity", QVariant(), false, "Entity is an object that controls multiple nodes and components");
 		m_pPropertiesModel->AppendProperty("Entity", "Mouse Input", PROPERTIESTYPE_bool, Qt::Unchecked, "Mouse hover and button inputs over this bounding volume or specified shapes", PROPERTIESACCESS_ToggleUnchecked);
 		break;
 
@@ -417,10 +443,10 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_ShapeFixture:
 		m_pEditModel = new GfxShapeModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
-		m_pPropertiesModel->AppendCategory("Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
+		m_pPropertiesModel->InsertCategory(-1, "Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
 		m_pPropertiesModel->AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
 		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_FloatArray, "", "An array of floats representing the shape's data", PROPERTIESACCESS_ToggleUnchecked);
-		m_pPropertiesModel->AppendCategory("Fixture", QVariant(), false, "Become a fixture used in physics simulations and collision");
+		m_pPropertiesModel->InsertCategory(-1, "Fixture", QVariant(), false, "Become a fixture used in physics simulations and collision");
 		m_pPropertiesModel->AppendProperty("Fixture", "Density", PROPERTIESTYPE_double, 0.0, "Usually in kg / m^2. A shape should have a non-zero density when the entity's physics is dynamic", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Restitution", PROPERTIESTYPE_double, 0.0, "The restitution (elasticity) usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
@@ -433,14 +459,27 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_ChainFixture:
 		m_pEditModel = new GfxChainModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
-		m_pPropertiesModel->AppendCategory("Chain", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
+		m_pPropertiesModel->InsertCategory(-1, "Chain", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
 		m_pPropertiesModel->AppendProperty("Chain", "Data", PROPERTIESTYPE_FloatArray, "", "An array of floats representing the chain's data", PROPERTIESACCESS_ToggleUnchecked);
-		m_pPropertiesModel->AppendCategory("Fixture", QVariant(), false, "Become a fixture used in physics simulations and collision");
+		m_pPropertiesModel->InsertCategory(-1, "Fixture", QVariant(), false, "Become a fixture used in physics simulations and collision");
 		m_pPropertiesModel->AppendProperty("Fixture", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Restitution", PROPERTIESTYPE_double, 0.0, "The restitution (elasticity) usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Category Mask", PROPERTIESTYPE_int, 0x0001, "The collision category bits for this shape. Normally you would just set one bit", PROPERTIESACCESS_ToggleUnchecked, 0, 0xFFFF, 1, QString(), QString(), QVariant());
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Collision Mask", PROPERTIESTYPE_int, 0xFFFF, "The collision mask bits. This states the categories that this shape would accept for collision", PROPERTIESACCESS_ToggleUnchecked, 0, 0xFFFF, 1, QString(), QString(), QVariant());
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", PROPERTIESACCESS_ToggleUnchecked, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
+		break;
+
+	case ITEM_UiLayout:
+		m_pPropertiesModel->InsertCategory(-1, "Layout", QVariant(), false, "Holds UI widget entities and arranges them programatically");
+		m_pPropertiesModel->AppendProperty("Layout", "Orientation", asdf;
+		m_pPropertiesModel->AppendProperty("Layout", "Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The layout's margins to keep its contained widgets within (in pixels)", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Layout", "Widget Spacing", PROPERTIESTYPE_int, 0, "Sets the spacing in pixels between widgets inside the layout", PROPERTIESACCESS_ToggleUnchecked);
+		break;
+
+	case ITEM_UiSpacer:
+		m_pPropertiesModel->InsertCategory(-1, "Spacer", QVariant(), false, "Pads space between widgets within a layout");
+		m_pPropertiesModel->AppendProperty("Spacer", "Size Policy", PROPERTIESTYPE_ComboBoxString, HyGlobal::SizePolicyName(HYSIZEPOLICY_Expanding), "Hints to the spacer on how it should size itself", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), HyGlobal::GetSizePolicyNameList());
+		m_pPropertiesModel->AppendProperty("Spacer", "Size", PROPERTIESTYPE_int, 0, "Sets the spacer's size hint in pixels", PROPERTIESACCESS_ToggleUnchecked);
 		break;
 
 	case ITEM_UiLabel:
@@ -453,7 +492,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_UiTextField:
 	case ITEM_UiComboBox: // TODO: Implement custom properties to populate combobox
 	case ITEM_UiSlider:
-		m_pPropertiesModel->AppendCategory("Widget", QVariant(), false, "Widgets are a 'user interface' type of entity");
+		m_pPropertiesModel->InsertCategory(-1, "Widget", QVariant(), false, "Widgets are a 'user interface' type of entity");
 		m_pPropertiesModel->AppendProperty("Widget", "Enabled", PROPERTIESTYPE_bool, Qt::Checked, "Use to disable or reenable a widget", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Widget", "KB Focus Allowed", PROPERTIESTYPE_bool, Qt::Checked, "Allow this widget to be the target of keyboard input", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Widget", "Highlighted", PROPERTIESTYPE_bool, Qt::Unchecked, "Whether to specify to the widget that it is highlighted", PROPERTIESACCESS_ToggleUnchecked);
@@ -467,7 +506,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Widget", "Min Size", PROPERTIESTYPE_ivec2, QPoint(0, 0), "The widget's minimum size it'll use when resizing", PROPERTIESACCESS_ToggleUnchecked, 0, MAX_INT_RANGE, 1, "[", "]");
 		m_pPropertiesModel->AppendProperty("Widget", "Max Size", PROPERTIESTYPE_ivec2, QPoint(MAX_INT_RANGE, MAX_INT_RANGE), "The widget's maximum size it'll use when resizing", PROPERTIESACCESS_ToggleUnchecked, 0, MAX_INT_RANGE, 1, "[", "]");
 
-		m_pPropertiesModel->AppendCategory("Panel", QVariant(), false, "The main visual background portion of this widget");
+		m_pPropertiesModel->InsertCategory(-1, "Panel", QVariant(), false, "The main visual background portion of this widget");
 		m_pPropertiesModel->AppendProperty("Panel", "Setup", PROPERTIESTYPE_UiPanel, QVariant(), "Initializes and setup the main panel of this widget", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Panel", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Panel", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.05);
@@ -484,7 +523,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 
 		if(GetType() != ITEM_UiSlider) // AKA all widgets derived from Label
 		{
-			m_pPropertiesModel->AppendCategory("Label", QVariant(), false, "The main text used in this widget");
+			m_pPropertiesModel->InsertCategory(-1, "Label", QVariant(), false, "The main text used in this widget");
 
 			if(GetType() == ITEM_UiRackMeter)
 			{
@@ -516,12 +555,12 @@ void EntityTreeItemData::InitalizePropertyModel()
 			}
 			else if(GetType() == ITEM_UiButton || GetType() == ITEM_UiCheckBox || GetType() == ITEM_UiRadioButton)
 			{
-				m_pPropertiesModel->AppendCategory("Button", QVariant(), false, "A button is a label that can be depressed");
+				m_pPropertiesModel->InsertCategory(-1, "Button", QVariant(), false, "A button is a label that can be depressed");
 				m_pPropertiesModel->AppendProperty("Button", "Checked", PROPERTIESTYPE_bool, Qt::Unchecked, "Sets this button as 'checked'", PROPERTIESACCESS_ToggleUnchecked);
 			}
 			else if(GetType() == ITEM_UiBarMeter)
 			{
-				m_pPropertiesModel->AppendCategory("Bar Meter", QVariant(), false, "Bar meter useful for things like a health bar or progress bar");
+				m_pPropertiesModel->InsertCategory(-1, "Bar Meter", QVariant(), false, "Bar meter useful for things like a health bar or progress bar");
 				m_pPropertiesModel->AppendProperty("Bar Meter", "Min Value", PROPERTIESTYPE_int, 0, "The minimum, clamped value that indicates the bar is empty", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 				m_pPropertiesModel->AppendProperty("Bar Meter", "Max Value", PROPERTIESTYPE_int, 0, "The maximum, clamped value that indicates the bar is full", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 				m_pPropertiesModel->AppendProperty("Bar Meter", "Value", PROPERTIESTYPE_int, 0, "The current bar meter's value, clamped to the Min and Max values", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
@@ -530,7 +569,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		}
 		else // Is ITEM_UiSlider
 		{
-			m_pPropertiesModel->AppendCategory("Slider", QVariant(), false, "Bar meter useful for things like a health bar or progress bar");
+			m_pPropertiesModel->InsertCategory(-1, "Slider", QVariant(), false, "Bar meter useful for things like a health bar or progress bar");
 			// TODO: m_pPropertiesModel->AppendProperty("Slider", "Set Range", PROPERTIESTYPE_UiSliderRange, 0, "Set the value range, or specify each value step along the slider", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Slider", "Value", PROPERTIESTYPE_int, 0, "The current slider value, clamped or corrected to a value appropriate from 'Set Range'", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 			m_pPropertiesModel->AppendProperty("Slider", "Vertical", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the slider will be vertical instead of horizontal", PROPERTIESACCESS_ToggleUnchecked);
@@ -544,26 +583,26 @@ void EntityTreeItemData::InitalizePropertyModel()
 	}
 
 	// TWEENS - Make sure these Category names match HyGlobal's sm_TweenPropNames
-	if(IsFixtureItem() == false)
+	if(IsFixtureItem() == false && IsLayoutItem() == false)
 	{
-		m_pPropertiesModel->AppendCategory("Tween Position", QVariant(), true, "Start a positional tween from the currently selected frame");
+		m_pPropertiesModel->InsertCategory(-1, "Tween Position", QVariant(), true, "Start a positional tween from the currently selected frame");
 		m_pPropertiesModel->AppendProperty("Tween Position", "Destination", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "The target destination for the tween to reach", PROPERTIESACCESS_Mutable, -fRANGE, fRANGE, 1.0, "[", "]");
 		m_pPropertiesModel->AppendProperty("Tween Position", "Duration", PROPERTIESTYPE_double, 0.0, "How long it will take to reach the target destination for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
 		m_pPropertiesModel->AppendProperty("Tween Position", "Tween Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::TweenFuncName(TWEENFUNC_Linear), "The type of tween to use", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTweenFuncNameList());
 
-		m_pPropertiesModel->AppendCategory("Tween Rotation", QVariant(), true, "Start a rotational tween from the currently selected frame");
+		m_pPropertiesModel->InsertCategory(-1, "Tween Rotation", QVariant(), true, "Start a rotational tween from the currently selected frame");
 		m_pPropertiesModel->AppendProperty("Tween Rotation", "Destination", PROPERTIESTYPE_double, 0.0, "The target rotation (in degrees) for the tween to reach", PROPERTIESACCESS_Mutable, -360, 360, 1.0);
 		m_pPropertiesModel->AppendProperty("Tween Rotation", "Duration", PROPERTIESTYPE_double, 0.0, "How long it will take to reach the target rotation for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
 		m_pPropertiesModel->AppendProperty("Tween Rotation", "Tween Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::TweenFuncName(TWEENFUNC_Linear), "The type of tween to use", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTweenFuncNameList());
 
-		m_pPropertiesModel->AppendCategory("Tween Scale", QVariant(), true, "Start a scaling tween from the currently selected frame");
+		m_pPropertiesModel->InsertCategory(-1, "Tween Scale", QVariant(), true, "Start a scaling tween from the currently selected frame");
 		m_pPropertiesModel->AppendProperty("Tween Scale", "Destination", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "The target scale for the tween to reach", PROPERTIESACCESS_Mutable, -fRANGE, fRANGE, 0.01, "[", "]");
 		m_pPropertiesModel->AppendProperty("Tween Scale", "Duration", PROPERTIESTYPE_double, 0.0, "How long it will take to reach the target scale for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
 		m_pPropertiesModel->AppendProperty("Tween Scale", "Tween Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::TweenFuncName(TWEENFUNC_Linear), "The type of tween to use", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTweenFuncNameList());
 
 		if(bIsBody)
 		{
-			m_pPropertiesModel->AppendCategory("Tween Alpha", QVariant(), true, "Start an alpha/transparency tween from the currently selected frame");
+			m_pPropertiesModel->InsertCategory(-1, "Tween Alpha", QVariant(), true, "Start an alpha/transparency tween from the currently selected frame");
 			m_pPropertiesModel->AppendProperty("Tween Alpha", "Destination", PROPERTIESTYPE_double, 1.0, "The target alpha for the tween to reach", PROPERTIESACCESS_Mutable, 0.0, 1.0, 0.01);
 			m_pPropertiesModel->AppendProperty("Tween Alpha", "Duration", PROPERTIESTYPE_double, 0.0, "How long it will take to reach the target rotation for the tween", PROPERTIESACCESS_Mutable, 0.0, QVariant(), 0.01, QString(), "sec");
 			m_pPropertiesModel->AppendProperty("Tween Alpha", "Tween Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::TweenFuncName(TWEENFUNC_Linear), "The type of tween to use", PROPERTIESACCESS_Mutable, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTweenFuncNameList());
@@ -583,14 +622,37 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		HyGuiLog("EntityTreeModel::EntityTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
-	EntityTreeItemData *pThisEntityItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sEntityCodeName, ITEM_Entity, ENTTYPE_Root, QUuid(fileMetaObj["UUID"].toString()), QUuid(fileMetaObj["UUID"].toString()));
-	QVariant v;
-	v.setValue(pThisEntityItem);
-	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
+
+	// Create root tree item data for each base class type.
+	// Then use "fusedItemList" to init each base class's fused tree item data, or create a new fused item if it doesn't exist below
+	QJsonArray fusedItemArray = fileMetaObj["fusedItemList"].toArray();
+	for(int i = 0; i < NUM_ENTBASECLASSTYPES; ++i)
 	{
-		if(setData(index(0, iCol, QModelIndex()), v, Qt::UserRole) == false)
-			HyGuiLog("EntityTreeModel::EntityTreeModel() - setData failed", LOGTYPE_Error);
+		m_BaseClassInfoList[i].m_pRootTreeItemData = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sEntityCodeName, ITEM_Entity, ENTTYPE_Root, QUuid(fileMetaObj["UUID"].toString()), QUuid(fileMetaObj["UUID"].toString()));
+		m_BaseClassInfoList[i].m_pRootTreeItemData->InitializeRootBaseClass(static_cast<EntityBaseClassType>(i));
+		
+		switch(i)
+		{
+		case ENTBASECLASS_HyEntity2d:
+			m_BaseClassInfoList[i].m_pFusedTreeItemData = nullptr;
+			break;
+	
+		case ENTBASECLASS_HyActor2d:
+			if(fusedItemArray.empty() || i <= fusedItemArray.size())
+				m_BaseClassInfoList[i].m_pFusedTreeItemData = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sEntityCodeName, ITEM_ShapeFixture, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
+			else
+				m_BaseClassInfoList[i].m_pFusedTreeItemData = new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
+			break;
+
+		case ENTBASECLASS_HyUiContainer:
+			if(fusedItemArray.empty() || i <= fusedItemArray.size())
+				m_BaseClassInfoList[i].m_pFusedTreeItemData = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sEntityCodeName, ITEM_UiLayout, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
+			else
+				m_BaseClassInfoList[i].m_pFusedTreeItemData = new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
+			break;
+		}
 	}
+	Cmd_ApplyRootBaseClass();
 
 	// Insert 'folder' to hold bounding volumes (shapes)
 	if(insertRow(1, QModelIndex()) == false)
@@ -598,14 +660,12 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		HyGuiLog("EntityTreeModel::EntityTreeModel() - insertRow failed", LOGTYPE_Error);
 		return;
 	}
-	EntityTreeItemData *pShapeFolderItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "Fixtures", ITEM_Prefix, ENTTYPE_BvFolder, QUuid(), QUuid());
-	QVariant shapeData;
-	shapeData.setValue(pShapeFolderItem);
-	for(int iCol = 0; iCol < NUMCOLUMNS; ++iCol)
-	{
-		if(setData(index(1, iCol, QModelIndex()), shapeData, Qt::UserRole) == false)
-			HyGuiLog("EntityTreeModel::EntityTreeModel() - setData failed", LOGTYPE_Error);
-	}
+	EntityTreeItemData *pFixtureFolderItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "Fixtures", ITEM_None, ENTTYPE_FixtureFolder, QUuid(), QUuid());
+	QVariant fixtureData;
+	fixtureData.setValue(pFixtureFolderItem);
+	if(setData(index(1, 0, QModelIndex()), fixtureData, Qt::UserRole) == false)
+		HyGuiLog("EntityTreeModel::EntityTreeModel() - setData failed", LOGTYPE_Error);
+
 
 	// Insert all the 'children' and 'shape' items
 	std::function<void(const QJsonArray &)> fpPopulateNodeTreeItems = [&](const QJsonArray &itemListArray)
@@ -613,12 +673,12 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		for(int i = 0; i < itemListArray.size(); ++i)
 		{
 			if(itemListArray[i].isObject())
-				m_ModelRef.Cmd_AddExistingItem(itemListArray[i].toObject(), false, i);
+				m_ModelRef.Cmd_AddExistingItem(itemListArray[i].toObject(), false, false, i);
 			else if(itemListArray[i].isArray())
 			{
 				QJsonArray subItemArray = itemListArray[i].toArray();
 				for(int j = 0; j < subItemArray.size(); ++j)
-					m_ModelRef.Cmd_AddExistingItem(subItemArray[j].toObject(), true, j == 0 ? i : j);
+					m_ModelRef.Cmd_AddExistingItem(subItemArray[j].toObject(), true, false, j == 0 ? i : j);
 			}
 			else
 				HyGuiLog("EntityTreeModel::EntityTreeModel invalid JSON type", LOGTYPE_Error);
@@ -644,9 +704,16 @@ TreeModelItem *EntityTreeModel::GetRootTreeItem() const
 EntityTreeItemData *EntityTreeModel::GetRootTreeItemData() const
 {
 	if(m_pRootItem->GetNumChildren() == 0)
+	{
+		HyGuiLog("EntityTreeModel::GetRootTreeItemData - root data not created", LOGTYPE_Error);
 		return nullptr;
+	}
 
-	return m_pRootItem->GetChild(0)->data(0).value<EntityTreeItemData *>();
+	if(m_BaseClassInfoList[m_ModelRef.GetBaseClassType()].m_pRootTreeItemData != m_pRootItem->GetChild(0)->data(0).value<EntityTreeItemData *>())
+		HyGuiLog("EntityTreeModel::GetRootTreeItemData root item data does not match expected base class root item data", LOGTYPE_Error);
+
+	return m_BaseClassInfoList[m_ModelRef.GetBaseClassType()].m_pRootTreeItemData;
+	//return m_pRootItem->GetChild(0)->data(0).value<EntityTreeItemData *>();
 }
 
 TreeModelItem *EntityTreeModel::GetFixtureFolderTreeItem() const
@@ -663,6 +730,15 @@ EntityTreeItemData *EntityTreeModel::GetFixtureFolderTreeItemData() const
 		return nullptr;
 
 	return m_pRootItem->GetChild(1)->data(0).value<EntityTreeItemData *>();
+}
+
+QList<EntityTreeItemData *> EntityTreeModel::GetFusedItemData() const
+{
+	QList<EntityTreeItemData *> fusedItemList;
+	for(int i = 0; i < NUM_ENTBASECLASSTYPES; ++i)
+		fusedItemList.push_back(m_BaseClassInfoList[i].m_pFusedTreeItemData);
+	
+	return fusedItemList;
 }
 
 TreeModelItem *EntityTreeModel::GetArrayFolderTreeItem(EntityTreeItemData *pArrayItem) const
@@ -900,6 +976,20 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 	return true;
 }
 
+void EntityTreeModel::Cmd_ApplyRootBaseClass()
+{
+	QVariant v;
+	v.setValue(m_BaseClassInfoList[m_ModelRef.GetBaseClassType()].m_pRootTreeItemData);
+	if(setData(index(0, 0, QModelIndex()), v, Qt::UserRole) == false)
+		HyGuiLog("EntityTreeModel::EntityTreeModel() - setData failed", LOGTYPE_Error);
+
+	// Remove/replace any fused items
+	for(int i = 0; i < NUM_ENTBASECLASSTYPES; ++i)
+		RemoveTreeItem(m_BaseClassInfoList[i].m_pFusedTreeItemData);
+	if(m_BaseClassInfoList[m_ModelRef.GetBaseClassType()].m_pFusedTreeItemData)
+		InsertTreeItem(m_ModelRef.GetItem().GetProject(), m_BaseClassInfoList[m_ModelRef.GetBaseClassType()].m_pFusedTreeItemData, GetRootTreeItem(), 0);
+}
+
 EntityTreeItemData *EntityTreeModel::Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow /*= -1*/)
 {
 	// Generate a unique code name for this new item
@@ -989,7 +1079,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocAssetTreeItem(IAssetItemData *pAss
 	return pNewItem;
 }
 
-EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descObj, bool bIsArrayItem, int iRow /*= -1*/)
+EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow)
 {
 	ItemType eGuiType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
 	QString sCodeName = descObj["codeName"].toString();
@@ -1006,7 +1096,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descO
 	if(bIsArrayItem)
 		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, sCodeName, eGuiType, iRow);
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, descObj, bIsArrayItem);
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, descObj, bIsArrayItem, bIsFusedItem);
 	iRow = (iRow < 0 || (bIsArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 
@@ -1145,58 +1235,57 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 		}
 
 	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
-		if(indexRef.column() == COLUMN_CodeName)
-		{
-			if(pReferencedItemData)
-			{
-				if(pReferencedItemData->IsProjectItem())
-				{
-					ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pReferencedItemData);
-					if(pProjItem->IsExistencePendingSave())
-						return QVariant(pItem->GetIcon(SUBICON_New));
-					else if(pProjItem->IsSaveClean() == false)
-						return QVariant(pItem->GetIcon(SUBICON_Dirty));
-				}
-				else
-					return QVariant(pReferencedItemData->GetIcon(SUBICON_None));
-			}
-
-			if(pItem->GetEntType() == ENTTYPE_ArrayFolder)
-				return HyGlobal::ItemIcon(pItem->GetType(), SUBICON_Open);
-
-			if(pItem->GetType() == ITEM_Primitive || pItem->GetType() == ITEM_ShapeFixture)
-			{
-				int iStateIndex = 0;
-				if(m_ModelRef.GetItem().GetWidget())
-					iStateIndex = m_ModelRef.GetItem().GetWidget()->GetCurStateIndex();
-				const EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_ModelRef.GetStateData(iStateIndex))->GetDopeSheetScene();
-
-				QIcon icon;
-				QString sIconUrl = ":/icons16x16/shapes/" % QString(pItem->GetType() == ITEM_Primitive ? "primitive_" : "shapes_");
-
-				QString sShapeType = dopeSheetSceneRef.BasicExtrapolateKeyFrameProperty(pItem, dopeSheetSceneRef.GetCurrentFrame(), pItem->GetType() == ITEM_Primitive ? "Primitive" : "Shape", "Type").toString();
-				switch(HyGlobal::GetShapeFromString(sShapeType))
-				{
-				case SHAPE_None:		sIconUrl += "icon.png"; break;
-				case SHAPE_Box:			sIconUrl += "box.png"; break;
-				case SHAPE_Circle:		sIconUrl += "circle.png"; break;
-				case SHAPE_LineSegment:	sIconUrl += "lineSeg.png"; break;
-				case SHAPE_Polygon:		sIconUrl += "polygon.png"; break;
-				case SHAPE_Capsule:		sIconUrl += "capsule.png"; break;
-				default: // Special case for primitives
-					sIconUrl += "lineChain.png";
-					break;
-				}
-
-				icon.addFile(sIconUrl);
-				return QVariant(icon);
-			}
-			
-			return QVariant(pItem->GetIcon(SUBICON_None));
-		}
-		else
+		if(indexRef.column() != COLUMN_CodeName)
 			return QVariant();
 
+		if(pReferencedItemData)
+		{
+			if(pReferencedItemData->IsProjectItem())
+			{
+				ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pReferencedItemData);
+				if(pProjItem->IsExistencePendingSave())
+					return QVariant(pItem->GetIcon(SUBICON_New));
+				else if(pProjItem->IsSaveClean() == false)
+					return QVariant(pItem->GetIcon(SUBICON_Dirty));
+			}
+			else
+				return QVariant(pReferencedItemData->GetIcon(SUBICON_None));
+		}
+
+		if(pItem->GetEntType() == ENTTYPE_FixtureFolder)
+			return QIcon(":/icons16x16/fixture-folder.png");
+		else if(pItem->GetEntType() == ENTTYPE_ArrayFolder)
+			return HyGlobal::ItemIcon(pItem->GetType(), SUBICON_Open);
+
+		if(pItem->GetType() == ITEM_Primitive || pItem->GetType() == ITEM_ShapeFixture)
+		{
+			int iStateIndex = 0;
+			if(m_ModelRef.GetItem().GetWidget())
+				iStateIndex = m_ModelRef.GetItem().GetWidget()->GetCurStateIndex();
+			const EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_ModelRef.GetStateData(iStateIndex))->GetDopeSheetScene();
+
+			QIcon icon;
+			QString sIconUrl = ":/icons16x16/shapes/" % QString(pItem->GetType() == ITEM_Primitive ? "primitive_" : "shapes_");
+
+			QString sShapeType = dopeSheetSceneRef.BasicExtrapolateKeyFrameProperty(pItem, dopeSheetSceneRef.GetCurrentFrame(), pItem->GetType() == ITEM_Primitive ? "Primitive" : "Shape", "Type").toString();
+			switch(HyGlobal::GetShapeFromString(sShapeType))
+			{
+			case SHAPE_None:		sIconUrl += "icon.png"; break;
+			case SHAPE_Box:			sIconUrl += "box.png"; break;
+			case SHAPE_Circle:		sIconUrl += "circle.png"; break;
+			case SHAPE_LineSegment:	sIconUrl += "lineSeg.png"; break;
+			case SHAPE_Polygon:		sIconUrl += "polygon.png"; break;
+			case SHAPE_Capsule:		sIconUrl += "capsule.png"; break;
+			default: // Special case for primitives
+				sIconUrl += "lineChain.png";
+				break;
+			}
+
+			icon.addFile(sIconUrl);
+			return QVariant(icon);
+		}
+			
+		return QVariant(pItem->GetIcon(SUBICON_None));
 
 	case Qt::ToolTipRole:		// The data displayed in the item's tooltip. (QString)
 		return QVariant();// QVariant(pItem->GetThisUuid().toString());
@@ -1216,7 +1305,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 	if(pItem->IsSelectable())
 		returnFlags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 	
-	if(pItem->GetEntType() == ENTTYPE_BvFolder)
+	if(pItem->GetEntType() == ENTTYPE_FixtureFolder)
 		returnFlags |= Qt::ItemIsEnabled;
 	
 	return returnFlags;

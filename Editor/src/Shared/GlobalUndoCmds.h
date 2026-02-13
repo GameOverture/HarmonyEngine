@@ -352,14 +352,14 @@ class UndoCmd_ComboBox : public QUndoCommand
 	int                 m_iNewValue;
 	
 public:
-	UndoCmd_ComboBox(QString sText, ProjectItemData &itemRef, ComboBoxMapper *pMapper, int iStateIndex, int iPrevValue, int iNewValue, QUndoCommand *pParent = nullptr) :
+	UndoCmd_ComboBox(QString sText, ProjectItemData &itemRef, ComboBoxMapper *pMapper, int iStateIndex, int iNewValue, QUndoCommand *pParent = nullptr) :
 		QUndoCommand(pParent),
 		m_ItemRef(itemRef),
 		m_pMapper(pMapper),
 		m_iStateIndex(iStateIndex),
-		m_iPrevValue(iPrevValue),
 		m_iNewValue(iNewValue)
 	{
+		m_iPrevValue = m_pMapper->currentIndex();
 		setText(sText);
 	}
 			

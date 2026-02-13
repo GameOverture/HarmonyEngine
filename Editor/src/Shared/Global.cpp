@@ -67,6 +67,8 @@
 	sm_sItemNames[ITEM_Header] = "Header";
 	sm_sItemNames[ITEM_ShapeFixture] = "Shape";
 	sm_sItemNames[ITEM_ChainFixture] = "Chain";
+	sm_sItemNames[ITEM_UiLayout] = "Layout";
+	sm_sItemNames[ITEM_UiSpacer] = "Spacer";
 	sm_sItemNames[ITEM_UiLabel] = "Label";
 	sm_sItemNames[ITEM_UiRichLabel] = "RichLabel";
 	sm_sItemNames[ITEM_UiButton] = "Button";
@@ -99,6 +101,8 @@
 	sm_sItemNamesPlural[ITEM_Header] = "Headers";
 	sm_sItemNamesPlural[ITEM_ShapeFixture] = "Shapes";
 	sm_sItemNamesPlural[ITEM_ChainFixture] = "Chains";
+	sm_sItemNamesPlural[ITEM_UiLayout] = "Layouts";
+	sm_sItemNamesPlural[ITEM_UiSpacer] = "Spacers";
 	sm_sItemNamesPlural[ITEM_UiLabel] = "Labels";
 	sm_sItemNamesPlural[ITEM_UiRichLabel] = "RichLabels";
 	sm_sItemNamesPlural[ITEM_UiButton] = "Buttons";
@@ -297,6 +301,8 @@
 	list.append(ITEM_Header);
 	list.append(ITEM_ShapeFixture);
 	list.append(ITEM_ChainFixture);
+	list.append(ITEM_UiLayout);
+	list.append(ITEM_UiSpacer);
 	list.append(ITEM_UiLabel);
 	list.append(ITEM_UiRichLabel);
 	list.append(ITEM_UiButton);
@@ -346,6 +352,8 @@
 /*static*/ QList<ItemType> HyGlobal::GetItemTypeList_Widget()
 {
 	QList<ItemType> list;
+	list.append(ITEM_UiLayout);
+	list.append(ITEM_UiSpacer);
 	list.append(ITEM_UiLabel);
 	list.append(ITEM_UiRichLabel);
 	list.append(ITEM_UiButton);
@@ -1088,6 +1096,25 @@
 		break;
 	}
 	return HYFIXTURE_Nothing;
+}
+
+/*static*/ EntityBaseClassType HyGlobal::GetEntityBaseClassType(QString sType)
+{
+	for(int i = 0; i < NUM_ENTBASECLASSTYPES; ++i)
+	{
+		if(sType == ENTITYBASECLASSTYPE_STRINGS[i])
+			return static_cast<EntityBaseClassType>(i);
+	}
+	
+	return ENTBASECLASS_Unknown;
+}
+
+/*static*/ QString HyGlobal::GetEntityBaseClassName(EntityBaseClassType eType)
+{
+	if(eType >= 0 && eType < NUM_ENTBASECLASSTYPES)
+		return ENTITYBASECLASSTYPE_STRINGS[eType];
+	else
+		return "";
 }
 
 /*static*/ EntityItemDeclarationType HyGlobal::GetEntityDeclType(QString sType)

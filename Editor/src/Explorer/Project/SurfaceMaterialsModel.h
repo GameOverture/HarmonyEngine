@@ -48,7 +48,7 @@ protected:
 
 		void InitProperties()
 		{
-			m_Properties.AppendCategory("Surface Properties");
+			m_Properties.InsertCategory(-1, "Surface Properties");
 			m_Properties.AppendProperty("Surface Properties", "Color", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "The color used in the editor as well as for physics debug rendering.");
 			m_Properties.AppendProperty("Surface Properties", "Friction", PROPERTIESTYPE_double, 0.6, "The Coulomb (dry) friction coefficient, usually in the range [0,1].");
 			m_Properties.AppendProperty("Surface Properties", "Restitution", PROPERTIESTYPE_double, 0.0, "The restitution (bounciness) coefficient, usually in the range [0,1].");

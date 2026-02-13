@@ -52,7 +52,7 @@ void PropertiesTreeMultiModel::Setup(const QList<PropertiesTreeModel *> &multiMo
 		if(DoesCategoryExist(propPair.first) == false)
 		{
 			PropertiesDef catDef = pModel->GetCategoryDefinition(propPair.first);
-			AppendCategory(propPair.first, catDef.delegateBuilder, catDef.IsToggleable(), catDef.sToolTip);
+			InsertCategory(-1, propPair.first, catDef.delegateBuilder, catDef.IsToggleable(), catDef.sToolTip);
 
 			if(catDef.IsToggleable())
 			{

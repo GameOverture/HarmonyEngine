@@ -32,10 +32,25 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->setupUi(this);
 
 	// Remove and re-add the main layout that holds everything. This makes the Qt Designer (.ui) files work with the base class 'IWidget'. Otherwise it jumbles them together.
-	layout()->removeItem(ui->verticalLayout);
-	GetBelowStatesLayout()->addItem(ui->verticalLayout);
-	GetAboveStatesLayout()->addWidget(ui->grpNodes);
+	layout()->removeItem(ui->lytAboveStates);
+	layout()->removeItem(ui->lytBelowStates);
+	GetBelowStatesLayout()->addItem(ui->lytBelowStates);
+	GetAboveStatesLayout()->addItem(ui->lytAboveStates);
 
+	//GetAboveStatesLayout()->addWidget(ui->grpNodes);
+
+	for(int i = 0; i < NUM_ENTBASECLASSTYPES; ++i)
+		ui->cmbBaseClass->addItem(ENTITYBASECLASSTYPE_STRINGS[i], i);
+	ui->cmbBaseClass->setCurrentIndex(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetBaseClassType());
+
+	ui->btnAddChild->setDefaultAction(ui->actionAddChildren);
+	ui->btnAddPrimitive->setDefaultAction(ui->actionAddPrimitive);
+	ui->btnAddFixtureShape->setDefaultAction(ui->actionAddShape);
+	ui->btnAddFixtureChain->setDefaultAction(ui->actionAddChain);
+
+	ui->btnAddLayoutHorz->setDefaultAction(ui->actionAddLayoutHorz);
+	ui->btnAddLayoutVert->setDefaultAction(ui->actionAddLayoutVert);
+	ui->btnAddSpacer->setDefaultAction(ui->actionAddSpacer);
 	ui->btnAddLabel->setDefaultAction(ui->actionAddLabel);
 	ui->btnAddRichLabel->setDefaultAction(ui->actionAddRichLabel);
 	ui->btnAddButton->setDefaultAction(ui->actionAddButton);
@@ -46,12 +61,6 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->btnAddTextField->setDefaultAction(ui->actionAddTextField);
 	ui->btnAddComboBox->setDefaultAction(ui->actionAddComboBox);
 	ui->btnAddSlider->setDefaultAction(ui->actionAddSlider);
-
-	ui->btnAddPrimitive->setDefaultAction(ui->actionAddPrimitive);
-	ui->btnAddFixtureShape->setDefaultAction(ui->actionAddShape);
-	ui->btnAddFixtureChain->setDefaultAction(ui->actionAddChain);
-
-	ui->btnAddChild->setDefaultAction(ui->actionAddChildren);
 
 	ui->btnOrderUp->setDefaultAction(ui->actionOrderChildrenUp);
 	ui->btnOrderDown->setDefaultAction(ui->actionOrderChildrenDown);
@@ -125,6 +134,8 @@ EntityWidget::~EntityWidget()
 
 /*virtual*/ void EntityWidget::OnUpdateActions() /*override*/
 {
+	ui->cmbBaseClass->setCurrentIndex(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetBaseClassType());
+
 	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
 
 	SetAddStateBtnEnabled(false);
@@ -233,7 +244,7 @@ EntityWidget::~EntityWidget()
 				bAllSameType = false;
 			if(pEntItemData->GetEntType() != ENTTYPE_ArrayItem)
 				bAllArrayItems = false;
-			if(pEntItemData->GetEntType() == ENTTYPE_Root || pEntItemData->GetEntType() == ENTTYPE_BvFolder)
+			if(pEntItemData->GetEntType() == ENTTYPE_Root || pEntItemData->GetEntType() == ENTTYPE_FixtureFolder)
 				bRootOrBvFolder = true;
 		}
 
@@ -616,6 +627,15 @@ void EntityWidget::OnKeyF()
 		ui->actionEditMode->toggle();
 }
 
+void EntityWidget::on_cmbBaseClass_activated(int iIndex)
+{
+	if(static_cast<EntityModel *>(GetItem().GetModel())->GetBaseClassType() == static_cast<EntityBaseClassType>(iIndex))
+		return;
+
+	EntityUndoCmd_BaseClass *pCmd = new EntityUndoCmd_BaseClass(GetItem(), static_cast<EntityBaseClassType>(iIndex));
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
 void EntityWidget::OnContextMenu(const QPoint &pos)
 {
 	if(m_ContextMenu.isEmpty() == false)
@@ -681,8 +701,8 @@ void EntityWidget::OnCollapsedNode(const QModelIndex &indexRef)
 {
 	EntityTreeItemData *pTreeItemData = ui->nodeTree->model()->data(indexRef, Qt::UserRole).value<EntityTreeItemData *>();
 
-	// Prevent Root or BvFolder from collapsing
-	if(pTreeItemData->GetEntType() == ENTTYPE_Root || pTreeItemData->GetEntType() == ENTTYPE_BvFolder)
+	// Prevent Root or FixtureFolder from collapsing
+	if(pTreeItemData->GetEntType() == ENTTYPE_Root || pTreeItemData->GetEntType() == ENTTYPE_FixtureFolder)
 		ui->nodeTree->expand(indexRef);
 }
 

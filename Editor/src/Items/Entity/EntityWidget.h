@@ -68,6 +68,8 @@ private Q_SLOTS:
 	void OnKeyShiftE();
 	void OnKeyF();
 
+	void on_cmbBaseClass_activated(int iIndex);
+
 	void OnContextMenu(const QPoint &pos);
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void OnCollapsedNode(const QModelIndex &indexRef);

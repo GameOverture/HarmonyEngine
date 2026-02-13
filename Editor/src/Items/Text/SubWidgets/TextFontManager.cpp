@@ -50,13 +50,13 @@ TextFontManager::TextFontManager(ProjectItemData &itemRef, QJsonObject availGlyp
 		sAdditional = availGlyphsObj["additional"].toString();
 	}
 
-	m_GlyphsModel.AppendCategory("Uses Glyphs");
+	m_GlyphsModel.InsertCategory(-1, "Uses Glyphs");
 	m_GlyphsModel.AppendProperty("Uses Glyphs", TEXTPROP_09, PROPERTIESTYPE_bool, QVariant(b09 ? Qt::Checked : Qt::Unchecked), "Include numerical glyphs 0-9");
 	m_GlyphsModel.AppendProperty("Uses Glyphs", TEXTPROP_AZ, PROPERTIESTYPE_bool, QVariant(bAZ ? Qt::Checked : Qt::Unchecked), "Include capital letter glyphs A-Z");
 	m_GlyphsModel.AppendProperty("Uses Glyphs", TEXTPROP_az, PROPERTIESTYPE_bool, QVariant(baz ? Qt::Checked : Qt::Unchecked), "Include lowercase letter glyphs a-z");
 	m_GlyphsModel.AppendProperty("Uses Glyphs", TEXTPROP_Symbols, PROPERTIESTYPE_bool, QVariant(bSymbols ? Qt::Checked : Qt::Unchecked), "Include common punctuation and symbol glyphs");
 	m_GlyphsModel.AppendProperty("Uses Glyphs", TEXTPROP_AdditionalSyms, PROPERTIESTYPE_LineEdit, QVariant(sAdditional), "Include specified glyphs");
-	m_GlyphsModel.AppendCategory("Atlas Info");
+	m_GlyphsModel.InsertCategory(-1, "Atlas Info");
 	m_GlyphsModel.AppendProperty("Atlas Info", TEXTPROP_AtlasGroup, PROPERTIESTYPE_LineEdit, "", "The atlas group the font sub atlas will reside in", PROPERTIESACCESS_ReadOnly);
 	m_GlyphsModel.AppendProperty("Atlas Info", TEXTPROP_Dimensions, PROPERTIESTYPE_ivec2, QPoint(0, 0), "The required portion size needed to fit on an atlas", PROPERTIESACCESS_ReadOnly);
 	m_GlyphsModel.AppendProperty("Atlas Info", TEXTPROP_UsedPercent, PROPERTIESTYPE_double, 0.0, "Percentage of the maximum size dimensions used", PROPERTIESACCESS_ReadOnly);

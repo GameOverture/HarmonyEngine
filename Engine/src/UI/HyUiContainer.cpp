@@ -532,6 +532,7 @@ void HyUiContainer::EnableScrollBars(bool bUseVert, bool bUseHorz)
 	m_VertBar.SetOnScrollCallback(m_bUseVertBar ? OnScroll : nullptr, this);
 	m_HorzBar.SetOnScrollCallback(m_bUseHorzBar ? OnScroll : nullptr, this);
 
+	// TODO: Check if this is still true
 	// Use alpha because *this container may want to SetVisible() and it should then propagate to the scroll bars
 	m_VertBar.alpha.Set(static_cast<int32>(m_bUseVertBar) * 1.0f);
 	m_HorzBar.alpha.Set(static_cast<int32>(m_bUseHorzBar) * 1.0f);

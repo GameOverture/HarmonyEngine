@@ -196,7 +196,8 @@ struct EntityPreviewComponent
 enum EntityItemType
 {
 	ENTTYPE_Root,
-	ENTTYPE_BvFolder,
+	ENTTYPE_FixtureFolder,
+	ENTTYPE_FusedItem,
 	ENTTYPE_Item,
 	ENTTYPE_ArrayFolder,
 	ENTTYPE_ArrayItem,
@@ -224,7 +225,7 @@ class EntityTreeItemData : public TreeModelItemData
 
 public:
 	EntityTreeItemData(EntityModel &entityModelRef, EntityItemDeclarationType eDeclarationType, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfReferencedItem, QUuid uuidOfThis);
-	EntityTreeItemData(EntityModel &entityModelRef, QJsonObject descObj, bool bIsArrayItem);
+	EntityTreeItemData(EntityModel &entityModelRef, QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem);
 	virtual ~EntityTreeItemData();
 
 	bool IsSelectable() const;
@@ -263,6 +264,7 @@ public:
 
 	void InsertJsonInfo_Desc(QJsonObject &childObjRef);
 
+	void InitializeRootBaseClass(EntityBaseClassType eBaseClass);
 protected:
 	void InitalizePropertyModel();
 };
@@ -274,6 +276,13 @@ class EntityTreeModel : public ITreeModel
 	Q_OBJECT
 
 	EntityModel &										m_ModelRef;
+
+	struct BaseClassInfo
+	{
+		EntityTreeItemData *							m_pRootTreeItemData;	// The root item data itself for each available base class to choose from
+		EntityTreeItemData *							m_pFusedTreeItemData;	// Each base class may have a special "fused" item that always is present in the tree
+	};
+	BaseClassInfo										m_BaseClassInfoList[NUM_ENTBASECLASSTYPES];
 
 public:
 	enum ColumnType
@@ -294,6 +303,8 @@ public:
 	TreeModelItem *GetFixtureFolderTreeItem() const;
 	EntityTreeItemData *GetFixtureFolderTreeItemData() const;
 
+	QList<EntityTreeItemData *> GetFusedItemData() const;
+
 	TreeModelItem *GetArrayFolderTreeItem(EntityTreeItemData *pArrayItem) const;
 	EntityTreeItemData *GetArrayFolderTreeItemData(EntityTreeItemData *pArrayItem) const;
 
@@ -304,9 +315,10 @@ public:
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 
 private: // These functions should only be called by EntityModel's Cmd_ functions
+	void Cmd_ApplyRootBaseClass();
 	EntityTreeItemData *Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocAssetTreeItem(IAssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
-	EntityTreeItemData *Cmd_AllocExistingTreeItem(QJsonObject descObj, bool bIsArrayItem, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocExistingTreeItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow);
 	EntityTreeItemData *Cmd_AllocWidgetTreeItem(ItemType eWidgetType, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocPrimitiveTreeItem(QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocFixtureTreeItem(bool bIsShape, QString sCodeNamePrefix, int iRow = -1);

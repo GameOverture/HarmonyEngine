@@ -130,12 +130,15 @@ EntityModel::AuxWidgetsModel::AuxWidgetsModel(EntityModel &entityModelRef, int i
 
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
+	m_eBaseClass(HyGlobal::GetEntityBaseClassType(itemFileDataRef.m_Meta["baseClass"].toString(ENTITYBASECLASSTYPE_STRINGS[ENTBASECLASS_HyEntity2d]))),
 	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this),
 	m_AuxWidgetsModel(*this, itemFileDataRef.m_Meta["framesPerSecond"].toInt(60), itemFileDataRef.m_Meta["autoInitialize"].toBool(true))
 {
 	// The EntityTreeModel ('m_TreeModel') was initialized first so that all the EntityTreeItemData's exist.
 	// InitStates will look them up using their UUID when initializing its Key Frames map within the state's DopeSheetScene
 	InitStates<EntityStateData>(itemFileDataRef);
+
+	Cmd_SetBaseClassType(m_eBaseClass);
 
 	//// Initialize the callbacks list by calling EntityDopeSheetScene::SetCallback() for all the callbacks found in "stateArray"
 	//// NOTE: EntityDopeSheetScene::SetCallback() will update *this 'm_CallbacksList'
@@ -154,6 +157,11 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 
 /*virtual*/ EntityModel::~EntityModel()
 {
+}
+
+EntityBaseClassType EntityModel::GetBaseClassType() const
+{
+	return m_eBaseClass;
 }
 
 EntityTreeModel &EntityModel::GetTreeModel()
@@ -184,6 +192,12 @@ int EntityModel::GetFinalFrameIndex(int iStateIndex) const
 int EntityModel::GetFramesPerSecond() const
 {
 	return m_AuxWidgetsModel.data(m_AuxWidgetsModel.index(0, AUXDOPEWIDGETSECTION_FramesPerSecond), Qt::UserRole).toInt();
+}
+
+void EntityModel::Cmd_SetBaseClassType(EntityBaseClassType eNewBaseClassType)
+{
+	m_eBaseClass = eNewBaseClassType;
+	m_TreeModel.Cmd_ApplyRootBaseClass();
 }
 
 QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow)
@@ -226,9 +240,9 @@ QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewAssets(QList<IAssetItemDat
 	return treeNodeList;
 }
 
-EntityTreeItemData *EntityModel::Cmd_AddExistingItem(QJsonObject descObj, bool bIsArrayItem, int iRow)
+EntityTreeItemData *EntityModel::Cmd_AddExistingItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocExistingTreeItem(descObj, bIsArrayItem, iRow);
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocExistingTreeItem(descObj, bIsArrayItem, bIsFusedItem, iRow);
 
 	QUuid uuidToRegister(descObj["itemUUID"].toString());
 	if(uuidToRegister.isNull() == false)
@@ -303,7 +317,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewPasteItems(QJsonObject mimeOb
 		}
 
 		// NOTE: Error checking the pasted item's states to match current entity should have already been done in EntityWidget::on_actionPasteEntityItems_triggered
-		EntityTreeItemData *pPastedTreeItemData = Cmd_AddExistingItem(descObj, bIsArrayItem, -1);
+		EntityTreeItemData *pPastedTreeItemData = Cmd_AddExistingItem(descObj, bIsArrayItem, false, -1);
 		pastedItemList.push_back(pPastedTreeItemData);
 
 		// Merge the pasted key frame data into the states for the new item
@@ -353,7 +367,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewArray(QList<EntityTreeItem
 		descObj.insert("codeName", sArrayName);
 		descObj.insert("isSelected", false);
 
-		EntityTreeItemData *pDuplicateItem = Cmd_AddExistingItem(descObj, true, i == 0 ? iArrayFolderRow : -1);
+		EntityTreeItemData *pDuplicateItem = Cmd_AddExistingItem(descObj, true, false, i == 0 ? iArrayFolderRow : -1);
 		newItemDataList.push_back(pDuplicateItem);
 
 		// Copy all its property/key frames into the newly created item
@@ -665,7 +679,29 @@ QString EntityModel::GenerateSrc_CallbacksDecl() const
 
 QString EntityModel::GenerateSrc_MemberInitializerList() const
 {
-	QString sSrc = " :\n\tHyEntity2d(pParent)";
+	QString sSrc;
+	switch(m_eBaseClass)
+	{
+	case ENTBASECLASS_HyEntity2d:
+		sSrc += " :\n\tHyEntity2d(pParent)";
+		break;
+
+	case ENTBASECLASS_HyActor2d:
+		sSrc += " :\n\tHyActor2d(pParent)";
+		break;
+
+	case ENTBASECLASS_HyUiContainer: {
+		m_TreeModel.GetRootTreeItemData()->GetPropertiesModel().FindPropertyValue(""
+		if(get_orientation)
+			sSrc += " :\n\tHyUiContainer(HYORIENT_Horizontal, " + GetPanelCtorStr() + ")";
+		else
+			sSrc += " :\n\tHyUiContainer(HYORIENT_Vertical, " + GetPanelCtorStr() + ")";
+		break; }
+
+	default:
+		HyGuiLog("EntityModel::GenerateSrc_MemberInitializerList() - Unhandled base class type: " % HyGlobal::GetEntityBaseClassName(m_eBaseClass), LOGTYPE_Error);
+		break;
+	}
 
 	sSrc += ",\n\tm_fTIMELINE_FRAME_DURATION(" + QString::number(1.0 / GetFramesPerSecond(), 'f') + "f)";
 	sSrc += ",\n\tm_fpTimelineUpdate(nullptr)";
@@ -1350,9 +1386,19 @@ QString EntityModel::DeserializeChainAsRuntimeCode(bool bIsPrimitive, QString sC
 
 /*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
+	itemSpecificFileDataOut.m_Meta.insert("baseClass", HyGlobal::GetEntityBaseClassName(m_eBaseClass));
 	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetRootTreeItemData()->GetCodeName());
-
 	itemSpecificFileDataOut.m_Meta.insert("framesPerSecond", GetFramesPerSecond());
+
+	QList<EntityTreeItemData *> fusedItemList = m_TreeModel.GetFusedItemData();
+	QJsonArray fusedItemArray;
+	for(EntityTreeItemData *pFusedItem : fusedItemList)
+	{
+		QJsonObject fusedObj;
+		pFusedItem->InsertJsonInfo_Desc(fusedObj);
+		fusedItemArray.append(fusedObj);
+	}
+	itemSpecificFileDataOut.m_Meta.insert("fusedItemList", fusedItemArray);
 	
 	QList<EntityTreeItemData *> childList;
 	QList<EntityTreeItemData *> shapeList;

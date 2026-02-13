@@ -394,7 +394,7 @@ bool PropertiesTreeModel::IsCategoryCheckable(int iCategoryIndex) const
 	return categoryPropDefRef.IsToggleable();
 }
 
-bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, QString sToolTip /*= ""*/)
+bool PropertiesTreeModel::InsertCategory(int iRow, QString sCategoryName, QVariant commonDelegateBuilder /*= QVariant()*/, bool bCheckable /*= false*/, QString sToolTip /*= ""*/)
 {
 	// All category names must be unique
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
@@ -405,14 +405,17 @@ bool PropertiesTreeModel::AppendCategory(QString sCategoryName, QVariant commonD
 
 	// Create the row inside the model
 	QModelIndex rootParentIndex = createIndex(m_pRootItem->GetIndex(), 0, m_pRootItem);
-	if(insertRow(m_pRootItem->GetNumChildren(), rootParentIndex) == false)
+
+	if(iRow < 0)
+		iRow = m_pRootItem->GetNumChildren();
+	if(insertRow(iRow, rootParentIndex) == false)
 	{
 		HyGuiLog("PropertiesTreeModel::AppendCategory() - insertRow failed", LOGTYPE_Error);
 		return false;
 	}
 
 	// Set data in the property's name column
-	TreeModelItem *pNewlyAddedTreeItem = m_pRootItem->GetChild(m_pRootItem->GetNumChildren() - 1);
+	TreeModelItem *pNewlyAddedTreeItem = m_pRootItem->GetChild(iRow);
 	if(setData(index(pNewlyAddedTreeItem->GetIndex(), PROPERTIESCOLUMN_Name, rootParentIndex), QVariant(sCategoryName), Qt::UserRole) == false)
 		HyGuiLog("PropertiesTreeModel::AppendCategory() - setData failed", LOGTYPE_Error);
 
@@ -530,6 +533,35 @@ QList<QPair<QString, QString>> PropertiesTreeModel::GetPropertiesList() const
 		}
 	}
 	return propertiesList;
+}
+
+QJsonObject PropertiesTreeModel::RemoveCategory(QString sCategoryName) // Returns the removed category's properties as a JSON object. Caller can use this to restore the category later if needed. Returns an empty JSON object if category doesn't exist or failed to remove.
+{
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+		{
+			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+
+			QJsonObject categoryObj;
+			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
+			{
+				TreeModelItem *pPropertyItem = pCategoryTreeItem->GetChild(j);
+				categoryObj.insert(pPropertyItem->data(PROPERTIESCOLUMN_Name).toString(), ConvertValueToJson(pPropertyItem));
+
+				m_PropertyDefMap.remove(pPropertyItem);
+			}
+
+			if(removeRow(i, createIndex(m_pRootItem->GetIndex(), 0, m_pRootItem)) == false)
+				HyGuiLog("PropertiesTreeModel::RemoveCategory() - removeRow failed", LOGTYPE_Error);
+
+			m_PropertyDefMap.remove(pCategoryTreeItem); // Remove the category definition
+			
+			return categoryObj;
+		}
+	}
+
+	return QJsonObject();
 }
 
 void PropertiesTreeModel::RemoveAllCategoryProperties()

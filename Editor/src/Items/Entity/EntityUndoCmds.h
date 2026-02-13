@@ -16,6 +16,22 @@
 
 #include <QUndoCommand>
 
+class EntityUndoCmd_BaseClass : public QUndoCommand
+{
+	ProjectItemData &			m_EntityItemRef;
+	EntityBaseClassType			m_eNewBaseClass;
+	EntityBaseClassType			m_eOldBaseClass;
+
+public:
+	EntityUndoCmd_BaseClass(ProjectItemData &entityItemRef, EntityBaseClassType eNewBaseClass, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_BaseClass();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_AddChildren : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;

@@ -37,8 +37,11 @@ class EntityModel : public IModel
 {
 	Q_OBJECT
 
+	EntityBaseClassType										m_eBaseClass;
+
 	// These maps store the CONSTRUCTOR property data for the entire entity
 	// HACK: These m_Ctor* member variables are declared before 'm_TreeModel' because its constructor needs to use/initialize these maps
+	QJsonObject												m_CtorRootEntityList[NUM_ENTBASECLASSTYPES];
 	QMap<EntityTreeItemData *, QJsonObject>					m_CtorKeyFramesMap;			// Store properties and tween values
 	QMap<EntityTreeItemData *, QJsonObject>					m_CtorPoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added with UNDO
 
@@ -65,6 +68,7 @@ public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
+	EntityBaseClassType GetBaseClassType() const;
 	EntityTreeModel &GetTreeModel();
 
 	QAbstractItemModel *GetAuxWidgetsModel();
@@ -76,9 +80,10 @@ public:
 	int GetFramesPerSecond() const;
 
 	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from UndoCmd's
+	void Cmd_SetBaseClassType(EntityBaseClassType eNewBaseClassType);
 	QList<EntityTreeItemData *> Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow);
 	QList<EntityTreeItemData *> Cmd_CreateNewAssets(QList<IAssetItemData *> assetItemList, int iRow);
-	EntityTreeItemData *Cmd_AddExistingItem(QJsonObject descObj, bool bIsArrayItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
+	EntityTreeItemData *Cmd_AddExistingItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
 	EntityTreeItemData *Cmd_CreateNewWidget(ItemType eWidgetType, int iRow);
 	EntityTreeItemData *Cmd_CreateNewPrimitive(int iRow);
 	EntityTreeItemData *Cmd_CreateNewFixture(bool bIsShape, int iRow);

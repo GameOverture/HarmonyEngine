@@ -27,7 +27,7 @@ protected:
 	static_assert((int)ACTORATTRIB_IsAirborne == (int)ENTITYATTRIB_NEXTFLAG, "HyActor2d is not matching with base classes attrib flags");
 
 	HyLocomotion2d							m_Locomotion;
-	HyShape2d								m_PhysicsMover;
+	HyShape2d								m_ActorFixture;
 
 public:
 	HyActor2d(HyEntity2d *pParent = nullptr);

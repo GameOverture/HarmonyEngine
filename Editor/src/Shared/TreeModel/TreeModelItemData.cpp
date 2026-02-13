@@ -76,6 +76,11 @@ bool TreeModelItemData::IsFixtureItem() const
 	return HyGlobal::IsItemType_Fixture(m_eTYPE);
 }
 
+bool TreeModelItemData::IsLayoutItem() const
+{
+	return m_eTYPE == ITEM_UiLayout || m_eTYPE == ITEM_UiSpacer;
+}
+
 QList<TreeModelItemData *> TreeModelItemData::GetDependants() const
 {
 	return m_DependantMap.keys();

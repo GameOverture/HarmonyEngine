@@ -324,6 +324,10 @@ if(Qt6_DIR)
 		src/Gfx/EditModels/Chain/GfxChainModel.h
 		src/Gfx/EditModels/Chain/GfxChainView.cpp
 		src/Gfx/EditModels/Chain/GfxChainView.h
+		src/Gfx/EditModels/Container/ContainerEditModel.cpp
+		src/Gfx/EditModels/Container/ContainerEditModel.h
+		src/Gfx/EditModels/Container/ContainerEditView.cpp
+		src/Gfx/EditModels/Container/ContainerEditView.h
 		src/Gfx/EditModels/Primitive/GfxPrimitiveModel.cpp
 		src/Gfx/EditModels/Primitive/GfxPrimitiveModel.h
 		src/Gfx/EditModels/Primitive/GfxPrimitiveView.cpp
@@ -437,9 +441,10 @@ if(Qt6_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer/Project")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx/EditModels")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx/EditModels/Shape")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx/EditModels/Chain")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx/EditModels/Container")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx/EditModels/Primitive")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx/EditModels/Shape")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Manager")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Properties")

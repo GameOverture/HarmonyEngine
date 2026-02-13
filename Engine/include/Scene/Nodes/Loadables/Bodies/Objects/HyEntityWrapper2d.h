@@ -66,15 +66,6 @@ public:
 		return m_FusedNode;
 	}
 
-	NODE2D &GetLeaf() // DEPRECATED: legacy function name
-	{
-		return m_FusedNode;
-	}
-	const NODE2D &GetLeaf() const // DEPRECATED: legacy function name
-	{
-		return m_FusedNode;
-	}
-
 	virtual uint32 GetState() const override
 	{
 		return m_FusedNode.GetState();
@@ -93,16 +84,6 @@ public:
 		}
 
 		return true;
-	}
-
-	void InitLeaf(const HyNodePath &nodePath) // DEPRECATED: legacy function name
-	{
-		m_FusedNode.Init(nodePath, this);
-	}
-
-	void InitLeaf(const char *szLeafPrefix, const char *szLeafName) // DEPRECATED: legacy function name
-	{
-		m_FusedNode.Init(szLeafPrefix, szLeafName, this);
 	}
 
 	virtual void Init(const HyNodePath &nodePath, HyEntity2d *pParent) override

@@ -164,7 +164,7 @@ public:
 	QModelIndex GetCategoryModelIndex(int iCategoryIndex) const;
 	bool IsCategoryCheckable(int iCategoryIndex) const;
 
-	bool AppendCategory(QString sCategoryName, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, QString sToolTip = "");
+	bool InsertCategory(int iRow, QString sCategoryName, QVariant commonDelegateBuilder = QVariant(), bool bCheckable = false, QString sToolTip = "");
 	bool AppendProperty(QString sCategoryName,
 						QString sName,
 						PropertiesType eType,
@@ -180,6 +180,7 @@ public:
 
 	QPair<QString, QString> GetCatPropPairName(const QModelIndex &indexRef) const;
 	QList<QPair<QString, QString>> GetPropertiesList() const; // Returns a list of all properties in the form of (category, property) pairs
+	QJsonObject RemoveCategory(QString sCategoryName); // Returns the removed category's properties as a JSON object. Caller can use this to restore the category later if needed. Returns an empty JSON object if category doesn't exist or failed to remove.
 	void RemoveAllCategoryProperties();
 
 	QJsonObject SerializeJson() const;

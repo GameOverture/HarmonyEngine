@@ -19,6 +19,31 @@
 
 #include <QJsonValue>
 
+EntityUndoCmd_BaseClass::EntityUndoCmd_BaseClass(ProjectItemData &entityItemRef, EntityBaseClassType eNewBaseClass, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_EntityItemRef(entityItemRef),
+	m_eNewBaseClass(eNewBaseClass),
+	m_eOldBaseClass(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetBaseClassType())
+{
+	setText("Change Base Class to " % HyGlobal::GetEntityBaseClassName(m_eNewBaseClass));
+}
+
+/*virtual*/ EntityUndoCmd_BaseClass::~EntityUndoCmd_BaseClass()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_BaseClass::redo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_SetBaseClassType(m_eNewBaseClass);
+}
+
+/*virtual*/ void EntityUndoCmd_BaseClass::undo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_SetBaseClassType(m_eOldBaseClass);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_EntityItemRef(entityItemRef),

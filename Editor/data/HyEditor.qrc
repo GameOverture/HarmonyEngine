@@ -385,5 +385,26 @@
         <file>icons16x16/collision.png</file>
         <file>icons16x16/slice-sprite-sheet.png</file>
         <file>icons16x16/edit-copy-disabled.png</file>
+        <file>icons16x16/layout-horizontal.png</file>
+        <file>icons16x16/layout-vertical.png</file>
+        <file>icons16x16/fixture-folder.png</file>
+        <file>icons16x16/items/Layout.png</file>
+        <file>icons16x16/items/Layout-Close.png</file>
+        <file>icons16x16/items/Layout-Delete.png</file>
+        <file>icons16x16/items/Layout-Dirty.png</file>
+        <file>icons16x16/items/Layout-New.png</file>
+        <file>icons16x16/items/Layout-Open.png</file>
+        <file>icons16x16/items/Layout-Pending.png</file>
+        <file>icons16x16/items/Layout-Settings.png</file>
+        <file>icons16x16/items/Layout-Warning.png</file>
+        <file>icons16x16/items/Spacer.png</file>
+        <file>icons16x16/items/Spacer-Close.png</file>
+        <file>icons16x16/items/Spacer-Delete.png</file>
+        <file>icons16x16/items/Spacer-Dirty.png</file>
+        <file>icons16x16/items/Spacer-New.png</file>
+        <file>icons16x16/items/Spacer-Open.png</file>
+        <file>icons16x16/items/Spacer-Pending.png</file>
+        <file>icons16x16/items/Spacer-Settings.png</file>
+        <file>icons16x16/items/Spacer-Warning.png</file>
     </qresource>
 </RCC>

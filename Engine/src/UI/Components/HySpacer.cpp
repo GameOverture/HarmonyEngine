@@ -49,6 +49,12 @@ void HySpacer::Setup(HySizePolicy eSizePolicy, uint32 uiSizeHint)
 		SetSizePolicy(HYSIZEPOLICY_Fixed, eSizePolicy);
 }
 
+void HySpacer::SetSize(uint32 uiSizeHint)
+{
+	m_iSizeHint = uiSizeHint;
+	SetSizeAndLayoutDirty();
+}
+
 /*virtual*/ glm::vec2 HySpacer::GetPosOffset() /*override*/
 {
 	return glm::vec2(0.0f, 0.0f);

@@ -64,6 +64,15 @@ bool ITreeModel::InsertTreeItem(Project &projectRef, TreeModelItemData *pNewItem
 	return true;
 }
 
+bool ITreeModel::RemoveTreeItem(TreeModelItemData *pExistingItemData)
+{
+	QModelIndex index = FindIndex<TreeModelItemData *>(pExistingItemData, 0);
+	if(index.isValid() == false)
+		return false;
+	
+	return removeRow(index.row(), index.parent());
+}
+
 QList<TreeModelItemData *> ITreeModel::GetItemsRecursively(const QModelIndex &indexRef) const
 {
 	QList<TreeModelItemData *> returnList;
