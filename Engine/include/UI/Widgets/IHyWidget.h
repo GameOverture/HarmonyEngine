@@ -11,10 +11,9 @@
 #define IHyWidget_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/IHyEntityUi.h"
 #include "UI/Components/HyPanel.h"
 
-class IHyWidget : public IHyEntityUi
+class IHyWidget : public HyPanel
 {
 	friend class HyUiContainer;
 
@@ -40,8 +39,6 @@ protected:
 	static_assert((int)WIDGETATTRIB_HideDisabled == (int)ENTITYATTRIB_NEXTFLAG, "IHyWidget is not matching with base classes attrib flags");
 
 	HyMouseCursor							m_eHoverCursor;	// When mouse hovers over *this, change to a specified cursor
-	HyPanelState							m_ePanelState;	// When set to anything but 'HYPANELSTATE_NotUsed', this is the current state of the panel
-	HyPanel									m_Panel;		// A rectangular width/height that is typically a visible graphic background (or main part) of the widget
 
 public:
 	IHyWidget(HyEntity2d *pParent = nullptr);
@@ -49,29 +46,12 @@ public:
 
 	bool IsButton() const;
 
-	virtual uint32 GetState() const override;
-	virtual bool SetState(uint32 uiStateIndex) override;	// If used, this turns off using "panel states"
-	virtual uint32 GetNumStates() override;
-
-	HyPanelState GetPanelState() const;
-	bool IsUsingPanelStates() const;
-	void UsePanelStates();
-
-	bool IsPanelVisible() const;
-	void SetPanelVisible(bool bVisible);
-	HyAnimFloat &PanelAlpha();
-
-	bool IsPanelBoundingVolume() const;
-	bool IsPanelNode() const;
-	IHyBody2d *GetPanelNode();
-	HyUiPanelInit ClonePanelInit() const;
-
 	bool IsInputAllowed() const;							// Checks itself and the container it's inserted in if input is allowed
 
 	bool IsEnabled() const;
 	bool IsHideDisabled() const;							// Whether to not visually indicate if disabled
 	void SetHideDisabled(bool bIsHideDisabled);				// Whether to not visually indicate if disabled
-	void SetAsEnabled(bool bEnabled);
+	void SetEnabled(bool bEnabled);
 
 	bool IsKeyboardFocus() const;
 	bool IsKeyboardFocusAllowed() const;
@@ -81,21 +61,17 @@ public:
 	bool IsHideDownState() const;
 	void SetHideDownState(bool bIsHideDownState);
 
-	bool IsHideMouseHoverState() const;
-	void SetHideMouseHoverState(bool bIsHideHoverState);
-	bool IsMouseHoverCursorSet() const;
-	void SetMouseHoverCursor(HyMouseCursor eMouseCursor);
+	bool IsHideHoverState() const;
+	void SetHideHoverState(bool bIsHideHoverState);
+	bool IsHoverCursorSet() const;
+	void SetHoverCursor(HyMouseCursor eMouseCursor);
 
 	bool IsHighlighted() const;
-	bool IsHideHighlightedState() const;
-	void SetHideHighlightedState(bool bIsHideHighlightedState);
-	void SetAsHighlighted(bool bIsHighlighted);
+	void SetHighlighted(bool bIsHighlighted);
+	bool IsHideHighlighted() const;
+	void SetHideHighlighted(bool bIsHideHighlighted);
 
 	virtual bool IsDepressed() const;				// Derived classes may override this if more than just mouse down is considered 'depressed' (e.g. button taking keyboard input like space/enter)
-
-#ifdef HY_PLATFORM_GUI
-	void GuiOverrideNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName = true);
-#endif
 
 protected:
 	virtual void OnMouseEnter() override final;
@@ -103,8 +79,6 @@ protected:
 	virtual void OnMouseDown() override final;
 	virtual void OnMouseUp() override final;
 	virtual void OnMouseClicked() override final;
-
-	virtual void OnSetSizeHint() override;			// Sets the preferred size of *this into 'm_vSizeHint
 
 	virtual void OnUiTextInput(std::string sNewText) { }
 	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) { }
@@ -120,7 +94,6 @@ protected:
 
 	HyPanelState CalcPanelState();
 	void ApplyPanelState();
-	virtual void OnPanelUpdated() { }				// Invoked whenever m_Panel is modified
 };
 
 #endif /* IHyWidget_h__ */

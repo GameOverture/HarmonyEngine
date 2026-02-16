@@ -21,8 +21,6 @@ class HySpacer : public IHyWidget
 	friend class HyUiContainer;
 
 	const HyOrientation		m_eORIEN_TYPE;
-	int32					m_iSizeHint;
-	int32					m_iActualSize;
 
 	HySpacer(HyOrientation eOrienType);
 public:
@@ -36,9 +34,10 @@ public:
 
 	void SetSize(uint32 uiSizeHint);
 
+	virtual glm::vec2 GetBotLeftOffset() override;
+
 protected:
-	virtual glm::vec2 GetPosOffset() override;
-	virtual void OnSetSizeHint() override;
+	virtual glm::ivec2 OnCalcPreferredSize() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
 };
 

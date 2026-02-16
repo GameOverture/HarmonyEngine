@@ -490,6 +490,7 @@ class HyGlobal
 	static QString														sm_sSubIconNames[NUM_SUBICONS];
 	static QString														sm_sTextTypeNames[HYNUM_TEXTTYPES];
 	static QString														sm_sAlignmentNames[HYNUM_ALIGNMENTS];
+	static QString														sm_sOrientationNames[HYNUM_ORIENTATIONS];
 	static QString														sm_sAudioPlayLists[HYNUM_PLAYLISTS];
 
 	static QIcon														sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
@@ -537,6 +538,8 @@ public:
 	static HyTextType GetTextTypeFromString(QString sTextType);
 	static QStringList GetAlignmentNameList();
 	static HyAlignment GetAlignmentFromString(QString sAlignment);
+	static QStringList GetOrientationNameList();
+	static HyOrientation GetOrientationFromString(QString sOrientation);
 	static QStringList GetAudioPlayListModeList();
 
 	static bool IsItemType_Project(ItemType eType);
@@ -551,6 +554,8 @@ public:
 	static const QString TweenFuncName(TweenFuncType eTween)			{ return sm_TweenFuncNames[eTween]; }
 	static const QString TweenPropName(TweenProperty eTweenProp)		{ return sm_TweenPropNames[eTweenProp]; }
 	static const QString SizePolicyName(HySizePolicy eSizePolicy)		{ return sm_SizePolicyNames[eSizePolicy]; }
+	static const QString AlignmentName(HyAlignment eAlignment)			{ return sm_sAlignmentNames[eAlignment]; }
+	static const QString OrientationName(HyOrientation eOrientation)	{ return sm_sOrientationNames[eOrientation]; }
 	static const QIcon TweenPropIcon(TweenProperty eTweenProp)			{ return sm_TweenPropIcons[eTweenProp]; }
 	static const QString ItemExt(ItemType eItem);
 	static const QIcon ItemIcon(ItemType eItm, SubIcon eSubIcon)		{ return sm_ItemIcons[eItm][eSubIcon]; }

@@ -111,7 +111,7 @@ void HyBarMeter::SetupBar(const HyUiPanelInit &barInit)
 {
 	m_Bar.Setup(barInit);
 	
-	SetAsEnabled(IsEnabled());
+	SetEnabled(IsEnabled());
 	SetAssembleNeeded();
 	OnSetup();
 }

@@ -39,7 +39,7 @@ HyTextField::HyTextField(HyEntity2d *pParent /*= nullptr*/) :
 	m_BlinkTimer.Init(HYLINEEDIT_BLINKDUR);
 
 	SetKeyboardFocusAllowed(true);
-	SetMouseHoverCursor(HYMOUSECURSOR_IBeam);
+	SetHoverCursor(HYMOUSECURSOR_IBeam);
 
 	UsePanelStates();
 }
@@ -70,7 +70,7 @@ HyTextField::HyTextField(const HyUiPanelInit &initRef, const HyUiTextInit &textI
 	m_BlinkTimer.Init(HYLINEEDIT_BLINKDUR);
 
 	SetKeyboardFocusAllowed(true);
-	SetMouseHoverCursor(HYMOUSECURSOR_IBeam);
+	SetHoverCursor(HYMOUSECURSOR_IBeam);
 
 	UsePanelStates();
 }
@@ -202,6 +202,13 @@ void HyTextField::Submit()
 {
 	if(m_fpOnSubmit != nullptr)
 		m_fpOnSubmit(this);
+}
+
+/*virtual*/ void HyTextField::OnAssemble() /*override*/
+{
+	HyLabel::OnAssemble();
+	m_Cursor.SetTint(GetPanelColor().IsDark() ? HyColor::White : HyColor::Black);
+	m_Selection.SetTint(GetPanelColor().IsDark() ? HyColor::White : HyColor::Black);
 }
 
 /*virtual*/ void HyTextField::OnUiTextInput(std::string sNewUtf8Text) /*override*/
@@ -367,14 +374,6 @@ void HyTextField::Submit()
 	
 	m_Selection.SetVisible(false);
 	m_Cursor.SetVisible(false);
-}
-
-/*virtual*/ void HyTextField::OnPanelUpdated() /*override*/
-{
-	HyLabel::OnPanelUpdated();
-
-	m_Cursor.SetTint(m_Panel.GetPanelColor().IsDark() ? HyColor::White : HyColor::Black);
-	m_Selection.SetTint(m_Panel.GetPanelColor().IsDark() ? HyColor::White : HyColor::Black);
 }
 
 void HyTextField::MoveCursor(int32 iOffset, bool bSelection)

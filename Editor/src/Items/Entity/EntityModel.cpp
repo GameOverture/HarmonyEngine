@@ -691,11 +691,22 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 		break;
 
 	case ENTBASECLASS_HyUiContainer: {
-		m_TreeModel.GetRootTreeItemData()->GetPropertiesModel().FindPropertyValue(""
-		if(get_orientation)
-			sSrc += " :\n\tHyUiContainer(HYORIENT_Horizontal, " + GetPanelCtorStr() + ")";
+		EntityTreeItemData *pFusedItemData = m_TreeModel.GetFusedItemData()[ENTBASECLASS_HyUiContainer];
+		HyOrientation eOrient = HYORIENT_Horizontal;
+		if(m_CtorKeyFramesMap.contains(pFusedItemData))
+		{
+			QJsonValue val = static_cast<const EntityStateData *>(GetStateData(0))->GetDopeSheetScene().GetKeyFrameProperty(pFusedItemData, -1, "Layout", "Orientation");
+			eOrient = HyGlobal::GetOrientationFromString(val.toString());
+			if(eOrient == HYORIENT_Null)
+				eOrient = HYORIENT_Horizontal;
+		}
+
+		// Check ctor for root layout's "Panel/Setup" to be applied in member initalizer list
+		QJsonObject panelInitObj = static_cast<const EntityStateData *>(GetStateData(0))->GetDopeSheetScene().GetKeyFrameProperty(m_TreeModel.GetRootTreeItemData(), -1, "Panel", "Setup").toObject();
+		if(eOrient == HYORIENT_Horizontal)
+			sSrc += " :\n\tHyUiContainer(HYORIENT_Horizontal, " + DeserializePanelInitAsRuntimeCode(panelInitObj) + ")";
 		else
-			sSrc += " :\n\tHyUiContainer(HYORIENT_Vertical, " + GetPanelCtorStr() + ")";
+			sSrc += " :\n\tHyUiContainer(HYORIENT_Vertical, " + DeserializePanelInitAsRuntimeCode(panelInitObj) + ")";
 		break; }
 
 	default:
@@ -1178,6 +1189,9 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 				case HYALIGN_Center:	sSrc += sCodeName + "SetAlignment(HYALIGN_Center);" + sNewLine;	break;
 				case HYALIGN_Right:		sSrc += sCodeName + "SetAlignment(HYALIGN_Right);" + sNewLine;	break;
 				case HYALIGN_Justify:	sSrc += sCodeName + "SetAlignment(HYALIGN_Justify);" + sNewLine;break;
+				default:
+					HyGuiLog("EntityModel::GenerateSrc_SetProperties() - Unhandled text alignment: " + textObj["Alignment"].toString(), LOGTYPE_Error);
+					break;
 				}
 			}
 			if(textObj.contains("Monospaced Digits"))
@@ -1188,37 +1202,168 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 		else if(sCategoryName == "Widget")
 		{
 			QJsonObject widgetObj = propObj["Widget"].toObject();
-			if(widgetObj.contains("Panel"))
-			{
-				QJsonObject panelObj = widgetObj["Panel"].toObject();
+			
+			if(widgetObj.contains("Enabled"))
+				sSrc += sCodeName + "SetEnabled(" + (widgetObj["Enabled"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(widgetObj.contains("KB Focus Allowed"))
+				sSrc += sCodeName + "SetKeyboardFocusAllowed(" + (widgetObj["KB Focus Allowed"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(widgetObj.contains("Highlighted"))
+				sSrc += sCodeName + "SetHighlighted(" + (widgetObj["Highlighted"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(widgetObj.contains("Hide Disabled"))
+				sSrc += sCodeName + "SetHideDisabled(" + (widgetObj["Hide Disabled"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(widgetObj.contains("Hide Hover State"))
+				sSrc += sCodeName + "SetHideHoverState(" + (widgetObj["Hide Hover State"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(widgetObj.contains("Hide Down State"))
+				sSrc += sCodeName + "SetHideDownState(" + (widgetObj["Hide Down State"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(widgetObj.contains("Hide Highlighted"))
+				sSrc += sCodeName + "SetHideHighlighted(" + (widgetObj["Hide Highlighted"].toBool() ? "true" : "false") + ");" + sNewLine;
 
-				QString sPanelParams;
-				ItemType eType = HyGlobal::GetTypeFromString(panelObj["nodeType"].toString());
-				if(eType == ITEM_Entity)
-					sPanelParams = QString::number(panelObj["width"].toInt()) + ", " + QString::number(panelObj["height"].toInt());
-				else if(eType == ITEM_Primitive)
-					sPanelParams = QString::number(panelObj["width"].toInt()) + ", " + QString::number(panelObj["height"].toInt()) + ", " + QString::number(panelObj["frameSize"].toInt()) + ", HyColor(" + QString::number(panelObj["panelColor"].toInt()) + "), HyColor(" + QString::number(panelObj["frameColor"].toInt()) + "), HyColor(" + QString::number(panelObj["tertiaryColor"].toInt()) + "))";
+			QString sHorzSizePolicy;
+			if(widgetObj.contains("Horizontal Policy"))
+			{
+				HySizePolicy eHorzSizePolicy = HyGlobal::GetSizePolicyFromString(widgetObj["Horizontal Policy"].toString());
+				switch(eHorzSizePolicy)
+				{
+				case HYSIZEPOLICY_Fixed:		sHorzSizePolicy = "HYSIZEPOLICY_Fixed";	break;
+				case HYSIZEPOLICY_Expanding:	sHorzSizePolicy = "HYSIZEPOLICY_Expanding";	break;
+				case HYSIZEPOLICY_Shrinkable:	sHorzSizePolicy = "HYSIZEPOLICY_Shrinkable";	break;
+				case HYSIZEPOLICY_Flexible:		sHorzSizePolicy = "HYSIZEPOLICY_Flexible";	break;
+				default:
+					HyGuiLog("EntityModel::GenerateSrc_SetProperties() - Unhandled horizontal size policy: " + widgetObj["Horizontal Policy"].toString(), LOGTYPE_Error);
+					break;
+				}
+			}
+			QString sVertSizePolicy;
+			if(widgetObj.contains("Vertical Policy"))
+			{
+				HySizePolicy eVertSizePolicy = HyGlobal::GetSizePolicyFromString(widgetObj["Vertical Policy"].toString());
+				switch(eVertSizePolicy)
+				{
+				case HYSIZEPOLICY_Fixed:		sVertSizePolicy = "HYSIZEPOLICY_Fixed";	break;
+				case HYSIZEPOLICY_Expanding:	sVertSizePolicy = "HYSIZEPOLICY_Expanding";	break;
+				case HYSIZEPOLICY_Shrinkable:	sVertSizePolicy = "HYSIZEPOLICY_Shrinkable";	break;
+				case HYSIZEPOLICY_Flexible:		sVertSizePolicy = "HYSIZEPOLICY_Flexible";	break;
+				default:
+					HyGuiLog("EntityModel::GenerateSrc_SetProperties() - Unhandled vertical size policy: " + widgetObj["Vertical Policy"].toString(), LOGTYPE_Error);
+					break;
+				}
+			}
+			if(sHorzSizePolicy.isEmpty() == false && sVertSizePolicy.isEmpty() == false)
+				sSrc += sCodeName + "SetSizePolicy(" + sHorzSizePolicy + ", " + sVertSizePolicy + ");" + sNewLine;
+			else if(sHorzSizePolicy.isEmpty() == false)
+				sSrc += sCodeName + "SetHorizontalPolicy(" + sHorzSizePolicy + ");" + sNewLine;
+			else if(sVertSizePolicy.isEmpty() == false)
+				sSrc += sCodeName + "SetVerticalPolicy(" + sVertSizePolicy + ");" + sNewLine;
+			
+			if(widgetObj.contains("Lock Proportions"))
+				sSrc += sCodeName + "SetLockedProportions(" + (widgetObj["Lock Proportions"].toBool() ? "true" : "false") + ");" + sNewLine;
+			if(widgetObj.contains("Min Size"))
+			{
+				QJsonArray minSizeArray = widgetObj["Min Size"].toArray();
+				sSrc += sCodeName + "SetMinSize(" + QString::number(minSizeArray[0].toInt()) + ", " + QString::number(minSizeArray[1].toInt()) + ");" + sNewLine;
+			}
+			if(widgetObj.contains("Max Size"))
+			{
+				QJsonArray maxSizeArray = widgetObj["Max Size"].toArray();
+				sSrc += sCodeName + "SetMaxSize(" + QString::number(maxSizeArray[0].toInt()) + ", " + QString::number(maxSizeArray[1].toInt()) + ");" + sNewLine;
+			}
+		}
+		else if(sCategoryName == "Panel")
+		{
+			QJsonObject panelObj = propObj["Panel"].toObject();
+
+			if(panelObj.contains("Setup"))
+				sSrc += sCodeName + "Setup(" + DeserializePanelInitAsRuntimeCode(panelObj["Setup"].toObject()) + ");";
+			
+
+
+
+			
+			m_pPropertiesModel->AppendProperty("Panel", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty("Panel", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.05);
+			if(GetType() == ITEM_UiBarMeter)
+			{
+				m_pPropertiesModel->AppendProperty("Panel", "Bar Setup", PROPERTIESTYPE_UiPanel, QVariant(), "Initializes and setup the inner bar of this Bar Meter", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Panel", "Bar Offset", PROPERTIESTYPE_ivec2, QPoint(0, 0), "The inner bar's positional offset from the main panel", PROPERTIESACCESS_ToggleUnchecked);
+				// TODO: bool SetBarState(uint32 uiStateIndex);
+				m_pPropertiesModel->AppendProperty("Panel", "Bar Vertical", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the bar will grow vertically instead of rightward, horizontally", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Panel", "Bar Inverted", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the bar will grow from right to left or bottom to top", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Panel", "Bar Stretched", PROPERTIESTYPE_bool, Qt::Unchecked, "When set and the 'Bar Setup' is a Node item, the bar node will be scaled to fit the range of the progress bar. Otherwise, the bar is stenciled/cropped to fit the range (default)", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Panel", "Bar Under Panel", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the bar will be drawn under the main panel instead of over it. Only useful if main panel is a node item with transparent center", PROPERTIESACCESS_ToggleUnchecked);
+			}
+		}
+		else if(sCategoryName == "Label")
+		{
+			QJsonObject labelObj = propObj["Label"].toObject();
+
+			if(labelObj.contains("Set Value")) // HyRackMeter
+				sSrc += sCodeName + "SetValue(" + QString::number(labelObj["Set Value"].toInt()) + ", 0.0f);" + sNewLine;
+			if(labelObj.contains("Text"))
+				sSrc += sCodeName + "SetText(\"" + labelObj["Text"].toString() + "\");" + sNewLine;
+			if(labelObj.contains("Input Validator"))
+				sSrc += sCodeName + "SetInputValidator(\"" + labelObj["Input Validator"].toString() + "\", true);" + sNewLine; // true for case-sensitive
+			
+			QUuid fontUuid;
+			if(labelObj.contains("Font"))
+				fontUuid = QUuid(labelObj["Font"].toString());
+			HyMargins<float> margins;
+			if(labelObj.contains("Margins"))
+			{
+				QJsonArray marginsArray = labelObj["Margins"].toArray();
+				margins.left = marginsArray[0].toDouble();
+				margins.bottom = marginsArray[1].toDouble();
+				margins.right = marginsArray[2].toDouble();
+				margins.top = marginsArray[3].toDouble();
+			}
+				sSrc += sCodeName + "Setup(" + DeserializeTextInitAsRuntimeCode(fontUuid, margins) + ");" + sNewLine;
+			if(GetType() != ITEM_UiSlider) // AKA all widgets derived from Label
+			{
+			
 				else
 				{
-					QUuid panelUuid(panelObj["nodeUuid"].toString());
-					TreeModelItemData *pItemData = m_ItemRef.GetProject().FindItemData(panelUuid);
-					if(pItemData && pItemData->IsProjectItem())
-					{
-						switch(eType)
-						{
-						case ITEM_Sprite:	sPanelParams = "HYTYPE_Sprite, HyNodePath(" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + ")"; break;
-						case ITEM_Spine:	sPanelParams = "HYTYPE_Spine, HyNodePath(" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + ")"; break;
+					
 
-						default:
-							HyGuiLog("EntityModel::GenerateSrc_SetProperties() - Unhandled panel node type", LOGTYPE_Error);
-							break;
-						}
-					}
+					if(GetType() == ITEM_UiTextField)
+						m_pPropertiesModel->AppendProperty("Label", "", PROPERTIESTYPE_LineEdit, "", "A case-sensitive regex that checks and permits only valid keyboard input", PROPERTIESACCESS_ToggleUnchecked);
 				}
-
-				sSrc += sCodeName + "Setup(HyUiPanelInit(" + sPanelParams + "));" + sNewLine;
+				m_pPropertiesModel->AppendProperty("Label", "Font", PROPERTIESTYPE_ComboBoxItems, QVariant(), "The specified project Text item used on this widget", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), ITEM_Text);
+				m_pPropertiesModel->AppendProperty("Label", "Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The text's margins within the main panel of this widget", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Label", "Style", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTextTypeNameList()[HYTEXT_Line], "The style of how the text is shown", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTextTypeNameList());
+				// TODO: m_pPropertiesModel->AppendProperty("Label", "Text State", PROPERTIESTYPE_StatesComboBox, 0, "The text's state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
+				// TODO: virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor);
+				m_pPropertiesModel->AppendProperty("Label", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this widget's main text gets rendered", PROPERTIESACCESS_ToggleUnchecked);
+				// TODO: void SetAsSideBySide(bool bPanelBeforeText = true, int32 iPadding = 5, HyOrientation eOrientation = HYORIENT_Horizontal);	// Show the panel and text side by side specified accordingly to the arguments passed
+				m_pPropertiesModel->AppendProperty("Label", "Alignment", PROPERTIESTYPE_ComboBoxString, HyGlobal::AlignmentName(HYALIGN_Left), "The alignment of the text", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAlignmentNameList());
+				m_pPropertiesModel->AppendProperty("Label", "Monospaced Digits", PROPERTIESTYPE_bool, false, "Check to use monospaced digits, which ensures all digits use the same width", PROPERTIESACCESS_ToggleUnchecked);
+				if(GetType() == ITEM_UiRackMeter)
+				{
+					m_pPropertiesModel->AppendProperty("Label", "Show As Cash", PROPERTIESTYPE_bool, false, "Check to format the text as currency/money", PROPERTIESACCESS_ToggleUnchecked);
+					m_pPropertiesModel->AppendProperty("Label", "Spinning Digits", PROPERTIESTYPE_bool, false, "Check to have digits spin when racking to new values", PROPERTIESACCESS_ToggleUnchecked);
+					// TODO: SetNumFormat(HyNumberFormat format);
+					// TODO: SetDenomination(uint32 uiDenom);
+				}
+				else if(GetType() == ITEM_UiButton || GetType() == ITEM_UiCheckBox || GetType() == ITEM_UiRadioButton)
+				{
+					m_pPropertiesModel->InsertCategory(-1, "Button", QVariant(), false, "A button is a label that can be depressed");
+					m_pPropertiesModel->AppendProperty("Button", "Checked", PROPERTIESTYPE_bool, Qt::Unchecked, "Sets this button as 'checked'", PROPERTIESACCESS_ToggleUnchecked);
+				}
+				else if(GetType() == ITEM_UiBarMeter)
+				{
+					m_pPropertiesModel->InsertCategory(-1, "Bar Meter", QVariant(), false, "Bar meter useful for things like a health bar or progress bar");
+					m_pPropertiesModel->AppendProperty("Bar Meter", "Min Value", PROPERTIESTYPE_int, 0, "The minimum, clamped value that indicates the bar is empty", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
+					m_pPropertiesModel->AppendProperty("Bar Meter", "Max Value", PROPERTIESTYPE_int, 0, "The maximum, clamped value that indicates the bar is full", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
+					m_pPropertiesModel->AppendProperty("Bar Meter", "Value", PROPERTIESTYPE_int, 0, "The current bar meter's value, clamped to the Min and Max values", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
+					// TODO: SetNumFormat(HyNumberFormat format);
+				}
 			}
-			
+			else // Is ITEM_UiSlider
+			{
+				m_pPropertiesModel->InsertCategory(-1, "Slider", QVariant(), false, "Bar meter useful for things like a health bar or progress bar");
+				// TODO: m_pPropertiesModel->AppendProperty("Slider", "Set Range", PROPERTIESTYPE_UiSliderRange, 0, "Set the value range, or specify each value step along the slider", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Slider", "Value", PROPERTIESTYPE_int, 0, "The current slider value, clamped or corrected to a value appropriate from 'Set Range'", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
+				m_pPropertiesModel->AppendProperty("Slider", "Vertical", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the slider will be vertical instead of horizontal", PROPERTIESACCESS_ToggleUnchecked);
+				// TODO: SetBarColors(HyColor posColor, HyColor negColor, HyColor strokeColor);
+			}
 		}
 		else if(sCategoryName == "Tween Position")
 		{
@@ -1250,7 +1395,7 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 
 			sSrc += sCodeName + "alpha.Tween(" + QString::number(tweenObj["Destination"].toDouble(), 'f') + "f, " + QString::number(tweenObj["Duration"].toDouble(), 'f') + "f, " + sTweenType + ");" + sNewLine;
 		}
-	}
+	} // for loop through propObj.keys()
 
 	return sSrc;
 }
@@ -1295,6 +1440,45 @@ QString EntityModel::GenerateSrc_TimelineAdvance() const
 		}
 	}
 
+	return sSrc;
+}
+
+QString EntityModel::DeserializeTextInitAsRuntimeCode(QUuid itemUuid, HyMargins<float> margins) const
+{
+
+}
+
+QString EntityModel::DeserializePanelInitAsRuntimeCode(QJsonObject panelInitObj) const
+{
+	if(panelInitObj.isEmpty())
+		return "HyUiPanelInit()";
+	
+	QString sSrc = "HyUiPanelInit(";
+
+	ItemType eType = HyGlobal::GetTypeFromString(panelInitObj["nodeType"].toString());
+	if(eType == ITEM_Entity)
+		sSrc += QString::number(panelInitObj["width"].toInt()) + ", " + QString::number(panelInitObj["height"].toInt());
+	else if(eType == ITEM_Primitive)
+		sSrc += QString::number(panelInitObj["width"].toInt()) + ", " + QString::number(panelInitObj["height"].toInt()) + ", " + QString::number(panelInitObj["frameSize"].toInt()) + ", HyColor(" + QString::number(panelInitObj["panelColor"].toInt()) + "), HyColor(" + QString::number(panelInitObj["frameColor"].toInt()) + "), HyColor(" + QString::number(panelInitObj["tertiaryColor"].toInt()) + "))";
+	else
+	{
+		QUuid panelUuid(panelInitObj["nodeUuid"].toString());
+		TreeModelItemData *pItemData = m_ItemRef.GetProject().FindItemData(panelUuid);
+		if(pItemData && pItemData->IsProjectItem())
+		{
+			switch(eType)
+			{
+			case ITEM_Sprite:	sSrc += "HYTYPE_Sprite, HyNodePath(" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + ")"; break;
+			case ITEM_Spine:	sSrc += "HYTYPE_Spine, HyNodePath(" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + ")"; break;
+
+			default:
+				HyGuiLog("EntityModel::GenerateSrc_SetProperties() - Unhandled panel node type", LOGTYPE_Error);
+				break;
+			}
+		}
+	}
+
+	sSrc += ")";
 	return sSrc;
 }
 

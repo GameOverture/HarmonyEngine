@@ -245,14 +245,14 @@ HyScrollBar::HyScrollBar(HyOrientation eOrientation, uint32 uiDiameter, HyEntity
 			m_AnimScrollPos.Offset(m_fLineScrollAmt);
 			InvokeOnScrollCallback();
 		});
-	m_PosBtn.SetAsEnabled(true);
+	m_PosBtn.SetEnabled(true);
 
 	m_NegBtn.SetButtonClickedCallback([this](HyButton *pPosBtn)
 		{
 			m_AnimScrollPos.Offset(-m_fLineScrollAmt);
 			InvokeOnScrollCallback();
 		});
-	m_NegBtn.SetAsEnabled(true);
+	m_NegBtn.SetEnabled(true);
 }
 
 /*virtual*/ HyScrollBar::~HyScrollBar()

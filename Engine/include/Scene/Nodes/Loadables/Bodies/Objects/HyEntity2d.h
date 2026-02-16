@@ -42,7 +42,7 @@ protected:
 	uint32									m_uiEntityAttribs;		// TODO: Combine with m_uiFlags into a single uint64_t flag set
 
 	float									m_fDeferAmt;
-	std::function<void(HyEntity2d *)>		m_fpDeferFinishedFunc;
+	std::function<void(HyEntity2d *)> *		m_fpDeferFinishedFunc;
 
 public:
 	HyPhysicsBody							physics;				// Optional physics component
@@ -65,18 +65,19 @@ public:
 
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused) override;
 	void SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitChildren);
+
+	virtual float GetWidth(float fPercent = 1.0f) override;				// Derived classes encouraged to override with faster implementation
+	virtual float GetHeight(float fPercent = 1.0f) override;			// Derived classes encouraged to override with faster implementation
+	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;	// Derived classes encouraged to override with faster implementation
+	virtual const b2AABB &GetSceneAABB() override;
 	
 	virtual void SetScissor(const HyRect &scissorRect) override;
-	//virtual void SetScissor(HyStencilHandle hScissorHandle) override;
-	//void SetScissor(HyStencilHandle hScissorHandle, bool bOverrideExplicitChildren);
 	void SetScissor(const HyRect &scissorRect, bool bOverrideExplicitChildren);
-	
 	virtual void ClearScissor(bool bUseParentScissor) override;
 	void ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChildren);
 
 	virtual void SetStencil(HyStencil *pStencil) override;
 	void SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren);
-	
 	virtual void ClearStencil(bool bUseParentStencil) override;
 	void ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren);
 
@@ -90,11 +91,6 @@ public:
 	virtual void SetDisplayOrder(int32 iOrderValue) override;
 	void SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildren);
 	virtual void ResetDisplayOrder() override; // Will override all children's display order explicit flags, and assign them their 'sibling display order'
-
-	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
-	virtual const b2AABB &GetSceneAABB() override;
-	virtual float GetWidth(float fPercent = 1.0f) override;		// Derived classes encouraged to override with faster implementation
-	virtual float GetHeight(float fPercent = 1.0f) override;	// Derived classes encouraged to override with faster implementation
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// CHILDREN NODES

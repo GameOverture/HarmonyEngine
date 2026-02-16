@@ -109,7 +109,7 @@ void HySlider::Setup(const HyUiPanelInit &sliderInitRef)
 	SetBarColors(m_Panel.GetTertiaryColor(), m_Panel.GetFrameColor(), m_Panel.GetFrameColor());
 	ChildAppend(m_Panel); // Moves the panel to the front of the display order
 
-	SetAsEnabled(IsEnabled());
+	SetEnabled(IsEnabled());
 	
 	OnSetup();
 	SetAssembleNeeded();
@@ -341,7 +341,7 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *)> fpCallbac
 	//SetSizeAndLayoutDirty();
 }
 
-/*virtual*/ glm::vec2 HySlider::GetPosOffset() /*override*/
+/*virtual*/ glm::vec2 HySlider::GetBotLeftOffset() /*override*/
 {
 	return glm::vec2(m_Panel.GetWidth(m_Panel.scale.X()) * 0.5f, m_Panel.GetHeight(m_Panel.scale.Y()) * 0.5f);
 }
@@ -360,9 +360,9 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *)> fpCallbac
 {
 	// TODO: Check if vertical breaks this... this seems incorrect
 
-	m_Panel.SetSizeDimension(GetOrientation() ^ 1, uiNewHeight);
+	SetSizeDimension(GetOrientation() ^ 1, uiNewHeight);
 
-	m_fLength = uiNewWidth - m_Panel.GetSizeDimension(GetOrientation());
+	m_fLength = uiNewWidth - GetSizeDimension(GetOrientation());
 	OnSetSizeHint();
 
 	SetAssembleNeeded();

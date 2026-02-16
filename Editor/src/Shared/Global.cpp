@@ -25,6 +25,7 @@
 /*static*/ QString HyGlobal::sm_sSubIconNames[NUM_SUBICONS];
 /*static*/ QString HyGlobal::sm_sTextTypeNames[HYNUM_TEXTTYPES];
 /*static*/ QString HyGlobal::sm_sAlignmentNames[HYNUM_ALIGNMENTS];
+/*static*/ QString HyGlobal::sm_sOrientationNames[HYNUM_ORIENTATIONS];
 /*static*/ QString HyGlobal::sm_sAudioPlayLists[HYNUM_PLAYLISTS];
 
 /*static*/ QIcon HyGlobal::sm_ItemIcons[NUM_ITEMTYPES][NUM_SUBICONS];
@@ -206,6 +207,9 @@
 	sm_sAlignmentNames[HYALIGN_Center] = "Center";
 	sm_sAlignmentNames[HYALIGN_Right] = "Right";
 	sm_sAlignmentNames[HYALIGN_Justify] = "Justify";
+
+	sm_sOrientationNames[HYORIENT_Horizontal] = "Horizontal";
+	sm_sOrientationNames[HYORIENT_Vertical] = "Vertical";
 
 	sm_sAudioPlayLists[HYPLAYLIST_Shuffle] = "Shuffle";
 	sm_sAudioPlayLists[HYPLAYLIST_Weighted] = "Weighted";
@@ -665,6 +669,25 @@
 	}
 
 	return HYALIGN_Unknown;
+}
+
+/*static*/ QStringList HyGlobal::GetOrientationNameList()
+{
+	QStringList list;
+	for(int i = 0; i < HYNUM_ORIENTATIONS; ++i)
+		list.append(sm_sOrientationNames[i]);
+	
+	return list;
+}
+
+/*static*/ HyOrientation HyGlobal::GetOrientationFromString(QString sOrientation)
+{
+	for(int i = 0; i < HYNUM_ORIENTATIONS; ++i)
+	{
+		if(sOrientation.compare(sm_sOrientationNames[i], Qt::CaseInsensitive) == 0)
+			return static_cast<HyOrientation>(i);
+	}
+	return HYORIENT_Null;
 }
 
 /*static*/ QStringList HyGlobal::GetAudioPlayListModeList()

@@ -55,13 +55,14 @@ void HySpacer::SetSize(uint32 uiSizeHint)
 	SetSizeAndLayoutDirty();
 }
 
-/*virtual*/ glm::vec2 HySpacer::GetPosOffset() /*override*/
+/*virtual*/ glm::vec2 HySpacer::GetBotLeftOffset() /*override*/
 {
 	return glm::vec2(0.0f, 0.0f);
 }
 
-/*virtual*/ void HySpacer::OnSetSizeHint() /*override*/
+/*virtual*/ glm::ivec2 HySpacer::OnCalcPreferredSize() /*override*/
 {
+	glm::ivec2 vSizeHint;
 	if(m_eORIEN_TYPE == HYORIENT_Horizontal)
 		HySetVec(m_vSizeHint, m_iSizeHint, 0);
 	else

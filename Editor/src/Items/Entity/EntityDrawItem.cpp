@@ -366,11 +366,11 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 		if(sPropertyName == "Hide Disabled")
 			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsHideDisabled());
 		if(sPropertyName == "Hide Hover State")
-			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsHideMouseHoverState());
+			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsHideHoverState());
 		if(sPropertyName == "Hide Down State")
 			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsHideDownState());
 		if(sPropertyName == "Hide Highlighted")
-			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsHideHighlightedState());
+			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsHideHighlighted());
 		if(sPropertyName == "Horizontal Policy")
 			return QJsonValue(HyGlobal::SizePolicyName(static_cast<IHyWidget *>(pThisHyNode)->GetHorizontalPolicy()));
 		if(sPropertyName == "Vertical Policy")
@@ -1112,19 +1112,19 @@ void ExtrapolateProperties(Project &projectRef,
 				QJsonObject widgetObj = propsObj["Widget"].toObject();
 
 				if(widgetObj.contains("Enabled"))
-					static_cast<IHyWidget *>(pThisHyNode)->SetAsEnabled(widgetObj["Enabled"].toBool());
+					static_cast<IHyWidget *>(pThisHyNode)->SetEnabled(widgetObj["Enabled"].toBool());
 				if(widgetObj.contains("KB Focus Allowed"))
 					static_cast<IHyWidget *>(pThisHyNode)->SetKeyboardFocusAllowed(widgetObj["KB Focus Allowed"].toBool());
 				if(widgetObj.contains("Highlighted"))
-					static_cast<IHyWidget *>(pThisHyNode)->SetAsHighlighted(widgetObj["Highlighted"].toBool());
+					static_cast<IHyWidget *>(pThisHyNode)->SetHighlighted(widgetObj["Highlighted"].toBool());
 				if(widgetObj.contains("Hide Disabled"))
 					static_cast<IHyWidget *>(pThisHyNode)->SetHideDisabled(widgetObj["Hide Disabled"].toBool());
 				if(widgetObj.contains("Hide Hover State"))
-					static_cast<IHyWidget *>(pThisHyNode)->SetHideMouseHoverState(widgetObj["Hide Hover State"].toBool());
+					static_cast<IHyWidget *>(pThisHyNode)->SetHideHoverState(widgetObj["Hide Hover State"].toBool());
 				if(widgetObj.contains("Hide Down State"))
 					static_cast<IHyWidget *>(pThisHyNode)->SetHideDownState(widgetObj["Hide Down State"].toBool());
 				if(widgetObj.contains("Hide Highlighted"))
-					static_cast<IHyWidget *>(pThisHyNode)->SetHideHighlightedState(widgetObj["Hide Highlighted"].toBool());
+					static_cast<IHyWidget *>(pThisHyNode)->SetHideHighlighted(widgetObj["Hide Highlighted"].toBool());
 				if(widgetObj.contains("Horizontal Policy"))
 					static_cast<IHyWidget *>(pThisHyNode)->SetHorizontalPolicy(HyGlobal::GetSizePolicyFromString(widgetObj["Horizontal Policy"].toString()));
 				if(widgetObj.contains("Vertical Policy"))
@@ -1174,7 +1174,7 @@ void ExtrapolateProperties(Project &projectRef,
 						HyJsonDoc itemDataDoc;
 						if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
 							HyGuiLog("ExtrapolateProperties() - failed to parse HyPanel node file data", LOGTYPE_Error);
-						static_cast<HyLabel *>(pThisHyNode)->GuiOverrideNodeData(panelInit.m_eNodeType, itemDataDoc.GetObject(), true);
+						//static_cast<HyPanel *>(pThisHyNode)->GuiOverrideNodeData(panelInit.m_eNodeType, itemDataDoc.GetObject(), true);
 					}
 				}
 				if(panelObj.contains("Visible"))

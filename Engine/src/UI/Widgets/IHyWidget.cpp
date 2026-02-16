@@ -13,10 +13,8 @@
 #include "HyEngine.h"
 
 IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
-	IHyEntityUi(pParent),
-	m_eHoverCursor(HYMOUSECURSOR_Default),
-	m_ePanelState(HYPANELSTATE_NotUsed),
-	m_Panel(this)
+	HyPanel(pParent),
+	m_eHoverCursor(HYMOUSECURSOR_Default)
 {
 }
 
@@ -27,86 +25,6 @@ IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
 bool IHyWidget::IsButton() const
 {
 	return (m_uiEntityAttribs & WIDGETATTRIB_IsTypeButton) != 0;
-}
-
-/*virtual*/ uint32 IHyWidget::GetState() const /*override*/
-{
-	if(IsUsingPanelStates())
-		return m_ePanelState;
-	else
-		return m_Panel.GetState();
-}
-
-/*virtual*/ bool IHyWidget::SetState(uint32 uiStateIndex) /*override*/
-{
-	if(IHyLoadable::SetState(uiStateIndex) == false || m_Panel.SetState(uiStateIndex) == false)
-		return false;
-	
-	m_ePanelState = HYPANELSTATE_NotUsed;
-	OnPanelUpdated();
-
-	return true;
-}
-
-/*virtual*/ uint32 IHyWidget::GetNumStates() /*override*/
-{
-	return m_Panel.GetNumStates();
-}
-
-HyPanelState IHyWidget::GetPanelState() const
-{
-	return m_ePanelState;
-}
-
-bool IHyWidget::IsUsingPanelStates() const
-{
-	return m_ePanelState != HYPANELSTATE_NotUsed;
-}
-
-void IHyWidget::UsePanelStates()
-{
-	m_ePanelState = HYPANELSTATE_Idle;
-
-	if(m_Panel.SetState(m_ePanelState))
-	{
-		OnPanelUpdated();
-		SetAssembleNeeded();
-	}
-}
-
-bool IHyWidget::IsPanelVisible() const
-{
-	return m_Panel.IsVisible();
-}
-
-void IHyWidget::SetPanelVisible(bool bVisible)
-{
-	m_Panel.SetVisible(bVisible);
-}
-
-HyAnimFloat &IHyWidget::PanelAlpha()
-{
-	return m_Panel.alpha;
-}
-
-bool IHyWidget::IsPanelBoundingVolume() const
-{
-	return m_Panel.IsBoundingVolume();
-}
-
-bool IHyWidget::IsPanelNode() const
-{
-	return m_Panel.IsNode();
-}
-
-IHyBody2d *IHyWidget::GetPanelNode()
-{
-	return m_Panel.GetNode();
-}
-
-HyUiPanelInit IHyWidget::ClonePanelInit() const
-{
-	return m_Panel.CloneInit();
 }
 
 bool IHyWidget::IsInputAllowed() const
@@ -137,11 +55,11 @@ void IHyWidget::SetHideDisabled(bool bIsHideDisabled)
 	else
 	{
 		m_uiEntityAttribs &= ~WIDGETATTRIB_HideDisabled;
-		SetAsEnabled(IsEnabled());
+		SetEnabled(IsEnabled());
 	}
 }
 
-void IHyWidget::SetAsEnabled(bool bEnabled)
+void IHyWidget::SetEnabled(bool bEnabled)
 {
 	if(bEnabled)
 	{
@@ -208,12 +126,12 @@ void IHyWidget::SetHideDownState(bool bIsHideDownState)
 	ApplyPanelState();
 }
 
-bool IHyWidget::IsHideMouseHoverState() const
+bool IHyWidget::IsHideHoverState() const
 {
 	return (m_uiEntityAttribs & WIDGETATTRIB_HideMouseHoverState) != 0 || HyEngine::Input().IsUsingTouchScreen();
 }
 
-void IHyWidget::SetHideMouseHoverState(bool bIsHideHoverState)
+void IHyWidget::SetHideHoverState(bool bIsHideHoverState)
 {
 	if(bIsHideHoverState)
 		m_uiEntityAttribs |= WIDGETATTRIB_HideMouseHoverState;
@@ -223,12 +141,12 @@ void IHyWidget::SetHideMouseHoverState(bool bIsHideHoverState)
 	ApplyPanelState();
 }
 
-bool IHyWidget::IsMouseHoverCursorSet() const
+bool IHyWidget::IsHoverCursorSet() const
 {
 	return m_eHoverCursor != HYMOUSECURSOR_Default;
 }
 
-void IHyWidget::SetMouseHoverCursor(HyMouseCursor eMouseCursor)
+void IHyWidget::SetHoverCursor(HyMouseCursor eMouseCursor)
 {
 	m_eHoverCursor = eMouseCursor;
 }
@@ -238,22 +156,7 @@ bool IHyWidget::IsHighlighted() const
 	return (m_uiEntityAttribs & (WIDGETATTRIB_IsHighlighted | WIDGETATTRIB_IsKeyboardFocus)) != 0;
 }
 
-bool IHyWidget::IsHideHighlightedState() const
-{
-	return (m_uiEntityAttribs & WIDGETATTRIB_HideHighlightedState) != 0;
-}
-
-void IHyWidget::SetHideHighlightedState(bool bIsHideHighlightedState)
-{
-	if(bIsHideHighlightedState)
-		m_uiEntityAttribs |= WIDGETATTRIB_HideHighlightedState;
-	else
-		m_uiEntityAttribs &= ~WIDGETATTRIB_HideHighlightedState;
-
-	ApplyPanelState();
-}
-
-void IHyWidget::SetAsHighlighted(bool bIsHighlighted)
+void IHyWidget::SetHighlighted(bool bIsHighlighted)
 {
 	if(bIsHighlighted)
 		m_uiEntityAttribs |= WIDGETATTRIB_IsHighlighted;
@@ -263,23 +166,31 @@ void IHyWidget::SetAsHighlighted(bool bIsHighlighted)
 	ApplyPanelState();
 }
 
+bool IHyWidget::IsHideHighlighted() const
+{
+	return (m_uiEntityAttribs & WIDGETATTRIB_HideHighlightedState) != 0;
+}
+
+void IHyWidget::SetHideHighlighted(bool bIsHideHighlighted)
+{
+	if(bIsHideHighlighted)
+		m_uiEntityAttribs |= WIDGETATTRIB_HideHighlightedState;
+	else
+		m_uiEntityAttribs &= ~WIDGETATTRIB_HideHighlightedState;
+
+	ApplyPanelState();
+}
+
 /*virtual*/ bool IHyWidget::IsDepressed() const
 {
 	return IsMouseDown();
 }
 
-#ifdef HY_PLATFORM_GUI
-void IHyWidget::GuiOverrideNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName /*= true*/)
-{
-	m_Panel.GuiOverrideNodeData(eNodeType, itemDataObj, bUseGuiOverrideName);
-}
-#endif
-
 /*virtual*/ void IHyWidget::OnMouseEnter() /*override final*/
 {
 	if(IsInputAllowed())
 	{
-		if(IsMouseHoverCursorSet())
+		if(IsHoverCursorSet())
 			HyEngine::Input().SetMouseCursor(m_eHoverCursor);
 
 		ApplyPanelState();
@@ -291,7 +202,7 @@ void IHyWidget::GuiOverrideNodeData(HyType eNodeType, HyJsonObj itemDataObj, boo
 {
 	if(IsInputAllowed())
 	{
-		if(IsMouseHoverCursorSet())
+		if(IsHoverCursorSet())
 			HyEngine::Input().ResetMouseCursor();
 
 		ApplyPanelState();
@@ -323,11 +234,6 @@ void IHyWidget::GuiOverrideNodeData(HyType eNodeType, HyJsonObj itemDataObj, boo
 	}
 }
 
-/*virtual*/ void IHyWidget::OnSetSizeHint() /*override*/
-{
-	m_vSizeHint = m_Panel.GetPanelSizeHint();
-}
-
 void IHyWidget::TakeKeyboardFocus()
 {
 	HyAssert(IsKeyboardFocusAllowed(), "IHyWidget::TakeKeyboardFocus was invoked when keyboard focus is NOT allowed");
@@ -352,21 +258,21 @@ HyPanelState IHyWidget::CalcPanelState()
 	{
 		if(IsDepressed() && IsHideDownState() == false)
 		{
-			if(IsHighlighted() && IsHideHighlightedState() == false)
+			if(IsHighlighted() && IsHideHighlighted() == false)
 				return HYPANELSTATE_HighlightedDown;
 			else
 				return HYPANELSTATE_Down;
 		}
-		else if(IsMouseHover() && IsHideMouseHoverState() == false)
+		else if(IsMouseHover() && IsHideHoverState() == false)
 		{
-			if(IsHighlighted() && IsHideHighlightedState() == false)
+			if(IsHighlighted() && IsHideHighlighted() == false)
 				return HYPANELSTATE_HighlightedHover;
 			else
 				return HYPANELSTATE_Hover;
 		}
 		else
 		{
-			if(IsHighlighted() && IsHideHighlightedState() == false)
+			if(IsHighlighted() && IsHideHighlighted() == false)
 				return HYPANELSTATE_Highlighted;
 			else
 				return HYPANELSTATE_Idle;
@@ -374,7 +280,7 @@ HyPanelState IHyWidget::CalcPanelState()
 	}
 	else // not enabled
 	{
-		if(IsHighlighted() && IsHideHighlightedState() == false)
+		if(IsHighlighted() && IsHideHighlighted() == false)
 			return HYPANELSTATE_Highlighted;
 		else
 			return HYPANELSTATE_Idle;
@@ -389,8 +295,7 @@ void IHyWidget::ApplyPanelState()
 		if(m_ePanelState != eCurState)
 		{
 			m_ePanelState = eCurState;
-			m_Panel.SetState(m_ePanelState);
-			OnPanelUpdated();
+			SetPanelState(m_ePanelState);
 		}
 	}
 }

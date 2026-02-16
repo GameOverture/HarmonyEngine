@@ -56,14 +56,9 @@ void HyDividerLine::SetThickness(float fThickness)
 {
 }
 
-/*virtual*/ glm::vec2 HyDividerLine::GetPosOffset() /*override*/
+/*virtual*/ glm::vec2 HyDividerLine::GetBotLeftOffset() /*override*/
 {
 	return glm::vec2(0.0f);
-}
-
-/*virtual*/ void HyDividerLine::OnSetSizeHint() /*override*/
-{
-	m_vSizeHint = m_Panel.GetPanelSizeHint();
 }
 
 /*virtual*/ glm::ivec2 HyDividerLine::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/

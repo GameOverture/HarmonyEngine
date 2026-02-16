@@ -113,7 +113,7 @@ public:
 	bool IsMonospacedDigits() const;
 	virtual void SetMonospacedDigits(bool bSet);
 
-	virtual glm::vec2 GetPosOffset() override;
+	virtual glm::vec2 GetBotLeftOffset() override;
 
 #ifdef HY_PLATFORM_GUI
 	void GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrideName = true);

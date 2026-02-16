@@ -19,13 +19,9 @@ HySpacerHandle HyUiContainer::sm_hSpacerHandleCounter = 1;
 HyLayoutHandle HyUiContainer::sm_hLayoutHandleCounter = 1;
 
 HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyUiPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
-	HyEntity2d(pParent),
-	//m_Shape(this),
+	HyPanel(initRef, pParent),
 	m_bInputAllowed(true),
 	m_iDefaultWidgetSpacing(HYUICONTAINER_DefaultWidgetSpacing),
-	m_bFlexSizeX(true),
-	m_bFlexSizeY(true),
-	m_Panel(this),
 	m_RootLayout(eRootLayoutDirection, HYUICONTAINER_DefaultWidgetSpacing, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f),
@@ -35,10 +31,6 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyUiPanel
 	m_HorzBar(HYORIENT_Horizontal, 20, this)
 {
 	m_RootBtnGrp.SetAsAutoExclusive();
-	m_Panel.Setup(initRef);
-
-	m_bFlexSizeX = m_Panel.GetWidth() == 0.0f;
-	m_bFlexSizeY = m_Panel.GetHeight() == 0.0f;
 
 	m_RootLayout.SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Flexible);
 	m_RootLayout.SetLayoutDirty();
@@ -415,7 +407,7 @@ glm::ivec2 HyUiContainer::GetLayoutSize(HyLayoutHandle hLayout)
 		OnRootLayoutUpdate();
 
 	if(m_SubLayoutMap.find(hLayout) != m_SubLayoutMap.end())
-		return m_SubLayoutMap.at(hLayout)->GetActualSize();
+		return glm::ivec2(m_SubLayoutMap.at(hLayout)->GetWidth(), m_SubLayoutMap.at(hLayout)->GetHeight());
 
 	return glm::ivec2(0, 0);
 }

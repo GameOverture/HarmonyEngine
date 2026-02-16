@@ -108,6 +108,8 @@ public:
 	QString GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJsonObject propObj, QString sNewLine) const;
 	QString GenerateSrc_TimelineAdvance() const; // Advance runtime by 1 frame on the timeline
 
+	QString DeserializeTextInitAsRuntimeCode(QUuid itemUuid, HyMargins<float> margins) const;
+	QString DeserializePanelInitAsRuntimeCode(QJsonObject panelInitObj) const;
 	QString DeserializeShapeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QJsonArray floatArray, QString sNewLine) const;
 	QString DeserializeChainAsRuntimeCode(bool bIsPrimitive, QString sCodeName, QJsonArray floatArray, QString sNewLine) const;
 

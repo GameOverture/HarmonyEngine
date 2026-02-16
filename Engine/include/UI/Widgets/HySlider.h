@@ -84,7 +84,7 @@ protected:
 	virtual void Update() override;
 	virtual void OnAssemble() override;
 
-	virtual glm::vec2 GetPosOffset() override;
+	virtual glm::vec2 GetBotLeftOffset() override;
 	virtual void OnSetSizeHint() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
 

@@ -19,7 +19,7 @@
 #include "UI/Components/HyToolButton.h"
 #include "UI/Components/HyScrollBar.h"
 
-class HyUiContainer : public HyEntity2d
+class HyUiContainer : public HyPanel
 {
 	friend class HyLayout;
 	friend class HyInput;
@@ -29,15 +29,9 @@ class HyUiContainer : public HyEntity2d
 	static std::vector<HyUiContainer *>		sm_pContainerList;
 
 protected:
-	//HyShape2d								m_Shape;
-
 	bool									m_bInputAllowed;
 	int32									m_iDefaultWidgetSpacing;
 
-	bool									m_bFlexSizeX;
-	bool									m_bFlexSizeY;
-
-	HyPanel									m_Panel;
 	HyLayout								m_RootLayout;
 	HyButtonGroup							m_RootBtnGrp;
 

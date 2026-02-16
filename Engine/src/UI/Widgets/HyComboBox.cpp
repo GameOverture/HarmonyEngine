@@ -44,8 +44,8 @@ uint32 HyComboBox::InsertSubButton(const HyUiPanelInit &panelInit, const HyUiTex
 {
 	HyButton *pNewBtn = HY_NEW HyButton(panelInit, textInit, this);
 	pNewBtn->SetButtonClickedCallback(fpCallBack, audioNodePath);
-	pNewBtn->SetAsEnabled(false);
-	pNewBtn->pos.Set(pNewBtn->GetPosOffset());
+	pNewBtn->SetEnabled(false);
+	pNewBtn->pos.Set(pNewBtn->GetBotLeftOffset());
 	pNewBtn->alpha.Set(0.0f);
 	pNewBtn->Load();
 
@@ -63,7 +63,7 @@ void HyComboBox::SetSubButtonEnabled(uint32 uiSubBtnIndex, bool bEnabled)
 	m_SubBtnEnabledMap[m_SubBtnList[uiSubBtnIndex]] = bEnabled;
 
 	if(IsExpanded() && bEnabled)
-		m_SubBtnList[uiSubBtnIndex]->SetAsEnabled(true);
+		m_SubBtnList[uiSubBtnIndex]->SetEnabled(true);
 }
 
 void HyComboBox::RemoveSubButton(uint32 uiSubBtnIndex)
@@ -140,7 +140,7 @@ void HyComboBox::ToggleExpanded()
 		for(uint32 i = 0; i < static_cast<uint32>(m_SubBtnList.size()); ++i)
 		{
 			HyButton *pSubBtn = m_SubBtnList[i];
-			glm::vec2 vOffset = pSubBtn->GetPosOffset();
+			glm::vec2 vOffset = pSubBtn->GetBotLeftOffset();
 			if(m_uiEntityAttribs & COMBOBOXATTRIB_IsInstantExpand)
 			{
 				pSubBtn->pos.Set(ptTweenDest[0] + vOffset.x, ptTweenDest[1] + vOffset.y);
@@ -169,10 +169,10 @@ void HyComboBox::ToggleExpanded()
 		{
 			HyButton *pSubBtn = m_SubBtnList[i];
 
-			glm::vec2 vOffset = pSubBtn->GetPosOffset();
+			glm::vec2 vOffset = pSubBtn->GetBotLeftOffset();
 			pSubBtn->pos.Tween(vOffset.x, vOffset.y, fTweenExpandDur * 0.5f, HyTween::Linear);
 			pSubBtn->alpha.Tween(0.0f, fTweenExpandDur * 0.5f);
-			pSubBtn->SetAsEnabled(false);
+			pSubBtn->SetEnabled(false);
 		}
 	}
 	
@@ -251,7 +251,7 @@ void HyComboBox::ResetExpandedTimeout()
 		if(bAllFinished)
 		{
 			for(uint32 i = 0; i < static_cast<uint32>(m_SubBtnList.size()); ++i)
-				m_SubBtnList[i]->SetAsEnabled(m_SubBtnEnabledMap[m_SubBtnList[i]]);
+				m_SubBtnList[i]->SetEnabled(m_SubBtnEnabledMap[m_SubBtnList[i]]);
 
 			ResetExpandedTimeout();
 			m_uiEntityAttribs &= ~(COMBOBOXATTRIB_IsTransition | COMBOBOXATTRIB_IsExpandMouseDwn);

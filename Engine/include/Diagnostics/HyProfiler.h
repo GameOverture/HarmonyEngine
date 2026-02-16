@@ -58,7 +58,7 @@ public:
 	}
 	virtual float GetWidth(float fPercent = 1.0f) override { return m_fWidth; }
 	virtual float GetHeight(float fPercent = 1.0f) override { return m_fHEIGHT; }
-	void SetWidth(float fWidth) { m_fWidth = fWidth; SetSizeAndLayoutDirty(); }
+	void SetWidth(float fWidth) { m_fWidth = fWidth; SetSizeDirty(); }
 	void AddDeltas(double dUpdate, double dRenderPrep, double dRender) {
 		m_PortionList[PORTION_Update].m_dDuration += dUpdate;
 		m_PortionList[PORTION_RenderPrep].m_dDuration += dRenderPrep;
@@ -73,7 +73,7 @@ public:
 	}
 
 protected:
-	virtual glm::vec2 GetPosOffset() override { return glm::vec2(0, 0); }
+	virtual glm::vec2 GetBotLeftOffset() override { return glm::vec2(0, 0); }
 	virtual void OnSetSizeHint() override { HySetVec(m_vSizeHint, static_cast<int32>(m_fWidth), static_cast<int32>(m_fHEIGHT)); }
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override {
 		m_fWidth = static_cast<float>(uiNewWidth);

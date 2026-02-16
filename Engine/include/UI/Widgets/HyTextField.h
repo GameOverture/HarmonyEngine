@@ -63,13 +63,13 @@ public:
 	void Submit();
 
 protected:
+	virtual void OnAssemble() override;
+
 	virtual void OnUiTextInput(std::string sNewUtf8Text) override;
 	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) override;
 
 	virtual void OnTakeKeyboardFocus() override;
 	virtual void OnRelinquishKeyboardFocus() override;
-
-	virtual void OnPanelUpdated() override;
 
 	void MoveCursor(int32 iOffset, bool bSelection);
 

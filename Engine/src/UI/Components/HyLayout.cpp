@@ -16,29 +16,14 @@
 HyLayout::HyLayout(HyOrientation eLayoutType, int32 iWidgetSpacing, HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
 	m_eLayoutType(eLayoutType),
-	m_vActualSize(0, 0),
 	m_bReverse(m_eLayoutType == HYORIENT_Horizontal ? false : true), // 'm_bReverse' is defaulted ON when 'm_eLayoutType' is HYORIENT_Vertical to achieve top->bottom as default
-	m_bLayoutDirty(false),
 	m_iWidgetSpacing(iWidgetSpacing)
 {
 	m_uiFlags |= NODETYPE_IsLayout;
-
-	m_SizePolicies[HYORIENT_Horizontal] = HYSIZEPOLICY_Flexible;
-	m_SizePolicies[HYORIENT_Vertical] = HYSIZEPOLICY_Flexible;
 }
 
 /*virtual*/ HyLayout::~HyLayout()
 {
-}
-
-/*virtual*/ float HyLayout::GetWidth(float fPercent /*= 1.0f*/) /*override*/
-{
-	return m_vActualSize.x * fPercent;
-}
-
-/*virtual*/ float HyLayout::GetHeight(float fPercent /*= 1.0f*/) /*override*/
-{
-	return m_vActualSize.y * fPercent;
 }
 
 HyOrientation HyLayout::GetLayoutType() const
@@ -56,12 +41,7 @@ void HyLayout::SetLayoutType(HyOrientation eLayoutType)
 	SetLayoutDirty();
 }
 
-glm::ivec2 HyLayout::GetActualSize() const
-{
-	return m_vActualSize;
-}
-
-/*virtual*/ HySizePolicy HyLayout::GetSizePolicy(HyOrientation eOrien) /*override*/
+/*virtual*/ HySizePolicy HyLayout::GetSizePolicy(HyOrientation eOrien) const /*override*/
 {
 	uint32 uiSizePolicy = 0;// HYSIZEPOLICY_Fixed;
 	bool bShrinkValid = true;
@@ -77,11 +57,6 @@ glm::ivec2 HyLayout::GetActualSize() const
 	}
 
 	return static_cast<HySizePolicy>(uiSizePolicy);
-}
-
-/*virtual*/ glm::vec2 HyLayout::GetPosOffset() /*override*/
-{
-	return glm::vec2(0, 0);
 }
 
 void HyLayout::AppendItem(IHyEntityUi &itemRef)
@@ -149,21 +124,6 @@ void HyLayout::SetMargins(const HyMargins<int16> &newMargins, int32 iWidgetSpaci
 int32 HyLayout::GetWidgetSpacing()
 {
 	return m_iWidgetSpacing;
-}
-
-bool HyLayout::IsLayoutDirty() const
-{
-	return m_bLayoutDirty;
-}
-
-void HyLayout::SetLayoutDirty()
-{
-	m_bSizeHintDirty = true;
-	m_bLayoutDirty = true;
-
-	// Propagate upward if this is nested in another layout
-	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
-		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
 }
 
 bool HyLayout::RequestWidgetFocus(IHyWidget *pWidget)
@@ -244,10 +204,10 @@ void HyLayout::OnSetDebugBox()
 }
 #endif
 
-/*virtual*/ void HyLayout::OnSetSizeHint() /*override*/
+/*virtual*/ glm::ivec2 HyLayout::OnCalcPreferredSize() /*override*/
 {
-	HySetVec(m_vMinSize, m_Margins.left + m_Margins.right, m_Margins.bottom + m_Margins.top);
-	m_vSizeHint = m_vMinSize;
+	glm::ivec2 vSizeHint(m_Margins.left + m_Margins.right, m_Margins.bottom + m_Margins.top);
+	glm::ivec2 vMinSize(vSizeHint);
 
 	uint32 uiNumChildren = ChildCount();
 	if(uiNumChildren == 0)
@@ -265,9 +225,9 @@ void HyLayout::OnSetDebugBox()
 		eInverseOrien = HYORIENT_Horizontal;
 	}
 
-	// Figure out m_vSizeHint while counting size policies
-	m_vSizeHint[eOrientation] += (GetWidgetSpacing() * (uiNumChildren - 1));
-	m_vMinSize[eOrientation] += (GetWidgetSpacing() * (uiNumChildren - 1));
+	// Figure out vSizeHint while counting size policies
+	vSizeHint[eOrientation] += (GetWidgetSpacing() * (uiNumChildren - 1));
+	vMinSize[eOrientation] += (GetWidgetSpacing() * (uiNumChildren - 1));
 	m_uiNumExpandItems = m_uiNumShrinkItems = 0;
 
 	for(uint32 i = 0; i < static_cast<uint32>(m_ChildList.size()); ++i)
@@ -278,16 +238,19 @@ void HyLayout::OnSetDebugBox()
 		IHyEntityUi *pItem = static_cast<IHyEntityUi *>(pChildItem);
 
 		glm::ivec2 vItemMinSize = pItem->GetMinSize();
-		m_vMinSize[eOrientation] += vItemMinSize[eOrientation];
-		m_vMinSize[eInverseOrien] = HyMath::Max(m_vMinSize[eInverseOrien], vItemMinSize[eInverseOrien]);
+		vMinSize[eOrientation] += vItemMinSize[eOrientation];
+		vMinSize[eInverseOrien] = HyMath::Max(vMinSize[eInverseOrien], vItemMinSize[eInverseOrien]);
 
 		m_uiNumExpandItems += (pItem->GetSizePolicy(eOrientation) & HY_SIZEFLAG_EXPAND);		// Adds 1 or 0
 		m_uiNumShrinkItems += ((pItem->GetSizePolicy(eOrientation) & HY_SIZEFLAG_SHRINK) >> 1);	// Adds 1 or 0
 
-		glm::ivec2 vItemSizeHint = pItem->GetSizeHint();
-		m_vSizeHint[eOrientation] += vItemSizeHint[eOrientation];
-		m_vSizeHint[eInverseOrien] = HyMath::Max(m_vSizeHint[eInverseOrien], vItemSizeHint[eInverseOrien]);
+		glm::ivec2 vItemSizeHint = pItem->GetPreferredSize();
+		vSizeHint[eOrientation] += vItemSizeHint[eOrientation];
+		vSizeHint[eInverseOrien] = HyMath::Max(vSizeHint[eInverseOrien], vItemSizeHint[eInverseOrien]);
 	}
+
+	SetMinSize(vMinSize.x, vMinSize.y);
+	return vSizeHint;
 }
 
 /*virtual*/ glm::ivec2 HyLayout::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
@@ -372,7 +335,7 @@ void HyLayout::OnSetDebugBox()
 			bNeedsResize = true;
 
 		// After resizing, apply offset to get 'pItem' oriented to its bottom left
-		pItem->pos.Offset(pItem->GetPosOffset());
+		pItem->pos.Offset(pItem->GetBotLeftOffset());
 
 		ptCurPos[eOrientation] += vActualItemSize[eOrientation] + GetWidgetSpacing();
 	};

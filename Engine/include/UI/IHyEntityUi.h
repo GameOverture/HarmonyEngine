@@ -14,30 +14,31 @@
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Input/HyInputKeys.h"
 
-class HyLayout;
-
 class IHyEntityUi : public HyEntity2d
 {
-	friend class HyUiContainer;
-	friend class HyScrollContainer;
-	friend class HyLayout;
+private:
+	glm::ivec2							m_vActualSize;
 
-protected:
-	HySizePolicy						m_SizePolicies[HYNUM_ORIENTATIONS];
 	glm::ivec2							m_vMinSize;
 	glm::ivec2							m_vMaxSize;
-	bool								m_bLockProportions;
 
-	bool								m_bSizeHintDirty;
-	glm::ivec2							m_vSizeHint;
+	glm::ivec2							m_vSizeHint;	// Ideal size. If a dimension is '0' then autosize it
+	bool								m_bSizeDirty;
+	bool								m_bLockProportions;
+	HySizePolicy						m_SizePolicies[HYNUM_ORIENTATIONS];
 
 public:
 	IHyEntityUi(HyEntity2d *pParent = nullptr);
 	virtual ~IHyEntityUi();
 
-	HySizePolicy GetHorizontalPolicy();
-	HySizePolicy GetVerticalPolicy();
-	virtual HySizePolicy GetSizePolicy(HyOrientation eOrien);
+	virtual float GetWidth(float fPercent = 1.0f) override;
+	virtual float GetHeight(float fPercent = 1.0f) override;
+	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
+	float GetSizeDimension(int32 iDimensionIndex, float fPercent = 1.0f);
+
+	HySizePolicy GetHorizontalPolicy() const;
+	HySizePolicy GetVerticalPolicy() const;
+	virtual HySizePolicy GetSizePolicy(HyOrientation eOrien) const;
 
 	void SetSizePolicy(HySizePolicy eHorizPolicy, HySizePolicy eVertPolicy);
 	void SetHorizontalPolicy(HySizePolicy ePolicy);
@@ -51,16 +52,17 @@ public:
 	glm::ivec2 GetMaxSize();
 	void SetMaxSize(uint32 uiMaxSizeX, uint32 uiMaxSizeY);
 
-	glm::ivec2 GetSizeHint();
-
-protected:
+	bool IsSizeDirty() const;
+	glm::ivec2 GetPreferredSize();											// Ideal size. If a dimension is '0' then autosize it
 	glm::ivec2 Resize(uint32 uiNewWidth, uint32 uiNewHeight);
 
-	virtual glm::vec2 GetPosOffset() = 0;									// What offset is needed to get *this oriented to its bottom left
-	virtual void OnSetSizeHint() = 0;										// Sets the preferred size of *this into 'm_vSizeHint'
-	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) = 0;	// Returns the size *this was actually set to (which may be different than what's passed in due to constraints)
+	virtual glm::vec2 GetBotLeftOffset() = 0;								// What offset is needed to get *this oriented to its bottom left
 
-	void SetSizeAndLayoutDirty();
+protected:
+	void SetSizeDirty();
+
+	virtual glm::ivec2 OnCalcPreferredSize() = 0;							// Returns the preferred size (may also set Min/Max sizes). Returned result is set to 'm_vSizeHint'.
+	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) = 0;	// Returns the size *this was actually set to (which may be different than what's passed in due to constraints)
 };
 
 #endif /* IHyEntityUi_h__ */

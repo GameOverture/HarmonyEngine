@@ -17,6 +17,7 @@
 HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyBody2d(HYTYPE_Entity, HyNodePath(), pParent),
 	m_uiEntityAttribs(0),
+	m_fDeferAmt(0.0f),
 	m_fpDeferFinishedFunc(nullptr),
 	physics(*this)
 {
@@ -26,7 +27,8 @@ HyEntity2d::HyEntity2d(HyEntity2d &&donor) noexcept :
 	IHyBody2d(std::move(donor)),
 	m_ChildList(std::move(donor.m_ChildList)),
 	m_uiEntityAttribs(std::move(donor.m_uiEntityAttribs)),
-	m_fpDeferFinishedFunc(std::move(donor.m_fpDeferFinishedFunc)),
+	m_fDeferAmt(0.0f),
+	m_fpDeferFinishedFunc(nullptr),
 	physics(*this)
 {
 }
@@ -100,26 +102,85 @@ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitCh
 		m_ChildList[i]->_SetPauseUpdate(IsPauseUpdate(), bOverrideExplicitChildren);
 }
 
+/*virtual*/ float HyEntity2d::GetWidth(float fPercent /*= 1.0f*/) /*override*/
+{
+	HyShape2d shape;
+	CalcLocalBoundingShape(shape);
+	
+	b2AABB aabb;
+	shape.ComputeAABB(aabb, glm::mat4(1.0f));
+	return (b2AABB_Extents(aabb).x * 2.0f) * fPercent;
+}
+
+/*virtual*/ float HyEntity2d::GetHeight(float fPercent /*= 1.0f*/) /*override*/
+{
+	HyShape2d shape;
+	CalcLocalBoundingShape(shape);
+	
+	b2AABB aabb;
+	shape.ComputeAABB(aabb, glm::mat4(1.0f));
+	return (b2AABB_Extents(aabb).y * 2.0f) * fPercent;
+}
+
+/*virtual*/ void HyEntity2d::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
+{
+	shapeOut.SetAsNothing();
+
+	b2AABB localAABB;
+	HyMath::InvalidateAABB(localAABB);
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(0 == (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody) ||
+			static_cast<IHyBody2d *>(m_ChildList[i])->IsLoadDataValid() == false)
+		{
+			continue;
+		}
+
+		static_cast<IHyBody2d *>(m_ChildList[i])->CalcLocalBoundingShape(shapeOut);
+		glm::mat4 localMtx;
+		m_ChildList[i]->GetLocalTransform(localMtx, 0.0f);
+
+		if(b2IsValidAABB(localAABB) == false)
+			shapeOut.ComputeAABB(localAABB, localMtx);
+		else
+		{
+			b2AABB tmpAABB;
+			shapeOut.ComputeAABB(tmpAABB, localMtx);
+			localAABB = b2AABB_Union(localAABB, tmpAABB);
+		}
+	}
+
+	if(b2IsValidAABB(localAABB))
+		shapeOut.SetAsBox(HyRect(b2AABB_Extents(localAABB).x, b2AABB_Extents(localAABB).y, glm::vec2(b2AABB_Center(localAABB).x, b2AABB_Center(localAABB).y), 0.0f));
+	else
+		shapeOut.SetAsNothing();
+}
+
+/*virtual*/ const b2AABB &HyEntity2d::GetSceneAABB() /*override*/
+{
+	HyMath::InvalidateAABB(m_SceneAABB);
+	for(uint32 i = 0; i < m_ChildList.size(); ++i)
+	{
+		if(0 == (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody) ||
+			static_cast<IHyBody2d *>(m_ChildList[i])->IsLoadDataValid() == false ||
+			b2IsValidAABB(static_cast<IHyBody2d *>(m_ChildList[i])->GetSceneAABB()) == false)
+		{
+			continue;
+		}
+
+		if(b2IsValidAABB(m_SceneAABB) == false)
+			m_SceneAABB = static_cast<IHyBody2d *>(m_ChildList[i])->GetSceneAABB();
+		else
+			m_SceneAABB = b2AABB_Union(m_SceneAABB, static_cast<IHyBody2d *>(m_ChildList[i])->GetSceneAABB());
+	}
+
+	return m_SceneAABB;
+}
+
 /*virtual*/ void HyEntity2d::SetScissor(const HyRect &scissorRect) /*override*/
 {
 	SetScissor(scissorRect, false);
 }
-
-///*virtual*/ void HyEntity2d::SetScissor(HyStencilHandle hScissorHandle) /*override*/
-//{
-//	SetScissor(hScissorHandle, false);
-//}
-//
-//void HyEntity2d::SetScissor(HyStencilHandle hScissorHandle, bool bOverrideExplicitChildren)
-//{
-//	IHyBody2d::SetScissor(hScissorHandle);
-//
-//	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-//	{
-//		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-//			static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissorStencil(m_hScissorStencil, bOverrideExplicitChildren);
-//	}
-//}
 
 void HyEntity2d::SetScissor(const HyRect &scissorRect, bool bOverrideExplicitChildren)
 {
@@ -231,81 +292,6 @@ void HyEntity2d::SetDisplayOrder(int32 iOrderValue, bool bOverrideExplicitChildr
 		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
 			static_cast<IHyBody2d *>(m_ChildList[i])->ResetDisplayOrder();
 	}
-}
-
-/*virtual*/ void HyEntity2d::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
-{
-	shapeOut.SetAsNothing();
-
-	b2AABB localAABB;
-	HyMath::InvalidateAABB(localAABB);
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		if(0 == (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody) ||
-			static_cast<IHyBody2d *>(m_ChildList[i])->IsLoadDataValid() == false)
-		{
-			continue;
-		}
-
-		static_cast<IHyBody2d *>(m_ChildList[i])->CalcLocalBoundingShape(shapeOut);
-		glm::mat4 localMtx;
-		m_ChildList[i]->GetLocalTransform(localMtx, 0.0f);
-
-		if(b2IsValidAABB(localAABB) == false)
-			shapeOut.ComputeAABB(localAABB, localMtx);
-		else
-		{
-			b2AABB tmpAABB;
-			shapeOut.ComputeAABB(tmpAABB, localMtx);
-			localAABB = b2AABB_Union(localAABB, tmpAABB);
-		}
-	}
-
-	if(b2IsValidAABB(localAABB))
-		shapeOut.SetAsBox(HyRect(b2AABB_Extents(localAABB).x, b2AABB_Extents(localAABB).y, glm::vec2(b2AABB_Center(localAABB).x, b2AABB_Center(localAABB).y), 0.0f));
-	else
-		shapeOut.SetAsNothing();
-}
-
-/*virtual*/ const b2AABB &HyEntity2d::GetSceneAABB() /*override*/
-{
-	HyMath::InvalidateAABB(m_SceneAABB);
-	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-	{
-		if(0 == (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody) ||
-			static_cast<IHyBody2d *>(m_ChildList[i])->IsLoadDataValid() == false ||
-			b2IsValidAABB(static_cast<IHyBody2d *>(m_ChildList[i])->GetSceneAABB()) == false)
-		{
-			continue;
-		}
-
-		if(b2IsValidAABB(m_SceneAABB) == false)
-			m_SceneAABB = static_cast<IHyBody2d *>(m_ChildList[i])->GetSceneAABB();
-		else
-			m_SceneAABB = b2AABB_Union(m_SceneAABB, static_cast<IHyBody2d *>(m_ChildList[i])->GetSceneAABB());
-	}
-
-	return m_SceneAABB;
-}
-
-/*virtual*/ float HyEntity2d::GetWidth(float fPercent /*= 1.0f*/) /*override*/
-{
-	HyShape2d shape;
-	CalcLocalBoundingShape(shape);
-	
-	b2AABB aabb;
-	shape.ComputeAABB(aabb, glm::mat4(1.0f));
-	return (b2AABB_Extents(aabb).x * 2.0f) * fPercent;
-}
-
-/*virtual*/ float HyEntity2d::GetHeight(float fPercent /*= 1.0f*/) /*override*/
-{
-	HyShape2d shape;
-	CalcLocalBoundingShape(shape);
-	
-	b2AABB aabb;
-	shape.ComputeAABB(aabb, glm::mat4(1.0f));
-	return (b2AABB_Extents(aabb).y * 2.0f) * fPercent;
 }
 
 void HyEntity2d::ChildAppend(IHyNode2d &childRef)
@@ -586,12 +572,13 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 void HyEntity2d::Defer(float fTime, std::function<void(HyEntity2d *)> fpFunc)
 {
 	m_fDeferAmt = fTime;
-	m_fpDeferFinishedFunc = fpFunc;
+	delete m_fpDeferFinishedFunc;
+	m_fpDeferFinishedFunc = HY_NEW std::function<void(HyEntity2d *)>(fpFunc);
 }
 
 bool HyEntity2d::IsDeferring() const
 {
-	return m_fpDeferFinishedFunc != nullptr;
+	return m_fDeferAmt > 0.0f;
 }
 
 bool HyEntity2d::IsRegisteredAssembleEntity() const
@@ -652,14 +639,15 @@ void HyEntity2d::Assemble()
 {
 	IHyBody2d::Update();
 
-	if(m_fpDeferFinishedFunc)
+	if(IsDeferring())
 	{
 		m_fDeferAmt -= HyEngine::DeltaTime();
 		if(m_fDeferAmt <= 0.0f)
 		{
-			m_fpDeferFinishedFunc(this);
+			(*m_fpDeferFinishedFunc)(this);
 			if(m_fDeferAmt <= 0.0f) // NOTE: Must recheck in case the 'm_fpDeferFinishedFunc' callback set a new Defer()
 			{
+				delete m_fpDeferFinishedFunc;
 				m_fpDeferFinishedFunc = nullptr;
 				m_fDeferAmt = 0.0f;
 			}

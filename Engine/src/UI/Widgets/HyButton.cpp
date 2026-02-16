@@ -19,7 +19,7 @@ HyButton::HyButton(HyEntity2d *pParent /*= nullptr*/) :
 {
 	m_uiEntityAttribs |= WIDGETATTRIB_IsTypeButton;
 	SetKeyboardFocusAllowed(true);
-	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
+	SetHoverCursor(HYMOUSECURSOR_Hand);
 	UsePanelStates();
 }
 
@@ -30,7 +30,7 @@ HyButton::HyButton(const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullp
 {
 	m_uiEntityAttribs |= WIDGETATTRIB_IsTypeButton;
 	SetKeyboardFocusAllowed(true);
-	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
+	SetHoverCursor(HYMOUSECURSOR_Hand);
 	UsePanelStates();
 }
 
@@ -41,7 +41,7 @@ HyButton::HyButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit,
 {
 	m_uiEntityAttribs |= WIDGETATTRIB_IsTypeButton;
 	SetKeyboardFocusAllowed(true);
-	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
+	SetHoverCursor(HYMOUSECURSOR_Hand);
 	UsePanelStates();
 }
 
@@ -52,7 +52,7 @@ HyButton::HyButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit,
 //{
 //	m_uiEntityAttribs |= WIDGETATTRIB_IsTypeButton;
 //	SetKeyboardFocusAllowed(true);
-//	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
+//	SetHoverCursor(HYMOUSECURSOR_Hand);
 //	UsePanelStates();
 //}
 //
@@ -63,7 +63,7 @@ HyButton::HyButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit,
 //{
 //	m_uiEntityAttribs |= WIDGETATTRIB_IsTypeButton;
 //	SetKeyboardFocusAllowed(true);
-//	SetMouseHoverCursor(HYMOUSECURSOR_Hand);
+//	SetHoverCursor(HYMOUSECURSOR_Hand);
 //	UsePanelStates();
 //}
 

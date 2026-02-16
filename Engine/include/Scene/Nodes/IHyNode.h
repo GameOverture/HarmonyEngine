@@ -71,6 +71,7 @@ public:
 		SETTING_IsPauseUpdate		= 1 << 25,
 		SETTING_AllocScissorStencil	= 1 << 26,
 	};
+	// TODO: Put entity flags here with a final 'ENTITYATTRIB_NEXTFLAG', then bump m_uiFlags to 64bits
 protected:
 	uint32							m_uiFlags;
 

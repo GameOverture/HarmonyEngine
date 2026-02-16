@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IHyEntityUi.cpp
+*	IHySizer2d.cpp
 *
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
@@ -13,11 +13,12 @@
 
 IHyEntityUi::IHyEntityUi(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
+	m_vActualSize(0, 0),
 	m_vMinSize(0, 0),
 	m_vMaxSize(std::numeric_limits<int32>().max(), std::numeric_limits<int32>().max()),
-	m_bLockProportions(false),
-	m_bSizeHintDirty(true),
-	m_vSizeHint(0, 0)
+	m_vSizeHint(0, 0),
+	m_bSizeDirty(true),
+	m_bLockProportions(false)
 {
 	for(int32 i = 0; i < HYNUM_ORIENTATIONS; ++i)
 		m_SizePolicies[i] = HYSIZEPOLICY_Fixed;
@@ -27,17 +28,46 @@ IHyEntityUi::IHyEntityUi(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-HySizePolicy IHyEntityUi::GetHorizontalPolicy()
+/*virtual*/ float IHyEntityUi::GetWidth(float fPercent = 1.0f) /*override*/
+{
+	if(m_bSizeDirty)
+		Resize(m_vActualSize.x, m_vActualSize.y);
+
+	return m_vActualSize.x * fPercent;
+}
+
+/*virtual*/ float IHyEntityUi::GetHeight(float fPercent = 1.0f) /*override*/
+{
+	if(m_bSizeDirty)
+		Resize(m_vActualSize.x, m_vActualSize.y);
+
+	return m_vActualSize.y * fPercent;
+}
+
+/*virtual*/ void IHyEntityUi::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
+{
+	shapeOut.SetAsBox(GetWidth(), GetHeight());
+}
+
+float IHyEntityUi::GetSizeDimension(int32 iDimensionIndex, float fPercent /*= 1.0f*/)
+{
+	if(iDimensionIndex == HYORIENT_Horizontal)
+		return GetWidth(fPercent);
+
+	return GetHeight(fPercent);
+}
+
+HySizePolicy IHyEntityUi::GetHorizontalPolicy() const
 {
 	return GetSizePolicy(HYORIENT_Horizontal);
 }
 
-HySizePolicy IHyEntityUi::GetVerticalPolicy()
+HySizePolicy IHyEntityUi::GetVerticalPolicy() const
 {
 	return GetSizePolicy(HYORIENT_Vertical);
 }
 
-/*virtual*/ HySizePolicy IHyEntityUi::GetSizePolicy(HyOrientation eOrien)
+/*virtual*/ HySizePolicy IHyEntityUi::GetSizePolicy(HyOrientation eOrien) const
 {
 	return m_SizePolicies[eOrien];
 }
@@ -49,7 +79,7 @@ void IHyEntityUi::SetSizePolicy(HySizePolicy eHorizPolicy, HySizePolicy eVertPol
 
 	m_SizePolicies[HYORIENT_Horizontal] = eHorizPolicy;
 	m_SizePolicies[HYORIENT_Vertical] = eVertPolicy;
-	SetSizeAndLayoutDirty();
+	SetSizeDirty();
 }
 
 void IHyEntityUi::SetHorizontalPolicy(HySizePolicy ePolicy)
@@ -58,7 +88,7 @@ void IHyEntityUi::SetHorizontalPolicy(HySizePolicy ePolicy)
 		return;
 
 	m_SizePolicies[HYORIENT_Horizontal] = ePolicy;
-	SetSizeAndLayoutDirty();
+	SetSizeDirty();
 }
 
 void IHyEntityUi::SetVerticalPolicy(HySizePolicy ePolicy)
@@ -67,7 +97,7 @@ void IHyEntityUi::SetVerticalPolicy(HySizePolicy ePolicy)
 		return;
 
 	m_SizePolicies[HYORIENT_Vertical] = ePolicy;
-	SetSizeAndLayoutDirty();
+	SetSizeDirty();
 }
 
 bool IHyEntityUi::IsLockedProportions() const
@@ -81,12 +111,17 @@ void IHyEntityUi::SetLockedProportions(bool bLockProportions)
 		return;
 
 	m_bLockProportions = bLockProportions;
-	SetSizeAndLayoutDirty();
+	SetSizeDirty();
 }
+
+//bool IHyEntityUi::IsAutoSize() const
+//{
+//	return m_vSizeHint.x <= 0 || m_vSizeHint.y <= 0;
+//}
 
 glm::ivec2 IHyEntityUi::GetMinSize()
 {
-	glm::ivec2 vSizeHint = GetSizeHint();
+	glm::ivec2 vSizeHint = GetPreferredSize();
 
 	glm::ivec2 vMinSize = m_vMinSize;
 	if((m_SizePolicies[HYORIENT_Horizontal] & HY_SIZEFLAG_SHRINK) == 0)
@@ -108,12 +143,12 @@ void IHyEntityUi::SetMinSize(uint32 uiMinSizeX, uint32 uiMinSizeY)
 		return;
 
 	HySetVec(m_vMinSize, uiMinSizeX, uiMinSizeY);
-	SetSizeAndLayoutDirty();
+	SetSizeDirty();
 }
 
 glm::ivec2 IHyEntityUi::GetMaxSize()
 {
-	glm::ivec2 vSizeHint = GetSizeHint();
+	glm::ivec2 vSizeHint = GetPreferredSize();
 
 	glm::ivec2 vMaxSize = m_vMaxSize;
 	if((m_SizePolicies[HYORIENT_Horizontal] & HY_SIZEFLAG_EXPAND) == 0)
@@ -135,22 +170,25 @@ void IHyEntityUi::SetMaxSize(uint32 uiMaxSizeX, uint32 uiMaxSizeY)
 		return;
 
 	HySetVec(m_vMaxSize, uiMaxSizeX, uiMaxSizeY);
-	SetSizeAndLayoutDirty();
+	SetSizeDirty();
 }
 
-glm::ivec2 IHyEntityUi::GetSizeHint()
+bool IHyEntityUi::IsSizeDirty() const
 {
-	if(m_bSizeHintDirty)
-	{
-		OnSetSizeHint();
-		m_bSizeHintDirty = false;
-	}
+	return m_bSizeDirty;
+}
+
+glm::ivec2 IHyEntityUi::GetPreferredSize()
+{
+	if(m_bSizeDirty)
+		m_vSizeHint = OnCalcPreferredSize();
+
 	return m_vSizeHint;
 }
 
 glm::ivec2 IHyEntityUi::Resize(uint32 uiNewWidth, uint32 uiNewHeight)
 {
-	glm::ivec2 vSizeHint = GetSizeHint();
+	glm::ivec2 vSizeHint = GetPreferredSize();
 	glm::ivec2 vDiff = glm::ivec2(uiNewWidth, uiNewHeight) - vSizeHint;
 
 	// X-Axis
@@ -182,12 +220,17 @@ glm::ivec2 IHyEntityUi::Resize(uint32 uiNewWidth, uint32 uiNewHeight)
 		uiNewHeight = vProportionalSize.y;
 	}
 
-	return OnResize(uiNewWidth, uiNewHeight);
+	m_vActualSize = OnResize(uiNewWidth, uiNewHeight);
+	m_bSizeDirty = false;
+
+	return m_vActualSize;
 }
 
-void IHyEntityUi::SetSizeAndLayoutDirty()
+void IHyEntityUi::SetSizeDirty()
 {
-	m_bSizeHintDirty = true;
+	m_bSizeDirty = true;
+
+	// This will propagate upward if *this is nested in another layout
 	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
-		static_cast<HyLayout *>(m_pParent)->SetLayoutDirty();
+		static_cast<HyLayout *>(m_pParent)->SetSizeDirty();
 }
