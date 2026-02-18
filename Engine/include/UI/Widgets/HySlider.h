@@ -12,10 +12,13 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/IHyWidget.h"
+#include "UI/Components/HyPanel.h"
 
 class HySlider : public IHyWidget
 {
 protected:
+	HyPanel									m_Panel;
+
 	enum SliderAttributes
 	{
 		SLIDERATTRIB_UseStepList			= 1 << 16,
@@ -59,9 +62,6 @@ public:
 	HySlider(const HyUiPanelInit &sliderInitRef, HyEntity2d *pParent = nullptr);
 	virtual ~HySlider();
 
-	virtual float GetWidth(float fPercent = 1.0f) override;
-	virtual float GetHeight(float fPercent = 1.0f) override;
-
 	void Setup(const HyUiPanelInit &sliderInitRef);
 
 	int64 GetNumTicks() const;
@@ -80,12 +80,13 @@ public:
 
 	void SetValueChangedCallback(std::function<void(HySlider *)> fpCallback);
 
+	virtual glm::vec2 GetBotLeftOffset() override;
+
 protected:
 	virtual void Update() override;
 	virtual void OnAssemble() override;
 
-	virtual glm::vec2 GetBotLeftOffset() override;
-	virtual void OnSetSizeHint() override;
+	virtual glm::ivec2 OnCalcPreferredSize() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
 
 	virtual void OnUiMouseDown() override;

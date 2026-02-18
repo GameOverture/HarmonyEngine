@@ -11,9 +11,9 @@
 #define IHyWidget_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/Components/HyPanel.h"
+#include "UI/IHyEntityUi.h"
 
-class IHyWidget : public HyPanel
+class IHyWidget : public IHyEntityUi
 {
 	friend class HyUiContainer;
 
@@ -94,6 +94,7 @@ protected:
 
 	HyPanelState CalcPanelState();
 	void ApplyPanelState();
+	virtual void OnApplyWidgetState(HyPanelState eWidgetState) { };
 };
 
 #endif /* IHyWidget_h__ */

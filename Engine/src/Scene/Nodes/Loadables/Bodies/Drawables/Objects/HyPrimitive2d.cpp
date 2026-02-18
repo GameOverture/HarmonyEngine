@@ -272,7 +272,7 @@ void HyPrimitive2d::SetWireframe(bool bIsWireframe)
 	AssembleData();
 }
 
-float HyPrimitive2d::GetLineThickness()
+float HyPrimitive2d::GetLineThickness() const
 {
 	return m_fLineThickness;
 }

@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/IHyWidget.h"
+#include "UI/Components/HyPanel.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 
 class HyLabel : public IHyWidget
@@ -32,11 +33,15 @@ protected:
 		LABELATTRIB_NEXTFLAG					= 1 << 22
 	};
 	static_assert((int)LABELATTRIB_IsSideBySide == (int)WIDGETATTRIB_NEXTFLAG, "HyLabel is not matching with base classes attrib flags");
+	bool										m_bUseWidgetStates; // TODO: insert into m_uiFlags when refactored to uint64_t
 
 	HyText2d									m_Text;
 	HyMargins<float>							m_TextMargins;					// Margins used for Stacked text scale box
 	HyAlignment									m_eStackedAlignment;			// The alignment used when set as 'Stacked'
 	int32										m_iSideBySidePadding;			// When set as 'Side-by-side', the pixel padding between text/panel
+
+public:
+	HyPanel										panel;
 
 public:
 	HyLabel(HyEntity2d *pParent = nullptr);
@@ -46,6 +51,7 @@ public:
 
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
+	virtual const b2AABB &GetSceneAABB() override;
 	virtual float GetTextWidth(float fPercent = 1.0f);
 	virtual float GetTextHeight(float fPercent = 1.0f);
 
@@ -123,10 +129,10 @@ protected:
 	virtual void OnSetup() { }				// Optional override. This may call SetAssembleNeeded() as its dirty flag will already be set
 	virtual void OnAssemble() override;
 
-	virtual void OnSetSizeHint() override;
+	virtual glm::ivec2 OnCalcPreferredSize() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
 
-	virtual void OnPanelUpdated() override;
+	virtual void OnApplyWidgetState(HyPanelState eWidgetState) override;
 };
 
 #endif /* HyLabel_h__ */

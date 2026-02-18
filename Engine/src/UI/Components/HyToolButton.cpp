@@ -16,16 +16,16 @@ HyToolButton::HyToolButton(HyToolButtonType eToolBtnType, const HyUiPanelInit &p
 	m_X1(this),
 	m_X2(this)
 {
-	const float fGlyphRadius = m_Panel.GetWidth(0.25f);
+	const float fGlyphRadius = panel.GetWidth(0.25f);
 	switch(eToolBtnType)
 	{
 	case HYTOOLBTN_Close: {
 		m_X1.SetAsLineSegment(glm::vec2(-fGlyphRadius, -fGlyphRadius), glm::vec2(fGlyphRadius, fGlyphRadius));
-		m_X1.SetLineThickness(static_cast<float>(m_Panel.GetFrameStrokeSize()));
+		m_X1.SetLineThickness(static_cast<float>(panel.GetFrameStrokeSize()));
 		m_X1.pos.Offset(fGlyphRadius * 2, fGlyphRadius * 2);
 
 		m_X2.SetAsLineSegment(glm::vec2(-fGlyphRadius, fGlyphRadius), glm::vec2(fGlyphRadius, -fGlyphRadius));
-		m_X2.SetLineThickness(static_cast<float>(m_Panel.GetFrameStrokeSize()));
+		m_X2.SetLineThickness(static_cast<float>(panel.GetFrameStrokeSize()));
 		m_X2.pos.Offset(fGlyphRadius * 2, fGlyphRadius * 2);
 		break; }
 
@@ -75,10 +75,11 @@ HyToolButton::HyToolButton(HyToolButtonType eToolBtnType, const HyUiPanelInit &p
 
 	default:
 		HyLogError("HyToolButton recieved an invalid HyToolButtonType in its ctor");
+		break;
 	}
 
-	m_X1.SetTint(m_Panel.GetTertiaryColor());
-	m_X2.SetTint(m_Panel.GetTertiaryColor());
+	m_X1.SetTint(panel.GetTertiaryColor());
+	m_X2.SetTint(panel.GetTertiaryColor());
 }
 
 /*virtual*/ HyToolButton::~HyToolButton()

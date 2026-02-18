@@ -60,7 +60,7 @@ struct HyUiPanelInit
 };
 
 // A flexible visual representation of single panel that can be composed with node items or programmatically
-class HyPanel : public IHyEntityUi
+class HyPanel// : public IHyEntityUi
 {
 	HyType						m_eNodeType;
 
@@ -78,7 +78,7 @@ class HyPanel : public IHyEntityUi
 
 		bool					m_bIsContainer; // TODO: Construct panels differently?
 
-		PrimParts(const HyUiPanelInit &initRef, HyPanel *pParent) :
+		PrimParts(const HyUiPanelInit &initRef, HyEntity2d *pParent) :
 			HyEntity2d(pParent),
 			m_uiFrameSize(initRef.m_uiFrameSize),
 			m_PanelColor(initRef.m_PanelColor),
@@ -92,57 +92,53 @@ class HyPanel : public IHyEntityUi
 	};
 	union PanelData
 	{
-		PrimParts *				m_pPrimParts;	// For 'Primitive' panel type.
-		IHyBody2d *				m_pNodeItem;	// For 'NodeItem' panel type.
+		glm::vec2				m_BoundingVolumeSize;	// For 'BoundingVolume' panel type.
+		PrimParts *				m_pPrimParts;			// For 'Primitive' panel type.
+		IHyBody2d *				m_pNodeItem;			// For 'NodeItem' panel type.
 		PanelData() : m_pPrimParts(nullptr)
 		{ }
 	};
 	PanelData					m_PanelData;
 
-	bool						m_bIsUsingPanelStates; // TODO: integrate with m_uiInternalFlags
-
 public:
-	HyPanel(HyEntity2d *pParent);
+	HyPanel();
 	HyPanel(const HyUiPanelInit &initRef, HyEntity2d *pParent);
-	virtual ~HyPanel();
+	~HyPanel();
 
-	void Setup(const HyUiPanelInit &initRef);
-	HyUiPanelInit ClonePanelInit(); // Uses currently set properties of this panel to create an equivalent HyPanelInit struct
+	bool IsBvForPanel() const;
+	bool IsItemForPanel() const;
+	bool IsPrimForPanel() const;
 
-	bool SetPanelState(HyPanelState ePanelState);
+	void Setup(const HyUiPanelInit &initRef, HyEntity2d *pParent);
+
+	float GetWidth(float fPercent = 1.0f) const;
+	float GetHeight(float fPercent = 1.0f) const;
+	glm::vec2 GetSize() const;
+	void SetSize(float fWidth, float fHeight);
+
+	bool SetPanelState(uint32 uiWidgetState);
 	uint32 GetNumPanelStates();
-	bool IsUsingPanelStates() const;
-	void SetUsingPanelStates(bool bUsePanelStates);
 
-	bool IsPanelVisible() const;
-	void SetPanelVisible(bool bVisible);
-	HyAnimFloat *PanelAlpha();
-
-	bool IsPanelBoundingVolume() const;
-
-	bool IsPanelNode() const;
-	IHyBody2d *GetPanelNode() const;
-
-	bool IsPanelPrimitive() const;
+	bool IsVisible() const;
+	void SetVisible(bool bVisible);
+	HyAnimFloat *Alpha();
+	
 	uint32 GetFrameStrokeSize() const;
 	HyColor GetPanelColor() const;
 	HyColor GetFrameColor() const;
 	HyColor GetTertiaryColor() const;
 
-	virtual glm::vec2 GetBotLeftOffset() override;							// What offset is needed to get *this oriented to its bottom left
+	IHyBody2d *GetPanelNode() const;
+	HyUiPanelInit ClonePanelInit() const; // Uses currently set properties of this panel to create an equivalent HyPanelInit struct
 
-//#ifdef HY_PLATFORM_GUI
-//	void GuiOverridePanelNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName = true);
-//#endif
+	glm::vec2 GetBotLeftOffset();		// What offset is needed to get *this oriented to its bottom left
 
-protected:
-	virtual void OnLoaded() override;
-
-	virtual glm::ivec2 OnCalcPreferredSize() override;
-	virtual glm::ivec2 OnResize(uint32 uiWidth, uint32 uiHeight) override;	// Returns the size *this was actually set to (which may be different than what's passed in due to constraints)
+#ifdef HY_PLATFORM_GUI
+	void GuiOverridePanelNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName, HyEntity2d *pParent);
+#endif
 
 private:
-	void ConstructPrimitives();
+	void ConstructPrimitives(float fWidth, float fHeight);
 	void DeleteData();
 };
 

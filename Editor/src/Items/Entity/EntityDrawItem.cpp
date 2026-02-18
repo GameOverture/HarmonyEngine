@@ -388,14 +388,18 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 			return QJsonValue(QJsonArray({ QJsonValue(vMaxSize.x), QJsonValue(vMaxSize.y) }));
 		}
 	}
-	else if(sCategory == "Panel")
+	else if(sCategory == "Panel") // Guaranteed to be IHyWidget
 	{
+		HyPanel &panelRef = static_cast<HyLabel *>(pThisHyNode)->panel;
+
 		if(sPropertyName == "Setup")
-			return QJsonValue(DlgSetUiPanel::SerializePanelInit(static_cast<IHyWidget *>(pThisHyNode)->ClonePanelInit(), m_pEntityTreeItemData->GetPreviewComponent().m_CurrentWidgetPanelNodeUuid).toJsonObject());
+			return QJsonValue(DlgSetUiPanel::SerializePanelInit(panelRef.ClonePanelInit(), m_pEntityTreeItemData->GetPreviewComponent().m_CurrentWidgetPanelNodeUuid).toJsonObject());
 		if(sPropertyName == "Visible")
-			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->IsPanelVisible());
-		if(sPropertyName == "Alpha")
-			return QJsonValue(static_cast<IHyWidget *>(pThisHyNode)->PanelAlpha().Get());
+			return QJsonValue(panelRef.IsVisible());
+		if(sPropertyName == "Alpha" && panelRef.Alpha())
+			return QJsonValue(panelRef.Alpha()->Get());
+
+		// HyBarMeter specific
 		if(sPropertyName == "Bar Setup")
 			return QJsonValue(DlgSetUiPanel::SerializePanelInit(static_cast<HyBarMeter *>(pThisHyNode)->CloneBarPanelInit(), m_pEntityTreeItemData->GetPreviewComponent().m_CurrentWidgetBarPanelNodeUuid).toJsonObject());
 		if(sPropertyName == "Bar Offset")
@@ -420,7 +424,7 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 			return QJsonValue(QString::fromUtf8(static_cast<HyLabel *>(pThisHyNode)->GetUtf8String().c_str()));
 		if(sPropertyName == "Input Validator")
 			return QJsonValue(QString::fromUtf8(static_cast<HyTextField *>(pThisHyNode)->GetInputValidator().c_str()));
-		if(sPropertyName == "Font")
+		if(sPropertyName == "Text Item")
 			return QJsonValue(m_pEntityTreeItemData->GetPreviewComponent().m_CurrentWidgetTextNodeUuid.toString(QUuid::WithoutBraces));
 		if(sPropertyName == "Margins") {
 			HyMargins<float> margins = static_cast<HyLabel *>(pThisHyNode)->GetTextMargins();
@@ -428,7 +432,7 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 		}
 		if(sPropertyName == "Style")
 			return QJsonValue(HyGlobal::GetTextTypeNameList()[static_cast<HyLabel *>(pThisHyNode)->GetTextType()]);		
-		if(sPropertyName == "Visible")
+		if(sPropertyName == "Text Visible")
 			return QJsonValue(static_cast<HyLabel *>(pThisHyNode)->IsTextVisible());
 		if(sPropertyName == "Alignment")
 			return QJsonValue(QString(HyGlobal::GetAlignmentNameList()[static_cast<HyLabel *>(pThisHyNode)->GetAlignment()]));
@@ -1174,13 +1178,13 @@ void ExtrapolateProperties(Project &projectRef,
 						HyJsonDoc itemDataDoc;
 						if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
 							HyGuiLog("ExtrapolateProperties() - failed to parse HyPanel node file data", LOGTYPE_Error);
-						//static_cast<HyPanel *>(pThisHyNode)->GuiOverrideNodeData(panelInit.m_eNodeType, itemDataDoc.GetObject(), true);
+						static_cast<HyLabel *>(pThisHyNode)->panel.GuiOverridePanelNodeData(panelInit.m_eNodeType, itemDataDoc.GetObject(), true, static_cast<HyEntity2d *>(pThisHyNode));
 					}
 				}
 				if(panelObj.contains("Visible"))
-					static_cast<IHyWidget *>(pThisHyNode)->SetPanelVisible(panelObj["Visible"].toBool());
-				if(panelObj.contains("Alpha"))
-					static_cast<IHyWidget *>(pThisHyNode)->PanelAlpha().Set(panelObj["Alpha"].toDouble());
+					static_cast<HyLabel *>(pThisHyNode)->panel.SetVisible(panelObj["Visible"].toBool());
+				if(panelObj.contains("Alpha") && static_cast<HyLabel *>(pThisHyNode)->panel.Alpha())
+					static_cast<HyLabel *>(pThisHyNode)->panel.Alpha()->Set(panelObj["Alpha"].toDouble());
 				if(panelObj.contains("Bar Setup"))
 				{
 					QJsonObject barSetupObj = panelObj["Bar Setup"].toObject();
@@ -1223,8 +1227,8 @@ void ExtrapolateProperties(Project &projectRef,
 					static_cast<HyBarMeter *>(pThisHyNode)->SetInverted(panelObj["Bar Inverted"].toBool());
 				if(panelObj.contains("Bar Stretched"))
 					static_cast<HyBarMeter *>(pThisHyNode)->SetBarStreteched(panelObj["Bar Stretched"].toBool());
-				if(panelObj.contains("Bar Under Panel"))
-					static_cast<HyBarMeter *>(pThisHyNode)->SetBarUnderPanel(panelObj["Bar Under Panel"].toBool());
+				//if(panelObj.contains("Bar Under Panel"))
+				//	static_cast<HyBarMeter *>(pThisHyNode)->SetBarUnderPanel(panelObj["Bar Under Panel"].toBool());
 			}
 			if(propsObj.contains("Label"))
 			{
@@ -1234,9 +1238,9 @@ void ExtrapolateProperties(Project &projectRef,
 					static_cast<HyRackMeter *>(pThisHyNode)->SetValue(labelObj["Set Value"].toInt(), 0.0f);
 				if(labelObj.contains("Text"))
 					static_cast<HyLabel *>(pThisHyNode)->SetText(labelObj["Text"].toString().toStdString());
-				if(labelObj.contains("Font"))
+				if(labelObj.contains("Text Item"))
 				{
-					previewComponentRef.m_CurrentWidgetTextNodeUuid = QUuid(labelObj["Font"].toString());
+					previewComponentRef.m_CurrentWidgetTextNodeUuid = QUuid(labelObj["Text Item"].toString());
 					TreeModelItemData *pTextItemData = projectRef.FindItemData(previewComponentRef.m_CurrentWidgetTextNodeUuid);
 					if(pTextItemData && pTextItemData->IsProjectItem())
 					{
@@ -1288,8 +1292,8 @@ void ExtrapolateProperties(Project &projectRef,
 						break;
 					}
 				}
-				if(labelObj.contains("Visible"))
-					static_cast<HyLabel *>(pThisHyNode)->SetTextVisible(labelObj["Visible"].toBool());
+				if(labelObj.contains("Text Visible"))
+					static_cast<HyLabel *>(pThisHyNode)->SetTextVisible(labelObj["Text Visible"].toBool());
 				if(labelObj.contains("Alignment"))
 					static_cast<HyLabel *>(pThisHyNode)->SetAlignment(HyGlobal::GetAlignmentFromString(labelObj["Alignment"].toString()));
 				if(labelObj.contains("Monospaced Digits"))

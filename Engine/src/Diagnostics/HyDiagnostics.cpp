@@ -150,7 +150,7 @@ void HyDiagnostics::Show(uint32 uiDiagFlags)
 		m_fpBeginRender = [this]() { m_pProfiler->BeginRender(m_TimeRef); };
 
 		m_pProfiler->SetVisible(true);
-		m_pProfiler->SetSize(static_cast<int32>(HyEngine::Window().GetWidthF(0.33f)), static_cast<int32>(HyEngine::Window().GetHeightF(1.0f)));
+		m_pProfiler->Resize(static_cast<int32>(HyEngine::Window().GetWidthF(0.33f)), static_cast<int32>(HyEngine::Window().GetHeightF(1.0f)));
 	}
 	else
 	{

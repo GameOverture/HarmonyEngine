@@ -28,7 +28,7 @@ IHyEntityUi::IHyEntityUi(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-/*virtual*/ float IHyEntityUi::GetWidth(float fPercent = 1.0f) /*override*/
+/*virtual*/ float IHyEntityUi::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
 	if(m_bSizeDirty)
 		Resize(m_vActualSize.x, m_vActualSize.y);
@@ -36,7 +36,7 @@ IHyEntityUi::IHyEntityUi(HyEntity2d *pParent /*= nullptr*/) :
 	return m_vActualSize.x * fPercent;
 }
 
-/*virtual*/ float IHyEntityUi::GetHeight(float fPercent = 1.0f) /*override*/
+/*virtual*/ float IHyEntityUi::GetHeight(float fPercent /*= 1.0f*/) /*override*/
 {
 	if(m_bSizeDirty)
 		Resize(m_vActualSize.x, m_vActualSize.y);
@@ -55,6 +55,13 @@ float IHyEntityUi::GetSizeDimension(int32 iDimensionIndex, float fPercent /*= 1.
 		return GetWidth(fPercent);
 
 	return GetHeight(fPercent);
+}
+
+glm::ivec2 IHyEntityUi::SetSizeDimension(int32 iDimensionIndex, uint32 uiSizeHint)
+{
+	if(iDimensionIndex == HYORIENT_Horizontal)
+		return Resize(uiSizeHint, m_vActualSize.y);
+	return Resize(m_vActualSize.x, uiSizeHint);
 }
 
 HySizePolicy IHyEntityUi::GetHorizontalPolicy() const
@@ -191,24 +198,28 @@ glm::ivec2 IHyEntityUi::Resize(uint32 uiNewWidth, uint32 uiNewHeight)
 	glm::ivec2 vSizeHint = GetPreferredSize();
 	glm::ivec2 vDiff = glm::ivec2(uiNewWidth, uiNewHeight) - vSizeHint;
 
-	// X-Axis
 	if(uiNewWidth != 0)
 	{
-		if(vDiff[0] >= 0)
-			uiNewWidth = vSizeHint.x + ((m_SizePolicies[0] & HY_SIZEFLAG_EXPAND) * vDiff[0]);
-		else
-			uiNewWidth = vSizeHint.x + (((m_SizePolicies[0] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[0]);
+		if(vSizeHint[0] != 0)
+		{
+			if(vDiff[0] >= 0)
+				uiNewWidth = vSizeHint.x + ((m_SizePolicies[0] & HY_SIZEFLAG_EXPAND) * vDiff[0]);
+			else
+				uiNewWidth = vSizeHint.x + (((m_SizePolicies[0] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[0]);
+		}
 		uiNewWidth = HyMath::Max(uiNewWidth, static_cast<uint32>(m_vMinSize.x));
 		uiNewWidth = HyMath::Min(uiNewWidth, static_cast<uint32>(m_vMaxSize.x));
 	}
 
-	// Y-Axis
 	if(uiNewHeight != 0)
 	{
-		if(vDiff[1] >= 0)
-			uiNewHeight = vSizeHint.y + ((m_SizePolicies[1] & HY_SIZEFLAG_EXPAND) * vDiff[1]);
-		else
-			uiNewHeight = vSizeHint.y + (((m_SizePolicies[1] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[1]);
+		if(vSizeHint[1] != 0)
+		{
+			if(vDiff[1] >= 0)
+				uiNewHeight = vSizeHint.y + ((m_SizePolicies[1] & HY_SIZEFLAG_EXPAND) * vDiff[1]);
+			else
+				uiNewHeight = vSizeHint.y + (((m_SizePolicies[1] & HY_SIZEFLAG_SHRINK) >> 1) * vDiff[1]);
+		}
 		uiNewHeight = HyMath::Max(uiNewHeight, static_cast<uint32>(m_vMinSize.y));
 		uiNewHeight = HyMath::Min(uiNewHeight, static_cast<uint32>(m_vMaxSize.y));
 	}
@@ -228,6 +239,8 @@ glm::ivec2 IHyEntityUi::Resize(uint32 uiNewWidth, uint32 uiNewHeight)
 
 void IHyEntityUi::SetSizeDirty()
 {
+	SetDirty(IHyNode::DIRTY_SceneAABB);
+
 	m_bSizeDirty = true;
 
 	// This will propagate upward if *this is nested in another layout

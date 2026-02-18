@@ -71,7 +71,7 @@ public:
 	void SetBarStreteched(bool bIsBarStretched);
 
 	bool IsBarUnderPanel() const;
-	void SetBarUnderPanel(bool bIsBarUnderPanel);
+	//void SetBarUnderPanel(bool bIsBarUnderPanel);
 
 	int32 GetMinimum() const;
 	int32 GetMaximum() const;

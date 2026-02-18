@@ -18,7 +18,7 @@ HyBarMeter::HyBarMeter(HyEntity2d *pParent /*= nullptr*/) :
 	m_iMaximum(0),
 	m_iValue(0),
 	m_BarMask(this),
-	m_Bar(this),
+	m_Bar(HyUiPanelInit(), this),
 	m_fBarProgressAmt(0.0f),
 	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
@@ -31,7 +31,7 @@ HyBarMeter::HyBarMeter(const HyUiPanelInit &panelInit, const HyUiPanelInit &barI
 	m_iMaximum(0),
 	m_iValue(0),
 	m_BarMask(this),
-	m_Bar(this),
+	m_Bar(),
 	m_fBarProgressAmt(0.0f),
 	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
@@ -45,7 +45,7 @@ HyBarMeter::HyBarMeter(const HyUiPanelInit &panelInit, const HyUiPanelInit &barI
 	m_iMaximum(0),
 	m_iValue(0),
 	m_BarMask(this),
-	m_Bar(this),
+	m_Bar(),
 	m_fBarProgressAmt(0.0f),
 	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
@@ -97,19 +97,19 @@ HyBarMeter::HyBarMeter(const HyUiPanelInit &panelInit, const HyUiPanelInit &barI
 
 void HyBarMeter::Setup(const HyUiPanelInit &panelInit, const HyUiPanelInit &barInit)
 {
-	m_Bar.Setup(barInit);
+	m_Bar.Setup(barInit, this);
 	HyLabel::Setup(panelInit);
 }
 
 void HyBarMeter::Setup(const HyUiPanelInit &panelInit, const HyUiPanelInit &barInit, const HyUiTextInit &textInit)
 {
-	m_Bar.Setup(barInit);
+	m_Bar.Setup(barInit, this);
 	HyLabel::Setup(panelInit, textInit);
 }
 
 void HyBarMeter::SetupBar(const HyUiPanelInit &barInit)
 {
-	m_Bar.Setup(barInit);
+	m_Bar.Setup(barInit, this);
 	
 	SetEnabled(IsEnabled());
 	SetAssembleNeeded();
@@ -134,7 +134,7 @@ void HyBarMeter::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
 
 bool HyBarMeter::SetBarState(uint32 uiStateIndex)
 {
-	bool bSuccess = m_Bar.SetState(uiStateIndex);
+	bool bSuccess = m_Bar.SetPanelState(uiStateIndex);
 	SetAssembleNeeded();
 	return bSuccess;
 }
@@ -180,7 +180,8 @@ void HyBarMeter::SetBarStreteched(bool bIsBarStretched)
 		m_uiEntityAttribs |= BARMETERATTRIB_IsBarStretched;
 	else
 	{
-		m_Bar.scale.Set(1.0f, 1.0f);
+		if(m_Bar.GetPanelNode())
+			m_Bar.GetPanelNode()->scale.Set(1.0f, 1.0f);
 		m_uiEntityAttribs &= ~BARMETERATTRIB_IsBarStretched;
 	}
 
@@ -192,23 +193,23 @@ bool HyBarMeter::IsBarUnderPanel() const
 	return (m_uiEntityAttribs & BARMETERATTRIB_IsBarUnderPanel) != 0;
 }
 
-void HyBarMeter::SetBarUnderPanel(bool bIsBarUnderPanel)
-{
-	if(bIsBarUnderPanel && IsBarUnderPanel() == false)
-	{
-		ChildRemove(&m_Bar);
-		ChildInsert(m_Panel, m_Bar);
-		m_uiEntityAttribs |= BARMETERATTRIB_IsBarUnderPanel;
-	}
-	else if(bIsBarUnderPanel == false && IsBarUnderPanel())
-	{
-		ChildRemove(&m_Bar);
-		ChildInsert(m_Text, m_Bar);
-		m_uiEntityAttribs &= ~BARMETERATTRIB_IsBarUnderPanel;
-	}
-	else
-		return;
-}
+//void HyBarMeter::SetBarUnderPanel(bool bIsBarUnderPanel)
+//{
+//	if(bIsBarUnderPanel && IsBarUnderPanel() == false)
+//	{
+//		ChildRemove(&m_Bar);
+//		ChildInsert(m_Panel, m_Bar);
+//		m_uiEntityAttribs |= BARMETERATTRIB_IsBarUnderPanel;
+//	}
+//	else if(bIsBarUnderPanel == false && IsBarUnderPanel())
+//	{
+//		ChildRemove(&m_Bar);
+//		ChildInsert(m_Text, m_Bar);
+//		m_uiEntityAttribs &= ~BARMETERATTRIB_IsBarUnderPanel;
+//	}
+//	else
+//		return;
+//}
 
 int32 HyBarMeter::GetMinimum() const
 {
@@ -279,13 +280,13 @@ void HyBarMeter::SetNumFormat(HyNumberFormat format)
 
 HyUiPanelInit HyBarMeter::CloneBarPanelInit() const
 {
-	return m_Bar.CloneInit();
+	return m_Bar.ClonePanelInit();
 }
 
 #ifdef HY_PLATFORM_GUI
 void HyBarMeter::GuiOverrideBarNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName /*= true*/)
 {
-	m_Panel.GuiOverrideNodeData(eNodeType, itemDataObj, bUseGuiOverrideName);
+	m_Bar.GuiOverridePanelNodeData(eNodeType, itemDataObj, bUseGuiOverrideName, this);
 }
 #endif
 
@@ -302,41 +303,51 @@ void HyBarMeter::GuiOverrideBarNodeData(HyType eNodeType, HyJsonObj itemDataObj,
 	HyLabel::OnAssemble();
 
 	m_BarMask.pos.Set(m_vBarOffset);
-	m_Bar.pos.Set(m_vBarOffset);
+	if(m_Bar.GetPanelNode())
+		m_Bar.GetPanelNode()->pos.Set(m_vBarOffset);
 
 	if(IsInverted())
 	{
 		if(IsVertical())
 		{
 			m_BarMask.scale_pivot.Set(0.0f, m_Bar.GetHeight(1.0f));
-			m_Bar.scale_pivot.Set(0.0f, m_Bar.GetHeight(1.0f));
+			if(m_Bar.GetPanelNode())
+				m_Bar.GetPanelNode()->scale_pivot.Set(0.0f, m_Bar.GetHeight(1.0f));
 		}
 		else
 		{
 			m_BarMask.scale_pivot.Set(m_Bar.GetWidth(1.0f), 0.0f);
-			m_Bar.scale_pivot.Set(m_Bar.GetWidth(1.0f), 0.0f);
+			if(m_Bar.GetPanelNode())
+				m_Bar.GetPanelNode()->scale_pivot.Set(m_Bar.GetWidth(1.0f), 0.0f);
 		}
 	}
 	else
 	{
 		m_BarMask.scale_pivot.Set(0.0f, 0.0f);
-		m_Bar.scale_pivot.Set(0.0f, 0.0f);
+		if(m_Bar.GetPanelNode())
+			m_Bar.GetPanelNode()->scale_pivot.Set(0.0f, 0.0f);
 	}
 
 	if(IsBarStretched())
-		m_Bar.SetStencil(nullptr);
+	{
+		if(m_Bar.GetPanelNode())
+			m_Bar.GetPanelNode()->SetStencil(nullptr);
+	}
 	else
 	{
 		glm::ivec2 vSpriteOffset(0.0f, 0.0f);
-		if(m_Bar.IsNode() && m_Bar.GetNode()->GetType() == HYTYPE_Sprite)
-			vSpriteOffset = static_cast<HySprite2d *>(m_Bar.GetNode())->GetCurFrameOffset();
+		if(m_Bar.IsItemForPanel() && m_Bar.GetPanelNode()->GetType() == HYTYPE_Sprite)
+			vSpriteOffset = static_cast<HySprite2d *>(m_Bar.GetPanelNode())->GetCurFrameOffset();
 
 		m_BarMask.SetAsBox(HyRect(m_Bar.GetWidth() + vSpriteOffset.x, m_Bar.GetHeight() + vSpriteOffset.x));
 		m_BarMask.SetVisible(false);
 		m_BarStencil.AddMask(m_BarMask);
 		
-		m_Bar.SetStencil(&m_BarStencil);
-		m_Bar.scale.Set(1.0f, 1.0f);
+		if(m_Bar.GetPanelNode())
+		{
+			m_Bar.GetPanelNode()->SetStencil(&m_BarStencil);
+			m_Bar.GetPanelNode()->scale.Set(1.0f, 1.0f);
+		}
 	}
 
 	AdjustProgress(0.0f);
@@ -361,14 +372,20 @@ void HyBarMeter::ApplyProgress()
 	if(IsVertical())
 	{
 		if(IsBarStretched())
-			m_Bar.scale.SetY(m_BarProgressAmt.Get());
-		else
-			m_BarMask.scale.SetY(m_BarProgressAmt.Get());
+		{
+			if(m_Bar.GetPanelNode())
+				m_Bar.GetPanelNode()->scale.SetY(m_BarProgressAmt.Get());
+		}
+		else if(m_Bar.GetPanelNode())
+			m_Bar.GetPanelNode()->scale.SetY(m_BarProgressAmt.Get());
 	}
 	else
 	{
 		if(IsBarStretched())
-			m_Bar.scale.SetX(m_BarProgressAmt.Get());
+		{
+			if(m_Bar.GetPanelNode())
+				m_Bar.GetPanelNode()->scale.SetX(m_BarProgressAmt.Get());
+		}
 		else
 			m_BarMask.scale.SetX(m_BarProgressAmt.Get());
 	}

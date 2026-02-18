@@ -63,8 +63,6 @@ public:
 	void Submit();
 
 protected:
-	virtual void OnAssemble() override;
-
 	virtual void OnUiTextInput(std::string sNewUtf8Text) override;
 	virtual void OnUiKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods) override;
 
@@ -72,6 +70,8 @@ protected:
 	virtual void OnRelinquishKeyboardFocus() override;
 
 	void MoveCursor(int32 iOffset, bool bSelection);
+
+	virtual void OnApplyWidgetState(HyPanelState eWidgetState) override;
 
 //private:
 //	using HyLabel::SetAsStacked;

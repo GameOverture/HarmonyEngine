@@ -14,11 +14,14 @@
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Input/HyInputKeys.h"
 
+class HyPanel;
+
 class IHyEntityUi : public HyEntity2d
 {
-private:
+protected:
 	glm::ivec2							m_vActualSize;
 
+private:
 	glm::ivec2							m_vMinSize;
 	glm::ivec2							m_vMaxSize;
 
@@ -35,6 +38,7 @@ public:
 	virtual float GetHeight(float fPercent = 1.0f) override;
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 	float GetSizeDimension(int32 iDimensionIndex, float fPercent = 1.0f);
+	glm::ivec2 SetSizeDimension(int32 iDimensionIndex, uint32 uiSizeHint);
 
 	HySizePolicy GetHorizontalPolicy() const;
 	HySizePolicy GetVerticalPolicy() const;

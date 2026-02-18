@@ -129,7 +129,7 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 	float fLargestLineAscender = 0.0f;
 	float fLargestLineDescender = 0.0f;
 	float fLineHeight = 0.0f;
-	const float fAVAILABLE_TEXT_WIDTH = m_Panel.GetWidth() - m_TextMargins.left - m_TextMargins.right;
+	const float fAVAILABLE_TEXT_WIDTH = panel.GetWidth() - m_TextMargins.left - m_TextMargins.right;
 
 	glm::vec2 ptCursorPos(0.0f, 0.0f);
 	uint32 uiCurFmtIndex = 0;
@@ -271,8 +271,7 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 		break;
 	}
 
-	if(m_Panel.IsAutoSize())
-		m_Panel.SetSize(m_vTextDimensions.x + m_TextMargins.left + m_TextMargins.right, m_vTextDimensions.y + m_TextMargins.top + m_TextMargins.bottom);
+	panel.SetSize(m_vTextDimensions.x + m_TextMargins.left + m_TextMargins.right, m_vTextDimensions.y + m_TextMargins.top + m_TextMargins.bottom);
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Delete old drawable list, then replace with new list
@@ -292,12 +291,12 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 	case HYTEXT_Column:
 	case HYTEXT_Box:
 		for(auto pDrawable : m_DrawableList)
-			pDrawable->pos.Offset(m_TextMargins.left, m_Panel.GetHeight() - m_TextMargins.top - fLargestLineAscender);
+			pDrawable->pos.Offset(m_TextMargins.left, panel.GetHeight() - m_TextMargins.top - fLargestLineAscender);
 		break;
 
 	case HYTEXT_ScaleBox: {
-		float fDesiredWidth = m_Panel.GetWidth() - m_TextMargins.left - m_TextMargins.right;
-		float fDesiredHeight = m_Panel.GetHeight() - m_TextMargins.bottom - m_TextMargins.top;
+		float fDesiredWidth = panel.GetWidth() - m_TextMargins.left - m_TextMargins.right;
+		float fDesiredHeight = panel.GetHeight() - m_TextMargins.bottom - m_TextMargins.top;
 
 		// Scale all drawables to fit within the box
 		float fScaleAmt = HyMath::Min(fDesiredWidth / m_vTextDimensions.x, fDesiredHeight / m_vTextDimensions.y);
@@ -312,13 +311,13 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 			if(pDrawable->GetType() == HYTYPE_Sprite)
 			{
 				pDrawable->pos.Set(pDrawable->pos.Get() * fScaleAmt);
-				pDrawable->pos.Offset(m_TextMargins.left, m_Panel.GetHeight() - m_TextMargins.top - fLargestLineAscender);
+				pDrawable->pos.Offset(m_TextMargins.left, panel.GetHeight() - m_TextMargins.top - fLargestLineAscender);
 				pDrawable->scale.Set(pDrawable->scale.GetX() * fScaleAmt, pDrawable->scale.GetY() * fScaleAmt);
 			}
 			else
 			{
 				pDrawable->scale.SetAll(fScaleAmt);
-				pDrawable->pos.Offset(m_TextMargins.left, m_Panel.GetHeight() - m_TextMargins.top - fLargestLineAscender);
+				pDrawable->pos.Offset(m_TextMargins.left, panel.GetHeight() - m_TextMargins.top - fLargestLineAscender);
 			}
 
 			if(m_uiEntityAttribs & LABELATTRIB_Vertical)
@@ -336,7 +335,7 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 		break;
 
 	case HYALIGN_Center: {
-		float fAvailableWidth = m_Panel.GetWidth() - m_TextMargins.left - m_TextMargins.right;
+		float fAvailableWidth = panel.GetWidth() - m_TextMargins.left - m_TextMargins.right;
 		if(m_vTextDimensions.x < fAvailableWidth)
 		{
 			for(auto pDrawable : m_DrawableList)
@@ -345,7 +344,7 @@ void HyRichLabel::ForEachDrawable(std::function<void(IHyDrawable2d *)> fpForEach
 		break; }
 
 	case HYALIGN_Right: {
-		float fAvailableWidth = m_Panel.GetWidth() - m_TextMargins.left - m_TextMargins.right;
+		float fAvailableWidth = panel.GetWidth() - m_TextMargins.left - m_TextMargins.right;
 		if(m_vTextDimensions.x < fAvailableWidth)
 		{
 			for(auto pDrawable : m_DrawableList)

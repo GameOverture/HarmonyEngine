@@ -85,7 +85,7 @@ public:
 	bool IsWireframe();
 	void SetWireframe(bool bIsWireframe);
 
-	float GetLineThickness();
+	float GetLineThickness() const;
 	void SetLineThickness(float fThickness);
 
 	uint32 GetNumCircleSegments();

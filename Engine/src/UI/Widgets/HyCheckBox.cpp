@@ -53,20 +53,17 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *)> fpC
 {
 	HyButton::OnAssemble();
 
-	if(m_Panel.IsAutoSize() == false)
-	{
-		float fRadius = (HyMath::Min(m_Panel.GetWidth(m_Panel.scale.X()), m_Panel.GetHeight(m_Panel.scale.Y())) - (m_Panel.GetFrameStrokeSize() * 4)) * 0.5f;
-		m_CheckMarkStroke.SetAsCircle(fRadius);
-		m_CheckMarkFill.SetAsCircle(fRadius - m_Panel.GetFrameStrokeSize());
-	}
+	float fRadius = (HyMath::Min(panel.GetWidth(), panel.GetHeight()) - (panel.GetFrameStrokeSize() * 4)) * 0.5f;
+	m_CheckMarkStroke.SetAsCircle(fRadius);
+	m_CheckMarkFill.SetAsCircle(fRadius - panel.GetFrameStrokeSize());
 
-	m_CheckMarkStroke.pos.Set(m_Panel.pos);
-	m_CheckMarkStroke.pos.Offset(m_Panel.GetWidth(m_Panel.scale.X()) * 0.5f, m_Panel.GetHeight(m_Panel.scale.Y()) * 0.5f);
-	m_CheckMarkStroke.SetTint(m_Panel.GetFrameColor().Lighten());
+	//m_CheckMarkStroke.pos.Set(panel.pos);
+	m_CheckMarkStroke.pos.Offset(panel.GetWidth() * 0.5f, panel.GetHeight() * 0.5f);
+	m_CheckMarkStroke.SetTint(panel.GetFrameColor().Lighten());
 
-	m_CheckMarkFill.pos.Set(m_Panel.pos);
-	m_CheckMarkFill.pos.Offset(m_Panel.GetWidth(m_Panel.scale.X()) * 0.5f, m_Panel.GetHeight(m_Panel.scale.Y()) * 0.5f);
-	m_CheckMarkFill.SetTint(m_Panel.GetPanelColor().Lighten());
+	//m_CheckMarkFill.pos.Set(panel.pos);
+	m_CheckMarkFill.pos.Offset(panel.GetWidth() * 0.5f, panel.GetHeight() * 0.5f);
+	m_CheckMarkFill.SetTint(panel.GetPanelColor().Lighten());
 
 	if(IsChecked())
 	{

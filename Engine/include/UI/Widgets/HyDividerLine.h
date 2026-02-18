@@ -12,6 +12,7 @@
 
 #include "Afx/HyStdAfx.h"
 #include "UI/Widgets/IHyWidget.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
 class HyDividerLine : public IHyWidget
 {

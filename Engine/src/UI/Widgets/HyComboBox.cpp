@@ -14,7 +14,7 @@
 HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(pParent),
 	m_Shape(this),
-	m_SubBtnPanel(this),
+	m_SubBtnPanel(HyUiPanelInit(), this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
 	m_fExpandedTimeout(0.0f),
@@ -26,7 +26,7 @@ HyComboBox::HyComboBox(HyEntity2d *pParent /*= nullptr*/) :
 HyComboBox::HyComboBox(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, textInit, pParent),
 	m_Shape(this),
-	m_SubBtnPanel(this),
+	m_SubBtnPanel(HyUiPanelInit(),this),
 	m_fSubBtnSpacing(5.0f),
 	m_fElapsedExpandedTime(0.0f),
 	m_fExpandedTimeout(0.0f),
@@ -95,7 +95,7 @@ void HyComboBox::ClearSubButtons()
 
 void HyComboBox::SetExpandPanel(const HyUiPanelInit &panelInit, HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate)
 {
-	m_SubBtnPanel.Setup(panelInit);
+	m_SubBtnPanel.Setup(panelInit, this);
 
 	if(eOrientation == HYORIENT_Horizontal)
 		m_uiEntityAttribs |= COMBOBOXATTRIB_IsHorzExpand;
@@ -136,7 +136,7 @@ void HyComboBox::ToggleExpanded()
 		int32 iExpandIndex = (m_uiEntityAttribs & COMBOBOXATTRIB_IsHorzExpand) ? 0 : 1;
 		int32 iExpandDir = (m_uiEntityAttribs & COMBOBOXATTRIB_IsPositiveExpand) ? 1 : -1;
 
-		ptTweenDest[iExpandIndex] += (GetSizeHint()[iExpandIndex] + m_fSubBtnSpacing) * iExpandDir;
+		ptTweenDest[iExpandIndex] += (GetPreferredSize()[iExpandIndex] + m_fSubBtnSpacing) * iExpandDir;
 		for(uint32 i = 0; i < static_cast<uint32>(m_SubBtnList.size()); ++i)
 		{
 			HyButton *pSubBtn = m_SubBtnList[i];
@@ -152,7 +152,7 @@ void HyComboBox::ToggleExpanded()
 				pSubBtn->alpha.Tween(1.0f, fTweenExpandDur * 0.5f);
 			}
 
-			ptTweenDest[iExpandIndex] += (pSubBtn->GetSizeHint()[iExpandIndex] + m_fSubBtnSpacing) * iExpandDir;
+			ptTweenDest[iExpandIndex] += (pSubBtn->GetPreferredSize()[iExpandIndex] + m_fSubBtnSpacing) * iExpandDir;
 		}
 
 		if(m_uiEntityAttribs & COMBOBOXATTRIB_IsInstantExpand)

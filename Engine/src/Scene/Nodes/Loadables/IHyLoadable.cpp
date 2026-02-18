@@ -15,26 +15,26 @@
 /*static*/ HyAssets *IHyLoadable::sm_pHyAssets = nullptr;
 
 IHyLoadable::IHyLoadable(const HyNodePath &nodePath) :
+	m_uiState(0),
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(nullptr),
-	m_NodePath(nodePath),
-	m_uiState(0)
+	m_NodePath(nodePath)
 {
 }
 
 IHyLoadable::IHyLoadable(const IHyLoadable &copyRef) :
+	m_uiState(copyRef.m_uiState),
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(copyRef.m_pData),
-	m_NodePath(copyRef.m_NodePath),
-	m_uiState(copyRef.m_uiState)
+	m_NodePath(copyRef.m_NodePath)
 {
 }
 
 IHyLoadable::IHyLoadable(IHyLoadable &&donor) noexcept :
+	m_uiState(std::move(donor.m_uiState)),
 	m_eLoadState(HYLOADSTATE_Inactive),
 	m_pData(std::move(donor.m_pData)),
-	m_NodePath(std::move(donor.m_NodePath)),
-	m_uiState(std::move(donor.m_uiState))
+	m_NodePath(std::move(donor.m_NodePath))
 {
 }
 

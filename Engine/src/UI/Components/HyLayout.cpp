@@ -38,7 +38,7 @@ void HyLayout::SetLayoutType(HyOrientation eLayoutType)
 
 	m_eLayoutType = eLayoutType;
 	m_bReverse = (m_eLayoutType == HYORIENT_Horizontal ? false : true), // 'm_bReverse' is defaulted ON when 'm_eLayoutType' is HYORIENT_Vertical to achieve top->bottom as default
-	SetLayoutDirty();
+	SetSizeDirty();
 }
 
 /*virtual*/ HySizePolicy HyLayout::GetSizePolicy(HyOrientation eOrien) const /*override*/
@@ -59,17 +59,22 @@ void HyLayout::SetLayoutType(HyOrientation eLayoutType)
 	return static_cast<HySizePolicy>(uiSizePolicy);
 }
 
+/*virtual*/ glm::vec2 HyLayout::GetBotLeftOffset() /*override*/
+{
+	return glm::vec2(0.0f, 0.0f);
+}
+
 void HyLayout::AppendItem(IHyEntityUi &itemRef)
 {
 	ChildAppend(itemRef);
-	SetLayoutDirty();
+	SetSizeDirty();
 }
 
 bool HyLayout::RemoveItem(IHyEntityUi &itemRef)
 {
 	if(ChildRemove(&itemRef))
 	{
-		SetLayoutDirty();
+		SetSizeDirty();
 		return true;
 	}
 
@@ -81,7 +86,7 @@ void HyLayout::DetachAllItems()
 	while(m_ChildList.empty() == false)
 		m_ChildList[m_ChildList.size() - 1]->ParentDetach();
 
-	SetLayoutDirty();
+	SetSizeDirty();
 }
 
 bool HyLayout::IsReverseOrder()
@@ -99,7 +104,7 @@ void HyLayout::ReverseOrder(bool bReverse)
 	else
 		m_bReverse = bReverse;
 
-	SetLayoutDirty();
+	SetSizeDirty();
 }
 
 const HyMargins<int16> &HyLayout::GetMargins() const
@@ -111,14 +116,14 @@ void HyLayout::SetMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, 
 {
 	m_Margins.Set(iLeft, iBottom, iRight, iTop);
 	m_iWidgetSpacing = iWidgetSpacing;
-	SetLayoutDirty();
+	SetSizeDirty();
 }
 
 void HyLayout::SetMargins(const HyMargins<int16> &newMargins, int32 iWidgetSpacing)
 {
 	m_Margins = newMargins;
 	m_iWidgetSpacing = iWidgetSpacing;
-	SetLayoutDirty();
+	SetSizeDirty();
 }
 
 int32 HyLayout::GetWidgetSpacing()
@@ -211,7 +216,7 @@ void HyLayout::OnSetDebugBox()
 
 	uint32 uiNumChildren = ChildCount();
 	if(uiNumChildren == 0)
-		return;
+		return vMinSize;
 
 	HyOrientation eOrientation, eInverseOrien;
 	if(m_eLayoutType == HYORIENT_Horizontal)
@@ -256,7 +261,7 @@ void HyLayout::OnSetDebugBox()
 /*virtual*/ glm::ivec2 HyLayout::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
 {
 	glm::ivec2 vTargetSize(uiNewWidth, uiNewHeight);
-	if(m_vActualSize == vTargetSize && m_bLayoutDirty == false)
+	if(m_vActualSize == vTargetSize && IsSizeDirty() == false)
 		return m_vActualSize;
 
 	HyOrientation eOrientation, eInverseOrien;
@@ -274,9 +279,10 @@ void HyLayout::OnSetDebugBox()
 		iInverseOrienMargin = m_Margins.left + m_Margins.right;
 	}
 
+	glm::ivec2 vSizeHint = GetPreferredSize();
 	float fExpandAmt = 0.0f, fShrinkAmt = 0.0f;
 	if(vTargetSize[eOrientation] != 0)
-		GetDistributedScalingAmts(vTargetSize[eOrientation], GetSizeHint()[eOrientation], fExpandAmt, fShrinkAmt);
+		GetDistributedScalingAmts(vTargetSize[eOrientation], vSizeHint[eOrientation], fExpandAmt, fShrinkAmt);
 
 	// Go through each child and set its position and OnResize()
 	glm::vec2 ptCurPos(m_Margins.left, m_Margins.bottom);
@@ -291,7 +297,7 @@ void HyLayout::OnSetDebugBox()
 		// Set item to the ptCurPos
 		pItem->pos.Set(ptCurPos);
 
-		glm::ivec2 vItemSize = pItem->GetSizeHint();
+		glm::ivec2 vItemSize = pItem->GetPreferredSize();
 
 		if(vTargetSize[eOrientation] != 0)
 		{
@@ -350,22 +356,20 @@ void HyLayout::OnSetDebugBox()
 		bNeedsResize = true;
 	}
 
-	if(bNeedsResize)
+	if(bNeedsResize) // TODO: Investigate this
 	{
-		SetSizeAndLayoutDirty();
+		SetSizeDirty();
 
 		vTargetSize[eOrientation] = static_cast<int32>(ptCurPos[eOrientation] - GetWidgetSpacing());
 		HySetVec(ptCurPos, m_Margins.left, m_Margins.bottom);
 
-		GetDistributedScalingAmts(vTargetSize[eOrientation], GetSizeHint()[eOrientation], fExpandAmt, fShrinkAmt);
+		GetDistributedScalingAmts(vTargetSize[eOrientation], GetPreferredSize()[eOrientation], fExpandAmt, fShrinkAmt);
 
 		if(m_bReverse)
 			std::for_each(m_ChildList.rbegin(), m_ChildList.rend(), fpPositionAndResize);
 		else
 			std::for_each(m_ChildList.begin(), m_ChildList.end(), fpPositionAndResize);
 	}
-
-	m_bLayoutDirty = false;
 
 	m_vActualSize[eOrientation] = static_cast<int32>(ptCurPos[eOrientation] - GetWidgetSpacing());
 	m_vActualSize[eInverseOrien] = vTargetSize[eInverseOrien];

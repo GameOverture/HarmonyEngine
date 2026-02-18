@@ -13,7 +13,7 @@
 #include "HyEngine.h"
 
 IHyWidget::IHyWidget(HyEntity2d *pParent /*= nullptr*/) :
-	HyPanel(pParent),
+	IHyEntityUi(pParent),
 	m_eHoverCursor(HYMOUSECURSOR_Default)
 {
 }
@@ -289,13 +289,16 @@ HyPanelState IHyWidget::CalcPanelState()
 
 void IHyWidget::ApplyPanelState()
 {
-	if(IsUsingPanelStates())
-	{
-		HyPanelState eCurState = CalcPanelState();
-		if(m_ePanelState != eCurState)
-		{
-			m_ePanelState = eCurState;
-			SetPanelState(m_ePanelState);
-		}
-	}
+	
+	//if(IsUsingPanelStates())
+	//{
+	//	HyPanelState eCurState = ;
+	//	if(m_ePanelState != eCurState)
+	//	{
+	//		m_ePanelState = eCurState;
+	//		SetPanelState(m_ePanelState);
+	//	}
+	//}
+
+	OnApplyWidgetState(CalcPanelState());
 }

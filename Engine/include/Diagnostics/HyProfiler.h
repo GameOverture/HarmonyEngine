@@ -72,15 +72,16 @@ public:
 		m_PortionList[PORTION_Render].m_dDuration = 0.0;
 	}
 
-protected:
 	virtual glm::vec2 GetBotLeftOffset() override { return glm::vec2(0, 0); }
-	virtual void OnSetSizeHint() override { HySetVec(m_vSizeHint, static_cast<int32>(m_fWidth), static_cast<int32>(m_fHEIGHT)); }
+
+protected:
+	virtual void OnApplyWidgetState(HyPanelState eWidgetState) override { }
+	virtual glm::ivec2 OnCalcPreferredSize() override { return glm::ivec2(static_cast<int32>(m_fWidth), static_cast<int32>(m_fHEIGHT)); }
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override {
 		m_fWidth = static_cast<float>(uiNewWidth);
-		OnSetSizeHint();
 		UpdatePortions();
 
-		return m_vSizeHint;
+		return glm::ivec2(uiNewWidth, m_fHEIGHT);
 	}
 	void UpdatePortions() {
 		double dTotal = 0.0;

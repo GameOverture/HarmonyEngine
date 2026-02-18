@@ -26,11 +26,11 @@ class IHyLoadable
 protected:
 	static HyAssets *				sm_pHyAssets;
 	
+	uint32							m_uiState;
+
 	HyLoadState						m_eLoadState;
 	const IHyNodeData *				m_pData;
 	HyNodePath						m_NodePath;
-
-	uint32							m_uiState;	// All 'Loadable' type nodes utilize a state system when setting up
 
 public:
 	IHyLoadable(const HyNodePath &nodePath);

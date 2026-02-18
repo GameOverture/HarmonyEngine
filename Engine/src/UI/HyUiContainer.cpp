@@ -19,9 +19,10 @@ HySpacerHandle HyUiContainer::sm_hSpacerHandleCounter = 1;
 HyLayoutHandle HyUiContainer::sm_hLayoutHandleCounter = 1;
 
 HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyUiPanelInit &initRef, HyEntity2d *pParent /*= nullptr*/) :
-	HyPanel(initRef, pParent),
+	IHyEntityUi(pParent),
 	m_bInputAllowed(true),
 	m_iDefaultWidgetSpacing(HYUICONTAINER_DefaultWidgetSpacing),
+	panel(initRef, this),
 	m_RootLayout(eRootLayoutDirection, HYUICONTAINER_DefaultWidgetSpacing, this),
 	m_eContainerState(CONTAINERSTATE_Shown),
 	m_fElapsedTime(0.0f),
@@ -33,15 +34,12 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyUiPanel
 	m_RootBtnGrp.SetAsAutoExclusive();
 
 	m_RootLayout.SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Flexible);
-	m_RootLayout.SetLayoutDirty();
 
 	sm_pContainerList.push_back(this);
 
 	// Scroll bars
 	SetScrollBarColor(initRef.m_PanelColor);
 	EnableScrollBars(m_bUseVertBar, m_bUseHorzBar);
-
-	SetSize(initRef.m_uiWidth, initRef.m_uiHeight);
 }
 
 /*virtual*/ HyUiContainer::~HyUiContainer()
@@ -61,18 +59,6 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyUiPanel
 /*static*/ bool HyUiContainer::IsModalActive()
 {
 	return sm_pCurModalContainer != nullptr;
-}
-
-glm::ivec2 HyUiContainer::GetSize()
-{
-	return glm::ivec2(m_Panel.GetWidth(), m_Panel.GetHeight());
-}
-
-void HyUiContainer::SetSize(int32 iNewWidth, int32 iNewHeight)
-{
-	//m_Shape.SetAsBox(iNewWidth, iNewHeight);
-	m_Panel.SetSize(iNewWidth, iNewHeight);
-	m_RootLayout.SetLayoutDirty();
 }
 
 bool HyUiContainer::Show(bool bInstant /*= false*/)
@@ -346,9 +332,6 @@ HySpacerHandle HyUiContainer::InsertSpacer(HySizePolicy eSizePolicy /*= HYSIZEPO
 
 uint32 HyUiContainer::GetSpacerSize(HySpacerHandle hSpacer)
 {
-	if(m_RootLayout.IsLayoutDirty())
-		OnRootLayoutUpdate();
-
 	if(m_SubSpacerMap.find(hSpacer) != m_SubSpacerMap.end())
 		return static_cast<uint32>(m_SubSpacerMap.at(hSpacer)->GetActualSize());
 
@@ -403,9 +386,6 @@ HyLayoutHandle HyUiContainer::InsertLayout(HyOrientation eNewLayoutType, HyLayou
 
 glm::ivec2 HyUiContainer::GetLayoutSize(HyLayoutHandle hLayout)
 {
-	if(m_RootLayout.IsLayoutDirty())
-		OnRootLayoutUpdate();
-
 	if(m_SubLayoutMap.find(hLayout) != m_SubLayoutMap.end())
 		return glm::ivec2(m_SubLayoutMap.at(hLayout)->GetWidth(), m_SubLayoutMap.at(hLayout)->GetHeight());
 
@@ -529,7 +509,7 @@ void HyUiContainer::EnableScrollBars(bool bUseVert, bool bUseHorz)
 	m_VertBar.alpha.Set(static_cast<int32>(m_bUseVertBar) * 1.0f);
 	m_HorzBar.alpha.Set(static_cast<int32>(m_bUseHorzBar) * 1.0f);
 
-	m_RootLayout.SetLayoutDirty();
+	SetSizeDirty();
 }
 
 void HyUiContainer::SetScrollBarColor(HyColor color)
@@ -543,7 +523,7 @@ void HyUiContainer::SetScrollBarSize(uint32 uiDiameter)
 	m_VertBar.SetDiameter(uiDiameter);
 	m_HorzBar.SetDiameter(uiDiameter);
 	
-	m_RootLayout.SetLayoutDirty();
+	SetSizeDirty();
 }
 
 void HyUiContainer::SetLineScrollAmt(float fLineScrollAmt)
@@ -558,13 +538,15 @@ void HyUiContainer::ScrollTo(float fVertScrollPos, float fHorzScrollPos)
 	m_HorzBar.ScrollTo(fHorzScrollPos);
 }
 
+/*virtual*/ glm::vec2 HyUiContainer::GetBotLeftOffset() /*override*/
+{
+	return panel.GetBotLeftOffset();
+}
+
 /*virtual*/ void HyUiContainer::OnUpdate() /*override final*/
 {
-	if(m_RootLayout.IsLayoutDirty())
-	{
-		OnRootLayoutUpdate();
-		OnRootLayoutUpdate();
-	}
+	if(IsSizeDirty())
+		Resize(panel.GetWidth(), panel.GetHeight());
 
 	if(m_fElapsedTime > 0.0f)
 	{
@@ -605,6 +587,106 @@ void HyUiContainer::ScrollTo(float fVertScrollPos, float fHorzScrollPos)
 	OnContainerUpdate();
 }
 
+/*virtual*/ glm::ivec2 HyUiContainer::OnCalcPreferredSize() /*override*/
+{
+	return panel.GetSize();
+}
+
+/*virtual*/ glm::ivec2 HyUiContainer::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
+{
+	panel.SetSize(uiNewWidth, uiNewHeight);
+
+	int32 iNewWidth = static_cast<int32>(panel.GetWidth());
+	int32 iNewHeight = static_cast<int32>(panel.GetHeight());
+
+	if(iNewWidth == 0 || iNewHeight == 0)
+		return glm::ivec2(0, 0);
+
+	if(m_bUseVertBar || m_bUseHorzBar)
+	{
+		// If scrolling, then use '0' for that dimension, to indicate to the layout use the exact amount it needs.
+		// NOTE: Using the layout's size hint (instead of '0') may be inaccurate if other dimension is being resized
+		if(m_bUseHorzBar && m_RootLayout.GetPreferredSize().x > iNewWidth)
+		{
+			//iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
+			iNewHeight -= m_HorzBar.GetDiameter();
+			iNewWidth = 0;
+		}
+
+		if(m_bUseVertBar && m_RootLayout.GetPreferredSize().y > iNewHeight)
+		{
+			if(iNewWidth != 0)
+			{
+				//iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
+				iNewWidth -= m_VertBar.GetDiameter();
+			}
+			iNewHeight = 0;
+		}
+	}
+
+	bool bVertBarShown = iNewHeight == 0;
+	bool bHorzBarShown = iNewWidth == 0;
+
+	int32 iScissorMargin = 0;
+	if(bVertBarShown || bHorzBarShown)
+	{
+		if(panel.IsPrimForPanel())
+			iScissorMargin = panel.GetFrameStrokeSize();
+
+		int32 iScissorWidth = static_cast<int32>(panel.GetWidth()) - (iScissorMargin * 2) - (static_cast<int32>(bVertBarShown) * m_VertBar.GetDiameter());
+		int32 iScissorHeight = static_cast<int32>(panel.GetHeight()) - (iScissorMargin * 2) - (static_cast<int32>(bHorzBarShown) * m_HorzBar.GetDiameter());
+		if(iScissorWidth > 0 && iScissorHeight > 0)
+			SetScissor(HyRect(static_cast<float>(iScissorMargin), static_cast<float>(iScissorMargin), static_cast<float>(iScissorWidth), static_cast<float>(iScissorHeight)));
+		else
+			ClearScissor(true);
+	}
+	else
+		ClearScissor(true);
+
+	m_VertBar.ClearScissor(false);
+	m_HorzBar.ClearScissor(false);
+
+	glm::ivec2 vActualSize = m_RootLayout.Resize(iNewWidth, iNewHeight);
+
+	glm::ivec2 vPanelSize = panel.GetSize();
+	if(bVertBarShown && bHorzBarShown == false)
+	{
+		m_VertBar.SetMetrics(vPanelSize.y - (iScissorMargin * 2), vActualSize.y, vPanelSize.y);
+		m_VertBar.pos.Set(vPanelSize.x - m_VertBar.GetDiameter() - iScissorMargin, iScissorMargin);
+		m_VertBar.alpha.Set(1.0f);
+		
+		m_HorzBar.alpha.Set(0.0f);
+		m_HorzBar.SetMetrics(vPanelSize.y - (iScissorMargin * 2), iNewWidth, iNewWidth);
+	}
+	else if(bVertBarShown == false && bHorzBarShown)
+	{
+		m_HorzBar.SetMetrics(vPanelSize.x - (iScissorMargin * 2), vActualSize.x, vPanelSize.x);
+		m_HorzBar.pos.Set(iScissorMargin, iScissorMargin);
+		m_HorzBar.alpha.Set(1.0f);
+		
+		m_VertBar.alpha.Set(0.0f);
+		m_VertBar.SetMetrics(vPanelSize.y - (iScissorMargin * 2), iNewHeight, iNewHeight);
+	}
+	else if(bVertBarShown && bHorzBarShown)
+	{
+		m_VertBar.SetMetrics(vPanelSize.y - (iScissorMargin * 2) - m_HorzBar.GetDiameter(), vActualSize.y, vPanelSize.y);
+		m_VertBar.pos.Set(vPanelSize.x - m_VertBar.GetDiameter() - iScissorMargin, iScissorMargin + static_cast<int32>(m_HorzBar.GetDiameter()));
+		m_VertBar.alpha.Set(1.0f);
+
+		m_HorzBar.SetMetrics(vPanelSize.x - (iScissorMargin * 2) - m_VertBar.GetDiameter(), vActualSize.x, vPanelSize.x);
+		m_HorzBar.pos.Set(iScissorMargin, iScissorMargin);
+		m_HorzBar.alpha.Set(1.0f);
+	}
+	else if(bVertBarShown == false && bHorzBarShown == false)
+	{
+		m_HorzBar.alpha.Set(0.0f);
+		m_HorzBar.SetMetrics(vPanelSize.x - (iScissorMargin * 2), iNewWidth, iNewWidth);
+
+		m_VertBar.alpha.Set(0.0f);
+		m_VertBar.SetMetrics(vPanelSize.y - (iScissorMargin * 2), iNewHeight, iNewHeight);
+	}
+}
+
 std::vector<IHyWidget *> HyUiContainer::AssembleWidgetList()
 {
 	std::vector<IHyWidget *> widgetList;
@@ -622,99 +704,6 @@ std::vector<IHyWidget *> HyUiContainer::AssembleWidgetList()
 	fpRecursive(&m_RootLayout);
 
 	return widgetList;
-}
-
-void HyUiContainer::OnRootLayoutUpdate()
-{
-	int32 iNewWidth = static_cast<int32>(m_Panel.GetWidth(m_Panel.scale.X()));
-	int32 iNewHeight = static_cast<int32>(m_Panel.GetHeight(m_Panel.scale.Y()));
-
-	if(iNewWidth == 0 || iNewHeight == 0)
-		return;
-
-	if(m_bUseVertBar || m_bUseHorzBar)
-	{
-		// If scrolling, then use '0' for that dimension, to indicate to the layout use the exact amount it needs.
-		// NOTE: Using the layout's size hint (instead of '0') may be inaccurate if other dimension is being resized
-		if(m_bUseHorzBar && m_RootLayout.GetSizeHint().x > iNewWidth)
-		{
-			//iNewHeight -= (m_RootLayout.GetMargins().top + m_RootLayout.GetMargins().bottom);
-			iNewHeight -= m_HorzBar.GetDiameter();
-			iNewWidth = 0;
-		}
-
-		if(m_bUseVertBar && m_RootLayout.GetSizeHint().y > iNewHeight)
-		{
-			if(iNewWidth != 0)
-			{
-				//iNewWidth -= (m_RootLayout.GetMargins().left + m_RootLayout.GetMargins().right);
-				iNewWidth -= m_VertBar.GetDiameter();
-			}
-			iNewHeight = 0;
-		}
-	}
-
-	bool bVertBarShown = iNewHeight == 0;
-	bool bHorzBarShown = iNewWidth == 0;
-
-	int32 iScissorMargin = 0;
-	if(bVertBarShown || bHorzBarShown)
-	{
-		if(m_Panel.IsPrimitive())
-			iScissorMargin = m_Panel.GetFrameStrokeSize();
-
-		int32 iScissorWidth = static_cast<int32>(m_Panel.GetWidth(m_Panel.scale.X())) - (iScissorMargin * 2) - (static_cast<int32>(bVertBarShown) * m_VertBar.GetDiameter());
-		int32 iScissorHeight = static_cast<int32>(m_Panel.GetHeight(m_Panel.scale.Y())) - (iScissorMargin * 2) - (static_cast<int32>(bHorzBarShown) * m_HorzBar.GetDiameter());
-		if(iScissorWidth > 0 && iScissorHeight > 0)
-			SetScissor(HyRect(static_cast<float>(iScissorMargin), static_cast<float>(iScissorMargin), static_cast<float>(iScissorWidth), static_cast<float>(iScissorHeight)));
-		else
-			ClearScissor(true);
-	}
-	else
-		ClearScissor(true);
-
-	m_Panel.ClearScissor(false);
-	m_VertBar.ClearScissor(false);
-	m_HorzBar.ClearScissor(false);
-
-	glm::ivec2 vActualSize = m_RootLayout.Resize(iNewWidth, iNewHeight);
-
-	if(bVertBarShown && bHorzBarShown == false)
-	{
-		m_VertBar.SetMetrics(GetSize().y - (iScissorMargin * 2), vActualSize.y, GetSize().y);
-		m_VertBar.pos.Set(GetSize().x - m_VertBar.GetDiameter() - iScissorMargin, iScissorMargin);
-		m_VertBar.alpha.Set(1.0f);
-		
-		m_HorzBar.alpha.Set(0.0f);
-		m_HorzBar.SetMetrics(GetSize().y - (iScissorMargin * 2), iNewWidth, iNewWidth);
-	}
-	else if(bVertBarShown == false && bHorzBarShown)
-	{
-		m_HorzBar.SetMetrics(GetSize().x - (iScissorMargin * 2), vActualSize.x, GetSize().x);
-		m_HorzBar.pos.Set(iScissorMargin, iScissorMargin);
-		m_HorzBar.alpha.Set(1.0f);
-		
-		m_VertBar.alpha.Set(0.0f);
-		m_VertBar.SetMetrics(GetSize().y - (iScissorMargin * 2), iNewHeight, iNewHeight);
-	}
-	else if(bVertBarShown && bHorzBarShown)
-	{
-		m_VertBar.SetMetrics(GetSize().y - (iScissorMargin * 2) - m_HorzBar.GetDiameter(), vActualSize.y, GetSize().y);
-		m_VertBar.pos.Set(GetSize().x - m_VertBar.GetDiameter() - iScissorMargin, iScissorMargin + static_cast<int32>(m_HorzBar.GetDiameter()));
-		m_VertBar.alpha.Set(1.0f);
-
-		m_HorzBar.SetMetrics(GetSize().x - (iScissorMargin * 2) - m_VertBar.GetDiameter(), vActualSize.x, GetSize().x);
-		m_HorzBar.pos.Set(iScissorMargin, iScissorMargin);
-		m_HorzBar.alpha.Set(1.0f);
-	}
-	else if(bVertBarShown == false && bHorzBarShown == false)
-	{
-		m_HorzBar.alpha.Set(0.0f);
-		m_HorzBar.SetMetrics(GetSize().x - (iScissorMargin * 2), iNewWidth, iNewWidth);
-
-		m_VertBar.alpha.Set(0.0f);
-		m_VertBar.SetMetrics(GetSize().y - (iScissorMargin * 2), iNewHeight, iNewHeight);
-	}
 }
 
 bool HyUiContainer::RequestWidgetFocus(IHyWidget *pWidget)

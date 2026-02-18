@@ -19,7 +19,7 @@
 #include "UI/Components/HyToolButton.h"
 #include "UI/Components/HyScrollBar.h"
 
-class HyUiContainer : public HyPanel
+class HyUiContainer : public IHyEntityUi
 {
 	friend class HyLayout;
 	friend class HyInput;
@@ -58,13 +58,13 @@ protected:
 	HyScrollBar								m_HorzBar;
 
 public:
+	HyPanel									panel;
+
+public:
 	HyUiContainer(HyOrientation eRootLayoutDirection, const HyUiPanelInit &initRef, HyEntity2d *pParent = nullptr);
 	virtual ~HyUiContainer();
 
 	static bool IsModalActive();
-
-	glm::ivec2 GetSize();
-	void SetSize(int32 iNewWidth, int32 iNewHeight);
 
 	bool Show(bool bInstant = false);
 	bool Hide(bool bInstant = false);
@@ -105,11 +105,15 @@ public:
 	void SetLineScrollAmt(float fLineScrollAmt);
 	void ScrollTo(float fVertScrollPos, float fHorzScrollPos);
 
+	virtual glm::vec2 GetBotLeftOffset() override;
+
 protected:
 	virtual void OnUpdate() override final;
+	virtual glm::ivec2 OnCalcPreferredSize() override;
+	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
+
 	std::vector<IHyWidget *> AssembleWidgetList();
 
-	virtual void OnRootLayoutUpdate();// { m_RootLayout.Resize(static_cast<uint32>(m_Panel.size.X()), static_cast<uint32>(m_Panel.size.Y())); }
 	virtual void OnContainerUpdate() { }
 
 	// Optional overrides to control show and hide animations/functionality
