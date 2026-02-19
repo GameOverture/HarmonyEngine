@@ -562,6 +562,9 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 	EntityTreeItemData *pCurArray = nullptr;
 	for(EntityTreeItemData *pItem : itemList)
 	{
+		if(pItem->IsLayoutItem())
+			continue;
+
 		if(pCurArray)
 		{
 			if(pCurArray->GetCodeName() == pItem->GetCodeName())
@@ -619,7 +622,7 @@ QString EntityModel::GenerateSrc_AccessorDecl() const
 				arrayList.push_back(sCodeName);
 			}
 		}
-		else
+		else if(pItem->IsLayoutItem() == false)
 		{
 			sSrc += "\n\t" + pItem->GetHyNodeTypeName(true) +
 				(pItem->GetDeclarationType() == ENTDECLTYPE_Static ? " &" : " *") +
@@ -658,7 +661,7 @@ QString EntityModel::GenerateSrc_AccessorDefinition(QString sClassName) const
 				arrayList.push_back(sCodeName);
 			}
 		}
-		else
+		else if(pItem->IsLayoutItem() == false)
 		{
 			sSrc += "\n" + pItem->GetHyNodeTypeName(true) +
 				(pItem->GetDeclarationType() == ENTDECLTYPE_Static ? " &" : " *") +
@@ -727,6 +730,9 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 	EntityTreeItemData *pCurArray = nullptr;
 	for(EntityTreeItemData *pItem : itemList)
 	{
+		if(pItem->IsLayoutItem())
+			continue;
+
 		if(pCurArray)
 		{
 			if(pCurArray->GetCodeName() != pItem->GetCodeName())

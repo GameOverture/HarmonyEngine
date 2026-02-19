@@ -685,6 +685,8 @@ void HyUiContainer::ScrollTo(float fVertScrollPos, float fHorzScrollPos)
 		m_VertBar.alpha.Set(0.0f);
 		m_VertBar.SetMetrics(vPanelSize.y - (iScissorMargin * 2), iNewHeight, iNewHeight);
 	}
+
+	return vPanelSize;
 }
 
 std::vector<IHyWidget *> HyUiContainer::AssembleWidgetList()

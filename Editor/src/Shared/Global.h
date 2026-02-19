@@ -109,8 +109,8 @@ enum ItemType
 	ITEM_ShapeFixture,
 	ITEM_ChainFixture,
 	ITEM_UiLayout,
-	// UI widgets
 	ITEM_UiSpacer,
+	// UI widgets
 	ITEM_UiLabel,
 	ITEM_UiRichLabel,
 	ITEM_UiButton,

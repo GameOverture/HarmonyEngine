@@ -456,13 +456,14 @@ void IManagerModel::AddAssetsToRepack(BankData *pBankData, QSet<IAssetItemData *
 		m_RepackAffectedAssetsMap[pBankData].unite(assetsSet);
 }
 
-void IManagerModel::FlushRepack()
+bool IManagerModel::FlushRepack()
 {
-	if(m_ProjectRef.IsUnsavedOpenItems())
-	{
-		HyGuiLog("Save should have aborted earlier: Cannot modify assets when there are unsaved opened items.", LOGTYPE_Error);
-		return;
-	}
+	// TODO: Text items expect to be unsaved when trying to repack atlases. Need to determine what could break specifically if unsaved items have assets get changed.
+	//if(m_ProjectRef.IsUnsavedOpenItems())
+	//{
+	//	HyGuiLog("Cannot modify assets when there are unsaved opened items.", LOGTYPE_Warning);
+	//	return false;
+	//}
 
 	OnFlushRepack();
 
@@ -477,6 +478,8 @@ void IManagerModel::FlushRepack()
 			StartRepackThread("Repacking Audio", new AudioRepackThread(m_RepackAffectedAssetsMap, m_MetaDir));
 		break;
 	}
+
+	return true;
 }
 
 QString IManagerModel::AssembleFilter(const TreeModelItemData *pAsset, bool bIncludeSelfIfFilter) const

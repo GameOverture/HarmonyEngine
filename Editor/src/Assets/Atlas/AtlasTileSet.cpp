@@ -719,9 +719,8 @@ bool AtlasTileSet::Save()
 	m_pUndoStack->setClean();
 
 	UpdateTileSetDataPair();
-	static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetDataPair);
 
-	return true;
+	return static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetDataPair);
 }
 
 bool AtlasTileSet::IsExistencePendingSave() const

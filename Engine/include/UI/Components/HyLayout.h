@@ -15,7 +15,7 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
 #if defined(HY_DEBUG) && !defined(HY_PLATFORM_GUI)
-	#define HY_USE_LAYOUT_DEBUG_BOXES
+	//#define HY_USE_LAYOUT_DEBUG_BOXES
 #endif
 
 class IHyWidget;

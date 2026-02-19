@@ -162,7 +162,9 @@ float HyPanel::GetWidth(float fPercent /*= 1.0f*/) const
 			return m_PanelData.m_pNodeItem->GetWidth(fPercent);
 
 	case HYTYPE_Primitive: // 'Primitive' panel
-		return (m_PanelData.m_pPrimParts->m_Body.GetWidth() - (m_PanelData.m_pPrimParts->m_uiFrameSize * 2)) * fPercent;
+		if(m_PanelData.m_pPrimParts->m_Body.GetShapeType() == HYFIXTURE_Nothing)
+			return 0.0f;
+		return (m_PanelData.m_pPrimParts->m_Body.GetWidth() + (m_PanelData.m_pPrimParts->m_uiFrameSize * 2)) * fPercent;
 
 	default:
 		HyLogError("HyPanel::GetWidth() - Unhandled m_eNodeType: " << m_eNodeType);
@@ -188,7 +190,9 @@ float HyPanel::GetHeight(float fPercent /*= 1.0f*/) const
 			return m_PanelData.m_pNodeItem->GetHeight(fPercent);
 
 	case HYTYPE_Primitive: // 'Primitive' panel
-		return (m_PanelData.m_pPrimParts->m_Body.GetHeight() - (m_PanelData.m_pPrimParts->m_uiFrameSize * 2)) * fPercent;
+		if(m_PanelData.m_pPrimParts->m_Body.GetShapeType() == HYFIXTURE_Nothing)
+			return 0.0f;
+		return (m_PanelData.m_pPrimParts->m_Body.GetHeight() + (m_PanelData.m_pPrimParts->m_uiFrameSize * 2)) * fPercent;
 
 	default:
 		HyLogError("HyPanel::GetHeight() - Unhandled m_eNodeType: " << m_eNodeType);
@@ -499,6 +503,7 @@ void HyPanel::DeleteData()
 		break;
 
 	case HYTYPE_Entity:
+		m_PanelData.m_BoundingVolumeSize.x = m_PanelData.m_BoundingVolumeSize.y = 0.0f;
 		break;
 
 	case HYTYPE_Sprite: // 'NodeItem' panel

@@ -94,10 +94,10 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 
 		aabb = b2MakeAABB(pointList.data(), pointList.size(), 0.0f);
 	}
-	else
-		m_Shape.ComputeAABB(aabb, glm::mat4(1.0f));
+	else if(m_Shape.ComputeAABB(aabb, glm::mat4(1.0f)))
+		return (b2AABB_Extents(aabb).x * 2.0f) * fPercent;
 
-	return (b2AABB_Extents(aabb).x * 2.0f) * fPercent;
+	return 0.0f;
 }
 
 /*virtual*/ float HyPrimitive2d::GetHeight(float fPercent /*= 1.0f*/) /*override*/
@@ -111,10 +111,10 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 
 		aabb = b2MakeAABB(pointList.data(), pointList.size(), 0.0f);
 	}
-	else
-		m_Shape.ComputeAABB(aabb, glm::mat4(1.0f));
+	else if(m_Shape.ComputeAABB(aabb, glm::mat4(1.0f)))
+		return (b2AABB_Extents(aabb).y * 2.0f) * fPercent;
 
-	return (b2AABB_Extents(aabb).y * 2.0f) * fPercent;
+	return 0.0f;
 }
 
 HyFixtureType HyPrimitive2d::GetShapeType() const

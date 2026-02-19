@@ -176,7 +176,9 @@ void TextModel::SetRuntimeAtlasDirty()
 	else
 		HyGuiLog("Could not create font meta directory", LOGTYPE_Error);
 
-	m_ItemRef.GetProject().GetAtlasModel().FlushRepack();
+	if(m_ItemRef.GetProject().GetAtlasModel().FlushRepack() == false)
+		return false;
+
 	m_bGenerateRuntimeAtlas = false;
 	return true;
 }

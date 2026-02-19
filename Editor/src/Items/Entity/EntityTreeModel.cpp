@@ -150,7 +150,18 @@ QString EntityTreeItemData::GetHyNodeTypeName(bool bIncludeNamespace) const
 	}
 
 	case ITEM_UiLabel:			return "HyLabel";
+	case ITEM_UiRichLabel:		return "HyRichLabel";
+	case ITEM_UiButton:			return "HyButton";
+	case ITEM_UiRackMeter:		return "HyRackMeter";
+	case ITEM_UiBarMeter:		return "HyBarMeter";
+	case ITEM_UiCheckBox:		return "HyCheckBox";
+	case ITEM_UiRadioButton:	return "HyRadioButton";
+	case ITEM_UiTextField:		return "HyTextField";
+	case ITEM_UiComboBox:		return "HyComboBox";
+	case ITEM_UiSlider:			return "HySlider";
 
+	case ITEM_UiLayout:
+	case ITEM_UiSpacer:
 	case ITEM_SoundClip:
 	case ITEM_Prefab:
 	case ITEM_Particles:
