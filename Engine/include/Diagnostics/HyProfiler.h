@@ -78,10 +78,11 @@ protected:
 	virtual void OnApplyWidgetState(HyPanelState eWidgetState) override { }
 	virtual glm::ivec2 OnCalcPreferredSize() override { return glm::ivec2(static_cast<int32>(m_fWidth), static_cast<int32>(m_fHEIGHT)); }
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override {
-		m_fWidth = static_cast<float>(uiNewWidth);
-		UpdatePortions();
+		if(uiNewWidth != 0)
+			m_fWidth = static_cast<float>(uiNewWidth);
 
-		return glm::ivec2(uiNewWidth, m_fHEIGHT);
+		UpdatePortions();
+		return glm::ivec2(m_fWidth, m_fHEIGHT);
 	}
 	void UpdatePortions() {
 		double dTotal = 0.0;

@@ -358,7 +358,7 @@ void HyLayout::OnSetDebugBox()
 
 	if(bNeedsResize) // TODO: Investigate this
 	{
-		SetSizeDirty();
+		//SetSizeDirty();
 
 		vTargetSize[eOrientation] = static_cast<int32>(ptCurPos[eOrientation] - GetWidgetSpacing());
 		HySetVec(ptCurPos, m_Margins.left, m_Margins.bottom);

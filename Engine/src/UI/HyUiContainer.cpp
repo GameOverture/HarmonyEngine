@@ -31,8 +31,10 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyUiPanel
 	m_VertBar(HYORIENT_Vertical, 20, this),
 	m_HorzBar(HYORIENT_Horizontal, 20, this)
 {
+	m_uiFlags |= NODETYPE_IsLayout;
 	m_RootBtnGrp.SetAsAutoExclusive();
 
+	SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Flexible);
 	m_RootLayout.SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Flexible);
 
 	sm_pContainerList.push_back(this);
@@ -384,7 +386,7 @@ HyLayoutHandle HyUiContainer::InsertLayout(HyOrientation eNewLayoutType, HyLayou
 	return hNewLayoutHandle;
 }
 
-glm::ivec2 HyUiContainer::GetLayoutSize(HyLayoutHandle hLayout)
+glm::ivec2 HyUiContainer::GetLayoutSize(HyLayoutHandle hLayout) const
 {
 	if(m_SubLayoutMap.find(hLayout) != m_SubLayoutMap.end())
 		return glm::ivec2(m_SubLayoutMap.at(hLayout)->GetWidth(), m_SubLayoutMap.at(hLayout)->GetHeight());
@@ -397,11 +399,13 @@ bool HyUiContainer::SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, in
 	if(hAffectedLayout == HY_UNUSED_HANDLE)
 	{
 		m_RootLayout.SetMargins(iLeft, iBottom, iRight, iTop, m_RootLayout.GetWidgetSpacing());
+		SetSizeDirty();
 		return true;
 	}
 	else if(m_SubLayoutMap.find(hAffectedLayout) != m_SubLayoutMap.end())
 	{
 		m_SubLayoutMap[hAffectedLayout]->SetMargins(iLeft, iBottom, iRight, iTop, m_SubLayoutMap[hAffectedLayout]->GetWidgetSpacing());
+		SetSizeDirty();
 		return true;
 	}
 
@@ -418,6 +422,7 @@ bool HyUiContainer::SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle 
 								m_RootLayout.GetMargins().right,
 								m_RootLayout.GetMargins().top,
 								iWidgetSpacing);
+		SetSizeDirty();
 		return true;
 	}
 	else if(m_SubLayoutMap.find(hAffectedLayout) != m_SubLayoutMap.end())
@@ -427,6 +432,7 @@ bool HyUiContainer::SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle 
 													m_SubLayoutMap[hAffectedLayout]->GetMargins().right,
 													m_SubLayoutMap[hAffectedLayout]->GetMargins().top,
 													iWidgetSpacing);
+		SetSizeDirty();
 		return true;
 	}
 
@@ -445,6 +451,7 @@ bool HyUiContainer::RemoveLayout(HyLayoutHandle hLayout)
 	{
 		m_SubLayoutMap.erase(hLayout);
 		delete pLayoutToRemove;
+		SetSizeDirty();
 		return true;
 	}
 
@@ -454,6 +461,7 @@ bool HyUiContainer::RemoveLayout(HyLayoutHandle hLayout)
 		{
 			m_SubLayoutMap.erase(hLayout);
 			delete pLayoutToRemove;
+			SetSizeDirty();
 			return true;
 		}
 	}
@@ -477,6 +485,8 @@ void HyUiContainer::SetDefaultWidgetSpacing(int32 iSpacing, bool bSetRootLayout)
 								m_RootLayout.GetMargins().top,
 								m_iDefaultWidgetSpacing);
 	}
+
+	SetSizeDirty();
 }
 
 void HyUiContainer::ClearItems()
@@ -494,6 +504,8 @@ void HyUiContainer::ClearItems()
 	for(auto pSubLayout : m_SubLayoutMap)
 		delete pSubLayout.second;
 	m_SubLayoutMap.clear();
+
+	SetSizeDirty();
 }
 
 void HyUiContainer::EnableScrollBars(bool bUseVert, bool bUseHorz)

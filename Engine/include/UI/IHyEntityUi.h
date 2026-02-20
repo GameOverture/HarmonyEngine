@@ -18,6 +18,8 @@ class HyPanel;
 
 class IHyEntityUi : public HyEntity2d
 {
+	friend class HyTexturedQuad2d;
+
 protected:
 	glm::ivec2							m_vActualSize;
 

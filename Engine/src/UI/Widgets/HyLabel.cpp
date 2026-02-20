@@ -89,7 +89,7 @@ HyLabel::HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, H
 {
 	Assemble();
 
-	if(panel.GetPanelNode() == nullptr) // Ensure to account for a 'bounding volume' panel
+	if(panel.IsBvForPanel()) // Ensure to account for a 'bounding volume' panel
 		return b2AABB_Union(IHyWidget::GetSceneAABB(), { {0, 0}, {panel.GetWidth(), panel.GetHeight()} });
 	
 	return IHyWidget::GetSceneAABB();
@@ -120,6 +120,7 @@ void HyLabel::Setup(const HyUiPanelInit &panelInit)
 
 	SetEnabled(IsEnabled());
 	SetAssembleNeeded();
+	SetSizeDirty();
 	OnSetup();
 }
 
@@ -130,6 +131,7 @@ void HyLabel::Setup(const HyUiTextInit &textInit)
 
 	SetEnabled(IsEnabled());
 	SetAssembleNeeded();
+	SetSizeDirty();
 	OnSetup();
 }
 
@@ -698,21 +700,14 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 		float fScaleY = static_cast<float>(vNewTextSize.y) / static_cast<float>(vTextSizeHint.y);
 		m_Text.scale.SetAll(HyMath::Min(fScaleX, fScaleY));
 	}
-
-	SetAssembleNeeded();
 	
 	return glm::ivec2(uiNewWidth, uiNewHeight);
 }
 
-///*virtual*/ void HyLabel::OnPanelUpdated() /*override*/
-//{
-//	
-//}
-
 /*virtual*/ void HyLabel::OnApplyWidgetState(HyPanelState eWidgetState) /*override*/
 {
 	if(m_bUseWidgetStates)
-		panel.SetPanelState(eWidgetState);
+		panel.SetState(eWidgetState);
 
 	//if(IsUsingPanelStates())
 	//{
@@ -720,7 +715,7 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 	//	if(m_ePanelState != eCurState)
 	//	{
 	//		m_ePanelState = eCurState;
-	//		SetPanelState(m_ePanelState);
+	//		SetState(m_ePanelState);
 	//	}
 	//}
 

@@ -135,7 +135,7 @@ void HyPanel::Setup(const HyUiPanelInit &initRef, HyEntity2d *pParent)
 		m_PanelData.m_pPrimParts->m_Body.SetTint(m_PanelData.m_pPrimParts->m_PanelColor);
 		m_PanelData.m_pPrimParts->m_Frame1.SetTint(m_PanelData.m_pPrimParts->m_FrameColor);
 		m_PanelData.m_pPrimParts->m_Frame2.SetTint(m_PanelData.m_pPrimParts->m_TertiaryColor);
-		SetPanelState(HYPANELSTATE_Idle);
+		SetState(HYPANELSTATE_Idle);
 		break;
 
 	default:
@@ -248,7 +248,7 @@ void HyPanel::SetSize(float fWidth, float fHeight)
 	}
 }
 
-bool HyPanel::SetPanelState(uint32 uiWidgetState)
+bool HyPanel::SetState(uint32 uiWidgetState)
 {
 	if(IsItemForPanel())
 		return m_PanelData.m_pNodeItem->SetState(uiWidgetState);
@@ -288,7 +288,7 @@ bool HyPanel::SetPanelState(uint32 uiWidgetState)
 			break;
 
 		default:
-			HyError("HyPanel::SetPanelState() - Unknown widget state enum: " << uiWidgetState);
+			HyError("HyPanel::SetState() - Unknown widget state enum: " << uiWidgetState);
 			return false;
 		}
 
@@ -298,7 +298,7 @@ bool HyPanel::SetPanelState(uint32 uiWidgetState)
 	return false;
 }
 
-uint32 HyPanel::GetNumPanelStates()
+uint32 HyPanel::GetNumStates()
 {
 	if(IsItemForPanel())
 		return m_PanelData.m_pNodeItem->GetNumStates();
@@ -331,6 +331,11 @@ HyAnimFloat *HyPanel::Alpha()
 		return &pPanelNode->alpha;
 
 	return nullptr;
+}
+
+bool HyPanel::IsNull() const
+{
+	return m_eNodeType == HYTYPE_Unknown;
 }
 
 bool HyPanel::IsBvForPanel() const

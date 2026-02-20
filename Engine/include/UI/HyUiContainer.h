@@ -89,7 +89,7 @@ public:
 	bool RemoveSpacer(HySpacerHandle hSpacer);
 
 	HyLayoutHandle InsertLayout(HyOrientation eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
-	glm::ivec2 GetLayoutSize(HyLayoutHandle hLayout);
+	glm::ivec2 GetLayoutSize(HyLayoutHandle hLayout) const;
 	bool SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 	bool SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 	bool RemoveLayout(HyLayoutHandle hLayout);

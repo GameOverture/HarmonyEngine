@@ -105,6 +105,7 @@ public:
 	HyPanel(const HyUiPanelInit &initRef, HyEntity2d *pParent);
 	~HyPanel();
 
+	bool IsNull() const;
 	bool IsBvForPanel() const;
 	bool IsItemForPanel() const;
 	bool IsPrimForPanel() const;
@@ -116,8 +117,8 @@ public:
 	glm::vec2 GetSize() const;
 	void SetSize(float fWidth, float fHeight);
 
-	bool SetPanelState(uint32 uiWidgetState);
-	uint32 GetNumPanelStates();
+	bool SetState(uint32 uiWidgetState);
+	uint32 GetNumStates();
 
 	bool IsVisible() const;
 	void SetVisible(bool bVisible);

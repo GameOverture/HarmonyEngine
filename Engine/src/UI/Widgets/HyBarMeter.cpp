@@ -134,7 +134,7 @@ void HyBarMeter::SetBarOffset(int32 iBarOffsetX, int32 iBarOffsetY)
 
 bool HyBarMeter::SetBarState(uint32 uiStateIndex)
 {
-	bool bSuccess = m_Bar.SetPanelState(uiStateIndex);
+	bool bSuccess = m_Bar.SetState(uiStateIndex);
 	SetAssembleNeeded();
 	return bSuccess;
 }

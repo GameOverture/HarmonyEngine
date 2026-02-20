@@ -296,7 +296,7 @@ void IHyWidget::ApplyPanelState()
 	//	if(m_ePanelState != eCurState)
 	//	{
 	//		m_ePanelState = eCurState;
-	//		SetPanelState(m_ePanelState);
+	//		SetState(m_ePanelState);
 	//	}
 	//}
 

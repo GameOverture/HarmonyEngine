@@ -10,6 +10,11 @@ class %HY_CLASS% : public HyEngine
 	enum InputAction
 	{
 		INPUT_ExitGame = 0,
+		
+		INPUT_CameraUp,
+		INPUT_CameraLeft,
+		INPUT_CameraDown,
+		INPUT_CameraRight
 	};
 
 public:
