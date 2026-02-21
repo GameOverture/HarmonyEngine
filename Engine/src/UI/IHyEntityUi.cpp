@@ -10,6 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "UI/IHyEntityUi.h"
 #include "UI/Components/HyLayout.h"
+#include "UI/HyUiContainer.h"
 
 IHyEntityUi::IHyEntityUi(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
@@ -249,5 +250,9 @@ void IHyEntityUi::SetSizeDirty()
 
 	// This will propagate upward if *this is nested in another layout
 	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+	{
 		static_cast<HyLayout *>(m_pParent)->SetSizeDirty();
+		if(static_cast<HyLayout *>(m_pParent)->IsRootLayout())
+			static_cast<HyUiContainer *>(m_pParent->ParentGet())->SetSizeDirty();
+	}
 }

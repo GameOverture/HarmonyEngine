@@ -31,13 +31,13 @@ HyUiContainer::HyUiContainer(HyOrientation eRootLayoutDirection, const HyUiPanel
 	m_VertBar(HYORIENT_Vertical, 20, this),
 	m_HorzBar(HYORIENT_Horizontal, 20, this)
 {
-	m_uiFlags |= NODETYPE_IsLayout;
-	m_RootBtnGrp.SetAsAutoExclusive();
+	sm_pContainerList.push_back(this);
 
 	SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Flexible);
 	m_RootLayout.SetSizePolicy(HYSIZEPOLICY_Flexible, HYSIZEPOLICY_Flexible);
+	m_RootLayout.SetAsRootLayout(true);
 
-	sm_pContainerList.push_back(this);
+	m_RootBtnGrp.SetAsAutoExclusive();
 
 	// Scroll bars
 	SetScrollBarColor(initRef.m_PanelColor);

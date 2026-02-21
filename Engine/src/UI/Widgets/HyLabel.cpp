@@ -344,6 +344,9 @@ void HyLabel::SetText(const std::stringstream &ssUtf8Text)
 
 /*virtual*/ void HyLabel::SetText(const std::string &sUtf8Text)
 {
+	if(sUtf8Text == m_Text.GetUtf8String())
+		return;
+
 	m_Text.SetText(sUtf8Text);
 	SetAssembleNeeded();
 }

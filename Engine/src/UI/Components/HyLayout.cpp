@@ -15,6 +15,7 @@
 
 HyLayout::HyLayout(HyOrientation eLayoutType, int32 iWidgetSpacing, HyEntity2d *pParent /*= nullptr*/) :
 	IHyEntityUi(pParent),
+	m_bIsRootLayout(false),
 	m_eLayoutType(eLayoutType),
 	m_bReverse(m_eLayoutType == HYORIENT_Horizontal ? false : true), // 'm_bReverse' is defaulted ON when 'm_eLayoutType' is HYORIENT_Vertical to achieve top->bottom as default
 	m_iWidgetSpacing(iWidgetSpacing)
@@ -24,6 +25,16 @@ HyLayout::HyLayout(HyOrientation eLayoutType, int32 iWidgetSpacing, HyEntity2d *
 
 /*virtual*/ HyLayout::~HyLayout()
 {
+}
+
+bool HyLayout::IsRootLayout() const
+{
+	return m_bIsRootLayout;
+}
+
+void HyLayout::SetAsRootLayout(bool bIsRootLayout)
+{
+	m_bIsRootLayout = bIsRootLayout;
 }
 
 HyOrientation HyLayout::GetLayoutType() const

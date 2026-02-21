@@ -27,12 +27,12 @@ class HyLayout : public IHyEntityUi
 	HyPrimitive2d						m_DebugBoxMargins;
 #endif
 
+	bool								m_bIsRootLayout;
 	HyOrientation						m_eLayoutType;
+	bool								m_bReverse;			// By default items are appended left->right, or top->bottom (NOTE: 'm_bReverse' is defaulted ON when 'm_eOrientation' is HYORIEN_Vertical to achieve top->bottom as default)
 
 	uint32								m_uiNumExpandItems;	// How many child items have a size policy of EXPAND
 	uint32								m_uiNumShrinkItems;	// How many child items have a size policy of SHRINK
-	
-	bool								m_bReverse;			// By default items are appended left->right, or top->bottom (NOTE: 'm_bReverse' is defaulted ON when 'm_eOrientation' is HYORIEN_Vertical to achieve top->bottom as default)
 
 	int32								m_iWidgetSpacing;	// Spacing between widgets inside the layout
 	HyMargins<int16>					m_Margins;			// Pixel margins
@@ -40,6 +40,9 @@ class HyLayout : public IHyEntityUi
 public:
 	HyLayout(HyOrientation eLayoutType, int32 iWidgetSpacing, HyEntity2d *pParent = nullptr);
 	virtual ~HyLayout();
+
+	bool IsRootLayout() const;
+	void SetAsRootLayout(bool bIsRootLayout);
 
 	HyOrientation GetLayoutType() const;
 	void SetLayoutType(HyOrientation eLayoutType);
