@@ -165,31 +165,31 @@ set(HYENGINE_SOURCE_FILES
 	src/Time/Watches/HyStopwatch.cpp
 	src/Time/Watches/HyTimer.cpp
 	src/Time/Watches/IHyTimeInst.cpp
-	src/UI/IHyEntityUi.cpp
-	src/UI/HyUiContainer.cpp
-	src/UI/Widgets/HyBarMeter.cpp
-	src/UI/Widgets/HyButton.cpp
-	src/UI/Widgets/HyCheckBox.cpp
-	src/UI/Widgets/HyComboBox.cpp
-	src/UI/Widgets/HyDividerLine.cpp
-	src/UI/Widgets/HyLabel.cpp
-	src/UI/Widgets/HyRackMeter.cpp
-	src/UI/Widgets/HyRadioButton.cpp
-	src/UI/Widgets/HyRichText.cpp
-	src/UI/Widgets/HySlider.cpp
-	src/UI/Widgets/HyTextField.cpp
-	src/UI/Widgets/IHyWidget.cpp
-	src/UI/Components/HyButtonGroup.cpp
-	src/UI/Components/HyToolButton.cpp
-	src/UI/Components/HyLayout.cpp
-	src/UI/Components/HyPanel.cpp
-	src/UI/Components/HyScrollBar.cpp
-	src/UI/Components/HySpacer.cpp
-	src/UI/Dialogs/HyRadioDialog.cpp
-	src/UI/Dialogs/IHyDialog.cpp
-	src/UI/Localization/HyLocale.cpp
-	src/UI/Localization/HyNumberFormat.cpp
-	src/UI/Localization/HyTranslateTable.cpp
+	src/Gui/IHyGuiBase.cpp
+	src/Gui/HyGui.cpp
+	src/Gui/Widgets/HyBarMeter.cpp
+	src/Gui/Widgets/HyButton.cpp
+	src/Gui/Widgets/HyCheckBox.cpp
+	src/Gui/Widgets/HyComboBox.cpp
+	src/Gui/Widgets/HyDividerLine.cpp
+	src/Gui/Widgets/HyLabel.cpp
+	src/Gui/Widgets/HyRackMeter.cpp
+	src/Gui/Widgets/HyRadioButton.cpp
+	src/Gui/Widgets/HyRichText.cpp
+	src/Gui/Widgets/HySlider.cpp
+	src/Gui/Widgets/HyTextField.cpp
+	src/Gui/Widgets/IHyWidget.cpp
+	src/Gui/Components/HyButtonGroup.cpp
+	src/Gui/Components/HyToolButton.cpp
+	src/Gui/Components/HyLayout.cpp
+	src/Gui/Components/HyPanel.cpp
+	src/Gui/Components/HyScrollBar.cpp
+	src/Gui/Components/HySpacer.cpp
+	src/Gui/Dialogs/HyRadioDialog.cpp
+	src/Gui/Dialogs/IHyDialog.cpp
+	src/Gui/Localization/HyLocale.cpp
+	src/Gui/Localization/HyNumberFormat.cpp
+	src/Gui/Localization/HyTranslateTable.cpp
 	src/Utilities/Crc32.cpp
 	src/Utilities/HyIO.cpp
 	src/Utilities/HyJson.cpp
@@ -307,32 +307,32 @@ set(HYENGINE_HEADER_FILES
 	include/Time/Watches/HyStopwatch.h
 	include/Time/Watches/HyTimer.h
 	include/Time/Watches/IHyTimeInst.h
-	include/UI/IHyEntityUi.h
-	include/UI/HyUiContainer.h
-	include/UI/Widgets/HyBarMeter.h
-	include/UI/Widgets/HyButton.h
-	include/UI/Widgets/HyCheckBox.h
-	include/UI/Widgets/HyComboBox.h
-	include/UI/Widgets/HyDividerLine.h
-	include/UI/Widgets/HyLabel.h
-	include/UI/Widgets/HyRackMeter.h
-	include/UI/Widgets/HyRadioButton.h
-	include/UI/Widgets/HyRichText.h
-	include/UI/Widgets/HySlider.h
-	include/UI/Widgets/HyTextField.h
-	include/UI/Widgets/IHyWidget.h
-	include/UI/Components/HyButtonGroup.h
-	include/UI/Components/HyToolButton.h
-	include/UI/Components/HyLayout.h
-	include/UI/Components/HyPanel.h
-	include/UI/Components/HyScrollBar.h
-	include/UI/Components/HySpacer.h
-	include/UI/Dialogs/HyRadioDialog.h
-	include/UI/Dialogs/IHyDialog.h
-	include/UI/Localization/HyLocale.h
-	include/UI/Localization/HyNumpunct.h
-	include/UI/Localization/HyNumberFormat.h
-	include/UI/Localization/HyTranslateTable.h
+	include/Gui/IHyGuiBase.h
+	include/Gui/HyGui.h
+	include/Gui/Widgets/HyBarMeter.h
+	include/Gui/Widgets/HyButton.h
+	include/Gui/Widgets/HyCheckBox.h
+	include/Gui/Widgets/HyComboBox.h
+	include/Gui/Widgets/HyDividerLine.h
+	include/Gui/Widgets/HyLabel.h
+	include/Gui/Widgets/HyRackMeter.h
+	include/Gui/Widgets/HyRadioButton.h
+	include/Gui/Widgets/HyRichText.h
+	include/Gui/Widgets/HySlider.h
+	include/Gui/Widgets/HyTextField.h
+	include/Gui/Widgets/IHyWidget.h
+	include/Gui/Components/HyButtonGroup.h
+	include/Gui/Components/HyToolButton.h
+	include/Gui/Components/HyLayout.h
+	include/Gui/Components/HyPanel.h
+	include/Gui/Components/HyScrollBar.h
+	include/Gui/Components/HySpacer.h
+	include/Gui/Dialogs/HyRadioDialog.h
+	include/Gui/Dialogs/IHyDialog.h
+	include/Gui/Localization/HyLocale.h
+	include/Gui/Localization/HyNumpunct.h
+	include/Gui/Localization/HyNumberFormat.h
+	include/Gui/Localization/HyTranslateTable.h
 	include/Utilities/Crc32.h
 	include/Utilities/HyIO.h
 	include/Utilities/HyJson.h

@@ -693,8 +693,8 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 		sSrc += " :\n\tHyActor2d(pParent)";
 		break;
 
-	case ENTBASECLASS_HyUiContainer: {
-		EntityTreeItemData *pFusedItemData = m_TreeModel.GetFusedItemData()[ENTBASECLASS_HyUiContainer];
+	case ENTBASECLASS_HyGui: {
+		EntityTreeItemData *pFusedItemData = m_TreeModel.GetFusedItemData()[ENTBASECLASS_HyGui];
 		HyOrientation eOrient = HYORIENT_Horizontal;
 		if(m_CtorKeyFramesMap.contains(pFusedItemData))
 		{
@@ -707,9 +707,9 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 		// Check ctor for root layout's "Panel/Setup" to be applied in member initalizer list
 		QJsonObject panelInitObj = static_cast<const EntityStateData *>(GetStateData(0))->GetDopeSheetScene().GetKeyFrameProperty(m_TreeModel.GetRootTreeItemData(), -1, "Panel", "Setup").toObject();
 		if(eOrient == HYORIENT_Horizontal)
-			sSrc += " :\n\tHyUiContainer(HYORIENT_Horizontal, " + DeserializePanelInitAsRuntimeCode(panelInitObj) + ")";
+			sSrc += " :\n\tHyGui(HYORIENT_Horizontal, " + DeserializePanelInitAsRuntimeCode(panelInitObj) + ")";
 		else
-			sSrc += " :\n\tHyUiContainer(HYORIENT_Vertical, " + DeserializePanelInitAsRuntimeCode(panelInitObj) + ")";
+			sSrc += " :\n\tHyGui(HYORIENT_Vertical, " + DeserializePanelInitAsRuntimeCode(panelInitObj) + ")";
 		break; }
 
 	default:

@@ -180,7 +180,7 @@ int32 HyTexturedQuad2d::GetEntireTextureHeight()
 	m_ShaderUniforms.SetTexHandle(0, static_cast<const HyTexturedQuadData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle());
 
 	//if(m_pParent && m_pParent->ParentGet() && (m_pParent->ParentGet()->GetInternalFlags() & NODETYPE_IsLayout) != 0)
-	//	static_cast<IHyEntityUi *>(m_pParent)->SetSizeDirty();
+	//	static_cast<IHyGuiBase *>(m_pParent)->SetSizeDirty();
 
 //	if(IsAuxiliary()) // Do blocking load of texture
 //	{

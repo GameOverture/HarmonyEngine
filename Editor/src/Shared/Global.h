@@ -460,11 +460,11 @@ enum EntityBaseClassType
 	
 	ENTBASECLASS_HyEntity2d = 0,
 	ENTBASECLASS_HyActor2d,
-	ENTBASECLASS_HyUiContainer,
+	ENTBASECLASS_HyGui,
 
 	NUM_ENTBASECLASSTYPES
 };
-const QString ENTITYBASECLASSTYPE_STRINGS[NUM_ENTBASECLASSTYPES] = { "HyEntity2d", "HyActor2d", "HyUiContainer" };
+const QString ENTITYBASECLASSTYPE_STRINGS[NUM_ENTBASECLASSTYPES] = { "HyEntity2d", "HyActor2d", "HyGui" };
 
 QAction *FindAction(QList<QAction *> list, QString sName);
 QString PointToQString(QPointF ptPoint);

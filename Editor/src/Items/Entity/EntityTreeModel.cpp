@@ -317,7 +317,7 @@ void EntityTreeItemData::InitializeRootBaseClass(EntityBaseClassType eBaseClass)
 		m_pPropertiesModel->InsertCategory(0, "Actor");
 		m_pPropertiesModel->AppendProperty("Actor", "Jump", PROPERTIESTYPE_bool, Qt::Checked, "Actor attempts to perform a jump", PROPERTIESACCESS_ToggleUnchecked);
 		break;
-	case ENTBASECLASS_HyUiContainer:
+	case ENTBASECLASS_HyGui:
 		m_pPropertiesModel->InsertCategory(0, "Panel", QVariant(), false, "The main visual background portion of this container");
 		m_pPropertiesModel->AppendProperty("Panel", "Setup", PROPERTIESTYPE_UiPanel, QVariant(), "Initializes and setup the main panel of this container", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Panel", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated", PROPERTIESACCESS_ToggleUnchecked);
@@ -484,7 +484,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_UiLayout:
 		m_pPropertiesModel->InsertCategory(-1, "Layout", QVariant(), false, "Holds UI widget entities and arranges them programatically");
 		m_pPropertiesModel->AppendProperty("Layout", "Orientation", PROPERTIESTYPE_ComboBoxString, HyGlobal::OrientationName(HYORIENT_Horizontal), "The orientation of this layout. This determines which direction UI widgets are arranged", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), HyGlobal::GetOrientationNameList());
-		m_pPropertiesModel->AppendProperty("Layout", "Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The layout's margins to keep its contained widgets within (in pixels)", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Layout", "Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The layout's margins to keep its contained widgets within (in pixels)", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE);
 		m_pPropertiesModel->AppendProperty("Layout", "Widget Spacing", PROPERTIESTYPE_int, 0, "Sets the spacing in pixels between widgets inside the layout", PROPERTIESACCESS_ToggleUnchecked);
 		break;
 
@@ -534,7 +534,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 				if(GetType() == ITEM_UiTextField)
 					m_pPropertiesModel->AppendProperty("Label", "Input Validator", PROPERTIESTYPE_LineEdit, "", "A case-sensitive regex that checks and permits only valid keyboard input", PROPERTIESACCESS_ToggleUnchecked);
 			}
-			m_pPropertiesModel->AppendProperty("Label", "Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The text's margins within the main panel of this widget", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty("Label", "Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The text's margins within the main panel of this widget", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE);
 			//m_pPropertiesModel->AppendProperty("Label", "Style", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTextTypeNameList()[HYTEXT_Line], "The style of how the text is shown", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTextTypeNameList());
 			// TODO: m_pPropertiesModel->AppendProperty("Label", "Text State", PROPERTIESTYPE_StatesComboBox, 0, "The text's state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 			// TODO: virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor);
@@ -657,7 +657,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 				m_BaseClassInfoList[i].m_pFusedTreeItemData = new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
 			break;
 
-		case ENTBASECLASS_HyUiContainer:
+		case ENTBASECLASS_HyGui:
 			if(fusedItemArray.empty() || i <= fusedItemArray.size())
 				m_BaseClassInfoList[i].m_pFusedTreeItemData = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sEntityCodeName, ITEM_UiLayout, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
 			else

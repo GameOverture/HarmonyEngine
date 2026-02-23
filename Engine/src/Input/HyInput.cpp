@@ -14,7 +14,7 @@
 #include "Input/HyInputMap.h"
 #include "Input/IHyController.h"
 #include "Window/HyWindow.h"
-#include "UI/HyUiContainer.h"
+#include "Gui/HyGui.h"
 
 #include <codecvt>
 
@@ -896,12 +896,12 @@ void HyInput::ApplyControllerButton(int32 iId, HyGamePadBtn eButtonType, HyBtnPr
 
 void HyInput::DistrubuteTextInput(std::string sNewText)
 {
-	HyUiContainer::DistrubuteTextInput(sNewText);
+	HyGui::DistrubuteTextInput(sNewText);
 }
 
 void HyInput::DistrubuteKeyboardInput(HyKeyboardBtn eBtn, HyBtnPressState eBtnState, HyKeyboardModifer iMods)
 {
-	HyUiContainer::DistrubuteKeyboardInput(eBtn, eBtnState, iMods);
+	HyGui::DistrubuteKeyboardInput(eBtn, eBtnState, iMods);
 }
 
 void HyInput::Update()

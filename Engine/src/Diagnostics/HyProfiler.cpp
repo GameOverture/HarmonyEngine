@@ -14,7 +14,7 @@
 #define HY_DIAGNOSTICS_DISPLAYORDER 0x7FFFFF00
 
 HyProfiler::HyProfiler() :
-	HyUiContainer(HYORIENT_Vertical, HyUiPanelInit()),
+	HyGui(HYORIENT_Vertical, HyUiPanelInit()),
 	m_dFrameTime_Low(9999.0),
 	m_dFrameTime_High(0.0),
 	m_dFrameTime_Cumulative(0.0),

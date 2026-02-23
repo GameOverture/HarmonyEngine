@@ -11,7 +11,7 @@
 #define HyProfiler_h__
 
 #include "Afx/HyStdAfx.h"
-#include "UI/HyUiContainer.h"
+#include "Gui/HyGui.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
@@ -101,7 +101,7 @@ protected:
 	}
 };
 
-class HyProfiler : public HyUiContainer
+class HyProfiler : public HyGui
 {
 	double					m_dFrameTime_Low;
 	double					m_dFrameTime_High;
