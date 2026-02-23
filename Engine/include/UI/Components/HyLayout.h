@@ -48,7 +48,6 @@ public:
 	void SetLayoutType(HyOrientation eLayoutType);
 
 	virtual HySizePolicy GetSizePolicy(HyOrientation eOrien) const override;
-	virtual glm::vec2 GetBotLeftOffset() override;
 
 	void AppendItem(IHyEntityUi &itemRef);
 	bool RemoveItem(IHyEntityUi &itemRef);

@@ -31,8 +31,6 @@ public:
 	void Setup(HySizePolicy eSizePolicy, uint32 uiSizeHint);
 	void SetSize(uint32 uiSizeHint);
 
-	virtual glm::vec2 GetBotLeftOffset() override;
-
 protected:
 	virtual glm::ivec2 OnCalcPreferredSize() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;

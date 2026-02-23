@@ -45,7 +45,6 @@ uint32 HyComboBox::InsertSubButton(const HyUiPanelInit &panelInit, const HyUiTex
 	HyButton *pNewBtn = HY_NEW HyButton(panelInit, textInit, this);
 	pNewBtn->SetButtonClickedCallback(fpCallBack, audioNodePath);
 	pNewBtn->SetEnabled(false);
-	pNewBtn->pos.Set(pNewBtn->GetBotLeftOffset());
 	pNewBtn->alpha.Set(0.0f);
 	pNewBtn->Load();
 
@@ -140,15 +139,14 @@ void HyComboBox::ToggleExpanded()
 		for(uint32 i = 0; i < static_cast<uint32>(m_SubBtnList.size()); ++i)
 		{
 			HyButton *pSubBtn = m_SubBtnList[i];
-			glm::vec2 vOffset = pSubBtn->GetBotLeftOffset();
 			if(m_uiEntityAttribs & COMBOBOXATTRIB_IsInstantExpand)
 			{
-				pSubBtn->pos.Set(ptTweenDest[0] + vOffset.x, ptTweenDest[1] + vOffset.y);
+				pSubBtn->pos.Set(ptTweenDest[0], ptTweenDest[1]);
 				pSubBtn->alpha.Set(1.0f);
 			}
 			else
 			{
-				pSubBtn->pos.Tween(ptTweenDest[0] + vOffset.x, ptTweenDest[1] + vOffset.y, 0.5f, HyTween::QuadOut);
+				pSubBtn->pos.Tween(ptTweenDest[0], ptTweenDest[1], 0.5f, HyTween::QuadOut);
 				pSubBtn->alpha.Tween(1.0f, fTweenExpandDur * 0.5f);
 			}
 
@@ -168,9 +166,6 @@ void HyComboBox::ToggleExpanded()
 		for(uint32 i = 0; i < static_cast<uint32>(m_SubBtnList.size()); ++i)
 		{
 			HyButton *pSubBtn = m_SubBtnList[i];
-
-			glm::vec2 vOffset = pSubBtn->GetBotLeftOffset();
-			pSubBtn->pos.Tween(vOffset.x, vOffset.y, fTweenExpandDur * 0.5f, HyTween::Linear);
 			pSubBtn->alpha.Tween(0.0f, fTweenExpandDur * 0.5f);
 			pSubBtn->SetEnabled(false);
 		}

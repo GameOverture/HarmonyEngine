@@ -132,13 +132,12 @@ public:
 	IHyBody2d *GetPanelNode() const;
 	HyUiPanelInit ClonePanelInit() const; // Uses currently set properties of this panel to create an equivalent HyPanelInit struct
 
-	glm::vec2 GetBotLeftOffset();		// What offset is needed to get *this oriented to its bottom left
-
 #ifdef HY_PLATFORM_GUI
 	void GuiOverridePanelNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName, HyEntity2d *pParent);
 #endif
 
 private:
+	void InitalizeSprite();
 	void ConstructPrimitives(float fWidth, float fHeight);
 	void DeleteData();
 };

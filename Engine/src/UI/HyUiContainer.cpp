@@ -550,11 +550,6 @@ void HyUiContainer::ScrollTo(float fVertScrollPos, float fHorzScrollPos)
 	m_HorzBar.ScrollTo(fHorzScrollPos);
 }
 
-/*virtual*/ glm::vec2 HyUiContainer::GetBotLeftOffset() /*override*/
-{
-	return panel.GetBotLeftOffset();
-}
-
 /*virtual*/ void HyUiContainer::OnUpdate() /*override final*/
 {
 	if(IsSizeDirty())

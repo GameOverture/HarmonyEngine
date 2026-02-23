@@ -70,11 +70,6 @@ void HyLayout::SetLayoutType(HyOrientation eLayoutType)
 	return static_cast<HySizePolicy>(uiSizePolicy);
 }
 
-/*virtual*/ glm::vec2 HyLayout::GetBotLeftOffset() /*override*/
-{
-	return glm::vec2(0.0f, 0.0f);
-}
-
 void HyLayout::AppendItem(IHyEntityUi &itemRef)
 {
 	ChildAppend(itemRef);
@@ -350,9 +345,6 @@ void HyLayout::OnSetDebugBox()
 		glm::ivec2 vActualItemSize = pItem->Resize(vResize.x, vResize.y);
 		if(vTargetSize[eOrientation] != 0 && vActualItemSize != vItemSize)
 			bNeedsResize = true;
-
-		// After resizing, apply offset to get 'pItem' oriented to its bottom left
-		pItem->pos.Offset(pItem->GetBotLeftOffset());
 
 		ptCurPos[eOrientation] += vActualItemSize[eOrientation] + GetWidgetSpacing();
 	};

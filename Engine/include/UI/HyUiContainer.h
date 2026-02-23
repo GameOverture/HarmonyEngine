@@ -105,8 +105,6 @@ public:
 	void SetLineScrollAmt(float fLineScrollAmt);
 	void ScrollTo(float fVertScrollPos, float fHorzScrollPos);
 
-	virtual glm::vec2 GetBotLeftOffset() override;
-
 protected:
 	virtual void OnUpdate() override final;
 	virtual glm::ivec2 OnCalcPreferredSize() override;

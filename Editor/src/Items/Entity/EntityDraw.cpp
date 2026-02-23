@@ -412,7 +412,7 @@ void EntityDraw::SetExtrapolatedProperties()
 			combinedFrameMap[-1] = ctorKeyFrameMapRef[pEntityTreeItemData];
 
 			// FlushHyNode (and clearing edit model) makes properties that aren't keyed on the timeline until later show the proper default values
-			pEntDrawItem->FlushHyNode(&m_RootEntity); 
+			pEntDrawItem->FlushHyNode(&m_RootEntity);
 			if(pEntDrawItem->GetEntityTreeItemData()->GetEditModel())
 				pEntDrawItem->GetEntityTreeItemData()->GetEditModel()->Deserialize(QList<float>());
 

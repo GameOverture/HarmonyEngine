@@ -60,8 +60,6 @@ public:
 	glm::ivec2 GetPreferredSize();											// Ideal size. If a dimension is '0' then autosize it
 	glm::ivec2 Resize(uint32 uiNewWidth, uint32 uiNewHeight);
 
-	virtual glm::vec2 GetBotLeftOffset() = 0;								// What offset is needed to get *this oriented to its bottom left
-
 protected:
 	void SetSizeDirty();
 

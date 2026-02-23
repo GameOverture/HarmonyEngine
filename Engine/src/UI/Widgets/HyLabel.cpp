@@ -109,7 +109,7 @@ HyLabel::HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, H
 
 /*virtual*/ bool HyLabel::IsLoadDataValid() /*override*/
 {
-	return (panel.IsPrimForPanel() && GetWidth() > 0.0f && GetHeight() > 0.0f) ||
+	return panel.IsPrimForPanel() ||
 		   (panel.IsItemForPanel() && panel.GetPanelNode()->IsLoadDataValid()) ||
 		   m_Text.IsLoadDataValid();
 }
@@ -463,17 +463,6 @@ bool HyLabel::IsMonospacedDigits() const
 	SetAssembleNeeded();
 }
 
-/*virtual*/ glm::vec2 HyLabel::GetBotLeftOffset() /*override*/
-{
-	if((m_uiEntityAttribs & LABELATTRIB_IsSideBySide) == 0) // Is Stacked
-	{
-		Assemble();
-		return panel.GetBotLeftOffset();
-	}
-
-	return glm::vec2(0.0f, 0.0f);
-}
-
 #ifdef HY_PLATFORM_GUI
 void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrideName /*= true*/)
 {
@@ -509,7 +498,7 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 			{
 				pSecond = panel.GetPanelNode();
 				HySetVec(vSecondSize, panel.GetWidth(), panel.GetHeight());
-				pSecond->pos.Set(panel.GetBotLeftOffset());
+				pSecond->pos.Set(0, 0);
 			}
 		}
 		else
@@ -523,7 +512,7 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 			{
 				pFirst = panel.GetPanelNode();
 				HySetVec(vFirstSize, panel.GetWidth(), panel.GetHeight());
-				pFirst->pos.Set(panel.GetBotLeftOffset());
+				pFirst->pos.Set(0, 0);
 			}
 
 			pSecond = &m_Text;
@@ -567,11 +556,10 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 		m_Text.SetAlignment(m_eStackedAlignment);
 
 		glm::vec2 vPanelDimensions(panel.GetWidth(), panel.GetHeight());
-		glm::ivec2 vPanelOffset = panel.GetBotLeftOffset();
 
 		// Position text to bottom left of 'm_TextMargins'
-		m_Text.pos.Set(panel.GetFrameStrokeSize() + (m_TextMargins.left - vPanelOffset.x),
-					   panel.GetFrameStrokeSize() + (m_TextMargins.bottom - vPanelOffset.y));
+		m_Text.pos.Set(panel.GetFrameStrokeSize() + m_TextMargins.left,
+					   panel.GetFrameStrokeSize() + m_TextMargins.bottom);
 
 		float fLineOffsetX = 0.0f;	// If *this is 'LABELATTRIB_StackedTextUseLine' determine how much to offset m_Text's position (not needed for scale boxes)
 		if(m_eStackedAlignment == HYALIGN_Center)

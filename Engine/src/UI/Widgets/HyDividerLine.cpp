@@ -58,11 +58,6 @@ void HyDividerLine::SetThickness(float fThickness)
 	//m_Panel.Set SetFrameStrokeSize(fThickness);
 }
 
-/*virtual*/ glm::vec2 HyDividerLine::GetBotLeftOffset() /*override*/
-{
-	return glm::vec2(0.0f);
-}
-
 /*virtual*/ glm::ivec2 HyDividerLine::OnCalcPreferredSize() /*override*/
 {
 	if(GetOrientation() == HYORIENT_Horizontal)

@@ -112,7 +112,7 @@ void HyPanel::Setup(const HyUiPanelInit &initRef, HyEntity2d *pParent)
 
 	case HYTYPE_Sprite: // 'NodeItem' panel
 		m_PanelData.m_pNodeItem = HY_NEW HySprite2d(initRef.m_NodePath, pParent);
-		static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->SetAllBoundsIncludeAlphaCrop(true);
+		InitalizeSprite();
 		break;
 	case HYTYPE_Spine: // 'NodeItem' panel
 		m_PanelData.m_pNodeItem = HY_NEW HySpine2d(initRef.m_NodePath, pParent);
@@ -162,7 +162,7 @@ float HyPanel::GetWidth(float fPercent /*= 1.0f*/) const
 			return m_PanelData.m_pNodeItem->GetWidth(fPercent);
 
 	case HYTYPE_Primitive: // 'Primitive' panel
-		if(m_PanelData.m_pPrimParts->m_Body.GetShapeType() == HYFIXTURE_Nothing)
+		if(m_PanelData.m_pPrimParts == nullptr || m_PanelData.m_pPrimParts->m_Body.GetShapeType() == HYFIXTURE_Nothing)
 			return 0.0f;
 		return (m_PanelData.m_pPrimParts->m_Body.GetWidth() + (m_PanelData.m_pPrimParts->m_uiFrameSize * 2)) * fPercent;
 
@@ -190,7 +190,7 @@ float HyPanel::GetHeight(float fPercent /*= 1.0f*/) const
 			return m_PanelData.m_pNodeItem->GetHeight(fPercent);
 
 	case HYTYPE_Primitive: // 'Primitive' panel
-		if(m_PanelData.m_pPrimParts->m_Body.GetShapeType() == HYFIXTURE_Nothing)
+		if(m_PanelData.m_pPrimParts == nullptr || m_PanelData.m_pPrimParts->m_Body.GetShapeType() == HYFIXTURE_Nothing)
 			return 0.0f;
 		return (m_PanelData.m_pPrimParts->m_Body.GetHeight() + (m_PanelData.m_pPrimParts->m_uiFrameSize * 2)) * fPercent;
 
@@ -236,6 +236,9 @@ void HyPanel::SetSize(float fWidth, float fHeight)
 			else
 				m_PanelData.m_pNodeItem->scale.Set(fWidth / vDefaultSize.x, fHeight / vDefaultSize.y);
 		}
+
+		if(m_eNodeType == HYTYPE_Sprite)
+			InitalizeSprite();
 		break; }
 
 	case HYTYPE_Primitive: // 'Primitive' panel
@@ -434,17 +437,6 @@ HyUiPanelInit HyPanel::ClonePanelInit() const
 	return init;
 }
 
-glm::vec2 HyPanel::GetBotLeftOffset()
-{
-	if(IsItemForPanel() && m_PanelData.m_pNodeItem->IsLoadDataValid() && m_PanelData.m_pNodeItem->GetType() == HYTYPE_Sprite)
-	{
-		glm::ivec2 vStateOffset = static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateOffset(m_PanelData.m_pNodeItem->GetState());
-		return -glm::vec2(vStateOffset.x * m_PanelData.m_pNodeItem->scale.X(), vStateOffset.y * m_PanelData.m_pNodeItem->scale.Y());
-	}
-
-	return glm::vec2(0.0f, 0.0f);
-}
-
 #ifdef HY_PLATFORM_GUI
 void HyPanel::GuiOverridePanelNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName, HyEntity2d *pParent)
 {	
@@ -453,8 +445,8 @@ void HyPanel::GuiOverridePanelNodeData(HyType eNodeType, HyJsonObj itemDataObj, 
 		DeleteData();
 		m_PanelData.m_pNodeItem = HY_NEW HySprite2d("", HY_GUI_DATAOVERRIDE, pParent);
 		static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GuiOverrideData<HySpriteData>(itemDataObj, bUseGuiOverrideName);
-		static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->SetAllBoundsIncludeAlphaCrop(true);
 		m_eNodeType = eNodeType;
+		InitalizeSprite();
 	}
 	else if(eNodeType == HYTYPE_Spine)
 	{
@@ -467,6 +459,23 @@ void HyPanel::GuiOverridePanelNodeData(HyType eNodeType, HyJsonObj itemDataObj, 
 		HyLogError("HyPanel::GuiOverrideNodeData() - unsupported type: " << eNodeType);
 }
 #endif
+
+void HyPanel::InitalizeSprite()
+{
+	if(IsItemForPanel() == false || m_PanelData.m_pNodeItem == nullptr || m_PanelData.m_pNodeItem->GetType() != HYTYPE_Sprite)
+	{
+		HyLogError("HyPanel::InitalizeSprite() - Panel is not a 'NodeItem' panel with a Sprite node");
+		return;
+	}
+	
+	static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->SetAllBoundsIncludeAlphaCrop(true);
+
+	if(m_PanelData.m_pNodeItem->IsLoadDataValid() == false)
+		return;
+
+	glm::ivec2 vStateOffset = static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateOffset(m_PanelData.m_pNodeItem->GetState());
+	m_PanelData.m_pNodeItem->pos.Set(-vStateOffset.x * m_PanelData.m_pNodeItem->scale.X(), -vStateOffset.y * m_PanelData.m_pNodeItem->scale.Y());
+}
 
 void HyPanel::ConstructPrimitives(float fWidth, float fHeight)
 {
@@ -527,4 +536,6 @@ void HyPanel::DeleteData()
 		HyLogError("HyPanel::Setup() - Invalid HyType for HyBody: " << m_eNodeType);
 		break;
 	}
+
+	m_eNodeType = HYTYPE_Unknown;
 }

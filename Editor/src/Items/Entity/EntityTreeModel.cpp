@@ -399,7 +399,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_Primitive: {
 		m_pEditModel = new GfxPrimitiveModel();
 
-		m_pPropertiesModel->InsertCategory(-1, "Primitive", QVariant(), false, "A visible shape that can be drawn to the screen");
+		m_pPropertiesModel->InsertCategory(0, "Primitive", QVariant(), false, "A visible shape that can be drawn to the screen");
 		m_pPropertiesModel->AppendProperty("Primitive", "Wireframe", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to render only the wireframe of the shape type", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Primitive", "Line Thickness", PROPERTIESTYPE_double, 1.0, "When applicable, how thick to render lines", PROPERTIESACCESS_ToggleUnchecked, 1.0, 100.0, 1.0);
 
@@ -410,7 +410,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break; }
 
 	case ITEM_Audio:
-		m_pPropertiesModel->InsertCategory(-1, "Audio", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		m_pPropertiesModel->InsertCategory(0, "Audio", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
 		// TODO: m_pPropertiesModel->AppendProperty("Audio", "Play List Mode", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAudioPlayListModeList()[HYPLAYLIST_Shuffle], "The method by which the next audio asset is chosen when played", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAudioPlayListModeList());
 		// TODO: m_pPropertiesModel->AppendProperty("Audio", "Play", 
 		m_pPropertiesModel->AppendProperty("Audio", "Volume", PROPERTIESTYPE_double, 1.0, "The volume of the audio", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.01);
@@ -418,7 +418,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_Text:
-		m_pPropertiesModel->InsertCategory(-1, "Text", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		m_pPropertiesModel->InsertCategory(0, "Text", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
 		m_pPropertiesModel->AppendProperty("Text", "Text", PROPERTIESTYPE_LineEdit, "Text123", "What UTF-8 string to be displayed", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Text", "Style", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTextTypeNameList()[HYTEXT_Line], "The style of how the text is shown", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTextTypeNameList());
 		// TODO: Custom Text Style widget
@@ -432,7 +432,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_Sprite:
-		m_pPropertiesModel->InsertCategory(-1, "Sprite", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		m_pPropertiesModel->InsertCategory(0, "Sprite", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
 		m_pPropertiesModel->AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 		m_pPropertiesModel->AppendProperty("Sprite", "Anim Pause", PROPERTIESTYPE_bool, false, "The current state's animation starts paused", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Sprite", "Anim Rate", PROPERTIESTYPE_double, 1.0, "The animation rate modifier", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.1);
@@ -442,7 +442,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_Entity:
-		m_pPropertiesModel->InsertCategory(-1, "Entity", QVariant(), false, "Entity is an object that controls multiple nodes and components");
+		m_pPropertiesModel->InsertCategory(0, "Entity", QVariant(), false, "Entity is an object that controls multiple nodes and components");
 		m_pPropertiesModel->AppendProperty("Entity", "Mouse Input", PROPERTIESTYPE_bool, Qt::Unchecked, "Mouse hover and button inputs over this bounding volume or specified shapes", PROPERTIESACCESS_ToggleUnchecked);
 		break;
 
@@ -453,6 +453,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_ShapeFixture:
 		m_pEditModel = new GfxShapeModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
+		// NOTE: This should be the first categories added for fixtures
 		m_pPropertiesModel->InsertCategory(-1, "Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
 		m_pPropertiesModel->AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
 		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_FloatArray, "", "An array of floats representing the shape's data", PROPERTIESACCESS_ToggleUnchecked);
@@ -469,6 +470,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_ChainFixture:
 		m_pEditModel = new GfxChainModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
+		// NOTE: This should be the first categories added for fixtures
 		m_pPropertiesModel->InsertCategory(-1, "Chain", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
 		m_pPropertiesModel->AppendProperty("Chain", "Data", PROPERTIESTYPE_FloatArray, "", "An array of floats representing the chain's data", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->InsertCategory(-1, "Fixture", QVariant(), false, "Become a fixture used in physics simulations and collision");
@@ -516,28 +518,9 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Widget", "Min Size", PROPERTIESTYPE_ivec2, QPoint(0, 0), "The widget's minimum size it'll use when resizing", PROPERTIESACCESS_ToggleUnchecked, 0, MAX_INT_RANGE, 1, "[", "]");
 		m_pPropertiesModel->AppendProperty("Widget", "Max Size", PROPERTIESTYPE_ivec2, QPoint(MAX_INT_RANGE, MAX_INT_RANGE), "The widget's maximum size it'll use when resizing", PROPERTIESACCESS_ToggleUnchecked, 0, MAX_INT_RANGE, 1, "[", "]");
 
-		if(GetType() != ITEM_UiSlider) // NOTE: "Panel" category guaranteed to be Label - AKA all widgets derived from Label except Slider 
-		{
-			m_pPropertiesModel->InsertCategory(-1, "Panel", QVariant(), false, "The main visual background portion of this widget");
-			m_pPropertiesModel->AppendProperty("Panel", "Setup", PROPERTIESTYPE_UiPanel, QVariant(), "Initializes and setup the main panel of this widget", PROPERTIESACCESS_ToggleUnchecked);
-			m_pPropertiesModel->AppendProperty("Panel", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated", PROPERTIESACCESS_ToggleUnchecked);
-			m_pPropertiesModel->AppendProperty("Panel", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.05);
-		}
-
-		if(GetType() == ITEM_UiBarMeter)
-		{
-			m_pPropertiesModel->AppendProperty("Panel", "Bar Setup", PROPERTIESTYPE_UiPanel, QVariant(), "Initializes and setup the inner bar of this Bar Meter", PROPERTIESACCESS_ToggleUnchecked);
-			m_pPropertiesModel->AppendProperty("Panel", "Bar Offset", PROPERTIESTYPE_ivec2, QPoint(0, 0), "The inner bar's positional offset from the main panel", PROPERTIESACCESS_ToggleUnchecked);
-			// TODO: bool SetBarState(uint32 uiStateIndex);
-			m_pPropertiesModel->AppendProperty("Panel", "Bar Vertical", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the bar will grow vertically instead of rightward, horizontally", PROPERTIESACCESS_ToggleUnchecked);
-			m_pPropertiesModel->AppendProperty("Panel", "Bar Inverted", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the bar will grow from right to left or bottom to top", PROPERTIESACCESS_ToggleUnchecked);
-			m_pPropertiesModel->AppendProperty("Panel", "Bar Stretched", PROPERTIESTYPE_bool, Qt::Unchecked, "When set and the 'Bar Setup' is a Node item, the bar node will be scaled to fit the range of the progress bar. Otherwise, the bar is stenciled/cropped to fit the range (default)", PROPERTIESACCESS_ToggleUnchecked);
-			m_pPropertiesModel->AppendProperty("Panel", "Bar Under Panel", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the bar will be drawn under the main panel instead of over it. Only useful if main panel is a node item with transparent center", PROPERTIESACCESS_ToggleUnchecked);
-		}
-
 		if(GetType() != ITEM_UiSlider) // AKA all widgets derived from Label
 		{
-			m_pPropertiesModel->InsertCategory(-1, "Label", QVariant(), false, "The main text used in this widget");
+			m_pPropertiesModel->InsertCategory(0, "Label", QVariant(), false, "The main text used in this widget");
 			m_pPropertiesModel->AppendProperty("Label", "Text Item", PROPERTIESTYPE_ComboBoxItems, QVariant(), "The specified project Text item used on this widget", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), ITEM_Text);
 			if(GetType() == ITEM_UiRackMeter)
 			{
@@ -568,26 +551,43 @@ void EntityTreeItemData::InitalizePropertyModel()
 			}
 			else if(GetType() == ITEM_UiButton || GetType() == ITEM_UiCheckBox || GetType() == ITEM_UiRadioButton)
 			{
-				m_pPropertiesModel->InsertCategory(-1, "Button", QVariant(), false, "A button is a label that can be depressed");
+				m_pPropertiesModel->InsertCategory(0, "Button", QVariant(), false, "A button is a label that can be depressed");
 				m_pPropertiesModel->AppendProperty("Button", "Checked", PROPERTIESTYPE_bool, Qt::Unchecked, "Sets this button as 'checked'", PROPERTIESACCESS_ToggleUnchecked);
 			}
 			else if(GetType() == ITEM_UiBarMeter)
 			{
-				m_pPropertiesModel->InsertCategory(-1, "Bar Meter", QVariant(), false, "Bar meter useful for things like a health bar or progress bar");
+				m_pPropertiesModel->InsertCategory(0, "Bar Meter", QVariant(), false, "Bar meter useful for things like a health bar or progress bar");
 				m_pPropertiesModel->AppendProperty("Bar Meter", "Min Value", PROPERTIESTYPE_int, 0, "The minimum, clamped value that indicates the bar is empty", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 				m_pPropertiesModel->AppendProperty("Bar Meter", "Max Value", PROPERTIESTYPE_int, 0, "The maximum, clamped value that indicates the bar is full", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 				m_pPropertiesModel->AppendProperty("Bar Meter", "Value", PROPERTIESTYPE_int, 0, "The current bar meter's value, clamped to the Min and Max values", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 				// TODO: SetNumFormat(HyNumberFormat format);
 			}
+
+			m_pPropertiesModel->InsertCategory(1, "Panel", QVariant(), false, "The main visual background portion of this widget");
+			m_pPropertiesModel->AppendProperty("Panel", "Setup", PROPERTIESTYPE_UiPanel, QVariant(), "Initializes and setup the main panel of this widget", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty("Panel", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this gets drawn and updated", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty("Panel", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this item is", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.05);
+
+			if(GetType() == ITEM_UiBarMeter) // Extra panel properties for Bar Meter
+			{
+				m_pPropertiesModel->AppendProperty("Panel", "Bar Setup", PROPERTIESTYPE_UiPanel, QVariant(), "Initializes and setup the inner bar of this Bar Meter", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Panel", "Bar Offset", PROPERTIESTYPE_ivec2, QPoint(0, 0), "The inner bar's positional offset from the main panel", PROPERTIESACCESS_ToggleUnchecked);
+				// TODO: bool SetBarState(uint32 uiStateIndex);
+				m_pPropertiesModel->AppendProperty("Panel", "Bar Vertical", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the bar will grow vertically instead of rightward, horizontally", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Panel", "Bar Inverted", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the bar will grow from right to left or bottom to top", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Panel", "Bar Stretched", PROPERTIESTYPE_bool, Qt::Unchecked, "When set and the 'Bar Setup' is a Node item, the bar node will be scaled to fit the range of the progress bar. Otherwise, the bar is stenciled/cropped to fit the range (default)", PROPERTIESACCESS_ToggleUnchecked);
+				m_pPropertiesModel->AppendProperty("Panel", "Bar Under Panel", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the bar will be drawn under the main panel instead of over it. Only useful if main panel is a node item with transparent center", PROPERTIESACCESS_ToggleUnchecked);
+			}
 		}
 		else // Is ITEM_UiSlider
 		{
-			m_pPropertiesModel->InsertCategory(-1, "Slider", QVariant(), false, "Bar meter useful for things like a health bar or progress bar");
+			m_pPropertiesModel->InsertCategory(0, "Slider", QVariant(), false, "Bar meter useful for things like a health bar or progress bar");
 			// TODO: m_pPropertiesModel->AppendProperty("Slider", "Set Range", PROPERTIESTYPE_UiSliderRange, 0, "Set the value range, or specify each value step along the slider", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Slider", "Value", PROPERTIESTYPE_int, 0, "The current slider value, clamped or corrected to a value appropriate from 'Set Range'", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 			m_pPropertiesModel->AppendProperty("Slider", "Vertical", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the slider will be vertical instead of horizontal", PROPERTIESACCESS_ToggleUnchecked);
 			// TODO: SetBarColors(HyColor posColor, HyColor negColor, HyColor strokeColor);
 		}
+
 		break;
 
 	default:

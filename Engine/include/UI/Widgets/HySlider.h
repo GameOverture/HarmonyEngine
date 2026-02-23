@@ -80,8 +80,6 @@ public:
 
 	void SetValueChangedCallback(std::function<void(HySlider *)> fpCallback);
 
-	virtual glm::vec2 GetBotLeftOffset() override;
-
 protected:
 	virtual void Update() override;
 	virtual void OnAssemble() override;

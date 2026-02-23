@@ -72,8 +72,6 @@ public:
 		m_PortionList[PORTION_Render].m_dDuration = 0.0;
 	}
 
-	virtual glm::vec2 GetBotLeftOffset() override { return glm::vec2(0, 0); }
-
 protected:
 	virtual void OnApplyWidgetState(HyPanelState eWidgetState) override { }
 	virtual glm::ivec2 OnCalcPreferredSize() override { return glm::ivec2(static_cast<int32>(m_fWidth), static_cast<int32>(m_fHEIGHT)); }

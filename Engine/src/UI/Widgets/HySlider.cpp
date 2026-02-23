@@ -210,11 +210,6 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *)> fpCallbac
 	m_fpOnValueChanged = fpCallback;
 }
 
-/*virtual*/ glm::vec2 HySlider::GetBotLeftOffset() /*override*/
-{
-	return glm::vec2(m_Panel.GetWidth() * 0.5f, m_Panel.GetHeight() * 0.5f);
-}
-
 /*virtual*/ void HySlider::Update() /*override*/
 {
 	IHyWidget::Update();

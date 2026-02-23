@@ -47,11 +47,6 @@ void HySpacer::SetSize(uint32 uiSizeHint)
 		Resize(1, m_uiSizeHint);
 }
 
-/*virtual*/ glm::vec2 HySpacer::GetBotLeftOffset() /*override*/
-{
-	return glm::vec2(0.0f, 0.0f);
-}
-
 /*virtual*/ glm::ivec2 HySpacer::OnCalcPreferredSize() /*override*/
 {
 	if(m_eORIEN_TYPE == HYORIENT_Horizontal)

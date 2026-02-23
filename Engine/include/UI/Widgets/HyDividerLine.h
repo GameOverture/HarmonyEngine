@@ -38,8 +38,6 @@ public:
 	float GetThickness() const;
 	void SetThickness(float fThickness);
 
-	virtual glm::vec2 GetBotLeftOffset() override;										// What offset is needed to get *this oriented to its bottom left
-
 protected:
 	virtual glm::ivec2 OnCalcPreferredSize() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;	// Returns the size *this was actually set to (which may be different than what's passed in due to constraints)

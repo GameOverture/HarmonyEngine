@@ -1246,15 +1246,17 @@ void ExtrapolateProperties(Project &projectRef,
 					{
 						ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pTextItemData);
 						static_cast<HyLabel *>(pThisHyNode)->Setup(HyUiTextInit(HyNodePath(pReferencedProjItemData->GetName(true).toStdString().c_str())));
+						//static_cast<HyLabel *>(pThisHyNode)->Load();
 
-						//FileDataPair fileDataPair;
-						//pReferencedProjItemData->GetSavedFileData(fileDataPair);
+						FileDataPair fileDataPair;
+						pReferencedProjItemData->GetSavedFileData(fileDataPair);
 
-						//QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
-						//HyJsonDoc itemDataDoc;
-						//if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
-						//	HyGuiLog("ExtrapolateProperties() - Label failed to parse its text node file data", LOGTYPE_Error);
-						//static_cast<HyLabel *>(pThisHyNode)->GuiOverrideTextNodeData(itemDataDoc.GetObject(), true);
+						QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+						HyJsonDoc itemDataDoc;
+						if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+							HyGuiLog("ExtrapolateProperties() - Label failed to parse its text node file data", LOGTYPE_Error);
+						static_cast<HyLabel *>(pThisHyNode)->GuiOverrideTextNodeData(itemDataDoc.GetObject(), false);
+						static_cast<HyLabel *>(pThisHyNode)->Load();
 					}
 				}
 				if(labelObj.contains("Margins"))
