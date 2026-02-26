@@ -14,9 +14,9 @@
 IHyFixture2d::IHyFixture2d(HyEntity2d *pParent /*= nullptr*/) :
 	m_pParent(nullptr),
 	m_eType(HYFIXTURE_Nothing),
+	m_fMaxPush(FLT_MAX),
 	m_bPhysicsAllowed(true),
 	m_bPhysicsDirty(false),
-	m_fMaxPush(FLT_MAX),
 	m_bClipVelocity(true)
 {
 	if(pParent)
@@ -26,9 +26,9 @@ IHyFixture2d::IHyFixture2d(HyEntity2d *pParent /*= nullptr*/) :
 IHyFixture2d::IHyFixture2d(const IHyFixture2d &copyRef) :
 	m_pParent(nullptr),
 	m_eType(HYFIXTURE_Nothing),
+	m_fMaxPush(copyRef.m_fMaxPush),
 	m_bPhysicsAllowed(copyRef.m_bPhysicsAllowed),
 	m_bPhysicsDirty(false),
-	m_fMaxPush(copyRef.m_fMaxPush),
 	m_bClipVelocity(copyRef.m_bClipVelocity)
 {
 	*this = copyRef;

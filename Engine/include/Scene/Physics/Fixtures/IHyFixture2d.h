@@ -24,11 +24,9 @@ protected:
 	HyEntity2d *								m_pParent;
 
 	HyFixtureType								m_eType;
+	float										m_fMaxPush;			// Setting this to FLT_MAX makes it as rigid as possible. Lower values can make the plane collision soft. Usually in meters.
 	bool 										m_bPhysicsAllowed;
 	bool										m_bPhysicsDirty;
-
-	// Physics Collisions
-	float										m_fMaxPush;			// Setting this to FLT_MAX makes it as rigid as possible. Lower values can make the plane collision soft. Usually in meters.
 	bool										m_bClipVelocity;	// Indicates if b2ClipVector should clip against this plane. Should be false for soft collision.
 
 public:

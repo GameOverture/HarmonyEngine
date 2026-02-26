@@ -18,18 +18,51 @@
 class HyPrimitive2d : public IHyDrawable2d
 {
 protected:
-	glm::vec2 *		m_pVertBuffer;
-	uint32			m_uiNumVerts;
+	struct Layer
+	{
+		glm::vec2 *		m_pVertBuffer;
+		uint32			m_uiNumVerts;
+		HyColor			m_Color;
 
-	bool			m_bWireframe;
-	float			m_fLineThickness;
-	uint32			m_uiNumSegments;
+		HyFixtureType	m_eFixtureType;
+		float			m_fLineThickness; // When > 0.0f, this layer will be drawn as an outline with the specified thickness in pixels
+		uint32			m_uiNumSegments;
 
-	HyRenderMode	m_eRenderMode;
-	bool			m_bUpdateShaderUniforms;
-
-	HyShape2d		m_Shape;
-	HyChainData *	m_pChainData;
+		Layer() :
+			m_pVertBuffer(nullptr),
+			m_uiNumVerts(0),
+			m_Color(HyColor::White),
+			m_eFixtureType(HYFIXTURE_Nothing),
+			m_fLineThickness(0.0f),
+			m_uiNumSegments(16)
+		{ }
+		Layer(const Layer &copyRef) :
+			m_pVertBuffer(nullptr),
+			m_Color(HyColor::White),
+			m_uiNumVerts(copyRef.m_uiNumVerts),
+			m_eFixtureType(copyRef.m_eFixtureType),
+			m_fLineThickness(copyRef.m_fLineThickness),
+			m_uiNumSegments(copyRef.m_uiNumSegments)
+		{
+			if(copyRef.m_pVertBuffer)
+			{
+				m_pVertBuffer = HY_NEW glm::vec2[m_uiNumVerts];
+				memcpy(m_pVertBuffer, copyRef.m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
+			}
+		}
+		Layer(Layer &&donor) noexcept :
+			m_pVertBuffer(donor.m_pVertBuffer),
+			m_uiNumVerts(donor.m_uiNumVerts),
+			m_eFixtureType(donor.m_eFixtureType),
+			m_fLineThickness(donor.m_fLineThickness),
+			m_uiNumSegments(donor.m_uiNumSegments)
+		{
+			donor.m_pVertBuffer = nullptr;
+			donor.m_uiNumVerts = 0;
+		}
+	};
+	std::vector<Layer>	m_LayerList;
+	bool				m_bUpdateShaderUniforms;
 
 public:
 	HyPrimitive2d(HyEntity2d *pParent = nullptr);
@@ -41,55 +74,43 @@ public:
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 	virtual float GetWidth(float fPercent = 1.0f) override;
 	virtual float GetHeight(float fPercent = 1.0f) override;
+	void GetCentroid(glm::vec2 &ptCentroidOut);
 
-	HyFixtureType GetShapeType() const;
+	int32 GetNumLayers() const;
 
-	void SetAsNothing();
+	HyFixtureType GetLayerType(int32 iLayerIndex) const;
 
-	void SetAsShape(const HyShape2d &shapeRef);
+	int32 SetAsNothing(int32 iLayerIndex);
 
 	// Set as an isolated edge.
-	void SetAsLineSegment(const glm::vec2 &pt1, const glm::vec2 &pt2);
+	int32 SetAsLineSegment(int32 iLayerIndex, const glm::vec2 &pt1, const glm::vec2 &pt2, float fLineThickness);
 
 	// A series of line segments chained together. 'bLoop' is whether to automatically connects last vertex to the first.
 	// Passed in parameters are copied, and understood to be local coordinates.
-	void SetAsLineChain(const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoop);
-	void SetAsLineChain(const std::vector<glm::vec2> &verticesList, bool bLoop);
-	void SetAsLineChain(const HyChainData &chainData);
+	int32 SetAsLineChain(int32 iLayerIndex, const glm::vec2 *pVertices, uint32 uiNumVerts, bool bLoop, float fLineThickness);
+	int32 SetAsLineChain(int32 iLayerIndex, const std::vector<glm::vec2> &verticesList, bool bLoop, float fLineThickness);
+	int32 SetAsLineChain(int32 iLayerIndex, const HyChainData &chainData, float fLineThickness);
+
+	int32 SetAsShape(int32 iLayerIndex, const HyShape2d &shapeRef, float fOutlineThickness = 0.0f);
 
 	// Set as a circle with the specified center and radius
-	void SetAsCircle(float fRadius);
-	void SetAsCircle(const glm::vec2 &ptCenter, float fRadius);
+	int32 SetAsCircle(int32 iLayerIndex, float fRadius, float fOutlineThickness = 0.0f);
+	int32 SetAsCircle(int32 iLayerIndex, const glm::vec2 &ptCenter, float fRadius, float fOutlineThickness = 0.0f);
 
-	// Set as a convex hull from the given array of local points.
-	// uiCount must be in the range [3, B2_MAX_POLYGON_VERTICES].
-	// The points may be re-ordered, even if they form a convex polygon
-	// Collinear points are handled but not removed. Collinear points
-	// may lead to poor stacking behavior in physics simulation.
-	void SetAsPolygon(const glm::vec2 *pPointArray, uint32 uiCount);
-	void SetAsPolygon(const std::vector<glm::vec2> &verticesList);
-	// TODO: Support rounded polygons
+	// Set as any type of polygon using counter-clockwise vertex winding array of vertices
+	int32 SetAsPolygon(int32 iLayerIndex, const glm::vec2 *pVertexArray, uint32 uiCount, float fOutlineThickness = 0.0f);
+	int32 SetAsPolygon(int32 iLayerIndex, const std::vector<glm::vec2> &verticesList, float fOutlineThickness = 0.0f);
 
-	void SetAsBox(float fWidth, float fHeight);	// Axis-aligned box, bottom left corner at 0,0
-	void SetAsBox(const HyRect &rect);			// Represent an oriented box
-	// TODO: Support rounded boxes
+	int32 SetAsBox(int32 iLayerIndex, float fWidth, float fHeight, float fOutlineThickness = 0.0f);	// Axis-aligned box, bottom left corner at 0,0
+	int32 SetAsBox(int32 iLayerIndex, const HyRect &rect, float fOutlineThickness = 0.0f);			// Represent an oriented box
 
-	void SetAsCapsule(const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius);
+	int32 SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, float fOutlineThickness = 0.0f);
 
-	const HyChainData *GetChainData() const;
+	uint32 GetNumVerts(int32 iLayerIndex) const;
+	const glm::vec2 *GetVerts(int32 iLayerIndex) const;
 
-	uint32 GetNumVerts() const;
-	const glm::vec2 *GetVerts() const;
-	void GetCentroid(glm::vec2 &ptCentroidOut) const;
-
-	bool IsWireframe();
-	void SetWireframe(bool bIsWireframe);
-
-	float GetLineThickness() const;
-	void SetLineThickness(float fThickness);
-
-	uint32 GetNumCircleSegments();
-	void SetNumCircleSegments(uint32 uiNumSegments);
+	bool IsOutline(int32 iLayerIndex);
+	float GetLineThickness(int32 iLayerIndex) const;
 
 	virtual bool IsLoadDataValid() override;
 
@@ -104,16 +125,13 @@ protected:
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
 
 private:
-	void ClearChainData();
-	void ClearVertexData();
-	void AssembleData();
+	void ClearAllData();
+	void DeleteLayerData(int32 iLayerIndex);
 
-	void AssembleLineChain(b2Vec2 *pVertexList, uint32 uiNumVertices);
-	void AssembleCircle(glm::vec2 ptCenter, float fRadius, uint32 uiSegments);
-	void AssemblePolygon(const b2Vec2 *pVertexList, uint32 uiNumVertices);
-	void AssembleCapsule(const b2Vec2 &ptCenter1, const b2Vec2 &ptCenter2, float fRadius, uint32 uiSegments);
-
-	static void OnShapeChanged(void *pData);
+	void AssembleLineChain(int32 iLayerIndex, const glm::vec2 *pVertexList, uint32 uiNumVertices, bool bLoop); // Also used to do shape outlines
+	void AssembleCircle(int32 iLayerIndex, glm::vec2 ptCenter, float fRadius, uint32 uiSegments);
+	void AssemblePolygon(int32 iLayerIndex, const glm::vec2 *pVertexList, uint32 uiNumVertices);
+	void AssembleCapsule(int32 iLayerIndex, const glm::vec2 &ptCenter1, const glm::vec2 &ptCenter2, float fRadius, uint32 uiSegments);
 
 private: // Hide inherited functionality that doesn't exist for primitives
 	using IHyLoadable::GetState;

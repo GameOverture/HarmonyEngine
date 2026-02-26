@@ -407,6 +407,7 @@ HyOpenGL::~HyOpenGL(void)
 		case HYSHADERPROG_Primitive:
 			pShader->SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);
 			pShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
+			pShader->AddVertexAttribute("attr_vColor", HyShaderVariable::vec4);
 			break;
 
 		case HYSHADERPROG_Spine:

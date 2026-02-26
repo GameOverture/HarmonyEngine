@@ -107,14 +107,20 @@ const char * const szHYPRIMATIVE_VERTEXSHADER = R"src(
 uniform mat4					u_mtxTransform;
 uniform mat4					u_mtxWorldToCamera;
 uniform mat4					u_mtxCameraToClip;
-uniform vec4					u_vColor;
+//uniform vec4					u_vColor;
 
 //layout(location = 0) in vec2	attr_vPosition;
+//layout(location = 1) in vec4	attr_vColor;
 
 attribute vec2					attr_vPosition;
+attribute vec4					attr_vColor;
+
+smooth out vec4					interp_vColor;
 
 void main()
 {
+	interp_vColor = attr_vColor;
+
 	vec4 vTemp = u_mtxTransform * vec4(attr_vPosition, 0, 1);
 	vTemp = u_mtxWorldToCamera * vTemp;
 	gl_Position = u_mtxCameraToClip * vTemp;
@@ -125,12 +131,14 @@ const char * const szHYPRIMATIVE_FRAGMENTSHADER = R"src(
 #version 140
 //#extension GL_ARB_explicit_attrib_location : enable
 
-uniform vec4	u_vColor;
-out vec4		out_vColor;
+//uniform vec4	u_vColor;
+smooth in vec4		interp_vColor;
+
+out vec4			out_vColor;
 
 void main()
 {
-	out_vColor = u_vColor;
+	out_vColor = interp_vColor;
 }
 )src";
 

@@ -355,7 +355,7 @@ void HySpine2d::SetAnimRate(float fPlayRate)
 	
 	uiNumVerticesPerInstOut = m_pRenderCmd->numIndices;
 #endif
-	uiNumInstancesOut = 0;
+	uiNumInstancesOut = 0; // Set to '0' to indicate to render with glDrawElements instead of glDrawArraysInstanced
 	bIsBatchable = false; // TODO: Maybe it is batchable?
 }
 
