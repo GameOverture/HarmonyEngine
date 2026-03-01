@@ -13,8 +13,7 @@
 
 GfxGrabPointView::GfxGrabPointView(HyEntity2d *pParent) :
 	HyEntity2d(pParent),
-	m_GrabOutline(this),
-	m_GrabFill(this)
+	m_GrabPt(this)
 {
 	UseWindowCoordinates(0);
 	SetDisplayOrder(DISPLAYORDER_TransformCtrl);
@@ -26,22 +25,22 @@ GfxGrabPointView::GfxGrabPointView(HyEntity2d *pParent) :
 
 void GfxGrabPointView::GetLocalBoundingShape(HyShape2d &shapeRefOut)
 {
-	m_GrabOutline.CalcLocalBoundingShape(shapeRefOut);
+	m_GrabPt.CalcLocalBoundingShape(shapeRefOut);
 }
 
 void GfxGrabPointView::Sync(const GfxGrabPointModel *pModel)
 {
 	if(pModel == nullptr)
 	{
-		m_GrabOutline.SetAsNothing();
-		m_GrabFill.SetAsNothing();
+		m_GrabPt.SetAsNothing(0);
+		m_GrabPt.SetAsNothing(1);
 		return;
 	}
 	
-	m_GrabOutline.SetAsCircle(pModel->GetRadius());
-	m_GrabOutline.SetTint(pModel->GetOutlineColor());
-	m_GrabFill.SetAsCircle(pModel->GetRadius() - 1.0f);
-	m_GrabFill.SetTint(pModel->GetFillColor());
+	m_GrabPt.SetAsCircle(0, pModel->GetRadius());
+	m_GrabPt.SetLayerColor(0, pModel->GetOutlineColor());
+	m_GrabPt.SetAsCircle(1, pModel->GetRadius() - 1.0f);
+	m_GrabPt.SetLayerColor(1, pModel->GetFillColor());
 
 	glm::vec2 ptPos = pModel->GetPos();
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);

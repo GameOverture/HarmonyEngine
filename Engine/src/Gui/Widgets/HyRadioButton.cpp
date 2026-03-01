@@ -13,8 +13,7 @@
 
 HyRadioButton::HyRadioButton(HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(pParent),
-	m_CheckMarkStroke(this),
-	m_CheckMarkFill(this),
+	m_CheckCircle(this),
 	m_fpOnCheckedChanged(nullptr)
 {
 	m_uiEntityAttribs |= BTNATTRIB_IsAutoExclusive;
@@ -23,8 +22,7 @@ HyRadioButton::HyRadioButton(HyEntity2d *pParent /*= nullptr*/) :
 
 HyRadioButton::HyRadioButton(const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, pParent),
-	m_CheckMarkStroke(this),
-	m_CheckMarkFill(this),
+	m_CheckCircle(this),
 	m_fpOnCheckedChanged(nullptr)
 {
 	m_uiEntityAttribs |= BTNATTRIB_IsAutoExclusive;
@@ -33,8 +31,7 @@ HyRadioButton::HyRadioButton(const HyUiPanelInit &panelInit, HyEntity2d *pParent
 
 HyRadioButton::HyRadioButton(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, textInit, pParent),
-	m_CheckMarkStroke(this),
-	m_CheckMarkFill(this),
+	m_CheckCircle(this),
 	m_fpOnCheckedChanged(nullptr)
 {
 	m_uiEntityAttribs |= BTNATTRIB_IsAutoExclusive;
@@ -60,25 +57,18 @@ void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *
 	HyButton::OnAssemble();
 
 	float fRadius = (HyMath::Min(panel.GetWidth(), panel.GetHeight()) - (panel.GetFrameStrokeSize() * 4)) * 0.5f;
-	m_CheckMarkStroke.SetAsCircle(fRadius);
-	m_CheckMarkFill.SetAsCircle(fRadius - panel.GetFrameStrokeSize());
+	m_CheckCircle.SetAsCircle(0, fRadius);
+	m_CheckCircle.SetAsCircle(1, fRadius - panel.GetFrameStrokeSize());
 
-	m_CheckMarkStroke.pos.Offset(panel.GetWidth() * 0.5f, panel.GetHeight() * 0.5f);
-	m_CheckMarkStroke.SetTint(panel.GetFrameColor().Lighten());
-
-	m_CheckMarkFill.pos.Offset(panel.GetWidth() * 0.5f, panel.GetHeight() * 0.5f);
-	m_CheckMarkFill.SetTint(panel.GetPanelColor().Lighten());
-
-	if(IsChecked())
+	if(panel.GetPanelNode())
 	{
-		m_CheckMarkStroke.alpha.Set(1.0f);
-		m_CheckMarkFill.alpha.Set(1.0f);
+		m_CheckCircle.pos.Set(panel.GetPanelNode()->pos);
+		m_CheckCircle.pos.Offset(panel.GetWidth() * 0.5f, panel.GetHeight() * 0.5f);
 	}
-	else
-	{
-		m_CheckMarkStroke.alpha.Set(0.0f);
-		m_CheckMarkFill.alpha.Set(0.0f);
-	}
+	m_CheckCircle.SetLayerColor(0, panel.GetFrameColor().Lighten().Lighten());
+	m_CheckCircle.SetLayerColor(1, panel.GetFrameColor().Lighten());
+
+	m_CheckCircle.alpha.Set(IsChecked() ? 1.0f : 0.0f);
 }
 
 /*virtual*/ void HyRadioButton::OnUiMouseClicked() /*override*/
@@ -92,14 +82,5 @@ void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *
 	if(m_fpOnCheckedChanged)
 		m_fpOnCheckedChanged(this);
 
-	if(bChecked)
-	{
-		m_CheckMarkStroke.alpha.Set(1.0f);
-		m_CheckMarkFill.alpha.Set(1.0f);
-	}
-	else
-	{
-		m_CheckMarkStroke.alpha.Set(0.0f);
-		m_CheckMarkFill.alpha.Set(0.0f);
-	}
+	m_CheckCircle.alpha.Set(bChecked ? 1.0f : 0.0f);
 }

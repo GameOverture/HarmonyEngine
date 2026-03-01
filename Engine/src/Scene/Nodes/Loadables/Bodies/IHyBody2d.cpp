@@ -198,17 +198,6 @@ int32 IHyBody2d::GetDisplayOrder() const
 	}
 }
 
-//const HyShape2d &IHyDrawable2d::GetLocalBoundingVolume()
-//{
-//	if(IsDirty(DIRTY_BoundingVolume) || m_LocalBoundingVolume.IsValidShape() == false)
-//	{
-//		OnCalcBoundingVolume();
-//		ClearDirty(DIRTY_BoundingVolume);
-//	}
-//
-//	return m_LocalBoundingVolume;
-//}
-
 float IHyBody2d::GetSceneHeight()
 {
 	const b2AABB &aabbRef = GetSceneAABB();
@@ -247,10 +236,10 @@ void IHyBody2d::GetScissor(HyRect &scissorOut)
 	HyAssert(pScissorStencil &&
 		pScissorStencil->GetBehavior() == HYSTENCILBEHAVIOR_Scissor &&
 		pScissorStencil->GetInstanceList().size() == 1 &&
-		pScissorStencil->GetInstanceList()[0]->GetType() == HYTYPE_Primitive, "IHyBody::GetScissor() m_hScissorStencil was a stencil that is not a scissor");
+		pScissorStencil->GetInstanceList()[0]->GetType() == HYTYPE_Primitive, "IHyBody::GetScissor() m_hScissorStencil was a stencil that is not a (primitive) scissor");
 
-	uint32 uiVertCount = static_cast<HyPrimitive2d *>(pScissorStencil->GetInstanceList()[0])->GetNumVerts();
-	const glm::vec2 *pVertArray = static_cast<HyPrimitive2d *>(pScissorStencil->GetInstanceList()[0])->GetVerts();
+	uint32 uiVertCount = static_cast<HyPrimitive2d *>(pScissorStencil->GetInstanceList()[0])->GetNumVerts(0);
+	const glm::vec2 *pVertArray = static_cast<HyPrimitive2d *>(pScissorStencil->GetInstanceList()[0])->GetVerts(0);
 
 	// Find dimensions of the box
 	float minX = pVertArray[0].x;
@@ -309,7 +298,7 @@ HyStencilHandle IHyBody2d::GetScissorHandle()
 			pScissorStencil->GetInstanceList()[0]->GetType() == HYTYPE_Primitive, "IHyBody2d::SetScissor() m_hScissorStencil was a stencil that is not a scissor");
 
 		HyPrimitive2d *pScissorPrim = static_cast<HyPrimitive2d *>(pScissorStencil->GetInstanceList()[0]);
-		pScissorPrim->SetAsBox(scissorRect);
+		pScissorPrim->SetAsBox(0, scissorRect);
 	}
 	else
 	{

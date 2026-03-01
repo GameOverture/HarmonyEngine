@@ -16,8 +16,7 @@ class GfxGrabPointModel;
 
 class GfxGrabPointView : public HyEntity2d
 {
-	HyPrimitive2d				m_GrabOutline;
-	HyPrimitive2d				m_GrabFill;
+	HyPrimitive2d				m_GrabPt;
 
 public:
 	GfxGrabPointView(HyEntity2d *pParent);

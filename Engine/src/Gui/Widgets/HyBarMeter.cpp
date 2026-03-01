@@ -339,7 +339,7 @@ void HyBarMeter::GuiOverrideBarNodeData(HyType eNodeType, HyJsonObj itemDataObj,
 		if(m_Bar.IsItemForPanel() && m_Bar.GetPanelNode()->GetType() == HYTYPE_Sprite)
 			vSpriteOffset = static_cast<HySprite2d *>(m_Bar.GetPanelNode())->GetCurFrameOffset();
 
-		m_BarMask.SetAsBox(HyRect(m_Bar.GetWidth() + vSpriteOffset.x, m_Bar.GetHeight() + vSpriteOffset.x));
+		m_BarMask.SetAsBox(0, HyRect(m_Bar.GetWidth() + vSpriteOffset.x, m_Bar.GetHeight() + vSpriteOffset.x));
 		m_BarMask.SetVisible(false);
 		m_BarStencil.AddMask(m_BarMask);
 		

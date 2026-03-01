@@ -40,7 +40,7 @@ HyGui::HyGui(HyOrientation eRootLayoutDirection, const HyUiPanelInit &initRef, H
 	m_RootBtnGrp.SetAsAutoExclusive();
 
 	// Scroll bars
-	SetScrollBarColor(initRef.m_PanelColor);
+	//SetScrollBarColor(initRef.m_PanelColor);
 	EnableScrollBars(m_bUseVertBar, m_bUseHorzBar);
 }
 
@@ -524,19 +524,19 @@ void HyGui::EnableScrollBars(bool bUseVert, bool bUseHorz)
 	SetSizeDirty();
 }
 
-void HyGui::SetScrollBarColor(HyColor color)
-{
-	m_VertBar.SetColor(color);
-	m_HorzBar.SetColor(color);
-}
-
-void HyGui::SetScrollBarSize(uint32 uiDiameter)
-{
-	m_VertBar.SetDiameter(uiDiameter);
-	m_HorzBar.SetDiameter(uiDiameter);
-	
-	SetSizeDirty();
-}
+//void HyGui::SetScrollBarColor(HyColor color)
+//{
+//	m_VertBar.SetColor(color);
+//	m_HorzBar.SetColor(color);
+//}
+//
+//void HyGui::SetScrollBarSize(uint32 uiDiameter)
+//{
+//	m_VertBar.SetDiameter(uiDiameter);
+//	m_HorzBar.SetDiameter(uiDiameter);
+//	
+//	SetSizeDirty();
+//}
 
 void HyGui::SetLineScrollAmt(float fLineScrollAmt)
 {

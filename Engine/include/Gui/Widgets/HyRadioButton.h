@@ -16,9 +16,7 @@
 class HyRadioButton : public HyButton
 {
 protected:
-	// To be drawn on panel when IsChecked
-	HyPrimitive2d									m_CheckMarkStroke;
-	HyPrimitive2d									m_CheckMarkFill;
+	HyPrimitive2d									m_CheckCircle; // To be drawn on panel when IsChecked
 
 	std::function<void(HyRadioButton *)>			m_fpOnCheckedChanged;
 

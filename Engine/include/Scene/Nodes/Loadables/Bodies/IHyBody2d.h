@@ -33,12 +33,10 @@ protected:
 
 	int32							m_iDisplayOrder;		// Higher values are displayed front-most
 
-	//HyShape2d						m_LocalBoundingVolume;	// A conforming shape around *this that assumes an identity matrix for its transform.
-
 	b2AABB							m_SceneAABB;			// Don't directly use, acquiring using GetSceneAABB()
 															// Derived versions of this function will properly update 'm_SceneAABB' before returning
 
-	HyStencilHandle					m_hScissorStencil;		// An additional stencil that works like a local clipping scissor rect, that will transform along with this node
+	HyStencilHandle					m_hScissorStencil;		// An additional (primitive) stencil that works like a local clipping scissor rect, that will transform along with this node
 
 public:
 	HyAnimVec3						topColor;

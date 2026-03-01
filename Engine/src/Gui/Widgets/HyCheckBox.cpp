@@ -13,24 +13,21 @@
 
 HyCheckBox::HyCheckBox(HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(pParent),
-	m_CheckMarkStroke(this),
-	m_CheckMarkFill(this)
+	m_CheckMark(this)
 {
 	SetAsSideBySide();
 }
 
 HyCheckBox::HyCheckBox(const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, pParent),
-	m_CheckMarkStroke(this),
-	m_CheckMarkFill(this)
+	m_CheckMark(this)
 {
 	SetAsSideBySide();
 }
 
 HyCheckBox::HyCheckBox(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyButton(panelInit, textInit, pParent),
-	m_CheckMarkStroke(this),
-	m_CheckMarkFill(this)
+	m_CheckMark(this)
 {
 	SetAsSideBySide();
 }
@@ -54,27 +51,18 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *)> fpC
 	HyButton::OnAssemble();
 
 	float fRadius = (HyMath::Min(panel.GetWidth(), panel.GetHeight()) - (panel.GetFrameStrokeSize() * 4)) * 0.5f;
-	m_CheckMarkStroke.SetAsCircle(fRadius);
-	m_CheckMarkFill.SetAsCircle(fRadius - panel.GetFrameStrokeSize());
+	m_CheckMark.SetAsCircle(0, fRadius);
+	m_CheckMark.SetAsCircle(1, fRadius - panel.GetFrameStrokeSize());
 
-	//m_CheckMarkStroke.pos.Set(panel.pos);
-	m_CheckMarkStroke.pos.Offset(panel.GetWidth() * 0.5f, panel.GetHeight() * 0.5f);
-	m_CheckMarkStroke.SetTint(panel.GetFrameColor().Lighten());
-
-	//m_CheckMarkFill.pos.Set(panel.pos);
-	m_CheckMarkFill.pos.Offset(panel.GetWidth() * 0.5f, panel.GetHeight() * 0.5f);
-	m_CheckMarkFill.SetTint(panel.GetPanelColor().Lighten());
-
-	if(IsChecked())
+	if(panel.GetPanelNode())
 	{
-		m_CheckMarkStroke.alpha.Set(1.0f);
-		m_CheckMarkFill.alpha.Set(1.0f);
+		m_CheckMark.pos.Set(panel.GetPanelNode()->pos);
+		m_CheckMark.pos.Offset(panel.GetWidth() * 0.5f, panel.GetHeight() * 0.5f);
 	}
-	else
-	{
-		m_CheckMarkStroke.alpha.Set(0.0f);
-		m_CheckMarkFill.alpha.Set(0.0f);
-	}
+	m_CheckMark.SetLayerColor(0, panel.GetFrameColor().Lighten().Lighten());
+	m_CheckMark.SetLayerColor(1, panel.GetFrameColor().Lighten());
+
+	m_CheckMark.alpha.Set(IsChecked() ? 1.0f : 0.0f);
 }
 
 /*virtual*/ void HyCheckBox::OnUiMouseClicked() /*override*/
@@ -88,14 +76,5 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *)> fpC
 	if(m_fpOnCheckedChanged)
 		m_fpOnCheckedChanged(this);
 
-	if(bChecked)
-	{
-		m_CheckMarkStroke.alpha.Set(1.0f);
-		m_CheckMarkFill.alpha.Set(1.0f);
-	}
-	else
-	{
-		m_CheckMarkStroke.alpha.Set(0.0f);
-		m_CheckMarkFill.alpha.Set(0.0f);
-	}
+	m_CheckMark.alpha.Set(bChecked ? 1.0f : 0.0f);
 }

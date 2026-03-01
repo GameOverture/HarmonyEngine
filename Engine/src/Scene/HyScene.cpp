@@ -101,7 +101,6 @@ float HyScene::GetPpmInverse()
 	{
 		if((*it) == pNode)
 		{
-			// TODO: Log about erasing Node
 			sm_NodeList_PauseUpdate.erase(it);
 			break;
 		}
@@ -125,7 +124,6 @@ void HyScene::RemoveNode_Loaded(const IHyDrawable2d *pDrawable)
 	{
 		if((*it) == pDrawable)
 		{
-			// TODO: Log about erasing instance
 			m_NodeList_LoadedDrawable2d.erase(it);
 			break;
 		}
@@ -138,7 +136,6 @@ void HyScene::RemoveNode_Loaded(const IHyDrawable3d *pDrawable)
 	{
 		if((*it) == pDrawable)
 		{
-			// TODO: Log about erasing instance
 			m_NodeList_LoadedDrawable3d.erase(it);
 			break;
 		}
@@ -201,8 +198,6 @@ void HyScene::SetPause(bool bPause)
 	m_bPauseGame = bPause;
 }
 
-//PRIVATE//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void HyScene::UpdateNodes()
 {
 	if(m_bPauseGame == false)
@@ -249,7 +244,7 @@ void HyScene::UpdateNodes()
 // Buffer Header (contains uiNum3dRenderStates; uiNum2dRenderStates) || RenderState3D/UniformData-|-RenderState2D/UniformData-|
 void HyScene::PrepareRender(IHyRenderer &rendererRef, float fExtrapolatePercent)
 {
-	// TODO: Determine whether I can multi-thread this buffer prep and HyRenderBuffer::State instantiations... Make everything take const references!
+	// TODO: Determine whether I should multi-thread this buffer prep and HyRenderBuffer::State instantiations... Make everything take const references!
 	// TODO: should I ensure that I start all writes on a 4byte boundary? ARM systems may be an issue
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

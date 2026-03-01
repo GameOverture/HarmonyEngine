@@ -109,8 +109,7 @@ void HyPhysicsDraw::DrawPolygon(const b2Vec2 *vertices, int32 vertexCount, b2Hex
 	for(int i = 0; i < vertexCount; ++i)
 		convertedVertList.emplace_back(vertices[i].x * m_fPixelsPerMeter, vertices[i].y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].SetAsPolygon(convertedVertList.data(), vertexCount);
-	m_DrawList[m_iDrawIndex].SetWireframe(true);
+	m_DrawList[m_iDrawIndex].SetAsPolygon(0, convertedVertList.data(), vertexCount, 1.0f);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color));
 	m_DrawList[m_iDrawIndex].SetVisible(true);
 
@@ -126,8 +125,7 @@ void HyPhysicsDraw::DrawSolidPolygon(b2Transform transform, const b2Vec2 *vertic
 	for(int i = 0; i < vertexCount; ++i)
 		convertedVertList.emplace_back(vertices[i].x * m_fPixelsPerMeter, vertices[i].y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].SetAsPolygon(convertedVertList.data(), vertexCount);
-	m_DrawList[m_iDrawIndex].SetWireframe(false);
+	m_DrawList[m_iDrawIndex].SetAsPolygon(0, convertedVertList.data(), vertexCount);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color));
 	m_DrawList[m_iDrawIndex].SetVisible(true);
 
@@ -141,8 +139,7 @@ void HyPhysicsDraw::DrawCircle(const b2Vec2 &center, float radius, b2HexColor co
 
 	glm::vec2 ptConvertedCenter(center.x * m_fPixelsPerMeter, center.y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].SetAsCircle(ptConvertedCenter, radius * m_fPixelsPerMeter);
-	m_DrawList[m_iDrawIndex].SetWireframe(true);
+	m_DrawList[m_iDrawIndex].SetAsCircle(0, ptConvertedCenter, radius * m_fPixelsPerMeter, 1.0f);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color));
 	m_DrawList[m_iDrawIndex].SetVisible(true);
 
@@ -156,8 +153,7 @@ void HyPhysicsDraw::DrawSolidCircle(b2Transform transform, b2Vec2 center, float 
 
 	glm::vec2 ptConvertedCenter(center.x * m_fPixelsPerMeter, center.y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].SetAsCircle(ptConvertedCenter, radius * m_fPixelsPerMeter);
-	m_DrawList[m_iDrawIndex].SetWireframe(false);
+	m_DrawList[m_iDrawIndex].SetAsCircle(0, ptConvertedCenter, radius * m_fPixelsPerMeter);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color));
 	m_DrawList[m_iDrawIndex].SetVisible(true);
 
@@ -176,7 +172,7 @@ void HyPhysicsDraw::DrawSegment(const b2Vec2 &p1, const b2Vec2 &p2, b2HexColor c
 	glm::vec2 ptConvertedP1(p1.x * m_fPixelsPerMeter, p1.y * m_fPixelsPerMeter);
 	glm::vec2 ptConvertedP2(p2.x * m_fPixelsPerMeter, p2.y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].SetAsLineSegment(ptConvertedP1, ptConvertedP2);
+	m_DrawList[m_iDrawIndex].SetAsLineSegment(0, ptConvertedP1, ptConvertedP2, 1.0f);
 	m_DrawList[m_iDrawIndex].SetTint(HyColor(color));
 	m_DrawList[m_iDrawIndex].SetVisible(true);
 

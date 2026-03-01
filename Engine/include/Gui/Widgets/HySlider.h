@@ -17,8 +17,6 @@
 class HySlider : public IHyWidget
 {
 protected:
-	HyPanel									m_Panel;
-
 	enum SliderAttributes
 	{
 		SLIDERATTRIB_UseStepList			= 1 << 16,
@@ -30,39 +28,42 @@ protected:
 	};
 	static_assert((int)SLIDERATTRIB_UseStepList == (int)WIDGETATTRIB_NEXTFLAG, "HySlider is not matching with base classes attrib flags");
 
+	float									m_fBarSize;
+	float									m_fBarThickness;
+	float									m_fHandleSize;
+	float									m_fHandleThickness;
+
 	int64									m_iMin;
 	int64									m_iMax;
 	int32									m_iStep;
-	std::vector<int64>						m_StepList;		// When used, only values present in this std::vector can be selected
-	float									m_fLength;		// Length of the slider bar in pixels (does not include the radius of the rounded ends)
-	float									m_fStrokeAmt;	// The stroke amount in pixels when rendering the bar
-
+	std::vector<int64>						m_StepList;			// When used, only values present in this std::vector can be selected
 	int64									m_iValue;
 
-	// TODO: Move 'BarPrimitives' to HyPanel, and have HyPanel construct itself based on a UI widget type
-	struct BarPrimitives : public HyEntity2d
-	{
-		HyPrimitive2d						m_EndCapNeg;
-		HyPrimitive2d						m_EndCapPos;
-		HyPrimitive2d						m_BarPos;		// Colored side of the slider
-		HyPrimitive2d						m_BarNeg;		// Dimmed side of the slider
+	//struct BarPrimitives : public HyEntity2d
+	//{
+	//	HyPrimitive2d						m_EndCapNeg;
+	//	HyPrimitive2d						m_EndCapPos;
+	//	HyPrimitive2d						m_BarPos;		// Colored side of the slider
+	//	HyPrimitive2d						m_BarNeg;		// Dimmed side of the slider
 
-		BarPrimitives(HyEntity2d *pParent);
-		void DoAssembly(HyOrientation eOrientation, float fBarThickness, float fBarLength, float fIndentAmt);
-	};
-	BarPrimitives							m_BarStroke;
-	BarPrimitives							m_BarFill;
-
-	glm::vec2								m_ptSliderCenter;
+	//	BarPrimitives(HyEntity2d *pParent);
+	//	void DoAssembly(HyOrientation eOrientation, float fBarThickness, float fBarLength, float fIndentAmt);
+	//};
+	//BarPrimitives							m_BarStroke;
+	//BarPrimitives							m_BarFill;
 
 	std::function<void(HySlider *)>			m_fpOnValueChanged;
 
 public:
+	HyPanel									bar;
+	HyPanel									handle;
+
+public:
 	HySlider(HyEntity2d *pParent = nullptr);
-	HySlider(const HyUiPanelInit &sliderInitRef, HyEntity2d *pParent = nullptr);
+	HySlider(HyOrientation eOrien, const HyUiPanelInit &barInitRef, const HyUiPanelInit &handleInitRef, HyEntity2d *pParent = nullptr);
 	virtual ~HySlider();
 
-	void Setup(const HyUiPanelInit &sliderInitRef);
+	void Setup(HyOrientation eOrien, const HyUiPanelInit &barInitRef, const HyUiPanelInit &handleInitRef);
 
 	int64 GetNumTicks() const;
 	int64 GetValue() const;
@@ -75,8 +76,6 @@ public:
 
 	HyOrientation GetOrientation() const;
 	void SetOrientation(HyOrientation eOrien);
-
-	void SetBarColors(HyColor posColor, HyColor negColor, HyColor strokeColor);
 
 	void SetValueChangedCallback(std::function<void(HySlider *)> fpCallback);
 
@@ -93,6 +92,8 @@ protected:
 
 	float GetBarThickness();
 	float GetBarRadius();
+
+	void PositionHandle();
 };
 
 #endif /* HySlider_h__ */

@@ -103,7 +103,7 @@ void HyStencil::SetAsScissor(const HyRect &scissorRect, IHyBody2d *pScissorOwner
 	m_eBehavior = HYSTENCILBEHAVIOR_Scissor;
 
 	HyPrimitive2d *pScissorPrim = HY_NEW HyPrimitive2d();
-	pScissorPrim->SetAsBox(scissorRect);
+	pScissorPrim->SetAsBox(0, scissorRect);
 	pScissorPrim->SetVisible(false);
 	AddMask(*pScissorPrim);
 

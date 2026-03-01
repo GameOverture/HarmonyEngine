@@ -84,7 +84,7 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 	m_vDIMENSIONS(fWidth, fHeight),
 	m_fGridSize(fGridSize)
 {
-	SetAsBox(m_vDIMENSIONS.x, m_vDIMENSIONS.y);
+	SetAsBox(0, m_vDIMENSIONS.x, m_vDIMENSIONS.y);
 	pos.Set(m_vDIMENSIONS.x * -0.5f, m_vDIMENSIONS.y * -0.5f);
 }
 
@@ -105,11 +105,11 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 
 /*virtual*/ bool CheckerGrid::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
 {
-	HyAssert(GetNumVerts() == 6, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
+	HyAssert(GetNumVerts(0) == 6, "CheckerGrid::OnWriteDrawBufferData is trying to draw a primitive that's not a quad");
 
 	for(int i = 0; i < 6; ++i)
 	{
-		vertexBufferRef.AppendVertexData(&m_pVertBuffer[i], sizeof(glm::vec2));
+		vertexBufferRef.AppendVertexData(&m_LayerList[0].m_pVertBuffer[i], sizeof(glm::vec2));
 		//*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pVertBuffer[i];
 		//pRefDataWritePos += sizeof(glm::vec2);
 
@@ -175,6 +175,7 @@ const float fDIMENSION_SIZE = 20000.0f;
 ProjectDraw::ProjectDraw() :
 	IDraw(nullptr, FileDataPair()),
 	m_CheckerGrid(fDIMENSION_SIZE, fDIMENSION_SIZE, DEFAULT_GRID_SIZE),
+	m_Origin(this),
 	m_OverGrid(fDIMENSION_SIZE, fDIMENSION_SIZE, DEFAULT_GRID_SIZE)
 {
 	ChildAppend(m_CheckerGrid);
@@ -189,44 +190,15 @@ ProjectDraw::ProjectDraw() :
 	m_CheckerGrid.SetShader(m_pCheckerGridShader);
 	m_CheckerGrid.SetDisplayOrder(-1000);
 
-	//std::vector<glm::vec2> lineList(2, glm::vec2());
-	//lineList[0].x = -fDIMENSION_SIZE * 0.5f;
-	//lineList[0].y = 0.0f;
-	//lineList[1].x = fDIMENSION_SIZE * 0.5f;
-	//lineList[1].y = 0.0f;
+	m_Origin.SetLayerColor(0, HyColor::Black);
+	m_Origin.SetLayerColor(1, HyColor::White);
+	m_Origin.SetLayerColor(2, HyColor::Black);
+	m_Origin.SetLayerColor(3, HyColor::White);
 
-	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
+	OnResizeRenderer();
 
-	m_OriginHorzBg.SetLineThickness(3.0f);
-	m_OriginHorzBg.SetTint(HyColor::Black);
-	m_OriginHorzBg.SetVisible(false);
-	m_OriginHorzBg.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
-	m_OriginHorzBg.UseWindowCoordinates();
-	m_OriginHorz.SetLineThickness(1.0f);
-	m_OriginHorz.SetTint(HyColor::White);
-	m_OriginHorz.SetVisible(false);
-	m_OriginHorz.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
-	m_OriginHorz.UseWindowCoordinates();
-
-	//lineList[0].x = 0.0f;
-	//lineList[0].y = -fDIMENSION_SIZE * 0.5f;
-	//lineList[1].x = 0.0f;
-	//lineList[1].y = fDIMENSION_SIZE * 0.5f;
-	m_OriginVertBg.SetLineThickness(3.0f);
-	m_OriginVertBg.SetTint(HyColor::Black);
-	m_OriginVertBg.SetVisible(false);
-	m_OriginVertBg.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
-	m_OriginVertBg.UseWindowCoordinates();
-	m_OriginVert.SetLineThickness(1.0f);
-	m_OriginVert.SetTint(HyColor::White);
-	m_OriginVert.SetVisible(false);
-	m_OriginVert.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
-	m_OriginVert.UseWindowCoordinates();
-
-	ChildAppend(m_OriginHorzBg);
-	ChildAppend(m_OriginVertBg);
-	ChildAppend(m_OriginHorz);
-	ChildAppend(m_OriginVert);
+	m_Origin.SetVisible(false);
+	m_Origin.UseWindowCoordinates();
 
 	ChildAppend(m_OverGrid);
 
@@ -253,10 +225,7 @@ ProjectDraw::ProjectDraw() :
 	glm::vec2 ptOriginPos;
 	m_pCamera->ProjectToCamera(glm::vec2(0.0f, 0.0f), ptOriginPos);
 
-	m_OriginHorzBg.pos.Set(0.0f, ptOriginPos.y);
-	m_OriginVertBg.pos.Set(ptOriginPos.x, 0.0f);
-	m_OriginHorz.pos.Set(0.0f, ptOriginPos.y);
-	m_OriginVert.pos.Set(ptOriginPos.x, 0.0f);
+	m_Origin.pos.Set(ptOriginPos);
 }
 
 void ProjectDraw::EnableGridBackground(bool bEnable)
@@ -266,10 +235,7 @@ void ProjectDraw::EnableGridBackground(bool bEnable)
 
 void ProjectDraw::EnableGridOrigin(bool bEnable)
 {
-	m_OriginHorzBg.SetVisible(bEnable);
-	m_OriginVertBg.SetVisible(bEnable);
-	m_OriginHorz.SetVisible(bEnable);
-	m_OriginVert.SetVisible(bEnable);
+	m_Origin.SetVisible(bEnable);
 }
 
 void ProjectDraw::EnableGridOverlay(bool bEnable)
@@ -280,11 +246,10 @@ void ProjectDraw::EnableGridOverlay(bool bEnable)
 /*virtual*/ void ProjectDraw::OnResizeRenderer() /*override*/
 {
 	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
-
-	m_OriginHorzBg.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
-	m_OriginHorz.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
-	m_OriginVertBg.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
-	m_OriginVert.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
+	m_Origin.SetAsLineSegment(0, glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f), 3.0f); // Horz BG
+	m_Origin.SetAsLineSegment(1, glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f), 1.0f); // Horz
+	m_Origin.SetAsLineSegment(2, glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y), 3.0f); // Vert BG
+	m_Origin.SetAsLineSegment(3, glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y), 1.0f); // Vert
 }
 
 ///*virtual*/ void ProjectDraw::OnCameraUpdated() /*override*/

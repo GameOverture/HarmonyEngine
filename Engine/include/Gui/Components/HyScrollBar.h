@@ -18,50 +18,53 @@ typedef std::function<void(HyScrollBar *pSelf, float fNewPosition, float fTotalR
 
 class HyScrollBar : public HyEntity2d
 {
-	class PageControl : public HyEntity2d
-	{
-		uint32					m_uiDiameter;
+	//class PageControl : public HyEntity2d
+	//{
+	//	uint32					m_uiDiameter;
 
-		HyPrimitive2d			m_Panel;
-		HyPrimitive2d			m_Slider;
+	//	bool					m_bIsDragging;
+	//	glm::vec2				m_ptDragPos;
 
-		bool					m_bIsDragging;
-		glm::vec2				m_ptDragPos;
+	//public:
+	//	PageControl(HyOrientation eOrientation, uint32 uiLength, uint32 uiDiameter, HyEntity2d *pParent);
+	//	virtual ~PageControl();
 
-	public:
-		PageControl(HyOrientation eOrientation, uint32 uiLength, uint32 uiDiameter, HyEntity2d *pParent);
-		virtual ~PageControl();
+	//	uint32 GetDiameter() const;
+	//	void SetDiameter(uint32 uiDiameter);
 
-		uint32 GetDiameter() const;
-		void SetDiameter(uint32 uiDiameter);
+	//	void SetMetrics(HyOrientation eOrientation, uint32 uiLength, uint32 uiDiameter, float fSliderPercent);
+	//	void SetSliderPos(HyOrientation eOrientation, float fAnimScrollPos, float fClientTotalSize, float fClientShownSize);
+	//	void SetColor(HyColor color);
 
-		void SetMetrics(HyOrientation eOrientation, uint32 uiLength, uint32 uiDiameter, float fSliderPercent);
-		void SetSliderPos(HyOrientation eOrientation, float fAnimScrollPos, float fClientTotalSize, float fClientShownSize);
-		void SetColor(HyColor color);
+	//protected:
+	//	virtual void OnUpdate() override;
+	//	virtual void OnMouseDown() override;
+	//	virtual void OnMouseClicked() override;
+	//};
+	//class Button : public HyButton
+	//{
+	//	//HyPrimitive2d			m_Panel;
+	//	//HyPrimitive2d			m_Decal;
 
-	protected:
-		virtual void OnUpdate() override;
-		virtual void OnMouseDown() override;
-		virtual void OnMouseClicked() override;
-	};
-	class Button : public HyButton
-	{
-		HyPrimitive2d			m_Panel;
-		HyPrimitive2d			m_Decal;
+	//public:
+	//	Button(HyOrientation eOrientation, bool bPositive, uint32 uiDiameter, HyEntity2d *pParent);
+	//	virtual ~Button();
 
-	public:
-		Button(HyOrientation eOrientation, bool bPositive, uint32 uiDiameter, HyEntity2d *pParent);
-		virtual ~Button();
+	//	void SetColor(HyColor color);
+	//	void SetMetrics(HyOrientation eOrientation, bool bPositive, uint32 uiDiameter);
+	//};
 
-		void SetColor(HyColor color);
-		void SetMetrics(HyOrientation eOrientation, bool bPositive, uint32 uiDiameter);
-	};
+	HyOrientation				m_eOrientation;
 
-	const HyOrientation			m_eORIENTATION;
+	uint32						m_uiDiameter;
+	bool						m_bIsDragging;
+	glm::vec2					m_ptDragPos;
 
-	PageControl					m_PageControl;
-	Button						m_PosBtn;
-	Button						m_NegBtn;
+	HyPanel						m_BarPanel;
+	HyPanel						m_HandlePanel;
+	//PageControl					m_PageControl;
+	HyButton					m_PosBtn;
+	HyButton					m_NegBtn;
 	float						m_fLineScrollAmt;
 
 	bool						m_bIsValidMetrics;
@@ -77,7 +80,11 @@ class HyScrollBar : public HyEntity2d
 
 public:
 	HyScrollBar(HyOrientation eOrientation, uint32 uiDiameter, HyEntity2d *pParent);
+	HyScrollBar(HyOrientation eOrientation, const HyUiPanelInit &posBtnInit, const HyUiPanelInit &negBtnInit, const HyUiPanelInit &barInit, const HyUiPanelInit &handleInit, HyEntity2d *pParent);
 	virtual ~HyScrollBar();
+
+	void Setup(HyOrientation eOrientation, uint32 uiDiameter);
+	void Setup(HyOrientation eOrientation, const HyUiPanelInit &posBtnInit, const HyUiPanelInit &negBtnInit, const HyUiPanelInit &barInit, const HyUiPanelInit &handleInit);
 
 	HyOrientation GetOrientation() const;
 
@@ -86,8 +93,8 @@ public:
 	float GetLineScrollAmt() const;
 	void SetLineScrollAmt(float fLineScrollAmt);
 
-	void SetColor(HyColor color);
-	void SetDiameter(uint32 uiDiameter);
+	//void SetColor(HyColor color);
+	//void SetDiameter(uint32 uiDiameter);
 	void SetMetrics(uint32 uiLength, uint32 uiClientTotalSize, uint32 uiClientShownSize);
 	bool IsValidMetrics() const;
 
@@ -101,6 +108,9 @@ public:
 
 protected:
 	virtual void OnUpdate() override;
+	virtual void OnAssemble() override;
+
+	virtual void OnMouseDown() override;
 
 private:
 	void InvokeOnScrollCallback();

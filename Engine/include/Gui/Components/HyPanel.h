@@ -64,41 +64,33 @@ class HyPanel// : public IHyGuiBase
 {
 	HyType						m_eNodeType;
 
-	struct PrimParts : public HyEntity2d
+	class PrimMade : public HyPrimitive2d
 	{
+	public:
 		uint32					m_uiFrameSize;
 		
 		HyColor					m_PanelColor;
 		HyColor					m_FrameColor;
 		HyColor					m_TertiaryColor;
-		
-		HyPrimitive2d			m_Frame1;
-		HyPrimitive2d			m_Frame2;
-		HyPrimitive2d			m_Body;
 
-		bool					m_bIsContainer; // TODO: Construct panels differently?
-
-		PrimParts(const HyUiPanelInit &initRef, HyEntity2d *pParent) :
-			HyEntity2d(pParent),
+		PrimMade(const HyUiPanelInit &initRef, HyEntity2d *pParent) :
+			HyPrimitive2d(pParent),
 			m_uiFrameSize(initRef.m_uiFrameSize),
 			m_PanelColor(initRef.m_PanelColor),
 			m_FrameColor(initRef.m_FrameColor),
-			m_TertiaryColor(initRef.m_TertiaryColor),
-			m_Frame1(this),
-			m_Frame2(this),
-			m_Body(this),
-			m_bIsContainer(false)
+			m_TertiaryColor(initRef.m_TertiaryColor)
 		{ }
 	};
 	union PanelData
 	{
 		glm::vec2				m_BoundingVolumeSize;	// For 'BoundingVolume' panel type.
-		PrimParts *				m_pPrimParts;			// For 'Primitive' panel type.
+		PrimMade *				m_pPrimMade;			// For 'Primitive' panel type.
 		IHyBody2d *				m_pNodeItem;			// For 'NodeItem' panel type.
-		PanelData() : m_pPrimParts(nullptr)
+		PanelData() : m_pPrimMade(nullptr)
 		{ }
 	};
 	PanelData					m_PanelData;
+	glm::vec2					m_ptPosition;
 
 public:
 	HyPanel();
@@ -120,6 +112,8 @@ public:
 	bool SetState(uint32 uiWidgetState);
 	uint32 GetNumStates();
 
+	glm::vec2 GetPosition() const;
+	void SetPosition(float fX, float fY);
 	bool IsVisible() const;
 	void SetVisible(bool bVisible);
 	HyAnimFloat *Alpha();
@@ -135,6 +129,15 @@ public:
 #ifdef HY_PLATFORM_GUI
 	void GuiOverridePanelNodeData(HyType eNodeType, HyJsonObj itemDataObj, bool bUseGuiOverrideName, HyEntity2d *pParent);
 #endif
+
+	enum PrimLayer
+	{
+		PRIMLAYER_Frame1 = 0,
+		PRIMLAYER_Frame2,
+		PRIMLAYER_Body,
+
+		PRIMLAYER_EXTRA_START,
+	};
 
 private:
 	void InitalizeSprite();

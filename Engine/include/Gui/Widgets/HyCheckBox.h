@@ -16,10 +16,7 @@
 class HyCheckBox : public HyButton
 {
 protected:
-	// To be drawn on panel when IsChecked
-	HyPrimitive2d								m_CheckMarkStroke;
-	HyPrimitive2d								m_CheckMarkFill;
-
+	HyPrimitive2d								m_CheckMark; // To be drawn on panel when IsChecked
 	std::function<void(HyCheckBox *)>			m_fpOnCheckedChanged;
 
 public:

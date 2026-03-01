@@ -155,26 +155,26 @@ void HyTextField::SetCursor(uint32 uiCharIndex, uint32 uiSelectionIndex)
 
 	if(m_Text.IsLoadDataValid() == false || IsCursorShown() == false)
 	{
-		m_Cursor.SetAsNothing();
-		m_Selection.SetAsNothing();
+		m_Cursor.SetAsNothing(0);
+		m_Selection.SetAsNothing(0);
 		return;
 	}
 
 	float fCursorHeight = m_Text.GetLineBreakHeight(m_Text.scale.Y());
-	m_Cursor.SetAsBox(HyRect(2.0f, fCursorHeight));
+	m_Cursor.SetAsBox(0, HyRect(2.0f, fCursorHeight));
 
 	m_Cursor.pos.Set(m_Text.pos);
 	m_Cursor.pos.Offset(m_Text.GetGlyphOffset(m_uiCursorIndex, 0).x * m_Text.scale.GetX(), m_Text.GetLineDescender(m_Text.scale.Y()));
 	
 	if(m_uiCursorIndex == m_uiSelectionIndex)
-		m_Selection.SetAsNothing();
+		m_Selection.SetAsNothing(0);
 	else
 	{
 		uint32 uiStartIndex, uiEndIndex;
 		GetSelection(uiStartIndex, uiEndIndex);
 
 		float fWidth = m_Text.GetGlyphOffset(uiEndIndex, 0).x - m_Text.GetGlyphOffset(uiStartIndex, 0).x;
-		m_Selection.SetAsBox(HyRect(fWidth, fCursorHeight));
+		m_Selection.SetAsBox(0, HyRect(fWidth, fCursorHeight));
 
 		m_Selection.pos.Set(m_Text.pos);
 		m_Selection.pos.Offset(m_Text.GetGlyphOffset(uiStartIndex, 0).x * m_Text.scale.GetX(), m_Text.GetLineDescender(m_Text.scale.Y()));

@@ -280,9 +280,9 @@ void IDraw::ResizeRenderer()
 	for(auto iter = m_GuideMap.begin(); iter != m_GuideMap.end(); ++iter)
 	{
 		if(iter.key().first == HYORIENT_Horizontal)
-			iter.value()->SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
+			iter.value()->SetAsLineSegment(0, glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f), 1.0f);
 		else
-			iter.value()->SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
+			iter.value()->SetAsLineSegment(0, glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y), 1.0f);
 	}
 
 	OnResizeRenderer();
@@ -528,8 +528,8 @@ bool IDraw::TryAllocateGuide(HyOrientation eOrientation, int iWorldPos)
 		glm::vec2 ptMousePos = HyEngine::Input().GetMousePos();
 		glm::ivec2 vRendererSize = HyEngine::Window().GetWindowSize();
 
-		m_PendingGuide.SetAsLineSegment(glm::vec2(0.0f, ptMousePos.y),
-										glm::vec2(static_cast<float>(vRendererSize.x), ptMousePos.y));
+		m_PendingGuide.SetAsLineSegment(0, glm::vec2(0.0f, ptMousePos.y),
+										glm::vec2(static_cast<float>(vRendererSize.x), ptMousePos.y), 1.0f);
 		m_PendingGuide.SetVisible(true);
 		break; }
 
@@ -537,8 +537,8 @@ bool IDraw::TryAllocateGuide(HyOrientation eOrientation, int iWorldPos)
 		glm::vec2 ptMousePos = HyEngine::Input().GetMousePos();
 		glm::ivec2 vRendererSize = HyEngine::Window().GetWindowSize();
 
-		m_PendingGuide.SetAsLineSegment(glm::vec2(ptMousePos.x, 0.0f),
-										glm::vec2(ptMousePos.x, static_cast<float>(vRendererSize.y)));
+		m_PendingGuide.SetAsLineSegment(0, glm::vec2(ptMousePos.x, 0.0f),
+										glm::vec2(ptMousePos.x, static_cast<float>(vRendererSize.y)), 1.0f);
 		m_PendingGuide.SetVisible(true);
 		break; }
 
@@ -645,9 +645,9 @@ bool IDraw::AllocateGuide(HyOrientation eOrientation, int iWorldPos)
 
 	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
 	if(eOrientation == HYORIENT_Horizontal)
-		pNewGuide->SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
+		pNewGuide->SetAsLineSegment(0, glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f), 1.0f);
 	else
-		pNewGuide->SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
+		pNewGuide->SetAsLineSegment(0, glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y), 1.0f);
 
 	ChildAppend(*pNewGuide);
 	m_GuideMap.insert(QPair<HyOrientation, int>(eOrientation, iWorldPos), pNewGuide);

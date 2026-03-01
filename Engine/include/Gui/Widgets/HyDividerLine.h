@@ -17,6 +17,7 @@
 class HyDividerLine : public IHyWidget
 {
 	HyPrimitive2d							m_Line;
+	float									m_fThickness;
 
 protected:
 	enum WidgetAttributes

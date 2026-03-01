@@ -65,8 +65,8 @@ QList<IDrawExItem *> IDrawEx::GetDrawItemList()
 	RefreshTransforms();
 	
 	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
-	m_SnapGuideHorz.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f));
-	m_SnapGuideVert.SetAsLineSegment(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y));
+	m_SnapGuideHorz.SetAsLineSegment(0, glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f), 1.0f);
+	m_SnapGuideVert.SetAsLineSegment(0, glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y), 1.0f);
 }
 
 /*virtual*/ void IDrawEx::OnUndoStackIndexChanged(int iIndex) /*override*/

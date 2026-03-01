@@ -26,8 +26,6 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	m_EditModeWindowOutline.UseWindowCoordinates();
 	m_EditModeWindowOutline.SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-	m_EditModeWindowOutline.SetWireframe(true);
-	m_EditModeWindowOutline.SetLineThickness(5.0f);
 	m_EditModeWindowOutline.SetVisible(false);
 }
 
@@ -559,7 +557,7 @@ void EntityDraw::SetExtrapolatedProperties()
 /*virtual*/ void EntityDraw::OnResizeRenderer() /*override*/
 {
 	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
-	m_EditModeWindowOutline.SetAsBox(HyRect(vWindowSize.x, vWindowSize.y));
+	m_EditModeWindowOutline.SetAsBox(0, HyRect(vWindowSize.x, vWindowSize.y), 5.0f);
 }
 
 /*virtual*/ void EntityDraw::OnRequestSelection(QList<IDrawExItem *> selectionList) /*override*/

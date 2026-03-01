@@ -320,6 +320,69 @@ int32 HyPrimitive2d::SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const
 	return SetAsPolygon(iLayerIndex, verticesList.data(), verticesList.size(), fOutlineThickness);
 }
 
+glm::vec2 HyPrimitive2d::GetLayerOffset(int32 iLayerIndex) const
+{
+	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
+	{
+		HyLogError("HyPrimitive2d::GetLayerOffset() failed - Invalid layer index");
+		return glm::vec2(0.0f, 0.0f);
+	}
+	return m_LayerList[iLayerIndex].m_vOffset;
+}
+
+int32 HyPrimitive2d::SetLayerOffset(int32 iLayerIndex, const glm::vec2 &vOffset)
+{
+	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
+	{
+		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
+		m_LayerList.emplace_back();
+	}
+	m_LayerList[iLayerIndex].m_vOffset = vOffset;
+	return iLayerIndex;
+}
+
+bool HyPrimitive2d::IsLayerVisible(int32 iLayerIndex) const
+{
+	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
+	{
+		HyLogError("HyPrimitive2d::IsLayerVisible() failed - Invalid layer index");
+		return false;
+	}
+	return m_LayerList[iLayerIndex].m_bVisible;
+}
+
+int32 HyPrimitive2d::SetLayerVisible(int32 iLayerIndex, bool bVisible)
+{
+	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
+	{
+		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
+		m_LayerList.emplace_back();
+	}
+	m_LayerList[iLayerIndex].m_bVisible = bVisible;
+	return iLayerIndex;
+}
+
+HyColor HyPrimitive2d::GetLayerColor(int32 iLayerIndex) const
+{
+	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
+	{
+		HyLogError("HyPrimitive2d::GetLayerColor() failed - Invalid layer index");
+		return HyColor::White;
+	}
+	return m_LayerList[iLayerIndex].m_Color;
+}
+
+int32 HyPrimitive2d::SetLayerColor(int32 iLayerIndex, HyColor color)
+{
+	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
+	{
+		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
+		m_LayerList.emplace_back();
+	}
+	m_LayerList[iLayerIndex].m_Color = color;
+	return iLayerIndex;
+}
+
 uint32 HyPrimitive2d::GetNumVerts(int32 iLayerIndex) const
 {
 	return m_LayerList[iLayerIndex].m_uiNumVerts;
@@ -358,7 +421,7 @@ float HyPrimitive2d::GetLineThickness(int32 iLayerIndex) const
 	for(int i = 0; i < m_LayerList.size(); ++i)
 	{
 		const Layer &layerRef = m_LayerList[i];
-		if(layerRef.m_uiNumVerts > 0 && layerRef.m_pVertBuffer != nullptr)
+		if(layerRef.m_bVisible && layerRef.m_uiNumVerts > 0 && layerRef.m_pVertBuffer != nullptr)
 			return true;
 	}
 
@@ -390,7 +453,7 @@ float HyPrimitive2d::GetLineThickness(int32 iLayerIndex) const
 	for(int iLayerIndex = 0; iLayerIndex < m_LayerList.size(); ++iLayerIndex)
 	{
 		const Layer &layerRef = m_LayerList[iLayerIndex];
-		if(layerRef.m_uiNumVerts > 0 && layerRef.m_pVertBuffer != nullptr)
+		if(layerRef.m_bVisible && layerRef.m_uiNumVerts > 0 && layerRef.m_pVertBuffer != nullptr)
 			uiNumInstancesOut += layerRef.m_uiNumVerts / uiNumVerticesPerInstOut;
 	}
 
@@ -416,14 +479,17 @@ float HyPrimitive2d::GetLineThickness(int32 iLayerIndex) const
 	for(int iLayerIndex = 0; iLayerIndex < m_LayerList.size(); ++iLayerIndex)
 	{
 		Layer &layerRef = m_LayerList[iLayerIndex];
-
-		vTopColor.x *= layerRef.m_Color.GetRedF();
-		vTopColor.y *= layerRef.m_Color.GetGreenF();
-		vTopColor.z *= layerRef.m_Color.GetBlueF();
-		for(int iVertIndex = 0; iVertIndex < layerRef.m_uiNumVerts; ++iVertIndex)
+		if(layerRef.m_bVisible && layerRef.m_uiNumVerts > 0 && layerRef.m_pVertBuffer != nullptr)
 		{
-			vertexBufferRef.AppendVertexData(&layerRef.m_pVertBuffer[iVertIndex], sizeof(glm::vec2));
-			vertexBufferRef.AppendVertexData(&vTopColor, sizeof(glm::vec4)); // TODO: Cache bot most and top most vertices and use that to mix color between vTopColor and vBotColor for a vertical gradient effect
+			vTopColor.x *= layerRef.m_Color.GetRedF();
+			vTopColor.y *= layerRef.m_Color.GetGreenF();
+			vTopColor.z *= layerRef.m_Color.GetBlueF();
+			for(int iVertIndex = 0; iVertIndex < layerRef.m_uiNumVerts; ++iVertIndex)
+			{
+				glm::vec2 ptVert = layerRef.m_pVertBuffer[iVertIndex] + layerRef.m_vOffset;
+				vertexBufferRef.AppendVertexData(&ptVert, sizeof(glm::vec2));
+				vertexBufferRef.AppendVertexData(&vTopColor, sizeof(glm::vec4)); // TODO: Cache bot most and top most vertices and use that to mix color between vTopColor and vBotColor for a vertical gradient effect
+			}
 		}
 	}
 

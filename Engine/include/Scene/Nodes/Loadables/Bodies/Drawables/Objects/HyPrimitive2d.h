@@ -22,6 +22,8 @@ protected:
 	{
 		glm::vec2 *		m_pVertBuffer;
 		uint32			m_uiNumVerts;
+		glm::vec2		m_vOffset;
+		bool			m_bVisible;
 		HyColor			m_Color;
 
 		HyFixtureType	m_eFixtureType;
@@ -31,6 +33,8 @@ protected:
 		Layer() :
 			m_pVertBuffer(nullptr),
 			m_uiNumVerts(0),
+			m_vOffset(0.0f, 0.0f),
+			m_bVisible(true),
 			m_Color(HyColor::White),
 			m_eFixtureType(HYFIXTURE_Nothing),
 			m_fLineThickness(0.0f),
@@ -38,8 +42,10 @@ protected:
 		{ }
 		Layer(const Layer &copyRef) :
 			m_pVertBuffer(nullptr),
-			m_Color(HyColor::White),
 			m_uiNumVerts(copyRef.m_uiNumVerts),
+			m_vOffset(copyRef.m_vOffset),
+			m_bVisible(true),
+			m_Color(HyColor::White),
 			m_eFixtureType(copyRef.m_eFixtureType),
 			m_fLineThickness(copyRef.m_fLineThickness),
 			m_uiNumSegments(copyRef.m_uiNumSegments)
@@ -53,6 +59,9 @@ protected:
 		Layer(Layer &&donor) noexcept :
 			m_pVertBuffer(donor.m_pVertBuffer),
 			m_uiNumVerts(donor.m_uiNumVerts),
+			m_vOffset(donor.m_vOffset),
+			m_bVisible(donor.m_bVisible),
+			m_Color(donor.m_Color),
 			m_eFixtureType(donor.m_eFixtureType),
 			m_fLineThickness(donor.m_fLineThickness),
 			m_uiNumSegments(donor.m_uiNumSegments)
@@ -105,6 +114,15 @@ public:
 	int32 SetAsBox(int32 iLayerIndex, const HyRect &rect, float fOutlineThickness = 0.0f);			// Represent an oriented box
 
 	int32 SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, float fOutlineThickness = 0.0f);
+
+	glm::vec2 GetLayerOffset(int32 iLayerIndex) const;
+	int32 SetLayerOffset(int32 iLayerIndex, const glm::vec2 &vOffset);
+
+	bool IsLayerVisible(int32 iLayerIndex) const;
+	int32 SetLayerVisible(int32 iLayerIndex, bool bVisible);
+
+	HyColor GetLayerColor(int32 iLayerIndex) const;
+	int32 SetLayerColor(int32 iLayerIndex, HyColor color);
 
 	uint32 GetNumVerts(int32 iLayerIndex) const;
 	const glm::vec2 *GetVerts(int32 iLayerIndex) const;
