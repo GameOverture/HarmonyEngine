@@ -17,7 +17,6 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 {
 	// NOTE: m_PrimOutline does not have a parent because it is projected to window coordinates
 	m_PrimOutline.UseWindowCoordinates();
-	m_PrimOutline.SetWireframe(true);
 	m_PrimOutline.SetDisplayOrder(DISPLAYORDER_TransformCtrl - 1);
 }
 
@@ -45,7 +44,7 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 {
 	if(m_pModel == nullptr)
 	{
-		m_PrimOutline.SetAsNothing();
+		m_PrimOutline.SetAsNothing(0);
 		return;
 	}
 	
@@ -62,7 +61,7 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 		projectedVertList.push_back(ptScreenPos);
 	}
 
-	m_PrimOutline.SetAsLineChain(projectedVertList, chainDataRef.bLoop);
+	m_PrimOutline.SetAsLineChain(0, projectedVertList, chainDataRef.bLoop, 1.0f);
 }
 
 /*virtual*/ void GfxChainView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
@@ -108,7 +107,7 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 			ptEndPoint = grabPointModelList.back().GetPos();
 		pCamera->ProjectToCamera(ptEndPoint, ptEndPoint);
 
-		m_PrimPreviewList[0]->SetAsLineSegment(ptNewVertex, ptEndPoint);
+		m_PrimPreviewList[0]->SetAsLineSegment(0, ptNewVertex, ptEndPoint, 1.0f);
 		break; }
 
 	case EDITMODEACTION_InsertVertex: {
@@ -148,8 +147,8 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 			ptConnectPoint2 = grabPointModelList[iGrabPointIndex - 1].GetPos();
 		pCamera->ProjectToCamera(ptConnectPoint2, ptConnectPoint2);
 
-		m_PrimPreviewList[0]->SetAsLineSegment(ptInsertVertex, ptConnectPoint1);
-		m_PrimPreviewList[1]->SetAsLineSegment(ptInsertVertex, ptConnectPoint2);
+		m_PrimPreviewList[0]->SetAsLineSegment(0, ptInsertVertex, ptConnectPoint1, 1.0f);
+		m_PrimPreviewList[1]->SetAsLineSegment(0, ptInsertVertex, ptConnectPoint2, 1.0f);
 		break; }
 
 	case EDITMODEACTION_HoverGrabPoint: {

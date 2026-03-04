@@ -16,7 +16,17 @@ GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QL
 	m_bSelfIntersecting(false),
 	m_ptSelfIntersection(0.0f, 0.0f)
 {
-	Deserialize(floatList);
+	QJsonObject serializedObj;
+	serializedObj.insert("type", "Line Chain");
+
+	QJsonArray dataArray;
+	for(float f : floatList)
+		dataArray.append(f);
+	serializedObj.insert("data", dataArray);
+
+	serializedObj.insert("outline", 1.0f);
+
+	Deserialize(serializedObj);
 }
 
 /*virtual*/ GfxChainModel::~GfxChainModel()
@@ -31,11 +41,20 @@ GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QL
 	return m_bSelfIntersecting == false;
 }
 
-/*virtual*/ QList<float> GfxChainModel::Serialize() const /*override*/
+/*virtual*/ QJsonObject GfxChainModel::Serialize() const /*override*/
 {
+	QJsonObject serializedObj;
+	serializedObj.insert("type", "Line Chain");
+
 	std::vector<float> serializedData = m_Chain.SerializeSelf();
-	QList<float> returnList(serializedData.begin(), serializedData.end());
-	return returnList;
+	QJsonArray dataArray;
+	for(float f : serializedData)
+		dataArray.append(f);
+	serializedObj.insert("data", dataArray);
+
+	serializedObj.insert("outline", 1.0f);
+
+	return serializedObj;
 }
 
 void GfxChainModel::TransformData(glm::mat4 mtxTransform)
@@ -87,7 +106,7 @@ bool GfxChainModel::IsLoopClosed() const
 	return sUndoText;
 }
 
-/*virtual*/ QList<float> GfxChainModel::GetActionSerialized() const /*override*/
+/*virtual*/ QJsonObject GfxChainModel::GetActionSerialized() const /*override*/
 {
 	switch(m_eCurAction)
 	{
@@ -118,10 +137,10 @@ bool GfxChainModel::IsLoopClosed() const
 		break;
 	}
 
-	return QList<float>();
+	return QJsonObject();
 }
 
-/*virtual*/ QString GfxChainModel::DoDeserialize(const QList<float> &floatList) /*override*/
+/*virtual*/ QString GfxChainModel::DoDeserialize(const QJsonObject &floatList) /*override*/
 {
 	if(floatList.empty())
 	{

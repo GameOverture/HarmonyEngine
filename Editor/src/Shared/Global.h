@@ -87,7 +87,6 @@ enum ItemType
 	// Project items
 	ITEM_Project,
 	ITEM_Prefix,
-	ITEM_Primitive,
 	ITEM_Audio,
 	ITEM_Particles,
 	ITEM_Text,
@@ -106,6 +105,8 @@ enum ItemType
 	ITEM_Source,
 	ITEM_Header,
 	// Entity items
+	ITEM_PrimNode,
+	ITEM_PrimLayer,
 	ITEM_ShapeFixture,
 	ITEM_ChainFixture,
 	ITEM_UiLayout,

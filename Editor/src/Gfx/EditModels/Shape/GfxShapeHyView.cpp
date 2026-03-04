@@ -16,10 +16,9 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 	IGfxEditView(pParent),
 	m_bIsFixture(bIsFixture)
 {
-	// NOTE: m_PrimOutline does not have a parent because it is projected to window coordinates
-	m_PrimOutline.UseWindowCoordinates();
-	m_PrimOutline.SetWireframe(true);
-	m_PrimOutline.SetDisplayOrder(DISPLAYORDER_TransformCtrl - 1);
+	// NOTE: m_Prim does not have a parent because it is projected to window coordinates
+	m_Prim.UseWindowCoordinates();
+	m_Prim.SetDisplayOrder(DISPLAYORDER_TransformCtrl - 1);
 }
 
 /*virtual*/ GfxShapeHyView::~GfxShapeHyView()
@@ -33,36 +32,12 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 	if(m_pModel == nullptr)
 		return;
 
-	HyColor color = m_pModel->GetColor();
-	bool bIsDark = color.IsDark();
-	for(HyPrimitive2d *pPrim : m_PrimList)
-	{
-		pPrim->SetTint(m_pModel->GetColor());
-		if(bIsDark)
-			color = color.Lighten();
-		else
-			color = color.Darken();
-	}
-
-	if(m_bIsFixture)
-	{
-		m_PrimOutline.SetTint(m_pModel->GetColor());
-		m_PrimOutline.SetLineThickness(2.0f);
-		for(HyPrimitive2d *pPrim : m_PrimList)
-			pPrim->alpha.Set(0.25f);
-	}
-	else
-	{
-		m_PrimOutline.SetTint(bIsDark ? HyColor::White : HyColor::Black);
-		m_PrimOutline.SetLineThickness(1.0f);
-
-		for(HyPrimitive2d *pPrim : m_PrimList)
-			pPrim->alpha.Set(1.0f);
-	}
+	m_Prim.SetTint(m_pModel->GetColor());
 }
 
 /*virtual*/ void GfxShapeHyView::ClearPreview() /*override*/
 {
+	m_Prim.Set
 	for(HyPrimitive2d *pPrim : m_PrimPreviewList)
 		delete pPrim;
 	m_PrimPreviewList.clear();

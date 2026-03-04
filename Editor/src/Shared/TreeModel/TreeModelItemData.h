@@ -24,8 +24,6 @@ protected:
 	const QUuid										m_UUID;
 	QString											m_sName;
 
-	bool											m_bIsProjectItem;	// TODO: Remove and use HyGlobal::IsProjectItem
-
 	// Dependant References : int = count
 	QMap<TreeModelItemData *, int>					m_DependantMap;		// What ItemDatas rely on 'this'
 	QMap<TreeModelItemData *, int>					m_DependeeMap;		// What ItemDatas 'this' relies on
@@ -44,6 +42,7 @@ public:
 	bool IsProjectItem() const;
 	bool IsAssetItem() const;
 	bool IsFixtureItem() const;
+	bool IsWidgetItem() const;
 	bool IsLayoutItem() const;
 
 	QList<TreeModelItemData *> GetDependants() const;

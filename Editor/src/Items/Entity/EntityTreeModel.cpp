@@ -126,7 +126,7 @@ QString EntityTreeItemData::GetHyNodeTypeName(bool bIncludeNamespace) const
 {
 	switch(m_eTYPE)
 	{
-	case ITEM_Primitive:		return "HyPrimitive2d";
+	case ITEM_PrimNode:			return "HyPrimitive2d";
 	case ITEM_Audio:			return "HyAudio2d";
 	case ITEM_Text:				return "HyText2d";
 	case ITEM_Spine:			return "HySpine2d";
@@ -344,7 +344,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	const double dRANGE = 16777215.0;
 
 	const bool bIsBody = GetType() != ITEM_Audio;
-	if(IsFixtureItem() == false && IsLayoutItem() == false)
+	if(IsProjectItem() || IsWidgetItem())
 	{
 		if(GetEntType() == ENTTYPE_Root || GetType() == ITEM_Entity)
 		{
@@ -396,17 +396,22 @@ void EntityTreeItemData::InitalizePropertyModel()
 
 	switch(GetType())
 	{
-	case ITEM_Primitive: {
-		m_pEditModel = new GfxPrimitiveModel();
+	case ITEM_PrimNode:
+		break;
+	case ITEM_PrimLayer: {
+		
+		//TreeModelItemData *pPrimitiveItemData = m_EntityModelRef.GetItem().GetProject().FindItemData(m_ReferencedItemUuid);
+		
+		m_pEditModel = new GfxPrimLayerModel();
 
-		m_pPropertiesModel->InsertCategory(0, "Primitive", QVariant(), false, "A visible shape that can be drawn to the screen");
-		m_pPropertiesModel->AppendProperty("Primitive", "Wireframe", PROPERTIESTYPE_bool, Qt::Unchecked, "Check to render only the wireframe of the shape type", PROPERTIESACCESS_ToggleUnchecked);
-		m_pPropertiesModel->AppendProperty("Primitive", "Line Thickness", PROPERTIESTYPE_double, 1.0, "When applicable, how thick to render lines", PROPERTIESACCESS_ToggleUnchecked, 1.0, 100.0, 1.0);
-
-		QStringList sComboBoxList = HyGlobal::GetShapeNameList();
-		sComboBoxList.append("Line Chain");
-		m_pPropertiesModel->AppendProperty("Primitive", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", sComboBoxList);
-		m_pPropertiesModel->AppendProperty("Primitive", "Data", PROPERTIESTYPE_FloatArray, "", "An array of floats representing the primitive's data", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->InsertCategory(0, "Primitive Layer", QVariant(), false, "A collection of shape layers that can be drawn to the screen");
+		QVariant primLayerDataVariant;
+		primLayerDataVariant.setValue<EntityTreeItemData *>(this);
+		m_pPropertiesModel->AppendProperty("Primitive Layer", "Data", PROPERTIESTYPE_ShapeData, QVariant(), "Sets this primitive layer's data", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), primLayerDataVariant);
+		m_pPropertiesModel->AppendProperty("Primitive Layer", "Offset", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "An additional positional offset to apply to this layer", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE, 1.0, "[", "]");
+		m_pPropertiesModel->AppendProperty("Primitive Layer", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this layer gets rendered", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Primitive Layer", "Color", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this layer with", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Primitive Layer", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this layer is", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.05);
 		break; }
 
 	case ITEM_Audio:
@@ -450,13 +455,14 @@ void EntityTreeItemData::InitalizePropertyModel()
 		// No HyTexturedQuad2d specific properties
 		break;
 
-	case ITEM_ShapeFixture:
+	case ITEM_ShapeFixture: {
 		m_pEditModel = new GfxShapeModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		// NOTE: This should be the first categories added for fixtures
 		m_pPropertiesModel->InsertCategory(-1, "Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
-		m_pPropertiesModel->AppendProperty("Shape", "Type", PROPERTIESTYPE_ComboBoxString, HyGlobal::ShapeName(SHAPE_None), "The type of shape this is", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetShapeNameList());
-		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_FloatArray, "", "An array of floats representing the shape's data", PROPERTIESACCESS_ToggleUnchecked);
+		QVariant shapeDataVariant;
+		shapeDataVariant.setValue<EntityTreeItemData *>(this);
+		m_pPropertiesModel->AppendProperty("Shape", "Data", PROPERTIESTYPE_ShapeData, QVariant(), "Sets the shape's type and data", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), shapeDataVariant);
 		m_pPropertiesModel->InsertCategory(-1, "Fixture", QVariant(), false, "Become a fixture used in physics simulations and collision");
 		m_pPropertiesModel->AppendProperty("Fixture", "Density", PROPERTIESTYPE_double, 0.0, "Usually in kg / m^2. A shape should have a non-zero density when the entity's physics is dynamic", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
@@ -465,21 +471,23 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Category Mask", PROPERTIESTYPE_int, 0x0001, "The collision category bits for this shape. Normally you would just set one bit", PROPERTIESACCESS_ToggleUnchecked, 0, 0xFFFF, 1, QString(), QString(), QVariant());
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Collision Mask", PROPERTIESTYPE_int, 0xFFFF, "The collision mask bits. This states the categories that this shape would accept for collision", PROPERTIESACCESS_ToggleUnchecked, 0, 0xFFFF, 1, QString(), QString(), QVariant());
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", PROPERTIESACCESS_ToggleUnchecked, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
-		break;
+		break; }
 
-	case ITEM_ChainFixture:
+	case ITEM_ChainFixture: {
 		m_pEditModel = new GfxChainModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		// NOTE: This should be the first categories added for fixtures
 		m_pPropertiesModel->InsertCategory(-1, "Chain", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
-		m_pPropertiesModel->AppendProperty("Chain", "Data", PROPERTIESTYPE_FloatArray, "", "An array of floats representing the chain's data", PROPERTIESACCESS_ToggleUnchecked);
+		QVariant chainDataVariant;
+		chainDataVariant.setValue<EntityTreeItemData *>(this);
+		m_pPropertiesModel->AppendProperty("Chain", "Data", PROPERTIESTYPE_ShapeData, QVariant(), "Representing the chain's data", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), chainDataVariant);
 		m_pPropertiesModel->InsertCategory(-1, "Fixture", QVariant(), false, "Become a fixture used in physics simulations and collision");
 		m_pPropertiesModel->AppendProperty("Fixture", "Friction", PROPERTIESTYPE_double, 0.2, "The friction coefficient, usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Restitution", PROPERTIESTYPE_double, 0.0, "The restitution (elasticity) usually in the range [0,1]", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.001, QString(), QString(), 5);
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Category Mask", PROPERTIESTYPE_int, 0x0001, "The collision category bits for this shape. Normally you would just set one bit", PROPERTIESACCESS_ToggleUnchecked, 0, 0xFFFF, 1, QString(), QString(), QVariant());
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Collision Mask", PROPERTIESTYPE_int, 0xFFFF, "The collision mask bits. This states the categories that this shape would accept for collision", PROPERTIESACCESS_ToggleUnchecked, 0, 0xFFFF, 1, QString(), QString(), QVariant());
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", PROPERTIESACCESS_ToggleUnchecked, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
-		break;
+		break; }
 
 	case ITEM_UiLayout:
 		m_pPropertiesModel->InsertCategory(-1, "Layout", QVariant(), false, "Holds UI widget entities and arranges them programatically");
@@ -637,7 +645,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 	}
 
 	// Create root tree item data for each base class type.
-	// Then use "fusedItemList" to init each base class's fused tree item data, or create a new fused item if it doesn't exist below
+	// Then use "fusedItemList" to init each base class's fused tree item data
 	QJsonArray fusedItemArray = fileMetaObj["fusedItemList"].toArray();
 	for(int i = 0; i < NUM_ENTBASECLASSTYPES; ++i)
 	{
@@ -652,14 +660,14 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 	
 		case ENTBASECLASS_HyActor2d:
 			if(fusedItemArray.empty() || i <= fusedItemArray.size())
-				m_BaseClassInfoList[i].m_pFusedTreeItemData = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sEntityCodeName, ITEM_ShapeFixture, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
+				m_BaseClassInfoList[i].m_pFusedTreeItemData = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "m_ActorFixture", ITEM_ShapeFixture, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
 			else
 				m_BaseClassInfoList[i].m_pFusedTreeItemData = new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
 			break;
 
 		case ENTBASECLASS_HyGui:
 			if(fusedItemArray.empty() || i <= fusedItemArray.size())
-				m_BaseClassInfoList[i].m_pFusedTreeItemData = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sEntityCodeName, ITEM_UiLayout, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
+				m_BaseClassInfoList[i].m_pFusedTreeItemData = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "m_RootLayout", ITEM_UiLayout, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
 			else
 				m_BaseClassInfoList[i].m_pFusedTreeItemData = new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
 			break;
@@ -752,6 +760,11 @@ QList<EntityTreeItemData *> EntityTreeModel::GetFusedItemData() const
 		fusedItemList.push_back(m_BaseClassInfoList[i].m_pFusedTreeItemData);
 	
 	return fusedItemList;
+}
+
+QJsonArray EntityTreeModel::GetGuiLayoutArray() const
+{
+	return QJsonArray();
 }
 
 TreeModelItem *EntityTreeModel::GetArrayFolderTreeItem(EntityTreeItemData *pArrayItem) const
@@ -907,6 +920,65 @@ EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
 	return nullptr;
 }
 
+int EntityTreeModel::GetPrimLayerIndex(EntityTreeItemData *pPrimLayer, EntityTreeItemData *&pPrimNodeOut) const
+{
+	if(pPrimLayer == nullptr || pPrimLayer->GetType() != ITEM_PrimLayer || pPrimLayer->GetReferencedItemUuid().isNull())
+	{
+		HyGuiLog("EntityTreeModel::GetPrimLayerIndex was passed an invalid PrimLayer item", LOGTYPE_Error);
+		return -1;
+	}
+
+	// Find the PrimNode that is the parent of the passed in pPrimLayer
+	QUuid primNodeUuid = pPrimLayer->GetReferencedItemUuid();
+	pPrimNodeOut = nullptr;
+
+	TreeModelItem *pThisEntity = GetRootTreeItem();
+	for(int i = 0; i < pThisEntity->GetNumChildren(); ++i)
+	{
+		EntityTreeItemData *pCurItem = pThisEntity->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		if(pCurItem == nullptr)
+			continue;
+		if(pCurItem->GetEntType() == ENTTYPE_ArrayFolder)
+		{
+			TreeModelItem *pArrayFolder = pThisEntity->GetChild(i);
+			for(int j = 0; j < pArrayFolder->GetNumChildren(); ++j)
+			{
+				EntityTreeItemData *pArrayItem = pArrayFolder->GetChild(j)->data(0).value<EntityTreeItemData *>();
+				if(pArrayItem->GetReferencedItemUuid() == primNodeUuid)
+				{
+					pPrimNodeOut = pArrayItem;
+					break;
+				}
+			}
+
+		}
+		if(pCurItem->GetReferencedItemUuid() == primNodeUuid)
+			pPrimNodeOut = pCurItem;
+
+		if(pPrimNodeOut)
+			break;
+	}
+
+	if(pPrimNodeOut == nullptr)
+	{
+		HyGuiLog("EntityTreeModel::GetPrimLayerIndex could not find parent PrimNode for the passed in PrimLayer", LOGTYPE_Error);
+		return -1;
+	}
+
+	// Look through the PrimNode's children to find the index of the passed in PrimLayer
+	TreeModelItem *pPrimNodeTreeItem = GetItem(FindIndex<EntityTreeItemData *>(pPrimNodeOut, 0));
+	for(int i = 0; i < pPrimNodeTreeItem->GetNumChildren(); ++i)
+	{
+		EntityTreeItemData *pCurItem = pPrimNodeTreeItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		if(pCurItem == nullptr)
+			continue;
+		if(pCurItem == pPrimLayer)
+			return i;
+	}
+
+	return -1;
+}
+
 bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const
 {
 	if(pItem == nullptr)
@@ -1000,7 +1072,10 @@ void EntityTreeModel::Cmd_ApplyRootBaseClass()
 	for(int i = 0; i < NUM_ENTBASECLASSTYPES; ++i)
 		RemoveTreeItem(m_BaseClassInfoList[i].m_pFusedTreeItemData);
 	if(m_BaseClassInfoList[m_ModelRef.GetBaseClassType()].m_pFusedTreeItemData)
-		InsertTreeItem(m_ModelRef.GetItem().GetProject(), m_BaseClassInfoList[m_ModelRef.GetBaseClassType()].m_pFusedTreeItemData, GetRootTreeItem(), 0);
+	{
+		TreeModelItem *pParentTreeItem = (m_BaseClassInfoList[m_ModelRef.GetBaseClassType()].m_pFusedTreeItemData->IsFixtureItem()) ? GetFixtureFolderTreeItem() : GetRootTreeItem();
+		InsertTreeItem(m_ModelRef.GetItem().GetProject(), m_BaseClassInfoList[m_ModelRef.GetBaseClassType()].m_pFusedTreeItemData, pParentTreeItem, 0);
+	}
 }
 
 EntityTreeItemData *EntityTreeModel::Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow /*= -1*/)
@@ -1128,13 +1203,27 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocWidgetTreeItem(ItemType eWidgetTyp
 	return pNewItem;
 }
 
-EntityTreeItemData *EntityTreeModel::Cmd_AllocPrimitiveTreeItem(QString sCodeNamePrefix, int iRow /*= -1*/)
+EntityTreeItemData *EntityTreeModel::Cmd_AllocPrimNodeTreeItem(QString sCodeNamePrefix, int iRow /*= -1*/)
 {
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + "Primitive");
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, ITEM_Primitive, ENTTYPE_Item, QUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, ITEM_PrimNode, ENTTYPE_Item, QUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
 
+	return pNewItem;
+}
+
+EntityTreeItemData *EntityTreeModel::Cmd_AllocPrimLayerTreeItem(EntityTreeItemData *pPrimNode, int iRow /*= -1*/)
+{
+	if(pPrimNode->GetType() != ITEM_PrimNode)
+	{
+		HyGuiLog("EntityTreeModel::Cmd_AllocPrimLayerTreeItem was passed a non-prim node item", LOGTYPE_Error);
+		return nullptr;
+	}
+
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "Layer", ITEM_PrimLayer, ENTTYPE_SubItem, pPrimNode->GetThisUuid(), QUuid::createUuid());
+	TreeModelItem *pParentTreeItem = GetItem(FindIndex<EntityTreeItemData *>(pPrimNode, 0));
+	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 	return pNewItem;
 }
 
@@ -1270,7 +1359,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 		else if(pItem->GetEntType() == ENTTYPE_ArrayFolder)
 			return HyGlobal::ItemIcon(pItem->GetType(), SUBICON_Open);
 
-		if(pItem->GetType() == ITEM_Primitive || pItem->GetType() == ITEM_ShapeFixture)
+		if(pItem->GetType() == ITEM_PrimLayer || pItem->GetType() == ITEM_ShapeFixture)
 		{
 			int iStateIndex = 0;
 			if(m_ModelRef.GetItem().GetWidget())
@@ -1278,9 +1367,9 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 			const EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_ModelRef.GetStateData(iStateIndex))->GetDopeSheetScene();
 
 			QIcon icon;
-			QString sIconUrl = ":/icons16x16/shapes/" % QString(pItem->GetType() == ITEM_Primitive ? "primitive_" : "shapes_");
+			QString sIconUrl = ":/icons16x16/shapes/" % QString(pItem->GetType() == ITEM_PrimLayer ? "primitive_" : "shapes_");
 
-			QString sShapeType = dopeSheetSceneRef.BasicExtrapolateKeyFrameProperty(pItem, dopeSheetSceneRef.GetCurrentFrame(), pItem->GetType() == ITEM_Primitive ? "Primitive" : "Shape", "Type").toString();
+			QString sShapeType = dopeSheetSceneRef.BasicExtrapolateKeyFrameProperty(pItem, dopeSheetSceneRef.GetCurrentFrame(), pItem->GetType() == ITEM_PrimLayer ? "Primitive Layer" : "Shape", "Type").toString();
 			switch(HyGlobal::GetShapeFromString(sShapeType))
 			{
 			case SHAPE_None:		sIconUrl += "icon.png"; break;

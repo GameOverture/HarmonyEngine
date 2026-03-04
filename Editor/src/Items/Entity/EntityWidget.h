@@ -88,6 +88,13 @@ private Q_SLOTS:
 	void on_actionAddSlider_triggered();
 	
 	void on_actionAddPrimitive_triggered();
+	void on_actionAddPrimBox_triggered();
+	void on_actionAddPrimCircle_triggered();
+	void on_actionAddPrimLineSegment_triggered();
+	void on_actionAddPrimPolygon_triggered();
+	void on_actionAddPrimCapsule_triggered();
+	void on_actionAddPrimLineChain_triggered();
+
 	void on_actionAddShape_triggered();
 	void on_actionAddChain_triggered();
 

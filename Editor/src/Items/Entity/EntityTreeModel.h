@@ -199,6 +199,7 @@ enum EntityItemType
 	ENTTYPE_FixtureFolder,
 	ENTTYPE_FusedItem,
 	ENTTYPE_Item,
+	ENTTYPE_SubItem,
 	ENTTYPE_ArrayFolder,
 	ENTTYPE_ArrayItem,
 };
@@ -281,6 +282,11 @@ class EntityTreeModel : public ITreeModel
 	{
 		EntityTreeItemData *							m_pRootTreeItemData;	// The root item data itself for each available base class to choose from
 		EntityTreeItemData *							m_pFusedTreeItemData;	// Each base class may have a special "fused" item that always is present in the tree
+
+		BaseClassInfo() :
+			m_pRootTreeItemData(nullptr),
+			m_pFusedTreeItemData(nullptr)
+		{ }
 	};
 	BaseClassInfo										m_BaseClassInfoList[NUM_ENTBASECLASSTYPES];
 
@@ -304,6 +310,7 @@ public:
 	EntityTreeItemData *GetFixtureFolderTreeItemData() const;
 
 	QList<EntityTreeItemData *> GetFusedItemData() const;
+	QJsonArray GetGuiLayoutArray() const;
 
 	TreeModelItem *GetArrayFolderTreeItem(EntityTreeItemData *pArrayItem) const;
 	EntityTreeItemData *GetArrayFolderTreeItemData(EntityTreeItemData *pArrayItem) const;
@@ -311,6 +318,8 @@ public:
 	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const;
 	void GetSelectedTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const;
 	EntityTreeItemData *FindTreeItemData(QUuid uuid) const;
+
+	int GetPrimLayerIndex(EntityTreeItemData *pPrimLayer, EntityTreeItemData *&pPrimNodeOut) const;
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 
@@ -320,7 +329,8 @@ private: // These functions should only be called by EntityModel's Cmd_ function
 	EntityTreeItemData *Cmd_AllocAssetTreeItem(IAssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocExistingTreeItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow);
 	EntityTreeItemData *Cmd_AllocWidgetTreeItem(ItemType eWidgetType, QString sCodeNamePrefix, int iRow = -1);
-	EntityTreeItemData *Cmd_AllocPrimitiveTreeItem(QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocPrimNodeTreeItem(QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocPrimLayerTreeItem(EntityTreeItemData *pPrimNode, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocFixtureTreeItem(bool bIsShape, QString sCodeNamePrefix, int iRow = -1);
 	bool Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow);
 	int32 Cmd_PopChild(EntityTreeItemData *pItem);

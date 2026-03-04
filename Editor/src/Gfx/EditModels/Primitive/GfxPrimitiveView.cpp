@@ -27,7 +27,7 @@ GfxPrimitiveView::GfxPrimitiveView(HyEntity2d *pParent /*= nullptr*/) :
 	if(m_pModel == nullptr)
 		return;
 
-	if(static_cast<GfxPrimitiveModel *>(m_pModel)->IsShapeModel())
+	if(static_cast<GfxPrimLayerModel *>(m_pModel)->IsShapeModel())
 		m_ShapeView.SyncColor();
 	else
 		m_ChainView.SyncColor();
@@ -41,7 +41,7 @@ GfxPrimitiveView::GfxPrimitiveView(HyEntity2d *pParent /*= nullptr*/) :
 
 /*virtual*/ void GfxPrimitiveView::OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) /*override*/
 {
-	if(static_cast<GfxPrimitiveModel *>(m_pModel)->IsShapeModel())
+	if(static_cast<GfxPrimLayerModel *>(m_pModel)->IsShapeModel())
 		m_ShapeView.OnSyncModel(eEditModeState, eResult);
 	else
 		m_ChainView.OnSyncModel(eEditModeState, eResult);
@@ -49,7 +49,7 @@ GfxPrimitiveView::GfxPrimitiveView(HyEntity2d *pParent /*= nullptr*/) :
 
 /*virtual*/ void GfxPrimitiveView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
 {
-	if(static_cast<GfxPrimitiveModel *>(m_pModel)->IsShapeModel())
+	if(static_cast<GfxPrimLayerModel *>(m_pModel)->IsShapeModel())
 		m_ShapeView.OnSyncPreview(eEditModeState, eResult, iGrabPointIndex, vDragDelta);
 	else
 		m_ChainView.OnSyncPreview(eEditModeState, eResult, iGrabPointIndex, vDragDelta);

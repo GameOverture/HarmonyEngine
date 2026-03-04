@@ -119,7 +119,8 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 				static_cast<HySprite2d *>(m_pChild)->SetAllBoundsIncludeAlphaCrop(true);
 				break;
 
-			case ITEM_Primitive:
+			case ITEM_PrimNode:
+			case ITEM_PrimLayer:
 			case ITEM_Audio:
 			case ITEM_SoundClip:
 			default:
@@ -169,7 +170,11 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 			break;
 		};
 	}
-	else if(m_pEntityTreeItemData->GetType() == ITEM_Primitive)
+	else if(m_pEntityTreeItemData->GetType() == ITEM_PrimNode)
+	{
+		m_pChild = new HyPrimitive2d(pParent);
+	}
+	else if(m_pEntityTreeItemData->GetType() == ITEM_PrimLayer)
 	{
 		m_pEditView = new GfxPrimitiveView();
 		
@@ -294,15 +299,6 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 		if(sPropertyName == "Mouse Input")
 			return QJsonValue(static_cast<HyEntity2d *>(pThisHyNode)->IsMouseInputEnabled());
 	}
-	//else if(sCategory == "Primitive")
-	//{
-	//}
-	//else if(sCategory == "Shape")
-	//{
-	//}
-	//else if(sCategory == "Fixture")
-	//{
-	//}
 	else if(sCategory == "Sprite")
 	{
 		if(sPropertyName == "Frame")
@@ -333,26 +329,51 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 		if(sPropertyName == "Text Indent")
 			return QJsonValue(static_cast<int>(static_cast<HyText2d *>(pThisHyNode)->GetTextIndent()));
 	}
-	else if(sCategory == "Primitive" || sCategory == "Shape" || sCategory == "Chain")
+	else if(sCategory == "Primitive Layer" || sCategory == "Shape" || sCategory == "Chain")
 	{
 		IGfxEditModel *pModel = static_cast<IGfxEditView *>(pThisHyNode)->GetModel();
 
-		if(sPropertyName == "Type")
-		{
-			if(pThisHyNode->GetType() == ITEM_Primitive)
-				return QJsonValue(static_cast<GfxPrimitiveModel *>(pModel)->GetPrimType());
-			else if(pThisHyNode->GetType() == ITEM_ShapeFixture)
-				return QJsonValue(HyGlobal::ShapeName(static_cast<GfxShapeModel *>(pModel)->GetShapeType()));
-			else
-				HyGuiLog("EntityDrawItem::ExtractPropertyData - unhandled Type property for Fixture", LOGTYPE_Error);
-		}
+		//if(sPropertyName == "Type")
+		//{
+		//	if(pThisHyNode->GetType() == ITEM_Primitive)
+		//		return QJsonValue(static_cast<GfxPrimLayerModel *>(pModel)->GetPrimType());
+		//	else if(pThisHyNode->GetType() == ITEM_ShapeFixture)
+		//		return QJsonValue(HyGlobal::ShapeName(static_cast<GfxShapeModel *>(pModel)->GetShapeType()));
+		//	else
+		//		HyGuiLog("EntityDrawItem::ExtractPropertyData - unhandled Type property for Fixture", LOGTYPE_Error);
+		//}
 		if(sPropertyName == "Data")
 		{
-			QJsonArray dataArray;
-			QList<float> floatList = m_pEntityTreeItemData->GetEditModel()->Serialize();
-			for(float fVal : floatList)
-				dataArray.append(QJsonValue(static_cast<double>(fVal)));
-			return dataArray;
+			return m_pEntityTreeItemData->GetEditModel()->Serialize();
+		}
+		if(sPropertyName == "Offset" || sPropertyName == "Visible" || sPropertyName == "Color" || sPropertyName == "Alpha")
+		{
+			EntityTreeItemData *pPrimNodeItemData = nullptr;
+			int iLayerIndex = m_pEntityTreeItemData->GetEntityModel().GetTreeModel().GetPrimLayerIndex(m_pEntityTreeItemData, pPrimNodeItemData);
+
+			EntityDrawItem *pPrimNode = nullptr;
+			QList<IDrawExItem *> drawItemList = static_cast<EntityDraw *>(m_pEntityTreeItemData->GetEntityModel().GetItem().GetDraw())->GetDrawItemList();
+			for(IDrawExItem *pDrawItem : drawItemList)
+			{
+				EntityDrawItem *pEntDrawItem = static_cast<EntityDrawItem *>(pDrawItem);
+				if(pEntDrawItem->GetEntityTreeItemData() == pPrimNodeItemData)
+				{
+					if(sPropertyName == "Offset")
+					{
+						glm::vec2 ptOffset = static_cast<HyPrimitive2d *>(pEntDrawItem->GetHyNode())->GetLayerOffset(iLayerIndex);
+						return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(ptOffset.x)), QJsonValue(static_cast<double>(ptOffset.y)) }));
+					}
+					if(sPropertyName == "Visible")
+						return QJsonValue(static_cast<HyPrimitive2d *>(pEntDrawItem->GetHyNode())->IsLayerVisible(iLayerIndex));
+					if(sPropertyName == "Color")
+					{
+						HyColor color = static_cast<HyPrimitive2d *>(pEntDrawItem->GetHyNode())->GetLayerColor(iLayerIndex);
+						return QJsonValue(QJsonArray({ QJsonValue(color.GetRedF()), QJsonValue(color.GetGreenF()), QJsonValue(color.GetBlueF()) }));
+					}
+					if(sPropertyName == "Alpha")
+						return QJsonValue(static_cast<double>(static_cast<HyPrimitive2d *>(pEntDrawItem->GetHyNode())->GetLayerAlpha(iLayerIndex)));
+				}
+			}
 		}
 	}
 	else if(sCategory == "Widget")
@@ -557,8 +578,12 @@ void SubEntity::CtorInitJsonObj(QMap<QUuid, IHyLoadable2d *> &uuidChildMapRef, c
 	IHyLoadable2d *pNewChild = nullptr;
 	switch(eItemType)
 	{
-	case ITEM_Primitive:
+	case ITEM_PrimNode:
 		pNewChild = new HyPrimitive2d(this);
+		break;
+
+	case ITEM_PrimLayer:
+		HyGuiLog("SubEntity ctor - PrimLayer not implemented", LOGTYPE_Error);
 		break;
 
 	case ITEM_Audio:
@@ -810,7 +835,7 @@ void ExtrapolateProperties(Project &projectRef,
 		const QJsonObject &propsObj = keyFrameMapRef[iFrame];
 
 		// Parse all and only the potential categories of the 'eItemType' type, and set the values to 'pHyNode'
-		if(HyGlobal::IsItemType_Fixture(eItemType) == false)
+		if(HyGlobal::IsItemType_Fixture(eItemType) == false && eItemType != ITEM_PrimLayer)
 		{
 			if(propsObj.contains("Common"))
 			{
@@ -920,28 +945,15 @@ void ExtrapolateProperties(Project &projectRef,
 		{
 		case ITEM_None:		// 'ITEM_None' is passed for the main entity root node
 		case ITEM_Entity:	// 'ITEM_Entity' is passed when this is a sub-entity (NOTE: sub-entity timeline events are handled above)
+		case ITEM_PrimNode:
 			break;
 
-		case ITEM_Primitive:
-			if(propsObj.contains("Primitive"))
+		case ITEM_PrimLayer:
+			if(propsObj.contains("Primitive Layer"))
 			{
-				QJsonObject primitiveObj = propsObj["Primitive"].toObject();
-				if(primitiveObj.contains("Wireframe"))
-					static_cast<HyPrimitive2d *>(pThisHyNode)->SetWireframe(primitiveObj["Wireframe"].toBool());
-				if(primitiveObj.contains("Line Thickness"))
-					static_cast<HyPrimitive2d *>(pThisHyNode)->SetLineThickness(primitiveObj["Line Thickness"].toDouble());
-
-				QList<float> floatList;
+				QJsonObject primitiveObj = propsObj["Primitive Layer"].toObject();
 				if(primitiveObj.contains("Data"))
-				{
-					QJsonArray floatArray = primitiveObj["Data"].toArray();
-					for(QJsonValue val : floatArray)
-						floatList.push_back(static_cast<float>(val.toDouble()));
-				}
-				if(primitiveObj.contains("Type"))
-					static_cast<GfxPrimitiveModel *>(pEditModel)->SetPrimType(primitiveObj["Type"].toString(), floatList);
-				else if(floatList.empty() == false)
-					pEditModel->Deserialize(floatList);
+					pEditModel->Deserialize(primitiveObj["Data"].toObject());
 			}
 			pEditModel->SetColor(HyColor(static_cast<IHyBody2d *>(pThisHyNode)->topColor.Get())); // Always try to sync colors
 			break;
@@ -953,15 +965,7 @@ void ExtrapolateProperties(Project &projectRef,
 
 				QList<float> floatList;
 				if(shapeObj.contains("Data"))
-				{
-					QJsonArray floatArray = shapeObj["Data"].toArray();
-					for(QJsonValue val : floatArray)
-						floatList.push_back(static_cast<float>(val.toDouble()));
-				}
-				if(shapeObj.contains("Type"))
-					static_cast<GfxShapeModel *>(pEditModel)->SetShapeType(HyGlobal::GetShapeFromString(shapeObj["Type"].toString()), floatList);
-				else if(floatList.empty() == false)
-					pEditModel->Deserialize(floatList);
+					pEditModel->Deserialize(shapeObj["Data"].toObject());
 			}
 			break;
 
@@ -970,13 +974,7 @@ void ExtrapolateProperties(Project &projectRef,
 			{
 				QJsonObject chainObj = propsObj["Chain"].toObject();
 				if(chainObj.contains("Data"))
-				{
-					QJsonArray floatArray = chainObj["Data"].toArray();
-					QList<float> floatList;
-					for(QJsonValue val : floatArray)
-						floatList.push_back(static_cast<float>(val.toDouble()));
-					pEditModel->Deserialize(floatList);
-				}
+					pEditModel->Deserialize(chainObj["Data"].toObject());
 			}
 			break;
 

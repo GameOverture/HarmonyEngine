@@ -244,8 +244,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			int iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
 			int iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
 			QString sCategoryName;
-			if(pTreeItemData->GetType() == ITEM_Primitive)
-				sCategoryName = "Primitive";
+			if(pTreeItemData->GetType() == ITEM_PrimLayer)
+				sCategoryName = "Primitive Layer";
 			else
 			{
 				switch(pTreeItemData->GetEditModel()->GetModelType())
@@ -412,7 +412,7 @@ void EntityDraw::SetExtrapolatedProperties()
 			// FlushHyNode (and clearing edit model) makes properties that aren't keyed on the timeline until later show the proper default values
 			pEntDrawItem->FlushHyNode(&m_RootEntity);
 			if(pEntDrawItem->GetEntityTreeItemData()->GetEditModel())
-				pEntDrawItem->GetEntityTreeItemData()->GetEditModel()->Deserialize(QList<float>());
+				pEntDrawItem->GetEntityTreeItemData()->GetEditModel()->Deserialize(QJsonObject());
 
 			ExtrapolateProperties(m_pProjItem->GetProject(),
 									pEntDrawItem->GetHyNode(),

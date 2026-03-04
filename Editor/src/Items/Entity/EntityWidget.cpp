@@ -44,7 +44,15 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ui->cmbBaseClass->setCurrentIndex(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetBaseClassType());
 
 	ui->btnAddChild->setDefaultAction(ui->actionAddChildren);
+	
 	ui->btnAddPrimitive->setDefaultAction(ui->actionAddPrimitive);
+	ui->btnAddPrimBox->setDefaultAction(ui->actionAddPrimBox);
+	ui->btnAddPrimCircle->setDefaultAction(ui->actionAddPrimCircle);
+	ui->btnAddPrimLineSegment->setDefaultAction(ui->actionAddPrimLineSegment);
+	ui->btnAddPrimPolygon->setDefaultAction(ui->actionAddPrimPolygon);
+	ui->btnAddPrimCapsule->setDefaultAction(ui->actionAddPrimCapsule);
+	ui->btnAddPrimLineChain->setDefaultAction(ui->actionAddPrimLineChain);
+
 	ui->btnAddFixtureShape->setDefaultAction(ui->actionAddShape);
 	ui->btnAddFixtureChain->setDefaultAction(ui->actionAddChain);
 
@@ -251,17 +259,17 @@ EntityWidget::~EntityWidget()
 		ui->actionOrderChildrenUp->setEnabled(bSelectedHaveSameParent);
 		ui->actionOrderChildrenDown->setEnabled(bSelectedHaveSameParent);
 
-		if(bRootOrBvFolder == false && selectedIndices.size() == 1 && (eType == ITEM_Primitive || HyGlobal::IsItemType_Fixture(eType))) // NOTE: Chain is supported here
+		if(bRootOrBvFolder == false && selectedIndices.size() == 1 && (eType == ITEM_PrimLayer || HyGlobal::IsItemType_Fixture(eType))) // NOTE: Chain is supported here
 		{
 			ui->actionConvertShape->setEnabled(true);
-			if(eType == ITEM_Primitive)
+			if(eType == ITEM_PrimLayer)
 			{
 				ui->actionConvertShape->setIcon(HyGlobal::ItemIcon(ITEM_ShapeFixture, SUBICON_None));
 				ui->actionConvertShape->setText("Convert Primitive to Fixture");
 			}
 			else
 			{
-				ui->actionConvertShape->setIcon(HyGlobal::ItemIcon(ITEM_Primitive, SUBICON_None));
+				ui->actionConvertShape->setIcon(HyGlobal::ItemIcon(ITEM_PrimNode, SUBICON_None));
 				ui->actionConvertShape->setText("Convert Fixture to Primitive");
 			}
 		}
@@ -793,6 +801,30 @@ void EntityWidget::on_actionAddPrimitive_triggered()
 {
 	QUndoCommand *pCmd = new EntityUndoCmd_AddPrimitive(m_ItemRef);
 	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddPrimBox_triggered()
+{
+}
+
+void EntityWidget::on_actionAddPrimCircle_triggered()
+{
+}
+
+void EntityWidget::on_actionAddPrimLineSegment_triggered()
+{
+}
+
+void EntityWidget::on_actionAddPrimPolygon_triggered()
+{
+}
+
+void EntityWidget::on_actionAddPrimCapsule_triggered()
+{
+}
+
+void EntityWidget::on_actionAddPrimLineChain_triggered()
+{
 }
 
 void EntityWidget::on_actionAddShape_triggered()

@@ -49,6 +49,7 @@ enum PropertiesType
 	PROPERTIESTYPE_Slider,
 	PROPERTIESTYPE_Color,			// NOTE: Internally uses QVariant like `PROPERTIESTYPE_ivec3`
 	PROPERTIESTYPE_SpriteFrames,	// delegateBuilder [QUuid] = The ProjectItemData's UUID that contains the sprite frames
+	PROPERTIESTYPE_ShapeData,		// QJsonObject { "type": "Circle"/"Polygon"/"Chain", "data": QJsonArray of floats, "outline": 0.0 }
 	PROPERTIESTYPE_UiPanel,			// QJsonObject
 };
 

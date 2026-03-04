@@ -77,6 +77,20 @@
            </widget>
           </item>
           <item>
+           <widget class="QToolButton" name="toolButton_7">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="toolButton_8">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="Line" name="line_4">
             <property name="frameShadow">
              <enum>QFrame::Shadow::Plain</enum>
@@ -97,42 +111,42 @@
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButton">
+           <widget class="QToolButton" name="btnAddPrimBox">
             <property name="text">
              <string>...</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButton_2">
+           <widget class="QToolButton" name="btnAddPrimCircle">
             <property name="text">
              <string>...</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButton_3">
+           <widget class="QToolButton" name="btnAddPrimLineSegment">
             <property name="text">
              <string>...</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButton_4">
+           <widget class="QToolButton" name="btnAddPrimPolygon">
             <property name="text">
              <string>...</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButton_5">
+           <widget class="QToolButton" name="btnAddPrimCapsule">
             <property name="text">
              <string>...</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QToolButton" name="toolButton_6">
+           <widget class="QToolButton" name="btnAddPrimLineChain">
             <property name="text">
              <string>...</string>
             </property>
@@ -839,6 +853,96 @@
    </property>
    <property name="toolTip">
     <string>Add a Spacer widget into a Layout that can help align other widgets in the layout</string>
+   </property>
+  </action>
+  <action name="actionAddPrimBox">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/primitive_box.png</normaloff>:/icons16x16/shapes/primitive_box.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Primitive Box Layer</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new layer to the selected primitive, as a box</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionAddPrimCircle">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/primitive_circle.png</normaloff>:/icons16x16/shapes/primitive_circle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Primitive Circle Layer</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new layer to the selected primitive, as a circle</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionAddPrimLineSegment">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/primitive_lineSeg.png</normaloff>:/icons16x16/shapes/primitive_lineSeg.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Primitive Line Segment Layer</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new layer to the selected primitive, as a line segment</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionAddPrimPolygon">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/primitive_polygon.png</normaloff>:/icons16x16/shapes/primitive_polygon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Primitive Polygon Layer</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new layer to the selected primitive, as a polygon</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionAddPrimCapsule">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/primitive_capsule.png</normaloff>:/icons16x16/shapes/primitive_capsule.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Primitive Capsule Layer</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new layer to the selected primitive, as a capsule</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionAddPrimLineChain">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons16x16/shapes/primitive_lineChain.png</normaloff>:/icons16x16/shapes/primitive_lineChain.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Primitive Line Chain Layer</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new layer to the selected primitive, as a line chain</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>

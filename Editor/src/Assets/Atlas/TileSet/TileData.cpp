@@ -159,11 +159,12 @@ QJsonObject TileData::GetTileData() const
 		QJsonObject collisionObj;
 		collisionObj["CollisionLayerUUID"] = it.key().toString(QUuid::WithoutBraces);
 
-		QJsonArray floatArray;
-		QList<float> floatList = it.value()->Serialize();
-		for(int j = 0; j < floatList.size(); ++j)
-			floatArray.push_back(floatList[j]);
-		collisionObj["Data"] = floatArray;
+		//QJsonArray floatArray;
+		//QList<float> floatList = it.value()->Serialize();
+		//for(int j = 0; j < floatList.size(); ++j)
+		//	floatArray.push_back(floatList[j]);
+		QJsonObject serialziedObj = it.value()->Serialize();
+		collisionObj["Data"] = serialziedObj["data"].toArray();
 
 		collisionArray.push_back(collisionObj);
 	}

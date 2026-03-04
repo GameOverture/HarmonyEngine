@@ -20,11 +20,9 @@ GfxTransformCtrl::GfxTransformCtrl(HyEntity2d *pParent) :
 	m_fCachedRotation(0.0f)
 {
 	m_BoundingVolume.SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_TransformBoundingVolume));
-	m_BoundingVolume.SetWireframe(true);
 	ChildAppend(m_BoundingVolume);
 
 	m_ExtrudeSegment.SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_TransformBoundingVolume));
-	m_ExtrudeSegment.SetWireframe(true);
 	ChildAppend(m_ExtrudeSegment);
 
 	for(uint i = 0; i < GRAB_Rotate; ++i)
@@ -52,7 +50,7 @@ GfxTransformCtrl::GfxTransformCtrl(HyEntity2d *pParent) :
 
 bool GfxTransformCtrl::IsValid() const
 {
-	return m_BoundingVolume.GetShapeType() != HYFIXTURE_Nothing;
+	return m_BoundingVolume.GetLayerType(0) != HYFIXTURE_Nothing;
 }
 
 void GfxTransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShapeTransform)
@@ -92,7 +90,7 @@ void GfxTransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShape
 
 	for(int i = 0; i < 4; ++i)
 		pCamera->ProjectToCamera(ptGrabPos[i], ptGrabPos[i]);
-	m_BoundingVolume.SetAsPolygon(ptGrabPos, 4);
+	m_BoundingVolume.SetAsPolygon(0, ptGrabPos, 4, 1.0f);
 
 	glm::vec4 ptTransformPos(ptExtrudeStart.x, ptExtrudeStart.y, 0.0f, 1.0f);
 	ptTransformPos = mtxShapeTransform * ptTransformPos;
@@ -100,7 +98,7 @@ void GfxTransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShape
 	pCamera->ProjectToCamera(ptExtrudeStart, ptExtrudeStart);
 	glm::vec2 ptRotatePos;
 	pCamera->ProjectToCamera(m_GrabPointModels[GRAB_Rotate]->GetPos(), ptRotatePos);
-	m_ExtrudeSegment.SetAsLineSegment(ptExtrudeStart, ptRotatePos);
+	m_ExtrudeSegment.SetAsLineSegment(0, ptExtrudeStart, ptRotatePos, 1.0f);
 
 	m_fCachedRotation = HyMath::AngleFromVector(ptRotatePos - ptExtrudeStart) - 90.0f;
 }
@@ -266,7 +264,7 @@ void GfxTransformCtrl::Hide()
 	m_ExtrudeSegment.SetVisible(false);
 }
 
-void GfxTransformCtrl::GetCentroid(glm::vec2 &ptCenterOut) const
+void GfxTransformCtrl::GetCentroid(glm::vec2 &ptCenterOut)
 {
 	if(IsValid())
 		m_BoundingVolume.GetCentroid(ptCenterOut);

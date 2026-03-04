@@ -387,6 +387,9 @@ if(Qt6_DIR)
 		src/Widget/WgtMakeRelDir.cpp
 		src/Widget/WgtMakeRelDir.h
 		src/Widget/WgtMakeRelDir.ui
+		src/Widget/WgtShapeData.cpp
+		src/Widget/WgtShapeData.h
+		src/Widget/WgtShapeData.ui
 		src/Widget/WgtSpineAnims.cpp
 		src/Widget/WgtSpineAnims.h
 		src/Widget/WgtSpineAnims.ui

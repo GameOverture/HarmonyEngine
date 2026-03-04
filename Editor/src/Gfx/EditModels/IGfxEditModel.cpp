@@ -43,9 +43,9 @@ void IGfxEditModel::SetColor(HyColor color)
 		pView->SyncColor();
 }
 
-void IGfxEditModel::Deserialize(const QList<float> &floatList)
+void IGfxEditModel::Deserialize(const QJsonObject &serializedObj)
 {
-	m_sMalformedReason = DoDeserialize(floatList);
+	m_sMalformedReason = DoDeserialize(serializedObj);
 	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 

@@ -264,11 +264,21 @@ EntityTreeItemData *EntityModel::Cmd_CreateNewWidget(ItemType eWidgetType, int i
 	return pTreeItemData;
 }
 
-EntityTreeItemData *EntityModel::Cmd_CreateNewPrimitive(int iRow)
+EntityTreeItemData *EntityModel::Cmd_CreateNewPrimNode(int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocPrimitiveTreeItem("m_", iRow);
-	static_cast<EntityStateData *>(GetStateData(0))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, -1, "Primitive", "Type", QJsonValue(HyGlobal::ShapeName(SHAPE_None)), false);
-	static_cast<EntityStateData *>(GetStateData(0))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, -1, "Primitive", "Data", QJsonArray(), true);
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocPrimNodeTreeItem("m_", iRow);
+	return pTreeItemData;
+}
+
+EntityTreeItemData *EntityModel::Cmd_CreateNewPrimLayer(EntityTreeItemData *pPrimNode, QString sLayerType, int iRow)
+{
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocPrimLayerTreeItem(pPrimNode, iRow);
+
+	QJsonObject layerDataObj;
+	layerDataObj.insert("type", sLayerType);
+	layerDataObj.insert("data", QJsonArray());
+	layerDataObj.insert("outline", 0.0);
+	static_cast<EntityStateData *>(GetStateData(0))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, -1, "Primitive Layer", "Data", layerDataObj, true);
 
 	return pTreeItemData;
 }
@@ -748,7 +758,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 		QString sInitialization;
 		switch(pItem->GetType())
 		{
-		case ITEM_Primitive:
+		case ITEM_PrimNode:
 		case ITEM_ShapeFixture:
 		case ITEM_ChainFixture:
 		case ITEM_Entity:
@@ -1083,37 +1093,23 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 					sSrc += sCodeName + "DisableMouseInput();" + sNewLine;
 			}
 		}
-		else if(sCategoryName == "Primitive")
+		else if(sCategoryName == "Primitive Layer")
 		{
-			QJsonObject primitiveObj = propObj["Primitive"].toObject();
-			if(primitiveObj.contains("Wireframe"))
-				sSrc += sCodeName + "SetWireframe(" + (primitiveObj["Wireframe"].toBool() ? "true" : "false") + ");" + sNewLine;
-			if(primitiveObj.contains("Line Thickness"))
-				sSrc += sCodeName + "SetLineThickness(" + QString::number(primitiveObj["Line Thickness"].toDouble(), 'f') + "f);" + sNewLine;
-			if(primitiveObj.contains("Type") && primitiveObj.contains("Data"))
-			{
-				QString sShapeType = primitiveObj["Type"].toString();
-				if(sShapeType != "Line Chain")
-					sSrc += DeserializeShapeAsRuntimeCode(sCodeName, HyGlobal::GetShapeFromString(sShapeType), primitiveObj["Data"].toArray(), sNewLine);
-				else
-					sSrc += DeserializeChainAsRuntimeCode(true, sCodeName, primitiveObj["Data"].toArray(), sNewLine);
-			}
-			else if(primitiveObj.contains("Type") || primitiveObj.contains("Data"))
-				HyGuiLog("EntityModel::GenerateSrc_SetProperties() - Primitive 'Data' missing corresponding 'Type' property.", LOGTYPE_Error);
+			QJsonObject primitiveObj = propObj["Primitive Layer"].toObject();
+			if(primitiveObj.contains("Data"))
+				sSrc += DeserializeShapeDataAsRuntimeCode(pItemData, sCodeName, primitiveObj["Data"].toObject(), sNewLine);
 		}
 		else if(sCategoryName == "Shape")
 		{
 			QJsonObject shapeObj = propObj["Shape"].toObject();
-			if(shapeObj.contains("Type") && shapeObj.contains("Data"))
-				sSrc += DeserializeShapeAsRuntimeCode(sCodeName, HyGlobal::GetShapeFromString(shapeObj["Type"].toString()), shapeObj["Data"].toArray(), sNewLine);
-			else if(shapeObj.contains("Type") || shapeObj.contains("Data"))
-				HyGuiLog("EntityModel::GenerateSrc_SetProperties() - Shape 'Data' missing corresponding 'Type' property.", LOGTYPE_Error);
+			if(shapeObj.contains("Data"))
+				sSrc += DeserializeShapeDataAsRuntimeCode(pItemData, sCodeName, shapeObj["Data"].toObject(), sNewLine);
 		}
 		else if(sCategoryName == "Chain")
 		{
 			QJsonObject chainObj = propObj["Chain"].toObject();
 			if(chainObj.contains("Data"))
-				sSrc += DeserializeChainAsRuntimeCode(false, sCodeName, chainObj["Data"].toArray(), sNewLine);
+				sSrc += DeserializeShapeDataAsRuntimeCode(pItemData, sCodeName, chainObj["Data"].toObject(), sNewLine);
 		}
 		else if(sCategoryName == "Fixture")
 		{
@@ -1492,7 +1488,7 @@ QString EntityModel::DeserializePanelInitAsRuntimeCode(QJsonObject panelInitObj)
 	ItemType eType = HyGlobal::GetTypeFromString(panelInitObj["nodeType"].toString());
 	if(eType == ITEM_Entity)
 		sSrc += QString::number(panelInitObj["width"].toInt()) + ", " + QString::number(panelInitObj["height"].toInt());
-	else if(eType == ITEM_Primitive)
+	else if(eType == ITEM_PrimNode)
 		sSrc += QString::number(panelInitObj["width"].toInt()) + ", " + QString::number(panelInitObj["height"].toInt()) + ", " + QString::number(panelInitObj["frameSize"].toInt()) + ", HyColor(" + QString::number(panelInitObj["panelColor"].toInt()) + "), HyColor(" + QString::number(panelInitObj["frameColor"].toInt()) + "), HyColor(" + QString::number(panelInitObj["tertiaryColor"].toInt()) + "))";
 	else
 	{
@@ -1516,78 +1512,155 @@ QString EntityModel::DeserializePanelInitAsRuntimeCode(QJsonObject panelInitObj)
 	return sSrc;
 }
 
-QString EntityModel::DeserializeShapeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QJsonArray floatArray, QString sNewLine) const
+QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItemData, QString sCodeName, QJsonObject serializedObj, QString sNewLine) const
 {
 	QString sSrc;
 
+	QJsonArray floatArray = serializedObj["data"].toArray();
 	QStringList sFloatList;
-	sFloatList.reserve(floatArray.size());
-	for(int i = 0; i < floatArray.size(); ++i)
-		sFloatList.append(QString::number(floatArray[i].toDouble(), 'f')); // Ensure we have a decimal point
-
-	switch(eShapeType)
-	{
-	case SHAPE_None:
-		sSrc += sCodeName + "SetAsNothing();" + sNewLine;
-		break;
-
-	case SHAPE_Polygon:
-		if((floatArray.size() & 1) == 0)
-			HyGuiLog("GfxShapeModel::DeserializeShapeAsRuntimeCode for polygon had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
-
-		HyGuiLog("GfxShapeModel::DeserializeShapeAsRuntimeCode for polygon NOT IMPLEMENTED", LOGTYPE_Error);
-		break;
-
-	case SHAPE_Box:
-		if((floatArray.size() & 1))
-			HyGuiLog("GfxShapeModel::DeserializeShapeAsRuntimeCode for box had an odd number of floats (should NOT have final loop float)", LOGTYPE_Error);
-
-		sSrc += "vertList.clear();" + sNewLine;
-		for(int i = 0; i < sFloatList.size(); i += 2)
-			sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
-		sSrc += sCodeName + "SetAsPolygon(vertList);" + sNewLine;
-		break;
-
-	case SHAPE_Circle:
-		sSrc += sCodeName + "SetAsCircle(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), " + sFloatList[2] + "f);" + sNewLine;
-		break;
-
-	case SHAPE_LineSegment:
-		sSrc += sCodeName + "SetAsLineSegment(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f));" + sNewLine;
-		break;
-
-	case SHAPE_Capsule:
-		sSrc += sCodeName + "SetAsCapsule(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f), " + sFloatList[2] + "f);" + sNewLine;
-		break;
-
-	default:
-		HyGuiLog("EntityModel::DeserializeShapeAsRuntimeCode() - Unhandled shape type", LOGTYPE_Error);
-		break;
-	}
-
-	return sSrc;
-}
-
-QString EntityModel::DeserializeChainAsRuntimeCode(bool bIsPrimitive, QString sCodeName, QJsonArray floatArray, QString sNewLine) const
-{
-	QString sSrc;
-
-	QStringList sFloatList;
-	if((floatArray.size() & 1) == 0)
-		HyGuiLog("GfxShapeModel::DeserializeChainAsRuntimeCode for chain had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
-
 	for(int i = 0; i < floatArray.size(); ++i)
 		sFloatList[i] = QString::number(floatArray[i].toDouble(), 'f'); // Ensure we have a decimal point
 
-	sSrc += "vertList.clear();" + sNewLine;
-	for(int i = 0; i < sFloatList.size(); i += 2)
-		sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
+	if(sFloatList.isEmpty() || HyGlobal::GetShapeFromString(serializedObj["type"].toString()) == SHAPE_None)
+	{
+		switch(pItemData->GetType())
+		{
+		case ITEM_PrimLayer: {
+			EntityTreeItemData *pPrimNode = nullptr;
+			int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
+			sSrc += sCodeName + "SetAsNothing(" + QString::number(iLayerIndex) + ");" + sNewLine;
+			break; }
 
-	if(bIsPrimitive)
-		sSrc += sCodeName + "SetAsLineChain(vertList);" + sNewLine;
-	else
-		sSrc += sCodeName + "SetData(vertList);" + sNewLine;
-	
+		case ITEM_ShapeFixture:
+			sSrc += sCodeName + "SetAsNothing();" + sNewLine;
+			break;
+
+		case ITEM_ChainFixture:
+			sSrc += sCodeName + "ClearData();" + sNewLine;
+			break;
+		}
+	}
+	else // Not 'Nothing' and has vert data
+	{
+		switch(pItemData->GetType())
+		{
+		case ITEM_PrimLayer:
+			if(serializedObj["type"].toString() == "Line Chain")
+			{
+				if((sFloatList.size() & 1) == 0)
+					HyGuiLog("GfxShapeModel::DeserializeShapeDataAsRuntimeCode for prim layer had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
+				sSrc += "vertList.clear();" + sNewLine;
+				for(int i = 0; i < sFloatList.size(); i += 2)
+					sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
+
+				EntityTreeItemData *pPrimNode = nullptr;
+				int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
+
+				sSrc += sCodeName + "SetAsLineChain(" + QString::number(iLayerIndex) + ", vertList, " + QString::number(serializedObj["outline"].toDouble(), 'f') + ");" + sNewLine;
+				break;
+			}
+			[[fallthrough]];
+		case ITEM_ShapeFixture:
+			switch(HyGlobal::GetShapeFromString(serializedObj["type"].toString()))
+			{
+			case SHAPE_None:
+				HyGuiLog("Already did SetAsNothing, shouldn't get here", LOGTYPE_Error);
+				break;
+
+			case SHAPE_Polygon:
+				if((sFloatList.size() & 1) == 0)
+					HyGuiLog("GfxShapeModel::DeserializeShapeDataAsRuntimeCode for polygon had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
+				sSrc += "vertList.clear();" + sNewLine;
+				for(int i = 0; i < sFloatList.size(); i += 2)
+					sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
+			
+				if(pItemData->GetType() == ITEM_PrimLayer)
+				{
+					EntityTreeItemData *pPrimNode = nullptr;
+					int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
+					sSrc += sCodeName + "SetAsPolygon(" + QString::number(iLayerIndex) + ", vertList, " + QString::number(serializedObj["outline"].toDouble(), 'f') + ");" + sNewLine;
+					break;
+				}
+				else
+					sSrc += sCodeName + "SetAsPolygon(vertList);" + sNewLine;
+				break;
+
+			case SHAPE_Box:
+				if((floatArray.size() & 1))
+					HyGuiLog("GfxShapeModel::DeserializeShapeDataAsRuntimeCode for box had an odd number of floats (should NOT have final loop float)", LOGTYPE_Error);
+				sSrc += "vertList.clear();" + sNewLine;
+				for(int i = 0; i < sFloatList.size(); i += 2)
+					sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
+
+				if(pItemData->GetType() == ITEM_PrimLayer)
+				{
+					EntityTreeItemData *pPrimNode = nullptr;
+					int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
+					sSrc += sCodeName + "SetAsPolygon(" + QString::number(iLayerIndex) + ", vertList, " + QString::number(serializedObj["outline"].toDouble(), 'f') + ");" + sNewLine;
+					break;
+				}
+				else
+					sSrc += sCodeName + "SetAsPolygon(vertList);" + sNewLine;
+				break;
+
+			case SHAPE_Circle:
+				if(pItemData->GetType() == ITEM_PrimLayer)
+				{
+					EntityTreeItemData *pPrimNode = nullptr;
+					int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
+					sSrc += sCodeName + "SetAsCircle(" + QString::number(iLayerIndex) + ", glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), " + sFloatList[2] + "f, " + QString::number(serializedObj["outline"].toDouble(), 'f') + ");" + sNewLine;
+					break;
+				}
+				else
+					sSrc += sCodeName + "SetAsCircle(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), " + sFloatList[2] + "f);" + sNewLine;
+				break;
+
+			case SHAPE_LineSegment:
+				if(pItemData->GetType() == ITEM_PrimLayer)
+				{
+					EntityTreeItemData *pPrimNode = nullptr;
+					int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
+					sSrc += sCodeName + "SetAsLineSegment(" + QString::number(iLayerIndex) + ", glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f, " + QString::number(serializedObj["outline"].toDouble(), 'f') + ");" + sNewLine;
+					break;
+				}
+				else
+					sSrc += sCodeName + "SetAsLineSegment(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f));" + sNewLine;
+				break;
+
+			case SHAPE_Capsule:
+				if(pItemData->GetType() == ITEM_PrimLayer)
+				{
+					EntityTreeItemData *pPrimNode = nullptr;
+					int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
+					sSrc += sCodeName + "SetAsCapsule(" + QString::number(iLayerIndex) + ", glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f), " + sFloatList[2] + "f, " + QString::number(serializedObj["outline"].toDouble(), 'f') + ");" + sNewLine;
+					break;
+				}
+				else
+					sSrc += sCodeName + "SetAsCapsule(glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f), " + sFloatList[2] + "f);" + sNewLine;
+				break;
+
+			default:
+				HyGuiLog("EntityModel::DeserializeShapeDataAsRuntimeCode() - Unhandled shape type", LOGTYPE_Error);
+				break;
+			}
+			break;
+
+		case ITEM_ChainFixture: {
+			QJsonArray floatArray = serializedObj["data"].toArray();
+			QStringList sFloatList;
+			if((floatArray.size() & 1) == 0)
+				HyGuiLog("GfxShapeModel::DeserializeShapeDataAsRuntimeCode for chain had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
+			for(int i = 0; i < floatArray.size(); ++i)
+				sFloatList[i] = QString::number(floatArray[i].toDouble(), 'f'); // Ensure we have a decimal point
+			sSrc += "vertList.clear();" + sNewLine;
+			for(int i = 0; i < sFloatList.size(); i += 2)
+				sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
+
+			sSrc += sCodeName + "SetData(vertList);" + sNewLine;
+			break; }
+		}
+	}
+
 	return sSrc;
 }
 
@@ -1618,6 +1691,8 @@ QString EntityModel::DeserializeChainAsRuntimeCode(bool bIsPrimitive, QString sC
 		fusedItemArray.append(fusedObj);
 	}
 	itemSpecificFileDataOut.m_Meta.insert("fusedItemList", fusedItemArray);
+
+	itemSpecificFileDataOut.m_Meta.insert("guiLayout", m_TreeModel.GetGuiLayoutArray());
 	
 	QList<EntityTreeItemData *> childList;
 	QList<EntityTreeItemData *> shapeList;
@@ -1625,8 +1700,14 @@ QString EntityModel::DeserializeChainAsRuntimeCode(bool bIsPrimitive, QString sC
 
 	QJsonArray childArray;
 	QString sCurrentArrayCodeName = "";
-	for(int i = 0; i < childList.size(); ) // 'i' is incremented inside the loop
+	for(int i = 0; i < childList.size(); ) // NOTE: 'i' is incremented inside the loop
 	{
+		if(childList[i]->GetEntType() == ENTTYPE_FusedItem)
+		{
+			++i;
+			continue;
+		}
+
 		if(childList[i]->GetEntType() == ENTTYPE_ArrayItem && sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) != 0)
 		{
 			sCurrentArrayCodeName = childList[i]->GetCodeName();
@@ -1656,8 +1737,14 @@ QString EntityModel::DeserializeChainAsRuntimeCode(bool bIsPrimitive, QString sC
 
 	QJsonArray shapeArray;
 	sCurrentArrayCodeName = "";
-	for(int i = 0; i < shapeList.size(); )
+	for(int i = 0; i < shapeList.size(); ) // NOTE: 'i' is incremented inside the loop
 	{
+		if(shapeList[i]->GetEntType() == ENTTYPE_FusedItem)
+		{
+			++i;
+			continue;
+		}
+
 		if(shapeList[i]->GetEntType() == ENTTYPE_ArrayItem && sCurrentArrayCodeName.compare(shapeList[i]->GetCodeName()) != 0)
 		{
 			sCurrentArrayCodeName = shapeList[i]->GetCodeName();

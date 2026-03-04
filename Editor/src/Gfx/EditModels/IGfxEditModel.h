@@ -78,8 +78,8 @@ public:
 	void SetColor(HyColor color);
 
 	virtual bool IsValidModel() const = 0;
-	virtual QList<float> Serialize() const = 0;
-	void Deserialize(const QList<float> &floatList);
+	virtual QJsonObject Serialize() const = 0;
+	void Deserialize(const QJsonObject &serializedObj);
 
 	void AddView(IGfxEditView *pView);
 	bool RemoveView(IGfxEditView *pView);
@@ -99,11 +99,11 @@ public:
 	void MouseTransform(EditModeState eEditModeState, bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
 	
 	virtual QString GetActionText(QString sNodeCodeName) const = 0; // Returns undo command description (blank if no change)
-	virtual QList<float> GetActionSerialized() const = 0;
+	virtual QJsonObject GetActionSerialized() const = 0;
 	void ClearAction();
 
 protected:
-	virtual QString DoDeserialize(const QList<float> &floatList) = 0; // Returns empty string if successful, otherwise returns reason for failure (e.g. "Polygon has intersecting edges")
+	virtual QString DoDeserialize(const QJsonObject &serializedObj) = 0; // Returns empty string if successful, otherwise returns reason for failure (e.g. "Polygon has intersecting edges")
 	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) = 0;
 	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) = 0;
 };

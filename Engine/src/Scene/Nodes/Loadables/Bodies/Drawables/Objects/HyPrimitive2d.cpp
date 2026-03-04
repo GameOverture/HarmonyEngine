@@ -383,6 +383,27 @@ int32 HyPrimitive2d::SetLayerColor(int32 iLayerIndex, HyColor color)
 	return iLayerIndex;
 }
 
+float HyPrimitive2d::GetLayerAlpha(int32 iLayerIndex) const
+{
+	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
+	{
+		HyLogError("HyPrimitive2d::GetLayerAlpha() failed - Invalid layer index");
+		return 1.0f;
+	}
+	return m_LayerList[iLayerIndex].m_fAlpha;
+}
+
+int32 HyPrimitive2d::SetLayerAlpha(int32 iLayerIndex, float fAlpha)
+{
+	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
+	{
+		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
+		m_LayerList.emplace_back();
+	}
+	m_LayerList[iLayerIndex].m_fAlpha = fAlpha;
+	return iLayerIndex;
+}
+
 uint32 HyPrimitive2d::GetNumVerts(int32 iLayerIndex) const
 {
 	return m_LayerList[iLayerIndex].m_uiNumVerts;
@@ -401,6 +422,19 @@ bool HyPrimitive2d::IsOutline(int32 iLayerIndex)
 float HyPrimitive2d::GetLineThickness(int32 iLayerIndex) const
 {
 	return m_LayerList[iLayerIndex].m_fLineThickness;
+}
+
+void HyPrimitive2d::RemoveLayer(int32 iLayerIndex)
+{
+	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
+	{
+		HyLogError("HyPrimitive2d::RemoveLayer() failed - Invalid layer index");
+		return;
+	}
+	DeleteLayerData(iLayerIndex);
+	m_LayerList.erase(m_LayerList.begin() + iLayerIndex);
+	m_bUpdateShaderUniforms = true;
+	SetDirty(DIRTY_SceneAABB);
 }
 
 /*virtual*/ bool HyPrimitive2d::IsLoadDataValid() /*override*/
@@ -481,14 +515,16 @@ float HyPrimitive2d::GetLineThickness(int32 iLayerIndex) const
 		Layer &layerRef = m_LayerList[iLayerIndex];
 		if(layerRef.m_bVisible && layerRef.m_uiNumVerts > 0 && layerRef.m_pVertBuffer != nullptr)
 		{
-			vTopColor.x *= layerRef.m_Color.GetRedF();
-			vTopColor.y *= layerRef.m_Color.GetGreenF();
-			vTopColor.z *= layerRef.m_Color.GetBlueF();
+			glm::vec4 layerColor = vTopColor;
+			layerColor.x *= layerRef.m_Color.GetRedF();
+			layerColor.y *= layerRef.m_Color.GetGreenF();
+			layerColor.z *= layerRef.m_Color.GetBlueF();
+			layerColor.a *= layerRef.m_fAlpha;
 			for(int iVertIndex = 0; iVertIndex < layerRef.m_uiNumVerts; ++iVertIndex)
 			{
 				glm::vec2 ptVert = layerRef.m_pVertBuffer[iVertIndex] + layerRef.m_vOffset;
 				vertexBufferRef.AppendVertexData(&ptVert, sizeof(glm::vec2));
-				vertexBufferRef.AppendVertexData(&vTopColor, sizeof(glm::vec4)); // TODO: Cache bot most and top most vertices and use that to mix color between vTopColor and vBotColor for a vertical gradient effect
+				vertexBufferRef.AppendVertexData(&layerColor, sizeof(glm::vec4)); // TODO: Cache bot most and top most vertices and use that to mix color between vTopColor and vBotColor for a vertical gradient effect
 			}
 		}
 	}

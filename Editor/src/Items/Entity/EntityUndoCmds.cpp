@@ -517,7 +517,7 @@ EntityUndoCmd_AddPrimitive::EntityUndoCmd_AddPrimitive(ProjectItemData &entityIt
 /*virtual*/ void EntityUndoCmd_AddPrimitive::redo() /*override*/
 {
 	if(m_pPrimitiveTreeItemData == nullptr)
-		m_pPrimitiveTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewPrimitive(m_iIndex);
+		m_pPrimitiveTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewPrimNode(m_iIndex);
 	else
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pPrimitiveTreeItemData, m_iIndex);
 
@@ -572,14 +572,14 @@ EntityUndoCmd_AddFixture::EntityUndoCmd_AddFixture(ProjectItemData &entityItemRe
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_EditModelData::EntityUndoCmd_EditModelData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pEntityItemData, const QList<float> &newDataList, QString sCategoryName, QString sPropName, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_EditModelData::EntityUndoCmd_EditModelData(QString sText, ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, EntityTreeItemData *pEntityItemData, const QJsonObject &newDataObj, QString sCategoryName, QString sPropName, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_iStateIndex(iStateIndex),
 	m_iFrameIndex(iFrameIndex),
 	m_pEntityItemData(pEntityItemData),
 	m_sCategoryName(sCategoryName),
 	m_sPropName(sPropName),
-	m_NewData(newDataList),
+	m_NewData(newDataObj),
 	m_bHadOldData(false)
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
@@ -587,11 +587,7 @@ EntityUndoCmd_EditModelData::EntityUndoCmd_EditModelData(QString sText, ProjectI
 	KeyFrameKey shapeDataKey = std::make_tuple(m_pEntityItemData, m_iFrameIndex, m_sCategoryName % "/" % m_sPropName);
 	m_bHadOldData = pStateData->GetDopeSheetScene().ContainsKeyFrameProperty(shapeDataKey);
 	if(m_bHadOldData)
-	{
-		QJsonArray dataArray = pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_pEntityItemData, m_iFrameIndex, m_sCategoryName, m_sPropName).toArray();
-		for(QJsonValue val : dataArray)
-			m_OldData.append(static_cast<float>(val.toDouble()));
-	}
+		m_OldData = pStateData->GetDopeSheetScene().GetKeyFrameProperty(m_pEntityItemData, m_iFrameIndex, m_sCategoryName, m_sPropName).toObject();
 
 	setText(sText);
 }
@@ -604,10 +600,7 @@ EntityUndoCmd_EditModelData::EntityUndoCmd_EditModelData(QString sText, ProjectI
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
 
-	QJsonArray newDataArray;
-	for(float f : m_NewData)
-		newDataArray.append(f);
-	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pEntityItemData, m_iFrameIndex, m_sCategoryName, m_sPropName, newDataArray, true);
+	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pEntityItemData, m_iFrameIndex, m_sCategoryName, m_sPropName, m_NewData, true);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget == nullptr)
@@ -623,10 +616,10 @@ EntityUndoCmd_EditModelData::EntityUndoCmd_EditModelData(QString sText, ProjectI
 {
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(m_iStateIndex));
 
-	QJsonArray oldDataArray;
-	for(float f : m_OldData)
-		oldDataArray.append(f);
-	pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pEntityItemData, m_iFrameIndex, m_sCategoryName, m_sPropName, oldDataArray, true);
+	if(m_OldData.isEmpty())
+		pStateData->GetDopeSheetScene().RemoveKeyFrameProperty(m_pEntityItemData, m_iFrameIndex, m_sCategoryName, m_sPropName, true);
+	else
+		pStateData->GetDopeSheetScene().SetKeyFrameProperty(m_pEntityItemData, m_iFrameIndex, m_sCategoryName, m_sPropName, m_OldData, true);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget == nullptr)

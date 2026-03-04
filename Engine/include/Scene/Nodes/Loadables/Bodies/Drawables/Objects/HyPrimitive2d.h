@@ -25,6 +25,7 @@ protected:
 		glm::vec2		m_vOffset;
 		bool			m_bVisible;
 		HyColor			m_Color;
+		float			m_fAlpha;
 
 		HyFixtureType	m_eFixtureType;
 		float			m_fLineThickness; // When > 0.0f, this layer will be drawn as an outline with the specified thickness in pixels
@@ -36,6 +37,7 @@ protected:
 			m_vOffset(0.0f, 0.0f),
 			m_bVisible(true),
 			m_Color(HyColor::White),
+			m_fAlpha(1.0f),
 			m_eFixtureType(HYFIXTURE_Nothing),
 			m_fLineThickness(0.0f),
 			m_uiNumSegments(16)
@@ -46,6 +48,7 @@ protected:
 			m_vOffset(copyRef.m_vOffset),
 			m_bVisible(true),
 			m_Color(HyColor::White),
+			m_fAlpha(copyRef.m_fAlpha),
 			m_eFixtureType(copyRef.m_eFixtureType),
 			m_fLineThickness(copyRef.m_fLineThickness),
 			m_uiNumSegments(copyRef.m_uiNumSegments)
@@ -62,12 +65,56 @@ protected:
 			m_vOffset(donor.m_vOffset),
 			m_bVisible(donor.m_bVisible),
 			m_Color(donor.m_Color),
+			m_fAlpha(donor.m_fAlpha),
 			m_eFixtureType(donor.m_eFixtureType),
 			m_fLineThickness(donor.m_fLineThickness),
 			m_uiNumSegments(donor.m_uiNumSegments)
 		{
 			donor.m_pVertBuffer = nullptr;
 			donor.m_uiNumVerts = 0;
+		}
+
+		const Layer &operator=(const Layer &rhs)
+		{
+			if(this != &rhs)
+			{
+				m_uiNumVerts = rhs.m_uiNumVerts;
+				m_vOffset = rhs.m_vOffset;
+				m_bVisible = rhs.m_bVisible;
+				m_Color = rhs.m_Color;
+				m_fAlpha = rhs.m_fAlpha;
+				m_eFixtureType = rhs.m_eFixtureType;
+				m_fLineThickness = rhs.m_fLineThickness;
+				m_uiNumSegments = rhs.m_uiNumSegments;
+				delete[] m_pVertBuffer;
+				m_pVertBuffer = nullptr;
+				if(rhs.m_pVertBuffer)
+				{
+					m_pVertBuffer = HY_NEW glm::vec2[m_uiNumVerts];
+					memcpy(m_pVertBuffer, rhs.m_pVertBuffer, m_uiNumVerts * sizeof(glm::vec2));
+				}
+			}
+			return *this;
+		}
+		
+		Layer &operator=(Layer &&donor) noexcept
+		{
+			if(this != &donor)
+			{
+				delete[] m_pVertBuffer;
+				m_pVertBuffer = donor.m_pVertBuffer;
+				m_uiNumVerts = donor.m_uiNumVerts;
+				m_vOffset = donor.m_vOffset;
+				m_bVisible = donor.m_bVisible;
+				m_Color = donor.m_Color;
+				m_fAlpha = donor.m_fAlpha;
+				m_eFixtureType = donor.m_eFixtureType;
+				m_fLineThickness = donor.m_fLineThickness;
+				m_uiNumSegments = donor.m_uiNumSegments;
+				donor.m_pVertBuffer = nullptr;
+				donor.m_uiNumVerts = 0;
+			}
+			return *this;
 		}
 	};
 	std::vector<Layer>	m_LayerList;
@@ -124,11 +171,16 @@ public:
 	HyColor GetLayerColor(int32 iLayerIndex) const;
 	int32 SetLayerColor(int32 iLayerIndex, HyColor color);
 
+	float GetLayerAlpha(int32 iLayerIndex) const;
+	int32 SetLayerAlpha(int32 iLayerIndex, float fAlpha);
+
 	uint32 GetNumVerts(int32 iLayerIndex) const;
 	const glm::vec2 *GetVerts(int32 iLayerIndex) const;
 
 	bool IsOutline(int32 iLayerIndex);
 	float GetLineThickness(int32 iLayerIndex) const;
+
+	void RemoveLayer(int32 iLayerIndex);
 
 	virtual bool IsLoadDataValid() override;
 

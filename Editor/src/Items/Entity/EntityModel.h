@@ -85,7 +85,8 @@ public:
 	QList<EntityTreeItemData *> Cmd_CreateNewAssets(QList<IAssetItemData *> assetItemList, int iRow);
 	EntityTreeItemData *Cmd_AddExistingItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
 	EntityTreeItemData *Cmd_CreateNewWidget(ItemType eWidgetType, int iRow);
-	EntityTreeItemData *Cmd_CreateNewPrimitive(int iRow);
+	EntityTreeItemData *Cmd_CreateNewPrimNode(int iRow);
+	EntityTreeItemData *Cmd_CreateNewPrimLayer(EntityTreeItemData *pPrimNode, QString sLayerType, int iRow);
 	EntityTreeItemData *Cmd_CreateNewFixture(bool bIsShape, int iRow);
 	QList<EntityTreeItemData *> Cmd_AddNewPasteItems(QJsonObject mimeObject, EntityTreeItemData *pArrayFolder);
 	QList<EntityTreeItemData *> Cmd_CreateNewArray(QList<EntityTreeItemData *> itemDataList, QString sArrayName, int iArrayFolderRow); // It is assumed that the items within 'itemDataList' have been removed/popped prior
@@ -110,8 +111,7 @@ public:
 
 	QString DeserializeTextInitAsRuntimeCode(QUuid itemUuid, HyMargins<float> margins) const;
 	QString DeserializePanelInitAsRuntimeCode(QJsonObject panelInitObj) const;
-	QString DeserializeShapeAsRuntimeCode(QString sCodeName, EditorShape eShapeType, QJsonArray floatArray, QString sNewLine) const;
-	QString DeserializeChainAsRuntimeCode(bool bIsPrimitive, QString sCodeName, QJsonArray floatArray, QString sNewLine) const;
+	QString DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItemData, QString sCodeName, QJsonObject serializedObj, QString sNewLine) const;
 
 	virtual void OnPopState(int iPoppedStateIndex) override;
 	virtual bool OnPrepSave() override;

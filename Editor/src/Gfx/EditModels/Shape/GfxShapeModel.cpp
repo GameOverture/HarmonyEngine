@@ -14,6 +14,7 @@
 GfxShapeModel::GfxShapeModel(HyColor color) :
 	IGfxEditModel(EDITMODETYPE_Shape, color),
 	m_eShapeType(SHAPE_None),
+	m_fOutline(0.0f),
 	m_bSelfIntersecting(false),
 	m_ptSelfIntersection(0.0f, 0.0f),
 	m_bReverseWindingOrder(false),
@@ -98,30 +99,32 @@ void GfxShapeModel::SetShapeType(EditorShape eNewShape, QList<float> floatList)
 	ClearFixtures();
 	m_ShapeList.push_back(new HyShape2d());
 
-	Deserialize(floatList);
+	// Reassemble model
+	QJsonObject serializedObj;
+	serializedObj.insert("type", HyGlobal::ShapeName(m_eShapeType));
+	QJsonArray dataArray;
+	for(float f : floatList)
+		dataArray.push_back(f);
+	serializedObj.insert("data", dataArray);
+	serializedObj.insert("outline", m_fOutline);
+
+	Deserialize(serializedObj);
 }
 
-/*virtual*/ QList<float> GfxShapeModel::Serialize() const /*override*/
+/*virtual*/ QJsonObject GfxShapeModel::Serialize() const /*override*/
 {
-	if(m_ShapeList.empty())
-		return QList<float>();
-	if(m_eShapeType != SHAPE_Polygon)
-	{
-		std::vector<float> serializedData = m_ShapeList[0]->SerializeSelf();
-		QList<float> returnList(serializedData.begin(), serializedData.end());
-		return returnList;
-	}
+	QJsonObject serializedObj;
+	serializedObj.insert("type", HyGlobal::ShapeName(m_eShapeType));
 
-	// SHAPE_Polygon
-	QList<float> returnList;
-	for(const GfxGrabPointModel &grabPt : m_GrabPointList)
-	{
-		glm::vec2 ptVertex = grabPt.GetPos();
-		returnList.push_back(static_cast<float>(ptVertex.x));
-		returnList.push_back(static_cast<float>(ptVertex.y));
-	}
-	returnList.push_back(m_bLoopClosed ? 1.0f : 0.0f); // Final float indicates whether loop is closed
-	return returnList;
+	QList<float> dataList = SerializeData();
+	QJsonArray dataArray;
+	for(float f : dataList)
+		dataArray.push_back(f);
+	serializedObj.insert("data", dataArray);
+
+	serializedObj.insert("outline", m_fOutline);
+
+	return serializedObj;
 }
 
 void GfxShapeModel::TransformData(glm::mat4 mtxTransform)
@@ -191,7 +194,7 @@ bool GfxShapeModel::IsLoopClosed() const
 	return sUndoText;
 }
 
-/*virtual*/ QList<float> GfxShapeModel::GetActionSerialized() const /*override*/
+/*virtual*/ QJsonObject GfxShapeModel::GetActionSerialized() const /*override*/
 {
 	switch(m_eCurAction)
 	{
@@ -213,7 +216,14 @@ bool GfxShapeModel::IsLoopClosed() const
 			tmpShape.TransformSelf(glm::translate(glm::mat4(1.0f), glm::vec3(m_vDragDelta, 0.0f)));
 
 			std::vector<float> serializedData = tmpShape.SerializeSelf();
-			return QList<float>(serializedData.begin(), serializedData.end());
+			QJsonObject serializedObj;
+			serializedObj.insert("type", HyGlobal::ShapeName(m_eShapeType));
+			QJsonArray dataArray;
+			for(float f : serializedData)
+				dataArray.push_back(f);
+			serializedObj.insert("data", dataArray);
+			serializedObj.insert("outline", m_fOutline);
+			return serializedObj;
 		}
 		else // SHAPE_Polygon
 		{
@@ -233,7 +243,16 @@ bool GfxShapeModel::IsLoopClosed() const
 			}
 
 			returnList.push_back(m_bLoopClosed ? 1.0f : 0.0f); // Final float indicates whether loop is closed
-			return returnList;
+
+			QJsonObject serializedObj;
+			serializedObj.insert("type", HyGlobal::ShapeName(m_eShapeType));
+			QJsonArray dataArray;
+			for(float f : returnList)
+				dataArray.push_back(f);
+			serializedObj.insert("data", dataArray);
+			serializedObj.insert("outline", m_fOutline);
+
+			return serializedObj;
 		}
 		break;
 
@@ -268,13 +287,21 @@ bool GfxShapeModel::IsLoopClosed() const
 		break;
 	}
 
-	return QList<float>();
+	return QJsonObject();
 }
 
-/*virtual*/ QString GfxShapeModel::DoDeserialize(const QList<float> &floatList) /*override*/
+/*virtual*/ QString GfxShapeModel::DoDeserialize(const QJsonObject &serializedObj) /*override*/
 {
 	if(m_ShapeList.empty())
 		m_ShapeList.push_back(new HyShape2d());
+
+	m_eShapeType = HyGlobal::GetShapeFromString(serializedObj["type"].toString());
+	m_fOutline = static_cast<float>(serializedObj["outline"].toDouble());
+
+	QJsonArray dataArray = serializedObj["data"].toArray();
+	QList<float> floatList;
+	for(const QJsonValue &val : dataArray)
+		floatList.push_back(static_cast<float>(val.toDouble()));
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Assemble `m_GrabPointList` and `m_GrabPointCenter`
@@ -686,7 +713,7 @@ QList<float> GfxShapeModel::ConvertedBoxData() const
 	case SHAPE_None:
 		break;
 	case SHAPE_Box:
-		return Serialize();
+		return SerializeData();
 	case SHAPE_Circle:
 		if(m_ShapeList[0]->IsValid())
 		{
@@ -775,7 +802,7 @@ QList<float> GfxShapeModel::ConvertedCircleData() const
 		}
 		break;
 	case SHAPE_Circle:
-		return Serialize();
+		return SerializeData();
 	case SHAPE_LineSegment:
 		if(m_ShapeList[0]->IsValid())
 		{
@@ -859,7 +886,7 @@ QList<float> GfxShapeModel::ConvertedLineSegmentData() const
 		}
 		break;
 	case SHAPE_LineSegment:
-		return Serialize();
+		return SerializeData();
 	case SHAPE_Capsule:
 		if(m_ShapeList[0]->IsValid())
 		{
@@ -933,7 +960,7 @@ QList<float> GfxShapeModel::ConvertedCapsuleData() const
 		}
 		break;
 	case SHAPE_Capsule:
-		return Serialize();
+		return SerializeData();
 	case SHAPE_Polygon:
 	case SHAPE_LineSegment: {
 		std::vector<glm::vec2> vertexList;
@@ -1013,7 +1040,7 @@ QList<float> GfxShapeModel::ConvertedPolygonOrLineChainData() const
 		}
 		break;
 	case SHAPE_Polygon:
-		convertedDataList = Serialize();
+		convertedDataList = SerializeData();
 		break;
 	case SHAPE_Capsule:
 		if(m_ShapeList[0]->IsValid())
@@ -1042,4 +1069,27 @@ QList<float> GfxShapeModel::ConvertedPolygonOrLineChainData() const
 	}
 	
 	return convertedDataList;
+}
+
+QList<float> GfxShapeModel::SerializeData() const
+{
+	if(m_ShapeList.empty())
+		return QList<float>();
+	if(m_eShapeType != SHAPE_Polygon)
+	{
+		std::vector<float> serializedData = m_ShapeList[0]->SerializeSelf();
+		QList<float> returnList(serializedData.begin(), serializedData.end());
+		return returnList;
+	}
+
+	// SHAPE_Polygon
+	QList<float> returnList;
+	for(const GfxGrabPointModel &grabPt : m_GrabPointList)
+	{
+		glm::vec2 ptVertex = grabPt.GetPos();
+		returnList.push_back(static_cast<float>(ptVertex.x));
+		returnList.push_back(static_cast<float>(ptVertex.y));
+	}
+	returnList.push_back(m_bLoopClosed ? 1.0f : 0.0f); // Final float indicates whether loop is closed
+	return returnList;
 }

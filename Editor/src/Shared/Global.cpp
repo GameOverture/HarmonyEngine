@@ -49,7 +49,6 @@
 {
 	sm_sItemNames[ITEM_Project] = "Project";
 	sm_sItemNames[ITEM_Prefix] = "Prefix";
-	sm_sItemNames[ITEM_Primitive] = "Primitive";
 	sm_sItemNames[ITEM_Audio] = "Audio";
 	sm_sItemNames[ITEM_Particles] = "Particles";
 	sm_sItemNames[ITEM_Text] = "Text";
@@ -66,6 +65,8 @@
 	sm_sItemNames[ITEM_SoundClip] = "SoundClip";
 	sm_sItemNames[ITEM_Source] = "Source";
 	sm_sItemNames[ITEM_Header] = "Header";
+	sm_sItemNames[ITEM_PrimNode] = "Primitive";
+	sm_sItemNames[ITEM_PrimLayer] = "PrimLayer";
 	sm_sItemNames[ITEM_ShapeFixture] = "Shape";
 	sm_sItemNames[ITEM_ChainFixture] = "Chain";
 	sm_sItemNames[ITEM_UiLayout] = "Layout";
@@ -83,7 +84,6 @@
 
 	sm_sItemNamesPlural[ITEM_Project] = "Projects";
 	sm_sItemNamesPlural[ITEM_Prefix] = "Prefixes";
-	sm_sItemNamesPlural[ITEM_Primitive] = "Primitives";
 	sm_sItemNamesPlural[ITEM_Audio] = "Audio";
 	sm_sItemNamesPlural[ITEM_Particles] = "Particles";
 	sm_sItemNamesPlural[ITEM_Text] = "Texts";
@@ -100,6 +100,8 @@
 	sm_sItemNamesPlural[ITEM_SoundClip] = "SoundClips";
 	sm_sItemNamesPlural[ITEM_Source] = "Source";
 	sm_sItemNamesPlural[ITEM_Header] = "Headers";
+	sm_sItemNamesPlural[ITEM_PrimNode] = "Primitives";
+	sm_sItemNamesPlural[ITEM_PrimLayer] = "PrimLayers";
 	sm_sItemNamesPlural[ITEM_ShapeFixture] = "Shapes";
 	sm_sItemNamesPlural[ITEM_ChainFixture] = "Chains";
 	sm_sItemNamesPlural[ITEM_UiLayout] = "Layouts";
@@ -286,7 +288,6 @@
 
 	list.append(ITEM_Project);
 	list.append(ITEM_Prefix);
-	list.append(ITEM_Primitive);
 	list.append(ITEM_Audio);
 	list.append(ITEM_Particles);
 	list.append(ITEM_Text);
@@ -303,6 +304,8 @@
 	list.append(ITEM_SoundClip);
 	list.append(ITEM_Source);
 	list.append(ITEM_Header);
+	list.append(ITEM_PrimNode);
+	list.append(ITEM_PrimLayer);
 	list.append(ITEM_ShapeFixture);
 	list.append(ITEM_ChainFixture);
 	list.append(ITEM_UiLayout);
@@ -1074,7 +1077,7 @@
 	case ITEM_Sprite:		return HYTYPE_Sprite;
 	case ITEM_Spine:		return HYTYPE_Spine;
 	case ITEM_AtlasFrame:	return HYTYPE_TexturedQuad;
-	case ITEM_Primitive:	return HYTYPE_Primitive;
+	case ITEM_PrimNode:		return HYTYPE_Primitive;
 	case ITEM_Text:			return HYTYPE_Text;
 	case ITEM_Prefab:		return HYTYPE_Prefab;
 	case ITEM_Entity:		return HYTYPE_Entity;
@@ -1092,7 +1095,7 @@
 	case HYTYPE_Sprite:			return ITEM_Sprite;
 	case HYTYPE_Spine:			return ITEM_Spine;
 	case HYTYPE_TexturedQuad:	return ITEM_AtlasFrame;
-	case HYTYPE_Primitive:		return ITEM_Primitive;
+	case HYTYPE_Primitive:		return ITEM_PrimNode;
 	case HYTYPE_Text:			return ITEM_Text;
 	case HYTYPE_Prefab:			return ITEM_Prefab;
 	case HYTYPE_Entity:			return ITEM_Entity;

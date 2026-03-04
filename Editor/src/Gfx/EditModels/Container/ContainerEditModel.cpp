@@ -25,10 +25,10 @@ ContainerEditModel::ContainerEditModel() :
 	return m_Box.IsValid();
 }
 
-/*virtual*/ QList<float> ContainerEditModel::Serialize() const /*override*/
+/*virtual*/ QJsonObject ContainerEditModel::Serialize() const /*override*/
 {
 	std::vector<float> serializedData = m_Box.SerializeSelf();
-	return QList<float>(serializedData.begin(), serializedData.end());
+	return QJsonObject();
 }
 
 /*virtual*/ QString ContainerEditModel::GetActionText(QString sNodeCodeName) const /*override*/
@@ -59,44 +59,13 @@ ContainerEditModel::ContainerEditModel() :
 	return sUndoText;
 }
 
-/*virtual*/ QList<float> ContainerEditModel::GetActionSerialized() const /*override*/
+/*virtual*/ QJsonObject ContainerEditModel::GetActionSerialized() const /*override*/
 {
 	return Serialize();
 }
 
-/*virtual*/ QString ContainerEditModel::DoDeserialize(const QList<float> &floatList) /*override*/
+/*virtual*/ QString ContainerEditModel::DoDeserialize(const QJsonObject &serializedObj) /*override*/
 {
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Assemble `m_GrabPointList` and `m_GrabPointCenter`
-	std::vector<glm::vec2> grabPointList;
-	if(floatList.empty() == false)
-	{
-		glm::vec2 ptCentroid;
-		grabPointList = m_Box.DeserializeSelf(HYFIXTURE_Polygon, std::vector<float>(floatList.begin(), floatList.end()));
-		m_Box.GetCentroid(ptCentroid);
-		
-		m_GrabPointCenter.Setup(ptCentroid);
-	}
-
-	// grabPointList is allowed to be empty, otherwise it will have proper data for the shape type
-	if(grabPointList.empty())
-		m_GrabPointList.clear();
-	else
-	{
-		if(grabPointList.size() != 4)
-			return "Invalid box shape data";
-
-		m_GrabPointList.resize(4);
-		for(int i = 0; i < 4; ++i)
-			m_GrabPointList[i].Setup(GRABPOINT_ShapeCtrlAll, grabPointList[i]);
-	}
-	
-	if(m_GrabPointList.empty())
-	{
-		m_Box.SetAsNothing();
-		return "No container data provided";
-	}
-
 	return QString();
 }
 

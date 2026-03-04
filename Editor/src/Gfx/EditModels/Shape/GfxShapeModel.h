@@ -15,12 +15,14 @@
 
 class GfxShapeModel : public IGfxEditModel
 {
-	friend class GfxPrimitiveModel;
+	friend class GfxPrimLayerModel;
 
 	EditorShape							m_eShapeType;			// "Shape", "Type" - when serialized in property (string)
 
 	// "Shape", "Data" - when serialized in property (QJsonArray of floats)
 	QList<HyShape2d *>					m_ShapeList;			// This is the actual shape data used for physics/collision/rendering - usually just one fixture, but could be multiple for complex polygons
+
+	float								m_fOutline;				// "outline" is used with primitive layers to determine whether to render a solid (0.0f) or an outline around the shape 
 	
 	// Extra validation used with Polygon
 	bool								m_bReverseWindingOrder;
@@ -37,7 +39,7 @@ public:
 	EditorShape GetShapeType() const;
 	void SetShapeType(EditorShape eNewShape, QList<float> floatList);
 
-	virtual QList<float> Serialize() const override;
+	virtual QJsonObject Serialize() const override;
 
 	void TransformData(glm::mat4 mtxTransform);
 
@@ -47,10 +49,10 @@ public:
 	bool IsLoopClosed() const;
 
 	virtual QString GetActionText(QString sNodeCodeName) const override;	// Returns undo command description (blank if no change)
-	virtual QList<float> GetActionSerialized() const override;
+	virtual QJsonObject GetActionSerialized() const override;
 
 protected:
-	virtual QString DoDeserialize(const QList<float> &floatList) override;
+	virtual QString DoDeserialize(const QJsonObject &serializedObj) override;
 	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) override;
 	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
 
@@ -67,6 +69,8 @@ protected:
 	QList<float> ConvertedLineSegmentData() const;
 	QList<float> ConvertedCapsuleData() const;
 	QList<float> ConvertedPolygonOrLineChainData() const;
+
+	QList<float> SerializeData() const;
 };
 
 #endif // GfxShapeModel_H

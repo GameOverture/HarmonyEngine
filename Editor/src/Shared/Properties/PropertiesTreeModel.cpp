@@ -722,6 +722,7 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 					propValue = categoryObj[sProperty].toArray();
 					break;
 
+				case PROPERTIESTYPE_ShapeData:
 				case PROPERTIESTYPE_UiPanel:
 					propValue = categoryObj[sProperty].toObject();
 					break;
@@ -1025,6 +1026,7 @@ void PropertiesTreeModel::ResetValues()
 	case PROPERTIESTYPE_FloatArray:
 		return QVariant(valueRef.toArray());
 
+	case PROPERTIESTYPE_ShapeData:
 	case PROPERTIESTYPE_UiPanel:
 		return QVariant(valueRef.toObject());
 
@@ -1087,6 +1089,7 @@ void PropertiesTreeModel::ResetValues()
 	case PROPERTIESTYPE_FloatArray:
 		return QJsonValue(valueRef.toJsonArray());
 
+	case PROPERTIESTYPE_ShapeData:
 	case PROPERTIESTYPE_UiPanel:
 		return QJsonValue(valueRef.toJsonObject());
 
@@ -1210,6 +1213,21 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 	case PROPERTIESTYPE_Root:
 	case PROPERTIESTYPE_Category:
 		break;
+
+	case PROPERTIESTYPE_ShapeData: {
+		QJsonObject shapeDataObj = treeItemValue.toJsonObject();
+		if(shapeDataObj.contains("data"))
+		{
+			sRetStr += "[ ";
+
+			QJsonArray shapeDataArray = shapeDataObj["data"].toArray();
+			bool bFirstVal = true;
+			for(QJsonValue val : shapeDataArray)
+				sRetStr += QString::number(val.toDouble(), 103, 1) + ", ";
+			
+			sRetStr += " ]";
+		}
+		break; }
 
 	case PROPERTIESTYPE_UiPanel:
 		sRetStr += "Panel";
