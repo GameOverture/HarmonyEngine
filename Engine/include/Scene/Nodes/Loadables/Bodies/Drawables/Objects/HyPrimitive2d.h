@@ -181,6 +181,7 @@ public:
 	float GetLineThickness(int32 iLayerIndex) const;
 
 	void RemoveLayer(int32 iLayerIndex);
+	void RemoveAllLayers();
 
 	virtual bool IsLoadDataValid() override;
 
@@ -195,7 +196,6 @@ protected:
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
 
 private:
-	void ClearAllData();
 	void DeleteLayerData(int32 iLayerIndex);
 
 	void AssembleLineChain(int32 iLayerIndex, const glm::vec2 *pVertexList, uint32 uiNumVertices, bool bLoop); // Also used to do shape outlines

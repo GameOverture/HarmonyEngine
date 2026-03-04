@@ -34,6 +34,22 @@ IHyFixture2d::IHyFixture2d(const IHyFixture2d &copyRef) :
 	*this = copyRef;
 }
 
+IHyFixture2d::IHyFixture2d(IHyFixture2d &&donor) noexcept :
+	m_pParent(donor.m_pParent),
+	m_eType(donor.m_eType),
+	m_fMaxPush(donor.m_fMaxPush),
+	m_bPhysicsAllowed(donor.m_bPhysicsAllowed),
+	m_bPhysicsDirty(donor.m_bPhysicsDirty),
+	m_bClipVelocity(donor.m_bClipVelocity)
+{
+	donor.m_pParent = nullptr;
+	donor.m_eType = HYFIXTURE_Nothing;
+	donor.m_fMaxPush = FLT_MAX;
+	donor.m_bPhysicsAllowed = true;
+	donor.m_bPhysicsDirty = false;
+	donor.m_bClipVelocity = true;
+}
+
 /*virtual*/ IHyFixture2d::~IHyFixture2d()
 {
 	HyAssert(m_pParent == nullptr, "IHyFixture2d::~IHyFixture2d() - Fixture still has a parent. Parent class should take care of this.");
@@ -51,6 +67,26 @@ const IHyFixture2d &IHyFixture2d::operator=(const IHyFixture2d &rhs)
 	m_bClipVelocity = rhs.m_bClipVelocity;
 
 	m_bPhysicsDirty = true;
+	return *this;
+}
+
+const IHyFixture2d &IHyFixture2d::operator=(IHyFixture2d &&donor) noexcept
+{
+	if(this == &donor)
+		return *this;
+
+	m_pParent = donor.m_pParent;
+	m_eType = donor.m_eType;
+	m_fMaxPush = donor.m_fMaxPush;
+	m_bPhysicsAllowed = donor.m_bPhysicsAllowed;
+	m_bPhysicsDirty = donor.m_bPhysicsDirty;
+	m_bClipVelocity = donor.m_bClipVelocity;
+	donor.m_pParent = nullptr;
+	donor.m_eType = HYFIXTURE_Nothing;
+	donor.m_fMaxPush = FLT_MAX;
+	donor.m_bPhysicsAllowed = true;
+	donor.m_bPhysicsDirty = false;
+	donor.m_bClipVelocity = true;
 	return *this;
 }
 

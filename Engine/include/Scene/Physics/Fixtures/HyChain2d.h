@@ -33,9 +33,11 @@ class HyChain2d : public IHyFixture2d
 public:
 	HyChain2d(HyEntity2d *pParent = nullptr);
 	HyChain2d(const HyChain2d &copyRef);
+	HyChain2d(HyChain2d &&donor) noexcept;
 	virtual ~HyChain2d();
 
 	const HyChain2d &operator=(const HyChain2d &rhs);
+	const HyChain2d &operator=(HyChain2d &&donor) noexcept;
 
 	virtual bool IsValid() const override;
 

@@ -19,6 +19,12 @@ class GfxShapeHyView : public IGfxEditView
 
 	bool						m_bIsFixture;
 
+	enum Layer
+	{
+		LAYER_Fill = 0,
+		LAYER_Outline,
+		LAYER_Preview
+	};
 	HyPrimitive2d				m_Prim;
 
 public:
@@ -31,8 +37,6 @@ public:
 protected:
 	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) override;
 	virtual void OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) override;
-
-	void ClearPrimitives();
 
 	void DoGrabPointPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta);
 };

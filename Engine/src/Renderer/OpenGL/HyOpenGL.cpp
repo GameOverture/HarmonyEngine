@@ -1457,11 +1457,22 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 	// Everything is prepared, do the drawing
 	if(pRenderState->m_uiNumInstances != 0)
 	{
-		glDrawArraysInstanced(eDrawMode, 0, pRenderState->m_uiNUM_VERTS_PER_INSTANCE, pRenderState->m_uiNumInstances);
-		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDrawArraysInstanced");
+		if(pRenderState->m_uiNUM_VERTS_PER_INSTANCE == 3 && eDrawMode == GL_TRIANGLES)
+		{
+			// Primitives
+			glDrawArrays(eDrawMode, 0, pRenderState->m_uiNUM_VERTS_PER_INSTANCE * pRenderState->m_uiNumInstances);
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDrawArrays");
+		}
+		else
+		{
+			// Sprites, Text Glyphs
+			glDrawArraysInstanced(eDrawMode, 0, pRenderState->m_uiNUM_VERTS_PER_INSTANCE, pRenderState->m_uiNumInstances);
+			HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDrawArraysInstanced");
+		}
 	}
 	else
 	{
+		// Spine
 		glDrawElements(eDrawMode, pRenderState->m_uiNUM_VERTS_PER_INSTANCE, GL_UNSIGNED_SHORT, reinterpret_cast<void *>(pRenderState->m_uiINDICES_OFFSET));
 		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDrawElements");
 	}

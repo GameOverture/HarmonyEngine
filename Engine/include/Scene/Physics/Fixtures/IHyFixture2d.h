@@ -32,9 +32,11 @@ protected:
 public:
 	IHyFixture2d(HyEntity2d *pParent = nullptr);
 	IHyFixture2d(const IHyFixture2d &copyRef);
+	IHyFixture2d(IHyFixture2d &&donor) noexcept;
 	virtual ~IHyFixture2d();
 
 	const IHyFixture2d &operator=(const IHyFixture2d &rhs);
+	const IHyFixture2d &operator=(IHyFixture2d &&donor) noexcept;
 
 	HyFixtureType GetType() const;
 	virtual bool IsValid() const;

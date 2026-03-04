@@ -41,7 +41,7 @@ public:
 	virtual QJsonObject GetActionSerialized() const override;
 
 protected:
-	virtual QString DoDeserialize(const QJsonObject &floatList) override;
+	virtual QString DoDeserialize(const QJsonObject &serializedObj) override;
 	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) override;
 	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
 

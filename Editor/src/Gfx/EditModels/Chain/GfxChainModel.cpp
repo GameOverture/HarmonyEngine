@@ -140,8 +140,13 @@ bool GfxChainModel::IsLoopClosed() const
 	return QJsonObject();
 }
 
-/*virtual*/ QString GfxChainModel::DoDeserialize(const QJsonObject &floatList) /*override*/
+/*virtual*/ QString GfxChainModel::DoDeserialize(const QJsonObject &serializedObj) /*override*/
 {
+	QJsonArray dataArray = serializedObj["data"].toArray();
+	std::vector<float> floatList;
+	for(const QJsonValue &val : dataArray)
+		floatList.push_back(static_cast<float>(val.toDouble()));
+
 	if(floatList.empty())
 	{
 		m_GrabPointList.clear();
@@ -154,7 +159,7 @@ bool GfxChainModel::IsLoopClosed() const
 	std::vector<glm::vec2> grabPointList;
 	if(floatList.empty() == false)
 	{
-		grabPointList = m_Chain.DeserializeSelf(HYFIXTURE_LineChain, std::vector<float>(floatList.begin(), floatList.end()));
+		grabPointList = m_Chain.DeserializeSelf(HYFIXTURE_LineChain, floatList);
 
 		if(grabPointList.empty())
 		{
@@ -226,6 +231,8 @@ bool GfxChainModel::IsLoopClosed() const
 		else
 			return "Chain has invalid vertex data";
 	}
+
+	return "";
 }
 
 /*virtual*/ EditModeAction GfxChainModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/

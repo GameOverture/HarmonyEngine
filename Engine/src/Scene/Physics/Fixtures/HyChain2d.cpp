@@ -17,7 +17,9 @@ HyChain2d::HyChain2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyFixture2d(pParent),
 	m_Data({}),
 	m_hPhysics(b2_nullChainId),
-	m_pPhysicsInit(nullptr)
+	m_pPhysicsInit(nullptr),
+	m_pMaterials(nullptr),
+	m_iMaterialCount(0)
 {
 }
 
@@ -25,9 +27,26 @@ HyChain2d::HyChain2d(const HyChain2d &copyRef) :
 	IHyFixture2d(copyRef),
 	m_Data({}),
 	m_hPhysics(b2_nullChainId),
-	m_pPhysicsInit(nullptr)
+	m_pPhysicsInit(nullptr),
+	m_pMaterials(nullptr),
+	m_iMaterialCount(0)
 {
 	*this = copyRef;
+}
+
+HyChain2d::HyChain2d(HyChain2d &&donor) noexcept :
+	IHyFixture2d(std::move(donor)),
+	m_Data(donor.m_Data),
+	m_hPhysics(donor.m_hPhysics),
+	m_pPhysicsInit(donor.m_pPhysicsInit),
+	m_pMaterials(donor.m_pMaterials),
+	m_iMaterialCount(donor.m_iMaterialCount)
+{
+	donor.m_Data = {};
+	donor.m_hPhysics = b2_nullChainId;
+	donor.m_pPhysicsInit = nullptr;
+	donor.m_pMaterials = nullptr;
+	donor.m_iMaterialCount = 0;
 }
 
 /*virtual*/ HyChain2d::~HyChain2d()
@@ -61,6 +80,27 @@ const HyChain2d &HyChain2d::operator=(const HyChain2d &rhs)
 		Setup(*rhs.m_pPhysicsInit);
 
 	ShapeChanged();
+	return *this;
+}
+
+const HyChain2d &HyChain2d::operator=(HyChain2d &&donor) noexcept
+{
+	if(this != &donor)
+	{
+		ClearShapeData();
+		m_Data = donor.m_Data;
+		m_hPhysics = donor.m_hPhysics;
+		m_pPhysicsInit = donor.m_pPhysicsInit;
+		m_pMaterials = donor.m_pMaterials;
+		m_iMaterialCount = donor.m_iMaterialCount;
+		IHyFixture2d::operator=(std::move(donor));
+		donor.m_Data = {};
+		donor.m_hPhysics = b2_nullChainId;
+		donor.m_pPhysicsInit = nullptr;
+		donor.m_pMaterials = nullptr;
+		donor.m_iMaterialCount = 0;
+		ShapeChanged();
+	}
 	return *this;
 }
 

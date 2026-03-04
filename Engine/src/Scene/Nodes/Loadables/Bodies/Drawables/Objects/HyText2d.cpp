@@ -75,7 +75,6 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 /*virtual*/ void HyText2d::OnSetDebugBox() /*override*/
 {
 	m_DebugBox.SetTint(HyColor::Red);
-	m_DebugBox.SetWireframe(true);
 
 	// SetAsLine
 	switch(GetTextType())
@@ -85,30 +84,30 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 		{
 		case HYALIGN_Left:
 		case HYALIGN_Justify:
-			m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(GetWidth(), 0.0f));
+			m_DebugBox.SetAsLineSegment(0, glm::vec2(0.0f), glm::vec2(GetWidth(), 0.0f), 1.0f);
 			break;
 
 		case HYALIGN_Center:
-			m_DebugBox.SetAsLineSegment(glm::vec2(GetWidth(-0.5f), 0.0f), glm::vec2(GetWidth(0.5f), 0.0f));
+			m_DebugBox.SetAsLineSegment(0, glm::vec2(GetWidth(-0.5f), 0.0f), glm::vec2(GetWidth(0.5f), 0.0f), 1.0f);
 			break;
 
 		case HYALIGN_Right:
-			m_DebugBox.SetAsLineSegment(glm::vec2(-GetWidth(), 0.0f), glm::vec2(0.0f, 0.0f));
+			m_DebugBox.SetAsLineSegment(0, glm::vec2(-GetWidth(), 0.0f), glm::vec2(0.0f, 0.0f), 1.0f);
 			break;
 		}
 		break;
 
 	case HYTEXT_Box:
 	case HYTEXT_ScaleBox:
-		m_DebugBox.SetAsBox(m_vBoxDimensions.x, m_vBoxDimensions.y);
+		m_DebugBox.SetAsBox(0, m_vBoxDimensions.x, m_vBoxDimensions.y, 1.0f);
 		break;
 
 	case HYTEXT_Column:
-		m_DebugBox.SetAsBox(HyRect(m_vBoxDimensions.x * 0.5f, GetHeight() * 0.5f, glm::vec2(m_vBoxDimensions.x * 0.5f, GetHeight() * -0.5f), 0.0f));
+		m_DebugBox.SetAsBox(0, HyRect(m_vBoxDimensions.x * 0.5f, GetHeight() * 0.5f, glm::vec2(m_vBoxDimensions.x * 0.5f, GetHeight() * -0.5f), 0.0f), 1.0f);
 		break;
 
 	case HYTEXT_Vertical:
-		m_DebugBox.SetAsLineSegment(glm::vec2(0.0f), glm::vec2(0.0f, -GetHeight()));
+		m_DebugBox.SetAsLineSegment(0, glm::vec2(0.0f), glm::vec2(0.0f, -GetHeight()), 1.0f);
 		break;
 
 	default:

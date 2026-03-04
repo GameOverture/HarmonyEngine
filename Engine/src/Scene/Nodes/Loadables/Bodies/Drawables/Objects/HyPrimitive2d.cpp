@@ -28,14 +28,14 @@ HyPrimitive2d::HyPrimitive2d(const HyPrimitive2d &copyRef) :
 
 HyPrimitive2d::~HyPrimitive2d(void)
 {
-	ClearAllData();
+	RemoveAllLayers();
 }
 
 const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 {
 	IHyDrawable2d::operator=(rhs);
 
-	ClearAllData();
+	RemoveAllLayers();
 
 	for(int i = 0; i < rhs.m_LayerList.size(); ++i)
 		m_LayerList.emplace_back(rhs.m_LayerList[i]);
@@ -142,6 +142,8 @@ int32 HyPrimitive2d::SetAsLineSegment(int32 iLayerIndex, const glm::vec2 &pt1, c
 	vertList.push_back(pt1);
 	vertList.push_back(pt2);
 	AssembleLineChain(iLayerIndex, vertList.data(), vertList.size(), false);
+
+	Load();
 	return iLayerIndex;
 }
 
@@ -170,6 +172,8 @@ int32 HyPrimitive2d::SetAsLineChain(int32 iLayerIndex, const glm::vec2 *pVertice
 		uiNumVerts--; // AssembleLineChain will make this connection as bLoop is true
 
 	AssembleLineChain(iLayerIndex, pVertices, uiNumVerts, bLoop);
+
+	Load();
 	return iLayerIndex;
 }
 
@@ -231,6 +235,7 @@ int32 HyPrimitive2d::SetAsShape(int32 iLayerIndex, const HyShape2d &shapeRef, fl
 		break;
 	}
 
+	Load();
 	return iLayerIndex;
 }
 
@@ -250,6 +255,8 @@ int32 HyPrimitive2d::SetAsCircle(int32 iLayerIndex, const glm::vec2 &ptCenter, f
 	m_LayerList[iLayerIndex].m_fLineThickness = fOutlineThickness;
 
 	AssembleCircle(iLayerIndex, ptCenter, fRadius, m_LayerList[iLayerIndex].m_uiNumSegments);
+
+	Load();
 	return iLayerIndex;
 }
 
@@ -264,6 +271,8 @@ int32 HyPrimitive2d::SetAsPolygon(int32 iLayerIndex, const glm::vec2 *pVertexArr
 	m_LayerList[iLayerIndex].m_fLineThickness = fOutlineThickness;
 
 	AssemblePolygon(iLayerIndex, pVertexArray, uiCount);
+
+	Load();
 	return iLayerIndex;
 }
 
@@ -315,7 +324,6 @@ int32 HyPrimitive2d::SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const
 	// Add semicircle endcaps on both ends
 	verticesList.emplace_back(pt2 + vRight);
 	verticesList.emplace_back(pt2 - vRight);
-
 
 	return SetAsPolygon(iLayerIndex, verticesList.data(), verticesList.size(), fOutlineThickness);
 }
@@ -428,13 +436,23 @@ void HyPrimitive2d::RemoveLayer(int32 iLayerIndex)
 {
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
-		HyLogError("HyPrimitive2d::RemoveLayer() failed - Invalid layer index");
+		HyLogWarning("HyPrimitive2d::RemoveLayer() - Invalid layer index");
 		return;
 	}
 	DeleteLayerData(iLayerIndex);
 	m_LayerList.erase(m_LayerList.begin() + iLayerIndex);
 	m_bUpdateShaderUniforms = true;
 	SetDirty(DIRTY_SceneAABB);
+}
+
+void HyPrimitive2d::RemoveAllLayers()
+{
+	for(int i = 0; i < m_LayerList.size(); ++i)
+		DeleteLayerData(i);
+		
+	m_LayerList.clear();
+	m_bUpdateShaderUniforms = true;
+	m_ShaderUniforms.Clear();
 }
 
 /*virtual*/ bool HyPrimitive2d::IsLoadDataValid() /*override*/
@@ -490,7 +508,6 @@ void HyPrimitive2d::RemoveLayer(int32 iLayerIndex)
 		if(layerRef.m_bVisible && layerRef.m_uiNumVerts > 0 && layerRef.m_pVertBuffer != nullptr)
 			uiNumInstancesOut += layerRef.m_uiNumVerts / uiNumVerticesPerInstOut;
 	}
-
 	bIsBatchable = true;
 }
 
@@ -532,16 +549,6 @@ void HyPrimitive2d::RemoveLayer(int32 iLayerIndex)
 	return true;
 }
 
-void HyPrimitive2d::ClearAllData()
-{
-	for(int i = 0; i < m_LayerList.size(); ++i)
-		DeleteLayerData(i);
-		
-	m_LayerList.clear();
-	m_bUpdateShaderUniforms = true;
-	m_ShaderUniforms.Clear();
-}
-
 void HyPrimitive2d::DeleteLayerData(int32 iLayerIndex)
 {
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
@@ -563,7 +570,7 @@ void HyPrimitive2d::DeleteLayerData(int32 iLayerIndex)
 void HyPrimitive2d::AssembleLineChain(int32 iLayerIndex, const glm::vec2 *pVertexList, uint32 uiNumVertices, bool bLoop)
 {
 	HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
-	HyAssert(bLoop && uiNumVertices > 2, "HyPrimitive2d::SetAsLineChain - Looping line chains must have at least 3 vertices");
+	HyAssert(bLoop == false || uiNumVertices > 2, "HyPrimitive2d::SetAsLineChain - Looping line chains must have at least 3 vertices");
 	
 	DeleteLayerData(iLayerIndex);
 
@@ -685,6 +692,10 @@ void HyPrimitive2d::AssembleCircle(int32 iLayerIndex, glm::vec2 ptCenter, float 
 
 void HyPrimitive2d::AssemblePolygon(int32 iLayerIndex, const glm::vec2 *pVertexList, uint32 uiNumVertices)
 {
+	HyAssert(uiNumVertices >= 3, "HyPrimitive2d::AssemblePolygon was passed an invalid vertexList with less than 3 vertices");
+	float fWindingOrder = HyMath::WindingOrder(pVertexList[0], pVertexList[1], pVertexList[2]);
+	HyAssert(fWindingOrder != 0.0f, "HyPrimitive2d::AssemblePolygon was passed an invalid vertexList with collinear vertices");
+
 	DeleteLayerData(iLayerIndex);
 
 	Layer &layerRef = m_LayerList[iLayerIndex];
@@ -692,6 +703,11 @@ void HyPrimitive2d::AssemblePolygon(int32 iLayerIndex, const glm::vec2 *pVertexL
 	if(layerRef.m_fLineThickness <= 0.0f)
 	{
 		std::vector<glm::vec2> vertList(pVertexList, pVertexList + uiNumVertices);
+
+		// Ensure CCW
+		if(fWindingOrder < 0.0f)
+			std::reverse(vertList.begin(), vertList.end());
+
 		std::vector<HyTriangle2d> triangleList = HyMath::Triangulate(vertList);
 
 		layerRef.m_uiNumVerts = static_cast<uint32>(triangleList.size()) * 3;

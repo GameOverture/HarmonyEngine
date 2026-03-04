@@ -23,8 +23,6 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 
 /*virtual*/ GfxShapeHyView::~GfxShapeHyView()
 {
-	ClearPrimitives();
-	ClearPreview();
 }
 
 /*virtual*/ void GfxShapeHyView::SyncColor() /*override*/
@@ -37,18 +35,14 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 
 /*virtual*/ void GfxShapeHyView::ClearPreview() /*override*/
 {
-	m_Prim.Set
-	for(HyPrimitive2d *pPrim : m_PrimPreviewList)
-		delete pPrim;
-	m_PrimPreviewList.clear();
+	m_Prim.RemoveLayer(LAYER_Preview);
 }
 
 /*virtual*/ void GfxShapeHyView::OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) /*override*/
 {
 	if(m_pModel == nullptr || static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_None)
 	{
-		ClearPrimitives();
-		m_PrimOutline.SetAsNothing();
+		m_Prim.RemoveAllLayers();
 		return;
 	}
 	
@@ -56,19 +50,12 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 	// Sync Primitives with Model
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
 	
+	float fOutlineThickness = 1.0f;
 	if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() != SHAPE_Polygon)
 	{
-		if(m_PrimList.size() != 1)
+		m_Prim.SetAsShape(LAYER_Fill, *static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(0));
+		if(m_Prim.GetLayerType(LAYER_Fill) != HYFIXTURE_Nothing)
 		{
-			ClearPrimitives();
-			HyPrimitive2d *pNewPrim = new HyPrimitive2d(this);
-			m_PrimList.push_back(pNewPrim);
-		}
-		m_PrimList[0]->SetAsShape(*static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(0));
-
-		if(m_PrimList[0]->GetShapeType() != HYFIXTURE_Nothing)
-		{
-			// Set `m_PrimOutline`
 			if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_Box)
 			{
 				b2Vec2 *pVerts = static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(0)->GetAsPolygon().vertices;
@@ -80,7 +67,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 					projectedVertList.push_back(ptScreenPos);
 				}
 
-				m_PrimOutline.SetAsPolygon(projectedVertList);
+				m_Prim.SetAsPolygon(LAYER_Outline, projectedVertList, fOutlineThickness);
 			}
 			else if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_Circle)
 			{
@@ -90,7 +77,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 				pCamera->ProjectToCamera(ptCenter, ptCenter);
 				float fRadius = circle.radius * pCamera->GetZoom();
 
-				m_PrimOutline.SetAsCircle(ptCenter, fRadius);
+				m_Prim.SetAsCircle(LAYER_Outline, ptCenter, fRadius, fOutlineThickness);
 			}
 			else if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_LineSegment)
 			{
@@ -100,7 +87,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 				glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
 				pCamera->ProjectToCamera(ptTwo, ptTwo);
 
-				m_PrimOutline.SetAsLineSegment(ptOne, ptTwo);
+				m_Prim.SetAsLineSegment(LAYER_Outline, ptOne, ptTwo, fOutlineThickness);
 			}
 			else if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_Capsule)
 			{
@@ -111,29 +98,19 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 				pCamera->ProjectToCamera(ptTwo, ptTwo);
 				float fRadius = capsule.radius * pCamera->GetZoom();
 
-				m_PrimOutline.SetAsLineSegment(ptOne, ptTwo);
+				m_Prim.SetAsCapsule(LAYER_Outline, ptOne, ptTwo, fRadius, SHAPE_Capsule);
 			}
 			else
 				HyGuiLog("GfxShapeHyView::RefreshView - Unsupported shape type for primitive sync", LOGTYPE_Error);
 		}
 		else
-			m_PrimOutline.SetAsNothing();
+			m_Prim.SetAsNothing(LAYER_Outline);
 	}
 	else // SHAPE_Polygon
 	{
 		int iNumFixtures = static_cast<GfxShapeModel *>(m_pModel)->GetNumShapeFixtures();
-		while(m_PrimList.size() < iNumFixtures)
-		{
-			HyPrimitive2d *pNewPrim = new HyPrimitive2d(this);
-			m_PrimList.push_back(pNewPrim);
-		}
-		while(m_PrimList.size() > iNumFixtures)
-		{
-			delete m_PrimList.back();
-			m_PrimList.pop_back();
-		}
 		for(int iIndex = 0; iIndex < iNumFixtures; ++iIndex)
-			m_PrimList[iIndex]->SetAsShape(*static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(iIndex));
+			m_Prim.SetAsShape(LAYER_Fill + iIndex, *static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(iIndex));
 
 		// Set `m_PrimOutline`
 		const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
@@ -144,7 +121,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			pCamera->ProjectToCamera(grabPointModelList[i].GetPos(), ptScreenPos);
 			projectedVertList.push_back(ptScreenPos);
 		}
-		m_PrimOutline.SetAsLineChain(projectedVertList, static_cast<GfxShapeModel *>(m_pModel)->IsLoopClosed());
+		m_Prim.SetAsLineChain(LAYER_Outline, projectedVertList, static_cast<GfxShapeModel *>(m_pModel)->IsLoopClosed(), fOutlineThickness);
 	}
 }
 
@@ -173,15 +150,15 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			HyGuiLog("GfxShapeHyView::RefreshView called with closed loop (or grab points empty)", LOGTYPE_Error);
 			break;
 		}
-		if(m_PrimPreviewList.empty())
-		{
-			m_PrimPreviewList.append(new HyPrimitive2d(this));
-			m_PrimPreviewList[0]->UseWindowCoordinates();
-			m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-			m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
-		}
-		if(m_PrimPreviewList.size() != 1)
-			HyGuiLog("GfxShapeHyView::RefreshView - EDITMODEACTION_AppendVertex - m_PrimPreviewList should have exactly 1 primitive", LOGTYPE_Error);
+		//if(m_PrimPreviewList.empty())
+		//{
+		//	m_PrimPreviewList.append(new HyPrimitive2d(this));
+		//	m_PrimPreviewList[0]->UseWindowCoordinates();
+		//	m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
+		//	m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
+		//}
+		//if(m_PrimPreviewList.size() != 1)
+		//	HyGuiLog("GfxShapeHyView::RefreshView - EDITMODEACTION_AppendVertex - m_PrimPreviewList should have exactly 1 primitive", LOGTYPE_Error);
 		
 		glm::vec2 ptNewVertex = grabPointModelList[iGrabPointIndex].GetPos();
 		ptNewVertex += vDragDelta;
@@ -195,7 +172,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			ptEndPoint = grabPointModelList.back().GetPos();
 		pCamera->ProjectToCamera(ptEndPoint, ptEndPoint);
 		
-		m_PrimPreviewList[0]->SetAsLineSegment(ptNewVertex, ptEndPoint);
+		//m_PrimPreviewList[0]->SetAsLineSegment(ptNewVertex, ptEndPoint);
 		break; }
 
 	case EDITMODEACTION_InsertVertex: {
@@ -209,20 +186,6 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			HyGuiLog("GfxShapeHyView::RefreshView called with less than 2 grab points", LOGTYPE_Error);
 			break;
 		}
-		if(m_PrimPreviewList.empty())
-		{
-			m_PrimPreviewList.append(new HyPrimitive2d(this));
-			m_PrimPreviewList.append(new HyPrimitive2d(this));
-
-			m_PrimPreviewList[0]->UseWindowCoordinates();
-			m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-			m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
-			m_PrimPreviewList[1]->UseWindowCoordinates();
-			m_PrimPreviewList[1]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-			m_PrimPreviewList[1]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
-		}
-		if(m_PrimPreviewList.size() != 2)
-			HyGuiLog("GfxShapeHyView::RefreshView - EDITMODEACTION_InsertVertex - m_PrimPreviewList should have exactly 2 primitives", LOGTYPE_Error);
 
 		glm::vec2 ptInsertVertex = grabPointModelList[iGrabPointIndex].GetPos();
 		ptInsertVertex += vDragDelta;
@@ -239,8 +202,8 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			ptConnectPoint2 = grabPointModelList[iGrabPointIndex - 1].GetPos();
 		pCamera->ProjectToCamera(ptConnectPoint2, ptConnectPoint2);
 		
-		m_PrimPreviewList[0]->SetAsLineSegment(ptInsertVertex, ptConnectPoint1);
-		m_PrimPreviewList[1]->SetAsLineSegment(ptInsertVertex, ptConnectPoint2);
+		//m_PrimPreviewList[0]->SetAsLineSegment(ptInsertVertex, ptConnectPoint1);
+		//m_PrimPreviewList[1]->SetAsLineSegment(ptInsertVertex, ptConnectPoint2);
 		break; }
 
 	case EDITMODEACTION_HoverGrabPoint:
@@ -252,36 +215,22 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 		if(eEditModeState == EDITMODE_MouseDragTransform)
 		{
 			
-
-			for(HyPrimitive2d *pPrim : m_PrimList)
-			{
-				m_PrimPreviewList.append(new HyPrimitive2d(this));
-				*m_PrimPreviewList.last() = *pPrim;
-
-				pPrim->alpha.Set(0.25f);
-			}
-
-			for(HyPrimitive2d *pPrim : m_PrimPreviewList)
-			{
-				HyShape2d tmpShape;
-				pPrim->CalcLocalBoundingShape(tmpShape);
-				glm::mat4 mtxTransform = glm::translate(mtxTransform, glm::vec3(vDragDelta, 0.0f));
-				tmpShape.TransformSelf(mtxTransform);
-				pPrim->SetAsShape(tmpShape);
-			}
 			
-			for(GfxGrabPointView *pGrabPtView : m_GrabPointViewList)
-				pGrabPtView->pos.Offset(vDragDelta);
+
+			//for(HyPrimitive2d *pPrim : m_PrimPreviewList)
+			//{
+			//	HyShape2d tmpShape;
+			//	pPrim->CalcLocalBoundingShape(tmpShape);
+			//	glm::mat4 mtxTransform = glm::translate(mtxTransform, glm::vec3(vDragDelta, 0.0f));
+			//	tmpShape.TransformSelf(mtxTransform);
+			//	pPrim->SetAsShape(tmpShape);
+			//}
+			//
+			//for(GfxGrabPointView *pGrabPtView : m_GrabPointViewList)
+			//	pGrabPtView->pos.Offset(vDragDelta);
 		}
 		break;
 	}
-}
-
-void GfxShapeHyView::ClearPrimitives()
-{
-	for(HyPrimitive2d *pPrim : m_PrimList)
-		delete pPrim;
-	m_PrimList.clear();
 }
 
 void GfxShapeHyView::DoGrabPointPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta)

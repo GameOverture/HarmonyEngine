@@ -283,7 +283,9 @@ public:
 	static glm::ivec2 PerpendicularCounterClockwise(const glm::ivec2 &vDirVector);
 
 	static float CrossProduct(const glm::vec2 &vA, const glm::vec2 &vB);
-	static float WindingOrder(const glm::vec2 &ptA, const glm::vec2 &ptB, const glm::vec2 &ptC); // >0 = CCW, <0 = CW, 0 = Collinear
+
+	// >0 = CCW, <0 = CW, 0 = Collinear
+	static float WindingOrder(const glm::vec2 &ptA, const glm::vec2 &ptB, const glm::vec2 &ptC);
 
 	static bool IsConvexPolygon(const std::vector<glm::vec2> &ccwOrderedVertexList); // Assumes an implicitly closed, counter-clockwise winding of vertices in `ccwOrderedVertexList`
 	static bool TestPointTriangle(const glm::vec2 &ptA, const glm::vec2 &ptB, const glm::vec2 &ptC, const glm::vec2 &ptTest); // Assumes counter-clockwise order of A,B,C

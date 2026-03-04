@@ -96,57 +96,8 @@ QVariant WgtShapeData::GetValue()
 
 void WgtShapeData::SetValue(QVariant data)
 {
-	switch(ui->stackedWidget->currentIndex())
-	{
-	case SHAPEDATATYPE_Primitive:
-		if(data.typeId() != QMetaType::Type::QPoint && data.typeId() != QMetaType::Type::QSize)
-		{
-			HyGuiLog("WgtShapeData::SetValue() data type is not a QPoint or QSize", LOGTYPE_Error);
-			return;
-		}
-
-		if(data.typeId() == QMetaType::Type::QPoint)
-		{
-			ui->intSpinBoxX->setValue(data.toPoint().x());
-			ui->intSpinBoxY->setValue(data.toPoint().y());
-		}
-		else if(data.typeId() == QMetaType::Type::QSize)
-		{
-			ui->intSpinBoxX->setValue(data.toSize().width());
-			ui->intSpinBoxY->setValue(data.toSize().height());
-		}
-		break;
-
-	case SHAPEDATATYPE_Shape:
-		if(data.typeId() != QMetaType::Type::QPointF && data.typeId() != QMetaType::Type::QSizeF)
-		{
-			HyGuiLog("WgtShapeData::SetValue() data type is not a QPointF or QSizeF", LOGTYPE_Error);
-			return;
-		}
-
-		if(data.typeId() == QMetaType::Type::QPointF)
-		{
-			ui->doubleSpinBoxX->setValue(data.toPointF().x());
-			ui->doubleSpinBoxY->setValue(data.toPointF().y());
-		}
-		else if(data.typeId() == QMetaType::Type::QSizeF)
-		{
-			ui->doubleSpinBoxX->setValue(data.toSizeF().width());
-			ui->doubleSpinBoxY->setValue(data.toSizeF().height());
-		}
-		break;
-
-	case SHAPEDATATYPE_Chain:
-		if(data.typeId() != QMetaType::Type::QRect)
-		{
-			HyGuiLog("WgtShapeData::SetValue() data type is not a QRect", LOGTYPE_Error);
-			return;
-		}
-		ui->intSpinBox3dX->setValue(data.toRect().left());
-		ui->intSpinBox3dY->setValue(data.toRect().top());
-		ui->intSpinBox3dZ->setValue(data.toRect().width());
-		break;
-	}
+	QJsonObject serializedObj = data.toJsonObject();
+	Init(static_cast<ShapeDataType>(ui->stackedWidget->currentIndex()), serializedObj);
 
 	Q_EMIT ValueChanged(data);
 }
