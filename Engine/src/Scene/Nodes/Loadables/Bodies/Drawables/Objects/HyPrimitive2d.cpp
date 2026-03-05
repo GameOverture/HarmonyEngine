@@ -305,24 +305,18 @@ int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, const HyRect &rect, float fOutl
 
 int32 HyPrimitive2d::SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, float fOutlineThickness)
 {
-	// Make a box over the line segment pt1 and pt2 (with a width extent of fRadius), then add semicircle endcaps on both ends
-	glm::vec2 vDir = pt2 - pt1;
-	glm::vec2 ptCenter = vDir * 0.5f;
+	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
+	{
+		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
+		m_LayerList.emplace_back();
+	}
 
-	glm::vec2 vRight = glm::normalize(HyMath::PerpendicularClockwise(vDir)) * fRadius;
+	m_LayerList[iLayerIndex].m_fLineThickness = fOutlineThickness;
 
-	b2Polygon boxPoly = b2MakeOffsetBox(fRadius, glm::length(pt2 - pt1) * 0.5f, {ptCenter.x, ptCenter.y}, b2MakeRot(atan2f(vDir.y, vDir.x)));
-	std::vector<glm::vec2> verticesList;
-	verticesList.emplace_back(boxPoly.vertices[0].x, boxPoly.vertices[0].y);
-	verticesList.emplace_back(boxPoly.vertices[1].x, boxPoly.vertices[1].y);
-	verticesList.emplace_back(boxPoly.vertices[2].x, boxPoly.vertices[2].y);
-	verticesList.emplace_back(boxPoly.vertices[3].x, boxPoly.vertices[3].y);
+	AssembleCapsule(iLayerIndex, pt1, pt2, fRadius, m_LayerList[iLayerIndex].m_uiNumSegments);
 
-	// Add semicircle endcaps on both ends
-	verticesList.emplace_back(pt2 + vRight);
-	verticesList.emplace_back(pt2 - vRight);
-
-	return SetAsPolygon(iLayerIndex, verticesList.data(), verticesList.size(), fOutlineThickness);
+	Load();
+	return iLayerIndex;
 }
 
 glm::vec2 HyPrimitive2d::GetLayerOffset(int32 iLayerIndex) const
@@ -766,19 +760,16 @@ void HyPrimitive2d::AssembleCapsule(int32 iLayerIndex, const glm::vec2 &ptCenter
 
 	if(layerRef.m_fLineThickness <= 0.0f) // Solid Capsule
 	{
-		glm::vec2 a = glm::vec2(ptCenter1.x, ptCenter1.y);
-		glm::vec2 b = glm::vec2(ptCenter2.x, ptCenter2.y);
-
 		// Direction and normal
-		glm::vec2 dir = glm::normalize(b - a);
+		glm::vec2 dir = glm::normalize(ptCenter2 - ptCenter1);
 		glm::vec2 normal = glm::vec2(-dir.y, dir.x);
 		glm::vec2 offset = normal * fRadius;
 
 		// Rectangle corners
-		glm::vec2 p0 = a + offset;
-		glm::vec2 p1 = b + offset;
-		glm::vec2 p2 = b - offset;
-		glm::vec2 p3 = a - offset;
+		glm::vec2 p0 = ptCenter1 + offset;
+		glm::vec2 p1 = ptCenter2 + offset;
+		glm::vec2 p2 = ptCenter2 - offset;
+		glm::vec2 p3 = ptCenter1 - offset;
 
 		// Add rectangle as two triangles
 		std::vector<glm::vec2> verts;
@@ -791,33 +782,43 @@ void HyPrimitive2d::AssembleCapsule(int32 iLayerIndex, const glm::vec2 &ptCenter
 		verts.push_back(p0);
 
 		// Circle caps
-		float angleStart = glm::atan(dir.y, dir.x);
-		float angleStep = glm::pi<float>() / static_cast<float>(uiSegments);
+		// TODO: Make semi-circles instead
+		const float k_segments = static_cast<float>(uiSegments);
+		const float k_increment = 2.0f * glm::pi<float>() / k_segments;
+		float sinInc = sinf(k_increment);
+		float cosInc = cosf(k_increment);
 
-		// Cap at 'a'
-		for(int i = 0; i < static_cast<int>(uiSegments); ++i) {
-			float angle1 = angleStart + glm::pi<float>() / 2 + i * angleStep;
-			float angle2 = angle1 + angleStep;
-
-			glm::vec2 pA1 = a + fRadius * glm::vec2(cos(angle1), sin(angle1));
-			glm::vec2 pA2 = a + fRadius * glm::vec2(cos(angle2), sin(angle2));
-
-			verts.push_back(a);
-			verts.push_back(pA1);
-			verts.push_back(pA2);
+		// ptCenter1
+		glm::vec2 r1(cosInc, sinInc);
+		glm::vec2 v1 = ptCenter1 + fRadius * r1;
+		for(int32 i = 0; i < k_segments; ++i)
+		{
+			glm::vec2 r2;
+			r2.x = cosInc * r1.x - sinInc * r1.y;
+			r2.y = sinInc * r1.x + cosInc * r1.y;
+			glm::vec2 v2 = ptCenter1 + fRadius * r2;
+			verts.push_back(ptCenter1);
+			verts.push_back(v1);
+			verts.push_back(v2);
+			r1 = r2;
+			v1 = v2;
 		}
 
-		// Cap at 'b'
-		for(int i = 0; i < static_cast<int>(uiSegments); ++i) {
-			float angle1 = angleStart - glm::pi<float>() / 2 - i * angleStep;
-			float angle2 = angle1 - angleStep;
-
-			glm::vec2 pB1 = b + fRadius * glm::vec2(cos(angle1), sin(angle1));
-			glm::vec2 pB2 = b + fRadius * glm::vec2(cos(angle2), sin(angle2));
-
-			verts.push_back(b);
-			verts.push_back(pB1);
-			verts.push_back(pB2);
+		// ptCenter2
+		r1.x = 1.0f;
+		r1.y = 0.0f;
+		v1 = ptCenter2 + fRadius * r1;
+		for(int32 i = 0; i < k_segments; ++i)
+		{
+			glm::vec2 r2;
+			r2.x = cosInc * r1.x - sinInc * r1.y;
+			r2.y = sinInc * r1.x + cosInc * r1.y;
+			glm::vec2 v2 = ptCenter2 + fRadius * r2;
+			verts.push_back(ptCenter2);
+			verts.push_back(v1);
+			verts.push_back(v2);
+			r1 = r2;
+			v1 = v2;
 		}
 
 		// Output
@@ -827,40 +828,24 @@ void HyPrimitive2d::AssembleCapsule(int32 iLayerIndex, const glm::vec2 &ptCenter
 	}
 	else // Capsule Outline
 	{
-		const float k_segments = static_cast<float>(uiSegments);
-		const float k_increment = 2.0f * glm::pi<float>() / k_segments;
-		float sinInc = sinf(k_increment);
-		float cosInc = cosf(k_increment);
-		glm::vec2 r1(cosInc, sinInc);
-		glm::vec2 v1 = ptCenter1 + fRadius * r1;
-
-		r1.x = 1.0f;
-		r1.y = 0.0f;
-		v1 = ptCenter1 + fRadius * r1;
+		glm::vec2 vDir = glm::normalize(ptCenter2 - ptCenter1) * -fRadius;
+		glm::vec2 vPerpendicularExtent = glm::vec2(-vDir.y, vDir.x);
+		glm::vec2 v45DegreeExtent = (vDir + vPerpendicularExtent) * 0.70710678f; // sin(45) == cos(45) == 0.70710678
+		glm::vec2 vOther45DegreeExtent = (vDir - vPerpendicularExtent) * 0.70710678f;
 
 		std::vector<glm::vec2> vertexList;
-		vertexList.push_back({ v1.x, v1.y });
-		
-		for(int32 i = 0; i < k_segments / 2; ++i)
-		{
-			glm::vec2 r2;
-			r2.x = cosInc * r1.x - sinInc * r1.y;
-			r2.y = sinInc * r1.x + cosInc * r1.y;
-			glm::vec2 v2 = ptCenter1 + fRadius * r2;
+		vertexList.reserve(10);
+		vertexList.push_back(ptCenter1 + vDir); // Start at top of first circle cap
+		vertexList.push_back(ptCenter1 + v45DegreeExtent); // Then go to 45 degree angle of the first circle caps
+		vertexList.push_back(ptCenter1 + vPerpendicularExtent); // Then go to one side of the rectangle
+		vertexList.push_back(ptCenter2 + vPerpendicularExtent); // Then go to the other side of the rectangle
+		vertexList.push_back(ptCenter2 - vOther45DegreeExtent); // Then go to 45 degree angle of the second circle cap
+		vertexList.push_back(ptCenter2 - vDir); // Then go to the top of the second circle cap
+		vertexList.push_back(ptCenter2 - v45DegreeExtent); // Then go to 45 degree angle of the second circle cap
+		vertexList.push_back(ptCenter2 - vPerpendicularExtent); // Then go to one side of the rectangle
+		vertexList.push_back(ptCenter1 - vPerpendicularExtent); // Then go to the other side of the rectangle
+		vertexList.push_back(ptCenter1 + vOther45DegreeExtent); // Then go to 45 degree angle of the first circle caps
 
-			vertexList.push_back({ v2.x, v2.y });
-
-			//m_lines->Vertex(v1, color);
-			//m_lines->Vertex(v2, color);
-			r1 = r2;
-			//v1 = v2;
-		}
-
-
-
-
-
-		//HyBuildCapsuleVerts(vertList, glm::vec2(shapeRef.GetAsCapsule().center1.x, shapeRef.GetAsCapsule().center1.y), glm::vec2(shapeRef.GetAsCapsule().center2.x, shapeRef.GetAsCapsule().center2.y), shapeRef.GetAsCapsule().radius, layerRef.m_uiNumSegments);
-		//AssembleLineChain(iLayerIndex, vertList.data(), vertList.size(), true);
+		AssembleLineChain(iLayerIndex, vertexList.data(), static_cast<uint32>(vertexList.size()), true);
 	}
 }
