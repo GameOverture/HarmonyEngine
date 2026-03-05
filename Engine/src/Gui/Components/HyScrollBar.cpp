@@ -340,7 +340,7 @@ void HyScrollBar::ScrollTo(float fPos)
 			HySetVec(ptDownArrow[0], m_uiDiameter * 0.2f, m_uiDiameter * 0.8f);
 			HySetVec(ptDownArrow[1], m_uiDiameter * 0.5f, m_uiDiameter * 0.2f);
 			HySetVec(ptDownArrow[2], m_uiDiameter * 0.8f, m_uiDiameter * 0.8f);
-			static_cast<HyPrimitive2d *>(m_PosBtn.panel.GetPanelNode())->SetAsPolygon(HyPanel::PRIMLAYER_EXTRA_START, ptDownArrow, 3);
+			static_cast<HyPrimitive2d *>(m_PosBtn.panel.GetPanelNode())->SetAsPolygon(HyPanel::PRIMLAYER_EXTRA_START, ptDownArrow, 3, 0.0f);
 		}
 		
 		if(m_NegBtn.panel.IsPrimForPanel() && m_NegBtn.panel.GetPanelNode())
@@ -349,7 +349,7 @@ void HyScrollBar::ScrollTo(float fPos)
 			HySetVec(ptUpArrow[0], m_uiDiameter * 0.2f, m_uiDiameter * 0.2f);
 			HySetVec(ptUpArrow[1], m_uiDiameter * 0.5f, m_uiDiameter * 0.8f);
 			HySetVec(ptUpArrow[2], m_uiDiameter * 0.8f, m_uiDiameter * 0.2f);
-			static_cast<HyPrimitive2d *>(m_NegBtn.panel.GetPanelNode())->SetAsPolygon(HyPanel::PRIMLAYER_EXTRA_START, ptUpArrow, 3);
+			static_cast<HyPrimitive2d *>(m_NegBtn.panel.GetPanelNode())->SetAsPolygon(HyPanel::PRIMLAYER_EXTRA_START, ptUpArrow, 3, 0.0f);
 		}
 	}
 	else // HYORIENT_Horizontal
@@ -360,7 +360,7 @@ void HyScrollBar::ScrollTo(float fPos)
 			HySetVec(ptRightArrow[0], m_uiDiameter * 0.2f, m_uiDiameter * 0.8f);
 			HySetVec(ptRightArrow[1], m_uiDiameter * 0.8f, m_uiDiameter * 0.5f);
 			HySetVec(ptRightArrow[2], m_uiDiameter * 0.2f, m_uiDiameter * 0.2f);
-			static_cast<HyPrimitive2d *>(m_PosBtn.panel.GetPanelNode())->SetAsPolygon(HyPanel::PRIMLAYER_EXTRA_START, ptRightArrow, 3);
+			static_cast<HyPrimitive2d *>(m_PosBtn.panel.GetPanelNode())->SetAsPolygon(HyPanel::PRIMLAYER_EXTRA_START, ptRightArrow, 3, 0.0f);
 		}
 		
 		if(m_NegBtn.panel.IsPrimForPanel() && m_NegBtn.panel.GetPanelNode())
@@ -369,7 +369,7 @@ void HyScrollBar::ScrollTo(float fPos)
 			HySetVec(ptLeftArrow[0], m_uiDiameter * 0.2f, m_uiDiameter * 0.5f);
 			HySetVec(ptLeftArrow[1], m_uiDiameter * 0.8f, m_uiDiameter * 0.8f);
 			HySetVec(ptLeftArrow[2], m_uiDiameter * 0.8f, m_uiDiameter * 0.2f);
-			static_cast<HyPrimitive2d *>(m_NegBtn.panel.GetPanelNode())->SetAsPolygon(HyPanel::PRIMLAYER_EXTRA_START, ptLeftArrow, 3);
+			static_cast<HyPrimitive2d *>(m_NegBtn.panel.GetPanelNode())->SetAsPolygon(HyPanel::PRIMLAYER_EXTRA_START, ptLeftArrow, 3, 0.0f);
 		}
 	}
 }

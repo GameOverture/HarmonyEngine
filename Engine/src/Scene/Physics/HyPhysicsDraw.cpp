@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Physics/HyPhysicsDraw.h"
+#include "Utilities/HyMath.h"
 
 #define HYDISPLAYORDER_BOX2DDRAW 99999999
 
@@ -60,7 +61,8 @@ void DrawStringFcn(b2Vec2 p, const char *s, b2HexColor color, void *context)
 HyPhysicsDraw::HyPhysicsDraw(float fPixelsPerMeter) :
 	HyEntity2d(nullptr),
 	m_fPixelsPerMeter(fPixelsPerMeter),
-	m_iDrawIndex(0)
+	m_iDrawIndex(0),
+	m_Prim(this)
 {
 	m_DebugDraw = {};
 	m_DebugDraw.DrawPolygonFcn = DrawPolygonFcn;
@@ -102,89 +104,106 @@ void HyPhysicsDraw::BeginFrame()
 
 void HyPhysicsDraw::DrawPolygon(const b2Vec2 *vertices, int32 vertexCount, b2HexColor color)
 {
-	while(m_iDrawIndex >= m_DrawList.size())
-		m_DrawList.emplace_back(this);
-
 	std::vector<glm::vec2> convertedVertList;
 	for(int i = 0; i < vertexCount; ++i)
 		convertedVertList.emplace_back(vertices[i].x * m_fPixelsPerMeter, vertices[i].y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].SetAsPolygon(0, convertedVertList.data(), vertexCount, 1.0f);
-	m_DrawList[m_iDrawIndex].SetTint(HyColor(color));
-	m_DrawList[m_iDrawIndex].SetVisible(true);
+	m_Prim.SetAsPolygon(m_iDrawIndex, convertedVertList.data(), vertexCount, 1.0f);
+	m_Prim.SetLayerColor(m_iDrawIndex, HyColor(color));
+	m_Prim.SetLayerVisible(m_iDrawIndex, true);
 
 	m_iDrawIndex++;
 }
 
 void HyPhysicsDraw::DrawSolidPolygon(b2Transform transform, const b2Vec2 *vertices, int32_t vertexCount, float radius, b2HexColor color)
 {
-	while(m_iDrawIndex >= m_DrawList.size())
-		m_DrawList.emplace_back(this);
-
 	std::vector<glm::vec2> convertedVertList;
 	for(int i = 0; i < vertexCount; ++i)
 		convertedVertList.emplace_back(vertices[i].x * m_fPixelsPerMeter, vertices[i].y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].SetAsPolygon(0, convertedVertList.data(), vertexCount);
-	m_DrawList[m_iDrawIndex].SetTint(HyColor(color));
-	m_DrawList[m_iDrawIndex].SetVisible(true);
+	m_Prim.SetAsPolygon(m_iDrawIndex, convertedVertList.data(), vertexCount, 0.0f);
+	m_Prim.SetLayerColor(m_iDrawIndex, HyColor(color));
+	m_Prim.SetLayerVisible(m_iDrawIndex, true);
 
 	m_iDrawIndex++;
 }
 
 void HyPhysicsDraw::DrawCircle(const b2Vec2 &center, float radius, b2HexColor color)
 {
-	while(m_iDrawIndex >= m_DrawList.size())
-		m_DrawList.emplace_back(this);
-
 	glm::vec2 ptConvertedCenter(center.x * m_fPixelsPerMeter, center.y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].SetAsCircle(0, ptConvertedCenter, radius * m_fPixelsPerMeter, 1.0f);
-	m_DrawList[m_iDrawIndex].SetTint(HyColor(color));
-	m_DrawList[m_iDrawIndex].SetVisible(true);
+	m_Prim.SetAsCircle(m_iDrawIndex, ptConvertedCenter, radius * m_fPixelsPerMeter, 1.0f);
+	m_Prim.SetLayerColor(m_iDrawIndex, HyColor(color));
+	m_Prim.SetLayerVisible(m_iDrawIndex, true);
 
 	m_iDrawIndex++;
 }
 
 void HyPhysicsDraw::DrawSolidCircle(b2Transform transform, b2Vec2 center, float radius, b2HexColor color)
 {
-	while(m_iDrawIndex >= m_DrawList.size())
-		m_DrawList.emplace_back(this);
-
 	glm::vec2 ptConvertedCenter(center.x * m_fPixelsPerMeter, center.y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].SetAsCircle(0, ptConvertedCenter, radius * m_fPixelsPerMeter);
-	m_DrawList[m_iDrawIndex].SetTint(HyColor(color));
-	m_DrawList[m_iDrawIndex].SetVisible(true);
+	m_Prim.SetAsCircle(m_iDrawIndex, ptConvertedCenter, radius * m_fPixelsPerMeter, 0.0f);
+	m_Prim.SetLayerColor(m_iDrawIndex, HyColor(color));
+	m_Prim.SetLayerVisible(m_iDrawIndex, true);
 
 	m_iDrawIndex++;
 }
 
 void HyPhysicsDraw::DrawSolidCapsule(b2Vec2 p1, b2Vec2 p2, float radius, b2HexColor color)
 {
+	glm::vec2 ptConvertedP1(p1.x * m_fPixelsPerMeter, p1.y * m_fPixelsPerMeter);
+	glm::vec2 ptConvertedP2(p2.x * m_fPixelsPerMeter, p2.y * m_fPixelsPerMeter);
+
+	m_Prim.SetAsCapsule(m_iDrawIndex, ptConvertedP1, ptConvertedP2, radius * m_fPixelsPerMeter, 0.0f);
+	m_Prim.SetLayerColor(m_iDrawIndex, HyColor(color));
+	m_Prim.SetLayerVisible(m_iDrawIndex, true);
+
+	m_iDrawIndex++;
 }
 
 void HyPhysicsDraw::DrawSegment(const b2Vec2 &p1, const b2Vec2 &p2, b2HexColor color)
 {
-	while(m_iDrawIndex >= m_DrawList.size())
-		m_DrawList.emplace_back(this);
-
 	glm::vec2 ptConvertedP1(p1.x * m_fPixelsPerMeter, p1.y * m_fPixelsPerMeter);
 	glm::vec2 ptConvertedP2(p2.x * m_fPixelsPerMeter, p2.y * m_fPixelsPerMeter);
 
-	m_DrawList[m_iDrawIndex].SetAsLineSegment(0, ptConvertedP1, ptConvertedP2, 1.0f);
-	m_DrawList[m_iDrawIndex].SetTint(HyColor(color));
-	m_DrawList[m_iDrawIndex].SetVisible(true);
+	m_Prim.SetAsLineSegment(m_iDrawIndex, ptConvertedP1, ptConvertedP2, 1.0f);
+	m_Prim.SetLayerColor(m_iDrawIndex, HyColor(color));
+	m_Prim.SetLayerVisible(m_iDrawIndex, true);
 
 	m_iDrawIndex++;
 }
 
 void HyPhysicsDraw::DrawTransform(const b2Transform &xf)
 {
+	glm::vec2 ptPos(xf.p.x * m_fPixelsPerMeter, xf.p.y * m_fPixelsPerMeter);
+	float fRot = atan2f(xf.q.s, xf.q.c);
+
+	// Draw two "arrow" segments to represent the transform's rotation
+	glm::vec2 dir(cosf(fRot), sinf(fRot));
+	glm::vec2 arrowP1 = ptPos + 0.5f * dir * m_fPixelsPerMeter;
+	glm::vec2 arrowP2 = ptPos + 0.25f * dir * m_fPixelsPerMeter + 0.125f * glm::vec2(-dir.y, dir.x) * m_fPixelsPerMeter;
+
+	m_Prim.SetAsLineSegment(m_iDrawIndex, ptPos, arrowP1, 1.0f);
+	m_Prim.SetLayerColor(m_iDrawIndex, HyColor::Red);
+	m_Prim.SetLayerVisible(m_iDrawIndex, true);
+	m_iDrawIndex++;
+
+	m_Prim.SetAsLineSegment(m_iDrawIndex, ptPos, arrowP2, 1.0f);
+	m_Prim.SetLayerColor(m_iDrawIndex, HyColor::Green);
+	m_Prim.SetLayerVisible(m_iDrawIndex, true);
+	m_iDrawIndex++;
 }
 
 void HyPhysicsDraw::DrawPoint(const b2Vec2 &p, float size, b2HexColor color)
 {
+	glm::vec2 ptConvertedP(p.x * m_fPixelsPerMeter, p.y * m_fPixelsPerMeter);
+
+	m_Prim.SetAsBox(m_iDrawIndex, HyRect(size * 0.5f, size * 0.5f, ptConvertedP, 0.0f), 0.0f);
+	m_Prim.SetLayerColor(m_iDrawIndex, HyColor(color));
+	m_Prim.SetLayerVisible(m_iDrawIndex, true);
+
+	m_iDrawIndex++;
 }
 
 void HyPhysicsDraw::DrawString(b2Vec2 p, const char *s, b2HexColor color)
@@ -193,6 +212,6 @@ void HyPhysicsDraw::DrawString(b2Vec2 p, const char *s, b2HexColor color)
 
 void HyPhysicsDraw::EndFrame()
 {
-	for(int32 i = m_iDrawIndex; i < m_DrawList.size(); ++i)
-		m_DrawList[i].SetVisible(false);
+	for(int32 i = m_iDrawIndex; i < m_Prim.GetNumLayers(); ++i)
+		m_Prim.SetLayerVisible(i, false);
 }

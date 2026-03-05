@@ -147,20 +147,20 @@ public:
 	int32 SetAsLineChain(int32 iLayerIndex, const std::vector<glm::vec2> &verticesList, bool bLoop, float fLineThickness);
 	int32 SetAsLineChain(int32 iLayerIndex, const HyChainData &chainData, float fLineThickness);
 
-	int32 SetAsShape(int32 iLayerIndex, const HyShape2d &shapeRef, float fOutlineThickness = 0.0f);
+	int32 SetAsShape(int32 iLayerIndex, const HyShape2d &shapeRef, float fOutlineThickness);
 
 	// Set as a circle with the specified center and radius
-	int32 SetAsCircle(int32 iLayerIndex, float fRadius, float fOutlineThickness = 0.0f);
-	int32 SetAsCircle(int32 iLayerIndex, const glm::vec2 &ptCenter, float fRadius, float fOutlineThickness = 0.0f);
+	int32 SetAsCircle(int32 iLayerIndex, float fRadius, float fOutlineThickness);
+	int32 SetAsCircle(int32 iLayerIndex, const glm::vec2 &ptCenter, float fRadius, float fOutlineThickness);
 
 	// Set as any type of polygon using counter-clockwise vertex winding array of vertices
-	int32 SetAsPolygon(int32 iLayerIndex, const glm::vec2 *pVertexArray, uint32 uiCount, float fOutlineThickness = 0.0f);
-	int32 SetAsPolygon(int32 iLayerIndex, const std::vector<glm::vec2> &verticesList, float fOutlineThickness = 0.0f);
+	int32 SetAsPolygon(int32 iLayerIndex, const glm::vec2 *pVertexArray, uint32 uiCount, float fOutlineThickness);
+	int32 SetAsPolygon(int32 iLayerIndex, const std::vector<glm::vec2> &verticesList, float fOutlineThickness);
 
-	int32 SetAsBox(int32 iLayerIndex, float fWidth, float fHeight, float fOutlineThickness = 0.0f);	// Axis-aligned box, bottom left corner at 0,0
-	int32 SetAsBox(int32 iLayerIndex, const HyRect &rect, float fOutlineThickness = 0.0f);			// Represent an oriented box
+	int32 SetAsBox(int32 iLayerIndex, float fWidth, float fHeight, float fOutlineThickness);	// Axis-aligned box, bottom left corner at 0,0
+	int32 SetAsBox(int32 iLayerIndex, const HyRect &rect, float fOutlineThickness);			// Represent an oriented box
 
-	int32 SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, float fOutlineThickness = 0.0f);
+	int32 SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, float fOutlineThickness);
 
 	glm::vec2 GetLayerOffset(int32 iLayerIndex) const;
 	int32 SetLayerOffset(int32 iLayerIndex, const glm::vec2 &vOffset);
@@ -198,7 +198,7 @@ protected:
 private:
 	void DeleteLayerData(int32 iLayerIndex);
 
-	void AssembleLineChain(int32 iLayerIndex, const glm::vec2 *pVertexList, uint32 uiNumVertices, bool bLoop); // Also used to do shape outlines
+	void AssembleLineChain(int32 iLayerIndex, const glm::vec2 *pVertexList, uint32 uiNumVertices, bool bLoop); // Also used to do shape outlines. pVertexList should NOT include a repeat of the first vertex even if it's a bLoop.
 	void AssembleCircle(int32 iLayerIndex, glm::vec2 ptCenter, float fRadius, uint32 uiSegments);
 	void AssemblePolygon(int32 iLayerIndex, const glm::vec2 *pVertexList, uint32 uiNumVertices);
 	void AssembleCapsule(int32 iLayerIndex, const glm::vec2 &ptCenter1, const glm::vec2 &ptCenter2, float fRadius, uint32 uiSegments);

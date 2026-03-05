@@ -19,9 +19,8 @@ class HyPhysicsDraw : public HyEntity2d
 	b2DebugDraw					m_DebugDraw;
 
 	float						m_fPixelsPerMeter;
-	std::vector<HyPrimitive2d>	m_DrawList;			// TODO: Convert this to a single HyPrimitive2d with multiple layers
-
 	int32						m_iDrawIndex;
+	HyPrimitive2d				m_Prim;
 
 public:
 	HyPhysicsDraw(float fPixelsPerMeter);

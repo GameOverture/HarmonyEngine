@@ -168,9 +168,6 @@ int32 HyPrimitive2d::SetAsLineChain(int32 iLayerIndex, const glm::vec2 *pVertice
 
 	m_LayerList[iLayerIndex].m_fLineThickness = fLineThickness;
 
-	if(bLoop && pVertices[0] == pVertices[uiNumVerts - 1])
-		uiNumVerts--; // AssembleLineChain will make this connection as bLoop is true
-
 	AssembleLineChain(iLayerIndex, pVertices, uiNumVerts, bLoop);
 
 	Load();
@@ -187,7 +184,7 @@ int32 HyPrimitive2d::SetAsLineChain(int32 iLayerIndex, const HyChainData &chainD
 	return SetAsLineChain(iLayerIndex, chainData.pPointList, chainData.iCount, chainData.bLoop, fLineThickness);
 }
 
-int32 HyPrimitive2d::SetAsShape(int32 iLayerIndex, const HyShape2d &shapeRef, float fOutlineThickness /*= 0.0f*/)
+int32 HyPrimitive2d::SetAsShape(int32 iLayerIndex, const HyShape2d &shapeRef, float fOutlineThickness)
 {
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
@@ -239,12 +236,12 @@ int32 HyPrimitive2d::SetAsShape(int32 iLayerIndex, const HyShape2d &shapeRef, fl
 	return iLayerIndex;
 }
 
-int32 HyPrimitive2d::SetAsCircle(int32 iLayerIndex, float fRadius, float fOutlineThickness /*= 0.0f*/)
+int32 HyPrimitive2d::SetAsCircle(int32 iLayerIndex, float fRadius, float fOutlineThickness)
 {
 	return SetAsCircle(iLayerIndex, glm::vec2(0.0f, 0.0f), fRadius, fOutlineThickness);
 }
 
-int32 HyPrimitive2d::SetAsCircle(int32 iLayerIndex, const glm::vec2 &ptCenter, float fRadius, float fOutlineThickness /*= 0.0f*/)
+int32 HyPrimitive2d::SetAsCircle(int32 iLayerIndex, const glm::vec2 &ptCenter, float fRadius, float fOutlineThickness)
 {
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
@@ -260,7 +257,7 @@ int32 HyPrimitive2d::SetAsCircle(int32 iLayerIndex, const glm::vec2 &ptCenter, f
 	return iLayerIndex;
 }
 
-int32 HyPrimitive2d::SetAsPolygon(int32 iLayerIndex, const glm::vec2 *pVertexArray, uint32 uiCount, float fOutlineThickness /*= 0.0f*/)
+int32 HyPrimitive2d::SetAsPolygon(int32 iLayerIndex, const glm::vec2 *pVertexArray, uint32 uiCount, float fOutlineThickness)
 {
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
@@ -276,23 +273,23 @@ int32 HyPrimitive2d::SetAsPolygon(int32 iLayerIndex, const glm::vec2 *pVertexArr
 	return iLayerIndex;
 }
 
-int32 HyPrimitive2d::SetAsPolygon(int32 iLayerIndex, const std::vector<glm::vec2> &verticesList, float fOutlineThickness /*= 0.0f*/)
+int32 HyPrimitive2d::SetAsPolygon(int32 iLayerIndex, const std::vector<glm::vec2> &verticesList, float fOutlineThickness)
 {
 	return SetAsPolygon(iLayerIndex, verticesList.data(), verticesList.size(), fOutlineThickness);
 }
 
-int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, float fWidth, float fHeight, float fOutlineThickness /*= 0.0f*/)
+int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, float fWidth, float fHeight, float fOutlineThickness )
 {
 	std::vector<glm::vec2> verticesList;
 	verticesList.emplace_back(-fWidth * 0.5f, -fHeight * 0.5f);
-	verticesList.emplace_back(-fWidth * 0.5f, fHeight * 0.5f);
-	verticesList.emplace_back(fWidth * 0.5f, fHeight * 0.5f);
 	verticesList.emplace_back(fWidth * 0.5f, -fHeight * 0.5f);
+	verticesList.emplace_back(fWidth * 0.5f, fHeight * 0.5f);
+	verticesList.emplace_back(-fWidth * 0.5f, fHeight * 0.5f);
 
 	return SetAsPolygon(iLayerIndex, verticesList.data(), verticesList.size(), fOutlineThickness);
 }
 
-int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, const HyRect &rect, float fOutlineThickness /*= 0.0f*/)
+int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, const HyRect &rect, float fOutlineThickness)
 {
 	glm::vec2 ptCenter = rect.GetCenter();
 	b2Polygon boxPoly = b2MakeOffsetBox(rect.GetWidth(0.5f), rect.GetHeight(0.5f), {ptCenter.x, ptCenter.y}, b2MakeRot(glm::radians(rect.GetRotation())));
@@ -306,7 +303,7 @@ int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, const HyRect &rect, float fOutl
 	return SetAsPolygon(iLayerIndex, verticesList.data(), verticesList.size(), fOutlineThickness);
 }
 
-int32 HyPrimitive2d::SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, float fOutlineThickness /*= 0.0f*/)
+int32 HyPrimitive2d::SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, float fOutlineThickness)
 {
 	// Make a box over the line segment pt1 and pt2 (with a width extent of fRadius), then add semicircle endcaps on both ends
 	glm::vec2 vDir = pt2 - pt1;
@@ -574,38 +571,74 @@ void HyPrimitive2d::AssembleLineChain(int32 iLayerIndex, const glm::vec2 *pVerte
 	
 	DeleteLayerData(iLayerIndex);
 
+	if(bLoop && HyCompareFloat(pVertexList[0].x, pVertexList[uiNumVertices - 1].x) && HyCompareFloat(pVertexList[0].y, pVertexList[uiNumVertices - 1].y))
+		uiNumVertices--; // AssembleLineChain will make this connection as bLoop is true
+
 	Layer &layerRef = m_LayerList[iLayerIndex];
-
-	if(bLoop)
-		layerRef.m_uiNumVerts = uiNumVertices * 6;
-	else
-		layerRef.m_uiNumVerts = (uiNumVertices - 1) * 6;
-
+	layerRef.m_uiNumVerts = (bLoop ? uiNumVertices : (uiNumVertices-1)) * 6;
 	layerRef.m_pVertBuffer = HY_NEW glm::vec2[layerRef.m_uiNumVerts];
 
 	uint32 uiBufferIndex = 0;
 
 	std::vector<glm::vec2> vertList;
-	for(uint32 i = 0; i < uiNumVertices - 1; ++i)
+	for(uint32 iIndex = 0; iIndex < uiNumVertices - 1; ++iIndex)
 	{
-		glm::vec2 vDir = glm::normalize(pVertexList[i + 1] - pVertexList[i]);
+		glm::vec2 vDir = glm::normalize(pVertexList[iIndex + 1] - pVertexList[iIndex]);
 		glm::vec2 ptExtents[4];
 		
 		ptExtents[0] = { vDir.y, -vDir.x };
 		ptExtents[0] *= (layerRef.m_fLineThickness * 0.5f);
-		ptExtents[0] += pVertexList[i];
+		ptExtents[0] += pVertexList[iIndex];
 
 		ptExtents[1] = { -vDir.y, vDir.x };
 		ptExtents[1] *= (layerRef.m_fLineThickness * 0.5f);
-		ptExtents[1] += pVertexList[i];
+		ptExtents[1] += pVertexList[iIndex];
 
 		ptExtents[2] = { -vDir.y, vDir.x };
 		ptExtents[2] *= (layerRef.m_fLineThickness * 0.5f);
-		ptExtents[2] += pVertexList[i + 1];
+		ptExtents[2] += pVertexList[iIndex + 1];
 
 		ptExtents[3] = { vDir.y, -vDir.x };
 		ptExtents[3] *= (layerRef.m_fLineThickness * 0.5f);
-		ptExtents[3] += pVertexList[i + 1];
+		ptExtents[3] += pVertexList[iIndex + 1];
+
+		for(uint32 i = 1; i < 3; ++i)
+		{
+			layerRef.m_pVertBuffer[uiBufferIndex].x = ptExtents[0].x;
+			layerRef.m_pVertBuffer[uiBufferIndex].y = ptExtents[0].y;
+			uiBufferIndex++;
+
+			layerRef.m_pVertBuffer[uiBufferIndex].x = ptExtents[i].x;
+			layerRef.m_pVertBuffer[uiBufferIndex].y = ptExtents[i].y;
+			uiBufferIndex++;
+
+			layerRef.m_pVertBuffer[uiBufferIndex].x = ptExtents[i + 1].x;
+			layerRef.m_pVertBuffer[uiBufferIndex].y = ptExtents[i + 1].y;
+			uiBufferIndex++;
+		}
+	}
+
+	if(bLoop)
+	{
+		int iFinalIndex = uiNumVertices - 1;
+		glm::vec2 vDir = glm::normalize(pVertexList[0] - pVertexList[iFinalIndex]);
+		glm::vec2 ptExtents[4];
+		
+		ptExtents[0] = { vDir.y, -vDir.x };
+		ptExtents[0] *= (layerRef.m_fLineThickness * 0.5f);
+		ptExtents[0] += pVertexList[iFinalIndex];
+
+		ptExtents[1] = { -vDir.y, vDir.x };
+		ptExtents[1] *= (layerRef.m_fLineThickness * 0.5f);
+		ptExtents[1] += pVertexList[iFinalIndex];
+
+		ptExtents[2] = { -vDir.y, vDir.x };
+		ptExtents[2] *= (layerRef.m_fLineThickness * 0.5f);
+		ptExtents[2] += pVertexList[0];
+
+		ptExtents[3] = { vDir.y, -vDir.x };
+		ptExtents[3] *= (layerRef.m_fLineThickness * 0.5f);
+		ptExtents[3] += pVertexList[0];
 
 		for(uint32 i = 1; i < 3; ++i)
 		{

@@ -298,7 +298,7 @@ HyStencilHandle IHyBody2d::GetScissorHandle()
 			pScissorStencil->GetInstanceList()[0]->GetType() == HYTYPE_Primitive, "IHyBody2d::SetScissor() m_hScissorStencil was a stencil that is not a scissor");
 
 		HyPrimitive2d *pScissorPrim = static_cast<HyPrimitive2d *>(pScissorStencil->GetInstanceList()[0]);
-		pScissorPrim->SetAsBox(0, scissorRect);
+		pScissorPrim->SetAsBox(0, scissorRect, 0.0f);
 	}
 	else
 	{

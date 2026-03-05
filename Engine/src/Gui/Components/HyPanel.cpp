@@ -511,14 +511,14 @@ void HyPanel::ConstructPrimitives(float fWidth, float fHeight)
 
 	if(m_PanelData.m_pPrimMade->m_uiFrameSize > 0)
 	{
-		m_PanelData.m_pPrimMade->SetAsBox(PRIMLAYER_Frame1, fWidth, fHeight);
+		m_PanelData.m_pPrimMade->SetAsBox(PRIMLAYER_Frame1, fWidth, fHeight, 0.0f);
 
 		if(m_PanelData.m_pPrimMade->m_uiFrameSize > 1)
 		{
 			HyRect frameRect(fWidth - (m_PanelData.m_pPrimMade->m_uiFrameSize * 2.0f) + 2.0f,
 							 fHeight - (m_PanelData.m_pPrimMade->m_uiFrameSize * 2.0f) + 2.0f,
 							 glm::vec2(fWidth * 0.5f + m_PanelData.m_pPrimMade->m_uiFrameSize - 1, fHeight * 0.5f + m_PanelData.m_pPrimMade->m_uiFrameSize - 1));
-			m_PanelData.m_pPrimMade->SetAsBox(PRIMLAYER_Frame2, frameRect);
+			m_PanelData.m_pPrimMade->SetAsBox(PRIMLAYER_Frame2, frameRect, 0.0f);
 		}
 		else
 			m_PanelData.m_pPrimMade->SetAsNothing(PRIMLAYER_Frame2);
@@ -532,7 +532,7 @@ void HyPanel::ConstructPrimitives(float fWidth, float fHeight)
 	HyRect bodyRect(fWidth - (m_PanelData.m_pPrimMade->m_uiFrameSize * 2.0f),
 					fHeight - (m_PanelData.m_pPrimMade->m_uiFrameSize * 2.0f),
 					glm::vec2(fWidth * 0.5f + m_PanelData.m_pPrimMade->m_uiFrameSize, fHeight * 0.5f + m_PanelData.m_pPrimMade->m_uiFrameSize));
-	m_PanelData.m_pPrimMade->SetAsBox(PRIMLAYER_Body, bodyRect);
+	m_PanelData.m_pPrimMade->SetAsBox(PRIMLAYER_Body, bodyRect, 0.0f);
 }
 
 void HyPanel::DeleteData()

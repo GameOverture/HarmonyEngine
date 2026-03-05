@@ -57,8 +57,8 @@ void HyRadioButton::SetCheckedChangedCallback(std::function<void(HyRadioButton *
 	HyButton::OnAssemble();
 
 	float fRadius = (HyMath::Min(panel.GetWidth(), panel.GetHeight()) - (panel.GetFrameStrokeSize() * 4)) * 0.5f;
-	m_CheckCircle.SetAsCircle(0, fRadius);
-	m_CheckCircle.SetAsCircle(1, fRadius - panel.GetFrameStrokeSize());
+	m_CheckCircle.SetAsCircle(0, fRadius, 0.0f);
+	m_CheckCircle.SetAsCircle(1, fRadius - panel.GetFrameStrokeSize(), 0.0f);
 
 	if(panel.GetPanelNode())
 	{
