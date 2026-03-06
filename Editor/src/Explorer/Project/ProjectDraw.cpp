@@ -84,8 +84,7 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 	m_vDIMENSIONS(fWidth, fHeight),
 	m_fGridSize(fGridSize)
 {
-	SetAsBox(0, m_vDIMENSIONS.x, m_vDIMENSIONS.y);
-	pos.Set(m_vDIMENSIONS.x * -0.5f, m_vDIMENSIONS.y * -0.5f);
+	SetAsBox(0, m_vDIMENSIONS.x, m_vDIMENSIONS.y, 0.0f);
 }
 
 /*virtual*/ CheckerGrid::~CheckerGrid()
@@ -110,38 +109,34 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 	for(int i = 0; i < 6; ++i)
 	{
 		vertexBufferRef.AppendVertexData(&m_LayerList[0].m_pVertBuffer[i], sizeof(glm::vec2));
-		//*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = m_pVertBuffer[i];
-		//pRefDataWritePos += sizeof(glm::vec2);
 
 		glm::vec2 vUV;
 		switch(i)
 		{
 		case 0:
-		case 3:
+		case 5:
 			vUV.x = 0.0f;
-			vUV.y = 1.0f;
+			vUV.y = 0.0f;
 			break;
 
 		case 1:
-			vUV.x = 1.0f;
+			vUV.x = 0.0f;
 			vUV.y = 1.0f;
 			break;
 
 		case 2:
-		case 4:
+		case 3:
 			vUV.x = 1.0f;
-			vUV.y = 0.0f;
+			vUV.y = 1.0f;
 			break;
 
-		case 5:
-			vUV.x = 0.0f;
+		case 4:
+			vUV.x = 1.0f;
 			vUV.y = 0.0f;
 			break;
 		}
 
 		vertexBufferRef.AppendVertexData(&vUV, sizeof(glm::vec2));
-		//*reinterpret_cast<glm::vec2 *>(pRefDataWritePos) = vUV;
-		//pRefDataWritePos += sizeof(glm::vec2);
 	}
 
 	return true;
@@ -173,7 +168,7 @@ OverGrid::OverGrid(float fWidth, float fHeight, float fGridSize) :
 const float fDIMENSION_SIZE = 20000.0f;
 
 ProjectDraw::ProjectDraw() :
-	IDraw(nullptr, FileDataPair()),
+	HyEntity2d(),
 	m_CheckerGrid(fDIMENSION_SIZE, fDIMENSION_SIZE, DEFAULT_GRID_SIZE),
 	m_Origin(this),
 	m_OverGrid(fDIMENSION_SIZE, fDIMENSION_SIZE, DEFAULT_GRID_SIZE)
@@ -191,8 +186,8 @@ ProjectDraw::ProjectDraw() :
 	m_CheckerGrid.SetDisplayOrder(-1000);
 
 	m_Origin.SetLayerColor(0, HyColor::Black);
-	m_Origin.SetLayerColor(1, HyColor::White);
-	m_Origin.SetLayerColor(2, HyColor::Black);
+	m_Origin.SetLayerColor(1, HyColor::Black);
+	m_Origin.SetLayerColor(2, HyColor::White);
 	m_Origin.SetLayerColor(3, HyColor::White);
 
 	OnResizeRenderer();
@@ -217,17 +212,6 @@ ProjectDraw::ProjectDraw() :
 {
 }
 
-/*virtual*/ void ProjectDraw::OnUpdate() /*override*/
-{
-	IDraw::OnUpdate();
-
-	// TODO: Do this in OnCameraUpdated() instead - Requires OnCameraUpdated() to be called for ProjectDraw (only other items' IDraw::OnCameraUpdated are called)
-	glm::vec2 ptOriginPos;
-	m_pCamera->ProjectToCamera(glm::vec2(0.0f, 0.0f), ptOriginPos);
-
-	m_Origin.pos.Set(ptOriginPos);
-}
-
 void ProjectDraw::EnableGridBackground(bool bEnable)
 {
 	m_CheckerGrid.SetVisible(bEnable);
@@ -243,22 +227,23 @@ void ProjectDraw::EnableGridOverlay(bool bEnable)
 	m_OverGrid.SetVisible(bEnable);
 }
 
-/*virtual*/ void ProjectDraw::OnResizeRenderer() /*override*/
+void ProjectDraw::OnResizeRenderer()
 {
 	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
-	m_Origin.SetAsLineSegment(0, glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f), 3.0f); // Horz BG
-	m_Origin.SetAsLineSegment(1, glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f), 1.0f); // Horz
-	m_Origin.SetAsLineSegment(2, glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y), 3.0f); // Vert BG
-	m_Origin.SetAsLineSegment(3, glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y), 1.0f); // Vert
+
+	m_Origin.SetAsLineSegment(0, glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f), 3.0f);
+	m_Origin.SetAsLineSegment(1, glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y), 3.0f);
+	m_Origin.SetAsLineSegment(2, glm::vec2(0.0f, 0.0f), glm::vec2(vWindowSize.x, 0.0f), 1.0f);
+	m_Origin.SetAsLineSegment(3, glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, vWindowSize.y), 1.0f);
 }
 
-///*virtual*/ void ProjectDraw::OnCameraUpdated() /*override*/
-//{
-	//glm::vec2 ptOriginPos;
-	//m_pCamera->ProjectToCamera(glm::vec2(0.0f, 0.0f), ptOriginPos);
+void ProjectDraw::OnCameraUpdated()
+{
+	glm::vec2 ptOriginPos;
+	HyEngine::Window(0).GetCamera2d(0)->ProjectToCamera(glm::vec2(0.0f, 0.0f), ptOriginPos);
 
-	//m_OriginHorzBg.pos.Set(0.0f, ptOriginPos.y);
-	//m_OriginVertBg.pos.Set(ptOriginPos.x, 0.0f);
-	//m_OriginHorz.pos.Set(0.0f, ptOriginPos.y);
-	//m_OriginVert.pos.Set(ptOriginPos.x, 0.0f);
-//}
+	m_Origin.SetLayerOffset(0, glm::vec2(0.0f, ptOriginPos.y));
+	m_Origin.SetLayerOffset(1, glm::vec2(ptOriginPos.x, 0.0f));
+	m_Origin.SetLayerOffset(2, glm::vec2(0.0f, ptOriginPos.y));
+	m_Origin.SetLayerOffset(3, glm::vec2(ptOriginPos.x, 0.0f));
+}

@@ -40,7 +40,7 @@ void GfxMarqueeCtrl::SetAsDrag(glm::vec2 ptWorldStartPos, glm::vec2 ptWorldDragP
 	HySetVec(ptLowerBound, ptWorldStartPos.x < ptWorldDragPos.x ? ptWorldStartPos.x : ptWorldDragPos.x, ptWorldStartPos.y < ptWorldDragPos.y ? ptWorldStartPos.y : ptWorldDragPos.y);
 	HySetVec(ptUpperBound, ptWorldStartPos.x >= ptWorldDragPos.x ? ptWorldStartPos.x : ptWorldDragPos.x, ptWorldStartPos.y >= ptWorldDragPos.y ? ptWorldStartPos.y : ptWorldDragPos.y);
 	ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
-	m_BoundingVolume.SetAsBox(0, HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f));
+	m_BoundingVolume.SetAsBox(0, HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f), 0.0f);
 
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
 	glm::vec2 ptWindowLowerBound, ptWindowUpperBound, ptWindowCenter;

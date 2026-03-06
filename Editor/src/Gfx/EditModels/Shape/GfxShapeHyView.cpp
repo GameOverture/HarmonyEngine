@@ -53,7 +53,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 	float fOutlineThickness = 1.0f;
 	if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() != SHAPE_Polygon)
 	{
-		m_Prim.SetAsShape(LAYER_Fill, *static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(0));
+		m_Prim.SetAsShape(LAYER_Fill, *static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(0), 0.0f);
 		if(m_Prim.GetLayerType(LAYER_Fill) != HYFIXTURE_Nothing)
 		{
 			if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_Box)
@@ -110,7 +110,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 	{
 		int iNumFixtures = static_cast<GfxShapeModel *>(m_pModel)->GetNumShapeFixtures();
 		for(int iIndex = 0; iIndex < iNumFixtures; ++iIndex)
-			m_Prim.SetAsShape(LAYER_Fill + iIndex, *static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(iIndex));
+			m_Prim.SetAsShape(LAYER_Fill + iIndex, *static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(iIndex), 0.0f);
 
 		// Set `m_PrimOutline`
 		const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();

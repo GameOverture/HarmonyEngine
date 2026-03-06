@@ -10,7 +10,7 @@
 #ifndef PROJECTDRAW_H
 #define PROJECTDRAW_H
 
-#include "IDraw.h"
+#include "Global.h"
 
 class CheckerGrid : public HyPrimitive2d
 {
@@ -35,7 +35,7 @@ public:
 	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
 };
 
-class ProjectDraw : public IDraw
+class ProjectDraw : public HyEntity2d
 {
 	CheckerGrid			m_CheckerGrid;
 	HyShader *			m_pCheckerGridShader;
@@ -49,17 +49,12 @@ public:
 	ProjectDraw();
 	virtual ~ProjectDraw();
 
-	virtual void OnUpdate() override;
-
 	void EnableGridBackground(bool bEnable);
 	void EnableGridOrigin(bool bEnable);
 	void EnableGridOverlay(bool bEnable);
 	
-protected:
-	virtual void OnResizeRenderer() override;
-
-	void SetupOrigin();
-	//virtual void OnCameraUpdated() override;
+	void OnResizeRenderer();
+	void OnCameraUpdated();
 };
 
 #endif // PROJECTDRAW_H

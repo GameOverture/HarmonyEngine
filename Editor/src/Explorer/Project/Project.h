@@ -148,6 +148,8 @@ public:
 	ProjectTabBar *GetTabBar();
 	ProjectItemData *GetCurrentOpenItem();
 
+	void OnCameraUpdated();
+
 	// ProjectDraw functions
 	void SetRenderSize(int iWidth, int iHeight);
 	

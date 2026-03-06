@@ -37,9 +37,9 @@ void GfxGrabPointView::Sync(const GfxGrabPointModel *pModel)
 		return;
 	}
 	
-	m_GrabPt.SetAsCircle(0, pModel->GetRadius());
+	m_GrabPt.SetAsCircle(0, pModel->GetRadius(), 0.0f);
 	m_GrabPt.SetLayerColor(0, pModel->GetOutlineColor());
-	m_GrabPt.SetAsCircle(1, pModel->GetRadius() - 1.0f);
+	m_GrabPt.SetAsCircle(1, pModel->GetRadius() - 1.0f, 0.0f);
 	m_GrabPt.SetLayerColor(1, pModel->GetFillColor());
 
 	glm::vec2 ptPos = pModel->GetPos();

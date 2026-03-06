@@ -584,6 +584,8 @@ void IDraw::CameraUpdated()
 	}
 
 	OnCameraUpdated();
+	if(m_pProjItem)
+		m_pProjItem->GetProject().OnCameraUpdated();
 }
 
 float IDraw::GetLineThickness(HyZoomLevel eZoomLevel)
