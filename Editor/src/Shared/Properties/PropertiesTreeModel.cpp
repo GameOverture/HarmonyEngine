@@ -383,6 +383,16 @@ QString PropertiesTreeModel::GetCategoryName(int iCategoryIndex) const
 	return m_pRootItem->GetChild(iCategoryIndex)->data(PROPERTIESCOLUMN_Name).toString();
 }
 
+int PropertiesTreeModel::FindCategoryIndex(QString sCategoryName) const
+{
+	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+	{
+		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+			return i;
+	}
+	return -1;
+}
+
 QModelIndex PropertiesTreeModel::GetCategoryModelIndex(int iCategoryIndex) const
 {
 	return index(iCategoryIndex, PROPERTIESCOLUMN_Name);
@@ -564,6 +574,27 @@ QJsonObject PropertiesTreeModel::RemoveCategory(QString sCategoryName) // Return
 	return QJsonObject();
 }
 
+bool PropertiesTreeModel::RestoreCategory(QString sCategoryName, const QJsonObject &propertiesObj, int iRowIndex)
+{
+	if(InsertCategory(iRowIndex, sCategoryName) == false)
+	{
+		HyGuiLog("PropertiesTreeModel::RestoreCategory() - InsertCategory failed", LOGTYPE_Error);
+		return false;
+	}
+
+	QStringList sPropertyList = propertiesObj.keys();
+	for(const QString &sProperty : sPropertyList)
+	{
+		QJsonValue propValue = propertiesObj[sProperty];
+		if(AppendProperty(sCategoryName, sProperty, PROPERTIESTYPE_Unknown, QVariant(), QString(), PROPERTIESACCESS_Mutable) == false)
+			HyGuiLog("PropertiesTreeModel::RestoreCategory() - AppendProperty failed for property: " % sProperty, LOGTYPE_Error);
+		
+		DeserializeJsonCategory(sCategoryName, propertiesObj);
+	}
+
+	return true;
+}
+
 void PropertiesTreeModel::RemoveAllCategoryProperties()
 {
 	m_PropertyDefMap.clear();
@@ -626,116 +657,7 @@ void PropertiesTreeModel::DeserializeJson(const QJsonObject &propertiesObj)
 		}
 
 		QJsonObject categoryObj = propertiesObj[sCategory].toObject();
-		QStringList sPropertyList = categoryObj.keys();
-		for(const QString &sProperty : sPropertyList)
-		{
-			const PropertiesDef propDef = GetDefinition(sCategory, sProperty);
-
-			QVariant propValue;
-			bool bIsProceduralObj = false; // TODO: Procedural values allow the user to use RNG, ranges, or sequences to set as values instead of hard-coding
-			if(categoryObj[sProperty].isObject() && categoryObj[sProperty].toObject().contains("procValType"))
-			{
-				propValue = categoryObj[sProperty].toObject();
-				bIsProceduralObj = true;
-			}
-			else
-			{
-				switch(propDef.eType)
-				{
-				case PROPERTIESTYPE_Unknown:
-					break;
-
-				case PROPERTIESTYPE_bool:
-					propValue = categoryObj[sProperty].toBool() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
-					break;
-
-				case PROPERTIESTYPE_ComboBoxString: {
-					QStringList sComboBoxStringList = propDef.delegateBuilder.toStringList();
-					if(sComboBoxStringList.contains(categoryObj[sProperty].toString()) == false)
-						HyGuiLog("PropertiesTreeModel::DeserializeJson could not resolve ComboBoxString: " % categoryObj[sProperty].toString(), LOGTYPE_Error);
-
-					propValue = categoryObj[sProperty].toString();
-					break; }
-
-				case PROPERTIESTYPE_int:
-				case PROPERTIESTYPE_ComboBoxInt:
-				case PROPERTIESTYPE_StatesComboBox:
-				case PROPERTIESTYPE_Slider:
-				case PROPERTIESTYPE_SpriteFrames:
-					propValue = categoryObj[sProperty].toInt();
-					break;
-
-				case PROPERTIESTYPE_ComboBoxItems:
-					propValue = QUuid(categoryObj[sProperty].toString());
-					break;
-
-				case PROPERTIESTYPE_int64:
-					propValue = categoryObj[sProperty].toVariant().toLongLong();
-					break;
-
-				case PROPERTIESTYPE_double:
-					propValue = categoryObj[sProperty].toDouble();
-					break;
-
-				case PROPERTIESTYPE_ivec2: {
-					QJsonArray ivec2Array = categoryObj[sProperty].toArray();
-					QPoint ptPoint(ivec2Array[0].toInt(), ivec2Array[1].toInt());
-					propValue = ptPoint;
-					break; }
-
-				case PROPERTIESTYPE_vec2: {
-					QJsonArray vec2Array = categoryObj[sProperty].toArray();
-					QPointF ptPoint(vec2Array[0].toDouble(), vec2Array[1].toDouble());
-					propValue = ptPoint;
-					break; }
-
-				case PROPERTIESTYPE_ivec3:
-				case PROPERTIESTYPE_Color: {
-					QJsonArray ivec3Array = categoryObj[sProperty].toArray();
-					QRect rect(ivec3Array[0].toInt(), ivec3Array[1].toInt(), ivec3Array[2].toInt(), 0);
-					propValue = rect;
-					break; }
-
-				case PROPERTIESTYPE_vec3: {
-					QJsonArray vec3Array = categoryObj[sProperty].toArray();
-					QRectF rect(vec3Array[0].toDouble(), vec3Array[1].toDouble(), vec3Array[2].toDouble(), 0.0);
-					propValue = rect;
-					break; }
-
-				case PROPERTIESTYPE_ivec4: {
-					QJsonArray ivec4Array = categoryObj[sProperty].toArray();
-					QRect rect(ivec4Array[0].toInt(), ivec4Array[1].toInt(), ivec4Array[2].toInt(), ivec4Array[3].toInt());
-					propValue = rect;
-					break; }
-
-				case PROPERTIESTYPE_vec4: {
-					QJsonArray vec4Array = categoryObj[sProperty].toArray();
-					QRectF rect(vec4Array[0].toDouble(), vec4Array[1].toDouble(), vec4Array[2].toDouble(), vec4Array[3].toDouble());
-					propValue = rect;
-					break; }
-
-				case PROPERTIESTYPE_LineEdit:
-					propValue = categoryObj[sProperty].toString();
-					break;
-
-				case PROPERTIESTYPE_FloatArray:
-					propValue = categoryObj[sProperty].toArray();
-					break;
-
-				case PROPERTIESTYPE_ShapeData:
-				case PROPERTIESTYPE_UiPanel:
-					propValue = categoryObj[sProperty].toObject();
-					break;
-
-				default:
-					HyGuiLog("Unhandled PropertiesTreeModel::DeserializeJson property", LOGTYPE_Error);
-					break;
-				}
-			}
-
-			SetPropertyValue(sCategory, sProperty, propValue);
-			SetToggleState(sCategory, sProperty, Qt::Checked); // NOTE: SetToggleState() only sets if it's toggleable property def
-		}
+		DeserializeJsonCategory(sCategory, categoryObj);
 	}
 }
 
@@ -1241,4 +1163,118 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 	sRetStr += propDefRef.sSuffix;
 
 	return sRetStr;
+}
+
+void PropertiesTreeModel::DeserializeJsonCategory(const QString &sCategory, const QJsonObject &categoryObj)
+{
+	QStringList sPropertyList = categoryObj.keys();
+	for(const QString &sProperty : sPropertyList)
+	{
+		const PropertiesDef propDef = GetDefinition(sCategory, sProperty);
+
+		QVariant propValue;
+		bool bIsProceduralObj = false; // TODO: Procedural values allow the user to use RNG, ranges, or sequences to set as values instead of hard-coding
+		if(categoryObj[sProperty].isObject() && categoryObj[sProperty].toObject().contains("procValType"))
+		{
+			propValue = categoryObj[sProperty].toObject();
+			bIsProceduralObj = true;
+		}
+		else
+		{
+			switch(propDef.eType)
+			{
+			case PROPERTIESTYPE_Unknown:
+				break;
+
+			case PROPERTIESTYPE_bool:
+				propValue = categoryObj[sProperty].toBool() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked;
+				break;
+
+			case PROPERTIESTYPE_ComboBoxString: {
+				QStringList sComboBoxStringList = propDef.delegateBuilder.toStringList();
+				if(sComboBoxStringList.contains(categoryObj[sProperty].toString()) == false)
+					HyGuiLog("PropertiesTreeModel::DeserializeJson could not resolve ComboBoxString: " % categoryObj[sProperty].toString(), LOGTYPE_Error);
+
+				propValue = categoryObj[sProperty].toString();
+				break; }
+
+			case PROPERTIESTYPE_int:
+			case PROPERTIESTYPE_ComboBoxInt:
+			case PROPERTIESTYPE_StatesComboBox:
+			case PROPERTIESTYPE_Slider:
+			case PROPERTIESTYPE_SpriteFrames:
+				propValue = categoryObj[sProperty].toInt();
+				break;
+
+			case PROPERTIESTYPE_ComboBoxItems:
+				propValue = QUuid(categoryObj[sProperty].toString());
+				break;
+
+			case PROPERTIESTYPE_int64:
+				propValue = categoryObj[sProperty].toVariant().toLongLong();
+				break;
+
+			case PROPERTIESTYPE_double:
+				propValue = categoryObj[sProperty].toDouble();
+				break;
+
+			case PROPERTIESTYPE_ivec2: {
+				QJsonArray ivec2Array = categoryObj[sProperty].toArray();
+				QPoint ptPoint(ivec2Array[0].toInt(), ivec2Array[1].toInt());
+				propValue = ptPoint;
+				break; }
+
+			case PROPERTIESTYPE_vec2: {
+				QJsonArray vec2Array = categoryObj[sProperty].toArray();
+				QPointF ptPoint(vec2Array[0].toDouble(), vec2Array[1].toDouble());
+				propValue = ptPoint;
+				break; }
+
+			case PROPERTIESTYPE_ivec3:
+			case PROPERTIESTYPE_Color: {
+				QJsonArray ivec3Array = categoryObj[sProperty].toArray();
+				QRect rect(ivec3Array[0].toInt(), ivec3Array[1].toInt(), ivec3Array[2].toInt(), 0);
+				propValue = rect;
+				break; }
+
+			case PROPERTIESTYPE_vec3: {
+				QJsonArray vec3Array = categoryObj[sProperty].toArray();
+				QRectF rect(vec3Array[0].toDouble(), vec3Array[1].toDouble(), vec3Array[2].toDouble(), 0.0);
+				propValue = rect;
+				break; }
+
+			case PROPERTIESTYPE_ivec4: {
+				QJsonArray ivec4Array = categoryObj[sProperty].toArray();
+				QRect rect(ivec4Array[0].toInt(), ivec4Array[1].toInt(), ivec4Array[2].toInt(), ivec4Array[3].toInt());
+				propValue = rect;
+				break; }
+
+			case PROPERTIESTYPE_vec4: {
+				QJsonArray vec4Array = categoryObj[sProperty].toArray();
+				QRectF rect(vec4Array[0].toDouble(), vec4Array[1].toDouble(), vec4Array[2].toDouble(), vec4Array[3].toDouble());
+				propValue = rect;
+				break; }
+
+			case PROPERTIESTYPE_LineEdit:
+				propValue = categoryObj[sProperty].toString();
+				break;
+
+			case PROPERTIESTYPE_FloatArray:
+				propValue = categoryObj[sProperty].toArray();
+				break;
+
+			case PROPERTIESTYPE_ShapeData:
+			case PROPERTIESTYPE_UiPanel:
+				propValue = categoryObj[sProperty].toObject();
+				break;
+
+			default:
+				HyGuiLog("Unhandled PropertiesTreeModel::DeserializeJson property", LOGTYPE_Error);
+				break;
+			}
+		}
+
+		SetPropertyValue(sCategory, sProperty, propValue);
+		SetToggleState(sCategory, sProperty, Qt::Checked); // NOTE: SetToggleState() only sets if it's toggleable property def
+	}
 }

@@ -280,6 +280,9 @@ int32 HyPrimitive2d::SetAsPolygon(int32 iLayerIndex, const std::vector<glm::vec2
 
 int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, float fWidth, float fHeight, float fOutlineThickness )
 {
+	if(fWidth < 1.0f || fHeight < 1.0f)
+		return SetAsNothing(iLayerIndex);
+
 	std::vector<glm::vec2> verticesList;
 	verticesList.emplace_back(-fWidth * 0.5f, -fHeight * 0.5f);
 	verticesList.emplace_back(fWidth * 0.5f, -fHeight * 0.5f);
@@ -291,6 +294,9 @@ int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, float fWidth, float fHeight, fl
 
 int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, const HyRect &rect, float fOutlineThickness)
 {
+	if(rect.GetWidth() < 1.0f || rect.GetHeight() < 1.0f)
+		return SetAsNothing(iLayerIndex);
+
 	glm::vec2 ptCenter = rect.GetCenter();
 	b2Polygon boxPoly = b2MakeOffsetBox(rect.GetWidth(0.5f), rect.GetHeight(0.5f), {ptCenter.x, ptCenter.y}, b2MakeRot(glm::radians(rect.GetRotation())));
 
@@ -327,6 +333,11 @@ glm::vec2 HyPrimitive2d::GetLayerOffset(int32 iLayerIndex) const
 		return glm::vec2(0.0f, 0.0f);
 	}
 	return m_LayerList[iLayerIndex].m_vOffset;
+}
+
+int32 HyPrimitive2d::SetLayerOffset(int32 iLayerIndex, float fX, float fY)
+{
+	return SetLayerOffset(iLayerIndex, glm::vec2(fX, fY));
 }
 
 int32 HyPrimitive2d::SetLayerOffset(int32 iLayerIndex, const glm::vec2 &vOffset)

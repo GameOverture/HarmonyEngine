@@ -61,7 +61,7 @@ public:
 	void Show(bool bShowGrabPoints);
 	void Hide();
 
-	void GetCentroid(glm::vec2 &ptCenterOut);
+	bool GetCentroid(glm::vec2 &ptCenterOut);
 	glm::vec2 GetGrabPointWorldPos(GrabPointType eGrabPoint) const;
 
 	float GetCachedRotation() const;

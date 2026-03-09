@@ -264,12 +264,15 @@ void GfxTransformCtrl::Hide()
 	m_ExtrudeSegment.SetVisible(false);
 }
 
-void GfxTransformCtrl::GetCentroid(glm::vec2 &ptCenterOut)
+bool GfxTransformCtrl::GetCentroid(glm::vec2 &ptCenterOut)
 {
 	if(IsValid())
+	{
 		m_BoundingVolume.GetCentroid(ptCenterOut);
-	else
-		HyGuiLog("GfxTransformCtrl::GetCentroid() called on invalid bounding volume", LOGTYPE_Error);
+		return true;
+	}
+	
+	return false;
 }
 
 glm::vec2 GfxTransformCtrl::GetGrabPointWorldPos(GrabPointType eGrabPoint) const

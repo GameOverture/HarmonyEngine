@@ -162,6 +162,7 @@ public:
 	int GetNumCategories() const;
 	QString GetCategoryName(const QModelIndex &indexRef) const;
 	QString GetCategoryName(int iCategoryIndex) const;
+	int FindCategoryIndex(QString sCategoryName) const;
 	QModelIndex GetCategoryModelIndex(int iCategoryIndex) const;
 	bool IsCategoryCheckable(int iCategoryIndex) const;
 
@@ -181,7 +182,10 @@ public:
 
 	QPair<QString, QString> GetCatPropPairName(const QModelIndex &indexRef) const;
 	QList<QPair<QString, QString>> GetPropertiesList() const; // Returns a list of all properties in the form of (category, property) pairs
+	
 	QJsonObject RemoveCategory(QString sCategoryName); // Returns the removed category's properties as a JSON object. Caller can use this to restore the category later if needed. Returns an empty JSON object if category doesn't exist or failed to remove.
+	bool RestoreCategory(QString sCategoryName, const QJsonObject &propertiesObj, int iRowIndex); // Restores a category and its properties from a JSON object. Returns false if failed to restore (e.g. category already exists or JSON object is invalid)
+	
 	void RemoveAllCategoryProperties();
 
 	QJsonObject SerializeJson() const;
@@ -204,6 +208,8 @@ public:
 private:
 	QJsonValue ConvertValueToJson(TreeModelItem *pTreeItem) const;
 	QString ConvertValueToString(TreeModelItem *pTreeItem) const;
+
+	void DeserializeJsonCategory(const QString &sCategory, const QJsonObject &categoryObj);
 };
 
 #endif // PROPERTIESTREEMODEL_H

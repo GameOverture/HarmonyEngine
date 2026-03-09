@@ -450,6 +450,23 @@ void EntityWidget::SetExtrapolatedProperties()
 		propModelRef.ResetValues();
 		propModelRef.DeserializeJson(propsObj);
 		ui->propertyTree->setModel(&propModelRef);
+		
+		// Hide/Show the root-specific properties based on which base class is chosen
+		if(selectedItemsDataList[0]->GetEntType() == ENTTYPE_Root)
+		{
+			EntityBaseClassType eCurBaseClassType = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetBaseClassType();
+			for(int iBaseClassType = 0; iBaseClassType < NUM_ENTBASECLASSTYPES; ++iBaseClassType)
+			{
+				int iBaseCategoryIndex = static_cast<PropertiesTreeModel *>(ui->propertyTree->model())->FindCategoryIndex(ENTITYBASECLASSCATEGORY_STRINGS[iBaseClassType]);
+				if(iBaseCategoryIndex >= 0)
+					ui->propertyTree->setRowHidden(iBaseCategoryIndex, QModelIndex(), eCurBaseClassType != iBaseClassType);
+			}
+		}
+		else
+		{
+			for(int i = 0; i < propModelRef.rowCount(); ++i)
+				ui->propertyTree->setRowHidden(i, QModelIndex(), false);
+		}
 
 		ui->lblSelectedItemIcon->setVisible(true);
 		ui->lblSelectedItemIcon->setPixmap(selectedItemsDataList[0]->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));

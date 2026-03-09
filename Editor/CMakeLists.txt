@@ -202,6 +202,8 @@ if(Qt6_DIR)
 		src/Items/Entity/EntityItemMimeData.h
 		src/Items/Entity/EntityModel.cpp
 		src/Items/Entity/EntityModel.h
+		src/Items/Entity/EntityTreeItemData.cpp
+		src/Items/Entity/EntityTreeItemData.h
 		src/Items/Entity/EntityTreeModel.cpp
 		src/Items/Entity/EntityTreeModel.h
 		src/Items/Entity/EntityUndoCmds.cpp

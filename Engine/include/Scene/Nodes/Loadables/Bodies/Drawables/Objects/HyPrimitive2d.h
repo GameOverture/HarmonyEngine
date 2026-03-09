@@ -163,6 +163,7 @@ public:
 	int32 SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, float fOutlineThickness);
 
 	glm::vec2 GetLayerOffset(int32 iLayerIndex) const;
+	int32 SetLayerOffset(int32 iLayerIndex, float fX, float fY);
 	int32 SetLayerOffset(int32 iLayerIndex, const glm::vec2 &vOffset);
 
 	bool IsLayerVisible(int32 iLayerIndex) const;
