@@ -459,6 +459,7 @@ enum EntityBaseClassType
 {
 	ENTBASECLASS_Unknown = -1,
 	
+	// NOTE: This order is used throughout the codebase as indices for arrays
 	ENTBASECLASS_HyEntity2d = 0,
 	ENTBASECLASS_HyActor2d,
 	ENTBASECLASS_HyGui,

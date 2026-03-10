@@ -69,6 +69,7 @@ public:
 	virtual ~EntityModel();
 
 	EntityBaseClassType GetBaseClassType() const;
+	bool HasFusedItem() const;
 	EntityTreeModel &GetTreeModel();
 
 	QAbstractItemModel *GetAuxWidgetsModel();

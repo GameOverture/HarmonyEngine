@@ -50,7 +50,7 @@ public:
 	TreeModelItem *GetFixtureFolderTreeItem() const;
 	EntityTreeItemData *GetFixtureFolderTreeItemData() const;
 
-	QList<EntityTreeItemData *> GetFusedItemData() const;
+	QList<EntityTreeItemData *> GetAllFusedItemData() const;
 	QJsonArray GetGuiLayoutArray() const;
 
 	TreeModelItem *GetArrayFolderTreeItem(EntityTreeItemData *pArrayItem) const;
@@ -65,7 +65,7 @@ public:
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 
 private: // These functions should only be called by EntityModel's Cmd_ functions
-	void Cmd_ApplyRootBaseClass();
+	void Cmd_ResetFusedItems();
 	EntityTreeItemData *Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocAssetTreeItem(IAssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocExistingTreeItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow);

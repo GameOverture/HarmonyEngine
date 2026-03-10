@@ -79,7 +79,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 			break;
 		}
 	}
-	Cmd_ApplyRootBaseClass();
+	Cmd_ResetFusedItems();
 
 	// Insert all the 'children' and 'shape' items
 	std::function<void(const QJsonArray &)> fpPopulateNodeTreeItems = [&](const QJsonArray &itemListArray)
@@ -142,7 +142,7 @@ EntityTreeItemData *EntityTreeModel::GetFixtureFolderTreeItemData() const
 	return m_pRootItem->GetChild(1)->data(0).value<EntityTreeItemData *>();
 }
 
-QList<EntityTreeItemData *> EntityTreeModel::GetFusedItemData() const
+QList<EntityTreeItemData *> EntityTreeModel::GetAllFusedItemData() const
 {
 	QList<EntityTreeItemData *> fusedItemList;
 	for(int i = 0; i < NUM_ENTBASECLASSTYPES; ++i)
@@ -450,13 +450,8 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 	return true;
 }
 
-void EntityTreeModel::Cmd_ApplyRootBaseClass()
+void EntityTreeModel::Cmd_ResetFusedItems()
 {
-	//QVariant v;
-	//v.setValue(m_BaseClassInfoList[m_ModelRef.GetBaseClassType()].m_pRootTreeItemData);
-	//if(setData(index(0, 0, QModelIndex()), v, Qt::UserRole) == false)
-	//	HyGuiLog("EntityTreeModel::EntityTreeModel() - setData failed", LOGTYPE_Error);
-
 	// Remove/replace any fused items
 	for(int i = 0; i < NUM_ENTBASECLASSTYPES; ++i)
 		RemoveTreeItem(m_FusedTreeItemData[i]);
@@ -796,8 +791,8 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 	if(pItem->IsSelectable())
 		returnFlags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 	
-	if(pItem->GetEntType() == ENTTYPE_FixtureFolder)
-		returnFlags |= Qt::ItemIsEnabled;
+	//if(pItem->GetEntType() == ENTTYPE_FixtureFolder)
+	//	returnFlags |= Qt::ItemIsEnabled;
 	
 	return returnFlags;
 }

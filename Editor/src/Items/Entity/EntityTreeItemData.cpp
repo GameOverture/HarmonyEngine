@@ -101,9 +101,6 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject 
 
 bool EntityTreeItemData::IsSelectable() const
 {
-	if(m_eEntType == ENTTYPE_FixtureFolder)
-		return false;
-
 	return m_bIsLocked == false;
 }
 

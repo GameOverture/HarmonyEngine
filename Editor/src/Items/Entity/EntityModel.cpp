@@ -164,6 +164,11 @@ EntityBaseClassType EntityModel::GetBaseClassType() const
 	return m_eBaseClass;
 }
 
+bool EntityModel::HasFusedItem() const
+{
+	return m_TreeModel.GetAllFusedItemData()[m_eBaseClass] != nullptr;
+}
+
 EntityTreeModel &EntityModel::GetTreeModel()
 {
 	return m_TreeModel;
@@ -197,7 +202,7 @@ int EntityModel::GetFramesPerSecond() const
 void EntityModel::Cmd_SetBaseClassType(EntityBaseClassType eNewBaseClassType)
 {
 	m_eBaseClass = eNewBaseClassType;
-	m_TreeModel.Cmd_ApplyRootBaseClass();
+	m_TreeModel.Cmd_ResetFusedItems();
 }
 
 QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow)
@@ -704,7 +709,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 		break;
 
 	case ENTBASECLASS_HyGui: {
-		EntityTreeItemData *pFusedItemData = m_TreeModel.GetFusedItemData()[ENTBASECLASS_HyGui];
+		EntityTreeItemData *pFusedItemData = m_TreeModel.GetAllFusedItemData()[ENTBASECLASS_HyGui];
 		HyOrientation eOrient = HYORIENT_Horizontal;
 		if(m_CtorKeyFramesMap.contains(pFusedItemData))
 		{
@@ -1681,7 +1686,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetRootTreeItemData()->GetCodeName());
 	itemSpecificFileDataOut.m_Meta.insert("framesPerSecond", GetFramesPerSecond());
 
-	QList<EntityTreeItemData *> fusedItemList = m_TreeModel.GetFusedItemData();
+	QList<EntityTreeItemData *> fusedItemList = m_TreeModel.GetAllFusedItemData();
 	QJsonArray fusedItemArray;
 	for(EntityTreeItemData *pFusedItem : fusedItemList)
 	{

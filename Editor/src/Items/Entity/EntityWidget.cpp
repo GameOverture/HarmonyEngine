@@ -239,6 +239,7 @@ EntityWidget::~EntityWidget()
 		bool bSelectedHaveSameParent = true;
 		bool bAllSameType = true;
 		bool bAllArrayItems = true;
+		bool bFusedItemSelected = false;
 
 		QModelIndex parentIndex = selectedIndices.at(0).parent();
 		ItemType eType = pFirstItemData->GetType();
@@ -254,10 +255,25 @@ EntityWidget::~EntityWidget()
 				bAllArrayItems = false;
 			if(pEntItemData->GetEntType() == ENTTYPE_Root || pEntItemData->GetEntType() == ENTTYPE_FixtureFolder)
 				bRootOrBvFolder = true;
+			if(pEntItemData->GetEntType() == ENTTYPE_FusedItem)
+				bFusedItemSelected = true;
 		}
 
-		ui->actionOrderChildrenUp->setEnabled(bSelectedHaveSameParent);
-		ui->actionOrderChildrenDown->setEnabled(bSelectedHaveSameParent);
+		ui->actionOrderChildrenUp->setEnabled(bSelectedHaveSameParent && bRootOrBvFolder == false && bFusedItemSelected == false);
+		ui->actionOrderChildrenDown->setEnabled(bSelectedHaveSameParent && bRootOrBvFolder == false && bFusedItemSelected == false);
+
+		bool bPrimNodeSelected = (selectedIndices.size() == 1 && eType == ITEM_PrimNode);
+		ui->actionAddPrimBox->setEnabled(bPrimNodeSelected);
+		ui->actionAddPrimCircle->setEnabled(bPrimNodeSelected);
+		ui->actionAddPrimLineSegment->setEnabled(bPrimNodeSelected);
+		ui->actionAddPrimPolygon->setEnabled(bPrimNodeSelected);
+		ui->actionAddPrimCapsule->setEnabled(bPrimNodeSelected);
+		ui->actionAddPrimLineChain->setEnabled(bPrimNodeSelected);
+
+		bool bGuiLayoutSelected = (selectedIndices.size() == 1 && eType == ITEM_UiLayout);
+		ui->actionAddLayoutHorz->setEnabled(bGuiLayoutSelected);
+		ui->actionAddLayoutVert->setEnabled(bGuiLayoutSelected);
+		ui->actionAddSpacer->setEnabled(bGuiLayoutSelected);
 
 		if(bRootOrBvFolder == false && selectedIndices.size() == 1 && (eType == ITEM_PrimLayer || HyGlobal::IsItemType_Fixture(eType))) // NOTE: Chain is supported here
 		{
@@ -461,11 +477,6 @@ void EntityWidget::SetExtrapolatedProperties()
 				if(iBaseCategoryIndex >= 0)
 					ui->propertyTree->setRowHidden(iBaseCategoryIndex, QModelIndex(), eCurBaseClassType != iBaseClassType);
 			}
-		}
-		else
-		{
-			for(int i = 0; i < propModelRef.rowCount(); ++i)
-				ui->propertyTree->setRowHidden(i, QModelIndex(), false);
 		}
 
 		ui->lblSelectedItemIcon->setVisible(true);
@@ -859,7 +870,12 @@ void EntityWidget::on_actionAddChain_triggered()
 void EntityWidget::on_actionOrderChildrenUp_triggered()
 {
 	QModelIndexList selectedIndexList = GetSelectedItems();
-	std::sort(selectedIndexList.begin(), selectedIndexList.end(), [](const QModelIndex &a, const QModelIndex &b)
+	if(selectedIndexList.empty())
+		return;
+
+	// NOTE: Only Order buttons are enabled when all selected items have the same parent, and no root/fusedItem/fixtureFolder is selected
+	std::sort(selectedIndexList.begin(), selectedIndexList.end(),
+		[](const QModelIndex &a, const QModelIndex &b)
 		{
 			return a.row() < b.row();
 		});
@@ -868,14 +884,11 @@ void EntityWidget::on_actionOrderChildrenUp_triggered()
 	QList<int> curIndexList;
 	QList<int> newIndexList;
 	int iDiscardTopIndices = -1;
-	for(QModelIndex index : selectedIndexList)
+	const int iTOP_INDEX = static_cast<EntityModel *>(m_ItemRef.GetModel())->HasFusedItem() ? 1 : 0;
+	for(const QModelIndex &index : selectedIndexList)
 	{
-		//// Only take selected items that are the first column, and they're children under the root entity tree item
-		//if(index.column() != 0 || index.parent().row() != 0)
-		//	continue;
-
-		if(iDiscardTopIndices == -1 && index.row() == 0)
-			iDiscardTopIndices = 0;
+		if(iDiscardTopIndices == -1 && index.row() == iTOP_INDEX)
+			iDiscardTopIndices = iTOP_INDEX;
 		else if((iDiscardTopIndices + 1) == index.row())
 			iDiscardTopIndices = index.row();
 
@@ -887,7 +900,7 @@ void EntityWidget::on_actionOrderChildrenUp_triggered()
 		newIndexList.push_back(iRow - 1);
 	}
 
-	while(iDiscardTopIndices >= 0)
+	while(iDiscardTopIndices >= iTOP_INDEX)
 	{
 		selectedItemDataList.takeFirst();
 		curIndexList.takeFirst();
@@ -906,7 +919,9 @@ void EntityWidget::on_actionOrderChildrenDown_triggered()
 	if(selectedIndexList.empty())
 		return;
 
-	std::sort(selectedIndexList.begin(), selectedIndexList.end(), [](const QModelIndex &a, const QModelIndex &b)
+	// NOTE: Only Order buttons are enabled when all selected items have the same parent, and no root/fusedItem/fixtureFolder is selected
+	std::sort(selectedIndexList.begin(), selectedIndexList.end(),
+		[](const QModelIndex &a, const QModelIndex &b)
 		{
 			return a.row() > b.row();
 		});
@@ -916,7 +931,7 @@ void EntityWidget::on_actionOrderChildrenDown_triggered()
 	QList<int> curIndexList;
 	QList<int> newIndexList;
 	int iDiscardBotIndices = -1;
-	for(QModelIndex index : selectedIndexList)
+	for(const QModelIndex &index : selectedIndexList)
 	{
 		if(iDiscardBotIndices == -1 && index.row() == (iNumChildren - 1))
 			iDiscardBotIndices = (iNumChildren - 1);
