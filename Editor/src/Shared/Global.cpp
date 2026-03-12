@@ -725,6 +725,11 @@
 	return widgetItemList.contains(eType);
 }
 
+/*static*/ bool HyGlobal::IsItemType_GuiLayout(ItemType eType)
+{
+	return (eType == ITEM_UiLayout || eType == ITEM_UiSpacer);
+}
+
 /*static*/ const QString HyGlobal::ItemExt(ItemType eItem)
 {
 	switch(eItem)

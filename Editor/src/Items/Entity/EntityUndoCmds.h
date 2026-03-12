@@ -48,15 +48,16 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_AddWidget : public QUndoCommand
+class EntityUndoCmd_AddGuiItem : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
-	ItemType						m_eWidgetType;
-	EntityTreeItemData *			m_pWidgetTreeItemData;
+	ItemType						m_eGuiItemType;
+	QUuid							m_UuidLayoutParent;
+	EntityTreeItemData *			m_pGuiTreeItemData;
 
 public:
-	EntityUndoCmd_AddWidget(ProjectItemData &entityItemRef, ItemType eWidgetType, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_AddWidget();
+	EntityUndoCmd_AddGuiItem(ProjectItemData &entityItemRef, ItemType eGuiItemType, QUuid uuidLayoutParent, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddGuiItem();
 
 	virtual void redo() override;
 	virtual void undo() override;

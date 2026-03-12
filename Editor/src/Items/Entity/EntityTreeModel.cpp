@@ -151,11 +151,6 @@ QList<EntityTreeItemData *> EntityTreeModel::GetAllFusedItemData() const
 	return fusedItemList;
 }
 
-QJsonArray EntityTreeModel::GetGuiLayoutArray() const
-{
-	return QJsonArray();
-}
-
 TreeModelItem *EntityTreeModel::GetArrayFolderTreeItem(EntityTreeItemData *pArrayItem) const
 {
 	if(pArrayItem->GetEntType() != ENTTYPE_ArrayItem)
@@ -575,7 +570,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descO
 	return pNewItem;
 }
 
-EntityTreeItemData *EntityTreeModel::Cmd_AllocWidgetTreeItem(ItemType eWidgetType, QString sCodeNamePrefix, int iRow /*= -1*/)
+EntityTreeItemData *EntityTreeModel::Cmd_AllocGuiItemTreeItem(ItemType eWidgetType, QString sCodeNamePrefix, int iRow /*= -1*/)
 {
 	// Generate a unique code name for this new widget
 	QString sCodeName = GenerateCodeName(sCodeNamePrefix + HyGlobal::ItemName(eWidgetType, false));

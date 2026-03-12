@@ -549,6 +549,7 @@ public:
 	static bool IsItemType_Asset(ItemType eType);
 	static bool IsItemType_Fixture(ItemType eType);
 	static bool IsItemType_Widget(ItemType eType);
+	static bool IsItemType_GuiLayout(ItemType eType);
 
 	static const QString ItemName(ItemType eItem, bool bPlural)			{ if(eItem == ITEM_None) return QString(); return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
 	static const QString AssetName(AssetManagerType eAsset)				{ return sm_AssetNames[eAsset]; }

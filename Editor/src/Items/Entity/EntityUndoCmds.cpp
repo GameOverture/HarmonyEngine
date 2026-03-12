@@ -95,33 +95,34 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_AddWidget::EntityUndoCmd_AddWidget(ProjectItemData &entityItemRef, ItemType eWidgetType, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_AddGuiItem::EntityUndoCmd_AddGuiItem(ProjectItemData &entityItemRef, ItemType eGuiItemType, QUuid uuidLayoutParent, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
-	m_eWidgetType(eWidgetType),
-	m_pWidgetTreeItemData(nullptr)
+	m_eGuiItemType(eGuiItemType),
+	m_UuidLayoutParent(uuidLayoutParent),
+	m_pGuiTreeItemData(nullptr)
 {
-	setText("Add New " % HyGlobal::ItemName(m_eWidgetType, false) % " Widget");
+	setText("Add New " % HyGlobal::ItemName(m_eGuiItemType, false) % " Widget");
 }
 
-/*virtual*/ EntityUndoCmd_AddWidget::~EntityUndoCmd_AddWidget()
+/*virtual*/ EntityUndoCmd_AddGuiItem::~EntityUndoCmd_AddGuiItem()
 {
 }
 
-/*virtual*/ void EntityUndoCmd_AddWidget::redo() /*override*/
+/*virtual*/ void EntityUndoCmd_AddGuiItem::redo() /*override*/
 {
-	if(m_pWidgetTreeItemData == nullptr)
-		m_pWidgetTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewWidget(m_eWidgetType, -1);
+	if(m_pGuiTreeItemData == nullptr)
+		m_pGuiTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewGuiItem(m_eGuiItemType, m_UuidLayoutParent, -1);
 	else
-		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pWidgetTreeItemData, -1);
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pGuiTreeItemData, -1);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
-		pWidget->RequestSelectedItems(QList<QUuid>() << m_pWidgetTreeItemData->GetThisUuid());
+		pWidget->RequestSelectedItems(QList<QUuid>() << m_pGuiTreeItemData->GetThisUuid());
 }
 
-/*virtual*/ void EntityUndoCmd_AddWidget::undo() /*override*/
+/*virtual*/ void EntityUndoCmd_AddGuiItem::undo() /*override*/
 {
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pWidgetTreeItemData);
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pGuiTreeItemData);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

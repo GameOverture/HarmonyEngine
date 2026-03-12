@@ -81,7 +81,7 @@ bool TreeModelItemData::IsWidgetItem() const
 
 bool TreeModelItemData::IsLayoutItem() const
 {
-	return m_eTYPE == ITEM_UiLayout || m_eTYPE == ITEM_UiSpacer;
+	return HyGlobal::IsItemType_GuiLayout(m_eTYPE);
 }
 
 QList<TreeModelItemData *> TreeModelItemData::GetDependants() const

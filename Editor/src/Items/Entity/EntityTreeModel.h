@@ -51,7 +51,6 @@ public:
 	EntityTreeItemData *GetFixtureFolderTreeItemData() const;
 
 	QList<EntityTreeItemData *> GetAllFusedItemData() const;
-	QJsonArray GetGuiLayoutArray() const;
 
 	TreeModelItem *GetArrayFolderTreeItem(EntityTreeItemData *pArrayItem) const;
 	EntityTreeItemData *GetArrayFolderTreeItemData(EntityTreeItemData *pArrayItem) const;
@@ -69,7 +68,7 @@ private: // These functions should only be called by EntityModel's Cmd_ function
 	EntityTreeItemData *Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocAssetTreeItem(IAssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocExistingTreeItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow);
-	EntityTreeItemData *Cmd_AllocWidgetTreeItem(ItemType eWidgetType, QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocGuiItemTreeItem(ItemType eWidgetType, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocPrimNodeTreeItem(QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocPrimLayerTreeItem(EntityTreeItemData *pPrimNode, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocFixtureTreeItem(bool bIsShape, QString sCodeNamePrefix, int iRow = -1);

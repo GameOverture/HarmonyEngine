@@ -191,6 +191,16 @@ void EntityTreeItemData::SetReferencedItemUuid(QUuid uuidOfReferencedItem)
 	m_ReferencedItemUuid = uuidOfReferencedItem;
 }
 
+const QUuid &EntityTreeItemData::GetGuiParentUuid() const
+{
+	return m_GuiParentUuid;
+}
+
+void EntityTreeItemData::SetGuiParentUuid(QUuid uuidOfGuiParent)
+{
+	m_GuiParentUuid = uuidOfGuiParent;
+}
+
 bool EntityTreeItemData::IsPromotedEntity() const
 {
 	return m_sPromotedEntityType.isEmpty() == false;

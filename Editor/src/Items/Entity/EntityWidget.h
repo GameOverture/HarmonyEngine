@@ -43,9 +43,11 @@ public:
 	virtual void OnUpdateActions() override;
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
-	QModelIndexList GetSelectedItems();
+	QModelIndexList GetSelectedItems() const;
 	void RequestSelectedItems(QList<QUuid> uuidList); // Will clear and select only what 'uuidList' contains
 	void RequestSelectedItemChange(EntityTreeItemData *pTreeItemData, QItemSelectionModel::SelectionFlags flags);
+
+	QUuid FindLayoutItemFromSelected() const;
 
 	void SetExtrapolatedProperties();
 
@@ -75,17 +77,6 @@ private Q_SLOTS:
 	void OnCollapsedNode(const QModelIndex &indexRef);
 
 	void on_actionAddChildren_triggered();
-
-	void on_actionAddLabel_triggered();
-	void on_actionAddRichLabel_triggered();
-	void on_actionAddButton_triggered();
-	void on_actionAddRackMeter_triggered();
-	void on_actionAddBarMeter_triggered();
-	void on_actionAddCheckBox_triggered();
-	void on_actionAddRadioButton_triggered();
-	void on_actionAddTextField_triggered();
-	void on_actionAddComboBox_triggered();
-	void on_actionAddSlider_triggered();
 	
 	void on_actionAddPrimitive_triggered();
 	void on_actionAddPrimBox_triggered();
@@ -97,6 +88,21 @@ private Q_SLOTS:
 
 	void on_actionAddShape_triggered();
 	void on_actionAddChain_triggered();
+
+	void on_actionAddLayoutHorz_triggered();
+	void on_actionAddLayoutVert_triggered();
+	void on_actionAddSpacer_triggered();
+
+	void on_actionAddLabel_triggered();
+	void on_actionAddRichLabel_triggered();
+	void on_actionAddButton_triggered();
+	void on_actionAddRackMeter_triggered();
+	void on_actionAddBarMeter_triggered();
+	void on_actionAddCheckBox_triggered();
+	void on_actionAddRadioButton_triggered();
+	void on_actionAddTextField_triggered();
+	void on_actionAddComboBox_triggered();
+	void on_actionAddSlider_triggered();
 
 	void on_actionOrderChildrenUp_triggered();
 	void on_actionOrderChildrenDown_triggered();
