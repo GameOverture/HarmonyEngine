@@ -45,42 +45,6 @@ class EntityModel : public IModel
 	QMap<EntityTreeItemData *, QJsonObject>					m_CtorKeyFramesMap;			// Store properties and tween values
 	QMap<EntityTreeItemData *, QJsonObject>					m_CtorPoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added with UNDO
 
-	// Only applicable when base class type is HyGui
-	struct GuiItem
-	{
-		QUuid												m_Uuid;						// References a widget, or unique when layout/spacer
-		QList<GuiItem>										m_ChildList;				// Only used when type is ITEM_UiLayout
-
-		GuiItem(QUuid uuid) : m_Uuid(uuid) { }
-		GuiItem(QJsonObject serializedObj)
-		{
-			if(serializedObj.isEmpty())
-				return;
-
-			m_Uuid = QUuid(serializedObj["uuid"].toString());
-			QJsonArray childArray = serializedObj["children"].toArray();
-			m_ChildList.reserve(childArray.size());
-			for(int i = 0; i < childArray.size(); ++i)
-				m_ChildList.emplace_back(childArray[i].toObject());
-		}
-		bool operator==(const QUuid &other) const { return m_Uuid == other; }
-		bool operator!=(const QUuid &other) const { return m_Uuid != other; }
-		bool IsValid() const { return m_Uuid.isNull() == false; }
-
-		QJsonObject Serialize() const
-		{
-			QJsonObject obj;
-			obj["uuid"] = m_Uuid.toString();
-			QJsonArray childArray;
-			for(const GuiItem &child : m_ChildList)
-				childArray.append(child.Serialize());
-			obj["children"] = childArray;
-			return obj;
-		}
-	};
-	GuiItem													m_GuiLayout;				// Serialized as an object "guiLayout" - purpose is to store the GUI layout heirarchy
-	QMap<EntityTreeItemData *, QJsonObject>					m_PoppedGuiItemsMap;
-
 	EntityTreeModel											m_TreeModel;
 
 	// This 'AuxWidgetsModel' is used to map (QDataWidgetMapper) to the widgets in AuxDopeSheet. It also contains the data for the widgets
@@ -108,10 +72,6 @@ public:
 	bool HasFusedItem() const;
 	EntityTreeModel &GetTreeModel();
 
-	void InsertGuiItem(QUuid uuidParent, QJsonObject guiItemObj);
-	void PopGuiItem(EntityTreeItemData *pItem);
-	QUuid FindGuiLayoutFromItemUuid(QUuid itemUuid) const;
-
 	QAbstractItemModel *GetAuxWidgetsModel();
 
 	QMap<EntityTreeItemData *, QJsonObject> &GetCtorKeyFramesMap();
@@ -125,7 +85,7 @@ public:
 	QList<EntityTreeItemData *> Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow);
 	QList<EntityTreeItemData *> Cmd_CreateNewAssets(QList<IAssetItemData *> assetItemList, int iRow);
 	EntityTreeItemData *Cmd_AddExistingItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
-	EntityTreeItemData *Cmd_CreateNewGuiItem(ItemType eGuiItemType, QUuid uuidParent, int iRow);
+	EntityTreeItemData *Cmd_CreateNewGuiItem(ItemType eGuiItemType, QUuid guiLayoutParentUuid, int iRow);
 	EntityTreeItemData *Cmd_CreateNewPrimNode(int iRow);
 	EntityTreeItemData *Cmd_CreateNewPrimLayer(EntityTreeItemData *pPrimNode, QString sLayerType, int iRow);
 	EntityTreeItemData *Cmd_CreateNewFixture(bool bIsShape, int iRow);

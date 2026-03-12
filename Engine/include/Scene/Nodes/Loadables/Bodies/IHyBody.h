@@ -53,8 +53,8 @@ public:
 
 protected:
 	// Internal Entity propagation function overrides
-	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding);
-	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding);
+	virtual void _setStencil(HyStencilHandle hHandle, bool bIsOverriding);
+	virtual void _setCoordinateSystem(int32 iWindowIndex, bool bIsOverriding);
 
 private:
 	virtual IHyNode &_VisableGetNodeRef() = 0;

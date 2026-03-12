@@ -129,7 +129,7 @@ void IHyBody::SetWindowCoordinates(int32 iWindowIndex /*= 0*/)
 	UseWindowCoordinates(iWindowIndex);
 }
 
-/*virtual*/ void IHyBody::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding)
+/*virtual*/ void IHyBody::_setStencil(HyStencilHandle hHandle, bool bIsOverriding)
 {
 	if(bIsOverriding)
 		_VisableGetNodeRef().m_uiFlags &= ~IHyNode::EXPLICIT_Stencil;
@@ -138,7 +138,7 @@ void IHyBody::SetWindowCoordinates(int32 iWindowIndex /*= 0*/)
 		m_hStencil = hHandle;
 }
 
-/*virtual*/ void IHyBody::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding)
+/*virtual*/ void IHyBody::_setCoordinateSystem(int32 iWindowIndex, bool bIsOverriding)
 {
 	if(bIsOverriding)
 		_VisableGetNodeRef().m_uiFlags &= ~IHyNode::EXPLICIT_CoordinateSystem;

@@ -359,8 +359,6 @@
 /*static*/ QList<ItemType> HyGlobal::GetItemTypeList_Widget()
 {
 	QList<ItemType> list;
-	list.append(ITEM_UiLayout);
-	list.append(ITEM_UiSpacer);
 	list.append(ITEM_UiLabel);
 	list.append(ITEM_UiRichLabel);
 	list.append(ITEM_UiButton);

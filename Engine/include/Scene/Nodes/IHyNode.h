@@ -112,7 +112,7 @@ protected:
 	virtual void Update();																// Only Scene will invoke this
 	
 	virtual void SetParentsVisible(bool bParentsVisible);								// Only Entity2d/3d will invoke this
-	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
+	virtual void _setPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding);			// Only Entity2d/3d will invoke this
 
 	virtual void SetDirty(uint32 uiDirtyFlags);
 	bool IsDirty(uint32 uiDirtyFlags) const;

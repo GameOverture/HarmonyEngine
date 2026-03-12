@@ -99,7 +99,7 @@ void HyEntity2d::SetPauseUpdate(bool bUpdateWhenPaused, bool bOverrideExplicitCh
 	m_uiFlags |= EXPLICIT_PauseUpdate;
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
-		m_ChildList[i]->_SetPauseUpdate(IsPauseUpdate(), bOverrideExplicitChildren);
+		m_ChildList[i]->_setPauseUpdate(IsPauseUpdate(), bOverrideExplicitChildren);
 }
 
 /*virtual*/ float HyEntity2d::GetWidth(float fPercent /*= 1.0f*/) /*override*/
@@ -189,7 +189,7 @@ void HyEntity2d::SetScissor(const HyRect &scissorRect, bool bOverrideExplicitChi
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-			static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissorStencil(m_hScissorStencil, bOverrideExplicitChildren);
+			static_cast<IHyBody2d *>(m_ChildList[i])->_setScissorStencil(m_hScissorStencil, bOverrideExplicitChildren);
 	}
 }
 
@@ -205,7 +205,7 @@ void HyEntity2d::ClearScissor(bool bUseParentScissor, bool bOverrideExplicitChil
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-			static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissorStencil(m_hScissorStencil, bOverrideExplicitChildren);
+			static_cast<IHyBody2d *>(m_ChildList[i])->_setScissorStencil(m_hScissorStencil, bOverrideExplicitChildren);
 	}
 }
 
@@ -221,7 +221,7 @@ void HyEntity2d::SetStencil(HyStencil *pStencil, bool bOverrideExplicitChildren)
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-			static_cast<IHyBody2d *>(m_ChildList[i])->_SetStencil(m_hStencil, bOverrideExplicitChildren);
+			static_cast<IHyBody2d *>(m_ChildList[i])->_setStencil(m_hStencil, bOverrideExplicitChildren);
 	}
 }
 
@@ -237,7 +237,7 @@ void HyEntity2d::ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChil
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-			static_cast<IHyBody2d *>(m_ChildList[i])->_SetStencil(m_hStencil, bOverrideExplicitChildren);
+			static_cast<IHyBody2d *>(m_ChildList[i])->_setStencil(m_hStencil, bOverrideExplicitChildren);
 	}
 }
 
@@ -253,7 +253,7 @@ void HyEntity2d::UseCameraCoordinates(bool bOverrideExplicitChildren)
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-			static_cast<IHyBody2d *>(m_ChildList[i])->_SetCoordinateSystem(m_iCoordinateSystem, bOverrideExplicitChildren);
+			static_cast<IHyBody2d *>(m_ChildList[i])->_setCoordinateSystem(m_iCoordinateSystem, bOverrideExplicitChildren);
 	}
 }
 
@@ -269,7 +269,7 @@ void HyEntity2d::UseWindowCoordinates(int32 iWindowIndex, bool bOverrideExplicit
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-			static_cast<IHyBody2d *>(m_ChildList[i])->_SetCoordinateSystem(iWindowIndex, bOverrideExplicitChildren);
+			static_cast<IHyBody2d *>(m_ChildList[i])->_setCoordinateSystem(iWindowIndex, bOverrideExplicitChildren);
 	}
 }
 
@@ -528,7 +528,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
 			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-				iOrderValue = static_cast<IHyBody2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
+				iOrderValue = static_cast<IHyBody2d *>(m_ChildList[i])->_setDisplayOrder(iOrderValue, bOverrideExplicitChildren);
 		}
 	}
 	else
@@ -536,7 +536,7 @@ int32 HyEntity2d::SetChildrenDisplayOrder(bool bOverrideExplicitChildren)
 		for(int32 i = static_cast<int32>(m_ChildList.size()) - 1; i >= 0; --i)
 		{
 			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-				iOrderValue = static_cast<IHyBody2d *>(m_ChildList[i])->_SetDisplayOrder(iOrderValue, bOverrideExplicitChildren);
+				iOrderValue = static_cast<IHyBody2d *>(m_ChildList[i])->_setDisplayOrder(iOrderValue, bOverrideExplicitChildren);
 		}
 	}
 
@@ -635,7 +635,7 @@ void HyEntity2d::Assemble()
 	}
 }
 
-/*virtual*/ void HyEntity2d::Update() /*override*/
+/*virtual*/ void HyEntity2d::Update() /*override final*/
 {
 	IHyBody2d::Update();
 
@@ -758,17 +758,17 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 {
 	SetDirty(DIRTY_ALL);
 	childRef.SetParentsVisible(IsVisible() && (GetInternalFlags() & EXPLICIT_ParentsVisible));
-	childRef._SetPauseUpdate(IsPauseUpdate(), false);
+	childRef._setPauseUpdate(IsPauseUpdate(), false);
 
 	if(childRef.GetInternalFlags() & NODETYPE_IsBody)
 	{
-		static_cast<IHyBody2d &>(childRef)._SetCoordinateSystem(GetCoordinateSystem(), false);
+		static_cast<IHyBody2d &>(childRef)._setCoordinateSystem(GetCoordinateSystem(), false);
 
 		if(IsScissorSet())
-			static_cast<IHyBody2d &>(childRef)._SetScissorStencil(m_hScissorStencil, false);
+			static_cast<IHyBody2d &>(childRef)._setScissorStencil(m_hScissorStencil, false);
 
 		if(IsStencilSet())
-			static_cast<IHyBody2d &>(childRef)._SetStencil(m_hStencil, false);
+			static_cast<IHyBody2d &>(childRef)._setStencil(m_hStencil, false);
 
 		SetChildrenDisplayOrder(false);
 	}
@@ -784,62 +784,62 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 		m_ChildList[i]->SetParentsVisible(IsVisible() && bParentsVisible);
 }
 
-/*virtual*/ void HyEntity2d::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) /*override final*/
+/*virtual*/ void HyEntity2d::_setPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) /*override final*/
 {
-	IHyNode::_SetPauseUpdate(bUpdateWhenPaused, bIsOverriding);
+	IHyNode::_setPauseUpdate(bUpdateWhenPaused, bIsOverriding);
 
 	if(0 == (m_uiFlags & EXPLICIT_PauseUpdate))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
-			m_ChildList[i]->_SetPauseUpdate(IsPauseUpdate(), bIsOverriding);
+			m_ChildList[i]->_setPauseUpdate(IsPauseUpdate(), bIsOverriding);
 	}
 }
 
-/*virtual*/ void HyEntity2d::_SetScissorStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override final*/
+/*virtual*/ void HyEntity2d::_setScissorStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override final*/
 {
-	IHyBody2d::_SetScissorStencil(hHandle, bIsOverriding);
+	IHyBody2d::_setScissorStencil(hHandle, bIsOverriding);
 	
 	if(0 == (m_uiFlags & EXPLICIT_ScissorStencil))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
 			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-				static_cast<IHyBody2d *>(m_ChildList[i])->_SetScissorStencil(m_hScissorStencil, bIsOverriding);
+				static_cast<IHyBody2d *>(m_ChildList[i])->_setScissorStencil(m_hScissorStencil, bIsOverriding);
 		}
 	}
 }
 
-/*virtual*/ void HyEntity2d::_SetStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override final*/
+/*virtual*/ void HyEntity2d::_setStencil(HyStencilHandle hHandle, bool bIsOverriding) /*override final*/
 {
-	IHyBody2d::_SetStencil(hHandle, bIsOverriding);
+	IHyBody2d::_setStencil(hHandle, bIsOverriding);
 
 	if(0 == (m_uiFlags & EXPLICIT_Stencil))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
 			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-				static_cast<IHyBody2d *>(m_ChildList[i])->_SetStencil(m_hStencil, bIsOverriding);
+				static_cast<IHyBody2d *>(m_ChildList[i])->_setStencil(m_hStencil, bIsOverriding);
 		}
 	}
 }
 
-/*virtual*/ void HyEntity2d::_SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override final*/
+/*virtual*/ void HyEntity2d::_setCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) /*override final*/
 {
-	IHyBody2d::_SetCoordinateSystem(iWindowIndex, bIsOverriding);
+	IHyBody2d::_setCoordinateSystem(iWindowIndex, bIsOverriding);
 
 	if(0 == (m_uiFlags & EXPLICIT_CoordinateSystem))
 	{
 		for(uint32 i = 0; i < m_ChildList.size(); ++i)
 		{
 			if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-				static_cast<IHyBody2d *>(m_ChildList[i])->_SetCoordinateSystem(iWindowIndex, bIsOverriding);
+				static_cast<IHyBody2d *>(m_ChildList[i])->_setCoordinateSystem(iWindowIndex, bIsOverriding);
 		}
 	}
 }
 
-/*virtual*/ int32 HyEntity2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override final*/
+/*virtual*/ int32 HyEntity2d::_setDisplayOrder(int32 iOrderValue, bool bIsOverriding) /*override final*/
 {
-	IHyBody2d::_SetDisplayOrder(iOrderValue, bIsOverriding);
+	IHyBody2d::_setDisplayOrder(iOrderValue, bIsOverriding);
 
 	if(0 == (m_uiFlags & EXPLICIT_DisplayOrder))
 		iOrderValue = SetChildrenDisplayOrder(bIsOverriding);

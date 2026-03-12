@@ -80,8 +80,8 @@ protected:
 	//virtual void Update() override;
 
 	// Internal Entity propagation function overrides
-	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding);
-	virtual void _SetScissorStencil(HyStencilHandle hHandle, bool bIsOverriding);
+	virtual int32 _setDisplayOrder(int32 iOrderValue, bool bIsOverriding);
+	virtual void _setScissorStencil(HyStencilHandle hHandle, bool bIsOverriding);
 
 private:
 	void CalculateColor(float fExtrapolatePercent);

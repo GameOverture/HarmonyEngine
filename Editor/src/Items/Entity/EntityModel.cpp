@@ -131,32 +131,14 @@ EntityModel::AuxWidgetsModel::AuxWidgetsModel(EntityModel &entityModelRef, int i
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
 	m_eBaseClass(HyGlobal::GetEntityBaseClassType(itemFileDataRef.m_Meta["baseClass"].toString(ENTITYBASECLASSTYPE_STRINGS[ENTBASECLASS_HyEntity2d]))),
-	m_GuiLayout(itemFileDataRef.m_Meta["guiLayout"].toObject()),
 	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this),
 	m_AuxWidgetsModel(*this, itemFileDataRef.m_Meta["framesPerSecond"].toInt(60), itemFileDataRef.m_Meta["autoInitialize"].toBool(true))
 {
-	if(m_GuiLayout.IsValid() == false)
-		m_GuiLayout.m_Uuid = m_TreeModel.GetAllFusedItemData()[ENTBASECLASS_HyGui]->GetThisUuid();
-
 	// The EntityTreeModel ('m_TreeModel') was initialized first so that all the EntityTreeItemData's exist.
 	// InitStates will look them up using their UUID when initializing its Key Frames map within the state's DopeSheetScene
 	InitStates<EntityStateData>(itemFileDataRef);
 
-	Cmd_SetBaseClassType(m_eBaseClass);
-
-	//// Initialize the callbacks list by calling EntityDopeSheetScene::SetCallback() for all the callbacks found in "stateArray"
-	//// NOTE: EntityDopeSheetScene::SetCallback() will update *this 'm_CallbacksList'
-	//QJsonArray stateArray = itemFileDataRef.m_Meta["stateArray"].toArray();
-	//for(int i = 0; i < stateArray.size(); ++i)
-	//{
-	//	QJsonObject stateObj = stateArray[i].toObject();
-	//	QJsonArray callbacksArray = stateObj["callbacks"].toArray();
-	//	for(int j = 0; j < callbacksArray.size(); ++j)
-	//	{
-	//		QJsonObject callbackObj = callbacksArray[j].toObject();
-	//		
-	//	}
-	//}
+	m_TreeModel.Cmd_ResetFusedItems();
 }
 
 /*virtual*/ EntityModel::~EntityModel()
@@ -176,104 +158,6 @@ bool EntityModel::HasFusedItem() const
 EntityTreeModel &EntityModel::GetTreeModel()
 {
 	return m_TreeModel;
-}
-
-void EntityModel::InsertGuiItem(QUuid uuidParent, QJsonObject guiItemObj)
-{
-	if(uuidParent.isNull())
-	{
-		HyGuiLog("EntityModel::InsertGuiItem - Attempting to insert a widget/layout item into the GUI heirarchy with a null parent", LOGTYPE_Error);
-		return;
-	}
-
-	// Find the parent item in the GUI heirarchy (m_GuiLayout), and insert this item as a child to the appropriate GuiItem within m_GuiLayout.
-	std::function<void(EntityModel::GuiItem &)> fpInsertFunc =
-		[&](EntityModel::GuiItem &curItem)
-		{
-			if(curItem.m_Uuid == uuidParent)
-			{
-				curItem.m_ChildList.removeOne(QUuid(guiItemObj["uuid"].toString()));
-				curItem.m_ChildList.push_back(EntityModel::GuiItem(guiItemObj));
-				return;
-			}
-			for(GuiItem &child : curItem.m_ChildList)
-				fpInsertFunc(child);
-		};
-	fpInsertFunc(m_GuiLayout);
-}
-
-void EntityModel::PopGuiItem(EntityTreeItemData *pItem)
-{
-	if(m_GuiLayout.m_Uuid == pItem->GetThisUuid())
-	{
-		HyGuiLog("EntityModel::PopGuiItem - Attempting to pop the root GUI item, which is not allowed", LOGTYPE_Error);
-		return;
-	}
-
-	QJsonObject poppedObj;
-	std::function<void(EntityModel::GuiItem &)> fpPopFunc =
-		[&](EntityModel::GuiItem &curItem)
-		{
-			for(int i = 0; i < curItem.m_ChildList.size(); ++i)
-			{
-				if(curItem.m_ChildList[i].m_Uuid == pItem->GetThisUuid())
-				{
-					poppedObj = curItem.m_ChildList[i].Serialize();
-					curItem.m_ChildList.removeAt(i);
-					return;
-				}
-				fpPopFunc(curItem.m_ChildList[i]);
-			}
-		};
-	fpPopFunc(m_GuiLayout);
-
-	m_PoppedGuiItemsMap.insert(pItem, poppedObj);
-}
-
-QUuid EntityModel::FindGuiLayoutFromItemUuid(QUuid itemUuid) const
-{
-	// Search through m_GuiLayout for the GuiItem that equals 'itemUuid' and set it to pCurItem
-	const GuiItem *pCurItem = nullptr;
-	std::function<void(const EntityModel::GuiItem &)> fpFindFunc =
-		[&](const EntityModel::GuiItem &curItem)
-		{
-			if(curItem == itemUuid)
-				pCurItem = &curItem;
-			for(const GuiItem &child : curItem.m_ChildList)
-				fpFindFunc(child);
-		};
-	fpFindFunc(m_GuiLayout);
-
-	if(pCurItem == nullptr)
-		return QUuid();
-
-	// Now search upward from pCurItem
-	while(pCurItem)
-	{
-		EntityTreeItemData *pTreeItem = m_TreeModel.FindTreeItemData(pCurItem->m_Uuid);
-		if(pTreeItem->GetType() == ITEM_UiLayout)
-			return pTreeItem->GetThisUuid(); // Found the layout!
-
-		const GuiItem *pParentItem = nullptr;
-		std::function<void(const EntityModel::GuiItem &)> fpFindParentFunc =
-			[&](const EntityModel::GuiItem &curItem)
-			{
-				for(const GuiItem &child : curItem.m_ChildList)
-				{
-					if(child == pCurItem->m_Uuid)
-					{
-						pParentItem = &curItem;
-						return;
-					}
-					fpFindParentFunc(child);
-				}
-			};
-		fpFindParentFunc(m_GuiLayout);
-
-		pCurItem = pParentItem;
-	}
-
-	return QUuid();
 }
 
 QAbstractItemModel *EntityModel::GetAuxWidgetsModel()
@@ -362,24 +246,13 @@ EntityTreeItemData *EntityModel::Cmd_AddExistingItem(QJsonObject descObj, bool b
 	return pTreeItemData;
 }
 
-EntityTreeItemData *EntityModel::Cmd_CreateNewGuiItem(ItemType eGuiItemType, QUuid uuidParent, int iRow)
+EntityTreeItemData *EntityModel::Cmd_CreateNewGuiItem(ItemType eGuiItemType, QUuid guiLayoutParentUuid, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocGuiItemTreeItem(eGuiItemType, HyGlobal::IsItemType_Widget(eGuiItemType) ? "m_" : "", iRow);
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocGuiItemTreeItem(eGuiItemType, HyGlobal::IsItemType_Widget(eGuiItemType) ? "m_" : "", guiLayoutParentUuid, iRow);
 	if(pTreeItemData->IsWidgetItem() == false && pTreeItemData->IsLayoutItem() == false)
 	{
 		HyGuiLog("EntityModel::Cmd_CreateNewGuiItem - Attempting to create a non-widget/layout item in the GUI heirarchy", LOGTYPE_Error);
 		return nullptr;
-	}
-	if(pTreeItemData->IsLayoutItem() && uuidParent.isNull())
-	{
-		HyGuiLog("EntityModel::Cmd_CreateNewGuiItem - Attempting to create a layout item in the GUI heirarchy without a valid layout parent", LOGTYPE_Error);
-		return nullptr;
-	}
-
-	if(uuidParent.isNull() == false)
-	{
-		InsertGuiItem(uuidParent, GuiItem(pTreeItemData->GetThisUuid()).Serialize());
-		pTreeItemData->SetGuiParentUuid(uuidParent);
 	}
 
 	return pTreeItemData;
@@ -573,9 +446,6 @@ int32 EntityModel::Cmd_RemoveTreeItem(EntityTreeItemData *pItem)
 	if(iRow < 0)
 		return iRow;
 
-	// If apart of GUI layout, remove it
-	PopGuiItem(pItem);
-
 	// Pop all the key frames associated with this item
 	for(IStateData *pStateData : m_StateList)
 		static_cast<EntityStateData *>(pStateData)->GetDopeSheetScene().PopAllKeyFrames(pItem, true);
@@ -593,9 +463,6 @@ bool EntityModel::Cmd_ReaddChild(EntityTreeItemData *pNodeItem, int iRow)
 		return false;
 
 	m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, QList<QUuid>() << pNodeItem->GetReferencedItemUuid());
-
-	// If apart of GUI layout, readd it
-	InsertGuiItem(pNodeItem->GetGuiParentUuid(), m_PoppedGuiItemsMap[pNodeItem]);
 
 	// Re-add all the key frames associated with this item
 	for(IStateData *pStateData : m_StateList)
@@ -1819,7 +1686,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 	}
 	itemSpecificFileDataOut.m_Meta.insert("fusedItemList", fusedItemArray);
 
-	itemSpecificFileDataOut.m_Meta.insert("guiLayout", m_GuiLayout.Serialize());
+	itemSpecificFileDataOut.m_Meta.insert("guiLayout", m_TreeModel.SerializeGuiLayout());
 	
 	QList<EntityTreeItemData *> childList;
 	QList<EntityTreeItemData *> shapeList;

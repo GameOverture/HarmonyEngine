@@ -436,7 +436,7 @@ QUuid EntityWidget::FindLayoutItemFromSelected() const
 		return QUuid();
 
 	EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>();
-	return static_cast<EntityModel *>(m_ItemRef.GetModel())->FindGuiLayoutFromItemUuid(pCurItemData->GetThisUuid());
+	return static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel().FindGuiLayoutFromItemUuid(pCurItemData->GetThisUuid());
 }
 
 void EntityWidget::SetExtrapolatedProperties()
@@ -829,6 +829,12 @@ void EntityWidget::on_actionAddLayoutHorz_triggered()
 
 void EntityWidget::on_actionAddLayoutVert_triggered()
 {
+	
+	// - Assmble the EntityTreeItemData's tree nodes in the root-layout or back in the child list based on which base class is selected
+	// - Set attributes on layouts or spacers (somehow?)
+	// - Allow order item up/down to traverse through the layout heirarchy or outside it in the item list
+	// - Preview layout changes
+	// - Save runtime for layout
 }
 
 void EntityWidget::on_actionAddSpacer_triggered()

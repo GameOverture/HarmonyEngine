@@ -225,7 +225,7 @@ bool IHyNode::IsRegistered() const
 		m_uiFlags &= ~EXPLICIT_ParentsVisible;
 }
 
-/*virtual*/ void IHyNode::_SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding)
+/*virtual*/ void IHyNode::_setPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding)
 {
 	if(bIsOverriding)
 		m_uiFlags &= ~EXPLICIT_PauseUpdate;

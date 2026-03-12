@@ -40,6 +40,44 @@ public:
 		NUMCOLUMNS
 	};
 
+	// Only applicable when entity base class type is HyGui
+	struct GuiItem
+	{
+		QUuid												m_Uuid;						// References a widget, or unique when layout/spacer
+		QList<GuiItem>										m_ChildList;				// Only used when type is ITEM_UiLayout
+
+		GuiItem(QUuid uuid) : m_Uuid(uuid) { }
+		GuiItem(QJsonObject serializedObj)
+		{
+			if(serializedObj.isEmpty())
+				return;
+
+			m_Uuid = QUuid(serializedObj["uuid"].toString());
+			QJsonArray childArray = serializedObj["children"].toArray();
+			m_ChildList.reserve(childArray.size());
+			for(int i = 0; i < childArray.size(); ++i)
+				m_ChildList.emplace_back(childArray[i].toObject());
+		}
+		bool operator==(const QUuid &other) const { return m_Uuid == other; }
+		bool operator!=(const QUuid &other) const { return m_Uuid != other; }
+		bool IsValid() const { return m_Uuid.isNull() == false; }
+
+		QJsonObject Serialize() const
+		{
+			QJsonObject obj;
+			obj["uuid"] = m_Uuid.toString();
+			QJsonArray childArray;
+			for(const GuiItem &child : m_ChildList)
+				childArray.append(child.Serialize());
+			obj["children"] = childArray;
+			return obj;
+		}
+	};
+
+private:
+	GuiItem													m_GuiLayout;				// Serialized as an object "guiLayout" - purpose is to store the GUI layout heirarchy
+	QMap<EntityTreeItemData *, QJsonObject>					m_PoppedGuiItemsMap;
+
 public:
 	explicit EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName, QJsonObject fileMetaObj, QObject *pParent = nullptr);
 	virtual ~EntityTreeModel();
@@ -55,6 +93,11 @@ public:
 	TreeModelItem *GetArrayFolderTreeItem(EntityTreeItemData *pArrayItem) const;
 	EntityTreeItemData *GetArrayFolderTreeItemData(EntityTreeItemData *pArrayItem) const;
 
+	void InsertGuiItem(QUuid uuidParent, QJsonObject guiItemObj);
+	void PopGuiItem(EntityTreeItemData *pItem);
+	QUuid FindGuiLayoutFromItemUuid(QUuid itemUuid) const;
+	void AssembleGuiLayoutHeirarchy();
+
 	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const;
 	void GetSelectedTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const;
 	EntityTreeItemData *FindTreeItemData(QUuid uuid) const;
@@ -63,12 +106,14 @@ public:
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 
+	QJsonObject SerializeGuiLayout() const;
+
 private: // These functions should only be called by EntityModel's Cmd_ functions
-	void Cmd_ResetFusedItems();
+	void Cmd_ResetFusedItems(); // (Re)inserts fuse items into the item tree model. It will also destruct/construct the GUI layout heirarchy
 	EntityTreeItemData *Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocAssetTreeItem(IAssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocExistingTreeItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow);
-	EntityTreeItemData *Cmd_AllocGuiItemTreeItem(ItemType eWidgetType, QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocGuiItemTreeItem(ItemType eWidgetType, QString sCodeNamePrefix, QUuid guiLayoutParentUuid, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocPrimNodeTreeItem(QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocPrimLayerTreeItem(EntityTreeItemData *pPrimNode, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocFixtureTreeItem(bool bIsShape, QString sCodeNamePrefix, int iRow = -1);

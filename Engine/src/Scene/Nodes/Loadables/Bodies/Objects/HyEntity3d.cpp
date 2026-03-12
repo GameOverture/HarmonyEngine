@@ -136,14 +136,14 @@ void HyEntity3d::SetNewChildAttributes(IHyNode3d &childRef)
 {
 	SetDirty(DIRTY_ALL);
 	childRef.SetParentsVisible(GetInternalFlags() & EXPLICIT_ParentsVisible);
-	childRef._SetPauseUpdate(IsPauseUpdate(), false);
+	childRef._setPauseUpdate(IsPauseUpdate(), false);
 
 	if(childRef.GetInternalFlags() & NODETYPE_IsBody)
 	{
-		static_cast<IHyBody3d &>(childRef)._SetCoordinateSystem(GetCoordinateSystem(), false);
+		static_cast<IHyBody3d &>(childRef)._setCoordinateSystem(GetCoordinateSystem(), false);
 
 		if(IsStencilSet())
-			static_cast<IHyBody3d &>(childRef)._SetStencil(m_hStencil, false);
+			static_cast<IHyBody3d &>(childRef)._setStencil(m_hStencil, false);
 	}
 
 	if(sm_pHyAssets)

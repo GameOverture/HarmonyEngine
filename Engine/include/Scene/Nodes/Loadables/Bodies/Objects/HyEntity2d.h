@@ -151,11 +151,11 @@ protected:
 	virtual void SetNewChildAttributes(IHyNode2d &childRef);
 
 	virtual void SetParentsVisible(bool bParentsVisible) override final;
-	virtual void _SetPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override final;
-	virtual void _SetScissorStencil(HyStencilHandle hHandle, bool bIsOverriding) override final;
-	virtual void _SetStencil(HyStencilHandle hHandle, bool bIsOverriding) override final;
-	virtual void _SetCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override final;
-	virtual int32 _SetDisplayOrder(int32 iOrderValue, bool bIsOverriding) override final;
+	virtual void _setPauseUpdate(bool bUpdateWhenPaused, bool bIsOverriding) override final;
+	virtual void _setScissorStencil(HyStencilHandle hHandle, bool bIsOverriding) override final;
+	virtual void _setStencil(HyStencilHandle hHandle, bool bIsOverriding) override final;
+	virtual void _setCoordinateSystem(int32 iWindowIndex, bool bIsOverriding) override final;
+	virtual int32 _setDisplayOrder(int32 iOrderValue, bool bIsOverriding) override final;
 
 	bool CalcMouseInBounds();
 

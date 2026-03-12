@@ -324,10 +324,7 @@ TreeModelItem *ITreeModel::GetItem(const QModelIndex &indexRef) const
 	{
 		TreeModelItem *pItem = static_cast<TreeModelItem *>(indexRef.internalPointer());
 		if(pItem)
-		{
-
 			return pItem;
-		}
 	}
 
 	return m_pRootItem;

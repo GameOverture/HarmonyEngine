@@ -351,7 +351,7 @@ HyStencilHandle IHyBody2d::GetScissorHandle()
 //	IHyLoadable2d::Update();
 //}
 
-/*virtual*/ int32 IHyBody2d::_SetDisplayOrder(int32 iOrderValue, bool bIsOverriding)
+/*virtual*/ int32 IHyBody2d::_setDisplayOrder(int32 iOrderValue, bool bIsOverriding)
 {
 	if(bIsOverriding)
 		m_uiFlags &= ~EXPLICIT_DisplayOrder;
@@ -367,7 +367,7 @@ HyStencilHandle IHyBody2d::GetScissorHandle()
 	return iOrderValue;
 }
 
-/*virtual*/ void IHyBody2d::_SetScissorStencil(HyStencilHandle hHandle, bool bIsOverriding)
+/*virtual*/ void IHyBody2d::_setScissorStencil(HyStencilHandle hHandle, bool bIsOverriding)
 {
 	if(bIsOverriding)
 		m_uiFlags &= ~EXPLICIT_ScissorStencil;
