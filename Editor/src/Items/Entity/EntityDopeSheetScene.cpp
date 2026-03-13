@@ -1324,11 +1324,17 @@ void EntityDopeSheetScene::SetKeyFrameTween(EntityTreeItemData *pItemData, int i
 
 void EntityDopeSheetScene::PopAllKeyFrames(EntityTreeItemData *pItemData, bool bRefreshGfxItems)
 {
-	if(m_KeyFramesMap.contains(pItemData) == false)
+	QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorKeyFramesMap();
+	QMap<EntityTreeItemData *, QJsonObject> &ctorPoppedMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorPoppedMap();
+
+	if(m_KeyFramesMap.contains(pItemData) == false && ctorKeyFrameMapRef.contains(pItemData) == false)
 		return;
 
 	// Store the "popped" key frames in case the user wants to readd ("Push") this item back
+	ctorPoppedMapRef[pItemData] = ctorKeyFrameMapRef[pItemData];
 	m_PoppedKeyFramesMap[pItemData] = m_KeyFramesMap[pItemData];
+
+	RemoveKeyFrameProperties(pItemData, -1, false); // Remove ctor keyframe properties
 
 	QMap<int, QJsonObject> &keyFrameMapRef = m_KeyFramesMap[pItemData];
 	QList<int> frameIndexList = keyFrameMapRef.keys();
@@ -1341,12 +1347,17 @@ void EntityDopeSheetScene::PopAllKeyFrames(EntityTreeItemData *pItemData, bool b
 
 void EntityDopeSheetScene::PushAllKeyFrames(EntityTreeItemData *pItemData, bool bRefreshGfxItems)
 {
-	if(m_PoppedKeyFramesMap.contains(pItemData) == false)
+	QMap<EntityTreeItemData *, QJsonObject> &ctorPoppedMapRef = static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetCtorPoppedMap();
+
+	if(m_PoppedKeyFramesMap.contains(pItemData) == false && ctorPoppedMapRef.contains(pItemData) == false)
 		return;
+
+	SetKeyFrameProperties(pItemData, -1, ctorPoppedMapRef[pItemData]);
 	
 	for(auto iter = m_PoppedKeyFramesMap[pItemData].begin(); iter != m_PoppedKeyFramesMap[pItemData].end(); ++iter)
 		SetKeyFrameProperties(pItemData, iter.key(), iter.value());
 
+	ctorPoppedMapRef.remove(pItemData);
 	m_PoppedKeyFramesMap.remove(pItemData);
 
 	if(bRefreshGfxItems)

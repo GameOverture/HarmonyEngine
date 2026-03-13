@@ -170,6 +170,11 @@ QMap<EntityTreeItemData *, QJsonObject> &EntityModel::GetCtorKeyFramesMap()
 	return m_CtorKeyFramesMap;
 }
 
+QMap<EntityTreeItemData *, QJsonObject> &EntityModel::GetCtorPoppedMap()
+{
+	return m_CtorPoppedKeyFramesMap;
+}
+
 QList<QString *> &EntityModel::GetCallbacksList()
 {
 	return m_CallbacksList;

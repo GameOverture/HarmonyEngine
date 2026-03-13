@@ -90,8 +90,10 @@ public:
 
 	HyLayoutHandle InsertLayout(HyOrientation eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
 	glm::ivec2 GetLayoutSize(HyLayoutHandle hLayout) const;
-	bool SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
-	bool SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+	HyOrientation GetLayoutOrientation(HyLayoutHandle hLayout) const;
+	bool SetLayoutOrientation(HyLayoutHandle hAffectedLayout, HyOrientation eNewLayoutType);
+	bool SetLayoutMargin(HyLayoutHandle hAffectedLayout, int16 iLeft, int16 iBottom, int16 iRight, int16 iTop);
+	bool SetLayoutWidgetSpacing(HyLayoutHandle hAffectedLayout, int32 iWidgetSpacing);
 	bool RemoveLayout(HyLayoutHandle hLayout);
 
 	int32 GetDefaultWidgetSpacing() const;

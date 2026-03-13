@@ -75,6 +75,8 @@ public:
 	QAbstractItemModel *GetAuxWidgetsModel();
 
 	QMap<EntityTreeItemData *, QJsonObject> &GetCtorKeyFramesMap();
+	QMap<EntityTreeItemData *, QJsonObject> &GetCtorPoppedMap();
+
 	QList<QString *> &GetCallbacksList();
 
 	int GetFinalFrameIndex(int iStateIndex) const;

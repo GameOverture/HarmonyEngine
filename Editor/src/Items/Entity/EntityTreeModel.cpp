@@ -57,6 +57,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 
 	// Then use "fusedItemList" to init each base class's fused tree item data
 	QJsonArray fusedItemArray = fileMetaObj["fusedItemList"].toArray();
+	int iNumFusedItemsInArray = fusedItemArray.size();
 	for(int i = 0; i < NUM_ENTBASECLASSTYPES; ++i)
 	{
 		switch(i)
@@ -66,17 +67,17 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 			break;
 	
 		case ENTBASECLASS_HyActor2d:
-			if(fusedItemArray.empty() || i <= fusedItemArray.size())
+			if(fusedItemArray.empty() || i >= fusedItemArray.size())
 				m_FusedTreeItemData[i] = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "m_ActorFixture", ITEM_ShapeFixture, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
 			else
-				m_FusedTreeItemData[i] = new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
+				m_FusedTreeItemData[i] = m_ModelRef.Cmd_AddExistingItem(fusedItemArray[i].toObject(), false, true, 0); //new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
 			break;
 
 		case ENTBASECLASS_HyGui:
-			if(fusedItemArray.empty() || i <= fusedItemArray.size())
+			if(fusedItemArray.empty() || i >= fusedItemArray.size())
 				m_FusedTreeItemData[i] = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "m_RootLayout", ITEM_UiLayout, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
 			else
-				m_FusedTreeItemData[i] = new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
+				m_FusedTreeItemData[i] = m_ModelRef.Cmd_AddExistingItem(fusedItemArray[i].toObject(), false, true, 0); //new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
 			break;
 		}
 	}
@@ -218,15 +219,16 @@ void EntityTreeModel::InsertGuiItem(QUuid uuidParent, QJsonObject guiItemObj)
 	fpInsertFunc(m_GuiLayout);
 }
 
-void EntityTreeModel::PopGuiItem(EntityTreeItemData *pItem)
+bool EntityTreeModel::PopGuiItem(EntityTreeItemData *pItem)
 {
 	if(m_GuiLayout.m_Uuid == pItem->GetThisUuid())
 	{
-		HyGuiLog("EntityModel::PopGuiItem - Attempting to pop the root GUI item, which is not allowed", LOGTYPE_Error);
-		return;
+		//HyGuiLog("EntityModel::PopGuiItem - Attempting to pop the root GUI item, which is not allowed", LOGTYPE_Error);
+		return false;
 	}
 
 	QJsonObject poppedObj;
+	bool bFound = false;
 	std::function<void(EntityTreeModel::GuiItem &)> fpPopFunc =
 		[&](EntityTreeModel::GuiItem &curItem)
 		{
@@ -236,14 +238,20 @@ void EntityTreeModel::PopGuiItem(EntityTreeItemData *pItem)
 				{
 					poppedObj = curItem.m_ChildList[i].Serialize();
 					curItem.m_ChildList.removeAt(i);
+					bFound = true;
 					return;
 				}
 				fpPopFunc(curItem.m_ChildList[i]);
 			}
 		};
 	fpPopFunc(m_GuiLayout);
-
-	m_PoppedGuiItemsMap.insert(pItem, poppedObj);
+	if(bFound)
+	{
+		m_PoppedGuiItemsMap.insert(pItem, poppedObj);
+		return true;
+	}
+	
+	return false;
 }
 
 QUuid EntityTreeModel::FindGuiLayoutFromItemUuid(QUuid itemUuid) const
@@ -267,7 +275,7 @@ QUuid EntityTreeModel::FindGuiLayoutFromItemUuid(QUuid itemUuid) const
 	while(pCurItem)
 	{
 		EntityTreeItemData *pTreeItem = FindTreeItemData(pCurItem->m_Uuid);
-		if(pTreeItem->GetType() == ITEM_UiLayout)
+		if(pTreeItem && pTreeItem->GetType() == ITEM_UiLayout)
 			return pTreeItem->GetThisUuid(); // Found the layout!
 
 		const GuiItem *pParentItem = nullptr;
@@ -292,16 +300,73 @@ QUuid EntityTreeModel::FindGuiLayoutFromItemUuid(QUuid itemUuid) const
 	return QUuid();
 }
 
-void EntityTreeModel::AssembleGuiLayoutHeirarchy()
+void EntityTreeModel::GuiDisassemble()
 {
-	EntityTreeItemData *pRootLayoutItem = GetAllFusedItemData()[ENTBASECLASS_HyGui];
-	if(pRootLayoutItem == nullptr)
+	// Disassemble the GUI layout heirarchy if it exists. Move any widget items to be in the regular list of children
+	QModelIndex layoutRootIndex = FindIndex<EntityTreeItemData *>(m_FusedTreeItemData[ENTBASECLASS_HyGui], 0);
+	if(layoutRootIndex.isValid())
 	{
-		HyGuiLog("EntityTreeModel::AssembleGuiLayoutHeirarchy - Root layout item was not found, cannot assemble GUI heirarchy", LOGTYPE_Error);
-		return;
+		std::function<void(const QModelIndex &)> fpDestructGuiLayoutHeirarchy = 
+			[&](const QModelIndex &parentIndex)
+			{
+				TreeModelItem *pParentItem = GetItem(parentIndex);
+				for(int i = 0; i < pParentItem->GetNumChildren(); ++i)
+				{
+					QModelIndex childIndex = index(i, 0, parentIndex);
+					EntityTreeItemData *pGuiItemData = pParentItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
+					if(pGuiItemData == nullptr || pGuiItemData->GetType() == ITEM_UiSpacer)
+						continue;
+					if(pGuiItemData->IsWidgetItem())
+						MoveTreeItem(pGuiItemData, GetRootTreeItemData(), 0);
+					else // Is ITEM_UiLayout, recursively disassemble its heirarchy
+						fpDestructGuiLayoutHeirarchy(childIndex);
+				}
+			};
+		fpDestructGuiLayoutHeirarchy(layoutRootIndex);
 	}
+}
 
-	// 'pRootLayoutItem' == m_GuiLayout. 
+void EntityTreeModel::GuiAssemble()
+{
+	// Reassemble the GUI layout heirarchy. Move any widget items that are children of the GetRootTreeItem() to be children of the appropriate layout item based on 'm_GuiLayout'
+	QModelIndex newLayoutRootIndex = FindIndex<EntityTreeItemData *>(m_FusedTreeItemData[ENTBASECLASS_HyGui], 0);
+	if(newLayoutRootIndex.isValid() == false)
+		HyGuiLog("EntityTreeModel::GuiAssemble - could not find root layout item after reinserting fused items", LOGTYPE_Error);
+
+	TreeModelItem *pEntRootTreeItem = GetRootTreeItem();
+	// Insert all layouts and spacers first to construct the proper heirarchy, then insert all widgets
+	std::function<void(const GuiItem &, const QModelIndex &)> fpConstructGuiLayoutHeirarchy =
+		[&](const GuiItem &curGuiItem, const QModelIndex &parentIndex)
+		{
+			for(const GuiItem &child : curGuiItem.m_ChildList)
+			{
+				EntityTreeItemData *pEntTreeItemData = FindTreeItemData(child.m_Uuid);
+				if(pEntTreeItemData == nullptr)
+				{
+					HyGuiLog("EntityTreeModel::GuiAssemble - could not find tree item data for a GUI item in the layout heirarchy", LOGTYPE_Error);
+					continue;
+				}
+						
+				if(pEntTreeItemData->GetType() == ITEM_UiLayout || pEntTreeItemData->GetType() == ITEM_UiSpacer)
+				{
+					InsertTreeItem(m_ModelRef.GetItem().GetProject(), pEntTreeItemData, GetItem(parentIndex), 0);
+					fpConstructGuiLayoutHeirarchy(child, FindIndex<EntityTreeItemData *>(pEntTreeItemData, 0));
+				}
+			}
+		};
+	fpConstructGuiLayoutHeirarchy(m_GuiLayout, newLayoutRootIndex);
+
+	// Now insert the widgets
+	for(int i = 0; i < pEntRootTreeItem->GetNumChildren(); ++i)
+	{
+		EntityTreeItemData *pGuiItemData = pEntRootTreeItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		if(pGuiItemData->IsWidgetItem())
+		{
+			EntityTreeItemData *pGuiLayoutParent = FindTreeItemData(FindGuiLayoutFromItemUuid(pGuiItemData->GetThisUuid()));
+			if(pGuiLayoutParent)
+				MoveTreeItem(pGuiItemData, pGuiLayoutParent, 0);
+		}
+	}
 }
 
 void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const
@@ -566,79 +631,23 @@ QJsonObject EntityTreeModel::SerializeGuiLayout() const
 // (Re)inserts fuse items into the item tree model. It will also disassemble/assemble the GUI layout heirarchy
 void EntityTreeModel::Cmd_ResetFusedItems()
 {
-	// Disassemble the GUI layout heirarchy if it exists. Move any widget items to be in the regular list of children
-	QModelIndex layoutRootIndex = FindIndex<EntityTreeItemData *>(m_FusedTreeItemData[ENTBASECLASS_HyGui], 0);
-	if(layoutRootIndex.isValid())
-	{
-		std::function<void(const QModelIndex &)> fpDestructGuiLayoutHeirarchy = 
-			[&](const QModelIndex &parentIndex)
-			{
-				TreeModelItem *pParentItem = GetItem(parentIndex);
-				for(int i = 0; i < pParentItem->GetNumChildren(); ++i)
-				{
-					QModelIndex childIndex = index(i, 0, parentIndex);
-					EntityTreeItemData *pGuiItemData = pParentItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
-					if(pGuiItemData == nullptr || pGuiItemData->GetType() == ITEM_UiSpacer)
-						continue;
-					if(pGuiItemData->IsWidgetItem())
-						MoveTreeItem(pGuiItemData, GetRootTreeItemData(), 0);
-					else // Is ITEM_UiLayout, recursively disassemble its heirarchy
-						fpDestructGuiLayoutHeirarchy(childIndex);
-				}
-			};
-		fpDestructGuiLayoutHeirarchy(layoutRootIndex);
-	}
+	GuiDisassemble();
 
 	// Remove/replace any fused items
 	for(int i = 0; i < NUM_ENTBASECLASSTYPES; ++i)
-		RemoveTreeItem(m_FusedTreeItemData[i]);
+	{
+		if(FindIndex<EntityTreeItemData *>(m_FusedTreeItemData[i], 0).isValid())
+		{
+			// Actually present, also pop all Dopesheet keyframes associated with this fused item
+			m_ModelRef.Cmd_RemoveTreeItem(m_FusedTreeItemData[i]);
+		}
+	}
+
 	if(m_FusedTreeItemData[m_ModelRef.GetBaseClassType()])
 	{
-		TreeModelItem *pParentTreeItem = (m_FusedTreeItemData[m_ModelRef.GetBaseClassType()]->IsFixtureItem()) ? GetFixtureFolderTreeItem() : GetRootTreeItem();
-		InsertTreeItem(m_ModelRef.GetItem().GetProject(), m_FusedTreeItemData[m_ModelRef.GetBaseClassType()], pParentTreeItem, 0);
-
-		if(m_ModelRef.GetBaseClassType() == ENTBASECLASS_HyGui)
-		{
-			// Reassemble the GUI layout heirarchy. Move any widget items that are children of the GetRootTreeItem() to be children of the appropriate layout item based on 'm_GuiLayout'
-			QModelIndex newLayoutRootIndex = FindIndex<EntityTreeItemData *>(m_FusedTreeItemData[ENTBASECLASS_HyGui], 0);
-			if(newLayoutRootIndex.isValid() == false)
-				HyGuiLog("EntityTreeModel::Cmd_ResetFusedItems - could not find root layout item after reinserting fused items", LOGTYPE_Error);
-
-			TreeModelItem *pEntRootTreeItem = GetRootTreeItem();
-			// Insert all layouts and spacers first to construct the proper heirarchy, then insert all widgets
-			std::function<void(const GuiItem &, const QModelIndex &)> fpConstructGuiLayoutHeirarchy =
-				[&](const GuiItem &curGuiItem, const QModelIndex &parentIndex)
-				{
-					for(const GuiItem &child : curGuiItem.m_ChildList)
-					{
-						EntityTreeItemData *pEntTreeItemData = FindTreeItemData(child.m_Uuid);
-						if(pEntTreeItemData == nullptr)
-						{
-							HyGuiLog("EntityTreeModel::Cmd_ResetFusedItems - could not find tree item data for a GUI item in the layout heirarchy", LOGTYPE_Error);
-							continue;
-						}
-						
-						if(pEntTreeItemData->GetType() == ITEM_UiLayout || pEntTreeItemData->GetType() == ITEM_UiSpacer)
-						{
-							InsertTreeItem(m_ModelRef.GetItem().GetProject(), pEntTreeItemData, GetItem(parentIndex), 0);
-							fpConstructGuiLayoutHeirarchy(child, FindIndex<EntityTreeItemData *>(pEntTreeItemData, 0));
-						}
-					}
-				};
-			fpConstructGuiLayoutHeirarchy(m_GuiLayout, newLayoutRootIndex);
-
-			// Now insert the widgets
-			for(int i = 0; i < pEntRootTreeItem->GetNumChildren(); ++i)
-			{
-				EntityTreeItemData *pGuiItemData = pEntRootTreeItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
-				if(pGuiItemData->IsWidgetItem())
-				{
-					EntityTreeItemData *pGuiLayoutParent = FindTreeItemData(FindGuiLayoutFromItemUuid(pGuiItemData->GetThisUuid()));
-					if(pGuiLayoutParent)
-						MoveTreeItem(pGuiItemData, pGuiLayoutParent, 0);
-				}
-			}
-		}
+		m_ModelRef.Cmd_ReaddChild(m_FusedTreeItemData[m_ModelRef.GetBaseClassType()], 0);
+		//if(m_ModelRef.GetBaseClassType() == ENTBASECLASS_HyGui)
+		//	GuiAssemble();
 	}
 }
 
@@ -771,6 +780,8 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocGuiItemTreeItem(ItemType eWidgetTy
 	{
 		InsertGuiItem(guiLayoutParentUuid, GuiItem(pNewItem->GetThisUuid()).Serialize());
 		pNewItem->SetGuiParentUuid(guiLayoutParentUuid);
+		GuiDisassemble();
+		GuiAssemble();
 	}
 
 	return pNewItem;
@@ -831,7 +842,12 @@ bool EntityTreeModel::Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow)
 		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, pItem->GetCodeName(), pItem->GetType(), iRow);
 
 	// If apart of GUI layout, readd it
-	InsertGuiItem(pItem->GetGuiParentUuid(), m_PoppedGuiItemsMap[pItem]);
+	if(pItem->GetGuiParentUuid().isNull() == false && m_PoppedGuiItemsMap[pItem].isEmpty() == false)
+	{
+		InsertGuiItem(pItem->GetGuiParentUuid(), m_PoppedGuiItemsMap[pItem]);
+		GuiDisassemble();
+		GuiAssemble();
+	}
 
 	iRow = (iRow < 0 || (pItem->GetEntType() == ENTTYPE_ArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
 	return InsertTreeItem(m_ModelRef.GetItem().GetProject(), pItem, pParentTreeItem, iRow);
@@ -871,7 +887,11 @@ int32 EntityTreeModel::Cmd_PopChild(EntityTreeItemData *pItem)
 	}
 
 	// If apart of GUI layout, remove it
-	PopGuiItem(pItem);
+	if(PopGuiItem(pItem))
+	{
+		GuiDisassemble();
+		GuiAssemble();
+	}
 
 	return iRow;
 }

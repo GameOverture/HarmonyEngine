@@ -394,7 +394,34 @@ glm::ivec2 HyGui::GetLayoutSize(HyLayoutHandle hLayout) const
 	return glm::ivec2(0, 0);
 }
 
-bool HyGui::SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
+HyOrientation HyGui::GetLayoutOrientation(HyLayoutHandle hLayout) const
+{
+	if(m_SubLayoutMap.find(hLayout) != m_SubLayoutMap.end())
+		return m_SubLayoutMap.at(hLayout)->GetLayoutType();
+
+	return HYORIENT_Null;
+}
+
+bool HyGui::SetLayoutOrientation(HyLayoutHandle hAffectedLayout, HyOrientation eNewLayoutType)
+{
+	if(hAffectedLayout == HY_UNUSED_HANDLE)
+	{
+		m_RootLayout.SetLayoutType(eNewLayoutType);
+		SetSizeDirty();
+		return true;
+	}
+	else if(m_SubLayoutMap.find(hAffectedLayout) != m_SubLayoutMap.end())
+	{
+		m_SubLayoutMap[hAffectedLayout]->SetLayoutType(eNewLayoutType);
+		SetSizeDirty();
+		return true;
+	}
+
+	HyLogWarning("HyGui::SetLayoutOrientation could not find specified layout: " << hAffectedLayout);
+	return false;
+}
+
+bool HyGui::SetLayoutMargin(HyLayoutHandle hAffectedLayout, int16 iLeft, int16 iBottom, int16 iRight, int16 iTop)
 {
 	if(hAffectedLayout == HY_UNUSED_HANDLE)
 	{
@@ -413,7 +440,7 @@ bool HyGui::SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop
 	return false;
 }
 
-bool HyGui::SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
+bool HyGui::SetLayoutWidgetSpacing(HyLayoutHandle hAffectedLayout, int32 iWidgetSpacing)
 {
 	if(hAffectedLayout == HY_UNUSED_HANDLE)
 	{

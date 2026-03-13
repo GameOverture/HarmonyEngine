@@ -94,9 +94,10 @@ public:
 	EntityTreeItemData *GetArrayFolderTreeItemData(EntityTreeItemData *pArrayItem) const;
 
 	void InsertGuiItem(QUuid uuidParent, QJsonObject guiItemObj);
-	void PopGuiItem(EntityTreeItemData *pItem);
+	bool PopGuiItem(EntityTreeItemData *pItem);
 	QUuid FindGuiLayoutFromItemUuid(QUuid itemUuid) const;
-	void AssembleGuiLayoutHeirarchy();
+	void GuiDisassemble();
+	void GuiAssemble();
 
 	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const;
 	void GetSelectedTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const;
