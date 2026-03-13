@@ -829,16 +829,18 @@ void EntityWidget::on_actionAddLayoutHorz_triggered()
 
 void EntityWidget::on_actionAddLayoutVert_triggered()
 {
-	
-	// + Assmble the EntityTreeItemData's tree nodes in the root-layout or back in the child list based on which base class is selected
-	// - Set attributes on layouts or spacers (somehow?)
-	// - Allow order item up/down to traverse through the layout heirarchy or outside it in the item list
-	// - Preview layout changes
-	// - Save runtime for layout
+	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
+	EntityUndoCmd_AddGuiItem *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiLayout, uuidLayoutParent);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+
+	static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().SetKeyFrameProperty(pCmd->GetGuiTreeItemData(), -1, "Layout", "Orientation", HyGlobal::OrientationName(HYORIENT_Vertical), true);
 }
 
 void EntityWidget::on_actionAddSpacer_triggered()
 {
+	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiSpacer, uuidLayoutParent);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddLabel_triggered()

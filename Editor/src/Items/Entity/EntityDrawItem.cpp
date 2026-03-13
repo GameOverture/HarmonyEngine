@@ -199,7 +199,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 
 	if(m_pChild)
 		m_pChild->Load();
-	else
+	else if(m_pEntityTreeItemData->IsLayoutItem() == false)
 		HyGuiLog("EntityDrawItem ctor - m_pChild remained null for item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 
 	// Delete the old cached nodes (if they existed)

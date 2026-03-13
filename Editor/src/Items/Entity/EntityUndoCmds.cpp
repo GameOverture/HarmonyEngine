@@ -125,6 +125,11 @@ EntityUndoCmd_AddGuiItem::EntityUndoCmd_AddGuiItem(ProjectItemData &entityItemRe
 	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pGuiTreeItemData);
 }
 
+EntityTreeItemData *EntityUndoCmd_AddGuiItem::GetGuiTreeItemData() const
+{
+	return m_pGuiTreeItemData;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 EntityUndoCmd_AddAssets::EntityUndoCmd_AddAssets(ProjectItemData &entityItemRef, QList<IAssetItemData *> assetItemList, QUndoCommand *pParent /*= nullptr*/) :

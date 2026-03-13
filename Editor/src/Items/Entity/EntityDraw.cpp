@@ -480,9 +480,10 @@ void EntityDraw::SetExtrapolatedProperties()
 	{
 		QJsonObject descObj = descObjList[i];
 		ItemType eType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
+		if(HyGlobal::IsItemType_GuiLayout(eType))
+			continue;
+
 		QUuid uuid(descObj["UUID"].toString());
-		//bool bIsLocked = descObj["isLocked"].toBool();
-		//bool bSelected = descObj["isSelected"].toBool();
 
 		// Try to find the draw item within 'staleItemList'
 		EntityDrawItem *pDrawItem = nullptr;

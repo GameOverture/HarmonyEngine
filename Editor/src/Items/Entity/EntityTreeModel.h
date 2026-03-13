@@ -31,6 +31,8 @@ class EntityTreeModel : public ITreeModel
 	EntityTreeItemData *								m_pRootTreeItemData;						// The root item data itself. It stores all the properties for EVERY available base class to choose from. The properties are shown/hidden and serialized to runtime accordingly.
 	EntityTreeItemData *								m_FusedTreeItemData[NUM_ENTBASECLASSTYPES];	// Each base class type can have one "fused" item that is a component of the class declaration
 
+	QList<EntityTreeItemData *>							m_GuiLayoutItemList;
+
 public:
 	enum ColumnType
 	{

@@ -314,12 +314,17 @@ void EntityTreeModel::GuiDisassemble()
 				{
 					QModelIndex childIndex = index(i, 0, parentIndex);
 					EntityTreeItemData *pGuiItemData = pParentItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
-					if(pGuiItemData == nullptr || pGuiItemData->GetType() == ITEM_UiSpacer)
+					if(pGuiItemData == nullptr)
 						continue;
 					if(pGuiItemData->IsWidgetItem())
 						MoveTreeItem(pGuiItemData, GetRootTreeItemData(), 0);
-					else // Is ITEM_UiLayout, recursively disassemble its heirarchy
+					else // Is ITEM_UiLayout or ITEM_UiSpacer, recursively disassemble its heirarchy
+					{
 						fpDestructGuiLayoutHeirarchy(childIndex);
+						RemoveTreeItem(pGuiItemData);
+						m_GuiLayoutItemList.removeOne(pGuiItemData);
+						m_GuiLayoutItemList.append(pGuiItemData);
+					}
 				}
 			};
 		fpDestructGuiLayoutHeirarchy(layoutRootIndex);
@@ -387,9 +392,30 @@ void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut,
 				childListOut.push_back(pArrayItem);
 			}
 		}
+		else if(pCurItem->GetEntType() == ENTTYPE_FusedItem && pCurItem->GetType() == ITEM_UiLayout)
+		{
+			// If this is the fused item for the GUI layout, also search through the GUI layout heirarchy for any widget items to add to the child list
+			TreeModelItem *pCurLayoutFolder = pThisEntity->GetChild(i);
+			QStack<TreeModelItem *> layoutStack;
+			layoutStack.push(pCurLayoutFolder);
+			while(layoutStack.empty() == false)
+			{
+				TreeModelItem *pCurLayoutItem = layoutStack.pop();
+				EntityTreeItemData *pCurLayoutItemData = pCurLayoutItem->data(0).value<EntityTreeItemData *>();
+				if(pCurLayoutItemData == nullptr)
+					continue;
+				if(pCurLayoutItemData->IsWidgetItem())
+					childListOut.push_back(pCurLayoutItemData);
+				for(int j = 0; j < pCurLayoutItem->GetNumChildren(); ++j)
+					layoutStack.push(pCurLayoutItem->GetChild(j));
+			}
+		}
 		else
 			childListOut.push_back(pCurItem);
 	}
+
+	for(int i = 0; i < m_GuiLayoutItemList.size(); ++i)
+		childListOut.push_back(m_GuiLayoutItemList[i]);
 
 	TreeModelItem *pThisFixturesFolder = GetFixtureFolderTreeItem();
 	for(int i = 0; i < pThisFixturesFolder->GetNumChildren(); ++i)
@@ -453,8 +479,34 @@ EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
 			}
 		}
 
+		if(pCurItem->GetEntType() == ENTTYPE_FusedItem && pCurItem->GetType() == ITEM_UiLayout)
+		{
+			// If this is the fused item for the GUI layout, also search through the GUI layout heirarchy for the item with this uuid
+			TreeModelItem *pCurLayoutFolder = pThisEntity->GetChild(i);
+			QStack<TreeModelItem *> layoutStack;
+			layoutStack.push(pCurLayoutFolder);
+
+			while(layoutStack.empty() == false)
+			{
+				TreeModelItem *pCurLayoutItem = layoutStack.pop();
+				EntityTreeItemData *pCurLayoutItemData = pCurLayoutItem->data(0).value<EntityTreeItemData *>();
+				if(pCurLayoutItemData == nullptr)
+					continue;
+				if(pCurLayoutItemData->GetThisUuid() == uuid)
+					return pCurLayoutItemData;
+				for(int j = 0; j < pCurLayoutItem->GetNumChildren(); ++j)
+					layoutStack.push(pCurLayoutItem->GetChild(j));
+			}
+		}
+
 		if(pCurItem->GetThisUuid() == uuid)
 			return pCurItem;
+	}
+
+	for(int i = 0; i < m_GuiLayoutItemList.size(); ++i)
+	{
+		if(m_GuiLayoutItemList[i]->GetThisUuid() == uuid)
+			return m_GuiLayoutItemList[i];
 	}
 
 	TreeModelItem *pThisFixtureFolder = GetFixtureFolderTreeItem();
@@ -646,8 +698,8 @@ void EntityTreeModel::Cmd_ResetFusedItems()
 	if(m_FusedTreeItemData[m_ModelRef.GetBaseClassType()])
 	{
 		m_ModelRef.Cmd_ReaddChild(m_FusedTreeItemData[m_ModelRef.GetBaseClassType()], 0);
-		//if(m_ModelRef.GetBaseClassType() == ENTBASECLASS_HyGui)
-		//	GuiAssemble();
+		if(m_ModelRef.GetBaseClassType() == ENTBASECLASS_HyGui)
+			GuiAssemble();
 	}
 }
 
@@ -758,8 +810,13 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descO
 		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, sCodeName, eGuiType, iRow);
 
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, descObj, bIsArrayItem, bIsFusedItem);
-	iRow = (iRow < 0 || (bIsArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
-	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
+	if(pNewItem->IsLayoutItem())
+		m_GuiLayoutItemList.append(pNewItem);
+	else
+	{
+		iRow = (iRow < 0 || (bIsArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
+		InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
+	}
 
 	return pNewItem;
 }
@@ -771,7 +828,10 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocGuiItemTreeItem(ItemType eWidgetTy
 
 	TreeModelItem *pParentTreeItem = GetRootTreeItem();
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, eWidgetType, ENTTYPE_Item, QUuid(), QUuid::createUuid());
-	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
+	if(pNewItem->IsLayoutItem())
+		m_GuiLayoutItemList.append(pNewItem);
+	else
+		InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 
 	if(pNewItem->IsLayoutItem() && guiLayoutParentUuid.isNull())
 		HyGuiLog("EntityTreeModel::Cmd_AllocGuiItemTreeItem - Attempting to create a layout item in the GUI heirarchy without a valid layout parent", LOGTYPE_Error);
