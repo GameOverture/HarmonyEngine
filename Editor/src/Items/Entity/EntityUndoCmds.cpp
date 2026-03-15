@@ -117,7 +117,12 @@ EntityUndoCmd_AddGuiItem::EntityUndoCmd_AddGuiItem(ProjectItemData &entityItemRe
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	if(pWidget)
+	{
+		if(m_UuidLayoutParent.isNull() == false)
+			pWidget->ExpandAllGuiLayouts();
+
 		pWidget->RequestSelectedItems(QList<QUuid>() << m_pGuiTreeItemData->GetThisUuid());
+	}
 }
 
 /*virtual*/ void EntityUndoCmd_AddGuiItem::undo() /*override*/

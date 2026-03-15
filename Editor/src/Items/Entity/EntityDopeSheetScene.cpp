@@ -1615,9 +1615,10 @@ void EntityDopeSheetScene::RefreshAllGfxItems()
 	bool bIncludeCtor = true;//m_pEntStateData->GetIndex() == 0;
 
 	// Gather all the entity items (root, children, shapes) into one list 'itemList'
-	QList<EntityTreeItemData *> entireItemList, shapeList;
-	static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetTreeModel().GetTreeItemData(entireItemList, shapeList);
+	QList<EntityTreeItemData *> entireItemList, shapeList, layoutList;
+	static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetTreeModel().GetTreeItemData(entireItemList, shapeList, layoutList);
 	entireItemList += shapeList;
+	entireItemList += layoutList;
 	entireItemList.prepend(static_cast<EntityModel &>(m_pEntStateData->GetModel()).GetTreeModel().GetRootTreeItemData());
 
 	m_iFinalFrame = 0; // Determine the final frame

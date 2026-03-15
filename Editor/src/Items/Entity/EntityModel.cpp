@@ -514,8 +514,8 @@ QString EntityModel::GenerateSrc_FileIncludes() const
 {
 	QString sSrc;
 
-	QList<EntityTreeItemData *> itemList, shapeList;
-	m_TreeModel.GetTreeItemData(itemList, shapeList);
+	QList<EntityTreeItemData *> itemList, shapeList, layoutList;
+	m_TreeModel.GetTreeItemData(itemList, shapeList, layoutList);
 
 	QStringList sIncludeList;
 	for(EntityTreeItemData *pItem : itemList)
@@ -565,8 +565,8 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 {
 	QString sSrc;
 
-	QList<EntityTreeItemData *> itemList, shapeList;
-	m_TreeModel.GetTreeItemData(itemList, shapeList);
+	QList<EntityTreeItemData *> itemList, shapeList, layoutList;
+	m_TreeModel.GetTreeItemData(itemList, shapeList, layoutList);
 	itemList.append(shapeList);
 	EntityTreeItemData *pCurArray = nullptr;
 	for(EntityTreeItemData *pItem : itemList)
@@ -609,8 +609,8 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 QString EntityModel::GenerateSrc_AccessorDecl() const
 {
 	QString sSrc;
-	QList<EntityTreeItemData *> itemList, shapeList;
-	m_TreeModel.GetTreeItemData(itemList, shapeList);
+	QList<EntityTreeItemData *> itemList, shapeList, layoutList;
+	m_TreeModel.GetTreeItemData(itemList, shapeList, layoutList);
 	itemList.append(shapeList);
 
 	QStringList arrayList;
@@ -645,8 +645,8 @@ QString EntityModel::GenerateSrc_AccessorDecl() const
 QString EntityModel::GenerateSrc_AccessorDefinition(QString sClassName) const
 {
 	QString sSrc;
-	QList<EntityTreeItemData *> itemList, shapeList;
-	m_TreeModel.GetTreeItemData(itemList, shapeList);
+	QList<EntityTreeItemData *> itemList, shapeList, layoutList;
+	m_TreeModel.GetTreeItemData(itemList, shapeList, layoutList);
 	itemList.append(shapeList);
 
 	QStringList arrayList;
@@ -733,8 +733,8 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 	sSrc += ",\n\tm_bTimelinePaused(false)";
 	sSrc += ",\n\tm_uiTimelineFinalFrame(0)";
 
-	QList<EntityTreeItemData *> itemList, shapeList;
-	m_TreeModel.GetTreeItemData(itemList, shapeList);
+	QList<EntityTreeItemData *> itemList, shapeList, layoutList;
+	m_TreeModel.GetTreeItemData(itemList, shapeList, layoutList);
 	itemList.append(shapeList);
 	EntityTreeItemData *pCurArray = nullptr;
 	for(EntityTreeItemData *pItem : itemList)
@@ -1424,8 +1424,8 @@ QString EntityModel::GenerateSrc_TimelineAdvance() const
 {
 	QString sSrc;
 
-	QList<EntityTreeItemData *> itemList, shapeList;
-	m_TreeModel.GetTreeItemData(itemList, shapeList);
+	QList<EntityTreeItemData *> itemList, shapeList, layoutList;
+	m_TreeModel.GetTreeItemData(itemList, shapeList, layoutList);
 	itemList.append(shapeList);
 	EntityTreeItemData *pCurArray = nullptr;
 	for(EntityTreeItemData *pItem : itemList)
@@ -1693,9 +1693,8 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 
 	itemSpecificFileDataOut.m_Meta.insert("guiLayout", m_TreeModel.SerializeGuiLayout());
 	
-	QList<EntityTreeItemData *> childList;
-	QList<EntityTreeItemData *> shapeList;
-	m_TreeModel.GetTreeItemData(childList, shapeList);
+	QList<EntityTreeItemData *> childList, shapeList, layoutList;
+	m_TreeModel.GetTreeItemData(childList, shapeList, layoutList);
 
 	QJsonArray childArray;
 	QString sCurrentArrayCodeName = "";
@@ -1771,6 +1770,15 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 	}
 	itemSpecificFileDataOut.m_Meta.insert("descShapeList", shapeArray);
 
+	QJsonArray layoutArray;
+	for(EntityTreeItemData *pLayout : layoutList)
+	{
+		QJsonObject layoutObj;
+		pLayout->InsertJsonInfo_Desc(layoutObj);
+		layoutArray.append(layoutObj);
+	}
+	itemSpecificFileDataOut.m_Meta.insert("descLayoutList", layoutArray);
+
 	//QJsonArray callbacksArray;
 	//for(QString sCallback : m_CallbacksList)
 	//	callbacksArray.append(sCallback);
@@ -1782,9 +1790,10 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 	EntityStateData *pStateData = static_cast<EntityStateData *>(m_StateList[uiIndex]);
 
 	// Combine all items (root, children, and shapes) into a single list 'itemList'
-	QList<EntityTreeItemData *> itemList, shapeList;
-	m_TreeModel.GetTreeItemData(itemList, shapeList);
+	QList<EntityTreeItemData *> itemList, shapeList, layoutList;
+	m_TreeModel.GetTreeItemData(itemList, shapeList, layoutList);
 	itemList.append(shapeList);
+	itemList.append(layoutList);
 	itemList.prepend(m_TreeModel.GetRootTreeItemData());
 
 	// Serialize all key frames for each item that has them

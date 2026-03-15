@@ -49,6 +49,8 @@ public:
 
 	QUuid FindLayoutItemFromSelected() const;
 
+	void ExpandAllGuiLayouts();
+
 	void SetExtrapolatedProperties();
 
 	bool IsEditMode() const;

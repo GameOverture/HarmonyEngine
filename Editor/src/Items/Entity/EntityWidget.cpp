@@ -91,9 +91,10 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	connect(ui->nodeTree, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(OnCollapsedNode(const QModelIndex &)));
 
 	// Initialize what items are selected in the model
-	QList<EntityTreeItemData *> childList, shapeList;
-	pEntityModel->GetTreeModel().GetTreeItemData(childList, shapeList);
+	QList<EntityTreeItemData *> childList, shapeList, layoutList;
+	pEntityModel->GetTreeModel().GetTreeItemData(childList, shapeList, layoutList);
 	childList += shapeList;
+	childList += layoutList;
 	QList<EntityTreeItemData *> selectedItemsList;
 	for(EntityTreeItemData *pItem : childList)
 	{
@@ -436,7 +437,22 @@ QUuid EntityWidget::FindLayoutItemFromSelected() const
 		return QUuid();
 
 	EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>();
-	return static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel().FindGuiLayoutFromItemUuid(pCurItemData->GetThisUuid());
+	return static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel().FindGuiLayoutUuid(pCurItemData);
+}
+
+void EntityWidget::ExpandAllGuiLayouts()
+{
+	if(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetBaseClassType() != ENTBASECLASS_HyGui)
+		return;
+
+	EntityTreeModel &entityTreeModelRef = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel();
+	QModelIndexList indexList = entityTreeModelRef.GetAllIndices();
+	for(const QModelIndex &index : indexList)
+	{
+		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pCurItemData->GetType() == ITEM_UiLayout)
+			ui->nodeTree->expand(index);
+	}
 }
 
 void EntityWidget::SetExtrapolatedProperties()
@@ -572,6 +588,7 @@ void EntityWidget::SetEditMode(EntityTreeItemData *pItemToEdit)
 /*virtual*/ void EntityWidget::showEvent(QShowEvent *pEvent) /*override*/
 {
 	resizeEvent(nullptr);
+	ExpandAllGuiLayouts();
 }
 
 /*virtual*/ void EntityWidget::resizeEvent(QResizeEvent *pEvent) /*override*/

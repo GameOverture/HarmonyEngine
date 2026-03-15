@@ -31,7 +31,7 @@ class EntityTreeModel : public ITreeModel
 	EntityTreeItemData *								m_pRootTreeItemData;						// The root item data itself. It stores all the properties for EVERY available base class to choose from. The properties are shown/hidden and serialized to runtime accordingly.
 	EntityTreeItemData *								m_FusedTreeItemData[NUM_ENTBASECLASSTYPES];	// Each base class type can have one "fused" item that is a component of the class declaration
 
-	QList<EntityTreeItemData *>							m_GuiLayoutItemList;
+	QList<EntityTreeItemData *>							m_GuiLayoutItemList;						// GUI layouts and spacers may be removed temporarily based on chosen entity base class, and are preserved in this list
 
 public:
 	enum ColumnType
@@ -97,11 +97,9 @@ public:
 
 	void InsertGuiItem(QUuid uuidParent, QJsonObject guiItemObj);
 	bool PopGuiItem(EntityTreeItemData *pItem);
-	QUuid FindGuiLayoutFromItemUuid(QUuid itemUuid) const;
-	void GuiDisassemble();
-	void GuiAssemble();
+	QUuid FindGuiLayoutUuid(EntityTreeItemData *pItem) const;
 
-	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const;
+	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut, QList<EntityTreeItemData *> &layoutListOut) const;
 	void GetSelectedTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const;
 	EntityTreeItemData *FindTreeItemData(QUuid uuid) const;
 
@@ -116,7 +114,7 @@ private: // These functions should only be called by EntityModel's Cmd_ function
 	EntityTreeItemData *Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocAssetTreeItem(IAssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocExistingTreeItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow);
-	EntityTreeItemData *Cmd_AllocGuiItemTreeItem(ItemType eWidgetType, QString sCodeNamePrefix, QUuid guiLayoutParentUuid, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocGuiItemTreeItem(ItemType eGuiItemType, QString sCodeNamePrefix, QUuid guiLayoutParentUuid, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocPrimNodeTreeItem(QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocPrimLayerTreeItem(EntityTreeItemData *pPrimNode, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocFixtureTreeItem(bool bIsShape, QString sCodeNamePrefix, int iRow = -1);

@@ -630,10 +630,12 @@ void EntityDopeSheetView::DrawCurrentFrameIndicator(QPainter *pPainter, qreal fP
 
 QList<EntityTreeItemData *> EntityDopeSheetView::GetItems() const
 {
-	// Gather all the entity items (root, children, shapes) into one list 'itemList'
-	QList<EntityTreeItemData *> itemList, shapeList;
-	static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetTreeItemData(itemList, shapeList);
+	// Gather all the entity items (root, children, shapes) into one list 'itemList'. Only include layout items if this is a HyGui
+	QList<EntityTreeItemData *> itemList, shapeList, layoutList;
+	static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetTreeItemData(itemList, shapeList, layoutList);
 	itemList += shapeList;
+	if(static_cast<EntityModel &>(m_pStateData->GetModel()).GetBaseClassType() == ENTBASECLASS_HyGui)
+		itemList += layoutList;
 	itemList.prepend(static_cast<EntityModel &>(m_pStateData->GetModel()).GetTreeModel().GetRootTreeItemData());
 
 	return itemList;
