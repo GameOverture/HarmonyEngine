@@ -728,29 +728,20 @@ void EntityTreeModel::Cmd_ResetFusedItems()
 							HyGuiLog("EntityTreeModel::Cmd_ResetFusedItems - could not find tree item data for a GUI item in the layout heirarchy", LOGTYPE_Error);
 							continue;
 						}
-						if(pEntTreeItemData->IsLayoutItem() == false)
-							continue;
 
-						// Insert this layout/spacer item as a child of pParentTreeItem
-						InsertTreeItem(m_ModelRef.GetItem().GetProject(), pEntTreeItemData, GetItem(parentIndex), 0);
+						if(pEntTreeItemData->IsLayoutItem()) // Insert this layout/spacer item as a child of pParentTreeItem
+							InsertTreeItem(m_ModelRef.GetItem().GetProject(), pEntTreeItemData, GetItem(parentIndex), -1);
+						else // Move the widget item to the layout heirarchy based on 'm_GuiLayout'
+						{
+							EntityTreeItemData *pGuiLayoutParent = FindTreeItemData(FindGuiLayoutUuid(pEntTreeItemData));
+							MoveTreeItem(pEntTreeItemData, pGuiLayoutParent, -1);
+						}
+
 						if(pEntTreeItemData->GetType() == ITEM_UiLayout)
 							fpConstructGuiLayoutHeirarchy(child, FindIndex<EntityTreeItemData *>(pEntTreeItemData, 0));
 					}
 				};
 			fpConstructGuiLayoutHeirarchy(m_GuiLayout, rootLayoutIndex);
-
-			// Now insert the widgets
-			TreeModelItem *pEntRootTreeItem = GetRootTreeItem();
-			for(int i = 0; i < pEntRootTreeItem->GetNumChildren(); ++i)
-			{
-				EntityTreeItemData *pGuiItemData = pEntRootTreeItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
-				if(pGuiItemData->IsWidgetItem())
-				{
-					EntityTreeItemData *pGuiLayoutParent = FindTreeItemData(FindGuiLayoutUuid(pGuiItemData));
-					if(pGuiLayoutParent)
-						MoveTreeItem(pGuiItemData, pGuiLayoutParent, 0);
-				}
-			}
 
 			if(m_ModelRef.GetItem().GetWidget())
 				static_cast<EntityWidget *>(m_ModelRef.GetItem().GetWidget())->ExpandAllGuiLayouts();

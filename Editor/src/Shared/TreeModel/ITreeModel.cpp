@@ -146,6 +146,9 @@ void ITreeModel::MoveTreeItem(TreeModelItemData *pSourceItemData, TreeModelItemD
 	}
 	TreeModelItem *pDestParentTreeItem = GetItem(destParentIndex);
 
+	if(iDestRow < 0)
+		iDestRow = pDestParentTreeItem->GetNumChildren();
+
 	int iSourceIndex = pSourceTreeItem->GetIndex();
 
 	// Appease the stupid Qt API - if sourceParent and destinationParent are the same, you must ensure
