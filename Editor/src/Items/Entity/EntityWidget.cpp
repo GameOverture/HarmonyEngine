@@ -1023,7 +1023,7 @@ void EntityWidget::on_actionOrderChildrenUp_triggered()
 		EntityTreeItemData *pEntTreeItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
 		if(pEntTreeItemData == nullptr)
 		{
-			HyGuiLog("EntityWidget - One of the selected items is nullptr. Cannot reorder children.", LOGTYPE_Error);
+			HyGuiLog("EntityWidget OrderUp - One of the selected items is nullptr. Cannot reorder children.", LOGTYPE_Error);
 			return;
 		}
 		selectedItemDataList.push_back(pEntTreeItemData);
@@ -1096,39 +1096,97 @@ void EntityWidget::on_actionOrderChildrenDown_triggered()
 		return;
 	}
 
+	EntityTreeItemData *pParentSwapDestination = nullptr;				// If 'bParentSwapAllowed' allowed (down below), this is what the new parent should be
+	int iParentSwapDestinationIndex = -1;								// If 'bParentSwapAllowed' allowed (down below), this is the index/row under the new parent that the items should be moved to
+	int iBOT_INDEX = ui->nodeTree->model()->rowCount(parentIndex) - 1;	// The bot index indicates where the lowermost index items are allowed to be moved down to. If 'bParentSwapAllowed', going past this index will move the items to 'pParentSwapDestination', otherwise they will clump at the bottom and be blocked from moving down any further.
 
-	int iNumChildren = ui->nodeTree->model()->rowCount(ui->nodeTree->model()->parent(selectedIndexList[0]));
+	if(pCurParentItem->GetType() == ITEM_UiLayout) // If the selected items are within the GUI Layout heirarchy
+	{
+		// Find the next sibling ITEM_UiLayout item below the selected items, and set the bot index to be that sibling if it exists.
+		QAbstractItemModel *pModel = ui->nodeTree->model();
+		int numSiblings = ui->nodeTree->model()->rowCount(parentIndex);
+		for(int row = selectedIndexList[0].row() + 1; row < numSiblings; ++row)
+		{
+			QModelIndex siblingIndex = pModel->index(row, 0, parentIndex);
+			EntityTreeItemData *pSiblingItemData = ui->nodeTree->model()->data(siblingIndex, Qt::UserRole).value<EntityTreeItemData *>();
+			if(pSiblingItemData && pSiblingItemData->GetType() == ITEM_UiLayout)
+			{
+				pParentSwapDestination = pSiblingItemData;
+
+				QModelIndex destinationParentIndex = static_cast<EntityTreeModel *>(ui->nodeTree->model())->FindIndex<EntityTreeItemData *>(pParentSwapDestination, 0);
+				iParentSwapDestinationIndex = 0;
+					
+				iBOT_INDEX = row - 1;
+				break;
+			}
+		}
+		if(pParentSwapDestination == nullptr) // Indicates that there are no sibling layouts below the selected items, so the items can be moved down to be below the parent layout (becoming siblings with the parent). Works going from root layout -> root entity too.
+		{
+			pParentSwapDestination = pCurGrandParentItem;
+			iParentSwapDestinationIndex = parentIndex.row() + 1;
+		}
+	}
+
+	int iDiscardBotIndices = -1;
+	bool bAllGuiItems = true;
 	QList<EntityTreeItemData *> selectedItemDataList;
 	QList<int> curIndexList;
 	QList<int> newIndexList;
-	int iDiscardBotIndices = -1;
 	for(const QModelIndex &index : selectedIndexList)
 	{
-		if(iDiscardBotIndices == -1 && index.row() == (iNumChildren - 1))
-			iDiscardBotIndices = (iNumChildren - 1);
+		if(iDiscardBotIndices == -1 && index.row() == iBOT_INDEX)
+			iDiscardBotIndices = iBOT_INDEX;
 		else if((iDiscardBotIndices - 1) == index.row())
 			iDiscardBotIndices = index.row();
 
 		EntityTreeItemData *pEntTreeItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pEntTreeItemData == nullptr)
+		{
+			HyGuiLog("EntityWidget OrderDown - One of the selected items is nullptr. Cannot reorder children.", LOGTYPE_Error);
+			return;
+		}
 		selectedItemDataList.push_back(pEntTreeItemData);
+		if(pEntTreeItemData->IsWidgetItem() == false && pEntTreeItemData->IsLayoutItem() == false && pEntTreeItemData->GetEntType() != ENTTYPE_ArrayFolder)
+			bAllGuiItems = false;
 
 		int iRow = index.row();
 		curIndexList.push_back(iRow);
 		newIndexList.push_back(iRow + 1);
 	}
 
-	while(iDiscardBotIndices >= 0 && iDiscardBotIndices < iNumChildren)
-	{
-		selectedItemDataList.takeFirst();
-		curIndexList.takeFirst();
-		newIndexList.takeFirst();
+	bool bParentSwapAllowed = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetBaseClassType() == ENTBASECLASS_HyGui &&
+							  bAllGuiItems &&
+							  pCurParentItem->GetEntType() != ENTTYPE_ArrayFolder &&
+							  pParentSwapDestination != nullptr &&
+							  pCurParentItem->GetType() == ITEM_UiLayout;
 
-		iDiscardBotIndices++;
+	EntityTreeItemData *pDestinationParent = pCurParentItem;
+	if(iDiscardBotIndices >= 0 && iDiscardBotIndices <= iBOT_INDEX)
+	{
+		if(bParentSwapAllowed && pParentSwapDestination)
+		{
+			pDestinationParent = pParentSwapDestination;
+		
+			// Update the indices of the items being moved to be their new indices under the new parent
+			for(int i = 0; i < newIndexList.size(); ++i)
+				newIndexList[i] = iParentSwapDestinationIndex;
+		}
+		else // Clump at the bottom and block from moving down any further
+		{
+			while(iDiscardBotIndices >= 0 && iDiscardBotIndices <= iBOT_INDEX)
+			{
+				selectedItemDataList.takeFirst();
+				curIndexList.takeFirst();
+				newIndexList.takeFirst();
+
+				iDiscardBotIndices++;
+			}
+		}
 	}
 
 	if(selectedItemDataList.empty() == false)
 	{
-		QUndoCommand *pCmd = new EntityUndoCmd_MoveChildren(m_ItemRef, selectedItemDataList, pCurParentItem, curIndexList, pCurParentItem, newIndexList, false);
+		QUndoCommand *pCmd = new EntityUndoCmd_MoveChildren(m_ItemRef, selectedItemDataList, pCurParentItem, curIndexList, pDestinationParent, newIndexList, false);
 		m_ItemRef.GetUndoStack()->push(pCmd);
 	}
 }
