@@ -670,29 +670,6 @@ void EntityTreeModel::Cmd_ResetFusedItems()
 				m_GuiLayoutItemList.append(static_cast<EntityTreeItemData *>(pTreeItem));
 			}
 		}
-
-		//std::function<void(const QModelIndex &)> fpDestructGuiLayoutHeirarchy = 
-		//	[&](const QModelIndex &parentIndex)
-		//	{
-		//		TreeModelItem *pParentItem = GetItem(parentIndex);
-		//		for(int i = 0; i < pParentItem->GetNumChildren(); ++i)
-		//		{
-		//			QModelIndex childIndex = index(i, 0, parentIndex);
-		//			EntityTreeItemData *pGuiItemData = pParentItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
-		//			if(pGuiItemData == nullptr)
-		//				continue;
-		//			//if(pGuiItemData->IsWidgetItem())
-		//			//	widgetsInLayoutsList.push_back(pGuiItemData);
-		//			//else // Is ITEM_UiLayout or ITEM_UiSpacer, recursively disassemble its heirarchy
-		//			//{
-		//				fpDestructGuiLayoutHeirarchy(childIndex);
-		//				RemoveTreeItem(pGuiItemData);
-		//				m_GuiLayoutItemList.removeOne(pGuiItemData);
-		//				m_GuiLayoutItemList.append(pGuiItemData);
-		//			//}
-		//		}
-		//	};
-		//fpDestructGuiLayoutHeirarchy(layoutRootIndex);
 	}
 
 	// Remove/replace any fused items

@@ -116,17 +116,22 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_OrderChildren : public QUndoCommand
+class EntityUndoCmd_MoveChildren : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
 	QList<EntityTreeItemData *>		m_SelectedItemDataList;
+
+	EntityTreeItemData *			m_pPrevParent;
 	QList<int>						m_PrevItemIndexList;
+
+	EntityTreeItemData *			m_pNewParent;
 	QList<int>						m_NewItemIndexList;
+
 	bool							m_bOrderUpwards;
 
 public:
-	EntityUndoCmd_OrderChildren(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> selectedItemDataList, QList<int> prevItemIndexList, QList<int> newItemIndexList, bool bOrderUpwards, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_OrderChildren();
+	EntityUndoCmd_MoveChildren(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> selectedItemDataList, EntityTreeItemData *pPrevParent, QList<int> prevItemIndexList, EntityTreeItemData *pNewParent, QList<int> newItemIndexList, bool bOrderUpwards, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_MoveChildren();
 
 	virtual void redo() override;
 	virtual void undo() override;

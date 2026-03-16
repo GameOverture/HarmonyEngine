@@ -265,10 +265,12 @@ EntityUndoCmd_PasteItems::EntityUndoCmd_PasteItems(ProjectItemData &entityItemRe
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> selectedItemDataList, QList<int> prevItemIndexList, QList<int> newItemIndexList, bool bOrderUpwards, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_MoveChildren::EntityUndoCmd_MoveChildren(ProjectItemData &entityItemRef, QList<EntityTreeItemData *> selectedItemDataList, EntityTreeItemData *pPrevParent, QList<int> prevItemIndexList, EntityTreeItemData *pNewParent, QList<int> newItemIndexList, bool bOrderUpwards, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_SelectedItemDataList(selectedItemDataList),
+	m_pPrevParent(pPrevParent),
 	m_PrevItemIndexList(prevItemIndexList),
+	m_pNewParent(pNewParent),
 	m_NewItemIndexList(newItemIndexList),
 	m_bOrderUpwards(bOrderUpwards)
 {
@@ -278,52 +280,26 @@ EntityUndoCmd_OrderChildren::EntityUndoCmd_OrderChildren(ProjectItemData &entity
 		setText(m_SelectedItemDataList.size() == 1 ? "Order Child Downwards" : "Order Children Downwards");
 }
 
-/*virtual*/ EntityUndoCmd_OrderChildren::~EntityUndoCmd_OrderChildren()
+/*virtual*/ EntityUndoCmd_MoveChildren::~EntityUndoCmd_MoveChildren()
 {
 }
 
-/*virtual*/ void EntityUndoCmd_OrderChildren::redo() /*override*/
+/*virtual*/ void EntityUndoCmd_MoveChildren::redo() /*override*/
 {
 	EntityTreeModel &entTreeModelRef = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel();
 
 	for(int i = 0; i < m_SelectedItemDataList.size(); ++i)
-	{
-		TreeModelItemData *pDestinationParent = nullptr;
-		if(m_SelectedItemDataList[i]->GetEntType() == ENTTYPE_ArrayItem)
-			pDestinationParent = entTreeModelRef.GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
-		else
-		{
-			if(m_SelectedItemDataList[i]->IsFixtureItem())
-				pDestinationParent = entTreeModelRef.GetFixtureFolderTreeItemData();
-			else
-				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
-		}
-
-		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], pDestinationParent, m_NewItemIndexList[i]);
-	}
+		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], m_pNewParent, m_NewItemIndexList[i]);
 	
 	static_cast<EntityStateData *>(static_cast<EntityWidget *>(m_EntityItemRef.GetWidget())->GetCurStateData())->GetDopeSheetScene().RefreshAllGfxItems();
 }
 
-/*virtual*/ void EntityUndoCmd_OrderChildren::undo() /*override*/
+/*virtual*/ void EntityUndoCmd_MoveChildren::undo() /*override*/
 {
 	EntityTreeModel &entTreeModelRef = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel();
 
 	for(int i = m_SelectedItemDataList.size() - 1; i >= 0; --i)
-	{
-		TreeModelItemData *pDestinationParent = nullptr;
-		if(m_SelectedItemDataList[i]->GetEntType() == ENTTYPE_ArrayItem)
-			pDestinationParent = entTreeModelRef.GetArrayFolderTreeItemData(m_SelectedItemDataList[i]);
-		else
-		{
-			if(m_SelectedItemDataList[i]->IsFixtureItem())
-				pDestinationParent = entTreeModelRef.GetFixtureFolderTreeItemData();
-			else
-				pDestinationParent = entTreeModelRef.GetRootTreeItemData();
-		}
-
-		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], pDestinationParent, m_PrevItemIndexList[i]);
-	}
+		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], m_pPrevParent, m_PrevItemIndexList[i]);
 
 	static_cast<EntityStateData *>(static_cast<EntityWidget *>(m_EntityItemRef.GetWidget())->GetCurStateData())->GetDopeSheetScene().RefreshAllGfxItems();
 }

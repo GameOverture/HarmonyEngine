@@ -150,9 +150,9 @@ EntityBaseClassType EntityModel::GetBaseClassType() const
 	return m_eBaseClass;
 }
 
-bool EntityModel::HasFusedItem() const
+EntityTreeItemData *EntityModel::GetFusedItem() const
 {
-	return m_TreeModel.GetAllFusedItemData()[m_eBaseClass] != nullptr;
+	return m_TreeModel.GetAllFusedItemData()[m_eBaseClass];
 }
 
 EntityTreeModel &EntityModel::GetTreeModel()
