@@ -178,7 +178,7 @@ void AtlasFrame::UpdateInfoFromPacker(int iTextureIndex, quint16 uiX, quint16 ui
 		//	QList<TreeModelItemData *> dependantList = GetDependants();
 		//	for(auto iter = dependantList.begin(); iter != dependantList.end(); ++iter) // There should only be '1' dependency
 		//	{
-		//		if((*iter)->IsProjectItem() == false)
+		//		if((*iter)->IsProjectItemData() == false)
 		//			continue;
 
 		//		ProjectItemData *pProjItem = static_cast<ProjectItemData *>(*iter);
@@ -238,7 +238,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	if(GetSubAtlasType() != ITEM_None)
 	{
 		QString sDependant;
-		if(GetDependants().empty() == false && GetDependants()[0]->IsProjectItem())
+		if(GetDependants().empty() == false && GetDependants()[0]->IsProjectItemData())
 			sDependant = static_cast<ProjectItemData *>(GetDependants()[0])->GetName(true);
 		QString sMessage;
 		if(sDependant.isEmpty() == false)

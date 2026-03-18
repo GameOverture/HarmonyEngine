@@ -399,7 +399,7 @@ QString ExplorerModel::AssemblePrefix(ExplorerItemData *pItem) const
 	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
 		if(pItem->GetType() == ITEM_Project && Harmony::GetProject() == pItem)
 			return QVariant(pItem->GetIcon(SUBICON_Activated));
-		if(pItem->IsProjectItem())
+		if(pItem->IsProjectItemData())
 		{
 			ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pItem);
 			if(pProjItem->IsExistencePendingSave())
@@ -459,7 +459,7 @@ QString ExplorerModel::AssemblePrefix(ExplorerItemData *pItem) const
 
 	for(auto *pItem : itemList)
 	{
-		if(pItem->IsProjectItem() && static_cast<ProjectItemData *>(pItem)->IsSaveClean() == false)
+		if(pItem->IsProjectItemData() && static_cast<ProjectItemData *>(pItem)->IsSaveClean() == false)
 		{
 			HyGuiLog("Cannot drag project items that are unsaved: " % pItem->GetName(true), LOGTYPE_Warning);
 			return nullptr;

@@ -17,12 +17,14 @@
 
 class EntityDraw : public IDrawEx
 {
-	HyEntity2d 								m_RootEntity;
+	HyEntity2d * 							m_pRootEntity;
 
 	bool									m_bPlayingPreview;
 
 	EditModeState							m_eEditModeState;
 	HyPrimitive2d							m_EditModeWindowOutline;
+
+	QMap<HyLayoutHandle, QUuid>				m_GuiLayoutMap;
 
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
@@ -46,6 +48,8 @@ public:
 	void SetExtrapolatedProperties();
 
 protected:
+	void FlushRootEntity();
+
 	virtual void OnApplyJsonMeta(QJsonObject &itemMetaObj) override;
 	virtual void OnResizeRenderer() override;
 	virtual void OnRequestSelection(QList<IDrawExItem *> selectionList) override;

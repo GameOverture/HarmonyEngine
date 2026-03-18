@@ -1168,7 +1168,7 @@ void MainWindow::NewItem(ItemType eItem)
 															 HyGlobal::GenerateNewItemFileData(pDlg->GetImportFile()),
 															 true);
 
-		if(pNewItem->IsProjectItem())
+		if(pNewItem->IsProjectItemData())
 		{
 			static_cast<ProjectItemData *>(pNewItem)->LoadModel();
 			MainWindow::OpenItem(static_cast<ProjectItemData *>(pNewItem));

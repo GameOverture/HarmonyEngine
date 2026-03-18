@@ -73,7 +73,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 	}
 	else if(HyGlobal::IsItemType_Project(m_pEntityTreeItemData->GetType()))
 	{
-		if(pReferencedItemData == nullptr || pReferencedItemData->IsProjectItem() == false)
+		if(pReferencedItemData == nullptr || pReferencedItemData->IsProjectItemData() == false)
 		{
 			HyGuiLog("EntityDrawItem ctor - could not find referenced item data UUID: " % referencedItemUuid.toString(), LOGTYPE_Error);
 			return;
@@ -133,10 +133,6 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 	{
 		switch(m_pEntityTreeItemData->GetType())
 		{
-		case ITEM_UiLayout:
-		case ITEM_UiSpacer:
-			m_pChild = new HyPrimitive(pParent);
-			break;
 		case ITEM_UiLabel:
 			m_pChild = new HyLabel(pParent);
 			break;
@@ -164,7 +160,6 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 		case ITEM_UiComboBox:
 			m_pChild = new HyComboBox(pParent);
 			break;
-
 		default:
 			HyGuiLog("EntityDrawItem ctor - unhandled widget item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 			break;
@@ -910,6 +905,7 @@ void ExtrapolateProperties(Project &projectRef,
 
 
 					// TODO: THIS IS WRONG! You cannot use pThisHyNode's current values. Need to store last good known value for each tween property, and it needs to work between states!
+					// Update: This may be resolved as all nodes are "flushed" before setting properties - needs testing
 					QVariant startValue;
 
 					
@@ -1165,7 +1161,7 @@ void ExtrapolateProperties(Project &projectRef,
 
 					previewComponentRef.m_CurrentWidgetPanelNodeUuid = QUuid(setupObj["nodeUuid"].toString());
 					TreeModelItemData *pItemData = projectRef.FindItemData(previewComponentRef.m_CurrentWidgetPanelNodeUuid);
-					if(pItemData && pItemData->IsProjectItem())
+					if(pItemData && pItemData->IsProjectItemData())
 					{
 						ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pItemData);
 
@@ -1200,7 +1196,7 @@ void ExtrapolateProperties(Project &projectRef,
 
 					previewComponentRef.m_CurrentWidgetBarPanelNodeUuid = QUuid(barSetupObj["nodeUuid"].toString());
 					TreeModelItemData *pBarItemData = projectRef.FindItemData(previewComponentRef.m_CurrentWidgetBarPanelNodeUuid);
-					if(pBarItemData && pBarItemData->IsProjectItem())
+					if(pBarItemData && pBarItemData->IsProjectItemData())
 					{
 						ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pBarItemData);
 
@@ -1240,7 +1236,7 @@ void ExtrapolateProperties(Project &projectRef,
 				{
 					previewComponentRef.m_CurrentWidgetTextNodeUuid = QUuid(labelObj["Text Item"].toString());
 					TreeModelItemData *pTextItemData = projectRef.FindItemData(previewComponentRef.m_CurrentWidgetTextNodeUuid);
-					if(pTextItemData && pTextItemData->IsProjectItem())
+					if(pTextItemData && pTextItemData->IsProjectItemData())
 					{
 						ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pTextItemData);
 						static_cast<HyLabel *>(pThisHyNode)->Setup(HyUiTextInit(HyNodePath(pReferencedProjItemData->GetName(true).toStdString().c_str())));

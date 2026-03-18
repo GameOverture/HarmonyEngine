@@ -232,7 +232,7 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		QList<ProjectItemData *> validItemList;
 		for(auto iter = projItemMapRef.keyValueBegin(); iter != projItemMapRef.keyValueEnd(); ++iter)
 		{
-			if(iter->second->GetType() == eItemType && iter->second->IsProjectItem())
+			if(iter->second->GetType() == eItemType && iter->second->IsProjectItemData())
 				validItemList.append(static_cast<ProjectItemData *>(iter->second));
 		}
 		std::sort(validItemList.begin(), validItemList.end(),
@@ -334,18 +334,11 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		const QVariant &origValue = pPropertiesTreeModel->GetIndexValue(index);
 		QJsonObject panelObj = origValue.toJsonObject();
 
-		HyUiPanelInit init;
-		init.m_eNodeType = HyGlobal::ConvertItemType(HyGlobal::GetTypeFromString(panelObj["nodeType"].toString()));
-		init.m_uiWidth = panelObj["width"].toInt();
-		init.m_uiHeight = panelObj["height"].toInt();
-		init.m_NodePath.Clear();
-		init.m_uiFrameSize = panelObj["frameSize"].toInt();
-		init.m_PanelColor = panelObj["panelColor"].toVariant().toUInt();
-		init.m_FrameColor = panelObj["frameColor"].toVariant().toUInt();
-		init.m_TertiaryColor = panelObj["tertiaryColor"].toVariant().toUInt();
+		QUuid nodeUuid;
+		HyUiPanelInit init = DlgSetUiPanel::DeserializePanelInit(panelObj, nodeUuid);
 
 		Project &projectRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetProjItem()->GetProject();
-		DlgSetUiPanel *pDlg = new DlgSetUiPanel(projectRef, "Setup Widget Panel", init, QUuid(panelObj["nodeUuid"].toString()), pParent);
+		DlgSetUiPanel *pDlg = new DlgSetUiPanel(projectRef, "Setup Widget Panel", init, nodeUuid, pParent);
 		if(pDlg->exec() == QDialog::Accepted)
 		{
 			QVariant newValue = DlgSetUiPanel::SerializePanelInit(pDlg->GetPanelInit(), pDlg->GetNodeUuid());

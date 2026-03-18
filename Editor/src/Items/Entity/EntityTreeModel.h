@@ -55,10 +55,13 @@ public:
 				return;
 
 			m_Uuid = QUuid(serializedObj["uuid"].toString());
-			QJsonArray childArray = serializedObj["children"].toArray();
-			m_ChildList.reserve(childArray.size());
-			for(int i = 0; i < childArray.size(); ++i)
-				m_ChildList.emplace_back(childArray[i].toObject());
+			if(serializedObj.contains("children"))
+			{
+				QJsonArray childArray = serializedObj["children"].toArray();
+				m_ChildList.reserve(childArray.size());
+				for(int i = 0; i < childArray.size(); ++i)
+					m_ChildList.emplace_back(childArray[i].toObject());
+			}
 		}
 		bool operator==(const QUuid &other) const { return m_Uuid == other; }
 		bool operator!=(const QUuid &other) const { return m_Uuid != other; }
@@ -67,11 +70,14 @@ public:
 		QJsonObject Serialize() const
 		{
 			QJsonObject obj;
-			obj["uuid"] = m_Uuid.toString();
-			QJsonArray childArray;
-			for(const GuiItem &child : m_ChildList)
-				childArray.append(child.Serialize());
-			obj["children"] = childArray;
+			obj["uuid"] = m_Uuid.toString(QUuid::WithoutBraces);
+			if(m_ChildList.isEmpty() == false)
+			{
+				QJsonArray childArray;
+				for(const GuiItem &child : m_ChildList)
+					childArray.append(child.Serialize());
+				obj["children"] = childArray;
+			}
 			return obj;
 		}
 	};

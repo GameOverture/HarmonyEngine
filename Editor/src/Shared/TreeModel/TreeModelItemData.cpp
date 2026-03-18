@@ -18,7 +18,8 @@
 
 TreeModelItemData::TreeModelItemData() :
 	m_eTYPE(ITEM_Unknown),
-	m_UUID() // Invalid zeroed out UUID
+	m_UUID(), // Invalid zeroed out UUID
+	m_bIsProjectItemData(false)
 {
 	// I think a default ctor is required for QObject to work?
 	HyGuiLog("Invalid TreeModelItemData ctor used", LOGTYPE_Error);
@@ -27,7 +28,8 @@ TreeModelItemData::TreeModelItemData() :
 TreeModelItemData::TreeModelItemData(ItemType eType, const QUuid &uuid, const QString sText) :
 	m_eTYPE(eType),
 	m_UUID(uuid),
-	m_sName(sText)
+	m_sName(sText),
+	m_bIsProjectItemData(false)
 { }
 
 /*virtual*/ TreeModelItemData::~TreeModelItemData()
@@ -59,9 +61,9 @@ QIcon TreeModelItemData::GetIcon(SubIcon eSubIcon) const
 	return HyGlobal::ItemIcon(m_eTYPE, eSubIcon);
 }
 
-bool TreeModelItemData::IsProjectItem() const
+bool TreeModelItemData::IsProjectItemData() const
 {
-	return HyGlobal::IsItemType_Project(m_eTYPE);
+	return m_bIsProjectItemData; // Don't simply check HyGlobal::IsItemType_Project(m_eTYPE) because this is checking if it's safe to cast this -> ProjectItemData *
 }
 
 bool TreeModelItemData::IsAssetItem() const

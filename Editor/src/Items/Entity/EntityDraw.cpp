@@ -13,13 +13,14 @@
 #include "MainWindow.h"
 #include "EntityUndoCmds.h"
 #include "GfxShapeModel.h"
+#include "DlgSetUiPanel.h"
 
 #include <QKeyEvent>
 #include <QApplication>
 
 EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef) :
 	IDrawEx(pProjItem, initFileDataRef),
-	m_RootEntity(this),
+	m_pRootEntity(nullptr),
 	m_bPlayingPreview(false),
 	m_eEditModeState(EDITMODE_Off),
 	m_EditModeWindowOutline(this)
@@ -27,6 +28,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_EditModeWindowOutline.UseWindowCoordinates();
 	m_EditModeWindowOutline.SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
 	m_EditModeWindowOutline.SetVisible(false);
+
+	FlushRootEntity();
 }
 
 /*virtual*/ EntityDraw::~EntityDraw()
@@ -368,10 +371,10 @@ void EntityDraw::SetExtrapolatedProperties()
 	QMap<int, QJsonObject> combinedFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData];
 	combinedFrameMap[-1] = ctorKeyFrameMapRef[pRootTreeItemData];
 
-	// TODO: Flush m_RootEntity's properties before extrapolating
+	FlushRootEntity();
 
 	ExtrapolateProperties(m_pProjItem->GetProject(),
-							&m_RootEntity,
+							m_pRootEntity,
 							nullptr,
 							false,
 							ITEM_None, // 'ITEM_None' indicates this is the root
@@ -410,7 +413,8 @@ void EntityDraw::SetExtrapolatedProperties()
 			combinedFrameMap[-1] = ctorKeyFrameMapRef[pEntityTreeItemData];
 
 			// FlushHyNode (and clearing edit model) makes properties that aren't keyed on the timeline until later show the proper default values
-			pEntDrawItem->FlushHyNode(&m_RootEntity);
+			if(false == (static_cast<EntityModel *>(m_pProjItem->GetModel())->GetBaseClassType() == ENTBASECLASS_HyGui && pEntDrawItem->GetEntityTreeItemData()->IsWidgetItem())) // Widgets will have already been 'flushed' within FlushRootEntity()
+				pEntDrawItem->FlushHyNode(m_pRootEntity);
 			if(pEntDrawItem->GetEntityTreeItemData()->GetEditModel())
 				pEntDrawItem->GetEntityTreeItemData()->GetEditModel()->Deserialize(QJsonObject());
 
@@ -428,6 +432,128 @@ void EntityDraw::SetExtrapolatedProperties()
 	}
 
 	RefreshTransforms();
+}
+
+void EntityDraw::FlushRootEntity()
+{
+	EntityModel *pEntModel = static_cast<EntityModel *>(m_pProjItem->GetModel());
+
+	delete m_pRootEntity;
+	switch(pEntModel->GetBaseClassType())
+	{
+	case ENTBASECLASS_HyEntity2d:
+		m_pRootEntity = new HyEntity2d(this);
+		break;
+	
+	case ENTBASECLASS_HyActor2d:
+		m_pRootEntity = new HyActor2d(this);
+		break;
+	
+	case ENTBASECLASS_HyGui: {
+		// Initialize the GUI layout with the entity model along with the ctor keyframes that indicate non-default properties
+		QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMap = pEntModel->GetCtorKeyFramesMap();
+
+		HyOrientation eRootGuiOrientation = HYORIENT_Horizontal;
+		if(ctorKeyFrameMap.contains(pEntModel->GetFusedItem()))
+		{
+			QJsonObject rootLayoutObj = ctorKeyFrameMap[pEntModel->GetFusedItem()];
+			if(rootLayoutObj.contains("Layout") && rootLayoutObj["Layout"].toObject().contains("Orientation"))
+				eRootGuiOrientation = HyGlobal::GetOrientationFromString(rootLayoutObj["Layout"].toObject()["Orientation"].toString());
+		}
+
+		m_pRootEntity = nullptr; // Deleted above
+		if(ctorKeyFrameMap.contains(pEntModel->GetTreeModel().GetRootTreeItemData()))
+		{
+			QJsonObject rootEntityObj = ctorKeyFrameMap[pEntModel->GetTreeModel().GetRootTreeItemData()];
+			if(rootEntityObj.contains(ENTITYBASECLASSCATEGORY_STRINGS[ENTBASECLASS_HyGui]))
+			{
+				QJsonObject guiCategoryObj = rootEntityObj[ENTITYBASECLASSCATEGORY_STRINGS[ENTBASECLASS_HyGui]].toObject();
+				if(guiCategoryObj.contains("Panel Setup"))
+				{
+					QJsonObject panelObj = guiCategoryObj["Panel Setup"].toObject();
+					QUuid nodeUuid;
+					HyUiPanelInit panelInit = DlgSetUiPanel::DeserializePanelInit(panelObj, nodeUuid);
+
+					if(nodeUuid.isNull())
+						m_pRootEntity = new HyGui(eRootGuiOrientation, panelInit, this);
+					else
+					{
+						TreeModelItemData *pNodeItemData = pEntModel->GetItem().GetProject().FindItemData(nodeUuid);
+						if(pNodeItemData && pNodeItemData->IsProjectItemData())
+						{
+							ProjectItemData *pReferencedProjItemData = static_cast<ProjectItemData *>(pNodeItemData);
+							FileDataPair fileDataPair;
+							pReferencedProjItemData->GetSavedFileData(fileDataPair);
+							QByteArray src = JsonValueToSrc(fileDataPair.m_Data);
+							HyJsonDoc itemDataDoc;
+							if(itemDataDoc.ParseInsitu(src.data()).HasParseError())
+								HyGuiLog("ExtrapolateProperties() - failed to parse HyPanel node file data", LOGTYPE_Error);
+
+							m_pRootEntity = new HyGui(eRootGuiOrientation, HyUiPanelInit(), this);
+							HyType eNodeType = HyGlobal::ConvertItemType(pNodeItemData->GetType());
+							static_cast<HyGui *>(m_pRootEntity)->panel.GuiOverridePanelNodeData(panelInit.m_eNodeType, itemDataDoc.GetObject(), true, m_pRootEntity);
+						}
+					}
+				}
+			}
+		}
+		
+		if(m_pRootEntity == nullptr)
+			m_pRootEntity = new HyGui(eRootGuiOrientation, HyUiPanelInit(), this);
+
+		m_GuiLayoutMap.clear();
+		if(m_ItemList.empty()) // Only bother to populate GUI layout if m_ItemList has been populated
+			break;
+		
+		std::function<void(HyLayoutHandle, QJsonObject)> fpRecursivelyPopulateLayout = 
+			[&](HyLayoutHandle hParentHandle, QJsonObject guiItemObj)
+			{
+				HyGui *pRootGui = static_cast<HyGui *>(m_pRootEntity);
+				QUuid childUuid = QUuid(guiItemObj["uuid"].toString());
+
+				for(IDrawExItem *pDrawItem : m_ItemList)
+				{
+					EntityTreeItemData *pEntItemData = static_cast<EntityDrawItem *>(pDrawItem)->GetEntityTreeItemData();
+					if(pEntItemData == nullptr)
+						HyGuiLog("EntityDraw::FlushRootEntity - Found null EntityTreeItemData in m_ItemList while populating GUI layout!", LOGTYPE_Error);
+					else if(pEntItemData->GetThisUuid() == childUuid)
+					{
+						if(pEntItemData->GetType() == ITEM_UiLayout)
+						{
+							HyLayoutHandle hCurHandle = HY_UNUSED_HANDLE;
+							if(childUuid != static_cast<EntityModel *>(m_pProjItem->GetModel())->GetFusedItem()->GetThisUuid()) // The root layout is already "fused" in pRootGui
+								hCurHandle = pRootGui->InsertLayout(HYORIENT_Horizontal, hParentHandle);
+							m_GuiLayoutMap.insert(hCurHandle, childUuid);
+
+							if(guiItemObj.contains("children"))
+							{
+								QJsonArray childrenArray = guiItemObj["children"].toArray();
+								for(int32 i = 0; i < childrenArray.size(); ++i)
+									fpRecursivelyPopulateLayout(hCurHandle, childrenArray[i].toObject());
+							}
+						}
+						else if(pEntItemData->GetType() == ITEM_UiSpacer)
+							pRootGui->InsertSpacer(HYSIZEPOLICY_Expanding, 0, hParentHandle);
+						else if(pEntItemData->IsWidgetItem())
+						{
+							static_cast<EntityDrawItem *>(pDrawItem)->FlushHyNode(nullptr);
+							IHyWidget *pWidget = static_cast<IHyWidget *>(static_cast<EntityDrawItem *>(pDrawItem)->GetHyNode());
+							pRootGui->InsertWidget(*pWidget, hParentHandle);
+						}
+						else
+							HyGuiLog("EntityDraw::FlushRootEntity - Found unsupported item type in m_ItemList while populating GUI layout!", LOGTYPE_Error);
+
+						break;
+					}
+				}
+			};
+		fpRecursivelyPopulateLayout(HY_UNUSED_HANDLE, pEntModel->GetTreeModel().SerializeGuiLayout());
+		break; }
+
+	default:
+		HyGuiLog("EntityDraw::FlushRootEntity - Unsupported base class type!", LOGTYPE_Error);
+		break;
+	}
 }
 
 /*virtual*/ void EntityDraw::OnApplyJsonMeta(QJsonObject &itemMetaObj) /*override*/
@@ -500,7 +626,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		if(pDrawItem == nullptr) // Not found within 'staleItemList', allocate new
 		{
 			EntityTreeItemData *pEntityTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(uuid);
-			pDrawItem = new EntityDrawItem(pEntityTreeItemData, this, &m_RootEntity);
+			pDrawItem = new EntityDrawItem(pEntityTreeItemData, this, m_pRootEntity);
 		}
 		else // Found within 'staleItemList'
 		{
@@ -512,7 +638,7 @@ void EntityDraw::SetExtrapolatedProperties()
 				
 				// Allocate first, then delete so Harmony doesn't unload the item data
 				EntityDrawItem *pOldDrawItem = pDrawItem;
-				pDrawItem = new EntityDrawItem(pEntityTreeItemData, this, &m_RootEntity);
+				pDrawItem = new EntityDrawItem(pEntityTreeItemData, this, m_pRootEntity);
 
 				if(pOldDrawItem == m_pCurHoverItem)
 					ClearHover();
@@ -523,7 +649,7 @@ void EntityDraw::SetExtrapolatedProperties()
 		}
 
 		m_ItemList.push_back(pDrawItem);					// Repopulate 'm_ItemList' with the valid existing or new draw items
-		m_RootEntity.ChildAppend(*pDrawItem->GetHyNode());	// Reinsert each valid draw item into the m_RootEntity, to establish the correct `descObjList` display order
+		m_pRootEntity->ChildAppend(*pDrawItem->GetHyNode());	// Reinsert each valid draw item into the m_RootEntity, to establish the correct `descObjList` display order
 
 		// Repopulate `m_SelectedItemList` if draw item is valid to select
 		if(pDrawItem->GetEntityTreeItemData()->IsSelected() && pDrawItem->GetEntityTreeItemData()->IsSelectable())

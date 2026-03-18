@@ -1006,7 +1006,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 		{
 			if(pReferencedItemData)
 			{
-				if(pReferencedItemData->IsProjectItem())
+				if(pReferencedItemData->IsProjectItemData())
 					return static_cast<ProjectItemData *>(pReferencedItemData)->GetName(true);
 				else if(pReferencedItemData->IsAssetItem())
 					return static_cast<IAssetItemData *>(pReferencedItemData)->GetPropertyInfo();
@@ -1021,7 +1021,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 
 		if(pReferencedItemData)
 		{
-			if(pReferencedItemData->IsProjectItem())
+			if(pReferencedItemData->IsProjectItemData())
 			{
 				ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pReferencedItemData);
 				if(pProjItem->IsExistencePendingSave())

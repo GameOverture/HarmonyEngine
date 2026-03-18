@@ -41,6 +41,7 @@ public:
 	QUuid GetNodeUuid();
 	
 	static QVariant SerializePanelInit(const HyUiPanelInit &init, QUuid selectedNodeUuid);
+	static HyUiPanelInit DeserializePanelInit(const QJsonObject &serializedObj, QUuid &selectedNodeUuidOut);
 
 protected:
 	void SyncNodeComboBox();

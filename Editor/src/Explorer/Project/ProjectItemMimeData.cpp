@@ -28,7 +28,7 @@ ProjectItemMimeData::ProjectItemMimeData(QList<ExplorerItemData *> &itemListRef)
 		itemObj.insert("type", HyGlobal::ItemName(itemListRef[i]->GetType(), false));
 
 		// If ProjectItem (aka not a prefix)
-		if(itemListRef[i]->IsProjectItem())
+		if(itemListRef[i]->IsProjectItemData())
 		{
 			itemObj.insert("isPrefix", false);
 

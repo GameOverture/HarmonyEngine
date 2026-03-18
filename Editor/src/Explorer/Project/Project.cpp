@@ -94,7 +94,7 @@ void ProjectTabBar::OnTabBarProjItemDataRemoved(ProjectItemData *pItem)
 				continue;
 
 			TreeModelItemData *pTreeModelItemData = m_pProjectOwner->FindItemData(QUuid(itemObj["UUID"].toString()));
-			if(pTreeModelItemData && pTreeModelItemData->IsProjectItem() == false)
+			if(pTreeModelItemData && pTreeModelItemData->IsProjectItemData() == false)
 				continue;
 
 			MainWindow::OpenItem(static_cast<ProjectItemData *>(pTreeModelItemData));
@@ -326,7 +326,7 @@ void Project::LoadExplorerModel()
 	for(QModelIndex index : indexList)
 	{
 		TreeModelItemData *pItemData = MainWindow::GetExplorerModel().data(index, Qt::UserRole).value<TreeModelItemData *>();
-		if(pItemData->IsProjectItem())
+		if(pItemData->IsProjectItemData())
 			static_cast<ProjectItemData *>(pItemData)->LoadModel();
 	}
 

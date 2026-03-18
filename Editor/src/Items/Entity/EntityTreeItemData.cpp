@@ -321,7 +321,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	const double dRANGE = 16777215.0;
 
 	const bool bIsBody = GetType() != ITEM_Audio;
-	if(IsProjectItem() || IsWidgetItem())
+	if(HyGlobal::IsItemType_Project(m_eTYPE) || IsWidgetItem())
 	{
 		if(GetEntType() == ENTTYPE_Root || GetType() == ITEM_Entity)
 		{

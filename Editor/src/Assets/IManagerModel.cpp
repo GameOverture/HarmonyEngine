@@ -232,7 +232,7 @@ void IManagerModel::RemoveItems(QList<IAssetItemData *> assetsList, QList<TreeMo
 			QString sMessage = "'" % assetsList[i]->GetFilter() % "/" % assetsList[i]->GetName() % "' cannot be deleted because it is in use by the following items: \n\n";
 			for(TreeModelItemData *pItemData : dependantList)
 			{
-				if(pItemData->IsProjectItem())
+				if(pItemData->IsProjectItemData())
 					sMessage.append(HyGlobal::ItemName(pItemData->GetType(), false) % " - " % static_cast<ProjectItemData *>(pItemData)->GetName(true) % "\n");
 				else
 					sMessage.append(HyGlobal::ItemName(pItemData->GetType(), false) % " - " % pItemData->GetText() % "\n");
@@ -311,7 +311,7 @@ bool IManagerModel::GetAffectedItems(QList<IAssetItemData *> assetsList, QList<P
 		QList<TreeModelItemData *> assetDependantList = assetsList[i]->GetDependants();
 		for(TreeModelItemData *pItemData : assetDependantList)
 		{
-			if(pItemData->IsProjectItem() == false)
+			if(pItemData->IsProjectItemData() == false)
 				continue;
 
 			ProjectItemData *pLinkedItem = static_cast<ProjectItemData *>(pItemData);

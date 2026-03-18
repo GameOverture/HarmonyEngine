@@ -779,7 +779,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 		case ITEM_Spine:
 		case ITEM_Sprite:
 		case ITEM_TileMap:
-			if(pReferencedItemData == nullptr || pReferencedItemData->IsProjectItem() == false)
+			if(pReferencedItemData == nullptr || pReferencedItemData->IsProjectItemData() == false)
 				HyGuiLog("EntityModel::GenerateSrc_MemberInitializerList() - Could not find referenced project item for: " % pItem->GetCodeName(), LOGTYPE_Error);
 			else
 			{
@@ -1467,7 +1467,7 @@ QString EntityModel::DeserializeTextInitAsRuntimeCode(QUuid textItemUuid, HyMarg
 	QString sSrc = "HyUiTextInit(";
 
 	TreeModelItemData *pItemData = m_ItemRef.GetProject().FindItemData(textItemUuid);
-	if(pItemData && pItemData->IsProjectItem() && pItemData->GetType() == ITEM_Text)
+	if(pItemData && pItemData->IsProjectItemData() && pItemData->GetType() == ITEM_Text)
 	{
 		sSrc += "HyNodePath(" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + "), ";
 		sSrc += "HyMargins<float>(" + QString::number(margins.left) + "f, " + QString::number(margins.bottom) + "f, " + QString::number(margins.right) + "f, " + QString::number(margins.top) + "f)";
@@ -1493,7 +1493,7 @@ QString EntityModel::DeserializePanelInitAsRuntimeCode(QJsonObject panelInitObj)
 	{
 		QUuid panelUuid(panelInitObj["nodeUuid"].toString());
 		TreeModelItemData *pItemData = m_ItemRef.GetProject().FindItemData(panelUuid);
-		if(pItemData && pItemData->IsProjectItem())
+		if(pItemData && pItemData->IsProjectItemData())
 		{
 			switch(eType)
 			{

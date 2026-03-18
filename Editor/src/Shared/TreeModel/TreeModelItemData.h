@@ -23,6 +23,7 @@ protected:
 	const ItemType									m_eTYPE;
 	const QUuid										m_UUID;
 	QString											m_sName;
+	bool											m_bIsProjectItemData;
 
 	// Dependant References : int = count
 	QMap<TreeModelItemData *, int>					m_DependantMap;		// What ItemDatas rely on 'this'
@@ -39,7 +40,7 @@ public:
 	virtual void SetText(QString sText);
 	QIcon GetIcon(SubIcon eSubIcon) const;
 
-	bool IsProjectItem() const;
+	bool IsProjectItemData() const;
 	bool IsAssetItem() const;
 	bool IsFixtureItem() const;
 	bool IsWidgetItem() const;

@@ -76,7 +76,7 @@ void ExplorerItemData::Rename(QString sNewPrefix, QString sNewName)
 
 	if(m_eTYPE == ITEM_Prefix)
 		m_pProject->DeletePrefixAndContents(GetName(true), true);
-	else if(IsProjectItem())
+	else if(IsProjectItemData())
 		m_pProject->DeleteItemData(m_eTYPE, GetName(true), true);
 }
 

@@ -69,6 +69,23 @@ QUuid DlgSetUiPanel::GetNodeUuid()
 	return QVariant(serializedObj);
 }
 
+/*static*/ HyUiPanelInit DlgSetUiPanel::DeserializePanelInit(const QJsonObject &serializedObj, QUuid &selectedNodeUuidOut)
+{
+	HyUiPanelInit init;
+	init.m_eNodeType = HyGlobal::ConvertItemType(HyGlobal::GetTypeFromString(serializedObj["nodeType"].toString()));
+	init.m_uiWidth = serializedObj["width"].toInt();
+	init.m_uiHeight = serializedObj["height"].toInt();
+	init.m_NodePath.Clear();
+	init.m_uiFrameSize = serializedObj["frameSize"].toInt();
+	init.m_PanelColor = serializedObj["panelColor"].toVariant().toUInt();
+	init.m_FrameColor = serializedObj["frameColor"].toVariant().toUInt();
+	init.m_TertiaryColor = serializedObj["tertiaryColor"].toVariant().toUInt();
+
+	selectedNodeUuidOut = QUuid(serializedObj["nodeUuid"].toString());
+
+	return init;
+}
+
 void DlgSetUiPanel::SyncNodeComboBox()
 {
 	const QMap<QUuid, TreeModelItemData *> &projItemMapRef = m_ProjectRef.GetItemMap();
@@ -76,7 +93,7 @@ void DlgSetUiPanel::SyncNodeComboBox()
 	QList<ProjectItemData *> validItemList;
 	for(auto iter = projItemMapRef.keyValueBegin(); iter != projItemMapRef.keyValueEnd(); ++iter)
 	{
-		if(iter->second->IsProjectItem() && (iter->second->GetType() == ITEM_Sprite || iter->second->GetType() == ITEM_Spine))
+		if(iter->second->IsProjectItemData() && (iter->second->GetType() == ITEM_Sprite || iter->second->GetType() == ITEM_Spine))
 			validItemList.append(static_cast<ProjectItemData *>(iter->second));
 	}
 	if(validItemList.empty() == false)

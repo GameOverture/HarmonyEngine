@@ -636,7 +636,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 	// Check for dependencies
 	for(int32 i = 0; i < selectedItems.size(); ++i)
 	{
-		if(selectedItems[i]->IsProjectItem())
+		if(selectedItems[i]->IsProjectItemData())
 		{
 			ProjectItemData *pProjItem = static_cast<ProjectItemData *>(selectedItems[i]);
 
@@ -646,7 +646,7 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 				QString sMessage = "'" % selectedItems[i]->GetName(true) % "' cannot be deleted because it is in use by the following items: \n\n";
 				for(TreeModelItemData *pDependant : dependantList)
 				{
-					if(pDependant->IsProjectItem())
+					if(pDependant->IsProjectItemData())
 						sMessage.append(HyGlobal::ItemName(pDependant->GetType(), false) % " - " % static_cast<ProjectItemData *>(pDependant)->GetName(true) % "\n");
 					else
 						sMessage.append(HyGlobal::ItemName(pDependant->GetType(), false) % " - " % pDependant->GetText() % "\n");
@@ -713,7 +713,7 @@ void ExplorerWidget::on_actionCopyItem_triggered()
 	bool bNothing = true;
 	for(int i = 0; i < selectedItems.size(); ++i)
 	{
-		if(selectedItems[i]->IsProjectItem())
+		if(selectedItems[i]->IsProjectItemData())
 		{
 			HyGuiLog(HyGlobal::ItemName(selectedItems[i]->GetType(), false) % " item (" % selectedItems[i]->GetName(true) % ")", LOGTYPE_Normal);
 			bNothing = false;
@@ -754,7 +754,7 @@ void ExplorerWidget::on_actionOpen_triggered()
 
 	for(int i = 0; i < selectedItems.size(); ++i)
 	{
-		if(selectedItems[i]->IsProjectItem())
+		if(selectedItems[i]->IsProjectItemData())
 		{
 			if(Harmony::GetProject() == &selectedItems[i]->GetProject())
 				MainWindow::OpenItem(static_cast<ProjectItemData *>(selectedItems[i]));
