@@ -22,7 +22,9 @@ HySlider::HySlider(HyEntity2d *pParent /*= nullptr*/) :
 	m_iMax(100),
 	m_iStep(5),
 	m_iValue(0),
-	m_fpOnValueChanged(nullptr)
+	m_fpOnValueChanged(nullptr),
+	bar(this),
+	handle(this)
 {
 	RegisterAssembleEntity();
 }
@@ -37,7 +39,9 @@ HySlider::HySlider(HyOrientation eOrien, const HyUiPanelInit &barInitRef, const 
 	m_iMax(100),
 	m_iStep(5),
 	m_iValue(0),
-	m_fpOnValueChanged(nullptr)
+	m_fpOnValueChanged(nullptr),
+	bar(this),
+	handle(this)
 {
 	RegisterAssembleEntity();
 	Setup(eOrien, barInitRef, handleInitRef);
@@ -65,8 +69,8 @@ void HySlider::Setup(HyOrientation eOrien, const HyUiPanelInit &barInitRef, cons
 		m_fHandleThickness = handleInitRef.m_uiHeight;
 	}
 
-	bar.Setup(barInitRef, this);
-	handle.Setup(handleInitRef, this);
+	bar.Setup(barInitRef);
+	handle.Setup(handleInitRef);
 
 	SetEnabled(IsEnabled());
 	

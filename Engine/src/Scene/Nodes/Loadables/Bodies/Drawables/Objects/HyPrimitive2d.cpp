@@ -582,6 +582,7 @@ void HyPrimitive2d::AssembleLineChain(int32 iLayerIndex, const glm::vec2 *pVerte
 	Layer &layerRef = m_LayerList[iLayerIndex];
 	layerRef.m_uiNumVerts = (bLoop ? uiNumVertices : (uiNumVertices-1)) * 6;
 	layerRef.m_pVertBuffer = HY_NEW glm::vec2[layerRef.m_uiNumVerts];
+	layerRef.m_eFixtureType = HYFIXTURE_LineChain;
 
 	uint32 uiBufferIndex = 0;
 
@@ -679,6 +680,7 @@ void HyPrimitive2d::AssembleCircle(int32 iLayerIndex, glm::vec2 ptCenter, float 
 	{
 		layerRef.m_uiNumVerts = static_cast<uint32>(k_segments) * 3;
 		layerRef.m_pVertBuffer = HY_NEW glm::vec2[layerRef.m_uiNumVerts];
+		layerRef.m_eFixtureType = HYFIXTURE_Circle;
 
 		//m_RenderState.SetShaderId(HYSHADERPROG_Primitive);
 		//m_RenderState.SetNumVerticesPerInstance(uiNumVerts);
@@ -750,6 +752,7 @@ void HyPrimitive2d::AssemblePolygon(int32 iLayerIndex, const glm::vec2 *pVertexL
 
 		layerRef.m_uiNumVerts = static_cast<uint32>(triangleList.size()) * 3;
 		layerRef.m_pVertBuffer = HY_NEW glm::vec2[layerRef.m_uiNumVerts];
+		layerRef.m_eFixtureType = HYFIXTURE_Polygon;
 
 		uint32 uiBufferIndex = 0;
 		for(int32 i = 0; i < triangleList.size(); ++i)
@@ -835,6 +838,8 @@ void HyPrimitive2d::AssembleCapsule(int32 iLayerIndex, const glm::vec2 &ptCenter
 		// Output
 		layerRef.m_uiNumVerts = static_cast<uint32_t>(verts.size());
 		layerRef.m_pVertBuffer = HY_NEW glm::vec2[layerRef.m_uiNumVerts];
+		layerRef.m_eFixtureType = HYFIXTURE_Capsule;
+
 		std::copy(verts.begin(), verts.end(), layerRef.m_pVertBuffer);
 	}
 	else // Capsule Outline

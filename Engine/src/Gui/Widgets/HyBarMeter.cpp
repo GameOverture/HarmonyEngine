@@ -31,7 +31,7 @@ HyBarMeter::HyBarMeter(const HyUiPanelInit &panelInit, const HyUiPanelInit &barI
 	m_iMaximum(0),
 	m_iValue(0),
 	m_BarMask(this),
-	m_Bar(),
+	m_Bar(this),
 	m_fBarProgressAmt(0.0f),
 	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
@@ -45,7 +45,7 @@ HyBarMeter::HyBarMeter(const HyUiPanelInit &panelInit, const HyUiPanelInit &barI
 	m_iMaximum(0),
 	m_iValue(0),
 	m_BarMask(this),
-	m_Bar(),
+	m_Bar(this),
 	m_fBarProgressAmt(0.0f),
 	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
 {
@@ -97,19 +97,19 @@ HyBarMeter::HyBarMeter(const HyUiPanelInit &panelInit, const HyUiPanelInit &barI
 
 void HyBarMeter::Setup(const HyUiPanelInit &panelInit, const HyUiPanelInit &barInit)
 {
-	m_Bar.Setup(barInit, this);
+	m_Bar.Setup(barInit);
 	HyLabel::Setup(panelInit);
 }
 
 void HyBarMeter::Setup(const HyUiPanelInit &panelInit, const HyUiPanelInit &barInit, const HyUiTextInit &textInit)
 {
-	m_Bar.Setup(barInit, this);
+	m_Bar.Setup(barInit);
 	HyLabel::Setup(panelInit, textInit);
 }
 
 void HyBarMeter::SetupBar(const HyUiPanelInit &barInit)
 {
-	m_Bar.Setup(barInit, this);
+	m_Bar.Setup(barInit);
 	
 	SetEnabled(IsEnabled());
 	SetAssembleNeeded();

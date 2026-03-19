@@ -20,6 +20,7 @@
 #include "MainWindow.h"
 #include "AuxDopeSheet.h"
 #include "PropertiesTreeMultiModel.h"
+#include "DlgSetUiPanel.h"
 
 #include <QClipboard>
 #include <QShortcut>
@@ -840,93 +841,156 @@ void EntityWidget::on_actionAddChain_triggered()
 void EntityWidget::on_actionAddLayoutHorz_triggered()
 {
 	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiLayout, uuidLayoutParent);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiLayout, uuidLayoutParent, QJsonObject());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddLayoutVert_triggered()
 {
-	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	EntityUndoCmd_AddGuiItem *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiLayout, uuidLayoutParent);
-	m_ItemRef.GetUndoStack()->push(pCmd);
+	QJsonObject defaultPropsObj;
+	QJsonObject layoutCategoryObj;
+	layoutCategoryObj.insert("Orientation", HyGlobal::OrientationName(HYORIENT_Vertical));
+	defaultPropsObj.insert("Layout", layoutCategoryObj);
 
-	static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().SetKeyFrameProperty(pCmd->GetGuiTreeItemData(), -1, "Layout", "Orientation", HyGlobal::OrientationName(HYORIENT_Vertical), true);
+	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
+	EntityUndoCmd_AddGuiItem *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiLayout, uuidLayoutParent, defaultPropsObj);
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddSpacer_triggered()
 {
 	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiSpacer, uuidLayoutParent);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiSpacer, uuidLayoutParent, QJsonObject());
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddLabel_triggered()
 {
+	QJsonObject defaultPropsObj;
+	QJsonObject panelCategoryObj;
+	QUuid tmpUuid;
+	panelCategoryObj.insert("Setup", DlgSetUiPanel::SerializePanelInit(HyUiPanelInit(HYWIDGET_Label), tmpUuid).toJsonObject());
+	defaultPropsObj.insert("Panel", panelCategoryObj);
+
 	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiLabel, uuidLayoutParent);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiLabel, uuidLayoutParent, defaultPropsObj);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddRichLabel_triggered()
 {
+	QJsonObject defaultPropsObj;
+	QJsonObject panelCategoryObj;
+	QUuid tmpUuid;
+	panelCategoryObj.insert("Setup", DlgSetUiPanel::SerializePanelInit(HyUiPanelInit(HYWIDGET_RichText), tmpUuid).toJsonObject());
+	defaultPropsObj.insert("Panel", panelCategoryObj);
+
 	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiRichLabel, uuidLayoutParent);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiRichLabel, uuidLayoutParent, defaultPropsObj);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddButton_triggered()
 {
+	QJsonObject defaultPropsObj;
+	QJsonObject panelCategoryObj;
+	QUuid tmpUuid;
+	panelCategoryObj.insert("Setup", DlgSetUiPanel::SerializePanelInit(HyUiPanelInit(HYWIDGET_Button), tmpUuid).toJsonObject());
+	defaultPropsObj.insert("Panel", panelCategoryObj);
+
 	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiButton, uuidLayoutParent);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiButton, uuidLayoutParent, defaultPropsObj);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddRackMeter_triggered()
 {
+	QJsonObject defaultPropsObj;
+	QJsonObject panelCategoryObj;
+	QUuid tmpUuid;
+	panelCategoryObj.insert("Setup", DlgSetUiPanel::SerializePanelInit(HyUiPanelInit(HYWIDGET_RackMeter), tmpUuid).toJsonObject());
+	defaultPropsObj.insert("Panel", panelCategoryObj);
+
 	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiRackMeter, uuidLayoutParent);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiRackMeter, uuidLayoutParent, defaultPropsObj);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddBarMeter_triggered()
 {
+	QJsonObject defaultPropsObj;
+	QJsonObject panelCategoryObj;
+	QUuid tmpUuid;
+	panelCategoryObj.insert("Setup", DlgSetUiPanel::SerializePanelInit(HyUiPanelInit(HYWIDGET_BarMeter), tmpUuid).toJsonObject());
+	defaultPropsObj.insert("Panel", panelCategoryObj);
+
 	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiBarMeter, uuidLayoutParent);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiBarMeter, uuidLayoutParent, defaultPropsObj);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddCheckBox_triggered()
 {
+	QJsonObject defaultPropsObj;
+	QJsonObject panelCategoryObj;
+	QUuid tmpUuid;
+	panelCategoryObj.insert("Setup", DlgSetUiPanel::SerializePanelInit(HyUiPanelInit(HYWIDGET_CheckBox), tmpUuid).toJsonObject());
+	defaultPropsObj.insert("Panel", panelCategoryObj);
+
 	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiCheckBox, uuidLayoutParent);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiCheckBox, uuidLayoutParent, defaultPropsObj);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddRadioButton_triggered()
 {
+	QJsonObject defaultPropsObj;
+	QJsonObject panelCategoryObj;
+	QUuid tmpUuid;
+	panelCategoryObj.insert("Setup", DlgSetUiPanel::SerializePanelInit(HyUiPanelInit(HYWIDGET_RadioButton), tmpUuid).toJsonObject());
+	defaultPropsObj.insert("Panel", panelCategoryObj);
+
 	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiRadioButton, uuidLayoutParent);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiRadioButton, uuidLayoutParent, defaultPropsObj);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddTextField_triggered()
 {
+	QJsonObject defaultPropsObj;
+	QJsonObject panelCategoryObj;
+	QUuid tmpUuid;
+	panelCategoryObj.insert("Setup", DlgSetUiPanel::SerializePanelInit(HyUiPanelInit(HYWIDGET_TextField), tmpUuid).toJsonObject());
+	defaultPropsObj.insert("Panel", panelCategoryObj);
+
 	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiTextField, uuidLayoutParent);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiTextField, uuidLayoutParent, defaultPropsObj);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddComboBox_triggered()
 {
+	QJsonObject defaultPropsObj;
+	QJsonObject panelCategoryObj;
+	QUuid tmpUuid;
+	panelCategoryObj.insert("Setup", DlgSetUiPanel::SerializePanelInit(HyUiPanelInit(HYWIDGET_ComboBox), tmpUuid).toJsonObject());
+	defaultPropsObj.insert("Panel", panelCategoryObj);
+
 	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiComboBox, uuidLayoutParent);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiComboBox, uuidLayoutParent, defaultPropsObj);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddSlider_triggered()
 {
+	QJsonObject defaultPropsObj;
+	QJsonObject panelCategoryObj;
+	QUuid tmpUuid;
+	panelCategoryObj.insert("Setup", DlgSetUiPanel::SerializePanelInit(HyUiPanelInit(HYWIDGET_Slider), tmpUuid).toJsonObject());
+	defaultPropsObj.insert("Panel", panelCategoryObj);
+
 	QUuid uuidLayoutParent = FindLayoutItemFromSelected();
-	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiSlider, uuidLayoutParent);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddGuiItem(m_ItemRef, ITEM_UiSlider, uuidLayoutParent, defaultPropsObj);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 

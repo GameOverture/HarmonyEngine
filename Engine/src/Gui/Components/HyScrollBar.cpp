@@ -129,7 +129,10 @@
 HyScrollBar::HyScrollBar(HyOrientation eOrientation, uint32 uiDiameter, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_eOrientation(eOrientation),
-	//m_PageControl(eOrientation, uiDiameter, uiDiameter, this),
+	m_uiDiameter(0),
+	m_bIsDragging(false),
+	m_BarPanel(this),
+	m_HandlePanel(this),
 	m_PosBtn(this),
 	m_NegBtn(this),
 	m_fLineScrollAmt(20.0f),
@@ -145,6 +148,10 @@ HyScrollBar::HyScrollBar(HyOrientation eOrientation, uint32 uiDiameter, HyEntity
 HyScrollBar::HyScrollBar(HyOrientation eOrientation, const HyUiPanelInit &posBtnInit, const HyUiPanelInit &negBtnInit, const HyUiPanelInit &barInit, const HyUiPanelInit &handleInit, HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_eOrientation(eOrientation),
+	m_uiDiameter(0),
+	m_bIsDragging(false),
+	m_BarPanel(this),
+	m_HandlePanel(this),
 	m_PosBtn(this),
 	m_NegBtn(this),
 	m_fLineScrollAmt(20.0f),
@@ -183,8 +190,8 @@ void HyScrollBar::Setup(HyOrientation eOrientation, const HyUiPanelInit &posBtnI
 	m_bIsDragging = false;
 	HySetVec(m_ptDragPos, 0.0f, 0.0f);
 
-	m_BarPanel.Setup(barInit, this);
-	m_HandlePanel.Setup(handleInit, this);
+	m_BarPanel.Setup(barInit);
+	m_HandlePanel.Setup(handleInit);
 
 	m_PosBtn.Setup(posBtnInit);
 	m_PosBtn.SetButtonClickedCallback([this](HyButton *pPosBtn)

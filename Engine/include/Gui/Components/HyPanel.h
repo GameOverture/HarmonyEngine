@@ -57,11 +57,13 @@ struct HyUiPanelInit
 	// Constructs a 'Primitive' panel. Default HyColor values of 0xDEADBE will be set to a default color determined by the widget
 	// Passing '0' for width/height will try to auto-size based on the widget if applicable (or it will be hidden)
 	HyUiPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor = HyColor(0xDE,0xAD,0xBE), HyColor frameColor = HyColor(0xDE,0xAD,0xBE), HyColor tertiaryColor = HyColor(0xDE,0xAD,0xBE));
+	HyUiPanelInit(HyWidgetType eWidgetType, HyColor panelColor = HyColor(0xDE,0xAD,0xBE), HyColor frameColor = HyColor(0xDE,0xAD,0xBE), HyColor tertiaryColor = HyColor(0xDE,0xAD,0xBE));
 };
 
 // A flexible visual representation of single panel that can be composed with node items or programmatically
 class HyPanel// : public IHyGuiBase
 {
+	HyEntity2d *				m_pParent;
 	HyType						m_eNodeType;
 
 	class PrimMade : public HyPrimitive2d
@@ -93,7 +95,7 @@ class HyPanel// : public IHyGuiBase
 	glm::vec2					m_ptPosition;
 
 public:
-	HyPanel();
+	HyPanel(HyEntity2d *pParent);
 	HyPanel(const HyUiPanelInit &initRef, HyEntity2d *pParent);
 	~HyPanel();
 
@@ -102,7 +104,7 @@ public:
 	bool IsItemForPanel() const;
 	bool IsPrimForPanel() const;
 
-	void Setup(const HyUiPanelInit &initRef, HyEntity2d *pParent);
+	void Setup(const HyUiPanelInit &initRef);
 
 	float GetWidth(float fPercent = 1.0f) const;
 	float GetHeight(float fPercent = 1.0f) const;
@@ -132,9 +134,9 @@ public:
 
 	enum PrimLayer
 	{
-		PRIMLAYER_Frame1 = 0,
-		PRIMLAYER_Frame2,
+		PRIMLAYER_Frame = 0,
 		PRIMLAYER_Body,
+		PRIMLAYER_Highlight,
 
 		PRIMLAYER_EXTRA_START,
 	};

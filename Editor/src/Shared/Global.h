@@ -113,15 +113,15 @@ enum ItemType
 	ITEM_UiSpacer,
 	// UI widgets
 	ITEM_UiLabel,
-	ITEM_UiRichLabel,
-	ITEM_UiButton,
 	ITEM_UiRackMeter,
 	ITEM_UiBarMeter,
+	ITEM_UiButton,
 	ITEM_UiCheckBox,
 	ITEM_UiRadioButton,
-	ITEM_UiTextField,
-	ITEM_UiComboBox,
 	ITEM_UiSlider,
+	ITEM_UiComboBox,
+	ITEM_UiTextField,
+	ITEM_UiRichLabel,
 
 	NUM_ITEMTYPES
 };

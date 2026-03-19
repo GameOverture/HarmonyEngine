@@ -87,6 +87,24 @@ enum HyType
 };
 static_assert((int)HYNUM_TYPES <= 16, "HyType cannot exceed 16 items due to IHyNode only reserving 4 bits to store this value");
 
+enum HyWidgetType
+{
+	HYWIDGET_Unknown = -1,
+
+	HYWIDGET_Label = 0,
+	HYWIDGET_RackMeter,
+	HYWIDGET_BarMeter,
+	HYWIDGET_Button,
+	HYWIDGET_CheckBox,
+	HYWIDGET_RadioButton,
+	HYWIDGET_Slider,
+	HYWIDGET_ComboBox,
+	HYWIDGET_TextField,
+	HYWIDGET_RichText,
+
+	HYNUM_WIDGETS
+};
+
 enum HyBodyType
 {
 	HYBODY_Static = 0,

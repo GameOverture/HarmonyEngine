@@ -68,8 +68,8 @@ HyUiPanelInit::HyUiPanelInit(HyType eNodeType, const HyNodePath &nodePath, uint3
 	HyAssert(m_eNodeType != HYTYPE_Entity && m_eNodeType != HYTYPE_Primitive, "HyPanelInit::HyUiPanelInit(eNodeType, nodePath, uint32 uiWidth, uint32 uiHeight) 'NodeItem' panels cannot be of type 'Entity'");
 }
 
-// Constructs an 'Primitive' panel. Colors of HyColor(0,0,0,0) will be set to a default color determined by the panel's usage
-HyUiPanelInit::HyUiPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor /*= HyColor(0,0,0,0)*/, HyColor frameColor /*= HyColor(0,0,0,0)*/, HyColor tertiaryColor /*= HyColor(0, 0, 0, 0)*/) :
+// Constructs an 'Primitive' panel. Default HyColor values of 0xDEADBE will be set to a default color determined by the widget
+HyUiPanelInit::HyUiPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize, HyColor panelColor /*= HyColor(0xDE,0xAD,0xBE)*/, HyColor frameColor /*= HyColor(0xDE,0xAD,0xBE)*/, HyColor tertiaryColor /*= HyColor(0xDE,0xAD,0xBE)*/) :
 	m_eNodeType(HYTYPE_Primitive),
 	m_uiWidth(uiWidth),
 	m_uiHeight(uiHeight),
@@ -80,18 +80,70 @@ HyUiPanelInit::HyUiPanelInit(uint32 uiWidth, uint32 uiHeight, uint32 uiFrameSize
 	m_TertiaryColor(tertiaryColor)
 { }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-HyPanel::HyPanel() :
+// Constructs an 'Primitive' panel as the specified default widget. Default HyColor values of 0xDEADBE will be set to a default color determined by the widget
+HyUiPanelInit::HyUiPanelInit(HyWidgetType eWidgetType, HyColor panelColor /*= HyColor(0xDE,0xAD,0xBE)*/, HyColor frameColor /*= HyColor(0xDE,0xAD,0xBE)*/, HyColor tertiaryColor /*= HyColor(0xDE,0xAD,0xBE)*/) :
+	m_eNodeType(HYTYPE_Primitive),
+	m_NodePath(),
+	m_PanelColor(panelColor),
+	m_FrameColor(frameColor),
+	m_TertiaryColor(tertiaryColor)
+{
+	switch(eWidgetType)
+	{
+	case HYWIDGET_Label:
+	case HYWIDGET_RackMeter:
+	case HYWIDGET_BarMeter:
+		m_uiWidth = 150;
+		m_uiHeight = 25;
+		m_uiFrameSize = 1;
+		break;
+	case HYWIDGET_Button:
+		m_uiWidth = 100;
+		m_uiHeight = 25;
+		m_uiFrameSize = 1;
+		break;
+	case HYWIDGET_CheckBox:
+	case HYWIDGET_RadioButton:
+		m_uiWidth = 15;
+		m_uiHeight = 15;
+		m_uiFrameSize = 1;
+		break;
+	case HYWIDGET_Slider:
+	case HYWIDGET_ComboBox:
+		m_uiWidth = 100;
+		m_uiHeight = 25;
+		m_uiFrameSize = 1;
+		break;
+	case HYWIDGET_TextField:
+		m_uiWidth = 150;
+		m_uiHeight = 25;
+		m_uiFrameSize = 1;
+		break;
+	case HYWIDGET_RichText:
+		m_uiWidth = 300;
+		m_uiHeight = 200;
+		m_uiFrameSize = 1;
+		break;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+HyPanel::HyPanel(HyEntity2d *pParent) :
+	m_pParent(pParent),
 	m_eNodeType(HYTYPE_Unknown),
 	m_PanelData()
 {
+	HyAssert(m_pParent != nullptr, "HyPanel::HyPanel 'm_pParent' cannot be null");
 }
 
 HyPanel::HyPanel(const HyUiPanelInit &initRef, HyEntity2d *pParent) :
+	m_pParent(pParent),
 	m_eNodeType(HYTYPE_Unknown),
 	m_PanelData()
 {
-	Setup(initRef, pParent);
+	HyAssert(m_pParent != nullptr, "HyPanel::HyPanel 'm_pParent' cannot be null");
+	Setup(initRef);
 }
 
 HyPanel::~HyPanel()
@@ -99,7 +151,7 @@ HyPanel::~HyPanel()
 	DeleteData();
 }
 
-void HyPanel::Setup(const HyUiPanelInit &initRef, HyEntity2d *pParent)
+void HyPanel::Setup(const HyUiPanelInit &initRef)
 {
 	DeleteData(); // Delete any previous data
 
@@ -111,21 +163,25 @@ void HyPanel::Setup(const HyUiPanelInit &initRef, HyEntity2d *pParent)
 		break;
 
 	case HYTYPE_Sprite: // 'NodeItem' panel
-		m_PanelData.m_pNodeItem = HY_NEW HySprite2d(initRef.m_NodePath, pParent);
+		m_PanelData.m_pNodeItem = HY_NEW HySprite2d(initRef.m_NodePath, nullptr);
+		m_pParent->ChildPrepend(*m_PanelData.m_pNodeItem);
 		InitalizeSprite();
 		m_PanelData.m_pNodeItem->pos.Set(m_ptPosition);
 		break;
 	case HYTYPE_Spine: // 'NodeItem' panel
-		m_PanelData.m_pNodeItem = HY_NEW HySpine2d(initRef.m_NodePath, pParent);
+		m_PanelData.m_pNodeItem = HY_NEW HySpine2d(initRef.m_NodePath, nullptr);
+		m_pParent->ChildPrepend(*m_PanelData.m_pNodeItem);
 		m_PanelData.m_pNodeItem->pos.Set(m_ptPosition);
 		break;
 	case HYTYPE_TexturedQuad: // 'NodeItem' panel
-		m_PanelData.m_pNodeItem = HY_NEW HyTexturedQuad2d(initRef.m_NodePath, pParent);
+		m_PanelData.m_pNodeItem = HY_NEW HyTexturedQuad2d(initRef.m_NodePath, nullptr);
+		m_pParent->ChildPrepend(*m_PanelData.m_pNodeItem);
 		m_PanelData.m_pNodeItem->pos.Set(m_ptPosition);
 		break;
 
 	case HYTYPE_Primitive: // 'Primitive' panel
-		m_PanelData.m_pPrimMade = HY_NEW PrimMade(initRef, pParent);
+		m_PanelData.m_pPrimMade = HY_NEW PrimMade(initRef, nullptr);
+		m_pParent->ChildPrepend(*m_PanelData.m_pPrimMade);
 
 		// If a PrimPart's color's RGBA is 0xDEADBEEF, then reassign it to a default color
 		if(m_PanelData.m_pPrimMade->m_PanelColor == HyColor::_InternalUse)
@@ -136,8 +192,8 @@ void HyPanel::Setup(const HyUiPanelInit &initRef, HyEntity2d *pParent)
 			m_PanelData.m_pPrimMade->m_TertiaryColor = HyColor::Orange;
 
 		m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Body, m_PanelData.m_pPrimMade->m_PanelColor);
-		m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame1, m_PanelData.m_pPrimMade->m_FrameColor);
-		m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame2, m_PanelData.m_pPrimMade->m_TertiaryColor);
+		m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame, m_PanelData.m_pPrimMade->m_FrameColor);
+		m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Highlight, m_PanelData.m_pPrimMade->m_TertiaryColor);
 		m_PanelData.m_pPrimMade->pos.Set(m_ptPosition);
 		SetState(HYPANELSTATE_Idle);
 		break;
@@ -265,33 +321,33 @@ bool HyPanel::SetState(uint32 uiWidgetState)
 		{
 		case HYPANELSTATE_Idle:
 			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Body, m_PanelData.m_pPrimMade->m_PanelColor);
-			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame1, m_PanelData.m_pPrimMade->m_FrameColor);
-			m_PanelData.m_pPrimMade->SetLayerVisible(PRIMLAYER_Frame2, false);
+			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame, m_PanelData.m_pPrimMade->m_FrameColor);
+			m_PanelData.m_pPrimMade->SetLayerVisible(PRIMLAYER_Highlight, false);
 			break;
 		case HYPANELSTATE_Down:
 			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Body, m_PanelData.m_pPrimMade->m_PanelColor.Darken());
-			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame1, m_PanelData.m_pPrimMade->m_FrameColor);
-			m_PanelData.m_pPrimMade->SetLayerVisible(PRIMLAYER_Frame2, false);
+			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame, m_PanelData.m_pPrimMade->m_FrameColor);
+			m_PanelData.m_pPrimMade->SetLayerVisible(PRIMLAYER_Highlight, false);
 			break;
 		case HYPANELSTATE_Hover:
 			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Body, m_PanelData.m_pPrimMade->m_PanelColor.Lighten());
-			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame1, m_PanelData.m_pPrimMade->m_FrameColor);
-			m_PanelData.m_pPrimMade->SetLayerVisible(PRIMLAYER_Frame2, false);
+			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame, m_PanelData.m_pPrimMade->m_FrameColor);
+			m_PanelData.m_pPrimMade->SetLayerVisible(PRIMLAYER_Highlight, false);
 			break;
 		case HYPANELSTATE_Highlighted:
 			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Body, m_PanelData.m_pPrimMade->m_PanelColor);
-			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame1, m_PanelData.m_pPrimMade->m_FrameColor.Lighten());
-			m_PanelData.m_pPrimMade->SetLayerVisible(PRIMLAYER_Frame2, true);
+			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame, m_PanelData.m_pPrimMade->m_FrameColor.Lighten());
+			m_PanelData.m_pPrimMade->SetLayerVisible(PRIMLAYER_Highlight, true);
 			break;
 		case HYPANELSTATE_HighlightedDown:
 			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Body, m_PanelData.m_pPrimMade->m_PanelColor.Darken());
-			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame1, m_PanelData.m_pPrimMade->m_FrameColor.Lighten());
-			m_PanelData.m_pPrimMade->SetLayerVisible(PRIMLAYER_Frame2, true);
+			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame, m_PanelData.m_pPrimMade->m_FrameColor.Lighten());
+			m_PanelData.m_pPrimMade->SetLayerVisible(PRIMLAYER_Highlight, true);
 			break;
 		case HYPANELSTATE_HighlightedHover:
 			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Body, m_PanelData.m_pPrimMade->m_PanelColor.Lighten());
-			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame1, m_PanelData.m_pPrimMade->m_FrameColor.Lighten());
-			m_PanelData.m_pPrimMade->SetLayerVisible(PRIMLAYER_Frame2, true);
+			m_PanelData.m_pPrimMade->SetLayerColor(PRIMLAYER_Frame, m_PanelData.m_pPrimMade->m_FrameColor.Lighten());
+			m_PanelData.m_pPrimMade->SetLayerVisible(PRIMLAYER_Highlight, true);
 			break;
 
 		default:
@@ -503,35 +559,25 @@ void HyPanel::ConstructPrimitives(float fWidth, float fHeight)
 {
 	if(fWidth <= 0.0f || fHeight <= 0.0f)
 	{
-		m_PanelData.m_pPrimMade->SetAsNothing(PRIMLAYER_Frame1);
-		m_PanelData.m_pPrimMade->SetAsNothing(PRIMLAYER_Frame2);
+		m_PanelData.m_pPrimMade->SetAsNothing(PRIMLAYER_Frame);
 		m_PanelData.m_pPrimMade->SetAsNothing(PRIMLAYER_Body);
+		m_PanelData.m_pPrimMade->SetAsNothing(PRIMLAYER_Highlight);
 		return;
 	}
 
 	if(m_PanelData.m_pPrimMade->m_uiFrameSize > 0)
-	{
-		m_PanelData.m_pPrimMade->SetAsBox(PRIMLAYER_Frame1, fWidth, fHeight, 0.0f);
-
-		if(m_PanelData.m_pPrimMade->m_uiFrameSize > 1)
-		{
-			HyRect frameRect(fWidth - (m_PanelData.m_pPrimMade->m_uiFrameSize * 2.0f) + 2.0f,
-							 fHeight - (m_PanelData.m_pPrimMade->m_uiFrameSize * 2.0f) + 2.0f,
-							 glm::vec2(fWidth * 0.5f + m_PanelData.m_pPrimMade->m_uiFrameSize - 1, fHeight * 0.5f + m_PanelData.m_pPrimMade->m_uiFrameSize - 1));
-			m_PanelData.m_pPrimMade->SetAsBox(PRIMLAYER_Frame2, frameRect, 0.0f);
-		}
-		else
-			m_PanelData.m_pPrimMade->SetAsNothing(PRIMLAYER_Frame2);
-	}
+		m_PanelData.m_pPrimMade->SetAsBox(PRIMLAYER_Frame, fWidth, fHeight, 0.0f);
 	else
-	{
-		m_PanelData.m_pPrimMade->SetAsNothing(PRIMLAYER_Frame1);
-		m_PanelData.m_pPrimMade->SetAsNothing(PRIMLAYER_Frame2);
-	}
+		m_PanelData.m_pPrimMade->SetAsNothing(PRIMLAYER_Frame);
+	
+	float fHighlightThickness = std::max(1.0f, static_cast<float>(m_PanelData.m_pPrimMade->m_uiFrameSize) * 0.25f);
+	HyRect frameRect(fWidth - (m_PanelData.m_pPrimMade->m_uiFrameSize * 2.0f),
+					 fHeight - (m_PanelData.m_pPrimMade->m_uiFrameSize * 2.0f));
+	m_PanelData.m_pPrimMade->SetAsBox(PRIMLAYER_Highlight, frameRect, fHighlightThickness);
+		
 
 	HyRect bodyRect(fWidth - (m_PanelData.m_pPrimMade->m_uiFrameSize * 2.0f),
-					fHeight - (m_PanelData.m_pPrimMade->m_uiFrameSize * 2.0f),
-					glm::vec2(fWidth * 0.5f + m_PanelData.m_pPrimMade->m_uiFrameSize, fHeight * 0.5f + m_PanelData.m_pPrimMade->m_uiFrameSize));
+					fHeight - (m_PanelData.m_pPrimMade->m_uiFrameSize * 2.0f));
 	m_PanelData.m_pPrimMade->SetAsBox(PRIMLAYER_Body, bodyRect, 0.0f);
 }
 

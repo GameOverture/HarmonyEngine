@@ -95,10 +95,11 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_AddGuiItem::EntityUndoCmd_AddGuiItem(ProjectItemData &entityItemRef, ItemType eGuiItemType, QUuid uuidLayoutParent, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_AddGuiItem::EntityUndoCmd_AddGuiItem(ProjectItemData &entityItemRef, ItemType eGuiItemType, QUuid uuidLayoutParent, QJsonObject ctorPropertiesObj, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_eGuiItemType(eGuiItemType),
 	m_UuidLayoutParent(uuidLayoutParent),
+	m_CtorProperties(ctorPropertiesObj),
 	m_pGuiTreeItemData(nullptr)
 {
 	setText("Add New " % HyGlobal::ItemName(m_eGuiItemType, false) % " Widget");
@@ -123,16 +124,14 @@ EntityUndoCmd_AddGuiItem::EntityUndoCmd_AddGuiItem(ProjectItemData &entityItemRe
 
 		pWidget->RequestSelectedItems(QList<QUuid>() << m_pGuiTreeItemData->GetThisUuid());
 	}
+
+	if(m_CtorProperties.isEmpty() == false)
+		static_cast<EntityStateData *>(m_EntityItemRef.GetModel()->GetStateData(0))->GetDopeSheetScene().SetKeyFrameProperties(m_pGuiTreeItemData, -1, m_CtorProperties);
 }
 
 /*virtual*/ void EntityUndoCmd_AddGuiItem::undo() /*override*/
 {
 	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pGuiTreeItemData);
-}
-
-EntityTreeItemData *EntityUndoCmd_AddGuiItem::GetGuiTreeItemData() const
-{
-	return m_pGuiTreeItemData;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

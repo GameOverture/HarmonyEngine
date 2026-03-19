@@ -94,7 +94,7 @@ void HyComboBox::ClearSubButtons()
 
 void HyComboBox::SetExpandPanel(const HyUiPanelInit &panelInit, HyOrientation eOrientation, bool bPositiveDirection, bool bAnimate)
 {
-	m_SubBtnPanel.Setup(panelInit, this);
+	m_SubBtnPanel.Setup(panelInit);
 
 	if(eOrientation == HYORIENT_Horizontal)
 		m_uiEntityAttribs |= COMBOBOXATTRIB_IsHorzExpand;

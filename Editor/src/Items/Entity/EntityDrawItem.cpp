@@ -1148,15 +1148,8 @@ void ExtrapolateProperties(Project &projectRef,
 				{
 					QJsonObject setupObj = panelObj["Setup"].toObject();
 
-					HyUiPanelInit panelInit;
-					panelInit.m_eNodeType = HyGlobal::ConvertItemType(HyGlobal::GetTypeFromString(setupObj["nodeType"].toString()));
-					panelInit.m_uiWidth = setupObj["width"].toInt(0);
-					panelInit.m_uiHeight = setupObj["height"].toInt(0);
-					panelInit.m_NodePath.Set("");
-					panelInit.m_uiFrameSize = setupObj["frameSize"].toInt();
-					panelInit.m_PanelColor = HyColor(setupObj["panelColor"].toInt());
-					panelInit.m_FrameColor = HyColor(setupObj["frameColor"].toInt());
-					panelInit.m_TertiaryColor = HyColor(setupObj["tertiaryColor"].toInt());
+					QUuid panelNodeUuid;
+					HyUiPanelInit panelInit = DlgSetUiPanel::DeserializePanelInit(setupObj, panelNodeUuid);
 					static_cast<HyLabel *>(pThisHyNode)->Setup(panelInit);
 
 					previewComponentRef.m_CurrentWidgetPanelNodeUuid = QUuid(setupObj["nodeUuid"].toString());

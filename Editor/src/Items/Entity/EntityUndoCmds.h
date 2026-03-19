@@ -53,16 +53,16 @@ class EntityUndoCmd_AddGuiItem : public QUndoCommand
 	ProjectItemData &				m_EntityItemRef;
 	ItemType						m_eGuiItemType;
 	QUuid							m_UuidLayoutParent;
+	QJsonObject						m_CtorProperties;
+
 	EntityTreeItemData *			m_pGuiTreeItemData;
 
 public:
-	EntityUndoCmd_AddGuiItem(ProjectItemData &entityItemRef, ItemType eGuiItemType, QUuid uuidLayoutParent, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_AddGuiItem(ProjectItemData &entityItemRef, ItemType eGuiItemType, QUuid uuidLayoutParent, QJsonObject ctorPropertiesObj, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_AddGuiItem();
 
 	virtual void redo() override;
 	virtual void undo() override;
-
-	EntityTreeItemData *GetGuiTreeItemData() const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

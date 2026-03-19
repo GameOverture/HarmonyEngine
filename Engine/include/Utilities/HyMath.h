@@ -77,37 +77,32 @@ public:
 		m_fRotDegrees(0.0f)
 	{ }
 
-	// Creates a rectangle with the bottom left corner at 0,0
+	// Creates a sized rectangle centered at 0,0
 	HyRect(float fWidth, float fHeight)
 	{
 		Set(fWidth, fHeight);
 	}
-	HyRect(const glm::ivec2 &vSize) // Creates a rectangle with the bottom left corner at 0,0
+
+	// Creates a sized rectangle centered at 0,0
+	HyRect(const glm::ivec2 &vSize)
 	{
 		Set(static_cast<float>(vSize.x), static_cast<float>(vSize.y));
 	}
-	HyRect(const glm::vec2 &vSize) // Creates a rectangle with the bottom left corner at 0,0
+
+	// Creates a sized rectangle centered at 0,0
+	HyRect(const glm::vec2 &vSize)
 	{
 		Set(vSize.x, vSize.y);
 	}
+
 	HyRect(float fX, float fY, float fWidth, float fHeight)
 	{
 		Set(fX, fY, fWidth, fHeight);
 	}
-	HyRect(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptCenter, float fRotDegrees = 0.0f)
+	HyRect(float fHalfWidth, float fHalfHeight, const glm::vec2 &ptCenter, float fRotDegrees)
 	{
 		Set(fHalfWidth, fHalfHeight, ptCenter, fRotDegrees);
 	}
-
-	//std::string ToString() const
-	//{
-	//	std::ostringstream s;
-	//	s << "(X:" <<  << ", Y:" << y << ", W:" << width << ", H:" << height;
-	//	if(rot != 0.0f)
-	//		s << ", Rot:" << rot;
-	//	s << ")";
-	//	return s.str();
-	//}
 
 	float GetWidth(float fPercent = 1.0f) const
 	{
@@ -130,7 +125,7 @@ public:
 	{
 		m_fHalfWidth = fWidth * 0.5f;
 		m_fHalfHeight = fHeight * 0.5f;
-		HySetVec(m_ptCenter, m_fHalfWidth, m_fHalfHeight);
+		HySetVec(m_ptCenter, 0.0f, 0.0f);
 		m_fRotDegrees = 0.0f;
 	}
 

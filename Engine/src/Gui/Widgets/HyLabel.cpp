@@ -14,7 +14,8 @@
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_eStackedAlignment(HYALIGN_Center),
-	m_iSideBySidePadding(0)
+	m_iSideBySidePadding(0),
+	panel(this)
 {
 	RegisterAssembleEntity();
 
@@ -26,7 +27,8 @@ HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 HyLabel::HyLabel(const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_eStackedAlignment(HYALIGN_Center),
-	m_iSideBySidePadding(0)
+	m_iSideBySidePadding(0),
+	panel(this)
 {
 	RegisterAssembleEntity();
 
@@ -40,7 +42,8 @@ HyLabel::HyLabel(const HyUiPanelInit &panelInit, HyEntity2d *pParent /*= nullptr
 HyLabel::HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_eStackedAlignment(HYALIGN_Center),
-	m_iSideBySidePadding(0)
+	m_iSideBySidePadding(0),
+	panel(this)
 {
 	RegisterAssembleEntity();
 
@@ -116,7 +119,7 @@ HyLabel::HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, H
 
 void HyLabel::Setup(const HyUiPanelInit &panelInit)
 {
-	panel.Setup(panelInit, this);
+	panel.Setup(panelInit);
 
 	SetEnabled(IsEnabled());
 	SetAssembleNeeded();
