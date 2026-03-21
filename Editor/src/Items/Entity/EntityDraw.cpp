@@ -431,6 +431,11 @@ void EntityDraw::SetExtrapolatedProperties()
 		}
 	}
 
+	// If entity is a HyGui, call Resize() in order to assemble the widgets in the layout.
+	// This needs to be done before RefreshTransforms();
+	if(static_cast<EntityModel *>(m_pProjItem->GetModel())->GetBaseClassType() == ENTBASECLASS_HyGui)
+		static_cast<HyGui *>(m_pRootEntity)->Resize(static_cast<HyGui *>(m_pRootEntity)->panel.GetWidth(), static_cast<HyGui *>(m_pRootEntity)->panel.GetHeight());
+
 	RefreshTransforms();
 }
 
