@@ -45,7 +45,7 @@ public:
 	// Only applicable when entity base class type is HyGui
 	struct GuiItem
 	{
-		QUuid												m_Uuid;						// References a widget, or unique when layout/spacer
+		QUuid												m_Uuid;						// References a widget, or a layout/spacer
 		QList<GuiItem>										m_ChildList;				// Only used when type is ITEM_UiLayout
 
 		GuiItem(QUuid uuid) : m_Uuid(uuid) { }
@@ -101,9 +101,11 @@ public:
 	TreeModelItem *GetArrayFolderTreeItem(EntityTreeItemData *pArrayItem) const;
 	EntityTreeItemData *GetArrayFolderTreeItemData(EntityTreeItemData *pArrayItem) const;
 
+	QList<EntityTreeItemData *> GetGuiLayoutItemDataList() const;
 	void InsertGuiItem(QUuid uuidParent, QJsonObject guiItemObj);
 	bool PopGuiItem(EntityTreeItemData *pItem);
 	QUuid FindGuiLayoutUuid(EntityTreeItemData *pItem) const;
+	void RefreshGuiLayout(); // Take the current heirarchy in the model and set it as m_GuiLayout
 
 	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut, QList<EntityTreeItemData *> &layoutListOut) const;
 	void GetSelectedTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const;

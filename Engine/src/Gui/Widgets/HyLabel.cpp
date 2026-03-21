@@ -680,18 +680,27 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 			vSizeHint.x -= m_iSideBySidePadding;
 
 			// Determine what % of size goes to panel/text
-			float fPanelPerc = static_cast<float>(vPanelSizeHint.x) / static_cast<float>(vSizeHint.x);
-			float fTextPerc = static_cast<float>(vTextSizeHint.x) / static_cast<float>(vSizeHint.x);
+			float fPanelPerc = 0.0f;
+			float fTextPerc = 0.0f;
+			if(vSizeHint.x > 0.0f)
+			{
+				fPanelPerc = static_cast<float>(vPanelSizeHint.x) / static_cast<float>(vSizeHint.x);
+				fTextPerc = static_cast<float>(vTextSizeHint.x) / static_cast<float>(vSizeHint.x);
+			}
 
 			vNewPanelSize = HyMath::LockAspectRatio(vPanelSizeHint.x, vPanelSizeHint.y, static_cast<int32>(uiNewWidth * fPanelPerc), uiNewHeight);
 			vNewTextSize = HyMath::LockAspectRatio(vTextSizeHint.x, vTextSizeHint.y, static_cast<int32>(uiNewWidth * fTextPerc), uiNewHeight);
-			//HySetVec(vNewTextSize, uiNewWidth * fTextPerc, vTextSizeHint.y);
 		}
 
 		panel.SetSize(vNewPanelSize.x, vNewPanelSize.y);
 
-		float fScaleX = static_cast<float>(vNewTextSize.x) / static_cast<float>(vTextSizeHint.x);
-		float fScaleY = static_cast<float>(vNewTextSize.y) / static_cast<float>(vTextSizeHint.y);
+		float fScaleX = 1.0f;
+		float fScaleY = 1.0f;
+		if(vTextSizeHint.x > 0.0f && vTextSizeHint.y > 0.0f)
+		{
+			fScaleX = static_cast<float>(vNewTextSize.x) / static_cast<float>(vTextSizeHint.x);
+			fScaleY = static_cast<float>(vNewTextSize.y) / static_cast<float>(vTextSizeHint.y);
+		}
 		m_Text.scale.SetAll(HyMath::Min(fScaleX, fScaleY));
 	}
 	

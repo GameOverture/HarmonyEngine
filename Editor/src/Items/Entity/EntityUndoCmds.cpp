@@ -289,6 +289,8 @@ EntityUndoCmd_MoveChildren::EntityUndoCmd_MoveChildren(ProjectItemData &entityIt
 
 	for(int i = 0; i < m_SelectedItemDataList.size(); ++i)
 		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], m_pNewParent, m_NewItemIndexList[i]);
+
+	entTreeModelRef.RefreshGuiLayout();
 	
 	static_cast<EntityStateData *>(static_cast<EntityWidget *>(m_EntityItemRef.GetWidget())->GetCurStateData())->GetDopeSheetScene().RefreshAllGfxItems();
 }
@@ -299,6 +301,8 @@ EntityUndoCmd_MoveChildren::EntityUndoCmd_MoveChildren(ProjectItemData &entityIt
 
 	for(int i = m_SelectedItemDataList.size() - 1; i >= 0; --i)
 		entTreeModelRef.MoveTreeItem(m_SelectedItemDataList[i], m_pPrevParent, m_PrevItemIndexList[i]);
+
+	entTreeModelRef.RefreshGuiLayout();
 
 	static_cast<EntityStateData *>(static_cast<EntityWidget *>(m_EntityItemRef.GetWidget())->GetCurStateData())->GetDopeSheetScene().RefreshAllGfxItems();
 }

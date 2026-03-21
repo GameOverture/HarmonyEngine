@@ -509,12 +509,11 @@ void EntityDraw::FlushRootEntity()
 				HyGui *pRootGui = static_cast<HyGui *>(m_pRootEntity);
 				QUuid childUuid = QUuid(guiItemObj["uuid"].toString());
 
-				for(IDrawExItem *pDrawItem : m_ItemList)
+				// First look for GUI layout items (layouts and spacers)
+				QList<EntityTreeItemData *> guiLayoutItemList = pEntModel->GetTreeModel().GetGuiLayoutItemDataList();
+				for(EntityTreeItemData *pEntItemData : guiLayoutItemList)
 				{
-					EntityTreeItemData *pEntItemData = static_cast<EntityDrawItem *>(pDrawItem)->GetEntityTreeItemData();
-					if(pEntItemData == nullptr)
-						HyGuiLog("EntityDraw::FlushRootEntity - Found null EntityTreeItemData in m_ItemList while populating GUI layout!", LOGTYPE_Error);
-					else if(pEntItemData->GetThisUuid() == childUuid)
+					if(pEntItemData->GetThisUuid() == childUuid)
 					{
 						if(pEntItemData->GetType() == ITEM_UiLayout)
 						{
@@ -532,17 +531,30 @@ void EntityDraw::FlushRootEntity()
 						}
 						else if(pEntItemData->GetType() == ITEM_UiSpacer)
 							pRootGui->InsertSpacer(HYSIZEPOLICY_Expanding, 0, hParentHandle);
-						else if(pEntItemData->IsWidgetItem())
-						{
-							static_cast<EntityDrawItem *>(pDrawItem)->FlushHyNode(nullptr);
-							IHyWidget *pWidget = static_cast<IHyWidget *>(static_cast<EntityDrawItem *>(pDrawItem)->GetHyNode());
-							pRootGui->InsertWidget(*pWidget, hParentHandle);
-						}
-						else
-							HyGuiLog("EntityDraw::FlushRootEntity - Found unsupported item type in m_ItemList while populating GUI layout!", LOGTYPE_Error);
-
 						break;
 					}
+				}
+
+				// Then look through m_ItemList if it's a widget
+				for(IDrawExItem *pDrawItem : m_ItemList)
+				{
+					EntityTreeItemData *pEntItemData = static_cast<EntityDrawItem *>(pDrawItem)->GetEntityTreeItemData();
+					if(pEntItemData == nullptr)
+					{
+						HyGuiLog("EntityDraw::FlushRootEntity - Found null EntityTreeItemData in m_ItemList while populating GUI layout!", LOGTYPE_Error);
+						continue;
+					}
+					if(pEntItemData->GetThisUuid() != childUuid)
+						continue;
+
+					if(pEntItemData->IsWidgetItem() == false)
+						HyGuiLog("EntityDraw::FlushRootEntity - Found unsupported item type in m_ItemList while populating GUI layout!", LOGTYPE_Error);
+					
+					static_cast<EntityDrawItem *>(pDrawItem)->FlushHyNode(nullptr);
+					IHyWidget *pWidget = static_cast<IHyWidget *>(static_cast<EntityDrawItem *>(pDrawItem)->GetHyNode());
+					pRootGui->InsertWidget(*pWidget, hParentHandle);
+					
+					break;
 				}
 			};
 		fpRecursivelyPopulateLayout(HY_UNUSED_HANDLE, pEntModel->GetTreeModel().SerializeGuiLayout());
@@ -604,8 +616,6 @@ void EntityDraw::FlushRootEntity()
 	{
 		QJsonObject descObj = descObjList[i];
 		ItemType eType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
-		if(HyGlobal::IsItemType_GuiLayout(eType))
-			continue;
 
 		QUuid uuid(descObj["UUID"].toString());
 
@@ -646,7 +656,7 @@ void EntityDraw::FlushRootEntity()
 			}
 		}
 
-		m_ItemList.push_back(pDrawItem);					// Repopulate 'm_ItemList' with the valid existing or new draw items
+		m_ItemList.push_back(pDrawItem);						// Repopulate 'm_ItemList' with the valid existing or new draw items
 		m_pRootEntity->ChildAppend(*pDrawItem->GetHyNode());	// Reinsert each valid draw item into the m_RootEntity, to establish the correct `descObjList` display order
 
 		// Repopulate `m_SelectedItemList` if draw item is valid to select

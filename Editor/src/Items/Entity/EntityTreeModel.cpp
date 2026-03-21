@@ -202,6 +202,11 @@ EntityTreeItemData *EntityTreeModel::GetArrayFolderTreeItemData(EntityTreeItemDa
 	return nullptr;
 }
 
+QList<EntityTreeItemData *> EntityTreeModel::GetGuiLayoutItemDataList() const
+{
+	return m_GuiLayoutItemList;
+}
+
 void EntityTreeModel::InsertGuiItem(QUuid uuidParent, QJsonObject guiItemObj)
 {
 	if(uuidParent.isNull())
@@ -307,6 +312,35 @@ QUuid EntityTreeModel::FindGuiLayoutUuid(EntityTreeItemData *pItem) const
 	}
 
 	return QUuid();
+}
+
+void EntityTreeModel::RefreshGuiLayout()
+{
+	if(m_ModelRef.GetBaseClassType() != ENTBASECLASS_HyGui)
+		return;
+
+	m_GuiLayout.m_Uuid = m_FusedTreeItemData[ENTBASECLASS_HyGui]->GetThisUuid();
+	m_GuiLayout.m_ChildList.clear();
+
+	TreeModelItem *pLayoutRootItem = GetItem(FindIndex<EntityTreeItemData *>(m_FusedTreeItemData[ENTBASECLASS_HyGui], 0));
+	if(pLayoutRootItem == nullptr)
+	{
+		HyGuiLog("EntityTreeModel::RefreshGuiLayout - Failed to find the root layout item in the tree", LOGTYPE_Error);
+		return;
+	}
+
+	std::function<void(TreeModelItem *, EntityTreeModel::GuiItem &)> fpSerializeFunc =
+		[&](TreeModelItem *pCurTreeItem, EntityTreeModel::GuiItem &curGuiItem)
+		{
+			for(int i = 0; i < pCurTreeItem->GetNumChildren(); ++i)
+			{
+				GuiItem childItem(pCurTreeItem->GetChild(i)->data(0).value<EntityTreeItemData *>()->GetThisUuid());
+
+				curGuiItem.m_ChildList.push_back(childItem);
+				fpSerializeFunc(pCurTreeItem->GetChild(i), childItem);
+			}
+		};
+	fpSerializeFunc(pLayoutRootItem, m_GuiLayout);
 }
 
 //void EntityTreeModel::GuiDisassemble()
