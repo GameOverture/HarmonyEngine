@@ -34,6 +34,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 /*virtual*/ EntityDraw::~EntityDraw()
 {
+	for(HyText2d *pText : m_WidgetTextMap)
+		delete pText;
 }
 
 /*virtual*/ void EntityDraw::OnUndoStackIndexChanged(int iIndex) /*override*/
@@ -418,7 +420,7 @@ void EntityDraw::SetExtrapolatedProperties()
 
 			ExtrapolateProperties(m_pProjItem->GetProject(),
 									pEntDrawItem->GetHyNode(),
-									pEntDrawItem->GetEntityTreeItemData()->GetEditModel(),
+									pEntDrawItem->GetEntityTreeItemData(),
 									pEntityTreeItemData->IsSelected(),
 									eItemType,
 									fFRAME_DURATION,
@@ -430,6 +432,18 @@ void EntityDraw::SetExtrapolatedProperties()
 	}
 
 	RefreshTransforms();
+}
+
+void EntityDraw::RegisterWidgetText(QUuid uuid, HyJsonObj textDataObj)
+{
+	if(m_WidgetTextMap.contains(uuid))
+		return;
+	
+	HyText2d *pText = new HyText2d();
+	pText->GuiOverrideData<HyTextData>(textDataObj, false);
+	pText->Load();
+
+	m_WidgetTextMap.insert(uuid, pText);
 }
 
 void EntityDraw::FlushRootEntity()
@@ -502,7 +516,7 @@ void EntityDraw::FlushRootEntity()
 		m_GuiLayoutMap.clear();
 		if(m_ItemList.empty()) // Only bother to populate GUI layout if m_ItemList has been populated
 			break;
-		
+		// Recursively populate the GUI layout
 		std::function<void(HyLayoutHandle, QJsonObject)> fpRecursivelyPopulateLayout = 
 			[&](HyLayoutHandle hParentHandle, QJsonObject guiItemObj)
 			{

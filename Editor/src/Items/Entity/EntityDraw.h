@@ -19,6 +19,8 @@ class EntityDraw : public IDrawEx
 {
 	HyEntity2d * 							m_pRootEntity;
 
+	QMap<QUuid, HyText2d *>					m_WidgetTextMap;
+
 	bool									m_bPlayingPreview;
 
 	EditModeState							m_eEditModeState;
@@ -46,6 +48,8 @@ public:
 	//void RequestClearShapeEdit();
 
 	void SetExtrapolatedProperties();
+
+	void RegisterWidgetText(QUuid uuid, HyJsonObj textDataObj);
 
 protected:
 	void FlushRootEntity();

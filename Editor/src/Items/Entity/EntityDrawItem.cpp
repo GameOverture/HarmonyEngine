@@ -790,7 +790,6 @@ void SubEntity::ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStat
 {
 	const QMap<IHyNode2d *, QMap<int, QJsonObject>> &childPropMapRef = m_StateInfoList[uiStateIndex].m_ChildPropertiesMap;
 
-
 	for(ChildInfo &childInfoRef : m_ChildInfoList)
 		ExtrapolateProperties(m_ProjectRef, childInfoRef.m_pChild, nullptr, false, childInfoRef.m_eItemType, 1.0f / 60, m_iSubTimelineStartFrame, m_iSubTimelineStartFrame + iNumFramesDuration, childPropMapRef[childInfoRef.m_pChild], *childInfoRef.m_pPreviewComponent);
 }
@@ -804,7 +803,7 @@ void SubEntity::ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStat
 //             - ExtrapolateProperties
 void ExtrapolateProperties(Project &projectRef,
 						   IHyLoadable2d *pThisHyNode,
-						   IGfxEditModel *pEditModel,
+						   EntityTreeItemData *pEntityTreeItemData,
 						   bool bIsSelected,
 						   ItemType eItemType,
 						   const float fFRAME_DURATION,
@@ -936,7 +935,10 @@ void ExtrapolateProperties(Project &projectRef,
 			}
 		} // IsFixture != true
 
-		
+		IGfxEditModel *pEditModel = nullptr;
+		if(pEntityTreeItemData)
+			pEditModel = pEntityTreeItemData->GetEditModel();
+
 		switch(eItemType)
 		{
 		case ITEM_None:		// 'ITEM_None' is passed for the main entity root node
@@ -1244,6 +1246,12 @@ void ExtrapolateProperties(Project &projectRef,
 							HyGuiLog("ExtrapolateProperties() - Label failed to parse its text node file data", LOGTYPE_Error);
 						static_cast<HyLabel *>(pThisHyNode)->GuiOverrideTextNodeData(itemDataDoc.GetObject(), false);
 						static_cast<HyLabel *>(pThisHyNode)->Load();
+
+						// Also register this HyText with EntityDraw in order to avoid unloading/reloading the text's sub-atlas (when this item gets flushed)
+						EntityDraw *pEntityDraw = static_cast<EntityDraw *>(pEntityTreeItemData->GetEntityModel().GetItem().GetDraw());
+						if(pEntityDraw == nullptr)
+							HyGuiLog("ExtrapolateProperties() - failed to get EntityDraw from EntityModel for registering HyLabel's text atlas", LOGTYPE_Error);
+						pEntityDraw->RegisterWidgetText(previewComponentRef.m_CurrentWidgetTextNodeUuid, itemDataDoc.GetObject());
 					}
 				}
 				if(labelObj.contains("Margins"))

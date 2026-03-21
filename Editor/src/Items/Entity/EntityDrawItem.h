@@ -106,6 +106,6 @@ private:
 };
 
 
-void ExtrapolateProperties(Project &projectRef, IHyLoadable2d *pThisHyNode, IGfxEditModel *pEditModel, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iSTART_FRAME, const int iDESTINATION_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, EntityPreviewComponent &previewComponentRef);
+void ExtrapolateProperties(Project &projectRef, IHyLoadable2d *pThisHyNode, EntityTreeItemData *pEntityTreeItemData, bool bIsSelected, ItemType eItemType, const float fFRAME_DURATION, const int iSTART_FRAME, const int iDESTINATION_FRAME, const QMap<int, QJsonObject> &keyFrameMapRef, EntityPreviewComponent &previewComponentRef);
 
 #endif // ENTITYDRAWITEM_H
