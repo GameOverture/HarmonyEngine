@@ -153,15 +153,18 @@ void HyLabel::SetTextMargins(HyMargins<float> margins)
 {
 	m_TextMargins = margins;
 
-	switch(GetTextType())
+	if((m_uiEntityAttribs & LABELATTRIB_IsSideBySide) == 0)
 	{
-	case HYTEXT_Line:		SetAsLine(); break;
-	case HYTEXT_Column:		SetAsColumn(GetWidth()); break;
-	case HYTEXT_Box:		SetAsBox(GetWidth(), GetHeight(), m_uiEntityAttribs & LABELATTRIB_Vertical, m_uiEntityAttribs & LABELATTRIB_BoxUseScissorOrSbsTextFirst); break;
-	case HYTEXT_ScaleBox:	SetAsScaleBox(GetWidth(), GetHeight(), m_uiEntityAttribs & LABELATTRIB_Vertical); break;
-	default:
-		HyLogError("HyLabel::Setup() - Unhandled text type: " << GetTextType());
-		break;
+		switch(GetTextType())
+		{
+		case HYTEXT_Line:		SetAsLine(); break;
+		case HYTEXT_Column:		SetAsColumn(GetWidth()); break;
+		case HYTEXT_Box:		SetAsBox(GetWidth(), GetHeight(), m_uiEntityAttribs & LABELATTRIB_Vertical, m_uiEntityAttribs & LABELATTRIB_BoxUseScissorOrSbsTextFirst); break;
+		case HYTEXT_ScaleBox:	SetAsScaleBox(GetWidth(), GetHeight(), m_uiEntityAttribs & LABELATTRIB_Vertical); break;
+		default:
+			HyLogError("HyLabel::Setup() - Unhandled text type: " << GetTextType());
+			break;
+		}
 	}
 
 	SetAssembleNeeded();
@@ -481,12 +484,12 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 
 		// Determine "first" and "second" size and offset
 		IHyBody2d *pFirst = nullptr;
-		glm::vec2 vFirstSize;
+		glm::vec2 vFirstSize(0.0f, 0.0f);
 
 		IHyBody2d *pSecond = nullptr;
-		glm::vec2 vSecondSize;
+		glm::vec2 vSecondSize(0.0f, 0.0f);
 
-		if(m_uiEntityAttribs & LABELATTRIB_BoxUseScissorOrSbsTextFirst)
+		if(m_uiEntityAttribs & LABELATTRIB_BoxUseScissorOrSbsTextFirst) // Text first, then panel
 		{
 			if(m_uiEntityAttribs & LABELATTRIB_Vertical)
 				m_Text.SetAlignment(HYALIGN_Center);
@@ -495,16 +498,27 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 
 			pFirst = &m_Text;
 			HySetVec(vFirstSize, m_Text.GetWidth(m_Text.scale.X()), m_Text.GetLineBreakHeight(m_Text.scale.Y()));
-			pFirst->pos.Set(-m_Text.GetBottomLeft());
 
 			if(panel.GetPanelNode())
-			{
 				pSecond = panel.GetPanelNode();
-				HySetVec(vSecondSize, panel.GetWidth(), panel.GetHeight());
-				pSecond->pos.Set(0, 0);
-			}
+			HySetVec(vSecondSize, panel.GetWidth(), panel.GetHeight());
+
+			// Position "first" and "second" appropriately
+			pFirst->pos.Set(0.0f, m_Text.GetLineDescender(m_Text.scale.GetY()));
+			if(pSecond)
+				pSecond->pos.Set(0.0f, 0.0f);
+			//if(m_uiEntityAttribs & LABELATTRIB_Vertical)
+			//{
+			//	pFirst->pos.Set((vSecondSize.x * -0.5f) - m_iSideBySidePadding, (vSecondSize.y * 0.5f) + m_iSideBySidePadding);
+			//	if(pSecond)
+			//		pSecond->pos.Set(0.0f, (vFirstSize.y * 0.5f) + m_iSideBySidePadding);
+			//}
+			//else
+			//{
+			//	pFirst->pos.Set((vSecondSize.x * -0.5f) - m_iSideBySidePadding, m_Text.GetLineDescender(m_Text.scale.GetY()));
+			//}
 		}
-		else
+		else // Panel first, then text
 		{
 			if(m_uiEntityAttribs & LABELATTRIB_Vertical)
 				m_Text.SetAlignment(HYALIGN_Center);
@@ -512,47 +526,67 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 				m_Text.SetAlignment(HYALIGN_Left);
 
 			if(panel.GetPanelNode())
-			{
 				pFirst = panel.GetPanelNode();
-				HySetVec(vFirstSize, panel.GetWidth(), panel.GetHeight());
-				pFirst->pos.Set(0, 0);
-			}
+			HySetVec(vFirstSize, panel.GetWidth(), panel.GetHeight());
 
 			pSecond = &m_Text;
 			HySetVec(vSecondSize, m_Text.GetWidth(m_Text.scale.X()), m_Text.GetLineBreakHeight(m_Text.scale.Y()));
-			pSecond->pos.Set(-m_Text.GetBottomLeft());
-		}
-
-		// Then offset "first" and "second" appropriately
-		if(m_uiEntityAttribs & LABELATTRIB_Vertical)
-		{
-			if(vFirstSize.x >= vSecondSize.x)
+			
+			// Position "first" and "second" appropriately
+			if(m_uiEntityAttribs & LABELATTRIB_Vertical)
 			{
 				if(pFirst)
-					pFirst->pos.Offset(0.0f, vSecondSize.y + m_iSideBySidePadding);
-				if(pSecond)
-					pSecond->pos.Offset((vFirstSize.x - vSecondSize.x) * 0.5f, 0.0f);
-			}
-			else if(pFirst)
-				pFirst->pos.Offset((vFirstSize.x - vSecondSize.x) * 0.5f, vSecondSize.y + m_iSideBySidePadding);
-		}
-		else // Horizontal side-by-side
-		{
-			if(vFirstSize.y >= vSecondSize.y)
-			{
-				if(pSecond)
-					pSecond->pos.Offset(vFirstSize.x + m_iSideBySidePadding, (vFirstSize.y - vSecondSize.y) * 0.5f);
+					pFirst->pos.Set(0.0f, vFirstSize.y * 0.5f);
+				pSecond->pos.Set(0.0f, vFirstSize.y + m_iSideBySidePadding);
+
+				float fTotalLength = vFirstSize.y + vSecondSize.y + m_iSideBySidePadding;
+				if(pFirst)
+					pFirst->pos.Offset(0.0f, fTotalLength * -0.5f);
+				pSecond->pos.Offset(0.0f, fTotalLength * -0.5f);
 			}
 			else
 			{
 				if(pFirst)
-					pFirst->pos.Offset(0.0f, (vSecondSize.y - vFirstSize.y) * 0.5f);
-				if(pSecond)
-					pSecond->pos.Offset(vFirstSize.x + m_iSideBySidePadding, 0.0f);
+					pFirst->pos.Set(vFirstSize.x * 0.5f, 0.0f);
+				pSecond->pos.Set(vFirstSize.x + m_iSideBySidePadding, m_Text.GetLineDescender(m_Text.scale.GetY()));
+
+				float fTotalLength = vFirstSize.x + vSecondSize.x + m_iSideBySidePadding;
+				if(pFirst)
+					pFirst->pos.Offset(fTotalLength * -0.5f, 0.0f);
+				pSecond->pos.Offset(fTotalLength * -0.5f, 0.0f);
 			}
 		}
 
-		m_Text.pos.Offset(0.0f, -m_Text.GetLineDescender(m_Text.scale.GetY()));
+		//// Then offset "first" and "second" appropriately
+		//if(m_uiEntityAttribs & LABELATTRIB_Vertical)
+		//{
+		//	if(vFirstSize.x >= vSecondSize.x)
+		//	{
+		//		if(pFirst)
+		//			pFirst->pos.Offset(0.0f, vSecondSize.y + m_iSideBySidePadding);
+		//		if(pSecond)
+		//			pSecond->pos.Offset((vFirstSize.x - vSecondSize.x) * 0.5f, 0.0f);
+		//	}
+		//	else if(pFirst)
+		//		pFirst->pos.Offset((vFirstSize.x - vSecondSize.x) * 0.5f, vSecondSize.y + m_iSideBySidePadding);
+		//}
+		//else // Horizontal side-by-side
+		//{
+		//	if(vFirstSize.y >= vSecondSize.y)
+		//	{
+		//		if(pSecond)
+		//			pSecond->pos.Offset(vFirstSize.x + m_iSideBySidePadding, (vFirstSize.y - vSecondSize.y) * 0.5f);
+		//	}
+		//	else
+		//	{
+		//		if(pFirst)
+		//			pFirst->pos.Offset(0.0f, (vSecondSize.y - vFirstSize.y) * 0.5f);
+		//		if(pSecond)
+		//			pSecond->pos.Offset(vFirstSize.x + m_iSideBySidePadding, 0.0f);
+		//	}
+		//}
+
+		//m_Text.pos.Offset(0.0f, -m_Text.GetLineDescender(m_Text.scale.GetY()));
 	}
 	else // Stacked Panel/Text
 	{
