@@ -53,10 +53,10 @@ public:
 
 protected:
 	virtual QString DoDeserialize(const QJsonObject &serializedObj) override;
-	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) override;
+	virtual EditModeAction DoMouseMoveIdle() override;
 	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
 
-	bool CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos);
+	bool CheckIfAddVertexOnEdge();
 	bool IsShareEdge(const std::vector<glm::vec2> &a, const std::vector<glm::vec2> &b, int &a0, int &a1, int &b0, int &b1);
 	std::vector<glm::vec2> MergePolygons(const std::vector<glm::vec2> &ptA, const std::vector<glm::vec2> &ptB, int a0, int a1, int b0, int b1);
 	std::vector<std::vector<glm::vec2>> MergeTriangles(const std::vector<HyTriangle2d> &triangleList);

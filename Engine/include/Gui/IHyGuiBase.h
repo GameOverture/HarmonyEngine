@@ -43,7 +43,6 @@ public:
 	HySizePolicy GetHorizontalPolicy() const;
 	HySizePolicy GetVerticalPolicy() const;
 	virtual HySizePolicy GetSizePolicy(HyOrientation eOrien) const;
-
 	void SetSizePolicy(HySizePolicy eHorizPolicy, HySizePolicy eVertPolicy);
 	void SetHorizontalPolicy(HySizePolicy ePolicy);
 	void SetVerticalPolicy(HySizePolicy ePolicy);

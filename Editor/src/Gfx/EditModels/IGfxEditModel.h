@@ -93,8 +93,8 @@ public:
 	bool IsHoverGrabPointSelected() const;
 	void DeselectAllGrabPoints();
 
-	Qt::CursorShape MouseMoveIdle(EditModeState eEditModeState, glm::vec2 ptWorldMousePos);
-	bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos); // Returns whether transform has begun (otherwise marquee select)
+	Qt::CursorShape MouseMoveIdle(EditModeState eEditModeState);
+	bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags); // Returns whether transform has begun (otherwise marquee select)
 	void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight);
 	void MouseTransform(EditModeState eEditModeState, bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
 	
@@ -104,7 +104,7 @@ public:
 
 protected:
 	virtual QString DoDeserialize(const QJsonObject &serializedObj) = 0; // Returns empty string if successful, otherwise returns reason for failure (e.g. "Polygon has intersecting edges")
-	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) = 0;
+	virtual EditModeAction DoMouseMoveIdle() = 0;
 	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) = 0;
 };
 

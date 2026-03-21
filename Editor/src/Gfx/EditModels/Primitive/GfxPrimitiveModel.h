@@ -38,7 +38,7 @@ public:
 
 protected:
 	virtual QString DoDeserialize(const QJsonObject &floatList) override;
-	virtual EditModeAction DoMouseMoveIdle(glm::vec2 ptWorldMousePos) override;
+	virtual EditModeAction DoMouseMoveIdle() override;
 	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
 };
 

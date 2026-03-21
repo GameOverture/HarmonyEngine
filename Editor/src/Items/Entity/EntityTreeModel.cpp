@@ -664,7 +664,7 @@ void EntityTreeModel::Cmd_ResetFusedItems()
 		{
 			if(pTreeItem->IsWidgetItem())
 				MoveTreeItem(pTreeItem, GetRootTreeItemData(), 0);
-			else if(pTreeItem->IsLayoutItem())
+			else if(pTreeItem->IsLayoutItem() && static_cast<EntityTreeItemData *>(pTreeItem)->GetEntType() != ENTTYPE_FusedItem)
 			{
 				m_GuiLayoutItemList.removeOne(pTreeItem);
 				m_GuiLayoutItemList.append(static_cast<EntityTreeItemData *>(pTreeItem));

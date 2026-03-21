@@ -302,13 +302,13 @@ bool GfxTransformCtrl::IsMouseOverBoundingVolume()
 
 GfxTransformCtrl::GrabPointType GfxTransformCtrl::IsMouseOverGrabPoint() const
 {
-	glm::vec2 ptWorldMousePos;
-	if(m_bIsShown == false || m_bShowGrabPoints == false || HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
+	//glm::vec2 ptWorldMousePos;
+	if(m_bIsShown == false || m_bShowGrabPoints == false)// || HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
 		return GRAB_None;
 
 	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
 	{
-		if(m_GrabPointModels[i]->TestPoint(ptWorldMousePos))
+		if(m_GrabPointModels[i]->IsMouseHover())
 			return static_cast<GrabPointType>(i);
 	}
 

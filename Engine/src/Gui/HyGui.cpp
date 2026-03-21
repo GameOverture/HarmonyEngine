@@ -623,7 +623,7 @@ void HyGui::ScrollTo(float fVertScrollPos, float fHorzScrollPos)
 
 /*virtual*/ glm::ivec2 HyGui::OnCalcPreferredSize() /*override*/
 {
-	return panel.GetSize();
+	return m_RootLayout.GetPreferredSize();//panel.GetSize();
 }
 
 /*virtual*/ glm::ivec2 HyGui::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/

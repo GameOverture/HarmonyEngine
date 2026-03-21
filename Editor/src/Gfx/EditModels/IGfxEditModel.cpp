@@ -124,9 +124,9 @@ void IGfxEditModel::DeselectAllGrabPoints()
 		grabPtModel.SetSelected(false);
 }
 
-Qt::CursorShape IGfxEditModel::MouseMoveIdle(EditModeState eEditModeState, glm::vec2 ptWorldMousePos)
+Qt::CursorShape IGfxEditModel::MouseMoveIdle(EditModeState eEditModeState)
 {
-	EditModeAction eResult = DoMouseMoveIdle(ptWorldMousePos);
+	EditModeAction eResult = DoMouseMoveIdle();
 
 	switch(eResult)
 	{
@@ -145,11 +145,11 @@ Qt::CursorShape IGfxEditModel::MouseMoveIdle(EditModeState eEditModeState, glm::
 	return Qt::ArrowCursor;
 }
 
-bool IGfxEditModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags, glm::vec2 ptWorldMousePos)
+bool IGfxEditModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags)
 {
 	bool bStartTransform = false;
 
-	EditModeAction eResult = DoMouseMoveIdle(ptWorldMousePos);
+	EditModeAction eResult = DoMouseMoveIdle();
 	if(eResult == EDITMODEACTION_AppendVertex || eResult == EDITMODEACTION_InsertVertex)
 	{
 		if(m_iGrabPointIndex == -1)

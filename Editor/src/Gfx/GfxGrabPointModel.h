@@ -48,7 +48,7 @@ public:
 
 	glm::vec2 GetPos() const;
 	float GetRadius() const;
-	bool TestPoint(glm::vec2 ptWorld) const;
+	bool IsMouseHover() const;
 
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);

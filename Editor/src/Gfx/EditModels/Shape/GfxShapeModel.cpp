@@ -466,20 +466,20 @@ bool GfxShapeModel::IsLoopClosed() const
 	return QString();
 }
 
-/*virtual*/ EditModeAction GfxShapeModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
+/*virtual*/ EditModeAction GfxShapeModel::DoMouseMoveIdle() /*override*/
 {
 	m_iGrabPointIndex = -1;
 	m_ptGrabPointPos = glm::vec2(0.0f, 0.0f);
 
 	for(int i = 0; i < m_GrabPointList.size(); ++i)
 	{
-		if(m_GrabPointList[i].TestPoint(ptWorldMousePos))
+		if(m_GrabPointList[i].IsMouseHover())
 		{
 			m_iGrabPointIndex = i;
 			return EDITMODEACTION_HoverGrabPoint;
 		}
 	}
-	if(m_GrabPointCenter.TestPoint(ptWorldMousePos))
+	if(m_GrabPointCenter.IsMouseHover())
 		return EDITMODEACTION_HoverCenter;
 
 	if(m_eShapeType == SHAPE_Polygon)
@@ -487,7 +487,7 @@ bool GfxShapeModel::IsLoopClosed() const
 		if(m_GrabPointList.empty())
 			return EDITMODEACTION_Creation;
 
-		if(CheckIfAddVertexOnEdge(ptWorldMousePos))
+		if(CheckIfAddVertexOnEdge())
 			return EDITMODEACTION_InsertVertex;
 
 		if(m_bLoopClosed == false)
@@ -504,13 +504,17 @@ bool GfxShapeModel::IsLoopClosed() const
 				if(m_GrabPointList.front().IsSelected())
 				{
 					m_iGrabPointIndex = 0;
-					m_ptGrabPointPos = ptWorldMousePos;
+					if(HyEngine::Input().GetWorldMousePos(m_ptGrabPointPos) == false)
+						HyGuiLog("GfxShapeModel::DoMouseMoveIdle - Failed to get world mouse position for append vertex", LOGTYPE_Error);
+					
 					return EDITMODEACTION_AppendVertex;
 				}
 				else if(m_GrabPointList.back().IsSelected())
 				{
 					m_iGrabPointIndex = m_GrabPointList.size();
-					m_ptGrabPointPos = ptWorldMousePos;
+					if(HyEngine::Input().GetWorldMousePos(m_ptGrabPointPos) == false)
+						HyGuiLog("GfxShapeModel::DoMouseMoveIdle - Failed to get world mouse position for append vertex", LOGTYPE_Error);
+
 					return EDITMODEACTION_AppendVertex;
 				}
 			}
@@ -521,6 +525,10 @@ bool GfxShapeModel::IsLoopClosed() const
 
 	for(HyShape2d *pFixture : m_ShapeList)
 	{
+		glm::vec2 ptWorldMousePos;
+		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
+			HyGuiLog("GfxShapeModel::DoMouseMoveIdle - Failed to get world mouse position for hit testing", LOGTYPE_Error);
+
 		if(pFixture->TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
 			return EDITMODEACTION_Inside;
 	}
@@ -586,7 +594,7 @@ void GfxShapeModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, gl
 	}
 }
 
-bool GfxShapeModel::CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos)
+bool GfxShapeModel::CheckIfAddVertexOnEdge()
 {
 	if(m_eShapeType != SHAPE_Polygon)
 	{
@@ -602,8 +610,17 @@ bool GfxShapeModel::CheckIfAddVertexOnEdge(glm::vec2 ptWorldMousePos)
 		if(i == (m_GrabPointList.size() - 1) && m_bLoopClosed == false)
 			break;
 
+		// TODO: Test whether to convert all this to camera space
 		glm::vec2 pt1 = m_GrabPointList[i].GetPos();
 		glm::vec2 pt2 = m_GrabPointList[(i + 1) % m_GrabPointList.size()].GetPos();
+
+		glm::vec2 ptWorldMousePos;
+		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
+		{
+			HyGuiLog("GfxShapeModel::CheckIfAddVertexOnEdge - Failed to get world mouse position for hit testing", LOGTYPE_Error);
+			return false;
+		}
+
 		tmpEdgeShape.SetAsLineSegment(pt1, pt2);
 		if(tmpEdgeShape.TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
 		{

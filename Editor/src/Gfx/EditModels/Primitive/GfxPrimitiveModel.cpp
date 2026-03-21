@@ -100,12 +100,12 @@ QString GfxPrimLayerModel::GetPrimType() const
 		return m_ChainModel.DoDeserialize(floatList);
 }
 
-/*virtual*/ EditModeAction GfxPrimLayerModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
+/*virtual*/ EditModeAction GfxPrimLayerModel::DoMouseMoveIdle() /*override*/
 {
 	if(m_bIsShape)
-		return m_ShapeModel.DoMouseMoveIdle(ptWorldMousePos);
+		return m_ShapeModel.DoMouseMoveIdle();
 	else
-		return m_ChainModel.DoMouseMoveIdle(ptWorldMousePos);
+		return m_ChainModel.DoMouseMoveIdle();
 }
 
 void GfxPrimLayerModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)

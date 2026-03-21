@@ -58,9 +58,12 @@ float GfxGrabPointModel::GetRadius() const
 	return GRABPOINT_SELECT_RADIUS;
 }
 
-bool GfxGrabPointModel::TestPoint(glm::vec2 ptWorld) const
+bool GfxGrabPointModel::IsMouseHover() const
 {
-	return glm::distance(m_ptPosition, ptWorld) <= (GRABPOINT_SELECT_RADIUS * 2);
+	glm::vec2 ptScreenPos;
+	HyEngine::Window(0).GetCamera2d(0)->ProjectToCamera(m_ptPosition, ptScreenPos);
+	
+	return glm::distance(ptScreenPos, HyEngine::Input().GetMousePos()) <= (GRABPOINT_SELECT_RADIUS * 2);
 }
 
 bool GfxGrabPointModel::IsSelected() const

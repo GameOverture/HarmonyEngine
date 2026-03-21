@@ -69,24 +69,28 @@ ContainerEditModel::ContainerEditModel() :
 	return QString();
 }
 
-/*virtual*/ EditModeAction ContainerEditModel::DoMouseMoveIdle(glm::vec2 ptWorldMousePos) /*override*/
+/*virtual*/ EditModeAction ContainerEditModel::DoMouseMoveIdle() /*override*/
 {
 	m_iGrabPointIndex = -1;
 	m_ptGrabPointPos = glm::vec2(0.0f, 0.0f);
 
 	for(int i = 0; i < m_GrabPointList.size(); ++i)
 	{
-		if(m_GrabPointList[i].TestPoint(ptWorldMousePos))
+		if(m_GrabPointList[i].IsMouseHover())
 		{
 			m_iGrabPointIndex = i;
 			return EDITMODEACTION_HoverGrabPoint;
 		}
 	}
-	if(m_GrabPointCenter.TestPoint(ptWorldMousePos))
+	if(m_GrabPointCenter.IsMouseHover())
 		return EDITMODEACTION_HoverCenter;
 
 	if(IsValidModel() == false) // Any shape besides SHAPE_Polygon
 		return EDITMODEACTION_Creation;
+
+	glm::vec2 ptWorldMousePos;
+	if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
+		HyGuiLog("ContainerEditModel::DoMouseMoveIdle - Failed to get world mouse position for hit testing", LOGTYPE_Error);
 
 	if(m_Box.TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
 		return EDITMODEACTION_Inside;
