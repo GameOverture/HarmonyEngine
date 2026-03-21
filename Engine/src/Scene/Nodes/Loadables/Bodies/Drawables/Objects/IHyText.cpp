@@ -1383,6 +1383,12 @@ offsetCalculation:
 			for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
 				m_pGlyphInfos[i].vOffset.y -= fCenterNudgeAmt;
 		}
+
+		for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
+		{
+			m_pGlyphInfos[i].vOffset.x -= m_vBoxDimensions.x * 0.5f;
+			m_pGlyphInfos[i].vOffset.y -= m_vBoxDimensions.y * 0.5f;
+		}
 	}
 	//else if(0 != (m_uiTextAttributes & TEXTATTRIB_IsColumn))	// Move column text to fit below its node position, which will extend downward from
 	//{

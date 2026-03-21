@@ -525,6 +525,8 @@ void EntityDraw::FlushRootEntity()
 
 				// First look for GUI layout items (layouts and spacers)
 				QList<EntityTreeItemData *> guiLayoutItemList = pEntModel->GetTreeModel().GetGuiLayoutItemDataList();
+				guiLayoutItemList.push_back(pEntModel->GetFusedItem());
+
 				for(EntityTreeItemData *pEntItemData : guiLayoutItemList)
 				{
 					if(pEntItemData->GetThisUuid() == childUuid)

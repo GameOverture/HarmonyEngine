@@ -523,6 +523,7 @@ void HyPanel::GuiOverridePanelNodeData(HyType eNodeType, HyJsonObj itemDataObj, 
 		DeleteData();
 		m_PanelData.m_pNodeItem = HY_NEW HySprite2d("", HY_GUI_DATAOVERRIDE, pParent);
 		static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GuiOverrideData<HySpriteData>(itemDataObj, bUseGuiOverrideName);
+		m_PanelData.m_pNodeItem->Load();
 		m_eNodeType = eNodeType;
 		InitalizeSprite();
 	}
@@ -531,6 +532,7 @@ void HyPanel::GuiOverridePanelNodeData(HyType eNodeType, HyJsonObj itemDataObj, 
 		DeleteData();
 		m_PanelData.m_pNodeItem = HY_NEW HySpine2d("", HY_GUI_DATAOVERRIDE, pParent);
 		static_cast<HySpine2d *>(m_PanelData.m_pNodeItem)->GuiOverrideData<HySpineData>(itemDataObj, bUseGuiOverrideName);
+		m_PanelData.m_pNodeItem->Load();
 		m_eNodeType = eNodeType;
 	}
 	else
@@ -552,7 +554,7 @@ void HyPanel::InitalizeSprite()
 		return;
 
 	glm::ivec2 vStateOffset = static_cast<HySprite2d *>(m_PanelData.m_pNodeItem)->GetStateOffset(m_PanelData.m_pNodeItem->GetState());
-	m_PanelData.m_pNodeItem->pos.Set(-vStateOffset.x * m_PanelData.m_pNodeItem->scale.X(), -vStateOffset.y * m_PanelData.m_pNodeItem->scale.Y());
+	m_PanelData.m_pNodeItem->pos.Set((GetWidth(0.5f) + vStateOffset.x) * m_PanelData.m_pNodeItem->scale.X(), (GetHeight(0.5f) + vStateOffset.y) * m_PanelData.m_pNodeItem->scale.Y());
 }
 
 void HyPanel::ConstructPrimitives(float fWidth, float fHeight)

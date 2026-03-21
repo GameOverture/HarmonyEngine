@@ -346,7 +346,8 @@ void HyLayout::OnSetDebugBox()
 		if(vTargetSize[eOrientation] != 0 && vActualItemSize != vItemSize)
 			bNeedsResize = true;
 
-		pItem->pos.Offset(pItem->GetWidth(0.5f), pItem->GetHeight(0.5f));
+		if(0 == (pItem->GetInternalFlags() & NODETYPE_IsLayout))
+			pItem->pos.Offset(pItem->GetWidth(0.5f), pItem->GetHeight(0.5f));
 
 		ptCurPos[eOrientation] += vActualItemSize[eOrientation] + GetWidgetSpacing();
 	};

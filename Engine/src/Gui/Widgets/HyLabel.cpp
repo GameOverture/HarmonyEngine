@@ -70,7 +70,7 @@ HyLabel::HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, H
 			return HyMath::Max(panel.GetWidth(), GetTextWidth()) * fPercent;
 	}
 	else // Is stacked
-		return panel.GetWidth(fPercent);
+		return HyMath::Max(panel.GetWidth(), GetTextWidth()) * fPercent;
 }
 
 /*virtual*/ float HyLabel::GetHeight(float fPercent /*= 1.0f*/) /*override*/
@@ -85,7 +85,7 @@ HyLabel::HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, H
 			return HyMath::Max(panel.GetHeight(), GetTextHeight()) * fPercent;
 	}
 	else // Is stacked
-		return panel.GetHeight(fPercent);
+		return HyMath::Max(panel.GetHeight(), GetTextHeight()) * fPercent;
 }
 
 /*virtual*/ const b2AABB &HyLabel::GetSceneAABB() /*override*/
@@ -504,19 +504,28 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 			HySetVec(vSecondSize, panel.GetWidth(), panel.GetHeight());
 
 			// Position "first" and "second" appropriately
-			pFirst->pos.Set(0.0f, m_Text.GetLineDescender(m_Text.scale.GetY()));
-			if(pSecond)
-				pSecond->pos.Set(0.0f, 0.0f);
-			//if(m_uiEntityAttribs & LABELATTRIB_Vertical)
-			//{
-			//	pFirst->pos.Set((vSecondSize.x * -0.5f) - m_iSideBySidePadding, (vSecondSize.y * 0.5f) + m_iSideBySidePadding);
-			//	if(pSecond)
-			//		pSecond->pos.Set(0.0f, (vFirstSize.y * 0.5f) + m_iSideBySidePadding);
-			//}
-			//else
-			//{
-			//	pFirst->pos.Set((vSecondSize.x * -0.5f) - m_iSideBySidePadding, m_Text.GetLineDescender(m_Text.scale.GetY()));
-			//}
+			if(m_uiEntityAttribs & LABELATTRIB_Vertical)
+			{
+				pFirst->pos.Set(0.0f, vFirstSize.y * 0.5f);
+				if(pSecond)
+					pSecond->pos.Set(0.0f, vFirstSize.y + m_iSideBySidePadding);
+
+				float fTotalLength = vFirstSize.y + vSecondSize.y + m_iSideBySidePadding;
+				pFirst->pos.Offset(0.0f, fTotalLength * -0.5f);
+				if(pSecond)
+					pSecond->pos.Offset(0.0f, fTotalLength * -0.5f);
+			}
+			else
+			{
+				pFirst->pos.Set(vFirstSize.x * 0.5f, m_Text.GetLineDescender(m_Text.scale.GetY()));
+				if(pSecond)
+					pSecond->pos.Set(vFirstSize.x + m_iSideBySidePadding, 0.0f);
+
+				float fTotalLength = vFirstSize.x + vSecondSize.x + m_iSideBySidePadding;
+				pFirst->pos.Offset(fTotalLength * -0.5f, 0.0f);
+				if(pSecond)
+					pSecond->pos.Offset(fTotalLength * -0.5f, 0.0f);
+			}
 		}
 		else // Panel first, then text
 		{
@@ -556,37 +565,6 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 				pSecond->pos.Offset(fTotalLength * -0.5f, 0.0f);
 			}
 		}
-
-		//// Then offset "first" and "second" appropriately
-		//if(m_uiEntityAttribs & LABELATTRIB_Vertical)
-		//{
-		//	if(vFirstSize.x >= vSecondSize.x)
-		//	{
-		//		if(pFirst)
-		//			pFirst->pos.Offset(0.0f, vSecondSize.y + m_iSideBySidePadding);
-		//		if(pSecond)
-		//			pSecond->pos.Offset((vFirstSize.x - vSecondSize.x) * 0.5f, 0.0f);
-		//	}
-		//	else if(pFirst)
-		//		pFirst->pos.Offset((vFirstSize.x - vSecondSize.x) * 0.5f, vSecondSize.y + m_iSideBySidePadding);
-		//}
-		//else // Horizontal side-by-side
-		//{
-		//	if(vFirstSize.y >= vSecondSize.y)
-		//	{
-		//		if(pSecond)
-		//			pSecond->pos.Offset(vFirstSize.x + m_iSideBySidePadding, (vFirstSize.y - vSecondSize.y) * 0.5f);
-		//	}
-		//	else
-		//	{
-		//		if(pFirst)
-		//			pFirst->pos.Offset(0.0f, (vSecondSize.y - vFirstSize.y) * 0.5f);
-		//		if(pSecond)
-		//			pSecond->pos.Offset(vFirstSize.x + m_iSideBySidePadding, 0.0f);
-		//	}
-		//}
-
-		//m_Text.pos.Offset(0.0f, -m_Text.GetLineDescender(m_Text.scale.GetY()));
 	}
 	else // Stacked Panel/Text
 	{
@@ -623,12 +601,12 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 
 			case HYTEXT_ScaleBox:
 				m_Text.SetAsScaleBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right)) - (panel.GetFrameStrokeSize() * 2),
-					vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top)) - (panel.GetFrameStrokeSize() * 2), true);
+									 vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top)) - (panel.GetFrameStrokeSize() * 2), true);
 				break;
 
 			case HYTEXT_Box:
 				m_Text.SetAsBox(vPanelDimensions.x - ((m_TextMargins.left + m_TextMargins.right)) - (panel.GetFrameStrokeSize() * 2),
-					vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top)) - (panel.GetFrameStrokeSize() * 2), true);
+								vPanelDimensions.y - ((m_TextMargins.bottom + m_TextMargins.top)) - (panel.GetFrameStrokeSize() * 2), true);
 				break;
 
 			case HYTEXT_Column:

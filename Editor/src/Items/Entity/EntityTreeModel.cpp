@@ -867,7 +867,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descO
 		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, sCodeName, eGuiType, iRow);
 
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, descObj, bIsArrayItem, bIsFusedItem);
-	if(pNewItem->IsLayoutItem())
+	if(pNewItem->IsLayoutItem() && bIsFusedItem == false)
 		m_GuiLayoutItemList.append(pNewItem);
 	else
 	{

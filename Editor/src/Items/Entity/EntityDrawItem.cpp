@@ -1299,7 +1299,7 @@ void ExtrapolateProperties(Project &projectRef,
 				if(labelObj.contains("Show As Cash"))
 					static_cast<HyRackMeter *>(pThisHyNode)->ShowAsCash(labelObj["Show As Cash"].toBool());
 				if(labelObj.contains("Spinning Digits"))
-					static_cast<HyRackMeter *>(pThisHyNode)->SetAsSpinningMeter(labelObj["Spinning Digits"].toBool());				
+					static_cast<HyRackMeter *>(pThisHyNode)->SetAsSpinningMeter(labelObj["Spinning Digits"].toBool());
 			}
 			if(propsObj.contains("Button"))
 			{
