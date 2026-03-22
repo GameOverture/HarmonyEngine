@@ -50,18 +50,14 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *)> fpC
 {
 	HyButton::OnAssemble();
 
-	float fRadius = (HyMath::Min(panel.GetWidth(), panel.GetHeight()) - (panel.GetFrameStrokeSize() * 4)) * 0.5f;
-	m_CheckMark.SetAsCircle(0, fRadius, 0.0f);
-	m_CheckMark.SetAsCircle(1, fRadius - panel.GetFrameStrokeSize(), 0.0f);
-
-	if(panel.GetPanelNode())
-	{
-		m_CheckMark.pos.Set(panel.GetPanelNode()->pos);
-		m_CheckMark.pos.Offset(panel.GetWidth() * 0.5f, panel.GetHeight() * 0.5f);
-	}
-	m_CheckMark.SetLayerColor(0, panel.GetFrameColor().Lighten().Lighten());
-	m_CheckMark.SetLayerColor(1, panel.GetFrameColor().Lighten());
-
+	std::vector<glm::vec2> checkMarkVerts;
+	checkMarkVerts.push_back(glm::vec2(panel.GetWidth(-0.4f), 0.0f));
+	checkMarkVerts.push_back(glm::vec2(0.0f, panel.GetHeight(-0.4f)));
+	checkMarkVerts.push_back(glm::vec2(panel.GetWidth(0.4f), panel.GetHeight(0.4f)));
+	m_CheckMark.SetAsLineChain(0, checkMarkVerts, false, 4.0f);
+	
+	m_CheckMark.SetLayerColor(0, panel.GetTertiaryColor());
+	m_CheckMark.pos.Set(panel.GetPanelNode()->pos);
 	m_CheckMark.alpha.Set(IsChecked() ? 1.0f : 0.0f);
 }
 
