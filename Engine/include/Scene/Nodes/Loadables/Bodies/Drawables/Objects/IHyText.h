@@ -174,7 +174,7 @@ public:
 
 	bool IsCenterVertically() const;
 
-	const glm::vec2 &GetTextBoxDimensions() const;
+	const glm::vec2 &GetTextBoxDimensions(float fPercent = 1.0f) const;
 
 	bool IsLine() const;
 	bool IsColumn() const;

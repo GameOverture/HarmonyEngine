@@ -66,6 +66,8 @@ class HyPanel// : public IHyGuiBase
 	HyEntity2d *				m_pParent;
 	HyType						m_eNodeType;
 
+	glm::vec2					m_Size;
+
 	class PrimMade : public HyPrimitive2d
 	{
 	public:
@@ -83,15 +85,14 @@ class HyPanel// : public IHyGuiBase
 			m_TertiaryColor(initRef.m_TertiaryColor)
 		{ }
 	};
-	union PanelData
-	{
-		glm::vec2				m_BoundingVolumeSize;	// For 'BoundingVolume' panel type.
-		PrimMade *				m_pPrimMade;			// For 'Primitive' panel type.
-		IHyBody2d *				m_pNodeItem;			// For 'NodeItem' panel type.
-		PanelData() : m_pPrimMade(nullptr)
-		{ }
-	};
-	PanelData					m_PanelData;
+	//union PanelData
+	//{
+	//	PrimMade *				m_pPrimMade;			// For 'Primitive' panel type.
+	//	IHyBody2d *				m_pNodeItem;			// For 'NodeItem' panel type.
+	//	PanelData() : m_pPrimMade(nullptr)
+	//	{ }
+	//};
+	IHyBody2d *					m_pNode;
 	glm::vec2					m_ptPosition;
 
 public:
@@ -143,7 +144,7 @@ public:
 
 private:
 	void InitalizeSprite();
-	void ConstructPrimitives(float fWidth, float fHeight);
+	void ConstructPrimitives();
 	void DeleteData();
 };
 

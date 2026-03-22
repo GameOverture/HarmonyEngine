@@ -17,6 +17,7 @@
 class HyDividerLine : public IHyWidget
 {
 	HyPrimitive2d							m_Line;
+	float									m_fLength;
 	float									m_fThickness;
 
 protected:
@@ -32,6 +33,9 @@ public:
 	HyDividerLine(HyEntity2d *pParent = nullptr);
 	HyDividerLine(HyOrientation eOrientation, float fThickness, HyColor eColor, HyEntity2d *pParent = nullptr);
 	virtual ~HyDividerLine();
+
+	virtual float GetWidth(float fPercent = 1.0f) override;
+	virtual float GetHeight(float fPercent = 1.0f) override;
 
 	HyOrientation GetOrientation() const;
 	void SetOrientation(HyOrientation eOrientation);

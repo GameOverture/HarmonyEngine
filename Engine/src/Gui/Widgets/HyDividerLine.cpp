@@ -13,6 +13,7 @@
 HyDividerLine::HyDividerLine(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_Line(this),
+	m_fLength(1.0f),
 	m_fThickness(1.0f)
 {
 }
@@ -20,6 +21,7 @@ HyDividerLine::HyDividerLine(HyEntity2d *pParent /*= nullptr*/) :
 HyDividerLine::HyDividerLine(HyOrientation eOrientation, float fThickness, HyColor eColor, HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),
 	m_Line(this),
+	m_fLength(1.0f),
 	m_fThickness(fThickness)
 {
 	m_Line.SetLayerColor(0, eColor);
@@ -28,6 +30,16 @@ HyDividerLine::HyDividerLine(HyOrientation eOrientation, float fThickness, HyCol
 
 /*virtual*/ HyDividerLine::~HyDividerLine()
 {
+}
+
+/*virtual*/ float HyDividerLine::GetWidth(float fPercent /*= 1.0f*/) /*override*/
+{
+	return (GetOrientation() == HYORIENT_Horizontal ? m_fLength : m_fThickness) * fPercent;
+}
+
+/*virtual*/ float HyDividerLine::GetHeight(float fPercent /*= 1.0f*/) /*override*/
+{
+	return (GetOrientation() == HYORIENT_Vertical ? m_fLength : m_fThickness) * fPercent;
 }
 
 HyOrientation HyDividerLine::GetOrientation() const
@@ -70,9 +82,15 @@ void HyDividerLine::SetThickness(float fThickness)
 /*virtual*/ glm::ivec2 HyDividerLine::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
 {
 	if(GetOrientation() == HYORIENT_Horizontal)
-		m_Line.SetAsLineSegment(0, glm::vec2(0.0f), glm::vec2((float)uiNewWidth, 0.0f), uiNewHeight);
+	{
+		m_Line.SetAsLineSegment(0, glm::vec2(-static_cast<float>(uiNewWidth), 0.0f), glm::vec2(uiNewWidth, 0.0f), uiNewHeight);
+		m_fLength = static_cast<float>(uiNewWidth);
+	}
 	else
-		m_Line.SetAsLineSegment(0, glm::vec2(0.0f), glm::vec2(0.0f, (float)uiNewHeight), uiNewWidth);
+	{
+		m_Line.SetAsLineSegment(0, glm::vec2(0.0f, -static_cast<float>(uiNewHeight)), glm::vec2(0.0f, uiNewHeight), uiNewWidth);
+		m_fLength = static_cast<float>(uiNewHeight);
+	}
 
 	return glm::ivec2(uiNewWidth, uiNewHeight);
 }
