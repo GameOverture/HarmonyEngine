@@ -179,8 +179,8 @@ int32 HyTexturedQuad2d::GetEntireTextureHeight()
 	IHyDrawable2d::OnLoaded();
 	m_ShaderUniforms.SetTexHandle(0, static_cast<const HyTexturedQuadData *>(UncheckedGetData())->GetAtlas()->GetTextureHandle());
 
-	//if(m_pParent && m_pParent->ParentGet() && (m_pParent->ParentGet()->GetInternalFlags() & NODETYPE_IsLayout) != 0)
-	//	static_cast<IHyGuiBase *>(m_pParent)->SetSizeDirty();
+	if(m_pParent && m_pParent->ParentGet() && (m_pParent->ParentGet()->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+		static_cast<IHyGuiBase *>(m_pParent)->SetSizeDirty();
 
 //	if(IsAuxiliary()) // Do blocking load of texture
 //	{
@@ -230,6 +230,7 @@ int32 HyTexturedQuad2d::GetEntireTextureHeight()
 	vertexBufferRef.AppendVertexData(&vSize, sizeof(glm::vec2));
 
 	glm::vec2 vOffset(0.0f, 0.0f);
+	vOffset = vSize * -0.5f; // Offset the vertices so that the center of the quad is at the node's position, instead of the top-left corner
 	vertexBufferRef.AppendVertexData(&vOffset, sizeof(glm::vec2));
 
 	vertexBufferRef.AppendVertexData(&CalculateTopTint(fExtrapolatePercent), sizeof(glm::vec3));

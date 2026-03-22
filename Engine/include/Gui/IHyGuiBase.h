@@ -59,9 +59,9 @@ public:
 	glm::ivec2 GetPreferredSize();											// Ideal size. If a dimension is '0' then autosize it
 	glm::ivec2 Resize(uint32 uiNewWidth, uint32 uiNewHeight);
 
-protected:
 	void SetSizeDirty();
 
+protected:
 	virtual glm::ivec2 OnCalcPreferredSize() = 0;							// Returns the preferred size (may also set Min/Max sizes). Returned result is set to 'm_vSizeHint'.
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) = 0;	// Returns the size *this was actually set to (which may be different than what's passed in due to constraints)
 };

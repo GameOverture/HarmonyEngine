@@ -569,12 +569,9 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 	else // Stacked Panel/Text
 	{
 		m_Text.SetAlignment(m_eStackedAlignment);
+		m_Text.pos.Set(0.0f, 0.0f);
 
 		glm::vec2 vPanelDimensions(panel.GetWidth(), panel.GetHeight());
-
-		// Position text to bottom left of 'm_TextMargins'
-		m_Text.pos.Set(panel.GetFrameStrokeSize() + m_TextMargins.left,
-					   panel.GetFrameStrokeSize() + m_TextMargins.bottom);
 
 		float fLineOffsetX = 0.0f;	// If *this is 'LABELATTRIB_StackedTextUseLine' determine how much to offset m_Text's position (not needed for scale boxes)
 		if(m_eStackedAlignment == HYALIGN_Center)
