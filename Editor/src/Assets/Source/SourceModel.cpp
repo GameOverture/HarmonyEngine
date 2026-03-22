@@ -43,19 +43,20 @@ bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 	m_ImportBaseClassList.clear();
 
 	QString sClassName = entityModelRef.GetItem().GetName(false);
+	QString sBaseClass = HyGlobal::GetEntityBaseClassName(entityModelRef.GetBaseClassType());
 
 	// Generate the cpp and h file of the entity (it will overwrite the entity files if they already exist)
 	QModelIndex entityFolderIndex = FindIndex<TreeModelItemData *>(m_pEntityFolderItem, 0);
 	QStringList sImportList;
 
-	QString sHeaderFile = GenerateSrcFile(TEMPLATE_EntityH, entityFolderIndex, sClassName, "hy_" % sClassName, "HyEntity2d", true, &entityModelRef);
+	QString sHeaderFile = GenerateSrcFile(TEMPLATE_EntityH, entityFolderIndex, sClassName, "hy_" % sClassName, sBaseClass, true, &entityModelRef);
 	if(false == DoesAssetExist(ComputeFileChecksum(AssembleFilter(m_pEntityFolderItem, true), QFileInfo(sHeaderFile).fileName())))
 	{
 		sImportList << sHeaderFile;
 		m_ImportBaseClassList << "HyEntity2d";
 	}
 
-	QString sSrcFile = GenerateSrcFile(TEMPLATE_EntityCpp, entityFolderIndex, sClassName, "hy_" % sClassName, "HyEntity2d", true, &entityModelRef);
+	QString sSrcFile = GenerateSrcFile(TEMPLATE_EntityCpp, entityFolderIndex, sClassName, "hy_" % sClassName, sBaseClass, true, &entityModelRef);
 	if(false == DoesAssetExist(ComputeFileChecksum(AssembleFilter(m_pEntityFolderItem, true), QFileInfo(sSrcFile).fileName())))
 	{
 		sImportList << sSrcFile;

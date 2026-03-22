@@ -1469,8 +1469,8 @@ QString EntityModel::DeserializeTextInitAsRuntimeCode(QUuid textItemUuid, HyMarg
 	TreeModelItemData *pItemData = m_ItemRef.GetProject().FindItemData(textItemUuid);
 	if(pItemData && pItemData->IsProjectItemData() && pItemData->GetType() == ITEM_Text)
 	{
-		sSrc += "HyNodePath(" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + "), ";
-		sSrc += "HyMargins<float>(" + QString::number(margins.left) + "f, " + QString::number(margins.bottom) + "f, " + QString::number(margins.right) + "f, " + QString::number(margins.top) + "f)";
+		sSrc += "HyNodePath(\"" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + "\"), ";
+		sSrc += "HyMargins<float>(" + QString::number(margins.left, 'f') + "f, " + QString::number(margins.bottom, 'f') + "f, " + QString::number(margins.right, 'f') + "f, " + QString::number(margins.top, 'f') + "f)";
 	}
 
 	sSrc += ")";
@@ -1488,7 +1488,7 @@ QString EntityModel::DeserializePanelInitAsRuntimeCode(QJsonObject panelInitObj)
 	if(eType == ITEM_Entity)
 		sSrc += QString::number(panelInitObj["width"].toInt()) + ", " + QString::number(panelInitObj["height"].toInt());
 	else if(eType == ITEM_PrimNode)
-		sSrc += QString::number(panelInitObj["width"].toInt()) + ", " + QString::number(panelInitObj["height"].toInt()) + ", " + QString::number(panelInitObj["frameSize"].toInt()) + ", HyColor(" + QString::number(panelInitObj["panelColor"].toInt()) + "), HyColor(" + QString::number(panelInitObj["frameColor"].toInt()) + "), HyColor(" + QString::number(panelInitObj["tertiaryColor"].toInt()) + "))";
+		sSrc += QString::number(panelInitObj["width"].toInt()) + ", " + QString::number(panelInitObj["height"].toInt()) + ", " + QString::number(panelInitObj["frameSize"].toInt()) + ", HyColor(" + QString::number(panelInitObj["panelColor"].toInt()) + "), HyColor(" + QString::number(panelInitObj["frameColor"].toInt()) + "), HyColor(" + QString::number(panelInitObj["tertiaryColor"].toInt()) + ")";
 	else
 	{
 		QUuid panelUuid(panelInitObj["nodeUuid"].toString());
@@ -1497,8 +1497,8 @@ QString EntityModel::DeserializePanelInitAsRuntimeCode(QJsonObject panelInitObj)
 		{
 			switch(eType)
 			{
-			case ITEM_Sprite:	sSrc += "HYTYPE_Sprite, HyNodePath(" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + ")"; break;
-			case ITEM_Spine:	sSrc += "HYTYPE_Spine, HyNodePath(" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + ")"; break;
+			case ITEM_Sprite:	sSrc += "HYTYPE_Sprite, HyNodePath(\"" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + "\")"; break;
+			case ITEM_Spine:	sSrc += "HYTYPE_Spine, HyNodePath(\"" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + "\")"; break;
 
 			default:
 				HyGuiLog("EntityModel::GenerateSrc_SetProperties() - Unhandled panel node type", LOGTYPE_Error);
