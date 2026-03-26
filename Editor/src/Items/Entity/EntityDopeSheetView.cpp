@@ -233,8 +233,16 @@ void EntityDopeSheetView::EnsureSelectedFrameVisible()
 
 		// Item Name
 		QString sCodeName;
-		if(pEntItemData->GetEntType() == ENTTYPE_ArrayItem)
-			sCodeName = pEntItemData->GetCodeName() % "[" % QString::number(pEntItemData->GetArrayIndex()) % "]";
+		if(pEntItemData->GetEntType() == ENTTYPE_ArrayItem || pEntItemData->GetEntType() == ENTTYPE_SubItem)
+		{
+			sCodeName = pEntItemData->GetCodeName();
+			if(pEntItemData->GetEntType() == ENTTYPE_ArrayItem)
+				sCodeName += "[" % QString::number(pEntItemData->GetArrayIndex()) % "]";
+			else if(pEntItemData->GetType() == ITEM_PrimLayer)
+				sCodeName += " Layer " % QString::number(pEntItemData->GetArrayIndex());
+			else
+				HyGuiLog("EntityDopeSheetView::drawForeground() - Unhandled Entity Item Type for array/sub item: " + QString::number(pEntItemData->GetEntType()), LOGTYPE_Error);
+		}
 		else
 			sCodeName = pEntItemData->GetCodeName();
 

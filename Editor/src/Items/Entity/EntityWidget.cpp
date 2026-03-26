@@ -205,6 +205,17 @@ EntityWidget::~EntityWidget()
 	{
 		bAllowEditMode = false;
 
+		ui->actionAddPrimBox->setEnabled(false);
+		ui->actionAddPrimCircle->setEnabled(false);
+		ui->actionAddPrimLineSegment->setEnabled(false);
+		ui->actionAddPrimPolygon->setEnabled(false);
+		ui->actionAddPrimCapsule->setEnabled(false);
+		ui->actionAddPrimLineChain->setEnabled(false);
+
+		ui->actionAddLayoutHorz->setEnabled(false);
+		ui->actionAddLayoutVert->setEnabled(false);
+		ui->actionAddSpacer->setEnabled(false);
+
 		ui->actionOrderChildrenUp->setEnabled(false);
 		ui->actionOrderChildrenDown->setEnabled(false);
 		ui->actionRemoveItems->setEnabled(false);
@@ -476,7 +487,7 @@ void EntityWidget::SetExtrapolatedProperties()
 	for(const QModelIndex &index : selectedIndexList)
 	{
 		EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
-		if(pEntItemData->GetEntType() == ENTTYPE_Root || pEntItemData->GetEntType() == ENTTYPE_FusedItem || pEntItemData->GetEntType() == ENTTYPE_Item || pEntItemData->GetEntType() == ENTTYPE_ArrayItem)
+		if(pEntItemData->GetEntType() == ENTTYPE_Root || pEntItemData->GetEntType() == ENTTYPE_FusedItem || pEntItemData->GetEntType() == ENTTYPE_Item || pEntItemData->GetEntType() == ENTTYPE_SubItem || pEntItemData->GetEntType() == ENTTYPE_ArrayItem)
 			selectedItemsDataList.push_back(pEntItemData);
 	}
 
@@ -722,7 +733,7 @@ void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const 
 		if(pCurItemData == nullptr)
 			continue;
 
-		if(pCurItemData->GetEntType() == ENTTYPE_ArrayItem)
+		if(pCurItemData->GetEntType() == ENTTYPE_ArrayItem || pCurItemData->GetEntType() == ENTTYPE_SubItem)
 		{
 			QModelIndex parentIndex = ui->nodeTree->model()->parent(selIndex);
 			ui->nodeTree->expand(parentIndex);
@@ -798,32 +809,98 @@ void EntityWidget::on_actionAddChildren_triggered()
 
 void EntityWidget::on_actionAddPrimitive_triggered()
 {
-	QUndoCommand *pCmd = new EntityUndoCmd_AddPrimitive(m_ItemRef);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddPrimNode(m_ItemRef);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddPrimBox_triggered()
 {
+	QModelIndexList selectedIndexList = GetSelectedItems();
+	for(const QModelIndex &index : selectedIndexList)
+	{
+		EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pEntItemData->GetType() == ITEM_PrimNode)
+		{
+			QUndoCommand *pCmd = new EntityUndoCmd_AddPrimLayer(m_ItemRef, pEntItemData, HyGlobal::ShapeName(SHAPE_Box), -1);
+			m_ItemRef.GetUndoStack()->push(pCmd);
+			break;
+		}
+	}
 }
 
 void EntityWidget::on_actionAddPrimCircle_triggered()
 {
+	QModelIndexList selectedIndexList = GetSelectedItems();
+	for(const QModelIndex &index : selectedIndexList)
+	{
+		EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pEntItemData->GetType() == ITEM_PrimNode)
+		{
+			QUndoCommand *pCmd = new EntityUndoCmd_AddPrimLayer(m_ItemRef, pEntItemData, HyGlobal::ShapeName(SHAPE_Circle), -1);
+			m_ItemRef.GetUndoStack()->push(pCmd);
+			break;
+		}
+	}
 }
 
 void EntityWidget::on_actionAddPrimLineSegment_triggered()
 {
+	QModelIndexList selectedIndexList = GetSelectedItems();
+	for(const QModelIndex &index : selectedIndexList)
+	{
+		EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pEntItemData->GetType() == ITEM_PrimNode)
+		{
+			QUndoCommand *pCmd = new EntityUndoCmd_AddPrimLayer(m_ItemRef, pEntItemData, HyGlobal::ShapeName(SHAPE_LineSegment), -1);
+			m_ItemRef.GetUndoStack()->push(pCmd);
+			break;
+		}
+	}
 }
 
 void EntityWidget::on_actionAddPrimPolygon_triggered()
 {
+	QModelIndexList selectedIndexList = GetSelectedItems();
+	for(const QModelIndex &index : selectedIndexList)
+	{
+		EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pEntItemData->GetType() == ITEM_PrimNode)
+		{
+			QUndoCommand *pCmd = new EntityUndoCmd_AddPrimLayer(m_ItemRef, pEntItemData, HyGlobal::ShapeName(SHAPE_Polygon), -1);
+			m_ItemRef.GetUndoStack()->push(pCmd);
+			break;
+		}
+	}
 }
 
 void EntityWidget::on_actionAddPrimCapsule_triggered()
 {
+	QModelIndexList selectedIndexList = GetSelectedItems();
+	for(const QModelIndex &index : selectedIndexList)
+	{
+		EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pEntItemData->GetType() == ITEM_PrimNode)
+		{
+			QUndoCommand *pCmd = new EntityUndoCmd_AddPrimLayer(m_ItemRef, pEntItemData, HyGlobal::ShapeName(SHAPE_Capsule), -1);
+			m_ItemRef.GetUndoStack()->push(pCmd);
+			break;
+		}
+	}
 }
 
 void EntityWidget::on_actionAddPrimLineChain_triggered()
 {
+	QModelIndexList selectedIndexList = GetSelectedItems();
+	for(const QModelIndex &index : selectedIndexList)
+	{
+		EntityTreeItemData *pEntItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
+		if(pEntItemData->GetType() == ITEM_PrimNode)
+		{
+			QUndoCommand *pCmd = new EntityUndoCmd_AddPrimLayer(m_ItemRef, pEntItemData, HYLINECHAIN_Name, -1);
+			m_ItemRef.GetUndoStack()->push(pCmd);
+			break;
+		}
+	}
 }
 
 void EntityWidget::on_actionAddShape_triggered()
@@ -1324,7 +1401,7 @@ void EntityWidget::on_actionRemoveItems_triggered()
 	for(QModelIndex index : selectedIndices)
 	{
 		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
-		if(pCurItemData->GetEntType() == ENTTYPE_Item || pCurItemData->GetEntType() == ENTTYPE_ArrayItem)
+		if(pCurItemData->GetEntType() == ENTTYPE_Item || pCurItemData->GetEntType() == ENTTYPE_SubItem || pCurItemData->GetEntType() == ENTTYPE_ArrayItem)
 			poppedItemList.push_back(pCurItemData);
 	}
 
@@ -1442,7 +1519,12 @@ void EntityWidget::on_actionCopyEntityItems_triggered()
 	{
 		EntityTreeItemData *pTreeItemData = ui->nodeTree->model()->data(index, Qt::UserRole).value<EntityTreeItemData *>();
 		if(pTreeItemData->GetEntType() == ENTTYPE_Item || pTreeItemData->GetEntType() == ENTTYPE_ArrayItem)
-			selectedTreeItemDataList.push_back(pTreeItemData);
+		{
+			if(pTreeItemData->GetType() == ITEM_PrimNode)
+				HyGuiLog("PrimNode not implemented for copying to clipboard yet. Skipping " % pTreeItemData->GetCodeName(), LOGTYPE_Warning);
+			else
+				selectedTreeItemDataList.push_back(pTreeItemData);
+		}
 	}
 
 	QClipboard *pClipboard = QGuiApplication::clipboard();

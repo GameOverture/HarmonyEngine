@@ -492,7 +492,7 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_AddPrimitive::EntityUndoCmd_AddPrimitive(ProjectItemData &entityItemRef, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_AddPrimNode::EntityUndoCmd_AddPrimNode(ProjectItemData &entityItemRef, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_iIndex(iRowIndex),
 	m_pPrimitiveTreeItemData(nullptr)
@@ -500,11 +500,11 @@ EntityUndoCmd_AddPrimitive::EntityUndoCmd_AddPrimitive(ProjectItemData &entityIt
 	setText("Add New Primitive");
 }
 
-/*virtual*/ EntityUndoCmd_AddPrimitive::~EntityUndoCmd_AddPrimitive()
+/*virtual*/ EntityUndoCmd_AddPrimNode::~EntityUndoCmd_AddPrimNode()
 {
 }
 
-/*virtual*/ void EntityUndoCmd_AddPrimitive::redo() /*override*/
+/*virtual*/ void EntityUndoCmd_AddPrimNode::redo() /*override*/
 {
 	if(m_pPrimitiveTreeItemData == nullptr)
 		m_pPrimitiveTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewPrimNode(m_iIndex);
@@ -512,12 +512,45 @@ EntityUndoCmd_AddPrimitive::EntityUndoCmd_AddPrimitive(ProjectItemData &entityIt
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pPrimitiveTreeItemData, m_iIndex);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
-	pWidget->SetEditMode(m_pPrimitiveTreeItemData);
+	if(pWidget)
+		pWidget->RequestSelectedItems(QList<QUuid>() << m_pPrimitiveTreeItemData->GetThisUuid());
 }
 
-/*virtual*/ void EntityUndoCmd_AddPrimitive::undo() /*override*/
+/*virtual*/ void EntityUndoCmd_AddPrimNode::undo() /*override*/
 {
 	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pPrimitiveTreeItemData);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_AddPrimLayer::EntityUndoCmd_AddPrimLayer(ProjectItemData &entityItemRef, EntityTreeItemData *pPrimNodeTreeItemData, QString sLayerType, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_iIndex(iRowIndex),
+	m_pPrimNodeTreeItemData(pPrimNodeTreeItemData),
+	m_sLayerType(sLayerType),
+	m_pPrimLayerTreeItemData(nullptr)
+{
+	setText("Add New Primitive " + m_sLayerType + " Layer");
+}
+
+/*virtual*/ EntityUndoCmd_AddPrimLayer::~EntityUndoCmd_AddPrimLayer()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_AddPrimLayer::redo() /*override*/
+{
+	if(m_pPrimLayerTreeItemData == nullptr)
+		m_pPrimLayerTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewPrimLayer(m_pPrimNodeTreeItemData, m_sLayerType, m_iIndex);
+	else
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pPrimLayerTreeItemData, m_iIndex);
+
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	pWidget->SetEditMode(m_pPrimLayerTreeItemData);
+}
+
+/*virtual*/ void EntityUndoCmd_AddPrimLayer::undo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pPrimLayerTreeItemData);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	pWidget->SetEditMode(nullptr);

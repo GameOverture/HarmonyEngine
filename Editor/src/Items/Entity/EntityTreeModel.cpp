@@ -74,14 +74,14 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 			if(fusedItemArray.empty() || i >= fusedItemArray.size())
 				m_FusedTreeItemData[i] = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "m_ActorFixture", ITEM_ShapeFixture, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
 			else
-				m_FusedTreeItemData[i] = m_ModelRef.Cmd_AddExistingItem(fusedItemArray[i].toObject(), false, true, 0); //new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
+				m_FusedTreeItemData[i] = m_ModelRef.Cmd_AddExistingItem(fusedItemArray[i].toObject(), ENTTYPE_FusedItem, 0); //new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
 			break;
 
 		case ENTBASECLASS_HyGui:
 			if(fusedItemArray.empty() || i >= fusedItemArray.size())
 				m_FusedTreeItemData[i] = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "m_RootLayout", ITEM_UiLayout, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
 			else
-				m_FusedTreeItemData[i] = m_ModelRef.Cmd_AddExistingItem(fusedItemArray[i].toObject(), false, true, 0); //new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
+				m_FusedTreeItemData[i] = m_ModelRef.Cmd_AddExistingItem(fusedItemArray[i].toObject(), ENTTYPE_FusedItem, 0); //new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
 			break;
 		}
 	}
@@ -97,12 +97,19 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		for(int i = 0; i < itemListArray.size(); ++i)
 		{
 			if(itemListArray[i].isObject())
-				m_ModelRef.Cmd_AddExistingItem(itemListArray[i].toObject(), false, false, i);
+				m_ModelRef.Cmd_AddExistingItem(itemListArray[i].toObject(), ENTTYPE_Item, i);
 			else if(itemListArray[i].isArray())
 			{
+				EntityItemType eEntType = ENTTYPE_ArrayItem;
 				QJsonArray subItemArray = itemListArray[i].toArray();
+				if(subItemArray.empty() == false)
+					continue;
+
+				if(HyGlobal::GetTypeFromString(subItemArray[0].toObject()["itemType"].toString()) == ITEM_PrimLayer)
+					eEntType = ENTTYPE_SubItem;
+
 				for(int j = 0; j < subItemArray.size(); ++j)
-					m_ModelRef.Cmd_AddExistingItem(subItemArray[j].toObject(), true, false, j == 0 ? i : j); // TODO: Confirm why [0] uses index i
+					m_ModelRef.Cmd_AddExistingItem(subItemArray[j].toObject(), eEntType, j == 0 ? i : j);
 			}
 			else
 				HyGuiLog("EntityTreeModel::EntityTreeModel invalid JSON type", LOGTYPE_Error);
@@ -410,6 +417,16 @@ void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut,
 					layoutStack.push(pCurLayoutItem->GetChild(j));
 			}
 		}
+		else if(pCurItem->GetType() == ITEM_PrimNode)
+		{
+			// Insert all the prim node's subitems into the child list
+			TreeModelItem *pPrimNodeItem = pThisEntity->GetChild(i);
+			for(int j = 0; j < pPrimNodeItem->GetNumChildren(); ++j)
+			{
+				EntityTreeItemData *pSubItem = pPrimNodeItem->GetChild(j)->data(0).value<EntityTreeItemData *>();
+				childListOut.push_back(pSubItem);
+			}
+		}
 		else
 			childListOut.push_back(pCurItem);
 	}
@@ -473,7 +490,7 @@ EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
 		if(pCurItem == nullptr)
 			continue;
 
-		if(pCurItem->GetEntType() == ENTTYPE_ArrayFolder)
+		if(pCurItem->GetEntType() == ENTTYPE_ArrayFolder || pCurItem->GetType() == ITEM_PrimNode)
 		{
 			TreeModelItem *pArrayFolder = pThisEntity->GetChild(i);
 			for(int i = 0; i < pArrayFolder->GetNumChildren(); ++i)
@@ -849,29 +866,58 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocAssetTreeItem(IAssetItemData *pAss
 	return pNewItem;
 }
 
-EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow)
+EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descObj, EntityItemType eEntType, int iRow)
 {
-	ItemType eGuiType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
+	ItemType eItemType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
 	QString sCodeName = descObj["codeName"].toString();
-	if(bIsArrayItem == false)
+	if(eEntType != ENTTYPE_ArrayItem && eEntType != ENTTYPE_SubItem)
 		sCodeName = GenerateCodeName(sCodeName);
 
 	TreeModelItem *pParentTreeItem = nullptr;
-	if(HyGlobal::IsItemType_Fixture(eGuiType) == false)
-		pParentTreeItem = GetRootTreeItem();
+	if(HyGlobal::IsItemType_Fixture(eItemType) == false)
+	{
+		if(eItemType == ITEM_PrimLayer)
+		{
+			EntityTreeItemData *pPrimNode = nullptr;
+
+			QList<EntityTreeItemData *> childListOut, fixtureListOut, layoutListOut;
+			GetTreeItemData(childListOut, fixtureListOut, layoutListOut);
+			for(EntityTreeItemData *pChildItem : childListOut)
+			{
+				if(pChildItem->GetType() == ITEM_PrimNode && pChildItem->GetUuid() == QUuid(descObj["referencedItemUuid"].toString()))
+				{
+					pPrimNode = pChildItem;
+					break;
+				}
+			}
+			if(pPrimNode == nullptr)
+			{
+				HyGuiLog("EntityTreeModel::Cmd_AllocExistingTreeItem - Could not find parent PrimNode for PrimLayer item being added: " % sCodeName, LOGTYPE_Error);
+				return nullptr;
+			}
+
+			descObj.insert("codeName", pPrimNode->GetCodeName()); // Update codeName incase it has changed
+			pParentTreeItem = GetItem(FindIndex<EntityTreeItemData *>(pPrimNode, 0));
+		}
+		else
+			pParentTreeItem = GetRootTreeItem();
+	}
 	else
 		pParentTreeItem = GetFixtureFolderTreeItem();
 
-	bool bFoundArrayFolder = false;
-	if(bIsArrayItem)
-		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, sCodeName, eGuiType, iRow);
-
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, descObj, bIsArrayItem, bIsFusedItem);
-	if(pNewItem->IsLayoutItem() && bIsFusedItem == false)
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, descObj, eEntType);
+	if(pNewItem->IsLayoutItem() && eEntType != ENTTYPE_FusedItem)
 		m_GuiLayoutItemList.append(pNewItem);
 	else
 	{
-		iRow = (iRow < 0 || (bIsArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
+		if(eEntType == ENTTYPE_ArrayItem)
+		{
+			if(FindOrCreateArrayFolder(pParentTreeItem, sCodeName, eItemType, iRow) == false)
+				iRow = pParentTreeItem->GetNumChildren(); // Array folder was created at 'iRow' - now update iRow to be used for first array item (AKA iRow = 0)
+		}
+
+		if(iRow < 0)
+			iRow = pParentTreeItem->GetNumChildren();
 		InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 	}
 
@@ -923,7 +969,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocPrimLayerTreeItem(EntityTreeItemDa
 		return nullptr;
 	}
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "Layer", ITEM_PrimLayer, ENTTYPE_SubItem, pPrimNode->GetThisUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, pPrimNode->GetCodeName(), ITEM_PrimLayer, ENTTYPE_SubItem, pPrimNode->GetThisUuid(), QUuid::createUuid());
 	TreeModelItem *pParentTreeItem = GetItem(FindIndex<EntityTreeItemData *>(pPrimNode, 0));
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 	return pNewItem;
@@ -949,6 +995,17 @@ bool EntityTreeModel::Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow)
 	TreeModelItem *pParentTreeItem = nullptr;
 	if(pItem->IsFixtureItem())
 		pParentTreeItem = GetFixtureFolderTreeItem();
+	else if(pItem->GetType() == ITEM_PrimLayer)
+	{
+		EntityTreeItemData *pPrimNode = nullptr;
+		int primLayerIndex = GetPrimLayerIndex(pItem, pPrimNode);
+		if(primLayerIndex < 0 || pPrimNode == nullptr)
+		{
+			HyGuiLog("EntityTreeModel::Cmd_ReaddChild could not find parent PrimNode for PrimLayer item being readded", LOGTYPE_Error);
+			return false;
+		}
+		pParentTreeItem = GetItem(FindIndex<EntityTreeItemData *>(pPrimNode, 0));
+	}
 	else
 	{
 		pParentTreeItem = GetRootTreeItem();
@@ -967,7 +1024,8 @@ bool EntityTreeModel::Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow)
 	if(pItem->GetEntType() == ENTTYPE_ArrayItem)
 		bFoundArrayFolder = FindOrCreateArrayFolder(pParentTreeItem, pItem->GetCodeName(), pItem->GetType(), iRow);
 
-	iRow = (iRow < 0 || (pItem->GetEntType() == ENTTYPE_ArrayItem && bFoundArrayFolder == false)) ? pParentTreeItem->GetNumChildren() : iRow;
+	bool bAppendItem = (iRow < 0 || (pItem->GetEntType() == ENTTYPE_ArrayItem && bFoundArrayFolder == false));
+	iRow = bAppendItem ? pParentTreeItem->GetNumChildren() : iRow;
 	return InsertTreeItem(m_ModelRef.GetItem().GetProject(), pItem, pParentTreeItem, iRow);
 }
 
@@ -1031,7 +1089,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 		{
 			if(pItem->GetEntType() == ENTTYPE_ArrayFolder)
 				return QVariant(pItem->GetCodeName() % "[" % QString::number(pTreeItem->GetNumChildren()) % "]");
-			else if(pItem->GetEntType() == ENTTYPE_ArrayItem)
+			else if(pItem->GetEntType() == ENTTYPE_ArrayItem || pItem->GetEntType() == ENTTYPE_SubItem)
 				return QVariant("[" % QString::number(pTreeItem->GetIndex()) % "] - " % pItem->GetThisUuid().toString(QUuid::StringFormat::WithoutBraces).split('-')[0]);
 			else
 				return QVariant(pItem->GetCodeName());
@@ -1053,6 +1111,41 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 		if(indexRef.column() != COLUMN_CodeName)
 			return QVariant();
 
+		if(pItem->GetType() == ITEM_PrimLayer || pItem->GetType() == ITEM_ShapeFixture)
+		{
+			int iStateIndex = 0;
+			if(m_ModelRef.GetItem().GetWidget())
+				iStateIndex = m_ModelRef.GetItem().GetWidget()->GetCurStateIndex();
+			const EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_ModelRef.GetStateData(iStateIndex))->GetDopeSheetScene();
+
+			QIcon icon;
+			QString sIconUrl = ":/icons16x16/shapes/" % QString(pItem->GetType() == ITEM_PrimLayer ? "primitive_" : "shapes_");
+
+			EditorShape eShapeType = SHAPE_None;
+			QVariant dataVariant = dopeSheetSceneRef.BasicExtrapolateKeyFrameProperty(pItem, dopeSheetSceneRef.GetCurrentFrame(), pItem->GetType() == ITEM_PrimLayer ? "Primitive Layer" : "Shape", "Data");
+			if(dataVariant.isValid())
+			{
+				QJsonObject shapeDataObj = dataVariant.toJsonObject();
+				eShapeType = HyGlobal::GetShapeFromString(shapeDataObj["type"].toString());
+			}
+
+			switch(eShapeType)
+			{
+			case SHAPE_None:		sIconUrl += "icon.png"; break;
+			case SHAPE_Box:			sIconUrl += "box.png"; break;
+			case SHAPE_Circle:		sIconUrl += "circle.png"; break;
+			case SHAPE_LineSegment:	sIconUrl += "lineSeg.png"; break;
+			case SHAPE_Polygon:		sIconUrl += "polygon.png"; break;
+			case SHAPE_Capsule:		sIconUrl += "capsule.png"; break;
+			default: // Special case for primitives
+				sIconUrl += "lineChain.png";
+				break;
+			}
+
+			icon.addFile(sIconUrl);
+			return QVariant(icon);
+		}
+
 		if(pReferencedItemData)
 		{
 			if(pReferencedItemData->IsProjectItemData())
@@ -1071,34 +1164,6 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 			return QIcon(":/icons16x16/fixture-folder.png");
 		else if(pItem->GetEntType() == ENTTYPE_ArrayFolder)
 			return HyGlobal::ItemIcon(pItem->GetType(), SUBICON_Open);
-
-		if(pItem->GetType() == ITEM_PrimLayer || pItem->GetType() == ITEM_ShapeFixture)
-		{
-			int iStateIndex = 0;
-			if(m_ModelRef.GetItem().GetWidget())
-				iStateIndex = m_ModelRef.GetItem().GetWidget()->GetCurStateIndex();
-			const EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_ModelRef.GetStateData(iStateIndex))->GetDopeSheetScene();
-
-			QIcon icon;
-			QString sIconUrl = ":/icons16x16/shapes/" % QString(pItem->GetType() == ITEM_PrimLayer ? "primitive_" : "shapes_");
-
-			QString sShapeType = dopeSheetSceneRef.BasicExtrapolateKeyFrameProperty(pItem, dopeSheetSceneRef.GetCurrentFrame(), pItem->GetType() == ITEM_PrimLayer ? "Primitive Layer" : "Shape", "Type").toString();
-			switch(HyGlobal::GetShapeFromString(sShapeType))
-			{
-			case SHAPE_None:		sIconUrl += "icon.png"; break;
-			case SHAPE_Box:			sIconUrl += "box.png"; break;
-			case SHAPE_Circle:		sIconUrl += "circle.png"; break;
-			case SHAPE_LineSegment:	sIconUrl += "lineSeg.png"; break;
-			case SHAPE_Polygon:		sIconUrl += "polygon.png"; break;
-			case SHAPE_Capsule:		sIconUrl += "capsule.png"; break;
-			default: // Special case for primitives
-				sIconUrl += "lineChain.png";
-				break;
-			}
-
-			icon.addFile(sIconUrl);
-			return QVariant(icon);
-		}
 			
 		return QVariant(pItem->GetIcon(SUBICON_None));
 

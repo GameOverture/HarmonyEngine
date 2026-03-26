@@ -17,7 +17,7 @@ class GfxShapeModel : public IGfxEditModel
 {
 	friend class GfxPrimLayerModel;
 
-	EditorShape							m_eShapeType;			// "Shape", "Type" - when serialized in property (string)
+	EditorShape							m_eShapeType;			// "Data", "type" - when serialized in property (string)
 
 	// "Shape", "Data" - when serialized in property (QJsonArray of floats)
 	QList<HyShape2d *>					m_ShapeList;			// This is the actual shape data used for physics/collision/rendering - usually just one fixture, but could be multiple for complex polygons

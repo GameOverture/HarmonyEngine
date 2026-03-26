@@ -714,6 +714,7 @@ void EntityDraw::FlushRootEntity()
 {
 	glm::vec2 vWindowSize = HyEngine::Window().GetWindowSize();
 	m_EditModeWindowOutline.SetAsBox(0, HyRect(vWindowSize.x, vWindowSize.y), 5.0f);
+	m_EditModeWindowOutline.pos.Set(vWindowSize.x * 0.5f, vWindowSize.y * 0.5f);
 }
 
 /*virtual*/ void EntityDraw::OnRequestSelection(QList<IDrawExItem *> selectionList) /*override*/

@@ -328,15 +328,6 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 	{
 		IGfxEditModel *pModel = static_cast<IGfxEditView *>(pThisHyNode)->GetModel();
 
-		//if(sPropertyName == "Type")
-		//{
-		//	if(pThisHyNode->GetType() == ITEM_Primitive)
-		//		return QJsonValue(static_cast<GfxPrimLayerModel *>(pModel)->GetPrimType());
-		//	else if(pThisHyNode->GetType() == ITEM_ShapeFixture)
-		//		return QJsonValue(HyGlobal::ShapeName(static_cast<GfxShapeModel *>(pModel)->GetShapeType()));
-		//	else
-		//		HyGuiLog("EntityDrawItem::ExtractPropertyData - unhandled Type property for Fixture", LOGTYPE_Error);
-		//}
 		if(sPropertyName == "Data")
 		{
 			return m_pEntityTreeItemData->GetEditModel()->Serialize();

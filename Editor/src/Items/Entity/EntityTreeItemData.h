@@ -192,7 +192,9 @@ struct EntityPreviewComponent
 
 enum EntityItemType
 {
-	ENTTYPE_Root,
+	ENTTYPE_Unknown = -1,
+
+	ENTTYPE_Root = 0,
 	ENTTYPE_FixtureFolder,
 	ENTTYPE_FusedItem,
 	ENTTYPE_Item,
@@ -210,7 +212,6 @@ class EntityTreeItemData : public TreeModelItemData
 	EntityPropertiesTreeModel *							m_pPropertiesModel;
 	IGfxEditModel *										m_pEditModel;			// Only allocated when this item is capable of using Edit Mode
 
-	QString												m_sPromotedEntityType;
 	EntityItemDeclarationType							m_eDeclarationType;
 
 	QUuid												m_ReferencedItemUuid;
@@ -225,7 +226,7 @@ class EntityTreeItemData : public TreeModelItemData
 
 public:
 	EntityTreeItemData(EntityModel &entityModelRef, EntityItemDeclarationType eDeclarationType, QString sCodeName, ItemType eItemType, EntityItemType eEntType, QUuid uuidOfReferencedItem, QUuid uuidOfThis);
-	EntityTreeItemData(EntityModel &entityModelRef, QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem);
+	EntityTreeItemData(EntityModel &entityModelRef, QJsonObject descObj, EntityItemType eEntType);
 	virtual ~EntityTreeItemData();
 
 	bool IsSelectable() const;
@@ -243,7 +244,6 @@ public:
 	const QUuid &GetGuiParentUuid() const;
 	void SetGuiParentUuid(QUuid uuidOfGuiParent);
 
-	bool IsPromotedEntity() const;
 	EntityItemDeclarationType GetDeclarationType() const;
 
 	EntityModel &GetEntityModel() const;

@@ -236,9 +236,9 @@ QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewAssets(QList<IAssetItemDat
 	return treeNodeList;
 }
 
-EntityTreeItemData *EntityModel::Cmd_AddExistingItem(QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem, int iRow)
+EntityTreeItemData *EntityModel::Cmd_AddExistingItem(QJsonObject descObj, EntityItemType eEntType, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocExistingTreeItem(descObj, bIsArrayItem, bIsFusedItem, iRow);
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocExistingTreeItem(descObj, eEntType, iRow);
 
 	QUuid uuidToRegister(descObj["itemUUID"].toString());
 	if(uuidToRegister.isNull() == false)
@@ -304,8 +304,13 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewPasteItems(QJsonObject mimeOb
 	for(int i = 0; i < itemArray.size(); ++i)
 	{
 		QJsonObject itemObj = itemArray[i].toObject();
-
 		QJsonObject descObj = itemObj["descObj"].toObject();
+		ItemType eItemType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
+		if(eItemType == ITEM_PrimLayer)
+		{
+			HyGuiLog("EntityUndoCmd_PasteItems::redo - pasting a Primitive Layer not implemented", LOGTYPE_Error);
+			continue;
+		}
 
 		QUuid newUuid = QUuid::createUuid();
 		descObj.insert("UUID", newUuid.toString(QUuid::StringFormat::WithoutBraces));
@@ -314,8 +319,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewPasteItems(QJsonObject mimeOb
 		bool bIsArrayItem = false;
 		if(pArrayFolder)
 		{
-			ItemType eGuiType = HyGlobal::GetTypeFromString(descObj["itemType"].toString());
-			if(eGuiType != pArrayFolder->GetType())
+			if(eItemType != pArrayFolder->GetType())
 			{
 				HyGuiLog("EntityUndoCmd_PasteItems::redo - pasted array item (" % descObj["codeName"].toString() % ") " % descObj["itemType"].toString() % " did match array type", LOGTYPE_Error);
 				continue;
@@ -326,7 +330,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_AddNewPasteItems(QJsonObject mimeOb
 		}
 
 		// NOTE: Error checking the pasted item's states to match current entity should have already been done in EntityWidget::on_actionPasteEntityItems_triggered
-		EntityTreeItemData *pPastedTreeItemData = Cmd_AddExistingItem(descObj, bIsArrayItem, false, -1);
+		EntityTreeItemData *pPastedTreeItemData = Cmd_AddExistingItem(descObj, bIsArrayItem ? ENTTYPE_ArrayItem : ENTTYPE_Item, -1);
 		pastedItemList.push_back(pPastedTreeItemData);
 
 		// Merge the pasted key frame data into the states for the new item
@@ -376,7 +380,7 @@ QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewArray(QList<EntityTreeItem
 		descObj.insert("codeName", sArrayName);
 		descObj.insert("isSelected", false);
 
-		EntityTreeItemData *pDuplicateItem = Cmd_AddExistingItem(descObj, true, false, i == 0 ? iArrayFolderRow : -1);
+		EntityTreeItemData *pDuplicateItem = Cmd_AddExistingItem(descObj, ENTTYPE_ArrayItem, i == 0 ? iArrayFolderRow : -1);
 		newItemDataList.push_back(pDuplicateItem);
 
 		// Copy all its property/key frames into the newly created item
@@ -490,14 +494,14 @@ void EntityModel::Cmd_RenameItem(EntityTreeItemData *pItemData, QString sNewName
 		for(TreeModelItemData *pItemData : arrayChildrenList)
 			pItemData->SetText(sNewName);
 	}
-	else if(pItemData->GetEntType() == ENTTYPE_ArrayItem)
+	else if(pItemData->GetEntType() == ENTTYPE_ArrayItem || pItemData->GetEntType() == ENTTYPE_SubItem)
 	{
-		QModelIndex arrayFolderIndex = m_TreeModel.parent(m_TreeModel.FindIndex<EntityTreeItemData *>(pItemData, 0));
-		EntityTreeItemData *pArrayFolderItemData = m_TreeModel.data(arrayFolderIndex, Qt::UserRole).value<EntityTreeItemData *>();
+		QModelIndex parentFolderIndex = m_TreeModel.parent(m_TreeModel.FindIndex<EntityTreeItemData *>(pItemData, 0));
+		EntityTreeItemData *pParentFolderItemData = m_TreeModel.data(parentFolderIndex, Qt::UserRole).value<EntityTreeItemData *>();
 
-		pArrayFolderItemData->SetText(sNewName);
+		pParentFolderItemData->SetText(sNewName);
 
-		QList<TreeModelItemData *> arrayChildrenList = m_TreeModel.GetItemsRecursively(arrayFolderIndex);
+		QList<TreeModelItemData *> arrayChildrenList = m_TreeModel.GetItemsRecursively(parentFolderIndex);
 		for(TreeModelItemData *pItemData : arrayChildrenList)
 			pItemData->SetText(sNewName);
 	}
@@ -523,12 +527,7 @@ QString EntityModel::GenerateSrc_FileIncludes() const
 		if(pItem->GetType() != ITEM_Entity)
 			continue;
 
-		QString sIncludeFileName;
-		if(pItem->IsPromotedEntity() == false)
-			sIncludeFileName = "hy_" + pItem->GetHyNodeTypeName(false) + ".h";
-		else
-			sIncludeFileName = pItem->GetHyNodeTypeName(false) + ".h";
-		
+		QString sIncludeFileName = "hy_" + pItem->GetHyNodeTypeName(false) + ".h";
 		sIncludeList.append(sIncludeFileName);
 	}
 	sIncludeList.removeDuplicates();
@@ -594,13 +593,13 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 		else
 			sSrc += " ";
 		sSrc += pItem->GetCodeName();
-		if(pItem->GetEntType() != ENTTYPE_ArrayItem)
-			sSrc += ";\n";
-		else
+		if(pItem->GetEntType() == ENTTYPE_ArrayItem)
 		{
 			sSrc += "[" + QString::number(m_TreeModel.GetArrayFolderTreeItem(pItem)->GetNumChildren()) + "];\n";
 			pCurArray = pItem;
 		}
+		else if(pItem->GetEntType() != ENTTYPE_SubItem)
+			sSrc += ";\n";
 	}
 
 	return sSrc;
@@ -631,7 +630,7 @@ QString EntityModel::GenerateSrc_AccessorDecl() const
 				arrayList.push_back(sCodeName);
 			}
 		}
-		else if(pItem->IsLayoutItem() == false)
+		else if(pItem->IsLayoutItem() == false && pItem->GetEntType() != ENTTYPE_SubItem)
 		{
 			sSrc += "\n\t" + pItem->GetHyNodeTypeName(true) +
 				(pItem->GetDeclarationType() == ENTDECLTYPE_Static ? " &" : " *") +
@@ -652,6 +651,9 @@ QString EntityModel::GenerateSrc_AccessorDefinition(QString sClassName) const
 	QStringList arrayList;
 	for(EntityTreeItemData *pItem : itemList)
 	{
+		if(pItem->IsLayoutItem() || pItem->GetEntType() == ENTTYPE_SubItem)
+			continue;
+
 		QString sCodeName = pItem->GetCodeName();
 		if(sCodeName.startsWith("m_"))
 			sCodeName.remove(0, 2);
@@ -739,7 +741,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 	EntityTreeItemData *pCurArray = nullptr;
 	for(EntityTreeItemData *pItem : itemList)
 	{
-		if(pItem->IsLayoutItem())
+		if(pItem->IsLayoutItem() || pItem->GetEntType() == ENTTYPE_SubItem)
 			continue;
 
 		if(pCurArray)
@@ -1706,7 +1708,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 			continue;
 		}
 
-		if(childList[i]->GetEntType() == ENTTYPE_ArrayItem && sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) != 0)
+		if((childList[i]->GetEntType() == ENTTYPE_ArrayItem || childList[i]->GetEntType() == ENTTYPE_SubItem) && sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) != 0) // sCurrentArrayCodeName not equal to this array item's code name means new array to pack
 		{
 			sCurrentArrayCodeName = childList[i]->GetCodeName();
 			QJsonArray packedArray;
@@ -1718,7 +1720,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 				packedArray.append(arrayItemObj);
 				++i;
 
-			} while(i < childList.size() && childList[i]->GetEntType() == ENTTYPE_ArrayItem && sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) == 0);
+			} while(i < childList.size() && (childList[i]->GetEntType() == ENTTYPE_ArrayItem || childList[i]->GetEntType() == ENTTYPE_SubItem) && sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) == 0);
 
 			childArray.append(packedArray);
 		}

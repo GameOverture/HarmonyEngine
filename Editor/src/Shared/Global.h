@@ -68,6 +68,8 @@ class Project;
 
 #define HYMETA_FontsDir							"Fonts/"
 
+#define HYLINECHAIN_Name						"Line Chain"
+
 #define HYMETA_ImageFilterList					{"*.png", "*.*"}
 #define HYMETA_FontFilterList					{"*.ttf", "*.otf"}
 

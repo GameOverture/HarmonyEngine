@@ -42,9 +42,9 @@ void WgtShapeData::Init(ShapeDataType eShapeDataType, QJsonObject serializedObj)
 	switch(eShapeDataType)
 	{
 	case SHAPEDATATYPE_Primitive:
-		sComboBoxList.append("Line Chain");
+		sComboBoxList.append(HYLINECHAIN_Name);
 		ui->cmbPrimType->addItems(sComboBoxList);
-		if(serializedObj["type"].toString() == "Line Chain")
+		if(serializedObj["type"].toString() == HYLINECHAIN_Name)
 			ui->cmbPrimType->setCurrentIndex(sComboBoxList.size() - 1);
 		else
 			ui->cmbPrimType->setCurrentIndex(HyGlobal::GetShapeFromString(serializedObj["type"].toString()));
@@ -81,7 +81,7 @@ QVariant WgtShapeData::GetValue()
 		break;
 
 	case SHAPEDATATYPE_Chain:
-		serializedObj.insert("type", "Line Chain");
+		serializedObj.insert("type", HYLINECHAIN_Name);
 		serializedObj.insert("outline", 1.0f);
 		break;
 

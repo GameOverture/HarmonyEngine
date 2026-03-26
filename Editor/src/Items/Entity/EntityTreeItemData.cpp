@@ -68,17 +68,16 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, EntityItemDe
 	ptrVariant.setValue<TreeModelItemData *>(this);
 	m_pPropertiesModel = new EntityPropertiesTreeModel(entityModelRef.GetItem(), -1, ptrVariant, this);
 
-	if(m_eEntType == ENTTYPE_Root || m_eEntType == ENTTYPE_FusedItem || m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_ArrayItem)
+	if(m_eEntType == ENTTYPE_Root || m_eEntType == ENTTYPE_FusedItem || m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_SubItem || m_eEntType == ENTTYPE_ArrayItem)
 		InitalizePropertyModel();
 }
 
-EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject descObj, bool bIsArrayItem, bool bIsFusedItem) :
+EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject descObj, EntityItemType eEntType) :
 	TreeModelItemData(HyGlobal::GetTypeFromString(descObj["itemType"].toString()), QUuid(descObj["UUID"].toString()), descObj["codeName"].toString()),
 	m_EntityModelRef(entityModelRef),
-	m_eEntType(bIsArrayItem ? ENTTYPE_ArrayItem : (bIsFusedItem ? ENTTYPE_FusedItem : ENTTYPE_Item)),
+	m_eEntType(eEntType),
 	m_pPropertiesModel(nullptr),
 	m_pEditModel(nullptr),
-	m_sPromotedEntityType(descObj["promotedEntityType"].toString()),
 	m_eDeclarationType(HyGlobal::GetEntityDeclType(descObj["declarationType"].toString())),
 	m_ReferencedItemUuid(descObj["itemUUID"].toString()),
 	m_bIsLocked(descObj["isLocked"].toBool(false)),
@@ -133,9 +132,6 @@ QString EntityTreeItemData::GetHyNodeTypeName(bool bIncludeNamespace) const
 	case ITEM_ShapeFixture: 	return "HyShape2d";
 	case ITEM_ChainFixture: 	return "HyChain2d";
 	case ITEM_Entity: {
-		if(m_sPromotedEntityType.isEmpty() == false)
-			return m_sPromotedEntityType;
-
 		QUuid referencedItemUuid = GetReferencedItemUuid();
 		ProjectItemData *pReferencedItemData = static_cast<ProjectItemData *>(m_EntityModelRef.GetItem().GetProject().FindItemData(referencedItemUuid));
 		if(pReferencedItemData == nullptr)
@@ -201,11 +197,6 @@ void EntityTreeItemData::SetGuiParentUuid(QUuid uuidOfGuiParent)
 	m_GuiParentUuid = uuidOfGuiParent;
 }
 
-bool EntityTreeItemData::IsPromotedEntity() const
-{
-	return m_sPromotedEntityType.isEmpty() == false;
-}
-
 EntityItemDeclarationType EntityTreeItemData::GetDeclarationType() const
 {
 	return m_eDeclarationType;
@@ -263,7 +254,7 @@ EntityPreviewComponent &EntityTreeItemData::GetPreviewComponent()
 
 int EntityTreeItemData::GetArrayIndex() const
 {
-	if(m_eEntType == ENTTYPE_ArrayItem)
+	if(m_eEntType == ENTTYPE_ArrayItem || m_eEntType == ENTTYPE_SubItem)
 	{
 		QModelIndex thisIndex = m_EntityModelRef.GetTreeModel().FindIndex<EntityTreeItemData *>(const_cast<EntityTreeItemData *>(this), 0);
 		if(thisIndex.isValid())
@@ -277,12 +268,12 @@ int EntityTreeItemData::GetArrayIndex() const
 
 int EntityTreeItemData::GetNumArrayItems() const
 {
-	if(m_eEntType == ENTTYPE_ArrayItem)
+	if(m_eEntType == ENTTYPE_ArrayItem || m_eEntType == ENTTYPE_SubItem)
 	{
 		QModelIndex thisIndex = m_EntityModelRef.GetTreeModel().FindIndex<EntityTreeItemData *>(const_cast<EntityTreeItemData *>(this), 0);
-		QModelIndex arrayFolderIndex = m_EntityModelRef.GetTreeModel().parent(thisIndex);
-		if(thisIndex.isValid() && arrayFolderIndex.isValid())
-			return m_EntityModelRef.GetTreeModel().rowCount(arrayFolderIndex);
+		QModelIndex parentFolderIndex = m_EntityModelRef.GetTreeModel().parent(thisIndex);
+		if(thisIndex.isValid() && parentFolderIndex.isValid())
+			return m_EntityModelRef.GetTreeModel().rowCount(parentFolderIndex);
 		else
 			HyGuiLog("EntityTreeItemData::GetNumArrayItems() - Failed to find parent index of this array item", LOGTYPE_Error);
 	}
@@ -296,7 +287,6 @@ void EntityTreeItemData::InsertJsonInfo_Desc(QJsonObject &childObjRef)
 	childObjRef.insert("codeName", GetCodeName());
 	childObjRef.insert("itemType", HyGlobal::ItemName(m_eTYPE, false));
 	childObjRef.insert("UUID", GetUuid().toString(QUuid::WithoutBraces));
-	childObjRef.insert("promotedEntityType", m_sPromotedEntityType);
 	childObjRef.insert("declarationType", ENTITYITEMDECLARATIONTYPE_STRINGS[m_eDeclarationType]);
 	childObjRef.insert("itemUUID", m_ReferencedItemUuid.toString(QUuid::WithoutBraces));
 	childObjRef.insert("isLocked", m_bIsLocked);
@@ -321,7 +311,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	const double dRANGE = 16777215.0;
 
 	const bool bIsBody = GetType() != ITEM_Audio;
-	if(HyGlobal::IsItemType_Project(m_eTYPE) || IsWidgetItem())
+	if(HyGlobal::IsItemType_Project(m_eTYPE) || IsWidgetItem() || m_eTYPE == ITEM_PrimNode)
 	{
 		if(GetEntType() == ENTTYPE_Root || GetType() == ITEM_Entity)
 		{
@@ -330,14 +320,14 @@ void EntityTreeItemData::InitalizePropertyModel()
 			m_pPropertiesModel->AppendProperty("Timeline", "Pause", PROPERTIESTYPE_bool, Qt::Unchecked, "Pausing the timeline will stop processing key frames, after this frame", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Timeline", "Frame", PROPERTIESTYPE_int, 0, "Jump to a different frame on the timeline, after processing this frame", PROPERTIESACCESS_ToggleUnchecked, 0, iRANGE, 1);
 		}
-		else if(IsAssetItem() == false)
+		else if(IsAssetItem() == false && IsWidgetItem() == false && m_eTYPE != ITEM_PrimNode)
 		{
 			m_pPropertiesModel->InsertCategory(-1, "Common");
 			m_pPropertiesModel->AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(GetType(), false) % "'s state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 		}
 
 		m_pPropertiesModel->InsertCategory(-1, "Common"); // Will just return 'false' if "Common" category already exists
-		m_pPropertiesModel->AppendProperty("Common", "Update During Paused", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Common", "Update During Pause", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 
 		m_pPropertiesModel->InsertCategory(-1, "Transformation");
@@ -389,6 +379,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	switch(GetType())
 	{
 	case ITEM_PrimNode:
+
 		break;
 	case ITEM_PrimLayer: {
 		

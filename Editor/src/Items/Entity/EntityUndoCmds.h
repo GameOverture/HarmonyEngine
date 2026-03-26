@@ -160,7 +160,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EntityUndoCmd_AddPrimitive : public QUndoCommand
+class EntityUndoCmd_AddPrimNode : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
 	int32							m_iIndex;
@@ -168,8 +168,29 @@ class EntityUndoCmd_AddPrimitive : public QUndoCommand
 	EntityTreeItemData *			m_pPrimitiveTreeItemData;
 
 public:
-	EntityUndoCmd_AddPrimitive(ProjectItemData &entityItemRef, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_AddPrimitive();
+	EntityUndoCmd_AddPrimNode(ProjectItemData &entityItemRef, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddPrimNode();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_AddPrimLayer : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	int32							m_iIndex;
+
+	EntityTreeItemData *			m_pPrimNodeTreeItemData;
+	QString							m_sLayerType;
+
+	EntityTreeItemData *			m_pPrimLayerTreeItemData;
+
+public:
+	EntityUndoCmd_AddPrimLayer(ProjectItemData &entityItemRef, EntityTreeItemData *pPrimNodeTreeItemData,  QString sLayerType, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddPrimLayer();
 
 	virtual void redo() override;
 	virtual void undo() override;
