@@ -42,8 +42,9 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 
 /*virtual*/ void GfxChainView::OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) /*override*/
 {
-	if(m_pModel == nullptr)
+	if(eEditModeState == EDITMODE_Off || m_pModel == nullptr)
 	{
+		m_CenterGrabPoint.SetVisible(false);
 		m_PrimOutline.SetAsNothing(0);
 		return;
 	}
@@ -188,4 +189,9 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 		}
 		break;
 	}
+}
+
+GfxChainModel *GfxChainView::GetChainModel()
+{
+	return static_cast<GfxChainModel *>(m_pModel);
 }

@@ -40,12 +40,13 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 
 /*virtual*/ void GfxShapeHyView::OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) /*override*/
 {
-	if(m_pModel == nullptr || static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_None)
+	if(eEditModeState == EDITMODE_Off || m_pModel == nullptr || GetShapeModel()->GetShapeType() == SHAPE_None || GetShapeModel()->GetNumShapeFixtures() == 0)
 	{
+		m_CenterGrabPoint.SetVisible(false);
 		m_Prim.RemoveAllLayers();
 		return;
 	}
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Sync Primitives with Model
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
@@ -309,4 +310,9 @@ void GfxShapeHyView::DoGrabPointPreview(EditModeState eEditModeState, EditModeAc
 		HyGuiLog("GfxShapeHyView::DoHoverGrabPoint - Unsupported shape type for grab point transform: " % QString::number(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType()), LOGTYPE_Error);
 		break;
 	}
+}
+
+GfxShapeModel *GfxShapeHyView::GetShapeModel()
+{
+	return static_cast<GfxShapeModel *>(m_pModel);
 }

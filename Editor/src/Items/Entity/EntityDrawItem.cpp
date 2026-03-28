@@ -205,7 +205,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 
 /*virtual*/ bool EntityDrawItem::IsSelectable() const /*override*/
 {
-	return m_pEntityTreeItemData->IsSelectable() && m_pEntityTreeItemData->IsFixtureItem() == false;
+	return m_pEntityTreeItemData->IsSelectable() && m_pEntityTreeItemData->IsFixtureItem() == false && m_pEntityTreeItemData->GetType() != ITEM_PrimLayer;
 }
 
 /*virtual*/ bool EntityDrawItem::IsSelected() /*override*/
@@ -215,19 +215,10 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 
 /*virtual*/ void EntityDrawItem::RefreshTransform() /*override*/
 {
-	IDrawExItem::RefreshTransform();
-
-	if(m_pEditView)
-	{
-		EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_pEntityTreeItemData->GetEntityModel().GetItem().GetDraw());
-		if(pEntityDraw)
-		{
-			if(pEntityDraw->GetCurEditItem() == this)
-				m_pEditView->GetModel()->SyncViews(pEntityDraw->GetEditModeState(), EDITMODEACTION_None);
-			else
-				m_pEditView->GetModel()->SyncViews(EDITMODE_Off, EDITMODEACTION_None);
-		}
-	}
+	if(m_pEntityTreeItemData->GetType() == ITEM_PrimLayer)
+		m_Transform.Hide();
+	else
+		IDrawExItem::RefreshTransform();
 }
 
 IGfxEditView *EntityDrawItem::GetEditView()

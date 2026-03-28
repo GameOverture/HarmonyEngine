@@ -13,6 +13,8 @@
 #include "Global.h"
 #include "IGfxEditView.h"
 
+class GfxShapeModel;
+
 class GfxShapeHyView : public IGfxEditView
 {
 	friend class GfxPrimitiveView;
@@ -39,6 +41,8 @@ protected:
 	virtual void OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) override;
 
 	void DoGrabPointPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta);
+
+	GfxShapeModel *GetShapeModel();
 };
 
 #endif // GfxShapeHyView_H

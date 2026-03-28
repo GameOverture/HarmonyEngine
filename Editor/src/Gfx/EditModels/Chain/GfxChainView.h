@@ -13,6 +13,8 @@
 #include "Global.h"
 #include "IGfxEditView.h"
 
+class GfxChainModel;
+
 class GfxChainView : public IGfxEditView
 {
 	friend class GfxPrimitiveView;
@@ -30,6 +32,8 @@ public:
 protected:
 	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) override;
 	virtual void OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) override;
+
+	GfxChainModel *GetChainModel();
 };
 
 #endif // GfxChainView_H
