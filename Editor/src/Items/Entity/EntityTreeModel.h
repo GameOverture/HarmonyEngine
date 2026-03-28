@@ -38,6 +38,7 @@ public:
 	{
 		COLUMN_CodeName = 0,
 		COLUMN_ItemPath,
+		COLUMN_EditMode,
 
 		NUMCOLUMNS
 	};

@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "EntityTreeModel.h"
 #include "EntityModel.h"
+#include "EntityDraw.h"
 #include "Project.h"
 #include "ExplorerModel.h"
 #include "EntityWidget.h"
@@ -1094,7 +1095,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 			else
 				return QVariant(pItem->GetCodeName());
 		}
-		else // COLUMN_ItemPath
+		else if(indexRef.column() == COLUMN_ItemPath)
 		{
 			if(pReferencedItemData)
 			{
@@ -1106,8 +1107,24 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 			
 			return QVariant();
 		}
+		else // COLUMN_EditModeBtn
+			return QVariant();
 
 	case Qt::DecorationRole:	// The data to be rendered as a decoration in the form of an icon. (QColor, QIcon or QPixmap)
+		if(indexRef.column() == COLUMN_EditMode)
+		{
+			if(pItem->GetEditModel())
+			{
+				EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ModelRef.GetItem().GetDraw());
+				if(pEntityDraw && pEntityDraw->GetCurEditItem() && pEntityDraw->GetCurEditItem()->GetEntityTreeItemData() == pItem)
+					return QVariant(QIcon(":/icons16x16/generic-editMode.png"));
+				else
+					return QVariant(QIcon(":/icons16x16/generic-editMode-disabled.png"));
+			}
+
+			return QVariant();
+		}
+
 		if(indexRef.column() != COLUMN_CodeName)
 			return QVariant();
 
@@ -1180,13 +1197,17 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 /*virtual*/ Qt::ItemFlags EntityTreeModel::flags(const QModelIndex &indexRef) const /*override*/
 {
 	EntityTreeItemData *pItem = GetItem(indexRef)->data(0).value<EntityTreeItemData *>();
-
 	Qt::ItemFlags returnFlags = Qt::NoItemFlags;
-	if(pItem->IsSelectable())
-		returnFlags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-	
-	//if(pItem->GetEntType() == ENTTYPE_FixtureFolder)
-	//	returnFlags |= Qt::ItemIsEnabled;
+
+	if(indexRef.column() == COLUMN_EditMode)
+	{
+		returnFlags |= Qt::ItemIsEnabled;
+	}
+	else
+	{
+		if(pItem->IsSelectable())
+			returnFlags |= Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+	}
 	
 	return returnFlags;
 }

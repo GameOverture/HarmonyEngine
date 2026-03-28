@@ -75,6 +75,7 @@ private Q_SLOTS:
 	void on_cmbBaseClass_activated(int iIndex);
 
 	void OnContextMenu(const QPoint &pos);
+	void OnTreeFocusIndexChanged(const QModelIndex &curIndex, const QModelIndex &prevIndex);
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void OnCollapsedNode(const QModelIndex &indexRef);
 

@@ -570,7 +570,7 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 	EntityTreeItemData *pCurArray = nullptr;
 	for(EntityTreeItemData *pItem : itemList)
 	{
-		if(pItem->IsLayoutItem())
+		if(pItem->IsLayoutItem() || pItem->GetType() == ITEM_PrimLayer)
 			continue;
 
 		if(pCurArray)

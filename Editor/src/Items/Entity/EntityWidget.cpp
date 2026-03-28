@@ -86,10 +86,17 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 
 	ui->nodeTree->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->nodeTree, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(OnContextMenu(const QPoint &)));
-
-	connect(ui->nodeTree->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(OnTreeSelectionChanged(const QItemSelection &, const QItemSelection &)));
-
 	connect(ui->nodeTree, SIGNAL(collapsed(const QModelIndex &)), this, SLOT(OnCollapsedNode(const QModelIndex &)));
+	connect(ui->nodeTree->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(OnTreeSelectionChanged(const QItemSelection &, const QItemSelection &)));
+	connect(ui->nodeTree->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(OnTreeFocusIndexChanged(const QModelIndex &, const QModelIndex &)));
+
+	//static_assert(2 == EntityTreeModel::COLUMN_EditMode, "szNoHighlightStyle below needs to be updated if COLUMN_EditMode changes");
+	//const char *const szNoHighlightStyle = R"src(srcQTreeView::item:column(2):hover {
+	//	background-color: transparent;
+	//	selection-background-color: transparent;
+	//}
+	//)src";
+	//ui->nodeTree->setStyleSheet(szNoHighlightStyle);
 
 	// Initialize what items are selected in the model
 	QList<EntityTreeItemData *> childList, shapeList, layoutList;
@@ -610,11 +617,13 @@ void EntityWidget::SetEditMode(EntityTreeItemData *pItemToEdit)
 	if(ui->nodeTree == nullptr)
 		return;
 
-	// TODO: Use formula to account for device pixels and scaling using QWindow::devicePixelRatio()
-	const int iInfoColumnWidth = 130;
+	const int iItemPathColumnWidth = 132;
+	const int iEditModeColumnWidth = 25;
 
 	int iTotalWidth = ui->nodeTree->size().width();
-	ui->nodeTree->setColumnWidth(0, iTotalWidth - iInfoColumnWidth);
+	ui->nodeTree->setColumnWidth(EntityTreeModel::COLUMN_CodeName, iTotalWidth - iItemPathColumnWidth - iEditModeColumnWidth);
+	ui->nodeTree->setColumnWidth(EntityTreeModel::COLUMN_ItemPath, iItemPathColumnWidth);
+	ui->nodeTree->setColumnWidth(EntityTreeModel::COLUMN_EditMode, iEditModeColumnWidth);
 }
 
 void EntityWidget::StopPreview()
@@ -718,6 +727,27 @@ void EntityWidget::OnContextMenu(const QPoint &pos)
 {
 	if(m_ContextMenu.isEmpty() == false)
 		m_ContextMenu.exec(ui->nodeTree->mapToGlobal(pos));
+}
+
+void EntityWidget::OnTreeFocusIndexChanged(const QModelIndex &curIndex, const QModelIndex &prevIndex)
+{
+	if(curIndex.column() == EntityTreeModel::COLUMN_EditMode)
+	{
+		QModelIndex indexWithData = ui->nodeTree->model()->index(curIndex.row(), 0, curIndex.parent());
+		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(indexWithData, Qt::UserRole).value<EntityTreeItemData *>();
+		EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+		if(pCurItemData == nullptr || pEntityDraw == nullptr)
+			return;
+
+		EntityDrawItem *pActiveEditDrawItem = pEntityDraw->GetCurEditItem();
+
+		if(pActiveEditDrawItem && pActiveEditDrawItem->GetEntityTreeItemData() == pCurItemData)
+			SetEditMode(nullptr); // Turn off edit mode
+		else if(pCurItemData->IsEditable())
+			SetEditMode(pCurItemData); // Turn on edit mode for the newly focused item
+
+		ui->nodeTree->selectionModel()->setCurrentIndex(indexWithData, QItemSelectionModel::Select); // Unfocus COLUMN_EditMode to allow toggling the button
+	}
 }
 
 void EntityWidget::OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)

@@ -406,5 +406,7 @@
         <file>icons16x16/items/Spacer-Pending.png</file>
         <file>icons16x16/items/Spacer-Settings.png</file>
         <file>icons16x16/items/Spacer-Warning.png</file>
+        <file>icons16x16/generic-editMode.png</file>
+        <file>icons16x16/generic-editMode-disabled.png</file>
     </qresource>
 </RCC>
