@@ -84,7 +84,7 @@ void GfxTransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShape
 		ptTransformPos = mtxShapeTransform * ptTransformPos;
 		HySetVec(ptGrabPos[i], ptTransformPos.x, ptTransformPos.y);
 		
-		m_GrabPointModels[i]->Setup(ptGrabPos[i]);
+		m_GrabPointModels[i]->SetPos(ptGrabPos[i]);
 		m_GrabPointViews[i]->Sync(m_GrabPointModels[i]);
 	}
 

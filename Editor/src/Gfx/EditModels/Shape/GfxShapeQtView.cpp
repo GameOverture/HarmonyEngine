@@ -30,19 +30,6 @@ GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
 	delete m_pGfxPolygonItem;
 }
 
-/*virtual*/ void GfxShapeQtView::SyncColor() /*override*/
-{
-	if(m_pModel == nullptr)
-		return;
-
-	m_pGfxPolygonItem->setBrush(QBrush(HyGlobal::ConvertHyColor(m_pModel->GetColor())));
-	m_pGfxPolygonItem->setPen(QPen(HyGlobal::ConvertHyColor(m_pModel->GetColor().IsDark() ? HyColor::White : HyColor::Black), 1.0f));
-}
-
-/*virtual*/ void GfxShapeQtView::ClearPreview() /*override*/
-{
-}
-
 /*virtual*/ QRectF GfxShapeQtView::boundingRect() const /*override*/
 {
 	return m_pGfxPolygonItem->boundingRect().adjusted(-5, -5, 5, 5); // Adjusted for grab points
@@ -52,6 +39,15 @@ GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
 {
 	// Intentionally left blank since we are using child QGraphicsItems for rendering
 }
+
+///*virtual*/ void GfxShapeQtView::OnSyncColor() /*override*/
+//{
+//	if(m_pModel == nullptr)
+//		return;
+//
+//	m_pGfxPolygonItem->setBrush(QBrush(HyGlobal::ConvertHyColor(m_pModel->GetColor())));
+//	m_pGfxPolygonItem->setPen(QPen(HyGlobal::ConvertHyColor(m_pModel->GetColor().IsDark() ? HyColor::White : HyColor::Black), 1.0f));
+//}
 
 /*virtual*/ void GfxShapeQtView::OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) /*override*/
 {
@@ -66,8 +62,4 @@ GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
 
 	QPolygonF polygon;
 	const QList<GfxGrabPointModel> &grabPointListRef = m_pModel->GetGrabPointList();
-}
-
-/*virtual*/ void GfxShapeQtView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
-{
 }

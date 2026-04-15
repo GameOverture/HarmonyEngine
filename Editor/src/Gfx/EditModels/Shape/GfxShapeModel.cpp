@@ -328,7 +328,7 @@ bool GfxShapeModel::IsLoopClosed() const
 				m_bLoopClosed = floatList.back() != 0.0f;
 			}
 		}
-		m_GrabPointCenter.Setup(ptCentroid);
+		m_GrabPointCenter.SetPos(ptCentroid);
 	}
 
 	// grabPointList is allowed to be empty, otherwise it will have proper data for the shape type
@@ -348,7 +348,7 @@ bool GfxShapeModel::IsLoopClosed() const
 
 			m_GrabPointList.resize(4);
 			for(int i = 0; i < 4; ++i)
-				m_GrabPointList[i].Setup(GRABPOINT_ShapeCtrlAll, grabPointList[i]);
+				m_GrabPointList[i].Set(GRABPOINT_ShapeCtrlAll, grabPointList[i]);
 			break;
 
 		case SHAPE_Circle:
@@ -356,10 +356,10 @@ bool GfxShapeModel::IsLoopClosed() const
 				return "Invalid circle shape data";
 
 			m_GrabPointList.resize(4);
-			m_GrabPointList[0].Setup(GRABPOINT_ShapeCtrlVert, grabPointList[0]); // Top
-			m_GrabPointList[1].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[1]); // Right
-			m_GrabPointList[2].Setup(GRABPOINT_ShapeCtrlVert, grabPointList[2]); // Bottom
-			m_GrabPointList[3].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[3]); // Left
+			m_GrabPointList[0].Set(GRABPOINT_ShapeCtrlVert, grabPointList[0]); // Top
+			m_GrabPointList[1].Set(GRABPOINT_ShapeCtrlHorz, grabPointList[1]); // Right
+			m_GrabPointList[2].Set(GRABPOINT_ShapeCtrlVert, grabPointList[2]); // Bottom
+			m_GrabPointList[3].Set(GRABPOINT_ShapeCtrlHorz, grabPointList[3]); // Left
 			break;
 
 		case SHAPE_LineSegment:
@@ -367,8 +367,8 @@ bool GfxShapeModel::IsLoopClosed() const
 				return "Invalid line segment shape data";
 
 			m_GrabPointList.resize(2);
-			m_GrabPointList[0].Setup(GRABPOINT_ShapeCtrlAll, grabPointList[0]);
-			m_GrabPointList[1].Setup(GRABPOINT_ShapeCtrlAll, grabPointList[1]);
+			m_GrabPointList[0].Set(GRABPOINT_ShapeCtrlAll, grabPointList[0]);
+			m_GrabPointList[1].Set(GRABPOINT_ShapeCtrlAll, grabPointList[1]);
 			break;
 
 		case SHAPE_Polygon:
@@ -378,15 +378,15 @@ bool GfxShapeModel::IsLoopClosed() const
 				if(static_cast<int>(m_GrabPointList.size()) - 1 < i)
 					m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, grabPointList[i]));
 				else
-					m_GrabPointList[i].Setup(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
+					m_GrabPointList[i].Set(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
 			}
 			if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
 				m_GrabPointList.resize(grabPointList.size());
 
 			if(m_bLoopClosed == false && m_GrabPointList.size() > 1)
 			{
-				m_GrabPointList.front().Setup(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
-				m_GrabPointList.back().Setup(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
+				m_GrabPointList.front().SetType(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
+				m_GrabPointList.back().SetType(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
 			}
 			break;
 
@@ -395,12 +395,12 @@ bool GfxShapeModel::IsLoopClosed() const
 				return "Invalid capsule shape data";
 
 			m_GrabPointList.resize(6);
-			m_GrabPointList[0].Setup(GRABPOINT_ShapeCtrlVert, grabPointList[0]); // Pt1
-			m_GrabPointList[1].Setup(GRABPOINT_ShapeCtrlVert, grabPointList[1]); // Pt2
-			m_GrabPointList[2].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[2]); // Center1 Right
-			m_GrabPointList[3].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[3]); // Center1 Left
-			m_GrabPointList[4].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[4]); // Center2 Right
-			m_GrabPointList[5].Setup(GRABPOINT_ShapeCtrlHorz, grabPointList[5]); // Center2 Left
+			m_GrabPointList[0].Set(GRABPOINT_ShapeCtrlVert, grabPointList[0]); // Pt1
+			m_GrabPointList[1].Set(GRABPOINT_ShapeCtrlVert, grabPointList[1]); // Pt2
+			m_GrabPointList[2].Set(GRABPOINT_ShapeCtrlHorz, grabPointList[2]); // Center1 Right
+			m_GrabPointList[3].Set(GRABPOINT_ShapeCtrlHorz, grabPointList[3]); // Center1 Left
+			m_GrabPointList[4].Set(GRABPOINT_ShapeCtrlHorz, grabPointList[4]); // Center2 Right
+			m_GrabPointList[5].Set(GRABPOINT_ShapeCtrlHorz, grabPointList[5]); // Center2 Left
 			break;
 		}
 	}
@@ -585,7 +585,7 @@ void GfxShapeModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, gl
 			HyGuiLog("GfxShapeModel::DoTransformCreation - Polygon or LineChain initial dragging with != 2 verts", LOGTYPE_Error);
 
 		m_GrabPointList[0].SetSelected(false);
-		m_GrabPointList[1].Setup(GRABPOINT_EndpointSelected, ptDragPos);
+		m_GrabPointList[1].Set(GRABPOINT_EndpointSelected, ptDragPos);
 		break;
 
 	default:

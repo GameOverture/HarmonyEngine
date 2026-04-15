@@ -42,11 +42,12 @@ public:
 	GfxGrabPointModel(GrabPointType eType, glm::vec2 ptPosition);
 	~GfxGrabPointModel();
 
-	void Setup(GrabPointType eType);
-	void Setup(glm::vec2 ptPosition);
-	void Setup(GrabPointType eType, glm::vec2 ptPosition);
+	void SetType(GrabPointType eType);
+	void SetPos(glm::vec2 ptWorldPosition);
+	void Set(GrabPointType eType, glm::vec2 ptPosition);
 
 	glm::vec2 GetPos() const;
+	glm::vec2 GetCameraPos() const;
 	float GetRadius() const;
 	bool IsMouseHover() const;
 

@@ -15,37 +15,21 @@
 GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 	IGfxEditView(pParent)
 {
-	// NOTE: m_PrimOutline does not have a parent because it is projected to window coordinates
-	m_PrimOutline.UseWindowCoordinates();
-	m_PrimOutline.SetDisplayOrder(DISPLAYORDER_TransformCtrl - 1);
+	// NOTE: m_DataPrim does not have a parent because it is projected to window coordinates
+	m_DataPrim.UseWindowCoordinates();
+	m_DataPrim.SetDisplayOrder(DISPLAYORDER_TransformCtrl - 1);
 }
 
 /*virtual*/ GfxChainView::~GfxChainView()
 {
-	ClearPreview();
-}
-
-/*virtual*/ void GfxChainView::SyncColor() /*override*/
-{
-	if(m_pModel == nullptr)
-		return;
-
-	m_PrimOutline.SetTint(m_pModel->GetColor());
-}
-
-/*virtual*/ void GfxChainView::ClearPreview() /*override*/
-{
-	for(HyPrimitive2d *pPrim : m_PrimPreviewList)
-		delete pPrim;
-	m_PrimPreviewList.clear();
 }
 
 /*virtual*/ void GfxChainView::OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) /*override*/
 {
 	if(eEditModeState == EDITMODE_Off || m_pModel == nullptr)
 	{
-		m_CenterGrabPoint.SetVisible(false);
-		m_PrimOutline.SetAsNothing(0);
+		
+		m_DataPrim.SetAsNothing(0);
 		return;
 	}
 	
@@ -62,13 +46,6 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 		projectedVertList.push_back(ptScreenPos);
 	}
 
-	m_PrimOutline.SetAsLineChain(0, projectedVertList, chainDataRef.bLoop, 1.0f);
-}
-
-/*virtual*/ void GfxChainView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
-{
-	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
-
 	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
 
 	switch(eEditModeAction)
@@ -81,86 +58,25 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 		break;
 
 	case EDITMODEACTION_AppendVertex: {
-		if(static_cast<GfxChainModel *>(m_pModel)->IsLoopClosed() || grabPointModelList.empty())
-		{
-			HyGuiLog("GfxChainView::RefreshView called with closed loop (or grab points empty)", LOGTYPE_Error);
-			break;
-		}
-		if(m_PrimPreviewList.empty())
-		{
-			m_PrimPreviewList.append(new HyPrimitive2d(this));
-			m_PrimPreviewList[0]->UseWindowCoordinates();
-			m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-			m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
-		}
-		if(m_PrimPreviewList.size() != 1)
-			HyGuiLog("GfxChainView::RefreshView - EDITMODEACTION_AppendVertex - invalid m_PrimPreviewList size", LOGTYPE_Error);
 
-		glm::vec2 ptNewVertex = grabPointModelList[iGrabPointIndex].GetPos();
-		ptNewVertex += vDragDelta;
-		pCamera->ProjectToCamera(ptNewVertex, ptNewVertex);
-		m_GrabPointViewList[iGrabPointIndex]->pos.Set(ptNewVertex);
 
-		glm::vec2 ptEndPoint;
-		if(grabPointModelList.front().IsSelected())
-			ptEndPoint = grabPointModelList.front().GetPos();
-		else
-			ptEndPoint = grabPointModelList.back().GetPos();
-		pCamera->ProjectToCamera(ptEndPoint, ptEndPoint);
 
-		m_PrimPreviewList[0]->SetAsLineSegment(0, ptNewVertex, ptEndPoint, 1.0f);
 		break; }
 
 	case EDITMODEACTION_InsertVertex: {
 		
-		if(grabPointModelList.size() < 2)
-		{
-			HyGuiLog("GfxChainView::RefreshView called with less than 2 grab points", LOGTYPE_Error);
-			break;
-		}
-		if(m_PrimPreviewList.empty())
-		{
-			m_PrimPreviewList.append(new HyPrimitive2d(this));
-			m_PrimPreviewList.append(new HyPrimitive2d(this));
-
-			m_PrimPreviewList[0]->UseWindowCoordinates();
-			m_PrimPreviewList[0]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-			m_PrimPreviewList[0]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
-			m_PrimPreviewList[1]->UseWindowCoordinates();
-			m_PrimPreviewList[1]->SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-			m_PrimPreviewList[1]->SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
-		}
-		if(m_PrimPreviewList.size() != 2)
-			HyGuiLog("GfxChainView::RefreshView - EDITMODEACTION_InsertVertex - expected m_PrimPreviewList to have exactly 2 primitives", LOGTYPE_Error);
-
-		glm::vec2 ptInsertVertex = grabPointModelList[iGrabPointIndex].GetPos();
-		ptInsertVertex += vDragDelta;
-		pCamera->ProjectToCamera(ptInsertVertex, ptInsertVertex);
-		m_GrabPointViewList[iGrabPointIndex]->pos.Set(ptInsertVertex);
-
-		glm::vec2 ptConnectPoint1 = grabPointModelList[(iGrabPointIndex + 1) % grabPointModelList.size()].GetPos();
-		pCamera->ProjectToCamera(ptConnectPoint1, ptConnectPoint1);
-
-		glm::vec2 ptConnectPoint2;
-		if(iGrabPointIndex == 0)
-			ptConnectPoint2 = grabPointModelList[grabPointModelList.size() - 1].GetPos();
-		else
-			ptConnectPoint2 = grabPointModelList[iGrabPointIndex - 1].GetPos();
-		pCamera->ProjectToCamera(ptConnectPoint2, ptConnectPoint2);
-
-		m_PrimPreviewList[0]->SetAsLineSegment(0, ptInsertVertex, ptConnectPoint1, 1.0f);
-		m_PrimPreviewList[1]->SetAsLineSegment(0, ptInsertVertex, ptConnectPoint2, 1.0f);
+		
 		break; }
 
 	case EDITMODEACTION_HoverGrabPoint: {
-		const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
-		if(iGrabPointIndex < 0 || iGrabPointIndex >= grabPointModelList.size())
-		{
-			HyGuiLog("GfxChainView::DoHoverGrabPoint - invalid m_iGrabPointIndex", LOGTYPE_Error);
-			return;
-		}
-		if(m_pModel->IsHoverGrabPointSelected() == false)
-			HyGuiLog("GfxChainView::DoHoverGrabPoint - Hover vertex not selected on box transform", LOGTYPE_Error);
+		//const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
+		//if(iGrabPointIndex < 0 || iGrabPointIndex >= grabPointModelList.size())
+		//{
+		//	HyGuiLog("GfxChainView::DoHoverGrabPoint - invalid m_iGrabPointIndex", LOGTYPE_Error);
+		//	return;
+		//}
+		//if(m_pModel->IsHoverGrabPointSelected() == false)
+		//	HyGuiLog("GfxChainView::DoHoverGrabPoint - Hover vertex not selected on box transform", LOGTYPE_Error);
 
 		// Apply grab point drag logic based on shape type
 
@@ -189,6 +105,8 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 		}
 		break;
 	}
+
+	m_DataPrim.SetAsLineChain(0, projectedVertList, chainDataRef.bLoop, 1.0f);
 }
 
 GfxChainModel *GfxChainView::GetChainModel()

@@ -14,35 +14,37 @@
 #define GRABPOINT_SELECT_RADIUS		6.0f	// In world units
 
 GfxGrabPointModel::GfxGrabPointModel() :
-	m_eType(GRABPOINT_Invalid)
+	m_eType(GRABPOINT_Invalid),
+	m_ptPosition(0.0f, 0.0f)
 {
 }
 
-GfxGrabPointModel::GfxGrabPointModel(GrabPointType eType)
+GfxGrabPointModel::GfxGrabPointModel(GrabPointType eType) :
+	m_ptPosition(0.0f, 0.0f)
 {
-	Setup(eType, m_ptPosition);
+	Set(eType, m_ptPosition);
 }
 
 GfxGrabPointModel::GfxGrabPointModel(GrabPointType eType, glm::vec2 ptPosition)
 {
-	Setup(eType, ptPosition);
+	Set(eType, ptPosition);
 }
 
 GfxGrabPointModel::~GfxGrabPointModel()
 {
 }
 
-void GfxGrabPointModel::Setup(GrabPointType eType)
+void GfxGrabPointModel::SetType(GrabPointType eType)
 {
-	Setup(eType, m_ptPosition);
+	Set(eType, m_ptPosition);
 }
 
-void GfxGrabPointModel::Setup(glm::vec2 ptPosition)
+void GfxGrabPointModel::SetPos(glm::vec2 ptWorldPosition)
 {
-	Setup(m_eType, ptPosition);
+	Set(m_eType, ptWorldPosition);
 }
 
-void GfxGrabPointModel::Setup(GrabPointType eType, glm::vec2 ptPosition)
+void GfxGrabPointModel::Set(GrabPointType eType, glm::vec2 ptPosition)
 {
 	m_eType = eType;
 	m_ptPosition = ptPosition;
@@ -51,6 +53,14 @@ void GfxGrabPointModel::Setup(GrabPointType eType, glm::vec2 ptPosition)
 glm::vec2 GfxGrabPointModel::GetPos() const
 {
 	return m_ptPosition;
+}
+
+glm::vec2 GfxGrabPointModel::GetCameraPos() const
+{
+	glm::vec2 ptCameraPos;
+	HyEngine::Window(0).GetCamera2d(0)->ProjectToCamera(m_ptPosition, ptCameraPos);
+	
+	return ptCameraPos;
 }
 
 float GfxGrabPointModel::GetRadius() const

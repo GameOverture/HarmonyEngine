@@ -171,7 +171,7 @@ bool GfxChainModel::IsLoopClosed() const
 		// Find center point
 		glm::vec2 ptCentroid;
 		m_Chain.GetCentroid(ptCentroid);
-		m_GrabPointCenter.Setup(ptCentroid);
+		m_GrabPointCenter.SetPos(ptCentroid);
 	}
 
 	// Preserve existing grab points where possible (keeps selection)
@@ -180,15 +180,15 @@ bool GfxChainModel::IsLoopClosed() const
 		if(static_cast<int>(m_GrabPointList.size()) - 1 < i)
 			m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, grabPointList[i]));
 		else
-			m_GrabPointList[i].Setup(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
+			m_GrabPointList[i].Set(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
 	}
 	if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
 		m_GrabPointList.resize(grabPointList.size());
 
 	if(IsLoopClosed() == false && m_GrabPointList.size() > 1)
 	{
-		m_GrabPointList.front().Setup(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
-		m_GrabPointList.back().Setup(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
+		m_GrabPointList.front().SetType(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
+		m_GrabPointList.back().SetType(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -318,7 +318,7 @@ void GfxChainModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, gl
 		HyGuiLog("GfxChainModel::MouseTransformDrag - Polygon or LineChain initial dragging with != 2 verts", LOGTYPE_Error);
 
 	m_GrabPointList[0].SetSelected(false);
-	m_GrabPointList[1].Setup(GRABPOINT_EndpointSelected, ptDragPos);
+	m_GrabPointList[1].Set(GRABPOINT_EndpointSelected, ptDragPos);
 }
 
 bool GfxChainModel::CheckIfAddVertexOnEdge()

@@ -19,19 +19,14 @@ class GfxChainView : public IGfxEditView
 {
 	friend class GfxPrimitiveView;
 
-	HyPrimitive2d				m_PrimOutline;			// This primitive is set as line chain. It forms an outline unaffected by camera zoom, using window coordinates
-	QList<HyPrimitive2d *>		m_PrimPreviewList;		// A list of primitives used for previewing transformations before they are committed. Uses world/camera coordinates
+	// 'm_DataPrim' is set as line chain. It forms an outline unaffected by camera zoom, using window coordinates
 
 public:
 	GfxChainView(HyEntity2d *pParent = nullptr);
 	virtual ~GfxChainView();
 
-	virtual void SyncColor() override;
-	virtual void ClearPreview() override;
-
 protected:
 	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) override;
-	virtual void OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) override;
 
 	GfxChainModel *GetChainModel();
 };

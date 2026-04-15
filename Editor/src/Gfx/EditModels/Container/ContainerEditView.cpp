@@ -21,20 +21,6 @@ ContainerEditView::ContainerEditView(bool bIsFixture, HyEntity2d *pParent /*= nu
 {
 }
 
-/*virtual*/ void ContainerEditView::SyncColor() /*override*/
-{
-	if(m_pModel == nullptr)
-		return;
-}
-
-/*virtual*/ void ContainerEditView::ClearPreview() /*override*/
-{
-}
-
 /*virtual*/ void ContainerEditView::OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) /*override*/
-{
-}
-
-/*virtual*/ void ContainerEditView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
 {
 }

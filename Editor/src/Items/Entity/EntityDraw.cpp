@@ -111,7 +111,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		break;
 
 	case EDITMODE_Idle: {
-		Qt::CursorShape eCursorShape = pTreeItemData->GetEditModel()->MouseMoveIdle(m_eEditModeState);
+		Qt::CursorShape eCursorShape = pTreeItemData->GetEditModel()->MouseMoveIdle();
 		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(eCursorShape);
 		break; }
 
@@ -136,7 +136,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	case EDITMODE_MouseDragTransform: {
 		bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-		pTreeItemData->GetEditModel()->MouseTransform(m_eEditModeState, bShiftHeld, m_ptDragStart, ptWorldMousePos);
+		pTreeItemData->GetEditModel()->MouseTransform(bShiftHeld, m_ptDragStart, ptWorldMousePos);
 		break; }
 
 	default:
@@ -280,7 +280,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	pTreeItemData->GetEditModel()->ClearAction();
 
 	// This is to reset the cursor and edit model based on where the mouse is now that the mouse button has been released
-	Qt::CursorShape eCursorShape = pTreeItemData->GetEditModel()->MouseMoveIdle(m_eEditModeState);
+	Qt::CursorShape eCursorShape = pTreeItemData->GetEditModel()->MouseMoveIdle();
 	Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(eCursorShape);
 
 	m_eEditModeState = EDITMODE_Idle;

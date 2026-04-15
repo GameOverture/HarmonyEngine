@@ -27,20 +27,15 @@ class GfxShapeHyView : public IGfxEditView
 		LAYER_Outline,
 		LAYER_Preview
 	};
-	HyPrimitive2d				m_Prim;
 
 public:
 	GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent = nullptr);
 	virtual ~GfxShapeHyView();
 
-	virtual void SyncColor() override;
-	virtual void ClearPreview() override;
-
 protected:
 	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) override;
-	virtual void OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) override;
 
-	void DoGrabPointPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta);
+	void DoGrabPointPreview(EditModeState eEditModeState, EditModeAction eEditModeAction);
 
 	GfxShapeModel *GetShapeModel();
 };

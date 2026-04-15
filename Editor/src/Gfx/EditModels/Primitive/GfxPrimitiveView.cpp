@@ -23,23 +23,6 @@ GfxPrimitiveView::GfxPrimitiveView(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-/*virtual*/ void GfxPrimitiveView::SyncColor() /*override*/
-{
-	if(m_pModel == nullptr)
-		return;
-
-	if(static_cast<GfxPrimLayerModel *>(m_pModel)->IsShapeModel())
-		m_ShapeView.SyncColor();
-	else
-		m_ChainView.SyncColor();
-}
-
-/*virtual*/ void GfxPrimitiveView::ClearPreview() /*override*/
-{
-	m_ShapeView.ClearPreview();
-	m_ChainView.ClearPreview();
-}
-
 /*virtual*/ void GfxPrimitiveView::OnSyncModel(EditModeState eEditModeState, EditModeAction eResult) /*override*/
 {
 	m_CenterGrabPoint.SetVisible(false);
@@ -61,12 +44,4 @@ GfxPrimitiveView::GfxPrimitiveView(HyEntity2d *pParent /*= nullptr*/) :
 		m_ShapeView.OnSyncModel(EDITMODE_Off, EDITMODEACTION_None);
 		m_ChainView.OnSyncModel(eEditModeState, eResult);
 	}
-}
-
-/*virtual*/ void GfxPrimitiveView::OnSyncPreview(EditModeState eEditModeState, EditModeAction eResult, int iGrabPointIndex, glm::vec2 vDragDelta) /*override*/
-{
-	if(static_cast<GfxPrimLayerModel *>(m_pModel)->IsShapeModel())
-		m_ShapeView.OnSyncPreview(eEditModeState, eResult, iGrabPointIndex, vDragDelta);
-	else
-		m_ChainView.OnSyncPreview(eEditModeState, eResult, iGrabPointIndex, vDragDelta);
 }

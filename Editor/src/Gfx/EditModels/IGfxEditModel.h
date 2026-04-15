@@ -87,16 +87,20 @@ public:
 
 	const QList<GfxGrabPointModel> &GetGrabPointList() const;
 	const GfxGrabPointModel &GetGrabPoint(int iIndex) const;
+	const GfxGrabPointModel *GetActiveGrabPoint() const;
 	const GfxGrabPointModel &GetCenterGrabPoint() const;
+	int GetActiveGrabPointIndex() const;
 	int GetNumGrabPointsSelected() const;
 	bool IsAllGrabPointsSelected() const;
 	bool IsHoverGrabPointSelected() const;
 	void DeselectAllGrabPoints();
 
-	Qt::CursorShape MouseMoveIdle(EditModeState eEditModeState);
+	Qt::CursorShape MouseMoveIdle();
 	bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags); // Returns whether transform has begun (otherwise marquee select)
 	void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight);
-	void MouseTransform(EditModeState eEditModeState, bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
+	void MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
+
+	glm::vec2 GetDragDelta() const;
 	
 	virtual QString GetActionText(QString sNodeCodeName) const = 0; // Returns undo command description (blank if no change)
 	virtual QJsonObject GetActionSerialized() const = 0;

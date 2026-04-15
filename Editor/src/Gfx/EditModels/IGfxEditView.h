@@ -22,6 +22,9 @@ protected:
 	QList<GfxGrabPointView *>	m_GrabPointViewList;	// Project to window coordinates
 	GfxGrabPointView			m_CenterGrabPoint;
 
+	HyPrimitive2d				m_DataPrim;
+	HyPrimitive2d				m_PreviewPrim;
+
 public:
 	IGfxEditView(HyEntity2d *pParent = nullptr);
 	virtual ~IGfxEditView();
@@ -29,16 +32,13 @@ public:
 	IGfxEditModel *GetModel() const;
 	void SetModel(IGfxEditModel *pModel);
 
-	virtual void SyncColor() = 0;
-	void SyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction);
-	void SyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta);
-	virtual void ClearPreview() = 0;
+	void SyncColor();
+	void SyncWithModel(EditModeState eEditModeState, EditModeAction eEditModeAction);
 
 	void ClearGrabPoints();
 
 protected:
 	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) = 0;
-	virtual void OnSyncPreview(EditModeState eEditModeState, EditModeAction eEditModeAction, int iGrabPointIndex, glm::vec2 vDragDelta) = 0;
 };
 
 #endif // IGfxEditView_H
