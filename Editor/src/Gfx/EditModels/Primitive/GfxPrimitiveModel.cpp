@@ -23,14 +23,6 @@ GfxPrimLayerModel::GfxPrimLayerModel() :
 {
 }
 
-/*virtual*/ bool GfxPrimLayerModel::IsValidModel() const /*override*/
-{
-	if(m_bIsShape)
-		return m_ShapeModel.IsValidModel();
-	else
-		return m_ChainModel.IsValidModel();
-}
-
 bool GfxPrimLayerModel::IsShapeModel() const
 {
 	return m_bIsShape;
@@ -82,14 +74,6 @@ QString GfxPrimLayerModel::GetPrimType() const
 		return m_ShapeModel.GetActionText(sNodeCodeName);
 	else
 		return m_ChainModel.GetActionText(sNodeCodeName);
-}
-
-/*virtual*/ QJsonObject GfxPrimLayerModel::GetActionSerialized() const /*override*/
-{
-	if(m_bIsShape)
-		return m_ShapeModel.GetActionSerialized();
-	else
-		return m_ChainModel.GetActionSerialized();
 }
 
 /*virtual*/ QString GfxPrimLayerModel::DoDeserialize(const QJsonObject &floatList) /*override*/

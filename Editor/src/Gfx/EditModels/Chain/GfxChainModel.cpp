@@ -12,9 +12,7 @@
 #include "IGfxEditView.h"
 
 GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QList<float>()*/) :
-	IGfxEditModel(EDITMODETYPE_Chain, color),
-	m_bSelfIntersecting(false),
-	m_ptSelfIntersection(0.0f, 0.0f)
+	IGfxEditModel(EDITMODETYPE_Chain, color)
 {
 	QJsonObject serializedObj;
 	serializedObj.insert("type", "Line Chain");
@@ -26,19 +24,24 @@ GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QL
 
 	serializedObj.insert("outline", 1.0f);
 
+	m_FixtureList.append(new HyChain2d());
+
 	Deserialize(serializedObj);
 }
 
 /*virtual*/ GfxChainModel::~GfxChainModel()
 {
+	delete m_FixtureList[0];
 }
 
-/*virtual*/ bool GfxChainModel::IsValidModel() const /*override*/
+HyChain2d *GfxChainModel::GetChain()
 {
-	if(m_Chain.GetChainData().iCount < 4)
-		return false;
+	return static_cast<HyChain2d *>(m_FixtureList[0]);
+}
 
-	return m_bSelfIntersecting == false;
+const HyChain2d *GfxChainModel::GetChain() const
+{
+	return static_cast<HyChain2d *>(m_FixtureList[0]);
 }
 
 /*virtual*/ QJsonObject GfxChainModel::Serialize() const /*override*/
@@ -46,7 +49,7 @@ GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QL
 	QJsonObject serializedObj;
 	serializedObj.insert("type", "Line Chain");
 
-	std::vector<float> serializedData = m_Chain.SerializeSelf();
+	std::vector<float> serializedData = GetChain()->SerializeSelf();
 	QJsonArray dataArray;
 	for(float f : serializedData)
 		dataArray.append(f);
@@ -59,18 +62,13 @@ GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QL
 
 void GfxChainModel::TransformData(glm::mat4 mtxTransform)
 {
-	m_Chain.TransformSelf(mtxTransform);
+	GetChain()->TransformSelf(mtxTransform);
 	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
-}
-
-const HyChain2d &GfxChainModel::GetChainFixture() const
-{
-	return m_Chain;
 }
 
 bool GfxChainModel::IsLoopClosed() const
 {
-	return m_Chain.GetChainData().bLoop;
+	return GetChain()->GetChainData().bLoop;
 }
 
 /*virtual*/ QString GfxChainModel::GetActionText(QString sNodeCodeName) const /*override*/
@@ -106,40 +104,6 @@ bool GfxChainModel::IsLoopClosed() const
 	return sUndoText;
 }
 
-/*virtual*/ QJsonObject GfxChainModel::GetActionSerialized() const /*override*/
-{
-	switch(m_eCurAction)
-	{
-	case EDITMODEACTION_Creation:
-		return Serialize();
-
-	case EDITMODEACTION_Inside:
-		if(IsAllGrabPointsSelected() == false)
-			HyGuiLog("GfxChainModel::GetActionSerialized - EDITMODEACTION_Inside with not all grab points selected", LOGTYPE_Error);
-		[[fallthrough]];
-	case EDITMODEACTION_HoverCenter:
-		// Translate entire shape by the drag delta.
-		
-		m_vDragDelta;
-
-		
-
-	case EDITMODEACTION_AppendVertex:
-	case EDITMODEACTION_InsertVertex:
-		// Guaranteed to be SHAPE_Polygon, translate all vertices by the drag delta.
-		break;
-
-	case EDITMODEACTION_HoverGrabPoint:
-		break;
-
-	default:
-		HyGuiLog("GfxChainModel::GetActionSerialized - Invalid m_eCurTransform", LOGTYPE_Error);
-		break;
-	}
-
-	return QJsonObject();
-}
-
 /*virtual*/ QString GfxChainModel::DoDeserialize(const QJsonObject &serializedObj) /*override*/
 {
 	QJsonArray dataArray = serializedObj["data"].toArray();
@@ -150,7 +114,7 @@ bool GfxChainModel::IsLoopClosed() const
 	if(floatList.empty())
 	{
 		m_GrabPointList.clear();
-		m_Chain.ClearData();
+		GetChain()->ClearData();
 		return "No data provided";
 	}
 
@@ -159,18 +123,25 @@ bool GfxChainModel::IsLoopClosed() const
 	std::vector<glm::vec2> grabPointList;
 	if(floatList.empty() == false)
 	{
-		grabPointList = m_Chain.DeserializeSelf(HYFIXTURE_LineChain, floatList);
-
+		QString sResult = GetChain()->DeserializeSelf(HYFIXTURE_LineChain, floatList).c_str();
+		if(sResult.isEmpty() == false)
+		{
+			m_GrabPointList.clear();
+			GetChain()->ClearData();
+			return sResult;
+		}
+		
+		grabPointList = GetChain()->CalcGrabPoints();
 		if(grabPointList.empty())
 		{
 			m_GrabPointList.clear();
-			m_Chain.ClearData();
-			return "Failed to deserialize chain data";
+			GetChain()->ClearData();
+			return "Failed to calculate chain grab points";
 		}
 		
 		// Find center point
 		glm::vec2 ptCentroid;
-		m_Chain.GetCentroid(ptCentroid);
+		GetChain()->GetCentroid(ptCentroid);
 		m_GrabPointCenter.SetPos(ptCentroid);
 	}
 
@@ -193,7 +164,7 @@ bool GfxChainModel::IsLoopClosed() const
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	if(m_GrabPointList.empty())
-		m_Chain.ClearData();
+		GetChain()->ClearData();
 	else
 	{
 		std::vector<glm::vec2> vertexList;
@@ -224,7 +195,7 @@ bool GfxChainModel::IsLoopClosed() const
 		}
 	}
 		
-	if(m_Chain.IsValid() == false)
+	if(GetChain()->IsValid() == false)
 	{
 		if(m_GrabPointList.size() < 4)
 			return "Chain must have at least 4 vertices";

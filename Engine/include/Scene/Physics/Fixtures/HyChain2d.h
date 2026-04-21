@@ -48,7 +48,8 @@ public:
 
 	virtual void TransformSelf(const glm::mat4 &mtxTransform) override;
 	virtual std::vector<float> SerializeSelf() const override;
-	virtual std::vector<glm::vec2> DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) override;
+	virtual std::string DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) override;
+	virtual std::vector<glm::vec2> CalcGrabPoints() const override;
 
 	bool GetCentroid(glm::vec2 &ptCentroidOut) const;
 
@@ -68,13 +69,15 @@ public:
 	virtual bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const override;
 
 protected:
+	virtual bool OnIsValid() const override;
+	virtual void PhysicsAttach() override;
+	virtual void PhysicsRemove(bool bUpdateBodyMass) override;
+
 	void ClearShapeData();
 	void ShapeChanged();
 
 	bool IsPhysicsRegistered() const;
 	bool IsPhysicsInitialized() const;
-	virtual void PhysicsAttach() override;
-	virtual void PhysicsRemove(bool bUpdateBodyMass) override;
 
 	// NOTE: Assumes 'chainDataOut' starts as zeroed-out. Will deep copy into 'chainDataOut' (dynamically allocate)
 	bool AllocChainData(HyChainData &chainDataOut, const glm::mat4 &mtxTransform) const;

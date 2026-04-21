@@ -24,10 +24,8 @@ public:
 	ContainerEditModel();
 	virtual ~ContainerEditModel();
 
-	virtual bool IsValidModel() const override;
 	virtual QJsonObject Serialize() const override;
 	virtual QString GetActionText(QString sNodeCodeName) const override;	// Returns undo command description (blank if no change)
-	virtual QJsonObject GetActionSerialized() const override;
 
 protected:
 	virtual QString DoDeserialize(const QJsonObject &floatList) override;

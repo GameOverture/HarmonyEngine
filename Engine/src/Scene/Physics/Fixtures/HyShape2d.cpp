@@ -160,12 +160,11 @@ b2Capsule HyShape2d::GetAsCapsule() const
 	return floatList;
 }
 
-/*virtual*/ std::vector<glm::vec2> HyShape2d::DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) /*override*/
+/*virtual*/ std::string HyShape2d::DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) /*override*/
 {
-	std::vector<glm::vec2> vertList;
-
+	ClearShapeData();
 	if(floatList.empty())
-		return vertList;
+		return "Empty float list provided";
 
 	switch(eFixtureType)
 	{
@@ -177,17 +176,11 @@ b2Capsule HyShape2d::GetAsCapsule() const
 		// NOTE: The final float indicating whether this is a closed polygon is not supplied here, which is unlike how HyEditor serializes polygons (and chains)
 		//       If this function is invoked it is ass
 		if(floatList.size() & 1)
-		{
-			HyLogWarning("HyShape2d::DeserializeSelf recieved an odd number of floats to deserialize a polygon");
-			return vertList;
-		}
+			return "Polygon took odd number of floats";
 		int iNumVerts = floatList.size() / 2;
 		if(iNumVerts > B2_MAX_POLYGON_VERTICES)
-		{
-			HyLogWarning("HyShape2d::DeserializeSelf recieved too many vertices (" << vertList.size() << ") to deserialize a polygon. Max is " << B2_MAX_POLYGON_VERTICES);
-			return vertList;
-		}
-
+			return "Too many vertices to deserialize a polygon. Max is " + std::to_string(B2_MAX_POLYGON_VERTICES);
+		std::vector<glm::vec2> vertList;
 		vertList.reserve(iNumVerts);
 		for(int i = 0; i < floatList.size(); i += 2)
 			vertList.emplace_back(glm::vec2(floatList[i], floatList[i + 1]));
@@ -196,60 +189,74 @@ b2Capsule HyShape2d::GetAsCapsule() const
 
 	case HYFIXTURE_Circle:
 		if(floatList.size() != 3)
-		{
-			HyLogWarning("HyShape2d::DeserializeSelf recieved an invalid number of floats to deserialize a circle. Expected 3 (center x, center y, radius) but got " << floatList.size());
-			return vertList;
-		}
+			return "Invalid number of floats to deserialize a circle. Expected 3 (center x, center y, radius) but got " + std::to_string(floatList.size());
 		SetAsCircle(glm::vec2(floatList[0], floatList[1]), floatList[2]);
-
-		// Add the circumference grab points (top, right, bottom, left)
-		vertList.reserve(4);
-		vertList.emplace_back(floatList[0]				 , floatList[1] + floatList[2]);	// Top
-		vertList.emplace_back(floatList[0] + floatList[2], floatList[1]);					// Right
-		vertList.emplace_back(floatList[0]				 , floatList[1] - floatList[2]);	// Bottom
-		vertList.emplace_back(floatList[0] - floatList[2], floatList[1]);					// Left
 		break;
 
 	case HYFIXTURE_LineSegment:
 		if(floatList.size() != 4)
-		{
-			HyLogWarning("HyShape2d::DeserializeSelf recieved an invalid number of floats to deserialize a line segment. Expected 4 (point1 x, point1 y, point2 x, point2 y) but got " << floatList.size());
-			return vertList;
-		}
-		vertList.reserve(2);
-		vertList.emplace_back(floatList[0], floatList[1]);
-		vertList.emplace_back(floatList[2], floatList[3]);
-		
-		SetAsLineSegment(vertList[0], vertList[1]);
+			return "Invalid number of floats for line segment. Expected 4 (point1 x, point1 y, point2 x, point2 y) but got " + std::to_string(floatList.size());
+		SetAsLineSegment(glm::vec2(floatList[0], floatList[1]), glm::vec2(floatList[2], floatList[3]));
 		break;
 
-	case HYFIXTURE_Capsule: {
+	case HYFIXTURE_Capsule:
 		if(floatList.size() != 5)
-		{
-			HyLogWarning("HyShape2d::DeserializeSelf recieved an invalid number of floats to deserialize a capsule. Expected 5 (center1 x, center1 y, center2 x, center2 y, radius) but got " << floatList.size());
-			return vertList;
-		}
-		vertList.reserve(6);
-		vertList.emplace_back(floatList[0], floatList[1]);
-		vertList.emplace_back(floatList[2], floatList[3]);
-	
-		SetAsCapsule(vertList[0], vertList[1], floatList[4]);
-
-		// Also add the circumference grab points (just left and right) of both semicircles
-		b2Vec2 dir = m_Data.capsule.center2 - m_Data.capsule.center1;
-		b2Vec2 norm = b2Normalize({ -dir.y, dir.x });
-		vertList.emplace_back(m_Data.capsule.center1.x + (norm.x * m_Data.capsule.radius), m_Data.capsule.center1.y + (norm.y * m_Data.capsule.radius)); // Center1 Right
-		vertList.emplace_back(m_Data.capsule.center1.x - (norm.x * m_Data.capsule.radius), m_Data.capsule.center1.y - (norm.y * m_Data.capsule.radius)); // Center1 Left
-		vertList.emplace_back(m_Data.capsule.center2.x + (norm.x * m_Data.capsule.radius), m_Data.capsule.center2.y + (norm.y * m_Data.capsule.radius)); // Center2 Right
-		vertList.emplace_back(m_Data.capsule.center2.x - (norm.x * m_Data.capsule.radius), m_Data.capsule.center2.y - (norm.y * m_Data.capsule.radius)); // Center2 Left
-		break; }
+			return "Invalid number of floats for capsule. Expected 5 (center1 x, center1 y, center2 x, center2 y, radius) but got " + std::to_string(floatList.size());
+		SetAsCapsule(glm::vec2(floatList[0], floatList[1]), glm::vec2(floatList[2], floatList[3]), floatList[4]);
+		break;
 
 	default:
 		HyLogWarning("HyShape2d::DeserializeSelf() - Unsupported shape type: " << eFixtureType);
 		break;
 	}
 
-	return vertList;
+	m_eType = eFixtureType;
+	return "";
+}
+
+/*virtual*/ std::vector<glm::vec2> HyShape2d::CalcGrabPoints() const /*override*/
+{
+	std::vector<glm::vec2> grabPtList;
+	switch(m_eType)
+	{
+	case HYFIXTURE_Nothing:
+		break;
+
+	case HYFIXTURE_Circle:
+		// Add the circumference grab points (top, right, bottom, left)
+		grabPtList.reserve(4);
+		grabPtList.emplace_back(m_Data.circle.center.x, m_Data.circle.center.y + m_Data.circle.radius);	// Top
+		grabPtList.emplace_back(m_Data.circle.center.x + m_Data.circle.radius, m_Data.circle.center.y);	// Right
+		grabPtList.emplace_back(m_Data.circle.center.x, m_Data.circle.center.y - m_Data.circle.radius);	// Bottom
+		grabPtList.emplace_back(m_Data.circle.center.x - m_Data.circle.radius, m_Data.circle.center.y);	// Left
+		break;
+
+	case HYFIXTURE_LineSegment:
+		grabPtList.reserve(2);
+		grabPtList.emplace_back(m_Data.segment.point1.x, m_Data.segment.point1.y);
+		grabPtList.emplace_back(m_Data.segment.point2.x, m_Data.segment.point2.y);
+		break;
+
+	case HYFIXTURE_Polygon:
+		grabPtList.reserve(m_Data.polygon.count);
+		for(int i = 0; i < m_Data.polygon.count; ++i)
+			grabPtList.emplace_back(m_Data.polygon.vertices[i].x, m_Data.polygon.vertices[i].y);
+		break;
+
+	case HYFIXTURE_Capsule: {
+		grabPtList.reserve(6);
+		grabPtList.emplace_back(m_Data.capsule.center1.x, m_Data.capsule.center1.y);
+		grabPtList.emplace_back(m_Data.capsule.center2.x, m_Data.capsule.center2.y);
+		b2Vec2 dir = m_Data.capsule.center2 - m_Data.capsule.center1;
+		b2Vec2 norm = b2Normalize({ -dir.y, dir.x });
+		grabPtList.emplace_back(m_Data.capsule.center1.x + (norm.x * m_Data.capsule.radius), m_Data.capsule.center1.y + (norm.y * m_Data.capsule.radius)); // Center1 Right
+		grabPtList.emplace_back(m_Data.capsule.center1.x - (norm.x * m_Data.capsule.radius), m_Data.capsule.center1.y - (norm.y * m_Data.capsule.radius)); // Center1 Left
+		grabPtList.emplace_back(m_Data.capsule.center2.x + (norm.x * m_Data.capsule.radius), m_Data.capsule.center2.y + (norm.y * m_Data.capsule.radius)); // Center2 Right
+		grabPtList.emplace_back(m_Data.capsule.center2.x - (norm.x * m_Data.capsule.radius), m_Data.capsule.center2.y - (norm.y * m_Data.capsule.radius)); // Center2 Left
+		break; }
+	}
+
+	return grabPtList;
 }
 
 bool HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
@@ -849,30 +856,27 @@ bool HyShape2d::IsSensor() const
 	return false;
 }
 
-void HyShape2d::ClearShapeData()
+/*virtual*/ bool HyShape2d::OnIsValid() const /*override*/
 {
-	PhysicsRemove(true);
-
-	m_Data = {};
-	m_eType = HYFIXTURE_Nothing;
+	switch(m_eType)
+	{
+	case HYFIXTURE_Nothing:
+		return false;
+	case HYFIXTURE_Circle:
+		return m_Data.circle.radius > HyMath::FloatSlop;
+	case HYFIXTURE_LineSegment:
+		return b2Distance(m_Data.segment.point1, m_Data.segment.point2) > HyMath::FloatSlop;
+	case HYFIXTURE_Polygon:
+		return m_Data.polygon.count >= 3;
+	case HYFIXTURE_Capsule:
+		return m_Data.capsule.radius > HyMath::FloatSlop && b2Distance(m_Data.capsule.center1, m_Data.capsule.center2) > HyMath::FloatSlop;
+	default:
+		HyError("HyShape2d::IsValid() - Unhandled shape type: " << m_eType);
+		return false;
+	}
 }
 
-void HyShape2d::ShapeChanged()
-{
-	m_bPhysicsDirty = true;
-}
-
-bool HyShape2d::IsPhysicsRegistered() const
-{
-	return B2_IS_NON_NULL(m_hPhysics);
-}
-
-bool HyShape2d::IsPhysicsInitialized() const
-{
-	return m_pPhysicsInit != nullptr;
-}
-
-void HyShape2d::PhysicsAttach()
+/*virtual*/ void HyShape2d::PhysicsAttach() /*override*/
 {
 	PhysicsRemove(false);
 
@@ -906,7 +910,7 @@ void HyShape2d::PhysicsAttach()
 	m_bPhysicsDirty = false;
 }
 
-void HyShape2d::PhysicsRemove(bool bUpdateBodyMass)
+/*virtual*/ void HyShape2d::PhysicsRemove(bool bUpdateBodyMass) /*override*/
 {
 	if(IsPhysicsRegistered() == false)
 		return;
@@ -915,6 +919,29 @@ void HyShape2d::PhysicsRemove(bool bUpdateBodyMass)
 	m_hPhysics = b2_nullShapeId;
 
 	m_bPhysicsDirty = false;
+}
+
+void HyShape2d::ClearShapeData()
+{
+	PhysicsRemove(true);
+
+	m_Data = {};
+	m_eType = HYFIXTURE_Nothing;
+}
+
+void HyShape2d::ShapeChanged()
+{
+	m_bPhysicsDirty = true;
+}
+
+bool HyShape2d::IsPhysicsRegistered() const
+{
+	return B2_IS_NON_NULL(m_hPhysics);
+}
+
+bool HyShape2d::IsPhysicsInitialized() const
+{
+	return m_pPhysicsInit != nullptr;
 }
 
 // NOTE: Assumes 'shapeDataOut' starts as zeroed-out ShapeData.

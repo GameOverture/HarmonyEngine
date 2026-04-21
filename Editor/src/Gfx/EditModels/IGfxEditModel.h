@@ -54,9 +54,15 @@ protected:
 
 	HyColor								m_Color;
 
+	// "Shape", "Data" - when serialized in property (QJsonArray of floats)
+	QList<IHyFixture2d *>				m_FixtureList;			// This is the actual shape data used for physics/collision/rendering - usually just one fixture, but could be multiple for complex polygons
 	QList<GfxGrabPointModel>			m_GrabPointList;		// Grab Points for editing the shape - Used to serialize data when type is SHAPE_Polygon (then assembles m_FixtureList with valid sub-polygons)
 	GfxGrabPointModel					m_GrabPointCenter;
 
+	// Extra validation used with Chain or Polygon types
+	bool								m_bSelfIntersecting;
+	glm::vec2							m_ptSelfIntersection;
+	bool								m_bLoopClosed;
 	QString								m_sMalformedReason;		// If not empty, this edit model is considered invalid and the reason is given by this string (e.g. "Polygon has intersecting edges")
 
 	// Transform Action info
@@ -77,7 +83,7 @@ public:
 	HyColor GetColor() const;
 	void SetColor(HyColor color);
 
-	virtual bool IsValidModel() const = 0;
+	bool IsValidModel() const;
 	virtual QJsonObject Serialize() const = 0;
 	void Deserialize(const QJsonObject &serializedObj);
 
@@ -103,12 +109,14 @@ public:
 	glm::vec2 GetDragDelta() const;
 	
 	virtual QString GetActionText(QString sNodeCodeName) const = 0; // Returns undo command description (blank if no change)
-	virtual QJsonObject GetActionSerialized() const = 0;
+	//virtual QJsonObject GetActionSerialized() const = 0;
 	void ClearAction();
 
 protected:
 	virtual QString DoDeserialize(const QJsonObject &serializedObj) = 0; // Returns empty string if successful, otherwise returns reason for failure (e.g. "Polygon has intersecting edges")
 	virtual EditModeAction DoMouseMoveIdle() = 0;
+
+	// Action Transforms - These overrides will change the model's data as they are being performed. Upon completion, Serialize() can be called
 	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) = 0;
 };
 

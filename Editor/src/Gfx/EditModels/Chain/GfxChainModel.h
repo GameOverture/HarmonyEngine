@@ -17,28 +17,20 @@ class GfxChainModel : public IGfxEditModel
 {
 	friend class GfxPrimLayerModel;
 
-	// "Chain", "Data" - when serialized in property (QJsonArray of floats)
-	HyChain2d							m_Chain;				// This is the actual shape data used for physics/collision/rendering - usually just one fixture, but could be multiple for complex polygons
-	
-	// Extra validation used with Chain
-	bool								m_bSelfIntersecting;
-	glm::vec2							m_ptSelfIntersection;
-
 public:
 	GfxChainModel(HyColor color, const QList<float> &floatList = QList<float>());
 	virtual ~GfxChainModel();
 
-	virtual bool IsValidModel() const override;
+	HyChain2d *GetChain();
+	const HyChain2d *GetChain() const;
 
 	virtual QJsonObject Serialize() const override;
 
 	void TransformData(glm::mat4 mtxTransform);
 
-	const HyChain2d &GetChainFixture() const;
 	bool IsLoopClosed() const;
 
 	virtual QString GetActionText(QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
-	virtual QJsonObject GetActionSerialized() const override;
 
 protected:
 	virtual QString DoDeserialize(const QJsonObject &serializedObj) override;

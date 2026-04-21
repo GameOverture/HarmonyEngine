@@ -20,11 +20,6 @@ ContainerEditModel::ContainerEditModel() :
 {
 }
 
-/*virtual*/ bool ContainerEditModel::IsValidModel() const /*override*/
-{
-	return m_Box.IsValid();
-}
-
 /*virtual*/ QJsonObject ContainerEditModel::Serialize() const /*override*/
 {
 	std::vector<float> serializedData = m_Box.SerializeSelf();
@@ -57,11 +52,6 @@ ContainerEditModel::ContainerEditModel() :
 	}
 
 	return sUndoText;
-}
-
-/*virtual*/ QJsonObject ContainerEditModel::GetActionSerialized() const /*override*/
-{
-	return Serialize();
 }
 
 /*virtual*/ QString ContainerEditModel::DoDeserialize(const QJsonObject &serializedObj) /*override*/

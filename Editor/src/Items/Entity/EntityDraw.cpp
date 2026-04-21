@@ -267,7 +267,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				}
 			}
 
-			QUndoCommand *pCmd = new EntityUndoCmd_EditModelData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pTreeItemData->GetEditModel()->GetActionSerialized(), sCategoryName, "Data");
+			QUndoCommand *pCmd = new EntityUndoCmd_EditModelData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pTreeItemData->GetEditModel()->Serialize(), sCategoryName, "Data");
 			m_pProjItem->GetUndoStack()->push(pCmd);
 		}
 		break; }

@@ -14,6 +14,10 @@
 IGfxEditModel::IGfxEditModel(EditModeType eModelType, HyColor color) :
 	m_eMODEL_TYPE(eModelType),
 	m_GrabPointCenter(GRABPOINT_Center),
+	m_bSelfIntersecting(false),
+	m_ptSelfIntersection(0.0f, 0.0f),
+	m_bLoopClosed(false),
+	m_sMalformedReason("No Data"),
 	m_eCurAction(EDITMODEACTION_None),
 	m_vDragDelta(0.0f, 0.0f),
 	m_iGrabPointIndex(-1),
@@ -42,6 +46,11 @@ void IGfxEditModel::SetColor(HyColor color)
 	m_Color = color;
 	for(IGfxEditView *pView : m_ViewList)
 		pView->SyncColor();
+}
+
+bool IGfxEditModel::IsValidModel() const
+{
+	return m_sMalformedReason.isEmpty();
 }
 
 void IGfxEditModel::Deserialize(const QJsonObject &serializedObj)
@@ -125,10 +134,8 @@ bool IGfxEditModel::IsAllGrabPointsSelected() const
 bool IGfxEditModel::IsHoverGrabPointSelected() const
 {
 	if(m_iGrabPointIndex < 0 || m_iGrabPointIndex >= m_GrabPointList.size())
-	{
-		HyGuiLog("IGfxEditModel::IsHoverGrabPointSelected - Index out of range", LOGTYPE_Error);
 		return false;
-	}
+
 	return m_GrabPointList[m_iGrabPointIndex].IsSelected();
 }
 
@@ -178,7 +185,7 @@ Qt::CursorShape IGfxEditModel::MouseMoveIdle()
 			MainWindow::SetStatus("Edit Mode - Translate Vertex", 0);
 			return Qt::SizeAllCursor;
 		}
-		else
+		else if(m_iGrabPointIndex >= 0)
 		{
 			MainWindow::SetStatus("Edit Mode - Select Vertex", 0);
 			return m_GrabPointList[m_iGrabPointIndex].GetHoverCursor();
@@ -300,6 +307,4 @@ void IGfxEditModel::ClearAction()
 	m_vDragDelta = glm::vec2(0.0f, 0.0f);
 	m_iGrabPointIndex = -1;
 	m_ptGrabPointPos = glm::vec2(0.0f, 0.0f);
-	//for(IGfxEditView *pView : m_ViewList)
-	//	pView->ClearPreview();
 }

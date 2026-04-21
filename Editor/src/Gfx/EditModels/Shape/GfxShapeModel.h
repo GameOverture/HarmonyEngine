@@ -19,22 +19,16 @@ class GfxShapeModel : public IGfxEditModel
 
 	EditorShape							m_eShapeType;			// "Data", "type" - when serialized in property (string)
 
-	// "Shape", "Data" - when serialized in property (QJsonArray of floats)
-	QList<HyShape2d *>					m_ShapeList;			// This is the actual shape data used for physics/collision/rendering - usually just one fixture, but could be multiple for complex polygons
-
 	float								m_fOutline;				// "outline" is used with primitive layers to determine whether to render a solid (0.0f) or an outline around the shape 
-	
-	// Extra validation used with Polygon
-	bool								m_bReverseWindingOrder;
-	bool								m_bSelfIntersecting;
-	glm::vec2							m_ptSelfIntersection;
-	bool								m_bLoopClosed;
+
 
 public:
 	GfxShapeModel(HyColor color);
 	virtual ~GfxShapeModel();
 
-	virtual bool IsValidModel() const override;
+	int GetNumShapeFixtures() const;
+	HyShape2d *GetShape(int iIndex);
+	const HyShape2d *GetShape(int iIndex) const;
 
 	EditorShape GetShapeType() const;
 	void SetShapeType(EditorShape eNewShape, QList<float> floatList);
@@ -43,13 +37,10 @@ public:
 
 	void TransformData(glm::mat4 mtxTransform);
 
-	int GetNumShapeFixtures() const;
-	HyShape2d *GetShapeFixture(int iIndex) const;
-
 	bool IsLoopClosed() const;
 
 	virtual QString GetActionText(QString sNodeCodeName) const override;	// Returns undo command description (blank if no change)
-	virtual QJsonObject GetActionSerialized() const override;
+	//virtual QJsonObject GetActionSerialized() const override;
 
 protected:
 	virtual QString DoDeserialize(const QJsonObject &serializedObj) override;

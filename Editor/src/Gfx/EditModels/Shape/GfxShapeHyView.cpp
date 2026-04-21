@@ -38,12 +38,12 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 	float fOutlineThickness = 1.0f;
 	if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() != SHAPE_Polygon)
 	{
-		m_DataPrim.SetAsShape(LAYER_Fill, *static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(0), 0.0f);
+		m_DataPrim.SetAsShape(LAYER_Fill, *static_cast<GfxShapeModel *>(m_pModel)->GetShape(0), 0.0f);
 		if(m_DataPrim.GetLayerType(LAYER_Fill) != HYFIXTURE_Nothing)
 		{
 			if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_Box)
 			{
-				b2Vec2 *pVerts = static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(0)->GetAsPolygon().vertices;
+				b2Vec2 *pVerts = static_cast<GfxShapeModel *>(m_pModel)->GetShape(0)->GetAsPolygon().vertices;
 				std::vector<glm::vec2> projectedVertList;
 				for(int i = 0; i < 4; ++i)
 				{
@@ -56,7 +56,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			}
 			else if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_Circle)
 			{
-				b2Circle circle = static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(0)->GetAsCircle();
+				b2Circle circle = static_cast<GfxShapeModel *>(m_pModel)->GetShape(0)->GetAsCircle();
 
 				glm::vec2 ptCenter(circle.center.x, circle.center.y);
 				pCamera->ProjectToCamera(ptCenter, ptCenter);
@@ -66,7 +66,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			}
 			else if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_LineSegment)
 			{
-				b2Segment seg = static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(0)->GetAsSegment();
+				b2Segment seg = static_cast<GfxShapeModel *>(m_pModel)->GetShape(0)->GetAsSegment();
 				glm::vec2 ptOne(seg.point1.x, seg.point1.y);
 				pCamera->ProjectToCamera(ptOne, ptOne);
 				glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
@@ -76,7 +76,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 			}
 			else if(static_cast<GfxShapeModel *>(m_pModel)->GetShapeType() == SHAPE_Capsule)
 			{
-				b2Capsule capsule = static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(0)->GetAsCapsule();
+				b2Capsule capsule = static_cast<GfxShapeModel *>(m_pModel)->GetShape(0)->GetAsCapsule();
 				glm::vec2 ptOne(capsule.center1.x, capsule.center1.y);
 				pCamera->ProjectToCamera(ptOne, ptOne);
 				glm::vec2 ptTwo(capsule.center2.x, capsule.center2.y);
@@ -95,7 +95,7 @@ GfxShapeHyView::GfxShapeHyView(bool bIsFixture, HyEntity2d *pParent /*= nullptr*
 	{
 		int iNumFixtures = static_cast<GfxShapeModel *>(m_pModel)->GetNumShapeFixtures();
 		for(int iIndex = 0; iIndex < iNumFixtures; ++iIndex)
-			m_DataPrim.SetAsShape(LAYER_Fill + iIndex, *static_cast<GfxShapeModel *>(m_pModel)->GetShapeFixture(iIndex), 0.0f);
+			m_DataPrim.SetAsShape(LAYER_Fill + iIndex, *static_cast<GfxShapeModel *>(m_pModel)->GetShape(iIndex), 0.0f);
 
 		// Set `m_PrimOutline`
 		const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();

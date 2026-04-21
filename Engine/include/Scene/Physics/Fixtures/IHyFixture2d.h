@@ -24,6 +24,8 @@ protected:
 	HyEntity2d *								m_pParent;
 
 	HyFixtureType								m_eType;
+	
+	// These settings only apply when attached to a physics body. They are ignored for rendering and point testing.
 	float										m_fMaxPush;			// Setting this to FLT_MAX makes it as rigid as possible. Lower values can make the plane collision soft. Usually in meters.
 	bool 										m_bPhysicsAllowed;
 	bool										m_bPhysicsDirty;
@@ -43,7 +45,8 @@ public:
 
 	virtual void TransformSelf(const glm::mat4 &mtxTransform) = 0;
 	virtual std::vector<float> SerializeSelf() const = 0;
-	virtual std::vector<glm::vec2> DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) = 0; // Returns vertex list of "grab points" for editing
+	virtual std::string DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) = 0; // Returns vertex list of "grab points" for editing
+	virtual std::vector<glm::vec2> CalcGrabPoints() const = 0; 
 
 	glm::vec2 ComputeSize() const;
 
@@ -66,9 +69,11 @@ public:
 	void GetCollisionInfo(float &fPushLimitOut, bool &bClipVelocityOut) const;
 
 protected:
-	bool IsPhysicsDirty() const;
+	virtual bool OnIsValid() const = 0;
 	virtual void PhysicsAttach() = 0;
 	virtual void PhysicsRemove(bool bUpdateBodyMass) = 0;
+	
+	bool IsPhysicsDirty() const;
 };
 
 #endif /* IHyFixture2d_h__ */

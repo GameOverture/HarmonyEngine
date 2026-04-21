@@ -97,7 +97,8 @@ HyFixtureType IHyFixture2d::GetType() const
 
 bool IHyFixture2d::IsValid() const
 {
-	return m_eType != HYFIXTURE_Nothing;
+
+	return m_eType != HYFIXTURE_Nothing && OnIsValid();
 }
 
 glm::vec2 IHyFixture2d::ComputeSize() const

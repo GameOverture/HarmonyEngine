@@ -37,7 +37,7 @@ GfxChainView::GfxChainView(HyEntity2d *pParent /*= nullptr*/) :
 	// Sync Primitives with Model
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
 		
-	const HyChainData &chainDataRef = static_cast<GfxChainModel *>(m_pModel)->GetChainFixture().GetChainData();
+	const HyChainData &chainDataRef = static_cast<GfxChainModel *>(m_pModel)->GetChain()->GetChainData();
 	std::vector<glm::vec2> projectedVertList;
 	for(int i = 0; i < chainDataRef.iCount; ++i)
 	{

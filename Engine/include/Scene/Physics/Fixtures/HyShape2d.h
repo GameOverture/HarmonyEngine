@@ -43,7 +43,8 @@ public:
 
 	virtual void TransformSelf(const glm::mat4 &mtxTransform) override;
 	virtual std::vector<float> SerializeSelf() const override;
-	virtual std::vector<glm::vec2> DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) override;
+	virtual std::string DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) override;
+	virtual std::vector<glm::vec2> HyShape2d::CalcGrabPoints() const override;
 
 	bool GetCentroid(glm::vec2 &ptCentroidOut) const;
 	float CalcArea() const; // Returns the area in meters squared
@@ -92,13 +93,15 @@ public:
 	virtual bool ComputeAABB(b2AABB &aabbOut, const glm::mat4 &mtxTransform) const override;
 
 protected:
+	virtual bool OnIsValid() const override;
+	virtual void PhysicsAttach() override;
+	virtual void PhysicsRemove(bool bUpdateBodyMass) override;
+
 	void ClearShapeData();
 	void ShapeChanged();
 
 	bool IsPhysicsRegistered() const;
 	bool IsPhysicsInitialized() const;
-	virtual void PhysicsAttach() override;
-	virtual void PhysicsRemove(bool bUpdateBodyMass) override;
 
 	// NOTE: Assumes 'shapeDataOut' starts as zeroed-out ShapeData
 	bool TransformShapeData(ShapeData &shapeDataOut, const glm::mat4 &mtxTransform) const;

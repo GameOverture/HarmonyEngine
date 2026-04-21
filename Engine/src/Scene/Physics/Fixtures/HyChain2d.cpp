@@ -187,34 +187,38 @@ void HyChain2d::ClearData()
 	return floatList;
 }
 
-/*virtual*/ std::vector<glm::vec2> HyChain2d::DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) /*override*/
+/*virtual*/ std::string HyChain2d::DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) /*override*/
 {
-	std::vector<glm::vec2> vertList;
-
 	if(floatList.empty())
 	{
-		SetData(vertList, false);
-		return vertList;
+		return "Empty float list provided";
+		SetData(std::vector<glm::vec2>(), false);
 	}
-
 	if(eFixtureType != HYFIXTURE_LineChain)
-	{
-		HyLogError("HyChain2d::DeserializeSelf() - Mismatched fixture type");
-		return vertList;
-	}
+		return "Mismatched fixture type";
 	if((floatList.size() & 1) == 0)
-	{
-		HyLogWarning("HyChain2d::DeserializeSelf recieved an even number of floats to deserialize a chain");
-		return vertList;
-	}
+		return "Missing last float closed indicator";
 
 	int iNumVertFloats = floatList.size() - 1;
+	std::vector<glm::vec2> vertList;
+	vertList.reserve(iNumVertFloats / 2);
 	for(int i = 0; i < iNumVertFloats; i += 2)
 		vertList.push_back(glm::vec2(floatList[i], floatList[i + 1]));
 
 	bool bLineLoop = floatList.back() != 0.0f; // Final float indicates whether this chain loops to the first vertex
 	SetData(vertList, bLineLoop);
-	return vertList;
+	return "";
+}
+
+/*virtual*/ std::vector<glm::vec2> HyChain2d::CalcGrabPoints() const /*override*/
+{
+	std::vector<glm::vec2> grabPointList;
+	if(IsValid() == false)
+		return grabPointList;
+	for(int i = 0; i < m_Data.iCount; ++i)
+		grabPointList.push_back(m_Data.pPointList[i]);
+	
+	return grabPointList;
 }
 
 bool HyChain2d::GetCentroid(glm::vec2 &ptCentroidOut) const
@@ -425,28 +429,12 @@ void HyChain2d::SetFilter(const b2Filter &filter)
 	return false;
 }
 
-void HyChain2d::ClearShapeData()
+/*virtual*/ bool HyChain2d::OnIsValid() const /*override*/
 {
-	PhysicsRemove(true);
+	if(m_eType != HYFIXTURE_LineChain || m_Data.pPointList == nullptr || m_Data.iCount < 4)
+		return false;
 
-	delete[] m_Data.pPointList;
-	m_Data = {};
-	m_eType = HYFIXTURE_Nothing;
-}
-
-void HyChain2d::ShapeChanged()
-{
-	m_bPhysicsDirty = true;
-}
-
-bool HyChain2d::IsPhysicsRegistered() const
-{
-	return B2_IS_NON_NULL(m_hPhysics);
-}
-
-bool HyChain2d::IsPhysicsInitialized() const
-{
-	return m_pPhysicsInit != nullptr;
+	return true;
 }
 
 /*virtual*/ void HyChain2d::PhysicsAttach() /*override*/
@@ -486,6 +474,30 @@ bool HyChain2d::IsPhysicsInitialized() const
 	m_hPhysics = b2_nullChainId;
 
 	m_bPhysicsDirty = false;
+}
+
+void HyChain2d::ClearShapeData()
+{
+	PhysicsRemove(true);
+
+	delete[] m_Data.pPointList;
+	m_Data = {};
+	m_eType = HYFIXTURE_Nothing;
+}
+
+void HyChain2d::ShapeChanged()
+{
+	m_bPhysicsDirty = true;
+}
+
+bool HyChain2d::IsPhysicsRegistered() const
+{
+	return B2_IS_NON_NULL(m_hPhysics);
+}
+
+bool HyChain2d::IsPhysicsInitialized() const
+{
+	return m_pPhysicsInit != nullptr;
 }
 
 // NOTE: Assumes 'chainDataOut' starts as zeroed-out. Will deep copy into 'chainDataOut' (dynamically allocate)

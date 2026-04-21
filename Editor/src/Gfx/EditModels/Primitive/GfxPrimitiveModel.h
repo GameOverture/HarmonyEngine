@@ -25,7 +25,6 @@ public:
 	GfxPrimLayerModel();
 	virtual ~GfxPrimLayerModel();
 
-	virtual bool IsValidModel() const override;
 	bool IsShapeModel() const;
 
 	QString GetPrimType() const;
@@ -34,7 +33,6 @@ public:
 	virtual QJsonObject Serialize() const override;
 
 	virtual QString GetActionText(QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
-	virtual QJsonObject GetActionSerialized() const override;
 
 protected:
 	virtual QString DoDeserialize(const QJsonObject &floatList) override;
