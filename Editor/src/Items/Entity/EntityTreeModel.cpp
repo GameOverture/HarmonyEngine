@@ -19,7 +19,6 @@
 #include "GfxPrimitiveModel.h"
 #include "GfxShapeModel.h"
 #include "GfxChainModel.h"
-#include "ContainerEditModel.h"
 
 #include <QVariant>
 #include <QStack>
