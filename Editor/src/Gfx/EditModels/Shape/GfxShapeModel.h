@@ -17,23 +17,16 @@ class GfxShapeModel : public IGfxEditModel
 {
 	friend class GfxPrimLayerModel;
 
-	EditorShape							m_eShapeType;			// "Data", "type" - when serialized in property (string)
-
-	float								m_fOutline;				// "outline" is used with primitive layers to determine whether to render a solid (0.0f) or an outline around the shape 
-
-
 public:
 	GfxShapeModel(HyColor color);
 	virtual ~GfxShapeModel();
 
-	int GetNumShapeFixtures() const;
+	
 	HyShape2d *GetShape(int iIndex);
 	const HyShape2d *GetShape(int iIndex) const;
 
 	EditorShape GetShapeType() const;
 	void SetShapeType(EditorShape eNewShape, QList<float> floatList);
-
-	virtual QJsonObject Serialize() const override;
 
 	void TransformData(glm::mat4 mtxTransform);
 
@@ -60,8 +53,6 @@ protected:
 	QList<float> ConvertedLineSegmentData() const;
 	QList<float> ConvertedCapsuleData() const;
 	QList<float> ConvertedPolygonOrLineChainData() const;
-
-	QList<float> SerializeData() const;
 };
 
 #endif // GfxShapeModel_H

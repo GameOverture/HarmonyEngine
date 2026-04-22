@@ -15,7 +15,7 @@ GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QL
 	IGfxEditModel(EDITMODETYPE_Chain, color)
 {
 	QJsonObject serializedObj;
-	serializedObj.insert("type", "Line Chain");
+	serializedObj.insert("type", HYLINECHAIN_Name);
 
 	QJsonArray dataArray;
 	for(float f : floatList)
@@ -47,7 +47,7 @@ const HyChain2d *GfxChainModel::GetChain() const
 /*virtual*/ QJsonObject GfxChainModel::Serialize() const /*override*/
 {
 	QJsonObject serializedObj;
-	serializedObj.insert("type", "Line Chain");
+	serializedObj.insert("type", HYLINECHAIN_Name);
 
 	std::vector<float> serializedData = GetChain()->SerializeSelf();
 	QJsonArray dataArray;
@@ -106,104 +106,7 @@ bool GfxChainModel::IsLoopClosed() const
 
 /*virtual*/ QString GfxChainModel::DoDeserialize(const QJsonObject &serializedObj) /*override*/
 {
-	QJsonArray dataArray = serializedObj["data"].toArray();
-	std::vector<float> floatList;
-	for(const QJsonValue &val : dataArray)
-		floatList.push_back(static_cast<float>(val.toDouble()));
 
-	if(floatList.empty())
-	{
-		m_GrabPointList.clear();
-		GetChain()->ClearData();
-		return "No data provided";
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Assemble `m_GrabPointList`
-	std::vector<glm::vec2> grabPointList;
-	if(floatList.empty() == false)
-	{
-		QString sResult = GetChain()->DeserializeSelf(HYFIXTURE_LineChain, floatList).c_str();
-		if(sResult.isEmpty() == false)
-		{
-			m_GrabPointList.clear();
-			GetChain()->ClearData();
-			return sResult;
-		}
-		
-		grabPointList = GetChain()->CalcGrabPoints();
-		if(grabPointList.empty())
-		{
-			m_GrabPointList.clear();
-			GetChain()->ClearData();
-			return "Failed to calculate chain grab points";
-		}
-		
-		// Find center point
-		glm::vec2 ptCentroid;
-		GetChain()->GetCentroid(ptCentroid);
-		m_GrabPointCenter.SetPos(ptCentroid);
-	}
-
-	// Preserve existing grab points where possible (keeps selection)
-	for(int i = 0; i < grabPointList.size(); ++i)
-	{
-		if(static_cast<int>(m_GrabPointList.size()) - 1 < i)
-			m_GrabPointList.push_back(GfxGrabPointModel(GRABPOINT_Vertex, grabPointList[i]));
-		else
-			m_GrabPointList[i].Set(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex, grabPointList[i]);
-	}
-	if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
-		m_GrabPointList.resize(grabPointList.size());
-
-	if(IsLoopClosed() == false && m_GrabPointList.size() > 1)
-	{
-		m_GrabPointList.front().SetType(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
-		m_GrabPointList.back().SetType(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
-	}
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	if(m_GrabPointList.empty())
-		GetChain()->ClearData();
-	else
-	{
-		std::vector<glm::vec2> vertexList;
-		vertexList.reserve(m_GrabPointList.size());
-		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
-			vertexList.emplace_back(grabPt.GetPos());
-
-		// Validate no self-intersections
-		m_bSelfIntersecting = false;
-		HySetVec(m_ptSelfIntersection, 0.0f, 0.0f);
-		glm::vec2 pt1, pt2, pt3, pt4;
-		for(int i = 0; i < vertexList.size(); ++i)
-		{
-			const glm::vec2 &pt1 = vertexList[i];
-			const glm::vec2 &pt2 = vertexList[(i + 1) % vertexList.size()];
-			for(int j = i + 2; j < vertexList.size(); ++j)
-			{
-				// Don't check adjacent edges
-				if(j == (i + 1) % vertexList.size() || (i == 0 && j == vertexList.size() - 1))
-					continue;
-
-				const glm::vec2 &pt3 = vertexList[j];
-				const glm::vec2 &pt4 = vertexList[(j + 1) % vertexList.size()];
-				m_bSelfIntersecting = HyMath::TestSegmentsOverlap(pt1, pt2, pt3, pt4, m_ptSelfIntersection);
-				if(m_bSelfIntersecting)
-					return "Chain has self-intersecting edges";
-			}
-		}
-	}
-		
-	if(GetChain()->IsValid() == false)
-	{
-		if(m_GrabPointList.size() < 4)
-			return "Chain must have at least 4 vertices";
-		else
-			return "Chain has invalid vertex data";
-	}
-
-	return "";
 }
 
 /*virtual*/ EditModeAction GfxChainModel::DoMouseMoveIdle() /*override*/

@@ -1546,7 +1546,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 		switch(pItemData->GetType())
 		{
 		case ITEM_PrimLayer:
-			if(serializedObj["type"].toString() == "Line Chain")
+			if(serializedObj["type"].toString() == HYLINECHAIN_Name)
 			{
 				if((sFloatList.size() & 1) == 0)
 					HyGuiLog("GfxShapeModel::DeserializeShapeDataAsRuntimeCode for prim layer had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);

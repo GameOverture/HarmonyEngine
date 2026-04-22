@@ -25,15 +25,6 @@ enum EditModeState
 	EDITMODE_MouseDragTransform,	// Transforming (translating, rotating, scaling) the edit item
 };
 
-enum EditModeType
-{
-	EDITMODETYPE_None = 0,
-	EDITMODETYPE_Shape,
-	EDITMODETYPE_Chain,
-	EDITMODETYPE_Primitive,
-	EDITMODETYPE_Container
-};
-
 enum EditModeAction
 {
 	EDITMODEACTION_None = 0,
@@ -49,16 +40,18 @@ enum EditModeAction
 
 class IGfxEditModel
 {
-protected:
-	const EditModeType					m_eMODEL_TYPE;
-
-	HyColor								m_Color;
-
-	// "Shape", "Data" - when serialized in property (QJsonArray of floats)
+	// ------------------------------------------------------------------------------------------------------------------
+	// "type" - when serialized in property (as a string)
+	bool								m_bIsLineChain;			// Whether this is a chain model (true) or shape model (false)
+	EditorShape							m_eShapeType;			// When m_bIsLineChain is false, this indicates the primitive shape type (Box, Circle, LineSegment, Polygon, Capsule). Ignored when m_bIsLineChain is true
+	// "data" - when serialized in property (QJsonArray of floats)
 	QList<IHyFixture2d *>				m_FixtureList;			// This is the actual shape data used for physics/collision/rendering - usually just one fixture, but could be multiple for complex polygons
 	QList<GfxGrabPointModel>			m_GrabPointList;		// Grab Points for editing the shape - Used to serialize data when type is SHAPE_Polygon (then assembles m_FixtureList with valid sub-polygons)
 	GfxGrabPointModel					m_GrabPointCenter;
-
+	// "outline" - when serialized in property (float)
+	float								m_fOutline;				// "outline" is used with primitive layers to determine whether to render a solid (0.0f) or an outline around the shape 
+	// ------------------------------------------------------------------------------------------------------------------
+	
 	// Extra validation used with Chain or Polygon types
 	bool								m_bSelfIntersecting;
 	glm::vec2							m_ptSelfIntersection;
@@ -75,21 +68,18 @@ protected:
 	QList<IGfxEditView *>				m_ViewList;
 
 public:
-	IGfxEditModel(EditModeType eModelType, HyColor color);
+	IGfxEditModel();
 	virtual ~IGfxEditModel();
 
-	EditModeType GetModelType() const;
-
-	HyColor GetColor() const;
-	void SetColor(HyColor color);
-
 	bool IsValidModel() const;
-	virtual QJsonObject Serialize() const = 0;
+	QJsonObject Serialize() const;
 	void Deserialize(const QJsonObject &serializedObj);
 
 	void AddView(IGfxEditView *pView);
 	bool RemoveView(IGfxEditView *pView);
 	void SyncViews(EditModeState eEditModeState, EditModeAction eResult) const;
+
+	int GetNumFixtures() const;
 
 	const QList<GfxGrabPointModel> &GetGrabPointList() const;
 	const GfxGrabPointModel &GetGrabPoint(int iIndex) const;
@@ -109,15 +99,25 @@ public:
 	glm::vec2 GetDragDelta() const;
 	
 	virtual QString GetActionText(QString sNodeCodeName) const = 0; // Returns undo command description (blank if no change)
-	//virtual QJsonObject GetActionSerialized() const = 0;
 	void ClearAction();
 
 protected:
-	virtual QString DoDeserialize(const QJsonObject &serializedObj) = 0; // Returns empty string if successful, otherwise returns reason for failure (e.g. "Polygon has intersecting edges")
 	virtual EditModeAction DoMouseMoveIdle() = 0;
+
+	void TransformData(glm::mat4 mtxTransform);
 
 	// Action Transforms - These overrides will change the model's data as they are being performed. Upon completion, Serialize() can be called
 	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) = 0;
+
+	void ClearFixtures();
+
+	std::vector<float> SerializeData() const;
+	QString DeserializeData(const QJsonObject &serializedObj); // Returns empty string if successful, otherwise returns reason for failure (e.g. "Polygon has intersecting edges")
+
+	void AssemblePolygonFixtures(std::vector<std::vector<glm::vec2>> subPolygonList);
+	std::vector<glm::vec2> MergePolygons(const std::vector<glm::vec2> &ptA, const std::vector<glm::vec2> &ptB, int a0, int a1, int b0, int b1);
+	std::vector<std::vector<glm::vec2>> MergeTriangles(const std::vector<HyTriangle2d> &triangleList);
+	bool IsShareEdge(const std::vector<glm::vec2> &a, const std::vector<glm::vec2> &b, int &a0, int &a1, int &b0, int &b1);
 };
 
 #endif // IGfxEditModel_H
