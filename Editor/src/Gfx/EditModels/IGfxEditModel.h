@@ -48,6 +48,7 @@ class IGfxEditModel
 	QList<IHyFixture2d *>				m_FixtureList;			// This is the actual shape data used for physics/collision/rendering - usually just one fixture, but could be multiple for complex polygons
 	QList<GfxGrabPointModel>			m_GrabPointList;		// Grab Points for editing the shape - Used to serialize data when type is SHAPE_Polygon (then assembles m_FixtureList with valid sub-polygons)
 	GfxGrabPointModel					m_GrabPointCenter;
+	bool								m_bLoopClosed;
 	// "outline" - when serialized in property (float)
 	float								m_fOutline;				// "outline" is used with primitive layers to determine whether to render a solid (0.0f) or an outline around the shape 
 	// ------------------------------------------------------------------------------------------------------------------
@@ -55,7 +56,6 @@ class IGfxEditModel
 	// Extra validation used with Chain or Polygon types
 	bool								m_bSelfIntersecting;
 	glm::vec2							m_ptSelfIntersection;
-	bool								m_bLoopClosed;
 	QString								m_sMalformedReason;		// If not empty, this edit model is considered invalid and the reason is given by this string (e.g. "Polygon has intersecting edges")
 
 	// Transform Action info
@@ -69,7 +69,16 @@ class IGfxEditModel
 
 public:
 	IGfxEditModel();
-	virtual ~IGfxEditModel();
+	~IGfxEditModel();
+
+	bool IsLineChain() const;
+	EditorShape GetShapeType() const;
+
+	void ChangeToLineChain();
+	void ChangeToShape(EditorShape eNewShapeType);
+
+	bool IsLoopClosed() const;
+	float GetOutline() const;
 
 	bool IsValidModel() const;
 	QJsonObject Serialize() const;
@@ -98,23 +107,30 @@ public:
 
 	glm::vec2 GetDragDelta() const;
 	
-	virtual QString GetActionText(QString sNodeCodeName) const = 0; // Returns undo command description (blank if no change)
+	QString GetActionText(QString sNodeCodeName) const; // Returns undo command description (blank if no change)
 	void ClearAction();
 
 protected:
-	virtual EditModeAction DoMouseMoveIdle() = 0;
+	std::vector<float> ConvertedBoxData() const;
+	std::vector<float> ConvertedCircleData() const;
+	std::vector<float> ConvertedLineSegmentData() const;
+	std::vector<float> ConvertedCapsuleData() const;
+	std::vector<float> ConvertedPolygonOrLineChainData() const;
+
+	EditModeAction DoMouseMoveIdle();
 
 	void TransformData(glm::mat4 mtxTransform);
 
 	// Action Transforms - These overrides will change the model's data as they are being performed. Upon completion, Serialize() can be called
-	virtual void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) = 0;
+	void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
 
 	void ClearFixtures();
 
 	std::vector<float> SerializeData() const;
 	QString DeserializeData(const QJsonObject &serializedObj); // Returns empty string if successful, otherwise returns reason for failure (e.g. "Polygon has intersecting edges")
 
-	void AssemblePolygonFixtures(std::vector<std::vector<glm::vec2>> subPolygonList);
+	bool CheckIfAddVertexOnEdge();
+	void AssemblePolygonFixtures(std::vector<std::vector<glm::vec2>> subPolygonList); // Assembles m_FixtureList from properly formed sub-polygons (no self-intersections, correct winding, convex, <= 8 vertices)
 	std::vector<glm::vec2> MergePolygons(const std::vector<glm::vec2> &ptA, const std::vector<glm::vec2> &ptB, int a0, int a1, int b0, int b1);
 	std::vector<std::vector<glm::vec2>> MergeTriangles(const std::vector<HyTriangle2d> &triangleList);
 	bool IsShareEdge(const std::vector<glm::vec2> &a, const std::vector<glm::vec2> &b, int &a0, int &a1, int &b0, int &b1);
