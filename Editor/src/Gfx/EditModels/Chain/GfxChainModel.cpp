@@ -9,10 +9,10 @@
 //*************************************************************************/
 //#include "Global.h"
 //#include "GfxChainModel.h"
-//#include "IGfxEditView.h"
+//#include "EditModeView.h"
 //
 //GfxChainModel::GfxChainModel(HyColor color, const QList<float> &floatList /*= QList<float>()*/) :
-//	IGfxEditModel(EDITMODETYPE_Chain, color)
+//	EditModeModel(EDITMODETYPE_Chain, color)
 //{
 //	QJsonObject serializedObj;
 //	serializedObj.insert("type", HYLINECHAIN_Name);

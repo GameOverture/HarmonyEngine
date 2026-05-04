@@ -50,8 +50,7 @@ public:
 	virtual std::vector<float> SerializeSelf() const override;
 	virtual std::string DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) override;
 	virtual std::vector<glm::vec2> CalcGrabPoints() const override;
-
-	bool GetCentroid(glm::vec2 &ptCentroidOut) const;
+	virtual bool GetCentroid(glm::vec2 &ptCentroidOut) const override;
 
 	// Applies when attached to a physics body
 	void Setup(const b2ChainDef &chainDefRef);

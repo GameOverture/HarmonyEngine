@@ -11,11 +11,11 @@
 //#define GfxPrimLayerModel_H
 //
 //#include "Global.h"
-//#include "IGfxEditModel.h"
+//#include "EditModeModel.h"
 //#include "GfxShapeModel.h"
 //#include "GfxChainModel.h"
 //
-//class GfxPrimLayerModel : public IGfxEditModel
+//class GfxPrimLayerModel : public EditModeModel
 //{
 //	bool								m_bIsShape;
 //	GfxShapeModel						m_ShapeModel;

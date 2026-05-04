@@ -285,7 +285,9 @@ public:
 	static bool IsConvexPolygon(const std::vector<glm::vec2> &ccwOrderedVertexList); // Assumes an implicitly closed, counter-clockwise winding of vertices in `ccwOrderedVertexList`
 	static bool TestPointTriangle(const glm::vec2 &ptA, const glm::vec2 &ptB, const glm::vec2 &ptC, const glm::vec2 &ptTest); // Assumes counter-clockwise order of A,B,C
 	static bool TestPointTriangle(const HyTriangle2d &tri, const glm::vec2 &ptTest);
-	static std::vector<HyTriangle2d> HyMath::Triangulate(const std::vector<glm::vec2> &ccwOrderedVertexList);
+	static std::vector<HyTriangle2d> Triangulate(const std::vector<glm::vec2> &ccwOrderedVertexList);
+	
+	static glm::vec2 CalculateCentroid(const std::vector<glm::vec2> &vertexList);
 
 	static float AngleFromVector(const glm::vec2 &vDirVector); // Caution: Operationally expensive
 	static glm::vec2 ClosestPointOnRay(const glm::vec2 &ptRayStart, const glm::vec2 &vNormalizedRayDir, const glm::vec2 &ptTestPoint);

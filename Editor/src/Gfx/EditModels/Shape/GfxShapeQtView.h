@@ -11,14 +11,14 @@
 #define GfxShapeQtView_H
 
 #include "Global.h"
-#include "IGfxEditView.h"
+#include "EditModeView.h"
 
 #include <QGraphicsItem>
 
 class QGraphicsPolygonItem;
 class QGraphicsRectItem;
 
-class GfxShapeQtView : public IGfxEditView, public QGraphicsItem
+class GfxShapeQtView : public EditModeView, public QGraphicsItem
 {
 	QGraphicsPolygonItem *				m_pGfxPolygonItem;
 	QList<QGraphicsRectItem *>			m_GrabPointList;
@@ -27,12 +27,10 @@ public:
 	GfxShapeQtView(QGraphicsItem *pParent = nullptr);
 	virtual ~GfxShapeQtView();
 
+	virtual void SyncWithModel(EditModeState eEditModeState, EditModeAction eEditModeAction) override;
+
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) override;
-	
-protected:
-	//virtual void OnSyncColor() override;
-	virtual void OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) override;
 };
 
 #endif // GfxShapeQtView_H

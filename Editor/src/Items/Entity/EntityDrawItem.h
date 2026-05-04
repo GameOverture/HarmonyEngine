@@ -14,15 +14,15 @@
 
 class EntityDraw;
 class EntityTreeItemData;
-class IGfxEditModel;
-class IGfxEditView;
+class EditModeModel;
+class EditModeView;
 
 // NOTE: this class does not keep its state when removed, it is deleted (should not be passed to UndoCmd's)
 class EntityDrawItem : public IDrawExItem
 {
 	EntityTreeItemData *							m_pEntityTreeItemData;
 	IHyBody2d *										m_pChild;
-	IGfxEditView *									m_pEditView;
+	EditModeView *									m_pEditView;
 
 public:
 	EntityDrawItem(EntityTreeItemData *pModelItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent);
@@ -38,7 +38,7 @@ public:
 
 	virtual void RefreshTransform() override;
 
-	IGfxEditView *GetEditView();
+	EditModeView *GetEditView();
 
 	// This draw visual has all the current extrapolated data set for the current frame
 	QJsonValue ExtractPropertyData(QString sCategory, QString sPropertyName);

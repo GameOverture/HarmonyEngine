@@ -16,7 +16,7 @@
 #include <QPen>
 
 GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
-	IGfxEditView(nullptr),
+	EditModeView(nullptr),
 	QGraphicsItem(pParent),
 	m_pGfxPolygonItem(nullptr)
 {
@@ -49,17 +49,17 @@ GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
 //	m_pGfxPolygonItem->setPen(QPen(HyGlobal::ConvertHyColor(m_pModel->GetColor().IsDark() ? HyColor::White : HyColor::Black), 1.0f));
 //}
 
-/*virtual*/ void GfxShapeQtView::OnSyncModel(EditModeState eEditModeState, EditModeAction eEditModeAction) /*override*/
+/*virtual*/ void GfxShapeQtView::SyncWithModel(EditModeState eEditModeState, EditModeAction eEditModeAction) /*override*/
 {
-	if(m_pModel == nullptr)
-	{
-		m_pGfxPolygonItem->hide();
-		return;
-	}
+	//if(m_pModel == nullptr)
+	//{
+	//	m_pGfxPolygonItem->hide();
+	//	return;
+	//}
 
-	m_pGfxPolygonItem->setBrush(QBrush(HyGlobal::ConvertHyColor(m_pModel->GetColor())));
-	m_pGfxPolygonItem->setPen(QPen(HyGlobal::ConvertHyColor(m_pModel->GetColor().IsDark() ? HyColor::White : HyColor::Black), 1.0f));
+	//m_pGfxPolygonItem->setBrush(QBrush(HyGlobal::ConvertHyColor(m_pModel->GetColor())));
+	//m_pGfxPolygonItem->setPen(QPen(HyGlobal::ConvertHyColor(m_pModel->GetColor().IsDark() ? HyColor::White : HyColor::Black), 1.0f));
 
-	QPolygonF polygon;
-	const QList<GfxGrabPointModel> &grabPointListRef = m_pModel->GetGrabPointList();
+	//QPolygonF polygon;
+	//const QList<GfxGrabPointModel> &grabPointListRef = m_pModel->GetGrabPointList();
 }

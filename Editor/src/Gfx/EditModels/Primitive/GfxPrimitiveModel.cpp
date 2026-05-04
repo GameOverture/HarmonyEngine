@@ -9,10 +9,10 @@
 //*************************************************************************/
 //#include "Global.h"
 //#include "GfxPrimitiveModel.h"
-//#include "IGfxEditView.h"
+//#include "EditModeView.h"
 //
 //GfxPrimLayerModel::GfxPrimLayerModel() :
-//	IGfxEditModel(EDITMODETYPE_Shape, HyColor::White),
+//	EditModeModel(EDITMODETYPE_Shape, HyColor::White),
 //	m_bIsShape(true),
 //	m_ShapeModel(HyColor::White),
 //	m_ChainModel(HyColor::White)

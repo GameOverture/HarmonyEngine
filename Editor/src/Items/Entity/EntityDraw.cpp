@@ -253,18 +253,10 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				sCategoryName = "Primitive Layer";
 			else
 			{
-				switch(pTreeItemData->GetEditModel()->GetModelType())
-				{
-				case EDITMODETYPE_Shape:
-					sCategoryName = "Shape";
-					break;
-				case EDITMODETYPE_Chain:
+				if(pTreeItemData->GetEditModel()->IsLineChain())
 					sCategoryName = "Chain";
-					break;
-				default:
-					HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_Transform with unsupported edit model type!", LOGTYPE_Error);
-					break;
-				}
+				else
+					sCategoryName = "Shape";
 			}
 
 			QUndoCommand *pCmd = new EntityUndoCmd_EditModelData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pTreeItemData->GetEditModel()->Serialize(), sCategoryName, "Data");

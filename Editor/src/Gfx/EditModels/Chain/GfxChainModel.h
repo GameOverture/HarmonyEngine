@@ -11,9 +11,9 @@
 //#define GfxChainModel_H
 //
 //#include "Global.h"
-//#include "IGfxEditModel.h"
+//#include "EditModeModel.h"
 //
-//class GfxChainModel : public IGfxEditModel
+//class GfxChainModel : public EditModeModel
 //{
 //	friend class GfxPrimLayerModel;
 //

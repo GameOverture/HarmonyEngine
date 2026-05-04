@@ -259,7 +259,7 @@ b2Capsule HyShape2d::GetAsCapsule() const
 	return grabPtList;
 }
 
-bool HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const
+/*virtual*/ bool HyShape2d::GetCentroid(glm::vec2 &ptCentroidOut) const /*override*/
 {
 	switch(m_eType)
 	{

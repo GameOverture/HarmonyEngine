@@ -17,7 +17,7 @@
 #include <QJsonObject>
 #include <QDataStream>
 
-class GfxShapeModel;
+class EditModeModel;
 
 class TileData
 {
@@ -38,7 +38,7 @@ class TileData
 	QUuid											m_TerrainSetUuid;		// The Terrain Set assigned to this tile
 	QMap<QUuid, QBitArray>							m_TerrainMap;			// Key: Terrain Uuid (NOT TERRAIN SET), Value: QBitArray(NUM_AUTOTILEPARTS)
 
-	QMap<QUuid, GfxShapeModel *>					m_CollisionLayerMap;
+	QMap<QUuid, EditModeModel *>					m_CollisionLayerMap;
 
 public:
 	TileData(QPoint metaGridPos, QPixmap tilePixmap);
@@ -68,7 +68,7 @@ public:
 	void SetTerrainMap(const QMap<QUuid, QBitArray> &terrainMap);
 
 	QList<QUuid> GetCollisionLayerList() const;
-	GfxShapeModel *GetCollisionLayerModel(QUuid uuid) const;
+	EditModeModel *GetCollisionLayerModel(QUuid uuid) const;
 };
 
 #endif // TILEDATA_H

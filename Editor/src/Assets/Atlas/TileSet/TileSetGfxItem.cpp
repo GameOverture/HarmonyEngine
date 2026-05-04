@@ -158,7 +158,7 @@ void TileSetGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileDa
 		
 		if(m_pCollisionView == nullptr)
 		{
-			GfxShapeModel *pShapeModel = pTileData->GetCollisionLayerModel(selectedCollisionUuid);
+			EditModeModel *pShapeModel = pTileData->GetCollisionLayerModel(selectedCollisionUuid);
 			pShapeModel->SetColor(pTileSet->GetCollisionLayerColor(selectedCollisionUuid));
 
 			m_pCollisionView = new GfxShapeQtView(this);

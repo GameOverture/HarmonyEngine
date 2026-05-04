@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IGfxEditModel.h
+*	EditModeModel.h
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2026 Jason Knobler
@@ -7,13 +7,13 @@
 *	Harmony Editor Tool License:
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef IGfxEditModel_H
-#define IGfxEditModel_H
+#ifndef EditModeModel_H
+#define EditModeModel_H
 
 #include "Global.h"
 #include "GfxGrabPointModel.h"
 
-class IGfxEditView;
+class EditModeView;
 
 enum EditModeState
 {
@@ -38,8 +38,10 @@ enum EditModeAction
 	EDITMODEACTION_HoverCenter
 };
 
-class IGfxEditModel
+class EditModeModel
 {
+	HyColor								m_Color;
+
 	// ------------------------------------------------------------------------------------------------------------------
 	// "type" - when serialized in property (as a string)
 	bool								m_bIsLineChain;			// Whether this is a chain model (true) or shape model (false)
@@ -65,11 +67,14 @@ class IGfxEditModel
 	glm::vec2							m_ptGrabPointPos;
 
 	// Track Views manually since we don't inherit from QObject
-	QList<IGfxEditView *>				m_ViewList;
+	QList<EditModeView *>				m_ViewList;
 
 public:
-	IGfxEditModel();
-	~IGfxEditModel();
+	EditModeModel(HyColor color);
+	~EditModeModel();
+
+	HyColor GetColor() const;
+	void SetColor(HyColor color);
 
 	bool IsLineChain() const;
 	EditorShape GetShapeType() const;
@@ -84,11 +89,12 @@ public:
 	QJsonObject Serialize() const;
 	void Deserialize(const QJsonObject &serializedObj);
 
-	void AddView(IGfxEditView *pView);
-	bool RemoveView(IGfxEditView *pView);
+	void AddView(EditModeView *pView);
+	bool RemoveView(EditModeView *pView);
 	void SyncViews(EditModeState eEditModeState, EditModeAction eResult) const;
 
 	int GetNumFixtures() const;
+	const IHyFixture2d *GetFixture(int iIndex) const;
 
 	const QList<GfxGrabPointModel> &GetGrabPointList() const;
 	const GfxGrabPointModel &GetGrabPoint(int iIndex) const;
@@ -136,4 +142,4 @@ protected:
 	bool IsShareEdge(const std::vector<glm::vec2> &a, const std::vector<glm::vec2> &b, int &a0, int &a1, int &b0, int &b1);
 };
 
-#endif // IGfxEditModel_H
+#endif // EditModeModel_H

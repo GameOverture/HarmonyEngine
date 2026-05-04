@@ -12,7 +12,7 @@
 
 #include "ProjectItemData.h"
 #include "PropertiesTreeMultiModel.h"
-#include "IGfxEditModel.h"
+#include "EditModeModel.h"
 
 #include <QJsonArray>
 
@@ -210,7 +210,7 @@ class EntityTreeItemData : public TreeModelItemData
 	EntityItemType										m_eEntType;
 
 	EntityPropertiesTreeModel *							m_pPropertiesModel;
-	IGfxEditModel *										m_pEditModel;			// Only allocated when this item is capable of using Edit Mode
+	EditModeModel *										m_pEditModel;			// Only allocated when this item is capable of using Edit Mode
 
 	EntityItemDeclarationType							m_eDeclarationType;
 
@@ -249,7 +249,7 @@ public:
 	EntityModel &GetEntityModel() const;
 	EntityPropertiesTreeModel &GetPropertiesModel() const;
 
-	IGfxEditModel *GetEditModel();
+	EditModeModel *GetEditModel();
 
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);

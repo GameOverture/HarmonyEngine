@@ -318,10 +318,10 @@ if(Qt6_DIR)
 		src/Gfx/GfxTextModel.h
 		src/Gfx/GfxTransformCtrl.cpp
 		src/Gfx/GfxTransformCtrl.h
-		src/Gfx/EditModels/IGfxEditModel.cpp
-		src/Gfx/EditModels/IGfxEditModel.h
-		src/Gfx/EditModels/IGfxEditView.cpp
-		src/Gfx/EditModels/IGfxEditView.h
+		src/Gfx/EditModels/EditModeModel.cpp
+		src/Gfx/EditModels/EditModeModel.h
+		src/Gfx/EditModels/EditModeView.cpp
+		src/Gfx/EditModels/EditModeView.h
 		src/Gfx/EditModels/Chain/GfxChainModel.cpp
 		src/Gfx/EditModels/Chain/GfxChainModel.h
 		src/Gfx/EditModels/Chain/GfxChainView.cpp

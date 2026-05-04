@@ -9,10 +9,10 @@
 //*************************************************************************/
 //#include "Global.h"
 //#include "GfxShapeModel.h"
-//#include "IGfxEditView.h"
+//#include "EditModeView.h"
 //
 //GfxShapeModel::GfxShapeModel(HyColor color) :
-//	IGfxEditModel(EDITMODETYPE_Shape, color)
+//	EditModeModel(EDITMODETYPE_Shape, color)
 //{
 //}
 //

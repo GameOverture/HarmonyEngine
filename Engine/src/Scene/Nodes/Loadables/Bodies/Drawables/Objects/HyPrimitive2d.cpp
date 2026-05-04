@@ -184,7 +184,7 @@ int32 HyPrimitive2d::SetAsLineChain(int32 iLayerIndex, const HyChainData &chainD
 	return SetAsLineChain(iLayerIndex, chainData.pPointList, chainData.iCount, chainData.bLoop, fLineThickness);
 }
 
-int32 HyPrimitive2d::SetAsShape(int32 iLayerIndex, const HyShape2d &shapeRef, float fOutlineThickness)
+int32 HyPrimitive2d::SetAsFixture(int32 iLayerIndex, const IHyFixture2d &fixtureRef, float fOutlineThickness)
 {
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
@@ -195,40 +195,50 @@ int32 HyPrimitive2d::SetAsShape(int32 iLayerIndex, const HyShape2d &shapeRef, fl
 	Layer &layerRef = m_LayerList[iLayerIndex];
 	layerRef.m_fLineThickness = fOutlineThickness;
 
-	switch(shapeRef.GetType())
+	switch(fixtureRef.GetType())
 	{
 	case HYFIXTURE_Nothing:
 		DeleteLayerData(iLayerIndex);
 		break;
 
 	case HYFIXTURE_Circle:
-		AssembleCircle(iLayerIndex, glm::vec2(shapeRef.GetAsCircle().center.x, shapeRef.GetAsCircle().center.y), shapeRef.GetAsCircle().radius, layerRef.m_uiNumSegments);
+		AssembleCircle(iLayerIndex,
+					   glm::vec2(static_cast<const HyShape2d &>(fixtureRef).GetAsCircle().center.x, static_cast<const HyShape2d &>(fixtureRef).GetAsCircle().center.y),
+					   static_cast<const HyShape2d &>(fixtureRef).GetAsCircle().radius,
+					   layerRef.m_uiNumSegments);
 		break;
 
 	case HYFIXTURE_LineSegment: {
 		std::vector<glm::vec2> pointList;
-		pointList.emplace_back(shapeRef.GetAsSegment().point1.x, shapeRef.GetAsSegment().point1.y);
-		pointList.emplace_back(shapeRef.GetAsSegment().point2.x, shapeRef.GetAsSegment().point2.y);
+		pointList.emplace_back(static_cast<const HyShape2d &>(fixtureRef).GetAsSegment().point1.x, static_cast<const HyShape2d &>(fixtureRef).GetAsSegment().point1.y);
+		pointList.emplace_back(static_cast<const HyShape2d &>(fixtureRef).GetAsSegment().point2.x, static_cast<const HyShape2d &>(fixtureRef).GetAsSegment().point2.y);
 		AssembleLineChain(iLayerIndex, pointList.data(), 2, false);
 		break; }
 
 	case HYFIXTURE_Polygon: {
 		std::vector<glm::vec2> vertList;
-		for(int32 i = 0; i < shapeRef.GetAsPolygon().count; ++i)
-			vertList.emplace_back(shapeRef.GetAsPolygon().vertices[i].x, shapeRef.GetAsPolygon().vertices[i].y);
+		for(int32 i = 0; i < static_cast<const HyShape2d &>(fixtureRef).GetAsPolygon().count; ++i)
+			vertList.emplace_back(static_cast<const HyShape2d &>(fixtureRef).GetAsPolygon().vertices[i].x, static_cast<const HyShape2d &>(fixtureRef).GetAsPolygon().vertices[i].y);
 		AssemblePolygon(iLayerIndex, vertList.data(), vertList.size());
 		break; }
 
 	case HYFIXTURE_Capsule:
 		AssembleCapsule(iLayerIndex,
-						glm::vec2(shapeRef.GetAsCapsule().center1.x, shapeRef.GetAsCapsule().center1.y),
-						glm::vec2(shapeRef.GetAsCapsule().center2.x, shapeRef.GetAsCapsule().center2.y),
-						shapeRef.GetAsCapsule().radius,
+						glm::vec2(static_cast<const HyShape2d &>(fixtureRef).GetAsCapsule().center1.x, static_cast<const HyShape2d &>(fixtureRef).GetAsCapsule().center1.y),
+						glm::vec2(static_cast<const HyShape2d &>(fixtureRef).GetAsCapsule().center2.x, static_cast<const HyShape2d &>(fixtureRef).GetAsCapsule().center2.y),
+						static_cast<const HyShape2d &>(fixtureRef).GetAsCapsule().radius,
 						layerRef.m_uiNumSegments);
 		break;
 
+	case HYFIXTURE_LineChain:
+		AssembleLineChain(iLayerIndex,
+						  static_cast<const HyChain2d &>(fixtureRef).GetChainData().pPointList,
+						  static_cast<const HyChain2d &>(fixtureRef).GetChainData().iCount,
+						  static_cast<const HyChain2d &>(fixtureRef).GetChainData().bLoop);
+		break;
+
 	default:
-		HyLogError("HyPrimitive2d::AssembleData() - Unknown shape type: " << shapeRef.GetType());
+		HyLogError("HyPrimitive2d::AssembleData() - Unknown shape type: " << fixtureRef.GetType());
 		break;
 	}
 

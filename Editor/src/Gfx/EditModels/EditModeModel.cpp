@@ -1,5 +1,5 @@
 /**************************************************************************
-*	IGfxEditModel.cpp
+*	EditModeModel.cpp
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2026 Jason Knobler
@@ -7,11 +7,12 @@
 *	Harmony Editor Tool License:
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#include "IGfxEditModel.h"
-#include "IGfxEditView.h"
+#include "EditModeModel.h"
+#include "EditModeView.h"
 #include "MainWindow.h"
 
-IGfxEditModel::IGfxEditModel() :
+EditModeModel::EditModeModel(HyColor color) :
+	m_Color(color),
 	m_bIsLineChain(false),
 	m_eShapeType(SHAPE_None),
 	m_bLoopClosed(false),
@@ -28,22 +29,34 @@ IGfxEditModel::IGfxEditModel() :
 	ClearAction();
 }
 
-/*virtual*/ IGfxEditModel::~IGfxEditModel()
+/*virtual*/ EditModeModel::~EditModeModel()
 {
 	ClearFixtures();
 }
 
-bool IGfxEditModel::IsLineChain() const
+HyColor EditModeModel::GetColor() const
+{
+	return m_Color;
+}
+
+void EditModeModel::SetColor(HyColor color)
+{
+	m_Color = color;
+	for(EditModeView *pView : m_ViewList)
+		pView->SyncColor();
+}
+
+bool EditModeModel::IsLineChain() const
 {
 	return m_bIsLineChain;
 }
 
-EditorShape IGfxEditModel::GetShapeType() const
+EditorShape EditModeModel::GetShapeType() const
 {
 	return m_eShapeType;
 }
 
-void IGfxEditModel::ChangeToLineChain()
+void EditModeModel::ChangeToLineChain()
 {
 	m_bIsLineChain = true;
 	m_eShapeType = SHAPE_None;
@@ -61,7 +74,7 @@ void IGfxEditModel::ChangeToLineChain()
 	Deserialize(serializedObj);
 }
 
-void IGfxEditModel::ChangeToShape(EditorShape eNewShapeType)
+void EditModeModel::ChangeToShape(EditorShape eNewShapeType)
 {
 	m_bIsLineChain = false;
 	m_eShapeType = eNewShapeType;
@@ -102,22 +115,22 @@ void IGfxEditModel::ChangeToShape(EditorShape eNewShapeType)
 	Deserialize(serializedObj);
 }
 
-bool IGfxEditModel::IsLoopClosed() const
+bool EditModeModel::IsLoopClosed() const
 {
 	return m_bLoopClosed;
 }
 
-float IGfxEditModel::GetOutline() const
+float EditModeModel::GetOutline() const
 {
 	return m_fOutline;
 }
 
-bool IGfxEditModel::IsValidModel() const
+bool EditModeModel::IsValidModel() const
 {
 	return m_sMalformedReason.isEmpty();
 }
 
-QJsonObject IGfxEditModel::Serialize() const
+QJsonObject EditModeModel::Serialize() const
 {
 	QJsonObject serializedObj;
 	if(m_bIsLineChain)
@@ -136,51 +149,62 @@ QJsonObject IGfxEditModel::Serialize() const
 	return serializedObj;
 }
 
-void IGfxEditModel::Deserialize(const QJsonObject &serializedObj)
+void EditModeModel::Deserialize(const QJsonObject &serializedObj)
 {
 	m_sMalformedReason = DeserializeData(serializedObj);
 	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 
-void IGfxEditModel::AddView(IGfxEditView *pView)
+void EditModeModel::AddView(EditModeView *pView)
 {
 	if(m_ViewList.contains(pView))
 		return;
 	m_ViewList.push_back(pView);
 }
 
-bool IGfxEditModel::RemoveView(IGfxEditView *pView)
+bool EditModeModel::RemoveView(EditModeView *pView)
 {
 	return m_ViewList.removeOne(pView);
 }
 
-void IGfxEditModel::SyncViews(EditModeState eEditModeState, EditModeAction eResult) const
+void EditModeModel::SyncViews(EditModeState eEditModeState, EditModeAction eResult) const
 {
-	for(IGfxEditView *pView : m_ViewList)
+	for(EditModeView *pView : m_ViewList)
 		pView->SyncWithModel(eEditModeState, eResult);
 }
 
-int IGfxEditModel::GetNumFixtures() const
+int EditModeModel::GetNumFixtures() const
 {
 	return m_FixtureList.size();
 }
 
-const QList<GfxGrabPointModel> &IGfxEditModel::GetGrabPointList() const
+const IHyFixture2d *EditModeModel::GetFixture(int iIndex) const
+{
+	if(iIndex < 0 || iIndex >= m_FixtureList.size())
+	{
+		HyGuiLog("EditModeModel::GetFixture - Index out of range", LOGTYPE_Error);
+		return nullptr;
+	}
+
+	return m_FixtureList[iIndex];
+}
+
+const QList<GfxGrabPointModel> &EditModeModel::GetGrabPointList() const
 {
 	return m_GrabPointList;
 }
 
-const GfxGrabPointModel &IGfxEditModel::GetGrabPoint(int iIndex) const
+const GfxGrabPointModel &EditModeModel::GetGrabPoint(int iIndex) const
 {
 	if(iIndex < 0 || iIndex >= m_GrabPointList.size())
 	{
-		HyGuiLog("IGfxEditModel::GetGrabPoint - Index out of range", LOGTYPE_Error);
+		HyGuiLog("EditModeModel::GetGrabPoint - Index out of range", LOGTYPE_Error);
 		return m_GrabPointCenter;
 	}
 	return m_GrabPointList[iIndex];
 }
 
-const GfxGrabPointModel *IGfxEditModel::GetActiveGrabPoint() const
+const GfxGrabPointModel *EditModeModel::GetActiveGrabPoint() const
 {
 	if(m_iGrabPointIndex < 0 || m_iGrabPointIndex >= m_GrabPointList.size())
 		return nullptr;
@@ -188,17 +212,17 @@ const GfxGrabPointModel *IGfxEditModel::GetActiveGrabPoint() const
 	return &m_GrabPointList[m_iGrabPointIndex];
 }
 
-const GfxGrabPointModel &IGfxEditModel::GetCenterGrabPoint() const
+const GfxGrabPointModel &EditModeModel::GetCenterGrabPoint() const
 {
 	return m_GrabPointCenter;
 }
 
-int IGfxEditModel::GetActiveGrabPointIndex() const
+int EditModeModel::GetActiveGrabPointIndex() const
 {
 	return m_iGrabPointIndex;
 }
 
-int IGfxEditModel::GetNumGrabPointsSelected() const
+int EditModeModel::GetNumGrabPointsSelected() const
 {
 	int iNumSelected = 0;
 	for(const GfxGrabPointModel &grabPtModel : m_GrabPointList)
@@ -209,7 +233,7 @@ int IGfxEditModel::GetNumGrabPointsSelected() const
 	return iNumSelected;
 }
 
-bool IGfxEditModel::IsAllGrabPointsSelected() const
+bool EditModeModel::IsAllGrabPointsSelected() const
 {
 	for(const GfxGrabPointModel &grabPtModel : m_GrabPointList)
 	{
@@ -219,7 +243,7 @@ bool IGfxEditModel::IsAllGrabPointsSelected() const
 	return true;
 }
 
-bool IGfxEditModel::IsHoverGrabPointSelected() const
+bool EditModeModel::IsHoverGrabPointSelected() const
 {
 	if(m_iGrabPointIndex < 0 || m_iGrabPointIndex >= m_GrabPointList.size())
 		return false;
@@ -227,13 +251,13 @@ bool IGfxEditModel::IsHoverGrabPointSelected() const
 	return m_GrabPointList[m_iGrabPointIndex].IsSelected();
 }
 
-void IGfxEditModel::DeselectAllGrabPoints()
+void EditModeModel::DeselectAllGrabPoints()
 {
 	for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
 		grabPtModel.SetSelected(false);
 }
 
-Qt::CursorShape IGfxEditModel::MouseMoveIdle()
+Qt::CursorShape EditModeModel::MouseMoveIdle()
 {
 	EditModeAction eResult = DoMouseMoveIdle();
 
@@ -284,7 +308,7 @@ Qt::CursorShape IGfxEditModel::MouseMoveIdle()
 		return Qt::SizeAllCursor;
 
 	default:
-		HyGuiLog("IGfxEditModel::MouseMoveIdle - unsupported edit mode action!", LOGTYPE_Error);
+		HyGuiLog("EditModeModel::MouseMoveIdle - unsupported edit mode action!", LOGTYPE_Error);
 		break;
 	}
 
@@ -292,7 +316,7 @@ Qt::CursorShape IGfxEditModel::MouseMoveIdle()
 	return Qt::ArrowCursor;
 }
 
-bool IGfxEditModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags)
+bool EditModeModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags)
 {
 	bool bStartTransform = false;
 
@@ -350,7 +374,7 @@ bool IGfxEditModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHel
 	return bStartTransform;
 }
 
-void IGfxEditModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight)
+void EditModeModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight)
 {
 	// Select grab points within marquee
 	for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
@@ -369,7 +393,7 @@ void IGfxEditModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLef
 	SyncViews(eEditModeState, EDITMODEACTION_None);
 }
 
-void IGfxEditModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
+void EditModeModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
 	HySetVec(m_vDragDelta, 0.0f, 0.0f);
 	if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
@@ -384,12 +408,12 @@ void IGfxEditModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::ve
 	SyncViews(EDITMODE_MouseDragTransform, m_eCurAction);
 }
 
-glm::vec2 IGfxEditModel::GetDragDelta() const
+glm::vec2 EditModeModel::GetDragDelta() const
 {
 	return m_vDragDelta;
 }
 
-QString IGfxEditModel::GetActionText(QString sNodeCodeName) const
+QString EditModeModel::GetActionText(QString sNodeCodeName) const
 {
 	QString sUndoText;
 	switch(m_eCurAction)
@@ -423,18 +447,18 @@ QString IGfxEditModel::GetActionText(QString sNodeCodeName) const
 		else if(m_eShapeType == SHAPE_Capsule)
 			sUndoText = "Adjust capsule size on " % sNodeCodeName;
 		else
-			HyGuiLog("IGfxEditModel::MouseTransformReleased - Invalid shape type for EDITMODEACTION_HoverGrabPoint", LOGTYPE_Error);
+			HyGuiLog("EditModeModel::MouseTransformReleased - Invalid shape type for EDITMODEACTION_HoverGrabPoint", LOGTYPE_Error);
 		break;
 
 	default:
-		HyGuiLog("IGfxEditModel::MouseTransformReleased - Invalid m_eCurTransform", LOGTYPE_Error);
+		HyGuiLog("EditModeModel::MouseTransformReleased - Invalid m_eCurTransform", LOGTYPE_Error);
 		break;
 	}
 
 	return sUndoText;
 }
 
-void IGfxEditModel::ClearAction()
+void EditModeModel::ClearAction()
 {
 	m_eCurAction = EDITMODEACTION_None;
 	m_vDragDelta = glm::vec2(0.0f, 0.0f);
@@ -442,7 +466,7 @@ void IGfxEditModel::ClearAction()
 	m_ptGrabPointPos = glm::vec2(0.0f, 0.0f);
 }
 
-std::vector<float> IGfxEditModel::ConvertedBoxData() const
+std::vector<float> EditModeModel::ConvertedBoxData() const
 {
 	HyShape2d tmpBoxShape;
 	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
@@ -503,18 +527,18 @@ std::vector<float> IGfxEditModel::ConvertedBoxData() const
 		}
 		break;
 	case SHAPE_Polygon:
-		HyGuiLog("IGfxEditModel::ConvertedBoxData - Polygon handled with line chain.", LOGTYPE_Error);
+		HyGuiLog("EditModeModel::ConvertedBoxData - Polygon handled with line chain.", LOGTYPE_Error);
 		break;
 
 	default:
-		HyGuiLog("IGfxEditModel::ConvertedBoxData - Unhandled conversion to Box", LOGTYPE_Error);
+		HyGuiLog("EditModeModel::ConvertedBoxData - Unhandled conversion to Box", LOGTYPE_Error);
 		break;
 	}
 	
 	return std::vector<float>();
 }
 
-std::vector<float> IGfxEditModel::ConvertedCircleData() const
+std::vector<float> EditModeModel::ConvertedCircleData() const
 {
 	std::vector<float> convertedDataList(3);
 	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
@@ -591,7 +615,7 @@ std::vector<float> IGfxEditModel::ConvertedCircleData() const
 			break;
 
 		case SHAPE_Polygon:
-			HyGuiLog("IGfxEditModel::ConvertedCircleData - Polygon handled with line chain.", LOGTYPE_Error);
+			HyGuiLog("EditModeModel::ConvertedCircleData - Polygon handled with line chain.", LOGTYPE_Error);
 			break;
 	
 		default:
@@ -603,7 +627,7 @@ std::vector<float> IGfxEditModel::ConvertedCircleData() const
 	return convertedDataList;
 }
 
-std::vector<float> IGfxEditModel::ConvertedLineSegmentData() const
+std::vector<float> EditModeModel::ConvertedLineSegmentData() const
 {
 	std::vector<float> convertedDataList(4);
 	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
@@ -665,7 +689,7 @@ std::vector<float> IGfxEditModel::ConvertedLineSegmentData() const
 			}
 			break;
 		case SHAPE_Polygon:
-			HyGuiLog("IGfxEditModel::ConvertedLineSegmentData - Polygon handled with line chain.", LOGTYPE_Error);
+			HyGuiLog("EditModeModel::ConvertedLineSegmentData - Polygon handled with line chain.", LOGTYPE_Error);
 			break;
 
 		default:
@@ -677,7 +701,7 @@ std::vector<float> IGfxEditModel::ConvertedLineSegmentData() const
 	return convertedDataList;
 }
 
-std::vector<float> IGfxEditModel::ConvertedCapsuleData() const
+std::vector<float> EditModeModel::ConvertedCapsuleData() const
 {
 	std::vector<float> convertedDataList(5);
 
@@ -739,10 +763,10 @@ std::vector<float> IGfxEditModel::ConvertedCapsuleData() const
 
 		case SHAPE_Polygon:
 		case SHAPE_LineSegment:
-			HyGuiLog("IGfxEditModel::ConvertedCapsuleData - Polygon and LineSegment handled with line chain.", LOGTYPE_Error);
+			HyGuiLog("EditModeModel::ConvertedCapsuleData - Polygon and LineSegment handled with line chain.", LOGTYPE_Error);
 			break;
 		default:
-			HyGuiLog("IGfxEditModel::ConvertedCapsuleData - Unhandled conversion to Capsule", LOGTYPE_Error);
+			HyGuiLog("EditModeModel::ConvertedCapsuleData - Unhandled conversion to Capsule", LOGTYPE_Error);
 			break;
 		}
 	}
@@ -750,7 +774,7 @@ std::vector<float> IGfxEditModel::ConvertedCapsuleData() const
 	return convertedDataList;
 }
 
-std::vector<float> IGfxEditModel::ConvertedPolygonOrLineChainData() const
+std::vector<float> EditModeModel::ConvertedPolygonOrLineChainData() const
 {
 	std::vector<float> convertedDataList;
 
@@ -836,7 +860,7 @@ std::vector<float> IGfxEditModel::ConvertedPolygonOrLineChainData() const
 	return convertedDataList;
 }
 
-EditModeAction IGfxEditModel::DoMouseMoveIdle()
+EditModeAction EditModeModel::DoMouseMoveIdle()
 {
 	m_iGrabPointIndex = -1;
 	m_ptGrabPointPos = glm::vec2(0.0f, 0.0f);
@@ -909,7 +933,7 @@ EditModeAction IGfxEditModel::DoMouseMoveIdle()
 	return EDITMODEACTION_Outside;
 }
 
-void IGfxEditModel::TransformData(glm::mat4 mtxTransform)
+void EditModeModel::TransformData(glm::mat4 mtxTransform)
 {
 	for(IHyFixture2d *pFixture : m_FixtureList)
 		pFixture->TransformSelf(mtxTransform);
@@ -917,7 +941,7 @@ void IGfxEditModel::TransformData(glm::mat4 mtxTransform)
 	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
 }
 
-void IGfxEditModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
+void EditModeModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
 	glm::vec2 ptLowerBound, ptUpperBound, ptCenter;
 	if(bShiftMod)
@@ -990,7 +1014,7 @@ void IGfxEditModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, gl
 			break; }
 
 		case SHAPE_Polygon:
-			HyGuiLog("IGfxEditModel::DoTransformCreation - Handled with Line Chain", LOGTYPE_Error);
+			HyGuiLog("EditModeModel::DoTransformCreation - Handled with Line Chain", LOGTYPE_Error);
 			break;
 
 		default:
@@ -1000,14 +1024,14 @@ void IGfxEditModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, gl
 	}
 }
 
-void IGfxEditModel::ClearFixtures()
+void EditModeModel::ClearFixtures()
 {
 	for(IHyFixture2d *pFixture : m_FixtureList)
 		delete pFixture;
 	m_FixtureList.clear();
 }
 
-std::vector<float> IGfxEditModel::SerializeData() const
+std::vector<float> EditModeModel::SerializeData() const
 {
 	if(m_FixtureList.empty())
 		return std::vector<float>();
@@ -1026,7 +1050,7 @@ std::vector<float> IGfxEditModel::SerializeData() const
 	return returnList;
 }
 
-QString IGfxEditModel::DeserializeData(const QJsonObject &serializedObj)
+QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 {
 	m_bSelfIntersecting = false;
 	HySetVec(m_ptSelfIntersection, 0.0f, 0.0f);
@@ -1089,7 +1113,7 @@ QString IGfxEditModel::DeserializeData(const QJsonObject &serializedObj)
 			HyGuiLog("GfxShapeModel::SetData for polygon had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
 		else
 		{
-			int iNumVertFloats = floatList.size() - 1;
+			int iNumVertFloats = static_cast<int>(floatList.size()) - 1;
 			grabPointList.reserve(iNumVertFloats / 2);
 			for(int i = 0; i < iNumVertFloats; i += 2)
 				grabPointList.emplace_back(glm::vec2(floatList[i], floatList[i + 1]));
@@ -1097,7 +1121,7 @@ QString IGfxEditModel::DeserializeData(const QJsonObject &serializedObj)
 			m_bLoopClosed = floatList.back() != 0.0f;
 		}
 
-		ptCentroid = HyGlobal::CalculateCentroid(grabPointList);
+		ptCentroid = HyMath::CalculateCentroid(grabPointList);
 	}
 	else
 	{
@@ -1176,7 +1200,7 @@ QString IGfxEditModel::DeserializeData(const QJsonObject &serializedObj)
 			break;
 
 		case SHAPE_Polygon:
-			HyGuiLog("IGfxEditModel::DeserializeData - Polygon shape type should have been handled by line chain deserialization!", LOGTYPE_Error);
+			HyGuiLog("EditModeModel::DeserializeData - Polygon shape type should have been handled by line chain deserialization!", LOGTYPE_Error);
 			break;
 
 		case SHAPE_Capsule:
@@ -1253,11 +1277,11 @@ QString IGfxEditModel::DeserializeData(const QJsonObject &serializedObj)
 	return QString();
 }
 
-bool IGfxEditModel::CheckIfAddVertexOnEdge()
+bool EditModeModel::CheckIfAddVertexOnEdge()
 {
 	if(m_bIsLineChain == false && m_eShapeType != SHAPE_Polygon)
 	{
-		HyGuiLog("IGfxEditModel::CheckIfAddVertexOnEdge invoked with shape that isn't a linechain or polygon", LOGTYPE_Error);
+		HyGuiLog("EditModeModel::CheckIfAddVertexOnEdge invoked with shape that isn't a linechain or polygon", LOGTYPE_Error);
 		return false;
 	}
 	if(m_GrabPointList.size() < 2)
@@ -1276,7 +1300,7 @@ bool IGfxEditModel::CheckIfAddVertexOnEdge()
 		glm::vec2 ptWorldMousePos;
 		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
 		{
-			HyGuiLog("IGfxEditModel::CheckIfAddVertexOnEdge - Failed to get world mouse position for hit testing", LOGTYPE_Error);
+			HyGuiLog("EditModeModel::CheckIfAddVertexOnEdge - Failed to get world mouse position for hit testing", LOGTYPE_Error);
 			return false;
 		}
 
@@ -1292,7 +1316,7 @@ bool IGfxEditModel::CheckIfAddVertexOnEdge()
 	return false;
 }
 
-void IGfxEditModel::AssemblePolygonFixtures(std::vector<std::vector<glm::vec2>> subPolygonList)
+void EditModeModel::AssemblePolygonFixtures(std::vector<std::vector<glm::vec2>> subPolygonList)
 {
 	ClearFixtures();
 	for(std::vector<glm::vec2> &subPoly : subPolygonList)
@@ -1303,7 +1327,7 @@ void IGfxEditModel::AssemblePolygonFixtures(std::vector<std::vector<glm::vec2>> 
 	}
 }
 
-std::vector<glm::vec2> IGfxEditModel::MergePolygons(const std::vector<glm::vec2> &ptA, const std::vector<glm::vec2> &ptB, int a0, int a1, int b0, int b1)
+std::vector<glm::vec2> EditModeModel::MergePolygons(const std::vector<glm::vec2> &ptA, const std::vector<glm::vec2> &ptB, int a0, int a1, int b0, int b1)
 {
 	std::vector<glm::vec2> out;
 
@@ -1320,7 +1344,7 @@ std::vector<glm::vec2> IGfxEditModel::MergePolygons(const std::vector<glm::vec2>
 	return out;
 }
 
-std::vector<std::vector<glm::vec2>> IGfxEditModel::MergeTriangles(const std::vector<HyTriangle2d> &triangleList)
+std::vector<std::vector<glm::vec2>> EditModeModel::MergeTriangles(const std::vector<HyTriangle2d> &triangleList)
 {
 	std::vector<std::vector<glm::vec2>> polys;
 	for(const HyTriangle2d &t : triangleList)
@@ -1354,7 +1378,7 @@ std::vector<std::vector<glm::vec2>> IGfxEditModel::MergeTriangles(const std::vec
 	return polys;
 }
 
-bool IGfxEditModel::IsShareEdge(const std::vector<glm::vec2> &a, const std::vector<glm::vec2> &b, int &a0, int &a1, int &b0, int &b1)
+bool EditModeModel::IsShareEdge(const std::vector<glm::vec2> &a, const std::vector<glm::vec2> &b, int &a0, int &a1, int &b0, int &b1)
 {
 	for(int i = 0; i < (int)a.size(); ++i)
 	{

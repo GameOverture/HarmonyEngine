@@ -211,7 +211,7 @@ EntityPropertiesTreeModel &EntityTreeItemData::GetPropertiesModel() const
 	return *m_pPropertiesModel;
 }
 
-IGfxEditModel *EntityTreeItemData::GetEditModel()
+EditModeModel *EntityTreeItemData::GetEditModel()
 {
 	return m_pEditModel;
 }
@@ -384,7 +384,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		
 		//TreeModelItemData *pPrimitiveItemData = m_EntityModelRef.GetItem().GetProject().FindItemData(m_ReferencedItemUuid);
 		
-		m_pEditModel = new GfxPrimLayerModel();
+		m_pEditModel = new EditModeModel(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
 
 		m_pPropertiesModel->InsertCategory(0, "Primitive Layer", QVariant(), false, "A collection of shape layers that can be drawn to the screen");
 		QVariant primLayerDataVariant;
@@ -438,7 +438,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_ShapeFixture: {
-		m_pEditModel = new GfxShapeModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+		m_pEditModel = new EditModeModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		// NOTE: This should be the first categories added for fixtures
 		m_pPropertiesModel->InsertCategory(-1, "Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
@@ -456,7 +456,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break; }
 
 	case ITEM_ChainFixture: {
-		m_pEditModel = new GfxChainModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+		m_pEditModel = new EditModeModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		// NOTE: This should be the first categories added for fixtures
 		m_pPropertiesModel->InsertCategory(-1, "Chain", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");

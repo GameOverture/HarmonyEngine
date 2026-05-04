@@ -45,8 +45,8 @@ public:
 	virtual std::vector<float> SerializeSelf() const override;
 	virtual std::string DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) override;
 	virtual std::vector<glm::vec2> HyShape2d::CalcGrabPoints() const override;
+	virtual bool GetCentroid(glm::vec2 &ptCentroidOut) const override;
 
-	bool GetCentroid(glm::vec2 &ptCentroidOut) const;
 	float CalcArea() const; // Returns the area in meters squared
 
 	void SetAsNothing();

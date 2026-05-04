@@ -46,7 +46,8 @@ public:
 	virtual void TransformSelf(const glm::mat4 &mtxTransform) = 0;
 	virtual std::vector<float> SerializeSelf() const = 0;
 	virtual std::string DeserializeSelf(HyFixtureType eFixtureType, const std::vector<float> &floatList) = 0; // Returns vertex list of "grab points" for editing
-	virtual std::vector<glm::vec2> CalcGrabPoints() const = 0; 
+	virtual std::vector<glm::vec2> CalcGrabPoints() const = 0;
+	virtual bool GetCentroid(glm::vec2 &ptCentroidOut) const = 0;
 
 	glm::vec2 ComputeSize() const;
 

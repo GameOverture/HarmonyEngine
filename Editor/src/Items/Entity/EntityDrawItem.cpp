@@ -16,9 +16,7 @@
 #include "MainWindow.h"
 #include "GfxPrimitiveModel.h"
 #include "GfxShapeModel.h"
-#include "GfxPrimitiveView.h"
-#include "GfxShapeHyView.h"
-#include "GfxChainView.h"
+#include "EditModeView.h"
 
 EntityDrawItem::EntityDrawItem(EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
 	IDrawExItem(pEntityDraw),
@@ -32,8 +30,8 @@ EntityDrawItem::EntityDrawItem(EntityTreeItemData *pEntityTreeItemData, EntityDr
 
 /*virtual*/ EntityDrawItem::~EntityDrawItem()
 {
-	if(m_pChild != m_pEditView)
-		delete m_pEditView;
+	//if(m_pChild != m_pEditView)
+	//	delete m_pEditView;
 	delete m_pChild;
 }
 
@@ -56,8 +54,9 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 {
 	// Cache old node pointer to be deleted after reallocating (to avoid Harmony unloading and reloading assets)
 	IHyBody2d *pOldChild = m_pChild;
-	IGfxEditView *pOldEditView = m_pEditView;
-	m_pChild = m_pEditView = nullptr;
+	EditModeView *pOldEditView = m_pEditView;
+	m_pChild = nullptr;
+	m_pEditView = nullptr;
 
 	Project &projectRef = m_pEntityTreeItemData->GetEntityModel().GetItem().GetProject();
 
@@ -171,7 +170,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 	}
 	else if(m_pEntityTreeItemData->GetType() == ITEM_PrimLayer)
 	{
-		m_pEditView = new GfxPrimitiveView();
+		m_pEditView = new EditModeView();
 		
 		m_pEditView->SetModel(m_pEntityTreeItemData->GetEditModel());
 		m_pChild = m_pEditView;
@@ -179,9 +178,9 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 	else if(m_pEntityTreeItemData->IsFixtureItem())
 	{
 		if(m_pEntityTreeItemData->GetType() == ITEM_ShapeFixture)
-			m_pEditView = new GfxShapeHyView(true, pParent);
+			m_pEditView = new EditModeView(pParent);
 		else if(m_pEntityTreeItemData->GetType() == ITEM_ChainFixture)
-			m_pEditView = new GfxChainView(pParent);
+			m_pEditView = new EditModeView(pParent);
 		else
 			HyGuiLog("EntityDrawItem ctor - unhandled fixture item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 
@@ -221,7 +220,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 		IDrawExItem::RefreshTransform();
 }
 
-IGfxEditView *EntityDrawItem::GetEditView()
+EditModeView *EntityDrawItem::GetEditView()
 {
 	return m_pEditView;
 }
@@ -317,7 +316,7 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 	}
 	else if(sCategory == "Primitive Layer" || sCategory == "Shape" || sCategory == "Chain")
 	{
-		IGfxEditModel *pModel = static_cast<IGfxEditView *>(pThisHyNode)->GetModel();
+		EditModeModel *pModel = static_cast<EditModeView *>(pThisHyNode)->GetModel();
 
 		if(sPropertyName == "Data")
 		{
@@ -917,7 +916,7 @@ void ExtrapolateProperties(Project &projectRef,
 			}
 		} // IsFixture != true
 
-		IGfxEditModel *pEditModel = nullptr;
+		EditModeModel *pEditModel = nullptr;
 		if(pEntityTreeItemData)
 			pEditModel = pEntityTreeItemData->GetEditModel();
 

@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "TileData.h"
-#include "GfxShapeModel.h"
+#include "EditModeModel.h"
 
 #include <QBitArray>
 #
@@ -63,8 +63,7 @@ TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 		for(int j = 0; j < dataArray.size(); ++j)
 			vertexList.push_back(static_cast<float>(dataArray[j].toDouble()));
 
-		m_CollisionLayerMap[collisionUuid] = new GfxShapeModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
-		m_CollisionLayerMap[collisionUuid]->SetShapeType(SHAPE_Polygon, vertexList);
+		m_CollisionLayerMap[collisionUuid] = new EditModeModel(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 	}
 }
 
@@ -265,7 +264,7 @@ QList<QUuid> TileData::GetCollisionLayerList() const
 	return m_CollisionLayerMap.keys();
 }
 
-GfxShapeModel *TileData::GetCollisionLayerModel(QUuid uuid) const
+EditModeModel *TileData::GetCollisionLayerModel(QUuid uuid) const
 {
 	return m_CollisionLayerMap.value(uuid);
 }

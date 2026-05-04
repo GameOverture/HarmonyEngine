@@ -147,7 +147,7 @@ public:
 	int32 SetAsLineChain(int32 iLayerIndex, const std::vector<glm::vec2> &verticesList, bool bLoop, float fLineThickness);
 	int32 SetAsLineChain(int32 iLayerIndex, const HyChainData &chainData, float fLineThickness);
 
-	int32 SetAsShape(int32 iLayerIndex, const HyShape2d &shapeRef, float fOutlineThickness);
+	int32 SetAsFixture(int32 iLayerIndex, const IHyFixture2d &fixtureRef, float fOutlineThickness);
 
 	// Set as a circle with the specified center and radius
 	int32 SetAsCircle(int32 iLayerIndex, float fRadius, float fOutlineThickness);

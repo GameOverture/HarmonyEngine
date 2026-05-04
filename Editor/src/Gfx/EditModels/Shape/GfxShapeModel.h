@@ -11,9 +11,9 @@
 //#define GfxShapeModel_H
 //
 //#include "Global.h"
-//#include "IGfxEditModel.h"
+//#include "EditModeModel.h"
 //
-//class GfxShapeModel : public IGfxEditModel
+//class GfxShapeModel : public EditModeModel
 //{
 //	friend class GfxPrimLayerModel;
 //

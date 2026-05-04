@@ -390,6 +390,27 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 	return result;
 }
 
+/*static*/ glm::vec2 HyMath::CalculateCentroid(const std::vector<glm::vec2> &vertexList)
+{
+	glm::vec2 vCentroid(0.0f);
+	float fSignedArea = 0.0f;
+	const int iNumVerts = static_cast<int>(vertexList.size());
+	for(int i = 0; i < iNumVerts; ++i)
+	{
+		const glm::vec2 &pt1Ref = vertexList[i];
+		const glm::vec2 &pt2Ref = vertexList[(i + 1) % iNumVerts];
+		float fA = (pt1Ref.x * pt2Ref.y) - (pt2Ref.x * pt1Ref.y);
+		fSignedArea += fA;
+		vCentroid.x += (pt1Ref.x + pt2Ref.x) * fA;
+		vCentroid.y += (pt1Ref.y + pt2Ref.y) * fA;
+	}
+	fSignedArea *= 0.5f;
+	vCentroid.x /= (6.0f * fSignedArea);
+	vCentroid.y /= (6.0f * fSignedArea);
+
+	return vCentroid;
+}
+
 // Caution: Operationally expensive
 /*static*/ float HyMath::AngleFromVector(const glm::vec2 &vDirVector)
 {

@@ -221,7 +221,7 @@ void HyChain2d::ClearData()
 	return grabPointList;
 }
 
-bool HyChain2d::GetCentroid(glm::vec2 &ptCentroidOut) const
+/*virtual*/ bool HyChain2d::GetCentroid(glm::vec2 &ptCentroidOut) const /*override*/
 {
 	if(IsValid() == false)
 		return false;
@@ -232,6 +232,7 @@ bool HyChain2d::GetCentroid(glm::vec2 &ptCentroidOut) const
 	{
 		ptCentroidOut += m_Data.pPointList[i];
 	}
+
 	ptCentroidOut /= static_cast<float>(iNumVerts);
 	return true;
 }
