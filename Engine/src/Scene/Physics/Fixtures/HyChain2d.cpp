@@ -174,8 +174,8 @@ void HyChain2d::ClearData()
 /*virtual*/ std::vector<float> HyChain2d::SerializeSelf() const /*override*/
 {
 	std::vector<float> floatList;
-	if(IsValid() == false)
-		return floatList;
+	//if(IsValid() == false)
+	//	return floatList;
 
 	for(int i = 0; i < m_Data.iCount; ++i)
 	{
@@ -213,8 +213,8 @@ void HyChain2d::ClearData()
 /*virtual*/ std::vector<glm::vec2> HyChain2d::CalcGrabPoints() const /*override*/
 {
 	std::vector<glm::vec2> grabPointList;
-	if(IsValid() == false)
-		return grabPointList;
+	//if(IsValid() == false)
+	//	return grabPointList;
 	for(int i = 0; i < m_Data.iCount; ++i)
 		grabPointList.push_back(m_Data.pPointList[i]);
 	

@@ -57,7 +57,7 @@ void EditModeView::SyncColor()
 
 void EditModeView::SyncWithModel(EditModeState eEditModeState, EditModeAction eEditModeAction)
 {
-	if(eEditModeState == EDITMODE_Off || m_pModel == nullptr || m_pModel->GetNumFixtures() == 0 || (m_pModel->IsLineChain() == false && m_pModel->GetShapeType() == SHAPE_None))
+	if(eEditModeState == EDITMODE_Off || m_pModel == nullptr || (m_pModel->IsLineChain() == false && m_pModel->GetShapeType() == SHAPE_None))
 	{
 		ClearGrabPoints();
 		m_CameraPrim.RemoveAllLayers();
@@ -89,8 +89,9 @@ void EditModeView::SyncWithModel(EditModeState eEditModeState, EditModeAction eE
 		for(const GfxGrabPointModel &pointRef : grabPointModelList)
 		{
 			glm::vec2 ptCameraPoint;
-			pCamera->ProjectToCamera(pointRef.GetPos(), ptCameraPoint);
-			outlinePtList.push_back(ptCameraPoint);
+			//pCamera->ProjectToCamera(pointRef.GetPos(), ptCameraPoint);
+			outlinePtList.push_back(pointRef.GetPos());
+			//outlinePtList.push_back(ptCameraPoint);
 		}
 		m_CameraPrim.SetAsLineChain(0, outlinePtList, m_pModel->IsLoopClosed(), m_pModel->GetOutline());
 

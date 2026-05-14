@@ -70,7 +70,7 @@ class EditModeModel
 	QList<EditModeView *>				m_ViewList;
 
 public:
-	EditModeModel(HyColor color);
+	EditModeModel(bool bIsLineChain, HyColor color);
 	~EditModeModel();
 
 	HyColor GetColor() const;
@@ -110,10 +110,11 @@ public:
 	bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags); // Returns whether transform has begun (otherwise marquee select)
 	void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight);
 	void MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
+	void MouseTransformRelease();
 
 	glm::vec2 GetDragDelta() const;
 	
-	QString GetActionText(QString sNodeCodeName) const; // Returns undo command description (blank if no change)
+	QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const; // Returns undo command description (blank if no change)
 	void ClearAction();
 
 protected:

@@ -11,9 +11,9 @@
 #include "EditModeView.h"
 #include "MainWindow.h"
 
-EditModeModel::EditModeModel(HyColor color) :
+EditModeModel::EditModeModel(bool bIsLineChain, HyColor color) :
 	m_Color(color),
-	m_bIsLineChain(false),
+	m_bIsLineChain(bIsLineChain),
 	m_eShapeType(SHAPE_None),
 	m_bLoopClosed(false),
 	m_fOutline(0.0f),
@@ -408,12 +408,37 @@ void EditModeModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::ve
 	SyncViews(EDITMODE_MouseDragTransform, m_eCurAction);
 }
 
+void EditModeModel::MouseTransformRelease()
+{
+	switch(m_eCurAction)
+	{
+	case EDITMODEACTION_None:
+		HyGuiLog("EditModeModel::MouseTransformReleased - No current action to release", LOGTYPE_Error);
+		break;
+
+	case EDITMODEACTION_Creation:
+		break;
+	case EDITMODEACTION_Outside:
+		break;
+	case EDITMODEACTION_Inside:
+		break;
+	case EDITMODEACTION_AppendVertex:
+		break;
+	case EDITMODEACTION_InsertVertex:
+		break;
+	case EDITMODEACTION_HoverGrabPoint:
+		break;
+	case EDITMODEACTION_HoverCenter:
+		break;
+	}
+}
+
 glm::vec2 EditModeModel::GetDragDelta() const
 {
 	return m_vDragDelta;
 }
 
-QString EditModeModel::GetActionText(QString sNodeCodeName) const
+QString EditModeModel::GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const
 {
 	QString sUndoText;
 	switch(m_eCurAction)
@@ -438,6 +463,9 @@ QString EditModeModel::GetActionText(QString sNodeCodeName) const
 		sUndoText = "Insert vertex on " % sNodeCodeName;
 		break;
 	case EDITMODEACTION_HoverGrabPoint:
+		if(eEditModeState == EDITMODE_MouseDownTransform) // Ensure the minimum drag distance has occured
+			break;
+
 		if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon || m_eShapeType == SHAPE_LineSegment)
 			sUndoText = "Translate vert(s) on " % sNodeCodeName;
 		else if(m_eShapeType == SHAPE_Circle)
@@ -963,16 +991,37 @@ void EditModeModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, gl
 
 	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
 	{
+		if(m_FixtureList.empty())
+		{
+			if(m_bIsLineChain)
+				m_FixtureList.push_back(new HyChain2d());
+			else
+				m_FixtureList.push_back(new HyShape2d());
+		}
+		m_fOutline = 1.0f;
+
 		m_GrabPointList.clear();
-		m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptDragPos));
+		m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptStartPos));
 		m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptDragPos));
 		
 		m_GrabPointList[0].SetSelected(false);
 		m_GrabPointList[1].Set(GRABPOINT_EndpointSelected, ptDragPos);
 		m_sMalformedReason = "Incomplete shape";
+
+		std::vector<glm::vec2> vertexList;
+		vertexList.push_back(ptStartPos);
+		vertexList.push_back(ptDragPos);
+
+		if(m_bIsLineChain)
+			static_cast<HyChain2d *>(m_FixtureList[0])->SetData(vertexList, false);
+		else
+			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsPolygon(vertexList);
 	}
 	else
 	{
+		if(m_FixtureList.empty())
+			m_FixtureList.push_back(new HyShape2d());
+
 		switch(m_eShapeType)
 		{
 		case SHAPE_Box: {
@@ -1035,10 +1084,10 @@ std::vector<float> EditModeModel::SerializeData() const
 {
 	if(m_FixtureList.empty())
 		return std::vector<float>();
-	if(m_eShapeType != SHAPE_Polygon)
+	if(m_bIsLineChain == false && m_eShapeType != SHAPE_Polygon)
 		return m_FixtureList[0]->SerializeSelf();
 
-	// SHAPE_Polygon
+	// Line Chain or SHAPE_Polygon
 	std::vector<float> returnList;
 	for(const GfxGrabPointModel &grabPt : m_GrabPointList)
 	{
@@ -1056,6 +1105,9 @@ QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 	HySetVec(m_ptSelfIntersection, 0.0f, 0.0f);
 
 	QString sType = serializedObj["type"].toString();
+	if(sType.isEmpty())
+		return "No data provided";
+
 	if(sType == HYLINECHAIN_Name)
 	{
 		m_bIsLineChain = true;

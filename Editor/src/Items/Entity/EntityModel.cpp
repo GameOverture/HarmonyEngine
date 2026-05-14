@@ -1520,7 +1520,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 	QJsonArray floatArray = serializedObj["data"].toArray();
 	QStringList sFloatList;
 	for(int i = 0; i < floatArray.size(); ++i)
-		sFloatList[i] = QString::number(floatArray[i].toDouble(), 'f'); // Ensure we have a decimal point
+		sFloatList.push_back(QString::number(floatArray[i].toDouble(), 'f')); // Ensure we have a decimal point
 
 	if(sFloatList.isEmpty() || HyGlobal::GetShapeFromString(serializedObj["type"].toString()) == SHAPE_None)
 	{

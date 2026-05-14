@@ -1096,7 +1096,7 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 			QJsonArray jsonArray = treeItemValue.toJsonArray();
 			for(int i = 0; i < jsonArray.size(); ++i)
 			{
-				sRetStr += QString::number(jsonArray[i].toDouble());
+				sRetStr += QString::number(jsonArray[i].toDouble(), 'f', 1);
 				if(i < jsonArray.size() - 1)
 					sRetStr += ", ";
 			}
@@ -1145,7 +1145,7 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 			QJsonArray shapeDataArray = shapeDataObj["data"].toArray();
 			bool bFirstVal = true;
 			for(QJsonValue val : shapeDataArray)
-				sRetStr += QString::number(val.toDouble(), 103, 1) + ", ";
+				sRetStr += QString::number(val.toDouble(), 'f', 1) + ", ";
 			
 			sRetStr += " ]";
 		}

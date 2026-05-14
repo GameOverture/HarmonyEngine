@@ -97,7 +97,6 @@ HyFixtureType IHyFixture2d::GetType() const
 
 bool IHyFixture2d::IsValid() const
 {
-
 	return m_eType != HYFIXTURE_Nothing && OnIsValid();
 }
 

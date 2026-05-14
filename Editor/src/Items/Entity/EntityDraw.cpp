@@ -243,9 +243,11 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	case EDITMODE_MouseDownTransform:
 	case EDITMODE_MouseDragTransform: {
-		QString sUndoText = pTreeItemData->GetEditModel()->GetActionText(pTreeItemData->GetCodeName());
+		QString sUndoText = pTreeItemData->GetEditModel()->GetActionText(m_eEditModeState, pTreeItemData->GetCodeName());
 		if(sUndoText.isEmpty() == false)
 		{
+			pTreeItemData->GetEditModel()->MouseTransformRelease();
+
 			int iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
 			int iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
 			QString sCategoryName;
@@ -262,6 +264,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			QUndoCommand *pCmd = new EntityUndoCmd_EditModelData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pTreeItemData->GetEditModel()->Serialize(), sCategoryName, "Data");
 			m_pProjItem->GetUndoStack()->push(pCmd);
 		}
+		pTreeItemData->GetEditModel()->SyncViews(m_eEditModeState, EDITMODEACTION_None);
+
 		break; }
 
 	default:
