@@ -172,6 +172,12 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		break;
 
 	case EDITMODE_Idle: {
+		if(pEvent->button() == Qt::RightButton)
+		{
+			pTreeItemData->GetEditModel()->DeselectAllGrabPoints();
+			break;
+		}
+
 		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), m_ptDragStart);
 		
 		bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
@@ -220,7 +226,6 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_Off reached in Edit Mode!", LOGTYPE_Error);
 		break;
 	case EDITMODE_Idle:
-		HyGuiLog("EntityDraw::OnMouseReleaseEvent - EDITMODE_Idle reached in Edit Mode!", LOGTYPE_Error);
 		break;
 
 	case EDITMODE_MouseDownOutside:
@@ -246,8 +251,6 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		QString sUndoText = pTreeItemData->GetEditModel()->GetActionText(m_eEditModeState, pTreeItemData->GetCodeName());
 		if(sUndoText.isEmpty() == false)
 		{
-			pTreeItemData->GetEditModel()->MouseTransformRelease();
-
 			int iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
 			int iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
 			QString sCategoryName;
@@ -298,15 +301,17 @@ bool EntityDraw::OnSetEditMode(bool bEnable)
 			if(pCurEditItem && pCurEditItem->GetEntityTreeItemData()->IsFixtureItem() == false)
 				pCurEditItem->ShowTransformCtrl(true);
 
-			ClearAction();
+			ClearBackgroundAction();
 			MainWindow::ClearStatus();
+
+			RefreshTransforms();
 		}
 
 		m_EditModeWindowOutline.SetVisible(false);
 		return true;
 	}
 
-	if(SetAction(HYACTION_EditMode) == false)
+	if(SetBackgroundAction(HYACTION_EditMode) == false)
 		return false;
 
 	EntityDrawItem *pCurEditItem = GetCurEditItem();
@@ -339,7 +344,7 @@ bool EntityDraw::OnSetEditMode(bool bEnable)
 
 EntityDrawItem *EntityDraw::GetCurEditItem() const
 {
-	if(GetCurAction() == HYACTION_EditMode && m_SelectedItemList.size() == 1 && static_cast<EntityDrawItem *>(m_SelectedItemList[0])->GetEntityTreeItemData()->IsEditable())
+	if((GetCurAction() == HYACTION_EditMode || GetCurAction() == HYACTION_Pan) && m_SelectedItemList.size() == 1 && static_cast<EntityDrawItem *>(m_SelectedItemList[0])->GetEntityTreeItemData()->IsEditable())
 		return static_cast<EntityDrawItem *>(m_SelectedItemList[0]);
 
 	return nullptr;
@@ -372,6 +377,7 @@ void EntityDraw::SetExtrapolatedProperties()
 	ExtrapolateProperties(m_pProjItem->GetProject(),
 							m_pRootEntity,
 							nullptr,
+							false,
 							false,
 							ITEM_None, // 'ITEM_None' indicates this is the root
 							fFRAME_DURATION,
@@ -411,19 +417,22 @@ void EntityDraw::SetExtrapolatedProperties()
 			// FlushHyNode (and clearing edit model) makes properties that aren't keyed on the timeline until later show the proper default values
 			if(false == (static_cast<EntityModel *>(m_pProjItem->GetModel())->GetBaseClassType() == ENTBASECLASS_HyGui && pEntDrawItem->GetEntityTreeItemData()->IsWidgetItem())) // Widgets will have already been 'flushed' within FlushRootEntity()
 				pEntDrawItem->FlushHyNode(m_pRootEntity);
+
+			bool bIsActiveEditModeItem = GetCurEditItem() == pEntDrawItem;
 			if(pEntDrawItem->GetEntityTreeItemData()->GetEditModel())
-				pEntDrawItem->GetEntityTreeItemData()->GetEditModel()->Deserialize(QJsonObject());
+				pEntDrawItem->GetEntityTreeItemData()->GetEditModel()->Deserialize(bIsActiveEditModeItem, QJsonObject());
 
 			ExtrapolateProperties(m_pProjItem->GetProject(),
-									pEntDrawItem->GetHyNode(),
-									pEntDrawItem->GetEntityTreeItemData(),
-									pEntityTreeItemData->IsSelected(),
-									eItemType,
-									fFRAME_DURATION,
-									-1,
-									iDESTINATION_FRAME,
-									combinedFrameMap,
-									pEntityTreeItemData->GetPreviewComponent());
+								  pEntDrawItem->GetHyNode(),
+								  pEntDrawItem->GetEntityTreeItemData(),
+								  pEntityTreeItemData->IsSelected(),
+								  bIsActiveEditModeItem,
+								  eItemType,
+								  fFRAME_DURATION,
+								  -1,
+								  iDESTINATION_FRAME,
+								  combinedFrameMap,
+								  pEntityTreeItemData->GetPreviewComponent());
 		}
 	}
 

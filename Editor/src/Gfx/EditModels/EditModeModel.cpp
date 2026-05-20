@@ -56,7 +56,7 @@ EditorShape EditModeModel::GetShapeType() const
 	return m_eShapeType;
 }
 
-void EditModeModel::ChangeToLineChain()
+void EditModeModel::ChangeToLineChain(bool bIsActiveEditModeItem)
 {
 	m_bIsLineChain = true;
 	m_eShapeType = SHAPE_None;
@@ -71,10 +71,10 @@ void EditModeModel::ChangeToLineChain()
 		dataArray.push_back(f);
 	serializedObj.insert("data", dataArray);
 	serializedObj.insert("outline", m_fOutline);
-	Deserialize(serializedObj);
+	Deserialize(bIsActiveEditModeItem, serializedObj);
 }
 
-void EditModeModel::ChangeToShape(EditorShape eNewShapeType)
+void EditModeModel::ChangeToShape(bool bIsActiveEditModeItem, EditorShape eNewShapeType)
 {
 	m_bIsLineChain = false;
 	m_eShapeType = eNewShapeType;
@@ -112,7 +112,7 @@ void EditModeModel::ChangeToShape(EditorShape eNewShapeType)
 		dataArray.push_back(f);
 	serializedObj.insert("data", dataArray);
 	serializedObj.insert("outline", m_fOutline);
-	Deserialize(serializedObj);
+	Deserialize(bIsActiveEditModeItem, serializedObj);
 }
 
 bool EditModeModel::IsLoopClosed() const
@@ -149,10 +149,10 @@ QJsonObject EditModeModel::Serialize() const
 	return serializedObj;
 }
 
-void EditModeModel::Deserialize(const QJsonObject &serializedObj)
+void EditModeModel::Deserialize(bool bEnabled, const QJsonObject &serializedObj)
 {
 	m_sMalformedReason = DeserializeData(serializedObj);
-	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
+	SyncViews(bEnabled ? EDITMODE_Idle : EDITMODE_Off, EDITMODEACTION_None);
 }
 
 void EditModeModel::AddView(EditModeView *pView)
@@ -406,31 +406,6 @@ void EditModeModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::ve
 		m_GrabPointList[m_iGrabPointIndex].SetPos(ptDragPos);
 
 	SyncViews(EDITMODE_MouseDragTransform, m_eCurAction);
-}
-
-void EditModeModel::MouseTransformRelease()
-{
-	switch(m_eCurAction)
-	{
-	case EDITMODEACTION_None:
-		HyGuiLog("EditModeModel::MouseTransformReleased - No current action to release", LOGTYPE_Error);
-		break;
-
-	case EDITMODEACTION_Creation:
-		break;
-	case EDITMODEACTION_Outside:
-		break;
-	case EDITMODEACTION_Inside:
-		break;
-	case EDITMODEACTION_AppendVertex:
-		break;
-	case EDITMODEACTION_InsertVertex:
-		break;
-	case EDITMODEACTION_HoverGrabPoint:
-		break;
-	case EDITMODEACTION_HoverCenter:
-		break;
-	}
 }
 
 glm::vec2 EditModeModel::GetDragDelta() const

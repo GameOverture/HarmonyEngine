@@ -218,6 +218,11 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 		m_Transform.Hide();
 	else
 		IDrawExItem::RefreshTransform();
+
+	bool bIsActiveEditModeItem = static_cast<EntityDraw *>(m_pEntityTreeItemData->GetEntityModel().GetItem().GetDraw())->GetCurEditItem() == this;
+	EditModeState eCurEditModeState = bIsActiveEditModeItem ? static_cast<EntityDraw *>(m_pEntityTreeItemData->GetEntityModel().GetItem().GetDraw())->GetEditModeState() : EDITMODE_Off;
+	if(m_pEntityTreeItemData->GetEditModel())
+		m_pEntityTreeItemData->GetEditModel()->SyncViews(eCurEditModeState, EDITMODEACTION_None);
 }
 
 EditModeView *EntityDrawItem::GetEditView()
@@ -669,6 +674,7 @@ void SubEntity::Extrapolate(const QMap<int, QJsonObject> &propMapRef, EntityPrev
 							  this,
 							  nullptr,
 							  bIsSelected,
+							  false,
 							  ITEM_Entity,
 							  fFrameDuration,
 							  m_iElapsedTimelineFrames, // Starting frame to extrapolate from
@@ -772,7 +778,7 @@ void SubEntity::ExtrapolateChildProperties(int iNumFramesDuration, uint32 uiStat
 	const QMap<IHyNode2d *, QMap<int, QJsonObject>> &childPropMapRef = m_StateInfoList[uiStateIndex].m_ChildPropertiesMap;
 
 	for(ChildInfo &childInfoRef : m_ChildInfoList)
-		ExtrapolateProperties(m_ProjectRef, childInfoRef.m_pChild, nullptr, false, childInfoRef.m_eItemType, 1.0f / 60, m_iSubTimelineStartFrame, m_iSubTimelineStartFrame + iNumFramesDuration, childPropMapRef[childInfoRef.m_pChild], *childInfoRef.m_pPreviewComponent);
+		ExtrapolateProperties(m_ProjectRef, childInfoRef.m_pChild, nullptr, false, false, childInfoRef.m_eItemType, 1.0f / 60, m_iSubTimelineStartFrame, m_iSubTimelineStartFrame + iNumFramesDuration, childPropMapRef[childInfoRef.m_pChild], *childInfoRef.m_pPreviewComponent);
 }
 // SubEntity
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -786,6 +792,7 @@ void ExtrapolateProperties(Project &projectRef,
 						   IHyLoadable2d *pThisHyNode,
 						   EntityTreeItemData *pEntityTreeItemData,
 						   bool bIsSelected,
+						   bool bIsActiveEditModeItem,
 						   ItemType eItemType,
 						   const float fFRAME_DURATION,
 						   const int iSTART_FRAME,
@@ -932,7 +939,7 @@ void ExtrapolateProperties(Project &projectRef,
 			{
 				QJsonObject primitiveObj = propsObj["Primitive Layer"].toObject();
 				if(primitiveObj.contains("Data"))
-					pEditModel->Deserialize(primitiveObj["Data"].toObject());
+					pEditModel->Deserialize(bIsActiveEditModeItem, primitiveObj["Data"].toObject());
 			}
 			pEditModel->SetColor(HyColor(static_cast<IHyBody2d *>(pThisHyNode)->topColor.Get())); // Always try to sync colors
 			break;
@@ -944,7 +951,7 @@ void ExtrapolateProperties(Project &projectRef,
 
 				QList<float> floatList;
 				if(shapeObj.contains("Data"))
-					pEditModel->Deserialize(shapeObj["Data"].toObject());
+					pEditModel->Deserialize(bIsActiveEditModeItem, shapeObj["Data"].toObject());
 			}
 			break;
 
@@ -953,7 +960,7 @@ void ExtrapolateProperties(Project &projectRef,
 			{
 				QJsonObject chainObj = propsObj["Chain"].toObject();
 				if(chainObj.contains("Data"))
-					pEditModel->Deserialize(chainObj["Data"].toObject());
+					pEditModel->Deserialize(bIsActiveEditModeItem, chainObj["Data"].toObject());
 			}
 			break;
 

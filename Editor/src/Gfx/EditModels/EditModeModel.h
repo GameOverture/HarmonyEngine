@@ -79,15 +79,15 @@ public:
 	bool IsLineChain() const;
 	EditorShape GetShapeType() const;
 
-	void ChangeToLineChain();
-	void ChangeToShape(EditorShape eNewShapeType);
+	void ChangeToLineChain(bool bIsActiveEditModeItem);
+	void ChangeToShape(bool bIsActiveEditModeItem, EditorShape eNewShapeType);
 
 	bool IsLoopClosed() const;
 	float GetOutline() const;
 
 	bool IsValidModel() const;
 	QJsonObject Serialize() const;
-	void Deserialize(const QJsonObject &serializedObj);
+	void Deserialize(bool bEnabled, const QJsonObject &serializedObj);
 
 	void AddView(EditModeView *pView);
 	bool RemoveView(EditModeView *pView);
@@ -110,7 +110,6 @@ public:
 	bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags); // Returns whether transform has begun (otherwise marquee select)
 	void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight);
 	void MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
-	void MouseTransformRelease();
 
 	glm::vec2 GetDragDelta() const;
 	

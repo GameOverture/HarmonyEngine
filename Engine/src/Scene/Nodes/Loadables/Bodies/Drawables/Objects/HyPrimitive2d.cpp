@@ -47,6 +47,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 {
 	// Make b2AABB by combining each layer
 	b2AABB aabb = { {0,0}, {0,0} };
+	HyMath::InvalidateAABB(aabb);
 	for(int i = 0; i < m_LayerList.size(); ++i)
 	{
 		const Layer &layerRef = m_LayerList[i];
@@ -55,7 +56,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 			std::vector<b2Vec2> pointList;
 			for(int i = 0; i < layerRef.m_uiNumVerts; ++i)
 				pointList.push_back({ layerRef.m_pVertBuffer[i].x, layerRef.m_pVertBuffer[i].y });
-			aabb = b2AABB_Union(aabb, b2MakeAABB(pointList.data(), pointList.size(), 0.0f));
+			aabb = b2MakeAABB(pointList.data(), pointList.size(), 0.0f);
 		}
 	}
 	if(b2IsValidAABB(aabb) == false)
