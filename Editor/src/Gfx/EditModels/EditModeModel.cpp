@@ -307,6 +307,10 @@ Qt::CursorShape EditModeModel::MouseMoveIdle()
 		MainWindow::SetStatus("Edit Mode - Translate", 0);
 		return Qt::SizeAllCursor;
 
+	case EDITMODEACTION_CloseLoop:
+		MainWindow::SetStatus("Edit Mode - Close Loop", 0);
+		return Qt::CrossCursor;
+
 	default:
 		HyGuiLog("EditModeModel::MouseMoveIdle - unsupported edit mode action!", LOGTYPE_Error);
 		break;
@@ -352,22 +356,35 @@ bool EditModeModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHel
 		}
 		else
 		{
-			if(uiButtonFlags & Qt::LeftButton)
+			for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
+				grabPtRef.SetCachePos();
+
+			if(m_GrabPointList[m_iGrabPointIndex].IsSelected() == false && (uiButtonFlags & Qt::LeftButton) != 0)
 			{
 				for(int i = 0; i < m_GrabPointList.size(); ++i)
 					m_GrabPointList[i].SetSelected(false);
 				m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
 			}
-			else if(uiButtonFlags & Qt::RightButton)
-				m_GrabPointList[m_iGrabPointIndex].SetSelected(false);
-		}
 
+			bStartTransform = true;
+		}
+	}
+	else if(eResult == EDITMODEACTION_HoverCenter)
+	{
+		for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
+			grabPtRef.SetCachePos();
+		m_GrabPointCenter.SetCachePos();
 		bStartTransform = true;
 	}
 	else if(eResult == EDITMODEACTION_Creation)
 		bStartTransform = true;
 	else if(eResult == EDITMODEACTION_Inside)
 		bStartTransform = IsAllGrabPointsSelected();
+	else if(eResult == EDITMODEACTION_CloseLoop)
+	{
+		m_bLoopClosed = true;
+		bStartTransform = true;
+	}
 
 	m_eCurAction = eResult;
 
@@ -405,12 +422,40 @@ void EditModeModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::ve
 	if(m_eCurAction == EDITMODEACTION_AppendVertex)
 		m_GrabPointList[m_iGrabPointIndex].SetPos(ptDragPos);
 
+	if(m_eCurAction == EDITMODEACTION_HoverGrabPoint)
+	{
+		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
+		{
+			if(grabPtModel.IsSelected())
+				grabPtModel.SetPos(grabPtModel.GetCachePos() + m_vDragDelta);
+		}
+	}
+	if(m_eCurAction == EDITMODEACTION_HoverCenter)
+	{
+		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
+			grabPtModel.SetPos(grabPtModel.GetCachePos() + m_vDragDelta);
+
+		m_GrabPointCenter.SetPos(m_GrabPointCenter.GetCachePos() + m_vDragDelta);
+	}
+
 	SyncViews(EDITMODE_MouseDragTransform, m_eCurAction);
 }
 
 glm::vec2 EditModeModel::GetDragDelta() const
 {
 	return m_vDragDelta;
+}
+
+EditModeAction EditModeModel::GetCurrentAction() const
+{
+	return m_eCurAction;
+}
+
+void EditModeModel::DoMouseReleaseSelectionLogic()
+{
+	for(int i = 0; i < m_GrabPointList.size(); ++i)
+		m_GrabPointList[i].SetSelected(false);
+	m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
 }
 
 QString EditModeModel::GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const
@@ -451,6 +496,10 @@ QString EditModeModel::GetActionText(EditModeState eEditModeState, QString sNode
 			sUndoText = "Adjust capsule size on " % sNodeCodeName;
 		else
 			HyGuiLog("EditModeModel::MouseTransformReleased - Invalid shape type for EDITMODEACTION_HoverGrabPoint", LOGTYPE_Error);
+		break;
+
+	case EDITMODEACTION_CloseLoop:
+		sUndoText = "Close loop on " % sNodeCodeName;
 		break;
 
 	default:
@@ -872,6 +921,16 @@ EditModeAction EditModeModel::DoMouseMoveIdle()
 	{
 		if(m_GrabPointList[i].IsMouseHover())
 		{
+			// Test for close loop
+			if(m_bLoopClosed == false &&
+			   m_GrabPointList[i].IsSelected() == false &&
+			   (i == 0 || i == m_GrabPointList.size() - 1) &&
+			   GetNumGrabPointsSelected() == 1 &&
+				(i == 0 ? m_GrabPointList.back().IsSelected() : m_GrabPointList.front().IsSelected()))
+			{
+				return EDITMODEACTION_CloseLoop;
+			}
+
 			m_iGrabPointIndex = i;
 			return EDITMODEACTION_HoverGrabPoint;
 		}
@@ -1158,6 +1217,8 @@ QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 
 		grabPointList = m_FixtureList[0]->CalcGrabPoints();
 		m_FixtureList[0]->GetCentroid(ptCentroid);
+
+		m_bLoopClosed = floatList.back() != 0.0f;
 	}
 
 	if(grabPointList.empty())

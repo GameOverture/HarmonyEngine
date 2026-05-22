@@ -50,6 +50,16 @@ void GfxGrabPointModel::Set(GrabPointType eType, glm::vec2 ptPosition)
 	m_ptPosition = ptPosition;
 }
 
+glm::vec2 GfxGrabPointModel::GetCachePos() const
+{
+	return m_ptCachePos;
+}
+
+void GfxGrabPointModel::SetCachePos()
+{
+	m_ptCachePos = m_ptPosition;
+}
+
 glm::vec2 GfxGrabPointModel::GetPos() const
 {
 	return m_ptPosition;
@@ -157,4 +167,6 @@ Qt::CursorShape GfxGrabPointModel::GetHoverCursor() const
 		HyGuiLog("GfxGrabPointModel::GetHoverCursor called on unsupported GrabPointType: " % QString::number(m_eType), LOGTYPE_Error);
 		break;
 	}
+
+	return Qt::ArrowCursor;
 }

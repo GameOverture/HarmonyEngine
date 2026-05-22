@@ -267,6 +267,9 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			QUndoCommand *pCmd = new EntityUndoCmd_EditModelData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pTreeItemData->GetEditModel()->Serialize(), sCategoryName, "Data");
 			m_pProjItem->GetUndoStack()->push(pCmd);
 		}
+		else if(pTreeItemData->GetEditModel()->GetCurrentAction() == EDITMODEACTION_HoverGrabPoint && (pEvent->buttons() & Qt::LeftButton) != 0)
+			pTreeItemData->GetEditModel()->DoMouseReleaseSelectionLogic();
+
 		pTreeItemData->GetEditModel()->SyncViews(m_eEditModeState, EDITMODEACTION_None);
 
 		break; }

@@ -35,7 +35,8 @@ enum EditModeAction
 	EDITMODEACTION_AppendVertex,
 	EDITMODEACTION_InsertVertex,
 	EDITMODEACTION_HoverGrabPoint,
-	EDITMODEACTION_HoverCenter
+	EDITMODEACTION_HoverCenter,
+	EDITMODEACTION_CloseLoop			// For polygon or line chain, when an end vertex is selected and the user clicks on the opposite end vertex to close the shape
 };
 
 class EditModeModel
@@ -111,7 +112,10 @@ public:
 	void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight);
 	void MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
 
+	void DoMouseReleaseSelectionLogic();
+
 	glm::vec2 GetDragDelta() const;
+	EditModeAction GetCurrentAction() const;
 	
 	QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const; // Returns undo command description (blank if no change)
 	void ClearAction();
