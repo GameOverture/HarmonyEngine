@@ -170,7 +170,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 	}
 	else if(m_pEntityTreeItemData->GetType() == ITEM_PrimLayer)
 	{
-		m_pEditView = new EditModeView();
+		m_pEditView = new EditModeView(pParent);
 		
 		m_pEditView->SetModel(m_pEntityTreeItemData->GetEditModel());
 		m_pChild = m_pEditView;

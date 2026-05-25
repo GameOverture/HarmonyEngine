@@ -41,7 +41,9 @@ enum EditModeAction
 
 class EditModeModel
 {
+	bool								m_bIsFixture;
 	HyColor								m_Color;
+	int32								m_iDisplayOrder;
 
 	// ------------------------------------------------------------------------------------------------------------------
 	// "type" - when serialized in property (as a string)
@@ -71,12 +73,16 @@ class EditModeModel
 	QList<EditModeView *>				m_ViewList;
 
 public:
-	EditModeModel(bool bIsLineChain, HyColor color);
+	EditModeModel(bool bIsFixture, bool bIsLineChain, HyColor color);
 	~EditModeModel();
 
 	HyColor GetColor() const;
 	void SetColor(HyColor color);
 
+	int GetDisplayOrder() const;
+	void SetDisplayOrder(int iDisplayOrder);
+
+	bool IsFixture() const;
 	bool IsLineChain() const;
 	EditorShape GetShapeType() const;
 

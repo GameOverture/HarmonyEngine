@@ -45,8 +45,10 @@ class Project;
 
 #define MAX_INT_RANGE 16777215						// Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
 
-#define DISPLAYORDER_SnapGuide		99999999
-#define DISPLAYORDER_TransformCtrl	9999999
+#define DISPLAYORDER_SnapGuide			99999999
+#define DISPLAYORDER_TransformCtrl		9999999
+#define DISPLAYORDER_FixtureSelected	999999
+#define DISPLAYORDER_Fixture			-100
 //#define HYGUI_UseBinaryMetaFiles
 
 #define DEFAULT_GRID_SIZE 25.0f

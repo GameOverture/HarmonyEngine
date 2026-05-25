@@ -13,12 +13,11 @@
 EditModeView::EditModeView(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
 	m_pModel(nullptr),
+	m_CameraPrim(this),
+	m_ScenePrim(this),
 	m_CenterGrabPoint(this)
 {
-	m_CameraPrim.SetDisplayOrder(DISPLAYORDER_TransformCtrl - 1);
 	m_CameraPrim.UseWindowCoordinates();
-
-	m_ScenePrim.SetDisplayOrder(DISPLAYORDER_TransformCtrl - 2);
 }
 
 /*virtual*/ EditModeView::~EditModeView()
@@ -63,6 +62,12 @@ void EditModeView::SyncWithModel(EditModeState eEditModeState, EditModeAction eE
 		m_CameraPrim.RemoveAllLayers();
 		m_ScenePrim.RemoveAllLayers();
 		return;
+	}
+
+	if(m_pModel->IsFixture())
+	{
+		m_CameraPrim.SetDisplayOrder(m_pModel->GetDisplayOrder() + 1);
+		m_ScenePrim.SetDisplayOrder(m_pModel->GetDisplayOrder());
 	}
 
 	// Sync Grab Point Views with Model

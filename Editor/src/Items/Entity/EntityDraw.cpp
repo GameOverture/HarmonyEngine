@@ -195,7 +195,16 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		break; }
 
 	default:
-		HyGuiLog("EntityDraw::OnMousePressEvent - Unhandled EditModeState reached!", LOGTYPE_Error);
+		// Cancel any in-progress marquee or transform on right-click
+		if(pEvent->buttons() & Qt::RightButton)
+		{
+			// TODO: Need to undo whatever change to the model has occurred already
+
+			pTreeItemData->GetEditModel()->ClearAction();
+			m_eEditModeState = EDITMODE_Idle;
+		}
+		else
+			HyGuiLog("EntityDraw::OnMousePressEvent - Unhandled EditModeState reached!", LOGTYPE_Error);
 		break;
 	}
 }

@@ -11,8 +11,10 @@
 #include "EditModeView.h"
 #include "MainWindow.h"
 
-EditModeModel::EditModeModel(bool bIsLineChain, HyColor color) :
+EditModeModel::EditModeModel(bool bIsFixture, bool bIsLineChain, HyColor color) :
+	m_bIsFixture(bIsFixture),
 	m_Color(color),
+	m_iDisplayOrder(0),
 	m_bIsLineChain(bIsLineChain),
 	m_eShapeType(SHAPE_None),
 	m_bLoopClosed(false),
@@ -44,6 +46,21 @@ void EditModeModel::SetColor(HyColor color)
 	m_Color = color;
 	for(EditModeView *pView : m_ViewList)
 		pView->SyncColor();
+}
+
+int EditModeModel::GetDisplayOrder() const
+{
+	return m_iDisplayOrder;
+}
+
+void EditModeModel::SetDisplayOrder(int iDisplayOrder)
+{
+	m_iDisplayOrder = iDisplayOrder;
+}
+
+bool EditModeModel::IsFixture() const
+{
+	return m_bIsFixture;
 }
 
 bool EditModeModel::IsLineChain() const
@@ -151,6 +168,9 @@ QJsonObject EditModeModel::Serialize() const
 
 void EditModeModel::Deserialize(bool bEnabled, const QJsonObject &serializedObj)
 {
+	if(m_bIsFixture)
+		m_iDisplayOrder = bEnabled ? DISPLAYORDER_FixtureSelected : DISPLAYORDER_Fixture;
+
 	m_sMalformedReason = DeserializeData(serializedObj);
 	SyncViews(bEnabled ? EDITMODE_Idle : EDITMODE_Off, EDITMODEACTION_None);
 }
