@@ -210,9 +210,9 @@
 	}
 
 	if(format.IsUsingScientificNotation())
-		str << std::scientific << std::showbase << std::put_money(iValue);
+		str << std::scientific << std::showbase << std::put_money(static_cast<long double>(iValue));
 	else
-		str << std::showbase << std::put_money(iValue);
+		str << std::showbase << std::put_money(static_cast<long double>(iValue));
 	sText = str.str();
 	
 	if(format.GetRounding() == HYFMTROUNDING_HideZeros)
@@ -280,9 +280,9 @@
 	int32 iCents = static_cast<int32>(dValue * 100.0); // Truncate any fractional values
 
 	if(format.IsUsingScientificNotation())
-		str << std::scientific << std::showbase << std::put_money(iCents);
+		str << std::scientific << std::showbase << std::put_money(static_cast<long double>(iCents));
 	else
-		str << std::showbase << std::put_money(iCents);
+		str << std::showbase << std::put_money(static_cast<long double>(iCents));
 
 	sText = str.str();
 
