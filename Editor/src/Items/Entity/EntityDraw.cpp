@@ -640,7 +640,17 @@ void EntityDraw::FlushRootEntity()
 	for(int32 i = 0; i < descChildArray.size(); ++i)
 	{
 		if(descChildArray[i].isObject())
-			descObjList.push_back(descChildArray[i].toObject());
+		{
+			QJsonObject descObj = descChildArray[i].toObject();
+			descObjList.push_back(descObj);
+
+			if(HyGlobal::GetTypeFromString(descObj["itemType"].toString()) == ITEM_PrimNode && descObj.contains("primLayers"))
+			{
+				QJsonArray primLayersArray = descObj["primLayers"].toArray();
+				for(int32 j = 0; j < primLayersArray.size(); ++j)
+					descObjList.push_back(primLayersArray[j].toObject());
+			}
+		}
 		else if(descChildArray[i].isArray())
 		{
 			QJsonArray arrayFolder = descChildArray[i].toArray();

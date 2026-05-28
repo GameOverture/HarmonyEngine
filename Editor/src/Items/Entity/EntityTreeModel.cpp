@@ -97,16 +97,24 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		for(int i = 0; i < itemListArray.size(); ++i)
 		{
 			if(itemListArray[i].isObject())
-				m_ModelRef.Cmd_AddExistingItem(itemListArray[i].toObject(), ENTTYPE_Item, i);
+			{
+				EntityTreeItemData *pNewlyAddedItemData = m_ModelRef.Cmd_AddExistingItem(itemListArray[i].toObject(), ENTTYPE_Item, i);
+				if(pNewlyAddedItemData->GetType() == ITEM_PrimNode)
+				{
+					QJsonArray primLayerArray = itemListArray[i].toObject()["primLayers"].toArray();
+					for(int j = 0; j < primLayerArray.size(); ++j)
+						m_ModelRef.Cmd_AddExistingItem(primLayerArray[j].toObject(), ENTTYPE_SubItem, j);
+				}
+			}
 			else if(itemListArray[i].isArray())
 			{
 				EntityItemType eEntType = ENTTYPE_ArrayItem;
 				QJsonArray subItemArray = itemListArray[i].toArray();
-				if(subItemArray.empty() == false)
+				if(subItemArray.empty())
 					continue;
 
-				if(HyGlobal::GetTypeFromString(subItemArray[0].toObject()["itemType"].toString()) == ITEM_PrimLayer)
-					eEntType = ENTTYPE_SubItem;
+				//if(HyGlobal::GetTypeFromString(subItemArray[0].toObject()["itemType"].toString()) == ITEM_PrimLayer)
+				//	eEntType = ENTTYPE_SubItem;
 
 				for(int j = 0; j < subItemArray.size(); ++j)
 					m_ModelRef.Cmd_AddExistingItem(subItemArray[j].toObject(), eEntType, j == 0 ? i : j);
@@ -419,7 +427,9 @@ void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut,
 		}
 		else if(pCurItem->GetType() == ITEM_PrimNode)
 		{
-			// Insert all the prim node's subitems into the child list
+			childListOut.push_back(pCurItem); // The root prim node
+
+			// Insert all the prim node's subitems (PrimLayers) into the child list
 			TreeModelItem *pPrimNodeItem = pThisEntity->GetChild(i);
 			for(int j = 0; j < pPrimNodeItem->GetNumChildren(); ++j)
 			{
@@ -574,7 +584,7 @@ int EntityTreeModel::GetPrimLayerIndex(EntityTreeItemData *pPrimLayer, EntityTre
 		EntityTreeItemData *pCurItem = pThisEntity->GetChild(i)->data(0).value<EntityTreeItemData *>();
 		if(pCurItem == nullptr)
 			continue;
-		if(pCurItem->GetEntType() == ENTTYPE_ArrayFolder)
+		if(pCurItem->GetType() == ITEM_PrimNode)
 		{
 			TreeModelItem *pArrayFolder = pThisEntity->GetChild(i);
 			for(int j = 0; j < pArrayFolder->GetNumChildren(); ++j)
@@ -884,7 +894,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descO
 			GetTreeItemData(childListOut, fixtureListOut, layoutListOut);
 			for(EntityTreeItemData *pChildItem : childListOut)
 			{
-				if(pChildItem->GetType() == ITEM_PrimNode && pChildItem->GetUuid() == QUuid(descObj["referencedItemUuid"].toString()))
+				if(pChildItem->GetType() == ITEM_PrimNode && pChildItem->GetUuid() == QUuid(descObj["itemUUID"].toString()))
 				{
 					pPrimNode = pChildItem;
 					break;

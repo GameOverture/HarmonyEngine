@@ -1722,7 +1722,15 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 
 			} while(i < childList.size() && (childList[i]->GetEntType() == ENTTYPE_ArrayItem || childList[i]->GetEntType() == ENTTYPE_SubItem) && sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) == 0);
 
-			childArray.append(packedArray);
+			// If packedArray is holding ITEM_PrimLayers, insert packedArray into the previously added PrimNode's object as "primLayers"
+			if(childList[i - 1]->GetType() == ITEM_PrimLayer)
+			{
+				QJsonObject primNodeObj = childArray[childArray.size() - 1].toObject();
+				primNodeObj.insert("primLayers", packedArray);
+				childArray[childArray.size() - 1] = primNodeObj;
+			}
+			else
+				childArray.append(packedArray);
 		}
 		else
 		{
