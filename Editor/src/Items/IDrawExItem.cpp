@@ -54,7 +54,7 @@ void IDrawExItem::HideTransformCtrl()
 	m_Transform.Hide();
 }
 
-void IDrawExItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)
+/*virtual*/ void IDrawExItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut)
 {
 	IHyBody2d *pHyBody = GetHyNode();
 	pHyBody->CalcLocalBoundingShape(boundingShapeOut);

@@ -39,17 +39,17 @@ void WgtMakeRelDir::Setup(QString sTitle, QString sDefaultName, QString sAbsProj
 
 	m_sAbsProjPath = sAbsProjectPath;
 
-	// Don't overwrite any already set 'm_sAbsParentDirPath' unless 'sDefaultRelativePath' is specified
-	if(sDefaultRelativePath.isEmpty() && m_sAbsParentDirPath.isEmpty())
-		m_sAbsParentDirPath = m_sAbsProjPath;
-	else
-	{
-		m_sAbsParentDirPath = QDir(m_sAbsProjPath).absoluteFilePath(sDefaultRelativePath);
-		// Go up one level to the parent directory
-		QDir dir(m_sAbsParentDirPath);
-		if(dir.cdUp())
-			m_sAbsParentDirPath = dir.absolutePath();
-	}
+	//// Don't overwrite any already set 'm_sAbsParentDirPath' unless 'sDefaultRelativePath' is specified
+	//if(sDefaultRelativePath.isEmpty() && m_sAbsParentDirPath.isEmpty())
+	//	m_sAbsParentDirPath = m_sAbsProjPath;
+	//else
+	//{
+	//	m_sAbsParentDirPath = QDir(m_sAbsProjPath).absoluteFilePath(sDefaultRelativePath);
+	//	// Go up one level to the parent directory
+	//	QDir dir(m_sAbsParentDirPath);
+	//	if(dir.cdUp())
+	//		m_sAbsParentDirPath = dir.absolutePath();
+	//}
 
 	ui->lblRelative->setText(m_sTitle % " relative location:");
 	ui->lblDirName->setText(m_sTitle % " dir name:");
@@ -64,15 +64,15 @@ QString WgtMakeRelDir::GetRelPath() const
 
 QString WgtMakeRelDir::GetAbsPath() const
 {
-	return m_sAbsParentDirPath % "/" % ui->txtDirName->text();
+	return m_sAbsProjPath % "/" % GetRelPath();// ui->txtDirName->text();
 }
 
 void WgtMakeRelDir::Refresh()
 {
-	QDir projDir(m_sAbsProjPath);
+	//QDir projDir(m_sAbsProjPath);
 
 	// Update ui->txtRelativePath using 'm_sAbsParentDirPath'
-	ui->txtRelativePath->setText(projDir.relativeFilePath(m_sAbsParentDirPath));
+	//ui->txtRelativePath->setText(projDir.relativeFilePath(m_sAbsParentDirPath));
 	if(ui->txtRelativePath->text().isEmpty())
 		ui->txtRelativePath->setText(".");
 
@@ -92,7 +92,7 @@ QString WgtMakeRelDir::GetError()
 
 		if(m_bMustBeEmptyFolder)
 		{
-			QDir parentDir(m_sAbsParentDirPath);
+			QDir parentDir(m_sAbsProjPath);
 			QDir newDir(parentDir.absolutePath() + "/" + ui->txtDirName->text());
 			if(parentDir.exists() && newDir.exists() && newDir.isEmpty() == false)
 			{
@@ -110,7 +110,10 @@ void WgtMakeRelDir::on_btnBrowseDir_clicked()
 {
 	QFileDialog *pDlg = new QFileDialog(this, "Choose where to place the new " % m_sTitle % " directory");
 
-	pDlg->setDirectory(m_sAbsParentDirPath);
+	QDir dir(m_sAbsProjPath);
+	dir.cdUp();
+	
+	pDlg->setDirectory(dir.absolutePath());
 	pDlg->setFileMode(QFileDialog::Directory);
 	pDlg->setOption(QFileDialog::ShowDirsOnly, true);
 	pDlg->setViewMode(QFileDialog::Detail);
@@ -119,7 +122,7 @@ void WgtMakeRelDir::on_btnBrowseDir_clicked()
 
 	if(pDlg->exec() == QDialog::Accepted)
 	{
-		m_sAbsParentDirPath = pDlg->selectedFiles()[0];
+		m_sAbsProjPath = pDlg->selectedFiles()[0];
 		Refresh();
 	}
 }

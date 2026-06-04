@@ -34,7 +34,7 @@ public:
 
 	void ShowTransformCtrl(bool bShowGrabPoints);
 	void HideTransformCtrl();
-	void ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut);
+	virtual void ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut);
 };
 
 #endif // IDRAWITEM_H

@@ -126,16 +126,19 @@ void EditModeView::SyncWithModel(EditModeState eEditModeState, EditModeAction eE
 				m_ScenePrim.SetAsFixture(iIndex, *m_pModel->GetFixture(iIndex), 0.0f);
 			break; }
 			
-		case SHAPE_LineSegment: {
-			b2Segment seg = static_cast<const HyShape2d *>(m_pModel->GetFixture(0))->GetAsSegment();
-			glm::vec2 ptOne(seg.point1.x, seg.point1.y);
-			pCamera->ProjectToCamera(ptOne, ptOne);
-			glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
-			pCamera->ProjectToCamera(ptTwo, ptTwo);
+		case SHAPE_LineSegment:
+			if(m_pModel->GetNumFixtures() > 0)
+			{
+				b2Segment seg = static_cast<const HyShape2d *>(m_pModel->GetFixture(0))->GetAsSegment();
+				glm::vec2 ptOne(seg.point1.x, seg.point1.y);
+				pCamera->ProjectToCamera(ptOne, ptOne);
+				glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
+				pCamera->ProjectToCamera(ptTwo, ptTwo);
 
-			m_CameraPrim.SetAsLineSegment(0, ptOne, ptTwo, m_pModel->GetOutline());
-			m_ScenePrim.RemoveAllLayers();
-			break; }
+				m_CameraPrim.SetAsLineSegment(0, ptOne, ptTwo, m_pModel->GetOutline());
+				m_ScenePrim.RemoveAllLayers();
+			}
+			break;
 
 		default:
 			HyGuiLog("EditModeView::SyncWithModel - Unhandled shape type", LOGTYPE_Error);

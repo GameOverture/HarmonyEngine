@@ -1451,7 +1451,7 @@ void ManagerWidget::on_actionNewBuild_triggered()
 				
 				for(auto fileInfo : buildFileInfoList)
 				{
-					if(fileInfo.suffix().compare("sln", Qt::CaseInsensitive) == 0) // Look for .sln (Visual Studio)
+					if(fileInfo.suffix().compare("sln", Qt::CaseInsensitive) == 0 || fileInfo.suffix().compare("slnx", Qt::CaseInsensitive) == 0) // Look for .sln (Visual Studio)
 					{
 						sBestAbsFilePath = fileInfo.absoluteFilePath();
 						break;

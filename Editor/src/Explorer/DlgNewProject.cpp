@@ -234,10 +234,10 @@ void DlgNewProject::on_chkCreateGameDir_clicked()
 
 void DlgNewProject::UpdateProjectDir()
 {
-	ui->wgtDataDir->Setup("Assets", "data", GetProjDirPath(), QString(), true);
-	ui->wgtMetaDir->Setup("Meta-Data", "meta", GetProjDirPath(), QString(), true);
-	ui->wgtSourceDir->Setup("Source Code", "Source", GetProjDirPath(), "meta", true);
-	ui->wgtBuildDir->Setup("Build", "build", GetProjDirPath(), QString(), true);
+	ui->wgtDataDir->Setup("Assets", "data", GetProjDirPath(), ".", true);
+	ui->wgtMetaDir->Setup("Meta-Data", "meta", GetProjDirPath(), ".", true);
+	ui->wgtSourceDir->Setup("Source Code", "src", GetProjDirPath(), "meta", true);
+	ui->wgtBuildDir->Setup("Build", "build", GetProjDirPath(), ".", true);
 }
 
 void DlgNewProject::ErrorCheck()

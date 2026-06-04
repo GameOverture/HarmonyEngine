@@ -86,11 +86,13 @@ public:
 	bool IsLineChain() const;
 	EditorShape GetShapeType() const;
 
+	void SetIsFixture(bool bIsFixture);
 	void ChangeToLineChain(bool bIsActiveEditModeItem);
 	void ChangeToShape(bool bIsActiveEditModeItem, EditorShape eNewShapeType);
 
 	bool IsLoopClosed() const;
 	float GetOutline() const;
+	void SetOutline(float fOutline);
 
 	bool IsValidModel() const;
 	QJsonObject Serialize() const;

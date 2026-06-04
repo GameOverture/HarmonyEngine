@@ -684,7 +684,7 @@ bool IHyText<NODETYPE, ENTTYPE>::IsCenterVertically() const
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-const glm::vec2 &IHyText<NODETYPE, ENTTYPE>::GetTextBoxDimensions(float fPercent /*= 1.0f*/) const
+glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetTextBoxDimensions(float fPercent /*= 1.0f*/) const
 {
 	return m_vBoxDimensions * fPercent;
 }

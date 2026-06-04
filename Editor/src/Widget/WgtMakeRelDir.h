@@ -23,7 +23,7 @@ class WgtMakeRelDir : public QWidget
 	QString					m_sTitle;
 	QString					m_sAbsProjPath;
 
-	QString					m_sAbsParentDirPath;	// The absolute path to the parent directory of the new dir will reside, but not the directory itself
+	//QString					m_sAbsParentDirPath;	// The absolute path to the parent directory of the new dir will reside, but not the directory itself
 
 	bool					m_bMustBeEmptyFolder;
 	

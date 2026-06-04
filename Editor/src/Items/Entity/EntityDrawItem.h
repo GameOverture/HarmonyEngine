@@ -37,6 +37,8 @@ public:
 	virtual bool IsSelected() override;
 
 	virtual void RefreshTransform() override;
+	
+	virtual void ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut) override;
 
 	EditModeView *GetEditView();
 

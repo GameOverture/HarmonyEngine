@@ -20,6 +20,7 @@
 #include "DlgColorPicker.h"
 #include "DlgSetUiPanel.h"
 #include "EntityTreeModel.h"
+#include "EntityDraw.h"
 
 #include <QPainter>
 #include <QHeaderView>
@@ -311,22 +312,23 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break; }
 
 	case PROPERTIESTYPE_ShapeData: {
-		const QVariant &origValue = pPropertiesTreeModel->GetIndexValue(index);
-		QJsonObject serializedObj = origValue.toJsonObject();
+		//const QVariant &origValue = pPropertiesTreeModel->GetIndexValue(index);
+		//QJsonObject serializedObj = origValue.toJsonObject();
 
 		EntityTreeItemData *pEntTreeItemData = propDefRef.delegateBuilder.value<EntityTreeItemData *>();
+		pReturnWidget = new WgtShapeData(pEntTreeItemData, pParent);
 		
-		if(pEntTreeItemData->GetType() == ITEM_PrimLayer)
-			pReturnWidget = new WgtShapeData(SHAPEDATATYPE_Primitive, serializedObj, pParent);
-		else if(pEntTreeItemData->GetType() == ITEM_ShapeFixture)
-			pReturnWidget = new WgtShapeData(SHAPEDATATYPE_Shape, serializedObj, pParent);
-		else if(pEntTreeItemData->GetType() == ITEM_ChainFixture)
-			pReturnWidget = new WgtShapeData(SHAPEDATATYPE_Chain, serializedObj, pParent);
-		else
-			HyGuiLog("PropertiesDelegate::createEditor invalid item type for ShapeData: " % QString::number(pEntTreeItemData->GetType()), LOGTYPE_Error);
+		//if(pEntTreeItemData->GetType() == ITEM_PrimLayer)
+		//	pReturnWidget = new WgtShapeData(SHAPEDATATYPE_Primitive, serializedObj, pParent);
+		//else if(pEntTreeItemData->GetType() == ITEM_ShapeFixture)
+		//	pReturnWidget = new WgtShapeData(SHAPEDATATYPE_Shape, serializedObj, pParent);
+		//else if(pEntTreeItemData->GetType() == ITEM_ChainFixture)
+		//	pReturnWidget = new WgtShapeData(SHAPEDATATYPE_Chain, serializedObj, pParent);
+		//else
+		//	HyGuiLog("PropertiesDelegate::createEditor invalid item type for ShapeData: " % QString::number(pEntTreeItemData->GetType()), LOGTYPE_Error);
 
-		if(propDefRef.defaultData.isValid())
-			static_cast<WgtVectorSpinBox *>(pReturnWidget)->SetValue(propDefRef.defaultData);
+		//if(propDefRef.defaultData.isValid())
+		//	static_cast<WgtShapeData *>(pReturnWidget)->SetValue(propDefRef.defaultData);
 		break;
 	}
 
@@ -365,11 +367,11 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	const QVariant &propValue = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetIndexValue(index);
 	PropertiesDef propDefRef = static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetIndexDefinition(index);
 
-	if(propValue.toJsonObject().isEmpty() == false)
-	{
-		HyGuiLog("PropertiesDelegate::setEditorData not implemented for procedural value", LOGTYPE_Error);
-	}
-	else
+	//if(propValue.toJsonObject().isEmpty() == false)
+	//{
+	//	HyGuiLog("PropertiesDelegate::setEditorData not implemented for procedural value", LOGTYPE_Error);
+	//}
+	//else
 	{
 		switch(propDefRef.eType)
 		{
@@ -415,6 +417,12 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		case PROPERTIESTYPE_SpriteFrames:
 			static_cast<QSlider *>(pEditor)->setValue(propValue.toInt());
 			break;
+
+		case PROPERTIESTYPE_ShapeData: {
+			EntityDrawItem *pEntDrawItem = static_cast<EntityDraw *>(static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetProjItem()->GetDraw())->GetCurEditItem();
+			bool bIsActiveEditModeItem = (pEntDrawItem && &pEntDrawItem->GetEntityTreeItemData()->GetPropertiesModel() == static_cast<EntityPropertiesTreeModel *>(m_pTableView->model()));
+			static_cast<WgtShapeData *>(pEditor)->SetValue(bIsActiveEditModeItem, propValue);
+			break; }
 
 		default:
 			HyGuiLog("PropertiesDelegate::setEditorData() Unsupported Delegate type:" % QString::number(propDefRef.eType), LOGTYPE_Error);
@@ -471,6 +479,10 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		break;
 	case PROPERTIESTYPE_Color: // Handled in DlgColorPicker
 		break;
+	case PROPERTIESTYPE_ShapeData:
+		newValue = static_cast<WgtShapeData *>(pEditor)->GetValue();
+		break;
+
 	default:
 		HyGuiLog("PropertiesDelegate::setModelData() Unsupported Delegate type:" % QString::number(propDefRef.eType), LOGTYPE_Error);
 	}

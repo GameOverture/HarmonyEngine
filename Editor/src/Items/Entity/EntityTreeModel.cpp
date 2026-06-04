@@ -625,6 +625,33 @@ int EntityTreeModel::GetPrimLayerIndex(EntityTreeItemData *pPrimLayer, EntityTre
 	return -1;
 }
 
+std::vector<EntityTreeItemData *> EntityTreeModel::FindPrimLayers(EntityTreeItemData *pPrimNode) const
+{
+	if(pPrimNode == nullptr || pPrimNode->GetType() != ITEM_PrimNode)
+	{
+		HyGuiLog("EntityTreeModel::FindPrimLayers was passed an invalid PrimNode item", LOGTYPE_Error);
+		return std::vector<EntityTreeItemData *>();
+	}
+
+	// Find children of this PrimNode that are PrimLayers and return them in a vector
+	std::vector<EntityTreeItemData *> primLayerList;
+	QModelIndex primNodeIndex = FindIndex<EntityTreeItemData *>(pPrimNode, 0);
+	if(primNodeIndex.isValid())
+	{
+		TreeModelItem *pPrimNodeTreeItem = GetItem(primNodeIndex);
+		for(int i = 0; i < pPrimNodeTreeItem->GetNumChildren(); ++i)
+		{
+			EntityTreeItemData *pCurItem = pPrimNodeTreeItem->GetChild(i)->data(0).value<EntityTreeItemData *>();
+			if(pCurItem && pCurItem->GetType() == ITEM_PrimLayer)
+				primLayerList.push_back(pCurItem);
+		}
+	}
+	else
+		HyGuiLog("EntityTreeModel::FindPrimLayers could not find the passed in PrimNode in the tree", LOGTYPE_Error);
+
+	return primLayerList;
+}
+
 bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const
 {
 	if(pItem == nullptr)

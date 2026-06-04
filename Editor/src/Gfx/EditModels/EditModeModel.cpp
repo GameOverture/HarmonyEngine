@@ -73,12 +73,17 @@ EditorShape EditModeModel::GetShapeType() const
 	return m_eShapeType;
 }
 
+void EditModeModel::SetIsFixture(bool bIsFixture)
+{
+	m_bIsFixture = bIsFixture;
+}
+
 void EditModeModel::ChangeToLineChain(bool bIsActiveEditModeItem)
 {
+	std::vector<float> floatList = ConvertedPolygonOrLineChainData();
+
 	m_bIsLineChain = true;
 	m_eShapeType = SHAPE_None;
-
-	std::vector<float> floatList = ConvertedPolygonOrLineChainData();
 
 	// Reassemble model
 	QJsonObject serializedObj;
@@ -93,11 +98,8 @@ void EditModeModel::ChangeToLineChain(bool bIsActiveEditModeItem)
 
 void EditModeModel::ChangeToShape(bool bIsActiveEditModeItem, EditorShape eNewShapeType)
 {
-	m_bIsLineChain = false;
-	m_eShapeType = eNewShapeType;
-
 	std::vector<float> floatList;
-	switch(m_eShapeType)
+	switch(eNewShapeType)
 	{
 	case SHAPE_None:
 		break;
@@ -121,6 +123,9 @@ void EditModeModel::ChangeToShape(bool bIsActiveEditModeItem, EditorShape eNewSh
 		break;
 	}
 
+	m_bIsLineChain = false;
+	m_eShapeType = eNewShapeType;
+
 	// Reassemble model
 	QJsonObject serializedObj;
 	serializedObj.insert("type", HyGlobal::ShapeName(m_eShapeType));
@@ -140,6 +145,11 @@ bool EditModeModel::IsLoopClosed() const
 float EditModeModel::GetOutline() const
 {
 	return m_fOutline;
+}
+
+void EditModeModel::SetOutline(float fOutline)
+{
+	m_fOutline = fOutline;
 }
 
 bool EditModeModel::IsValidModel() const
@@ -612,7 +622,7 @@ std::vector<float> EditModeModel::ConvertedBoxData() const
 
 std::vector<float> EditModeModel::ConvertedCircleData() const
 {
-	std::vector<float> convertedDataList(3);
+	std::vector<float> convertedDataList;
 	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
 	{
 		std::vector<glm::vec2> vertexList;
@@ -701,7 +711,7 @@ std::vector<float> EditModeModel::ConvertedCircleData() const
 
 std::vector<float> EditModeModel::ConvertedLineSegmentData() const
 {
-	std::vector<float> convertedDataList(4);
+	std::vector<float> convertedDataList;
 	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
 	{
 		std::vector<glm::vec2> vertexList;
@@ -775,7 +785,7 @@ std::vector<float> EditModeModel::ConvertedLineSegmentData() const
 
 std::vector<float> EditModeModel::ConvertedCapsuleData() const
 {
-	std::vector<float> convertedDataList(5);
+	std::vector<float> convertedDataList;
 
 	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon || m_eShapeType == SHAPE_LineSegment)
 	{
@@ -849,7 +859,6 @@ std::vector<float> EditModeModel::ConvertedCapsuleData() const
 std::vector<float> EditModeModel::ConvertedPolygonOrLineChainData() const
 {
 	std::vector<float> convertedDataList;
-
 
 	switch(m_eShapeType)
 	{

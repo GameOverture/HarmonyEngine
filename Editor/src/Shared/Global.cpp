@@ -1118,6 +1118,8 @@
 		return HYFIXTURE_Polygon;
 	case SHAPE_Circle:
 		return HYFIXTURE_Circle;
+	case SHAPE_LineSegment:
+		return HYFIXTURE_LineSegment;
 	case SHAPE_Capsule:
 		return HYFIXTURE_Capsule;
 	default:

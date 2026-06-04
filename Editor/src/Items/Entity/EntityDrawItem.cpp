@@ -225,6 +225,53 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 		m_pEntityTreeItemData->GetEditModel()->SyncViews(eCurEditModeState, EDITMODEACTION_None);
 }
 
+/*virtual*/ void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut) /*override*/
+{
+	if(m_pEntityTreeItemData->GetType() == ITEM_PrimNode)
+	{
+		std::vector<EntityTreeItemData *> primLayerList = m_pEntityTreeItemData->GetEntityModel().GetTreeModel().FindPrimLayers(m_pEntityTreeItemData);
+
+		transformMtxOut = GetHyNode()->GetSceneTransform(0.0f);
+
+		// Combine all the layers to get an encompassing bounding shape
+		b2AABB localAABB;
+		HyMath::InvalidateAABB(localAABB);
+
+		QList<IDrawExItem *> drawItemList = static_cast<EntityDraw *>(m_pEntityTreeItemData->GetEntityModel().GetItem().GetDraw())->GetDrawItemList();
+		for(EntityTreeItemData *pPrimLayer : primLayerList)
+		{
+			// Find the draw item for this primitive layer
+			for(IDrawExItem *pDrawItem : drawItemList)
+			{
+				EntityDrawItem *pEntDrawItem = static_cast<EntityDrawItem *>(pDrawItem);
+				if(pEntDrawItem->GetEntityTreeItemData() == pPrimLayer)
+				{
+					HyShape2d layerShape;
+					glm::mat4 layerTransform;
+					pEntDrawItem->ExtractTransform(layerShape, layerTransform);
+
+					if(b2IsValidAABB(localAABB) == false)
+						layerShape.ComputeAABB(localAABB, layerTransform);
+					else
+					{
+						b2AABB tmpAABB;
+						layerShape.ComputeAABB(tmpAABB, layerTransform);
+						localAABB = b2AABB_Union(localAABB, tmpAABB);
+					}
+					break;
+				}
+			}
+		}
+
+		if(b2IsValidAABB(localAABB))
+			boundingShapeOut.SetAsBox(HyRect(b2AABB_Extents(localAABB).x, b2AABB_Extents(localAABB).y, glm::vec2(b2AABB_Center(localAABB).x, b2AABB_Center(localAABB).y), 0.0f));
+		else
+			boundingShapeOut.SetAsNothing();
+	}
+	else
+		IDrawExItem::ExtractTransform(boundingShapeOut, transformMtxOut);
+}
+
 EditModeView *EntityDrawItem::GetEditView()
 {
 	return m_pEditView;
