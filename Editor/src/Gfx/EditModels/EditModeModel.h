@@ -122,6 +122,8 @@ public:
 
 	void DoMouseReleaseSelectionLogic();
 
+	void OnDeleteKeyPressed();
+
 	glm::vec2 GetDragDelta() const;
 	EditModeAction GetCurrentAction() const;
 	

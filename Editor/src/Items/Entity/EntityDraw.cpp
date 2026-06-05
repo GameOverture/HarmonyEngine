@@ -49,8 +49,30 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 {
 	IDrawEx::OnKeyPressEvent(pEvent);
 
-	if(pEvent->key() == Qt::Key_Backspace) // Qt::Key_Delete isn't being passed to this callback
+	if(pEvent->key() == Qt::Key_Delete) // TODO: Qt::Key_Delete isn't being passed to this callback probably because something is intercepting it
 	{
+		int i = 0;
+		i++;
+	}
+
+	if(GetCurAction() == HYACTION_EditMode && pEvent->key() == Qt::Key_Backspace)
+	{
+		EntityDrawItem *pCurEditItem = GetCurEditItem();
+		if(pCurEditItem == nullptr)
+		{
+			HyGuiLog("EntityDraw::OnMouseMoveEvent - with null edit item", LOGTYPE_Error);
+			return;
+		}
+		EntityTreeItemData *pTreeItemData = pCurEditItem->GetEntityTreeItemData();
+		if(pTreeItemData->GetEditModel() == nullptr)
+		{
+			HyGuiLog("EntityDraw::OnMouseMoveEvent - with null edit model", LOGTYPE_Error);
+			return;
+		}
+
+		pTreeItemData->GetEditModel()->OnDeleteKeyPressed();
+
+
 		//EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
 		//if(pCurVertexEditItem)
 		//{
@@ -74,6 +96,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		//	m_pProjItem->GetUndoStack()->push(pCmd);
 		//}
 	}
+
 }
 
 /*virtual*/ void EntityDraw::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/

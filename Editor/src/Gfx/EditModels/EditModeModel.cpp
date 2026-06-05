@@ -488,6 +488,24 @@ void EditModeModel::DoMouseReleaseSelectionLogic()
 	m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
 }
 
+void EditModeModel::OnDeleteKeyPressed()
+{
+	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
+	{
+		for(int i = m_GrabPointList.size() - 1; i >= 0; --i)
+		{
+			if(m_GrabPointList[i].IsSelected())
+			{
+				m_GrabPointList.erase(m_GrabPointList.begin() + i);
+				if(i < m_iGrabPointIndex)
+					--m_iGrabPointIndex;
+			}
+		}
+
+		SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
+	}
+}
+
 QString EditModeModel::GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const
 {
 	QString sUndoText;
