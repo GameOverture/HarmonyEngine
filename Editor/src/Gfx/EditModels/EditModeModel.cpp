@@ -457,15 +457,28 @@ void EditModeModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::ve
 		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
 		{
 			if(grabPtModel.IsSelected())
-				grabPtModel.SetPos(grabPtModel.GetCachePos() + m_vDragDelta);
+			{
+				glm::vec2 ptNewPos = grabPtModel.GetCachePos() + m_vDragDelta;
+				if(bShiftMod) // Snap to 25 pixel increments if shift is held
+					HySetVec(ptNewPos, roundf(ptNewPos.x / 25.0f) * 25.0f, roundf(ptNewPos.y / 25.0f) * 25.0f);
+				grabPtModel.SetPos(ptNewPos);
+			}
 		}
 	}
 	if(m_eCurAction == EDITMODEACTION_HoverCenter)
 	{
 		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
-			grabPtModel.SetPos(grabPtModel.GetCachePos() + m_vDragDelta);
+		{
+			glm::vec2 ptNewPos = grabPtModel.GetCachePos() + m_vDragDelta;
+			if(bShiftMod) // Snap to 25 pixel increments if shift is held
+				HySetVec(ptNewPos, roundf(ptNewPos.x / 25.0f) * 25.0f, roundf(ptNewPos.y / 25.0f) * 25.0f);
+			grabPtModel.SetPos(ptNewPos);
+		}
 
-		m_GrabPointCenter.SetPos(m_GrabPointCenter.GetCachePos() + m_vDragDelta);
+		glm::vec2 ptNewPos = m_GrabPointCenter.GetCachePos() + m_vDragDelta;
+		if(bShiftMod) // Snap to 25 pixel increments if shift is held
+			HySetVec(ptNewPos, roundf(ptNewPos.x / 25.0f) * 25.0f, roundf(ptNewPos.y / 25.0f) * 25.0f);
+		m_GrabPointCenter.SetPos(ptNewPos);
 	}
 
 	SyncViews(EDITMODE_MouseDragTransform, m_eCurAction);
@@ -970,6 +983,7 @@ EditModeAction EditModeModel::DoMouseMoveIdle()
 		{
 			// Test for close loop
 			if(m_bLoopClosed == false &&
+			   m_GrabPointList.size() > 2 &&
 			   m_GrabPointList[i].IsSelected() == false &&
 			   (i == 0 || i == m_GrabPointList.size() - 1) &&
 			   GetNumGrabPointsSelected() == 1 &&

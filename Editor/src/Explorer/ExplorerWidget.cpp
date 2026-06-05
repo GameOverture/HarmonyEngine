@@ -18,6 +18,8 @@
 #include "ExplorerModel.h"
 #include "IModel.h"
 #include "DlgInputName.h"
+#include "SourceModel.h"
+#include "EntityModel.h"
 
 #include <QJsonArray>
 #include <QMessageBox>
@@ -618,7 +620,22 @@ void ExplorerWidget::on_actionRename_triggered()
 	
 	DlgInputName *pDlg = new DlgInputName(HyGlobal::ItemName(pFirstSelected->GetType(), false), pFirstSelected->GetName(false), HyGlobal::CodeNameValidator(), nullptr, nullptr);
 	if(pDlg->exec() == QDialog::Accepted)
-		pFirstSelected->Rename(pDlg->GetName());
+	{
+		// If this is an entity, first delete the previously generated .cpp and .h files for this entity, then resave with new name
+		if(pFirstSelected->GetType() == ITEM_Entity)
+		{
+			Project *pProject = Harmony::GetProject();
+			if(pProject == nullptr)
+				HyGuiLog("on_actionRename_triggered() failed to get project for entity rename", LOGTYPE_Error);
+			
+			ProjectItemData *pProjItem = static_cast<ProjectItemData *>(pFirstSelected);
+			pProject->GetSourceModel().DeleteEntitySrcFiles(*static_cast<EntityModel *>(pProjItem->GetModel()));
+			pFirstSelected->Rename(pDlg->GetName());
+			pProject->GetSourceModel().GenerateEntitySrcFiles(*static_cast<EntityModel *>(pProjItem->GetModel()));
+		}
+		else
+			pFirstSelected->Rename(pDlg->GetName());
+	}
 
 	delete pDlg;
 }
