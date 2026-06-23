@@ -106,6 +106,15 @@ int32 HyPrimitive2d::GetNumLayers() const
 	return static_cast<int32>(m_LayerList.size());
 }
 
+void HyPrimitive2d::SetNumLayers(int32 iNumLayers)
+{
+	while(GetNumLayers() < iNumLayers)
+		SetAsNothing(-1);
+
+	while(GetNumLayers() > iNumLayers)
+		RemoveLayer(GetNumLayers() - 1);
+}
+
 HyFixtureType HyPrimitive2d::GetLayerType(int32 iLayerIndex) const
 {
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())

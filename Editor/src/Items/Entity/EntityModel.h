@@ -38,6 +38,7 @@ class EntityModel : public IModel
 	Q_OBJECT
 
 	EntityBaseClassType										m_eBaseClass;
+	QString													m_sCustomBaseClass;
 
 	// These maps store the CONSTRUCTOR property data for the entire entity
 	// HACK: These m_Ctor* member variables are declared before 'm_TreeModel' because its constructor needs to use/initialize these maps
@@ -69,6 +70,9 @@ public:
 	virtual ~EntityModel();
 
 	EntityBaseClassType GetBaseClassType() const;
+	QString GetCustomBaseClass() const;
+	void CacheCustomBaseClassName(QString sCustomBaseClass);
+
 	EntityTreeItemData *GetFusedItem() const;
 	EntityTreeModel &GetTreeModel();
 

@@ -499,6 +499,7 @@ void EntityDraw::FlushRootEntity()
 	switch(pEntModel->GetBaseClassType())
 	{
 	case ENTBASECLASS_HyEntity2d:
+	case ENTBASECLASS_Custom:
 		m_pRootEntity = new HyEntity2d(this);
 		break;
 	

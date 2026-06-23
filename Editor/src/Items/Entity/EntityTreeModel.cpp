@@ -67,6 +67,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		switch(i)
 		{
 		case ENTBASECLASS_HyEntity2d:
+		case ENTBASECLASS_Custom:
 			m_FusedTreeItemData[i] = nullptr;
 			break;
 	
@@ -575,7 +576,7 @@ int EntityTreeModel::GetPrimLayerIndex(EntityTreeItemData *pPrimLayer, EntityTre
 	}
 
 	// Find the PrimNode that is the parent of the passed in pPrimLayer
-	QUuid primNodeUuid = pPrimLayer->GetReferencedItemUuid();
+	QUuid primLayerUuid = pPrimLayer->GetReferencedItemUuid();
 	pPrimNodeOut = nullptr;
 
 	TreeModelItem *pThisEntity = GetRootTreeItem();
@@ -586,20 +587,18 @@ int EntityTreeModel::GetPrimLayerIndex(EntityTreeItemData *pPrimLayer, EntityTre
 			continue;
 		if(pCurItem->GetType() == ITEM_PrimNode)
 		{
-			TreeModelItem *pArrayFolder = pThisEntity->GetChild(i);
-			for(int j = 0; j < pArrayFolder->GetNumChildren(); ++j)
+			TreeModelItem *pCurPrimNodeItem = pThisEntity->GetChild(i);
+			for(int j = 0; j < pCurPrimNodeItem->GetNumChildren(); ++j)
 			{
-				EntityTreeItemData *pArrayItem = pArrayFolder->GetChild(j)->data(0).value<EntityTreeItemData *>();
-				if(pArrayItem->GetReferencedItemUuid() == primNodeUuid)
+				EntityTreeItemData *pCurPrimLayer = pCurPrimNodeItem->GetChild(j)->data(0).value<EntityTreeItemData *>();
+				if(pCurPrimLayer->GetReferencedItemUuid() == primLayerUuid)
 				{
-					pPrimNodeOut = pArrayItem;
+					pPrimNodeOut = pCurPrimNodeItem->data(0).value<EntityTreeItemData *>();
 					break;
 				}
 			}
 
 		}
-		if(pCurItem->GetReferencedItemUuid() == primNodeUuid)
-			pPrimNodeOut = pCurItem;
 
 		if(pPrimNodeOut)
 			break;
@@ -622,6 +621,7 @@ int EntityTreeModel::GetPrimLayerIndex(EntityTreeItemData *pPrimLayer, EntityTre
 			return i;
 	}
 
+	HyGuiLog("EntityTreeModel::GetPrimLayerIndex could not find the passed in PrimLayer in its parent PrimNode", LOGTYPE_Error);
 	return -1;
 }
 

@@ -48,6 +48,39 @@ void EditModeModel::SetColor(HyColor color)
 		pView->SyncColor();
 }
 
+glm::vec2 EditModeModel::GetOffset() const
+{
+	return m_vOffset;
+}
+
+void EditModeModel::SetOffset(glm::vec2 vOffset)
+{
+	m_vOffset = vOffset;
+	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
+}
+
+bool EditModeModel::IsVisible() const
+{
+	return m_bVisible;
+}
+
+void EditModeModel::SetVisible(bool bVisible)
+{
+	m_bVisible = bVisible;
+	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
+}
+
+float EditModeModel::GetAlpha() const
+{
+	return m_fAlpha;
+}
+
+void EditModeModel::SetAlpha(float fAlpha)
+{
+	m_fAlpha = fAlpha;
+	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
+}
+
 int EditModeModel::GetDisplayOrder() const
 {
 	return m_iDisplayOrder;

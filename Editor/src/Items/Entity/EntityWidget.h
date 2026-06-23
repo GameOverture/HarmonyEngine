@@ -43,6 +43,9 @@ public:
 	virtual void OnUpdateActions() override;
 	virtual void OnFocusState(int iStateIndex, QVariant subState) override;
 
+	void ShowCustomBaseClassTextBox(bool bShow);
+	void SyncCustomBaseClassText();
+
 	QModelIndexList GetSelectedItems() const;
 	void RequestSelectedItems(QList<QUuid> uuidList); // Will clear and select only what 'uuidList' contains
 	void RequestSelectedItemChange(EntityTreeItemData *pTreeItemData, QItemSelectionModel::SelectionFlags flags);
@@ -73,6 +76,7 @@ private Q_SLOTS:
 	void OnKeyF();
 
 	void on_cmbBaseClass_activated(int iIndex);
+	void on_txtCustomBaseClass_editingFinished();
 
 	void OnContextMenu(const QPoint &pos);
 	void OnTreeFocusIndexChanged(const QModelIndex &curIndex, const QModelIndex &prevIndex);

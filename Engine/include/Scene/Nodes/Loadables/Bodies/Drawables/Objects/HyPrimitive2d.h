@@ -133,6 +133,7 @@ public:
 	void GetCentroid(glm::vec2 &ptCentroidOut);
 
 	int32 GetNumLayers() const;
+	void SetNumLayers(int32 iNumLayers);
 
 	HyFixtureType GetLayerType(int32 iLayerIndex) const;
 

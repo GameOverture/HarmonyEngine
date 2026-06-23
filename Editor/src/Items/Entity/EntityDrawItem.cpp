@@ -987,8 +987,22 @@ void ExtrapolateProperties(Project &projectRef,
 				QJsonObject primitiveObj = propsObj["Primitive Layer"].toObject();
 				if(primitiveObj.contains("Data"))
 					pEditModel->Deserialize(bIsActiveEditModeItem, primitiveObj["Data"].toObject());
+				if(primitiveObj.contains("Offset"))
+				{
+					QJsonArray offsetArray = primitiveObj["Offset"].toArray();
+					if(offsetArray.size() == 2)
+						pEditModel->SetOffset(glm::vec2(offsetArray[0].toDouble(), offsetArray[1].toDouble()));
+				}
+				if(primitiveObj.contains("Visible"))
+					pEditModel->SetVisible(primitiveObj["Visible"].toBool());
+				if(primitiveObj.contains("Color"))
+				{
+					QJsonArray colorArray = primitiveObj["Color"].toArray();
+					pEditModel->SetColor(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
+				}
+				if(primitiveObj.contains("Alpha"))
+					pEditModel->SetAlpha(primitiveObj["Alpha"].toDouble());
 			}
-			pEditModel->SetColor(HyColor(static_cast<IHyBody2d *>(pThisHyNode)->topColor.Get())); // Always try to sync colors
 			break;
 		
 		case ITEM_ShapeFixture:

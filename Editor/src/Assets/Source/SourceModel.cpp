@@ -44,6 +44,8 @@ bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 
 	QString sClassName = entityModelRef.GetItem().GetName(false);
 	QString sBaseClass = HyGlobal::GetEntityBaseClassName(entityModelRef.GetBaseClassType());
+	if(sBaseClass == ENTITYCUSTOMBASECLASS_STRING_ID)
+		sBaseClass = entityModelRef.GetCustomBaseClass();
 
 	// Generate the cpp and h file of the entity (it will overwrite the entity files if they already exist)
 	QModelIndex entityFolderIndex = FindIndex<TreeModelItemData *>(m_pEntityFolderItem, 0);

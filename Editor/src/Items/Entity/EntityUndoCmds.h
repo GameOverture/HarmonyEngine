@@ -32,6 +32,22 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class EntityUndoCmd_CustomBaseClassName : public QUndoCommand
+{
+	ProjectItemData &			m_EntityItemRef;
+	QString						m_sNewBaseClassName;
+	QString						m_sOldBaseClassName;
+
+public:
+	EntityUndoCmd_CustomBaseClassName(ProjectItemData &entityItemRef, QString sNewBaseClassName, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_CustomBaseClassName();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_AddChildren : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;

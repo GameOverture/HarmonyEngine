@@ -42,7 +42,12 @@ enum EditModeAction
 class EditModeModel
 {
 	bool								m_bIsFixture;
+	
 	HyColor								m_Color;
+	glm::vec2							m_vOffset;				// Only used for primitive layer
+	bool								m_bVisible;				// Only used for primitive layer
+	float								m_fAlpha;				// Only used for primitive layer
+
 	int32								m_iDisplayOrder;
 
 	// ------------------------------------------------------------------------------------------------------------------
@@ -78,6 +83,15 @@ public:
 
 	HyColor GetColor() const;
 	void SetColor(HyColor color);
+
+	glm::vec2 GetOffset() const;
+	void SetOffset(glm::vec2 vOffset);
+
+	bool IsVisible() const;
+	void SetVisible(bool bVisible);
+
+	float GetAlpha() const;
+	void SetAlpha(float fAlpha);
 
 	int GetDisplayOrder() const;
 	void SetDisplayOrder(int iDisplayOrder);

@@ -131,6 +131,7 @@ EntityModel::AuxWidgetsModel::AuxWidgetsModel(EntityModel &entityModelRef, int i
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
 	m_eBaseClass(HyGlobal::GetEntityBaseClassType(itemFileDataRef.m_Meta["baseClass"].toString(ENTITYBASECLASSTYPE_STRINGS[ENTBASECLASS_HyEntity2d]))),
+	m_sCustomBaseClass(itemFileDataRef.m_Meta["customBaseClass"].toString()),
 	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this),
 	m_AuxWidgetsModel(*this, itemFileDataRef.m_Meta["framesPerSecond"].toInt(60), itemFileDataRef.m_Meta["autoInitialize"].toBool(true))
 {
@@ -148,6 +149,16 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 EntityBaseClassType EntityModel::GetBaseClassType() const
 {
 	return m_eBaseClass;
+}
+
+QString EntityModel::GetCustomBaseClass() const
+{
+	return m_sCustomBaseClass;
+}
+
+void EntityModel::CacheCustomBaseClassName(QString sCustomBaseClass)
+{
+	m_sCustomBaseClass = sCustomBaseClass;
 }
 
 EntityTreeItemData *EntityModel::GetFusedItem() const
@@ -193,6 +204,10 @@ int EntityModel::GetFramesPerSecond() const
 void EntityModel::Cmd_SetBaseClassType(EntityBaseClassType eNewBaseClassType)
 {
 	m_eBaseClass = eNewBaseClassType;
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
+	if(pWidget)
+		pWidget->ShowCustomBaseClassTextBox(m_eBaseClass == ENTBASECLASS_Custom);
+
 	m_TreeModel.Cmd_ResetFusedItems();
 }
 
@@ -522,6 +537,9 @@ QString EntityModel::GenerateSrc_FileIncludes() const
 	m_TreeModel.GetTreeItemData(itemList, shapeList, layoutList);
 
 	QStringList sIncludeList;
+	if(m_eBaseClass == ENTBASECLASS_Custom)
+		sIncludeList += m_sCustomBaseClass + ".h";
+
 	for(EntityTreeItemData *pItem : itemList)
 	{
 		if(pItem->GetType() != ITEM_Entity)
@@ -723,6 +741,10 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 			sSrc += " :\n\tHyGui(HYORIENT_Vertical, " + DeserializePanelInitAsRuntimeCode(panelInitObj) + ")";
 		break; }
 
+	case ENTBASECLASS_Custom:
+		sSrc += " :\n\t" + GetCustomBaseClass() + "(pParent)";
+		break;
+
 	default:
 		HyGuiLog("EntityModel::GenerateSrc_MemberInitializerList() - Unhandled base class type: " % HyGlobal::GetEntityBaseClassName(m_eBaseClass), LOGTYPE_Error);
 		break;
@@ -827,6 +849,23 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 QString EntityModel::GenerateSrc_Ctor() const
 {
 	QString sSrc;
+
+	// For every PrimNode, initialize the number of layers it will have
+	QModelIndex index = m_TreeModel.FindIndex<EntityTreeItemData *>(m_TreeModel.GetRootTreeItemData(), 0);
+	QList<TreeModelItemData *> allItemsList = m_TreeModel.GetItemsRecursively(index);
+	for(TreeModelItemData *pTreeItemData : allItemsList)
+	{
+		if(pTreeItemData->GetType() == ITEM_PrimNode)
+		{
+			EntityTreeItemData *pPrimNode = static_cast<EntityTreeItemData *>(pTreeItemData);
+			EntityItemDeclarationType eDeclType = pPrimNode->GetDeclarationType();
+			QString sDeref = (pPrimNode->GetDeclarationType() == ENTDECLTYPE_Static) ? "." : "->";
+			int iNumChildren = static_cast<int>(m_TreeModel.FindPrimLayers(pPrimNode).size());
+			sSrc += pPrimNode->GetCodeName() + sDeref + "SetNumLayers(" + QString::number(iNumChildren) + ");\n\t";
+		}
+	}
+
+	sSrc += "std::vector<glm::vec2> vertList;\n\t";
 
 	// CALL IN THIS ORDER:
 	// 1: Standard Properties
@@ -1033,7 +1072,7 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 			if(bodyObj.contains("Color Tint"))
 			{
 				QJsonArray colorArray = bodyObj["Color Tint"].toArray();
-				sSrc += sCodeName + "SetTint(HyColor(" + QString::number(colorArray[0].toInt()) + ", " + QString::number(colorArray[1].toInt()) + ", " + QString::number(colorArray[2].toInt()) + ", 255));" + sNewLine;
+				sSrc += sCodeName + "SetTint(HyColor(" + QString::number(colorArray[0].toInt()) + ", " + QString::number(colorArray[1].toInt()) + ", " + QString::number(colorArray[2].toInt()) + "));" + sNewLine;
 			}
 			if(bodyObj.contains("Alpha"))
 				sSrc += sCodeName + "alpha.Set(" + QString::number(bodyObj["Alpha"].toDouble(), 'f') + "f);" + sNewLine;
@@ -1099,6 +1138,33 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 			QJsonObject primitiveObj = propObj["Primitive Layer"].toObject();
 			if(primitiveObj.contains("Data"))
 				sSrc += DeserializeShapeDataAsRuntimeCode(pItemData, sCodeName, primitiveObj["Data"].toObject(), sNewLine);
+			if(primitiveObj.contains("Offset"))
+			{
+				QJsonArray offsetArray = primitiveObj["Offset"].toArray();
+				EntityTreeItemData *pPrimNode = nullptr;
+				int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
+				sSrc += sCodeName + "SetLayerOffset(" + QString::number(iLayerIndex) + ", " + QString::number(offsetArray[0].toDouble(), 'f') + "f, " + QString::number(offsetArray[1].toDouble(), 'f') + "f);" + sNewLine;
+			}
+			if(primitiveObj.contains("Visible"))
+			{
+				EntityTreeItemData *pPrimNode = nullptr;
+				int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
+				QString sVisibleParam = primitiveObj["Visible"].toBool() ? "true" : "false";
+				sSrc += sCodeName + "SetLayerVisible(" + QString::number(iLayerIndex) + ", " + sVisibleParam + ");" + sNewLine;
+			}
+			if(primitiveObj.contains("Color"))
+			{
+				QJsonArray colorArray = primitiveObj["Color"].toArray();
+				EntityTreeItemData *pPrimNode = nullptr;
+				int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
+				sSrc += sCodeName + "SetLayerColor(" + QString::number(iLayerIndex) + ", HyColor(" + QString::number(colorArray[0].toInt()) + ", " + QString::number(colorArray[1].toInt()) + ", " + QString::number(colorArray[2].toInt()) + "));" + sNewLine;
+			}
+			if(primitiveObj.contains("Alpha"))
+			{
+				EntityTreeItemData *pPrimNode = nullptr;
+				int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
+				sSrc += sCodeName + "SetLayerAlpha(" + QString::number(iLayerIndex) + ", " + QString::number(primitiveObj["Alpha"].toDouble(), 'f') + "f);" + sNewLine;
+			}
 		}
 		else if(sCategoryName == "Shape")
 		{
@@ -1503,7 +1569,7 @@ QString EntityModel::DeserializePanelInitAsRuntimeCode(QJsonObject panelInitObj)
 			case ITEM_Spine:	sSrc += "HYTYPE_Spine, HyNodePath(\"" + static_cast<ProjectItemData *>(pItemData)->GetName(true) + "\")"; break;
 
 			default:
-				HyGuiLog("EntityModel::GenerateSrc_SetProperties() - Unhandled panel node type", LOGTYPE_Error);
+				HyGuiLog("EntityModel::DeserializePanelInitAsRuntimeCode() - Unhandled panel node type", LOGTYPE_Error);
 				break;
 			}
 		}
@@ -1522,7 +1588,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 	for(int i = 0; i < floatArray.size(); ++i)
 		sFloatList.push_back(QString::number(floatArray[i].toDouble(), 'f')); // Ensure we have a decimal point
 
-	if(sFloatList.isEmpty() || HyGlobal::GetShapeFromString(serializedObj["type"].toString()) == SHAPE_None)
+	if(sFloatList.isEmpty() || (serializedObj["type"].toString() != HYLINECHAIN_Name && HyGlobal::GetShapeFromString(serializedObj["type"].toString()) == SHAPE_None))
 	{
 		switch(pItemData->GetType())
 		{
@@ -1651,13 +1717,22 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 			QStringList sFloatList;
 			if((floatArray.size() & 1) == 0)
 				HyGuiLog("GfxShapeModel::DeserializeShapeDataAsRuntimeCode for chain had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
+			sFloatList.resize(floatArray.size());
 			for(int i = 0; i < floatArray.size(); ++i)
 				sFloatList[i] = QString::number(floatArray[i].toDouble(), 'f'); // Ensure we have a decimal point
 			sSrc += "vertList.clear();" + sNewLine;
-			for(int i = 0; i < sFloatList.size(); i += 2)
-				sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
+			if(sFloatList.size() > 1)
+			{
+				bool bIsLooped = floatArray[sFloatList.size() - 1].toDouble() != 0.0;
+				for(int i = 0; i < sFloatList.size(); i += 2)
+				{
+					if(i + 1 >= sFloatList.size())
+						break;
+					sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
+				}
 
-			sSrc += sCodeName + "SetData(vertList);" + sNewLine;
+				sSrc += sCodeName + "SetData(vertList, " + (bIsLooped ? "true" : "false") + ");" + sNewLine;
+			}
 			break; }
 		}
 	}
@@ -1679,6 +1754,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 /*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
 	itemSpecificFileDataOut.m_Meta.insert("baseClass", HyGlobal::GetEntityBaseClassName(m_eBaseClass));
+	itemSpecificFileDataOut.m_Meta.insert("customBaseClass", GetCustomBaseClass());
 	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetRootTreeItemData()->GetCodeName());
 	itemSpecificFileDataOut.m_Meta.insert("framesPerSecond", GetFramesPerSecond());
 

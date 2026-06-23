@@ -35,6 +35,7 @@ class GfxGrabPointModel
 {
 	GrabPointType				m_eType;
 	glm::vec2					m_ptPosition;
+	glm::vec2					m_vOffset;
 	glm::vec2					m_ptCachePos; // Used to cache the position of the grab point when it is selected, so that it can be used for delta calculations during dragging
 
 public:

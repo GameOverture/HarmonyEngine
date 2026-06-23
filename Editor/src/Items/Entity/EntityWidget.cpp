@@ -44,6 +44,10 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 		ui->cmbBaseClass->addItem(ENTITYBASECLASSTYPE_STRINGS[i], i);
 	ui->cmbBaseClass->setCurrentIndex(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetBaseClassType());
 
+	ui->txtCustomBaseClass->setValidator(HyGlobal::CodeNameValidator());
+	ui->txtCustomBaseClass->setText(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetCustomBaseClass());
+	ShowCustomBaseClassTextBox(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetBaseClassType() == ENTBASECLASS_Custom);
+
 	ui->btnAddChild->setDefaultAction(ui->actionAddChildren);
 	
 	ui->btnAddPrimitive->setDefaultAction(ui->actionAddPrimitive);
@@ -398,6 +402,21 @@ EntityWidget::~EntityWidget()
 	pAuxDopeSheet->SetEntityStateModel(pEntStateData);
 }
 
+void EntityWidget::ShowCustomBaseClassTextBox(bool bShow)
+{
+	if(bShow)
+		ui->txtCustomBaseClass->show();
+	else
+		ui->txtCustomBaseClass->hide();
+}
+
+void EntityWidget::SyncCustomBaseClassText()
+{
+	ui->txtCustomBaseClass->blockSignals(true);
+	ui->txtCustomBaseClass->setText(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetCustomBaseClass());
+	ui->txtCustomBaseClass->blockSignals(false);
+}
+
 QModelIndexList EntityWidget::GetSelectedItems() const
 {
 	QModelIndexList indexList = ui->nodeTree->selectionModel()->selectedIndexes();
@@ -721,6 +740,15 @@ void EntityWidget::on_cmbBaseClass_activated(int iIndex)
 
 	EntityUndoCmd_BaseClass *pCmd = new EntityUndoCmd_BaseClass(GetItem(), static_cast<EntityBaseClassType>(iIndex));
 	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_txtCustomBaseClass_editingFinished()
+{
+	if(ui->txtCustomBaseClass->text() != static_cast<EntityModel *>(m_ItemRef.GetModel())->GetCustomBaseClass())
+	{
+		EntityUndoCmd_CustomBaseClassName *pCmd = new EntityUndoCmd_CustomBaseClassName(GetItem(), ui->txtCustomBaseClass->text());
+		m_ItemRef.GetUndoStack()->push(pCmd);
+	}
 }
 
 void EntityWidget::OnContextMenu(const QPoint &pos)

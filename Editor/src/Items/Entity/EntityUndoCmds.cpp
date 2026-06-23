@@ -44,6 +44,37 @@ EntityUndoCmd_BaseClass::EntityUndoCmd_BaseClass(ProjectItemData &entityItemRef,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EntityUndoCmd_CustomBaseClassName::EntityUndoCmd_CustomBaseClassName(ProjectItemData &entityItemRef, QString sNewBaseClassName, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_EntityItemRef(entityItemRef),
+	m_sNewBaseClassName(sNewBaseClassName),
+	m_sOldBaseClassName(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetCustomBaseClass())
+{
+	setText("Change Custom Base Class Name to " % m_sNewBaseClassName);
+}
+
+/*virtual*/ EntityUndoCmd_CustomBaseClassName::~EntityUndoCmd_CustomBaseClassName()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_CustomBaseClassName::redo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->CacheCustomBaseClassName(m_sNewBaseClassName);
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->SyncCustomBaseClassText();
+}
+
+/*virtual*/ void EntityUndoCmd_CustomBaseClassName::undo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->CacheCustomBaseClassName(m_sOldBaseClassName);
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
+	if(pWidget)
+		pWidget->SyncCustomBaseClassText();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_EntityItemRef(entityItemRef),
