@@ -16,6 +16,11 @@
 {
 }
 
+/*static*/ %HY_CLASS% *%HY_CLASS%::Get()
+{
+	return static_cast<%HY_CLASS% *>(sm_pInstance);
+}
+
 /*virtual*/ bool %HY_CLASS%::OnUpdate() /*override*/
 {
 	if(HyEngine::Input().IsActionDown(INPUT_CameraUp))

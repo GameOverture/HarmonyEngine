@@ -20,6 +20,8 @@ class %HY_CLASS% : public HyEngine
 public:
 	%HY_CLASS%(HyInit &initStruct);
 	virtual ~%HY_CLASS%();
+	
+	static %HY_CLASS% *Get();
 
 	virtual bool OnUpdate() override;
 };

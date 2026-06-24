@@ -55,8 +55,10 @@
 
 class HyEngine
 {
+protected:
 	static HyEngine *			sm_pInstance;
 
+private:
 	// The order of these member declarations matter as some are used to initialize each other
 	const HyInit				m_Init;
 	HyConsoleInterop			m_Console;
