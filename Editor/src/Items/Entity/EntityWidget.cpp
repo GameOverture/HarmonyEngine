@@ -328,7 +328,7 @@ EntityWidget::~EntityWidget()
 
 		ui->actionRemoveItems->setEnabled(bRootOrBvFolder == false);
 		
-		if(bSelectedHaveSameParent && bAllSameType && bAllArrayItems)
+		if(bSelectedHaveSameParent && bAllSameType && bAllArrayItems && bRootOrBvFolder == false)
 		{
 			ui->actionPackToArray->setEnabled(false);
 			ui->actionDuplicateToArray->setEnabled(false);
@@ -337,7 +337,7 @@ EntityWidget::~EntityWidget()
 			ui->actionUnpackFromArray->setIcon(HyGlobal::ItemIcon(eType, SUBICON_Close));
 			m_ContextMenu.addAction(ui->actionUnpackFromArray);
 		}
-		else if(bSelectedHaveSameParent && bAllSameType && selectedIndices.size() == 1)
+		else if(bSelectedHaveSameParent && bAllSameType && selectedIndices.size() == 1 && bRootOrBvFolder == false)
 		{
 			ui->actionPackToArray->setEnabled(false);
 			ui->actionDuplicateToArray->setEnabled(true);
@@ -346,7 +346,7 @@ EntityWidget::~EntityWidget()
 			ui->actionDuplicateToArray->setIcon(HyGlobal::ItemIcon(eType, SUBICON_New));
 			m_ContextMenu.addAction(ui->actionDuplicateToArray);
 		}
-		else
+		else if(bRootOrBvFolder == false)
 		{
 			ui->actionPackToArray->setEnabled(bSelectedHaveSameParent && bAllSameType && bAllArrayItems == false);
 			ui->actionDuplicateToArray->setEnabled(false);
