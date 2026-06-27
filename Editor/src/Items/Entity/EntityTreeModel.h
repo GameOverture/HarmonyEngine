@@ -127,7 +127,7 @@ private: // These functions should only be called by EntityModel's Cmd_ function
 	EntityTreeItemData *Cmd_AllocGuiItemTreeItem(ItemType eGuiItemType, QString sCodeNamePrefix, QUuid guiLayoutParentUuid, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocPrimNodeTreeItem(QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocPrimLayerTreeItem(EntityTreeItemData *pPrimNode, int iRow = -1);
-	EntityTreeItemData *Cmd_AllocFixtureTreeItem(bool bIsShape, QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocFixtureTreeItem(EditModeType eEditModeType, QString sCodeNamePrefix, int iRow = -1);
 	bool Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow);
 	int32 Cmd_PopChild(EntityTreeItemData *pItem);
 

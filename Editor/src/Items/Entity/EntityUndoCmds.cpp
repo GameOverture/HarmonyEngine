@@ -589,16 +589,30 @@ EntityUndoCmd_AddPrimLayer::EntityUndoCmd_AddPrimLayer(ProjectItemData &entityIt
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_AddFixture::EntityUndoCmd_AddFixture(ProjectItemData &entityItemRef, bool bIsShape, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_AddFixture::EntityUndoCmd_AddFixture(ProjectItemData &entityItemRef, EditModeType eEditModeType, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
-	m_bIsShape(bIsShape),
+	m_eEditModeType(eEditModeType),
 	m_iIndex(iRowIndex),
-	m_pShapeTreeItemData(nullptr)
+	m_pFixtureTreeItemData(nullptr)
 {
-	if(m_bIsShape)
+	switch(m_eEditModeType)
+	{
+	case EDITMODETYPE_FixtureShape:
 		setText("Add New Shape Fixture");
-	else
+		break;
+
+	case EDITMODETYPE_FixtureChain:
 		setText("Add New Chain Fixture");
+		break;
+
+	case EDITMODETYPE_FixturePoint:
+		setText("Add New Point Fixture");
+		break;
+
+	default:
+		HyGuiLog("EntityUndoCmd_AddFixture ctor - Unhandled edit mode type", LOGTYPE_Error);
+		break;
+	}
 }
 
 /*virtual*/ EntityUndoCmd_AddFixture::~EntityUndoCmd_AddFixture()
@@ -607,18 +621,18 @@ EntityUndoCmd_AddFixture::EntityUndoCmd_AddFixture(ProjectItemData &entityItemRe
 
 /*virtual*/ void EntityUndoCmd_AddFixture::redo() /*override*/
 {
-	if(m_pShapeTreeItemData == nullptr)
-		m_pShapeTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewFixture(m_bIsShape, m_iIndex);
+	if(m_pFixtureTreeItemData == nullptr)
+		m_pFixtureTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateNewFixture(m_eEditModeType, m_iIndex);
 	else
-		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pShapeTreeItemData, m_iIndex);
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pFixtureTreeItemData, m_iIndex);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
-	pWidget->SetEditMode(m_pShapeTreeItemData);
+	pWidget->SetEditMode(m_pFixtureTreeItemData);
 }
 
 /*virtual*/ void EntityUndoCmd_AddFixture::undo() /*override*/
 {
-	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pShapeTreeItemData);
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pFixtureTreeItemData);
 
 	EntityWidget *pWidget = static_cast<EntityWidget *>(m_EntityItemRef.GetWidget());
 	pWidget->SetEditMode(nullptr);

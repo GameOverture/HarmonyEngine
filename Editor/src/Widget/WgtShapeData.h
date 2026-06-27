@@ -10,6 +10,8 @@
 #ifndef WgtShapeData_H
 #define WgtShapeData_H
 
+#include "EditModeModel.h"
+
 #include <QWidget>
 #include <QSpinBox>
 #include <QMouseEvent>
@@ -41,7 +43,7 @@ public:
 	virtual ~WgtShapeData();
 
 	void Init(EntityTreeItemData *pTreeItemData);
-	void UpdateModel(bool bIsActiveEditModeItem, bool bIsFixture, bool bIsLineChain, EditorShape eShapeType);
+	void UpdateModel(bool bIsActiveEditModeItem, EditModeType eEditModeType, EditorShape eShapeType);
 
 	QVariant GetValue();
 

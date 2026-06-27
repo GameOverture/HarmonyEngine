@@ -297,15 +297,17 @@ EntityTreeItemData *EntityModel::Cmd_CreateNewPrimLayer(EntityTreeItemData *pPri
 	return pTreeItemData;
 }
 
-EntityTreeItemData *EntityModel::Cmd_CreateNewFixture(bool bIsShape, int iRow)
+EntityTreeItemData *EntityModel::Cmd_CreateNewFixture(EditModeType eEditModeType, int iRow)
 {
-	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocFixtureTreeItem(bIsShape, "m_", iRow);
-	if(bIsShape)
+	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocFixtureTreeItem(eEditModeType, "m_", iRow);
+	if(eEditModeType == EDITMODETYPE_FixtureShape)
 	{
 		static_cast<EntityStateData *>(GetStateData(0))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, -1, "Shape", "Type", QJsonValue(HyGlobal::ShapeName(SHAPE_None)), false);
 		static_cast<EntityStateData *>(GetStateData(0))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, -1, "Shape", "Data", QJsonArray(), true);
 	}
-	else
+	else if(eEditModeType == EDITMODETYPE_FixturePoint)
+		static_cast<EntityStateData *>(GetStateData(0))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, -1, "Point", "Data", QJsonArray(), true);
+	else // EDITMODETYPE_FixtureChain
 		static_cast<EntityStateData *>(GetStateData(0))->GetDopeSheetScene().SetKeyFrameProperty(pTreeItemData, -1, "Chain", "Data", QJsonArray(), true);
 
 	return pTreeItemData;

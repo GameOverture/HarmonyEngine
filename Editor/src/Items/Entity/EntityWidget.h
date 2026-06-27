@@ -95,6 +95,7 @@ private Q_SLOTS:
 
 	void on_actionAddShape_triggered();
 	void on_actionAddChain_triggered();
+	void on_actionAddPoint_triggered();
 
 	void on_actionAddLayoutHorz_triggered();
 	void on_actionAddLayoutVert_triggered();

@@ -408,5 +408,14 @@
         <file>icons16x16/items/Spacer-Warning.png</file>
         <file>icons16x16/generic-editMode.png</file>
         <file>icons16x16/generic-editMode-disabled.png</file>
+        <file>icons16x16/items/Point.png</file>
+        <file>icons16x16/items/Point-Close.png</file>
+        <file>icons16x16/items/Point-Delete.png</file>
+        <file>icons16x16/items/Point-Dirty.png</file>
+        <file>icons16x16/items/Point-New.png</file>
+        <file>icons16x16/items/Point-Open.png</file>
+        <file>icons16x16/items/Point-Pending.png</file>
+        <file>icons16x16/items/Point-Settings.png</file>
+        <file>icons16x16/items/Point-Warning.png</file>
     </qresource>
 </RCC>

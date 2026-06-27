@@ -60,6 +60,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 
 	ui->btnAddFixtureShape->setDefaultAction(ui->actionAddShape);
 	ui->btnAddFixtureChain->setDefaultAction(ui->actionAddChain);
+	ui->btnAddFixturePoint->setDefaultAction(ui->actionAddPoint);
 
 	ui->btnAddLayoutHorz->setDefaultAction(ui->actionAddLayoutHorz);
 	ui->btnAddLayoutVert->setDefaultAction(ui->actionAddLayoutVert);
@@ -963,13 +964,19 @@ void EntityWidget::on_actionAddPrimLineChain_triggered()
 
 void EntityWidget::on_actionAddShape_triggered()
 {
-	QUndoCommand *pCmd = new EntityUndoCmd_AddFixture(m_ItemRef, true);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddFixture(m_ItemRef, EDITMODETYPE_FixtureShape);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddChain_triggered()
 {
-	QUndoCommand *pCmd = new EntityUndoCmd_AddFixture(m_ItemRef, false);
+	QUndoCommand *pCmd = new EntityUndoCmd_AddFixture(m_ItemRef, EDITMODETYPE_FixtureChain);
+	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddPoint_triggered()
+{
+	QUndoCommand *pCmd = new EntityUndoCmd_AddFixture(m_ItemRef, EDITMODETYPE_FixturePoint);
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 

@@ -11,11 +11,10 @@
 #include "EditModeView.h"
 #include "MainWindow.h"
 
-EditModeModel::EditModeModel(bool bIsFixture, bool bIsLineChain, HyColor color) :
-	m_bIsFixture(bIsFixture),
+EditModeModel::EditModeModel(EditModeType eEditModeType, HyColor color) :
+	m_eEditModeType(eEditModeType),
 	m_Color(color),
 	m_iDisplayOrder(0),
-	m_bIsLineChain(bIsLineChain),
 	m_eShapeType(SHAPE_None),
 	m_bLoopClosed(false),
 	m_fOutline(0.0f),
@@ -34,6 +33,31 @@ EditModeModel::EditModeModel(bool bIsFixture, bool bIsLineChain, HyColor color) 
 /*virtual*/ EditModeModel::~EditModeModel()
 {
 	ClearFixtures();
+}
+
+EditModeType EditModeModel::GetEditModeType() const
+{
+	return m_eEditModeType;
+}
+
+bool EditModeModel::IsFixture() const
+{
+	return m_eEditModeType == EDITMODETYPE_FixtureShape || m_eEditModeType == EDITMODETYPE_FixtureChain || m_eEditModeType == EDITMODETYPE_FixturePoint;
+}
+
+bool EditModeModel::IsLineChain() const
+{
+	return m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain;
+}
+
+void EditModeModel::SetEditModeType(EditModeType eEditModeType)
+{
+	m_eEditModeType = eEditModeType;
+}
+
+EditorShape EditModeModel::GetShapeType() const
+{
+	return m_eShapeType;
 }
 
 HyColor EditModeModel::GetColor() const
@@ -91,31 +115,15 @@ void EditModeModel::SetDisplayOrder(int iDisplayOrder)
 	m_iDisplayOrder = iDisplayOrder;
 }
 
-bool EditModeModel::IsFixture() const
-{
-	return m_bIsFixture;
-}
-
-bool EditModeModel::IsLineChain() const
-{
-	return m_bIsLineChain;
-}
-
-EditorShape EditModeModel::GetShapeType() const
-{
-	return m_eShapeType;
-}
-
-void EditModeModel::SetIsFixture(bool bIsFixture)
-{
-	m_bIsFixture = bIsFixture;
-}
-
-void EditModeModel::ChangeToLineChain(bool bIsActiveEditModeItem)
+void EditModeModel::ChangeToLineChain(bool bIsActiveEditModeItem, bool bAsFixture)
 {
 	std::vector<float> floatList = ConvertedPolygonOrLineChainData();
 
-	m_bIsLineChain = true;
+	if(bAsFixture)
+		m_eEditModeType = EDITMODETYPE_FixtureChain;
+	else
+		m_eEditModeType = EDITMODETYPE_PrimitiveLineChain;
+
 	m_eShapeType = SHAPE_None;
 
 	// Reassemble model
@@ -129,7 +137,26 @@ void EditModeModel::ChangeToLineChain(bool bIsActiveEditModeItem)
 	Deserialize(bIsActiveEditModeItem, serializedObj);
 }
 
-void EditModeModel::ChangeToShape(bool bIsActiveEditModeItem, EditorShape eNewShapeType)
+void EditModeModel::ChangeToPoint(bool bIsActiveEditModeItem)
+{
+	std::vector<float> floatList = ConvertedPointData();
+
+	m_eEditModeType = EDITMODETYPE_FixturePoint;
+
+	m_eShapeType = SHAPE_None;
+
+	// Reassemble model
+	QJsonObject serializedObj;
+	serializedObj.insert("type", HYPOINT_Name);
+	QJsonArray dataArray;
+	for(float f : floatList)
+		dataArray.push_back(f);
+	serializedObj.insert("data", dataArray);
+	serializedObj.insert("outline", m_fOutline);
+	Deserialize(bIsActiveEditModeItem, serializedObj);
+}
+
+void EditModeModel::ChangeToShape(bool bIsActiveEditModeItem, EditorShape eNewShapeType, bool bAsFixture)
 {
 	std::vector<float> floatList;
 	switch(eNewShapeType)
@@ -156,7 +183,11 @@ void EditModeModel::ChangeToShape(bool bIsActiveEditModeItem, EditorShape eNewSh
 		break;
 	}
 
-	m_bIsLineChain = false;
+	if(bAsFixture)
+		m_eEditModeType = EDITMODETYPE_FixtureShape;
+	else
+		m_eEditModeType = EDITMODETYPE_PrimitiveShape;
+
 	m_eShapeType = eNewShapeType;
 
 	// Reassemble model
@@ -193,8 +224,10 @@ bool EditModeModel::IsValidModel() const
 QJsonObject EditModeModel::Serialize() const
 {
 	QJsonObject serializedObj;
-	if(m_bIsLineChain)
+	if(m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain)
 		serializedObj.insert("type", HYLINECHAIN_Name);
+	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+		serializedObj.insert("type", HYPOINT_Name);
 	else
 		serializedObj.insert("type", HyGlobal::ShapeName(m_eShapeType));
 
@@ -211,7 +244,7 @@ QJsonObject EditModeModel::Serialize() const
 
 void EditModeModel::Deserialize(bool bEnabled, const QJsonObject &serializedObj)
 {
-	if(m_bIsFixture)
+	if(IsFixture())
 		m_iDisplayOrder = bEnabled ? DISPLAYORDER_FixtureSelected : DISPLAYORDER_Fixture;
 
 	m_sMalformedReason = DeserializeData(serializedObj);
@@ -536,7 +569,8 @@ void EditModeModel::DoMouseReleaseSelectionLogic()
 
 void EditModeModel::OnDeleteKeyPressed()
 {
-	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
+	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
+		m_eShapeType == SHAPE_Polygon)
 	{
 		for(int i = m_GrabPointList.size() - 1; i >= 0; --i)
 		{
@@ -561,8 +595,10 @@ QString EditModeModel::GetActionText(EditModeState eEditModeState, QString sNode
 	case EDITMODEACTION_Outside:
 		break;
 	case EDITMODEACTION_Creation:
-		if(m_bIsLineChain)
+		if(m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain)
 			sUndoText = "Create new Line Chain " % sNodeCodeName;
+		else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+			sUndoText = "Create new Point " % sNodeCodeName;
 		else
 			sUndoText = "Create new " % HyGlobal::ShapeName(m_eShapeType) % " shape " % sNodeCodeName;
 		break;
@@ -580,8 +616,14 @@ QString EditModeModel::GetActionText(EditModeState eEditModeState, QString sNode
 		if(eEditModeState == EDITMODE_MouseDownTransform) // Ensure the minimum drag distance has occured
 			break;
 
-		if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon || m_eShapeType == SHAPE_LineSegment)
+		if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
+			m_eShapeType == SHAPE_Polygon ||
+			m_eShapeType == SHAPE_LineSegment)
+		{
 			sUndoText = "Translate vert(s) on " % sNodeCodeName;
+		}
+		else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+			sUndoText = "Translate point position on " % sNodeCodeName;
 		else if(m_eShapeType == SHAPE_Circle)
 			sUndoText = "Adjust circle radius on " % sNodeCodeName;
 		else if(m_eShapeType == SHAPE_Box)
@@ -612,10 +654,23 @@ void EditModeModel::ClearAction()
 	m_ptGrabPointPos = glm::vec2(0.0f, 0.0f);
 }
 
+std::vector<float> EditModeModel::ConvertedPointData() const
+{
+	std::vector<float> convertedDataList;
+	convertedDataList.reserve(2);
+
+	glm::vec2 ptPos = m_GrabPointCenter.GetPos();
+	convertedDataList.emplace_back(ptPos.x);
+	convertedDataList.emplace_back(ptPos.y);
+
+	return convertedDataList;
+}
+
 std::vector<float> EditModeModel::ConvertedBoxData() const
 {
 	HyShape2d tmpBoxShape;
-	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
+	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
+	    m_eShapeType == SHAPE_Polygon)
 	{
 		std::vector<glm::vec2> vertexList;
 		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
@@ -628,6 +683,11 @@ std::vector<float> EditModeModel::ConvertedBoxData() const
 		glm::vec2 vHalfExtents = glm::vec2(0.5f * (boundingBox.upperBound.x - boundingBox.lowerBound.x), 0.5f * (boundingBox.upperBound.y - boundingBox.lowerBound.y));
 		tmpBoxShape.SetAsBox(HyRect(vHalfExtents.x, vHalfExtents.y, ptCenter, 0.0f));
 		
+		return tmpBoxShape.SerializeSelf();
+	}
+	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+	{
+		tmpBoxShape.SetAsBox(HyRect(10.0f, 10.0f, m_GrabPointCenter.GetPos(), 0.0f));
 		return tmpBoxShape.SerializeSelf();
 	}
 
@@ -687,7 +747,8 @@ std::vector<float> EditModeModel::ConvertedBoxData() const
 std::vector<float> EditModeModel::ConvertedCircleData() const
 {
 	std::vector<float> convertedDataList;
-	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
+	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
+		m_eShapeType == SHAPE_Polygon)
 	{
 		std::vector<glm::vec2> vertexList;
 		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
@@ -704,6 +765,13 @@ std::vector<float> EditModeModel::ConvertedCircleData() const
 			convertedDataList.push_back(ptCenter.y);
 			convertedDataList.push_back(fRadius);
 		}
+	}
+	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+	{
+		glm::vec2 ptPos = m_GrabPointCenter.GetPos();
+		convertedDataList.push_back(ptPos.x);
+		convertedDataList.push_back(ptPos.y);
+		convertedDataList.push_back(10.0f);
 	}
 	else
 	{
@@ -776,7 +844,8 @@ std::vector<float> EditModeModel::ConvertedCircleData() const
 std::vector<float> EditModeModel::ConvertedLineSegmentData() const
 {
 	std::vector<float> convertedDataList;
-	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
+	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
+		m_eShapeType == SHAPE_Polygon)
 	{
 		std::vector<glm::vec2> vertexList;
 		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
@@ -791,6 +860,14 @@ std::vector<float> EditModeModel::ConvertedLineSegmentData() const
 			convertedDataList.push_back(boundingBox.upperBound.x);
 			convertedDataList.push_back(boundingBox.upperBound.y);
 		}
+	}
+	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+	{
+		glm::vec2 ptPos = m_GrabPointCenter.GetPos();
+		convertedDataList.push_back(ptPos.x - 10.0f);
+		convertedDataList.push_back(ptPos.y - 10.0f);
+		convertedDataList.push_back(ptPos.x + 10.0f);
+		convertedDataList.push_back(ptPos.y + 10.0f);
 	}
 	else
 	{
@@ -851,7 +928,8 @@ std::vector<float> EditModeModel::ConvertedCapsuleData() const
 {
 	std::vector<float> convertedDataList;
 
-	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon || m_eShapeType == SHAPE_LineSegment)
+	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
+		m_eShapeType == SHAPE_Polygon || m_eShapeType == SHAPE_LineSegment)
 	{
 		std::vector<glm::vec2> vertexList;
 		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
@@ -868,6 +946,15 @@ std::vector<float> EditModeModel::ConvertedCapsuleData() const
 			float fRadius = HyMath::Min(0.5f * (boundingBox.upperBound.x - boundingBox.lowerBound.x), 0.5f * (boundingBox.upperBound.y - boundingBox.lowerBound.y));
 			convertedDataList.push_back(fRadius);
 		}
+	}
+	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+	{
+		glm::vec2 ptPos = m_GrabPointCenter.GetPos();
+		convertedDataList.push_back(ptPos.x - 10.0f);
+		convertedDataList.push_back(ptPos.y - 10.0f);
+		convertedDataList.push_back(ptPos.x + 10.0f);
+		convertedDataList.push_back(ptPos.y + 10.0f);
+		convertedDataList.push_back(10.0f);
 	}
 	else
 	{
@@ -923,6 +1010,23 @@ std::vector<float> EditModeModel::ConvertedCapsuleData() const
 std::vector<float> EditModeModel::ConvertedPolygonOrLineChainData() const
 {
 	std::vector<float> convertedDataList;
+
+	if(m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain)
+	{
+		convertedDataList = SerializeData();
+		return convertedDataList;
+	}
+	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+	{
+		glm::vec2 ptPos = m_GrabPointCenter.GetPos();
+		convertedDataList.push_back(ptPos.x - 10.0f);
+		convertedDataList.push_back(ptPos.y - 10.0f);
+		convertedDataList.push_back(ptPos.x + 10.0f);
+		convertedDataList.push_back(ptPos.y + 10.0f);
+		convertedDataList.push_back(0.0f);
+
+		return convertedDataList;
+	}
 
 	switch(m_eShapeType)
 	{
@@ -1032,7 +1136,8 @@ EditModeAction EditModeModel::DoMouseMoveIdle()
 	if(m_GrabPointCenter.IsMouseHover())
 		return EDITMODEACTION_HoverCenter;
 
-	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
+	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
+		m_eShapeType == SHAPE_Polygon)
 	{
 		if(m_GrabPointList.empty())
 			return EDITMODEACTION_Creation;
@@ -1073,7 +1178,9 @@ EditModeAction EditModeModel::DoMouseMoveIdle()
 	else if(IsValidModel() == false) // Any shape besides SHAPE_Polygon
 		return EDITMODEACTION_Creation;
 
-	if(m_bIsLineChain == false)
+	if(m_eEditModeType != EDITMODETYPE_PrimitiveLineChain &&
+	   m_eEditModeType != EDITMODETYPE_FixtureChain &&
+	   m_eEditModeType != EDITMODETYPE_FixturePoint)
 	{
 		for(IHyFixture2d *pFixture : m_FixtureList)
 		{
@@ -1117,11 +1224,12 @@ void EditModeModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, gl
 		ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
 	}
 
-	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
+	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
+		m_eShapeType == SHAPE_Polygon)
 	{
 		if(m_FixtureList.empty())
 		{
-			if(m_bIsLineChain)
+			if(m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain)
 				m_FixtureList.push_back(new HyChain2d());
 			else
 				m_FixtureList.push_back(new HyShape2d());
@@ -1140,10 +1248,16 @@ void EditModeModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, gl
 		vertexList.push_back(ptStartPos);
 		vertexList.push_back(ptDragPos);
 
-		if(m_bIsLineChain)
+		if(m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain)
 			static_cast<HyChain2d *>(m_FixtureList[0])->SetData(vertexList, false);
 		else
 			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsPolygon(vertexList);
+	}
+	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+	{
+		ClearFixtures();
+		m_GrabPointList.clear();
+		m_GrabPointCenter.Set(GRABPOINT_Center, ptDragPos);
 	}
 	else
 	{
@@ -1212,16 +1326,28 @@ std::vector<float> EditModeModel::SerializeData() const
 {
 	if(m_FixtureList.empty())
 		return std::vector<float>();
-	if(m_bIsLineChain == false && m_eShapeType != SHAPE_Polygon)
+	if((m_eEditModeType != EDITMODETYPE_PrimitiveLineChain && m_eEditModeType != EDITMODETYPE_FixtureChain) &&
+		m_eShapeType != SHAPE_Polygon)
+	{
 		return m_FixtureList[0]->SerializeSelf();
+	}
+	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+	{
+		std::vector<float> returnList;
+		glm::vec2 ptPos = m_GrabPointCenter.GetPos();
+		returnList.push_back(ptPos.x);
+		returnList.push_back(ptPos.y);
+
+		return returnList;
+	}
 
 	// Line Chain or SHAPE_Polygon
 	std::vector<float> returnList;
 	for(const GfxGrabPointModel &grabPt : m_GrabPointList)
 	{
 		glm::vec2 ptVertex = grabPt.GetPos();
-		returnList.push_back(static_cast<float>(ptVertex.x));
-		returnList.push_back(static_cast<float>(ptVertex.y));
+		returnList.push_back(ptVertex.x);
+		returnList.push_back(ptVertex.y);
 	}
 	returnList.push_back(m_bLoopClosed ? 1.0f : 0.0f); // Final float indicates whether loop is closed
 	return returnList;
@@ -1238,12 +1364,23 @@ QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 
 	if(sType == HYLINECHAIN_Name)
 	{
-		m_bIsLineChain = true;
+		if(IsFixture())
+			m_eEditModeType = EDITMODETYPE_FixtureChain;
+		else
+			m_eEditModeType = EDITMODETYPE_PrimitiveLineChain;
+		m_eShapeType = SHAPE_None;
+	}
+	else if(sType == HYPOINT_Name)
+	{
+		m_eEditModeType = EDITMODETYPE_FixturePoint;
 		m_eShapeType = SHAPE_None;
 	}
 	else
 	{
-		m_bIsLineChain = false;
+		if(IsFixture())
+			m_eEditModeType = EDITMODETYPE_FixtureShape;
+		else
+			m_eEditModeType = EDITMODETYPE_PrimitiveShape;
 		m_eShapeType = HyGlobal::GetShapeFromString(sType);
 	}
 
@@ -1262,7 +1399,7 @@ QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 	}
 
 	HyFixtureType eFixtureType = HYFIXTURE_Nothing;
-	if(m_bIsLineChain)
+	if(m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain)
 	{
 		if(m_FixtureList.size() > 1)
 			ClearFixtures();
@@ -1270,6 +1407,10 @@ QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 			m_FixtureList.push_back(new HyChain2d());
 
 		eFixtureType = HYFIXTURE_LineChain;
+	}
+	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+	{
+		ClearFixtures();
 	}
 	else
 	{
@@ -1286,11 +1427,12 @@ QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 	std::vector<glm::vec2> grabPointList;
 	glm::vec2 ptCentroid;
 
-	if(m_bIsLineChain == false && m_eShapeType == SHAPE_Polygon)
+	if((m_eEditModeType != EDITMODETYPE_PrimitiveLineChain && m_eEditModeType != EDITMODETYPE_FixtureChain) &&
+		m_eShapeType == SHAPE_Polygon)
 	{
 		// SHAPE_Polygon deserialization
 		if((floatList.size() & 1) == 0)
-			HyGuiLog("GfxShapeModel::SetData for polygon had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
+			HyGuiLog("EditModeModel::DeserializeData for polygon had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
 		else
 		{
 			int iNumVertFloats = static_cast<int>(floatList.size()) - 1;
@@ -1302,6 +1444,18 @@ QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 		}
 
 		ptCentroid = HyMath::CalculateCentroid(grabPointList);
+	}
+	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+	{
+		if(floatList.size() != 4)
+			HyGuiLog("EditModeModel::DeserializeData did not have 4 serialized floats for a fixture point", LOGTYPE_Error);
+		else
+		{
+			grabPointList.reserve(1);
+			grabPointList.emplace_back(glm::vec2(floatList[0], floatList[1]));
+
+			m_bLoopClosed = false;
+		}
 	}
 	else
 	{
@@ -1325,7 +1479,8 @@ QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 	// Assemble `m_GrabPointList` and `m_GrabPointCenter`
 	m_GrabPointCenter.SetPos(ptCentroid);
 
-	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
+	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
+		m_eShapeType == SHAPE_Polygon)
 	{
 		// Preserve existing grab points where possible (keeps selection)
 		for(int i = 0; i < grabPointList.size(); ++i)
@@ -1342,6 +1497,16 @@ QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 		{
 			m_GrabPointList.front().SetType(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
 			m_GrabPointList.back().SetType(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
+		}
+	}
+	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+	{
+		if(grabPointList.size() == 1)
+		{
+			m_GrabPointList.clear();
+			m_GrabPointCenter.Set(GRABPOINT_Center, grabPointList[0]);
+
+			return QString();
 		}
 	}
 	else
@@ -1402,10 +1567,14 @@ QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	if(m_GrabPointList.empty() && (m_bIsLineChain == true || m_eShapeType != SHAPE_None))
+	if(m_GrabPointList.empty() &&
+		((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain || m_eEditModeType == EDITMODETYPE_FixturePoint) || m_eShapeType != SHAPE_None))
+	{
 		return "Grab points not provided";
+	}
 
-	if(m_bIsLineChain || m_eShapeType == SHAPE_Polygon)
+	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
+		m_eShapeType == SHAPE_Polygon)
 	{
 		std::vector<glm::vec2> vertexList;
 		vertexList.reserve(m_GrabPointList.size());
@@ -1461,7 +1630,8 @@ QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 
 bool EditModeModel::CheckIfAddVertexOnEdge()
 {
-	if(m_bIsLineChain == false && m_eShapeType != SHAPE_Polygon)
+	if((m_eEditModeType != EDITMODETYPE_PrimitiveLineChain && m_eEditModeType != EDITMODETYPE_FixtureChain) &&
+		m_eShapeType != SHAPE_Polygon)
 	{
 		HyGuiLog("EditModeModel::CheckIfAddVertexOnEdge invoked with shape that isn't a linechain or polygon", LOGTYPE_Error);
 		return false;

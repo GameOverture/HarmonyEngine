@@ -177,10 +177,12 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 	}
 	else if(m_pEntityTreeItemData->IsFixtureItem())
 	{
-		if(m_pEntityTreeItemData->GetType() == ITEM_ShapeFixture)
+		if(m_pEntityTreeItemData->GetType() == ITEM_ShapeFixture ||
+		   m_pEntityTreeItemData->GetType() == ITEM_ChainFixture ||
+		   m_pEntityTreeItemData->GetType() == ITEM_PointFixture)
+		{
 			m_pEditView = new EditModeView(pParent);
-		else if(m_pEntityTreeItemData->GetType() == ITEM_ChainFixture)
-			m_pEditView = new EditModeView(pParent);
+		}
 		else
 			HyGuiLog("EntityDrawItem ctor - unhandled fixture item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 
@@ -1022,6 +1024,15 @@ void ExtrapolateProperties(Project &projectRef,
 				QJsonObject chainObj = propsObj["Chain"].toObject();
 				if(chainObj.contains("Data"))
 					pEditModel->Deserialize(bIsActiveEditModeItem, chainObj["Data"].toObject());
+			}
+			break;
+
+		case ITEM_PointFixture:
+			if(propsObj.contains("Point"))
+			{
+				QJsonObject pointObj = propsObj["Point"].toObject();
+				if(pointObj.contains("Data"))
+					pEditModel->Deserialize(bIsActiveEditModeItem, pointObj["Data"].toObject());
 			}
 			break;
 

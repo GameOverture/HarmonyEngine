@@ -71,6 +71,7 @@ class Project;
 #define HYMETA_FontsDir							"Fonts/"
 
 #define HYLINECHAIN_Name						"Line Chain"
+#define HYPOINT_Name							"Point"
 
 #define HYMETA_ImageFilterList					{"*.png", "*.*"}
 #define HYMETA_FontFilterList					{"*.ttf", "*.otf"}
@@ -113,6 +114,7 @@ enum ItemType
 	ITEM_PrimLayer,
 	ITEM_ShapeFixture,
 	ITEM_ChainFixture,
+	ITEM_PointFixture,
 	ITEM_UiLayout,
 	ITEM_UiSpacer,
 	// UI widgets

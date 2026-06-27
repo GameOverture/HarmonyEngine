@@ -1012,16 +1012,28 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocPrimLayerTreeItem(EntityTreeItemDa
 	return pNewItem;
 }
 
-EntityTreeItemData *EntityTreeModel::Cmd_AllocFixtureTreeItem(bool bIsShape, QString sCodeNamePrefix, int iRow /*= -1*/)
+EntityTreeItemData *EntityTreeModel::Cmd_AllocFixtureTreeItem(EditModeType eEditModeType, QString sCodeNamePrefix, int iRow /*= -1*/)
 {
 	// Generate a unique code name for this new item
 	QString sCodeName;
-	if(bIsShape)
+	ItemType eItemType = ITEM_Unknown;
+	switch(eEditModeType)
+	{
+	case EDITMODETYPE_FixtureShape:
 		sCodeName = GenerateCodeName(sCodeNamePrefix + "Shape");
-	else
+		eItemType = ITEM_ShapeFixture;
+		break;
+	case EDITMODETYPE_FixtureChain:
 		sCodeName = GenerateCodeName(sCodeNamePrefix + "Chain");
+		eItemType = ITEM_ChainFixture;
+		break;
+	case EDITMODETYPE_FixturePoint:
+		sCodeName = GenerateCodeName(sCodeNamePrefix + "Point");
+		eItemType = ITEM_PointFixture;
+		break;
+	}
 
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, bIsShape ? ITEM_ShapeFixture : ITEM_ChainFixture, ENTTYPE_Item, QUuid(), QUuid::createUuid());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, eItemType, ENTTYPE_Item, QUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetFixtureFolderTreeItem(), iRow);
 
 	return pNewItem;

@@ -15,6 +15,20 @@
 
 class EditModeView;
 
+enum EditModeType
+{
+	EDITMODETYPE_Invalid = -1,
+
+	EDITMODETYPE_PrimitiveShape = 0,
+	EDITMODETYPE_PrimitiveLineChain,
+
+	EDITMODETYPE_FixtureShape,
+	EDITMODETYPE_FixtureChain,
+	EDITMODETYPE_FixturePoint,
+
+	NUM_EDITMODETYPES
+};
+
 enum EditModeState
 {
 	EDITMODE_Off = 0,
@@ -41,7 +55,7 @@ enum EditModeAction
 
 class EditModeModel
 {
-	bool								m_bIsFixture;
+	EditModeType						m_eEditModeType;
 	
 	HyColor								m_Color;
 	glm::vec2							m_vOffset;				// Only used for primitive layer
@@ -52,8 +66,7 @@ class EditModeModel
 
 	// ------------------------------------------------------------------------------------------------------------------
 	// "type" - when serialized in property (as a string)
-	bool								m_bIsLineChain;			// Whether this is a chain model (true) or shape model (false)
-	EditorShape							m_eShapeType;			// When m_bIsLineChain is false, this indicates the primitive shape type (Box, Circle, LineSegment, Polygon, Capsule). Ignored when m_bIsLineChain is true
+	EditorShape							m_eShapeType;			// When m_eEditModeType == EDITMODETYPE_PrimitiveShape or EDITMODETYPE_FixtureShape (None, Box, Circle, LineSegment, Polygon, Capsule). Not used otherwise
 	// "data" - when serialized in property (QJsonArray of floats)
 	QList<IHyFixture2d *>				m_FixtureList;			// This is the actual shape data used for physics/collision/rendering - usually just one fixture, but could be multiple for complex polygons
 	QList<GfxGrabPointModel>			m_GrabPointList;		// Grab Points for editing the shape - Used to serialize data when type is SHAPE_Polygon (then assembles m_FixtureList with valid sub-polygons)
@@ -78,8 +91,14 @@ class EditModeModel
 	QList<EditModeView *>				m_ViewList;
 
 public:
-	EditModeModel(bool bIsFixture, bool bIsLineChain, HyColor color);
+	EditModeModel(EditModeType eEditModeType, HyColor color);
 	~EditModeModel();
+
+	EditModeType GetEditModeType() const;
+	bool IsFixture() const;
+	bool IsLineChain() const;
+	void SetEditModeType(EditModeType eEditModeType);
+	EditorShape GetShapeType() const;
 
 	HyColor GetColor() const;
 	void SetColor(HyColor color);
@@ -96,13 +115,9 @@ public:
 	int GetDisplayOrder() const;
 	void SetDisplayOrder(int iDisplayOrder);
 
-	bool IsFixture() const;
-	bool IsLineChain() const;
-	EditorShape GetShapeType() const;
-
-	void SetIsFixture(bool bIsFixture);
-	void ChangeToLineChain(bool bIsActiveEditModeItem);
-	void ChangeToShape(bool bIsActiveEditModeItem, EditorShape eNewShapeType);
+	void ChangeToLineChain(bool bIsActiveEditModeItem, bool bAsFixture);
+	void ChangeToPoint(bool bIsActiveEditModeItem);
+	void ChangeToShape(bool bIsActiveEditModeItem, EditorShape eNewShapeType, bool bAsFixture);
 
 	bool IsLoopClosed() const;
 	float GetOutline() const;
@@ -145,6 +160,7 @@ public:
 	void ClearAction();
 
 protected:
+	std::vector<float> ConvertedPointData() const;
 	std::vector<float> ConvertedBoxData() const;
 	std::vector<float> ConvertedCircleData() const;
 	std::vector<float> ConvertedLineSegmentData() const;

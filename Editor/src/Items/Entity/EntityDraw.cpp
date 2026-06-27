@@ -292,6 +292,8 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			{
 				if(pTreeItemData->GetEditModel()->IsLineChain())
 					sCategoryName = "Chain";
+				else if(pTreeItemData->GetEditModel()->GetEditModeType() == EDITMODETYPE_FixturePoint)
+					sCategoryName = "Point";
 				else
 					sCategoryName = "Shape";
 			}

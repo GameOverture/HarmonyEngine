@@ -384,7 +384,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		
 		//TreeModelItemData *pPrimitiveItemData = m_EntityModelRef.GetItem().GetProject().FindItemData(m_ReferencedItemUuid);
 		
-		m_pEditModel = new EditModeModel(false, false, HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
+		m_pEditModel = new EditModeModel(EDITMODETYPE_PrimitiveShape, HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
 
 		m_pPropertiesModel->InsertCategory(0, "Primitive Layer", QVariant(), false, "A collection of shape layers that can be drawn to the screen");
 		QVariant primLayerDataVariant;
@@ -438,7 +438,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_ShapeFixture: {
-		m_pEditModel = new EditModeModel(true, false, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+		m_pEditModel = new EditModeModel(EDITMODETYPE_FixtureShape, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		// NOTE: This should be the first categories added for fixtures
 		m_pPropertiesModel->InsertCategory(-1, "Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
@@ -456,10 +456,10 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break; }
 
 	case ITEM_ChainFixture: {
-		m_pEditModel = new EditModeModel(true, true, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+		m_pEditModel = new EditModeModel(EDITMODETYPE_FixtureChain, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		// NOTE: This should be the first categories added for fixtures
-		m_pPropertiesModel->InsertCategory(-1, "Chain", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
+		m_pPropertiesModel->InsertCategory(-1, "Chain", QVariant(), false, "Use chain to establish collision, ideally for terrain");
 		QVariant chainDataVariant;
 		chainDataVariant.setValue<EntityTreeItemData *>(this);
 		m_pPropertiesModel->AppendProperty("Chain", "Data", PROPERTIESTYPE_ShapeData, QVariant(), "Representing the chain's data", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), chainDataVariant);
@@ -469,6 +469,15 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Category Mask", PROPERTIESTYPE_int, 0x0001, "The collision category bits for this shape. Normally you would just set one bit", PROPERTIESACCESS_ToggleUnchecked, 0, 0xFFFF, 1, QString(), QString(), QVariant());
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Collision Mask", PROPERTIESTYPE_int, 0xFFFF, "The collision mask bits. This states the categories that this shape would accept for collision", PROPERTIESACCESS_ToggleUnchecked, 0, 0xFFFF, 1, QString(), QString(), QVariant());
 		m_pPropertiesModel->AppendProperty("Fixture", "Filter: Group Override", PROPERTIESTYPE_int, 0, "Collision overrides allow a certain group of objects to never collide (negative) or always collide (positive). Zero means no collision override", PROPERTIESACCESS_ToggleUnchecked, std::numeric_limits<int16>::min(), std::numeric_limits<int16>::max(), 1, QString(), QString(), QVariant());
+		break; }
+
+	case ITEM_PointFixture: {
+		m_pEditModel = new EditModeModel(EDITMODETYPE_FixturePoint, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+
+		m_pPropertiesModel->InsertCategory(-1, "Point", QVariant(), false, "Creates a point in space, usually for reference");
+		QVariant pointDataVariant;
+		pointDataVariant.setValue<EntityTreeItemData *>(this);
+		m_pPropertiesModel->AppendProperty("Point", "Data", PROPERTIESTYPE_ShapeData, QVariant(), "Representing the point's data", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), pointDataVariant);
 		break; }
 
 	case ITEM_UiLayout:

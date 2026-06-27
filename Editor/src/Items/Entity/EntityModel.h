@@ -94,7 +94,7 @@ public:
 	EntityTreeItemData *Cmd_CreateNewGuiItem(ItemType eGuiItemType, QUuid guiLayoutParentUuid, int iRow);
 	EntityTreeItemData *Cmd_CreateNewPrimNode(int iRow);
 	EntityTreeItemData *Cmd_CreateNewPrimLayer(EntityTreeItemData *pPrimNode, QString sLayerType, int iRow);
-	EntityTreeItemData *Cmd_CreateNewFixture(bool bIsShape, int iRow);
+	EntityTreeItemData *Cmd_CreateNewFixture(EditModeType eEditModeType, int iRow);
 	QList<EntityTreeItemData *> Cmd_AddNewPasteItems(QJsonObject mimeObject, EntityTreeItemData *pArrayFolder);
 	QList<EntityTreeItemData *> Cmd_CreateNewArray(QList<EntityTreeItemData *> itemDataList, QString sArrayName, int iArrayFolderRow); // It is assumed that the items within 'itemDataList' have been removed/popped prior
 	void Cmd_SelectionChanged(QList<EntityTreeItemData *> selectedList, QList<EntityTreeItemData *> deselectedList);

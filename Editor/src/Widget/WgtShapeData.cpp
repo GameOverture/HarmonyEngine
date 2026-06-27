@@ -85,25 +85,32 @@ void WgtShapeData::Init(EntityTreeItemData *pTreeItemData)
 	}
 }
 
-void WgtShapeData::UpdateModel(bool bIsActiveEditModeItem, bool bIsFixture, bool bIsLineChain, EditorShape eShapeType)
+void WgtShapeData::UpdateModel(bool bIsActiveEditModeItem, EditModeType eEditModeType, EditorShape eShapeType)
 {
 	bool bValueChanged = false;
 
 	EditModeModel *pEditModeModel = m_pTreeItemData->GetEditModel();
 
-	if(pEditModeModel->IsFixture() != bIsFixture)
+	if(pEditModeModel->GetEditModeType() != eEditModeType)
 	{
-		pEditModeModel->SetIsFixture(bIsFixture);
-		bValueChanged = true;
-	}
-	if(bIsLineChain && pEditModeModel->IsLineChain() == false)
-	{
-		pEditModeModel->ChangeToLineChain(bIsActiveEditModeItem);
-		bValueChanged = true;
-	}
-	else if(pEditModeModel->GetShapeType() != eShapeType)
-	{
-		pEditModeModel->ChangeToShape(bIsActiveEditModeItem, eShapeType);
+		switch(eEditModeType)
+		{
+		case EDITMODETYPE_PrimitiveShape:
+			pEditModeModel->ChangeToShape(bIsActiveEditModeItem, eShapeType, false);
+			break;
+		case EDITMODETYPE_FixtureShape:
+			pEditModeModel->ChangeToShape(bIsActiveEditModeItem, eShapeType, true);
+			break;
+		case EDITMODETYPE_PrimitiveLineChain:
+			pEditModeModel->ChangeToLineChain(bIsActiveEditModeItem, false);
+			break;
+		case EDITMODETYPE_FixtureChain:
+			pEditModeModel->ChangeToLineChain(bIsActiveEditModeItem, true);
+			break;
+		case EDITMODETYPE_FixturePoint:
+			pEditModeModel->ChangeToPoint(bIsActiveEditModeItem);
+			break;
+		}
 		bValueChanged = true;
 	}
 
@@ -146,7 +153,26 @@ void WgtShapeData::SetValue(bool bIsActiveEditModeItem, QVariant data)
 	QJsonObject serializedObj = data.toJsonObject();
 
 	QString sType = serializedObj["type"].toString();
-	UpdateModel(bIsActiveEditModeItem, m_pTreeItemData->GetEditModel()->IsFixture(), sType == HYLINECHAIN_Name, HyGlobal::GetShapeFromString(sType));
+
+	EditModeType eEditModeType = EDITMODETYPE_Invalid;
+	if(sType == HYLINECHAIN_Name)
+	{
+		if(m_pTreeItemData->GetEditModel()->IsFixture())
+			eEditModeType = EDITMODETYPE_FixtureChain;
+		else
+			eEditModeType = EDITMODETYPE_PrimitiveLineChain;
+	}
+	else if(sType == HYPOINT_Name)
+		eEditModeType = EDITMODETYPE_FixturePoint;
+	else
+	{
+		if(m_pTreeItemData->GetEditModel()->IsFixture())
+			eEditModeType = EDITMODETYPE_FixtureShape;
+		else
+			eEditModeType = EDITMODETYPE_PrimitiveShape;
+	}
+
+	UpdateModel(bIsActiveEditModeItem, eEditModeType, HyGlobal::GetShapeFromString(sType));
 }
 
 void WgtShapeData::OnValueChanged(int iValue)
@@ -171,14 +197,17 @@ void WgtShapeData::on_cmbPrimType_currentIndexChanged(int iIndex)
 	}
 	pEntWidget->SetEditMode(m_pTreeItemData);
 
-	bool bIsLineChain = false;
+	EditModeType eEditModeType = EDITMODETYPE_Invalid;
 	EditorShape eShapeType = SHAPE_None;
 	if(ui->cmbPrimType->currentIndex() >= NUM_SHAPES)
-		bIsLineChain = true;
+		eEditModeType = EDITMODETYPE_PrimitiveLineChain;
 	else
+	{
+		eEditModeType = EDITMODETYPE_PrimitiveShape;
 		eShapeType = static_cast<EditorShape>(ui->cmbPrimType->currentIndex());
+	}
 
-	UpdateModel(true, m_pTreeItemData->GetEditModel()->IsFixture(), bIsLineChain, eShapeType);
+	UpdateModel(true, eEditModeType, eShapeType);
 }
 
 void WgtShapeData::on_sbPrimOutline_valueChanged(double dValue)
@@ -198,5 +227,5 @@ void WgtShapeData::on_cmbShapeType_currentIndexChanged(int iIndex)
 
 	EditorShape eShapeType = static_cast<EditorShape>(ui->cmbShapeType->currentIndex());
 
-	UpdateModel(true, m_pTreeItemData->GetEditModel()->IsFixture(), false, eShapeType);
+	UpdateModel(true, EDITMODETYPE_FixtureShape, eShapeType);
 }

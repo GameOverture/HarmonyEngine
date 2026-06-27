@@ -217,13 +217,13 @@ public:
 class EntityUndoCmd_AddFixture : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
-	bool							m_bIsShape;
+	EditModeType					m_eEditModeType;
 	int32							m_iIndex;
 
-	EntityTreeItemData *			m_pShapeTreeItemData;
+	EntityTreeItemData *			m_pFixtureTreeItemData;
 
 public:
-	EntityUndoCmd_AddFixture(ProjectItemData &entityItemRef, bool bIsShape, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_AddFixture(ProjectItemData &entityItemRef, EditModeType eEditModeType, int32 iRowIndex = -1, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_AddFixture();
 
 	virtual void redo() override;
