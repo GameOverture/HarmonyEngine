@@ -11,7 +11,7 @@
 #define IEditModeView_H
 
 #include "Global.h"
-#include "EditModeModel.h"
+#include "IEditModeModel.h"
 
 class IEditModeView : public HyEntity2d
 {

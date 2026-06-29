@@ -10,7 +10,7 @@
 #ifndef WgtShapeData_H
 #define WgtShapeData_H
 
-#include "EditModeModel.h"
+#include "VectorModel.h"
 
 #include <QWidget>
 #include <QSpinBox>

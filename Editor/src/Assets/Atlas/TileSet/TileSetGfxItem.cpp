@@ -11,8 +11,8 @@
 #include "TileSetGfxItem.h"
 #include "AuxTileSet.h"
 #include "TileData.h"
-#include "GfxShapeModel.h"
-#include "GfxShapeQtView.h"
+#include "VectorQtView.h"
+#include "VectorModel.h"
 
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
@@ -161,10 +161,10 @@ void TileSetGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileDa
 		
 		if(m_pCollisionView == nullptr)
 		{
-			EditModeModel *pShapeModel = pTileData->GetCollisionLayerModel(selectedCollisionUuid);
+			VectorModel *pShapeModel = pTileData->GetCollisionLayerModel(selectedCollisionUuid);
 			pShapeModel->SetColor(pTileSet->GetCollisionLayerColor(selectedCollisionUuid));
 
-			m_pCollisionView = new GfxShapeQtView(this);
+			m_pCollisionView = new VectorQtView(this);
 			m_pCollisionView->SetModel(pShapeModel);
 		}
 		

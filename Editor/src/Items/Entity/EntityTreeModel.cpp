@@ -12,13 +12,7 @@
 #include "EntityModel.h"
 #include "EntityDraw.h"
 #include "Project.h"
-#include "ExplorerModel.h"
 #include "EntityWidget.h"
-#include "MainWindow.h"
-#include "EntityUndoCmds.h"
-#include "GfxPrimitiveModel.h"
-#include "GfxShapeModel.h"
-#include "GfxChainModel.h"
 
 #include <QVariant>
 #include <QStack>

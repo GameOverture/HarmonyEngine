@@ -1,5 +1,5 @@
 /**************************************************************************
- *	EditModeView.cpp
+ *	VectorView.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2026 Jason Knobler
@@ -8,9 +8,10 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "EditModeView.h"
+#include "VectorView.h"
+#include "VectorModel.h"
 
-EditModeView::EditModeView(HyEntity2d *pParent /*= nullptr*/) :
+VectorView::VectorView(HyEntity2d *pParent /*= nullptr*/) :
 	IEditModeView(pParent),
 	m_CameraPrim(this),
 	m_ScenePrim(this),
@@ -19,23 +20,23 @@ EditModeView::EditModeView(HyEntity2d *pParent /*= nullptr*/) :
 	m_CameraPrim.UseWindowCoordinates();
 }
 
-/*virtual*/ EditModeView::~EditModeView()
+/*virtual*/ VectorView::~VectorView()
 {
 	ClearGrabPoints();
 }
 
-void EditModeView::SyncColor()
+void VectorView::SyncColor()
 {
 	if(m_pModel)
 	{
-		m_CameraPrim.SetTint(static_cast<EditModeModel *>(m_pModel)->GetColor());
-		m_ScenePrim.SetTint(static_cast<EditModeModel *>(m_pModel)->GetColor());
+		m_CameraPrim.SetTint(static_cast<VectorModel *>(m_pModel)->GetColor());
+		m_ScenePrim.SetTint(static_cast<VectorModel *>(m_pModel)->GetColor());
 	}
 }
 
-/*virtual*/ void EditModeView::SyncWithModel(EditModeState eEditModeState) /*override*/
+/*virtual*/ void VectorView::SyncWithModel(EditModeState eEditModeState) /*override*/
 {
-	EditModeModel *pVectorModel = static_cast<EditModeModel *>(m_pModel);
+	VectorModel *pVectorModel = static_cast<VectorModel *>(m_pModel);
 
 	if(pVectorModel == nullptr ||
 		(pVectorModel->IsLineChain() == false && pVectorModel->GetShapeType() == SHAPE_None) ||
@@ -131,14 +132,14 @@ void EditModeView::SyncColor()
 			break;
 
 		default:
-			HyGuiLog("EditModeView::SyncWithModel - Unhandled shape type", LOGTYPE_Error);
+			HyGuiLog("VectorView::SyncWithModel - Unhandled shape type", LOGTYPE_Error);
 		}
 	}
 
 	SyncColor();
 }
 
-void EditModeView::ClearGrabPoints()
+void VectorView::ClearGrabPoints()
 {
 	for(GfxGrabPointView *pGrabPtView : m_GrabPointViewList)
 		delete pGrabPtView;

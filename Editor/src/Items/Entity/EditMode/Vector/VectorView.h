@@ -1,5 +1,5 @@
 /**************************************************************************
- *	EditModeView.h
+ *	VectorView.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2026 Jason Knobler
@@ -7,14 +7,14 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef EditModeView_H
-#define EditModeView_H
+#ifndef VectorView_H
+#define VectorView_H
 
 #include "Global.h"
 #include "IEditModeView.h"
 #include "GfxGrabPointView.h"
 
-class EditModeView : public IEditModeView
+class VectorView : public IEditModeView
 {
 protected:
 	HyPrimitive2d				m_CameraPrim;
@@ -24,8 +24,8 @@ protected:
 	GfxGrabPointView			m_CenterGrabPoint;
 
 public:
-	EditModeView(HyEntity2d *pParent = nullptr);
-	virtual ~EditModeView();
+	VectorView(HyEntity2d *pParent = nullptr);
+	virtual ~VectorView();
 
 	void SyncColor();
 	virtual void SyncWithModel(EditModeState eEditModeState) override;
@@ -33,4 +33,4 @@ public:
 	void ClearGrabPoints();
 };
 
-#endif // EditModeView_H
+#endif // VectorView_H

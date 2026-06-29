@@ -1,5 +1,5 @@
 /**************************************************************************
- *	GfxShapeQtView.h
+ *	VectorQtView.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2025 Jason Knobler
@@ -7,25 +7,25 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef GfxShapeQtView_H
-#define GfxShapeQtView_H
+#ifndef VectorQtView_H
+#define VectorQtView_H
 
 #include "Global.h"
-#include "EditModeView.h"
+#include "VectorView.h"
 
 #include <QGraphicsItem>
 
 class QGraphicsPolygonItem;
 class QGraphicsRectItem;
 
-class GfxShapeQtView : public EditModeView, public QGraphicsItem
+class VectorQtView : public VectorView, public QGraphicsItem
 {
 	QGraphicsPolygonItem *				m_pGfxPolygonItem;
 	QList<QGraphicsRectItem *>			m_GrabPointList;
 
 public:
-	GfxShapeQtView(QGraphicsItem *pParent = nullptr);
-	virtual ~GfxShapeQtView();
+	VectorQtView(QGraphicsItem *pParent = nullptr);
+	virtual ~VectorQtView();
 
 	virtual void SyncWithModel(EditModeState eEditModeState) override;
 
@@ -33,4 +33,4 @@ public:
 	virtual void paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) override;
 };
 
-#endif // GfxShapeQtView_H
+#endif // VectorQtView_H

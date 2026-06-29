@@ -10,7 +10,6 @@
 #include "Global.h"
 #include "WgtShapeData.h"
 #include "ui_WgtShapeData.h"
-#include "EditModeModel.h"
 #include "EntityWidget.h"
 
 WgtShapeData::WgtShapeData(QWidget *parent) :
@@ -41,7 +40,7 @@ void WgtShapeData::Init(EntityTreeItemData *pTreeItemData)
 {
 	m_pTreeItemData = pTreeItemData;
 
-	EditModeModel *pEditModeModel = static_cast<EditModeModel *>(m_pTreeItemData->GetEditModel());
+	VectorModel *pEditModeModel = static_cast<VectorModel *>(m_pTreeItemData->GetEditModel());
 
 	ShapeDataType eShapeDataType;
 	if(pEditModeModel->IsFixture() == false)
@@ -89,7 +88,7 @@ void WgtShapeData::UpdateModel(bool bIsActiveEditModeItem, EditModeType eEditMod
 {
 	bool bValueChanged = false;
 
-	EditModeModel *pEditModeModel = static_cast<EditModeModel *>(m_pTreeItemData->GetEditModel());
+	VectorModel *pEditModeModel = static_cast<VectorModel *>(m_pTreeItemData->GetEditModel());
 
 	if(pEditModeModel->GetEditModeType() != eEditModeType)
 	{
@@ -120,7 +119,7 @@ void WgtShapeData::UpdateModel(bool bIsActiveEditModeItem, EditModeType eEditMod
 
 QVariant WgtShapeData::GetValue()
 {
-	EditModeModel *pEditModeModel = static_cast<EditModeModel *>(m_pTreeItemData->GetEditModel());
+	VectorModel *pEditModeModel = static_cast<VectorModel *>(m_pTreeItemData->GetEditModel());
 	QJsonObject serializedObj = pEditModeModel->Serialize();
 	//switch(ui->stackedWidget->currentIndex())
 	//{
@@ -157,7 +156,7 @@ void WgtShapeData::SetValue(bool bIsActiveEditModeItem, QVariant data)
 	EditModeType eEditModeType = EDITMODETYPE_Invalid;
 	if(sType == HYLINECHAIN_Name)
 	{
-		if(static_cast<EditModeModel *>(m_pTreeItemData->GetEditModel())->IsFixture())
+		if(static_cast<VectorModel *>(m_pTreeItemData->GetEditModel())->IsFixture())
 			eEditModeType = EDITMODETYPE_FixtureChain;
 		else
 			eEditModeType = EDITMODETYPE_PrimitiveLineChain;
@@ -166,7 +165,7 @@ void WgtShapeData::SetValue(bool bIsActiveEditModeItem, QVariant data)
 		eEditModeType = EDITMODETYPE_FixturePoint;
 	else
 	{
-		if(static_cast<EditModeModel *>(m_pTreeItemData->GetEditModel())->IsFixture())
+		if(static_cast<VectorModel *>(m_pTreeItemData->GetEditModel())->IsFixture())
 			eEditModeType = EDITMODETYPE_FixtureShape;
 		else
 			eEditModeType = EDITMODETYPE_PrimitiveShape;
@@ -212,7 +211,7 @@ void WgtShapeData::on_cmbPrimType_currentIndexChanged(int iIndex)
 
 void WgtShapeData::on_sbPrimOutline_valueChanged(double dValue)
 {
-	static_cast<EditModeModel *>(m_pTreeItemData->GetEditModel())->SetOutline(ui->sbPrimOutline->value());
+	static_cast<VectorModel *>(m_pTreeItemData->GetEditModel())->SetOutline(ui->sbPrimOutline->value());
 }
 
 void WgtShapeData::on_cmbShapeType_currentIndexChanged(int iIndex)

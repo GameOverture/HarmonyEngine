@@ -211,6 +211,16 @@ if(Qt6_DIR)
 		src/Items/Entity/EntityWidget.cpp
 		src/Items/Entity/EntityWidget.h
 		src/Items/Entity/EntityWidget.ui
+		src/Items/Entity/EditMode/IEditModeModel.cpp
+		src/Items/Entity/EditMode/IEditModeModel.h
+		src/Items/Entity/EditMode/IEditModeView.cpp
+		src/Items/Entity/EditMode/IEditModeView.h
+		src/Items/Entity/EditMode/Vector/VectorModel.cpp
+		src/Items/Entity/EditMode/Vector/VectorModel.h
+		src/Items/Entity/EditMode/Vector/VectorView.cpp
+		src/Items/Entity/EditMode/Vector/VectorView.h
+		src/Items/Entity/EditMode/Vector/VectorQtView.cpp
+		src/Items/Entity/EditMode/Vector/VectorQtView.h
 		src/Items/Prefab/PrefabDraw.cpp
 		src/Items/Prefab/PrefabModel.cpp
 		src/Items/Prefab/PrefabWidget.cpp
@@ -318,28 +328,6 @@ if(Qt6_DIR)
 		src/Gfx/GfxTextModel.h
 		src/Gfx/GfxTransformCtrl.cpp
 		src/Gfx/GfxTransformCtrl.h
-		src/Gfx/EditModels/EditModeModel.cpp
-		src/Gfx/EditModels/EditModeModel.h
-		src/Gfx/EditModels/EditModeView.cpp
-		src/Gfx/EditModels/EditModeView.h
-		src/Gfx/EditModels/IEditModeModel.cpp
-		src/Gfx/EditModels/IEditModeModel.h
-		src/Gfx/EditModels/IEditModeView.cpp
-		src/Gfx/EditModels/IEditModeView.h
-		src/Gfx/EditModels/Chain/GfxChainModel.cpp
-		src/Gfx/EditModels/Chain/GfxChainModel.h
-		src/Gfx/EditModels/Chain/GfxChainView.cpp
-		src/Gfx/EditModels/Chain/GfxChainView.h
-		src/Gfx/EditModels/Primitive/GfxPrimitiveModel.cpp
-		src/Gfx/EditModels/Primitive/GfxPrimitiveModel.h
-		src/Gfx/EditModels/Primitive/GfxPrimitiveView.cpp
-		src/Gfx/EditModels/Primitive/GfxPrimitiveView.h
-		src/Gfx/EditModels/Shape/GfxShapeModel.cpp
-		src/Gfx/EditModels/Shape/GfxShapeModel.h
-		src/Gfx/EditModels/Shape/GfxShapeHyView.cpp
-		src/Gfx/EditModels/Shape/GfxShapeHyView.h
-		src/Gfx/EditModels/Shape/GfxShapeQtView.cpp
-		src/Gfx/EditModels/Shape/GfxShapeQtView.h
 		src/Shared/Global.cpp
 		src/Shared/Global.h
 		src/Shared/GlobalUndoCmds.h
@@ -437,6 +425,8 @@ if(Qt6_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Prefab")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Primitive")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Entity")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Entity/EditMode")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Entity/EditMode/Vector")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Audio")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Dialogs")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Harmony")
@@ -445,10 +435,6 @@ if(Qt6_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Explorer/Project")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx/EditModels")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx/EditModels/Chain")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx/EditModels/Primitive")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Gfx/EditModels/Shape")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Manager")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Shared/Properties")

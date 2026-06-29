@@ -11,10 +11,8 @@
 #include "EntityTreeItemData.h"
 #include "EntityModel.h"
 #include "Project.h"
-#include "ExplorerModel.h"
-#include "MainWindow.h"
 #include "EntityUndoCmds.h"
-#include "EditModeModel.h"
+#include "VectorModel.h"
 
 #include <QVariant>
 #include <QStack>
@@ -383,7 +381,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		
 		//TreeModelItemData *pPrimitiveItemData = m_EntityModelRef.GetItem().GetProject().FindItemData(m_ReferencedItemUuid);
 		
-		m_pEditModel = new EditModeModel(EDITMODETYPE_PrimitiveShape, HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
+		m_pEditModel = new VectorModel(EDITMODETYPE_PrimitiveShape, HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
 
 		m_pPropertiesModel->InsertCategory(0, "Primitive Layer", QVariant(), false, "A collection of shape layers that can be drawn to the screen");
 		QVariant primLayerDataVariant;
@@ -437,7 +435,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_ShapeFixture: {
-		m_pEditModel = new EditModeModel(EDITMODETYPE_FixtureShape, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+		m_pEditModel = new VectorModel(EDITMODETYPE_FixtureShape, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		// NOTE: This should be the first categories added for fixtures
 		m_pPropertiesModel->InsertCategory(-1, "Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
@@ -455,7 +453,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break; }
 
 	case ITEM_ChainFixture: {
-		m_pEditModel = new EditModeModel(EDITMODETYPE_FixtureChain, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+		m_pEditModel = new VectorModel(EDITMODETYPE_FixtureChain, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		// NOTE: This should be the first categories added for fixtures
 		m_pPropertiesModel->InsertCategory(-1, "Chain", QVariant(), false, "Use chain to establish collision, ideally for terrain");
@@ -471,7 +469,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break; }
 
 	case ITEM_PointFixture: {
-		m_pEditModel = new EditModeModel(EDITMODETYPE_FixturePoint, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+		m_pEditModel = new VectorModel(EDITMODETYPE_FixturePoint, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		m_pPropertiesModel->InsertCategory(-1, "Point", QVariant(), false, "Creates a point in space, usually for reference");
 		QVariant pointDataVariant;

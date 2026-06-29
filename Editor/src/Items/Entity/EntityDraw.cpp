@@ -12,7 +12,6 @@
 #include "EntityWidget.h"
 #include "MainWindow.h"
 #include "EntityUndoCmds.h"
-#include "GfxShapeModel.h"
 #include "DlgSetUiPanel.h"
 
 #include <QKeyEvent>

@@ -11,12 +11,10 @@
 #include "EntityDrawItem.h"
 #include "EntityModel.h"
 #include "EntityDraw.h"
-#include "EntityDopeSheetScene.h"
 #include "DlgSetUiPanel.h"
 #include "MainWindow.h"
-#include "GfxPrimitiveModel.h"
-#include "GfxShapeModel.h"
-#include "EditModeView.h"
+#include "VectorView.h"
+#include "VectorModel.h"
 
 EntityDrawItem::EntityDrawItem(EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
 	IDrawExItem(pEntityDraw),
@@ -54,7 +52,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 {
 	// Cache old node pointer to be deleted after reallocating (to avoid Harmony unloading and reloading assets)
 	IHyBody2d *pOldChild = m_pChild;
-	EditModeView *pOldEditView = m_pEditView;
+	IEditModeView *pOldEditView = m_pEditView;
 	m_pChild = nullptr;
 	m_pEditView = nullptr;
 
@@ -170,7 +168,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 	}
 	else if(m_pEntityTreeItemData->GetType() == ITEM_PrimLayer)
 	{
-		m_pEditView = new EditModeView(pParent);
+		m_pEditView = new VectorView(pParent);
 		
 		m_pEditView->SetModel(m_pEntityTreeItemData->GetEditModel());
 		m_pChild = m_pEditView;
@@ -181,7 +179,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 		   m_pEntityTreeItemData->GetType() == ITEM_ChainFixture ||
 		   m_pEntityTreeItemData->GetType() == ITEM_PointFixture)
 		{
-			m_pEditView = new EditModeView(pParent);
+			m_pEditView = new VectorView(pParent);
 		}
 		else
 			HyGuiLog("EntityDrawItem ctor - unhandled fixture item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
@@ -274,7 +272,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 		IDrawExItem::ExtractTransform(boundingShapeOut, transformMtxOut);
 }
 
-EditModeView *EntityDrawItem::GetEditView()
+IEditModeView *EntityDrawItem::GetEditView()
 {
 	return m_pEditView;
 }
@@ -370,8 +368,6 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 	}
 	else if(sCategory == "Primitive Layer" || sCategory == "Shape" || sCategory == "Chain")
 	{
-		//EditModeModel *pModel = static_cast<EditModeView *>(pThisHyNode)->GetModel();
-
 		if(sPropertyName == "Data")
 		{
 			return m_pEntityTreeItemData->GetEditModel()->Serialize();
@@ -993,17 +989,17 @@ void ExtrapolateProperties(Project &projectRef,
 				{
 					QJsonArray offsetArray = primitiveObj["Offset"].toArray();
 					if(offsetArray.size() == 2)
-						static_cast<EditModeModel *>(pEditModel)->SetOffset(glm::vec2(offsetArray[0].toDouble(), offsetArray[1].toDouble()));
+						static_cast<VectorModel *>(pEditModel)->SetOffset(glm::vec2(offsetArray[0].toDouble(), offsetArray[1].toDouble()));
 				}
 				if(primitiveObj.contains("Visible"))
-					static_cast<EditModeModel *>(pEditModel)->SetVisible(primitiveObj["Visible"].toBool());
+					static_cast<VectorModel *>(pEditModel)->SetVisible(primitiveObj["Visible"].toBool());
 				if(primitiveObj.contains("Color"))
 				{
 					QJsonArray colorArray = primitiveObj["Color"].toArray();
-					static_cast<EditModeModel *>(pEditModel)->SetColor(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
+					static_cast<VectorModel *>(pEditModel)->SetColor(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
 				}
 				if(primitiveObj.contains("Alpha"))
-					static_cast<EditModeModel *>(pEditModel)->SetAlpha(primitiveObj["Alpha"].toDouble());
+					static_cast<VectorModel *>(pEditModel)->SetAlpha(primitiveObj["Alpha"].toDouble());
 			}
 			break;
 		

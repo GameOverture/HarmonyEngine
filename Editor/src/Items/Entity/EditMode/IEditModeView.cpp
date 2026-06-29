@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "IEditModeView.h"
+#include "IEditModeModel.h"
 
 IEditModeView::IEditModeView(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),

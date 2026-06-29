@@ -1,5 +1,5 @@
 /**************************************************************************
-*	EditModeModel.h
+*	VectorModel.h
 *
 *	Harmony Engine - Editor Tool
 *	Copyright (c) 2026 Jason Knobler
@@ -7,28 +7,28 @@
 *	Harmony Editor Tool License:
 *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
 *************************************************************************/
-#ifndef EditModeModel_H
-#define EditModeModel_H
+#ifndef VectorModel_H
+#define VectorModel_H
 
 #include "Global.h"
 #include "IEditModeModel.h"
 #include "GfxGrabPointModel.h"
 
-enum EditModeAction
+enum VectorAction
 {
-	EDITMODEACTION_None = 0,
+	VECTORACTION_None = 0,
 
-	EDITMODEACTION_Creation,
-	EDITMODEACTION_Outside,
-	EDITMODEACTION_Inside,
-	EDITMODEACTION_AppendVertex,
-	EDITMODEACTION_InsertVertex,
-	EDITMODEACTION_HoverGrabPoint,
-	EDITMODEACTION_HoverCenter,
-	EDITMODEACTION_CloseLoop			// For polygon or line chain, when an end vertex is selected and the user clicks on the opposite end vertex to close the shape
+	VECTORACTION_Creation,
+	VECTORACTION_Outside,
+	VECTORACTION_Inside,
+	VECTORACTION_AppendVertex,
+	VECTORACTION_InsertVertex,
+	VECTORACTION_HoverGrabPoint,
+	VECTORACTION_HoverCenter,
+	VECTORACTION_CloseLoop			// For polygon or line chain, when an end vertex is selected and the user clicks on the opposite end vertex to close the shape
 };
 
-class EditModeModel : public IEditModeModel
+class VectorModel : public IEditModeModel
 {
 	HyColor								m_Color;
 	glm::vec2							m_vOffset;				// Only used for primitive layer
@@ -55,14 +55,14 @@ class EditModeModel : public IEditModeModel
 	QString								m_sMalformedReason;		// If not empty, this edit model is considered invalid and the reason is given by this string (e.g. "Polygon has intersecting edges")
 
 	// Transform Action info
-	EditModeAction						m_eCurAction;
+	VectorAction						m_eCurAction;
 	glm::vec2							m_vDragDelta;
 	int									m_iGrabPointIndex;
 	glm::vec2							m_ptGrabPointPos;
 
 public:
-	EditModeModel(EditModeType eEditModeType, HyColor color);
-	virtual ~EditModeModel();
+	VectorModel(EditModeType eEditModeType, HyColor color);
+	virtual ~VectorModel();
 
 	virtual QJsonObject Serialize() const override;
 	virtual void Deserialize(bool bEnabled, const QJsonObject &serializedObj) override;
@@ -120,7 +120,7 @@ public:
 	void OnDeleteKeyPressed();
 
 	glm::vec2 GetDragDelta() const;
-	EditModeAction GetCurrentAction() const;
+	VectorAction GetCurrentAction() const;
 	
 	QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const; // Returns undo command description (blank if no change)
 	void ClearAction();
@@ -133,7 +133,7 @@ protected:
 	std::vector<float> ConvertedCapsuleData() const;
 	std::vector<float> ConvertedPolygonOrLineChainData() const;
 
-	EditModeAction DoMouseMoveIdle();
+	VectorAction DoMouseMoveIdle();
 
 	void TransformData(glm::mat4 mtxTransform);
 
@@ -152,4 +152,4 @@ protected:
 	bool IsShareEdge(const std::vector<glm::vec2> &a, const std::vector<glm::vec2> &b, int &a0, int &a1, int &b0, int &b1);
 };
 
-#endif // EditModeModel_H
+#endif // VectorModel_H
