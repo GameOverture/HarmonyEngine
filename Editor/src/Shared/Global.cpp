@@ -54,7 +54,6 @@
 	sm_sItemNames[ITEM_Text] = "Text";
 	sm_sItemNames[ITEM_Spine] = "Spine";
 	sm_sItemNames[ITEM_Sprite] = "Sprite";
-	sm_sItemNames[ITEM_TileMap] = "TileMap";
 	sm_sItemNames[ITEM_Shader] = "Shader";
 	sm_sItemNames[ITEM_Prefab] = "Prefab";
 	sm_sItemNames[ITEM_Entity] = "Entity";
@@ -65,6 +64,7 @@
 	sm_sItemNames[ITEM_SoundClip] = "SoundClip";
 	sm_sItemNames[ITEM_Source] = "Source";
 	sm_sItemNames[ITEM_Header] = "Header";
+	sm_sItemNames[ITEM_TileMap] = "TileMap";
 	sm_sItemNames[ITEM_PrimNode] = "Primitive";
 	sm_sItemNames[ITEM_PrimLayer] = "PrimLayer";
 	sm_sItemNames[ITEM_ShapeFixture] = "Shape";
@@ -90,9 +90,8 @@
 	sm_sItemNamesPlural[ITEM_Text] = "Texts";
 	sm_sItemNamesPlural[ITEM_Spine] = "Spine";
 	sm_sItemNamesPlural[ITEM_Sprite] = "Sprites";
-	sm_sItemNamesPlural[ITEM_TileMap] = "TileMaps";
 	sm_sItemNamesPlural[ITEM_Shader] = "Shaders";
-    sm_sItemNamesPlural[ITEM_Prefab] = "Prefabs";
+	sm_sItemNamesPlural[ITEM_Prefab] = "Prefabs";
 	sm_sItemNamesPlural[ITEM_Entity] = "Entities";
 	sm_sItemNamesPlural[ITEM_Entity3d] = "Entities3d";
 	sm_sItemNamesPlural[ITEM_Filter] = "Filters";
@@ -101,6 +100,7 @@
 	sm_sItemNamesPlural[ITEM_SoundClip] = "SoundClips";
 	sm_sItemNamesPlural[ITEM_Source] = "Source";
 	sm_sItemNamesPlural[ITEM_Header] = "Headers";
+	sm_sItemNamesPlural[ITEM_TileMap] = "TileMaps";
 	sm_sItemNamesPlural[ITEM_PrimNode] = "Primitives";
 	sm_sItemNamesPlural[ITEM_PrimLayer] = "PrimLayers";
 	sm_sItemNamesPlural[ITEM_ShapeFixture] = "Shapes";
@@ -295,7 +295,6 @@
 	list.append(ITEM_Text);
 	list.append(ITEM_Spine);
 	list.append(ITEM_Sprite);
-	list.append(ITEM_TileMap);
 	list.append(ITEM_Shader);
 	list.append(ITEM_Prefab);
 	list.append(ITEM_Entity);
@@ -306,6 +305,7 @@
 	list.append(ITEM_SoundClip);
 	list.append(ITEM_Source);
 	list.append(ITEM_Header);
+	list.append(ITEM_TileMap);
 	list.append(ITEM_PrimNode);
 	list.append(ITEM_PrimLayer);
 	list.append(ITEM_ShapeFixture);
@@ -338,7 +338,6 @@
 	list.append(ITEM_Text);
 	list.append(ITEM_Spine);
 	list.append(ITEM_Sprite);
-	list.append(ITEM_TileMap);
 	list.append(ITEM_Shader);
 	list.append(ITEM_Prefab);
 	list.append(ITEM_Entity);

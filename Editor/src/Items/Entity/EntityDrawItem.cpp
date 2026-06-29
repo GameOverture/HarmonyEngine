@@ -224,7 +224,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 	bool bIsActiveEditModeItem = static_cast<EntityDraw *>(m_pEntityTreeItemData->GetEntityModel().GetItem().GetDraw())->GetCurEditItem() == this;
 	EditModeState eCurEditModeState = bIsActiveEditModeItem ? static_cast<EntityDraw *>(m_pEntityTreeItemData->GetEntityModel().GetItem().GetDraw())->GetEditModeState() : EDITMODE_Off;
 	if(m_pEntityTreeItemData->GetEditModel())
-		m_pEntityTreeItemData->GetEditModel()->SyncViews(eCurEditModeState, EDITMODEACTION_None);
+		m_pEntityTreeItemData->GetEditModel()->SyncViews(eCurEditModeState);
 }
 
 /*virtual*/ void EntityDrawItem::ExtractTransform(HyShape2d &boundingShapeOut, glm::mat4 &transformMtxOut) /*override*/
@@ -370,7 +370,7 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 	}
 	else if(sCategory == "Primitive Layer" || sCategory == "Shape" || sCategory == "Chain")
 	{
-		EditModeModel *pModel = static_cast<EditModeView *>(pThisHyNode)->GetModel();
+		//EditModeModel *pModel = static_cast<EditModeView *>(pThisHyNode)->GetModel();
 
 		if(sPropertyName == "Data")
 		{
@@ -972,7 +972,7 @@ void ExtrapolateProperties(Project &projectRef,
 			}
 		} // IsFixture != true
 
-		EditModeModel *pEditModel = nullptr;
+		IEditModeModel *pEditModel = nullptr;
 		if(pEntityTreeItemData)
 			pEditModel = pEntityTreeItemData->GetEditModel();
 
@@ -993,17 +993,17 @@ void ExtrapolateProperties(Project &projectRef,
 				{
 					QJsonArray offsetArray = primitiveObj["Offset"].toArray();
 					if(offsetArray.size() == 2)
-						pEditModel->SetOffset(glm::vec2(offsetArray[0].toDouble(), offsetArray[1].toDouble()));
+						static_cast<EditModeModel *>(pEditModel)->SetOffset(glm::vec2(offsetArray[0].toDouble(), offsetArray[1].toDouble()));
 				}
 				if(primitiveObj.contains("Visible"))
-					pEditModel->SetVisible(primitiveObj["Visible"].toBool());
+					static_cast<EditModeModel *>(pEditModel)->SetVisible(primitiveObj["Visible"].toBool());
 				if(primitiveObj.contains("Color"))
 				{
 					QJsonArray colorArray = primitiveObj["Color"].toArray();
-					pEditModel->SetColor(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
+					static_cast<EditModeModel *>(pEditModel)->SetColor(HyColor(colorArray[0].toInt(), colorArray[1].toInt(), colorArray[2].toInt()));
 				}
 				if(primitiveObj.contains("Alpha"))
-					pEditModel->SetAlpha(primitiveObj["Alpha"].toDouble());
+					static_cast<EditModeModel *>(pEditModel)->SetAlpha(primitiveObj["Alpha"].toDouble());
 			}
 			break;
 		

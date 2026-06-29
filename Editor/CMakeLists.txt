@@ -322,6 +322,10 @@ if(Qt6_DIR)
 		src/Gfx/EditModels/EditModeModel.h
 		src/Gfx/EditModels/EditModeView.cpp
 		src/Gfx/EditModels/EditModeView.h
+		src/Gfx/EditModels/IEditModeModel.cpp
+		src/Gfx/EditModels/IEditModeModel.h
+		src/Gfx/EditModels/IEditModeView.cpp
+		src/Gfx/EditModels/IEditModeView.h
 		src/Gfx/EditModels/Chain/GfxChainModel.cpp
 		src/Gfx/EditModels/Chain/GfxChainModel.h
 		src/Gfx/EditModels/Chain/GfxChainView.cpp

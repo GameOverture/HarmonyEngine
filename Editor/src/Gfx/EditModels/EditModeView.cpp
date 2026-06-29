@@ -11,8 +11,7 @@
 #include "EditModeView.h"
 
 EditModeView::EditModeView(HyEntity2d *pParent /*= nullptr*/) :
-	HyEntity2d(pParent),
-	m_pModel(nullptr),
+	IEditModeView(pParent),
 	m_CameraPrim(this),
 	m_ScenePrim(this),
 	m_CenterGrabPoint(this)
@@ -23,55 +22,46 @@ EditModeView::EditModeView(HyEntity2d *pParent /*= nullptr*/) :
 /*virtual*/ EditModeView::~EditModeView()
 {
 	ClearGrabPoints();
-
-	if(m_pModel)
-		m_pModel->RemoveView(this);
-}
-
-EditModeModel *EditModeView::GetModel() const
-{
-	return m_pModel;
-}
-
-void EditModeView::SetModel(EditModeModel *pModel)
-{
-	if(m_pModel == pModel)
-		return;
-	if(m_pModel)
-		m_pModel->RemoveView(this);
-
-	m_pModel = pModel;
-	if(m_pModel)
-		m_pModel->AddView(this);
 }
 
 void EditModeView::SyncColor()
 {
 	if(m_pModel)
 	{
-		m_CameraPrim.SetTint(m_pModel->GetColor());
-		m_ScenePrim.SetTint(m_pModel->GetColor());
+		m_CameraPrim.SetTint(static_cast<EditModeModel *>(m_pModel)->GetColor());
+		m_ScenePrim.SetTint(static_cast<EditModeModel *>(m_pModel)->GetColor());
 	}
 }
 
-void EditModeView::SyncWithModel(EditModeState eEditModeState, EditModeAction eEditModeAction)
+/*virtual*/ void EditModeView::SyncWithModel(EditModeState eEditModeState) /*override*/
 {
-	if(m_pModel == nullptr || (m_pModel->IsLineChain() == false && m_pModel->GetShapeType() == SHAPE_None))
+	EditModeModel *pVectorModel = static_cast<EditModeModel *>(m_pModel);
+
+	if(pVectorModel == nullptr ||
+		(pVectorModel->IsLineChain() == false && pVectorModel->GetShapeType() == SHAPE_None) ||
+		pVectorModel->GetEditModeType() == EDITMODETYPE_FixturePoint)
 	{
 		ClearGrabPoints();
 		m_CameraPrim.RemoveAllLayers();
 		m_ScenePrim.RemoveAllLayers();
+
+		if(pVectorModel->GetEditModeType() == EDITMODETYPE_FixturePoint)
+		{
+			m_CenterGrabPoint.Sync(&pVectorModel->GetCenterGrabPoint());
+			m_CenterGrabPoint.SetVisible(eEditModeState != EDITMODE_Off);
+		}
+
 		return;
 	}
 
-	if(m_pModel->IsFixture())
+	if(pVectorModel->IsFixture())
 	{
-		m_CameraPrim.SetDisplayOrder(m_pModel->GetDisplayOrder() + 1);
-		m_ScenePrim.SetDisplayOrder(m_pModel->GetDisplayOrder());
+		m_CameraPrim.SetDisplayOrder(pVectorModel->GetDisplayOrder() + 1);
+		m_ScenePrim.SetDisplayOrder(pVectorModel->GetDisplayOrder());
 	}
 
 	// Sync Grab Point Views with Model
-	const QList<GfxGrabPointModel> &grabPointModelList = m_pModel->GetGrabPointList();
+	const QList<GfxGrabPointModel> &grabPointModelList = pVectorModel->GetGrabPointList();
 	while(static_cast<uint32>(m_GrabPointViewList.size()) > grabPointModelList.size())
 	{
 		delete m_GrabPointViewList.back();
@@ -83,7 +73,7 @@ void EditModeView::SyncWithModel(EditModeState eEditModeState, EditModeAction eE
 	for(int i = 0; i < grabPointModelList.size(); ++i)
 		m_GrabPointViewList[i]->Sync(&grabPointModelList[i]);
 
-	m_CenterGrabPoint.Sync(&m_pModel->GetCenterGrabPoint());
+	m_CenterGrabPoint.Sync(&pVectorModel->GetCenterGrabPoint());
 
 	bool bGrabPtsVisible = (eEditModeState != EDITMODE_Off);
 	for(GfxGrabPointView *pGrabPtView : m_GrabPointViewList)
@@ -93,7 +83,7 @@ void EditModeView::SyncWithModel(EditModeState eEditModeState, EditModeAction eE
 	// Sync Fixture Primitive with Model
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
 
-	if(m_pModel->IsLineChain() || m_pModel->GetShapeType() == SHAPE_Polygon)
+	if(pVectorModel->IsLineChain() || pVectorModel->GetShapeType() == SHAPE_Polygon)
 	{
 		std::vector<glm::vec2> outlinePtList;
 		for(const GfxGrabPointModel &pointRef : grabPointModelList)
@@ -102,40 +92,40 @@ void EditModeView::SyncWithModel(EditModeState eEditModeState, EditModeAction eE
 			pCamera->ProjectToCamera(pointRef.GetPos(), ptCameraPoint);
 			outlinePtList.push_back(ptCameraPoint);
 		}
-		m_CameraPrim.SetAsLineChain(0, outlinePtList, m_pModel->IsLoopClosed(), m_pModel->GetOutline());
+		m_CameraPrim.SetAsLineChain(0, outlinePtList, pVectorModel->IsLoopClosed(), pVectorModel->GetOutline());
 
-		if(m_pModel->GetShapeType() == SHAPE_Polygon)
+		if(pVectorModel->GetShapeType() == SHAPE_Polygon)
 		{
-			int iNumFixtures = m_pModel->GetNumFixtures();
+			int iNumFixtures = pVectorModel->GetNumFixtures();
 			for(int iIndex = 0; iIndex < iNumFixtures; ++iIndex)
-				m_ScenePrim.SetAsFixture(iIndex, *m_pModel->GetFixture(iIndex), 0.0f);
+				m_ScenePrim.SetAsFixture(iIndex, *pVectorModel->GetFixture(iIndex), 0.0f);
 		}
 		else
 			m_ScenePrim.RemoveAllLayers();
 	}
-	else if(m_pModel->GetEditModeType() == EDITMODETYPE_PrimitiveShape || m_pModel->GetEditModeType() == EDITMODETYPE_FixtureShape) // Shape that isn't Polygon
+	else if(pVectorModel->GetEditModeType() == EDITMODETYPE_PrimitiveShape || pVectorModel->GetEditModeType() == EDITMODETYPE_FixtureShape) // Shape that isn't Polygon
 	{
-		switch(m_pModel->GetShapeType())
+		switch(pVectorModel->GetShapeType())
 		{
 		case SHAPE_Box:
 		case SHAPE_Circle:
 		case SHAPE_Capsule: {
 			m_CameraPrim.RemoveAllLayers();
-			int iNumFixtures = m_pModel->GetNumFixtures();
+			int iNumFixtures = pVectorModel->GetNumFixtures();
 			for(int iIndex = 0; iIndex < iNumFixtures; ++iIndex)
-				m_ScenePrim.SetAsFixture(iIndex, *m_pModel->GetFixture(iIndex), 0.0f);
+				m_ScenePrim.SetAsFixture(iIndex, *pVectorModel->GetFixture(iIndex), 0.0f);
 			break; }
 			
 		case SHAPE_LineSegment:
-			if(m_pModel->GetNumFixtures() > 0)
+			if(pVectorModel->GetNumFixtures() > 0)
 			{
-				b2Segment seg = static_cast<const HyShape2d *>(m_pModel->GetFixture(0))->GetAsSegment();
+				b2Segment seg = static_cast<const HyShape2d *>(pVectorModel->GetFixture(0))->GetAsSegment();
 				glm::vec2 ptOne(seg.point1.x, seg.point1.y);
 				pCamera->ProjectToCamera(ptOne, ptOne);
 				glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
 				pCamera->ProjectToCamera(ptTwo, ptTwo);
 
-				m_CameraPrim.SetAsLineSegment(0, ptOne, ptTwo, m_pModel->GetOutline());
+				m_CameraPrim.SetAsLineSegment(0, ptOne, ptTwo, pVectorModel->GetOutline());
 				m_ScenePrim.RemoveAllLayers();
 			}
 			break;

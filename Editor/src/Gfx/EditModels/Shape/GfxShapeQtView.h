@@ -27,7 +27,7 @@ public:
 	GfxShapeQtView(QGraphicsItem *pParent = nullptr);
 	virtual ~GfxShapeQtView();
 
-	virtual void SyncWithModel(EditModeState eEditModeState, EditModeAction eEditModeAction) override;
+	virtual void SyncWithModel(EditModeState eEditModeState) override;
 
 	virtual QRectF boundingRect() const override;
 	virtual void paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) override;

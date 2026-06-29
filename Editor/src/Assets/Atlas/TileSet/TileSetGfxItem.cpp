@@ -93,7 +93,10 @@ void TileSetGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileDa
 
 	m_pAnimationRectItem->hide();
 
-	AutoTileType eAutoTileType = pTileSet->GetTerrainSetType(pTileData->GetTerrainSet());
+	
+	AutoTileType eAutoTileType = AUTOTILETYPE_Unknown;
+	if(pTileData)
+		eAutoTileType = pTileSet->GetTerrainSetType(pTileData->GetTerrainSet());
 	if(m_eAutoTileType != eAutoTileType)
 	{
 		m_eAutoTileType = eAutoTileType;

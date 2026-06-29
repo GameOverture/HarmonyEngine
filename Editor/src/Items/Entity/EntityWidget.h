@@ -84,6 +84,7 @@ private Q_SLOTS:
 	void OnCollapsedNode(const QModelIndex &indexRef);
 
 	void on_actionAddChildren_triggered();
+	void on_actionAddTileMap_triggered();
 	
 	void on_actionAddPrimitive_triggered();
 	void on_actionAddPrimBox_triggered();

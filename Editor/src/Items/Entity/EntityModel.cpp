@@ -823,6 +823,10 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 			sInitialization = "(" + QString::number(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum()) + ", " + QString::number(static_cast<IAssetItemData *>(pReferencedItemData)->GetBankId()) + ", this)";
 			break;
 
+		case ITEM_PointFixture:
+			sInitialization = "(0.0f, 0.0f)";
+			break;
+
 		default:
 			HyGuiLog("EntityModel::GenerateSrc_MemberInitializerList() - Unhandled item type: " % HyGlobal::ItemName(pItem->GetType(), false), LOGTYPE_Error);
 			break;
@@ -1012,10 +1016,15 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 		else
 			sCodeName = pItemData->GetCodeName();
 
-		if(pItemData->GetDeclarationType() == ENTDECLTYPE_Static)
-			sCodeName += ".";
+		if(pItemData->GetType() == ITEM_PointFixture)
+			sCodeName += " = ";
 		else
-			sCodeName += "->";
+		{
+			if(pItemData->GetDeclarationType() == ENTDECLTYPE_Static)
+				sCodeName += ".";
+			else
+				sCodeName += "->";
+		}
 	}
 
 	for(QString sCategoryName : propObj.keys())
@@ -1179,6 +1188,22 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 			QJsonObject chainObj = propObj["Chain"].toObject();
 			if(chainObj.contains("Data"))
 				sSrc += DeserializeShapeDataAsRuntimeCode(pItemData, sCodeName, chainObj["Data"].toObject(), sNewLine);
+		}
+		else if(sCategoryName == "Point")
+		{
+			QJsonObject pointObj = propObj["Point"].toObject();
+			if(pointObj.contains("Data"))
+			{
+				QJsonObject dataObj = pointObj["Data"].toObject();
+
+				QJsonArray floatArray = dataObj["data"].toArray();
+				QStringList sFloatList;
+				for(int i = 0; i < floatArray.size(); ++i)
+					sFloatList.push_back(QString::number(floatArray[i].toDouble(), 'f'));
+
+				if(sFloatList.size() == 2)
+					sSrc += sCodeName + "{ " + sFloatList[0] + "f, " + sFloatList[1] + "f };" + sNewLine;
+			}
 		}
 		else if(sCategoryName == "Fixture")
 		{

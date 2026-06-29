@@ -11,33 +11,8 @@
 #define EditModeModel_H
 
 #include "Global.h"
+#include "IEditModeModel.h"
 #include "GfxGrabPointModel.h"
-
-class EditModeView;
-
-enum EditModeType
-{
-	EDITMODETYPE_Invalid = -1,
-
-	EDITMODETYPE_PrimitiveShape = 0,
-	EDITMODETYPE_PrimitiveLineChain,
-
-	EDITMODETYPE_FixtureShape,
-	EDITMODETYPE_FixtureChain,
-	EDITMODETYPE_FixturePoint,
-
-	NUM_EDITMODETYPES
-};
-
-enum EditModeState
-{
-	EDITMODE_Off = 0,
-	EDITMODE_Idle,					// Mouse cursor determined by draw models
-	EDITMODE_MouseDownOutside,		// Click started outside of the edit item's bounds
-	EDITMODE_MouseDragMarquee,		// Click-dragging a marquee select box
-	EDITMODE_MouseDownTransform,	// Click started on item to be manipulated
-	EDITMODE_MouseDragTransform,	// Transforming (translating, rotating, scaling) the edit item
-};
 
 enum EditModeAction
 {
@@ -53,10 +28,8 @@ enum EditModeAction
 	EDITMODEACTION_CloseLoop			// For polygon or line chain, when an end vertex is selected and the user clicks on the opposite end vertex to close the shape
 };
 
-class EditModeModel
+class EditModeModel : public IEditModeModel
 {
-	EditModeType						m_eEditModeType;
-	
 	HyColor								m_Color;
 	glm::vec2							m_vOffset;				// Only used for primitive layer
 	bool								m_bVisible;				// Only used for primitive layer
@@ -87,14 +60,20 @@ class EditModeModel
 	int									m_iGrabPointIndex;
 	glm::vec2							m_ptGrabPointPos;
 
-	// Track Views manually since we don't inherit from QObject
-	QList<EditModeView *>				m_ViewList;
-
 public:
 	EditModeModel(EditModeType eEditModeType, HyColor color);
-	~EditModeModel();
+	virtual ~EditModeModel();
 
-	EditModeType GetEditModeType() const;
+	virtual QJsonObject Serialize() const override;
+	virtual void Deserialize(bool bEnabled, const QJsonObject &serializedObj) override;
+
+	virtual Qt::CursorShape MouseMoveIdle() override;
+	virtual void MouseIdleRightClick() override;
+	virtual bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld) override; // Returns whether transform has begun (otherwise marquee select)
+	virtual void MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
+	virtual void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight) override;
+	virtual void MouseClickTransformReleased(glm::vec2 ptClickPos) override;
+
 	bool IsFixture() const;
 	bool IsLineChain() const;
 	void SetEditModeType(EditModeType eEditModeType);
@@ -124,12 +103,6 @@ public:
 	void SetOutline(float fOutline);
 
 	bool IsValidModel() const;
-	QJsonObject Serialize() const;
-	void Deserialize(bool bEnabled, const QJsonObject &serializedObj);
-
-	void AddView(EditModeView *pView);
-	bool RemoveView(EditModeView *pView);
-	void SyncViews(EditModeState eEditModeState, EditModeAction eResult) const;
 
 	int GetNumFixtures() const;
 	const IHyFixture2d *GetFixture(int iIndex) const;
@@ -143,13 +116,6 @@ public:
 	bool IsAllGrabPointsSelected() const;
 	bool IsHoverGrabPointSelected() const;
 	void DeselectAllGrabPoints();
-
-	Qt::CursorShape MouseMoveIdle();
-	bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags); // Returns whether transform has begun (otherwise marquee select)
-	void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight);
-	void MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
-
-	void DoMouseReleaseSelectionLogic();
 
 	void OnDeleteKeyPressed();
 

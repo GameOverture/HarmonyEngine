@@ -97,7 +97,6 @@ enum ItemType
 	ITEM_Text,
 	ITEM_Spine,
 	ITEM_Sprite,
-	ITEM_TileMap,
 	ITEM_Shader,
 	ITEM_Prefab,
 	ITEM_Entity,
@@ -110,6 +109,7 @@ enum ItemType
 	ITEM_Source,
 	ITEM_Header,
 	// Entity items
+	ITEM_TileMap,
 	ITEM_PrimNode,
 	ITEM_PrimLayer,
 	ITEM_ShapeFixture,

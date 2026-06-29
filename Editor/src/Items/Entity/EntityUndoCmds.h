@@ -176,6 +176,21 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class EntityUndoCmd_AddTileMap : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	EntityTreeItemData *			m_pTileMapTreeItemData;
+
+public:
+	EntityUndoCmd_AddTileMap(ProjectItemData &entityItemRef, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddTileMap();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_AddPrimNode : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
@@ -190,7 +205,6 @@ public:
 	virtual void redo() override;
 	virtual void undo() override;
 };
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

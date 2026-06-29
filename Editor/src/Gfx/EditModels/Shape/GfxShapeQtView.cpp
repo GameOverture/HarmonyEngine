@@ -49,7 +49,7 @@ GfxShapeQtView::GfxShapeQtView(QGraphicsItem *pParent /*= nullptr*/) :
 //	m_pGfxPolygonItem->setPen(QPen(HyGlobal::ConvertHyColor(m_pModel->GetColor().IsDark() ? HyColor::White : HyColor::Black), 1.0f));
 //}
 
-/*virtual*/ void GfxShapeQtView::SyncWithModel(EditModeState eEditModeState, EditModeAction eEditModeAction) /*override*/
+/*virtual*/ void GfxShapeQtView::SyncWithModel(EditModeState eEditModeState) /*override*/
 {
 	//if(m_pModel == nullptr)
 	//{

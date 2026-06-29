@@ -14,7 +14,7 @@
 
 class EntityDraw;
 class EntityTreeItemData;
-class EditModeModel;
+class IEditModeModel;
 class EditModeView;
 
 // NOTE: this class does not keep its state when removed, it is deleted (should not be passed to UndoCmd's)

@@ -139,7 +139,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		break; }
 
 	case EDITMODE_MouseDownOutside:
-	case EDITMODE_MouseDownTransform: {
+	case EDITMODE_MouseClickTransform: {
 		QPointF dragDelta = QPointF(ptWorldMousePos.x, ptWorldMousePos.y) - QPointF(m_ptDragStart.x, m_ptDragStart.y);
 		if(dragDelta.manhattanLength() >= MANHATTAN_DRAG_THRESHOLD)
 		{
@@ -148,7 +148,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 				m_MarqueeCtrl.SetAsDrag(m_ptDragStart, ptWorldMousePos);
 				m_eEditModeState = EDITMODE_MouseDragMarquee;
 			}
-			else // EDITMODE_MouseDownTransform
+			else // EDITMODE_MouseClickTransform
 				m_eEditModeState = EDITMODE_MouseDragTransform;
 		}
 		break; }
@@ -197,18 +197,18 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	case EDITMODE_Idle: {
 		if(pEvent->button() == Qt::RightButton)
 		{
-			pTreeItemData->GetEditModel()->DeselectAllGrabPoints();
+			pTreeItemData->GetEditModel()->MouseIdleRightClick();
 			break;
 		}
 
 		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), m_ptDragStart);
 		
 		bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-		bool bStartTransform = pTreeItemData->GetEditModel()->MousePressEvent(m_eEditModeState, bShiftHeld, pEvent->buttons());
+		bool bStartTransform = pTreeItemData->GetEditModel()->MousePressEvent(m_eEditModeState, bShiftHeld);
 		if(bStartTransform)
 		{
 			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BlankCursor);
-			m_eEditModeState = EDITMODE_MouseDownTransform;
+			m_eEditModeState = EDITMODE_MouseClickTransform;
 		}
 		else
 		{
@@ -278,7 +278,9 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		m_MarqueeCtrl.Hide();
 		break; }
 
-	case EDITMODE_MouseDownTransform:
+	case EDITMODE_MouseClickTransform:
+		pTreeItemData->GetEditModel()->MouseClickTransformReleased(m_ptDragStart);
+		[[fallthrough]];
 	case EDITMODE_MouseDragTransform: {
 		QString sUndoText = pTreeItemData->GetEditModel()->GetActionText(m_eEditModeState, pTreeItemData->GetCodeName());
 		if(sUndoText.isEmpty() == false)
@@ -286,25 +288,20 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			int iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
 			int iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
 			QString sCategoryName;
-			if(pTreeItemData->GetType() == ITEM_PrimLayer)
+			if(pTreeItemData->GetType() == ITEM_PrimLayer) // Both EDITMODETYPE_PrimitiveShape and EDITMODETYPE_PrimitiveLineChain
 				sCategoryName = "Primitive Layer";
-			else
-			{
-				if(pTreeItemData->GetEditModel()->IsLineChain())
-					sCategoryName = "Chain";
-				else if(pTreeItemData->GetEditModel()->GetEditModeType() == EDITMODETYPE_FixturePoint)
-					sCategoryName = "Point";
-				else
-					sCategoryName = "Shape";
-			}
+			else if(pTreeItemData->GetEditModel()->GetEditModeType() == EDITMODETYPE_FixtureShape)
+				sCategoryName = "Shape";
+			else if(pTreeItemData->GetEditModel()->GetEditModeType() == EDITMODETYPE_FixtureChain)
+				sCategoryName = "Chain";
+			else if(pTreeItemData->GetEditModel()->GetEditModeType() == EDITMODETYPE_FixturePoint)
+				sCategoryName = "Point";
 
 			QUndoCommand *pCmd = new EntityUndoCmd_EditModelData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pTreeItemData->GetEditModel()->Serialize(), sCategoryName, "Data");
 			m_pProjItem->GetUndoStack()->push(pCmd);
 		}
-		else if(pTreeItemData->GetEditModel()->GetCurrentAction() == EDITMODEACTION_HoverGrabPoint && (pEvent->buttons() & Qt::LeftButton) != 0)
-			pTreeItemData->GetEditModel()->DoMouseReleaseSelectionLogic();
 
-		pTreeItemData->GetEditModel()->SyncViews(m_eEditModeState, EDITMODEACTION_None);
+		pTreeItemData->GetEditModel()->SyncViews(m_eEditModeState);
 
 		break; }
 

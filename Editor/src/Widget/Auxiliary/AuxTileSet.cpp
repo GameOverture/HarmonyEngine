@@ -224,6 +224,7 @@ void AuxTileSet::CmdSet_TileSizeWidgets(QSize tileSize)
 	ui->vsbTileSize->SetValue(QPoint(tileSize.width(), tileSize.height()));
 
 	m_pTileSet->SetTileSize(tileSize);
+	m_pTileSet->SetAtlasRegionSize(tileSize);
 	ui->vsbTileSize->blockSignals(false);
 }
 

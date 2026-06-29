@@ -11,14 +11,12 @@
 #define EditModeView_H
 
 #include "Global.h"
-#include "EditModeModel.h"
+#include "IEditModeView.h"
 #include "GfxGrabPointView.h"
 
-class EditModeView : public HyEntity2d
+class EditModeView : public IEditModeView
 {
 protected:
-	EditModeModel *				m_pModel;
-
 	HyPrimitive2d				m_CameraPrim;
 	HyPrimitive2d				m_ScenePrim;
 
@@ -29,11 +27,8 @@ public:
 	EditModeView(HyEntity2d *pParent = nullptr);
 	virtual ~EditModeView();
 
-	EditModeModel *GetModel() const;
-	void SetModel(EditModeModel *pModel);
-
 	void SyncColor();
-	virtual void SyncWithModel(EditModeState eEditModeState, EditModeAction eEditModeAction);
+	virtual void SyncWithModel(EditModeState eEditModeState) override;
 
 	void ClearGrabPoints();
 };

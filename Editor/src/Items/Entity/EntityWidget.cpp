@@ -49,6 +49,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	ShowCustomBaseClassTextBox(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetBaseClassType() == ENTBASECLASS_Custom);
 
 	ui->btnAddChild->setDefaultAction(ui->actionAddChildren);
+	ui->btnAddTileMap->setDefaultAction(ui->actionAddTileMap);
 	
 	ui->btnAddPrimitive->setDefaultAction(ui->actionAddPrimitive);
 	ui->btnAddPrimBox->setDefaultAction(ui->actionAddPrimBox);
@@ -864,6 +865,11 @@ void EntityWidget::on_actionAddChildren_triggered()
 	}
 	QUndoCommand *pCmd = new EntityUndoCmd_AddChildren(m_ItemRef, validItemList);
 	m_ItemRef.GetUndoStack()->push(pCmd);
+}
+
+void EntityWidget::on_actionAddTileMap_triggered()
+{
+
 }
 
 void EntityWidget::on_actionAddPrimitive_triggered()

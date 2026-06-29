@@ -14,9 +14,7 @@
 #include "ExplorerModel.h"
 #include "MainWindow.h"
 #include "EntityUndoCmds.h"
-#include "GfxPrimitiveModel.h"
-#include "GfxShapeModel.h"
-#include "GfxChainModel.h"
+#include "EditModeModel.h"
 
 #include <QVariant>
 #include <QStack>
@@ -130,6 +128,7 @@ QString EntityTreeItemData::GetHyNodeTypeName(bool bIncludeNamespace) const
 	case ITEM_AtlasFrame:		return "HyTexturedQuad2d";
 	case ITEM_ShapeFixture: 	return "HyShape2d";
 	case ITEM_ChainFixture: 	return "HyChain2d";
+	case ITEM_PointFixture:		return "glm::vec2";
 	case ITEM_Entity: {
 		QUuid referencedItemUuid = GetReferencedItemUuid();
 		ProjectItemData *pReferencedItemData = static_cast<ProjectItemData *>(m_EntityModelRef.GetItem().GetProject().FindItemData(referencedItemUuid));
@@ -211,7 +210,7 @@ EntityPropertiesTreeModel &EntityTreeItemData::GetPropertiesModel() const
 	return *m_pPropertiesModel;
 }
 
-EditModeModel *EntityTreeItemData::GetEditModel()
+IEditModeModel *EntityTreeItemData::GetEditModel()
 {
 	return m_pEditModel;
 }

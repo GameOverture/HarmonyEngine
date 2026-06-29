@@ -12,7 +12,7 @@
 #include "MainWindow.h"
 
 EditModeModel::EditModeModel(EditModeType eEditModeType, HyColor color) :
-	m_eEditModeType(eEditModeType),
+	IEditModeModel(eEditModeType),
 	m_Color(color),
 	m_iDisplayOrder(0),
 	m_eShapeType(SHAPE_None),
@@ -35,9 +35,249 @@ EditModeModel::EditModeModel(EditModeType eEditModeType, HyColor color) :
 	ClearFixtures();
 }
 
-EditModeType EditModeModel::GetEditModeType() const
+/*virtual*/ QJsonObject EditModeModel::Serialize() const /*override*/
 {
-	return m_eEditModeType;
+	QJsonObject serializedObj;
+	if(m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain)
+		serializedObj.insert("type", HYLINECHAIN_Name);
+	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+		serializedObj.insert("type", HYPOINT_Name);
+	else
+		serializedObj.insert("type", HyGlobal::ShapeName(m_eShapeType));
+
+	std::vector<float> dataList = SerializeData();
+	QJsonArray dataArray;
+	for(float f : dataList)
+		dataArray.push_back(f);
+	serializedObj.insert("data", dataArray);
+
+	serializedObj.insert("outline", m_fOutline);
+
+	return serializedObj;
+}
+
+/*virtual*/ void EditModeModel::Deserialize(bool bEnabled, const QJsonObject &serializedObj) /*override*/
+{
+	if(IsFixture())
+		m_iDisplayOrder = bEnabled ? DISPLAYORDER_FixtureSelected : DISPLAYORDER_Fixture;
+
+	m_sMalformedReason = DeserializeData(serializedObj);
+	SyncViews(bEnabled ? EDITMODE_Idle : EDITMODE_Off);
+}
+
+/*virtual*/ Qt::CursorShape EditModeModel::MouseMoveIdle() /*override*/
+{
+	EditModeAction eResult = DoMouseMoveIdle();
+
+	switch(eResult)
+	{
+	case EDITMODEACTION_Creation:
+		MainWindow::SetStatus("Edit Mode - Creation", 0);
+		return Qt::CrossCursor;
+
+	case EDITMODEACTION_Outside:
+		MainWindow::SetStatus("Edit Mode", 0);
+		return Qt::ArrowCursor;
+
+	case EDITMODEACTION_Inside:
+		if(IsAllGrabPointsSelected())
+		{
+			MainWindow::SetStatus("Edit Mode - Translate ", 0);
+			return Qt::SizeAllCursor;
+		}
+		else
+		{
+			MainWindow::SetStatus("Edit Mode - Mouse Over", 0);
+			return Qt::ArrowCursor;
+		}
+
+	case EDITMODEACTION_AppendVertex:
+		MainWindow::SetStatus("Edit Mode - Append Vertex", 0);
+		return Qt::CrossCursor;
+
+	case EDITMODEACTION_InsertVertex:
+		MainWindow::SetStatus("Edit Mode - Insert Vertex", 0);
+		return Qt::CrossCursor;
+
+	case EDITMODEACTION_HoverGrabPoint:
+		if(IsHoverGrabPointSelected())
+		{
+			MainWindow::SetStatus("Edit Mode - Translate Vertex", 0);
+			return Qt::SizeAllCursor;
+		}
+		else if(m_iGrabPointIndex >= 0)
+		{
+			MainWindow::SetStatus("Edit Mode - Select Vertex", 0);
+			return m_GrabPointList[m_iGrabPointIndex].GetHoverCursor();
+		}
+
+	case EDITMODEACTION_HoverCenter:
+		MainWindow::SetStatus("Edit Mode - Translate", 0);
+		return Qt::SizeAllCursor;
+
+	case EDITMODEACTION_CloseLoop:
+		MainWindow::SetStatus("Edit Mode - Close Loop", 0);
+		return Qt::CrossCursor;
+
+	default:
+		HyGuiLog("EditModeModel::MouseMoveIdle - unsupported edit mode action!", LOGTYPE_Error);
+		break;
+	}
+
+	MainWindow::SetStatus("Edit Mode", 0);
+	return Qt::ArrowCursor;
+}
+
+/*virtual*/ void EditModeModel::MouseIdleRightClick() /*override*/
+{
+	DeselectAllGrabPoints();
+}
+
+/*virtual*/ bool EditModeModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld) /*override*/
+{
+	bool bStartTransform = false;
+
+	EditModeAction eResult = DoMouseMoveIdle();
+	if(eResult == EDITMODEACTION_AppendVertex || eResult == EDITMODEACTION_InsertVertex)
+	{
+		if(m_iGrabPointIndex == -1)
+		{
+			HyGuiLog("GfxShapeModel::MousePressEvent - Insert vertex index was -1 on AddVertex/Crosshair", LOGTYPE_Error);
+			return EDITMODEACTION_None;
+		}
+		m_GrabPointList.insert(m_GrabPointList.begin() + m_iGrabPointIndex, GfxGrabPointModel(GRABPOINT_VertexSelected, m_ptGrabPointPos));
+		for(int i = 0; i < m_GrabPointList.size(); ++i)
+			m_GrabPointList[i].SetSelected(false);
+		m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
+
+		bStartTransform = true;
+	}
+	else if(eResult == EDITMODEACTION_HoverGrabPoint)
+	{
+		if(m_iGrabPointIndex == -1)
+		{
+			HyGuiLog("GfxShapeModel::OnMousePressEvent - Hover vertex index was -1 on HoverVertex/HoverSelectedVertex", LOGTYPE_Error);
+			return EDITMODEACTION_None;
+		}
+
+		if(bShiftHeld)
+		{
+			m_GrabPointList[m_iGrabPointIndex].SetSelected(!m_GrabPointList[m_iGrabPointIndex].IsSelected());
+		}
+		else
+		{
+			for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
+				grabPtRef.SetCachePos();
+
+			if(m_GrabPointList[m_iGrabPointIndex].IsSelected() == false)
+			{
+				for(int i = 0; i < m_GrabPointList.size(); ++i)
+					m_GrabPointList[i].SetSelected(false);
+				m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
+			}
+
+			bStartTransform = true;
+		}
+	}
+	else if(eResult == EDITMODEACTION_HoverCenter)
+	{
+		for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
+			grabPtRef.SetCachePos();
+		m_GrabPointCenter.SetCachePos();
+		bStartTransform = true;
+	}
+	else if(eResult == EDITMODEACTION_Creation)
+		bStartTransform = true;
+	else if(eResult == EDITMODEACTION_Inside)
+		bStartTransform = IsAllGrabPointsSelected();
+	else if(eResult == EDITMODEACTION_CloseLoop)
+	{
+		m_bLoopClosed = true;
+		bStartTransform = true;
+	}
+
+	m_eCurAction = eResult;
+
+	return bStartTransform;
+}
+
+/*virtual*/ void EditModeModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) /*override*/
+{
+	HySetVec(m_vDragDelta, 0.0f, 0.0f);
+	if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
+		HySetVec(m_vDragDelta, ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y);
+
+	if(m_eCurAction == EDITMODEACTION_Creation)
+		DoTransformCreation(bShiftMod, ptStartPos, ptDragPos);
+
+	if(m_eCurAction == EDITMODEACTION_AppendVertex)
+		m_GrabPointList[m_iGrabPointIndex].SetPos(ptDragPos);
+
+	if(m_eCurAction == EDITMODEACTION_HoverGrabPoint)
+	{
+		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
+		{
+			if(grabPtModel.IsSelected())
+			{
+				glm::vec2 ptNewPos = grabPtModel.GetCachePos() + m_vDragDelta;
+				if(bShiftMod) // Snap to 25 pixel increments if shift is held
+					HySetVec(ptNewPos, roundf(ptNewPos.x / 25.0f) * 25.0f, roundf(ptNewPos.y / 25.0f) * 25.0f);
+				grabPtModel.SetPos(ptNewPos);
+			}
+		}
+	}
+	if(m_eCurAction == EDITMODEACTION_HoverCenter)
+	{
+		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
+		{
+			glm::vec2 ptNewPos = grabPtModel.GetCachePos() + m_vDragDelta;
+			if(bShiftMod) // Snap to 25 pixel increments if shift is held
+				HySetVec(ptNewPos, roundf(ptNewPos.x / 25.0f) * 25.0f, roundf(ptNewPos.y / 25.0f) * 25.0f);
+			grabPtModel.SetPos(ptNewPos);
+		}
+
+		glm::vec2 ptNewPos = m_GrabPointCenter.GetCachePos() + m_vDragDelta;
+		if(bShiftMod) // Snap to 25 pixel increments if shift is held
+			HySetVec(ptNewPos, roundf(ptNewPos.x / 25.0f) * 25.0f, roundf(ptNewPos.y / 25.0f) * 25.0f);
+		m_GrabPointCenter.SetPos(ptNewPos);
+	}
+
+	SyncViews(EDITMODE_MouseDragTransform);
+}
+
+/*virtual*/ void EditModeModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight) /*override*/
+{
+	// Select grab points within marquee
+	for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
+	{
+		grabPtModel.SetSelected(false);
+
+		QPointF ptGrabPos(grabPtModel.GetPos().x, grabPtModel.GetPos().y);
+		if(ptGrabPos.x() >= ptBotLeft.x() && ptGrabPos.x() <= ptTopRight.x() &&
+		   ptGrabPos.y() >= ptBotLeft.y() && ptGrabPos.y() <= ptTopRight.y())
+		{
+			if(bLeftClick)
+				grabPtModel.SetSelected(true);
+		}
+	}
+
+	SyncViews(eEditModeState);
+}
+
+/*virtual*/ void EditModeModel::MouseClickTransformReleased(glm::vec2 ptClickPos) /*override*/
+{
+	if(m_eCurAction == EDITMODEACTION_Creation)
+	{
+		glm::vec2 ptStartPos = ptClickPos + glm::vec2(-25.0f, -25.0f);
+		glm::vec2 ptDragPos = ptClickPos + glm::vec2(25.0f, 25.0f);
+		DoTransformCreation(false, ptStartPos, ptDragPos);
+	}
+	else if(m_eCurAction == EDITMODEACTION_HoverGrabPoint)
+	{
+		for(int i = 0; i < m_GrabPointList.size(); ++i)
+			m_GrabPointList[i].SetSelected(false);
+		m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
+	}
 }
 
 bool EditModeModel::IsFixture() const
@@ -68,8 +308,8 @@ HyColor EditModeModel::GetColor() const
 void EditModeModel::SetColor(HyColor color)
 {
 	m_Color = color;
-	for(EditModeView *pView : m_ViewList)
-		pView->SyncColor();
+	for(IEditModeView *pView : m_ViewList)
+		static_cast<EditModeView *>(pView)->SyncColor();
 }
 
 glm::vec2 EditModeModel::GetOffset() const
@@ -80,7 +320,7 @@ glm::vec2 EditModeModel::GetOffset() const
 void EditModeModel::SetOffset(glm::vec2 vOffset)
 {
 	m_vOffset = vOffset;
-	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
+	SyncViews(EDITMODE_Idle);
 }
 
 bool EditModeModel::IsVisible() const
@@ -91,7 +331,7 @@ bool EditModeModel::IsVisible() const
 void EditModeModel::SetVisible(bool bVisible)
 {
 	m_bVisible = bVisible;
-	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
+	SyncViews(EDITMODE_Idle);
 }
 
 float EditModeModel::GetAlpha() const
@@ -102,7 +342,7 @@ float EditModeModel::GetAlpha() const
 void EditModeModel::SetAlpha(float fAlpha)
 {
 	m_fAlpha = fAlpha;
-	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
+	SyncViews(EDITMODE_Idle);
 }
 
 int EditModeModel::GetDisplayOrder() const
@@ -221,54 +461,6 @@ bool EditModeModel::IsValidModel() const
 	return m_sMalformedReason.isEmpty();
 }
 
-QJsonObject EditModeModel::Serialize() const
-{
-	QJsonObject serializedObj;
-	if(m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain)
-		serializedObj.insert("type", HYLINECHAIN_Name);
-	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
-		serializedObj.insert("type", HYPOINT_Name);
-	else
-		serializedObj.insert("type", HyGlobal::ShapeName(m_eShapeType));
-
-	std::vector<float> dataList = SerializeData();
-	QJsonArray dataArray;
-	for(float f : dataList)
-		dataArray.push_back(f);
-	serializedObj.insert("data", dataArray);
-
-	serializedObj.insert("outline", m_fOutline);
-
-	return serializedObj;
-}
-
-void EditModeModel::Deserialize(bool bEnabled, const QJsonObject &serializedObj)
-{
-	if(IsFixture())
-		m_iDisplayOrder = bEnabled ? DISPLAYORDER_FixtureSelected : DISPLAYORDER_Fixture;
-
-	m_sMalformedReason = DeserializeData(serializedObj);
-	SyncViews(bEnabled ? EDITMODE_Idle : EDITMODE_Off, EDITMODEACTION_None);
-}
-
-void EditModeModel::AddView(EditModeView *pView)
-{
-	if(m_ViewList.contains(pView))
-		return;
-	m_ViewList.push_back(pView);
-}
-
-bool EditModeModel::RemoveView(EditModeView *pView)
-{
-	return m_ViewList.removeOne(pView);
-}
-
-void EditModeModel::SyncViews(EditModeState eEditModeState, EditModeAction eResult) const
-{
-	for(EditModeView *pView : m_ViewList)
-		pView->SyncWithModel(eEditModeState, eResult);
-}
-
 int EditModeModel::GetNumFixtures() const
 {
 	return m_FixtureList.size();
@@ -353,203 +545,6 @@ void EditModeModel::DeselectAllGrabPoints()
 		grabPtModel.SetSelected(false);
 }
 
-Qt::CursorShape EditModeModel::MouseMoveIdle()
-{
-	EditModeAction eResult = DoMouseMoveIdle();
-
-	switch(eResult)
-	{
-	case EDITMODEACTION_Creation:
-		MainWindow::SetStatus("Edit Mode - Creation", 0);
-		return Qt::CrossCursor;
-
-	case EDITMODEACTION_Outside:
-		MainWindow::SetStatus("Edit Mode", 0);
-		return Qt::ArrowCursor;
-
-	case EDITMODEACTION_Inside:
-		if(IsAllGrabPointsSelected())
-		{
-			MainWindow::SetStatus("Edit Mode - Translate ", 0);
-			return Qt::SizeAllCursor;
-		}
-		else
-		{
-			MainWindow::SetStatus("Edit Mode - Mouse Over", 0);
-			return Qt::ArrowCursor;
-		}
-
-	case EDITMODEACTION_AppendVertex:
-		MainWindow::SetStatus("Edit Mode - Append Vertex", 0);
-		return Qt::CrossCursor;
-
-	case EDITMODEACTION_InsertVertex:
-		MainWindow::SetStatus("Edit Mode - Insert Vertex", 0);
-		return Qt::CrossCursor;
-
-	case EDITMODEACTION_HoverGrabPoint:
-		if(IsHoverGrabPointSelected())
-		{
-			MainWindow::SetStatus("Edit Mode - Translate Vertex", 0);
-			return Qt::SizeAllCursor;
-		}
-		else if(m_iGrabPointIndex >= 0)
-		{
-			MainWindow::SetStatus("Edit Mode - Select Vertex", 0);
-			return m_GrabPointList[m_iGrabPointIndex].GetHoverCursor();
-		}
-
-	case EDITMODEACTION_HoverCenter:
-		MainWindow::SetStatus("Edit Mode - Translate", 0);
-		return Qt::SizeAllCursor;
-
-	case EDITMODEACTION_CloseLoop:
-		MainWindow::SetStatus("Edit Mode - Close Loop", 0);
-		return Qt::CrossCursor;
-
-	default:
-		HyGuiLog("EditModeModel::MouseMoveIdle - unsupported edit mode action!", LOGTYPE_Error);
-		break;
-	}
-
-	MainWindow::SetStatus("Edit Mode", 0);
-	return Qt::ArrowCursor;
-}
-
-bool EditModeModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, Qt::MouseButtons uiButtonFlags)
-{
-	bool bStartTransform = false;
-
-	EditModeAction eResult = DoMouseMoveIdle();
-	if(eResult == EDITMODEACTION_AppendVertex || eResult == EDITMODEACTION_InsertVertex)
-	{
-		if(m_iGrabPointIndex == -1)
-		{
-			HyGuiLog("GfxShapeModel::MousePressEvent - Insert vertex index was -1 on AddVertex/Crosshair", LOGTYPE_Error);
-			return EDITMODEACTION_None;
-		}
-		m_GrabPointList.insert(m_GrabPointList.begin() + m_iGrabPointIndex, GfxGrabPointModel(GRABPOINT_VertexSelected, m_ptGrabPointPos));
-		for(int i = 0; i < m_GrabPointList.size(); ++i)
-			m_GrabPointList[i].SetSelected(false);
-		m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
-
-		bStartTransform = true;
-	}
-	else if(eResult == EDITMODEACTION_HoverGrabPoint)
-	{
-		if(m_iGrabPointIndex == -1)
-		{
-			HyGuiLog("GfxShapeModel::OnMousePressEvent - Hover vertex index was -1 on HoverVertex/HoverSelectedVertex", LOGTYPE_Error);
-			return EDITMODEACTION_None;
-		}
-
-		if(bShiftHeld)
-		{
-			if(uiButtonFlags & Qt::LeftButton)
-				m_GrabPointList[m_iGrabPointIndex].SetSelected(!m_GrabPointList[m_iGrabPointIndex].IsSelected());
-			else if(uiButtonFlags & Qt::RightButton)
-				m_GrabPointList[m_iGrabPointIndex].SetSelected(false);
-		}
-		else
-		{
-			for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
-				grabPtRef.SetCachePos();
-
-			if(m_GrabPointList[m_iGrabPointIndex].IsSelected() == false && (uiButtonFlags & Qt::LeftButton) != 0)
-			{
-				for(int i = 0; i < m_GrabPointList.size(); ++i)
-					m_GrabPointList[i].SetSelected(false);
-				m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
-			}
-
-			bStartTransform = true;
-		}
-	}
-	else if(eResult == EDITMODEACTION_HoverCenter)
-	{
-		for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
-			grabPtRef.SetCachePos();
-		m_GrabPointCenter.SetCachePos();
-		bStartTransform = true;
-	}
-	else if(eResult == EDITMODEACTION_Creation)
-		bStartTransform = true;
-	else if(eResult == EDITMODEACTION_Inside)
-		bStartTransform = IsAllGrabPointsSelected();
-	else if(eResult == EDITMODEACTION_CloseLoop)
-	{
-		m_bLoopClosed = true;
-		bStartTransform = true;
-	}
-
-	m_eCurAction = eResult;
-
-	return bStartTransform;
-}
-
-void EditModeModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight)
-{
-	// Select grab points within marquee
-	for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
-	{
-		grabPtModel.SetSelected(false);
-
-		QPointF ptGrabPos(grabPtModel.GetPos().x, grabPtModel.GetPos().y);
-		if(ptGrabPos.x() >= ptBotLeft.x() && ptGrabPos.x() <= ptTopRight.x() &&
-		   ptGrabPos.y() >= ptBotLeft.y() && ptGrabPos.y() <= ptTopRight.y())
-		{
-			if(bLeftClick)
-				grabPtModel.SetSelected(true);
-		}
-	}
-
-	SyncViews(eEditModeState, EDITMODEACTION_None);
-}
-
-void EditModeModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
-{
-	HySetVec(m_vDragDelta, 0.0f, 0.0f);
-	if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
-		HySetVec(m_vDragDelta, ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y);
-
-	if(m_eCurAction == EDITMODEACTION_Creation)
-		DoTransformCreation(bShiftMod, ptStartPos, ptDragPos);
-
-	if(m_eCurAction == EDITMODEACTION_AppendVertex)
-		m_GrabPointList[m_iGrabPointIndex].SetPos(ptDragPos);
-
-	if(m_eCurAction == EDITMODEACTION_HoverGrabPoint)
-	{
-		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
-		{
-			if(grabPtModel.IsSelected())
-			{
-				glm::vec2 ptNewPos = grabPtModel.GetCachePos() + m_vDragDelta;
-				if(bShiftMod) // Snap to 25 pixel increments if shift is held
-					HySetVec(ptNewPos, roundf(ptNewPos.x / 25.0f) * 25.0f, roundf(ptNewPos.y / 25.0f) * 25.0f);
-				grabPtModel.SetPos(ptNewPos);
-			}
-		}
-	}
-	if(m_eCurAction == EDITMODEACTION_HoverCenter)
-	{
-		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
-		{
-			glm::vec2 ptNewPos = grabPtModel.GetCachePos() + m_vDragDelta;
-			if(bShiftMod) // Snap to 25 pixel increments if shift is held
-				HySetVec(ptNewPos, roundf(ptNewPos.x / 25.0f) * 25.0f, roundf(ptNewPos.y / 25.0f) * 25.0f);
-			grabPtModel.SetPos(ptNewPos);
-		}
-
-		glm::vec2 ptNewPos = m_GrabPointCenter.GetCachePos() + m_vDragDelta;
-		if(bShiftMod) // Snap to 25 pixel increments if shift is held
-			HySetVec(ptNewPos, roundf(ptNewPos.x / 25.0f) * 25.0f, roundf(ptNewPos.y / 25.0f) * 25.0f);
-		m_GrabPointCenter.SetPos(ptNewPos);
-	}
-
-	SyncViews(EDITMODE_MouseDragTransform, m_eCurAction);
-}
-
 glm::vec2 EditModeModel::GetDragDelta() const
 {
 	return m_vDragDelta;
@@ -558,13 +553,6 @@ glm::vec2 EditModeModel::GetDragDelta() const
 EditModeAction EditModeModel::GetCurrentAction() const
 {
 	return m_eCurAction;
-}
-
-void EditModeModel::DoMouseReleaseSelectionLogic()
-{
-	for(int i = 0; i < m_GrabPointList.size(); ++i)
-		m_GrabPointList[i].SetSelected(false);
-	m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
 }
 
 void EditModeModel::OnDeleteKeyPressed()
@@ -582,7 +570,7 @@ void EditModeModel::OnDeleteKeyPressed()
 			}
 		}
 
-		SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
+		SyncViews(EDITMODE_Idle);
 	}
 }
 
@@ -613,7 +601,7 @@ QString EditModeModel::GetActionText(EditModeState eEditModeState, QString sNode
 		sUndoText = "Insert vertex on " % sNodeCodeName;
 		break;
 	case EDITMODEACTION_HoverGrabPoint:
-		if(eEditModeState == EDITMODE_MouseDownTransform) // Ensure the minimum drag distance has occured
+		if(eEditModeState == EDITMODE_MouseClickTransform) // Ensure the minimum drag distance has occured
 			break;
 
 		if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
@@ -1201,7 +1189,7 @@ void EditModeModel::TransformData(glm::mat4 mtxTransform)
 	for(IHyFixture2d *pFixture : m_FixtureList)
 		pFixture->TransformSelf(mtxTransform);
 
-	SyncViews(EDITMODE_Idle, EDITMODEACTION_None);
+	SyncViews(EDITMODE_Idle);
 }
 
 void EditModeModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
@@ -1257,7 +1245,7 @@ void EditModeModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, gl
 	{
 		ClearFixtures();
 		m_GrabPointList.clear();
-		m_GrabPointCenter.Set(GRABPOINT_Center, ptDragPos);
+		m_GrabPointCenter.Set(GRABPOINT_Center, ptCenter);
 	}
 	else
 	{
@@ -1266,6 +1254,9 @@ void EditModeModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, gl
 
 		switch(m_eShapeType)
 		{
+		case SHAPE_None:
+			m_eShapeType = SHAPE_Box;
+			[[fallthrough]];
 		case SHAPE_Box: {
 			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsBox(HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f));
 			m_GrabPointList.clear();
@@ -1324,14 +1315,7 @@ void EditModeModel::ClearFixtures()
 
 std::vector<float> EditModeModel::SerializeData() const
 {
-	if(m_FixtureList.empty())
-		return std::vector<float>();
-	if((m_eEditModeType != EDITMODETYPE_PrimitiveLineChain && m_eEditModeType != EDITMODETYPE_FixtureChain) &&
-		m_eShapeType != SHAPE_Polygon)
-	{
-		return m_FixtureList[0]->SerializeSelf();
-	}
-	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
+	if(m_eEditModeType == EDITMODETYPE_FixturePoint)
 	{
 		std::vector<float> returnList;
 		glm::vec2 ptPos = m_GrabPointCenter.GetPos();
@@ -1339,6 +1323,14 @@ std::vector<float> EditModeModel::SerializeData() const
 		returnList.push_back(ptPos.y);
 
 		return returnList;
+	}
+
+	if(m_FixtureList.empty())
+		return std::vector<float>();
+	if((m_eEditModeType != EDITMODETYPE_PrimitiveLineChain && m_eEditModeType != EDITMODETYPE_FixtureChain) &&
+		m_eShapeType != SHAPE_Polygon)
+	{
+		return m_FixtureList[0]->SerializeSelf();
 	}
 
 	// Line Chain or SHAPE_Polygon
@@ -1447,8 +1439,8 @@ QString EditModeModel::DeserializeData(const QJsonObject &serializedObj)
 	}
 	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
 	{
-		if(floatList.size() != 4)
-			HyGuiLog("EditModeModel::DeserializeData did not have 4 serialized floats for a fixture point", LOGTYPE_Error);
+		if(floatList.size() != 2)
+			HyGuiLog("EditModeModel::DeserializeData did not have 2 serialized floats for a fixture point", LOGTYPE_Error);
 		else
 		{
 			grabPointList.reserve(1);

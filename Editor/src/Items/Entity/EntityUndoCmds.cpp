@@ -523,6 +523,27 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EntityUndoCmd_AddTileMap::EntityUndoCmd_AddTileMap(ProjectItemData &entityItemRef, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_pTileMapTreeItemData(nullptr)
+{
+	setText("Add New TileMap Layer");
+}
+
+/*virtual*/ EntityUndoCmd_AddTileMap::~EntityUndoCmd_AddTileMap()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_AddTileMap::redo() /*override*/
+{
+}
+
+/*virtual*/ void EntityUndoCmd_AddTileMap::undo() /*override*/
+{
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_AddPrimNode::EntityUndoCmd_AddPrimNode(ProjectItemData &entityItemRef, int32 iRowIndex /*= -1*/, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
 	m_iIndex(iRowIndex),

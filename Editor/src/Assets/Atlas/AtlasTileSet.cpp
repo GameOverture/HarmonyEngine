@@ -180,6 +180,7 @@ QSize AtlasTileSet::GetAtlasRegionSize() const
 void AtlasTileSet::SetAtlasRegionSize(QSize size)
 {
 	m_RegionSize = size;
+	m_bSubAtlasDirty = true;
 }
 
 QSize AtlasTileSet::GetTileSize() const
