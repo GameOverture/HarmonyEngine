@@ -1,17 +1,20 @@
 /**************************************************************************
- *	TileMapUndoCmds.h
+ *	TileMapView.cpp
  *
  *	Harmony Engine - Editor Tool
- *	Copyright (c) 2024 Jason Knobler
+ *	Copyright (c) 2026 Jason Knobler
  *
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef TILEMAPUNDOCMDS_H
-#define TILEMAPUNDOCMDS_H
+#include "Global.h"
+#include "TileMapView.h"
 
-#include <QUndoCommand>
+TileMapView::TileMapView(HyEntity2d *pParent /*= nullptr*/) :
+	IEditModeView(pParent)
+{
+}
 
-
-
-#endif // TILEMAPUNDOCMDS_H
+/*virtual*/ TileMapView::~TileMapView()
+{
+}

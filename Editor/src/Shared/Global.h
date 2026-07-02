@@ -495,6 +495,7 @@ class HyGlobal
 	static QString														sm_sItemNamesPlural[NUM_ITEMTYPES];
 	static QString														sm_AssetNames[NUM_ASSETMANTYPES];
 	static QString														sm_TileSetShapeNames[NUM_TILESETSHAPES];
+	static QString														sm_TileMapLayouts[HYNUM_TILELAYOUTS];
 	static QString														sm_ShapeNames[NUM_SHAPES];
 	static QString														sm_TweenFuncNames[NUM_TWEENFUNCS];
 	static QString														sm_TweenPropNames[NUM_TWEENPROPS];
@@ -548,6 +549,8 @@ public:
 	static HySizePolicy GetSizePolicyFromString(QString sSizePolicy);
 	static QStringList GetTextTypeNameList();
 	static HyTextType GetTextTypeFromString(QString sTextType);
+	static QStringList GetTileMapLayoutNameList();
+	static HyTileMapLayout GetTileMapLayoutFromString(QString sTileMapLayout);
 	static QStringList GetAlignmentNameList();
 	static HyAlignment GetAlignmentFromString(QString sAlignment);
 	static QStringList GetOrientationNameList();
@@ -563,6 +566,7 @@ public:
 	static const QString ItemName(ItemType eItem, bool bPlural)			{ if(eItem == ITEM_None) return QString(); return bPlural ? sm_sItemNamesPlural[eItem] : sm_sItemNames[eItem]; }
 	static const QString AssetName(AssetManagerType eAsset)				{ return sm_AssetNames[eAsset]; }
 	static const QString TileSetShapeName(TileSetShape eTileSetType)	{ return sm_TileSetShapeNames[eTileSetType]; }
+	static const QString TileMapLayout(HyTileMapLayout eTileMapLayout)	{ return sm_TileMapLayouts[eTileMapLayout]; }
 	static const QString ShapeName(EditorShape eShape)					{ return sm_ShapeNames[eShape]; }
 	static const QString TweenFuncName(TweenFuncType eTween)			{ return sm_TweenFuncNames[eTween]; }
 	static const QString TweenPropName(TweenProperty eTweenProp)		{ return sm_TweenPropNames[eTweenProp]; }

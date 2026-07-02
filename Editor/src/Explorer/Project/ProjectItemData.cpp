@@ -18,8 +18,6 @@
 #include "IModel.h"
 #include "SpriteWidget.h"
 #include "SpriteDraw.h"
-#include "TileMapWidget.h"
-#include "TileMapDraw.h"
 #include "TextWidget.h"
 #include "TextDraw.h"
 #include "SpineWidget.h"
@@ -88,9 +86,6 @@ void ProjectItemData::LoadModel()
 	{
 	case ITEM_Sprite:
 		m_pModel = new SpriteModel(*this, m_ItemFileData);
-		break;
-	case ITEM_TileMap:
-		m_pModel = new TileMapModel(*this, m_ItemFileData);
 		break;
 	case ITEM_Text:
 		m_pModel = new TextModel(*this, m_ItemFileData);
@@ -254,9 +249,6 @@ void ProjectItemData::WidgetLoad()
 	case ITEM_Sprite:
 		m_pWidget = new SpriteWidget(*this);
 		break;
-	case ITEM_TileMap:
-		m_pWidget = new TileMapWidget(*this);
-		break;
 	case ITEM_Text:
 		m_pWidget = new TextWidget(*this);
 		break;
@@ -294,9 +286,6 @@ void ProjectItemData::DrawLoad()
 	{
 	case ITEM_Sprite:
 		m_pDraw = new SpriteDraw(this, m_ItemFileData);
-		break;
-	case ITEM_TileMap:
-		m_pDraw = new TileMapDraw(this, m_ItemFileData);
 		break;
 	case ITEM_Text:
 		m_pDraw = new TextDraw(this, m_ItemFileData);

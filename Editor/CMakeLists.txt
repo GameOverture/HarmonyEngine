@@ -181,15 +181,6 @@ if(Qt6_DIR)
 		src/Items/Text/SubWidgets/TextFontManager.h
 		src/Items/Text/SubWidgets/TextLayersModel.h
 		src/Items/Text/SubWidgets/TextLayersWidget.h
-		src/Items/TileMap/TileMapDraw.cpp
-		src/Items/TileMap/TileMapModels.cpp
-		src/Items/TileMap/TileMapUndoCmds.cpp
-		src/Items/TileMap/TileMapWidget.cpp
-		src/Items/TileMap/TileMapDraw.h
-		src/Items/TileMap/TileMapModels.h
-		src/Items/TileMap/TileMapUndoCmds.h
-		src/Items/TileMap/TileMapWidget.h
-		src/Items/TileMap/TileMapWidget.ui
 		src/Items/Entity/EntityDopeSheetScene.cpp
 		src/Items/Entity/EntityDopeSheetScene.h
 		src/Items/Entity/EntityDopeSheetView.cpp
@@ -215,6 +206,10 @@ if(Qt6_DIR)
 		src/Items/Entity/EditMode/IEditModeModel.h
 		src/Items/Entity/EditMode/IEditModeView.cpp
 		src/Items/Entity/EditMode/IEditModeView.h
+		src/Items/Entity/EditMode/TileMap/TileMapModel.cpp
+		src/Items/Entity/EditMode/TileMap/TileMapModel.h
+		src/Items/Entity/EditMode/TileMap/TileMapView.cpp
+		src/Items/Entity/EditMode/TileMap/TileMapView.h
 		src/Items/Entity/EditMode/Vector/VectorModel.cpp
 		src/Items/Entity/EditMode/Vector/VectorModel.h
 		src/Items/Entity/EditMode/Vector/VectorView.cpp
@@ -419,13 +414,13 @@ if(Qt6_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Assets/Audio")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Sprite")
-	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/TileMap")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Text")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Spine")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Prefab")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Primitive")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Entity")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Entity/EditMode")
+	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Entity/EditMode/TileMap")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Entity/EditMode/Vector")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Items/Audio")
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/Dialogs")

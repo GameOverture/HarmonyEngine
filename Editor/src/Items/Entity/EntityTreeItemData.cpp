@@ -307,7 +307,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	const double dRANGE = 16777215.0;
 
 	const bool bIsBody = GetType() != ITEM_Audio;
-	if(HyGlobal::IsItemType_Project(m_eTYPE) || IsWidgetItem() || m_eTYPE == ITEM_PrimNode)
+	if(HyGlobal::IsItemType_Project(m_eTYPE) || IsWidgetItem() || m_eTYPE == ITEM_PrimNode || m_eTYPE == ITEM_TileMap)
 	{
 		if(GetEntType() == ENTTYPE_Root || GetType() == ITEM_Entity)
 		{
@@ -316,7 +316,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 			m_pPropertiesModel->AppendProperty("Timeline", "Pause", PROPERTIESTYPE_bool, Qt::Unchecked, "Pausing the timeline will stop processing key frames, after this frame", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Timeline", "Frame", PROPERTIESTYPE_int, 0, "Jump to a different frame on the timeline, after processing this frame", PROPERTIESACCESS_ToggleUnchecked, 0, iRANGE, 1);
 		}
-		else if(IsAssetItem() == false && IsWidgetItem() == false && m_eTYPE != ITEM_PrimNode)
+		else if(IsAssetItem() == false && IsWidgetItem() == false && m_eTYPE != ITEM_PrimNode && m_eTYPE != ITEM_TileMap)
 		{
 			m_pPropertiesModel->InsertCategory(-1, "Common");
 			m_pPropertiesModel->AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(GetType(), false) % "'s state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
@@ -374,25 +374,6 @@ void EntityTreeItemData::InitalizePropertyModel()
 
 	switch(GetType())
 	{
-	case ITEM_PrimNode:
-
-		break;
-	case ITEM_PrimLayer: {
-		
-		//TreeModelItemData *pPrimitiveItemData = m_EntityModelRef.GetItem().GetProject().FindItemData(m_ReferencedItemUuid);
-		
-		m_pEditModel = new VectorModel(EDITMODETYPE_PrimitiveShape, HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
-
-		m_pPropertiesModel->InsertCategory(0, "Primitive Layer", QVariant(), false, "A collection of shape layers that can be drawn to the screen");
-		QVariant primLayerDataVariant;
-		primLayerDataVariant.setValue<EntityTreeItemData *>(this);
-		m_pPropertiesModel->AppendProperty("Primitive Layer", "Data", PROPERTIESTYPE_ShapeData, QVariant(), "Sets this primitive layer's data", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), primLayerDataVariant);
-		m_pPropertiesModel->AppendProperty("Primitive Layer", "Offset", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "An additional positional offset to apply to this layer", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE, 1.0, "[", "]");
-		m_pPropertiesModel->AppendProperty("Primitive Layer", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this layer gets rendered", PROPERTIESACCESS_ToggleUnchecked);
-		m_pPropertiesModel->AppendProperty("Primitive Layer", "Color", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this layer with", PROPERTIESACCESS_ToggleUnchecked);
-		m_pPropertiesModel->AppendProperty("Primitive Layer", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this layer is", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.05);
-		break; }
-
 	case ITEM_Audio:
 		m_pPropertiesModel->InsertCategory(0, "Audio", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
 		// TODO: m_pPropertiesModel->AppendProperty("Audio", "Play List Mode", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAudioPlayListModeList()[HYPLAYLIST_Shuffle], "The method by which the next audio asset is chosen when played", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAudioPlayListModeList());
@@ -430,9 +411,33 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Entity", "Mouse Input", PROPERTIESTYPE_bool, Qt::Unchecked, "Mouse hover and button inputs over this bounding volume or specified shapes", PROPERTIESACCESS_ToggleUnchecked);
 		break;
 
-	case ITEM_AtlasFrame:
-		// No HyTexturedQuad2d specific properties
+	case ITEM_AtlasFrame: // No HyTexturedQuad2d specific properties
 		break;
+
+	case ITEM_TileMap: {
+		m_pPropertiesModel->InsertCategory(0, "Tile Map", QVariant(), false, "A Tile Map layer using tiles from a Tile Set on a grid");
+		QVariant tileMapDataVariant;
+		tileMapDataVariant.setValue<EntityTreeItemData *>(this);
+		m_pPropertiesModel->AppendProperty("Tile Map", "Data", PROPERTIESTYPE_ShapeData, QVariant(), "Sets this Tile Map's tile data", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), tileMapDataVariant);
+		m_pPropertiesModel->AppendProperty("Tile Map", "Tile Layout", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTileMapLayoutNameList()[HYTILELAYOUT_Stacked], "For all half-offset shapes (Isometric, Hexagonal and Half-Offset square), changes the way tiles are indexed in the Tile Map's grid", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTileMapLayoutNameList());
+		m_pPropertiesModel->AppendProperty("Tile Map", "Tile Offset Axis", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetOrientationNameList()[HYORIENT_Horizontal], "For all half-offset shapes (Isometric, Hexagonal and Half-Offset square), determines the offset axis", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetOrientationNameList());
+		m_pPropertiesModel->AppendProperty("Tile Map", "Grid Size", PROPERTIESTYPE_ivec2, QPoint(32, 32), "The grid size, in pixels which tiles are placed in. For all tile shapes, this size corresponds to the bounding rectangle of the tile shape. This is independent to the tile's actual size, or the region sampled on the texture atlas", PROPERTIESACCESS_ToggleUnchecked, 1, iRANGE, 1.0, "[", "]");
+		break; }
+
+	case ITEM_PrimNode:
+		break;
+	case ITEM_PrimLayer: {
+		m_pEditModel = new VectorModel(EDITMODETYPE_PrimitiveShape, HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
+
+		m_pPropertiesModel->InsertCategory(0, "Primitive Layer", QVariant(), false, "A collection of shape layers that can be drawn to the screen");
+		QVariant primLayerDataVariant;
+		primLayerDataVariant.setValue<EntityTreeItemData *>(this);
+		m_pPropertiesModel->AppendProperty("Primitive Layer", "Data", PROPERTIESTYPE_ShapeData, QVariant(), "Sets this primitive layer's data", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), primLayerDataVariant);
+		m_pPropertiesModel->AppendProperty("Primitive Layer", "Offset", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "An additional positional offset to apply to this layer", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE, 1.0, "[", "]");
+		m_pPropertiesModel->AppendProperty("Primitive Layer", "Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this layer gets rendered", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Primitive Layer", "Color", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this layer with", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Primitive Layer", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this layer is", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.05);
+		break; }
 
 	case ITEM_ShapeFixture: {
 		m_pEditModel = new VectorModel(EDITMODETYPE_FixtureShape, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));

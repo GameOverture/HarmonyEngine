@@ -77,6 +77,7 @@ enum HyType
 	HYTYPE_Sprite,
 	HYTYPE_Spine,
 	HYTYPE_TexturedQuad,
+	HYTYPE_TileMap,
 	HYTYPE_Primitive,
 	HYTYPE_Text,
 	HYTYPE_Prefab,
@@ -181,6 +182,20 @@ enum HyAlignment
 	HYALIGN_Justify,
 
 	HYNUM_ALIGNMENTS
+};
+
+enum HyTileMapLayout
+{
+	HYTILELAYOUT_Unknown = -1,
+
+	HYTILELAYOUT_Stacked = 0,
+	HYTILELAYOUT_StackedOffset,
+	HYTILELAYOUT_StairsRight,
+	HYTILELAYOUT_StairsDown,
+	HYTILELAYOUT_DiamondRight,
+	HYTILELAYOUT_DiamondDown,
+
+	HYNUM_TILELAYOUTS
 };
 
 enum HyPlaylistMode
