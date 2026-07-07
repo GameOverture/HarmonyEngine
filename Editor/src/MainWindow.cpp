@@ -409,6 +409,9 @@ void MainWindow::SetCurrentProject(Project *pProject)
 
 	pItem->GiveMenuActions(sm_pInstance->ui->menu_Edit);
 	sm_pInstance->ui->mainToolBar->addActions(sm_pInstance->ui->menu_Edit->actions());
+
+	if(pItem->GetWidget())
+		pItem->GetWidget()->OnUpdateActions();
 }
 
 /*static*/ void MainWindow::CloseItem(ProjectItemData *pItem)

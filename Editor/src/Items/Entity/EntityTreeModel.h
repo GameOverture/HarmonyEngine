@@ -12,7 +12,7 @@
 
 #include "ProjectItemData.h"
 #include "EntityTreeItemData.h"
-#include "IAssetItemData.h"
+#include "AtlasTileSet.h"
 #include "ITreeModel.h"
 
 #include <QObject>
@@ -123,6 +123,7 @@ private: // These functions should only be called by EntityModel's Cmd_ function
 	void Cmd_ResetFusedItems(); // (Re)inserts fuse items into the item tree model. It will also destruct/construct the GUI layout heirarchy
 	EntityTreeItemData *Cmd_AllocChildTreeItem(ProjectItemData *pProjItem, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocAssetTreeItem(IAssetItemData *pAssetItem, QString sCodeNamePrefix, int iRow = -1);
+	EntityTreeItemData *Cmd_AllocTileMapTreeItem(AtlasTileSet *pTileSet, QString sCodeNamePrefix, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocExistingTreeItem(QJsonObject descObj, EntityItemType eEntType, int iRow);
 	EntityTreeItemData *Cmd_AllocGuiItemTreeItem(ItemType eGuiItemType, QString sCodeNamePrefix, QUuid guiLayoutParentUuid, int iRow = -1);
 	EntityTreeItemData *Cmd_AllocPrimNodeTreeItem(QString sCodeNamePrefix, int iRow = -1);

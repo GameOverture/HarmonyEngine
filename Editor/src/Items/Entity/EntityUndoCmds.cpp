@@ -80,7 +80,7 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 	m_ChildrenList(projItemList)
 {
 	if(m_EntityItemRef.GetType() != ITEM_Entity)
-		HyGuiLog("EntityUndoCmd recieved wrong type: " % QString::number(m_EntityItemRef.GetType()), LOGTYPE_Error);
+		HyGuiLog("EntityUndoCmd_AddChildren recieved wrong type: " % QString::number(m_EntityItemRef.GetType()), LOGTYPE_Error);
 
 	setText("Add New Project Explorer Items(s)");
 }
@@ -121,6 +121,36 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 		if(static_cast<EntityModel *>(m_EntityItemRef.GetModel())->GetTreeModel().IsItemValid(pNodeItem, true))
 			static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(pNodeItem);
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+EntityUndoCmd_AddTileMap::EntityUndoCmd_AddTileMap(ProjectItemData &entityItemRef, AtlasTileSet *pTileSetAsset, QUndoCommand *pParent /*= nullptr*/) :
+	m_EntityItemRef(entityItemRef),
+	m_pTileSetAsset(pTileSetAsset),
+	m_pTileMapTreeItemData(nullptr)
+{
+	if(m_EntityItemRef.GetType() != ITEM_Entity)
+		HyGuiLog("EntityUndoCmd_AddTileMap recieved wrong type: " % QString::number(m_EntityItemRef.GetType()), LOGTYPE_Error);
+
+	setText("Add New TileMap Layer");
+}
+
+/*virtual*/ EntityUndoCmd_AddTileMap::~EntityUndoCmd_AddTileMap()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_AddTileMap::redo() /*override*/
+{
+	if(m_pTileMapTreeItemData == nullptr)
+		m_pTileMapTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateTileMap(m_pTileSetAsset, -1);
+	else
+		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pTileMapTreeItemData, -1);
+}
+
+/*virtual*/ void EntityUndoCmd_AddTileMap::undo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_RemoveTreeItem(m_pTileMapTreeItemData);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -518,27 +548,6 @@ EntityUndoCmd_Transform::EntityUndoCmd_Transform(ProjectItemData &entityItemRef,
 		pWidget->RequestSelectedItems(affectedItemUuidList);
 
 	m_EntityItemRef.FocusWidgetState(m_iStateIndex, -1);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-EntityUndoCmd_AddTileMap::EntityUndoCmd_AddTileMap(ProjectItemData &entityItemRef, QUndoCommand *pParent /*= nullptr*/) :
-	m_EntityItemRef(entityItemRef),
-	m_pTileMapTreeItemData(nullptr)
-{
-	setText("Add New TileMap Layer");
-}
-
-/*virtual*/ EntityUndoCmd_AddTileMap::~EntityUndoCmd_AddTileMap()
-{
-}
-
-/*virtual*/ void EntityUndoCmd_AddTileMap::redo() /*override*/
-{
-}
-
-/*virtual*/ void EntityUndoCmd_AddTileMap::undo() /*override*/
-{
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

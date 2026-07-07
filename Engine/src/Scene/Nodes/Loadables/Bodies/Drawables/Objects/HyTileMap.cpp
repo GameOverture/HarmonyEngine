@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMap.h"
 
-HyTileMap::HyTileMap(HyEntity2d *pParent /*= nullptr*/) :
+HyTileMap::HyTileMap(std::string sTileSetName, HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_TileMap, HyNodePath(), pParent)
 {
 }

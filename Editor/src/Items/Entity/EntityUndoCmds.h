@@ -13,6 +13,7 @@
 #include "EntityModel.h"
 #include "PropertiesUndoCmd.h"
 #include "EntityItemMimeData.h"
+#include "AtlasTileSet.h"
 
 #include <QUndoCommand>
 
@@ -57,6 +58,22 @@ class EntityUndoCmd_AddChildren : public QUndoCommand
 public:
 	EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_AddChildren();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class EntityUndoCmd_AddTileMap : public QUndoCommand
+{
+	ProjectItemData &				m_EntityItemRef;
+	AtlasTileSet *					m_pTileSetAsset;
+	EntityTreeItemData *			m_pTileMapTreeItemData;
+
+public:
+	EntityUndoCmd_AddTileMap(ProjectItemData &entityItemRef, AtlasTileSet *pTileSetAsset, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_AddTileMap();
 
 	virtual void redo() override;
 	virtual void undo() override;
@@ -169,21 +186,6 @@ class EntityUndoCmd_Transform : public QUndoCommand
 public:
 	EntityUndoCmd_Transform(ProjectItemData &entityItemRef, int iStateIndex, int iFrameIndex, const QList<EntityTreeItemData *> &affectedItemDataList, const QList<glm::mat4> &newTransformList, const QList<glm::mat4> &oldTransformList, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_Transform();
-
-	virtual void redo() override;
-	virtual void undo() override;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class EntityUndoCmd_AddTileMap : public QUndoCommand
-{
-	ProjectItemData &				m_EntityItemRef;
-	EntityTreeItemData *			m_pTileMapTreeItemData;
-
-public:
-	EntityUndoCmd_AddTileMap(ProjectItemData &entityItemRef, QUndoCommand *pParent = nullptr);
-	virtual ~EntityUndoCmd_AddTileMap();
 
 	virtual void redo() override;
 	virtual void undo() override;

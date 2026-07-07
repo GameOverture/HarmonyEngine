@@ -92,6 +92,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Assets/Nodes/Objects/HySpriteData.cpp
 	src/Assets/Nodes/Objects/HyTextData.cpp
 	src/Assets/Nodes/Objects/HyTexturedQuadData.cpp
+	src/Assets/Nodes/Objects/HyTileSetData.cpp
 	src/Audio/HyAudioCore.cpp
 	src/Audio/HySoundAsset.cpp
 	src/Diagnostics/HyDiagnostics.cpp
@@ -231,6 +232,7 @@ set(HYENGINE_HEADER_FILES
 	include/Assets/Nodes/Objects/HySpriteData.h
 	include/Assets/Nodes/Objects/HyTextData.h
 	include/Assets/Nodes/Objects/HyTexturedQuadData.h
+	include/Assets/Nodes/Objects/HyTileSetData.h
 	include/Audio/HyAudioCore.h
 	include/Audio/HySoundAsset.h
 	include/Diagnostics/HyDiagnostics.h

@@ -27,6 +27,8 @@
 #define HYASSETS_AudioDir "Audio/"
 #define HYASSETS_SpineDir "Spine/"
 
+#define HYASSETS_TileSetBankId 0xEFFFFFFF
+
 class HyAudioCore;
 class HyScene;
 class IHyRenderer;

@@ -886,10 +886,6 @@ void ManagerWidget::OnContextMenu(const QPoint &pos)
 
 void ManagerWidget::OnAssetTreeSelectionChanged(const QModelIndex &current, const QModelIndex &previous)
 {
-	// Call `IWidget::OnUpdateActions()` on the currently open project item
-	ProjectItemData *pCurrentOpenItem = m_pModel->GetProjOwner().GetCurrentOpenItem();
-	if(pCurrentOpenItem && pCurrentOpenItem->GetWidget())
-		pCurrentOpenItem->GetWidget()->OnUpdateActions();
 }
 
 void ManagerWidget::on_assetTree_pressed(const QModelIndex &index)
@@ -911,6 +907,11 @@ void ManagerWidget::on_assetTree_pressed(const QModelIndex &index)
 	}
 	else
 		MainWindow::HideAuxWidget(AUXTAB_TileSet);
+
+	// Call `IWidget::OnUpdateActions()` on the currently open project item
+	ProjectItemData *pCurrentOpenItem = m_pModel->GetProjOwner().GetCurrentOpenItem();
+	if(pCurrentOpenItem && pCurrentOpenItem->GetWidget())
+		pCurrentOpenItem->GetWidget()->OnUpdateActions();
 }
 
 void ManagerWidget::on_assetTree_doubleClicked(const QModelIndex &index)

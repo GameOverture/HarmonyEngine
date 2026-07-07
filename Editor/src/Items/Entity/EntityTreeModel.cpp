@@ -816,63 +816,6 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocChildTreeItem(ProjectItemData *pPr
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, pProjItem->GetType(), ENTTYPE_Item, pProjItem->GetUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
 
-	//// If pProjItem is a sub-entity, also create tree items for all of its children
-	//if(pProjItem->GetType() == ITEM_Entity)
-	//{
-	//	TreeModelItem *pCurParent = GetItem(FindIndex<EntityTreeItemData *>(pNewItem, 0));
-
-	//	FileDataPair entFileDataPair;
-	//	pProjItem->GetLatestFileData(entFileDataPair);
-	//	QJsonArray descChildList = entFileDataPair.m_Meta["descChildList"].toArray();
-	//	for(int i = 0; i < descChildList.size(); ++i)
-	//	{
-	//		if(descChildList[i].isObject())
-	//		{
-	//			QJsonObject childObj = descChildList[i].toObject();
-	//		}
-	//		else
-	//		{
-	//			QJsonArray childArray = descChildList[i].toArray();
-	//			for(int j = 0; j < childArray.size(); ++j)
-	//			{
-	//				QJsonObject childObj = childArray[j].toObject();
-	//			}
-	//		}
-
-	//		EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef,
-	//															  HyGlobal::GetEntityDeclType(childObj["declarationType"].toString()),
-	//															  childObj["codeName"].toString(),
-	//															  HyGlobal::GetTypeFromString(childObj["itemType"].toString()), ENTTYPE_Item, pProjItem->GetUuid(), QUuid::createUuid());
-	//		InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pCurParent, iRow);
-	//	}
-
-	//	QStack<ProjectItemData *> projItemStack;
-	//	for(ProjectItemData *pProjItem : projItemList)
-	//		projItemStack.push_back(pProjItem);
-
-	//	while(projItemStack.empty() == false)
-	//	{
-	//		ProjectItemData *pProjItem = projItemStack.pop();
-
-	//		if(pProjItem->GetType() == ITEM_Entity)
-	//		{
-	//			// Exhaustively add all sub-entity children (and children's children)
-	//			pProjItem->GetLatestFileData(entFileDataPair);
-
-	//			QJsonArray descChildList = entFileDataPair.m_Meta["descChildList"].toArray();
-	//			for(int i = 0; i < descChildList.size(); ++i)
-	//			{
-	//				QUuid nestedChildUuid(descChildList[i].toObject()["itemUUID"].toString());
-	//				projItemStack.push_back(static_cast<ProjectItemData *>(m_ItemRef.GetProject().FindItemData(nestedChildUuid)));
-	//			}
-	//		}
-	//	}
-	//}
-
-
-
-
-
 	return pNewItem;
 }
 
@@ -892,6 +835,16 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocAssetTreeItem(IAssetItemData *pAss
 	}
 	QUuid assetUuid = pAssetItem->GetUuid();
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, eItemType, ENTTYPE_Item, assetUuid, QUuid::createUuid());
+	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
+
+	return pNewItem;
+}
+
+EntityTreeItemData *EntityTreeModel::Cmd_AllocTileMapTreeItem(AtlasTileSet *pTileSet, QString sCodeNamePrefix, int iRow /*= -1*/)
+{
+	// Generate a unique code name for this new item
+	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pTileSet->GetName());
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, ITEM_TileMap, ENTTYPE_Item, pTileSet->GetUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
 
 	return pNewItem;

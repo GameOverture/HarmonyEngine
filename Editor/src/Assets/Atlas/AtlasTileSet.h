@@ -31,7 +31,7 @@ class AtlasTileSet : public AtlasFrame
 {
 	Q_OBJECT
 
-	FileDataPair				m_TileSetDataPair;				// The currently 'saved to disk' data of the TileSet
+	QJsonObject					m_TileSetMetaObj;				// The currently 'saved to disk' data of the TileSet
 	bool						m_bExistencePendingSave;
 	bool						m_bSubAtlasDirty;
 	
@@ -219,7 +219,7 @@ public:
 				 HyTextureInfo texInfo,
 				 quint16 uiW, quint16 uiH, quint16 uiX, quint16 uiY,
 				 int iTextureIndex,
-				 const FileDataPair &tileSetDataPair,
+				 const QJsonObject &tileSetMetaData,
 				 bool bIsPendingSave,
 				 uint uiErrors);
 	~AtlasTileSet();

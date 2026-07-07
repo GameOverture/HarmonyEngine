@@ -25,6 +25,8 @@ enum EditModeType
 	EDITMODETYPE_FixtureChain,
 	EDITMODETYPE_FixturePoint,
 
+	EDITMODETYPE_TileMap,
+
 	NUM_EDITMODETYPES
 };
 

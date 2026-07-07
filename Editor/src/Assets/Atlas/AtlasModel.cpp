@@ -28,25 +28,16 @@ AtlasModel::AtlasModel(Project &projRef) :
 	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0)
 {
 	QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));
-	QFile tileSetDataFile(m_DataDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_DataExt));
-	if(tileSetMetaFile.exists() == false && tileSetDataFile.exists() == false)
+	if(tileSetMetaFile.exists() == false)
 		WriteTileSetsToDisk();
 
 	if(tileSetMetaFile.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
 		QJsonDocument tileSetMetaDoc = QJsonDocument::fromJson(tileSetMetaFile.readAll());
-		m_TileSetsDataPair.m_Meta = tileSetMetaDoc.object();
+		m_TileSetsMeta = tileSetMetaDoc.object();
 	}
 	else
 		HyGuiLog("Failed to create or open tile set meta file: " + tileSetMetaFile.fileName(), LOGTYPE_Error);
-
-	if(tileSetDataFile.open(QIODevice::ReadOnly | QIODevice::Text))
-	{
-		QJsonDocument tileSetDataDoc = QJsonDocument::fromJson(tileSetDataFile.readAll());
-		m_TileSetsDataPair.m_Data = tileSetDataDoc.object();
-	}
-	else
-		HyGuiLog("Failed to create or open tile set data file: " + tileSetDataFile.fileName(), LOGTYPE_Error);
 }
 
 /*virtual*/ AtlasModel::~AtlasModel()
@@ -201,7 +192,7 @@ AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pPar
 												 -1,
 												-1,
 												-1,
-												FileDataPair(),
+												QJsonObject(),
 												true,
 												0);
 
@@ -213,14 +204,14 @@ AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pPar
 	return pNewTileSet;
 }
 
-bool AtlasModel::SaveTileSet(QUuid tileSetUuid, const FileDataPair &tileSetFileDataPairRef)
+bool AtlasModel::SaveTileSet(QUuid tileSetUuid, const QJsonObject &tileSetMetaDataRef)
 {
 	if(FlushRepack() == false)
 		return false;
 
-	QString sTileSetUuid = tileSetUuid.toString(QUuid::WithoutBraces);
-	m_TileSetsDataPair.m_Data.insert(sTileSetUuid, tileSetFileDataPairRef.m_Data);
-	m_TileSetsDataPair.m_Meta.insert(sTileSetUuid, tileSetFileDataPairRef.m_Meta);
+	QJsonObject metaTileSetsObjs = m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)].toObject();
+	metaTileSetsObjs.insert(tileSetUuid.toString(QUuid::WithoutBraces), tileSetMetaDataRef);
+	m_TileSetsMeta.insert(HyGlobal::ItemName(ITEM_AtlasTileSet, true), metaTileSetsObjs);
 
 	WriteTileSetsToDisk();
 	return true;
@@ -234,10 +225,13 @@ void AtlasModel::WriteTileSetsToDisk()
 		HyGuiLog("Couldn't open TileSet meta file for writing: " % tileSetMetaFile.errorString(), LOGTYPE_Error);
 	else
 	{
-		m_TileSetsDataPair.m_Meta.insert("$fileVersion", HYGUI_FILE_VERSION);
+		if(m_TileSetsMeta.contains(HyGlobal::ItemName(ITEM_AtlasTileSet, true)) == false)
+			m_TileSetsMeta.insert(HyGlobal::ItemName(ITEM_AtlasTileSet, true), QJsonObject());
+
+		m_TileSetsMeta.insert("$fileVersion", HYGUI_FILE_VERSION);
 
 		QJsonDocument metaDoc;
-		metaDoc.setObject(m_TileSetsDataPair.m_Meta);
+		metaDoc.setObject(m_TileSetsMeta);
 
 //#ifdef HYGUI_UseBinaryMetaFiles
 //		qint64 iBytesWritten = tileSetMetaFile.write(metaDoc.toBinaryData());
@@ -248,22 +242,6 @@ void AtlasModel::WriteTileSetsToDisk()
 			HyGuiLog("Could not write to meta data file: " % tileSetMetaFile.errorString(), LOGTYPE_Error);
 
 		tileSetMetaFile.close();
-	}
-
-	// Save Runtime Data
-	QFile tileSetDataFile(m_DataDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_DataExt));
-	if(!tileSetDataFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-		HyGuiLog("Couldn't open TileSet data file for writing: " % tileSetDataFile.errorString(), LOGTYPE_Error);
-	else
-	{
-		m_TileSetsDataPair.m_Data.insert("$fileVersion", HYGUI_FILE_VERSION);
-
-		QJsonDocument dataDoc;
-		dataDoc.setObject(m_TileSetsDataPair.m_Data);
-		qint64 iBytesWritten = tileSetDataFile.write(dataDoc.toJson());
-		if(0 == iBytesWritten || -1 == iBytesWritten)
-			HyGuiLog("Could not write to data file: " % tileSetDataFile.errorString(), LOGTYPE_Error);
-		tileSetDataFile.close();
 	}
 }
 
@@ -448,9 +426,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	}
 	else if(eAssetItemType == ITEM_AtlasTileSet)
 	{
-		FileDataPair tileSetFileDataPair;
-		tileSetFileDataPair.m_Data = m_TileSetsDataPair.m_Data[metaObj["assetUUID"].toString()].toObject();
-		tileSetFileDataPair.m_Meta = m_TileSetsDataPair.m_Meta[metaObj["assetUUID"].toString()].toObject();
+		QJsonObject tileSetMetaObj = m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)].toObject()[metaObj["assetUUID"].toString()].toObject();
 
 		AtlasTileSet *pNewTileSet = new AtlasTileSet(*this,
 													 QUuid(metaObj["assetUUID"].toString()),
@@ -463,7 +439,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 													 metaObj["x"].toInt(),
 													 metaObj["y"].toInt(),
 													 metaObj["textureIndex"].toInt(),
-													 tileSetFileDataPair,
+													 tileSetMetaObj,
 													 false,
 													 metaObj["errors"].toInt(0));
 		return pNewTileSet;
@@ -485,8 +461,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 			MainWindow::HideAuxWidget(AUXTAB_TileSet);
 
 			QString sTileSetUuid = pFrame->GetUuid().toString(QUuid::WithoutBraces);
-			m_TileSetsDataPair.m_Data.remove(sTileSetUuid);
-			m_TileSetsDataPair.m_Meta.remove(sTileSetUuid);
+			m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)].toObject().remove(sTileSetUuid);
 
 			WriteTileSetsToDisk();
 		}
@@ -758,14 +733,27 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 
 		banksArray.append(bankObj);
 	}
-	
-	// TileSets ///////////
-	QJsonArray tileSetsArray;
-	for(auto iter = m_TileSetsDataPair.m_Data.begin(); iter != m_TileSetsDataPair.m_Data.end(); ++iter)
-		tileSetsArray.append(iter.value());
 
 	dataObjRef.insert("banks", banksArray);
-	dataObjRef.insert("tileSets", tileSetsArray);
+
+	// TileSets ///////////
+	QJsonObject tileSetsMetaObjs = m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)].toObject();
+	QJsonArray tileSetTexturesArray;
+	for(QString sUuidKey : tileSetsMetaObjs.keys())
+	{
+		QJsonObject metaObj = tileSetsMetaObjs[sUuidKey].toObject();
+
+		QJsonObject runtimeTileSetObj;
+		runtimeTileSetObj.insert("name", metaObj["name"].toString());
+		HyTextureInfo texInfo(HYTEXFILTER_NEAREST, HYTEXTURE_Uncompressed, 4, HyTextureInfo::UNCOMPRESSEDFILE_RAW16);
+		runtimeTileSetObj.insert("textureInfo", QJsonValue(static_cast<qint64>(texInfo.GetBucketId())));
+		runtimeTileSetObj.insert("width", metaObj["atlasCols"]);
+		runtimeTileSetObj.insert("height", metaObj["atlasRows"]);
+		runtimeTileSetObj.insert("assets", QJsonArray());
+		
+		tileSetTexturesArray.append(runtimeTileSetObj);
+	}
+	dataObjRef.insert("tileSets", tileSetTexturesArray);
 }
 
 void AtlasModel::AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSet)

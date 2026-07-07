@@ -17,14 +17,18 @@
 #include <QJsonObject>
 #include <QDataStream>
 
+#define TILEDATA_INVALID_ATLASINDEX 0xFFFF
+
 class VectorModel;
 
 class TileData
 {
 	QUuid											m_Uuid;
+	uint16											m_uiAtlasIndex;			// The index location (row major) in the sub-atlas
 	QPoint											m_MetaGridPos;			// The user defined position in the grid when setting up the TileSet - and not its location on the sub-atlas texture
 
 	QPixmap											m_TilePixmap;
+	quint32											m_uiChecksum;
 	QPoint											m_TextureOffset;
 
 	bool 											m_bIsFlippedHorz;
@@ -38,16 +42,20 @@ class TileData
 	QUuid											m_TerrainSetUuid;		// The Terrain Set assigned to this tile
 	QMap<QUuid, QBitArray>							m_TerrainMap;			// Key: Terrain Uuid (NOT TERRAIN SET), Value: QBitArray(NUM_AUTOTILEPARTS)
 
-	QMap<QUuid, VectorModel *>					m_CollisionLayerMap;
+	QMap<QUuid, VectorModel *>						m_CollisionLayerMap;
 
 public:
 	TileData(QPoint metaGridPos, QPixmap tilePixmap);
 	TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap);
-	TileData(const TileData &other);
-	TileData &operator=(const TileData &other);
+	TileData(TileData &&other) noexcept;
+	TileData(const TileData &other) = delete;
+	TileData &operator=(const TileData &other) = delete;
 	~TileData();
 
 	QUuid GetUuid() const;
+
+	uint16 GetAtlasIndex() const;
+	void SetAtlasIndex(uint16 uiAtlasIndex);
 
 	QPoint GetMetaGridPos() const;
 	void SetMetaGridPos(QPoint metaGridPos);

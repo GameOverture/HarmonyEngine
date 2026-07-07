@@ -745,6 +745,9 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 			m_FilesMap[eFileType].m_uiNumFiles += texturesArray.Size();
 		}
 
+		HyJsonArray tileSetsArray = fileDoc["tileSets"].GetArray();
+		m_FilesMap[eFileType].m_uiNumFiles += tileSetsArray.Size();
+
 		m_FilesMap[eFileType].m_pFiles = reinterpret_cast<HyFileAtlas *>(HY_NEW unsigned char[sizeof(HyFileAtlas) * m_FilesMap[eFileType].m_uiNumFiles]);
 		HyFileAtlas *pAtlasWriteLocation = static_cast<HyFileAtlas *>(m_FilesMap[eFileType].m_pFiles);
 
@@ -779,6 +782,27 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 				++uiManifestIndex;
 			}
 		}
+		for(uint32 i = 0; i < tileSetsArray.Size(); ++i) // The runtime data textures, not the sub-atlases
+		{
+			HyAssert(uiManifestIndex < m_FilesMap[eFileType].m_uiNumFiles, "HyAssets::OnThreadInit instantiated too many atlases+tilesets");
+
+			HyJsonObj tileSetObj = tileSetsArray[i].GetObject();
+
+			HyTextureInfo texInfo(tileSetObj["textureInfo"].GetUint());
+			std::string sFilePath = tileSetObj["name"].GetString();
+			sFilePath += texInfo.GetFileExt();
+
+			new (pAtlasWriteLocation)HyFileAtlas(sFilePath,
+				HYASSETS_TileSetBankId,
+				i,
+				uiManifestIndex,
+				tileSetObj);
+
+			++pAtlasWriteLocation;
+			++uiManifestIndex;
+		}
+		
+
 		break; }
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -414,7 +414,7 @@ enum HyTextureFormat
 {
 	// NOTE: Order cannot change without editor version patcher update. New entires may append to this list
 	HYTEXTURE_Unknown = 255,
-	HYTEXTURE_Uncompressed = 0,		// Param1: num channels						Param2: disk file type (PNG, ...)
+	HYTEXTURE_Uncompressed = 0,		// Param1: num channels						Param2: disk file type (PNG, RAW8, RAW16)
 	HYTEXTURE_DXT,					// Param1: num channels						Param2: DXT format (1,3,5)
 	HYTEXTURE_ASTC,					// Param1: Block Size index (4x4 -> 12x12)	Param2: Color Profile (LDR linear, LDR sRGB, HDR RGB, HDR RGBA)
 
@@ -424,9 +424,11 @@ static_assert(HYNUM_TEXTUREFORMATS < 255, "HyTextureFormat cannot exceed 255 val
 
 struct HyTextureInfo
 {
-	enum UncompressedFileType
+	enum UncompressedFileType // NOTE: Uncompressed as it sits in VRAM, not the initial file read from disk
 	{
-		UNCOMPRESSEDFILE_PNG = 0
+		UNCOMPRESSEDFILE_PNG = 0,
+		UNCOMPRESSEDFILE_RAW8,
+		UNCOMPRESSEDFILE_RAW16,
 	};
 	uint8				m_uiFiltering;
 	uint8				m_uiFormat;

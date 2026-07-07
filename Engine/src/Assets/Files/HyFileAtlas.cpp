@@ -24,31 +24,35 @@ HyFileAtlas::HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexI
 	m_hTextureHandle(HY_UNUSED_HANDLE),
 	m_uiNUM_FRAMES(textureObj["assets"].GetArray().Size()),
 	m_pPixelData(nullptr),
-	m_uiPixelDataSize(0)
+	m_uiPixelDataSize(0),
+	m_pFrames(nullptr)
 {
-	m_pFrames = HY_NEW Frame[m_uiNUM_FRAMES];
-
-	HyJsonArray framesArrayRef = textureObj["assets"].GetArray();
-	for(uint32 k = 0; k < m_uiNUM_FRAMES; ++k)
+	if(m_uiNUM_FRAMES > 0)
 	{
-		HyJsonObj srcFrameObj = framesArrayRef[k].GetObject();
+		m_pFrames = HY_NEW Frame[m_uiNUM_FRAMES];
 
-		// NOTE: Masks are serialized in LEFT, TOP, RIGHT, BOTTOM order. Each value is uint16 bits.
+		HyJsonArray framesArrayRef = textureObj["assets"].GetArray();
+		for(uint32 k = 0; k < m_uiNUM_FRAMES; ++k)
+		{
+			HyJsonObj srcFrameObj = framesArrayRef[k].GetObject();
 
-		uint32 uiCropMaskHi = srcFrameObj["cropMaskHi"].GetUint();
-		uint32 uiCropMaskLo = srcFrameObj["cropMaskLo"].GetUint();
-		m_pFrames[k].m_uiCropMask = (static_cast<uint64>(uiCropMaskHi) << 32) | uiCropMaskLo;
+			// NOTE: Masks are serialized in LEFT, TOP, RIGHT, BOTTOM order. Each value is uint16 bits.
+
+			uint32 uiCropMaskHi = srcFrameObj["cropMaskHi"].GetUint();
+			uint32 uiCropMaskLo = srcFrameObj["cropMaskLo"].GetUint();
+			m_pFrames[k].m_uiCropMask = (static_cast<uint64>(uiCropMaskHi) << 32) | uiCropMaskLo;
 		
-		//m_pFrames[k].m_Rect.bottom = srcFrameObj["bottom"].GetUint();
-		//m_pFrames[k].m_Rect.right = srcFrameObj["right"].GetUint();
-		//m_pFrames[k].m_Rect.left = srcFrameObj["left"].GetUint();
-		//m_pFrames[k].m_Rect.top = srcFrameObj["top"].GetUint();
+			//m_pFrames[k].m_Rect.bottom = srcFrameObj["bottom"].GetUint();
+			//m_pFrames[k].m_Rect.right = srcFrameObj["right"].GetUint();
+			//m_pFrames[k].m_Rect.left = srcFrameObj["left"].GetUint();
+			//m_pFrames[k].m_Rect.top = srcFrameObj["top"].GetUint();
 
-		uint32 uiFrameMaskHi = srcFrameObj["frameMaskHi"].GetUint();
-		uint32 uiFrameMaskLo = srcFrameObj["frameMaskLo"].GetUint();
-		m_pFrames[k].m_uiFrameMask = (static_cast<uint64>(uiFrameMaskHi) << 32) | uiFrameMaskLo;
+			uint32 uiFrameMaskHi = srcFrameObj["frameMaskHi"].GetUint();
+			uint32 uiFrameMaskLo = srcFrameObj["frameMaskLo"].GetUint();
+			m_pFrames[k].m_uiFrameMask = (static_cast<uint64>(uiFrameMaskHi) << 32) | uiFrameMaskLo;
 
-		m_ChecksumMap[srcFrameObj["checksum"].GetUint()] = &m_pFrames[k];
+			m_ChecksumMap[srcFrameObj["checksum"].GetUint()] = &m_pFrames[k];
+		}
 	}
 }
 
@@ -162,10 +166,15 @@ void HyFileAtlas::DeletePixelData()
 		std::string sAtlasFilePath;
 		if(IsAuxiliary() == false)//m_iWidth != 0 && m_iHeight != 0)
 		{
-			char szTmpBuffer[16];
 			sAtlasFilePath = HyEngine::DataDir() + HYASSETS_AtlasDir;
-			sprintf(szTmpBuffer, "%05d", m_uiBANK_ID);
-			sAtlasFilePath += szTmpBuffer;
+			if(m_uiBANK_ID == HYASSETS_TileSetBankId)
+				sAtlasFilePath += "TileSets";
+			else
+			{
+				char szTmpBuffer[16];
+				sprintf(szTmpBuffer, "%05d", m_uiBANK_ID);
+				sAtlasFilePath += szTmpBuffer;
+			}
 			sAtlasFilePath += "/";
 			sAtlasFilePath += m_sFILE_NAME;
 		}

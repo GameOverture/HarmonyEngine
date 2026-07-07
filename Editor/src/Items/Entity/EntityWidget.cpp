@@ -21,6 +21,7 @@
 #include "AuxDopeSheet.h"
 #include "PropertiesTreeMultiModel.h"
 #include "DlgSetUiPanel.h"
+#include "ManagerWidget.h"
 
 #include <QClipboard>
 #include <QShortcut>
@@ -193,6 +194,12 @@ EntityWidget::~EntityWidget()
 	ui->actionAddChildren->setEnabled(bEnableAddNodeBtn);
 	if(iNumValidItems != 1)
 		eSelectedSingleItemType = ITEM_None;
+
+	// Only enable actionAddTileMap if a single TileSet is selected in the Atlas Manager
+	QList<IAssetItemData *> selectedAssets;
+	QList<TreeModelItemData *> selectedFilters;
+	m_ItemRef.GetProject().GetAtlasWidget()->GetSelected(selectedAssets, selectedFilters, false);
+	ui->actionAddTileMap->setEnabled(selectedFilters.isEmpty() && selectedAssets.size() == 1 && selectedAssets[0]->GetType() == ITEM_AtlasTileSet);
 
 	// Manage currently selected items in the item tree
 	bool bAllowEditMode = false;
@@ -869,7 +876,17 @@ void EntityWidget::on_actionAddChildren_triggered()
 
 void EntityWidget::on_actionAddTileMap_triggered()
 {
-
+	QList<IAssetItemData *> selectedAssets;
+	QList<TreeModelItemData *> selectedFilters;
+	m_ItemRef.GetProject().GetAtlasWidget()->GetSelected(selectedAssets, selectedFilters, false);
+	if(selectedFilters.isEmpty() == false || selectedAssets.size() != 1 || selectedAssets[0]->GetType() != ITEM_AtlasTileSet)
+	{
+		HyGuiLog("Currently selected asset item(s) in Atlas manager is not a Tile Set. Cannot create Tile Map.", LOGTYPE_Error);
+		return;
+	}
+	
+	QUndoCommand *pCmd = new EntityUndoCmd_AddTileMap(m_ItemRef, static_cast<AtlasTileSet *>(selectedAssets[0]));
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::on_actionAddPrimitive_triggered()

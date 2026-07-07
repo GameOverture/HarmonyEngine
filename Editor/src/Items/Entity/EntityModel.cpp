@@ -251,6 +251,26 @@ QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewAssets(QList<IAssetItemDat
 	return treeNodeList;
 }
 
+EntityTreeItemData *EntityModel::Cmd_CreateTileMap(AtlasTileSet *pTileSet, int iRow)
+{
+	EntityTreeItemData *pAddedTileMap = m_TreeModel.Cmd_AllocTileMapTreeItem(pTileSet, "m_", iRow);
+	if(pAddedTileMap == nullptr)
+	{
+		HyGuiLog("EntityModel::Cmd_CreateTileMap could not insert a tile map with tile set: " % pTileSet->GetName(), LOGTYPE_Error);
+		return nullptr;
+	}
+
+	// NOTE: We register the tile map's dependency on the tile set. The entity will have a dependency on the tile map, which in turn has a dependency on the tile set.
+	QList<QUuid> registerList;
+	registerList.push_back(pTileSet->GetUuid());
+	m_ItemRef.GetProject().IncrementDependencies(pAddedTileMap, registerList);
+	registerList.clear();
+	registerList.push_back(pAddedTileMap->GetUuid());
+	m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, registerList);
+
+	return pAddedTileMap;
+}
+
 EntityTreeItemData *EntityModel::Cmd_AddExistingItem(QJsonObject descObj, EntityItemType eEntType, int iRow)
 {
 	EntityTreeItemData *pTreeItemData = m_TreeModel.Cmd_AllocExistingTreeItem(descObj, eEntType, iRow);

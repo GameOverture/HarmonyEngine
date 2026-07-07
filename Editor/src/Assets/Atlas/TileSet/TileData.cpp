@@ -12,10 +12,10 @@
 #include "VectorModel.h"
 
 #include <QBitArray>
-#
 
 TileData::TileData(QPoint metaGridPos, QPixmap tilePixmap) :
 	m_Uuid(QUuid::createUuid()),
+	m_uiAtlasIndex(TILEDATA_INVALID_ATLASINDEX),
 	m_MetaGridPos(metaGridPos),
 	m_TilePixmap(tilePixmap),
 	m_TextureOffset(0, 0),
@@ -24,12 +24,17 @@ TileData::TileData(QPoint metaGridPos, QPixmap tilePixmap) :
 	m_bIsRotated(false),
 	m_iProbability(100)
 {
+	// Create QImage with m_TilePixmap
+	QImage img = m_TilePixmap.toImage();
+	m_uiChecksum = HyGlobal::CRCData(0, img.bits(), img.sizeInBytes());
 }
 
 TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 	m_Uuid(QUuid(tileDataObj["UUID"].toString())),
+	m_uiAtlasIndex(static_cast<uint16>(tileDataObj["AtlasIndex"].toInt())),
 	m_MetaGridPos(QPoint(tileDataObj["MetaGridPosX"].toInt(), tileDataObj["MetaGridPosY"].toInt())),
 	m_TilePixmap(tilePixmap),
+	m_uiChecksum(JSONOBJ_TOINT(tileDataObj, "Checksum")),
 	m_TextureOffset(QPoint(tileDataObj["TextureOffsetX"].toInt(), tileDataObj["TextureOffsetY"].toInt())),
 	m_bIsFlippedHorz(tileDataObj["IsFlippedHorz"].toBool()),
 	m_bIsFlippedVert(tileDataObj["IsFlippedVert"].toBool()),
@@ -38,6 +43,11 @@ TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 	m_AnimationUuid(QUuid(tileDataObj["AnimationUUID"].toString())),
 	m_TerrainSetUuid(QUuid(tileDataObj["TerrainSetUUID"].toString()))
 {
+	QImage img = m_TilePixmap.toImage();
+	quint32 uiChecksumCheck = HyGlobal::CRCData(0, img.bits(), img.sizeInBytes());
+	//if(uiChecksumCheck != m_uiChecksum)
+	//	HyGuiLog("TileData::TileData(QJsonObject) invalid checksum given with tilePixmap", LOGTYPE_Error);
+
 	QJsonArray terrainArray = tileDataObj["TerrainMap"].toArray();
 	for(int i = 0; i < terrainArray.size(); ++i)
 	{
@@ -67,8 +77,12 @@ TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 	}
 }
 
-TileData::TileData(const TileData &other) :
-	m_TilePixmap(other.m_TilePixmap),
+TileData::TileData(TileData &&other) noexcept :
+	m_Uuid(other.m_Uuid),
+	m_uiAtlasIndex(other.m_uiAtlasIndex),
+	m_MetaGridPos(other.m_MetaGridPos),
+	m_TilePixmap(std::move(other.m_TilePixmap)),
+	m_uiChecksum(other.m_uiChecksum),
 	m_TextureOffset(other.m_TextureOffset),
 	m_bIsFlippedHorz(other.m_bIsFlippedHorz),
 	m_bIsFlippedVert(other.m_bIsFlippedVert),
@@ -76,29 +90,55 @@ TileData::TileData(const TileData &other) :
 	m_iProbability(other.m_iProbability),
 	m_AnimationUuid(other.m_AnimationUuid),
 	m_TerrainSetUuid(other.m_TerrainSetUuid),
-	m_TerrainMap(other.m_TerrainMap),
-	m_CollisionLayerMap(other.m_CollisionLayerMap)
+	m_TerrainMap(std::move(other.m_TerrainMap)),
+	m_CollisionLayerMap(std::move(other.m_CollisionLayerMap))
 {
+	other.m_Uuid = QUuid();
+	other.m_uiAtlasIndex = TILEDATA_INVALID_ATLASINDEX;
+	other.m_uiChecksum = 0;
+	other.m_bIsFlippedHorz = false;
+	other.m_bIsFlippedVert = false;
+	other.m_bIsRotated = false;
+	other.m_iProbability = 0;
+	HyGuiLog("TileData move ctor invoked", LOGTYPE_Warning); // Determining if this is ever called
 }
 
-TileData &TileData::operator=(const TileData &other)
-{
-	if(this == &other)
-		return *this;
-	
-	m_TilePixmap = other.m_TilePixmap;
-	m_TextureOffset = other.m_TextureOffset;
-	m_bIsFlippedHorz = other.m_bIsFlippedHorz;
-	m_bIsFlippedVert = other.m_bIsFlippedVert;
-	m_bIsRotated = other.m_bIsRotated;
-	m_iProbability = other.m_iProbability;
-	m_AnimationUuid = other.m_AnimationUuid;
-	m_TerrainSetUuid = other.m_TerrainSetUuid;
-	m_TerrainMap = other.m_TerrainMap;
-	m_CollisionLayerMap = other.m_CollisionLayerMap;
-
-	return *this;
-}
+//TileData::TileData(const TileData &other) :
+//	m_Uuid(QUuid::createUuid()),
+//	m_TilePixmap(other.m_TilePixmap),
+//	m_uiChecksum(other.m_uiChecksum),
+//	m_TextureOffset(other.m_TextureOffset),
+//	m_bIsFlippedHorz(other.m_bIsFlippedHorz),
+//	m_bIsFlippedVert(other.m_bIsFlippedVert),
+//	m_bIsRotated(other.m_bIsRotated),
+//	m_iProbability(other.m_iProbability),
+//	m_AnimationUuid(other.m_AnimationUuid),
+//	m_TerrainSetUuid(other.m_TerrainSetUuid),
+//	m_TerrainMap(other.m_TerrainMap),
+//	m_CollisionLayerMap(other.m_CollisionLayerMap)
+//{
+//	HyGuiLog("TileData copy ctor invoked", LOGTYPE_Warning); // Determining if this is ever called
+//}
+//
+//TileData &TileData::operator=(const TileData &other)
+//{
+//	if(this == &other)
+//		return *this;
+//	
+//	m_TilePixmap = other.m_TilePixmap;
+//	m_TextureOffset = other.m_TextureOffset;
+//	m_bIsFlippedHorz = other.m_bIsFlippedHorz;
+//	m_bIsFlippedVert = other.m_bIsFlippedVert;
+//	m_bIsRotated = other.m_bIsRotated;
+//	m_iProbability = other.m_iProbability;
+//	m_AnimationUuid = other.m_AnimationUuid;
+//	m_TerrainSetUuid = other.m_TerrainSetUuid;
+//	m_TerrainMap = other.m_TerrainMap;
+//	m_CollisionLayerMap = other.m_CollisionLayerMap;
+//
+//	HyGuiLog("TileData operator= invoked", LOGTYPE_Warning); // Determining if this is ever called
+//	return *this;
+//}
 
 TileData::~TileData()
 {
@@ -107,6 +147,16 @@ TileData::~TileData()
 QUuid TileData::GetUuid() const
 {
 	return m_Uuid;
+}
+
+uint16 TileData::GetAtlasIndex() const
+{
+	return m_uiAtlasIndex;
+}
+
+void TileData::SetAtlasIndex(uint16 uiAtlasIndex)
+{
+	m_uiAtlasIndex = uiAtlasIndex;
 }
 
 QPoint TileData::GetMetaGridPos() const
@@ -124,8 +174,10 @@ QJsonObject TileData::GetTileData() const
 	QJsonObject tileDataObjOut;
 
 	tileDataObjOut["UUID"] = m_Uuid.toString(QUuid::WithoutBraces);
+	tileDataObjOut["AtlasIndex"] = m_uiAtlasIndex;
 	tileDataObjOut["MetaGridPosX"] = m_MetaGridPos.x();
 	tileDataObjOut["MetaGridPosY"] = m_MetaGridPos.y();
+	tileDataObjOut["Checksum"] = QJsonValue(static_cast<qint64>(m_uiChecksum));
 	tileDataObjOut["TextureOffsetX"] = m_TextureOffset.x();
 	tileDataObjOut["TextureOffsetY"] = m_TextureOffset.y();
 	tileDataObjOut["IsFlippedHorz"] = m_bIsFlippedHorz;

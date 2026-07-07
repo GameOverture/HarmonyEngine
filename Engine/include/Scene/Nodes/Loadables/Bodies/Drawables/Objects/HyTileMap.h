@@ -34,7 +34,7 @@ protected:
 	std::vector<TileChunk>							m_ChunkList;
 
 public:
-	HyTileMap(HyEntity2d *pParent = nullptr);
+	HyTileMap(std::string sTileSetName, HyEntity2d *pParent = nullptr);
 	HyTileMap(const HyTileMap &copyRef);
 	virtual ~HyTileMap(void);
 

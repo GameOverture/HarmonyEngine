@@ -26,7 +26,7 @@ class AtlasModel : public IManagerModel
 	
 	HyTextureInfo						m_DefaultTextureInfo;
 	
-	FileDataPair						m_TileSetsDataPair;		// Holds the contents of TileSets.meta and TileSets.data
+	QJsonObject							m_TileSetsMeta;		// Holds the contents of TileSets.meta
 
 public:
 	AtlasModel(Project &projRef);
@@ -48,7 +48,7 @@ public:
 	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, ItemType eSubAtlasType);
 
 	AtlasTileSet *GenerateTileSet(QString sName, TreeModelItemData *pParentTreeItemData, quint32 uiBankId);
-	bool SaveTileSet(QUuid tileSetUuid, const FileDataPair &itemFileDataRef);
+	bool SaveTileSet(QUuid tileSetUuid, const QJsonObject &tileSetMetaDataRef);
 	void WriteTileSetsToDisk();
 
 	void OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *pFirstSelection);
