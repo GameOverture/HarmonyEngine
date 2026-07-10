@@ -19,6 +19,7 @@
 #include "WgtTileSetTerrain.h"
 #include "WgtTileSetCollision.h"
 #include "TileData.h"
+#include "PropertiesTreeMultiModel.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -30,6 +31,7 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::AuxTileSet),
 	m_pTileSet(nullptr),
+	m_pSetupPropertiesMultiModel(nullptr),
 	m_pSelectedAnimationWgt(nullptr),
 	m_pSelectedTerrainSetWgt(nullptr),
 	m_pSelectedTerrainWgt(nullptr),
@@ -254,11 +256,37 @@ void AuxTileSet::UpdateGfxItemSelection()
 	ui->btnConfirmAdd->setText("Import " % QString::number(m_pTileSet->GetGfxScene()->GetNumImportPixmaps()) % " Tiles");
 	ErrorCheckImport();
 
-	int iNumSetupSelected = m_pTileSet->GetGfxScene()->GetNumSetupSelected();
-	if(iNumSetupSelected == 1)
-		ui->lblArrangeSelectedTiles->setText(QString::number(iNumSetupSelected) % " Selected Tile");
+	QMap<TileData *, TileSetGfxItem *> selectedTilesMap = m_pTileSet->GetGfxScene()->GetSelectedSetupTiles();
+	int iNumSetupSelected = selectedTilesMap.size();
+	if(iNumSetupSelected == 0)
+	{
+		ui->lblSetupSelectedTiles->setText("No Selected Tiles");
+		ui->setupPropertyTree->setModel(nullptr);
+	}
+	else if(iNumSetupSelected == 1)
+	{
+		TileData *pTile = selectedTilesMap.firstKey();
+		ui->lblSetupSelectedTiles->setText(QString::number(iNumSetupSelected) % " Selected Tile");
+		//ui->lblSetupSelectedTiles->setText("Tile ID " % QString::number(pTile->GetTileId()) % " Selected");
+
+		ui->setupPropertyTree->setModel(pTile->GetSetupPropertiesModel());
+	}
 	else
-		ui->lblArrangeSelectedTiles->setText(QString::number(iNumSetupSelected) % " Selected Tiles");
+	{
+		if(iNumSetupSelected == m_pTileSet->GetNumTiles())
+			ui->lblSetupSelectedTiles->setText("All Tiles Selected");
+		else
+			ui->lblSetupSelectedTiles->setText(QString::number(iNumSetupSelected) % " Selected Tiles");
+
+		QList<PropertiesTreeModel *> multiModelList;
+		for(TileData *pTileData : selectedTilesMap.keys())
+			multiModelList.push_back(pTileData->GetSetupPropertiesModel());
+
+		delete m_pSetupPropertiesMultiModel;
+		m_pSetupPropertiesMultiModel = new PropertiesTreeMultiModel(nullptr, -1, 0, multiModelList, this);
+		ui->setupPropertyTree->setModel(m_pSetupPropertiesMultiModel);
+	}
+
 	ui->actionReplaceTiles->setEnabled(iNumSetupSelected > 0);
 	ui->actionRemoveTiles->setEnabled(iNumSetupSelected > 0);
 }

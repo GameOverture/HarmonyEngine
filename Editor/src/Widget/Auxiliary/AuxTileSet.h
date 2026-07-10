@@ -20,6 +20,7 @@ class WgtTileSetTerrainSet;
 class WgtTileSetTerrain;
 class WgtTileSetCollision;
 class TileData;
+class PropertiesTreeMultiModel;
 
 namespace Ui {
 class AuxTileSet;
@@ -32,6 +33,9 @@ class AuxTileSet : public QWidget
 	QTabBar *									m_pTabBar;
 
 	AtlasTileSet *								m_pTileSet;
+
+	PropertiesTreeMultiModel *					m_pSetupPropertiesMultiModel;
+
 	WgtTileSetAnimation *						m_pSelectedAnimationWgt;
 	WgtTileSetTerrainSet *						m_pSelectedTerrainSetWgt;
 	WgtTileSetTerrain *							m_pSelectedTerrainWgt;

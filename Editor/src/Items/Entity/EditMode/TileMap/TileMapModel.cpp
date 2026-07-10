@@ -68,6 +68,6 @@ TileMapModel::TileMapModel() :
 {
 }
 
-void TileMapModel::UpdateAtlasIndices(const std::vector<std::pair<uint16, uint16>> &modifiedIndexList)
+void TileMapModel::UpdateTileIds(const std::vector<std::pair<uint16, uint16>> &modifiedIndexList) // Pair<old, new>
 {
 }

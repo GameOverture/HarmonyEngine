@@ -19,6 +19,8 @@
 #include <QJsonObject>
 #include <QUndoStack>
 
+#define TILEDATA_INVALID_ID 0xFFFF
+
 #define NUM_COLS_TILESET(numTiles) static_cast<int>(std::floor(std::sqrt(numTiles)))
 #define NUM_ROWS_TILESET(numTiles, numCols) (static_cast<int>(numTiles) + static_cast<int>(numCols) - 1) / static_cast<int>(numCols);
 #define TILESET_TILE_PADDING 2 // Padding between tiles in the sub-atlas texture to avoid texture bleeding
@@ -52,15 +54,25 @@ class AtlasTileSet : public AtlasFrame
 		QUuid					m_uuid;
 		QString					m_sName;
 		HyColor					m_Color;
-		float					m_fFrameDuration; // In seconds
-		bool					m_bStartAtRandomFrame;
+		quint16					m_uiFrameDurationMs;
+		bool					m_bGlobalSync;
+		bool					m_bBounceAnim;	// AKA Ping-pong
+		bool					m_bReverseAnim;
+		bool					m_bLooping;
+		bool					m_bEnabled;
+		QUuid					m_StartingTileUuid;
+		QList<quint32>			m_TileChecksumList;	// Each frame's checksum
 
 		Animation(QString sName, HyColor color) :
 			m_uuid(QUuid::createUuid()),
 			m_sName(sName),
 			m_Color(color),
-			m_fFrameDuration(0.0333f),
-			m_bStartAtRandomFrame(false)
+			m_uiFrameDurationMs(33),
+			m_bGlobalSync(true),
+			m_bBounceAnim(false),
+			m_bReverseAnim(false),
+			m_bLooping(true),
+			m_bEnabled(true)
 		{
 		}
 		Animation(const QJsonObject &initObj)
@@ -68,8 +80,16 @@ class AtlasTileSet : public AtlasFrame
 			m_uuid = QUuid(initObj["UUID"].toString());
 			m_sName = initObj["name"].toString();
 			m_Color = HyColor(initObj["color"].toVariant().toLongLong());
-			m_fFrameDuration = static_cast<float>(initObj["frameDuration"].toDouble());
-			m_bStartAtRandomFrame = initObj["startAtRandomFrame"].toBool();
+			m_uiFrameDurationMs = initObj["frameDuration"].toInt();
+			m_bGlobalSync = initObj["globalSync"].toBool();
+			m_bBounceAnim = initObj["bounceAnim"].toBool();
+			m_bReverseAnim = initObj["reverseAnim"].toBool();
+			m_bLooping = initObj["looping"].toBool();
+			m_bEnabled = initObj["enabled"].toBool();
+			m_StartingTileUuid = QUuid(initObj["startingTile"].toString());
+			QJsonArray checksumArray = initObj["checksumFrames"].toArray();
+			for(QJsonValue checksumVal : checksumArray)
+				m_TileChecksumList.push_back(static_cast<quint32>(checksumVal.toVariant().toLongLong()));
 		}
 
 		QJsonObject ToJsonObject() const
@@ -78,12 +98,23 @@ class AtlasTileSet : public AtlasFrame
 			animationObj["UUID"] = m_uuid.toString(QUuid::WithoutBraces);
 			animationObj["name"] = m_sName;
 			animationObj["color"] = static_cast<qint64>(m_Color.GetAsHexCode());
-			animationObj["frameDuration"] = static_cast<double>(m_fFrameDuration);
-			animationObj["startAtRandomFrame"] = m_bStartAtRandomFrame;
+			animationObj["frameDuration"] = m_uiFrameDurationMs;
+			animationObj["globalSync"] = m_bGlobalSync;
+			animationObj["bounceAnim"] = m_bBounceAnim;
+			animationObj["reverseAnim"] = m_bReverseAnim;
+			animationObj["looping"] = m_bLooping;
+			animationObj["enabled"] = m_bEnabled;
+			animationObj["startingTile"] = m_StartingTileUuid.toString(QUuid::WithoutBraces);
+			QJsonArray checksumArray;
+			for(const quint32 &checksumRef : m_TileChecksumList)
+				checksumArray.append(static_cast<qint64>(checksumRef));
+			animationObj["checksumFrames"] = checksumArray;
+
 			return animationObj;
 		}
 	};
 	QList<Animation>			m_AnimationList;
+	QList<quint16>				m_AnimationStartingAtlasIndexList; // This is determined when the sub-atlas is generated
 
 	struct TerrainSet
 	{
@@ -203,11 +234,13 @@ class AtlasTileSet : public AtlasFrame
 	};
 	QList<CollisionLayer>		m_CollisionLayerList;
 
-	// Map of all imported TileData objects in this tile set
-	// Atlas Indices are row-major order
+	// Tile Image Indices are row-major order
 	// TileSet texture sub-atlas' rows and columns is made based on the total # of tiles
 	//     COLUMNS = static_cast<int>(std::floor(std::sqrt(n)))
 	//     ROWS    = static_cast<int>(std::ceil(static_cast<double>(n) / columns))
+	QMap<quint32, QPixmap>		m_TileImageMap;
+
+	// Tile IDs must be sequential with no gaps, as the ID is used to sample the row-major texel in the ShaderDescriptor data texture
 	QVector<TileData *>			m_TileDataList;
 
 public:
@@ -222,7 +255,7 @@ public:
 				 const QJsonObject &tileSetMetaData,
 				 bool bIsPendingSave,
 				 uint uiErrors);
-	~AtlasTileSet();
+	virtual ~AtlasTileSet();
 
 	int GetNumTiles() const;
 	
@@ -260,6 +293,8 @@ public:
 	TileData *FindTileData(QUuid uuid) const;
 	QVector<TileData *> GetTileDataList() const;
 
+	QPixmap GetTilePixmap(const TileData *pTile) const;
+
 	TileSetScene *GetGfxScene();
 
 	// Cmd functions are the only functions that change the data (via Undo/Redo)
@@ -271,13 +306,12 @@ public:
 	void Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj);
 	void Cmd_RemoveJsonItem(QUuid uuid);
 
-	//QAction *GetSaveAction();
 	QUndoStack *GetUndoStack();
 	QAction *GetUndoAction();
 	QAction *GetRedoAction();
 
 	void SetSubAtlasDirty();
-	void UpdateTileSetDataPair();
+	void UpdateTileSetMeta();
 	bool Save();
 	bool IsExistencePendingSave() const;
 	bool IsSaveClean() const;

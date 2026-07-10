@@ -38,7 +38,7 @@ public:
 	virtual QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
 	virtual void ClearAction() override;
 
-	void UpdateAtlasIndices(const std::vector<std::pair<uint16, uint16>> &modifiedIndexList);
+	void UpdateTileIds(const std::vector<std::pair<uint16, uint16>> &modifiedIndexList); // Pair<old, new>
 };
 
 #endif // TileMapModel_H

@@ -11,31 +11,22 @@
 #define TILEDATA_H
 
 #include "AtlasTileSet.h"
+#include "PropertiesTreeModel.h"
 
 #include <QWidget>
 #include <QSet>
 #include <QJsonObject>
 #include <QDataStream>
 
-#define TILEDATA_INVALID_ATLASINDEX 0xFFFF
-
 class VectorModel;
 
 class TileData
 {
 	QUuid											m_Uuid;
-	uint16											m_uiAtlasIndex;			// The index location (row major) in the sub-atlas
+	quint32											m_uiTileChecksum;
 	QPoint											m_MetaGridPos;			// The user defined position in the grid when setting up the TileSet - and not its location on the sub-atlas texture
 
-	QPixmap											m_TilePixmap;
-	quint32											m_uiChecksum;
-	QPoint											m_TextureOffset;
-
-	bool 											m_bIsFlippedHorz;
-	bool 											m_bIsFlippedVert;
-	bool 											m_bIsRotated;			// Transpose
-
-	int												m_iProbability;
+	PropertiesTreeModel *							m_pSetupPropertiesModel;
 
 	QUuid											m_AnimationUuid;
 
@@ -45,24 +36,28 @@ class TileData
 	QMap<QUuid, VectorModel *>						m_CollisionLayerMap;
 
 public:
-	TileData(QPoint metaGridPos, QPixmap tilePixmap);
-	TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap);
+	TileData(quint32 uiTileChecksum, QPoint metaGridPos);
+	TileData(const QJsonObject &tileDataObj);
 	TileData(TileData &&other) noexcept;
 	TileData(const TileData &other) = delete;
 	TileData &operator=(const TileData &other) = delete;
 	~TileData();
 
+	void InitPropertiesModel();
+
 	QUuid GetUuid() const;
 
-	uint16 GetAtlasIndex() const;
-	void SetAtlasIndex(uint16 uiAtlasIndex);
+	quint32 GetTileChecksum() const;
+
+	uint16 GetTileId() const;
+	void SetTileId(uint16 uiTileId);
 
 	QPoint GetMetaGridPos() const;
 	void SetMetaGridPos(QPoint metaGridPos);
 
 	QJsonObject GetTileData() const;
-	QPoint GetTextureOffset() const;
-	QPixmap GetPixmap() const;
+
+	PropertiesTreeModel *GetSetupPropertiesModel() const;
 
 	QUuid GetAnimation() const;
 	void SetAnimation(QUuid animationUuid);

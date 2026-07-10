@@ -33,7 +33,7 @@ EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &projItemRe
 }
 
 EntityPropertiesTreeMultiModel::EntityPropertiesTreeMultiModel(ProjectItemData &projItemRef, int iStateIndex, QVariant subState, QList<PropertiesTreeModel *> multiModelList, QObject *pParent /*= nullptr*/) :
-	PropertiesTreeMultiModel(projItemRef, iStateIndex, subState, multiModelList, pParent)
+	PropertiesTreeMultiModel(&projItemRef, iStateIndex, subState, multiModelList, pParent)
 {
 }
 

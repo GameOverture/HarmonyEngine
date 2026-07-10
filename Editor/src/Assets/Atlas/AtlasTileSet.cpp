@@ -46,27 +46,16 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 	m_bSubAtlasDirty(bIsPendingSave),
 	m_eTileShape(TILESETSHAPE_Unknown)
 {
-	//m_ActionSave.setIcon(QIcon(":/icons16x16/file-save.png"));
-	////m_ActionSave.setShortcuts(QKeySequence::Save);
-	////m_ActionSave.setShortcutContext(Qt::WidgetShortcut);
-	//m_ActionSave.setToolTip("Save Tile Set and pack into Atlas manager");
-	//m_ActionSave.setObjectName("Save");
-	//QObject::connect(&m_ActionSave, &QAction::triggered, this, &AtlasTileSet::on_actionSave_triggered);
-
 	m_pUndoStack = new QUndoStack(this);
 	m_pActionUndo = m_pUndoStack->createUndoAction(nullptr, "&Undo");
 	m_pActionUndo->setIcon(QIcon(":/icons16x16/edit-undo.png"));
-	//m_pActionUndo->setShortcuts(QKeySequence::Undo);
-	//m_pActionUndo->setShortcutContext(Qt::WidgetShortcut);
 	m_pActionUndo->setObjectName("Undo");
 	m_pActionRedo = m_pUndoStack->createRedoAction(nullptr, "&Redo");
 	m_pActionRedo->setIcon(QIcon(":/icons16x16/edit-redo.png"));
-	//m_pActionRedo->setShortcuts(QKeySequence::Redo);
-	//m_pActionRedo->setShortcutContext(Qt::WidgetShortcut);
 	m_pActionRedo->setObjectName("Redo");
 
 	// Initialize AtlasTileSet members with 'm_TileSetMetaObj'
-	if (m_TileSetMetaObj.empty() == false)
+	if(m_TileSetMetaObj.empty() == false)
 	{
 		m_eTileShape = HyGlobal::GetTileSetShapeFromString(m_TileSetMetaObj["tileShape"].toString());
 
@@ -83,7 +72,7 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 
 		QJsonArray animationArray = m_TileSetMetaObj["animations"].toArray();
 		m_AnimationList.reserve(animationArray.size());
-		for (int i = 0; i < animationArray.size(); ++i)
+		for(int i = 0; i < animationArray.size(); ++i)
 		{
 			QJsonObject animationObj = animationArray[i].toObject();
 			m_AnimationList.push_back(Animation(animationObj));
@@ -91,7 +80,7 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 
 		QJsonArray terrainSetArray = m_TileSetMetaObj["terrainSets"].toArray();
 		m_TerrainSetList.reserve(terrainSetArray.size());
-		for (int i = 0; i < terrainSetArray.size(); ++i)
+		for(int i = 0; i < terrainSetArray.size(); ++i)
 		{
 			QJsonObject terrainSetObj = terrainSetArray[i].toObject();
 			m_TerrainSetList.push_back(TerrainSet(terrainSetObj));
@@ -99,21 +88,19 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 
 		QJsonArray collisionLayerArray = m_TileSetMetaObj["collisionLayers"].toArray();
 		m_CollisionLayerList.reserve(collisionLayerArray.size());
-		for (int i = 0; i < collisionLayerArray.size(); ++i)
+		for(int i = 0; i < collisionLayerArray.size(); ++i)
 		{
 			QJsonObject collisionObj = collisionLayerArray[i].toObject();
 			m_CollisionLayerList.push_back(CollisionLayer(collisionObj));
 		}
 
-		QJsonArray tileArray = m_TileSetMetaObj["tileData"].toArray();
-
 		// Slice the pixmaps from the sub-atlas. The row-order of the pixmaps is aligned with m_TileDataList
-		QVector<QPixmap> pixmapList;
+		QJsonArray tileImagesArray = m_TileSetMetaObj["tileImages"].toArray();
 		QImage subAtlas(GetAbsMetaFilePath());
-		if (subAtlas.isNull() == false && tileArray.size() > 0)
+		if(subAtlas.isNull() == false && tileImagesArray.size() > 0)
 		{
-			const int iNUM_COLS = NUM_COLS_TILESET(tileArray.size());
-			for (int index = 0; index < tileArray.size(); ++index)
+			const int iNUM_COLS = NUM_COLS_TILESET(tileImagesArray.size());
+			for(int index = 0; index < tileImagesArray.size(); ++index)
 			{
 				int iCol = index % iNUM_COLS;
 				int iRow = index / iNUM_COLS;
@@ -122,21 +109,23 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 							   iRow * (m_RegionSize.height() + TILESET_TILE_PADDING),
 							   m_RegionSize.width(),
 							   m_RegionSize.height());
-				QPixmap tilePixmap = QPixmap::fromImage(subAtlas.copy(tileRect));
-				pixmapList.append(tilePixmap);
-			}
 
-			for (int i = 0; i < tileArray.size(); ++i)
-			{
-				QJsonObject tileObj = tileArray[i].toObject();
-				m_TileDataList.append(new TileData(tileObj, pixmapList[i]));
+				QImage tileImg = subAtlas.copy(tileRect);
+				quint32 uiChecksum = HyGlobal::CRCData(0, tileImg.bits(), tileImg.sizeInBytes());
+				m_TileImageMap.insert(uiChecksum, QPixmap::fromImage(tileImg));
 			}
 		}
-
-		if(m_TileDataList.size() != tileArray.size())
+		if(m_TileImageMap.size() != tileImagesArray.size())
 		{
 			SetError(ASSETERROR_CannotFindMetaFile);
 			HyGuiLog("AtlasTileSet::AtlasTileSet() - Tile data count mismatch for TileSet: " + GetName(), LOGTYPE_Error);
+		}
+
+		QJsonArray tileArray = m_TileSetMetaObj["tileData"].toArray();
+		for(int i = 0; i < tileArray.size(); ++i)
+		{
+			QJsonObject tileObj = tileArray[i].toObject();
+			m_TileDataList.append(new TileData(tileObj));
 		}
 
 		m_bSubAtlasDirty = false;
@@ -387,6 +376,11 @@ QVector<TileData *> AtlasTileSet::GetTileDataList() const
 	return m_TileDataList;
 }
 
+QPixmap AtlasTileSet::GetTilePixmap(const TileData *pTile) const
+{
+	return m_TileImageMap[pTile->GetTileChecksum()];
+}
+
 TileSetScene *AtlasTileSet::GetGfxScene()
 {
 	return &m_GfxScene;
@@ -456,11 +450,15 @@ QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vRegionS
 	{
 		QPoint newGridPos = it.key() + vGridOffset;
 
-		TileData *pTileData = new TileData(newGridPos, it.value());
+		QImage tileImg = it.value().toImage();
+		quint32 uiChecksum = HyGlobal::CRCData(0, tileImg.bits(), tileImg.sizeInBytes());
+		m_TileImageMap.insert(uiChecksum, it.value());
+
+		TileData *pTileData = new TileData(uiChecksum, newGridPos);
 		m_TileDataList.append(pTileData);
 		newTileDataList.push_back(QPair<QPoint, TileData *>(newGridPos, pTileData));
 
-		GetGfxScene()->AddTile(false, pTileData, GetTilePolygon(), pTileData->GetMetaGridPos(), pTileData->GetPixmap(), false);
+		GetGfxScene()->AddTile(false, pTileData, GetTilePolygon(), pTileData->GetMetaGridPos(), it.value(), false);
 	}
 
 	GetGfxScene()->ClearImportTiles();
@@ -627,11 +625,6 @@ QUndoStack *AtlasTileSet::GetUndoStack()
 	return m_pUndoStack;
 }
 
-//QAction *AtlasTileSet::GetSaveAction()
-//{
-//	return &m_ActionSave;
-//}
-
 QAction *AtlasTileSet::GetUndoAction()
 {
 	return m_pActionUndo;
@@ -660,7 +653,7 @@ void AtlasTileSet::SetSubAtlasDirty()
 	m_bSubAtlasDirty = true;
 }
 
-void AtlasTileSet::UpdateTileSetDataPair()
+void AtlasTileSet::UpdateTileSetMeta()
 {
 	// Start with blank
 	m_TileSetMetaObj = QJsonObject();
@@ -717,20 +710,44 @@ bool AtlasTileSet::Save()
 		return false;
 	}
 
+	// Update tile IDs is needed, and inform any TileMap of changes
+	uint16 uiTileId = 0;
+	std::vector<std::pair<uint16, uint16>> modifiedIdList; // pair<old, new>
+	for(TileData *pTileData : m_TileDataList)
+	{
+		if(pTileData->GetTileId() != uiTileId)
+		{
+			if(pTileData->GetTileId() != TILEDATA_INVALID_ID)
+				modifiedIdList.push_back(std::pair<uint16, uint16>(pTileData->GetTileId(), uiTileId));
+			pTileData->SetTileId(uiTileId);
+		}
+
+		uiTileId++;
+	}
+	for(TreeModelItemData *pTileMap : m_DependantMap.keys())
+	{
+		if(pTileMap->GetType() != ITEM_TileMap)
+			HyGuiLog("AtlasTileSet::RegenerateSubAtlas() - Dependent item is not a TileMap", LOGTYPE_Error);
+
+		static_cast<TileMapModel *>(static_cast<EntityTreeItemData *>(pTileMap)->GetEditModel())->UpdateTileIds(modifiedIdList);
+	}
+
+	// Regenerate Sub-Atlas if needed
 	if(m_bSubAtlasDirty)
 	{
 		if(RegenerateSubAtlas() == false)
 			return false;
 	}
 
+	// Lastly, update meta data
+	UpdateTileSetMeta();
+
 	m_bSubAtlasDirty = false;
 	m_bExistencePendingSave = false;
 	m_pUndoStack->setClean();
 
-	UpdateTileSetDataPair();
-
 	// Save the runtime tile data that will be uploaded as a texture to the graphics API
-	//asdf;
+	asdf;
 
 	return static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetMetaObj);
 }
@@ -811,27 +828,71 @@ void AtlasTileSet::UpdateTilePolygon()
 
 bool AtlasTileSet::RegenerateSubAtlas()
 {
-	if(m_TileDataList.isEmpty())
+	if(m_TileImageMap.isEmpty())
 		return true;
 
-	std::sort(m_TileDataList.begin(), m_TileDataList.end(),
-		[](TileData *pA, TileData *pB)
-		{
-			QUuid animA = pA->GetAnimation();
-			QUuid animB = pB->GetAnimation();
-			if(animA.isNull() == false && animB.isNull())
-				return true;
-			else if(animA.isNull() && animB.isNull() == false)
-				return false;
-			else if(animA.isNull() == false && animB.isNull() == false && animA != animB)
-				return animA.toString(QUuid::WithoutBraces) < animB.toString(QUuid::WithoutBraces);
+	QVector<quint32> tileChecksumList;	// All tiles checksums that will be drawn into the sub-atlas
 
-			return pA->GetMetaGridPos() < pB->GetMetaGridPos();
+	// Initialize m_AnimationStartingAtlasIndexList to hold all '0' and be the same length as m_AnimationList
+	m_AnimationStartingAtlasIndexList.fill(0, m_AnimationList.size());
+
+	// Tiles apart of Animations must occupy consecutive atlas tiles.
+	// First sort 'm_AnimationList' by the largest number of frames each animation has in descending order
+	std::sort(m_AnimationList.begin(), m_AnimationList.end(),
+		[](Animation &animA, Animation &animB)
+		{
+			return animA.m_TileChecksumList.size() > animB.m_TileChecksumList.size();
 		});
 
+	int iAnimIndex = 0;
+	for(Animation &anim : m_AnimationList)
+	{
+		// First try looking through 'tileChecksumList' to see if fully contains 'anim.m_TileChecksumList' and if so set 'StartingAtlasIndex' and don't append tile checksums
+		bool bFound = false;
+		for(int i = 0; i <= tileChecksumList.size() - anim.m_TileChecksumList.size(); ++i)
+		{
+			if(std::equal(anim.m_TileChecksumList.begin(), anim.m_TileChecksumList.end(), tileChecksumList.begin() + i))
+			{
+				m_AnimationStartingAtlasIndexList[iAnimIndex] = i;
+				iAnimIndex++;
+				bFound = true;
+				break;
+			}
+		}
+		if(bFound)
+			continue;
+
+		// Next try looking through 'tileChecksumList' if it contains a portion of 'anim.m_TileChecksumList' at the end and if so, append the remaining tile checksums to 'tileChecksumList' and set 'StartingAtlasIndex'
+		for(int i = 0; i < anim.m_TileChecksumList.size(); ++i)
+		{
+			if(std::equal(anim.m_TileChecksumList.begin(), anim.m_TileChecksumList.end() - i, tileChecksumList.end() - (anim.m_TileChecksumList.size() - i)))
+			{
+				m_AnimationStartingAtlasIndexList[iAnimIndex] = tileChecksumList.size() - (anim.m_TileChecksumList.size() - i);
+				iAnimIndex++;
+				tileChecksumList.append(anim.m_TileChecksumList.end() - i, anim.m_TileChecksumList.end());
+				bFound = true;
+				break;
+			}
+		}
+		if(bFound)
+			continue;
+		
+		// Not found in 'tileChecksumList', so append all tile checksums to 'tileChecksumList' and set 'StartingAtlasIndex'
+		m_AnimationStartingAtlasIndexList[iAnimIndex] = tileChecksumList.size();
+		iAnimIndex++;
+		tileChecksumList.append(anim.m_TileChecksumList.begin(), anim.m_TileChecksumList.end());
+	}
+
+	// Now go through 'm_TileImageMap' and append any tile not already found in 'tileChecksumList'
+	for(auto it = m_TileImageMap.begin(); it != m_TileImageMap.end(); ++it)
+	{
+		if(std::find(tileChecksumList.begin(), tileChecksumList.end(), it.key()) == tileChecksumList.end())
+			tileChecksumList.push_back(it.key());
+	}
+
 	// Create a texture with a size that will accommodate all the existing, and newly appended tiles
-	const int iNUM_COLS = NUM_COLS_TILESET(m_TileDataList.size());
-	const int iNUM_ROWS = NUM_ROWS_TILESET(m_TileDataList.size(), iNUM_COLS);
+	const int iNUM_COLS = NUM_COLS_TILESET(tileChecksumList.size());
+	const int iNUM_ROWS = NUM_ROWS_TILESET(tileChecksumList.size(), iNUM_COLS);
 
 	QImage newTexture(iNUM_COLS * (m_RegionSize.width() + TILESET_TILE_PADDING), iNUM_ROWS * (m_RegionSize.height() + TILESET_TILE_PADDING), QImage::Format_ARGB32);
 	newTexture.fill(Qt::transparent);
@@ -839,45 +900,25 @@ bool AtlasTileSet::RegenerateSubAtlas()
 	// Iterate through all the tiles and draw them to the blank newTexture
 	QPainter p(&newTexture);
 	int index = 0;
-	std::vector<std::pair<uint16, uint16>> modifiedIndexList;
-	for(auto it = m_TileDataList.begin(); it != m_TileDataList.end(); ++it, ++index)
+	for(auto it = tileChecksumList.begin(); it != tileChecksumList.end(); ++it, ++index)
 	{
-		TileData *pTile = *it;
-		if(pTile == nullptr)
-			continue;
-
-		if(pTile->GetAtlasIndex() != index)
-		{
-			if(pTile->GetAtlasIndex() != TILEDATA_INVALID_ATLASINDEX)
-				modifiedIndexList.push_back(std::pair<uint16, uint16>(pTile->GetAtlasIndex(), index));
-			pTile->SetAtlasIndex(index);
-		}
+		quint32 uiChecksum = *it;
+		QPixmap &pixmap = m_TileImageMap[uiChecksum];
 
 		int iCol = index % iNUM_COLS;
 		int iRow = index / iNUM_COLS;
 
 		QPoint destPos(iCol * (m_RegionSize.width() + TILESET_TILE_PADDING), iRow * (m_RegionSize.height() + TILESET_TILE_PADDING));
 		// If the pixmap's dimensions are smaller than the tile size, we need to center it
-		if(pTile->GetPixmap().width() < m_RegionSize.width() || pTile->GetPixmap().height() < m_RegionSize.height())
+		if(pixmap.width() < m_RegionSize.width() || pixmap.height() < m_RegionSize.height())
 		{
-			destPos.setX(destPos.x() + (m_RegionSize.width() - pTile->GetPixmap().width()) / 2);
-			destPos.setY(destPos.y() + (m_RegionSize.height() - pTile->GetPixmap().height()) / 2);
+			destPos.setX(destPos.x() + (m_RegionSize.width() - pixmap.width()) / 2);
+			destPos.setY(destPos.y() + (m_RegionSize.height() - pixmap.height()) / 2);
 		}
-		// Then apply the user specified texture offset property
-		QPoint vOffset = pTile->GetTextureOffset();
-		destPos += vOffset;
 		
-		p.drawPixmap(destPos, pTile->GetPixmap());
+		p.drawPixmap(destPos, pixmap);
 	}
 	p.end();
-
-	for(TreeModelItemData *pTileMap : m_DependantMap.keys())
-	{
-		if(pTileMap->GetType() != ITEM_TileMap)
-			HyGuiLog("AtlasTileSet::RegenerateSubAtlas() - Dependent item is not a TileMap", LOGTYPE_Error);
-
-		static_cast<TileMapModel *>(static_cast<EntityTreeItemData *>(pTileMap)->GetEditModel())->UpdateAtlasIndices(modifiedIndexList);
-	}
 
 	if(static_cast<AtlasModel &>(m_ModelRef).ReplaceFrame(this, GetName(), newTexture, ITEM_AtlasTileSet) == false)
 	{

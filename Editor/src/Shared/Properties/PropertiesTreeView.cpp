@@ -58,6 +58,8 @@ PropertiesTreeView::~PropertiesTreeView()
 		else
 			collapse(pPropModel->GetCategoryModelIndex(i));
 	}
+
+	resizeColumnToContents(0);
 }
 
 /*virtual*/ void PropertiesTreeView::paintEvent(QPaintEvent *pEvent) /*override*/

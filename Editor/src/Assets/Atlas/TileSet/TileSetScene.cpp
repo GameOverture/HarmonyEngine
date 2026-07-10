@@ -70,7 +70,7 @@ void TileSetScene::Initialize(AtlasTileSet *pTileSet)
 
 	QVector<TileData*> tileDataList = m_pTileSet->GetTileDataList();
 	for(int i = 0; i < tileDataList.size(); ++i)
-		AddTile(false, tileDataList[i], m_pTileSet->GetTilePolygon(), tileDataList[i]->GetMetaGridPos(), tileDataList[i]->GetPixmap(), false);
+		AddTile(false, tileDataList[i], m_pTileSet->GetTilePolygon(), tileDataList[i]->GetMetaGridPos(), m_pTileSet->GetTilePixmap(tileDataList[i]), false);
 }
 
 QGraphicsRectItem &TileSetScene::GetGfxBorderRect()
@@ -341,7 +341,7 @@ void TileSetScene::RefreshTiles(AuxTileSet &auxTileSetRef, QPointF vDragDelta /*
 		if (m_SetupTileMap.contains(tileDataList[i]) == false)
 		{
 			// TileData exists in TileSet but not in Scene, so add it
-			AddTile(false, tileDataList[i], m_pTileSet->GetTilePolygon(), tileDataList[i]->GetMetaGridPos(), tileDataList[i]->GetPixmap(), false);
+			AddTile(false, tileDataList[i], m_pTileSet->GetTilePolygon(), tileDataList[i]->GetMetaGridPos(), m_pTileSet->GetTilePixmap(tileDataList[i]), false);
 		}
 	}
 	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); )

@@ -13,40 +13,25 @@
 
 #include <QBitArray>
 
-TileData::TileData(QPoint metaGridPos, QPixmap tilePixmap) :
+TileData::TileData(quint32 uiTileChecksum, QPoint metaGridPos) :
 	m_Uuid(QUuid::createUuid()),
-	m_uiAtlasIndex(TILEDATA_INVALID_ATLASINDEX),
+	m_uiTileChecksum(uiTileChecksum),
 	m_MetaGridPos(metaGridPos),
-	m_TilePixmap(tilePixmap),
-	m_TextureOffset(0, 0),
-	m_bIsFlippedHorz(false),
-	m_bIsFlippedVert(false),
-	m_bIsRotated(false),
-	m_iProbability(100)
+	m_pSetupPropertiesModel(nullptr)
 {
-	// Create QImage with m_TilePixmap
-	QImage img = m_TilePixmap.toImage();
-	m_uiChecksum = HyGlobal::CRCData(0, img.bits(), img.sizeInBytes());
+	InitPropertiesModel();
 }
 
-TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
+TileData::TileData(const QJsonObject &tileDataObj) :
 	m_Uuid(QUuid(tileDataObj["UUID"].toString())),
-	m_uiAtlasIndex(static_cast<uint16>(tileDataObj["AtlasIndex"].toInt())),
+	m_uiTileChecksum(static_cast<quint32>(tileDataObj["TileChecksum"].toVariant().toLongLong())),
 	m_MetaGridPos(QPoint(tileDataObj["MetaGridPosX"].toInt(), tileDataObj["MetaGridPosY"].toInt())),
-	m_TilePixmap(tilePixmap),
-	m_uiChecksum(JSONOBJ_TOINT(tileDataObj, "Checksum")),
-	m_TextureOffset(QPoint(tileDataObj["TextureOffsetX"].toInt(), tileDataObj["TextureOffsetY"].toInt())),
-	m_bIsFlippedHorz(tileDataObj["IsFlippedHorz"].toBool()),
-	m_bIsFlippedVert(tileDataObj["IsFlippedVert"].toBool()),
-	m_bIsRotated(tileDataObj["IsRotated"].toBool()),
-	m_iProbability(tileDataObj["Probability"].toInt()),
+	m_pSetupPropertiesModel(nullptr),
 	m_AnimationUuid(QUuid(tileDataObj["AnimationUUID"].toString())),
 	m_TerrainSetUuid(QUuid(tileDataObj["TerrainSetUUID"].toString()))
 {
-	QImage img = m_TilePixmap.toImage();
-	quint32 uiChecksumCheck = HyGlobal::CRCData(0, img.bits(), img.sizeInBytes());
-	//if(uiChecksumCheck != m_uiChecksum)
-	//	HyGuiLog("TileData::TileData(QJsonObject) invalid checksum given with tilePixmap", LOGTYPE_Error);
+	InitPropertiesModel();
+	m_pSetupPropertiesModel->DeserializeJson(tileDataObj["SetupProperties"].toObject());
 
 	QJsonArray terrainArray = tileDataObj["TerrainMap"].toArray();
 	for(int i = 0; i < terrainArray.size(); ++i)
@@ -79,69 +64,49 @@ TileData::TileData(const QJsonObject &tileDataObj, QPixmap tilePixmap) :
 
 TileData::TileData(TileData &&other) noexcept :
 	m_Uuid(other.m_Uuid),
-	m_uiAtlasIndex(other.m_uiAtlasIndex),
+	m_uiTileChecksum(other.m_uiTileChecksum),
 	m_MetaGridPos(other.m_MetaGridPos),
-	m_TilePixmap(std::move(other.m_TilePixmap)),
-	m_uiChecksum(other.m_uiChecksum),
-	m_TextureOffset(other.m_TextureOffset),
-	m_bIsFlippedHorz(other.m_bIsFlippedHorz),
-	m_bIsFlippedVert(other.m_bIsFlippedVert),
-	m_bIsRotated(other.m_bIsRotated),
-	m_iProbability(other.m_iProbability),
+	m_pSetupPropertiesModel(nullptr),
 	m_AnimationUuid(other.m_AnimationUuid),
 	m_TerrainSetUuid(other.m_TerrainSetUuid),
 	m_TerrainMap(std::move(other.m_TerrainMap)),
 	m_CollisionLayerMap(std::move(other.m_CollisionLayerMap))
 {
+	PropertiesTreeModel *pOldPropModel = m_pSetupPropertiesModel;
+	InitPropertiesModel();
+	m_pSetupPropertiesModel->DeserializeJson(pOldPropModel->SerializeJson());
+	delete pOldPropModel;
+
 	other.m_Uuid = QUuid();
-	other.m_uiAtlasIndex = TILEDATA_INVALID_ATLASINDEX;
-	other.m_uiChecksum = 0;
-	other.m_bIsFlippedHorz = false;
-	other.m_bIsFlippedVert = false;
-	other.m_bIsRotated = false;
-	other.m_iProbability = 0;
+	other.m_uiTileChecksum = 0;
+
 	HyGuiLog("TileData move ctor invoked", LOGTYPE_Warning); // Determining if this is ever called
 }
 
-//TileData::TileData(const TileData &other) :
-//	m_Uuid(QUuid::createUuid()),
-//	m_TilePixmap(other.m_TilePixmap),
-//	m_uiChecksum(other.m_uiChecksum),
-//	m_TextureOffset(other.m_TextureOffset),
-//	m_bIsFlippedHorz(other.m_bIsFlippedHorz),
-//	m_bIsFlippedVert(other.m_bIsFlippedVert),
-//	m_bIsRotated(other.m_bIsRotated),
-//	m_iProbability(other.m_iProbability),
-//	m_AnimationUuid(other.m_AnimationUuid),
-//	m_TerrainSetUuid(other.m_TerrainSetUuid),
-//	m_TerrainMap(other.m_TerrainMap),
-//	m_CollisionLayerMap(other.m_CollisionLayerMap)
-//{
-//	HyGuiLog("TileData copy ctor invoked", LOGTYPE_Warning); // Determining if this is ever called
-//}
-//
-//TileData &TileData::operator=(const TileData &other)
-//{
-//	if(this == &other)
-//		return *this;
-//	
-//	m_TilePixmap = other.m_TilePixmap;
-//	m_TextureOffset = other.m_TextureOffset;
-//	m_bIsFlippedHorz = other.m_bIsFlippedHorz;
-//	m_bIsFlippedVert = other.m_bIsFlippedVert;
-//	m_bIsRotated = other.m_bIsRotated;
-//	m_iProbability = other.m_iProbability;
-//	m_AnimationUuid = other.m_AnimationUuid;
-//	m_TerrainSetUuid = other.m_TerrainSetUuid;
-//	m_TerrainMap = other.m_TerrainMap;
-//	m_CollisionLayerMap = other.m_CollisionLayerMap;
-//
-//	HyGuiLog("TileData operator= invoked", LOGTYPE_Warning); // Determining if this is ever called
-//	return *this;
-//}
-
 TileData::~TileData()
 {
+	delete m_pSetupPropertiesModel;
+}
+
+void TileData::InitPropertiesModel()
+{
+	m_pSetupPropertiesModel = new PropertiesTreeModel(nullptr, -1, QVariant());
+
+	m_pSetupPropertiesModel->InsertCategory(-1, "Info");
+	m_pSetupPropertiesModel->AppendProperty("Info", "Tile ID", PROPERTIESTYPE_int, TILEDATA_INVALID_ID, "This tile's assigned ID used in a TileMap. This ID may change when the TileSet's atlas is repacked, tiles are added/removed, or tile animations are set. Changed IDs will automatically update existing TileMaps", PROPERTIESACCESS_ReadOnly);
+	//m_pSetupPropertiesModel->AppendProperty("Info", "Tile Checksum", PROPERTIESTYPE_int, 0, "The tile's image checksum", PROPERTIESACCESS_ReadOnly); // The row-major index of the tile image packed in the sub-atlas. Tiles with duplicate images, or Tile Variants will share the same Atlas Index
+	m_pSetupPropertiesModel->AppendProperty("Info", "Is Variant Tile", PROPERTIESTYPE_bool, false, "False indicates this is a standard imported tile. If true, this tile references a standard imported tile but may have different properties set", PROPERTIESACCESS_ReadOnly);
+
+	m_pSetupPropertiesModel->InsertCategory(-1, "Rendering");
+	m_pSetupPropertiesModel->AppendProperty("Rendering", "Texture Origin Offset", PROPERTIESTYPE_ivec2, QPoint(0, 0), "Tiles are placed centered at their grid location. This property can be used to visually offset the tile", PROPERTIESACCESS_Mutable, 0, 0xFFFF, 1);
+	m_pSetupPropertiesModel->AppendProperty("Rendering", "Flip Horz", PROPERTIESTYPE_bool, false, "If true, the tile is flipped horizontally", PROPERTIESACCESS_Mutable);
+	m_pSetupPropertiesModel->AppendProperty("Rendering", "Flip Vert", PROPERTIESTYPE_bool, false, "If true, the tile is flipped vertically", PROPERTIESACCESS_Mutable);
+	m_pSetupPropertiesModel->AppendProperty("Rendering", "Transpose", PROPERTIESTYPE_bool, false, "If true, the tile is rotated 90 degrees counter-clockwise and then flipped vertically. If you want to roate a tile by 90 degrees clockwise without flipping it, you would enable both 'Flip Horz' and 'Transpose'. To rotate a tile by 180 degrees clockwise, enable 'Flip Horz' and 'Flip Vert'. To rotate a tile by 270 degrees clockwise, enable 'Flip Vert' and 'Transpose'", PROPERTIESACCESS_Mutable);
+	m_pSetupPropertiesModel->AppendProperty("Rendering", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this tile with", PROPERTIESACCESS_Mutable);
+	m_pSetupPropertiesModel->AppendProperty("Rendering", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this tile is", PROPERTIESACCESS_Mutable, 0.0, 1.0, 0.05);
+	
+	m_pSetupPropertiesModel->InsertCategory(-1, "Randomization");
+	m_pSetupPropertiesModel->AppendProperty("Randomization", "Probability", PROPERTIESTYPE_double, 1.0, "The relative probability of this tile appearing when painting with \"Place Random Tile\" enabled", PROPERTIESACCESS_Mutable, 0.0, 1.0, 0.05);
 }
 
 QUuid TileData::GetUuid() const
@@ -149,14 +114,19 @@ QUuid TileData::GetUuid() const
 	return m_Uuid;
 }
 
-uint16 TileData::GetAtlasIndex() const
+quint32 TileData::GetTileChecksum() const
 {
-	return m_uiAtlasIndex;
+	return m_uiTileChecksum;
 }
 
-void TileData::SetAtlasIndex(uint16 uiAtlasIndex)
+uint16 TileData::GetTileId() const
 {
-	m_uiAtlasIndex = uiAtlasIndex;
+	return static_cast<uint16>(m_pSetupPropertiesModel->FindPropertyValue("Info", "Tile ID").toInt());
+}
+
+void TileData::SetTileId(uint16 uiTileId)
+{
+	m_pSetupPropertiesModel->SetPropertyValue("Info", "Tile ID", QVariant(uiTileId));
 }
 
 QPoint TileData::GetMetaGridPos() const
@@ -174,17 +144,10 @@ QJsonObject TileData::GetTileData() const
 	QJsonObject tileDataObjOut;
 
 	tileDataObjOut["UUID"] = m_Uuid.toString(QUuid::WithoutBraces);
-	tileDataObjOut["AtlasIndex"] = m_uiAtlasIndex;
+	tileDataObjOut["TileChecksum"] = static_cast<qint64>(m_uiTileChecksum);
 	tileDataObjOut["MetaGridPosX"] = m_MetaGridPos.x();
 	tileDataObjOut["MetaGridPosY"] = m_MetaGridPos.y();
-	tileDataObjOut["Checksum"] = QJsonValue(static_cast<qint64>(m_uiChecksum));
-	tileDataObjOut["TextureOffsetX"] = m_TextureOffset.x();
-	tileDataObjOut["TextureOffsetY"] = m_TextureOffset.y();
-	tileDataObjOut["IsFlippedHorz"] = m_bIsFlippedHorz;
-	tileDataObjOut["IsFlippedVert"] = m_bIsFlippedVert;
-	tileDataObjOut["IsRotated"] = m_bIsRotated;
-	tileDataObjOut["Probability"] = m_iProbability;
-	
+	tileDataObjOut["SetupProperties"] = m_pSetupPropertiesModel->SerializeJson();
 	tileDataObjOut["AnimationUUID"] = m_AnimationUuid.toString(QUuid::WithoutBraces);
 	tileDataObjOut["TerrainSetUUID"] = m_TerrainSetUuid.toString(QUuid::WithoutBraces);
 	QJsonArray terrainMapArray;
@@ -224,14 +187,9 @@ QJsonObject TileData::GetTileData() const
 	return tileDataObjOut;
 }
 
-QPoint TileData::GetTextureOffset() const
+PropertiesTreeModel *TileData::GetSetupPropertiesModel() const
 {
-	return m_TextureOffset;
-}
-
-QPixmap TileData::GetPixmap() const
-{
-	return m_TilePixmap;
+	return m_pSetupPropertiesModel;
 }
 
 QUuid TileData::GetAnimation() const

@@ -27,7 +27,7 @@ class WgtTileSetAnimation : public IWgtTileSetItem
 
 	Ui::WgtTileSetAnimation *		ui;
 
-	QList<TileData *>				m_PreviewFrameList;
+	QList<quint32>					m_TileChecksumList;	// Each frame's checksum
 	QTimer *						m_pPreviewTimer;
 	int								m_iPreviewFrameIndex;
 
@@ -56,13 +56,21 @@ private Q_SLOTS:
 	void on_actionDownward_triggered();
 	void on_txtName_editingFinished();
 	void on_btnColor_clicked();
+	void on_sbNumFrames_valueChanged(int iNewValue);
+	void on_sbSeparation_valueChanged(int iNewValue);
+	void on_btnHz1_clicked();
 	void on_btnHz10_clicked();
 	void on_btnHz20_clicked();
 	void on_btnHz30_clicked();
 	void on_btnHz40_clicked();
+	void on_btnHz50_clicked();
 	void on_btnHz60_clicked();
-	void on_sbFrameRate_valueChanged(double dNewValue);
-	void on_chkStartRandom_toggled(bool bChecked);
+	void on_sbFrameDuration_valueChanged(int iNewValue);
+	void on_chkEnabled_toggled(bool bChecked);
+	void on_chkGlobalSync_toggled(bool bChecked);
+	void on_chkLoop_toggled(bool bChecked);
+	void on_chkReverse_toggled(bool bChecked);
+	void on_chkBounce_toggled(bool bChecked);
 };
 
 #endif // WgtTileSetAnimation_H
