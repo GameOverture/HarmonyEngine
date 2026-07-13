@@ -44,7 +44,8 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 	m_TileSetMetaObj(tileSetMetaData),
 	m_bExistencePendingSave(bIsPendingSave),
 	m_bSubAtlasDirty(bIsPendingSave),
-	m_eTileShape(TILESETSHAPE_Unknown)
+	m_eTileShape(TILESETSHAPE_Unknown),
+	m_iNumSubAtlasTiles(0)
 {
 	m_pUndoStack = new QUndoStack(this);
 	m_pActionUndo = m_pUndoStack->createUndoAction(nullptr, "&Undo");
@@ -95,12 +96,12 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 		}
 
 		// Slice the pixmaps from the sub-atlas. The row-order of the pixmaps is aligned with m_TileDataList
-		QJsonArray tileImagesArray = m_TileSetMetaObj["tileImages"].toArray();
+		m_iNumSubAtlasTiles = m_TileSetMetaObj["numSubAtlasTiles"].toInt();
 		QImage subAtlas(GetAbsMetaFilePath());
-		if(subAtlas.isNull() == false && tileImagesArray.size() > 0)
+		if(subAtlas.isNull() == false && m_iNumSubAtlasTiles > 0)
 		{
-			const int iNUM_COLS = NUM_COLS_TILESET(tileImagesArray.size());
-			for(int index = 0; index < tileImagesArray.size(); ++index)
+			const int iNUM_COLS = NUM_COLS_TILESET(m_iNumSubAtlasTiles);
+			for(int index = 0; index < m_iNumSubAtlasTiles; ++index)
 			{
 				int iCol = index % iNUM_COLS;
 				int iRow = index / iNUM_COLS;
@@ -115,7 +116,7 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 				m_TileImageMap.insert(uiChecksum, QPixmap::fromImage(tileImg));
 			}
 		}
-		if(m_TileImageMap.size() != tileImagesArray.size())
+		if(m_TileImageMap.size() != m_iNumSubAtlasTiles)
 		{
 			SetError(ASSETERROR_CannotFindMetaFile);
 			HyGuiLog("AtlasTileSet::AtlasTileSet() - Tile data count mismatch for TileSet: " + GetName(), LOGTYPE_Error);
@@ -378,7 +379,16 @@ QVector<TileData *> AtlasTileSet::GetTileDataList() const
 
 QPixmap AtlasTileSet::GetTilePixmap(const TileData *pTile) const
 {
+	if(m_TileImageMap.contains(pTile->GetTileChecksum()) == false)
+		HyGuiLog("AtlasTileSet::GetTilePixmap - Cannot find pixmap for tile: " % pTile->GetUuid().toString(), LOGTYPE_Error);
 	return m_TileImageMap[pTile->GetTileChecksum()];
+}
+
+QPixmap AtlasTileSet::GetTilePixmap(quint32 uiChecksum) const
+{
+	if(m_TileImageMap.contains(uiChecksum) == false)
+		HyGuiLog("AtlasTileSet::GetTilePixmap - Cannot find pixmap for tile checksum: " % QString::number(uiChecksum), LOGTYPE_Error);
+	return m_TileImageMap[uiChecksum];
 }
 
 TileSetScene *AtlasTileSet::GetGfxScene()
@@ -695,10 +705,7 @@ void AtlasTileSet::UpdateTileSetMeta()
 	}
 	m_TileSetMetaObj["tileData"] = tileArray;
 
-	int iNumCols = NUM_COLS_TILESET(m_TileDataList.size());
-	int iNumRows = NUM_ROWS_TILESET(m_TileDataList.size(), iNumCols);
-	m_TileSetMetaObj["atlasCols"] = iNumCols;
-	m_TileSetMetaObj["atlasRows"] = iNumRows;
+	m_TileSetMetaObj["numSubAtlasTiles"] = QJsonValue(m_iNumSubAtlasTiles);
 	m_TileSetMetaObj["name"] = GetName();
 }
 
@@ -747,7 +754,7 @@ bool AtlasTileSet::Save()
 	m_pUndoStack->setClean();
 
 	// Save the runtime tile data that will be uploaded as a texture to the graphics API
-	asdf;
+	//asdf;
 
 	return static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetMetaObj);
 }
@@ -831,7 +838,7 @@ bool AtlasTileSet::RegenerateSubAtlas()
 	if(m_TileImageMap.isEmpty())
 		return true;
 
-	QVector<quint32> tileChecksumList;	// All tiles checksums that will be drawn into the sub-atlas
+	QVector<quint32> tileChecksumList;	// All tiles checksums that will be drawn into the sub-atlas (it may contain duplicates)
 
 	// Initialize m_AnimationStartingAtlasIndexList to hold all '0' and be the same length as m_AnimationList
 	m_AnimationStartingAtlasIndexList.fill(0, m_AnimationList.size());
@@ -890,9 +897,11 @@ bool AtlasTileSet::RegenerateSubAtlas()
 			tileChecksumList.push_back(it.key());
 	}
 
+	m_iNumSubAtlasTiles = tileChecksumList.size();
+
 	// Create a texture with a size that will accommodate all the existing, and newly appended tiles
-	const int iNUM_COLS = NUM_COLS_TILESET(tileChecksumList.size());
-	const int iNUM_ROWS = NUM_ROWS_TILESET(tileChecksumList.size(), iNUM_COLS);
+	const int iNUM_COLS = NUM_COLS_TILESET(m_iNumSubAtlasTiles);
+	const int iNUM_ROWS = NUM_ROWS_TILESET(m_iNumSubAtlasTiles, iNUM_COLS);
 
 	QImage newTexture(iNUM_COLS * (m_RegionSize.width() + TILESET_TILE_PADDING), iNUM_ROWS * (m_RegionSize.height() + TILESET_TILE_PADDING), QImage::Format_ARGB32);
 	newTexture.fill(Qt::transparent);

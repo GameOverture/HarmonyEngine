@@ -27,7 +27,9 @@ class WgtTileSetAnimation : public IWgtTileSetItem
 
 	Ui::WgtTileSetAnimation *		ui;
 
-	QList<quint32>					m_TileChecksumList;	// Each frame's checksum
+	QList<quint32>					m_FramesChecksumList;	// Each frame's checksum
+	
+	QList<QPixmap>					m_PreviewFrameList;
 	QTimer *						m_pPreviewTimer;
 	int								m_iPreviewFrameIndex;
 
@@ -45,7 +47,12 @@ public:
 protected:
 	virtual QFrame *GetBorderFrame() const override;
 
+	void GatherFrames();
 	void RefreshPreview();
+
+	bool IsError();
+	void SetError(QString sMessage);
+	void ClearError();
 
 protected Q_SLOTS:
 	void OnPreviewUpdate();

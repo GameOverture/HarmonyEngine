@@ -624,7 +624,7 @@ void TileSetScene::DisplaceTiles(QPoint vGridDelta)
 	HyGuiLog("Number of displaced tiles: " % QString::number(displacedTileMap.size()), LOGTYPE_Info);
 
 	// For each tile in displacedTileMap, determine the best direction to displace/cascade that makes the least impact
-	// Skip over any selected tiles and animation tile positions since they are locked in place
+	// Skip over any selected tiles
 	for(auto iter = displacedTileMap.begin(); iter != displacedTileMap.end(); ++iter)
 	{
 		int iDirectionImpact[NUM_DIRECTIONS] = { 0, 0, 0, 0 };
@@ -645,7 +645,7 @@ void TileSetScene::DisplaceTiles(QPoint vGridDelta)
 					{
 						ptTestGridPos += directionVectors[i];
 
-						if (false == testIter.value()->IsSelected()) // TODO: Also test for animation tiles to skip over
+						if (false == testIter.value()->IsSelected())
 							iDirectionImpact[i]++;
 
 						bCollisionFound = true;
@@ -667,7 +667,7 @@ void TileSetScene::DisplaceTiles(QPoint vGridDelta)
 			}
 		}
 
-		// Move this tile in the best direction, skipping over any selected tiles and animation tile positions
+		// Move this tile in the best direction, skipping over any selected tiles
 		// Also cascade any newly displaced tiles in the best direction along the way while preserving their original order
 		QPair<TileData*, TileSetGfxItem*> curTile(iter.key(), iter.value());
 		QPoint ptTestGridPos = curTile.second->GetDraggingGridPos();
@@ -676,7 +676,6 @@ void TileSetScene::DisplaceTiles(QPoint vGridDelta)
 			ptTestGridPos += directionVectors[eBestDir];
 
 			// First check if this a skipped-over position collides with any other tile
-			// TODO: Also test for animation tiles to skip over
 			bool bSkipGridSpot = false;
 			for (auto skipIter = selectedTilesSet.begin(); skipIter != selectedTilesSet.end(); ++skipIter)
 			{

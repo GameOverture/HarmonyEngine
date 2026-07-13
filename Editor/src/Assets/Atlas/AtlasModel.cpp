@@ -461,7 +461,9 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 			MainWindow::HideAuxWidget(AUXTAB_TileSet);
 
 			QString sTileSetUuid = pFrame->GetUuid().toString(QUuid::WithoutBraces);
-			m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)].toObject().remove(sTileSetUuid);
+			QJsonObject tileSetsObj = m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)].toObject();
+			tileSetsObj.remove(sTileSetUuid);
+			m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)] = tileSetsObj;
 
 			WriteTileSetsToDisk();
 		}
@@ -747,8 +749,12 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 		runtimeTileSetObj.insert("name", metaObj["name"].toString());
 		HyTextureInfo texInfo(HYTEXFILTER_NEAREST, HYTEXTURE_Uncompressed, 4, HyTextureInfo::UNCOMPRESSEDFILE_RAW16);
 		runtimeTileSetObj.insert("textureInfo", QJsonValue(static_cast<qint64>(texInfo.GetBucketId())));
-		runtimeTileSetObj.insert("width", metaObj["atlasCols"]);
-		runtimeTileSetObj.insert("height", metaObj["atlasRows"]);
+
+		int iNumSubAtlasTiles = metaObj["numSubAtlasTiles"].toInt();
+		int iNumCols = NUM_COLS_TILESET(iNumSubAtlasTiles);
+		int iNumRows = NUM_ROWS_TILESET(iNumSubAtlasTiles, iNumCols);
+		runtimeTileSetObj.insert("width", iNumCols);
+		runtimeTileSetObj.insert("height", iNumRows);
 		runtimeTileSetObj.insert("assets", QJsonArray());
 		
 		tileSetTexturesArray.append(runtimeTileSetObj);
