@@ -12,6 +12,7 @@
 
 #include "Global.h"
 #include "IWgtTileSetItem.h"
+#include "AtlasTileSet.h"
 
 #include <QTimer>
 
@@ -27,7 +28,7 @@ class WgtTileSetAnimation : public IWgtTileSetItem
 
 	Ui::WgtTileSetAnimation *		ui;
 
-	QList<quint32>					m_FramesChecksumList;	// Each frame's checksum
+	QList<TileAnimation>			m_TileAnimList;
 	
 	QList<QPixmap>					m_PreviewFrameList;
 	QTimer *						m_pPreviewTimer;
@@ -43,11 +44,13 @@ public:
 	void SetOrderBtns(bool bUpEnabled, bool bDownEnabled);
 
 	QString GetName() const;
+	int GetSelectedFrameIndex() const;
+	void SetSelectedFrameIndex(int iFrameIndex);
 
 protected:
 	virtual QFrame *GetBorderFrame() const override;
 
-	void GatherFrames();
+	void ErrorCheckFrames();
 	void RefreshPreview();
 
 	bool IsError();
@@ -63,8 +66,11 @@ private Q_SLOTS:
 	void on_actionDownward_triggered();
 	void on_txtName_editingFinished();
 	void on_btnColor_clicked();
-	void on_sbNumFrames_valueChanged(int iNewValue);
-	void on_sbSeparation_valueChanged(int iNewValue);
+	void on_sbWidth_valueChanged(int iNewValue);
+	void on_sbHeight_valueChanged(int iNewValue);
+	void on_actionAddFrame_triggered();
+	void on_actionRemoveFrame_triggered();
+	void on_framesList_currentRowChanged(int iCurrentRow);
 	void on_btnHz1_clicked();
 	void on_btnHz10_clicked();
 	void on_btnHz20_clicked();

@@ -194,9 +194,10 @@ class TileSetUndoCmd_PaintAnimation : public QUndoCommand
 {
 	AuxTileSet &						m_AuxTileSetRef;
 	QUuid								m_AnimationUuid;
+	int									m_iFrameIndex;
 	bool								m_bLeftClick;
-	QList<TileData *>					m_PaintedMap;
-	QList<QUuid>						m_OriginalAnimationMap;
+	QList<TileData *>					m_PaintedList;
+	QList<QMap<QUuid, QList<int>>>		m_OriginalAnimationMapList;
 
 public:
 	TileSetUndoCmd_PaintAnimation(AuxTileSet &auxTileSetRef, bool bLeftClick, QList<TileData *> paintedTiles, QUndoCommand *pParent = nullptr);

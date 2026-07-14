@@ -595,11 +595,14 @@ TileSetUndoCmd_PaintAnimation::TileSetUndoCmd_PaintAnimation(AuxTileSet &auxTile
 	QUndoCommand(pParent),
 	m_AuxTileSetRef(auxTileSetRef),
 	m_AnimationUuid(auxTileSetRef.GetSelectedAnimation()),
+	m_iFrameIndex(auxTileSetRef.GetSelectedAnimationFrame()),
 	m_bLeftClick(bLeftClick),
-	m_PaintedMap(paintedTiles)
+	m_PaintedList(paintedTiles)
 {
 	if(m_AnimationUuid.isNull())
 		HyGuiLog("TileSetUndoCmd_PaintAnimation() - No animation selected, cannot paint animation.", LOGTYPE_Error);
+	if(m_iFrameIndex < 0)
+		HyGuiLog("TileSetUndoCmd_PaintAnimation() - Invalid frame index selected, cannot paint animation.", LOGTYPE_Error);
 
 	if(m_bLeftClick)
 		setText("Assign Tiles to Animation");
@@ -607,8 +610,8 @@ TileSetUndoCmd_PaintAnimation::TileSetUndoCmd_PaintAnimation(AuxTileSet &auxTile
 		setText("Remove Tiles from Animation");
 
 	// Copy current existing animation maps for undo
-	for(TileData *pTileData : m_PaintedMap)
-		m_OriginalAnimationMap.append(pTileData->GetAnimation());
+	for(TileData *pTileData : m_PaintedList)
+		m_OriginalAnimationMapList.push_back(pTileData->GetAnimationMap());
 }
 
 /*virtual*/ TileSetUndoCmd_PaintAnimation::~TileSetUndoCmd_PaintAnimation()
@@ -617,31 +620,35 @@ TileSetUndoCmd_PaintAnimation::TileSetUndoCmd_PaintAnimation(AuxTileSet &auxTile
 
 /*virtual*/ void TileSetUndoCmd_PaintAnimation::redo() /*override*/
 {
-	for(TileData *pTileData : m_PaintedMap)
+	for(TileData *pTileData : m_PaintedList)
 	{
 		if(m_bLeftClick)
 		{
-			for(int i = 0; i < m_PaintedMap.size(); ++i)
-				m_PaintedMap[i]->SetAnimation(m_AnimationUuid);
+			for(int i = 0; i < m_PaintedList.size(); ++i)
+				m_PaintedList[i]->SetAnimationFrame(m_AnimationUuid, m_iFrameIndex);
 		}
 		else
 		{
-			for(int i = 0; i < m_PaintedMap.size(); ++i)
-				m_PaintedMap[i]->SetAnimation(QUuid());
+			for(int i = 0; i < m_PaintedList.size(); ++i)
+				m_PaintedList[i]->RemoveAnimationFrame(m_AnimationUuid, m_iFrameIndex);
 		}
 	}
 	m_AuxTileSetRef.GetTileSet()->SetSubAtlasDirty();
 
 	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
+	m_AuxTileSetRef.SetSelectedAnimFrame(m_AnimationUuid, m_iFrameIndex);
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef);
 }
 
 /*virtual*/ void TileSetUndoCmd_PaintAnimation::undo() /*override*/
 {
-	for(int i = 0; i < m_PaintedMap.size(); ++i)
-		m_PaintedMap[i]->SetAnimation(m_OriginalAnimationMap[i]);
+	for(int i = 0; i < m_PaintedList.size(); ++i)
+		m_PaintedList[i]->SetAnimationMap(m_OriginalAnimationMapList[i]);
 	m_AuxTileSetRef.GetTileSet()->SetSubAtlasDirty();
 
 	m_AuxTileSetRef.SetCurrentPage(TILESETPAGE_Animation);
+	m_AuxTileSetRef.SetSelectedAnimFrame(m_AnimationUuid, m_iFrameIndex);
+	m_AuxTileSetRef.GetTileSet()->GetGfxScene()->RefreshTiles(m_AuxTileSetRef);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

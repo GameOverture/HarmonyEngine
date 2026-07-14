@@ -71,12 +71,12 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 
 		UpdateTilePolygon();
 
-		QJsonArray animationArray = m_TileSetMetaObj["animations"].toArray();
-		m_AnimationList.reserve(animationArray.size());
-		for(int i = 0; i < animationArray.size(); ++i)
+		QJsonArray animationSetsArray = m_TileSetMetaObj["animationSets"].toArray();
+		m_AnimationSetList.reserve(animationSetsArray.size());
+		for(int i = 0; i < animationSetsArray.size(); ++i)
 		{
-			QJsonObject animationObj = animationArray[i].toObject();
-			m_AnimationList.push_back(Animation(animationObj));
+			QJsonObject animationSetObj = animationSetsArray[i].toObject();
+			m_AnimationSetList.push_back(AnimationSet(animationSetObj));
 		}
 
 		QJsonArray terrainSetArray = m_TileSetMetaObj["terrainSets"].toArray();
@@ -240,7 +240,7 @@ QString AtlasTileSet::GetTileSetInfo() const
 
 /*static*/ QJsonObject AtlasTileSet::GenerateNewAnimationJsonObject(QString sName, HyColor color)
 {
-	Animation anim(sName, color);
+	AnimationSet anim(sName, color);
 	return anim.ToJsonObject();
 }
 
@@ -265,8 +265,8 @@ QString AtlasTileSet::GetTileSetInfo() const
 QVector<QJsonObject> AtlasTileSet::GetAnimations() const
 {
 	QVector<QJsonObject> animationObjList;
-	animationObjList.reserve(m_AnimationList.size());
-	for (const Animation &animation : m_AnimationList)
+	animationObjList.reserve(m_AnimationSetList.size());
+	for (const AnimationSet &animation : m_AnimationSetList)
 		animationObjList.push_back(animation.ToJsonObject());
 	return animationObjList;
 }
@@ -291,7 +291,7 @@ QVector<QJsonObject> AtlasTileSet::GetCollisionLayers() const
 
 QJsonObject AtlasTileSet::GetJsonItem(QUuid uuid) const
 {
-	for (const Animation &animation : m_AnimationList)
+	for (const AnimationSet &animation : m_AnimationSetList)
 	{
 		if (animation.m_uuid == uuid)
 			return animation.ToJsonObject();
@@ -318,7 +318,7 @@ QJsonObject AtlasTileSet::GetJsonItem(QUuid uuid) const
 
 HyColor AtlasTileSet::GetAnimationColor(QUuid animationUuid) const
 {
-	for(const Animation &animationRef : m_AnimationList)
+	for(const AnimationSet &animationRef : m_AnimationSetList)
 	{
 		if(animationRef.m_uuid == animationUuid)
 			return animationRef.m_Color;
@@ -523,7 +523,7 @@ void AtlasTileSet::Cmd_AllocateJsonItem(TileSetWgtType eType, QJsonObject data)
 	switch(eType)
 	{
 	case TILESETWGT_Animation:
-		m_AnimationList.push_back(Animation(data));
+		m_AnimationSetList.push_back(AnimationSet(data));
 		break;
 	case TILESETWGT_TerrainSet:
 		m_TerrainSetList.push_back(TerrainSet(data));
@@ -555,11 +555,11 @@ void AtlasTileSet::Cmd_AllocateJsonItem(TileSetWgtType eType, QJsonObject data)
 
 void AtlasTileSet::Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj)
 {
-	for(Animation &animationRef : m_AnimationList)
+	for(AnimationSet &animationRef : m_AnimationSetList)
 	{
 		if(animationRef.m_uuid == uuid)
 		{
-			animationRef = Animation(itemDataObj);
+			animationRef = AnimationSet(itemDataObj);
 			return;
 		}
 	}
@@ -594,11 +594,11 @@ void AtlasTileSet::Cmd_SetJsonItem(QUuid uuid, const QJsonObject &itemDataObj)
 
 void AtlasTileSet::Cmd_RemoveJsonItem(QUuid uuid)
 {
-	for(int i = 0; i < m_AnimationList.size(); ++i)
+	for(int i = 0; i < m_AnimationSetList.size(); ++i)
 	{
-		if(m_AnimationList[i].m_uuid == uuid)
+		if(m_AnimationSetList[i].m_uuid == uuid)
 		{
-			m_AnimationList.removeAt(i);
+			m_AnimationSetList.removeAt(i);
 			return;
 		}
 	}
@@ -673,13 +673,13 @@ void AtlasTileSet::UpdateTileSetMeta()
 	m_TileSetMetaObj["tileSize"] = QJsonArray() << QJsonValue(m_TileSize.width()) << QJsonValue(m_TileSize.height());
 	m_TileSetMetaObj["tileOffset"] = QJsonArray() << QJsonValue(m_TileOffset.x()) << QJsonValue(m_TileOffset.y());
 
-	QJsonArray animationArray;
-	for(int i = 0; i < m_AnimationList.size(); ++i)
+	QJsonArray animationSetArray;
+	for(int i = 0; i < m_AnimationSetList.size(); ++i)
 	{
-		QJsonObject animationObj = m_AnimationList[i].ToJsonObject();
-		animationArray.append(animationObj);
+		QJsonObject animationObj = m_AnimationSetList[i].ToJsonObject();
+		animationSetArray.append(animationObj);
 	}
-	m_TileSetMetaObj["animations"] = animationArray;
+	m_TileSetMetaObj["animationSets"] = animationSetArray;
 
 	QJsonArray terrainSetArray;
 	for(int i = 0; i < m_TerrainSetList.size(); ++i)
@@ -840,54 +840,51 @@ bool AtlasTileSet::RegenerateSubAtlas()
 
 	QVector<quint32> tileChecksumList;	// All tiles checksums that will be drawn into the sub-atlas (it may contain duplicates)
 
-	// Initialize m_AnimationStartingAtlasIndexList to hold all '0' and be the same length as m_AnimationList
-	m_AnimationStartingAtlasIndexList.fill(0, m_AnimationList.size());
-
 	// Tiles apart of Animations must occupy consecutive atlas tiles.
-	// First sort 'm_AnimationList' by the largest number of frames each animation has in descending order
-	std::sort(m_AnimationList.begin(), m_AnimationList.end(),
-		[](Animation &animA, Animation &animB)
-		{
-			return animA.m_TileChecksumList.size() > animB.m_TileChecksumList.size();
-		});
+	
+	//// First sort 'm_AnimationSetList' by the largest number of frames each animation has in descending order
+	//std::sort(m_AnimationSetList.begin(), m_AnimationSetList.end(),
+	//	[](AnimationSet &animA, AnimationSet &animB)
+	//	{
+	//		return animA. m_TileChecksumList.size() > animB.m_TileChecksumList.size();
+	//	});
 
-	int iAnimIndex = 0;
-	for(Animation &anim : m_AnimationList)
+	for(AnimationSet &animSet : m_AnimationSetList)
 	{
-		// First try looking through 'tileChecksumList' to see if fully contains 'anim.m_TileChecksumList' and if so set 'StartingAtlasIndex' and don't append tile checksums
-		bool bFound = false;
-		for(int i = 0; i <= tileChecksumList.size() - anim.m_TileChecksumList.size(); ++i)
+		for(TileAnimation &anim : animSet.m_AnimationList)
 		{
-			if(std::equal(anim.m_TileChecksumList.begin(), anim.m_TileChecksumList.end(), tileChecksumList.begin() + i))
+			// First try looking through 'tileChecksumList' to see if fully contains 'anim.m_TileChecksumList' and if so set 'StartingAtlasIndex' and don't append tile checksums
+			bool bFound = false;
+			for(int i = 0; i <= tileChecksumList.size() - anim.m_TileChecksumList.size(); ++i)
 			{
-				m_AnimationStartingAtlasIndexList[iAnimIndex] = i;
-				iAnimIndex++;
-				bFound = true;
-				break;
+				if(std::equal(anim.m_TileChecksumList.begin(), anim.m_TileChecksumList.end(), tileChecksumList.begin() + i))
+				{
+					anim.m_uiStartingAtlasIndex = i;
+					bFound = true;
+					break;
+				}
 			}
-		}
-		if(bFound)
-			continue;
+			if(bFound)
+				continue;
 
-		// Next try looking through 'tileChecksumList' if it contains a portion of 'anim.m_TileChecksumList' at the end and if so, append the remaining tile checksums to 'tileChecksumList' and set 'StartingAtlasIndex'
-		for(int i = 0; i < anim.m_TileChecksumList.size(); ++i)
-		{
-			if(std::equal(anim.m_TileChecksumList.begin(), anim.m_TileChecksumList.end() - i, tileChecksumList.end() - (anim.m_TileChecksumList.size() - i)))
+			// Next try looking through 'tileChecksumList' if it contains a portion of 'anim.m_TileChecksumList' at the end and if so, append the remaining tile checksums to 'tileChecksumList' and set 'StartingAtlasIndex'
+			for(int i = 0; i < anim.m_TileChecksumList.size(); ++i)
 			{
-				m_AnimationStartingAtlasIndexList[iAnimIndex] = tileChecksumList.size() - (anim.m_TileChecksumList.size() - i);
-				iAnimIndex++;
-				tileChecksumList.append(anim.m_TileChecksumList.end() - i, anim.m_TileChecksumList.end());
-				bFound = true;
-				break;
+				if(std::equal(anim.m_TileChecksumList.begin(), anim.m_TileChecksumList.end() - i, tileChecksumList.end() - (anim.m_TileChecksumList.size() - i)))
+				{
+					anim.m_uiStartingAtlasIndex = tileChecksumList.size() - (anim.m_TileChecksumList.size() - i);
+					tileChecksumList.append(anim.m_TileChecksumList.end() - i, anim.m_TileChecksumList.end());
+					bFound = true;
+					break;
+				}
 			}
-		}
-		if(bFound)
-			continue;
+			if(bFound)
+				continue;
 		
-		// Not found in 'tileChecksumList', so append all tile checksums to 'tileChecksumList' and set 'StartingAtlasIndex'
-		m_AnimationStartingAtlasIndexList[iAnimIndex] = tileChecksumList.size();
-		iAnimIndex++;
-		tileChecksumList.append(anim.m_TileChecksumList.begin(), anim.m_TileChecksumList.end());
+			// Not found in 'tileChecksumList', so append all tile checksums to 'tileChecksumList' and set 'StartingAtlasIndex'
+			anim.m_uiStartingAtlasIndex = tileChecksumList.size();
+			tileChecksumList.append(anim.m_TileChecksumList.begin(), anim.m_TileChecksumList.end());
+		}
 	}
 
 	// Now go through 'm_TileImageMap' and append any tile not already found in 'tileChecksumList'

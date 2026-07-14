@@ -180,11 +180,31 @@ void AuxTileSet::SetCurrentPage(TileSetPage ePage)
 	m_pTileSet->GetGfxScene()->RefreshTiles(*this);
 }
 
+void AuxTileSet::SetSelectedAnimFrame(QUuid animationUuid, int iFrameIndex)
+{
+	for (WgtTileSetAnimation *pAnimationWidget : m_AnimationList)
+	{
+		if(pAnimationWidget->GetUuid() == animationUuid)
+		{
+			MakeSelectionChange(pAnimationWidget);
+			pAnimationWidget->SetSelectedFrameIndex(iFrameIndex);
+			break;
+		}
+	}
+}
+
 QUuid AuxTileSet::GetSelectedAnimation() const
 {
 	if(m_pSelectedAnimationWgt)
 		return m_pSelectedAnimationWgt->GetUuid();
 	return QUuid();
+}
+
+int AuxTileSet::GetSelectedAnimationFrame() const
+{
+	if(m_pSelectedAnimationWgt)
+		return m_pSelectedAnimationWgt->GetSelectedFrameIndex();
+	return -1;
 }
 
 QUuid AuxTileSet::GetSelectedTerrainSet() const

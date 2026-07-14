@@ -377,8 +377,8 @@ enum MergableUndoCmd
 	MERGABLEUNDOCMD_TileSize = 1,
 	MERGABLEUNDOCMD_TileOffset = 2,
 	MERGABLEUNDOCMD_TileSetAnimColumn = 3,
-	MERGABLEUNDOCMD_TileSetAnimNumFrames = 4,
-	MERGABLEUNDOCMD_TileSetAnimSeparation = 5,
+	MERGABLEUNDOCMD_TileSetAnimWidth = 4,
+	MERGABLEUNDOCMD_TileSetAnimHeight = 5,
 	MERGABLEUNDOCMD_TileSetAnimFrameRate = 6
 };
 

@@ -58,8 +58,10 @@ public:
 
 	TileSetPage GetCurrentPage() const;
 	void SetCurrentPage(TileSetPage ePage);
+	void SetSelectedAnimFrame(QUuid animationUuid, int iFrameIndex);
 
 	QUuid GetSelectedAnimation() const;
+	int GetSelectedAnimationFrame() const;
 	QUuid GetSelectedTerrainSet() const;
 	QUuid GetSelectedTerrain() const;
 	QUuid GetSelectedCollision() const;

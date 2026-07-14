@@ -120,17 +120,20 @@ void TileSetGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileDa
 	case TILESETPAGE_Arrange:
 		break;
 
-	case TILESETPAGE_Animation:
-		if(pTileData->GetAnimation().isNull())
+	case TILESETPAGE_Animation: {
+		QUuid selectedAnimUuid = auxTileSetRef.GetSelectedAnimation();
+		int iFrameIndex = auxTileSetRef.GetSelectedAnimationFrame();
+		
+		QMap<QUuid, QList<int>> animMap = pTileData->GetAnimationMap();
+		if(animMap.contains(selectedAnimUuid) && animMap[selectedAnimUuid].contains(iFrameIndex))
+			SetAnimation(true, pTileSet->GetAnimationColor(selectedAnimUuid));
+		else
 		{
 			SetAnimation(false, HyColor::Black);
 			setOpacity(fUNSELECTED_OPACITY);
 			break;
 		}
-		else
-			SetAnimation(true, pTileSet->GetAnimationColor(pTileData->GetAnimation()));
-
-		break;
+		break; }
 
 	case TILESETPAGE_Autotile:
 		if(pTileSet->GetTerrainSetType(pTileData->GetTerrainSet()) == AUTOTILETYPE_Unknown ||

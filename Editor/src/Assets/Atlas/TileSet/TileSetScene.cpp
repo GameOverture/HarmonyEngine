@@ -510,6 +510,10 @@ void TileSetScene::OnPaintingStroke(AuxTileSet &auxTileSetRef, QPointF ptScenePo
 		if(animUuid.isNull()) // Only paint if an animation is selected
 			return;
 
+		int iFrameIndex = auxTileSetRef.GetSelectedAnimationFrame();
+		if(iFrameIndex < 0)
+			return;
+
 		TileSetGfxItem *pGfxTile = m_SetupTileMap[pTile];
 		pGfxTile->SetAnimation(uiMouseFlags & Qt::LeftButton, m_pTileSet->GetAnimationColor(animUuid));
 

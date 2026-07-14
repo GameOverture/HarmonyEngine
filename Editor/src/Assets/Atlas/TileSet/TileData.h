@@ -28,7 +28,7 @@ class TileData
 
 	PropertiesTreeModel *							m_pSetupPropertiesModel;
 
-	QUuid											m_AnimationUuid;
+	QMap<QUuid, QList<int>>							m_AnimationMap;				// Key: Animation Uuid, Value: Associated frame indices (usually just one)
 
 	QUuid											m_TerrainSetUuid;		// The Terrain Set assigned to this tile
 	QMap<QUuid, QBitArray>							m_TerrainMap;			// Key: Terrain Uuid (NOT TERRAIN SET), Value: QBitArray(NUM_AUTOTILEPARTS)
@@ -59,8 +59,10 @@ public:
 
 	PropertiesTreeModel *GetSetupPropertiesModel() const;
 
-	QUuid GetAnimation() const;
-	void SetAnimation(QUuid animationUuid);
+	QMap<QUuid, QList<int>> GetAnimationMap() const;
+	void SetAnimationMap(QMap<QUuid, QList<int>> animMap);
+	void SetAnimationFrame(QUuid animationUuid, int iFrameIndex);
+	void RemoveAnimationFrame(QUuid animationUuid, int iFrameIndex);
 
 	QUuid GetTerrainSet() const;
 	void SetTerrainSet(QUuid terrainSetUuid);

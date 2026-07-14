@@ -29,6 +29,40 @@ bool operator<(const QPoint &a, const QPoint &b);
 
 class TileData;
 
+struct TileAnimation
+{
+	QUuid				m_StartingTileUuid;
+	QList<quint32>		m_TileChecksumList;	// Each frame's checksum
+
+	quint16				m_uiStartingAtlasIndex; // This is determined when the sub-atlas is generated
+	TileAnimation() :
+		m_uiStartingAtlasIndex(TILEDATA_INVALID_ID)
+	{ }
+	TileAnimation(QJsonObject animObj)
+	{
+		m_StartingTileUuid = QUuid(animObj["startingTile"].toString());
+
+		QJsonArray checksumArray = animObj["checksumFrames"].toArray();
+		for(QJsonValue checksumVal : checksumArray)
+			m_TileChecksumList.push_back(static_cast<quint32>(checksumVal.toVariant().toLongLong()));
+
+		m_uiStartingAtlasIndex = animObj["startingAtlasIndex"].toInt();
+	}
+
+	QJsonObject ToJsonObject() const
+	{
+		QJsonObject animObj;
+		animObj["startingTile"] = m_StartingTileUuid.toString(QUuid::WithoutBraces);
+		QJsonArray checksumArray;
+		for(const quint32 &checksumRef : m_TileChecksumList)
+			checksumArray.append(static_cast<qint64>(checksumRef));
+		animObj["checksumFrames"] = checksumArray;
+		animObj["startingAtlasIndex"] = m_uiStartingAtlasIndex;
+
+		return animObj;
+	}
+};
+
 class AtlasTileSet : public AtlasFrame
 {
 	Q_OBJECT
@@ -49,24 +83,26 @@ class AtlasTileSet : public AtlasFrame
 	QPoint						m_TileOffset;
 	QPolygonF					m_TilePolygon;					// Represents the actual tile, that is able to be arranged in a TileMap (grid)
 
-	struct Animation
+	struct AnimationSet
 	{
 		QUuid					m_uuid;
 		QString					m_sName;
 		HyColor					m_Color;
+		QSize					m_SizeInTiles;
 		quint16					m_uiFrameDurationMs;
 		bool					m_bGlobalSync;
 		bool					m_bBounceAnim;	// AKA Ping-pong
 		bool					m_bReverseAnim;
 		bool					m_bLooping;
 		bool					m_bEnabled;
-		QUuid					m_StartingTileUuid;
-		QList<quint32>			m_TileChecksumList;	// Each frame's checksum
 
-		Animation(QString sName, HyColor color) :
+		QList<TileAnimation>	m_AnimationList; // Each 'TileAnimation' is a tile that forms 'm_SizeInTiles', and they all have the same amount of frames
+
+		AnimationSet(QString sName, HyColor color) :
 			m_uuid(QUuid::createUuid()),
 			m_sName(sName),
 			m_Color(color),
+			m_SizeInTiles(1, 1),
 			m_uiFrameDurationMs(33),
 			m_bGlobalSync(true),
 			m_bBounceAnim(false),
@@ -75,46 +111,53 @@ class AtlasTileSet : public AtlasFrame
 			m_bEnabled(true)
 		{
 		}
-		Animation(const QJsonObject &initObj)
+		AnimationSet(const QJsonObject &initObj)
 		{
 			m_uuid = QUuid(initObj["UUID"].toString());
 			m_sName = initObj["name"].toString();
 			m_Color = HyColor(initObj["color"].toVariant().toLongLong());
+			m_SizeInTiles.setWidth(initObj["width"].toInt());
+			m_SizeInTiles.setHeight(initObj["height"].toInt());
 			m_uiFrameDurationMs = initObj["frameDuration"].toInt();
 			m_bGlobalSync = initObj["globalSync"].toBool();
 			m_bBounceAnim = initObj["bounceAnim"].toBool();
 			m_bReverseAnim = initObj["reverseAnim"].toBool();
 			m_bLooping = initObj["looping"].toBool();
 			m_bEnabled = initObj["enabled"].toBool();
-			m_StartingTileUuid = QUuid(initObj["startingTile"].toString());
-			QJsonArray checksumArray = initObj["checksumFrames"].toArray();
-			for(QJsonValue checksumVal : checksumArray)
-				m_TileChecksumList.push_back(static_cast<quint32>(checksumVal.toVariant().toLongLong()));
+			
+			m_AnimationList.clear();
+			QJsonArray tileAnimArray = initObj["tileAnims"].toArray();
+			for(QJsonValue tileAnimVal : tileAnimArray)
+			{
+				QJsonObject animObj = tileAnimVal.toObject();
+				m_AnimationList.push_back(TileAnimation(animObj));
+			}
 		}
 
 		QJsonObject ToJsonObject() const
 		{
-			QJsonObject animationObj;
-			animationObj["UUID"] = m_uuid.toString(QUuid::WithoutBraces);
-			animationObj["name"] = m_sName;
-			animationObj["color"] = static_cast<qint64>(m_Color.GetAsHexCode());
-			animationObj["frameDuration"] = m_uiFrameDurationMs;
-			animationObj["globalSync"] = m_bGlobalSync;
-			animationObj["bounceAnim"] = m_bBounceAnim;
-			animationObj["reverseAnim"] = m_bReverseAnim;
-			animationObj["looping"] = m_bLooping;
-			animationObj["enabled"] = m_bEnabled;
-			animationObj["startingTile"] = m_StartingTileUuid.toString(QUuid::WithoutBraces);
-			QJsonArray checksumArray;
-			for(const quint32 &checksumRef : m_TileChecksumList)
-				checksumArray.append(static_cast<qint64>(checksumRef));
-			animationObj["checksumFrames"] = checksumArray;
+			QJsonObject animationSetObj;
+			animationSetObj["UUID"] = m_uuid.toString(QUuid::WithoutBraces);
+			animationSetObj["name"] = m_sName;
+			animationSetObj["color"] = static_cast<qint64>(m_Color.GetAsHexCode());
+			animationSetObj["width"] = m_SizeInTiles.width();
+			animationSetObj["height"] = m_SizeInTiles.height();
+			animationSetObj["frameDuration"] = m_uiFrameDurationMs;
+			animationSetObj["globalSync"] = m_bGlobalSync;
+			animationSetObj["bounceAnim"] = m_bBounceAnim;
+			animationSetObj["reverseAnim"] = m_bReverseAnim;
+			animationSetObj["looping"] = m_bLooping;
+			animationSetObj["enabled"] = m_bEnabled;
 
-			return animationObj;
+			QJsonArray tileAnimsArray;
+			for(const TileAnimation &animRef : m_AnimationList)
+				tileAnimsArray.append(animRef.ToJsonObject());
+			animationSetObj["tileAnims"] = tileAnimsArray;
+
+			return animationSetObj;
 		}
 	};
-	QList<Animation>			m_AnimationList;
-	QList<quint16>				m_AnimationStartingAtlasIndexList; // This is determined when the sub-atlas is generated
+	QList<AnimationSet>			m_AnimationSetList;
 
 	struct TerrainSet
 	{

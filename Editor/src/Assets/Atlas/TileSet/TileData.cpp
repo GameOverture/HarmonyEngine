@@ -27,11 +27,20 @@ TileData::TileData(const QJsonObject &tileDataObj) :
 	m_uiTileChecksum(static_cast<quint32>(tileDataObj["TileChecksum"].toVariant().toLongLong())),
 	m_MetaGridPos(QPoint(tileDataObj["MetaGridPosX"].toInt(), tileDataObj["MetaGridPosY"].toInt())),
 	m_pSetupPropertiesModel(nullptr),
-	m_AnimationUuid(QUuid(tileDataObj["AnimationUUID"].toString())),
 	m_TerrainSetUuid(QUuid(tileDataObj["TerrainSetUUID"].toString()))
 {
 	InitPropertiesModel();
 	m_pSetupPropertiesModel->DeserializeJson(tileDataObj["SetupProperties"].toObject());
+
+	QJsonObject animObj = tileDataObj["Animation"].toObject();
+	for(QString sKey : animObj.keys())
+	{
+		QList<int> frameIndexList;
+		QJsonArray frameIndexArray = animObj[sKey].toArray();
+		for(QJsonValue val : frameIndexArray)
+			frameIndexList.push_back(val.toInt());
+		m_AnimationMap.insert(QUuid(sKey), frameIndexList);
+	}
 
 	QJsonArray terrainArray = tileDataObj["TerrainMap"].toArray();
 	for(int i = 0; i < terrainArray.size(); ++i)
@@ -67,7 +76,7 @@ TileData::TileData(TileData &&other) noexcept :
 	m_uiTileChecksum(other.m_uiTileChecksum),
 	m_MetaGridPos(other.m_MetaGridPos),
 	m_pSetupPropertiesModel(nullptr),
-	m_AnimationUuid(other.m_AnimationUuid),
+	m_AnimationMap(other.m_AnimationMap),
 	m_TerrainSetUuid(other.m_TerrainSetUuid),
 	m_TerrainMap(std::move(other.m_TerrainMap)),
 	m_CollisionLayerMap(std::move(other.m_CollisionLayerMap))
@@ -148,7 +157,16 @@ QJsonObject TileData::GetTileData() const
 	tileDataObjOut["MetaGridPosX"] = m_MetaGridPos.x();
 	tileDataObjOut["MetaGridPosY"] = m_MetaGridPos.y();
 	tileDataObjOut["SetupProperties"] = m_pSetupPropertiesModel->SerializeJson();
-	tileDataObjOut["AnimationUUID"] = m_AnimationUuid.toString(QUuid::WithoutBraces);
+
+	QJsonObject animObj;
+	for(QUuid uuid : m_AnimationMap.keys())
+	{
+		QJsonArray frameIndexArray;
+		for(int iFrameIndex : m_AnimationMap[uuid])
+			frameIndexArray.append(iFrameIndex);
+		animObj.insert(uuid.toString(QUuid::WithoutBraces), frameIndexArray);
+	}
+	tileDataObjOut["Animation"] = animObj;
 	tileDataObjOut["TerrainSetUUID"] = m_TerrainSetUuid.toString(QUuid::WithoutBraces);
 	QJsonArray terrainMapArray;
 	for(QMap<QUuid, QBitArray>::const_iterator iter = m_TerrainMap.begin(); iter != m_TerrainMap.end(); ++iter)
@@ -192,14 +210,32 @@ PropertiesTreeModel *TileData::GetSetupPropertiesModel() const
 	return m_pSetupPropertiesModel;
 }
 
-QUuid TileData::GetAnimation() const
+QMap<QUuid, QList<int>>  TileData::GetAnimationMap() const
 {
-	return m_AnimationUuid;
+	return m_AnimationMap;
 }
 
-void TileData::SetAnimation(QUuid animationUuid)
+void TileData::SetAnimationMap(QMap<QUuid, QList<int>> animMap)
 {
-	m_AnimationUuid = animationUuid;
+	m_AnimationMap = animMap;
+}
+
+void TileData::SetAnimationFrame(QUuid animationUuid, int iFrameIndex)
+{
+	if(m_AnimationMap.contains(animationUuid) == false)
+		m_AnimationMap.insert(animationUuid, QList<int>());
+	if(m_AnimationMap[animationUuid].contains(iFrameIndex) == false)
+		m_AnimationMap[animationUuid].push_back(iFrameIndex);
+}
+
+void TileData::RemoveAnimationFrame(QUuid animationUuid, int iFrameIndex)
+{
+	if(m_AnimationMap.contains(animationUuid) == false)
+		return;
+
+	m_AnimationMap[animationUuid].removeAll(iFrameIndex);
+	if(m_AnimationMap[animationUuid].isEmpty())
+		m_AnimationMap.remove(animationUuid);
 }
 
 QUuid TileData::GetTerrainSet() const
