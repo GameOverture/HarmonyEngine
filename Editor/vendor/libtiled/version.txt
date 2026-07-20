@@ -1,0 +1,2 @@
+https://github.com/mapeditor/tiled - master branch
+commit: aa069419db754412a2b4d51d8ea03bb048499f0a
