@@ -28,6 +28,10 @@ if(Qt6_DIR)
 	message(STATUS "Adding Vendor: QCodeEditor")
 	add_subdirectory(vendor/QCodeEditor)
 	set_target_properties(QCodeEditor PROPERTIES FOLDER "Editor Libs")
+	
+	message(STATUS "Adding Vendor: libtiled")
+	add_subdirectory(vendor/libtiled)
+	set_target_properties(libtiled PROPERTIES FOLDER "Editor Libs")
 
 	message(STATUS "Setting up HyEditor...")
 	find_package(Qt6 COMPONENTS Core Gui Widgets OpenGLWidgets Multimedia REQUIRED)
@@ -440,7 +444,7 @@ if(Qt6_DIR)
 	target_include_directories(HyEditor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../Engine/include/Harmony")
 
 	target_compile_definitions(HyEditor PRIVATE HY_USE_QT)
-	target_link_libraries(HyEditor PUBLIC HyEngine freetype-gl ogg vorbis QCodeEditor Qt6::Core Qt6::Gui Qt6::Widgets Qt6::OpenGLWidgets Qt6::Multimedia)
+	target_link_libraries(HyEditor PUBLIC HyEngine freetype-gl ogg vorbis QCodeEditor libtiled Qt6::Core Qt6::Gui Qt6::Widgets Qt6::OpenGLWidgets Qt6::Multimedia)
 
 	set_target_properties(HyEditor PROPERTIES
 		CXX_STANDARD 17
