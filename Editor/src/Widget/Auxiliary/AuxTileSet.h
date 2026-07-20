@@ -66,6 +66,8 @@ public:
 	QUuid GetSelectedTerrain() const;
 	QUuid GetSelectedCollision() const;
 
+	//void CmdSet_AddAnimationFrames(QUuid animWidgetUuid, int iFrameIndex, QList<TileData *> tileList);
+	//void CmdSet_RemoveAnimationFrames(QUuid animWidgetUuid, int iFrameIndex, QList<TileData *> tileList);
 	void CmdSet_TileShapeWidget(TileSetShape eTileShape);	// Blocks the WgtVectorSpinBox::SetValue signal
 	void CmdSet_TileSizeWidgets(QSize tileSize);			// Blocks the WgtVectorSpinBox::SetValue signal
 	void CmdSet_TileOffsetWidgets(QPoint tileOffset);		// Blocks the WgtVectorSpinBox::SetValue signal

@@ -228,6 +228,39 @@ QUuid AuxTileSet::GetSelectedCollision() const
 	return QUuid();
 }
 
+//void AuxTileSet::CmdSet_AddAnimationFrames(QUuid animWidgetUuid, int iFrameIndex, QList<TileData *> tileList)
+//{
+//	bool bFound = false;
+//	for(WgtTileSetAnimation *pAnimWgt : m_AnimationList)
+//	{
+//		if(pAnimWgt->GetUuid() == animWidgetUuid)
+//		{
+//			pAnimWgt->CmdSet_AddAnimationFrames(iFrameIndex, tileList);
+//			bFound = true;
+//			break;
+//		}
+//	}
+//
+//	if(bFound == false)
+//		HyGuiLog("AuxTileSet::CmdSet_AddAnimationFrames - Animation Widget not found for UUID: " % animWidgetUuid.toString(), LOGTYPE_Error);
+//}
+//
+//void AuxTileSet::CmdSet_RemoveAnimationFrames(QUuid animWidgetUuid, int iFrameIndex, QList<TileData *> tileList)
+//{
+//	bool bFound = false;
+//	for(WgtTileSetAnimation *pAnimWgt : m_AnimationList)
+//	{
+//		if(pAnimWgt->GetUuid() == animWidgetUuid)
+//		{
+//			pAnimWgt->CmdSet_RemoveAnimationFrames(iFrameIndex, tileList);
+//			bFound = true;
+//			break;
+//		}
+//	}
+//	if(bFound == false)
+//		HyGuiLog("AuxTileSet::CmdSet_RemoveAnimationFrames - Animation Widget not found for UUID: " % animWidgetUuid.toString(), LOGTYPE_Error);
+//}
+
 void AuxTileSet::CmdSet_TileShapeWidget(TileSetShape eTileShape)
 {
 	ui->cmbTileShape->blockSignals(true);
@@ -437,6 +470,9 @@ void AuxTileSet::CmdSet_DeleteWgtItem(QUuid uuid)
 		WgtTileSetAnimation *pAnimationWidget = m_AnimationList[i];
 		if (pAnimationWidget->GetUuid() == uuid)
 		{
+			if(m_pSelectedAnimationWgt == pAnimationWidget)
+				m_pSelectedAnimationWgt = nullptr;
+
 			ui->lytAnimations->removeWidget(pAnimationWidget);
 			m_AnimationList.removeAt(i);
 			delete pAnimationWidget;
@@ -449,6 +485,9 @@ void AuxTileSet::CmdSet_DeleteWgtItem(QUuid uuid)
 		WgtTileSetTerrainSet *pTerrainWidget = m_TerrainSetList[i];
 		if (pTerrainWidget->GetUuid() == uuid)
 		{
+			if(m_pSelectedTerrainSetWgt == pTerrainWidget)
+				m_pSelectedTerrainSetWgt = nullptr;
+
 			ui->lytTerrainSets->removeWidget(pTerrainWidget);
 			m_TerrainSetList.removeAt(i);
 			delete pTerrainWidget;
@@ -462,6 +501,9 @@ void AuxTileSet::CmdSet_DeleteWgtItem(QUuid uuid)
 			WgtTileSetTerrain *pTerrainSubWidget = terrains[j];
 			if (pTerrainSubWidget->GetUuid() == uuid)
 			{
+				if(m_pSelectedTerrainWgt == pTerrainSubWidget)
+					m_pSelectedTerrainWgt = nullptr;
+
 				pTerrainWidget->CmdSet_DeleteTerrain(uuid);
 				m_pTileSet->Cmd_RemoveJsonItem(uuid);
 				return;
@@ -473,6 +515,9 @@ void AuxTileSet::CmdSet_DeleteWgtItem(QUuid uuid)
 		WgtTileSetCollision *pCollisionWidget = m_CollisionList[i];
 		if (pCollisionWidget->GetUuid() == uuid)
 		{
+			if(m_pSelectedCollisionWgt == pCollisionWidget)
+				m_pSelectedCollisionWgt = nullptr;
+
 			ui->lytCollisions->removeWidget(pCollisionWidget);
 			m_CollisionList.removeAt(i);
 			delete pCollisionWidget;

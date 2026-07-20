@@ -29,40 +29,6 @@ bool operator<(const QPoint &a, const QPoint &b);
 
 class TileData;
 
-struct TileAnimation
-{
-	QUuid				m_StartingTileUuid;
-	QList<quint32>		m_TileChecksumList;	// Each frame's checksum
-
-	quint16				m_uiStartingAtlasIndex; // This is determined when the sub-atlas is generated
-	TileAnimation() :
-		m_uiStartingAtlasIndex(TILEDATA_INVALID_ID)
-	{ }
-	TileAnimation(QJsonObject animObj)
-	{
-		m_StartingTileUuid = QUuid(animObj["startingTile"].toString());
-
-		QJsonArray checksumArray = animObj["checksumFrames"].toArray();
-		for(QJsonValue checksumVal : checksumArray)
-			m_TileChecksumList.push_back(static_cast<quint32>(checksumVal.toVariant().toLongLong()));
-
-		m_uiStartingAtlasIndex = animObj["startingAtlasIndex"].toInt();
-	}
-
-	QJsonObject ToJsonObject() const
-	{
-		QJsonObject animObj;
-		animObj["startingTile"] = m_StartingTileUuid.toString(QUuid::WithoutBraces);
-		QJsonArray checksumArray;
-		for(const quint32 &checksumRef : m_TileChecksumList)
-			checksumArray.append(static_cast<qint64>(checksumRef));
-		animObj["checksumFrames"] = checksumArray;
-		animObj["startingAtlasIndex"] = m_uiStartingAtlasIndex;
-
-		return animObj;
-	}
-};
-
 class AtlasTileSet : public AtlasFrame
 {
 	Q_OBJECT
@@ -85,18 +51,22 @@ class AtlasTileSet : public AtlasFrame
 
 	struct AnimationSet
 	{
-		QUuid					m_uuid;
-		QString					m_sName;
-		HyColor					m_Color;
-		QSize					m_SizeInTiles;
-		quint16					m_uiFrameDurationMs;
-		bool					m_bGlobalSync;
-		bool					m_bBounceAnim;	// AKA Ping-pong
-		bool					m_bReverseAnim;
-		bool					m_bLooping;
-		bool					m_bEnabled;
+		QUuid						m_uuid;
+		QString						m_sName;
+		HyColor						m_Color;
+		QSize						m_SizeInTiles;
+		quint16						m_uiFrameDurationMs;
+		bool						m_bGlobalSync;
+		bool						m_bBounceAnim;	// AKA Ping-pong
+		bool						m_bReverseAnim;
+		bool						m_bLooping;
+		bool						m_bEnabled;
+		int							m_iNumFrames;
 
-		QList<TileAnimation>	m_AnimationList; // Each 'TileAnimation' is a tile that forms 'm_SizeInTiles', and they all have the same amount of frames
+		QList<QList<TileData *>>	m_TempTileList;	// Used during AtlasTileSet::RegenerateSubAtlas() to help assemble animation tiles consecutively
+													// size[m_iNumFrames][m_SizeInTiles.width * m_SizeInTiles.height] (the 2nd dimension to be sorted by the tiles' meta-grid location)
+
+		QList<int>					m_TempStartingAtlasIndexList; // size[m_SizeInTiles.width * m_SizeInTiles.height]
 
 		AnimationSet(QString sName, HyColor color) :
 			m_uuid(QUuid::createUuid()),
@@ -108,7 +78,8 @@ class AtlasTileSet : public AtlasFrame
 			m_bBounceAnim(false),
 			m_bReverseAnim(false),
 			m_bLooping(true),
-			m_bEnabled(true)
+			m_bEnabled(true),
+			m_iNumFrames(0)
 		{
 		}
 		AnimationSet(const QJsonObject &initObj)
@@ -124,14 +95,15 @@ class AtlasTileSet : public AtlasFrame
 			m_bReverseAnim = initObj["reverseAnim"].toBool();
 			m_bLooping = initObj["looping"].toBool();
 			m_bEnabled = initObj["enabled"].toBool();
+			m_iNumFrames = initObj["numFrames"].toInt();
 			
-			m_AnimationList.clear();
-			QJsonArray tileAnimArray = initObj["tileAnims"].toArray();
-			for(QJsonValue tileAnimVal : tileAnimArray)
-			{
-				QJsonObject animObj = tileAnimVal.toObject();
-				m_AnimationList.push_back(TileAnimation(animObj));
-			}
+			//m_AnimationList.clear();
+			//QJsonArray tileAnimArray = initObj["tileAnims"].toArray();
+			//for(QJsonValue tileAnimVal : tileAnimArray)
+			//{
+			//	QJsonObject animObj = tileAnimVal.toObject();
+			//	m_AnimationList.push_back(TileAnimation(animObj));
+			//}
 		}
 
 		QJsonObject ToJsonObject() const
@@ -148,11 +120,12 @@ class AtlasTileSet : public AtlasFrame
 			animationSetObj["reverseAnim"] = m_bReverseAnim;
 			animationSetObj["looping"] = m_bLooping;
 			animationSetObj["enabled"] = m_bEnabled;
+			animationSetObj["numFrames"] = m_iNumFrames;
 
-			QJsonArray tileAnimsArray;
-			for(const TileAnimation &animRef : m_AnimationList)
-				tileAnimsArray.append(animRef.ToJsonObject());
-			animationSetObj["tileAnims"] = tileAnimsArray;
+			//QJsonArray tileAnimsArray;
+			//for(const TileAnimation &animRef : m_AnimationList)
+			//	tileAnimsArray.append(animRef.ToJsonObject());
+			//animationSetObj["tileAnims"] = tileAnimsArray;
 
 			return animationSetObj;
 		}

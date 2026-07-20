@@ -210,7 +210,7 @@ PropertiesTreeModel *TileData::GetSetupPropertiesModel() const
 	return m_pSetupPropertiesModel;
 }
 
-QMap<QUuid, QList<int>>  TileData::GetAnimationMap() const
+const QMap<QUuid, QList<int>> &TileData::GetAnimationMap() const
 {
 	return m_AnimationMap;
 }

@@ -625,12 +625,18 @@ TileSetUndoCmd_PaintAnimation::TileSetUndoCmd_PaintAnimation(AuxTileSet &auxTile
 		if(m_bLeftClick)
 		{
 			for(int i = 0; i < m_PaintedList.size(); ++i)
+			{
 				m_PaintedList[i]->SetAnimationFrame(m_AnimationUuid, m_iFrameIndex);
+				//m_AuxTileSetRef.CmdSet_AddAnimationFrames(m_AnimationUuid, m_iFrameIndex, m_PaintedList);
+			}
 		}
 		else
 		{
 			for(int i = 0; i < m_PaintedList.size(); ++i)
+			{
 				m_PaintedList[i]->RemoveAnimationFrame(m_AnimationUuid, m_iFrameIndex);
+				//m_AuxTileSetRef.CmdSet_RemoveAnimationFrames(m_AnimationUuid, m_iFrameIndex, m_PaintedList);
+			}
 		}
 	}
 	m_AuxTileSetRef.GetTileSet()->SetSubAtlasDirty();

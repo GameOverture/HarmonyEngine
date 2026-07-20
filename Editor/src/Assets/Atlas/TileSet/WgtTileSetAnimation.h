@@ -27,8 +27,6 @@ class WgtTileSetAnimation : public IWgtTileSetItem
 	Q_OBJECT
 
 	Ui::WgtTileSetAnimation *		ui;
-
-	QList<TileAnimation>			m_TileAnimList;
 	
 	QList<QPixmap>					m_PreviewFrameList;
 	QTimer *						m_pPreviewTimer;
@@ -47,11 +45,13 @@ public:
 	int GetSelectedFrameIndex() const;
 	void SetSelectedFrameIndex(int iFrameIndex);
 
+	//void CmdSet_AddAnimationFrames(int iFrameIndex, QList<TileData *> tileList);
+	//void CmdSet_RemoveAnimationFrames(int iFrameIndex, QList<TileData *> tileList);
+
 protected:
 	virtual QFrame *GetBorderFrame() const override;
 
 	void ErrorCheckFrames();
-	void RefreshPreview();
 
 	bool IsError();
 	void SetError(QString sMessage);

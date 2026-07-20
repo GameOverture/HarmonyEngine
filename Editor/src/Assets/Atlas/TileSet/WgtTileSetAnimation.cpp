@@ -16,6 +16,7 @@
 
 #include <QPushButton>
 #include <QColorDialog>
+#include <QPainter>
 
 //#define TILEANIM_UNSET_TEXT "<Not Set>"
 
@@ -64,25 +65,25 @@ WgtTileSetAnimation::~WgtTileSetAnimation()
 	ui->chkLoop->setChecked(serializedObj["looping"].toBool());
 	ui->chkEnabled->setChecked(serializedObj["enabled"].toBool());
 
-	m_TileAnimList.clear();
-	QJsonArray tileAnimsArray = serializedObj["tileAnims"].toArray();
-	for(QJsonValue tileAnimVal : tileAnimsArray)
+	int iNumFrames = serializedObj["numFrames"].toInt();
+	// Add or remove rows to ui->framesList so it equals iNumFrames
+	while(ui->framesList->count() < iNumFrames)
+		ui->framesList->addItem(new QListWidgetItem("Frame " % QString::number(ui->framesList->count())));
+	while(ui->framesList->count() > iNumFrames)
 	{
-		QJsonObject animObj = tileAnimVal.toObject();
-		m_TileAnimList.push_back(TileAnimation(animObj));
+		QListWidgetItem *pItem = ui->framesList->takeItem(ui->framesList->count() - 1);
+		delete pItem;
 	}
 
-	int iMaxFrames = 0;
-	for(TileAnimation &tileAnim : m_TileAnimList)
-	{
-		if(iMaxFrames < tileAnim.m_TileChecksumList.size())
-			iMaxFrames = tileAnim.m_TileChecksumList.size();
-	}
-	for(int i = ui->framesList->count(); i < iMaxFrames; ++i)
-		ui->framesList->addItem(new QListWidgetItem("Frame " % QString::number(i)));
+	//m_TileAnimList.clear();
+	//QJsonArray tileAnimsArray = serializedObj["tileAnims"].toArray();
+	//for(QJsonValue tileAnimVal : tileAnimsArray)
+	//{
+	//	QJsonObject animObj = tileAnimVal.toObject();
+	//	m_TileAnimList.push_back(TileAnimation(animObj));
+	//}
 
 	ErrorCheckFrames();
-	RefreshPreview();
 }
 
 /*virtual*/ QJsonObject WgtTileSetAnimation::SerializeCurrentWidgets() /*override*/
@@ -99,10 +100,12 @@ WgtTileSetAnimation::~WgtTileSetAnimation()
 	serializedJsonObj["width"] = ui->sbWidth->value();
 	serializedJsonObj["height"] = ui->sbHeight->value();
 
-	QJsonArray tileAnimsArray;
-	for(TileAnimation &tileAnim : m_TileAnimList)
-		tileAnimsArray.append(tileAnim.ToJsonObject());
-	serializedJsonObj["tileAnims"] = tileAnimsArray;
+	serializedJsonObj["numFrames"] = ui->framesList->count();
+
+	//QJsonArray tileAnimsArray;
+	//for(TileAnimation &tileAnim : m_TileAnimList)
+	//	tileAnimsArray.append(tileAnim.ToJsonObject());
+	//serializedJsonObj["tileAnims"] = tileAnimsArray;
 
 	serializedJsonObj["frameDuration"] = ui->sbFrameDuration->value();
 	serializedJsonObj["globalSync"] = ui->chkGlobalSync->isChecked();
@@ -135,6 +138,56 @@ void WgtTileSetAnimation::SetSelectedFrameIndex(int iFrameIndex)
 	ui->framesList->setCurrentRow(iFrameIndex);
 }
 
+//void WgtTileSetAnimation::CmdSet_AddAnimationFrames(int iFrameIndex, QList<TileData *> tileList)
+//{
+//	// Sort tileList by their meta-grid locations (left to right, top to bottom)
+//	std::sort(tileList.begin(), tileList.end(),
+//		[](TileData *pTileA, TileData *pTileB)
+//		{
+//			QPoint ptTileA = pTileA->GetMetaGridPos();
+//			QPoint ptTileB = pTileB->GetMetaGridPos();
+//			if(ptTileA.y() == ptTileB.y())
+//				return ptTileA.x() < ptTileB.x();
+//			else
+//				return ptTileA.y() < ptTileB.y();
+//		});
+//	
+//	if(m_TileAnimList.size() < tileList.size())
+//		m_TileAnimList.resize(tileList.size());
+//
+//	for(int i = 0; i < tileList.size(); ++i)
+//	{
+//		if(m_TileAnimList[i].m_TileChecksumList.size() < iFrameIndex+1)
+//			m_TileAnimList[i].m_TileChecksumList.resize(iFrameIndex+1, -1);
+//
+//		m_TileAnimList[i].m_TileChecksumList[iFrameIndex] = tileList[i]->GetTileChecksum();
+//
+//		if(iFrameIndex == 0)
+//			m_TileAnimList[i].m_StartingTileUuid = tileList[i]->GetUuid();
+//	}
+//}
+//
+//void WgtTileSetAnimation::CmdSet_RemoveAnimationFrames(int iFrameIndex, QList<TileData *> tileList)
+//{
+//	for(int i = 0; i < m_TileAnimList.size(); ++i)
+//	{
+//		if(m_TileAnimList[i].m_TileChecksumList.size() > iFrameIndex)
+//		{
+//			for(int j = 0; j < tileList.size(); ++j)
+//			{
+//				if(m_TileAnimList[i].m_TileChecksumList[iFrameIndex] == tileList[j]->GetTileChecksum())
+//					m_TileAnimList[i].m_TileChecksumList[iFrameIndex] = -1;
+//			}
+//		}
+//
+//		while(m_TileAnimList[i].m_TileChecksumList.back() == -1)
+//			m_TileAnimList[i].m_TileChecksumList.pop_back();
+//	}
+//
+//	while(m_TileAnimList.back().m_TileChecksumList.empty())
+//		m_TileAnimList.pop_back();
+//}
+
 /*virtual*/ QFrame *WgtTileSetAnimation::GetBorderFrame() const /*override*/
 {
 	return ui->frmBorder;
@@ -142,95 +195,91 @@ void WgtTileSetAnimation::SetSelectedFrameIndex(int iFrameIndex)
 
 void WgtTileSetAnimation::ErrorCheckFrames()
 {
+	m_PreviewFrameList.clear();
+	m_pPreviewTimer->stop();
+
 	int iNumDesiredFrames = ui->framesList->count();
 	int iRequiredNumTileAnims = ui->sbWidth->value() * ui->sbHeight->value();
 
+	QVector<TileData *> tileDataList = m_pAuxTileSet->GetTileSet()->GetTileDataList();
+	QString sErrorMsg;
+
 	for(int iFrameIndex = 0; iFrameIndex < iNumDesiredFrames; ++iFrameIndex)
 	{
-		m_TileAnimList.size();
+		QList<TileData *> tileFrameList;
+
+		for(TileData *pTile : tileDataList)
+		{
+			const QMap<QUuid, QList<int>> &tileAnimMapRef = pTile->GetAnimationMap();
+			
+			for(QUuid animUuid : tileAnimMapRef.keys())
+			{
+				if(GetUuid() == animUuid)
+				{
+					for(int iFrame : tileAnimMapRef[animUuid])
+					{
+						if(iFrame == iFrameIndex)
+							tileFrameList.push_back(pTile);
+					}
+				}
+			}
+		}
+
+		// Sort 'tileFrameList' by their meta-grid positions
+		std::sort(tileFrameList.begin(), tileFrameList.end(),
+			[](TileData *pTileDataA, TileData *pTileDataB)
+			{
+				QPoint ptTileA = pTileDataA->GetMetaGridPos();
+				QPoint ptTileB = pTileDataB->GetMetaGridPos();
+				if(ptTileA.y() == ptTileB.y())
+					return ptTileA.x() < ptTileB.x();
+				else
+					return ptTileA.y() < ptTileB.y();
+			});
+		QImage frameImg(ui->sbWidth->value() * m_pAuxTileSet->GetTileSet()->GetTileSize().width(), ui->sbHeight->value() * m_pAuxTileSet->GetTileSet()->GetTileSize().height(), QImage::Format_ARGB32);
+		frameImg.fill(Qt::transparent);
+		QPainter p(&frameImg);
+		for(int iCol = 0; iCol < ui->sbWidth->value(); ++iCol)
+		{
+			for(int iRow = 0; iRow < ui->sbHeight->value(); ++iRow)
+			{
+				int iTileIndex = (iRow * ui->sbWidth->value()) + iCol;
+				if(iTileIndex < tileFrameList.size())
+				{
+					QPixmap tilePixmap = m_pAuxTileSet->GetTileSet()->GetTilePixmap(tileFrameList[iTileIndex]->GetTileChecksum());
+					p.drawPixmap(iCol * m_pAuxTileSet->GetTileSet()->GetTileSize().width(), iRow * m_pAuxTileSet->GetTileSet()->GetTileSize().height(), tilePixmap);
+				}
+			}
+		}
+		m_PreviewFrameList.push_back(QPixmap::fromImage(frameImg));
+
+		int iTileCountThisFrame = tileFrameList.size();
+		QString sFrameText = "Frame " % QString::number(iFrameIndex);
+		if(iRequiredNumTileAnims == 1 && iTileCountThisFrame == 0)
+			sFrameText += " - Select a tile";
+		else if(iTileCountThisFrame < iRequiredNumTileAnims)
+			sFrameText += " - Select " % QString::number(iRequiredNumTileAnims - iTileCountThisFrame) % " Tiles";
+		else if(iTileCountThisFrame > iRequiredNumTileAnims)
+			sFrameText += " - Too many tiles selected";
+
+		ui->framesList->item(iFrameIndex)->setText(sFrameText);
+		
+		if(iTileCountThisFrame != iRequiredNumTileAnims)
+			sErrorMsg = "Animation not setup properly";
 	}
-	
 
-	//m_FramesChecksumList.clear();
-	//if(ui->txtStartingTile->text() == TILEANIM_UNSET_TEXT)
-	//	return;
+	if(m_PreviewFrameList.empty() == false)
+	{
+		m_pPreviewTimer->setInterval(ui->sbFrameDuration->value());
+		m_pPreviewTimer->start();
 
-	//QUuid startTileUuid = QUuid(ui->txtStartingTile->text());
-	//QVector<TileData *> tileDataList = m_pAuxTileSet->GetTileSet()->GetTileDataList();
-	//TileData *pCurTile = nullptr;
-	//int iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
-	//for(TileData *pTile : tileDataList)
-	//{
-	//	if(pCurTile == nullptr && pTile->GetUuid() == startTileUuid)
-	//		pCurTile = pTile;
-	//	
-	//	QPoint ptGridPos = pTile->GetMetaGridPos();
-	//	iMinGridX = HyMath::Min(iMinGridX, ptGridPos.x());
-	//	iMaxGridX = HyMath::Max(iMaxGridX, ptGridPos.x());
-	//	iMinGridY = HyMath::Min(iMinGridY, ptGridPos.y());
-	//	iMaxGridY = HyMath::Max(iMaxGridY, ptGridPos.y());
-	//}
-	//if(pCurTile == nullptr)
-	//{
-	//	HyGuiLog("WgtTileSetAnimation::GatherFrames - Starting tile not found", LOGTYPE_Error);
-	//	ui->txtStartingTile->setText(TILEANIM_UNSET_TEXT);
-	//	return;
-	//}
+		m_iPreviewFrameIndex = 0;
+	}
 
-	//int iNumFrames = ui->sbNumFrames->value();
-	//int iSeparation = ui->sbSeparation->value();
-	//QPoint ptCurGridPos = pCurTile->GetMetaGridPos();
-
-	//for(int i = 0; i < iNumFrames; ++i)
-	//{
-	//	m_FramesChecksumList.append(pCurTile->GetTileChecksum());
-
-	//	for(int j = 0; j < (1 + iSeparation); ++j)
-	//	{
-	//		ptCurGridPos.setX(ptCurGridPos.x() + 1);
-	//		if(ptCurGridPos.x() > iMaxGridX)
-	//		{
-	//			ptCurGridPos.setX(iMinGridX);
-	//			ptCurGridPos.setY(ptCurGridPos.y() + 1);
-
-	//			if(ptCurGridPos.y() > iMaxGridY)
-	//			{
-	//				SetError("Animation frames out of bounds");
-	//				break;
-	//			}
-	//		}
-	//	}
-	//	if(IsError())
-	//	{
-	//		m_FramesChecksumList.clear();
-	//		break;
-	//	}
-	//	
-	//	for(TileData *pTile : tileDataList)
-	//	{
-	//		if(pTile->GetMetaGridPos() == ptCurGridPos)
-	//		{
-	//			pCurTile = pTile;
-	//			break;
-	//		}
-	//	}
-	//}
-}
-
-void WgtTileSetAnimation::RefreshPreview()
-{
-	m_PreviewFrameList.clear();
-	m_pPreviewTimer->stop();
-	//for(quint32 uiChecksum : m_FramesChecksumList)
-	//	m_PreviewFrameList.append(m_pAuxTileSet->GetTileSet()->GetTilePixmap(uiChecksum));
-	//
-	//if(m_PreviewFrameList.empty() == false)
-	//{
-	//	m_pPreviewTimer->setInterval(ui->sbFrameDuration->value());
-	//	m_pPreviewTimer->start();
-
-	//	m_iPreviewFrameIndex = 0;
-	//}
+	if(sErrorMsg.isEmpty())
+		ClearError();
+	else
+		SetError(sErrorMsg);
 }
 
 bool WgtTileSetAnimation::IsError()
@@ -307,7 +356,6 @@ void WgtTileSetAnimation::on_sbWidth_valueChanged(int iNewValue)
 	m_pAuxTileSet->GetTileSet()->SetSubAtlasDirty();
 
 	ErrorCheckFrames();
-	RefreshPreview();
 }
 
 void WgtTileSetAnimation::on_sbHeight_valueChanged(int iNewValue)
@@ -316,25 +364,30 @@ void WgtTileSetAnimation::on_sbHeight_valueChanged(int iNewValue)
 	m_pAuxTileSet->GetTileSet()->SetSubAtlasDirty();
 
 	ErrorCheckFrames();
-	RefreshPreview();
 }
 
 void WgtTileSetAnimation::on_actionAddFrame_triggered()
 {
 	ui->framesList->addItem(new QListWidgetItem("Frame " % QString::number(ui->framesList->count())));
+	OnModifyWidget("Animation Frame Added", -1);
 	m_pAuxTileSet->GetTileSet()->SetSubAtlasDirty();
 	
 	ErrorCheckFrames();
-	RefreshPreview();
 }
 
 void WgtTileSetAnimation::on_actionRemoveFrame_triggered()
 {
-	ui->framesList->removeItemWidget(ui->framesList->currentItem());
+	int itest = ui->framesList->count();
+	QListWidgetItem *pItem = ui->framesList->takeItem(ui->framesList->currentRow());
+	if(pItem == nullptr)
+		return;
+	delete pItem;
+
+	itest = ui->framesList->count();
+	OnModifyWidget("Animation Frame Removed", -1);
 	m_pAuxTileSet->GetTileSet()->SetSubAtlasDirty();
 
 	ErrorCheckFrames();
-	RefreshPreview();
 }
 
 void WgtTileSetAnimation::on_framesList_currentRowChanged(int iCurrentRow)
@@ -380,35 +433,35 @@ void WgtTileSetAnimation::on_btnHz60_clicked()
 void WgtTileSetAnimation::on_sbFrameDuration_valueChanged(int iNewValue)
 {
 	OnModifyWidget("Animation Frame Duration", MERGABLEUNDOCMD_TileSetAnimFrameRate);
-	RefreshPreview();
+	ErrorCheckFrames();
 }
 
 void WgtTileSetAnimation::on_chkEnabled_toggled(bool bChecked)
 {
 	OnModifyWidget("Animation Enabled", -1);
-	RefreshPreview();
+	ErrorCheckFrames();
 }
 
 void WgtTileSetAnimation::on_chkGlobalSync_toggled(bool bChecked)
 {
 	OnModifyWidget("Animation Global Sync", -1);
-	RefreshPreview();
+	ErrorCheckFrames();
 }
 
 void WgtTileSetAnimation::on_chkLoop_toggled(bool bChecked)
 {
 	OnModifyWidget("Animation Loop", -1);
-	RefreshPreview();
+	ErrorCheckFrames();
 }
 
 void WgtTileSetAnimation::on_chkReverse_toggled(bool bChecked)
 {
 	OnModifyWidget("Animation Reverse", -1);
-	RefreshPreview();
+	ErrorCheckFrames();
 }
 
 void WgtTileSetAnimation::on_chkBounce_toggled(bool bChecked)
 {
 	OnModifyWidget("Animation Bounce", -1);
-	RefreshPreview();
+	ErrorCheckFrames();
 }

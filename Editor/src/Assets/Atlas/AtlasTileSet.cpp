@@ -717,11 +717,32 @@ bool AtlasTileSet::Save()
 		return false;
 	}
 
-	// Update tile IDs is needed, and inform any TileMap of changes
+	// Clear out all AnimationSet's m_TempTileList, which will be repopulated when looping through m_TileDataList below
+	for(AnimationSet &animSetRef : m_AnimationSetList)
+	{
+		animSetRef.m_TempTileList.clear();
+		animSetRef.m_TempTileList.resize(animSetRef.m_iNumFrames);
+	}
+
 	uint16 uiTileId = 0;
 	std::vector<std::pair<uint16, uint16>> modifiedIdList; // pair<old, new>
 	for(TileData *pTileData : m_TileDataList)
 	{
+		// Check each AnimationSet to see if pTileData is apart of its animation
+		const QMap<QUuid, QList<int>> &tileAnimMapRef = pTileData->GetAnimationMap();
+		for(AnimationSet &animSetRef : m_AnimationSetList)
+		{
+			for(QUuid tileAnimUuid : tileAnimMapRef.keys())
+			{
+				if(animSetRef.m_uuid == tileAnimUuid)
+				{
+					for(int iFrameIndex : tileAnimMapRef[tileAnimUuid])
+						animSetRef.m_TempTileList[iFrameIndex].push_back(pTileData);
+				}
+			}
+		}
+
+		// Update tile IDs if needed, and inform any TileMap of changes by storing the change in 'modifiedIdList'
 		if(pTileData->GetTileId() != uiTileId)
 		{
 			if(pTileData->GetTileId() != TILEDATA_INVALID_ID)
@@ -731,12 +752,43 @@ bool AtlasTileSet::Save()
 
 		uiTileId++;
 	}
-	for(TreeModelItemData *pTileMap : m_DependantMap.keys())
+	for(TreeModelItemData *pTileMap : m_DependantMap.keys()) // Inform TileMaps of tile ID changes
 	{
 		if(pTileMap->GetType() != ITEM_TileMap)
 			HyGuiLog("AtlasTileSet::RegenerateSubAtlas() - Dependent item is not a TileMap", LOGTYPE_Error);
 
 		static_cast<TileMapModel *>(static_cast<EntityTreeItemData *>(pTileMap)->GetEditModel())->UpdateTileIds(modifiedIdList);
+	}
+
+	// Error check each AnimationSet's m_TempTileList and ensure each set of tiles per frame are sorted by the tiles' meta-grid location
+	bool bHasAnimationError = false;
+	for(AnimationSet &animSetRef : m_AnimationSetList)
+	{
+		for(int iFrameIndex = 0; iFrameIndex < animSetRef.m_TempTileList.size(); ++iFrameIndex)
+		{
+			if(animSetRef.m_TempTileList[iFrameIndex].size() != (animSetRef.m_SizeInTiles.width() * animSetRef.m_SizeInTiles.height()))
+			{
+				bHasAnimationError = true;
+				break;
+			}
+			std::sort(animSetRef.m_TempTileList[iFrameIndex].begin(), animSetRef.m_TempTileList[iFrameIndex].end(),
+				[](TileData *pTileDataA, TileData *pTileDataB)
+				{
+					QPoint posA = pTileDataA->GetMetaGridPos();
+					QPoint posB = pTileDataB->GetMetaGridPos();
+					if(posA.y() != posB.y())
+						return posA.y() < posB.y();
+					else
+						return posA.x() < posB.x();
+				});
+		}
+		if(bHasAnimationError)
+			break;
+	}
+	if(bHasAnimationError)
+	{
+		HyGuiLog("TileSet has invalid animations setup and cannot save", LOGTYPE_Warning);
+		return false;
 	}
 
 	// Regenerate Sub-Atlas if needed
@@ -754,7 +806,10 @@ bool AtlasTileSet::Save()
 	m_pUndoStack->setClean();
 
 	// Save the runtime tile data that will be uploaded as a texture to the graphics API
-	//asdf;
+	for(TileData *pTileData : m_TileDataList)
+	{
+		//asdf;
+	}
 
 	return static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetMetaObj);
 }
@@ -833,33 +888,80 @@ void AtlasTileSet::UpdateTilePolygon()
 	}
 }
 
+//struct TileAnimation
+//{
+//	QUuid				m_StartingTileUuid;
+//	QList<int64>		m_TileChecksumList;	// Each frame's checksum (-1 indicates it's invalid)
+//
+//	quint16				m_uiStartingAtlasIndex; // This is determined when the sub-atlas is generated
+//	TileAnimation() :
+//		m_uiStartingAtlasIndex(TILEDATA_INVALID_ID)
+//	{ }
+	//TileAnimation(QJsonObject animObj)
+	//{
+	//	m_StartingTileUuid = QUuid(animObj["startingTile"].toString());
+
+	//	QJsonArray checksumArray = animObj["checksumFrames"].toArray();
+	//	for(QJsonValue checksumVal : checksumArray)
+	//		m_TileChecksumList.push_back(static_cast<int64>(checksumVal.toVariant().toLongLong()));
+
+	//	m_uiStartingAtlasIndex = animObj["startingAtlasIndex"].toInt();
+	//}
+
+	//QJsonObject ToJsonObject() const
+	//{
+	//	QJsonObject animObj;
+	//	animObj["startingTile"] = m_StartingTileUuid.toString(QUuid::WithoutBraces);
+	//	QJsonArray checksumArray;
+	//	for(int64 iChecksum : m_TileChecksumList)
+	//		checksumArray.append(static_cast<qint64>(iChecksum));
+	//	animObj["checksumFrames"] = checksumArray;
+	//	animObj["startingAtlasIndex"] = m_uiStartingAtlasIndex;
+
+	//	return animObj;
+	//}
+//};
+
 bool AtlasTileSet::RegenerateSubAtlas()
 {
 	if(m_TileImageMap.isEmpty())
 		return true;
 
-	QVector<quint32> tileChecksumList;	// All tiles checksums that will be drawn into the sub-atlas (it may contain duplicates)
+	QVector<quint32> subAtlasTileChecksumList;	// All tiles checksums that will be drawn into the sub-atlas (it may contain duplicates explained below)
 
-	// Tiles apart of Animations must occupy consecutive atlas tiles.
+	// Tiles apart of animations must occupy consecutive atlas tiles. These will be painted first in the sub-atlas. It also means if 
+	// animations reuse tiles with the same checksum, those tiles will need to be duplicated in the sub-atlas. The below algorithm
+	// will try to reuse tile sequences when possible, but if an animation's tile sequence is not fully contained in the existing sub-atlas, it will append
 	
-	//// First sort 'm_AnimationSetList' by the largest number of frames each animation has in descending order
-	//std::sort(m_AnimationSetList.begin(), m_AnimationSetList.end(),
-	//	[](AnimationSet &animA, AnimationSet &animB)
-	//	{
-	//		return animA. m_TileChecksumList.size() > animB.m_TileChecksumList.size();
-	//	});
-
+	// Make a list of sorted AnimationSet ptrs 'sortedAnimSetList' by the largest number of frames each animation has in descending order
+	QList<AnimationSet *> sortedAnimSetList;
+	sortedAnimSetList.reserve(m_AnimationSetList.size());
 	for(AnimationSet &animSet : m_AnimationSetList)
-	{
-		for(TileAnimation &anim : animSet.m_AnimationList)
+		sortedAnimSetList.push_back(&animSet);
+	std::sort(sortedAnimSetList.begin(), sortedAnimSetList.end(),
+		[](AnimationSet *pAnimA, AnimationSet *pAnimB)
 		{
-			// First try looking through 'tileChecksumList' to see if fully contains 'anim.m_TileChecksumList' and if so set 'StartingAtlasIndex' and don't append tile checksums
+			return pAnimA->m_iNumFrames > pAnimB->m_iNumFrames;
+		});
+
+	// Start populating 'subAtlasTileChecksumList' with all the AnimationSets' tile animations
+	for(AnimationSet *pAnimSet : sortedAnimSetList)
+	{
+		pAnimSet->m_TempStartingAtlasIndexList.clear();
+
+		for(int iTileAnimIndex = 0; iTileAnimIndex < (pAnimSet->m_SizeInTiles.width() * pAnimSet->m_SizeInTiles.height()); ++iTileAnimIndex)
+		{
+			QList<quint32> tileAnimChecksumList;
+			for(int iFrameIndex = 0; iFrameIndex < pAnimSet->m_iNumFrames; ++iFrameIndex)
+				tileAnimChecksumList.push_back(pAnimSet->m_TempTileList[iFrameIndex][iTileAnimIndex]->GetTileChecksum()); // NOTE: Size has been error checked prior in AtlasTileSet::Save()
+
+			// Once fully initialized, try looking through 'subAtlasTileChecksumList' to see if fully contains 'tileAnimChecksumList' and if so set 'StartingAtlasIndex' and don't append tile checksums
 			bool bFound = false;
-			for(int i = 0; i <= tileChecksumList.size() - anim.m_TileChecksumList.size(); ++i)
+			for(int i = 0; i <= subAtlasTileChecksumList.size() - tileAnimChecksumList.size(); ++i)
 			{
-				if(std::equal(anim.m_TileChecksumList.begin(), anim.m_TileChecksumList.end(), tileChecksumList.begin() + i))
+				if(std::equal(tileAnimChecksumList.begin(), tileAnimChecksumList.end(), subAtlasTileChecksumList.begin() + i))
 				{
-					anim.m_uiStartingAtlasIndex = i;
+					pAnimSet->m_TempStartingAtlasIndexList.push_back(i);
 					bFound = true;
 					break;
 				}
@@ -867,13 +969,13 @@ bool AtlasTileSet::RegenerateSubAtlas()
 			if(bFound)
 				continue;
 
-			// Next try looking through 'tileChecksumList' if it contains a portion of 'anim.m_TileChecksumList' at the end and if so, append the remaining tile checksums to 'tileChecksumList' and set 'StartingAtlasIndex'
-			for(int i = 0; i < anim.m_TileChecksumList.size(); ++i)
+			// Next try looking through 'subAtlasTileChecksumList' if it contains a portion of 'tileAnimChecksumList' at the end and if so, append the remaining tile checksums to 'subAtlasTileChecksumList' and set 'StartingAtlasIndex'
+			for(int i = 0; i < tileAnimChecksumList.size(); ++i)
 			{
-				if(std::equal(anim.m_TileChecksumList.begin(), anim.m_TileChecksumList.end() - i, tileChecksumList.end() - (anim.m_TileChecksumList.size() - i)))
+				if(std::equal(tileAnimChecksumList.begin(), tileAnimChecksumList.end() - i, subAtlasTileChecksumList.end() - (tileAnimChecksumList.size() - i)))
 				{
-					anim.m_uiStartingAtlasIndex = tileChecksumList.size() - (anim.m_TileChecksumList.size() - i);
-					tileChecksumList.append(anim.m_TileChecksumList.end() - i, anim.m_TileChecksumList.end());
+					pAnimSet->m_TempStartingAtlasIndexList.push_back(subAtlasTileChecksumList.size() - (tileAnimChecksumList.size() - i));
+					subAtlasTileChecksumList.append(tileAnimChecksumList.end() - i, tileAnimChecksumList.end());
 					bFound = true;
 					break;
 				}
@@ -881,20 +983,20 @@ bool AtlasTileSet::RegenerateSubAtlas()
 			if(bFound)
 				continue;
 		
-			// Not found in 'tileChecksumList', so append all tile checksums to 'tileChecksumList' and set 'StartingAtlasIndex'
-			anim.m_uiStartingAtlasIndex = tileChecksumList.size();
-			tileChecksumList.append(anim.m_TileChecksumList.begin(), anim.m_TileChecksumList.end());
-		}
-	}
+			// Not found in 'subAtlasTileChecksumList', so append all tile checksums to 'subAtlasTileChecksumList' and set 'StartingAtlasIndex'
+			pAnimSet->m_TempStartingAtlasIndexList.push_back(subAtlasTileChecksumList.size());
+			subAtlasTileChecksumList.append(tileAnimChecksumList.begin(), tileAnimChecksumList.end());
+		} // foreach tile anim in the AnimationSet
+	} // foreach AnimationSet
 
-	// Now go through 'm_TileImageMap' and append any tile not already found in 'tileChecksumList'
+	// Now go through 'm_TileImageMap' and append any tile not already found in 'subAtlasTileChecksumList'
 	for(auto it = m_TileImageMap.begin(); it != m_TileImageMap.end(); ++it)
 	{
-		if(std::find(tileChecksumList.begin(), tileChecksumList.end(), it.key()) == tileChecksumList.end())
-			tileChecksumList.push_back(it.key());
+		if(std::find(subAtlasTileChecksumList.begin(), subAtlasTileChecksumList.end(), it.key()) == subAtlasTileChecksumList.end())
+			subAtlasTileChecksumList.push_back(it.key());
 	}
 
-	m_iNumSubAtlasTiles = tileChecksumList.size();
+	m_iNumSubAtlasTiles = subAtlasTileChecksumList.size();
 
 	// Create a texture with a size that will accommodate all the existing, and newly appended tiles
 	const int iNUM_COLS = NUM_COLS_TILESET(m_iNumSubAtlasTiles);
@@ -906,7 +1008,7 @@ bool AtlasTileSet::RegenerateSubAtlas()
 	// Iterate through all the tiles and draw them to the blank newTexture
 	QPainter p(&newTexture);
 	int index = 0;
-	for(auto it = tileChecksumList.begin(); it != tileChecksumList.end(); ++it, ++index)
+	for(auto it = subAtlasTileChecksumList.begin(); it != subAtlasTileChecksumList.end(); ++it, ++index)
 	{
 		quint32 uiChecksum = *it;
 		QPixmap &pixmap = m_TileImageMap[uiChecksum];

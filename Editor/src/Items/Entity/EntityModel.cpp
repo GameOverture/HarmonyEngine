@@ -18,6 +18,7 @@
 #include "IAssetItemData.h"
 #include "SourceModel.h"
 #include "EntityUndoCmds.h"
+#include "TileMapModel.h"
 
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData),
@@ -1916,6 +1917,16 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 	//for(QString sCallback : m_CallbacksList)
 	//	callbacksArray.append(sCallback);
 	//itemSpecificFileDataOut.m_Meta.insert("callbacksList", callbacksArray);
+
+	QJsonObject tileMapObj;
+	for(EntityTreeItemData *pChild : childList)
+	{
+		if(pChild->GetType() != ITEM_TileMap)
+			continue;
+
+		TileMapModel *pTileMapModel = static_cast<TileMapModel *>(pChild->GetEditModel());
+	}
+	itemSpecificFileDataOut.m_Meta.insert("tileMaps", tileMapObj);
 }
 
 /*virtual*/ void EntityModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
