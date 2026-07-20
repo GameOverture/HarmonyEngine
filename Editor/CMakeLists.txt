@@ -32,7 +32,7 @@ if(Qt6_DIR)
 	message(STATUS "Adding Vendor: libtiled")
 	add_subdirectory(vendor/libtiled)
 	set_target_properties(libtiled PROPERTIES FOLDER "Editor Libs")
-
+	
 	message(STATUS "Setting up HyEditor...")
 	find_package(Qt6 COMPONENTS Core Gui Widgets OpenGLWidgets Multimedia REQUIRED)
 

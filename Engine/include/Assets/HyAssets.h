@@ -37,6 +37,7 @@ class IHyFile;
 class IHyNodeData;
 class HyEntityData;
 class HyAudioData;
+class HyTileMapData;
 class HySpriteData;
 class HySpineData;
 class HyTextData;
@@ -75,6 +76,7 @@ class HyAssets : public IHyThreadClass
 		const tData *GetData(const HyNodePath &nodePath) const;
 	};
 	Factory<HyAudioData>										m_AudioFactory;
+	Factory<HyTileMapData>										m_TileMapFactory;
 	Factory<HySpriteData>										m_SpriteFactory;
 	Factory<HyTextData>											m_TextFactory;
 	Factory<HySpineData>										m_SpineFactory;

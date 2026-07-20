@@ -18,3 +18,7 @@ TileMapView::TileMapView(HyEntity2d *pParent /*= nullptr*/) :
 /*virtual*/ TileMapView::~TileMapView()
 {
 }
+
+/*virtual*/ void TileMapView::SyncWithModel(EditModeState eEditModeState) /*override*/
+{
+}

@@ -7,7 +7,12 @@ option(TILED_STATIC_ZSTD "Link zstd statically" OFF)
 
 set(TILED_LIB_DIR "lib" CACHE STRING "Library install directory")
 
-find_package(Qt6 REQUIRED COMPONENTS Gui)
+# enable moc/autogen for this subproject
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+find_package(Qt6 REQUIRED COMPONENTS Core Gui)
 
 find_package(PkgConfig)
 
@@ -128,9 +133,22 @@ set(TILED_HEADERS
     world.h
 )
 
-add_library(libtiled
+add_library(libtiled SHARED
     ${TILED_SOURCES}
     ${TILED_HEADERS}
+)
+
+set_target_properties(libtiled PROPERTIES
+    AUTOMOC ON
+    AUTOUIC ON
+    AUTORCC ON
+)
+
+# make libtiled output its runtime files to HyEditor's folder
+set_target_properties(libtiled PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY $<TARGET_FILE_DIR:HyEditor>
+  RUNTIME_OUTPUT_DIRECTORY_DEBUG $<TARGET_FILE_DIR:HyEditor>
+  RUNTIME_OUTPUT_DIRECTORY_RELEASE $<TARGET_FILE_DIR:HyEditor>
 )
 
 target_compile_features(libtiled PUBLIC cxx_std_17)
@@ -159,6 +177,7 @@ endif()
 
 target_link_libraries(libtiled
     PUBLIC
+        Qt6::Core
         Qt6::Gui
 )
 

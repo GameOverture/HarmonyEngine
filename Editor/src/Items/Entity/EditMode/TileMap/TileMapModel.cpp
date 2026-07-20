@@ -11,8 +11,7 @@
 #include "AtlasTileSet.h"
 
 TileMapModel::TileMapModel() :
-	IEditModeModel(EDITMODETYPE_TileMap),
-	m_pTileSet(nullptr)
+	IEditModeModel(EDITMODETYPE_TileMap)
 {
 }
 
@@ -66,6 +65,20 @@ TileMapModel::TileMapModel() :
 
 /*virtual*/ void TileMapModel::ClearAction() /*override*/
 {
+}
+
+void TileMapModel::SetCell(int iX, int iY, AtlasTileSet *pTileSet, int iTileId)
+{
+	Tiled::Cell cell(pTileSet->GetTiledTileSet().data(), iTileId);
+	m_TiledLayer.setCell(iX, iY, cell);
+
+	//// NOTE: We register the tile map's dependency on the tile set. The entity will have a dependency on the tile map, which in turn has a dependency on the tile set.
+	//QList<QUuid> registerList;
+	//registerList.push_back(pTileSet->GetUuid());
+	//m_ItemRef.GetProject().IncrementDependencies(pAddedTileMap, registerList);
+	//registerList.clear();
+	//registerList.push_back(pAddedTileMap->GetUuid());
+	//m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, registerList);
 }
 
 void TileMapModel::UpdateTileIds(const std::vector<std::pair<uint16, uint16>> &modifiedIndexList) // Pair<old, new>

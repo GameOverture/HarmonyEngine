@@ -13,6 +13,7 @@
 #include "Global.h"
 #include "AtlasFrame.h"
 #include "TileSetScene.h"
+#include "vendor/libtiled/tileset.h"
 
 #include <QWidget>
 #include <QSet>
@@ -260,6 +261,8 @@ class AtlasTileSet : public AtlasFrame
 	// Tile IDs must be sequential with no gaps, as the ID is used to sample the row-major texel in the ShaderDescriptor data texture
 	QVector<TileData *>			m_TileDataList;
 
+	Tiled::SharedTileset		m_pTiledTileSet;	// Dummy tileset ptr to reference this AtlasTileSet in the Tiled API
+
 public:
 	AtlasTileSet(IManagerModel &modelRef,
 				 QUuid uuid,
@@ -336,6 +339,8 @@ public:
 	void DiscardChanges();
 
 	virtual void InsertUniqueJson(QJsonObject &frameObj) override;
+
+	Tiled::SharedTileset GetTiledTileSet() const;
 
 protected:
 	void UpdateTilePolygon();

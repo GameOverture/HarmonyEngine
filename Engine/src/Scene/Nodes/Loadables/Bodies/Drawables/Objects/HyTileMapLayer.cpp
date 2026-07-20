@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyTileMap.cpp
+ *	HyTileMapLayer.cpp
  *	
  *	Harmony Engine
  *	Copyright (c) 2026 Jason Knobler
@@ -8,30 +8,34 @@
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMap.h"
+#include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMapLayer.h"
+#include "Assets/Nodes/Objects/HyTileMapData.h"
 
-HyTileMap::HyTileMap(std::string sTileSetName, HyEntity2d *pParent /*= nullptr*/) :
-	IHyDrawable2d(HYTYPE_TileMap, HyNodePath(), pParent)
+HyTileMapLayer::HyTileMapLayer(const HyNodePath &nodePath, HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_TileMap, nodePath, pParent),
+	m_iTileMapDataIndex(0)
 {
 }
 
-HyTileMap::HyTileMap(const HyTileMap &copyRef) :
+HyTileMapLayer::HyTileMapLayer(const HyTileMapLayer &copyRef) :
 	IHyDrawable2d(copyRef)
 {
 	operator=(copyRef);
 }
 
-HyTileMap::~HyTileMap(void)
+HyTileMapLayer::~HyTileMapLayer(void)
 {
 }
 
-const HyTileMap &HyTileMap::operator=(const HyTileMap &rhs)
+const HyTileMapLayer &HyTileMapLayer::operator=(const HyTileMapLayer &rhs)
 {
 	IHyDrawable2d::operator=(rhs);
+	m_iTileMapDataIndex = rhs.m_iTileMapDataIndex;
+
 	return *this;
 }
 
-/*virtual*/ void HyTileMap::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
+/*virtual*/ void HyTileMapLayer::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
 {
 	//// Make b2AABB by combining each layer
 	//b2AABB aabb = { {0,0}, {0,0} };
@@ -58,27 +62,35 @@ const HyTileMap &HyTileMap::operator=(const HyTileMap &rhs)
 	//shapeOut.SetAsBox(HyRect(vExtents.x, vExtents.y, glm::vec2(ptCenter.x, ptCenter.y), 0.0f));
 }
 
-/*virtual*/ float HyTileMap::GetWidth(float fPercent /*= 1.0f*/) /*override*/
+/*virtual*/ float HyTileMapLayer::GetWidth(float fPercent /*= 1.0f*/) /*override*/
 {
-	return static_cast<float>(m_uiTotalWidth) * fPercent;
+	if(AcquireData() == nullptr || m_iTileMapDataIndex >= static_cast<const HyTileMapData *>(UncheckedGetData())->GetNumTileMaps() || m_iTileMapDataIndex < 0)
+		return 0.0f;
+
+	const HyTileMapData *pData = static_cast<const HyTileMapData *>(UncheckedGetData());
+	return pData->GetTileMapWidth(m_iTileMapDataIndex) * fPercent;
 }
 
-/*virtual*/ float HyTileMap::GetHeight(float fPercent /*= 1.0f*/) /*override*/
+/*virtual*/ float HyTileMapLayer::GetHeight(float fPercent /*= 1.0f*/) /*override*/
 {
-	return static_cast<float>(m_uiTotalHeight) * fPercent;
+	if(AcquireData() == nullptr || m_iTileMapDataIndex >= static_cast<const HyTileMapData *>(UncheckedGetData())->GetNumTileMaps() || m_iTileMapDataIndex < 0)
+		return 0.0f;
+
+	const HyTileMapData *pData = static_cast<const HyTileMapData *>(UncheckedGetData());
+	return pData->GetTileMapHeight(m_iTileMapDataIndex) * fPercent;
 }
 
-/*virtual*/ bool HyTileMap::IsLoadDataValid() /*override*/
+/*virtual*/ bool HyTileMapLayer::IsLoadDataValid() /*override*/
 {
 	return true;
 }
 
-/*virtual*/ bool HyTileMap::OnIsValidToRender() /*override*/
+/*virtual*/ bool HyTileMapLayer::OnIsValidToRender() /*override*/
 {
 	return true;
 }
 
-/*virtual*/ void HyTileMap::OnUpdateUniforms(float fExtrapolatePercent) /*override*/
+/*virtual*/ void HyTileMapLayer::OnUpdateUniforms(float fExtrapolatePercent) /*override*/
 {
 	//// TODO: get rid of this check and improve m_ShaderUniforms
 	//if(m_bUpdateShaderUniforms)
@@ -92,7 +104,7 @@ const HyTileMap &HyTileMap::operator=(const HyTileMap &rhs)
 	//}
 }
 
-/*virtual*/ void HyTileMap::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, HyBlendMode &eBlendModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
+/*virtual*/ void HyTileMapLayer::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, HyBlendMode &eBlendModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
 {
 	//eRenderModeOut = HYRENDERMODE_Triangles;
 	//eBlendModeOut = HYBLENDMODE_Normal;
@@ -109,7 +121,7 @@ const HyTileMap &HyTileMap::operator=(const HyTileMap &rhs)
 	//bIsBatchable = true;
 }
 
-/*virtual*/ bool HyTileMap::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
+/*virtual*/ bool HyTileMapLayer::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
 {
 	//// TODO: Get rid of top/bot color
 	//glm::vec3 vTop = CalculateTopTint(fExtrapolatePercent);

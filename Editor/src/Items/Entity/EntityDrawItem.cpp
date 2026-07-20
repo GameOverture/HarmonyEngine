@@ -13,6 +13,7 @@
 #include "EntityDraw.h"
 #include "DlgSetUiPanel.h"
 #include "MainWindow.h"
+#include "TileMapView.h"
 #include "VectorView.h"
 #include "VectorModel.h"
 
@@ -161,6 +162,13 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 			HyGuiLog("EntityDrawItem ctor - unhandled widget item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 			break;
 		};
+	}
+	else if(m_pEntityTreeItemData->GetType() == ITEM_TileMap)
+	{
+		m_pEditView = new TileMapView(pParent);
+
+		m_pEditView->SetModel(m_pEntityTreeItemData->GetEditModel());
+		m_pChild = m_pEditView;
 	}
 	else if(m_pEntityTreeItemData->GetType() == ITEM_PrimNode)
 	{
@@ -976,6 +984,8 @@ void ExtrapolateProperties(Project &projectRef,
 		{
 		case ITEM_None:		// 'ITEM_None' is passed for the main entity root node
 		case ITEM_Entity:	// 'ITEM_Entity' is passed when this is a sub-entity (NOTE: sub-entity timeline events are handled above)
+		case ITEM_TileMap:
+			// TILETODO: Do we deserialize the entire map?
 		case ITEM_PrimNode:
 			break;
 

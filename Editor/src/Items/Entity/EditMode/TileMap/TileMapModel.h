@@ -12,12 +12,13 @@
 
 #include "Global.h"
 #include "IEditModeModel.h"
+#include "vendor/libtiled/tilelayer.h"
 
 class AtlasTileSet;
 
 class TileMapModel : public IEditModeModel
 {
-	AtlasTileSet *			m_pTileSet;
+	Tiled::TileLayer		m_TiledLayer;
 
 public:
 	TileMapModel();
@@ -37,6 +38,8 @@ public:
 	
 	virtual QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
 	virtual void ClearAction() override;
+
+	void SetCell(int iX, int iY, AtlasTileSet *pTileSet, int iTileId);
 
 	void UpdateTileIds(const std::vector<std::pair<uint16, uint16>> &modifiedIndexList); // Pair<old, new>
 };

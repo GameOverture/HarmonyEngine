@@ -92,7 +92,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Assets/Nodes/Objects/HySpriteData.cpp
 	src/Assets/Nodes/Objects/HyTextData.cpp
 	src/Assets/Nodes/Objects/HyTexturedQuadData.cpp
-	src/Assets/Nodes/Objects/HyTileSetData.cpp
+	src/Assets/Nodes/Objects/HyTileMapData.cpp
 	src/Audio/HyAudioCore.cpp
 	src/Audio/HySoundAsset.cpp
 	src/Diagnostics/HyDiagnostics.cpp
@@ -144,7 +144,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.cpp
-	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMap.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMapLayer.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySpine.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.cpp
@@ -232,7 +232,7 @@ set(HYENGINE_HEADER_FILES
 	include/Assets/Nodes/Objects/HySpriteData.h
 	include/Assets/Nodes/Objects/HyTextData.h
 	include/Assets/Nodes/Objects/HyTexturedQuadData.h
-	include/Assets/Nodes/Objects/HyTileSetData.h
+	include/Assets/Nodes/Objects/HyTileMapData.h
 	include/Audio/HyAudioCore.h
 	include/Audio/HySoundAsset.h
 	include/Diagnostics/HyDiagnostics.h
@@ -287,7 +287,7 @@ set(HYENGINE_HEADER_FILES
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h
-	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMap.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMapLayer.h
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.h
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySpine.h
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.h

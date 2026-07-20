@@ -252,22 +252,14 @@ QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewAssets(QList<IAssetItemDat
 	return treeNodeList;
 }
 
-EntityTreeItemData *EntityModel::Cmd_CreateTileMap(AtlasTileSet *pTileSet, int iRow)
+EntityTreeItemData *EntityModel::Cmd_CreateTileMap(int iRow)
 {
-	EntityTreeItemData *pAddedTileMap = m_TreeModel.Cmd_AllocTileMapTreeItem(pTileSet, "m_", iRow);
+	EntityTreeItemData *pAddedTileMap = m_TreeModel.Cmd_AllocTileMapTreeItem("m_", iRow);
 	if(pAddedTileMap == nullptr)
 	{
-		HyGuiLog("EntityModel::Cmd_CreateTileMap could not insert a tile map with tile set: " % pTileSet->GetName(), LOGTYPE_Error);
+		HyGuiLog("EntityModel::Cmd_CreateTileMap could not insert a tile map", LOGTYPE_Error);
 		return nullptr;
 	}
-
-	// NOTE: We register the tile map's dependency on the tile set. The entity will have a dependency on the tile map, which in turn has a dependency on the tile set.
-	QList<QUuid> registerList;
-	registerList.push_back(pTileSet->GetUuid());
-	m_ItemRef.GetProject().IncrementDependencies(pAddedTileMap, registerList);
-	registerList.clear();
-	registerList.push_back(pAddedTileMap->GetUuid());
-	m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, registerList);
 
 	return pAddedTileMap;
 }
@@ -1918,15 +1910,17 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 	//	callbacksArray.append(sCallback);
 	//itemSpecificFileDataOut.m_Meta.insert("callbacksList", callbacksArray);
 
-	QJsonObject tileMapObj;
-	for(EntityTreeItemData *pChild : childList)
-	{
-		if(pChild->GetType() != ITEM_TileMap)
-			continue;
 
-		TileMapModel *pTileMapModel = static_cast<TileMapModel *>(pChild->GetEditModel());
-	}
-	itemSpecificFileDataOut.m_Meta.insert("tileMaps", tileMapObj);
+	itemSpecificFileDataOut.m_Data.insert(
+	//QJsonObject tileMapObj;
+	//for(EntityTreeItemData *pChild : childList)
+	//{
+	//	if(pChild->GetType() != ITEM_TileMap)
+	//		continue;
+
+	//	TileMapModel *pTileMapModel = static_cast<TileMapModel *>(pChild->GetEditModel());
+	//}
+	//itemSpecificFileDataOut.m_Meta.insert("tileMaps", tileMapObj);
 }
 
 /*virtual*/ void EntityModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/

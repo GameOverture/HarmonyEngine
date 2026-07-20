@@ -840,11 +840,12 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocAssetTreeItem(IAssetItemData *pAss
 	return pNewItem;
 }
 
-EntityTreeItemData *EntityTreeModel::Cmd_AllocTileMapTreeItem(AtlasTileSet *pTileSet, QString sCodeNamePrefix, int iRow /*= -1*/)
+EntityTreeItemData *EntityTreeModel::Cmd_AllocTileMapTreeItem(QString sCodeNamePrefix, int iRow /*= -1*/)
 {
 	// Generate a unique code name for this new item
-	QString sCodeName = GenerateCodeName(sCodeNamePrefix + pTileSet->GetName());
-	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, ITEM_TileMap, ENTTYPE_Item, pTileSet->GetUuid(), QUuid::createUuid());
+	QString sCodeName = GenerateCodeName(sCodeNamePrefix + "TileMapLayer");
+
+	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, ITEM_TileMap, ENTTYPE_Item, m_ModelRef.GetUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetRootTreeItem(), iRow);
 
 	return pNewItem;

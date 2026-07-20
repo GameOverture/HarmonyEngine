@@ -14,6 +14,7 @@
 #include "Assets/Files/HyGLTF.h"
 #include "Assets/Files/HyFileAudio.h"
 #include "Assets/Nodes/Objects/HyAudioData.h"
+#include "Assets/Nodes/Objects/HyTileMapData.h"
 #include "Assets/Nodes/Objects/HySpineData.h"
 #include "Assets/Nodes/Objects/HySpriteData.h"
 #include "Assets/Nodes/Objects/HyTextData.h"
@@ -233,6 +234,9 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 {
 	switch(pLoadable->_LoadableGetType())
 	{
+	case HYTYPE_TileMap:
+		pDataOut = m_TileMapFactory.GetData(pLoadable->GetPath());
+		break;
 	case HYTYPE_Sprite:
 		pDataOut = m_SpriteFactory.GetData(pLoadable->GetPath());
 		break;
@@ -639,6 +643,8 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	if(itemsDoc.HasMember("Audio"))
 		m_AudioFactory.Init("Audio", itemsDoc["Audio"].GetObject(), *this);
+	if(itemsDoc.HasMember("Entities"))
+		m_TileMapFactory.Init("TileMap", itemsDoc["Entities"].GetObject(), *this);
 	if(itemsDoc.HasMember("Sprites"))
 		m_SpriteFactory.Init("Sprite", itemsDoc["Sprites"].GetObject(), *this);
 	if(itemsDoc.HasMember("Texts"))

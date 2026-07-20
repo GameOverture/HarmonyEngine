@@ -1,5 +1,5 @@
 /**************************************************************************
- *	HyTileMap.h
+ *	HyTileMapLayer.h
  *	
  *	Harmony Engine
  *	Copyright (c) 2026 Jason Knobler
@@ -7,38 +7,24 @@
  *	Harmony License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef HyTileMap_h__
-#define HyTileMap_h__
+#ifndef HyTileMapLayer_h__
+#define HyTileMapLayer_h__
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 #include <array>
 
-#define HYTILEMAP_CHUNKDIMENSION 32
-#define HYTILEMAP_CHUNKSIZE (HYTILEMAP_CHUNKDIMENSION * HYTILEMAP_CHUNKDIMENSION)
-
-class HyTileMap : public IHyDrawable2d
+class HyTileMapLayer : public IHyDrawable2d
 {
 protected:
-	uint16_t										m_uiTotalWidth;
-	uint16_t										m_uiTotalHeight;
-
-	struct TileChunk
-	{
-		glm::ivec2									m_vCoordinate;
-		std::array<uint32_t, HYTILEMAP_CHUNKSIZE>	m_Tiles;
-
-		HyTextureHandle								m_hTileTexture;
-		bool										m_bDirty;
-	};
-	std::vector<TileChunk>							m_ChunkList;
+	int					m_iTileMapDataIndex;
 
 public:
-	HyTileMap(std::string sTileSetName, HyEntity2d *pParent = nullptr);
-	HyTileMap(const HyTileMap &copyRef);
-	virtual ~HyTileMap(void);
+	HyTileMapLayer(const HyNodePath &nodePath, HyEntity2d *pParent = nullptr);
+	HyTileMapLayer(const HyTileMapLayer &copyRef);
+	virtual ~HyTileMapLayer(void);
 
-	const HyTileMap &operator=(const HyTileMap &rhs);
+	const HyTileMapLayer &operator=(const HyTileMapLayer &rhs);
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 	virtual float GetWidth(float fPercent = 1.0f) override;
@@ -65,4 +51,4 @@ private: // Hide inherited functionality that doesn't exist for tile maps
 	using IHyLoadable2d::Uninit;
 };
 
-#endif /* HyTileMap_h__ */
+#endif /* HyTileMapLayer_h__ */

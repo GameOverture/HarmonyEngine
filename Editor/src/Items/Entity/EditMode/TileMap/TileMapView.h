@@ -19,7 +19,7 @@ public:
 	TileMapView(HyEntity2d *pParent = nullptr);
 	virtual ~TileMapView();
 
-	virtual void SyncWithModel(EditModeState eEditModeState) = 0;
+	virtual void SyncWithModel(EditModeState eEditModeState);
 };
 
 #endif // TileMapView_H

@@ -125,9 +125,8 @@ EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-EntityUndoCmd_AddTileMap::EntityUndoCmd_AddTileMap(ProjectItemData &entityItemRef, AtlasTileSet *pTileSetAsset, QUndoCommand *pParent /*= nullptr*/) :
+EntityUndoCmd_AddTileMap::EntityUndoCmd_AddTileMap(ProjectItemData &entityItemRef, QUndoCommand *pParent /*= nullptr*/) :
 	m_EntityItemRef(entityItemRef),
-	m_pTileSetAsset(pTileSetAsset),
 	m_pTileMapTreeItemData(nullptr)
 {
 	if(m_EntityItemRef.GetType() != ITEM_Entity)
@@ -143,7 +142,7 @@ EntityUndoCmd_AddTileMap::EntityUndoCmd_AddTileMap(ProjectItemData &entityItemRe
 /*virtual*/ void EntityUndoCmd_AddTileMap::redo() /*override*/
 {
 	if(m_pTileMapTreeItemData == nullptr)
-		m_pTileMapTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateTileMap(m_pTileSetAsset, -1);
+		m_pTileMapTreeItemData = static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_CreateTileMap(-1);
 	else
 		static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_ReaddChild(m_pTileMapTreeItemData, -1);
 }

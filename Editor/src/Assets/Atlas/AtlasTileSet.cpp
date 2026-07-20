@@ -138,6 +138,8 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 	}
 
 	m_GfxScene.Initialize(this);
+
+	m_pTiledTileSet = Tiled::Tileset::create(m_sName, 0, 0, 0, 0);
 }
 
 AtlasTileSet::~AtlasTileSet()
@@ -838,6 +840,11 @@ void AtlasTileSet::DiscardChanges()
 	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TexInfo.GetBucketId())));
 	frameObj.insert("x", QJsonValue(GetX()));
 	frameObj.insert("y", QJsonValue(GetY()));
+}
+
+Tiled::SharedTileset AtlasTileSet::GetTiledTileSet() const
+{
+	return m_pTiledTileSet;
 }
 
 void AtlasTileSet::UpdateTilePolygon()

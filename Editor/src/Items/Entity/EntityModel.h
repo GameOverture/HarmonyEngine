@@ -91,7 +91,7 @@ public:
 	void Cmd_SetBaseClassType(EntityBaseClassType eNewBaseClassType);
 	QList<EntityTreeItemData *> Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow);
 	QList<EntityTreeItemData *> Cmd_CreateNewAssets(QList<IAssetItemData *> assetItemList, int iRow);
-	EntityTreeItemData *Cmd_CreateTileMap(AtlasTileSet *pTileSet, int iRow);
+	EntityTreeItemData *Cmd_CreateTileMap(int iRow);
 	EntityTreeItemData *Cmd_AddExistingItem(QJsonObject descObj, EntityItemType eEntType, int iRow); // If a newly created ArrayFolder is needed, it'll be placed at 'iRow'. If ArrayFolder already exists, 'iRow' is the row within the ArrayFolder
 	EntityTreeItemData *Cmd_CreateNewGuiItem(ItemType eGuiItemType, QUuid guiLayoutParentUuid, int iRow);
 	EntityTreeItemData *Cmd_CreateNewPrimNode(int iRow);

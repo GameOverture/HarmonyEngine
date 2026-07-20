@@ -68,11 +68,10 @@ public:
 class EntityUndoCmd_AddTileMap : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;
-	AtlasTileSet *					m_pTileSetAsset;
 	EntityTreeItemData *			m_pTileMapTreeItemData;
 
 public:
-	EntityUndoCmd_AddTileMap(ProjectItemData &entityItemRef, AtlasTileSet *pTileSetAsset, QUndoCommand *pParent = nullptr);
+	EntityUndoCmd_AddTileMap(ProjectItemData &entityItemRef, QUndoCommand *pParent = nullptr);
 	virtual ~EntityUndoCmd_AddTileMap();
 
 	virtual void redo() override;

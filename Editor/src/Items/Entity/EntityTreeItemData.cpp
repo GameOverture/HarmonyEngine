@@ -119,6 +119,7 @@ QString EntityTreeItemData::GetHyNodeTypeName(bool bIncludeNamespace) const
 {
 	switch(m_eTYPE)
 	{
+	case ITEM_TileMap:			return "HyTileMapLayer";
 	case ITEM_PrimNode:			return "HyPrimitive2d";
 	case ITEM_Audio:			return "HyAudio2d";
 	case ITEM_Text:				return "HyText2d";
