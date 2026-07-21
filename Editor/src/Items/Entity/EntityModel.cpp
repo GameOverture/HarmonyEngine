@@ -19,6 +19,7 @@
 #include "SourceModel.h"
 #include "EntityUndoCmds.h"
 #include "TileMapModel.h"
+#include "vendor/libtiled/maptovariantconverter.h"
 
 EntityStateData::EntityStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :
 	IStateData(iStateIndex, modelRef, stateFileData),
@@ -141,6 +142,35 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 	InitStates<EntityStateData>(itemFileDataRef);
 
 	m_TreeModel.Cmd_ResetFusedItems();
+
+	QJsonObject tiledMapObj = itemFileDataRef.m_Meta["tiledParams"].toObject();
+	m_TiledMapParameters.orientation = Tiled::orientationFromString(tiledMapObj["orientation"].toString());
+	m_TiledMapParameters.renderOrder = Tiled::renderOrderFromString(tiledMapObj["renderorder"].toString());
+	m_TiledMapParameters.width = tiledMapObj["width"].toInt();
+	m_TiledMapParameters.height = tiledMapObj["height"].toInt();
+	m_TiledMapParameters.tileWidth = tiledMapObj["tilewidth"].toInt();
+	m_TiledMapParameters.tileHeight = tiledMapObj["tileheight"].toInt();
+	m_TiledMapParameters.infinite = tiledMapObj["infinite"].toBool();
+	m_TiledMapParameters.hexSideLength = tiledMapObj["hexsidelength"].toInt();
+	m_TiledMapParameters.staggerAxis = Tiled::staggerAxisFromString(tiledMapObj["staggeraxis"].toString());
+	m_TiledMapParameters.staggerIndex = Tiled::staggerIndexFromString(tiledMapObj["staggerindex"].toString());
+	m_TiledMapParameters.skewX = tiledMapObj["skewx"].toInt();
+	m_TiledMapParameters.skewY = tiledMapObj["skewy"].toInt();
+	m_TiledMapParameters.parallaxOrigin = QPointF(tiledMapObj["parallaxoriginx"].toDouble(), tiledMapObj["parallaxoriginy"].toDouble());
+	const QString sBgColor = tiledMapObj["backgroundcolor"].toString();
+	if(QColor::isValidColor(sBgColor))
+		m_TiledMapParameters.backgroundColor = QColor(sBgColor);
+
+	m_TiledMapEditorSettings.compressionLevel = tiledMapObj["compressionlevel"].toInt(-1);
+	QJsonObject chunkSizeObj = tiledMapObj["chunksize"].toObject();
+	int iChunkWidth = chunkSizeObj["width"].toInt(Tiled::CHUNK_SIZE);
+	int iChunkHeight = chunkSizeObj["height"].toInt(Tiled::CHUNK_SIZE);
+	if(iChunkWidth == 0)
+		iChunkWidth = Tiled::CHUNK_SIZE;
+	if(iChunkHeight == 0)
+		iChunkHeight = Tiled::CHUNK_SIZE;
+	m_TiledMapEditorSettings.chunkSize = QSize(iChunkWidth, iChunkHeight);
+	m_TiledMapEditorSettings.layerDataFormat = Tiled::Map::Base64Zlib;
 }
 
 /*virtual*/ EntityModel::~EntityModel()
@@ -1905,22 +1935,13 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 	}
 	itemSpecificFileDataOut.m_Meta.insert("descLayoutList", layoutArray);
 
-	//QJsonArray callbacksArray;
-	//for(QString sCallback : m_CallbacksList)
-	//	callbacksArray.append(sCallback);
-	//itemSpecificFileDataOut.m_Meta.insert("callbacksList", callbacksArray);
+	std::unique_ptr<Tiled::Map> exportedMapPtr = ExportToTiledMap();
+	Tiled::MapToVariantConverter tiledMapConverter;
+	QVariant tiledMapVariant = tiledMapConverter.toVariant(*exportedMapPtr, QDir());
 
-
-	itemSpecificFileDataOut.m_Data.insert(
-	//QJsonObject tileMapObj;
-	//for(EntityTreeItemData *pChild : childList)
-	//{
-	//	if(pChild->GetType() != ITEM_TileMap)
-	//		continue;
-
-	//	TileMapModel *pTileMapModel = static_cast<TileMapModel *>(pChild->GetEditModel());
-	//}
-	//itemSpecificFileDataOut.m_Meta.insert("tileMaps", tileMapObj);
+	QJsonArray referencedTileSetsArray;
+	QJsonArray tileMapsArray;
+	// TILETODO: finish this
 }
 
 /*virtual*/ void EntityModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
@@ -1956,4 +1977,32 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 {
 	SourceModel &sourceModelRef = m_ItemRef.GetProject().GetSourceModel();
 	sourceModelRef.DeleteEntitySrcFiles(*this);
+}
+
+std::unique_ptr<Tiled::Map> EntityModel::ExportToTiledMap() const
+{
+	std::unique_ptr<Tiled::Map> exportedMapOut = std::make_unique<Tiled::Map>(m_TiledMapParameters);
+
+	exportedMapOut->setCompressionLevel(m_TiledMapEditorSettings.compressionLevel);
+	exportedMapOut->setChunkSize(m_TiledMapEditorSettings.chunkSize);
+	exportedMapOut->setLayerDataFormat(m_TiledMapEditorSettings.layerDataFormat);
+
+	QList<EntityTreeItemData *> childList, shapeList, layoutList;
+	m_TreeModel.GetTreeItemData(childList, shapeList, layoutList);
+	for(EntityTreeItemData *pChild : childList)
+	{
+		if(pChild->GetType() != ITEM_TileMap)
+			continue;
+
+		TileMapModel *pTileMapModel = static_cast<TileMapModel *>(pChild->GetEditModel());
+
+		QList<AtlasTileSet *> tileSetList = pTileMapModel->UsedTilesets(m_ItemRef.GetProject().GetAtlasModel());
+		for(AtlasTileSet *pTileSet : tileSetList)
+			exportedMapOut->addTileset(pTileSet->GetTiledTileSet());
+
+		// NOTE: Tiled::Map takes ownership of layers added to it, so ensure we clone TileMapModel's internal Tiled::TileLayer component
+		exportedMapOut->addLayer(pTileMapModel->GetTiledTileLayer().clone());
+	}
+
+	return exportedMapOut;
 }

@@ -15,6 +15,7 @@
 #include "vendor/libtiled/tilelayer.h"
 
 class AtlasTileSet;
+class AtlasModel;
 
 class TileMapModel : public IEditModeModel
 {
@@ -38,6 +39,9 @@ public:
 	
 	virtual QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
 	virtual void ClearAction() override;
+
+	const Tiled::TileLayer &GetTiledTileLayer() const;
+	QList<AtlasTileSet *> UsedTilesets(const AtlasModel &atlasManagerRef) const;
 
 	void SetCell(int iX, int iY, AtlasTileSet *pTileSet, int iTileId);
 

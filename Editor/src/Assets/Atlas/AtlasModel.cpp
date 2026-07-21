@@ -179,8 +179,19 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	return true;
 }
 
+const QMap<QString, AtlasTileSet *> &AtlasModel::GetTileSetMap() const
+{
+	return m_TileSetsMap;
+}
+
 AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pParentTreeItemData, quint32 uiBankId)
 {
+	if(m_TileSetsMap.contains(sName.toLower()))
+	{
+		HyGuiLog("AtlasModel::GenerateTileSet() - an AtlasTileSet that already existed by the same name: " % sName, LOGTYPE_Error);
+		return nullptr;
+	}
+
 	AtlasTileSet *pNewTileSet = new AtlasTileSet(*this,
 												 QUuid::createUuid(),
 												 0,
@@ -195,6 +206,8 @@ AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pPar
 												QJsonObject(),
 												true,
 												0);
+
+	m_TileSetsMap.insert(pNewTileSet->GetName().toLower(), pNewTileSet);
 
 	RegisterAsset(pNewTileSet);
 
@@ -442,6 +455,11 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 													 tileSetMetaObj,
 													 false,
 													 metaObj["errors"].toInt(0));
+
+		if(m_TileSetsMap.contains(pNewTileSet->GetName().toLower()))
+			HyGuiLog("AtlasModel::OnAllocateAssetData() - Allocated an AtlasTileSet that already existed by the same name: " % pNewTileSet->GetName(), LOGTYPE_Error);
+		m_TileSetsMap.insert(pNewTileSet->GetName().toLower(), pNewTileSet);
+
 		return pNewTileSet;
 	}
 

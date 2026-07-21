@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "TileMapModel.h"
 #include "AtlasTileSet.h"
+#include "AtlasModel.h"
 
 TileMapModel::TileMapModel() :
 	IEditModeModel(EDITMODETYPE_TileMap)
@@ -65,6 +66,29 @@ TileMapModel::TileMapModel() :
 
 /*virtual*/ void TileMapModel::ClearAction() /*override*/
 {
+}
+
+const Tiled::TileLayer &TileMapModel::GetTiledTileLayer() const
+{
+	return m_TiledLayer;
+}
+
+QList<AtlasTileSet *> TileMapModel::UsedTilesets(const AtlasModel &atlasManagerRef) const
+{
+	const QMap<QString, AtlasTileSet *> &tileSetMapRef = atlasManagerRef.GetTileSetMap();
+	QList<AtlasTileSet *> returnList;
+
+	QSet<Tiled::SharedTileset> tiledTileSets = m_TiledLayer.usedTilesets();
+	for(Tiled::SharedTileset tileSetPtr : tiledTileSets)
+	{
+		QString sTileSetName = tileSetPtr->name();
+		if(tileSetMapRef.contains(sTileSetName.toLower()) == false)
+			HyGuiLog("TileMapModel::UsedTilesets - could not find TileSet in Atlas Manager with name: " % sTileSetName, LOGTYPE_Error);
+		else
+			returnList.push_back(tileSetMapRef[sTileSetName.toLower()]);
+	}
+
+	return returnList;
 }
 
 void TileMapModel::SetCell(int iX, int iY, AtlasTileSet *pTileSet, int iTileId)

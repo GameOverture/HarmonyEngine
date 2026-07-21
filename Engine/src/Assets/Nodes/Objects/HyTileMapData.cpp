@@ -16,7 +16,8 @@ HyTileMapData::HyTileMapData(const HyNodePath &nodePath, HyJsonObj itemDataObj, 
 {
 	HyUvCoord rSubAtlasUVRect;
 	uint64 uiCropMask = 0;
-	m_pAtlas = assetsRef.GetAtlas(itemDataObj["checksum"].GetUint(), itemDataObj["bankId"].GetUint(), rSubAtlasUVRect, uiCropMask);
+	// TILETODO: parse itemDataObj
+	//m_pAtlas = assetsRef.GetAtlas(itemDataObj["checksum"].GetUint(), itemDataObj["bankId"].GetUint(), rSubAtlasUVRect, uiCropMask);
 
 	for(TileSet &tileSetRef : m_TileSetList)
 	{

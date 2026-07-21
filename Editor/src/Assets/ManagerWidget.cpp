@@ -1369,7 +1369,14 @@ void ManagerWidget::on_actionCreateTileSet_triggered()
 
 	pParentTreeItem = m_pModel->FindTreeItemFilter(pParentTreeItem, true);
 
-	DlgInputName dlgInputName("Enter TileSet Name", "New TileSet", HyGlobal::FileNameValidator(), nullptr, nullptr);
+	DlgInputName dlgInputName("Enter TileSet Name", "New TileSet", HyGlobal::FreeFormValidator(),
+		[this](QString sInputName) -> QString
+		{
+			if(static_cast<AtlasModel *>(m_pModel)->GetTileSetMap().contains(sInputName.toLower()))
+				return QString("A TileSet already exists with this name");
+
+			return QString();
+		}, nullptr);
 	if(dlgInputName.exec() == QDialog::Accepted)
 	{
 		QString sName = dlgInputName.GetName();

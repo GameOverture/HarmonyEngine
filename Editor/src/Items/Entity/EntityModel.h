@@ -17,6 +17,7 @@
 #include "EntityDopeSheetScene.h"
 #include "ProjectItemMimeData.h"
 #include "AtlasTileSet.h"
+#include "vendor/libtiled/map.h"
 
 #include <QObject>
 #include <QJsonArray>
@@ -65,6 +66,9 @@ class EntityModel : public IModel
 	AuxWidgetsModel											m_AuxWidgetsModel;
 
 	QList<QString *>										m_CallbacksList;	// All callbacks (aka QString) is referenced from this list. 'EntityDopeSheetScene' will create and modify its state's callbacks using this list.
+
+	Tiled::Map::Parameters									m_TiledMapParameters;
+	Tiled::Map::EditorSettings								m_TiledMapEditorSettings;
 
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
@@ -127,6 +131,8 @@ public:
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
 	virtual void OnItemDeleted() override;
+
+	std::unique_ptr<Tiled::Map> ExportToTiledMap() const;
 };
 
 #endif // ENTITYMODEL_H
