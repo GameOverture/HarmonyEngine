@@ -12,7 +12,6 @@
 
 PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIndex &index, const QVariant &newData, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
-	m_ItemRef(*pModel->GetProjItem()),
 	m_iStateIndex(pModel->GetStateIndex()),
 	m_Substate(pModel->GetSubstate()),
 	m_pModel(pModel),
@@ -64,14 +63,16 @@ PropertiesUndoCmd::PropertiesUndoCmd(PropertiesTreeModel *pModel, const QModelIn
 {
 	// HACK: Avoid using m_pModel outside of OnRedo() because entities delete their multi-models
 	OnRedo();
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_Substate);
+	if(m_pModel->GetProjItem())
+		m_pModel->GetProjItem()->FocusWidgetState(m_iStateIndex, m_Substate);
 }
 
 /*virtual*/ void PropertiesUndoCmd::undo() /*override*/
 {
 	// HACK: Avoid using m_pModel outside of OnUndo() because entities delete their multi-models
 	OnUndo();
-	m_ItemRef.FocusWidgetState(m_iStateIndex, m_Substate);
+	if(m_pModel->GetProjItem())
+		m_pModel->GetProjItem()->FocusWidgetState(m_iStateIndex, m_Substate);
 }
 
 /*virtual*/ void PropertiesUndoCmd::OnRedo()

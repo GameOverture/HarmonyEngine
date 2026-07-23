@@ -362,6 +362,9 @@ if(Qt6_DIR)
 		src/Widget/Auxiliary/AuxShaderEditor.cpp
 		src/Widget/Auxiliary/AuxShaderEditor.h
 		src/Widget/Auxiliary/AuxShaderEditor.ui
+		src/Widget/Auxiliary/AuxTileMap.cpp
+		src/Widget/Auxiliary/AuxTileMap.h
+		src/Widget/Auxiliary/AuxTileMap.ui
 		src/Widget/Auxiliary/AuxTileSet.cpp
 		src/Widget/Auxiliary/AuxTileSet.h
 		src/Widget/Auxiliary/AuxTileSet.ui

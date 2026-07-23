@@ -15,9 +15,10 @@
 #include "SpriteModels.h"
 #include "MainWindow.h"
 
-PropertiesTreeModel::PropertiesTreeModel(ProjectItemData *pProjItemData, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
+PropertiesTreeModel::PropertiesTreeModel(ProjectItemData *pProjItemData, QUndoStack *pUndoStack, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
 	ITreeModel(2, { "Property", "Value" }, pParent),
 	m_pProjItemData(pProjItemData),
+	m_pUndoStack(pUndoStack),
 	m_iSTATE_INDEX(iStateIndex),
 	m_iSUBSTATE(subState)
 {
@@ -30,6 +31,11 @@ PropertiesTreeModel::PropertiesTreeModel(ProjectItemData *pProjItemData, int iSt
 ProjectItemData *PropertiesTreeModel::GetProjItem()
 {
 	return m_pProjItemData;
+}
+
+QUndoStack *PropertiesTreeModel::GetUndoStack()
+{
+	return m_pUndoStack;
 }
 
 int PropertiesTreeModel::GetStateIndex() const
@@ -699,10 +705,13 @@ void PropertiesTreeModel::ResetValues()
 		const QVariant &origValue = GetIndexValue(indexRef);
 		if(origValue != valueRef)
 		{
-			if(m_pProjItemData)
+			PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
+			if(m_pUndoStack)
+				m_pUndoStack->push(pUndoCmd);
+			else
 			{
-				PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
-				m_pProjItemData->GetUndoStack()->push(pUndoCmd);
+				pUndoCmd->redo();
+				delete pUndoCmd;
 			}
 		}
 	}
@@ -732,10 +741,13 @@ void PropertiesTreeModel::ResetValues()
 
 		if(bCheckChanged)
 		{
-			if(m_pProjItemData)
+			PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
+			if(m_pUndoStack)
+				m_pUndoStack->push(pUndoCmd);
+			else
 			{
-				PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
-				m_pProjItemData->GetUndoStack()->push(pUndoCmd);
+				pUndoCmd->redo();
+				delete pUndoCmd;
 			}
 		}
 	}

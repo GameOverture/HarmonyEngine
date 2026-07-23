@@ -143,34 +143,57 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 
 	m_TreeModel.Cmd_ResetFusedItems();
 
-	QJsonObject tiledMapObj = itemFileDataRef.m_Meta["tiledParams"].toObject();
-	m_TiledMapParameters.orientation = Tiled::orientationFromString(tiledMapObj["orientation"].toString());
-	m_TiledMapParameters.renderOrder = Tiled::renderOrderFromString(tiledMapObj["renderorder"].toString());
-	m_TiledMapParameters.width = tiledMapObj["width"].toInt();
-	m_TiledMapParameters.height = tiledMapObj["height"].toInt();
-	m_TiledMapParameters.tileWidth = tiledMapObj["tilewidth"].toInt();
-	m_TiledMapParameters.tileHeight = tiledMapObj["tileheight"].toInt();
-	m_TiledMapParameters.infinite = tiledMapObj["infinite"].toBool();
-	m_TiledMapParameters.hexSideLength = tiledMapObj["hexsidelength"].toInt();
-	m_TiledMapParameters.staggerAxis = Tiled::staggerAxisFromString(tiledMapObj["staggeraxis"].toString());
-	m_TiledMapParameters.staggerIndex = Tiled::staggerIndexFromString(tiledMapObj["staggerindex"].toString());
-	m_TiledMapParameters.skewX = tiledMapObj["skewx"].toInt();
-	m_TiledMapParameters.skewY = tiledMapObj["skewy"].toInt();
-	m_TiledMapParameters.parallaxOrigin = QPointF(tiledMapObj["parallaxoriginx"].toDouble(), tiledMapObj["parallaxoriginy"].toDouble());
-	const QString sBgColor = tiledMapObj["backgroundcolor"].toString();
-	if(QColor::isValidColor(sBgColor))
-		m_TiledMapParameters.backgroundColor = QColor(sBgColor);
+	if(itemFileDataRef.m_Meta.contains("tiledParams"))
+	{
+		QJsonObject tiledMapObj = itemFileDataRef.m_Meta["tiledParams"].toObject();
+		m_TiledMapParameters.orientation = Tiled::orientationFromString(tiledMapObj["orientation"].toString());
+		m_TiledMapParameters.renderOrder = Tiled::renderOrderFromString(tiledMapObj["renderorder"].toString());
+		m_TiledMapParameters.width = tiledMapObj["width"].toInt();
+		m_TiledMapParameters.height = tiledMapObj["height"].toInt();
+		m_TiledMapParameters.tileWidth = tiledMapObj["tilewidth"].toInt();
+		m_TiledMapParameters.tileHeight = tiledMapObj["tileheight"].toInt();
+		m_TiledMapParameters.infinite = tiledMapObj["infinite"].toBool();
+		m_TiledMapParameters.hexSideLength = tiledMapObj["hexsidelength"].toInt();
+		m_TiledMapParameters.staggerAxis = Tiled::staggerAxisFromString(tiledMapObj["staggeraxis"].toString());
+		m_TiledMapParameters.staggerIndex = Tiled::staggerIndexFromString(tiledMapObj["staggerindex"].toString());
+		m_TiledMapParameters.skewX = tiledMapObj["skewx"].toInt();
+		m_TiledMapParameters.skewY = tiledMapObj["skewy"].toInt();
+		m_TiledMapParameters.parallaxOrigin = QPointF(tiledMapObj["parallaxoriginx"].toDouble(), tiledMapObj["parallaxoriginy"].toDouble());
+		const QString sBgColor = tiledMapObj["backgroundcolor"].toString();
+		if(QColor::isValidColorName(sBgColor))
+			m_TiledMapParameters.backgroundColor = QColor(sBgColor);
 
-	m_TiledMapEditorSettings.compressionLevel = tiledMapObj["compressionlevel"].toInt(-1);
-	QJsonObject chunkSizeObj = tiledMapObj["chunksize"].toObject();
-	int iChunkWidth = chunkSizeObj["width"].toInt(Tiled::CHUNK_SIZE);
-	int iChunkHeight = chunkSizeObj["height"].toInt(Tiled::CHUNK_SIZE);
-	if(iChunkWidth == 0)
-		iChunkWidth = Tiled::CHUNK_SIZE;
-	if(iChunkHeight == 0)
-		iChunkHeight = Tiled::CHUNK_SIZE;
-	m_TiledMapEditorSettings.chunkSize = QSize(iChunkWidth, iChunkHeight);
-	m_TiledMapEditorSettings.layerDataFormat = Tiled::Map::Base64Zlib;
+		m_TiledMapEditorSettings.compressionLevel = tiledMapObj["compressionlevel"].toInt(-1);
+		QJsonObject chunkSizeObj = tiledMapObj["chunksize"].toObject();
+		int iChunkWidth = chunkSizeObj["width"].toInt(Tiled::CHUNK_SIZE);
+		int iChunkHeight = chunkSizeObj["height"].toInt(Tiled::CHUNK_SIZE);
+		if(iChunkWidth == 0)
+			iChunkWidth = Tiled::CHUNK_SIZE;
+		if(iChunkHeight == 0)
+			iChunkHeight = Tiled::CHUNK_SIZE;
+		m_TiledMapEditorSettings.chunkSize = QSize(iChunkWidth, iChunkHeight);
+		const QString sEncoding = tiledMapObj["encoding"].toString();
+		const QString sCompression = tiledMapObj["compression"].toString();
+		if(sEncoding.isEmpty() || sEncoding == QLatin1String("csv"))
+			m_TiledMapEditorSettings.layerDataFormat = Tiled::Map::CSV;
+		else if(sEncoding == QLatin1String("base64"))
+		{
+			if(sCompression.isEmpty())
+				m_TiledMapEditorSettings.layerDataFormat = Tiled::Map::Base64;
+			else if(sCompression == QLatin1String("gzip"))
+				m_TiledMapEditorSettings.layerDataFormat = Tiled::Map::Base64Gzip;
+			else if(sCompression == QLatin1String("zlib"))
+				m_TiledMapEditorSettings.layerDataFormat = Tiled::Map::Base64Zlib;
+			else if(sCompression == QLatin1String("zstd"))
+				m_TiledMapEditorSettings.layerDataFormat = Tiled::Map::Base64Zstandard;
+			else
+				HyGuiLog("Compression method '" % sCompression % "' not supported", LOGTYPE_Error);
+		}
+		else
+			HyGuiLog("Unknown encoding: " % sEncoding, LOGTYPE_Error);
+	}
+	else
+		m_TiledMapEditorSettings.layerDataFormat = Tiled::Map::CSV; // Defaulting to CSV
 }
 
 /*virtual*/ EntityModel::~EntityModel()
@@ -1934,6 +1957,46 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 		layoutArray.append(layoutObj);
 	}
 	itemSpecificFileDataOut.m_Meta.insert("descLayoutList", layoutArray);
+
+
+	QJsonObject tiledMapObj;
+	tiledMapObj.insert("orientation", Tiled::orientationToString(m_TiledMapParameters.orientation));
+	tiledMapObj.insert("renderorder", Tiled::renderOrderToString(m_TiledMapParameters.renderOrder));
+	tiledMapObj.insert("width", m_TiledMapParameters.width);
+	tiledMapObj.insert("height", m_TiledMapParameters.height);
+	tiledMapObj.insert("tilewidth", m_TiledMapParameters.tileWidth);
+	tiledMapObj.insert("tileheight", m_TiledMapParameters.tileHeight);
+	tiledMapObj.insert("infinite", m_TiledMapParameters.infinite);
+	tiledMapObj.insert("hexsidelength", m_TiledMapParameters.hexSideLength);
+	tiledMapObj.insert("staggeraxis", Tiled::staggerAxisToString(m_TiledMapParameters.staggerAxis));
+	tiledMapObj.insert("staggerindex", Tiled::staggerIndexToString(m_TiledMapParameters.staggerIndex));
+	tiledMapObj.insert("skewx", m_TiledMapParameters.skewX);
+	tiledMapObj.insert("skewy", m_TiledMapParameters.skewY);
+	tiledMapObj.insert("parallaxoriginx", m_TiledMapParameters.parallaxOrigin.x());
+	tiledMapObj.insert("parallaxoriginy", m_TiledMapParameters.parallaxOrigin.y());
+	tiledMapObj.insert("backgroundcolor", Tiled::colorToString(m_TiledMapParameters.backgroundColor));
+
+	tiledMapObj.insert("compressionlevel", m_TiledMapEditorSettings.compressionLevel);
+	QJsonObject chunkSizeObj;
+	chunkSizeObj.insert("width", m_TiledMapEditorSettings.chunkSize.width());
+	chunkSizeObj.insert("height", m_TiledMapEditorSettings.chunkSize.height());
+	tiledMapObj.insert("chunksize", chunkSizeObj);
+
+	switch(m_TiledMapEditorSettings.layerDataFormat)
+	{
+	case Tiled::Map::XML:
+	case Tiled::Map::CSV:
+		tiledMapObj.insert("encoding", "");
+		break;
+	case Tiled::Map::Base64:
+	case Tiled::Map::Base64Zlib:
+	case Tiled::Map::Base64Gzip:
+	case Tiled::Map::Base64Zstandard:
+		tiledMapObj.insert("encoding", QLatin1String("base64"));
+		tiledMapObj.insert("compression", Tiled::compressionToString(m_TiledMapEditorSettings.layerDataFormat));
+		break;
+	}
+	itemSpecificFileDataOut.m_Meta.insert("tiledParams", tiledMapObj);
 
 	std::unique_ptr<Tiled::Map> exportedMapPtr = ExportToTiledMap();
 	Tiled::MapToVariantConverter tiledMapConverter;

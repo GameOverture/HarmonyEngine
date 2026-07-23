@@ -292,7 +292,13 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			if(origValue != newValue)
 			{
 				QUndoCommand *pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
-				pPropertiesTreeModel->GetProjItem()->GetUndoStack()->push(pUndoCmd);
+				if(pPropertiesTreeModel->GetUndoStack())
+					pPropertiesTreeModel->GetUndoStack()->push(pUndoCmd);
+				else
+				{
+					pUndoCmd->redo();
+					delete pUndoCmd;
+				}
 			}
 		}
 		break; }
@@ -349,7 +355,13 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			if(origValue != newValue)
 			{
 				QUndoCommand *pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
-				pPropertiesTreeModel->GetProjItem()->GetUndoStack()->push(pUndoCmd);
+				if(pPropertiesTreeModel->GetUndoStack())
+					pPropertiesTreeModel->GetUndoStack()->push(pUndoCmd);
+				else
+				{
+					pUndoCmd->redo();
+					delete pUndoCmd;
+				}
 			}
 		}
 		break; }
@@ -436,8 +448,6 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 {
 	PropertiesTreeModel *pPropertiesTreeModel = static_cast<PropertiesTreeModel *>(pModel);
 
-	QUndoCommand *pUndoCmd = nullptr;
-
 	PropertiesDef propDefRef = pPropertiesTreeModel->GetIndexDefinition(index);
 	QVariant newValue;
 	switch(propDefRef.eType)
@@ -492,8 +502,14 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 	const QVariant &origValue = pPropertiesTreeModel->GetIndexValue(index);
 	if(origValue != newValue)
 	{
-		pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
-		pPropertiesTreeModel->GetProjItem()->GetUndoStack()->push(pUndoCmd);
+		QUndoCommand *pUndoCmd = pPropertiesTreeModel->AllocateUndoCmd(index, newValue);
+		if(pPropertiesTreeModel->GetUndoStack())
+			pPropertiesTreeModel->GetUndoStack()->push(pUndoCmd);
+		else
+		{
+			pUndoCmd->redo();
+			delete pUndoCmd;
+		}
 	}
 
 	// Select the name column after editing to force the editor to close

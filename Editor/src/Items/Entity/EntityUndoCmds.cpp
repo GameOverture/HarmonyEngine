@@ -1629,7 +1629,7 @@ EntityUndoCmd_PropertyModified::EntityUndoCmd_PropertyModified(PropertiesTreeMod
 
 void EntityUndoCmd_PropertyModified::UpdateEntityModel(bool bIsRedo)
 {
-	EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(m_iStateIndex))->GetDopeSheetScene();
+	EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_pModel->GetProjItem()->GetModel()->GetStateData(m_iStateIndex))->GetDopeSheetScene();
 
 	for(int i = 0; i < m_EntityTreeItemDataList.size(); ++i)
 	{

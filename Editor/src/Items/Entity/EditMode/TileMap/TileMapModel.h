@@ -12,6 +12,7 @@
 
 #include "Global.h"
 #include "IEditModeModel.h"
+#include "vendor/libtiled/map.h"
 #include "vendor/libtiled/tilelayer.h"
 
 class AtlasTileSet;
@@ -19,6 +20,7 @@ class AtlasModel;
 
 class TileMapModel : public IEditModeModel
 {
+	Tiled::Map::Parameters	m_TiledMapParameters;
 	Tiled::TileLayer		m_TiledLayer;
 
 public:

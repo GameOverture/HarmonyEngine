@@ -24,7 +24,7 @@ class EntityPropertiesTreeModel : public PropertiesTreeModel
 	Q_OBJECT
 
 public:
-	explicit EntityPropertiesTreeModel(ProjectItemData &projItemRef, int iStateIndex, QVariant subState, QObject *pParent = nullptr);
+	explicit EntityPropertiesTreeModel(ProjectItemData &projItemRef, QUndoStack *pUndoStack, int iStateIndex, QVariant subState, QObject *pParent = nullptr);
 	virtual ~EntityPropertiesTreeModel();
 
 	virtual PropertiesUndoCmd *AllocateUndoCmd(const QModelIndex &index, const QVariant &newData) override;
@@ -35,7 +35,7 @@ class EntityPropertiesTreeMultiModel : public PropertiesTreeMultiModel
 	Q_OBJECT
 
 public:
-	explicit EntityPropertiesTreeMultiModel(ProjectItemData &projItemRef, int iStateIndex, QVariant subState, QList<PropertiesTreeModel *> multiModelList, QObject *pParent = nullptr);
+	explicit EntityPropertiesTreeMultiModel(ProjectItemData &projItemRef, QUndoStack *pUndoStack, int iStateIndex, QVariant subState, QList<PropertiesTreeModel *> multiModelList, QObject *pParent = nullptr);
 	virtual ~EntityPropertiesTreeMultiModel();
 
 	virtual PropertiesUndoCmd *AllocateUndoCmd(const QModelIndex &index, const QVariant &newData) override;

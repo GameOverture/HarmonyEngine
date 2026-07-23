@@ -126,7 +126,7 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 		for(int i = 0; i < tileArray.size(); ++i)
 		{
 			QJsonObject tileObj = tileArray[i].toObject();
-			m_TileDataList.append(new TileData(tileObj));
+			m_TileDataList.append(new TileData(tileObj, m_pUndoStack));
 		}
 
 		m_bSubAtlasDirty = false;
@@ -466,7 +466,7 @@ QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vRegionS
 		quint32 uiChecksum = HyGlobal::CRCData(0, tileImg.bits(), tileImg.sizeInBytes());
 		m_TileImageMap.insert(uiChecksum, it.value());
 
-		TileData *pTileData = new TileData(uiChecksum, newGridPos);
+		TileData *pTileData = new TileData(uiChecksum, newGridPos, m_pUndoStack);
 		m_TileDataList.append(pTileData);
 		newTileDataList.push_back(QPair<QPoint, TileData *>(newGridPos, pTileData));
 
@@ -976,19 +976,19 @@ bool AtlasTileSet::RegenerateSubAtlas()
 			if(bFound)
 				continue;
 
-			// Next try looking through 'subAtlasTileChecksumList' if it contains a portion of 'tileAnimChecksumList' at the end and if so, append the remaining tile checksums to 'subAtlasTileChecksumList' and set 'StartingAtlasIndex'
-			for(int i = 0; i < tileAnimChecksumList.size(); ++i)
-			{
-				if(std::equal(tileAnimChecksumList.begin(), tileAnimChecksumList.end() - i, subAtlasTileChecksumList.end() - (tileAnimChecksumList.size() - i)))
-				{
-					pAnimSet->m_TempStartingAtlasIndexList.push_back(subAtlasTileChecksumList.size() - (tileAnimChecksumList.size() - i));
-					subAtlasTileChecksumList.append(tileAnimChecksumList.end() - i, tileAnimChecksumList.end());
-					bFound = true;
-					break;
-				}
-			}
-			if(bFound)
-				continue;
+			//// Next try looking through 'subAtlasTileChecksumList' if it contains a portion of 'tileAnimChecksumList' at the end and if so, append the remaining tile checksums to 'subAtlasTileChecksumList' and set 'StartingAtlasIndex'
+			//for(int i = 0; i < tileAnimChecksumList.size(); ++i)
+			//{
+			//	if(std::equal(tileAnimChecksumList.begin(), tileAnimChecksumList.end() - i, subAtlasTileChecksumList.end() - (tileAnimChecksumList.size() - i)))
+			//	{
+			//		pAnimSet->m_TempStartingAtlasIndexList.push_back(subAtlasTileChecksumList.size() - (tileAnimChecksumList.size() - i));
+			//		subAtlasTileChecksumList.append(tileAnimChecksumList.end() - i, tileAnimChecksumList.end());
+			//		bFound = true;
+			//		break;
+			//	}
+			//}
+			//if(bFound)
+			//	continue;
 		
 			// Not found in 'subAtlasTileChecksumList', so append all tile checksums to 'subAtlasTileChecksumList' and set 'StartingAtlasIndex'
 			pAnimSet->m_TempStartingAtlasIndexList.push_back(subAtlasTileChecksumList.size());

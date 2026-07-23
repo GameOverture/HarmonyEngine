@@ -36,14 +36,14 @@ class TileData
 	QMap<QUuid, VectorModel *>						m_CollisionLayerMap;
 
 public:
-	TileData(quint32 uiTileChecksum, QPoint metaGridPos);
-	TileData(const QJsonObject &tileDataObj);
-	TileData(TileData &&other) noexcept;
+	TileData(quint32 uiTileChecksum, QPoint metaGridPos, QUndoStack *pUndoStack);
+	TileData(const QJsonObject &tileDataObj, QUndoStack *pUndoStack);
+	TileData(TileData &&other) = delete;
 	TileData(const TileData &other) = delete;
 	TileData &operator=(const TileData &other) = delete;
 	~TileData();
 
-	void InitPropertiesModel();
+	void InitPropertiesModel(QUndoStack *pUndoStack);
 
 	QUuid GetUuid() const;
 

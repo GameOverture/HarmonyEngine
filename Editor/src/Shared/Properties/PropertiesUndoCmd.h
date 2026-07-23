@@ -16,7 +16,6 @@
 class PropertiesUndoCmd : public QUndoCommand
 {
 protected:
-	ProjectItemData &		m_ItemRef;
 	int						m_iStateIndex;
 	QVariant				m_Substate;
 

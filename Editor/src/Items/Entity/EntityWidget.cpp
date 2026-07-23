@@ -583,7 +583,7 @@ void EntityWidget::SetExtrapolatedProperties()
 
 		ui->propertyTree->setModel(nullptr);
 		delete m_pMultiPropModel;
-		m_pMultiPropModel = new EntityPropertiesTreeMultiModel(m_ItemRef, -1, 0, multiModelList, this);
+		m_pMultiPropModel = new EntityPropertiesTreeMultiModel(m_ItemRef, m_ItemRef.GetUndoStack(), -1, 0, multiModelList, this);
 		ui->propertyTree->setModel(m_pMultiPropModel);
 
 		ui->lblSelectedItemIcon->setVisible(false);

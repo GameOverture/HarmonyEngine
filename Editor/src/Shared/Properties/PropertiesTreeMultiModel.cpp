@@ -10,8 +10,8 @@
 #include "Global.h"
 #include "PropertiesTreeMultiModel.h"
 
-PropertiesTreeMultiModel::PropertiesTreeMultiModel(ProjectItemData *pProjItemData, int iStateIndex, QVariant subState, const QList<PropertiesTreeModel *> &multiModelListRef, QObject *pParent /*= nullptr*/) :
-	PropertiesTreeModel(pProjItemData, iStateIndex, subState, pParent)
+PropertiesTreeMultiModel::PropertiesTreeMultiModel(ProjectItemData *pProjItemData, QUndoStack *pUndoStack, int iStateIndex, QVariant subState, const QList<PropertiesTreeModel *> &multiModelListRef, QObject *pParent /*= nullptr*/) :
+	PropertiesTreeModel(pProjItemData, pUndoStack, iStateIndex, subState, pParent)
 {
 	Setup(multiModelListRef);
 }

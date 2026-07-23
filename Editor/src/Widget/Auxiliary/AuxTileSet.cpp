@@ -336,7 +336,7 @@ void AuxTileSet::UpdateGfxItemSelection()
 			multiModelList.push_back(pTileData->GetSetupPropertiesModel());
 
 		delete m_pSetupPropertiesMultiModel;
-		m_pSetupPropertiesMultiModel = new PropertiesTreeMultiModel(nullptr, -1, 0, multiModelList, this);
+		m_pSetupPropertiesMultiModel = new PropertiesTreeMultiModel(nullptr, m_pTileSet->GetUndoStack(), -1, 0, multiModelList, this);
 		ui->setupPropertyTree->setModel(m_pSetupPropertiesMultiModel);
 	}
 

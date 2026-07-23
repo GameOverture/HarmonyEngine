@@ -118,16 +118,18 @@ class PropertiesTreeModel : public ITreeModel
 	Q_OBJECT
 
 	ProjectItemData *							m_pProjItemData;
+	QUndoStack *								m_pUndoStack;
 	const int									m_iSTATE_INDEX;
 	const QVariant								m_iSUBSTATE;
 
 	QMap<TreeModelItem *, PropertiesDef>		m_PropertyDefMap;
 
 public:
-	explicit PropertiesTreeModel(ProjectItemData *pProjItemData, int iStateIndex, QVariant subState, QObject *pParent = nullptr);
+	explicit PropertiesTreeModel(ProjectItemData *pProjItemData, QUndoStack *pUndoStack, int iStateIndex, QVariant subState, QObject *pParent = nullptr);
 	virtual ~PropertiesTreeModel();
 
 	ProjectItemData *GetProjItem();
+	QUndoStack *GetUndoStack();
 	int GetStateIndex() const;
 	const QVariant &GetSubstate() const;
 

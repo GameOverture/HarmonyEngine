@@ -13,23 +13,23 @@
 
 #include <QBitArray>
 
-TileData::TileData(quint32 uiTileChecksum, QPoint metaGridPos) :
+TileData::TileData(quint32 uiTileChecksum, QPoint metaGridPos, QUndoStack *pUndoStack) :
 	m_Uuid(QUuid::createUuid()),
 	m_uiTileChecksum(uiTileChecksum),
 	m_MetaGridPos(metaGridPos),
 	m_pSetupPropertiesModel(nullptr)
 {
-	InitPropertiesModel();
+	InitPropertiesModel(pUndoStack);
 }
 
-TileData::TileData(const QJsonObject &tileDataObj) :
+TileData::TileData(const QJsonObject &tileDataObj, QUndoStack *pUndoStack) :
 	m_Uuid(QUuid(tileDataObj["UUID"].toString())),
 	m_uiTileChecksum(static_cast<quint32>(tileDataObj["TileChecksum"].toVariant().toLongLong())),
 	m_MetaGridPos(QPoint(tileDataObj["MetaGridPosX"].toInt(), tileDataObj["MetaGridPosY"].toInt())),
 	m_pSetupPropertiesModel(nullptr),
 	m_TerrainSetUuid(QUuid(tileDataObj["TerrainSetUUID"].toString()))
 {
-	InitPropertiesModel();
+	InitPropertiesModel(pUndoStack);
 	m_pSetupPropertiesModel->DeserializeJson(tileDataObj["SetupProperties"].toObject());
 
 	QJsonObject animObj = tileDataObj["Animation"].toObject();
@@ -71,35 +71,35 @@ TileData::TileData(const QJsonObject &tileDataObj) :
 	}
 }
 
-TileData::TileData(TileData &&other) noexcept :
-	m_Uuid(other.m_Uuid),
-	m_uiTileChecksum(other.m_uiTileChecksum),
-	m_MetaGridPos(other.m_MetaGridPos),
-	m_pSetupPropertiesModel(nullptr),
-	m_AnimationMap(other.m_AnimationMap),
-	m_TerrainSetUuid(other.m_TerrainSetUuid),
-	m_TerrainMap(std::move(other.m_TerrainMap)),
-	m_CollisionLayerMap(std::move(other.m_CollisionLayerMap))
-{
-	PropertiesTreeModel *pOldPropModel = m_pSetupPropertiesModel;
-	InitPropertiesModel();
-	m_pSetupPropertiesModel->DeserializeJson(pOldPropModel->SerializeJson());
-	delete pOldPropModel;
-
-	other.m_Uuid = QUuid();
-	other.m_uiTileChecksum = 0;
-
-	HyGuiLog("TileData move ctor invoked", LOGTYPE_Warning); // Determining if this is ever called
-}
+//TileData::TileData(TileData &&other) noexcept :
+//	m_Uuid(other.m_Uuid),
+//	m_uiTileChecksum(other.m_uiTileChecksum),
+//	m_MetaGridPos(other.m_MetaGridPos),
+//	m_pSetupPropertiesModel(nullptr),
+//	m_AnimationMap(other.m_AnimationMap),
+//	m_TerrainSetUuid(other.m_TerrainSetUuid),
+//	m_TerrainMap(std::move(other.m_TerrainMap)),
+//	m_CollisionLayerMap(std::move(other.m_CollisionLayerMap))
+//{
+//	PropertiesTreeModel *pOldPropModel = m_pSetupPropertiesModel;
+//	InitPropertiesModel();
+//	m_pSetupPropertiesModel->DeserializeJson(pOldPropModel->SerializeJson());
+//	delete pOldPropModel;
+//
+//	other.m_Uuid = QUuid();
+//	other.m_uiTileChecksum = 0;
+//
+//	HyGuiLog("TileData move ctor invoked", LOGTYPE_Warning); // Determining if this is ever called
+//}
 
 TileData::~TileData()
 {
 	delete m_pSetupPropertiesModel;
 }
 
-void TileData::InitPropertiesModel()
+void TileData::InitPropertiesModel(QUndoStack *pUndoStack)
 {
-	m_pSetupPropertiesModel = new PropertiesTreeModel(nullptr, -1, QVariant());
+	m_pSetupPropertiesModel = new PropertiesTreeModel(nullptr, pUndoStack, -1, QVariant());
 
 	m_pSetupPropertiesModel->InsertCategory(-1, "Info");
 	m_pSetupPropertiesModel->AppendProperty("Info", "Tile ID", PROPERTIESTYPE_int, TILEDATA_INVALID_ID, "This tile's assigned ID used in a TileMap. This ID may change when the TileSet's atlas is repacked, tiles are added/removed, or tile animations are set. Changed IDs will automatically update existing TileMaps", PROPERTIESACCESS_ReadOnly);

@@ -19,8 +19,8 @@
 #include <QStack>
 
 
-EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &projItemRef, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
-	PropertiesTreeModel(&projItemRef, iStateIndex, subState, pParent)
+EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &projItemRef, QUndoStack *pUndoStack, int iStateIndex, QVariant subState, QObject *pParent /*= nullptr*/) :
+	PropertiesTreeModel(&projItemRef, pUndoStack, iStateIndex, subState, pParent)
 {
 }
 
@@ -32,8 +32,8 @@ EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &projItemRe
 	return new EntityUndoCmd_PropertyModified(this, index, newData);
 }
 
-EntityPropertiesTreeMultiModel::EntityPropertiesTreeMultiModel(ProjectItemData &projItemRef, int iStateIndex, QVariant subState, QList<PropertiesTreeModel *> multiModelList, QObject *pParent /*= nullptr*/) :
-	PropertiesTreeMultiModel(&projItemRef, iStateIndex, subState, multiModelList, pParent)
+EntityPropertiesTreeMultiModel::EntityPropertiesTreeMultiModel(ProjectItemData &projItemRef, QUndoStack *pUndoStack, int iStateIndex, QVariant subState, QList<PropertiesTreeModel *> multiModelList, QObject *pParent /*= nullptr*/) :
+	PropertiesTreeMultiModel(&projItemRef, pUndoStack, iStateIndex, subState, multiModelList, pParent)
 {
 }
 
@@ -62,7 +62,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, EntityItemDe
 {
 	QVariant ptrVariant;
 	ptrVariant.setValue<TreeModelItemData *>(this);
-	m_pPropertiesModel = new EntityPropertiesTreeModel(entityModelRef.GetItem(), -1, ptrVariant, this);
+	m_pPropertiesModel = new EntityPropertiesTreeModel(entityModelRef.GetItem(), entityModelRef.GetItem().GetUndoStack(), -1, ptrVariant, this);
 
 	if(m_eEntType == ENTTYPE_Root || m_eEntType == ENTTYPE_FusedItem || m_eEntType == ENTTYPE_Item || m_eEntType == ENTTYPE_SubItem || m_eEntType == ENTTYPE_ArrayItem)
 		InitalizePropertyModel();
@@ -83,7 +83,7 @@ EntityTreeItemData::EntityTreeItemData(EntityModel &entityModelRef, QJsonObject 
 {
 	QVariant ptrVariant;
 	ptrVariant.setValue<TreeModelItemData *>(this);
-	m_pPropertiesModel = new EntityPropertiesTreeModel(entityModelRef.GetItem(), -1, ptrVariant, this);
+	m_pPropertiesModel = new EntityPropertiesTreeModel(entityModelRef.GetItem(), entityModelRef.GetItem().GetUndoStack(), -1, ptrVariant, this);
 
 	InitalizePropertyModel();
 }

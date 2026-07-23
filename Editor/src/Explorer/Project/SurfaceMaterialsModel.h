@@ -28,7 +28,7 @@ protected:
 		Surface() :
 			m_Uuid(QUuid::createUuid()),
 			m_sName("Untitled Surface"),
-			m_Properties(nullptr, 0, QVariant())
+			m_Properties(nullptr, nullptr, 0, QVariant())
 		{
 			InitProperties();
 		}
@@ -36,7 +36,7 @@ protected:
 		Surface(QJsonObject initObj) :
 			m_Uuid(initObj["UUID"].toString()),
 			m_sName(initObj["Name"].toString()),
-			m_Properties(nullptr, 0, QVariant())
+			m_Properties(nullptr, nullptr, 0, QVariant())
 		{
 			InitProperties();
 			m_Properties.DeserializeJson(initObj["Properties"].toObject());

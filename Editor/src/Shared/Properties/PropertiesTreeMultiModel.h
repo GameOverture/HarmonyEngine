@@ -20,7 +20,7 @@ class PropertiesTreeMultiModel : public PropertiesTreeModel
 	QList<PropertiesTreeModel *>		m_MultiModelList;
 
 public:
-	explicit PropertiesTreeMultiModel(ProjectItemData *pProjItemData, int iStateIndex, QVariant subState, const QList<PropertiesTreeModel *> &multiModelListRef, QObject *pParent = nullptr);
+	explicit PropertiesTreeMultiModel(ProjectItemData *pProjItemData, QUndoStack *pUndoStack, int iStateIndex, QVariant subState, const QList<PropertiesTreeModel *> &multiModelListRef, QObject *pParent = nullptr);
 	virtual ~PropertiesTreeMultiModel();
 
 	void Setup(const QList<PropertiesTreeModel *> &multiModelListRef);
