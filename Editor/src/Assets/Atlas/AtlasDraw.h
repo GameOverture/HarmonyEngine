@@ -11,7 +11,7 @@
 //#define ATLASDRAW_H
 //
 //#include "IManagerDraw.h"
-//#include "AtlasModel.h"
+//#include "AtlasManager.h"
 //
 //class AtlasDraw : public IManagerDraw
 //{
@@ -35,7 +35,7 @@
 //	HyTexturedQuad2d *						m_pHoverTexQuad;
 //
 //public:
-//	AtlasDraw(AtlasModel &atlasManagerModelRef);
+//	AtlasDraw(AtlasManager &atlasManagerModelRef);
 //	virtual ~AtlasDraw();
 //
 //	virtual void SetHover(TreeModelItemData *pHoverItem) override;

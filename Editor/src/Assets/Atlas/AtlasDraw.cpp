@@ -18,7 +18,7 @@
 //
 //#define DISPLAYORDER_AtlasSelectedFrames 1000
 //
-//AtlasDraw::AtlasDraw(AtlasModel &atlasManagerModelRef) :
+//AtlasDraw::AtlasDraw(AtlasManager &atlasManagerModelRef) :
 //	m_bIsMouseOver(false),
 //	m_pHoverTexQuad(nullptr)
 //{

@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "WgtAudioCategory.h"
 #include "ui_WgtAudioCategory.h"
-#include "AudioManagerModel.h"
+#include "AudioManager.h"
 
 #include <QColorDialog>
 

@@ -1,0 +1,61 @@
+/**************************************************************************
+*	TileMapGfxView.h
+*
+*	Harmony Engine - Editor Tool
+*	Copyright (c) 2026 Jason Knobler
+*
+*	Harmony Editor Tool License:
+*	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
+*************************************************************************/
+#ifndef TILEMAPGFXVIEW_H
+#define TILEMAPGFXVIEW_H
+
+#include "CommonGfxView.h"
+#include "AuxTileSet.h"
+
+class AuxTileSet;
+class TileSetScene;
+
+class TileMapGfxView : public CommonGfxView
+{
+	Q_OBJECT
+
+	AuxTileSet *				m_pAuxTileSet;
+
+	enum DragState
+	{
+		DRAGSTATE_None,
+		DRAGSTATE_InitialPress,
+		DRAGSTATE_MarqueeSelect,
+		DRAGSTATE_ArrangingSelection,
+		DRAGSTATE_Painting
+	};
+	DragState					m_eDragState;
+	QPoint						m_ptDragStart; // In View Coordinates
+
+public:
+	TileMapGfxView(QWidget *pParent = nullptr);
+	virtual ~TileMapGfxView();
+
+	TileSetScene *GetScene() const;
+	void SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene);
+
+	void ResetCamera(TileSetPage ePage);
+
+protected:
+	virtual void contextMenuEvent(QContextMenuEvent *pEvent) override;
+
+	virtual void showEvent(QShowEvent *pEvent) override;
+
+	//virtual void drawBackground(QPainter *pPainter, const QRectF &rect) override;
+	//virtual void drawForeground(QPainter *pPainter, const QRectF &rect) override;
+
+	virtual void mousePressEvent(QMouseEvent *pEvent) override;
+	virtual void mouseMoveEvent(QMouseEvent *pEvent) override;
+	virtual void mouseReleaseEvent(QMouseEvent *pEvent) override;
+
+private:
+	void DrawShadowText(QPainter *pPainter, QRectF textRect, const QString &sText, HyColor textColor);
+};
+
+#endif // TILEMAPGFXVIEW_H

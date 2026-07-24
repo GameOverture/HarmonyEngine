@@ -1,5 +1,5 @@
 /**************************************************************************
- *	AudioManagerModel.cpp
+ *	AudioManager.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2017 Jason Knobler
@@ -8,7 +8,7 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "AudioManagerModel.h"
+#include "AudioManager.h"
 #include "Project.h"
 #include "MainWindow.h"
 
@@ -72,7 +72,7 @@ int AudioCategoriesModel::GetIndex(quint32 uiId) const
 	return QVariant();
 }
 
-AudioManagerModel::AudioManagerModel(Project &projRef) :
+AudioManager::AudioManager(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Audio),
 	m_uiNextCategoryId(2) // Defaults are SFX:0, Music:1
 {
@@ -83,16 +83,16 @@ AudioManagerModel::AudioManagerModel(Project &projRef) :
 	//m_DesiredRawFormat.setSampleRate(HY_DEFAULT_SAMPLE_RATE);
 }
 
-/*virtual*/ AudioManagerModel::~AudioManagerModel()
+/*virtual*/ AudioManager::~AudioManager()
 {
 }
 
-AudioCategoriesModel &AudioManagerModel::GetCategoriesModel()
+AudioCategoriesModel &AudioManager::GetCategoriesModel()
 {
 	return m_AudioCategoriesModel;
 }
 
-bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
+bool AudioManager::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 {
 	QFile file(sFilePath);
 	if(file.open(QIODevice::ReadOnly) == false)
@@ -119,14 +119,14 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 	return true;
 }
 
-/*virtual*/ QString AudioManagerModel::OnBankInfo(uint uiBankIndex) /*override*/
+/*virtual*/ QString AudioManager::OnBankInfo(uint uiBankIndex) /*override*/
 {
 	auto assetList = GetBankAssets(uiBankIndex);
 	QString sInfo = "Num Assets: " % QString::number(assetList.size());
 	return sInfo;
 }
 
-/*virtual*/ bool AudioManagerModel::OnBankSettingsDlg(uint uiBankIndex) /*override*/
+/*virtual*/ bool AudioManager::OnBankSettingsDlg(uint uiBankIndex) /*override*/
 {
 	QList<IAssetItemData *> assetList = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
 	bool bBankHasAssets = assetList.size() > 0;
@@ -135,27 +135,27 @@ bool AudioManagerModel::IsWaveValid(QString sFilePath, WaveHeader &wavHeaderOut)
 	return bAccepted;
 }
 
-/*virtual*/ QStringList AudioManagerModel::GetSupportedFileExtList() const /*override*/
+/*virtual*/ QStringList AudioManager::GetSupportedFileExtList() const /*override*/
 {
 	return QStringList() << ".wav";
 }
 
-int AudioManagerModel::GetCategoryIndexFromCategoryId(quint32 uiCategoryId) const
+int AudioManager::GetCategoryIndexFromCategoryId(quint32 uiCategoryId) const
 {
 	return m_AudioCategoriesModel.GetIndex(uiCategoryId);
 }
 
-quint32 AudioManagerModel::GetGroupIdFromGroupIndex(uint uiCategoryIndex) const
+quint32 AudioManager::GetGroupIdFromGroupIndex(uint uiCategoryIndex) const
 {
 	return m_AudioCategoriesModel.GetId(uiCategoryIndex);
 }
 
-QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
+QString AudioManager::GetCategoryName(quint32 uiCategoryId) const
 {
 	return m_AudioCategoriesModel.GetName(m_AudioCategoriesModel.GetIndex(uiCategoryId));
 }
 
-/*virtual*/ void AudioManagerModel::OnInit() /*override*/
+/*virtual*/ void AudioManager::OnInit() /*override*/
 {
 	// Create data runtime file if one doesn't exist
 	QFile runtimeFile(m_DataDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt));
@@ -169,7 +169,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	if(runtimeFile.exists() == false)
 		HyGuiLog("audio runtime file doesn't exist!", LOGTYPE_Error);
 	if(!runtimeFile.open(QIODevice::ReadOnly))
-		HyGuiLog(QString("AudioManagerModel::OnInit() could not open ") % HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt, LOGTYPE_Error);
+		HyGuiLog(QString("AudioManager::OnInit() could not open ") % HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt, LOGTYPE_Error);
 
 	QJsonDocument runtimeDoc = QJsonDocument::fromJson(runtimeFile.readAll());
 	runtimeFile.close();
@@ -197,7 +197,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 		HyGuiLog("audio meta file doesn't exist!", LOGTYPE_Error);
 	
 	if(!settingsFile.open(QIODevice::ReadOnly))
-		HyGuiLog(QString("AudioManagerModel::OnInit() could not open ") % HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_MetaExt, LOGTYPE_Error);
+		HyGuiLog(QString("AudioManager::OnInit() could not open ") % HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_MetaExt, LOGTYPE_Error);
 
 #ifdef HYGUI_UseBinaryMetaFiles
 	QJsonDocument settingsDoc = QJsonDocument::fromBinaryData(settingsFile.readAll());
@@ -210,11 +210,11 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	m_uiNextCategoryId = JSONOBJ_TOINT(settingsObj, "nextCategoryId");
 }
 
-/*virtual*/ void AudioManagerModel::OnCreateNewBank(QJsonObject &newMetaBankObjRef) /*override*/
+/*virtual*/ void AudioManager::OnCreateNewBank(QJsonObject &newMetaBankObjRef) /*override*/
 {
 }
 
-/*virtual*/ IAssetItemData *AudioManagerModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
+/*virtual*/ IAssetItemData *AudioManager::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
 	WaveHeader wavHeader(metaObj["wavHeader"].toObject());
 	SoundClip *pNewFrame = new SoundClip(*this,
@@ -234,7 +234,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	return pNewFrame;
 }
 
-/*virtual*/ bool AudioManagerModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/
+/*virtual*/ bool AudioManager::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/
 {
 	QSet<BankData *> affectedBankSet;
 	for(int i = 0; i < assetList.count(); ++i)
@@ -249,7 +249,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	return true;
 }
 
-/*virtual*/ bool AudioManagerModel::OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) /*override*/
+/*virtual*/ bool AudioManager::OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) /*override*/
 {
 	QList<WaveHeader> headerList;
 
@@ -276,7 +276,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 		QFile file(sImportAssetList[i]);
 		if(!file.open(QIODevice::ReadOnly))
 		{
-			HyGuiLog("AudioManagerModel::OnReplaceAssets - Could not open file " % sImportAssetList[i], LOGTYPE_Error);
+			HyGuiLog("AudioManager::OnReplaceAssets - Could not open file " % sImportAssetList[i], LOGTYPE_Error);
 			return false;
 		}
 		QByteArray pBinaryData(file.readAll());
@@ -287,7 +287,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 		pAudio->ReplaceAudio(fileInfo.baseName(), uiChecksum, headerList[i]);
 		if(QFile::copy(fileInfo.absoluteFilePath(), m_MetaDir.absoluteFilePath(pAudio->ConstructMetaFileName())) == false)
 		{
-			HyGuiLog("AudioManagerModel::OnReplaceAssets - Could not copy file to meta " % fileInfo.absoluteFilePath(), LOGTYPE_Error);
+			HyGuiLog("AudioManager::OnReplaceAssets - Could not copy file to meta " % fileInfo.absoluteFilePath(), LOGTYPE_Error);
 			HyGuiLog(fileInfo.baseName() % " will not have a valid meta file!", LOGTYPE_Error);
 		}
 
@@ -303,7 +303,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	return true;
 }
 
-/*virtual*/ bool AudioManagerModel::OnUpdateAssets(QList<IAssetItemData *> assetList) /*override*/
+/*virtual*/ bool AudioManager::OnUpdateAssets(QList<IAssetItemData *> assetList) /*override*/
 {
 	for(int i = 0; i < assetList.count(); ++i)
 		AddAssetsToRepack(m_BanksModel.GetBank(GetBankIndexFromBankId(assetList[i]->GetBankId())), assetList[i]);
@@ -311,7 +311,7 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	return true;
 }
 
-/*virtual*/ bool AudioManagerModel::OnMoveAssets(QList<IAssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
+/*virtual*/ bool AudioManager::OnMoveAssets(QList<IAssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
 {
 	QList<uint> affectedBankIndexList;			// old
 	QSet<IAssetItemData *> assetsGoingToNewBankSet;	// new
@@ -342,17 +342,17 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	return true;
 }
 
-/*virtual*/ void AudioManagerModel::OnFlushRepack() /*override*/
+/*virtual*/ void AudioManager::OnFlushRepack() /*override*/
 {
 
 }
 
-/*virtual*/ void AudioManagerModel::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
+/*virtual*/ void AudioManager::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
 {
 	metaObjRef.insert("nextCategoryId", static_cast<qint64>(m_uiNextCategoryId));
 }
 
-/*virtual*/ void AudioManagerModel::OnSaveData(QJsonObject &dataObjRef) /*override*/
+/*virtual*/ void AudioManager::OnSaveData(QJsonObject &dataObjRef) /*override*/
 {
 	QJsonArray bankArray;
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
@@ -393,12 +393,12 @@ QString AudioManagerModel::GetCategoryName(quint32 uiCategoryId) const
 	dataObjRef.insert("categories", groupArray);
 }
 
-SoundClip *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, QUuid uuid, const WaveHeader &wavHeaderRef)
+SoundClip *AudioManager::ImportSound(QString sFilePath, quint32 uiBankId, QUuid uuid, const WaveHeader &wavHeaderRef)
 {
 	QFile file(sFilePath);
 	if(!file.open(QIODevice::ReadOnly))
 	{
-		HyGuiLog("AudioManagerModel::ImportSound - Could not open file " % sFilePath, LOGTYPE_Error);
+		HyGuiLog("AudioManager::ImportSound - Could not open file " % sFilePath, LOGTYPE_Error);
 		return nullptr;
 	}
 
@@ -412,7 +412,7 @@ SoundClip *AudioManagerModel::ImportSound(QString sFilePath, quint32 uiBankId, Q
 
 	if(QFile::copy(sFilePath, m_MetaDir.absoluteFilePath(pNewAsset->ConstructMetaFileName())) == false)
 	{
-		HyGuiLog("AudioManagerModel::ImportSound - Could not copy file to meta " % sFilePath, LOGTYPE_Error);
+		HyGuiLog("AudioManager::ImportSound - Could not copy file to meta " % sFilePath, LOGTYPE_Error);
 		delete pNewAsset;
 		return nullptr;
 	}

@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "DlgSyncAssets.h"
 #include "ui_DlgSyncAssets.h"
-#include "AtlasModel.h"
+#include "AtlasManager.h"
 #include "MainWindow.h"
 
 #include <QDir>
@@ -251,7 +251,7 @@ bool DlgSyncAssets::SyncDir(QDir syncSubDir, QMap<TreeModelItem *, TreeModelItem
 								case ASSETMAN_Atlases: {
 									QImage newImage(syncSubDirFileInfo.absoluteFilePath());
 									uiSyncAssetChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.sizeInBytes());
-									bIsValidSyncAsset = static_cast<AtlasModel &>(m_AssManRef).IsImageValid(newImage, m_uiBankId);
+									bIsValidSyncAsset = static_cast<AtlasManager &>(m_AssManRef).IsImageValid(newImage, m_uiBankId);
 									break; }
 
 								case ASSETMAN_Source:
@@ -342,7 +342,7 @@ TreeModelItem *DlgSyncAssets::FindFileContents(QFileInfo currentSyncFile, const 
 		case ASSETMAN_Atlases: {
 			QImage newImage(currentSyncFile.absoluteFilePath());
 			uiSyncAssetChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.sizeInBytes());
-			bIsValidSyncAsset = static_cast<AtlasModel &>(m_AssManRef).IsImageValid(newImage, m_uiBankId);
+			bIsValidSyncAsset = static_cast<AtlasManager &>(m_AssManRef).IsImageValid(newImage, m_uiBankId);
 			break; }
 
 		case ASSETMAN_Source:
@@ -394,7 +394,7 @@ bool DlgSyncAssets::SyncFile(QFileInfo currentSyncFile, QMap<TreeModelItem *, Tr
 			case ASSETMAN_Atlases: {
 				QImage newImage(currentSyncFile.absoluteFilePath());
 				uiSyncAssetChecksum = HyGlobal::CRCData(0, newImage.bits(), newImage.sizeInBytes());
-				bIsValidSyncAsset = static_cast<AtlasModel &>(m_AssManRef).IsImageValid(newImage, m_uiBankId);
+				bIsValidSyncAsset = static_cast<AtlasManager &>(m_AssManRef).IsImageValid(newImage, m_uiBankId);
 				break; }
 
 			case ASSETMAN_Source:

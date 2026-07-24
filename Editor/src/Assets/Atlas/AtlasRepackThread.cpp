@@ -100,7 +100,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 		{
 			const int iNUM_NEW_TEXTURES = iter.value()->m_Packer.GetNumBins();
 
-			// Grab 'existingTexturesInfoList' - This is after AtlasModel::OnFlushRepack() has deleted the obsolete textures
+			// Grab 'existingTexturesInfoList' - This is after AtlasManager::OnFlushRepack() has deleted the obsolete textures
 			QFileInfoList existingTexturesInfoList = runtimeBankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 
 			// Using our stock of newly generated textures, fill in any gaps in the texture array.
@@ -274,11 +274,11 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 		{
 		case HyTextureInfo::UNCOMPRESSEDFILE_PNG:
 			if(false == pTexture->save(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % texInfo.GetFileExt().c_str())))
-				HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a PNG atlas", LOGTYPE_Error);
+				HyGuiLog("AtlasManager::ConstructAtlasTexture failed to generate a PNG atlas", LOGTYPE_Error);
 			break;
 
 		default:
-			HyGuiLog("AtlasModel::ConstructAtlasTexture unknown uncompressed file type", LOGTYPE_Error);
+			HyGuiLog("AtlasManager::ConstructAtlasTexture unknown uncompressed file type", LOGTYPE_Error);
 			break;
 		}
 		break;
@@ -295,7 +295,7 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 										imgProperlyFormatted.bits(),
 										0))
 		{
-			HyGuiLog("AtlasModel::ConstructAtlasTexture failed to generate a DTX5 atlas", LOGTYPE_Error);
+			HyGuiLog("AtlasManager::ConstructAtlasTexture failed to generate a DTX5 atlas", LOGTYPE_Error);
 		}
 		break; }
 
@@ -370,7 +370,7 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 		break; }
 
 	default:
-		HyGuiLog("AtlasModel::ConstructAtlasTexture tried to create an unsupported texture type: " % QString::number(texInfo.GetFormat()), LOGTYPE_Error);
+		HyGuiLog("AtlasManager::ConstructAtlasTexture tried to create an unsupported texture type: " % QString::number(texInfo.GetFormat()), LOGTYPE_Error);
 		break;
 	}
 

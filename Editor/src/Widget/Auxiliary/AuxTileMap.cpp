@@ -11,6 +11,8 @@
 #include "AuxTileMap.h"
 #include "ui_AuxTileMap.h"
 
+#include "TileMapModel.h"
+
 AuxTileMap::AuxTileMap(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::AuxTileMap)
@@ -21,4 +23,9 @@ AuxTileMap::AuxTileMap(QWidget *pParent /*= nullptr*/) :
 /*virtual*/ AuxTileMap::~AuxTileMap()
 {
 	delete ui;
+}
+
+void AuxTileMap::Init(Project &projectRef, TileMapModel &tileMapModelRef)
+{
+	//ui->tileSetsTableView
 }

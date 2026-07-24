@@ -1,5 +1,5 @@
 /**************************************************************************
- *	SourceModel.cpp
+ *	SourceManager.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2021 Jason Knobler
@@ -8,7 +8,7 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "SourceModel.h"
+#include "SourceManager.h"
 #include "SourceFile.h"
 #include "DlgBuildSettings.h"
 #include "DlgAddClassFiles.h"
@@ -22,23 +22,23 @@
 #include <QJsonArray>
 #include <QMimeData>
 
-SourceModel::SourceModel(Project &projRef) :
+SourceManager::SourceManager(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Source),
 	m_pEntityFolderItem(nullptr)
 {
 	m_bIsSingleBank = true;
 	m_MetaDir.setPath(m_ProjectRef.GetSourceAbsPath());
-	m_DataDir.setPath(m_ProjectRef.GetSourceAbsPath()); // SourceModel doesn't use a DataDir
+	m_DataDir.setPath(m_ProjectRef.GetSourceAbsPath()); // SourceManager doesn't use a DataDir
 
 	m_pEntityFolderItem = new TreeModelItemData(ITEM_Filter, QUuid(), HySrcEntityFilter);
 	InsertTreeItem(m_ProjectRef, m_pEntityFolderItem, nullptr);
 }
 
-/*virtual*/ SourceModel::~SourceModel()
+/*virtual*/ SourceManager::~SourceManager()
 {
 }
 
-bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
+bool SourceManager::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 {
 	m_ImportBaseClassList.clear();
 
@@ -79,7 +79,7 @@ bool SourceModel::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 	return ImportNewAssets(sImportList, 0, correspondingParentList, correspondingUuidList);
 }
 
-void SourceModel::DeleteEntitySrcFiles(EntityModel &entityModelRef)
+void SourceManager::DeleteEntitySrcFiles(EntityModel &entityModelRef)
 {
 	QList<IAssetItemData *> &assetListRef = m_BanksModel.GetBank(0)->m_AssetList;
 
@@ -95,7 +95,7 @@ void SourceModel::DeleteEntitySrcFiles(EntityModel &entityModelRef)
 	RemoveItems(deleteList, QList<TreeModelItemData *>(), false);
 }
 
-QStringList SourceModel::GetEditorEntityList() const
+QStringList SourceManager::GetEditorEntityList() const
 {
 	QStringList sEntityList;
 	
@@ -115,16 +115,16 @@ QStringList SourceModel::GetEditorEntityList() const
 	return sEntityList;
 }
 
-/*virtual*/ QString SourceModel::OnBankInfo(uint uiBankIndex) /*override*/
+/*virtual*/ QString SourceManager::OnBankInfo(uint uiBankIndex) /*override*/
 {
 	return "";
 }
 
-/*virtual*/ bool SourceModel::OnBankSettingsDlg(uint uiBankIndex) /*override*/
+/*virtual*/ bool SourceManager::OnBankSettingsDlg(uint uiBankIndex) /*override*/
 {
 	if(uiBankIndex != 0)
 	{
-		HyGuiLog("SourceModel::OnBankSettingsDlg was invoked with invalid bank index: " % QString::number(uiBankIndex), LOGTYPE_Error);
+		HyGuiLog("SourceManager::OnBankSettingsDlg was invoked with invalid bank index: " % QString::number(uiBankIndex), LOGTYPE_Error);
 		uiBankIndex = 0;
 	}
 
@@ -142,12 +142,12 @@ QStringList SourceModel::GetEditorEntityList() const
 	return bAccepted;
 }
 
-/*virtual*/ QStringList SourceModel::GetSupportedFileExtList() const /*override*/
+/*virtual*/ QStringList SourceManager::GetSupportedFileExtList() const /*override*/
 {
 	return QStringList() << ".cpp" << ".c" << ".h" << ".hpp" << ".cxx";
 }
 
-void SourceModel::OnAddClass(TreeModelItemData *pFirstSelected)
+void SourceManager::OnAddClass(TreeModelItemData *pFirstSelected)
 {
 	DlgAddClassFiles *pDlg = new DlgAddClassFiles(GetEditorEntityList());
 	if(QDialog::Accepted == pDlg->exec())
@@ -181,7 +181,7 @@ void SourceModel::OnAddClass(TreeModelItemData *pFirstSelected)
 	delete pDlg;
 }
 
-quint32 SourceModel::ComputeFileChecksum(QString sFilterPath, QString sFileName) const
+quint32 SourceManager::ComputeFileChecksum(QString sFilterPath, QString sFileName) const
 {
 	QString sCombinedPath;
 	if(sFilterPath.isEmpty() || sFilterPath == ".")
@@ -194,7 +194,7 @@ quint32 SourceModel::ComputeFileChecksum(QString sFilterPath, QString sFileName)
 	return HyGlobal::CRCData(0, reinterpret_cast<const uchar *>(sCleanPath.data()), sCleanPath.size());
 }
 
-QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex destIndex, QString sClassName, QString sFileName, QString sBaseClass, bool bEntityBaseClass, EntityModel *pEntityModel)
+QString SourceManager::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex destIndex, QString sClassName, QString sFileName, QString sBaseClass, bool bEntityBaseClass, EntityModel *pEntityModel)
 {
 	QString sTemplateFilePath = MainWindow::EngineSrcLocation() % HYGUIPATH_ProjGenDir % "src/";
 	switch(eTemplate)
@@ -260,7 +260,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 
 			case TEMPLATE_EntityH:
 				if(pEntityModel == nullptr)
-					HyGuiLog("SourceModel::GenerateSrcFile() is TEMPLATE_EntityH and was passed a nullptr 'pEntityModel'", LOGTYPE_Error);
+					HyGuiLog("SourceManager::GenerateSrcFile() is TEMPLATE_EntityH and was passed a nullptr 'pEntityModel'", LOGTYPE_Error);
 				sContents.replace("%HY_INCLUDES%", pEntityModel->GenerateSrc_FileIncludes());
 				sContents.replace("%HY_STATEENUMS%", pEntityModel->GenerateSrc_StateEnums());
 				sClassCtorSignature = "HyEntity2d *pParent = nullptr";
@@ -271,7 +271,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 
 			case TEMPLATE_EntityCpp:
 				if(pEntityModel == nullptr)
-					HyGuiLog("SourceModel::GenerateSrcFile() is TEMPLATE_EntityCpp and was passed a nullptr 'pEntityModel'", LOGTYPE_Error);
+					HyGuiLog("SourceManager::GenerateSrcFile() is TEMPLATE_EntityCpp and was passed a nullptr 'pEntityModel'", LOGTYPE_Error);
 				sClassCtorSignature = "HyEntity2d *pParent /*= nullptr*/";
 				sMemberInitializerList = pEntityModel->GenerateSrc_MemberInitializerList();
 				sContents.replace("%HY_CTORIMPL%", pEntityModel->GenerateSrc_Ctor());
@@ -299,7 +299,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 	// Make sure destination directory exists
 	QDir dir;
 	if(dir.mkpath(QFileInfo(file).absolutePath()) == false)
-		HyGuiLog("SourceModel::GenerateSrcFile - QDir::mkpath failed", LOGTYPE_Error);
+		HyGuiLog("SourceManager::GenerateSrcFile - QDir::mkpath failed", LOGTYPE_Error);
 
 	QIODevice::OpenMode eOpenMode = QFile::WriteOnly | QFile::Text;
 	if(pEntityModel == nullptr)
@@ -315,7 +315,7 @@ QString SourceModel::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex des
 	return sDestinationPath;
 }
 
-void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint32> &checksumListOut) const
+void SourceManager::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint32> &checksumListOut) const
 {
 	srcFilePathListOut.clear();
 	checksumListOut.clear();
@@ -355,7 +355,7 @@ void SourceModel::GatherSourceFiles(QStringList &srcFilePathListOut, QList<quint
 	}
 }
 
-QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
+QString SourceManager::CleanEmscriptenCcall(QString sUserValue) const
 {
 	sUserValue = sUserValue.simplified();
 	sUserValue.replace(' ', "");
@@ -386,7 +386,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	return sLinkFlags;
 }
 
-/*virtual*/ void SourceModel::OnInit() /*override*/
+/*virtual*/ void SourceManager::OnInit() /*override*/
 {
 	if(m_BanksModel.GetBank(0)->m_AssetList.empty())
 	{
@@ -468,7 +468,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	}
 }
 
-/*virtual*/ void SourceModel::OnCreateNewBank(QJsonObject &newMetaBankObjRef) /*override*/
+/*virtual*/ void SourceManager::OnCreateNewBank(QJsonObject &newMetaBankObjRef) /*override*/
 {
 	newMetaBankObjRef["OutputName"] = m_ProjectRef.GetName();
 	newMetaBankObjRef["SrcDepends"] = QJsonArray();
@@ -481,7 +481,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	newMetaBankObjRef["EmscriptenCcall"] = "";
 }
 
-/*virtual*/ IAssetItemData *SourceModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
+/*virtual*/ IAssetItemData *SourceManager::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
 	SourceFile *pNewFile = new SourceFile(*this,
 										  QUuid(metaObj["assetUUID"].toString()),
@@ -493,7 +493,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	return pNewFile;
 }
 
-/*virtual*/ bool SourceModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/
+/*virtual*/ bool SourceManager::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/
 {
 	for(int i = 0; i < assetList.count(); ++i)
 	{
@@ -517,29 +517,29 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	return true;
 }
 
-/*virtual*/ bool SourceModel::OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) /*override*/
+/*virtual*/ bool SourceManager::OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) /*override*/
 {
 	// This function doesn't make sense with how source files are kept
 	return false;
 }
 
-/*virtual*/ bool SourceModel::OnUpdateAssets(QList<IAssetItemData *> assetList) /*override*/
+/*virtual*/ bool SourceManager::OnUpdateAssets(QList<IAssetItemData *> assetList) /*override*/
 {
 	// This function doesn't make sense with how source files are kept (they're updated via some IDE)
 	return false;
 }
 
-/*virtual*/ bool SourceModel::OnMoveAssets(QList<IAssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
+/*virtual*/ bool SourceManager::OnMoveAssets(QList<IAssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
 {
 	// This function doesn't make sense with how source files are kept (single bank)
 	return false;
 }
 
-/*virtual*/ void SourceModel::OnFlushRepack() /*override*/
+/*virtual*/ void SourceManager::OnFlushRepack() /*override*/
 {
 }
 
-/*virtual*/ void SourceModel::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
+/*virtual*/ void SourceManager::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
 {
 	const BankData *pSourceBank = m_BanksModel.GetBank(0);
 
@@ -556,7 +556,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 		if(pSourceBank->m_AssetList[i]->GetFilter().isEmpty() == false)
 		{
 			if(m_MetaDir.mkpath(pSourceBank->m_AssetList[i]->GetFilter()) == false)
-				HyGuiLog("SourceModel::OnSaveMeta mkpath() failed", LOGTYPE_Error);
+				HyGuiLog("SourceManager::OnSaveMeta mkpath() failed", LOGTYPE_Error);
 		}
 
 		for(int32 iSrcFileIndex = 0; iSrcFileIndex < currentChecksumList.size(); ++iSrcFileIndex)
@@ -744,7 +744,7 @@ QString SourceModel::CleanEmscriptenCcall(QString sUserValue) const
 	file.close();
 }
 
-/*virtual*/ void SourceModel::OnSaveData(QJsonObject &dataObjRef) /*override*/
+/*virtual*/ void SourceManager::OnSaveData(QJsonObject &dataObjRef) /*override*/
 {
 	// This function doesn't make sense with m_bHasRuntimeMantifest == false
 }

@@ -11,7 +11,7 @@
 #include "TextFontManager.h"
 #include "TextModel.h"
 #include "Project.h"
-#include "AtlasModel.h"
+#include "AtlasManager.h"
 
 #define TEXTFONTERROR_Success 0
 #define TEXTFONTERROR_Unknown -1
@@ -292,7 +292,7 @@ TextLayerHandle TextFontManager::AddNewLayer(QString sFontName, rendermode_t eRe
 
 void TextFontManager::SetAtlasGroup(quint32 uiBankId)
 {
-	AtlasModel &atlasModelRef = m_GlyphsModel.GetProjItem()->GetProject().GetAtlasModel();
+	AtlasManager &atlasModelRef = m_GlyphsModel.GetProjItem()->GetProject().GetAtlasModel();
 	m_GlyphsModel.SetPropertyValue("Atlas Info", TEXTPROP_AtlasGroup, atlasModelRef.GetBankName(atlasModelRef.GetBankIndexFromBankId(uiBankId)));
 }
 

@@ -1,5 +1,5 @@
 /**************************************************************************
- *	AudioManagerModel.h
+ *	AudioManager.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2020 Jason Knobler
@@ -7,8 +7,8 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef AudioManagerModel_H
-#define AudioManagerModel_H
+#ifndef AudioManager_H
+#define AudioManager_H
 
 #include "IManagerModel.h"
 #include "SoundClip.h"
@@ -37,8 +37,7 @@ public:
 	virtual QVariant headerData(int iIndex, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 };
 
-// TODO: Rename to AudioManager
-class AudioManagerModel : public IManagerModel
+class AudioManager : public IManagerModel
 {
 	Q_OBJECT
 
@@ -49,8 +48,8 @@ class AudioManagerModel : public IManagerModel
 	quint32									m_uiNextCategoryId;
 
 public:
-	AudioManagerModel(Project &projRef);
-	virtual ~AudioManagerModel();
+	AudioManager(Project &projRef);
+	virtual ~AudioManager();
 
 	AudioCategoriesModel &GetCategoriesModel();
 
@@ -84,4 +83,4 @@ private:
 	SoundClip *ImportSound(QString sFilePath, quint32 uiBankIndex, QUuid uuid, const WaveHeader &wavHeaderRef);
 };
 
-#endif // AudioManagerModel_H
+#endif // AudioManager_H

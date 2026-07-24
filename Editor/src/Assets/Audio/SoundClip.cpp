@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "SoundClip.h"
-#include "AudioManagerModel.h"
+#include "AudioManager.h"
 
 SoundClip::SoundClip(IManagerModel &modelRef,
 					 QUuid uuid,
@@ -130,7 +130,7 @@ void SoundClip::ReplaceAudio(QString sName, uint32 uiChecksum, const WaveHeader 
 /*virtual*/ QString SoundClip::GetPropertyInfo() /*override*/
 {
 	QString sInfo;
-	sInfo = static_cast<AudioManagerModel &>(m_ModelRef).GetCategoryName(m_iCategoryId);
+	sInfo = static_cast<AudioManager &>(m_ModelRef).GetCategoryName(m_iCategoryId);
 	if(m_bIsStreaming)
 	{
 		if(sInfo.isEmpty() == false)

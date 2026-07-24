@@ -170,7 +170,7 @@ bool IManagerModel::ImportNewAssets(QStringList sImportList, quint32 uiBankId, Q
 {
 	if(correspondingParentList.size() != sImportList.size() || correspondingUuidList.size() != sImportList.size())
 	{
-		HyGuiLog("AtlasModel::ImportNewAssets was passed a correspondingParentList/correspondingUuidList that isn't the same size as the sImportList", LOGTYPE_Error);
+		HyGuiLog("AtlasManager::ImportNewAssets was passed a correspondingParentList/correspondingUuidList that isn't the same size as the sImportList", LOGTYPE_Error);
 		return false;
 	}
 	

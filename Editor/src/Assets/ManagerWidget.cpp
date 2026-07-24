@@ -24,7 +24,7 @@
 #include "AuxTileSet.h"
 #include "DlgAssetProperties.h"
 #include "DlgSyncAssets.h"
-#include "SourceModel.h"
+#include "SourceManager.h"
 #include "SourceFile.h"
 #include "AssetMimeData.h"
 #include "DlgNewBuild.h"
@@ -1162,7 +1162,7 @@ void ManagerWidget::on_actionAddClassFiles_triggered()
 	else
 		pFirstSelected = GetSelected();
 
-	static_cast<SourceModel *>(m_pModel)->OnAddClass(pFirstSelected);
+	static_cast<SourceManager *>(m_pModel)->OnAddClass(pFirstSelected);
 }
 
 void ManagerWidget::on_actionSliceSpriteSheet_triggered()
@@ -1182,7 +1182,7 @@ void ManagerWidget::on_actionSliceSpriteSheet_triggered()
 	else
 		pFirstSelected = GetSelected();
 
-	static_cast<AtlasModel *>(m_pModel)->OnSliceSprite(m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()), pFirstSelected);
+	static_cast<AtlasManager *>(m_pModel)->OnSliceSprite(m_pModel->GetBankIdFromBankIndex(ui->cmbBanks->currentIndex()), pFirstSelected);
 }
 
 void ManagerWidget::on_actionImportAssets_triggered()
@@ -1372,7 +1372,7 @@ void ManagerWidget::on_actionCreateTileSet_triggered()
 	DlgInputName dlgInputName("Enter TileSet Name", "New TileSet", HyGlobal::FreeFormValidator(),
 		[this](QString sInputName) -> QString
 		{
-			if(static_cast<AtlasModel *>(m_pModel)->GetTileSetMap().contains(sInputName.toLower()))
+			if(static_cast<AtlasManager *>(m_pModel)->GetTileSetMap().contains(sInputName.toLower()))
 				return QString("A TileSet already exists with this name");
 
 			return QString();
@@ -1380,7 +1380,7 @@ void ManagerWidget::on_actionCreateTileSet_triggered()
 	if(dlgInputName.exec() == QDialog::Accepted)
 	{
 		QString sName = dlgInputName.GetName();
-		AtlasModel *pAtlasModel = static_cast<AtlasModel *>(m_pModel);
+		AtlasManager *pAtlasModel = static_cast<AtlasManager *>(m_pModel);
 		AtlasTileSet *pNewTileSet = pAtlasModel->GenerateTileSet(sName, pParentTreeItem, uiBankId);
 		QModelIndex tileSetIndex = pAtlasModel->FindIndex<AtlasTileSet *>(pNewTileSet, 0);
 

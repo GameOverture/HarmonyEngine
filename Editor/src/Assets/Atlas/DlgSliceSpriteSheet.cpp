@@ -12,8 +12,7 @@
 #include "ui_DlgSliceSpriteSheet.h"
 #include "Project.h"
 #include "MainWindow.h"
-#include "AtlasModel.h"
-#include "IManagerModel.h"
+#include "AtlasManager.h"
 #include "ManagerWidget.h"
 
 #include <QDir>

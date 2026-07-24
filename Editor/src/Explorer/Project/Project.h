@@ -25,11 +25,11 @@
 #include <QFileSystemWatcher>
 
 // Forward declaration
-class SourceModel;
-class AtlasModel;
+class SourceManager;
+class AtlasManager;
 class IManagerModel;
 class ManagerWidget;
-class AudioManagerModel;
+class AudioManager;
 class Harmony;
 class ExplorerModel;
 
@@ -63,11 +63,11 @@ class Project : public ExplorerItemData
 
 	ProjectDraw *										m_pDraw;
 
-	SourceModel *										m_pSourceModel;
+	SourceManager *										m_pSourceManager;
 	ManagerWidget *										m_pSourceWidget;
-	AtlasModel *										m_pAtlasModel;
+	AtlasManager *										m_pAtlasManager;
 	ManagerWidget *										m_pAtlasWidget;
-	AudioManagerModel *									m_pAudioModel;
+	AudioManager *										m_pAudioManager;
 	ManagerWidget *										m_pAudioWidget;
 
 	QStandardItemModel									m_FontListModel;
@@ -122,11 +122,11 @@ public:
 
 	IManagerModel *GetManagerModel(AssetManagerType eManagerType);
 
-	SourceModel &GetSourceModel();
+	SourceManager &GetSourceModel();
 	ManagerWidget *GetSourceWidget();
-	AtlasModel &GetAtlasModel();
+	AtlasManager &GetAtlasModel();
 	ManagerWidget *GetAtlasWidget();
-	AudioManagerModel &GetAudioModel();
+	AudioManager &GetAudioModel();
 	ManagerWidget *GetAudioWidget();
 
 	void AddDirtyItems(IManagerModel *pDirtyManager, QList<ProjectItemData *> dirtyProjItemList);

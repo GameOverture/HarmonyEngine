@@ -12,7 +12,7 @@
 #include "ui_DlgAssetProperties.h"
 #include "AtlasFrame.h"
 #include "SoundClip.h"
-#include "AudioManagerModel.h"
+#include "AudioManager.h"
 
 #include <QMessageBox>
 
@@ -161,7 +161,7 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 				break;
 			}
 		}
-		ui->audioCategory->Init(&static_cast<AudioManagerModel *>(pManagerModel)->GetCategoriesModel(), iCategoryId, bCheckable);
+		ui->audioCategory->Init(&static_cast<AudioManager *>(pManagerModel)->GetCategoriesModel(), iCategoryId, bCheckable);
 
 		// Is Streaming ///////////////////////////////////////////////////////////////////////////////////////////
 		eCheckState = static_cast<SoundClip *>(m_SelectedAssets[0])->IsStreaming() ? Qt::Checked : Qt::Unchecked;

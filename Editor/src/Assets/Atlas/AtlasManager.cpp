@@ -1,5 +1,5 @@
 /**************************************************************************
- *	AtlasModel.cpp
+ *	AtlasManager.cpp
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2017 Jason Knobler
@@ -8,7 +8,7 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "AtlasModel.h"
+#include "AtlasManager.h"
 #include "AtlasDraw.h"
 #include "AtlasTileSet.h"
 #include "Project.h"
@@ -23,7 +23,7 @@
 #include <QJsonArray>
 #include <QMimeData>
 
-AtlasModel::AtlasModel(Project &projRef) :
+AtlasManager::AtlasManager(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Atlases),
 	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0)
 {
@@ -40,23 +40,23 @@ AtlasModel::AtlasModel(Project &projRef) :
 		HyGuiLog("Failed to create or open tile set meta file: " + tileSetMetaFile.fileName(), LOGTYPE_Error);
 }
 
-/*virtual*/ AtlasModel::~AtlasModel()
+/*virtual*/ AtlasManager::~AtlasManager()
 {
 
 }
 
-QFileInfoList AtlasModel::GetExistingTextureInfoList(uint uiBankIndex) const
+QFileInfoList AtlasManager::GetExistingTextureInfoList(uint uiBankIndex) const
 {
 	QDir bankDir(m_BanksModel.GetBank(uiBankIndex)->m_sAbsPath);
 	return bankDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
 }
 
-int AtlasModel::GetNumTextures(uint uiBankIndex) const
+int AtlasManager::GetNumTextures(uint uiBankIndex) const
 {
 	return GetExistingTextureInfoList(uiBankIndex).size();
 }
 
-QSize AtlasModel::GetMaxAtlasDimensions(uint uiBankIndex) const
+QSize AtlasManager::GetMaxAtlasDimensions(uint uiBankIndex) const
 {
 	int iWidth = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["maxWidth"].toInt();
 	int iHeight = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["maxHeight"].toInt();
@@ -64,7 +64,7 @@ QSize AtlasModel::GetMaxAtlasDimensions(uint uiBankIndex) const
 	return QSize(iWidth, iHeight);
 }
 
-QSize AtlasModel::GetTextureSize(uint uiBankIndex, int iTextureIndex) const
+QSize AtlasManager::GetTextureSize(uint uiBankIndex, int iTextureIndex) const
 {
 	QJsonArray textureSizesArray = m_BanksModel.GetBank(uiBankIndex)->m_MetaObj["textureSizes"].toArray();
 	QJsonArray texSizeArray = textureSizesArray[iTextureIndex].toArray();
@@ -72,18 +72,18 @@ QSize AtlasModel::GetTextureSize(uint uiBankIndex, int iTextureIndex) const
 	return QSize(texSizeArray[0].toInt(), texSizeArray[1].toInt());
 }
 
-bool AtlasModel::IsImageValid(QImage &image, quint32 uiBankId) const
+bool AtlasManager::IsImageValid(QImage &image, quint32 uiBankId) const
 {
 	return IsImageValid(image.width(), image.height(), uiBankId);
 }
 
-bool AtlasModel::IsImageValid(int iWidth, int iHeight, quint32 uiBankId) const
+bool AtlasManager::IsImageValid(int iWidth, int iHeight, quint32 uiBankId) const
 {
 	uint uiBankIndex = GetBankIndexFromBankId(uiBankId);
 	return IsImageValid(iWidth, iHeight, m_BanksModel.GetBank(uiBankIndex)->m_MetaObj);
 }
 
-bool AtlasModel::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings) const
+bool AtlasManager::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasSettings) const
 {
 	int iMarginWidth =  atlasSettings["sbFrameMarginLeft"].toInt();
 	iMarginWidth +=     atlasSettings["sbFrameMarginRight"].toInt();
@@ -102,7 +102,7 @@ bool AtlasModel::IsImageValid(int iWidth, int iHeight, const QJsonObject &atlasS
 	return true;
 }
 
-AtlasFrame *AtlasModel::FindFrame(quint32 uiChecksum, quint32 uiBankId) const
+AtlasFrame *AtlasManager::FindFrame(quint32 uiChecksum, quint32 uiBankId) const
 {
 	uint uiBankIndex = GetBankIndexFromBankId(uiBankId);
 	const QList<IAssetItemData *> &assetListRef = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
@@ -117,7 +117,7 @@ AtlasFrame *AtlasModel::FindFrame(quint32 uiChecksum, quint32 uiBankId) const
 	return nullptr;
 }
 
-AtlasFrame *AtlasModel::FindFrame(const QUuid &itemUuidRef, quint32 uiBankId) const
+AtlasFrame *AtlasManager::FindFrame(const QUuid &itemUuidRef, quint32 uiBankId) const
 {
 	uint uiBankIndex = GetBankIndexFromBankId(uiBankId);
 	const QList<IAssetItemData *> &assetListRef = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
@@ -132,7 +132,7 @@ AtlasFrame *AtlasModel::FindFrame(const QUuid &itemUuidRef, quint32 uiBankId) co
 	return nullptr;
 }
 
-AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiBankIndex, ItemType eSubAtlasType)
+AtlasFrame *AtlasManager::GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiBankIndex, ItemType eSubAtlasType)
 {
 	if(IsImageValid(newImage, m_BanksModel.GetBank(uiBankIndex)->GetId()) == false)
 		return nullptr;
@@ -153,7 +153,7 @@ AtlasFrame *AtlasModel::GenerateFrame(ProjectItemData *pItem, QString sName, QIm
 	return nullptr;
 }
 
-bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, ItemType eSubAtlasType)
+bool AtlasManager::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, ItemType eSubAtlasType)
 {
 	if(IsImageValid(newImage, pFrame->GetBankId()) == false)
 		return false;
@@ -179,16 +179,16 @@ bool AtlasModel::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImag
 	return true;
 }
 
-const QMap<QString, AtlasTileSet *> &AtlasModel::GetTileSetMap() const
+const QMap<QString, AtlasTileSet *> &AtlasManager::GetTileSetMap() const
 {
 	return m_TileSetsMap;
 }
 
-AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pParentTreeItemData, quint32 uiBankId)
+AtlasTileSet *AtlasManager::GenerateTileSet(QString sName, TreeModelItemData *pParentTreeItemData, quint32 uiBankId)
 {
 	if(m_TileSetsMap.contains(sName.toLower()))
 	{
-		HyGuiLog("AtlasModel::GenerateTileSet() - an AtlasTileSet that already existed by the same name: " % sName, LOGTYPE_Error);
+		HyGuiLog("AtlasManager::GenerateTileSet() - an AtlasTileSet that already existed by the same name: " % sName, LOGTYPE_Error);
 		return nullptr;
 	}
 
@@ -217,7 +217,7 @@ AtlasTileSet *AtlasModel::GenerateTileSet(QString sName, TreeModelItemData *pPar
 	return pNewTileSet;
 }
 
-bool AtlasModel::SaveTileSet(QUuid tileSetUuid, const QJsonObject &tileSetMetaDataRef)
+bool AtlasManager::SaveTileSet(QUuid tileSetUuid, const QJsonObject &tileSetMetaDataRef)
 {
 	if(FlushRepack() == false)
 		return false;
@@ -230,7 +230,7 @@ bool AtlasModel::SaveTileSet(QUuid tileSetUuid, const QJsonObject &tileSetMetaDa
 	return true;
 }
 
-void AtlasModel::WriteTileSetsToDisk()
+void AtlasManager::WriteTileSetsToDisk()
 {
 	// Save Meta Data
 	QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));
@@ -258,7 +258,7 @@ void AtlasModel::WriteTileSetsToDisk()
 	}
 }
 
-void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *pFirstSelected)
+void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *pFirstSelected)
 {
 	DlgSliceSpriteSheet *pDlg = new DlgSliceSpriteSheet();
 	if(QDialog::Accepted == pDlg->exec())
@@ -321,7 +321,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	}
 }
 
-/*virtual*/ QString AtlasModel::OnBankInfo(uint uiBankIndex) /*override*/
+/*virtual*/ QString AtlasManager::OnBankInfo(uint uiBankIndex) /*override*/
 {
 	QString sInfo = "Num Textures: " % QString::number(GetNumTextures(uiBankIndex)) % " | " %
 		"(" % QString::number(GetMaxAtlasDimensions(uiBankIndex).width()) % "x" % QString::number(GetMaxAtlasDimensions(uiBankIndex).height()) % ")";
@@ -329,7 +329,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	return sInfo;
 }
 
-/*virtual*/ bool AtlasModel::OnBankSettingsDlg(uint uiBankIndex) /*override*/
+/*virtual*/ bool AtlasManager::OnBankSettingsDlg(uint uiBankIndex) /*override*/
 {
 	QList<IAssetItemData *> assetList = m_BanksModel.GetBank(uiBankIndex)->m_AssetList;
 	bool bBankHasAssets = assetList.size() > 0;
@@ -379,12 +379,12 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	return bAccepted;
 }
 
-/*virtual*/ QStringList AtlasModel::GetSupportedFileExtList() const /*override*/
+/*virtual*/ QStringList AtlasManager::GetSupportedFileExtList() const /*override*/
 {
 	return QStringList() << ".png";
 }
 
-/*virtual*/ void AtlasModel::OnInit() /*override*/
+/*virtual*/ void AtlasManager::OnInit() /*override*/
 {
 	// Create data manifest file if one doesn't exist
 	QFile manifestFile(m_DataDir.absoluteFilePath(HyGlobal::AssetName(m_eASSET_TYPE) % HYGUIPATH_DataExt));
@@ -395,7 +395,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	}
 }
 
-/*virtual*/ void AtlasModel::OnCreateNewBank(QJsonObject &newMetaBankObjRef) /*override*/
+/*virtual*/ void AtlasManager::OnCreateNewBank(QJsonObject &newMetaBankObjRef) /*override*/
 {
 	newMetaBankObjRef.insert("cmbSortOrder", 0);
 	newMetaBankObjRef.insert("sbFrameMarginTop", 0);
@@ -411,7 +411,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	newMetaBankObjRef.insert("minimumFillRate", 80);
 }
 
-/*virtual*/ IAssetItemData *AtlasModel::OnAllocateAssetData(QJsonObject metaObj) /*override*/
+/*virtual*/ IAssetItemData *AtlasManager::OnAllocateAssetData(QJsonObject metaObj) /*override*/
 {
 	ItemType eAssetItemType = HyGlobal::GetTypeFromString(metaObj["itemType"].toString());
 	if(eAssetItemType == ITEM_AtlasFrame)
@@ -457,17 +457,17 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 													 metaObj["errors"].toInt(0));
 
 		if(m_TileSetsMap.contains(pNewTileSet->GetName().toLower()))
-			HyGuiLog("AtlasModel::OnAllocateAssetData() - Allocated an AtlasTileSet that already existed by the same name: " % pNewTileSet->GetName(), LOGTYPE_Error);
+			HyGuiLog("AtlasManager::OnAllocateAssetData() - Allocated an AtlasTileSet that already existed by the same name: " % pNewTileSet->GetName(), LOGTYPE_Error);
 		m_TileSetsMap.insert(pNewTileSet->GetName().toLower(), pNewTileSet);
 
 		return pNewTileSet;
 	}
 
-	HyGuiLog("AtlasModel::OnAllocateAssetData() - Unknown asset type: " % metaObj["itemType"].toString(), LOGTYPE_Error);
+	HyGuiLog("AtlasManager::OnAllocateAssetData() - Unknown asset type: " % metaObj["itemType"].toString(), LOGTYPE_Error);
 	return nullptr;
 }
 
-/*virtual*/ bool AtlasModel::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/
+/*virtual*/ bool AtlasManager::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/
 {
 	QMap<BankData *, QSet<int> > repackTexIndexMap;
 	for(int i = 0; i < assetList.count(); ++i)
@@ -499,7 +499,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	return true;
 }
 
-/*virtual*/ bool AtlasModel::OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) /*override*/
+/*virtual*/ bool AtlasManager::OnReplaceAssets(QStringList sImportAssetList, QList<IAssetItemData *> assetList) /*override*/
 {
 	// Error check all the replacement assets before adding them, and cancel entire replace if any fail
 	QList<QImage *> newReplacementImageList;
@@ -554,7 +554,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	return true;
 }
 
-/*virtual*/ bool AtlasModel::OnUpdateAssets(QList<IAssetItemData *> assetList) /*override*/
+/*virtual*/ bool AtlasManager::OnUpdateAssets(QList<IAssetItemData *> assetList) /*override*/
 {
 	QMap<BankData *, QSet<int> > repackTexIndexMap;
 	for(int i = 0; i < assetList.count(); ++i)
@@ -569,7 +569,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	return true;
 }
 
-/*virtual*/ bool AtlasModel::OnMoveAssets(QList<IAssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
+/*virtual*/ bool AtlasManager::OnMoveAssets(QList<IAssetItemData *> assetsList, quint32 uiNewBankId) /*override*/
 {
 	// Ensure all transferred assets (images) can fit on new atlas
 	for(int i = 0; i < assetsList.count(); ++i)
@@ -616,7 +616,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	return true;
 }
 
-/*virtual*/ void AtlasModel::OnFlushRepack() /*override*/
+/*virtual*/ void AtlasManager::OnFlushRepack() /*override*/
 {
 	// Ensure 'm_RepackAffectedAssetsMap' contains the BankData *'s that 'm_RepackTexIndicesMap' contains
 	for(auto iter = m_RepackTexIndicesMap.begin(); iter != m_RepackTexIndicesMap.end(); ++iter)
@@ -681,7 +681,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	m_RepackTexIndicesMap.clear();
 }
 
-/*virtual*/ void AtlasModel::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
+/*virtual*/ void AtlasManager::OnSaveMeta(QJsonObject &metaObjRef) /*override*/
 {
 	//// Just ensure TileSet.meta file exists - don't try to save over an existing one
 	//QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));
@@ -689,7 +689,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	//	SaveTileSets();
 }
 
-/*virtual*/ void AtlasModel::OnSaveData(QJsonObject &dataObjRef) /*override*/
+/*virtual*/ void AtlasManager::OnSaveData(QJsonObject &dataObjRef) /*override*/
 {
 	QJsonArray banksArray;
 	for(int i = 0; i < m_BanksModel.rowCount(); ++i)
@@ -780,7 +780,7 @@ void AtlasModel::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *p
 	dataObjRef.insert("tileSets", tileSetTexturesArray);
 }
 
-void AtlasModel::AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSet)
+void AtlasManager::AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSet)
 {
 	m_RepackTexIndicesMap[pBankData].unite(texIndicesSet);
 
@@ -802,7 +802,7 @@ void AtlasModel::AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSe
 	}
 }
 
-AtlasFrame *AtlasModel::ImportImage(QString sName, QImage &newImage, quint32 uiBankId, ItemType eSubAtlasType, QUuid uuid)
+AtlasFrame *AtlasManager::ImportImage(QString sName, QImage &newImage, quint32 uiBankId, ItemType eSubAtlasType, QUuid uuid)
 {
 	QFileInfo fileInfo(sName);
 

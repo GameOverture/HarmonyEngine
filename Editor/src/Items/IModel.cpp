@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "IModel.h"
-#include "AtlasModel.h"
+#include "AtlasManager.h"
 #include "Project.h"
 
 IStateData::IStateData(int iIndex, IModel &modelRef, FileDataPair stateFileData) :

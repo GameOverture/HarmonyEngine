@@ -1,5 +1,5 @@
 /**************************************************************************
- *	AtlasModel.h
+ *	AtlasManager.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2017 Jason Knobler
@@ -7,16 +7,15 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef ATLASMODEL_H
-#define ATLASMODEL_H
+#ifndef ATLASMANAGER_H
+#define ATLASMANAGER_H
 
 #include "IManagerModel.h"
 
 #include "AtlasFrame.h"
 #include "AtlasTileSet.h"
 
-// TODO: Rename to AtlasManager
-class AtlasModel : public IManagerModel
+class AtlasManager : public IManagerModel
 {
 	Q_OBJECT
 
@@ -30,8 +29,8 @@ class AtlasModel : public IManagerModel
 	QJsonObject							m_TileSetsMeta;			// Holds the contents of TileSets.meta
 
 public:
-	AtlasModel(Project &projRef);
-	virtual ~AtlasModel();
+	AtlasManager(Project &projRef);
+	virtual ~AtlasManager();
 
 	QFileInfoList GetExistingTextureInfoList(uint uiBankIndex) const;
 
@@ -80,4 +79,4 @@ private:
 	AtlasFrame *ImportImage(QString sName, QImage &newImage, quint32 uiBankIndex, ItemType eSubAtlasType, QUuid uuid);
 };
 
-#endif // ATLASMODEL_H
+#endif // ATLASMANAGER_H

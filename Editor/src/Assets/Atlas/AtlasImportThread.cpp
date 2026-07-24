@@ -9,8 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "AtlasImportThread.h"
-
-#include <AtlasModel.h>
+#include "AtlasManager.h"
 
 AtlasImportThread::AtlasImportThread(IManagerModel &managerModelRef, QStringList sImportAssetList, quint32 uiBankId, QVector<TreeModelItemData *> correspondingParentList, QVector<QUuid> correspondingUuidList) :
 	IImportThread(managerModelRef, sImportAssetList, uiBankId, correspondingParentList, correspondingUuidList)
@@ -23,7 +22,7 @@ AtlasImportThread::AtlasImportThread(IManagerModel &managerModelRef, QStringList
 
 /*virtual*/ bool AtlasImportThread::OnRun(QString &sReportOut) /*override*/
 {
-	AtlasModel &atlasModelRef = static_cast<AtlasModel &>(m_ManagerModelRef);
+	AtlasManager &atlasManagerRef = static_cast<AtlasManager &>(m_ManagerModelRef);
 
 	const int iEMIT_THROTTLE = m_sImportAssetList.size() / 100;
 
@@ -35,10 +34,10 @@ AtlasImportThread::AtlasImportThread(IManagerModel &managerModelRef, QStringList
 		tempImage.load(fileInfo.absoluteFilePath());
 		
 		// Error check the imported assets before adding them
-		if(atlasModelRef.IsImageValid(tempImage, m_uiBankId))
+		if(atlasManagerRef.IsImageValid(tempImage, m_uiBankId))
 		{
 			// ImportImage calls RegisterAsset()
-			atlasModelRef.m_ImportedAssetList.append(atlasModelRef.ImportImage(fileInfo.baseName(), tempImage, m_uiBankId, ITEM_None, m_CorrespondingUuidList[i]));
+			atlasManagerRef.m_ImportedAssetList.append(atlasManagerRef.ImportImage(fileInfo.baseName(), tempImage, m_uiBankId, ITEM_None, m_CorrespondingUuidList[i]));
 
 			if(iEMIT_THROTTLE == 0 || (i % iEMIT_THROTTLE) == 0)
 				Q_EMIT ImportUpdate(i + 1, m_sImportAssetList.size());
@@ -50,17 +49,17 @@ AtlasImportThread::AtlasImportThread(IManagerModel &managerModelRef, QStringList
 	sReportOut.clear();
 	if(invalidImportList.empty() == false)
 	{
-		QSize atlasDimensions = atlasModelRef.GetMaxAtlasDimensions(atlasModelRef.GetBankIndexFromBankId(m_uiBankId));
+		QSize atlasDimensions = atlasManagerRef.GetMaxAtlasDimensions(atlasManagerRef.GetBankIndexFromBankId(m_uiBankId));
 		sReportOut += "The following images were not imported because they were too large to fit in the atlas bank '" % QString::number(m_uiBankId) % "' (" % QString::number(atlasDimensions.width()) % "x" % QString::number(atlasDimensions.height()) % "):";
 		for(int i = 0; i < invalidImportList.size(); ++i)
 			sReportOut += "\n" % invalidImportList[i].fileName();
 	}
 
 	// Repack asset bank with newly imported images
-	if(atlasModelRef.m_ImportedAssetList.empty() == false)
+	if(atlasManagerRef.m_ImportedAssetList.empty() == false)
 	{
-		QSet<IAssetItemData *> returnListAsSet(atlasModelRef.m_ImportedAssetList.begin(), atlasModelRef.m_ImportedAssetList.end());
-		atlasModelRef.AddAssetsToRepack(atlasModelRef.m_BanksModel.GetBank(atlasModelRef.GetBankIndexFromBankId(m_uiBankId)), returnListAsSet);
+		QSet<IAssetItemData *> returnListAsSet(atlasManagerRef.m_ImportedAssetList.begin(), atlasManagerRef.m_ImportedAssetList.end());
+		atlasManagerRef.AddAssetsToRepack(atlasManagerRef.m_BanksModel.GetBank(atlasManagerRef.GetBankIndexFromBankId(m_uiBankId)), returnListAsSet);
 
 		return true;
 	}

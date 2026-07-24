@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "AtlasTileSet.h"
-#include "AtlasModel.h"
+#include "AtlasManager.h"
 #include "TileData.h"
 #include "AtlasPacker.h"
 #include "Project.h"
@@ -148,6 +148,11 @@ AtlasTileSet::~AtlasTileSet()
 		delete *it;
 
 	delete m_pUndoStack;
+}
+
+const QJsonObject &AtlasTileSet::GetSavedTileSetMeta() const
+{
+	return m_TileSetMetaObj;
 }
 
 int AtlasTileSet::GetNumTiles() const
@@ -813,7 +818,7 @@ bool AtlasTileSet::Save()
 		//asdf;
 	}
 
-	return static_cast<AtlasModel &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetMetaObj);
+	return static_cast<AtlasManager &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetMetaObj);
 }
 
 bool AtlasTileSet::IsExistencePendingSave() const
@@ -1035,9 +1040,9 @@ bool AtlasTileSet::RegenerateSubAtlas()
 	}
 	p.end();
 
-	if(static_cast<AtlasModel &>(m_ModelRef).ReplaceFrame(this, GetName(), newTexture, ITEM_AtlasTileSet) == false)
+	if(static_cast<AtlasManager &>(m_ModelRef).ReplaceFrame(this, GetName(), newTexture, ITEM_AtlasTileSet) == false)
 	{
-		HyGuiLog("AtlasModel::ReplaceFrame failed (or can't fit in main atlases) for tile set sub-atlas: " % GetName(), LOGTYPE_Error);
+		HyGuiLog("AtlasManager::ReplaceFrame failed (or can't fit in main atlases) for tile set sub-atlas: " % GetName(), LOGTYPE_Error);
 		return false;
 	}
 

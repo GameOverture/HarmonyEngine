@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "SpriteModels.h"
 #include "Project.h"
-#include "AtlasModel.h"
+#include "AtlasManager.h"
 #include "SpriteWidget.h"
 
 #include <QJsonArray>

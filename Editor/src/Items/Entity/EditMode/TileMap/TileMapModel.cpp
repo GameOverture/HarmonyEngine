@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "TileMapModel.h"
 #include "AtlasTileSet.h"
-#include "AtlasModel.h"
+#include "AtlasManager.h"
 
 TileMapModel::TileMapModel() :
 	IEditModeModel(EDITMODETYPE_TileMap)
@@ -73,7 +73,7 @@ const Tiled::TileLayer &TileMapModel::GetTiledTileLayer() const
 	return m_TiledLayer;
 }
 
-QList<AtlasTileSet *> TileMapModel::UsedTilesets(const AtlasModel &atlasManagerRef) const
+QList<AtlasTileSet *> TileMapModel::UsedTilesets(const AtlasManager &atlasManagerRef) const
 {
 	const QMap<QString, AtlasTileSet *> &tileSetMapRef = atlasManagerRef.GetTileSetMap();
 	QList<AtlasTileSet *> returnList;

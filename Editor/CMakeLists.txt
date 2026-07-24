@@ -76,8 +76,8 @@ if(Qt6_DIR)
 		src/Assets/Source/DlgPackageBuild.ui
 		src/Assets/Source/SourceFile.cpp
 		src/Assets/Source/SourceFile.h
-		src/Assets/Source/SourceModel.cpp
-		src/Assets/Source/SourceModel.h
+		src/Assets/Source/SourceManager.cpp
+		src/Assets/Source/SourceManager.h
 		src/Assets/Source/SourceImportThread.cpp
 		src/Assets/Source/SourceImportThread.h
 		src/Assets/Source/WgtSrcDependency.cpp
@@ -89,8 +89,8 @@ if(Qt6_DIR)
 		src/Assets/Atlas/AtlasFrame.h
 		src/Assets/Atlas/AtlasImportThread.cpp
 		src/Assets/Atlas/AtlasImportThread.h
-		src/Assets/Atlas/AtlasModel.cpp
-		src/Assets/Atlas/AtlasModel.h
+		src/Assets/Atlas/AtlasManager.cpp
+		src/Assets/Atlas/AtlasManager.h
 		src/Assets/Atlas/AtlasPacker.cpp
 		src/Assets/Atlas/AtlasPacker.h
 		src/Assets/Atlas/AtlasRepackThread.cpp
@@ -129,8 +129,8 @@ if(Qt6_DIR)
 		src/Assets/Audio/AudioAssetsWidget.ui
 		src/Assets/Audio/AudioImportThread.cpp
 		src/Assets/Audio/AudioImportThread.h
-		src/Assets/Audio/AudioManagerModel.cpp
-		src/Assets/Audio/AudioManagerModel.h
+		src/Assets/Audio/AudioManager.cpp
+		src/Assets/Audio/AudioManager.h
 		src/Assets/Audio/AudioRepackThread.cpp
 		src/Assets/Audio/AudioRepackThread.h
 		src/Assets/Audio/SoundClip.cpp
@@ -210,6 +210,10 @@ if(Qt6_DIR)
 		src/Items/Entity/EditMode/IEditModeModel.h
 		src/Items/Entity/EditMode/IEditModeView.cpp
 		src/Items/Entity/EditMode/IEditModeView.h
+		src/Items/Entity/EditMode/TileMap/TileMapGfxScene.cpp
+		src/Items/Entity/EditMode/TileMap/TileMapGfxScene.h
+		src/Items/Entity/EditMode/TileMap/TileMapGfxView.cpp
+		src/Items/Entity/EditMode/TileMap/TileMapGfxView.h
 		src/Items/Entity/EditMode/TileMap/TileMapModel.cpp
 		src/Items/Entity/EditMode/TileMap/TileMapModel.h
 		src/Items/Entity/EditMode/TileMap/TileMapView.cpp

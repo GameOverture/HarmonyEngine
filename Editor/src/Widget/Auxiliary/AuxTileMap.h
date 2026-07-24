@@ -17,6 +17,8 @@ namespace Ui {
 class AuxTileMap;
 }
 
+class TileMapModel;
+
 class AuxTileMap : public QWidget
 {
 	Q_OBJECT
@@ -24,6 +26,8 @@ class AuxTileMap : public QWidget
 public:
 	explicit AuxTileMap(QWidget *pParent = nullptr);
 	virtual ~AuxTileMap();
+
+	void Init(Project &projectRef, TileMapModel &tileMapModelRef);
 
 private:
 	Ui::AuxTileMap *ui;

@@ -9,7 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "SourceImportThread.h"
-#include "SourceModel.h"
+#include "SourceManager.h"
 #include "SourceFile.h"
 
 SourceImportThread::SourceImportThread(IManagerModel &managerModelRef, QStringList sImportAssetList, quint32 uiBankId, QVector<TreeModelItemData *> correspondingParentList, QVector<QUuid> correspondingUuidList) :
@@ -23,7 +23,7 @@ SourceImportThread::SourceImportThread(IManagerModel &managerModelRef, QStringLi
 
 /*virtual*/ bool SourceImportThread::OnRun(QString &sReportOut) /*override*/
 {
-	SourceModel &sourceModelRef = static_cast<SourceModel &>(m_ManagerModelRef);
+	SourceManager &sourceManagerRef = static_cast<SourceManager &>(m_ManagerModelRef);
 
 	QStringList sErrorList;
 
@@ -39,14 +39,14 @@ SourceImportThread::SourceImportThread(IManagerModel &managerModelRef, QStringLi
 			sErrorList.append("Could not find imported file: " % m_sImportAssetList[i]);
 			continue;
 		}
-		auto srcFilesInFilter = sourceModelRef.FindByChecksum(sourceModelRef.ComputeFileChecksum(sourceModelRef.AssembleFilter(m_CorrespondingParentList[i], true), origFileInfo.fileName()));
+		auto srcFilesInFilter = sourceManagerRef.FindByChecksum(sourceManagerRef.ComputeFileChecksum(sourceManagerRef.AssembleFilter(m_CorrespondingParentList[i], true), origFileInfo.fileName()));
 		if(srcFilesInFilter.isEmpty() == false)
 		{
 			sErrorList.append("A file with the name: " % origFileInfo.fileName() % "\nalready exists in this location.");
 			continue;
 		}
 
-		QString sNewFilterPath = sourceModelRef.AssembleFilter(m_CorrespondingParentList[i], true);
+		QString sNewFilterPath = sourceManagerRef.AssembleFilter(m_CorrespondingParentList[i], true);
 		QString sNewFileName = origFileInfo.fileName();
 
 		QString sNewFilePath;
@@ -56,7 +56,7 @@ SourceImportThread::SourceImportThread(IManagerModel &managerModelRef, QStringLi
 			sNewFilePath = sNewFilterPath + "/" + sNewFileName;
 
 		// Copy file into source location
-		sNewFilePath = sourceModelRef.m_MetaDir.filePath(sNewFilePath);
+		sNewFilePath = sourceManagerRef.m_MetaDir.filePath(sNewFilePath);
 		if(origFileInfo.absoluteFilePath().compare(sNewFilePath, Qt::CaseInsensitive) != 0 && QFile::exists(sNewFilePath) == false)
 		{
 			if(QFile::copy(origFileInfo.absoluteFilePath(), sNewFilePath) == false)
@@ -67,12 +67,12 @@ SourceImportThread::SourceImportThread(IManagerModel &managerModelRef, QStringLi
 		}
 
 		QString sBaseClass;
-		if(sourceModelRef.m_ImportBaseClassList.size() > i)
-			sBaseClass = sourceModelRef.m_ImportBaseClassList[i];
+		if(sourceManagerRef.m_ImportBaseClassList.size() > i)
+			sBaseClass = sourceManagerRef.m_ImportBaseClassList[i];
 
-		SourceFile *pNewFile = new SourceFile(sourceModelRef, m_CorrespondingUuidList[i], sBaseClass, sourceModelRef.ComputeFileChecksum(sNewFilterPath, sNewFileName), sNewFileName, 0);
-		sourceModelRef.m_ImportedAssetList.append(pNewFile);
-		sourceModelRef.RegisterAsset(pNewFile);
+		SourceFile *pNewFile = new SourceFile(sourceManagerRef, m_CorrespondingUuidList[i], sBaseClass, sourceManagerRef.ComputeFileChecksum(sNewFilterPath, sNewFileName), sNewFileName, 0);
+		sourceManagerRef.m_ImportedAssetList.append(pNewFile);
+		sourceManagerRef.RegisterAsset(pNewFile);
 
 		if(iEMIT_THROTTLE == 0 || (i % iEMIT_THROTTLE) == 0)
 			Q_EMIT ImportUpdate(i + 1, m_sImportAssetList.size());
@@ -86,5 +86,5 @@ SourceImportThread::SourceImportThread(IManagerModel &managerModelRef, QStringLi
 			sReportOut += sErrorList[i] % "\n";
 	}
 
-	return sourceModelRef.m_ImportedAssetList.empty() == false;
+	return sourceManagerRef.m_ImportedAssetList.empty() == false;
 }

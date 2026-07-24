@@ -277,6 +277,7 @@ public:
 				 uint uiErrors);
 	virtual ~AtlasTileSet();
 
+	const QJsonObject &GetSavedTileSetMeta() const;
 	int GetNumTiles() const;
 	
 	TileSetShape GetTileShape() const;

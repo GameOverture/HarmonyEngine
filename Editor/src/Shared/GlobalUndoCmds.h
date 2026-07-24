@@ -7,15 +7,15 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef UNDOCMDS
-#define UNDOCMDS
+#ifndef GlobalUndoCmds_h__
+#define GlobalUndoCmds_h__
 
 #include "Global.h"
 #include "ProjectItemData.h"
 #include "Project.h"
 #include "IModel.h"
 #include "GlobalWidgetMappers.h"
-#include "AtlasModel.h"
+#include "AtlasManager.h"
 
 #include <QUndoCommand>
 #include <QComboBox>
@@ -574,4 +574,4 @@ public:
 	}
 };
 
-#endif // UNDOCMDS
+#endif // GlobalUndoCmds_h__

@@ -22,7 +22,7 @@
 #include "ExplorerWidget.h"
 #include "AudioAssetsWidget.h"
 #include "ManagerWidget.h"
-#include "SourceModel.h"
+#include "SourceManager.h"
 #include "Themes.h"
 #include "EntityModel.h"
 #include "WgtCodeEditor.h"

@@ -14,7 +14,7 @@
 #include "Project/ProjectItemData.h"
 #include "Harmony/Harmony.h"
 #include "Project/ProjectItemMimeData.h"
-#include "AtlasModel.h"
+#include "AtlasManager.h"
 
 ExplorerModel::ExplorerModel() :
 	ITreeModel(1, QStringList(), nullptr)

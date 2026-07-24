@@ -16,7 +16,7 @@
 #include "vendor/libtiled/tilelayer.h"
 
 class AtlasTileSet;
-class AtlasModel;
+class AtlasManager;
 
 class TileMapModel : public IEditModeModel
 {
@@ -43,7 +43,7 @@ public:
 	virtual void ClearAction() override;
 
 	const Tiled::TileLayer &GetTiledTileLayer() const;
-	QList<AtlasTileSet *> UsedTilesets(const AtlasModel &atlasManagerRef) const;
+	QList<AtlasTileSet *> UsedTilesets(const AtlasManager &atlasManagerRef) const;
 
 	void SetCell(int iX, int iY, AtlasTileSet *pTileSet, int iTileId);
 

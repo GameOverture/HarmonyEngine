@@ -1,6 +1,8 @@
 # BUILD OPTIONS: HYBUILD_Qt, HYBUILD_SDL2, HYBUILD_SDL_NET, HYBUILD_NLOHMANN_JSON, HYBUILD_STATIC
 # BUILD EXTRAS:  HYBUILD_SPINE, HYBUILD_ICU
 
+set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake Libs")
+
 message(STATUS "Adding Vendor: Box2d")
 add_subdirectory(vendor/box2d)
 set_target_properties(box2d PROPERTIES FOLDER "Engine Libs")

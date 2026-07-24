@@ -12,7 +12,7 @@
 #include "Project.h"
 #include "ExplorerModel.h"
 #include "AtlasFrame.h"
-#include "AtlasModel.h"
+#include "AtlasManager.h"
 #include "ManagerWidget.h"
 
 TextStateData::TextStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :

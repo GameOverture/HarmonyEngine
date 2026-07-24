@@ -9,14 +9,14 @@
  *************************************************************************/
 #include "Global.h"
 #include "Project.h"
-#include "SourceModel.h"
-#include "AudioManagerModel.h"
+#include "SourceManager.h"
+#include "AudioManager.h"
 #include "MainWindow.h"
 #include "ProjectItemMimeData.h"
 #include "ExplorerModel.h"
 #include "VersionPatcher.h"
 #include "ManagerWidget.h"
-#include "AtlasModel.h"
+#include "AtlasManager.h"
 #include "GlobalUndoCmds.h"
 #include "IAssetItemData.h"
 #include "TextModel.h" // For Project::ReloadHarmony() hack
@@ -115,11 +115,11 @@ void ProjectTabBar::OnTabBarProjItemDataRemoved(ProjectItemData *pItem)
 Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	ExplorerItemData(*this, ITEM_Project, QUuid(), HyIO::CleanPath(sProjectFilePath.toStdString(), HyGlobal::ItemExt(ITEM_Project).toStdString()).c_str()),
 	m_pDraw(nullptr),
-	m_pSourceModel(nullptr),
+	m_pSourceManager(nullptr),
 	m_pSourceWidget(nullptr),
-	m_pAtlasModel(nullptr),
+	m_pAtlasManager(nullptr),
 	m_pAtlasWidget(nullptr),
-	m_pAudioModel(nullptr),
+	m_pAudioManager(nullptr),
 	m_pAudioWidget(nullptr),
 	m_pTabBar(nullptr),
 	m_pCurOpenItem(nullptr),
@@ -148,20 +148,20 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	m_pSourceModel = new SourceModel(*this);
-	m_pSourceModel->Init();
+	m_pSourceManager = new SourceManager(*this);
+	m_pSourceManager->Init();
 	if(bFilesPatched)
-		m_pSourceModel->SaveMeta();
-	DlgBuildSettings *pDlg = new DlgBuildSettings(*this, static_cast<BanksModel *>(m_pSourceModel->GetBanksModel())->GetBank(0)->m_MetaObj);
+		m_pSourceManager->SaveMeta();
+	DlgBuildSettings *pDlg = new DlgBuildSettings(*this, static_cast<BanksModel *>(m_pSourceManager->GetBanksModel())->GetBank(0)->m_MetaObj);
 	if(pDlg->IsError())
 		HyGuiLog("Project " % GetName(false) % " has invalid build settings.\n\n" % pDlg->GetError() % "\n\nPlease activate project, and resolve in Build -> Build Settings", LOGTYPE_Error);
 	delete pDlg;
 
-	m_pAtlasModel = new AtlasModel(*this);
-	m_pAtlasModel->Init();
+	m_pAtlasManager = new AtlasManager(*this);
+	m_pAtlasManager->Init();
 
-	m_pAudioModel = new AudioManagerModel(*this);
-	m_pAudioModel->Init();
+	m_pAudioManager = new AudioManager(*this);
+	m_pAudioManager->Init();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -204,9 +204,9 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 
 	delete m_pDraw;
 	
-	delete m_pSourceModel;
-	delete m_pAtlasModel;
-	delete m_pAudioModel;
+	delete m_pSourceManager;
+	delete m_pAtlasManager;
+	delete m_pAudioManager;
 }
 
 QString Project::GetName() const
@@ -530,13 +530,13 @@ IManagerModel *Project::GetManagerModel(AssetManagerType eManagerType)
 	switch(eManagerType)
 	{
 	case ASSETMAN_Source:
-		return m_pSourceModel;
+		return m_pSourceManager;
 
 	case ASSETMAN_Atlases:
-		return m_pAtlasModel;
+		return m_pAtlasManager;
 
 	case ASSETMAN_Audio:
-		return m_pAudioModel;
+		return m_pAudioManager;
 
 	default:
 		HyGuiLog("Project::GetManagerModel was passed invalid eManagerType", LOGTYPE_Error);
@@ -544,9 +544,9 @@ IManagerModel *Project::GetManagerModel(AssetManagerType eManagerType)
 	}
 }
 
-SourceModel &Project::GetSourceModel()
+SourceManager &Project::GetSourceModel()
 {
-	return *m_pSourceModel;
+	return *m_pSourceManager;
 }
 
 ManagerWidget *Project::GetSourceWidget()
@@ -554,9 +554,9 @@ ManagerWidget *Project::GetSourceWidget()
 	return m_pSourceWidget;
 }
 
-AtlasModel &Project::GetAtlasModel()
+AtlasManager &Project::GetAtlasModel()
 {
-	return *m_pAtlasModel;
+	return *m_pAtlasManager;
 }
 
 ManagerWidget *Project::GetAtlasWidget()
@@ -564,9 +564,9 @@ ManagerWidget *Project::GetAtlasWidget()
 	return m_pAtlasWidget;
 }
 
-AudioManagerModel &Project::GetAudioModel()
+AudioManager &Project::GetAudioModel()
 {
-	return *m_pAudioModel;
+	return *m_pAudioManager;
 }
 
 ManagerWidget *Project::GetAudioWidget()
@@ -621,15 +621,15 @@ bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType
 	switch(eAssetType)
 	{
 	case ASSETMAN_Source:
-		pManager = m_pSourceModel;
+		pManager = m_pSourceManager;
 		uiBankId = 0;
 		break;
 	case ASSETMAN_Atlases:
-		pManager = m_pAtlasModel;
+		pManager = m_pAtlasManager;
 		uiBankId = m_pAtlasWidget ? m_pAtlasWidget->GetSelectedBankId() : 0;
 		break;
 	case ASSETMAN_Audio:
-		pManager = m_pAudioModel;
+		pManager = m_pAudioManager;
 		uiBankId = m_pAudioWidget ? m_pAudioWidget->GetSelectedBankId() : 0;
 		break;
 	default:
@@ -647,7 +647,7 @@ bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType
 	QVector<QUuid>					correspondingUuidList;
 
 	if(eAssetType == ASSETMAN_Source)
-		static_cast<SourceModel *>(pManager)->m_ImportBaseClassList.clear();
+		static_cast<SourceManager *>(pManager)->m_ImportBaseClassList.clear();
 
 	for(int i = 0; i < assetArrayRef.size(); ++i)
 	{
@@ -666,7 +666,7 @@ bool Project::PasteAssets(QJsonArray &assetArrayRef, AssetManagerType eAssetType
 			correspondingUuidList.push_back(QUuid(assetObj["assetUUID"].toString())); // The UUID has already been re-created for this imported asset if moving to another project (so it doesn't conflict with its old project)
 
 			if(eAssetType == ASSETMAN_Source)
-				static_cast<SourceModel *>(pManager)->m_ImportBaseClassList.push_back(assetObj["baseClass"].toString());
+				static_cast<SourceManager *>(pManager)->m_ImportBaseClassList.push_back(assetObj["baseClass"].toString());
 		}
 	}
 
@@ -1370,9 +1370,9 @@ bool Project::HarmonyInitialize()
 	delete m_pSourceWidget;
 	delete m_pAtlasWidget;
 	delete m_pAudioWidget;
-	m_pSourceWidget = new ManagerWidget(m_pSourceModel, nullptr);
-	m_pAtlasWidget = new ManagerWidget(m_pAtlasModel, nullptr);
-	m_pAudioWidget = new ManagerWidget(m_pAudioModel, nullptr);
+	m_pSourceWidget = new ManagerWidget(m_pSourceManager, nullptr);
+	m_pAtlasWidget = new ManagerWidget(m_pAtlasManager, nullptr);
+	m_pAudioWidget = new ManagerWidget(m_pAudioManager, nullptr);
 
 	for(int i = 0; i < m_pTabBar->count(); ++i)
 	{

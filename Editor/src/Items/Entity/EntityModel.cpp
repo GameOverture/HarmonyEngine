@@ -16,7 +16,7 @@
 #include "EntityWidget.h"
 #include "EntityItemMimeData.h"
 #include "IAssetItemData.h"
-#include "SourceModel.h"
+#include "SourceManager.h"
 #include "EntityUndoCmds.h"
 #include "TileMapModel.h"
 #include "vendor/libtiled/maptovariantconverter.h"
@@ -1840,7 +1840,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 /*virtual*/ bool EntityModel::OnPrepSave() /*override*/
 {
 	// Save generated C++ class in a .h
-	SourceModel &sourceModelRef = m_ItemRef.GetProject().GetSourceModel();
+	SourceManager &sourceModelRef = m_ItemRef.GetProject().GetSourceModel();
 	return sourceModelRef.GenerateEntitySrcFiles(*this);
 }
 
@@ -2038,7 +2038,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 
 /*virtual*/ void EntityModel::OnItemDeleted() /*override*/
 {
-	SourceModel &sourceModelRef = m_ItemRef.GetProject().GetSourceModel();
+	SourceManager &sourceModelRef = m_ItemRef.GetProject().GetSourceModel();
 	sourceModelRef.DeleteEntitySrcFiles(*this);
 }
 

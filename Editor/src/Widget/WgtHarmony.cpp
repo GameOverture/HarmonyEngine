@@ -13,7 +13,7 @@
 #include "ProjectItemMimeData.h"
 #include "EntityModel.h"
 #include "EntityUndoCmds.h"
-#include "AudioManagerModel.h"
+#include "AudioManager.h"
 #include "MainWindow.h"
 #include "AssetMimeData.h"
 #include "GlobalUndoCmds.h"

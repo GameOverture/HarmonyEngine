@@ -11,7 +11,7 @@
 #include "SpineModel.h"
 #include "ProjectItemData.h"
 #include "Project.h"
-#include "AtlasModel.h"
+#include "AtlasManager.h"
 #include "ManagerWidget.h"
 
 #include <QImage>

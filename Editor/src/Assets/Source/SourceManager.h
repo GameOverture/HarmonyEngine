@@ -1,5 +1,5 @@
 /**************************************************************************
- *	SourceModel.h
+ *	SourceManager.h
  *
  *	Harmony Engine - Editor Tool
  *	Copyright (c) 2021 Jason Knobler
@@ -7,8 +7,8 @@
  *	Harmony Editor Tool License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
-#ifndef SOURCEMODEL_H
-#define SOURCEMODEL_H
+#ifndef SOURCEMANAGER_H
+#define SOURCEMANAGER_H
 
 #include "IManagerModel.h"
 
@@ -16,8 +16,7 @@ class WgtCodeEditor;
 class SourceFile;
 class EntityModel;
 
-// TODO: Rename to SourceManager
-class SourceModel : public IManagerModel
+class SourceManager : public IManagerModel
 {
 	Q_OBJECT
 
@@ -28,8 +27,8 @@ class SourceModel : public IManagerModel
 	QStringList									m_ImportBaseClassList;
 
 public:
-	SourceModel(Project &projRef);
-	virtual ~SourceModel();
+	SourceManager(Project &projRef);
+	virtual ~SourceManager();
 
 	bool GenerateEntitySrcFiles(EntityModel &entityModelRef);
 	void DeleteEntitySrcFiles(EntityModel &entityModelRef);
@@ -62,4 +61,4 @@ protected:
 	virtual void OnSaveData(QJsonObject &dataObjRef) override;
 };
 
-#endif // SOURCEMODEL_H
+#endif // SOURCEMANAGER_H

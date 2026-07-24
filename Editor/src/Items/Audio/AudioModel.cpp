@@ -9,7 +9,7 @@
 *************************************************************************/
 #include "Global.h"
 #include "AudioModel.h"
-#include "AudioManagerModel.h"
+#include "AudioManager.h"
 #include "Project.h"
 
 AudioStateData::AudioStateData(int iStateIndex, IModel &modelRef, FileDataPair stateFileData) :

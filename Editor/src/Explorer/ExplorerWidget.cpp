@@ -18,7 +18,7 @@
 #include "ExplorerModel.h"
 #include "IModel.h"
 #include "DlgInputName.h"
-#include "SourceModel.h"
+#include "SourceManager.h"
 #include "EntityModel.h"
 
 #include <QJsonArray>
