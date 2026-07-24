@@ -454,10 +454,10 @@ QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vRegionS
 	switch(eAppendEdge)
 	{
 	case Qt::TopEdge:
-		vGridOffset = QPoint(existMinX, existMinY - importSize.height());
+		vGridOffset = QPoint(existMinX + 1, existMinY - importSize.height() + 1);
 		break;
 	case Qt::LeftEdge:
-		vGridOffset = QPoint(existMinX - importSize.width(), existMinY);
+		vGridOffset = QPoint(existMinX - importSize.width() + 1, existMinY + 1);
 		break;
 	case Qt::RightEdge:
 		vGridOffset = QPoint(existMaxX + 1, existMinY + 1);

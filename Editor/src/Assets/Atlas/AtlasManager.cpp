@@ -17,6 +17,7 @@
 #include "DlgAtlasGroupSettings.h"
 #include "DlgSliceSpriteSheet.h"
 #include "AuxAssetInspector.h"
+#include "AuxTileSet.h"
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -476,6 +477,7 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 
 		if(pFrame->GetSubAtlasType() == ITEM_AtlasTileSet)
 		{
+			static_cast<AuxTileSet *>(MainWindow::GetAuxWidget(AUXTAB_TileSet))->Init(nullptr);
 			MainWindow::HideAuxWidget(AUXTAB_TileSet);
 
 			QString sTileSetUuid = pFrame->GetUuid().toString(QUuid::WithoutBraces);
