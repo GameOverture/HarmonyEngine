@@ -1041,8 +1041,25 @@ bool AtlasTileSet::RegenerateSubAtlas()
 		}
 		
 		p.drawPixmap(destPos, pixmap);
+
+		// NOTE: The following code is to check if the tile's checksum has changed after being drawn to the new texture.
+		//       If it has changed, we need to update the checksum in 'm_TileImageMap' and the TileData that uses it.
+		//       This is happening when there are semi-transparent pixels in the tile's pixmap.
+		//       I don't know why the checksum is changing. I suspect it has something to do with how QPainter handles 
+		//       drawing QPixmap's semi-transparent pixels onto a QImage filled with transparency.
+		QImage tmpImg = newTexture.copy(destPos.x(), destPos.y(), m_RegionSize.width(), m_RegionSize.height());
+		quint32 uiNewChecksum = HyGlobal::CRCData(0, tmpImg.bits(), tmpImg.sizeInBytes());
+		if(uiNewChecksum != uiChecksum)
+		{
+			m_TileImageMap[uiNewChecksum] = pixmap;
+			m_TileImageMap.remove(uiChecksum);
+			for(TileData *pTileData : m_TileDataList)
+			{
+				if(pTileData->GetTileChecksum() == uiChecksum)
+					pTileData->SetTileChecksum(uiNewChecksum);
+			}
+		}
 	}
-	p.end();
 
 	if(static_cast<AtlasManager &>(m_ModelRef).ReplaceFrame(this, GetName(), newTexture, ITEM_AtlasTileSet) == false)
 	{

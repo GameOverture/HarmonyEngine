@@ -48,6 +48,7 @@ public:
 	QUuid GetUuid() const;
 
 	quint32 GetTileChecksum() const;
+	void SetTileChecksum(quint32 uiTileChecksum);
 
 	uint16 GetTileId() const;
 	void SetTileId(uint16 uiTileId);

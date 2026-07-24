@@ -128,6 +128,11 @@ quint32 TileData::GetTileChecksum() const
 	return m_uiTileChecksum;
 }
 
+void TileData::SetTileChecksum(quint32 uiTileChecksum)
+{
+	m_uiTileChecksum = uiTileChecksum;
+}
+
 uint16 TileData::GetTileId() const
 {
 	return static_cast<uint16>(m_pSetupPropertiesModel->FindPropertyValue("Info", "Tile ID").toInt());
