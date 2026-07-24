@@ -18,7 +18,8 @@
 #include <QBitArray>
 
 const HyMargins<int> g_borderMargins(5, 5, 5, 5);
-const int g_iSpacingAmt = 5;
+const int g_iImportSpacingAmt = 4;
+const int g_iSpacingAmt = 6;
 const float g_fSceneMargins = 7000.0f;
 
 TileSetScene::TileSetScene() :
@@ -235,7 +236,7 @@ void TileSetScene::ClearSetupSelection()
 
 void TileSetScene::AddTile(bool bImportTile, TileData *pTileData, const QPolygonF& outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected)
 {
-	TileSetGfxItem* pNewTileSetGfxItem = new TileSetGfxItem(pixmap, outlinePolygon);
+	TileSetGfxItem* pNewTileSetGfxItem = new TileSetGfxItem(pixmap, bImportTile ? QPolygonF() : outlinePolygon);
 	pNewTileSetGfxItem->SetSelected(bDefaultSelected);
 
 	if (bImportTile)
@@ -260,12 +261,12 @@ void TileSetScene::AddTile(bool bImportTile, TileData *pTileData, const QPolygon
 
 void TileSetScene::RefreshImportTiles(AuxTileSet &auxTileSetRef)
 {
-	m_pModeSetupGroup->setOpacity(0.42f);
+	m_pModeSetupGroup->setVisible(false);
 	m_pModeImportGroup->setVisible(true);
 
 	int iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
-	int iTileSpacingWidth = m_vImportRegionSize.width() + g_iSpacingAmt;
-	int iTileSpacingHeight = m_vImportRegionSize.height() + g_iSpacingAmt;
+	int iTileSpacingWidth = m_vImportRegionSize.width() + g_iImportSpacingAmt;
+	int iTileSpacingHeight = m_vImportRegionSize.height() + g_iImportSpacingAmt;
 	for(auto iter = m_ImportTileMap.begin(); iter != m_ImportTileMap.end(); ++iter)
 	{
 		QPoint ptGridPos = iter.key();
@@ -286,8 +287,8 @@ void TileSetScene::RefreshImportTiles(AuxTileSet &auxTileSetRef)
 	int iNumRows = fabs(iMaxGridY - iMinGridY + 1);
 	m_ImportBorderRect.setRect(iMinGridX * iTileSpacingWidth - g_borderMargins.left - (iTileSpacingWidth / 2),
 							   iMinGridY * iTileSpacingHeight - g_borderMargins.top - (iTileSpacingHeight / 2),
-							   iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right - g_iSpacingAmt,
-							   iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom - g_iSpacingAmt);
+							   iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right,
+							   iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom);
 
 	if(m_ImportTileMap.empty())
 		m_ImportBorderRect.setVisible(false);
@@ -295,32 +296,34 @@ void TileSetScene::RefreshImportTiles(AuxTileSet &auxTileSetRef)
 	{
 		m_ImportBorderRect.setVisible(true);
 
-		if(m_SetupBorderRect.isVisible())
-		{
-			// Position the m_pModeImportGroup against the m_pModeSetupGroup's 'm_eImportAppendEdge'
-			QPointF ptImportGroupPos;
-			switch(m_eImportAppendEdge)
-			{
-			case Qt::TopEdge:
-				ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
-				ptImportGroupPos.setY(m_SetupBorderRect.rect().top() - g_borderMargins.bottom - m_ImportBorderRect.rect().height());
-				break;
-			case Qt::BottomEdge:
-				ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
-				ptImportGroupPos.setY(m_SetupBorderRect.rect().bottom() + g_borderMargins.top);
-				break;
-			case Qt::LeftEdge:
-				ptImportGroupPos.setX(m_SetupBorderRect.rect().left() - g_borderMargins.right - m_ImportBorderRect.rect().width());
-				ptImportGroupPos.setY(m_SetupBorderRect.rect().center().y() - m_ImportBorderRect.rect().height() / 2.0f);
-				break;
-			case Qt::RightEdge:
-				ptImportGroupPos.setX(m_SetupBorderRect.rect().right() + g_borderMargins.left);
-				ptImportGroupPos.setY(m_SetupBorderRect.rect().center().y() - m_ImportBorderRect.rect().height() / 2.0f);
-				break;
-			}
-			m_pModeImportGroup->setPos(ptImportGroupPos);
-		}
+		//if(m_SetupBorderRect.isVisible())
+		//{
+		//	// Position the m_pModeImportGroup against the m_pModeSetupGroup's 'm_eImportAppendEdge'
+		//	QPointF ptImportGroupPos;
+		//	switch(m_eImportAppendEdge)
+		//	{
+		//	case Qt::TopEdge:
+		//		ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
+		//		ptImportGroupPos.setY(m_SetupBorderRect.rect().top() - g_borderMargins.bottom - m_ImportBorderRect.rect().height());
+		//		break;
+		//	case Qt::BottomEdge:
+		//		ptImportGroupPos.setX(m_SetupBorderRect.rect().center().x() - m_ImportBorderRect.rect().width() / 2.0f);
+		//		ptImportGroupPos.setY(m_SetupBorderRect.rect().bottom() + g_borderMargins.top);
+		//		break;
+		//	case Qt::LeftEdge:
+		//		ptImportGroupPos.setX(m_SetupBorderRect.rect().left() - g_borderMargins.right - m_ImportBorderRect.rect().width());
+		//		ptImportGroupPos.setY(m_SetupBorderRect.rect().center().y() - m_ImportBorderRect.rect().height() / 2.0f);
+		//		break;
+		//	case Qt::RightEdge:
+		//		ptImportGroupPos.setX(m_SetupBorderRect.rect().right() + g_borderMargins.left);
+		//		ptImportGroupPos.setY(m_SetupBorderRect.rect().center().y() - m_ImportBorderRect.rect().height() / 2.0f);
+		//		break;
+		//	}
+		//	m_pModeImportGroup->setPos(ptImportGroupPos);
+		//}
 	}
+
+	auxTileSetRef.UpdateGfxItemSelection();
 }
 
 void TileSetScene::RefreshTiles(AuxTileSet &auxTileSetRef, QPointF vDragDelta /*= QPointF()*/)
@@ -329,7 +332,7 @@ void TileSetScene::RefreshTiles(AuxTileSet &auxTileSetRef, QPointF vDragDelta /*
 		RefreshImportTiles(auxTileSetRef);
 	else
 	{
-		m_pModeSetupGroup->setOpacity(1.0f);
+		m_pModeSetupGroup->setVisible(true);
 		m_pModeImportGroup->setVisible(false);
 	}
 
@@ -395,8 +398,8 @@ void TileSetScene::RefreshTiles(AuxTileSet &auxTileSetRef, QPointF vDragDelta /*
 	int iNumRows = fabs(iMaxGridY - iMinGridY + 1);
 	m_SetupBorderRect.setRect(iMinGridX * iTileSpacingWidth - g_borderMargins.left - (iTileSpacingWidth / 2),
 							  iMinGridY * iTileSpacingHeight - g_borderMargins.top - (iTileSpacingHeight / 2),
-							  iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right - g_iSpacingAmt,
-							  iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom - g_iSpacingAmt);
+							  iNumColumns * iTileSpacingWidth + g_borderMargins.left + g_borderMargins.right,
+							  iNumRows * iTileSpacingHeight + g_borderMargins.top + g_borderMargins.bottom);
 	m_SetupBorderRect.setVisible(m_SetupTileMap.empty() == false && vDragDelta.isNull());
 }
 

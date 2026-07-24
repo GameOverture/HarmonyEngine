@@ -11,7 +11,7 @@
 #include "AtlasTileSet.h"
 #include "AtlasManager.h"
 
-TileMapModel::TileMapModel() :
+TileMapModel::TileMapModel(QUndoStack *pUndoStack) :
 	IEditModeModel(EDITMODETYPE_TileMap)
 {
 }

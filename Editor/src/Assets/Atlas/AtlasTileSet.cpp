@@ -150,6 +150,11 @@ AtlasTileSet::~AtlasTileSet()
 	delete m_pUndoStack;
 }
 
+TileSetCachedAuxSettings &AtlasTileSet::GetCachedAuxSettings()
+{
+	return m_CachedAuxSettings;
+}
+
 const QJsonObject &AtlasTileSet::GetSavedTileSetMeta() const
 {
 	return m_TileSetMetaObj;
@@ -455,10 +460,10 @@ QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vRegionS
 		vGridOffset = QPoint(existMinX - importSize.width(), existMinY);
 		break;
 	case Qt::RightEdge:
-		vGridOffset = QPoint(existMaxX + 1, existMinY); // shift to right of current max X
+		vGridOffset = QPoint(existMaxX + 1, existMinY + 1);
 		break;
 	case Qt::BottomEdge:
-		vGridOffset = QPoint(existMinX, existMaxY + 1);
+		vGridOffset = QPoint(existMinX + 1, existMaxY + 1);
 		break;
 	}
 
@@ -860,7 +865,6 @@ void AtlasTileSet::UpdateTilePolygon()
 	switch(m_eTileShape)
 	{
 	case TILESETSHAPE_Square:
-	case TILESETSHAPE_HalfOffsetSquare:
 		// Center the square polygon around the origin
 		m_TilePolygon << QPoint(-m_TileSize.width() / 2, -m_TileSize.height() / 2)
 					  << QPoint(m_TileSize.width() / 2, -m_TileSize.height() / 2)

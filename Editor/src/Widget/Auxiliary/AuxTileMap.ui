@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>617</width>
-    <height>477</height>
+    <height>332</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,7 +34,26 @@
         <number>2</number>
        </property>
        <item>
-        <widget class="PropertiesTreeView" name="mapPropertiesTree"/>
+        <widget class="QFrame" name="tabFrame">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Shape::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QTableView" name="tileSetsTableView"/>
@@ -47,7 +66,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QFrame" name="tabFrame">
+        <widget class="QFrame" name="toolBarFrame">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
            <horstretch>0</horstretch>
@@ -78,11 +97,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>PropertiesTreeView</class>
-   <extends>QTreeView</extends>
-   <header>PropertiesTreeView.h</header>
-  </customwidget>
   <customwidget>
    <class>TileMapGfxView</class>
    <extends>QGraphicsView</extends>

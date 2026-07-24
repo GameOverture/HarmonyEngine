@@ -50,8 +50,11 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	m_pPixmapItem = new QGraphicsPixmapItem(pixmapRef, this);
 	m_pPixmapItem->setPos(pixmapRef.width() * -0.5f, pixmapRef.height() * -0.5f);
 
-	m_pShapeItem = new QGraphicsPolygonItem(outlinePolygon, this);
-	m_pShapeItem->setPen(m_ShapePen);
+	if(outlinePolygon.empty() == false)
+	{
+		m_pShapeItem = new QGraphicsPolygonItem(outlinePolygon, this);
+		m_pShapeItem->setPen(m_ShapePen);
+	}
 
 	for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
 		m_pTerrainParts[i] = nullptr;
@@ -84,12 +87,16 @@ void TileSetGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileDa
 	m_pRectItem->setRect(rect);
 
 	bool bAutoTilePartsDirty = false;
-	if(pTileSet->GetTilePolygon() != m_pShapeItem->polygon())
+	if(m_pShapeItem)
 	{
-		m_pShapeItem->setPolygon(pTileSet->GetTilePolygon());
-		bAutoTilePartsDirty = true;
+		if(pTileSet->GetTilePolygon() != m_pShapeItem->polygon())
+		{
+			m_pShapeItem->setPolygon(pTileSet->GetTilePolygon());
+			bAutoTilePartsDirty = true;
+		}
+		m_pShapeItem->setPos(pTileSet->GetTileOffset());
+		m_pShapeItem->setVisible(true);
 	}
-	m_pShapeItem->setPos(pTileSet->GetTileOffset());
 
 	m_pAnimationRectItem->hide();
 
@@ -111,7 +118,6 @@ void TileSetGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileDa
 			m_pTerrainParts[i]->hide();
 	}
 
-	m_pShapeItem->setVisible(true);// m_bSelected);
 	setOpacity(1.0f);
 
 	switch(auxTileSetRef.GetCurrentPage())
@@ -371,7 +377,7 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 		break;
 
 	case AUTOTILEPART_RightSide:		// Hexagon-pointed, Square, Half-offset-square
-		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		if(eTileSetShape == TILESETSHAPE_Square)
 		{
 			if(eAutoTileType == AUTOTILETYPE_MatchSides)
 			{
@@ -462,7 +468,7 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 		break;
 
 	case AUTOTILEPART_BottomRightCorner:	// Hexagon-flat, Hexagon-pointed, Square, Half-offset-square
-		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		if(eTileSetShape == TILESETSHAPE_Square)
 		{
 			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
 			{
@@ -526,7 +532,7 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 		break;
 
 	case AUTOTILEPART_BottomSide:			// Hexagon-flat, Square, Half-offset-square
-		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		if(eTileSetShape == TILESETSHAPE_Square)
 		{
 			if(eAutoTileType == AUTOTILETYPE_MatchSides)
 			{
@@ -660,7 +666,7 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 		break;
 
 	case AUTOTILEPART_BottomLeftCorner:		// Hexagon-flat, Hexagon-pointed, Square, Half-offset-square
-		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		if(eTileSetShape == TILESETSHAPE_Square)
 		{
 			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
 			{
@@ -767,7 +773,7 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 		break;
 
 	case AUTOTILEPART_LeftSide:				// Hexagon-pointed, Square, Half-offset-square
-		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		if(eTileSetShape == TILESETSHAPE_Square)
 		{
 			if(eAutoTileType == AUTOTILETYPE_MatchSides)
 			{
@@ -858,7 +864,7 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 		break;
 
 	case AUTOTILEPART_TopLeftCorner:		// Hexagon-flat, Hexagon-pointed, Square, Half-offset-square
-		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		if(eTileSetShape == TILESETSHAPE_Square)
 		{
 			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
 			{
@@ -965,7 +971,7 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 		break;
 
 	case AUTOTILEPART_TopSide:				// Hexagon-flat, Square, Half-offset-square
-		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		if(eTileSetShape == TILESETSHAPE_Square)
 		{
 			if(eAutoTileType == AUTOTILETYPE_MatchSides)
 			{
@@ -1056,7 +1062,7 @@ QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, Ti
 		break;
 
 	case AUTOTILEPART_TopRightCorner:		// Hexagon-flat, Hexagon-pointed, Square, Half-offset-square
-		if(eTileSetShape == TILESETSHAPE_Square || eTileSetShape == TILESETSHAPE_HalfOffsetSquare)
+		if(eTileSetShape == TILESETSHAPE_Square)
 		{
 			if(eAutoTileType == AUTOTILETYPE_MatchCorner)
 			{

@@ -11,7 +11,6 @@
 #include "AuxAssetInspector.h"
 #include "ui_AuxAssetInspector.h"
 #include "IManagerModel.h"
-#include "SourceModel.h"
 #include "SourceFile.h"
 
 #include <QGraphicsPixmapItem>

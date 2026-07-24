@@ -244,7 +244,6 @@ enum TileSetShape
 
 	TILESETSHAPE_Square = 0,
 	TILESETSHAPE_Isometric,
-	TILESETSHAPE_HalfOffsetSquare,
 	TILESETSHAPE_HexagonPointTop,
 	TILESETSHAPE_HexagonFlatTop,
 
@@ -496,7 +495,7 @@ class HyGlobal
 	static QString														sm_sItemNamesPlural[NUM_ITEMTYPES];
 	static QString														sm_AssetNames[NUM_ASSETMANTYPES];
 	static QString														sm_TileSetShapeNames[NUM_TILESETSHAPES];
-	static QString														sm_TileMapLayouts[HYNUM_TILELAYOUTS];
+	static QString														sm_TileMapLayouts[HYNUM_TILEMAPLAYOUTS];
 	static QString														sm_ShapeNames[NUM_SHAPES];
 	static QString														sm_TweenFuncNames[NUM_TWEENFUNCS];
 	static QString														sm_TweenPropNames[NUM_TWEENPROPS];

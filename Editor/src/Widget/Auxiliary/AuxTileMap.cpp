@@ -18,6 +18,16 @@ AuxTileMap::AuxTileMap(QWidget *pParent /*= nullptr*/) :
 	ui(new Ui::AuxTileMap)
 {
 	ui->setupUi(this);
+
+	m_pTabBar = new QTabBar(ui->tabFrame);
+	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/items/TileSet.png")), tr("Tiles"));
+	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/Tools-ImportTileSheet.png")), tr("Patterns"));
+	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/tileset-autotile.png")), tr("Terrains"));
+
+	m_pToolBar = new QToolBar(ui->toolBarFrame);
+
+	ui->tileSetsTableView->verticalHeader()->hide();
+	ui->tileSetsTableView->horizontalHeader()->hide();
 }
 
 /*virtual*/ AuxTileMap::~AuxTileMap()

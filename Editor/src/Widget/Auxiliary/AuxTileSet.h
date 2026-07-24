@@ -41,7 +41,6 @@ class AuxTileSet : public QWidget
 	WgtTileSetTerrain *							m_pSelectedTerrainWgt;
 	WgtTileSetCollision *						m_pSelectedCollisionWgt;
 
-	bool										m_bIsImportingTileSheet;
 	QPixmap *									m_pImportTileSheetPixmap;
 	QPolygonF									m_ImportPolygon;
 
@@ -91,7 +90,7 @@ protected:
 private:
 	Ui::AuxTileSet *ui;
 
-	void SetImportWidgets();
+	void CacheAuxSettings();
 	void SliceSheetPixmaps();
 	void ErrorCheckImport();
 

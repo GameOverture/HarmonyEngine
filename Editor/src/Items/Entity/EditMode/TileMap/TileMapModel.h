@@ -12,6 +12,7 @@
 
 #include "Global.h"
 #include "IEditModeModel.h"
+#include "PropertiesTreeModel.h"
 #include "vendor/libtiled/map.h"
 #include "vendor/libtiled/tilelayer.h"
 
@@ -24,7 +25,7 @@ class TileMapModel : public IEditModeModel
 	Tiled::TileLayer		m_TiledLayer;
 
 public:
-	TileMapModel();
+	TileMapModel(QUndoStack *pUndoStack);
 	virtual ~TileMapModel();
 
 	virtual QJsonObject Serialize() const override;

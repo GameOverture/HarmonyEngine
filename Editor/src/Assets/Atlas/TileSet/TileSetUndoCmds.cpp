@@ -235,7 +235,18 @@ TileSetUndoCmd_RemoveTiles::TileSetUndoCmd_RemoveTiles(AuxTileSet &auxTileSetRef
 }
 
 /*virtual*/ TileSetUndoCmd_RemoveTiles::~TileSetUndoCmd_RemoveTiles()
-{ }
+{
+	// TODO: I'm not sure if this will delete valid data when redo() is called and this is destructed, I rather just leak memory
+	
+	//// Delete both the keys and values from m_TilesMap
+	//while(m_TilesMap.empty() == false)
+	//{
+	//	TileData *pTileData = m_TilesMap.firstKey();
+	//	TileSetGfxItem *pGfxItem = m_TilesMap.take(pTileData);
+	//	delete pTileData;
+	//	delete pGfxItem;
+	//}
+}
 
 /*virtual*/ void TileSetUndoCmd_RemoveTiles::redo() /*override*/
 {

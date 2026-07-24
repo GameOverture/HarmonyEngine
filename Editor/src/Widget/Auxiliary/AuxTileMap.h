@@ -12,6 +12,7 @@
 
 #include <QWidget>
 #include <QDataWidgetMapper>
+#include <QToolBar>
 
 namespace Ui {
 class AuxTileMap;
@@ -22,6 +23,9 @@ class TileMapModel;
 class AuxTileMap : public QWidget
 {
 	Q_OBJECT
+
+	QTabBar *				m_pTabBar;
+	QToolBar *				m_pToolBar;
 
 public:
 	explicit AuxTileMap(QWidget *pParent = nullptr);

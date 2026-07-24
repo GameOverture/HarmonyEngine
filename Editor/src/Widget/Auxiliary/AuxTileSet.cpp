@@ -36,7 +36,6 @@ AuxTileSet::AuxTileSet(QWidget *pParent /*= nullptr*/) :
 	m_pSelectedTerrainSetWgt(nullptr),
 	m_pSelectedTerrainWgt(nullptr),
 	m_pSelectedCollisionWgt(nullptr),
-	m_bIsImportingTileSheet(true),
 	m_pImportTileSheetPixmap(nullptr)
 {
 	ui->setupUi(this);
@@ -117,16 +116,12 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 	if(m_pTileSet == nullptr)
 		return;
 	
-	if(m_pTileSet->GetAtlasRegionSize().isValid() == false)
-		m_pTileSet->SetAtlasRegionSize(QSize(g_iDefaultTileSize, g_iDefaultTileSize));
 	if(m_pTileSet->GetTileSize().isValid() == false)
 		m_pTileSet->SetTileSize(QSize(g_iDefaultTileSize, g_iDefaultTileSize));
 	
 	CmdSet_TileShapeWidget(m_pTileSet->GetTileShape());
 	CmdSet_TileSizeWidgets(m_pTileSet->GetTileSize());
 	CmdSet_TileOffsetWidgets(m_pTileSet->GetTileOffset());
-
-	ui->vsbTextureRegion->SetValue(QPoint(m_pTileSet->GetAtlasRegionSize().width(), m_pTileSet->GetAtlasRegionSize().height()));
 
 	ui->btnSave->setDefaultAction(MainWindow::GetSaveAction());
 	ui->btnUndo->setDefaultAction(m_pTileSet->GetUndoAction());
@@ -135,7 +130,54 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 	connect(m_pTileSet->GetUndoStack(), SIGNAL(cleanChanged(bool)), this, SLOT(on_undoStack_cleanChanged(bool)));
 	connect(m_pTileSet->GetUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(on_undoStack_indexChanged(int)));
 
-	SetImportWidgets();
+	delete m_pImportTileSheetPixmap;
+	m_pImportTileSheetPixmap = nullptr;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Initialize import settings with the cached settings from the tile set
+	ui->radTileSheet->blockSignals(true);
+	ui->radTileImages->blockSignals(true);
+	ui->vsbTextureRegion->blockSignals(true);
+	ui->vsbStartOffset->blockSignals(true);
+	ui->vsbPadding->blockSignals(true);
+
+	ui->radTileSheet->setChecked(m_pTileSet->GetCachedAuxSettings().m_bTileSheet);
+	ui->txtImagePath->setText(m_pTileSet->GetCachedAuxSettings().m_sImportPath);
+	if(ui->txtImagePath->text().isEmpty() == false)
+	{
+		QPixmap importPixmap(ui->txtImagePath->text());
+		if(importPixmap.isNull() == false)
+			m_pImportTileSheetPixmap = new QPixmap(importPixmap);
+	}
+
+	if(m_pTileSet->GetCachedAuxSettings().m_TextureRegion.isEmpty())
+	{
+		if(m_pTileSet->GetAtlasRegionSize().isEmpty())
+			ui->vsbTextureRegion->SetValue(QPoint(g_iDefaultTileSize, g_iDefaultTileSize));
+		else
+			ui->vsbTextureRegion->SetValue(QPoint(m_pTileSet->GetAtlasRegionSize().width(), m_pTileSet->GetAtlasRegionSize().height()));
+	}
+	else
+		ui->vsbTextureRegion->SetValue(m_pTileSet->GetCachedAuxSettings().m_TextureRegion);
+
+	ui->vsbStartOffset->SetValue(m_pTileSet->GetCachedAuxSettings().m_StartOffset);
+	ui->vsbPadding->SetValue(m_pTileSet->GetCachedAuxSettings().m_Padding);
+
+	ui->radTileSheet->blockSignals(false);
+	ui->radTileImages->blockSignals(false);
+	ui->vsbTextureRegion->blockSignals(false);
+	ui->vsbStartOffset->blockSignals(false);
+	ui->vsbPadding->blockSignals(false);
+
+	ui->grpSlicingOptions->setVisible(ui->radTileSheet->isChecked());
+
+	m_pTileSet->GetGfxScene()->ClearImportTiles();
+	m_pTileSet->GetGfxScene()->RefreshTiles(*this);
+	SliceSheetPixmaps();
+	//ui->graphicsView->ResetCamera(TILESETPAGE_Arrange);
+
+	ErrorCheckImport();
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	QVector<QJsonObject> animObjList = m_pTileSet->GetAnimations();
 	for(QJsonObject animObj : animObjList)
@@ -152,9 +194,23 @@ void AuxTileSet::Init(AtlasTileSet *pTileSet)
 	ui->graphicsView->SetScene(this, m_pTileSet->GetGfxScene());
 
 	if(m_pTileSet->GetNumTiles() == 0)
+	{
 		m_pTabBar->setCurrentIndex(TILESETPAGE_Import);
+		m_pTabBar->setTabEnabled(TILESETPAGE_Arrange, false);
+		m_pTabBar->setTabEnabled(TILESETPAGE_Animation, false);
+		m_pTabBar->setTabEnabled(TILESETPAGE_Autotile, false);
+		m_pTabBar->setTabEnabled(TILESETPAGE_Collision, false);
+		m_pTabBar->setTabEnabled(TILESETPAGE_CustomData, false);
+	}
 	else
-		m_pTabBar->setCurrentIndex(TILESETPAGE_Arrange);
+	{
+		m_pTabBar->setCurrentIndex(m_pTileSet->GetCachedAuxSettings().m_eCurPage);
+		m_pTabBar->setTabEnabled(TILESETPAGE_Arrange, true);
+		m_pTabBar->setTabEnabled(TILESETPAGE_Animation, true);
+		m_pTabBar->setTabEnabled(TILESETPAGE_Autotile, true);
+		m_pTabBar->setTabEnabled(TILESETPAGE_Collision, true);
+		m_pTabBar->setTabEnabled(TILESETPAGE_CustomData, true);
+	}
 
 	OnTabBarChanged(m_pTabBar->currentIndex());
 	
@@ -279,7 +335,6 @@ void AuxTileSet::CmdSet_TileSizeWidgets(QSize tileSize)
 	ui->vsbTileSize->SetValue(QPoint(tileSize.width(), tileSize.height()));
 
 	m_pTileSet->SetTileSize(tileSize);
-	m_pTileSet->SetAtlasRegionSize(tileSize);
 	ui->vsbTileSize->blockSignals(false);
 }
 
@@ -659,44 +714,14 @@ void AuxTileSet::SetPainting_Animation(QUuid animUuid)
 	m_pTileSet->GetProject().ApplySaveEnables();
 }
 
-void AuxTileSet::SetImportWidgets()
+void AuxTileSet::CacheAuxSettings()
 {
-	bool bTileSheet = ui->radTileSheet->isChecked();
-	if(m_bIsImportingTileSheet != bTileSheet)
-	{
-		bool bHasPendingInfo = ui->txtImagePath->text().isEmpty() == false;/* ||
-			ui->vsbTextureRegion->GetValue().toSize() != m_pTileSet->GetAtlasRegionSize() ||
-			ui->vsbStartOffset->GetValue().toPoint() != m_pTileSet->GetTileOffset() ||
-			ui->vsbPadding->GetValue().toPoint() != QPoint(0, 0);*/
-
-		if(bHasPendingInfo)
-		{
-			if(QMessageBox::No == QMessageBox::question(MainWindow::GetInstance(), "Pending Changes", "Switching to " % QString(bTileSheet ? "'Tile Sheet Image'" : "'Individual Tile Images'") % " will lose your changes. Do you want to continue?", QMessageBox::Yes, QMessageBox::No))
-			{
-				if(bTileSheet)
-					ui->radTileSheet->setChecked(false);
-				else
-					ui->radTileImages->setChecked(false);
-				return;
-			}
-
-			ui->txtImagePath->clear();
-		}
-	}
-
-	ui->vsbTextureRegion->SetValue(m_pTileSet->GetAtlasRegionSize());
-	ui->vsbStartOffset->SetValue(QPoint(0, 0));
-	ui->vsbPadding->SetValue(QPoint(0, 0));
-
-	// Switching widgets
-	m_bIsImportingTileSheet = bTileSheet;
-	ui->grpSlicingOptions->setVisible(m_bIsImportingTileSheet);
-
-	m_pTileSet->GetGfxScene()->ClearImportTiles();
-	m_pTileSet->GetGfxScene()->RefreshTiles(*this);
-	ui->graphicsView->ResetCamera(TILESETPAGE_Arrange);
-
-	ErrorCheckImport();
+	m_pTileSet->GetCachedAuxSettings().m_eCurPage = static_cast<TileSetPage>(ui->setupStackedWidget->currentIndex());
+	m_pTileSet->GetCachedAuxSettings().m_bTileSheet = ui->radTileSheet->isChecked();
+	m_pTileSet->GetCachedAuxSettings().m_sImportPath = ui->txtImagePath->text();
+	m_pTileSet->GetCachedAuxSettings().m_TextureRegion = QSize(ui->vsbTextureRegion->GetValue().toPoint().x(), ui->vsbTextureRegion->GetValue().toPoint().y());
+	m_pTileSet->GetCachedAuxSettings().m_StartOffset = QSize(ui->vsbStartOffset->GetValue().toPoint().x(), ui->vsbStartOffset->GetValue().toPoint().y());
+	m_pTileSet->GetCachedAuxSettings().m_Padding = QSize(ui->vsbPadding->GetValue().toPoint().x(), ui->vsbPadding->GetValue().toPoint().y());
 }
 
 void AuxTileSet::SliceSheetPixmaps()
@@ -744,7 +769,7 @@ void AuxTileSet::ErrorCheckImport()
 	bool bIsError = false;
 	do
 	{
-		if(m_bIsImportingTileSheet)
+		if(ui->radTileSheet->isChecked())
 		{
 			if(QFile::exists(ui->txtImagePath->text()) == false)
 			{
@@ -821,12 +846,18 @@ void AuxTileSet::on_undoStack_indexChanged(int iIndex)
 
 void AuxTileSet::on_radTileSheet_toggled(bool bChecked)
 {
-	SetImportWidgets();
+	ui->txtImagePath->clear();
+	m_pTileSet->GetGfxScene()->ClearImportTiles();
+	m_pTileSet->GetGfxScene()->RefreshTiles(*this);
+	CacheAuxSettings();
 }
 
 void AuxTileSet::on_radTileImages_toggled(bool bChecked)
 {
-	SetImportWidgets();
+	ui->txtImagePath->clear();
+	m_pTileSet->GetGfxScene()->ClearImportTiles();
+	m_pTileSet->GetGfxScene()->RefreshTiles(*this);
+	CacheAuxSettings();
 }
 
 void AuxTileSet::on_btnImageBrowse_clicked()
@@ -839,7 +870,7 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 	dlg.setWindowModality(Qt::ApplicationModal);
 	dlg.setModal(true);
 
-	if(m_bIsImportingTileSheet)
+	if(ui->radTileSheet->isChecked())
 	{
 		dlg.setWindowTitle("Select Tile Sheet Image");
 		dlg.setFileMode(QFileDialog::ExistingFile);
@@ -857,7 +888,7 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 	if(sImportImgList.empty())
 		return;
 
-	if(m_bIsImportingTileSheet)
+	if(ui->radTileSheet->isChecked())
 	{
 		ui->txtImagePath->setText(sImportImgList[0]);
 
@@ -911,6 +942,8 @@ void AuxTileSet::on_btnImageBrowse_clicked()
 		pGfxScene->RefreshImportTiles(*this);
 	}
 
+	CacheAuxSettings();
+
 	ui->graphicsView->ResetCamera(TILESETPAGE_Import);
 
 	ErrorCheckImport();
@@ -953,42 +986,49 @@ void AuxTileSet::OnTileOffsetChanged(QVariant newOffset)
 
 void AuxTileSet::OnTextureRegionChanged(QVariant newOffset)
 {
+	CacheAuxSettings();
 	SliceSheetPixmaps();
 	ErrorCheckImport();
 }
 
 void AuxTileSet::OnStartOffsetChanged(QVariant newOffset)
 {
+	CacheAuxSettings();
 	SliceSheetPixmaps();
 	ErrorCheckImport();
 }
 
 void AuxTileSet::OnPaddingChanged(QVariant newPadding)
 {
+	CacheAuxSettings();
 	SliceSheetPixmaps();
 	ErrorCheckImport();
 }
 
 void AuxTileSet::on_radImportBottom_toggled(bool bChecked)
 {
+	CacheAuxSettings();
 	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::BottomEdge);
 	m_pTileSet->GetGfxScene()->RefreshImportTiles(*this);
 }
 
 void AuxTileSet::on_radImportTop_toggled(bool bChecked)
 {
+	CacheAuxSettings();
 	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::TopEdge);
 	m_pTileSet->GetGfxScene()->RefreshImportTiles(*this);
 }
 
 void AuxTileSet::on_radImportLeft_toggled(bool bChecked)
 {
+	CacheAuxSettings();
 	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::LeftEdge);
 	m_pTileSet->GetGfxScene()->RefreshImportTiles(*this);
 }
 
 void AuxTileSet::on_radImportRight_toggled(bool bChecked)
 {
+	CacheAuxSettings();
 	m_pTileSet->GetGfxScene()->SetImportAppendEdge(Qt::RightEdge);
 	m_pTileSet->GetGfxScene()->RefreshImportTiles(*this);
 }
@@ -1023,42 +1063,16 @@ void AuxTileSet::on_btnConfirmAdd_clicked()
 	TileSetUndoCmd_AppendTiles *pUndoCmd = new TileSetUndoCmd_AppendTiles(*this, importMap, vImportRegionSize, eAppendEdge);
 	m_pTileSet->GetUndoStack()->push(pUndoCmd);
 
-	//QDir tempDir = HyGlobal::PrepTempDir(m_ProjectRef, HYGUIPATH_TEMPSUBDIR_ImportTileSheet);
+	ui->txtImagePath->clear();
+	delete m_pImportTileSheetPixmap;
+	m_pImportTileSheetPixmap = nullptr;
+	CacheAuxSettings();
 
-	//char szBuffer[16];
-	//uint uiPixmapIndex = 0;
-	//for(auto pPixmap : m_TilePixmaps)
-	//{
-	//	QString sMetaName;// = ui->txtTilePrefix->text();
-	//	sprintf(szBuffer, "%05u.png", uiPixmapIndex);
-	//	sMetaName += szBuffer;
-
-	//	pPixmap->save(tempDir.absoluteFilePath(sMetaName));
-	//	uiPixmapIndex++;
-	//}
-
-	//QFileInfoList imageFileList = tempDir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-	//QStringList sImageImportList;
-	//for(auto fileInfo : imageFileList)
-	//	sImageImportList << fileInfo.absoluteFilePath();
-
-	//quint32 uiBankId = m_ProjectRef.GetAtlasWidget() ? m_ProjectRef.GetAtlasWidget()->GetSelectedBankId() : 0;
-
-	//TreeModelItemData *pFirstSelected = nullptr;
-	//if(m_ProjectRef.GetAtlasWidget())
-	//	pFirstSelected = m_ProjectRef.GetAtlasWidget()->GetSelected();
-
-	//TreeModelItemData *pParent = m_ProjectRef.GetAtlasModel().FindTreeItemFilter(pFirstSelected);
-
-	//QVector<TreeModelItemData *> correspondingParentList;
-	//QVector<QUuid> correspondingUuidList;
-	//for(int i = 0; i < sImageImportList.size(); ++i)
-	//{
-	//	correspondingParentList.append(pParent);
-	//	correspondingUuidList.append(QUuid::createUuid());
-	//}
-
-	//m_ProjectRef.GetAtlasModel().ImportNewAssets(sImageImportList, uiBankId, correspondingParentList, correspondingUuidList);
+	m_pTabBar->setTabEnabled(TILESETPAGE_Arrange, true);
+	m_pTabBar->setTabEnabled(TILESETPAGE_Animation, true);
+	m_pTabBar->setTabEnabled(TILESETPAGE_Autotile, true);
+	m_pTabBar->setTabEnabled(TILESETPAGE_Collision, true);
+	m_pTabBar->setTabEnabled(TILESETPAGE_CustomData, true);
 }
 
 void AuxTileSet::on_actionRemoveTiles_triggered()
@@ -1134,4 +1148,5 @@ void AuxTileSet::OnTabBarChanged(int iIndex)
 	}
 
 	m_pTileSet->GetGfxScene()->RefreshTiles(*this);
+	CacheAuxSettings();
 }

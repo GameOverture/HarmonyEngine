@@ -186,16 +186,17 @@ enum HyAlignment
 
 enum HyTileMapLayout
 {
-	HYTILELAYOUT_Unknown = -1,
+	HYTILEMAPLAYOUT_Unknown = -1,
 
-	HYTILELAYOUT_Stacked = 0,
-	HYTILELAYOUT_StackedOffset,
-	HYTILELAYOUT_StairsRight,
-	HYTILELAYOUT_StairsDown,
-	HYTILELAYOUT_DiamondRight,
-	HYTILELAYOUT_DiamondDown,
+	HYTILEMAPLAYOUT_Square = 0,
+	HYTILEMAPLAYOUT_HalfOffsetSquare,
+	HYTILEMAPLAYOUT_Isometric,
+	HYTILEMAPLAYOUT_IsometricStaggerX,
+	HYTILEMAPLAYOUT_IsometricStaggerY,
+	HYTILEMAPLAYOUT_HexagonFlatTop,
+	HYTILEMAPLAYOUT_HexagonPointTop,
 
-	HYNUM_TILELAYOUTS
+	HYNUM_TILEMAPLAYOUTS
 };
 
 enum HyPlaylistMode

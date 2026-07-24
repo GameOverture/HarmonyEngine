@@ -906,7 +906,10 @@ void ManagerWidget::on_assetTree_pressed(const QModelIndex &index)
 		MainWindow::FocusAuxWidget(AUXTAB_TileSet);
 	}
 	else
+	{
+		static_cast<AuxTileSet *>(MainWindow::GetAuxWidget(AUXTAB_TileSet))->Init(nullptr);
 		MainWindow::HideAuxWidget(AUXTAB_TileSet);
+	}
 
 	// Call `IWidget::OnUpdateActions()` on the currently open project item
 	ProjectItemData *pCurrentOpenItem = m_pModel->GetProjOwner().GetCurrentOpenItem();

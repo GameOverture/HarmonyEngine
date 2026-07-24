@@ -30,11 +30,21 @@ bool operator<(const QPoint &a, const QPoint &b);
 
 class TileData;
 
+struct TileSetCachedAuxSettings
+{
+	TileSetPage					m_eCurPage = TILESETPAGE_Arrange;
+	bool						m_bTileSheet = true;
+	QString						m_sImportPath = "";
+	QSize						m_TextureRegion = QSize(0, 0);
+	QSize						m_StartOffset = QSize(0, 0);
+	QSize						m_Padding = QSize(0, 0);
+};
+
 class AtlasTileSet : public AtlasFrame
 {
 	Q_OBJECT
 
-	QJsonObject					m_TileSetMetaObj;				// The currently 'saved to disk' data of the TileSet
+	QJsonObject					m_TileSetMetaObj;			// The currently 'saved to disk' data of the TileSet
 	bool						m_bExistencePendingSave;
 	bool						m_bSubAtlasDirty;
 	
@@ -45,10 +55,12 @@ class AtlasTileSet : public AtlasFrame
 	TileSetScene				m_GfxScene;
 
 	TileSetShape				m_eTileShape;
-	QSize						m_RegionSize;					// The size of the atlas cutout dimensions (not necessarily the size of the tile)
-	QSize						m_TileSize;						// User specified size that is used in conjunction with m_eTileType to create m_TilePolygon
+	QSize						m_RegionSize;				// The size of the atlas cutout dimensions (not necessarily the size of the tile)
+	QSize						m_TileSize;					// User specified size that is used in conjunction with m_eTileType to create m_TilePolygon
 	QPoint						m_TileOffset;
-	QPolygonF					m_TilePolygon;					// Represents the actual tile, that is able to be arranged in a TileMap (grid)
+	QPolygonF					m_TilePolygon;				// Represents the actual tile, that is able to be arranged in a TileMap (grid)
+
+	TileSetCachedAuxSettings	m_CachedAuxSettings;		// Not serialized, this is just so the AuxTileSet remembers Aux widget settings per tile set
 
 	struct AnimationSet
 	{
@@ -276,6 +288,8 @@ public:
 				 bool bIsPendingSave,
 				 uint uiErrors);
 	virtual ~AtlasTileSet();
+
+	TileSetCachedAuxSettings &GetCachedAuxSettings();
 
 	const QJsonObject &GetSavedTileSetMeta() const;
 	int GetNumTiles() const;

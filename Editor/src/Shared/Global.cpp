@@ -18,7 +18,7 @@
 /*static*/ QString HyGlobal::sm_sItemNamesPlural[NUM_ITEMTYPES];
 /*static*/ QString HyGlobal::sm_AssetNames[NUM_ASSETMANTYPES];
 /*static*/ QString HyGlobal::sm_TileSetShapeNames[NUM_TILESETSHAPES];
-/*static*/ QString HyGlobal::sm_TileMapLayouts[HYNUM_TILELAYOUTS];
+/*static*/ QString HyGlobal::sm_TileMapLayouts[HYNUM_TILEMAPLAYOUTS];
 /*static*/ QString HyGlobal::sm_ShapeNames[NUM_SHAPES];
 /*static*/ QString HyGlobal::sm_TweenFuncNames[NUM_TWEENFUNCS];
 /*static*/ QString HyGlobal::sm_TweenPropNames[NUM_TWEENPROPS];
@@ -127,16 +127,16 @@
 
 	sm_TileSetShapeNames[TILESETSHAPE_Square] = "Square";
 	sm_TileSetShapeNames[TILESETSHAPE_Isometric] = "Isometric";
-	sm_TileSetShapeNames[TILESETSHAPE_HalfOffsetSquare] = "Half-Offset Square";
 	sm_TileSetShapeNames[TILESETSHAPE_HexagonPointTop] = "Hexagon Point-Top";
 	sm_TileSetShapeNames[TILESETSHAPE_HexagonFlatTop] = "Hexagon Flat-Top";
 
-	sm_TileMapLayouts[HYTILELAYOUT_Stacked] = "Stacked";
-	sm_TileMapLayouts[HYTILELAYOUT_StackedOffset] = "Stacked Offset";
-	sm_TileMapLayouts[HYTILELAYOUT_StairsRight] = "Stairs Right";
-	sm_TileMapLayouts[HYTILELAYOUT_StairsDown] = "Stairs Down";
-	sm_TileMapLayouts[HYTILELAYOUT_DiamondRight] = "Diamond Right";
-	sm_TileMapLayouts[HYTILELAYOUT_DiamondDown] = "Diamond Down";
+	sm_TileMapLayouts[HYTILEMAPLAYOUT_Square] = "Square";
+	sm_TileMapLayouts[HYTILEMAPLAYOUT_HalfOffsetSquare] = "Half Offset Square";
+	sm_TileMapLayouts[HYTILEMAPLAYOUT_Isometric] = "Isometric";
+	sm_TileMapLayouts[HYTILEMAPLAYOUT_IsometricStaggerX] = "Isometric Staggered X";
+	sm_TileMapLayouts[HYTILEMAPLAYOUT_IsometricStaggerY] = "Isometric Staggered Y";
+	sm_TileMapLayouts[HYTILEMAPLAYOUT_HexagonPointTop] = "Hexagon Point-Top";
+	sm_TileMapLayouts[HYTILEMAPLAYOUT_HexagonFlatTop] = "Hexagon Flat-Top";
 
 	sm_ShapeNames[SHAPE_None] = "None";
 	sm_ShapeNames[SHAPE_Box] = "Box";
@@ -388,7 +388,6 @@
 	QList<TileSetShape> list;
 	list.append(TILESETSHAPE_Square);
 	list.append(TILESETSHAPE_Isometric);
-	list.append(TILESETSHAPE_HalfOffsetSquare);
 	list.append(TILESETSHAPE_HexagonPointTop);
 	list.append(TILESETSHAPE_HexagonFlatTop);
 
@@ -664,7 +663,7 @@
 /*static*/ QStringList HyGlobal::GetTileMapLayoutNameList()
 {
 	QStringList list;
-	for(int i = 0; i < HYNUM_TILELAYOUTS; ++i)
+	for(int i = 0; i < HYNUM_TILEMAPLAYOUTS; ++i)
 		list.append(sm_TileMapLayouts[i]);
 	
 	return list;
@@ -672,13 +671,13 @@
 
 /*static*/ HyTileMapLayout HyGlobal::GetTileMapLayoutFromString(QString sTileMapLayout)
 {
-	for(int i = 0; i < HYNUM_TILELAYOUTS; ++i)
+	for(int i = 0; i < HYNUM_TILEMAPLAYOUTS; ++i)
 	{
 		if(sTileMapLayout.compare(sm_TileMapLayouts[i], Qt::CaseInsensitive) == 0)
 			return static_cast<HyTileMapLayout>(i);
 	}
 
-	return HYTILELAYOUT_Unknown;
+	return HYTILEMAPLAYOUT_Unknown;
 }
 
 /*static*/ QStringList HyGlobal::GetAlignmentNameList()
