@@ -25,6 +25,7 @@ AuxTileMap::AuxTileMap(QWidget *pParent /*= nullptr*/) :
 	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/tileset-autotile.png")), tr("Terrains"));
 
 	m_pToolBar = new QToolBar(ui->toolBarFrame);
+	//m_pToolBar->addAction(
 
 	ui->tileSetsTableView->verticalHeader()->hide();
 	ui->tileSetsTableView->horizontalHeader()->hide();
@@ -35,7 +36,7 @@ AuxTileMap::AuxTileMap(QWidget *pParent /*= nullptr*/) :
 	delete ui;
 }
 
-void AuxTileMap::Init(Project &projectRef, TileMapModel &tileMapModelRef)
+void AuxTileMap::Init(TileMapModel &tileMapModelRef)
 {
 	//ui->tileSetsTableView
 }

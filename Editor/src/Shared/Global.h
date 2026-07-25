@@ -157,6 +157,7 @@ enum AuxTab
 	AUXTAB_Log = 0,			// Always visible
 	AUXTAB_AssetInspector,	// Visible when Asset Manager Docking Window is visible
 	AUXTAB_TileSet,			// Only visible when a single TileSet is selected in the Asset Manager
+	AUXTAB_TileMap,			// Only visible when a TileMap entity item is selected AND has its edit mode enabled
 	AUXTAB_DopeSheet,		// Only visible when an Entity is the current item opened
 	AUXTAB_ShaderEditor		// Only visible when a Shader is the current item opened
 };

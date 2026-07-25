@@ -31,7 +31,7 @@ public:
 	explicit AuxTileMap(QWidget *pParent = nullptr);
 	virtual ~AuxTileMap();
 
-	void Init(Project &projectRef, TileMapModel &tileMapModelRef);
+	void Init(TileMapModel &tileMapModelRef);
 
 private:
 	Ui::AuxTileMap *ui;

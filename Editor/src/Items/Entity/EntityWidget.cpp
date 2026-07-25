@@ -18,8 +18,10 @@
 #include "DlgInputName.h"
 #include "DlgInputNumber.h"
 #include "MainWindow.h"
+#include "AuxTileMap.h"
 #include "AuxDopeSheet.h"
 #include "PropertiesTreeMultiModel.h"
+#include "TileMapModel.h"
 #include "DlgSetUiPanel.h"
 #include "ManagerWidget.h"
 
@@ -609,11 +611,6 @@ void EntityWidget::SetEditMode(EntityTreeItemData *pItemToEdit)
 {
 	if(pItemToEdit)
 	{
-		if(IsEditMode())
-		{
-
-		}
-
 		RequestSelectedItems(QList<QUuid>() << pItemToEdit->GetThisUuid());
 
 		// Update EntityDraw with latest selection via ApplyJsonData()
@@ -627,9 +624,20 @@ void EntityWidget::SetEditMode(EntityTreeItemData *pItemToEdit)
 		pEntityDraw->ApplyJsonData();
 
 		ui->actionEditMode->setChecked(true);
+
+		if(pItemToEdit->GetType() == ITEM_TileMap)
+		{
+			MainWindow::FocusAuxWidget(AUXTAB_TileMap);
+			static_cast<AuxTileMap *>(MainWindow::GetAuxWidget(AUXTAB_TileMap))->Init(*static_cast<TileMapModel *>(pItemToEdit->GetEditModel()));
+		}
+		else
+			MainWindow::HideAuxWidget(AUXTAB_TileMap);
 	}
 	else
+	{
 		ui->actionEditMode->setChecked(false);
+		MainWindow::HideAuxWidget(AUXTAB_TileMap);
+	}
 }
 
 /*virtual*/ void EntityWidget::showEvent(QShowEvent *pEvent) /*override*/

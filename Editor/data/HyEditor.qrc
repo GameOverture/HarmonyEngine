@@ -417,5 +417,15 @@
         <file>icons16x16/items/Point-Pending.png</file>
         <file>icons16x16/items/Point-Settings.png</file>
         <file>icons16x16/items/Point-Warning.png</file>
+        <file>icons22x22/color-picker.png</file>
+        <file>icons22x22/draw-ellipse.png</file>
+        <file>icons22x22/draw-eraser.png</file>
+        <file>icons22x22/draw-freehand.png</file>
+        <file>icons22x22/draw-rectangle.png</file>
+        <file>icons22x22/object-flip-horizontal.png</file>
+        <file>icons22x22/object-flip-vertical.png</file>
+        <file>icons22x22/object-rotate-left.png</file>
+        <file>icons22x22/object-rotate-right.png</file>
+        <file>icons22x22/paint-bucket-fill.png</file>
     </qresource>
 </RCC>

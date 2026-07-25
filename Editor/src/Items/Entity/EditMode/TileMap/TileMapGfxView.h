@@ -11,10 +11,9 @@
 #define TILEMAPGFXVIEW_H
 
 #include "CommonGfxView.h"
-#include "AuxTileSet.h"
+#include "TileMapGfxScene.h"
 
 class AuxTileSet;
-class TileSetScene;
 
 class TileMapGfxView : public CommonGfxView
 {
@@ -37,10 +36,8 @@ public:
 	TileMapGfxView(QWidget *pParent = nullptr);
 	virtual ~TileMapGfxView();
 
-	TileSetScene *GetScene() const;
-	void SetScene(AuxTileSet *pAuxTileSet, TileSetScene *pTileSetScene);
-
-	void ResetCamera(TileSetPage ePage);
+	TileMapGfxScene *GetScene() const;
+	void SetScene(TileMapGfxScene *pTileSetScene);
 
 protected:
 	virtual void contextMenuEvent(QContextMenuEvent *pEvent) override;
