@@ -11,9 +11,9 @@
 #define TILEMAPGFXVIEW_H
 
 #include "CommonGfxView.h"
-#include "TileMapGfxScene.h"
 
 class AuxTileSet;
+class TileMapGfxScene;
 
 class TileMapGfxView : public CommonGfxView
 {
@@ -37,7 +37,7 @@ public:
 	virtual ~TileMapGfxView();
 
 	TileMapGfxScene *GetScene() const;
-	void SetScene(TileMapGfxScene *pTileSetScene);
+	//void SetScene(TileMapGfxScene *pTileSetScene);
 
 protected:
 	virtual void contextMenuEvent(QContextMenuEvent *pEvent) override;

@@ -9,18 +9,7 @@
 *************************************************************************/
 #include "Global.h"
 #include "TileMapGfxView.h"
-#include "TileSetScene.h"
-#include "TileSetGfxItem.h"
-#include "AuxTileSet.h"
-#include "IWgtTileSetItem.h"
-#include "WgtTileSetAnimation.h"
-#include "TileData.h"
-
-#include <QPainter>
-#include <QScrollBar>
-#include <QGraphicsItem>
-#include <QMouseEvent>
-#include <QApplication>
+#include "TileMapGfxScene.h"
 
 TileMapGfxView::TileMapGfxView(QWidget *pParent /*= nullptr*/) :
 	CommonGfxView(pParent),
@@ -40,10 +29,10 @@ TileMapGfxScene *TileMapGfxView::GetScene() const
 	return static_cast<TileMapGfxScene *>(scene());
 }
 
-void TileMapGfxView::SetScene(TileMapGfxScene *pTileSetScene)
-{
-	setScene(pTileSetScene);
-}
+//void TileMapGfxView::SetScene(TileMapGfxScene *pTileSetScene)
+//{
+//	setScene(pTileSetScene);
+//}
 
 /*virtual*/ void TileMapGfxView::contextMenuEvent(QContextMenuEvent *pEvent) /*override*/
 {

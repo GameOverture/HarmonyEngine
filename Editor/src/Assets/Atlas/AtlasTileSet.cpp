@@ -283,6 +283,11 @@ QVector<QJsonObject> AtlasTileSet::GetAnimations() const
 	return animationObjList;
 }
 
+bool AtlasTileSet::HasTerrainSets() const
+{
+	return !m_TerrainSetList.isEmpty();
+}
+
 QVector<QJsonObject> AtlasTileSet::GetTerrainSets() const
 {
 	QVector<QJsonObject> terrainSetObjList;
@@ -680,6 +685,7 @@ void AtlasTileSet::UpdateTileSetMeta()
 	// Start with blank
 	m_TileSetMetaObj = QJsonObject();
 
+	m_TileSetMetaObj["UUID"] = m_UUID.toString();
 	m_TileSetMetaObj["tileShape"] = HyGlobal::TileSetShapeName(m_eTileShape);
 	m_TileSetMetaObj["regionSize"] = QJsonArray() << QJsonValue(m_RegionSize.width()) << QJsonValue(m_RegionSize.height());
 	m_TileSetMetaObj["tileSize"] = QJsonArray() << QJsonValue(m_TileSize.width()) << QJsonValue(m_TileSize.height());
@@ -823,7 +829,7 @@ bool AtlasTileSet::Save()
 		//asdf;
 	}
 
-	return static_cast<AtlasManager &>(m_ModelRef).SaveTileSet(GetUuid(), m_TileSetMetaObj);
+	return static_cast<AtlasManager &>(m_ModelRef).SaveTileSets();
 }
 
 bool AtlasTileSet::IsExistencePendingSave() const

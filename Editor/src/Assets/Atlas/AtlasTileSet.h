@@ -317,6 +317,7 @@ public:
 	static QJsonObject GenerateNewTerrainJsonObject(QUuid terrainSetUuid, QString sName, HyColor color);
 	static QJsonObject GenerateNewCollisionJsonObject(HyColor color);
 	QVector<QJsonObject> GetAnimations() const;
+	bool HasTerrainSets() const;
 	QVector<QJsonObject> GetTerrainSets() const;
 	QVector<QJsonObject> GetCollisionLayers() const;
 	QJsonObject GetJsonItem(QUuid uuid) const;

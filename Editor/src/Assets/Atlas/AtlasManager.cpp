@@ -26,7 +26,8 @@
 
 AtlasManager::AtlasManager(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Atlases),
-	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0)
+	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0),
+	m_TileSetsTreeModel(this)
 {
 	QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));
 	if(tileSetMetaFile.exists() == false)
@@ -180,14 +181,19 @@ bool AtlasManager::ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newIm
 	return true;
 }
 
-const QMap<QString, AtlasTileSet *> &AtlasManager::GetTileSetMap() const
+const TileSetsTreeModel &AtlasManager::GetTileSetsModel() const
 {
-	return m_TileSetsMap;
+	return m_TileSetsTreeModel;
+}
+
+TileSetsTreeModel &AtlasManager::GetTileSetsModel()
+{
+	return m_TileSetsTreeModel;
 }
 
 AtlasTileSet *AtlasManager::GenerateTileSet(QString sName, TreeModelItemData *pParentTreeItemData, quint32 uiBankId)
 {
-	if(m_TileSetsMap.contains(sName.toLower()))
+	if(m_TileSetsTreeModel.Contains(sName))
 	{
 		HyGuiLog("AtlasManager::GenerateTileSet() - an AtlasTileSet that already existed by the same name: " % sName, LOGTYPE_Error);
 		return nullptr;
@@ -208,7 +214,7 @@ AtlasTileSet *AtlasManager::GenerateTileSet(QString sName, TreeModelItemData *pP
 												true,
 												0);
 
-	m_TileSetsMap.insert(pNewTileSet->GetName().toLower(), pNewTileSet);
+	m_TileSetsTreeModel.Add(pNewTileSet);
 
 	RegisterAsset(pNewTileSet);
 
@@ -218,14 +224,10 @@ AtlasTileSet *AtlasManager::GenerateTileSet(QString sName, TreeModelItemData *pP
 	return pNewTileSet;
 }
 
-bool AtlasManager::SaveTileSet(QUuid tileSetUuid, const QJsonObject &tileSetMetaDataRef)
+bool AtlasManager::SaveTileSets()
 {
 	if(FlushRepack() == false)
 		return false;
-
-	QJsonObject metaTileSetsObjs = m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)].toObject();
-	metaTileSetsObjs.insert(tileSetUuid.toString(QUuid::WithoutBraces), tileSetMetaDataRef);
-	m_TileSetsMeta.insert(HyGlobal::ItemName(ITEM_AtlasTileSet, true), metaTileSetsObjs);
 
 	WriteTileSetsToDisk();
 	return true;
@@ -239,9 +241,7 @@ void AtlasManager::WriteTileSetsToDisk()
 		HyGuiLog("Couldn't open TileSet meta file for writing: " % tileSetMetaFile.errorString(), LOGTYPE_Error);
 	else
 	{
-		if(m_TileSetsMeta.contains(HyGlobal::ItemName(ITEM_AtlasTileSet, true)) == false)
-			m_TileSetsMeta.insert(HyGlobal::ItemName(ITEM_AtlasTileSet, true), QJsonObject());
-
+		m_TileSetsMeta.insert(HyGlobal::ItemName(ITEM_AtlasTileSet, true), m_TileSetsTreeModel.GetTileSetsMetaArray());
 		m_TileSetsMeta.insert("$fileVersion", HYGUI_FILE_VERSION);
 
 		QJsonDocument metaDoc;
@@ -440,7 +440,16 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 	}
 	else if(eAssetItemType == ITEM_AtlasTileSet)
 	{
-		QJsonObject tileSetMetaObj = m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)].toObject()[metaObj["assetUUID"].toString()].toObject();
+		QJsonObject tileSetMetaObj;
+		QJsonArray tileSetArray = m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)].toArray();
+		for(QJsonValue tileSetMetaVal : tileSetArray)
+		{
+			if(tileSetMetaVal.toObject()["UUID"].toString() == metaObj["assetUUID"].toString())
+			{
+				tileSetMetaObj = tileSetMetaVal.toObject();
+				break;
+			}
+		}
 
 		AtlasTileSet *pNewTileSet = new AtlasTileSet(*this,
 													 QUuid(metaObj["assetUUID"].toString()),
@@ -457,9 +466,11 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 													 false,
 													 metaObj["errors"].toInt(0));
 
-		if(m_TileSetsMap.contains(pNewTileSet->GetName().toLower()))
-			HyGuiLog("AtlasManager::OnAllocateAssetData() - Allocated an AtlasTileSet that already existed by the same name: " % pNewTileSet->GetName(), LOGTYPE_Error);
-		m_TileSetsMap.insert(pNewTileSet->GetName().toLower(), pNewTileSet);
+		if(m_TileSetsTreeModel.Add(pNewTileSet) == false)
+		{
+			delete pNewTileSet;
+			return nullptr;
+		}
 
 		return pNewTileSet;
 	}
@@ -471,6 +482,7 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 /*virtual*/ bool AtlasManager::OnRemoveAssets(QStringList sPreviousFilterPaths, QList<IAssetItemData *> assetList) /*override*/
 {
 	QMap<BankData *, QSet<int> > repackTexIndexMap;
+	bool bTileSetsDirty = false;
 	for(int i = 0; i < assetList.count(); ++i)
 	{
 		AtlasFrame *pFrame = static_cast<AtlasFrame *>(assetList[i]);
@@ -480,12 +492,8 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 			static_cast<AuxTileSet *>(MainWindow::GetAuxWidget(AUXTAB_TileSet))->Init(nullptr);
 			MainWindow::HideAuxWidget(AUXTAB_TileSet);
 
-			QString sTileSetUuid = pFrame->GetUuid().toString(QUuid::WithoutBraces);
-			QJsonObject tileSetsObj = m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)].toObject();
-			tileSetsObj.remove(sTileSetUuid);
-			m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)] = tileSetsObj;
-
-			WriteTileSetsToDisk();
+			m_TileSetsTreeModel.Remove(static_cast<AtlasTileSet *>(pFrame));
+			bTileSetsDirty = true;
 		}
 
 		static_cast<AuxAssetInspector *>(MainWindow::GetAuxWidget(AUXTAB_AssetInspector))->Clear(ASSETMAN_Atlases);
@@ -494,6 +502,9 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 
 		DeleteAsset(pFrame);
 	}
+
+	if(bTileSetsDirty)
+		WriteTileSetsToDisk();
 
 	for(auto iter = repackTexIndexMap.begin(); iter != repackTexIndexMap.end(); ++iter)
 		AddTexturesToRepack(iter.key(), iter.value());
@@ -759,11 +770,11 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 	dataObjRef.insert("banks", banksArray);
 
 	// TileSets ///////////
-	QJsonObject tileSetsMetaObjs = m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)].toObject();
 	QJsonArray tileSetTexturesArray;
-	for(QString sUuidKey : tileSetsMetaObjs.keys())
+	QJsonArray metaTileSetArray = m_TileSetsMeta[HyGlobal::ItemName(ITEM_AtlasTileSet, true)].toArray();
+	for(QJsonValue tileSetVal : metaTileSetArray)
 	{
-		QJsonObject metaObj = tileSetsMetaObjs[sUuidKey].toObject();
+		QJsonObject metaObj = tileSetVal.toObject();
 
 		QJsonObject runtimeTileSetObj;
 		runtimeTileSetObj.insert("name", metaObj["name"].toString());

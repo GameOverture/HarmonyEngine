@@ -12,15 +12,22 @@
 
 #include <QGraphicsScene>
 
+class AtlasTileSet;
+
 class TileMapGfxScene : public QGraphicsScene
 {
 	Q_OBJECT
 
+	const AtlasTileSet *			m_pTileSet;
+	QUuid							m_TerrainUuid;
+
+	QList<QGraphicsPixmapItem *>	m_TileMapItemsList;
+
 public:
-	TileMapGfxScene();
+	TileMapGfxScene(QObject *pParent = nullptr);
 	virtual ~TileMapGfxScene();
 
-	void Initialize(const QJsonObject &tileSetMetaObj);
+	void Initialize(const AtlasTileSet *pTileSet, QUuid terrainUuid);
 };
 
 #endif // TILEMAPGFXSCENE_H

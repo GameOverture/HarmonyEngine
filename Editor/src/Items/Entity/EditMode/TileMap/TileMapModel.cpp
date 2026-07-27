@@ -75,17 +75,16 @@ const Tiled::TileLayer &TileMapModel::GetTiledTileLayer() const
 
 QList<AtlasTileSet *> TileMapModel::UsedTilesets(const AtlasManager &atlasManagerRef) const
 {
-	const QMap<QString, AtlasTileSet *> &tileSetMapRef = atlasManagerRef.GetTileSetMap();
 	QList<AtlasTileSet *> returnList;
 
 	QSet<Tiled::SharedTileset> tiledTileSets = m_TiledLayer.usedTilesets();
 	for(Tiled::SharedTileset tileSetPtr : tiledTileSets)
 	{
 		QString sTileSetName = tileSetPtr->name();
-		if(tileSetMapRef.contains(sTileSetName.toLower()) == false)
+		if(atlasManagerRef.GetTileSetsModel().Contains(sTileSetName) == false)
 			HyGuiLog("TileMapModel::UsedTilesets - could not find TileSet in Atlas Manager with name: " % sTileSetName, LOGTYPE_Error);
 		else
-			returnList.push_back(tileSetMapRef[sTileSetName.toLower()]);
+			returnList.push_back(atlasManagerRef.GetTileSetsModel().GetTileSet(sTileSetName));
 	}
 
 	return returnList;

@@ -265,7 +265,7 @@
         <enum>QTabWidget::TabPosition::South</enum>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="tabOutputLog">
         <attribute name="title">
@@ -343,16 +343,23 @@
         <attribute name="title">
          <string>TileMap Palette</string>
         </attribute>
-        <widget class="AuxTileMap" name="tileMapPalette" native="true">
-         <property name="geometry">
-          <rect>
-           <x>280</x>
-           <y>0</y>
-           <width>120</width>
-           <height>80</height>
-          </rect>
+        <layout class="QVBoxLayout" name="verticalLayout_11">
+         <property name="leftMargin">
+          <number>0</number>
          </property>
-        </widget>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="AuxTileMap" name="tileMapPalette" native="true"/>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tabDopeSheet">
         <attribute name="title">

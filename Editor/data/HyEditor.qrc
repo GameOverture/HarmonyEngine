@@ -427,5 +427,9 @@
         <file>icons22x22/object-rotate-left.png</file>
         <file>icons22x22/object-rotate-right.png</file>
         <file>icons22x22/paint-bucket-fill.png</file>
+        <file>icons22x22/edit-select.png</file>
+        <file>icons16x16/tileset-terrainset-corners.png</file>
+        <file>icons16x16/tileset-terrainset-cornersandsides.png</file>
+        <file>icons16x16/tileset-terrainset-sides.png</file>
     </qresource>
 </RCC>

@@ -14,6 +14,7 @@
 
 #include "AtlasFrame.h"
 #include "AtlasTileSet.h"
+#include "TileSetsTreeModel.h"
 
 class AtlasManager : public IManagerModel
 {
@@ -25,8 +26,8 @@ class AtlasManager : public IManagerModel
 	
 	HyTextureInfo						m_DefaultTextureInfo;
 	
-	QMap<QString, AtlasTileSet *>		m_TileSetsMap;			// (Key: names in LOWERCASE) Lookup table to find AtlasTileSets by their name and ensure they're all uniquely named
-	QJsonObject							m_TileSetsMeta;			// Holds the contents of TileSets.meta
+	TileSetsTreeModel					m_TileSetsTreeModel;
+	QJsonObject							m_TileSetsMeta;			// The currently 'saved to disk' meta-data of the TileSets
 
 public:
 	AtlasManager(Project &projRef);
@@ -47,9 +48,10 @@ public:
 	AtlasFrame *GenerateFrame(ProjectItemData *pItem, QString sName, QImage &newImage, quint32 uiAtlasGrpIndex, ItemType eSubAtlasType);
 	bool ReplaceFrame(AtlasFrame *pFrame, QString sName, QImage &newImage, ItemType eSubAtlasType);
 
-	const QMap<QString, AtlasTileSet *> &GetTileSetMap() const;
+	const TileSetsTreeModel &GetTileSetsModel() const;
+	TileSetsTreeModel &GetTileSetsModel();
 	AtlasTileSet *GenerateTileSet(QString sName, TreeModelItemData *pParentTreeItemData, quint32 uiBankId);
-	bool SaveTileSet(QUuid tileSetUuid, const QJsonObject &tileSetMetaDataRef);
+	bool SaveTileSets();
 	void WriteTileSetsToDisk();
 
 	void OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *pFirstSelection);

@@ -10,25 +10,68 @@
 #include "Global.h"
 #include "AuxTileMap.h"
 #include "ui_AuxTileMap.h"
+#include "AtlasManager.h"
 
-#include "TileMapModel.h"
+#include <QActionGroup>
+#include <QResizeEvent>
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//TileSetTreeView::TileSetTreeView(QWidget *pParent /*= 0*/) :
+//	QTreeView(pParent)
+//{
+//}
+///*virtual*/ void TileSetTreeView::resizeEvent(QResizeEvent *pResizeEvent)
+//{
+//	// TODO: Use formula to account for device pixels and scaling using QWindow::devicePixelRatio()
+//	int iWidth = pResizeEvent->size().width();
+//
+//	iWidth -= 50;
+//	setColumnWidth(TileSetsTreeModel::COLUMN_Name, iWidth);
+//	setColumnWidth(TileSetsTreeModel::COLUMN_Info, 50);
+//
+//	QTreeView::resizeEvent(pResizeEvent);
+//}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 AuxTileMap::AuxTileMap(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
-	ui(new Ui::AuxTileMap)
+	ui(new Ui::AuxTileMap),
+	m_TileMapGfxScene(this)
 {
 	ui->setupUi(this);
 
-	m_pTabBar = new QTabBar(ui->tabFrame);
-	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/items/TileSet.png")), tr("Tiles"));
-	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/Tools-ImportTileSheet.png")), tr("Patterns"));
-	m_pTabBar->addTab(QIcon(QString::fromUtf8(":/icons16x16/tileset-autotile.png")), tr("Terrains"));
+	m_pToolActionGroup = new QActionGroup(this);
+	m_pToolActionGroup->setExclusive(true);
+	m_pToolActionGroup->addAction(ui->actionSelectTool);
+	m_pToolActionGroup->addAction(ui->actionPaintTool);
+	m_pToolActionGroup->addAction(ui->actionRectTool);
+	m_pToolActionGroup->addAction(ui->actionCircleTool);
+	m_pToolActionGroup->addAction(ui->actionFillTool);
+	m_pToolActionGroup->addAction(ui->actionPickerTool);
+	m_pToolActionGroup->addAction(ui->actionEraserTool);
 
 	m_pToolBar = new QToolBar(ui->toolBarFrame);
-	//m_pToolBar->addAction(
+	m_pToolBar->addAction(ui->actionSelectTool);
+	m_pToolBar->addSeparator();
+	m_pToolBar->addAction(ui->actionPaintTool);
+	m_pToolBar->addAction(ui->actionRectTool);
+	m_pToolBar->addAction(ui->actionCircleTool);
+	m_pToolBar->addAction(ui->actionFillTool);
+	m_pToolBar->addSeparator();
+	m_pToolBar->addAction(ui->actionPickerTool);
+	m_pToolBar->addAction(ui->actionEraserTool);
+	m_pToolBar->addSeparator();
+	m_pToolBar->addAction(ui->actionRotateTileLeft);
+	m_pToolBar->addAction(ui->actionRotateTileRight);
+	m_pToolBar->addAction(ui->actionFlipTileH);
+	m_pToolBar->addAction(ui->actionFlipTileV);
 
-	ui->tileSetsTableView->verticalHeader()->hide();
-	ui->tileSetsTableView->horizontalHeader()->hide();
+	ui->actionPaintTool->setChecked(true);
+
+	//ui->tileSetsTreeView->setHeaderHidden(true);
+	ui->tileSetsTreeView->setStyleSheet("QTreeView::item { height: 32px; }");
+
+	ui->graphicsView->setScene(&m_TileMapGfxScene);
 }
 
 /*virtual*/ AuxTileMap::~AuxTileMap()
@@ -36,7 +79,21 @@ AuxTileMap::AuxTileMap(QWidget *pParent /*= nullptr*/) :
 	delete ui;
 }
 
-void AuxTileMap::Init(TileMapModel &tileMapModelRef)
+void AuxTileMap::Init(AtlasManager &atlasManagerRef, TileMapModel &tileMapModelRef)
 {
-	//ui->tileSetsTableView
+	ui->tileSetsTreeView->setModel(&atlasManagerRef.GetTileSetsModel());
+	ui->tileSetsTreeView->expandAll();
+	//ui->tileSetsTreeView->resizeColumnToContents(0);
+}
+
+void AuxTileMap::on_tileSetsTreeView_clicked(QModelIndex index)
+{
+	if(ui->tileSetsTreeView->model() == nullptr)
+		return;
+	
+	TileSetsTreeModel *pModel = static_cast<TileSetsTreeModel *>(ui->tileSetsTreeView->model());
+	AtlasTileSet *pTileSetPtr = pModel->GetTileSet(index);
+	QUuid terrainUuid = pModel->GetTerrainUuid(index);
+	
+	m_TileMapGfxScene.Initialize(pTileSetPtr, terrainUuid);
 }

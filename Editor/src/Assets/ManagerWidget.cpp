@@ -1375,7 +1375,7 @@ void ManagerWidget::on_actionCreateTileSet_triggered()
 	DlgInputName dlgInputName("Enter TileSet Name", "New TileSet", HyGlobal::FreeFormValidator(),
 		[this](QString sInputName) -> QString
 		{
-			if(static_cast<AtlasManager *>(m_pModel)->GetTileSetMap().contains(sInputName.toLower()))
+			if(static_cast<AtlasManager *>(m_pModel)->GetTileSetsModel().Contains(sInputName))
 				return QString("A TileSet already exists with this name");
 
 			return QString();

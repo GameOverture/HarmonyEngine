@@ -20,6 +20,9 @@
    <property name="topMargin">
     <number>0</number>
    </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
    <property name="bottomMargin">
     <number>0</number>
    </property>
@@ -177,7 +180,7 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>381</width>
+                <width>387</width>
                 <height>446</height>
                </rect>
               </property>
@@ -415,8 +418,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>381</width>
-                <height>446</height>
+                <width>262</width>
+                <height>408</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -578,8 +581,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>395</width>
-                <height>418</height>
+                <width>113</width>
+                <height>62</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -653,8 +656,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>395</width>
-                <height>418</height>
+                <width>111</width>
+                <height>62</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_7">

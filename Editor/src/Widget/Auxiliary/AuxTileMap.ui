@@ -13,88 +13,258 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="leftMargin">
     <number>0</number>
    </property>
    <property name="topMargin">
     <number>0</number>
    </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
    <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
-    <widget class="QSplitter" name="splitter">
-     <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>2</number>
      </property>
-     <widget class="QWidget" name="verticalLayoutWidget">
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <property name="spacing">
-        <number>2</number>
+     <item>
+      <widget class="QTreeView" name="tileSetsTreeView">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <item>
-        <widget class="QFrame" name="tabFrame">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>24</height>
-          </size>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Shape::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTableView" name="tileSetsTableView"/>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="verticalLayoutWidget_2">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="spacing">
-        <number>0</number>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
        </property>
-       <item>
-        <widget class="QFrame" name="toolBarFrame">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>24</height>
-          </size>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Shape::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Shadow::Raised</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="TileMapGfxView" name="graphicsView"/>
-       </item>
-      </layout>
-     </widget>
-    </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="spacing">
+      <number>2</number>
+     </property>
+     <item>
+      <widget class="QFrame" name="toolBarFrame">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Shape::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Shadow::Raised</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="TileMapGfxView" name="graphicsView"/>
+     </item>
+    </layout>
    </item>
   </layout>
+  <action name="actionSelectTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons22x22/edit-select.png</normaloff>:/icons22x22/edit-select.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Select tiles that have been painted into the TileMapLayer in the center window</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionPaintTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons22x22/draw-freehand.png</normaloff>:/icons22x22/draw-freehand.png</iconset>
+   </property>
+   <property name="text">
+    <string>Paint Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Place selected tiles from the palette into the TileMapLayer in the center window</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionRectTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons22x22/draw-rectangle.png</normaloff>:/icons22x22/draw-rectangle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rect Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Rect Tool (R)</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionCircleTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons22x22/draw-ellipse.png</normaloff>:/icons22x22/draw-ellipse.png</iconset>
+   </property>
+   <property name="text">
+    <string>Circle Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Circle Tool</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionFillTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons22x22/paint-bucket-fill.png</normaloff>:/icons22x22/paint-bucket-fill.png</iconset>
+   </property>
+   <property name="text">
+    <string>Fill Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Fill Tool</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionPickerTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons22x22/color-picker.png</normaloff>:/icons22x22/color-picker.png</iconset>
+   </property>
+   <property name="text">
+    <string>Picker Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Picker Tool</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionEraserTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons22x22/draw-eraser.png</normaloff>:/icons22x22/draw-eraser.png</iconset>
+   </property>
+   <property name="text">
+    <string>Eraser Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Eraser Tool</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionRotateTileLeft">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons22x22/object-rotate-left.png</normaloff>:/icons22x22/object-rotate-left.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate Tile Left</string>
+   </property>
+   <property name="toolTip">
+    <string>Rotate Tile Left</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionRotateTileRight">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons22x22/object-rotate-right.png</normaloff>:/icons22x22/object-rotate-right.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate Tile Right</string>
+   </property>
+   <property name="toolTip">
+    <string>Rotate Tile Right</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionFlipTileH">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons22x22/object-flip-horizontal.png</normaloff>:/icons22x22/object-flip-horizontal.png</iconset>
+   </property>
+   <property name="text">
+    <string>Flip Tile Horizontally</string>
+   </property>
+   <property name="toolTip">
+    <string>Flip Tile Horizontally</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionFlipTileV">
+   <property name="icon">
+    <iconset resource="../../../data/HyEditor.qrc">
+     <normaloff>:/icons22x22/object-flip-vertical.png</normaloff>:/icons22x22/object-flip-vertical.png</iconset>
+   </property>
+   <property name="text">
+    <string>Flip Tile Vertically</string>
+   </property>
+   <property name="toolTip">
+    <string>Flip Tile Vertically</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
