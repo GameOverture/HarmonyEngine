@@ -102,7 +102,7 @@ public:
 class TileSetUndoCmd_RemoveTiles : public QUndoCommand
 {
 	AuxTileSet &						m_AuxTileSetRef;
-	QMap<TileData *, TileSetGfxItem *>	m_TilesMap;
+	QMap<TileData *, TileGfxItem *>		m_TilesMap;
 
 public:
 	TileSetUndoCmd_RemoveTiles(AuxTileSet &auxTileSetRef, QUndoCommand *pParent = nullptr);

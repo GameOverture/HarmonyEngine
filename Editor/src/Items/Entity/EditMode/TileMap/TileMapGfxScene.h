@@ -11,23 +11,29 @@
 #define TILEMAPGFXSCENE_H
 
 #include <QGraphicsScene>
+#include <QGraphicsRectItem>
 
 class AtlasTileSet;
+class TileData;
+class TileGfxItem;
 
 class TileMapGfxScene : public QGraphicsScene
 {
 	Q_OBJECT
 
-	const AtlasTileSet *			m_pTileSet;
-	QUuid							m_TerrainUuid;
+	const AtlasTileSet *				m_pTileSet;
+	QUuid								m_TerrainUuid;
 
-	QList<QGraphicsPixmapItem *>	m_TileMapItemsList;
+	QGraphicsRectItem					m_BorderRect;
+	QMap<TileData *, TileGfxItem *>		m_TileGfxItemsMap;
 
 public:
 	TileMapGfxScene(QObject *pParent = nullptr);
 	virtual ~TileMapGfxScene();
 
 	void Initialize(const AtlasTileSet *pTileSet, QUuid terrainUuid);
+
+	void OnMarqueeRelease(Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag);
 };
 
 #endif // TILEMAPGFXSCENE_H

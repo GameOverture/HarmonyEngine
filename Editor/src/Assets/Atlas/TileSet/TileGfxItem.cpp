@@ -8,7 +8,7 @@
  *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"
-#include "TileSetGfxItem.h"
+#include "TileGfxItem.h"
 #include "AuxTileSet.h"
 #include "TileData.h"
 #include "VectorQtView.h"
@@ -20,13 +20,14 @@
 const int iTILE_PADDING = 0;
 const float fUNSELECTED_OPACITY = 0.4f;
 
-TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon) :
+TileGfxItem::TileGfxItem(bool bIsTileSet, const QPixmap& pixmapRef, const QPolygonF& outlinePolygon) :
 	QGraphicsItem(nullptr),
+	m_bIsTileSet(bIsTileSet),
 	m_SelectedPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::White)), 1.0f, Qt::DashLine, Qt::SquareCap, Qt::MiterJoin)),
 	m_UnselectedPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Black)), 1.0f, Qt::DashLine, Qt::SquareCap, Qt::MiterJoin)),
 	m_DraggedPen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::White)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)),
 	m_ShapePen(QPen(QBrush(HyGlobal::ConvertHyColor(HyColor::Orange)), 1.0f, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin)),
-	m_bSelected(true),
+	m_bSelected(bIsTileSet ? true : false),
 	m_bDragged(false),
 	m_eTileSetShape(TILESETSHAPE_Unknown),
 	m_eAutoTileType(AUTOTILETYPE_Unknown),
@@ -62,10 +63,10 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	m_pCollisionView = nullptr;
 
 	setAcceptHoverEvents(true);
-	//setAcceptedMouseButtons(Qt::NoButton);
+	SetSelected(m_bSelected);
 }
 
-/*virtual*/ TileSetGfxItem::~TileSetGfxItem()
+/*virtual*/ TileGfxItem::~TileGfxItem()
 {
 	delete m_pRectItem;
 	delete m_pPixmapItem;
@@ -77,7 +78,7 @@ TileSetGfxItem::TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlin
 	delete m_pCollisionView;
 }
 
-void TileSetGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileData *pTileData)
+void TileGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileData *pTileData)
 {
 	AtlasTileSet *pTileSet = auxTileSetRef.GetTileSet();
 
@@ -100,7 +101,6 @@ void TileSetGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileDa
 
 	m_pAnimationRectItem->hide();
 
-	
 	AutoTileType eAutoTileType = AUTOTILETYPE_Unknown;
 	if(pTileData)
 		eAutoTileType = pTileSet->GetTerrainSetType(pTileData->GetTerrainSet());
@@ -183,27 +183,37 @@ void TileSetGfxItem::Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileDa
 		break;
 
 	default:
-		HyGuiLog("TileSetGfxItem::Refresh: Unhandled TileSetPage enum value!", LOGTYPE_Error);
+		HyGuiLog("TileGfxItem::Refresh: Unhandled TileSetPage enum value!", LOGTYPE_Error);
 		break;
 	}
 }
 
-bool TileSetGfxItem::IsSelected() const
+bool TileGfxItem::IsSelected() const
 {
 	return m_bSelected;
 }
 
-void TileSetGfxItem::SetSelected(bool bSelected)
+void TileGfxItem::SetSelected(bool bSelected)
 {
 	m_bSelected = bSelected;
 
-	if(m_bSelected)
-		m_pRectItem->setPen(m_SelectedPen);
-	else
-		m_pRectItem->setPen(m_UnselectedPen);
+	if(m_bIsTileSet)
+	{
+		if(m_bSelected)
+			m_pRectItem->setPen(m_SelectedPen);
+		else
+			m_pRectItem->setPen(m_UnselectedPen);
+	}
+	else // Tile Map
+	{
+		if(m_bSelected)
+			m_pRectItem->show();
+		else
+			m_pRectItem->hide();
+	}
 }
 
-void TileSetGfxItem::SetAsDragged(bool bDragged)
+void TileGfxItem::SetAsDragged(bool bDragged)
 {
 	m_bDragged = bDragged;
 
@@ -223,48 +233,48 @@ void TileSetGfxItem::SetAsDragged(bool bDragged)
 	}
 }
 
-QPointF TileSetGfxItem::GetDraggingInitialPos() const
+QPointF TileGfxItem::GetDraggingInitialPos() const
 {
 	return m_ptDraggingInitialPos;
 }
 
-void TileSetGfxItem::SetDraggingInitialPos(QPointF ptInitialPos)
+void TileGfxItem::SetDraggingInitialPos(QPointF ptInitialPos)
 {
 	m_ptDraggingInitialPos = ptInitialPos;
 }
 
-QPoint TileSetGfxItem::GetDraggingGridPos() const
+QPoint TileGfxItem::GetDraggingGridPos() const
 {
 	return m_ptDraggingGridPos;
 }
 
-void TileSetGfxItem::SetDraggingGridPos(QPoint ptGridPos)
+void TileGfxItem::SetDraggingGridPos(QPoint ptGridPos)
 {
 	m_ptDraggingGridPos = ptGridPos;
 }
 
-QPixmap TileSetGfxItem::GetPixmap() const
+QPixmap TileGfxItem::GetPixmap() const
 {
 	return m_pPixmapItem->pixmap();
 }
 
-/*virtual*/ QRectF TileSetGfxItem::boundingRect() const /*override*/
+/*virtual*/ QRectF TileGfxItem::boundingRect() const /*override*/
 {
 	return m_pRectItem->rect();// .adjusted(-iTILE_PADDING, -iTILE_PADDING, iTILE_PADDING, iTILE_PADDING); // Adjust for selection border
 }
 
-/*virtual*/ void TileSetGfxItem::paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) /*override*/
+/*virtual*/ void TileGfxItem::paint(QPainter* pPainter, const QStyleOptionGraphicsItem* pOption, QWidget* pWidget) /*override*/
 {
 	// Intentionally left blank since we are using child QGraphicsItems for rendering
 }
 
-void TileSetGfxItem::SetAnimation(bool bShow, HyColor color)
+void TileGfxItem::SetAnimation(bool bShow, HyColor color)
 {
 	m_pAnimationRectItem->setBrush(HyGlobal::ConvertHyColor(color));
 	m_pAnimationRectItem->setVisible(bShow);
 }
 
-void TileSetGfxItem::AllocateAutoTileParts(AtlasTileSet *pTileSet, AutoTileType eAutoTileType, TileSetShape eTileSetShape)
+void TileGfxItem::AllocateAutoTileParts(AtlasTileSet *pTileSet, AutoTileType eAutoTileType, TileSetShape eTileSetShape)
 {
 	for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
 	{
@@ -283,7 +293,7 @@ void TileSetGfxItem::AllocateAutoTileParts(AtlasTileSet *pTileSet, AutoTileType 
 	}
 }
 
-QGraphicsPolygonItem *TileSetGfxItem::GetAutoTilePartAt(QPointF ptLocalPos, TileSetAutoTilePart &ePartOut)
+QGraphicsPolygonItem *TileGfxItem::GetAutoTilePartAt(QPointF ptLocalPos, TileSetAutoTilePart &ePartOut)
 {
 	for(int i = 0; i < NUM_AUTOTILEPARTS; ++i)
 	{
@@ -298,7 +308,7 @@ QGraphicsPolygonItem *TileSetGfxItem::GetAutoTilePartAt(QPointF ptLocalPos, Tile
 	return nullptr;
 }
 
-QPolygonF TileSetGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, TileSetShape eTileSetShape, TileSetAutoTilePart ePart)
+QPolygonF TileGfxItem::AssembleAutoTilePolygon(AutoTileType eAutoTileType, TileSetShape eTileSetShape, TileSetAutoTilePart ePart)
 {
 	// `mainShape` has a clockwise winding order, with the first vertex at the center top (or top-left corner if shape is square or flat-top hexagon)
 	QPolygonF mainShape = m_pShapeItem->polygon();

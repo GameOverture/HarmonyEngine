@@ -10,7 +10,7 @@
 #include "Global.h"
 #include "TileSetView.h"
 #include "TileSetScene.h"
-#include "TileSetGfxItem.h"
+#include "TileGfxItem.h"
 #include "AuxTileSet.h"
 #include "IWgtTileSetItem.h"
 #include "WgtTileSetAnimation.h"
@@ -178,7 +178,7 @@ void TileSetView::ResetCamera(TileSetPage ePage)
 				break;
 
 			case TILESETPAGE_Arrange:
-				TileSetGfxItem *pHoveredSetupItem = GetScene()->GetGfxTile(GetScene()->IsPointInTile(mapToScene(m_ptDragStart)));
+				TileGfxItem *pHoveredSetupItem = GetScene()->GetGfxTile(GetScene()->IsPointInTile(mapToScene(m_ptDragStart)));
 				
 				if (QApplication::keyboardModifiers().testFlag(Qt::KeyboardModifier::ShiftModifier) == false && pHoveredSetupItem)
 				{

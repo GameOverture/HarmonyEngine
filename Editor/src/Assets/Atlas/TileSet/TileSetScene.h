@@ -16,7 +16,7 @@
 
 class AtlasTileSet;
 class AuxTileSet;
-class TileSetGfxItem;
+class TileGfxItem;
 class TileData;
 
 class TileSetGfxItemGroup : public QGraphicsItemGroup {
@@ -37,13 +37,13 @@ class TileSetScene : public QGraphicsScene
 
 	AtlasTileSet *													m_pTileSet;
 
-	QMap<TileData *, TileSetGfxItem *>								m_SetupTileMap;			// Keys are pointing to Actual concrete tiles from AtlasTileSet::m_TileDataMap
+	QMap<TileData *, TileGfxItem *>									m_SetupTileMap;			// Keys are pointing to Actual concrete tiles from AtlasTileSet::m_TileDataMap
 	QGraphicsRectItem												m_SetupBorderRect;		// A dash-line box that encompasses the working-portion of the 'setup' tiles
 	TileSetGfxItemGroup *											m_pModeSetupGroup;
 
 	QPointF															m_vArrangingStartMousePos;
 
-	QMap<QPoint, TileSetGfxItem *>									m_ImportTileMap;		// Pending import tiles
+	QMap<QPoint, TileGfxItem *>										m_ImportTileMap;		// Pending import tiles
 	QGraphicsRectItem												m_ImportBorderRect;		// A dash-line box that encompasses the working-portion of the 'import' tiles
 	TileSetGfxItemGroup *											m_pModeImportGroup;
 	QSize															m_vImportRegionSize;
@@ -68,9 +68,9 @@ public:
 	QMap<QPoint, QPixmap> AssembleImportMap();
 	void SetImportAppendEdge(Qt::Edge eEdge);
 
-	TileSetGfxItem *GetGfxTile(TileData *pTileData) const;
+	TileGfxItem *GetGfxTile(TileData *pTileData) const;
 	int GetNumSetupSelected() const;
-	QMap<TileData *, TileSetGfxItem *> GetSelectedSetupTiles() const;
+	QMap<TileData *, TileGfxItem *> GetSelectedSetupTiles() const;
 
 	TileData *IsPointInTile(QPointF ptScenePos) const;
 	void OnMarqueeRelease(AuxTileSet &auxTileSetRef, Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag);
@@ -101,7 +101,7 @@ public:
 
 private:
 	// Used during a drag operation, displace unselected tiles by the given grid delta
-	// and assign their temp 'TileSetGfxItem::m_ptDraggingGridPos'
+	// and assign their temp 'TileGfxItem::m_ptDraggingGridPos'
 	void DisplaceTiles(QPoint vGridDelta);
 };
 

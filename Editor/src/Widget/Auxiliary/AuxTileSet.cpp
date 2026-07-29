@@ -364,7 +364,7 @@ void AuxTileSet::UpdateGfxItemSelection()
 	ui->btnConfirmAdd->setText("Import " % QString::number(m_pTileSet->GetGfxScene()->GetNumImportPixmaps()) % " Tiles");
 	ErrorCheckImport();
 
-	QMap<TileData *, TileSetGfxItem *> selectedTilesMap = m_pTileSet->GetGfxScene()->GetSelectedSetupTiles();
+	QMap<TileData *, TileGfxItem *> selectedTilesMap = m_pTileSet->GetGfxScene()->GetSelectedSetupTiles();
 	int iNumSetupSelected = selectedTilesMap.size();
 	if(iNumSetupSelected == 0)
 	{

@@ -36,7 +36,7 @@
 AuxTileMap::AuxTileMap(QWidget *pParent /*= nullptr*/) :
 	QWidget(pParent),
 	ui(new Ui::AuxTileMap),
-	m_TileMapGfxScene(this)
+	m_pTileMapGfxScene(nullptr)
 {
 	ui->setupUi(this);
 
@@ -71,7 +71,8 @@ AuxTileMap::AuxTileMap(QWidget *pParent /*= nullptr*/) :
 	//ui->tileSetsTreeView->setHeaderHidden(true);
 	ui->tileSetsTreeView->setStyleSheet("QTreeView::item { height: 32px; }");
 
-	ui->graphicsView->setScene(&m_TileMapGfxScene);
+	m_pTileMapGfxScene = new TileMapGfxScene(this);
+	ui->graphicsView->setScene(m_pTileMapGfxScene);
 }
 
 /*virtual*/ AuxTileMap::~AuxTileMap()
@@ -83,6 +84,10 @@ void AuxTileMap::Init(AtlasManager &atlasManagerRef, TileMapModel &tileMapModelR
 {
 	ui->tileSetsTreeView->setModel(&atlasManagerRef.GetTileSetsModel());
 	ui->tileSetsTreeView->expandAll();
+
+	int iTotalWidth = width();
+	int iTreeViewWidth = ui->tileSetsTreeView->sizeHint().width();
+	ui->splitter->setSizes(QList<int>() << iTreeViewWidth << (iTotalWidth - iTreeViewWidth));
 	//ui->tileSetsTreeView->resizeColumnToContents(0);
 }
 
@@ -95,5 +100,5 @@ void AuxTileMap::on_tileSetsTreeView_clicked(QModelIndex index)
 	AtlasTileSet *pTileSetPtr = pModel->GetTileSet(index);
 	QUuid terrainUuid = pModel->GetTerrainUuid(index);
 	
-	m_TileMapGfxScene.Initialize(pTileSetPtr, terrainUuid);
+	m_pTileMapGfxScene->Initialize(pTileSetPtr, terrainUuid);
 }

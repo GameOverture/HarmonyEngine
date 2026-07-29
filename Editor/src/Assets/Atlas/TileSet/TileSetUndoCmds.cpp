@@ -242,7 +242,7 @@ TileSetUndoCmd_RemoveTiles::TileSetUndoCmd_RemoveTiles(AuxTileSet &auxTileSetRef
 	//while(m_TilesMap.empty() == false)
 	//{
 	//	TileData *pTileData = m_TilesMap.firstKey();
-	//	TileSetGfxItem *pGfxItem = m_TilesMap.take(pTileData);
+	//	TileGfxItem *pGfxItem = m_TilesMap.take(pTileData);
 	//	delete pTileData;
 	//	delete pGfxItem;
 	//}

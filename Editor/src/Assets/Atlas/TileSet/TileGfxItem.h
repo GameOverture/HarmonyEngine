@@ -20,8 +20,10 @@ class AtlasTileSet;
 class TileData;
 class VectorQtView;
 
-class TileSetGfxItem : public QGraphicsItem
+class TileGfxItem : public QGraphicsItem
 {
+	bool								m_bIsTileSet;				// True if this is a tile in a tile set, false if this is a tile in a tile map
+
 	bool								m_bSelected;
 	bool								m_bDragged;
 
@@ -44,11 +46,11 @@ class TileSetGfxItem : public QGraphicsItem
 
 	QGraphicsPolygonItem *				m_pTerrainParts[NUM_AUTOTILEPARTS];
 
-	VectorQtView *					m_pCollisionView;
+	VectorQtView *						m_pCollisionView;
 
 public:
-	TileSetGfxItem(const QPixmap& pixmapRef, const QPolygonF& outlinePolygon);
-	virtual ~TileSetGfxItem();
+	TileGfxItem(bool bIsTileSet, const QPixmap& pixmapRef, const QPolygonF& outlinePolygon);
+	virtual ~TileGfxItem();
 
 	void Refresh(AuxTileSet &auxTileSetRef, QSize regionSize, TileData *pTileData);
 

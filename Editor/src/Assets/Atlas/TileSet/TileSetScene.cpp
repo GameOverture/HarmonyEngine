@@ -12,7 +12,7 @@
 #include "TileSetScene.h"
 #include "AtlasTileSet.h"
 #include "TileData.h"
-#include "TileSetGfxItem.h"
+#include "TileGfxItem.h"
 #include "TileSetUndoCmds.h"
 
 #include <QBitArray>
@@ -117,7 +117,7 @@ void TileSetScene::SetImportAppendEdge(Qt::Edge eEdge)
 	m_eImportAppendEdge = eEdge;
 }
 
-TileSetGfxItem *TileSetScene::GetGfxTile(TileData *pTileData) const
+TileGfxItem *TileSetScene::GetGfxTile(TileData *pTileData) const
 {
 	if (m_SetupTileMap.contains(pTileData))
 		return m_SetupTileMap.value(pTileData);
@@ -135,9 +135,9 @@ int TileSetScene::GetNumSetupSelected() const
 	return iNumSetupTiles;
 }
 
-QMap<TileData *, TileSetGfxItem *> TileSetScene::GetSelectedSetupTiles() const
+QMap<TileData *, TileGfxItem *> TileSetScene::GetSelectedSetupTiles() const
 {
-	QMap<TileData*, TileSetGfxItem*> selectedTileMap;
+	QMap<TileData*, TileGfxItem*> selectedTileMap;
 	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
 	{
 		if (iter.value()->IsSelected())
@@ -236,7 +236,7 @@ void TileSetScene::ClearSetupSelection()
 
 void TileSetScene::AddTile(bool bImportTile, TileData *pTileData, const QPolygonF& outlinePolygon, QPoint ptGridPos, QPixmap pixmap, bool bDefaultSelected)
 {
-	TileSetGfxItem* pNewTileSetGfxItem = new TileSetGfxItem(pixmap, bImportTile ? QPolygonF() : outlinePolygon);
+	TileGfxItem* pNewTileSetGfxItem = new TileGfxItem(true, pixmap, bImportTile ? QPolygonF() : outlinePolygon);
 	pNewTileSetGfxItem->SetSelected(bDefaultSelected);
 
 	if (bImportTile)
@@ -480,7 +480,7 @@ void TileSetScene::HoverAutoTilePartAt(QPointF ptScenePos)
 	if(pTile == nullptr || pTile->GetTerrainSet().isNull())
 		return;
 
-	TileSetGfxItem *pGfxTile = m_SetupTileMap[pTile];
+	TileGfxItem *pGfxTile = m_SetupTileMap[pTile];
 	QPointF ptTileLocalPos = ptScenePos - pGfxTile->scenePos();
 
 	TileSetAutoTilePart ePart = AUTOTILEPART_Unknown;
@@ -517,7 +517,7 @@ void TileSetScene::OnPaintingStroke(AuxTileSet &auxTileSetRef, QPointF ptScenePo
 		if(iFrameIndex < 0)
 			return;
 
-		TileSetGfxItem *pGfxTile = m_SetupTileMap[pTile];
+		TileGfxItem *pGfxTile = m_SetupTileMap[pTile];
 		pGfxTile->SetAnimation(uiMouseFlags & Qt::LeftButton, m_pTileSet->GetAnimationColor(animUuid));
 
 		m_PaintStrokeAnimationList.push_back(pTile);
@@ -531,7 +531,7 @@ void TileSetScene::OnPaintingStroke(AuxTileSet &auxTileSetRef, QPointF ptScenePo
 		if(terrainUuid.isNull())
 			return;
 		
-		TileSetGfxItem *pGfxTile = m_SetupTileMap[pTile];
+		TileGfxItem *pGfxTile = m_SetupTileMap[pTile];
 		QPointF ptTileLocalPos = ptScenePos - pGfxTile->scenePos();
 
 		TileSetAutoTilePart ePart = AUTOTILEPART_Unknown;
@@ -587,7 +587,7 @@ void TileSetScene::DisplaceTiles(QPoint vGridDelta)
 		return;
 
 	// Gather selected tiles (the tiles being dragged)
-	QSet<TileSetGfxItem*> selectedTilesSet;
+	QSet<TileGfxItem*> selectedTilesSet;
 	for (auto iter = m_SetupTileMap.begin(); iter != m_SetupTileMap.end(); ++iter)
 	{
 		if (iter.value()->IsSelected())
@@ -595,7 +595,7 @@ void TileSetScene::DisplaceTiles(QPoint vGridDelta)
 	}
 
 	// Determine what collisions will occur from moving selected tiles to their new destinations
-	QMap<TileData*, TileSetGfxItem*> displacedTileMap;
+	QMap<TileData*, TileGfxItem*> displacedTileMap;
 	for (auto iter = selectedTilesSet.begin(); iter != selectedTilesSet.end(); ++iter)
 	{
 		QPoint ptDestinationTileGridPos = (*iter)->GetDraggingGridPos() + vGridDelta;
@@ -676,7 +676,7 @@ void TileSetScene::DisplaceTiles(QPoint vGridDelta)
 
 		// Move this tile in the best direction, skipping over any selected tiles
 		// Also cascade any newly displaced tiles in the best direction along the way while preserving their original order
-		QPair<TileData*, TileSetGfxItem*> curTile(iter.key(), iter.value());
+		QPair<TileData*, TileGfxItem*> curTile(iter.key(), iter.value());
 		QPoint ptTestGridPos = curTile.second->GetDraggingGridPos();
 		while (true)
 		{
@@ -714,7 +714,7 @@ void TileSetScene::DisplaceTiles(QPoint vGridDelta)
 						if (testIter.key()->GetMetaGridPos().y() < curTile.first->GetMetaGridPos().y())
 						{
 							curTile.second->SetDraggingGridPos(ptTestGridPos);
-							curTile = QPair<TileData*, TileSetGfxItem*>(testIter.key(), testIter.value());
+							curTile = QPair<TileData*, TileGfxItem*>(testIter.key(), testIter.value());
 							ptTestGridPos = curTile.second->GetDraggingGridPos();
 						}
 						else
@@ -724,7 +724,7 @@ void TileSetScene::DisplaceTiles(QPoint vGridDelta)
 						if (testIter.key()->GetMetaGridPos().x() > curTile.first->GetMetaGridPos().x())
 						{
 							curTile.second->SetDraggingGridPos(ptTestGridPos);
-							curTile = QPair<TileData*, TileSetGfxItem*>(testIter.key(), testIter.value());
+							curTile = QPair<TileData*, TileGfxItem*>(testIter.key(), testIter.value());
 							ptTestGridPos = curTile.second->GetDraggingGridPos();
 						}
 						else
@@ -734,7 +734,7 @@ void TileSetScene::DisplaceTiles(QPoint vGridDelta)
 						if (testIter.key()->GetMetaGridPos().y() > curTile.first->GetMetaGridPos().y())
 						{
 							curTile.second->SetDraggingGridPos(ptTestGridPos);
-							curTile = QPair<TileData*, TileSetGfxItem*>(testIter.key(), testIter.value());
+							curTile = QPair<TileData*, TileGfxItem*>(testIter.key(), testIter.value());
 							ptTestGridPos = curTile.second->GetDraggingGridPos();
 						}
 						else
@@ -744,7 +744,7 @@ void TileSetScene::DisplaceTiles(QPoint vGridDelta)
 						if (testIter.key()->GetMetaGridPos().x() < curTile.first->GetMetaGridPos().x())
 						{
 							curTile.second->SetDraggingGridPos(ptTestGridPos);
-							curTile = QPair<TileData*, TileSetGfxItem*>(testIter.key(), testIter.value());
+							curTile = QPair<TileData*, TileGfxItem*>(testIter.key(), testIter.value());
 							ptTestGridPos = curTile.second->GetDraggingGridPos();
 						}
 						else

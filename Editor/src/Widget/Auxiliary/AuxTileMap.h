@@ -44,7 +44,7 @@ class AuxTileMap : public QWidget
 	QActionGroup *			m_pToolActionGroup;
 	QToolBar *				m_pToolBar;
 
-	TileMapGfxScene			m_TileMapGfxScene;
+	TileMapGfxScene *		m_pTileMapGfxScene;
 
 public:
 	explicit AuxTileMap(QWidget *pParent = nullptr);

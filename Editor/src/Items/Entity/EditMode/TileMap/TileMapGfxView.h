@@ -19,15 +19,11 @@ class TileMapGfxView : public CommonGfxView
 {
 	Q_OBJECT
 
-	AuxTileSet *				m_pAuxTileSet;
-
 	enum DragState
 	{
 		DRAGSTATE_None,
 		DRAGSTATE_InitialPress,
-		DRAGSTATE_MarqueeSelect,
-		DRAGSTATE_ArrangingSelection,
-		DRAGSTATE_Painting
+		DRAGSTATE_MarqueeSelect
 	};
 	DragState					m_eDragState;
 	QPoint						m_ptDragStart; // In View Coordinates
