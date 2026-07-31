@@ -13,7 +13,7 @@
 #include "Global.h"
 #include "IEditModeModel.h"
 #include "PropertiesTreeModel.h"
-#include "vendor/libtiled/map.h"
+
 #include "vendor/libtiled/tilelayer.h"
 
 class AtlasTileSet;
@@ -21,11 +21,16 @@ class AtlasManager;
 
 class TileMapModel : public IEditModeModel
 {
-	Tiled::Map::Parameters	m_TiledMapParameters;
-	Tiled::TileLayer		m_TiledLayer;
+	Project &					m_ProjectRef;
+
+	HyTileMapLayout				m_eLayout;
+	HyTileMapStagger			m_eStagger;
+	glm::ivec2					m_vTileSize;
+
+	Tiled::TileLayer			m_TiledLayer;
 
 public:
-	TileMapModel(QUndoStack *pUndoStack);
+	TileMapModel(Project &projectRef, QUndoStack *pUndoStack);
 	virtual ~TileMapModel();
 
 	virtual QJsonObject Serialize() const override;
@@ -43,8 +48,14 @@ public:
 	virtual QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
 	virtual void ClearAction() override;
 
+	HyTileMapLayout GetLayout() const;
+	HyTileMapStagger GetStagger() const;
+	glm::ivec2 GetTileSize() const;
 	const Tiled::TileLayer &GetTiledTileLayer() const;
 	QList<AtlasTileSet *> UsedTilesets(const AtlasManager &atlasManagerRef) const;
+
+	HyShader *GetSquareShader();
+	HyShader *GetHexShader();
 
 	void SetCell(int iX, int iY, AtlasTileSet *pTileSet, int iTileId);
 

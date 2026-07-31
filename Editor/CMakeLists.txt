@@ -216,6 +216,8 @@ if(Qt6_DIR)
 		src/Items/Entity/EditMode/TileMap/TileMapGfxScene.h
 		src/Items/Entity/EditMode/TileMap/TileMapGfxView.cpp
 		src/Items/Entity/EditMode/TileMap/TileMapGfxView.h
+		src/Items/Entity/EditMode/TileMap/TileMapGrid.cpp
+		src/Items/Entity/EditMode/TileMap/TileMapGrid.h
 		src/Items/Entity/EditMode/TileMap/TileMapModel.cpp
 		src/Items/Entity/EditMode/TileMap/TileMapModel.h
 		src/Items/Entity/EditMode/TileMap/TileMapView.cpp

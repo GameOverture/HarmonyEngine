@@ -151,6 +151,7 @@ public:
 	void OnCameraUpdated();
 
 	// ProjectDraw functions
+	ProjectDraw *GetProjDraw();
 	void SetRenderSize(int iWidth, int iHeight);
 	
 	void ShowGridBackground(bool bShow);

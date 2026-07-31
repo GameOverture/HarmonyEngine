@@ -10,9 +10,14 @@
 #include "TileMapModel.h"
 #include "AtlasTileSet.h"
 #include "AtlasManager.h"
+#include "Project.h"
 
-TileMapModel::TileMapModel(QUndoStack *pUndoStack) :
-	IEditModeModel(EDITMODETYPE_TileMap)
+TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack) :
+	IEditModeModel(EDITMODETYPE_TileMap),
+	m_ProjectRef(projectRef),
+	m_eLayout(HYTILEMAPLAYOUT_Unknown),
+	m_eStagger(HYTILEMAPSTAGGER_Odd),
+	m_vTileSize(0.0f, 0.0f)
 {
 }
 
@@ -68,6 +73,21 @@ TileMapModel::TileMapModel(QUndoStack *pUndoStack) :
 {
 }
 
+HyTileMapLayout TileMapModel::GetLayout() const
+{
+	return m_eLayout;
+}
+
+HyTileMapStagger TileMapModel::GetStagger() const
+{
+	return m_eStagger;
+}
+
+glm::ivec2 TileMapModel::GetTileSize() const
+{
+	return m_vTileSize;
+}
+
 const Tiled::TileLayer &TileMapModel::GetTiledTileLayer() const
 {
 	return m_TiledLayer;
@@ -88,6 +108,16 @@ QList<AtlasTileSet *> TileMapModel::UsedTilesets(const AtlasManager &atlasManage
 	}
 
 	return returnList;
+}
+
+HyShader *TileMapModel::GetSquareShader()
+{
+	return m_ProjectRef.GetProjDraw()->GetTileMapSquareShader();
+}
+
+HyShader *TileMapModel::GetHexShader()
+{
+	return m_ProjectRef.GetProjDraw()->GetTileMapHexShader();
 }
 
 void TileMapModel::SetCell(int iX, int iY, AtlasTileSet *pTileSet, int iTileId)

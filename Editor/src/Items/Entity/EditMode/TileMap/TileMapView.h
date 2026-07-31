@@ -12,9 +12,14 @@
 
 #include "Global.h"
 #include "IEditModeView.h"
+#include "TileMapGrid.h"
+
+#include "vendor/libtiled/map.h"
 
 class TileMapView : public IEditModeView
 {
+	TileMapGrid *			m_pMouseHoverGrid;
+
 public:
 	TileMapView(HyEntity2d *pParent = nullptr);
 	virtual ~TileMapView();

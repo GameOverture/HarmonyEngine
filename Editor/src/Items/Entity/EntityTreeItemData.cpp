@@ -417,7 +417,8 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_TileMap: {
-		m_pEditModel = new TileMapModel(m_EntityModelRef.GetItem().GetUndoStack());
+		m_pEditModel = new TileMapModel(m_EntityModelRef.GetItem().GetProject(),
+										m_EntityModelRef.GetItem().GetUndoStack());
 
 		m_pPropertiesModel->InsertCategory(0, "Tile Map", QVariant(), false, "A Tile Map layer using tiles from a Tile Set on a grid");
 		QVariant tileMapDataVariant;

@@ -45,6 +45,10 @@ class ProjectDraw : public HyEntity2d
 	OverGrid			m_OverGrid;
 	HyShader *			m_pOverGridShader;
 
+	// Misc shaders (used elsewhere than ProjectDraw)
+	HyShader *			m_pTileMapSquareShader;
+	HyShader *			m_pTileMapHexShader;
+
 public:
 	ProjectDraw();
 	virtual ~ProjectDraw();
@@ -55,6 +59,9 @@ public:
 	
 	void OnResizeRenderer();
 	void OnCameraUpdated();
+
+	HyShader *GetTileMapSquareShader();
+	HyShader *GetTileMapHexShader();
 };
 
 #endif // PROJECTDRAW_H

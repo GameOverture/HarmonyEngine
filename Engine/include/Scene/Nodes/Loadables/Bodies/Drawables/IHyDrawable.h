@@ -43,7 +43,7 @@ public:
 protected:
 	virtual bool IsValidToRender() = 0;
 	
-	virtual void OnUpdateUniforms(float fExtrapolatePercent) { } // Invoked before AppendRenderState(), last chance to update ShaderUniforms. HyPrimitives need this or they glitch out upon new texture loads
+	virtual void OnUpdateUniforms(float fExtrapolatePercent) { } // Invoked before AppendRenderState(), last chance to update ShaderUniforms for the frame. HyPrimitives need this or they glitch out upon new texture loads
 
 	// Prepares the render stage for the next WriteVertexData. Also returns the required render state information for this stage.
 	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, HyBlendMode &eBlendModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) = 0;

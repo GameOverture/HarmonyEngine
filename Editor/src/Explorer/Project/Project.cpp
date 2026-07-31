@@ -768,6 +768,11 @@ void Project::OnCameraUpdated()
 		m_pDraw->OnCameraUpdated();
 }
 
+ProjectDraw *Project::GetProjDraw()
+{
+	return m_pDraw;
+}
+
 void Project::SetRenderSize(int iWidth, int iHeight)
 {
 	if(m_pTabBar && m_pTabBar->count() != 0)
