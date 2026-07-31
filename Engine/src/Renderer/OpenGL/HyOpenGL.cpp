@@ -393,35 +393,35 @@ HyOpenGL::~HyOpenGL(void)
 		{
 		case HYSHADERPROG_QuadBatch:
 			pShader->SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
-			pShader->AddVertexAttribute("attr_vSize", HyShaderVariable::vec2, false, 1);
-			pShader->AddVertexAttribute("attr_vOffset", HyShaderVariable::vec2, false, 1);
-			pShader->AddVertexAttribute("attr_vTopTint", HyShaderVariable::vec4, false, 1);
-			pShader->AddVertexAttribute("attr_vBotTint", HyShaderVariable::vec4, false, 1);
-			pShader->AddVertexAttribute("attr_vUVcoord0", HyShaderVariable::vec2, false, 1);
-			pShader->AddVertexAttribute("attr_vUVcoord1", HyShaderVariable::vec2, false, 1);
-			pShader->AddVertexAttribute("attr_vUVcoord2", HyShaderVariable::vec2, false, 1);
-			pShader->AddVertexAttribute("attr_vUVcoord3", HyShaderVariable::vec2, false, 1);
-			pShader->AddVertexAttribute("attr_mtxLocalToWorld", HyShaderVariable::mat4, false, 1);
+			pShader->AddVertexAttribute("attr_size", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_offset", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_top_tint", HyShaderVariable::vec4, false, 1);
+			pShader->AddVertexAttribute("attr_bot_tint", HyShaderVariable::vec4, false, 1);
+			pShader->AddVertexAttribute("attr_uv0", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_uv1", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_uv2", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_uv3", HyShaderVariable::vec2, false, 1);
+			pShader->AddVertexAttribute("attr_transform_mtx", HyShaderVariable::mat4, false, 1);
 			break;
 
 		case HYSHADERPROG_Primitive:
 			pShader->SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);
-			pShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
-			pShader->AddVertexAttribute("attr_vColor", HyShaderVariable::vec4);
+			pShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
+			pShader->AddVertexAttribute("attr_color", HyShaderVariable::vec4);
 			break;
 
 		case HYSHADERPROG_Spine:
 			pShader->SetSourceCode(szHYSPINE_VERTEXSHADER, HYSHADER_Vertex);
-			pShader->AddVertexAttribute("attr_Pos", HyShaderVariable::vec2, false, 0);
-			pShader->AddVertexAttribute("attr_TexCoord", HyShaderVariable::vec2, false, 0);
-			pShader->AddVertexAttribute("attr_LightColor", HyShaderVariable::color, true, 0);
-			//pShader->AddVertexAttribute("attr_DarkColor", HyShaderVariable::color, true, 0);
+			pShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2, false, 0);
+			pShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2, false, 0);
+			pShader->AddVertexAttribute("attr_light_color", HyShaderVariable::color, true, 0);
+			//pShader->AddVertexAttribute("attr_dark_color", HyShaderVariable::color, true, 0);
 			break;
 
 		case HYSHADERPROG_Lines2d:
 			pShader->SetSourceCode(szHYLINES2D_VERTEXSHADER, HYSHADER_Vertex);
-			pShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
-			pShader->AddVertexAttribute("attr_vNormal", HyShaderVariable::vec2);
+			pShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
+			pShader->AddVertexAttribute("attr_normal", HyShaderVariable::vec2);
 			break;
 
 		default:
@@ -1125,7 +1125,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Always attempt to assign these uniforms if the shader chooses to use them
-	GLint iUniLocation = glGetUniformLocation(hGlHandle, "u_mtxWorldToCamera");
+	GLint iUniLocation = glGetUniformLocation(hGlHandle, "u_view_mtx");
 	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glGetUniformLocation");
 	if(iUniLocation >= 0)
 	{
@@ -1133,7 +1133,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glUniformMatrix4fv");
 	}
 
-	iUniLocation = glGetUniformLocation(hGlHandle, "u_mtxCameraToClip");
+	iUniLocation = glGetUniformLocation(hGlHandle, "u_projection_mtx");
 	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glGetUniformLocation");
 	if(iUniLocation >= 0)
 	{

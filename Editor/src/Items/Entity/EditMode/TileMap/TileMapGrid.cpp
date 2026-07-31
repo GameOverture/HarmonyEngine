@@ -42,10 +42,10 @@ void TileMapGrid::Reset(HyTileMapLayout eLayout, float fWidth, float fHeight)
 {
 	glm::mat4 mtx = HyPrimitive2d::GetSceneTransform(fExtrapolatePercent);
 
-	m_ShaderUniforms.Set("u_mtxTransform", mtx);
-	m_ShaderUniforms.Set("uDimensions", m_vDimensions);
-	m_ShaderUniforms.Set("uWorldOrigin", pos.Get());
-	//m_ShaderUniforms.Set("uTileSize", glm::vec4(HyGlobal::GetEditorColor(EDITORCOLOR_GridColor1).GetAsVec4()));
+	m_ShaderUniforms.Set("u_transform_mtx", mtx);
+	m_ShaderUniforms.Set("u_dimensions", m_vDimensions);
+	m_ShaderUniforms.Set("u_world_origin", pos.Get());
+	//m_ShaderUniforms.Set("u_tile_size", glm::vec4(HyGlobal::GetEditorColor(EDITORCOLOR_GridColor1).GetAsVec4()));
 }
 
 /*virtual*/ bool TileMapGrid::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/

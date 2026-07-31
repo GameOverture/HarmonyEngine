@@ -15,44 +15,44 @@
 const char * const szCHECKERGRID_VERTEXSHADER = R"src(
 #version 140
 
-uniform mat4					u_mtxTransform;
-uniform mat4					u_mtxWorldToCamera;
-uniform mat4					u_mtxCameraToClip;
+uniform mat4					u_transform_mtx;
+uniform mat4					u_view_mtx;
+uniform mat4					u_projection_mtx;
 
-//layout(location = 0) in vec2	attr_vPosition;
-//layout(location = 1) in vec2	attr_vUVcoord;
+//layout(location = 0) in vec2	attr_pos;
+//layout(location = 1) in vec2	attr_uv;
 
-attribute vec2					attr_vPosition;
-attribute vec2					attr_vUVcoord;
+attribute vec2					attr_pos;
+attribute vec2					attr_uv;
 
-smooth out vec2					interp_vUV;
+smooth out vec2					interp_uv;
 
 void main()
 {
-	interp_vUV.x = attr_vUVcoord.x;
-	interp_vUV.y = attr_vUVcoord.y;
+	interp_uv.x = attr_uv.x;
+	interp_uv.y = attr_uv.y;
 
-	vec4 vTemp = u_mtxTransform * vec4(attr_vPosition, 0, 1);
-	vTemp = u_mtxWorldToCamera * vTemp;
-	gl_Position = u_mtxCameraToClip * vTemp;
+	vec4 pos = u_transform_mtx * vec4(attr_pos, 0, 1);
+	pos = u_view_mtx * pos;
+	gl_Position = u_projection_mtx * pos;
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char *const szCHECKERGRID_FRAGMENTSHADER = R"src(
 #version 140
 
-uniform float					u_fGridSize;
-uniform vec2					u_vDimensions;
-uniform vec4					u_vGridColor1;
-uniform vec4					u_vGridColor2;
+uniform float					u_grid_size;
+uniform vec2					u_dimensions;
+uniform vec4					u_grid_color1;
+uniform vec4					u_grid_color2;
 
-smooth in vec2					interp_vUV;
-out vec4						out_vColor;
+smooth in vec2					interp_uv;
+out vec4						out_color;
 
 void main()
 {
-	vec2 vScreenCoords = (interp_vUV * u_vDimensions) / u_fGridSize;
-	out_vColor = mix(u_vGridColor1, u_vGridColor2, step((float(int(floor(vScreenCoords.x) + floor(vScreenCoords.y)) & 1)), 0.9));
+	vec2 screen_coords = (interp_uv * u_dimensions) / u_grid_size;
+	out_color = mix(u_grid_color1, u_grid_color2, step((float(int(floor(screen_coords.x) + floor(screen_coords.y)) & 1)), 0.9));
 }
 )src";
 
@@ -60,55 +60,55 @@ void main()
 const char *const szOVERGRID_FRAGMENTSHADER = R"src(
 #version 140
 
-uniform float					u_fGridSize;
-uniform vec2					u_vDimensions;
-uniform vec4					u_vGridColor;
+uniform float					u_grid_size;
+uniform vec2					u_dimensions;
+uniform vec4					u_grid_color;
 
-smooth in vec2					interp_vUV;
-out vec4						out_vColor;
+smooth in vec2					interp_uv;
+out vec4						out_color;
 
 void main()
 {
-	vec2 vScreenCoords = (interp_vUV * u_vDimensions);
+	vec2 screen_coords = (interp_uv * u_dimensions);
 
-	int iWidth = int(vScreenCoords.x);
-	int iHeight = int(vScreenCoords.y);
-	int iGridSize = int(u_fGridSize);
+	int width = int(screen_coords.x);
+	int height = int(screen_coords.y);
+	int grid_size = int(u_grid_size);
 
-	if(iWidth % iGridSize == 0 || iHeight % iGridSize == 0)
-		out_vColor = u_vGridColor;
+	if(width % grid_size == 0 || height % grid_size == 0)
+		out_color = u_grid_color;
 	else
-		out_vColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+		out_color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char *const szTILEMAPGRIDSQUARE_FRAGMENTSHADER = R"src(
 #version 140
 
-uniform vec2					uDimensions;
-uniform vec2					uWorldOrigin;	// World-space origin of the grid
-//uniform vec2					uTileSize;		// Width and height
+uniform vec2					u_dimensions;
+uniform vec2					u_world_origin;	// World-space origin of the grid
+//uniform vec2					u_tile_size;	// Width and height
 
-smooth in vec2					interp_vUV;
-out vec4						oColor;
+smooth in vec2					interp_uv;
+out vec4						out_color;
 
 void main()
 {
-	vec2 uv = interp_vUV;
-	uv += uWorldOrigin;
-	oColor = vec4(uv.xy, uDimensions.x, 1.0);
+	vec2 uv = interp_uv;
+	uv += u_world_origin;
+	out_color = vec4(uv.xy, u_dimensions.x, 1.0);
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char *const szTILEMAPGRIDHEX_FRAGMENTSHADER = R"src(
 #version 140
 
-uniform vec2					uDimensions;
-uniform vec2					uWorldOrigin;	// World-space origin of the grid
-//uniform vec2					uTileSize;		// Width and height
+uniform vec2					u_dimensions;
+uniform vec2					u_world_origin;	// World-space origin of the grid
+//uniform vec2					u_tile_size;		// Width and height
 
-smooth in vec2					interp_vUV;
-out vec4						oColor;
+smooth in vec2					interp_uv;
+out vec4						out_color;
 
 const float x_shift = sin(1.0471975511965);
 
@@ -122,14 +122,14 @@ float hex(vec2 p)
 
 void main()
 {
-	vec2 uv = interp_vUV;
-	uv += uWorldOrigin;
+	vec2 uv = interp_uv;
+	uv += u_world_origin;
 	uv -= 0.5;
-	uv.x *= uDimensions.x / uDimensions.y;
+	uv.x *= u_dimensions.x / u_dimensions.y;
 	uv *= 5.0;
 	vec3 color = vec3(0.0, 0.0, 0.0);
 	color += vec3(hex(uv));
-	oColor = vec4(color, 1.0);
+	out_color = vec4(color, 1.0);
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
@@ -151,11 +151,11 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 {
 	glm::mat4 mtx = HyPrimitive2d::GetSceneTransform(fExtrapolatePercent);
 
-	m_ShaderUniforms.Set("u_mtxTransform", mtx);
-	m_ShaderUniforms.Set("u_fGridSize", m_fGridSize);
-	m_ShaderUniforms.Set("u_vDimensions", m_vDIMENSIONS);
-	m_ShaderUniforms.Set("u_vGridColor1", glm::vec4(HyGlobal::GetEditorColor(EDITORCOLOR_GridColor1).GetAsVec4()));
-	m_ShaderUniforms.Set("u_vGridColor2", glm::vec4(HyGlobal::GetEditorColor(EDITORCOLOR_GridColor2).GetAsVec4()));
+	m_ShaderUniforms.Set("u_transform_mtx", mtx);
+	m_ShaderUniforms.Set("u_grid_size", m_fGridSize);
+	m_ShaderUniforms.Set("u_dimensions", m_vDIMENSIONS);
+	m_ShaderUniforms.Set("u_grid_color1", glm::vec4(HyGlobal::GetEditorColor(EDITORCOLOR_GridColor1).GetAsVec4()));
+	m_ShaderUniforms.Set("u_grid_color2", glm::vec4(HyGlobal::GetEditorColor(EDITORCOLOR_GridColor2).GetAsVec4()));
 }
 
 /*virtual*/ bool CheckerGrid::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
@@ -212,10 +212,10 @@ OverGrid::OverGrid(float fWidth, float fHeight, float fGridSize) :
 {
 	glm::mat4 mtx = HyPrimitive2d::GetSceneTransform(fExtrapolatePercent);
 
-	m_ShaderUniforms.Set("u_mtxTransform", mtx);
-	m_ShaderUniforms.Set("u_fGridSize", m_fGridSize);
-	m_ShaderUniforms.Set("u_vDimensions", m_vDIMENSIONS);
-	m_ShaderUniforms.Set("u_vGridColor", glm::vec4(0.0f, 0.0f, 0.0f, 0.25f));
+	m_ShaderUniforms.Set("u_transform_mtx", mtx);
+	m_ShaderUniforms.Set("u_grid_size", m_fGridSize);
+	m_ShaderUniforms.Set("u_dimensions", m_vDIMENSIONS);
+	m_ShaderUniforms.Set("u_grid_color", glm::vec4(0.0f, 0.0f, 0.0f, 0.25f));
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -235,8 +235,8 @@ ProjectDraw::ProjectDraw() :
 
 	m_pCheckerGridShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
 	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
-	m_pCheckerGridShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
-	m_pCheckerGridShader->AddVertexAttribute("attr_vUVcoord", HyShaderVariable::vec2);
+	m_pCheckerGridShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
+	m_pCheckerGridShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
 	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
 	m_pCheckerGridShader->Finalize();
 
@@ -257,8 +257,8 @@ ProjectDraw::ProjectDraw() :
 
 	m_pOverGridShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
 	m_pOverGridShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
-	m_pOverGridShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
-	m_pOverGridShader->AddVertexAttribute("attr_vUVcoord", HyShaderVariable::vec2);
+	m_pOverGridShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
+	m_pOverGridShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
 	m_pOverGridShader->SetSourceCode(szOVERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
 	m_pOverGridShader->Finalize();
 
@@ -268,15 +268,15 @@ ProjectDraw::ProjectDraw() :
 	// Misc shaders
 	m_pTileMapSquareShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
 	m_pTileMapSquareShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
-	m_pTileMapSquareShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
-	m_pTileMapSquareShader->AddVertexAttribute("attr_vUVcoord", HyShaderVariable::vec2);
+	m_pTileMapSquareShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
+	m_pTileMapSquareShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
 	m_pTileMapSquareShader->SetSourceCode(szTILEMAPGRIDSQUARE_FRAGMENTSHADER, HYSHADER_Fragment);
 	m_pTileMapSquareShader->Finalize();
 
 	m_pTileMapHexShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
 	m_pTileMapHexShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
-	m_pTileMapHexShader->AddVertexAttribute("attr_vPosition", HyShaderVariable::vec2);
-	m_pTileMapHexShader->AddVertexAttribute("attr_vUVcoord", HyShaderVariable::vec2);
+	m_pTileMapHexShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
+	m_pTileMapHexShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
 	m_pTileMapHexShader->SetSourceCode(szTILEMAPGRIDHEX_FRAGMENTSHADER, HYSHADER_Fragment);
 	m_pTileMapHexShader->Finalize();
 }

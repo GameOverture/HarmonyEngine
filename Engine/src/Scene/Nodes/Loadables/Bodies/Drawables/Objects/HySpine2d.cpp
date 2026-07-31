@@ -282,7 +282,7 @@ void HySpine2d::SetAnimRate(float fPlayRate)
 /*virtual*/ void HySpine2d::OnUpdateUniforms(float fExtrapolatePercent) /*override*/
 {
 	glm::mat4 mtx = GetSceneTransform(fExtrapolatePercent);
-	m_ShaderUniforms.Set("u_mtxTransform", mtx);
+	m_ShaderUniforms.Set("u_transform_mtx", mtx);
 }
 
 /*virtual*/ bool HySpine2d::OnIsValidToRender() /*override*/

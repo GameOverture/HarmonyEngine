@@ -509,8 +509,8 @@ void HyPrimitive2d::RemoveAllLayers()
 	{
 		glm::mat4 mtx = GetSceneTransform(fExtrapolatePercent);
 
-		m_ShaderUniforms.Set("u_mtxTransform", mtx);
-		//m_ShaderUniforms.Set("u_vColor", vTop);
+		m_ShaderUniforms.Set("u_transform_mtx", mtx);
+		//m_ShaderUniforms.Set("u_color", vTop);
 
 		m_bUpdateShaderUniforms = false;
 	}
