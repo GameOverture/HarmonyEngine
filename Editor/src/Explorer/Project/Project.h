@@ -18,6 +18,8 @@
 #include "SurfaceMaterialsModel.h"
 #include "IMimeData.h"
 
+#include "vendor/libtiled/map.h"
+
 #include <QQueue>
 #include <QJsonObject>
 #include <QStandardItemModel>
@@ -82,6 +84,8 @@ class Project : public ExplorerItemData
 
 	uint32												m_uiSnappingSettings;	// Snapping
 
+	Tiled::Map::EditorSettings							m_TileMapSettings;		// Meta-data tile map storage configuration (runtime is optimized differently)
+
 	QMap<QUuid, TreeModelItemData *>					m_ItemDataUuidMap;		// Lookup map to help find tree item data pointers
 
 	QSet<IManagerModel *>								m_DirtyManagerSet;		// Dirty managers that need to SaveMeta() & SaveData() before a ReloadHarmony()
@@ -119,6 +123,8 @@ public:
 	QString GetBuildAbsPath() const;
 	QString GetBuildRelPath() const;
 	QString GetUserAbsPath() const;
+
+	Tiled::Map::EditorSettings GetTileMapSettings();
 
 	IManagerModel *GetManagerModel(AssetManagerType eManagerType);
 

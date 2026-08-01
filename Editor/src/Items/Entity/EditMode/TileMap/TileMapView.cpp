@@ -31,7 +31,7 @@ TileMapView::TileMapView(HyEntity2d *pParent /*= nullptr*/) :
 	{
 		if(m_pMouseHoverGrid == nullptr)
 		{
-			m_pMouseHoverGrid = new TileMapGrid(pModel->GetLayout(), fMouseHoverGridWidth, fMouseHoverGridHeight);
+			m_pMouseHoverGrid = new TileMapGrid(pModel->GetLayout(), glm::vec2(pModel->GetTileSize()), glm::vec2(fMouseHoverGridWidth, fMouseHoverGridHeight));
 
 			if(pModel->GetLayout() == HYTILEMAPLAYOUT_HexagonFlatTop || pModel->GetLayout() == HYTILEMAPLAYOUT_HexagonPointTop)
 				m_pMouseHoverGrid->SetShader(pModel->GetHexShader());
@@ -39,6 +39,6 @@ TileMapView::TileMapView(HyEntity2d *pParent /*= nullptr*/) :
 				m_pMouseHoverGrid->SetShader(pModel->GetSquareShader());
 		}
 		else
-			m_pMouseHoverGrid->Reset(pModel->GetLayout(), fMouseHoverGridWidth, fMouseHoverGridHeight);
+			m_pMouseHoverGrid->Reset(pModel->GetLayout(), glm::vec2(pModel->GetTileSize()), glm::vec2(fMouseHoverGridWidth, fMouseHoverGridHeight));
 	}
 }

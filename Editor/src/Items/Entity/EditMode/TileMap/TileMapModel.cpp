@@ -32,6 +32,8 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack) :
 
 /*virtual*/ void TileMapModel::Deserialize(bool bEnabled, const QJsonObject &serializedObj) /*override*/
 {
+	int i =0;
+	++i;
 }
 
 /*virtual*/ Qt::CursorShape TileMapModel::MouseMoveIdle() /*override*/

@@ -13,9 +13,10 @@
 const float g_fGridWidth = 500.0f;
 const glm::vec2		m_vDIMENSIONS;
 
-TileMapGrid::TileMapGrid(HyTileMapLayout eLayout, float fWidth, float fHeight) :
+TileMapGrid::TileMapGrid(HyTileMapLayout eLayout, glm::vec2 vTileSize, glm::vec2 vGridSize) :
 	m_eLayout(eLayout),
-	m_vDimensions(fWidth, fHeight)
+	m_vTileSize(vTileSize),
+	m_vDimensions(vGridSize)
 {
 	SetAsBox(0, m_vDimensions.x, m_vDimensions.y, 0.0f);
 	
@@ -30,10 +31,11 @@ HyTileMapLayout TileMapGrid::GetLayout() const
 	return m_eLayout;
 }
 
-void TileMapGrid::Reset(HyTileMapLayout eLayout, float fWidth, float fHeight)
+void TileMapGrid::Reset(HyTileMapLayout eLayout, glm::vec2 vTileSize, glm::vec2 vGridSize)
 {
 	m_eLayout = eLayout;
-	m_vDimensions = { fWidth, fHeight };
+	m_vTileSize = vTileSize;
+	m_vDimensions = vGridSize;
 
 	SetAsBox(0, m_vDimensions.x, m_vDimensions.y, 0.0f);
 }
@@ -45,7 +47,7 @@ void TileMapGrid::Reset(HyTileMapLayout eLayout, float fWidth, float fHeight)
 	m_ShaderUniforms.Set("u_transform_mtx", mtx);
 	m_ShaderUniforms.Set("u_dimensions", m_vDimensions);
 	m_ShaderUniforms.Set("u_world_origin", pos.Get());
-	//m_ShaderUniforms.Set("u_tile_size", glm::vec4(HyGlobal::GetEditorColor(EDITORCOLOR_GridColor1).GetAsVec4()));
+	m_ShaderUniforms.Set("u_tile_size", m_vTileSize);
 }
 
 /*virtual*/ bool TileMapGrid::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/

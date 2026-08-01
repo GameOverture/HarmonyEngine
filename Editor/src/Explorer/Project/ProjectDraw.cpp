@@ -87,16 +87,24 @@ const char *const szTILEMAPGRIDSQUARE_FRAGMENTSHADER = R"src(
 
 uniform vec2					u_dimensions;
 uniform vec2					u_world_origin;	// World-space origin of the grid
-//uniform vec2					u_tile_size;	// Width and height
+uniform vec2					u_tile_size;	// Width and height
 
 smooth in vec2					interp_uv;
 out vec4						out_color;
 
 void main()
 {
-	vec2 uv = interp_uv;
-	uv += u_world_origin;
-	out_color = vec4(uv.xy, u_dimensions.x, 1.0);
+	vec2 screen_coords = (interp_uv * u_dimensions);
+
+	int width = int(screen_coords.x + u_world_origin.x);
+	int height = int(screen_coords.y + u_world_origin.y);
+	int tile_size_width = int(u_tile_size.x);
+	int tile_size_height = int(u_tile_size.y);
+
+	if(width % tile_size_width == 0 || height % tile_size_height == 0)
+		out_color = vec4(0.9804, 0.3529, 0.0392, 1.0);
+	else
+		out_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
@@ -105,7 +113,7 @@ const char *const szTILEMAPGRIDHEX_FRAGMENTSHADER = R"src(
 
 uniform vec2					u_dimensions;
 uniform vec2					u_world_origin;	// World-space origin of the grid
-//uniform vec2					u_tile_size;		// Width and height
+//uniform vec2					u_tile_size;	// Width and height
 
 smooth in vec2					interp_uv;
 out vec4						out_color;

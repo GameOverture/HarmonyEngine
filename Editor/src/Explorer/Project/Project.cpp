@@ -164,7 +164,6 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	m_pAudioManager->Init();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	QStringList sFilterList(HYMETA_FontFilterList);
 	QMap<QString,QString> fontsMap;
 
@@ -187,8 +186,11 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	}
 
 	ScanMetaFontDir();
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	m_TileMapSettings.compressionLevel = -1;
+	m_TileMapSettings.chunkSize = QSize(Tiled::CHUNK_SIZE, Tiled::CHUNK_SIZE);
+	m_TileMapSettings.layerDataFormat = Tiled::Map::Base64Zlib;
 
 	QObject::connect(&m_OpenFileWatcher, SIGNAL(fileChanged(const QString &)), this, SLOT(OnFileChanged(const QString &)));
 
@@ -523,6 +525,11 @@ QString Project::GetUserAbsPath() const
 	QFileInfo projFileInfo(GetAbsPath());
 	
 	return settingsDir.absoluteFilePath(GetName(false) % HYGUIPATH_UserExt);
+}
+
+Tiled::Map::EditorSettings Project::GetTileMapSettings()
+{
+	return m_TileMapSettings;
 }
 
 IManagerModel *Project::GetManagerModel(AssetManagerType eManagerType)

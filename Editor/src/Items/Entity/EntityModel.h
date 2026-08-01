@@ -67,9 +67,6 @@ class EntityModel : public IModel
 
 	QList<QString *>										m_CallbacksList;	// All callbacks (aka QString) is referenced from this list. 'EntityDopeSheetScene' will create and modify its state's callbacks using this list.
 
-	Tiled::Map::Parameters									m_TiledMapParameters;
-	Tiled::Map::EditorSettings								m_TiledMapEditorSettings;
-
 public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
@@ -132,6 +129,7 @@ public:
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
 	virtual void OnItemDeleted() override;
 
+	void MakeTiledMapParameters(Tiled::Map::Parameters &tiledMapParamsOut) const;
 	std::unique_ptr<Tiled::Map> ExportToTiledMap() const;
 };
 
