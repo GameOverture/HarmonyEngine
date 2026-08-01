@@ -16,6 +16,7 @@
 #include "TileMapView.h"
 #include "VectorView.h"
 #include "VectorModel.h"
+#include "TileMapModel.h"
 
 EntityDrawItem::EntityDrawItem(EntityTreeItemData *pEntityTreeItemData, EntityDraw *pEntityDraw, HyEntity2d *pParent) :
 	IDrawExItem(pEntityDraw),
@@ -984,8 +985,27 @@ void ExtrapolateProperties(Project &projectRef,
 		{
 		case ITEM_None:		// 'ITEM_None' is passed for the main entity root node
 		case ITEM_Entity:	// 'ITEM_Entity' is passed when this is a sub-entity (NOTE: sub-entity timeline events are handled above)
+			break;
+
 		case ITEM_TileMap:
-			// TILETODO: Do we deserialize the entire map?
+			if(propsObj.contains("Tile Map"))
+			{
+				QJsonObject tileMapObj = propsObj["Tile Map"].toObject();
+				if(tileMapObj.contains("Data"))
+					pEditModel->Deserialize(bIsActiveEditModeItem, tileMapObj["Data"].toObject());
+				if(tileMapObj.contains("Grid Size"))
+				{
+					QJsonArray gridSizeArray = tileMapObj["Grid Size"].toArray();
+					if(gridSizeArray.size() == 2)
+						static_cast<TileMapModel *>(pEditModel)->SetGridSize(glm::ivec2(gridSizeArray[0].toInt(), gridSizeArray[1].toInt()));
+				}
+				if(tileMapObj.contains("Layout"))
+					static_cast<TileMapModel *>(pEditModel)->SetLayout(HyGlobal::GetTileMapLayoutFromString(tileMapObj["Layout"].toString()));
+				if(tileMapObj.contains("Stagger Index"))
+					static_cast<TileMapModel *>(pEditModel)->SetStaggerIndex(HyGlobal::GetTileMapStaggerFromString(tileMapObj["Stagger Index"].toString()));
+			}
+			break;
+
 		case ITEM_PrimNode:
 			break;
 

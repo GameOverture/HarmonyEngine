@@ -16,8 +16,8 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack) :
 	IEditModeModel(EDITMODETYPE_TileMap),
 	m_ProjectRef(projectRef),
 	m_eLayout(HYTILEMAPLAYOUT_Unknown),
-	m_eStagger(HYTILEMAPSTAGGER_Odd),
-	m_vTileSize(0.0f, 0.0f)
+	m_eStaggerIndex(HYTILEMAPSTAGGER_Odd),
+	m_vGridSize(32.0f, 32.0f)
 {
 }
 
@@ -38,6 +38,7 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack) :
 
 /*virtual*/ Qt::CursorShape TileMapModel::MouseMoveIdle() /*override*/
 {
+	SyncViews(EDITMODE_Idle);
 	return Qt::ArrowCursor;
 }
 
@@ -75,19 +76,34 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack) :
 {
 }
 
+glm::ivec2 TileMapModel::GetGridSize() const
+{
+	return m_vGridSize;
+}
+
+void TileMapModel::SetGridSize(glm::ivec2 vGridSize)
+{
+	m_vGridSize = vGridSize;
+}
+
 HyTileMapLayout TileMapModel::GetLayout() const
 {
 	return m_eLayout;
 }
 
-HyTileMapStagger TileMapModel::GetStagger() const
+void TileMapModel::SetLayout(HyTileMapLayout eLayout)
 {
-	return m_eStagger;
+	m_eLayout = eLayout;
 }
 
-glm::ivec2 TileMapModel::GetTileSize() const
+HyTileMapStagger TileMapModel::GetStaggerIndex() const
 {
-	return m_vTileSize;
+	return m_eStaggerIndex;
+}
+
+void TileMapModel::SetStaggerIndex(HyTileMapStagger eStaggerIndex)
+{
+	m_eStaggerIndex = eStaggerIndex;
 }
 
 const Tiled::TileLayer &TileMapModel::GetTiledTileLayer() const

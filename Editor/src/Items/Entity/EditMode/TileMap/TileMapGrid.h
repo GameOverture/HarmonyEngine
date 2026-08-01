@@ -15,17 +15,19 @@
 class TileMapGrid : public HyPrimitive2d
 {
 protected:
-	HyTileMapLayout		m_eLayout;
-	glm::vec2			m_vTileSize;
+	glm::mat4			m_InverseTileMapLayerTransform;
+
 	glm::vec2			m_vDimensions;
+
+	glm::vec2			m_vGridSize;
+	HyTileMapLayout		m_eLayout;
+	HyTileMapStagger	m_eStagger;
 	
 public:
-	TileMapGrid(HyTileMapLayout eLayout, glm::vec2 vTileSize, glm::vec2 vGridSize);
+	TileMapGrid(HyEntity2d *pParent = nullptr);
 	virtual ~TileMapGrid();
 
-	HyTileMapLayout GetLayout() const;
-
-	void Reset(HyTileMapLayout eLayout, glm::vec2 vTileSize, glm::vec2 vGridSize);
+	void Reset(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimensions, glm::vec2 vGridSize, HyTileMapLayout eLayout, HyTileMapStagger eStagger);
 
 	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;

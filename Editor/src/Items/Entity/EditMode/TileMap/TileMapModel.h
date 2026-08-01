@@ -23,9 +23,9 @@ class TileMapModel : public IEditModeModel
 {
 	Project &					m_ProjectRef;
 
+	glm::ivec2					m_vGridSize;
 	HyTileMapLayout				m_eLayout;
-	HyTileMapStagger			m_eStagger;
-	glm::ivec2					m_vTileSize;
+	HyTileMapStagger			m_eStaggerIndex;
 
 	Tiled::TileLayer			m_TiledLayer;
 
@@ -48,9 +48,15 @@ public:
 	virtual QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
 	virtual void ClearAction() override;
 
+	glm::ivec2 GetGridSize() const;
+	void SetGridSize(glm::ivec2 vGridSize);
+
 	HyTileMapLayout GetLayout() const;
-	HyTileMapStagger GetStagger() const;
-	glm::ivec2 GetTileSize() const;
+	void SetLayout(HyTileMapLayout eLayout);
+
+	HyTileMapStagger GetStaggerIndex() const;
+	void SetStaggerIndex(HyTileMapStagger eStagger);
+
 	const Tiled::TileLayer &GetTiledTileLayer() const;
 	QList<AtlasTileSet *> UsedTilesets(const AtlasManager &atlasManagerRef) const;
 

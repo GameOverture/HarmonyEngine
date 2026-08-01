@@ -85,26 +85,55 @@ void main()
 const char *const szTILEMAPGRIDSQUARE_FRAGMENTSHADER = R"src(
 #version 140
 
-uniform vec2					u_dimensions;
-uniform vec2					u_world_origin;	// World-space origin of the grid
-uniform vec2					u_tile_size;	// Width and height
+uniform mat4					u_inv_tilemap;		// World to local space transform matrix of the TileMapLayer
+uniform vec2					u_position;
+uniform vec2					u_dimensions;		// Width and height of entire render quad
+uniform vec2					u_grid_size;		// Width and height of the tiles in the grid
+uniform vec3					u_grid_color;
+uniform vec4					u_hover_color;
+uniform float					u_line_width;		// Grid line width in world units
 
 smooth in vec2					interp_uv;
 out vec4						out_color;
 
 void main()
 {
-	vec2 screen_coords = (interp_uv * u_dimensions);
+	// Compute this fragment's world-space position.
+	vec2 quad_offset = (interp_uv - vec2(0.5)) * u_dimensions;
+	quad_offset.y *= -1.0; // Harmony world up is positive Y, but UV's are the opposite
 
-	int width = int(screen_coords.x + u_world_origin.x);
-	int height = int(screen_coords.y + u_world_origin.y);
-	int tile_size_width = int(u_tile_size.x);
-	int tile_size_height = int(u_tile_size.y);
+	vec2 world_pos = u_position + quad_offset;
+	
+	// Convert both the fragment position and the mouse position into the TileMapLayer's local coordinate system.
+	vec2 local_pos = (u_inv_tilemap * vec4(world_pos, 0.0, 1.0)).xy;
+	
+	vec2 mouse_local = (u_inv_tilemap * vec4(u_position, 0.0, 1.0)).xy;
+	
+	// Determine which tile each belongs to.
+	vec2 cell = floor(local_pos / u_grid_size);
+	vec2 mouse_cell = floor(mouse_local / u_grid_size);
+	
+	bool hovered = all(equal(cell, mouse_cell));
+	
+	// Position within the current cell.
+	vec2 cell_frac = fract(local_pos / u_grid_size);
+	
+	// Distance to the nearest grid edge.
+	vec2 dist = min(cell_frac, 1.0 - cell_frac) * u_grid_size;
+	
+	float grid = max(
+		step(dist.x, u_line_width),
+		step(dist.y, u_line_width));
+	
+	vec4 color = vec4(0.0);
+	
+	if (grid > 0.0)
+		color = vec4(u_grid_color, 1.0);
+	
+	if (hovered)
+		color = mix(color, u_hover_color, u_hover_color.a);
 
-	if(width % tile_size_width == 0 || height % tile_size_height == 0)
-		out_color = vec4(0.9804, 0.3529, 0.0392, 1.0);
-	else
-		out_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	out_color = color;
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------

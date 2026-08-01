@@ -18,7 +18,7 @@
 
 class TileMapView : public IEditModeView
 {
-	TileMapGrid *			m_pMouseHoverGrid;
+	TileMapGrid			m_MouseHoverGrid;
 
 public:
 	TileMapView(HyEntity2d *pParent = nullptr);

@@ -19,6 +19,7 @@
 /*static*/ QString HyGlobal::sm_AssetNames[NUM_ASSETMANTYPES];
 /*static*/ QString HyGlobal::sm_TileSetShapeNames[NUM_TILESETSHAPES];
 /*static*/ QString HyGlobal::sm_TileMapLayouts[HYNUM_TILEMAPLAYOUTS];
+/*static*/ QString HyGlobal::sm_TileMapStaggers[HYNUM_TILEMAPSTAGGERS];
 /*static*/ QString HyGlobal::sm_ShapeNames[NUM_SHAPES];
 /*static*/ QString HyGlobal::sm_TweenFuncNames[NUM_TWEENFUNCS];
 /*static*/ QString HyGlobal::sm_TweenPropNames[NUM_TWEENPROPS];
@@ -138,6 +139,9 @@
 	sm_TileMapLayouts[HYTILEMAPLAYOUT_HexagonPointTop] = "Hexagon Point-Top";
 	sm_TileMapLayouts[HYTILEMAPLAYOUT_HexagonFlatTop] = "Hexagon Flat-Top";
 
+	sm_TileMapStaggers[HYTILEMAPSTAGGER_Odd] = "Odd";
+	sm_TileMapStaggers[HYTILEMAPSTAGGER_Even] = "Even";
+
 	sm_ShapeNames[SHAPE_None] = "None";
 	sm_ShapeNames[SHAPE_Box] = "Box";
 	sm_ShapeNames[SHAPE_Circle] = "Circle";
@@ -246,6 +250,8 @@
 	sm_EditorColors[EDITORCOLOR_TransformGrabPointFill] = HyColor::Blue.Lighten();
 	sm_EditorColors[EDITORCOLOR_TransformRotateGrabPointOutline] = HyColor::Blue.Lighten();
 	sm_EditorColors[EDITORCOLOR_TransformRotateGrabPointFill] = HyColor::White;
+	sm_EditorColors[EDITORCOLOR_TileMapGrid] = HyColor::Orange;
+	sm_EditorColors[EDITORCOLOR_TileMapHighlight] = HyColor::Blue.Lighten();
 	sm_EditorColors[EDITORCOLOR_Widgets] = HyColor(0x8eef97);	// Pale green that matches the icon set (same color as Godot's control nodes)
 	sm_EditorColors[EDITORCOLOR_Fixtures] = HyColor(0x28b2ff);	// A light blue that matches the icon set
 	sm_EditorColors[EDITORCOLOR_EditMode] = HyColor(0xfc7f7f);	// Pale red
@@ -678,6 +684,26 @@
 	}
 
 	return HYTILEMAPLAYOUT_Unknown;
+}
+
+/*static*/ QStringList HyGlobal::GetTileMapStaggerNameList()
+{
+	QStringList list;
+	for(int i = 0; i < HYNUM_TILEMAPSTAGGERS; ++i)
+		list.append(sm_TileMapStaggers[i]);
+	
+	return list;
+}
+
+/*static*/ HyTileMapStagger HyGlobal::GetTileMapStaggerFromString(QString sTileMapStagger)
+{
+	for(int i = 0; i < HYNUM_TILEMAPSTAGGERS; ++i)
+	{
+		if(sTileMapStagger.compare(sm_TileMapStaggers[i], Qt::CaseInsensitive) == 0)
+			return static_cast<HyTileMapStagger>(i);
+	}
+
+	return HYTILEMAPSTAGGER_Unknown;
 }
 
 /*static*/ QStringList HyGlobal::GetAlignmentNameList()

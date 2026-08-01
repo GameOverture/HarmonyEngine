@@ -203,8 +203,12 @@ enum HyTileMapLayout
 // Only used with HYTILEMAPLAYOUT_IsometricStagger* and HYTILEMAPLAYOUT_Hexagon*
 enum HyTileMapStagger
 {
+	HYTILEMAPSTAGGER_Unknown = -1,
+
 	HYTILEMAPSTAGGER_Odd = 0,
-	HYTILEMAPSTAGGER_Even
+	HYTILEMAPSTAGGER_Even,
+
+	HYNUM_TILEMAPSTAGGERS
 };
 
 enum HyPlaylistMode

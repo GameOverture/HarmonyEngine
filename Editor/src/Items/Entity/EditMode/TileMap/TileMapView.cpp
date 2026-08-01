@@ -13,7 +13,7 @@
 
 TileMapView::TileMapView(HyEntity2d *pParent /*= nullptr*/) :
 	IEditModeView(pParent),
-	m_pMouseHoverGrid(nullptr)
+	m_MouseHoverGrid(nullptr)
 {
 }
 
@@ -23,22 +23,29 @@ TileMapView::TileMapView(HyEntity2d *pParent /*= nullptr*/) :
 
 /*virtual*/ void TileMapView::SyncWithModel(EditModeState eEditModeState) /*override*/
 {
+	if(eEditModeState == EDITMODE_Off)
+	{
+		m_MouseHoverGrid.SetVisible(false);
+		return;
+	}
+
 	TileMapModel *pModel = static_cast<TileMapModel *>(GetModel());
 
-	const float fMouseHoverGridWidth = 500.0f;
-	const float fMouseHoverGridHeight = 500.0f;
-	if(m_pMouseHoverGrid == nullptr || pModel->GetLayout() != m_pMouseHoverGrid->GetLayout())
-	{
-		if(m_pMouseHoverGrid == nullptr)
-		{
-			m_pMouseHoverGrid = new TileMapGrid(pModel->GetLayout(), glm::vec2(pModel->GetTileSize()), glm::vec2(fMouseHoverGridWidth, fMouseHoverGridHeight));
+	const glm::vec2 vQuadDimensions(250.0f, 250.0f);
+	m_MouseHoverGrid.Reset(glm::inverse(GetSceneTransform(0.0f)),
+							vQuadDimensions,
+							pModel->GetGridSize(),
+							pModel->GetLayout(),
+							pModel->GetStaggerIndex());
 
-			if(pModel->GetLayout() == HYTILEMAPLAYOUT_HexagonFlatTop || pModel->GetLayout() == HYTILEMAPLAYOUT_HexagonPointTop)
-				m_pMouseHoverGrid->SetShader(pModel->GetHexShader());
-			else
-				m_pMouseHoverGrid->SetShader(pModel->GetSquareShader());
-		}
-		else
-			m_pMouseHoverGrid->Reset(pModel->GetLayout(), glm::vec2(pModel->GetTileSize()), glm::vec2(fMouseHoverGridWidth, fMouseHoverGridHeight));
-	}
+	if(pModel->GetLayout() == HYTILEMAPLAYOUT_HexagonFlatTop || pModel->GetLayout() == HYTILEMAPLAYOUT_HexagonPointTop)
+		m_MouseHoverGrid.SetShader(pModel->GetHexShader());
+	else
+		m_MouseHoverGrid.SetShader(pModel->GetSquareShader());
+
+	glm::vec2 ptWorldMousePos;
+	if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
+		m_MouseHoverGrid.pos.Set(ptWorldMousePos);
+
+	m_MouseHoverGrid.SetVisible(true);
 }
