@@ -206,7 +206,7 @@ void main()
 }
 )src";
 
-const char *const szTILEMAPGRIDHEX_FRAGMENTSHADER = R"src(
+const char *const szTILEMAPGRIDHEXFLATTOP_FRAGMENTSHADER = R"src(
 #version 140
 
 uniform mat4					u_inv_tilemap;	// World to local space transform matrix of the infinite TileMapLayer grid
@@ -243,6 +243,57 @@ void main()
 
 	float line = u_line_width / min(u_grid_size.x, u_grid_size.y);
 	float edge = abs(1.0 - max(local_pos.x * 1.5 + local_pos.y, local_pos.y * 2.0));
+
+	// IF NO ANTI-ALIASING USE THIS
+	//float d = 1.0 - step(line, edge);
+	//vec3 color = vec3(d);
+	//color *= u_grid_color;
+	//out_color = vec4(color, d);
+
+	// IF ANTI-ALIASING USE THIS (also mixes in black outline)
+	float gridAlpha = smoothstep(line, 0.0, edge);
+	vec3 finalColor = mix(vec3(0.0), u_grid_color, gridAlpha);
+	out_color = vec4(finalColor, gridAlpha);
+}
+)src";
+
+const char *const szTILEMAPGRIDHEXPOINTTOP_FRAGMENTSHADER = R"src(
+#version 140
+
+uniform mat4					u_inv_tilemap;	// World to local space transform matrix of the infinite TileMapLayer grid
+uniform vec2					u_position;		// Centered position of the quad viewport in world space
+uniform vec2					u_dimensions;	// Width and height of entire render quad
+uniform vec2					u_grid_size;	// Width and height of the tiles in the grid
+uniform vec3					u_grid_color;	// Color of the grid lines
+uniform float					u_line_width;	// Grid line width in world units
+
+smooth in vec2					interp_uv;
+out vec4						out_color;
+
+const float x_shift = 0.8660254038; // AKA sin(3.1415926535 / 3.0)
+
+void main()
+{
+	// Compute this fragment's world-space position.
+	vec2 quad_offset = (interp_uv - vec2(0.5)) * u_dimensions;
+	quad_offset.y *= -1.0; // Harmony world up is positive Y, but UV's are the opposite
+	vec2 world_pos = u_position + quad_offset;
+
+	// Convert the fragment position into the TileMapLayer's local coordinate system.
+	vec2 local_pos = (u_inv_tilemap * vec4(world_pos, 0.0, 1.0)).xy;
+
+	// Offset grid so the sample rectangle (corner) of a hex tile lies on the origin.
+	local_pos.x -= u_grid_size.x * 0.5;
+	local_pos.y -= u_grid_size.y * x_shift;
+	
+	// Hexagonal grid math
+	vec2 cell = vec2(u_grid_size.x, u_grid_size.y * 0.75);
+	local_pos /= cell;
+	local_pos.x += floor(local_pos.y) * 0.5;
+	local_pos = abs(fract(local_pos) - 0.5);
+
+	float line = u_line_width / min(u_grid_size.x, u_grid_size.y);
+	float edge = abs(1.0 - max(local_pos.y * 1.5 + local_pos.x, local_pos.x * 2.0));
 
 	// IF NO ANTI-ALIASING USE THIS
 	//float d = 1.0 - step(line, edge);
@@ -355,7 +406,8 @@ ProjectDraw::ProjectDraw() :
 	m_pTileMapSquareShader(nullptr),
 	m_pTileMapHalfSquareShader(nullptr),
 	m_pTileMapIsometricShader(nullptr),
-	m_pTileMapHexShader(nullptr)
+	m_pTileMapHexFlatTopShader(nullptr),
+	m_pTileMapHexPointTopShader(nullptr)
 {
 	ChildAppend(m_CheckerGrid);
 
@@ -413,12 +465,19 @@ ProjectDraw::ProjectDraw() :
 	m_pTileMapIsometricShader->SetSourceCodePtrs({szTILEMAPGRIDSISOMETRIC_FRAGMENTSHADER}, HYSHADER_Fragment);
 	m_pTileMapIsometricShader->Finalize();
 
-	m_pTileMapHexShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
-	m_pTileMapHexShader->SetSourceCodePtrs({szCHECKERGRID_VERTEXSHADER}, HYSHADER_Vertex);
-	m_pTileMapHexShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
-	m_pTileMapHexShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
-	m_pTileMapHexShader->SetSourceCodePtrs({szTILEMAPGRIDHEX_FRAGMENTSHADER}, HYSHADER_Fragment);
-	m_pTileMapHexShader->Finalize();
+	m_pTileMapHexFlatTopShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
+	m_pTileMapHexFlatTopShader->SetSourceCodePtrs({szCHECKERGRID_VERTEXSHADER}, HYSHADER_Vertex);
+	m_pTileMapHexFlatTopShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
+	m_pTileMapHexFlatTopShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
+	m_pTileMapHexFlatTopShader->SetSourceCodePtrs({szTILEMAPGRIDHEXFLATTOP_FRAGMENTSHADER}, HYSHADER_Fragment);
+	m_pTileMapHexFlatTopShader->Finalize();
+
+	m_pTileMapHexPointTopShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
+	m_pTileMapHexPointTopShader->SetSourceCodePtrs({szCHECKERGRID_VERTEXSHADER}, HYSHADER_Vertex);
+	m_pTileMapHexPointTopShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
+	m_pTileMapHexPointTopShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
+	m_pTileMapHexPointTopShader->SetSourceCodePtrs({szTILEMAPGRIDHEXPOINTTOP_FRAGMENTSHADER}, HYSHADER_Fragment);
+	m_pTileMapHexPointTopShader->Finalize();
 }
 
 /*virtual*/ ProjectDraw::~ProjectDraw()
@@ -478,8 +537,10 @@ HyShader *ProjectDraw::GetTileMapGridShader(HyTileMapLayout eLayout) const
 		return m_pTileMapIsometricShader;
 
 	case HYTILEMAPLAYOUT_HexagonFlatTop:
+		return m_pTileMapHexFlatTopShader;
+
 	case HYTILEMAPLAYOUT_HexagonPointTop:
-		return m_pTileMapHexShader;
+		return m_pTileMapHexPointTopShader;
 
 	default:
 		HyGuiLog("ProjectDraw::GetTileMapGridShader() - Unknown tilemap layout type: " + QString::number(eLayout), LOGTYPE_Error);

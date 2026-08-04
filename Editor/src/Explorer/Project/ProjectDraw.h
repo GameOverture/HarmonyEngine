@@ -49,7 +49,8 @@ class ProjectDraw : public HyEntity2d
 	HyShader *			m_pTileMapSquareShader;
 	HyShader *			m_pTileMapHalfSquareShader;
 	HyShader *			m_pTileMapIsometricShader;
-	HyShader *			m_pTileMapHexShader;
+	HyShader *			m_pTileMapHexFlatTopShader;
+	HyShader *			m_pTileMapHexPointTopShader;
 
 public:
 	ProjectDraw();
