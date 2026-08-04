@@ -74,8 +74,8 @@ void HyTileMapLayer::SetLayout(HyTileMapLayout eLayout)
 
 glm::ivec2 HyTileMapLayer::WorldToTile(glm::vec2 ptWorldPos)
 {
-	if(AcquireData() == nullptr || m_iTileMapDataIndex >= static_cast<const HyTileMapData *>(UncheckedGetData())->GetNumTileMaps() || m_iTileMapDataIndex < 0)
-		return glm::ivec2(0, 0);
+	//if(AcquireData() == nullptr || m_iTileMapDataIndex >= static_cast<const HyTileMapData *>(UncheckedGetData())->GetNumTileMaps() || m_iTileMapDataIndex < 0)
+	//	return glm::ivec2(0, 0);
 
 	// Convert to local coordinates
 	glm::vec2 ptLocal = GetSceneTransform(0.0f) * glm::vec4(ptWorldPos, 0.0f, 1.0f);
@@ -114,8 +114,10 @@ glm::ivec2 HyTileMapLayer::WorldToTile(glm::vec2 ptWorldPos)
 
 	case HYTILEMAPLAYOUT_HexagonFlatTop:
 		// TODO
+		break;
 	case HYTILEMAPLAYOUT_HexagonPointTop:
 		// TODO
+		break;
 	default:
 		HyLogError("HyTileMapLayer::WorldToTile() - Unknown tile map layout");
 		break;

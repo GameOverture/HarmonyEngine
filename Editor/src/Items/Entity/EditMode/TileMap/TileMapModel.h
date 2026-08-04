@@ -30,6 +30,9 @@ class TileMapModel : public IEditModeModel
 	Tiled::GidMapper			m_TiledGidMapper;
 	Tiled::TileLayer			m_TiledLayer;
 
+	bool						m_bValidHoverCoord;
+	QPoint						m_ptHoverCoord;
+
 public:
 	TileMapModel(Project &projectRef, QUndoStack *pUndoStack);
 	virtual ~TileMapModel();
@@ -54,6 +57,8 @@ public:
 
 	HyTileMapLayout GetLayout() const;
 	void SetLayout(HyTileMapLayout eLayout);
+
+	void SetHoverCoordinates(bool bValidHoverCoord, QPoint ptHoverCoord);
 
 	const Tiled::TileLayer &GetTiledTileLayer() const;
 	QList<AtlasTileSet *> UsedTilesets(const AtlasManager &atlasManagerRef) const;

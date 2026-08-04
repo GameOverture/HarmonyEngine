@@ -94,7 +94,23 @@ void TileMapView::SyncMouseHoverGrid()
 		m_MouseHoverGrid.SetVisible(false);
 		return;
 	}
-
 	m_MouseHoverGrid.SetVisible(true);
+
 	SyncMouseHoverGrid();
+
+	TileMapModel *pModel = static_cast<TileMapModel *>(GetModel());
+	m_TileMapLayer.SetGridSize(pModel->GetGridSize());
+	m_TileMapLayer.SetLayout(pModel->GetLayout());
+
+	bool bValidHoverCoord = false;
+	QPoint ptHoverCoord;
+	glm::vec2 ptWorldMousePos;
+	if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos))
+	{
+		glm::ivec2 ptCoord = m_TileMapLayer.WorldToTile(ptWorldMousePos);
+		ptHoverCoord.setX(ptCoord.x);
+		ptHoverCoord.setY(ptCoord.y);
+		bValidHoverCoord = true;
+	}
+	pModel->SetHoverCoordinates(bValidHoverCoord, ptHoverCoord);
 }

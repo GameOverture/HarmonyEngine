@@ -12,12 +12,14 @@
 #include "AtlasManager.h"
 #include "Project.h"
 #include "TileMapView.h"
+#include "MainWindow.h"
 
 TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack) :
 	IEditModeModel(EDITMODETYPE_TileMap),
 	m_ProjectRef(projectRef),
 	m_vGridSize(0.0f, 0.0f),
-	m_eLayout(HYTILEMAPLAYOUT_Unknown)
+	m_eLayout(HYTILEMAPLAYOUT_Unknown),
+	m_bValidHoverCoord(false)
 {
 }
 
@@ -44,8 +46,12 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack) :
 
 /*virtual*/ Qt::CursorShape TileMapModel::MouseMoveIdle() /*override*/
 {
-	for(IEditModeView *pView : m_ViewList)
-		static_cast<TileMapView *>(pView)->SyncMouseHoverGrid();
+	SyncViews(EDITMODE_Idle);
+
+	if(m_bValidHoverCoord)
+		MainWindow::SetStatus("Edit Mode - " + QString::number(m_ptHoverCoord.x()) + ", " + QString::number(m_ptHoverCoord.y()), 0);
+	else
+		MainWindow::SetStatus("Edit Mode", 0);
 
 	return Qt::ArrowCursor;
 }
@@ -104,6 +110,12 @@ HyTileMapLayout TileMapModel::GetLayout() const
 void TileMapModel::SetLayout(HyTileMapLayout eLayout)
 {
 	m_eLayout = eLayout;
+}
+
+void TileMapModel::SetHoverCoordinates(bool bValidHoverCoord, QPoint ptHoverCoord)
+{
+	m_bValidHoverCoord = bValidHoverCoord;
+	m_ptHoverCoord = ptHoverCoord;
 }
 
 const Tiled::TileLayer &TileMapModel::GetTiledTileLayer() const
