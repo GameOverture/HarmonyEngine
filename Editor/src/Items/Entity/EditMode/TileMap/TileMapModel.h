@@ -14,6 +14,7 @@
 #include "IEditModeModel.h"
 #include "PropertiesTreeModel.h"
 
+#include "vendor/libtiled/gidmapper.h"
 #include "vendor/libtiled/tilelayer.h"
 
 class AtlasTileSet;
@@ -27,6 +28,7 @@ class TileMapModel : public IEditModeModel
 	HyTileMapLayout				m_eLayout;
 	HyTileMapStagger			m_eStaggerIndex;
 
+	Tiled::GidMapper			m_TiledGidMapper;
 	Tiled::TileLayer			m_TiledLayer;
 
 public:
@@ -60,8 +62,7 @@ public:
 	const Tiled::TileLayer &GetTiledTileLayer() const;
 	QList<AtlasTileSet *> UsedTilesets(const AtlasManager &atlasManagerRef) const;
 
-	HyShader *GetSquareShader();
-	HyShader *GetHexShader();
+	HyShader *GetGridShader();
 
 	void SetCell(int iX, int iY, AtlasTileSet *pTileSet, int iTileId);
 

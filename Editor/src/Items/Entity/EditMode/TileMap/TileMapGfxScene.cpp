@@ -9,6 +9,7 @@
  *************************************************************************/
 #include "Global.h"
 #include "TileMapGfxScene.h"
+#include "AuxTileMap.h"
 #include "AtlasTileSet.h"
 #include "TileData.h"
 #include "TileGfxItem.h"
@@ -19,6 +20,7 @@ const float g_fSceneMargins = 7000.0f;
 
 TileMapGfxScene::TileMapGfxScene(QObject *pParent /*= nullptr*/) :
 	QGraphicsScene(pParent),
+	m_pAuxTileMap(static_cast<AuxTileMap *>(pParent)),
 	m_pTileSet(nullptr)
 {
 	m_BorderRect.setPen(QPen(QBrush(QColor(255, 255, 255)), 2.0f, Qt::DashLine));
@@ -104,13 +106,37 @@ void TileMapGfxScene::OnMarqueeRelease(Qt::MouseButton eMouseBtn, bool bShiftHel
 	ptBotRight.setY(HyMath::Max(ptStartDrag.y(), ptEndDrag.y()));
 	QRectF sceneRect(ptTopLeft, ptBotRight);
 
+	QList<TileData *> brushList;
 	for(auto iter = m_TileGfxItemsMap.begin(); iter != m_TileGfxItemsMap.end(); ++iter)
 	{
+		if(iter.value()->isVisible() == false)
+			continue;
+
 		QRectF testRect(iter.value()->boundingRect());
 		testRect.translate(iter.value()->scenePos());
 		if (sceneRect.intersects(testRect))
 			iter.value()->SetSelected(eMouseBtn == Qt::LeftButton);
 		else if(bShiftHeld == false)
 			iter.value()->SetSelected(false);
+
+		if(iter.value()->IsSelected())
+			brushList.push_back(iter.key());
 	}
+
+	// Normalize the brush map so that the top-left tile is at (0, 0)
+	int iMinGridX = INT_MAX, iMinGridY = INT_MAX;
+	for(int i = 0; i < brushList.size(); ++i)
+	{
+		QPoint ptGridPos = brushList[i]->GetMetaGridPos();
+		iMinGridX = HyMath::Min(iMinGridX, ptGridPos.x());
+		iMinGridY = HyMath::Min(iMinGridY, ptGridPos.y());
+	}
+
+	QMap<QPoint, TileData *> brushMap;
+	for(int i = 0; i < brushList.size(); ++i)
+	{
+		QPoint ptGridPos = brushList[i]->GetMetaGridPos();
+		brushMap.insert(QPoint(ptGridPos.x() - iMinGridX, ptGridPos.y() - iMinGridY), brushList[i]);
+	}
+	m_pAuxTileMap->SetBrush(brushMap);
 }

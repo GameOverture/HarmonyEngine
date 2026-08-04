@@ -19,12 +19,32 @@ class HyTileMapLayer : public IHyDrawable2d
 protected:
 	int					m_iTileMapDataIndex;
 
+	glm::ivec2			m_vGridSize;
+	HyTileMapLayout		m_eLayout;
+	HyTileMapStagger	m_eStagger;
+
 public:
+	HyTileMapLayer(HyEntity2d *pParent = nullptr);
 	HyTileMapLayer(const HyNodePath &nodePath, HyEntity2d *pParent = nullptr);
 	HyTileMapLayer(const HyTileMapLayer &copyRef);
 	virtual ~HyTileMapLayer(void);
 
 	const HyTileMapLayer &operator=(const HyTileMapLayer &rhs);
+
+	int GetTileMapDataIndex() const;
+	void SetTileMapDataIndex(int iTileMapDataIndex);
+
+	glm::ivec2 GetGridSize() const;
+	void SetGridSize(glm::ivec2 vGridSize);
+
+	HyTileMapLayout GetLayout() const;
+	void SetLayout(HyTileMapLayout eLayout);
+
+	HyTileMapStagger GetStagger() const;
+	void SetStagger(HyTileMapStagger eStagger);
+
+	glm::ivec2 WorldToTile(glm::vec2 ptWorldPos);
+	glm::vec2 TileToWorld(glm::ivec2 ptTileCoord) const;
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 	virtual float GetWidth(float fPercent = 1.0f) override;

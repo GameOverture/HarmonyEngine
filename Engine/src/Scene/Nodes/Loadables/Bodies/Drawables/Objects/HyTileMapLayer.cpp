@@ -10,6 +10,13 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMapLayer.h"
 #include "Assets/Nodes/Objects/HyTileMapData.h"
+#include "Diagnostics/Console/IHyConsole.h"
+
+HyTileMapLayer::HyTileMapLayer(HyEntity2d *pParent /*= nullptr*/) :
+	IHyDrawable2d(HYTYPE_TileMap, HyNodePath(), pParent),
+	m_iTileMapDataIndex(0)
+{
+}
 
 HyTileMapLayer::HyTileMapLayer(const HyNodePath &nodePath, HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_TileMap, nodePath, pParent),
@@ -33,6 +40,126 @@ const HyTileMapLayer &HyTileMapLayer::operator=(const HyTileMapLayer &rhs)
 	m_iTileMapDataIndex = rhs.m_iTileMapDataIndex;
 
 	return *this;
+}
+
+int HyTileMapLayer::GetTileMapDataIndex() const
+{
+	return m_iTileMapDataIndex;
+}
+
+void HyTileMapLayer::SetTileMapDataIndex(int iTileMapDataIndex)
+{
+	m_iTileMapDataIndex = iTileMapDataIndex;
+}
+
+glm::ivec2 HyTileMapLayer::GetGridSize() const
+{
+	return m_vGridSize;
+}
+
+void HyTileMapLayer::SetGridSize(glm::ivec2 vGridSize)
+{
+	m_vGridSize = vGridSize;
+}
+
+HyTileMapLayout HyTileMapLayer::GetLayout() const
+{
+	return m_eLayout;
+}
+
+void HyTileMapLayer::SetLayout(HyTileMapLayout eLayout)
+{
+	m_eLayout = eLayout;
+}
+
+HyTileMapStagger HyTileMapLayer::GetStagger() const
+{
+	return m_eStagger;
+}
+
+void HyTileMapLayer::SetStagger(HyTileMapStagger eStagger)
+{
+	m_eStagger = eStagger;
+}
+
+glm::ivec2 HyTileMapLayer::WorldToTile(glm::vec2 ptWorldPos)
+{
+	if(AcquireData() == nullptr || m_iTileMapDataIndex >= static_cast<const HyTileMapData *>(UncheckedGetData())->GetNumTileMaps() || m_iTileMapDataIndex < 0)
+		return glm::ivec2(0, 0);
+
+	// Convert to local coordinates
+	glm::vec2 ptLocal = GetSceneTransform(0.0f) * glm::vec4(ptWorldPos, 0.0f, 1.0f);
+
+	switch(m_eLayout)
+	{
+	case HYTILEMAPLAYOUT_Square:
+		return glm::ivec2(ptLocal.x / m_vGridSize.x, ptLocal.y / m_vGridSize.y);
+
+	case HYTILEMAPLAYOUT_HalfOffsetSquare: {
+		int iRow = ptLocal.y / m_vGridSize.y;
+		float fOffset = 0.0f;
+		if(m_eStagger == HYTILEMAPSTAGGER_Even)
+			fOffset = (iRow & 1) ? m_vGridSize.x * 0.5f : 0.0f;
+		else if(m_eStagger == HYTILEMAPSTAGGER_Odd)
+			fOffset = (iRow & 1) ? 0.0f : m_vGridSize.x * 0.5f;
+
+		return glm::ivec2((ptLocal.x - fOffset) / m_vGridSize.x, iRow);
+		break; }
+
+	case HYTILEMAPLAYOUT_Isometric: {
+		float fIsoX = ptLocal.x / (m_vGridSize.x * 0.5f);
+		float fIsoY = ptLocal.y / (m_vGridSize.y * 0.5f);
+
+		int iTileX = static_cast<int>(floor((fIsoY + fIsoX) * 0.5f));
+		int iTileY = static_cast<int>(floor((fIsoY - fIsoX) * 0.5f));
+		return glm::ivec2(iTileX, iTileY);
+		break; }
+
+	case HYTILEMAPLAYOUT_IsometricStaggerX: {
+		if(m_eStagger == HYTILEMAPSTAGGER_Even)
+		{
+			int iTileX = static_cast<int>(floor(ptLocal.x / m_vGridSize.x));
+			int iTileY = static_cast<int>(floor((ptLocal.y - ((iTileX & 1) ? m_vGridSize.y * 0.5f : 0.0f)) / m_vGridSize.y));
+			return glm::ivec2(iTileX, iTileY);
+		}
+		else if(m_eStagger == HYTILEMAPSTAGGER_Odd)
+		{
+			int iTileX = static_cast<int>(floor(ptLocal.x / m_vGridSize.x));
+			int iTileY = static_cast<int>(floor((ptLocal.y - ((iTileX & 1) ? 0.0f : m_vGridSize.y * 0.5f)) / m_vGridSize.y));
+			return glm::ivec2(iTileX, iTileY);
+		}
+		break; }
+
+	case HYTILEMAPLAYOUT_IsometricStaggerY: {
+		if(m_eStagger == HYTILEMAPSTAGGER_Even)
+		{
+			int iTileY = static_cast<int>(floor(ptLocal.y / m_vGridSize.y));
+			int iTileX = static_cast<int>(floor((ptLocal.x - ((iTileY & 1) ? m_vGridSize.x * 0.5f : 0.0f)) / m_vGridSize.x));
+			return glm::ivec2(iTileX, iTileY);
+		}
+		else if(m_eStagger == HYTILEMAPSTAGGER_Odd)
+		{
+			int iTileY = static_cast<int>(floor(ptLocal.y / m_vGridSize.y));
+			int iTileX = static_cast<int>(floor((ptLocal.x - ((iTileY & 1) ? 0.0f : m_vGridSize.x * 0.5f)) / m_vGridSize.x));
+			return glm::ivec2(iTileX, iTileY);
+		}
+		break; }
+
+	case HYTILEMAPLAYOUT_HexagonFlatTop:
+		// TODO
+	case HYTILEMAPLAYOUT_HexagonPointTop:
+		// TODO
+	default:
+		HyLogError("HyTileMapLayer::WorldToTile() - Unknown tile map layout");
+		break;
+	}
+
+	return glm::ivec2(0, 0);
+}
+
+glm::vec2 HyTileMapLayer::TileToWorld(glm::ivec2 ptTileCoord) const
+{
+	return glm::vec2(ptTileCoord.x * m_vGridSize.x, ptTileCoord.y * m_vGridSize.y);
 }
 
 /*virtual*/ void HyTileMapLayer::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/

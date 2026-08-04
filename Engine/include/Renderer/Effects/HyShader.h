@@ -30,7 +30,7 @@ class HyShader : public IHyFile
 	const HyShaderProgramDefaults			m_eDEFAULTS_FROM;
 
 	bool									m_bIsFinalized;
-	std::string								m_sSourceCode[HYNUM_SHADERTYPES];
+	std::vector<const char *>				m_SourceCodePtrList[HYNUM_SHADERTYPES];
 
 	std::vector<HyShaderVertexAttribute>	m_VertexAttributeList;
 	size_t									m_uiStride;
@@ -48,8 +48,8 @@ public:
 
 	HyShaderProgramDefaults GetDefaults() const;
 
-	const std::string &GetSourceCode(HyShaderType eType);
-	void SetSourceCode(std::string sSource, HyShaderType eType);
+	std::vector<const char *> GetSourceCodePtrs(HyShaderType eType);
+	void SetSourceCodePtrs(std::vector<const char *> vSourcePtrs, HyShaderType eType); // Source code is NOT copied, so the caller must ensure the source code remains valid. Even after Finalized() is called, the source code still needs to be valid until the shader is fully uploaded to the GPU
 
 	void AddVertexAttribute(const char *szName, HyShaderVariable eVarType, bool bNormalize = false, uint32 uiInstanceDivisor = 0);
 	std::vector<HyShaderVertexAttribute> &GetVertextAttributes();

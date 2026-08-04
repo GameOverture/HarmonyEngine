@@ -20,8 +20,6 @@ HyShader::HyShader(HyShaderProgramDefaults eDefaultsFrom) :
 	m_bIsFinalized(false),
 	m_uiStride(0)
 {
-	for(int i = 0; i < HYNUM_SHADERTYPES; ++i)
-		m_sSourceCode[i].clear();
 }
 
 HyShader::~HyShader()
@@ -54,17 +52,14 @@ HyShaderProgramDefaults HyShader::GetDefaults() const
 	return m_eDEFAULTS_FROM;
 }
 
-const std::string &HyShader::GetSourceCode(HyShaderType eType)
+std::vector<const char *> HyShader::GetSourceCodePtrs(HyShaderType eType)
 {
-	return m_sSourceCode[eType];
+	return m_SourceCodePtrList[eType];
 }
 
-void HyShader::SetSourceCode(std::string sSource, HyShaderType eType)
+void HyShader::SetSourceCodePtrs(std::vector<const char *> vSourcePtrs, HyShaderType eType)
 {
-	if(sSource.empty())
-		return;
-
-	m_sSourceCode[eType] = sSource;
+	m_SourceCodePtrList[eType] = vSourcePtrs;
 }
 
 /*virtual*/ void HyShader::AddVertexAttribute(const char *szName, HyShaderVariable eVarType, bool bNormalize /*= false*/, uint32 uiInstanceDivisor /*= 0*/)

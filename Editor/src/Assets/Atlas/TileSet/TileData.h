@@ -22,6 +22,7 @@ class VectorModel;
 
 class TileData
 {
+	AtlasTileSet *									m_pTileSet;
 	QUuid											m_Uuid;
 	quint32											m_uiTileChecksum;
 	QPoint											m_MetaGridPos;			// The user defined position in the grid when setting up the TileSet - and not its location on the sub-atlas texture
@@ -36,8 +37,8 @@ class TileData
 	QMap<QUuid, VectorModel *>						m_CollisionLayerMap;
 
 public:
-	TileData(quint32 uiTileChecksum, QPoint metaGridPos, QUndoStack *pUndoStack);
-	TileData(const QJsonObject &tileDataObj, QUndoStack *pUndoStack);
+	TileData(AtlasTileSet *pTileSet, quint32 uiTileChecksum, QPoint metaGridPos, QUndoStack *pUndoStack);
+	TileData(AtlasTileSet *pTileSet, const QJsonObject &tileDataObj, QUndoStack *pUndoStack);
 	TileData(TileData &&other) = delete;
 	TileData(const TileData &other) = delete;
 	TileData &operator=(const TileData &other) = delete;
@@ -45,6 +46,7 @@ public:
 
 	void InitPropertiesModel(QUndoStack *pUndoStack);
 
+	AtlasTileSet *GetTileSet() const;
 	QUuid GetUuid() const;
 
 	quint32 GetTileChecksum() const;

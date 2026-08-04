@@ -268,7 +268,9 @@ class AtlasTileSet : public AtlasFrame
 	//     COLUMNS = static_cast<int>(std::floor(std::sqrt(n)))
 	//     ROWS    = static_cast<int>(std::ceil(static_cast<double>(n) / columns))
 	QMap<quint32, QPixmap>		m_TileImageMap;
-	int							m_iNumSubAtlasTiles;	// NOTE: This value may be different from m_TileImageMap.size() because there can be duplicate tiles due to animations requiring consecutive placement
+	QList<quint32>				m_TileSubAtlasChecksumList; // The order of checksums corresponds to the row-major order in the sub-atlas
+															// NOTE: This list size may be different from m_TileImageMap.size() because 
+															// there can be duplicate tiles due to animations requiring consecutive placement
 
 	// Tile IDs must be sequential with no gaps, as the ID is used to sample the row-major texel in the ShaderDescriptor data texture
 	QVector<TileData *>			m_TileDataList;
@@ -293,6 +295,7 @@ public:
 
 	const QJsonObject &GetSavedTileSetMeta() const;
 	int GetNumTiles() const;
+	int GetNumSubAtlasTiles() const;
 	
 	TileSetShape GetTileShape() const;
 	void SetTileShape(TileSetShape eTileSetShape);
@@ -331,6 +334,9 @@ public:
 
 	QPixmap GetTilePixmap(const TileData *pTile) const;
 	QPixmap GetTilePixmap(quint32 uiChecksum) const;
+
+	int GetTileSubAtlasIndex(const TileData *pTile) const;
+	int GetTileSubAtlasIndex(quint32 uiChecksum) const;
 
 	TileSetScene *GetGfxScene();
 

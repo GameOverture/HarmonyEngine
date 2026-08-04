@@ -27,7 +27,7 @@ public:
 	TileMapGrid(HyEntity2d *pParent = nullptr);
 	virtual ~TileMapGrid();
 
-	void Reset(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimensions, glm::vec2 vGridSize, HyTileMapLayout eLayout, HyTileMapStagger eStagger);
+	void Sync(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimensions, glm::vec2 vGridSize, HyTileMapLayout eLayout, HyTileMapStagger eStagger);
 
 	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;

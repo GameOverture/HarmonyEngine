@@ -82,7 +82,75 @@ void main()
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
-const char *const szTILEMAPGRIDSQUARE_FRAGMENTSHADER = R"src(
+const char *const szTILEMAPGRID_FRAGMENTSHADER = R"src(
+#version 140
+
+uniform mat4					u_inv_tilemap;		// World to local space transform matrix of the TileMapLayer
+uniform vec2					u_position;
+uniform vec2					u_dimensions;		// Width and height of entire render quad
+uniform vec2					u_grid_size;		// Width and height of the tiles in the grid
+uniform bool					u_stagger_odd;		// Whether the grid is staggered on odd rows or even rows
+uniform vec3					u_grid_color;
+uniform float					u_line_width;		// Grid line width in world units
+
+smooth in vec2					interp_uv;
+out vec4						out_color;
+
+float TileSDF(vec2 local_pos);
+
+void main()
+{
+	// Compute this fragment's world-space position.
+	vec2 quad_offset = (interp_uv - vec2(0.5)) * u_dimensions;
+	quad_offset.y *= -1.0; // Harmony world up is positive Y, but UV's are the opposite
+	vec2 world_pos = u_position + quad_offset;
+	
+	// Convert the fragment position into the TileMapLayer's local coordinate system.
+	vec2 local_pos = (u_inv_tilemap * vec4(world_pos, 0.0, 1.0)).xy;
+
+	// IF NO ANTI-ALIASING USE THIS
+	//float dist = TileSDF(local_pos);
+	//out_color = vec4(u_grid_color, step(dist, u_line_width));
+
+	// IF ANTI-ALIASING USE THIS (also mixes in black outline)
+	float gridAlpha = smoothstep(u_line_width, 0.0, TileSDF(local_pos));
+	vec3 finalColor = mix(vec3(0.0), u_grid_color, gridAlpha);
+	out_color = vec4(finalColor, gridAlpha);
+}
+)src";
+
+const char *const szTILEMAPGRIDSQUARESDF_FRAGMENTSHADER = R"src(
+float TileSDF(vec2 local_pos)
+{
+	vec2 cell_frac = fract(local_pos / u_grid_size);
+	vec2 dist = min(cell_frac, 1.0 - cell_frac) * u_grid_size;
+
+	return min(dist.x, dist.y);
+}
+)src";
+
+const char *const szTILEMAPGRIDHALFSQUARESDF_FRAGMENTSHADER = R"src(
+float TileSDF(vec2 local_pos)
+{
+	vec2 p = local_pos;
+
+	float row = floor(p.y / u_grid_size.y);
+
+	bool stagger = u_stagger_odd ?
+		(mod(row, 2.0) == 1.0) :
+		(mod(row, 2.0) == 0.0);
+
+	if(stagger)
+		p.x -= u_grid_size.x * 0.5;
+
+	vec2 f = fract(p / u_grid_size);
+
+	vec2 d = min(f, 1.0 - f) * u_grid_size;
+	return min(d.x, d.y);
+}
+)src";
+
+const char *const szTILEMAPGRIDSISOMETRIC_FRAGMENTSHADER = R"src(
 #version 140
 
 uniform mat4					u_inv_tilemap;		// World to local space transform matrix of the TileMapLayer
@@ -90,83 +158,99 @@ uniform vec2					u_position;
 uniform vec2					u_dimensions;		// Width and height of entire render quad
 uniform vec2					u_grid_size;		// Width and height of the tiles in the grid
 uniform vec3					u_grid_color;
-uniform vec4					u_hover_color;
 uniform float					u_line_width;		// Grid line width in world units
 
 smooth in vec2					interp_uv;
 out vec4						out_color;
+
+// Helper to calculate distance to nearest grid line for antialiasing
+float lineDistance(float coord, float size, float width)
+{
+	// Find position within the current tile [0, size)
+	float pos = mod(coord, size);
+	// Calculate distance to the nearest edge (0 or size)
+	float dist = min(pos, size - pos);
+	// Return smoothed alpha: 1.0 inside the line, 0.0 outside, smooth transition
+	return smoothstep(width, 0.0, dist);
+}
 
 void main()
 {
 	// Compute this fragment's world-space position.
 	vec2 quad_offset = (interp_uv - vec2(0.5)) * u_dimensions;
 	quad_offset.y *= -1.0; // Harmony world up is positive Y, but UV's are the opposite
-
 	vec2 world_pos = u_position + quad_offset;
 	
-	// Convert both the fragment position and the mouse position into the TileMapLayer's local coordinate system.
+	// Convert the fragment position into the TileMapLayer's local coordinate system.
 	vec2 local_pos = (u_inv_tilemap * vec4(world_pos, 0.0, 1.0)).xy;
-	
-	vec2 mouse_local = (u_inv_tilemap * vec4(u_position, 0.0, 1.0)).xy;
-	
-	// Determine which tile each belongs to.
-	vec2 cell = floor(local_pos / u_grid_size);
-	vec2 mouse_cell = floor(mouse_local / u_grid_size);
-	
-	bool hovered = all(equal(cell, mouse_cell));
-	
-	// Position within the current cell.
-	vec2 cell_frac = fract(local_pos / u_grid_size);
-	
-	// Distance to the nearest grid edge.
-	vec2 dist = min(cell_frac, 1.0 - cell_frac) * u_grid_size;
-	
-	float grid = max(
-		step(dist.x, u_line_width),
-		step(dist.y, u_line_width));
-	
-	vec4 color = vec4(0.0);
-	
-	if (grid > 0.0)
-		color = vec4(u_grid_color, 1.0);
-	
-	if (hovered)
-		color = mix(color, u_hover_color, u_hover_color.a);
 
-	out_color = color;
+
+	float slope = u_grid_size.y / u_grid_size.x;
+
+	float axisA = (slope * local_pos.x) + local_pos.y;
+	float axisB = (-slope * local_pos.x) + local_pos.y;
+	
+	float spacing = slope * u_grid_size.x;
+
+	float distA = lineDistance(axisA, spacing, u_line_width);
+	float distB = lineDistance(axisB, spacing, u_line_width);
+
+	// IF NO ANTI-ALIASING USE THIS
+	//float dist = max(distA, distB);
+	//out_color = vec4(u_grid_color, step(dist, u_line_width));
+
+	// IF ANTI-ALIASING USE THIS (also mixes in black outline)
+	float gridAlpha = max(distA, distB);
+	vec3 finalColor = mix(vec3(0.0), u_grid_color, gridAlpha);
+	out_color = vec4(finalColor, gridAlpha);
 }
 )src";
-//-------------------------------------------------------------------------------------------------------------------------------------------------
+
 const char *const szTILEMAPGRIDHEX_FRAGMENTSHADER = R"src(
 #version 140
 
-uniform vec2					u_dimensions;
-uniform vec2					u_world_origin;	// World-space origin of the grid
-//uniform vec2					u_tile_size;	// Width and height
+uniform mat4					u_inv_tilemap;		// World to local space transform matrix of the TileMapLayer
+uniform vec2					u_position;
+uniform vec2					u_dimensions;		// Width and height of entire render quad
+uniform vec2					u_grid_size;		// Width and height of the tiles in the grid
+uniform vec3					u_grid_color;
+//uniform float					u_line_width;		// Grid line width in world units
 
 smooth in vec2					interp_uv;
 out vec4						out_color;
 
-const float x_shift = sin(1.0471975511965);
+const float x_shift = sin(3.1415926535 / 3.0);
 
 float hex(vec2 p)
 {
-	p.x /= x_shift;
 	p.y += floor(p.x) * 0.5;
 	p = abs(fract(p) - 0.5);
-	return smoothstep(0.001, 0.05, abs(1.0 - max(p.x * 1.5 + p.y, p.y * 2.0)));
+	return 1.0 - step(0.05, abs(1.0 - max(p.x * 1.5 + p.y, p.y * 2.0)));
 }
 
 void main()
 {
-	vec2 uv = interp_uv;
-	uv += u_world_origin;
-	uv -= 0.5;
-	uv.x *= u_dimensions.x / u_dimensions.y;
-	uv *= 5.0;
-	vec3 color = vec3(0.0, 0.0, 0.0);
-	color += vec3(hex(uv));
-	out_color = vec4(color, 1.0);
+	// Compute this fragment's world-space position.
+	vec2 quad_offset = (interp_uv - vec2(0.5)) * u_dimensions;
+	quad_offset.y *= -1.0; // Harmony world up is positive Y, but UV's are the opposite
+	vec2 world_pos = u_position + quad_offset;
+	
+	// Convert the fragment position into the TileMapLayer's local coordinate system.
+	vec2 local_pos = (u_inv_tilemap * vec4(world_pos, 0.0, 1.0)).xy;
+
+	local_pos /= u_grid_size;
+	local_pos.x /= x_shift;
+
+	// IF NO ANTI-ALIASING USE THIS
+	float dist = hex(local_pos);
+	vec3 color = vec3(dist);
+	color *= u_grid_color;
+	out_color = vec4(color, dist);
+
+	// IF ANTI-ALIASING USE THIS (also mixes in black outline)
+	//float gridAlpha = smoothstep(u_line_width, 0.0, hex(dist));
+	//vec3 finalColor = mix(vec3(0.0), u_grid_color, gridAlpha);
+	//out_color = vec4(finalColor, gridAlpha);
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
@@ -266,15 +350,17 @@ ProjectDraw::ProjectDraw() :
 	m_Origin(this),
 	m_OverGrid(fDIMENSION_SIZE, fDIMENSION_SIZE, DEFAULT_GRID_SIZE),
 	m_pTileMapSquareShader(nullptr),
+	m_pTileMapHalfSquareShader(nullptr),
+	m_pTileMapIsometricShader(nullptr),
 	m_pTileMapHexShader(nullptr)
 {
 	ChildAppend(m_CheckerGrid);
 
 	m_pCheckerGridShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
-	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
+	m_pCheckerGridShader->SetSourceCodePtrs({szCHECKERGRID_VERTEXSHADER}, HYSHADER_Vertex);
 	m_pCheckerGridShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
 	m_pCheckerGridShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
-	m_pCheckerGridShader->SetSourceCode(szCHECKERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
+	m_pCheckerGridShader->SetSourceCodePtrs({szCHECKERGRID_FRAGMENTSHADER}, HYSHADER_Fragment);
 	m_pCheckerGridShader->Finalize();
 
 	m_CheckerGrid.SetShader(m_pCheckerGridShader);
@@ -293,10 +379,10 @@ ProjectDraw::ProjectDraw() :
 	ChildAppend(m_OverGrid);
 
 	m_pOverGridShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
-	m_pOverGridShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
+	m_pOverGridShader->SetSourceCodePtrs({szCHECKERGRID_VERTEXSHADER}, HYSHADER_Vertex);
 	m_pOverGridShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
 	m_pOverGridShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
-	m_pOverGridShader->SetSourceCode(szOVERGRID_FRAGMENTSHADER, HYSHADER_Fragment);
+	m_pOverGridShader->SetSourceCodePtrs({szOVERGRID_FRAGMENTSHADER}, HYSHADER_Fragment);
 	m_pOverGridShader->Finalize();
 
 	m_OverGrid.SetShader(m_pOverGridShader);
@@ -304,17 +390,31 @@ ProjectDraw::ProjectDraw() :
 	
 	// Misc shaders
 	m_pTileMapSquareShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
-	m_pTileMapSquareShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
+	m_pTileMapSquareShader->SetSourceCodePtrs({szCHECKERGRID_VERTEXSHADER}, HYSHADER_Vertex);
 	m_pTileMapSquareShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
 	m_pTileMapSquareShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
-	m_pTileMapSquareShader->SetSourceCode(szTILEMAPGRIDSQUARE_FRAGMENTSHADER, HYSHADER_Fragment);
+	m_pTileMapSquareShader->SetSourceCodePtrs({szTILEMAPGRID_FRAGMENTSHADER, szTILEMAPGRIDSQUARESDF_FRAGMENTSHADER}, HYSHADER_Fragment);
 	m_pTileMapSquareShader->Finalize();
 
+	m_pTileMapHalfSquareShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
+	m_pTileMapHalfSquareShader->SetSourceCodePtrs({ szCHECKERGRID_VERTEXSHADER }, HYSHADER_Vertex);
+	m_pTileMapHalfSquareShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
+	m_pTileMapHalfSquareShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
+	m_pTileMapHalfSquareShader->SetSourceCodePtrs({szTILEMAPGRID_FRAGMENTSHADER, szTILEMAPGRIDHALFSQUARESDF_FRAGMENTSHADER}, HYSHADER_Fragment);
+	m_pTileMapHalfSquareShader->Finalize();
+
+	m_pTileMapIsometricShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
+	m_pTileMapIsometricShader->SetSourceCodePtrs({szCHECKERGRID_VERTEXSHADER}, HYSHADER_Vertex);
+	m_pTileMapIsometricShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
+	m_pTileMapIsometricShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
+	m_pTileMapIsometricShader->SetSourceCodePtrs({szTILEMAPGRIDSISOMETRIC_FRAGMENTSHADER}, HYSHADER_Fragment);
+	m_pTileMapIsometricShader->Finalize();
+
 	m_pTileMapHexShader = HY_NEW HyShader(HYSHADERPROG_Primitive);
-	m_pTileMapHexShader->SetSourceCode(szCHECKERGRID_VERTEXSHADER, HYSHADER_Vertex);
+	m_pTileMapHexShader->SetSourceCodePtrs({szCHECKERGRID_VERTEXSHADER}, HYSHADER_Vertex);
 	m_pTileMapHexShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
 	m_pTileMapHexShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2);
-	m_pTileMapHexShader->SetSourceCode(szTILEMAPGRIDHEX_FRAGMENTSHADER, HYSHADER_Fragment);
+	m_pTileMapHexShader->SetSourceCodePtrs({szTILEMAPGRIDHEX_FRAGMENTSHADER}, HYSHADER_Fragment);
 	m_pTileMapHexShader->Finalize();
 }
 
@@ -358,12 +458,30 @@ void ProjectDraw::OnCameraUpdated()
 	m_Origin.SetLayerOffset(3, glm::vec2(ptOriginPos.x, 0.0f));
 }
 
-HyShader *ProjectDraw::GetTileMapSquareShader()
+HyShader *ProjectDraw::GetTileMapGridShader(HyTileMapLayout eLayout) const
 {
-	return m_pTileMapSquareShader;
-}
+	switch(eLayout)
+	{
+	case HYTILEMAPLAYOUT_Unknown:
+	case HYTILEMAPLAYOUT_Square:
+		return m_pTileMapSquareShader;
 
-HyShader *ProjectDraw::GetTileMapHexShader()
-{
-	return m_pTileMapHexShader;
+	case HYTILEMAPLAYOUT_HalfOffsetSquare:
+		return m_pTileMapHalfSquareShader;
+
+	case HYTILEMAPLAYOUT_Isometric:
+	case HYTILEMAPLAYOUT_IsometricStaggerX:
+	case HYTILEMAPLAYOUT_IsometricStaggerY:
+		return m_pTileMapIsometricShader;
+
+	case HYTILEMAPLAYOUT_HexagonFlatTop:
+	case HYTILEMAPLAYOUT_HexagonPointTop:
+		return m_pTileMapHexShader;
+
+	default:
+		HyGuiLog("ProjectDraw::GetTileMapGridShader() - Unknown tilemap layout type: " + QString::number(eLayout), LOGTYPE_Error);
+		break;
+	}
+
+	return nullptr;
 }

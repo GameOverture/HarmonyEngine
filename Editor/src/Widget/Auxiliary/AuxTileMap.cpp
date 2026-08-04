@@ -91,6 +91,11 @@ void AuxTileMap::Init(AtlasManager &atlasManagerRef, TileMapModel &tileMapModelR
 	//ui->tileSetsTreeView->resizeColumnToContents(0);
 }
 
+void AuxTileMap::SetBrush(QMap<QPoint, TileData *> brushMap)
+{
+	m_BrushMap = brushMap;
+}
+
 void AuxTileMap::on_tileSetsTreeView_clicked(QModelIndex index)
 {
 	if(ui->tileSetsTreeView->model() == nullptr)

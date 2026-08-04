@@ -11,13 +11,14 @@
 #include "AtlasTileSet.h"
 #include "AtlasManager.h"
 #include "Project.h"
+#include "TileMapView.h"
 
 TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack) :
 	IEditModeModel(EDITMODETYPE_TileMap),
 	m_ProjectRef(projectRef),
 	m_eLayout(HYTILEMAPLAYOUT_Unknown),
 	m_eStaggerIndex(HYTILEMAPSTAGGER_Odd),
-	m_vGridSize(32.0f, 32.0f)
+	m_vGridSize(0.0f, 0.0f)
 {
 }
 
@@ -32,13 +33,22 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack) :
 
 /*virtual*/ void TileMapModel::Deserialize(bool bEnabled, const QJsonObject &serializedObj) /*override*/
 {
-	int i =0;
-	++i;
+	if(serializedObj.empty())
+	{
+		m_vGridSize = { 0.0f, 0.0f };
+		m_eLayout = HYTILEMAPLAYOUT_Unknown;
+		m_eStaggerIndex = HYTILEMAPSTAGGER_Unknown;
+
+		//m_TiledLayer.
+		return;
+	}
 }
 
 /*virtual*/ Qt::CursorShape TileMapModel::MouseMoveIdle() /*override*/
 {
-	SyncViews(EDITMODE_Idle);
+	for(IEditModeView *pView : m_ViewList)
+		static_cast<TileMapView *>(pView)->SyncMouseHoverGrid();
+
 	return Qt::ArrowCursor;
 }
 
@@ -53,6 +63,8 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack) :
 
 /*virtual*/ void TileMapModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) /*override*/
 {
+	for(IEditModeView *pView : m_ViewList)
+		static_cast<TileMapView *>(pView)->SyncMouseHoverGrid();
 }
 
 /*virtual*/ void TileMapModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight) /*override*/
@@ -128,14 +140,9 @@ QList<AtlasTileSet *> TileMapModel::UsedTilesets(const AtlasManager &atlasManage
 	return returnList;
 }
 
-HyShader *TileMapModel::GetSquareShader()
+HyShader *TileMapModel::GetGridShader()
 {
-	return m_ProjectRef.GetProjDraw()->GetTileMapSquareShader();
-}
-
-HyShader *TileMapModel::GetHexShader()
-{
-	return m_ProjectRef.GetProjDraw()->GetTileMapHexShader();
+	return m_ProjectRef.GetProjDraw()->GetTileMapGridShader(m_eLayout);
 }
 
 void TileMapModel::SetCell(int iX, int iY, AtlasTileSet *pTileSet, int iTileId)

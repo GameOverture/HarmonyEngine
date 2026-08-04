@@ -439,8 +439,8 @@ public:
 		return m_uiB / 255.0f;
 	}
 
-	glm::vec4 GetAsVec4() const {
-		return glm::vec4(GetRedF(), GetGreenF(), GetBlueF(), 1.0f);
+	glm::vec4 GetAsVec4(float fAlphaChannel = 1.0f) const {
+		return glm::vec4(GetRedF(), GetGreenF(), GetBlueF(), fAlphaChannel);
 	}
 	glm::vec3 GetAsVec3() const {
 		return glm::vec3(GetRedF(), GetGreenF(), GetBlueF());

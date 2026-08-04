@@ -44,8 +44,7 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 	m_TileSetMetaObj(tileSetMetaData),
 	m_bExistencePendingSave(bIsPendingSave),
 	m_bSubAtlasDirty(bIsPendingSave),
-	m_eTileShape(TILESETSHAPE_Unknown),
-	m_iNumSubAtlasTiles(0)
+	m_eTileShape(TILESETSHAPE_Unknown)
 {
 	m_pUndoStack = new QUndoStack(this);
 	m_pActionUndo = m_pUndoStack->createUndoAction(nullptr, "&Undo");
@@ -96,12 +95,13 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 		}
 
 		// Slice the pixmaps from the sub-atlas. The row-order of the pixmaps is aligned with m_TileDataList
-		m_iNumSubAtlasTiles = m_TileSetMetaObj["numSubAtlasTiles"].toInt();
+		int iNumSubAtlasTiles = m_TileSetMetaObj["numSubAtlasTiles"].toInt();
+		m_TileSubAtlasChecksumList.reserve(iNumSubAtlasTiles);
 		QImage subAtlas(GetAbsMetaFilePath());
-		if(subAtlas.isNull() == false && m_iNumSubAtlasTiles > 0)
+		if(subAtlas.isNull() == false && iNumSubAtlasTiles > 0)
 		{
-			const int iNUM_COLS = NUM_COLS_TILESET(m_iNumSubAtlasTiles);
-			for(int index = 0; index < m_iNumSubAtlasTiles; ++index)
+			const int iNUM_COLS = NUM_COLS_TILESET(iNumSubAtlasTiles);
+			for(int index = 0; index < iNumSubAtlasTiles; ++index)
 			{
 				int iCol = index % iNUM_COLS;
 				int iRow = index / iNUM_COLS;
@@ -114,19 +114,20 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 				QImage tileImg = subAtlas.copy(tileRect);
 				quint32 uiChecksum = HyGlobal::CRCData(0, tileImg.bits(), tileImg.sizeInBytes());
 				m_TileImageMap.insert(uiChecksum, QPixmap::fromImage(tileImg));
+				m_TileSubAtlasChecksumList.append(uiChecksum);
 			}
 		}
-		if(m_TileImageMap.size() != m_iNumSubAtlasTiles)
+		if(m_TileSubAtlasChecksumList.size() != iNumSubAtlasTiles)
 		{
 			SetError(ASSETERROR_CannotFindMetaFile);
-			HyGuiLog("AtlasTileSet::AtlasTileSet() - Tile data count mismatch for TileSet: " + GetName(), LOGTYPE_Error);
+			HyGuiLog("AtlasTileSet::AtlasTileSet() - Cannot find meta image file or tile data count mismatch for TileSet: " + GetName(), LOGTYPE_Error);
 		}
 
 		QJsonArray tileArray = m_TileSetMetaObj["tileData"].toArray();
 		for(int i = 0; i < tileArray.size(); ++i)
 		{
 			QJsonObject tileObj = tileArray[i].toObject();
-			m_TileDataList.append(new TileData(tileObj, m_pUndoStack));
+			m_TileDataList.append(new TileData(this, tileObj, m_pUndoStack));
 		}
 
 		m_bSubAtlasDirty = false;
@@ -163,6 +164,11 @@ const QJsonObject &AtlasTileSet::GetSavedTileSetMeta() const
 int AtlasTileSet::GetNumTiles() const
 {
 	return m_TileDataList.size();
+}
+
+int AtlasTileSet::GetNumSubAtlasTiles() const
+{
+	return m_TileSubAtlasChecksumList.size();
 }
 
 TileSetShape AtlasTileSet::GetTileShape() const
@@ -408,6 +414,16 @@ QPixmap AtlasTileSet::GetTilePixmap(quint32 uiChecksum) const
 	return m_TileImageMap[uiChecksum];
 }
 
+int AtlasTileSet::GetTileSubAtlasIndex(const TileData *pTile) const
+{
+	return GetTileSubAtlasIndex(pTile->GetTileChecksum());
+}
+
+int AtlasTileSet::GetTileSubAtlasIndex(quint32 uiChecksum) const
+{
+	return m_TileSubAtlasChecksumList.indexOf(uiChecksum);
+}
+
 TileSetScene *AtlasTileSet::GetGfxScene()
 {
 	return &m_GfxScene;
@@ -481,7 +497,7 @@ QList<QPair<QPoint, TileData *>> AtlasTileSet::Cmd_AppendNewTiles(QSize vRegionS
 		quint32 uiChecksum = HyGlobal::CRCData(0, tileImg.bits(), tileImg.sizeInBytes());
 		m_TileImageMap.insert(uiChecksum, it.value());
 
-		TileData *pTileData = new TileData(uiChecksum, newGridPos, m_pUndoStack);
+		TileData *pTileData = new TileData(this, uiChecksum, newGridPos, m_pUndoStack);
 		m_TileDataList.append(pTileData);
 		newTileDataList.push_back(QPair<QPoint, TileData *>(newGridPos, pTileData));
 
@@ -680,7 +696,7 @@ void AtlasTileSet::SetSubAtlasDirty()
 	m_bSubAtlasDirty = true;
 }
 
-void AtlasTileSet::UpdateTileSetMeta()
+void AtlasTileSet::UpdateTileSetMeta() // NOTE: invoked after regenerating the sub-atlas
 {
 	// Start with blank
 	m_TileSetMetaObj = QJsonObject();
@@ -723,7 +739,7 @@ void AtlasTileSet::UpdateTileSetMeta()
 	}
 	m_TileSetMetaObj["tileData"] = tileArray;
 
-	m_TileSetMetaObj["numSubAtlasTiles"] = QJsonValue(m_iNumSubAtlasTiles);
+	m_TileSetMetaObj["numSubAtlasTiles"] = QJsonValue(m_TileSubAtlasChecksumList.size());
 	m_TileSetMetaObj["name"] = GetName();
 }
 
@@ -816,7 +832,7 @@ bool AtlasTileSet::Save()
 			return false;
 	}
 
-	// Lastly, update meta data
+	// Lastly, update meta data (after RegenerateSubAtlas() since it may have changed the sub-atlas size)
 	UpdateTileSetMeta();
 
 	m_bSubAtlasDirty = false;
@@ -910,40 +926,6 @@ void AtlasTileSet::UpdateTilePolygon()
 	}
 }
 
-//struct TileAnimation
-//{
-//	QUuid				m_StartingTileUuid;
-//	QList<int64>		m_TileChecksumList;	// Each frame's checksum (-1 indicates it's invalid)
-//
-//	quint16				m_uiStartingAtlasIndex; // This is determined when the sub-atlas is generated
-//	TileAnimation() :
-//		m_uiStartingAtlasIndex(TILEDATA_INVALID_ID)
-//	{ }
-	//TileAnimation(QJsonObject animObj)
-	//{
-	//	m_StartingTileUuid = QUuid(animObj["startingTile"].toString());
-
-	//	QJsonArray checksumArray = animObj["checksumFrames"].toArray();
-	//	for(QJsonValue checksumVal : checksumArray)
-	//		m_TileChecksumList.push_back(static_cast<int64>(checksumVal.toVariant().toLongLong()));
-
-	//	m_uiStartingAtlasIndex = animObj["startingAtlasIndex"].toInt();
-	//}
-
-	//QJsonObject ToJsonObject() const
-	//{
-	//	QJsonObject animObj;
-	//	animObj["startingTile"] = m_StartingTileUuid.toString(QUuid::WithoutBraces);
-	//	QJsonArray checksumArray;
-	//	for(int64 iChecksum : m_TileChecksumList)
-	//		checksumArray.append(static_cast<qint64>(iChecksum));
-	//	animObj["checksumFrames"] = checksumArray;
-	//	animObj["startingAtlasIndex"] = m_uiStartingAtlasIndex;
-
-	//	return animObj;
-	//}
-//};
-
 bool AtlasTileSet::RegenerateSubAtlas()
 {
 	if(m_TileImageMap.isEmpty())
@@ -1018,11 +1000,13 @@ bool AtlasTileSet::RegenerateSubAtlas()
 			subAtlasTileChecksumList.push_back(it.key());
 	}
 
-	m_iNumSubAtlasTiles = subAtlasTileChecksumList.size();
+	int iNumSubAtlasTiles = subAtlasTileChecksumList.size();
+	m_TileSubAtlasChecksumList.clear();
+	m_TileSubAtlasChecksumList.reserve(iNumSubAtlasTiles);
 
 	// Create a texture with a size that will accommodate all the existing, and newly appended tiles
-	const int iNUM_COLS = NUM_COLS_TILESET(m_iNumSubAtlasTiles);
-	const int iNUM_ROWS = NUM_ROWS_TILESET(m_iNumSubAtlasTiles, iNUM_COLS);
+	const int iNUM_COLS = NUM_COLS_TILESET(iNumSubAtlasTiles);
+	const int iNUM_ROWS = NUM_ROWS_TILESET(iNumSubAtlasTiles, iNUM_COLS);
 
 	QImage newTexture(iNUM_COLS * (m_RegionSize.width() + TILESET_TILE_PADDING), iNUM_ROWS * (m_RegionSize.height() + TILESET_TILE_PADDING), QImage::Format_ARGB32);
 	newTexture.fill(Qt::transparent);
@@ -1065,6 +1049,8 @@ bool AtlasTileSet::RegenerateSubAtlas()
 					pTileData->SetTileChecksum(uiNewChecksum);
 			}
 		}
+
+		m_TileSubAtlasChecksumList.append(uiNewChecksum);
 	}
 
 	if(static_cast<AtlasManager &>(m_ModelRef).ReplaceFrame(this, GetName(), newTexture, ITEM_AtlasTileSet) == false)

@@ -385,14 +385,14 @@ HyOpenGL::~HyOpenGL(void)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// If unassigned vertex shader, fill in defaults
-	if(pShader->GetSourceCode(HYSHADER_Vertex).empty())
+	if(pShader->GetSourceCodePtrs(HYSHADER_Vertex).empty())
 	{
 		shaderVertexAttribListRef.clear();
 
 		switch(pShader->GetDefaults())
 		{
 		case HYSHADERPROG_QuadBatch:
-			pShader->SetSourceCode(szHYQUADBATCH_VERTEXSHADER, HYSHADER_Vertex);
+			pShader->SetSourceCodePtrs({szHYQUADBATCH_VERTEXSHADER}, HYSHADER_Vertex);
 			pShader->AddVertexAttribute("attr_size", HyShaderVariable::vec2, false, 1);
 			pShader->AddVertexAttribute("attr_offset", HyShaderVariable::vec2, false, 1);
 			pShader->AddVertexAttribute("attr_top_tint", HyShaderVariable::vec4, false, 1);
@@ -405,13 +405,13 @@ HyOpenGL::~HyOpenGL(void)
 			break;
 
 		case HYSHADERPROG_Primitive:
-			pShader->SetSourceCode(szHYPRIMATIVE_VERTEXSHADER, HYSHADER_Vertex);
+			pShader->SetSourceCodePtrs({szHYPRIMATIVE_VERTEXSHADER}, HYSHADER_Vertex);
 			pShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
 			pShader->AddVertexAttribute("attr_color", HyShaderVariable::vec4);
 			break;
 
 		case HYSHADERPROG_Spine:
-			pShader->SetSourceCode(szHYSPINE_VERTEXSHADER, HYSHADER_Vertex);
+			pShader->SetSourceCodePtrs({szHYSPINE_VERTEXSHADER}, HYSHADER_Vertex);
 			pShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2, false, 0);
 			pShader->AddVertexAttribute("attr_uv", HyShaderVariable::vec2, false, 0);
 			pShader->AddVertexAttribute("attr_light_color", HyShaderVariable::color, true, 0);
@@ -419,7 +419,7 @@ HyOpenGL::~HyOpenGL(void)
 			break;
 
 		case HYSHADERPROG_Lines2d:
-			pShader->SetSourceCode(szHYLINES2D_VERTEXSHADER, HYSHADER_Vertex);
+			pShader->SetSourceCodePtrs({szHYLINES2D_VERTEXSHADER}, HYSHADER_Vertex);
 			pShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
 			pShader->AddVertexAttribute("attr_normal", HyShaderVariable::vec2);
 			break;
@@ -431,24 +431,24 @@ HyOpenGL::~HyOpenGL(void)
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// If unassigned fragment shader, fill in defaults
-	if(pShader->GetSourceCode(HYSHADER_Fragment).empty())
+	if(pShader->GetSourceCodePtrs(HYSHADER_Fragment).empty())
 	{
 		switch(pShader->GetDefaults())
 		{
 		case HYSHADERPROG_QuadBatch:
-			pShader->SetSourceCode(szHYQUADBATCH_FRAGMENTSHADER, HYSHADER_Fragment);
+			pShader->SetSourceCodePtrs({szHYQUADBATCH_FRAGMENTSHADER}, HYSHADER_Fragment);
 			break;
 
 		case HYSHADERPROG_Primitive:
-			pShader->SetSourceCode(szHYPRIMATIVE_FRAGMENTSHADER, HYSHADER_Fragment);
+			pShader->SetSourceCodePtrs({szHYPRIMATIVE_FRAGMENTSHADER}, HYSHADER_Fragment);
 			break;
 
 		case HYSHADERPROG_Spine:
-			pShader->SetSourceCode(szHYSPINE_FRAGMENTSHADER, HYSHADER_Fragment);
+			pShader->SetSourceCodePtrs({szHYSPINE_FRAGMENTSHADER}, HYSHADER_Fragment);
 			break;
 
 		case HYSHADERPROG_Lines2d:
-			pShader->SetSourceCode(szHYLINES2D_FRAGMENTSHADER, HYSHADER_Fragment);
+			pShader->SetSourceCodePtrs({szHYLINES2D_FRAGMENTSHADER}, HYSHADER_Fragment);
 			break;
 
 		default:
@@ -996,8 +996,8 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glCreateShader");
 
 	// Compile the shader from the passed in source code
-	const char *szSrc = pShader->GetSourceCode(eType).c_str();
-	glShaderSource(iShaderHandle, 1, &szSrc, NULL);
+	std::vector<const char *> srcPtrList = pShader->GetSourceCodePtrs(eType);
+	glShaderSource(iShaderHandle, srcPtrList.size(), srcPtrList.data(), NULL);
 	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glShaderSource");
 
 	glCompileShader(iShaderHandle);

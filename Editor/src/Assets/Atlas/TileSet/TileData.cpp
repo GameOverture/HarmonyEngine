@@ -13,7 +13,8 @@
 
 #include <QBitArray>
 
-TileData::TileData(quint32 uiTileChecksum, QPoint metaGridPos, QUndoStack *pUndoStack) :
+TileData::TileData(AtlasTileSet *pTileSet, quint32 uiTileChecksum, QPoint metaGridPos, QUndoStack *pUndoStack) :
+	m_pTileSet(pTileSet),
 	m_Uuid(QUuid::createUuid()),
 	m_uiTileChecksum(uiTileChecksum),
 	m_MetaGridPos(metaGridPos),
@@ -22,7 +23,8 @@ TileData::TileData(quint32 uiTileChecksum, QPoint metaGridPos, QUndoStack *pUndo
 	InitPropertiesModel(pUndoStack);
 }
 
-TileData::TileData(const QJsonObject &tileDataObj, QUndoStack *pUndoStack) :
+TileData::TileData(AtlasTileSet *pTileSet, const QJsonObject &tileDataObj, QUndoStack *pUndoStack) :
+	m_pTileSet(pTileSet),
 	m_Uuid(QUuid(tileDataObj["UUID"].toString())),
 	m_uiTileChecksum(static_cast<quint32>(tileDataObj["TileChecksum"].toVariant().toLongLong())),
 	m_MetaGridPos(QPoint(tileDataObj["MetaGridPosX"].toInt(), tileDataObj["MetaGridPosY"].toInt())),
@@ -116,6 +118,11 @@ void TileData::InitPropertiesModel(QUndoStack *pUndoStack)
 	
 	m_pSetupPropertiesModel->InsertCategory(-1, "Randomization");
 	m_pSetupPropertiesModel->AppendProperty("Randomization", "Probability", PROPERTIESTYPE_double, 1.0, "The relative probability of this tile appearing when painting with \"Place Random Tile\" enabled", PROPERTIESACCESS_Mutable, 0.0, 1.0, 0.05);
+}
+
+AtlasTileSet *TileData::GetTileSet() const
+{
+	return m_pTileSet;
 }
 
 QUuid TileData::GetUuid() const

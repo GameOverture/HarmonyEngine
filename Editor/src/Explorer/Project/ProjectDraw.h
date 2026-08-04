@@ -47,6 +47,8 @@ class ProjectDraw : public HyEntity2d
 
 	// Misc shaders (used elsewhere than ProjectDraw)
 	HyShader *			m_pTileMapSquareShader;
+	HyShader *			m_pTileMapHalfSquareShader;
+	HyShader *			m_pTileMapIsometricShader;
 	HyShader *			m_pTileMapHexShader;
 
 public:
@@ -60,8 +62,7 @@ public:
 	void OnResizeRenderer();
 	void OnCameraUpdated();
 
-	HyShader *GetTileMapSquareShader();
-	HyShader *GetTileMapHexShader();
+	HyShader *GetTileMapGridShader(HyTileMapLayout eLayout) const;
 };
 
 #endif // PROJECTDRAW_H

@@ -13,6 +13,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 
+class AuxTileMap;
 class AtlasTileSet;
 class TileData;
 class TileGfxItem;
@@ -21,6 +22,7 @@ class TileMapGfxScene : public QGraphicsScene
 {
 	Q_OBJECT
 
+	AuxTileMap *						m_pAuxTileMap;
 	const AtlasTileSet *				m_pTileSet;
 	QUuid								m_TerrainUuid;
 

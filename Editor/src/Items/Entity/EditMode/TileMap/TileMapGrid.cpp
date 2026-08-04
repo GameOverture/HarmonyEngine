@@ -24,7 +24,7 @@ TileMapGrid::TileMapGrid(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-void TileMapGrid::Reset(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimensions, glm::vec2 vGridSize, HyTileMapLayout eLayout, HyTileMapStagger eStagger)
+void TileMapGrid::Sync(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimensions, glm::vec2 vGridSize, HyTileMapLayout eLayout, HyTileMapStagger eStagger)
 {
 	m_InverseTileMapLayerTransform = inverseTileMapLayerTransform;
 
@@ -45,16 +45,20 @@ void TileMapGrid::Reset(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimen
 	m_ShaderUniforms.Set("u_transform_mtx", GetSceneTransform(fExtrapolatePercent));
 
 	// Fragment shader uniforms
+	// TODO: Based on camera zoom, modify 'u_line_width' and create bool uniform to optionally disable anti-aliasing
 	m_ShaderUniforms.Set("u_inv_tilemap", m_InverseTileMapLayerTransform);
-	glm::vec2 ptPos = pos.Get();
 	m_ShaderUniforms.Set("u_position", pos.Get());
 	m_ShaderUniforms.Set("u_dimensions", m_vDimensions);
 	m_ShaderUniforms.Set("u_grid_size", m_vGridSize);
+	if(m_eLayout == HYTILEMAPLAYOUT_HalfOffsetSquare)
+	{
+		m_ShaderUniforms.Set("u_stagger_odd", m_eStagger == HYTILEMAPSTAGGER_Odd);
+	}
 	m_ShaderUniforms.Set("u_grid_color", HyGlobal::GetEditorColor(EDITORCOLOR_TileMapGrid).GetAsVec3());
-	glm::vec4 highlightColor = HyGlobal::GetEditorColor(EDITORCOLOR_TileMapHighlight).GetAsVec4();
-	highlightColor.w = 0.5f;
-	m_ShaderUniforms.Set("u_hover_color", highlightColor);
-	m_ShaderUniforms.Set("u_line_width", 1.0f);
+	//m_ShaderUniforms.Set("u_hover_color", HyGlobal::GetEditorColor(EDITORCOLOR_TileMapHighlight).GetAsVec4(0.5f));
+
+	if(m_eLayout != HYTILEMAPLAYOUT_HexagonFlatTop && m_eLayout != HYTILEMAPLAYOUT_HexagonPointTop)
+		m_ShaderUniforms.Set("u_line_width", 2.0f);
 }
 
 /*virtual*/ bool TileMapGrid::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
