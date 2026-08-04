@@ -209,24 +209,17 @@ void main()
 const char *const szTILEMAPGRIDHEX_FRAGMENTSHADER = R"src(
 #version 140
 
-uniform mat4					u_inv_tilemap;		// World to local space transform matrix of the TileMapLayer
-uniform vec2					u_position;
-uniform vec2					u_dimensions;		// Width and height of entire render quad
-uniform vec2					u_grid_size;		// Width and height of the tiles in the grid
-uniform vec3					u_grid_color;
-//uniform float					u_line_width;		// Grid line width in world units
+uniform mat4					u_inv_tilemap;	// World to local space transform matrix of the infinite TileMapLayer grid
+uniform vec2					u_position;		// Centered position of the quad viewport in world space
+uniform vec2					u_dimensions;	// Width and height of entire render quad
+uniform vec2					u_grid_size;	// Width and height of the tiles in the grid
+uniform vec3					u_grid_color;	// Color of the grid lines
+uniform float					u_line_width;	// Grid line width in world units
 
 smooth in vec2					interp_uv;
 out vec4						out_color;
 
-const float x_shift = sin(3.1415926535 / 3.0);
-
-float hex(vec2 p)
-{
-	p.y += floor(p.x) * 0.5;
-	p = abs(fract(p) - 0.5);
-	return 1.0 - step(0.05, abs(1.0 - max(p.x * 1.5 + p.y, p.y * 2.0)));
-}
+const float x_shift = 0.8660254038; // AKA sin(3.1415926535 / 3.0)
 
 void main()
 {
@@ -234,23 +227,33 @@ void main()
 	vec2 quad_offset = (interp_uv - vec2(0.5)) * u_dimensions;
 	quad_offset.y *= -1.0; // Harmony world up is positive Y, but UV's are the opposite
 	vec2 world_pos = u_position + quad_offset;
-	
+
 	// Convert the fragment position into the TileMapLayer's local coordinate system.
 	vec2 local_pos = (u_inv_tilemap * vec4(world_pos, 0.0, 1.0)).xy;
 
-	local_pos /= u_grid_size;
-	local_pos.x /= x_shift;
+	// Offset grid so the sample rectangle (corner) of a hex tile lies on the origin.
+	local_pos.x -= u_grid_size.x * x_shift;
+	local_pos.y -= u_grid_size.y * 0.5;
+	
+	// Hexagonal grid math
+	vec2 cell = vec2(u_grid_size.x * 0.75, u_grid_size.y);
+	local_pos /= cell;
+	local_pos.y += floor(local_pos.x) * 0.5;
+	local_pos = abs(fract(local_pos) - 0.5);
+
+	float line = u_line_width / min(u_grid_size.x, u_grid_size.y);
+	float edge = abs(1.0 - max(local_pos.x * 1.5 + local_pos.y, local_pos.y * 2.0));
 
 	// IF NO ANTI-ALIASING USE THIS
-	float dist = hex(local_pos);
-	vec3 color = vec3(dist);
-	color *= u_grid_color;
-	out_color = vec4(color, dist);
+	//float d = 1.0 - step(line, edge);
+	//vec3 color = vec3(d);
+	//color *= u_grid_color;
+	//out_color = vec4(color, d);
 
 	// IF ANTI-ALIASING USE THIS (also mixes in black outline)
-	//float gridAlpha = smoothstep(u_line_width, 0.0, hex(dist));
-	//vec3 finalColor = mix(vec3(0.0), u_grid_color, gridAlpha);
-	//out_color = vec4(finalColor, gridAlpha);
+	float gridAlpha = smoothstep(line, 0.0, edge);
+	vec3 finalColor = mix(vec3(0.0), u_grid_color, gridAlpha);
+	out_color = vec4(finalColor, gridAlpha);
 }
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------

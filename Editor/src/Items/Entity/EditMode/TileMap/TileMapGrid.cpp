@@ -55,10 +55,7 @@ void TileMapGrid::Sync(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimens
 		m_ShaderUniforms.Set("u_stagger_odd", m_eStagger == HYTILEMAPSTAGGER_Odd);
 	}
 	m_ShaderUniforms.Set("u_grid_color", HyGlobal::GetEditorColor(EDITORCOLOR_TileMapGrid).GetAsVec3());
-	//m_ShaderUniforms.Set("u_hover_color", HyGlobal::GetEditorColor(EDITORCOLOR_TileMapHighlight).GetAsVec4(0.5f));
-
-	if(m_eLayout != HYTILEMAPLAYOUT_HexagonFlatTop && m_eLayout != HYTILEMAPLAYOUT_HexagonPointTop)
-		m_ShaderUniforms.Set("u_line_width", 2.0f);
+	m_ShaderUniforms.Set("u_line_width", 2.0f);
 }
 
 /*virtual*/ bool TileMapGrid::WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) /*override*/
