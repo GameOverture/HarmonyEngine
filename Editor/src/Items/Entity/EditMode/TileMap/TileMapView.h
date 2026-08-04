@@ -27,7 +27,7 @@ public:
 	virtual ~BrushPreview();
 
 	void Clear();
-	void Sync(const QMap<QPoint, TileData *> &brushMap, glm::vec2 vGridSize, HyTileMapLayout eLayout, HyTileMapStagger eStagger);
+	void Sync(const QMap<QPoint, TileData *> &brushMap, glm::vec2 vGridSize, HyTileMapLayout eLayout);
 };
 
 class TileMapView : public IEditModeView

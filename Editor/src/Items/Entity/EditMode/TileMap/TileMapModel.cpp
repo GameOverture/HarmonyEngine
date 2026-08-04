@@ -16,9 +16,8 @@
 TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack) :
 	IEditModeModel(EDITMODETYPE_TileMap),
 	m_ProjectRef(projectRef),
-	m_eLayout(HYTILEMAPLAYOUT_Unknown),
-	m_eStaggerIndex(HYTILEMAPSTAGGER_Odd),
-	m_vGridSize(0.0f, 0.0f)
+	m_vGridSize(0.0f, 0.0f),
+	m_eLayout(HYTILEMAPLAYOUT_Unknown)
 {
 }
 
@@ -37,7 +36,6 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack) :
 	{
 		m_vGridSize = { 0.0f, 0.0f };
 		m_eLayout = HYTILEMAPLAYOUT_Unknown;
-		m_eStaggerIndex = HYTILEMAPSTAGGER_Unknown;
 
 		//m_TiledLayer.
 		return;
@@ -106,16 +104,6 @@ HyTileMapLayout TileMapModel::GetLayout() const
 void TileMapModel::SetLayout(HyTileMapLayout eLayout)
 {
 	m_eLayout = eLayout;
-}
-
-HyTileMapStagger TileMapModel::GetStaggerIndex() const
-{
-	return m_eStaggerIndex;
-}
-
-void TileMapModel::SetStaggerIndex(HyTileMapStagger eStaggerIndex)
-{
-	m_eStaggerIndex = eStaggerIndex;
 }
 
 const Tiled::TileLayer &TileMapModel::GetTiledTileLayer() const

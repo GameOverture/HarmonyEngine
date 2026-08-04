@@ -426,7 +426,6 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Tile Map", "Data", PROPERTIESTYPE_ShapeData, QVariant(), "Sets this Tile Map's tile data", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), tileMapDataVariant);
 		m_pPropertiesModel->AppendProperty("Tile Map", "Grid Size", PROPERTIESTYPE_ivec2, QPoint(32, 32), "The grid size, in pixels which tiles are placed in. For all tile shapes, this size corresponds to the bounding rectangle of the tile shape. This is independent to the tile's actual size, or the region sampled on the texture atlas", PROPERTIESACCESS_ToggleUnchecked, 1, iRANGE, 1.0, "[", "]");
 		m_pPropertiesModel->AppendProperty("Tile Map", "Layout", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTileMapLayoutNameList()[HYTILEMAPLAYOUT_Square], "The tile map orientation which controls how the grid is projected and how tiles are positioned relative to each other", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTileMapLayoutNameList());
-		m_pPropertiesModel->AppendProperty("Tile Map", "Stagger Index", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTileMapStaggerNameList()[HYTILEMAPSTAGGER_Odd], "The stagger index is used to determine which rows or columns are offset in a staggered tile map layout", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTileMapStaggerNameList());
 		break; }
 
 	case ITEM_PrimNode:

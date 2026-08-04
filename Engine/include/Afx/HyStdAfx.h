@@ -199,18 +199,6 @@ enum HyTileMapLayout
 	HYNUM_TILEMAPLAYOUTS
 };
 
-// When staggering, specifies whether the odd or the even rows/columns are shifted half a tile right/down.
-// Only used with HYTILEMAPLAYOUT_IsometricStagger* and HYTILEMAPLAYOUT_Hexagon*
-enum HyTileMapStagger
-{
-	HYTILEMAPSTAGGER_Unknown = -1,
-
-	HYTILEMAPSTAGGER_Odd = 0,
-	HYTILEMAPSTAGGER_Even,
-
-	HYNUM_TILEMAPSTAGGERS
-};
-
 enum HyPlaylistMode
 {
 	// NOTE: Order matters, mode is serialized as int

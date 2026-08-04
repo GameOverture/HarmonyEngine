@@ -26,7 +26,6 @@ class TileMapModel : public IEditModeModel
 
 	glm::ivec2					m_vGridSize;
 	HyTileMapLayout				m_eLayout;
-	HyTileMapStagger			m_eStaggerIndex;
 
 	Tiled::GidMapper			m_TiledGidMapper;
 	Tiled::TileLayer			m_TiledLayer;
@@ -55,9 +54,6 @@ public:
 
 	HyTileMapLayout GetLayout() const;
 	void SetLayout(HyTileMapLayout eLayout);
-
-	HyTileMapStagger GetStaggerIndex() const;
-	void SetStaggerIndex(HyTileMapStagger eStagger);
 
 	const Tiled::TileLayer &GetTiledTileLayer() const;
 	QList<AtlasTileSet *> UsedTilesets(const AtlasManager &atlasManagerRef) const;

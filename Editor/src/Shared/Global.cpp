@@ -19,7 +19,6 @@
 /*static*/ QString HyGlobal::sm_AssetNames[NUM_ASSETMANTYPES];
 /*static*/ QString HyGlobal::sm_TileSetShapeNames[NUM_TILESETSHAPES];
 /*static*/ QString HyGlobal::sm_TileMapLayouts[HYNUM_TILEMAPLAYOUTS];
-/*static*/ QString HyGlobal::sm_TileMapStaggers[HYNUM_TILEMAPSTAGGERS];
 /*static*/ QString HyGlobal::sm_ShapeNames[NUM_SHAPES];
 /*static*/ QString HyGlobal::sm_TweenFuncNames[NUM_TWEENFUNCS];
 /*static*/ QString HyGlobal::sm_TweenPropNames[NUM_TWEENPROPS];
@@ -127,7 +126,7 @@
 	sm_AssetNames[ASSETMAN_Audio] = "Audio";
 
 	sm_TileSetShapeNames[TILESETSHAPE_Square] = "Square";
-	sm_TileSetShapeNames[TILESETSHAPE_Isometric] = "Isometric";
+	sm_TileSetShapeNames[TILESETSHAPE_Isometric] = "Diamond (Isometric)";
 	sm_TileSetShapeNames[TILESETSHAPE_HexagonPointTop] = "Hexagon Point-Top";
 	sm_TileSetShapeNames[TILESETSHAPE_HexagonFlatTop] = "Hexagon Flat-Top";
 
@@ -138,9 +137,6 @@
 	sm_TileMapLayouts[HYTILEMAPLAYOUT_IsometricStaggerY] = "Isometric Staggered Y";
 	sm_TileMapLayouts[HYTILEMAPLAYOUT_HexagonPointTop] = "Hexagon Point-Top";
 	sm_TileMapLayouts[HYTILEMAPLAYOUT_HexagonFlatTop] = "Hexagon Flat-Top";
-
-	sm_TileMapStaggers[HYTILEMAPSTAGGER_Odd] = "Odd";
-	sm_TileMapStaggers[HYTILEMAPSTAGGER_Even] = "Even";
 
 	sm_ShapeNames[SHAPE_None] = "None";
 	sm_ShapeNames[SHAPE_Box] = "Box";
@@ -684,26 +680,6 @@
 	}
 
 	return HYTILEMAPLAYOUT_Unknown;
-}
-
-/*static*/ QStringList HyGlobal::GetTileMapStaggerNameList()
-{
-	QStringList list;
-	for(int i = 0; i < HYNUM_TILEMAPSTAGGERS; ++i)
-		list.append(sm_TileMapStaggers[i]);
-	
-	return list;
-}
-
-/*static*/ HyTileMapStagger HyGlobal::GetTileMapStaggerFromString(QString sTileMapStagger)
-{
-	for(int i = 0; i < HYNUM_TILEMAPSTAGGERS; ++i)
-	{
-		if(sTileMapStagger.compare(sm_TileMapStaggers[i], Qt::CaseInsensitive) == 0)
-			return static_cast<HyTileMapStagger>(i);
-	}
-
-	return HYTILEMAPSTAGGER_Unknown;
 }
 
 /*static*/ QStringList HyGlobal::GetAlignmentNameList()

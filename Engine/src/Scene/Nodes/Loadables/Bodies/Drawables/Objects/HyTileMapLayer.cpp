@@ -72,16 +72,6 @@ void HyTileMapLayer::SetLayout(HyTileMapLayout eLayout)
 	m_eLayout = eLayout;
 }
 
-HyTileMapStagger HyTileMapLayer::GetStagger() const
-{
-	return m_eStagger;
-}
-
-void HyTileMapLayer::SetStagger(HyTileMapStagger eStagger)
-{
-	m_eStagger = eStagger;
-}
-
 glm::ivec2 HyTileMapLayer::WorldToTile(glm::vec2 ptWorldPos)
 {
 	if(AcquireData() == nullptr || m_iTileMapDataIndex >= static_cast<const HyTileMapData *>(UncheckedGetData())->GetNumTileMaps() || m_iTileMapDataIndex < 0)
@@ -97,12 +87,7 @@ glm::ivec2 HyTileMapLayer::WorldToTile(glm::vec2 ptWorldPos)
 
 	case HYTILEMAPLAYOUT_HalfOffsetSquare: {
 		int iRow = ptLocal.y / m_vGridSize.y;
-		float fOffset = 0.0f;
-		if(m_eStagger == HYTILEMAPSTAGGER_Even)
-			fOffset = (iRow & 1) ? m_vGridSize.x * 0.5f : 0.0f;
-		else if(m_eStagger == HYTILEMAPSTAGGER_Odd)
-			fOffset = (iRow & 1) ? 0.0f : m_vGridSize.x * 0.5f;
-
+		float fOffset = (iRow & 1) ? 0.0f : m_vGridSize.x * 0.5f;
 		return glm::ivec2((ptLocal.x - fOffset) / m_vGridSize.x, iRow);
 		break; }
 
@@ -116,33 +101,15 @@ glm::ivec2 HyTileMapLayer::WorldToTile(glm::vec2 ptWorldPos)
 		break; }
 
 	case HYTILEMAPLAYOUT_IsometricStaggerX: {
-		if(m_eStagger == HYTILEMAPSTAGGER_Even)
-		{
-			int iTileX = static_cast<int>(floor(ptLocal.x / m_vGridSize.x));
-			int iTileY = static_cast<int>(floor((ptLocal.y - ((iTileX & 1) ? m_vGridSize.y * 0.5f : 0.0f)) / m_vGridSize.y));
-			return glm::ivec2(iTileX, iTileY);
-		}
-		else if(m_eStagger == HYTILEMAPSTAGGER_Odd)
-		{
-			int iTileX = static_cast<int>(floor(ptLocal.x / m_vGridSize.x));
-			int iTileY = static_cast<int>(floor((ptLocal.y - ((iTileX & 1) ? 0.0f : m_vGridSize.y * 0.5f)) / m_vGridSize.y));
-			return glm::ivec2(iTileX, iTileY);
-		}
+		int iTileX = static_cast<int>(floor(ptLocal.x / m_vGridSize.x));
+		int iTileY = static_cast<int>(floor((ptLocal.y - ((iTileX & 1) ? 0.0f : m_vGridSize.y * 0.5f)) / m_vGridSize.y));
+		return glm::ivec2(iTileX, iTileY);
 		break; }
 
 	case HYTILEMAPLAYOUT_IsometricStaggerY: {
-		if(m_eStagger == HYTILEMAPSTAGGER_Even)
-		{
-			int iTileY = static_cast<int>(floor(ptLocal.y / m_vGridSize.y));
-			int iTileX = static_cast<int>(floor((ptLocal.x - ((iTileY & 1) ? m_vGridSize.x * 0.5f : 0.0f)) / m_vGridSize.x));
-			return glm::ivec2(iTileX, iTileY);
-		}
-		else if(m_eStagger == HYTILEMAPSTAGGER_Odd)
-		{
-			int iTileY = static_cast<int>(floor(ptLocal.y / m_vGridSize.y));
-			int iTileX = static_cast<int>(floor((ptLocal.x - ((iTileY & 1) ? 0.0f : m_vGridSize.x * 0.5f)) / m_vGridSize.x));
-			return glm::ivec2(iTileX, iTileY);
-		}
+		int iTileY = static_cast<int>(floor(ptLocal.y / m_vGridSize.y));
+		int iTileX = static_cast<int>(floor((ptLocal.x - ((iTileY & 1) ? 0.0f : m_vGridSize.x * 0.5f)) / m_vGridSize.x));
+		return glm::ivec2(iTileX, iTileY);
 		break; }
 
 	case HYTILEMAPLAYOUT_HexagonFlatTop:

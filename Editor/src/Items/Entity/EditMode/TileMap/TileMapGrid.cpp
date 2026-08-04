@@ -15,8 +15,7 @@ TileMapGrid::TileMapGrid(HyEntity2d *pParent /*= nullptr*/) :
 	m_InverseTileMapLayerTransform(1.0f),
 	m_vDimensions(0.0f, 0.0f),
 	m_vGridSize(0.0f, 0.0f),
-	m_eLayout(HYTILEMAPLAYOUT_Unknown),
-	m_eStagger(HYTILEMAPSTAGGER_Unknown)
+	m_eLayout(HYTILEMAPLAYOUT_Unknown)
 {
 }
 
@@ -24,7 +23,7 @@ TileMapGrid::TileMapGrid(HyEntity2d *pParent /*= nullptr*/) :
 {
 }
 
-void TileMapGrid::Sync(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimensions, glm::vec2 vGridSize, HyTileMapLayout eLayout, HyTileMapStagger eStagger)
+void TileMapGrid::Sync(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimensions, glm::vec2 vGridSize, HyTileMapLayout eLayout)
 {
 	m_InverseTileMapLayerTransform = inverseTileMapLayerTransform;
 
@@ -36,7 +35,6 @@ void TileMapGrid::Sync(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimens
 
 	m_vGridSize = vGridSize;
 	m_eLayout = eLayout;
-	m_eStagger = eStagger;
 }
 
 /*virtual*/ void TileMapGrid::OnUpdateUniforms(float fExtrapolatePercent) /*override*/
@@ -50,10 +48,6 @@ void TileMapGrid::Sync(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimens
 	m_ShaderUniforms.Set("u_position", pos.Get());
 	m_ShaderUniforms.Set("u_dimensions", m_vDimensions);
 	m_ShaderUniforms.Set("u_grid_size", m_vGridSize);
-	if(m_eLayout == HYTILEMAPLAYOUT_HalfOffsetSquare)
-	{
-		m_ShaderUniforms.Set("u_stagger_odd", m_eStagger == HYTILEMAPSTAGGER_Odd);
-	}
 	m_ShaderUniforms.Set("u_grid_color", HyGlobal::GetEditorColor(EDITORCOLOR_TileMapGrid).GetAsVec3());
 	m_ShaderUniforms.Set("u_line_width", 2.0f);
 }

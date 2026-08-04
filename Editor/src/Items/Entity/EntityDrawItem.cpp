@@ -1001,8 +1001,6 @@ void ExtrapolateProperties(Project &projectRef,
 				}
 				if(tileMapObj.contains("Layout"))
 					static_cast<TileMapModel *>(pEditModel)->SetLayout(HyGlobal::GetTileMapLayoutFromString(tileMapObj["Layout"].toString()));
-				if(tileMapObj.contains("Stagger Index"))
-					static_cast<TileMapModel *>(pEditModel)->SetStaggerIndex(HyGlobal::GetTileMapStaggerFromString(tileMapObj["Stagger Index"].toString()));
 			}
 			break;
 

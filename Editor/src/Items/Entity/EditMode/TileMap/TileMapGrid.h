@@ -21,13 +21,12 @@ protected:
 
 	glm::vec2			m_vGridSize;
 	HyTileMapLayout		m_eLayout;
-	HyTileMapStagger	m_eStagger;
 	
 public:
 	TileMapGrid(HyEntity2d *pParent = nullptr);
 	virtual ~TileMapGrid();
 
-	void Sync(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimensions, glm::vec2 vGridSize, HyTileMapLayout eLayout, HyTileMapStagger eStagger);
+	void Sync(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimensions, glm::vec2 vGridSize, HyTileMapLayout eLayout);
 
 	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;

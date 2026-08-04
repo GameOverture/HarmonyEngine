@@ -32,7 +32,7 @@ void BrushPreview::Clear()
 	m_TileList.clear();
 }
 
-void BrushPreview::Sync(const QMap<QPoint, TileData *> &brushMap, glm::vec2 vGridSize, HyTileMapLayout eLayout, HyTileMapStagger eStagger)
+void BrushPreview::Sync(const QMap<QPoint, TileData *> &brushMap, glm::vec2 vGridSize, HyTileMapLayout eLayout)
 {
 	Clear();
 	for(auto iter = brushMap.constBegin(); iter != brushMap.constEnd(); ++iter)
@@ -78,8 +78,7 @@ void TileMapView::SyncMouseHoverGrid()
 	m_MouseHoverGrid.Sync(glm::inverse(GetSceneTransform(0.0f)),
 						  vQuadDimensions,
 						  pModel->GetGridSize(),
-						  pModel->GetLayout(),
-						  pModel->GetStaggerIndex());
+						  pModel->GetLayout());
 
 	m_MouseHoverGrid.SetShader(pModel->GetGridShader());
 

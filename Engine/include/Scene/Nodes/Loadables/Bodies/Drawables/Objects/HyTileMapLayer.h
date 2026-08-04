@@ -21,7 +21,6 @@ protected:
 
 	glm::ivec2			m_vGridSize;
 	HyTileMapLayout		m_eLayout;
-	HyTileMapStagger	m_eStagger;
 
 public:
 	HyTileMapLayer(HyEntity2d *pParent = nullptr);
@@ -39,9 +38,6 @@ public:
 
 	HyTileMapLayout GetLayout() const;
 	void SetLayout(HyTileMapLayout eLayout);
-
-	HyTileMapStagger GetStagger() const;
-	void SetStagger(HyTileMapStagger eStagger);
 
 	glm::ivec2 WorldToTile(glm::vec2 ptWorldPos);
 	glm::vec2 TileToWorld(glm::ivec2 ptTileCoord) const;

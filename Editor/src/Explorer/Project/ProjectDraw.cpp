@@ -89,7 +89,6 @@ uniform mat4					u_inv_tilemap;		// World to local space transform matrix of the
 uniform vec2					u_position;
 uniform vec2					u_dimensions;		// Width and height of entire render quad
 uniform vec2					u_grid_size;		// Width and height of the tiles in the grid
-uniform bool					u_stagger_odd;		// Whether the grid is staggered on odd rows or even rows
 uniform vec3					u_grid_color;
 uniform float					u_line_width;		// Grid line width in world units
 
@@ -136,11 +135,7 @@ float TileSDF(vec2 local_pos)
 
 	float row = floor(p.y / u_grid_size.y);
 
-	bool stagger = u_stagger_odd ?
-		(mod(row, 2.0) == 1.0) :
-		(mod(row, 2.0) == 0.0);
-
-	if(stagger)
+	if(mod(row, 2.0) == 1.0)
 		p.x -= u_grid_size.x * 0.5;
 
 	vec2 f = fract(p / u_grid_size);
@@ -184,6 +179,8 @@ void main()
 	// Convert the fragment position into the TileMapLayer's local coordinate system.
 	vec2 local_pos = (u_inv_tilemap * vec4(world_pos, 0.0, 1.0)).xy;
 
+	// Offset grid so the sample rectangle (bottom left) of a diamond tile lies on the origin.
+	local_pos.y -= u_grid_size.y * 0.5;
 
 	float slope = u_grid_size.y / u_grid_size.x;
 
