@@ -50,6 +50,7 @@ protected:
 
 	// Built-in shaders
 	HyShader *										m_pShaderQuadBatch;
+	HyShader *										m_pShaderTileMapLayer;
 	HyShader *										m_pShaderPrimitive;
 	HyShader *										m_pShaderSpine;
 
@@ -84,10 +85,10 @@ public:
 	virtual void DrawRenderState_2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera) = 0;
 	virtual void FinishRender() = 0;
 	virtual void UploadShader(HyShader *pShader) = 0;
-	virtual uint32 AddTexture(const HyTextureInfo &infoRef, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, uint32 hPBO) = 0;
-	//virtual uint32 AddTextureArray(const HyTextureInfo &infoRef, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) = 0;	// Returns texture's ID used for API specific drawing. May not fit entire array, 'uiNumTexturesUploaded' is how many textures it did upload.
+	virtual uint32 AddTexture(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, uint32 hPBO) = 0; // Returns texture's API specific ID used for drawing
+	virtual uint32 AddTextureArray(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) = 0; // Returns texture's API specific ID used for drawing
 	virtual void DeleteTexture(uint32 uiTextureHandle) = 0;
-	virtual uint32 GenerateVertexBuffer() = 0;	// Returns the graphics API handle to a new vertex buffer in the form of a uint32
+	virtual uint32 GenerateVertexBuffer() = 0;	// Returns the graphics API handle to a new vertex buffer
 	virtual uint32 GenerateIndexBuffer() = 0;
 	virtual uint8 *GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) = 0;
 

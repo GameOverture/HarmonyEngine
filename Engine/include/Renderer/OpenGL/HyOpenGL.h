@@ -67,8 +67,8 @@ public:
 	virtual void FinishRender() override;
 
 	virtual void UploadShader(HyShader *pShader) override;
-	virtual uint32 AddTexture(const HyTextureInfo &infoRef, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, uint32 hPBO) override;
-	//virtual uint32 AddTextureArray(const HyTextureInfo &infoRef, uint32 uiWidth, uint32 uiHeight, std::vector<unsigned char *> &pixelDataList, uint32 &uiNumTexturesUploadedOut) override;
+	virtual uint32 AddTexture(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, uint32 hPBO) override;
+	virtual uint32 AddTextureArray(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) override;
 	virtual void DeleteTexture(uint32 uiTextureHandle) override;
 	virtual uint32 GenerateVertexBuffer() override;
 	virtual uint32 GenerateIndexBuffer() override;
@@ -78,6 +78,9 @@ public:
 
 private:
 	void CompileShader(HyShader *pShader, HyShaderType eType);
+	void GetTextureFormats(const HyTextureInfo formatInfo, GLenum &eInternalFormatOut, GLenum &eFormatOut, bool &bIsPixelDataCompressedOut) const;
+	void SetTextureParameters(const HyTextureInfo formatInfo, GLenum eTarget) const;
+
 	void RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera);
 };
 
