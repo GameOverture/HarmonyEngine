@@ -294,6 +294,22 @@ public:
 	static glm::vec2 ClosestPointOnSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &ptTestPoint);
 	static bool TestSegmentsOverlap(const glm::vec2 &ptSegA1, const glm::vec2 &ptSegA2, const glm::vec2 &ptSegB1, const glm::vec2 &ptSegB2, glm::vec2 &ptIntersectionOut);
 
+	static glm::ivec2 TileMapPointToCell_Square(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize);
+	static glm::ivec2 TileMapPointToCell_HalfSquare(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize);
+	static glm::ivec2 TileMapPointToCell_Isometric(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize);
+	static glm::ivec2 TileMapPointToCell_IsometricStaggerX(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize);
+	static glm::ivec2 TileMapPointToCell_IsometricStaggerY(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize);
+	static glm::ivec2 TileMapPointToCell_HexagonFlatTop(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize);
+	static glm::ivec2 TileMapPointToCell_HexagonPointTop(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize);
+
+	static glm::vec2 TileMapCellToPoint_Square(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize);
+	static glm::vec2 TileMapCellToPoint_HalfSquare(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize);
+	static glm::vec2 TileMapCellToPoint_Isometric(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize);
+	static glm::vec2 TileMapCellToPoint_IsometricStaggerX(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize);
+	static glm::vec2 TileMapCellToPoint_IsometricStaggerY(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize);
+	static glm::vec2 TileMapCellToPoint_HexagonFlatTop(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize);
+	static glm::vec2 TileMapCellToPoint_HexagonPointTop(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize);
+
 	// Normalizes a value to an arbitrary range. The value wraps when going below min range or above max range.
 	static float NormalizeRange(float fValue, float fMin, float fMax);
 	static int32 NormalizeRange(int32 iValue, int32 iMin, int32 iMax);

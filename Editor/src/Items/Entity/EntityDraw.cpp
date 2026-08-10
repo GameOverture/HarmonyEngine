@@ -22,7 +22,10 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_pRootEntity(nullptr),
 	m_bPlayingPreview(false),
 	m_eEditModeState(EDITMODE_Off),
-	m_EditModeWindowOutline(this)
+	m_EditModeWindowOutline(this),
+	m_CursorFill(QPixmap(":/icons22x22/paint-bucket-fill.png"), 1, 20),
+	m_CursorEyeDrop(QPixmap(":/icons22x22/color-picker.png"), 1, 21),
+	m_CursorEraser(QPixmap(":/icons22x22/draw-eraser.png"), 1, 20)
 {
 	m_EditModeWindowOutline.UseWindowCoordinates();
 	m_EditModeWindowOutline.SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
@@ -134,7 +137,23 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 	case EDITMODE_Idle: {
 		Qt::CursorShape eCursorShape = pTreeItemData->GetEditModel()->MouseMoveIdle();
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(eCursorShape);
+		if(eCursorShape < Qt::CustomCursor)
+			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(eCursorShape);
+		else
+		{
+			switch(eCursorShape)
+			{
+			case (Qt::CustomCursor + TILEMAPTOOL_Fill):
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(m_CursorFill);
+				break;
+			case (Qt::CustomCursor + TILEMAPTOOL_Picker):
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(m_CursorEyeDrop);
+				break;
+			case (Qt::CustomCursor + TILEMAPTOOL_Eraser):
+				Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(m_CursorEraser);
+				break;
+			}
+		}
 		break; }
 
 	case EDITMODE_MouseDownOutside:
@@ -203,7 +222,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), m_ptDragStart);
 		
 		bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-		bool bStartTransform = pTreeItemData->GetEditModel()->MousePressEvent(m_eEditModeState, bShiftHeld);
+		bool bStartTransform = pTreeItemData->GetEditModel()->MousePressEvent(m_eEditModeState, bShiftHeld, m_ptDragStart);
 		if(bStartTransform)
 		{
 			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BlankCursor);

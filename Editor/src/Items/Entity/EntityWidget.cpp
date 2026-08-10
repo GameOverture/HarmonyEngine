@@ -27,6 +27,7 @@
 
 #include <QClipboard>
 #include <QShortcut>
+#include <QMouseEvent>
 
 EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullptr*/) :
 	IWidget(itemRef, pParent),
@@ -609,12 +610,13 @@ bool EntityWidget::IsEditMode() const
 
 void EntityWidget::SetEditMode(EntityTreeItemData *pItemToEdit)
 {
+	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+
 	if(pItemToEdit)
 	{
 		RequestSelectedItems(QList<QUuid>() << pItemToEdit->GetThisUuid());
 
 		// Update EntityDraw with latest selection via ApplyJsonData()
-		EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
 		if(pEntityDraw == nullptr)
 		{
 			HyGuiLog("EntityWidget::SetEditMode() - pEntityDraw is nullptr", LOGTYPE_Error);
@@ -638,6 +640,15 @@ void EntityWidget::SetEditMode(EntityTreeItemData *pItemToEdit)
 		ui->actionEditMode->setChecked(false);
 		MainWindow::HideAuxWidget(AUXTAB_TileMap);
 	}
+
+	if(pEntityDraw)
+	{
+		// Invoke fake mouse move event to update the mouse cursor
+		QMouseEvent *pFakeEvent = new QMouseEvent(QEvent::MouseButtonPress, QPointF(0.0, 0.0), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+		pEntityDraw->OnMouseMoveEvent(pFakeEvent);
+		delete pFakeEvent;
+	}
+	ui->nodeTree->update(); // Refresh entity tree node view so edit mode icon is correct
 }
 
 /*virtual*/ void EntityWidget::showEvent(QShowEvent *pEvent) /*override*/
@@ -674,6 +685,20 @@ void EntityWidget::StopPreview()
 	// Restore selected items
 	RequestSelectedItems(m_PreviewSelectedItemsList);
 	m_PreviewSelectedItemsList.clear();
+}
+
+void EntityWidget::ToggleEditMode(EntityTreeItemData *pCurItemData)
+{
+	EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
+	if(pCurItemData == nullptr || pEntityDraw == nullptr)
+		return;
+
+	EntityDrawItem *pActiveEditDrawItem = pEntityDraw->GetCurEditItem();
+
+	if(pActiveEditDrawItem && pActiveEditDrawItem->GetEntityTreeItemData() == pCurItemData)
+		SetEditMode(nullptr); // Turn off edit mode
+	else if(pCurItemData->IsEditable())
+		SetEditMode(pCurItemData); // Turn on edit mode for the newly focused item
 }
 
 void EntityWidget::OnKeySpace()
@@ -747,7 +772,14 @@ void EntityWidget::OnKeyShiftE()
 void EntityWidget::OnKeyF()
 {
 	if(ui->actionEditMode->isEnabled())
-		ui->actionEditMode->toggle();
+	{
+		QModelIndexList selectedIndices = GetSelectedItems();
+		if(selectedIndices.size() == 1)
+		{
+			EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>();
+			ToggleEditMode(pCurItemData);
+		}
+	}
 }
 
 void EntityWidget::on_cmbBaseClass_activated(int iIndex)
@@ -780,16 +812,8 @@ void EntityWidget::OnTreeFocusIndexChanged(const QModelIndex &curIndex, const QM
 	{
 		QModelIndex indexWithData = ui->nodeTree->model()->index(curIndex.row(), 0, curIndex.parent());
 		EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(indexWithData, Qt::UserRole).value<EntityTreeItemData *>();
-		EntityDraw *pEntityDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
-		if(pCurItemData == nullptr || pEntityDraw == nullptr)
-			return;
-
-		EntityDrawItem *pActiveEditDrawItem = pEntityDraw->GetCurEditItem();
-
-		if(pActiveEditDrawItem && pActiveEditDrawItem->GetEntityTreeItemData() == pCurItemData)
-			SetEditMode(nullptr); // Turn off edit mode
-		else if(pCurItemData->IsEditable())
-			SetEditMode(pCurItemData); // Turn on edit mode for the newly focused item
+		
+		ToggleEditMode(pCurItemData);
 
 		ui->nodeTree->selectionModel()->setCurrentIndex(indexWithData, QItemSelectionModel::Select); // Unfocus COLUMN_EditMode to allow toggling the button
 	}

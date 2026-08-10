@@ -239,6 +239,29 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 	else
 		MainWindow::SetStatus("Edit Mode", 0);
 
+	AuxTileMap *pAuxTileMap = static_cast<AuxTileMap *>(MainWindow::GetAuxWidget(AUXTAB_TileMap));
+	TileMapTool eCurTool = pAuxTileMap->GetSelectedTool();
+
+	switch(eCurTool)
+	{
+	case TILEMAPTOOL_Select:
+		return Qt::ArrowCursor;
+
+	case TILEMAPTOOL_Paint:
+	case TILEMAPTOOL_Rect:
+	case TILEMAPTOOL_Circle:
+		return Qt::CrossCursor;
+
+	case TILEMAPTOOL_Fill:
+		return static_cast<Qt::CursorShape>(Qt::CustomCursor + TILEMAPTOOL_Fill);
+
+	case TILEMAPTOOL_Picker:
+		return static_cast<Qt::CursorShape>(Qt::CustomCursor + TILEMAPTOOL_Picker);
+
+	case TILEMAPTOOL_Eraser:
+		return static_cast<Qt::CursorShape>(Qt::CustomCursor + TILEMAPTOOL_Eraser);
+	}
+
 	return Qt::ArrowCursor;
 }
 
@@ -246,7 +269,7 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 {
 }
 
-/*virtual*/ bool TileMapModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld) /*override*/
+/*virtual*/ bool TileMapModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, glm::vec2 ptClickPos) /*override*/
 {
 	AuxTileMap *pAuxTileMap = static_cast<AuxTileMap *>(MainWindow::GetAuxWidget(AUXTAB_TileMap));
 	TileMapTool eCurTool = pAuxTileMap->GetSelectedTool();
@@ -256,8 +279,38 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 	case TILEMAPTOOL_Select:
 		break;
 
-	case TILEMAPTOOL_Paint:
-		return true;
+	case TILEMAPTOOL_Paint: {
+		// Write selected tiles to the map
+		AuxTileMap *pAuxTileMap = static_cast<AuxTileMap *>(MainWindow::GetAuxWidget(AUXTAB_TileMap));
+		const QMap<QPoint, TileData *> &brushMapRef = pAuxTileMap->GetBrush();
+		if(brushMapRef.empty() || m_ViewList.empty())
+			return false;
+
+		// Determine what the center QPoint would be in brushMapRef (doesn't have to be an existing key)
+		int iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
+		for(QPoint ptTileCoord : brushMapRef.keys())
+		{
+			if(ptTileCoord.x() < iMinGridX)
+				iMinGridX = ptTileCoord.x();
+			else if(ptTileCoord.x() > iMaxGridX)
+				iMaxGridX = ptTileCoord.x();
+			if(ptTileCoord.y() < iMinGridY)
+				iMinGridY = ptTileCoord.y();
+			else if(ptTileCoord.y() > iMaxGridY)
+				iMaxGridY = ptTileCoord.y();
+		}
+		QPoint ptBrushCenter((iMinGridX + iMaxGridX) / 2, (iMinGridY + iMaxGridY) / 2);
+
+		glm::ivec2 ptClickGridCoord = static_cast<TileMapView *>(m_ViewList[0])->GetTileMapLayer().WorldToTile(ptClickPos);
+
+		// Write brush to tilemap
+		for(QMap<QPoint, TileData *>::const_iterator it = brushMapRef.begin(); it != brushMapRef.end(); ++it)
+		{
+
+			//SetCell( 0, 0, 
+		}
+
+		return true; }
 
 	case TILEMAPTOOL_Rect:
 	case TILEMAPTOOL_Circle:
@@ -280,7 +333,7 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 {
 }
 
-/*virtual*/ void TileMapModel::MouseClickTransformReleased(glm::vec2 ptClickPos) /*override*/
+/*virtual*/ void TileMapModel::MouseClickTransformReleased(glm::vec2 ptReleasePos) /*override*/
 {
 }
 
@@ -424,6 +477,11 @@ QList<AtlasTileSet *> TileMapModel::UsedTilesets() const
 HyShader *TileMapModel::GetGridShader()
 {
 	return m_ProjectRef.GetProjDraw()->GetTileMapGridShader(GetLayout());
+}
+
+void TileMapModel::SetCellsBrush()
+{
+
 }
 
 void TileMapModel::SetCell(int iX, int iY, AtlasTileSet *pTileSet, int iTileId)

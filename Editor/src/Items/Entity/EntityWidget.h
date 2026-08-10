@@ -64,6 +64,7 @@ protected:
 	virtual void resizeEvent(QResizeEvent *pEvent) override;
 
 	void StopPreview();
+	void ToggleEditMode(EntityTreeItemData *pCurItemData);
 
 public Q_SLOTS:
 	void OnKeySpace();

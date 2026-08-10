@@ -18,21 +18,20 @@
 
 class TileData;
 
-class BrushPreview : public HyEntity2d
-{
-	QList<HyTexturedQuad2d *>	m_TileList;
-
-public:
-	BrushPreview(HyEntity2d *pParent = nullptr);
-	virtual ~BrushPreview();
-
-	void Clear();
-	void Sync(const QMap<QPoint, TileData *> &brushMap, glm::vec2 vGridSize, HyTileMapLayout eLayout);
-};
+//class BrushPreview : public HyEntity2d
+//{
+//	QList<HyTexturedQuad2d *>	m_TileList;
+//
+//public:
+//	BrushPreview(HyEntity2d *pParent = nullptr);
+//	virtual ~BrushPreview();
+//
+//	void Clear();
+//	void Sync(const QMap<QPoint, TileData *> &brushMap, glm::vec2 vGridSize, HyTileMapLayout eLayout);
+//};
 
 class TileMapView : public IEditModeView
 {
-	BrushPreview		m_Brush;
 	TileMapGrid			m_MouseHoverGrid;
 
 	HyTileMapLayer		m_TileMapLayer;
@@ -40,6 +39,8 @@ class TileMapView : public IEditModeView
 public:
 	TileMapView(HyEntity2d *pParent = nullptr);
 	virtual ~TileMapView();
+
+	HyTileMapLayer &GetTileMapLayer();
 
 	void SyncMouseHoverGrid();
 	virtual void SyncWithModel(EditModeState eEditModeState);

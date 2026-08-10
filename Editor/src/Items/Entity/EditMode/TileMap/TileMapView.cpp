@@ -14,51 +14,53 @@
 #include "Assets/Nodes/Objects/HyTexturedQuadData.h"
 #include "Assets/Files/HyFileAtlas.h"
 
-BrushPreview::BrushPreview(HyEntity2d *pParent /*= nullptr*/) :
-	HyEntity2d(pParent)
-{
+//BrushPreview::BrushPreview(HyEntity2d *pParent /*= nullptr*/) :
+//	HyEntity2d(pParent)
+//{
+//
+//}
+//
+///*virtual*/ BrushPreview::~BrushPreview()
+//{
+//	Clear();
+//}
+//
+//void BrushPreview::Clear()
+//{
+//	for(int i = 0; i < m_TileList.size(); ++i)
+//		delete m_TileList[i];
+//	m_TileList.clear();
+//}
+//
+//void BrushPreview::Sync(const QMap<QPoint, TileData *> &brushMap, glm::vec2 vGridSize, HyTileMapLayout eLayout)
+//{
+//	Clear();
+//	for(auto iter = brushMap.constBegin(); iter != brushMap.constEnd(); ++iter)
+//	{
+//		const QPoint &pt = iter.key();
+//		TileData *pTileData = iter.value();
+//		AtlasTileSet *pTileSet = pTileData->GetTileSet();
+//		QSize sampleRegionSize = pTileSet->GetAtlasRegionSize();
+//		int iSubAtlasIndex = pTileSet->GetTileSubAtlasIndex(pTileData);
+//		int iNumCols = NUM_COLS_TILESET(pTileSet->GetNumSubAtlasTiles());
+//
+//		HyTexturedQuad2d *pTileQuad = new HyTexturedQuad2d(pTileSet->GetChecksum(), pTileSet->GetBankId(), this);
+//
+//		const HyTexturedQuadData *pTileQuadData = static_cast<const HyTexturedQuadData *>(pTileQuad->AcquireData());
+//		HyUvCoord uvCoords = pTileQuadData->GetUvCoords();
+//		int iX = uvCoords.left * pTileQuadData->GetAtlas()->GetWidth();
+//		iX += (iSubAtlasIndex % iNumCols) * sampleRegionSize.width();
+//		int iY = uvCoords.top * pTileQuadData->GetAtlas()->GetHeight();
+//		iY += (iSubAtlasIndex / iNumCols) * sampleRegionSize.height();
+//		
+//		pTileQuad->SetUvCoordinates(iX, iY, sampleRegionSize.width(), sampleRegionSize.height());
+//		pTileQuad->pos.Set(pt.x(), pt.y());
+//		
+//		m_TileList.push_back(pTileQuad);
+//	}
+//}
 
-}
-
-/*virtual*/ BrushPreview::~BrushPreview()
-{
-	Clear();
-}
-
-void BrushPreview::Clear()
-{
-	for(int i = 0; i < m_TileList.size(); ++i)
-		delete m_TileList[i];
-	m_TileList.clear();
-}
-
-void BrushPreview::Sync(const QMap<QPoint, TileData *> &brushMap, glm::vec2 vGridSize, HyTileMapLayout eLayout)
-{
-	Clear();
-	for(auto iter = brushMap.constBegin(); iter != brushMap.constEnd(); ++iter)
-	{
-		const QPoint &pt = iter.key();
-		TileData *pTileData = iter.value();
-		AtlasTileSet *pTileSet = pTileData->GetTileSet();
-		QSize sampleRegionSize = pTileSet->GetAtlasRegionSize();
-		int iSubAtlasIndex = pTileSet->GetTileSubAtlasIndex(pTileData);
-		int iNumCols = NUM_COLS_TILESET(pTileSet->GetNumSubAtlasTiles());
-
-		HyTexturedQuad2d *pTileQuad = new HyTexturedQuad2d(pTileSet->GetChecksum(), pTileSet->GetBankId(), this);
-
-		const HyTexturedQuadData *pTileQuadData = static_cast<const HyTexturedQuadData *>(pTileQuad->AcquireData());
-		HyUvCoord uvCoords = pTileQuadData->GetUvCoords();
-		int iX = uvCoords.left * pTileQuadData->GetAtlas()->GetWidth();
-		iX += (iSubAtlasIndex % iNumCols) * sampleRegionSize.width();
-		int iY = uvCoords.top * pTileQuadData->GetAtlas()->GetHeight();
-		iY += (iSubAtlasIndex / iNumCols) * sampleRegionSize.height();
-		
-		pTileQuad->SetUvCoordinates(iX, iY, sampleRegionSize.width(), sampleRegionSize.height());
-		pTileQuad->pos.Set(pt.x(), pt.y());
-		
-		m_TileList.push_back(pTileQuad);
-	}
-}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 TileMapView::TileMapView(HyEntity2d *pParent /*= nullptr*/) :
 	IEditModeView(pParent),
@@ -69,6 +71,11 @@ TileMapView::TileMapView(HyEntity2d *pParent /*= nullptr*/) :
 
 /*virtual*/ TileMapView::~TileMapView()
 {
+}
+
+HyTileMapLayer &TileMapView::GetTileMapLayer()
+{
+	return m_TileMapLayer;
 }
 
 void TileMapView::SyncMouseHoverGrid()

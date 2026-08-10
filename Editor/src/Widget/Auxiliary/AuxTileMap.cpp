@@ -108,6 +108,11 @@ TileMapTool AuxTileMap::GetSelectedTool() const
 	return TILEMAPTOOL_Unknown;
 }
 
+const QMap<QPoint, TileData *> &AuxTileMap::GetBrush() const
+{
+	return m_BrushMap;
+}
+
 void AuxTileMap::SetBrush(QMap<QPoint, TileData *> brushMap)
 {
 	m_BrushMap = brushMap;

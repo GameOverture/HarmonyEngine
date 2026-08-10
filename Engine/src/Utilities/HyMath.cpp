@@ -499,6 +499,106 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 	return false;
 }
 
+/*static*/ glm::ivec2 HyMath::TileMapPointToCell_Square(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize)
+{
+	float fX = ptLocal.x;
+	if(fX < 0.0f)
+		fX -= vGridSize.x;
+	float fY = ptLocal.y;
+	if(fY < 0.0f)
+		fY -= vGridSize.y;
+	
+	return glm::ivec2(fX / vGridSize.x, fY / vGridSize.y);
+}
+
+/*static*/ glm::ivec2 HyMath::TileMapPointToCell_HalfSquare(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize)
+{
+	int iRow = ptLocal.y / vGridSize.y;
+	float fOffset = (iRow & 1) ? 0.0f : vGridSize.x * 0.5f;
+	
+	return glm::ivec2((ptLocal.x - fOffset) / vGridSize.x, iRow);
+}
+
+/*static*/ glm::ivec2 HyMath::TileMapPointToCell_Isometric(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize)
+{
+	float fIsoX = ptLocal.x / (vGridSize.x * 0.5f);
+	float fIsoY = ptLocal.y / (vGridSize.y * 0.5f);
+	int iTileX = static_cast<int>(floor((fIsoY + fIsoX) * 0.5f));
+	int iTileY = static_cast<int>(floor((fIsoY - fIsoX) * 0.5f));
+
+	return glm::ivec2(iTileX, iTileY);
+}
+
+/*static*/ glm::ivec2 HyMath::TileMapPointToCell_IsometricStaggerX(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize)
+{
+	int iTileX = static_cast<int>(floor(ptLocal.x / vGridSize.x));
+	int iTileY = static_cast<int>(floor((ptLocal.y - ((iTileX & 1) ? 0.0f : vGridSize.y * 0.5f)) / vGridSize.y));
+	
+	return glm::ivec2(iTileX, iTileY);
+}
+
+/*static*/ glm::ivec2 HyMath::TileMapPointToCell_IsometricStaggerY(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize)
+{
+	int iTileY = static_cast<int>(floor(ptLocal.y / vGridSize.y));
+	int iTileX = static_cast<int>(floor((ptLocal.x - ((iTileY & 1) ? 0.0f : vGridSize.x * 0.5f)) / vGridSize.x));
+	
+	return glm::ivec2(iTileX, iTileY);
+}
+
+/*static*/ glm::ivec2 HyMath::TileMapPointToCell_HexagonFlatTop(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize)
+{
+	// TODO:
+	return glm::ivec2(0, 0);
+}
+
+/*static*/ glm::ivec2 HyMath::TileMapPointToCell_HexagonPointTop(const glm::vec2 &ptLocal, const glm::ivec2 &vGridSize)
+{
+	// TODO:
+	return glm::ivec2(0, 0);
+}
+
+/*static*/ glm::vec2 HyMath::TileMapCellToPoint_Square(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize)
+{
+	// TODO:
+	return glm::vec2(0, 0);
+}
+
+/*static*/ glm::vec2 HyMath::TileMapCellToPoint_HalfSquare(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize)
+{
+	// TODO:
+	return glm::vec2(0, 0);
+}
+
+/*static*/ glm::vec2 HyMath::TileMapCellToPoint_Isometric(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize)
+{
+	// TODO:
+	return glm::vec2(0, 0);
+}
+
+/*static*/ glm::vec2 HyMath::TileMapCellToPoint_IsometricStaggerX(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize)
+{
+	// TODO:
+	return glm::vec2(0, 0);
+}
+
+/*static*/ glm::vec2 HyMath::TileMapCellToPoint_IsometricStaggerY(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize)
+{
+	// TODO:
+	return glm::vec2(0, 0);
+}
+
+/*static*/ glm::vec2 HyMath::TileMapCellToPoint_HexagonFlatTop(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize)
+{
+	// TODO:
+	return glm::vec2(0, 0);
+}
+
+/*static*/ glm::vec2 HyMath::TileMapCellToPoint_HexagonPointTop(const glm::ivec2 &ptCell, const glm::ivec2 &vGridSize)
+{
+	// TODO:
+	return glm::vec2(0, 0);
+}
+
 /*static*/ float HyMath::NormalizeRange(float fValue, float fMin, float fMax)
 {
 	float fWidth = fMax - fMin;

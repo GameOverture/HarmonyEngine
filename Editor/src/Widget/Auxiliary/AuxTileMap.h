@@ -56,6 +56,7 @@ public:
 
 	TileMapTool GetSelectedTool() const;
 
+	const QMap<QPoint, TileData *> &GetBrush() const;
 	void SetBrush(QMap<QPoint, TileData *> brushMap);
 
 private:

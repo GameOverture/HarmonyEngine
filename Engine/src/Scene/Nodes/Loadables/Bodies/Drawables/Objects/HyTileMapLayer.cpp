@@ -14,13 +14,17 @@
 
 HyTileMapLayer::HyTileMapLayer(HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_TileMap, HyNodePath(), pParent),
-	m_iTileMapDataIndex(0)
+	m_iTileMapDataIndex(0),
+	m_fpLocalToCellFunc(nullptr),
+	m_fpCellToLocalFunc(nullptr)
 {
 }
 
 HyTileMapLayer::HyTileMapLayer(const HyNodePath &nodePath, HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_TileMap, nodePath, pParent),
-	m_iTileMapDataIndex(0)
+	m_iTileMapDataIndex(0),
+	m_fpLocalToCellFunc(nullptr),
+	m_fpCellToLocalFunc(nullptr)
 {
 }
 
@@ -38,6 +42,8 @@ const HyTileMapLayer &HyTileMapLayer::operator=(const HyTileMapLayer &rhs)
 {
 	IHyDrawable2d::operator=(rhs);
 	m_iTileMapDataIndex = rhs.m_iTileMapDataIndex;
+	m_fpLocalToCellFunc = rhs.m_fpLocalToCellFunc;
+	m_fpCellToLocalFunc = rhs.m_fpCellToLocalFunc;
 
 	return *this;
 }
@@ -70,69 +76,52 @@ HyTileMapLayout HyTileMapLayer::GetLayout() const
 void HyTileMapLayer::SetLayout(HyTileMapLayout eLayout)
 {
 	m_eLayout = eLayout;
+	switch(m_eLayout)
+	{
+	case HYTILEMAPLAYOUT_Square:
+		m_fpLocalToCellFunc = HyMath::TileMapPointToCell_Square;
+		m_fpCellToLocalFunc = HyMath::TileMapCellToPoint_Square;
+		break;
+	case HYTILEMAPLAYOUT_HalfOffsetSquare:
+		m_fpLocalToCellFunc = HyMath::TileMapPointToCell_HalfSquare;
+		m_fpCellToLocalFunc = HyMath::TileMapCellToPoint_HalfSquare;
+		break;
+	case HYTILEMAPLAYOUT_Isometric:
+		m_fpLocalToCellFunc = HyMath::TileMapPointToCell_Isometric;
+		m_fpCellToLocalFunc = HyMath::TileMapCellToPoint_Isometric;
+		break;
+	case HYTILEMAPLAYOUT_IsometricStaggerX:
+		m_fpLocalToCellFunc = HyMath::TileMapPointToCell_IsometricStaggerX;
+		m_fpCellToLocalFunc = HyMath::TileMapCellToPoint_IsometricStaggerX;
+		break;
+	case HYTILEMAPLAYOUT_IsometricStaggerY:
+		m_fpLocalToCellFunc = HyMath::TileMapPointToCell_IsometricStaggerY;
+		m_fpCellToLocalFunc = HyMath::TileMapCellToPoint_IsometricStaggerY;
+		break;
+	case HYTILEMAPLAYOUT_HexagonFlatTop:
+		m_fpLocalToCellFunc = HyMath::TileMapPointToCell_HexagonFlatTop;
+		m_fpCellToLocalFunc = HyMath::TileMapCellToPoint_HexagonFlatTop;
+		break;
+	case HYTILEMAPLAYOUT_HexagonPointTop:
+		m_fpLocalToCellFunc = HyMath::TileMapPointToCell_HexagonPointTop;
+		m_fpCellToLocalFunc = HyMath::TileMapCellToPoint_HexagonPointTop;
+		break;
+	default:
+		HyLogError("HyTileMapLayer::SetLayout() - Unknown tile map layout");
+		break;
+	}
 }
 
 glm::ivec2 HyTileMapLayer::WorldToTile(glm::vec2 ptWorldPos)
 {
-	//if(AcquireData() == nullptr || m_iTileMapDataIndex >= static_cast<const HyTileMapData *>(UncheckedGetData())->GetNumTileMaps() || m_iTileMapDataIndex < 0)
-	//	return glm::ivec2(0, 0);
-
-	// Convert to local coordinates
-	glm::vec2 ptLocal = GetSceneTransform(0.0f) * glm::vec4(ptWorldPos, 0.0f, 1.0f);
-
-	switch(m_eLayout)
-	{
-	case HYTILEMAPLAYOUT_Square:
-		if(ptLocal.x < 0.0f)
-			ptLocal.x -= m_vGridSize.x;
-		if(ptLocal.y < 0.0f)
-			ptLocal.y -= m_vGridSize.y;
-		return glm::ivec2(ptLocal.x / m_vGridSize.x, ptLocal.y / m_vGridSize.y);
-
-	case HYTILEMAPLAYOUT_HalfOffsetSquare: {
-		int iRow = ptLocal.y / m_vGridSize.y;
-		float fOffset = (iRow & 1) ? 0.0f : m_vGridSize.x * 0.5f;
-		return glm::ivec2((ptLocal.x - fOffset) / m_vGridSize.x, iRow);
-		break; }
-
-	case HYTILEMAPLAYOUT_Isometric: {
-		float fIsoX = ptLocal.x / (m_vGridSize.x * 0.5f);
-		float fIsoY = ptLocal.y / (m_vGridSize.y * 0.5f);
-
-		int iTileX = static_cast<int>(floor((fIsoY + fIsoX) * 0.5f));
-		int iTileY = static_cast<int>(floor((fIsoY - fIsoX) * 0.5f));
-		return glm::ivec2(iTileX, iTileY);
-		break; }
-
-	case HYTILEMAPLAYOUT_IsometricStaggerX: {
-		int iTileX = static_cast<int>(floor(ptLocal.x / m_vGridSize.x));
-		int iTileY = static_cast<int>(floor((ptLocal.y - ((iTileX & 1) ? 0.0f : m_vGridSize.y * 0.5f)) / m_vGridSize.y));
-		return glm::ivec2(iTileX, iTileY);
-		break; }
-
-	case HYTILEMAPLAYOUT_IsometricStaggerY: {
-		int iTileY = static_cast<int>(floor(ptLocal.y / m_vGridSize.y));
-		int iTileX = static_cast<int>(floor((ptLocal.x - ((iTileY & 1) ? 0.0f : m_vGridSize.x * 0.5f)) / m_vGridSize.x));
-		return glm::ivec2(iTileX, iTileY);
-		break; }
-
-	case HYTILEMAPLAYOUT_HexagonFlatTop:
-		// TODO
-		break;
-	case HYTILEMAPLAYOUT_HexagonPointTop:
-		// TODO
-		break;
-	default:
-		HyLogError("HyTileMapLayer::WorldToTile() - Unknown tile map layout");
-		break;
-	}
-
-	return glm::ivec2(0, 0);
+	glm::vec2 ptLocal = glm::inverse(GetSceneTransform(0.0f)) * glm::vec4(ptWorldPos, 0.0f, 1.0f);
+	return m_fpLocalToCellFunc(ptLocal, m_vGridSize);
 }
 
-glm::vec2 HyTileMapLayer::TileToWorld(glm::ivec2 ptTileCoord) const
+glm::vec2 HyTileMapLayer::TileToWorld(glm::ivec2 ptTileCoord)
 {
-	return glm::vec2(ptTileCoord.x * m_vGridSize.x, ptTileCoord.y * m_vGridSize.y);
+	glm::vec2 ptLocal = m_fpCellToLocalFunc(ptTileCoord, m_vGridSize);
+	return GetSceneTransform(0.0f) * glm::vec4(ptLocal, 0.0f, 1.0f);
 }
 
 /*virtual*/ void HyTileMapLayer::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/

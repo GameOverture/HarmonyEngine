@@ -38,10 +38,10 @@ public:
 
 	virtual Qt::CursorShape MouseMoveIdle() override;
 	virtual void MouseIdleRightClick() override;
-	virtual bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld) override; // Returns whether transform has begun (otherwise marquee select)
+	virtual bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, glm::vec2 ptClickPos) override; // Returns whether transform has begun (otherwise marquee select)
 	virtual void MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override;
 	virtual void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight) override;
-	virtual void MouseClickTransformReleased(glm::vec2 ptClickPos) override;
+	virtual void MouseClickTransformReleased(glm::vec2 ptReleasePos) override;
 
 	virtual void OnDeleteKeyPressed() override;
 	
@@ -61,6 +61,7 @@ public:
 
 	HyShader *GetGridShader();
 
+	void SetCellsBrush();
 	void SetCell(int iX, int iY, AtlasTileSet *pTileSet, int iTileId);
 
 	void UpdateTileIds(const std::vector<std::pair<uint16, uint16>> &modifiedIndexList); // Pair<old, new>

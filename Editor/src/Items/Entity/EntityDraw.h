@@ -28,6 +28,11 @@ class EntityDraw : public IDrawEx
 
 	QMap<HyLayoutHandle, QUuid>				m_GuiLayoutMap;
 
+	// Custom TileMap Cursors
+	QCursor									m_CursorFill;
+	QCursor									m_CursorEyeDrop;
+	QCursor									m_CursorEraser;
+
 public:
 	EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileDataRef);
 	virtual ~EntityDraw();

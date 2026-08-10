@@ -123,11 +123,13 @@ void TileMapGfxScene::OnMarqueeRelease(Qt::MouseButton eMouseBtn, bool bShiftHel
 			brushList.push_back(iter.key());
 	}
 
-	// Normalize the brush map so that the top-left tile is at (0, 0)
+	// Normalize the brush map so that the bottom-left tile is at (0, 0)
 	int iMinGridX = INT_MAX, iMinGridY = INT_MAX;
 	for(int i = 0; i < brushList.size(); ++i)
 	{
 		QPoint ptGridPos = brushList[i]->GetMetaGridPos();
+		ptGridPos.setY(ptGridPos.y() * -1); // TileSets' meta-grid coordinates go top-to-bottom, but Harmony and TileMaps go bottom-to-top // TILETODO: make tile sets meta-grid go bottom-to-top
+
 		iMinGridX = HyMath::Min(iMinGridX, ptGridPos.x());
 		iMinGridY = HyMath::Min(iMinGridY, ptGridPos.y());
 	}
@@ -136,6 +138,8 @@ void TileMapGfxScene::OnMarqueeRelease(Qt::MouseButton eMouseBtn, bool bShiftHel
 	for(int i = 0; i < brushList.size(); ++i)
 	{
 		QPoint ptGridPos = brushList[i]->GetMetaGridPos();
+		ptGridPos.setY(ptGridPos.y() * -1); // TileSets' meta-grid coordinates go top-to-bottom, but Harmony and TileMaps go bottom-to-top // TILETODO: make tile sets meta-grid go bottom-to-top
+
 		brushMap.insert(QPoint(ptGridPos.x() - iMinGridX, ptGridPos.y() - iMinGridY), brushList[i]);
 	}
 	m_pAuxTileMap->SetBrush(brushMap);

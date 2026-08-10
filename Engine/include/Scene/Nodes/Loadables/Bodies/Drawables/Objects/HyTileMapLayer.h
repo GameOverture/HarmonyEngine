@@ -17,10 +17,13 @@
 class HyTileMapLayer : public IHyDrawable2d
 {
 protected:
-	int					m_iTileMapDataIndex;
+	int															m_iTileMapDataIndex;
 
-	glm::ivec2			m_vGridSize;
-	HyTileMapLayout		m_eLayout;
+	glm::ivec2													m_vGridSize;
+	HyTileMapLayout												m_eLayout;
+
+	std::function<glm::ivec2(glm::vec2, const glm::ivec2 &)>	m_fpLocalToCellFunc;
+	std::function<glm::vec2(glm::ivec2, const glm::ivec2 &)>	m_fpCellToLocalFunc;
 
 public:
 	HyTileMapLayer(HyEntity2d *pParent = nullptr);
@@ -40,7 +43,7 @@ public:
 	void SetLayout(HyTileMapLayout eLayout);
 
 	glm::ivec2 WorldToTile(glm::vec2 ptWorldPos);
-	glm::vec2 TileToWorld(glm::ivec2 ptTileCoord) const;
+	glm::vec2 TileToWorld(glm::ivec2 ptTileCoord);
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 	virtual float GetWidth(float fPercent = 1.0f) override;

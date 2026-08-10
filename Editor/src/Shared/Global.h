@@ -313,6 +313,7 @@ enum TileMapTool
 {
 	TILEMAPTOOL_Unknown = -1,
 
+	// NOTE: The order matters because it is used to determine the mouse cursor in EntityDraw.cpp
 	TILEMAPTOOL_Select = 0,
 	TILEMAPTOOL_Paint,
 	TILEMAPTOOL_Rect,

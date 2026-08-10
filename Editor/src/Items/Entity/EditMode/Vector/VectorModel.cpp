@@ -133,7 +133,7 @@ VectorModel::VectorModel(EditModeType eEditModeType, HyColor color) :
 	DeselectAllGrabPoints();
 }
 
-/*virtual*/ bool VectorModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld) /*override*/
+/*virtual*/ bool VectorModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, glm::vec2 ptClickPos) /*override*/
 {
 	bool bStartTransform = false;
 
@@ -264,12 +264,12 @@ VectorModel::VectorModel(EditModeType eEditModeType, HyColor color) :
 	SyncViews(eEditModeState);
 }
 
-/*virtual*/ void VectorModel::MouseClickTransformReleased(glm::vec2 ptClickPos) /*override*/
+/*virtual*/ void VectorModel::MouseClickTransformReleased(glm::vec2 ptReleasePos) /*override*/
 {
 	if(m_eCurAction == VECTORACTION_Creation)
 	{
-		glm::vec2 ptStartPos = ptClickPos + glm::vec2(-25.0f, -25.0f);
-		glm::vec2 ptDragPos = ptClickPos + glm::vec2(25.0f, 25.0f);
+		glm::vec2 ptStartPos = ptReleasePos + glm::vec2(-25.0f, -25.0f);
+		glm::vec2 ptDragPos = ptReleasePos + glm::vec2(25.0f, 25.0f);
 		DoTransformCreation(false, ptStartPos, ptDragPos);
 	}
 	else if(m_eCurAction == VECTORACTION_HoverGrabPoint)
