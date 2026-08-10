@@ -40,6 +40,14 @@ AuxTileMap::AuxTileMap(QWidget *pParent /*= nullptr*/) :
 {
 	ui->setupUi(this);
 
+	ui->actionSelectTool->setData(TILEMAPTOOL_Select);
+	ui->actionPaintTool->setData(TILEMAPTOOL_Paint);
+	ui->actionRectTool->setData(TILEMAPTOOL_Rect);
+	ui->actionCircleTool->setData(TILEMAPTOOL_Circle);
+	ui->actionFillTool->setData(TILEMAPTOOL_Fill);
+	ui->actionPickerTool->setData(TILEMAPTOOL_Picker);
+	ui->actionEraserTool->setData(TILEMAPTOOL_Eraser);
+
 	m_pToolActionGroup = new QActionGroup(this);
 	m_pToolActionGroup->setExclusive(true);
 	m_pToolActionGroup->addAction(ui->actionSelectTool);
@@ -89,6 +97,15 @@ void AuxTileMap::Init(AtlasManager &atlasManagerRef, TileMapModel &tileMapModelR
 	int iTreeViewWidth = ui->tileSetsTreeView->sizeHint().width();
 	ui->splitter->setSizes(QList<int>() << iTreeViewWidth << (iTotalWidth - iTreeViewWidth));
 	//ui->tileSetsTreeView->resizeColumnToContents(0);
+}
+
+TileMapTool AuxTileMap::GetSelectedTool() const
+{
+	QAction *pCheckedTool = m_pToolActionGroup->checkedAction();
+	if(pCheckedTool)
+		return static_cast<TileMapTool>(pCheckedTool->data().toInt());
+
+	return TILEMAPTOOL_Unknown;
 }
 
 void AuxTileMap::SetBrush(QMap<QPoint, TileData *> brushMap)

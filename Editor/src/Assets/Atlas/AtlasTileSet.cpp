@@ -141,6 +141,7 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 	m_GfxScene.Initialize(this);
 
 	m_pTiledTileSet = Tiled::Tileset::create(m_sName, 0, 0, 0, 0);
+	m_pTiledTileSet->setNextTileId(HyMath::Max(GetNumTiles(), 1));
 }
 
 AtlasTileSet::~AtlasTileSet()
@@ -831,6 +832,8 @@ bool AtlasTileSet::Save()
 		if(RegenerateSubAtlas() == false)
 			return false;
 	}
+
+	m_pTiledTileSet->setNextTileId(HyMath::Max(GetNumTiles(), 1));
 
 	// Lastly, update meta data (after RegenerateSubAtlas() since it may have changed the sub-atlas size)
 	UpdateTileSetMeta();

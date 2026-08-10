@@ -24,17 +24,13 @@ class TileMapModel : public IEditModeModel
 {
 	Project &					m_ProjectRef;
 
-	glm::ivec2					m_vGridSize;
-	HyTileMapLayout				m_eLayout;
-
-	Tiled::GidMapper			m_TiledGidMapper;
-	Tiled::TileLayer			m_TiledLayer;
+	std::unique_ptr<Tiled::Map>	m_pTiledMap;
 
 	bool						m_bValidHoverCoord;
 	QPoint						m_ptHoverCoord;
 
 public:
-	TileMapModel(Project &projectRef, QUndoStack *pUndoStack);
+	TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString sLayerCodeName);
 	virtual ~TileMapModel();
 
 	virtual QJsonObject Serialize() const override;
@@ -61,7 +57,7 @@ public:
 	void SetHoverCoordinates(bool bValidHoverCoord, QPoint ptHoverCoord);
 
 	const Tiled::TileLayer &GetTiledTileLayer() const;
-	QList<AtlasTileSet *> UsedTilesets(const AtlasManager &atlasManagerRef) const;
+	QList<AtlasTileSet *> UsedTilesets() const;
 
 	HyShader *GetGridShader();
 

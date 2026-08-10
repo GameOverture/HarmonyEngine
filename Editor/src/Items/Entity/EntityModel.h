@@ -128,9 +128,6 @@ public:
 	virtual void InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) override;
 	virtual void InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const override;
 	virtual void OnItemDeleted() override;
-
-	void MakeTiledMapParameters(Tiled::Map::Parameters &tiledMapParamsOut) const;
-	std::unique_ptr<Tiled::Map> ExportToTiledMap() const;
 };
 
 #endif // ENTITYMODEL_H

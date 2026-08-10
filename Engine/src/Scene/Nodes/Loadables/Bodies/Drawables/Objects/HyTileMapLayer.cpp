@@ -83,6 +83,10 @@ glm::ivec2 HyTileMapLayer::WorldToTile(glm::vec2 ptWorldPos)
 	switch(m_eLayout)
 	{
 	case HYTILEMAPLAYOUT_Square:
+		if(ptLocal.x < 0.0f)
+			ptLocal.x -= m_vGridSize.x;
+		if(ptLocal.y < 0.0f)
+			ptLocal.y -= m_vGridSize.y;
 		return glm::ivec2(ptLocal.x / m_vGridSize.x, ptLocal.y / m_vGridSize.y);
 
 	case HYTILEMAPLAYOUT_HalfOffsetSquare: {
@@ -202,8 +206,8 @@ glm::vec2 HyTileMapLayer::TileToWorld(glm::ivec2 ptTileCoord) const
 
 /*virtual*/ void HyTileMapLayer::PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, HyBlendMode &eBlendModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) /*override*/
 {
-	//eRenderModeOut = HYRENDERMODE_Triangles;
-	//eBlendModeOut = HYBLENDMODE_Normal;
+	eRenderModeOut = HYRENDERMODE_Triangles;
+	eBlendModeOut = HYBLENDMODE_Normal;
 
 	//// TODO: Do stages with circle batching (and its own shader)
 	//uiNumVerticesPerInstOut = 3;

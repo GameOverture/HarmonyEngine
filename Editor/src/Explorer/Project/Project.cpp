@@ -527,7 +527,7 @@ QString Project::GetUserAbsPath() const
 	return settingsDir.absoluteFilePath(GetName(false) % HYGUIPATH_UserExt);
 }
 
-Tiled::Map::EditorSettings Project::GetTileMapSettings()
+const Tiled::Map::EditorSettings &Project::GetTileMapSettings() const
 {
 	return m_TileMapSettings;
 }

@@ -418,12 +418,13 @@ void EntityTreeItemData::InitalizePropertyModel()
 
 	case ITEM_TileMap: {
 		m_pEditModel = new TileMapModel(m_EntityModelRef.GetItem().GetProject(),
-										m_EntityModelRef.GetItem().GetUndoStack());
+										m_EntityModelRef.GetItem().GetUndoStack(),
+										GetCodeName());
 
 		m_pPropertiesModel->InsertCategory(0, "Tile Map", QVariant(), false, "A Tile Map layer using tiles from a Tile Set on a grid");
 		QVariant tileMapDataVariant;
 		tileMapDataVariant.setValue<EntityTreeItemData *>(this);
-		m_pPropertiesModel->AppendProperty("Tile Map", "Data", PROPERTIESTYPE_ShapeData, QVariant(), "Sets this Tile Map's tile data", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), tileMapDataVariant);
+		m_pPropertiesModel->AppendProperty("Tile Map", "Data", PROPERTIESTYPE_TileMapLayerData, QVariant(), "Sets this Tile Map's tile data", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), tileMapDataVariant);
 		m_pPropertiesModel->AppendProperty("Tile Map", "Grid Size", PROPERTIESTYPE_ivec2, QPoint(32, 32), "The grid size, in pixels which tiles are placed in. For all tile shapes, this size corresponds to the bounding rectangle of the tile shape. This is independent to the tile's actual size, or the region sampled on the texture atlas", PROPERTIESACCESS_ToggleUnchecked, 1, iRANGE, 1.0, "[", "]");
 		m_pPropertiesModel->AppendProperty("Tile Map", "Layout", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTileMapLayoutNameList()[HYTILEMAPLAYOUT_Square], "The tile map orientation which controls how the grid is projected and how tiles are positioned relative to each other", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTileMapLayoutNameList());
 		break; }

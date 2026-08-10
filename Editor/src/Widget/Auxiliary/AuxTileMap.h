@@ -10,6 +10,7 @@
 #ifndef AuxTileMap_H
 #define AuxTileMap_H
 
+#include "Global.h"
 #include "TileMapGfxScene.h"
 
 #include <QWidget>
@@ -52,6 +53,8 @@ public:
 	virtual ~AuxTileMap();
 
 	void Init(AtlasManager &atlasManagerRef, TileMapModel &tileMapModelRef);
+
+	TileMapTool GetSelectedTool() const;
 
 	void SetBrush(QMap<QPoint, TileData *> brushMap);
 

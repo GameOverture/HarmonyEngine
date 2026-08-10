@@ -309,6 +309,21 @@ enum TileSetAutoTilePart
 	NUM_AUTOTILEPARTS
 };
 
+enum TileMapTool
+{
+	TILEMAPTOOL_Unknown = -1,
+
+	TILEMAPTOOL_Select = 0,
+	TILEMAPTOOL_Paint,
+	TILEMAPTOOL_Rect,
+	TILEMAPTOOL_Circle,
+	TILEMAPTOOL_Fill,
+	TILEMAPTOOL_Picker,
+	TILEMAPTOOL_Eraser,
+
+	NUM_TILEMAPTOOLS
+};
+
 enum EditorShape
 {
 	SHAPE_None = 0,

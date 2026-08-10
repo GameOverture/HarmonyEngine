@@ -1963,13 +1963,29 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 	//}
 	//itemSpecificFileDataOut.m_Meta.insert("tiledParams", tiledMapObj);
 
-	std::unique_ptr<Tiled::Map> exportedMapPtr = ExportToTiledMap();
-	Tiled::MapToVariantConverter tiledMapConverter;
-	QVariant tiledMapVariant = tiledMapConverter.toVariant(*exportedMapPtr, QDir());
+	
 
 	QJsonArray referencedTileSetsArray;
 	QJsonArray tileMapsArray;
 	// TILETODO: finish this
+
+
+	// Write itemSpecificFileDataOut.m_Data
+	// Save every tile map data this entity has as an array (which will be selected at runtime by HyTileMapLayer::SetTileMapDataIndex())
+	// For each tile map data:
+	// 
+	//		REFERENCED TILESETS:
+	//		- An index assigned to each contributing tileset
+	// 
+	//		RENDER BUCKETS:
+	//		- Each tile map data has render buckets which organizes what tiles get drawn per render pass and in what order
+	//		- A Y-Sort Disabled Tile Map sorts its render buckets based on:
+	//			Refernced tilesets
+	//		- A Y-Sort Enabled Tile Map sorts its render buckets is based on:
+	//			"Y-Sort value" (tile's center Y position + Y-Sort Origin)
+	//			Contributing tilesets within the "Y-Sort value"
+	
+
 }
 
 /*virtual*/ void EntityModel::InsertStateSpecificData(uint32 uiIndex, FileDataPair &stateFileDataOut) const /*override*/
@@ -2005,41 +2021,4 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 {
 	SourceManager &sourceModelRef = m_ItemRef.GetProject().GetSourceModel();
 	sourceModelRef.DeleteEntitySrcFiles(*this);
-}
-
-void EntityModel::MakeTiledMapParameters(Tiled::Map::Parameters &tiledMapParamsOut) const
-{
-
-}
-
-std::unique_ptr<Tiled::Map> EntityModel::ExportToTiledMap() const
-{
-	Tiled::Map::Parameters tiledMapParameters;
-	MakeTiledMapParameters(tiledMapParameters);
-
-	std::unique_ptr<Tiled::Map> exportedMapOut = std::make_unique<Tiled::Map>(tiledMapParameters);
-
-	Tiled::Map::EditorSettings tileMapSettings = m_ItemRef.GetProject().GetTileMapSettings();
-	exportedMapOut->setCompressionLevel(tileMapSettings.compressionLevel);
-	exportedMapOut->setChunkSize(tileMapSettings.chunkSize);
-	exportedMapOut->setLayerDataFormat(tileMapSettings.layerDataFormat);
-
-	QList<EntityTreeItemData *> childList, shapeList, layoutList;
-	m_TreeModel.GetTreeItemData(childList, shapeList, layoutList);
-	for(EntityTreeItemData *pChild : childList)
-	{
-		if(pChild->GetType() != ITEM_TileMap)
-			continue;
-
-		TileMapModel *pTileMapModel = static_cast<TileMapModel *>(pChild->GetEditModel());
-
-		QList<AtlasTileSet *> tileSetList = pTileMapModel->UsedTilesets(m_ItemRef.GetProject().GetAtlasModel());
-		for(AtlasTileSet *pTileSet : tileSetList)
-			exportedMapOut->addTileset(pTileSet->GetTiledTileSet());
-
-		// NOTE: Tiled::Map takes ownership of layers added to it, so ensure we clone TileMapModel's internal Tiled::TileLayer component
-		exportedMapOut->addLayer(pTileMapModel->GetTiledTileLayer().clone());
-	}
-
-	return exportedMapOut;
 }

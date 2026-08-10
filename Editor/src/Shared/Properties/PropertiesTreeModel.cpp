@@ -960,6 +960,7 @@ void PropertiesTreeModel::ResetValues()
 	case PROPERTIESTYPE_FloatArray:
 		return QVariant(valueRef.toArray());
 
+	case PROPERTIESTYPE_TileMapLayerData:
 	case PROPERTIESTYPE_ShapeData:
 	case PROPERTIESTYPE_UiPanel:
 		return QVariant(valueRef.toObject());
@@ -1023,6 +1024,7 @@ void PropertiesTreeModel::ResetValues()
 	case PROPERTIESTYPE_FloatArray:
 		return QJsonValue(valueRef.toJsonArray());
 
+	case PROPERTIESTYPE_TileMapLayerData:
 	case PROPERTIESTYPE_ShapeData:
 	case PROPERTIESTYPE_UiPanel:
 		return QJsonValue(valueRef.toJsonObject());
@@ -1147,6 +1149,19 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 	case PROPERTIESTYPE_Root:
 	case PROPERTIESTYPE_Category:
 		break;
+
+	case PROPERTIESTYPE_TileMapLayerData: {
+		QJsonObject tileMapDataObj = treeItemValue.toJsonObject();
+		QJsonObject tileLayerObj = tileMapDataObj["tileLayer"].toObject();
+		QJsonArray chunksArray = tileLayerObj["chunks"].toArray();
+		for(QJsonValue val : chunksArray)
+		{
+			sRetStr += "[";
+			QJsonObject chunkObj = val.toObject();
+			sRetStr += chunkObj["data"].toString();
+			sRetStr += "], ";
+		}
+		break; }
 
 	case PROPERTIESTYPE_ShapeData: {
 		QJsonObject shapeDataObj = treeItemValue.toJsonObject();
@@ -1275,6 +1290,7 @@ void PropertiesTreeModel::DeserializeJsonCategory(const QString &sCategory, cons
 				propValue = categoryObj[sProperty].toArray();
 				break;
 
+			case PROPERTIESTYPE_TileMapLayerData:
 			case PROPERTIESTYPE_ShapeData:
 			case PROPERTIESTYPE_UiPanel:
 				propValue = categoryObj[sProperty].toObject();

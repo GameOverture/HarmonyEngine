@@ -272,6 +272,7 @@ enum HyRenderMode
 enum HyShaderProgramDefaults
 {
 	HYSHADERPROG_QuadBatch = 1,
+	HYSHADERPROG_TileMapLayer,
 	HYSHADERPROG_Primitive,
 	HYSHADERPROG_Spine,
 	HYSHADERPROG_Lines2d,

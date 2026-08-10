@@ -319,6 +319,9 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			static_cast<QSlider *>(pReturnWidget)->setValue(propDefRef.defaultData.toInt());
 		break; }
 
+	case PROPERTIESTYPE_TileMapLayerData:
+		break;
+
 	case PROPERTIESTYPE_ShapeData: {
 		//const QVariant &origValue = pPropertiesTreeModel->GetIndexValue(index);
 		//QJsonObject serializedObj = origValue.toJsonObject();
@@ -432,6 +435,9 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 			static_cast<QSlider *>(pEditor)->setValue(propValue.toInt());
 			break;
 
+		case PROPERTIESTYPE_TileMapLayerData:
+			break;
+
 		case PROPERTIESTYPE_ShapeData: {
 			EntityDrawItem *pEntDrawItem = static_cast<EntityDraw *>(static_cast<PropertiesTreeModel *>(m_pTableView->model())->GetProjItem()->GetDraw())->GetCurEditItem();
 			bool bIsActiveEditModeItem = (pEntDrawItem && &pEntDrawItem->GetEntityTreeItemData()->GetPropertiesModel() == static_cast<EntityPropertiesTreeModel *>(m_pTableView->model()));
@@ -490,6 +496,8 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 		newValue = QVariant(static_cast<QSlider *>(pEditor)->value());
 		break;
 	case PROPERTIESTYPE_Color: // Handled in DlgColorPicker
+		break;
+	case PROPERTIESTYPE_TileMapLayerData:
 		break;
 	case PROPERTIESTYPE_ShapeData:
 		newValue = static_cast<WgtShapeData *>(pEditor)->GetValue();

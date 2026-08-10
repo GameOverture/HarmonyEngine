@@ -124,7 +124,7 @@ public:
 	QString GetBuildRelPath() const;
 	QString GetUserAbsPath() const;
 
-	Tiled::Map::EditorSettings GetTileMapSettings();
+	const Tiled::Map::EditorSettings &GetTileMapSettings() const;
 
 	IManagerModel *GetManagerModel(AssetManagerType eManagerType);
 

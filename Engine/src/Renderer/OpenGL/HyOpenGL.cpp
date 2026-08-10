@@ -404,6 +404,11 @@ HyOpenGL::~HyOpenGL(void)
 			pShader->AddVertexAttribute("attr_transform_mtx", HyShaderVariable::mat4, false, 1);
 			break;
 
+		case HYSHADERPROG_TileMapLayer:
+			pShader->SetSourceCodePtrs({szHYTILEMAPLAYER_VERTEXSHADER}, HYSHADER_Vertex);
+			//asdf;
+			break;
+
 		case HYSHADERPROG_Primitive:
 			pShader->SetSourceCodePtrs({szHYPRIMATIVE_VERTEXSHADER}, HYSHADER_Vertex);
 			pShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
@@ -437,6 +442,10 @@ HyOpenGL::~HyOpenGL(void)
 		{
 		case HYSHADERPROG_QuadBatch:
 			pShader->SetSourceCodePtrs({szHYQUADBATCH_FRAGMENTSHADER}, HYSHADER_Fragment);
+			break;
+
+		case HYSHADERPROG_TileMapLayer:
+			pShader->SetSourceCodePtrs({szHYTILEMAPLAYER_FRAGMENTSHADER}, HYSHADER_Fragment);
 			break;
 
 		case HYSHADERPROG_Primitive:
@@ -668,13 +677,13 @@ HyOpenGL::~HyOpenGL(void)
 	}
 
 	if(bIsPixelDataCompressed == false)
-	{ 
-		glTexImage2D(GL_TEXTURE_2D, 0, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData);
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData); // TODO: Properly support mipmaps
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
 	}
 	else
 	{
-		glCompressedTexImage2D(GL_TEXTURE_2D, 0, eInternalFormat, uiWidth, uiHeight, 0, uiPixelDataSize, pPixelData);
+		glCompressedTexImage2D(GL_TEXTURE_2D, 0, eInternalFormat, uiWidth, uiHeight, 0, uiPixelDataSize, pPixelData); // TODO: Properly support mipmaps
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glCompressedTexImage2D");
 	}
 
@@ -720,7 +729,7 @@ HyOpenGL::~HyOpenGL(void)
 		{
 			// Write each texture into storage
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
-							0,						// Mipmap number
+							0,						// Mipmap number // TODO: Properly support mipmaps
 							0, 0, i,				// xoffset, yoffset, zoffset
 							uiWidth, uiHeight, 1,	// width, height, depth (of texture you're copying in)
 							eFormat,				// format
@@ -739,7 +748,7 @@ HyOpenGL::~HyOpenGL(void)
 		{
 			// Write each texture into storage
 			glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY,
-									  0,							// Mipmap number
+									  0,							// Mipmap number // TODO: Properly support mipmaps
 									  0, 0, i,						// xoffset, yoffset, zoffset
 									  uiWidth, uiHeight, 1,			// width, height, depth (of texture you're copying in)
 									  eFormat,						// format

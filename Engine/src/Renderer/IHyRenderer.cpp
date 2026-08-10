@@ -26,6 +26,7 @@ IHyRenderer::IHyRenderer(int32 iVSync, std::vector<HyWindow *> &windowListRef, H
 	m_VertexBuffer(*this),
 	m_pCurWindow(nullptr),
 	m_pShaderQuadBatch(HY_NEW HyShader(HYSHADERPROG_QuadBatch)),
+	m_pShaderTileMapLayer(HY_NEW HyShader(HYSHADERPROG_TileMapLayer)),
 	m_pShaderPrimitive(HY_NEW HyShader(HYSHADERPROG_Primitive)),
 	m_pShaderSpine(HY_NEW HyShader(HYSHADERPROG_Spine))
 {
@@ -34,6 +35,7 @@ IHyRenderer::IHyRenderer(int32 iVSync, std::vector<HyWindow *> &windowListRef, H
 
 	// Built-in shaders
 	m_pShaderQuadBatch->Finalize();
+	m_pShaderTileMapLayer->Finalize();
 	m_pShaderPrimitive->Finalize();
 	m_pShaderSpine->Finalize();
 }
@@ -133,6 +135,9 @@ HyShaderHandle IHyRenderer::GetDefaultShaderHandle(HyType eType)
 	case HYTYPE_TexturedQuad:
 	case HYTYPE_Text:
 		return m_pShaderQuadBatch->GetHandle();
+
+	case HYTYPE_TileMap:
+		return m_pShaderTileMapLayer->GetHandle();
 
 	case HYTYPE_Primitive:
 		return m_pShaderPrimitive->GetHandle();

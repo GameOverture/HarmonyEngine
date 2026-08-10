@@ -62,7 +62,8 @@ void BrushPreview::Sync(const QMap<QPoint, TileData *> &brushMap, glm::vec2 vGri
 
 TileMapView::TileMapView(HyEntity2d *pParent /*= nullptr*/) :
 	IEditModeView(pParent),
-	m_MouseHoverGrid(nullptr)
+	m_MouseHoverGrid(nullptr),
+	m_TileMapLayer(this)
 {
 }
 
