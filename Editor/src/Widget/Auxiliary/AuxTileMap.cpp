@@ -88,8 +88,10 @@ AuxTileMap::AuxTileMap(QWidget *pParent /*= nullptr*/) :
 	delete ui;
 }
 
-void AuxTileMap::Init(AtlasManager &atlasManagerRef, TileMapModel &tileMapModelRef)
+void AuxTileMap::Init(AtlasManager &atlasManagerRef, TileMapModel *pTileMapModel)
 {
+	m_pTileMapModel = pTileMapModel;
+
 	ui->tileSetsTreeView->setModel(&atlasManagerRef.GetTileSetsModel());
 	ui->tileSetsTreeView->expandAll();
 
@@ -108,16 +110,6 @@ TileMapTool AuxTileMap::GetSelectedTool() const
 	return TILEMAPTOOL_Unknown;
 }
 
-const QMap<QPoint, TileData *> &AuxTileMap::GetBrush() const
-{
-	return m_BrushMap;
-}
-
-void AuxTileMap::SetBrush(QMap<QPoint, TileData *> brushMap)
-{
-	m_BrushMap = brushMap;
-}
-
 void AuxTileMap::on_tileSetsTreeView_clicked(QModelIndex index)
 {
 	if(ui->tileSetsTreeView->model() == nullptr)
@@ -127,5 +119,5 @@ void AuxTileMap::on_tileSetsTreeView_clicked(QModelIndex index)
 	AtlasTileSet *pTileSetPtr = pModel->GetTileSet(index);
 	QUuid terrainUuid = pModel->GetTerrainUuid(index);
 	
-	m_pTileMapGfxScene->Initialize(pTileSetPtr, terrainUuid);
+	m_pTileMapGfxScene->Initialize(pTileSetPtr, terrainUuid, m_pTileMapModel);
 }

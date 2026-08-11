@@ -19,15 +19,21 @@
 
 class AtlasTileSet;
 class AtlasManager;
+class TileData;
+
+typedef QMap<QPoint, TileData *> TileMapBrush;
 
 class TileMapModel : public IEditModeModel
 {
-	Project &					m_ProjectRef;
+	Project &									m_ProjectRef;
 
-	std::unique_ptr<Tiled::Map>	m_pTiledMap;
+	std::unique_ptr<Tiled::Map>					m_pTiledMap;
 
-	bool						m_bValidHoverCoord;
-	QPoint						m_ptHoverCoord;
+	bool										m_bValidHoverCoord;
+	QPoint										m_ptHoverCoord;
+
+	QMap<const AtlasTileSet *, TileMapBrush>	m_TileSetBrushMap;
+	QMap<int, TileMapBrush>						m_PresetBrushMap;
 
 public:
 	TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString sLayerCodeName);
@@ -61,8 +67,10 @@ public:
 
 	HyShader *GetGridShader();
 
+	void SetTileSetBrush(const AtlasTileSet *pTileSet, QList<TileData *> brushList);
+
 	void SetCellsBrush();
-	void SetCell(int iX, int iY, AtlasTileSet *pTileSet, int iTileId);
+	void SetCell(int iX, int iY, TileData *pTileData);
 
 	void UpdateTileIds(const std::vector<std::pair<uint16, uint16>> &modifiedIndexList); // Pair<old, new>
 };

@@ -630,7 +630,7 @@ void EntityWidget::SetEditMode(EntityTreeItemData *pItemToEdit)
 		if(pItemToEdit->GetType() == ITEM_TileMap)
 		{
 			MainWindow::FocusAuxWidget(AUXTAB_TileMap);
-			static_cast<AuxTileMap *>(MainWindow::GetAuxWidget(AUXTAB_TileMap))->Init(m_ItemRef.GetProject().GetAtlasModel(), *static_cast<TileMapModel *>(pItemToEdit->GetEditModel()));
+			static_cast<AuxTileMap *>(MainWindow::GetAuxWidget(AUXTAB_TileMap))->Init(m_ItemRef.GetProject().GetAtlasModel(), static_cast<TileMapModel *>(pItemToEdit->GetEditModel()));
 		}
 		else
 			MainWindow::HideAuxWidget(AUXTAB_TileMap);

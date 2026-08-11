@@ -15,6 +15,7 @@
 
 class AuxTileMap;
 class AtlasTileSet;
+class TileMapModel;
 class TileData;
 class TileGfxItem;
 
@@ -26,6 +27,8 @@ class TileMapGfxScene : public QGraphicsScene
 	const AtlasTileSet *				m_pTileSet;
 	QUuid								m_TerrainUuid;
 
+	TileMapModel *						m_pTileMapModel;
+
 	QGraphicsRectItem					m_BorderRect;
 	QMap<TileData *, TileGfxItem *>		m_TileGfxItemsMap;
 
@@ -33,7 +36,7 @@ public:
 	TileMapGfxScene(QObject *pParent = nullptr);
 	virtual ~TileMapGfxScene();
 
-	void Initialize(const AtlasTileSet *pTileSet, QUuid terrainUuid);
+	void Initialize(const AtlasTileSet *pTileSet, QUuid terrainUuid, TileMapModel *pTileMapModel);
 
 	void OnMarqueeRelease(Qt::MouseButton eMouseBtn, bool bShiftHeld, QPointF ptStartDrag, QPointF ptEndDrag);
 };

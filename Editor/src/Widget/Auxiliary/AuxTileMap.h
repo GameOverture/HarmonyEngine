@@ -42,22 +42,20 @@ class AuxTileMap : public QWidget
 {
 	Q_OBJECT
 
+	TileMapModel *				m_pTileMapModel;
+
 	QActionGroup *				m_pToolActionGroup;
 	QToolBar *					m_pToolBar;
 
 	TileMapGfxScene *			m_pTileMapGfxScene;
-	QMap<QPoint, TileData *>	m_BrushMap;
 
 public:
 	explicit AuxTileMap(QWidget *pParent = nullptr);
 	virtual ~AuxTileMap();
 
-	void Init(AtlasManager &atlasManagerRef, TileMapModel &tileMapModelRef);
+	void Init(AtlasManager &atlasManagerRef, TileMapModel *pTileMapModel);
 
 	TileMapTool GetSelectedTool() const;
-
-	const QMap<QPoint, TileData *> &GetBrush() const;
-	void SetBrush(QMap<QPoint, TileData *> brushMap);
 
 private:
 	Ui::AuxTileMap *ui;
