@@ -125,5 +125,5 @@ void TileMapGfxScene::OnMarqueeRelease(Qt::MouseButton eMouseBtn, bool bShiftHel
 			brushList.push_back(iter.key());
 	}
 
-	m_pTileMapModel->SetTileSetBrush(m_pTileSet, brushList);
+	m_pTileMapModel->CreateBrush(m_pTileSet, brushList);
 }

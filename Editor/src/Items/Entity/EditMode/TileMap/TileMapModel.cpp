@@ -20,7 +20,8 @@
 TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString sLayerCodeName) :
 	IEditModeModel(EDITMODETYPE_TileMap),
 	m_ProjectRef(projectRef),
-	m_bValidHoverCoord(false)
+	m_bValidHoverCoord(false),
+	m_pCurrentBrush(nullptr)
 {
 	m_pTiledMap = std::make_unique<Tiled::Map>();
 	m_pTiledMap->setInfinite(true);
@@ -281,34 +282,14 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 		break;
 
 	case TILEMAPTOOL_Paint: {
-		// Write selected tiles to the map
-		AuxTileMap *pAuxTileMap = static_cast<AuxTileMap *>(MainWindow::GetAuxWidget(AUXTAB_TileMap));
-		
-		if(m_BrushMap.empty() || m_ViewList.empty())
-			return false;
-
-		// Determine what the center QPoint would be in m_BrushMap (doesn't have to be an existing key)
-		int iMinGridX = INT_MAX, iMaxGridX = INT_MIN, iMinGridY = INT_MAX, iMaxGridY = INT_MIN;
-		for(QPoint ptTileCoord : m_BrushMap.keys())
-		{
-			if(ptTileCoord.x() < iMinGridX)
-				iMinGridX = ptTileCoord.x();
-			else if(ptTileCoord.x() > iMaxGridX)
-				iMaxGridX = ptTileCoord.x();
-			if(ptTileCoord.y() < iMinGridY)
-				iMinGridY = ptTileCoord.y();
-			else if(ptTileCoord.y() > iMaxGridY)
-				iMaxGridY = ptTileCoord.y();
-		}
-		QPoint ptBrushCenter((iMinGridX + iMaxGridX) / 2, (iMinGridY + iMaxGridY) / 2);
+		if(m_pCurrentBrush == nullptr || m_ViewList.empty())
+			break;
 
 		glm::ivec2 ptClickGridCoord = static_cast<TileMapView *>(m_ViewList[0])->GetTileMapLayer().WorldToTile(ptClickPos);
-
-		// Write brush to tilemap
-		for(QMap<QPoint, TileData *>::const_iterator it = m_BrushMap.begin(); it != m_BrushMap.end(); ++it)
+		for(QMap<QPoint, TileData *>::const_iterator it = m_pCurrentBrush->begin(); it != m_pCurrentBrush->end(); ++it)
 		{
-			ptClickGridCoord
-			SetCell(0, 0, 
+			QPoint ptGridPos(ptClickGridCoord.x + it.key().x(), ptClickGridCoord.y + it.key().y());
+			SetCell(ptGridPos.x(), ptGridPos.y(), it.value());
 		}
 
 		return true; }
@@ -484,18 +465,19 @@ HyShader *TileMapModel::GetGridShader()
 //{
 //}
 
-void TileMapModel::SetTileSetBrush(const AtlasTileSet *pTileSet, QList<TileData *> brushList)
+void TileMapModel::CreateBrush(const AtlasTileSet *pTileSet, QList<TileData *> tileList)
 {
-	if(brushList.isEmpty())
+	if(tileList.isEmpty())
 	{
 		m_TileSetBrushMap.remove(pTileSet);
+		m_pCurrentBrush = nullptr;
 		return;
 	}
 
 	int iMinGridX = INT_MAX, iMinGridY = INT_MAX, iMaxGridX = INT_MIN, iMaxGridY = INT_MIN;
-	for(int i = 0; i < brushList.size(); ++i)
+	for(int i = 0; i < tileList.size(); ++i)
 	{
-		QPoint ptGridPos = brushList[i]->GetMetaGridPos();
+		QPoint ptGridPos = tileList[i]->GetMetaGridPos();
 
 		iMinGridX = HyMath::Min(iMinGridX, ptGridPos.x());
 		iMinGridY = HyMath::Min(iMinGridY, ptGridPos.y());
@@ -507,16 +489,46 @@ void TileMapModel::SetTileSetBrush(const AtlasTileSet *pTileSet, QList<TileData 
 	// Normalize the brush map so that the tiles are centered around (0, 0) while keeping their formation
 	// Also change the coordinates so it matches Harmony's Y-Up grid
 	TileMapBrush brushMap;
-	for(int i = 0; i < brushList.size(); ++i)
+	for(int i = 0; i < tileList.size(); ++i)
 	{
-		QPoint ptGridPos = brushList[i]->GetMetaGridPos();
+		QPoint ptGridPos = tileList[i]->GetMetaGridPos();
 		QPoint ptDiff = ptGridPos - ptCenter;
 		ptDiff.setY(ptDiff.y() * -1); // TileSets' meta-grid coordinates go top-to-bottom, but Harmony and TileMaps go bottom-to-top // TILETODO: make tile sets meta-grid go bottom-to-top
 
-		brushMap.insert(ptDiff, brushList[i]);
+		brushMap.insert(ptDiff, tileList[i]);
 	}
 
 	m_TileSetBrushMap.insert(pTileSet, brushMap);
+	m_pCurrentBrush = &m_TileSetBrushMap[pTileSet];
+}
+
+void TileMapModel::CreateBrush(int iPresetIndex, TileMapBrush brush)
+{
+	if(brush.empty())
+	{
+		m_PresetBrushMap.remove(iPresetIndex);
+		m_pCurrentBrush = nullptr;
+		return;
+	}
+
+	m_PresetBrushMap[iPresetIndex] = brush;
+	m_pCurrentBrush = &m_PresetBrushMap[iPresetIndex];
+}
+
+void TileMapModel::SetBrush(const AtlasTileSet *pTileSet)
+{
+	if(m_TileSetBrushMap.contains(pTileSet) == false)
+		m_pCurrentBrush = nullptr;
+	else
+		m_pCurrentBrush = &m_TileSetBrushMap[pTileSet];
+}
+
+void TileMapModel::SetBrush(int iPresetIndex)
+{
+	if(m_PresetBrushMap.contains(iPresetIndex) == false)
+		m_pCurrentBrush = nullptr;
+	else
+		m_pCurrentBrush = &m_PresetBrushMap[iPresetIndex];
 }
 
 void TileMapModel::SetCellsBrush()
@@ -534,8 +546,10 @@ void TileMapModel::SetCell(int iX, int iY, TileData *pTileData)
 	}
 
 	Tiled::TileLayer *pTiledTileLayer = pLayer0->asTileLayer();
-	Tiled::Cell cell(pTileData->GetTileSet()->GetTiledTileSet().data(), iTileId);
-	pTiledTileLayer->setCell(iX, iY, cell);
+	if(pTileData == nullptr)
+		pTiledTileLayer->setCell(iX, iY, Tiled::Cell::empty);
+	else
+		pTiledTileLayer->setCell(iX, iY, Tiled::Cell(pTileData->GetTileSet()->GetTiledTileSet().data(), pTileData->GetTileId()));
 
 	//// NOTE: We register the tile map's dependency on the tile set. The entity will have a dependency on the tile map, which in turn has a dependency on the tile set.
 	//QList<QUuid> registerList;

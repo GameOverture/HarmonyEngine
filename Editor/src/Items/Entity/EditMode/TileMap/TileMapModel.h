@@ -34,6 +34,7 @@ class TileMapModel : public IEditModeModel
 
 	QMap<const AtlasTileSet *, TileMapBrush>	m_TileSetBrushMap;
 	QMap<int, TileMapBrush>						m_PresetBrushMap;
+	TileMapBrush *								m_pCurrentBrush;
 
 public:
 	TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString sLayerCodeName);
@@ -67,7 +68,10 @@ public:
 
 	HyShader *GetGridShader();
 
-	void SetTileSetBrush(const AtlasTileSet *pTileSet, QList<TileData *> brushList);
+	void CreateBrush(const AtlasTileSet *pTileSet, QList<TileData *> tileList);
+	void CreateBrush(int iPresetIndex, TileMapBrush brush);
+	void SetBrush(const AtlasTileSet *pTileSet);
+	void SetBrush(int iPresetIndex);
 
 	void SetCellsBrush();
 	void SetCell(int iX, int iY, TileData *pTileData);
