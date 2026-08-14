@@ -23,18 +23,34 @@ class TileData;
 
 typedef QMap<QPoint, TileData *> TileMapBrush;
 
+//struct TileMapModification
+//{
+//	Tiled::Cell									m_OldCell;
+//	Tiled::Cell									m_NewCell;
+//
+//	TileMapModification(const Tiled::Cell &oldCellRef, const Tiled::Cell &newCellRef) :
+//		m_OldCell(oldCellRef.tileset(), oldCellRef.tileId()),
+//		m_NewCell(newCellRef.tileset(), newCellRef.tileId())
+//	{
+//		m_OldCell.setFlags(oldCellRef.flags());
+//		m_NewCell.setFlags(newCellRef.flags());
+//	}
+//};
+
 class TileMapModel : public IEditModeModel
 {
-	Project &									m_ProjectRef;
+	Project &													m_ProjectRef;
 
-	std::unique_ptr<Tiled::Map>					m_pTiledMap;
+	std::unique_ptr<Tiled::Map>									m_pTiledMap;
 
-	bool										m_bValidHoverCoord;
-	QPoint										m_ptHoverCoord;
+	bool														m_bValidHoverCoord;
+	QPoint														m_ptHoverCoord;
 
-	QMap<const AtlasTileSet *, TileMapBrush>	m_TileSetBrushMap;
-	QMap<int, TileMapBrush>						m_PresetBrushMap;
-	TileMapBrush *								m_pCurrentBrush;
+	QMap<const AtlasTileSet *, TileMapBrush>					m_TileSetBrushMap;
+	QMap<int, TileMapBrush>										m_PresetBrushMap;
+	TileMapBrush *												m_pCurrentBrush;
+
+	//std::map<glm::ivec2, std::unique_ptr<TileMapModification>>	m_CurrentModificationMap; // Used for undo/redo
 
 public:
 	TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString sLayerCodeName);
@@ -73,8 +89,10 @@ public:
 	void SetBrush(const AtlasTileSet *pTileSet);
 	void SetBrush(int iPresetIndex);
 
-	void SetCellsBrush();
-	void SetCell(int iX, int iY, TileData *pTileData);
+	bool SetCellsBrush(glm::ivec2 ptGridCoord);
+	void SetCell(glm::ivec2 ptGridCoord, TileData *pTileData);
+
+	//std::map<glm::ivec2, std::unique_ptr<TileMapModification>> TakeModificationMap();
 
 	void UpdateTileIds(const std::vector<std::pair<uint16, uint16>> &modifiedIndexList); // Pair<old, new>
 };

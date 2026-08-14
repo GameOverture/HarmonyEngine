@@ -141,6 +141,7 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 	m_GfxScene.Initialize(this);
 
 	m_pTiledTileSet = Tiled::Tileset::create(m_sName, 0, 0, 0, 0);
+	m_pTiledTileSet->setFileName(m_sName);
 	m_pTiledTileSet->setNextTileId(HyMath::Max(GetNumTiles(), 1));
 }
 

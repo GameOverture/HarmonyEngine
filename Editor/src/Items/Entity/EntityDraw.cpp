@@ -306,7 +306,9 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			int iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
 			int iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
 			QString sCategoryName;
-			if(pTreeItemData->GetType() == ITEM_PrimLayer) // Both EDITMODETYPE_PrimitiveShape and EDITMODETYPE_PrimitiveLineChain
+			if(pTreeItemData->GetEditModel()->GetEditModeType() == EDITMODETYPE_TileMap)
+				sCategoryName = "Tile Map";
+			else if(pTreeItemData->GetType() == ITEM_PrimLayer) // Both EDITMODETYPE_PrimitiveShape and EDITMODETYPE_PrimitiveLineChain
 				sCategoryName = "Primitive Layer";
 			else if(pTreeItemData->GetEditModel()->GetEditModeType() == EDITMODETYPE_FixtureShape)
 				sCategoryName = "Shape";

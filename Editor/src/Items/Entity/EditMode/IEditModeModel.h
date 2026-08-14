@@ -45,7 +45,7 @@ class IEditModeModel
 protected:
 	EditModeType						m_eEditModeType;
 	
-	// Track Views manually since we don't inherit from QObject
+	// Track Views manually since we don't inherit from QObject // TODO: Only have a single view not a list
 	QList<IEditModeView *>				m_ViewList;
 
 public:

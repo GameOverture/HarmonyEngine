@@ -50,7 +50,8 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 
 		QJsonObject tileSetObj;
 		tileSetObj.insert("firstgid", tileSetVarMap["firstgid"].toInt());
-		tileSetObj.insert("source", tileSetVarMap["source"].toString());
+		QString sSource = tileSetVarMap["source"].toString();
+		tileSetObj.insert("source", sSource);
 
 		tileSetsArray.append(tileSetObj);
 	}
@@ -108,16 +109,21 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
  
 /*virtual*/ void TileMapModel::Deserialize(bool bEnabled, const QJsonObject &serializedObj) /*override*/
 {
+	QString sLayerName;
 	while(m_pTiledMap->layerCount() > 0)
 	{
 		Tiled::Layer *pLayer = m_pTiledMap->takeLayerAt(0);
+		sLayerName = pLayer->name();
 		delete pLayer;
 	}
 	while(m_pTiledMap->tilesetCount() > 0)
 		m_pTiledMap->removeTilesetAt(0);
 
 	if(serializedObj.empty())
+	{
+		m_pTiledMap->addLayer(new Tiled::TileLayer(sLayerName));
 		return;
+	}
 
 	Tiled::GidMapper mGidMapper;
 
@@ -125,10 +131,12 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 	for(QJsonValue val : tileSetsArray)
 	{
 		QJsonObject tileSetObj = val.toObject();
-		AtlasTileSet *pTileSet = m_ProjectRef.GetAtlasModel().GetTileSetsModel().GetTileSet(tileSetObj["source"].toString());
-		m_pTiledMap->addTileset(pTileSet->GetTiledTileSet());
+		unsigned int uiFirstGid = static_cast<unsigned int>(tileSetObj["firstgid"].toInteger());
+		QString sSource = tileSetObj["source"].toString();
 
-		mGidMapper.insert(static_cast<uint32_t>(tileSetObj["firstgid"].toInteger()), pTileSet->GetTiledTileSet());
+		AtlasTileSet *pTileSet = m_ProjectRef.GetAtlasModel().GetTileSetsModel().GetTileSet(sSource);
+		m_pTiledMap->addTileset(pTileSet->GetTiledTileSet());
+		mGidMapper.insert(uiFirstGid, pTileSet->GetTiledTileSet());
 	}
 
 	QJsonObject tileLayerObj = serializedObj["tileLayer"].toObject();
@@ -281,18 +289,10 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 	case TILEMAPTOOL_Select:
 		break;
 
-	case TILEMAPTOOL_Paint: {
-		if(m_pCurrentBrush == nullptr || m_ViewList.empty())
+	case TILEMAPTOOL_Paint:
+		if(m_ViewList.empty())
 			break;
-
-		glm::ivec2 ptClickGridCoord = static_cast<TileMapView *>(m_ViewList[0])->GetTileMapLayer().WorldToTile(ptClickPos);
-		for(QMap<QPoint, TileData *>::const_iterator it = m_pCurrentBrush->begin(); it != m_pCurrentBrush->end(); ++it)
-		{
-			QPoint ptGridPos(ptClickGridCoord.x + it.key().x(), ptClickGridCoord.y + it.key().y());
-			SetCell(ptGridPos.x(), ptGridPos.y(), it.value());
-		}
-
-		return true; }
+		return SetCellsBrush(static_cast<TileMapView *>(m_ViewList[0])->GetTileMapLayer().WorldToTile(ptClickPos));
 
 	case TILEMAPTOOL_Rect:
 	case TILEMAPTOOL_Circle:
@@ -325,6 +325,26 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 
 /*virtual*/ QString TileMapModel::GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const /*override*/
 {
+	if(eEditModeState != EDITMODE_MouseClickTransform && eEditModeState != EDITMODE_MouseDragTransform)
+		return QString();
+
+	AuxTileMap *pAuxTileMap = static_cast<AuxTileMap *>(MainWindow::GetAuxWidget(AUXTAB_TileMap));
+	switch(pAuxTileMap->GetSelectedTool())
+	{
+	case TILEMAPTOOL_Select:
+		break;
+
+	case TILEMAPTOOL_Paint:
+		return "Paint Tiles";
+
+	case TILEMAPTOOL_Rect:
+	case TILEMAPTOOL_Circle:
+	case TILEMAPTOOL_Fill:
+	case TILEMAPTOOL_Picker:
+	case TILEMAPTOOL_Eraser:
+		break;
+	}
+
 	return QString();
 }
 
@@ -531,12 +551,21 @@ void TileMapModel::SetBrush(int iPresetIndex)
 		m_pCurrentBrush = &m_PresetBrushMap[iPresetIndex];
 }
 
-void TileMapModel::SetCellsBrush()
+bool TileMapModel::SetCellsBrush(glm::ivec2 ptGridCoord)
 {
+	if(m_pCurrentBrush == nullptr || m_pCurrentBrush->empty())
+		return false;
 
+	for(QMap<QPoint, TileData *>::const_iterator it = m_pCurrentBrush->begin(); it != m_pCurrentBrush->end(); ++it)
+	{
+		QPoint ptGridPos(ptGridCoord.x + it.key().x(), ptGridCoord.y + it.key().y());
+		SetCell(ptGridCoord, it.value());
+	}
+
+	return true;
 }
 
-void TileMapModel::SetCell(int iX, int iY, TileData *pTileData)
+void TileMapModel::SetCell(glm::ivec2 ptGridCoord, TileData *pTileData)
 {
 	Tiled::Layer *pLayer0 = m_pTiledMap->layerAt(0);
 	if(pLayer0->isTileLayer() == false)
@@ -546,10 +575,16 @@ void TileMapModel::SetCell(int iX, int iY, TileData *pTileData)
 	}
 
 	Tiled::TileLayer *pTiledTileLayer = pLayer0->asTileLayer();
+	Tiled::Cell oldCell = pTiledTileLayer->cellAt(ptGridCoord.x, ptGridCoord.y);
+	Tiled::Cell newCell;
 	if(pTileData == nullptr)
-		pTiledTileLayer->setCell(iX, iY, Tiled::Cell::empty);
+		newCell = Tiled::Cell::empty;
 	else
-		pTiledTileLayer->setCell(iX, iY, Tiled::Cell(pTileData->GetTileSet()->GetTiledTileSet().data(), pTileData->GetTileId()));
+		newCell.setTile(pTileData->GetTileSet()->GetTiledTileSet().data(), pTileData->GetTileId());
+	
+	pTiledTileLayer->setCell(ptGridCoord.x, ptGridCoord.y, newCell);
+	m_pTiledMap->addTileset(pTileData->GetTileSet()->GetTiledTileSet());
+	//m_CurrentModificationMap.emplace(ptGridCoord, std::make_unique<TileMapModification>(oldCell, newCell));
 
 	//// NOTE: We register the tile map's dependency on the tile set. The entity will have a dependency on the tile map, which in turn has a dependency on the tile set.
 	//QList<QUuid> registerList;
@@ -559,6 +594,11 @@ void TileMapModel::SetCell(int iX, int iY, TileData *pTileData)
 	//registerList.push_back(pAddedTileMap->GetUuid());
 	//m_ItemRef.GetProject().IncrementDependencies(&m_ItemRef, registerList);
 }
+
+//std::map<glm::ivec2, std::unique_ptr<TileMapModification>> TileMapModel::TakeModificationMap()
+//{
+//	return std::move(m_CurrentModificationMap);
+//}
 
 void TileMapModel::UpdateTileIds(const std::vector<std::pair<uint16, uint16>> &modifiedIndexList) // Pair<old, new>
 {
