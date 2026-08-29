@@ -119,7 +119,7 @@ public:
 	void SetPosition(float fX, float fY);
 	bool IsVisible() const;
 	void SetVisible(bool bVisible);
-	HyAnimFloat *Alpha();
+	HyAnimVec1 *Alpha();
 	
 	uint32 GetFrameStrokeSize() const;
 	HyColor GetPanelColor() const;

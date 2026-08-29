@@ -52,7 +52,7 @@
 #define HY_UNUSED_HANDLE 0
 typedef uint32 HyTextureHandle;
 typedef uint32 HyStencilHandle;
-typedef uint8 HyShaderHandle;
+typedef uint32 HyShaderHandle;
 typedef uint32 HyVertexBufferHandle;
 typedef uint32 HyAudioNodeHandle;
 typedef std::pair<uint32, uint32> HyTextureQuadHandle;	// FIRST is the checksum, SECOND is the bank ID ---OR--- FIRST is '0', indicating SECOND is a 'HyAuxiliaryFileHandle'
@@ -62,8 +62,9 @@ typedef uint32 HySpacerHandle;
 typedef uint32 HyLayoutHandle;
 
 // Tags aren't used by the engine, and solely used for whatever purpose the client wishes (tracking, unique ID, etc.)
-// They increase the memory footprint of every node/instance by 8 bytes
-#define HY_ENABLE_USER_TAGS
+// Default 32bit user tags fill a memory fragmented gap and don't contribute to increasing the memory footprint of nodes
+// Enabling 64bit user tags increase the memory footprint of every node/instance by 8 bytes due to alignment (on x64 builds)
+#define HY_64BIT_USER_TAGS 0
 
 #define HY_SIZEFLAG_EXPAND (1 << 0)
 #define HY_SIZEFLAG_SHRINK (1 << 1)

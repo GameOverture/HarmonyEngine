@@ -15,34 +15,26 @@
 HyScene *IHyNode::sm_pScene = nullptr;
 
 IHyNode::IHyNode(HyType eNodeType) :
+	m_iTag(0),
 	m_uiFlags(static_cast<uint32>(eNodeType) | SETTING_IsVisible | EXPLICIT_ParentsVisible)
-#ifdef HY_ENABLE_USER_TAGS
-	, m_iTag(0)
-#endif
 {
 	SetRegistered(true);
 }
 
 IHyNode::IHyNode(const IHyNode &copyRef) :
-	m_uiFlags(0),
-#ifdef HY_ENABLE_USER_TAGS
-	m_iTag(copyRef.m_iTag)
-#endif
+	m_iTag(copyRef.m_iTag),
+	m_uiFlags(copyRef.m_uiFlags)
 {
 	if(copyRef.IsRegistered())
 		SetRegistered(true);
 
 	if(copyRef.IsPauseUpdate())
 		SetPauseUpdate(true);
-
-	m_uiFlags = copyRef.m_uiFlags;
 }
 
 IHyNode::IHyNode(IHyNode &&donor) noexcept :
-	m_uiFlags(0)
-#ifdef HY_ENABLE_USER_TAGS
-	, m_iTag(std::move(donor.m_iTag))
-#endif
+	m_iTag(std::move(donor.m_iTag)),
+	m_uiFlags(std::move(donor.m_uiFlags))
 {
 	if(donor.IsRegistered())
 	{
@@ -55,8 +47,6 @@ IHyNode::IHyNode(IHyNode &&donor) noexcept :
 		donor.SetPauseUpdate(false);
 		SetPauseUpdate(true);
 	}
-
-	m_uiFlags = donor.m_uiFlags;
 }
 
 /*virtual*/ IHyNode::~IHyNode()
@@ -72,11 +62,8 @@ IHyNode &IHyNode::operator=(const IHyNode &rhs)
 	SetRegistered(rhs.IsRegistered());
 	SetPauseUpdate(rhs.IsPauseUpdate());
 
-	m_uiFlags = rhs.m_uiFlags;
-
-#ifdef HY_ENABLE_USER_TAGS
 	m_iTag = rhs.m_iTag;
-#endif
+	m_uiFlags = rhs.m_uiFlags;
 
 	return *this;
 }
@@ -95,13 +82,20 @@ IHyNode &IHyNode::operator=(IHyNode &&donor)
 		SetPauseUpdate(true);
 	}
 
+	m_iTag = donor.m_iTag;
 	m_uiFlags = donor.m_uiFlags;
 
-#ifdef HY_ENABLE_USER_TAGS
-	m_iTag = donor.m_iTag;
-#endif
-
 	return *this;
+}
+
+int64_t IHyNode::GetTag() const
+{
+	return m_iTag;
+}
+
+void IHyNode::SetTag(int64_t iTag)
+{
+	m_iTag = iTag;
 }
 
 HyType IHyNode::GetType() const
@@ -158,18 +152,6 @@ uint32 IHyNode::GetInternalFlags() const
 {
 	return m_uiFlags;
 }
-
-#ifdef HY_ENABLE_USER_TAGS
-int64_t IHyNode::GetTag() const
-{
-	return m_iTag;
-}
-
-void IHyNode::SetTag(int64_t iTag)
-{
-	m_iTag = iTag;
-}
-#endif
 
 bool IHyNode::IsRegistered() const
 {

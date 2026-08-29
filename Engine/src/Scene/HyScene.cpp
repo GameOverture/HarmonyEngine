@@ -348,10 +348,12 @@ bool HyScene::CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &
 {
 	if(pInst1->GetDisplayOrder() == pInst2->GetDisplayOrder())
 	{
-		if(pInst1->GetShaderUniforms().GetCrc64() == pInst2->GetShaderUniforms().GetCrc64())
+		uint64 uiInst1ShaderCrc = pInst1->GetShaderUniforms().GetCrc64();
+		uint64 uiInst2ShaderCrc = pInst2->GetShaderUniforms().GetCrc64();
+		if(uiInst1ShaderCrc == uiInst2ShaderCrc)
 			return reinterpret_cast<const char *>(pInst1) < reinterpret_cast<const char *>(pInst2);
 
-		return pInst1->GetShaderUniforms().GetCrc64() < pInst2->GetShaderUniforms().GetCrc64();
+		return uiInst1ShaderCrc < uiInst2ShaderCrc;
 	}
 
 	return pInst1->GetDisplayOrder() < pInst2->GetDisplayOrder();

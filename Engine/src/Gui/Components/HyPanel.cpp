@@ -424,7 +424,7 @@ void HyPanel::SetVisible(bool bVisible)
 		return pPanelNode->SetVisible(bVisible);
 }
 
-HyAnimFloat *HyPanel::Alpha()
+HyAnimVec1 *HyPanel::Alpha()
 {
 	IHyBody2d *pPanelNode = GetPanelNode();
 	if(pPanelNode)

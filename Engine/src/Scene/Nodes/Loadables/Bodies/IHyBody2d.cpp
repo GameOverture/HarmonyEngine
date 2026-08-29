@@ -20,12 +20,11 @@
 IHyBody2d::IHyBody2d(HyType eNodeType, const HyNodePath &nodePath, HyEntity2d *pParent) :
 	IHyLoadable2d(eNodeType, nodePath, pParent),
 	IHyBody(),
-	m_fAlpha(1.0f),
 	m_fCachedAlpha(1.0f),
 	m_iDisplayOrder(0),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color),
+	alpha(*this, DIRTY_Color),
 	m_hScissorStencil(HY_UNUSED_HANDLE)
 {
 	m_uiFlags |= NODETYPE_IsBody;
@@ -35,6 +34,7 @@ IHyBody2d::IHyBody2d(HyType eNodeType, const HyNodePath &nodePath, HyEntity2d *p
 
 	topColor.SetAll(1.0f);
 	botColor.SetAll(1.0f);
+	alpha.Set(1.0f);
 
 	m_CachedTopColor = topColor.Get();
 	m_CachedBotColor = botColor.Get();
@@ -60,7 +60,7 @@ IHyBody2d::IHyBody2d(const IHyBody2d &copyRef) :
 	m_SceneAABB(copyRef.m_SceneAABB),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color),
+	alpha(*this, DIRTY_Color),
 	m_hScissorStencil(copyRef.m_hScissorStencil)
 {
 	m_uiFlags |= NODETYPE_IsBody;
@@ -80,7 +80,7 @@ IHyBody2d::IHyBody2d(IHyBody2d &&donor) noexcept :
 	m_SceneAABB(std::move(donor.m_SceneAABB)),
 	topColor(*this, DIRTY_Color),
 	botColor(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color),
+	alpha(*this, DIRTY_Color),
 	m_hScissorStencil(std::move(donor.m_hScissorStencil))
 {
 	m_uiFlags |= NODETYPE_IsBody;

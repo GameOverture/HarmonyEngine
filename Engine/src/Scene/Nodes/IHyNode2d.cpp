@@ -17,12 +17,11 @@ extern void HyNodeCtorAppend(HyEntity2d *pEntity, IHyNode2d *pChildNode);
 IHyNode2d::IHyNode2d(HyType eNodeType, HyEntity2d *pParent) :
 	IHyNode(eNodeType),
 	m_pParent(pParent),
-	m_fRotation(0.0f),
 	pos(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
-	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
-	rot_pivot(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
+	rot(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
+	rot_pivot(0.0f, 0.0f),
 	scale(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB)
+	scale_pivot(0.0f, 0.0f)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -46,12 +45,11 @@ IHyNode2d::IHyNode2d(const IHyNode2d &copyRef) :
 	IHyNode(copyRef),
 	m_pParent(nullptr),
 	m_mtxCached(copyRef.m_mtxCached),
-	m_fRotation(copyRef.m_fRotation),
 	pos(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
-	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
-	rot_pivot(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
+	rot(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
+	rot_pivot(0.0f, 0.0f),
 	scale(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB)
+	scale_pivot(0.0f, 0.0f)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -69,12 +67,11 @@ IHyNode2d::IHyNode2d(IHyNode2d &&donor) noexcept :
 	IHyNode(std::move(donor)),
 	m_pParent(donor.ParentGet()),
 	m_mtxCached(std::move(donor.m_mtxCached)),
-	m_fRotation(donor.m_fRotation),
 	pos(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
-	rot(m_fRotation, *this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
-	rot_pivot(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
+	rot(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
+	rot_pivot(0.0f, 0.0f),
 	scale(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB),
-	scale_pivot(*this, DIRTY_Transform | DIRTY_ScissorStencil | DIRTY_SceneAABB)
+	scale_pivot(0.0f, 0.0f)
 {
 	m_uiFlags |= NODETYPE_Is2d;
 
@@ -97,7 +94,7 @@ IHyNode2d &IHyNode2d::operator=(const IHyNode2d &rhs)
 	IHyNode::operator=(rhs);
 	
 	pos = rhs.pos;
-	rot = rhs.rot; // This will set 'm_fRotation'
+	rot = rhs.rot;
 	rot_pivot = rhs.rot_pivot;
 	scale = rhs.scale;
 	scale_pivot = rhs.scale_pivot;
@@ -146,8 +143,8 @@ void IHyNode2d::GetLocalTransform(glm::mat4 &mtxOut, float fExtrapolatePercent) 
 	glm::vec3 ptPos = pos.Extrapolate(fExtrapolatePercent);
 	glm::vec3 vScale = scale.Extrapolate(fExtrapolatePercent);
 	vScale.z = 1.0f;
-	glm::vec3 ptRotPivot = rot_pivot.Extrapolate(fExtrapolatePercent);
-	glm::vec3 ptScalePivot = scale_pivot.Extrapolate(fExtrapolatePercent);
+	glm::vec3 ptRotPivot(rot_pivot, 0.0f);
+	glm::vec3 ptScalePivot(scale_pivot, 0.0f);
 	
 	mtxOut = glm::translate(mtxOut, ptPos);
 

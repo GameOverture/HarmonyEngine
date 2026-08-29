@@ -26,7 +26,6 @@ class IHyBody2d : public IHyLoadable2d, public IHyBody
 	friend class HyStencil;
 
 protected:
-	float							m_fAlpha;
 	float							m_fCachedAlpha;
 	glm::vec3						m_CachedTopColor;
 	glm::vec3						m_CachedBotColor;
@@ -41,7 +40,7 @@ protected:
 public:
 	HyAnimVec3						topColor;
 	HyAnimVec3						botColor;
-	HyAnimFloat						alpha;
+	HyAnimVec1						alpha;
 
 public:
 	IHyBody2d(HyType eNodeType, const HyNodePath &nodePath, HyEntity2d *pParent);

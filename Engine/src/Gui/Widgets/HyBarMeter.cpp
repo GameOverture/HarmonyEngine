@@ -310,22 +310,22 @@ void HyBarMeter::GuiOverrideBarNodeData(HyType eNodeType, HyJsonObj itemDataObj,
 	{
 		if(IsVertical())
 		{
-			m_BarMask.scale_pivot.Set(0.0f, m_Bar.GetHeight(1.0f));
+			m_BarMask.scale_pivot = {0.0f, m_Bar.GetHeight(1.0f)};
 			if(m_Bar.GetPanelNode())
-				m_Bar.GetPanelNode()->scale_pivot.Set(0.0f, m_Bar.GetHeight(1.0f));
+				m_Bar.GetPanelNode()->scale_pivot = {0.0f, m_Bar.GetHeight(1.0f)};
 		}
 		else
 		{
-			m_BarMask.scale_pivot.Set(m_Bar.GetWidth(1.0f), 0.0f);
+			m_BarMask.scale_pivot = {m_Bar.GetWidth(1.0f), 0.0f};
 			if(m_Bar.GetPanelNode())
-				m_Bar.GetPanelNode()->scale_pivot.Set(m_Bar.GetWidth(1.0f), 0.0f);
+				m_Bar.GetPanelNode()->scale_pivot = {m_Bar.GetWidth(1.0f), 0.0f};
 		}
 	}
 	else
 	{
-		m_BarMask.scale_pivot.Set(0.0f, 0.0f);
+		m_BarMask.scale_pivot = {0.0f, 0.0f};
 		if(m_Bar.GetPanelNode())
-			m_Bar.GetPanelNode()->scale_pivot.Set(0.0f, 0.0f);
+			m_Bar.GetPanelNode()->scale_pivot = {0.0f, 0.0f};
 	}
 
 	if(IsBarStretched())

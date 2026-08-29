@@ -262,7 +262,7 @@ void IDrawEx::RefreshTransforms()
 		m_MultiTransform.Show(true);
 		if(m_ActiveTransform.rot.Get() == 0.0f)
 		{
-			m_MultiTransform.rot_pivot.Set(0.0f, 0.0f);
+			m_MultiTransform.rot_pivot = {0.0f, 0.0f};
 			m_MultiTransform.rot.Set(0.0f);
 			m_MultiTransform.WrapTo(m_SelectedItemList);
 		}
@@ -270,7 +270,7 @@ void IDrawEx::RefreshTransforms()
 		{
 			glm::vec2 ptCenterPivot;
 			m_MultiTransform.GetCentroid(ptCenterPivot);
-			m_MultiTransform.rot_pivot.Set(ptCenterPivot);
+			m_MultiTransform.rot_pivot = ptCenterPivot;
 			m_MultiTransform.rot.Set(m_fMultiTransformStartRot + m_ActiveTransform.rot.Get());
 		}
 	}
@@ -541,12 +541,12 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 		if(bCtrlMod)
 		{
 			fRot = HyMath::AngleFromVector(ptItemWorldPos - ptWorldMousePos) - HyMath::AngleFromVector(ptItemWorldPos - m_ptDragStart);
-			m_ActiveTransform.rot_pivot.Set(ptItemWorldPos);
+			m_ActiveTransform.rot_pivot = ptItemWorldPos;
 		}
 		else
 		{
 			fRot = HyMath::AngleFromVector(m_ptDragCenter - ptWorldMousePos) - HyMath::AngleFromVector(m_ptDragCenter - m_ptDragStart);
-			m_ActiveTransform.rot_pivot.Set(m_ptDragCenter);
+			m_ActiveTransform.rot_pivot = m_ptDragCenter;
 		}
 
 		if(bShiftMod)
@@ -720,7 +720,7 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 		}
 		else
 		{
-			m_ActiveTransform.scale_pivot.Set(ptDragAnchorPoint);
+			m_ActiveTransform.scale_pivot = ptDragAnchorPoint;
 			m_ActiveTransform.scale.Set(vScaleAmt);
 		}
 

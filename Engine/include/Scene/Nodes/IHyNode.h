@@ -27,6 +27,12 @@ class IHyNode
 protected:
 	static HyScene *				sm_pScene;
 
+#if HY_64BIT_USER_TAGS
+	int64_t							m_iTag;	// This 'tag' isn't used by the engine, and solely used for whatever purpose the application wants (tracking, unique ID, etc.)
+#else
+	int32_t							m_iTag;	// This 'tag' isn't used by the engine, and solely used for whatever purpose the application wants (tracking, unique ID, etc.)
+#endif
+
 public:
 	// These flags describe this Node's C++ object type and are set upon construction, and are then immutable
 	enum TypeFlag
@@ -71,15 +77,10 @@ public:
 		SETTING_IsPauseUpdate		= 1 << 25,
 		SETTING_AllocScissorStencil	= 1 << 26,
 	};
-	// TODO: Put entity flags here with a final 'ENTITYATTRIB_NEXTFLAG', then bump m_uiFlags to 64bits
 protected:
 	uint32							m_uiFlags;
 
 	std::vector<HyAnimFloat *>		m_ActiveAnimFloatsList;
-
-#ifdef HY_ENABLE_USER_TAGS
-	int64_t							m_iTag;				// This 'tag' isn't used by the engine, and solely used for whatever purpose the application wants (tracking, unique ID, etc.)
-#endif
 
 public:
 	IHyNode(HyType eNodeType);
@@ -89,6 +90,9 @@ public:
 
 	IHyNode &operator=(const IHyNode &rhs);
 	IHyNode &operator=(IHyNode &&donor);
+
+	int64_t GetTag() const;
+	void SetTag(int64_t iTag);
 
 	HyType GetType() const;
 	bool Is2D() const;
@@ -100,11 +104,6 @@ public:
 	virtual void SetPauseUpdate(bool bUpdateWhenPaused);
 
 	uint32 GetInternalFlags() const;
-
-#ifdef HY_ENABLE_USER_TAGS
-	int64_t GetTag() const;
-	void SetTag(int64_t iTag);
-#endif
 
 protected:
 	bool IsRegistered() const;
