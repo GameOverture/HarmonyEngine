@@ -15,21 +15,21 @@
 
 HyTextureInfo::HyTextureInfo() :
 	m_uiFiltering(HYTEXFILTER_BILINEAR),
-	m_uiFormat(HYTEXTURE_Uncompressed),
+	m_uiFileType(HYTEXTUREFILE_PNG),
 	m_uiFormatParam1(4),
-	m_uiFormatParam2(0)
+	m_uiFormatParam2(HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT8, HYTEXTUREFORMAT_NORM8))
 { }
 
-HyTextureInfo::HyTextureInfo(HyTextureFiltering eFiltering, HyTextureFormat eFormat, uint8 uiFormatParam1, uint8 uiFormatParam2) :
+HyTextureInfo::HyTextureInfo(HyTextureFiltering eFiltering, HyTextureFileType eFileType, uint8 uiFormatParam1, uint8 uiFormatParam2) :
 	m_uiFiltering(eFiltering),
-	m_uiFormat(eFormat),
+	m_uiFileType(eFileType),
 	m_uiFormatParam1(uiFormatParam1),
 	m_uiFormatParam2(uiFormatParam2)
 { }
 
 HyTextureInfo::HyTextureInfo(uint32 uiBucketId) :
 	m_uiFiltering(uiBucketId & 0xFF),
-	m_uiFormat((uiBucketId & 0xFF00) >> 8),
+	m_uiFileType((uiBucketId & 0xFF00) >> 8),
 	m_uiFormatParam1((uiBucketId & 0xFF0000) >> 16),
 	m_uiFormatParam2((uiBucketId & 0xFF000000) >> 24)
 { }
@@ -44,14 +44,25 @@ bool HyTextureInfo::operator!=(const HyTextureInfo &rhs) const
 	return GetBucketId() != rhs.GetBucketId();
 }
 
-HyTextureFormat HyTextureInfo::GetFormat() const
+HyTextureFileType HyTextureInfo::GetFileType() const
 {
-	return static_cast<HyTextureFormat>(m_uiFormat);
+	return static_cast<HyTextureFileType>(m_uiFileType);
 }
 
 HyTextureFiltering HyTextureInfo::GetFiltering() const
 {
 	return static_cast<HyTextureFiltering>(m_uiFiltering);
+}
+
+void HyTextureInfo::GetUncompressedFormatTypes(HyTextureFormatType &eDataFormatOut, HyTextureFormatType &eInternalFormatOut) const
+{
+	eDataFormatOut = static_cast<HyTextureFormatType>(m_uiFormatParam2 & 0x0F);
+	eInternalFormatOut = static_cast<HyTextureFormatType>((m_uiFormatParam2 & 0xF0) >> 4);
+}
+
+/*static*/ uint8 HyTextureInfo::PackUncompressedFormatTypes(HyTextureFormatType eDataFormat, HyTextureFormatType eInternalFormat)
+{
+	return (static_cast<uint8>(eDataFormat) | (static_cast<uint8>(eInternalFormat) << 4));
 }
 
 bool HyTextureInfo::IsMipMaps() const
@@ -71,22 +82,17 @@ bool HyTextureInfo::IsMipMaps() const
 
 std::string HyTextureInfo::GetFileExt() const
 {
-	switch(m_uiFormat)
+	switch(m_uiFileType)
 	{
-	case HYTEXTURE_Uncompressed:
-		switch(m_uiFormatParam2)
-		{
-		case UNCOMPRESSEDFILE_PNG:
-			return ".png";
-		default:
-			return ".xxx";
-		}
-	case HYTEXTURE_DXT:
+	case HYTEXTUREFILE_PNG:
+		return ".png";
+	case HYTEXTUREFILE_DXT:
 		return ".dds";
-	case HYTEXTURE_ASTC:
+	case HYTEXTUREFILE_ASTC:
 		return ".astc";
 
-	case HYTEXTURE_Unknown:
+	case HYTEXTUREFILE_RAW:
+	case HYTEXTUREFILE_Unknown:
 	default:
 		return ".xxx";
 	}
@@ -94,7 +100,7 @@ std::string HyTextureInfo::GetFileExt() const
 
 uint32 HyTextureInfo::GetBucketId() const
 {
-	return m_uiFiltering | (m_uiFormat << 8) | (m_uiFormatParam1 << 16) | (m_uiFormatParam2 << 24);
+	return m_uiFiltering | (m_uiFileType << 8) | (m_uiFormatParam1 << 16) | (m_uiFormatParam2 << 24);
 }
 
 HyInit::HyInit()

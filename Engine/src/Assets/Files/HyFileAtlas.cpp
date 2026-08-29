@@ -137,7 +137,7 @@ bool HyFileAtlas::GetUvRect(uint32 uiChecksum, HyUvCoord &UVRectOut, uint64 &cro
 
 void HyFileAtlas::DeletePixelData()
 {
-	if(m_TextureInfo.GetFormat() == HYTEXTURE_ASTC)
+	if(m_TextureInfo.GetFileType() == HYTEXTUREFILE_ASTC)
 		delete[] m_pPixelData;
 	else
 		SOIL_free_image_data(m_pPixelData);// stbi_image_free(m_pPixelData);
@@ -167,49 +167,48 @@ void HyFileAtlas::DeletePixelData()
 		if(IsAuxiliary() == false)//m_iWidth != 0 && m_iHeight != 0)
 		{
 			sAtlasFilePath = HyEngine::DataDir() + HYASSETS_AtlasDir;
-			if(m_uiBANK_ID == HYASSETS_TileSetBankId)
-				sAtlasFilePath += "TileSets";
-			else
-			{
-				char szTmpBuffer[16];
-				sprintf(szTmpBuffer, "%05d", m_uiBANK_ID);
-				sAtlasFilePath += szTmpBuffer;
-			}
+			
+			char szTmpBuffer[16];
+			sprintf(szTmpBuffer, "%05d", m_uiBANK_ID);
+			sAtlasFilePath += szTmpBuffer;
+			
 			sAtlasFilePath += "/";
 			sAtlasFilePath += m_sFILE_NAME;
 		}
 		else
 			sAtlasFilePath = m_sFILE_NAME; // This is an auxiliary file, don't prepend the data directory
 
-		switch(m_TextureInfo.GetFormat())
+		switch(m_TextureInfo.GetFileType())
 		{
-		case HYTEXTURE_Uncompressed: {
+		case HYTEXTUREFILE_PNG: {
+			// Param2: data format & uploaded internal format
+			HyTextureFormatType eDataType, eInternalType;
+			m_TextureInfo.GetUncompressedFormatTypes(eDataType, eInternalType);
+			HyAssert(eDataType == HYTEXTUREFORMAT_UINT8, "Only 8bit PNGs currently supported"); // TODO: Support 16bit PNGs
+
 			// Param1: num channels
-			// Param2: disk file type (PNG, ...)
 			int iNum8bitClrChannels; // out variables
 			m_pPixelData = SOIL_load_image(sAtlasFilePath.c_str(), &m_iWidth, &m_iHeight, &iNum8bitClrChannels, m_TextureInfo.m_uiFormatParam1);
-
 			m_uiPixelDataSize = m_iWidth * m_iHeight * 4;
 			break; }
 
-		case HYTEXTURE_DXT:
+		case HYTEXTUREFILE_DXT:
 			m_pPixelData = SOIL_load_DDS(sAtlasFilePath.c_str(), &m_uiPixelDataSize, 0);
 			break;
 
-		case HYTEXTURE_ASTC:
+		case HYTEXTUREFILE_ASTC:
 			m_pPixelData = LoadAstc(sAtlasFilePath.c_str(), m_uiPixelDataSize);
 			break;
 
-		case HYTEXTURE_Unknown:
+		case HYTEXTUREFILE_RAW:
+			HyError("HyFileAtlas::OnLoadThread() - RAW Texture not implemented");
+			//HyIO::ParseRawTextureFile(sAtlasFilePath, , m_TextureInfo, m_pPixelData, m_uiPixelDataSize);
+			break;
+
+		case HYTEXTUREFILE_Unknown:
 		default:
 			HyError("HyFileAtlas::OnLoadThread() - Unknown texture type");
 			break;
-		}
-
-		// Use PBO/DMA transfer if available
-		if(m_pGfxApiPixelBuffer)
-		{
-			memcpy(m_pGfxApiPixelBuffer, m_pPixelData, m_uiPixelDataSize);
 		}
 
 		if(m_pPixelData == nullptr)
@@ -225,7 +224,7 @@ void HyFileAtlas::DeletePixelData()
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
 		if(m_iWidth > 0 && m_iHeight > 0)
-			m_hTextureHandle = rendererRef.AddTexture(m_TextureInfo, m_iWidth, m_iHeight, m_pPixelData, m_uiPixelDataSize, m_hGfxApiPbo);
+			m_hTextureHandle = rendererRef.AddTexture(m_TextureInfo, m_iWidth, m_iHeight, m_pPixelData, m_uiPixelDataSize);
 		else
 			HyLogError("HyFileAtlas::OnRenderThread() - Texture was invalid");
 		DeletePixelData();
@@ -243,7 +242,7 @@ void HyFileAtlas::DeletePixelData()
 	if(IsAuxiliary())
 		ss << "[AUX] " << HyIO::GetFileNameFromPath(m_sFILE_NAME);
 	else
-		ss << "[" << std::setw(3) << std::setfill('0') << m_uiMANIFEST_INDEX << "] Bank " << m_uiBANK_ID << ", Index " << m_uiINDEX_IN_BANK << " (" << HyAssets::GetTextureFormatName(m_TextureInfo.GetFormat()) << ")";
+		ss << "[" << std::setw(3) << std::setfill('0') << m_uiMANIFEST_INDEX << "] Bank " << m_uiBANK_ID << ", Index " << m_uiINDEX_IN_BANK << " (" << HyAssets::GetTextureFileTypeName(m_TextureInfo.GetFileType()) << ")";
 	
 	return ss.str();
 }
@@ -251,7 +250,7 @@ void HyFileAtlas::DeletePixelData()
 uint8 *HyFileAtlas::LoadAstc(std::string sAtlasFilePath, uint32 &uiPixelDataSizeOut)
 {
 	std::vector<uint8> astcData;
-	HyIO::ReadBinaryFile(sAtlasFilePath.c_str(), astcData);
+	HyIO::ReadBinaryFile(sAtlasFilePath, astcData);
 	if(astcData.empty())
 	{
 		HyLogError("HyFileAtlas::LoadAstc() failed to read binary file: " << sAtlasFilePath);

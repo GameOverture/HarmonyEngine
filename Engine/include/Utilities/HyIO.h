@@ -44,8 +44,9 @@ public:
 	static void ReadTextFile(const char *szFilePath, std::vector<char> &sContentsOut);
 	static void WriteTextFile(const char *szFilePath, const char *szContentBuffer);
 
-	static void ReadBinaryFile(const char *szFilePath, std::vector<uint8> &contentsOut);
-	//static uint8 *ReadBinaryFile(const char *szFilePath, uint32 &uiBufferSizeOut); // Returns a dynamically allocated buffer of file contents
+	static bool ReadBinaryFile(const std::string &sFilePath, std::vector<uint8> &contentsOut);
+	
+	static bool ParseRawTextureFile(const std::string &sFilePath, const std::string &sMagicNumberHeader, const HyTextureInfo textureInfo, unsigned char *&pTexelDataOut, uint32 &uiDataSizeOut);
 
 	static std::string UrlEncode(std::string sString);
 	static std::string UrlDecode(std::string sString);

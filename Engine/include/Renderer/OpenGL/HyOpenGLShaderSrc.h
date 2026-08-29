@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // QUADBATCH
 const char * const szHYQUADBATCH_VERTEXSHADER = R"src(
-#version 140
+#version 150
 
 uniform mat4					u_view_mtx;
 uniform mat4					u_projection_mtx;
@@ -74,7 +74,7 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYQUADBATCH_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
 
 uniform sampler2D				u_diffuse;
 
@@ -99,17 +99,46 @@ void main()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TILEMAPLAYER
 const char * const szHYTILEMAPLAYER_VERTEXSHADER = R"src(
-#version 140
+#version 150
+
+smooth out vec2					interp_uv;
+
+void main()
+{
+}
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYTILEMAPLAYER_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
+
+precision highp int; // Use highp precision for integers
+
+uniform highp usampler2D		u_descriptor;
+uniform sampler2D				u_diffuse;
+
+smooth in vec2					interp_uv;
+
+out vec4						out_color;
+
+void main()
+{
+	ivec2 coord = ivec2(gl_FragCoord.xy);
+
+	vec4 texel_color = texture(u_diffuse, interp_uv);
+
+	// texelFetch is recommended for integer textures to avoid filtering
+	uvec4 texel = texelFetch(u_descriptor, coord, 0);
+	uint r = texel.r;
+	uint g = texel.g;
+	uint b = texel.b;
+	uint a = texel.a;
+}
 )src";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // PRIMITIVE
 const char * const szHYPRIMATIVE_VERTEXSHADER = R"src(
-#version 140
+#version 150
 
 uniform mat4					u_transform_mtx;
 uniform mat4					u_view_mtx;
@@ -134,7 +163,7 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYPRIMATIVE_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
 
 smooth in vec4					interp_color;
 
@@ -149,7 +178,7 @@ void main()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SPINE
 const char *const szHYSPINE_VERTEXSHADER = R"src(
-#version 140
+#version 150
 
 uniform mat4					u_transform_mtx;
 uniform mat4					u_view_mtx;
@@ -185,7 +214,7 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char *const szHYSPINE_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
 
 in vec2							interp_uv;
 in vec4							interp_light_color;
@@ -208,7 +237,7 @@ void main()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CIRCLE
 const char *const szHYCIRCLE_VERTEXSHADER = R"src(
-#version 140
+#version 150
 
 uniform mat4					u_transform_mtx;
 uniform mat4					u_view_mtx;
@@ -230,7 +259,7 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char *const szHYCIRCLE_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
 
 uniform vec4					u_color;
 out vec4						out_color;
@@ -258,7 +287,7 @@ void main()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // LINES2D
 const char * const szHYLINES2D_VERTEXSHADER = R"src(
-#version 140
+#version 150
 
 uniform float					u_half_width;
 uniform float					u_feather_amt;
@@ -286,7 +315,7 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYLINES2D_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
 
 uniform float					u_half_width;
 uniform float					u_feather_amt;
@@ -305,7 +334,7 @@ void main()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // GLTF
 const char * const szHYGLTF_VERTEXSHADER = R"src(
-#version 140
+#version 150
 
 uniform mat4					u_transform_mtx;
 uniform mat4					u_view_mtx;
@@ -333,7 +362,7 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char * const szHYGLTF_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
 
 uniform sampler2D				u_diffuse;
 

@@ -101,14 +101,14 @@ quint64 AtlasFrame::GetFrameMask() const
 	return (quint64(m_uiPosX) << 48) | (quint64(m_uiPosY) << 32) | (quint64(m_uiPosX + GetCroppedWidth()) << 16) | quint64(m_uiPosY + GetCroppedHeight());
 }
 
-HyTextureFormat AtlasFrame::GetFormat() const
+HyTextureFileType AtlasFrame::GetFileType() const
 {
-	return m_TexInfo.GetFormat();
+	return m_TexInfo.GetFileType();
 }
 
-void AtlasFrame::SetFormat(HyTextureFormat eFormat, uint8 uiFormatParam1, uint8 uiFormatParam2)
+void AtlasFrame::SetFormat(HyTextureFileType eFileType, uint8 uiFormatParam1, uint8 uiFormatParam2)
 {
-	m_TexInfo.m_uiFormat = eFormat;
+	m_TexInfo.m_uiFileType = eFileType;
 	m_TexInfo.m_uiFormatParam1 = uiFormatParam1;
 	m_TexInfo.m_uiFormatParam2 = uiFormatParam2;
 }
@@ -230,7 +230,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 
 /*virtual*/ QString AtlasFrame::GetPropertyInfo() /*override*/
 {
-	return QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(m_TexInfo.m_uiFormat)).c_str()) % " | " % QString(HyAssets::GetTextureFilteringName(static_cast<HyTextureFiltering>(m_TexInfo.m_uiFiltering)).c_str());
+	return QString(HyAssets::GetTextureFileTypeName(static_cast<HyTextureFileType>(m_TexInfo.m_uiFileType)).c_str()) % " | " % QString(HyAssets::GetTextureFilteringName(static_cast<HyTextureFiltering>(m_TexInfo.m_uiFiltering)).c_str());
 }
 
 /*virtual*/ QString AtlasFrame::OnReplaceAllowed() /*override*/

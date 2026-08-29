@@ -27,9 +27,6 @@ protected:
 	HyLoadState						m_eLoadState;
 	uint32							m_uiRefCount;
 
-	uint32							m_hGfxApiPbo;
-	uint8 *							m_pGfxApiPixelBuffer;
-
 public:
 	IHyFile(HyFileType eType, std::string sFileName, uint32 uiBankId, uint32 uiManifestIndex) :
 		m_eLOADABLE_TYPE(eType),
@@ -37,9 +34,7 @@ public:
 		m_uiBANK_ID(uiBankId),
 		m_uiMANIFEST_INDEX(uiManifestIndex),
 		m_eLoadState(HYLOADSTATE_Inactive),
-		m_uiRefCount(0),
-		m_hGfxApiPbo(0),
-		m_pGfxApiPixelBuffer(nullptr)
+		m_uiRefCount(0)
 	{ }
 
 	bool IsAuxiliary() const		{ return m_uiMANIFEST_INDEX == std::numeric_limits<uint32>::max(); }

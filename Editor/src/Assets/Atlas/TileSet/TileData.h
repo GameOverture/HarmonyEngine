@@ -49,6 +49,8 @@ public:
 	AtlasTileSet *GetTileSet() const;
 	QUuid GetUuid() const;
 
+	bool IsExTile() const;
+
 	quint32 GetTileChecksum() const;
 	void SetTileChecksum(quint32 uiTileChecksum);
 

@@ -47,7 +47,7 @@ private Q_SLOTS:
 private:
 	Ui::DlgAssetProperties *ui;
 
-	HyTextureFormat GetSelectedAtlasFormat(uint8 &uiParam1Out, uint8 &uiParam2Out) const;
+	HyTextureFileType GetSelectedAtlasFormat(uint8 &uiParam1Out, uint8 &uiParam2Out) const;
 	HyTextureFiltering GetSelectedAtlasFiltering() const;
 
 	void Refresh();

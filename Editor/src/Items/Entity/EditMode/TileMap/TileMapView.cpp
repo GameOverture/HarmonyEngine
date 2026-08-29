@@ -85,7 +85,7 @@ void TileMapView::SyncMouseHoverGrid()
 	const glm::vec2 vQuadDimensions(250.0f, 250.0f);
 	m_MouseHoverGrid.Sync(glm::inverse(GetSceneTransform(0.0f)),
 						  vQuadDimensions,
-						  pModel->GetGridSize(),
+						  pModel->GetCellDimensions(),
 						  pModel->GetLayout());
 
 	m_MouseHoverGrid.SetShader(pModel->GetGridShader());
@@ -107,7 +107,7 @@ void TileMapView::SyncMouseHoverGrid()
 	SyncMouseHoverGrid();
 
 	TileMapModel *pModel = static_cast<TileMapModel *>(GetModel());
-	m_TileMapLayer.SetGridSize(pModel->GetGridSize());
+	m_TileMapLayer.SetCellDimensions(pModel->GetCellDimensions());
 	m_TileMapLayer.SetLayout(pModel->GetLayout());
 
 	bool bValidHoverCoord = false;
@@ -121,4 +121,7 @@ void TileMapView::SyncMouseHoverGrid()
 		bValidHoverCoord = true;
 	}
 	pModel->SetHoverCoordinates(bValidHoverCoord, ptHoverCoord);
+
+
+	//m_TileMapLayer.GuiOverrideData<HyTileMapData>(
 }

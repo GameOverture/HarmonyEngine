@@ -11,33 +11,48 @@
 #define HyTileMapLayer_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
-#include <array>
+#include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
+#include "Assets/HyAssets.h"
 
-class HyTileMapLayer : public IHyDrawable2d
+class HyTileMapLayer : public HyEntity2d
 {
 protected:
-	int															m_iTileMapDataIndex;
-
-	glm::ivec2													m_vGridSize;
+	glm::ivec2													m_vCellDimensions;
 	HyTileMapLayout												m_eLayout;
 
 	std::function<glm::ivec2(glm::vec2, const glm::ivec2 &)>	m_fpLocalToCellFunc;
 	std::function<glm::vec2(glm::ivec2, const glm::ivec2 &)>	m_fpCellToLocalFunc;
 
+	float														m_fTotalWidth;
+	float														m_fTotalHeight;
+	struct TileChunk
+	{
+		glm::ivec2												m_vCoordinate;	// The chunk coordinate, among other chunks (not local/world space)
+		b2AABB													m_SceneAABB;	// Used to determine if chunk is within a camera frustum
+
+		struct RenderStage
+		{
+			uint32_t											m_TileIdList[HYASSETS_TileMapChunkSize][HYASSETS_TileMapChunkSize];
+
+			HyTextureHandle										m_hTileTexture;
+			bool												m_bDirty;
+		};
+		std::vector<RenderStage>								m_RenderStageList;
+	};
+	std::vector<TileChunk>										m_ChunkList;
+
 public:
 	HyTileMapLayer(HyEntity2d *pParent = nullptr);
 	HyTileMapLayer(const HyNodePath &nodePath, HyEntity2d *pParent = nullptr);
-	HyTileMapLayer(const HyTileMapLayer &copyRef);
+	HyTileMapLayer(const HyTileMapLayer &copyRef) = delete;
 	virtual ~HyTileMapLayer(void);
 
-	const HyTileMapLayer &operator=(const HyTileMapLayer &rhs);
+	const HyTileMapLayer &operator=(HyTileMapLayer &&donor);
 
-	int GetTileMapDataIndex() const;
-	void SetTileMapDataIndex(int iTileMapDataIndex);
+	bool WriteCell(std::string sTileSet, glm::ivec2 ptCellCoord, uint16_t uiTileId);
 
-	glm::ivec2 GetGridSize() const;
-	void SetGridSize(glm::ivec2 vGridSize);
+	glm::ivec2 GetCellDimensions() const;
+	void SetCellDimensions(glm::ivec2 vCellDimensions);
 
 	HyTileMapLayout GetLayout() const;
 	void SetLayout(HyTileMapLayout eLayout);
@@ -52,12 +67,7 @@ public:
 	virtual bool IsLoadDataValid() override;
 
 protected:
-	virtual bool OnIsValidToRender() override;
-
-	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
-
-	virtual void PrepRenderStage(uint32 uiStageIndex, HyRenderMode &eRenderModeOut, HyBlendMode &eBlendModeOut, uint32 &uiNumInstancesOut, uint32 &uiNumVerticesPerInstOut, bool &bIsBatchable) override;
-	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
+	virtual void OnDataAcquired() override;
 
 
 private: // Hide inherited functionality that doesn't exist for tile maps

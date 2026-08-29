@@ -352,14 +352,14 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 {
 }
 
-glm::ivec2 TileMapModel::GetGridSize() const
+glm::ivec2 TileMapModel::GetCellDimensions() const
 {
 	return glm::ivec2(m_pTiledMap->tileSize().width(), m_pTiledMap->tileSize().height());
 }
 
-void TileMapModel::SetGridSize(glm::ivec2 vGridSize)
+void TileMapModel::SetCellDimensions(glm::ivec2 vCellDimensions)
 {
-	m_pTiledMap->setTileSize(QSize(vGridSize.x, vGridSize.y));
+	m_pTiledMap->setTileSize(QSize(vCellDimensions.x, vCellDimensions.y));
 }
 
 HyTileMapLayout TileMapModel::GetLayout() const

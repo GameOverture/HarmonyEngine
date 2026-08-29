@@ -45,6 +45,7 @@ class AtlasTileSet : public AtlasFrame
 	Q_OBJECT
 
 	QJsonObject					m_TileSetMetaObj;			// The currently 'saved to disk' data of the TileSet
+	bool						m_bDescriptorEx;
 	bool						m_bExistencePendingSave;
 	bool						m_bSubAtlasDirty;
 	

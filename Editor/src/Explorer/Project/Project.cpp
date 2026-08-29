@@ -36,6 +36,8 @@
 #include <QDragEnterEvent>
 #include <QSettings>
 
+static_assert(Tiled::CHUNK_SIZE == HYASSETS_TileMapChunkSize, "Tiled default 'CHUNK_SIZE' does not equal Harmony's chunk size");
+
 ProjectTabBar::ProjectTabBar(Project *pProjectOwner) :
 	m_pProjectOwner(pProjectOwner)
 {

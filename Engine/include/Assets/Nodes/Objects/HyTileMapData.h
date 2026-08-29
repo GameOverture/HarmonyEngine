@@ -24,45 +24,31 @@
 
 class HyTileMapData : public IHyNodeData
 {
+	std::vector<HyFileTileSet *>	m_DescriptorTileSetList;	// All potential tile set descriptor textures
+	std::vector<HyFileAtlas *>		m_SubAtlasTileSetList;		// The diffuse (image) textures of the tile sets
+
 	struct TileSet
 	{
 		uint32_t					m_uiFirstGid;
 
-		HyFileAtlas *				m_pAtlas;			// The texture atlas that contains the tile set images
-		HyFileAtlas *				m_pShaderDescriptor;// Additional render information for each tile stored as a data texture (GL_RGBA32UI)
-															// R - Atlas Index + Bit Flags (ModulateColor, FlipH, FlipV, Transpose, isAnimActive, isAnimLooping, Rand Phase, Ping-Pong, Reverse)
-															// G - Texture Origin to visually offset the tile (X and Y packed as two signed 16 bit values)
-															// B - Color Tint + Alpha (RGBA packed as four unsigned 8bit integers values)
-															// A - Animation info (frameDurationMs and frameCount packed as two unsigned 16 bit values)
+		HyFileAtlas *				m_pAtlas;				// The texture atlas that contains the tile set images
+		HyFileAtlas *				m_pShaderDescriptor;	// Render information for each tile stored as a data texture (GL_RGBA16UI)
+																// R - Atlas Index (unsigned 16bits)
+																// G - Animation bit flags (isAnimActive, isAnimLooping, Rand Phase, Ping-Pong, Reverse)
+																// B - Animation frames duration in milliseconds (unsigned 16bits)
+																// A - Animation frame count (unsigned 16bits)
+
+		HyFileAtlas *				m_pShaderDescriptorEx;	// Optional render information for each tile stored as a data texture (GL_RGBA16UI)
+																// R - Texture Origin to visually offset the tile in the X-Axis (signed 16bits)
+																// G - Texture Origin to visually offset the tile in the Y-Axis (signed 16bits)
+																// B - Color Tint Red and Green channels (packed as 2 unsigned 8bit integers)
+																// A - Color Tint Blue and Alpha channels (packed as 2 unsigned 8bit integers)
 	};
 	std::vector<TileSet>			m_TileSetList;
-
-	glm::ivec2						m_vChunkSize;
-	struct TileMap
-	{
-		float						m_fTotalWidth;
-		float						m_fTotalHeight;
-
-		struct TileChunk
-		{
-			glm::ivec2				m_vCoordinate;
-			std::vector<uint32_t>	m_TileGidList;
-
-			HyTextureHandle			m_hTileTexture;
-			bool					m_bDirty;
-		};
-		std::vector<TileChunk>		m_ChunkList;
-	};
-	std::vector<TileMap>			m_TileMapList;
 
 public:
 	HyTileMapData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAssets &assetsRef);
 	virtual ~HyTileMapData();
-
-	int GetNumTileMaps() const;
-
-	float GetTileMapWidth(int iTileMapIndex) const;
-	float GetTileMapHeight(int iTileMapIndex) const;
 };
 
 #endif /* HyTileMapData_h__ */

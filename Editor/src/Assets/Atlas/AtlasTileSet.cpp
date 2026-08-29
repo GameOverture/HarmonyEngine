@@ -42,6 +42,7 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 						   uint uiErrors) :
 	AtlasFrame(ITEM_AtlasTileSet, modelRef, ITEM_AtlasTileSet, uuid, uiChecksum, uiBankId, sName, 0, 0, 0, 0, texInfo, uiW, uiH, uiX, uiY, iTextureIndex, uiErrors),
 	m_TileSetMetaObj(tileSetMetaData),
+	m_bDescriptorEx(false),
 	m_bExistencePendingSave(bIsPendingSave),
 	m_bSubAtlasDirty(bIsPendingSave),
 	m_eTileShape(TILESETSHAPE_Unknown)
@@ -57,6 +58,8 @@ AtlasTileSet::AtlasTileSet(IManagerModel &modelRef,
 	// Initialize AtlasTileSet members with 'm_TileSetMetaObj'
 	if(m_TileSetMetaObj.empty() == false)
 	{
+		m_bDescriptorEx = m_TileSetMetaObj["isEx"].toBool();
+
 		m_eTileShape = HyGlobal::GetTileSetShapeFromString(m_TileSetMetaObj["tileShape"].toString());
 
 		QJsonArray atlasRegionSizeArray = m_TileSetMetaObj["regionSize"].toArray();
@@ -704,6 +707,7 @@ void AtlasTileSet::UpdateTileSetMeta() // NOTE: invoked after regenerating the s
 	m_TileSetMetaObj = QJsonObject();
 
 	m_TileSetMetaObj["UUID"] = m_UUID.toString();
+	m_TileSetMetaObj["isEx"] = m_bDescriptorEx;
 	m_TileSetMetaObj["tileShape"] = HyGlobal::TileSetShapeName(m_eTileShape);
 	m_TileSetMetaObj["regionSize"] = QJsonArray() << QJsonValue(m_RegionSize.width()) << QJsonValue(m_RegionSize.height());
 	m_TileSetMetaObj["tileSize"] = QJsonArray() << QJsonValue(m_TileSize.width()) << QJsonValue(m_TileSize.height());
@@ -760,10 +764,13 @@ bool AtlasTileSet::Save()
 		animSetRef.m_TempTileList.resize(animSetRef.m_iNumFrames);
 	}
 
+	m_bDescriptorEx = false; // Will get set correctly in first loop below
 	uint16 uiTileId = 0;
 	std::vector<std::pair<uint16, uint16>> modifiedIdList; // pair<old, new>
 	for(TileData *pTileData : m_TileDataList)
 	{
+		m_bDescriptorEx = m_bDescriptorEx || pTileData->IsExTile(); // Convenient place to check if there are any "EX Tiles"
+
 		// Check each AnimationSet to see if pTileData is apart of its animation
 		const QMap<QUuid, QList<int>> &tileAnimMapRef = pTileData->GetAnimationMap();
 		for(AnimationSet &animSetRef : m_AnimationSetList)
@@ -843,11 +850,93 @@ bool AtlasTileSet::Save()
 	m_bExistencePendingSave = false;
 	m_pUndoStack->setClean();
 
-	// Save the runtime tile data that will be uploaded as a texture to the graphics API
-	for(TileData *pTileData : m_TileDataList)
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Save the runtime descriptor tile data Texture Buffer Object(s) that will be uploaded via the graphics API for the render shaders
+	QString sFilePath = m_ModelRef.GetProjOwner().GetAssetsAbsPath() + HYASSETS_TileSetDir + GetName() + HYASSETS_TileSetExt;
+	QFile file(sFilePath);
+	if(file.open(QIODevice::WriteOnly))
 	{
-		//asdf;
+		QDataStream fileData(&file);
+		fileData.setByteOrder(QDataStream::LittleEndian);
+
+		// First write the file 'header' which is 8 bytes
+		size_t uiMagicNumLen = strlen(HYASSETS_TileSetExt);
+		for(size_t i = 1; i < uiMagicNumLen; ++i) // NOTE: Start at '1' to skip the initial '.'
+			fileData << static_cast<char>(HYASSETS_TileSetExt[i]);
+		// Pad out to 'HYASSETS_MagicNumberHeaderSize' bytes for magic number header
+		for(size_t i = uiMagicNumLen; i < HYASSETS_MagicNumberHeaderSize; ++i)
+			fileData << static_cast<char>('\n');
+
+		// Next write the number of texels that will be packed (as 4 byte integer)
+		fileData << static_cast<int32_t>(m_TileDataList.size());
+
+		// Now pack all the texel data as GL_RGBA16UI (each texel is 8 bytes)
+		for(TileData *pTileData : m_TileDataList)
+		{
+			// R - Atlas Index (unsigned 16bits)
+			// G - Animation bit flags (isAnimActive, isAnimLooping, Rand Phase, Ping-Pong, Reverse)
+			// B - Animation frames duration in milliseconds (unsigned 16bits)
+			// A - Animation frame count (unsigned 16bits)
+			qsizetype iSubAtlasIndex = GetTileSubAtlasIndex(pTileData);
+			if(iSubAtlasIndex < 0)
+				HyGuiLog("AtlasTileSet::Save() - Could not retrieve SubAtlas index for tile ID: " % QString::number(pTileData->GetTileId()), LOGTYPE_Error);
+			uint16_t uiRed = static_cast<uint16_t>(iSubAtlasIndex);
+			fileData << uiRed;
+			
+			uint16_t uiGreen;
+			fileData << uiGreen;
+
+			uint16_t uiBlue;
+			fileData << uiBlue;
+
+			uint16_t uiAlpha;
+			fileData << uiAlpha;
+
+			// TILETODO: do this
+		}
+
+		file.close();
 	}
+	else
+		HyGuiLog("AtlasTileSet::Save() - Could not open file to write shader descriptor: " % sFilePath, LOGTYPE_Error);
+	//----------------------------------------------------------------------------------------------------------------------------
+	if(m_bDescriptorEx) // Optional render information for each tile stored as a data texture (GL_RGBA16UI)
+	{
+		sFilePath = m_ModelRef.GetProjOwner().GetAssetsAbsPath() + HYASSETS_TileSetDir + GetName() + HYASSETS_TileSetExExt;
+		QFile fileEx(sFilePath);
+		if(fileEx.open(QIODevice::WriteOnly))
+		{
+			QDataStream fileData(&fileEx);
+			fileData.setByteOrder(QDataStream::LittleEndian);
+
+			// First write the file 'header' which is 8 bytes
+			size_t uiMagicNumLen = strlen(HYASSETS_TileSetExExt);
+			for(size_t i = 1; i < uiMagicNumLen; ++i) // NOTE: Start at '1' to skip the initial '.'
+				fileData << static_cast<char>(HYASSETS_TileSetExExt[i]);
+			// Pad out to 'HYASSETS_MagicNumberHeaderSize' bytes for magic number header
+			for(size_t i = uiMagicNumLen; i < HYASSETS_MagicNumberHeaderSize; ++i)
+				fileData << static_cast<char>('\n');
+
+			// Next write the number of texels that will be packed (as 4 byte integer)
+			fileData << static_cast<int32_t>(m_TileDataList.size());
+
+			// Now pack all the EX texel data as GL_RGBA16UI (each texel is 8 bytes)
+			for(TileData *pTileData : m_TileDataList)
+			{
+				// R - Texture Origin to visually offset the tile in the X-Axis (signed 16bits)
+				// G - Texture Origin to visually offset the tile in the Y-Axis (signed 16bits)
+				// B - Color Tint Red and Green channels (packed as 2 unsigned 8bit integers)
+				// A - Color Tint Blue and Alpha channels (packed as 2 unsigned 8bit integers)
+
+				// TILETODO: do this
+			}
+
+			fileEx.close();
+		}
+		else
+			HyGuiLog("AtlasTileSet::Save() - Could not open file to write shader descriptor EX: " % sFilePath, LOGTYPE_Error);
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	return static_cast<AtlasManager &>(m_ModelRef).SaveTileSets();
 }

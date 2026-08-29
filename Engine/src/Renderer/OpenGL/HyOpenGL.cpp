@@ -404,11 +404,6 @@ HyOpenGL::~HyOpenGL(void)
 			pShader->AddVertexAttribute("attr_transform_mtx", HyShaderVariable::mat4, false, 1);
 			break;
 
-		case HYSHADERPROG_TileMapLayer:
-			pShader->SetSourceCodePtrs({szHYTILEMAPLAYER_VERTEXSHADER}, HYSHADER_Vertex);
-			//asdf;
-			break;
-
 		case HYSHADERPROG_Primitive:
 			pShader->SetSourceCodePtrs({szHYPRIMATIVE_VERTEXSHADER}, HYSHADER_Vertex);
 			pShader->AddVertexAttribute("attr_pos", HyShaderVariable::vec2);
@@ -442,10 +437,6 @@ HyOpenGL::~HyOpenGL(void)
 		{
 		case HYSHADERPROG_QuadBatch:
 			pShader->SetSourceCodePtrs({szHYQUADBATCH_FRAGMENTSHADER}, HYSHADER_Fragment);
-			break;
-
-		case HYSHADERPROG_TileMapLayer:
-			pShader->SetSourceCodePtrs({szHYTILEMAPLAYER_FRAGMENTSHADER}, HYSHADER_Fragment);
 			break;
 
 		case HYSHADERPROG_Primitive:
@@ -655,12 +646,13 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////
 }
 
-/*virtual*/ uint32 HyOpenGL::AddTexture(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize, uint32 hPBO) /*override*/
+/*virtual*/ uint32 HyOpenGL::AddTexture(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize) /*override*/
 {
-	GLenum eInternalFormat = GL_RGBA;
-	GLenum eFormat = GL_RGBA; // Used in uncompressed
+	GLenum eInternalFormat = GL_RGBA8;
+	GLenum eFormat = GL_RGBA;
+	GLenum eType = GL_UNSIGNED_BYTE;
 	bool bIsPixelDataCompressed = false;
-	GetTextureFormats(formatInfo, eInternalFormat, eFormat, bIsPixelDataCompressed);
+	GetTextureFormats(formatInfo, eInternalFormat, eFormat, eType, bIsPixelDataCompressed);
 
 	GLuint hGLTexture;
 	glGenTextures(1, &hGLTexture);
@@ -669,16 +661,16 @@ HyOpenGL::~HyOpenGL(void)
 	glBindTexture(GL_TEXTURE_2D, hGLTexture);
 	HyErrorCheck_OpenGL("HyOpenGLShader::AddTexture", "glBindTexture");
 
-	if(hPBO != 0)
-	{
-		HyAssert(pPixelData == nullptr, "AddTexture() has a valid PBO handle as well as pixel data");
-		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, hPBO);
-		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glBindBuffer");
-	}
+	//if(hPBO != 0)
+	//{
+	//	HyAssert(pPixelData == nullptr, "AddTexture() has a valid PBO handle as well as pixel data");
+	//	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, hPBO);
+	//	HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glBindBuffer");
+	//}
 
 	if(bIsPixelDataCompressed == false)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, eInternalFormat, uiWidth, uiHeight, 0, eFormat, GL_UNSIGNED_BYTE, pPixelData); // TODO: Properly support mipmaps
+		glTexImage2D(GL_TEXTURE_2D, 0, eInternalFormat, uiWidth, uiHeight, 0, eFormat, eType, pPixelData); // TODO: Properly support mipmaps
 		HyErrorCheck_OpenGL("HyOpenGL::AddTexture", "glTexImage2D");
 	}
 	else
@@ -706,9 +698,10 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ uint32 HyOpenGL::AddTextureArray(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) /*override*/
 {
 	GLenum eInternalFormat = GL_RGBA;
-	GLenum eFormat = GL_RGBA; // Used in uncompressed
+	GLenum eFormat = GL_RGBA;
+	GLenum eType = GL_UNSIGNED_BYTE;
 	bool bIsPixelDataCompressed = false;
-	GetTextureFormats(formatInfo, eInternalFormat, eFormat, bIsPixelDataCompressed);
+	GetTextureFormats(formatInfo, eInternalFormat, eFormat, eType, bIsPixelDataCompressed);
 
 	GLuint hGLTextureArray;
 	glGenTextures(1, &hGLTextureArray);
@@ -722,7 +715,7 @@ HyOpenGL::~HyOpenGL(void)
 	// Create (blank) storage for the texture array
 	if(bIsPixelDataCompressed == false)
 	{
-		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, iNumTextures, 0, eFormat, GL_UNSIGNED_BYTE, NULL);
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, eInternalFormat, uiWidth, uiHeight, iNumTextures, 0, eFormat, eType, NULL);
 		HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glTexImage3D");
 	
 		for(GLint i = 0; i < static_cast<GLint>(iNumTextures); ++i)
@@ -733,7 +726,7 @@ HyOpenGL::~HyOpenGL(void)
 							0, 0, i,				// xoffset, yoffset, zoffset
 							uiWidth, uiHeight, 1,	// width, height, depth (of texture you're copying in)
 							eFormat,				// format
-							GL_UNSIGNED_BYTE,		// type
+							eType,					// type
 							pixelDataList[i]);		// pointer to pixel data
 
 			HyErrorCheck_OpenGL("HyOpenGL:AddTextureArray", "glTexSubImage3D");
@@ -751,7 +744,7 @@ HyOpenGL::~HyOpenGL(void)
 									  0,							// Mipmap number // TODO: Properly support mipmaps
 									  0, 0, i,						// xoffset, yoffset, zoffset
 									  uiWidth, uiHeight, 1,			// width, height, depth (of texture you're copying in)
-									  eFormat,						// format
+									  eInternalFormat,				// format
 									  uiPixelDataSizePerTexture,	// image size
 									  pixelDataList[i]);			// pointer to pixel data
 
@@ -769,6 +762,40 @@ HyOpenGL::~HyOpenGL(void)
 {
 	glDeleteTextures(1, &uiTextureHandle);
 	HyErrorCheck_OpenGL("HyOpenGL:DeleteTexture", "glDeleteTextures");
+}
+
+/*virtual*/ std::pair<uint32, uint32> HyOpenGL::AddTextureBufferObject(const HyTextureInfo formatInfo, unsigned char *pData, uint32 uiDataSize) /*override*/
+{
+	GLenum eInternalFormat = GL_RGBA;
+	GLenum eFormat = GL_RGBA;
+	GLenum eType = GL_UNSIGNED_BYTE;
+	bool bIsPixelDataCompressed = false;
+	GetTextureFormats(formatInfo, eInternalFormat, eFormat, eType, bIsPixelDataCompressed);
+	HyAssert(bIsPixelDataCompressed == false, "HyOpenGL::AddTextureBufferObject() passed a HyTextureInfo that uses compressed data");
+
+	GLuint hTboBuffer, hTboTexture;
+	glGenBuffers(1, &hTboBuffer);
+	glBindBuffer(GL_TEXTURE_BUFFER, hTboBuffer);
+	glBufferData(GL_TEXTURE_BUFFER, uiDataSize, pData, GL_STATIC_DRAW);
+	HyErrorCheck_OpenGL("HyOpenGLShader::AddTextureBufferObject", "glBufferData");
+
+	glGenTextures(1, &hTboTexture);
+	glBindTexture(GL_TEXTURE_BUFFER, hTboTexture);
+	glTexBuffer(GL_TEXTURE_BUFFER, eInternalFormat, hTboBuffer);
+	HyErrorCheck_OpenGL("HyOpenGLShader::AddTextureBufferObject", "glTexBuffer");
+
+	glBindBuffer(GL_TEXTURE_BUFFER, 0);
+	glBindTexture(GL_TEXTURE_BUFFER, 0);
+	return std::pair<uint32, uint32>(hTboBuffer, hTboTexture);
+}
+
+/*virtual*/ void HyOpenGL::DeleteTextureBufferObject(std::pair<uint32, uint32> hTboPair) /*override*/
+{
+	glDeleteTextures(1, &hTboPair.second); // Breaks the reference, but buffer still exists
+	HyErrorCheck_OpenGL("HyOpenGL:DeleteTextureBufferObject", "glDeleteTextures");
+
+	glDeleteBuffers(1, &hTboPair.first); // Actually frees the buffer
+	HyErrorCheck_OpenGL("HyOpenGL:DeleteTextureBufferObject", "glDeleteBuffers");
 }
 
 /*virtual*/ uint32 HyOpenGL::GenerateVertexBuffer() /*override*/
@@ -897,31 +924,132 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glAttachShader");
 }
 
-void HyOpenGL::GetTextureFormats(const HyTextureInfo formatInfo, GLenum &eInternalFormatOut, GLenum &eFormatOut, bool &bIsPixelDataCompressedOut) const
+void HyOpenGL::GetTextureFormats(const HyTextureInfo formatInfo, GLenum &eInternalFormatOut, GLenum &eFormatOut, GLenum &eTypeOut, bool &bIsPixelDataCompressedOut) const
 {
 	eInternalFormatOut = GL_RGBA;
-	eFormatOut = GL_RGBA; // Used in uncompressed
+	eFormatOut = GL_RGBA;
+	eTypeOut = GL_UNSIGNED_BYTE;
 	bIsPixelDataCompressedOut = false;
 
-	switch(formatInfo.m_uiFormat)
+	switch(formatInfo.m_uiFileType)
 	{
-	case HYTEXTURE_Uncompressed:
+	case HYTEXTUREFILE_PNG:
+	case HYTEXTUREFILE_RAW: {
 		// Param1: num channels
-		// Param2: disk file type (PNG, ...)
+		// Param2: format types
+		HyTextureFormatType eDataFormat, eInternalFormat;
+		formatInfo.GetUncompressedFormatTypes(eDataFormat, eInternalFormat);
+
 		if(formatInfo.m_uiFormatParam1 == 4)
 		{
-			eInternalFormatOut = GL_RGBA;
 			eFormatOut = GL_RGBA;
+			switch(eInternalFormat)
+			{
+			case HYTEXTUREFORMAT_UINT8:		eInternalFormatOut = GL_RGBA8UI; break;
+			case HYTEXTUREFORMAT_INT8:		eInternalFormatOut = GL_RGBA8I; break;
+			case HYTEXTUREFORMAT_NORM8:		eInternalFormatOut = GL_RGBA8; break;
+			case HYTEXTUREFORMAT_SNORM8:	eInternalFormatOut = GL_RGBA8_SNORM; break;
+			case HYTEXTUREFORMAT_UINT16:	eInternalFormatOut = GL_RGBA16UI; break;
+			case HYTEXTUREFORMAT_INT16:		eInternalFormatOut = GL_RGBA16I; break;
+			case HYTEXTUREFORMAT_NORM16:	eInternalFormatOut = GL_RGBA16; break;
+			case HYTEXTUREFORMAT_SNORM16:	eInternalFormatOut = GL_RGBA16_SNORM; break;
+			case HYTEXTUREFORMAT_UINT32:	eInternalFormatOut = GL_RGBA32UI; break;
+			case HYTEXTUREFORMAT_INT32:		eInternalFormatOut = GL_RGBA32I; break;
+			case HYTEXTUREFORMAT_FLOAT16:	eInternalFormatOut = GL_RGBA16F; break;
+			case HYTEXTUREFORMAT_FLOAT32:	eInternalFormatOut = GL_RGBA32F; break;
+			default:
+				HyError("HyOpenGL::GetTextureFormats() - Invalid uncompressed internal format");
+			}
 		}
 		else if(formatInfo.m_uiFormatParam1 == 3)
 		{
-			eInternalFormatOut = GL_RGB;
 			eFormatOut = GL_RGB;
+			switch(eInternalFormat)
+			{
+			case HYTEXTUREFORMAT_UINT8:		eInternalFormatOut = GL_RGB8UI; break;
+			case HYTEXTUREFORMAT_INT8:		eInternalFormatOut = GL_RGB8I; break;
+			case HYTEXTUREFORMAT_NORM8:		eInternalFormatOut = GL_RGB8; break;
+			case HYTEXTUREFORMAT_SNORM8:	eInternalFormatOut = GL_RGB8_SNORM; break;
+			case HYTEXTUREFORMAT_UINT16:	eInternalFormatOut = GL_RGB16UI; break;
+			case HYTEXTUREFORMAT_INT16:		eInternalFormatOut = GL_RGB16I; break;
+			case HYTEXTUREFORMAT_NORM16:	eInternalFormatOut = GL_RGB16; break;
+			case HYTEXTUREFORMAT_SNORM16:	eInternalFormatOut = GL_RGB16_SNORM; break;
+			case HYTEXTUREFORMAT_UINT32:	eInternalFormatOut = GL_RGB32UI; break;
+			case HYTEXTUREFORMAT_INT32:		eInternalFormatOut = GL_RGB32I; break;
+			case HYTEXTUREFORMAT_FLOAT16:	eInternalFormatOut = GL_RGB16F; break;
+			case HYTEXTUREFORMAT_FLOAT32:	eInternalFormatOut = GL_RGB32F; break;
+			default:
+				HyError("HyOpenGL::GetTextureFormats() - Invalid uncompressed internal format");
+			}
 		}
-		break;
+		else if(formatInfo.m_uiFormatParam1 == 2)
+		{
+			eFormatOut = GL_RG;
+			switch(eInternalFormat)
+			{
+			case HYTEXTUREFORMAT_UINT8:		eInternalFormatOut = GL_RG8UI; break;
+			case HYTEXTUREFORMAT_INT8:		eInternalFormatOut = GL_RG8I; break;
+			case HYTEXTUREFORMAT_NORM8:		eInternalFormatOut = GL_RG8; break;
+			case HYTEXTUREFORMAT_SNORM8:	eInternalFormatOut = GL_RG8_SNORM; break;
+			case HYTEXTUREFORMAT_UINT16:	eInternalFormatOut = GL_RG16UI; break;
+			case HYTEXTUREFORMAT_INT16:		eInternalFormatOut = GL_RG16I; break;
+			case HYTEXTUREFORMAT_NORM16:	eInternalFormatOut = GL_RG16; break;
+			case HYTEXTUREFORMAT_SNORM16:	eInternalFormatOut = GL_RG16_SNORM; break;
+			case HYTEXTUREFORMAT_UINT32:	eInternalFormatOut = GL_RG32UI; break;
+			case HYTEXTUREFORMAT_INT32:		eInternalFormatOut = GL_RG32I; break;
+			case HYTEXTUREFORMAT_FLOAT16:	eInternalFormatOut = GL_RG16F; break;
+			case HYTEXTUREFORMAT_FLOAT32:	eInternalFormatOut = GL_RG32F; break;
+			default:
+				HyError("HyOpenGL::GetTextureFormats() - Invalid uncompressed internal format");
+			}
+		}
+		else if(formatInfo.m_uiFormatParam1 == 1)
+		{
+			eFormatOut = GL_RED;
+			switch(eInternalFormat)
+			{
+			case HYTEXTUREFORMAT_UINT8:		eInternalFormatOut = GL_R8UI; break;
+			case HYTEXTUREFORMAT_INT8:		eInternalFormatOut = GL_R8I; break;
+			case HYTEXTUREFORMAT_NORM8:		eInternalFormatOut = GL_R8; break;
+			case HYTEXTUREFORMAT_SNORM8:	eInternalFormatOut = GL_R8_SNORM; break;
+			case HYTEXTUREFORMAT_UINT16:	eInternalFormatOut = GL_R16UI; break;
+			case HYTEXTUREFORMAT_INT16:		eInternalFormatOut = GL_R16I; break;
+			case HYTEXTUREFORMAT_NORM16:	eInternalFormatOut = GL_R16; break;
+			case HYTEXTUREFORMAT_SNORM16:	eInternalFormatOut = GL_R16_SNORM; break;
+			case HYTEXTUREFORMAT_UINT32:	eInternalFormatOut = GL_R32UI; break;
+			case HYTEXTUREFORMAT_INT32:		eInternalFormatOut = GL_R32I; break;
+			case HYTEXTUREFORMAT_FLOAT16:	eInternalFormatOut = GL_R16F; break;
+			case HYTEXTUREFORMAT_FLOAT32:	eInternalFormatOut = GL_R32F; break;
+			default:
+				HyError("HyOpenGL::GetTextureFormats() - Invalid uncompressed internal format");
+			}
+		}
+		else
+			HyError("HyOpenGL::GetTextureFormats() - Invalid number of channels specified");
+
+		switch(eDataFormat)
+		{
+		case HYTEXTUREFORMAT_UINT8:		eTypeOut = GL_UNSIGNED_BYTE; break;
+		case HYTEXTUREFORMAT_INT8:		eTypeOut = GL_BYTE; break;
+		case HYTEXTUREFORMAT_UINT16:	eTypeOut = GL_UNSIGNED_SHORT; break;
+		case HYTEXTUREFORMAT_INT16:		eTypeOut = GL_SHORT; break;
+		case HYTEXTUREFORMAT_UINT32:	eTypeOut = GL_UNSIGNED_INT; break;
+		case HYTEXTUREFORMAT_INT32:		eTypeOut = GL_INT; break;
+		case HYTEXTUREFORMAT_FLOAT16:	eTypeOut = GL_HALF_FLOAT; break;
+		case HYTEXTUREFORMAT_FLOAT32:	eTypeOut = GL_FLOAT; break;
+		case HYTEXTUREFORMAT_NORM8:
+		case HYTEXTUREFORMAT_SNORM8:
+		case HYTEXTUREFORMAT_NORM16:
+		case HYTEXTUREFORMAT_SNORM16:
+		default:
+			HyError("HyOpenGL::GetTextureFormats() - Invalid uncompressed data format");
+			break;
+		}
+
+		break; }
 
 #ifndef HY_PLATFORM_BROWSER
-	case HYTEXTURE_DXT:
+	case HYTEXTUREFILE_DXT:
 		bIsPixelDataCompressedOut = true;
 		// Param1: num channels
 		// Param2: DXT format (1,3,5)
@@ -938,7 +1066,7 @@ void HyOpenGL::GetTextureFormats(const HyTextureInfo formatInfo, GLenum &eIntern
 			eInternalFormatOut = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 		break;
 
-	case HYTEXTURE_ASTC:
+	case HYTEXTUREFILE_ASTC:
 		bIsPixelDataCompressedOut = true;
 		// Param1: Block Size index (4x4 -> 12x12)
 		// Param2: Color Profile (LDR linear, LDR sRBG, HDR RGB, HDR RGBA)
@@ -961,7 +1089,7 @@ void HyOpenGL::GetTextureFormats(const HyTextureInfo formatInfo, GLenum &eIntern
 			case 12: eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_12x10_KHR; break; // 1.07 bpp
 			case 13: eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_12x12_KHR; break; // 0.89 bpp
 			default:
-				HyError("AddTexture() - Invalid ASTC m_uiFormatParam1");
+				HyError("HyOpenGL::GetTextureFormats() - Invalid ASTC m_uiFormatParam1");
 				eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_6x6_KHR;
 				break;
 			}
@@ -985,23 +1113,25 @@ void HyOpenGL::GetTextureFormats(const HyTextureInfo formatInfo, GLenum &eIntern
 			case 12: eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR; break; // 1.07 bpp
 			case 13: eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR; break; // 0.89 bpp
 			default:
-				HyError("AddTexture() - Invalid SRGB8 ASTC m_uiFormatParam1");
+				HyError("HyOpenGL::GetTextureFormats() - Invalid SRGB8 ASTC m_uiFormatParam1");
 				eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR;
 				break;
 			}
 		}
 		else
 		{
-			HyError("AddTexture() - Invalid ASTC m_uiFormatParam2");
+			HyError("HyOpenGL::GetTextureFormats() - Invalid ASTC m_uiFormatParam2");
 			eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_6x6_KHR;
 		}
 		break;
 #endif
-		
 	default:
-		HyLogError("Unknown TextureFormat used for 'eDesiredFormat'");
+		HyLogError("HyOpenGL::GetTextureFormats() - Unknown TextureFileType");
 		break;
 	}
+
+	if(bIsPixelDataCompressedOut)
+		eFormatOut = eInternalFormatOut;
 }
 
 void HyOpenGL::SetTextureParameters(const HyTextureInfo formatInfo, GLenum eTarget) const
@@ -1122,7 +1252,7 @@ void HyOpenGL::RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNo
 		GLuint uiTexHandle = *reinterpret_cast<HyTextureHandle *>(pTexUnitExBuffer);
 		pTexUnitExBuffer += sizeof(HyTextureHandle);
 		
-		glBindTexture(GL_TEXTURE_2D, uiTexHandle);
+		glBindTexture(GL_TEXTURE_2D, uiTexHandle); // TILETODO: Also bind GL_TEXTURE_BUFFERS when needed
 		HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glBindTexture");
 	}
 

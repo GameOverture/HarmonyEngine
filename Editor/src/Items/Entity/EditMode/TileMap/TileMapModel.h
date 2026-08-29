@@ -71,8 +71,8 @@ public:
 	virtual QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
 	virtual void ClearAction() override;
 
-	glm::ivec2 GetGridSize() const;
-	void SetGridSize(glm::ivec2 vGridSize);
+	glm::ivec2 GetCellDimensions() const;
+	void SetCellDimensions(glm::ivec2 vCellDimensions);
 
 	HyTileMapLayout GetLayout() const;
 	void SetLayout(HyTileMapLayout eLayout);

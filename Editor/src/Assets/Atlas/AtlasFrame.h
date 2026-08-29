@@ -71,8 +71,8 @@ public:
 	quint64 GetCropMask() const;
 	quint64 GetFrameMask() const;
 	
-	HyTextureFormat GetFormat() const;
-	void SetFormat(HyTextureFormat eFormat, uint8 uiFormatParam1, uint8 uiFormatParam2);
+	HyTextureFileType GetFileType() const;
+	void SetFormat(HyTextureFileType eFileType, uint8 uiFormatParam1, uint8 uiFormatParam2);
 
 	HyTextureFiltering GetFiltering() const;
 	void SetFiltering(HyTextureFiltering eFiltering);

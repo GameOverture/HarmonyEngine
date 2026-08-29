@@ -23,11 +23,19 @@
 #define HYASSETS_TranslationsFile "Translations.data"
 
 #define HYASSETS_AtlasDir "Atlases/"
+#define HYASSETS_TileSetDir "TileSets/"
 #define HYASSETS_PrefabDir "Prefabs/"
 #define HYASSETS_AudioDir "Audio/"
 #define HYASSETS_SpineDir "Spine/"
 
-#define HYASSETS_TileSetBankId 0xEFFFFFFF
+#define HYASSETS_MagicNumberHeaderSize 8
+#define HYASSETS_TileSetExt ".hyts"
+#define HYASSETS_TileSetExExt ".hytsex"
+//#define HYASSETS_TileSetBankId 0xEFFFFFFF
+static_assert((sizeof(HYASSETS_TileSetExt) - 1) < HYASSETS_MagicNumberHeaderSize, "TileSet extension (minus the .) is used as the file header 'magic number' and must fit within 8 bytes");
+static_assert((sizeof(HYASSETS_TileSetExExt) - 1) < HYASSETS_MagicNumberHeaderSize, "TileSet extension (minus the .) is used as the file header 'magic number' and must fit within 8 bytes");
+
+#define HYASSETS_TileMapChunkSize 16
 
 class HyAudioCore;
 class HyScene;
@@ -44,6 +52,7 @@ class HyTextData;
 class HyTexturedQuadData;
 class HyPrefabData;
 class HyFileAtlas;
+class HyFileTileSet;
 class HyGLTF;
 class HyFileAudio;
 
@@ -76,7 +85,7 @@ class HyAssets : public IHyThreadClass
 		const tData *GetData(const HyNodePath &nodePath) const;
 	};
 	Factory<HyAudioData>										m_AudioFactory;
-	Factory<HyTileMapData>										m_TileMapFactory;
+	//Factory<HyTileMapData>										m_TileMapFactory;
 	Factory<HySpriteData>										m_SpriteFactory;
 	Factory<HyTextData>											m_TextFactory;
 	Factory<HySpineData>										m_SpineFactory;
@@ -145,10 +154,10 @@ private:
 	void SetAsUnloaded(IHyLoadable *pLoadable);
 
 public:
-	static std::vector<HyTextureFormat> GetTextureFormatList();
-	static std::vector<std::string> GetTextureFormatNameList();
-	static std::string GetTextureFormatName(HyTextureFormat eType);
-	static HyTextureFormat GetTextureFormatFromString(std::string sFormat);
+	static std::vector<HyTextureFileType> GetTextureFileTypeList();
+	static std::vector<std::string> GetTextureFileTypeNameList();
+	static std::string GetTextureFileTypeName(HyTextureFileType eFileType);
+	static HyTextureFileType GetTextureFileTypeFromString(std::string sFileType);
 
 	static std::vector<HyTextureFiltering> GetTextureFilteringList();
 	static std::vector<std::string> GetTextureFilteringNameList();

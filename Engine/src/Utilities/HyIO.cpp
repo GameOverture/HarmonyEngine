@@ -9,6 +9,7 @@
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Utilities/HyIO.h"
+#include "Assets/HyAssets.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
 #include "vendor/SOIL2/src/SOIL2/SOIL2.h"
@@ -452,39 +453,6 @@
 	infile.close();
 }
 
-/*static*/ void HyIO::ReadBinaryFile(const char *szFilePath, std::vector<uint8> &contentsOut)
-{
-	if(szFilePath == nullptr)
-		return;
-
-	std::ifstream infile(szFilePath, std::ifstream::in | std::ios::binary);
-	contentsOut = std::vector<uint8>(std::istreambuf_iterator<char>(infile), {});
-
-	infile.close();
-}
-
-///*static*/ uint8 *HyIO::ReadBinaryFile(const char *szFilePath, uint32 &uiBufferSizeOut)
-//{
-//	if(szFilePath == nullptr)
-//		return nullptr;
-//
-//	std::ifstream infile(szFilePath, std::ifstream::in | std::ios::binary | std::ios::ate);
-//	HyAssert(infile, "ReadBinaryFile invalid file: " << szFilePath);
-//
-//	std::streamsize size = infile.tellg();
-//	infile.seekg(0, std::ios::beg);
-//
-//	uiBufferSizeOut = static_cast<uint32>(size);
-//	uint8 *pBuffer = HY_NEW uint8[uiBufferSizeOut];
-//
-//	if(!infile.read(reinterpret_cast<char *>(pBuffer), size))
-//		HyLogError("HyIO::ReadBinaryFile - only " << infile.gcount() << " bytes was read");
-//
-//	infile.close();
-//
-//	return pBuffer;
-//}
-
 /*static*/ void HyIO::WriteTextFile(const char *szFilePath, const char *szContentBuffer)
 {
 	std::ofstream outfile(szFilePath);
@@ -499,6 +467,81 @@
 	outfile.write(szContentBuffer, strlen(szContentBuffer));
 	outfile.close();
 	HyLog("HyIO::WriteTextFile - Wrote " << strlen(szContentBuffer) << " bytes to " << szFilePath);
+}
+
+/*static*/ bool HyIO::ReadBinaryFile(const std::string &sFilePath, std::vector<uint8> &contentsOut)
+{
+	if(sFilePath.empty())
+		return false;
+
+	std::ifstream infile(sFilePath, std::ifstream::in | std::ios::binary);
+	if(!infile)
+		return false;
+
+	contentsOut = std::vector<uint8>(std::istreambuf_iterator<char>(infile), {});
+	if(infile.bad())
+		return false;
+
+	infile.close();
+	return true;
+}
+
+/*static*/ bool HyIO::ParseRawTextureFile(const std::string &sFilePath, const std::string &sMagicNumberHeader, const HyTextureInfo textureInfo, unsigned char *&pTexelDataOut, uint32 &uiDataSizeOut)
+{
+	HyAssert(sMagicNumberHeader.size() < HYASSETS_MagicNumberHeaderSize, "HyIO::ParseRawTextureFile() - Invalid magic number specified");
+	HyAssert(textureInfo.GetFileType() == HYTEXTUREFILE_RAW, "HyIO::ParseRawTextureFile() - Invalid HyTextureInfo specified");
+
+	std::vector<uint8> fileData;
+	if(HyIO::ReadBinaryFile(sFilePath, fileData) == false)
+	{
+		HyLogError("HyIO::ParseRawTextureFile() - failed to read file: " << sFilePath);
+		return false;
+	}
+
+	if(0 != strcmp(reinterpret_cast<const char *>(&fileData[0]), sMagicNumberHeader.c_str()))
+	{
+		HyLogError("HyIO::ParseRawTextureFile() - Improper magic number file header: " << sFilePath);
+		return false;
+	}
+
+	int iTexelSize = 0; // In bytes
+	int iNumChannels = textureInfo.m_uiFormatParam1;
+	HyTextureFormatType eDataFormat, eInternalFormat;
+	textureInfo.GetUncompressedFormatTypes(eDataFormat, eInternalFormat);
+	switch(eDataFormat)
+	{
+		case HYTEXTUREFORMAT_UINT8:
+		case HYTEXTUREFORMAT_INT8:
+			iTexelSize = iNumChannels;
+			break;
+		case HYTEXTUREFORMAT_UINT16:
+		case HYTEXTUREFORMAT_INT16:
+		case HYTEXTUREFORMAT_FLOAT16:
+			iTexelSize = iNumChannels * 2;
+			break;
+		case HYTEXTUREFORMAT_UINT32:
+		case HYTEXTUREFORMAT_INT32:
+		case HYTEXTUREFORMAT_FLOAT32:
+			iTexelSize = iNumChannels * 4;
+			break;
+		default:
+			HyError("HyIO::ParseRawTextureFile() - Unhandled raw data format");
+			return false;
+	}
+
+	int32_t iNumTexels = *reinterpret_cast<int32_t *>(&fileData[HYASSETS_MagicNumberHeaderSize]);
+	uiDataSizeOut = iNumTexels * iTexelSize;
+	
+	pTexelDataOut = HY_NEW unsigned char[uiDataSizeOut];
+	memcpy(pTexelDataOut, &fileData[HYASSETS_MagicNumberHeaderSize + sizeof(int32_t)], uiDataSizeOut);
+	if(pTexelDataOut == nullptr || uiDataSizeOut == 0)
+	{
+		HyLogError("HyIO::ParseRawTextureFile() - Failed to load texel data: " << sFilePath);
+		delete[] pTexelDataOut;
+		return false;
+	}
+
+	return true;
 }
 
 /*static*/ std::string HyIO::UrlEncode(std::string sStr)

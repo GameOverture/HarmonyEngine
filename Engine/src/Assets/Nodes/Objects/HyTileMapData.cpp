@@ -30,17 +30,3 @@ HyTileMapData::~HyTileMapData(void)
 {
 }
 
-int HyTileMapData::GetNumTileMaps() const
-{
-	return m_TileMapList.size();
-}
-
-float HyTileMapData::GetTileMapWidth(int iTileMapIndex) const
-{
-	return m_TileMapList[iTileMapIndex].m_fTotalWidth;
-}
-
-float HyTileMapData::GetTileMapHeight(int iTileMapIndex) const
-{
-	return m_TileMapList[iTileMapIndex].m_fTotalHeight;
-}

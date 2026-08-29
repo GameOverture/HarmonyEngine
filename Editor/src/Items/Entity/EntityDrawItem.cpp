@@ -997,7 +997,7 @@ void ExtrapolateProperties(Project &projectRef,
 				{
 					QJsonArray gridSizeArray = tileMapObj["Grid Size"].toArray();
 					if(gridSizeArray.size() == 2)
-						static_cast<TileMapModel *>(pEditModel)->SetGridSize(glm::ivec2(gridSizeArray[0].toInt(), gridSizeArray[1].toInt()));
+						static_cast<TileMapModel *>(pEditModel)->SetCellDimensions(glm::ivec2(gridSizeArray[0].toInt(), gridSizeArray[1].toInt()));
 				}
 				if(tileMapObj.contains("Layout"))
 					static_cast<TileMapModel *>(pEditModel)->SetLayout(HyGlobal::GetTileMapLayoutFromString(tileMapObj["Layout"].toString()));

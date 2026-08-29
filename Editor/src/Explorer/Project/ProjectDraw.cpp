@@ -13,7 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const char * const szCHECKERGRID_VERTEXSHADER = R"src(
-#version 140
+#version 150
 
 uniform mat4					u_transform_mtx;
 uniform mat4					u_view_mtx;
@@ -39,7 +39,7 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char *const szCHECKERGRID_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
 
 uniform float					u_grid_size;
 uniform vec2					u_dimensions;
@@ -58,7 +58,7 @@ void main()
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char *const szOVERGRID_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
 
 uniform float					u_grid_size;
 uniform vec2					u_dimensions;
@@ -83,7 +83,7 @@ void main()
 )src";
 //-------------------------------------------------------------------------------------------------------------------------------------------------
 const char *const szTILEMAPGRID_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
 
 uniform mat4					u_inv_tilemap;		// World to local space transform matrix of the TileMapLayer
 uniform vec2					u_position;
@@ -146,7 +146,7 @@ float TileSDF(vec2 local_pos)
 )src";
 
 const char *const szTILEMAPGRIDSISOMETRIC_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
 
 uniform mat4					u_inv_tilemap;		// World to local space transform matrix of the TileMapLayer
 uniform vec2					u_position;
@@ -204,7 +204,7 @@ void main()
 )src";
 
 const char *const szTILEMAPGRIDHEXFLATTOP_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
 
 uniform mat4					u_inv_tilemap;	// World to local space transform matrix of the infinite TileMapLayer grid
 uniform vec2					u_position;		// Centered position of the quad viewport in world space
@@ -255,7 +255,7 @@ void main()
 )src";
 
 const char *const szTILEMAPGRIDHEXPOINTTOP_FRAGMENTSHADER = R"src(
-#version 140
+#version 150
 
 uniform mat4					u_inv_tilemap;	// World to local space transform matrix of the infinite TileMapLayer grid
 uniform vec2					u_position;		// Centered position of the quad viewport in world space

@@ -108,16 +108,16 @@ void TileData::InitPropertiesModel(QUndoStack *pUndoStack)
 	//m_pSetupPropertiesModel->AppendProperty("Info", "Tile Checksum", PROPERTIESTYPE_int, 0, "The tile's image checksum", PROPERTIESACCESS_ReadOnly); // The row-major index of the tile image packed in the sub-atlas. Tiles with duplicate images, or Tile Variants will share the same Atlas Index
 	m_pSetupPropertiesModel->AppendProperty("Info", "Is Variant Tile", PROPERTIESTYPE_bool, false, "False indicates this is a standard imported tile. If true, this tile references a standard imported tile but may have different properties set", PROPERTIESACCESS_ReadOnly);
 
-	m_pSetupPropertiesModel->InsertCategory(-1, "Rendering");
-	m_pSetupPropertiesModel->AppendProperty("Rendering", "Texture Origin Offset", PROPERTIESTYPE_ivec2, QPoint(0, 0), "Tiles are placed centered at their grid location. This property can be used to visually offset the tile", PROPERTIESACCESS_Mutable, 0, 0xFFFF, 1);
-	m_pSetupPropertiesModel->AppendProperty("Rendering", "Flip Horz", PROPERTIESTYPE_bool, false, "If true, the tile is flipped horizontally", PROPERTIESACCESS_Mutable);
-	m_pSetupPropertiesModel->AppendProperty("Rendering", "Flip Vert", PROPERTIESTYPE_bool, false, "If true, the tile is flipped vertically", PROPERTIESACCESS_Mutable);
-	m_pSetupPropertiesModel->AppendProperty("Rendering", "Transpose", PROPERTIESTYPE_bool, false, "If true, the tile is rotated 90 degrees counter-clockwise and then flipped vertically. If you want to roate a tile by 90 degrees clockwise without flipping it, you would enable both 'Flip Horz' and 'Transpose'. To rotate a tile by 180 degrees clockwise, enable 'Flip Horz' and 'Flip Vert'. To rotate a tile by 270 degrees clockwise, enable 'Flip Vert' and 'Transpose'", PROPERTIESACCESS_Mutable);
-	m_pSetupPropertiesModel->AppendProperty("Rendering", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this tile with", PROPERTIESACCESS_Mutable);
-	m_pSetupPropertiesModel->AppendProperty("Rendering", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this tile is", PROPERTIESACCESS_Mutable, 0.0, 1.0, 0.05);
-	
 	m_pSetupPropertiesModel->InsertCategory(-1, "Randomization");
 	m_pSetupPropertiesModel->AppendProperty("Randomization", "Probability", PROPERTIESTYPE_double, 1.0, "The relative probability of this tile appearing when painting with \"Place Random Tile\" enabled", PROPERTIESACCESS_Mutable, 0.0, 1.0, 0.05);
+
+	m_pSetupPropertiesModel->InsertCategory(-1, "EX Rendering");
+	//m_pSetupPropertiesModel->AppendProperty("Rendering", "Flip Horz", PROPERTIESTYPE_bool, false, "If true, the tile is flipped horizontally", PROPERTIESACCESS_Mutable);
+	//m_pSetupPropertiesModel->AppendProperty("Rendering", "Flip Vert", PROPERTIESTYPE_bool, false, "If true, the tile is flipped vertically", PROPERTIESACCESS_Mutable);
+	//m_pSetupPropertiesModel->AppendProperty("Rendering", "Transpose", PROPERTIESTYPE_bool, false, "If true, the tile is rotated 90 degrees counter-clockwise and then flipped vertically. If you want to roate a tile by 90 degrees clockwise without flipping it, you would enable both 'Flip Horz' and 'Transpose'. To rotate a tile by 180 degrees clockwise, enable 'Flip Horz' and 'Flip Vert'. To rotate a tile by 270 degrees clockwise, enable 'Flip Vert' and 'Transpose'", PROPERTIESACCESS_Mutable);
+	m_pSetupPropertiesModel->AppendProperty("EX Rendering", "Additional Offset", PROPERTIESTYPE_ivec2, QPoint(0, 0), "All tiles are placed centered at their grid location and then offset by their tileset's offset. An additional offset can be set here if the this particular tile needs it.", PROPERTIESACCESS_Mutable, 0, 0xFFFF, 1);
+	m_pSetupPropertiesModel->AppendProperty("EX Rendering", "Color Tint", PROPERTIESTYPE_Color, QRect(255, 255, 255, 0), "A color to alpha blend this tile with", PROPERTIESACCESS_Mutable);
+	m_pSetupPropertiesModel->AppendProperty("EX Rendering", "Alpha", PROPERTIESTYPE_double, 1.0, "A value from 0.0 to 1.0 that indicates how opaque/transparent this tile is", PROPERTIESACCESS_Mutable, 0.0, 1.0, 0.05);
 }
 
 AtlasTileSet *TileData::GetTileSet() const
@@ -128,6 +128,22 @@ AtlasTileSet *TileData::GetTileSet() const
 QUuid TileData::GetUuid() const
 {
 	return m_Uuid;
+}
+
+bool TileData::IsExTile() const
+{
+	const int iExRenderingCategoryIndex = 2;
+	const int iNumExRenderingProperties = 3;
+	HyAssert(iExRenderingCategoryIndex == m_pSetupPropertiesModel->FindCategoryIndex("EX Rendering"), "TileData's 'EX Rendering' category index is not set correctly");
+	HyAssert(m_pSetupPropertiesModel->GetNumProperties(iExRenderingCategoryIndex) == iNumExRenderingProperties, "TileData's 'EX Rendering' category does not correct number of properties");
+	
+	for(int i = 0; i < iNumExRenderingProperties; ++i)
+	{
+		if(m_pSetupPropertiesModel->IsPropertyDefaultValue(iExRenderingCategoryIndex, i) == false)
+			return true;
+	}
+
+	return false;
 }
 
 quint32 TileData::GetTileChecksum() const

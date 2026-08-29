@@ -30,7 +30,7 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 	// Uncompressed
 	ui->cmbUncompressedColorChannels->setItemData(0, 4); // RGBA
 	ui->cmbUncompressedColorChannels->setItemData(1, 3); // RGB
-	ui->cmbUncompressedFileType->setItemData(0, HyTextureInfo::UNCOMPRESSEDFILE_PNG);
+	ui->cmbUncompressedFileType->setItemData(0, HYTEXTUREFORMAT_UINT8);
 	// DXT
 	ui->cmbDxtType->setItemData(0, 5); // DXT 5 (RGBA)
 	ui->cmbDxtType->setItemData(1, 1); // DXT 1 (RGB)
@@ -91,7 +91,7 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 		for(auto pAsset : m_SelectedAssets)
 		{
 			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
-			if(pFrame->GetFormat() != texInfo.GetFormat())
+			if(pFrame->GetFileType() != texInfo.GetFileType())
 			{
 				ui->cmbTextureType->addItem("<different options>");
 				ui->cmbTextureType->setCurrentIndex(0);
@@ -99,16 +99,16 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 				break;
 			}
 		}
-		for(int i = 0; i < HYNUM_TEXTUREFORMATS; ++i)
-			ui->cmbTextureType->addItem(QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(i)).c_str()));
+		for(int i = 0; i < HYNUM_TEXTUREFILES; ++i)
+			ui->cmbTextureType->addItem(QString(HyAssets::GetTextureFileTypeName(static_cast<HyTextureFileType>(i)).c_str()));
 
 		if(bIsDiffOptions == false)
 		{
-			ui->cmbTextureType->setCurrentIndex(texInfo.GetFormat());
+			ui->cmbTextureType->setCurrentIndex(texInfo.GetFileType());
 
-			switch(texInfo.GetFormat())
+			switch(texInfo.GetFileType())
 			{
-			case HYTEXTURE_Uncompressed:
+			case HYTEXTUREFILE_PNG:
 				if(texInfo.m_uiFormatParam1 == 4)
 					ui->cmbUncompressedColorChannels->setCurrentIndex(0);
 				else
@@ -116,14 +116,14 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 				ui->cmbUncompressedFileType->setCurrentIndex(ui->cmbUncompressedFileType->findData(QVariant(texInfo.m_uiFormatParam2)));
 				break;
 
-			case HYTEXTURE_DXT:
+			case HYTEXTUREFILE_DXT:
 				if(texInfo.m_uiFormatParam2 == 5)
 					ui->cmbDxtType->setCurrentIndex(0);
 				else
 					ui->cmbDxtType->setCurrentIndex(1);
 				break;
 
-			case HYTEXTURE_ASTC:
+			case HYTEXTUREFILE_ASTC:
 				ui->cmbAstcBlockSize->setCurrentIndex(ui->cmbAstcBlockSize->findData(QVariant(texInfo.m_uiFormatParam1)));
 				ui->cmbAstcColorProfile->setCurrentIndex(ui->cmbAstcColorProfile->findData(QVariant(texInfo.m_uiFormatParam2)));
 				break;
@@ -240,7 +240,7 @@ void DlgAssetProperties::ApplyChanges()
 	{
 	case ASSETMAN_Atlases: {
 		uint8 uiParam1 = 0, uiParam2 = 0;
-		HyTextureFormat eFormat = GetSelectedAtlasFormat(uiParam1, uiParam2);
+		HyTextureFileType eFileType = GetSelectedAtlasFormat(uiParam1, uiParam2);
 		HyTextureFiltering eFiltering = GetSelectedAtlasFiltering();
 
 		for(auto pAsset : m_ChangedAssets)
@@ -251,8 +251,8 @@ void DlgAssetProperties::ApplyChanges()
 			if(eFiltering != HYTEXFILTER_Unknown)
 				pFrame->SetFiltering(eFiltering);
 
-			if(eFormat != HYTEXTURE_Unknown)
-				pFrame->SetFormat(eFormat, uiParam1, uiParam2);
+			if(eFileType != HYTEXTUREFILE_Unknown)
+				pFrame->SetFormat(eFileType, uiParam1, uiParam2);
 		}
 		break; }
 
@@ -335,24 +335,24 @@ void DlgAssetProperties::on_sbInstanceLimit_valueChanged(int iArg)
 	QDialog::done(r);
 }
 
-HyTextureFormat DlgAssetProperties::GetSelectedAtlasFormat(uint8 &uiParam1Out, uint8 &uiParam2Out) const
+HyTextureFileType DlgAssetProperties::GetSelectedAtlasFormat(uint8 &uiParam1Out, uint8 &uiParam2Out) const
 {
-	bool bHasDiffOptions = ui->cmbTextureType->count() == (HYNUM_TEXTUREFORMATS + 1);
+	bool bHasDiffOptions = ui->cmbTextureType->count() == (HYNUM_TEXTUREFILES + 1);
 	if(bHasDiffOptions && ui->cmbTextureType->currentIndex() == 0)
 	{
 		uiParam1Out = uiParam2Out = 0;
-		return HYTEXTURE_Unknown; // This means "<different options>" is selected
+		return HYTEXTUREFILE_Unknown; // This means "<different options>" is selected
 	}
 
-	HyTextureFormat eFormat = static_cast<HyTextureFormat>(ui->cmbTextureType->currentIndex() - (bHasDiffOptions ? 1 : 0));
-	switch(eFormat)
+	HyTextureFileType eFileType = static_cast<HyTextureFileType>(ui->cmbTextureType->currentIndex() - (bHasDiffOptions ? 1 : 0));
+	switch(eFileType)
 	{
-	case HYTEXTURE_Uncompressed:
+	case HYTEXTUREFILE_PNG:
 		uiParam1Out = static_cast<uint8>(ui->cmbUncompressedColorChannels->currentData().toUInt());
-		uiParam2Out = static_cast<uint8>(ui->cmbUncompressedFileType->currentData().toUInt());
+		uiParam2Out = HyTextureInfo::PackUncompressedFormatTypes(static_cast<HyTextureFormatType>(ui->cmbUncompressedFileType->currentData().toUInt()), HYTEXTUREFORMAT_NORM8);
 		break;
 
-	case HYTEXTURE_DXT:
+	case HYTEXTUREFILE_DXT:
 		if(ui->cmbDxtType->currentData().toUInt() == 1)
 		{
 			uiParam1Out = 3; // RGB
@@ -365,13 +365,13 @@ HyTextureFormat DlgAssetProperties::GetSelectedAtlasFormat(uint8 &uiParam1Out, u
 		}
 		break;
 
-	case HYTEXTURE_ASTC:
+	case HYTEXTUREFILE_ASTC:
 		uiParam1Out = static_cast<uint8>(ui->cmbAstcBlockSize->currentData().toUInt());
 		uiParam2Out = static_cast<uint8>(ui->cmbAstcColorProfile->currentData().toUInt());
 		break;
 	}
 
-	return eFormat;
+	return eFileType;
 }
 
 HyTextureFiltering DlgAssetProperties::GetSelectedAtlasFiltering() const
@@ -389,13 +389,13 @@ void DlgAssetProperties::Refresh()
 	{
 	case ASSETMAN_Atlases: {
 		uint8 uiParam1 = 0, uiParam2 = 0;
-		HyTextureFormat eFormat = GetSelectedAtlasFormat(uiParam1, uiParam2);
-		if(eFormat == HYTEXTURE_Unknown)
+		HyTextureFileType eFileType = GetSelectedAtlasFormat(uiParam1, uiParam2);
+		if(eFileType == HYTEXTUREFILE_Unknown)
 			ui->grpFormatOptions->setVisible(false);
 		else
 		{
 			ui->grpFormatOptions->setVisible(true);
-			ui->stackedFormatOptions->setCurrentIndex(eFormat);
+			ui->stackedFormatOptions->setCurrentIndex(eFileType);
 		}
 		break; }
 
@@ -414,7 +414,7 @@ bool DlgAssetProperties::DetermineChangedAssets()
 	{
 	case ASSETMAN_Atlases: {
 		uint8 uiParam1 = 0, uiParam2 = 0;
-		HyTextureFormat eFormat = GetSelectedAtlasFormat(uiParam1, uiParam2);
+		HyTextureFileType eFileType = GetSelectedAtlasFormat(uiParam1, uiParam2);
 		HyTextureFiltering eFiltering = GetSelectedAtlasFiltering();
 
 		for(auto pAsset : m_SelectedAssets)
@@ -423,9 +423,9 @@ bool DlgAssetProperties::DetermineChangedAssets()
 
 			if(eFiltering != HYTEXFILTER_Unknown && eFiltering != assetTexInfo.GetFiltering())
 				m_ChangedAssets.append(pAsset);
-			else if(eFormat != HYTEXTURE_Unknown)
+			else if(eFileType != HYTEXTUREFILE_Unknown)
 			{
-				HyTextureInfo selectedTexInfo(eFiltering, eFormat, uiParam1, uiParam2);
+				HyTextureInfo selectedTexInfo(eFiltering, eFileType, uiParam1, uiParam2);
 				if(selectedTexInfo.GetBucketId() != assetTexInfo.GetBucketId())
 					m_ChangedAssets.append(pAsset);
 			}

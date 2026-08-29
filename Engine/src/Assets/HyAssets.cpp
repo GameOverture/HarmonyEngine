@@ -234,9 +234,9 @@ void HyAssets::AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pData
 {
 	switch(pLoadable->_LoadableGetType())
 	{
-	case HYTYPE_TileMap:
-		pDataOut = m_TileMapFactory.GetData(pLoadable->GetPath());
-		break;
+	//case HYTYPE_TileMap:
+	//	pDataOut = m_TileMapFactory.GetData(pLoadable->GetPath());
+	//	break;
 	case HYTYPE_Sprite:
 		pDataOut = m_SpriteFactory.GetData(pLoadable->GetPath());
 		break;
@@ -460,7 +460,7 @@ HyTextureQuadHandle HyAssets::CreateAuxiliaryTextureQuad(const std::string &sFil
 {
 	std::vector<char> handleData(sFilePath.begin(), sFilePath.end());
 	handleData.push_back(textureInfo.m_uiFiltering);
-	handleData.push_back(textureInfo.m_uiFormat);
+	handleData.push_back(textureInfo.m_uiFileType);
 	handleData.push_back(textureInfo.m_uiFormatParam1);
 	handleData.push_back(textureInfo.m_uiFormatParam2);
 	
@@ -554,7 +554,6 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 				{
 					HyFileAtlas *pAtlas = static_cast<HyFileAtlas *>(pFileData);
 					uint32 uiBufferSize = pAtlas->GetWidth() * pAtlas->GetHeight() * 4;
-					pFileData->m_pGfxApiPixelBuffer = rendererRef.GetPixelBufferPtr(uiBufferSize, pFileData->m_hGfxApiPbo);
 				}
 
 				m_Load_Shared.push(pFileData);
@@ -643,8 +642,8 @@ void HyAssets::Update(IHyRenderer &rendererRef)
 
 	if(itemsDoc.HasMember("Audio"))
 		m_AudioFactory.Init("Audio", itemsDoc["Audio"].GetObject(), *this);
-	if(itemsDoc.HasMember("Entities"))
-		m_TileMapFactory.Init("TileMap", itemsDoc["Entities"].GetObject(), *this);
+	//if(itemsDoc.HasMember("Entities"))
+	//	m_TileMapFactory.Init("TileMap", itemsDoc["Entities"].GetObject(), *this);
 	if(itemsDoc.HasMember("Sprites"))
 		m_SpriteFactory.Init("Sprite", itemsDoc["Sprites"].GetObject(), *this);
 	if(itemsDoc.HasMember("Texts"))
@@ -751,8 +750,8 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 			m_FilesMap[eFileType].m_uiNumFiles += texturesArray.Size();
 		}
 
-		HyJsonArray tileSetsArray = fileDoc["tileSets"].GetArray();
-		m_FilesMap[eFileType].m_uiNumFiles += tileSetsArray.Size();
+		//HyJsonArray tileSetsArray = fileDoc["tileSets"].GetArray();
+		//m_FilesMap[eFileType].m_uiNumFiles += tileSetsArray.Size();
 
 		m_FilesMap[eFileType].m_pFiles = reinterpret_cast<HyFileAtlas *>(HY_NEW unsigned char[sizeof(HyFileAtlas) * m_FilesMap[eFileType].m_uiNumFiles]);
 		HyFileAtlas *pAtlasWriteLocation = static_cast<HyFileAtlas *>(m_FilesMap[eFileType].m_pFiles);
@@ -788,26 +787,26 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 				++uiManifestIndex;
 			}
 		}
-		for(uint32 i = 0; i < tileSetsArray.Size(); ++i) // The runtime data textures, not the sub-atlases
-		{
-			HyAssert(uiManifestIndex < m_FilesMap[eFileType].m_uiNumFiles, "HyAssets::OnThreadInit instantiated too many atlases+tilesets");
 
-			HyJsonObj tileSetObj = tileSetsArray[i].GetObject();
+		//for(uint32 i = 0; i < tileSetsArray.Size(); ++i) // The runtime data textures, not the sub-atlases
+		//{
+		//	HyAssert(uiManifestIndex < m_FilesMap[eFileType].m_uiNumFiles, "HyAssets::OnThreadInit instantiated too many atlases+tilesets");
 
-			HyTextureInfo texInfo(tileSetObj["textureInfo"].GetUint());
-			std::string sFilePath = tileSetObj["name"].GetString();
-			sFilePath += texInfo.GetFileExt();
+		//	HyJsonObj tileSetObj = tileSetsArray[i].GetObject();
 
-			new (pAtlasWriteLocation)HyFileAtlas(sFilePath,
-				HYASSETS_TileSetBankId,
-				i,
-				uiManifestIndex,
-				tileSetObj);
+		//	HyTextureInfo texInfo(tileSetObj["textureInfo"].GetUint());
+		//	std::string sFilePath = tileSetObj["name"].GetString();
+		//	sFilePath += texInfo.GetFileExt();
 
-			++pAtlasWriteLocation;
-			++uiManifestIndex;
-		}
-		
+		//	new (pAtlasWriteLocation)HyFileAtlas(sFilePath,
+		//		HYASSETS_TileSetBankId,
+		//		i,
+		//		uiManifestIndex,
+		//		tileSetObj);
+
+		//	++pAtlasWriteLocation;
+		//	++uiManifestIndex;
+		//}
 
 		break; }
 
@@ -994,62 +993,64 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 	SetEntityLoaded(pLoadable->_LoadableGetParentPtr());
 }
 
-/*static*/ std::vector<HyTextureFormat> HyAssets::GetTextureFormatList()
+/*static*/ std::vector<HyTextureFileType> HyAssets::GetTextureFileTypeList()
 {
-	std::vector<HyTextureFormat> list;
-	list.push_back(HYTEXTURE_Uncompressed);
-	list.push_back(HYTEXTURE_DXT);
-	list.push_back(HYTEXTURE_ASTC);
+	std::vector<HyTextureFileType> list;
+	list.push_back(HYTEXTUREFILE_PNG);
+	list.push_back(HYTEXTUREFILE_DXT);
+	list.push_back(HYTEXTUREFILE_ASTC);
+	list.push_back(HYTEXTUREFILE_RAW);
 	
-	HyAssert(list.size() == HYNUM_TEXTUREFORMATS, "HyGlobal::GetTextureFormatList missing a format!");
+	HyAssert(list.size() == HYNUM_TEXTUREFILES, "HyAssets::GetTextureFormatList() is missing a format!");
 
 	return list;
 }
 
-/*static*/ std::vector<std::string> HyAssets::GetTextureFormatNameList()
+/*static*/ std::vector<std::string> HyAssets::GetTextureFileTypeNameList()
 {
-	std::vector<HyTextureFormat> formatList = GetTextureFormatList();
+	std::vector<HyTextureFileType> formatList = GetTextureFileTypeList();
 
 	std::vector<std::string> list;
 	for(int32 i = 0; i < static_cast<int32>(formatList.size()); ++i)
-		list.push_back(GetTextureFormatName(formatList[i]));
+		list.push_back(GetTextureFileTypeName(formatList[i]));
 
 	return list;
 }
 
-/*static*/ std::string HyAssets::GetTextureFormatName(HyTextureFormat eType)
+/*static*/ std::string HyAssets::GetTextureFileTypeName(HyTextureFileType eFileType)
 {
-	// WARNING: Changing any of these strings affects data and meta files and requires a version patcher bump!
-	switch(eType)
+	switch(eFileType)
 	{
-	case HYTEXTURE_Uncompressed:
-		return "Uncompressed";
-	case HYTEXTURE_DXT:
+	case HYTEXTUREFILE_PNG:
+		return "PNG";
+	case HYTEXTUREFILE_DXT:
 		return "DXT";
-	case HYTEXTURE_ASTC:
+	case HYTEXTUREFILE_ASTC:
 		return "ASTC";
+	case HYTEXTUREFILE_RAW:
+		return "RAW";
 	
-	case HYTEXTURE_Unknown:
+	case HYTEXTUREFILE_Unknown:
 	default:
 		return "Unknown";
 	}
 }
 
-/*static*/ HyTextureFormat HyAssets::GetTextureFormatFromString(std::string sFormat)
+/*static*/ HyTextureFileType HyAssets::GetTextureFileTypeFromString(std::string sFormat)
 {
 	std::transform(sFormat.begin(), sFormat.end(), sFormat.begin(), ::tolower);
 
-	std::vector<std::string> sTextureFormatList = GetTextureFormatNameList();
+	std::vector<std::string> sTextureFormatList = GetTextureFileTypeNameList();
 	for(int32 i = 0; i < static_cast<int32>(sTextureFormatList.size()); ++i)
 	{
 		std::string sCurStr = sTextureFormatList[i];
 		std::transform(sCurStr.begin(), sCurStr.end(), sCurStr.begin(), ::tolower);
 		
 		if(sFormat == sCurStr)
-			return GetTextureFormatList()[i];
+			return GetTextureFileTypeList()[i];
 	}
 
-	return HYTEXTURE_Unknown;
+	return HYTEXTUREFILE_Unknown;
 }
 
 

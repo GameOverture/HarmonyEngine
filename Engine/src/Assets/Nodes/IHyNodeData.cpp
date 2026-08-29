@@ -13,7 +13,7 @@
 IHyNodeData::IHyNodeData(const HyNodePath &nodePath) :
 	m_PATH(nodePath),
 	m_uiNumStates(0),
-	m_RequiredFiles{ HYFILE_Atlas, HYFILE_GLTF, HYFILE_AudioBank, HYFILE_Shader }
+	m_RequiredFiles{ HYFILE_Atlas, HYFILE_TileSet, HYFILE_GLTF, HYFILE_AudioBank, HYFILE_Shader }
 {
 }
 

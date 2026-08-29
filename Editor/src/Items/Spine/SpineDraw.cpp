@@ -45,12 +45,11 @@ SpineDraw::~SpineDraw()
 			uint32 uiPixelDataSize = iWidth * iHeight * 4;
 
 			HyTextureHandle hNewTex = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(
-				HyTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0),
+				HyTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTUREFILE_PNG, 4, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT8, HYTEXTUREFORMAT_NORM8)),
 				iWidth,
 				iHeight,
 				pPixelData,
-				uiPixelDataSize,
-				0);
+				uiPixelDataSize);
 
 			SOIL_free_image_data(pPixelData);
 

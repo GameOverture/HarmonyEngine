@@ -26,7 +26,7 @@
 
 AtlasManager::AtlasManager(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Atlases),
-	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTURE_Uncompressed, 4, 0),
+	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTUREFILE_PNG, 4, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT8, HYTEXTUREFORMAT_NORM8)),
 	m_TileSetsTreeModel(this)
 {
 	QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));
@@ -778,19 +778,22 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 
 		QJsonObject runtimeTileSetObj;
 		runtimeTileSetObj.insert("name", metaObj["name"].toString());
-		HyTextureInfo texInfo(HYTEXFILTER_NEAREST, HYTEXTURE_Uncompressed, 4, HyTextureInfo::UNCOMPRESSEDFILE_RAW16);
+		HyTextureInfo texInfo(HYTEXFILTER_NEAREST, HYTEXTUREFILE_RAW, 4, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT16, HYTEXTUREFORMAT_UINT16));
 		runtimeTileSetObj.insert("textureInfo", QJsonValue(static_cast<qint64>(texInfo.GetBucketId())));
+
+		// TILETODO: do cols, rows, isEx
 
 		int iNumSubAtlasTiles = metaObj["numSubAtlasTiles"].toInt();
 		int iNumCols = NUM_COLS_TILESET(iNumSubAtlasTiles);
 		int iNumRows = NUM_ROWS_TILESET(iNumSubAtlasTiles, iNumCols);
-		runtimeTileSetObj.insert("width", iNumCols);
-		runtimeTileSetObj.insert("height", iNumRows);
-		runtimeTileSetObj.insert("assets", QJsonArray());
+		//runtimeTileSetObj.insert("width", iNumCols);
+		//runtimeTileSetObj.insert("height", iNumRows);
+		//runtimeTileSetObj.insert("assets", QJsonArray());
 		
 		tileSetTexturesArray.append(runtimeTileSetObj);
 	}
-	dataObjRef.insert("tileSets", tileSetTexturesArray);
+	// TILETODO: Create TileSets.data file and don't use Atlases.data
+	//dataObjRef.insert("tileSets", tileSetTexturesArray);
 }
 
 void AtlasManager::AddTexturesToRepack(BankData *pBankData, QSet<int> texIndicesSet)

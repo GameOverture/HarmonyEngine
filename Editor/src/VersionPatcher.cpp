@@ -219,8 +219,12 @@
 			Patch_16to17(metaAtlasDoc);
 			[[fallthrough]];
 		case 17:
+			HyGuiLog("Patching project files: version 17 -> 18", LOGTYPE_Info);
+			Patch_17to18(metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
+		case 18:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 17, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 18, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -541,7 +545,7 @@
 		int iBankId = frameObj["atlasGrpId"].toInt();
 
 		// Find 'textureType' in metaBanksArray that has the correct bank ID
-		int iTextureFormat = HYTEXTURE_Unknown;
+		int iTextureFormat = HYTEXTUREFILE_Unknown;
 		for(int j = 0; j < metaBanksArray.size(); ++j)
 		{
 			QJsonObject bankObj = metaBanksArray[j].toObject();
@@ -551,7 +555,7 @@
 				break;
 			}
 		}
-		frameObj.insert("textureFormat", QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(iTextureFormat)).c_str()));
+		frameObj.insert("textureFormat", iTextureFormat == 0 ? "Uncompressed" : QString(HyAssets::GetTextureFileTypeName(static_cast<HyTextureFileType>(iTextureFormat)).c_str()));
 
 		frameObj.remove("atlasGrpId");
 		frameObj.insert("bankId", iBankId);
@@ -672,7 +676,7 @@
 			QJsonObject newTextureObj;
 			newTextureObj.insert("width", iWidth);
 			newTextureObj.insert("height", iWidth);
-			newTextureObj.insert("format", QString(HyAssets::GetTextureFormatName(static_cast<HyTextureFormat>(iTextureType)).c_str()));
+			newTextureObj.insert("format", iTextureType == 0 ? "Uncompressed" : QString(HyAssets::GetTextureFileTypeName(static_cast<HyTextureFileType>(iTextureType)).c_str()));
 			newTextureObj.insert("assets", texturesArray.at(j).toArray());
 
 			texturesArray.replace(j, newTextureObj);
@@ -883,25 +887,25 @@
 		if(sFiltering.compare("Nearest", Qt::CaseInsensitive) == 0)
 			eFiltering = HYTEXFILTER_NEAREST;
 
-		HyTextureFormat eFormat = HYTEXTURE_Unknown;
+		HyTextureFileType eFormat = HYTEXTUREFILE_Unknown;
 		uint8 uiParam1 = 0;
 		uint8 uiParam2 = 0;
 		QString sFormat = assetObj["textureFormat"].toString();
 		if(sFormat.compare("R8G8B8A8", Qt::CaseInsensitive) == 0)
 		{
-			eFormat = HYTEXTURE_Uncompressed;
+			eFormat = static_cast<HyTextureFileType>(0);//HYTEXTURE_Uncompressed;
 			uiParam1 = 4; // Num channels
-			uiParam2 = HyTextureInfo::UNCOMPRESSEDFILE_PNG;
+			uiParam2 = 0;//HyTextureInfo::UNCOMPRESSEDFILE_PNG;
 		}
 		else if(sFormat.compare("RGB_DTX1", Qt::CaseInsensitive) == 0)
 		{
-			eFormat = HYTEXTURE_DXT;
+			eFormat = HYTEXTUREFILE_DXT;
 			uiParam1 = 3; // Num channels
 			uiParam2 = 1; // DXT Type
 		}
 		else if(sFormat.compare("DTX5", Qt::CaseInsensitive) == 0)
 		{
-			eFormat = HYTEXTURE_DXT;
+			eFormat = HYTEXTUREFILE_DXT;
 			uiParam1 = 4; // Num channels
 			uiParam2 = 5; // DXT Type
 		}
@@ -935,25 +939,25 @@
 			if(sFiltering.compare("Nearest", Qt::CaseInsensitive) == 0)
 				eFiltering = HYTEXFILTER_NEAREST;
 
-			HyTextureFormat eFormat = HYTEXTURE_Unknown;
+			HyTextureFileType eFormat = HYTEXTUREFILE_Unknown;
 			uint8 uiParam1 = 0;
 			uint8 uiParam2 = 0;
 			QString sFormat = textureObj["format"].toString();
 			if(sFormat.compare("R8G8B8A8", Qt::CaseInsensitive) == 0)
 			{
-				eFormat = HYTEXTURE_Uncompressed;
+				eFormat = static_cast<HyTextureFileType>(0);//HYTEXTURE_Uncompressed;
 				uiParam1 = 4; // Num channels
-				uiParam2 = HyTextureInfo::UNCOMPRESSEDFILE_PNG;
+				uiParam2 = 0;//HyTextureInfo::UNCOMPRESSEDFILE_PNG;
 			}
 			else if(sFormat.compare("RGB_DTX1", Qt::CaseInsensitive) == 0)
 			{
-				eFormat = HYTEXTURE_DXT;
+				eFormat = HYTEXTUREFILE_DXT;
 				uiParam1 = 3; // Num channels
 				uiParam2 = 1; // DXT Type
 			}
 			else if(sFormat.compare("DTX5", Qt::CaseInsensitive) == 0)
 			{
-				eFormat = HYTEXTURE_DXT;
+				eFormat = HYTEXTUREFILE_DXT;
 				uiParam1 = 4; // Num channels
 				uiParam2 = 5; // DXT Type
 			}
@@ -1467,6 +1471,57 @@
 
 	metaAtlasObj.insert("assets", metaAssetsArray);
 	metaAtlasDocRef.setObject(metaAtlasObj);
+}
+
+/*static*/ void VersionPatcher::Patch_17to18(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef)
+{
+	// Modifying "textureInfo" to now hold data format and internal format when uncompressed
+
+	// Fix Atlases.meta
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
+	QJsonArray metaAssetsArray = metaAtlasObj["assets"].toArray();
+	for(int iMetaAssetIndex = 0; iMetaAssetIndex < metaAssetsArray.size(); ++iMetaAssetIndex)
+	{
+		QJsonObject metaAssetObj = metaAssetsArray[iMetaAssetIndex].toObject();
+		uint32 uiTexInfo = static_cast<uint32>(metaAssetObj["textureInfo"].toInteger());
+
+		if(((uiTexInfo & 0xFF00) >> 8) == 0) // AKA was HYTEXTURE_Uncompressed - Is now HYTEXTUREFILE_PNG (same value) but need to update param2 to hold new dataFormat and internalFormat
+		{
+			HyTextureFiltering eFilter = static_cast<HyTextureFiltering>(uiTexInfo & 0xFF); // Preserve filter
+			HyTextureInfo newInfo(eFilter, HYTEXTUREFILE_PNG, 4, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT8, HYTEXTUREFORMAT_NORM8));
+			
+			metaAssetObj.insert("textureInfo", QJsonValue(static_cast<qint64>(newInfo.GetBucketId())));
+			metaAssetsArray.replace(iMetaAssetIndex, metaAssetObj);
+		}
+	}
+	metaAtlasObj.insert("assets", metaAssetsArray);
+	metaAtlasDocRef.setObject(metaAtlasObj);
+
+	// Now fix Atlases.data
+	QJsonObject dataAtlasObj = dataAtlasDocRef.object();
+	QJsonArray dataBanksArray = dataAtlasObj["banks"].toArray();
+	for(int iDataBankIndex = 0; iDataBankIndex < dataBanksArray.size(); ++iDataBankIndex)
+	{
+		QJsonObject dataBankObj = dataBanksArray[iDataBankIndex].toObject();
+		QJsonArray dataTexturesArray = dataBankObj["textures"].toArray();
+		for(int iTextureIndex = 0; iTextureIndex < dataTexturesArray.size(); ++iTextureIndex)
+		{
+			QJsonObject dataTextureObj = dataTexturesArray[iTextureIndex].toObject();
+			uint32 uiTexInfo = static_cast<uint32>(dataTextureObj["textureInfo"].toInteger());
+			if(((uiTexInfo & 0xFF00) >> 8) == 0) // AKA was HYTEXTURE_Uncompressed - Is now HYTEXTUREFILE_PNG (same value) but need to update param2 to hold new dataFormat and internalFormat
+			{
+				HyTextureFiltering eFilter = static_cast<HyTextureFiltering>(uiTexInfo & 0xFF); // Preserve filter
+				HyTextureInfo newInfo(eFilter, HYTEXTUREFILE_PNG, 4, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT8, HYTEXTUREFORMAT_NORM8));
+			
+				dataTextureObj.insert("textureInfo", QJsonValue(static_cast<qint64>(newInfo.GetBucketId())));
+				dataTexturesArray.replace(iTextureIndex, dataTextureObj);
+			}
+		}
+		dataBankObj.insert("textures", dataTexturesArray);
+		dataBanksArray.replace(iDataBankIndex, dataBankObj);
+	}
+	dataAtlasObj.insert("banks", dataBanksArray);
+	dataAtlasDocRef.setObject(dataAtlasObj);
 }
 
 /*static*/ void VersionPatcher::RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta)

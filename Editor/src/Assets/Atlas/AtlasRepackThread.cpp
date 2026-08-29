@@ -265,25 +265,27 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 	QImage *pTexture = static_cast<QImage *>(p.device());
 	QDir runtimeBankDir(pBankData->m_sAbsPath);
 
-	switch(texInfo.GetFormat())
+	switch(texInfo.GetFileType())
 	{
-	case HYTEXTURE_Uncompressed:
+	case HYTEXTUREFILE_PNG:
 		// Param1: num channels
-		// Param2: disk file type (PNG, ...)
-		switch(texInfo.m_uiFormatParam2)
+		// Param2: format types
+		HyTextureFormatType eDataFormat, eInternalFormat;
+		texInfo.GetUncompressedFormatTypes(eDataFormat, eInternalFormat);
+		switch(eDataFormat)
 		{
-		case HyTextureInfo::UNCOMPRESSEDFILE_PNG:
+		case HYTEXTUREFORMAT_UINT8:
 			if(false == pTexture->save(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % texInfo.GetFileExt().c_str())))
 				HyGuiLog("AtlasManager::ConstructAtlasTexture failed to generate a PNG atlas", LOGTYPE_Error);
 			break;
 
 		default:
-			HyGuiLog("AtlasManager::ConstructAtlasTexture unknown uncompressed file type", LOGTYPE_Error);
+			HyGuiLog("AtlasManager::ConstructAtlasTexture unhandled PNG data format", LOGTYPE_Error);
 			break;
 		}
 		break;
 
-	case HYTEXTURE_DXT: {
+	case HYTEXTUREFILE_DXT: {
 		// Param1: num channels
 		// Param2: DXT format (1,3,5)
 		QImage imgProperlyFormatted = pTexture->convertToFormat(texInfo.m_uiFormatParam1 == 4 ? QImage::Format_RGBA8888 : QImage::Format_RGB888);
@@ -299,7 +301,7 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 		}
 		break; }
 
-	case HYTEXTURE_ASTC: {
+	case HYTEXTUREFILE_ASTC: {
 		// Param1: Block Size index (4x4 -> 12x12)
 		// Param2: Color Profile (LDR linear, LDR sRGB, HDR RGB, HDR RGBA)
 		QString sProgramPath = MainWindow::EngineSrcLocation() % HYGUIPATH_AstcEncDir;
@@ -370,7 +372,7 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 		break; }
 
 	default:
-		HyGuiLog("AtlasManager::ConstructAtlasTexture tried to create an unsupported texture type: " % QString::number(texInfo.GetFormat()), LOGTYPE_Error);
+		HyGuiLog("AtlasManager::ConstructAtlasTexture tried to create an unsupported texture type: " % QString(HyAssets::GetTextureFileTypeName(texInfo.GetFileType()).c_str()), LOGTYPE_Error);
 		break;
 	}
 
