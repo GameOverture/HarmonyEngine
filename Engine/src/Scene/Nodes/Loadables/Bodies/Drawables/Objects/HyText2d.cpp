@@ -44,11 +44,11 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 /*virtual*/ void HyText2d::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
 {
 	CalculateGlyphInfos();
-	if(m_uiNumReservedGlyphs == 0)
+	if(m_uiGlyphInfosArraySize == 0)
 		return;
 
 	glm::vec2 ptBotLeft(m_pGlyphInfos[0].vOffset.x - m_uiIndent, m_pGlyphInfos[0].vOffset.y);
-	for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
+	for(uint32 i = 0; i < m_uiGlyphInfosArraySize; ++i)
 	{
 		if(m_pGlyphInfos[i].vOffset.x < ptBotLeft.x)
 			ptBotLeft.x = m_pGlyphInfos[i].vOffset.x;
@@ -160,10 +160,11 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	const uint32 uiNUMLAYERS = pData->GetNumLayers(m_uiState);
 	const glm::mat4 &mtxTransformRef = GetSceneTransform(fExtrapolatePercent);
 
+	uint32 uiNumCharacters = GetNumCharacters();
 	uint32 iOffsetIndex = 0;
 	for(int32 i = uiNUMLAYERS - 1; i >= 0; --i)
 	{
-		for(uint32 j = 0; j < m_uiNumValidCharacters; ++j, ++iOffsetIndex)
+		for(uint32 j = 0; j < uiNumCharacters; ++j, ++iOffsetIndex)
 		{
 			uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(j, uiNUMLAYERS, i);
 

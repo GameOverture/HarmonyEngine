@@ -28,19 +28,6 @@ template<typename NODETYPE, typename ENTTYPE>
 class IHyText : public NODETYPE
 {
 protected:
-	enum TextAttributes
-	{
-		TEXTATTRIB_TypeMask					= 0x7, // 3 bits to hold a 'HyTextType' value
-		TEXTATTRIB_IsDirty					= 1 << 3,
-		TEXTATTRIB_CenterVertically			= 1 << 4,
-		TEXTATTRIB_UseMonospacedDigits		= 1 << 5,
-		TEXTATTRIB_IsTweeningLayerColor		= 1 << 6,
-		TEXTATTRIB_BoxScissor				= 1 << 7,
-
-		// NOTE: CURRENTLY MAXED OUT (do not exceed 8 bits)
-	};
-	uint8								m_uiTextAttributes;
-
 	std::string							m_sRawString;
 	std::vector<uint32>					m_Utf32CodeList;
 
@@ -86,9 +73,9 @@ protected:
 	{
 		glm::vec2						vOffset;
 		float							fAlpha;
-		float							fScale;			// NOTE: When `fScale` is stored as negative, use the abs() value and the scale anchor is the center of the glyph
-		glm::vec2						vScaleKerning;	// This is applied to `vOffset` when rendering if fScale != 1.0f
-		glm::vec2						vUserKerning;	// Optional arbitrary user kerning value per glyph
+		float							fScale;					// NOTE: When `fScale` is stored as negative, use the abs() value and the scale anchor is the center of the glyph
+		glm::vec2						vScaleKerning;			// This is applied to `vOffset` when rendering if fScale != 1.0f
+		glm::vec2						vUserKerning;			// Optional arbitrary user kerning value per glyph
 
 		GlyphInfo() :
 			vOffset(0.0f),
@@ -99,15 +86,26 @@ protected:
 		{ }
 	};
 	GlyphInfo *							m_pGlyphInfos;
-	uint32								m_uiNumReservedGlyphs;		// Essentially NUM_LAYERS * NUM_UTF32_CHARACTERS
+	uint32								m_uiGlyphInfosArraySize;// Essentially NUM_LAYERS * NUM_UTF32_CHARACTERS
 
-	uint32								m_uiNumValidCharacters;		// How many characters (with their effects) were rendered
 	uint32								m_uiNumRenderQuads;
 
 	uint32								m_uiIndent;
 
 	float								m_fUsedPixelWidth;
 	float								m_fUsedPixelHeight;
+
+	enum TextAttributes
+	{
+		TEXTATTRIB_TypeMask					= 0x7, // 3 bits to hold a 'HyTextType' value
+		TEXTATTRIB_IsDirty					= 1 << 3,
+		TEXTATTRIB_CenterVertically			= 1 << 4,
+		TEXTATTRIB_UseMonospacedDigits		= 1 << 5,
+		TEXTATTRIB_IsTweeningLayerColor		= 1 << 6,
+		TEXTATTRIB_BoxScissor				= 1 << 7,
+		// Do not exceed 32 bits
+	};
+	uint32								m_uiTextAttributes;
 
 public:
 	IHyText(const HyNodePath &nodePath, ENTTYPE *pParent);
@@ -137,7 +135,6 @@ public:
 	bool IsCharacterAvailable(const std::string sUtf8Character);						// Pass a single utf8 character, returns whether that character exists in the font
 	bool IsCharacterAvailable(uint32 uiStateIndex, const std::string sUtf8Character);	// Pass a single utf8 character, returns whether that character exists in the font
 	uint32 GetNumCharacters() const;
-	uint32 GetNumShownCharacters() const;
 	uint32 GetNumRenderQuads();
 
 	uint32 GetCharacterCode(uint32 uiCharIndex) const;

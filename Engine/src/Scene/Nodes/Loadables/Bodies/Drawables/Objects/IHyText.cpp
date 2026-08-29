@@ -26,8 +26,7 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(const HyNodePath &nodePath, ENTTYPE *pParent
 	m_fScaleBoxModifier(1.0f),
 	m_eAlignment(HYALIGN_Left),
 	m_pGlyphInfos(nullptr),
-	m_uiNumReservedGlyphs(0),
-	m_uiNumValidCharacters(0),
+	m_uiGlyphInfosArraySize(0),
 	m_uiIndent(0),
 	m_fUsedPixelWidth(0.0f),
 	m_fUsedPixelHeight(0.0f)
@@ -45,8 +44,7 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(const IHyText &copyRef) :
 	m_fScaleBoxModifier(copyRef.m_fScaleBoxModifier),
 	m_eAlignment(copyRef.m_eAlignment),
 	m_pGlyphInfos(nullptr),
-	m_uiNumReservedGlyphs(copyRef.m_uiNumReservedGlyphs),
-	m_uiNumValidCharacters(copyRef.m_uiNumValidCharacters),
+	m_uiGlyphInfosArraySize(copyRef.m_uiGlyphInfosArraySize),
 	m_uiNumRenderQuads(copyRef.m_uiNumRenderQuads),
 	m_uiIndent(copyRef.m_uiIndent),
 	m_fUsedPixelWidth(copyRef.m_fUsedPixelWidth),
@@ -83,8 +81,7 @@ const IHyText<NODETYPE, ENTTYPE> &IHyText<NODETYPE, ENTTYPE>::operator=(const IH
 	m_fScaleBoxModifier = rhs.m_fScaleBoxModifier;
 	m_eAlignment = rhs.m_eAlignment;
 	m_pGlyphInfos = nullptr;
-	m_uiNumReservedGlyphs = rhs.m_uiNumReservedGlyphs;
-	m_uiNumValidCharacters = rhs.m_uiNumValidCharacters;
+	m_uiGlyphInfosArraySize = rhs.m_uiGlyphInfosArraySize;
 	m_uiNumRenderQuads = rhs.m_uiNumRenderQuads;
 	m_uiIndent = rhs.m_uiIndent;
 	m_fUsedPixelWidth = rhs.m_fUsedPixelWidth;
@@ -225,7 +222,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset(uint32 uiCharIndex, uint32 
 	uint32 uiNumLayers = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNumLayers, uiLayerIndex);
-	HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset() - HYTEXT2D_GlyphIndex returned index that is out of bounds of m_pGlyphInfos");
+	HyAssert(uiGlyphOffsetIndex < m_uiGlyphInfosArraySize, "IHyText<NODETYPE, ENTTYPE>::GetGlyphOffset() - HYTEXT2D_GlyphIndex returned index that is out of bounds of m_pGlyphInfos");
 
 	return m_pGlyphInfos[uiGlyphOffsetIndex].vOffset;
 }
@@ -276,12 +273,6 @@ uint32 IHyText<NODETYPE, ENTTYPE>::GetNumCharacters() const
 }
 
 template<typename NODETYPE, typename ENTTYPE>
-uint32 IHyText<NODETYPE, ENTTYPE>::GetNumShownCharacters() const
-{
-	return m_uiNumValidCharacters;
-}
-
-template<typename NODETYPE, typename ENTTYPE>
 uint32 IHyText<NODETYPE, ENTTYPE>::GetNumRenderQuads()
 {
 	CalculateGlyphInfos();
@@ -314,7 +305,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetCharacterOffset(uint32 uiCharIndex)
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
-	HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::GetCharacterOffset() was passed invalid 'uiCharIndex'");
+	HyAssert(uiGlyphOffsetIndex < m_uiGlyphInfosArraySize, "IHyText<NODETYPE, ENTTYPE>::GetCharacterOffset() was passed invalid 'uiCharIndex'");
 
 	return m_pGlyphInfos[uiGlyphOffsetIndex].vUserKerning;
 }
@@ -340,7 +331,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetCharacterOffset(uint32 uiCharIndex, glm::vec
 	for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
 	{
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, uiLayerIndex);
-		HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::SetCharacterOffset() - HYTEXT2D_GlyphIndex returned index that is out of bounds of m_pGlyphInfos");
+		HyAssert(uiGlyphOffsetIndex < m_uiGlyphInfosArraySize, "IHyText<NODETYPE, ENTTYPE>::SetCharacterOffset() - HYTEXT2D_GlyphIndex returned index that is out of bounds of m_pGlyphInfos");
 		m_pGlyphInfos[uiGlyphOffsetIndex].vUserKerning = vOffsetAmt;
 	}
 }
@@ -364,7 +355,7 @@ float IHyText<NODETYPE, ENTTYPE>::GetCharacterScale(uint32 uiCharIndex)
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
-	HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::GetCharacterScale() was passed invalid 'uiCharIndex'");
+	HyAssert(uiGlyphOffsetIndex < m_uiGlyphInfosArraySize, "IHyText<NODETYPE, ENTTYPE>::GetCharacterScale() was passed invalid 'uiCharIndex'");
 	
 	return m_pGlyphInfos[uiGlyphOffsetIndex].fScale;
 }
@@ -389,7 +380,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetCharacterScale(uint32 uiCharIndex, float fSc
 	for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
 	{
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, uiLayerIndex);
-		HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha() was passed invalid 'uiCharIndex'");
+		HyAssert(uiGlyphOffsetIndex < m_uiGlyphInfosArraySize, "IHyText<NODETYPE, ENTTYPE>::SetGlyphAlpha() was passed invalid 'uiCharIndex'");
 		m_pGlyphInfos[uiGlyphOffsetIndex].fScale = fScale;
 	}
 
@@ -412,7 +403,7 @@ float IHyText<NODETYPE, ENTTYPE>::GetCharacterAlpha(uint32 uiCharIndex)
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
 
 	uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, 0);
-	HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::GetGlyphAlpha() was passed invalid 'uiCharIndex'");
+	HyAssert(uiGlyphOffsetIndex < m_uiGlyphInfosArraySize, "IHyText<NODETYPE, ENTTYPE>::GetGlyphAlpha() was passed invalid 'uiCharIndex'");
 	return m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha;
 }
 
@@ -436,7 +427,7 @@ void IHyText<NODETYPE, ENTTYPE>::SetCharacterAlpha(uint32 uiCharIndex, float fAl
 	for(uint32 uiLayerIndex = 0; uiLayerIndex < uiNUM_LAYERS; ++uiLayerIndex)
 	{
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiCharIndex, uiNUM_LAYERS, uiLayerIndex);
-		HyAssert(uiGlyphOffsetIndex < m_uiNumReservedGlyphs, "IHyText<NODETYPE, ENTTYPE>::SetCharacterAlpha() was passed invalid 'uiCharIndex'");
+		HyAssert(uiGlyphOffsetIndex < m_uiGlyphInfosArraySize, "IHyText<NODETYPE, ENTTYPE>::SetCharacterAlpha() was passed invalid 'uiCharIndex'");
 		m_pGlyphInfos[uiGlyphOffsetIndex].fAlpha = fAlpha;
 	}
 }
@@ -589,16 +580,17 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetCursorPos()
 	}
 
 	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
-	if(m_uiNumValidCharacters > 0)
+	uint32 uiNumValidCharacters = GetNumCharacters();
+	if(uiNumValidCharacters > 0)
 	{
 		uint32 uiLastCharOffset = 1;
-		uint32 uiUtf32Code = m_Utf32CodeList[m_uiNumValidCharacters - uiLastCharOffset];
+		uint32 uiUtf32Code = m_Utf32CodeList[uiNumValidCharacters - uiLastCharOffset];
 		while(uiUtf32Code == 10) // 10 == '\n' character
 		{
-			if(m_uiNumValidCharacters >= uiLastCharOffset)
+			if(uiNumValidCharacters >= uiLastCharOffset)
 			{
 				uiLastCharOffset++;
-				uiUtf32Code = m_Utf32CodeList[m_uiNumValidCharacters - uiLastCharOffset];
+				uiUtf32Code = m_Utf32CodeList[uiNumValidCharacters - uiLastCharOffset];
 			}
 			else
 				return glm::vec2();
@@ -607,7 +599,7 @@ glm::vec2 IHyText<NODETYPE, ENTTYPE>::GetCursorPos()
 		if(pGlyph == nullptr)
 			return glm::vec2();
 
-		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(m_uiNumValidCharacters - uiLastCharOffset, pData->GetNumLayers(this->m_uiState), 0);
+		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiNumValidCharacters - uiLastCharOffset, pData->GetNumLayers(this->m_uiState), 0);
 
 		glm::vec2 ptCursorPos = m_pGlyphInfos[uiGlyphOffsetIndex].vOffset + glm::vec2(pGlyph->fADVANCE_X * m_fScaleBoxModifier, 0.0f);
 
@@ -861,8 +853,8 @@ template<typename NODETYPE, typename ENTTYPE>
 {
 	// OnIsValidToRender() will always be invoked before this IHyText is sent off to render.
 	// Esure CalculateGlyphInfos() will always have a chance to be invoked here to not skip any rendering frame
-	CalculateGlyphInfos(); // sets 'm_uiNumValidCharacters' inside
-	return m_uiNumValidCharacters > 0;
+	CalculateGlyphInfos();
+	return GetNumCharacters() > 0;
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -981,20 +973,20 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 	const HyTextType eTEXT_TYPE = GetTextType();
 	const HyTextData *pData = static_cast<const HyTextData *>(this->UncheckedGetData());
 
-	m_uiNumValidCharacters = m_uiNumRenderQuads = 0;
+	m_uiNumRenderQuads = 0;
 	const uint32 uiNUM_LAYERS = pData->GetNumLayers(this->m_uiState);
-	const uint32 uiSTR_SIZE = static_cast<uint32>(m_Utf32CodeList.size());
+	const uint32 uiSTR_SIZE = GetNumCharacters();
 
-	if(m_pGlyphInfos == nullptr || m_uiNumReservedGlyphs < uiSTR_SIZE * uiNUM_LAYERS)
+	if(m_pGlyphInfos == nullptr || m_uiGlyphInfosArraySize < uiSTR_SIZE * uiNUM_LAYERS)
 	{
 		delete[] m_pGlyphInfos;
 		m_pGlyphInfos = nullptr;
 
-		m_uiNumReservedGlyphs = uiSTR_SIZE * uiNUM_LAYERS;
-		if(m_uiNumReservedGlyphs == 0)
+		m_uiGlyphInfosArraySize = uiSTR_SIZE * uiNUM_LAYERS;
+		if(m_uiGlyphInfosArraySize == 0)
 			return;
 
-		m_pGlyphInfos = HY_NEW GlyphInfo[m_uiNumReservedGlyphs];
+		m_pGlyphInfos = HY_NEW GlyphInfo[m_uiGlyphInfosArraySize];
 	}
 
 	glm::vec2 *pWritePos = HY_NEW glm::vec2[uiNUM_LAYERS];
@@ -1039,7 +1031,7 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphInfos()
 
 offsetCalculation:
 
-	for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
+	for(uint32 i = 0; i < m_uiGlyphInfosArraySize; ++i)
 		m_pGlyphInfos[i].vOffset.x = m_pGlyphInfos[i].vOffset.y = 0.0f;
 
 	memset(pWritePos, 0, sizeof(glm::vec2) * uiNUM_LAYERS);
@@ -1275,8 +1267,7 @@ offsetCalculation:
 	// Push the final line (row)
 	vNewlineInfo.push_back(LineInfo(fCurLineWidth, (fCurLineAscender + fCurLineDecender), uiNewlineIndex));
 
-	m_uiNumValidCharacters = uiSTR_SIZE;
-	m_uiNumRenderQuads = ((m_uiNumValidCharacters - uiNumUnprintableCharacters) * uiNUM_LAYERS);
+	m_uiNumRenderQuads = ((uiSTR_SIZE - uiNumUnprintableCharacters) * uiNUM_LAYERS);
 
 	// Fix each text line to match proper alignment (by default, HYALIGN_Left is already set at this point)
 	if(m_eAlignment != HYALIGN_Left)
@@ -1291,7 +1282,7 @@ offsetCalculation:
 			fNudgeAmt *= (m_eAlignment == HYALIGN_Center) ? 0.5f : 1.0f; // else HYALIGN_Right|HYALIGN_Justify
 
 			uint32 uiStrIndex = vNewlineInfo[i].uiSTART_CHARACTER_INDEX;
-			uint32 uiEndIndex = (i + 1) < vNewlineInfo.size() ? vNewlineInfo[i + 1].uiSTART_CHARACTER_INDEX : m_uiNumValidCharacters;
+			uint32 uiEndIndex = (i + 1) < vNewlineInfo.size() ? vNewlineInfo[i + 1].uiSTART_CHARACTER_INDEX : uiSTR_SIZE;
 
 			if(m_eAlignment != HYALIGN_Justify)
 			{
@@ -1380,11 +1371,11 @@ offsetCalculation:
 		else if(0 != (m_uiTextAttributes & TEXTATTRIB_CenterVertically))
 		{
 			float fCenterNudgeAmt = (m_vBoxDimensions.y - m_fUsedPixelHeight) * 0.5f;
-			for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
+			for(uint32 i = 0; i < m_uiGlyphInfosArraySize; ++i)
 				m_pGlyphInfos[i].vOffset.y -= fCenterNudgeAmt;
 		}
 
-		for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
+		for(uint32 i = 0; i < m_uiGlyphInfosArraySize; ++i)
 		{
 			m_pGlyphInfos[i].vOffset.x -= m_vBoxDimensions.x * 0.5f;
 			m_pGlyphInfos[i].vOffset.y -= m_vBoxDimensions.y * 0.5f;
@@ -1393,7 +1384,7 @@ offsetCalculation:
 	//else if(0 != (m_uiTextAttributes & TEXTATTRIB_IsColumn))	// Move column text to fit below its node position, which will extend downward from
 	//{
 	//	float fTopLineNudgeAmt = vNewlineInfo[0].fUSED_HEIGHT;
-	//	for(uint32 i = 0; i < m_uiNumReservedGlyphs; ++i)
+	//	for(uint32 i = 0; i < m_uiGlyphInfosArraySize; ++i)
 	//		m_pGlyphInfos[i].vOffset.y -= fTopLineNudgeAmt;
 	//}
 
@@ -1421,7 +1412,8 @@ void IHyText<NODETYPE, ENTTYPE>::CalculateGlyphScaleKerning()
 		return;
 
 	float fGlyphScaleKerningAccum = 0.0f;
-	for(uint32 uiIndex = 0; uiIndex < m_uiNumValidCharacters; ++uiIndex)
+	uint32 uiNumValidCharacters = GetNumCharacters();
+	for(uint32 uiIndex = 0; uiIndex < uiNumValidCharacters; ++uiIndex)
 	{
 		uint32 uiGlyphOffsetIndex = HYTEXT2D_GlyphIndex(uiIndex, uiNUM_LAYERS, 0);
 
