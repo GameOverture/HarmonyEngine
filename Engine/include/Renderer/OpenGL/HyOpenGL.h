@@ -49,12 +49,12 @@ class HyOpenGL : public IHyRenderer
 	//bool											m_bVBO3dDirty;
 
 public:
-	HyOpenGL(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagnostics &diagnosticsRef);
+	HyOpenGL(std::vector<HyWindow *> &windowListRef, HyDiagnostics &diagnosticsRef);
 	virtual ~HyOpenGL(void);
 
 	virtual void SetCurrentWindow(uint32 uiIndex) override;
 
-	virtual void SetVSync(int32 iVSync) override;
+	virtual void SetVSync(int32 iVSync, uint32 uiWindowIndex) override;
 
 	virtual void StartRender() override;
 	

@@ -24,7 +24,7 @@ HyEngine::HyEngine(const HyInit &initStruct) :
 	m_Assets(m_Audio, m_Scene, m_Init.sDataPath),
 	m_Time(m_Init.uiUpdatesPerSec),
 	m_Diagnostics(m_Init, m_Time, m_Assets, m_Scene),
-	m_Renderer(m_Init.iVSync, m_WindowManager.GetWindowList(), m_Diagnostics)
+	m_Renderer(m_WindowManager.GetWindowList(), m_Diagnostics)
 {
 	HyAssert(sm_pInstance == nullptr, "Only one instance of IHyEngine may exist. Delete existing instance before constructing again.");
 

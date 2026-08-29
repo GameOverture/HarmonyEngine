@@ -126,7 +126,6 @@ void DlgNewProject::on_buttonBox_accepted()
 	jsonObj.insert("BuildPath", QString(ui->wgtBuildDir->GetRelPath() + "/"));
 
 	jsonObj.insert("UpdatesPerSec", static_cast<qint64>(hyInit.uiUpdatesPerSec));
-	jsonObj.insert("VSync", hyInit.iVSync);
 	jsonObj.insert("NumInputMaps", static_cast<qint64>(hyInit.uiNumInputMaps));
 	jsonObj.insert("ShowCursor", hyInit.bShowCursor);
 
@@ -140,6 +139,7 @@ void DlgNewProject::on_buttonBox_accepted()
 	QJsonObject windowInfoObj;
 	windowInfoObj.insert("Name", ui->txtTitleName->text());
 	windowInfoObj.insert("Type", hyInit.windowInfoList[0].eMode);
+	windowInfoObj.insert("VSync", hyInit.windowInfoList[0].iVSync);
 	windowInfoObj.insert("ResolutionX", hyInit.windowInfoList[0].vSize.x);
 	windowInfoObj.insert("ResolutionY", hyInit.windowInfoList[0].vSize.y);
 	windowInfoObj.insert("LocationX", hyInit.windowInfoList[0].ptLocation.x);

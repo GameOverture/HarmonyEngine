@@ -20,8 +20,8 @@
 #include "Scene/Nodes/Objects/HyCamera.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
 
-HyOpenGL::HyOpenGL(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagnostics &diagnosticsRef) :
-	IHyRenderer(iVSync, windowListRef, diagnosticsRef),
+HyOpenGL::HyOpenGL(std::vector<HyWindow *> &windowListRef, HyDiagnostics &diagnosticsRef) :
+	IHyRenderer(windowListRef, diagnosticsRef),
 	m_mtxView(1.0f),
 	m_mtxProj(1.0f)
 {
@@ -50,6 +50,10 @@ HyOpenGL::HyOpenGL(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagn
 	for(uint32 i = 0; i < static_cast<uint32>(m_WindowListRef.size()); ++i)
 	{
 		SetCurrentWindow(i);
+
+#ifndef HY_PLATFORM_BROWSER
+		SetVSync(m_WindowListRef[i]->GetVSync(), i);
+#endif
 
 #if defined(HY_USE_SDL2) && !defined(HY_USE_GLFW)
 		// Prep GL extensions with GLAD+SDL2
@@ -167,10 +171,6 @@ HyOpenGL::HyOpenGL(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagn
 					iMaxTextureSize,
 					sCompressedTextureFormats);
 
-#ifndef HY_PLATFORM_BROWSER
-	SetVSync(m_iVSync);
-#endif
-
 	glDisable(GL_SCISSOR_TEST); // Harmony scissors are handled by using 2d quad (HyPrimitive2d) stencils, allowing transformations to take place
 	HyErrorCheck_OpenGL("HyOpenGL::RenderPass2d", "glDisable");
 }
@@ -199,17 +199,19 @@ HyOpenGL::~HyOpenGL(void)
 #endif
 }
 
-/*virtual*/ void HyOpenGL::SetVSync(int32 iVSync) /*override*/
+/*virtual*/ void HyOpenGL::SetVSync(int32 iVSync, uint32 uiWindowIndex) /*override*/
 {
-	m_iVSync = iVSync;
+	// Correct OpenGL context must be active in order to set V-Sync
+	SetCurrentWindow(uiWindowIndex);
+	m_pCurWindow->SetVSyncValue(iVSync);
 
 	// 0 for immediate updates
 	// 1 for updates synchronized with the vertical retrace
 	// -1 for adaptive vsync (SDL only?)
 #ifdef HY_USE_GLFW
-	glfwSwapInterval(m_iVSync);
+	glfwSwapInterval(iVSync);
 #elif defined(HY_USE_SDL2)
-	SDL_GL_SetSwapInterval(m_iVSync);
+	SDL_GL_SetSwapInterval(iVSync);
 #endif
 }
 
@@ -370,8 +372,6 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ void HyOpenGL::FinishRender()
 {
-	SetVSync(m_iVSync);
-
 #ifdef HY_USE_GLFW
 	glfwSwapBuffers(m_pCurWindow->GetInterop());
 #elif defined(HY_USE_SDL2)

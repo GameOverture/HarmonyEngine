@@ -65,11 +65,6 @@ DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :
 	else
 		ui->sbUpdatePerSec->setValue(defaultVals.uiUpdatesPerSec);
 
-	if(projSettingsObj.contains("VSync"))
-		ui->chkVSync->setChecked(projSettingsObj["VSync"].toInt() != 0);
-	else
-		ui->chkVSync->setChecked(defaultVals.iVSync != 0);
-
 	if(projSettingsObj.contains("ShowCursor"))
 		ui->chkShowCursor->setChecked(projSettingsObj["ShowCursor"].toBool());
 	else
@@ -137,7 +132,6 @@ QJsonObject DlgProjectSettings::SerializeWidgets()
 	settingsObj.insert("SourcePath", QString(ui->wgtSourceDir->GetRelPath() + "/"));
 	settingsObj.insert("BuildPath", QString(ui->wgtBuildDir->GetRelPath() + "/"));
 	settingsObj.insert("UpdatesPerSec", static_cast<qint64>(ui->sbUpdatePerSec->value()));
-	settingsObj.insert("VSync", ui->chkVSync->isChecked() ? 1 : 0);
 	settingsObj.insert("NumInputMaps", static_cast<qint64>(ui->sbInputMaps->value()));
 	settingsObj.insert("ShowCursor", ui->chkShowCursor->isChecked());
 	QVariant vGravity2d = ui->vsbGravity2d->GetValue();

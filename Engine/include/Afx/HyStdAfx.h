@@ -474,6 +474,7 @@ struct HyWindowInfo
 	glm::ivec2		vSize;
 	glm::ivec2		ptLocation;
 	HyWindowMode	eMode;
+	int32			iVSync;
 
 	HyWindowInfo &operator =(const HyWindowInfo &rhs)
 	{
@@ -481,6 +482,7 @@ struct HyWindowInfo
 		vSize = rhs.vSize;
 		ptLocation = rhs.ptLocation;
 		eMode = rhs.eMode;
+		iVSync = rhs.iVSync;
 
 		return *this;
 	}
@@ -495,7 +497,6 @@ struct HyInit
 	std::string					sDataPath;			// a directory path when loose assets are used, or file path when packed assets are used (without the extension)
 	std::vector<HyWindowInfo>	windowInfoList;
 	uint32						uiUpdatesPerSec;
-	int32						iVSync;
 	uint32						uiNumInputMaps;
 	bool						bShowCursor;
 	glm::vec2					vGravity2d;

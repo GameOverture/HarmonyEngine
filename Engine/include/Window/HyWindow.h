@@ -19,6 +19,7 @@ class HyWindowManager;
 class HyWindow
 {
 	friend class IHyRenderer;
+	friend class HyOpenGL;
 	friend class HyScene;
 
 	const uint32							m_uiINDEX;
@@ -26,7 +27,9 @@ class HyWindow
 	uint32									m_uiId;
 
 	HyWindowInfo							m_Info;
+	
 	bool									m_bHasFocus;
+	int32									m_iVSync;
 	glm::ivec2								m_vFramebufferSize;
 	
 	std::vector<HyCamera2d *>				m_Cams2dList;
@@ -86,6 +89,7 @@ public:
 	void								SetTitle(const std::string &sTitle);
 
 	bool								HasFocus() const;
+	int32								GetVSync() const;
 
 	int32								GetWidth();
 	int32								GetHeight();
@@ -136,6 +140,7 @@ public:
 #endif
 
 protected:
+	void SetVSyncValue(int32 iVSyncValue);
 	void DoWindowResized();
 	void DoWindowMoved();
 };

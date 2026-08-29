@@ -58,6 +58,7 @@ HyWindow::HyWindow(uint32 uiIndex, HyWindowManager &managerRef, const HyWindowIn
 	m_pInterop(nullptr)
 {
 	m_Info = windowInfoRef;
+	m_iVSync = m_Info.iVSync;
 	m_vFramebufferSize = m_Info.vSize;
 
 #if defined(HY_USE_GLFW)
@@ -221,6 +222,11 @@ void HyWindow::SetTitle(const std::string &sTitle)
 bool HyWindow::HasFocus() const
 {
 	return m_bHasFocus;
+}
+
+int32 HyWindow::GetVSync() const
+{
+	return m_iVSync;
 }
 
 int32 HyWindow::GetWidth()
@@ -655,6 +661,11 @@ void HyWindow::DoEvent(const SDL_Event &eventRef, HyInput &inputRef)
 	}
 }
 #endif
+
+void HyWindow::SetVSyncValue(int32 iVSyncValue)
+{
+	m_iVSync = iVSyncValue;
+}
 
 void HyWindow::DoWindowResized()
 {

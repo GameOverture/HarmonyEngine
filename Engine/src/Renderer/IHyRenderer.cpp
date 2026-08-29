@@ -19,8 +19,7 @@
 
 IHyRenderer *IHyRenderer::sm_pInstance = nullptr;
 
-IHyRenderer::IHyRenderer(int32 iVSync, std::vector<HyWindow *> &windowListRef, HyDiagnostics &diagnosticsRef) :
-	m_iVSync(iVSync),
+IHyRenderer::IHyRenderer(std::vector<HyWindow *> &windowListRef, HyDiagnostics &diagnosticsRef) :
 	m_WindowListRef(windowListRef),
 	m_DiagnosticsRef(diagnosticsRef),
 	m_VertexBuffer(*this),
@@ -219,6 +218,11 @@ void IHyRenderer::Render()
 
 		FinishRender();
 	}
+}
+
+int32 IHyRenderer::GetVSync(uint32 uiWindowIndex) const
+{
+	return m_WindowListRef[uiWindowIndex]->GetVSync();
 }
 
 /*virtual*/ void IHyRenderer::SetCurrentWindow(uint32 uiIndex)

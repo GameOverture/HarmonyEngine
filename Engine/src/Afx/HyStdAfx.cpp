@@ -110,13 +110,13 @@ HyInit::HyInit()
 	sGameName = "Untitled Game";
 	sDataPath = "data";
 	uiUpdatesPerSec = 0;
-	iVSync = 1;
 	uiNumInputMaps = 1;
 	bShowCursor = true;
 
 	HyWindowInfo windowInfoDefault;
 	windowInfoDefault.sName = "Untitled";
 	windowInfoDefault.eMode = HYWINDOW_WindowedFixed;
+	windowInfoDefault.iVSync = 0;
 	windowInfoDefault.vSize.x = 1280;
 	windowInfoDefault.vSize.y = 756;
 	windowInfoDefault.ptLocation.x = 80;
@@ -186,10 +186,6 @@ HyInit::HyInit(std::string sHyProjFileName)
 		uiUpdatesPerSec = projDoc["UpdatesPerSec"].GetUint();
 	else
 		uiUpdatesPerSec = defaultVals.uiUpdatesPerSec;
-	if(projDoc.HasMember("VSync"))
-		iVSync = projDoc["VSync"].GetInt();
-	else
-		iVSync = defaultVals.iVSync;
 	if(projDoc.HasMember("NumInputMaps"))
 		uiNumInputMaps = projDoc["NumInputMaps"].GetUint();
 	else
@@ -225,6 +221,11 @@ HyInit::HyInit(std::string sHyProjFileName)
 			winInfo.vSize.y = windowInfoObj["ResolutionY"].GetInt();
 			winInfo.ptLocation.x = windowInfoObj["LocationX"].GetInt();
 			winInfo.ptLocation.y = windowInfoObj["LocationY"].GetInt();
+			if(windowInfoObj.HasMember("VSync"))
+				winInfo.iVSync = windowInfoObj["VSync"].GetInt();
+			else
+				winInfo.iVSync = defaultVals.windowInfoList[0].iVSync;
+
 			windowInfoList.push_back(winInfo);
 		}
 	}
