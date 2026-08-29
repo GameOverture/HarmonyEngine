@@ -24,11 +24,10 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(const HyNodePath &nodePath, ENTTYPE *pPare
 	NODETYPE(HYTYPE_Audio, nodePath, pParent),
 	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(0),
-	m_fVolume(1.0f),
-	m_fPitch(0.0f),
-	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
-	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
+	volume(*this, NODETYPE::DIRTY_Audio),
+	pitch(*this, NODETYPE::DIRTY_Audio)
 {
+	volume.Set(1.0f);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -36,11 +35,10 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(uint32 uiSoundChecksum, uint32 uiBankId, E
 	NODETYPE(HYTYPE_Audio, HyNodePath(uiSoundChecksum, uiBankId), pParent),
 	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(0),
-	m_fVolume(1.0f),
-	m_fPitch(0.0f),
-	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
-	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
+	volume(*this, NODETYPE::DIRTY_Audio),
+	pitch(*this, NODETYPE::DIRTY_Audio)
 {
+	volume.Set(1.0f);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -48,11 +46,10 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(HyAudioHandle hAudioHandle, ENTTYPE *pPare
 	NODETYPE(HYTYPE_Audio, HyNodePath(hAudioHandle.first, hAudioHandle.second), pParent),
 	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(0),
-	m_fVolume(1.0f),
-	m_fPitch(0.0f),
-	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
-	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
+	volume(*this, NODETYPE::DIRTY_Audio),
+	pitch(*this, NODETYPE::DIRTY_Audio)
 {
+	volume.Set(1.0f);
 }
 
 template<typename NODETYPE, typename ENTTYPE>
@@ -60,11 +57,10 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(std::string sFilePath, bool bIsStreaming, 
 	NODETYPE(HYTYPE_Audio, HyNodePath(), pParent),
 	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(0),
-	m_fVolume(1.0f),
-	m_fPitch(0.0f),
-	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
-	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
+	volume(*this, NODETYPE::DIRTY_Audio),
+	pitch(*this, NODETYPE::DIRTY_Audio)
 {
+	volume.Set(1.0f);
 	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateAudio(HyIO::CleanPath(sFilePath.c_str()), bIsStreaming, iInstanceLimit, iCategoryId);
 	this->m_NodePath.Set(hTexQuadHandle.first, hTexQuadHandle.second);
 }
@@ -74,10 +70,8 @@ IHyAudio<NODETYPE, ENTTYPE>::IHyAudio(const IHyAudio &copyRef) :
 	NODETYPE(copyRef),
 	m_hUNIQUE_ID(sm_hUniqueIdCounter++),
 	m_uiCueFlags(copyRef.m_uiCueFlags),
-	m_fVolume(copyRef.m_fVolume),
-	m_fPitch(copyRef.m_fPitch),
-	volume(m_fVolume, *this, NODETYPE::DIRTY_Audio),
-	pitch(m_fPitch, *this, NODETYPE::DIRTY_Audio)
+	volume(*this, NODETYPE::DIRTY_Audio),
+	pitch(*this, NODETYPE::DIRTY_Audio)
 {
 	for(uint32 i = 0; i < static_cast<uint32>(copyRef.m_AudioStateAttribList.size()); ++i)
 		m_AudioStateAttribList.push_back(copyRef.m_AudioStateAttribList[i]);
@@ -98,8 +92,6 @@ const IHyAudio<NODETYPE, ENTTYPE> &IHyAudio<NODETYPE, ENTTYPE>::operator=(const 
 	NODETYPE::operator=(rhs);
 
 	m_uiCueFlags = rhs.m_uiCueFlags;
-	m_fVolume = rhs.m_fVolume;
-	m_fPitch = rhs.m_fPitch;
 	
 	m_AudioStateAttribList.clear();
 	for(uint32 i = 0; i < static_cast<uint32>(rhs.m_AudioStateAttribList.size()); ++i)

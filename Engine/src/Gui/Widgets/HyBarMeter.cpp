@@ -19,8 +19,7 @@ HyBarMeter::HyBarMeter(HyEntity2d *pParent /*= nullptr*/) :
 	m_iValue(0),
 	m_BarMask(this),
 	m_Bar(HyUiPanelInit(), this),
-	m_fBarProgressAmt(0.0f),
-	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
+	m_BarProgressAmt(*this, 0)
 {
 	m_NumberFormat.SetFractionPrecision(0, 1);
 }
@@ -32,8 +31,7 @@ HyBarMeter::HyBarMeter(const HyUiPanelInit &panelInit, const HyUiPanelInit &barI
 	m_iValue(0),
 	m_BarMask(this),
 	m_Bar(this),
-	m_fBarProgressAmt(0.0f),
-	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
+	m_BarProgressAmt(*this, 0)
 {
 	m_NumberFormat.SetFractionPrecision(0, 1);
 	Setup(panelInit, barInit);
@@ -46,8 +44,7 @@ HyBarMeter::HyBarMeter(const HyUiPanelInit &panelInit, const HyUiPanelInit &barI
 	m_iValue(0),
 	m_BarMask(this),
 	m_Bar(this),
-	m_fBarProgressAmt(0.0f),
-	m_BarProgressAmt(m_fBarProgressAmt, *this, 0)
+	m_BarProgressAmt(*this, 0)
 {
 	m_NumberFormat.SetFractionPrecision(0, 1);
 	Setup(panelInit, barInit, textInit);

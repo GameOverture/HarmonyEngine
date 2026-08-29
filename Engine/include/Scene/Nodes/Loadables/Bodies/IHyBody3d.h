@@ -21,13 +21,12 @@ class IHyBody3d : public IHyLoadable3d, public IHyBody
 	friend class HyEntity3d;
 
 protected:
-	float							m_fAlpha;
 	float							m_fCachedAlpha;
 	glm::vec3						m_CachedTint;
 	
 public:
 	HyAnimVec3						tint;
-	HyAnimFloat						alpha;
+	HyAnimVec1						alpha;
 
 public:
 	IHyBody3d(HyType eNodeType, const HyNodePath &nodePath, HyEntity3d *pParent);

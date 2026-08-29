@@ -69,8 +69,7 @@ class HyScrollBar : public HyEntity2d
 
 	bool						m_bIsValidMetrics;
 
-	float						m_fScrollPos;
-	HyAnimFloat					m_AnimScrollPos;
+	HyAnimVec1					m_AnimScrollPos;
 
 	float						m_fClientTotalSize;
 	float						m_fClientShownSize;

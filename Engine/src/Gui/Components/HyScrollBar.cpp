@@ -137,8 +137,7 @@ HyScrollBar::HyScrollBar(HyOrientation eOrientation, uint32 uiDiameter, HyEntity
 	m_NegBtn(this),
 	m_fLineScrollAmt(20.0f),
 	m_bIsValidMetrics(false),
-	m_fScrollPos(0.0f),
-	m_AnimScrollPos(m_fScrollPos, *this, 0),
+	m_AnimScrollPos(*this, 0),
 	m_fpCallback(nullptr),
 	m_pCallbackData(nullptr)
 {
@@ -156,8 +155,7 @@ HyScrollBar::HyScrollBar(HyOrientation eOrientation, const HyUiPanelInit &posBtn
 	m_NegBtn(this),
 	m_fLineScrollAmt(20.0f),
 	m_bIsValidMetrics(false),
-	m_fScrollPos(0.0f),
-	m_AnimScrollPos(m_fScrollPos, *this, 0),
+	m_AnimScrollPos(*this, 0),
 	m_fpCallback(nullptr),
 	m_pCallbackData(nullptr)
 {

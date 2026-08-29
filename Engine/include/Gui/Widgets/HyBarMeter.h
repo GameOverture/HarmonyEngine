@@ -39,8 +39,7 @@ protected:
 	HyStencil			m_BarStencil;
 	HyPanel				m_Bar;
 
-	float				m_fBarProgressAmt;
-	HyAnimFloat			m_BarProgressAmt;
+	HyAnimVec1			m_BarProgressAmt;
 	
 	HyNumberFormat		m_NumberFormat;
 

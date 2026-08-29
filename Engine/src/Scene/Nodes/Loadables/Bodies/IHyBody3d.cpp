@@ -16,14 +16,14 @@
 
 IHyBody3d::IHyBody3d(HyType eNodeType, const HyNodePath &nodePath, HyEntity3d *pParent) :
 	IHyLoadable3d(eNodeType, nodePath, pParent),
-	m_fAlpha(1.0f),
 	m_fCachedAlpha(1.0f),
 	tint(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color)
+	alpha(*this, DIRTY_Color)
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
 	tint.SetAll(1.0f);
+	alpha.Set(1.0f);
 
 	if(m_pParent)
 	{
@@ -38,7 +38,7 @@ IHyBody3d::IHyBody3d(const IHyBody3d &copyRef) :
 	IHyLoadable3d(copyRef),
 	IHyBody(copyRef),
 	tint(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color)
+	alpha(*this, DIRTY_Color)
 {
 	m_uiFlags |= NODETYPE_IsBody;
 
@@ -50,7 +50,7 @@ IHyBody3d::IHyBody3d(IHyBody3d &&donor) noexcept :
 	IHyLoadable3d(std::move(donor)),
 	IHyBody(std::move(donor)),
 	tint(*this, DIRTY_Color),
-	alpha(m_fAlpha, *this, DIRTY_Color)
+	alpha(*this, DIRTY_Color)
 {
 	m_uiFlags |= NODETYPE_IsBody;
 

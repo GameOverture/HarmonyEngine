@@ -11,7 +11,7 @@
 #define IHyAudio_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Scene/AnimFloats/HyAnimFloat.h"
+#include "Scene/AnimFloats/HyAnimVec1.h"
 #include "Assets/Nodes/HyNodePath.h"
 
 #define HYAUDIO_InfiniteLoops 255
@@ -35,8 +35,6 @@ class IHyAudio : public NODETYPE
 	const HyAudioNodeHandle			m_hUNIQUE_ID;
 
 	uint32							m_uiCueFlags;
-	float							m_fVolume;
-	float							m_fPitch;
 
 	// Configurable
 	struct AudioStateAttribs
@@ -61,8 +59,8 @@ class IHyAudio : public NODETYPE
 	HyAudioHandle					m_hLastPlayed;			// Checksum/BankId of last played sound from m_SoundOrderList
 
 public:
-	HyAnimFloat						volume;
-	HyAnimFloat						pitch;
+	HyAnimVec1						volume;
+	HyAnimVec1						pitch;
 
 public:
 	IHyAudio(const HyNodePath &nodePath, ENTTYPE *pParent);

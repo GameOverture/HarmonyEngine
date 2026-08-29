@@ -25,10 +25,10 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(const HyNodePath &nodePath, ENTTYPE *pParent
 	m_vBoxDimensions(0.0f, 0.0f),
 	m_fScaleBoxModifier(1.0f),
 	m_eAlignment(HYALIGN_Left),
-	m_uiIndent(0),
 	m_pGlyphInfos(nullptr),
 	m_uiNumReservedGlyphs(0),
 	m_uiNumValidCharacters(0),
+	m_uiIndent(0),
 	m_fUsedPixelWidth(0.0f),
 	m_fUsedPixelHeight(0.0f)
 {
@@ -44,11 +44,11 @@ IHyText<NODETYPE, ENTTYPE>::IHyText(const IHyText &copyRef) :
 	m_vBoxDimensions(copyRef.m_vBoxDimensions),
 	m_fScaleBoxModifier(copyRef.m_fScaleBoxModifier),
 	m_eAlignment(copyRef.m_eAlignment),
-	m_uiIndent(copyRef.m_uiIndent),
 	m_pGlyphInfos(nullptr),
 	m_uiNumReservedGlyphs(copyRef.m_uiNumReservedGlyphs),
 	m_uiNumValidCharacters(copyRef.m_uiNumValidCharacters),
 	m_uiNumRenderQuads(copyRef.m_uiNumRenderQuads),
+	m_uiIndent(copyRef.m_uiIndent),
 	m_fUsedPixelWidth(copyRef.m_fUsedPixelWidth),
 	m_fUsedPixelHeight(copyRef.m_fUsedPixelHeight)
 {
@@ -82,11 +82,11 @@ const IHyText<NODETYPE, ENTTYPE> &IHyText<NODETYPE, ENTTYPE>::operator=(const IH
 	m_vBoxDimensions = rhs.m_vBoxDimensions;
 	m_fScaleBoxModifier = rhs.m_fScaleBoxModifier;
 	m_eAlignment = rhs.m_eAlignment;
-	m_uiIndent = rhs.m_uiIndent;
 	m_pGlyphInfos = nullptr;
 	m_uiNumReservedGlyphs = rhs.m_uiNumReservedGlyphs;
 	m_uiNumValidCharacters = rhs.m_uiNumValidCharacters;
 	m_uiNumRenderQuads = rhs.m_uiNumRenderQuads;
+	m_uiIndent = rhs.m_uiIndent;
 	m_fUsedPixelWidth = rhs.m_fUsedPixelWidth;
 	m_fUsedPixelHeight = rhs.m_fUsedPixelHeight;
 	MarkAsDirty();

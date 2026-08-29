@@ -81,7 +81,6 @@ protected:
 	float								m_fScaleBoxModifier;
 
 	HyAlignment							m_eAlignment;
-	uint32								m_uiIndent;
 
 	struct GlyphInfo
 	{
@@ -104,6 +103,8 @@ protected:
 
 	uint32								m_uiNumValidCharacters;		// How many characters (with their effects) were rendered
 	uint32								m_uiNumRenderQuads;
+
+	uint32								m_uiIndent;
 
 	float								m_fUsedPixelWidth;
 	float								m_fUsedPixelHeight;
