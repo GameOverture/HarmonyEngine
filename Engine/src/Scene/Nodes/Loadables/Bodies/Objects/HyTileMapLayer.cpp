@@ -9,12 +9,15 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyTileMapLayer.h"
+#include "Assets/HyAssets.h"
 #include "Assets/Nodes/Objects/HyTileMapData.h"
 #include "Scene/Physics/Fixtures/HyShape2d.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
 HyTileMapLayer::HyTileMapLayer(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
+	m_RenderSettings(0, 0),
+	m_vCellDimensions(0, 0),
 	m_eLayout(HYTILEMAPLAYOUT_Unknown),
 	m_fpLocalToCellFunc(nullptr),
 	m_fpCellToLocalFunc(nullptr),
@@ -25,6 +28,8 @@ HyTileMapLayer::HyTileMapLayer(HyEntity2d *pParent /*= nullptr*/) :
 
 HyTileMapLayer::HyTileMapLayer(const HyNodePath &nodePath, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
+	m_RenderSettings(0, 0),
+	m_vCellDimensions(0, 0),
 	m_eLayout(HYTILEMAPLAYOUT_Unknown),
 	m_fpLocalToCellFunc(nullptr),
 	m_fpCellToLocalFunc(nullptr),
@@ -41,6 +46,10 @@ HyTileMapLayer::~HyTileMapLayer(void)
 const HyTileMapLayer &HyTileMapLayer::operator=(HyTileMapLayer &&donor)
 {
 	HyEntity2d::operator=(std::move(donor));
+
+	m_RenderSettings = donor.m_RenderSettings;
+	m_vCellDimensions = donor.m_vCellDimensions;
+	m_eLayout = donor.m_eLayout;
 	m_fpLocalToCellFunc = donor.m_fpLocalToCellFunc;
 	m_fpCellToLocalFunc = donor.m_fpCellToLocalFunc;
 	m_fTotalWidth = donor.m_fTotalWidth;
@@ -49,13 +58,47 @@ const HyTileMapLayer &HyTileMapLayer::operator=(HyTileMapLayer &&donor)
 	return *this;
 }
 
-bool HyTileMapLayer::WriteCell(std::string sTileSet, glm::ivec2 ptCellCoord, uint16_t uiTileId)
+bool HyTileMapLayer::WriteCell(HyTileSetHandle hTileSet, uint16_t uiTileId, glm::ivec2 ptCellCoord)
 {
-	// TILETODO:
+	// Determine chunk coordinate (can reuse TileMapPointToCell_Square function for this purpose)
+	glm::ivec2 ptChunkCoord = HyMath::TileMapPointToCell_Square(ptCellCoord, glm::ivec2(HYASSETS_TileMapChunkSize, HYASSETS_TileMapChunkSize));
+
+	// Try to find existing chunk
+	TileChunk *pChunk = nullptr;
+	for(TileChunk &tileChunkRef : m_ChunkList)
+	{
+		if(tileChunkRef.m_ptCoordinate == ptChunkCoord)
+		{
+			pChunk = &tileChunkRef;
+			break;
+		}
+	}
+	if(pChunk == nullptr)
+	{
+		m_ChunkList.emplace_back(ptChunkCoord);
+		pChunk = &m_ChunkList.back();
+	}
+
+	// Find existing TileMapBatch by comparing the tile set
+	HyTileMapBatch *pTileMapBatch = nullptr;
+	for(HyTileMapBatch *pTileMap : pChunk->m_RenderBatchList)
+	{
+		if(pTileMap->GetHandle() == hTileSet)
+		{
+			pTileMapBatch = pTileMap;
+			break;
+		}
+	}
+	if(pTileMapBatch == nullptr)
+	{
+
+		//pChunk->m_RenderBatchList.emplace_back(sm_pAssets->GetTileSet(hTileSet), this);
+	}
+
 	return false;
 }
 
-glm::ivec2 HyTileMapLayer::GetCellDimensions() const
+const glm::ivec2 &HyTileMapLayer::GetCellDimensions() const
 {
 	return m_vCellDimensions;
 }

@@ -18,6 +18,8 @@ class HyAssets;
 
 class HyFileTileSet : public IHyFile
 {
+	HyTileSetHandle								m_hCrcHandle;
+
 	bool										m_bUseDescriptorEx;
 
 	int32										m_iColumns;
@@ -39,8 +41,11 @@ public:
 	HyFileTileSet(std::string sTileSetName, uint32 uiManifestIndex, HyJsonObj tileSetObj);
 	~HyFileTileSet();
 	
-	int32 GetNumColumns() const;
-	int32 GetNumRows() const;
+	HyTileSetHandle GetHandle() const;
+	const std::string &GetTileSetName() const;
+
+	int32 GetNumSubAtlasColumns() const;
+	int32 GetNumSubAtlasRows() const;
 
 	void DeleteTexelData();
 

@@ -533,7 +533,7 @@
 	uiDataSizeOut = iNumTexels * iTexelSize;
 	
 	pTexelDataOut = HY_NEW unsigned char[uiDataSizeOut];
-	memcpy(pTexelDataOut, &fileData[HYASSETS_MagicNumberHeaderSize + sizeof(int32_t)], uiDataSizeOut);
+	memcpy(pTexelDataOut, &fileData[HYASSETS_MagicNumberHeaderSize + sizeof(int32_t) + sizeof(int32_t)], uiDataSizeOut);
 	if(pTexelDataOut == nullptr || uiDataSizeOut == 0)
 	{
 		HyLogError("HyIO::ParseRawTextureFile() - Failed to load texel data: " << sFilePath);

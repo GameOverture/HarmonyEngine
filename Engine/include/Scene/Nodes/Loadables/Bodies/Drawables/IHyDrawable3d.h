@@ -13,6 +13,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/IHyBody3d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable.h"
+#include "Utilities/HyJson.h"
 
 class IHyDrawable3d : public IHyBody3d, public IHyDrawable
 {

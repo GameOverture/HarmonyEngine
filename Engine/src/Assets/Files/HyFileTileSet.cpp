@@ -11,9 +11,11 @@
 #include "Assets/Files/HyFileTileSet.h"
 #include "Assets/HyAssets.h"
 #include "HyEngine.h"
+#include "Utilities/Crc32.h"
 
 HyFileTileSet::HyFileTileSet(std::string sTileSetName, uint32 uiManifestIndex, HyJsonObj tileSetObj) :
 	IHyFile(HYFILE_TileSet, sTileSetName, 0, uiManifestIndex),
+	m_hCrcHandle(HyAssets::CalcTileSetHandle(sTileSetName)),
 	m_bUseDescriptorEx(tileSetObj["isEx"].GetBool()),
 	m_iColumns(tileSetObj["cols"].GetInt()),
 	m_iRows(tileSetObj["rows"].GetInt()),
@@ -33,12 +35,22 @@ HyFileTileSet::~HyFileTileSet()
 	DeleteTexelData();
 }
 
-int32 HyFileTileSet::GetNumColumns() const
+HyTileSetHandle HyFileTileSet::GetHandle() const
+{
+	return m_hCrcHandle;
+}
+
+const std::string &HyFileTileSet::GetTileSetName() const
+{
+	return m_sFILE_NAME;
+}
+
+int32 HyFileTileSet::GetNumSubAtlasColumns() const
 {
 	return m_iColumns;
 }
 
-int32 HyFileTileSet::GetNumRows() const
+int32 HyFileTileSet::GetNumSubAtlasRows() const
 {
 	return m_iRows;
 }

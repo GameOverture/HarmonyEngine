@@ -10,6 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Gui/Widgets/HyLabel.h"
 #include "Diagnostics/Console/IHyConsole.h"
+#include "Assets/Nodes/Objects/HyTextData.h"
 
 HyLabel::HyLabel(HyEntity2d *pParent /*= nullptr*/) :
 	IHyWidget(pParent),

@@ -120,6 +120,9 @@ public:
 	uint32 GetNumAtlases();
 	HyFilesManifest *GetLoadedAtlases();
 
+	static HyTileSetHandle CalcTileSetHandle(const std::string &sTileSetName);
+	HyFileTileSet *GetTileSet(HyTileSetHandle hTileSet) const;
+
 	HyGLTF *GetGltf(const std::string &sIdentifier);
 
 	void AcquireNodeData(IHyLoadable *pLoadable, const IHyNodeData *&pDataOut);

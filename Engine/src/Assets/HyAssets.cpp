@@ -11,6 +11,7 @@
 #include "Afx/HyInteropAfx.h"
 #include "Assets/HyAssets.h"
 #include "Assets/Files/HyFileAtlas.h"
+#include "Assets/Files/HyFileTileSet.h"
 #include "Assets/Files/HyGLTF.h"
 #include "Assets/Files/HyFileAudio.h"
 #include "Assets/Nodes/Objects/HyAudioData.h"
@@ -220,6 +221,24 @@ HyFilesManifest *HyAssets::GetLoadedAtlases()
 	return m_FilesMap[HYFILE_Atlas].m_pLoadedManifest;
 }
 
+/*static*/ HyTileSetHandle HyAssets::CalcTileSetHandle(const std::string &sTileSetName)
+{
+	std::string sCrcName(sTileSetName);
+	std::transform(sCrcName.begin(), sCrcName.end(), sCrcName.begin(), ::tolower);
+
+	return crc32_fast(sCrcName.data(), sCrcName.size(), 0);
+}
+
+HyFileTileSet *HyAssets::GetTileSet(HyTileSetHandle hTileSet) const
+{
+	for(uint32 i = 0; i < m_FilesMap[HYFILE_TileSet].m_uiNumFiles; ++i)
+	{
+		if(static_cast<HyFileTileSet *>(m_FilesMap[HYFILE_TileSet].m_pFiles)[i].GetHandle() == hTileSet)
+			return &static_cast<HyFileTileSet *>(m_FilesMap[HYFILE_TileSet].m_pFiles)[i];
+	}
+
+	return nullptr;
+}
 
 HyGLTF *HyAssets::GetGltf(const std::string &sIdentifier)
 {

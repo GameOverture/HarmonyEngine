@@ -265,7 +265,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef, float fExtrapolatePercent)
 		if(m_NodeList_LoadedDrawable3d[i]->IsValidToRender() == false)
 			continue;
 
-		rendererRef.AppendDrawable3d(i, *m_NodeList_LoadedDrawable3d[i], HY_FULL_CAMERA_MASK, fExtrapolatePercent);
+		rendererRef.AppendDrawable3d(i + 1, *m_NodeList_LoadedDrawable3d[i], HY_FULL_CAMERA_MASK, fExtrapolatePercent); // NOTE: i + 1 because '0' is reserved for stencils and disables batching
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -286,7 +286,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef, float fExtrapolatePercent)
 		if(m_NodeList_LoadedDrawable2d[i]->IsValidToRender() == false || CalculateCameraMask(*m_NodeList_LoadedDrawable2d[i], uiCameraMask) == false)
 			continue;
 
-		rendererRef.AppendDrawable2d(i, *m_NodeList_LoadedDrawable2d[i], uiCameraMask, fExtrapolatePercent);
+		rendererRef.AppendDrawable2d(i + 1, *m_NodeList_LoadedDrawable2d[i], uiCameraMask, fExtrapolatePercent); // NOTE: i + 1 because '0' is reserved for stencils and disables batching
 	}
 	
 	//// Debug physics draws

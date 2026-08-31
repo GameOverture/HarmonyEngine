@@ -147,7 +147,7 @@ set(HYENGINE_SOURCE_FILES
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.cpp
-	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMapChunk.cpp
+	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMapBatch.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySpine.cpp
 	src/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.cpp
@@ -292,7 +292,7 @@ set(HYENGINE_HEADER_FILES
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HySprite2d.h
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyText2d.h
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTexturedQuad2d.h
-	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMapChunk.h
+	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMapBatch.h
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySprite.h
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHySpine.h
 	include/Scene/Nodes/Loadables/Bodies/Drawables/Objects/IHyText.h

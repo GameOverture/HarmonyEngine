@@ -54,6 +54,7 @@ typedef uint32 HyTextureHandle;
 typedef uint32 HyStencilHandle;
 typedef uint32 HyShaderHandle;
 typedef uint32 HyVertexBufferHandle;
+typedef uint32 HyTileSetHandle;							// 32bit CRC derived from the tile set's name in lowercase
 typedef uint32 HyAudioNodeHandle;
 typedef std::pair<uint32, uint32> HyTextureQuadHandle;	// FIRST is the checksum, SECOND is the bank ID ---OR--- FIRST is '0', indicating SECOND is a 'HyAuxiliaryFileHandle'
 typedef std::pair<uint32, uint32> HyAudioHandle;		// FIRST is the checksum, SECOND is the bank ID ---OR--- FIRST is '0', indicating SECOND is a 'HyAuxiliaryFileHandle'
@@ -76,6 +77,7 @@ enum HyType
 	HYTYPE_Audio,
 	HYTYPE_Particles,
 	HYTYPE_Sprite,
+	HYTYPE_TileMapBatch,
 	HYTYPE_Spine,
 	HYTYPE_TexturedQuad,
 	HYTYPE_Primitive,

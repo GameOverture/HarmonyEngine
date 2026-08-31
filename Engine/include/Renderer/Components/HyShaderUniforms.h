@@ -11,8 +11,6 @@
 #define HyShaderUniforms_h__
 
 #include "Afx/HyStdAfx.h"
-#include "Assets/HyAssets.h"
-#include "Renderer/Components/HyVertexBuffer.h"
 
 #define HY_SHADER_UNIFORM_NAME_LENGTH		16	// includes the NULL terminator
 #define HY_SHADER_UNIFORM_BUFFER_LENGTH		(sizeof(uint32) + HY_SHADER_UNIFORM_NAME_LENGTH + sizeof(glm::mat4))
