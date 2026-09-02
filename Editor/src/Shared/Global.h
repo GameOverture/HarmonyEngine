@@ -41,7 +41,7 @@ class Project;
 #define HySrcEntityFilter "_hy_"
 #define HySrcEntityNamespace "hy"
 
-#define HYGUI_FILE_VERSION 18
+#define HYGUI_FILE_VERSION 19
 
 #define MAX_INT_RANGE 16777215						// Uses 3 bytes (0xFFFFFF)... Qt uses this value for their default ranges in QSpinBox
 

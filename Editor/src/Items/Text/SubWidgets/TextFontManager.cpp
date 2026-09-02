@@ -703,9 +703,9 @@ void TextFontManager::RegenFontArray()
 				glyphInfoObj.insert("offset_x", pGlyph->offset_x);
 				glyphInfoObj.insert("offset_y", pGlyph->offset_y);
 				glyphInfoObj.insert("left", pGlyph->s0);
-				glyphInfoObj.insert("top", pGlyph->t0);
+				glyphInfoObj.insert("top", 1.0f - pGlyph->t0);		// NOTE: Flipping UV Y-Axis because Harmony uses bottom-to-top
 				glyphInfoObj.insert("right", pGlyph->s1);
-				glyphInfoObj.insert("bottom", pGlyph->t1);
+				glyphInfoObj.insert("bottom", 1.0f - pGlyph->t1);	// NOTE: Flipping UV Y-Axis because Harmony uses bottom-to-top
 			}
 
 #if 0		// Not using kerning data

@@ -107,6 +107,8 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 			// If there aren't enough new textures then shift textures (and their frames) to fill any remaining gaps in the indices.
 			const int iTOTAL_NUM_TEXTURES = iNUM_NEW_TEXTURES + existingTexturesInfoList.size();
 
+			// TODO: "textureSizes" isn't getting cleared out, so if a previous pack had more textures than this one, old/stale sizes will be left in the "textureSizes" array
+
 			int iNumNewTexturesUsed = 0;
 			int iCurrentIndex = 0;
 			for(; iCurrentIndex < iTOTAL_NUM_TEXTURES; ++iCurrentIndex)
@@ -255,10 +257,10 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 		HyMargins<int> frameMargins = atlasPackerRef.GetFrameMargins();
 		pFrame->UpdateInfoFromPacker(iActualTextureIndex,
 									 packFrameRef.pos.x() + frameMargins.left,
-									 packFrameRef.pos.y() + frameMargins.top,
+									 textureSize.height() - packFrameRef.pos.y() - packFrameRef.crop.height() - frameMargins.top, // NOTE: Packer uses top-left for position, but we store it bottom-left
 									 textureSize);
 
-		QPoint pos(pFrame->GetX(), pFrame->GetY());
+		QPoint pos(pFrame->GetX(), packFrameRef.pos.y() + frameMargins.top);
 		p.drawImage(pos.x(), pos.y(), QImage(packFrameRef.path), packFrameRef.crop.x(), packFrameRef.crop.y(), packFrameRef.crop.width(), packFrameRef.crop.height());
 	}
 

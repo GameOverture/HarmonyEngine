@@ -31,6 +31,8 @@
 #include "Utilities/HyMath.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
+#include "vendor/SOIL2/src/SOIL2/stb_image.h"
+
 #include <fstream>
 #include <iostream>
 
@@ -80,6 +82,8 @@ HyAssets::HyAssets(HyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDa
 	m_bInitialized(false),
 	m_uiLoadingCountTotal(0)
 {
+	stbi_set_flip_vertically_on_load(true);
+
 	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();
 	ThreadWait();

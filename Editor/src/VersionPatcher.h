@@ -26,6 +26,7 @@ private:
 	static void Patch_15to16(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef); // Within 'dataAtlasDocRef', adding 'cropMask' and changing [top,left,right,bottom] to 'frameMask' for each asset. THEN within 'metaAtlasDocRef', update all assets' 'cropRight' and 'cropBottom' to be margins, not stored QRect
 	static void Patch_16to17(QJsonDocument &metaAtlasDocRef); // Upgrading 'isSubAtlas' (bool) to be 'subAtlasType' (string); ITEM_None is serialized as empty string ""
 	static void Patch_17to18(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef); // Modifying "textureInfo" to now hold data format and internal format when uncompressed
+	static void Patch_18to19(QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef); // UVs being flipped from top-to-bottom -> bottom-to-top
 
 	static void RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta);
 };

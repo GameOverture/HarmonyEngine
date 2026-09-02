@@ -223,8 +223,12 @@
 			Patch_17to18(metaAtlasDoc, dataAtlasDoc);
 			[[fallthrough]];
 		case 18:
+			HyGuiLog("Patching project files: version 18 -> 19", LOGTYPE_Info);
+			Patch_18to19(dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
+		case 19:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 18, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 19, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -1516,6 +1520,123 @@
 				dataTextureObj.insert("textureInfo", QJsonValue(static_cast<qint64>(newInfo.GetBucketId())));
 				dataTexturesArray.replace(iTextureIndex, dataTextureObj);
 			}
+		}
+		dataBankObj.insert("textures", dataTexturesArray);
+		dataBanksArray.replace(iDataBankIndex, dataBankObj);
+	}
+	dataAtlasObj.insert("banks", dataBanksArray);
+	dataAtlasDocRef.setObject(dataAtlasObj);
+}
+
+/*static*/ void VersionPatcher::Patch_18to19(QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef)
+{
+	// UVs being flipped from top-to-bottom -> bottom-to-top
+
+	// Fix Items.data
+	QJsonObject dataItemsObj = dataItemsDocRef.object();
+	QJsonObject dataTextsListObj = dataItemsObj["Texts"].toObject();
+	QStringList sTextKeysList = dataTextsListObj.keys();
+	for(int iKeyIndex = 0; iKeyIndex < sTextKeysList.size(); ++iKeyIndex)
+	{
+		QJsonObject dataTextObj = dataTextsListObj[sTextKeysList.at(iKeyIndex)].toObject();
+		QJsonArray fontArray = dataTextObj["fontArray"].toArray();
+		for(int iFontArrayIndex = 0; iFontArrayIndex < fontArray.size(); ++iFontArrayIndex)
+		{
+			QJsonObject fontArrayObj = fontArray[iFontArrayIndex].toObject();
+			QJsonArray glyphsArray = fontArrayObj["glyphs"].toArray();
+			for(int iGlyphIndex = 0; iGlyphIndex < glyphsArray.size(); ++iGlyphIndex)
+			{
+				QJsonObject glyphObj = glyphsArray[iGlyphIndex].toObject();
+
+				double dOldBot = glyphObj["bottom"].toDouble();
+				double dOldTop = glyphObj["top"].toDouble();
+				glyphObj.insert("bottom", 1.0 - dOldBot);
+				glyphObj.insert("top", 1.0 - dOldTop);
+
+				glyphsArray.replace(iGlyphIndex, glyphObj);
+			}
+			fontArrayObj.insert("glyphs", glyphsArray);
+			fontArray.replace(iFontArrayIndex, fontArrayObj);
+		}
+		dataTextObj.insert("fontArray", fontArray);
+		dataTextsListObj.insert(sTextKeysList.at(iKeyIndex), dataTextObj);
+	}
+	dataItemsObj.insert("Texts", dataTextsListObj);
+	dataItemsDocRef.setObject(dataItemsObj);
+
+	// For both Atlases.meta and Atlases.data...
+	// First get each bank's texture sizes and store each one in 'textureSizesArrayMap' (key is bankId, value is the array of texture sizes)
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
+	QJsonArray metaBanksArray = metaAtlasObj["banks"].toArray();
+	QMap<int, QJsonArray> textureSizesArrayMap;
+	for(int iMetaBankIndex = 0; iMetaBankIndex < metaBanksArray.size(); ++iMetaBankIndex)
+	{
+		QJsonObject metaBankObj = metaBanksArray[iMetaBankIndex].toObject();
+		textureSizesArrayMap.insert(metaBankObj["bankId"].toInt(), metaBankObj["textureSizes"].toArray());
+	}
+
+	// Now fix Atlases.meta
+	QJsonArray metaAssetsArray = metaAtlasObj["assets"].toArray();
+	for(int iMetaAssetIndex = 0; iMetaAssetIndex < metaAssetsArray.size(); ++iMetaAssetIndex)
+	{
+		QJsonObject metaAssetObj = metaAssetsArray[iMetaAssetIndex].toObject();
+		int iBankId = metaAssetObj["bankId"].toInt();
+		int iTextureIndex = metaAssetObj["textureIndex"].toInt();
+
+		QJsonArray textureSizeArray = textureSizesArrayMap[iBankId];
+		int iTextureHeight = textureSizeArray.at(iTextureIndex).toArray().at(1).toInt();
+
+		int iOldY = static_cast<uint32>(metaAssetObj["y"].toInt()); // REMOVE ME: Should get 2015 on first
+		int iHeight = metaAssetObj["height"].toInt();
+
+		int iNewY = iTextureHeight - iOldY - iHeight;
+
+		metaAssetObj.insert("y", iNewY);
+		metaAssetsArray.replace(iMetaAssetIndex, metaAssetObj);
+	}
+	metaAtlasObj.insert("assets", metaAssetsArray);
+	metaAtlasDocRef.setObject(metaAtlasObj);
+
+	// Now fix Atlases.data
+	QJsonObject dataAtlasObj = dataAtlasDocRef.object();
+	QJsonArray dataBanksArray = dataAtlasObj["banks"].toArray();
+	for(int iDataBankIndex = 0; iDataBankIndex < dataBanksArray.size(); ++iDataBankIndex)
+	{
+		QJsonObject dataBankObj = dataBanksArray[iDataBankIndex].toObject();
+		int iBankId = dataBankObj["bankId"].toInt();
+		QJsonArray dataTexturesArray = dataBankObj["textures"].toArray();
+		for(int iTextureIndex = 0; iTextureIndex < dataTexturesArray.size(); ++iTextureIndex)
+		{
+			QJsonObject dataTextureObj = dataTexturesArray[iTextureIndex].toObject();
+			QJsonArray dataTexturesAssetsArray = dataTextureObj["assets"].toArray();
+			for(int iTexturesAssetsArrayIndex = 0; iTexturesAssetsArrayIndex < dataTexturesAssetsArray.size(); ++iTexturesAssetsArrayIndex)
+			{
+				QJsonObject assetObj = dataTexturesAssetsArray[iTexturesAssetsArrayIndex].toObject();
+
+				int iTextureHeight = textureSizesArrayMap[iBankId].at(iTextureIndex).toArray().at(1).toInt();
+
+				qint64 iOldFrameMaskHi = assetObj["frameMaskHi"].toInteger();
+				qint64 iOldFrameMaskLo = assetObj["frameMaskLo"].toInteger();
+				uint64 uiOldMask = (static_cast<uint64>(iOldFrameMaskHi) << 32) | iOldFrameMaskLo;
+
+				// LEFT, TOP, RIGHT, BOTTOM = 16 bits each. Laid out like: 0xLLLLTTTTRRRRBBBB
+				uint16 uiLeft = static_cast<uint16>((uiOldMask >> 48) & 0xFFFF);
+				uint16 uiTop = static_cast<uint16>((uiOldMask >> 32) & 0xFFFF);
+				uint16 uiRight = static_cast<uint16>((uiOldMask >> 16) & 0xFFFF);
+				uint16 uiBottom = static_cast<uint16>(uiOldMask & 0xFFFF);
+
+				uint16 uiFrameHeight = uiBottom - uiTop;
+				int iNewY = iTextureHeight - uiTop - uiFrameHeight;
+
+				uint64 uiNewMask = (quint64(uiLeft) << 48) | (quint64(iNewY + uiFrameHeight) << 32) | (quint64(uiRight) << 16) | quint64(iNewY);
+				qint64 iNewFrameMaskHi = static_cast<qint64>(uiNewMask >> 32);
+				qint64 iNewFrameMaskLo = static_cast<qint64>(uiNewMask & 0xFFFFFFFF);
+				assetObj.insert("frameMaskHi", QJsonValue(iNewFrameMaskHi));
+				assetObj.insert("frameMaskLo", QJsonValue(iNewFrameMaskLo));
+				dataTexturesAssetsArray.replace(iTexturesAssetsArrayIndex, assetObj);
+			}
+			dataTextureObj.insert("assets", dataTexturesAssetsArray);
+			dataTexturesArray.replace(iTextureIndex, dataTextureObj);
 		}
 		dataBankObj.insert("textures", dataTexturesArray);
 		dataBanksArray.replace(iDataBankIndex, dataBankObj);

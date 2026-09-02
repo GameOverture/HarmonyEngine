@@ -77,8 +77,8 @@ HyTextData::HyTextData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAsse
 	}
 	else
 	{
-		rSubAtlasUVRect.left = rSubAtlasUVRect.top = 0.0f;
-		rSubAtlasUVRect.right = rSubAtlasUVRect.bottom = 1.0f;
+		rSubAtlasUVRect.left = rSubAtlasUVRect.bottom = 0.0f;
+		rSubAtlasUVRect.right = rSubAtlasUVRect.top = 1.0f;
 
 		if(itemDataObj.HasMember("subAtlasWidth") && itemDataObj.HasMember("subAtlasHeight"))
 		{
@@ -119,11 +119,24 @@ HyTextData::HyTextData(const HyNodePath &nodePath, HyJsonObj itemDataObj, HyAsse
 
 			float fLeftUv = (uiFullAtlasWidth * rSubAtlasUVRect.left) + (fSubAtlasWidth * glyphObj["left"].GetFloat());
 			fLeftUv /= uiFullAtlasWidth;
-			float fTopUv = (uiFullAtlasHeight * rSubAtlasUVRect.top) + (fSubAtlasHeight * glyphObj["top"].GetFloat());
+
+			float fGlyphTop = glyphObj["top"].GetFloat();
+			float fGlyphBot = glyphObj["bottom"].GetFloat();
+
+#ifdef HY_PLATFORM_GUI
+			if(nodePath.GetPath() == HY_GUI_DATAOVERRIDE)
+			{
+				// If it's a preview runtime atlas, it isn't flipped. So undo the UV flip here.
+				fGlyphTop = 1.0f - fGlyphTop;
+				fGlyphBot = 1.0f - fGlyphBot;
+			}
+#endif
+
+			float fTopUv = (uiFullAtlasHeight * rSubAtlasUVRect.bottom) + (fSubAtlasHeight * fGlyphTop);
 			fTopUv /= uiFullAtlasHeight;
 			float fRightUv = (uiFullAtlasWidth * rSubAtlasUVRect.left) + (fSubAtlasWidth * glyphObj["right"].GetFloat());
 			fRightUv /= uiFullAtlasWidth;
-			float fBottomUv = (uiFullAtlasHeight * rSubAtlasUVRect.top) + (fSubAtlasHeight * glyphObj["bottom"].GetFloat());
+			float fBottomUv = (uiFullAtlasHeight * rSubAtlasUVRect.bottom) + (fSubAtlasHeight * fGlyphBot);
 			fBottomUv /= uiFullAtlasHeight;
 
 			uint32 uiCode = glyphObj["code"].GetUint();

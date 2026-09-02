@@ -79,8 +79,6 @@ public:
 
 	HyTextureInfo GetTextureInfo() const;
 
-	QPoint GetPosition() const;
-
 	int GetTextureIndex() const;
 	quint16 GetX() const;
 	quint16 GetY() const;

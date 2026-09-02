@@ -98,7 +98,7 @@ quint64 AtlasFrame::GetCropMask() const
 // LEFT, TOP, RIGHT, BOTTOM = 16 bits each. Laid out like: 0xLLLLTTTTRRRRBBBB
 quint64 AtlasFrame::GetFrameMask() const
 {
-	return (quint64(m_uiPosX) << 48) | (quint64(m_uiPosY) << 32) | (quint64(m_uiPosX + GetCroppedWidth()) << 16) | quint64(m_uiPosY + GetCroppedHeight());
+	return (quint64(m_uiPosX) << 48) | (quint64(m_uiPosY + GetCroppedHeight()) << 32) | (quint64(m_uiPosX + GetCroppedWidth()) << 16) | quint64(m_uiPosY);
 }
 
 HyTextureFileType AtlasFrame::GetFileType() const
@@ -126,11 +126,6 @@ void AtlasFrame::SetFiltering(HyTextureFiltering eFiltering)
 HyTextureInfo AtlasFrame::GetTextureInfo() const
 {
 	return m_TexInfo;
-}
-
-QPoint AtlasFrame::GetPosition() const
-{
-	return QPoint(m_uiPosX, m_uiPosY);
 }
 
 int AtlasFrame::GetTextureIndex() const

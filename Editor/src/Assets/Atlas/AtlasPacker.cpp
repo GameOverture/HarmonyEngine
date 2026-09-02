@@ -82,8 +82,10 @@ void AtlasPacker::PackFramesToBins(BankData *pBankData)
 	{
 		if(m_PackFramesList.at(i).duplicateId != NULL)
 		{
-			m_PackFramesList.operator [](i).pos = FindPackFrame(m_PackFramesList.at(i).duplicateId)->pos;
-			m_PackFramesList.operator [](i).textureId = FindPackFrame(m_PackFramesList.at(i).duplicateId)->textureId;
+			const PackFrame *pFoundFrame = FindPackFrame(m_PackFramesList.at(i).duplicateId);
+
+			m_PackFramesList.operator [](i).pos = pFoundFrame->pos;
+			m_PackFramesList.operator [](i).textureId = pFoundFrame->textureId;
 			m_iNumDuplicates++;
 		}
 	}
