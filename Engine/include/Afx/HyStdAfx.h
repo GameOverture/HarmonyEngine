@@ -51,6 +51,7 @@
 
 #define HY_UNUSED_HANDLE 0
 typedef uint32 HyTextureHandle;
+typedef uint32 HyBufferHandle;
 typedef uint32 HyStencilHandle;
 typedef uint32 HyShaderHandle;
 typedef uint32 HyVertexBufferHandle;

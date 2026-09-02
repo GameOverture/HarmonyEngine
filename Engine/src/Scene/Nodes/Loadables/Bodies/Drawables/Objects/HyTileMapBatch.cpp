@@ -11,23 +11,33 @@
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMapBatch.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyTileMapLayer.h"
 #include "Scene/Physics/Fixtures/HyShape2d.h"
-#include "Assets/HyAssets.h"
 #include "Assets/Files/HyFileTileSet.h"
 #include "Diagnostics/Console/IHyConsole.h"
+#include "HyEngine.h"
+
+/*static*/ IHyRenderer *HyTileMapBatch::sm_pHyRenderer = nullptr;
 
 HyTileMapBatch::HyTileMapBatch(HyFileTileSet *pTileSet, HyTileMapLayer *pParent) :
 	IHyDrawable2d(HYTYPE_TileMapBatch, HyNodePath(), pParent),
 	m_pTileSet(pTileSet),
 	m_hTileMap(HY_UNUSED_HANDLE),
-	m_pTileIdList(HY_NEW uint16_t[HYASSETS_TileMapChunkSize * HYASSETS_TileMapChunkSize]),
-	m_bDirty(false)
+	m_bDirty(false),
+	m_vDirtySize(0, 0),
+	m_ptDirtyOffset(0, 0),
+	m_pTileIdArray(nullptr)
 {
 	HyAssert(m_pTileSet, "HyTileMapBatch ctor - null HyFileTileSet was passed in");
+
+	m_pTileIdArray = HY_NEW std::array<uint16_t, HYASSETS_TileMapChunkSize * HYASSETS_TileMapChunkSize>();
+	m_pTileIdArray->fill(0);
+
+	HyTextureInfo texInfo(HYTEXFILTER_NEAREST, HYTEXTUREFILE_RAW, 1, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT16, HYTEXTUREFORMAT_UINT16));
+	m_hTileMap = sm_pHyRenderer->AddTexture(texInfo, HYASSETS_TileMapChunkSize, HYASSETS_TileMapChunkSize, reinterpret_cast<unsigned char *>(m_pTileIdArray->data()), sizeof(uint16_t) * (HYASSETS_TileMapChunkSize * HYASSETS_TileMapChunkSize));
 }
 
 HyTileMapBatch::~HyTileMapBatch(void)
 {
-	delete[] m_pTileIdList;
+	delete m_pTileIdArray;
 }
 
 HyTileSetHandle HyTileMapBatch::GetHandle() const
@@ -35,10 +45,28 @@ HyTileSetHandle HyTileMapBatch::GetHandle() const
 	return m_pTileSet->GetHandle();
 }
 
-bool HyTileMapBatch::WriteTileMapTexture(glm::ivec2 ptChunkCellCoord, uint16_t uiTileId)
+bool HyTileMapBatch::WriteTileMapTexel(glm::ivec2 ptChunkCellCoord, uint16_t uiTileId)
 {
-	// TILETODO: Write texel data to tile ID texture
-	return false;
+	int32 iIndex = (ptChunkCellCoord.y * HYASSETS_TileMapChunkSize) + ptChunkCellCoord.x;
+	if(ptChunkCellCoord.x < 0 ||
+	   ptChunkCellCoord.x >= HYASSETS_TileMapChunkSize ||
+	   ptChunkCellCoord.y < 0 ||
+	   ptChunkCellCoord.y >= HYASSETS_TileMapChunkSize ||
+	   m_pTileIdArray->at(iIndex) == uiTileId)
+	{
+		return false;
+	}
+
+	m_pTileIdArray->at(iIndex) = uiTileId;
+	m_bDirty = true;
+	
+	if(ptChunkCellCoord.x < m_ptDirtyOffset.x)
+		m_ptDirtyOffset.x = ptChunkCellCoord.x;
+	if(ptChunkCellCoord.y < m_ptDirtyOffset.y)
+		m_ptDirtyOffset.y = ptChunkCellCoord.y;
+	//m_vDirtySize
+
+	return true;
 }
 
 /*virtual*/ void HyTileMapBatch::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
@@ -67,10 +95,6 @@ bool HyTileMapBatch::WriteTileMapTexture(glm::ivec2 ptChunkCellCoord, uint16_t u
 	return true;
 }
 
-/*virtual*/ void HyTileMapBatch::OnDataAcquired() /*override*/
-{
-}
-
 /*virtual*/ bool HyTileMapBatch::OnIsValidToRender() /*override*/
 {
 	return true;
@@ -78,6 +102,16 @@ bool HyTileMapBatch::WriteTileMapTexture(glm::ivec2 ptChunkCellCoord, uint16_t u
 
 /*virtual*/ void HyTileMapBatch::OnUpdateUniforms(float fExtrapolatePercent) /*override*/
 {
+	if(m_bDirty)
+	{
+		GLint xoffset;
+ 		GLint yoffset;
+ 		GLsizei width;
+ 		GLsizei height;
+		sm_pHyRenderer->WriteTexels(m_hTileMap);
+		m_bDirty = false;
+	}
+
 	//// TODO: get rid of this check and improve m_ShaderUniforms
 	//if(m_bUpdateShaderUniforms)
 	//{

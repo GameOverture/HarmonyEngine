@@ -12,26 +12,37 @@
 
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
+#include "Assets/HyAssets.h"
+
+#include <array>
 
 class HyFileTileSet;
 class HyTileMapLayer;
+class IHyRenderer;
 
 class HyTileMapBatch : public IHyDrawable2d
 {
-protected:
-	HyFileTileSet *										m_pTileSet;
-	HyTextureHandle										m_hTileMap; // single channel uint16_t texture
-	
-	uint16_t *											m_pTileIdList; // 1D array layout of row major [HYASSETS_TileMapChunkSize][HYASSETS_TileMapChunkSize];
-	bool												m_bDirty;
+	friend class HyTileMapLayer;
+	friend class IHyRenderer;
+	static IHyRenderer *														sm_pHyRenderer;
 
-public:
+protected:
+	HyFileTileSet *																m_pTileSet;
+	HyTextureHandle																m_hTileMap; // single channel uint16_t texture
+	
+	bool																		m_bDirty;
+	glm::ivec2																	m_vDirtySize;
+	glm::ivec2																	m_ptDirtyOffset;
+
+	std::array<uint16_t, HYASSETS_TileMapChunkSize * HYASSETS_TileMapChunkSize>	*m_pTileIdArray; // 1D array layout of row major [HYASSETS_TileMapChunkSize][HYASSETS_TileMapChunkSize];
+
 	HyTileMapBatch(HyFileTileSet *pTileSet, HyTileMapLayer *pParent);
+public:
 	virtual ~HyTileMapBatch(void);
 
 	HyTileSetHandle GetHandle() const;
 
-	bool WriteTileMapTexture(glm::ivec2 ptChunkCellCoord, uint16_t uiTileId);
+	bool WriteTileMapTexel(glm::ivec2 ptChunkCellCoord, uint16_t uiTileId);
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
 	virtual float GetWidth(float fPercent = 1.0f) override;
@@ -40,8 +51,6 @@ public:
 	virtual bool IsLoadDataValid() override;
 
 protected:
-	virtual void OnDataAcquired() override;
-
 	virtual bool OnIsValidToRender() override;
 
 	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;

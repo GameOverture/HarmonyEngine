@@ -9,10 +9,8 @@
  *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyTileMapLayer.h"
-#include "Assets/HyAssets.h"
 #include "Assets/Nodes/Objects/HyTileMapData.h"
 #include "Scene/Physics/Fixtures/HyShape2d.h"
-#include "Diagnostics/Console/IHyConsole.h"
 
 HyTileMapLayer::HyTileMapLayer(HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
@@ -63,39 +61,33 @@ bool HyTileMapLayer::WriteCell(HyTileSetHandle hTileSet, uint16_t uiTileId, glm:
 	// Determine chunk coordinate (can reuse TileMapPointToCell_Square function for this purpose)
 	glm::ivec2 ptChunkCoord = HyMath::TileMapPointToCell_Square(ptCellCoord, glm::ivec2(HYASSETS_TileMapChunkSize, HYASSETS_TileMapChunkSize));
 
-	// Try to find existing chunk
-	TileChunk *pChunk = nullptr;
+	// Try to find existing chunk/HyTileMapBatch to WriteTileMapTexel, otherwise add new chunk/HyTileMapBatch then WriteTileMapTexel
 	for(TileChunk &tileChunkRef : m_ChunkList)
 	{
 		if(tileChunkRef.m_ptCoordinate == ptChunkCoord)
 		{
-			pChunk = &tileChunkRef;
-			break;
+			for(HyTileMapBatch *pTileMapBatch : tileChunkRef.m_BatchList)
+			{
+				if(pTileMapBatch->GetHandle() == hTileSet)
+					return pTileMapBatch->WriteTileMapTexel(ptCellCoord % HYASSETS_TileMapChunkSize, uiTileId);
+			}
+
+			// 'HyTileMapBatch' not found within chunk, allocating new HyTileMapBatch
+			HyTileMapBatch *pTileMapBatch = tileChunkRef.AllocateTileMapBatch(hTileSet, this);
+			if(pTileMapBatch == nullptr)
+				return false;
+
+			return pTileMapBatch->WriteTileMapTexel(ptCellCoord % HYASSETS_TileMapChunkSize, uiTileId);
 		}
-	}
-	if(pChunk == nullptr)
-	{
-		m_ChunkList.emplace_back(ptChunkCoord);
-		pChunk = &m_ChunkList.back();
 	}
 
-	// Find existing TileMapBatch by comparing the tile set
-	HyTileMapBatch *pTileMapBatch = nullptr;
-	for(HyTileMapBatch *pTileMap : pChunk->m_RenderBatchList)
-	{
-		if(pTileMap->GetHandle() == hTileSet)
-		{
-			pTileMapBatch = pTileMap;
-			break;
-		}
-	}
+	// Chunk not found, add both new chunk and HyTileMapBatch
+	m_ChunkList.emplace_back(ptChunkCoord);
+	HyTileMapBatch *pTileMapBatch = m_ChunkList.back().AllocateTileMapBatch(hTileSet, this);
 	if(pTileMapBatch == nullptr)
-	{
+		return false;
 
-		//pChunk->m_RenderBatchList.emplace_back(sm_pAssets->GetTileSet(hTileSet), this);
-	}
-
-	return false;
+	return pTileMapBatch->WriteTileMapTexel(ptCellCoord % HYASSETS_TileMapChunkSize, uiTileId);
 }
 
 const glm::ivec2 &HyTileMapLayer::GetCellDimensions() const

@@ -31,6 +31,8 @@ IHyRenderer::IHyRenderer(std::vector<HyWindow *> &windowListRef, HyDiagnostics &
 	HyAssert(sm_pInstance == nullptr, "IHyRenderer ctor called twice");
 	sm_pInstance = this;
 
+	HyTileMapBatch::sm_pHyRenderer = this;
+
 	// Built-in shaders
 	m_pShaderQuadBatch->Finalize();
 	m_pShaderPrimitive->Finalize();

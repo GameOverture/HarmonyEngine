@@ -646,7 +646,7 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////
 }
 
-/*virtual*/ uint32 HyOpenGL::AddTexture(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize) /*override*/
+/*virtual*/ HyTextureHandle HyOpenGL::AddTexture(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize) /*override*/
 {
 	GLenum eInternalFormat = GL_RGBA8;
 	GLenum eFormat = GL_RGBA;
@@ -692,10 +692,10 @@ HyOpenGL::~HyOpenGL(void)
 	SetTextureParameters(formatInfo, GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-	return hGLTexture;
+	return static_cast<HyTextureHandle>(hGLTexture);
 }
 
-/*virtual*/ uint32 HyOpenGL::AddTextureArray(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) /*override*/
+/*virtual*/ HyTextureHandle HyOpenGL::AddTextureArray(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) /*override*/
 {
 	GLenum eInternalFormat = GL_RGBA;
 	GLenum eFormat = GL_RGBA;
@@ -755,16 +755,16 @@ HyOpenGL::~HyOpenGL(void)
 	SetTextureParameters(formatInfo, GL_TEXTURE_2D_ARRAY);
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-	return hGLTextureArray;
+	return static_cast<HyTextureHandle>(hGLTextureArray);
 }
 
-/*virtual*/ void HyOpenGL::DeleteTexture(uint32 uiTextureHandle) /*override*/
+/*virtual*/ void HyOpenGL::DeleteTexture(HyTextureHandle hTexture) /*override*/
 {
-	glDeleteTextures(1, &uiTextureHandle);
+	glDeleteTextures(1, &hTexture);
 	HyErrorCheck_OpenGL("HyOpenGL:DeleteTexture", "glDeleteTextures");
 }
 
-/*virtual*/ std::pair<uint32, uint32> HyOpenGL::AddTextureBufferObject(const HyTextureInfo formatInfo, unsigned char *pData, uint32 uiDataSize) /*override*/
+/*virtual*/ std::pair<HyBufferHandle, HyTextureHandle> HyOpenGL::AddTextureBufferObject(const HyTextureInfo formatInfo, unsigned char *pData, uint32 uiDataSize) /*override*/
 {
 	GLenum eInternalFormat = GL_RGBA;
 	GLenum eFormat = GL_RGBA;
@@ -786,10 +786,10 @@ HyOpenGL::~HyOpenGL(void)
 
 	glBindBuffer(GL_TEXTURE_BUFFER, 0);
 	glBindTexture(GL_TEXTURE_BUFFER, 0);
-	return std::pair<uint32, uint32>(hTboBuffer, hTboTexture);
+	return std::pair<HyBufferHandle, HyTextureHandle>(hTboBuffer, hTboTexture);
 }
 
-/*virtual*/ void HyOpenGL::DeleteTextureBufferObject(std::pair<uint32, uint32> hTboPair) /*override*/
+/*virtual*/ void HyOpenGL::DeleteTextureBufferObject(std::pair<HyBufferHandle, HyTextureHandle> hTboPair) /*override*/
 {
 	glDeleteTextures(1, &hTboPair.second); // Breaks the reference, but buffer still exists
 	HyErrorCheck_OpenGL("HyOpenGL:DeleteTextureBufferObject", "glDeleteTextures");
@@ -798,60 +798,27 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGL:DeleteTextureBufferObject", "glDeleteBuffers");
 }
 
-/*virtual*/ uint32 HyOpenGL::GenerateVertexBuffer() /*override*/
+/*virtual*/ HyBufferHandle HyOpenGL::GenerateVertexBuffer() /*override*/
 {
 	GLuint hVBO;
 	glGenBuffers(1, &hVBO);
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glGenBuffers");
 
-	return hVBO;
+	return static_cast<HyBufferHandle>(hVBO);
 }
 
-/*virtual*/ uint32 HyOpenGL::GenerateIndexBuffer() /*override*/
+/*virtual*/ HyBufferHandle HyOpenGL::GenerateIndexBuffer() /*override*/
 {
 	GLuint hIBO;
 	glGenBuffers(1, &hIBO);
 	HyErrorCheck_OpenGL("HyOpenGL:Initialize", "glGenBuffers");
-	return hIBO;
+	return static_cast<HyBufferHandle>(hIBO);
 }
 
-/*virtual*/ uint8 *HyOpenGL::GetPixelBufferPtr(uint32 uiMaxBufferSize, uint32 &hPboOut) /*override*/
-{
-//	hPboOut = 0;
-//
-//	if(m_pPboHandles == nullptr)
-//		return nullptr;
-//
-//#ifndef HY_PLATFORM_BROWSER
-//	for(uint32 i = 0; i < HY_NUM_PBO; ++i)
-//	{
-//		if(m_pPboStates[i] == PBO_Free)
-//		{
-//			m_pPboStates[i] = PBO_Mapped;
-//
-//			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_pPboHandles[i]);
-//			HyErrorCheck_OpenGL("HyOpenGL::GetPixelBufferPtr", "glBindBuffer");
-//			glBufferData(GL_PIXEL_UNPACK_BUFFER, uiMaxBufferSize, nullptr, GL_STREAM_DRAW); // Reserve size
-//			HyErrorCheck_OpenGL("HyOpenGL::GetPixelBufferPtr", "glBufferData");
-//
-//			uint8 *pMappedPtr = static_cast<uint8 *>(glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY));
-//			HyErrorCheck_OpenGL("HyOpenGL::GetPixelBufferPtr", "glMapBuffer");
-//
-//			glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-//
-//			hPboOut = m_pPboHandles[i];
-//			return pMappedPtr;
-//		}
-//	}
-//#endif
-
-	return nullptr;
-}
-
-/*virtual*/ void HyOpenGL::GetTextureSize(uint32 uiTextureHandle, uint32 &uiWidthOut, uint32 &uiHeightOut) /*override*/
+/*virtual*/ void HyOpenGL::GetTextureSize(HyTextureHandle hTexture, uint32 &uiWidthOut, uint32 &uiHeightOut) /*override*/
 {
 #ifndef HY_PLATFORM_BROWSER
-	glBindTexture(GL_TEXTURE_2D, uiTextureHandle);
+	glBindTexture(GL_TEXTURE_2D, hTexture);
 	HyErrorCheck_OpenGL("HyOpenGL:GetTextureSize", "glBindTexture");
 
 	GLint iWidth, iHeight;
@@ -867,6 +834,11 @@ HyOpenGL::~HyOpenGL(void)
 	uiHeightOut = 0;
 	HyLogWarning("HyOpenGL::GetTextureSize() - Not implemented for WebGL");
 #endif
+}
+
+/*virtual*/ void HyOpenGL::WriteTexels(HyTextureHandle hTexture) /*override*/
+{
+	//glTexSubImage2D(hTexture, 0, 
 }
 
 void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)

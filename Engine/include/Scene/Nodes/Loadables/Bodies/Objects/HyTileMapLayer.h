@@ -13,11 +13,11 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyEntity2d.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyTileMapBatch.h"
+#include "Assets/HyAssets.h"
+#include "Diagnostics/Console/IHyConsole.h"
 
 class HyTileMapLayer : public HyEntity2d
 {
-	friend class HyEngine;
-
 protected:
 	glm::ivec2													m_RenderSettings;		// Default both X/Y to '0' is batch rendering. Otherwise significantly changes to individual sorted by the specified axis, allowing other tiles and sprites to sort correctly between tiles
 
@@ -30,11 +30,30 @@ protected:
 	struct TileChunk
 	{
 		const glm::ivec2										m_ptCoordinate;	// The chunk coordinate, among other chunks (not local/world space)
-		std::vector<HyTileMapBatch *>							m_RenderBatchList;
+		std::vector<HyTileMapBatch *>							m_BatchList;
 
 		TileChunk(glm::ivec2 ptChunkCoord) :
 			m_ptCoordinate(ptChunkCoord)
 		{ }
+		~TileChunk()
+		{
+			for(HyTileMapBatch *pTileMapBatch : m_BatchList)
+				delete pTileMapBatch;
+		}
+
+		HyTileMapBatch *AllocateTileMapBatch(HyTileSetHandle hTileSet, HyTileMapLayer *pTileMapLayer)
+		{
+			HyFileTileSet *pTileSet = sm_pHyAssets->GetTileSet(hTileSet);
+			if(pTileSet == nullptr)
+			{
+				HyLogWarning("HyTileMapLayer::TileChunk::AllocateTileMapBatch was passed an invalid TileSet handle");
+				return nullptr;
+			}
+			HyTileMapBatch *pTileMapBatch = HY_NEW HyTileMapBatch(pTileSet, pTileMapLayer);
+			m_BatchList.push_back(pTileMapBatch);
+
+			return pTileMapBatch;
+		}
 	};
 	std::vector<TileChunk>										m_ChunkList;
 	float														m_fTotalWidth;

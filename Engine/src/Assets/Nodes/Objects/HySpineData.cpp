@@ -29,8 +29,8 @@ HySpineTextureLoader::HySpineTextureLoader()
 	std::string sFileName = HyIO::GetFileNameFromPath(path.buffer());
 	HyIO::MakeLowercase(sFileName); // Make lowercase for easier compare
 
-	uint32 uiNumAtlases = m_SubAtlasList.size();
-	for(uint32 i = 0; i < uiNumAtlases; ++i)
+	size_t uiNumAtlases = m_SubAtlasList.size();
+	for(size_t i = 0; i < uiNumAtlases; ++i)
 	{
 		std::string sSubAtlasName = m_SubAtlasList[i].m_sName;
 		std::transform(sSubAtlasName.begin(), sSubAtlasName.end(), sSubAtlasName.begin(), ::tolower); // Make lowercase for easier compare
