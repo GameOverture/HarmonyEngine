@@ -50,14 +50,16 @@ public:
 	static bool ReadBinaryFile(const std::string &sFilePath, std::vector<uint8> &contentsOut);
 	static bool WriteBinaryFile(const std::string &sFilePath, const std::vector<uint8> &data);
 	
-	static uint8 *ReadImage(const std::string &sFilePath, HyImageInfo &loadHintsInOut, int &iWidthOut, int &iHeightOut, int &iNumChannelsOut, int &iDataSizeOut);
+	static uint8 *ReadImage(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut);
 	static void DeleteImage(uint8 *pImageData);
-	static bool WriteImage(const std::string &sFilePath, HyImageType eImageType, int iWidth, int iHeight, int iNumChannels, bool bFlipVertically, uint8 *pData);
+	static bool WriteImage(const std::string &sFilePath, HyImageInfo imageInfo, uint8 *pData);
 
 private:
-	static uint8 *ReadImage_PNG(const std::string &sFilePath, HyImageInfo &loadHintsInOut, int &iWidthOut, int &iHeightOut, int &iNumChannelsOut, int &iDataSizeOut);
-	static uint8 *ReadImage_HYTX(const std::string &sFilePath, int &iWidthOut, int &iHeightOut, int &iNumChannelsOut, int &iDataSizeOut);
-	static uint8 *ReadImage_DDS(const std::string &sFilePath, int &iWidthOut, int &iHeightOut, int &iNumChannelsOut, int &iDataSizeOut);
+	static uint8 *ReadImage_PNG(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut);
+	static uint8 *ReadImage_HYTX(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut);
+	static uint8 *ReadImage_DDS(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut);
+
+	static bool WriteImage_DDS(const std::string &sFilePath, HyImageInfo imageInfo, uint8 *pData);
 };
 
 #endif /* HyFileIO_h__ */

@@ -85,10 +85,10 @@ public:
 	virtual void DrawRenderState_2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera) = 0;
 	virtual void FinishRender() = 0;
 	virtual void UploadShader(HyShader *pShader) = 0;
-	virtual HyTextureHandle AddTexture(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, unsigned char *pPixelData, uint32 uiPixelDataSize) = 0; // Returns texture's API specific ID used for drawing
-	virtual HyTextureHandle AddTextureArray(const HyTextureInfo formatInfo, uint32 uiWidth, uint32 uiHeight, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) = 0; // Returns texture's API specific ID used for drawing
+	virtual HyTextureHandle AddTexture(HyImageInfo imageInfo, HyTextureInf textureInfo, unsigned char *pPixelData, uint32 uiPixelDataSize) = 0; // Returns texture's API specific ID used for drawing
+	virtual HyTextureHandle AddTextureArray(HyImageInfo imageInfo, HyTextureInf textureInfo, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) = 0; // Returns texture's API specific ID used for drawing
 	virtual void DeleteTexture(HyTextureHandle hTexture) = 0;
-	virtual std::pair<HyBufferHandle, HyTextureHandle> AddTextureBufferObject(const HyTextureInfo formatInfo, unsigned char *pData, uint32 uiDataSize) = 0;
+	virtual std::pair<HyBufferHandle, HyTextureHandle> AddTextureBufferObject(HyTextureInf textureInfo, unsigned char *pData, uint32 uiDataSize) = 0;
 	virtual void DeleteTextureBufferObject(std::pair<HyBufferHandle, HyTextureHandle> hTboPair) = 0;
 	virtual HyBufferHandle GenerateVertexBuffer() = 0;	// Returns the graphics API handle to a new vertex buffer
 	virtual HyBufferHandle GenerateIndexBuffer() = 0;

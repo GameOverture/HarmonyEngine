@@ -31,8 +31,6 @@
 #include "Utilities/HyMath.h"
 #include "Diagnostics/Console/IHyConsole.h"
 
-#include "vendor/SOIL2/src/SOIL2/stb_image.h"
-
 #include <fstream>
 #include <iostream>
 
@@ -82,8 +80,6 @@ HyAssets::HyAssets(HyAudioCore &audioCoreRef, HyScene &sceneRef, std::string sDa
 	m_bInitialized(false),
 	m_uiLoadingCountTotal(0)
 {
-	stbi_set_flip_vertically_on_load(true);
-
 	IHyLoadable::sm_pHyAssets = this;
 	ThreadStart();
 	ThreadWait();
@@ -479,19 +475,20 @@ void HyAssets::GetNodeLoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut) 
 	uiTotalOut = m_uiLoadingCountTotal;
 }
 
-HyTextureQuadHandle HyAssets::CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyTextureInfo textureInfo)
+HyTextureQuadHandle HyAssets::CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyImageInfo imageInfo, HyTextureInf textureInfo)
 {
+	uint64 uiImage = imageInfo.GetBucketId();
+	uint32 uiTexture = textureInfo.GetBucketId();
+
 	std::vector<char> handleData(sFilePath.begin(), sFilePath.end());
-	handleData.push_back(textureInfo.m_uiFiltering);
-	handleData.push_back(textureInfo.m_uiFileType);
-	handleData.push_back(textureInfo.m_uiFormatParam1);
-	handleData.push_back(textureInfo.m_uiFormatParam2);
+	handleData.insert(handleData.end(), reinterpret_cast<char *>(&uiImage), reinterpret_cast<char *>(&uiImage) + sizeof(uint64));
+	handleData.insert(handleData.end(), reinterpret_cast<char *>(&uiTexture), reinterpret_cast<char *>(&uiTexture) + sizeof(uint32));
 	
 	HyAuxiliaryFileHandle hFileHandle = crc32_fast(handleData.data(), handleData.size());
 	HyTextureQuadHandle hTexQuadHandle(0, hFileHandle);
 
 	if(m_AuxiliaryTextureQuadMap.find(hTexQuadHandle) == m_AuxiliaryTextureQuadMap.end())
-		m_AuxiliaryTextureQuadMap.insert({ hTexQuadHandle, HY_NEW HyTexturedQuadData(hFileHandle, sFilePath, textureInfo, *this) });
+		m_AuxiliaryTextureQuadMap.insert({ hTexQuadHandle, HY_NEW HyTexturedQuadData(hFileHandle, sFilePath, imageInfo, textureInfo, *this) });
 
 	return hTexQuadHandle;
 }
@@ -1016,107 +1013,97 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 	SetEntityLoaded(pLoadable->_LoadableGetParentPtr());
 }
 
-/*static*/ std::vector<HyTextureFileType> HyAssets::GetTextureFileTypeList()
+/*static*/ std::vector<HyImageType> HyAssets::GetImageTypeList()
 {
-	std::vector<HyTextureFileType> list;
-	list.push_back(HYTEXTUREFILE_PNG);
-	list.push_back(HYTEXTUREFILE_DXT);
-	list.push_back(HYTEXTUREFILE_ASTC);
-	list.push_back(HYTEXTUREFILE_RAW);
-	
-	HyAssert(list.size() == HYNUM_TEXTUREFILES, "HyAssets::GetTextureFormatList() is missing a format!");
+	std::vector<HyImageType> list;
+	list.push_back(HYIMAGE_PNG);
+	list.push_back(HYIMAGE_HYTX);
+	list.push_back(HYIMAGE_DDS);
+	list.push_back(HYIMAGE_ASTC);
+	HyAssert(list.size() == HYNUM_IMAGETYPES, "HyAssets::GetImageTypeList() is missing a format!");
 
 	return list;
 }
 
-/*static*/ std::vector<std::string> HyAssets::GetTextureFileTypeNameList()
+/*static*/ std::vector<std::string> HyAssets::GetImageTypeNameList()
 {
-	std::vector<HyTextureFileType> formatList = GetTextureFileTypeList();
+	std::vector<HyImageType> formatList = GetImageTypeList();
 
 	std::vector<std::string> list;
 	for(int32 i = 0; i < static_cast<int32>(formatList.size()); ++i)
-		list.push_back(GetTextureFileTypeName(formatList[i]));
+		list.push_back(GetImageTypeName(formatList[i]));
 
 	return list;
 }
 
-/*static*/ std::string HyAssets::GetTextureFileTypeName(HyTextureFileType eFileType)
+/*static*/ std::string HyAssets::GetImageTypeName(HyImageType eType)
 {
-	switch(eFileType)
+	switch(eType)
 	{
-	case HYTEXTUREFILE_PNG:
+	case HYIMAGE_PNG:
 		return "PNG";
-	case HYTEXTUREFILE_DXT:
-		return "DXT";
-	case HYTEXTUREFILE_ASTC:
+	case HYIMAGE_HYTX:
+		return "HYTX";
+	case HYIMAGE_DDS:
+		return "DDS";
+	case HYIMAGE_ASTC:
 		return "ASTC";
-	case HYTEXTUREFILE_RAW:
-		return "RAW";
 	
-	case HYTEXTUREFILE_Unknown:
+	case HYIMAGE_Unknown:
 	default:
 		return "Unknown";
 	}
 }
 
-/*static*/ HyTextureFileType HyAssets::GetTextureFileTypeFromString(std::string sFormat)
+/*static*/ HyImageType HyAssets::GetImageTypeFromString(std::string sFormat)
 {
 	std::transform(sFormat.begin(), sFormat.end(), sFormat.begin(), ::tolower);
 
-	std::vector<std::string> sTextureFormatList = GetTextureFileTypeNameList();
-	for(int32 i = 0; i < static_cast<int32>(sTextureFormatList.size()); ++i)
+	std::vector<std::string> sImageTypeList = GetImageTypeNameList();
+	for(int32 i = 0; i < static_cast<int32>(sImageTypeList.size()); ++i)
 	{
-		std::string sCurStr = sTextureFormatList[i];
+		std::string sCurStr = sImageTypeList[i];
 		std::transform(sCurStr.begin(), sCurStr.end(), sCurStr.begin(), ::tolower);
 		
 		if(sFormat == sCurStr)
-			return GetTextureFileTypeList()[i];
+			return GetImageTypeList()[i];
 	}
 
-	return HYTEXTUREFILE_Unknown;
+	return HYIMAGE_Unknown;
 }
 
 
-/*static*/ std::vector<HyTextureFiltering> HyAssets::GetTextureFilteringList()
+/*static*/ std::vector<HyTextureFilter> HyAssets::GetTextureFilterList()
 {
-	std::vector<HyTextureFiltering> list;
+	std::vector<HyTextureFilter> list;
 	list.push_back(HYTEXFILTER_NEAREST);
-	list.push_back(HYTEXFILTER_NEAREST_MIPMAP);
-	list.push_back(HYTEXFILTER_LINEAR_MIPMAP);
 	list.push_back(HYTEXFILTER_BILINEAR);
-	list.push_back(HYTEXFILTER_BILINEAR_MIPMAP);
 	list.push_back(HYTEXFILTER_TRILINEAR);
 
-	HyAssert(list.size() == HYNUM_TEXTUREFILTERS, "HyGlobal::GetTextureFilteringList missing a format!");
+	HyAssert(list.size() == HYNUM_TEXTUREFILTERS, "HyGlobal::GetTextureFilterList missing a format!");
 	return list;
 }
 
-/*static*/ std::vector<std::string> HyAssets::GetTextureFilteringNameList()
+/*static*/ std::vector<std::string> HyAssets::GetTextureFilterNameList()
 {
-	std::vector<HyTextureFiltering> formatList = GetTextureFilteringList();
+	std::vector<HyTextureFilter> formatList = GetTextureFilterList();
 
 	std::vector<std::string> list;
 	for(int32 i = 0; i < static_cast<int32>(formatList.size()); ++i)
-		list.push_back(GetTextureFilteringName(formatList[i]));
+		list.push_back(GetTextureFilterName(formatList[i]));
 
 	return list;
 }
 
-/*static*/ std::string HyAssets::GetTextureFilteringName(HyTextureFiltering eType)
+/*static*/ std::string HyAssets::GetTextureFilterName(HyTextureFilter eType)
 {
 	// WARNING: Changing any of these strings affects data and meta files and requires a version patcher bump!
 	switch(eType)
 	{
 	case HYTEXFILTER_NEAREST:
 		return "Nearest";
-	case HYTEXFILTER_NEAREST_MIPMAP:
-		return "Nearest Mipmap";
-	case HYTEXFILTER_LINEAR_MIPMAP:
-		return "Linear Mipmap";
 	case HYTEXFILTER_BILINEAR:
 		return "Bilinear";
-	case HYTEXFILTER_BILINEAR_MIPMAP:
-		return "Bilinear Mipmap";
 	case HYTEXFILTER_TRILINEAR:
 		return "Trilinear";
 
@@ -1126,18 +1113,18 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 	}
 }
 
-/*static*/ HyTextureFiltering HyAssets::GetTextureFilteringFromString(std::string sFilter)
+/*static*/ HyTextureFilter HyAssets::GetTextureFilterFromString(std::string sFilter)
 {
 	std::transform(sFilter.begin(), sFilter.end(), sFilter.begin(), ::tolower);
 
-	std::vector<std::string> sTextureFilteringList = GetTextureFilteringNameList();
+	std::vector<std::string> sTextureFilteringList = GetTextureFilterNameList();
 	for(int32 i = 0; i < static_cast<int32>(sTextureFilteringList.size()); ++i)
 	{
 		std::string sCurStr = sTextureFilteringList[i];
 		std::transform(sCurStr.begin(), sCurStr.end(), sCurStr.begin(), ::tolower);
 		
 		if(sFilter == sCurStr)
-			return GetTextureFilteringList()[i];
+			return GetTextureFilterList()[i];
 	}
 
 	return HYTEXFILTER_Unknown;

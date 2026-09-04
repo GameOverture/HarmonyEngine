@@ -20,6 +20,7 @@ HyFileAtlas::HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexI
 	m_uiINDEX_IN_BANK(uiIndexInBank),
 	m_iWidth(textureObj["width"].GetInt()),
 	m_iHeight(textureObj["height"].GetInt()),
+	m_ImageInfo(textureObj["imageInfo"].GetUint()),
 	m_TextureInfo(textureObj["textureInfo"].GetUint()),
 	m_hTextureHandle(HY_UNUSED_HANDLE),
 	m_uiNUM_FRAMES(textureObj["assets"].GetArray().Size()),
@@ -56,11 +57,12 @@ HyFileAtlas::HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexI
 	}
 }
 
-HyFileAtlas::HyFileAtlas(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, HyTextureInfo textureInfo) :
+HyFileAtlas::HyFileAtlas(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, HyImageInfo imageInfo, HyTextureInf textureInfo) :
 	IHyFile(HYFILE_Atlas, sFileName, std::numeric_limits<uint32>::max(), std::numeric_limits<uint32>::max()),
 	m_uiINDEX_IN_BANK(std::numeric_limits<uint32>::max()),
 	m_iWidth(0),
 	m_iHeight(0),
+	m_ImageInfo(imageInfo),
 	m_TextureInfo(textureInfo),
 	m_hTextureHandle(HY_UNUSED_HANDLE),
 	m_uiNUM_FRAMES(1),
@@ -137,10 +139,12 @@ bool HyFileAtlas::GetUvRect(uint32 uiChecksum, HyUvCoord &UVRectOut, uint64 &cro
 
 void HyFileAtlas::DeletePixelData()
 {
-	if(m_TextureInfo.GetFileType() == HYTEXTUREFILE_ASTC)
-		delete[] m_pPixelData;
-	else
-		SOIL_free_image_data(m_pPixelData);// stbi_image_free(m_pPixelData);
+	HyIO::DeleteImage(m_pPixelData);
+
+	//if(m_TextureInfo.GetFileType() == HYTEXTUREFILE_ASTC)
+	//	delete[] m_pPixelData;
+	//else
+	//	SOIL_free_image_data(m_pPixelData);// stbi_image_free(m_pPixelData);
 
 	m_pPixelData = nullptr;
 	m_uiPixelDataSize = 0;
@@ -178,38 +182,41 @@ void HyFileAtlas::DeletePixelData()
 		else
 			sAtlasFilePath = m_sFILE_NAME; // This is an auxiliary file, don't prepend the data directory
 
-		switch(m_TextureInfo.GetFileType())
-		{
-		case HYTEXTUREFILE_PNG: {
-			// Param2: data format & uploaded internal format
-			HyTextureFormatType eDataType, eInternalType;
-			m_TextureInfo.GetUncompressedFormatTypes(eDataType, eInternalType);
-			HyAssert(eDataType == HYTEXTUREFORMAT_UINT8, "Only 8bit PNGs currently supported"); // TODO: Support 16bit PNGs
+		int iNumChannels;
+		m_pPixelData = HyIO::ReadImage(sAtlasFilePath, m_ImageInfo, m_iWidth, m_iHeight, iNumChannels, m_uiPixelDataSize);
 
-			// Param1: num channels
-			int iNum8bitClrChannels; // out variables
-			m_pPixelData = SOIL_load_image(sAtlasFilePath.c_str(), &m_iWidth, &m_iHeight, &iNum8bitClrChannels, m_TextureInfo.m_uiFormatParam1);
-			m_uiPixelDataSize = m_iWidth * m_iHeight * 4;
-			break; }
+		//switch(m_TextureInfo.GetFileType())
+		//{
+		//case HYTEXTUREFILE_PNG: {
+		//	// Param2: data format & uploaded internal format
+		//	HyTextureFormatType eDataType, eInternalType;
+		//	m_TextureInfo.GetUncompressedFormatTypes(eDataType, eInternalType);
+		//	HyAssert(eDataType == HYTEXTUREFORMAT_UINT8, "Only 8bit PNGs currently supported"); // TODO: Support 16bit PNGs
 
-		case HYTEXTUREFILE_DXT:
-			m_pPixelData = SOIL_load_DDS(sAtlasFilePath.c_str(), &m_uiPixelDataSize, 0);
-			break;
+		//	// Param1: num channels
+		//	int iNum8bitClrChannels; // out variables
+		//	m_pPixelData = SOIL_load_image(sAtlasFilePath.c_str(), &m_iWidth, &m_iHeight, &iNum8bitClrChannels, m_TextureInfo.m_uiFormatParam1);
+		//	m_uiPixelDataSize = m_iWidth * m_iHeight * 4;
+		//	break; }
 
-		case HYTEXTUREFILE_ASTC:
-			m_pPixelData = LoadAstc(sAtlasFilePath.c_str(), m_uiPixelDataSize);
-			break;
+		//case HYTEXTUREFILE_DXT:
+		//	m_pPixelData = SOIL_load_DDS(sAtlasFilePath.c_str(), &m_uiPixelDataSize, 0);
+		//	break;
 
-		case HYTEXTUREFILE_RAW:
-			HyError("HyFileAtlas::OnLoadThread() - RAW Texture not implemented");
-			//HyIO::ParseRawTextureFile(sAtlasFilePath, , m_TextureInfo, m_pPixelData, m_uiPixelDataSize);
-			break;
+		//case HYTEXTUREFILE_ASTC:
+		//	m_pPixelData = LoadAstc(sAtlasFilePath.c_str(), m_uiPixelDataSize);
+		//	break;
 
-		case HYTEXTUREFILE_Unknown:
-		default:
-			HyError("HyFileAtlas::OnLoadThread() - Unknown texture type");
-			break;
-		}
+		//case HYTEXTUREFILE_RAW:
+		//	HyError("HyFileAtlas::OnLoadThread() - RAW Texture not implemented");
+		//	//HyIO::ParseRawTextureFile(sAtlasFilePath, , m_TextureInfo, m_pPixelData, m_uiPixelDataSize);
+		//	break;
+
+		//case HYTEXTUREFILE_Unknown:
+		//default:
+		//	HyError("HyFileAtlas::OnLoadThread() - Unknown texture type");
+		//	break;
+		//}
 
 		if(m_pPixelData == nullptr)
 			HyLogError("HyFileAtlas failed to load image data: " << sAtlasFilePath);

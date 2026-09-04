@@ -31,7 +31,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(const HyNodePath &nodePath, HyEntity2d *pPare
 	// If 'nodePath' has a project path, treat it as a file path on disk using a default HyTextureInfo()
 	if(nodePath.IsAuxiliary() == false)
 	{
-		HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTexture(HyIO::CleanPath(nodePath.GetPath().c_str()), HyTextureInfo());
+		HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTextureQuad(HyIO::CleanPath(nodePath.GetPath().c_str()), HyImageInfo(), HyTextureInf());
 		m_NodePath.Set(hTexQuadHandle.first, hTexQuadHandle.second);
 	}
 }
@@ -53,7 +53,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(std::string sFilePath, HyTextureInfo textureI
 {
 	m_ShaderUniforms.SetNumTexUnits(1);
 
-	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTexture(HyIO::CleanPath(sFilePath.c_str()), textureInfo);
+	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTextureQuad(HyIO::CleanPath(sFilePath.c_str()), textureInfo);
 	m_NodePath.Set(hTexQuadHandle.first, hTexQuadHandle.second);
 }
 
@@ -87,7 +87,7 @@ void HyTexturedQuad2d::Init(HyTextureQuadHandle hTextureQuadHandle, HyEntity2d *
 
 void HyTexturedQuad2d::Init(std::string sFilePath, HyTextureInfo textureInfo, HyEntity2d *pParent)
 {
-	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTexture(HyIO::CleanPath(sFilePath.c_str()), textureInfo);
+	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTextureQuad(HyIO::CleanPath(sFilePath.c_str()), textureInfo);
 	IHyLoadable2d::Init(HyNodePath(hTexQuadHandle.first, hTexQuadHandle.second), pParent);
 }
 

@@ -449,6 +449,13 @@ enum HyTextureFormat
 	HYTEXFORMAT_FLOAT16,
 	HYTEXFORMAT_FLOAT32,
 
+	HYTEXFORMAT_DXT5,			// DXT5
+	HYTEXFORMAT_DXT1,			// DXT1
+	HYTEXFORMAT_RGTC1,			// BC4U
+	HYTEXFORMAT_SIGNED_RGTC1,	// BC4S
+	HYTEXFORMAT_RGTC2,			// BC5U
+	HYTEXFORMAT_SIGNED_RGTC2,	// BC5S
+
 	HYNUM_TEXTUREFORMATS
 };
 static_assert(HYNUM_TEXTUREFORMATS < 255, "HyTextureFormat cannot exceed 254 values. Needs to fit in uint8 (HyImageInfo::m_uiFormat & HyTextureInfo::m_uiFormat)");
@@ -469,16 +476,26 @@ static_assert(HYNUM_IMAGETYPES < 255, "HyImageType cannot exceed 254 values. Nee
 
 class HyImageInfo
 {
+	uint16				m_uiWidth;
+	uint16				m_uiHeight;
+	
 	uint8				m_uiType;
 	uint8				m_uiChannels;
 	uint8				m_uiFormat;
-	uint8				m_uiFlipVertically;
+	uint8				m_uiVerticalFlip;
 
 public:
-	HyImageInfo(HyImageType eType, int iNumChannels, HyTextureFormat eFormat, bool bFlipVertically);
-	HyImageInfo(uint32 uiBucketId);
+	HyImageInfo();
+	HyImageInfo(uint16 uiWidth, uint16 uiHeight, HyImageType eType, int iNumChannels, HyTextureFormat eFormat, bool bVerticalFlip);
+	HyImageInfo(uint64 uiBucketId);
 
-	uint32 GetBucketId() const;
+	uint64 GetBucketId() const;
+
+	uint16 GetWidth() const;
+	void SetWidth(uint16 uiWidth);
+
+	uint16 GetHeight() const;
+	void SetHeight(uint16 uiHeight);
 
 	HyImageType GetType() const;
 	void SetType(HyImageType eType);
@@ -489,8 +506,8 @@ public:
 	HyTextureFormat GetFormat() const;
 	void SetFormat(HyTextureFormat eFormat);
 
-	bool IsFlipVertically() const;
-	void SetFlipVertically(bool bFlipVertically);
+	bool IsVerticalFlip() const;
+	void SetVerticalFlip(bool bVerticalFlip);
 
 	static std::string GetExt(HyImageType eType); // Includes the dot (like ".png")
 };

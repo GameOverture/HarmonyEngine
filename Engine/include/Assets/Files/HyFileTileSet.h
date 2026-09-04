@@ -25,12 +25,12 @@ class HyFileTileSet : public IHyFile
 	int32										m_iColumns;
 	int32										m_iRows;
 
-	const HyTextureInfo							m_DescriptorTextureInfo;
+	HyImageInfo									m_DescriptorImageInfo;
 	unsigned char *								m_pDescriptorTexelData;
 	uint32										m_uiDescriptorSize;
 	std::pair<HyTextureHandle, HyTextureHandle>	m_hDescriptorBufferPair;
 
-	const HyTextureInfo							m_DescriptorExTextureInfo;
+	HyImageInfo									m_DescriptorExImageInfo;
 	unsigned char *								m_pDescriptorExTexelData;
 	uint32										m_uiDescriptorExSize;
 	std::pair<HyTextureHandle, HyTextureHandle>	m_hDescriptorExBufferPair;

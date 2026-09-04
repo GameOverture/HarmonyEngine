@@ -126,7 +126,7 @@ public:
 
 	void GetNodeLoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut) const;
 
-	HyTextureQuadHandle CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyTextureInfo textureInfo);
+	HyTextureQuadHandle CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyImageInfo imageInfo, HyTextureInf textureInfo);
 	HyAudioHandle CreateAuxiliaryAudio(const std::string &sFilePath, bool bIsStreamed, int32 iInstanceLimit, int32 iCategoryId);
 
 	void Shutdown();
@@ -150,15 +150,15 @@ private:
 	void SetAsUnloaded(IHyLoadable *pLoadable);
 
 public:
-	static std::vector<HyTextureFileType> GetTextureFileTypeList();
-	static std::vector<std::string> GetTextureFileTypeNameList();
-	static std::string GetTextureFileTypeName(HyTextureFileType eFileType);
-	static HyTextureFileType GetTextureFileTypeFromString(std::string sFileType);
+	static std::vector<HyImageType> GetImageTypeList();
+	static std::vector<std::string> GetImageTypeNameList();
+	static std::string GetImageTypeName(HyImageType eType);
+	static HyImageType GetImageTypeFromString(std::string sFileType);
 
-	static std::vector<HyTextureFiltering> GetTextureFilteringList();
-	static std::vector<std::string> GetTextureFilteringNameList();
-	static std::string GetTextureFilteringName(HyTextureFiltering eType);
-	static HyTextureFiltering GetTextureFilteringFromString(std::string sFilter);
+	static std::vector<HyTextureFilter> GetTextureFilterList();
+	static std::vector<std::string> GetTextureFilterNameList();
+	static std::string GetTextureFilterName(HyTextureFilter eType);
+	static HyTextureFilter GetTextureFilterFromString(std::string sFilter);
 };
 
 #endif /* HyAssets_h__ */

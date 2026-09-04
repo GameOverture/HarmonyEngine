@@ -56,6 +56,39 @@ struct HY_DDS_HEADER
 	uint32_t reserved2;
 };
 #pragma pack(pop)
+/*	The dwFlags member of the original DDSURFACEDESC2 structure
+	can be set to one or more of the following values.	*/
+#define DDSD_CAPS	0x00000001
+#define DDSD_HEIGHT	0x00000002
+#define DDSD_WIDTH	0x00000004
+#define DDSD_PITCH	0x00000008
+#define DDSD_PIXELFORMAT	0x00001000
+#define DDSD_MIPMAPCOUNT	0x00020000
+#define DDSD_LINEARSIZE	0x00080000
+#define DDSD_DEPTH	0x00800000
+
+/*	DirectDraw Pixel Format	*/
+#define DDPF_ALPHAPIXELS	0x00000001
+#define DDPF_FOURCC	0x00000004
+#define DDPF_RGB	0x00000040
+#define DDPF_LUMINANCE 0x20000
+
+/*	The dwCaps1 member of the DDSCAPS2 structure can be
+	set to one or more of the following values.	*/
+#define DDSCAPS_COMPLEX	0x00000008
+#define DDSCAPS_TEXTURE	0x00001000
+#define DDSCAPS_MIPMAP	0x00400000
+
+/*	The dwCaps2 member of the DDSCAPS2 structure can be
+	set to one or more of the following values.		*/
+#define DDSCAPS2_CUBEMAP	0x00000200
+#define DDSCAPS2_CUBEMAP_POSITIVEX	0x00000400
+#define DDSCAPS2_CUBEMAP_NEGATIVEX	0x00000800
+#define DDSCAPS2_CUBEMAP_POSITIVEY	0x00001000
+#define DDSCAPS2_CUBEMAP_NEGATIVEY	0x00002000
+#define DDSCAPS2_CUBEMAP_POSITIVEZ	0x00004000
+#define DDSCAPS2_CUBEMAP_NEGATIVEZ	0x00008000
+#define DDSCAPS2_VOLUME	0x00200000
 
 /*static*/ HyStorage HyIO::SessionStorage(true);
 /*static*/ HyStorage HyIO::LocalStorage(false);
@@ -736,7 +769,7 @@ struct HY_DDS_HEADER
 	return true;
 }
 
-/*static*/ uint8 *HyIO::ReadImage(const std::string &sFilePath, HyImageInfo &loadHintsInOut, int &iWidthOut, int &iHeightOut, int &iNumChannelsOut, int &iDataSizeOut)
+/*static*/ uint8 *HyIO::ReadImage(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut)
 {
 	uint8 *pData = nullptr;
 	switch(loadHintsInOut.GetType())
@@ -749,21 +782,21 @@ struct HY_DDS_HEADER
 			if(sExt == HyImageInfo::GetExt(static_cast<HyImageType>(i)))
 			{
 				loadHintsInOut.SetType(static_cast<HyImageType>(i));
-				return ReadImage(sFilePath, loadHintsInOut, iWidthOut, iHeightOut, iNumChannelsOut, iDataSizeOut);
+				return ReadImage(sFilePath, loadHintsInOut, uiDataSizeOut);
 			}
 		}
 		break; }
 
 	case HYIMAGE_PNG:
-		pData = ReadImage_PNG(sFilePath, loadHintsInOut, iWidthOut, iHeightOut, iNumChannelsOut, iDataSizeOut);
+		pData = ReadImage_PNG(sFilePath, loadHintsInOut, uiDataSizeOut);
 		break;
 
 	case HYIMAGE_HYTX:
-		pData = ReadImage_HYTX(sFilePath, iWidthOut, iHeightOut, iNumChannelsOut, iDataSizeOut);
+		pData = ReadImage_HYTX(sFilePath, loadHintsInOut, uiDataSizeOut);
 		break;
 
 	case HYIMAGE_DDS:
-		pData = ReadImage_DDS(sFilePath, iWidthOut, iHeightOut, iNumChannelsOut, iDataSizeOut);
+		pData = ReadImage_DDS(sFilePath, loadHintsInOut, uiDataSizeOut);
 		break;
 
 	case HYIMAGE_ASTC:
@@ -774,7 +807,6 @@ struct HY_DDS_HEADER
 		break;
 	}
 
-	loadHintsInOut.SetNumChannels(iNumChannelsOut);
 	return pData;
 }
 
@@ -783,21 +815,39 @@ struct HY_DDS_HEADER
 	stbi_image_free(pImageData);
 }
 
-/*static*/ bool HyIO::WriteImage(const std::string &sFilePath, HyImageType eImageType, int iWidth, int iHeight, int iNumChannels, bool bFlipVertically, uint8 *pData)
+/*static*/ bool HyIO::WriteImage(const std::string &sFilePath, HyImageInfo imageInfo, uint8 *pData)
 {
-	bool bResult = false;
-	switch(eImageType)
+	if(imageInfo.GetWidth() <= 0 || imageInfo.GetHeight() <= 0 || imageInfo.GetNumChannels() <= 0 || pData == nullptr)
 	{
-	case HYIMAGE_Unknown:
-		break;
+		HyLogWarning("HyIO::WriteImage - passed invalid parameters");
+		return false;
+	}
+
+	bool bResult = false;
+	switch(imageInfo.GetType())
+	{
+	case HYIMAGE_Unknown: {
+		std::string sExt = GetExtensionFromPath(sFilePath);
+		std::transform(sExt.begin(), sExt.end(), sExt.begin(), ::tolower);
+		for(int i = 0; i < HYNUM_IMAGETYPES; ++i)
+		{
+			if(sExt == HyImageInfo::GetExt(static_cast<HyImageType>(i)))
+				return WriteImage(sFilePath, imageInfo, pData);
+		}
+		break; }
+
 	case HYIMAGE_PNG:
-		stbi_flip_vertically_on_write(bFlipVertically ? 1 : 0);
-		bResult = stbi_write_png(sFilePath.c_str(), iWidth, iHeight, iNumChannels, pData, 0) != 0;
+		stbi_flip_vertically_on_write(imageInfo.IsVerticalFlip() ? 1 : 0);
+		bResult = stbi_write_png(sFilePath.c_str(), imageInfo.GetWidth(), imageInfo.GetHeight(), imageInfo.GetNumChannels(), pData, 0) != 0;
 		break;
+
 	case HYIMAGE_HYTX:
 		break;
+
 	case HYIMAGE_DDS:
+		bResult = WriteImage_DDS(sFilePath, imageInfo, pData);
 		break;
+
 	case HYIMAGE_ASTC:
 		break;
 	}
@@ -805,18 +855,31 @@ struct HY_DDS_HEADER
 	return bResult;
 }
 
-/*static*/ uint8 *HyIO::ReadImage_PNG(const std::string &sFilePath, HyImageInfo &loadHintsInOut, int &iWidthOut, int &iHeightOut, int &iNumChannelsOut, int &iDataSizeOut)
+/*static*/ uint8 *HyIO::ReadImage_PNG(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut)
 {
 	uint8 *pData = nullptr;
+	int iWidthOut, iHeightOut, iNumChannelsOut;
 	if(loadHintsInOut.GetFormat() == HYTEXFORMAT_UINT8 || loadHintsInOut.GetFormat() == HYTEXFORMAT_Unknown)
 	{
+		stbi_set_flip_vertically_on_load(loadHintsInOut.IsVerticalFlip() ? 0 : 1); // Is image already flipped?
 		pData = stbi_load(sFilePath.c_str(), &iWidthOut, &iHeightOut, &iNumChannelsOut, loadHintsInOut.GetNumChannels());
-		iDataSizeOut = iWidthOut * iHeightOut * iNumChannelsOut;
+		if(pData == nullptr)
+		{
+			HyLogError("HyIO::ReadImage - " << stbi_failure_reason());
+			return nullptr;
+		}
+		uiDataSizeOut = iWidthOut * iHeightOut * iNumChannelsOut;
 	}
 	else if(loadHintsInOut.GetFormat() == HYTEXFORMAT_UINT16)
 	{
+		stbi_set_flip_vertically_on_load(loadHintsInOut.IsVerticalFlip() ? 0 : 1); // Is image already flipped?
 		pData = reinterpret_cast<uint8 *>(stbi_load_16(sFilePath.c_str(), &iWidthOut, &iHeightOut, &iNumChannelsOut, loadHintsInOut.GetNumChannels()));
-		iDataSizeOut = iWidthOut * iHeightOut * (iNumChannelsOut * 2);
+		if(pData == nullptr)
+		{
+			HyLogError("HyIO::ReadImage - " << stbi_failure_reason());
+			return nullptr;
+		}
+		uiDataSizeOut = iWidthOut * iHeightOut * (iNumChannelsOut * 2);
 	}
 	else
 	{
@@ -824,13 +887,14 @@ struct HY_DDS_HEADER
 		return nullptr;
 	}
 
-	if(pData == nullptr)
-		HyLogError("HyIO::ReadImage - " << stbi_failure_reason());
+	loadHintsInOut.SetWidth(iWidthOut);
+	loadHintsInOut.SetHeight(iHeightOut);
+	loadHintsInOut.SetNumChannels(iNumChannelsOut);
 
 	return pData;
 }
 
-/*static*/ uint8 *HyIO::ReadImage_HYTX(const std::string &sFilePath, int &iWidthOut, int &iHeightOut, int &iNumChannelsOut, int &iDataSizeOut)
+/*static*/ uint8 *HyIO::ReadImage_HYTX(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut)
 {
 	std::error_code ec;
 	std::ifstream infile(sFilePath, std::ifstream::in | std::ios::binary);
@@ -850,50 +914,50 @@ struct HY_DDS_HEADER
 	}
 
 	int iTexelSize = 0; // In bytes
-	int iNumChannels = textureInfo.m_uiFormatParam1;
-	HyTextureFormatType eDataFormat, eInternalFormat;
-	textureInfo.GetUncompressedFormatTypes(eDataFormat, eInternalFormat);
-	switch(eDataFormat)
-	{
-		case HYTEXTUREFORMAT_UINT8:
-		case HYTEXTUREFORMAT_INT8:
-			iTexelSize = iNumChannels;
-			break;
-		case HYTEXTUREFORMAT_UINT16:
-		case HYTEXTUREFORMAT_INT16:
-		case HYTEXTUREFORMAT_FLOAT16:
-			iTexelSize = iNumChannels * 2;
-			break;
-		case HYTEXTUREFORMAT_UINT32:
-		case HYTEXTUREFORMAT_INT32:
-		case HYTEXTUREFORMAT_FLOAT32:
-			iTexelSize = iNumChannels * 4;
-			break;
-		default:
-			HyError("HyIO::ParseRawTextureFile() - Unhandled raw data format");
-			return false;
-	}
+	//int iNumChannels = textureInfo.m_uiFormatParam1;
+	//HyTextureFormatType eDataFormat, eInternalFormat;
+	//textureInfo.GetUncompressedFormatTypes(eDataFormat, eInternalFormat);
+	//switch(eDataFormat)
+	//{
+	//	case HYTEXTUREFORMAT_UINT8:
+	//	case HYTEXTUREFORMAT_INT8:
+	//		iTexelSize = iNumChannels;
+	//		break;
+	//	case HYTEXTUREFORMAT_UINT16:
+	//	case HYTEXTUREFORMAT_INT16:
+	//	case HYTEXTUREFORMAT_FLOAT16:
+	//		iTexelSize = iNumChannels * 2;
+	//		break;
+	//	case HYTEXTUREFORMAT_UINT32:
+	//	case HYTEXTUREFORMAT_INT32:
+	//	case HYTEXTUREFORMAT_FLOAT32:
+	//		iTexelSize = iNumChannels * 4;
+	//		break;
+	//	default:
+	//		HyError("HyIO::ParseRawTextureFile() - Unhandled raw data format");
+	//		return false;
+	//}
 
-	int32_t iNumTexels = *reinterpret_cast<int32_t *>(&fileData[HYASSETS_MagicNumberHeaderSize]);
-	size_t uiDataSize = iNumTexels * iTexelSize;
-	if(uiDataSize == 0)
-	{
-		HyLogError("HyIO::ParseRawTextureFile() - Failed to load texel data: " << sFilePath);
-		return false;
-	}
-	
-	contentsOut.resize(uiDataSize);
-	memcpy(contentsOut.data(), &fileData[HYASSETS_MagicNumberHeaderSize + sizeof(int32_t) + sizeof(int32_t)], uiDataSize);
+	//int32_t iNumTexels = *reinterpret_cast<int32_t *>(&fileData[HYASSETS_MagicNumberHeaderSize]);
+	//size_t uiDataSize = iNumTexels * iTexelSize;
+	//if(uiDataSize == 0)
+	//{
+	//	HyLogError("HyIO::ParseRawTextureFile() - Failed to load texel data: " << sFilePath);
+	//	return false;
+	//}
+	//
+	//contentsOut.resize(uiDataSize);
+	//memcpy(contentsOut.data(), &fileData[HYASSETS_MagicNumberHeaderSize + sizeof(int32_t) + sizeof(int32_t)], uiDataSize);
 }
 
-/*static*/ uint8 *HyIO::ReadImage_DDS(const std::string &sFilePath, int &iWidthOut, int &iHeightOut, int &iNumChannelsOut, int &iDataSizeOut)
+/*static*/ uint8 *HyIO::ReadImage_DDS(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut)
 {
 	std::error_code ec;
 	std::ifstream infile(sFilePath, std::ifstream::in | std::ios::binary);
 	if(!infile || infile.bad())
 	{
 		ec = std::error_code(errno, std::generic_category());
-		HyLogError("HyIO::ReadImage - opening DDS file - " << ec.message() << ": " << sFilePath);
+		HyLogError("HyIO::ReadImage_DDS - opening file - " << ec.message() << ": " << sFilePath);
 		return false;
 	}
 
@@ -901,14 +965,14 @@ struct HY_DDS_HEADER
 	infile.read(reinterpret_cast<char *>(&uiMagic), sizeof(uint32));
 	if(uiMagic != 0x20534444) // "DDS "
 	{
-		HyLogError("HyIO::ReadImage - Invalid DDS magic number");
+		HyLogError("HyIO::ReadImage_DDS - Invalid magic number");
 		return nullptr;
 	}
 
 	HY_DDS_HEADER header;
 	infile.read(reinterpret_cast<char *>(&header), sizeof(HY_DDS_HEADER));
-	iWidthOut = header.width;
-	iHeightOut = header.height;
+	loadHintsInOut.SetWidth(header.width);
+	loadHintsInOut.SetHeight(header.height);
 	int iNumMipMaps = header.mipMapCount;
 	if(iNumMipMaps == 0)
 		iNumMipMaps = 1;
@@ -916,38 +980,38 @@ struct HY_DDS_HEADER
 	switch(header.pf.fourCC)
 	{
 	case 0x31545844:		// "DXT1"
-		iNumChannelsOut = 3;// or 4 (RGBA w/ 1-bit alpha)
+		loadHintsInOut.SetNumChannels(3); // or 4 (RGBA w/ 1-bit alpha)
 		iBlockSize = 8;		// 8 bytes per 4x4 block
 		break;
 	case 0x55344342:		// "BC4U"
 	case 0x53344342:		// "BC4S"
-		iNumChannelsOut = 1;
+		loadHintsInOut.SetNumChannels(1);
 		iBlockSize = 8;		// 8 bytes per 4x4 block
 		break;
 	case 0x33545844:		// "DXT3" (mostly obsolete)
 	case 0x35545844:		// "DXT5"
-		iNumChannelsOut = 4;
+		loadHintsInOut.SetNumChannels(4);
 		iBlockSize = 16;	// 16 bytes per 4x4 block
 		break;
 	case 0x55354342:		// "BC5U"
 	case 0x53354342:		// "BC5S"
-		iNumChannelsOut = 2;
+		loadHintsInOut.SetNumChannels(2);
 		iBlockSize = 16;	// 16 bytes per 4x4 block
 		break;
 	default:
-		HyLogError("HyIO::ReadImage - DDS file - Unhandled fourCC: " << std::hex << header.pf.fourCC << std::dec);
+		HyLogError("HyIO::ReadImage_DDS - Unhandled fourCC: " << std::hex << header.pf.fourCC << std::dec);
 		return nullptr;
 	}
 
 	// Read pixel data - Compute data size using block sizes
-	iDataSizeOut = 0; //iDataSizeOut = (iNumMipMaps > 1) ? header.pitchOrLinearSize * 4 / 3 : header.pitchOrLinearSize;
-	int w = iWidthOut;
-	int h = iHeightOut;
+	uiDataSizeOut = 0; //iDataSizeOut = (iNumMipMaps > 1) ? header.pitchOrLinearSize * 4 / 3 : header.pitchOrLinearSize;
+	int w = header.width;
+	int h = header.height;
 	for(int i = 0; i < iNumMipMaps; i++)
 	{
 		int bw = (w + 3) / 4;
 		int bh = (h + 3) / 4;
-		iDataSizeOut += bw * bh * iBlockSize;
+		uiDataSizeOut += bw * bh * iBlockSize;
 		w = (w + 1) / 2;
 		h = (h + 1) / 2;
 		if(w == 0)
@@ -955,13 +1019,14 @@ struct HY_DDS_HEADER
 		if(h == 0)
 			h = 1;
 	}
+	HyAssert(uiDataSizeOut == header.pitchOrLinearSize, "HyIO::ReadImage_DDS - Data size did not match pitchOrLinearSize"); // TODO: Support MipMaps
 
-	uint8 *pData = reinterpret_cast<uint8 *>(malloc(iDataSizeOut));
-	infile.read(reinterpret_cast<char *>(pData), iDataSizeOut);
+	uint8 *pData = reinterpret_cast<uint8 *>(malloc(uiDataSizeOut));
+	infile.read(reinterpret_cast<char *>(pData), uiDataSizeOut);
 	if(infile.bad())
 	{
 		ec = std::error_code(errno, std::generic_category());
-		HyLogError("HyIO::ReadImage - reading DDS file - " << ec.message() << ": " << sFilePath);
+		HyLogError("HyIO::ReadImage_DDS - reading DDS file - " << ec.message() << ": " << sFilePath);
 		free(pData);
 		return nullptr;
 	}
@@ -970,10 +1035,243 @@ struct HY_DDS_HEADER
 	if(infile.bad())
 	{
 		ec = std::error_code(errno, std::generic_category());
-		HyLogError("HyIO::ReadImage - closing DDS file - " << ec.message() << ": " << sFilePath);
+		HyLogError("HyIO::ReadImage_DDS - closing DDS file - " << ec.message() << ": " << sFilePath);
 		free(pData);
 		return nullptr;
 	}
 
 	return pData;
+}
+
+//static inline uint8_t getChannel(const uint8_t *src, int width, int height, int x, int y, int channel, int numChannels)
+//{
+//	int cx = (x < width) ? x : width - 1;
+//	int cy = (y < height) ? y : height - 1;
+//	return src[(cy * width + cx) * numChannels + channel];
+//}
+
+/*static*/ bool HyIO::WriteImage_DDS(const std::string &sFilePath, HyImageInfo imageInfo, uint8 *pData)
+{
+	int iWidth = imageInfo.GetWidth();
+	int iHeight = imageInfo.GetHeight();
+	int iNumChannels = imageInfo.GetNumChannels();
+
+	int iNumBlocksX = (imageInfo.GetWidth() + 3) / 4;
+	int iNumBlocksY = (imageInfo.GetHeight() + 3) / 4;
+	int iNumTotalBlocks = iNumBlocksX * iNumBlocksY;
+
+	// Build DDS header
+	HY_DDS_HEADER header;
+	memset(&header, 0, sizeof(HY_DDS_HEADER));
+	header.size = sizeof(HY_DDS_HEADER);
+	header.flags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_LINEARSIZE | DDSD_MIPMAPCOUNT;
+	header.width = iWidth;
+	header.height = iHeight;
+	header.mipMapCount = 1; // TODO: Support mipmaps
+	header.caps = DDSCAPS_TEXTURE;
+	header.pf.size = sizeof(HY_DDS_PIXELFORMAT);
+	header.pf.flags = DDPF_FOURCC;
+
+	int iBlockSize;
+	switch(imageInfo.GetNumChannels())
+	{
+	case 1:
+		if(imageInfo.GetFormat() != HYTEXFORMAT_SIGNED_RGTC1)
+			header.pf.fourCC = 0x55344342; // "BC4U"
+		else
+			header.pf.fourCC = 0x53344342; // "BC4S"
+		iBlockSize = 8;		// 8 bytes per 4x4 block
+		header.pitchOrLinearSize = iNumTotalBlocks * iBlockSize;
+		break;
+
+	case 2:
+		if(imageInfo.GetFormat() != HYTEXFORMAT_SIGNED_RGTC2)
+			header.pf.fourCC = 0x55354342; // "BC5U"
+		else
+			header.pf.fourCC = 0x53354342; // "BC5S"
+		iBlockSize = 16;	// 16 bytes per 4x4 block
+		header.pitchOrLinearSize = iNumTotalBlocks * iBlockSize;
+		break;
+
+	case 3:
+		header.pf.fourCC = 0x31545844; // "DXT1"
+		iBlockSize = 8;		// 8 bytes per 4x4 block
+		header.pitchOrLinearSize = iNumTotalBlocks * iBlockSize;
+		break;
+	
+	case 4:
+		header.pf.fourCC = 0x35545844; // "DXT5"
+		iBlockSize = 16;	// 16 bytes per 4x4 block
+		header.pitchOrLinearSize = iNumTotalBlocks * iBlockSize;
+		break;
+	
+	default:
+		HyLogError("HyIO::WriteImage_DDS - Unhandled fourCC: " << std::hex << header.pf.fourCC << std::dec);
+		return nullptr;
+	}
+	HyAssert(header.pf.fourCC != 0, "HyIO::WriteImage_DDS - Did not set header.pf.fourCC");
+	HyAssert(header.pitchOrLinearSize != 0, "HyIO::WriteImage_DDS - Did not set header.pitchOrLinearSize");
+
+	std::vector<uint8_t> compressed(header.pitchOrLinearSize);
+
+	// Compress each 4x4 block
+	for(int by = 0; by < iNumBlocksY; by++)
+	{
+		for(int bx = 0; bx < iNumBlocksX; bx++)
+		{
+			uint8_t *dest = &compressed[(by * iNumBlocksX + bx) * iBlockSize];
+
+			// Vertical flip: read from bottom of source
+			int srcBy = imageInfo.IsVerticalFlip() ? (iNumBlocksY - 1 - by) : by;
+
+			switch(iNumChannels)
+			{
+			case 3:
+			case 4: {
+				// Input: 16 pixels × 4 bytes (RGBA) = 64 bytes
+				uint8_t block[16 * 4];
+				for(int y = 0; y < 4; y++)
+				{
+					for(int x = 0; x < 4; x++)
+					{
+						int sx = bx * 4 + x;
+						int sy = srcBy * 4 + y;
+						uint8_t *px = &block[(y * 4 + x) * 4];
+
+						int cx = (sx < iWidth) ? sx : iWidth - 1;
+						int cy = (sy < iHeight) ? sy : iHeight - 1;
+						px[0] = pData[(cy * iWidth + cx) * iNumChannels + 0];
+						px[1] = pData[(cy * iWidth + cx) * iNumChannels + 1];
+						px[2] = pData[(cy * iWidth + cx) * iNumChannels + 2];
+						if(iNumChannels == 4)
+							px[3] = pData[(cy * iWidth + cx) * iNumChannels + 3];
+						else
+							px[3] = 255;
+
+						//px[0] = getChannel(pData, iWidth, iHeight, sx, sy, 0, iNumChannels);
+						//px[1] = getChannel(pData, iWidth, iHeight, sx, sy, 1, iNumChannels);
+						//px[2] = getChannel(pData, iWidth, iHeight, sx, sy, 2, iNumChannels);
+						//px[3] = (iNumChannels >= 4)
+							//? getChannel(pData, iWidth, iHeight, sx, sy, 3, iNumChannels)
+							//: 255; // opaque if no alpha
+					}
+				}
+				int alpha = (iNumChannels == 4) ? 1 : 0;
+				stb_compress_dxt_block(dest, block, alpha, 0);
+				break; }
+
+			case 1: {
+				// Input: 16 pixels × 1 byte (R) = 16 bytes
+				uint8_t block[16];
+				for(int y = 0; y < 4; y++)
+				{
+					for(int x = 0; x < 4; x++)
+					{
+						int sx = bx * 4 + x;
+						int sy = srcBy * 4 + y;
+
+						int cx = (sx < iWidth) ? sx : iWidth - 1;
+						int cy = (sy < iHeight) ? sy : iHeight - 1;
+						block[y * 4 + x] = pData[(cy * iWidth + cx) * iNumChannels + 0];
+						//block[y * 4 + x] = getChannel(pData, iWidth, iHeight, sx, sy, 0, iNumChannels);
+					}
+				}
+				stb_compress_bc4_block(dest, block);
+				break; }
+
+			case 2: {
+				// Input: 16 pixels × 2 bytes (RG interleaved) = 32 bytes
+				uint8_t block[16 * 2];
+				for(int y = 0; y < 4; y++)
+				{
+					for(int x = 0; x < 4; x++)
+					{
+						int sx = bx * 4 + x;
+						int sy = srcBy * 4 + y;
+						int idx = (y * 4 + x) * 2;
+
+						int cx = (sx < iWidth) ? sx : iWidth - 1;
+						int cy = (sy < iHeight) ? sy : iHeight - 1;
+						block[idx] = pData[(cy * iWidth + cx) * iNumChannels + 0];
+						block[idx + 1] = pData[(cy * iWidth + cx) * iNumChannels + 1];
+						//block[idx] = getChannel(pData, iWidth, iHeight, sx, sy, 0, iNumChannels); // R
+						//block[idx + 1] = getChannel(pData, iWidth, iHeight, sx, sy, 1, iNumChannels); // G
+					}
+				}
+				stb_compress_bc5_block(dest, block);
+				break; }
+			}
+		}
+	}
+	
+
+	//for(int by = 0; by < blocksY; by++)
+	//{
+	//	for(int bx = 0; bx < blocksX; bx++)
+	//	{
+	//		// Build a 4x4 RGBA block (pad with black if near edge)
+	//		uint8_t block[4 * 4 * 4];
+	//		for(int y = 0; y < 4; y++)
+	//		{
+	//			for(int x = 0; x < 4; x++)
+	//			{
+	//				int px = bx * 4 + x;
+	//				int py = by * 4 + y;
+	//				uint8_t *dst = &block[(y * 4 + x) * 4];
+	//				if(px < iWidth && py < iHeight)
+	//				{
+	//					const uint8_t *src = &rgba[(py * iWidth + px) * 4];
+	//					memcpy(dst, src, 4);
+	//				}
+	//				else
+	//				{
+	//					dst[0] = dst[1] = dst[2] = 0;
+	//					dst[3] = 255;
+	//				}
+	//			}
+	//		}
+
+	//		// alpha = 1 (use DXT5)
+	//		// mode = 0 (standard quality)
+	//		stb_compress_dxt_block(&compressed[(by * blocksX + bx) * iBlockSize], block,	1, 0);
+	//	}
+	//}
+
+	
+	// Write file
+	std::error_code ec;
+	std::ofstream outfile(sFilePath, std::ios::binary);
+	if(!outfile || outfile.bad())
+	{
+		ec = std::error_code(errno, std::generic_category());
+		HyLogError("HyIO::WriteImage_DDS - " << ec.message() << ": " << sFilePath);
+		return false;
+	}
+
+	uint32_t uiMagicNumber = 0x20534444; // "DDS "
+	outfile.write(reinterpret_cast<const char *>(&uiMagicNumber), sizeof(uint32_t));
+	outfile.write(reinterpret_cast<const char *>(&header), sizeof(HY_DDS_HEADER));
+	outfile.write(reinterpret_cast<const char *>(compressed.data()), compressed.size());
+	if(outfile.bad())
+	{
+		ec = std::error_code(errno, std::generic_category());
+		HyLogError("HyIO::WriteImage_DDS - writing file - " << ec.message() << ": " << sFilePath);
+		return false;
+	}
+	if(!outfile.flush())
+	{
+		ec = std::error_code(errno, std::generic_category());
+		HyLogError("HyIO::WriteImage_DDS - flushing file - " << ec.message() << ": " << sFilePath);
+		return false;
+	}
+
+	outfile.close();
+	if(outfile.bad())
+	{
+		ec = std::error_code(errno, std::generic_category());
+		HyLogError("HyIO::WriteImage_DDS - closing file - " << ec.message() << ": " << sFilePath);
+		return false;
+	}
+
+	return true;
 }

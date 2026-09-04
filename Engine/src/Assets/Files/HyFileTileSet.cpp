@@ -19,11 +19,11 @@ HyFileTileSet::HyFileTileSet(std::string sTileSetName, uint32 uiManifestIndex, H
 	m_bUseDescriptorEx(tileSetObj["isEx"].GetBool()),
 	m_iColumns(tileSetObj["cols"].GetInt()),
 	m_iRows(tileSetObj["rows"].GetInt()),
-	m_DescriptorTextureInfo(tileSetObj["descriptorTextureInfo"].GetUint()),
+	m_DescriptorImageInfo(tileSetObj["descriptorImageInfo"].GetUint()),
 	m_pDescriptorTexelData(nullptr),
 	m_uiDescriptorSize(0),
 	m_hDescriptorBufferPair(HY_UNUSED_HANDLE, HY_UNUSED_HANDLE),
-	m_DescriptorExTextureInfo(tileSetObj["descriptorExTextureInfo"].GetUint()),
+	m_DescriptorExImageInfo(tileSetObj["descriptorExImageInfo"].GetUint()),
 	m_pDescriptorExTexelData(nullptr),
 	m_uiDescriptorExSize(0),
 	m_hDescriptorExBufferPair(HY_UNUSED_HANDLE, HY_UNUSED_HANDLE)
@@ -85,14 +85,12 @@ void HyFileTileSet::DeleteTexelData()
 
 		DeleteTexelData();
 
-		std::string sAtlasFilePath = HyEngine::DataDir() + HYASSETS_TileSetDir + m_sFILE_NAME + HYASSETS_TileSetExt;
-		std::string sMagicNumber(&HYASSETS_TileSetExt[1]);
-		HyIO::ParseRawTextureFile(sAtlasFilePath, sMagicNumber, m_DescriptorTextureInfo, m_pDescriptorTexelData, m_uiDescriptorSize);
+		std::string sAtlasFilePath = HyEngine::DataDir() + HYASSETS_TileSetDir + m_sFILE_NAME + HyImageInfo::GetExt(HYIMAGE_HYTX);
+		HyIO::ReadImage(sAtlasFilePath, m_DescriptorImageInfo, m_pDescriptorTexelData, m_uiDescriptorSize);
 
 		if(m_bUseDescriptorEx)
 		{
-			std::string sAtlasFilePathEx = HyEngine::DataDir() + HYASSETS_TileSetDir + m_sFILE_NAME + HYASSETS_TileSetExExt;
-			std::string sExMagicNumber(&HYASSETS_TileSetExExt[1]);
+			std::string sAtlasFilePathEx = HyEngine::DataDir() + HYASSETS_TileSetDir + m_sFILE_NAME + "Ex" + HyImageInfo::GetExt(HYIMAGE_HYTX);
 			HyIO::ParseRawTextureFile(sAtlasFilePathEx, sExMagicNumber, m_DescriptorExTextureInfo, m_pDescriptorExTexelData, m_uiDescriptorExSize);
 		}
 	}

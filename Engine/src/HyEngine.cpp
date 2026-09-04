@@ -357,10 +357,10 @@ bool HyEngine::PollPlatformApi()
 	return sAbsDataDir;
 }
 
-/*static*/ HyTextureQuadHandle HyEngine::CreateTexture(std::string sFilePath, HyTextureInfo textureInfo)
+/*static*/ HyTextureQuadHandle HyEngine::CreateTextureQuad(std::string sFilePath, HyImageInfo imageInfo, HyTextureInf textureInfo)
 {
-	HyAssert(sm_pInstance != nullptr, "HyEngine::CreateTexture() was invoked before engine has been initialized.");
-	return sm_pInstance->m_Assets.CreateAuxiliaryTextureQuad(sFilePath, textureInfo);
+	HyAssert(sm_pInstance != nullptr, "HyEngine::CreateTextureQuad() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Assets.CreateAuxiliaryTextureQuad(sFilePath, imageInfo, textureInfo);
 }
 
 /*static*/ HyAudioHandle HyEngine::CreateAudio(std::string sFilePath, bool bIsStreaming /*= false*/, int32 iInstanceLimit /*= 0*/, int32 iCategoryId /*= 0*/)
