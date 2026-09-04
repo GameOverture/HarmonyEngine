@@ -13,6 +13,70 @@
 #include "Utilities/HyIO.h"
 #include "Utilities/HyJson.h"
 
+HyImageInfo::HyImageInfo(HyImageType eType, int iNumChannels, HyTextureFormat eFormat, bool bFlipVertically)
+{
+}
+
+HyImageInfo::HyImageInfo(uint32 uiBucketId)
+{
+}
+
+uint32 HyImageInfo::GetBucketId() const
+{
+}
+
+HyImageType HyImageInfo::GetType() const
+{
+}
+
+void HyImageInfo::SetType(HyImageType eType)
+{
+}
+
+int HyImageInfo::GetNumChannels() const
+{
+}
+
+void HyImageInfo::SetNumChannels(int iNumChannels)
+{
+}
+
+HyTextureFormat HyImageInfo::GetFormat() const
+{
+}
+
+void HyImageInfo::SetFormat(HyTextureFormat eFormat)
+{
+}
+
+bool HyImageInfo::IsFlipVertically() const
+{
+}
+
+void HyImageInfo::SetFlipVertically(bool bFlipVertically)
+{
+}
+
+/*static*/ std::string HyImageInfo::GetExt(HyImageType eType)
+{
+	switch(eType)
+	{
+	case HYIMAGE_HYTX:
+		return ".hytx";
+	case HYIMAGE_PNG:
+		return ".png";
+	case HYIMAGE_DDS:
+		return ".dds";
+	case HYIMAGE_ASTC:
+		return ".astc";
+	case HYIMAGE_Unknown:
+	default:
+		break;
+	}
+
+	return std::string();
+}
+
 HyTextureInfo::HyTextureInfo() :
 	m_uiFiltering(HYTEXFILTER_BILINEAR),
 	m_uiFileType(HYTEXTUREFILE_PNG),
@@ -77,24 +141,6 @@ bool HyTextureInfo::IsMipMaps() const
 
 	default:
 		return false;
-	}
-}
-
-std::string HyTextureInfo::GetFileExt() const
-{
-	switch(m_uiFileType)
-	{
-	case HYTEXTUREFILE_PNG:
-		return ".png";
-	case HYTEXTUREFILE_DXT:
-		return ".dds";
-	case HYTEXTUREFILE_ASTC:
-		return ".astc";
-
-	case HYTEXTUREFILE_RAW:
-	case HYTEXTUREFILE_Unknown:
-	default:
-		return ".xxx";
 	}
 }
 

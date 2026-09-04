@@ -28,13 +28,6 @@
 #define HYASSETS_AudioDir "Audio/"
 #define HYASSETS_SpineDir "Spine/"
 
-#define HYASSETS_MagicNumberHeaderSize 8
-#define HYASSETS_TileSetExt ".hyts"
-#define HYASSETS_TileSetExExt ".hytsex"
-//#define HYASSETS_TileSetBankId 0xEFFFFFFF
-static_assert((sizeof(HYASSETS_TileSetExt) - 1) < HYASSETS_MagicNumberHeaderSize, "TileSet extension (minus the .) is used as the file header 'magic number' and must fit within 8 bytes");
-static_assert((sizeof(HYASSETS_TileSetExExt) - 1) < HYASSETS_MagicNumberHeaderSize, "TileSet extension (minus the .) is used as the file header 'magic number' and must fit within 8 bytes");
-
 #define HYASSETS_TileMapChunkSize 16
 
 class HyAudioCore;

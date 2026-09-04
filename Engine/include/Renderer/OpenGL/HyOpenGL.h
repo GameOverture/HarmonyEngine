@@ -76,6 +76,7 @@ public:
 	virtual HyBufferHandle GenerateIndexBuffer() override;
 	virtual void GetTextureSize(HyTextureHandle hTexture, uint32 &uiWidthOut, uint32 &uiHeightOut) override;
 	virtual void WriteTexels(HyTextureHandle hTexture) override;
+	virtual bool SaveScreenshot(const std::string &sFilePath, uint32 uiWindowIndex) override;
 
 private:
 	void CompileShader(HyShader *pShader, HyShaderType eType);

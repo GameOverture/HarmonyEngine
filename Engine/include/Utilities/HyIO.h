@@ -31,30 +31,33 @@ public:
 	static uint32 Utf8_to_Utf32(const char *pChar, uint32 &uiNumBytesUsedRef); // Converts a given UTF-8 encoded character (array) to its UTF-32 LE equivalent
 	static std::string Utf32_to_Utf8(uint32 uiChar); // Converts a given UTF-32 LE character to its UTF-8 encoded equivalent
 
+	static std::string UrlEncode(std::string sString);
+	static std::string UrlDecode(std::string sString);
+	static std::string HtmlDecode(std::string sString);
+
 	static std::string CleanPath(const std::string &sDirtyPath, const std::string &sExtension = "");
 	static std::string GetWorkingDirectory();
 	static std::string GetFileNameFromPath(const std::string &sPath);
 	static std::string GetDirectoryFromPath(const std::string &sPath); // Returns the directory of sPath. If sPath is a directory, then it returns the parent directory of sPath. Return value will have a trailing slash.
 	static std::string GetExtensionFromPath(const std::string &sPath);
 	static std::string GetFileNameWithoutExtension(const std::string &sPath);
-	static bool FileExists(const std::string &sFilePath);
+	static bool FileExists(const std::string &sFilePath, bool bRegularFile = true);
 	static bool DirectoryExists(const std::string &sDirPath);
 	static std::vector<std::string> GetFileList(const std::string &sDirPath, const std::string &sFilterExtension, bool bRecursively); // sFilterExtension can be empty or in the form of example: ".png" or ".txt"
 
-	static void ReadTextFile(const char *szFilePath, std::vector<char> &sContentsOut);
-	static void WriteTextFile(const char *szFilePath, const char *szContentBuffer);
-
+	static bool ReadTextFile(const std::string &sFilePath, std::vector<char> &sContentsOut);
+	static bool WriteTextFile(const std::string &sFilePath, const char *szContentBuffer);
 	static bool ReadBinaryFile(const std::string &sFilePath, std::vector<uint8> &contentsOut);
+	static bool WriteBinaryFile(const std::string &sFilePath, const std::vector<uint8> &data);
 	
-	static bool ParseRawTextureFile(const std::string &sFilePath, const std::string &sMagicNumberHeader, const HyTextureInfo textureInfo, unsigned char *&pTexelDataOut, uint32 &uiDataSizeOut);
+	static uint8 *ReadImage(const std::string &sFilePath, HyImageInfo &loadHintsInOut, int &iWidthOut, int &iHeightOut, int &iNumChannelsOut, int &iDataSizeOut);
+	static void DeleteImage(uint8 *pImageData);
+	static bool WriteImage(const std::string &sFilePath, HyImageType eImageType, int iWidth, int iHeight, int iNumChannels, bool bFlipVertically, uint8 *pData);
 
-	static std::string UrlEncode(std::string sString);
-	static std::string UrlDecode(std::string sString);
-
-	static std::string HtmlDecode(std::string sString);
-
-	static bool SaveImage_DTX5(const char *szFilename, int iWidth, int iHeight, const unsigned char *const pUncompressedPixelData);
-	static bool SaveImage_DTX1(const char *szFilename, int iWidth, int iHeight, const unsigned char *const pUncompressedPixelData);
+private:
+	static uint8 *ReadImage_PNG(const std::string &sFilePath, HyImageInfo &loadHintsInOut, int &iWidthOut, int &iHeightOut, int &iNumChannelsOut, int &iDataSizeOut);
+	static uint8 *ReadImage_HYTX(const std::string &sFilePath, int &iWidthOut, int &iHeightOut, int &iNumChannelsOut, int &iDataSizeOut);
+	static uint8 *ReadImage_DDS(const std::string &sFilePath, int &iWidthOut, int &iHeightOut, int &iNumChannelsOut, int &iDataSizeOut);
 };
 
 #endif /* HyFileIO_h__ */

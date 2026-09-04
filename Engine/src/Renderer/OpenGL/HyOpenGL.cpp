@@ -19,6 +19,7 @@
 #include "Diagnostics/Console/IHyConsole.h"
 #include "Scene/Nodes/Objects/HyCamera.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/IHyDrawable2d.h"
+#include "Utilities/HyIO.h"
 
 HyOpenGL::HyOpenGL(std::vector<HyWindow *> &windowListRef, HyDiagnostics &diagnosticsRef) :
 	IHyRenderer(windowListRef, diagnosticsRef),
@@ -839,6 +840,47 @@ HyOpenGL::~HyOpenGL(void)
 /*virtual*/ void HyOpenGL::WriteTexels(HyTextureHandle hTexture) /*override*/
 {
 	//glTexSubImage2D(hTexture, 0, 
+}
+
+/*virtual*/ bool HyOpenGL::SaveScreenshot(const std::string &sFilePath, uint32 uiWindowIndex) /*override*/
+{
+	SetCurrentWindow(uiWindowIndex);
+
+	GLint iPackAlignment;
+	glGetIntegerv(GL_PACK_ALIGNMENT, &iPackAlignment);
+	if(iPackAlignment != 1)
+		glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+	glm::ivec2 vFrameBufferSize = m_pCurWindow->GetFramebufferSize();
+	size_t uiDataSize = 3ll * vFrameBufferSize.x * vFrameBufferSize.y;
+
+	std::vector<uint8> dataVec;
+	dataVec.resize(uiDataSize);
+
+	glReadPixels(0, 0, vFrameBufferSize.x, vFrameBufferSize.y, GL_RGB, GL_UNSIGNED_BYTE, dataVec.data());
+
+	glPixelStorei(GL_PACK_ALIGNMENT, iPackAlignment);
+
+	// Flip/invert the image data
+	for(int iRow = 0; (iRow * 2) < vFrameBufferSize.y; ++iRow)
+	{
+		int index1 = iRow * vFrameBufferSize.x * 3;
+		int index2 = (vFrameBufferSize.y - 1 - iRow) * vFrameBufferSize.x * 3;
+		for(int i = vFrameBufferSize.x * 3; i > 0; --i)
+		{
+			uint8 uiTemp = dataVec[index1];
+			dataVec[index1] = dataVec[index2];
+			dataVec[index2] = uiTemp;
+			++index1;
+			++index2;
+		}
+	}
+
+	return HyIO::WritePngImage(sFilePath, vFrameBufferSize.x, vFrameBufferSize.y, 3, dataVec);
+
+	/*	save the image	*/
+	save_result = SOIL_save_image( filename, image_type, width, height, 3, pixel_data);
+
 }
 
 void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)

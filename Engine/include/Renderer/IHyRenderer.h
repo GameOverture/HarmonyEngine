@@ -94,6 +94,7 @@ public:
 	virtual HyBufferHandle GenerateIndexBuffer() = 0;
 	virtual void GetTextureSize(HyTextureHandle hTexture, uint32 &uiWidthOut, uint32 &uiHeightOut) = 0;
 	virtual void WriteTexels(HyTextureHandle hTexture) = 0;
+	virtual bool SaveScreenshot(const std::string &sFilePath, uint32 uiWindowIndex) = 0;
 
 	static HyShader *FindShader(HyShaderHandle hHandle);
 	static void AddShader(HyShader *pShader);

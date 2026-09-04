@@ -400,75 +400,126 @@ enum HyDiagFlag
 	HYDIAG_ALL				= (HYDIAG_FRAMERATE | HYDIAG_GRAPH | HYDIAG_INPUT | HYDIAG_PHYSICS_ALL)
 };
 
-enum HyTextureFiltering
+enum HyTextureFilter
 {
 	// NOTE: Order cannot change without editor version patcher update. New entires may append to this list
 	HYTEXFILTER_Unknown = 255,
+
 	HYTEXFILTER_NEAREST = 0,
-	HYTEXFILTER_NEAREST_MIPMAP,
-	HYTEXFILTER_LINEAR_MIPMAP,
 	HYTEXFILTER_BILINEAR,
-	HYTEXFILTER_BILINEAR_MIPMAP,
 	HYTEXFILTER_TRILINEAR,
+	//HYTEXFILTER_NEAREST_MIPMAP,
+	//HYTEXFILTER_LINEAR_MIPMAP,
+	//HYTEXFILTER_BILINEAR_MIPMAP,
 
 	HYNUM_TEXTUREFILTERS
 };
-static_assert(HYNUM_TEXTUREFILTERS < 255, "HyTextureFiltering cannot exceed 255 values (including unknown). Needs to fit in uint8 (HyTextureInfo::m_uiFiltering)");
+static_assert(HYNUM_TEXTUREFILTERS < 255, "HyTextureFilter cannot exceed 254 values. Needs to fit in uint8 (HyTextureInfo::m_uiFilter)");
 
-enum HyTextureFileType
+enum HyTextureWrap
 {
 	// NOTE: Order cannot change without editor version patcher update. New entires may append to this list
-	HYTEXTUREFILE_Unknown = 255,
-	HYTEXTUREFILE_PNG = 0,		// Param1: num channels						Param2: Two packed HyTextureFormatTypes (only UINT8 and UINT16 supported for the first dataFormat)
-	HYTEXTUREFILE_DXT,			// Param1: num channels						Param2: DXT format (1,3,5)
-	HYTEXTUREFILE_ASTC,			// Param1: Block Size index (4x4 -> 12x12)	Param2: Color Profile (LDR linear, LDR sRGB, HDR RGB, HDR RGBA)
-	HYTEXTUREFILE_RAW,			// Param1: num channels						Param2: Two packed HyTextureFormatTypes
+	HYTEXWRAP_Unknown = 255,
 
-	HYNUM_TEXTUREFILES
+	HYTEXWRAP_Repeat = 0,
+	HYTEXWRAP_ClampToEdge,
+	HYTEXWRAP_ClampToBorder,
+	HYTEXWRAP_MirroredRepeat,
+	HYTEXWRAP_MirrorClampToEdge,
+
+	HYNUM_TEXTUREWRAPS
 };
-static_assert(HYNUM_TEXTUREFILES < 255, "HyTextureFileType cannot exceed 255 values (including unknown). Needs to fit in uint8 (HyTextureInfo::m_uiFileType)");
+static_assert(HYNUM_TEXTUREFILTERS < 255, "HyTextureWrap cannot exceed 254 values. Needs to fit in uint8 (HyTextureInfo::m_uiWrap)");
 
-enum HyTextureFormatType
+enum HyTextureFormat
 {
-	HYTEXTUREFORMAT_UINT8 = 0,
-	HYTEXTUREFORMAT_INT8,
-	HYTEXTUREFORMAT_NORM8,
-	HYTEXTUREFORMAT_SNORM8,
-	HYTEXTUREFORMAT_UINT16,
-	HYTEXTUREFORMAT_INT16,
-	HYTEXTUREFORMAT_NORM16,
-	HYTEXTUREFORMAT_SNORM16,
-	HYTEXTUREFORMAT_UINT32,
-	HYTEXTUREFORMAT_INT32,
-	HYTEXTUREFORMAT_FLOAT16,
-	HYTEXTUREFORMAT_FLOAT32,
+	// NOTE: Order cannot change without editor version patcher update. New entires may append to this list
+	HYTEXFORMAT_Unknown = 255,
 
-	HYNUM_TEXTUREFORMATSTYPES
+	HYTEXFORMAT_UINT8 = 0,
+	HYTEXFORMAT_INT8,
+	HYTEXFORMAT_NORM8,
+	HYTEXFORMAT_SNORM8,
+	HYTEXFORMAT_UINT16,
+	HYTEXFORMAT_INT16,
+	HYTEXFORMAT_NORM16,
+	HYTEXFORMAT_SNORM16,
+	HYTEXFORMAT_UINT32,
+	HYTEXFORMAT_INT32,
+	HYTEXFORMAT_FLOAT16,
+	HYTEXFORMAT_FLOAT32,
+
+	HYNUM_TEXTUREFORMATS
 };
-static_assert(HYNUM_TEXTUREFORMATSTYPES < 16, "HyTextureFormatType cannot exceed 16 values. Need to pack two in a uint8 (HyTextureInfo::m_uiFormatParam2)");
+static_assert(HYNUM_TEXTUREFORMATS < 255, "HyTextureFormat cannot exceed 254 values. Needs to fit in uint8 (HyImageInfo::m_uiFormat & HyTextureInfo::m_uiFormat)");
 
-struct HyTextureInfo
+enum HyImageType
 {
-	uint8				m_uiFiltering;
-	uint8				m_uiFileType;
-	uint8				m_uiFormatParam1;
-	uint8				m_uiFormatParam2;
+	// NOTE: Order cannot change without editor version patcher update. New entires may append to this list
+	HYIMAGE_Unknown = 255,
 
-	HyTextureInfo();
-	HyTextureInfo(HyTextureFiltering eFiltering, HyTextureFileType eFileType, uint8 uiFormatParam1, uint8 uiFormatParam2);
-	HyTextureInfo(uint32 uiBucketId);
+	HYIMAGE_PNG = 0,	// only HYTEXFORMAT_UINT8 and HYTEXFORMAT_UINT16 supported
+	HYIMAGE_HYTX,
+	HYIMAGE_DDS,		// Param1: num channels						Param2: DXT format (1,3,5)
+	HYIMAGE_ASTC,		// Param1: Block Size index (4x4 -> 12x12)	Param2: Color Profile (LDR linear, LDR sRGB, HDR RGB, HDR RGBA)
 
-	bool operator==(const HyTextureInfo &rhs) const;
-	bool operator!=(const HyTextureInfo &rhs) const;
+	HYNUM_IMAGETYPES
+};
+static_assert(HYNUM_IMAGETYPES < 255, "HyImageType cannot exceed 254 values. Needs to fit in uint8 (HyImageInfo::m_uiType)");
 
-	HyTextureFileType GetFileType() const;
-	HyTextureFiltering GetFiltering() const;
-	void GetUncompressedFormatTypes(HyTextureFormatType &eDataFormatOut, HyTextureFormatType &eInternalFormatOut) const;
-	static uint8 PackUncompressedFormatTypes(HyTextureFormatType eDataFormat, HyTextureFormatType eInternalFormat);
+class HyImageInfo
+{
+	uint8				m_uiType;
+	uint8				m_uiChannels;
+	uint8				m_uiFormat;
+	uint8				m_uiFlipVertically;
 
-	bool IsMipMaps() const;
-	std::string GetFileExt() const; // Includes the dot (like ".png")
+public:
+	HyImageInfo(HyImageType eType, int iNumChannels, HyTextureFormat eFormat, bool bFlipVertically);
+	HyImageInfo(uint32 uiBucketId);
+
 	uint32 GetBucketId() const;
+
+	HyImageType GetType() const;
+	void SetType(HyImageType eType);
+
+	int GetNumChannels() const;
+	void SetNumChannels(int iNumChannels);
+
+	HyTextureFormat GetFormat() const;
+	void SetFormat(HyTextureFormat eFormat);
+
+	bool IsFlipVertically() const;
+	void SetFlipVertically(bool bFlipVertically);
+
+	static std::string GetExt(HyImageType eType); // Includes the dot (like ".png")
+};
+
+class HyTextureInf
+{
+	uint8				m_uiFilter;
+	uint8				m_uiWrap;
+	uint8				m_uiFormat;
+	uint8				m_uiFlags;
+
+public:
+	HyTextureInf();
+	HyTextureInf(HyTextureFilter eFilter, HyTextureWrap eWrap, HyTextureFormat eFormat, uint8 uiFlags);
+	HyTextureInf(uint32 uiBucketId);
+
+	uint32 GetBucketId() const;
+
+	HyTextureFilter GetFilter() const;
+	void SetFilter(HyTextureFilter eFilter);
+
+	HyTextureWrap GetWrap() const;
+	void SetWrap(HyTextureWrap eWrap);
+
+	HyTextureFormat GetFormat() const;
+	void SetFormat(HyTextureFormat eFormat);
+
+	uint8 GetFlags() const;
+	void SetFlags(uint8 uiFlags);
 };
 
 struct HyWindowInfo
