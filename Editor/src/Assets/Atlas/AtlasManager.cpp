@@ -26,7 +26,8 @@
 
 AtlasManager::AtlasManager(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Atlases),
-	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTUREFILE_PNG, 4, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT8, HYTEXTUREFORMAT_NORM8)),
+	m_DefaultImageInfo(0, 0, HYIMAGE_PNG, 4, HYTEXFORMAT_UINT8, true),
+	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXWRAP_ClampToEdge, HYTEXFORMAT_NORM8, 0),
 	m_TileSetsTreeModel(this)
 {
 	QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));

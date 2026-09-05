@@ -23,7 +23,8 @@ AtlasFrame::AtlasFrame(ItemType eThisAssetType, // Might be either ITEM_AtlasFra
 					   quint16 uiCropTop,
 					   quint16 uiCropRight,
 					   quint16 uiCropBottom,
-					   HyTextureInfo texInfo,
+					   HyImageInfo imageInfo,
+					   HyTextureInf textureInfo,
 					   quint16 uiW,
 					   quint16 uiH,
 					   quint16 uiX,
@@ -38,7 +39,8 @@ AtlasFrame::AtlasFrame(ItemType eThisAssetType, // Might be either ITEM_AtlasFra
 	m_uiCropTop(uiCropTop),
 	m_uiCropRight(uiCropRight),
 	m_uiCropBottom(uiCropBottom),
-	m_TexInfo(texInfo),
+	m_ImageInfo(imageInfo),
+	m_TextureInfo(textureInfo),
 	m_iTextureIndex(iTextureIndex),
 	m_uiPosX(uiX),
 	m_uiPosY(uiY)
@@ -101,31 +103,47 @@ quint64 AtlasFrame::GetFrameMask() const
 	return (quint64(m_uiPosX) << 48) | (quint64(m_uiPosY + GetCroppedHeight()) << 32) | (quint64(m_uiPosX + GetCroppedWidth()) << 16) | quint64(m_uiPosY);
 }
 
-HyTextureFileType AtlasFrame::GetFileType() const
+HyImageType AtlasFrame::GetImageType() const
 {
-	return m_TexInfo.GetFileType();
+	return m_ImageInfo.GetType();
 }
 
-void AtlasFrame::SetFormat(HyTextureFileType eFileType, uint8 uiFormatParam1, uint8 uiFormatParam2)
+void AtlasFrame::SetImageType(HyImageType eType, int iNumChannels, HyTextureFormat eFormat)
 {
-	m_TexInfo.m_uiFileType = eFileType;
-	m_TexInfo.m_uiFormatParam1 = uiFormatParam1;
-	m_TexInfo.m_uiFormatParam2 = uiFormatParam2;
+	m_ImageInfo.SetType(eType);
+	m_ImageInfo.SetNumChannels(iNumChannels);
+	m_ImageInfo.SetFormat(eFormat);
+	m_TextureInfo.SetFormat(eFormat);
 }
 
-HyTextureFiltering AtlasFrame::GetFiltering() const
+HyTextureFilter AtlasFrame::GetFilter() const
 {
-	return m_TexInfo.GetFiltering();
+	return m_TextureInfo.GetFilter();
 }
 
-void AtlasFrame::SetFiltering(HyTextureFiltering eFiltering)
+void AtlasFrame::SetFilter(HyTextureFilter eFilter)
 {
-	m_TexInfo.m_uiFiltering = eFiltering;
+	m_TextureInfo.SetFilter(eFilter);
 }
 
-HyTextureInfo AtlasFrame::GetTextureInfo() const
+HyTextureWrap AtlasFrame::GetWrap() const
 {
-	return m_TexInfo;
+	return m_TextureInfo.GetWrap();
+}
+
+void AtlasFrame::SetWrap(HyTextureWrap eWrap)
+{
+	m_TextureInfo.SetWrap(eWrap);
+}
+
+HyImageInfo AtlasFrame::GetImageInfo() const
+{
+	return m_ImageInfo;
+}
+
+HyTextureInf AtlasFrame::GetTextureInfo() const
+{
+	return m_TextureInfo;
 }
 
 int AtlasFrame::GetTextureIndex() const
@@ -225,7 +243,7 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 
 /*virtual*/ QString AtlasFrame::GetPropertyInfo() /*override*/
 {
-	return QString(HyAssets::GetTextureFileTypeName(static_cast<HyTextureFileType>(m_TexInfo.m_uiFileType)).c_str()) % " | " % QString(HyAssets::GetTextureFilteringName(static_cast<HyTextureFiltering>(m_TexInfo.m_uiFiltering)).c_str());
+	return QString(HyAssets::GetImageTypeName(m_ImageInfo.GetType()).c_str()) % " | " % QString(HyAssets::GetTextureFilterName(static_cast<HyTextureFilter>(m_TextureInfo.GetFilter())).c_str());
 }
 
 /*virtual*/ QString AtlasFrame::OnReplaceAllowed() /*override*/
@@ -259,5 +277,6 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	frameObj.insert("cropTop", QJsonValue(m_uiCropTop));//GetCrop().top()));
 	frameObj.insert("cropRight", QJsonValue(m_uiCropRight));//GetCrop().right()));
 	frameObj.insert("cropBottom", QJsonValue(m_uiCropBottom));//GetCrop().bottom()));
-	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TexInfo.GetBucketId())));
+	frameObj.insert("imageInfo", QJsonValue(static_cast<qint64>(m_ImageInfo.GetBucketId())));
+	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TextureInfo.GetBucketId())));
 }

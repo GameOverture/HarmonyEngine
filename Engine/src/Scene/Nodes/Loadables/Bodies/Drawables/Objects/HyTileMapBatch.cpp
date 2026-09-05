@@ -31,8 +31,8 @@ HyTileMapBatch::HyTileMapBatch(HyFileTileSet *pTileSet, HyTileMapLayer *pParent)
 	m_pTileIdArray = HY_NEW std::array<uint16_t, HYASSETS_TileMapChunkSize * HYASSETS_TileMapChunkSize>();
 	m_pTileIdArray->fill(0);
 
-	HyTextureInfo texInfo(HYTEXFILTER_NEAREST, HYTEXTUREFILE_RAW, 1, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT16, HYTEXTUREFORMAT_UINT16));
-	m_hTileMap = sm_pHyRenderer->AddTexture(texInfo, HYASSETS_TileMapChunkSize, HYASSETS_TileMapChunkSize, reinterpret_cast<unsigned char *>(m_pTileIdArray->data()), sizeof(uint16_t) * (HYASSETS_TileMapChunkSize * HYASSETS_TileMapChunkSize));
+	//HyTextureInfo texInfo(HYTEXFILTER_NEAREST, HYTEXTUREFILE_RAW, 1, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT16, HYTEXTUREFORMAT_UINT16));
+	//m_hTileMap = sm_pHyRenderer->AddTexture(texInfo, HYASSETS_TileMapChunkSize, HYASSETS_TileMapChunkSize, reinterpret_cast<unsigned char *>(m_pTileIdArray->data()), sizeof(uint16_t) * (HYASSETS_TileMapChunkSize * HYASSETS_TileMapChunkSize));
 }
 
 HyTileMapBatch::~HyTileMapBatch(void)

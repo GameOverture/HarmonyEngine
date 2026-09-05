@@ -86,12 +86,12 @@ void HyFileTileSet::DeleteTexelData()
 		DeleteTexelData();
 
 		std::string sAtlasFilePath = HyEngine::DataDir() + HYASSETS_TileSetDir + m_sFILE_NAME + HyImageInfo::GetExt(HYIMAGE_HYTX);
-		HyIO::ReadImage(sAtlasFilePath, m_DescriptorImageInfo, m_pDescriptorTexelData, m_uiDescriptorSize);
+		m_pDescriptorTexelData = HyIO::ReadImage(sAtlasFilePath, m_DescriptorImageInfo, m_uiDescriptorSize);
 
 		if(m_bUseDescriptorEx)
 		{
 			std::string sAtlasFilePathEx = HyEngine::DataDir() + HYASSETS_TileSetDir + m_sFILE_NAME + "Ex" + HyImageInfo::GetExt(HYIMAGE_HYTX);
-			HyIO::ParseRawTextureFile(sAtlasFilePathEx, sExMagicNumber, m_DescriptorExTextureInfo, m_pDescriptorExTexelData, m_uiDescriptorExSize);
+			m_pDescriptorExTexelData = HyIO::ReadImage(sAtlasFilePathEx, m_DescriptorExImageInfo, m_uiDescriptorExSize);
 		}
 	}
 
@@ -103,9 +103,13 @@ void HyFileTileSet::DeleteTexelData()
 	m_Mutex_PixelData.lock();
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		m_hDescriptorBufferPair = rendererRef.AddTextureBufferObject(m_DescriptorTextureInfo, m_pDescriptorTexelData, m_uiDescriptorSize);
+		HyTextureInf textureInfo(HYTEXFILTER_NEAREST, HYTEXWRAP_ClampToEdge, m_DescriptorImageInfo.GetFormat(), 0);
+		m_hDescriptorBufferPair = rendererRef.AddTextureBufferObject(m_DescriptorImageInfo, textureInfo, m_pDescriptorTexelData, m_uiDescriptorSize);
 		if(m_bUseDescriptorEx)
-			m_hDescriptorExBufferPair = rendererRef.AddTextureBufferObject(m_DescriptorExTextureInfo, m_pDescriptorExTexelData, m_uiDescriptorExSize);
+		{
+			HyTextureInf textureInfoEx(HYTEXFILTER_NEAREST, HYTEXWRAP_ClampToEdge, m_DescriptorExImageInfo.GetFormat(), 0);
+			m_hDescriptorExBufferPair = rendererRef.AddTextureBufferObject(m_DescriptorExImageInfo, textureInfoEx, m_pDescriptorExTexelData, m_uiDescriptorExSize);
+		}
 
 		DeleteTexelData();
 	}
@@ -121,9 +125,9 @@ void HyFileTileSet::DeleteTexelData()
 /*virtual*/ std::string HyFileTileSet::GetAssetInfo() /*override*/
 {
 	std::stringstream ss;
-	ss << m_sFILE_NAME + HYASSETS_TileSetExt;
+	ss << m_sFILE_NAME;
 	if(m_bUseDescriptorEx)
-		ss << " + " + m_sFILE_NAME + HYASSETS_TileSetExExt;
+		ss << " + " + m_sFILE_NAME + "Ex";
 	
 	return ss.str();
 }

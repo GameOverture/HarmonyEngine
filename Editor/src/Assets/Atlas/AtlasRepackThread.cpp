@@ -221,7 +221,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 	}
 }
 
-QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker &atlasPackerRef, HyTextureInfo texInfo, int iPackerBinIndex, int iActualTextureIndex)
+QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker &atlasPackerRef, HyImageInfo imageInfo, HyTextureInf textureInfo, int iPackerBinIndex, int iActualTextureIndex)
 {
 	QSize textureSize = atlasPackerRef.GetBinDimensions(iPackerBinIndex);
 

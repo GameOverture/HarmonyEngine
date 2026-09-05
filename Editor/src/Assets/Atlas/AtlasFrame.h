@@ -33,7 +33,8 @@ protected:
 	quint16								m_uiCropRight;
 	quint16								m_uiCropBottom;
 
-	HyTextureInfo						m_TexInfo;
+	HyImageInfo							m_ImageInfo;
+	HyTextureInf						m_TextureInfo;
 	int									m_iTextureIndex;
 
 	quint16								m_uiPosX;
@@ -53,7 +54,8 @@ public:
 			   quint16 uiCropTop,
 			   quint16 uiCropRight,
 			   quint16 uiCropBottom,
-			   HyTextureInfo texInfo,
+			   HyImageInfo imageInfo,
+			   HyTextureInf textureInfo,
 			   quint16 uiW, quint16 uiH, quint16 uiX, quint16 uiY,
 			   int iTextureIndex,
 			   uint uiErrors);
@@ -71,13 +73,15 @@ public:
 	quint64 GetCropMask() const;
 	quint64 GetFrameMask() const;
 	
-	HyTextureFileType GetFileType() const;
-	void SetFormat(HyTextureFileType eFileType, uint8 uiFormatParam1, uint8 uiFormatParam2);
+	HyImageType GetImageType() const;
+	void SetImageType(HyImageType eType, int iNumChannels, HyTextureFormat eFormat);
+	HyTextureFilter GetFilter() const;
+	void SetFilter(HyTextureFilter eFilter);
+	HyTextureWrap GetWrap() const;
+	void SetWrap(HyTextureWrap eWrap);
 
-	HyTextureFiltering GetFiltering() const;
-	void SetFiltering(HyTextureFiltering eFiltering);
-
-	HyTextureInfo GetTextureInfo() const;
+	HyImageInfo GetImageInfo() const;
+	HyTextureInf GetTextureInfo() const;
 
 	int GetTextureIndex() const;
 	quint16 GetX() const;

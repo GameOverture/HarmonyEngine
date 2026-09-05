@@ -794,8 +794,10 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 				std::string sAtlasFilePath = szTmpBuffer;
 
 				HyJsonObj texObj = texturesArray[j].GetObject();
-				HyTextureInfo texInfo(texObj["textureInfo"].GetUint());
-				sAtlasFilePath += texInfo.GetFileExt();
+				HyImageInfo imageInfo(static_cast<uint64>(texObj["imageInfo"].GetInt64()));
+				sAtlasFilePath += HyImageInfo::GetExt(imageInfo.GetType());
+				
+				HyTextureInf texInfo(texObj["textureInfo"].GetUint());
 
 				new (pAtlasWriteLocation)HyFileAtlas(sAtlasFilePath,
 					uiBankId,
@@ -1077,8 +1079,11 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 {
 	std::vector<HyTextureFilter> list;
 	list.push_back(HYTEXFILTER_NEAREST);
+	list.push_back(HYTEXFILTER_NEAREST_MIPMAP);
+	list.push_back(HYTEXFILTER_LINEAR_MIPMAP);
 	list.push_back(HYTEXFILTER_BILINEAR);
-	list.push_back(HYTEXFILTER_TRILINEAR);
+	list.push_back(HYTEXFILTER_BILINEAR_MIPMAP);
+	list.push_back(HYTEXFILTER_TRILINEAR_MIPMAP);
 
 	HyAssert(list.size() == HYNUM_TEXTUREFILTERS, "HyGlobal::GetTextureFilterList missing a format!");
 	return list;
@@ -1102,10 +1107,16 @@ void HyAssets::SetAsUnloaded(IHyLoadable *pLoadable)
 	{
 	case HYTEXFILTER_NEAREST:
 		return "Nearest";
+	case HYTEXFILTER_NEAREST_MIPMAP:
+		return "Nearest Mipmap";
+	case HYTEXFILTER_LINEAR_MIPMAP:
+		return "Linear Mipmap";
 	case HYTEXFILTER_BILINEAR:
 		return "Bilinear";
-	case HYTEXFILTER_TRILINEAR:
-		return "Trilinear";
+	case HYTEXFILTER_BILINEAR_MIPMAP:
+		return "Bilinear Mipmap";
+	case HYTEXFILTER_TRILINEAR_MIPMAP:
+		return "Trilinear Mipmap";
 
 	case HYTEXFILTER_Unknown:
 	default:
