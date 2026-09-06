@@ -13,8 +13,6 @@
 #include "Renderer/IHyRenderer.h"
 #include "HyEngine.h"
 
-#include "vendor/SOIL2/src/SOIL2/SOIL2.h"
-
 HyFileAtlas::HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexInBank, uint32 uiManifestIndex, HyJsonObj textureObj) :
 	IHyFile(HYFILE_Atlas, sFileName, uiBankId, uiManifestIndex),
 	m_uiINDEX_IN_BANK(uiIndexInBank),
@@ -55,7 +53,7 @@ HyFileAtlas::HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexI
 	}
 }
 
-HyFileAtlas::HyFileAtlas(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, HyImageInfo imageInfo, HyTextureInf textureInfo) :
+HyFileAtlas::HyFileAtlas(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, HyImageInfo imageInfo, HyTextureIn textureInfo) :
 	IHyFile(HYFILE_Atlas, sFileName, std::numeric_limits<uint32>::max(), std::numeric_limits<uint32>::max()),
 	m_uiINDEX_IN_BANK(std::numeric_limits<uint32>::max()),
 	m_ImageInfo(imageInfo),
@@ -178,44 +176,9 @@ void HyFileAtlas::DeletePixelData()
 		else
 			sAtlasFilePath = m_sFILE_NAME; // This is an auxiliary file, don't prepend the data directory
 
-		int iNumChannels;
 		m_pPixelData = HyIO::ReadImage(sAtlasFilePath, m_ImageInfo, m_uiPixelDataSize);
-
-		//switch(m_TextureInfo.GetFileType())
-		//{
-		//case HYTEXTUREFILE_PNG: {
-		//	// Param2: data format & uploaded internal format
-		//	HyTextureFormatType eDataType, eInternalType;
-		//	m_TextureInfo.GetUncompressedFormatTypes(eDataType, eInternalType);
-		//	HyAssert(eDataType == HYTEXTUREFORMAT_UINT8, "Only 8bit PNGs currently supported"); // TODO: Support 16bit PNGs
-
-		//	// Param1: num channels
-		//	int iNum8bitClrChannels; // out variables
-		//	m_pPixelData = SOIL_load_image(sAtlasFilePath.c_str(), &m_iWidth, &m_iHeight, &iNum8bitClrChannels, m_TextureInfo.m_uiFormatParam1);
-		//	m_uiPixelDataSize = m_iWidth * m_iHeight * 4;
-		//	break; }
-
-		//case HYTEXTUREFILE_DXT:
-		//	m_pPixelData = SOIL_load_DDS(sAtlasFilePath.c_str(), &m_uiPixelDataSize, 0);
-		//	break;
-
-		//case HYTEXTUREFILE_ASTC:
-		//	m_pPixelData = LoadAstc(sAtlasFilePath.c_str(), m_uiPixelDataSize);
-		//	break;
-
-		//case HYTEXTUREFILE_RAW:
-		//	HyError("HyFileAtlas::OnLoadThread() - RAW Texture not implemented");
-		//	//HyIO::ParseRawTextureFile(sAtlasFilePath, , m_TextureInfo, m_pPixelData, m_uiPixelDataSize);
-		//	break;
-
-		//case HYTEXTUREFILE_Unknown:
-		//default:
-		//	HyError("HyFileAtlas::OnLoadThread() - Unknown texture type");
-		//	break;
-		//}
-
 		if(m_pPixelData == nullptr)
-			HyLogError("HyFileAtlas failed to load image data: " << sAtlasFilePath);
+			HyLogError("HyFileAtlas::OnLoadThread - failed to load image data: " << sAtlasFilePath);
 	}
 
 	m_Mutex_PixelData.unlock();
@@ -248,49 +211,4 @@ void HyFileAtlas::DeletePixelData()
 		ss << "[" << std::setw(3) << std::setfill('0') << m_uiMANIFEST_INDEX << "] Bank " << m_uiBANK_ID << ", Index " << m_uiINDEX_IN_BANK << " (" << HyAssets::GetImageTypeName(m_ImageInfo.GetType()) << ")";
 	
 	return ss.str();
-}
-
-uint8 *HyFileAtlas::LoadAstc(std::string sAtlasFilePath, uint32 &uiPixelDataSizeOut)
-{
-	std::vector<uint8> astcData;
-	HyIO::ReadBinaryFile(sAtlasFilePath, astcData);
-	if(astcData.empty())
-	{
-		HyLogError("HyFileAtlas::LoadAstc() failed to read binary file: " << sAtlasFilePath);
-		return nullptr;
-	}
-
-	// ASTC header declaration.
-	struct AstcHeader
-	{
-		unsigned char  magic[4];
-		unsigned char  blockdim_x;
-		unsigned char  blockdim_y;
-		unsigned char  blockdim_z;
-		unsigned char  xsize[3];   /* x-size = xsize[0] + xsize[1] + xsize[2] */
-		unsigned char  ysize[3];   /* x-size, y-size and z-size are given in texels */
-		unsigned char  zsize[3];   /* block count is inferred */
-	};
-
-	// Traverse the file structure
-	AstcHeader *pAstcHeader = reinterpret_cast<AstcHeader *>(astcData.data());
-
-	// Store number of bytes for each dimension
-	// Merge x,y,z-sizes from 3 chars into one integer value
-	int32 xsize = pAstcHeader->xsize[0] + (pAstcHeader->xsize[1] << 8) + (pAstcHeader->xsize[2] << 16);
-	int32 ysize = pAstcHeader->ysize[0] + (pAstcHeader->ysize[1] << 8) + (pAstcHeader->ysize[2] << 16);
-	int32 zsize = pAstcHeader->zsize[0] + (pAstcHeader->zsize[1] << 8) + (pAstcHeader->zsize[2] << 16);
-
-	// Number of blocks in the x, y and z direction
-	int32 xblocks = (xsize + pAstcHeader->blockdim_x - 1) / pAstcHeader->blockdim_x;
-	int32 yblocks = (ysize + pAstcHeader->blockdim_y - 1) / pAstcHeader->blockdim_y;
-	int32 zblocks = (zsize + pAstcHeader->blockdim_z - 1) / pAstcHeader->blockdim_z;
-
-	// Each block is encoded on 16 bytes, so calculate total compressed image data size
-	uiPixelDataSizeOut = xblocks * yblocks * zblocks << 4;
-
-	uint8 *pPixelBuffer = HY_NEW uint8[uiPixelDataSizeOut];
-	memcpy(pPixelBuffer, &pAstcHeader[1], uiPixelDataSizeOut);
-
-	return pPixelBuffer;
 }

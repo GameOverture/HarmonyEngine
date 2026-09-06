@@ -285,7 +285,7 @@ public:
 				 quint32 uiBankId,
 				 QString sName,
 				 HyImageInfo imageInfo,
-				 HyTextureInf textureInfo,
+				 HyTextureIn textureInfo,
 				 quint16 uiW, quint16 uiH, quint16 uiX, quint16 uiY,
 				 int iTextureIndex,
 				 const QJsonObject &tileSetMetaData,

@@ -475,7 +475,7 @@ void HyAssets::GetNodeLoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut) 
 	uiTotalOut = m_uiLoadingCountTotal;
 }
 
-HyTextureQuadHandle HyAssets::CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyImageInfo imageInfo, HyTextureInf textureInfo)
+HyTextureQuadHandle HyAssets::CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyImageInfo imageInfo, HyTextureIn textureInfo)
 {
 	uint64 uiImage = imageInfo.GetBucketId();
 	uint32 uiTexture = textureInfo.GetBucketId();
@@ -796,8 +796,6 @@ bool HyAssets::ParseManifestFile(HyFileType eFileType)
 				HyJsonObj texObj = texturesArray[j].GetObject();
 				HyImageInfo imageInfo(static_cast<uint64>(texObj["imageInfo"].GetInt64()));
 				sAtlasFilePath += HyImageInfo::GetExt(imageInfo.GetType());
-				
-				HyTextureInf texInfo(texObj["textureInfo"].GetUint());
 
 				new (pAtlasWriteLocation)HyFileAtlas(sAtlasFilePath,
 					uiBankId,

@@ -11,8 +11,6 @@
 #include "AtlasRepackThread.h"
 #include "MainWindow.h"
 
-#include "vendor/SOIL2/src/SOIL2/SOIL2.h"
-
 #include <QPainter>
 #include <QImageWriter>
 #include <QProcess>
@@ -35,12 +33,15 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 		for(int i = 0; i < affectedFramesList.size(); ++i)
 		{
 			AtlasFrame *pAtlasFrame = static_cast<AtlasFrame *>(affectedFramesList[i]);
-			uint32 uiKey = pAtlasFrame->GetTextureInfo().GetBucketId();
+			HyImageInfo imgInfo = pAtlasFrame->GetImageInfo();
+			imgInfo.SetWidth(0);
+			imgInfo.SetHeight(0);
+			std::pair<uint64, uint32> uiKeyPair(imgInfo.GetBucketId(), pAtlasFrame->GetTextureInfo().GetBucketId());
 
-			if(curBankRef.m_BucketMap.contains(uiKey) == false)
-				curBankRef.m_BucketMap.insert(uiKey, new RepackBank::PackerBucket());
+			if(curBankRef.m_BucketMap.contains(uiKeyPair) == false)
+				curBankRef.m_BucketMap.insert(uiKeyPair, new RepackBank::PackerBucket());
 
-			curBankRef.m_BucketMap[uiKey]->m_FramesList.append(pAtlasFrame);
+			curBankRef.m_BucketMap[uiKeyPair]->m_FramesList.append(pAtlasFrame);
 		}
 	}
 }
@@ -59,7 +60,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 	for(int32 iBankCnt = 0; iBankCnt < m_RepackBankList.size(); ++iBankCnt)
 	{
 		BankData *pBankData = m_RepackBankList[iBankCnt].m_pBankData;
-		QMap<uint32, RepackBank::PackerBucket *> &bucketMapRef = m_RepackBankList[iBankCnt].m_BucketMap;
+		QMap<std::pair<uint64, uint32>, RepackBank::PackerBucket *> &bucketMapRef = m_RepackBankList[iBankCnt].m_BucketMap;
 
 		// Run image packer on each bucket's m_FramesList
 		for(auto iter = bucketMapRef.begin(); iter != bucketMapRef.end(); ++iter)
@@ -90,7 +91,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 	for(int32 iBankCnt = 0; iBankCnt < m_RepackBankList.size(); ++iBankCnt)
 	{
 		BankData *pBankData = m_RepackBankList[iBankCnt].m_pBankData;
-		QMap<uint32, RepackBank::PackerBucket *> &bucketMapRef = m_RepackBankList[iBankCnt].m_BucketMap;
+		QMap<std::pair<uint64, uint32>, RepackBank::PackerBucket *> &bucketMapRef = m_RepackBankList[iBankCnt].m_BucketMap;
 		QSize fullAtlasSize(pBankData->m_MetaObj["maxWidth"].toInt(), pBankData->m_MetaObj["maxHeight"].toInt());
 
 		// Go through the packer's bins and ensure textures have a sequential index name
@@ -127,7 +128,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 
 				if(iNumNewTexturesUsed < iNUM_NEW_TEXTURES)
 				{
-					QSize textureSize = ConstructAtlasTexture(pBankData, iter.value()->m_Packer, HyTextureInfo(iter.key()), iNumNewTexturesUsed, iCurrentIndex);
+					QSize textureSize = ConstructAtlasTexture(pBankData, iter.value()->m_Packer, HyImageInfo(iter.key().first), HyTextureIn(iter.key().second), iNumNewTexturesUsed, iCurrentIndex);
 					iNumNewTexturesUsed++;
 
 					iLoadedBlocks++;
@@ -221,9 +222,11 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 	}
 }
 
-QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker &atlasPackerRef, HyImageInfo imageInfo, HyTextureInf textureInfo, int iPackerBinIndex, int iActualTextureIndex)
+QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker &atlasPackerRef, HyImageInfo imageInfo, HyTextureIn textureInfo, int iPackerBinIndex, int iActualTextureIndex)
 {
 	QSize textureSize = atlasPackerRef.GetBinDimensions(iPackerBinIndex);
+	imageInfo.SetWidth(textureSize.width());
+	imageInfo.SetHeight(textureSize.height());
 
 	QImage newTexture(textureSize.width(), textureSize.height(), QImage::Format_ARGB32);
 	newTexture.fill(Qt::transparent);
@@ -267,43 +270,27 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 	QImage *pTexture = static_cast<QImage *>(p.device());
 	QDir runtimeBankDir(pBankData->m_sAbsPath);
 
-	switch(texInfo.GetFileType())
+	if(imageInfo.GetType() != HYIMAGE_ASTC)
 	{
-	case HYTEXTUREFILE_PNG:
-		// Param1: num channels
-		// Param2: format types
-		HyTextureFormatType eDataFormat, eInternalFormat;
-		texInfo.GetUncompressedFormatTypes(eDataFormat, eInternalFormat);
-		switch(eDataFormat)
+		std::string sFilePath = runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % HyImageInfo::GetExt(imageInfo.GetType()).c_str()).toStdString();
+		switch(imageInfo.GetNumChannels())
 		{
-		case HYTEXTUREFORMAT_UINT8:
-			if(false == pTexture->save(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % texInfo.GetFileExt().c_str())))
-				HyGuiLog("AtlasManager::ConstructAtlasTexture failed to generate a PNG atlas", LOGTYPE_Error);
+		case 4:
+			HyIO::WriteImage(sFilePath, imageInfo, pTexture->convertToFormat(QImage::Format_RGBA8888).bits());
 			break;
-
+		case 3:
+			if(imageInfo.GetType() == HYIMAGE_DDS) // NOTE: HyIO::WriteImage for DDS files require its data to be padded to 4 bytes even when writing RGB DXT1
+				HyIO::WriteImage(sFilePath, imageInfo, pTexture->convertToFormat(QImage::Format_RGBX8888).bits());
+			else
+				HyIO::WriteImage(sFilePath, imageInfo, pTexture->convertToFormat(QImage::Format_RGB888).bits());
+			break;
 		default:
-			HyGuiLog("AtlasManager::ConstructAtlasTexture unhandled PNG data format", LOGTYPE_Error);
+			HyGuiLog("AtlasManager::ConstructAtlasTexture - Invalid number of color channels", LOGTYPE_Error);
 			break;
 		}
-		break;
-
-	case HYTEXTUREFILE_DXT: {
-		// Param1: num channels
-		// Param2: DXT format (1,3,5)
-		QImage imgProperlyFormatted = pTexture->convertToFormat(texInfo.m_uiFormatParam1 == 4 ? QImage::Format_RGBA8888 : QImage::Format_RGB888);
-		if(0 == SOIL_save_image_quality(runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % texInfo.GetFileExt().c_str()).toStdString().c_str(),
-										SOIL_SAVE_TYPE_DDS,
-										imgProperlyFormatted.width(),
-										imgProperlyFormatted.height(),
-										texInfo.m_uiFormatParam1,
-										imgProperlyFormatted.bits(),
-										0))
-		{
-			HyGuiLog("AtlasManager::ConstructAtlasTexture failed to generate a DTX5 atlas", LOGTYPE_Error);
-		}
-		break; }
-
-	case HYTEXTUREFILE_ASTC: {
+	}
+	else // Saving as ASTC
+	{
 		// Param1: Block Size index (4x4 -> 12x12)
 		// Param2: Color Profile (LDR linear, LDR sRGB, HDR RGB, HDR RGBA)
 		QString sProgramPath = MainWindow::EngineSrcLocation() % HYGUIPATH_AstcEncDir;
@@ -371,11 +358,6 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 		// Remove the temp texture
 		if(false == QFile::remove(sTempTexturePath))
 			HyGuiLog("Could not remove temp PNG texture when encoding into ASTC: " % sTempTexturePath, LOGTYPE_Warning);
-		break; }
-
-	default:
-		HyGuiLog("AtlasManager::ConstructAtlasTexture tried to create an unsupported texture type: " % QString(HyAssets::GetTextureFileTypeName(texInfo.GetFileType()).c_str()), LOGTYPE_Error);
-		break;
 	}
 
 	return textureSize;

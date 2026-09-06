@@ -22,15 +22,15 @@ class HyFileTileSet : public IHyFile
 
 	bool										m_bUseDescriptorEx;
 
-	int32										m_iColumns;
-	int32										m_iRows;
+	int32										m_iSubAtlasCols;
+	int32										m_iSubAtlasRows;
 
-	HyImageInfo									m_DescriptorImageInfo;
+	int32										m_iNumDescriptorTexels;
+
 	uint8 *										m_pDescriptorTexelData;
 	uint32										m_uiDescriptorSize;
 	std::pair<HyTextureHandle, HyTextureHandle>	m_hDescriptorBufferPair;
 
-	HyImageInfo									m_DescriptorExImageInfo;
 	uint8 *										m_pDescriptorExTexelData;
 	uint32										m_uiDescriptorExSize;
 	std::pair<HyTextureHandle, HyTextureHandle>	m_hDescriptorExBufferPair;
@@ -54,6 +54,10 @@ public:
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 
 	virtual std::string GetAssetInfo() override;
+
+protected:
+	HyImageInfo GenerateImageInfo() const;
+	HyTextureIn GenerateTextureInfo() const;
 };
 
 #endif /* HyFileTileSet_h__ */

@@ -7,9 +7,6 @@ message(STATUS "Adding Vendor: Box2d")
 add_subdirectory(vendor/box2d)
 set_target_properties(box2d PROPERTIES FOLDER "Engine Libs")
 
-message(STATUS "Adding Vendor: soil2")
-add_subdirectory(vendor/soil2)
-
 if(HYBUILD_SPINE)
 	message(STATUS "Adding Vendor: spine-cpp")
 	add_subdirectory(extras/Spine/spine-cpp)
@@ -363,7 +360,7 @@ set_target_properties(HyEngine PROPERTIES
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")	
 target_include_directories(HyEngine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-target_link_libraries(HyEngine PUBLIC box2d soil2)
+target_link_libraries(HyEngine PUBLIC box2d)
 
 if(HYBUILD_SPINE)
 	target_link_libraries(HyEngine PUBLIC spine-cpp)

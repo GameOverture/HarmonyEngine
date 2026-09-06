@@ -34,7 +34,7 @@ protected:
 	quint16								m_uiCropBottom;
 
 	HyImageInfo							m_ImageInfo;
-	HyTextureInf						m_TextureInfo;
+	HyTextureIn							m_TextureInfo;
 	int									m_iTextureIndex;
 
 	quint16								m_uiPosX;
@@ -55,7 +55,7 @@ public:
 			   quint16 uiCropRight,
 			   quint16 uiCropBottom,
 			   HyImageInfo imageInfo,
-			   HyTextureInf textureInfo,
+			   HyTextureIn textureInfo,
 			   quint16 uiW, quint16 uiH, quint16 uiX, quint16 uiY,
 			   int iTextureIndex,
 			   uint uiErrors);
@@ -81,7 +81,7 @@ public:
 	void SetWrap(HyTextureWrap eWrap);
 
 	HyImageInfo GetImageInfo() const;
-	HyTextureInf GetTextureInfo() const;
+	HyTextureIn GetTextureInfo() const;
 
 	int GetTextureIndex() const;
 	quint16 GetX() const;

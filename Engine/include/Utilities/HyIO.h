@@ -58,7 +58,9 @@ private:
 	static uint8 *ReadImage_PNG(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut);
 	static uint8 *ReadImage_HYTX(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut);
 	static uint8 *ReadImage_DDS(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut);
+	static uint8 *ReadImage_ASTC(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut);
 
+	static bool WriteImage_HYTX(const std::string &sFilePath, HyImageInfo imageInfo, uint8 *pData);
 	static bool WriteImage_DDS(const std::string &sFilePath, HyImageInfo imageInfo, uint8 *pData);
 };
 

@@ -20,14 +20,14 @@ class AtlasRepackThread : public IRepackThread
 
 	struct RepackBank
 	{
-		BankData *						m_pBankData;
+		BankData *										m_pBankData;
 
 		struct PackerBucket
 		{
-			AtlasPacker					m_Packer;
-			QList<AtlasFrame *>			m_FramesList;
+			AtlasPacker									m_Packer;
+			QList<AtlasFrame *>							m_FramesList;
 		};
-		QMap<uint32, PackerBucket *>	m_BucketMap;	// Within each bank, there can be multiple buckets of textures. Each bucket has a unique 'texInfo' uint32 (specifying the file type, texture filtering, etc)
+		QMap<std::pair<uint64, uint32>, PackerBucket *>	m_BucketMap;	// Within each bank, there can be multiple buckets of textures. Each bucket has a unique std::pair<uint64, uint32> (specifying the image type, texture filtering, etc)
 
 		RepackBank() :
 			m_pBankData(nullptr)
@@ -49,7 +49,7 @@ public:
 	//void RepackBank(BankData *pBankData, 
 
 private:
-	QSize ConstructAtlasTexture(BankData *pBankData, AtlasPacker &atlasPackerRef, HyImageInfo imageInfo, HyTextureInf textureInfo, int iPackerBinIndex, int iActualTextureIndex);
+	QSize ConstructAtlasTexture(BankData *pBankData, AtlasPacker &atlasPackerRef, HyImageInfo imageInfo, HyTextureIn textureInfo, int iPackerBinIndex, int iActualTextureIndex);
 };
 
 #endif // ATLASREPACKTHREAD_H

@@ -18,7 +18,6 @@
 #include "vendor/stb/stb_image.h"
 #include "vendor/stb/stb_image_write.h"
 #include "vendor/stb/stb_dxt.h"
-//#include "vendor/SOIL2/src/SOIL2/SOIL2.h"
 
 #include <fstream>
 #include <iomanip>
@@ -27,6 +26,16 @@
 #include <regex>
 
 #pragma pack(push, 1)
+struct HY_HYTX_HEADER
+{
+	uint32_t uiReserve32;	// Pads the magic number to 8 bytes incase it needs to increase
+	uint32_t uiWidth;
+	uint32_t uiHeight;
+	uint32_t uiNumChannels;
+	uint32_t uiFormatCode;
+	uint64_t uiReserve64;	// Incase more information should be added
+};
+
 struct HY_DDS_PIXELFORMAT
 {
 	uint32_t size;
@@ -800,6 +809,7 @@ struct HY_DDS_HEADER
 		break;
 
 	case HYIMAGE_ASTC:
+		pData = ReadImage_ASTC(sFilePath, loadHintsInOut, uiDataSizeOut);
 		break;
 
 	default:
@@ -842,6 +852,7 @@ struct HY_DDS_HEADER
 		break;
 
 	case HYIMAGE_HYTX:
+		bResult = WriteImage_HYTX(sFilePath, imageInfo, pData);
 		break;
 
 	case HYIMAGE_DDS:
@@ -849,6 +860,7 @@ struct HY_DDS_HEADER
 		break;
 
 	case HYIMAGE_ASTC:
+		HyLogWarning("HyIO::WriteImage - Writing ASTC images is not supported via HyEngine, you can only export ASTC images using the editor");
 		break;
 	}
 
@@ -913,41 +925,70 @@ struct HY_DDS_HEADER
 		return nullptr;
 	}
 
-	int iTexelSize = 0; // In bytes
-	//int iNumChannels = textureInfo.m_uiFormatParam1;
-	//HyTextureFormatType eDataFormat, eInternalFormat;
-	//textureInfo.GetUncompressedFormatTypes(eDataFormat, eInternalFormat);
-	//switch(eDataFormat)
-	//{
-	//	case HYTEXTUREFORMAT_UINT8:
-	//	case HYTEXTUREFORMAT_INT8:
-	//		iTexelSize = iNumChannels;
-	//		break;
-	//	case HYTEXTUREFORMAT_UINT16:
-	//	case HYTEXTUREFORMAT_INT16:
-	//	case HYTEXTUREFORMAT_FLOAT16:
-	//		iTexelSize = iNumChannels * 2;
-	//		break;
-	//	case HYTEXTUREFORMAT_UINT32:
-	//	case HYTEXTUREFORMAT_INT32:
-	//	case HYTEXTUREFORMAT_FLOAT32:
-	//		iTexelSize = iNumChannels * 4;
-	//		break;
-	//	default:
-	//		HyError("HyIO::ParseRawTextureFile() - Unhandled raw data format");
-	//		return false;
-	//}
+	HY_HYTX_HEADER header;
+	infile.read(reinterpret_cast<char *>(&header), sizeof(HY_HYTX_HEADER));
+	loadHintsInOut.SetWidth(header.uiWidth);
+	loadHintsInOut.SetHeight(header.uiHeight);
+	loadHintsInOut.SetNumChannels(header.uiNumChannels);
+	switch(header.uiFormatCode)
+	{
+	case 0x55493038: // "UI08"
+		loadHintsInOut.SetFormat(HYTEXFORMAT_UINT8);
+		uiDataSizeOut = loadHintsInOut.GetWidth() * loadHintsInOut.GetHeight() * loadHintsInOut.GetNumChannels();
+		break;
+	case 0x53493038: // "SI08"
+		loadHintsInOut.SetFormat(HYTEXFORMAT_INT8);
+		uiDataSizeOut = loadHintsInOut.GetWidth() * loadHintsInOut.GetHeight() * loadHintsInOut.GetNumChannels();
+		break;
+	case 0x55493136: // "UI16"
+		loadHintsInOut.SetFormat(HYTEXFORMAT_UINT16);
+		uiDataSizeOut = loadHintsInOut.GetWidth() * loadHintsInOut.GetHeight() * (loadHintsInOut.GetNumChannels() * 2);
+		break;
+	case 0x53493136: // "SI16"
+		loadHintsInOut.SetFormat(HYTEXFORMAT_INT16);
+		uiDataSizeOut = loadHintsInOut.GetWidth() * loadHintsInOut.GetHeight() * (loadHintsInOut.GetNumChannels() * 2);
+		break;
+	case 0x55493332: // "UI32"
+		loadHintsInOut.SetFormat(HYTEXFORMAT_UINT32);
+		uiDataSizeOut = loadHintsInOut.GetWidth() * loadHintsInOut.GetHeight() * (loadHintsInOut.GetNumChannels() * 4);
+		break;
+	case 0x53493332: // "SI32"
+		loadHintsInOut.SetFormat(HYTEXFORMAT_INT32);
+		uiDataSizeOut = loadHintsInOut.GetWidth() * loadHintsInOut.GetHeight() * (loadHintsInOut.GetNumChannels() * 4);
+		break;
+	case 0x53463136: // "SF16"
+		loadHintsInOut.SetFormat(HYTEXFORMAT_FLOAT16);
+		uiDataSizeOut = loadHintsInOut.GetWidth() * loadHintsInOut.GetHeight() * (loadHintsInOut.GetNumChannels() * 2);
+		break;
+	case 0x53463332: // "SF32"
+		loadHintsInOut.SetFormat(HYTEXFORMAT_FLOAT32);
+		uiDataSizeOut = loadHintsInOut.GetWidth() * loadHintsInOut.GetHeight() * (loadHintsInOut.GetNumChannels() * 4);
+		break;
+	default:
+		HyLogError("HyIO::ReadImage_HYTX - Invalid format read");
+		return nullptr;
+	}
 
-	//int32_t iNumTexels = *reinterpret_cast<int32_t *>(&fileData[HYASSETS_MagicNumberHeaderSize]);
-	//size_t uiDataSize = iNumTexels * iTexelSize;
-	//if(uiDataSize == 0)
-	//{
-	//	HyLogError("HyIO::ParseRawTextureFile() - Failed to load texel data: " << sFilePath);
-	//	return false;
-	//}
-	//
-	//contentsOut.resize(uiDataSize);
-	//memcpy(contentsOut.data(), &fileData[HYASSETS_MagicNumberHeaderSize + sizeof(int32_t) + sizeof(int32_t)], uiDataSize);
+	uint8 *pData = reinterpret_cast<uint8 *>(malloc(uiDataSizeOut));
+	infile.read(reinterpret_cast<char *>(pData), uiDataSizeOut);
+	if(infile.bad())
+	{
+		ec = std::error_code(errno, std::generic_category());
+		HyLogError("HyIO::ReadImage_HYTX - reading HYTX file - " << ec.message() << ": " << sFilePath);
+		free(pData);
+		return nullptr;
+	}
+
+	infile.close();
+	if(infile.bad())
+	{
+		ec = std::error_code(errno, std::generic_category());
+		HyLogError("HyIO::ReadImage_HYTX - closing HYTX file - " << ec.message() << ": " << sFilePath);
+		free(pData);
+		return nullptr;
+	}
+
+	return pData;
 }
 
 /*static*/ uint8 *HyIO::ReadImage_DDS(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut)
@@ -980,22 +1021,38 @@ struct HY_DDS_HEADER
 	switch(header.pf.fourCC)
 	{
 	case 0x31545844:		// "DXT1"
-		loadHintsInOut.SetNumChannels(3); // or 4 (RGBA w/ 1-bit alpha)
+		loadHintsInOut.SetNumChannels(3); // TODO: also check for 4 channels (RGBA w/ 1-bit alpha)
+		loadHintsInOut.SetFormat(HYTEXFORMAT_RGB_DXT1);
 		iBlockSize = 8;		// 8 bytes per 4x4 block
 		break;
 	case 0x55344342:		// "BC4U"
-	case 0x53344342:		// "BC4S"
 		loadHintsInOut.SetNumChannels(1);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_RGTC1);
 		iBlockSize = 8;		// 8 bytes per 4x4 block
 		break;
-	case 0x33545844:		// "DXT3" (mostly obsolete)
+	case 0x53344342:		// "BC4S"
+		loadHintsInOut.SetNumChannels(1);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_SIGNED_RGTC1);
+		iBlockSize = 8;		// 8 bytes per 4x4 block
+		break;
 	case 0x35545844:		// "DXT5"
 		loadHintsInOut.SetNumChannels(4);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_DXT5);
 		iBlockSize = 16;	// 16 bytes per 4x4 block
 		break;
 	case 0x55354342:		// "BC5U"
+		loadHintsInOut.SetNumChannels(2);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_RGTC2);
+		iBlockSize = 16;	// 16 bytes per 4x4 block
+		break;
 	case 0x53354342:		// "BC5S"
 		loadHintsInOut.SetNumChannels(2);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_SIGNED_RGTC2);
+		iBlockSize = 16;	// 16 bytes per 4x4 block
+		break;
+	case 0x33545844:		// "DXT3" (mostly obsolete)
+		loadHintsInOut.SetNumChannels(4);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_DXT3);
 		iBlockSize = 16;	// 16 bytes per 4x4 block
 		break;
 	default:
@@ -1041,6 +1098,141 @@ struct HY_DDS_HEADER
 	}
 
 	return pData;
+}
+
+/*static*/ uint8 *HyIO::ReadImage_ASTC(const std::string &sFilePath, HyImageInfo &loadHintsInOut, uint32_t &uiDataSizeOut)
+{
+	// TODO: Read the image file in-place instead of needing a memcpy below
+	std::vector<uint8> astcData;
+	HyIO::ReadBinaryFile(sFilePath, astcData);
+	if(astcData.empty())
+	{
+		HyLogError("HyFileAtlas::ReadImage_ASTC - failed to read binary file: " << sFilePath);
+		return nullptr;
+	}
+
+	// ASTC header declaration.
+	struct AstcHeader
+	{
+		unsigned char  magic[4];
+		unsigned char  blockdim_x;
+		unsigned char  blockdim_y;
+		unsigned char  blockdim_z;
+		unsigned char  xsize[3];   /* x-size = xsize[0] + xsize[1] + xsize[2] */
+		unsigned char  ysize[3];   /* x-size, y-size and z-size are given in texels */
+		unsigned char  zsize[3];   /* block count is inferred */
+	};
+
+	// Traverse the file structure
+	AstcHeader *pAstcHeader = reinterpret_cast<AstcHeader *>(astcData.data());
+
+	// Store number of bytes for each dimension
+	// Merge x,y,z-sizes from 3 chars into one integer value
+	int32 xsize = pAstcHeader->xsize[0] + (pAstcHeader->xsize[1] << 8) + (pAstcHeader->xsize[2] << 16);
+	int32 ysize = pAstcHeader->ysize[0] + (pAstcHeader->ysize[1] << 8) + (pAstcHeader->ysize[2] << 16);
+	int32 zsize = pAstcHeader->zsize[0] + (pAstcHeader->zsize[1] << 8) + (pAstcHeader->zsize[2] << 16);
+
+	// Number of blocks in the x, y and z direction
+	int32 xblocks = (xsize + pAstcHeader->blockdim_x - 1) / pAstcHeader->blockdim_x;
+	int32 yblocks = (ysize + pAstcHeader->blockdim_y - 1) / pAstcHeader->blockdim_y;
+	int32 zblocks = (zsize + pAstcHeader->blockdim_z - 1) / pAstcHeader->blockdim_z;
+
+	// Each block is encoded on 16 bytes, so calculate total compressed image data size
+	uiDataSizeOut = xblocks * yblocks * zblocks << 4;
+
+	uint8 *pData = reinterpret_cast<uint8 *>(malloc(uiDataSizeOut));
+	memcpy(pData, &pAstcHeader[1], uiDataSizeOut);
+
+	return pData;
+}
+
+/*static*/ bool HyIO::WriteImage_HYTX(const std::string &sFilePath, HyImageInfo imageInfo, uint8 *pData)
+{
+	std::streamsize uiDataSize;
+
+	HY_HYTX_HEADER header;
+	header.uiReserve32 = 0;
+	header.uiWidth = imageInfo.GetWidth();
+	header.uiHeight = imageInfo.GetHeight();
+	header.uiNumChannels = imageInfo.GetNumChannels();
+	switch(imageInfo.GetFormat())
+	{
+	case HYTEXFORMAT_Unknown:
+		[[fallthrough]];
+	case HYTEXFORMAT_UINT8:
+		header.uiFormatCode = 0x55493038; // "UI08"
+		uiDataSize = imageInfo.GetWidth() * imageInfo.GetHeight() * imageInfo.GetNumChannels();
+		break;
+	case HYTEXFORMAT_INT8:
+		header.uiFormatCode = 0x53493038; // "SI08"
+		uiDataSize = imageInfo.GetWidth() * imageInfo.GetHeight() * imageInfo.GetNumChannels();
+		break;
+	case HYTEXFORMAT_UINT16:
+		header.uiFormatCode = 0x55493136; // "UI16"
+		uiDataSize = imageInfo.GetWidth() * imageInfo.GetHeight() * (imageInfo.GetNumChannels() * 2);
+		break;
+	case HYTEXFORMAT_INT16:
+		header.uiFormatCode = 0x53493136; // "SI16"
+		uiDataSize = imageInfo.GetWidth() * imageInfo.GetHeight() * (imageInfo.GetNumChannels() * 2);
+		break;
+	case HYTEXFORMAT_UINT32:
+		header.uiFormatCode = 0x55493332; // "UI32"
+		uiDataSize = imageInfo.GetWidth() * imageInfo.GetHeight() * (imageInfo.GetNumChannels() * 4);
+		break;
+	case HYTEXFORMAT_INT32:
+		header.uiFormatCode = 0x53493332; // "SI32"
+		uiDataSize = imageInfo.GetWidth() * imageInfo.GetHeight() * (imageInfo.GetNumChannels() * 4);
+		break;
+	case HYTEXFORMAT_FLOAT16:
+		header.uiFormatCode = 0x53463136; // "SF16"
+		uiDataSize = imageInfo.GetWidth() * imageInfo.GetHeight() * (imageInfo.GetNumChannels() * 2);
+		break;
+	case HYTEXFORMAT_FLOAT32:
+		header.uiFormatCode = 0x53463332; // "SF32"
+		uiDataSize = imageInfo.GetWidth() * imageInfo.GetHeight() * (imageInfo.GetNumChannels() * 4);
+		break;
+	default:
+		HyLogError("HyIO::WriteImage_HYTX - Invalid format specified");
+		return false;
+	}
+	header.uiReserve64 = 0;
+
+	// Write file
+	std::error_code ec;
+	std::ofstream outfile(sFilePath, std::ios::binary);
+	if(!outfile || outfile.bad())
+	{
+		ec = std::error_code(errno, std::generic_category());
+		HyLogError("HyIO::WriteImage_HYTX - " << ec.message() << ": " << sFilePath);
+		return false;
+	}
+
+	uint32_t uiMagicNumber = 0x58545948; // "HYTX"
+	outfile.write(reinterpret_cast<const char *>(&uiMagicNumber), sizeof(uint32_t));
+	outfile.write(reinterpret_cast<const char *>(&header), sizeof(HY_HYTX_HEADER));
+	outfile.write(reinterpret_cast<const char *>(pData), uiDataSize);
+	if(outfile.bad())
+	{
+		ec = std::error_code(errno, std::generic_category());
+		HyLogError("HyIO::WriteImage_HYTX - writing file - " << ec.message() << ": " << sFilePath);
+		return false;
+	}
+	if(!outfile.flush())
+	{
+		ec = std::error_code(errno, std::generic_category());
+		HyLogError("HyIO::WriteImage_HYTX - flushing file - " << ec.message() << ": " << sFilePath);
+		return false;
+	}
+
+	outfile.close();
+	if(outfile.bad())
+	{
+		ec = std::error_code(errno, std::generic_category());
+		HyLogError("HyIO::WriteImage_HYTX - closing file - " << ec.message() << ": " << sFilePath);
+		return false;
+	}
+
+	return true;
 }
 
 //static inline uint8_t getChannel(const uint8_t *src, int width, int height, int x, int y, int channel, int numChannels)

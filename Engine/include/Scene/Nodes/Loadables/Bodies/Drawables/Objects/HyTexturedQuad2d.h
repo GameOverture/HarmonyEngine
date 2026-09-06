@@ -23,7 +23,7 @@ public:
 	HyTexturedQuad2d(const HyNodePath &nodePath, HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(HyTextureQuadHandle hTextureQuadHandle, HyEntity2d *pParent = nullptr);
-	HyTexturedQuad2d(std::string sFilePath, HyImageInfo imageInfo, HyTextureInf textureInfo, HyEntity2d *pParent = nullptr);
+	HyTexturedQuad2d(std::string sFilePath, HyImageInfo imageInfo, HyTextureIn textureInfo, HyEntity2d *pParent = nullptr);
 	HyTexturedQuad2d(const HyTexturedQuad2d &copyRef);
 	virtual ~HyTexturedQuad2d();
 
@@ -31,7 +31,7 @@ public:
 
 	void Init(uint32 uiAtlasFrameChecksum, uint32 uiBankId, HyEntity2d *pParent);
 	void Init(HyTextureQuadHandle hTextureQuadHandle, HyEntity2d *pParent);
-	void Init(std::string sFilePath, HyImageInfo imageInfo, HyTextureInf textureInfo, HyEntity2d *pParent);
+	void Init(std::string sFilePath, HyImageInfo imageInfo, HyTextureIn textureInfo, HyEntity2d *pParent);
 	void Uninit();
 
 	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;

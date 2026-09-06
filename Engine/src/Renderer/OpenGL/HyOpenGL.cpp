@@ -647,18 +647,21 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////
 }
 
-/*virtual*/ HyTextureHandle HyOpenGL::AddTexture(HyImageInfo imageInfo, HyTextureInf textureInfo, unsigned char *pPixelData, uint32 uiPixelDataSize) /*override*/
+/*virtual*/ HyTextureHandle HyOpenGL::AddTexture(HyImageInfo imageInfo, HyTextureIn textureInfo, unsigned char *pPixelData, uint32 uiPixelDataSize) /*override*/
 {
-	GLenum eFormat = GL_RGBA;
-	GLenum eType = GL_UNSIGNED_BYTE;
-	bool bIsPixelDataCompressed = false;
+	GLenum eFormat, eType;
+	bool bIsPixelDataCompressed;
 	GetGLFormat(imageInfo, eFormat, eType, bIsPixelDataCompressed);
 
-	GLenum eInternalFormat = GL_RGBA8;
+	GLenum eInternalFormat;
 	if(bIsPixelDataCompressed)
 		GetGLInternalFormatCompressed(textureInfo.GetFormat(), eInternalFormat);
 	else
-		GetGLInternalFormat(textureInfo.GetFormat(), imageInfo.GetNumChannels(), eInternalFormat); // TODO: Use textureInfo's flags to determine if num channels is overridden
+	{
+		if(textureInfo.GetNumChannels() == 0 && imageInfo.GetNumChannels() != 0)
+			textureInfo.SetNumChannels(imageInfo.GetNumChannels());
+		GetGLInternalFormat(textureInfo.GetFormat(), eInternalFormat);
+	}
 
 	GLuint hGLTexture;
 	glGenTextures(1, &hGLTexture);
@@ -684,18 +687,21 @@ HyOpenGL::~HyOpenGL(void)
 	return static_cast<HyTextureHandle>(hGLTexture);
 }
 
-/*virtual*/ HyTextureHandle HyOpenGL::AddTextureArray(HyImageInfo imageInfo, HyTextureInf textureInfo, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) /*override*/
+/*virtual*/ HyTextureHandle HyOpenGL::AddTextureArray(HyImageInfo imageInfo, HyTextureIn textureInfo, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) /*override*/
 {
-	GLenum eFormat = GL_RGBA;
-	GLenum eType = GL_UNSIGNED_BYTE;
-	bool bIsPixelDataCompressed = false;
+	GLenum eFormat, eType;
+	bool bIsPixelDataCompressed;
 	GetGLFormat(imageInfo, eFormat, eType, bIsPixelDataCompressed);
 
-	GLenum eInternalFormat = GL_RGBA8;
+	GLenum eInternalFormat;
 	if(bIsPixelDataCompressed)
 		GetGLInternalFormatCompressed(textureInfo.GetFormat(), eInternalFormat);
 	else
-		GetGLInternalFormat(textureInfo.GetFormat(), imageInfo.GetNumChannels(), eInternalFormat); // TODO: Use textureInfo's flags to determine if num channels is overridden
+	{
+		if(textureInfo.GetNumChannels() == 0 && imageInfo.GetNumChannels() != 0)
+			textureInfo.SetNumChannels(imageInfo.GetNumChannels());
+		GetGLInternalFormat(textureInfo.GetFormat(), eInternalFormat);
+	}
 
 	GLuint hGLTextureArray;
 	glGenTextures(1, &hGLTextureArray);
@@ -758,10 +764,10 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGL:DeleteTexture", "glDeleteTextures");
 }
 
-/*virtual*/ std::pair<HyBufferHandle, HyTextureHandle> HyOpenGL::AddTextureBufferObject(HyImageInfo imageInfo, HyTextureInf textureInfo, unsigned char *pData, uint32 uiDataSize) /*override*/
+/*virtual*/ std::pair<HyBufferHandle, HyTextureHandle> HyOpenGL::AddTextureBufferObject(HyTextureIn textureInfo, unsigned char *pData, uint32 uiDataSize) /*override*/
 {
-	GLenum eInternalFormat = GL_RGBA;
-	GetGLInternalFormat(textureInfo, imageInfo.GetNumChannels(), eInternalFormat);
+	GLenum eInternalFormat;
+	GetGLInternalFormat(textureInfo, eInternalFormat);
 
 	GLuint hTboBuffer, hTboTexture;
 	glGenBuffers(1, &hTboBuffer);
@@ -931,6 +937,8 @@ void HyOpenGL::GetGLFormat(HyImageInfo imageInfo, GLenum &eFormatOut, GLenum &eT
 	case 1: eFormatOut = GL_RED; break;
 	case 2: eFormatOut = GL_RG; break;
 	case 3: eFormatOut = GL_RGB; break;
+	case 0: // Default to 4
+		[[fallthrough]];
 	case 4: eFormatOut = GL_RGBA; break;
 	default:
 		HyError("HyOpenGL::GetGLFormat - Invalid number of channels specified");
@@ -940,9 +948,11 @@ void HyOpenGL::GetGLFormat(HyImageInfo imageInfo, GLenum &eFormatOut, GLenum &eT
 
 	switch(imageInfo.GetFormat())
 	{
+	case HYTEXFORMAT_Unknown: // Default unknown to UINT8
+		[[fallthrough]];
 	case HYTEXFORMAT_UINT8:			eTypeOut = GL_UNSIGNED_BYTE; break;
 	case HYTEXFORMAT_INT8:			eTypeOut = GL_BYTE; break;
-	case HYTEXFORMAT_NORM8:			eTypeOut = GL_UNSIGNED_BYTE;
+	case HYTEXFORMAT_NORM8:			eTypeOut = GL_UNSIGNED_BYTE; break;
 	case HYTEXFORMAT_UINT16:		eTypeOut = GL_UNSIGNED_SHORT; break;
 	case HYTEXFORMAT_INT16:			eTypeOut = GL_SHORT; break;
 	case HYTEXFORMAT_UINT32:		eTypeOut = GL_UNSIGNED_INT; break;
@@ -968,6 +978,7 @@ void HyOpenGL::GetGLFormat(HyImageInfo imageInfo, GLenum &eFormatOut, GLenum &eT
 
 	switch(imageInfo.GetType())
 	{
+	case HYIMAGE_Unknown:
 	case HYIMAGE_PNG:
 	case HYIMAGE_HYTX:
 		bIsPixelDataCompressedOut = false;
@@ -983,14 +994,17 @@ void HyOpenGL::GetGLFormat(HyImageInfo imageInfo, GLenum &eFormatOut, GLenum &eT
 	}
 }
 
-void HyOpenGL::GetGLInternalFormat(HyTextureInf textureInfo, int iNumChannels, GLenum &eInternalFormatOut) const
+void HyOpenGL::GetGLInternalFormat(HyTextureIn textureInfo, GLenum &eInternalFormatOut) const
 {
-	if(iNumChannels == 4)
+	int iNumChannels = textureInfo.GetNumChannels();
+	if(iNumChannels == 4 || iNumChannels == 0)
 	{
 		switch(textureInfo.GetFormat())
 		{
 		case HYTEXFORMAT_UINT8:		eInternalFormatOut = GL_RGBA8UI; break;
 		case HYTEXFORMAT_INT8:		eInternalFormatOut = GL_RGBA8I; break;
+		case HYTEXFORMAT_Unknown: // Default unknown to NORM8
+			[[fallthrough]];
 		case HYTEXFORMAT_NORM8:		eInternalFormatOut = GL_RGBA8; break;
 		case HYTEXFORMAT_SNORM8:	eInternalFormatOut = GL_RGBA8_SNORM; break;
 		case HYTEXFORMAT_UINT16:	eInternalFormatOut = GL_RGBA16UI; break;
@@ -1011,6 +1025,8 @@ void HyOpenGL::GetGLInternalFormat(HyTextureInf textureInfo, int iNumChannels, G
 		{
 		case HYTEXFORMAT_UINT8:		eInternalFormatOut = GL_RGB8UI; break;
 		case HYTEXFORMAT_INT8:		eInternalFormatOut = GL_RGB8I; break;
+		case HYTEXFORMAT_Unknown: // Default unknown to NORM8
+			[[fallthrough]];
 		case HYTEXFORMAT_NORM8:		eInternalFormatOut = GL_RGB8; break;
 		case HYTEXFORMAT_SNORM8:	eInternalFormatOut = GL_RGB8_SNORM; break;
 		case HYTEXFORMAT_UINT16:	eInternalFormatOut = GL_RGB16UI; break;
@@ -1031,6 +1047,8 @@ void HyOpenGL::GetGLInternalFormat(HyTextureInf textureInfo, int iNumChannels, G
 		{
 		case HYTEXFORMAT_UINT8:		eInternalFormatOut = GL_RG8UI; break;
 		case HYTEXFORMAT_INT8:		eInternalFormatOut = GL_RG8I; break;
+		case HYTEXFORMAT_Unknown: // Default unknown to NORM8
+			[[fallthrough]];
 		case HYTEXFORMAT_NORM8:		eInternalFormatOut = GL_RG8; break;
 		case HYTEXFORMAT_SNORM8:	eInternalFormatOut = GL_RG8_SNORM; break;
 		case HYTEXFORMAT_UINT16:	eInternalFormatOut = GL_RG16UI; break;
@@ -1051,6 +1069,8 @@ void HyOpenGL::GetGLInternalFormat(HyTextureInf textureInfo, int iNumChannels, G
 		{
 		case HYTEXFORMAT_UINT8:		eInternalFormatOut = GL_R8UI; break;
 		case HYTEXFORMAT_INT8:		eInternalFormatOut = GL_R8I; break;
+		case HYTEXFORMAT_Unknown: // Default unknown to NORM8
+			[[fallthrough]];
 		case HYTEXFORMAT_NORM8:		eInternalFormatOut = GL_R8; break;
 		case HYTEXFORMAT_SNORM8:	eInternalFormatOut = GL_R8_SNORM; break;
 		case HYTEXFORMAT_UINT16:	eInternalFormatOut = GL_R16UI; break;
@@ -1074,6 +1094,8 @@ void HyOpenGL::GetGLInternalFormatCompressed(HyTextureFormat eTexFormat, GLenum 
 	switch(eTexFormat)
 	{
 #ifndef HY_PLATFORM_BROWSER
+	case HYTEXFORMAT_Unknown: // Default unknown to DXT5
+		[[fallthrough]];
 	case HYTEXFORMAT_DXT5:						eInternalFormatOut = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT; break;
 	case HYTEXFORMAT_RGB_DXT1:					eInternalFormatOut = GL_COMPRESSED_RGB_S3TC_DXT1_EXT; break;
 	case HYTEXFORMAT_RGBA_DXT1:					eInternalFormatOut = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT; break;
@@ -1117,7 +1139,7 @@ void HyOpenGL::GetGLInternalFormatCompressed(HyTextureFormat eTexFormat, GLenum 
 	}
 }
 
-void HyOpenGL::SetTextureParameters(HyTextureInf textureInfo, GLenum eTarget) const
+void HyOpenGL::SetTextureParameters(HyTextureIn textureInfo, GLenum eTarget) const
 {
 	switch(textureInfo.GetFilter())
 	{
@@ -1137,6 +1159,8 @@ void HyOpenGL::SetTextureParameters(HyTextureInf textureInfo, GLenum eTarget) co
 		glTexParameteri(eTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 		glTexParameteri(eTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		break;
+	case HYTEXFILTER_Unknown: // Default unknown to bilinear
+		[[fallthrough]];
 	case HYTEXFILTER_BILINEAR:
 		glTexParameteri(eTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(eTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -1161,6 +1185,8 @@ void HyOpenGL::SetTextureParameters(HyTextureInf textureInfo, GLenum eTarget) co
 
 	switch(textureInfo.GetWrap())
 	{
+	case HYTEXWRAP_Unknown: // Default unknown to Repeat
+		[[fallthrough]];
 	case HYTEXWRAP_Repeat:
 		glTexParameteri(eTarget, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(eTarget, GL_TEXTURE_WRAP_T, GL_REPEAT);

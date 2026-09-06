@@ -27,7 +27,7 @@
 AtlasManager::AtlasManager(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Atlases),
 	m_DefaultImageInfo(0, 0, HYIMAGE_PNG, 4, HYTEXFORMAT_UINT8, true),
-	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXWRAP_ClampToEdge, HYTEXFORMAT_NORM8, 0),
+	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXWRAP_ClampToEdge, 4, HYTEXFORMAT_NORM8, 0),
 	m_TileSetsTreeModel(this)
 {
 	QFile tileSetMetaFile(m_MetaDir.absoluteFilePath(HyGlobal::ItemName(ITEM_AtlasTileSet, true) % HYGUIPATH_MetaExt));
@@ -205,6 +205,7 @@ AtlasTileSet *AtlasManager::GenerateTileSet(QString sName, TreeModelItemData *pP
 												 0,
 												 uiBankId,
 												 sName,
+												 m_DefaultImageInfo,
 												 m_DefaultTextureInfo,
 												 0,
 												 0,
@@ -429,7 +430,8 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 											   metaObj["cropTop"].toInt(),
 											   metaObj["cropRight"].toInt(),
 											   metaObj["cropBottom"].toInt(),
-											   HyTextureInfo(JSONOBJ_TOINT(metaObj, "textureInfo")),
+											   HyImageInfo(static_cast<uint64>(JSONOBJ_TOINT(metaObj, "imageInfo"))),
+											   HyTextureIn(JSONOBJ_TOINT(metaObj, "textureInfo")),
 											   metaObj["width"].toInt(),
 											   metaObj["height"].toInt(),
 											   metaObj["x"].toInt(),
@@ -457,7 +459,8 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 													 JSONOBJ_TOINT(metaObj, "checksum"),
 													 JSONOBJ_TOINT(metaObj, "bankId"),
 													 metaObj["name"].toString(),
-													 HyTextureInfo(JSONOBJ_TOINT(metaObj, "textureInfo")),
+													 HyImageInfo(static_cast<uint64>(JSONOBJ_TOINT(metaObj, "imageInfo"))),
+													 HyTextureIn(JSONOBJ_TOINT(metaObj, "textureInfo")),
 													 metaObj["width"].toInt(),
 													 metaObj["height"].toInt(),
 													 metaObj["x"].toInt(),
@@ -714,7 +717,8 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 		
 		// These List indices correspond to each other
 		QList<QJsonArray> assetArrayList;
-		QList<HyTextureInfo> textureInfoList;
+		QList<HyImageInfo> imageInfoList;
+		QList<HyTextureIn> textureInfoList;
 
 		QList<IAssetItemData *> &entireBankAssetsListRef = m_BanksModel.GetBank(i)->m_AssetList;
 		for(int j = 0; j < entireBankAssetsListRef.size(); ++j)
@@ -726,7 +730,8 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 			while(assetArrayList.empty() || assetArrayList.size() <= pAtlasFrame->GetTextureIndex())
 			{
 				assetArrayList.append(QJsonArray());
-				textureInfoList.append(HyTextureInfo());
+				imageInfoList.append(HyImageInfo());
+				textureInfoList.append(HyTextureIn());
 			}
 
 			QJsonObject frameObj;
@@ -745,6 +750,7 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 			frameObj.insert("frameMaskLo", QJsonValue(static_cast<qint64>(uiFrameMask & 0xFFFFFFFF)));
 
 			assetArrayList[pAtlasFrame->GetTextureIndex()].append(frameObj);
+			imageInfoList[pAtlasFrame->GetTextureIndex()] = pAtlasFrame->GetImageInfo();
 			textureInfoList[pAtlasFrame->GetTextureIndex()] = pAtlasFrame->GetTextureInfo();
 		}
 
@@ -754,9 +760,10 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 			QJsonObject textureObj;
 
 			QSize textureSize = GetTextureSize(i, j);
-			textureObj.insert("width", textureSize.width());
-			textureObj.insert("height", textureSize.height());
+			imageInfoList[j].SetWidth(textureSize.width());
+			imageInfoList[j].SetHeight(textureSize.height());
 
+			textureObj.insert("imageInfo", QJsonValue(static_cast<qint64>(imageInfoList[j].GetBucketId())));
 			textureObj.insert("textureInfo", QJsonValue(static_cast<qint64>(textureInfoList[j].GetBucketId())));
 			textureObj.insert("assets", assetArrayList[j]);
 
@@ -779,8 +786,8 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 
 		QJsonObject runtimeTileSetObj;
 		runtimeTileSetObj.insert("name", metaObj["name"].toString());
-		HyTextureInfo texInfo(HYTEXFILTER_NEAREST, HYTEXTUREFILE_RAW, 4, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT16, HYTEXTUREFORMAT_UINT16));
-		runtimeTileSetObj.insert("textureInfo", QJsonValue(static_cast<qint64>(texInfo.GetBucketId())));
+		//HyTextureInfo texInfo(HYTEXFILTER_NEAREST, HYTEXTUREFILE_RAW, 4, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT16, HYTEXTUREFORMAT_UINT16));
+		//runtimeTileSetObj.insert("textureInfo", QJsonValue(static_cast<qint64>(texInfo.GetBucketId())));
 
 		// TILETODO: do cols, rows, isEx
 
@@ -846,6 +853,7 @@ AtlasFrame *AtlasManager::ImportImage(QString sName, QImage &newImage, quint32 u
 											uiCropTop,
 											uiCropRight,
 											uiCropBottom,
+											m_DefaultImageInfo,
 											m_DefaultTextureInfo,
 											newImage.width(),
 											newImage.height(),

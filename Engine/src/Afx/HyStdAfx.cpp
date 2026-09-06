@@ -130,71 +130,83 @@ void HyImageInfo::SetVerticalFlip(bool bVerticalFlip)
 	return std::string();
 }
 
-HyTextureInf::HyTextureInf() :
+HyTextureIn::HyTextureIn() :
 	m_uiFilter(HYTEXFILTER_Unknown),
-	m_uiWrap(HYTEXWRAP_Unknown),
+	m_uiWrapAndChannels(HYTEXWRAP_Unknown << 4), // NOTE: NumChannels is '0'
 	m_uiFormat(HYTEXFORMAT_Unknown),
 	m_uiFlags(0)
 { }
 
-HyTextureInf::HyTextureInf(HyTextureFilter eFilter, HyTextureWrap eWrap, HyTextureFormat eFormat, uint8 uiFlags) :
+HyTextureIn::HyTextureIn(HyTextureFilter eFilter, HyTextureWrap eWrap, int iNumChannels, HyTextureFormat eFormat, uint8 uiFlags) :
 	m_uiFilter(eFilter),
-	m_uiWrap(eWrap),
+	m_uiWrapAndChannels((eWrap << 4) | (iNumChannels & 0x0F)),
 	m_uiFormat(eFormat),
 	m_uiFlags(uiFlags)
 { }
 
-HyTextureInf::HyTextureInf(uint32 uiBucketId) :
-	m_uiFilter((uiBucketId & 0xFF000000) >> 24),
-	m_uiWrap((uiBucketId &   0x00FF0000) >> 16),
-	m_uiFormat((uiBucketId & 0x0000FF00) >> 8),
-	m_uiFlags(uiBucketId &   0x000000FF)
+HyTextureIn::HyTextureIn(uint32 uiBucketId) :
+	m_uiFilter((uiBucketId &          0xFF000000) >> 24),
+	m_uiWrapAndChannels((uiBucketId & 0x00FF0000) >> 16),
+	m_uiFormat((uiBucketId &          0x0000FF00) >> 8),
+	m_uiFlags(uiBucketId &            0x000000FF)
 { }
 
-uint32 HyTextureInf::GetBucketId() const
+uint32 HyTextureIn::GetBucketId() const
 {
 	return (static_cast<uint32>(m_uiFilter) << 24) |
-		   (static_cast<uint32>(m_uiWrap) << 16) |
+		   (static_cast<uint32>(m_uiWrapAndChannels) << 16) |
 		   (static_cast<uint32>(m_uiFormat) << 8) |
 		    static_cast<uint32>(m_uiFlags);
 }
 
-HyTextureFilter HyTextureInf::GetFilter() const
+HyTextureFilter HyTextureIn::GetFilter() const
 {
 	return static_cast<HyTextureFilter>(m_uiFilter);
 }
 
-void HyTextureInf::SetFilter(HyTextureFilter eFilter)
+void HyTextureIn::SetFilter(HyTextureFilter eFilter)
 {
 	m_uiFilter = static_cast<uint8>(eFilter);
 }
 
-HyTextureWrap HyTextureInf::GetWrap() const
+HyTextureWrap HyTextureIn::GetWrap() const
 {
-	return static_cast<HyTextureWrap>(m_uiWrap);
+	return static_cast<HyTextureWrap>((m_uiWrapAndChannels & 0xF0) >> 4);
 }
 
-void HyTextureInf::SetWrap(HyTextureWrap eWrap)
+void HyTextureIn::SetWrap(HyTextureWrap eWrap)
 {
-	m_uiWrap = static_cast<uint8>(eWrap);
+	m_uiWrapAndChannels &= ~0xF0;
+	m_uiWrapAndChannels |= static_cast<uint8>(eWrap << 4);
 }
 
-HyTextureFormat HyTextureInf::GetFormat() const
+int HyTextureIn::GetNumChannels() const
+{
+	return (m_uiWrapAndChannels & 0x0F);
+}
+
+void HyTextureIn::SetNumChannels(int iNumChannels)
+{
+	m_uiWrapAndChannels &= ~0x0F;
+	m_uiWrapAndChannels |= static_cast<uint8>(iNumChannels & 0x0000000F);
+}
+
+HyTextureFormat HyTextureIn::GetFormat() const
 {
 	return static_cast<HyTextureFormat>(m_uiFormat);
 }
 
-void HyTextureInf::SetFormat(HyTextureFormat eFormat)
+void HyTextureIn::SetFormat(HyTextureFormat eFormat)
 {
 	m_uiFormat = static_cast<uint8>(eFormat);
 }
 
-uint8 HyTextureInf::GetFlags() const
+uint8 HyTextureIn::GetFlags() const
 {
 	return m_uiFlags;
 }
 
-void HyTextureInf::SetFlags(uint8 uiFlags)
+void HyTextureIn::SetFlags(uint8 uiFlags)
 {
 	m_uiFlags = uiFlags;
 }

@@ -67,10 +67,10 @@ public:
 	virtual void FinishRender() override;
 
 	virtual void UploadShader(HyShader *pShader) override;
-	virtual HyTextureHandle AddTexture(HyImageInfo imageInfo, HyTextureInf textureInfo, unsigned char *pPixelData, uint32 uiPixelDataSize) override;
-	virtual HyTextureHandle AddTextureArray(HyImageInfo imageInfo, HyTextureInf textureInfo, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) override;
+	virtual HyTextureHandle AddTexture(HyImageInfo imageInfo, HyTextureIn textureInfo, unsigned char *pPixelData, uint32 uiPixelDataSize) override;
+	virtual HyTextureHandle AddTextureArray(HyImageInfo imageInfo, HyTextureIn textureInfo, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) override;
 	virtual void DeleteTexture(HyTextureHandle hTexture) override;
-	virtual std::pair<HyBufferHandle, HyTextureHandle> AddTextureBufferObject(HyImageInfo imageInfo, HyTextureInf textureInfo, unsigned char *pData, uint32 uiDataSize) override;
+	virtual std::pair<HyBufferHandle, HyTextureHandle> AddTextureBufferObject(HyTextureIn textureInfo, unsigned char *pData, uint32 uiDataSize) override;
 	virtual void DeleteTextureBufferObject(std::pair<HyBufferHandle, HyTextureHandle> hTboPair) override;
 	virtual HyBufferHandle GenerateVertexBuffer() override;
 	virtual HyBufferHandle GenerateIndexBuffer() override;
@@ -81,9 +81,9 @@ public:
 private:
 	void CompileShader(HyShader *pShader, HyShaderType eType);
 	void GetGLFormat(HyImageInfo imageInfo, GLenum &eFormatOut, GLenum &eTypeOut, bool &bIsPixelDataCompressedOut) const;
-	void GetGLInternalFormat(HyTextureInf textureInfo, int iNumChannels, GLenum &eInternalFormatOut) const;
+	void GetGLInternalFormat(HyTextureIn textureInfo, GLenum &eInternalFormatOut) const;
 	void GetGLInternalFormatCompressed(HyTextureFormat eTexFormat, GLenum &eInternalFormatOut) const;
-	void SetTextureParameters(HyTextureInf textureInfo, GLenum eTarget) const;
+	void SetTextureParameters(HyTextureIn textureInfo, GLenum eTarget) const;
 
 	void RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera);
 };

@@ -15,8 +15,6 @@
 #include "Utilities/HyIO.h"
 #include "HyEngine.h"
 
-#include "vendor/SOIL2/src/SOIL2/SOIL2.h"
-
 HyTexturedQuad2d::HyTexturedQuad2d(HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_TexturedQuad, HyNodePath(), pParent)
 {
@@ -31,7 +29,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(const HyNodePath &nodePath, HyEntity2d *pPare
 	// If 'nodePath' has a project path, treat it as a file path on disk using a default HyTextureInfo()
 	if(nodePath.IsAuxiliary() == false)
 	{
-		HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTextureQuad(HyIO::CleanPath(nodePath.GetPath().c_str()), HyImageInfo(), HyTextureInf());
+		HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTextureQuad(HyIO::CleanPath(nodePath.GetPath().c_str()), HyImageInfo(), HyTextureIn());
 		m_NodePath.Set(hTexQuadHandle.first, hTexQuadHandle.second);
 	}
 }
@@ -48,7 +46,7 @@ HyTexturedQuad2d::HyTexturedQuad2d(HyTextureQuadHandle hTextureQuadHandle, HyEnt
 	m_ShaderUniforms.SetNumTexUnits(1);
 }
 
-HyTexturedQuad2d::HyTexturedQuad2d(std::string sFilePath, HyImageInfo imageInfo, HyTextureInf textureInfo, HyEntity2d *pParent /*= nullptr*/) :
+HyTexturedQuad2d::HyTexturedQuad2d(std::string sFilePath, HyImageInfo imageInfo, HyTextureIn textureInfo, HyEntity2d *pParent /*= nullptr*/) :
 	IHyDrawable2d(HYTYPE_TexturedQuad, HyNodePath(), pParent)
 {
 	m_ShaderUniforms.SetNumTexUnits(1);
@@ -85,7 +83,7 @@ void HyTexturedQuad2d::Init(HyTextureQuadHandle hTextureQuadHandle, HyEntity2d *
 	IHyLoadable2d::Init(HyNodePath(hTextureQuadHandle.first, hTextureQuadHandle.second), pParent);
 }
 
-void HyTexturedQuad2d::Init(std::string sFilePath, HyImageInfo imageInfo, HyTextureInf textureInfo, HyEntity2d *pParent)
+void HyTexturedQuad2d::Init(std::string sFilePath, HyImageInfo imageInfo, HyTextureIn textureInfo, HyEntity2d *pParent)
 {
 	HyTextureQuadHandle hTexQuadHandle = HyEngine::CreateTextureQuad(HyIO::CleanPath(sFilePath.c_str()), imageInfo, textureInfo);
 	IHyLoadable2d::Init(HyNodePath(hTexQuadHandle.first, hTexQuadHandle.second), pParent);

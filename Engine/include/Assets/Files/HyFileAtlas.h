@@ -22,7 +22,7 @@ class HyFileAtlas : public IHyFile
 	const uint32							m_uiINDEX_IN_BANK;
 
 	HyImageInfo								m_ImageInfo;
-	HyTextureInf							m_TextureInfo;
+	HyTextureIn								m_TextureInfo;
 	HyTextureHandle							m_hTextureHandle;
 
 	const uint32							m_uiNUM_FRAMES;
@@ -51,7 +51,7 @@ class HyFileAtlas : public IHyFile
 
 public:
 	HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexInBank, uint32 uiManifestIndex, HyJsonObj textureObj);
-	HyFileAtlas(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, HyImageInfo imageInfo, HyTextureInf textureInfo);
+	HyFileAtlas(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, HyImageInfo imageInfo, HyTextureIn textureInfo);
 
 	~HyFileAtlas();
 
@@ -69,9 +69,6 @@ public:
 	virtual void OnRenderThread(IHyRenderer &rendererRef) override;
 
 	virtual std::string GetAssetInfo() override;
-
-protected:
-	unsigned char *LoadAstc(std::string sAtlasFilePath, uint32 &uiPixelDataSizeOut);
 };
 
 #endif /* HyFileAtlas_h__ */

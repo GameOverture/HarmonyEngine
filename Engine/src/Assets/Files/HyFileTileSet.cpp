@@ -17,13 +17,12 @@ HyFileTileSet::HyFileTileSet(std::string sTileSetName, uint32 uiManifestIndex, H
 	IHyFile(HYFILE_TileSet, sTileSetName, 0, uiManifestIndex),
 	m_hCrcHandle(HyAssets::CalcTileSetHandle(sTileSetName)),
 	m_bUseDescriptorEx(tileSetObj["isEx"].GetBool()),
-	m_iColumns(tileSetObj["cols"].GetInt()),
-	m_iRows(tileSetObj["rows"].GetInt()),
-	m_DescriptorImageInfo(tileSetObj["descriptorImageInfo"].GetUint()),
+	m_iSubAtlasCols(tileSetObj["subAtlasCols"].GetInt()),
+	m_iSubAtlasRows(tileSetObj["subAtlasRows"].GetInt()),
+	m_iNumDescriptorTexels(tileSetObj["numDescriptorTexels"].GetInt()),
 	m_pDescriptorTexelData(nullptr),
 	m_uiDescriptorSize(0),
 	m_hDescriptorBufferPair(HY_UNUSED_HANDLE, HY_UNUSED_HANDLE),
-	m_DescriptorExImageInfo(tileSetObj["descriptorExImageInfo"].GetUint()),
 	m_pDescriptorExTexelData(nullptr),
 	m_uiDescriptorExSize(0),
 	m_hDescriptorExBufferPair(HY_UNUSED_HANDLE, HY_UNUSED_HANDLE)
@@ -47,12 +46,12 @@ const std::string &HyFileTileSet::GetTileSetName() const
 
 int32 HyFileTileSet::GetNumSubAtlasColumns() const
 {
-	return m_iColumns;
+	return m_iSubAtlasCols;
 }
 
 int32 HyFileTileSet::GetNumSubAtlasRows() const
 {
-	return m_iRows;
+	return m_iSubAtlasRows;
 }
 
 void HyFileTileSet::DeleteTexelData()
@@ -86,12 +85,14 @@ void HyFileTileSet::DeleteTexelData()
 		DeleteTexelData();
 
 		std::string sAtlasFilePath = HyEngine::DataDir() + HYASSETS_TileSetDir + m_sFILE_NAME + HyImageInfo::GetExt(HYIMAGE_HYTX);
-		m_pDescriptorTexelData = HyIO::ReadImage(sAtlasFilePath, m_DescriptorImageInfo, m_uiDescriptorSize);
+		HyImageInfo imageInfo = GenerateImageInfo();
+		m_pDescriptorTexelData = HyIO::ReadImage(sAtlasFilePath, imageInfo, m_uiDescriptorSize);
 
 		if(m_bUseDescriptorEx)
 		{
 			std::string sAtlasFilePathEx = HyEngine::DataDir() + HYASSETS_TileSetDir + m_sFILE_NAME + "Ex" + HyImageInfo::GetExt(HYIMAGE_HYTX);
-			m_pDescriptorExTexelData = HyIO::ReadImage(sAtlasFilePathEx, m_DescriptorExImageInfo, m_uiDescriptorExSize);
+			HyImageInfo imageInfoEx = GenerateImageInfo();
+			m_pDescriptorExTexelData = HyIO::ReadImage(sAtlasFilePathEx, imageInfoEx, m_uiDescriptorExSize);
 		}
 	}
 
@@ -103,13 +104,9 @@ void HyFileTileSet::DeleteTexelData()
 	m_Mutex_PixelData.lock();
 	if(GetLoadableState() == HYLOADSTATE_Queued)
 	{
-		HyTextureInf textureInfo(HYTEXFILTER_NEAREST, HYTEXWRAP_ClampToEdge, m_DescriptorImageInfo.GetFormat(), 0);
-		m_hDescriptorBufferPair = rendererRef.AddTextureBufferObject(m_DescriptorImageInfo, textureInfo, m_pDescriptorTexelData, m_uiDescriptorSize);
+		m_hDescriptorBufferPair = rendererRef.AddTextureBufferObject(GenerateTextureInfo(), m_pDescriptorTexelData, m_uiDescriptorSize);
 		if(m_bUseDescriptorEx)
-		{
-			HyTextureInf textureInfoEx(HYTEXFILTER_NEAREST, HYTEXWRAP_ClampToEdge, m_DescriptorExImageInfo.GetFormat(), 0);
-			m_hDescriptorExBufferPair = rendererRef.AddTextureBufferObject(m_DescriptorExImageInfo, textureInfoEx, m_pDescriptorExTexelData, m_uiDescriptorExSize);
-		}
+			m_hDescriptorExBufferPair = rendererRef.AddTextureBufferObject(GenerateTextureInfo(), m_pDescriptorExTexelData, m_uiDescriptorExSize);
 
 		DeleteTexelData();
 	}
@@ -130,4 +127,14 @@ void HyFileTileSet::DeleteTexelData()
 		ss << " + " + m_sFILE_NAME + "Ex";
 	
 	return ss.str();
+}
+
+HyImageInfo HyFileTileSet::GenerateImageInfo() const
+{
+	return HyImageInfo(m_iNumDescriptorTexels, 1, HYIMAGE_HYTX, 4, HYTEXFORMAT_UINT16, false);
+}
+
+HyTextureIn HyFileTileSet::GenerateTextureInfo() const
+{
+	return HyTextureIn(HYTEXFILTER_NEAREST, HYTEXWRAP_Repeat, 4, HYTEXFORMAT_UINT16, 0);
 }

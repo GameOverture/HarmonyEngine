@@ -20,7 +20,7 @@ HyTexturedQuadData::HyTexturedQuadData(uint32 uiChecksum, uint32 uiBankId, HyAss
 	m_pAtlas = assetsRef.GetAtlas(uiChecksum, uiBankId, m_UvCoords, m_uiCropMask);
 }
 
-HyTexturedQuadData::HyTexturedQuadData(HyAuxiliaryFileHandle hFileHandle, std::string sFilePath, HyImageInfo imageInfo, HyTextureInf textureInfo, HyAssets &assetsRef) :
+HyTexturedQuadData::HyTexturedQuadData(HyAuxiliaryFileHandle hFileHandle, std::string sFilePath, HyImageInfo imageInfo, HyTextureIn textureInfo, HyAssets &assetsRef) :
 	IHyNodeData(HyNodePath(0, hFileHandle)),
 	m_pAtlas(HY_NEW HyFileAtlas(hFileHandle, sFilePath, imageInfo, textureInfo)),
 	m_UvCoords(0.0f, 0.0f, 1.0f, 1.0f),

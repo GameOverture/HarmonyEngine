@@ -419,37 +419,52 @@ static_assert(HYNUM_TEXTUREFILTERS < 255, "HyTextureFilter cannot exceed 254 val
 enum HyTextureWrap
 {
 	// NOTE: Order cannot change without editor version patcher update. New entires may append to this list
-	HYTEXWRAP_Unknown = 255,
+	HYTEXWRAP_Unknown = 15,
 
 	HYTEXWRAP_Repeat = 0,
 	HYTEXWRAP_ClampToEdge,
 	HYTEXWRAP_ClampToBorder,
 	HYTEXWRAP_MirroredRepeat,
 	HYTEXWRAP_MirrorClampToEdge,
+	HYTEXWRAP_MirrorClampToBorder,
 
 	HYNUM_TEXTUREWRAPS
 };
-static_assert(HYNUM_TEXTUREFILTERS < 255, "HyTextureWrap cannot exceed 254 values. Needs to fit in uint8 (HyTextureInfo::m_uiWrap)");
+static_assert(HYNUM_TEXTUREWRAPS < 15, "HyTextureWrap cannot exceed 14 values. Needs to fit in 4 bits (HyTextureInfo::m_uiWrapAndChannels)");
 
 enum HyTextureFormat
 {
-	// NOTE: Order cannot change without editor version patcher update. New entires may append to this list
+	// NOTE: Order cannot change without editor version patcher update. New uncompressed entires should use reserves, and compressed should append to this list
 	HYTEXFORMAT_Unknown = 255,
+										// Format code: HYTX
+	HYTEXFORMAT_UINT8 = 0,				// UI08
+	HYTEXFORMAT_INT8,					// SI08
+	HYTEXFORMAT_NORM8,					
+	HYTEXFORMAT_SNORM8,					
+	HYTEXFORMAT_UINT16,					// UI16
+	HYTEXFORMAT_INT16,					// SI16
+	HYTEXFORMAT_NORM16,					
+	HYTEXFORMAT_SNORM16,				
+	HYTEXFORMAT_UINT32,					// UI32
+	HYTEXFORMAT_INT32,					// SI32
+	HYTEXFORMAT_FLOAT16,				// SF16
+	HYTEXFORMAT_FLOAT32,				// SF32
 
-	HYTEXFORMAT_UINT8 = 0,
-	HYTEXFORMAT_INT8,
-	HYTEXFORMAT_NORM8,
-	HYTEXFORMAT_SNORM8,
-	HYTEXFORMAT_UINT16,
-	HYTEXFORMAT_INT16,
-	HYTEXFORMAT_NORM16,
-	HYTEXFORMAT_SNORM16,
-	HYTEXFORMAT_UINT32,
-	HYTEXFORMAT_INT32,
-	HYTEXFORMAT_FLOAT16,
-	HYTEXFORMAT_FLOAT32,
-
+	HYTEXFORMAT_RESERVE01,
+	HYTEXFORMAT_RESERVE02,
+	HYTEXFORMAT_RESERVE03,
+	HYTEXFORMAT_RESERVE04,
+	HYTEXFORMAT_RESERVE05,
+	HYTEXFORMAT_RESERVE06,
+	HYTEXFORMAT_RESERVE07,
+	HYTEXFORMAT_RESERVE08,
+	HYTEXFORMAT_RESERVE09,
+	HYTEXFORMAT_RESERVE10,
+	HYTEXFORMAT_RESERVE11,
+	HYTEXFORMAT_RESERVE12,
+										// Format code: DDS
 	HYTEXFORMAT_DXT5,					// DXT5
+	HYTEXFORMAT_DXT3,					// DXT3 (mostly obsolete, only support for auxiliary loading)
 	HYTEXFORMAT_RGB_DXT1,				// DXT1
 	HYTEXFORMAT_RGBA_DXT1,				// DXT1 with 1bit alpha channel
 	HYTEXFORMAT_RGTC1,					// BC4U
@@ -542,17 +557,17 @@ public:
 	static std::string GetExt(HyImageType eType); // Includes the dot (like ".png")
 };
 
-class HyTextureInf
+class HyTextureIn
 {
 	uint8				m_uiFilter;
-	uint8				m_uiWrap;
+	uint8				m_uiWrapAndChannels;
 	uint8				m_uiFormat;
 	uint8				m_uiFlags;
 
 public:
-	HyTextureInf();
-	HyTextureInf(HyTextureFilter eFilter, HyTextureWrap eWrap, HyTextureFormat eFormat, uint8 uiFlags);
-	HyTextureInf(uint32 uiBucketId);
+	HyTextureIn();
+	HyTextureIn(HyTextureFilter eFilter, HyTextureWrap eWrap, int iNumChannels, HyTextureFormat eFormat, uint8 uiFlags);
+	HyTextureIn(uint32 uiBucketId);
 
 	uint32 GetBucketId() const;
 
@@ -561,6 +576,9 @@ public:
 
 	HyTextureWrap GetWrap() const;
 	void SetWrap(HyTextureWrap eWrap);
+
+	int GetNumChannels() const;
+	void SetNumChannels(int iNumChannels);
 
 	HyTextureFormat GetFormat() const;
 	void SetFormat(HyTextureFormat eFormat);

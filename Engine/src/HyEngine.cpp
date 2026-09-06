@@ -357,7 +357,7 @@ bool HyEngine::PollPlatformApi()
 	return sAbsDataDir;
 }
 
-/*static*/ HyTextureQuadHandle HyEngine::CreateTextureQuad(std::string sFilePath, HyImageInfo imageInfo, HyTextureInf textureInfo)
+/*static*/ HyTextureQuadHandle HyEngine::CreateTextureQuad(std::string sFilePath, HyImageInfo imageInfo, HyTextureIn textureInfo)
 {
 	HyAssert(sm_pInstance != nullptr, "HyEngine::CreateTextureQuad() was invoked before engine has been initialized.");
 	return sm_pInstance->m_Assets.CreateAuxiliaryTextureQuad(sFilePath, imageInfo, textureInfo);
