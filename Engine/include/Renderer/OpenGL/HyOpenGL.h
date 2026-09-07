@@ -80,9 +80,10 @@ public:
 
 private:
 	void CompileShader(HyShader *pShader, HyShaderType eType);
+
 	void GetGLFormat(HyImageInfo imageInfo, GLenum &eFormatOut, GLenum &eTypeOut, bool &bIsPixelDataCompressedOut) const;
 	void GetGLInternalFormat(HyTextureIn textureInfo, GLenum &eInternalFormatOut) const;
-	void GetGLInternalFormatCompressed(HyTextureFormat eTexFormat, GLenum &eInternalFormatOut) const;
+	void GetGLInternalFormatCompressed(HyTextureIn textureInfo, GLenum &eInternalFormatOut) const;
 	void SetTextureParameters(HyTextureIn textureInfo, GLenum eTarget) const;
 
 	void RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera);

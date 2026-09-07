@@ -291,8 +291,6 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 	}
 	else // Saving as ASTC
 	{
-		// Param1: Block Size index (4x4 -> 12x12)
-		// Param2: Color Profile (LDR linear, LDR sRGB, HDR RGB, HDR RGBA)
 		QString sProgramPath = MainWindow::EngineSrcLocation() % HYGUIPATH_AstcEncDir;
 #if defined(Q_OS_WIN)
 		sProgramPath += "win/astcenc-sse2.exe";
@@ -303,12 +301,22 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 #endif
 
 		QStringList sArgList;
-		switch(texInfo.m_uiFormatParam2)
+		switch(imageInfo.GetFormatParam())
 		{
-		case 0: sArgList << "-cl"; break; // LDR linear
-		case 1: sArgList << "-cs"; break; // LDR sRGB
-		case 2: sArgList << "-ch"; break; // HDR RGB
-		case 3: sArgList << "-cH"; break; // HDR RGBA
+		case HYASTC_Linear:			// LDR (Low Dynamic Range) linear color data
+			sArgList << "-cl";
+			break;
+		case HYASTC_Unknown:
+			[[fallthrough]];
+		case HYASTC_Standard:		// LDR Standard RGBA - Recommended for standard color textures as gamma curve better matches human perception
+			sArgList << "-cs";
+			break;
+		case HYASTC_HDR_LinearA:	// HDR (High Dynamic Range) RGB data combined with Low Dynamic Range alpha
+			sArgList << "-ch";
+			break;
+		case HYASTC_HDRA:			// HDR RGB data combined with High Dynamic Range alpha (usually not needed)
+			sArgList << "-cH";
+			break;
 		default:
 			HyGuiLog("Invalid ASTC Encoder color profile", LOGTYPE_Error);
 			break;
@@ -316,28 +324,70 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 
 		// Create temp PNG file to be used
 		QString sTempTexturePath = runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % ".png");
-		QString sAstcTexturePath = runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % texInfo.GetFileExt().c_str());
+		QString sAstcTexturePath = runtimeBankDir.absoluteFilePath(HyGlobal::MakeFileNameFromCounter(iActualTextureIndex) % HyImageInfo::GetExt(HYIMAGE_ASTC).c_str());
 		pTexture->save(sTempTexturePath);
 
 		sArgList << sTempTexturePath;
 		sArgList << sAstcTexturePath;
 
-		switch(texInfo.m_uiFormatParam1)
+		switch(imageInfo.GetFormat())
 		{
-		case 0:  sArgList << "4x4"; break;   // 8.00 bpp
-		case 1:  sArgList << "5x4"; break;   // 6.40 bpp
-		case 2:  sArgList << "5x5"; break;   // 5.12 bpp
-		case 3:  sArgList << "6x5"; break;   // 4.27 bpp
-		case 4:  sArgList << "6x6"; break;   // 3.56 bpp
-		case 5:  sArgList << "8x5"; break;   // 3.20 bpp
-		case 6:  sArgList << "8x6"; break;   // 2.67 bpp
-		case 7:  sArgList << "10x5"; break;  // 2.56 bpp
-		case 8:  sArgList << "10x6"; break;  // 2.13 bpp
-		case 9:  sArgList << "8x8"; break;   // 2.00 bpp
-		case 10: sArgList << "10x8"; break;  // 1.60 bpp
-		case 11: sArgList << "10x10"; break; // 1.28 bpp
-		case 12: sArgList << "12x10"; break; // 1.07 bpp
-		case 13: sArgList << "12x12"; break; // 0.89 bpp
+		case HYTEXFORMAT_ASTC_LINEAR_4x4:
+		case HYTEXFORMAT_ASTC_sRGB_A8_4x4:
+			sArgList << "4x4"; // 8.00 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_5x4:
+		case HYTEXFORMAT_ASTC_sRGB_A8_5x4:
+			sArgList << "5x4"; // 6.40 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_5x5:
+		case HYTEXFORMAT_ASTC_sRGB_A8_5x5:
+			sArgList << "5x5"; // 5.12 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_6x5:
+		case HYTEXFORMAT_ASTC_sRGB_A8_6x5:
+			sArgList << "6x5"; // 4.27 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_6x6:
+		case HYTEXFORMAT_ASTC_sRGB_A8_6x6:
+			sArgList << "6x6"; // 3.56 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_8x5:
+		case HYTEXFORMAT_ASTC_sRGB_A8_8x5:
+			sArgList << "8x5"; // 3.20 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_8x6:
+		case HYTEXFORMAT_ASTC_sRGB_A8_8x6:
+			sArgList << "8x6"; // 2.67 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_10x5:
+		case HYTEXFORMAT_ASTC_sRGB_A8_10x5:
+			sArgList << "10x5"; // 2.56 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_10x6:
+		case HYTEXFORMAT_ASTC_sRGB_A8_10x6:
+			sArgList << "10x6"; // 2.13 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_8x8:
+		case HYTEXFORMAT_ASTC_sRGB_A8_8x8:
+			sArgList << "8x8"; // 2.00 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_10x8:
+		case HYTEXFORMAT_ASTC_sRGB_A8_10x8:
+			sArgList << "10x8"; // 1.60 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_10x10:
+		case HYTEXFORMAT_ASTC_sRGB_A8_10x10:
+			sArgList << "10x10"; // 1.28 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_12x10:
+		case HYTEXFORMAT_ASTC_sRGB_A8_12x10:
+			sArgList << "12x10"; // 1.07 bpp
+			break;
+		case HYTEXFORMAT_ASTC_LINEAR_12x12:
+		case HYTEXFORMAT_ASTC_sRGB_A8_12x12:
+			sArgList << "12x12"; // 0.89 bpp
+			break;
 		default:
 			HyGuiLog("Invalid ASTC Encoder block footprint", LOGTYPE_Error);
 			break;

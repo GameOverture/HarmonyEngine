@@ -17,27 +17,27 @@ HyImageInfo::HyImageInfo() :
 	m_uiWidth(0),
 	m_uiHeight(0),
 	m_uiType(static_cast<uint8>(HYIMAGE_Unknown)),
-	m_uiChannels(static_cast<uint8>(0)),
+	m_uiFlipAndChannels(0),
 	m_uiFormat(static_cast<uint8>(HYTEXFORMAT_Unknown)),
-	m_uiVerticalFlip(false)
+	m_uiFormatParam(0)
 { }
 
-HyImageInfo::HyImageInfo(uint16 uiWidth, uint16 uiHeight, HyImageType eType, int iNumChannels, HyTextureFormat eFormat, bool bVerticalFlip) :
+HyImageInfo::HyImageInfo(uint16 uiWidth, uint16 uiHeight, HyImageType eType, bool bVerticalFlip, int iNumChannels, HyTextureFormat eFormat, uint8 uiFormatParam) :
 	m_uiWidth(uiWidth),
 	m_uiHeight(uiHeight),
 	m_uiType(static_cast<uint8>(eType)),
-	m_uiChannels(static_cast<uint8>(iNumChannels)),
+	m_uiFlipAndChannels(((bVerticalFlip ? 1 : 0) << 4) | (iNumChannels & 0x0F)),
 	m_uiFormat(static_cast<uint8>(eFormat)),
-	m_uiVerticalFlip(static_cast<uint8>(bVerticalFlip ? 1 : 0))
+	m_uiFormatParam(uiFormatParam)
 { }
 
 HyImageInfo::HyImageInfo(uint64 uiBucketId) :
-	m_uiWidth((uiBucketId &       0xFFFF000000000000) >> 48),
-	m_uiHeight((uiBucketId &      0x0000FFFF00000000) >> 32),
-	m_uiType((uiBucketId &        0x00000000FF000000) >> 24),
-	m_uiChannels((uiBucketId &    0x0000000000FF0000) >> 16),
-	m_uiFormat((uiBucketId &      0x000000000000FF00) >> 8),
-	m_uiVerticalFlip(uiBucketId & 0x00000000000000FF)
+	m_uiWidth((uiBucketId &           0xFFFF000000000000) >> 48),
+	m_uiHeight((uiBucketId &          0x0000FFFF00000000) >> 32),
+	m_uiType((uiBucketId &            0x00000000FF000000) >> 24),
+	m_uiFlipAndChannels((uiBucketId & 0x0000000000FF0000) >> 16),
+	m_uiFormat((uiBucketId &          0x000000000000FF00) >> 8),
+	m_uiFormatParam(uiBucketId &      0x00000000000000FF)
 { }
 
 uint64 HyImageInfo::GetBucketId() const
@@ -45,9 +45,9 @@ uint64 HyImageInfo::GetBucketId() const
 	return (static_cast<uint64>(m_uiWidth) << 48) |
 		   (static_cast<uint64>(m_uiHeight) << 32) |
 		   (static_cast<uint64>(m_uiType) << 24) |
-		   (static_cast<uint64>(m_uiChannels) << 16) |
+		   (static_cast<uint64>(m_uiFlipAndChannels) << 16) |
 		   (static_cast<uint64>(m_uiFormat) << 8) |
-		    static_cast<uint64>(m_uiVerticalFlip);
+		    static_cast<uint64>(m_uiFormatParam);
 }
 
 uint16 HyImageInfo::GetWidth() const
@@ -80,14 +80,26 @@ void HyImageInfo::SetType(HyImageType eType)
 	m_uiType = static_cast<uint8>(eType);
 }
 
+bool HyImageInfo::IsVerticalFlip() const
+{
+	return ((m_uiFlipAndChannels & 0xF0) >> 4) != 0;
+}
+
+void HyImageInfo::SetVerticalFlip(bool bVerticalFlip)
+{
+	m_uiFlipAndChannels &= ~0xF0;
+	m_uiFlipAndChannels |= static_cast<uint8>((bVerticalFlip ? 1 : 0) << 4);
+}
+
 int HyImageInfo::GetNumChannels() const
 {
-	return m_uiChannels;
+	return (m_uiFlipAndChannels & 0x0F);
 }
 
 void HyImageInfo::SetNumChannels(int iNumChannels)
 {
-	m_uiChannels = static_cast<uint8>(iNumChannels);
+	m_uiFlipAndChannels &= ~0x0F;
+	m_uiFlipAndChannels |= static_cast<uint8>(iNumChannels & 0x0000000F);
 }
 
 HyTextureFormat HyImageInfo::GetFormat() const
@@ -100,14 +112,14 @@ void HyImageInfo::SetFormat(HyTextureFormat eFormat)
 	m_uiFormat = static_cast<uint8>(eFormat);
 }
 
-bool HyImageInfo::IsVerticalFlip() const
+uint8 HyImageInfo::GetFormatParam() const
 {
-	return m_uiVerticalFlip != 0;
+	return m_uiFormatParam;
 }
 
-void HyImageInfo::SetVerticalFlip(bool bVerticalFlip)
+void HyImageInfo::SetFormatParam(uint8 uiFormatParam)
 {
-	m_uiVerticalFlip = bVerticalFlip ? 1 : 0;
+	m_uiFormatParam = uiFormatParam;
 }
 
 /*static*/ std::string HyImageInfo::GetExt(HyImageType eType)
@@ -134,21 +146,21 @@ HyTextureIn::HyTextureIn() :
 	m_uiFilter(HYTEXFILTER_Unknown),
 	m_uiWrapAndChannels(HYTEXWRAP_Unknown << 4), // NOTE: NumChannels is '0'
 	m_uiFormat(HYTEXFORMAT_Unknown),
-	m_uiFlags(0)
+	m_uiFormatParam(0)
 { }
 
-HyTextureIn::HyTextureIn(HyTextureFilter eFilter, HyTextureWrap eWrap, int iNumChannels, HyTextureFormat eFormat, uint8 uiFlags) :
+HyTextureIn::HyTextureIn(HyTextureFilter eFilter, HyTextureWrap eWrap, int iNumChannels, HyTextureFormat eFormat, uint8 uiFormatParam) :
 	m_uiFilter(eFilter),
 	m_uiWrapAndChannels((eWrap << 4) | (iNumChannels & 0x0F)),
 	m_uiFormat(eFormat),
-	m_uiFlags(uiFlags)
+	m_uiFormatParam(uiFormatParam)
 { }
 
 HyTextureIn::HyTextureIn(uint32 uiBucketId) :
 	m_uiFilter((uiBucketId &          0xFF000000) >> 24),
 	m_uiWrapAndChannels((uiBucketId & 0x00FF0000) >> 16),
 	m_uiFormat((uiBucketId &          0x0000FF00) >> 8),
-	m_uiFlags(uiBucketId &            0x000000FF)
+	m_uiFormatParam(uiBucketId &            0x000000FF)
 { }
 
 uint32 HyTextureIn::GetBucketId() const
@@ -156,7 +168,7 @@ uint32 HyTextureIn::GetBucketId() const
 	return (static_cast<uint32>(m_uiFilter) << 24) |
 		   (static_cast<uint32>(m_uiWrapAndChannels) << 16) |
 		   (static_cast<uint32>(m_uiFormat) << 8) |
-		    static_cast<uint32>(m_uiFlags);
+		    static_cast<uint32>(m_uiFormatParam);
 }
 
 HyTextureFilter HyTextureIn::GetFilter() const
@@ -201,14 +213,14 @@ void HyTextureIn::SetFormat(HyTextureFormat eFormat)
 	m_uiFormat = static_cast<uint8>(eFormat);
 }
 
-uint8 HyTextureIn::GetFlags() const
+uint8 HyTextureIn::GetFormatParam() const
 {
-	return m_uiFlags;
+	return m_uiFormatParam;
 }
 
-void HyTextureIn::SetFlags(uint8 uiFlags)
+void HyTextureIn::SetFormatParam(uint8 uiFormatParam)
 {
-	m_uiFlags = uiFlags;
+	m_uiFormatParam = uiFormatParam;
 }
 
 HyInit::HyInit()

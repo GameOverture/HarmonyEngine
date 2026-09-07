@@ -26,7 +26,7 @@
 
 AtlasManager::AtlasManager(Project &projRef) :
 	IManagerModel(projRef, ASSETMAN_Atlases),
-	m_DefaultImageInfo(0, 0, HYIMAGE_PNG, 4, HYTEXFORMAT_UINT8, true),
+	m_DefaultImageInfo(0, 0, HYIMAGE_PNG, true, 4, HYTEXFORMAT_UINT8, 0),
 	m_DefaultTextureInfo(HYTEXFILTER_BILINEAR, HYTEXWRAP_ClampToEdge, 4, HYTEXFORMAT_NORM8, 0),
 	m_TileSetsTreeModel(this)
 {

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>250</width>
-    <height>283</height>
+    <width>301</width>
+    <height>322</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -43,20 +43,20 @@
      <widget class="QWidget" name="sourcePage"/>
      <widget class="QWidget" name="atlasPage">
       <layout class="QFormLayout" name="formLayout">
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_7">
          <property name="text">
-          <string>Format</string>
+          <string>Image Type</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QComboBox" name="cmbTextureType"/>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="cmbImageType"/>
        </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QGroupBox" name="grpFormatOptions">
+       <item row="1" column="0" colspan="2">
+        <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>Format Options</string>
+          <string>Image Format</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
@@ -66,6 +66,18 @@
             </property>
             <widget class="QWidget" name="page_3">
              <layout class="QFormLayout" name="formLayout_2">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item row="0" column="0">
                <widget class="QLabel" name="label_4">
                 <property name="text">
@@ -87,26 +99,48 @@
                 </item>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_5">
+             </layout>
+            </widget>
+            <widget class="QWidget" name="page">
+             <layout class="QFormLayout" name="formLayout_5">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_3">
                 <property name="text">
-                 <string>Runtime File Type</string>
+                 <string>TextLabel</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
-               <widget class="QComboBox" name="cmbUncompressedFileType">
-                <item>
-                 <property name="text">
-                  <string>PNG</string>
-                 </property>
-                </item>
-               </widget>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="comboBox"/>
               </item>
              </layout>
             </widget>
             <widget class="QWidget" name="page_4">
              <layout class="QFormLayout" name="formLayout_3">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item row="0" column="1">
                <widget class="QComboBox" name="cmbDxtType">
                 <item>
@@ -121,10 +155,29 @@
                 </item>
                </widget>
               </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>TextLabel</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
             <widget class="QWidget" name="page_5">
              <layout class="QFormLayout" name="formLayout_4">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item row="0" column="0">
                <widget class="QLabel" name="label_9">
                 <property name="text">
@@ -141,7 +194,7 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>sRGB</string>
+                  <string>sRGB + A</string>
                  </property>
                 </item>
                 <item>
@@ -244,13 +297,26 @@
          </layout>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="cmbTextureFiltering"/>
-       </item>
-       <item row="1" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>Filtering</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="cmbTextureFiltering"/>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="chkVerticalFlip">
+         <property name="toolTip">
+          <string>Images should be flipped to avoid doing so at run-time when loading.</string>
+         </property>
+         <property name="text">
+          <string>Pre-Flip Vertically (optimal)</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -331,7 +397,7 @@
             <item>
              <spacer name="horizontalSpacer">
               <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+               <enum>Qt::Orientation::Horizontal</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -366,10 +432,10 @@
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
      </property>
     </widget>
    </item>

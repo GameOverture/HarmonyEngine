@@ -436,74 +436,78 @@ enum HyTextureFormat
 {
 	// NOTE: Order cannot change without editor version patcher update. New uncompressed entires should use reserves, and compressed should append to this list
 	HYTEXFORMAT_Unknown = 255,
-										// Format code: HYTX
-	HYTEXFORMAT_UINT8 = 0,				// UI08
-	HYTEXFORMAT_INT8,					// SI08
-	HYTEXFORMAT_NORM8,					
-	HYTEXFORMAT_SNORM8,					
-	HYTEXFORMAT_UINT16,					// UI16
-	HYTEXFORMAT_INT16,					// SI16
-	HYTEXFORMAT_NORM16,					
-	HYTEXFORMAT_SNORM16,				
-	HYTEXFORMAT_UINT32,					// UI32
-	HYTEXFORMAT_INT32,					// SI32
-	HYTEXFORMAT_FLOAT16,				// SF16
-	HYTEXFORMAT_FLOAT32,				// SF32
+	
+	// UNCOMPRESSED					Format code: HYTX
+	HYTEXFORMAT_UINT8 = 0,			// UI08
+	HYTEXFORMAT_INT8,				// SI08
+	HYTEXFORMAT_NORM8,				
+	HYTEXFORMAT_SNORM8,				
+	HYTEXFORMAT_UINT16,				// UI16
+	HYTEXFORMAT_INT16,				// SI16
+	HYTEXFORMAT_NORM16,				
+	HYTEXFORMAT_SNORM16,			
+	HYTEXFORMAT_UINT32,				// UI32
+	HYTEXFORMAT_INT32,				// SI32
+	HYTEXFORMAT_FLOAT16,			// SF16
+	HYTEXFORMAT_FLOAT32,			// SF32
 
-	HYTEXFORMAT_RESERVE01,
-	HYTEXFORMAT_RESERVE02,
-	HYTEXFORMAT_RESERVE03,
-	HYTEXFORMAT_RESERVE04,
-	HYTEXFORMAT_RESERVE05,
-	HYTEXFORMAT_RESERVE06,
-	HYTEXFORMAT_RESERVE07,
-	HYTEXFORMAT_RESERVE08,
-	HYTEXFORMAT_RESERVE09,
-	HYTEXFORMAT_RESERVE10,
-	HYTEXFORMAT_RESERVE11,
-	HYTEXFORMAT_RESERVE12,
-										// Format code: DDS
-	HYTEXFORMAT_DXT5,					// DXT5
-	HYTEXFORMAT_DXT3,					// DXT3 (mostly obsolete, only support for auxiliary loading)
-	HYTEXFORMAT_RGB_DXT1,				// DXT1
-	HYTEXFORMAT_RGBA_DXT1,				// DXT1 with 1bit alpha channel
-	HYTEXFORMAT_RGTC1,					// BC4U
-	HYTEXFORMAT_SIGNED_RGTC1,			// BC4S
-	HYTEXFORMAT_RGTC2,					// BC5U
-	HYTEXFORMAT_SIGNED_RGTC2,			// BC5S
+	// BLOCK COMPRESSION			Format code: DDS
+	HYTEXFORMAT_BC1_DXT1,			// DXT1 (when used in conjunction with 4 color channels, it's the 1bit alpha channel version)
+	HYTEXFORMAT_BC2_DXT3,			// DXT3 (mostly obsolete, only support for auxiliary loading)
+	HYTEXFORMAT_BC3_DXT5,			// DXT5
+	HYTEXFORMAT_BC4_RGTC1,			// ATI1 or BC4U
+	HYTEXFORMAT_BC4_SIGNED_RGTC1,	// BC4S
+	HYTEXFORMAT_BC5_RGTC2,			// ATI2 or BC5U
+	HYTEXFORMAT_BC5_SIGNED_RGTC2,	// BC5S
+	HYTEXFORMAT_BC6_HDR,			// DX10
+	HYTEXFORMAT_BC6_SIGNED_HDR,		// DX10
+	HYTEXFORMAT_BC7_LINEAR,			// DX10 (Encoding modes 0-7 specified by the format parameter)
+	HYTEXFORMAT_BC7_sRGB_A8,		// DX10 (Encoding modes 0-7 specified by the format parameter)
 
-	HYTEXFORMAT_ASTC_RGBA_4x4,			// 8.00 bpp
-	HYTEXFORMAT_ASTC_RGBA_5x4,			// 6.40 bpp
-	HYTEXFORMAT_ASTC_RGBA_5x5,			// 5.12 bpp
-	HYTEXFORMAT_ASTC_RGBA_6x5,			// 4.27 bpp
-	HYTEXFORMAT_ASTC_RGBA_6x6,			// 3.56 bpp
-	HYTEXFORMAT_ASTC_RGBA_8x5,			// 3.20 bpp
-	HYTEXFORMAT_ASTC_RGBA_8x6,			// 2.67 bpp
-	HYTEXFORMAT_ASTC_RGBA_10x5,			// 2.56 bpp
-	HYTEXFORMAT_ASTC_RGBA_10x6,			// 2.13 bpp
-	HYTEXFORMAT_ASTC_RGBA_8x8,			// 2.00 bpp
-	HYTEXFORMAT_ASTC_RGBA_10x8,			// 1.60 bpp
-	HYTEXFORMAT_ASTC_RGBA_10x10,		// 1.28 bpp
-	HYTEXFORMAT_ASTC_RGBA_12x10,		// 1.07 bpp
-	HYTEXFORMAT_ASTC_RGBA_12x12,		// 0.89 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_4x4,	// 8.00 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_5x4,	// 6.40 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_5x5,	// 5.12 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_6x5,	// 4.27 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_6x6,	// 3.56 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_8x5,	// 3.20 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_8x6,	// 2.67 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_10x5,	// 2.56 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_10x6,	// 2.13 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_8x8,	// 2.00 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_10x8,	// 1.60 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_10x10,// 1.28 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_12x10,// 1.07 bpp
-	HYTEXFORMAT_ASTC_SRGB8_ALPHA8_12x12,// 0.89 bpp
+	// ASTC COMPRESSION
+	HYTEXFORMAT_ASTC_LINEAR_4x4,	// 8.00 bpp
+	HYTEXFORMAT_ASTC_LINEAR_5x4,	// 6.40 bpp
+	HYTEXFORMAT_ASTC_LINEAR_5x5,	// 5.12 bpp
+	HYTEXFORMAT_ASTC_LINEAR_6x5,	// 4.27 bpp
+	HYTEXFORMAT_ASTC_LINEAR_6x6,	// 3.56 bpp
+	HYTEXFORMAT_ASTC_LINEAR_8x5,	// 3.20 bpp
+	HYTEXFORMAT_ASTC_LINEAR_8x6,	// 2.67 bpp
+	HYTEXFORMAT_ASTC_LINEAR_10x5,	// 2.56 bpp
+	HYTEXFORMAT_ASTC_LINEAR_10x6,	// 2.13 bpp
+	HYTEXFORMAT_ASTC_LINEAR_8x8,	// 2.00 bpp
+	HYTEXFORMAT_ASTC_LINEAR_10x8,	// 1.60 bpp
+	HYTEXFORMAT_ASTC_LINEAR_10x10,	// 1.28 bpp
+	HYTEXFORMAT_ASTC_LINEAR_12x10,	// 1.07 bpp
+	HYTEXFORMAT_ASTC_LINEAR_12x12,	// 0.89 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_4x4,	// 8.00 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_5x4,	// 6.40 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_5x5,	// 5.12 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_6x5,	// 4.27 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_6x6,	// 3.56 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_8x5,	// 3.20 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_8x6,	// 2.67 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_10x5,	// 2.56 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_10x6,	// 2.13 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_8x8,	// 2.00 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_10x8,	// 1.60 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_10x10,	// 1.28 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_12x10,	// 1.07 bpp
+	HYTEXFORMAT_ASTC_sRGB_A8_12x12,	// 0.89 bpp
 
 	HYNUM_TEXTUREFORMATS
 };
 static_assert(HYNUM_TEXTUREFORMATS < 255, "HyTextureFormat cannot exceed 254 values. Needs to fit in uint8 (HyImageInfo::m_uiFormat & HyTextureInfo::m_uiFormat)");
+
+enum HyAstcColorProfile
+{
+	// NOTE: This enum maps the format parameter value used in both HyImageInfo/HyTextureInfo to an ASTC color profile (all profiles support alpha)
+	HYASTC_Unknown = 0,
+
+	HYASTC_Linear = 1,			// LDR (Low Dynamic Range) linear color data
+	HYASTC_Standard = 2,		// LDR Standard RGBA - Recommended for standard color textures as gamma curve better matches human perception
+	HYASTC_HDR_LinearA = 3,		// HDR (High Dynamic Range) RGB data combined with Low Dynamic Range alpha
+	HYASTC_HDRA = 4				// HDR RGB data combined with High Dynamic Range alpha (usually not needed)
+};
 
 enum HyImageType
 {
@@ -525,13 +529,13 @@ class HyImageInfo
 	uint16				m_uiHeight;
 	
 	uint8				m_uiType;
-	uint8				m_uiChannels;
+	uint8				m_uiFlipAndChannels;
 	uint8				m_uiFormat;
-	uint8				m_uiVerticalFlip;
+	uint8				m_uiFormatParam;
 
 public:
 	HyImageInfo();
-	HyImageInfo(uint16 uiWidth, uint16 uiHeight, HyImageType eType, int iNumChannels, HyTextureFormat eFormat, bool bVerticalFlip);
+	HyImageInfo(uint16 uiWidth, uint16 uiHeight, HyImageType eType, bool bVerticalFlip, int iNumChannels, HyTextureFormat eFormat, uint8 uiFormatParam);
 	HyImageInfo(uint64 uiBucketId);
 
 	uint64 GetBucketId() const;
@@ -545,14 +549,17 @@ public:
 	HyImageType GetType() const;
 	void SetType(HyImageType eType);
 
+	bool IsVerticalFlip() const;
+	void SetVerticalFlip(bool bVerticalFlip);
+
 	int GetNumChannels() const;
 	void SetNumChannels(int iNumChannels);
 
 	HyTextureFormat GetFormat() const;
 	void SetFormat(HyTextureFormat eFormat);
 
-	bool IsVerticalFlip() const;
-	void SetVerticalFlip(bool bVerticalFlip);
+	uint8 GetFormatParam() const;
+	void SetFormatParam(uint8 uiFormatParam);
 
 	static std::string GetExt(HyImageType eType); // Includes the dot (like ".png")
 };
@@ -562,11 +569,11 @@ class HyTextureIn
 	uint8				m_uiFilter;
 	uint8				m_uiWrapAndChannels;
 	uint8				m_uiFormat;
-	uint8				m_uiFlags;
+	uint8				m_uiFormatParam;
 
 public:
 	HyTextureIn();
-	HyTextureIn(HyTextureFilter eFilter, HyTextureWrap eWrap, int iNumChannels, HyTextureFormat eFormat, uint8 uiFlags);
+	HyTextureIn(HyTextureFilter eFilter, HyTextureWrap eWrap, int iNumChannels, HyTextureFormat eFormat, uint8 uiFormatParam);
 	HyTextureIn(uint32 uiBucketId);
 
 	uint32 GetBucketId() const;
@@ -583,8 +590,8 @@ public:
 	HyTextureFormat GetFormat() const;
 	void SetFormat(HyTextureFormat eFormat);
 
-	uint8 GetFlags() const;
-	void SetFlags(uint8 uiFlags);
+	uint8 GetFormatParam() const;
+	void SetFormatParam(uint8 uiFormatParam);
 };
 
 struct HyWindowInfo

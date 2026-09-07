@@ -131,7 +131,7 @@ void HyFileTileSet::DeleteTexelData()
 
 HyImageInfo HyFileTileSet::GenerateImageInfo() const
 {
-	return HyImageInfo(m_iNumDescriptorTexels, 1, HYIMAGE_HYTX, 4, HYTEXFORMAT_UINT16, false);
+	return HyImageInfo(m_iNumDescriptorTexels, 1, HYIMAGE_HYTX, false, 4, HYTEXFORMAT_UINT16, 0);
 }
 
 HyTextureIn HyFileTileSet::GenerateTextureInfo() const

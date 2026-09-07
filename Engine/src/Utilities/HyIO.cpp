@@ -1022,39 +1022,42 @@ struct HY_DDS_HEADER
 	{
 	case 0x31545844:		// "DXT1"
 		loadHintsInOut.SetNumChannels(3); // TODO: also check for 4 channels (RGBA w/ 1-bit alpha)
-		loadHintsInOut.SetFormat(HYTEXFORMAT_RGB_DXT1);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_BC1_DXT1);
 		iBlockSize = 8;		// 8 bytes per 4x4 block
 		break;
+	case 0x33545844:		// "DXT3" (mostly obsolete)
+		loadHintsInOut.SetNumChannels(4);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_BC2_DXT3);
+		iBlockSize = 16;	// 16 bytes per 4x4 block
+		break;
+	case 0x35545844:		// "DXT5"
+		loadHintsInOut.SetNumChannels(4);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_BC3_DXT5);
+		iBlockSize = 16;	// 16 bytes per 4x4 block
+		break;
+	case 0x31495441:		// "ATI1"
 	case 0x55344342:		// "BC4U"
 		loadHintsInOut.SetNumChannels(1);
-		loadHintsInOut.SetFormat(HYTEXFORMAT_RGTC1);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_BC4_RGTC1);
 		iBlockSize = 8;		// 8 bytes per 4x4 block
 		break;
 	case 0x53344342:		// "BC4S"
 		loadHintsInOut.SetNumChannels(1);
-		loadHintsInOut.SetFormat(HYTEXFORMAT_SIGNED_RGTC1);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_BC4_SIGNED_RGTC1);
 		iBlockSize = 8;		// 8 bytes per 4x4 block
 		break;
-	case 0x35545844:		// "DXT5"
-		loadHintsInOut.SetNumChannels(4);
-		loadHintsInOut.SetFormat(HYTEXFORMAT_DXT5);
-		iBlockSize = 16;	// 16 bytes per 4x4 block
-		break;
+	case 0x32495441:		// "ATI2"
 	case 0x55354342:		// "BC5U"
 		loadHintsInOut.SetNumChannels(2);
-		loadHintsInOut.SetFormat(HYTEXFORMAT_RGTC2);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_BC5_RGTC2);
 		iBlockSize = 16;	// 16 bytes per 4x4 block
 		break;
 	case 0x53354342:		// "BC5S"
 		loadHintsInOut.SetNumChannels(2);
-		loadHintsInOut.SetFormat(HYTEXFORMAT_SIGNED_RGTC2);
+		loadHintsInOut.SetFormat(HYTEXFORMAT_BC5_SIGNED_RGTC2);
 		iBlockSize = 16;	// 16 bytes per 4x4 block
 		break;
-	case 0x33545844:		// "DXT3" (mostly obsolete)
-		loadHintsInOut.SetNumChannels(4);
-		loadHintsInOut.SetFormat(HYTEXFORMAT_DXT3);
-		iBlockSize = 16;	// 16 bytes per 4x4 block
-		break;
+
 	default:
 		HyLogError("HyIO::ReadImage_DDS - Unhandled fourCC: " << std::hex << header.pf.fourCC << std::dec);
 		return nullptr;
@@ -1268,7 +1271,7 @@ struct HY_DDS_HEADER
 	switch(imageInfo.GetNumChannels())
 	{
 	case 1:
-		if(imageInfo.GetFormat() != HYTEXFORMAT_SIGNED_RGTC1)
+		if(imageInfo.GetFormat() != HYTEXFORMAT_BC4_SIGNED_RGTC1)
 			header.pf.fourCC = 0x55344342; // "BC4U"
 		else
 			header.pf.fourCC = 0x53344342; // "BC4S"
@@ -1277,7 +1280,7 @@ struct HY_DDS_HEADER
 		break;
 
 	case 2:
-		if(imageInfo.GetFormat() != HYTEXFORMAT_SIGNED_RGTC2)
+		if(imageInfo.GetFormat() != HYTEXFORMAT_BC5_SIGNED_RGTC2)
 			header.pf.fourCC = 0x55354342; // "BC5U"
 		else
 			header.pf.fourCC = 0x53354342; // "BC5S"

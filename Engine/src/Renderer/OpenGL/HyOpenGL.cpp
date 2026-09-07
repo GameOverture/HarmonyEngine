@@ -655,11 +655,13 @@ HyOpenGL::~HyOpenGL(void)
 
 	GLenum eInternalFormat;
 	if(bIsPixelDataCompressed)
+	{
+		
 		GetGLInternalFormatCompressed(textureInfo.GetFormat(), eInternalFormat);
+	}
 	else
 	{
-		if(textureInfo.GetNumChannels() == 0 && imageInfo.GetNumChannels() != 0)
-			textureInfo.SetNumChannels(imageInfo.GetNumChannels());
+		
 		GetGLInternalFormat(textureInfo.GetFormat(), eInternalFormat);
 	}
 
@@ -689,6 +691,9 @@ HyOpenGL::~HyOpenGL(void)
 
 /*virtual*/ HyTextureHandle HyOpenGL::AddTextureArray(HyImageInfo imageInfo, HyTextureIn textureInfo, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) /*override*/
 {
+	if(textureInfo.GetNumChannels() == 0 && imageInfo.GetNumChannels() != 0)
+		textureInfo.SetNumChannels(imageInfo.GetNumChannels());
+
 	GLenum eFormat, eType;
 	bool bIsPixelDataCompressed;
 	GetGLFormat(imageInfo, eFormat, eType, bIsPixelDataCompressed);
@@ -697,11 +702,7 @@ HyOpenGL::~HyOpenGL(void)
 	if(bIsPixelDataCompressed)
 		GetGLInternalFormatCompressed(textureInfo.GetFormat(), eInternalFormat);
 	else
-	{
-		if(textureInfo.GetNumChannels() == 0 && imageInfo.GetNumChannels() != 0)
-			textureInfo.SetNumChannels(imageInfo.GetNumChannels());
 		GetGLInternalFormat(textureInfo.GetFormat(), eInternalFormat);
-	}
 
 	GLuint hGLTextureArray;
 	glGenTextures(1, &hGLTextureArray);
@@ -871,7 +872,7 @@ HyOpenGL::~HyOpenGL(void)
 	//	}
 	//}
 
-	HyImageInfo imageInfo(vFrameBufferSize.x, vFrameBufferSize.y, HYIMAGE_PNG, 4, HYTEXFORMAT_UINT8, true);
+	HyImageInfo imageInfo(vFrameBufferSize.x, vFrameBufferSize.y, HYIMAGE_PNG, true, 4, HYTEXFORMAT_UINT8, 0);
 	return HyIO::WriteImage(sFilePath, imageInfo, dataVec.data());
 }
 
@@ -932,50 +933,6 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 
 void HyOpenGL::GetGLFormat(HyImageInfo imageInfo, GLenum &eFormatOut, GLenum &eTypeOut, bool &bIsPixelDataCompressedOut) const
 {
-	switch(imageInfo.GetNumChannels())
-	{
-	case 1: eFormatOut = GL_RED; break;
-	case 2: eFormatOut = GL_RG; break;
-	case 3: eFormatOut = GL_RGB; break;
-	case 0: // Default to 4
-		[[fallthrough]];
-	case 4: eFormatOut = GL_RGBA; break;
-	default:
-		HyError("HyOpenGL::GetGLFormat - Invalid number of channels specified");
-		eFormatOut = GL_RGBA;
-		break;
-	}
-
-	switch(imageInfo.GetFormat())
-	{
-	case HYTEXFORMAT_Unknown: // Default unknown to UINT8
-		[[fallthrough]];
-	case HYTEXFORMAT_UINT8:			eTypeOut = GL_UNSIGNED_BYTE; break;
-	case HYTEXFORMAT_INT8:			eTypeOut = GL_BYTE; break;
-	case HYTEXFORMAT_NORM8:			eTypeOut = GL_UNSIGNED_BYTE; break;
-	case HYTEXFORMAT_UINT16:		eTypeOut = GL_UNSIGNED_SHORT; break;
-	case HYTEXFORMAT_INT16:			eTypeOut = GL_SHORT; break;
-	case HYTEXFORMAT_UINT32:		eTypeOut = GL_UNSIGNED_INT; break;
-	case HYTEXFORMAT_INT32:			eTypeOut = GL_INT; break;
-	case HYTEXFORMAT_FLOAT16:		eTypeOut = GL_HALF_FLOAT; break;
-	case HYTEXFORMAT_FLOAT32:		eTypeOut = GL_FLOAT; break;
-	
-	case HYTEXFORMAT_DXT5:			// DXT5
-	case HYTEXFORMAT_RGB_DXT1:		// DXT1
-	case HYTEXFORMAT_RGBA_DXT1:		// DXT1 with 1bit alpha channel
-	case HYTEXFORMAT_RGTC1:			// BC4U
-	case HYTEXFORMAT_SIGNED_RGTC1:	// BC4S
-	case HYTEXFORMAT_RGTC2:			// BC5U
-	case HYTEXFORMAT_SIGNED_RGTC2:	// BC5S
-		eTypeOut = GL_DONT_CARE;	// NOTE: Compressed image format not required (not the same as internal format)
-		break;
-
-	default:
-		HyError("HyOpenGL::GetGLFormat - Invalid format specified");
-		eTypeOut = GL_UNSIGNED_BYTE;
-		break;
-	}
-
 	switch(imageInfo.GetType())
 	{
 	case HYIMAGE_Unknown:
@@ -991,6 +948,48 @@ void HyOpenGL::GetGLFormat(HyImageInfo imageInfo, GLenum &eFormatOut, GLenum &eT
 		HyError("HyOpenGL::GetGLFormat - Invalid image type specified");
 		bIsPixelDataCompressedOut = false;
 		break;
+	}
+
+	if(bIsPixelDataCompressedOut)
+	{
+		// NOTE: Compressed image format not required (not the same as internal format)
+		eFormatOut = GL_DONT_CARE;
+		eTypeOut = GL_DONT_CARE;	
+	}
+	else
+	{
+		switch(imageInfo.GetNumChannels())
+		{
+		case 1: eFormatOut = GL_RED; break;
+		case 2: eFormatOut = GL_RG; break;
+		case 3: eFormatOut = GL_RGB; break;
+		case 0: // Default to 4
+			[[fallthrough]];
+		case 4: eFormatOut = GL_RGBA; break;
+		default:
+			HyError("HyOpenGL::GetGLFormat - Invalid number of channels specified");
+			eFormatOut = GL_RGBA;
+			break;
+		}
+
+		switch(imageInfo.GetFormat())
+		{
+		case HYTEXFORMAT_Unknown: // Default unknown to UINT8
+			[[fallthrough]];
+		case HYTEXFORMAT_UINT8:			eTypeOut = GL_UNSIGNED_BYTE; break;
+		case HYTEXFORMAT_INT8:			eTypeOut = GL_BYTE; break;
+		case HYTEXFORMAT_NORM8:			eTypeOut = GL_UNSIGNED_BYTE; break;
+		case HYTEXFORMAT_UINT16:		eTypeOut = GL_UNSIGNED_SHORT; break;
+		case HYTEXFORMAT_INT16:			eTypeOut = GL_SHORT; break;
+		case HYTEXFORMAT_UINT32:		eTypeOut = GL_UNSIGNED_INT; break;
+		case HYTEXFORMAT_INT32:			eTypeOut = GL_INT; break;
+		case HYTEXFORMAT_FLOAT16:		eTypeOut = GL_HALF_FLOAT; break;
+		case HYTEXFORMAT_FLOAT32:		eTypeOut = GL_FLOAT; break;
+		default:
+			HyError("HyOpenGL::GetGLFormat - Invalid format specified");
+			eTypeOut = GL_UNSIGNED_BYTE;
+			break;
+		}
 	}
 }
 
@@ -1089,52 +1088,59 @@ void HyOpenGL::GetGLInternalFormat(HyTextureIn textureInfo, GLenum &eInternalFor
 		HyError("HyOpenGL::GetGLInternalFormat - Invalid number of channels specified");
 }
 
-void HyOpenGL::GetGLInternalFormatCompressed(HyTextureFormat eTexFormat, GLenum &eInternalFormatOut) const
+void HyOpenGL::GetGLInternalFormatCompressed(HyTextureIn textureInfo, GLenum &eInternalFormatOut) const
 {
-	switch(eTexFormat)
+	switch(textureInfo.GetFormat())
 	{
 #ifndef HY_PLATFORM_BROWSER
-	case HYTEXFORMAT_Unknown: // Default unknown to DXT5
-		[[fallthrough]];
-	case HYTEXFORMAT_DXT5:						eInternalFormatOut = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT; break;
-	case HYTEXFORMAT_RGB_DXT1:					eInternalFormatOut = GL_COMPRESSED_RGB_S3TC_DXT1_EXT; break;
-	case HYTEXFORMAT_RGBA_DXT1:					eInternalFormatOut = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT; break;
-	case HYTEXFORMAT_RGTC1:						eInternalFormatOut = GL_COMPRESSED_RED_RGTC1; break;
-	case HYTEXFORMAT_SIGNED_RGTC1:				eInternalFormatOut = GL_COMPRESSED_SIGNED_RED_RGTC1; break;
-	case HYTEXFORMAT_RGTC2:						eInternalFormatOut = GL_COMPRESSED_RG_RGTC2; break;
-	case HYTEXFORMAT_SIGNED_RGTC2:				eInternalFormatOut = GL_COMPRESSED_SIGNED_RG_RGTC2; break;
+	case HYTEXFORMAT_BC1_DXT1:
+		if(textureInfo.GetNumChannels() == 4)
+			eInternalFormatOut = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+		else
+			eInternalFormatOut = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+		break;
+	case HYTEXFORMAT_BC2_DXT3:				eInternalFormatOut = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT; break;
+	case HYTEXFORMAT_BC3_DXT5:				eInternalFormatOut = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT; break;
+	case HYTEXFORMAT_BC4_RGTC1:				eInternalFormatOut = GL_COMPRESSED_RED_RGTC1; break;
+	case HYTEXFORMAT_BC4_SIGNED_RGTC1:		eInternalFormatOut = GL_COMPRESSED_SIGNED_RED_RGTC1; break;
+	case HYTEXFORMAT_BC5_RGTC2:				eInternalFormatOut = GL_COMPRESSED_RG_RGTC2; break;
+	case HYTEXFORMAT_BC5_SIGNED_RGTC2:		eInternalFormatOut = GL_COMPRESSED_SIGNED_RG_RGTC2; break;
+	case HYTEXFORMAT_BC6_HDR:				eInternalFormatOut = GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT; break; // TODO: Unsure if this is correct
+	case HYTEXFORMAT_BC6_SIGNED_HDR:		eInternalFormatOut = GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT; break; // TODO: Unsure if this is correct
+	case HYTEXFORMAT_BC7_LINEAR:			eInternalFormatOut = GL_COMPRESSED_RGBA_BPTC_UNORM; break;
+	case HYTEXFORMAT_BC7_sRGB_A8:			eInternalFormatOut = GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM; break;
 
-	case HYTEXFORMAT_ASTC_RGBA_4x4:				eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_4x4_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_5x4:				eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_5x4_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_5x5:				eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_5x5_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_6x5:				eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_6x5_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_6x6:				eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_6x6_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_8x5:				eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_8x5_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_8x6:				eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_8x6_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_10x5:			eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_10x5_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_10x6:			eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_10x6_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_8x8:				eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_8x8_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_10x8:			eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_10x8_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_10x10:			eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_10x10_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_12x10:			eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_12x10_KHR; break;
-	case HYTEXFORMAT_ASTC_RGBA_12x12:			eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_12x12_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_4x4:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_5x4:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_5x5:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_6x5:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_6x6:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_8x5:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_8x6:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_10x5:	eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_10x6:	eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_8x8:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_10x8:	eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_10x10:	eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_12x10:	eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR; break;
-	case HYTEXFORMAT_ASTC_SRGB8_ALPHA8_12x12:	eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_4x4:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_4x4_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_5x4:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_5x4_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_5x5:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_5x5_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_6x5:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_6x5_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_6x6:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_6x6_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_8x5:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_8x5_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_8x6:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_8x6_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_10x5:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_10x5_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_10x6:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_10x6_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_8x8:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_8x8_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_10x8:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_10x8_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_10x10:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_10x10_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_12x10:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_12x10_KHR; break;
+	case HYTEXFORMAT_ASTC_LINEAR_12x12:		eInternalFormatOut = GL_COMPRESSED_RGBA_ASTC_12x12_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_4x4:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_5x4:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_5x5:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_6x5:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_6x6:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_8x5:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_8x6:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_10x5:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_10x6:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_8x8:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_10x8:		eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_10x10:	eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_12x10:	eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR; break;
+	case HYTEXFORMAT_ASTC_sRGB_A8_12x12:	eInternalFormatOut = GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR; break;
 #endif
 	default:
-		HyError("HyOpenGL::GetGLInternalFormatCompressed - Invalid compressed internal format");
+		HyError("HyOpenGL::GetGLInternalFormatCompressed - Unhandled or Invalid compressed internal format");
 		break;
 	}
 }
