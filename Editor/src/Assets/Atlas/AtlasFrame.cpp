@@ -103,47 +103,24 @@ quint64 AtlasFrame::GetFrameMask() const
 	return (quint64(m_uiPosX) << 48) | (quint64(m_uiPosY + GetCroppedHeight()) << 32) | (quint64(m_uiPosX + GetCroppedWidth()) << 16) | quint64(m_uiPosY);
 }
 
-HyImageType AtlasFrame::GetImageType() const
-{
-	return m_ImageInfo.GetType();
-}
-
-void AtlasFrame::SetImageType(HyImageType eType, int iNumChannels, HyTextureFormat eFormat)
-{
-	m_ImageInfo.SetType(eType);
-	m_ImageInfo.SetNumChannels(iNumChannels);
-	m_ImageInfo.SetFormat(eFormat);
-	m_TextureInfo.SetFormat(eFormat);
-}
-
-HyTextureFilter AtlasFrame::GetFilter() const
-{
-	return m_TextureInfo.GetFilter();
-}
-
-void AtlasFrame::SetFilter(HyTextureFilter eFilter)
-{
-	m_TextureInfo.SetFilter(eFilter);
-}
-
-HyTextureWrap AtlasFrame::GetWrap() const
-{
-	return m_TextureInfo.GetWrap();
-}
-
-void AtlasFrame::SetWrap(HyTextureWrap eWrap)
-{
-	m_TextureInfo.SetWrap(eWrap);
-}
-
 HyImageInfo AtlasFrame::GetImageInfo() const
 {
 	return m_ImageInfo;
 }
 
+void AtlasFrame::SetImageInfo(HyImageInfo imageInfo)
+{
+	m_ImageInfo = imageInfo;
+}
+
 HyTextureIn AtlasFrame::GetTextureInfo() const
 {
 	return m_TextureInfo;
+}
+
+void AtlasFrame::SetTextureInfo(HyTextureIn textureInfo)
+{
+	m_TextureInfo = textureInfo;
 }
 
 int AtlasFrame::GetTextureIndex() const
@@ -273,10 +250,10 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));
 	frameObj.insert("x", QJsonValue(GetX()));
 	frameObj.insert("y", QJsonValue(GetY()));
-	frameObj.insert("cropLeft", QJsonValue(m_uiCropLeft));// GetCrop().left()));
-	frameObj.insert("cropTop", QJsonValue(m_uiCropTop));//GetCrop().top()));
-	frameObj.insert("cropRight", QJsonValue(m_uiCropRight));//GetCrop().right()));
-	frameObj.insert("cropBottom", QJsonValue(m_uiCropBottom));//GetCrop().bottom()));
 	frameObj.insert("imageInfo", QJsonValue(static_cast<qint64>(m_ImageInfo.GetBucketId())));
 	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TextureInfo.GetBucketId())));
+	frameObj.insert("cropLeft", QJsonValue(m_uiCropLeft));
+	frameObj.insert("cropTop", QJsonValue(m_uiCropTop));
+	frameObj.insert("cropRight", QJsonValue(m_uiCropRight));
+	frameObj.insert("cropBottom", QJsonValue(m_uiCropBottom));
 }

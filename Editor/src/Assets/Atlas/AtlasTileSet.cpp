@@ -853,104 +853,80 @@ bool AtlasTileSet::Save()
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Save the runtime descriptor tile data Texture Buffer Object(s) that will be uploaded via the graphics API for the render shaders
-	QFileInfo fileInfo(m_ModelRef.GetProjOwner().GetAssetsAbsPath() + HYASSETS_TileSetDir + GetName() + HYASSETS_TileSetExt);
+	QFileInfo fileInfo(m_ModelRef.GetProjOwner().GetAssetsAbsPath() + HYASSETS_TileSetDir + GetName() + HyImageInfo::GetExt(HYIMAGE_HYTX).c_str());
+	QFileInfo fileInfoEx(m_ModelRef.GetProjOwner().GetAssetsAbsPath() + HYASSETS_TileSetDir + GetName() + "Ex" + HyImageInfo::GetExt(HYIMAGE_HYTX).c_str());
 	QDir dir;
-	if(dir.mkpath(fileInfo.absolutePath()))
+	if(dir.mkpath(fileInfo.absolutePath()) == false)
 	{
-		QFile file(fileInfo.absoluteFilePath());
-		if(file.open(QIODevice::WriteOnly))
-		{
-			QDataStream fileData(&file);
-			fileData.setByteOrder(QDataStream::LittleEndian);
-
-			// First write the file 'header' which is 8 bytes
-			size_t uiMagicNumLen = strlen(HYASSETS_TileSetExt);
-			for(size_t i = 1; i < uiMagicNumLen; ++i) // NOTE: Start at '1' to skip the initial '.'
-				fileData << static_cast<char>(HYASSETS_TileSetExt[i]);
-			// Pad out to 'HYASSETS_MagicNumberHeaderSize' bytes for magic number header
-			for(size_t i = uiMagicNumLen - 1; i < HYASSETS_MagicNumberHeaderSize; ++i)
-				fileData << static_cast<char>('\n');
-
-			// Next write the number of texels that will be packed (as 4 byte integer)
-			fileData << static_cast<int32_t>(m_TileDataList.size());
-
-			// Then write the texel size in bytes (as 4 byte integer)
-			uint32 uiTexelSizeBytes = 8;
-			fileData << uiTexelSizeBytes;
-
-			// Now pack all the texel data as GL_RGBA16UI (each texel is 8 bytes)
-			for(TileData *pTileData : m_TileDataList)
-			{
-				// R - Atlas Index (unsigned 16bits)
-				// G - Animation bit flags (isAnimActive, isAnimLooping, Rand Phase, Ping-Pong, Reverse)
-				// B - Animation frames duration in milliseconds (unsigned 16bits)
-				// A - Animation frame count (unsigned 16bits)
-				qsizetype iSubAtlasIndex = GetTileSubAtlasIndex(pTileData);
-				if(iSubAtlasIndex < 0)
-					HyGuiLog("AtlasTileSet::Save() - Could not retrieve SubAtlas index for tile ID: " % QString::number(pTileData->GetTileId()), LOGTYPE_Error);
-				uint16_t uiRed = static_cast<uint16_t>(iSubAtlasIndex);
-				fileData << uiRed;
+		HyGuiLog("AtlasTileSet::Save() - Could not create data TileSets directory: " % fileInfo.absolutePath(), LOGTYPE_Error);
+		return false;
+	}
+	
+	QByteArray textureData;
+	for(TileData *pTileData : m_TileDataList)
+	{
+		// Pack all the texel data as GL_RGBA16UI (each texel is 4 color channels totaling 8 bytes)
+		//
+		// R - Atlas Index (unsigned 16bits)
+		// G - Animation bit flags (isAnimActive, isAnimLooping, Rand Phase, Ping-Pong, Reverse)
+		// B - Animation frames duration in milliseconds (unsigned 16bits)
+		// A - Animation frame count (unsigned 16bits)
+		qsizetype iSubAtlasIndex = GetTileSubAtlasIndex(pTileData);
+		if(iSubAtlasIndex < 0)
+			HyGuiLog("AtlasTileSet::Save() - Could not retrieve SubAtlas index for tile ID: " % QString::number(pTileData->GetTileId()), LOGTYPE_Error);
+		uint16_t uiRed = static_cast<uint16_t>(iSubAtlasIndex);
+		textureData.append(reinterpret_cast<const char *>(&uiRed), sizeof(uint16_t));
 			
-				uint16_t uiGreen;
-				fileData << uiGreen;
+		uint16_t uiGreen;
+		textureData.append(reinterpret_cast<const char *>(&uiGreen), sizeof(uint16_t));
 
-				uint16_t uiBlue;
-				fileData << uiBlue;
+		uint16_t uiBlue;
+		textureData.append(reinterpret_cast<const char *>(&uiBlue), sizeof(uint16_t));
 
-				uint16_t uiAlpha;
-				fileData << uiAlpha;
+		uint16_t uiAlpha;
+		textureData.append(reinterpret_cast<const char *>(&uiAlpha), sizeof(uint16_t));
 
-				// TILETODO: do this
-			}
-
-			file.close();
-		}
-		else
-			HyGuiLog("AtlasTileSet::Save() - Could not open file to write shader descriptor: " % fileInfo.absoluteFilePath(), LOGTYPE_Error);
-		//----------------------------------------------------------------------------------------------------------------------------
-		if(m_bDescriptorEx) // Optional render information for each tile stored as a data texture (GL_RGBA16UI)
+		// TILETODO: do this
+	}
+	HyImageInfo descriptorImageInfo(m_TileDataList.size(), 1, HYIMAGE_HYTX, false, 4, HYTEXFORMAT_UINT16, 0);
+	if(HyIO::WriteImage(fileInfo.absoluteFilePath().toStdString(), descriptorImageInfo, reinterpret_cast<uint8 *>(textureData.data())) == false)
+	{
+		HyGuiLog("AtlasTileSet::Save() - Failed to save descriptor texture", LOGTYPE_Error);
+		return false;
+	}
+	//----------------------------------------------------------------------------------------------------------------------------
+	if(m_bDescriptorEx) // Optional render information for each tile stored as a data texture (GL_RGBA16UI)
+	{
+		QByteArray textureDataEx;
+		for(TileData *pTileData : m_TileDataList)
 		{
-			QFileInfo fileInfoEx(m_ModelRef.GetProjOwner().GetAssetsAbsPath() + HYASSETS_TileSetDir + GetName() + HYASSETS_TileSetExExt);
-			QFile fileEx(fileInfoEx.absoluteFilePath());
-			if(fileEx.open(QIODevice::WriteOnly))
-			{
-				QDataStream fileData(&fileEx);
-				fileData.setByteOrder(QDataStream::LittleEndian);
+			// Pack all the EX texel data as GL_RGBA16UI (each texel is 4 color channels totaling 8 bytes)
+			//
+			// R - Texture Origin to visually offset the tile in the X-Axis (signed 16bits)
+			// G - Texture Origin to visually offset the tile in the Y-Axis (signed 16bits)
+			// B - Color Tint Red and Green channels (packed as 2 unsigned 8bit integers)
+			// A - Color Tint Blue and Alpha channels (packed as 2 unsigned 8bit integers)
+			uint16_t uiRed;
+			textureDataEx.append(reinterpret_cast<const char *>(&uiRed), sizeof(uint16_t));
+			
+			uint16_t uiGreen;
+			textureDataEx.append(reinterpret_cast<const char *>(&uiGreen), sizeof(uint16_t));
 
-				// First write the file 'header' which is 8 bytes
-				size_t uiMagicNumLen = strlen(HYASSETS_TileSetExExt);
-				for(size_t i = 1; i < uiMagicNumLen; ++i) // NOTE: Start at '1' to skip the initial '.'
-					fileData << static_cast<char>(HYASSETS_TileSetExExt[i]);
-				// Pad out to 'HYASSETS_MagicNumberHeaderSize' bytes for magic number header
-				for(size_t i = uiMagicNumLen - 1; i < HYASSETS_MagicNumberHeaderSize; ++i)
-					fileData << static_cast<char>('\n');
+			uint16_t uiBlue;
+			textureDataEx.append(reinterpret_cast<const char *>(&uiBlue), sizeof(uint16_t));
 
-				// Next write the number of texels that will be packed (as 4 byte integer)
-				fileData << static_cast<int32_t>(m_TileDataList.size());
+			uint16_t uiAlpha;
+			textureDataEx.append(reinterpret_cast<const char *>(&uiAlpha), sizeof(uint16_t));
 
-				// Then write the texel size in bytes (as 4 byte integer)
-				uint32 uiTexelSizeBytes = 8;
-				fileData << uiTexelSizeBytes;
-
-				// Now pack all the EX texel data as GL_RGBA16UI (each texel is 8 bytes)
-				for(TileData *pTileData : m_TileDataList)
-				{
-					// R - Texture Origin to visually offset the tile in the X-Axis (signed 16bits)
-					// G - Texture Origin to visually offset the tile in the Y-Axis (signed 16bits)
-					// B - Color Tint Red and Green channels (packed as 2 unsigned 8bit integers)
-					// A - Color Tint Blue and Alpha channels (packed as 2 unsigned 8bit integers)
-
-					// TILETODO: do this
-				}
-
-				fileEx.close();
-			}
-			else
-				HyGuiLog("AtlasTileSet::Save() - Could not open file to write shader descriptor EX: " % fileInfoEx.absoluteFilePath(), LOGTYPE_Error);
+			// TILETODO: do this
+		}
+		HyImageInfo descriptorExImageInfo(m_TileDataList.size(), 1, HYIMAGE_HYTX, false, 4, HYTEXFORMAT_UINT16, 0);
+		if(HyIO::WriteImage(fileInfoEx.absoluteFilePath().toStdString(), descriptorExImageInfo, reinterpret_cast<uint8 *>(textureDataEx.data())) == false)
+		{
+			HyGuiLog("AtlasTileSet::Save() - Failed to save descriptor EX texture", LOGTYPE_Error);
+			return false;
 		}
 	}
-	else
-		HyGuiLog("AtlasTileSet::Save() - Could not create data TileSets directory: " % fileInfo.absolutePath(), LOGTYPE_Error);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	return static_cast<AtlasManager &>(m_ModelRef).SaveTileSets();
@@ -977,9 +953,10 @@ void AtlasTileSet::DiscardChanges()
 	frameObj.insert("width", QJsonValue(GetSize().width()));
 	frameObj.insert("height", QJsonValue(GetSize().height()));
 	frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));
-	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TexInfo.GetBucketId())));
 	frameObj.insert("x", QJsonValue(GetX()));
 	frameObj.insert("y", QJsonValue(GetY()));
+	frameObj.insert("imageInfo", QJsonValue(static_cast<qint64>(m_ImageInfo.GetBucketId())));
+	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TextureInfo.GetBucketId())));
 }
 
 Tiled::SharedTileset AtlasTileSet::GetTiledTileSet() const

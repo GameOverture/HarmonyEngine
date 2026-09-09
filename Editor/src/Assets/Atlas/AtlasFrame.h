@@ -72,16 +72,11 @@ public:
 	quint16 GetCroppedHeight() const;
 	quint64 GetCropMask() const;
 	quint64 GetFrameMask() const;
-	
-	HyImageType GetImageType() const;
-	void SetImageType(HyImageType eType, int iNumChannels, HyTextureFormat eFormat);
-	HyTextureFilter GetFilter() const;
-	void SetFilter(HyTextureFilter eFilter);
-	HyTextureWrap GetWrap() const;
-	void SetWrap(HyTextureWrap eWrap);
 
 	HyImageInfo GetImageInfo() const;
+	void SetImageInfo(HyImageInfo imageInfo);
 	HyTextureIn GetTextureInfo() const;
+	void SetTextureInfo(HyTextureIn textureInfo);
 
 	int GetTextureIndex() const;
 	quint16 GetX() const;

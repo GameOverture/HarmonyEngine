@@ -314,7 +314,7 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 		case HYASTC_HDR_LinearA:	// HDR (High Dynamic Range) RGB data combined with Low Dynamic Range alpha
 			sArgList << "-ch";
 			break;
-		case HYASTC_HDRA:			// HDR RGB data combined with High Dynamic Range alpha (usually not needed)
+		case HYASTC_HDR_RGBA:		// HDR RGB data combined with High Dynamic Range alpha (usually not needed)
 			sArgList << "-cH";
 			break;
 		default:

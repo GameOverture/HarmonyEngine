@@ -54,7 +54,7 @@
         <widget class="QComboBox" name="cmbImageType"/>
        </item>
        <item row="1" column="0" colspan="2">
-        <widget class="QGroupBox" name="groupBox">
+        <widget class="QGroupBox" name="grpImageFormat">
          <property name="title">
           <string>Image Format</string>
          </property>
@@ -62,9 +62,23 @@
           <item>
            <widget class="QStackedWidget" name="stackedFormatOptions">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
-            <widget class="QWidget" name="page_3">
+            <widget class="QWidget" name="pageDiffOptions">
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <item>
+               <widget class="QLabel" name="label_12">
+                <property name="text">
+                 <string>&lt;Different Options&gt;</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="pagePng">
              <layout class="QFormLayout" name="formLayout_2">
               <property name="leftMargin">
                <number>0</number>
@@ -86,22 +100,11 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="cmbUncompressedColorChannels">
-                <item>
-                 <property name="text">
-                  <string>RGBA</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>RGB</string>
-                 </property>
-                </item>
-               </widget>
+               <widget class="QComboBox" name="cmbPngChannels"/>
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="page">
+            <widget class="QWidget" name="pageHytx">
              <layout class="QFormLayout" name="formLayout_5">
               <property name="leftMargin">
                <number>0</number>
@@ -118,16 +121,26 @@
               <item row="0" column="0">
                <widget class="QLabel" name="label_3">
                 <property name="text">
-                 <string>TextLabel</string>
+                 <string>Color Channels</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="comboBox"/>
+               <widget class="QComboBox" name="cmbHytxChannels"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>Data Type</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="cmbHytxDataType"/>
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="page_4">
+            <widget class="QWidget" name="pageDds">
              <layout class="QFormLayout" name="formLayout_3">
               <property name="leftMargin">
                <number>0</number>
@@ -142,29 +155,28 @@
                <number>0</number>
               </property>
               <item row="0" column="1">
-               <widget class="QComboBox" name="cmbDxtType">
-                <item>
-                 <property name="text">
-                  <string>RGBA DXT 5</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>RGB DXT 1</string>
-                 </property>
-                </item>
-               </widget>
+               <widget class="QComboBox" name="cmbDdsCompression"/>
               </item>
               <item row="0" column="0">
                <widget class="QLabel" name="label_5">
                 <property name="text">
-                 <string>TextLabel</string>
+                 <string>Block Compression</string>
                 </property>
                </widget>
               </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="lblDdsDxt1Channels">
+                <property name="text">
+                 <string>Color Channels</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QComboBox" name="cmbDdsDxt1Channels"/>
+              </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="page_5">
+            <widget class="QWidget" name="pageAstc">
              <layout class="QFormLayout" name="formLayout_4">
               <property name="leftMargin">
                <number>0</number>
@@ -186,28 +198,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="cmbAstcColorProfile">
-                <item>
-                 <property name="text">
-                  <string>Linear</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>sRGB + A</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>HDR RGB</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>HDR RGBA</string>
-                 </property>
-                </item>
-               </widget>
+               <widget class="QComboBox" name="cmbAstcColorProfile"/>
               </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_8">
@@ -217,78 +208,7 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QComboBox" name="cmbAstcBlockSize">
-                <item>
-                 <property name="text">
-                  <string>4x4 (8.00bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>5x4 (6.40bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>5x5 (5.12bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>6x5 (4.27bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>6x6 (3.56bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>8x5 (3.20bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>8x6 (2.67bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>10x5 (2.56bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>10x6 (2.13bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>8x8 (2.00bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>10x8 (1.60bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>10x10 (1.28bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>12x10 (1.07bpp)</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>12x12 (0.89bpp)</string>
-                 </property>
-                </item>
-               </widget>
+               <widget class="QComboBox" name="cmbAstcBlockSize"/>
               </item>
              </layout>
             </widget>
@@ -305,15 +225,15 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QComboBox" name="cmbTextureFiltering"/>
+        <widget class="QComboBox" name="cmbTextureFilter"/>
        </item>
        <item row="2" column="1">
         <widget class="QCheckBox" name="chkVerticalFlip">
          <property name="toolTip">
-          <string>Images should be flipped to avoid doing so at run-time when loading.</string>
+          <string>Harmony's Y-Axis goes bottom-to-top, so it reads its texture data upside down. Images should be pre-flipped when saved to avoid needing to do so at run-time.</string>
          </property>
          <property name="text">
-          <string>Pre-Flip Vertically (optimal)</string>
+          <string>Pre-Flip Vertically</string>
          </property>
          <property name="checked">
           <bool>true</bool>

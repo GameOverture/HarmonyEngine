@@ -26,34 +26,6 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 	setWindowIcon(HyGlobal::AssetIcon(pManagerModel->GetAssetType(), SUBICON_Settings));
 	ui->stackedAssetType->setCurrentIndex(pManagerModel->GetAssetType());
 
-	// Assign values to each combobox entry
-	// Uncompressed
-	ui->cmbUncompressedColorChannels->setItemData(0, 4); // RGBA
-	ui->cmbUncompressedColorChannels->setItemData(1, 3); // RGB
-	ui->cmbUncompressedFileType->setItemData(0, HYTEXTUREFORMAT_UINT8);
-	// DXT
-	ui->cmbDxtType->setItemData(0, 5); // DXT 5 (RGBA)
-	ui->cmbDxtType->setItemData(1, 1); // DXT 1 (RGB)
-	// ASTC
-	ui->cmbAstcColorProfile->setItemData(0, 0); // LDR Linear
-	ui->cmbAstcColorProfile->setItemData(1, 1); // LDR sRGBA
-	ui->cmbAstcColorProfile->setItemData(2, 2); // HDR RGB
-	ui->cmbAstcColorProfile->setItemData(3, 3); // HDR RGBA
-	ui->cmbAstcBlockSize->setItemData(0, 0); // 4x4
-	ui->cmbAstcBlockSize->setItemData(1, 1); // 5x4
-	ui->cmbAstcBlockSize->setItemData(2, 2); // 5x5
-	ui->cmbAstcBlockSize->setItemData(3, 3); // 6x5
-	ui->cmbAstcBlockSize->setItemData(4, 4); // 6x6
-	ui->cmbAstcBlockSize->setItemData(5, 5); // 8x5
-	ui->cmbAstcBlockSize->setItemData(6, 6); // 8x6
-	ui->cmbAstcBlockSize->setItemData(7, 7); // 10x5
-	ui->cmbAstcBlockSize->setItemData(8, 8); // 10x6
-	ui->cmbAstcBlockSize->setItemData(9, 9); // 8x8
-	ui->cmbAstcBlockSize->setItemData(10, 10); // 10x8
-	ui->cmbAstcBlockSize->setItemData(11, 11); // 10x10
-	ui->cmbAstcBlockSize->setItemData(12, 12); // 12x10
-	ui->cmbAstcBlockSize->setItemData(13, 13); // 12x12
-
 	// Set 'name' and 'num selected'
 	if(m_SelectedAssets.count() > 1)
 	{
@@ -80,82 +52,218 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 		ui->lblNumSelected->setVisible(false);
 	}
 
-	Qt::CheckState eCheckState;
+	// Assign values (and map data) to each combobox entry
+	std::vector<HyImageType> imageTypeList = HyAssets::GetImageTypeList();
+	for(HyImageType eType : imageTypeList)
+		ui->cmbImageType->addItem(QString(HyAssets::GetImageTypeName(eType).c_str()), eType);
+
+	ui->cmbPngChannels->addItem("32bit - RGBA", 4);
+	ui->cmbPngChannels->addItem("24bit - RGB", 3);
+	ui->cmbPngChannels->setCurrentIndex(0);
+
+	ui->cmbHytxChannels->addItem("32bit - RGBA", 4);
+	ui->cmbHytxChannels->addItem("24bit - RGB", 3);
+	ui->cmbHytxChannels->setCurrentIndex(0);
+	ui->cmbHytxDataType->addItem("UINT8", HYTEXFORMAT_UINT8);
+	ui->cmbHytxDataType->addItem("INT8", HYTEXFORMAT_INT8);
+	ui->cmbHytxDataType->setCurrentIndex(0);
+
+	ui->cmbDdsCompression->addItem("DXT5", HYTEXFORMAT_BC3_DXT5);
+	ui->cmbDdsCompression->addItem("DXT1", HYTEXFORMAT_BC1_DXT1);
+	ui->cmbDdsCompression->setCurrentIndex(0);
+	ui->cmbDdsDxt1Channels->addItem("RGB", 3);
+	ui->cmbDdsDxt1Channels->addItem("RGBA (1 bit alpha)", 4);
+	ui->cmbDdsDxt1Channels->setCurrentIndex(0);
+	// cmbDdsDxt1Channels visibility gets set by 'on_cmbDdsCompression_currentIndexChanged' signal callback
+	
+	ui->cmbAstcColorProfile->addItem("LDR - Linear", HYASTC_Linear);
+	ui->cmbAstcColorProfile->addItem("LDR - Standard", HYASTC_Standard);
+	ui->cmbAstcColorProfile->addItem("HDR - RGB (with linear alpha)", HYASTC_HDR_LinearA);
+	ui->cmbAstcColorProfile->addItem("HDR - RGBA", HYASTC_HDR_RGBA);
+	ui->cmbAstcColorProfile->setCurrentIndex(1);
+	// NOTE: Using HYTEXFORMAT_ASTC_LINEAR_* as the item data (even if LDR - Standard is selected)
+	ui->cmbAstcBlockSize->addItem("4x4 (8.00bpp)", HYTEXFORMAT_ASTC_LINEAR_4x4);
+	ui->cmbAstcBlockSize->addItem("5x4 (6.40bpp)", HYTEXFORMAT_ASTC_LINEAR_5x4);
+	ui->cmbAstcBlockSize->addItem("5x5 (5.12bpp)", HYTEXFORMAT_ASTC_LINEAR_5x5);
+	ui->cmbAstcBlockSize->addItem("6x5 (4.27bpp)", HYTEXFORMAT_ASTC_LINEAR_6x5);
+	ui->cmbAstcBlockSize->addItem("6x6 (3.56bpp)", HYTEXFORMAT_ASTC_LINEAR_6x6);
+	ui->cmbAstcBlockSize->addItem("8x5 (3.20bpp)", HYTEXFORMAT_ASTC_LINEAR_8x5);
+	ui->cmbAstcBlockSize->addItem("8x6 (2.67bpp)", HYTEXFORMAT_ASTC_LINEAR_8x6);
+	ui->cmbAstcBlockSize->addItem("10x5 (2.56bpp)", HYTEXFORMAT_ASTC_LINEAR_10x5);
+	ui->cmbAstcBlockSize->addItem("10x6 (2.13bpp)", HYTEXFORMAT_ASTC_LINEAR_10x6);
+	ui->cmbAstcBlockSize->addItem("8x8 (2.00bpp)", HYTEXFORMAT_ASTC_LINEAR_8x8);
+	ui->cmbAstcBlockSize->addItem("10x8 (1.60bpp)", HYTEXFORMAT_ASTC_LINEAR_10x8);
+	ui->cmbAstcBlockSize->addItem("10x10 (1.28bpp)", HYTEXFORMAT_ASTC_LINEAR_10x10);
+	ui->cmbAstcBlockSize->addItem("12x10 (1.07bpp)", HYTEXFORMAT_ASTC_LINEAR_12x10);
+	ui->cmbAstcBlockSize->addItem("12x12 (0.89bpp)", HYTEXFORMAT_ASTC_LINEAR_12x12);
+	ui->cmbAstcBlockSize->setCurrentIndex(4);
+
+	std::vector<HyTextureFilter> filterList = HyAssets::GetTextureFilterList();
+	for(HyTextureFilter eFilter : filterList)
+		ui->cmbTextureFilter->addItem(QString(HyAssets::GetTextureFilterName(eFilter).c_str()), eFilter);
 
 	switch(pManagerModel->GetAssetType())
 	{
 	case ASSETMAN_Atlases: {
-		// Texture Format ///////////////////////////////////////////////////////////////////////////////////////////
-		HyTextureInfo texInfo = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetTextureInfo();
-		bool bIsDiffOptions = false;
+		// Image Type and Format ///////////////////////////////////////////////////////////////////////////////////////////
+		HyImageInfo compareImageInfo = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetImageInfo();
+		HyTextureIn compareTextureInfo = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetTextureInfo();
+		bool bIsDiffImage = false;
 		for(auto pAsset : m_SelectedAssets)
 		{
 			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
-			if(pFrame->GetFileType() != texInfo.GetFileType())
+			if(pFrame->GetImageInfo().GetType() != compareImageInfo.GetType())
 			{
-				ui->cmbTextureType->addItem("<different options>");
-				ui->cmbTextureType->setCurrentIndex(0);
-				bIsDiffOptions = true;
+				ui->cmbImageType->insertItem(0, "<different options>", HYIMAGE_Unknown);
+				ui->cmbImageType->setCurrentIndex(0);
+				bIsDiffImage = true;
 				break;
 			}
 		}
-		for(int i = 0; i < HYNUM_TEXTUREFILES; ++i)
-			ui->cmbTextureType->addItem(QString(HyAssets::GetTextureFileTypeName(static_cast<HyTextureFileType>(i)).c_str()));
-
-		if(bIsDiffOptions == false)
+		if(bIsDiffImage)
+			ui->stackedFormatOptions->setCurrentIndex(ui->stackedFormatOptions->count() - 1);
+		else
 		{
-			ui->cmbTextureType->setCurrentIndex(texInfo.GetFileType());
+			ui->cmbImageType->setCurrentIndex(compareImageInfo.GetType());
 
-			switch(texInfo.GetFileType())
+			bool bIsDiffFormatOption1 = false;
+			bool bIsDiffFormatOption2 = false;
+			QVariant imageTypeVar = ui->cmbImageType->itemData(ui->cmbImageType->currentIndex());
+			switch(static_cast<HyImageType>(imageTypeVar.toInt()))
 			{
-			case HYTEXTUREFILE_PNG:
-				if(texInfo.m_uiFormatParam1 == 4)
-					ui->cmbUncompressedColorChannels->setCurrentIndex(0);
-				else
-					ui->cmbUncompressedColorChannels->setCurrentIndex(1);
-				ui->cmbUncompressedFileType->setCurrentIndex(ui->cmbUncompressedFileType->findData(QVariant(texInfo.m_uiFormatParam2)));
+			case HYIMAGE_PNG:
+				for(auto pAsset : m_SelectedAssets)
+				{
+					AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+					if(pFrame->GetImageInfo().GetNumChannels() != compareImageInfo.GetNumChannels())
+					{
+						ui->cmbPngChannels->insertItem(0, "<different options>", 0);
+						ui->cmbPngChannels->setCurrentIndex(0);
+						bIsDiffFormatOption1 = true;
+						break;
+					}
+				}
+				if(bIsDiffFormatOption1 == false)
+					ui->cmbPngChannels->setCurrentIndex(ui->cmbPngChannels->findData(compareImageInfo.GetNumChannels()));
+				break;
+			case HYIMAGE_HYTX:
+				for(auto pAsset : m_SelectedAssets)
+				{
+					AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+					if(bIsDiffFormatOption1 == false && pFrame->GetImageInfo().GetNumChannels() != compareImageInfo.GetNumChannels())
+					{
+						ui->cmbHytxChannels->insertItem(0, "<different options>", 0);
+						ui->cmbHytxChannels->setCurrentIndex(0);
+						bIsDiffFormatOption1 = true;
+					}
+					if(bIsDiffFormatOption2 == false && pFrame->GetImageInfo().GetFormat() != compareImageInfo.GetFormat())
+					{
+						ui->cmbHytxDataType->insertItem(0, "<different options>", HYTEXFORMAT_Unknown);
+						ui->cmbHytxDataType->setCurrentIndex(0);
+						bIsDiffFormatOption2 = true;
+					}
+					if(bIsDiffFormatOption1 && bIsDiffFormatOption2)
+						break;
+				}
+				if(bIsDiffFormatOption1 == false)
+					ui->cmbHytxChannels->setCurrentIndex(ui->cmbHytxChannels->findData(compareImageInfo.GetNumChannels()));
+				if(bIsDiffFormatOption2 == false)
+					ui->cmbHytxDataType->setCurrentIndex(ui->cmbHytxDataType->findData(compareImageInfo.GetFormat()));
 				break;
 
-			case HYTEXTUREFILE_DXT:
-				if(texInfo.m_uiFormatParam2 == 5)
-					ui->cmbDxtType->setCurrentIndex(0);
-				else
-					ui->cmbDxtType->setCurrentIndex(1);
+			case HYIMAGE_DDS:
+				for(auto pAsset : m_SelectedAssets)
+				{
+					AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+					if(pFrame->GetImageInfo().GetFormat() != compareImageInfo.GetFormat())
+					{
+						ui->cmbDdsCompression->insertItem(0, "<different options>", HYTEXFORMAT_Unknown);
+						ui->cmbDdsCompression->setCurrentIndex(0);
+						bIsDiffFormatOption1 = true;
+						break;
+					}
+				}
+				if(bIsDiffFormatOption1 == false && compareImageInfo.GetFormat() == HYTEXFORMAT_BC1_DXT1)
+				{
+					for(auto pAsset : m_SelectedAssets)
+					{
+						AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+						if(pFrame->GetImageInfo().GetNumChannels() != compareImageInfo.GetNumChannels())
+						{
+							ui->cmbDdsDxt1Channels->insertItem(0, "<different options>", 0);
+							ui->cmbDdsDxt1Channels->setCurrentIndex(0);
+							bIsDiffFormatOption2 = true;
+							break;
+						}
+					}
+				}
+				if(bIsDiffFormatOption1 == false)
+					ui->cmbDdsCompression->setCurrentIndex(ui->cmbDdsCompression->findData(compareImageInfo.GetFormat()));
+				if(bIsDiffFormatOption2 == false)
+					ui->cmbDdsDxt1Channels->setCurrentIndex(ui->cmbDdsDxt1Channels->findData(compareImageInfo.GetNumChannels()));
 				break;
 
-			case HYTEXTUREFILE_ASTC:
-				ui->cmbAstcBlockSize->setCurrentIndex(ui->cmbAstcBlockSize->findData(QVariant(texInfo.m_uiFormatParam1)));
-				ui->cmbAstcColorProfile->setCurrentIndex(ui->cmbAstcColorProfile->findData(QVariant(texInfo.m_uiFormatParam2)));
+			case HYIMAGE_ASTC:
+				for(auto pAsset : m_SelectedAssets)
+				{
+					AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+					if(bIsDiffFormatOption1 == false && pFrame->GetImageInfo().GetFormatParam() != compareImageInfo.GetFormatParam())
+					{
+						ui->cmbAstcColorProfile->insertItem(0, "<different options>", HYASTC_Unknown);
+						ui->cmbAstcColorProfile->setCurrentIndex(0);
+						bIsDiffFormatOption1 = true;
+					}
+					if(bIsDiffFormatOption2 == false && pFrame->GetImageInfo().GetFormat() != compareImageInfo.GetFormat())
+					{
+						ui->cmbAstcBlockSize->insertItem(0, "<different options>", HYTEXFORMAT_Unknown);
+						ui->cmbAstcBlockSize->setCurrentIndex(0);
+						bIsDiffFormatOption2 = true;
+					}
+				}
+				if(bIsDiffFormatOption1 == false)
+					ui->cmbAstcBlockSize->setCurrentIndex(ui->cmbAstcBlockSize->findData(compareImageInfo.GetFormatParam()));
+				if(bIsDiffFormatOption2 == false)
+					ui->cmbAstcColorProfile->setCurrentIndex(ui->cmbAstcColorProfile->findData(compareImageInfo.GetFormat()));
 				break;
 			}
-			ui->grpFormatOptions->setVisible(true);
 		}
-
-		// Texture Filtering ///////////////////////////////////////////////////////////////////////////////////////////
-		HyTextureFiltering eFiltering = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetFiltering();
+		// Flip Image ///////////////////////////////////////////////////////////////////////////////////////////
+		bool bIsDiffFlip = false;
 		for(auto pAsset : m_SelectedAssets)
 		{
 			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
-			if(pFrame->GetFiltering() != eFiltering)
+			if(pFrame->GetImageInfo().IsVerticalFlip() != compareImageInfo.IsVerticalFlip())
 			{
-				ui->cmbTextureFiltering->addItem("<different options>");
-				eFiltering = HYTEXFILTER_Unknown;
+				ui->chkVerticalFlip->setCheckState(Qt::PartiallyChecked);
+				bIsDiffFlip = true;
 				break;
 			}
 		}
-		for(int i = 0; i < HYNUM_TEXTUREFILTERS; ++i)
-			ui->cmbTextureFiltering->addItem(QString(HyAssets::GetTextureFilteringName(static_cast<HyTextureFiltering>(i)).c_str()));
+		if(bIsDiffFlip == false)
+			ui->chkVerticalFlip->setChecked(compareImageInfo.IsVerticalFlip());
 
-		ui->cmbTextureFiltering->setCurrentIndex(eFiltering == HYTEXFILTER_Unknown ? 0 : eFiltering);
+		// Texture Filter //////////////////////////////////////////////////////////////////////////////////////////
+		bool bIsDiffFilter = false;
+		for(auto pAsset : m_SelectedAssets)
+		{
+			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+			if(pFrame->GetTextureInfo().GetFilter() != compareTextureInfo.GetFilter())
+			{
+				ui->cmbTextureFilter->insertItem(0, "<different options>", HYTEXFILTER_Unknown);
+				ui->cmbTextureFilter->setCurrentIndex(0);
+				break;
+			}
+		}
 		break; }
 
-	case ASSETMAN_Audio:
+	case ASSETMAN_Audio: {
+		Qt::CheckState eCheckState;
 		// Audio Category /////////////////////////////////////////////////////////////////////////////////////////
 		int32 iCategoryId = static_cast<SoundClip *>(m_SelectedAssets[0])->GetCategoryId();
 		bool bCheckable = false;
-		for(auto asset : m_SelectedAssets)
+		for(auto pAsset : m_SelectedAssets)
 		{
-			if(static_cast<SoundClip *>(asset)->GetCategoryId() != iCategoryId)
+			if(static_cast<SoundClip *>(pAsset)->GetCategoryId() != iCategoryId)
 			{
 				bCheckable = true;
 				break;
@@ -165,10 +273,10 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 
 		// Is Streaming ///////////////////////////////////////////////////////////////////////////////////////////
 		eCheckState = static_cast<SoundClip *>(m_SelectedAssets[0])->IsStreaming() ? Qt::Checked : Qt::Unchecked;
-		for(auto asset : m_SelectedAssets)
+		for(auto pAsset : m_SelectedAssets)
 		{
-			if((eCheckState == Qt::Unchecked && static_cast<SoundClip *>(asset)->IsStreaming()) ||
-			   (eCheckState == Qt::Checked && static_cast<SoundClip *>(asset)->IsStreaming() == false))
+			if((eCheckState == Qt::Unchecked && static_cast<SoundClip *>(pAsset)->IsStreaming()) ||
+			   (eCheckState == Qt::Checked && static_cast<SoundClip *>(pAsset)->IsStreaming() == false))
 			{
 				eCheckState = Qt::PartiallyChecked;
 				break;
@@ -178,10 +286,10 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 
 		// Export As Mono ///////////////////////////////////////////////////////////////////////////////////////////
 		eCheckState = static_cast<SoundClip *>(m_SelectedAssets[0])->IsExportMono() ? Qt::Checked : Qt::Unchecked;
-		for(auto asset : m_SelectedAssets)
+		for(auto pAsset : m_SelectedAssets)
 		{
-			if((eCheckState == Qt::Unchecked && static_cast<SoundClip *>(asset)->IsExportMono()) ||
-			   (eCheckState == Qt::Checked && static_cast<SoundClip *>(asset)->IsExportMono() == false))
+			if((eCheckState == Qt::Unchecked && static_cast<SoundClip *>(pAsset)->IsExportMono()) ||
+			   (eCheckState == Qt::Checked && static_cast<SoundClip *>(pAsset)->IsExportMono() == false))
 			{
 				eCheckState = Qt::PartiallyChecked;
 				break;
@@ -191,10 +299,10 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 
 		// Is Compressed ///////////////////////////////////////////////////////////////////////////////////////////
 		eCheckState = static_cast<SoundClip *>(m_SelectedAssets[0])->IsCompressed() ? Qt::Checked : Qt::Unchecked;
-		for(auto asset : m_SelectedAssets)
+		for(auto pAsset : m_SelectedAssets)
 		{
-			if((eCheckState == Qt::Unchecked && static_cast<SoundClip *>(asset)->IsCompressed()) ||
-			   (eCheckState == Qt::Checked && static_cast<SoundClip *>(asset)->IsCompressed() == false))
+			if((eCheckState == Qt::Unchecked && static_cast<SoundClip *>(pAsset)->IsCompressed()) ||
+			   (eCheckState == Qt::Checked && static_cast<SoundClip *>(pAsset)->IsCompressed() == false))
 			{
 				eCheckState = Qt::PartiallyChecked;
 				break;
@@ -204,9 +312,9 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 
 		// Use Instance Limit ///////////////////////////////////////////////////////////////////////////////////////////
 		int iInstLimit = static_cast<SoundClip *>(m_SelectedAssets[0])->GetInstanceLimit(); // 0 == no limit; -1 == different settings among assets
-		for(auto asset : m_SelectedAssets)
+		for(auto pAsset : m_SelectedAssets)
 		{
-			if(static_cast<SoundClip *>(asset)->GetInstanceLimit() != iInstLimit)
+			if(static_cast<SoundClip *>(pAsset)->GetInstanceLimit() != iInstLimit)
 			{
 				iInstLimit = -1;
 				break;
@@ -218,10 +326,11 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 			ui->sbInstanceLimit->clear();
 		else
 			ui->sbInstanceLimit->setValue(iInstLimit);
-		break;
-	} // switch(eManagerType)
 
-	Refresh();
+		ui->sbVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
+		ui->lblVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
+		break; }
+	} // switch(eManagerType)
 }
 
 DlgAssetProperties::~DlgAssetProperties()
@@ -239,20 +348,40 @@ void DlgAssetProperties::ApplyChanges()
 	switch(ui->stackedAssetType->currentIndex())
 	{
 	case ASSETMAN_Atlases: {
-		uint8 uiParam1 = 0, uiParam2 = 0;
-		HyTextureFileType eFileType = GetSelectedAtlasFormat(uiParam1, uiParam2);
-		HyTextureFiltering eFiltering = GetSelectedAtlasFiltering();
+		bool bIsVerticalFlipSet;
+		HyImageInfo curImageInfo = GetSelectedImageInfo(bIsVerticalFlipSet);
+		HyTextureIn curTextureInfo = GetSelectedTextureInfo();
 
 		for(auto pAsset : m_ChangedAssets)
 		{
 			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
-			HyTextureInfo assetTexInfo = pFrame->GetTextureInfo();
+			HyImageInfo frameImageInfo = pFrame->GetImageInfo();
+			HyTextureIn frameTextureInfo = pFrame->GetTextureInfo();
 
-			if(eFiltering != HYTEXFILTER_Unknown)
-				pFrame->SetFiltering(eFiltering);
+			if(curImageInfo.GetType() != HYIMAGE_Unknown && frameImageInfo.GetType() != curImageInfo.GetType())
+				frameImageInfo.SetType(curImageInfo.GetType());
 
-			if(eFileType != HYTEXTUREFILE_Unknown)
-				pFrame->SetFormat(eFileType, uiParam1, uiParam2);
+			if(curImageInfo.GetNumChannels() != 0 && frameImageInfo.GetNumChannels() != curImageInfo.GetNumChannels())
+				frameImageInfo.SetNumChannels(curImageInfo.GetNumChannels());
+
+			if(curImageInfo.GetFormat() != HYTEXFORMAT_Unknown && frameImageInfo.GetFormat() != curImageInfo.GetFormat())
+				frameImageInfo.SetFormat(curImageInfo.GetFormat());
+
+			if(curImageInfo.GetFormatParam() != 0 && frameImageInfo.GetFormatParam() != curImageInfo.GetFormatParam())
+				frameImageInfo.SetFormatParam(curImageInfo.GetFormatParam());
+
+			if(bIsVerticalFlipSet && frameImageInfo.IsVerticalFlip() != curImageInfo.IsVerticalFlip())
+				frameImageInfo.SetVerticalFlip(curImageInfo.IsVerticalFlip());
+
+			if(curTextureInfo.GetFilter() != HYTEXFILTER_Unknown && frameTextureInfo.GetFilter() != curTextureInfo.GetFilter())
+				frameTextureInfo.SetFilter(curTextureInfo.GetFilter());
+			
+			frameTextureInfo.SetNumChannels(frameImageInfo.GetNumChannels());
+			frameTextureInfo.SetFormat(frameImageInfo.GetFormat());
+			frameTextureInfo.SetFormatParam(frameImageInfo.GetFormatParam());
+
+			pFrame->SetImageInfo(frameImageInfo);
+			pFrame->SetTextureInfo(frameTextureInfo);
 		}
 		break; }
 
@@ -292,30 +421,37 @@ void DlgAssetProperties::ApplyChanges()
 	}
 }
 
-void DlgAssetProperties::on_cmbTextureType_currentIndexChanged(int iIndex)
+void DlgAssetProperties::on_cmbImageType_currentIndexChanged(int iIndex)
 {
-	Refresh();
+	ui->stackedFormatOptions->setCurrentIndex(ui->cmbImageType->itemData(ui->cmbImageType->currentIndex()).toInt());
+}
+
+void DlgAssetProperties::on_cmbDdsCompression_currentIndexChanged(int iIndex)
+{
+	if(ui->cmbDdsCompression->itemData(iIndex).toInt() == HYTEXFORMAT_BC1_DXT1)
+	{
+		ui->cmbDdsDxt1Channels->setVisible(true);
+		ui->lblDdsDxt1Channels->setVisible(true);
+	}
+	else
+	{
+		ui->cmbDdsDxt1Channels->setVisible(false);
+		ui->lblDdsDxt1Channels->setVisible(false);
+	}
 }
 
 void DlgAssetProperties::on_chkIsCompressed_clicked()
 {
-	Refresh();
+	ui->sbVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
+	ui->lblVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
 }
 
 void DlgAssetProperties::on_sbVbrQuality_valueChanged(double dArg)
 {
 	ui->chkIsCompressed->setChecked(true);
-	Refresh();
-}
-
-void DlgAssetProperties::on_chkUseGlobalLimit_clicked()
-{
-	Refresh();
-}
-
-void DlgAssetProperties::on_sbInstanceLimit_valueChanged(int iArg)
-{
-	Refresh();
+	
+	ui->sbVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
+	ui->lblVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
 }
 
 /*virtual*/ void DlgAssetProperties::done(int r)
@@ -335,75 +471,53 @@ void DlgAssetProperties::on_sbInstanceLimit_valueChanged(int iArg)
 	QDialog::done(r);
 }
 
-HyTextureFileType DlgAssetProperties::GetSelectedAtlasFormat(uint8 &uiParam1Out, uint8 &uiParam2Out) const
+HyImageInfo DlgAssetProperties::GetSelectedImageInfo(bool &bIsVerticalFlipSetOut) const
 {
-	bool bHasDiffOptions = ui->cmbTextureType->count() == (HYNUM_TEXTUREFILES + 1);
-	if(bHasDiffOptions && ui->cmbTextureType->currentIndex() == 0)
-	{
-		uiParam1Out = uiParam2Out = 0;
-		return HYTEXTUREFILE_Unknown; // This means "<different options>" is selected
-	}
+	HyImageInfo imageInfo;
 
-	HyTextureFileType eFileType = static_cast<HyTextureFileType>(ui->cmbTextureType->currentIndex() - (bHasDiffOptions ? 1 : 0));
-	switch(eFileType)
+	HyImageType eImageType = static_cast<HyImageType>(ui->cmbImageType->itemData(ui->cmbImageType->currentIndex()).toInt());
+	imageInfo.SetType(eImageType);
+
+	switch(eImageType)
 	{
-	case HYTEXTUREFILE_PNG:
-		uiParam1Out = static_cast<uint8>(ui->cmbUncompressedColorChannels->currentData().toUInt());
-		uiParam2Out = HyTextureInfo::PackUncompressedFormatTypes(static_cast<HyTextureFormatType>(ui->cmbUncompressedFileType->currentData().toUInt()), HYTEXTUREFORMAT_NORM8);
+	case HYIMAGE_PNG:
+		imageInfo.SetNumChannels(ui->cmbPngChannels->itemData(ui->cmbPngChannels->currentIndex()).toInt());
 		break;
 
-	case HYTEXTUREFILE_DXT:
-		if(ui->cmbDxtType->currentData().toUInt() == 1)
-		{
-			uiParam1Out = 3; // RGB
-			uiParam2Out = 1; // DXT 1
-		}
-		else
-		{
-			uiParam1Out = 4; // RGBA
-			uiParam2Out = 5; // DXT 5
-		}
+	case HYIMAGE_HYTX:
+		imageInfo.SetNumChannels(ui->cmbHytxChannels->itemData(ui->cmbHytxChannels->currentIndex()).toInt());
+		imageInfo.SetFormat(static_cast<HyTextureFormat>(ui->cmbHytxDataType->itemData(ui->cmbHytxDataType->currentIndex()).toInt()));
 		break;
 
-	case HYTEXTUREFILE_ASTC:
-		uiParam1Out = static_cast<uint8>(ui->cmbAstcBlockSize->currentData().toUInt());
-		uiParam2Out = static_cast<uint8>(ui->cmbAstcColorProfile->currentData().toUInt());
+	case HYIMAGE_DDS:
+		imageInfo.SetFormat(static_cast<HyTextureFormat>(ui->cmbDdsCompression->itemData(ui->cmbDdsCompression->currentIndex()).toInt()));
+		if(imageInfo.GetFormat() == HYTEXFORMAT_BC1_DXT1)
+			imageInfo.SetNumChannels(ui->cmbDdsDxt1Channels->itemData(ui->cmbDdsDxt1Channels->currentIndex()).toInt());
+		break;
+
+	case HYIMAGE_ASTC:
+		imageInfo.SetFormatParam(static_cast<HyAstcColorProfile>(ui->cmbAstcColorProfile->itemData(ui->cmbAstcColorProfile->currentIndex()).toInt()));
+		imageInfo.SetFormat(static_cast<HyTextureFormat>(ui->cmbAstcBlockSize->itemData(ui->cmbAstcBlockSize->currentIndex()).toInt()));
 		break;
 	}
 
-	return eFileType;
+	if(ui->chkVerticalFlip->checkState() != Qt::PartiallyChecked)
+	{
+		bIsVerticalFlipSetOut = true;
+		imageInfo.SetVerticalFlip(ui->chkVerticalFlip->isChecked());
+	}
+	else
+		bIsVerticalFlipSetOut = false;
+
+	return imageInfo;
 }
 
-HyTextureFiltering DlgAssetProperties::GetSelectedAtlasFiltering() const
+HyTextureIn DlgAssetProperties::GetSelectedTextureInfo() const
 {
-	bool bHasDiffOptions = ui->cmbTextureFiltering->count() == (HYNUM_TEXTUREFILTERS + 1);
-	if(bHasDiffOptions && ui->cmbTextureFiltering->currentIndex() == 0)
-		return HYTEXFILTER_Unknown; // This means "<different options>" is selected
-
-	return static_cast<HyTextureFiltering>(ui->cmbTextureFiltering->currentIndex() - (bHasDiffOptions ? 1 : 0));
-}
-
-void DlgAssetProperties::Refresh()
-{
-	switch(ui->stackedAssetType->currentIndex())
-	{
-	case ASSETMAN_Atlases: {
-		uint8 uiParam1 = 0, uiParam2 = 0;
-		HyTextureFileType eFileType = GetSelectedAtlasFormat(uiParam1, uiParam2);
-		if(eFileType == HYTEXTUREFILE_Unknown)
-			ui->grpFormatOptions->setVisible(false);
-		else
-		{
-			ui->grpFormatOptions->setVisible(true);
-			ui->stackedFormatOptions->setCurrentIndex(eFileType);
-		}
-		break; }
-
-	case ASSETMAN_Audio:
-		ui->sbVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
-		ui->lblVbrQuality->setDisabled(ui->chkIsCompressed->checkState() == Qt::Unchecked);
-		break;
-	}
+	HyTextureIn textureInfo;
+	textureInfo.SetFilter(static_cast<HyTextureFilter>(ui->cmbTextureFilter->itemData(ui->cmbTextureFilter->currentIndex()).toInt()));
+	
+	return textureInfo;
 }
 
 bool DlgAssetProperties::DetermineChangedAssets()
@@ -413,21 +527,24 @@ bool DlgAssetProperties::DetermineChangedAssets()
 	switch(ui->stackedAssetType->currentIndex())
 	{
 	case ASSETMAN_Atlases: {
-		uint8 uiParam1 = 0, uiParam2 = 0;
-		HyTextureFileType eFileType = GetSelectedAtlasFormat(uiParam1, uiParam2);
-		HyTextureFiltering eFiltering = GetSelectedAtlasFiltering();
+		bool bIsVerticalFlipSet;
+		HyImageInfo curImageInfo = GetSelectedImageInfo(bIsVerticalFlipSet);
+		HyTextureIn curTextureInfo = GetSelectedTextureInfo();
 
 		for(auto pAsset : m_SelectedAssets)
 		{
-			HyTextureInfo assetTexInfo = static_cast<AtlasFrame *>(pAsset)->GetTextureInfo();
+			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
+			HyImageInfo frameImageInfo = pFrame->GetImageInfo();
+			HyTextureIn frameTextureInfo = pFrame->GetTextureInfo();
 
-			if(eFiltering != HYTEXFILTER_Unknown && eFiltering != assetTexInfo.GetFiltering())
-				m_ChangedAssets.append(pAsset);
-			else if(eFileType != HYTEXTUREFILE_Unknown)
+			if((curImageInfo.GetType() != HYIMAGE_Unknown && frameImageInfo.GetType() != curImageInfo.GetType()) ||
+			   (curImageInfo.GetNumChannels() != 0 && frameImageInfo.GetNumChannels() != curImageInfo.GetNumChannels()) ||
+			   (curImageInfo.GetFormat() != HYTEXFORMAT_Unknown && frameImageInfo.GetFormat() != curImageInfo.GetFormat()) ||
+			   (curImageInfo.GetFormatParam() != 0 && frameImageInfo.GetFormatParam() != curImageInfo.GetFormatParam()) ||
+			   (bIsVerticalFlipSet && frameImageInfo.IsVerticalFlip() != curImageInfo.IsVerticalFlip()) ||
+			   (curTextureInfo.GetFilter() != HYTEXFILTER_Unknown && frameTextureInfo.GetFilter() != curTextureInfo.GetFilter()))
 			{
-				HyTextureInfo selectedTexInfo(eFiltering, eFileType, uiParam1, uiParam2);
-				if(selectedTexInfo.GetBucketId() != assetTexInfo.GetBucketId())
-					m_ChangedAssets.append(pAsset);
+				m_ChangedAssets.append(pAsset);
 			}
 		}
 		break; }

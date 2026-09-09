@@ -506,7 +506,7 @@ enum HyAstcColorProfile
 	HYASTC_Linear = 1,			// LDR (Low Dynamic Range) linear color data
 	HYASTC_Standard = 2,		// LDR Standard RGBA - Recommended for standard color textures as gamma curve better matches human perception
 	HYASTC_HDR_LinearA = 3,		// HDR (High Dynamic Range) RGB data combined with Low Dynamic Range alpha
-	HYASTC_HDRA = 4				// HDR RGB data combined with High Dynamic Range alpha (usually not needed)
+	HYASTC_HDR_RGBA = 4			// HDR RGB data combined with High Dynamic Range alpha (usually not needed)
 };
 
 enum HyImageType
@@ -514,10 +514,10 @@ enum HyImageType
 	// NOTE: Order cannot change without editor version patcher update. New entires may append to this list
 	HYIMAGE_Unknown = 255,
 
-	HYIMAGE_PNG = 0,	// only HYTEXFORMAT_UINT8 and HYTEXFORMAT_UINT16 supported
+	HYIMAGE_PNG = 0,	// Format = HYTEXFORMAT_UINT8 or HYTEXFORMAT_UINT16
 	HYIMAGE_HYTX,
-	HYIMAGE_DDS,		// Param1: num channels						Param2: DXT format (1,3,5)
-	HYIMAGE_ASTC,		// Param1: Block Size index (4x4 -> 12x12)	Param2: Color Profile (LDR linear, LDR sRGB, HDR RGB, HDR RGBA)
+	HYIMAGE_DDS,
+	HYIMAGE_ASTC,		// Format = block Size (4x4 -> 12x12); FormatParam = HyAstcColorProfile (LDR linear, LDR sRGB, HDR RGB, HDR RGBA)
 
 	HYNUM_IMAGETYPES
 };
