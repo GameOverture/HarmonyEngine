@@ -37,18 +37,20 @@ void TextDraw::SetTextState(uint uiStateIndex)
 	uint uiAtlasPixelDataSize = 0;
 	QSize atlasDimensions;
 	unsigned char *pAtlasPixelData = static_cast<TextModel *>(m_pProjItem->GetModel())->GetFontManager().GetAtlasInfo(uiAtlasPixelDataSize, atlasDimensions);
-	if(pAtlasPixelData == nullptr || Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer() == nullptr)
+	HyRendererInterop *pRenderer = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer();
+	if(pAtlasPixelData == nullptr || pRenderer == nullptr)
 		return;
 
 	if(m_hTexture != HY_UNUSED_HANDLE)
-		Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->DeleteTexture(m_hTexture);
+		pRenderer->DeleteTexture(m_hTexture);
 
 	// Upload texture to gfx api
-	m_hTexture = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(HyTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTUREFILE_RAW, 4, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT8, HYTEXTUREFORMAT_NORM8)),
-																										atlasDimensions.width(),
-																										atlasDimensions.height(),
-																										pAtlasPixelData,
-																										uiAtlasPixelDataSize);
+	HyImageInfo loadHints;
+	uint32 uiPixelDataSize;
+	loadHints.SetWidth(atlasDimensions.width());
+	loadHints.SetHeight(atlasDimensions.height());
+	loadHints.SetNumChannels(4);
+	m_hTexture = pRenderer->AddTexture(loadHints, HyTextureIn(), pAtlasPixelData, uiAtlasPixelDataSize);
 
 	// Re-acquire latest FileDataPair because a newly generated preview texture may have been created above via GetAtlasInfo()
 	FileDataPair itemFileData;

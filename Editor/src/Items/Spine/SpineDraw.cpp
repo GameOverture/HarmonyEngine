@@ -38,18 +38,14 @@ SpineDraw::~SpineDraw()
 		rapidjson::Value guiTexturesArray(rapidjson::kArrayType);
 		for(const auto &subAtlasRef : subAtlasList)
 		{
-			int iWidth, iHeight, iNum8bitClrChannels;
-			uchar *pPixelData = SOIL_load_image(subAtlasRef.m_ImageFileInfo.absoluteFilePath().toStdString().c_str(), &iWidth, &iHeight, &iNum8bitClrChannels, 4);
-			uint32 uiPixelDataSize = iWidth * iHeight * 4;
-
-			HyTextureHandle hNewTex = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer()->AddTexture(
-				HyTextureInfo(HYTEXFILTER_BILINEAR, HYTEXTUREFILE_PNG, 4, HyTextureInfo::PackUncompressedFormatTypes(HYTEXTUREFORMAT_UINT8, HYTEXTUREFORMAT_NORM8)),
-				iWidth,
-				iHeight,
-				pPixelData,
-				uiPixelDataSize);
-
-			SOIL_free_image_data(pPixelData);
+			HyImageInfo loadHints;
+			uint32 uiPixelDataSize;
+			loadHints.SetNumChannels(4);
+			
+			uint8 *pPixelData = HyIO::ReadImage(subAtlasRef.m_ImageFileInfo.absoluteFilePath().toStdString().c_str(), loadHints, uiPixelDataSize);
+			HyRendererInterop *pRenderer = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer();
+			HyTextureHandle hNewTex = pRenderer->AddTexture(loadHints, HyTextureIn(), pPixelData, uiPixelDataSize);
+			HyIO::DeleteImage(pPixelData);
 
 			rapidjson::Value value(rapidjson::kNumberType);
 			value.SetUint(hNewTex);
