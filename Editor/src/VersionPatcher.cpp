@@ -227,8 +227,12 @@
 			Patch_18to19(dataItemsDoc, metaAtlasDoc, dataAtlasDoc);
 			[[fallthrough]];
 		case 19:
+			HyGuiLog("Patching project files: version 19 -> 20", LOGTYPE_Info);
+			Patch_19to20(metaAtlasDoc, dataAtlasDoc);
+			[[fallthrough]];
+		case 20:
 			// current version
-			static_assert(HYGUI_FILE_VERSION == 19, "Improper file version set in VersionPatcher");
+			static_assert(HYGUI_FILE_VERSION == 20, "Improper file version set in VersionPatcher");
 			break;
 
 		default:
@@ -1729,6 +1733,78 @@ struct HyLegacyTextureInfo2
 				dataTexturesAssetsArray.replace(iTexturesAssetsArrayIndex, assetObj);
 			}
 			dataTextureObj.insert("assets", dataTexturesAssetsArray);
+			dataTexturesArray.replace(iTextureIndex, dataTextureObj);
+		}
+		dataBankObj.insert("textures", dataTexturesArray);
+		dataBanksArray.replace(iDataBankIndex, dataBankObj);
+	}
+	dataAtlasObj.insert("banks", dataBanksArray);
+	dataAtlasDocRef.setObject(dataAtlasObj);
+}
+
+/*static*/ void VersionPatcher::Patch_19to20(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef)
+{
+	// "textureInfo" is now split between HyImageInfo ("imageInfo") and HyTextureInfo to hold more data, and future proofing storing and loading images/textures
+
+	// Fix Atlases.meta
+	QJsonObject metaAtlasObj = metaAtlasDocRef.object();
+	QJsonArray metaAssetsArray = metaAtlasObj["assets"].toArray();
+	for(int iMetaAssetIndex = 0; iMetaAssetIndex < metaAssetsArray.size(); ++iMetaAssetIndex)
+	{
+		QJsonObject metaAssetObj = metaAssetsArray[iMetaAssetIndex].toObject();
+		HyLegacyTextureInfo2 oldTexInfo(static_cast<uint32>(metaAssetObj["textureInfo"].toInteger()));
+
+		HyImageType eType = HYIMAGE_PNG;
+		int iNumChannels = 4;
+		HyTextureFormat eFormat = HYTEXFORMAT_UINT8;
+		int iFormatParam = 0;
+		switch(oldTexInfo.m_uiFileType)
+		{
+		case HYTEXTUREFILE_PNG:		eType = HYIMAGE_PNG;	iNumChannels = 4;							eFormat = HYTEXFORMAT_UINT8; break;
+		case HYTEXTUREFILE_DXT:		eType = HYIMAGE_DDS;	iNumChannels = oldTexInfo.m_uiFormatParam1; eFormat = (oldTexInfo.m_uiFormatParam2 == 1 ? HYTEXFORMAT_BC1_DXT1 : HYTEXFORMAT_BC3_DXT5); break;
+		case HYTEXTUREFILE_ASTC:	eType = HYIMAGE_ASTC;	iNumChannels = 4;							eFormat = HYTEXFORMAT_ASTC_sRGB_A8_6x6; iFormatParam = oldTexInfo.m_uiFormatParam2; break;
+		case HYTEXTUREFILE_RAW:		eType = HYIMAGE_HYTX;	iNumChannels = oldTexInfo.m_uiFormatParam1; eFormat = HYTEXFORMAT_UINT8; break;
+		}
+
+		HyImageInfo newImgInfo(0, 0, eType, false, iNumChannels, eFormat, iFormatParam);
+		HyTextureInfo newTexInfo(static_cast<HyTextureFilter>(oldTexInfo.m_uiFiltering), HYTEXWRAP_ClampToEdge, iNumChannels, HYTEXFORMAT_NORM8, 0);
+
+		metaAssetObj.insert("imageInfo", QJsonValue(static_cast<qint64>(newImgInfo.GetBucketId())));
+		metaAssetObj.insert("textureInfo", QJsonValue(static_cast<qint64>(newTexInfo.GetBucketId())));
+		metaAssetsArray.replace(iMetaAssetIndex, metaAssetObj);
+	}
+	metaAtlasObj.insert("assets", metaAssetsArray);
+	metaAtlasDocRef.setObject(metaAtlasObj);
+
+	// Fix Atlases.data
+	QJsonObject dataAtlasObj = dataAtlasDocRef.object();
+	QJsonArray dataBanksArray = dataAtlasObj["banks"].toArray();
+	for(int iDataBankIndex = 0; iDataBankIndex < dataBanksArray.size(); ++iDataBankIndex)
+	{
+		QJsonObject dataBankObj = dataBanksArray[iDataBankIndex].toObject();
+		QJsonArray dataTexturesArray = dataBankObj["textures"].toArray();
+		for(int iTextureIndex = 0; iTextureIndex < dataTexturesArray.size(); ++iTextureIndex)
+		{
+			QJsonObject dataTextureObj = dataTexturesArray[iTextureIndex].toObject();
+			HyLegacyTextureInfo2 oldTexInfo(static_cast<uint32>(dataTextureObj["textureInfo"].toInteger()));
+
+			HyImageType eType = HYIMAGE_PNG;
+			int iNumChannels = 4;
+			HyTextureFormat eFormat = HYTEXFORMAT_UINT8;
+			int iFormatParam = 0;
+			switch(oldTexInfo.m_uiFileType)
+			{
+			case HYTEXTUREFILE_PNG:		eType = HYIMAGE_PNG;	iNumChannels = 4;							eFormat = HYTEXFORMAT_UINT8; break;
+			case HYTEXTUREFILE_DXT:		eType = HYIMAGE_DDS;	iNumChannels = oldTexInfo.m_uiFormatParam1; eFormat = (oldTexInfo.m_uiFormatParam2 == 1 ? HYTEXFORMAT_BC1_DXT1 : HYTEXFORMAT_BC3_DXT5); break;
+			case HYTEXTUREFILE_ASTC:	eType = HYIMAGE_ASTC;	iNumChannels = 4;							eFormat = HYTEXFORMAT_ASTC_sRGB_A8_6x6; iFormatParam = oldTexInfo.m_uiFormatParam2; break;
+			case HYTEXTUREFILE_RAW:		eType = HYIMAGE_HYTX;	iNumChannels = oldTexInfo.m_uiFormatParam1; eFormat = HYTEXFORMAT_UINT8; break;
+			}
+
+			HyImageInfo newImgInfo(dataTextureObj["width"].toInt(), dataTextureObj["height"].toInt(), eType, false, iNumChannels, eFormat, iFormatParam);
+			HyTextureInfo newTexInfo(static_cast<HyTextureFilter>(oldTexInfo.m_uiFiltering), HYTEXWRAP_ClampToEdge, iNumChannels, HYTEXFORMAT_NORM8, 0);
+
+			dataTextureObj.insert("imageInfo", QJsonValue(static_cast<qint64>(newImgInfo.GetBucketId())));
+			dataTextureObj.insert("textureInfo", QJsonValue(static_cast<qint64>(newTexInfo.GetBucketId())));
 			dataTexturesArray.replace(iTextureIndex, dataTextureObj);
 		}
 		dataBankObj.insert("textures", dataTexturesArray);

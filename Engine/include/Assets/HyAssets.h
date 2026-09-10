@@ -126,7 +126,7 @@ public:
 
 	void GetNodeLoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut) const;
 
-	HyTextureQuadHandle CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyImageInfo imageInfo, HyTextureIn textureInfo);
+	HyTextureQuadHandle CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyImageInfo imageInfo, HyTextureInfo textureInfo);
 	HyAudioHandle CreateAuxiliaryAudio(const std::string &sFilePath, bool bIsStreamed, int32 iInstanceLimit, int32 iCategoryId);
 
 	void Shutdown();

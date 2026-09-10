@@ -107,7 +107,7 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 	case ASSETMAN_Atlases: {
 		// Image Type and Format ///////////////////////////////////////////////////////////////////////////////////////////
 		HyImageInfo compareImageInfo = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetImageInfo();
-		HyTextureIn compareTextureInfo = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetTextureInfo();
+		HyTextureInfo compareTextureInfo = static_cast<AtlasFrame *>(m_SelectedAssets[0])->GetTextureInfo();
 		bool bIsDiffImage = false;
 		for(auto pAsset : m_SelectedAssets)
 		{
@@ -350,13 +350,13 @@ void DlgAssetProperties::ApplyChanges()
 	case ASSETMAN_Atlases: {
 		bool bIsVerticalFlipSet;
 		HyImageInfo curImageInfo = GetSelectedImageInfo(bIsVerticalFlipSet);
-		HyTextureIn curTextureInfo = GetSelectedTextureInfo();
+		HyTextureInfo curTextureInfo = GetSelectedTextureInfo();
 
 		for(auto pAsset : m_ChangedAssets)
 		{
 			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
 			HyImageInfo frameImageInfo = pFrame->GetImageInfo();
-			HyTextureIn frameTextureInfo = pFrame->GetTextureInfo();
+			HyTextureInfo frameTextureInfo = pFrame->GetTextureInfo();
 
 			if(curImageInfo.GetType() != HYIMAGE_Unknown && frameImageInfo.GetType() != curImageInfo.GetType())
 				frameImageInfo.SetType(curImageInfo.GetType());
@@ -512,9 +512,9 @@ HyImageInfo DlgAssetProperties::GetSelectedImageInfo(bool &bIsVerticalFlipSetOut
 	return imageInfo;
 }
 
-HyTextureIn DlgAssetProperties::GetSelectedTextureInfo() const
+HyTextureInfo DlgAssetProperties::GetSelectedTextureInfo() const
 {
-	HyTextureIn textureInfo;
+	HyTextureInfo textureInfo;
 	textureInfo.SetFilter(static_cast<HyTextureFilter>(ui->cmbTextureFilter->itemData(ui->cmbTextureFilter->currentIndex()).toInt()));
 	
 	return textureInfo;
@@ -529,13 +529,13 @@ bool DlgAssetProperties::DetermineChangedAssets()
 	case ASSETMAN_Atlases: {
 		bool bIsVerticalFlipSet;
 		HyImageInfo curImageInfo = GetSelectedImageInfo(bIsVerticalFlipSet);
-		HyTextureIn curTextureInfo = GetSelectedTextureInfo();
+		HyTextureInfo curTextureInfo = GetSelectedTextureInfo();
 
 		for(auto pAsset : m_SelectedAssets)
 		{
 			AtlasFrame *pFrame = static_cast<AtlasFrame *>(pAsset);
 			HyImageInfo frameImageInfo = pFrame->GetImageInfo();
-			HyTextureIn frameTextureInfo = pFrame->GetTextureInfo();
+			HyTextureInfo frameTextureInfo = pFrame->GetTextureInfo();
 
 			if((curImageInfo.GetType() != HYIMAGE_Unknown && frameImageInfo.GetType() != curImageInfo.GetType()) ||
 			   (curImageInfo.GetNumChannels() != 0 && frameImageInfo.GetNumChannels() != curImageInfo.GetNumChannels()) ||

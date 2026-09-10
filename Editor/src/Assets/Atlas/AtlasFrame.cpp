@@ -24,7 +24,7 @@ AtlasFrame::AtlasFrame(ItemType eThisAssetType, // Might be either ITEM_AtlasFra
 					   quint16 uiCropRight,
 					   quint16 uiCropBottom,
 					   HyImageInfo imageInfo,
-					   HyTextureIn textureInfo,
+					   HyTextureInfo textureInfo,
 					   quint16 uiW,
 					   quint16 uiH,
 					   quint16 uiX,
@@ -113,12 +113,12 @@ void AtlasFrame::SetImageInfo(HyImageInfo imageInfo)
 	m_ImageInfo = imageInfo;
 }
 
-HyTextureIn AtlasFrame::GetTextureInfo() const
+HyTextureInfo AtlasFrame::GetTextureInfo() const
 {
 	return m_TextureInfo;
 }
 
-void AtlasFrame::SetTextureInfo(HyTextureIn textureInfo)
+void AtlasFrame::SetTextureInfo(HyTextureInfo textureInfo)
 {
 	m_TextureInfo = textureInfo;
 }

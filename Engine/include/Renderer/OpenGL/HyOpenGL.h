@@ -16,7 +16,13 @@
 #define HY_NUM_PBO 10
 
 #ifndef HY_PLATFORM_BROWSER
-	#define HyErrorCheck_OpenGL(funcLoc, funcName) { GLenum eError = glGetError(); HyAssert(eError == GL_NO_ERROR, "HyOpenGL error in " << funcLoc << " on function " << funcName << ": " << eError); }
+	#ifdef HY_PLATFORM_GUI
+		#define HyErrorCheck_OpenGL(funcLoc, funcName)
+		//#include <QString>
+		//#define HyErrorCheck_OpenGL(funcLoc, funcName) { GLenum eError = glGetError(); if(eError != GL_NO_ERROR) HyGuiLog(QString("HyOpenGL error in ") % QString(funcLoc) % QString(" on function ") % QString(funcName) % QString(": ") % QString::number(eError), LOGTYPE_Error); }
+	#else
+		#define HyErrorCheck_OpenGL(funcLoc, funcName) { GLenum eError = glGetError(); HyAssert(eError == GL_NO_ERROR, "HyOpenGL error in " << funcLoc << " on function " << funcName << ": " << eError); }
+	#endif
 #else
 	#define HyErrorCheck_OpenGL(funcLoc, funcName) // Avoid GPU-CPU Sync Points with Emscripten
 #endif
@@ -67,10 +73,10 @@ public:
 	virtual void FinishRender() override;
 
 	virtual void UploadShader(HyShader *pShader) override;
-	virtual HyTextureHandle AddTexture(HyImageInfo imageInfo, HyTextureIn textureInfo, unsigned char *pPixelData, uint32 uiPixelDataSize) override;
-	virtual HyTextureHandle AddTextureArray(HyImageInfo imageInfo, HyTextureIn textureInfo, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) override;
+	virtual HyTextureHandle AddTexture(HyImageInfo imageInfo, HyTextureInfo textureInfo, unsigned char *pPixelData, uint32 uiPixelDataSize) override;
+	virtual HyTextureHandle AddTextureArray(HyImageInfo imageInfo, HyTextureInfo textureInfo, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) override;
 	virtual void DeleteTexture(HyTextureHandle hTexture) override;
-	virtual std::pair<HyBufferHandle, HyTextureHandle> AddTextureBufferObject(HyTextureIn textureInfo, unsigned char *pData, uint32 uiDataSize) override;
+	virtual std::pair<HyBufferHandle, HyTextureHandle> AddTextureBufferObject(HyTextureInfo textureInfo, unsigned char *pData, uint32 uiDataSize) override;
 	virtual void DeleteTextureBufferObject(std::pair<HyBufferHandle, HyTextureHandle> hTboPair) override;
 	virtual HyBufferHandle GenerateVertexBuffer() override;
 	virtual HyBufferHandle GenerateIndexBuffer() override;
@@ -82,9 +88,9 @@ private:
 	void CompileShader(HyShader *pShader, HyShaderType eType);
 
 	void GetGLFormat(HyImageInfo imageInfo, GLenum &eFormatOut, GLenum &eTypeOut, bool &bIsPixelDataCompressedOut) const;
-	void GetGLInternalFormat(HyTextureIn textureInfo, GLenum &eInternalFormatOut) const;
-	void GetGLInternalFormatCompressed(HyTextureIn textureInfo, GLenum &eInternalFormatOut) const;
-	void SetTextureParameters(HyTextureIn textureInfo, GLenum eTarget) const;
+	void GetGLInternalFormat(HyTextureInfo textureInfo, GLenum &eInternalFormatOut) const;
+	void GetGLInternalFormatCompressed(HyTextureInfo textureInfo, GLenum &eInternalFormatOut) const;
+	void SetTextureParameters(HyTextureInfo textureInfo, GLenum eTarget) const;
 
 	void RenderPass2d(HyRenderBuffer::State *pRenderState, IHyCamera<IHyNode2d> *pCamera);
 };

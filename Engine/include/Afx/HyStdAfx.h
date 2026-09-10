@@ -564,7 +564,7 @@ public:
 	static std::string GetExt(HyImageType eType); // Includes the dot (like ".png")
 };
 
-class HyTextureIn
+class HyTextureInfo
 {
 	uint8				m_uiFilter;
 	uint8				m_uiWrapAndChannels;
@@ -572,9 +572,9 @@ class HyTextureIn
 	uint8				m_uiFormatParam;
 
 public:
-	HyTextureIn();
-	HyTextureIn(HyTextureFilter eFilter, HyTextureWrap eWrap, int iNumChannels, HyTextureFormat eFormat, uint8 uiFormatParam);
-	HyTextureIn(uint32 uiBucketId);
+	HyTextureInfo();
+	HyTextureInfo(HyTextureFilter eFilter, HyTextureWrap eWrap, int iNumChannels, HyTextureFormat eFormat, uint8 uiFormatParam);
+	HyTextureInfo(uint32 uiBucketId);
 
 	uint32 GetBucketId() const;
 

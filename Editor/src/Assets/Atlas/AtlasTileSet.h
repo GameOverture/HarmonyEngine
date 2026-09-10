@@ -285,7 +285,7 @@ public:
 				 quint32 uiBankId,
 				 QString sName,
 				 HyImageInfo imageInfo,		// NOTE: This is the image info for the sub-atlas
-				 HyTextureIn textureInfo,	//       This is the texture info for the sub-atlas
+				 HyTextureInfo textureInfo,	//       This is the texture info for the sub-atlas
 				 quint16 uiW, quint16 uiH, quint16 uiX, quint16 uiY,
 				 int iTextureIndex,
 				 const QJsonObject &tileSetMetaData,

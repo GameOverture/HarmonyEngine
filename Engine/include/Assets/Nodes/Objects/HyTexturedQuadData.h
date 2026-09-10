@@ -25,7 +25,7 @@ class HyTexturedQuadData : public IHyNodeData
 
 public:
 	HyTexturedQuadData(uint32 uiChecksum, uint32 uiBankId, HyAssets &assetsRef);
-	HyTexturedQuadData(HyAuxiliaryFileHandle hHandle, std::string sFilePath, HyImageInfo imageInfo, HyTextureIn textureInfo, HyAssets &assetsRef);
+	HyTexturedQuadData(HyAuxiliaryFileHandle hHandle, std::string sFilePath, HyImageInfo imageInfo, HyTextureInfo textureInfo, HyAssets &assetsRef);
 	virtual ~HyTexturedQuadData();
 
 	virtual IHyFile *GetAuxiliaryFile() const override;

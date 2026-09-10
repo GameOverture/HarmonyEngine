@@ -44,7 +44,7 @@ SpineDraw::~SpineDraw()
 			
 			uint8 *pPixelData = HyIO::ReadImage(subAtlasRef.m_ImageFileInfo.absoluteFilePath().toStdString().c_str(), loadHints, uiPixelDataSize);
 			HyRendererInterop *pRenderer = Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->GetHarmonyRenderer();
-			HyTextureHandle hNewTex = pRenderer->AddTexture(loadHints, HyTextureIn(), pPixelData, uiPixelDataSize);
+			HyTextureHandle hNewTex = pRenderer->AddTexture(loadHints, HyTextureInfo(), pPixelData, uiPixelDataSize);
 			HyIO::DeleteImage(pPixelData);
 
 			rapidjson::Value value(rapidjson::kNumberType);

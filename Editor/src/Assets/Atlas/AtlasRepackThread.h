@@ -49,7 +49,7 @@ public:
 	//void RepackBank(BankData *pBankData, 
 
 private:
-	QSize ConstructAtlasTexture(BankData *pBankData, AtlasPacker &atlasPackerRef, HyImageInfo imageInfo, HyTextureIn textureInfo, int iPackerBinIndex, int iActualTextureIndex);
+	QSize ConstructAtlasTexture(BankData *pBankData, AtlasPacker &atlasPackerRef, HyImageInfo imageInfo, HyTextureInfo textureInfo, int iPackerBinIndex, int iActualTextureIndex);
 };
 
 #endif // ATLASREPACKTHREAD_H

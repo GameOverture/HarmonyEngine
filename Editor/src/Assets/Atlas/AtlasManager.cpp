@@ -431,7 +431,7 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 											   metaObj["cropRight"].toInt(),
 											   metaObj["cropBottom"].toInt(),
 											   HyImageInfo(static_cast<uint64>(JSONOBJ_TOINT(metaObj, "imageInfo"))),
-											   HyTextureIn(JSONOBJ_TOINT(metaObj, "textureInfo")),
+											   HyTextureInfo(JSONOBJ_TOINT(metaObj, "textureInfo")),
 											   metaObj["width"].toInt(),
 											   metaObj["height"].toInt(),
 											   metaObj["x"].toInt(),
@@ -460,7 +460,7 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 													 JSONOBJ_TOINT(metaObj, "bankId"),
 													 metaObj["name"].toString(),
 													 HyImageInfo(static_cast<uint64>(JSONOBJ_TOINT(metaObj, "imageInfo"))),
-													 HyTextureIn(JSONOBJ_TOINT(metaObj, "textureInfo")),
+													 HyTextureInfo(JSONOBJ_TOINT(metaObj, "textureInfo")),
 													 metaObj["width"].toInt(),
 													 metaObj["height"].toInt(),
 													 metaObj["x"].toInt(),
@@ -718,7 +718,7 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 		// These List indices correspond to each other
 		QList<QJsonArray> assetArrayList;
 		QList<HyImageInfo> imageInfoList;
-		QList<HyTextureIn> textureInfoList;
+		QList<HyTextureInfo> textureInfoList;
 
 		QList<IAssetItemData *> &entireBankAssetsListRef = m_BanksModel.GetBank(i)->m_AssetList;
 		for(int j = 0; j < entireBankAssetsListRef.size(); ++j)
@@ -731,7 +731,7 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 			{
 				assetArrayList.append(QJsonArray());
 				imageInfoList.append(HyImageInfo());
-				textureInfoList.append(HyTextureIn());
+				textureInfoList.append(HyTextureInfo());
 			}
 
 			QJsonObject frameObj;

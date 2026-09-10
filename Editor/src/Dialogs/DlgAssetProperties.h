@@ -47,7 +47,7 @@ private:
 	Ui::DlgAssetProperties *ui;
 
 	HyImageInfo GetSelectedImageInfo(bool &bIsVerticalFlipSetOut) const;
-	HyTextureIn GetSelectedTextureInfo() const;
+	HyTextureInfo GetSelectedTextureInfo() const;
 
 	bool DetermineChangedAssets();
 };

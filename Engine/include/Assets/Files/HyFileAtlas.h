@@ -22,7 +22,7 @@ class HyFileAtlas : public IHyFile
 	const uint32							m_uiINDEX_IN_BANK;
 
 	HyImageInfo								m_ImageInfo;
-	HyTextureIn								m_TextureInfo;
+	HyTextureInfo								m_TextureInfo;
 	HyTextureHandle							m_hTextureHandle;
 
 	const uint32							m_uiNUM_FRAMES;
@@ -51,7 +51,7 @@ class HyFileAtlas : public IHyFile
 
 public:
 	HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexInBank, uint32 uiManifestIndex, HyJsonObj textureObj);
-	HyFileAtlas(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, HyImageInfo imageInfo, HyTextureIn textureInfo);
+	HyFileAtlas(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, HyImageInfo imageInfo, HyTextureInfo textureInfo);
 
 	~HyFileAtlas();
 

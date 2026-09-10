@@ -50,7 +50,7 @@ void TextDraw::SetTextState(uint uiStateIndex)
 	loadHints.SetWidth(atlasDimensions.width());
 	loadHints.SetHeight(atlasDimensions.height());
 	loadHints.SetNumChannels(4);
-	m_hTexture = pRenderer->AddTexture(loadHints, HyTextureIn(), pAtlasPixelData, uiAtlasPixelDataSize);
+	m_hTexture = pRenderer->AddTexture(loadHints, HyTextureInfo(), pAtlasPixelData, uiAtlasPixelDataSize);
 
 	// Re-acquire latest FileDataPair because a newly generated preview texture may have been created above via GetAtlasInfo()
 	FileDataPair itemFileData;

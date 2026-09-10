@@ -20,13 +20,14 @@ private:
 	static void Patch_9to10(QJsonDocument &metaAudioDocRef, QJsonDocument &dataAudioDocRef);
 	static void Patch_10to11(QJsonDocument &metaSourceDocRef);
 	static void Patch_11to12(QJsonDocument &metaAtlasDocRef, QJsonDocument &metaAudioDocRef);
-	static void Patch_12to13(const QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, const QJsonDocument &metaAtlasDocRef); // Adding 'bankId' wherever only a checksum was used
-	static void Patch_13to14(QJsonDocument &metaAtlasDocRef, const QJsonDocument &dataAtlasDocRef); // Adding 'textureSizes' array to each meta atlas bank. Also adding 'cropUnusedSpace', 'squareTexturesOnly', 'aggressiveResizing', and 'minimumFillRate' packing settings
-	static void Patch_14to15(QJsonDocument &dataItemsDocRef, const QJsonDocument &metaItemsDocRef, QJsonDocument &metaAudioDocRef, QJsonDocument &dataAudioDocRef); // Adding 'bankId' wherever only an audio checksum was used; Renaming 'group' -> 'category'; Renaming "playList" -> "playlist"
-	static void Patch_15to16(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef); // Within 'dataAtlasDocRef', adding 'cropMask' and changing [top,left,right,bottom] to 'frameMask' for each asset. THEN within 'metaAtlasDocRef', update all assets' 'cropRight' and 'cropBottom' to be margins, not stored QRect
-	static void Patch_16to17(QJsonDocument &metaAtlasDocRef); // Upgrading 'isSubAtlas' (bool) to be 'subAtlasType' (string); ITEM_None is serialized as empty string ""
-	static void Patch_17to18(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef); // Modifying "textureInfo" to now hold data format and internal format when uncompressed
-	static void Patch_18to19(QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef); // UVs being flipped from top-to-bottom -> bottom-to-top
+	static void Patch_12to13(const QJsonDocument &metaItemsDocRef, QJsonDocument &dataItemsDocRef, const QJsonDocument &metaAtlasDocRef); // 6/15/23 - Adding 'bankId' wherever only a checksum was used
+	static void Patch_13to14(QJsonDocument &metaAtlasDocRef, const QJsonDocument &dataAtlasDocRef); // 8/14/23 - Adding 'textureSizes' array to each meta atlas bank. Also adding 'cropUnusedSpace', 'squareTexturesOnly', 'aggressiveResizing', and 'minimumFillRate' packing settings
+	static void Patch_14to15(QJsonDocument &dataItemsDocRef, const QJsonDocument &metaItemsDocRef, QJsonDocument &metaAudioDocRef, QJsonDocument &dataAudioDocRef); // 12/24/23 - Adding 'bankId' wherever only an audio checksum was used; Renaming 'group' -> 'category'; Renaming "playList" -> "playlist"
+	static void Patch_15to16(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef); // 1/20/24 - Within 'dataAtlasDocRef', adding 'cropMask' and changing [top,left,right,bottom] to 'frameMask' for each asset. THEN within 'metaAtlasDocRef', update all assets' 'cropRight' and 'cropBottom' to be margins, not stored QRect
+	static void Patch_16to17(QJsonDocument &metaAtlasDocRef); // 10/25/24 - Upgrading 'isSubAtlas' (bool) to be 'subAtlasType' (string); ITEM_None is serialized as empty string ""
+	static void Patch_17to18(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef); // 8/28/26 - Modifying "textureInfo" to now hold data format and internal format when uncompressed
+	static void Patch_18to19(QJsonDocument &dataItemsDocRef, QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef); // 9/2/26 - UVs being flipped from top-to-bottom -> bottom-to-top
+	static void Patch_19to20(QJsonDocument &metaAtlasDocRef, QJsonDocument &dataAtlasDocRef); // 9/10/26 - "textureInfo" is now split between HyImageInfo ("imageInfo") and HyTextureInfo to hold more data, and future proofing storing and loading images/textures
 
 	static void RewriteFile(QString sFilePath, QJsonDocument &fileDocRef, bool bIsMeta);
 };

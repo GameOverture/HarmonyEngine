@@ -128,7 +128,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 
 				if(iNumNewTexturesUsed < iNUM_NEW_TEXTURES)
 				{
-					QSize textureSize = ConstructAtlasTexture(pBankData, iter.value()->m_Packer, HyImageInfo(iter.key().first), HyTextureIn(iter.key().second), iNumNewTexturesUsed, iCurrentIndex);
+					QSize textureSize = ConstructAtlasTexture(pBankData, iter.value()->m_Packer, HyImageInfo(iter.key().first), HyTextureInfo(iter.key().second), iNumNewTexturesUsed, iCurrentIndex);
 					iNumNewTexturesUsed++;
 
 					iLoadedBlocks++;
@@ -222,7 +222,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 	}
 }
 
-QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker &atlasPackerRef, HyImageInfo imageInfo, HyTextureIn textureInfo, int iPackerBinIndex, int iActualTextureIndex)
+QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker &atlasPackerRef, HyImageInfo imageInfo, HyTextureInfo textureInfo, int iPackerBinIndex, int iActualTextureIndex)
 {
 	QSize textureSize = atlasPackerRef.GetBinDimensions(iPackerBinIndex);
 	imageInfo.SetWidth(textureSize.width());

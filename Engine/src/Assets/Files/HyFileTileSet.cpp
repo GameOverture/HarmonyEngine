@@ -134,7 +134,7 @@ HyImageInfo HyFileTileSet::GenerateImageInfo() const
 	return HyImageInfo(m_iNumDescriptorTexels, 1, HYIMAGE_HYTX, false, 4, HYTEXFORMAT_UINT16, 0);
 }
 
-HyTextureIn HyFileTileSet::GenerateTextureInfo() const
+HyTextureInfo HyFileTileSet::GenerateTextureInfo() const
 {
-	return HyTextureIn(HYTEXFILTER_NEAREST, HYTEXWRAP_Repeat, 4, HYTEXFORMAT_UINT16, 0);
+	return HyTextureInfo(HYTEXFILTER_NEAREST, HYTEXWRAP_Repeat, 4, HYTEXFORMAT_UINT16, 0);
 }

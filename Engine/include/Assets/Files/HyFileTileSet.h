@@ -57,7 +57,7 @@ public:
 
 protected:
 	HyImageInfo GenerateImageInfo() const;
-	HyTextureIn GenerateTextureInfo() const;
+	HyTextureInfo GenerateTextureInfo() const;
 };
 
 #endif /* HyFileTileSet_h__ */

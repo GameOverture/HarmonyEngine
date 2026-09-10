@@ -16,7 +16,7 @@
 HyFileAtlas::HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexInBank, uint32 uiManifestIndex, HyJsonObj textureObj) :
 	IHyFile(HYFILE_Atlas, sFileName, uiBankId, uiManifestIndex),
 	m_uiINDEX_IN_BANK(uiIndexInBank),
-	m_ImageInfo(textureObj["imageInfo"].GetUint()),
+	m_ImageInfo(textureObj["imageInfo"].GetUint64()),
 	m_TextureInfo(textureObj["textureInfo"].GetUint()),
 	m_hTextureHandle(HY_UNUSED_HANDLE),
 	m_uiNUM_FRAMES(textureObj["assets"].GetArray().Size()),
@@ -53,7 +53,7 @@ HyFileAtlas::HyFileAtlas(std::string sFileName, uint32 uiBankId, uint32 uiIndexI
 	}
 }
 
-HyFileAtlas::HyFileAtlas(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, HyImageInfo imageInfo, HyTextureIn textureInfo) :
+HyFileAtlas::HyFileAtlas(HyAuxiliaryFileHandle hGivenHandle, std::string sFileName, HyImageInfo imageInfo, HyTextureInfo textureInfo) :
 	IHyFile(HYFILE_Atlas, sFileName, std::numeric_limits<uint32>::max(), std::numeric_limits<uint32>::max()),
 	m_uiINDEX_IN_BANK(std::numeric_limits<uint32>::max()),
 	m_ImageInfo(imageInfo),

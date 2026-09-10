@@ -647,7 +647,7 @@ HyOpenGL::~HyOpenGL(void)
 	////////////////////////////////////////////////////////////////////////////
 }
 
-/*virtual*/ HyTextureHandle HyOpenGL::AddTexture(HyImageInfo imageInfo, HyTextureIn textureInfo, unsigned char *pPixelData, uint32 uiPixelDataSize) /*override*/
+/*virtual*/ HyTextureHandle HyOpenGL::AddTexture(HyImageInfo imageInfo, HyTextureInfo textureInfo, unsigned char *pPixelData, uint32 uiPixelDataSize) /*override*/
 {
 	GLenum eFormat, eType;
 	bool bIsPixelDataCompressed;
@@ -655,15 +655,9 @@ HyOpenGL::~HyOpenGL(void)
 
 	GLenum eInternalFormat;
 	if(bIsPixelDataCompressed)
-	{
-		
-		GetGLInternalFormatCompressed(textureInfo.GetFormat(), eInternalFormat);
-	}
+		GetGLInternalFormatCompressed(textureInfo, eInternalFormat);
 	else
-	{
-		
-		GetGLInternalFormat(textureInfo.GetFormat(), eInternalFormat);
-	}
+		GetGLInternalFormat(textureInfo, eInternalFormat);
 
 	GLuint hGLTexture;
 	glGenTextures(1, &hGLTexture);
@@ -689,7 +683,7 @@ HyOpenGL::~HyOpenGL(void)
 	return static_cast<HyTextureHandle>(hGLTexture);
 }
 
-/*virtual*/ HyTextureHandle HyOpenGL::AddTextureArray(HyImageInfo imageInfo, HyTextureIn textureInfo, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) /*override*/
+/*virtual*/ HyTextureHandle HyOpenGL::AddTextureArray(HyImageInfo imageInfo, HyTextureInfo textureInfo, const std::vector<unsigned char *> &pixelDataList, uint32 uiPixelDataSizePerTexture) /*override*/
 {
 	if(textureInfo.GetNumChannels() == 0 && imageInfo.GetNumChannels() != 0)
 		textureInfo.SetNumChannels(imageInfo.GetNumChannels());
@@ -700,9 +694,9 @@ HyOpenGL::~HyOpenGL(void)
 
 	GLenum eInternalFormat;
 	if(bIsPixelDataCompressed)
-		GetGLInternalFormatCompressed(textureInfo.GetFormat(), eInternalFormat);
+		GetGLInternalFormatCompressed(textureInfo, eInternalFormat);
 	else
-		GetGLInternalFormat(textureInfo.GetFormat(), eInternalFormat);
+		GetGLInternalFormat(textureInfo, eInternalFormat);
 
 	GLuint hGLTextureArray;
 	glGenTextures(1, &hGLTextureArray);
@@ -765,7 +759,7 @@ HyOpenGL::~HyOpenGL(void)
 	HyErrorCheck_OpenGL("HyOpenGL:DeleteTexture", "glDeleteTextures");
 }
 
-/*virtual*/ std::pair<HyBufferHandle, HyTextureHandle> HyOpenGL::AddTextureBufferObject(HyTextureIn textureInfo, unsigned char *pData, uint32 uiDataSize) /*override*/
+/*virtual*/ std::pair<HyBufferHandle, HyTextureHandle> HyOpenGL::AddTextureBufferObject(HyTextureInfo textureInfo, unsigned char *pData, uint32 uiDataSize) /*override*/
 {
 	GLenum eInternalFormat;
 	GetGLInternalFormat(textureInfo, eInternalFormat);
@@ -993,7 +987,7 @@ void HyOpenGL::GetGLFormat(HyImageInfo imageInfo, GLenum &eFormatOut, GLenum &eT
 	}
 }
 
-void HyOpenGL::GetGLInternalFormat(HyTextureIn textureInfo, GLenum &eInternalFormatOut) const
+void HyOpenGL::GetGLInternalFormat(HyTextureInfo textureInfo, GLenum &eInternalFormatOut) const
 {
 	int iNumChannels = textureInfo.GetNumChannels();
 	if(iNumChannels == 4 || iNumChannels == 0)
@@ -1088,7 +1082,7 @@ void HyOpenGL::GetGLInternalFormat(HyTextureIn textureInfo, GLenum &eInternalFor
 		HyError("HyOpenGL::GetGLInternalFormat - Invalid number of channels specified");
 }
 
-void HyOpenGL::GetGLInternalFormatCompressed(HyTextureIn textureInfo, GLenum &eInternalFormatOut) const
+void HyOpenGL::GetGLInternalFormatCompressed(HyTextureInfo textureInfo, GLenum &eInternalFormatOut) const
 {
 	switch(textureInfo.GetFormat())
 	{
@@ -1145,7 +1139,7 @@ void HyOpenGL::GetGLInternalFormatCompressed(HyTextureIn textureInfo, GLenum &eI
 	}
 }
 
-void HyOpenGL::SetTextureParameters(HyTextureIn textureInfo, GLenum eTarget) const
+void HyOpenGL::SetTextureParameters(HyTextureInfo textureInfo, GLenum eTarget) const
 {
 	switch(textureInfo.GetFilter())
 	{

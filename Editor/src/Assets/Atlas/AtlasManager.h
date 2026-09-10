@@ -25,7 +25,7 @@ class AtlasManager : public IManagerModel
 	QMap<BankData *, QSet<int>>			m_RepackTexIndicesMap;	// This exists to keep track of affected texture indices. When deleting a large number of frames where they encompass the entire texture, the repack will delete the frames before clearing out the affected textures. This caused those textures to be left behind
 	
 	HyImageInfo							m_DefaultImageInfo;
-	HyTextureIn							m_DefaultTextureInfo;
+	HyTextureInfo							m_DefaultTextureInfo;
 	
 	TileSetsTreeModel					m_TileSetsTreeModel;
 	QJsonObject							m_TileSetsMeta;			// The currently 'saved to disk' meta-data of the TileSets

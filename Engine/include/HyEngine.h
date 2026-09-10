@@ -112,7 +112,7 @@ public:
 	static HyDiagnostics &Diagnostics();
 	static HyShaderHandle DefaultShaderHandle(HyType eType);
 	static std::string DataDir();
-	static HyTextureQuadHandle CreateTextureQuad(std::string sFilePath, HyImageInfo imageInfo, HyTextureIn textureInfo);
+	static HyTextureQuadHandle CreateTextureQuad(std::string sFilePath, HyImageInfo imageInfo, HyTextureInfo textureInfo);
 	static HyAudioHandle CreateAudio(std::string sFilePath, bool bIsStreaming = false, int32 iInstanceLimit = 0, int32 iCategoryId = 0);
 };
 

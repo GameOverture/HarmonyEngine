@@ -475,7 +475,7 @@ void HyAssets::GetNodeLoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut) 
 	uiTotalOut = m_uiLoadingCountTotal;
 }
 
-HyTextureQuadHandle HyAssets::CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyImageInfo imageInfo, HyTextureIn textureInfo)
+HyTextureQuadHandle HyAssets::CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyImageInfo imageInfo, HyTextureInfo textureInfo)
 {
 	uint64 uiImage = imageInfo.GetBucketId();
 	uint32 uiTexture = textureInfo.GetBucketId();
