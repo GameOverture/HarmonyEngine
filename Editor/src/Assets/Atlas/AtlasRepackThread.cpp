@@ -36,7 +36,7 @@ AtlasRepackThread::AtlasRepackThread(QMap<BankData *, QSet<IAssetItemData *>> &a
 			HyImageInfo imgInfo = pAtlasFrame->GetImageInfo();
 			imgInfo.SetWidth(0);
 			imgInfo.SetHeight(0);
-			std::pair<uint64, uint32> uiKeyPair(imgInfo.GetBucketId(), pAtlasFrame->GetTextureInfo().GetBucketId());
+			std::pair<uint64, uint32> uiKeyPair(imgInfo.GetBucketId(true), pAtlasFrame->GetTextureInfo().GetBucketId(true));
 
 			if(curBankRef.m_BucketMap.contains(uiKeyPair) == false)
 				curBankRef.m_BucketMap.insert(uiKeyPair, new RepackBank::PackerBucket());

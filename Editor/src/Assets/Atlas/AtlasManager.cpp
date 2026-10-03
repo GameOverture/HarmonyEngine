@@ -763,8 +763,8 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 			imageInfoList[j].SetWidth(textureSize.width());
 			imageInfoList[j].SetHeight(textureSize.height());
 
-			textureObj.insert("imageInfo", QJsonValue(static_cast<qint64>(imageInfoList[j].GetBucketId())));
-			textureObj.insert("textureInfo", QJsonValue(static_cast<qint64>(textureInfoList[j].GetBucketId())));
+			textureObj.insert("imageInfo", QJsonValue(static_cast<qint64>(imageInfoList[j].GetBucketId(false))));
+			textureObj.insert("textureInfo", QJsonValue(static_cast<qint64>(textureInfoList[j].GetBucketId(false))));
 			textureObj.insert("assets", assetArrayList[j]);
 
 			textureArray.append(textureObj);

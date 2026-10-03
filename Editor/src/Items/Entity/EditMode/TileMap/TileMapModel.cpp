@@ -562,6 +562,7 @@ bool TileMapModel::SetCellsBrush(glm::ivec2 ptGridCoord)
 		SetCell(ptGridCoord, it.value());
 	}
 
+	SyncViews(EDITMODE_Idle);
 	return true;
 }
 
@@ -581,9 +582,11 @@ void TileMapModel::SetCell(glm::ivec2 ptGridCoord, TileData *pTileData)
 		newCell = Tiled::Cell::empty;
 	else
 		newCell.setTile(pTileData->GetTileSet()->GetTiledTileSet().data(), pTileData->GetTileId());
-	
+		
 	pTiledTileLayer->setCell(ptGridCoord.x, ptGridCoord.y, newCell);
-	m_pTiledMap->addTileset(pTileData->GetTileSet()->GetTiledTileSet());
+	//m_pTiledMap->addTileset(pTileData->GetTileSet()->GetTiledTileSet());
+	
+	
 	//m_CurrentModificationMap.emplace(ptGridCoord, std::make_unique<TileMapModification>(oldCell, newCell));
 
 	//// NOTE: We register the tile map's dependency on the tile set. The entity will have a dependency on the tile map, which in turn has a dependency on the tile set.

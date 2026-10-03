@@ -250,8 +250,8 @@ void AtlasFrame::ReplaceImage(QString sName, quint32 uiChecksum, QImage &newImag
 	frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));
 	frameObj.insert("x", QJsonValue(GetX()));
 	frameObj.insert("y", QJsonValue(GetY()));
-	frameObj.insert("imageInfo", QJsonValue(static_cast<qint64>(m_ImageInfo.GetBucketId())));
-	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TextureInfo.GetBucketId())));
+	frameObj.insert("imageInfo", QJsonValue(static_cast<qint64>(m_ImageInfo.GetBucketId(false))));
+	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TextureInfo.GetBucketId(false))));
 	frameObj.insert("cropLeft", QJsonValue(m_uiCropLeft));
 	frameObj.insert("cropTop", QJsonValue(m_uiCropTop));
 	frameObj.insert("cropRight", QJsonValue(m_uiCropRight));

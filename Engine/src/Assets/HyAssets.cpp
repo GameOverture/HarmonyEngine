@@ -477,8 +477,8 @@ void HyAssets::GetNodeLoadingStatus(uint32 &uiNumQueuedOut, uint32 &uiTotalOut) 
 
 HyTextureQuadHandle HyAssets::CreateAuxiliaryTextureQuad(const std::string &sFilePath, HyImageInfo imageInfo, HyTextureInfo textureInfo)
 {
-	uint64 uiImage = imageInfo.GetBucketId();
-	uint32 uiTexture = textureInfo.GetBucketId();
+	uint64 uiImage = imageInfo.GetBucketId(true);
+	uint32 uiTexture = textureInfo.GetBucketId(true);
 
 	std::vector<char> handleData(sFilePath.begin(), sFilePath.end());
 	handleData.insert(handleData.end(), reinterpret_cast<char *>(&uiImage), reinterpret_cast<char *>(&uiImage) + sizeof(uint64));

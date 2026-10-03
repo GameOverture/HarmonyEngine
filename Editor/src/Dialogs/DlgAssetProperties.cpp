@@ -243,6 +243,7 @@ DlgAssetProperties::DlgAssetProperties(IManagerModel *pManagerModel, QList<IAsse
 			ui->chkVerticalFlip->setChecked(compareImageInfo.IsVerticalFlip());
 
 		// Texture Filter //////////////////////////////////////////////////////////////////////////////////////////
+		ui->cmbTextureFilter->setCurrentIndex(compareTextureInfo.GetFilter());
 		bool bIsDiffFilter = false;
 		for(auto pAsset : m_SelectedAssets)
 		{
@@ -377,8 +378,6 @@ void DlgAssetProperties::ApplyChanges()
 				frameTextureInfo.SetFilter(curTextureInfo.GetFilter());
 			
 			frameTextureInfo.SetNumChannels(frameImageInfo.GetNumChannels());
-			frameTextureInfo.SetFormat(frameImageInfo.GetFormat());
-			frameTextureInfo.SetFormatParam(frameImageInfo.GetFormatParam());
 
 			pFrame->SetImageInfo(frameImageInfo);
 			pFrame->SetTextureInfo(frameTextureInfo);

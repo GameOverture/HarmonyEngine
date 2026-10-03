@@ -538,7 +538,7 @@ public:
 	HyImageInfo(uint16 uiWidth, uint16 uiHeight, HyImageType eType, bool bVerticalFlip, int iNumChannels, HyTextureFormat eFormat, uint8 uiFormatParam);
 	HyImageInfo(uint64 uiBucketId);
 
-	uint64 GetBucketId() const;
+	uint64 GetBucketId(bool bForCompare) const;
 
 	uint16 GetWidth() const;
 	void SetWidth(uint16 uiWidth);
@@ -576,7 +576,7 @@ public:
 	HyTextureInfo(HyTextureFilter eFilter, HyTextureWrap eWrap, int iNumChannels, HyTextureFormat eFormat, uint8 uiFormatParam);
 	HyTextureInfo(uint32 uiBucketId);
 
-	uint32 GetBucketId() const;
+	uint32 GetBucketId(bool bForCompare) const;
 
 	HyTextureFilter GetFilter() const;
 	void SetFilter(HyTextureFilter eFilter);

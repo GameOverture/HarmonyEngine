@@ -955,8 +955,8 @@ void AtlasTileSet::DiscardChanges()
 	frameObj.insert("textureIndex", QJsonValue(GetTextureIndex()));
 	frameObj.insert("x", QJsonValue(GetX()));
 	frameObj.insert("y", QJsonValue(GetY()));
-	frameObj.insert("imageInfo", QJsonValue(static_cast<qint64>(m_ImageInfo.GetBucketId())));
-	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TextureInfo.GetBucketId())));
+	frameObj.insert("imageInfo", QJsonValue(static_cast<qint64>(m_ImageInfo.GetBucketId(false))));
+	frameObj.insert("textureInfo", QJsonValue(static_cast<qint64>(m_TextureInfo.GetBucketId(false))));
 }
 
 Tiled::SharedTileset AtlasTileSet::GetTiledTileSet() const

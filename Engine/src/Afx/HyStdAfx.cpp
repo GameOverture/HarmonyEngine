@@ -40,14 +40,41 @@ HyImageInfo::HyImageInfo(uint64 uiBucketId) :
 	m_uiFormatParam(uiBucketId &      0x00000000000000FF)
 { }
 
-uint64 HyImageInfo::GetBucketId() const
+uint64 HyImageInfo::GetBucketId(bool bForCompare) const
 {
-	return (static_cast<uint64>(m_uiWidth) << 48) |
-		   (static_cast<uint64>(m_uiHeight) << 32) |
-		   (static_cast<uint64>(m_uiType) << 24) |
-		   (static_cast<uint64>(m_uiFlipAndChannels) << 16) |
-		   (static_cast<uint64>(m_uiFormat) << 8) |
-		    static_cast<uint64>(m_uiFormatParam);
+	if(bForCompare)
+	{
+		HyImageType eType = GetType();
+		if(eType == HYIMAGE_Unknown)
+			eType = HYIMAGE_PNG;
+
+		int iNumChannels = GetNumChannels();
+		if(iNumChannels == 0)
+			iNumChannels = 4;
+		uint8 uiFlipAndChannels = m_uiFlipAndChannels;
+		uiFlipAndChannels &= ~0x0F;
+		uiFlipAndChannels |= static_cast<uint8>(iNumChannels & 0x0000000F);
+
+		HyTextureFormat eFormat = GetFormat();
+		if(eFormat == HYTEXFORMAT_Unknown)
+			eFormat = HYTEXFORMAT_UINT8;
+
+		return (static_cast<uint64>(m_uiWidth) << 48) |
+			   (static_cast<uint64>(m_uiHeight) << 32) |
+			   (static_cast<uint64>(eType) << 24) |
+			   (static_cast<uint64>(uiFlipAndChannels) << 16) |
+			   (static_cast<uint64>(eFormat) << 8) |
+				static_cast<uint64>(m_uiFormatParam);
+	}
+	else
+	{
+		return (static_cast<uint64>(m_uiWidth) << 48) |
+			   (static_cast<uint64>(m_uiHeight) << 32) |
+			   (static_cast<uint64>(m_uiType) << 24) |
+			   (static_cast<uint64>(m_uiFlipAndChannels) << 16) |
+			   (static_cast<uint64>(m_uiFormat) << 8) |
+				static_cast<uint64>(m_uiFormatParam);
+	}
 }
 
 uint16 HyImageInfo::GetWidth() const
@@ -163,12 +190,37 @@ HyTextureInfo::HyTextureInfo(uint32 uiBucketId) :
 	m_uiFormatParam(uiBucketId &            0x000000FF)
 { }
 
-uint32 HyTextureInfo::GetBucketId() const
+uint32 HyTextureInfo::GetBucketId(bool bForCompare) const
 {
-	return (static_cast<uint32>(m_uiFilter) << 24) |
-		   (static_cast<uint32>(m_uiWrapAndChannels) << 16) |
-		   (static_cast<uint32>(m_uiFormat) << 8) |
-		    static_cast<uint32>(m_uiFormatParam);
+	if(bForCompare)
+	{
+		HyTextureFilter eFilter = GetFilter();
+		if(eFilter == HYTEXFILTER_Unknown)
+			eFilter = HYTEXFILTER_BILINEAR;
+
+		int iNumChannels = GetNumChannels();
+		if(iNumChannels == 0)
+			iNumChannels = 4;
+		uint8 uiWrapAndChannels = m_uiWrapAndChannels;
+		uiWrapAndChannels &= ~0x0F;
+		uiWrapAndChannels |= static_cast<uint8>(iNumChannels & 0x0000000F);
+
+		HyTextureFormat eFormat = GetFormat();
+		if(eFormat == HYTEXFORMAT_Unknown)
+			eFormat = HYTEXFORMAT_NORM8;
+
+		return (static_cast<uint32>(eFilter) << 24) |
+			   (static_cast<uint32>(uiWrapAndChannels) << 16) |
+			   (static_cast<uint32>(eFormat) << 8) |
+				static_cast<uint32>(m_uiFormatParam);
+	}
+	else
+	{
+		return (static_cast<uint32>(m_uiFilter) << 24) |
+			   (static_cast<uint32>(m_uiWrapAndChannels) << 16) |
+			   (static_cast<uint32>(m_uiFormat) << 8) |
+				static_cast<uint32>(m_uiFormatParam);
+	}
 }
 
 HyTextureFilter HyTextureInfo::GetFilter() const

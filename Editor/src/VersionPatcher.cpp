@@ -1769,8 +1769,8 @@ struct HyLegacyTextureInfo2
 		HyImageInfo newImgInfo(0, 0, eType, false, iNumChannels, eFormat, iFormatParam);
 		HyTextureInfo newTexInfo(static_cast<HyTextureFilter>(oldTexInfo.m_uiFiltering), HYTEXWRAP_ClampToEdge, iNumChannels, HYTEXFORMAT_NORM8, 0);
 
-		metaAssetObj.insert("imageInfo", QJsonValue(static_cast<qint64>(newImgInfo.GetBucketId())));
-		metaAssetObj.insert("textureInfo", QJsonValue(static_cast<qint64>(newTexInfo.GetBucketId())));
+		metaAssetObj.insert("imageInfo", QJsonValue(static_cast<qint64>(newImgInfo.GetBucketId(false))));
+		metaAssetObj.insert("textureInfo", QJsonValue(static_cast<qint64>(newTexInfo.GetBucketId(false))));
 		metaAssetsArray.replace(iMetaAssetIndex, metaAssetObj);
 	}
 	metaAtlasObj.insert("assets", metaAssetsArray);
@@ -1803,8 +1803,8 @@ struct HyLegacyTextureInfo2
 			HyImageInfo newImgInfo(dataTextureObj["width"].toInt(), dataTextureObj["height"].toInt(), eType, false, iNumChannels, eFormat, iFormatParam);
 			HyTextureInfo newTexInfo(static_cast<HyTextureFilter>(oldTexInfo.m_uiFiltering), HYTEXWRAP_ClampToEdge, iNumChannels, HYTEXFORMAT_NORM8, 0);
 
-			dataTextureObj.insert("imageInfo", QJsonValue(static_cast<qint64>(newImgInfo.GetBucketId())));
-			dataTextureObj.insert("textureInfo", QJsonValue(static_cast<qint64>(newTexInfo.GetBucketId())));
+			dataTextureObj.insert("imageInfo", QJsonValue(static_cast<qint64>(newImgInfo.GetBucketId(false))));
+			dataTextureObj.insert("textureInfo", QJsonValue(static_cast<qint64>(newTexInfo.GetBucketId(false))));
 			dataTexturesArray.replace(iTextureIndex, dataTextureObj);
 		}
 		dataBankObj.insert("textures", dataTexturesArray);
