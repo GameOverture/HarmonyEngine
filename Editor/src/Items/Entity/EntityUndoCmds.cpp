@@ -74,6 +74,30 @@ EntityUndoCmd_CustomBaseClassName::EntityUndoCmd_CustomBaseClassName(ProjectItem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+EntityUndoCmd_EnableAnimStates::EntityUndoCmd_EnableAnimStates(ProjectItemData &entityItemRef, bool bEnable, QUndoCommand *pParent /*= nullptr*/) :
+	QUndoCommand(pParent),
+	m_EntityItemRef(entityItemRef),
+	m_bEnable(bEnable)
+{
+	setText(m_bEnable ? "Enabled Animation States" : "Disabled Animation States");
+}
+
+/*virtual*/ EntityUndoCmd_EnableAnimStates::~EntityUndoCmd_EnableAnimStates()
+{
+}
+
+/*virtual*/ void EntityUndoCmd_EnableAnimStates::redo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_SetAnimStatesEnabled(m_bEnable);
+}
+
+/*virtual*/ void EntityUndoCmd_EnableAnimStates::undo() /*override*/
+{
+	static_cast<EntityModel *>(m_EntityItemRef.GetModel())->Cmd_SetAnimStatesEnabled(!m_bEnable);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 EntityUndoCmd_AddChildren::EntityUndoCmd_AddChildren(ProjectItemData &entityItemRef, QList<ProjectItemData *> projItemList, QUndoCommand *pParent /*= nullptr*/) :
 	QUndoCommand(pParent),
 	m_EntityItemRef(entityItemRef),

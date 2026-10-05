@@ -321,6 +321,29 @@ void PropertiesTreeModel::SetPropertyAsDifferentValues(QString sCategoryName, QS
 	}
 }
 
+//bool PropertiesTreeModel::SetPropertyAccessType(QString sCategoryName, QString sPropertyName, PropertiesAccessType eAccessType)
+//{
+//	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)
+//	{
+//		if(0 == m_pRootItem->GetChild(i)->data(PROPERTIESCOLUMN_Name).toString().compare(sCategoryName, Qt::CaseSensitive))
+//		{
+//			TreeModelItem *pCategoryTreeItem = m_pRootItem->GetChild(i);
+//			for(int j = 0; j < pCategoryTreeItem->GetNumChildren(); ++j)
+//			{
+//				TreeModelItem *pPropertyTreeItem = pCategoryTreeItem->GetChild(j);
+//
+//				if(0 == pPropertyTreeItem->data(PROPERTIESCOLUMN_Name).toString().compare(sPropertyName, Qt::CaseSensitive))
+//				{
+//					m_PropertyDefMap[pPropertyTreeItem].eAccessType = eAccessType;
+//					return true;
+//				}
+//			}
+//		}
+//	}
+//
+//	return false;
+//}
+
 bool PropertiesTreeModel::DoesCategoryExist(QString sCategoryName) const
 {
 	for(int i = 0; i < m_pRootItem->GetNumChildren(); ++i)

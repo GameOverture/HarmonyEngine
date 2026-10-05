@@ -600,6 +600,13 @@
            <number>1</number>
           </property>
           <item>
+           <widget class="QCheckBox" name="chkEnableAnimStates">
+            <property name="text">
+             <string>Enable Animation States</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_3">
             <property name="orientation">
              <enum>Qt::Orientation::Horizontal</enum>

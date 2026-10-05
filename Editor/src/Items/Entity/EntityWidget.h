@@ -46,6 +46,8 @@ public:
 	void ShowCustomBaseClassTextBox(bool bShow);
 	void SyncCustomBaseClassText();
 
+	void SetAnimStatesEnabled(bool bEnable);
+
 	QModelIndexList GetSelectedItems() const;
 	void RequestSelectedItems(QList<QUuid> uuidList); // Will clear and select only what 'uuidList' contains
 	void RequestSelectedItemChange(EntityTreeItemData *pTreeItemData, QItemSelectionModel::SelectionFlags flags);
@@ -66,6 +68,8 @@ protected:
 	void StopPreview();
 	void ToggleEditMode(EntityTreeItemData *pCurItemData);
 
+	void ToggleSetConstructor();
+
 public Q_SLOTS:
 	void OnKeySpace();
 
@@ -78,6 +82,8 @@ private Q_SLOTS:
 
 	void on_cmbBaseClass_activated(int iIndex);
 	void on_txtCustomBaseClass_editingFinished();
+
+	void on_chkEnableAnimStates_clicked();
 
 	void OnContextMenu(const QPoint &pos);
 	void OnTreeFocusIndexChanged(const QModelIndex &curIndex, const QModelIndex &prevIndex);

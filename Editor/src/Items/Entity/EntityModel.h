@@ -39,6 +39,7 @@ class EntityModel : public IModel
 {
 	Q_OBJECT
 
+	bool													m_bEnableAnimStates;
 	EntityBaseClassType										m_eBaseClass;
 	QString													m_sCustomBaseClass;
 
@@ -71,6 +72,7 @@ public:
 	EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef);
 	virtual ~EntityModel();
 
+	bool IsAnimStatesEnabled() const;
 	EntityBaseClassType GetBaseClassType() const;
 	QString GetCustomBaseClass() const;
 	void CacheCustomBaseClassName(QString sCustomBaseClass);
@@ -89,6 +91,7 @@ public:
 	int GetFramesPerSecond() const;
 
 	// Command Modifiers (Cmd_) - These mutate the internal state and should only be called from UndoCmd's
+	void Cmd_SetAnimStatesEnabled(bool bEnable);
 	void Cmd_SetBaseClassType(EntityBaseClassType eNewBaseClassType);
 	QList<EntityTreeItemData *> Cmd_CreateNewChildren(QList<ProjectItemData *> projItemList, int iRow);
 	QList<EntityTreeItemData *> Cmd_CreateNewAssets(QList<IAssetItemData *> assetItemList, int iRow);
@@ -116,12 +119,12 @@ public:
 	QString GenerateSrc_MemberInitializerList() const;
 	QString GenerateSrc_Ctor() const;
 	QString GenerateSrc_SetStateImpl() const;
-	QString GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJsonObject propObj, QString sNewLine) const;
+	QString GenerateSrc_SetProperties(bool &bVertListDeclaredRef, EntityTreeItemData *pItemData, QJsonObject propObj, QString sNewLine) const;
 	QString GenerateSrc_TimelineAdvance() const; // Advance runtime by 1 frame on the timeline
 
 	QString DeserializeTextInitAsRuntimeCode(QUuid itemUuid, HyMargins<float> margins) const;
 	QString DeserializePanelInitAsRuntimeCode(QJsonObject panelInitObj) const;
-	QString DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItemData, QString sCodeName, QJsonObject serializedObj, QString sNewLine) const;
+	QString DeserializeShapeDataAsRuntimeCode(bool &bVertListDeclaredRef, EntityTreeItemData *pItemData, QString sCodeName, QJsonObject serializedObj, QString sNewLine) const;
 
 	virtual void OnPopState(int iPoppedStateIndex) override;
 	virtual bool OnPrepSave() override;

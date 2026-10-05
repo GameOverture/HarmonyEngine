@@ -132,6 +132,7 @@ EntityModel::AuxWidgetsModel::AuxWidgetsModel(EntityModel &entityModelRef, int i
 
 EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataRef) :
 	IModel(itemRef, itemFileDataRef),
+	m_bEnableAnimStates(itemFileDataRef.m_Meta["isAnimStates"].toBool(false)),
 	m_eBaseClass(HyGlobal::GetEntityBaseClassType(itemFileDataRef.m_Meta["baseClass"].toString(ENTITYBASECLASSTYPE_STRINGS[ENTBASECLASS_HyEntity2d]))),
 	m_sCustomBaseClass(itemFileDataRef.m_Meta["customBaseClass"].toString()),
 	m_TreeModel(*this, m_ItemRef.GetName(false), itemFileDataRef.m_Meta, this),
@@ -164,6 +165,11 @@ EntityModel::EntityModel(ProjectItemData &itemRef, const FileDataPair &itemFileD
 
 /*virtual*/ EntityModel::~EntityModel()
 {
+}
+
+bool EntityModel::IsAnimStatesEnabled() const
+{
+	return m_bEnableAnimStates;
 }
 
 EntityBaseClassType EntityModel::GetBaseClassType() const
@@ -219,6 +225,17 @@ int EntityModel::GetFinalFrameIndex(int iStateIndex) const
 int EntityModel::GetFramesPerSecond() const
 {
 	return m_AuxWidgetsModel.data(m_AuxWidgetsModel.index(0, AUXDOPEWIDGETSECTION_FramesPerSecond), Qt::UserRole).toInt();
+}
+
+void EntityModel::Cmd_SetAnimStatesEnabled(bool bEnable)
+{
+	m_bEnableAnimStates = bEnable;
+	EntityWidget *pWidget = static_cast<EntityWidget *>(m_ItemRef.GetWidget());
+	if(pWidget)
+		pWidget->SetAnimStatesEnabled(m_bEnableAnimStates);
+
+	// Show/Remove 'Anim States' related properties (if it doesn't break anything)
+	//m_TreeModel.GetRootTreeItemData()->GetPropertiesModel().SetPropertyAccessType(bEnable ? PROPERTIESACCESS_ToggleUnchecked : PROPERTIESACCESS_ReadOnly);
 }
 
 void EntityModel::Cmd_SetBaseClassType(EntityBaseClassType eNewBaseClassType)
@@ -784,12 +801,15 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 		break;
 	}
 
-	sSrc += ",\n\tm_fTIMELINE_FRAME_DURATION(" + QString::number(1.0 / GetFramesPerSecond(), 'f') + "f)";
-	sSrc += ",\n\tm_fpTimelineUpdate(nullptr)";
-	sSrc += ",\n\tm_fTimelineFrameTime(0.0f)";
-	sSrc += ",\n\tm_uiTimelineFrame(0)";
-	sSrc += ",\n\tm_bTimelinePaused(false)";
-	sSrc += ",\n\tm_uiTimelineFinalFrame(0)";
+	if(m_bEnableAnimStates)
+	{
+		sSrc += ",\n\tm_fTIMELINE_FRAME_DURATION(" + QString::number(1.0 / GetFramesPerSecond(), 'f') + "f)";
+		sSrc += ",\n\tm_fpTimelineUpdate(nullptr)";
+		sSrc += ",\n\tm_fTimelineFrameTime(0.0f)";
+		sSrc += ",\n\tm_uiTimelineFrame(0)";
+		sSrc += ",\n\tm_bTimelinePaused(false)";
+		sSrc += ",\n\tm_uiTimelineFinalFrame(0)";
+	}
 
 	QList<EntityTreeItemData *> itemList, shapeList, layoutList;
 	m_TreeModel.GetTreeItemData(itemList, shapeList, layoutList);
@@ -903,46 +923,49 @@ QString EntityModel::GenerateSrc_Ctor() const
 		}
 	}
 
-	sSrc += "std::vector<glm::vec2> vertList;\n\t";
+	bool bVertListDeclared = false;
 
 	// CALL IN THIS ORDER:
 	// 1: Standard Properties
 	for(auto iter = m_CtorKeyFramesMap.begin(); iter != m_CtorKeyFramesMap.end(); ++iter)
-		sSrc += GenerateSrc_SetProperties(iter.key(), iter.value(), "\n\t");
+		sSrc += GenerateSrc_SetProperties(bVertListDeclared, iter.key(), iter.value(), "\n\t");
 
-	// 2: Root Entity Timeline Events - Needs to be invoked in this order: Pause, SetState, SetFrame
-	QString sTimeLineFrameSrc;
-	if(m_CtorKeyFramesMap.contains(m_TreeModel.GetRootTreeItemData()))
+	if(m_bEnableAnimStates)
 	{
-		bool bStateExplicitlySet = false;
-		QJsonObject rootPropsObj = m_CtorKeyFramesMap[m_TreeModel.GetRootTreeItemData()];
-		for(QString sCategoryName : rootPropsObj.keys())
+		// 2: Root Entity Timeline Events - Needs to be invoked in this order: Pause, SetState, SetFrame
+		QString sTimeLineFrameSrc;
+		if(m_CtorKeyFramesMap.contains(m_TreeModel.GetRootTreeItemData()))
 		{
-			if(sCategoryName == "Timeline")
+			bool bStateExplicitlySet = false;
+			QJsonObject rootPropsObj = m_CtorKeyFramesMap[m_TreeModel.GetRootTreeItemData()];
+			for(QString sCategoryName : rootPropsObj.keys())
 			{
-				QJsonObject timelineObj = rootPropsObj["Timeline"].toObject();
-
-				if(timelineObj.contains("Pause"))
-					sSrc += "SetTimelinePause(" + QString(timelineObj["Pause"].toBool() ? "true" : "false") + ");" + "\n\t";
-
-				if(timelineObj.contains("State"))
+				if(sCategoryName == "Timeline")
 				{
-					sSrc += "SetState(" + QString::number(timelineObj["State"].toInt()) + ");" + "\n\t";
-					bStateExplicitlySet = true;
+					QJsonObject timelineObj = rootPropsObj["Timeline"].toObject();
+
+					if(timelineObj.contains("Pause"))
+						sSrc += "SetTimelinePause(" + QString(timelineObj["Pause"].toBool() ? "true" : "false") + ");" + "\n\t";
+
+					if(timelineObj.contains("State"))
+					{
+						sSrc += "SetState(" + QString::number(timelineObj["State"].toInt()) + ");" + "\n\t";
+						bStateExplicitlySet = true;
+					}
+
+					if(timelineObj.contains("Frame"))
+						sTimeLineFrameSrc += "SetTimelineFrame(" + QString::number(timelineObj["Frame"].toInt()) + ");" + "\n\t";
 				}
-
-				if(timelineObj.contains("Frame"))
-					sTimeLineFrameSrc += "SetTimelineFrame(" + QString::number(timelineObj["Frame"].toInt()) + ");" + "\n\t";
 			}
+
+			if(bStateExplicitlySet == false)
+				sSrc += "SetState(0);";
 		}
-
-		if(bStateExplicitlySet == false)
+		else
 			sSrc += "SetState(0);";
-	}
-	else
-		sSrc += "SetState(0);";
 
-	sSrc += sTimeLineFrameSrc;
+		sSrc += sTimeLineFrameSrc;
+	}
 	
 	return sSrc;
 }
@@ -966,6 +989,7 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 		sSrc += "m_fpTimelineUpdate = [this]()\n\t\t{\n\t\t\t";
 
 		sSrc += "std::vector<glm::vec2> vertList;\n\t\t\t";
+		bool bVertListDeclared = true;
 		sSrc += "switch(m_uiTimelineFrame)\n\t\t\t{\n\t\t\t";
 		sSrc += "default:\n\t\t\t\tbreak;\n\n\t\t\t";
 
@@ -990,7 +1014,7 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 			if(propertiesMapByFrame.contains(iFrameIndex))
 			{
 				for(QMap<EntityTreeItemData *, QJsonObject>::const_iterator iter = propertiesMapByFrame[iFrameIndex].begin(); iter != propertiesMapByFrame[iFrameIndex].end(); ++iter)
-					sSrc += GenerateSrc_SetProperties(iter.key(), iter.value(), "\n\t\t\t\t");
+					sSrc += GenerateSrc_SetProperties(bVertListDeclared, iter.key(), iter.value(), "\n\t\t\t\t");
 			}
 
 			// 2: Callbacks
@@ -1036,7 +1060,7 @@ QString EntityModel::GenerateSrc_SetStateImpl() const
 	return sSrc;
 }
 
-QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJsonObject propObj, QString sNewLine) const
+QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, EntityTreeItemData *pItemData, QJsonObject propObj, QString sNewLine) const
 {
 	QString sSrc;
 
@@ -1180,7 +1204,7 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 		{
 			QJsonObject primitiveObj = propObj["Primitive Layer"].toObject();
 			if(primitiveObj.contains("Data"))
-				sSrc += DeserializeShapeDataAsRuntimeCode(pItemData, sCodeName, primitiveObj["Data"].toObject(), sNewLine);
+				sSrc += DeserializeShapeDataAsRuntimeCode(bVertListDeclaredRef, pItemData, sCodeName, primitiveObj["Data"].toObject(), sNewLine);
 			if(primitiveObj.contains("Offset"))
 			{
 				QJsonArray offsetArray = primitiveObj["Offset"].toArray();
@@ -1213,13 +1237,13 @@ QString EntityModel::GenerateSrc_SetProperties(EntityTreeItemData *pItemData, QJ
 		{
 			QJsonObject shapeObj = propObj["Shape"].toObject();
 			if(shapeObj.contains("Data"))
-				sSrc += DeserializeShapeDataAsRuntimeCode(pItemData, sCodeName, shapeObj["Data"].toObject(), sNewLine);
+				sSrc += DeserializeShapeDataAsRuntimeCode(bVertListDeclaredRef, pItemData, sCodeName, shapeObj["Data"].toObject(), sNewLine);
 		}
 		else if(sCategoryName == "Chain")
 		{
 			QJsonObject chainObj = propObj["Chain"].toObject();
 			if(chainObj.contains("Data"))
-				sSrc += DeserializeShapeDataAsRuntimeCode(pItemData, sCodeName, chainObj["Data"].toObject(), sNewLine);
+				sSrc += DeserializeShapeDataAsRuntimeCode(bVertListDeclaredRef, pItemData, sCodeName, chainObj["Data"].toObject(), sNewLine);
 		}
 		else if(sCategoryName == "Point")
 		{
@@ -1638,7 +1662,7 @@ QString EntityModel::DeserializePanelInitAsRuntimeCode(QJsonObject panelInitObj)
 	return sSrc;
 }
 
-QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItemData, QString sCodeName, QJsonObject serializedObj, QString sNewLine) const
+QString EntityModel::DeserializeShapeDataAsRuntimeCode(bool &bVertListDeclaredRef, EntityTreeItemData *pItemData, QString sCodeName, QJsonObject serializedObj, QString sNewLine) const
 {
 	QString sSrc;
 
@@ -1668,6 +1692,12 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 	}
 	else // Not 'Nothing' and has vert data
 	{
+		if(bVertListDeclaredRef == false)
+		{
+			sSrc += "std::vector<glm::vec2> vertList;\n\t";
+			bVertListDeclaredRef = true;
+		}
+
 		switch(pItemData->GetType())
 		{
 		case ITEM_PrimLayer:
@@ -1812,6 +1842,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(EntityTreeItemData *pItem
 
 /*virtual*/ void EntityModel::InsertItemSpecificData(FileDataPair &itemSpecificFileDataOut) /*override*/
 {
+	itemSpecificFileDataOut.m_Meta.insert("isAnimStates", m_bEnableAnimStates);
 	itemSpecificFileDataOut.m_Meta.insert("baseClass", HyGlobal::GetEntityBaseClassName(m_eBaseClass));
 	itemSpecificFileDataOut.m_Meta.insert("customBaseClass", GetCustomBaseClass());
 	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetRootTreeItemData()->GetCodeName());

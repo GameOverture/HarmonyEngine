@@ -51,14 +51,17 @@ bool SourceManager::GenerateEntitySrcFiles(EntityModel &entityModelRef)
 	QModelIndex entityFolderIndex = FindIndex<TreeModelItemData *>(m_pEntityFolderItem, 0);
 	QStringList sImportList;
 
-	QString sHeaderFile = GenerateSrcFile(TEMPLATE_EntityH, entityFolderIndex, sClassName, "hy_" % sClassName, sBaseClass, true, &entityModelRef);
+
+	TemplateFileType eTemplateTypeH = entityModelRef.IsAnimStatesEnabled() ? TEMPLATE_AnimEntityH : TEMPLATE_StdEntityH;
+	QString sHeaderFile = GenerateSrcFile(eTemplateTypeH, entityFolderIndex, sClassName, "hy_" % sClassName, sBaseClass, true, &entityModelRef);
 	if(false == DoesAssetExist(ComputeFileChecksum(AssembleFilter(m_pEntityFolderItem, true), QFileInfo(sHeaderFile).fileName())))
 	{
 		sImportList << sHeaderFile;
 		m_ImportBaseClassList << "HyEntity2d";
 	}
 
-	QString sSrcFile = GenerateSrcFile(TEMPLATE_EntityCpp, entityFolderIndex, sClassName, "hy_" % sClassName, sBaseClass, true, &entityModelRef);
+	TemplateFileType eTemplateTypeCpp = entityModelRef.IsAnimStatesEnabled() ? TEMPLATE_AnimEntityCpp : TEMPLATE_StdEntityCpp;
+	QString sSrcFile = GenerateSrcFile(eTemplateTypeCpp, entityFolderIndex, sClassName, "hy_" % sClassName, sBaseClass, true, &entityModelRef);
 	if(false == DoesAssetExist(ComputeFileChecksum(AssembleFilter(m_pEntityFolderItem, true), QFileInfo(sSrcFile).fileName())))
 	{
 		sImportList << sSrcFile;
@@ -205,8 +208,10 @@ QString SourceManager::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex d
 	case TEMPLATE_MainClassH:	sTemplateFilePath += "MainClass.h";		break;
 	case TEMPLATE_ClassCpp:		sTemplateFilePath += "Class.cpp";		break;
 	case TEMPLATE_ClassH:		sTemplateFilePath += "Class.h";			break;
-	case TEMPLATE_EntityCpp:	sTemplateFilePath += "Entity.cpp";		break;
-	case TEMPLATE_EntityH:		sTemplateFilePath += "Entity.h";		break;
+	case TEMPLATE_StdEntityCpp:	sTemplateFilePath += "StdEntity.cpp";	break;
+	case TEMPLATE_StdEntityH:	sTemplateFilePath += "StdEntity.h";		break;
+	case TEMPLATE_AnimEntityCpp:sTemplateFilePath += "AnimEntity.cpp";	break;
+	case TEMPLATE_AnimEntityH:	sTemplateFilePath += "AnimEntity.h";	break;
 	}
 
 	QFile file(sTemplateFilePath);
@@ -258,7 +263,8 @@ QString SourceManager::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex d
 				sClassFuncs = "/*virtual*/ void " + sClassName + "::OnUpdate() /*override*/\n{\n}";
 				break;
 
-			case TEMPLATE_EntityH:
+			case TEMPLATE_StdEntityH:
+			case TEMPLATE_AnimEntityH:
 				if(pEntityModel == nullptr)
 					HyGuiLog("SourceManager::GenerateSrcFile() is TEMPLATE_EntityH and was passed a nullptr 'pEntityModel'", LOGTYPE_Error);
 				sContents.replace("%HY_INCLUDES%", pEntityModel->GenerateSrc_FileIncludes());
@@ -269,7 +275,8 @@ QString SourceManager::GenerateSrcFile(TemplateFileType eTemplate, QModelIndex d
 				sContents.replace("%HY_CALLBACKSDECL%", pEntityModel->GenerateSrc_CallbacksDecl());
 				break;
 
-			case TEMPLATE_EntityCpp:
+			case TEMPLATE_StdEntityCpp:
+			case TEMPLATE_AnimEntityCpp:
 				if(pEntityModel == nullptr)
 					HyGuiLog("SourceManager::GenerateSrcFile() is TEMPLATE_EntityCpp and was passed a nullptr 'pEntityModel'", LOGTYPE_Error);
 				sClassCtorSignature = "HyEntity2d *pParent /*= nullptr*/";

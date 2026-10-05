@@ -49,6 +49,21 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class EntityUndoCmd_EnableAnimStates : public QUndoCommand
+{
+	ProjectItemData &			m_EntityItemRef;
+	bool						m_bEnable;
+
+public:
+	EntityUndoCmd_EnableAnimStates(ProjectItemData &entityItemRef, bool bEnable, QUndoCommand *pParent = nullptr);
+	virtual ~EntityUndoCmd_EnableAnimStates();
+
+	virtual void redo() override;
+	virtual void undo() override;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class EntityUndoCmd_AddChildren : public QUndoCommand
 {
 	ProjectItemData &				m_EntityItemRef;

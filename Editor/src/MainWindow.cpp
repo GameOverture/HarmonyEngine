@@ -388,17 +388,7 @@ void MainWindow::SetCurrentProject(Project *pProject)
 	sm_pInstance->ui->dockWidgetProperties->setWindowTitle(sWindowTitle);
 	sm_pInstance->ui->dockWidgetProperties->setWidget(pItem->GetWidget());
 
-	if(pItem->GetType() == ITEM_Entity)
-	{
-		sm_pInstance->ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, true);
-		sm_pInstance->ui->tabWidgetAux->setCurrentIndex(AUXTAB_DopeSheet);
-		int iStateIndex = 0;
-		if(pItem->GetWidget())
-			iStateIndex = pItem->GetWidget()->GetCurStateIndex();
-		sm_pInstance->ui->dopeSheet->SetEntityStateModel(static_cast<EntityStateData *>(pItem->GetModel()->GetStateData(iStateIndex)));
-	}
-	else
-		sm_pInstance->ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, false);
+	sm_pInstance->ui->tabWidgetAux->setTabVisible(AUXTAB_DopeSheet, false);
 
 	// Remove all the actions in the "Edit" menu, and replace it with the current item's actions
 	QList<QAction *> editActionList = sm_pInstance->ui->menu_Edit->actions();

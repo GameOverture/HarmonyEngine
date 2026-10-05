@@ -157,6 +157,7 @@ public:
 
 	virtual void SetPropertyValue(QString sCategoryName, QString sPropertyName, const QVariant &valueRef);
 	void SetPropertyAsDifferentValues(QString sCategoryName, QString sPropertyName);
+	//bool SetPropertyAccessType(QString sCategoryName, QString sPropertyName, PropertiesAccessType eAccessType);
 
 	bool DoesCategoryExist(QString sCategoryName) const;
 	bool IsCategory(const QModelIndex &indexRef) const;

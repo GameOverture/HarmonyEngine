@@ -439,8 +439,10 @@ enum TemplateFileType
 	TEMPLATE_ClassCpp,
 	TEMPLATE_ClassH,
 
-	TEMPLATE_EntityCpp,
-	TEMPLATE_EntityH
+	TEMPLATE_StdEntityCpp,
+	TEMPLATE_StdEntityH,
+	TEMPLATE_AnimEntityCpp,
+	TEMPLATE_AnimEntityH
 };
 
 enum PanFlags

@@ -146,6 +146,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_E), this, SLOT(OnKeyShiftE()));
 	new QShortcut(QKeySequence(Qt::Key_F), this, SLOT(OnKeyF()));
 
+	SetAnimStatesEnabled(static_cast<EntityModel *>(m_ItemRef.GetModel())->IsAnimStatesEnabled());
 	UpdateActions();
 }
 
@@ -161,6 +162,10 @@ EntityWidget::~EntityWidget()
 
 /*virtual*/ void EntityWidget::OnUpdateActions() /*override*/
 {
+	bool bIsAnimStatesEnabled = static_cast<EntityModel *>(m_ItemRef.GetModel())->IsAnimStatesEnabled();
+	if(bIsAnimStatesEnabled != MainWindow::GetAuxWidget(AUXTAB_DopeSheet)->isVisible())
+		SetAnimStatesEnabled(bIsAnimStatesEnabled);
+
 	ui->cmbBaseClass->setCurrentIndex(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetBaseClassType());
 
 	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
@@ -427,6 +432,28 @@ void EntityWidget::SyncCustomBaseClassText()
 	ui->txtCustomBaseClass->blockSignals(true);
 	ui->txtCustomBaseClass->setText(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetCustomBaseClass());
 	ui->txtCustomBaseClass->blockSignals(false);
+}
+
+void EntityWidget::SetAnimStatesEnabled(bool bEnable)
+{
+	ui->chkEnableAnimStates->blockSignals(true);
+	ui->chkEnableAnimStates->setChecked(bEnable);
+	ui->chkEnableAnimStates->blockSignals(false);
+
+	ui->chkSetConstructor->setChecked(true);
+	ToggleSetConstructor();
+	ui->chkSetConstructor->setVisible(bEnable);
+
+	if(bEnable)
+	{
+		EntityStateData *pStateData = static_cast<EntityStateData *>(GetItem().GetModel()->GetStateData(GetCurStateIndex()));
+		MainWindow::FocusAuxWidget(AUXTAB_DopeSheet);
+		static_cast<AuxDopeSheet *>(MainWindow::GetAuxWidget(AUXTAB_DopeSheet))->SetEntityStateModel(pStateData);
+	}
+	else
+		MainWindow::HideAuxWidget(AUXTAB_DopeSheet);
+
+	ShowStates(bEnable);
 }
 
 QModelIndexList EntityWidget::GetSelectedItems() const
@@ -701,6 +728,20 @@ void EntityWidget::ToggleEditMode(EntityTreeItemData *pCurItemData)
 		SetEditMode(pCurItemData); // Turn on edit mode for the newly focused item
 }
 
+void EntityWidget::ToggleSetConstructor()
+{
+	if(ui->chkSetConstructor->isChecked())
+	{
+		m_iPreviewStartingFrame = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().GetCurrentFrame();
+		if(m_iPreviewStartingFrame == -1)
+			m_iPreviewStartingFrame = 0;
+
+		static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().SetCurrentFrame(-1);
+	}
+	else
+		static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().SetCurrentFrame(m_iPreviewStartingFrame);
+}
+
 void EntityWidget::OnKeySpace()
 {
 	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
@@ -798,6 +839,12 @@ void EntityWidget::on_txtCustomBaseClass_editingFinished()
 		EntityUndoCmd_CustomBaseClassName *pCmd = new EntityUndoCmd_CustomBaseClassName(GetItem(), ui->txtCustomBaseClass->text());
 		m_ItemRef.GetUndoStack()->push(pCmd);
 	}
+}
+
+void EntityWidget::on_chkEnableAnimStates_clicked()
+{
+	EntityUndoCmd_EnableAnimStates *pCmd = new EntityUndoCmd_EnableAnimStates(GetItem(), ui->chkEnableAnimStates->isChecked());
+	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
 void EntityWidget::OnContextMenu(const QPoint &pos)
@@ -1775,16 +1822,7 @@ void EntityWidget::on_chkEditMode_clicked()
 
 void EntityWidget::on_chkSetConstructor_clicked()
 {
-	if(ui->chkSetConstructor->isChecked())
-	{
-		m_iPreviewStartingFrame = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().GetCurrentFrame();
-		if(m_iPreviewStartingFrame == -1)
-			m_iPreviewStartingFrame = 0;
-
-		static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().SetCurrentFrame(-1);
-	}
-	else
-		static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().SetCurrentFrame(m_iPreviewStartingFrame);
+	ToggleSetConstructor();
 }
 
 void EntityWidget::OnPreviewUpdate()
