@@ -81,9 +81,8 @@ public:
 	virtual void ClearStencil(bool bUseParentStencil) override;
 	void ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChildren);
 
-	// TODO: Rename this to UseSceneCoordinates
-	virtual void UseCameraCoordinates() override;
-	void UseCameraCoordinates(bool bOverrideExplicitChildren);
+	virtual void UseSceneCoordinates() override;
+	void UseSceneCoordinates(bool bOverrideExplicitChildren);
 
 	virtual void UseWindowCoordinates(int32 iWindowIndex = 0) override;
 	void UseWindowCoordinates(int32 iWindowIndex, bool bOverrideExplicitChildren);

@@ -22,7 +22,7 @@ class HyEntity3d;
 class IHyBody
 {
 protected:
-	int32							m_iCoordinateSystem;	// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
+	int32							m_iWindowIndex;	// -1 (or any negative value) means using world/camera coordinates. Otherwise it represents the Window index
 	HyStencilHandle					m_hStencil;
 
 public:
@@ -40,13 +40,9 @@ public:
 	virtual void SetStencil(HyStencil *pStencil);
 	virtual void ClearStencil(bool bUseParentStencil);
 
-	int32 GetCoordinateSystem() const;
-	virtual void UseCameraCoordinates(); // TODO: Rename this to UseSceneCoordinates
+	virtual void UseSceneCoordinates();
 	virtual void UseWindowCoordinates(int32 iWindowIndex = 0);
-
-	// Synonym for UseCameraCoordinates() & UseWindowCoordinates()
-	void SetCameraCoordinates();
-	void SetWindowCoordinates(int32 iWindowIndex = 0);
+	int32 GetWindowIndex() const;
 
 	virtual float GetWidth(float fPercent = 1.0f) = 0;
 	virtual float GetHeight(float fPercent = 1.0f) = 0;

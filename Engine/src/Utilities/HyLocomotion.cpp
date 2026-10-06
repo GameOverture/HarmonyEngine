@@ -28,48 +28,62 @@ static float CastCallback(b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float 
 	return fraction;
 }
 
-HyLocomotion2d::HyLocomotion2d() : // NOTE: These default values are assuming pixels per second for use in UpdateSimple()
-	m_vThrottle(0.0f),
-	m_vVelocity(0.0f),
-	m_fMinSpeed(0.0f),
-	m_fMaxSpeed(250.0f),
-	m_fAccel(100.0f),
-	m_fDecel(300.0f),
-	m_fPogoVelocity(0.0f),
+HyLocomotionParams::HyLocomotionParams() :
+	m_fMinSpeed(0.1f),
+	m_fMaxSpeed(6.0f),
+	m_fAccel(20.0f),
+	m_fDecel(3.0f),
 	m_fJumpSpeed(10.0f),
 	m_fMoverGravity(30.0f),
 	m_fFriction(8.0f),
 	m_fAirSteer(0.2f)
-{
-}
+{ }
 
-HyLocomotion2d::HyLocomotion2d(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration) :
-	m_vThrottle(0.0f),
-	m_vVelocity(0.0f),
+HyLocomotionParams::HyLocomotionParams(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration) :
 	m_fMinSpeed(fMinSpeed),
 	m_fMaxSpeed(fMaxSpeed),
 	m_fAccel(fAcceleration),
 	m_fDecel(fDeceleration),
-	m_fPogoVelocity(0.0f),
 	m_fJumpSpeed(10.0f),
 	m_fMoverGravity(30.0f),
 	m_fFriction(8.0f),
 	m_fAirSteer(0.2f)
-{
-}
+{ }
 
-HyLocomotion2d::HyLocomotion2d(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration, float fJumpSpeed, float fMoverGravity, float fFriction, float fAirSteer) :
-	m_vThrottle(0.0f),
-	m_vVelocity(0.0f),
+HyLocomotionParams::HyLocomotionParams(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration, float fJumpSpeed, float fMoverGravity, float fFriction, float fAirSteer) :
 	m_fMinSpeed(fMinSpeed),
 	m_fMaxSpeed(fMaxSpeed),
 	m_fAccel(fAcceleration),
 	m_fDecel(fDeceleration),
-	m_fPogoVelocity(0.0f),
 	m_fJumpSpeed(fJumpSpeed),
 	m_fMoverGravity(fMoverGravity),
 	m_fFriction(fFriction),
 	m_fAirSteer(fAirSteer)
+{ }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+HyLocomotion2d::HyLocomotion2d() :
+	HyLocomotion2d(HyLocomotionParams())
+{
+}
+
+HyLocomotion2d::HyLocomotion2d(const HyLocomotionParams &initRef) :
+	m_Params(initRef),
+	m_vThrottle(0.0f),
+	m_vVelocity(0.0f),
+	m_fPogoVelocity(0.0f)
+{
+	Setup(initRef);
+}
+
+HyLocomotion2d::HyLocomotion2d(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration) :
+	HyLocomotion2d(HyLocomotionParams(fMinSpeed, fMaxSpeed, fAcceleration, fDeceleration))
+{
+}
+
+HyLocomotion2d::HyLocomotion2d(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration, float fJumpSpeed, float fMoverGravity, float fFriction, float fAirSteer) :
+	HyLocomotion2d(HyLocomotionParams(fMinSpeed, fMaxSpeed, fAcceleration, fDeceleration, fJumpSpeed, fMoverGravity, fFriction, fAirSteer))
 {
 }
 
@@ -102,25 +116,21 @@ void HyLocomotion2d::SetVelocityY(float fVelocityY)
 	m_vVelocity.y = fVelocityY;
 }
 
+void HyLocomotion2d::Setup(const HyLocomotionParams &initRef)
+{
+	m_Params = initRef;
+	if(m_Params.m_fMinSpeed <= 0.0f) // Min speed cannot be zero
+		m_Params.m_fMinSpeed = 0.001f;
+}
+
 void HyLocomotion2d::SetupSimple(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration)
 {
-	m_fMinSpeed = fMinSpeed;
-	m_fMaxSpeed = fMaxSpeed;
-	m_fAccel = fAcceleration;
-	m_fDecel = fDeceleration;
+	Setup(HyLocomotionParams(fMinSpeed, fMaxSpeed, fAcceleration, fDeceleration));
 }
 
 void HyLocomotion2d::SetupPhysical(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration, float fJumpSpeed, float fMoverGravity, float fFriction, float fAirSteer)
 {
-	m_fMinSpeed = fMinSpeed;
-	m_fMaxSpeed = fMaxSpeed;
-	m_fAccel = fAcceleration;
-	m_fDecel = fDeceleration;
-
-	m_fJumpSpeed = fJumpSpeed;
-	m_fMoverGravity = fMoverGravity;
-	m_fFriction = fFriction;
-	m_fAirSteer = fAirSteer;
+	Setup(HyLocomotionParams(fMinSpeed, fMaxSpeed, fAcceleration, fDeceleration, fJumpSpeed, fMoverGravity, fFriction, fAirSteer));
 }
 
 void HyLocomotion2d::GoUp()
@@ -151,7 +161,7 @@ void HyLocomotion2d::SetThrottle(glm::vec2 vThrottle)
 
 void HyLocomotion2d::Jump()
 {
-	m_vVelocity.y = m_fJumpSpeed;
+	m_vVelocity.y = m_Params.m_fJumpSpeed;
 }
 
 void HyLocomotion2d::StopX()
@@ -166,53 +176,53 @@ void HyLocomotion2d::StopY()
 
 void HyLocomotion2d::UpdateSimple()
 {
-	const float fSpeedLimitX = m_fMaxSpeed * m_vThrottle.x;
-	const float fSpeedLimitY = m_fMaxSpeed * m_vThrottle.y;
+	const float fSpeedLimitX = m_Params.m_fMaxSpeed * m_vThrottle.x;
+	const float fSpeedLimitY = m_Params.m_fMaxSpeed * m_vThrottle.y;
 
 	// LEFT/RIGHT
 	if(m_vThrottle.x < 0.0f) // LEFT
 	{
 		if(fSpeedLimitX <= m_vVelocity.x)
-			m_vVelocity.x = HyMath::Max(fSpeedLimitX, m_vVelocity.x - (m_fAccel * HyEngine::DeltaTime()));
+			m_vVelocity.x = HyMath::Max(fSpeedLimitX, m_vVelocity.x - (m_Params.m_fAccel * HyEngine::DeltaTime()));
 		else
-			m_vVelocity.x = HyMath::Min(0.0f, m_vVelocity.x + (m_fDecel * HyEngine::DeltaTime()));
+			m_vVelocity.x = HyMath::Min(0.0f, m_vVelocity.x + (m_Params.m_fDecel * HyEngine::DeltaTime()));
 	}
 	else if(m_vThrottle.x > 0.0f) // RIGHT
 	{
 		if(fSpeedLimitX >= m_vVelocity.x)
-			m_vVelocity.x = HyMath::Min(fSpeedLimitX, m_vVelocity.x + (m_fAccel * HyEngine::DeltaTime()));
+			m_vVelocity.x = HyMath::Min(fSpeedLimitX, m_vVelocity.x + (m_Params.m_fAccel * HyEngine::DeltaTime()));
 		else
-			m_vVelocity.x = HyMath::Max(0.0f, m_vVelocity.x - (m_fDecel * HyEngine::DeltaTime()));
+			m_vVelocity.x = HyMath::Max(0.0f, m_vVelocity.x - (m_Params.m_fDecel * HyEngine::DeltaTime()));
 	}
 	else // m_vThrottle.x == 0.0f
 	{
 		if(m_vVelocity.x > 0.0f)
-			m_vVelocity.x = HyMath::Max(0.0f, m_vVelocity.x - (m_fDecel * HyEngine::DeltaTime()));
+			m_vVelocity.x = HyMath::Max(0.0f, m_vVelocity.x - (m_Params.m_fDecel * HyEngine::DeltaTime()));
 		else if(m_vVelocity.x < 0.0f)
-			m_vVelocity.x = HyMath::Min(0.0f, m_vVelocity.x + (m_fDecel * HyEngine::DeltaTime()));
+			m_vVelocity.x = HyMath::Min(0.0f, m_vVelocity.x + (m_Params.m_fDecel * HyEngine::DeltaTime()));
 	}
 
 	// UP/DOWN
 	if(m_vThrottle.y > 0.0f) // UP
 	{
 		if(fSpeedLimitY >= m_vVelocity.y)
-			m_vVelocity.y = HyMath::Min(fSpeedLimitY, m_vVelocity.y + (m_fAccel * HyEngine::DeltaTime()));
+			m_vVelocity.y = HyMath::Min(fSpeedLimitY, m_vVelocity.y + (m_Params.m_fAccel * HyEngine::DeltaTime()));
 		else
-			m_vVelocity.y = HyMath::Max(0.0f, m_vVelocity.y - (m_fDecel * HyEngine::DeltaTime()));
+			m_vVelocity.y = HyMath::Max(0.0f, m_vVelocity.y - (m_Params.m_fDecel * HyEngine::DeltaTime()));
 	}
 	else if(m_vThrottle.y < 0.0f) // DOWN
 	{
 		if(fSpeedLimitY <= m_vVelocity.y)
-			m_vVelocity.y = HyMath::Max(fSpeedLimitY, m_vVelocity.y - (m_fAccel * HyEngine::DeltaTime()));
+			m_vVelocity.y = HyMath::Max(fSpeedLimitY, m_vVelocity.y - (m_Params.m_fAccel * HyEngine::DeltaTime()));
 		else
-			m_vVelocity.y = HyMath::Min(0.0f, m_vVelocity.y + (m_fDecel * HyEngine::DeltaTime()));
+			m_vVelocity.y = HyMath::Min(0.0f, m_vVelocity.y + (m_Params.m_fDecel * HyEngine::DeltaTime()));
 	}
 	else // m_vThrottle.y == 0.0f
 	{
 		if(m_vVelocity.y > 0.0f)
-			m_vVelocity.y = HyMath::Max(0.0f, m_vVelocity.y - (m_fDecel * HyEngine::DeltaTime()));
+			m_vVelocity.y = HyMath::Max(0.0f, m_vVelocity.y - (m_Params.m_fDecel * HyEngine::DeltaTime()));
 		else if(m_vVelocity.y < 0.0f)
-			m_vVelocity.y = HyMath::Min(0.0f, m_vVelocity.y + (m_fDecel * HyEngine::DeltaTime()));
+			m_vVelocity.y = HyMath::Min(0.0f, m_vVelocity.y + (m_Params.m_fDecel * HyEngine::DeltaTime()));
 	}
 
 	m_vThrottle.x = m_vThrottle.y = 0.0f;
@@ -223,36 +233,36 @@ void HyLocomotion2d::UpdateSimple()
 // pogoFilter = { MoverBit, StaticBit | DynamicBit };
 // collideFilter = { MoverBit, StaticBit | DynamicBit | MoverBit }; // Mover overlap filter
 // castFilter = { MoverBit, StaticBit | DynamicBit }; // Movers don't sweep against other movers, allows for soft collision
-void HyLocomotion2d::UpdatePhysical(b2WorldId hWorld, glm::vec2 &ptPosOut, bool &bOnGroundOut, const b2Capsule &moverCapsule, b2QueryFilter pogoFilter, b2QueryFilter collideFilter, b2QueryFilter castFilter)
+void HyLocomotion2d::UpdatePhysical(b2WorldId hWorld, glm::vec2 &ptPosInOut, bool &bOnGroundInOut, const b2Capsule &moverCapsule, b2QueryFilter pogoFilter, b2QueryFilter collideFilter, b2QueryFilter castFilter)
 {
-	b2Transform transform = { { ptPosOut.x, ptPosOut.y }, b2Rot_identity };
+	b2Transform transform = { { ptPosInOut.x, ptPosInOut.y }, b2Rot_identity };
 
 	// Friction
 	float fSpeed = b2Length({ m_vVelocity.x, m_vVelocity.y });
-	if(fSpeed < m_fMinSpeed)
+	if(fSpeed < m_Params.m_fMinSpeed)
 	{
 		m_vVelocity.x = 0.0f;
 		m_vVelocity.y = 0.0f;
 	}
-	else if(bOnGroundOut)
+	else if(bOnGroundInOut)
 	{
 		// Linear damping above 'm_fDecel' and fixed reduction below 'm_fDecel'
-		float fControl = fSpeed < m_fDecel ? m_fDecel : fSpeed;
+		float fControl = fSpeed < m_Params.m_fDecel ? m_Params.m_fDecel : fSpeed;
 
 		// friction has units of 1/time
-		float fDrop = fControl * m_fFriction * HyEngine::DeltaTime();
+		float fDrop = fControl * m_Params.m_fFriction * HyEngine::DeltaTime();
 		float fNewSpeed = b2MaxFloat(0.0f, fSpeed - fDrop);
 		m_vVelocity *= fNewSpeed / fSpeed;
 	}
 
-	b2Vec2 vDesiredVelocity = { m_fMaxSpeed * m_vThrottle.x, m_fMaxSpeed * m_vThrottle.y };
+	b2Vec2 vDesiredVelocity = { m_Params.m_fMaxSpeed * m_vThrottle.x, m_Params.m_fMaxSpeed * m_vThrottle.y };
 	float fDesiredSpeed;
 	b2Vec2 vDesiredDirection = b2GetLengthAndNormalize(&fDesiredSpeed, vDesiredVelocity);
 
-	if(fDesiredSpeed > m_fMaxSpeed)
-		fDesiredSpeed = m_fMaxSpeed;
+	if(fDesiredSpeed > m_Params.m_fMaxSpeed)
+		fDesiredSpeed = m_Params.m_fMaxSpeed;
 
-	if(bOnGroundOut)
+	if(bOnGroundInOut)
 		m_vVelocity.y = 0.0f;
 
 	// Accelerate
@@ -260,8 +270,8 @@ void HyLocomotion2d::UpdatePhysical(b2WorldId hWorld, glm::vec2 &ptPosOut, bool 
 	float fAddSpeed = fDesiredSpeed - fCurrentSpeed;
 	if(fAddSpeed > 0.0f)
 	{
-		float fSteer = bOnGroundOut ? 1.0f : m_fAirSteer;
-		float fAccelSpeed = fSteer * m_fAccel * m_fMaxSpeed * HyEngine::DeltaTime();
+		float fSteer = bOnGroundInOut ? 1.0f : m_Params.m_fAirSteer;
+		float fAccelSpeed = fSteer * m_Params.m_fAccel * m_Params.m_fMaxSpeed * HyEngine::DeltaTime();
 		if(fAccelSpeed > fAddSpeed)
 			fAccelSpeed = fAddSpeed;
 
@@ -271,7 +281,7 @@ void HyLocomotion2d::UpdatePhysical(b2WorldId hWorld, glm::vec2 &ptPosOut, bool 
 	}
 
 	// TODO: Apply mover gravity in the same direction b2World_GetGravity() is pointing
-	m_vVelocity.y -= m_fMoverGravity * HyEngine::DeltaTime();
+	m_vVelocity.y -= m_Params.m_fMoverGravity * HyEngine::DeltaTime();
 
 	b2Vec2 ptOrigin = b2TransformPoint(transform, moverCapsule.center1);
 	b2Circle circle = { ptOrigin, 0.5f * moverCapsule.radius };
@@ -306,10 +316,10 @@ void HyLocomotion2d::UpdatePhysical(b2WorldId hWorld, glm::vec2 &ptPosOut, bool 
 	b2World_CastShape(hWorld, &proxy, translation, pogoFilter, CastCallback, &castResult);
 
 	// Avoid snapping to ground if still going up
-	if(bOnGroundOut == false)
-		bOnGroundOut = castResult.hit && m_vVelocity.y <= 0.01f; // TODO: Need to account for direction of gravity b2World_GetGravity() is pointing
+	if(bOnGroundInOut == false)
+		bOnGroundInOut = castResult.hit && m_vVelocity.y <= 0.01f; // TODO: Need to account for direction of gravity b2World_GetGravity() is pointing
 	else
-		bOnGroundOut = castResult.hit;
+		bOnGroundInOut = castResult.hit;
 
 	if(castResult.hit == false)
 	{
@@ -401,8 +411,8 @@ void HyLocomotion2d::UpdatePhysical(b2WorldId hWorld, glm::vec2 &ptPosOut, bool 
 	m_vVelocity.x = vVel.x;
 	m_vVelocity.y = vVel.y;
 
-	ptPosOut.x = transform.p.x;
-	ptPosOut.y = transform.p.y;
+	ptPosInOut.x = transform.p.x;
+	ptPosInOut.y = transform.p.y;
 
 	m_vThrottle.x = m_vThrottle.y = 0.0f;
 }

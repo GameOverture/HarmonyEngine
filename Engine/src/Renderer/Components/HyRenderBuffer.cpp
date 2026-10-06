@@ -71,7 +71,7 @@ void HyRenderBuffer::AppendRenderState(uint32 uiId, IHyDrawable2d &instanceRef, 
 															 instanceRef.GetShaderHandle(),
 															 instanceRef.GetScissorHandle(),
 															 instanceRef.GetStencilHandle(),// (instanceRef.GetStencil() != nullptr && instanceRef.GetStencil()->IsMaskReady()) ? instanceRef.GetStencil()->GetHandle() : HY_UNUSED_HANDLE,
-															 instanceRef.GetCoordinateSystem(),
+															 instanceRef.GetWindowIndex(),
 															 uiNumInstances,
 															 uiNumVerticesPerInstance);
 		m_pCurWritePosition += sizeof(State);

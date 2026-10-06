@@ -371,7 +371,7 @@ bool EntityDraw::OnSetEditMode(bool bEnable)
 	EntityDrawItem *pCurEditItem = GetCurEditItem();
 	if(pCurEditItem == nullptr)
 	{
-		HyGuiLog("EntityDraw::SetEditMode - No item selected to enter Edit Mode!", LOGTYPE_Error);
+		HyGuiLog("EntityDraw::OnSetEditMode - No item selected to enter Edit Mode!", LOGTYPE_Error);
 		return false;
 	}
 
@@ -384,7 +384,7 @@ bool EntityDraw::OnSetEditMode(bool bEnable)
 	if(pTreeItemData->GetEditModel())
 		MainWindow::SetStatus("Edit Mode - " % pTreeItemData->GetCodeName(), 0);
 	else
-		HyGuiLog("EntityDraw::SetEditMode - Unsupported edit item type!", LOGTYPE_Error);
+		HyGuiLog("EntityDraw::OnSetEditMode - Unsupported edit item type!", LOGTYPE_Error);
 
 	m_eEditModeState = EDITMODE_Idle;
 	m_EditModeWindowOutline.SetVisible(true);
@@ -679,7 +679,14 @@ void EntityDraw::FlushRootEntity()
 		}
 	}
 
-	// Add children items next
+	// Add the fused item next if it exists
+	EntityBaseClassType eEntBaseClassType = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetBaseClassType();
+	QJsonArray fusedItemArray = itemMetaObj["fusedItemList"].toArray();
+	QJsonObject fusedItemObj = fusedItemArray.at(eEntBaseClassType).toObject();
+	if(fusedItemObj.isEmpty() == false)
+		descObjList.push_back(fusedItemObj);
+
+	// Add children items last (to simulate implicit display order)
 	for(int32 i = 0; i < descChildArray.size(); ++i)
 	{
 		if(descChildArray[i].isObject())

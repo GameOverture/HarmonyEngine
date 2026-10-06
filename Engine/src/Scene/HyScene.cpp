@@ -320,7 +320,7 @@ void HyScene::PrepareRender(IHyRenderer &rendererRef, float fExtrapolatePercent)
 bool HyScene::CalculateCameraMask(/*const*/ IHyDrawable2d &instanceRef, uint32 &uiCameraMaskOut) const
 {
 	uiCameraMaskOut = 0;
-	if(instanceRef.GetCoordinateSystem() >= 0) // Only test if using camera (world) coordinates
+	if(instanceRef.GetWindowIndex() >= 0) // Only test if using scene coordinates
 		return true;
 
 	b2AABB worldAABB;

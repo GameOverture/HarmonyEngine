@@ -27,10 +27,11 @@ protected:
 	static_assert((int)ACTORATTRIB_IsAirborne == (int)ENTITYATTRIB_NEXTFLAG, "HyActor2d is not matching with base classes attrib flags");
 
 	HyLocomotion2d							m_Locomotion;
-	HyShape2d								m_ActorFixture;
+	HyShape2d								m_ActorFixture; // This is simulated externally to the world via 'm_Locomotion'::UpdatePhysical, and is explicitly set in meters instead of pixels
 
 public:
 	HyActor2d(HyEntity2d *pParent = nullptr);
+	HyActor2d(const HyLocomotionParams &locomotionInit, float fWidth, float fHeight, HyEntity2d *pParent = nullptr);
 	HyActor2d(const HyEntity2d &) = delete;
 	HyActor2d(HyActor2d &&donor) noexcept;
 	virtual ~HyActor2d(void);

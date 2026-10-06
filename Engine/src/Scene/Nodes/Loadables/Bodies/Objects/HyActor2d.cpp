@@ -10,19 +10,33 @@
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/Loadables/Bodies/Objects/HyActor2d.h"
 #include "Scene/HyScene.h"
+#include "HyEngine.h"
 
 HyActor2d::HyActor2d(HyEntity2d *pParent /*= nullptr*/) :
+	HyActor2d(HyLocomotionParams(), HyEngine::InitValues().fPixelsPerMeter * 0.3f, HyEngine::InitValues().fPixelsPerMeter * 2.0f, pParent)
+{ }
+
+HyActor2d::HyActor2d(const HyLocomotionParams &locomotionInit, float fWidth, float fHeight, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
-	m_Locomotion(0.1f, 6.0f, 20.0f, 3.0f, 10.0f, 30.0f, 8.0f, 0.2f),
-	m_ActorFixture(this)
+	m_Locomotion(locomotionInit),
+	m_ActorFixture(nullptr) // This is simulated externally to the world via 'm_Locomotion'::UpdatePhysical
 {
+	// NOTE: explicitly set 'm_ActorFixture' in meters instead of pixels
+	fWidth *= sm_pScene->GetPpmInverse();
+	fHeight *= sm_pScene->GetPpmInverse();
+
+	float fRadius = (fWidth * 0.5f);
+	m_ActorFixture.SetAsCapsule(glm::vec2(0.0f, fRadius), glm::vec2(0.0f, fHeight - (fRadius * 2.0f)), fWidth * 0.5f);
 	m_ActorFixture.SetPhysicsAllowed(false);
-	m_ActorFixture.SetAsCapsule(glm::vec2(0.0f, -0.5f), glm::vec2(0.0f, 0.5f), 0.3f);
 }
 
 HyActor2d::HyActor2d(HyActor2d &&donor) noexcept :
-	HyEntity2d(std::move(donor))
+	HyEntity2d(std::move(donor)),
+	m_Locomotion(donor.m_Locomotion),
+	m_ActorFixture(nullptr) // This is simulated externally to the world via 'm_Locomotion'::UpdatePhysical
 {
+	m_ActorFixture = donor.m_ActorFixture;
+	m_ActorFixture.SetPhysicsAllowed(false);
 }
 
 /*virtual*/ HyActor2d::~HyActor2d(void)
@@ -55,13 +69,17 @@ void HyActor2d::Jump()
 /*virtual*/ void HyActor2d::Update() /*override*/
 {
 	glm::vec2 ptPos = pos.Get();
+	ptPos *= sm_pScene->GetPpmInverse();
+
 	bool bOnGround = IsOnGround();
 	b2QueryFilter pogoFilter = { HYCOLLISION_Actor, HYCOLLISION_Default | HYCOLLISION_Dynamic };
 	b2QueryFilter collideFilter = { HYCOLLISION_Actor, HYCOLLISION_Default | HYCOLLISION_Dynamic | HYCOLLISION_Actor }; // Mover overlap filter
 	b2QueryFilter castFilter = { HYCOLLISION_Actor, HYCOLLISION_Default | HYCOLLISION_Dynamic }; // Movers don't sweep against other movers, allows for soft collision
 	m_Locomotion.UpdatePhysical(IHyNode::sm_pScene->GetPhysicsWorld(), ptPos, bOnGround, m_ActorFixture.GetAsCapsule(), pogoFilter, collideFilter, castFilter);
 
+	ptPos *= sm_pScene->GetPixelsPerMeter();
 	pos.Set(ptPos);
+
 	if(bOnGround)
 		m_uiEntityAttribs &= ~ACTORATTRIB_IsAirborne;
 	else

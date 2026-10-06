@@ -41,7 +41,7 @@ IHyBody2d::IHyBody2d(HyType eNodeType, const HyNodePath &nodePath, HyEntity2d *p
 
 	if(m_pParent)
 	{
-		m_iCoordinateSystem = m_pParent->GetCoordinateSystem();
+		m_iWindowIndex = m_pParent->GetWindowIndex();
 
 		if(m_pParent->IsScissorSet())
 			m_hScissorStencil = m_pParent->m_hScissorStencil;

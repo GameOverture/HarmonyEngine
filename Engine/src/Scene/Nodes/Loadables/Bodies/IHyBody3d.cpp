@@ -27,7 +27,7 @@ IHyBody3d::IHyBody3d(HyType eNodeType, const HyNodePath &nodePath, HyEntity3d *p
 
 	if(m_pParent)
 	{
-		m_iCoordinateSystem = m_pParent->GetCoordinateSystem();
+		m_iWindowIndex = m_pParent->GetWindowIndex();
 
 		if(m_pParent->IsStencilSet())
 			m_hStencil = m_pParent->m_hStencil;

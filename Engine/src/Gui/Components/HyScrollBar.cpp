@@ -384,7 +384,7 @@ void HyScrollBar::ScrollTo(float fPos)
 	HyScrollBar *pScrollBar = static_cast<HyScrollBar *>(m_pParent);
 
 	glm::vec2 ptMousePos;
-	if(GetCoordinateSystem() >= 0)
+	if(GetWindowIndex() >= 0)
 		ptMousePos = HyEngine::Input().GetMousePos();
 	else
 		HyEngine::Input().GetWorldMousePos(ptMousePos);

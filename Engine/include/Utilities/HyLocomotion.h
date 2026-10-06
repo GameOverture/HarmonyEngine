@@ -12,23 +12,35 @@
 
 #include "Afx/HyStdAfx.h"
 
+struct HyLocomotionParams
+{
+	// Simple
+	float				m_fMaxSpeed;		// Meters per second
+	float				m_fMinSpeed;		// Meters per second
+	float				m_fAccel;			// Meters per second squared
+	float				m_fDecel;			// Meters per second squared
+
+	// Physical
+	float				m_fJumpSpeed;		// Meters per second
+	float				m_fMoverGravity;	// Meters per second squared
+	float				m_fFriction;		// Friction has units of 1/time
+	float				m_fAirSteer;
+
+	HyLocomotionParams();
+	HyLocomotionParams(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration);
+	HyLocomotionParams(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration, float fJumpSpeed, float fMoverGravity, float fFriction, float fAirSteer);
+};
+
 class HyLocomotion2d
 {
-	glm::vec2				m_vThrottle;
+	HyLocomotionParams		m_Params;
 
 	// Simple + Physical
+	glm::vec2				m_vThrottle;
 	glm::vec2				m_vVelocity;
-	float					m_fMaxSpeed;
-	float					m_fMinSpeed;
-	float					m_fAccel;
-	float					m_fDecel;
 
 	// Physical
 	float					m_fPogoVelocity;
-	float					m_fJumpSpeed;
-	float					m_fMoverGravity;
-	float					m_fFriction;			// Friction has units of 1/time
-	float					m_fAirSteer;
 
 public:
 	static constexpr int	m_planeCapacity = 8;
@@ -37,7 +49,9 @@ public:
 
 public:
 	HyLocomotion2d();
+	HyLocomotion2d(const HyLocomotionParams &initRef);
 	HyLocomotion2d(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration);
+
 	HyLocomotion2d(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration, float fJumpSpeed, float fMoverGravity, float fFriction, float fAirSteer);
 	~HyLocomotion2d();
 
@@ -47,6 +61,7 @@ public:
 	void SetVelocityX(float fVelocityX);
 	void SetVelocityY(float fVelocityY);
 
+	void Setup(const HyLocomotionParams &initRef);
 	void SetupSimple(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration);
 	void SetupPhysical(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration, float fJumpSpeed, float fMoverGravity, float fFriction, float fAirSteer);
 
@@ -61,7 +76,7 @@ public:
 	void StopY();
 
 	void UpdateSimple();					// Should be invoked every frame after all Go*() functions have been called
-	void UpdatePhysical(b2WorldId hWorld, glm::vec2 &ptPosOut, bool &bOnGroundOut, const b2Capsule &moverRef, b2QueryFilter pogoFilter, b2QueryFilter collideFilter, b2QueryFilter castFilter);	// Should be invoked every frame after all Go*() functions have been called - Uses the active physics simulation
+	void UpdatePhysical(b2WorldId hWorld, glm::vec2 &ptPosInOut, bool &bOnGroundInOut, const b2Capsule &moverRef, b2QueryFilter pogoFilter, b2QueryFilter collideFilter, b2QueryFilter castFilter);	// Should be invoked every frame after all Go*() functions have been called - Uses the active physics simulation
 
 private:
 	static bool PlaneResultFcn(b2ShapeId shapeId, const b2PlaneResult *planeResult, void *context);

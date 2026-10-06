@@ -144,7 +144,7 @@ void HyStencil::PrepRender(HyRenderBuffer::State *pPtr, float fExtrapolatePercen
 		pScissorPrim->pos.Set(ptTranslation);
 		pScissorPrim->rot.Set(glm::degrees(glm::atan(mtxSceneRef[0][1], mtxSceneRef[0][0])));
 		pScissorPrim->scale.Set(vScale);
-		pScissorPrim->UseWindowCoordinates(m_pScissorOwner->GetCoordinateSystem());
+		pScissorPrim->UseWindowCoordinates(m_pScissorOwner->GetWindowIndex());
 
 		m_pScissorOwner->ClearDirty(IHyNode::DIRTY_ScissorStencil);
 	}

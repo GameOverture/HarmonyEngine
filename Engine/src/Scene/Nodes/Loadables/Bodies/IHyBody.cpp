@@ -17,19 +17,19 @@
 #include "Renderer/Effects/HyStencil.h"
 
 IHyBody::IHyBody() :
-	m_iCoordinateSystem(-1),
+	m_iWindowIndex(-1),
 	m_hStencil(HY_UNUSED_HANDLE)
 {
 }
 
 IHyBody::IHyBody(const IHyBody &copyRef) :
-	m_iCoordinateSystem(copyRef.m_iCoordinateSystem),
+	m_iWindowIndex(copyRef.m_iWindowIndex),
 	m_hStencil(copyRef.m_hStencil)
 {
 }
 
 IHyBody::IHyBody(IHyBody &&donor) :
-	m_iCoordinateSystem(std::move(donor.m_iCoordinateSystem)),
+	m_iWindowIndex(std::move(donor.m_iWindowIndex)),
 	m_hStencil(std::move(donor.m_hStencil))
 {
 }
@@ -40,7 +40,7 @@ IHyBody::~IHyBody()
 
 IHyBody &IHyBody::operator=(const IHyBody &rhs)
 {
-	m_iCoordinateSystem = rhs.m_iCoordinateSystem;
+	m_iWindowIndex = rhs.m_iWindowIndex;
 	m_hStencil = rhs.m_hStencil;
 
 	return *this;
@@ -48,7 +48,7 @@ IHyBody &IHyBody::operator=(const IHyBody &rhs)
 
 IHyBody &IHyBody::operator=(IHyBody &&donor)
 {
-	m_iCoordinateSystem = std::move(donor.m_iCoordinateSystem);
+	m_iWindowIndex = std::move(donor.m_iWindowIndex);
 	m_hStencil = std::move(donor.m_hStencil);
 
 	return *this;
@@ -102,31 +102,21 @@ HyStencilHandle IHyBody::GetStencilHandle() const
 	}
 }
 
-int32 IHyBody::GetCoordinateSystem() const
+/*virtual*/ void IHyBody::UseSceneCoordinates()
 {
-	return m_iCoordinateSystem;
-}
-
-/*virtual*/ void IHyBody::UseCameraCoordinates()
-{
-	m_iCoordinateSystem = -1;
+	m_iWindowIndex = -1;
 	_VisableGetNodeRef().m_uiFlags |= IHyNode::EXPLICIT_CoordinateSystem;
 }
 
 /*virtual*/ void IHyBody::UseWindowCoordinates(int32 iWindowIndex /*= 0*/)
 {
-	m_iCoordinateSystem = iWindowIndex;
+	m_iWindowIndex = iWindowIndex;
 	_VisableGetNodeRef().m_uiFlags |= IHyNode::EXPLICIT_CoordinateSystem;
 }
 
-void IHyBody::SetCameraCoordinates()
+int32 IHyBody::GetWindowIndex() const
 {
-	UseCameraCoordinates();
-}
-
-void IHyBody::SetWindowCoordinates(int32 iWindowIndex /*= 0*/)
-{
-	UseWindowCoordinates(iWindowIndex);
+	return m_iWindowIndex;
 }
 
 /*virtual*/ void IHyBody::_setStencil(HyStencilHandle hHandle, bool bIsOverriding)
@@ -144,5 +134,5 @@ void IHyBody::SetWindowCoordinates(int32 iWindowIndex /*= 0*/)
 		_VisableGetNodeRef().m_uiFlags &= ~IHyNode::EXPLICIT_CoordinateSystem;
 
 	if(0 == (_VisableGetNodeRef().m_uiFlags & IHyNode::EXPLICIT_CoordinateSystem))
-		m_iCoordinateSystem = iWindowIndex;
+		m_iWindowIndex = iWindowIndex;
 }

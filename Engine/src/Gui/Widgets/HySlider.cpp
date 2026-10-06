@@ -194,9 +194,9 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *)> fpCallbac
 		}
 
 		glm::vec2 ptMousePos;
-		if(GetCoordinateSystem() >= 0)
+		if(GetWindowIndex() >= 0)
 		{
-			if(HyEngine::Input().GetMouseWindowIndex() == GetCoordinateSystem())
+			if(HyEngine::Input().GetMouseWindowIndex() == GetWindowIndex())
 				ptMousePos = HyEngine::Input().GetMousePos();
 			else
 				return;

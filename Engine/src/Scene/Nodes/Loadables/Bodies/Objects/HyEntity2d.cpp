@@ -26,6 +26,7 @@ HyEntity2d::HyEntity2d(HyEntity2d *pParent /*= nullptr*/) :
 HyEntity2d::HyEntity2d(HyEntity2d &&donor) noexcept :
 	IHyBody2d(std::move(donor)),
 	m_ChildList(std::move(donor.m_ChildList)),
+	m_FixtureList(std::move(donor.m_FixtureList)),
 	m_uiEntityAttribs(std::move(donor.m_uiEntityAttribs)),
 	m_fDeferAmt(0.0f),
 	m_fpDeferFinishedFunc(nullptr),
@@ -241,19 +242,19 @@ void HyEntity2d::ClearStencil(bool bUseParentStencil, bool bOverrideExplicitChil
 	}
 }
 
-/*virtual*/ void HyEntity2d::UseCameraCoordinates() /*override*/
+/*virtual*/ void HyEntity2d::UseSceneCoordinates() /*override*/
 {
-	UseCameraCoordinates(false);
+	UseSceneCoordinates(false);
 }
 
-void HyEntity2d::UseCameraCoordinates(bool bOverrideExplicitChildren)
+void HyEntity2d::UseSceneCoordinates(bool bOverrideExplicitChildren)
 {
-	IHyBody2d::UseCameraCoordinates();
+	IHyBody2d::UseSceneCoordinates();
 
 	for(uint32 i = 0; i < m_ChildList.size(); ++i)
 	{
 		if(0 != (m_ChildList[i]->m_uiFlags & NODETYPE_IsBody))
-			static_cast<IHyBody2d *>(m_ChildList[i])->_setCoordinateSystem(m_iCoordinateSystem, bOverrideExplicitChildren);
+			static_cast<IHyBody2d *>(m_ChildList[i])->_setCoordinateSystem(m_iWindowIndex, bOverrideExplicitChildren);
 	}
 }
 
@@ -762,7 +763,7 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 
 	if(childRef.GetInternalFlags() & NODETYPE_IsBody)
 	{
-		static_cast<IHyBody2d &>(childRef)._setCoordinateSystem(GetCoordinateSystem(), false);
+		static_cast<IHyBody2d &>(childRef)._setCoordinateSystem(GetWindowIndex(), false);
 
 		if(IsScissorSet())
 			static_cast<IHyBody2d &>(childRef)._setScissorStencil(m_hScissorStencil, false);
@@ -850,14 +851,14 @@ void HyEntity2d::SetNewChildAttributes(IHyNode2d &childRef)
 bool HyEntity2d::CalcMouseInBounds()
 {
 	glm::vec2 ptMouseInSceneCoords;
-	if(GetCoordinateSystem() >= 0)
+	if(GetWindowIndex() >= 0)
 	{
-		if(HyEngine::Input().GetMouseWindowIndex() != GetCoordinateSystem())
+		if(HyEngine::Input().GetMouseWindowIndex() != GetWindowIndex())
 			return false;
 
 		ptMouseInSceneCoords = HyEngine::Input().GetMousePos();
 	}
-	else if(GetCoordinateSystem() < 0)
+	else if(GetWindowIndex() < 0)
 	{
 		if(HyEngine::Input().GetWorldMousePos(ptMouseInSceneCoords) == false)
 			return false;
