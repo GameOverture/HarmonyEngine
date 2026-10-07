@@ -71,6 +71,7 @@
 	sm_sItemNames[ITEM_ShapeFixture] = "Shape";
 	sm_sItemNames[ITEM_ChainFixture] = "Chain";
 	sm_sItemNames[ITEM_PointFixture] = "Point";
+	sm_sItemNames[ITEM_ActorMover] = "Actor";
 	sm_sItemNames[ITEM_UiLayout] = "Layout";
 	sm_sItemNames[ITEM_UiSpacer] = "Spacer";
 	sm_sItemNames[ITEM_UiLabel] = "Label";
@@ -107,6 +108,7 @@
 	sm_sItemNamesPlural[ITEM_ShapeFixture] = "Shapes";
 	sm_sItemNamesPlural[ITEM_ChainFixture] = "Chains";
 	sm_sItemNamesPlural[ITEM_PointFixture] = "Points";
+	sm_sItemNamesPlural[ITEM_ActorMover] = "Actors";
 	sm_sItemNamesPlural[ITEM_UiLayout] = "Layouts";
 	sm_sItemNamesPlural[ITEM_UiSpacer] = "Spacers";
 	sm_sItemNamesPlural[ITEM_UiLabel] = "Labels";
@@ -321,6 +323,7 @@
 	list.append(ITEM_ShapeFixture);
 	list.append(ITEM_ChainFixture);
 	list.append(ITEM_PointFixture);
+	list.append(ITEM_ActorMover);
 	list.append(ITEM_UiLayout);
 	list.append(ITEM_UiSpacer);
 	list.append(ITEM_UiLabel);

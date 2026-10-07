@@ -356,6 +356,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 			sCategory = ENTITYBASECLASSCATEGORY_STRINGS[ENTBASECLASS_HyActor2d];
 			m_pPropertiesModel->InsertCategory(0, sCategory);
 			m_pPropertiesModel->AppendProperty(sCategory, "Jump", PROPERTIESTYPE_bool, Qt::Checked, "Actor attempts to perform a jump", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty(sCategory, "Size", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Actors are simulated as an upright capsule, based on this width and height", PROPERTIESACCESS_ToggleUnchecked, 0.0f, fRANGE, 1.0f);
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			// All entities have "Physics"
@@ -486,6 +487,9 @@ void EntityTreeItemData::InitalizePropertyModel()
 		pointDataVariant.setValue<EntityTreeItemData *>(this);
 		m_pPropertiesModel->AppendProperty("Point", "Data", PROPERTIESTYPE_ShapeData, QVariant(), "Representing the point's data", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), pointDataVariant);
 		break; }
+
+	case ITEM_ActorMover:
+		break;
 
 	case ITEM_UiLayout:
 		m_pPropertiesModel->InsertCategory(-1, "Layout", QVariant(), false, "Holds UI widget entities and arranges them programatically");

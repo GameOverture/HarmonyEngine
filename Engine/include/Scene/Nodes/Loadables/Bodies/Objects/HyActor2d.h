@@ -38,6 +38,8 @@ public:
 
 	HyActor2d &operator=(HyActor2d &&donor) noexcept;
 
+	void SetSize(float fWidth, float fHeight);
+
 	bool IsOnGround() const;
 
 	void SetThrottle(glm::vec2 vThrottle);

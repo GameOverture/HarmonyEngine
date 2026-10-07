@@ -63,7 +63,37 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 	QUuid referencedItemUuid = m_pEntityTreeItemData->GetReferencedItemUuid();
 	TreeModelItemData *pReferencedItemData = projectRef.FindItemData(referencedItemUuid);
 
-	if(m_pEntityTreeItemData->IsAssetItem())
+	if(m_pEntityTreeItemData->GetEntType() == ENTTYPE_FusedItem && m_pEntityTreeItemData->GetType() == ITEM_ActorMover)
+	{
+		// SPECIAL CASE: HyActor fused item (show as capsule)
+		m_pChild = new HyPrimitive2d(pParent);
+
+		float fWidth = 0.0f;
+		float fHeight = 0.0f;
+		if(m_pEntityTreeItemData->GetEntityModel().GetCtorKeyFramesMap().contains(m_pEntityTreeItemData))
+		{
+			QJsonObject ctorObj = m_pEntityTreeItemData->GetEntityModel().GetCtorKeyFramesMap()[m_pEntityTreeItemData];
+			if(ctorObj.contains(ENTITYBASECLASSCATEGORY_STRINGS[ENTBASECLASS_HyActor2d]))
+			{
+				QJsonObject actorObj = actorObj[ENTITYBASECLASSCATEGORY_STRINGS[ENTBASECLASS_HyActor2d]].toObject();
+				if(actorObj.contains("Size"))
+				{
+					QJsonArray sizeArray = actorObj["Size"].toArray();
+					fWidth = sizeArray[0].toDouble();
+					fHeight = sizeArray[1].toDouble();
+				}
+			}
+		}
+		if(fWidth <= 0.0f)
+			fWidth = HyEngine::InitValues().fPixelsPerMeter * 0.3f; // NOTE: This was taken from HyActor2d's ctor
+		if(fHeight <= 0.0f)
+			fHeight = HyEngine::InitValues().fPixelsPerMeter * 2.0f; // NOTE: This was taken from HyActor2d's ctor
+		float fRadius = (fWidth * 0.5f);
+		static_cast<HyPrimitive2d *>(m_pChild)->SetAsCapsule(0, glm::vec2(0.0f, fRadius), glm::vec2(0.0f, fHeight - (fRadius * 2.0f)), fWidth * 0.5f, 0.0f);
+
+		m_pEditView = nullptr;
+	}
+	else if(m_pEntityTreeItemData->IsAssetItem())
 	{
 		if(m_pEntityTreeItemData->GetType() == ITEM_AtlasFrame)
 			m_pChild = new HyTexturedQuad2d(static_cast<IAssetItemData *>(pReferencedItemData)->GetChecksum(), static_cast<IAssetItemData *>(pReferencedItemData)->GetBankId(), pParent);
@@ -196,6 +226,8 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 		m_pEditView->SetModel(m_pEntityTreeItemData->GetEditModel());
 		m_pChild = m_pEditView;
 	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	if(m_pEditView && m_pEditView->GetModel() == nullptr)
 		HyGuiLog("EntityDrawItem ctor - m_pEditView has no model for item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
@@ -1058,6 +1090,9 @@ void ExtrapolateProperties(Project &projectRef,
 				if(pointObj.contains("Data"))
 					pEditModel->Deserialize(bIsActiveEditModeItem, pointObj["Data"].toObject());
 			}
+			break;
+
+		case ITEM_ActorMover:
 			break;
 
 		case ITEM_AtlasFrame:

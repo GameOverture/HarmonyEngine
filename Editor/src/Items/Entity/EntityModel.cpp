@@ -1200,6 +1200,18 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 					sSrc += sCodeName + "DisableMouseInput();" + sNewLine;
 			}
 		}
+		else if(sCategoryName == ENTITYBASECLASSCATEGORY_STRINGS[ENTBASECLASS_HyActor2d])
+		{
+			QJsonObject actorObj = propObj[ENTITYBASECLASSCATEGORY_STRINGS[ENTBASECLASS_HyActor2d]].toObject();
+			if(actorObj.contains("Jump") && actorObj["Jump"].toBool() == true)
+				sSrc += sCodeName + "Jump();" + sNewLine;
+			
+			if(actorObj.contains("Size"))
+			{
+				QJsonArray sizeArray = actorObj["Size"].toArray();
+				sSrc += sCodeName + "SetSize(" + QString::number(sizeArray[0].toDouble(), 'f') + "f, " + QString::number(sizeArray[1].toDouble(), 'f') + "f);" + sNewLine;
+			}
+		}
 		else if(sCategoryName == "Primitive Layer")
 		{
 			QJsonObject primitiveObj = propObj["Primitive Layer"].toObject();

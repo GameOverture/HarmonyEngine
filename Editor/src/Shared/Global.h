@@ -115,6 +115,7 @@ enum ItemType
 	ITEM_ShapeFixture,
 	ITEM_ChainFixture,
 	ITEM_PointFixture,
+	ITEM_ActorMover,
 	ITEM_UiLayout,
 	ITEM_UiSpacer,
 	// UI widgets

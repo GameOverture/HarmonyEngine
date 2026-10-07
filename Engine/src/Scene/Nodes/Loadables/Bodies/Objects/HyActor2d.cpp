@@ -13,7 +13,7 @@
 #include "HyEngine.h"
 
 HyActor2d::HyActor2d(HyEntity2d *pParent /*= nullptr*/) :
-	HyActor2d(HyLocomotionParams(), HyEngine::InitValues().fPixelsPerMeter * 0.3f, HyEngine::InitValues().fPixelsPerMeter * 2.0f, pParent)
+	HyActor2d(HyLocomotionParams(), 0.0f, 0.0f, pParent)
 { }
 
 HyActor2d::HyActor2d(const HyLocomotionParams &locomotionInit, float fWidth, float fHeight, HyEntity2d *pParent /*= nullptr*/) :
@@ -21,13 +21,7 @@ HyActor2d::HyActor2d(const HyLocomotionParams &locomotionInit, float fWidth, flo
 	m_Locomotion(locomotionInit),
 	m_ActorFixture(nullptr) // This is simulated externally to the world via 'm_Locomotion'::UpdatePhysical
 {
-	// NOTE: explicitly set 'm_ActorFixture' in meters instead of pixels
-	fWidth *= sm_pScene->GetPpmInverse();
-	fHeight *= sm_pScene->GetPpmInverse();
-
-	float fRadius = (fWidth * 0.5f);
-	m_ActorFixture.SetAsCapsule(glm::vec2(0.0f, fRadius), glm::vec2(0.0f, fHeight - (fRadius * 2.0f)), fWidth * 0.5f);
-	m_ActorFixture.SetPhysicsAllowed(false);
+	SetSize(fWidth, fHeight);
 }
 
 HyActor2d::HyActor2d(HyActor2d &&donor) noexcept :
@@ -48,6 +42,22 @@ HyActor2d &HyActor2d::operator=(HyActor2d &&donor) noexcept
 	HyEntity2d::operator=(std::move(donor));
 
 	return *this;
+}
+
+void HyActor2d::SetSize(float fWidth, float fHeight)
+{
+	if(fWidth <= 0.0f)
+		fWidth = HyEngine::InitValues().fPixelsPerMeter * 0.3f;
+	if(fHeight <= 0.0f)
+		fHeight = HyEngine::InitValues().fPixelsPerMeter * 2.0f;
+
+	// NOTE: explicitly set 'm_ActorFixture' in meters instead of pixels
+	fWidth *= sm_pScene->GetPpmInverse();
+	fHeight *= sm_pScene->GetPpmInverse();
+
+	float fRadius = (fWidth * 0.5f);
+	m_ActorFixture.SetAsCapsule(glm::vec2(0.0f, fRadius), glm::vec2(0.0f, fHeight - (fRadius * 2.0f)), fWidth * 0.5f);
+	m_ActorFixture.SetPhysicsAllowed(false); // Simulated externally to the world via 'm_Locomotion'::UpdatePhysical
 }
 
 bool HyActor2d::IsOnGround() const
