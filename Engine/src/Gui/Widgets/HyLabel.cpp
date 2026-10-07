@@ -94,9 +94,12 @@ HyLabel::HyLabel(const HyUiPanelInit &panelInit, const HyUiTextInit &textInit, H
 	Assemble();
 
 	if(panel.IsBvForPanel()) // Ensure to account for a 'bounding volume' panel
-		return b2AABB_Union(IHyWidget::GetSceneAABB(), { {0, 0}, {panel.GetWidth(), panel.GetHeight()} });
-	
-	return IHyWidget::GetSceneAABB();
+	{
+		m_SceneAABB = b2AABB_Union(IHyWidget::GetSceneAABB(), { {0, 0}, {panel.GetWidth(), panel.GetHeight()} });
+		return m_SceneAABB;
+	}
+	else
+		return IHyWidget::GetSceneAABB();
 }
 
 /*virtual*/ float HyLabel::GetTextWidth(float fPercent /*= 1.0f*/)
@@ -662,8 +665,8 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 			if((vTextSizeHint.x != uiNewWidth || vTextSizeHint.y != uiNewHeight) &&
 			   (vTextSizeHint.x != 0.0f && vTextSizeHint.y != 0.0f))
 			{
-				float fScaleX = uiNewWidth / vTextSizeHint.x;
-				float fScaleY = uiNewHeight / vTextSizeHint.y;
+				float fScaleX = static_cast<float>(uiNewWidth / vTextSizeHint.x);
+				float fScaleY = static_cast<float>(uiNewHeight / vTextSizeHint.y);
 				m_Text.scale.SetAll(HyMath::Min(fScaleX, fScaleY));
 
 				uiNewWidth = static_cast<uint32>(GetTextWidth());
@@ -671,7 +674,7 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 			}
 		}
 		
-		panel.SetSize(uiNewWidth, uiNewHeight);
+		panel.SetSize(static_cast<float>(uiNewWidth), static_cast<float>(uiNewHeight));
 	}
 	else // Side-by-side
 	{
@@ -702,7 +705,7 @@ void HyLabel::GuiOverrideTextNodeData(HyJsonObj itemDataObj, bool bUseGuiOverrid
 			vNewTextSize = HyMath::LockAspectRatio(vTextSizeHint.x, vTextSizeHint.y, static_cast<int32>(uiNewWidth * fTextPerc), uiNewHeight);
 		}
 
-		panel.SetSize(vNewPanelSize.x, vNewPanelSize.y);
+		panel.SetSize(static_cast<float>(vNewPanelSize.x), static_cast<float>(vNewPanelSize.y));
 
 		float fScaleX = 1.0f;
 		float fScaleY = 1.0f;

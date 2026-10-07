@@ -11,6 +11,7 @@
 #define GfxTextModel_H
 
 #include "Global.h"
+#include "HyEngine.h"
 
 class GfxTextModel
 {

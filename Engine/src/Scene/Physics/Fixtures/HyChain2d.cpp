@@ -199,10 +199,10 @@ void HyChain2d::ClearData()
 	if((floatList.size() & 1) == 0)
 		return "Missing last float closed indicator";
 
-	int iNumVertFloats = floatList.size() - 1;
+	size_t uiNumVertFloats = floatList.size() - 1;
 	std::vector<glm::vec2> vertList;
-	vertList.reserve(iNumVertFloats / 2);
-	for(int i = 0; i < iNumVertFloats; i += 2)
+	vertList.reserve(uiNumVertFloats / 2);
+	for(size_t i = 0; i < uiNumVertFloats; i += 2)
 		vertList.push_back(glm::vec2(floatList[i], floatList[i + 1]));
 
 	bool bLineLoop = floatList.back() != 0.0f; // Final float indicates whether this chain loops to the first vertex

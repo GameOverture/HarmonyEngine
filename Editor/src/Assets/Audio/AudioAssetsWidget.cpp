@@ -10,8 +10,8 @@
 #include "Global.h"
 #include "AudioAssetsWidget.h"
 #include "ui_AudioAssetsWidget.h"
-
 #include "DlgInputName.h"
+#include "HyEngine.h"
 
 #include <QFile>
 #include <QJsonDocument>

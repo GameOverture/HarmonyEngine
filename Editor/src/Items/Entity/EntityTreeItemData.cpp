@@ -606,7 +606,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	}
 
 	// TWEENS - Make sure these Category names match HyGlobal's sm_TweenPropNames
-	if(IsFixtureItem() == false && IsLayoutItem() == false)
+	if(IsFixtureItem() == false && IsLayoutItem() == false && GetType() != ITEM_ActorMover)
 	{
 		m_pPropertiesModel->InsertCategory(-1, "Tween Position", QVariant(), true, "Start a positional tween from the currently selected frame");
 		m_pPropertiesModel->AppendProperty("Tween Position", "Destination", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "The target destination for the tween to reach", PROPERTIESACCESS_Mutable, -fRANGE, fRANGE, 1.0, "[", "]");

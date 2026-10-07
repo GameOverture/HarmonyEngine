@@ -13,24 +13,19 @@
 #include "HyEngine.h"
 
 HyActor2d::HyActor2d(HyEntity2d *pParent /*= nullptr*/) :
-	HyActor2d(HyLocomotionParams(), 0.0f, 0.0f, pParent)
+	HyActor2d(0.0f, 0.0f, HyLocomotionParams(), pParent)
 { }
 
-HyActor2d::HyActor2d(const HyLocomotionParams &locomotionInit, float fWidth, float fHeight, HyEntity2d *pParent /*= nullptr*/) :
+HyActor2d::HyActor2d(float fWidth, float fHeight, const HyLocomotionParams &locomotionInit, HyEntity2d *pParent /*= nullptr*/) :
 	HyEntity2d(pParent),
-	m_Locomotion(locomotionInit),
-	m_ActorFixture(nullptr) // This is simulated externally to the world via 'm_Locomotion'::UpdatePhysical
+	m_ActorMover(glm::ivec2(fWidth, fHeight), locomotionInit)
 {
-	SetSize(fWidth, fHeight);
 }
 
 HyActor2d::HyActor2d(HyActor2d &&donor) noexcept :
 	HyEntity2d(std::move(donor)),
-	m_Locomotion(donor.m_Locomotion),
-	m_ActorFixture(nullptr) // This is simulated externally to the world via 'm_Locomotion'::UpdatePhysical
+	m_ActorMover(donor.m_ActorMover)
 {
-	m_ActorFixture = donor.m_ActorFixture;
-	m_ActorFixture.SetPhysicsAllowed(false);
 }
 
 /*virtual*/ HyActor2d::~HyActor2d(void)
@@ -46,18 +41,7 @@ HyActor2d &HyActor2d::operator=(HyActor2d &&donor) noexcept
 
 void HyActor2d::SetSize(float fWidth, float fHeight)
 {
-	if(fWidth <= 0.0f)
-		fWidth = HyEngine::InitValues().fPixelsPerMeter * 0.3f;
-	if(fHeight <= 0.0f)
-		fHeight = HyEngine::InitValues().fPixelsPerMeter * 2.0f;
-
-	// NOTE: explicitly set 'm_ActorFixture' in meters instead of pixels
-	fWidth *= sm_pScene->GetPpmInverse();
-	fHeight *= sm_pScene->GetPpmInverse();
-
-	float fRadius = (fWidth * 0.5f);
-	m_ActorFixture.SetAsCapsule(glm::vec2(0.0f, fRadius), glm::vec2(0.0f, fHeight - (fRadius * 2.0f)), fWidth * 0.5f);
-	m_ActorFixture.SetPhysicsAllowed(false); // Simulated externally to the world via 'm_Locomotion'::UpdatePhysical
+	m_ActorMover.SetSize(glm::ivec2(fWidth, fHeight));
 }
 
 bool HyActor2d::IsOnGround() const
@@ -67,12 +51,12 @@ bool HyActor2d::IsOnGround() const
 
 void HyActor2d::SetThrottle(glm::vec2 vThrottle)
 {
-	m_Locomotion.SetThrottle(vThrottle);
+	m_ActorMover.SetThrottle(vThrottle);
 }
 
 void HyActor2d::Jump()
 {
-	m_Locomotion.Jump();
+	m_ActorMover.Jump();
 	m_uiEntityAttribs |= ACTORATTRIB_IsAirborne;
 }
 
@@ -85,7 +69,7 @@ void HyActor2d::Jump()
 	b2QueryFilter pogoFilter = { HYCOLLISION_Actor, HYCOLLISION_Default | HYCOLLISION_Dynamic };
 	b2QueryFilter collideFilter = { HYCOLLISION_Actor, HYCOLLISION_Default | HYCOLLISION_Dynamic | HYCOLLISION_Actor }; // Mover overlap filter
 	b2QueryFilter castFilter = { HYCOLLISION_Actor, HYCOLLISION_Default | HYCOLLISION_Dynamic }; // Movers don't sweep against other movers, allows for soft collision
-	m_Locomotion.UpdatePhysical(IHyNode::sm_pScene->GetPhysicsWorld(), ptPos, bOnGround, m_ActorFixture.GetAsCapsule(), pogoFilter, collideFilter, castFilter);
+	m_ActorMover.Update(IHyNode::sm_pScene->GetPhysicsWorld(), ptPos, bOnGround, pogoFilter, collideFilter, castFilter);
 
 	ptPos *= sm_pScene->GetPixelsPerMeter();
 	pos.Set(ptPos);

@@ -513,7 +513,7 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 
 /*static*/ glm::ivec2 HyMath::TileMapPointToCell_HalfSquare(const glm::vec2 &ptLocal, const glm::ivec2 &vCellDimensions)
 {
-	int iRow = ptLocal.y / vCellDimensions.y;
+	int iRow = static_cast<int>(ptLocal.y / vCellDimensions.y);
 	float fOffset = (iRow & 1) ? 0.0f : vCellDimensions.x * 0.5f;
 	
 	return glm::ivec2((ptLocal.x - fOffset) / vCellDimensions.x, iRow);

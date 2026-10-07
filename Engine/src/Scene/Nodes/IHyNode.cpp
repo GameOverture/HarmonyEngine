@@ -88,12 +88,12 @@ IHyNode &IHyNode::operator=(IHyNode &&donor)
 	return *this;
 }
 
-int64_t IHyNode::GetTag() const
+HyTag IHyNode::GetTag() const
 {
 	return m_iTag;
 }
 
-void IHyNode::SetTag(int64_t iTag)
+void IHyNode::SetTag(HyTag iTag)
 {
 	m_iTag = iTag;
 }

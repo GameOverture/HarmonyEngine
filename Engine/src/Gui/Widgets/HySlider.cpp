@@ -56,17 +56,17 @@ void HySlider::Setup(HyOrientation eOrien, const HyUiPanelInit &barInitRef, cons
 	SetOrientation(eOrien);
 	if(eOrien == HYORIENT_Horizontal)
 	{
-		m_fBarSize = barInitRef.m_uiWidth;
-		m_fBarThickness = barInitRef.m_uiHeight;
-		m_fHandleSize = handleInitRef.m_uiHeight;
-		m_fHandleThickness = handleInitRef.m_uiWidth;
+		m_fBarSize = static_cast<float>(barInitRef.m_uiWidth);
+		m_fBarThickness = static_cast<float>(barInitRef.m_uiHeight);
+		m_fHandleSize = static_cast<float>(handleInitRef.m_uiHeight);
+		m_fHandleThickness = static_cast<float>(handleInitRef.m_uiWidth);
 	}
 	else
 	{
-		m_fBarSize = barInitRef.m_uiHeight;
-		m_fBarThickness = barInitRef.m_uiWidth;
-		m_fHandleSize = handleInitRef.m_uiWidth;
-		m_fHandleThickness = handleInitRef.m_uiHeight;
+		m_fBarSize = static_cast<float>(barInitRef.m_uiHeight);
+		m_fBarThickness = static_cast<float>(barInitRef.m_uiWidth);
+		m_fHandleSize = static_cast<float>(handleInitRef.m_uiWidth);
+		m_fHandleThickness = static_cast<float>(handleInitRef.m_uiHeight);
 	}
 
 	bar.Setup(barInitRef);
@@ -302,16 +302,16 @@ void HySlider::SetValueChangedCallback(std::function<void(HySlider *)> fpCallbac
 {
 	if(GetOrientation() == HYORIENT_Horizontal)
 	{
-		bar.SetSize(uiNewWidth, HyMath::Min(m_fBarThickness, static_cast<float>(uiNewHeight)));
-		handle.SetSize(HyMath::Min(m_fHandleThickness, static_cast<float>(uiNewWidth)), uiNewHeight);
+		bar.SetSize(static_cast<float>(uiNewWidth), HyMath::Min(m_fBarThickness, static_cast<float>(uiNewHeight)));
+		handle.SetSize(HyMath::Min(m_fHandleThickness, static_cast<float>(uiNewWidth)), static_cast<float>(uiNewHeight));
 
 		PositionHandle();
 		return glm::ivec2(bar.GetWidth(), handle.GetHeight());
 	}
 	else
 	{
-		bar.SetSize(HyMath::Min(m_fBarThickness, static_cast<float>(uiNewWidth)), uiNewHeight);
-		handle.SetSize(uiNewWidth, HyMath::Min(m_fHandleThickness, static_cast<float>(uiNewHeight)));
+		bar.SetSize(HyMath::Min(m_fBarThickness, static_cast<float>(uiNewWidth)), static_cast<float>(uiNewHeight));
+		handle.SetSize(static_cast<float>(uiNewWidth), HyMath::Min(m_fHandleThickness, static_cast<float>(uiNewHeight)));
 
 		PositionHandle();
 		return glm::ivec2(handle.GetWidth(), bar.GetHeight());

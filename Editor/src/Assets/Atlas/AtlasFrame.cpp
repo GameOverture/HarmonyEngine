@@ -11,6 +11,7 @@
 #include "AtlasFrame.h"
 #include "IManagerModel.h"
 #include "SpineModel.h"
+#include "HyEngine.h"
 
 AtlasFrame::AtlasFrame(ItemType eThisAssetType, // Might be either ITEM_AtlasFrame or ITEM_AtlasTileSet
 					   IManagerModel &modelRef,

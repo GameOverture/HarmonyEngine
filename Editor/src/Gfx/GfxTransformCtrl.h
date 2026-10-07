@@ -11,6 +11,7 @@
 #define GFXTRANSFORMCTRL_H
 
 #include "Global.h"
+#include "HyEngine.h"
 
 class IDrawExItem;
 class GfxGrabPointModel;

@@ -108,7 +108,9 @@ public:
 	QUuid FindGuiLayoutUuid(EntityTreeItemData *pItem) const;
 	void RefreshGuiLayout(); // Take the current heirarchy in the model and set it as m_GuiLayout
 
+	// Does not retrieve the root entity data. childListOut contains the fused items
 	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut, QList<EntityTreeItemData *> &layoutListOut) const;
+
 	void GetSelectedTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut) const;
 	EntityTreeItemData *FindTreeItemData(QUuid uuid) const;
 

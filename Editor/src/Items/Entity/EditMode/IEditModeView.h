@@ -12,6 +12,7 @@
 
 #include "Global.h"
 #include "IEditModeModel.h"
+#include "HyEngine.h"
 
 class IEditModeView : public HyEntity2d
 {

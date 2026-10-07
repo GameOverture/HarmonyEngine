@@ -104,10 +104,10 @@ bool HyTileMapBatch::WriteTileMapTexel(glm::ivec2 ptChunkCellCoord, uint16_t uiT
 {
 	if(m_bDirty)
 	{
-		GLint xoffset;
- 		GLint yoffset;
- 		GLsizei width;
- 		GLsizei height;
+		//GLint xoffset;
+ 	//	GLint yoffset;
+ 	//	GLsizei width;
+ 	//	GLsizei height;
 		sm_pHyRenderer->WriteTexels(m_hTileMap);
 		m_bDirty = false;
 	}

@@ -15,6 +15,7 @@
 #include "Project.h"
 #include "EntityTreeItemData.h"
 #include "TileMapModel.h"
+#include "HyEngine.h"
 
 #include <QPainter>
 

@@ -11,6 +11,7 @@
 #define IDRAW_H
 
 #include "Global.h"
+#include "HyEngine.h"
 
 class ProjectItemData;
 

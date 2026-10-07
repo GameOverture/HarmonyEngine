@@ -11,6 +11,7 @@
 #define GfxMarqueeCtrl_H
 
 #include "Global.h"
+#include "HyEngine.h"
 
 class GfxMarqueeCtrl : public HyEntity2d
 {

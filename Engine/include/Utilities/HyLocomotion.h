@@ -29,31 +29,27 @@ struct HyLocomotionParams
 	HyLocomotionParams();
 	HyLocomotionParams(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration);
 	HyLocomotionParams(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration, float fJumpSpeed, float fMoverGravity, float fFriction, float fAirSteer);
+
+	void Setup(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration);
+	void SetupPhys(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration, float fJumpSpeed, float fMoverGravity, float fFriction, float fAirSteer);
 };
 
 class HyLocomotion2d
 {
-	HyLocomotionParams		m_Params;
+protected:
+	float					m_fMaxSpeed;		// Meters per second
+	float					m_fMinSpeed;		// Meters per second
+	float					m_fAccel;			// Meters per second squared
+	float					m_fDecel;			// Meters per second squared
 
-	// Simple + Physical
 	glm::vec2				m_vThrottle;
 	glm::vec2				m_vVelocity;
-
-	// Physical
-	float					m_fPogoVelocity;
-
-public:
-	static constexpr int	m_planeCapacity = 8;
-	b2CollisionPlane		m_planes[m_planeCapacity] = {};
-	int						m_planeCount;
 
 public:
 	HyLocomotion2d();
 	HyLocomotion2d(const HyLocomotionParams &initRef);
 	HyLocomotion2d(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration);
-
-	HyLocomotion2d(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration, float fJumpSpeed, float fMoverGravity, float fFriction, float fAirSteer);
-	~HyLocomotion2d();
+	virtual ~HyLocomotion2d();
 
 	bool IsMoving() const;
 	glm::vec2 GetVelocity() const;
@@ -61,9 +57,7 @@ public:
 	void SetVelocityX(float fVelocityX);
 	void SetVelocityY(float fVelocityY);
 
-	void Setup(const HyLocomotionParams &initRef);
-	void SetupSimple(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration);
-	void SetupPhysical(float fMinSpeed, float fMaxSpeed, float fAcceleration, float fDeceleration, float fJumpSpeed, float fMoverGravity, float fFriction, float fAirSteer);
+	virtual void Setup(const HyLocomotionParams &initRef);
 
 	void GoUp();							// Should be invoked every frame going UP is desired. Called before Update()
 	void GoDown();							// Should be invoked every frame going DOWN is desired. Called before Update()
@@ -71,15 +65,10 @@ public:
 	void GoRight();							// Should be invoked every frame going RIGHT is desired. Called before Update()
 	void SetThrottle(glm::vec2 vThrottle);
 
-	void Jump();
 	void StopX();
 	void StopY();
 
-	void UpdateSimple();					// Should be invoked every frame after all Go*() functions have been called
-	void UpdatePhysical(b2WorldId hWorld, glm::vec2 &ptPosInOut, bool &bOnGroundInOut, const b2Capsule &moverRef, b2QueryFilter pogoFilter, b2QueryFilter collideFilter, b2QueryFilter castFilter);	// Should be invoked every frame after all Go*() functions have been called - Uses the active physics simulation
-
-private:
-	static bool PlaneResultFcn(b2ShapeId shapeId, const b2PlaneResult *planeResult, void *context);
+	virtual void Update();					// Should be invoked every frame after all Go*() functions have been called
 };
 
 #endif /* HyLocomotion_h__ */

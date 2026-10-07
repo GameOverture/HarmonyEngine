@@ -177,11 +177,11 @@ b2Capsule HyShape2d::GetAsCapsule() const
 		//       If this function is invoked it is ass
 		if(floatList.size() & 1)
 			return "Polygon took odd number of floats";
-		int iNumVerts = floatList.size() / 2;
-		if(iNumVerts > B2_MAX_POLYGON_VERTICES)
+		size_t uiNumVerts = floatList.size() / 2;
+		if(uiNumVerts > B2_MAX_POLYGON_VERTICES)
 			return "Too many vertices to deserialize a polygon. Max is " + std::to_string(B2_MAX_POLYGON_VERTICES);
 		std::vector<glm::vec2> vertList;
-		vertList.reserve(iNumVerts);
+		vertList.reserve(uiNumVerts);
 		for(int i = 0; i < floatList.size(); i += 2)
 			vertList.emplace_back(glm::vec2(floatList[i], floatList[i + 1]));
 		SetAsPolygon(vertList);
@@ -387,7 +387,7 @@ bool HyShape2d::SetAsPolygon(const glm::vec2 *pVertices, uint32 uiCount, const b
 {
 	HyAssert(uiCount <= B2_MAX_POLYGON_VERTICES, "HyShape2d::SetAsPolygon took too many vertices (" << uiCount << "). Max is " << B2_MAX_POLYGON_VERTICES);
 	b2Vec2 b2Verts[B2_MAX_POLYGON_VERTICES];
-	for(int i = 0; i < uiCount; ++i)
+	for(uint32 i = 0; i < uiCount; ++i)
 	{
 		b2Verts[i].x = pVertices[i].x;
 		b2Verts[i].y = pVertices[i].y;

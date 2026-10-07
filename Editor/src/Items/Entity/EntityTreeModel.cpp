@@ -67,7 +67,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 	
 		case ENTBASECLASS_HyActor2d:
 			if(fusedItemArray.empty() || i >= fusedItemArray.size())
-				m_FusedTreeItemData[i] = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "m_ActorFixture", ITEM_ActorMover, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
+				m_FusedTreeItemData[i] = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "m_ActorMover", ITEM_ActorMover, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
 			else
 				m_FusedTreeItemData[i] = m_ModelRef.Cmd_AddExistingItem(fusedItemArray[i].toObject(), ENTTYPE_FusedItem, 0); //new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
 			break;

@@ -83,12 +83,12 @@ void HyDividerLine::SetThickness(float fThickness)
 {
 	if(GetOrientation() == HYORIENT_Horizontal)
 	{
-		m_Line.SetAsLineSegment(0, glm::vec2(-static_cast<float>(uiNewWidth), 0.0f), glm::vec2(uiNewWidth, 0.0f), uiNewHeight);
+		m_Line.SetAsLineSegment(0, glm::vec2(-static_cast<float>(uiNewWidth), 0.0f), glm::vec2(uiNewWidth, 0.0f), static_cast<float>(uiNewHeight));
 		m_fLength = static_cast<float>(uiNewWidth);
 	}
 	else
 	{
-		m_Line.SetAsLineSegment(0, glm::vec2(0.0f, -static_cast<float>(uiNewHeight)), glm::vec2(0.0f, uiNewHeight), uiNewWidth);
+		m_Line.SetAsLineSegment(0, glm::vec2(0.0f, -static_cast<float>(uiNewHeight)), glm::vec2(0.0f, uiNewHeight), static_cast<float>(uiNewWidth));
 		m_fLength = static_cast<float>(uiNewHeight);
 	}
 

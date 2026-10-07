@@ -13,6 +13,7 @@
 #include "Global.h"
 #include "IEditModeModel.h"
 #include "GfxGrabPointModel.h"
+#include "HyEngine.h"
 
 enum VectorAction
 {

@@ -583,6 +583,14 @@ void EntityWidget::SetExtrapolatedProperties()
 				if(iBaseCategoryIndex >= 0)
 					ui->propertyTree->setRowHidden(iBaseCategoryIndex, QModelIndex(), eCurBaseClassType != iBaseClassType);
 			}
+
+			int iTimelineCategoryIndex = static_cast<PropertiesTreeModel *>(ui->propertyTree->model())->FindCategoryIndex("Timeline");
+			if(iTimelineCategoryIndex >= 0)
+			{
+				bool bHide = false == static_cast<EntityModel *>(m_ItemRef.GetModel())->IsAnimStatesEnabled();
+				ui->propertyTree->setRowHidden(iTimelineCategoryIndex, QModelIndex(), bHide);
+			}
+			
 		}
 
 		ui->lblSelectedItemIcon->setVisible(true);

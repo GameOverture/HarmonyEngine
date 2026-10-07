@@ -205,7 +205,7 @@ void HyPanel::Setup(const HyUiPanelInit &initRef)
 		break;
 	}
 
-	SetSize(initRef.m_uiWidth, initRef.m_uiHeight);
+	SetSize(static_cast<float>(initRef.m_uiWidth), static_cast<float>(initRef.m_uiHeight));
 }
 
 float HyPanel::GetWidth(float fPercent /*= 1.0f*/) const

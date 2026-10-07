@@ -169,9 +169,9 @@ HyScrollBar::HyScrollBar(HyOrientation eOrientation, const HyUiPanelInit &posBtn
 void HyScrollBar::Setup(HyOrientation eOrientation, uint32 uiDiameter)
 {
 	if(eOrientation == HYORIENT_Horizontal)
-		Setup(eOrientation, HyUiPanelInit(uiDiameter, uiDiameter, 0), HyUiPanelInit(uiDiameter, uiDiameter, 0), HyUiPanelInit(uiDiameter * 2.0f, uiDiameter, 0), HyUiPanelInit(uiDiameter * 0.9f, uiDiameter, 0));
+		Setup(eOrientation, HyUiPanelInit(uiDiameter, uiDiameter, 0), HyUiPanelInit(uiDiameter, uiDiameter, 0), HyUiPanelInit(uiDiameter * 2, uiDiameter, 0), HyUiPanelInit(static_cast<uint32_t>(uiDiameter * 0.9f), uiDiameter, 0));
 	else
-		Setup(eOrientation, HyUiPanelInit(uiDiameter, uiDiameter, 0), HyUiPanelInit(uiDiameter, uiDiameter, 0), HyUiPanelInit(uiDiameter, uiDiameter * 2.0f, 0), HyUiPanelInit(uiDiameter, uiDiameter * 0.9f, 0));
+		Setup(eOrientation, HyUiPanelInit(uiDiameter, uiDiameter, 0), HyUiPanelInit(uiDiameter, uiDiameter, 0), HyUiPanelInit(uiDiameter, uiDiameter * 2, 0), HyUiPanelInit(uiDiameter, static_cast<uint32_t>(uiDiameter * 0.9f), 0));
 }
 
 void HyScrollBar::Setup(HyOrientation eOrientation, const HyUiPanelInit &posBtnInit, const HyUiPanelInit &negBtnInit, const HyUiPanelInit &barInit, const HyUiPanelInit &handleInit)
@@ -262,13 +262,13 @@ void HyScrollBar::SetMetrics(uint32 uiLength, uint32 uiClientTotalSize, uint32 u
 
 	if(m_eOrientation == HYORIENT_Horizontal)
 	{
-		m_BarPanel.SetPosition(uiDiameter, 0);
+		m_BarPanel.SetPosition(static_cast<float>(uiDiameter), 0.0f);
 		m_PosBtn.pos.Set(uiLength - uiDiameter, 0);
 		m_NegBtn.pos.Set(0, 0);
 	}
 	else // HYORIENT_Vertical
 	{
-		m_BarPanel.SetPosition(0, uiDiameter);
+		m_BarPanel.SetPosition(0.0f, static_cast<float>(uiDiameter));
 		m_PosBtn.pos.Set(0, 0);
 		m_NegBtn.pos.Set(0, uiLength - uiDiameter);
 	}

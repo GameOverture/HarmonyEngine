@@ -890,7 +890,7 @@ void HyOpenGL::CompileShader(HyShader *pShader, HyShaderType eType)
 
 	// Compile the shader from the passed in source code
 	std::vector<const char *> srcPtrList = pShader->GetSourceCodePtrs(eType);
-	glShaderSource(iShaderHandle, srcPtrList.size(), srcPtrList.data(), NULL);
+	glShaderSource(iShaderHandle, static_cast<GLsizei>(srcPtrList.size()), srcPtrList.data(), NULL);
 	HyErrorCheck_OpenGL("HyOpenGLShader:CompileFromString", "glShaderSource");
 
 	glCompileShader(iShaderHandle);

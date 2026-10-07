@@ -27,11 +27,7 @@ class IHyNode
 protected:
 	static HyScene *				sm_pScene;
 
-#if HY_64BIT_USER_TAGS
-	int64_t							m_iTag;	// This 'tag' isn't used by the engine, and solely used for whatever purpose the application wants (tracking, unique ID, etc.)
-#else
-	int32_t							m_iTag;	// This 'tag' isn't used by the engine, and solely used for whatever purpose the application wants (tracking, unique ID, etc.)
-#endif
+	HyTag							m_iTag;	// This 'tag' isn't used by the engine, and solely used for whatever purpose the application wants (tracking, unique ID, etc.)
 
 public:
 	// These flags describe this Node's C++ object type and are set upon construction, and are then immutable
@@ -91,8 +87,8 @@ public:
 	IHyNode &operator=(const IHyNode &rhs);
 	IHyNode &operator=(IHyNode &&donor);
 
-	int64_t GetTag() const;
-	void SetTag(int64_t iTag);
+	HyTag GetTag() const;
+	void SetTag(HyTag iTag);
 
 	HyType GetType() const;
 	bool Is2D() const;

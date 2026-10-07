@@ -46,7 +46,6 @@ void TextDraw::SetTextState(uint uiStateIndex)
 
 	// Upload texture to gfx api
 	HyImageInfo loadHints;
-	uint32 uiPixelDataSize;
 	loadHints.SetWidth(atlasDimensions.width());
 	loadHints.SetHeight(atlasDimensions.height());
 	loadHints.SetNumChannels(4);

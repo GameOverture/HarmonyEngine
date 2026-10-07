@@ -11,6 +11,7 @@
 #define HARMONYCONNECTION_H
 
 #include "Global.h"
+#include "HyEngine.h"
 
 #include <QObject>
 #include <QAction>

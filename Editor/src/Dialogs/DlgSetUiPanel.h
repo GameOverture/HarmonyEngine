@@ -10,6 +10,9 @@
 #ifndef DLGSETUIPANEL_H
 #define DLGSETUIPANEL_H
 
+#include "Global.h"
+#include "HyEngine.h"
+
 #include <QDialog>
 
 class QButton;

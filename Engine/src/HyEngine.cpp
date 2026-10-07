@@ -316,6 +316,18 @@ bool HyEngine::PollPlatformApi()
 	return sm_pInstance->m_Audio;
 }
 
+/*static*/ float HyEngine::GetPixelsPerMeter()
+{
+	HyAssert(sm_pInstance != nullptr, "HyEngine::GetPixelsPerMeter() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Scene.GetPixelsPerMeter();
+}
+
+/*static*/ float HyEngine::GetPpmInverse()
+{
+	HyAssert(sm_pInstance != nullptr, "HyEngine::GetPpmInverse() was invoked before engine has been initialized.");
+	return sm_pInstance->m_Scene.GetPpmInverse();
+}
+
 /*static*/ HyDiagnostics &HyEngine::Diagnostics()
 {
 	HyAssert(sm_pInstance != nullptr, "HyEngine::Diagnostics() was invoked before engine has been initialized.");

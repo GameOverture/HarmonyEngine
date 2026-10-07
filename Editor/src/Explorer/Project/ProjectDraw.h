@@ -11,6 +11,7 @@
 #define PROJECTDRAW_H
 
 #include "Global.h"
+#include "HyEngine.h"
 
 class CheckerGrid : public HyPrimitive2d
 {

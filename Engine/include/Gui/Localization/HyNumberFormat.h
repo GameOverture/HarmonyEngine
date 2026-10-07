@@ -98,9 +98,9 @@ public:
 	// Only used when 'HYFMTROUNDING_None'. Values will clamp to [0-15]
 	HyNumberFormat SetFractionPrecision(int32 iMinFractionPlaces = 0, int32 iMaxFractionPlaces = 6);
 
-	// Whether to optionally use the minor fractional symbol when formatting currencies if the value is less than 1 integer unit (aka 50¢)
+	// Whether to optionally use the minor fractional symbol when formatting currencies if the value is less than 1 integer unit (aka 50 cents)
 	bool IsUsingMinorCurrencySymbol() const;
-	// Whether to optionally use the minor fractional symbol when formatting currencies if the value is less than 1 integer unit (aka 50¢)
+	// Whether to optionally use the minor fractional symbol when formatting currencies if the value is less than 1 integer unit (aka 50 cents)
 	HyNumberFormat SetUsingMinorCurrencySymbol(bool bUseMinorCurrencySymbol);
 
 	// Whether to optionally format floating-point values using scientific notation

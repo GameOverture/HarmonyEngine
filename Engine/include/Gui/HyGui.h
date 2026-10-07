@@ -25,8 +25,8 @@ class HyGui : public IHyGuiBase
 	friend class HyInput;
 
 	// Global UI Container members
-	static HyGui *					sm_pCurModalContainer;	// If any container is considered 'modal' then only that container may accept input
-	static std::vector<HyGui *>		sm_pContainerList;
+	static HyGui *							sm_pCurModalContainer;	// If any container is considered 'modal' then only that container may accept input
+	static std::vector<HyGui *>				sm_pContainerList;
 
 protected:
 	bool									m_bInputAllowed;

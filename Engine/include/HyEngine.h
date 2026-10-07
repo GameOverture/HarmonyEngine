@@ -109,6 +109,8 @@ public:
 	static void PauseGame(bool bPause);
 	static HyInput &Input();
 	static HyAudioCore &Audio();
+	static float GetPixelsPerMeter();
+	static float GetPpmInverse();
 	static HyDiagnostics &Diagnostics();
 	static HyShaderHandle DefaultShaderHandle(HyType eType);
 	static std::string DataDir();

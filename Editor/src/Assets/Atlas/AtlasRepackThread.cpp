@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "AtlasRepackThread.h"
 #include "MainWindow.h"
+#include "HyEngine.h"
 
 #include <QPainter>
 #include <QImageWriter>

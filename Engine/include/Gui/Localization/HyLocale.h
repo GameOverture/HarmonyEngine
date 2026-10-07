@@ -75,7 +75,7 @@ public:
 	static void Imbue(std::string sLangCountryCode, std::string sIso4217Code); // sLangCountryCode: a combined ISO639 and ISO3166 code delimited with a '-' or a '_'
 
 	// Once specified, HyNumberFormat's used in Money_Format() can optionally use the minor
-	// fractional symbol if the value is less than 1 integer unit (aka 50¢)
+	// fractional symbol if the value is less than 1 integer unit (aka 50 cents)
 	// sMinorCurrencyUnitUtf8: UTF-8 string representing the minor currency symbol to use
 	static void SetMinorCurrencySymbol(std::string sMinorCurrencySymbolUtf8);
 

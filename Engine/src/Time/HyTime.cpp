@@ -63,7 +63,7 @@ double HyTime::GetFrameDelta() const
 void HyTime::SetUpdatesPerSec(uint32 uiUpdatesPerSec)
 {
 #ifdef HY_PLATFORM_GUI
-	uiUpdatesPerSec = 0; // Disable throttled update on GUI
+	uiUpdatesPerSec = 0; // Disable throttled update on editor
 #endif
 
 	if(uiUpdatesPerSec == 0)
@@ -114,7 +114,7 @@ double HyTime::GetTotalElapsedTime() const
 #elif defined(HY_USE_SDL2)
 	return static_cast<double>(SDL_GetPerformanceCounter()) / static_cast<double>(SDL_GetPerformanceFrequency());
 #else
-	return std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	return static_cast<double>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 #endif
 }
 

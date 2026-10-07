@@ -11,6 +11,7 @@
 #define GfxGrabPointView_H
 
 #include "Global.h"
+#include "HyEngine.h"
 
 class GfxGrabPointModel;
 

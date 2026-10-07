@@ -11,6 +11,7 @@
 #define TILEMAPGRID_H
 
 #include "Global.h"
+#include "HyEngine.h"
 
 class TileMapGrid : public HyPrimitive2d
 {

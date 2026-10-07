@@ -10,13 +10,14 @@
 #ifndef HyStdAfx_h__
 #define HyStdAfx_h__
 
+// TODO: Get rid of this _SILENCE #define - Upgrade RapidJson to a newer release version once it becomes available
+#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
+
 // Order of these #includes matter!
 #include "Compilers/HyCompiler.h"
 #include "Platforms/HyPlatform.h"
 #include "HyFlags.h"
-
-// TODO: Get rid of this #define - Upgrade RapidJson to a newer release version once it becomes available
-#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
 
 #include "vendor/box2d/include/box2d/box2d.h"
 
@@ -67,6 +68,13 @@ typedef uint32 HyLayoutHandle;
 // Default 32bit user tags fill a memory fragmented gap and don't contribute to increasing the memory footprint of nodes
 // Enabling 64bit user tags increase the memory footprint of every node/instance by 8 bytes due to alignment (on x64 builds)
 #define HY_64BIT_USER_TAGS 0
+
+#if HY_64BIT_USER_TAGS
+	typedef int64_t HyTag;
+#else
+	typedef int32_t HyTag;
+#endif
+
 
 #define HY_SIZEFLAG_EXPAND (1 << 0)
 #define HY_SIZEFLAG_SHRINK (1 << 1)

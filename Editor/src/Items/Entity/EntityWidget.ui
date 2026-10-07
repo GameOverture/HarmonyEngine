@@ -27,7 +27,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Base Class   </string>
+          <string>Base Class: </string>
          </property>
         </widget>
        </item>
@@ -43,6 +43,13 @@
        </item>
        <item>
         <widget class="QLineEdit" name="txtCustomBaseClass"/>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="chkEnableAnimStates">
+         <property name="text">
+          <string>Enable Animation States</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -599,13 +606,6 @@
           <property name="spacing">
            <number>1</number>
           </property>
-          <item>
-           <widget class="QCheckBox" name="chkEnableAnimStates">
-            <property name="text">
-             <string>Enable Animation States</string>
-            </property>
-           </widget>
-          </item>
           <item>
            <spacer name="horizontalSpacer_3">
             <property name="orientation">

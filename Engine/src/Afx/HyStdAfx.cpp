@@ -33,9 +33,9 @@ HyImageInfo::HyImageInfo(uint16 uiWidth, uint16 uiHeight, HyImageType eType, boo
 
 HyImageInfo::HyImageInfo(uint64 uiBucketId) :
 	m_uiWidth((uiBucketId &           0xFFFF000000000000) >> 48),
-	m_uiHeight((uiBucketId &          0x0000FFFF00000000) >> 32),
+	m_uiHeight(static_cast<uint16>((uiBucketId &          0x0000FFFF00000000) >> 32)),
 	m_uiType((uiBucketId &            0x00000000FF000000) >> 24),
-	m_uiFlipAndChannels((uiBucketId & 0x0000000000FF0000) >> 16),
+	m_uiFlipAndChannels(static_cast<uint8>((uiBucketId & 0x0000000000FF0000) >> 16)),
 	m_uiFormat((uiBucketId &          0x000000000000FF00) >> 8),
 	m_uiFormatParam(uiBucketId &      0x00000000000000FF)
 { }

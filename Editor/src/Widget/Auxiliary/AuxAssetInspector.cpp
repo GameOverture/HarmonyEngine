@@ -321,7 +321,7 @@ void AuxAssetInspector::OnPanTimer()
 	if(m_uiPanFlags & PAN_DOWN)
 		m_PanLocomotion.GoDown();
 
-	m_PanLocomotion.UpdateSimple();
+	m_PanLocomotion.Update();
 
 	if(m_PanLocomotion.IsMoving())
 	{

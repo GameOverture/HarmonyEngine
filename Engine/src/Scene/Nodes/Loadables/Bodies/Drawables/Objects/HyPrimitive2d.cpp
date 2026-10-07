@@ -54,9 +54,9 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 		if(layerRef.m_uiNumVerts > 0)
 		{
 			std::vector<b2Vec2> pointList;
-			for(int i = 0; i < layerRef.m_uiNumVerts; ++i)
-				pointList.push_back({ layerRef.m_pVertBuffer[i].x, layerRef.m_pVertBuffer[i].y });
-			aabb = b2MakeAABB(pointList.data(), pointList.size(), 0.0f);
+			for(uint32 j = 0; j < layerRef.m_uiNumVerts; ++j)
+				pointList.push_back({ layerRef.m_pVertBuffer[j].x, layerRef.m_pVertBuffer[j].y });
+			aabb = b2MakeAABB(pointList.data(), static_cast<int>(pointList.size()), 0.0f);
 		}
 	}
 	if(b2IsValidAABB(aabb) == false)
@@ -151,7 +151,7 @@ int32 HyPrimitive2d::SetAsLineSegment(int32 iLayerIndex, const glm::vec2 &pt1, c
 	std::vector<glm::vec2> vertList;
 	vertList.push_back(pt1);
 	vertList.push_back(pt2);
-	AssembleLineChain(iLayerIndex, vertList.data(), vertList.size(), false);
+	AssembleLineChain(iLayerIndex, vertList.data(), static_cast<uint32>(vertList.size()), false);
 
 	Load();
 	return iLayerIndex;
@@ -186,7 +186,7 @@ int32 HyPrimitive2d::SetAsLineChain(int32 iLayerIndex, const glm::vec2 *pVertice
 
 int32 HyPrimitive2d::SetAsLineChain(int32 iLayerIndex, const std::vector<glm::vec2> &verticesList, bool bLoop, float fLineThickness)
 {
-	return SetAsLineChain(iLayerIndex, verticesList.data(), verticesList.size(), bLoop, fLineThickness);
+	return SetAsLineChain(iLayerIndex, verticesList.data(), static_cast<uint32>(verticesList.size()), bLoop, fLineThickness);
 }
 
 int32 HyPrimitive2d::SetAsLineChain(int32 iLayerIndex, const HyChainData &chainData, float fLineThickness)
@@ -229,7 +229,7 @@ int32 HyPrimitive2d::SetAsFixture(int32 iLayerIndex, const IHyFixture2d &fixture
 		std::vector<glm::vec2> vertList;
 		for(int32 i = 0; i < static_cast<const HyShape2d &>(fixtureRef).GetAsPolygon().count; ++i)
 			vertList.emplace_back(static_cast<const HyShape2d &>(fixtureRef).GetAsPolygon().vertices[i].x, static_cast<const HyShape2d &>(fixtureRef).GetAsPolygon().vertices[i].y);
-		AssemblePolygon(iLayerIndex, vertList.data(), vertList.size());
+		AssemblePolygon(iLayerIndex, vertList.data(), static_cast<uint32>(vertList.size()));
 		break; }
 
 	case HYFIXTURE_Capsule:
@@ -295,7 +295,7 @@ int32 HyPrimitive2d::SetAsPolygon(int32 iLayerIndex, const glm::vec2 *pVertexArr
 
 int32 HyPrimitive2d::SetAsPolygon(int32 iLayerIndex, const std::vector<glm::vec2> &verticesList, float fOutlineThickness)
 {
-	return SetAsPolygon(iLayerIndex, verticesList.data(), verticesList.size(), fOutlineThickness);
+	return SetAsPolygon(iLayerIndex, verticesList.data(), static_cast<uint32>(verticesList.size()), fOutlineThickness);
 }
 
 int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, float fWidth, float fHeight, float fOutlineThickness )
@@ -309,7 +309,7 @@ int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, float fWidth, float fHeight, fl
 	verticesList.emplace_back(fWidth * 0.5f, fHeight * 0.5f);
 	verticesList.emplace_back(-fWidth * 0.5f, fHeight * 0.5f);
 
-	return SetAsPolygon(iLayerIndex, verticesList.data(), verticesList.size(), fOutlineThickness);
+	return SetAsPolygon(iLayerIndex, verticesList.data(), static_cast<uint32>(verticesList.size()), fOutlineThickness);
 }
 
 int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, const HyRect &rect, float fOutlineThickness)
@@ -326,7 +326,7 @@ int32 HyPrimitive2d::SetAsBox(int32 iLayerIndex, const HyRect &rect, float fOutl
 	verticesList.emplace_back(boxPoly.vertices[2].x, boxPoly.vertices[2].y);
 	verticesList.emplace_back(boxPoly.vertices[3].x, boxPoly.vertices[3].y);
 
-	return SetAsPolygon(iLayerIndex, verticesList.data(), verticesList.size(), fOutlineThickness);
+	return SetAsPolygon(iLayerIndex, verticesList.data(), static_cast<uint32>(verticesList.size()), fOutlineThickness);
 }
 
 int32 HyPrimitive2d::SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, float fOutlineThickness)
@@ -559,7 +559,7 @@ void HyPrimitive2d::RemoveAllLayers()
 			layerColor.y *= layerRef.m_Color.GetGreenF();
 			layerColor.z *= layerRef.m_Color.GetBlueF();
 			layerColor.a *= layerRef.m_fAlpha;
-			for(int iVertIndex = 0; iVertIndex < layerRef.m_uiNumVerts; ++iVertIndex)
+			for(uint32 iVertIndex = 0; iVertIndex < layerRef.m_uiNumVerts; ++iVertIndex)
 			{
 				glm::vec2 ptVert = layerRef.m_pVertBuffer[iVertIndex] + layerRef.m_vOffset;
 				vertexBufferRef.AppendVertexData(&ptVert, sizeof(glm::vec2));

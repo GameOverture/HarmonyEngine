@@ -639,7 +639,7 @@ QString EntityModel::GenerateSrc_MemberVariables() const
 	EntityTreeItemData *pCurArray = nullptr;
 	for(EntityTreeItemData *pItem : itemList)
 	{
-		if(pItem->IsLayoutItem() || pItem->GetType() == ITEM_PrimLayer)
+		if(pItem->GetEntType() == ENTTYPE_FusedItem || pItem->IsLayoutItem() || pItem->GetType() == ITEM_PrimLayer)
 			continue;
 
 		if(pCurArray)
@@ -684,6 +684,9 @@ QString EntityModel::GenerateSrc_AccessorDecl() const
 	QStringList arrayList;
 	for(EntityTreeItemData *pItem : itemList)
 	{
+		if(pItem->GetEntType() == ENTTYPE_FusedItem)
+			continue;
+
 		QString sCodeName = pItem->GetCodeName();
 		if(sCodeName.startsWith("m_"))
 			sCodeName.remove(0, 2);
@@ -720,7 +723,7 @@ QString EntityModel::GenerateSrc_AccessorDefinition(QString sClassName) const
 	QStringList arrayList;
 	for(EntityTreeItemData *pItem : itemList)
 	{
-		if(pItem->IsLayoutItem() || pItem->GetEntType() == ENTTYPE_SubItem)
+		if(pItem->GetEntType() == ENTTYPE_FusedItem || pItem->IsLayoutItem() || pItem->GetEntType() == ENTTYPE_SubItem)
 			continue;
 
 		QString sCodeName = pItem->GetCodeName();
@@ -817,7 +820,7 @@ QString EntityModel::GenerateSrc_MemberInitializerList() const
 	EntityTreeItemData *pCurArray = nullptr;
 	for(EntityTreeItemData *pItem : itemList)
 	{
-		if(pItem->IsLayoutItem() || pItem->GetEntType() == ENTTYPE_SubItem)
+		if(pItem->GetEntType() == ENTTYPE_FusedItem || pItem->IsLayoutItem() || pItem->GetEntType() == ENTTYPE_SubItem)
 			continue;
 
 		if(pCurArray)
@@ -1859,6 +1862,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(bool &bVertListDeclaredRe
 	itemSpecificFileDataOut.m_Meta.insert("customBaseClass", GetCustomBaseClass());
 	itemSpecificFileDataOut.m_Meta.insert("codeName", m_TreeModel.GetRootTreeItemData()->GetCodeName());
 	itemSpecificFileDataOut.m_Meta.insert("framesPerSecond", GetFramesPerSecond());
+	itemSpecificFileDataOut.m_Meta.insert("ctor", m_CtorKeyFramesMap[m_TreeModel.GetRootTreeItemData()]);
 
 	QList<EntityTreeItemData *> fusedItemList = m_TreeModel.GetAllFusedItemData();
 	QJsonArray fusedItemArray;

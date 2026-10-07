@@ -580,7 +580,7 @@ void HyGui::ScrollTo(float fVertScrollPos, float fHorzScrollPos)
 /*virtual*/ void HyGui::OnUpdate() /*override final*/
 {
 	if(IsSizeDirty())
-		Resize(panel.GetWidth(), panel.GetHeight());
+		Resize(static_cast<uint32_t>(panel.GetWidth()), static_cast<uint32_t>(panel.GetHeight()));
 
 	if(m_fElapsedTime > 0.0f)
 	{
@@ -628,7 +628,7 @@ void HyGui::ScrollTo(float fVertScrollPos, float fHorzScrollPos)
 
 /*virtual*/ glm::ivec2 HyGui::OnResize(uint32 uiNewWidth, uint32 uiNewHeight) /*override*/
 {
-	panel.SetSize(uiNewWidth, uiNewHeight);
+	panel.SetSize(static_cast<float>(uiNewWidth), static_cast<float>(uiNewHeight));
 
 	int32 iNewWidth = static_cast<int32>(panel.GetWidth());
 	int32 iNewHeight = static_cast<int32>(panel.GetHeight());

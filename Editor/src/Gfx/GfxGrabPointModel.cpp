@@ -10,6 +10,7 @@
 #include "Global.h"
 #include "GfxGrabPointModel.h"
 #include "GfxGrabPointView.h"
+#include "HyEngine.h"
 
 #define GRABPOINT_SELECT_RADIUS		6.0f	// In world units
 
