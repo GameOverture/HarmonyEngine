@@ -35,24 +35,22 @@ class GfxGrabPointModel
 {
 	GrabPointType				m_eType;
 	glm::vec2					m_ptPosition;
-	glm::vec2					m_vOffset;
 	glm::vec2					m_ptCachePos; // Used to cache the position of the grab point when it is selected, so that it can be used for delta calculations during dragging
 
 public:
 	GfxGrabPointModel();
 	GfxGrabPointModel(GrabPointType eType);
-	GfxGrabPointModel(GrabPointType eType, glm::vec2 ptPosition);
+	GfxGrabPointModel(GrabPointType eType, glm::vec2 ptWorldPosition);
 	~GfxGrabPointModel();
 
 	void SetType(GrabPointType eType);
 	void SetPos(glm::vec2 ptWorldPosition);
-	void Set(GrabPointType eType, glm::vec2 ptPosition);
+	void Set(GrabPointType eType, glm::vec2 ptWorldPosition);
 
 	glm::vec2 GetCachePos() const;
 	void SetCachePos();
 
 	glm::vec2 GetPos() const;
-	glm::vec2 GetCameraPos() const;
 	float GetRadius() const;
 	bool IsMouseHover() const;
 

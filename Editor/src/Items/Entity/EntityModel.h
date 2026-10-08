@@ -45,7 +45,6 @@ class EntityModel : public IModel
 
 	// These maps store the CONSTRUCTOR property data for the entire entity
 	// HACK: These m_Ctor* member variables are declared before 'm_TreeModel' because its constructor needs to use/initialize these maps
-	QJsonObject												m_CtorRootEntityList[NUM_ENTBASECLASSTYPES];
 	QMap<EntityTreeItemData *, QJsonObject>					m_CtorKeyFramesMap;			// Store properties and tween values
 	QMap<EntityTreeItemData *, QJsonObject>					m_CtorPoppedKeyFramesMap;	// Keep removed items' keyframes, in case they are re-added with UNDO
 

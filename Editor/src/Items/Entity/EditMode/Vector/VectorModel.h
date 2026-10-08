@@ -15,6 +15,8 @@
 #include "GfxGrabPointModel.h"
 #include "HyEngine.h"
 
+class EntityTreeItemData;
+
 enum VectorAction
 {
 	VECTORACTION_None = 0,
@@ -31,6 +33,9 @@ enum VectorAction
 
 class VectorModel : public IEditModeModel
 {
+	EntityTreeItemData *				m_pPrimNodeTreeItemData;
+	int									m_iPrimLayerIndex;
+
 	HyColor								m_Color;
 	glm::vec2							m_vOffset;				// Only used for primitive layer
 	bool								m_bVisible;				// Only used for primitive layer
@@ -64,6 +69,8 @@ class VectorModel : public IEditModeModel
 public:
 	VectorModel(EditModeType eEditModeType, HyColor color);
 	virtual ~VectorModel();
+
+	void SetPrimNodeTreeItemData(EntityTreeItemData *pPrimNodeTreeItemData, int iLayerIndex);
 
 	virtual QJsonObject Serialize() const override;
 	virtual void Deserialize(bool bEnabled, const QJsonObject &serializedObj) override;

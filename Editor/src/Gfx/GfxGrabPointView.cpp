@@ -43,9 +43,7 @@ void GfxGrabPointView::Sync(const GfxGrabPointModel *pModel)
 	m_GrabPt.SetLayerColor(1, pModel->GetFillColor());
 
 	glm::vec2 ptPos = pModel->GetPos();
-	//ptPos += pModel->GetOffset();
-	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
-	pCamera->ProjectToCamera(ptPos, ptPos);
+	HyEngine::Window(0).GetCamera2d(0)->ProjectToCamera(ptPos, ptPos);
 	pos.Set(ptPos);
 }
 

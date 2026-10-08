@@ -25,11 +25,16 @@ VectorView::VectorView(HyEntity2d *pParent /*= nullptr*/) :
 	ClearGrabPoints();
 }
 
+/*virtual*/ void VectorView::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
+{
+	m_ScenePrim.CalcLocalBoundingShape(shapeOut);
+}
+
 void VectorView::SyncColor()
 {
 	if(m_pModel)
 	{
-		m_CameraPrim.SetTint(static_cast<VectorModel *>(m_pModel)->GetColor());
+		m_CameraPrim.SetTint(static_cast<VectorModel *>(m_pModel)->GetColor().Darken());
 		m_ScenePrim.SetTint(static_cast<VectorModel *>(m_pModel)->GetColor());
 	}
 }

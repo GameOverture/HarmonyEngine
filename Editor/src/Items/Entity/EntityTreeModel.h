@@ -116,6 +116,7 @@ public:
 
 	int GetPrimLayerIndex(EntityTreeItemData *pPrimLayer, EntityTreeItemData *&pPrimNodeOut) const;
 	std::vector<EntityTreeItemData *> FindPrimLayers(EntityTreeItemData *pPrimNode) const;
+	EntityTreeItemData *FindPrimNode(EntityTreeItemData *pPrimLayer) const;
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 

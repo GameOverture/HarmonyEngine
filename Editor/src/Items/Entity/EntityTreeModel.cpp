@@ -13,6 +13,7 @@
 #include "EntityDraw.h"
 #include "Project.h"
 #include "EntityWidget.h"
+#include "VectorModel.h"
 
 #include <QVariant>
 #include <QStack>
@@ -38,6 +39,8 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 		HyGuiLog("EntityTreeModel::EntityTreeModel() - setData on root failed", LOGTYPE_Error);
 		return;
 	}
+
+	m_ModelRef.GetCtorKeyFramesMap()[m_pRootTreeItemData] = fileMetaObj["ctor"].toObject();
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Insert 'Fixture Folder' to hold physics/collision bounding volumes (shapes)
@@ -646,6 +649,22 @@ std::vector<EntityTreeItemData *> EntityTreeModel::FindPrimLayers(EntityTreeItem
 	return primLayerList;
 }
 
+EntityTreeItemData *EntityTreeModel::FindPrimNode(EntityTreeItemData *pPrimLayer) const
+{
+	if(pPrimLayer == nullptr || pPrimLayer->GetType() != ITEM_PrimLayer)
+	{
+		HyGuiLog("EntityTreeModel::FindPrimNode was passed an invalid PrimLayer item", LOGTYPE_Error);
+		return nullptr;
+	}
+
+	// Find the direct parent of pPrimLayer and return it as EntityTreeItemData *
+	QModelIndex primLayerIndex = FindIndex<EntityTreeItemData *>(pPrimLayer, 0);
+	QModelIndex primNodeIndex = parent(primLayerIndex);
+
+	EntityTreeItemData *pPrimNodeItemData = data(primNodeIndex, Qt::UserRole).value<EntityTreeItemData *>();
+	return pPrimNodeItemData;
+}
+
 bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const
 {
 	if(pItem == nullptr)
@@ -858,13 +877,13 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descO
 	if(eEntType != ENTTYPE_ArrayItem && eEntType != ENTTYPE_SubItem)
 		sCodeName = GenerateCodeName(sCodeName);
 
+	EntityTreeItemData *pPrimNode = nullptr;
+
 	TreeModelItem *pParentTreeItem = nullptr;
 	if(HyGlobal::IsItemType_Fixture(eItemType) == false)
 	{
 		if(eItemType == ITEM_PrimLayer)
 		{
-			EntityTreeItemData *pPrimNode = nullptr;
-
 			QList<EntityTreeItemData *> childListOut, fixtureListOut, layoutListOut;
 			GetTreeItemData(childListOut, fixtureListOut, layoutListOut);
 			for(EntityTreeItemData *pChildItem : childListOut)
@@ -903,6 +922,10 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descO
 
 		if(iRow < 0)
 			iRow = pParentTreeItem->GetNumChildren();
+
+		if(eItemType == ITEM_PrimLayer && pPrimNode)
+			static_cast<VectorModel *>(pNewItem->GetEditModel())->SetPrimNodeTreeItemData(pPrimNode, iRow);
+
 		InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 	}
 
@@ -957,6 +980,9 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocPrimLayerTreeItem(EntityTreeItemDa
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, pPrimNode->GetCodeName(), ITEM_PrimLayer, ENTTYPE_SubItem, pPrimNode->GetThisUuid(), QUuid::createUuid());
 	TreeModelItem *pParentTreeItem = GetItem(FindIndex<EntityTreeItemData *>(pPrimNode, 0));
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
+
+	QModelIndex index = FindIndex<EntityTreeItemData *>(pNewItem, 0);
+	static_cast<VectorModel *>(pNewItem->GetEditModel())->SetPrimNodeTreeItemData(pPrimNode, index.row());
 	return pNewItem;
 }
 

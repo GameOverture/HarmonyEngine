@@ -510,6 +510,17 @@ void EntityDraw::RegisterWidgetText(QUuid uuid, HyJsonObj textDataObj)
 	m_WidgetTextMap.insert(uuid, pText);
 }
 
+EntityDrawItem *EntityDraw::FindDrawItem(EntityTreeItemData *pEntTreeItemData)
+{
+	for(IDrawExItem *pDrawItem : m_ItemList)
+	{
+		if(static_cast<EntityDrawItem *>(pDrawItem)->GetEntityTreeItemData() == pEntTreeItemData)
+			return static_cast<EntityDrawItem *>(pDrawItem);
+	}
+
+	return nullptr;
+}
+
 void EntityDraw::FlushRootEntity()
 {
 	EntityModel *pEntModel = static_cast<EntityModel *>(m_pProjItem->GetModel());

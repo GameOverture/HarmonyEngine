@@ -27,6 +27,8 @@ public:
 	VectorView(HyEntity2d *pParent = nullptr);
 	virtual ~VectorView();
 
+	virtual void CalcLocalBoundingShape(HyShape2d &shapeOut) override;
+
 	void SyncColor();
 	virtual void SyncWithModel(EditModeState eEditModeState) override;
 

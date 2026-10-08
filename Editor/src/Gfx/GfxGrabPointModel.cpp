@@ -16,19 +16,22 @@
 
 GfxGrabPointModel::GfxGrabPointModel() :
 	m_eType(GRABPOINT_Invalid),
-	m_ptPosition(0.0f, 0.0f)
+	m_ptPosition(0.0f, 0.0f),
+	m_ptCachePos(0.0f, 0.0f)
 {
 }
 
 GfxGrabPointModel::GfxGrabPointModel(GrabPointType eType) :
-	m_ptPosition(0.0f, 0.0f)
+	m_ptPosition(0.0f, 0.0f),
+	m_ptCachePos(0.0f, 0.0f)
 {
 	Set(eType, m_ptPosition);
 }
 
-GfxGrabPointModel::GfxGrabPointModel(GrabPointType eType, glm::vec2 ptPosition)
+GfxGrabPointModel::GfxGrabPointModel(GrabPointType eType, glm::vec2 ptWorldPosition) :
+	m_ptCachePos(0.0f, 0.0f)
 {
-	Set(eType, ptPosition);
+	Set(eType, ptWorldPosition);
 }
 
 GfxGrabPointModel::~GfxGrabPointModel()
@@ -45,10 +48,10 @@ void GfxGrabPointModel::SetPos(glm::vec2 ptWorldPosition)
 	Set(m_eType, ptWorldPosition);
 }
 
-void GfxGrabPointModel::Set(GrabPointType eType, glm::vec2 ptPosition)
+void GfxGrabPointModel::Set(GrabPointType eType, glm::vec2 ptWorldPosition)
 {
 	m_eType = eType;
-	m_ptPosition = ptPosition;
+	m_ptPosition = ptWorldPosition;
 }
 
 glm::vec2 GfxGrabPointModel::GetCachePos() const
@@ -64,14 +67,6 @@ void GfxGrabPointModel::SetCachePos()
 glm::vec2 GfxGrabPointModel::GetPos() const
 {
 	return m_ptPosition;
-}
-
-glm::vec2 GfxGrabPointModel::GetCameraPos() const
-{
-	glm::vec2 ptCameraPos;
-	HyEngine::Window(0).GetCamera2d(0)->ProjectToCamera(m_ptPosition, ptCameraPos);
-	
-	return ptCameraPos;
 }
 
 float GfxGrabPointModel::GetRadius() const

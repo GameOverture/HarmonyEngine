@@ -56,6 +56,8 @@ public:
 
 	void RegisterWidgetText(QUuid uuid, HyJsonObj textDataObj);
 
+	EntityDrawItem *FindDrawItem(EntityTreeItemData *pEntTreeItemData);
+
 protected:
 	void FlushRootEntity();
 

@@ -10,9 +10,14 @@
 #include "VectorModel.h"
 #include "VectorView.h"
 #include "MainWindow.h"
+#include "EntityTreeItemData.h"
+#include "EntityModel.h"
+#include "EntityDraw.h"
 
 VectorModel::VectorModel(EditModeType eEditModeType, HyColor color) :
 	IEditModeModel(eEditModeType),
+	m_pPrimNodeTreeItemData(nullptr),
+	m_iPrimLayerIndex(0),
 	m_Color(color),
 	m_iDisplayOrder(0),
 	m_eShapeType(SHAPE_None),
@@ -33,6 +38,12 @@ VectorModel::VectorModel(EditModeType eEditModeType, HyColor color) :
 /*virtual*/ VectorModel::~VectorModel()
 {
 	ClearFixtures();
+}
+
+void VectorModel::SetPrimNodeTreeItemData(EntityTreeItemData *pPrimNodeTreeItemData, int iLayerIndex)
+{
+	m_pPrimNodeTreeItemData = pPrimNodeTreeItemData;
+	m_iPrimLayerIndex = iLayerIndex;
 }
 
 /*virtual*/ QJsonObject VectorModel::Serialize() const /*override*/
@@ -62,6 +73,13 @@ VectorModel::VectorModel(EditModeType eEditModeType, HyColor color) :
 		m_iDisplayOrder = bEnabled ? DISPLAYORDER_FixtureSelected : DISPLAYORDER_Fixture;
 
 	m_sMalformedReason = DeserializeData(serializedObj);
+	if(m_pPrimNodeTreeItemData && (m_sMalformedReason.isEmpty() == false || m_FixtureList.empty())) // *this is a prim layer, update the parent primitive node
+	{
+		EntityDrawItem *pPrimNodeDrawItem = static_cast<EntityDraw *>(m_pPrimNodeTreeItemData->GetEntityModel().GetItem().GetDraw())->FindDrawItem(m_pPrimNodeTreeItemData);
+		if(pPrimNodeDrawItem)
+			static_cast<HyPrimitive2d *>(pPrimNodeDrawItem->GetHyNode())->SetAsNothing(m_iPrimLayerIndex);
+	}
+
 	SyncViews(bEnabled ? EDITMODE_Idle : EDITMODE_Off);
 }
 
@@ -1412,6 +1430,13 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 			m_FixtureList.push_back(new HyShape2d());
 		
 		eFixtureType = HyGlobal::ConvertShapeToFixtureType(m_eShapeType);
+	}
+
+	if(m_pPrimNodeTreeItemData && m_FixtureList.empty() == false)
+	{
+		EntityDrawItem *pPrimNodeDrawItem = static_cast<EntityDraw *>(m_pPrimNodeTreeItemData->GetEntityModel().GetItem().GetDraw())->FindDrawItem(m_pPrimNodeTreeItemData);
+		if(pPrimNodeDrawItem)
+			static_cast<HyPrimitive2d *>(pPrimNodeDrawItem->GetHyNode())->SetAsFixture(m_iPrimLayerIndex, *m_FixtureList[0], m_fOutline);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
