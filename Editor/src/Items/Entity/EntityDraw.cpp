@@ -339,6 +339,11 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 	m_eEditModeState = EDITMODE_Idle;
 }
 
+HyEntity2d *EntityDraw::GetRootEntity()
+{
+	return m_pRootEntity;
+}
+
 EditModeState EntityDraw::GetEditModeState() const
 {
 	return m_eEditModeState;

@@ -71,13 +71,26 @@ void HyLocomotionPhys2d::SetSize(glm::vec2 vSize)
 	// NOTE: explicitly set 'm_Mover' in meters instead of pixels
 	vSize.x *= HyEngine::GetPpmInverse();
 	vSize.y *= HyEngine::GetPpmInverse();
-
-	float fRadius = (vSize.x * 0.5f);
-
-	m_Mover.center1 = { 0.0f, fRadius };
-	m_Mover.center2 = { 0.0f, vSize.y - (fRadius * 2.0f) };
-	m_Mover.radius = vSize.x * 0.5f;
+	if(vSize.x <= vSize.y)
+	{
+		float fRadius = (vSize.x * 0.5f);
+		m_Mover.radius = fRadius;
+		m_Mover.center1 = { 0.0f, fRadius };
+		m_Mover.center2 = { 0.0f, vSize.y - fRadius };
+	}
+	else
+	{
+		float fRadius = (vSize.y * 0.5f);
+		m_Mover.radius = fRadius;
+		m_Mover.center1 = { (vSize.x * -0.5f) + fRadius, fRadius };
+		m_Mover.center2 = { (vSize.x * 0.5f) - fRadius, fRadius };
+	}
 }
+
+const b2Capsule &HyLocomotionPhys2d::GetMover() const
+{
+	return m_Mover;
+}	
 
 void HyLocomotionPhys2d::Jump()
 {

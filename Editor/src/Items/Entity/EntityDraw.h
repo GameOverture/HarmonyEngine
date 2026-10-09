@@ -46,6 +46,8 @@ public:
 	virtual void OnMousePressEvent(QMouseEvent *pEvent) override;
 	virtual void OnMouseReleaseEvent(QMouseEvent *pEvent) override;
 
+	HyEntity2d *GetRootEntity();
+
 	EditModeState GetEditModeState() const;
 	bool OnSetEditMode(bool bEnable);
 	EntityDrawItem *GetCurEditItem() const;

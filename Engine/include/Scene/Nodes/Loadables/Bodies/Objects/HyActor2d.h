@@ -43,6 +43,7 @@ public:
 	void DisableSimulation();
 
 	void SetSize(float fWidth, float fHeight);
+	const b2Capsule &GetMover() const;
 
 	bool IsOnGround() const;
 

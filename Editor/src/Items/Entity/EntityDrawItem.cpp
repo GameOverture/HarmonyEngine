@@ -86,13 +86,18 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 				}
 			}
 		}
-		if(fWidth <= 0.0f)
-			fWidth = HyEngine::InitValues().fPixelsPerMeter * 0.3f; // NOTE: This was taken from HyActor2d's ctor
-		if(fHeight <= 0.0f)
-			fHeight = HyEngine::InitValues().fPixelsPerMeter * 2.0f; // NOTE: This was taken from HyActor2d's ctor
-		float fRadius = (fWidth * 0.5f);
-		static_cast<HyPrimitive2d *>(m_pChild)->SetAsCapsule(0, glm::vec2(0.0f, fRadius), glm::vec2(0.0f, fHeight - (fRadius * 2.0f)), fWidth * 0.5f, 0.0f);
-		static_cast<HyPrimitive2d *>(m_pChild)->SetLayerColor(0, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+
+		if(entModelRef.GetBaseClassType() == ENTBASECLASS_HyActor2d && GetEntityDraw().GetRootEntity() != nullptr)
+		{
+			static_cast<HyActor2d *>(GetEntityDraw().GetRootEntity())->SetSize(fWidth, fHeight);
+			const b2Capsule &capsuleRef = static_cast<const HyActor2d *>(GetEntityDraw().GetRootEntity())->GetMover();
+			glm::vec2 pt1 = { capsuleRef.center1.x * HyEngine::GetPixelsPerMeter(), capsuleRef.center1.y * HyEngine::GetPixelsPerMeter() };
+			glm::vec2 pt2 = { capsuleRef.center2.x * HyEngine::GetPixelsPerMeter(), capsuleRef.center2.y * HyEngine::GetPixelsPerMeter() };
+			float fRadius = capsuleRef.radius * HyEngine::GetPixelsPerMeter();
+
+			static_cast<HyPrimitive2d *>(m_pChild)->SetAsCapsule(0, pt1, pt2, fRadius, 0.0f);
+			static_cast<HyPrimitive2d *>(m_pChild)->SetLayerColor(0, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+		}
 
 		m_pEditView = nullptr;
 	}

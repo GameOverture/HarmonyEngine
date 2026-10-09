@@ -37,6 +37,7 @@ public:
 
 	void Setup(glm::vec2 vSize, const HyLocomotionParams &initRef);
 	void SetSize(glm::vec2 vSize);
+	const b2Capsule &GetMover() const;
 
 	void Jump();
 

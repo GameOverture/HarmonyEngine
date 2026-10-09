@@ -59,6 +59,11 @@ void HyActor2d::SetSize(float fWidth, float fHeight)
 	m_ActorMover.SetSize(glm::ivec2(fWidth, fHeight));
 }
 
+const b2Capsule &HyActor2d::GetMover() const
+{
+	return m_ActorMover.GetMover();
+}
+
 bool HyActor2d::IsOnGround() const
 {
 	return (m_uiEntityAttribs & ACTORATTRIB_IsAirborne) == 0;
