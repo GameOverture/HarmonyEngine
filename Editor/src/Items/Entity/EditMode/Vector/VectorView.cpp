@@ -141,6 +141,8 @@ void VectorView::SyncColor()
 		}
 	}
 
+	SetVisible(eEditModeState != EDITMODE_Off);
+
 	SyncColor();
 }
 

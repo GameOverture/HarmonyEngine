@@ -46,8 +46,8 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 /*virtual*/ void HyPrimitive2d::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
 {
 	// Make b2AABB by combining each layer
-	b2AABB aabb = { {0,0}, {0,0} };
-	HyMath::InvalidateAABB(aabb);
+	b2AABB combinedAabb = { {0,0}, {0,0} };
+	HyMath::InvalidateAABB(combinedAabb);
 	for(int i = 0; i < m_LayerList.size(); ++i)
 	{
 		const Layer &layerRef = m_LayerList[i];
@@ -56,17 +56,22 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 			std::vector<b2Vec2> pointList;
 			for(uint32 j = 0; j < layerRef.m_uiNumVerts; ++j)
 				pointList.push_back({ layerRef.m_pVertBuffer[j].x, layerRef.m_pVertBuffer[j].y });
-			aabb = b2MakeAABB(pointList.data(), static_cast<int>(pointList.size()), 0.0f);
+			b2AABB layerAabb = b2MakeAABB(pointList.data(), static_cast<int>(pointList.size()), 0.0f);
+
+			if(b2IsValidAABB(combinedAabb) == false)
+				combinedAabb = layerAabb;
+			else
+				combinedAabb = b2AABB_Union(combinedAabb, layerAabb);
 		}
 	}
-	if(b2IsValidAABB(aabb) == false)
+	if(b2IsValidAABB(combinedAabb) == false)
 	{
 		shapeOut.SetAsNothing();
 		return;
 	}
 
-	b2Vec2 vExtents = b2AABB_Extents(aabb);
-	b2Vec2 ptCenter = b2AABB_Center(aabb);
+	b2Vec2 vExtents = b2AABB_Extents(combinedAabb);
+	b2Vec2 ptCenter = b2AABB_Center(combinedAabb);
 	shapeOut.SetAsBox(HyRect(vExtents.x, vExtents.y, glm::vec2(ptCenter.x, ptCenter.y), 0.0f));
 }
 
