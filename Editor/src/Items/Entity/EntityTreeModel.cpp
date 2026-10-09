@@ -73,6 +73,7 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 				m_FusedTreeItemData[i] = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, "m_ActorMover", ITEM_ActorMover, ENTTYPE_FusedItem, QUuid(), QUuid::createUuid());
 			else
 				m_FusedTreeItemData[i] = m_ModelRef.Cmd_AddExistingItem(fusedItemArray[i].toObject(), ENTTYPE_FusedItem, 0); //new EntityTreeItemData(m_ModelRef, fusedItemArray[i].toObject(), false, true);
+			m_FusedTreeItemData[i]->SetLocked(true);
 			break;
 
 		case ENTBASECLASS_HyGui:

@@ -39,6 +39,21 @@ HyActor2d &HyActor2d::operator=(HyActor2d &&donor) noexcept
 	return *this;
 }
 
+bool HyActor2d::IsSimulated() const
+{
+	return (m_uiEntityAttribs & ACTORATTRIB_HaltSimulatation) == 0;
+}
+
+void HyActor2d::EnableSimulation()
+{
+	m_uiEntityAttribs &= ~ACTORATTRIB_HaltSimulatation;
+}
+
+void HyActor2d::DisableSimulation()
+{
+	m_uiEntityAttribs |= ACTORATTRIB_HaltSimulatation;
+}
+
 void HyActor2d::SetSize(float fWidth, float fHeight)
 {
 	m_ActorMover.SetSize(glm::ivec2(fWidth, fHeight));
@@ -62,22 +77,25 @@ void HyActor2d::Jump()
 
 /*virtual*/ void HyActor2d::Update() /*override*/
 {
-	glm::vec2 ptPos = pos.Get();
-	ptPos *= sm_pScene->GetPpmInverse();
+	if((m_uiEntityAttribs & ACTORATTRIB_HaltSimulatation) == 0)
+	{
+		glm::vec2 ptPos = pos.Get();
+		ptPos *= sm_pScene->GetPpmInverse();
 
-	bool bOnGround = IsOnGround();
-	b2QueryFilter pogoFilter = { HYCOLLISION_Actor, HYCOLLISION_Default | HYCOLLISION_Dynamic };
-	b2QueryFilter collideFilter = { HYCOLLISION_Actor, HYCOLLISION_Default | HYCOLLISION_Dynamic | HYCOLLISION_Actor }; // Mover overlap filter
-	b2QueryFilter castFilter = { HYCOLLISION_Actor, HYCOLLISION_Default | HYCOLLISION_Dynamic }; // Movers don't sweep against other movers, allows for soft collision
-	m_ActorMover.Update(IHyNode::sm_pScene->GetPhysicsWorld(), ptPos, bOnGround, pogoFilter, collideFilter, castFilter);
+		bool bOnGround = IsOnGround();
+		b2QueryFilter pogoFilter = { HYCOLLISION_Actor, HYCOLLISION_Default | HYCOLLISION_Dynamic };
+		b2QueryFilter collideFilter = { HYCOLLISION_Actor, HYCOLLISION_Default | HYCOLLISION_Dynamic | HYCOLLISION_Actor }; // Mover overlap filter
+		b2QueryFilter castFilter = { HYCOLLISION_Actor, HYCOLLISION_Default | HYCOLLISION_Dynamic }; // Movers don't sweep against other movers, allows for soft collision
+		m_ActorMover.Update(IHyNode::sm_pScene->GetPhysicsWorld(), ptPos, bOnGround, pogoFilter, collideFilter, castFilter);
 
-	ptPos *= sm_pScene->GetPixelsPerMeter();
-	pos.Set(ptPos);
+		ptPos *= sm_pScene->GetPixelsPerMeter();
+		pos.Set(ptPos);
 
-	if(bOnGround)
-		m_uiEntityAttribs &= ~ACTORATTRIB_IsAirborne;
-	else
-		m_uiEntityAttribs |= ACTORATTRIB_IsAirborne;
+		if(bOnGround)
+			m_uiEntityAttribs &= ~ACTORATTRIB_IsAirborne;
+		else
+			m_uiEntityAttribs |= ACTORATTRIB_IsAirborne;
+	}
 
 	HyEntity2d::Update();
 }

@@ -441,7 +441,7 @@ void EntityWidget::SetAnimStatesEnabled(bool bEnable)
 	ui->chkEnableAnimStates->blockSignals(false);
 
 	ui->chkSetConstructor->setChecked(true);
-	ToggleSetConstructor();
+	OnToggleSetConstructor();
 	ui->chkSetConstructor->setVisible(bEnable);
 
 	if(bEnable)
@@ -587,12 +587,29 @@ void EntityWidget::SetExtrapolatedProperties()
 			int iTimelineCategoryIndex = static_cast<PropertiesTreeModel *>(ui->propertyTree->model())->FindCategoryIndex("Timeline");
 			if(iTimelineCategoryIndex >= 0)
 			{
-				bool bHide = false == static_cast<EntityModel *>(m_ItemRef.GetModel())->IsAnimStatesEnabled();
-				ui->propertyTree->setRowHidden(iTimelineCategoryIndex, QModelIndex(), bHide);
+				if(static_cast<EntityModel *>(m_ItemRef.GetModel())->IsAnimStatesEnabled())
+					ui->propertyTree->setRowHidden(iTimelineCategoryIndex, QModelIndex(), false);
+				else
+					ui->propertyTree->setRowHidden(iTimelineCategoryIndex, QModelIndex(), true);
 			}
-			
 		}
 
+		// Hide/Show Tween Properties based on whether AnimStates are enabled
+		bool bHideTweenProperties = !(static_cast<EntityModel *>(m_ItemRef.GetModel())->IsAnimStatesEnabled());
+		int iTweenPositionCategoryIndex = static_cast<PropertiesTreeModel *>(ui->propertyTree->model())->FindCategoryIndex("Tween Position");
+		if(iTweenPositionCategoryIndex >= 0)
+			ui->propertyTree->setRowHidden(iTweenPositionCategoryIndex, QModelIndex(), bHideTweenProperties);
+		int iTweenRotationCategoryIndex = static_cast<PropertiesTreeModel *>(ui->propertyTree->model())->FindCategoryIndex("Tween Rotation");
+		if(iTweenRotationCategoryIndex >= 0)
+			ui->propertyTree->setRowHidden(iTweenRotationCategoryIndex, QModelIndex(), bHideTweenProperties);
+		int iTweenScaleCategoryIndex = static_cast<PropertiesTreeModel *>(ui->propertyTree->model())->FindCategoryIndex("Tween Scale");
+		if(iTweenScaleCategoryIndex >= 0)
+			ui->propertyTree->setRowHidden(iTweenScaleCategoryIndex, QModelIndex(), bHideTweenProperties);
+		int iTweenAlphaCategoryIndex = static_cast<PropertiesTreeModel *>(ui->propertyTree->model())->FindCategoryIndex("Tween Alpha");
+		if(iTweenAlphaCategoryIndex >= 0)
+			ui->propertyTree->setRowHidden(iTweenAlphaCategoryIndex, QModelIndex(), bHideTweenProperties);
+
+		// Icon for Properties title
 		ui->lblSelectedItemIcon->setVisible(true);
 		ui->lblSelectedItemIcon->setPixmap(selectedItemsDataList[0]->GetIcon(SUBICON_Settings).pixmap(QSize(16, 16)));
 		ui->lblSelectedItemText->setVisible(true);
@@ -736,7 +753,7 @@ void EntityWidget::ToggleEditMode(EntityTreeItemData *pCurItemData)
 		SetEditMode(pCurItemData); // Turn on edit mode for the newly focused item
 }
 
-void EntityWidget::ToggleSetConstructor()
+void EntityWidget::OnToggleSetConstructor()
 {
 	if(ui->chkSetConstructor->isChecked())
 	{
@@ -1842,7 +1859,7 @@ void EntityWidget::on_chkEditMode_clicked()
 
 void EntityWidget::on_chkSetConstructor_clicked()
 {
-	ToggleSetConstructor();
+	OnToggleSetConstructor();
 }
 
 void EntityWidget::OnPreviewUpdate()

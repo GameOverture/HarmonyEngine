@@ -67,7 +67,7 @@ class VectorModel : public IEditModeModel
 	glm::vec2							m_ptGrabPointPos;
 
 public:
-	VectorModel(EditModeType eEditModeType, HyColor color);
+	VectorModel(EditModeType eEditModeType);
 	virtual ~VectorModel();
 
 	void SetPrimNodeTreeItemData(EntityTreeItemData *pPrimNodeTreeItemData, int iLayerIndex);

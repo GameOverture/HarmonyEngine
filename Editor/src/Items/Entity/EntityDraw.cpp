@@ -535,6 +535,7 @@ void EntityDraw::FlushRootEntity()
 	
 	case ENTBASECLASS_HyActor2d:
 		m_pRootEntity = new HyActor2d(this);
+		static_cast<HyActor2d *>(m_pRootEntity)->DisableSimulation();
 		break;
 	
 	case ENTBASECLASS_HyGui: {

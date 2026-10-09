@@ -92,6 +92,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 			fHeight = HyEngine::InitValues().fPixelsPerMeter * 2.0f; // NOTE: This was taken from HyActor2d's ctor
 		float fRadius = (fWidth * 0.5f);
 		static_cast<HyPrimitive2d *>(m_pChild)->SetAsCapsule(0, glm::vec2(0.0f, fRadius), glm::vec2(0.0f, fHeight - (fRadius * 2.0f)), fWidth * 0.5f, 0.0f);
+		static_cast<HyPrimitive2d *>(m_pChild)->SetLayerColor(0, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		m_pEditView = nullptr;
 	}

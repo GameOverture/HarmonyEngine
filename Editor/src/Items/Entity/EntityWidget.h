@@ -68,7 +68,7 @@ protected:
 	void StopPreview();
 	void ToggleEditMode(EntityTreeItemData *pCurItemData);
 
-	void ToggleSetConstructor();
+	void OnToggleSetConstructor();
 
 public Q_SLOTS:
 	void OnKeySpace();

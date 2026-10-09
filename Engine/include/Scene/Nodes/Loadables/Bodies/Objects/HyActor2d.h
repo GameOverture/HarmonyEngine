@@ -20,11 +20,12 @@ class HyActor2d : public HyEntity2d
 protected:
 	enum ActorAttributes
 	{
-		ACTORATTRIB_IsAirborne				= 1 << 7,
+		ACTORATTRIB_HaltSimulatation		= 1 << 7,
+		ACTORATTRIB_IsAirborne				= 1 << 8,
 
-		ACTORATTRIB_NEXTFLAG				= 1 << 8,
+		ACTORATTRIB_NEXTFLAG				= 1 << 9,
 	};
-	static_assert((int)ACTORATTRIB_IsAirborne == (int)ENTITYATTRIB_NEXTFLAG, "HyActor2d is not matching with base classes attrib flags");
+	static_assert((int)ACTORATTRIB_HaltSimulatation == (int)ENTITYATTRIB_NEXTFLAG, "HyActor2d is not matching with base classes attrib flags");
 
 	HyLocomotionPhys2d						m_ActorMover; // This is simulated externally to the world via 'm_Locomotion'::UpdatePhysical, and is its dimensions are converted to meters instead of pixels
 
@@ -36,6 +37,10 @@ public:
 	virtual ~HyActor2d(void);
 
 	HyActor2d &operator=(HyActor2d &&donor) noexcept;
+
+	bool IsSimulated() const;
+	void EnableSimulation();
+	void DisableSimulation();
 
 	void SetSize(float fWidth, float fHeight);
 

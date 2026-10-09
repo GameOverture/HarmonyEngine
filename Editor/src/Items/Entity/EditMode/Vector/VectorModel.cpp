@@ -14,11 +14,14 @@
 #include "EntityModel.h"
 #include "EntityDraw.h"
 
-VectorModel::VectorModel(EditModeType eEditModeType, HyColor color) :
+VectorModel::VectorModel(EditModeType eEditModeType) :
 	IEditModeModel(eEditModeType),
 	m_pPrimNodeTreeItemData(nullptr),
 	m_iPrimLayerIndex(0),
-	m_Color(color),
+	m_Color(HyColor::White),
+	m_vOffset(0.0f, 0.0f),
+	m_bVisible(true),
+	m_fAlpha(1.0f),
 	m_iDisplayOrder(0),
 	m_eShapeType(SHAPE_None),
 	m_bLoopClosed(false),

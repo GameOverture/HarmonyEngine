@@ -433,7 +433,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_PrimNode:
 		break;
 	case ITEM_PrimLayer: {
-		m_pEditModel = new VectorModel(EDITMODETYPE_PrimitiveShape, HyGlobal::GetEditorColor(EDITORCOLOR_EditMode));
+		m_pEditModel = new VectorModel(EDITMODETYPE_PrimitiveShape);
 
 		m_pPropertiesModel->InsertCategory(0, "Primitive Layer", QVariant(), false, "A collection of shape layers that can be drawn to the screen");
 		QVariant primLayerDataVariant;
@@ -446,7 +446,8 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break; }
 
 	case ITEM_ShapeFixture: {
-		m_pEditModel = new VectorModel(EDITMODETYPE_FixtureShape, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+		m_pEditModel = new VectorModel(EDITMODETYPE_FixtureShape);
+		static_cast<VectorModel *>(m_pEditModel)->SetColor(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		// NOTE: This should be the first categories added for fixtures
 		m_pPropertiesModel->InsertCategory(-1, "Shape", QVariant(), false, "Use shapes to establish collision, mouse input, hitbox, etc");
@@ -464,7 +465,8 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break; }
 
 	case ITEM_ChainFixture: {
-		m_pEditModel = new VectorModel(EDITMODETYPE_FixtureChain, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+		m_pEditModel = new VectorModel(EDITMODETYPE_FixtureChain);
+		static_cast<VectorModel *>(m_pEditModel)->SetColor(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		// NOTE: This should be the first categories added for fixtures
 		m_pPropertiesModel->InsertCategory(-1, "Chain", QVariant(), false, "Use chain to establish collision, ideally for terrain");
@@ -480,7 +482,8 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break; }
 
 	case ITEM_PointFixture: {
-		m_pEditModel = new VectorModel(EDITMODETYPE_FixturePoint, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+		m_pEditModel = new VectorModel(EDITMODETYPE_FixturePoint);
+		static_cast<VectorModel *>(m_pEditModel)->SetColor(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 
 		m_pPropertiesModel->InsertCategory(-1, "Point", QVariant(), false, "Creates a point in space, usually for reference");
 		QVariant pointDataVariant;
@@ -606,7 +609,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	}
 
 	// TWEENS - Make sure these Category names match HyGlobal's sm_TweenPropNames
-	if(IsFixtureItem() == false && IsLayoutItem() == false && GetType() != ITEM_ActorMover)
+	if(IsFixtureItem() == false && IsLayoutItem() == false && GetType() != ITEM_ActorMover && GetType() != ITEM_PrimLayer)
 	{
 		m_pPropertiesModel->InsertCategory(-1, "Tween Position", QVariant(), true, "Start a positional tween from the currently selected frame");
 		m_pPropertiesModel->AppendProperty("Tween Position", "Destination", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "The target destination for the tween to reach", PROPERTIESACCESS_Mutable, -fRANGE, fRANGE, 1.0, "[", "]");

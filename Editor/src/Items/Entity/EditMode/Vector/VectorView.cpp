@@ -151,11 +151,13 @@ void VectorView::SyncColor()
 		HyPrimitive2d *pHyPrimNode = pVectorModel->GetPrimNode(iLayerIndex);
 		if(pHyPrimNode)
 		{
+			pHyPrimNode->SetLayerOffset(iLayerIndex, pVectorModel->GetOffset());
+			pHyPrimNode->SetLayerVisible(iLayerIndex, pVectorModel->IsVisible());
+			pHyPrimNode->SetLayerColor(iLayerIndex, pVectorModel->GetColor());
+			pHyPrimNode->SetLayerAlpha(iLayerIndex, pVectorModel->GetAlpha());
+
 			if(eEditModeState == EDITMODE_Off)
-			{
-				pHyPrimNode->GetLayerAlpha(iLayerIndex)->Set(1.0f);
 				m_bUpdatePrimNodeFlash = false;
-			}
 			else
 				m_bUpdatePrimNodeFlash = true;
 		}
@@ -184,11 +186,11 @@ void VectorView::ClearGrabPoints()
 	if(pHyPrimNode == nullptr)
 		return;
 
-	if(pHyPrimNode->GetLayerAlpha(iLayerIndex)->IsAnimating() == false)
-	{
-		if(pHyPrimNode->GetLayerAlpha(iLayerIndex)->Get() == 1.0f)
-			pHyPrimNode->GetLayerAlpha(iLayerIndex)->Tween(0.25f, 1.00f, HyTween::QuartIn);
-		else
-			pHyPrimNode->GetLayerAlpha(iLayerIndex)->Tween(1.0f, 1.00f, HyTween::QuartOut);
-	}
+	//if(pHyPrimNode->GetLayerAlpha(iLayerIndex)->IsAnimating() == false)
+	//{
+	//	if(pHyPrimNode->GetLayerAlpha(iLayerIndex)->Get() == 1.0f)
+	//		pHyPrimNode->GetLayerAlpha(iLayerIndex)->Tween(0.5f, 1.00f, HyTween::QuadIn);
+	//	else
+	//		pHyPrimNode->GetLayerAlpha(iLayerIndex)->Tween(1.0f, 1.00f, HyTween::QuadOut);
+	//}
 }

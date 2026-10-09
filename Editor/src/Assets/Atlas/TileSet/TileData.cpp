@@ -69,7 +69,8 @@ TileData::TileData(AtlasTileSet *pTileSet, const QJsonObject &tileDataObj, QUndo
 		for(int j = 0; j < dataArray.size(); ++j)
 			vertexList.push_back(static_cast<float>(dataArray[j].toDouble()));
 
-		m_CollisionLayerMap[collisionUuid] = new VectorModel(EDITMODETYPE_FixtureShape, HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
+		m_CollisionLayerMap[collisionUuid] = new VectorModel(EDITMODETYPE_FixtureShape);
+		m_CollisionLayerMap[collisionUuid]->SetColor(HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures));
 	}
 }
 
