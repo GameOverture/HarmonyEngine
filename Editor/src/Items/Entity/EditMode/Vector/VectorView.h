@@ -23,6 +23,8 @@ protected:
 	QList<GfxGrabPointView *>	m_GrabPointViewList;	// Project to window coordinates
 	GfxGrabPointView			m_CenterGrabPoint;
 
+	bool						m_bUpdatePrimNodeFlash;
+
 public:
 	VectorView(HyEntity2d *pParent = nullptr);
 	virtual ~VectorView();
@@ -33,6 +35,9 @@ public:
 	virtual void SyncWithModel(EditModeState eEditModeState) override;
 
 	void ClearGrabPoints();
+
+protected:
+	virtual void OnUpdate() override;
 };
 
 #endif // VectorView_H

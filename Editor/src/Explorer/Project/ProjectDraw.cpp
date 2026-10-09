@@ -336,7 +336,7 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 
 	for(int i = 0; i < 6; ++i)
 	{
-		vertexBufferRef.AppendVertexData(&m_LayerList[0].m_pVertBuffer[i], sizeof(glm::vec2));
+		vertexBufferRef.AppendVertexData(&m_LayerList[0]->m_pVertBuffer[i], sizeof(glm::vec2));
 
 		glm::vec2 vUV;
 		switch(i)

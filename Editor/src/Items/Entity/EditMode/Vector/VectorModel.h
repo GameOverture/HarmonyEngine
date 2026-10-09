@@ -71,6 +71,7 @@ public:
 	virtual ~VectorModel();
 
 	void SetPrimNodeTreeItemData(EntityTreeItemData *pPrimNodeTreeItemData, int iLayerIndex);
+	HyPrimitive2d *GetPrimNode(int &iLayerIndexOut);
 
 	virtual QJsonObject Serialize() const override;
 	virtual void Deserialize(bool bEnabled, const QJsonObject &serializedObj) override;
@@ -82,6 +83,7 @@ public:
 	virtual void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight) override;
 	virtual void MouseClickTransformReleased(glm::vec2 ptReleasePos) override;
 
+	bool IsPrimitive() const;
 	bool IsFixture() const;
 	bool IsLineChain() const;
 	void SetEditModeType(EditModeType eEditModeType);

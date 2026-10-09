@@ -38,7 +38,10 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	RemoveAllLayers();
 
 	for(int i = 0; i < rhs.m_LayerList.size(); ++i)
-		m_LayerList.emplace_back(rhs.m_LayerList[i]);
+	{
+		m_LayerList.push_back(HY_NEW Layer(*this));
+		//m_LayerList.at(i) = rhs.m_LayerList[i];
+	}
 
 	return *this;
 }
@@ -50,7 +53,7 @@ const HyPrimitive2d &HyPrimitive2d::operator=(const HyPrimitive2d &rhs)
 	HyMath::InvalidateAABB(combinedAabb);
 	for(int i = 0; i < m_LayerList.size(); ++i)
 	{
-		const Layer &layerRef = m_LayerList[i];
+		const Layer &layerRef = *m_LayerList[i];
 		if(layerRef.m_uiNumVerts > 0)
 		{
 			std::vector<b2Vec2> pointList;
@@ -128,7 +131,7 @@ HyFixtureType HyPrimitive2d::GetLayerType(int32 iLayerIndex) const
 		return HYFIXTURE_Nothing;
 	}
 
-	return m_LayerList[iLayerIndex].m_eFixtureType;
+	return m_LayerList[iLayerIndex]->m_eFixtureType;
 }
 
 int32 HyPrimitive2d::SetAsNothing(int32 iLayerIndex)
@@ -136,7 +139,7 @@ int32 HyPrimitive2d::SetAsNothing(int32 iLayerIndex)
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
-		m_LayerList.emplace_back();
+		m_LayerList.push_back(HY_NEW Layer(*this));
 	}
 
 	DeleteLayerData(iLayerIndex);
@@ -148,10 +151,10 @@ int32 HyPrimitive2d::SetAsLineSegment(int32 iLayerIndex, const glm::vec2 &pt1, c
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
-		m_LayerList.emplace_back();
+		m_LayerList.push_back(HY_NEW Layer(*this));
 	}
 
-	m_LayerList[iLayerIndex].m_fLineThickness = fLineThickness;
+	m_LayerList[iLayerIndex]->m_fLineThickness = fLineThickness;
 
 	std::vector<glm::vec2> vertList;
 	vertList.push_back(pt1);
@@ -178,10 +181,10 @@ int32 HyPrimitive2d::SetAsLineChain(int32 iLayerIndex, const glm::vec2 *pVertice
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
-		m_LayerList.emplace_back();
+		m_LayerList.push_back(HY_NEW Layer(*this));
 	}
 
-	m_LayerList[iLayerIndex].m_fLineThickness = fLineThickness;
+	m_LayerList[iLayerIndex]->m_fLineThickness = fLineThickness;
 
 	AssembleLineChain(iLayerIndex, pVertices, uiNumVerts, bLoop);
 
@@ -204,10 +207,10 @@ int32 HyPrimitive2d::SetAsFixture(int32 iLayerIndex, const IHyFixture2d &fixture
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
-		m_LayerList.emplace_back();
+		m_LayerList.push_back(HY_NEW Layer(*this));
 	}
 
-	Layer &layerRef = m_LayerList[iLayerIndex];
+	Layer &layerRef = *m_LayerList[iLayerIndex];
 	layerRef.m_fLineThickness = fOutlineThickness;
 
 	switch(fixtureRef.GetType())
@@ -271,12 +274,12 @@ int32 HyPrimitive2d::SetAsCircle(int32 iLayerIndex, const glm::vec2 &ptCenter, f
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
-		m_LayerList.emplace_back();
+		m_LayerList.push_back(HY_NEW Layer(*this));
 	}
 
-	m_LayerList[iLayerIndex].m_fLineThickness = fOutlineThickness;
+	m_LayerList[iLayerIndex]->m_fLineThickness = fOutlineThickness;
 
-	AssembleCircle(iLayerIndex, ptCenter, fRadius, m_LayerList[iLayerIndex].m_uiNumSegments);
+	AssembleCircle(iLayerIndex, ptCenter, fRadius, m_LayerList[iLayerIndex]->m_uiNumSegments);
 
 	Load();
 	return iLayerIndex;
@@ -287,10 +290,10 @@ int32 HyPrimitive2d::SetAsPolygon(int32 iLayerIndex, const glm::vec2 *pVertexArr
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
-		m_LayerList.emplace_back();
+		m_LayerList.push_back(HY_NEW Layer(*this));
 	}
 
-	m_LayerList[iLayerIndex].m_fLineThickness = fOutlineThickness;
+	m_LayerList[iLayerIndex]->m_fLineThickness = fOutlineThickness;
 
 	AssemblePolygon(iLayerIndex, pVertexArray, uiCount);
 
@@ -339,12 +342,12 @@ int32 HyPrimitive2d::SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
-		m_LayerList.emplace_back();
+		m_LayerList.push_back(HY_NEW Layer(*this));
 	}
 
-	m_LayerList[iLayerIndex].m_fLineThickness = fOutlineThickness;
+	m_LayerList[iLayerIndex]->m_fLineThickness = fOutlineThickness;
 
-	AssembleCapsule(iLayerIndex, pt1, pt2, fRadius, m_LayerList[iLayerIndex].m_uiNumSegments);
+	AssembleCapsule(iLayerIndex, pt1, pt2, fRadius, m_LayerList[iLayerIndex]->m_uiNumSegments);
 
 	Load();
 	return iLayerIndex;
@@ -357,7 +360,7 @@ glm::vec2 HyPrimitive2d::GetLayerOffset(int32 iLayerIndex) const
 		HyLogError("HyPrimitive2d::GetLayerOffset() failed - Invalid layer index");
 		return glm::vec2(0.0f, 0.0f);
 	}
-	return m_LayerList[iLayerIndex].m_vOffset;
+	return m_LayerList[iLayerIndex]->m_vOffset;
 }
 
 int32 HyPrimitive2d::SetLayerOffset(int32 iLayerIndex, float fX, float fY)
@@ -370,9 +373,9 @@ int32 HyPrimitive2d::SetLayerOffset(int32 iLayerIndex, const glm::vec2 &vOffset)
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
-		m_LayerList.emplace_back();
+		m_LayerList.push_back(HY_NEW Layer(*this));
 	}
-	m_LayerList[iLayerIndex].m_vOffset = vOffset;
+	m_LayerList[iLayerIndex]->m_vOffset = vOffset;
 	return iLayerIndex;
 }
 
@@ -383,7 +386,7 @@ bool HyPrimitive2d::IsLayerVisible(int32 iLayerIndex) const
 		HyLogError("HyPrimitive2d::IsLayerVisible() failed - Invalid layer index");
 		return false;
 	}
-	return m_LayerList[iLayerIndex].m_bVisible;
+	return m_LayerList[iLayerIndex]->m_bVisible;
 }
 
 int32 HyPrimitive2d::SetLayerVisible(int32 iLayerIndex, bool bVisible)
@@ -391,9 +394,9 @@ int32 HyPrimitive2d::SetLayerVisible(int32 iLayerIndex, bool bVisible)
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
-		m_LayerList.emplace_back();
+		m_LayerList.push_back(HY_NEW Layer(*this));
 	}
-	m_LayerList[iLayerIndex].m_bVisible = bVisible;
+	m_LayerList[iLayerIndex]->m_bVisible = bVisible;
 	return iLayerIndex;
 }
 
@@ -404,7 +407,7 @@ HyColor HyPrimitive2d::GetLayerColor(int32 iLayerIndex) const
 		HyLogError("HyPrimitive2d::GetLayerColor() failed - Invalid layer index");
 		return HyColor::White;
 	}
-	return m_LayerList[iLayerIndex].m_Color;
+	return m_LayerList[iLayerIndex]->m_Color;
 }
 
 int32 HyPrimitive2d::SetLayerColor(int32 iLayerIndex, HyColor color)
@@ -412,20 +415,20 @@ int32 HyPrimitive2d::SetLayerColor(int32 iLayerIndex, HyColor color)
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
-		m_LayerList.emplace_back();
+		m_LayerList.push_back(HY_NEW Layer(*this));
 	}
-	m_LayerList[iLayerIndex].m_Color = color;
+	m_LayerList[iLayerIndex]->m_Color = color;
 	return iLayerIndex;
 }
 
-float HyPrimitive2d::GetLayerAlpha(int32 iLayerIndex) const
+HyAnimVec1 *HyPrimitive2d::GetLayerAlpha(int32 iLayerIndex)
 {
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		HyLogError("HyPrimitive2d::GetLayerAlpha() failed - Invalid layer index");
-		return 1.0f;
+		return nullptr;
 	}
-	return m_LayerList[iLayerIndex].m_fAlpha;
+	return &m_LayerList[iLayerIndex]->m_Alpha;
 }
 
 int32 HyPrimitive2d::SetLayerAlpha(int32 iLayerIndex, float fAlpha)
@@ -433,30 +436,30 @@ int32 HyPrimitive2d::SetLayerAlpha(int32 iLayerIndex, float fAlpha)
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
-		m_LayerList.emplace_back();
+		m_LayerList.push_back(HY_NEW Layer(*this));
 	}
-	m_LayerList[iLayerIndex].m_fAlpha = fAlpha;
+	m_LayerList[iLayerIndex]->m_Alpha.Set(fAlpha);
 	return iLayerIndex;
 }
 
 uint32 HyPrimitive2d::GetNumVerts(int32 iLayerIndex) const
 {
-	return m_LayerList[iLayerIndex].m_uiNumVerts;
+	return m_LayerList[iLayerIndex]->m_uiNumVerts;
 }
 
 const glm::vec2 *HyPrimitive2d::GetVerts(int32 iLayerIndex) const
 {
-	return m_LayerList[iLayerIndex].m_pVertBuffer;
+	return m_LayerList[iLayerIndex]->m_pVertBuffer;
 }
 
 bool HyPrimitive2d::IsOutline(int32 iLayerIndex)
 {
-	return m_LayerList[iLayerIndex].m_fLineThickness > 0.0f;
+	return m_LayerList[iLayerIndex]->m_fLineThickness > 0.0f;
 }
 
 float HyPrimitive2d::GetLineThickness(int32 iLayerIndex) const
 {
-	return m_LayerList[iLayerIndex].m_fLineThickness;
+	return m_LayerList[iLayerIndex]->m_fLineThickness;
 }
 
 void HyPrimitive2d::RemoveLayer(int32 iLayerIndex)
@@ -467,6 +470,7 @@ void HyPrimitive2d::RemoveLayer(int32 iLayerIndex)
 		return;
 	}
 	DeleteLayerData(iLayerIndex);
+	delete m_LayerList[iLayerIndex];
 	m_LayerList.erase(m_LayerList.begin() + iLayerIndex);
 	m_bUpdateShaderUniforms = true;
 	SetDirty(DIRTY_SceneAABB);
@@ -474,10 +478,9 @@ void HyPrimitive2d::RemoveLayer(int32 iLayerIndex)
 
 void HyPrimitive2d::RemoveAllLayers()
 {
-	for(int i = 0; i < m_LayerList.size(); ++i)
-		DeleteLayerData(i);
-		
-	m_LayerList.clear();
+	while(m_LayerList.empty() == false)
+		RemoveLayer(0);
+
 	m_bUpdateShaderUniforms = true;
 	m_ShaderUniforms.Clear();
 }
@@ -499,7 +502,7 @@ void HyPrimitive2d::RemoveAllLayers()
 {
 	for(int i = 0; i < m_LayerList.size(); ++i)
 	{
-		const Layer &layerRef = m_LayerList[i];
+		const Layer &layerRef = *m_LayerList[i];
 		if(layerRef.m_bVisible && layerRef.m_uiNumVerts > 0 && layerRef.m_pVertBuffer != nullptr)
 			return true;
 	}
@@ -531,7 +534,7 @@ void HyPrimitive2d::RemoveAllLayers()
 	uiNumInstancesOut = 0;
 	for(int iLayerIndex = 0; iLayerIndex < m_LayerList.size(); ++iLayerIndex)
 	{
-		const Layer &layerRef = m_LayerList[iLayerIndex];
+		const Layer &layerRef = *m_LayerList[iLayerIndex];
 		if(layerRef.m_bVisible && layerRef.m_uiNumVerts > 0 && layerRef.m_pVertBuffer != nullptr)
 			uiNumInstancesOut += layerRef.m_uiNumVerts / uiNumVerticesPerInstOut;
 	}
@@ -556,14 +559,14 @@ void HyPrimitive2d::RemoveAllLayers()
 
 	for(int iLayerIndex = 0; iLayerIndex < m_LayerList.size(); ++iLayerIndex)
 	{
-		Layer &layerRef = m_LayerList[iLayerIndex];
+		Layer &layerRef = *m_LayerList[iLayerIndex];
 		if(layerRef.m_bVisible && layerRef.m_uiNumVerts > 0 && layerRef.m_pVertBuffer != nullptr)
 		{
 			glm::vec4 layerColor = vTopColor;
 			layerColor.x *= layerRef.m_Color.GetRedF();
 			layerColor.y *= layerRef.m_Color.GetGreenF();
 			layerColor.z *= layerRef.m_Color.GetBlueF();
-			layerColor.a *= layerRef.m_fAlpha;
+			layerColor.a *= layerRef.m_Alpha.Get();
 			for(uint32 iVertIndex = 0; iVertIndex < layerRef.m_uiNumVerts; ++iVertIndex)
 			{
 				glm::vec2 ptVert = layerRef.m_pVertBuffer[iVertIndex] + layerRef.m_vOffset;
@@ -583,7 +586,7 @@ void HyPrimitive2d::DeleteLayerData(int32 iLayerIndex)
 		HyLogWarning("HyPrimitive2d::ClearVertexData() - Invalid layer index: " << iLayerIndex);
 		return;
 	}
-	Layer &layerRef = m_LayerList[iLayerIndex];
+	Layer &layerRef = *m_LayerList[iLayerIndex];
 
 	delete[] layerRef.m_pVertBuffer;
 	layerRef.m_pVertBuffer = nullptr;
@@ -604,7 +607,7 @@ void HyPrimitive2d::AssembleLineChain(int32 iLayerIndex, const glm::vec2 *pVerte
 	if(bLoop && HyCompareFloat(pVertexList[0].x, pVertexList[uiNumVertices - 1].x) && HyCompareFloat(pVertexList[0].y, pVertexList[uiNumVertices - 1].y))
 		uiNumVertices--; // AssembleLineChain will make this connection as bLoop is true
 
-	Layer &layerRef = m_LayerList[iLayerIndex];
+	Layer &layerRef = *m_LayerList[iLayerIndex];
 	layerRef.m_uiNumVerts = (bLoop ? uiNumVertices : (uiNumVertices-1)) * 6;
 	layerRef.m_pVertBuffer = HY_NEW glm::vec2[layerRef.m_uiNumVerts];
 	layerRef.m_eFixtureType = HYFIXTURE_LineChain;
@@ -699,7 +702,7 @@ void HyPrimitive2d::AssembleCircle(int32 iLayerIndex, glm::vec2 ptCenter, float 
 	glm::vec2 r1(cosInc, sinInc);
 	glm::vec2 v1 = ptCenter + fRadius * r1;
 
-	Layer &layerRef = m_LayerList[iLayerIndex];
+	Layer &layerRef = *m_LayerList[iLayerIndex];
 
 	if(layerRef.m_fLineThickness <= 0.0f) // Solid Circle
 	{
@@ -763,7 +766,7 @@ void HyPrimitive2d::AssemblePolygon(int32 iLayerIndex, const glm::vec2 *pVertexL
 
 	DeleteLayerData(iLayerIndex);
 
-	Layer &layerRef = m_LayerList[iLayerIndex];
+	Layer &layerRef = *m_LayerList[iLayerIndex];
 
 	if(layerRef.m_fLineThickness <= 0.0f)
 	{
@@ -795,7 +798,7 @@ void HyPrimitive2d::AssembleCapsule(int32 iLayerIndex, const glm::vec2 &ptCenter
 {
 	DeleteLayerData(iLayerIndex);
 
-	Layer &layerRef = m_LayerList[iLayerIndex];
+	Layer &layerRef = *m_LayerList[iLayerIndex];
 
 	if(layerRef.m_fLineThickness <= 0.0f) // Solid Capsule
 	{

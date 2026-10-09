@@ -58,7 +58,7 @@ void TileMapGrid::Sync(glm::mat4 inverseTileMapLayerTransform, glm::vec2 vDimens
 
 	for(int i = 0; i < 6; ++i)
 	{
-		vertexBufferRef.AppendVertexData(&m_LayerList[0].m_pVertBuffer[i], sizeof(glm::vec2));
+		vertexBufferRef.AppendVertexData(&m_LayerList[0]->m_pVertBuffer[i], sizeof(glm::vec2));
 
 		glm::vec2 vUV;
 		switch(i)

@@ -440,7 +440,7 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 						return QJsonValue(QJsonArray({ QJsonValue(color.GetRedF()), QJsonValue(color.GetGreenF()), QJsonValue(color.GetBlueF()) }));
 					}
 					if(sPropertyName == "Alpha")
-						return QJsonValue(static_cast<double>(static_cast<HyPrimitive2d *>(pEntDrawItem->GetHyNode())->GetLayerAlpha(iLayerIndex)));
+						return QJsonValue(static_cast<double>(static_cast<HyPrimitive2d *>(pEntDrawItem->GetHyNode())->GetLayerAlpha(iLayerIndex)->Get()));
 				}
 			}
 		}

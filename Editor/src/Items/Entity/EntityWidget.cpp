@@ -784,6 +784,9 @@ void EntityWidget::OnKeySpace()
 
 void EntityWidget::OnKeyQ()
 {
+	if(static_cast<EntityModel *>(m_ItemRef.GetModel())->IsAnimStatesEnabled() == false)
+		return;
+
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
 	entityDopeSheetSceneRef.SetCurrentFrame(0);
 
@@ -793,6 +796,9 @@ void EntityWidget::OnKeyQ()
 
 void EntityWidget::OnKeyE()
 {
+	if(static_cast<EntityModel *>(m_ItemRef.GetModel())->IsAnimStatesEnabled() == false)
+		return;
+
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
 	entityDopeSheetSceneRef.SetCurrentFrame(entityDopeSheetSceneRef.GetFinalFrame());
 
@@ -802,6 +808,9 @@ void EntityWidget::OnKeyE()
 
 void EntityWidget::OnKeyShiftQ()
 {
+	if(static_cast<EntityModel *>(m_ItemRef.GetModel())->IsAnimStatesEnabled() == false)
+		return;
+
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
 	entityDopeSheetSceneRef.SetCurrentFrame(entityDopeSheetSceneRef.GetCurrentFrame() - 1);
 
@@ -811,6 +820,9 @@ void EntityWidget::OnKeyShiftQ()
 
 void EntityWidget::OnKeyShiftE()
 {
+	if(static_cast<EntityModel *>(m_ItemRef.GetModel())->IsAnimStatesEnabled() == false)
+		return;
+
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene();
 	entityDopeSheetSceneRef.SetCurrentFrame(entityDopeSheetSceneRef.GetCurrentFrame() + 1);
 

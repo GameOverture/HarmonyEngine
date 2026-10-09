@@ -46,6 +46,19 @@ void VectorModel::SetPrimNodeTreeItemData(EntityTreeItemData *pPrimNodeTreeItemD
 	m_iPrimLayerIndex = iLayerIndex;
 }
 
+HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
+{
+	if(m_pPrimNodeTreeItemData == nullptr)
+		return nullptr;
+
+	EntityDrawItem *pPrimNodeDrawItem = static_cast<EntityDraw *>(m_pPrimNodeTreeItemData->GetEntityModel().GetItem().GetDraw())->FindDrawItem(m_pPrimNodeTreeItemData);
+	if(pPrimNodeDrawItem == nullptr)
+		return nullptr;
+	
+	iLayerIndexOut = m_iPrimLayerIndex;
+	return static_cast<HyPrimitive2d *>(pPrimNodeDrawItem->GetHyNode());
+}
+
 /*virtual*/ QJsonObject VectorModel::Serialize() const /*override*/
 {
 	QJsonObject serializedObj;
@@ -75,9 +88,9 @@ void VectorModel::SetPrimNodeTreeItemData(EntityTreeItemData *pPrimNodeTreeItemD
 	m_sMalformedReason = DeserializeData(serializedObj);
 	if(m_pPrimNodeTreeItemData && (m_sMalformedReason.isEmpty() == false || m_FixtureList.empty())) // *this is a prim layer, update the parent primitive node
 	{
-		EntityDrawItem *pPrimNodeDrawItem = static_cast<EntityDraw *>(m_pPrimNodeTreeItemData->GetEntityModel().GetItem().GetDraw())->FindDrawItem(m_pPrimNodeTreeItemData);
-		if(pPrimNodeDrawItem)
-			static_cast<HyPrimitive2d *>(pPrimNodeDrawItem->GetHyNode())->SetAsNothing(m_iPrimLayerIndex);
+		HyPrimitive2d *pHyPrimNode = GetPrimNode(m_iPrimLayerIndex);
+		if(pHyPrimNode)
+			pHyPrimNode->SetAsNothing(m_iPrimLayerIndex);
 	}
 
 	SyncViews(bEnabled ? EDITMODE_Idle : EDITMODE_Off);
@@ -296,6 +309,11 @@ void VectorModel::SetPrimNodeTreeItemData(EntityTreeItemData *pPrimNodeTreeItemD
 			m_GrabPointList[i].SetSelected(false);
 		m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
 	}
+}
+
+bool VectorModel::IsPrimitive() const
+{
+	return m_eEditModeType == EDITMODETYPE_PrimitiveShape || m_eEditModeType == EDITMODETYPE_PrimitiveLineChain;
 }
 
 bool VectorModel::IsFixture() const
@@ -1434,9 +1452,9 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 
 	if(m_pPrimNodeTreeItemData && m_FixtureList.empty() == false)
 	{
-		EntityDrawItem *pPrimNodeDrawItem = static_cast<EntityDraw *>(m_pPrimNodeTreeItemData->GetEntityModel().GetItem().GetDraw())->FindDrawItem(m_pPrimNodeTreeItemData);
-		if(pPrimNodeDrawItem)
-			static_cast<HyPrimitive2d *>(pPrimNodeDrawItem->GetHyNode())->SetAsFixture(m_iPrimLayerIndex, *m_FixtureList[0], m_fOutline);
+		HyPrimitive2d *pHyPrimNode = GetPrimNode(m_iPrimLayerIndex);
+		if(pHyPrimNode)
+			pHyPrimNode->SetAsFixture(m_iPrimLayerIndex, *m_FixtureList[0], m_fOutline);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

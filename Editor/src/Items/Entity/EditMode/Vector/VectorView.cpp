@@ -15,7 +15,8 @@ VectorView::VectorView(HyEntity2d *pParent /*= nullptr*/) :
 	IEditModeView(pParent),
 	m_CameraPrim(this),
 	m_ScenePrim(this),
-	m_CenterGrabPoint(this)
+	m_CenterGrabPoint(this),
+	m_bUpdatePrimNodeFlash(false)
 {
 	m_CameraPrim.UseWindowCoordinates();
 }
@@ -140,8 +141,25 @@ void VectorView::SyncColor()
 			HyGuiLog("VectorView::SyncWithModel - Unhandled shape type", LOGTYPE_Error);
 		}
 	}
+	
+	if(pVectorModel->IsPrimitive())
+	{
+		m_CameraPrim.SetVisible(false);
+		m_ScenePrim.SetVisible(false);
 
-	SetVisible(eEditModeState != EDITMODE_Off);
+		int iLayerIndex;
+		HyPrimitive2d *pHyPrimNode = pVectorModel->GetPrimNode(iLayerIndex);
+		if(pHyPrimNode)
+		{
+			if(eEditModeState == EDITMODE_Off)
+			{
+				pHyPrimNode->GetLayerAlpha(iLayerIndex)->Set(1.0f);
+				m_bUpdatePrimNodeFlash = false;
+			}
+			else
+				m_bUpdatePrimNodeFlash = true;
+		}
+	}
 
 	SyncColor();
 }
@@ -153,4 +171,24 @@ void VectorView::ClearGrabPoints()
 	m_GrabPointViewList.clear();
 
 	m_CenterGrabPoint.SetVisible(false);
+}
+
+/*virtual*/ void VectorView::OnUpdate() /*override*/
+{
+	VectorModel *pVectorModel = static_cast<VectorModel *>(m_pModel);
+	if(m_bUpdatePrimNodeFlash == false || pVectorModel == nullptr)
+		return;
+
+	int iLayerIndex;
+	HyPrimitive2d *pHyPrimNode = pVectorModel->GetPrimNode(iLayerIndex);
+	if(pHyPrimNode == nullptr)
+		return;
+
+	if(pHyPrimNode->GetLayerAlpha(iLayerIndex)->IsAnimating() == false)
+	{
+		if(pHyPrimNode->GetLayerAlpha(iLayerIndex)->Get() == 1.0f)
+			pHyPrimNode->GetLayerAlpha(iLayerIndex)->Tween(0.25f, 1.00f, HyTween::QuartIn);
+		else
+			pHyPrimNode->GetLayerAlpha(iLayerIndex)->Tween(1.0f, 1.00f, HyTween::QuartOut);
+	}
 }

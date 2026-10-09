@@ -14,8 +14,8 @@
 HyLocomotionParams::HyLocomotionParams() :
 	m_fMinSpeed(0.0f),
 	m_fMaxSpeed(10.0f),
-	m_fAccel(30.0f),
-	m_fDecel(50.0f),
+	m_fAccel(64.0f),
+	m_fDecel(75.0f),
 	m_fJumpSpeed(10.0f),
 	m_fMoverGravity(30.0f),
 	m_fFriction(8.0f),
