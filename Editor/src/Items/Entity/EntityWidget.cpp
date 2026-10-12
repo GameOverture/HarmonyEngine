@@ -310,6 +310,16 @@ EntityWidget::~EntityWidget()
 		ui->actionAddPrimPolygon->setEnabled(bPrimNodeSelected);
 		ui->actionAddPrimCapsule->setEnabled(bPrimNodeSelected);
 		ui->actionAddPrimLineChain->setEnabled(bPrimNodeSelected);
+		if(bPrimNodeSelected)
+		{
+			m_ContextMenu.addAction(ui->actionAddPrimBox);
+			m_ContextMenu.addAction(ui->actionAddPrimCircle);
+			m_ContextMenu.addAction(ui->actionAddPrimLineSegment);
+			m_ContextMenu.addAction(ui->actionAddPrimPolygon);
+			m_ContextMenu.addAction(ui->actionAddPrimCapsule);
+			m_ContextMenu.addAction(ui->actionAddPrimLineChain);
+			m_ContextMenu.addSeparator();
+		}
 
 		bool bGuiLayoutSelected = (selectedIndices.size() == 1 && eType == ITEM_UiLayout);
 		ui->actionAddLayoutHorz->setEnabled(bGuiLayoutSelected);
@@ -345,6 +355,7 @@ EntityWidget::~EntityWidget()
 
 		ui->actionRemoveItems->setEnabled(bRootOrBvFolder == false);
 		
+		// ARRAY ACTIONS - PackTo, DuplicateTo, UnpackFrom
 		if(bSelectedHaveSameParent && bAllSameType && bAllArrayItems && bRootOrBvFolder == false)
 		{
 			ui->actionPackToArray->setEnabled(false);
@@ -354,7 +365,7 @@ EntityWidget::~EntityWidget()
 			ui->actionUnpackFromArray->setIcon(HyGlobal::ItemIcon(eType, SUBICON_Close));
 			m_ContextMenu.addAction(ui->actionUnpackFromArray);
 		}
-		else if(bSelectedHaveSameParent && bAllSameType && selectedIndices.size() == 1 && bRootOrBvFolder == false)
+		else if(bSelectedHaveSameParent && bAllSameType && selectedIndices.size() == 1 && bRootOrBvFolder == false && eType != ITEM_PrimLayer)
 		{
 			ui->actionPackToArray->setEnabled(false);
 			ui->actionDuplicateToArray->setEnabled(true);
@@ -363,7 +374,7 @@ EntityWidget::~EntityWidget()
 			ui->actionDuplicateToArray->setIcon(HyGlobal::ItemIcon(eType, SUBICON_New));
 			m_ContextMenu.addAction(ui->actionDuplicateToArray);
 		}
-		else if(bRootOrBvFolder == false)
+		else if(bRootOrBvFolder == false && eType != ITEM_PrimLayer)
 		{
 			ui->actionPackToArray->setEnabled(bSelectedHaveSameParent && bAllSameType && bAllArrayItems == false);
 			ui->actionDuplicateToArray->setEnabled(false);
@@ -372,9 +383,18 @@ EntityWidget::~EntityWidget()
 			ui->actionPackToArray->setIcon(HyGlobal::ItemIcon(eType, SUBICON_Open));
 			m_ContextMenu.addAction(ui->actionPackToArray);
 		}
+		else
+		{
+			ui->actionPackToArray->setEnabled(false);
+			ui->actionDuplicateToArray->setEnabled(false);
+			ui->actionUnpackFromArray->setEnabled(false);
+		}
 
+		// CONVERT SHAPE ACTION
 		if(ui->actionConvertShape->isEnabled())
 			m_ContextMenu.addAction(ui->actionConvertShape);
+
+		// STANDARD ACTIONS
 		m_ContextMenu.addAction(ui->actionOrderChildrenUp);
 		m_ContextMenu.addAction(ui->actionOrderChildrenDown);
 		m_ContextMenu.addSeparator();

@@ -683,16 +683,28 @@ void EntityDraw::FlushRootEntity()
 	// Pull out all the valid json objects that represent items in the entity
 	QList<QJsonObject> descObjList;
 
+	std::function<void(QJsonObject)> fpPushDescObj = 
+		[&](QJsonObject descObj)
+		{
+			descObjList.push_back(descObj);
+			if(HyGlobal::GetTypeFromString(descObj["itemType"].toString()) == ITEM_PrimNode && descObj.contains("primLayers"))
+			{
+				QJsonArray primLayersArray = descObj["primLayers"].toArray();
+				for(int32 j = 0; j < primLayersArray.size(); ++j)
+					descObjList.push_back(primLayersArray[j].toObject());
+			}
+		};
+
 	// Add 'shape' items first because they usually encompass large portions of the entire entity, making child item selection more difficult
 	for(int32 i = 0; i < descShapeArray.size(); ++i)
 	{
 		if(descShapeArray[i].isObject())
-			descObjList.push_back(descShapeArray[i].toObject());
+			fpPushDescObj(descShapeArray[i].toObject());
 		else if(descShapeArray[i].isArray())
 		{
 			QJsonArray arrayFolder = descShapeArray[i].toArray();
 			for(int32 j = 0; j < arrayFolder.size(); ++j)
-				descObjList.push_back(arrayFolder[j].toObject());
+				fpPushDescObj(arrayFolder[j].toObject());
 		}
 	}
 
@@ -701,7 +713,7 @@ void EntityDraw::FlushRootEntity()
 	QJsonArray fusedItemArray = itemMetaObj["fusedItemList"].toArray();
 	QJsonObject fusedItemObj = fusedItemArray.at(eEntBaseClassType).toObject();
 	if(fusedItemObj.isEmpty() == false)
-		descObjList.push_back(fusedItemObj);
+		fpPushDescObj(fusedItemObj);
 
 	// Add children items last (to simulate implicit display order)
 	for(int32 i = 0; i < descChildArray.size(); ++i)
@@ -709,20 +721,16 @@ void EntityDraw::FlushRootEntity()
 		if(descChildArray[i].isObject())
 		{
 			QJsonObject descObj = descChildArray[i].toObject();
-			descObjList.push_back(descObj);
-
-			if(HyGlobal::GetTypeFromString(descObj["itemType"].toString()) == ITEM_PrimNode && descObj.contains("primLayers"))
-			{
-				QJsonArray primLayersArray = descObj["primLayers"].toArray();
-				for(int32 j = 0; j < primLayersArray.size(); ++j)
-					descObjList.push_back(primLayersArray[j].toObject());
-			}
+			fpPushDescObj(descObj);
 		}
 		else if(descChildArray[i].isArray())
 		{
 			QJsonArray arrayFolder = descChildArray[i].toArray();
 			for(int32 j = 0; j < arrayFolder.size(); ++j)
-				descObjList.push_back(arrayFolder[j].toObject());
+			{
+				QJsonObject descObj = arrayFolder[j].toObject();
+				fpPushDescObj(descObj);
+			}
 		}
 	}
 
@@ -749,6 +757,9 @@ void EntityDraw::FlushRootEntity()
 		if(pDrawItem == nullptr) // Not found within 'staleItemList', allocate new
 		{
 			EntityTreeItemData *pEntityTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(uuid);
+			if(pEntityTreeItemData == nullptr)
+				HyGuiLog("EntityDraw::OnApplyJsonMeta() - FindTreeItemData returned nullptr on: " % uuid.toString(), LOGTYPE_Error);
+
 			pDrawItem = new EntityDrawItem(pEntityTreeItemData, this, m_pRootEntity);
 		}
 		else // Found within 'staleItemList'

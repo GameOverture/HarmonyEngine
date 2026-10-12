@@ -112,11 +112,16 @@ EntityTreeModel::EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName,
 				if(subItemArray.empty())
 					continue;
 
-				//if(HyGlobal::GetTypeFromString(subItemArray[0].toObject()["itemType"].toString()) == ITEM_PrimLayer)
-				//	eEntType = ENTTYPE_SubItem;
-
 				for(int j = 0; j < subItemArray.size(); ++j)
-					m_ModelRef.Cmd_AddExistingItem(subItemArray[j].toObject(), eEntType, j == 0 ? i : j);
+				{
+					EntityTreeItemData *pNewlyAddedItemData = m_ModelRef.Cmd_AddExistingItem(subItemArray[j].toObject(), eEntType, j == 0 ? i : j);
+					if(pNewlyAddedItemData->GetType() == ITEM_PrimNode)
+					{
+						QJsonArray primLayerArray = subItemArray[j].toObject()["primLayers"].toArray();
+						for(int k = 0; k < primLayerArray.size(); ++k)
+							m_ModelRef.Cmd_AddExistingItem(primLayerArray[k].toObject(), ENTTYPE_SubItem, k);
+					}
+				}
 			}
 			else
 				HyGuiLog("EntityTreeModel::EntityTreeModel invalid JSON type", LOGTYPE_Error);
@@ -402,8 +407,21 @@ void EntityTreeModel::GetTreeItemData(QList<EntityTreeItemData *> &childListOut,
 			TreeModelItem *pArrayFolder = pThisEntity->GetChild(i);
 			for(int j = 0; j < pArrayFolder->GetNumChildren(); ++j)
 			{
-				EntityTreeItemData *pArrayItem = pArrayFolder->GetChild(j)->data(0).value<EntityTreeItemData *>();
-				childListOut.push_back(pArrayItem);
+				TreeModelItem *pArrayItem = pArrayFolder->GetChild(j);
+
+				EntityTreeItemData *pArrayItemData = pArrayItem->data(0).value<EntityTreeItemData *>();
+				childListOut.push_back(pArrayItemData);
+
+				if(pArrayItemData->GetType() == ITEM_PrimNode)
+				{
+					// Insert all the prim node's subitems (PrimLayers) into the child list
+					for(int k = 0; k < pArrayItem->GetNumChildren(); ++k)
+					{
+						TreeModelItem *pPrimLayerItem = pArrayItem->GetChild(k);
+						EntityTreeItemData *pPrimLayerItemData = pPrimLayerItem->data(0).value<EntityTreeItemData *>();
+						childListOut.push_back(pPrimLayerItemData);
+					}
+				}
 			}
 		}
 		else if(pCurItem->GetEntType() == ENTTYPE_FusedItem && pCurItem->GetType() == ITEM_UiLayout)
@@ -502,11 +520,22 @@ EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
 		if(pCurItem->GetEntType() == ENTTYPE_ArrayFolder || pCurItem->GetType() == ITEM_PrimNode)
 		{
 			TreeModelItem *pArrayFolder = pThisEntity->GetChild(i);
-			for(int i = 0; i < pArrayFolder->GetNumChildren(); ++i)
+			for(int j = 0; j < pArrayFolder->GetNumChildren(); ++j)
 			{
-				EntityTreeItemData *pArrayItem = pArrayFolder->GetChild(i)->data(0).value<EntityTreeItemData *>();
+				EntityTreeItemData *pArrayItem = pArrayFolder->GetChild(j)->data(0).value<EntityTreeItemData *>();
 				if(pArrayItem->GetThisUuid() == uuid)
 					return pArrayItem;
+
+				if(pArrayItem->GetType() == ITEM_PrimNode) // Might be array of PrimNodes
+				{
+					TreeModelItem *pPrimNodeTreeItem = pArrayFolder->GetChild(j);
+					for(int k = 0; k < pPrimNodeTreeItem->GetNumChildren(); ++k)
+					{
+						EntityTreeItemData *pPrimLayerItem = pPrimNodeTreeItem->GetChild(k)->data(0).value<EntityTreeItemData *>();
+						if(pPrimLayerItem->GetThisUuid() == uuid)
+							return pPrimLayerItem;
+					}
+				}
 			}
 		}
 
@@ -574,28 +603,45 @@ int EntityTreeModel::GetPrimLayerIndex(EntityTreeItemData *pPrimLayer, EntityTre
 	}
 
 	// Find the PrimNode that is the parent of the passed in pPrimLayer
-	QUuid primLayerUuid = pPrimLayer->GetReferencedItemUuid();
 	pPrimNodeOut = nullptr;
-
-	TreeModelItem *pThisEntity = GetRootTreeItem();
-	for(int i = 0; i < pThisEntity->GetNumChildren(); ++i)
-	{
-		EntityTreeItemData *pCurItem = pThisEntity->GetChild(i)->data(0).value<EntityTreeItemData *>();
-		if(pCurItem == nullptr)
-			continue;
-		if(pCurItem->GetType() == ITEM_PrimNode)
+	std::function<void(TreeModelItem *)> fpFindLayerInPrimNode = 
+		[&](TreeModelItem *pCurPrimNodeItem)
 		{
-			TreeModelItem *pCurPrimNodeItem = pThisEntity->GetChild(i);
 			for(int j = 0; j < pCurPrimNodeItem->GetNumChildren(); ++j)
 			{
-				EntityTreeItemData *pCurPrimLayer = pCurPrimNodeItem->GetChild(j)->data(0).value<EntityTreeItemData *>();
-				if(pCurPrimLayer->GetReferencedItemUuid() == primLayerUuid)
+				EntityTreeItemData *pTestPrimLayer = pCurPrimNodeItem->GetChild(j)->data(0).value<EntityTreeItemData *>();
+				if(pTestPrimLayer == pPrimLayer)
 				{
 					pPrimNodeOut = pCurPrimNodeItem->data(0).value<EntityTreeItemData *>();
 					break;
 				}
 			}
+		};
 
+	TreeModelItem *pThisEntity = GetRootTreeItem();
+	for(int i = 0; i < pThisEntity->GetNumChildren(); ++i)
+	{
+		EntityTreeItemData *pCurItemData = pThisEntity->GetChild(i)->data(0).value<EntityTreeItemData *>();
+		if(pCurItemData == nullptr)
+			continue;
+
+		if(pCurItemData->GetType() == ITEM_PrimNode)
+		{
+			TreeModelItem *pCurPrimNodeItem = pThisEntity->GetChild(i);
+
+			if(pCurItemData->GetEntType() != ENTTYPE_ArrayFolder)
+				fpFindLayerInPrimNode(pCurPrimNodeItem);
+			else
+			{
+				TreeModelItem *pCurPrimNodeArrayFolder = pCurPrimNodeItem;
+				for(int j = 0; j < pCurPrimNodeArrayFolder->GetNumChildren(); ++j)
+				{
+					pCurPrimNodeItem = pCurPrimNodeArrayFolder->GetChild(j);
+					fpFindLayerInPrimNode(pCurPrimNodeItem);
+					if(pPrimNodeOut)
+						break;
+				}
+			}
 		}
 
 		if(pPrimNodeOut)

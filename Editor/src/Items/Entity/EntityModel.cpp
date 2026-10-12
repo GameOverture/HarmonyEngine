@@ -446,9 +446,33 @@ QList<EntityTreeItemData *> EntityModel::Cmd_CreateNewArray(QList<EntityTreeItem
 		descObj.insert("codeName", sArrayName);
 		descObj.insert("isSelected", false);
 
+		QJsonArray primLayersArray;
+		if(descObj["itemType"].toString().compare(HyGlobal::ItemName(ITEM_PrimNode, false)) == 0)
+		{
+			primLayersArray = descObj["primLayers"].toArray();
+			for(int iPrimLayerIndex = 0; iPrimLayerIndex < primLayersArray.size(); ++iPrimLayerIndex)
+			{
+				QJsonObject primLayerObj = primLayersArray[iPrimLayerIndex].toObject();
+				QUuid newLayerUuid = QUuid::createUuid();
+				primLayerObj.insert("UUID", newLayerUuid.toString(QUuid::StringFormat::WithoutBraces));
+				primLayerObj.insert("itemUUID", newUuid.toString(QUuid::StringFormat::WithoutBraces));
+
+				primLayersArray[iPrimLayerIndex] = primLayerObj;
+			}
+			descObj.insert("primLayers", primLayersArray);
+		}
+
 		EntityTreeItemData *pDuplicateItem = Cmd_AddExistingItem(descObj, ENTTYPE_ArrayItem, i == 0 ? iArrayFolderRow : -1);
 		newItemDataList.push_back(pDuplicateItem);
 
+		for(int iPrimLayerIndex = 0; primLayersArray.size(); ++iPrimLayerIndex)
+		{
+			EntityTreeItemData *pDuplicateLayerItem = Cmd_AddExistingItem(descObj, ENTTYPE_SubItem, iPrimLayerIndex);
+			newItemDataList.push_back(pDuplicateLayerItem);
+		}
+
+		// TODO: Check if this is setting only 'pDuplicateItem' key frames properly
+		// 
 		// Copy all its property/key frames into the newly created item
 		for(int j = 0; j < stateKeyFramesArray.size(); ++j)
 		{
@@ -1882,45 +1906,78 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(bool &bVertListDeclaredRe
 
 	QJsonArray childArray;
 	QString sCurrentArrayCodeName = "";
-	for(int i = 0; i < childList.size(); ) // NOTE: 'i' is incremented inside the loop
-	{
-		if(childList[i]->GetEntType() == ENTTYPE_FusedItem)
-		{
-			++i;
-			continue;
-		}
 
-		if((childList[i]->GetEntType() == ENTTYPE_ArrayItem || childList[i]->GetEntType() == ENTTYPE_SubItem) && sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) != 0) // sCurrentArrayCodeName not equal to this array item's code name means new array to pack
+	std::function<void(QJsonObject &, QString, int &)> fpAddPrimLayers =
+		[&](QJsonObject &primNodeObjRef, QString sCurrentPrimCodeName, int &i)
 		{
-			sCurrentArrayCodeName = childList[i]->GetCodeName();
-			QJsonArray packedArray;
-			do
+			if(primNodeObjRef["itemType"].toString().compare(HyGlobal::ItemName(ITEM_PrimNode, false)) != 0)
+				HyGuiLog("EntityModel::InsertItemSpecificData() - Previously added item was not a PrimNode it was: " % primNodeObjRef["itemType"].toString(), LOGTYPE_Error);
+
+			++i;
+
+			QJsonArray packedPrimLayersArray;
+			while(i < childList.size() &&
+				    childList[i]->GetType() == ITEM_PrimLayer &&
+				    sCurrentPrimCodeName.compare(childList[i]->GetCodeName()) == 0)
 			{
 				QJsonObject arrayItemObj;
 				childList[i]->InsertJsonInfo_Desc(arrayItemObj);
 
-				packedArray.append(arrayItemObj);
+				packedPrimLayersArray.append(arrayItemObj);
 				++i;
-
-			} while(i < childList.size() && (childList[i]->GetEntType() == ENTTYPE_ArrayItem || childList[i]->GetEntType() == ENTTYPE_SubItem) && sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) == 0);
-
-			// If packedArray is holding ITEM_PrimLayers, insert packedArray into the previously added PrimNode's object as "primLayers"
-			if(childList[i - 1]->GetType() == ITEM_PrimLayer)
-			{
-				QJsonObject primNodeObj = childArray[childArray.size() - 1].toObject();
-				primNodeObj.insert("primLayers", packedArray);
-				childArray[childArray.size() - 1] = primNodeObj;
 			}
-			else
-				childArray.append(packedArray);
+
+			// Insert packedPrimLayersArray into the previously added PrimNode's object as "primLayers"
+			primNodeObjRef.insert("primLayers", packedPrimLayersArray);
+		};
+
+	for(int i = 0; i < childList.size(); ) // NOTE: 'i' is incremented inside the loop
+	{
+		if(childList[i]->GetEntType() == ENTTYPE_FusedItem)
+		{
+			// Skip fused items, they are serialized separately
+			++i;
+			continue;
+		}
+
+		// ARRAY ITEMS
+		if(childList[i]->GetEntType() == ENTTYPE_ArrayItem &&
+			sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) != 0) // sCurrentArrayCodeName not equal to this array item's code name means new array to pack
+		{
+			if(childList[i]->GetType() == ITEM_PrimLayer)
+				HyGuiLog("EntityModel::InsertItemSpecificData() - An ITEM_PrimLayer was an ENTTYPE_ArrayItem (it should be ENTTYPE_SubItem)", LOGTYPE_Error);
+
+			sCurrentArrayCodeName = childList[i]->GetCodeName();
+			QJsonArray packedArray;
+			do // Array items are sorted together in `childList`
+			{
+				QJsonObject arrayItemObj;
+				childList[i]->InsertJsonInfo_Desc(arrayItemObj);
+
+				if(childList[i]->GetType() == ITEM_PrimNode)
+					fpAddPrimLayers(arrayItemObj, childList[i]->GetCodeName(), i);
+				else
+					++i;
+				
+				packedArray.append(arrayItemObj);
+
+			} while(i < childList.size() &&
+				    childList[i]->GetEntType() == ENTTYPE_ArrayItem &&
+				    sCurrentArrayCodeName.compare(childList[i]->GetCodeName()) == 0);
+			
+			childArray.append(packedArray);
 		}
 		else
 		{
 			QJsonObject childObj;
 			childList[i]->InsertJsonInfo_Desc(childObj);
+
+			if(childList[i]->GetType() == ITEM_PrimNode)
+				fpAddPrimLayers(childObj, childList[i]->GetCodeName(), i);
+			else
+				++i;
 			
 			childArray.append(childObj);
-			++i;
 		}
 	}
 	itemSpecificFileDataOut.m_Meta.insert("descChildList", childArray);
