@@ -139,14 +139,14 @@
             <item row="1" column="0">
              <widget class="QCheckBox" name="chkBounce">
               <property name="text">
-               <string>Play Bounce</string>
+               <string>Bounce</string>
               </property>
              </widget>
             </item>
             <item row="0" column="0">
              <widget class="QCheckBox" name="chkReverse">
               <property name="text">
-               <string>Play Reverse</string>
+               <string>Reverse</string>
               </property>
              </widget>
             </item>
@@ -164,7 +164,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <property name="spacing">
-           <number>3</number>
+           <number>1</number>
           </property>
           <item>
            <spacer name="horizontalSpacer_4">
@@ -182,7 +182,7 @@
           <item>
            <widget class="QLabel" name="label_3">
             <property name="text">
-             <string>Anim Frame Rate:</string>
+             <string>Frame Rate</string>
             </property>
            </widget>
           </item>

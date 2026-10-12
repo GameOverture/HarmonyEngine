@@ -16,6 +16,9 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QVBoxLayout" name="lytAboveStates">
+     <property name="spacing">
+      <number>2</number>
+     </property>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
@@ -44,14 +47,14 @@
        <item>
         <widget class="QLineEdit" name="txtCustomBaseClass"/>
        </item>
-       <item>
-        <widget class="QCheckBox" name="chkEnableAnimStates">
-         <property name="text">
-          <string>Enable Animation States</string>
-         </property>
-        </widget>
-       </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkEnableAnimStates">
+       <property name="text">
+        <string>Enable Animation States</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QGroupBox" name="grpNodes">
@@ -187,7 +190,7 @@
            </widget>
           </item>
           <item>
-           <widget class="Line" name="line_Gui">
+           <widget class="Line" name="line_Gui1">
             <property name="frameShadow">
              <enum>QFrame::Shadow::Plain</enum>
             </property>
@@ -207,7 +210,7 @@
            </widget>
           </item>
           <item>
-           <widget class="Line" name="line_7">
+           <widget class="Line" name="line_Gui2">
             <property name="frameShadow">
              <enum>QFrame::Shadow::Sunken</enum>
             </property>
@@ -227,7 +230,7 @@
            </widget>
           </item>
           <item>
-           <widget class="Line" name="line_8">
+           <widget class="Line" name="line_Gui3">
             <property name="frameShadow">
              <enum>QFrame::Shadow::Sunken</enum>
             </property>

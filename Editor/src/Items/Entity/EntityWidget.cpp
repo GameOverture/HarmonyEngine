@@ -161,7 +161,9 @@ EntityWidget::~EntityWidget()
 	ui->cmbBaseClass->setCurrentIndex(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetBaseClassType());
 
 	bool bShowGuiButtons = ui->cmbBaseClass->currentIndex() == ENTBASECLASS_HyGui;
-	ui->line_Gui->setVisible(bShowGuiButtons);
+	ui->line_Gui1->setVisible(bShowGuiButtons);
+	ui->line_Gui2->setVisible(bShowGuiButtons);
+	ui->line_Gui3->setVisible(bShowGuiButtons);
 	ui->btnAddLayoutHorz->setVisible(bShowGuiButtons);
 	ui->btnAddLayoutVert->setVisible(bShowGuiButtons);
 	ui->btnAddSpacer->setVisible(bShowGuiButtons);
