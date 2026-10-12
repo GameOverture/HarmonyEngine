@@ -54,15 +54,7 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 
 	ui->btnAddChild->setDefaultAction(ui->actionAddChildren);
 	ui->btnAddTileMap->setDefaultAction(ui->actionAddTileMap);
-	
 	ui->btnAddPrimitive->setDefaultAction(ui->actionAddPrimitive);
-	ui->btnAddPrimBox->setDefaultAction(ui->actionAddPrimBox);
-	ui->btnAddPrimCircle->setDefaultAction(ui->actionAddPrimCircle);
-	ui->btnAddPrimLineSegment->setDefaultAction(ui->actionAddPrimLineSegment);
-	ui->btnAddPrimPolygon->setDefaultAction(ui->actionAddPrimPolygon);
-	ui->btnAddPrimCapsule->setDefaultAction(ui->actionAddPrimCapsule);
-	ui->btnAddPrimLineChain->setDefaultAction(ui->actionAddPrimLineChain);
-
 	ui->btnAddFixtureShape->setDefaultAction(ui->actionAddShape);
 	ui->btnAddFixtureChain->setDefaultAction(ui->actionAddChain);
 	ui->btnAddFixturePoint->setDefaultAction(ui->actionAddPoint);
@@ -167,6 +159,12 @@ EntityWidget::~EntityWidget()
 		SetAnimStatesEnabled(bIsAnimStatesEnabled);
 
 	ui->cmbBaseClass->setCurrentIndex(static_cast<EntityModel *>(m_ItemRef.GetModel())->GetBaseClassType());
+
+	bool bShowGuiButtons = ui->cmbBaseClass->currentIndex() == ENTBASECLASS_HyGui;
+	ui->line_Gui->setVisible(bShowGuiButtons);
+	ui->btnAddLayoutHorz->setVisible(bShowGuiButtons);
+	ui->btnAddLayoutVert->setVisible(bShowGuiButtons);
+	ui->btnAddSpacer->setVisible(bShowGuiButtons);
 
 	EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
 

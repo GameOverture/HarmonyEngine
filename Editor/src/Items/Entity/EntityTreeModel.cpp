@@ -510,6 +510,12 @@ EntityTreeItemData *EntityTreeModel::FindTreeItemData(QUuid uuid) const
 	if(pRootItemData && pRootItemData->GetUuid() == uuid)
 		return pRootItemData;
 
+	for(int i = 0; i < NUM_ENTBASECLASSTYPES; ++i)
+	{
+		if(m_FusedTreeItemData[i] && m_FusedTreeItemData[i]->GetUuid() == uuid)
+			return m_FusedTreeItemData[i];
+	}
+
 	TreeModelItem *pThisEntity = GetRootTreeItem();
 	for(int i = 0; i < pThisEntity->GetNumChildren(); ++i)
 	{

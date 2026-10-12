@@ -530,7 +530,7 @@ void EntityDraw::FlushRootEntity()
 {
 	EntityModel *pEntModel = static_cast<EntityModel *>(m_pProjItem->GetModel());
 
-	delete m_pRootEntity;
+	HyEntity2d *pOldRootEntity = m_pRootEntity;
 	switch(pEntModel->GetBaseClassType())
 	{
 	case ENTBASECLASS_HyEntity2d:
@@ -595,6 +595,8 @@ void EntityDraw::FlushRootEntity()
 		if(m_pRootEntity == nullptr)
 			m_pRootEntity = new HyGui(eRootGuiOrientation, HyUiPanelInit(), this);
 
+		delete pOldRootEntity;
+
 		m_GuiLayoutMap.clear();
 		if(m_ItemList.empty()) // Only bother to populate GUI layout if m_ItemList has been populated
 			break;
@@ -645,7 +647,7 @@ void EntityDraw::FlushRootEntity()
 					if(pEntItemData->GetThisUuid() != childUuid)
 						continue;
 
-					if(pEntItemData->IsWidgetItem() == false)
+					if(pEntItemData->IsWidgetItem() == false && pEntItemData->IsLayoutItem() == false)
 						HyGuiLog("EntityDraw::FlushRootEntity - Found unsupported item type in m_ItemList while populating GUI layout!", LOGTYPE_Error);
 					
 					static_cast<EntityDrawItem *>(pDrawItem)->FlushHyNode(nullptr);
