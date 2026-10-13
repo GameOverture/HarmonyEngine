@@ -156,6 +156,8 @@ void VectorView::SyncColor()
 			pHyPrimNode->SetLayerColor(iLayerIndex, pVectorModel->GetColor());
 			pHyPrimNode->SetLayerAlpha(iLayerIndex, pVectorModel->GetAlpha());
 
+			pHyPrimNode->SetAsFixture(0, *pVectorModel->GetFixture(0), 0.0f);
+
 			if(eEditModeState == EDITMODE_Off)
 				m_bUpdatePrimNodeFlash = false;
 			else

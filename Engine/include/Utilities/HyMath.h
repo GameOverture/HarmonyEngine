@@ -22,6 +22,7 @@
 #define HYCOLOR_XYUV(y,u,v)   HYCOLOR_ARGB(0xff,y,u,v)
 #define HYCOLOR_AYUV(a,y,u,v) HYCOLOR_ARGB(a,y,u,v)
 
+// TODO: Deprecated - Remove HySetVec and use `vec = { fX, fY };` instead
 void HySetVec(glm::vec2 &vecOut, float fX, float fY);
 void HySetVec(glm::vec2 &vecOut, const glm::vec2 &srcRef);
 void HySetVec(glm::vec2 &vecOut, const glm::vec3 &srcRef);
@@ -293,6 +294,7 @@ public:
 	static glm::vec2 ClosestPointOnRay(const glm::vec2 &ptRayStart, const glm::vec2 &vNormalizedRayDir, const glm::vec2 &ptTestPoint);
 	static glm::vec2 ClosestPointOnSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &ptTestPoint);
 	static bool TestSegmentsOverlap(const glm::vec2 &ptSegA1, const glm::vec2 &ptSegA2, const glm::vec2 &ptSegB1, const glm::vec2 &ptSegB2, glm::vec2 &ptIntersectionOut);
+	static bool TestRaysOverlap(const glm::vec2 &ptRayStart1, const glm::vec2 &vNormalizedRayDir1, const glm::vec2 &ptRayStart2, const glm::vec2 &vNormalizedRayDir2, glm::vec2 &ptIntersectionOut);
 
 	static glm::ivec2 TileMapPointToCell_Square(const glm::vec2 &ptLocal, const glm::ivec2 &vCellDimensions);
 	static glm::ivec2 TileMapPointToCell_HalfSquare(const glm::vec2 &ptLocal, const glm::ivec2 &vCellDimensions);

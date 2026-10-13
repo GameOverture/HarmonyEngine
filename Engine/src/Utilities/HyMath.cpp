@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Utilities/HyMath.h"
 
-const float HyMath::FloatSlop = 0.005f;
+const float HyMath::FloatSlop = 0.00001f; //0.005f;
 
 const HyColor HyColor::White(0xffffff);
 const HyColor HyColor::Black(0x000000);
@@ -497,6 +497,26 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 	}
 
 	return false;
+}
+
+/*static*/ bool HyMath::TestRaysOverlap(const glm::vec2 &ptRayStart1, const glm::vec2 &vNormalizedRayDir1, const glm::vec2 &ptRayStart2, const glm::vec2 &vNormalizedRayDir2, glm::vec2 &ptIntersectionOut)
+{
+	const float det = vNormalizedRayDir1.x * vNormalizedRayDir2.y - vNormalizedRayDir1.y * vNormalizedRayDir2.x;
+
+	// Check for parallel or anti-parallel (no intersection)
+	if(std::abs(det) < HyMath::FloatSlop)
+		return false;
+
+	const glm::vec2 diff = ptRayStart2 - ptRayStart1;
+	const float r = (diff.x * vNormalizedRayDir2.y - diff.y * vNormalizedRayDir2.x) / det;
+	const float s = (diff.x * vNormalizedRayDir1.y - diff.y * vNormalizedRayDir1.x) / det;
+
+	// Both parameters must be non-negative for a ray-to-ray hit
+	if(r < 0.0f || s < 0.0f)
+		return false;
+
+	ptIntersectionOut = ptRayStart1 + r * vNormalizedRayDir1;
+	return true;
 }
 
 /*static*/ glm::ivec2 HyMath::TileMapPointToCell_Square(const glm::vec2 &ptLocal, const glm::ivec2 &vCellDimensions)

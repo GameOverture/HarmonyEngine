@@ -194,24 +194,26 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 			return VECTORACTION_None;
 		}
 
-		if(bShiftHeld)
+		if(m_GrabPointList[m_iGrabPointIndex].IsTypeSelectable())
 		{
-			m_GrabPointList[m_iGrabPointIndex].SetSelected(!m_GrabPointList[m_iGrabPointIndex].IsSelected());
-		}
-		else
-		{
-			for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
-				grabPtRef.SetCachePos();
-
-			if(m_GrabPointList[m_iGrabPointIndex].IsSelected() == false)
+			if(bShiftHeld)
 			{
-				for(int i = 0; i < m_GrabPointList.size(); ++i)
-					m_GrabPointList[i].SetSelected(false);
-				m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
+				m_GrabPointList[m_iGrabPointIndex].SetSelected(!m_GrabPointList[m_iGrabPointIndex].IsSelected());
 			}
-
-			bStartTransform = true;
+			else
+			{
+				if(m_GrabPointList[m_iGrabPointIndex].IsSelected() == false)
+				{
+					for(int i = 0; i < m_GrabPointList.size(); ++i)
+						m_GrabPointList[i].SetSelected(false);
+					m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
+				}
+			}
 		}
+
+		for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
+			grabPtRef.SetCachePos();
+		bStartTransform = true;
 	}
 	else if(eResult == VECTORACTION_HoverCenter)
 	{
@@ -237,43 +239,78 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 
 /*virtual*/ void VectorModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) /*override*/
 {
-	HySetVec(m_vDragDelta, 0.0f, 0.0f);
+	const float fSNAP_AMT = 25.0f;
+
+	m_vDragDelta = { 0.0f, 0.0f };
 	if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
-		HySetVec(m_vDragDelta, ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y);
+		m_vDragDelta = { ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y };
 
-	if(m_eCurAction == VECTORACTION_Creation)
-		DoTransformCreation(bShiftMod, ptStartPos, ptDragPos);
-
-	if(m_eCurAction == VECTORACTION_AppendVertex)
-		m_GrabPointList[m_iGrabPointIndex].SetPos(ptDragPos);
-
-	if(m_eCurAction == VECTORACTION_HoverGrabPoint)
+	switch(m_eCurAction)
 	{
-		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
+	case VECTORACTION_Creation:
+		DoTransformCreation(bShiftMod, ptStartPos, ptDragPos);
+		break;
+
+	case VECTORACTION_AppendVertex:
+		m_GrabPointList[m_iGrabPointIndex].SetPos(ptDragPos);
+		break;
+
+	case VECTORACTION_HoverGrabPoint:
+		if(m_GrabPointList[m_iGrabPointIndex].IsTypeSelectable())
 		{
-			if(grabPtModel.IsSelected())
+			for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
 			{
-				glm::vec2 ptNewPos = grabPtModel.GetCachePos() + m_vDragDelta;
-				if(bShiftMod) // Snap to 25 pixel increments if shift is held
-					HySetVec(ptNewPos, roundf(ptNewPos.x / 25.0f) * 25.0f, roundf(ptNewPos.y / 25.0f) * 25.0f);
-				grabPtModel.SetPos(ptNewPos);
+				if(grabPtModel.IsSelected())
+				{
+					glm::vec2 ptNewPos = grabPtModel.GetCachePos() + m_vDragDelta;
+					if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
+						ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
+					grabPtModel.SetPos(ptNewPos);
+				}
 			}
 		}
-	}
-	if(m_eCurAction == VECTORACTION_HoverCenter)
-	{
+		else // Not assembling vertices, this is a shape ctrl grab point
+		{
+			switch(m_eShapeType)
+			{
+			case SHAPE_Box:
+				DoTransformShapeCtrlGrabPoint_Box(bShiftMod, fSNAP_AMT);
+				break;
+
+			case SHAPE_Circle:
+			case SHAPE_LineSegment:
+			case SHAPE_Polygon:
+			case SHAPE_Capsule:
+			case SHAPE_None:
+			default:
+				HyGuiLog("VectorModel::MouseTransform() - Unhandled shape type", LOGTYPE_Error);
+				break;
+			}
+		}
+		break;
+
+	case VECTORACTION_HoverCenter: {
 		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
 		{
 			glm::vec2 ptNewPos = grabPtModel.GetCachePos() + m_vDragDelta;
-			if(bShiftMod) // Snap to 25 pixel increments if shift is held
-				HySetVec(ptNewPos, roundf(ptNewPos.x / 25.0f) * 25.0f, roundf(ptNewPos.y / 25.0f) * 25.0f);
+			if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
+				ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
 			grabPtModel.SetPos(ptNewPos);
 		}
 
 		glm::vec2 ptNewPos = m_GrabPointCenter.GetCachePos() + m_vDragDelta;
-		if(bShiftMod) // Snap to 25 pixel increments if shift is held
-			HySetVec(ptNewPos, roundf(ptNewPos.x / 25.0f) * 25.0f, roundf(ptNewPos.y / 25.0f) * 25.0f);
+		if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
+			ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
 		m_GrabPointCenter.SetPos(ptNewPos);
+		break; }
+
+	case VECTORACTION_InsertVertex:
+	case VECTORACTION_CloseLoop:
+	case VECTORACTION_Outside:
+	case VECTORACTION_Inside:
+	default:
+		HyGuiLog("VectorModel::MouseTransform() - Unhandled VectorAction: " % QString::number(m_eCurAction), LOGTYPE_Error);
+		break;
 	}
 
 	SyncViews(EDITMODE_MouseDragTransform);
@@ -1149,6 +1186,235 @@ std::vector<float> VectorModel::ConvertedPolygonOrLineChainData() const
 	}
 	
 	return convertedDataList;
+}
+
+void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapAmt)
+{
+	if(m_FixtureList.size() != 1)
+		HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - m_FixtureList isn't size 1", LOGTYPE_Error);
+
+	std::function<GfxTransformCtrl::GrabPointType(int)> fpIndexToEnum =
+		[](int iGrabPointIndex) -> GfxTransformCtrl::GrabPointType
+		{
+			switch(iGrabPointIndex)
+			{
+			case 0:	return GfxTransformCtrl::GRAB_BotLeft;
+			case 1:	return GfxTransformCtrl::GRAB_BotMid;
+			case 2:	return GfxTransformCtrl::GRAB_BotRight;
+			case 3:	return GfxTransformCtrl::GRAB_MidRight;
+			case 4:	return GfxTransformCtrl::GRAB_TopRight;
+			case 5:	return GfxTransformCtrl::GRAB_TopMid;
+			case 6:	return GfxTransformCtrl::GRAB_TopLeft;
+			case 7:	return GfxTransformCtrl::GRAB_MidLeft;
+			default:
+				HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - Box shape had invalid iGrabPointIndex", LOGTYPE_Error);
+				break;
+			}
+			return GfxTransformCtrl::GRAB_None;
+		};
+	std::function<int(GfxTransformCtrl::GrabPointType)> fpEnumToIndex =
+		[](GfxTransformCtrl::GrabPointType eGrabPt) -> int
+		{
+			switch(eGrabPt)
+			{
+			case GfxTransformCtrl::GRAB_BotLeft: return 0;
+			case GfxTransformCtrl::GRAB_BotMid: return 1;
+			case GfxTransformCtrl::GRAB_BotRight: return 2;
+			case GfxTransformCtrl::GRAB_MidRight: return 3;
+			case GfxTransformCtrl::GRAB_TopRight: return 4;
+			case GfxTransformCtrl::GRAB_TopMid: return 5;
+			case GfxTransformCtrl::GRAB_TopLeft: return 6;
+			case GfxTransformCtrl::GRAB_MidLeft: return 7;
+			default:
+				HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - Box shape had invalid GfxTransformCtrl::GrabPointType enum", LOGTYPE_Error);
+				break;
+			}
+			return -1;
+		};
+	#define fpGetGrabPt(x) m_GrabPointList[fpEnumToIndex(x)]
+
+	GfxTransformCtrl::GrabPointType eGrabbedPoint = fpIndexToEnum(m_iGrabPointIndex);
+	switch(eGrabbedPoint)
+	{
+	case GfxTransformCtrl::GRAB_BotLeft:
+	case GfxTransformCtrl::GRAB_BotRight:
+	case GfxTransformCtrl::GRAB_TopRight:
+	case GfxTransformCtrl::GRAB_TopLeft: {
+
+		int iAnchorIndex = -1, iAdjacentIndex1 = -1, iAdjacentIndex2 = -1;
+		GfxGrabPointModel *pGrabbed, *pAnchor, *pAdjacentMid1, *pAdjacentMid2, *pAdjacentCorner1, *pAdjacentCorner2, *pFarMid1, *pFarMid2;
+		pGrabbed = &fpGetGrabPt(eGrabbedPoint);
+		if(eGrabbedPoint == GfxTransformCtrl::GRAB_BotLeft)
+		{
+			iAnchorIndex = fpEnumToIndex(GfxTransformCtrl::GRAB_TopRight);
+			pAnchor = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopRight);
+			pAdjacentMid1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotMid);
+			pAdjacentMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidLeft);
+			iAdjacentIndex1 = fpEnumToIndex(GfxTransformCtrl::GRAB_BotRight);
+			pAdjacentCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotRight);
+			iAdjacentIndex2 = fpEnumToIndex(GfxTransformCtrl::GRAB_TopLeft);
+			pAdjacentCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopLeft);
+			pFarMid1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidRight);
+			pFarMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopMid);
+		}
+		else if(eGrabbedPoint == GfxTransformCtrl::GRAB_BotRight)
+		{
+			iAnchorIndex = fpEnumToIndex(GfxTransformCtrl::GRAB_TopLeft);
+			pAnchor = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopLeft);
+			pAdjacentMid1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidRight);
+			pAdjacentMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotMid);
+			iAdjacentIndex1 = fpEnumToIndex(GfxTransformCtrl::GRAB_TopRight);
+			pAdjacentCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopRight);
+			iAdjacentIndex2 = fpEnumToIndex(GfxTransformCtrl::GRAB_BotLeft);
+			pAdjacentCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotLeft);
+			pFarMid1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopMid);
+			pFarMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidLeft);
+		}
+		else if(eGrabbedPoint == GfxTransformCtrl::GRAB_TopRight)
+		{
+			iAnchorIndex = fpEnumToIndex(GfxTransformCtrl::GRAB_BotLeft);
+			pAnchor = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotLeft);
+			pAdjacentMid1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopMid);
+			pAdjacentMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidRight);
+			iAdjacentIndex1 = fpEnumToIndex(GfxTransformCtrl::GRAB_TopLeft);
+			pAdjacentCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopLeft);
+			iAdjacentIndex2 = fpEnumToIndex(GfxTransformCtrl::GRAB_BotRight);
+			pAdjacentCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotRight);
+			pFarMid1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidLeft);
+			pFarMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotMid);
+		}
+		else if(eGrabbedPoint == GfxTransformCtrl::GRAB_TopLeft)
+		{
+			iAnchorIndex = fpEnumToIndex(GfxTransformCtrl::GRAB_BotRight);
+			pAnchor = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotRight);
+			pAdjacentMid1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidLeft);
+			pAdjacentMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopMid);
+			iAdjacentIndex1 = fpEnumToIndex(GfxTransformCtrl::GRAB_BotLeft);
+			pAdjacentCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotLeft);
+			iAdjacentIndex2 = fpEnumToIndex(GfxTransformCtrl::GRAB_TopRight);
+			pAdjacentCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopRight);
+			pFarMid1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotMid);
+			pFarMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidRight);
+		}
+
+		glm::vec2 ptNewPos = pGrabbed->GetCachePos() + m_vDragDelta;
+		if(bShiftMod) // Snap to fSnapAmt pixel increments if shift is held
+			ptNewPos = { roundf(ptNewPos.x / fSnapAmt) * fSnapAmt, roundf(ptNewPos.y / fSnapAmt) * fSnapAmt };
+
+		glm::vec2 vDir1 = pAdjacentCorner1->GetCachePos() - pGrabbed->GetCachePos();
+		glm::vec2 vDir2 = pAdjacentCorner2->GetCachePos() - pGrabbed->GetCachePos();
+		glm::vec2 vAnchorDir1 = pAdjacentCorner1->GetCachePos() - pAnchor->GetCachePos();
+		glm::vec2 vAnchorDir2 = pAdjacentCorner2->GetCachePos() - pAnchor->GetCachePos();
+
+		// First do half-space tests to see if the grabbed point was dragged past the anchor point
+		bool bPast1 = false;
+		bool bPast2 = false;
+		if(1 == HyMath::HalfSpaceTest(ptNewPos, glm::normalize(vDir1), pAnchor->GetCachePos()))
+			bPast1 = true;
+		if(1 == HyMath::HalfSpaceTest(ptNewPos, glm::normalize(vDir2), pAnchor->GetCachePos()))
+			bPast2 = true;
+		if(bPast1 || bPast2)
+		{
+			if(bPast1 && bPast2)
+				m_iGrabPointIndex = iAnchorIndex;
+			else if(bPast1)
+				m_iGrabPointIndex = iAdjacentIndex1;
+			else
+				m_iGrabPointIndex = iAdjacentIndex2;
+
+			// TODO: Only reset position on proper vertices in order to flip on the pivoted point
+			for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
+				grabPtRef.SetPos(grabPtRef.GetCachePos());
+
+			return;
+		}
+
+		glm::vec2 ptIntersection1, ptIntersection2;
+		bool bValid = true;
+		if(HyMath::TestRaysOverlap(ptNewPos, glm::normalize(vDir1), pAnchor->GetCachePos(), glm::normalize(vAnchorDir1), ptIntersection1) == false)
+			bValid = false;
+		if(HyMath::TestRaysOverlap(ptNewPos, glm::normalize(vDir2), pAnchor->GetCachePos(), glm::normalize(vAnchorDir2), ptIntersection2) == false)
+			bValid = false;
+		if(bValid == false)
+			return;
+		
+		pGrabbed->SetPos(ptNewPos);
+		pAdjacentCorner1->SetPos(ptIntersection1);
+		pAdjacentCorner2->SetPos(ptIntersection2);
+		pAdjacentMid1->SetPos(ptNewPos + ((ptIntersection1 - ptNewPos) * 0.5f));
+		pAdjacentMid2->SetPos(ptNewPos + ((ptIntersection2 - ptNewPos) * 0.5f));
+		pFarMid1->SetPos(pAnchor->GetCachePos() + ((ptIntersection1 - pAnchor->GetCachePos()) * 0.5f));
+		pFarMid2->SetPos(pAnchor->GetCachePos() + ((ptIntersection2 - pAnchor->GetCachePos()) * 0.5f));
+
+		break; }
+
+	case GfxTransformCtrl::GRAB_BotMid:
+	case GfxTransformCtrl::GRAB_MidRight:
+	case GfxTransformCtrl::GRAB_TopMid:
+	case GfxTransformCtrl::GRAB_MidLeft: {
+
+		GfxGrabPointModel *pGrabbed, *pAnchorCorner1, *pAnchorCorner2, *pAnchorMid, *pAdjacentCorner1, *pAdjacentCorner2, *pAdjacentMid1, *pAdjacentMid2;
+		pGrabbed = &fpGetGrabPt(eGrabbedPoint);
+		if(eGrabbedPoint == GfxTransformCtrl::GRAB_BotMid)
+		{
+			pAnchorCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopRight);
+			pAnchorCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopLeft);
+			pAnchorMid = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopMid);
+			pAdjacentCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotRight);
+			pAdjacentCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotLeft);
+			pAdjacentMid1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidRight);
+			pAdjacentMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidLeft);
+		}
+		else if(eGrabbedPoint == GfxTransformCtrl::GRAB_MidRight)
+		{
+			pAnchorCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopLeft);
+			pAnchorCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotLeft);
+			pAnchorMid = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidLeft);
+			pAdjacentCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopRight);
+			pAdjacentCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotRight);
+			pAdjacentMid1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopMid);
+			pAdjacentMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotMid);
+		}
+		else if(eGrabbedPoint == GfxTransformCtrl::GRAB_TopMid)
+		{
+			pAnchorCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotLeft);
+			pAnchorCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotRight);
+			pAnchorMid = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotMid);
+			pAdjacentCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopLeft);
+			pAdjacentCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopRight);
+			pAdjacentMid1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidLeft);
+			pAdjacentMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidRight);
+		}
+		else if(eGrabbedPoint == GfxTransformCtrl::GRAB_MidLeft)
+		{
+			pAnchorCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotRight);
+			pAnchorCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopRight);
+			pAnchorMid = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidRight);
+			pAdjacentCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotLeft);
+			pAdjacentCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopLeft);
+			pAdjacentMid1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotMid);
+			pAdjacentMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopMid);
+		}
+
+		glm::vec2 ptNewPos = pGrabbed->GetCachePos() + m_vDragDelta;
+		if(bShiftMod) // Snap to fSnapAmt pixel increments if shift is held
+			ptNewPos = { roundf(ptNewPos.x / fSnapAmt) * fSnapAmt, roundf(ptNewPos.y / fSnapAmt) * fSnapAmt };
+
+		// First check half space tests
+
+		break; }
+	default:
+		HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - Box shape had invalid eGrabSpot", LOGTYPE_Error);
+		break;
+	}
+
+	std::vector<glm::vec2> ptVertexList = { m_GrabPointList[0].GetPos(), m_GrabPointList[2].GetPos(), m_GrabPointList[4].GetPos(), m_GrabPointList[6].GetPos() };
+	static_cast<HyShape2d *>(m_FixtureList[0])->SetAsPolygon(ptVertexList);
+	glm::vec2 ptCentroid;
+	m_FixtureList[0]->GetCentroid(ptCentroid);
+	m_GrabPointCenter.SetPos(ptCentroid);
+
+	SyncViews(EDITMODE_MouseDragTransform);
 }
 
 VectorAction VectorModel::DoMouseMoveIdle()

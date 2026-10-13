@@ -63,8 +63,8 @@ public:
 
 	virtual Qt::CursorShape MouseMoveIdle() = 0;
 	virtual void MouseIdleRightClick() = 0;
-	virtual bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, glm::vec2 ptClickPos) = 0; // ptClickPos in world coordinates; Returns whether transform has begun (otherwise marquee select)
-	virtual void MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) = 0;
+	virtual bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, glm::vec2 ptClickPos) = 0;	// ptClickPos in world coordinates; Returns whether transform has begun (otherwise marquee select)
+	virtual void MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) = 0;				// Gets here if MousePressEvent() returns true and mouse is held + dragged
 	virtual void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight) = 0;
 	virtual void MouseClickTransformReleased(glm::vec2 ptReleasePos) = 0; // ptReleasePos in world coordinates
 

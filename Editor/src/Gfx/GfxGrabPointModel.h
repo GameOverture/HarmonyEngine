@@ -56,6 +56,7 @@ public:
 	float GetRadius() const;
 	bool IsMouseHover() const;
 
+	bool IsTypeSelectable() const;
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);
 

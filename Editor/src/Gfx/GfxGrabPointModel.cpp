@@ -82,6 +82,11 @@ bool GfxGrabPointModel::IsMouseHover() const
 	return glm::distance(ptScreenPos, HyEngine::Input().GetMousePos()) <= (GRABPOINT_SELECT_RADIUS * 2);
 }
 
+bool GfxGrabPointModel::IsTypeSelectable() const
+{
+	return (m_eType == GRABPOINT_Vertex || m_eType == GRABPOINT_VertexSelected || m_eType == GRABPOINT_Endpoint || m_eType == GRABPOINT_EndpointSelected);
+}
+
 bool GfxGrabPointModel::IsSelected() const
 {
 	return m_eType == GRABPOINT_VertexSelected || m_eType == GRABPOINT_EndpointSelected;
