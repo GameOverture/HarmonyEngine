@@ -27,6 +27,8 @@ enum GrabPointType
 	GRABPOINT_ShapeCtrlAll,
 	GRABPOINT_ShapeCtrlHorz,
 	GRABPOINT_ShapeCtrlVert,
+	GRABPOINT_ShapeCtrlDiagUp,		// BotLeft -> TopRight
+	GRABPOINT_ShapeCtrlDiagDown,	// TopLeft -> BotRight
 
 	GRABPOINT_Center
 };
@@ -60,7 +62,7 @@ public:
 	HyColor GetOutlineColor() const;
 	HyColor GetFillColor() const;
 
-	Qt::CursorShape GetHoverCursor() const;
+	Qt::CursorShape GetHoverCursor(float fRotation) const;
 };
 
 #endif // GfxGrabPointModel_H

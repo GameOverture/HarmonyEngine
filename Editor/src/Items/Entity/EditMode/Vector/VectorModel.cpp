@@ -142,7 +142,7 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 		else if(m_iGrabPointIndex >= 0)
 		{
 			MainWindow::SetStatus("Edit Mode - Select Vertex", 0);
-			return m_GrabPointList[m_iGrabPointIndex].GetHoverCursor();
+			return m_GrabPointList[m_iGrabPointIndex].GetHoverCursor(CalcRotation());
 		}
 
 	case VECTORACTION_HoverCenter:
@@ -392,6 +392,21 @@ int VectorModel::GetDisplayOrder() const
 void VectorModel::SetDisplayOrder(int iDisplayOrder)
 {
 	m_iDisplayOrder = iDisplayOrder;
+}
+
+float VectorModel::CalcRotation() const
+{
+	if(m_eShapeType == SHAPE_Box)
+	{
+		if(m_FixtureList.isEmpty())
+			return 0.0f;
+
+		std::vector<glm::vec2> ptCorners = m_FixtureList[0]->CalcGrabPoints();
+		glm::vec2 dir = glm::normalize(ptCorners[1] - ptCorners[0]);
+		return glm::degrees(glm::atan(dir.y, dir.x));
+	}
+
+	return 0.0f;
 }
 
 void VectorModel::ChangeToLineChain(bool bIsActiveEditModeItem, bool bAsFixture)
@@ -1501,9 +1516,24 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 		if(sResult.isEmpty() == false)
 			return sResult;
 
-		grabPointList = m_FixtureList[0]->CalcGrabPoints();
-		m_FixtureList[0]->GetCentroid(ptCentroid);
+		if(m_eShapeType == SHAPE_Box)
+		{
+			std::vector<glm::vec2> ptCorners = m_FixtureList[0]->CalcGrabPoints();
 
+			grabPointList.reserve(8);
+			grabPointList.emplace_back(ptCorners[0]);
+			grabPointList.emplace_back((ptCorners[0] + ptCorners[1]) * 0.5f);
+			grabPointList.emplace_back(ptCorners[1]);
+			grabPointList.emplace_back((ptCorners[1] + ptCorners[2]) * 0.5f);
+			grabPointList.emplace_back(ptCorners[2]);
+			grabPointList.emplace_back((ptCorners[2] + ptCorners[3]) * 0.5f);
+			grabPointList.emplace_back(ptCorners[3]);
+			grabPointList.emplace_back((ptCorners[3] + ptCorners[0]) * 0.5f);
+		}
+		else
+			grabPointList = m_FixtureList[0]->CalcGrabPoints();
+
+		m_FixtureList[0]->GetCentroid(ptCentroid);
 		m_bLoopClosed = floatList.back() != 0.0f;
 	}
 
@@ -1556,12 +1586,18 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 			break;
 
 		case SHAPE_Box:
-			if(grabPointList.size() != 4)
+			if(grabPointList.size() != 8)
 				return "Invalid box shape data";
 
-			m_GrabPointList.resize(4);
-			for(int i = 0; i < 4; ++i)
-				m_GrabPointList[i].Set(GRABPOINT_ShapeCtrlAll, grabPointList[i]);
+			m_GrabPointList.resize(8);
+			m_GrabPointList[0].Set(GRABPOINT_ShapeCtrlDiagUp, grabPointList[0]);
+			m_GrabPointList[1].Set(GRABPOINT_ShapeCtrlVert, grabPointList[1]);
+			m_GrabPointList[2].Set(GRABPOINT_ShapeCtrlDiagDown, grabPointList[2]);
+			m_GrabPointList[3].Set(GRABPOINT_ShapeCtrlHorz, grabPointList[3]);
+			m_GrabPointList[4].Set(GRABPOINT_ShapeCtrlDiagUp, grabPointList[4]);
+			m_GrabPointList[5].Set(GRABPOINT_ShapeCtrlVert, grabPointList[5]);
+			m_GrabPointList[6].Set(GRABPOINT_ShapeCtrlDiagDown, grabPointList[6]);
+			m_GrabPointList[7].Set(GRABPOINT_ShapeCtrlHorz, grabPointList[7]);
 			break;
 
 		case SHAPE_Circle:

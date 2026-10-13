@@ -1238,6 +1238,37 @@
 	return QRect(x, y, w, h);
 }
 
+Qt::CursorShape HyGlobal::RotateCursor(Qt::CursorShape eStartCursor, float fRotation)
+{
+	fRotation = HyMath::NormalizeRange(fRotation, 0.0f, 360.0f);
+
+	int32 iThresholds = 0;
+	if(fRotation <= 22.5f || fRotation >= 337.5f)
+		iThresholds = 0;
+	else if(fRotation >= 22.5f && fRotation <= 67.5f)
+		iThresholds = 1;
+	else if(fRotation >= 67.5f && fRotation <= 112.5f)
+		iThresholds = 2;
+	else if(fRotation >= 112.5 && fRotation <= 157.5f)
+		iThresholds = 3;
+	else if(fRotation >= 157.5f && fRotation <= 202.5f)
+		iThresholds = 4;
+	else if(fRotation >= 202.5f && fRotation <= 247.5f)
+		iThresholds = 5;
+	else if(fRotation >= 247.5f && fRotation <= 292.5f)
+		iThresholds = 6;
+	else //if(fRotation >= 292.5f && fRotation <= 337.5f)
+		iThresholds = 7;
+
+	const Qt::CursorShape cursorShapes[] = { Qt::SizeBDiagCursor, Qt::SizeVerCursor, Qt::SizeFDiagCursor, Qt::SizeHorCursor };
+	for(int32 i = 0; i < 4; ++i)
+	{
+		if(eStartCursor == cursorShapes[i])
+			return cursorShapes[HyMath::NormalizeRange(i + iThresholds, 0, 4)];
+	}
+	return eStartCursor;
+}
+
 QAction *FindAction(QList<QAction *> list, QString sName)
 {
 	for(int i = 0; i < list.size(); ++i)

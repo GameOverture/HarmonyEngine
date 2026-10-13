@@ -105,6 +105,8 @@ HyColor GfxGrabPointModel::GetOutlineColor() const
 	case GRABPOINT_ShapeCtrlAll:
 	case GRABPOINT_ShapeCtrlHorz:
 	case GRABPOINT_ShapeCtrlVert:
+	case GRABPOINT_ShapeCtrlDiagUp:
+	case GRABPOINT_ShapeCtrlDiagDown:
 	case GRABPOINT_Vertex:				return HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointOutline);
 	case GRABPOINT_VertexSelected:		return HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointSelectedOutline);
 	case GRABPOINT_Endpoint:			return HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointOutline);
@@ -129,6 +131,8 @@ HyColor GfxGrabPointModel::GetFillColor() const
 	case GRABPOINT_ShapeCtrlAll:
 	case GRABPOINT_ShapeCtrlHorz:
 	case GRABPOINT_ShapeCtrlVert:
+	case GRABPOINT_ShapeCtrlDiagUp:
+	case GRABPOINT_ShapeCtrlDiagDown:
 	case GRABPOINT_Vertex:				return HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointFill);
 	case GRABPOINT_VertexSelected:		return HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointSelectedFill);
 	case GRABPOINT_Endpoint:			return HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointFill);
@@ -143,15 +147,17 @@ HyColor GfxGrabPointModel::GetFillColor() const
 	return HyColor();
 }
 
-Qt::CursorShape GfxGrabPointModel::GetHoverCursor() const
+Qt::CursorShape GfxGrabPointModel::GetHoverCursor(float fRotation) const
 {
 	switch(m_eType)
 	{ 
 	case GRABPOINT_Transform:			return Qt::ArrowCursor;
 	case GRABPOINT_TransformRotate:		return Qt::UpArrowCursor;
 	case GRABPOINT_ShapeCtrlAll:		return Qt::SizeAllCursor;
-	case GRABPOINT_ShapeCtrlHorz:		return Qt::SizeHorCursor;
-	case GRABPOINT_ShapeCtrlVert:		return Qt::SizeVerCursor;
+	case GRABPOINT_ShapeCtrlHorz:		return HyGlobal::RotateCursor(Qt::SizeHorCursor, fRotation);
+	case GRABPOINT_ShapeCtrlVert:		return HyGlobal::RotateCursor(Qt::SizeVerCursor, fRotation);
+	case GRABPOINT_ShapeCtrlDiagUp:		return HyGlobal::RotateCursor(Qt::SizeBDiagCursor, fRotation);
+	case GRABPOINT_ShapeCtrlDiagDown:	return HyGlobal::RotateCursor(Qt::SizeFDiagCursor, fRotation);
 	case GRABPOINT_Vertex:				return Qt::PointingHandCursor;
 	case GRABPOINT_VertexSelected:		return Qt::SizeAllCursor;
 	case GRABPOINT_Endpoint:			return Qt::PointingHandCursor;

@@ -104,6 +104,8 @@ public:
 	int GetDisplayOrder() const;
 	void SetDisplayOrder(int iDisplayOrder);
 
+	float CalcRotation() const;
+
 	void ChangeToLineChain(bool bIsActiveEditModeItem, bool bAsFixture);
 	void ChangeToPoint(bool bIsActiveEditModeItem);
 	void ChangeToShape(bool bIsActiveEditModeItem, EditorShape eNewShapeType, bool bAsFixture);

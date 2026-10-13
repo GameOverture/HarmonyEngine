@@ -652,6 +652,8 @@ public:
 	static EntityItemDeclarationType GetEntityDeclType(QString sType);
 
 	static QRect AlphaCropImage(const QImage &img);
+
+	static Qt::CursorShape RotateCursor(Qt::CursorShape eStartCursor, float fRotation);
 };
 
 struct SortTreeWidgetsPredicate
