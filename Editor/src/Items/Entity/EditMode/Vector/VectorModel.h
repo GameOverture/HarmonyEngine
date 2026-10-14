@@ -62,9 +62,9 @@ class VectorModel : public IEditModeModel
 
 	// Transform Action info
 	VectorAction						m_eCurAction;
-	glm::vec2							m_vDragDelta;
 	int									m_iGrabPointIndex;
-	glm::vec2							m_ptGrabPointPos;
+	bool								m_bOverrideTransformStart;
+	glm::vec2							m_ptTransformStartOverride;
 
 public:
 	VectorModel(EditModeType eEditModeType);
@@ -131,7 +131,6 @@ public:
 
 	void OnDeleteKeyPressed();
 
-	glm::vec2 GetDragDelta() const;
 	VectorAction GetCurrentAction() const;
 	
 	QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const; // Returns undo command description (blank if no change)
@@ -145,7 +144,7 @@ protected:
 	std::vector<float> ConvertedCapsuleData() const;
 	std::vector<float> ConvertedPolygonOrLineChainData() const;
 
-	void DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapAmt);
+	void DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapAmt, glm::vec2 vDragDelta);
 
 	VectorAction DoMouseMoveIdle();
 

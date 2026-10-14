@@ -295,6 +295,7 @@ public:
 	static glm::vec2 ClosestPointOnSegment(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &ptTestPoint);
 	static bool TestSegmentsOverlap(const glm::vec2 &ptSegA1, const glm::vec2 &ptSegA2, const glm::vec2 &ptSegB1, const glm::vec2 &ptSegB2, glm::vec2 &ptIntersectionOut);
 	static bool TestRaysOverlap(const glm::vec2 &ptRayStart1, const glm::vec2 &vNormalizedRayDir1, const glm::vec2 &ptRayStart2, const glm::vec2 &vNormalizedRayDir2, glm::vec2 &ptIntersectionOut);
+	static bool TestLinesOverlap(const glm::vec2 &ptLine1, const glm::vec2 &vNormalizedLineDir1, const glm::vec2 &ptLine2, const glm::vec2 &vNormalizedLineDir2, glm::vec2 &ptIntersectionOut);
 
 	static glm::ivec2 TileMapPointToCell_Square(const glm::vec2 &ptLocal, const glm::ivec2 &vCellDimensions);
 	static glm::ivec2 TileMapPointToCell_HalfSquare(const glm::vec2 &ptLocal, const glm::ivec2 &vCellDimensions);

@@ -31,9 +31,9 @@ VectorModel::VectorModel(EditModeType eEditModeType) :
 	m_ptSelfIntersection(0.0f, 0.0f),
 	m_sMalformedReason("No Data"),
 	m_eCurAction(VECTORACTION_None),
-	m_vDragDelta(0.0f, 0.0f),
 	m_iGrabPointIndex(-1),
-	m_ptGrabPointPos(0.0f, 0.0f)
+	m_bOverrideTransformStart(false),
+	m_ptTransformStartOverride(0.0f, 0.0f)
 {
 	ClearAction();
 }
@@ -179,7 +179,7 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 			HyGuiLog("GfxShapeModel::MousePressEvent - Insert vertex index was -1 on AddVertex/Crosshair", LOGTYPE_Error);
 			return VECTORACTION_None;
 		}
-		m_GrabPointList.insert(m_GrabPointList.begin() + m_iGrabPointIndex, GfxGrabPointModel(GRABPOINT_VertexSelected, m_ptGrabPointPos));
+		m_GrabPointList.insert(m_GrabPointList.begin() + m_iGrabPointIndex, GfxGrabPointModel(GRABPOINT_VertexSelected, ptClickPos));
 		for(int i = 0; i < m_GrabPointList.size(); ++i)
 			m_GrabPointList[i].SetSelected(false);
 		m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
@@ -241,9 +241,12 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 {
 	const float fSNAP_AMT = 25.0f;
 
-	m_vDragDelta = { 0.0f, 0.0f };
+	if(m_bOverrideTransformStart)
+		ptStartPos = m_ptTransformStartOverride;
+
+	glm::vec2 vDragDelta = { 0.0f, 0.0f };
 	if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
-		m_vDragDelta = { ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y };
+		vDragDelta = { ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y };
 
 	switch(m_eCurAction)
 	{
@@ -262,7 +265,7 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 			{
 				if(grabPtModel.IsSelected())
 				{
-					glm::vec2 ptNewPos = grabPtModel.GetCachePos() + m_vDragDelta;
+					glm::vec2 ptNewPos = grabPtModel.GetCachePos() + vDragDelta;
 					if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
 						ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
 					grabPtModel.SetPos(ptNewPos);
@@ -271,19 +274,36 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 		}
 		else // Not assembling vertices, this is a shape ctrl grab point
 		{
+			if(m_FixtureList.size() != 1)
+				HyGuiLog("VectorModel::MouseTransform() - m_FixtureList isn't size 1 with a shape ctrl grab point", LOGTYPE_Error);
+
 			switch(m_eShapeType)
 			{
 			case SHAPE_Box:
-				DoTransformShapeCtrlGrabPoint_Box(bShiftMod, fSNAP_AMT);
+				DoTransformShapeCtrlGrabPoint_Box(bShiftMod, fSNAP_AMT, vDragDelta);
 				break;
 
-			case SHAPE_Circle:
+			case SHAPE_Circle: {
+				glm::vec2 ptNewPos = m_GrabPointList[m_iGrabPointIndex].GetCachePos() + vDragDelta;
+				if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
+					ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
+
+				float fNewRadius = glm::length(ptNewPos - m_GrabPointCenter.GetCachePos());
+				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCircle(m_GrabPointCenter.GetCachePos(), fNewRadius);
+				std::vector<glm::vec2> grabList = static_cast<HyShape2d *>(m_FixtureList[0])->CalcGrabPoints();
+				if(m_GrabPointList.size() != 4 || grabList.size() != 4)
+					HyGuiLog("VectorModel::MouseTransform() - Circle shape ctrl was expecting 4 grab points", LOGTYPE_Error);
+				for(int i = 0; i < 4; i++)
+					m_GrabPointList[i].SetPos(grabList[i]);
+
+				break; }
+			case SHAPE_Capsule:
+				break;
 			case SHAPE_LineSegment:
 			case SHAPE_Polygon:
-			case SHAPE_Capsule:
 			case SHAPE_None:
 			default:
-				HyGuiLog("VectorModel::MouseTransform() - Unhandled shape type", LOGTYPE_Error);
+				HyGuiLog("VectorModel::MouseTransform() - Unhandled shape type with shape ctrl grab point", LOGTYPE_Error);
 				break;
 			}
 		}
@@ -292,13 +312,13 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 	case VECTORACTION_HoverCenter: {
 		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
 		{
-			glm::vec2 ptNewPos = grabPtModel.GetCachePos() + m_vDragDelta;
+			glm::vec2 ptNewPos = grabPtModel.GetCachePos() + vDragDelta;
 			if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
 				ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
 			grabPtModel.SetPos(ptNewPos);
 		}
 
-		glm::vec2 ptNewPos = m_GrabPointCenter.GetCachePos() + m_vDragDelta;
+		glm::vec2 ptNewPos = m_GrabPointCenter.GetCachePos() + vDragDelta;
 		if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
 			ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
 		m_GrabPointCenter.SetPos(ptNewPos);
@@ -636,11 +656,6 @@ void VectorModel::DeselectAllGrabPoints()
 		grabPtModel.SetSelected(false);
 }
 
-glm::vec2 VectorModel::GetDragDelta() const
-{
-	return m_vDragDelta;
-}
-
 VectorAction VectorModel::GetCurrentAction() const
 {
 	return m_eCurAction;
@@ -728,9 +743,9 @@ QString VectorModel::GetActionText(EditModeState eEditModeState, QString sNodeCo
 void VectorModel::ClearAction()
 {
 	m_eCurAction = VECTORACTION_None;
-	m_vDragDelta = glm::vec2(0.0f, 0.0f);
 	m_iGrabPointIndex = -1;
-	m_ptGrabPointPos = glm::vec2(0.0f, 0.0f);
+	m_bOverrideTransformStart = false;
+	m_ptTransformStartOverride = { 0.0f, 0.0f };
 }
 
 std::vector<float> VectorModel::ConvertedPointData() const
@@ -1188,11 +1203,8 @@ std::vector<float> VectorModel::ConvertedPolygonOrLineChainData() const
 	return convertedDataList;
 }
 
-void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapAmt)
+void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapAmt, glm::vec2 vDragDelta)
 {
-	if(m_FixtureList.size() != 1)
-		HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - m_FixtureList isn't size 1", LOGTYPE_Error);
-
 	std::function<GfxTransformCtrl::GrabPointType(int)> fpIndexToEnum =
 		[](int iGrabPointIndex) -> GfxTransformCtrl::GrabPointType
 		{
@@ -1297,7 +1309,7 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 			pFarMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidRight);
 		}
 
-		glm::vec2 ptNewPos = pGrabbed->GetCachePos() + m_vDragDelta;
+		glm::vec2 ptNewPos = pGrabbed->GetCachePos() + vDragDelta;
 		if(bShiftMod) // Snap to fSnapAmt pixel increments if shift is held
 			ptNewPos = { roundf(ptNewPos.x / fSnapAmt) * fSnapAmt, roundf(ptNewPos.y / fSnapAmt) * fSnapAmt };
 
@@ -1306,7 +1318,7 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 		glm::vec2 vAnchorDir1 = pAdjacentCorner1->GetCachePos() - pAnchor->GetCachePos();
 		glm::vec2 vAnchorDir2 = pAdjacentCorner2->GetCachePos() - pAnchor->GetCachePos();
 
-		// First do half-space tests to see if the grabbed point was dragged past the anchor point
+		// Do half-space tests to see if the grabbed point was dragged past the anchor point
 		bool bPast1 = false;
 		bool bPast2 = false;
 		if(1 == HyMath::HalfSpaceTest(ptNewPos, glm::normalize(vDir1), pAnchor->GetCachePos()))
@@ -1316,27 +1328,67 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 		if(bPast1 || bPast2)
 		{
 			if(bPast1 && bPast2)
+			{
+				// TODO: This conditional seems to get stuck in the editor
+				pGrabbed->SetPos(pAnchor->GetPos());
+				pAnchor->SetPos(ptNewPos);
+
+				glm::vec2 ptIntersection1, ptIntersection2;
+				if(HyMath::TestLinesOverlap(ptNewPos, glm::normalize(vAnchorDir1), pAnchor->GetCachePos(), glm::normalize(vDir1), ptIntersection1) == false)
+					HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - HyMath::TestLinesOverlap failed [bPast1 && bPast2, ptIntersection1]", LOGTYPE_Error);
+				if(HyMath::TestLinesOverlap(ptNewPos, glm::normalize(vAnchorDir2), pAnchor->GetCachePos(), glm::normalize(vDir2), ptIntersection2) == false)
+					HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - HyMath::TestLinesOverlap failed [bPast1 && bPast2, ptIntersection2]", LOGTYPE_Error);
+				pAdjacentCorner1->SetPos(ptIntersection1);
+				pAdjacentCorner2->SetPos(ptIntersection2);
+
 				m_iGrabPointIndex = iAnchorIndex;
+			}
 			else if(bPast1)
+			{
+				pAdjacentCorner2->SetPos(pAnchor->GetPos());
+				pAdjacentCorner1->SetPos(ptNewPos);
+
+				glm::vec2 ptIntersection1, ptIntersection2;
+				if(HyMath::TestLinesOverlap(ptNewPos, glm::normalize(vDir1 * -1.0f), pAnchor->GetCachePos(), glm::normalize(vAnchorDir1), ptIntersection1) == false)
+					HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - HyMath::TestLinesOverlap failed [bPast1, ptIntersection1]", LOGTYPE_Error);
+				if(HyMath::TestLinesOverlap(ptNewPos, glm::normalize(vDir2), pAnchor->GetCachePos(), glm::normalize(vAnchorDir2 * -1.0f), ptIntersection2) == false)
+					HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - HyMath::TestLinesOverlap failed [bPast1, ptIntersection2]", LOGTYPE_Error);
+				pGrabbed->SetPos(ptIntersection1);
+				pAnchor->SetPos(ptIntersection2);
+
 				m_iGrabPointIndex = iAdjacentIndex1;
+			}
 			else
+			{
+				pAdjacentCorner1->SetPos(pAnchor->GetPos());
+				pAdjacentCorner2->SetPos(ptNewPos);
+
+				glm::vec2 ptIntersection1, ptIntersection2;
+				if(HyMath::TestLinesOverlap(ptNewPos, glm::normalize(vDir2 * -1.0f), pAnchor->GetCachePos(), glm::normalize(vAnchorDir2), ptIntersection1) == false)
+					HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - HyMath::TestLinesOverlap failed [bPast2, ptIntersection1]", LOGTYPE_Error);
+				if(HyMath::TestLinesOverlap(ptNewPos, glm::normalize(vDir1), pAnchor->GetCachePos(), glm::normalize(vAnchorDir1 * -1.0f), ptIntersection2) == false)
+					HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - HyMath::TestLinesOverlap failed [bPast2, ptIntersection2]", LOGTYPE_Error);
+				pGrabbed->SetPos(ptIntersection1);
+				pAnchor->SetPos(ptIntersection2);
+
 				m_iGrabPointIndex = iAdjacentIndex2;
+			}
 
-			// TODO: Only reset position on proper vertices in order to flip on the pivoted point
 			for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
-				grabPtRef.SetPos(grabPtRef.GetCachePos());
+				grabPtRef.SetCachePos();
 
+			m_bOverrideTransformStart = true;
+			m_ptTransformStartOverride = ptNewPos;
+
+			DoTransformShapeCtrlGrabPoint_Box(bShiftMod, fSnapAmt, glm::vec2(0.0f, 0.0f));
 			return;
 		}
-
+		
 		glm::vec2 ptIntersection1, ptIntersection2;
-		bool bValid = true;
-		if(HyMath::TestRaysOverlap(ptNewPos, glm::normalize(vDir1), pAnchor->GetCachePos(), glm::normalize(vAnchorDir1), ptIntersection1) == false)
-			bValid = false;
-		if(HyMath::TestRaysOverlap(ptNewPos, glm::normalize(vDir2), pAnchor->GetCachePos(), glm::normalize(vAnchorDir2), ptIntersection2) == false)
-			bValid = false;
-		if(bValid == false)
-			return;
+		if(HyMath::TestLinesOverlap(ptNewPos, glm::normalize(vDir1), pAnchor->GetCachePos(), glm::normalize(vAnchorDir1), ptIntersection1) == false)
+			HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - HyMath::TestLinesOverlap failed [regular, 1]", LOGTYPE_Error);
+		if(HyMath::TestLinesOverlap(ptNewPos, glm::normalize(vDir2), pAnchor->GetCachePos(), glm::normalize(vAnchorDir2), ptIntersection2) == false)
+			HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - HyMath::TestLinesOverlap failed [regular, 2]", LOGTYPE_Error);
 		
 		pGrabbed->SetPos(ptNewPos);
 		pAdjacentCorner1->SetPos(ptIntersection1);
@@ -1345,7 +1397,7 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 		pAdjacentMid2->SetPos(ptNewPos + ((ptIntersection2 - ptNewPos) * 0.5f));
 		pFarMid1->SetPos(pAnchor->GetCachePos() + ((ptIntersection1 - pAnchor->GetCachePos()) * 0.5f));
 		pFarMid2->SetPos(pAnchor->GetCachePos() + ((ptIntersection2 - pAnchor->GetCachePos()) * 0.5f));
-
+		
 		break; }
 
 	case GfxTransformCtrl::GRAB_BotMid:
@@ -1401,37 +1453,51 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 			pAdjacentMid2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopMid);
 		}
 
-		glm::vec2 ptNewPos = pGrabbed->GetCachePos() + m_vDragDelta;
+		glm::vec2 ptNewPos = pGrabbed->GetCachePos() + vDragDelta;
 		if(bShiftMod) // Snap to fSnapAmt pixel increments if shift is held
 			ptNewPos = { roundf(ptNewPos.x / fSnapAmt) * fSnapAmt, roundf(ptNewPos.y / fSnapAmt) * fSnapAmt };
-
-		glm::vec2 vMainDir = pAnchorMid->GetCachePos() - pGrabbed->GetCachePos();
-		if(1 == HyMath::HalfSpaceTest(ptNewPos, glm::normalize(vMainDir), pAnchorMid->GetCachePos()))
-		{
-			m_iGrabPointIndex = iAnchorIndex;
-
-			// TODO: Only reset position on proper vertices in order to flip on the pivoted point
-			for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
-				grabPtRef.SetPos(grabPtRef.GetCachePos());
-
-			return;
-		}
 
 		glm::vec2 vDir1 = pAdjacentCorner1->GetCachePos() - pGrabbed->GetCachePos();
 		glm::vec2 vDir2 = pAdjacentCorner2->GetCachePos() - pGrabbed->GetCachePos();
 		glm::vec2 vAnchorDir1 = pAdjacentCorner1->GetCachePos() - pAnchorCorner1->GetCachePos();
 		glm::vec2 vAnchorDir2 = pAdjacentCorner2->GetCachePos() - pAnchorCorner2->GetCachePos();
 
+		glm::vec2 vMainDir = pAnchorMid->GetCachePos() - pGrabbed->GetCachePos();
+		if(1 == HyMath::HalfSpaceTest(ptNewPos, glm::normalize(vMainDir), pAnchorMid->GetCachePos()))
+		{
+			pGrabbed->SetPos(pAnchorMid->GetPos());
+			pAdjacentCorner1->SetPos(pAnchorCorner1->GetPos());
+			pAdjacentCorner2->SetPos(pAnchorCorner2->GetPos());
 
+			glm::vec2 ptIntersection1, ptIntersection2;
+			if(HyMath::TestLinesOverlap(ptNewPos, glm::normalize(vDir1), pAnchorCorner1->GetCachePos(), glm::normalize(vAnchorDir1 * -1.0f), ptIntersection1) == false)
+				HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - HyMath::TestLinesOverlap failed [flip, mid grab point 1]", LOGTYPE_Error);
+			
+			if(HyMath::TestLinesOverlap(ptNewPos, glm::normalize(vDir2), pAnchorCorner2->GetCachePos(), glm::normalize(vAnchorDir2 * -1.0f), ptIntersection2) == false)
+				HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - HyMath::TestLinesOverlap failed [flip, mid grab point 2]", LOGTYPE_Error);
+			
+			pAnchorCorner1->SetPos(ptIntersection1);
+			pAnchorCorner2->SetPos(ptIntersection2);
+			pAnchorMid->SetPos(ptIntersection1 + (ptIntersection2 - ptIntersection1) * 0.5f);
+
+			m_iGrabPointIndex = iAnchorIndex;
+
+			for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
+				grabPtRef.SetCachePos();
+
+			m_bOverrideTransformStart = true;
+			m_ptTransformStartOverride = ptNewPos;
+
+			DoTransformShapeCtrlGrabPoint_Box(bShiftMod, fSnapAmt, glm::vec2(0.0f, 0.0f));
+			return;
+		}
 
 		glm::vec2 ptIntersection1, ptIntersection2;
-		bool bValid = true;
-		if(HyMath::TestRaysOverlap(ptNewPos, glm::normalize(vDir1), pAnchorCorner1->GetCachePos(), glm::normalize(vAnchorDir1), ptIntersection1) == false)
-			bValid = false;
-		if(HyMath::TestRaysOverlap(ptNewPos, glm::normalize(vDir2), pAnchorCorner2->GetCachePos(), glm::normalize(vAnchorDir2), ptIntersection2) == false)
-			bValid = false;
-		if(bValid == false)
-			return;
+		if(HyMath::TestLinesOverlap(ptNewPos, glm::normalize(vDir1), pAnchorCorner1->GetCachePos(), glm::normalize(vAnchorDir1), ptIntersection1) == false)
+			HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - HyMath::TestLinesOverlap failed [regular, mid grab point 1]", LOGTYPE_Error);
+		
+		if(HyMath::TestLinesOverlap(ptNewPos, glm::normalize(vDir2), pAnchorCorner2->GetCachePos(), glm::normalize(vAnchorDir2), ptIntersection2) == false)
+			HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - HyMath::TestLinesOverlap failed [regular, mid grab point 2]", LOGTYPE_Error);
 		
 		pAdjacentCorner1->SetPos(ptIntersection1);
 		pAdjacentCorner2->SetPos(ptIntersection2);
@@ -1457,7 +1523,6 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 VectorAction VectorModel::DoMouseMoveIdle()
 {
 	m_iGrabPointIndex = -1;
-	m_ptGrabPointPos = glm::vec2(0.0f, 0.0f);
 
 	for(int i = 0; i < m_GrabPointList.size(); ++i)
 	{
@@ -1504,17 +1569,11 @@ VectorAction VectorModel::DoMouseMoveIdle()
 				if(m_GrabPointList.front().IsSelected())
 				{
 					m_iGrabPointIndex = 0;
-					if(HyEngine::Input().GetWorldMousePos(m_ptGrabPointPos) == false)
-						HyGuiLog("GfxShapeModel::DoMouseMoveIdle - Failed to get world mouse position for append vertex", LOGTYPE_Error);
-					
 					return VECTORACTION_AppendVertex;
 				}
 				else if(m_GrabPointList.back().IsSelected())
 				{
 					m_iGrabPointIndex = m_GrabPointList.size();
-					if(HyEngine::Input().GetWorldMousePos(m_ptGrabPointPos) == false)
-						HyGuiLog("GfxShapeModel::DoMouseMoveIdle - Failed to get world mouse position for append vertex", LOGTYPE_Error);
-
 					return VECTORACTION_AppendVertex;
 				}
 			}
@@ -2037,7 +2096,6 @@ bool VectorModel::CheckIfAddVertexOnEdge()
 		if(tmpEdgeShape.TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
 		{
 			m_iGrabPointIndex = i + 1;
-			m_ptGrabPointPos = HyMath::ClosestPointOnSegment(pt1, pt2, ptWorldMousePos);
 			return true;
 		}
 	}

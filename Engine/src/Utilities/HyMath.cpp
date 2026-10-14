@@ -10,7 +10,7 @@
 #include "Afx/HyStdAfx.h"
 #include "Utilities/HyMath.h"
 
-const float HyMath::FloatSlop = 0.00001f; //0.005f;
+const float HyMath::FloatSlop = 0.00001f;
 
 const HyColor HyColor::White(0xffffff);
 const HyColor HyColor::Black(0x000000);
@@ -516,6 +516,19 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 		return false;
 
 	ptIntersectionOut = ptRayStart1 + r * vNormalizedRayDir1;
+	return true;
+}
+
+/*static*/ bool HyMath::TestLinesOverlap(const glm::vec2 &ptLine1, const glm::vec2 &vNormalizedLineDir1, const glm::vec2 &ptLine2, const glm::vec2 &vNormalizedLineDir2, glm::vec2 &ptIntersectionOut)
+{
+	float fCross = HyMath::CrossProduct(vNormalizedLineDir1, vNormalizedLineDir2);
+
+	if(std::abs(fCross) < HyMath::FloatSlop)
+		return false;
+
+	float t = ((ptLine2.x - ptLine1.x) * vNormalizedLineDir2.y - (ptLine2.y - ptLine1.y) * vNormalizedLineDir2.x) / fCross;
+
+	ptIntersectionOut = ptLine1 + (vNormalizedLineDir1 * t);
 	return true;
 }
 
