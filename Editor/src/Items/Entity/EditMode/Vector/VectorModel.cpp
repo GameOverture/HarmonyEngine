@@ -1355,10 +1355,12 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 
 		GfxGrabPointModel *pGrabbed, *pAnchorCorner1, *pAnchorCorner2, *pAnchorMid, *pAdjacentCorner1, *pAdjacentCorner2, *pAdjacentMid1, *pAdjacentMid2;
 		pGrabbed = &fpGetGrabPt(eGrabbedPoint);
+		int iAnchorIndex = -1;
 		if(eGrabbedPoint == GfxTransformCtrl::GRAB_BotMid)
 		{
 			pAnchorCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopRight);
 			pAnchorCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopLeft);
+			iAnchorIndex = fpEnumToIndex(GfxTransformCtrl::GRAB_TopMid);
 			pAnchorMid = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopMid);
 			pAdjacentCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotRight);
 			pAdjacentCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotLeft);
@@ -1369,6 +1371,7 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 		{
 			pAnchorCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopLeft);
 			pAnchorCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotLeft);
+			iAnchorIndex = fpEnumToIndex(GfxTransformCtrl::GRAB_MidLeft);
 			pAnchorMid = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidLeft);
 			pAdjacentCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopRight);
 			pAdjacentCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotRight);
@@ -1379,6 +1382,7 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 		{
 			pAnchorCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotLeft);
 			pAnchorCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotRight);
+			iAnchorIndex = fpEnumToIndex(GfxTransformCtrl::GRAB_BotMid);
 			pAnchorMid = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotMid);
 			pAdjacentCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopLeft);
 			pAdjacentCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopRight);
@@ -1389,6 +1393,7 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 		{
 			pAnchorCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotRight);
 			pAnchorCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopRight);
+			iAnchorIndex = fpEnumToIndex(GfxTransformCtrl::GRAB_MidRight);
 			pAnchorMid = &fpGetGrabPt(GfxTransformCtrl::GRAB_MidRight);
 			pAdjacentCorner1 = &fpGetGrabPt(GfxTransformCtrl::GRAB_BotLeft);
 			pAdjacentCorner2 = &fpGetGrabPt(GfxTransformCtrl::GRAB_TopLeft);
@@ -1400,7 +1405,39 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 		if(bShiftMod) // Snap to fSnapAmt pixel increments if shift is held
 			ptNewPos = { roundf(ptNewPos.x / fSnapAmt) * fSnapAmt, roundf(ptNewPos.y / fSnapAmt) * fSnapAmt };
 
-		// First check half space tests
+		glm::vec2 vMainDir = pAnchorMid->GetCachePos() - pGrabbed->GetCachePos();
+		if(1 == HyMath::HalfSpaceTest(ptNewPos, glm::normalize(vMainDir), pAnchorMid->GetCachePos()))
+		{
+			m_iGrabPointIndex = iAnchorIndex;
+
+			// TODO: Only reset position on proper vertices in order to flip on the pivoted point
+			for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
+				grabPtRef.SetPos(grabPtRef.GetCachePos());
+
+			return;
+		}
+
+		glm::vec2 vDir1 = pAdjacentCorner1->GetCachePos() - pGrabbed->GetCachePos();
+		glm::vec2 vDir2 = pAdjacentCorner2->GetCachePos() - pGrabbed->GetCachePos();
+		glm::vec2 vAnchorDir1 = pAdjacentCorner1->GetCachePos() - pAnchorCorner1->GetCachePos();
+		glm::vec2 vAnchorDir2 = pAdjacentCorner2->GetCachePos() - pAnchorCorner2->GetCachePos();
+
+
+
+		glm::vec2 ptIntersection1, ptIntersection2;
+		bool bValid = true;
+		if(HyMath::TestRaysOverlap(ptNewPos, glm::normalize(vDir1), pAnchorCorner1->GetCachePos(), glm::normalize(vAnchorDir1), ptIntersection1) == false)
+			bValid = false;
+		if(HyMath::TestRaysOverlap(ptNewPos, glm::normalize(vDir2), pAnchorCorner2->GetCachePos(), glm::normalize(vAnchorDir2), ptIntersection2) == false)
+			bValid = false;
+		if(bValid == false)
+			return;
+		
+		pAdjacentCorner1->SetPos(ptIntersection1);
+		pAdjacentCorner2->SetPos(ptIntersection2);
+		pGrabbed->SetPos(ptIntersection1 + (ptIntersection2 - ptIntersection1) * 0.5f);
+		pAdjacentMid1->SetPos(pAdjacentCorner1->GetPos() + (pAnchorCorner1->GetCachePos() - pAdjacentCorner1->GetPos()) * 0.5f);
+		pAdjacentMid2->SetPos(pAdjacentCorner2->GetPos() + (pAnchorCorner2->GetCachePos() - pAdjacentCorner2->GetPos()) * 0.5f);
 
 		break; }
 	default:
