@@ -54,7 +54,7 @@ void VectorModel::InitPrimTreeItemData(EntityTreeItemData *pPrimTreeItemData, in
 	m_iPrimLayerIndex = iLayerIndex;
 }
 
-HyPrimitive2d *VectorModel::GetPrimitive() const
+HyPrimitive2d *VectorModel::GetHyNode() const
 {
 	if(m_pPrimTreeItemData == nullptr)
 		return nullptr;
@@ -95,7 +95,7 @@ HyPrimitive2d *VectorModel::GetPrimitive() const
 	m_sMalformedReason = DeserializeData(serializedObj);
 	if(m_sMalformedReason.isEmpty() == false || m_FixtureList.empty()) // *this is a prim layer, update the parent primitive node
 	{
-		HyPrimitive2d *pHyPrimNode = GetPrimitive();
+		HyPrimitive2d *pHyPrimNode = GetHyNode();
 		if(pHyPrimNode)
 			pHyPrimNode->SetAsNothing(m_iPrimLayerIndex);
 	}
@@ -302,11 +302,17 @@ HyPrimitive2d *VectorModel::GetPrimitive() const
 
 				break; }
 
-			case SHAPE_Capsule:
-				
-				break;
+			case SHAPE_LineSegment: {
+				glm::vec2 ptNewPos = m_GrabPointList[m_iGrabPointIndex].GetCachePos() + vDragDelta;
+				if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
+					ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
 
-			case SHAPE_LineSegment:
+				m_GrabPointList[m_iGrabPointIndex].SetPos(ptNewPos);
+
+				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsLineSegment(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos());
+				break; }
+
+			case SHAPE_Capsule:
 			case SHAPE_Polygon:
 			case SHAPE_None:
 			default:
@@ -781,20 +787,18 @@ void VectorModel::ClearAction()
 
 /*virtual*/ void VectorModel::OnSyncViews() const /*override*/
 {
-	if(IsPrimitive())
+	HyPrimitive2d *pHyPrimNode = GetHyNode();
+	if(pHyPrimNode)
 	{
-		HyPrimitive2d *pHyPrimNode = GetPrimitive();
-		if(pHyPrimNode)
-		{
-			pHyPrimNode->SetLayerOffset(m_iPrimLayerIndex, GetOffset());
-			pHyPrimNode->SetLayerVisible(m_iPrimLayerIndex, IsVisible());
-			pHyPrimNode->SetLayerColor(m_iPrimLayerIndex, GetColor());
-			pHyPrimNode->SetLayerAlpha(m_iPrimLayerIndex, GetAlpha());
+		pHyPrimNode->SetLayerOffset(m_iPrimLayerIndex, GetOffset());
+		pHyPrimNode->SetLayerVisible(m_iPrimLayerIndex, IsVisible());
+		pHyPrimNode->SetLayerColor(m_iPrimLayerIndex, GetColor());
+		pHyPrimNode->SetLayerAlpha(m_iPrimLayerIndex, GetAlpha());
 
-			if(GetNumFixtures() > 0)
-				pHyPrimNode->SetAsFixture(m_iPrimLayerIndex, *GetFixture(0), 0.0f);
-		}
+		if(GetNumFixtures() > 0)
+			pHyPrimNode->SetAsFixture(m_iPrimLayerIndex, *GetFixture(0), m_fOutline);
 	}
+	
 }
 
 std::vector<float> VectorModel::ConvertedPointData() const
@@ -1895,7 +1899,7 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 
 	if(m_FixtureList.empty() == false)
 	{
-		HyPrimitive2d *pHyPrimNode = GetPrimitive();
+		HyPrimitive2d *pHyPrimNode = GetHyNode();
 		if(pHyPrimNode)
 			pHyPrimNode->SetAsFixture(m_iPrimLayerIndex, *m_FixtureList[0], m_fOutline);
 	}

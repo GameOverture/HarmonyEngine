@@ -137,6 +137,8 @@ EntityWidget::EntityWidget(ProjectItemData &itemRef, QWidget *pParent /*= nullpt
 	new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_Q), this, SLOT(OnKeyShiftQ()));
 	new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_E), this, SLOT(OnKeyShiftE()));
 	new QShortcut(QKeySequence(Qt::Key_F), this, SLOT(OnKeyF()));
+	new QShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F), this, SLOT(OnKeyShiftF()));
+	new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(OnKeyEsc()));
 
 	SetAnimStatesEnabled(static_cast<EntityModel *>(m_ItemRef.GetModel())->IsAnimStatesEnabled());
 	UpdateActions();
@@ -787,6 +789,59 @@ void EntityWidget::OnToggleSetConstructor()
 		static_cast<EntityStateData *>(m_ItemRef.GetModel()->GetStateData(GetCurStateIndex()))->GetDopeSheetScene().SetCurrentFrame(m_iPreviewStartingFrame);
 }
 
+void EntityWidget::CycleEditMode(bool bNext)
+{
+	QModelIndexList selectedIndices = GetSelectedItems();
+	if(selectedIndices.size() != 1)
+		return;
+	EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>();
+	if(pCurItemData == nullptr)
+		return;
+
+	if(pCurItemData->GetType() == ITEM_PrimNode)
+	{
+		EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
+		std::vector<EntityTreeItemData *> primLayerList = pTreeModel->FindPrimLayers(pCurItemData);
+		if(primLayerList.empty() == false)
+		{
+			if(bNext)
+				ToggleEditMode(primLayerList[0]);
+			else
+				ToggleEditMode(primLayerList[primLayerList.size() - 1]);
+		}
+	}
+	else if(pCurItemData->GetType() == ITEM_PrimLayer)
+	{
+		EntityTreeItemData *pPrimNode = nullptr;
+
+		EntityTreeModel *pTreeModel = static_cast<EntityTreeModel *>(ui->nodeTree->model());
+		int iLayerIndex = pTreeModel->GetPrimLayerIndex(pCurItemData, pPrimNode);
+		std::vector<EntityTreeItemData *> primLayerList = pTreeModel->FindPrimLayers(pPrimNode);
+		if(primLayerList.empty() == false)
+		{
+			if(IsEditMode())
+			{
+				if(bNext)
+				{
+					iLayerIndex++;
+					if(iLayerIndex >= primLayerList.size())
+						iLayerIndex = 0;
+				}
+				else
+				{
+					iLayerIndex--;
+					if(iLayerIndex < 0)
+						iLayerIndex = primLayerList.size() - 1;
+				}
+			}
+
+			ToggleEditMode(primLayerList[iLayerIndex]);
+		}
+	}
+	else if(ui->actionEditMode->isEnabled())
+		ToggleEditMode(pCurItemData);
+}
+
 void EntityWidget::OnKeySpace()
 {
 	EntityDraw *pEntDraw = static_cast<EntityDraw *>(m_ItemRef.GetDraw());
@@ -869,15 +924,17 @@ void EntityWidget::OnKeyShiftE()
 
 void EntityWidget::OnKeyF()
 {
-	if(ui->actionEditMode->isEnabled())
-	{
-		QModelIndexList selectedIndices = GetSelectedItems();
-		if(selectedIndices.size() == 1)
-		{
-			EntityTreeItemData *pCurItemData = ui->nodeTree->model()->data(selectedIndices[0], Qt::UserRole).value<EntityTreeItemData *>();
-			ToggleEditMode(pCurItemData);
-		}
-	}
+	CycleEditMode(true);
+}
+
+void EntityWidget::OnKeyShiftF()
+{
+	CycleEditMode(false);
+}
+
+void EntityWidget::OnKeyEsc()
+{
+	SetEditMode(nullptr);
 }
 
 void EntityWidget::on_cmbBaseClass_activated(int iIndex)

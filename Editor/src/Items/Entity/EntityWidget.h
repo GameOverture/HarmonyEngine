@@ -70,6 +70,8 @@ protected:
 
 	void OnToggleSetConstructor();
 
+	void CycleEditMode(bool bNext);
+
 public Q_SLOTS:
 	void OnKeySpace();
 
@@ -79,6 +81,8 @@ private Q_SLOTS:
 	void OnKeyShiftQ();
 	void OnKeyShiftE();
 	void OnKeyF();
+	void OnKeyShiftF();
+	void OnKeyEsc();
 
 	void on_cmbBaseClass_activated(int iIndex);
 	void on_txtCustomBaseClass_editingFinished();

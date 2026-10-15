@@ -27,7 +27,7 @@ VectorView::VectorView(HyEntity2d *pParent /*= nullptr*/) :
 /*virtual*/ void VectorView::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
 {
 	VectorModel *pVectorModel = static_cast<VectorModel *>(m_pModel);
-	pVectorModel->GetPrimitive()->CalcLocalBoundingShape(shapeOut);
+	pVectorModel->GetHyNode()->CalcLocalBoundingShape(shapeOut);
 }
 
 void VectorView::SyncColor()
@@ -149,7 +149,7 @@ void VectorView::SyncColor()
 				glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
 				pCamera->ProjectToCamera(ptTwo, ptTwo);
 
-				m_GrabPointOutline.SetAsLineSegment(0, ptOne, ptTwo, pVectorModel->GetOutline());
+				m_GrabPointOutline.SetAsLineSegment(0, ptOne, ptTwo, 1.0f);
 			}
 			break;
 

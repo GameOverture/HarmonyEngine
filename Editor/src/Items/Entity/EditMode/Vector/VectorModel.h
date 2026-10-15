@@ -72,7 +72,7 @@ public:
 	virtual ~VectorModel();
 	void InitPrimTreeItemData(EntityTreeItemData *pPrimTreeItemData, int iLayerIndex);
 
-	HyPrimitive2d *GetPrimitive() const;
+	HyPrimitive2d *GetHyNode() const;
 
 	virtual QJsonObject Serialize() const override;
 	virtual void Deserialize(bool bEnabled, const QJsonObject &serializedObj) override;
