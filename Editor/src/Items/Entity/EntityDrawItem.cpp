@@ -232,7 +232,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 			HyGuiLog("EntityDrawItem ctor - unhandled fixture item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 
 		m_pEditView->SetModel(m_pEntityTreeItemData->GetEditModel());
-		m_pChild = m_pEditView;
+		m_pChild = new HyPrimitive2d(pParent);
 	}
 	else if(m_pEntityTreeItemData->GetType() == ITEM_UiLayout || m_pEntityTreeItemData->GetType() == ITEM_UiSpacer)
 	{

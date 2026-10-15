@@ -16,8 +16,8 @@
 
 VectorModel::VectorModel(EditModeType eEditModeType) :
 	IEditModeModel(eEditModeType),
-	m_pPrimNodeTreeItemData(nullptr),
-	m_iPrimLayerIndex(0),
+	m_pPrimTreeItemData(nullptr),
+	m_iPrimLayerIndex(-1),
 	m_Color(HyColor::White),
 	m_vOffset(0.0f, 0.0f),
 	m_bVisible(true),
@@ -35,6 +35,11 @@ VectorModel::VectorModel(EditModeType eEditModeType) :
 	m_bOverrideTransformStart(false),
 	m_ptTransformStartOverride(0.0f, 0.0f)
 {
+	if(IsFixture())
+		m_WidgetColor = HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures);
+	else
+		m_WidgetColor = HyGlobal::GetEditorColor(EDITORCOLOR_ShapeGrabPointFill);
+
 	ClearAction();
 }
 
@@ -43,22 +48,21 @@ VectorModel::VectorModel(EditModeType eEditModeType) :
 	ClearFixtures();
 }
 
-void VectorModel::SetPrimNodeTreeItemData(EntityTreeItemData *pPrimNodeTreeItemData, int iLayerIndex)
+void VectorModel::InitPrimTreeItemData(EntityTreeItemData *pPrimTreeItemData, int iLayerIndex)
 {
-	m_pPrimNodeTreeItemData = pPrimNodeTreeItemData;
+	m_pPrimTreeItemData = pPrimTreeItemData;
 	m_iPrimLayerIndex = iLayerIndex;
 }
 
-HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
+HyPrimitive2d *VectorModel::GetPrimitive() const
 {
-	if(m_pPrimNodeTreeItemData == nullptr)
+	if(m_pPrimTreeItemData == nullptr)
 		return nullptr;
 
-	EntityDrawItem *pPrimNodeDrawItem = static_cast<EntityDraw *>(m_pPrimNodeTreeItemData->GetEntityModel().GetItem().GetDraw())->FindDrawItem(m_pPrimNodeTreeItemData);
+	EntityDrawItem *pPrimNodeDrawItem = static_cast<EntityDraw *>(m_pPrimTreeItemData->GetEntityModel().GetItem().GetDraw())->FindDrawItem(m_pPrimTreeItemData);
 	if(pPrimNodeDrawItem == nullptr)
 		return nullptr;
 	
-	iLayerIndexOut = m_iPrimLayerIndex;
 	return static_cast<HyPrimitive2d *>(pPrimNodeDrawItem->GetHyNode());
 }
 
@@ -89,9 +93,9 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 		m_iDisplayOrder = bEnabled ? DISPLAYORDER_FixtureSelected : DISPLAYORDER_Fixture;
 
 	m_sMalformedReason = DeserializeData(serializedObj);
-	if(m_pPrimNodeTreeItemData && (m_sMalformedReason.isEmpty() == false || m_FixtureList.empty())) // *this is a prim layer, update the parent primitive node
+	if(m_sMalformedReason.isEmpty() == false || m_FixtureList.empty()) // *this is a prim layer, update the parent primitive node
 	{
-		HyPrimitive2d *pHyPrimNode = GetPrimNode(m_iPrimLayerIndex);
+		HyPrimitive2d *pHyPrimNode = GetPrimitive();
 		if(pHyPrimNode)
 			pHyPrimNode->SetAsNothing(m_iPrimLayerIndex);
 	}
@@ -213,6 +217,7 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 
 		for(GfxGrabPointModel &grabPtRef : m_GrabPointList)
 			grabPtRef.SetCachePos();
+		m_GrabPointCenter.SetCachePos();
 		bStartTransform = true;
 	}
 	else if(eResult == VECTORACTION_HoverCenter)
@@ -287,7 +292,6 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 				glm::vec2 ptNewPos = m_GrabPointList[m_iGrabPointIndex].GetCachePos() + vDragDelta;
 				if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
 					ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
-
 				float fNewRadius = glm::length(ptNewPos - m_GrabPointCenter.GetCachePos());
 				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCircle(m_GrabPointCenter.GetCachePos(), fNewRadius);
 				std::vector<glm::vec2> grabList = static_cast<HyShape2d *>(m_FixtureList[0])->CalcGrabPoints();
@@ -297,8 +301,11 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 					m_GrabPointList[i].SetPos(grabList[i]);
 
 				break; }
+
 			case SHAPE_Capsule:
+				
 				break;
+
 			case SHAPE_LineSegment:
 			case SHAPE_Polygon:
 			case SHAPE_None:
@@ -310,18 +317,32 @@ HyPrimitive2d *VectorModel::GetPrimNode(int &iLayerIndexOut)
 		break;
 
 	case VECTORACTION_HoverCenter: {
-		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
-		{
-			glm::vec2 ptNewPos = grabPtModel.GetCachePos() + vDragDelta;
-			if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
-				ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
-			grabPtModel.SetPos(ptNewPos);
-		}
 
-		glm::vec2 ptNewPos = m_GrabPointCenter.GetCachePos() + vDragDelta;
+		glm::vec2 vDragDelta = { 0.0f, 0.0f };
 		if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
-			ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
-		m_GrabPointCenter.SetPos(ptNewPos);
+			ptDragPos = { roundf(ptDragPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptDragPos.y / fSNAP_AMT) * fSNAP_AMT };
+		if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
+			vDragDelta = { ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y };
+
+
+		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
+			grabPtModel.SetPos(grabPtModel.GetCachePos() + vDragDelta);
+		m_GrabPointCenter.SetPos(m_GrabPointCenter.GetCachePos() + vDragDelta);
+
+		
+
+		//for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
+		//{
+		//	glm::vec2 ptNewPos = grabPtModel.GetCachePos() + vDragDelta;
+		//	if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
+		//		ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
+		//	grabPtModel.SetPos(ptNewPos);
+		//}
+
+		//glm::vec2 ptNewPos = m_GrabPointCenter.GetCachePos() + vDragDelta;
+		//if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
+		//	ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
+		//m_GrabPointCenter.SetPos(ptNewPos);
 		break; }
 
 	case VECTORACTION_InsertVertex:
@@ -394,6 +415,16 @@ void VectorModel::SetEditModeType(EditModeType eEditModeType)
 EditorShape VectorModel::GetShapeType() const
 {
 	return m_eShapeType;
+}
+
+HyColor VectorModel::GetWidgetColor() const
+{
+	return m_WidgetColor;
+}
+
+void VectorModel::SetWidgetColor(HyColor widgetColor)
+{
+	m_WidgetColor = widgetColor;
 }
 
 HyColor VectorModel::GetColor() const
@@ -746,6 +777,24 @@ void VectorModel::ClearAction()
 	m_iGrabPointIndex = -1;
 	m_bOverrideTransformStart = false;
 	m_ptTransformStartOverride = { 0.0f, 0.0f };
+}
+
+/*virtual*/ void VectorModel::OnSyncViews() const /*override*/
+{
+	if(IsPrimitive())
+	{
+		HyPrimitive2d *pHyPrimNode = GetPrimitive();
+		if(pHyPrimNode)
+		{
+			pHyPrimNode->SetLayerOffset(m_iPrimLayerIndex, GetOffset());
+			pHyPrimNode->SetLayerVisible(m_iPrimLayerIndex, IsVisible());
+			pHyPrimNode->SetLayerColor(m_iPrimLayerIndex, GetColor());
+			pHyPrimNode->SetLayerAlpha(m_iPrimLayerIndex, GetAlpha());
+
+			if(GetNumFixtures() > 0)
+				pHyPrimNode->SetAsFixture(m_iPrimLayerIndex, *GetFixture(0), 0.0f);
+		}
+	}
 }
 
 std::vector<float> VectorModel::ConvertedPointData() const
@@ -1246,13 +1295,28 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 	#define fpGetGrabPt(x) m_GrabPointList[fpEnumToIndex(x)]
 
 	GfxTransformCtrl::GrabPointType eGrabbedPoint = fpIndexToEnum(m_iGrabPointIndex);
+	bool bCornerGrabbed = false;
 	switch(eGrabbedPoint)
 	{
 	case GfxTransformCtrl::GRAB_BotLeft:
 	case GfxTransformCtrl::GRAB_BotRight:
 	case GfxTransformCtrl::GRAB_TopRight:
-	case GfxTransformCtrl::GRAB_TopLeft: {
+	case GfxTransformCtrl::GRAB_TopLeft:
+		bCornerGrabbed = true;
+		break;
+	case GfxTransformCtrl::GRAB_BotMid:
+	case GfxTransformCtrl::GRAB_MidRight:
+	case GfxTransformCtrl::GRAB_TopMid:
+	case GfxTransformCtrl::GRAB_MidLeft:
+		bCornerGrabbed = false;
+		break;
+	default:
+		HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - Box shape had invalid eGrabSpot", LOGTYPE_Error);
+		break;
+	}
 
+	if(bCornerGrabbed)
+	{
 		int iAnchorIndex = -1, iAdjacentIndex1 = -1, iAdjacentIndex2 = -1;
 		GfxGrabPointModel *pGrabbed, *pAnchor, *pAdjacentMid1, *pAdjacentMid2, *pAdjacentCorner1, *pAdjacentCorner2, *pFarMid1, *pFarMid2;
 		pGrabbed = &fpGetGrabPt(eGrabbedPoint);
@@ -1397,14 +1461,9 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 		pAdjacentMid2->SetPos(ptNewPos + ((ptIntersection2 - ptNewPos) * 0.5f));
 		pFarMid1->SetPos(pAnchor->GetCachePos() + ((ptIntersection1 - pAnchor->GetCachePos()) * 0.5f));
 		pFarMid2->SetPos(pAnchor->GetCachePos() + ((ptIntersection2 - pAnchor->GetCachePos()) * 0.5f));
-		
-		break; }
-
-	case GfxTransformCtrl::GRAB_BotMid:
-	case GfxTransformCtrl::GRAB_MidRight:
-	case GfxTransformCtrl::GRAB_TopMid:
-	case GfxTransformCtrl::GRAB_MidLeft: {
-
+	}
+	else // Mid-edge point grabbed
+	{
 		GfxGrabPointModel *pGrabbed, *pAnchorCorner1, *pAnchorCorner2, *pAnchorMid, *pAdjacentCorner1, *pAdjacentCorner2, *pAdjacentMid1, *pAdjacentMid2;
 		pGrabbed = &fpGetGrabPt(eGrabbedPoint);
 		int iAnchorIndex = -1;
@@ -1504,20 +1563,13 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 		pGrabbed->SetPos(ptIntersection1 + (ptIntersection2 - ptIntersection1) * 0.5f);
 		pAdjacentMid1->SetPos(pAdjacentCorner1->GetPos() + (pAnchorCorner1->GetCachePos() - pAdjacentCorner1->GetPos()) * 0.5f);
 		pAdjacentMid2->SetPos(pAdjacentCorner2->GetPos() + (pAnchorCorner2->GetCachePos() - pAdjacentCorner2->GetPos()) * 0.5f);
-
-		break; }
-	default:
-		HyGuiLog("VectorModel::DoTransformShapeCtrlGrabPoint_Box() - Box shape had invalid eGrabSpot", LOGTYPE_Error);
-		break;
-	}
+	} // end of corner or mid-point logic
 
 	std::vector<glm::vec2> ptVertexList = { m_GrabPointList[0].GetPos(), m_GrabPointList[2].GetPos(), m_GrabPointList[4].GetPos(), m_GrabPointList[6].GetPos() };
 	static_cast<HyShape2d *>(m_FixtureList[0])->SetAsPolygon(ptVertexList);
 	glm::vec2 ptCentroid;
 	m_FixtureList[0]->GetCentroid(ptCentroid);
 	m_GrabPointCenter.SetPos(ptCentroid);
-
-	SyncViews(EDITMODE_MouseDragTransform);
 }
 
 VectorAction VectorModel::DoMouseMoveIdle()
@@ -1676,8 +1728,19 @@ void VectorModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm:
 		case SHAPE_Box: {
 			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsBox(HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f));
 			m_GrabPointList.clear();
-			std::vector<glm::vec2> lineGrabPoints = m_FixtureList[0]->CalcGrabPoints();
-			for(glm::vec2 &ptGrab : lineGrabPoints)
+			std::vector<glm::vec2> fixtureGrabPoints = m_FixtureList[0]->CalcGrabPoints();
+
+			std::vector<glm::vec2> boxGrabPoints;
+			boxGrabPoints.reserve(8);
+			boxGrabPoints.emplace_back(fixtureGrabPoints[0]);
+			boxGrabPoints.emplace_back((fixtureGrabPoints[0] + fixtureGrabPoints[1]) * 0.5f);
+			boxGrabPoints.emplace_back(fixtureGrabPoints[1]);
+			boxGrabPoints.emplace_back((fixtureGrabPoints[1] + fixtureGrabPoints[2]) * 0.5f);
+			boxGrabPoints.emplace_back(fixtureGrabPoints[2]);
+			boxGrabPoints.emplace_back((fixtureGrabPoints[2] + fixtureGrabPoints[3]) * 0.5f);
+			boxGrabPoints.emplace_back(fixtureGrabPoints[3]);
+			boxGrabPoints.emplace_back((fixtureGrabPoints[3] + fixtureGrabPoints[0]) * 0.5f);
+			for(glm::vec2 &ptGrab : boxGrabPoints)
 				m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptGrab));
 			break; }
 
@@ -1830,9 +1893,9 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 		eFixtureType = HyGlobal::ConvertShapeToFixtureType(m_eShapeType);
 	}
 
-	if(m_pPrimNodeTreeItemData && m_FixtureList.empty() == false)
+	if(m_FixtureList.empty() == false)
 	{
-		HyPrimitive2d *pHyPrimNode = GetPrimNode(m_iPrimLayerIndex);
+		HyPrimitive2d *pHyPrimNode = GetPrimitive();
 		if(pHyPrimNode)
 			pHyPrimNode->SetAsFixture(m_iPrimLayerIndex, *m_FixtureList[0], m_fOutline);
 	}
@@ -1874,6 +1937,9 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 	}
 	else
 	{
+		if(m_FixtureList.empty())
+			return "Fixture list is empty";
+
 		QString sResult = m_FixtureList[0]->DeserializeSelf(eFixtureType, floatList).c_str();
 		if(sResult.isEmpty() == false)
 			return sResult;

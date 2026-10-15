@@ -17,13 +17,10 @@
 class VectorView : public IEditModeView
 {
 protected:
-	HyPrimitive2d				m_CameraPrim;
-	HyPrimitive2d				m_ScenePrim;
+	HyPrimitive2d				m_GrabPointOutline;
 
 	QList<GfxGrabPointView *>	m_GrabPointViewList;	// Project to window coordinates
 	GfxGrabPointView			m_CenterGrabPoint;
-
-	bool						m_bUpdatePrimNodeFlash;
 
 public:
 	VectorView(HyEntity2d *pParent = nullptr);

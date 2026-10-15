@@ -13,12 +13,10 @@
 
 VectorView::VectorView(HyEntity2d *pParent /*= nullptr*/) :
 	IEditModeView(pParent),
-	m_CameraPrim(this),
-	m_ScenePrim(this),
-	m_CenterGrabPoint(this),
-	m_bUpdatePrimNodeFlash(false)
+	m_GrabPointOutline(this),
+	m_CenterGrabPoint(this)
 {
-	m_CameraPrim.UseWindowCoordinates();
+	m_GrabPointOutline.UseWindowCoordinates();
 }
 
 /*virtual*/ VectorView::~VectorView()
@@ -28,16 +26,14 @@ VectorView::VectorView(HyEntity2d *pParent /*= nullptr*/) :
 
 /*virtual*/ void VectorView::CalcLocalBoundingShape(HyShape2d &shapeOut) /*override*/
 {
-	m_ScenePrim.CalcLocalBoundingShape(shapeOut);
+	VectorModel *pVectorModel = static_cast<VectorModel *>(m_pModel);
+	pVectorModel->GetPrimitive()->CalcLocalBoundingShape(shapeOut);
 }
 
 void VectorView::SyncColor()
 {
 	if(m_pModel)
-	{
-		m_CameraPrim.SetTint(static_cast<VectorModel *>(m_pModel)->GetColor().Darken());
-		m_ScenePrim.SetTint(static_cast<VectorModel *>(m_pModel)->GetColor());
-	}
+		m_GrabPointOutline.SetTint(static_cast<VectorModel *>(m_pModel)->GetWidgetColor());
 }
 
 /*virtual*/ void VectorView::SyncWithModel(EditModeState eEditModeState) /*override*/
@@ -49,8 +45,7 @@ void VectorView::SyncColor()
 		pVectorModel->GetEditModeType() == EDITMODETYPE_FixturePoint)
 	{
 		ClearGrabPoints();
-		m_CameraPrim.RemoveAllLayers();
-		m_ScenePrim.RemoveAllLayers();
+		m_GrabPointOutline.RemoveAllLayers();
 
 		if(pVectorModel->GetEditModeType() == EDITMODETYPE_FixturePoint)
 		{
@@ -63,8 +58,7 @@ void VectorView::SyncColor()
 
 	if(pVectorModel->IsFixture())
 	{
-		m_CameraPrim.SetDisplayOrder(pVectorModel->GetDisplayOrder() + 1);
-		m_ScenePrim.SetDisplayOrder(pVectorModel->GetDisplayOrder());
+		m_GrabPointOutline.SetDisplayOrder(pVectorModel->GetDisplayOrder());
 	}
 
 	// Sync Grab Point Views with Model
@@ -86,6 +80,7 @@ void VectorView::SyncColor()
 	for(GfxGrabPointView *pGrabPtView : m_GrabPointViewList)
 		pGrabPtView->SetVisible(bGrabPtsVisible);
 	m_CenterGrabPoint.SetVisible(bGrabPtsVisible);
+	m_GrabPointOutline.SetVisible(bGrabPtsVisible);
 
 	// Sync Fixture Primitive with Model
 	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
@@ -99,29 +94,51 @@ void VectorView::SyncColor()
 			pCamera->ProjectToCamera(pointRef.GetPos(), ptCameraPoint);
 			outlinePtList.push_back(ptCameraPoint);
 		}
-		m_CameraPrim.SetAsLineChain(0, outlinePtList, pVectorModel->IsLoopClosed(), pVectorModel->GetOutline());
+		m_GrabPointOutline.SetAsLineChain(0, outlinePtList, pVectorModel->IsLoopClosed(), pVectorModel->GetOutline());
 
-		if(pVectorModel->GetShapeType() == SHAPE_Polygon)
-		{
-			int iNumFixtures = pVectorModel->GetNumFixtures();
-			for(int iIndex = 0; iIndex < iNumFixtures; ++iIndex)
-				m_ScenePrim.SetAsFixture(iIndex, *pVectorModel->GetFixture(iIndex), 0.0f);
-		}
-		else
-			m_ScenePrim.RemoveAllLayers();
+		//if(pVectorModel->GetShapeType() == SHAPE_Polygon)
+		//{
+		//	int iNumFixtures = pVectorModel->GetNumFixtures();
+		//	for(int iIndex = 0; iIndex < iNumFixtures; ++iIndex)
+		//		m_ScenePrim.SetAsFixture(iIndex, *pVectorModel->GetFixture(iIndex), 0.0f);
+		//}
+		//else
+		//	m_ScenePrim.RemoveAllLayers();
 	}
 	else if(pVectorModel->GetEditModeType() == EDITMODETYPE_PrimitiveShape || pVectorModel->GetEditModeType() == EDITMODETYPE_FixtureShape) // Shape that isn't Polygon
 	{
 		switch(pVectorModel->GetShapeType())
 		{
 		case SHAPE_Box:
-		case SHAPE_Circle:
-		case SHAPE_Capsule: {
-			m_CameraPrim.RemoveAllLayers();
-			int iNumFixtures = pVectorModel->GetNumFixtures();
-			for(int iIndex = 0; iIndex < iNumFixtures; ++iIndex)
-				m_ScenePrim.SetAsFixture(iIndex, *pVectorModel->GetFixture(iIndex), 0.0f);
+			if(grabPointModelList.empty() == false)
+			{
+				std::vector<glm::vec2> vertexList;
+				glm::vec2 ptCameraPoint;
+
+				pCamera->ProjectToCamera(grabPointModelList[0].GetPos(), ptCameraPoint);
+				vertexList.push_back(ptCameraPoint);
+				pCamera->ProjectToCamera(grabPointModelList[2].GetPos(), ptCameraPoint);
+				vertexList.push_back(ptCameraPoint);
+				pCamera->ProjectToCamera(grabPointModelList[4].GetPos(), ptCameraPoint);
+				vertexList.push_back(ptCameraPoint);
+				pCamera->ProjectToCamera(grabPointModelList[6].GetPos(), ptCameraPoint);
+				vertexList.push_back(ptCameraPoint);
+
+				m_GrabPointOutline.SetAsLineChain(0, vertexList, true, 1.0f);
+			}
+			break;
+
+		case SHAPE_Circle: {
+			glm::vec2 ptCenter = pVectorModel->GetCenterGrabPoint().GetPos();
+			pCamera->ProjectToCamera(ptCenter, ptCenter);
+			float fRadius = glm::length(grabPointModelList[0].GetPos() - pVectorModel->GetCenterGrabPoint().GetPos());
+			fRadius *= pCamera->GetZoom();
+			m_GrabPointOutline.SetAsCircle(0, ptCenter, fRadius, 1.0f);
 			break; }
+
+		case SHAPE_Capsule:
+			m_GrabPointOutline.RemoveAllLayers();
+			break;
 			
 		case SHAPE_LineSegment:
 			if(pVectorModel->GetNumFixtures() > 0)
@@ -132,37 +149,12 @@ void VectorView::SyncColor()
 				glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
 				pCamera->ProjectToCamera(ptTwo, ptTwo);
 
-				m_CameraPrim.SetAsLineSegment(0, ptOne, ptTwo, pVectorModel->GetOutline());
-				m_ScenePrim.RemoveAllLayers();
+				m_GrabPointOutline.SetAsLineSegment(0, ptOne, ptTwo, pVectorModel->GetOutline());
 			}
 			break;
 
 		default:
 			HyGuiLog("VectorView::SyncWithModel - Unhandled shape type", LOGTYPE_Error);
-		}
-	}
-	
-	if(pVectorModel->IsPrimitive())
-	{
-		m_CameraPrim.SetVisible(false);
-		m_ScenePrim.SetVisible(false);
-
-		int iLayerIndex;
-		HyPrimitive2d *pHyPrimNode = pVectorModel->GetPrimNode(iLayerIndex);
-		if(pHyPrimNode)
-		{
-			pHyPrimNode->SetLayerOffset(iLayerIndex, pVectorModel->GetOffset());
-			pHyPrimNode->SetLayerVisible(iLayerIndex, pVectorModel->IsVisible());
-			pHyPrimNode->SetLayerColor(iLayerIndex, pVectorModel->GetColor());
-			pHyPrimNode->SetLayerAlpha(iLayerIndex, pVectorModel->GetAlpha());
-
-			if(pVectorModel->GetNumFixtures() > 0)
-				pHyPrimNode->SetAsFixture(0, *pVectorModel->GetFixture(0), 0.0f);
-
-			if(eEditModeState == EDITMODE_Off)
-				m_bUpdatePrimNodeFlash = false;
-			else
-				m_bUpdatePrimNodeFlash = true;
 		}
 	}
 
@@ -180,20 +172,20 @@ void VectorView::ClearGrabPoints()
 
 /*virtual*/ void VectorView::OnUpdate() /*override*/
 {
-	VectorModel *pVectorModel = static_cast<VectorModel *>(m_pModel);
-	if(m_bUpdatePrimNodeFlash == false || pVectorModel == nullptr)
-		return;
+	//VectorModel *pVectorModel = static_cast<VectorModel *>(m_pModel);
+	//if(m_bUpdatePrimNodeFlash == false || pVectorModel == nullptr)
+	//	return;
 
-	int iLayerIndex;
-	HyPrimitive2d *pHyPrimNode = pVectorModel->GetPrimNode(iLayerIndex);
-	if(pHyPrimNode == nullptr)
-		return;
+	//int iLayerIndex;
+	//HyPrimitive2d *pHyPrimNode = pVectorModel->GetPrimNode(iLayerIndex);
+	//if(pHyPrimNode == nullptr)
+	//	return;
 
-	//if(pHyPrimNode->GetLayerAlpha(iLayerIndex)->IsAnimating() == false)
-	//{
-	//	if(pHyPrimNode->GetLayerAlpha(iLayerIndex)->Get() == 1.0f)
-	//		pHyPrimNode->GetLayerAlpha(iLayerIndex)->Tween(0.5f, 1.00f, HyTween::QuadIn);
-	//	else
-	//		pHyPrimNode->GetLayerAlpha(iLayerIndex)->Tween(1.0f, 1.00f, HyTween::QuadOut);
-	//}
+	////if(pHyPrimNode->GetLayerAlpha(iLayerIndex)->IsAnimating() == false)
+	////{
+	////	if(pHyPrimNode->GetLayerAlpha(iLayerIndex)->Get() == 1.0f)
+	////		pHyPrimNode->GetLayerAlpha(iLayerIndex)->Tween(0.5f, 1.00f, HyTween::QuadIn);
+	////	else
+	////		pHyPrimNode->GetLayerAlpha(iLayerIndex)->Tween(1.0f, 1.00f, HyTween::QuadOut);
+	////}
 }

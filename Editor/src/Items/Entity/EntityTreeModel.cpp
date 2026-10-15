@@ -977,7 +977,9 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocExistingTreeItem(QJsonObject descO
 			iRow = pParentTreeItem->GetNumChildren();
 
 		if(eItemType == ITEM_PrimLayer && pPrimNode)
-			static_cast<VectorModel *>(pNewItem->GetEditModel())->SetPrimNodeTreeItemData(pPrimNode, iRow);
+			static_cast<VectorModel *>(pNewItem->GetEditModel())->InitPrimTreeItemData(pPrimNode, iRow);
+		else if(HyGlobal::IsItemType_Fixture(eItemType))
+			static_cast<VectorModel *>(pNewItem->GetEditModel())->InitPrimTreeItemData(pNewItem, 0);
 
 		InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 	}
@@ -1035,7 +1037,7 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocPrimLayerTreeItem(EntityTreeItemDa
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, pParentTreeItem, iRow);
 
 	QModelIndex index = FindIndex<EntityTreeItemData *>(pNewItem, 0);
-	static_cast<VectorModel *>(pNewItem->GetEditModel())->SetPrimNodeTreeItemData(pPrimNode, index.row());
+	static_cast<VectorModel *>(pNewItem->GetEditModel())->InitPrimTreeItemData(pPrimNode, index.row());
 	return pNewItem;
 }
 
@@ -1063,6 +1065,10 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocFixtureTreeItem(EditModeType eEdit
 	EntityTreeItemData *pNewItem = new EntityTreeItemData(m_ModelRef, ENTDECLTYPE_Static, sCodeName, eItemType, ENTTYPE_Item, QUuid(), QUuid::createUuid());
 	InsertTreeItem(m_ModelRef.GetItem().GetProject(), pNewItem, GetFixtureFolderTreeItem(), iRow);
 
+	if(pNewItem->GetEditModel()->IsVectorModel() == false)
+		HyGuiLog("EntityTreeModel::Cmd_AllocFixtureTreeItem - did not create an edit mode vector model", LOGTYPE_Error);
+	
+	static_cast<VectorModel *>(pNewItem->GetEditModel())->InitPrimTreeItemData(pNewItem, 0);
 	return pNewItem;
 }
 

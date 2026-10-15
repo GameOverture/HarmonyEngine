@@ -33,9 +33,10 @@ enum VectorAction
 
 class VectorModel : public IEditModeModel
 {
-	EntityTreeItemData *				m_pPrimNodeTreeItemData;
+	EntityTreeItemData *				m_pPrimTreeItemData; // This will either be EntityDrawItem's EntityTreeItemData (fixtures), or the parent item when it's a primitive type
 	int									m_iPrimLayerIndex;
 
+	HyColor								m_WidgetColor;
 	HyColor								m_Color;
 	glm::vec2							m_vOffset;				// Only used for primitive layer
 	bool								m_bVisible;				// Only used for primitive layer
@@ -69,9 +70,9 @@ class VectorModel : public IEditModeModel
 public:
 	VectorModel(EditModeType eEditModeType);
 	virtual ~VectorModel();
+	void InitPrimTreeItemData(EntityTreeItemData *pPrimTreeItemData, int iLayerIndex);
 
-	void SetPrimNodeTreeItemData(EntityTreeItemData *pPrimNodeTreeItemData, int iLayerIndex);
-	HyPrimitive2d *GetPrimNode(int &iLayerIndexOut);
+	HyPrimitive2d *GetPrimitive() const;
 
 	virtual QJsonObject Serialize() const override;
 	virtual void Deserialize(bool bEnabled, const QJsonObject &serializedObj) override;
@@ -88,6 +89,9 @@ public:
 	bool IsLineChain() const;
 	void SetEditModeType(EditModeType eEditModeType);
 	EditorShape GetShapeType() const;
+
+	HyColor GetWidgetColor() const;
+	void SetWidgetColor(HyColor widgetColor);
 
 	HyColor GetColor() const;
 	void SetColor(HyColor color);
@@ -137,6 +141,8 @@ public:
 	void ClearAction();
 
 protected:
+	virtual void OnSyncViews() const override;
+
 	std::vector<float> ConvertedPointData() const;
 	std::vector<float> ConvertedBoxData() const;
 	std::vector<float> ConvertedCircleData() const;

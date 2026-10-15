@@ -53,6 +53,7 @@ public:
 	virtual ~IEditModeModel();
 
 	EditModeType GetEditModeType() const;
+	bool IsVectorModel() const;
 
 	void AddView(IEditModeView *pView);
 	bool RemoveView(IEditModeView *pView);
@@ -72,6 +73,9 @@ public:
 	
 	virtual QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const = 0; // Returns undo command description (blank if no change)
 	virtual void ClearAction() = 0;
+
+protected:
+	virtual void OnSyncViews() const { }
 };
 
 #endif // IEditModeModel_H

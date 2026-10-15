@@ -24,6 +24,15 @@ EditModeType IEditModeModel::GetEditModeType() const
 	return m_eEditModeType;
 }
 
+bool IEditModeModel::IsVectorModel() const
+{
+	return	m_eEditModeType == EDITMODETYPE_PrimitiveShape ||
+			m_eEditModeType == EDITMODETYPE_PrimitiveLineChain ||
+			m_eEditModeType == EDITMODETYPE_FixtureShape ||
+			m_eEditModeType == EDITMODETYPE_FixtureChain ||
+			m_eEditModeType == EDITMODETYPE_FixturePoint;
+}
+
 void IEditModeModel::AddView(IEditModeView *pView)
 {
 	if(m_ViewList.contains(pView))
@@ -40,4 +49,6 @@ void IEditModeModel::SyncViews(EditModeState eEditModeState) const
 {
 	for(IEditModeView *pView : m_ViewList)
 		pView->SyncWithModel(eEditModeState);
+
+	OnSyncViews();
 }
