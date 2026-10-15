@@ -934,7 +934,10 @@ void EntityWidget::OnKeyShiftF()
 
 void EntityWidget::OnKeyEsc()
 {
-	SetEditMode(nullptr);
+	if(IsEditMode())
+		SetEditMode(nullptr);
+	else
+		RequestSelectedItems(QList<QUuid>());
 }
 
 void EntityWidget::on_cmbBaseClass_activated(int iIndex)

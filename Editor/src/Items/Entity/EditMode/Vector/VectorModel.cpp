@@ -312,7 +312,36 @@ HyPrimitive2d *VectorModel::GetHyNode() const
 				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsLineSegment(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos());
 				break; }
 
-			case SHAPE_Capsule:
+			case SHAPE_Capsule: {
+				glm::vec2 ptNewPos = m_GrabPointList[m_iGrabPointIndex].GetCachePos() + vDragDelta;
+				if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
+					ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
+				
+				float fRadius;
+				if(m_iGrabPointIndex == 0 || m_iGrabPointIndex == 1) // Position grab point
+				{
+					fRadius = glm::distance(m_GrabPointList[0].GetCachePos(), m_GrabPointList[2].GetCachePos());
+					m_GrabPointList[m_iGrabPointIndex].SetPos(ptNewPos);
+				}
+				else // A radius grab point
+				{
+					if(m_iGrabPointIndex == 2 || m_iGrabPointIndex == 3)
+						fRadius = glm::length(ptNewPos - m_GrabPointList[0].GetCachePos());
+					else
+						fRadius = glm::length(ptNewPos - m_GrabPointList[1].GetCachePos());
+				}
+				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCapsule(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos(), fRadius);
+				
+				std::vector<glm::vec2> grabPtList = static_cast<HyShape2d *>(m_FixtureList[0])->CalcGrabPoints();
+				if(m_GrabPointList.size() != 6 || grabPtList.size() != 6)
+					HyGuiLog("VectorModel::MouseTransform() - Capsule shape ctrl was expecting 6 grab points", LOGTYPE_Error);
+				for(int i = 0; i < 6; i++)
+					m_GrabPointList[i].SetPos(grabPtList[i]);
+				glm::vec2 ptCenter;
+				m_FixtureList[0]->GetCentroid(ptCenter);
+				m_GrabPointCenter.SetPos(ptCenter);
+				break; }
+
 			case SHAPE_Polygon:
 			case SHAPE_None:
 			default:
@@ -1771,6 +1800,7 @@ void VectorModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm:
 			break; }
 
 		case SHAPE_LineSegment: {
+			m_fOutline = 1.0f;
 			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsLineSegment(ptStartPos, ptDragPos);
 			m_GrabPointList.clear();
 			std::vector<glm::vec2> lineGrabPoints = m_FixtureList[0]->CalcGrabPoints();
