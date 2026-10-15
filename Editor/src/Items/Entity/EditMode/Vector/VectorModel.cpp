@@ -364,7 +364,28 @@ HyPrimitive2d *VectorModel::GetHyNode() const
 			grabPtModel.SetPos(grabPtModel.GetCachePos() + vDragDelta);
 		m_GrabPointCenter.SetPos(m_GrabPointCenter.GetCachePos() + vDragDelta);
 
-		
+		switch(m_eShapeType)
+		{
+		case SHAPE_Box:
+			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsBox(HyRect(m_GrabPointList[0].GetPos(), m_GrabPointList[2].GetPos(), m_GrabPointList[4].GetPos(), m_GrabPointList[6].GetPos()));
+			break;
+
+		case SHAPE_Circle:
+			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCircle(m_GrabPointCenter.GetPos(), 0.5f * glm::distance(m_GrabPointList[0].GetCachePos(), m_GrabPointList[2].GetCachePos()));
+			break;
+
+		case SHAPE_LineSegment:
+			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsLineSegment(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos());
+			break;
+
+		case SHAPE_Capsule:
+			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCapsule(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos(), glm::length(m_GrabPointList[0].GetPos() - m_GrabPointList[2].GetPos()));
+			break;
+
+		default:
+			HyGuiLog("VectorModel::MouseTransform() - HoverCenter dragged, Unhandled shape type", LOGTYPE_Error);
+			break;
+		}
 
 		//for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
 		//{

@@ -104,6 +104,10 @@ public:
 	{
 		Set(fHalfWidth, fHalfHeight, ptCenter, fRotDegrees);
 	}
+	HyRect(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &pt3, const glm::vec2 &pt4) // Counter-Clockwise winding order
+	{
+		Set(pt1, pt2, pt3, pt4);
+	}
 
 	float GetWidth(float fPercent = 1.0f) const
 	{
@@ -144,6 +148,15 @@ public:
 		m_fHalfHeight = fHalfHeight;
 		m_ptCenter = ptCenter;
 		m_fRotDegrees = fRotDegrees;
+	}
+
+	// Counter-Clockwise winding order
+	void Set(const glm::vec2 &pt1, const glm::vec2 &pt2, const glm::vec2 &pt3, const glm::vec2 &pt4)
+	{
+		m_ptCenter = (pt1 + pt2 + pt3 + pt4) * 0.25f; // Compute center as the average of the four corners (robust against ordering)
+		m_fHalfWidth = glm::length(pt2 - pt1) * 0.5f;
+		m_fHalfHeight = glm::length(pt3 - pt2) * 0.5f;
+		m_fRotDegrees = glm::degrees(atan2f(pt2.y - pt1.y, pt2.x - pt1.x));
 	}
 };
 
