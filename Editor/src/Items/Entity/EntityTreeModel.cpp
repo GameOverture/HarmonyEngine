@@ -1222,26 +1222,35 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 			QIcon icon;
 			QString sIconUrl = ":/icons16x16/shapes/" % QString(pItem->GetType() == ITEM_PrimLayer ? "primitive_" : "shapes_");
 
-			EditorShape eShapeType = SHAPE_None;
 			QVariant dataVariant = dopeSheetSceneRef.BasicExtrapolateKeyFrameProperty(pItem, dopeSheetSceneRef.GetCurrentFrame(), pItem->GetType() == ITEM_PrimLayer ? "Primitive Layer" : "Shape", "Data");
 			if(dataVariant.isValid())
 			{
 				QJsonObject shapeDataObj = dataVariant.toJsonObject();
-				eShapeType = HyGlobal::GetShapeFromString(shapeDataObj["type"].toString());
-			}
 
-			switch(eShapeType)
-			{
-			case SHAPE_None:		sIconUrl += "icon.png"; break;
-			case SHAPE_Box:			sIconUrl += "box.png"; break;
-			case SHAPE_Circle:		sIconUrl += "circle.png"; break;
-			case SHAPE_LineSegment:	sIconUrl += "lineSeg.png"; break;
-			case SHAPE_Polygon:		sIconUrl += "polygon.png"; break;
-			case SHAPE_Capsule:		sIconUrl += "capsule.png"; break;
-			default: // Special case for primitives
-				sIconUrl += "lineChain.png";
-				break;
+				QString sType = shapeDataObj["type"].toString();
+				if(sType.compare(HYLINECHAIN_Name) == 0)
+					sIconUrl += "lineChain.png";
+				else if(sType.compare(HYPOINT_Name) == 0)
+					sIconUrl += "point.png";
+				else
+				{
+					EditorShape eShapeType = HyGlobal::GetShapeFromString(shapeDataObj["type"].toString());
+					switch(eShapeType)
+					{
+					case SHAPE_Box:			sIconUrl += "box.png"; break;
+					case SHAPE_Circle:		sIconUrl += "circle.png"; break;
+					case SHAPE_LineSegment:	sIconUrl += "lineSeg.png"; break;
+					case SHAPE_Polygon:		sIconUrl += "polygon.png"; break;
+					case SHAPE_Capsule:		sIconUrl += "capsule.png"; break;
+					case SHAPE_None:
+					default:
+						sIconUrl += "icon.png";
+						break;
+					}
+				}
 			}
+			else
+				sIconUrl += "icon.png";
 
 			icon.addFile(sIconUrl);
 			return QVariant(icon);

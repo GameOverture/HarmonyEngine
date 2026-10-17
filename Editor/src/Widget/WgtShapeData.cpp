@@ -90,7 +90,7 @@ void WgtShapeData::UpdateModel(bool bIsActiveEditModeItem, EditModeType eEditMod
 
 	VectorModel *pEditModeModel = static_cast<VectorModel *>(m_pTreeItemData->GetEditModel());
 
-	if(pEditModeModel->GetEditModeType() != eEditModeType)
+	if(pEditModeModel->GetEditModeType() != eEditModeType || pEditModeModel->GetShapeType() != eShapeType)
 	{
 		switch(eEditModeType)
 		{
@@ -211,7 +211,12 @@ void WgtShapeData::on_cmbPrimType_currentIndexChanged(int iIndex)
 
 void WgtShapeData::on_sbPrimOutline_valueChanged(double dValue)
 {
-	static_cast<VectorModel *>(m_pTreeItemData->GetEditModel())->SetOutline(ui->sbPrimOutline->value());
+	float fOutline = static_cast<float>(ui->sbPrimOutline->value());
+	if(static_cast<VectorModel *>(m_pTreeItemData->GetEditModel())->GetOutline() != fOutline)
+	{
+		static_cast<VectorModel *>(m_pTreeItemData->GetEditModel())->SetOutline(fOutline);
+		Q_EMIT ValueChanged(GetValue());
+	}
 }
 
 void WgtShapeData::on_cmbShapeType_currentIndexChanged(int iIndex)

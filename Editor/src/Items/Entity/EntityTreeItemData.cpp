@@ -27,9 +27,21 @@ EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &projItemRe
 /*virtual*/ EntityPropertiesTreeModel::~EntityPropertiesTreeModel()
 { }
 
-/*virtual*/ PropertiesUndoCmd *EntityPropertiesTreeModel::AllocateUndoCmd(const QModelIndex &index, const QVariant &newData) /*override*/
+/*virtual*/ QUndoCommand *EntityPropertiesTreeModel::AllocateUndoCmd(const QModelIndex &index, const QVariant &newData) /*override*/
 {
-	return new EntityUndoCmd_PropertyModified(this, index, newData);
+	if(GetIndexDefinition(index).eType == PROPERTIESTYPE_ShapeData)
+	{
+		int iStateIndex = m_pProjItemData->GetWidget()->GetCurStateIndex();
+		EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItemData->GetWidget()->GetCurStateData())->GetDopeSheetScene();
+		int iFrameIndex = dopeSheetSceneRef.GetCurrentFrame();
+		QString sUndoText = "Changed Shape's Data";
+
+		EntityTreeItemData *pTreeItemData = GetIndexDefinition(index).delegateBuilder.value<EntityTreeItemData *>();
+		QPair<QString, QString> catPropPair = GetCatPropPairName(index);
+		return new EntityUndoCmd_EditModelData(sUndoText, *m_pProjItemData, iStateIndex, iFrameIndex, pTreeItemData, newData.toJsonObject(), catPropPair.first, catPropPair.second);
+	}
+	else
+		return new EntityUndoCmd_PropertyModified(this, index, newData);
 }
 
 EntityPropertiesTreeMultiModel::EntityPropertiesTreeMultiModel(ProjectItemData &projItemRef, QUndoStack *pUndoStack, int iStateIndex, QVariant subState, QList<PropertiesTreeModel *> multiModelList, QObject *pParent /*= nullptr*/) :
@@ -40,7 +52,7 @@ EntityPropertiesTreeMultiModel::EntityPropertiesTreeMultiModel(ProjectItemData &
 /*virtual*/ EntityPropertiesTreeMultiModel::~EntityPropertiesTreeMultiModel()
 { }
 
-/*virtual*/ PropertiesUndoCmd *EntityPropertiesTreeMultiModel::AllocateUndoCmd(const QModelIndex &index, const QVariant &newData) /*override*/
+/*virtual*/ QUndoCommand *EntityPropertiesTreeMultiModel::AllocateUndoCmd(const QModelIndex &index, const QVariant &newData) /*override*/
 {
 	return new EntityUndoCmd_PropertyModified(this, index, newData);
 }

@@ -50,7 +50,7 @@ enum PropertiesType
 	PROPERTIESTYPE_Color,			// NOTE: Internally uses QVariant like `PROPERTIESTYPE_ivec3`
 	PROPERTIESTYPE_SpriteFrames,	// delegateBuilder [QUuid] = The ProjectItemData's UUID that contains the sprite frames
 	PROPERTIESTYPE_TileMapLayerData,// QJsonObject { "tilesets": QJsonArray, "tileLayer": QJsonObject }
-	PROPERTIESTYPE_ShapeData,		// QJsonObject { "type": "Circle"/"Polygon"/"Chain", "data": QJsonArray of floats, "outline": 0.0 }
+	PROPERTIESTYPE_ShapeData,		// QJsonObject { "type": "Circle"/"Polygon"/"Chain/...", "data": QJsonArray of floats, "outline": 0.0 }
 	PROPERTIESTYPE_UiPanel,			// QJsonObject
 };
 
@@ -118,6 +118,7 @@ class PropertiesTreeModel : public ITreeModel
 {
 	Q_OBJECT
 
+protected:
 	ProjectItemData *							m_pProjItemData;
 	QUndoStack *								m_pUndoStack;
 	const int									m_iSTATE_INDEX;
@@ -207,7 +208,7 @@ public:
 	static QVariant ConvertJsonToVariant(PropertiesType ePropType, const QJsonValue &valueRef);
 	static QJsonValue ConvertVariantToJson(PropertiesType ePropType, const QVariant &valueRef);
 
-	virtual PropertiesUndoCmd *AllocateUndoCmd(const QModelIndex &index, const QVariant &newData);
+	virtual QUndoCommand *AllocateUndoCmd(const QModelIndex &index, const QVariant &newData);
 
 private:
 	QJsonValue ConvertValueToJson(TreeModelItem *pTreeItem) const;

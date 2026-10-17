@@ -431,5 +431,6 @@
         <file>icons16x16/tileset-terrainset-corners.png</file>
         <file>icons16x16/tileset-terrainset-cornersandsides.png</file>
         <file>icons16x16/tileset-terrainset-sides.png</file>
+        <file>icons16x16/shapes/shapes_point.png</file>
     </qresource>
 </RCC>

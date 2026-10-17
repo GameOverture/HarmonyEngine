@@ -1745,13 +1745,14 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(bool &bVertListDeclaredRe
 				if((sFloatList.size() & 1) == 0)
 					HyGuiLog("GfxShapeModel::DeserializeShapeDataAsRuntimeCode for prim layer had an even number of floats (final, odd float indcates loop)", LOGTYPE_Error);
 				sSrc += "vertList.clear();" + sNewLine;
-				for(int i = 0; i < sFloatList.size(); i += 2)
+				for(int i = 0; (i+1) < sFloatList.size(); i += 2)
 					sSrc += "vertList.push_back(glm::vec2(" + sFloatList[i] + "f, " + sFloatList[i + 1] + "f));" + sNewLine;
 
 				EntityTreeItemData *pPrimNode = nullptr;
 				int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
 
-				sSrc += sCodeName + "SetAsLineChain(" + QString::number(iLayerIndex) + ", vertList, " + QString::number(serializedObj["outline"].toDouble(), 'f') + ");" + sNewLine;
+				bool bIsLooped = floatArray[sFloatList.size() - 1].toDouble() != 0.0;
+				sSrc += sCodeName + "SetAsLineChain(" + QString::number(iLayerIndex) + ", vertList, " + (bIsLooped ? "true, " : "false, ") + QString::number(serializedObj["outline"].toDouble(), 'f') + ");" + sNewLine;
 				break;
 			}
 			[[fallthrough]];

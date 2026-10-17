@@ -705,7 +705,7 @@ void PropertiesTreeModel::ResetValues()
 		const QVariant &origValue = GetIndexValue(indexRef);
 		if(origValue != valueRef)
 		{
-			PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
+			QUndoCommand *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
 			if(m_pUndoStack)
 				m_pUndoStack->push(pUndoCmd);
 			else
@@ -741,7 +741,7 @@ void PropertiesTreeModel::ResetValues()
 
 		if(bCheckChanged)
 		{
-			PropertiesUndoCmd *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
+			QUndoCommand *pUndoCmd = AllocateUndoCmd(indexRef, valueRef);
 			if(m_pUndoStack)
 				m_pUndoStack->push(pUndoCmd);
 			else
@@ -780,6 +780,12 @@ void PropertiesTreeModel::ResetValues()
 		//	return Qt::AlignHCenter;
 
 	case Qt::ToolTipRole:
+		if(propDefRef.eType == PROPERTIESTYPE_ShapeData)
+		{
+			QString sTip = ConvertValueToString(pTreeItem);
+			if(sTip.isEmpty() == false)
+				return sTip;
+		}
 		return propDefRef.sToolTip;
 
 	case Qt::BackgroundRole:
@@ -1037,7 +1043,7 @@ void PropertiesTreeModel::ResetValues()
 	return QJsonValue();
 }
 
-/*virtual*/ PropertiesUndoCmd *PropertiesTreeModel::AllocateUndoCmd(const QModelIndex &index, const QVariant &newData)
+/*virtual*/ QUndoCommand *PropertiesTreeModel::AllocateUndoCmd(const QModelIndex &index, const QVariant &newData)
 {
 	return new PropertiesUndoCmd(this, index, newData);
 }
@@ -1165,16 +1171,54 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 
 	case PROPERTIESTYPE_ShapeData: {
 		QJsonObject shapeDataObj = treeItemValue.toJsonObject();
-		if(shapeDataObj.contains("data"))
+		if(shapeDataObj.contains("type") && shapeDataObj.contains("data"))
 		{
-			sRetStr += "[ ";
-
+			QString sType = shapeDataObj["type"].toString();
 			QJsonArray shapeDataArray = shapeDataObj["data"].toArray();
-			bool bFirstVal = true;
+			QList<float> floatList;
 			for(QJsonValue val : shapeDataArray)
-				sRetStr += QString::number(val.toDouble(), 'f', 1) + ", ";
-			
-			sRetStr += " ]";
+				floatList.append(static_cast<float>(val.toDouble()));
+
+			if(sType.isEmpty() == false && floatList.isEmpty() == false)
+			{
+				float fOutline = static_cast<float>(shapeDataObj["outline"].toDouble());
+
+				if(sType == HYLINECHAIN_Name || sType == HyGlobal::ShapeName(SHAPE_Polygon))
+				{
+					int iNumVerts = floatList.size() / 2;
+					bool bIsLooped = floatList[floatList.size() - 1] != 0.0;
+
+					if(sType == HYLINECHAIN_Name)
+						sRetStr += "LINE CHAIN: ";
+					else
+						sRetStr += "POLYGON: ";
+					sRetStr += QString::number(iNumVerts) + " verts " + (bIsLooped ? "[CLOSED] " : "[OPEN] ") + QString::number(fOutline, 'f', 1) + " outline";
+				}
+				else if(sType == HYPOINT_Name)
+					sRetStr += "POINT: [" + QString::number(floatList[0], 'f', 1) + ", " + QString::number(floatList[1], 'f', 1) + "]";
+				else
+				{
+					EditorShape eShape = HyGlobal::GetShapeFromString(sType);
+					switch(eShape)
+					{
+					case SHAPE_Box:
+						sRetStr += "BOX: [" + QString::number(floatList[0], 'f', 1) + ", " + QString::number(floatList[1], 'f', 1) + "], [" + QString::number(floatList[4], 'f', 1) + ", " + QString::number(floatList[5], 'f', 1) + "] " + QString::number(fOutline, 'f', 1) + " outline";
+						break;
+					case SHAPE_Circle:
+						sRetStr += "CIRCLE: [" + QString::number(floatList[0], 'f', 1) + ", " + QString::number(floatList[1], 'f', 1) + "] radius(" + QString::number(floatList[2], 'f', 1) + ") " + QString::number(fOutline, 'f', 1) + " outline";
+						break;
+					case SHAPE_LineSegment:
+						sRetStr += "SEGMENT: [" + QString::number(floatList[0], 'f', 1) + ", " + QString::number(floatList[1], 'f', 1) + "], [" + QString::number(floatList[2], 'f', 1) + ", " + QString::number(floatList[3], 'f', 1) + "] " + QString::number(fOutline, 'f', 1) + " outline";
+						break;
+					case SHAPE_Capsule:
+						sRetStr += "CAPSULE: [" + QString::number(floatList[0], 'f', 1) + ", " + QString::number(floatList[1], 'f', 1) + "], [" + QString::number(floatList[2], 'f', 1) + ", " + QString::number(floatList[3], 'f', 1) + "] radius(" + QString::number(floatList[4], 'f', 1) + ") " + QString::number(fOutline, 'f', 1) + " outline";
+						break;
+					case SHAPE_Polygon: // Handled above
+					default:
+						break;
+					}
+				}
+			}
 		}
 		break; }
 

@@ -359,46 +359,44 @@ HyPrimitive2d *VectorModel::GetHyNode() const
 		if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
 			vDragDelta = { ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y };
 
-
 		for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
 			grabPtModel.SetPos(grabPtModel.GetCachePos() + vDragDelta);
 		m_GrabPointCenter.SetPos(m_GrabPointCenter.GetCachePos() + vDragDelta);
 
-		switch(m_eShapeType)
+		if(IsLineChain())
 		{
-		case SHAPE_Box:
-			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsBox(HyRect(m_GrabPointList[0].GetPos(), m_GrabPointList[2].GetPos(), m_GrabPointList[4].GetPos(), m_GrabPointList[6].GetPos()));
-			break;
-
-		case SHAPE_Circle:
-			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCircle(m_GrabPointCenter.GetPos(), 0.5f * glm::distance(m_GrabPointList[0].GetCachePos(), m_GrabPointList[2].GetCachePos()));
-			break;
-
-		case SHAPE_LineSegment:
-			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsLineSegment(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos());
-			break;
-
-		case SHAPE_Capsule:
-			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCapsule(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos(), glm::length(m_GrabPointList[0].GetPos() - m_GrabPointList[2].GetPos()));
-			break;
-
-		default:
-			HyGuiLog("VectorModel::MouseTransform() - HoverCenter dragged, Unhandled shape type", LOGTYPE_Error);
-			break;
+			std::vector<glm::vec2> vertexList;
+			for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
+				vertexList.push_back(grabPtModel.GetPos());
+			
+			HyChain2d *pChainFixture = static_cast<HyChain2d *>(m_FixtureList[0]);
+			pChainFixture->SetData(vertexList, pChainFixture->GetChainData().bLoop);
 		}
+		else
+		{
+			switch(m_eShapeType)
+			{
+			case SHAPE_Box:
+				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsBox(HyRect(m_GrabPointList[0].GetPos(), m_GrabPointList[2].GetPos(), m_GrabPointList[4].GetPos(), m_GrabPointList[6].GetPos()));
+				break;
 
-		//for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
-		//{
-		//	glm::vec2 ptNewPos = grabPtModel.GetCachePos() + vDragDelta;
-		//	if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
-		//		ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
-		//	grabPtModel.SetPos(ptNewPos);
-		//}
+			case SHAPE_Circle:
+				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCircle(m_GrabPointCenter.GetPos(), 0.5f * glm::distance(m_GrabPointList[0].GetCachePos(), m_GrabPointList[2].GetCachePos()));
+				break;
 
-		//glm::vec2 ptNewPos = m_GrabPointCenter.GetCachePos() + vDragDelta;
-		//if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
-		//	ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
-		//m_GrabPointCenter.SetPos(ptNewPos);
+			case SHAPE_LineSegment:
+				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsLineSegment(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos());
+				break;
+
+			case SHAPE_Capsule:
+				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCapsule(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos(), glm::length(m_GrabPointList[0].GetPos() - m_GrabPointList[2].GetPos()));
+				break;
+
+			default:
+				HyGuiLog("VectorModel::MouseTransform() - HoverCenter dragged, Unhandled shape type", LOGTYPE_Error);
+				break;
+			}
+		}
 		break; }
 
 	case VECTORACTION_InsertVertex:
@@ -571,7 +569,7 @@ void VectorModel::ChangeToLineChain(bool bIsActiveEditModeItem, bool bAsFixture)
 	for(float f : floatList)
 		dataArray.push_back(f);
 	serializedObj.insert("data", dataArray);
-	serializedObj.insert("outline", m_fOutline);
+	serializedObj.insert("outline", m_fOutline <= 0.0f ? 1.0f : m_fOutline);
 	Deserialize(bIsActiveEditModeItem, serializedObj);
 }
 
@@ -635,7 +633,10 @@ void VectorModel::ChangeToShape(bool bIsActiveEditModeItem, EditorShape eNewShap
 	for(float f : floatList)
 		dataArray.push_back(f);
 	serializedObj.insert("data", dataArray);
-	serializedObj.insert("outline", m_fOutline);
+	if(m_eShapeType == SHAPE_LineSegment)
+		serializedObj.insert("outline", m_fOutline <= 0.0f ? 1.0f : m_fOutline);
+	else
+		serializedObj.insert("outline", m_fOutline);
 	Deserialize(bIsActiveEditModeItem, serializedObj);
 }
 
@@ -1289,10 +1290,14 @@ std::vector<float> VectorModel::ConvertedPolygonOrLineChainData() const
 			// Approximate capsule with 8 vertices
 			convertedDataList.push_back(pt1.x + vPerp.x * fRadius);
 			convertedDataList.push_back(pt1.y + vPerp.y * fRadius);
+			convertedDataList.push_back(pt1.x + (vDir.x * fRadius * -1.0f));
+			convertedDataList.push_back(pt1.y + (vDir.y * fRadius * -1.0f));
 			convertedDataList.push_back(pt1.x - vPerp.x * fRadius);
 			convertedDataList.push_back(pt1.y - vPerp.y * fRadius);
 			convertedDataList.push_back(pt2.x - vPerp.x * fRadius);
 			convertedDataList.push_back(pt2.y - vPerp.y * fRadius);
+			convertedDataList.push_back(pt2.x + (vDir.x * fRadius));
+			convertedDataList.push_back(pt2.y + (vDir.y * fRadius));
 			convertedDataList.push_back(pt2.x + vPerp.x * fRadius);
 			convertedDataList.push_back(pt2.y + vPerp.y * fRadius);
 			convertedDataList.push_back(1.0f); // Closed loop
@@ -1925,10 +1930,11 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 	}
 
 	HyFixtureType eFixtureType = HYFIXTURE_Nothing;
-	if(m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain)
+	if(IsLineChain())
 	{
-		if(m_FixtureList.size() > 1)
+		if(m_FixtureList.size() > 1 || (m_FixtureList.size() == 1 && m_FixtureList[0]->GetType() != HYFIXTURE_LineChain))
 			ClearFixtures();
+
 		if(m_FixtureList.empty())
 			m_FixtureList.push_back(new HyChain2d());
 
@@ -1960,8 +1966,7 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 	std::vector<glm::vec2> grabPointList;
 	glm::vec2 ptCentroid;
 
-	if((m_eEditModeType != EDITMODETYPE_PrimitiveLineChain && m_eEditModeType != EDITMODETYPE_FixtureChain) &&
-		m_eShapeType == SHAPE_Polygon)
+	if(IsLineChain() == false && m_eShapeType == SHAPE_Polygon)
 	{
 		// SHAPE_Polygon deserialization
 		if((floatList.size() & 1) == 0)
@@ -2030,8 +2035,7 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 	// Assemble `m_GrabPointList` and `m_GrabPointCenter`
 	m_GrabPointCenter.SetPos(ptCentroid);
 
-	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
-		m_eShapeType == SHAPE_Polygon)
+	if(IsLineChain() || m_eShapeType == SHAPE_Polygon)
 	{
 		// Preserve existing grab points where possible (keeps selection)
 		for(int i = 0; i < grabPointList.size(); ++i)

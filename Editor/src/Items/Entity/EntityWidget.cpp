@@ -708,6 +708,8 @@ void EntityWidget::SetEditMode(EntityTreeItemData *pItemToEdit)
 		}
 		else
 			MainWindow::HideAuxWidget(AUXTAB_TileMap);
+
+		pItemToEdit->GetEditModel()->SyncViews(EDITMODE_Idle);
 	}
 	else
 	{

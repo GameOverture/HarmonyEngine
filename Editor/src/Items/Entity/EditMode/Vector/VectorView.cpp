@@ -41,6 +41,7 @@ void VectorView::SyncColor()
 	VectorModel *pVectorModel = static_cast<VectorModel *>(m_pModel);
 
 	if(pVectorModel == nullptr ||
+		pVectorModel->IsValidModel() == false ||
 		(pVectorModel->IsLineChain() == false && pVectorModel->GetShapeType() == SHAPE_None) ||
 		pVectorModel->GetEditModeType() == EDITMODETYPE_FixturePoint)
 	{
@@ -94,7 +95,7 @@ void VectorView::SyncColor()
 			pCamera->ProjectToCamera(pointRef.GetPos(), ptCameraPoint);
 			outlinePtList.push_back(ptCameraPoint);
 		}
-		m_GrabPointOutline.SetAsLineChain(0, outlinePtList, pVectorModel->IsLoopClosed(), pVectorModel->GetOutline());
+		m_GrabPointOutline.SetAsLineChain(0, outlinePtList, pVectorModel->IsLoopClosed(), 1.0f);
 
 		//if(pVectorModel->GetShapeType() == SHAPE_Polygon)
 		//{
