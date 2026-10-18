@@ -78,6 +78,7 @@ public:
 
 	EntityTreeItemData *GetFusedItem() const;
 	EntityTreeModel &GetTreeModel();
+	const EntityTreeModel &GetTreeModel() const;
 
 	QAbstractItemModel *GetAuxWidgetsModel();
 

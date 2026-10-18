@@ -51,9 +51,6 @@ public Q_SLOTS:
 	void SetValue(bool bIsActiveEditModeItem, QVariant data);
 	
 protected Q_SLOTS:
-	void OnValueChanged(int iValue);
-	void OnValueChanged(double dValue);
-
 	void on_cmbPrimType_currentIndexChanged(int iIndex);
 	void on_sbPrimOutline_valueChanged(double dValue);
 

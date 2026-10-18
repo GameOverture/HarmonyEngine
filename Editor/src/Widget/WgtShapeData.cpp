@@ -53,6 +53,7 @@ void WgtShapeData::Init(EntityTreeItemData *pTreeItemData)
 	ui->stackedWidget->setCurrentIndex(eShapeDataType);
 
 	ui->cmbPrimType->clear();
+	ui->cmbShapeType->clear();
 	QStringList sComboBoxList = HyGlobal::GetShapeNameList();
 	switch(eShapeDataType)
 	{
@@ -172,18 +173,6 @@ void WgtShapeData::SetValue(bool bIsActiveEditModeItem, QVariant data)
 	}
 
 	UpdateModel(bIsActiveEditModeItem, eEditModeType, HyGlobal::GetShapeFromString(sType));
-}
-
-void WgtShapeData::OnValueChanged(int iValue)
-{
-	QVariant data = GetValue();
-	Q_EMIT ValueChanged(data);
-}
-
-void WgtShapeData::OnValueChanged(double dValue)
-{
-	QVariant data = GetValue();
-	Q_EMIT ValueChanged(data);
 }
 
 void WgtShapeData::on_cmbPrimType_currentIndexChanged(int iIndex)

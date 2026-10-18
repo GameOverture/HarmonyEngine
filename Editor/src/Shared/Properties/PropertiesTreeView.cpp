@@ -328,6 +328,8 @@ PropertiesDelegate::PropertiesDelegate(PropertiesTreeView *pTableView, QObject *
 
 		EntityTreeItemData *pEntTreeItemData = propDefRef.delegateBuilder.value<EntityTreeItemData *>();
 		pReturnWidget = new WgtShapeData(pEntTreeItemData, pParent);
+
+		connect(static_cast<QComboBox *>(pReturnWidget), SIGNAL(currentIndexChanged(int)), this, SLOT(OnComboBoxEditorSubmit(int)));
 		
 		//if(pEntTreeItemData->GetType() == ITEM_PrimLayer)
 		//	pReturnWidget = new WgtShapeData(SHAPEDATATYPE_Primitive, serializedObj, pParent);

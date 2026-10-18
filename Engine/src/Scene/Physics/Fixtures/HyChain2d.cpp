@@ -420,8 +420,7 @@ void HyChain2d::SetFilter(const b2Filter &filter)
 	HyChainData chainData = {};
 	if(AllocChainData(chainData, mtxTransform))
 	{
-		HyMath::InvalidateAABB(aabbOut);
-		HyMath::ComputeAABB(aabbOut, chainData.pPointList, chainData.iCount);
+		aabbOut = HyMath::ComputeAABB(chainData.pPointList, chainData.iCount);
 
 		delete[] chainData.pPointList;
 		return true;

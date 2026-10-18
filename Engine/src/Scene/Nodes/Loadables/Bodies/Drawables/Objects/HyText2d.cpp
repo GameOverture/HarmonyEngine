@@ -133,7 +133,7 @@ const HyText2d &HyText2d::operator=(const HyText2d &rhs)
 	m_DebugBox.pos.Set(ptTranslation);
 	m_DebugBox.rot.Set(glm::degrees(glm::atan(mtxSceneRef[0][1], mtxSceneRef[0][0])));
 	m_DebugBox.scale.Set(vScale);
-	m_DebugBox.UseWindowCoordinates(GetCoordinateSystem());
+	m_DebugBox.UseWindowCoordinates(GetWindowIndex());
 	m_DebugBox.SetDisplayOrder(GetDisplayOrder()+1);
 	m_DebugBox.SetVisible(IsValidToRender());
 #endif

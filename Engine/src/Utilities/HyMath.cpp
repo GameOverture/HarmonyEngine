@@ -211,8 +211,11 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 	aabbOut.upperBound = { -1.0f, -1.0f };
 }
 
-/*static*/ void HyMath::ComputeAABB(b2AABB &aabbOut, const glm::vec2 *pPointList, int32 iPointCount, float fInflateFlatDimensions /*= 0.0f*/)
+/*static*/ b2AABB HyMath::ComputeAABB(const glm::vec2 *pPointList, int32 iPointCount, float fInflateFlatDimensions /*= 0.0f*/)
 {
+	b2AABB aabbOut;
+	InvalidateAABB(aabbOut);
+
 	for(int32 i = 0; i < iPointCount; ++i)
 	{
 		if(b2IsValidAABB(aabbOut) == false)
@@ -247,6 +250,8 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 			aabbOut.upperBound.y += fInflateFlatDimensions;
 		}
 	}
+
+	return aabbOut;
 }
 
 /*static*/ bool HyMath::TestPointAABB(const b2AABB &aabb, const glm::vec2 &pt)

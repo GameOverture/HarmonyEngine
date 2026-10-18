@@ -197,6 +197,11 @@ EntityTreeModel &EntityModel::GetTreeModel()
 	return m_TreeModel;
 }
 
+const EntityTreeModel &EntityModel::GetTreeModel() const
+{
+	return m_TreeModel;
+}
+
 QAbstractItemModel *EntityModel::GetAuxWidgetsModel()
 {
 	return &m_AuxWidgetsModel;
@@ -940,13 +945,23 @@ QString EntityModel::GenerateSrc_Ctor() const
 	QList<TreeModelItemData *> allItemsList = m_TreeModel.GetItemsRecursively(index);
 	for(TreeModelItemData *pTreeItemData : allItemsList)
 	{
+		if(static_cast<EntityTreeItemData *>(pTreeItemData)->GetEntType() == ENTTYPE_ArrayFolder)
+			continue;
+
 		if(pTreeItemData->GetType() == ITEM_PrimNode)
 		{
 			EntityTreeItemData *pPrimNode = static_cast<EntityTreeItemData *>(pTreeItemData);
+
+			QString sCodeName;
+			if(pPrimNode->GetEntType() == ENTTYPE_ArrayItem)
+				sCodeName = pPrimNode->GetCodeName() % "[" % QString::number(pPrimNode->GetArrayIndex()) % "]";
+			else
+				sCodeName = pPrimNode->GetCodeName();
+
 			EntityItemDeclarationType eDeclType = pPrimNode->GetDeclarationType();
 			QString sDeref = (pPrimNode->GetDeclarationType() == ENTDECLTYPE_Static) ? "." : "->";
 			int iNumChildren = static_cast<int>(m_TreeModel.FindPrimLayers(pPrimNode).size());
-			sSrc += pPrimNode->GetCodeName() + sDeref + "SetNumLayers(" + QString::number(iNumChildren) + ");\n\t";
+			sSrc += sCodeName + sDeref + "SetNumLayers(" + QString::number(iNumChildren) + ");\n\t";
 		}
 	}
 
@@ -1094,8 +1109,18 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 	QString sCodeName;
 	if(pItemData->GetEntType() != ENTTYPE_Root)
 	{
+		int iArrayIndex = -1;
 		if(pItemData->GetEntType() == ENTTYPE_ArrayItem)
-			sCodeName = pItemData->GetCodeName() % "[" % QString::number(pItemData->GetArrayIndex()) % "]";
+			iArrayIndex = pItemData->GetArrayIndex();
+		else if(pItemData->GetType() == ITEM_PrimLayer)
+		{
+			EntityTreeItemData *pPrimNode = GetTreeModel().FindPrimNode(pItemData);
+			if(pPrimNode->GetEntType() == ENTTYPE_ArrayItem)
+				iArrayIndex = pPrimNode->GetArrayIndex();
+		}
+
+		if(iArrayIndex >= 0)
+			sCodeName = pItemData->GetCodeName() % "[" % QString::number(iArrayIndex) % "]";
 		else
 			sCodeName = pItemData->GetCodeName();
 
@@ -1816,7 +1841,7 @@ QString EntityModel::DeserializeShapeDataAsRuntimeCode(bool &bVertListDeclaredRe
 				{
 					EntityTreeItemData *pPrimNode = nullptr;
 					int iLayerIndex = m_TreeModel.GetPrimLayerIndex(pItemData, pPrimNode);
-					sSrc += sCodeName + "SetAsLineSegment(" + QString::number(iLayerIndex) + ", glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f, " + QString::number(serializedObj["outline"].toDouble(), 'f') + ");" + sNewLine;
+					sSrc += sCodeName + "SetAsLineSegment(" + QString::number(iLayerIndex) + ", glm::vec2(" + sFloatList[0] + "f, " + sFloatList[1] + "f), glm::vec2(" + sFloatList[2] + "f, " + sFloatList[3] + "f), " + QString::number(serializedObj["outline"].toDouble(), 'f') + ");" + sNewLine;
 					break;
 				}
 				else

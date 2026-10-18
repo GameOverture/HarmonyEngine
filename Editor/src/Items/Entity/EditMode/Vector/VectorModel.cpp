@@ -874,8 +874,7 @@ std::vector<float> VectorModel::ConvertedBoxData() const
 		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
 			vertexList.push_back(grabPt.GetPos());
 		
-		b2AABB boundingBox;
-		HyMath::ComputeAABB(boundingBox, vertexList.data(), static_cast<int>(vertexList.size()), 5.0f);
+		b2AABB boundingBox = HyMath::ComputeAABB(vertexList.data(), static_cast<int>(vertexList.size()), 5.0f);
 
 		glm::vec2 ptCenter = glm::vec2(0.5f * (boundingBox.lowerBound.x + boundingBox.upperBound.x), 0.5f * (boundingBox.lowerBound.y + boundingBox.upperBound.y));
 		glm::vec2 vHalfExtents = glm::vec2(0.5f * (boundingBox.upperBound.x - boundingBox.lowerBound.x), 0.5f * (boundingBox.upperBound.y - boundingBox.lowerBound.y));
@@ -954,8 +953,8 @@ std::vector<float> VectorModel::ConvertedCircleData() const
 		
 		if(vertexList.size() > 1)
 		{
-			b2AABB boundingBox;
-			HyMath::ComputeAABB(boundingBox, vertexList.data(), static_cast<int>(vertexList.size()), 5.0f);
+			b2AABB boundingBox = HyMath::ComputeAABB(vertexList.data(), static_cast<int>(vertexList.size()), 5.0f);
+			
 			glm::vec2 ptCenter = glm::vec2(0.5f * (boundingBox.lowerBound.x + boundingBox.upperBound.x), 0.5f * (boundingBox.lowerBound.y + boundingBox.upperBound.y));
 			glm::vec2 vHalfExtents = glm::vec2(0.5f * (boundingBox.upperBound.x - boundingBox.lowerBound.x), 0.5f * (boundingBox.upperBound.y - boundingBox.lowerBound.y));
 			float fRadius = HyMath::Max(vHalfExtents.x, vHalfExtents.y);
@@ -1051,8 +1050,8 @@ std::vector<float> VectorModel::ConvertedLineSegmentData() const
 		
 		if(vertexList.size() > 1)
 		{
-			b2AABB boundingBox;
-			HyMath::ComputeAABB(boundingBox, vertexList.data(), static_cast<int>(vertexList.size()), 5.0f);
+			b2AABB boundingBox = HyMath::ComputeAABB(vertexList.data(), static_cast<int>(vertexList.size()), 5.0f);
+			
 			convertedDataList.push_back(boundingBox.lowerBound.x);
 			convertedDataList.push_back(boundingBox.lowerBound.y);
 			convertedDataList.push_back(boundingBox.upperBound.x);
@@ -1135,8 +1134,8 @@ std::vector<float> VectorModel::ConvertedCapsuleData() const
 		
 		if(vertexList.size() > 1)
 		{
-			b2AABB boundingBox;
-			HyMath::ComputeAABB(boundingBox, vertexList.data(), static_cast<int>(vertexList.size()), 5.0f);
+			b2AABB boundingBox = HyMath::ComputeAABB(vertexList.data(), static_cast<int>(vertexList.size()), 5.0f);
+			
 			convertedDataList.push_back(boundingBox.lowerBound.x);
 			convertedDataList.push_back(boundingBox.lowerBound.y);
 			convertedDataList.push_back(boundingBox.upperBound.x);
@@ -2212,10 +2211,7 @@ bool VectorModel::CheckIfAddVertexOnEdge()
 
 		glm::vec2 ptWorldMousePos;
 		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
-		{
-			HyGuiLog("VectorModel::CheckIfAddVertexOnEdge - Failed to get world mouse position for hit testing", LOGTYPE_Error);
 			return false;
-		}
 
 		tmpEdgeShape.SetAsLineSegment(pt1, pt2);
 		if(tmpEdgeShape.TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
