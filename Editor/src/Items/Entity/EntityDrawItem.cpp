@@ -216,8 +216,9 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 	else if(m_pEntityTreeItemData->GetType() == ITEM_PrimLayer)
 	{
 		m_pEditView = new VectorView(pParent);
-		
+		static_cast<VectorModel *>(m_pEntityTreeItemData->GetEditModel())->FlushPrimLayer();
 		m_pEditView->SetModel(m_pEntityTreeItemData->GetEditModel());
+
 		m_pChild = m_pEditView;
 	}
 	else if(m_pEntityTreeItemData->IsFixtureItem())

@@ -151,6 +151,8 @@ QVariant WgtShapeData::GetValue()
 void WgtShapeData::SetValue(bool bIsActiveEditModeItem, QVariant data)
 {
 	QJsonObject serializedObj = data.toJsonObject();
+	if(serializedObj.contains("type") == false)
+		return;
 
 	QString sType = serializedObj["type"].toString();
 

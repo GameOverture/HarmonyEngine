@@ -74,6 +74,8 @@ public:
 
 	HyPrimitive2d *GetHyNode() const;
 
+	void FlushPrimLayer();
+
 	virtual QJsonObject Serialize() const override;
 	virtual void Deserialize(bool bEnabled, const QJsonObject &serializedObj) override;
 

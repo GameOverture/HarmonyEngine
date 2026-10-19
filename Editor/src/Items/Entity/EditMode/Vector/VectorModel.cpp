@@ -66,6 +66,14 @@ HyPrimitive2d *VectorModel::GetHyNode() const
 	return static_cast<HyPrimitive2d *>(pPrimNodeDrawItem->GetHyNode());
 }
 
+void VectorModel::FlushPrimLayer()
+{
+	m_Color = HyColor::White;
+	m_vOffset = { 0.0f, 0.0f };
+	m_bVisible = true;
+	m_fAlpha = 1.0f;
+}
+
 /*virtual*/ QJsonObject VectorModel::Serialize() const /*override*/
 {
 	QJsonObject serializedObj;
@@ -99,8 +107,6 @@ HyPrimitive2d *VectorModel::GetHyNode() const
 		if(pHyPrimNode)
 			pHyPrimNode->SetAsNothing(m_iPrimLayerIndex);
 	}
-
-	SyncViews(bEnabled ? EDITMODE_Idle : EDITMODE_Off);
 }
 
 /*virtual*/ Qt::CursorShape VectorModel::MouseMoveIdle() /*override*/
@@ -501,7 +507,6 @@ glm::vec2 VectorModel::GetOffset() const
 void VectorModel::SetOffset(glm::vec2 vOffset)
 {
 	m_vOffset = vOffset;
-	SyncViews(EDITMODE_Idle);
 }
 
 bool VectorModel::IsVisible() const
@@ -512,7 +517,6 @@ bool VectorModel::IsVisible() const
 void VectorModel::SetVisible(bool bVisible)
 {
 	m_bVisible = bVisible;
-	SyncViews(EDITMODE_Idle);
 }
 
 float VectorModel::GetAlpha() const
@@ -523,7 +527,6 @@ float VectorModel::GetAlpha() const
 void VectorModel::SetAlpha(float fAlpha)
 {
 	m_fAlpha = fAlpha;
-	SyncViews(EDITMODE_Idle);
 }
 
 int VectorModel::GetDisplayOrder() const
