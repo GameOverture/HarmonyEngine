@@ -289,7 +289,6 @@ void VectorModel::FlushPrimLayer()
 		DoTransformCreation(bCtrlHeld, bShiftHeld, fSNAP_AMT, ptStartPos, ptDragPos);
 		break;
 
-
 	case VECTORACTION_CloseLoop:
 		// Convert CloseLoop to AppendVertex
 		if(m_iGrabPointIndex == -1)
@@ -307,6 +306,7 @@ void VectorModel::FlushPrimLayer()
 
 		m_eCurAction = VECTORACTION_AppendVertex;
 		[[fallthrough]];
+	case VECTORACTION_InsertVertex:
 	case VECTORACTION_AppendVertex:
 		if(bCtrlHeld)
 			ptDragPos = { roundf(ptDragPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptDragPos.y / fSNAP_AMT) * fSNAP_AMT };
@@ -460,9 +460,6 @@ void VectorModel::FlushPrimLayer()
 			}
 		}
 		break; }
-
-	case VECTORACTION_InsertVertex:
-		break;
 
 	case VECTORACTION_Outside:
 	case VECTORACTION_Inside:
