@@ -47,6 +47,8 @@ public:
 
 	QVariant GetValue();
 
+	QComboBox *GetComboBox();
+
 public Q_SLOTS:
 	void SetValue(bool bIsActiveEditModeItem, QVariant data);
 	

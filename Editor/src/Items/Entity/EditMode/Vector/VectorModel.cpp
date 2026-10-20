@@ -68,10 +68,27 @@ HyPrimitive2d *VectorModel::GetHyNode() const
 
 void VectorModel::FlushPrimLayer()
 {
-	m_Color = HyColor::White;
-	m_vOffset = { 0.0f, 0.0f };
-	m_bVisible = true;
-	m_fAlpha = 1.0f;
+	m_eShapeType = SHAPE_None;
+	ClearFixtures();
+
+	HyPrimitive2d *pHyPrimitive = GetHyNode();
+	if(pHyPrimitive)
+		pHyPrimitive->SetAsNothing(m_iPrimLayerIndex);
+
+	if(IsPrimitive())
+	{
+		m_Color = HyColor::White;
+		m_vOffset = { 0.0f, 0.0f };
+		m_bVisible = true;
+		m_fAlpha = 1.0f;
+	}
+	else
+	{
+		m_Color = HyGlobal::GetEditorColor(EDITORCOLOR_Fixtures);
+		m_vOffset = { 0.0f, 0.0f };
+		m_bVisible = true;
+		m_fAlpha = 0.42f;
+	}
 }
 
 /*virtual*/ QJsonObject VectorModel::Serialize() const /*override*/
@@ -1784,8 +1801,9 @@ void VectorModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm:
 		switch(m_eShapeType)
 		{
 		case SHAPE_None:
-			m_eShapeType = SHAPE_Box;
-			[[fallthrough]];
+			break;
+			//m_eShapeType = SHAPE_Box;
+			//[[fallthrough]];
 		case SHAPE_Box: {
 			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsBox(HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f));
 			m_GrabPointList.clear();

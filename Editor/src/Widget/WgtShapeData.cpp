@@ -148,6 +148,14 @@ QVariant WgtShapeData::GetValue()
 	return serializedObj;
 }
 
+QComboBox *WgtShapeData::GetComboBox()
+{
+	if(ui->stackedWidget->currentIndex() == SHAPEDATATYPE_Primitive)
+		return ui->cmbPrimType;
+	else if(ui->stackedWidget->currentIndex() == SHAPEDATATYPE_Shape)
+		return ui->cmbShapeType;
+}
+
 void WgtShapeData::SetValue(bool bIsActiveEditModeItem, QVariant data)
 {
 	QJsonObject serializedObj = data.toJsonObject();

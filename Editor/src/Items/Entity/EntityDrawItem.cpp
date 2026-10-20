@@ -232,6 +232,7 @@ void EntityDrawItem::FlushHyNode(HyEntity2d *pParent)
 		else
 			HyGuiLog("EntityDrawItem ctor - unhandled fixture item type: " % HyGlobal::ItemName(m_pEntityTreeItemData->GetType(), false), LOGTYPE_Error);
 
+		static_cast<VectorModel *>(m_pEntityTreeItemData->GetEditModel())->FlushPrimLayer();
 		m_pEditView->SetModel(m_pEntityTreeItemData->GetEditModel());
 		m_pChild = new HyPrimitive2d(pParent);
 	}

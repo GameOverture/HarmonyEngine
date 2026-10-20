@@ -800,7 +800,7 @@ QJsonValue EntityDopeSheetScene::GetKeyFrameProperty(EntityTreeItemData *pItemDa
 
 QJsonValue EntityDopeSheetScene::BasicExtrapolateKeyFrameProperty(EntityTreeItemData *pItemData, int iFrameIndex, QString sCategoryName, QString sPropName) const
 {
-	if(m_KeyFramesMap.contains(pItemData))
+	if(iFrameIndex >= 0 && m_KeyFramesMap.contains(pItemData))
 	{
 		const QMap<int, QJsonObject> &itemKeyFrameMapRef = m_KeyFramesMap[pItemData];
 

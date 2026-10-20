@@ -29,7 +29,7 @@ EntityPropertiesTreeModel::EntityPropertiesTreeModel(ProjectItemData &projItemRe
 
 /*virtual*/ QUndoCommand *EntityPropertiesTreeModel::AllocateUndoCmd(const QModelIndex &index, const QVariant &newData) /*override*/
 {
-	if(GetIndexDefinition(index).eType == PROPERTIESTYPE_ShapeData)
+	if(index.column() == PROPERTIESCOLUMN_Value && GetIndexDefinition(index).eType == PROPERTIESTYPE_ShapeData)
 	{
 		int iStateIndex = m_pProjItemData->GetWidget()->GetCurStateIndex();
 		EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItemData->GetWidget()->GetCurStateData())->GetDopeSheetScene();
