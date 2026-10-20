@@ -279,7 +279,7 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 {
 }
 
-/*virtual*/ bool TileMapModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, glm::vec2 ptClickPos) /*override*/
+/*virtual*/ bool TileMapModel::MousePressEvent(bool bCtrlHeld, bool bShiftHeld, EditModeState eEditModeState, glm::vec2 ptClickPos) /*override*/
 {
 	AuxTileMap *pAuxTileMap = static_cast<AuxTileMap *>(MainWindow::GetAuxWidget(AUXTAB_TileMap));
 	TileMapTool eCurTool = pAuxTileMap->GetSelectedTool();
@@ -305,17 +305,17 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 	return false;
 }
 
-/*virtual*/ void TileMapModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) /*override*/
+/*virtual*/ void TileMapModel::MouseTransform(bool bCtrlHeld, bool bShiftHeld, glm::vec2 ptStartPos, glm::vec2 ptDragPos) /*override*/
 {
 	for(IEditModeView *pView : m_ViewList)
 		static_cast<TileMapView *>(pView)->SyncMouseHoverGrid();
 }
 
-/*virtual*/ void TileMapModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight) /*override*/
+/*virtual*/ void TileMapModel::MouseClickTransformReleased(bool bCtrlHeld, bool bShiftHeld, glm::vec2 ptReleasePos) /*override*/
 {
 }
 
-/*virtual*/ void TileMapModel::MouseClickTransformReleased(glm::vec2 ptReleasePos) /*override*/
+/*virtual*/ void TileMapModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight) /*override*/
 {
 }
 

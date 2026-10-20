@@ -9,12 +9,12 @@
  *************************************************************************/
 #include "Global.h"
 #include "VectorView.h"
-#include "VectorModel.h"
 
 VectorView::VectorView(HyEntity2d *pParent /*= nullptr*/) :
 	IEditModeView(pParent),
 	m_GrabPointOutline(this),
-	m_CenterGrabPoint(this)
+	m_CenterGrabPoint(this),
+	m_iPulseGrabPointIndex(-1)
 {
 	m_GrabPointOutline.UseWindowCoordinates();
 }
@@ -39,9 +39,7 @@ void VectorView::SyncColor()
 /*virtual*/ void VectorView::SyncWithModel(EditModeState eEditModeState) /*override*/
 {
 	VectorModel *pVectorModel = static_cast<VectorModel *>(m_pModel);
-
-	if(pVectorModel == nullptr ||
-		pVectorModel->IsValidModel() == false ||
+	if(pVectorModel == nullptr || pVectorModel->GetNumFixtures() < 0 ||
 		(pVectorModel->IsLineChain() == false && pVectorModel->GetShapeType() == SHAPE_None) ||
 		pVectorModel->GetEditModeType() == EDITMODETYPE_FixturePoint)
 	{
@@ -57,10 +55,11 @@ void VectorView::SyncColor()
 		return;
 	}
 
+	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
+
+	// Fixtures have low display order to show behind everything
 	if(pVectorModel->IsFixture())
-	{
 		m_GrabPointOutline.SetDisplayOrder(pVectorModel->GetDisplayOrder());
-	}
 
 	// Sync Grab Point Views with Model
 	const QList<GfxGrabPointModel> &grabPointModelList = pVectorModel->GetGrabPointList();
@@ -81,11 +80,9 @@ void VectorView::SyncColor()
 	for(GfxGrabPointView *pGrabPtView : m_GrabPointViewList)
 		pGrabPtView->SetVisible(bGrabPtsVisible);
 	m_CenterGrabPoint.SetVisible(bGrabPtsVisible);
-	m_GrabPointOutline.SetVisible(bGrabPtsVisible);
 
 	// Sync Fixture Primitive with Model
-	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
-
+	m_GrabPointOutline.SetVisible(bGrabPtsVisible);
 	if(pVectorModel->IsLineChain() || pVectorModel->GetShapeType() == SHAPE_Polygon)
 	{
 		std::vector<glm::vec2> outlinePtList;
@@ -95,7 +92,7 @@ void VectorView::SyncColor()
 			pCamera->ProjectToCamera(pointRef.GetPos(), ptCameraPoint);
 			outlinePtList.push_back(ptCameraPoint);
 		}
-		m_GrabPointOutline.SetAsLineChain(0, outlinePtList, pVectorModel->IsLoopClosed(), 1.0f);
+		m_GrabPointOutline.SetAsLineChain(LAYER_GrabPointOutline, outlinePtList, pVectorModel->IsLoopClosed(), 1.0f);
 
 		//if(pVectorModel->GetShapeType() == SHAPE_Polygon)
 		//{
@@ -125,7 +122,7 @@ void VectorView::SyncColor()
 				pCamera->ProjectToCamera(grabPointModelList[6].GetPos(), ptCameraPoint);
 				vertexList.push_back(ptCameraPoint);
 
-				m_GrabPointOutline.SetAsLineChain(0, vertexList, true, 1.0f);
+				m_GrabPointOutline.SetAsLineChain(LAYER_GrabPointOutline, vertexList, true, 1.0f);
 			}
 			break;
 
@@ -134,7 +131,7 @@ void VectorView::SyncColor()
 			pCamera->ProjectToCamera(ptCenter, ptCenter);
 			float fRadius = glm::length(grabPointModelList[0].GetPos() - pVectorModel->GetCenterGrabPoint().GetPos());
 			fRadius *= pCamera->GetZoom();
-			m_GrabPointOutline.SetAsCircle(0, ptCenter, fRadius, 1.0f);
+			m_GrabPointOutline.SetAsCircle(LAYER_GrabPointOutline, ptCenter, fRadius, 1.0f);
 			break; }
 
 		case SHAPE_Capsule:
@@ -150,7 +147,7 @@ void VectorView::SyncColor()
 				glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
 				pCamera->ProjectToCamera(ptTwo, ptTwo);
 
-				m_GrabPointOutline.SetAsLineSegment(0, ptOne, ptTwo, 1.0f);
+				m_GrabPointOutline.SetAsLineSegment(LAYER_GrabPointOutline, ptOne, ptTwo, 1.0f);
 			}
 			break;
 
@@ -160,6 +157,78 @@ void VectorView::SyncColor()
 	}
 
 	SyncColor();
+}
+
+void VectorView::DrawVectorAction(VectorAction eAction)
+{
+	HyCamera2d *pCamera = HyEngine::Window().GetCamera2d(0);
+	VectorModel *pVectorModel = static_cast<VectorModel *>(m_pModel);
+	const QList<GfxGrabPointModel> &grabPtList = pVectorModel->GetGrabPointList();
+	//glm::vec2 ptWorldMousePos;
+	//if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
+	//	HyGuiLog("GfxShapeModel::DoMouseMoveIdle - Failed to get world mouse position for hit testing", LOGTYPE_Error);
+	glm::vec2 ptMousePos = HyEngine::Input().GetMousePos();
+
+	if(eAction != VECTORACTION_CloseLoop)
+		PulseGrabPoint(-1);
+
+	switch(eAction)
+	{
+	case VECTORACTION_AppendVertex: {
+		glm::vec2 ptEndPt;
+		if(grabPtList.front().IsSelected())
+			pCamera->ProjectToCamera(grabPtList.front().GetPos(), ptEndPt);
+		else
+			pCamera->ProjectToCamera(grabPtList.back().GetPos(), ptEndPt);
+		m_GrabPointOutline.SetAsLineSegment(LAYER_AppendVertexPreview, ptMousePos, ptEndPt, 1.0f);
+		m_GrabPointOutline.SetLayerAlpha(LAYER_AppendVertexPreview, 0.5f);
+		m_GrabPointOutline.SetLayerVisible(LAYER_AppendVertexPreview, true);
+		break; }
+
+	case VECTORACTION_CloseLoop: {
+		glm::vec2 ptEndPt;
+		glm::vec2 ptStartPt;
+		if(grabPtList.front().IsSelected())
+		{
+			pCamera->ProjectToCamera(grabPtList.front().GetPos(), ptEndPt);
+			pCamera->ProjectToCamera(grabPtList.back().GetPos(), ptStartPt);
+
+			PulseGrabPoint(grabPtList.size() - 1);
+		}
+		else
+		{
+			pCamera->ProjectToCamera(grabPtList.back().GetPos(), ptEndPt);
+			pCamera->ProjectToCamera(grabPtList.front().GetPos(), ptStartPt);
+
+			PulseGrabPoint(0);
+		}
+		m_GrabPointOutline.SetAsLineSegment(LAYER_AppendVertexPreview, ptStartPt, ptEndPt, 1.0f);
+		m_GrabPointOutline.SetLayerAlpha(LAYER_AppendVertexPreview, 0.5f);
+		m_GrabPointOutline.SetLayerVisible(LAYER_AppendVertexPreview, true);
+		break; }
+
+	case VECTORACTION_Creation:
+	case VECTORACTION_Outside:
+	case VECTORACTION_Inside:
+	case VECTORACTION_InsertVertex:
+	case VECTORACTION_HoverGrabPoint:
+	case VECTORACTION_HoverCenter:
+	case VECTORACTION_None:
+	default:
+		m_GrabPointOutline.SetLayerVisible(LAYER_AppendVertexPreview, false);
+		break;
+	}
+}
+
+void VectorView::PulseGrabPoint(int iIndex)
+{
+	m_iPulseGrabPointIndex = iIndex;
+	if(m_iPulseGrabPointIndex < 0)
+	{
+		for(GfxGrabPointView *pGrabPt : m_GrabPointViewList)
+			pGrabPt->scale.Set(1.0f, 1.0f);
+		m_iPulseGrabPointIndex = -1;
+	}
 }
 
 void VectorView::ClearGrabPoints()
@@ -173,6 +242,12 @@ void VectorView::ClearGrabPoints()
 
 /*virtual*/ void VectorView::OnUpdate() /*override*/
 {
+	if(m_iPulseGrabPointIndex >= 0 && m_iPulseGrabPointIndex < m_GrabPointViewList.size())
+	{
+		if(m_GrabPointViewList[m_iPulseGrabPointIndex]->scale.IsAnimating() == false)
+			m_GrabPointViewList[m_iPulseGrabPointIndex]->scale.Tween(1.25f, 1.25f, 0.25f, HyTween::QuadOut, 0.0f, [](IHyNode *pThis) { static_cast<GfxGrabPointView *>(pThis)->scale.Tween(1.0f, 1.0f, 0.25f, HyTween::QuadIn); });
+	}
+
 	//VectorModel *pVectorModel = static_cast<VectorModel *>(m_pModel);
 	//if(m_bUpdatePrimNodeFlash == false || pVectorModel == nullptr)
 	//	return;

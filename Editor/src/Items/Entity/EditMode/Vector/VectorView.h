@@ -13,14 +13,22 @@
 #include "Global.h"
 #include "IEditModeView.h"
 #include "GfxGrabPointView.h"
+#include "VectorModel.h"
 
 class VectorView : public IEditModeView
 {
 protected:
+	enum PrimitiveLayer
+	{
+		LAYER_GrabPointOutline = 0,
+		LAYER_AppendVertexPreview,
+	};
 	HyPrimitive2d				m_GrabPointOutline;
 
 	QList<GfxGrabPointView *>	m_GrabPointViewList;	// Project to window coordinates
 	GfxGrabPointView			m_CenterGrabPoint;
+
+	int							m_iPulseGrabPointIndex;
 
 public:
 	VectorView(HyEntity2d *pParent = nullptr);
@@ -30,6 +38,10 @@ public:
 
 	void SyncColor();
 	virtual void SyncWithModel(EditModeState eEditModeState) override;
+
+	void DrawVectorAction(VectorAction eAction);
+
+	void PulseGrabPoint(int iIndex);
 
 	void ClearGrabPoints();
 

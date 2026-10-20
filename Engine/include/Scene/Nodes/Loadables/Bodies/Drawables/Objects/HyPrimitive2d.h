@@ -22,7 +22,7 @@ protected:
 	{
 		glm::vec2 *		m_pVertBuffer;
 		uint32			m_uiNumVerts;
-		glm::vec2		m_vOffset;
+		HyAnimVec2		m_Offset;
 		bool			m_bVisible;
 		HyColor			m_Color;
 		HyAnimVec1		m_Alpha;
@@ -34,7 +34,7 @@ protected:
 		Layer(HyPrimitive2d &primRef) :
 			m_pVertBuffer(nullptr),
 			m_uiNumVerts(0),
-			m_vOffset(0.0f, 0.0f),
+			m_Offset(primRef, IHyNode::DIRTY_Transform),
 			m_bVisible(true),
 			m_Color(HyColor::White),
 			m_Alpha(primRef, IHyNode::DIRTY_Color),
@@ -85,7 +85,7 @@ protected:
 			if(this != &rhs)
 			{
 				m_uiNumVerts = rhs.m_uiNumVerts;
-				m_vOffset = rhs.m_vOffset;
+				m_Offset = rhs.m_Offset;
 				m_bVisible = rhs.m_bVisible;
 				m_Color = rhs.m_Color;
 				m_Alpha = rhs.m_Alpha;
@@ -169,7 +169,7 @@ public:
 
 	int32 SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, float fOutlineThickness);
 
-	glm::vec2 GetLayerOffset(int32 iLayerIndex) const;
+	HyAnimVec2 *GetLayerOffset(int32 iLayerIndex) const;
 	int32 SetLayerOffset(int32 iLayerIndex, float fX, float fY);
 	int32 SetLayerOffset(int32 iLayerIndex, const glm::vec2 &vOffset);
 

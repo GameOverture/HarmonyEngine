@@ -81,10 +81,10 @@ public:
 
 	virtual Qt::CursorShape MouseMoveIdle() override;
 	virtual void MouseIdleRightClick() override;
-	virtual bool MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, glm::vec2 ptClickPos) override; // Returns whether transform has begun (otherwise marquee select)
-	virtual void MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override; // Gets here if MousePressEvent() returns true and mouse is held + dragged
+	virtual bool MousePressEvent(bool bCtrlHeld, bool bShiftHeld, EditModeState eEditModeState, glm::vec2 ptClickPos) override; // Returns whether transform has begun (otherwise marquee select)
+	virtual void MouseTransform(bool bCtrlHeld, bool bShiftHeld, glm::vec2 ptStartPos, glm::vec2 ptDragPos) override; // Gets here if MousePressEvent() returns true and mouse is held + dragged
+	virtual void MouseClickTransformReleased(bool bCtrlHeld, bool bShiftHeld, glm::vec2 ptReleasePos) override;
 	virtual void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight) override;
-	virtual void MouseClickTransformReleased(glm::vec2 ptReleasePos) override;
 
 	bool IsPrimitive() const;
 	bool IsFixture() const;
@@ -152,14 +152,14 @@ protected:
 	std::vector<float> ConvertedCapsuleData() const;
 	std::vector<float> ConvertedPolygonOrLineChainData() const;
 
-	void DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapAmt, glm::vec2 vDragDelta);
+	void DoTransformShapeCtrlGrabPoint_Box(bool bCtrlHeld, bool bShiftHeld, float fSnapAmt, glm::vec2 vDragDelta);
 
 	VectorAction DoMouseMoveIdle();
 
 	void TransformData(glm::mat4 mtxTransform);
 
 	// Action Transforms - These overrides will change the model's data as they are being performed. Upon completion, Serialize() can be called
-	void DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
+	void DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSnapAmt, glm::vec2 ptStartPos, glm::vec2 ptDragPos);
 
 	void ClearFixtures();
 

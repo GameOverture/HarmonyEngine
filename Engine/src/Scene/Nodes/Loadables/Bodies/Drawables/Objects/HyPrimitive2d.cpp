@@ -353,14 +353,14 @@ int32 HyPrimitive2d::SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const
 	return iLayerIndex;
 }
 
-glm::vec2 HyPrimitive2d::GetLayerOffset(int32 iLayerIndex) const
+HyAnimVec2 *HyPrimitive2d::GetLayerOffset(int32 iLayerIndex) const
 {
 	if(iLayerIndex < 0 || iLayerIndex >= m_LayerList.size())
 	{
 		HyLogError("HyPrimitive2d::GetLayerOffset() failed - Invalid layer index");
-		return glm::vec2(0.0f, 0.0f);
+		return nullptr;
 	}
-	return m_LayerList[iLayerIndex]->m_vOffset;
+	return &m_LayerList[iLayerIndex]->m_Offset;
 }
 
 int32 HyPrimitive2d::SetLayerOffset(int32 iLayerIndex, float fX, float fY)
@@ -375,7 +375,7 @@ int32 HyPrimitive2d::SetLayerOffset(int32 iLayerIndex, const glm::vec2 &vOffset)
 		iLayerIndex = static_cast<int32>(m_LayerList.size());	// If index is out of bounds, add a new layer at the end
 		m_LayerList.push_back(HY_NEW Layer(*this));
 	}
-	m_LayerList[iLayerIndex]->m_vOffset = vOffset;
+	m_LayerList[iLayerIndex]->m_Offset.Set(vOffset);
 	return iLayerIndex;
 }
 
@@ -569,7 +569,7 @@ void HyPrimitive2d::RemoveAllLayers()
 			layerColor.a *= layerRef.m_Alpha.Get();
 			for(uint32 iVertIndex = 0; iVertIndex < layerRef.m_uiNumVerts; ++iVertIndex)
 			{
-				glm::vec2 ptVert = layerRef.m_pVertBuffer[iVertIndex] + layerRef.m_vOffset;
+				glm::vec2 ptVert = layerRef.m_pVertBuffer[iVertIndex] + layerRef.m_Offset.Get();
 				vertexBufferRef.AppendVertexData(&ptVert, sizeof(glm::vec2));
 				vertexBufferRef.AppendVertexData(&layerColor, sizeof(glm::vec4)); // TODO: Cache bot most and top most vertices and use that to mix color between vTopColor and vBotColor for a vertical gradient effect
 			}

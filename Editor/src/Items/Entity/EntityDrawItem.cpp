@@ -441,7 +441,7 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 				{
 					if(sPropertyName == "Offset")
 					{
-						glm::vec2 ptOffset = static_cast<HyPrimitive2d *>(pEntDrawItem->GetHyNode())->GetLayerOffset(iLayerIndex);
+						glm::vec2 ptOffset = static_cast<HyPrimitive2d *>(pEntDrawItem->GetHyNode())->GetLayerOffset(iLayerIndex)->Get();
 						return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(ptOffset.x)), QJsonValue(static_cast<double>(ptOffset.y)) }));
 					}
 					if(sPropertyName == "Visible")

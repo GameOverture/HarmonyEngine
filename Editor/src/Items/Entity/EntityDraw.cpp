@@ -176,8 +176,9 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		break;
 
 	case EDITMODE_MouseDragTransform: {
+		bool bCtrlHeld = (QApplication::keyboardModifiers() & Qt::ControlModifier);
 		bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-		pTreeItemData->GetEditModel()->MouseTransform(bShiftHeld, m_ptDragStart, ptWorldMousePos);
+		pTreeItemData->GetEditModel()->MouseTransform(bCtrlHeld, bShiftHeld, m_ptDragStart, ptWorldMousePos);
 		break; }
 
 	default:
@@ -221,8 +222,9 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 
 		m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), m_ptDragStart);
 		
+		bool bCtrlHeld = (QApplication::keyboardModifiers() & Qt::ControlModifier);
 		bool bShiftHeld = (QApplication::keyboardModifiers() & Qt::ShiftModifier);
-		bool bStartTransform = pTreeItemData->GetEditModel()->MousePressEvent(m_eEditModeState, bShiftHeld, m_ptDragStart);
+		bool bStartTransform = pTreeItemData->GetEditModel()->MousePressEvent(bCtrlHeld, bShiftHeld, m_eEditModeState, m_ptDragStart);
 		if(bStartTransform)
 		{
 			Harmony::GetHarmonyWidget(&m_pProjItem->GetProject())->setCursor(Qt::BlankCursor);
@@ -297,7 +299,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		break; }
 
 	case EDITMODE_MouseClickTransform:
-		pTreeItemData->GetEditModel()->MouseClickTransformReleased(m_ptDragStart);
+		pTreeItemData->GetEditModel()->MouseClickTransformReleased((pEvent->modifiers() & Qt::ControlModifier), (pEvent->modifiers() & Qt::ShiftModifier), m_ptDragStart);
 		[[fallthrough]];
 	case EDITMODE_MouseDragTransform: {
 		QString sUndoText = pTreeItemData->GetEditModel()->GetActionText(m_eEditModeState, pTreeItemData->GetCodeName());

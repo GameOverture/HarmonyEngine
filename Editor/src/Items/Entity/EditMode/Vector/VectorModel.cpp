@@ -14,6 +14,8 @@
 #include "EntityModel.h"
 #include "EntityDraw.h"
 
+const float fSNAP_AMT = 25.0f;
+
 VectorModel::VectorModel(EditModeType eEditModeType) :
 	IEditModeModel(eEditModeType),
 	m_pPrimTreeItemData(nullptr),
@@ -130,10 +132,13 @@ void VectorModel::FlushPrimLayer()
 {
 	VectorAction eResult = DoMouseMoveIdle();
 
+	for(IEditModeView *pView : m_ViewList)
+		static_cast<VectorView *>(pView)->DrawVectorAction(eResult);
+
 	switch(eResult)
 	{
 	case VECTORACTION_Creation:
-		MainWindow::SetStatus("Edit Mode - Creation", 0);
+		MainWindow::SetStatus("Edit Mode - Click + Drag to Create", 0);
 		return Qt::CrossCursor;
 
 	case VECTORACTION_Outside:
@@ -171,6 +176,7 @@ void VectorModel::FlushPrimLayer()
 			MainWindow::SetStatus("Edit Mode - Select Vertex", 0);
 			return m_GrabPointList[m_iGrabPointIndex].GetHoverCursor(CalcRotation());
 		}
+		break;
 
 	case VECTORACTION_HoverCenter:
 		MainWindow::SetStatus("Edit Mode - Translate", 0);
@@ -194,7 +200,7 @@ void VectorModel::FlushPrimLayer()
 	DeselectAllGrabPoints();
 }
 
-/*virtual*/ bool VectorModel::MousePressEvent(EditModeState eEditModeState, bool bShiftHeld, glm::vec2 ptClickPos) /*override*/
+/*virtual*/ bool VectorModel::MousePressEvent(bool bCtrlHeld, bool bShiftHeld, EditModeState eEditModeState, glm::vec2 ptClickPos) /*override*/
 {
 	bool bStartTransform = false;
 
@@ -265,55 +271,84 @@ void VectorModel::FlushPrimLayer()
 	return bStartTransform;
 }
 
-/*virtual*/ void VectorModel::MouseTransform(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos) /*override*/
+/*virtual*/ void VectorModel::MouseTransform(bool bCtrlHeld, bool bShiftHeld, glm::vec2 ptStartPos, glm::vec2 ptDragPos) /*override*/
 {
-	const float fSNAP_AMT = 25.0f;
-
 	if(m_bOverrideTransformStart)
 		ptStartPos = m_ptTransformStartOverride;
 
 	glm::vec2 vDragDelta = { 0.0f, 0.0f };
 	if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
 		vDragDelta = { ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y };
+	
+	for(IEditModeView *pView : m_ViewList)
+		static_cast<VectorView *>(pView)->DrawVectorAction(VECTORACTION_None);
 
 	switch(m_eCurAction)
 	{
 	case VECTORACTION_Creation:
-		DoTransformCreation(bShiftMod, ptStartPos, ptDragPos);
+		DoTransformCreation(bCtrlHeld, bShiftHeld, fSNAP_AMT, ptStartPos, ptDragPos);
 		break;
 
+
+	case VECTORACTION_CloseLoop:
+		// Convert CloseLoop to AppendVertex
+		if(m_iGrabPointIndex == -1)
+		{
+			HyGuiLog("GfxShapeModel::MouseTransform - CloseLoop -> AppendVertex m_iGrabPointIndex was -1", LOGTYPE_Error);
+			return;
+		}
+
+		if(bCtrlHeld)
+			ptDragPos = { roundf(ptDragPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptDragPos.y / fSNAP_AMT) * fSNAP_AMT };
+		m_GrabPointList.insert(m_GrabPointList.begin() + m_iGrabPointIndex, GfxGrabPointModel(GRABPOINT_VertexSelected, ptDragPos));
+		for(int i = 0; i < m_GrabPointList.size(); ++i)
+			m_GrabPointList[i].SetSelected(false);
+		m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
+
+		m_eCurAction = VECTORACTION_AppendVertex;
+		[[fallthrough]];
 	case VECTORACTION_AppendVertex:
+		if(bCtrlHeld)
+			ptDragPos = { roundf(ptDragPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptDragPos.y / fSNAP_AMT) * fSNAP_AMT };
 		m_GrabPointList[m_iGrabPointIndex].SetPos(ptDragPos);
 		break;
 
 	case VECTORACTION_HoverGrabPoint:
 		if(m_GrabPointList[m_iGrabPointIndex].IsTypeSelectable())
 		{
-			for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
+			glm::vec2 ptNewPos = m_GrabPointList[m_iGrabPointIndex].GetCachePos() + vDragDelta;
+			if(bCtrlHeld) // Snap to fSNAP_AMT pixel increments if ctrl is held
+				ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
+			m_GrabPointList[m_iGrabPointIndex].SetPos(ptNewPos);
+
+			glm::vec2 vOffsetAmt = ptNewPos - m_GrabPointList[m_iGrabPointIndex].GetCachePos();
+
+			std::vector<glm::vec2> grabPointPosList;
+			for(int i = 0; i < m_GrabPointList.size(); ++i)
 			{
-				if(grabPtModel.IsSelected())
-				{
-					glm::vec2 ptNewPos = grabPtModel.GetCachePos() + vDragDelta;
-					if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
-						ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
-					grabPtModel.SetPos(ptNewPos);
-				}
+				GfxGrabPointModel &grabPtModel = m_GrabPointList[i];
+				if(grabPtModel.IsSelected() && i != m_iGrabPointIndex)
+					grabPtModel.SetPos(grabPtModel.GetCachePos() + vOffsetAmt);
+
+				grabPointPosList.push_back(grabPtModel.GetPos());
 			}
+
+			m_GrabPointCenter.SetPos(HyMath::CalculateCentroid(grabPointPosList));
 		}
-		else // Not assembling vertices, this is a shape ctrl grab point
+		else // Not assembling vertices, this is a shape grab point
 		{
 			if(m_FixtureList.size() != 1)
-				HyGuiLog("VectorModel::MouseTransform() - m_FixtureList isn't size 1 with a shape ctrl grab point", LOGTYPE_Error);
+				HyGuiLog("VectorModel::MouseTransform() - m_FixtureList isn't size 1 with a shape grab point", LOGTYPE_Error);
 
 			switch(m_eShapeType)
 			{
 			case SHAPE_Box:
-				DoTransformShapeCtrlGrabPoint_Box(bShiftMod, fSNAP_AMT, vDragDelta);
+				DoTransformShapeCtrlGrabPoint_Box(bCtrlHeld, bShiftHeld, fSNAP_AMT, vDragDelta);
 				break;
 
 			case SHAPE_Circle: {
 				glm::vec2 ptNewPos = m_GrabPointList[m_iGrabPointIndex].GetCachePos() + vDragDelta;
-				if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
+				if(bCtrlHeld) // Snap to fSNAP_AMT pixel increments if ctrl is held
 					ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
 				float fNewRadius = glm::length(ptNewPos - m_GrabPointCenter.GetCachePos());
 				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCircle(m_GrabPointCenter.GetCachePos(), fNewRadius);
@@ -327,17 +362,21 @@ void VectorModel::FlushPrimLayer()
 
 			case SHAPE_LineSegment: {
 				glm::vec2 ptNewPos = m_GrabPointList[m_iGrabPointIndex].GetCachePos() + vDragDelta;
-				if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
+				if(bCtrlHeld) // Snap to fSNAP_AMT pixel increments if ctrl is held
 					ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
 
 				m_GrabPointList[m_iGrabPointIndex].SetPos(ptNewPos);
 
 				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsLineSegment(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos());
+
+				glm::vec2 ptCenter;
+				m_FixtureList[0]->GetCentroid(ptCenter);
+				m_GrabPointCenter.SetPos(ptCenter);
 				break; }
 
 			case SHAPE_Capsule: {
 				glm::vec2 ptNewPos = m_GrabPointList[m_iGrabPointIndex].GetCachePos() + vDragDelta;
-				if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
+				if(bCtrlHeld) // Snap to fSNAP_AMT pixel increments if ctrl is held
 					ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
 				
 				float fRadius;
@@ -377,7 +416,7 @@ void VectorModel::FlushPrimLayer()
 	case VECTORACTION_HoverCenter: {
 
 		glm::vec2 vDragDelta = { 0.0f, 0.0f };
-		if(bShiftMod) // Snap to fSNAP_AMT pixel increments if shift is held
+		if(bCtrlHeld) // Snap to fSNAP_AMT pixel increments if ctrl is held
 			ptDragPos = { roundf(ptDragPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptDragPos.y / fSNAP_AMT) * fSNAP_AMT };
 		if(false == (HyCompareFloat(ptStartPos.x, ptDragPos.y) && HyCompareFloat(ptStartPos.y, ptDragPos.y)))
 			vDragDelta = { ptDragPos.x - ptStartPos.x, ptDragPos.y - ptStartPos.y };
@@ -423,7 +462,8 @@ void VectorModel::FlushPrimLayer()
 		break; }
 
 	case VECTORACTION_InsertVertex:
-	case VECTORACTION_CloseLoop:
+		break;
+
 	case VECTORACTION_Outside:
 	case VECTORACTION_Inside:
 	default:
@@ -432,6 +472,25 @@ void VectorModel::FlushPrimLayer()
 	}
 
 	SyncViews(EDITMODE_MouseDragTransform);
+}
+
+/*virtual*/ void VectorModel::MouseClickTransformReleased(bool bCtrlHeld, bool bShiftHeld, glm::vec2 ptReleasePos) /*override*/
+{
+	if(m_eCurAction == VECTORACTION_Creation)
+	{
+		glm::vec2 ptStartPos = ptReleasePos + glm::vec2(-25.0f, -25.0f);
+		glm::vec2 ptDragPos = ptReleasePos + glm::vec2(25.0f, 25.0f);
+		DoTransformCreation(bCtrlHeld, bShiftHeld, fSNAP_AMT, ptStartPos, ptDragPos);
+	}
+	else if(m_eCurAction == VECTORACTION_HoverGrabPoint)
+	{
+		if(bShiftHeld == false)
+		{
+			for(int i = 0; i < m_GrabPointList.size(); ++i)
+				m_GrabPointList[i].SetSelected(false);
+		}
+		m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
+	}
 }
 
 /*virtual*/ void VectorModel::MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight) /*override*/
@@ -451,22 +510,6 @@ void VectorModel::FlushPrimLayer()
 	}
 
 	SyncViews(eEditModeState);
-}
-
-/*virtual*/ void VectorModel::MouseClickTransformReleased(glm::vec2 ptReleasePos) /*override*/
-{
-	if(m_eCurAction == VECTORACTION_Creation)
-	{
-		glm::vec2 ptStartPos = ptReleasePos + glm::vec2(-25.0f, -25.0f);
-		glm::vec2 ptDragPos = ptReleasePos + glm::vec2(25.0f, 25.0f);
-		DoTransformCreation(false, ptStartPos, ptDragPos);
-	}
-	else if(m_eCurAction == VECTORACTION_HoverGrabPoint)
-	{
-		for(int i = 0; i < m_GrabPointList.size(); ++i)
-			m_GrabPointList[i].SetSelected(false);
-		m_GrabPointList[m_iGrabPointIndex].SetSelected(true);
-	}
 }
 
 bool VectorModel::IsPrimitive() const
@@ -1330,7 +1373,7 @@ std::vector<float> VectorModel::ConvertedPolygonOrLineChainData() const
 	return convertedDataList;
 }
 
-void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapAmt, glm::vec2 vDragDelta)
+void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bCtrlHeld, bool bShiftHeld, float fSnapAmt, glm::vec2 vDragDelta)
 {
 	std::function<GfxTransformCtrl::GrabPointType(int)> fpIndexToEnum =
 		[](int iGrabPointIndex) -> GfxTransformCtrl::GrabPointType
@@ -1452,7 +1495,7 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 		}
 
 		glm::vec2 ptNewPos = pGrabbed->GetCachePos() + vDragDelta;
-		if(bShiftMod) // Snap to fSnapAmt pixel increments if shift is held
+		if(bCtrlHeld) // Snap to fSnapAmt pixel increments if ctrl is held
 			ptNewPos = { roundf(ptNewPos.x / fSnapAmt) * fSnapAmt, roundf(ptNewPos.y / fSnapAmt) * fSnapAmt };
 
 		glm::vec2 vDir1 = pAdjacentCorner1->GetCachePos() - pGrabbed->GetCachePos();
@@ -1522,7 +1565,7 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 			m_bOverrideTransformStart = true;
 			m_ptTransformStartOverride = ptNewPos;
 
-			DoTransformShapeCtrlGrabPoint_Box(bShiftMod, fSnapAmt, glm::vec2(0.0f, 0.0f));
+			DoTransformShapeCtrlGrabPoint_Box(bCtrlHeld, bShiftHeld, fSnapAmt, glm::vec2(0.0f, 0.0f));
 			return;
 		}
 		
@@ -1591,7 +1634,7 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 		}
 
 		glm::vec2 ptNewPos = pGrabbed->GetCachePos() + vDragDelta;
-		if(bShiftMod) // Snap to fSnapAmt pixel increments if shift is held
+		if(bCtrlHeld) // Snap to fSnapAmt pixel increments if ctrl is held
 			ptNewPos = { roundf(ptNewPos.x / fSnapAmt) * fSnapAmt, roundf(ptNewPos.y / fSnapAmt) * fSnapAmt };
 
 		glm::vec2 vDir1 = pAdjacentCorner1->GetCachePos() - pGrabbed->GetCachePos();
@@ -1625,7 +1668,7 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bShiftMod, float fSnapA
 			m_bOverrideTransformStart = true;
 			m_ptTransformStartOverride = ptNewPos;
 
-			DoTransformShapeCtrlGrabPoint_Box(bShiftMod, fSnapAmt, glm::vec2(0.0f, 0.0f));
+			DoTransformShapeCtrlGrabPoint_Box(bCtrlHeld, bShiftHeld, fSnapAmt, glm::vec2(0.0f, 0.0f));
 			return;
 		}
 
@@ -1658,6 +1701,8 @@ VectorAction VectorModel::DoMouseMoveIdle()
 	{
 		if(m_GrabPointList[i].IsMouseHover())
 		{
+			m_iGrabPointIndex = i;
+
 			// Test for close loop
 			if(m_bLoopClosed == false &&
 			   m_GrabPointList.size() > 2 &&
@@ -1669,7 +1714,6 @@ VectorAction VectorModel::DoMouseMoveIdle()
 				return VECTORACTION_CloseLoop;
 			}
 
-			m_iGrabPointIndex = i;
 			return VECTORACTION_HoverGrabPoint;
 		}
 	}
@@ -1716,12 +1760,12 @@ VectorAction VectorModel::DoMouseMoveIdle()
 	   m_eEditModeType != EDITMODETYPE_FixtureChain &&
 	   m_eEditModeType != EDITMODETYPE_FixturePoint)
 	{
+		glm::vec2 ptWorldMousePos;
+		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
+			HyGuiLog("GfxShapeModel::DoMouseMoveIdle - Failed to get world mouse position for hit testing", LOGTYPE_Error);
+
 		for(IHyFixture2d *pFixture : m_FixtureList)
 		{
-			glm::vec2 ptWorldMousePos;
-			if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
-				HyGuiLog("GfxShapeModel::DoMouseMoveIdle - Failed to get world mouse position for hit testing", LOGTYPE_Error);
-
 			if(pFixture->TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
 				return VECTORACTION_Inside;
 		}
@@ -1738,10 +1782,16 @@ void VectorModel::TransformData(glm::mat4 mtxTransform)
 	SyncViews(EDITMODE_Idle);
 }
 
-void VectorModel::DoTransformCreation(bool bShiftMod, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
+void VectorModel::DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSnapAmt, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
+	if(bCtrlHeld)
+	{
+		ptStartPos = { roundf(ptStartPos.x / fSnapAmt) * fSnapAmt, roundf(ptStartPos.y / fSnapAmt) * fSnapAmt };
+		ptDragPos = { roundf(ptDragPos.x / fSnapAmt) * fSnapAmt, roundf(ptDragPos.y / fSnapAmt) * fSnapAmt };
+	}
+
 	glm::vec2 ptLowerBound, ptUpperBound, ptCenter;
-	if(bShiftMod)
+	if(bShiftHeld)
 	{
 		ptCenter = ptStartPos;
 
