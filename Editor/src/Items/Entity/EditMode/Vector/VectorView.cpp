@@ -39,7 +39,7 @@ void VectorView::SyncColor()
 /*virtual*/ void VectorView::SyncWithModel(EditModeState eEditModeState) /*override*/
 {
 	VectorModel *pVectorModel = static_cast<VectorModel *>(m_pModel);
-	if(pVectorModel == nullptr || pVectorModel->GetNumFixtures() < 0 ||
+	if(pVectorModel == nullptr || pVectorModel->GetFixture() == nullptr ||
 		(pVectorModel->IsLineChain() == false && pVectorModel->GetShapeType() == SHAPE_None) ||
 		pVectorModel->GetEditModeType() == EDITMODETYPE_FixturePoint)
 	{
@@ -138,18 +138,15 @@ void VectorView::SyncColor()
 			m_GrabPointOutline.RemoveAllLayers();
 			break;
 			
-		case SHAPE_LineSegment:
-			if(pVectorModel->GetNumFixtures() > 0)
-			{
-				b2Segment seg = static_cast<const HyShape2d *>(pVectorModel->GetFixture(0))->GetAsSegment();
-				glm::vec2 ptOne(seg.point1.x, seg.point1.y);
-				pCamera->ProjectToCamera(ptOne, ptOne);
-				glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
-				pCamera->ProjectToCamera(ptTwo, ptTwo);
+		case SHAPE_LineSegment: {
+			b2Segment seg = static_cast<const HyShape2d *>(pVectorModel->GetFixture())->GetAsSegment();
+			glm::vec2 ptOne(seg.point1.x, seg.point1.y);
+			pCamera->ProjectToCamera(ptOne, ptOne);
+			glm::vec2 ptTwo(seg.point2.x, seg.point2.y);
+			pCamera->ProjectToCamera(ptTwo, ptTwo);
 
-				m_GrabPointOutline.SetAsLineSegment(LAYER_GrabPointOutline, ptOne, ptTwo, 1.0f);
-			}
-			break;
+			m_GrabPointOutline.SetAsLineSegment(LAYER_GrabPointOutline, ptOne, ptTwo, 1.0f);
+			break; }
 
 		default:
 			HyGuiLog("VectorView::SyncWithModel - Unhandled shape type", LOGTYPE_Error);

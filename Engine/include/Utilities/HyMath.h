@@ -302,6 +302,7 @@ public:
 	static std::vector<HyTriangle2d> Triangulate(const std::vector<glm::vec2> &ccwOrderedVertexList);
 	
 	static glm::vec2 CalculateCentroid(const std::vector<glm::vec2> &vertexList);
+	static glm::vec2 CalculateCentroid(const glm::vec2 *pVerts, size_t uiNumVerts);
 
 	static float AngleFromVector(const glm::vec2 &vDirVector); // Caution: Operationally expensive
 	static glm::vec2 ClosestPointOnRay(const glm::vec2 &ptRayStart, const glm::vec2 &vNormalizedRayDir, const glm::vec2 &ptTestPoint);

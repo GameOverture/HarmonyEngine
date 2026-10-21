@@ -26,6 +26,7 @@ VectorModel::VectorModel(EditModeType eEditModeType) :
 	m_fAlpha(1.0f),
 	m_iDisplayOrder(0),
 	m_eShapeType(SHAPE_None),
+	m_pFixture(nullptr),
 	m_bLoopClosed(false),
 	m_fOutline(0.0f),
 	m_GrabPointCenter(GRABPOINT_Center),
@@ -120,7 +121,7 @@ void VectorModel::FlushPrimLayer()
 		m_iDisplayOrder = bEnabled ? DISPLAYORDER_FixtureSelected : DISPLAYORDER_Fixture;
 
 	m_sMalformedReason = DeserializeData(serializedObj);
-	if(m_sMalformedReason.isEmpty() == false || m_FixtureList.empty()) // *this is a prim layer, update the parent primitive node
+	if(m_sMalformedReason.isEmpty() == false || m_pFixture == nullptr) // *this is a prim layer, update the parent primitive node
 	{
 		HyPrimitive2d *pHyPrimNode = GetHyNode();
 		if(pHyPrimNode)
@@ -337,8 +338,8 @@ void VectorModel::FlushPrimLayer()
 		}
 		else // Not assembling vertices, this is a shape grab point
 		{
-			if(m_FixtureList.size() != 1)
-				HyGuiLog("VectorModel::MouseTransform() - m_FixtureList isn't size 1 with a shape grab point", LOGTYPE_Error);
+			if(m_pFixture == nullptr)
+				HyGuiLog("VectorModel::MouseTransform() - m_pFixture is nullptr with a shape grab point", LOGTYPE_Error);
 
 			switch(m_eShapeType)
 			{
@@ -351,8 +352,8 @@ void VectorModel::FlushPrimLayer()
 				if(bCtrlHeld) // Snap to fSNAP_AMT pixel increments if ctrl is held
 					ptNewPos = { roundf(ptNewPos.x / fSNAP_AMT) * fSNAP_AMT, roundf(ptNewPos.y / fSNAP_AMT) * fSNAP_AMT };
 				float fNewRadius = glm::length(ptNewPos - m_GrabPointCenter.GetCachePos());
-				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCircle(m_GrabPointCenter.GetCachePos(), fNewRadius);
-				std::vector<glm::vec2> grabList = static_cast<HyShape2d *>(m_FixtureList[0])->CalcGrabPoints();
+				static_cast<HyShape2d *>(m_pFixture)->SetAsCircle(m_GrabPointCenter.GetCachePos(), fNewRadius);
+				std::vector<glm::vec2> grabList = static_cast<HyShape2d *>(m_pFixture)->CalcGrabPoints();
 				if(m_GrabPointList.size() != 4 || grabList.size() != 4)
 					HyGuiLog("VectorModel::MouseTransform() - Circle shape ctrl was expecting 4 grab points", LOGTYPE_Error);
 				for(int i = 0; i < 4; i++)
@@ -367,10 +368,10 @@ void VectorModel::FlushPrimLayer()
 
 				m_GrabPointList[m_iGrabPointIndex].SetPos(ptNewPos);
 
-				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsLineSegment(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos());
+				static_cast<HyShape2d *>(m_pFixture)->SetAsLineSegment(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos());
 
 				glm::vec2 ptCenter;
-				m_FixtureList[0]->GetCentroid(ptCenter);
+				m_pFixture->GetCentroid(ptCenter);
 				m_GrabPointCenter.SetPos(ptCenter);
 				break; }
 
@@ -392,15 +393,15 @@ void VectorModel::FlushPrimLayer()
 					else
 						fRadius = glm::length(ptNewPos - m_GrabPointList[1].GetCachePos());
 				}
-				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCapsule(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos(), fRadius);
+				static_cast<HyShape2d *>(m_pFixture)->SetAsCapsule(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos(), fRadius);
 				
-				std::vector<glm::vec2> grabPtList = static_cast<HyShape2d *>(m_FixtureList[0])->CalcGrabPoints();
+				std::vector<glm::vec2> grabPtList = static_cast<HyShape2d *>(m_pFixture)->CalcGrabPoints();
 				if(m_GrabPointList.size() != 6 || grabPtList.size() != 6)
 					HyGuiLog("VectorModel::MouseTransform() - Capsule shape ctrl was expecting 6 grab points", LOGTYPE_Error);
 				for(int i = 0; i < 6; i++)
 					m_GrabPointList[i].SetPos(grabPtList[i]);
 				glm::vec2 ptCenter;
-				m_FixtureList[0]->GetCentroid(ptCenter);
+				m_pFixture->GetCentroid(ptCenter);
 				m_GrabPointCenter.SetPos(ptCenter);
 				break; }
 
@@ -431,7 +432,7 @@ void VectorModel::FlushPrimLayer()
 			for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
 				vertexList.push_back(grabPtModel.GetPos());
 			
-			HyChain2d *pChainFixture = static_cast<HyChain2d *>(m_FixtureList[0]);
+			HyChain2d *pChainFixture = static_cast<HyChain2d *>(m_pFixture);
 			pChainFixture->SetData(vertexList, pChainFixture->GetChainData().bLoop);
 		}
 		else
@@ -439,19 +440,19 @@ void VectorModel::FlushPrimLayer()
 			switch(m_eShapeType)
 			{
 			case SHAPE_Box:
-				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsBox(HyRect(m_GrabPointList[0].GetPos(), m_GrabPointList[2].GetPos(), m_GrabPointList[4].GetPos(), m_GrabPointList[6].GetPos()));
+				static_cast<HyShape2d *>(m_pFixture)->SetAsBox(HyRect(m_GrabPointList[0].GetPos(), m_GrabPointList[2].GetPos(), m_GrabPointList[4].GetPos(), m_GrabPointList[6].GetPos()));
 				break;
 
 			case SHAPE_Circle:
-				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCircle(m_GrabPointCenter.GetPos(), 0.5f * glm::distance(m_GrabPointList[0].GetCachePos(), m_GrabPointList[2].GetCachePos()));
+				static_cast<HyShape2d *>(m_pFixture)->SetAsCircle(m_GrabPointCenter.GetPos(), 0.5f * glm::distance(m_GrabPointList[0].GetCachePos(), m_GrabPointList[2].GetCachePos()));
 				break;
 
 			case SHAPE_LineSegment:
-				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsLineSegment(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos());
+				static_cast<HyShape2d *>(m_pFixture)->SetAsLineSegment(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos());
 				break;
 
 			case SHAPE_Capsule:
-				static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCapsule(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos(), glm::length(m_GrabPointList[0].GetPos() - m_GrabPointList[2].GetPos()));
+				static_cast<HyShape2d *>(m_pFixture)->SetAsCapsule(m_GrabPointList[0].GetPos(), m_GrabPointList[1].GetPos(), glm::length(m_GrabPointList[0].GetPos() - m_GrabPointList[2].GetPos()));
 				break;
 
 			default:
@@ -600,10 +601,10 @@ float VectorModel::CalcRotation() const
 {
 	if(m_eShapeType == SHAPE_Box)
 	{
-		if(m_FixtureList.isEmpty())
+		if(m_pFixture == nullptr)
 			return 0.0f;
 
-		std::vector<glm::vec2> ptCorners = m_FixtureList[0]->CalcGrabPoints();
+		std::vector<glm::vec2> ptCorners = m_pFixture->CalcGrabPoints();
 		glm::vec2 dir = glm::normalize(ptCorners[1] - ptCorners[0]);
 		return glm::degrees(glm::atan(dir.y, dir.x));
 	}
@@ -720,20 +721,25 @@ bool VectorModel::IsValidModel() const
 	return m_sMalformedReason.isEmpty();
 }
 
-int VectorModel::GetNumFixtures() const
+const IHyFixture2d *VectorModel::GetFixture() const
 {
-	return m_FixtureList.size();
+	return m_pFixture;
 }
 
-const IHyFixture2d *VectorModel::GetFixture(int iIndex) const
+int VectorModel::GetNumPolygonFixtures() const
 {
-	if(iIndex < 0 || iIndex >= m_FixtureList.size())
+	return m_PolygonList.size();
+}
+
+const HyShape2d *VectorModel::GetPolygonFixture(int iIndex)
+{
+	if(iIndex < 0 || iIndex >= m_PolygonList.size())
 	{
-		HyGuiLog("VectorModel::GetFixture - Index out of range", LOGTYPE_Error);
+		HyGuiLog("VectorModel::GetPolygonFixture - Index out of range", LOGTYPE_Error);
 		return nullptr;
 	}
 
-	return m_FixtureList[iIndex];
+	return m_PolygonList[iIndex];
 }
 
 const QList<GfxGrabPointModel> &VectorModel::GetGrabPointList() const
@@ -906,8 +912,8 @@ void VectorModel::ClearAction()
 		pHyPrimNode->SetLayerColor(m_iPrimLayerIndex, GetColor());
 		pHyPrimNode->SetLayerAlpha(m_iPrimLayerIndex, GetAlpha());
 
-		if(GetNumFixtures() > 0)
-			pHyPrimNode->SetAsFixture(m_iPrimLayerIndex, *GetFixture(0), m_fOutline);
+		if(m_pFixture)
+			pHyPrimNode->SetAsFixture(m_iPrimLayerIndex, *m_pFixture, m_fOutline);
 	}
 	
 }
@@ -927,8 +933,7 @@ std::vector<float> VectorModel::ConvertedPointData() const
 std::vector<float> VectorModel::ConvertedBoxData() const
 {
 	HyShape2d tmpBoxShape;
-	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
-	    m_eShapeType == SHAPE_Polygon)
+	if(IsLineChain() || m_eShapeType == SHAPE_Polygon)
 	{
 		std::vector<glm::vec2> vertexList;
 		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
@@ -955,9 +960,9 @@ std::vector<float> VectorModel::ConvertedBoxData() const
 	case SHAPE_Box:
 		return SerializeData();
 	case SHAPE_Circle:
-		if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+		if(m_pFixture->IsValid())
 		{
-			b2Circle b2Circ = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCircle();
+			b2Circle b2Circ = static_cast<HyShape2d *>(m_pFixture)->GetAsCircle();
 			glm::vec2 ptCenter(b2Circ.center.x, b2Circ.center.y);
 			float fRadius = b2Circ.radius;
 			tmpBoxShape.SetAsBox(HyRect(fRadius, fRadius, ptCenter, 0.0f));
@@ -965,9 +970,9 @@ std::vector<float> VectorModel::ConvertedBoxData() const
 		}
 		break;
 	case SHAPE_LineSegment:
-		if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+		if(m_pFixture->IsValid())
 		{
-			b2Segment b2LineSeg = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsSegment();
+			b2Segment b2LineSeg = static_cast<HyShape2d *>(m_pFixture)->GetAsSegment();
 			glm::vec2 pt1(b2LineSeg.point1.x, b2LineSeg.point1.y);
 			glm::vec2 pt2(b2LineSeg.point2.x, b2LineSeg.point2.y);
 			glm::vec2 ptCenter = (pt1 + pt2) * 0.5f;
@@ -977,9 +982,9 @@ std::vector<float> VectorModel::ConvertedBoxData() const
 		}
 		break;
 	case SHAPE_Capsule:
-		if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+		if(m_pFixture->IsValid())
 		{
-			b2Capsule b2Cap = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCapsule();
+			b2Capsule b2Cap = static_cast<HyShape2d *>(m_pFixture)->GetAsCapsule();
 			glm::vec2 pt1(b2Cap.center1.x, b2Cap.center1.y);
 			glm::vec2 pt2(b2Cap.center2.x, b2Cap.center2.y);
 			float fRadius = b2Cap.radius;
@@ -1004,8 +1009,7 @@ std::vector<float> VectorModel::ConvertedBoxData() const
 std::vector<float> VectorModel::ConvertedCircleData() const
 {
 	std::vector<float> convertedDataList;
-	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
-		m_eShapeType == SHAPE_Polygon)
+	if(IsLineChain() || m_eShapeType == SHAPE_Polygon)
 	{
 		std::vector<glm::vec2> vertexList;
 		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
@@ -1037,9 +1041,9 @@ std::vector<float> VectorModel::ConvertedCircleData() const
 		case SHAPE_None:
 			break;
 		case SHAPE_Box:
-			if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+			if(m_pFixture->IsValid())
 			{
-				b2Polygon b2Poly = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsPolygon();
+				b2Polygon b2Poly = static_cast<HyShape2d *>(m_pFixture)->GetAsPolygon();
 				glm::vec2 ptCenter(0.0f, 0.0f);
 				for(int i = 0; i < b2Poly.count; ++i)
 					ptCenter += glm::vec2(b2Poly.vertices[i].x, b2Poly.vertices[i].y);
@@ -1059,9 +1063,9 @@ std::vector<float> VectorModel::ConvertedCircleData() const
 		case SHAPE_Circle:
 			return SerializeData();
 		case SHAPE_LineSegment:
-			if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+			if(m_pFixture->IsValid())
 			{
-				b2Segment b2LineSeg = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsSegment();
+				b2Segment b2LineSeg = static_cast<HyShape2d *>(m_pFixture)->GetAsSegment();
 				glm::vec2 pt1(b2LineSeg.point1.x, b2LineSeg.point1.y);
 				glm::vec2 pt2(b2LineSeg.point2.x, b2LineSeg.point2.y);
 				glm::vec2 ptCenter = (pt1 + pt2) * 0.5f;
@@ -1072,9 +1076,9 @@ std::vector<float> VectorModel::ConvertedCircleData() const
 			}
 			break;
 		case SHAPE_Capsule:
-			if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+			if(m_pFixture->IsValid())
 			{
-				b2Capsule b2Cap = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCapsule();
+				b2Capsule b2Cap = static_cast<HyShape2d *>(m_pFixture)->GetAsCapsule();
 				glm::vec2 pt1(b2Cap.center1.x, b2Cap.center1.y);
 				glm::vec2 pt2(b2Cap.center2.x, b2Cap.center2.y);
 				glm::vec2 ptCenter = (pt1 + pt2) * 0.5f;
@@ -1101,8 +1105,7 @@ std::vector<float> VectorModel::ConvertedCircleData() const
 std::vector<float> VectorModel::ConvertedLineSegmentData() const
 {
 	std::vector<float> convertedDataList;
-	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
-		m_eShapeType == SHAPE_Polygon)
+	if(IsLineChain() || m_eShapeType == SHAPE_Polygon)
 	{
 		std::vector<glm::vec2> vertexList;
 		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
@@ -1133,9 +1136,9 @@ std::vector<float> VectorModel::ConvertedLineSegmentData() const
 		case SHAPE_None:
 			break;
 		case SHAPE_Box:
-			if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+			if(m_pFixture->IsValid())
 			{
-				b2Polygon b2Poly = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsPolygon();
+				b2Polygon b2Poly = static_cast<HyShape2d *>(m_pFixture)->GetAsPolygon();
 				convertedDataList.push_back(b2Poly.vertices[0].x);
 				convertedDataList.push_back(b2Poly.vertices[0].y);
 				convertedDataList.push_back(b2Poly.vertices[2].x);
@@ -1143,9 +1146,9 @@ std::vector<float> VectorModel::ConvertedLineSegmentData() const
 			}
 			break;
 		case SHAPE_Circle:
-			if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+			if(m_pFixture->IsValid())
 			{
-				b2Circle b2Circ = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCircle();
+				b2Circle b2Circ = static_cast<HyShape2d *>(m_pFixture)->GetAsCircle();
 				glm::vec2 ptCenter(b2Circ.center.x, b2Circ.center.y);
 				float fRadius = b2Circ.radius;
 				convertedDataList.push_back(ptCenter.x - fRadius);
@@ -1157,9 +1160,9 @@ std::vector<float> VectorModel::ConvertedLineSegmentData() const
 		case SHAPE_LineSegment:
 			return SerializeData();
 		case SHAPE_Capsule:
-			if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+			if(m_pFixture->IsValid())
 			{
-				b2Capsule b2Cap = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCapsule();
+				b2Capsule b2Cap = static_cast<HyShape2d *>(m_pFixture)->GetAsCapsule();
 				glm::vec2 pt1(b2Cap.center1.x, b2Cap.center1.y);
 				glm::vec2 pt2(b2Cap.center2.x, b2Cap.center2.y);
 				convertedDataList.push_back(pt1.x);
@@ -1185,8 +1188,7 @@ std::vector<float> VectorModel::ConvertedCapsuleData() const
 {
 	std::vector<float> convertedDataList;
 
-	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
-		m_eShapeType == SHAPE_Polygon || m_eShapeType == SHAPE_LineSegment)
+	if(IsLineChain() || m_eShapeType == SHAPE_Polygon || m_eShapeType == SHAPE_LineSegment)
 	{
 		std::vector<glm::vec2> vertexList;
 		for(const GfxGrabPointModel &grabPt : m_GrabPointList)
@@ -1220,9 +1222,9 @@ std::vector<float> VectorModel::ConvertedCapsuleData() const
 		case SHAPE_None:
 			break;
 		case SHAPE_Box:
-			if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+			if(m_pFixture->IsValid())
 			{
-				b2Polygon b2Poly = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsPolygon();
+				b2Polygon b2Poly = static_cast<HyShape2d *>(m_pFixture)->GetAsPolygon();
 				glm::vec2 pt1(b2Poly.vertices[1].x, b2Poly.vertices[1].y);
 				glm::vec2 pt2(b2Poly.vertices[3].x, b2Poly.vertices[3].y);
 				float fRadius = glm::distance(pt1, pt2) * 0.5f;
@@ -1234,9 +1236,9 @@ std::vector<float> VectorModel::ConvertedCapsuleData() const
 			}
 			break;
 		case SHAPE_Circle:
-			if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+			if(m_pFixture->IsValid())
 			{
-				b2Circle b2Circ = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCircle();
+				b2Circle b2Circ = static_cast<HyShape2d *>(m_pFixture)->GetAsCircle();
 				glm::vec2 ptCenter(b2Circ.center.x, b2Circ.center.y);
 				float fRadius = b2Circ.radius;
 				glm::vec2 pt1 = ptCenter + glm::vec2(0.0f, -fRadius);
@@ -1290,9 +1292,9 @@ std::vector<float> VectorModel::ConvertedPolygonOrLineChainData() const
 	case SHAPE_None:
 		break;
 	case SHAPE_Box:
-		if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+		if(m_pFixture->IsValid() && m_pFixture->GetType() == HYFIXTURE_Polygon)
 		{
-			b2Polygon b2Poly = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsPolygon();
+			b2Polygon b2Poly = static_cast<HyShape2d *>(m_pFixture)->GetAsPolygon();
 			for(int i = 0; i < b2Poly.count; ++i)
 			{
 				convertedDataList.push_back(b2Poly.vertices[i].x);
@@ -1302,9 +1304,9 @@ std::vector<float> VectorModel::ConvertedPolygonOrLineChainData() const
 		}
 		break;
 	case SHAPE_Circle:
-		if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+		if(m_pFixture->IsValid() && m_pFixture->GetType() == HYFIXTURE_Circle)
 		{
-			b2Circle b2Circ = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCircle();
+			b2Circle b2Circ = static_cast<HyShape2d *>(m_pFixture)->GetAsCircle();
 			glm::vec2 ptCenter(b2Circ.center.x, b2Circ.center.y);
 			float fRadius = b2Circ.radius;
 
@@ -1324,9 +1326,9 @@ std::vector<float> VectorModel::ConvertedPolygonOrLineChainData() const
 		}
 		break;
 	case SHAPE_LineSegment:
-		if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+		if(m_pFixture->IsValid() && m_pFixture->GetType() == HYFIXTURE_LineSegment)
 		{
-			b2Segment b2LineSeg = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsSegment();
+			b2Segment b2LineSeg = static_cast<HyShape2d *>(m_pFixture)->GetAsSegment();
 			convertedDataList.push_back(b2LineSeg.point1.x);
 			convertedDataList.push_back(b2LineSeg.point1.y);
 			convertedDataList.push_back(b2LineSeg.point2.x);
@@ -1338,9 +1340,9 @@ std::vector<float> VectorModel::ConvertedPolygonOrLineChainData() const
 		convertedDataList = SerializeData();
 		break;
 	case SHAPE_Capsule:
-		if(m_FixtureList[0]->IsValid() && m_FixtureList[0]->GetType() != HYFIXTURE_LineSegment)
+		if(m_pFixture->IsValid() && m_pFixture->GetType() == HYFIXTURE_Capsule)
 		{
-			b2Capsule b2Cap = static_cast<HyShape2d *>(m_FixtureList[0])->GetAsCapsule();
+			b2Capsule b2Cap = static_cast<HyShape2d *>(m_pFixture)->GetAsCapsule();
 			glm::vec2 pt1(b2Cap.center1.x, b2Cap.center1.y);
 			glm::vec2 pt2(b2Cap.center2.x, b2Cap.center2.y);
 			float fRadius = b2Cap.radius;
@@ -1684,9 +1686,9 @@ void VectorModel::DoTransformShapeCtrlGrabPoint_Box(bool bCtrlHeld, bool bShiftH
 	} // end of corner or mid-point logic
 
 	std::vector<glm::vec2> ptVertexList = { m_GrabPointList[0].GetPos(), m_GrabPointList[2].GetPos(), m_GrabPointList[4].GetPos(), m_GrabPointList[6].GetPos() };
-	static_cast<HyShape2d *>(m_FixtureList[0])->SetAsPolygon(ptVertexList);
+	static_cast<HyShape2d *>(m_pFixture)->SetAsPolygon(ptVertexList);
 	glm::vec2 ptCentroid;
-	m_FixtureList[0]->GetCentroid(ptCentroid);
+	m_pFixture->GetCentroid(ptCentroid);
 	m_GrabPointCenter.SetPos(ptCentroid);
 }
 
@@ -1761,22 +1763,14 @@ VectorAction VectorModel::DoMouseMoveIdle()
 		if(HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
 			HyGuiLog("GfxShapeModel::DoMouseMoveIdle - Failed to get world mouse position for hit testing", LOGTYPE_Error);
 
-		for(IHyFixture2d *pFixture : m_FixtureList)
+		for(HyShape2d *pPolygonShape : m_PolygonList)
 		{
-			if(pFixture->TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
+			if(pPolygonShape->TestPoint(ptWorldMousePos, glm::identity<glm::mat4>()))
 				return VECTORACTION_Inside;
 		}
 	}
 	
 	return VECTORACTION_Outside;
-}
-
-void VectorModel::TransformData(glm::mat4 mtxTransform)
-{
-	for(IHyFixture2d *pFixture : m_FixtureList)
-		pFixture->TransformSelf(mtxTransform);
-
-	SyncViews(EDITMODE_Idle);
 }
 
 void VectorModel::DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSnapAmt, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
@@ -1805,16 +1799,11 @@ void VectorModel::DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSn
 		ptCenter = ptLowerBound + ((ptUpperBound - ptLowerBound) * 0.5f);
 	}
 
-	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
-		m_eShapeType == SHAPE_Polygon)
+	if(IsLineChain() || m_eShapeType == SHAPE_Polygon)
 	{
-		if(m_FixtureList.empty())
-		{
-			if(m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain)
-				m_FixtureList.push_back(new HyChain2d());
-			else
-				m_FixtureList.push_back(new HyShape2d());
-		}
+		ClearFixtures();
+		m_pFixture = new HyChain2d();
+		
 		m_fOutline = 1.0f;
 
 		m_GrabPointList.clear();
@@ -1829,10 +1818,7 @@ void VectorModel::DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSn
 		vertexList.push_back(ptStartPos);
 		vertexList.push_back(ptDragPos);
 
-		if(m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain)
-			static_cast<HyChain2d *>(m_FixtureList[0])->SetData(vertexList, false);
-		else
-			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsPolygon(vertexList);
+		static_cast<HyChain2d *>(m_pFixture)->SetData(vertexList, false);
 	}
 	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
 	{
@@ -1842,8 +1828,8 @@ void VectorModel::DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSn
 	}
 	else
 	{
-		if(m_FixtureList.empty())
-			m_FixtureList.push_back(new HyShape2d());
+		ClearFixtures();
+		m_pFixture = new HyShape2d();
 
 		switch(m_eShapeType)
 		{
@@ -1852,9 +1838,9 @@ void VectorModel::DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSn
 			//m_eShapeType = SHAPE_Box;
 			//[[fallthrough]];
 		case SHAPE_Box: {
-			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsBox(HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f));
+			static_cast<HyShape2d *>(m_pFixture)->SetAsBox(HyRect((ptUpperBound.x - ptLowerBound.x) * 0.5f, (ptUpperBound.y - ptLowerBound.y) * 0.5f, ptCenter, 0.0f));
 			m_GrabPointList.clear();
-			std::vector<glm::vec2> fixtureGrabPoints = m_FixtureList[0]->CalcGrabPoints();
+			std::vector<glm::vec2> fixtureGrabPoints = m_pFixture->CalcGrabPoints();
 
 			std::vector<glm::vec2> boxGrabPoints;
 			boxGrabPoints.reserve(8);
@@ -1871,9 +1857,9 @@ void VectorModel::DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSn
 			break; }
 
 		case SHAPE_Circle: {
-			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCircle(ptCenter, glm::distance(ptCenter, ptUpperBound));
+			static_cast<HyShape2d *>(m_pFixture)->SetAsCircle(ptCenter, glm::distance(ptCenter, ptUpperBound));
 			m_GrabPointList.clear();
-			std::vector<glm::vec2> lineGrabPoints = m_FixtureList[0]->CalcGrabPoints();
+			std::vector<glm::vec2> lineGrabPoints = m_pFixture->CalcGrabPoints();
 			for(glm::vec2 &ptGrab : lineGrabPoints)
 				m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptGrab));
 			break; }
@@ -1885,18 +1871,18 @@ void VectorModel::DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSn
 			pt2.x = ptCenter.x;
 			pt2.y = ptUpperBound.y;
 			float fRadius = 0.5f * glm::distance(pt1, pt2);
-			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsCapsule(ptStartPos, ptDragPos, fRadius);
+			static_cast<HyShape2d *>(m_pFixture)->SetAsCapsule(ptStartPos, ptDragPos, fRadius);
 			m_GrabPointList.clear();
-			std::vector<glm::vec2> lineGrabPoints = m_FixtureList[0]->CalcGrabPoints();
+			std::vector<glm::vec2> lineGrabPoints = m_pFixture->CalcGrabPoints();
 			for(glm::vec2 &ptGrab : lineGrabPoints)
 				m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptGrab));
 			break; }
 
 		case SHAPE_LineSegment: {
 			m_fOutline = 1.0f;
-			static_cast<HyShape2d *>(m_FixtureList[0])->SetAsLineSegment(ptStartPos, ptDragPos);
+			static_cast<HyShape2d *>(m_pFixture)->SetAsLineSegment(ptStartPos, ptDragPos);
 			m_GrabPointList.clear();
-			std::vector<glm::vec2> lineGrabPoints = m_FixtureList[0]->CalcGrabPoints();
+			std::vector<glm::vec2> lineGrabPoints = m_pFixture->CalcGrabPoints();
 			for(glm::vec2 &ptGrab : lineGrabPoints)
 				m_GrabPointList.append(GfxGrabPointModel(GRABPOINT_Endpoint, ptGrab));
 			break; }
@@ -1914,9 +1900,12 @@ void VectorModel::DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSn
 
 void VectorModel::ClearFixtures()
 {
-	for(IHyFixture2d *pFixture : m_FixtureList)
-		delete pFixture;
-	m_FixtureList.clear();
+	delete m_pFixture;
+	m_pFixture = nullptr;
+
+	for(HyShape2d *pPolyShape : m_PolygonList)
+		delete pPolyShape;
+	m_PolygonList.clear();
 }
 
 std::vector<float> VectorModel::SerializeData() const
@@ -1931,12 +1920,13 @@ std::vector<float> VectorModel::SerializeData() const
 		return returnList;
 	}
 
-	if(m_FixtureList.empty())
+	if(m_pFixture == nullptr)
 		return std::vector<float>();
+
 	if((m_eEditModeType != EDITMODETYPE_PrimitiveLineChain && m_eEditModeType != EDITMODETYPE_FixtureChain) &&
 		m_eShapeType != SHAPE_Polygon)
 	{
-		return m_FixtureList[0]->SerializeSelf();
+		return m_pFixture->SerializeSelf();
 	}
 
 	// Line Chain or SHAPE_Polygon
@@ -1999,11 +1989,10 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 	HyFixtureType eFixtureType = HYFIXTURE_Nothing;
 	if(IsLineChain())
 	{
-		if(m_FixtureList.size() > 1 || (m_FixtureList.size() == 1 && m_FixtureList[0]->GetType() != HYFIXTURE_LineChain))
+		if(m_pFixture && m_pFixture->GetType() != HYFIXTURE_LineChain)
 			ClearFixtures();
-
-		if(m_FixtureList.empty())
-			m_FixtureList.push_back(new HyChain2d());
+		if(m_pFixture == nullptr)
+			m_pFixture = new HyChain2d();
 
 		eFixtureType = HYFIXTURE_LineChain;
 	}
@@ -2013,19 +2002,19 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 	}
 	else
 	{
-		if(m_FixtureList.size() == 1 && m_FixtureList[0]->GetType() == HYFIXTURE_LineChain)
+		if(m_pFixture && m_pFixture->GetType() == HYFIXTURE_LineChain)
 			ClearFixtures();
-		if(m_FixtureList.empty())
-			m_FixtureList.push_back(new HyShape2d());
+		if(m_pFixture == nullptr)
+			m_pFixture = new HyShape2d();
 		
 		eFixtureType = HyGlobal::ConvertShapeToFixtureType(m_eShapeType);
 	}
 
-	if(m_FixtureList.empty() == false)
+	if(m_pFixture)
 	{
 		HyPrimitive2d *pHyPrimNode = GetHyNode();
 		if(pHyPrimNode)
-			pHyPrimNode->SetAsFixture(m_iPrimLayerIndex, *m_FixtureList[0], m_fOutline);
+			pHyPrimNode->SetAsFixture(m_iPrimLayerIndex, *m_pFixture, m_fOutline);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2064,16 +2053,16 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 	}
 	else
 	{
-		if(m_FixtureList.empty())
-			return "Fixture list is empty";
+		if(m_pFixture == nullptr)
+			return "Fixture is empty";
 
-		QString sResult = m_FixtureList[0]->DeserializeSelf(eFixtureType, floatList).c_str();
+		QString sResult = m_pFixture->DeserializeSelf(eFixtureType, floatList).c_str();
 		if(sResult.isEmpty() == false)
 			return sResult;
 
 		if(m_eShapeType == SHAPE_Box)
 		{
-			std::vector<glm::vec2> ptCorners = m_FixtureList[0]->CalcGrabPoints();
+			std::vector<glm::vec2> ptCorners = m_pFixture->CalcGrabPoints();
 
 			grabPointList.reserve(8);
 			grabPointList.emplace_back(ptCorners[0]);
@@ -2086,9 +2075,9 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 			grabPointList.emplace_back((ptCorners[3] + ptCorners[0]) * 0.5f);
 		}
 		else
-			grabPointList = m_FixtureList[0]->CalcGrabPoints();
+			grabPointList = m_pFixture->CalcGrabPoints();
 
-		m_FixtureList[0]->GetCentroid(ptCentroid);
+		m_pFixture->GetCentroid(ptCentroid);
 		m_bLoopClosed = floatList.back() != 0.0f;
 	}
 
@@ -2201,8 +2190,7 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 		return "Grab points not provided";
 	}
 
-	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
-		m_eShapeType == SHAPE_Polygon)
+	if(IsLineChain() || m_eShapeType == SHAPE_Polygon)
 	{
 		std::vector<glm::vec2> vertexList;
 		vertexList.reserve(m_GrabPointList.size());
@@ -2294,12 +2282,15 @@ bool VectorModel::CheckIfAddVertexOnEdge()
 
 void VectorModel::AssemblePolygonFixtures(std::vector<std::vector<glm::vec2>> subPolygonList)
 {
-	ClearFixtures();
+	for(HyShape2d *pPolyShape : m_PolygonList)
+		delete pPolyShape;
+	m_PolygonList.clear();
+
 	for(std::vector<glm::vec2> &subPoly : subPolygonList)
 	{
 		HyShape2d *pShape2d = new HyShape2d();
 		pShape2d->SetAsPolygon(subPoly);
-		m_FixtureList.push_back(pShape2d);
+		m_PolygonList.push_back(pShape2d);
 	}
 }
 

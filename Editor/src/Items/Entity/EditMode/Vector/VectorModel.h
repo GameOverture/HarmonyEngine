@@ -48,7 +48,8 @@ class VectorModel : public IEditModeModel
 	// "type" - when serialized in property (as a string)
 	EditorShape							m_eShapeType;			// When m_eEditModeType == EDITMODETYPE_PrimitiveShape or EDITMODETYPE_FixtureShape (None, Box, Circle, LineSegment, Polygon, Capsule). Not used otherwise
 	// "data" - when serialized in property (QJsonArray of floats)
-	QList<IHyFixture2d *>				m_FixtureList;			// This is the actual shape data used for physics/collision/rendering - usually just one fixture, but could be multiple for complex polygons
+	IHyFixture2d *						m_pFixture;				// This is the actual fixture data used for physics/collision/rendering (except for polygon, which is represented here using a line chain)
+	QList<HyShape2d *>					m_PolygonList;			// Complex polygons may require more than one fixture for physics/collision
 	QList<GfxGrabPointModel>			m_GrabPointList;		// Grab Points for editing the shape - Used to serialize data when type is SHAPE_Polygon (then assembles m_FixtureList with valid sub-polygons)
 	GfxGrabPointModel					m_GrabPointCenter;
 	bool								m_bLoopClosed;
@@ -122,8 +123,9 @@ public:
 
 	bool IsValidModel() const;
 
-	int GetNumFixtures() const;
-	const IHyFixture2d *GetFixture(int iIndex) const;
+	const IHyFixture2d *GetFixture() const;
+	int GetNumPolygonFixtures() const;
+	const HyShape2d *GetPolygonFixture(int iIndex);
 
 	const QList<GfxGrabPointModel> &GetGrabPointList() const;
 	const GfxGrabPointModel &GetGrabPoint(int iIndex) const;
@@ -155,8 +157,6 @@ protected:
 	void DoTransformShapeCtrlGrabPoint_Box(bool bCtrlHeld, bool bShiftHeld, float fSnapAmt, glm::vec2 vDragDelta);
 
 	VectorAction DoMouseMoveIdle();
-
-	void TransformData(glm::mat4 mtxTransform);
 
 	// Action Transforms - These overrides will change the model's data as they are being performed. Upon completion, Serialize() can be called
 	void DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSnapAmt, glm::vec2 ptStartPos, glm::vec2 ptDragPos);

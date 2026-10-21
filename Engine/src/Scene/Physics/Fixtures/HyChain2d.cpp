@@ -223,17 +223,10 @@ void HyChain2d::ClearData()
 
 /*virtual*/ bool HyChain2d::GetCentroid(glm::vec2 &ptCentroidOut) const /*override*/
 {
-	if(IsValid() == false)
+	if(m_Data.iCount <= 0)
 		return false;
 
-	ptCentroidOut = m_Data.pPointList[0];
-	int32 iNumVerts = m_Data.iCount;
-	for(int32 i = 1; i < iNumVerts; ++i)
-	{
-		ptCentroidOut += m_Data.pPointList[i];
-	}
-
-	ptCentroidOut /= static_cast<float>(iNumVerts);
+	ptCentroidOut = HyMath::CalculateCentroid(m_Data.pPointList, m_Data.iCount);
 	return true;
 }
 

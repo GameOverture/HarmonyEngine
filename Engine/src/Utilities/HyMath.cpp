@@ -397,13 +397,17 @@ glm::ivec2 HyMath::LockAspectRatio(int32 iOldWidth, int32 iOldHeight, int32 iNew
 
 /*static*/ glm::vec2 HyMath::CalculateCentroid(const std::vector<glm::vec2> &vertexList)
 {
+	return CalculateCentroid(vertexList.data(), vertexList.size());
+}
+
+/*static*/ glm::vec2 HyMath::CalculateCentroid(const glm::vec2 *pVerts, size_t uiNumVerts)
+{
 	glm::vec2 vCentroid(0.0f);
 	float fSignedArea = 0.0f;
-	const int iNumVerts = static_cast<int>(vertexList.size());
-	for(int i = 0; i < iNumVerts; ++i)
+	for(size_t i = 0; i < uiNumVerts; ++i)
 	{
-		const glm::vec2 &pt1Ref = vertexList[i];
-		const glm::vec2 &pt2Ref = vertexList[(i + 1) % iNumVerts];
+		const glm::vec2 &pt1Ref = pVerts[i];
+		const glm::vec2 &pt2Ref = pVerts[(i + 1) % uiNumVerts];
 		float fA = (pt1Ref.x * pt2Ref.y) - (pt2Ref.x * pt1Ref.y);
 		fSignedArea += fA;
 		vCentroid.x += (pt1Ref.x + pt2Ref.x) * fA;
