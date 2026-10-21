@@ -72,33 +72,17 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 			return;
 		}
 
-		pTreeItemData->GetEditModel()->OnDeleteKeyPressed();
-
-
-		//EntityDrawItem *pCurVertexEditItem = GetCurShapeEditItem();
-		//if(pCurVertexEditItem)
-		//{
-		//	if(pCurVertexEditItem->GetShapeCtrl().RemoveSelectedVerts() == false)
-		//		return;
-
-		//	int iStateIndex = 0;
-		//	int iFrameIndex = 0;
-		//	if(m_pProjItem->GetWidget() == nullptr)
-		//		HyGuiLog("EntityDraw::OnKeyPressEvent - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
-		//	else
-		//	{
-		//		iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
-		//		iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
-		//	}
-
-		//	QUuid thisUuid = pCurVertexEditItem->GetEntityTreeItemData()->GetThisUuid();
-		//	EntityTreeItemData *pTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().FindTreeItemData(thisUuid);
-
-		//	QUndoCommand *pCmd = new EntityUndoCmd_ShapeData("Removed vertices from " % pTreeItemData->GetCodeName(), *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData,  pCurVertexEditItem->GetShapeView().SerializeVemVerts(m_pCamera));
-		//	m_pProjItem->GetUndoStack()->push(pCmd);
-		//}
+		QString sUndoText = pTreeItemData->GetEditModel()->OnDeleteKeyPressed();
+		if(sUndoText.isEmpty() == false)
+		{
+			int iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
+			int iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
+			QString sCategoryName = pTreeItemData->GetEditModel()->GetCategoryName();
+			
+			QUndoCommand *pCmd = new EntityUndoCmd_EditModelData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pTreeItemData->GetEditModel()->Serialize(), sCategoryName, "Data");
+			m_pProjItem->GetUndoStack()->push(pCmd);
+		}
 	}
-
 }
 
 /*virtual*/ void EntityDraw::OnKeyReleaseEvent(QKeyEvent *pEvent) /*override*/
@@ -307,17 +291,7 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 		{
 			int iStateIndex = m_pProjItem->GetWidget()->GetCurStateIndex();
 			int iFrameIndex = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(iStateIndex))->GetDopeSheetScene().GetCurrentFrame();
-			QString sCategoryName;
-			if(pTreeItemData->GetEditModel()->GetEditModeType() == EDITMODETYPE_TileMap)
-				sCategoryName = "Tile Map";
-			else if(pTreeItemData->GetType() == ITEM_PrimLayer) // Both EDITMODETYPE_PrimitiveShape and EDITMODETYPE_PrimitiveLineChain
-				sCategoryName = "Primitive Layer";
-			else if(pTreeItemData->GetEditModel()->GetEditModeType() == EDITMODETYPE_FixtureShape)
-				sCategoryName = "Shape";
-			else if(pTreeItemData->GetEditModel()->GetEditModeType() == EDITMODETYPE_FixtureChain)
-				sCategoryName = "Chain";
-			else if(pTreeItemData->GetEditModel()->GetEditModeType() == EDITMODETYPE_FixturePoint)
-				sCategoryName = "Point";
+			QString sCategoryName = pTreeItemData->GetEditModel()->GetCategoryName();
 
 			QUndoCommand *pCmd = new EntityUndoCmd_EditModelData(sUndoText, *m_pProjItem, iStateIndex, iFrameIndex, pTreeItemData, pTreeItemData->GetEditModel()->Serialize(), sCategoryName, "Data");
 			m_pProjItem->GetUndoStack()->push(pCmd);

@@ -319,8 +319,9 @@ TileMapModel::TileMapModel(Project &projectRef, QUndoStack *pUndoStack, QString 
 {
 }
 
-/*virtual*/ void TileMapModel::OnDeleteKeyPressed() /*override*/
+/*virtual*/ QString TileMapModel::OnDeleteKeyPressed() /*override*/
 {
+	return "";
 }
 
 /*virtual*/ QString TileMapModel::GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const /*override*/

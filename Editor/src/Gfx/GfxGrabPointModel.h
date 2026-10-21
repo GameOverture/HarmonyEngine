@@ -60,6 +60,8 @@ public:
 	bool IsSelected() const;
 	void SetSelected(bool bIsSelected);
 
+	bool IsEndPoint() const;
+
 	HyColor GetOutlineColor() const;
 	HyColor GetFillColor() const;
 

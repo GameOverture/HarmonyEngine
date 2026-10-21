@@ -101,6 +101,11 @@ void GfxGrabPointModel::SetSelected(bool bIsSelected)
 		m_eType = bIsSelected ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint;
 }
 
+bool GfxGrabPointModel::IsEndPoint() const
+{
+	return m_eType == GRABPOINT_Endpoint || m_eType == GRABPOINT_EndpointSelected;
+}
+
 HyColor GfxGrabPointModel::GetOutlineColor() const
 {
 	switch(m_eType)

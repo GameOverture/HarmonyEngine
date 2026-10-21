@@ -37,10 +37,20 @@ void GfxGrabPointView::Sync(const GfxGrabPointModel *pModel)
 		return;
 	}
 	
-	m_GrabPt.SetAsCircle(0, pModel->GetRadius(), 0.0f);
-	m_GrabPt.SetLayerColor(0, pModel->GetOutlineColor());
-	m_GrabPt.SetAsCircle(1, pModel->GetRadius() - 1.0f, 0.0f);
-	m_GrabPt.SetLayerColor(1, pModel->GetFillColor());
+	if(pModel->IsEndPoint())
+	{
+		m_GrabPt.SetAsBox(0, HyRect(pModel->GetRadius(), pModel->GetRadius(), glm::vec2(0.0f, 0.0f), 45.0f), 0.0f);
+		m_GrabPt.SetLayerColor(0, pModel->GetOutlineColor());
+		m_GrabPt.SetAsBox(1, HyRect(pModel->GetRadius() - 1.0f, pModel->GetRadius() - 1.0f, glm::vec2(0.0f, 0.0f), 45.0f), 0.0f);
+		m_GrabPt.SetLayerColor(1, pModel->GetFillColor());
+	}
+	else
+	{
+		m_GrabPt.SetAsCircle(0, pModel->GetRadius(), 0.0f);
+		m_GrabPt.SetLayerColor(0, pModel->GetOutlineColor());
+		m_GrabPt.SetAsCircle(1, pModel->GetRadius() - 1.0f, 0.0f);
+		m_GrabPt.SetLayerColor(1, pModel->GetFillColor());
+	}
 
 	glm::vec2 ptPos = pModel->GetPos();
 	HyEngine::Window(0).GetCamera2d(0)->ProjectToCamera(ptPos, ptPos);

@@ -599,10 +599,12 @@ void HyPrimitive2d::DeleteLayerData(int32 iLayerIndex)
 
 void HyPrimitive2d::AssembleLineChain(int32 iLayerIndex, const glm::vec2 *pVertexList, uint32 uiNumVertices, bool bLoop)
 {
-	HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
+	//HyAssert(uiNumVertices > 1, "HyPrimitive2d::SetAsLineChain was passed an empty vertexList or a vertexList of only '1' vertex");
 	HyAssert(bLoop == false || uiNumVertices > 2, "HyPrimitive2d::SetAsLineChain - Looping line chains must have at least 3 vertices");
 	
 	DeleteLayerData(iLayerIndex);
+	if(uiNumVertices <= 1)
+		return;
 
 	if(bLoop && HyCompareFloat(pVertexList[0].x, pVertexList[uiNumVertices - 1].x) && HyCompareFloat(pVertexList[0].y, pVertexList[uiNumVertices - 1].y))
 		uiNumVertices--; // AssembleLineChain will make this connection as bLoop is true

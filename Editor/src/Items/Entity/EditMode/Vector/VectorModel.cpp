@@ -426,7 +426,7 @@ void VectorModel::FlushPrimLayer()
 			grabPtModel.SetPos(grabPtModel.GetCachePos() + vDragDelta);
 		m_GrabPointCenter.SetPos(m_GrabPointCenter.GetCachePos() + vDragDelta);
 
-		if(IsLineChain())
+		if(IsLineChain() || m_eShapeType == SHAPE_Polygon)
 		{
 			std::vector<glm::vec2> vertexList;
 			for(GfxGrabPointModel &grabPtModel : m_GrabPointList)
@@ -815,23 +815,43 @@ VectorAction VectorModel::GetCurrentAction() const
 	return m_eCurAction;
 }
 
-void VectorModel::OnDeleteKeyPressed()
+/*virtual*/ QString VectorModel::OnDeleteKeyPressed() /*override*/
 {
-	if((m_eEditModeType == EDITMODETYPE_PrimitiveLineChain || m_eEditModeType == EDITMODETYPE_FixtureChain) ||
-		m_eShapeType == SHAPE_Polygon)
+	if(IsLineChain() || m_eShapeType == SHAPE_Polygon)
 	{
+		int iNumVertsRemoved = 0;
+		bool bBreakLoop = false;
 		for(int i = m_GrabPointList.size() - 1; i >= 0; --i)
 		{
 			if(m_GrabPointList[i].IsSelected())
 			{
+				if(m_GrabPointList[i].IsEndPoint())
+					bBreakLoop = true;
+
 				m_GrabPointList.erase(m_GrabPointList.begin() + i);
 				if(i < m_iGrabPointIndex)
 					--m_iGrabPointIndex;
+
+				iNumVertsRemoved++;
 			}
 		}
+		if(m_GrabPointList.size() <= 2)
+			bBreakLoop = true;
 
-		SyncViews(EDITMODE_Idle);
+		if(bBreakLoop)
+		{
+			m_bLoopClosed = false;
+
+			if(m_GrabPointList.size() > 0 && m_GrabPointList.first().IsEndPoint() == false)
+				m_GrabPointList.first().SetType(GRABPOINT_Endpoint);
+			if(m_GrabPointList.size() > 1 && m_GrabPointList.last().IsEndPoint() == false)
+				m_GrabPointList.last().SetType(GRABPOINT_Endpoint);
+		}
+
+		return "Removed " % QString::number(iNumVertsRemoved) % " vertices from " % m_pPrimTreeItemData->GetCodeName();
 	}
+
+	return "";
 }
 
 QString VectorModel::GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const
@@ -1775,6 +1795,17 @@ VectorAction VectorModel::DoMouseMoveIdle()
 
 void VectorModel::DoTransformCreation(bool bCtrlHeld, bool bShiftHeld, float fSnapAmt, glm::vec2 ptStartPos, glm::vec2 ptDragPos)
 {
+	// Automatically become a box if type is none
+	if(IsLineChain() == false && m_eShapeType == SHAPE_None)
+	{
+		if(IsFixture())
+			m_eEditModeType = EDITMODETYPE_FixtureShape;
+		else
+			m_eEditModeType = EDITMODETYPE_PrimitiveShape;
+
+		m_eShapeType = SHAPE_Box;
+	}
+
 	if(bCtrlHeld)
 	{
 		ptStartPos = { roundf(ptStartPos.x / fSnapAmt) * fSnapAmt, roundf(ptStartPos.y / fSnapAmt) * fSnapAmt };
@@ -2104,11 +2135,16 @@ QString VectorModel::DeserializeData(const QJsonObject &serializedObj)
 		if(static_cast<int>(m_GrabPointList.size()) > static_cast<int>(grabPointList.size())) // Truncate to new size
 			m_GrabPointList.resize(grabPointList.size());
 
-		if(m_bLoopClosed == false && m_GrabPointList.size() > 1)
+
+		for(int i = 0; i < m_GrabPointList.size(); ++i)
 		{
-			m_GrabPointList.front().SetType(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
-			m_GrabPointList.back().SetType(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
+			if(m_GrabPointList[i].IsEndPoint() && (i != 0 && i != (m_GrabPointList.size() - 1)))
+				m_GrabPointList[i].SetType(m_GrabPointList[i].IsSelected() ? GRABPOINT_VertexSelected : GRABPOINT_Vertex);
 		}
+		if(m_GrabPointList.size() > 0 && m_GrabPointList.front().IsEndPoint() == false)
+			m_GrabPointList.front().SetType(m_GrabPointList.front().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
+		if(m_GrabPointList.size() > 1 && m_GrabPointList.back().IsEndPoint() == false)
+			m_GrabPointList.back().SetType(m_GrabPointList.back().IsSelected() ? GRABPOINT_EndpointSelected : GRABPOINT_Endpoint);
 	}
 	else if(m_eEditModeType == EDITMODETYPE_FixturePoint)
 	{

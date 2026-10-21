@@ -131,9 +131,9 @@
    <addaction name="actionCloseProject"/>
    <addaction name="actionProjectSettings"/>
    <addaction name="separator"/>
+   <addaction name="actionShowGridOverlay"/>
    <addaction name="actionShowGridBackground"/>
    <addaction name="actionShowGridOrigin"/>
-   <addaction name="actionShowGridOverlay"/>
    <addaction name="actionSnappingSettings"/>
    <addaction name="separator"/>
   </widget>

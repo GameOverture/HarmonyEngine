@@ -66,7 +66,7 @@ public:
 	virtual void MouseClickTransformReleased(bool bCtrlHeld, bool bShiftHeld, glm::vec2 ptReleasePos) override;
 	virtual void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight) override;
 
-	virtual void OnDeleteKeyPressed() override;
+	virtual QString OnDeleteKeyPressed() override;
 	
 	virtual QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const override; // Returns undo command description (blank if no change)
 	virtual void ClearAction() override;

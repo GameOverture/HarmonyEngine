@@ -137,7 +137,7 @@ public:
 	bool IsHoverGrabPointSelected() const;
 	void DeselectAllGrabPoints();
 
-	void OnDeleteKeyPressed();
+	virtual QString OnDeleteKeyPressed() override;
 
 	VectorAction GetCurrentAction() const;
 	

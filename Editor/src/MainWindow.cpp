@@ -988,9 +988,9 @@ void MainWindow::on_menu_View_aboutToShow()
 
 	ui->menu_View->addMenu(pThemesMenu);
 	ui->menu_View->addSeparator();
+	ui->menu_View->addAction(ui->actionShowGridOverlay);
 	ui->menu_View->addAction(ui->actionShowGridBackground);
 	ui->menu_View->addAction(ui->actionShowGridOrigin);
-	ui->menu_View->addAction(ui->actionShowGridOverlay);
 	
 	ui->menu_View->addSeparator();
 	QMenu *pPopupMenu = this->createPopupMenu();

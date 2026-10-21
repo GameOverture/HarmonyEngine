@@ -54,6 +54,7 @@ public:
 
 	EditModeType GetEditModeType() const;
 	bool IsVectorModel() const;
+	QString GetCategoryName() const;
 
 	void AddView(IEditModeView *pView);
 	bool RemoveView(IEditModeView *pView);
@@ -69,7 +70,7 @@ public:
 	virtual void MouseClickTransformReleased(bool bCtrlHeld, bool bShiftHeld, glm::vec2 ptReleasePos) = 0; // ptReleasePos in world coordinates
 	virtual void MouseMarqueeReleased(EditModeState eEditModeState, bool bLeftClick, QPointF ptBotLeft, QPointF ptTopRight) = 0;
 
-	virtual void OnDeleteKeyPressed() = 0;
+	virtual QString OnDeleteKeyPressed() = 0;
 	
 	virtual QString GetActionText(EditModeState eEditModeState, QString sNodeCodeName) const = 0; // Returns undo command description (blank if no change)
 	virtual void ClearAction() = 0;

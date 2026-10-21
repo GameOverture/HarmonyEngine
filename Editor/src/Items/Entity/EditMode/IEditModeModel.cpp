@@ -33,6 +33,23 @@ bool IEditModeModel::IsVectorModel() const
 			m_eEditModeType == EDITMODETYPE_FixturePoint;
 }
 
+QString IEditModeModel::GetCategoryName() const
+{
+	switch(m_eEditModeType)
+	{
+	case EDITMODETYPE_PrimitiveShape:		return "Primitive Layer";
+	case EDITMODETYPE_PrimitiveLineChain:	return "Primitive Layer";
+	case EDITMODETYPE_FixtureShape:			return "Shape";
+	case EDITMODETYPE_FixtureChain:			return "Chain";
+	case EDITMODETYPE_FixturePoint:			return "Point";
+	case EDITMODETYPE_TileMap:				return "Tile Map";
+
+	default:
+		HyGuiLog("IEditModeModel::GetCategoryName() - unhandled edit mode type", LOGTYPE_Error);
+		break;
+	}
+}
+
 void IEditModeModel::AddView(IEditModeView *pView)
 {
 	if(m_ViewList.contains(pView))
