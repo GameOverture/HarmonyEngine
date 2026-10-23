@@ -569,7 +569,6 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 		break; }
 
 	case HYACTION_TransformingScale: {
-		bool bUniformScale = true;
 		GfxTransformCtrl::GrabPointType eAnchorPoint = GfxTransformCtrl::GRAB_None;
 		GfxTransformCtrl::GrabPointType eAnchorWidth = GfxTransformCtrl::GRAB_None;
 		GfxTransformCtrl::GrabPointType eAnchorHeight = GfxTransformCtrl::GRAB_None;
@@ -577,56 +576,48 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 		switch(m_eCurHoverGrabPoint)
 		{
 		case GfxTransformCtrl::GRAB_BotLeft:
-			bUniformScale = true;
 			eAnchorPoint = GfxTransformCtrl::GRAB_TopRight;
 			eAnchorWidth = GfxTransformCtrl::GRAB_TopLeft;
 			eAnchorHeight = GfxTransformCtrl::GRAB_BotRight;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
 		case GfxTransformCtrl::GRAB_BotRight:
-			bUniformScale = true;
 			eAnchorPoint = GfxTransformCtrl::GRAB_TopLeft;
 			eAnchorWidth = GfxTransformCtrl::GRAB_TopRight;
 			eAnchorHeight = GfxTransformCtrl::GRAB_BotLeft;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
 		case GfxTransformCtrl::GRAB_TopRight:
-			bUniformScale = true;
 			eAnchorPoint = GfxTransformCtrl::GRAB_BotLeft;
 			eAnchorWidth = GfxTransformCtrl::GRAB_BotRight;
 			eAnchorHeight = GfxTransformCtrl::GRAB_TopLeft;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
 		case GfxTransformCtrl::GRAB_TopLeft:
-			bUniformScale = true;
 			eAnchorPoint = GfxTransformCtrl::GRAB_BotRight;
 			eAnchorWidth = GfxTransformCtrl::GRAB_BotLeft;
 			eAnchorHeight = GfxTransformCtrl::GRAB_TopRight;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
 		case GfxTransformCtrl::GRAB_BotMid:
-			bUniformScale = false;
 			eAnchorPoint = GfxTransformCtrl::GRAB_TopMid;
 			eAnchorHeight = GfxTransformCtrl::GRAB_BotMid;
 			bScaleDimensions.x = false;
 			bScaleDimensions.y = true;
 			break;
 		case GfxTransformCtrl::GRAB_MidRight:
-			bUniformScale = false;
 			eAnchorPoint = GfxTransformCtrl::GRAB_MidLeft;
 			eAnchorWidth = GfxTransformCtrl::GRAB_MidRight;
 			bScaleDimensions.x = true;
 			bScaleDimensions.y = false;
 			break;
 		case GfxTransformCtrl::GRAB_TopMid:
-			bUniformScale = false;
 			eAnchorPoint = GfxTransformCtrl::GRAB_BotMid;
 			eAnchorHeight = GfxTransformCtrl::GRAB_TopMid;
 			bScaleDimensions.x = false;
 			bScaleDimensions.y = true;
 			break;
 		case GfxTransformCtrl::GRAB_MidLeft:
-			bUniformScale = false;
 			eAnchorPoint = GfxTransformCtrl::GRAB_MidRight;
 			eAnchorWidth = GfxTransformCtrl::GRAB_MidLeft;
 			bScaleDimensions.x = true;
@@ -662,11 +653,8 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 			}
 		}
 
-		if(bShiftMod)
-			bUniformScale = !bUniformScale;
-
 		glm::vec2 vScaleAmt(1.0f);
-		if(bUniformScale)
+		if(bShiftMod) // Uniform scale
 		{
 			float fScaleAmt = HyMath::Max(vDesiredSize.x / m_vDragStartSize.x, vDesiredSize.y / m_vDragStartSize.y);
 			HySetVec(vScaleAmt, fScaleAmt, fScaleAmt);
@@ -683,7 +671,7 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 
 		if(pSingleItem)
 		{
-			//pSingleItem->GetHyNode()->scale_pivot.Set(ptDragAnchorPoint);
+			//pSingleItem->GetHyNode()->scale_pivot = ptDragAnchorPoint;
 			pSingleItem->GetHyNode()->scale.Set(vScaleAmt);
 		}
 		else
