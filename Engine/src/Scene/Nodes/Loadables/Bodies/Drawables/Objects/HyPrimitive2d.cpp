@@ -295,6 +295,13 @@ int32 HyPrimitive2d::SetAsPolygon(int32 iLayerIndex, const glm::vec2 *pVertexArr
 
 	m_LayerList[iLayerIndex]->m_fLineThickness = fOutlineThickness;
 
+	if(uiCount < 3)
+		return SetAsNothing(iLayerIndex);
+
+	float fWindingOrder = HyMath::WindingOrder(pVertexArray[0], pVertexArray[1], pVertexArray[2]);
+	if(fWindingOrder == 0.0f)
+		return SetAsNothing(iLayerIndex);
+
 	AssemblePolygon(iLayerIndex, pVertexArray, uiCount);
 
 	Load();
