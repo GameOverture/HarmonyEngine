@@ -14,8 +14,6 @@
 #include "EntityModel.h"
 #include "EntityDraw.h"
 
-const float fSNAP_AMT = 25.0f;
-
 VectorModel::VectorModel(EditModeType eEditModeType) :
 	IEditModeModel(eEditModeType),
 	m_pPrimTreeItemData(nullptr),
@@ -284,6 +282,8 @@ void VectorModel::FlushPrimLayer()
 	for(IEditModeView *pView : m_ViewList)
 		static_cast<VectorView *>(pView)->DrawVectorAction(VECTORACTION_None);
 
+	const float fSNAP_AMT = m_pPrimTreeItemData->GetEntityModel().GetItem().GetProject().GetGridSize();
+
 	switch(m_eCurAction)
 	{
 	case VECTORACTION_Creation:
@@ -474,6 +474,8 @@ void VectorModel::FlushPrimLayer()
 
 /*virtual*/ void VectorModel::MouseClickTransformReleased(bool bCtrlHeld, bool bShiftHeld, glm::vec2 ptReleasePos) /*override*/
 {
+	const float fSNAP_AMT = m_pPrimTreeItemData->GetEntityModel().GetItem().GetProject().GetGridSize();
+
 	if(m_eCurAction == VECTORACTION_Creation)
 	{
 		glm::vec2 ptStartPos = ptReleasePos + glm::vec2(-25.0f, -25.0f);

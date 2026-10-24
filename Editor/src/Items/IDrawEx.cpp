@@ -337,14 +337,17 @@ void IDrawEx::DoMouseMove(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 		if(m_MultiTransform.IsShown())
 		{
 			m_eCurHoverGrabPoint = m_MultiTransform.IsMouseOverGrabPoint();
-			SetTransformHoverActionViaGrabPoint(m_eCurHoverGrabPoint, m_MultiTransform.GetCachedRotation());
+			if(SetTransformHoverActionViaGrabPoint(m_eCurHoverGrabPoint, 0.0f))//m_MultiTransform.GetCachedRotation()))
+				m_pCurHoverItem = nullptr;
+			else if(m_eDrawAction == HYACTION_HoverScale || m_eDrawAction == HYACTION_HoverRotate)
+				ClearAction();
 		}
 
 		if(m_SelectedItemList.size() == 1)
 		{
 			GfxTransformCtrl &transformCtrlRef = m_SelectedItemList[0]->GetTransformCtrl();
 			m_eCurHoverGrabPoint = transformCtrlRef.IsMouseOverGrabPoint();
-			if(SetTransformHoverActionViaGrabPoint(m_eCurHoverGrabPoint, transformCtrlRef.GetCachedRotation()))
+			if(SetTransformHoverActionViaGrabPoint(m_eCurHoverGrabPoint, m_SelectedItemList[0]->GetHyNode()->rot.Get()))// transformCtrlRef.GetCachedRotation()))
 				m_pCurHoverItem = m_SelectedItemList[0]; // Override whatever might be above this item, because we're hovering over a grab point
 			else if(m_eDrawAction == HYACTION_HoverScale || m_eDrawAction == HYACTION_HoverRotate)
 				ClearAction();
@@ -438,9 +441,17 @@ void IDrawEx::BeginTransform()
 
 	GfxTransformCtrl *pCurTransform = nullptr;
 	if(m_MultiTransform.IsShown())
+	{
 		pCurTransform = &m_MultiTransform;
+		m_MultiTransform.GetCentroid(m_ptDragItemPos);
+		m_pCamera->ProjectToWorld(m_ptDragItemPos, m_ptDragItemPos);
+	}
 	else
+	{
 		pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
+		glm::mat4 mtxScene = m_SelectedItemList[0]->GetHyNode()->GetSceneTransform(0.0f);
+		HySetVec(m_ptDragItemPos, mtxScene[3].x, mtxScene[3].y);
+	}
 
 	if(pCurTransform)
 	{
@@ -484,22 +495,11 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 	glm::vec2 ptWorldMousePos;
 	m_pCamera->ProjectToWorld(HyEngine::Input().GetMousePos(), ptWorldMousePos);
 
-	glm::vec2 ptItemWorldPos(0.0f, 0.0f);
 	GfxTransformCtrl *pCurTransform = nullptr;
-	IDrawExItem *pSingleItem = nullptr;
 	if(m_MultiTransform.IsShown())
-	{
 		pCurTransform = &m_MultiTransform;
-		ptItemWorldPos = m_MultiTransform.GetGrabPointWorldPos(GfxTransformCtrl::GRAB_BotLeft);
-	}
 	else
-	{
-		pSingleItem = m_SelectedItemList[0];
 		pCurTransform = &m_SelectedItemList[0]->GetTransformCtrl();
-
-		glm::mat4 mtxScene = m_SelectedItemList[0]->GetHyNode()->GetSceneTransform(0.0f);
-		HySetVec(ptItemWorldPos, mtxScene[3].x, mtxScene[3].y);
-	}
 
 	// Process the transform
 	switch(GetCurAction())
@@ -508,8 +508,8 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 		float fRot = 0.0f;
 		if(bCtrlMod)
 		{
-			fRot = HyMath::AngleFromVector(ptItemWorldPos - ptWorldMousePos) - HyMath::AngleFromVector(ptItemWorldPos - m_ptDragStart);
-			m_ActiveTransform.rot_pivot = ptItemWorldPos;
+			fRot = HyMath::AngleFromVector(m_ptDragItemPos - ptWorldMousePos) - HyMath::AngleFromVector(m_ptDragItemPos - m_ptDragStart);
+			m_ActiveTransform.rot_pivot = m_ptDragItemPos;
 		}
 		else
 		{
@@ -526,11 +526,14 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 		}
 		else
 			m_ActiveTransform.rot.Set(HyMath::Round(fRot));
+
+		// TODO: RefreshTransforms safely for rotations - When multiselect, the transform widget bugs out when trying to wrap items
+		RefreshTransforms();
 		break; }
 
 	case HYACTION_TransformingTranslate: {
 		glm::vec2 ptDestination = m_ActiveTransform.pos.Get();
-		if(bShiftMod)
+		if(bShiftMod && bCtrlMod == false)
 		{
 			glm::vec2 ptTarget = ptWorldMousePos;
 			const glm::vec2 UNIT_VECTOR_LIST[] = {
@@ -562,64 +565,89 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 		else
 			ptDestination = HyMath::RoundVec(ptWorldMousePos - m_ptDragStart);
 
-		//if(bCtrlMod)
-		//	HySetVec(ptDestination, HyMath::RoundToNearest(ptDestination.x, GetPrecisionGridSize()), HyMath::RoundToNearest(ptDestination.y, GetPrecisionGridSize()));
-
 		m_ActiveTransform.pos.Set(ptDestination);
+
+		if(bCtrlMod && bShiftMod == false)
+		{
+			// Snap 'm_ptDragItemPos' onto the grid
+			const float fSNAP_AMT = m_pProjItem->GetProject().GetGridSize();
+
+			glm::vec2 ptSnapPos = { HyMath::RoundToNearest(ptDestination.x, fSNAP_AMT), HyMath::RoundToNearest(ptDestination.y, fSNAP_AMT) };
+			glm::vec2 vSnapOffset = ptSnapPos - ptDestination;
+
+			glm::vec2 ptSnapPos2 = { HyMath::RoundToNearest(m_ptDragItemPos.x, fSNAP_AMT), HyMath::RoundToNearest(m_ptDragItemPos.y, fSNAP_AMT) };
+			glm::vec2 vSnapOffset2 = ptSnapPos2 - m_ptDragItemPos;
+
+			m_ActiveTransform.pos.Offset(vSnapOffset + vSnapOffset2);
+		}
+
+		if(bCtrlMod == false && bShiftMod == false) // Override snapping when Shift or Ctrl is held
+		{
+			SnapCandidates snapCandidates;
+			GetSnapCandidateList(snapCandidates);
+			if(snapCandidates.IsEmpty() == false)
+			{
+				RefreshTransforms(); // Update pCurTransform
+				glm::vec2 vSnapOffset = SnapTransform(snapCandidates, pCurTransform);
+				m_ActiveTransform.pos.Offset(vSnapOffset);
+			}
+		}
+
+		RefreshTransforms();
 		break; }
 
 	case HYACTION_TransformingScale: {
 		GfxTransformCtrl::GrabPointType eAnchorPoint = GfxTransformCtrl::GRAB_None;
-		GfxTransformCtrl::GrabPointType eAnchorWidth = GfxTransformCtrl::GRAB_None;
-		GfxTransformCtrl::GrabPointType eAnchorHeight = GfxTransformCtrl::GRAB_None;
+		GfxTransformCtrl::GrabPointType eDragWidth = GfxTransformCtrl::GRAB_None;
+		GfxTransformCtrl::GrabPointType eDragHeight = GfxTransformCtrl::GRAB_None;
 		glm::bvec2 bScaleDimensions;
 		switch(m_eCurHoverGrabPoint)
 		{
 		case GfxTransformCtrl::GRAB_BotLeft:
 			eAnchorPoint = GfxTransformCtrl::GRAB_TopRight;
-			eAnchorWidth = GfxTransformCtrl::GRAB_TopLeft;
-			eAnchorHeight = GfxTransformCtrl::GRAB_BotRight;
+			eDragWidth = GfxTransformCtrl::GRAB_TopLeft;
+			eDragHeight = GfxTransformCtrl::GRAB_BotRight;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
 		case GfxTransformCtrl::GRAB_BotRight:
 			eAnchorPoint = GfxTransformCtrl::GRAB_TopLeft;
-			eAnchorWidth = GfxTransformCtrl::GRAB_TopRight;
-			eAnchorHeight = GfxTransformCtrl::GRAB_BotLeft;
+			eDragWidth = GfxTransformCtrl::GRAB_TopRight;
+			eDragHeight = GfxTransformCtrl::GRAB_BotLeft;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
 		case GfxTransformCtrl::GRAB_TopRight:
 			eAnchorPoint = GfxTransformCtrl::GRAB_BotLeft;
-			eAnchorWidth = GfxTransformCtrl::GRAB_BotRight;
-			eAnchorHeight = GfxTransformCtrl::GRAB_TopLeft;
+			eDragWidth = GfxTransformCtrl::GRAB_BotRight;
+			eDragHeight = GfxTransformCtrl::GRAB_TopLeft;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
 		case GfxTransformCtrl::GRAB_TopLeft:
 			eAnchorPoint = GfxTransformCtrl::GRAB_BotRight;
-			eAnchorWidth = GfxTransformCtrl::GRAB_BotLeft;
-			eAnchorHeight = GfxTransformCtrl::GRAB_TopRight;
+			eDragWidth = GfxTransformCtrl::GRAB_BotLeft;
+			eDragHeight = GfxTransformCtrl::GRAB_TopRight;
 			bScaleDimensions.x = bScaleDimensions.y = true;
 			break;
 		case GfxTransformCtrl::GRAB_BotMid:
 			eAnchorPoint = GfxTransformCtrl::GRAB_TopMid;
-			eAnchorHeight = GfxTransformCtrl::GRAB_BotMid;
+			eDragHeight = GfxTransformCtrl::GRAB_BotMid;
 			bScaleDimensions.x = false;
 			bScaleDimensions.y = true;
 			break;
 		case GfxTransformCtrl::GRAB_MidRight:
 			eAnchorPoint = GfxTransformCtrl::GRAB_MidLeft;
-			eAnchorWidth = GfxTransformCtrl::GRAB_MidRight;
+			eDragWidth = GfxTransformCtrl::GRAB_MidRight;
 			bScaleDimensions.x = true;
 			bScaleDimensions.y = false;
 			break;
 		case GfxTransformCtrl::GRAB_TopMid:
 			eAnchorPoint = GfxTransformCtrl::GRAB_BotMid;
-			eAnchorHeight = GfxTransformCtrl::GRAB_TopMid;
+			eDragHeight = GfxTransformCtrl::GRAB_TopMid;
 			bScaleDimensions.x = false;
 			bScaleDimensions.y = true;
 			break;
 		case GfxTransformCtrl::GRAB_MidLeft:
 			eAnchorPoint = GfxTransformCtrl::GRAB_MidRight;
-			eAnchorWidth = GfxTransformCtrl::GRAB_MidLeft;
+			eDragWidth = GfxTransformCtrl::GRAB_MidLeft;
 			bScaleDimensions.x = true;
 			bScaleDimensions.y = false;
 			break;
@@ -632,25 +660,21 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 		glm::vec2 vDesiredSize(m_vDragStartSize);
 		if(bScaleDimensions.x)
 		{
-			glm::vec2 ptAnchorWidth = pCurTransform->GetGrabPointWorldPos(eAnchorWidth);
+			glm::vec2 ptAnchorWidth = pCurTransform->GetGrabPointWorldPos(eDragWidth);
+			ptAnchorWidth = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorWidth - ptDragAnchorPoint), ptWorldMousePos);
 			if(ptAnchorWidth == ptDragAnchorPoint)
-				vDesiredSize.x = 0.01f;
+				vDesiredSize.x = HyMath::FloatSlop;
 			else
-			{
-				ptAnchorWidth = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorWidth - ptDragAnchorPoint), ptWorldMousePos);
 				vDesiredSize.x = glm::distance(ptDragAnchorPoint, ptAnchorWidth);
-			}
 		}
 		if(bScaleDimensions.y)
 		{
-			glm::vec2 ptAnchorHeight = pCurTransform->GetGrabPointWorldPos(eAnchorHeight);
+			glm::vec2 ptAnchorHeight = pCurTransform->GetGrabPointWorldPos(eDragHeight);
+			ptAnchorHeight = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorHeight - ptDragAnchorPoint), ptWorldMousePos);
 			if(ptAnchorHeight == ptDragAnchorPoint)
-				vDesiredSize.y = 0.01f;
+				vDesiredSize.y = HyMath::FloatSlop;
 			else
-			{
-				ptAnchorHeight = HyMath::ClosestPointOnRay(ptDragAnchorPoint, glm::normalize(ptAnchorHeight - ptDragAnchorPoint), ptWorldMousePos);
 				vDesiredSize.y = glm::distance(ptDragAnchorPoint, ptAnchorHeight);
-			}
 		}
 
 		glm::vec2 vScaleAmt(1.0f);
@@ -662,56 +686,24 @@ void IDrawEx::DoMouseMove_Transform(bool bCtrlMod, bool bShiftMod, bool bAltMod)
 		else
 			HySetVec(vScaleAmt, vDesiredSize.x / m_vDragStartSize.x, vDesiredSize.y / m_vDragStartSize.y);
 
-		// TODO: When transforming a single item that has a non-zero rotation, it skews the scaling during preview
+		// TODO: When transforming item(s) that has a non-zero rotation, it skews the scaling during preview
+
 		if(std::isnan(vScaleAmt.x) || std::isnan(vScaleAmt.y))
 		{
 			HyGuiLog("Scaling resulted in NaN", LOGTYPE_Error);
 			break;
 		}
-
-		if(pSingleItem)
-		{
-			//pSingleItem->GetHyNode()->scale_pivot = ptDragAnchorPoint;
-			pSingleItem->GetHyNode()->scale.Set(vScaleAmt);
-		}
-		else
-		{
-			m_ActiveTransform.scale_pivot = ptDragAnchorPoint;
-			m_ActiveTransform.scale.Set(vScaleAmt);
-		}
+		m_ActiveTransform.scale_pivot = ptDragAnchorPoint;
+		m_ActiveTransform.scale.Set(vScaleAmt);
+	
+		// TODO: RefreshTransforms safely here - floating point error is causing scaling to bug out when pivot points nudge slightly
+		//       Also would be good to somehow un-skew the scaling transform while scaling is being performed (to show like the end result when you release the mouse)
 
 		break; }
 
 	default:
 		HyGuiLog("EntityDraw::OnMouseMoveEvent - Unknown transform state not handled: " % QString::number(GetCurAction()), LOGTYPE_Error);
 		break;
-	}
-
-	RefreshTransforms(); // Need to refreshTransforms first here because m_ActiveTransform was updated, and pCurTransform might be used below
-
-	if(GetCurAction() == HYACTION_TransformingTranslate)
-	{
-		if(bCtrlMod) // Override snapping when Ctrl is held (snap to precision grid)
-		{
-			ptItemWorldPos = m_ActiveTransform.pos.Get() + ptItemWorldPos;
-
-			glm::vec2 vGridSnapOffset(HyMath::RoundToNearest(ptItemWorldPos.x, GetPrecisionGridSize()) - ptItemWorldPos.x, HyMath::RoundToNearest(ptItemWorldPos.y, GetPrecisionGridSize()) - ptItemWorldPos.y);
-			m_ActiveTransform.pos.Offset(vGridSnapOffset);
-
-			RefreshTransforms();
-		}
-		else
-		{
-			SnapCandidates snapCandidates;
-			GetSnapCandidateList(snapCandidates);
-			if(snapCandidates.IsEmpty() == false)
-			{
-				glm::vec2 vSnapOffset = SnapTransform(snapCandidates, pCurTransform);
-				m_ActiveTransform.pos.Offset(vSnapOffset);
-
-				RefreshTransforms();
-			}
-		}
 	}
 }
 
@@ -725,7 +717,9 @@ void IDrawEx::DoMouseRelease_Transform()
 	// Reset 'm_ActiveTransform' to prep for the next transform
 	m_ActiveTransform.pos.Set(0.0f, 0.0f);
 	m_ActiveTransform.rot.Set(0.0f);
+	m_ActiveTransform.rot_pivot = { 0.0f, 0.0f };
 	m_ActiveTransform.scale.Set(1.0f, 1.0f);
+	m_ActiveTransform.scale_pivot = { 0.0f, 0.0f };
 
 	m_SnapGuideHorz.SetVisible(false);
 	m_SnapGuideVert.SetVisible(false);
@@ -862,10 +856,4 @@ glm::vec2 IDrawEx::SnapTransform(const SnapCandidates &snapCandidatesRef, GfxTra
 	}
 
 	return vSnapOffset;
-}
-
-float IDrawEx::GetPrecisionGridSize() const
-{
-	// TODO: Make this customizable by the user
-	return 5.0f;
 }

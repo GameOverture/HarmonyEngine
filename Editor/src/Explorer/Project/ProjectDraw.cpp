@@ -319,6 +319,11 @@ CheckerGrid::CheckerGrid(float fWidth, float fHeight, float fGridSize) :
 {
 }
 
+float CheckerGrid::GetGridSize() const
+{
+	return m_fGridSize;
+}
+
 /*virtual*/ void CheckerGrid::OnUpdateUniforms(float fExtrapolatePercent) /*override*/
 {
 	glm::mat4 mtx = HyPrimitive2d::GetSceneTransform(fExtrapolatePercent);
@@ -479,6 +484,11 @@ ProjectDraw::ProjectDraw() :
 
 /*virtual*/ ProjectDraw::~ProjectDraw()
 {
+}
+
+float ProjectDraw::GetGridSize() const
+{
+	return m_CheckerGrid.GetGridSize();
 }
 
 void ProjectDraw::EnableGridBackground(bool bEnable)

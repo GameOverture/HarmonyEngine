@@ -798,6 +798,14 @@ void Project::SetRenderSize(int iWidth, int iHeight)
 		m_pDraw->OnResizeRenderer();
 }
 
+float Project::GetGridSize() const
+{
+	if(m_pDraw)
+		return m_pDraw->GetGridSize();
+	
+	return DEFAULT_GRID_SIZE;
+}
+
 void Project::ShowGridBackground(bool bShow)
 {
 	if(m_pDraw == nullptr)

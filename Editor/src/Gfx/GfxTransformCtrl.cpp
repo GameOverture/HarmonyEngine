@@ -16,8 +16,7 @@
 GfxTransformCtrl::GfxTransformCtrl(HyEntity2d *pParent) :
 	HyEntity2d(pParent),
 	m_bIsShown(false),
-	m_bShowGrabPoints(false),
-	m_fCachedRotation(0.0f)
+	m_bShowGrabPoints(false)
 {
 	m_BoundingVolume.SetTint(HyGlobal::GetEditorColor(EDITORCOLOR_TransformBoundingVolume));
 	ChildAppend(m_BoundingVolume);
@@ -71,12 +70,6 @@ void GfxTransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShape
 	ptGrabPos[GRAB_MidRight] = ptGrabPos[GRAB_BotRight] + ((ptGrabPos[GRAB_TopRight] - ptGrabPos[GRAB_BotRight]) * 0.5f);
 	ptGrabPos[GRAB_TopMid] = ptGrabPos[GRAB_TopLeft] + ((ptGrabPos[GRAB_TopRight] - ptGrabPos[GRAB_TopLeft]) * 0.5f);
 	ptGrabPos[GRAB_MidLeft] = ptGrabPos[GRAB_BotLeft] + ((ptGrabPos[GRAB_TopLeft] - ptGrabPos[GRAB_BotLeft]) * 0.5f);
-	
-	// Create the top rotate grab anchor - Along the top edge, find the midpoint and extrude a line segment out perpendicularly
-	glm::vec2 vTopEdge = ptGrabPos[GRAB_TopRight] - ptGrabPos[GRAB_TopLeft];
-	glm::vec2 vExtrudeDir = glm::normalize(HyMath::PerpendicularCounterClockwise(vTopEdge));
-	glm::vec2 ptExtrudeStart = ptGrabPos[GRAB_TopLeft] + (vTopEdge * 0.5f);
-	ptGrabPos[GRAB_Rotate] = ptExtrudeStart + (vExtrudeDir * (42.0f * (1.0f / pCamera->GetZoom()))); // 42px line segment length
 
 	for(int i = 0; i < NUM_GRABPOINTS; ++i)
 	{
@@ -92,15 +85,23 @@ void GfxTransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShape
 		pCamera->ProjectToCamera(ptGrabPos[i], ptGrabPos[i]);
 	m_BoundingVolume.SetAsPolygon(0, ptGrabPos, 4, 1.0f);
 
-	glm::vec4 ptTransformPos(ptExtrudeStart.x, ptExtrudeStart.y, 0.0f, 1.0f);
-	ptTransformPos = mtxShapeTransform * ptTransformPos;
-	HySetVec(ptExtrudeStart, ptTransformPos.x, ptTransformPos.y);
-	pCamera->ProjectToCamera(ptExtrudeStart, ptExtrudeStart);
-	glm::vec2 ptRotatePos;
-	pCamera->ProjectToCamera(m_GrabPointModels[GRAB_Rotate]->GetPos(), ptRotatePos);
-	m_ExtrudeSegment.SetAsLineSegment(0, ptExtrudeStart, ptRotatePos, 1.0f);
+	//glm::vec4 ptTransformPos(ptExtrudeStart.x, ptExtrudeStart.y, 0.0f, 1.0f);
+	//ptTransformPos = mtxShapeTransform * ptTransformPos;
+	//HySetVec(ptExtrudeStart, ptTransformPos.x, ptTransformPos.y);
+	//pCamera->ProjectToCamera(ptExtrudeStart, ptExtrudeStart);
 
-	m_fCachedRotation = HyMath::AngleFromVector(ptRotatePos - ptExtrudeStart) - 90.0f;
+
+	// Using the above projected screen/camera coordinates, create the top rotate grab anchor - Along the top edge, find the midpoint and extrude a line segment out perpendicularly
+	glm::vec2 vTopEdge = ptGrabPos[GRAB_TopRight] - ptGrabPos[GRAB_TopLeft];
+	glm::vec2 vExtrudeDir = glm::normalize(HyMath::PerpendicularCounterClockwise(vTopEdge));
+	glm::vec2 ptExtrudeStart = ptGrabPos[GRAB_TopLeft] + (vTopEdge * 0.5f);
+	glm::vec2 ptRotatePos = ptExtrudeStart + (vExtrudeDir * (42.0f * pCamera->GetZoom())); // 42px line segment length
+
+	m_ExtrudeSegment.SetAsLineSegment(0, ptExtrudeStart, ptRotatePos, 1.0f);
+	
+	pCamera->ProjectToWorld(ptRotatePos, ptRotatePos);
+	m_GrabPointModels[GRAB_Rotate]->SetPos(ptRotatePos);
+	m_GrabPointViews[GRAB_Rotate]->Sync(m_GrabPointModels[GRAB_Rotate]);
 }
 
 void GfxTransformCtrl::WrapTo(QList<IDrawExItem *> itemDrawList)
@@ -279,11 +280,6 @@ glm::vec2 GfxTransformCtrl::GetGrabPointWorldPos(GrabPointType eGrabPoint) const
 {
 	HyAssert(eGrabPoint > GRAB_None && eGrabPoint < NUM_GRABPOINTS, "GfxTransformCtrl::GetGrabPointPos invalid grab enum");
 	return m_GrabPointModels[eGrabPoint]->GetPos();
-}
-
-float GfxTransformCtrl::GetCachedRotation() const
-{
-	return m_fCachedRotation;
 }
 
 bool GfxTransformCtrl::IsMouseOverBoundingVolume()

@@ -23,6 +23,8 @@ public:
 	CheckerGrid(float fWidth, float fHeight, float fGridSize);
 	virtual ~CheckerGrid();
 
+	float GetGridSize() const;
+
 	virtual void OnUpdateUniforms(float fExtrapolatePercent) override;
 	virtual bool WriteVertexData(uint32 uiNumInstances, HyVertexBuffer &vertexBufferRef, float fExtrapolatePercent) override;
 };
@@ -56,6 +58,8 @@ class ProjectDraw : public HyEntity2d
 public:
 	ProjectDraw();
 	virtual ~ProjectDraw();
+
+	float GetGridSize() const;
 
 	void EnableGridBackground(bool bEnable);
 	void EnableGridOrigin(bool bEnable);

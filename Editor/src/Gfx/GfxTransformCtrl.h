@@ -47,7 +47,6 @@ protected:
 
 	bool						m_bIsShown;
 	bool						m_bShowGrabPoints;
-	float						m_fCachedRotation;
 
 public:
 	GfxTransformCtrl(HyEntity2d *pParent);
@@ -64,8 +63,6 @@ public:
 
 	bool GetCentroid(glm::vec2 &ptCenterOut);
 	glm::vec2 GetGrabPointWorldPos(GrabPointType eGrabPoint) const;
-
-	float GetCachedRotation() const;
 
 	bool IsMouseOverBoundingVolume();
 	GrabPointType IsMouseOverGrabPoint() const;

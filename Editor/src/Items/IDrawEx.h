@@ -60,6 +60,7 @@ protected:
 	bool									m_bSelectionHandled;	// During mouse release, this bool can signify if selection was already handled by previous logic (or if selection is not necessary)
 	glm::vec2								m_ptDragStart;			// Scene/World space
 	glm::vec2								m_ptDragCenter;			// Scene/World space
+	glm::vec2								m_ptDragItemPos;		// Scene/World space
 	glm::vec2								m_vDragStartSize;
 	QPoint									m_vNudgeTranslate;		// Used for nudging selected items with arrow keys
 
@@ -107,8 +108,6 @@ protected:
 
 	void GetSnapCandidateList(SnapCandidates &snapCandidatesOut); // Gather snapping candidates using the snapping settings and items from m_ItemList
 	glm::vec2 SnapTransform(const SnapCandidates &snapCandidatesRef, GfxTransformCtrl *pCurTransform);
-
-	float GetPrecisionGridSize() const;
 
 	virtual void OnPerformTransform() = 0;
 };

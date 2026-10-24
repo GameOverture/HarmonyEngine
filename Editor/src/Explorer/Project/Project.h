@@ -159,6 +159,7 @@ public:
 	// ProjectDraw functions
 	ProjectDraw *GetProjDraw();
 	void SetRenderSize(int iWidth, int iHeight);
+	float GetGridSize() const;
 	
 	void ShowGridBackground(bool bShow);
 	void ShowGridOrigin(bool bShow);
