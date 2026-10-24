@@ -85,12 +85,6 @@ void GfxTransformCtrl::WrapTo(const HyShape2d &boundingShape, glm::mat4 mtxShape
 		pCamera->ProjectToCamera(ptGrabPos[i], ptGrabPos[i]);
 	m_BoundingVolume.SetAsPolygon(0, ptGrabPos, 4, 1.0f);
 
-	//glm::vec4 ptTransformPos(ptExtrudeStart.x, ptExtrudeStart.y, 0.0f, 1.0f);
-	//ptTransformPos = mtxShapeTransform * ptTransformPos;
-	//HySetVec(ptExtrudeStart, ptTransformPos.x, ptTransformPos.y);
-	//pCamera->ProjectToCamera(ptExtrudeStart, ptExtrudeStart);
-
-
 	// Using the above projected screen/camera coordinates, create the top rotate grab anchor - Along the top edge, find the midpoint and extrude a line segment out perpendicularly
 	glm::vec2 vTopEdge = ptGrabPos[GRAB_TopRight] - ptGrabPos[GRAB_TopLeft];
 	glm::vec2 vExtrudeDir = glm::normalize(HyMath::PerpendicularCounterClockwise(vTopEdge));
@@ -118,35 +112,6 @@ void GfxTransformCtrl::WrapTo(QList<IDrawExItem *> itemDrawList)
 		return;
 	}
 
-	//// Determine the rotation of this transform control. If not specified, determine if all draw items share a common rotation and use that
-	//if(fRotation != 0.0f)
-	//	m_fCachedRotation = fRotation;
-	//else 
-	//{
-	//	// Find common rotation using an int (truncating float values) of degrees
-	//	int32 iCommonRotation = 99999; // Not yet set (valid values are 0-360)
-	//	for(EntityDrawItem *pDrawItem : itemDrawList)
-	//	{
-	//		if(pDrawItem->GetGuiType() != ITEM_Shape)
-	//		{
-	//			float fItemRotation = pDrawItem->GetNodeChild()->rot.Get();
-
-	//			if(iCommonRotation == 99999)
-	//				iCommonRotation = static_cast<int32>(fItemRotation);
-
-	//			if(iCommonRotation != static_cast<int32>(fItemRotation))
-	//			{
-	//				iCommonRotation = 99999;
-	//				break;
-	//			}
-	//		}
-	//	}
-	//	if(iCommonRotation == 99999)
-	//		iCommonRotation = 0;
-
-	//	m_fCachedRotation = iCommonRotation;
-	//}
-
 	// Determine the center point of all the items and store in 'ptRotPivot'
 	glm::vec3 ptRotPivot;
 	b2AABB combinedAabb;
@@ -172,68 +137,10 @@ void GfxTransformCtrl::WrapTo(QList<IDrawExItem *> itemDrawList)
 	}
 	HySetVec(ptRotPivot, b2AABB_Center(combinedAabb).x, b2AABB_Center(combinedAabb).y, 0.0f);
 
-	//// Recalculate 'combinedAabb' but transform each item with a rotation matrix ('ptRotPivot' and by 'm_fCachedRotation' degrees)
-	//HyMath::InvalidateAABB(combinedAabb);
-	//for(EntityDrawItem *pDrawItem : itemDrawList)
-	//{
-	//	HyShape2d *pItemShape = new HyShape2d();
-	//	glm::mat4 mtxItemTransform;
-	//	pDrawItem->ExtractTransform(*pItemShape, mtxItemTransform);
-	//	if(pItemShape->IsValidShape() == false)
-	//	{
-	//		delete pItemShape;
-	//		continue;
-	//	}
-
-	//	// Rotation compensation
-	//	//glm::mat4 mtxRotateCompensate(1.0f);
-	//	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot);
-	//	//mtxRotateCompensate = glm::rotate(mtxRotateCompensate, glm::radians(-m_fCachedRotation), glm::vec3(0, 0, 1));
-	//	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot * -1.0f);
-	//	//mtxItemTransform *= mtxRotateCompensate;
-
-	//		
-	//	//glm::vec3 ptItemPos = mtxItemTransform[3];
-	//	//glm::vec3 vRotations = glm::eulerAngles(glm::quat_cast(mtxItemTransform));
-
-	//	//glm::mat4 mtxOut(1.0f);
-	//	//mtxOut = glm::translate(mtxOut, ptItemPos);
-
-	//	//mtxOut = glm::translate(mtxOut, ptRotPivot);
-	//	//mtxOut = glm::rotate(mtxOut, glm::radians(rot.Extrapolate(fExtrapolatePercent)), glm::vec3(0, 0, 1));
-	//	//mtxOut = glm::translate(mtxOut, ptRotPivot * -1.0f);
-
-
-
-	//	// Rotation compensation
-	//	mtxItemTransform = glm::translate(mtxItemTransform, ptRotPivot * -1.0f);
-	//	mtxItemTransform = glm::rotate(mtxItemTransform, glm::radians(-m_fCachedRotation), glm::vec3(0, 0, 1));
-	//	mtxItemTransform = glm::translate(mtxItemTransform, ptRotPivot);
-	//	//glm::mat4 mtxRotateCompensate(1.0f);
-	//	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot * -1.0f);
-	//	//mtxRotateCompensate = glm::rotate(mtxRotateCompensate, glm::radians(-m_fCachedRotation), glm::vec3(0, 0, 1));
-	//	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot);
-	//	//mtxItemTransform *= mtxRotateCompensate;
-
-	//	b2AABB itemAabb;
-	//	pItemShape->ComputeAABB(itemAabb, mtxItemTransform);
-
-	//	if(combinedAabb.IsValid() == false)
-	//		combinedAabb = itemAabb;
-	//	else
-	//		combinedAabb.Combine(itemAabb);
-	//}
-
 	// Using 'combinedAabb' create an OBB in 'boundingShape', then rotate it back by the previous rotation compensation
 	// Cannot use SetAsPolygon() because Box2d wields the vertices in an odd order
 	boundingShape.SetAsBox(HyRect(b2AABB_Extents(combinedAabb).x, b2AABB_Extents(combinedAabb).y, ptRotPivot, 0.0f));
 
-	//glm::mat4 mtxRotateCompensate(1.0f);
-	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot);
-	//mtxRotateCompensate = glm::rotate(mtxRotateCompensate, glm::radians(m_fCachedRotation), glm::vec3(0, 0, 1));
-	//mtxRotateCompensate = glm::translate(mtxRotateCompensate, ptRotPivot * -1.0f);
-	//
-	//boundingShape.TransformSelf(mtxRotateCompensate);
 	WrapTo(boundingShape, glm::mat4(1.0f));
 }
 
@@ -298,8 +205,7 @@ bool GfxTransformCtrl::IsMouseOverBoundingVolume()
 
 GfxTransformCtrl::GrabPointType GfxTransformCtrl::IsMouseOverGrabPoint() const
 {
-	//glm::vec2 ptWorldMousePos;
-	if(m_bIsShown == false || m_bShowGrabPoints == false)// || HyEngine::Input().GetWorldMousePos(ptWorldMousePos) == false)
+	if(m_bIsShown == false || m_bShowGrabPoints == false)
 		return GRAB_None;
 
 	for(int32 i = 0; i < NUM_GRABPOINTS; ++i)
