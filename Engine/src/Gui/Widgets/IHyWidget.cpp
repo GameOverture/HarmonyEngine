@@ -29,7 +29,7 @@ bool IHyWidget::IsButton() const
 
 bool IHyWidget::IsInputAllowed() const
 {
-	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsGuiLayout) != 0)
 		return IsEnabled() && static_cast<HyLayout *>(m_pParent)->IsWidgetInputAllowed();
 
 	return IsEnabled();
@@ -105,7 +105,7 @@ void IHyWidget::SetKeyboardFocusAllowed(bool bEnabled)
 
 bool IHyWidget::RequestKeyboardFocus()
 {
-	if(IsKeyboardFocusAllowed() && m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+	if(IsKeyboardFocusAllowed() && m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsGuiLayout) != 0)
 		return static_cast<HyLayout *>(m_pParent)->RequestWidgetFocus(this);
 
 	return false;

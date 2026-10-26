@@ -29,7 +29,7 @@ int32 HySpacer::GetActualSize()
 
 void HySpacer::Setup(HySizePolicy eSizePolicy, uint32 uiSizeHint)
 {
-	HyAssert(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0, "HySpacer::Setup() invoked and not attached to a layout");
+	HyAssert(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsGuiLayout) != 0, "HySpacer::Setup() invoked and not attached to a layout");
 
 	m_uiSizeHint = uiSizeHint;
 	if(m_eORIEN_TYPE == HYORIENT_Horizontal)

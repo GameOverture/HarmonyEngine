@@ -21,6 +21,8 @@ IHyGuiBase::IHyGuiBase(HyEntity2d *pParent /*= nullptr*/) :
 	m_bSizeDirty(true),
 	m_bLockProportions(false)
 {
+	m_uiFlags |= NODETYPE_IsGui;
+
 	for(int32 i = 0; i < HYNUM_ORIENTATIONS; ++i)
 		m_SizePolicies[i] = HYSIZEPOLICY_Fixed;
 }
@@ -249,7 +251,7 @@ void IHyGuiBase::SetSizeDirty()
 	m_bSizeDirty = true;
 
 	// This will propagate upward if *this is nested in another layout
-	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+	if(m_pParent && (m_pParent->GetInternalFlags() & NODETYPE_IsGuiLayout) != 0)
 	{
 		static_cast<HyLayout *>(m_pParent)->SetSizeDirty();
 		if(static_cast<HyLayout *>(m_pParent)->IsRootLayout())

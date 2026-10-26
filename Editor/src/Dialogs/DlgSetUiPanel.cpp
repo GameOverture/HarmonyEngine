@@ -14,11 +14,11 @@
 
 #include <QColorDialog>
 
-DlgSetUiPanel::DlgSetUiPanel(Project &projectRef, QString sTitle, HyUiPanelInit &init, QUuid selectedNodeUuid, QWidget *parent /*= nullptr*/) :
+DlgSetUiPanel::DlgSetUiPanel(Project &projectRef, QString sTitle, HyUiPanelInit &init, QUuid nodeUuid, QWidget *parent /*= nullptr*/) :
 	QDialog(parent),
 	m_ProjectRef(projectRef),
 	m_Init(init),
-	m_SelectedNodeUuid(selectedNodeUuid),
+	m_NodeUuid(nodeUuid),
 	ui(new Ui::DlgSetUiPanel)
 {
 	ui->setupUi(this);
@@ -51,16 +51,16 @@ HyUiPanelInit DlgSetUiPanel::GetPanelInit()
 
 QUuid DlgSetUiPanel::GetNodeUuid()
 {
-	return m_SelectedNodeUuid;
+	return m_NodeUuid;
 }
 
-/*static*/ QVariant DlgSetUiPanel::SerializePanelInit(const HyUiPanelInit &init, QUuid selectedNodeUuid)
+/*static*/ QVariant DlgSetUiPanel::SerializePanelInit(const HyUiPanelInit &init, QUuid nodeUuid)
 {
 	QJsonObject serializedObj;
 	serializedObj.insert("nodeType", HyGlobal::ItemName(HyGlobal::ConvertHyType(init.m_eNodeType), false));
 	serializedObj.insert("width", QJsonValue(static_cast<qint64>(init.m_uiWidth)));
 	serializedObj.insert("height", QJsonValue(static_cast<qint64>(init.m_uiHeight)));
-	serializedObj.insert("nodeUuid", selectedNodeUuid.toString(QUuid::WithoutBraces));
+	serializedObj.insert("nodeUuid", nodeUuid.toString(QUuid::WithoutBraces));
 	serializedObj.insert("frameSize", QJsonValue(static_cast<qint64>(init.m_uiFrameSize)));
 	serializedObj.insert("panelColor", QJsonValue(static_cast<qint64>(init.m_PanelColor.GetAsHexCode())));
 	serializedObj.insert("frameColor", QJsonValue(static_cast<qint64>(init.m_FrameColor.GetAsHexCode())));
@@ -69,7 +69,7 @@ QUuid DlgSetUiPanel::GetNodeUuid()
 	return QVariant(serializedObj);
 }
 
-/*static*/ HyUiPanelInit DlgSetUiPanel::DeserializePanelInit(const QJsonObject &serializedObj, QUuid &selectedNodeUuidOut)
+/*static*/ HyUiPanelInit DlgSetUiPanel::DeserializePanelInit(const QJsonObject &serializedObj, QUuid &nodeUuidOut)
 {
 	HyUiPanelInit init;
 	init.m_eNodeType = HyGlobal::ConvertItemType(HyGlobal::GetTypeFromString(serializedObj["nodeType"].toString()));
@@ -81,7 +81,7 @@ QUuid DlgSetUiPanel::GetNodeUuid()
 	init.m_FrameColor = serializedObj["frameColor"].toVariant().toUInt();
 	init.m_TertiaryColor = serializedObj["tertiaryColor"].toVariant().toUInt();
 
-	selectedNodeUuidOut = QUuid(serializedObj["nodeUuid"].toString());
+	nodeUuidOut = QUuid(serializedObj["nodeUuid"].toString());
 
 	return init;
 }
@@ -143,7 +143,7 @@ void DlgSetUiPanel::SyncWidgets()
 	else
 		ui->vsbNodeSize->SetValue(QPointF(0.0f, 0.0f));
 
-	ui->cmbNode->setCurrentIndex(ui->cmbNode->findData(m_SelectedNodeUuid));
+	ui->cmbNode->setCurrentIndex(ui->cmbNode->findData(m_NodeUuid));
 }
 
 void DlgSetUiPanel::on_radBoundingVolume_toggled(bool bChecked)
@@ -208,7 +208,7 @@ void DlgSetUiPanel::on_btnTertiaryColor_clicked()
 
 void DlgSetUiPanel::on_cmbNode_currentIndexChanged(int index)
 {
-	m_SelectedNodeUuid = ui->cmbNode->currentData().toUuid();
+	m_NodeUuid = ui->cmbNode->currentData().toUuid();
 }
 
 HyColor DlgSetUiPanel::SetPrimColor(HyColor startingColor, QPushButton *pButton, bool bShowDialog)

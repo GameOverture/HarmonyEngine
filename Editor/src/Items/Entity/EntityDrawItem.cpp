@@ -533,7 +533,7 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 			return QJsonValue(QJsonArray({ margins.left, margins.bottom, margins.right, margins.top }));
 		}
 		if(sPropertyName == "Style")
-			return QJsonValue(HyGlobal::GetTextTypeNameList()[static_cast<HyLabel *>(pThisHyNode)->GetTextType()]);		
+			return QJsonValue(HyGlobal::GetTextTypeNameList()[static_cast<HyLabel *>(pThisHyNode)->GetTextType()]);
 		if(sPropertyName == "Text Visible")
 			return QJsonValue(static_cast<HyLabel *>(pThisHyNode)->IsTextVisible());
 		if(sPropertyName == "Alignment")

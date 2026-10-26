@@ -57,7 +57,10 @@ void HyCheckBox::SetCheckedChangedCallback(std::function<void(HyCheckBox *)> fpC
 	m_CheckMark.SetAsLineChain(0, checkMarkVerts, false, 4.0f);
 	
 	m_CheckMark.SetLayerColor(0, panel.GetTertiaryColor());
-	m_CheckMark.pos.Set(panel.GetPanelNode()->pos);
+	if(panel.GetPanelNode())
+		m_CheckMark.pos.Set(panel.GetPanelNode()->pos);
+	else
+		m_CheckMark.pos.Set(0.0f, 0.0f);
 	m_CheckMark.alpha.Set(IsChecked() ? 1.0f : 0.0f);
 }
 

@@ -330,15 +330,11 @@ void EntityTreeItemData::InitalizePropertyModel()
 			m_pPropertiesModel->AppendProperty("Timeline", "Pause", PROPERTIESTYPE_bool, Qt::Unchecked, "Pausing the timeline will stop processing key frames, after this frame", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Timeline", "Frame", PROPERTIESTYPE_int, 0, "Jump to a different frame on the timeline, after processing this frame", PROPERTIESACCESS_ToggleUnchecked, 0, iRANGE, 1);
 		}
-		else if(IsAssetItem() == false && IsWidgetItem() == false && m_eTYPE != ITEM_PrimNode && m_eTYPE != ITEM_TileMap)
-		{
-			m_pPropertiesModel->InsertCategory(-1, "Common");
-			m_pPropertiesModel->AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(GetType(), false) % "'s state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
-		}
-
-		m_pPropertiesModel->InsertCategory(-1, "Common"); // Will just return 'false' if "Common" category already exists
-		m_pPropertiesModel->AppendProperty("Common", "Update During Pause", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused", PROPERTIESACCESS_ToggleUnchecked);
-		m_pPropertiesModel->AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
+		//else if(IsAssetItem() == false && IsWidgetItem() == false && m_eTYPE != ITEM_PrimNode && m_eTYPE != ITEM_TileMap)
+		//{
+		//	m_pPropertiesModel->InsertCategory(-1, "Common");
+		//	m_pPropertiesModel->AppendProperty("Common", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(GetType(), false) % "'s state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
+		//}
 
 		m_pPropertiesModel->InsertCategory(-1, "Transformation");
 		m_pPropertiesModel->AppendProperty("Transformation", "Position", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Position is relative to parent node", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE, 1.0, "[", "]");
@@ -385,12 +381,17 @@ void EntityTreeItemData::InitalizePropertyModel()
 			m_pPropertiesModel->AppendProperty("Physics", "Linear Velocity", PROPERTIESTYPE_vec2, QPointF(0.0f, 0.0f), "Starting Linear velocity of the body's origin in scene coordinates", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE, 1.0, "[", "]");
 			m_pPropertiesModel->AppendProperty("Physics", "Angular Velocity", PROPERTIESTYPE_double, 0.0, "Starting Angular velocity of the body", PROPERTIESACCESS_ToggleUnchecked, 0.0, 100.0, 0.01);
 		}
+
+		m_pPropertiesModel->InsertCategory(-1, "Common"); // Will just return 'false' if "Common" category already exists
+		m_pPropertiesModel->AppendProperty("Common", "Update During Pause", PROPERTIESTYPE_bool, Qt::Unchecked, "Only items with this checked will receive updates when the game/application is paused", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Common", "User Tag", PROPERTIESTYPE_int, 0, "Not used by Harmony. You can set it to anything you like", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 	}
 
 	switch(GetType())
 	{
 	case ITEM_Audio:
 		m_pPropertiesModel->InsertCategory(0, "Audio", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		m_pPropertiesModel->AppendProperty("Audio", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(GetType(), false) % "'s state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 		// TODO: m_pPropertiesModel->AppendProperty("Audio", "Play List Mode", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetAudioPlayListModeList()[HYPLAYLIST_Shuffle], "The method by which the next audio asset is chosen when played", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAudioPlayListModeList());
 		// TODO: m_pPropertiesModel->AppendProperty("Audio", "Play", 
 		m_pPropertiesModel->AppendProperty("Audio", "Volume", PROPERTIESTYPE_double, 1.0, "The volume of the audio", PROPERTIESACCESS_ToggleUnchecked, 0.0, 1.0, 0.01);
@@ -399,6 +400,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 
 	case ITEM_Text:
 		m_pPropertiesModel->InsertCategory(0, "Text", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		m_pPropertiesModel->AppendProperty("Text", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(GetType(), false) % "'s state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 		m_pPropertiesModel->AppendProperty("Text", "Text", PROPERTIESTYPE_LineEdit, "Text123", "What UTF-8 string to be displayed", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Text", "Style", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTextTypeNameList()[HYTEXT_Line], "The style of how the text is shown", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTextTypeNameList());
 		// TODO: Custom Text Style widget
@@ -409,10 +411,13 @@ void EntityTreeItemData::InitalizePropertyModel()
 		break;
 
 	case ITEM_Spine:
+		m_pPropertiesModel->InsertCategory(0, "Spine", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		m_pPropertiesModel->AppendProperty("Spine", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(GetType(), false) % "'s state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 		break;
 
 	case ITEM_Sprite:
 		m_pPropertiesModel->InsertCategory(0, "Sprite", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		m_pPropertiesModel->AppendProperty("Sprite", "State", PROPERTIESTYPE_StatesComboBox, 0, "The " % HyGlobal::ItemName(GetType(), false) % "'s state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 		m_pPropertiesModel->AppendProperty("Sprite", "Frame", PROPERTIESTYPE_SpriteFrames, 0, "The sprite frame index to start on", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 		m_pPropertiesModel->AppendProperty("Sprite", "Anim Pause", PROPERTIESTYPE_bool, false, "The current state's animation starts paused", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Sprite", "Anim Rate", PROPERTIESTYPE_double, 1.0, "The animation rate modifier", PROPERTIESACCESS_ToggleUnchecked, 0.0, fRANGE, 0.1);
@@ -509,7 +514,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_UiLayout:
 		m_pPropertiesModel->InsertCategory(-1, "Layout", QVariant(), false, "Holds UI widget entities and arranges them programatically");
 		m_pPropertiesModel->AppendProperty("Layout", "Orientation", PROPERTIESTYPE_ComboBoxString, HyGlobal::OrientationName(HYORIENT_Horizontal), "The orientation of this layout. This determines which direction UI widgets are arranged", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), HyGlobal::GetOrientationNameList());
-		m_pPropertiesModel->AppendProperty("Layout", "Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The layout's margins to keep its contained widgets within (in pixels)", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE);
+		m_pPropertiesModel->AppendProperty("Layout", "Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The layout's margins (Left, Bottom, Right, Top) to keep its contained widgets within (in pixels)", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE);
 		m_pPropertiesModel->AppendProperty("Layout", "Widget Spacing", PROPERTIESTYPE_int, 0, "Sets the spacing in pixels between widgets inside the layout", PROPERTIESACCESS_ToggleUnchecked);
 		break;
 
@@ -559,14 +564,14 @@ void EntityTreeItemData::InitalizePropertyModel()
 				if(GetType() == ITEM_UiTextField)
 					m_pPropertiesModel->AppendProperty("Label", "Input Validator", PROPERTIESTYPE_LineEdit, "", "A case-sensitive regex that checks and permits only valid keyboard input", PROPERTIESACCESS_ToggleUnchecked);
 			}
-			m_pPropertiesModel->AppendProperty("Label", "Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The text's margins within the main panel of this widget", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE);
+			m_pPropertiesModel->AppendProperty("Label", "Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The text's margins (Left, Bottom, Right, Top) within the main panel of this widget", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE);
 			//m_pPropertiesModel->AppendProperty("Label", "Style", PROPERTIESTYPE_ComboBoxString, HyGlobal::GetTextTypeNameList()[HYTEXT_Line], "The style of how the text is shown", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetTextTypeNameList());
 			// TODO: m_pPropertiesModel->AppendProperty("Label", "Text State", PROPERTIESTYPE_StatesComboBox, 0, "The text's state to be displayed", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), GetReferencedItemUuid());
 			// TODO: virtual void SetTextLayerColor(uint32 uiStateIndex, uint32 uiLayerIndex, HyColor topColor, HyColor botColor);
 			// TODO: void SetAsSideBySide(bool bPanelBeforeText = true, int32 iPadding = 5, HyOrientation eOrientation = HYORIENT_Horizontal);	// Show the panel and text side by side specified accordingly to the arguments passed
 			m_pPropertiesModel->AppendProperty("Label", "Text Visible", PROPERTIESTYPE_bool, Qt::Checked, "Enabled dictates whether this widget's main text gets rendered", PROPERTIESACCESS_ToggleUnchecked);
 			m_pPropertiesModel->AppendProperty("Label", "Alignment", PROPERTIESTYPE_ComboBoxString, HyGlobal::AlignmentName(HYALIGN_Left), "The alignment of the text", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), "", "", HyGlobal::GetAlignmentNameList());
-			m_pPropertiesModel->AppendProperty("Label", "Monospaced Digits", PROPERTIESTYPE_bool, false, "Check to use monospaced digits, which ensures all digits use the same width", PROPERTIESACCESS_ToggleUnchecked);
+			m_pPropertiesModel->AppendProperty("Label", "Monospaced Digits", PROPERTIESTYPE_bool, false, "Check to use monospaced digits, which ensures all digits use the same width which looks better when racking", PROPERTIESACCESS_ToggleUnchecked);
 			if(GetType() == ITEM_UiRackMeter)
 			{
 				m_pPropertiesModel->AppendProperty("Label", "Show As Cash", PROPERTIESTYPE_bool, false, "Check to format the text as currency/money", PROPERTIESACCESS_ToggleUnchecked);

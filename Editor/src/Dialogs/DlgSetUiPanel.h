@@ -27,7 +27,7 @@ class DlgSetUiPanel : public QDialog
 	
 	Project	&			m_ProjectRef;
 	HyUiPanelInit		m_Init;
-	QUuid				m_SelectedNodeUuid;
+	QUuid				m_NodeUuid; // The UUID of the referenced node, when set as 'NodeItem' panel type
 
 	enum StackedPage
 	{
@@ -37,14 +37,14 @@ class DlgSetUiPanel : public QDialog
 	};
 
 public:
-	explicit DlgSetUiPanel(Project &projectRef, QString sTitle, HyUiPanelInit &init, QUuid selectedNodeUuid, QWidget *parent = 0);
+	explicit DlgSetUiPanel(Project &projectRef, QString sTitle, HyUiPanelInit &init, QUuid nodeUuid, QWidget *parent = 0);
 	~DlgSetUiPanel();
 
 	HyUiPanelInit GetPanelInit();
 	QUuid GetNodeUuid();
 	
-	static QVariant SerializePanelInit(const HyUiPanelInit &init, QUuid selectedNodeUuid);
-	static HyUiPanelInit DeserializePanelInit(const QJsonObject &serializedObj, QUuid &selectedNodeUuidOut);
+	static QVariant SerializePanelInit(const HyUiPanelInit &init, QUuid nodeUuid);
+	static HyUiPanelInit DeserializePanelInit(const QJsonObject &serializedObj, QUuid &nodeUuidOut);
 
 protected:
 	void SyncNodeComboBox();

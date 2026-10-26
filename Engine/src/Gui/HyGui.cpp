@@ -250,7 +250,7 @@ glm::vec2 HyGui::GetWidgetPos(IHyWidget &widgetRef)
 			
 			// Add together each "parent" layout
 			// Propagate upward if this is nested in another layout
-			while(pCurLayout && (pCurLayout->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+			while(pCurLayout && (pCurLayout->GetInternalFlags() & NODETYPE_IsGuiLayout) != 0)
 			{
 				vPos += pCurLayout->pos.Get();
 				pCurLayout = pCurLayout->ParentGet();
@@ -731,7 +731,7 @@ std::vector<IHyWidget *> HyGui::AssembleWidgetList()
 		for(uint32 i = 0; i < pLayout->ChildCount(); ++i)
 		{
 			IHyGuiBase *pItem = static_cast<IHyGuiBase *>(pLayout->ChildGet(i));
-			if((pItem->GetInternalFlags() & NODETYPE_IsLayout) == 0)
+			if((pItem->GetInternalFlags() & NODETYPE_IsGuiLayout) == 0)
 				widgetList.push_back(static_cast<IHyWidget *>(pItem));
 			else
 				fpRecursive(static_cast<HyLayout *>(pItem));

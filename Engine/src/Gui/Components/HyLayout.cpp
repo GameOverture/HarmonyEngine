@@ -20,7 +20,7 @@ HyLayout::HyLayout(HyOrientation eLayoutType, int32 iWidgetSpacing, HyEntity2d *
 	m_bReverse(m_eLayoutType == HYORIENT_Horizontal ? false : true), // 'm_bReverse' is defaulted ON when 'm_eLayoutType' is HYORIENT_Vertical to achieve top->bottom as default
 	m_iWidgetSpacing(iWidgetSpacing)
 {
-	m_uiFlags |= NODETYPE_IsLayout;
+	m_uiFlags |= NODETYPE_IsGuiLayout;
 }
 
 /*virtual*/ HyLayout::~HyLayout()
@@ -58,6 +58,8 @@ void HyLayout::SetLayoutType(HyOrientation eLayoutType)
 	bool bShrinkValid = true;
 	for(int32 i = 0; i < static_cast<int32>(m_ChildList.size()); ++i)
 	{
+		HyAssert(m_ChildList[i]->GetInternalFlags() & NODETYPE_IsGui, "HyLayout::GetSizePolicy() - m_ChildList contains a non-Gui item");
+
 		// Children are guaranteed to be IHyGuiBase
 		IHyGuiBase *pItem = static_cast<IHyGuiBase *>(m_ChildList[i]);
 
@@ -142,7 +144,7 @@ bool HyLayout::RequestWidgetFocus(IHyWidget *pWidget)
 	// Propagate upward if this is nested in another layout
 	if(m_pParent)
 	{
-		if((m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+		if((m_pParent->GetInternalFlags() & NODETYPE_IsGuiLayout) != 0)
 			return static_cast<HyLayout *>(m_pParent)->RequestWidgetFocus(pWidget);
 		else // m_pParent must be the container (and *this is the root layout)
 			return static_cast<HyGui *>(m_pParent)->RequestWidgetFocus(pWidget);
@@ -155,7 +157,7 @@ bool HyLayout::IsWidgetInputAllowed()
 	// Propagate upward if this is nested in another layout
 	if(m_pParent)
 	{
-		if((m_pParent->GetInternalFlags() & NODETYPE_IsLayout) != 0)
+		if((m_pParent->GetInternalFlags() & NODETYPE_IsGuiLayout) != 0)
 			return static_cast<HyLayout *>(m_pParent)->IsWidgetInputAllowed();
 		else // m_pParent must be the container (and *this is the root layout)
 			return static_cast<HyGui *>(m_pParent)->IsInputAllowed();
@@ -244,6 +246,7 @@ void HyLayout::OnSetDebugBox()
 	for(uint32 i = 0; i < static_cast<uint32>(m_ChildList.size()); ++i)
 	{
 		IHyNode2d *pChildItem = m_ChildList[i];
+		HyAssert(pChildItem->GetInternalFlags() & NODETYPE_IsGui, "HyLayout::OnCalcPreferredSize() - m_ChildList contains a non-Gui item");
 
 		// Children are guaranteed to be IHyGuiBase
 		IHyGuiBase *pItem = static_cast<IHyGuiBase *>(pChildItem);
@@ -297,6 +300,8 @@ void HyLayout::OnSetDebugBox()
 
 	auto fpPositionAndResize = [&](IHyNode2d *&pChildItem) // Lambda func used to iterate over 'm_ChildList'
 	{
+		HyAssert(pChildItem->GetInternalFlags() & NODETYPE_IsGui, "HyLayout::OnResize() - fpPositionAndResize was passed a non-Gui item");
+
 		// Children are guaranteed to be IHyGuiBase
 		IHyGuiBase *pItem = static_cast<IHyGuiBase *>(pChildItem);
 
@@ -335,7 +340,7 @@ void HyLayout::OnSetDebugBox()
 
 		// If 'pItem' is a nested layout, it should pass '0' to Resize where appropriate
 		glm::ivec2 vResize = vItemSize;
-		if(pItem->GetInternalFlags() & NODETYPE_IsLayout)
+		if(pItem->GetInternalFlags() & NODETYPE_IsGuiLayout)
 		{
 			if(vTargetSize.x == 0)
 				vResize.x = 0;
@@ -346,7 +351,7 @@ void HyLayout::OnSetDebugBox()
 		if(vTargetSize[eOrientation] != 0 && vActualItemSize != vItemSize)
 			bNeedsResize = true;
 
-		if(0 == (pItem->GetInternalFlags() & NODETYPE_IsLayout))
+		if(0 == (pItem->GetInternalFlags() & NODETYPE_IsGuiLayout))
 			pItem->pos.Offset(pItem->GetWidth(0.5f), pItem->GetHeight(0.5f));
 
 		ptCurPos[eOrientation] += vActualItemSize[eOrientation] + GetWidgetSpacing();

@@ -62,7 +62,7 @@ struct HyUiPanelInit
 };
 
 // A flexible visual representation of single panel that can be composed with node items or programmatically
-class HyPanel// : public IHyGuiBase
+class HyPanel
 {
 	HyEntity2d *				m_pParent;
 	HyType						m_eNodeType;
