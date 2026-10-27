@@ -52,8 +52,6 @@ public:
 	bool OnSetEditMode(bool bEnable);
 	EntityDrawItem *GetCurEditItem() const;
 
-	//void RequestClearShapeEdit();
-
 	void SetExtrapolatedProperties();
 
 	void RegisterWidgetText(QUuid uuid, HyJsonObj textDataObj);

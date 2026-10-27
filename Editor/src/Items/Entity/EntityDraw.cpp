@@ -43,8 +43,6 @@ EntityDraw::EntityDraw(ProjectItemData *pProjItem, const FileDataPair &initFileD
 /*virtual*/ void EntityDraw::OnUndoStackIndexChanged(int iIndex) /*override*/
 {
 	IDrawEx::OnUndoStackIndexChanged(iIndex);
-	//if(GetCurAction() == HYACTION_EntityShapeDragAddPrimitive || GetCurAction() == HYACTION_EntityShapeDragAddShape)
-	//	RequestClearShapeEdit();
 }
 
 /*virtual*/ void EntityDraw::OnKeyPressEvent(QKeyEvent *pEvent) /*override*/
@@ -385,30 +383,23 @@ EntityDrawItem *EntityDraw::GetCurEditItem() const
 	return nullptr;
 }
 
-//void EntityDraw::RequestClearShapeEdit()
-//{
-//	static_cast<EntityModel *>(m_pProjItem->GetModel())->SetShapeEditMode(false);
-//}
-
 void EntityDraw::SetExtrapolatedProperties()
 {
 	if(m_pProjItem->GetWidget() == nullptr)
 		HyGuiLog("EntityDraw::SetExtrapolatedProperties - m_pProjItem->GetWidget() is nullptr", LOGTYPE_Error);
 
+	// Acquire references and parameters needed to extrapolate
+	EntityModel *pEntityModel = static_cast<EntityModel *>(m_pProjItem->GetModel());
 	EntityDopeSheetScene &entityDopeSheetSceneRef = static_cast<EntityStateData *>(m_pProjItem->GetModel()->GetStateData(m_pProjItem->GetWidget()->GetCurStateIndex()))->GetDopeSheetScene();
-
-	const float fFRAME_DURATION = 1.0f / static_cast<EntityModel &>(entityDopeSheetSceneRef.GetStateData()->GetModel()).GetFramesPerSecond();
+	QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = pEntityModel->GetCtorKeyFramesMap();
+	const float fFRAME_DURATION = 1.0f / pEntityModel->GetFramesPerSecond();
 	const int iDESTINATION_FRAME = entityDopeSheetSceneRef.GetCurrentFrame();
 
-	// Set the extrapolated properties for the 'm_RootEntity' item
-	EntityTreeItemData *pRootTreeItemData = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetTreeModel().GetRootTreeItemData();
-
-	QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetCtorKeyFramesMap();
-	QMap<int, QJsonObject> combinedFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData];
-	combinedFrameMap[-1] = ctorKeyFrameMapRef[pRootTreeItemData];
-
+	// Set the extrapolated properties for the 'm_pRootEntity' item
+	EntityTreeItemData *pRootTreeItemData = pEntityModel->GetTreeModel().GetRootTreeItemData();
+	QMap<int, QJsonObject> rootEntityCombinedFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pRootTreeItemData];
+	rootEntityCombinedFrameMap[-1] = ctorKeyFrameMapRef[pRootTreeItemData];
 	FlushRootEntity();
-
 	ExtrapolateProperties(m_pProjItem->GetProject(),
 							m_pRootEntity,
 							nullptr,
@@ -418,22 +409,20 @@ void EntityDraw::SetExtrapolatedProperties()
 							fFRAME_DURATION,
 							-1,
 							iDESTINATION_FRAME,
-							combinedFrameMap,
+							rootEntityCombinedFrameMap,
 							pRootTreeItemData->GetPreviewComponent());
 
 	// Set the extrapolated properties for all the children items
 	for(IDrawExItem *pDrawItem : m_ItemList)
 	{
 		EntityDrawItem *pEntDrawItem = static_cast<EntityDrawItem *>(pDrawItem);
-
 		EntityTreeItemData *pEntityTreeItemData = pEntDrawItem->GetEntityTreeItemData();
 		ItemType eItemType = pEntityTreeItemData->GetType();
-		if(eItemType == ITEM_Prefix) // aka Shapes folder
+		if(eItemType == ITEM_Prefix) // aka Fixture folder
 			continue;
 
 		if(eItemType == ITEM_Entity) // Sub-entity
 		{
-			QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetCtorKeyFramesMap();
 			QMap<int, QJsonObject> combinedFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
 			combinedFrameMap[-1] = ctorKeyFrameMapRef[pEntityTreeItemData];
 
@@ -445,13 +434,18 @@ void EntityDraw::SetExtrapolatedProperties()
 		}
 		else
 		{
-			QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMapRef = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetCtorKeyFramesMap();
 			QMap<int, QJsonObject> combinedFrameMap = entityDopeSheetSceneRef.GetKeyFramesMap()[pEntityTreeItemData];
 			combinedFrameMap[-1] = ctorKeyFrameMapRef[pEntityTreeItemData];
 
 			// FlushHyNode (and clearing edit model) makes properties that aren't keyed on the timeline until later show the proper default values
-			if(false == (static_cast<EntityModel *>(m_pProjItem->GetModel())->GetBaseClassType() == ENTBASECLASS_HyGui && pEntDrawItem->GetEntityTreeItemData()->IsWidgetItem())) // Widgets will have already been 'flushed' within FlushRootEntity()
+			// 
+			// If this is a HyGui, widgets/layouts nested in 'm_RootLayout' will have already been 'flushed' within FlushRootEntity()
+			if(pEntityModel->GetBaseClassType() != ENTBASECLASS_HyGui ||
+			   pEntDrawItem->GetEntityTreeItemData()->IsWidgetItem() == false ||
+			   pEntityModel->GetTreeModel().FindGuiLayoutUuid(pEntDrawItem->GetEntityTreeItemData()).isNull())
+			{
 				pEntDrawItem->FlushHyNode(m_pRootEntity);
+			}
 
 			bool bIsActiveEditModeItem = GetCurEditItem() == pEntDrawItem;
 			if(pEntDrawItem->GetEntityTreeItemData()->GetEditModel())
@@ -505,8 +499,9 @@ EntityDrawItem *EntityDraw::FindDrawItem(EntityTreeItemData *pEntTreeItemData)
 void EntityDraw::FlushRootEntity()
 {
 	EntityModel *pEntModel = static_cast<EntityModel *>(m_pProjItem->GetModel());
-
 	HyEntity2d *pOldRootEntity = m_pRootEntity;
+	m_pRootEntity = nullptr;
+
 	switch(pEntModel->GetBaseClassType())
 	{
 	case ENTBASECLASS_HyEntity2d:
@@ -520,10 +515,13 @@ void EntityDraw::FlushRootEntity()
 		break;
 	
 	case ENTBASECLASS_HyGui: {
-		// Initialize the GUI layout with the entity model along with the ctor keyframes that indicate non-default properties
 		QMap<EntityTreeItemData *, QJsonObject> &ctorKeyFrameMap = pEntModel->GetCtorKeyFramesMap();
 
+		// HyGui requires a HyOrientation and HyPanelInit to be instanciated (look in 'ctorKeyFrameMap' for initial values)
 		HyOrientation eRootGuiOrientation = HYORIENT_Horizontal;
+		HyUiPanelInit panelInit;
+
+		// Initialize 'eRootGuiOrientation' using HyGui fused item (m_RootLayout)
 		if(ctorKeyFrameMap.contains(pEntModel->GetFusedItem()))
 		{
 			QJsonObject rootLayoutObj = ctorKeyFrameMap[pEntModel->GetFusedItem()];
@@ -531,7 +529,7 @@ void EntityDraw::FlushRootEntity()
 				eRootGuiOrientation = HyGlobal::GetOrientationFromString(rootLayoutObj["Layout"].toObject()["Orientation"].toString());
 		}
 
-		m_pRootEntity = nullptr; // Deleted above
+		// Initialize 'panelInit' using HyGui base class specific properties
 		if(ctorKeyFrameMap.contains(pEntModel->GetTreeModel().GetRootTreeItemData()))
 		{
 			QJsonObject rootEntityObj = ctorKeyFrameMap[pEntModel->GetTreeModel().GetRootTreeItemData()];
@@ -542,7 +540,7 @@ void EntityDraw::FlushRootEntity()
 				{
 					QJsonObject panelObj = guiCategoryObj["Panel Setup"].toObject();
 					QUuid nodeUuid;
-					HyUiPanelInit panelInit = DlgSetUiPanel::DeserializePanelInit(panelObj, nodeUuid);
+					panelInit = DlgSetUiPanel::DeserializePanelInit(panelObj, nodeUuid);
 
 					if(nodeUuid.isNull())
 						m_pRootEntity = new HyGui(eRootGuiOrientation, panelInit, this);
@@ -569,9 +567,7 @@ void EntityDraw::FlushRootEntity()
 		}
 		
 		if(m_pRootEntity == nullptr)
-			m_pRootEntity = new HyGui(eRootGuiOrientation, HyUiPanelInit(), this);
-
-		delete pOldRootEntity;
+			m_pRootEntity = new HyGui(eRootGuiOrientation, panelInit, this);
 
 		m_GuiLayoutMap.clear();
 		if(m_ItemList.empty()) // Only bother to populate GUI layout if m_ItemList has been populated
@@ -640,6 +636,8 @@ void EntityDraw::FlushRootEntity()
 		HyGuiLog("EntityDraw::FlushRootEntity - Unsupported base class type!", LOGTYPE_Error);
 		break;
 	}
+
+	delete pOldRootEntity;
 }
 
 /*virtual*/ void EntityDraw::OnApplyJsonMeta(QJsonObject &itemMetaObj) /*override*/
@@ -650,6 +648,8 @@ void EntityDraw::FlushRootEntity()
 		if(pItem->GetHyNode()->GetInternalFlags() & NODETYPE_IsBody)
 			static_cast<IHyBody2d *>(pItem->GetHyNode())->ResetDisplayOrder();
 	}
+
+	FlushRootEntity(); // This is required here for when switching base classes, and m_pRootEntity is still pointing at the old entity
 
 	QList<IDrawExItem *> staleItemList(m_ItemList);
 	m_ItemList.clear();
@@ -761,7 +761,7 @@ void EntityDraw::FlushRootEntity()
 		}
 
 		m_ItemList.push_back(pDrawItem);						// Repopulate 'm_ItemList' with the valid existing or new draw items
-		m_pRootEntity->ChildAppend(*pDrawItem->GetHyNode());	// Reinsert each valid draw item into the m_RootEntity, to establish the correct `descObjList` display order
+		m_pRootEntity->ChildAppend(*pDrawItem->GetHyNode());	// Reinsert each valid draw item into the m_pRootEntity, to establish the correct `descObjList` display order
 
 		// Repopulate `m_SelectedItemList` if draw item is valid to select
 		if(pDrawItem->GetEntityTreeItemData()->IsSelected() && pDrawItem->GetEntityTreeItemData()->IsSelectable())
@@ -847,7 +847,7 @@ void EntityDraw::FlushRootEntity()
 		iFrameIndex = dopeSheetSceneRef.GetCurrentFrame();
 	}
 
-	// Transferring the children in 'm_ActiveTransform' back into 'm_RootEntity' will be done automatically in OnApplyJsonMeta()
+	// Transferring the children in 'm_ActiveTransform' back into 'm_pRootEntity' will be done automatically in OnApplyJsonMeta()
 	QUndoCommand *pCmd = new EntityUndoCmd_Transform(*m_pProjItem, iStateIndex, iFrameIndex, treeItemDataList, newTransformList, m_PrevTransformList);
 	m_pProjItem->GetUndoStack()->push(pCmd);
 }
