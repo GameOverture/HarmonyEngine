@@ -89,11 +89,13 @@ public:
 	bool RemoveSpacer(HySpacerHandle hSpacer);
 
 	HyLayoutHandle InsertLayout(HyOrientation eNewLayoutType, HyLayoutHandle hInsertInto = HY_UNUSED_HANDLE);
-	glm::ivec2 GetLayoutSize(HyLayoutHandle hLayout) const;
-	HyOrientation GetLayoutOrientation(HyLayoutHandle hLayout) const;
-	bool SetLayoutOrientation(HyLayoutHandle hAffectedLayout, HyOrientation eNewLayoutType);
-	bool SetLayoutMargin(HyLayoutHandle hAffectedLayout, int16 iLeft, int16 iBottom, int16 iRight, int16 iTop);
-	bool SetLayoutWidgetSpacing(HyLayoutHandle hAffectedLayout, int32 iWidgetSpacing);
+	glm::ivec2 GetLayoutSize(HyLayoutHandle hLayout = HY_UNUSED_HANDLE);
+	HyOrientation GetLayoutOrientation(HyLayoutHandle hLayout = HY_UNUSED_HANDLE);
+	bool SetLayoutOrientation(HyOrientation eNewLayoutType, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+	bool IsLayoutReverseOrder(HyLayoutHandle hLayout = HY_UNUSED_HANDLE) const;
+	bool SetLayoutReverseOrder(bool bReverse, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+	bool SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+	bool SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 	bool RemoveLayout(HyLayoutHandle hLayout);
 
 	int32 GetDefaultWidgetSpacing() const;

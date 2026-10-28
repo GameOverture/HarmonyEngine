@@ -1129,9 +1129,14 @@ QString PropertiesTreeModel::ConvertValueToString(TreeModelItem *pTreeItem) cons
 	case PROPERTIESTYPE_ComboBoxInt:
 		sRetStr += propDefRef.delegateBuilder.toStringList()[treeItemValue.toInt()];
 		break;
-	case PROPERTIESTYPE_ComboBoxItems:
-		sRetStr += treeItemValue.toString();
-		break;
+	case PROPERTIESTYPE_ComboBoxItems: {
+		QUuid itemUuid = treeItemValue.toUuid();
+		TreeModelItemData *pFoundItem = m_pProjItemData->GetProject().FindItemData(itemUuid);
+		if(pFoundItem)
+			sRetStr += pFoundItem->GetText();
+		else
+			sRetStr += treeItemValue.toString();
+		break; }
 	case PROPERTIESTYPE_StatesComboBox: {
 		if(m_pProjItemData)
 		{

@@ -97,7 +97,7 @@ void HyLayout::DetachAllItems()
 	SetSizeDirty();
 }
 
-bool HyLayout::IsReverseOrder()
+bool HyLayout::IsReverseOrder() const
 {
 	if(m_eLayoutType == HYORIENT_Vertical)
 		return !m_bReverse; // HYORIENT_Vertical needs this flipped to achieve top->bottom default

@@ -53,7 +53,7 @@ public:
 	bool RemoveItem(IHyGuiBase &itemRef);
 	void DetachAllItems();
 
-	bool IsReverseOrder();
+	bool IsReverseOrder() const;
 	void ReverseOrder(bool bReverse);
 
 	const HyMargins<int16> &GetMargins() const;

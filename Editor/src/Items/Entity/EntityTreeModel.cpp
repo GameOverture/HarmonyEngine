@@ -1205,27 +1205,76 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 
 			return QVariant();
 		}
-
 		if(indexRef.column() != COLUMN_CodeName)
 			return QVariant();
 
 		if(pItem->GetType() == ITEM_ActorMover)
 			return QIcon(":/icons16x16/shapes/shapes_capsule.png");
-
-		if(pItem->GetType() == ITEM_PrimLayer || pItem->GetType() == ITEM_ShapeFixture)
+		else if(pItem->GetType() == ITEM_UiLayout)
 		{
 			int iStateIndex = 0;
 			if(m_ModelRef.GetItem().GetWidget())
 				iStateIndex = m_ModelRef.GetItem().GetWidget()->GetCurStateIndex();
 			const EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_ModelRef.GetStateData(iStateIndex))->GetDopeSheetScene();
 
-			QIcon icon;
+			
+			QString sIconUrl = ":/icons16x16/layout-";
+		
+			QJsonValue dataVal = dopeSheetSceneRef.BasicExtrapolateKeyFrameProperty(pItem, dopeSheetSceneRef.GetCurrentFrame(), "Layout", "Orientation");
+			if(dataVal.isNull() == false)
+			{
+				if(dataVal.isString() == false)
+					HyGuiLog("EntityTreeModel::data() - Layout 'Orientation' property is not a JSON string", LOGTYPE_Error);
+				
+				for(int iOrientIndex = 0; iOrientIndex < HYNUM_ORIENTATIONS; ++iOrientIndex)
+				{
+					if(dataVal.toString().compare(HyGlobal::OrientationName(static_cast<HyOrientation>(iOrientIndex))) == 0)
+					{
+						switch(static_cast<HyOrientation>(iOrientIndex))
+						{
+						case HYORIENT_Horizontal:	sIconUrl += "horizontal"; break;
+						case HYORIENT_Vertical:		sIconUrl += "vertical"; break;
+						default:
+							HyGuiLog("EntityTreeModel::data() - Layout unhandled orientation", LOGTYPE_Error);
+							break;
+						}
+						break; // for loop
+					}
+				}
+
+				QJsonValue dataVal = dopeSheetSceneRef.BasicExtrapolateKeyFrameProperty(pItem, dopeSheetSceneRef.GetCurrentFrame(), "Layout", "Reverse");
+				if(dataVal.isUndefined() == false && dataVal.isNull() == false)
+				{
+					if(dataVal.isBool() == false)
+						HyGuiLog("EntityTreeModel::data() - Layout 'Reverse' property is not a JSON bool", LOGTYPE_Error);
+
+					if(dataVal.toBool())
+						sIconUrl += "-reverse";
+				}
+
+				sIconUrl += ".png";
+			}
+			else
+				sIconUrl += "horizontal.png"; // Default
+
+			return QVariant(QIcon(sIconUrl));
+		}
+		else if(pItem->GetType() == ITEM_PrimLayer || pItem->GetType() == ITEM_ShapeFixture)
+		{
+			int iStateIndex = 0;
+			if(m_ModelRef.GetItem().GetWidget())
+				iStateIndex = m_ModelRef.GetItem().GetWidget()->GetCurStateIndex();
+			const EntityDopeSheetScene &dopeSheetSceneRef = static_cast<EntityStateData *>(m_ModelRef.GetStateData(iStateIndex))->GetDopeSheetScene();
+
 			QString sIconUrl = ":/icons16x16/shapes/" % QString(pItem->GetType() == ITEM_PrimLayer ? "primitive_" : "shapes_");
 
-			QVariant dataVariant = dopeSheetSceneRef.BasicExtrapolateKeyFrameProperty(pItem, dopeSheetSceneRef.GetCurrentFrame(), pItem->GetType() == ITEM_PrimLayer ? "Primitive Layer" : "Shape", "Data");
-			if(dataVariant.isValid())
+			QJsonValue dataVal = dopeSheetSceneRef.BasicExtrapolateKeyFrameProperty(pItem, dopeSheetSceneRef.GetCurrentFrame(), pItem->GetType() == ITEM_PrimLayer ? "Primitive Layer" : "Shape", "Data");
+			if(dataVal.isUndefined() == false && dataVal.isNull() == false)
 			{
-				QJsonObject shapeDataObj = dataVariant.toJsonObject();
+				if(dataVal.isObject() == false)
+					HyGuiLog("EntityTreeModel::data() - PrimLayer/Fixture 'Data' property is not a JSON object", LOGTYPE_Error);
+
+				QJsonObject shapeDataObj = dataVal.toObject();
 
 				QString sType = shapeDataObj["type"].toString();
 				if(sType.compare(HYLINECHAIN_Name) == 0)
@@ -1252,8 +1301,7 @@ QVariant EntityTreeModel::data(const QModelIndex &indexRef, int iRole /*= Qt::Di
 			else
 				sIconUrl += "icon.png";
 
-			icon.addFile(sIconUrl);
-			return QVariant(icon);
+			return QVariant(QIcon(sIconUrl));
 		}
 
 		if(pReferencedItemData)

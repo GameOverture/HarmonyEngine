@@ -514,6 +514,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 	case ITEM_UiLayout:
 		m_pPropertiesModel->InsertCategory(-1, "Layout", QVariant(), false, "Holds UI widget entities and arranges them programatically");
 		m_pPropertiesModel->AppendProperty("Layout", "Orientation", PROPERTIESTYPE_ComboBoxString, HyGlobal::OrientationName(HYORIENT_Horizontal), "The orientation of this layout. This determines which direction UI widgets are arranged", PROPERTIESACCESS_ToggleUnchecked, QVariant(), QVariant(), QVariant(), QString(), QString(), HyGlobal::GetOrientationNameList());
+		m_pPropertiesModel->AppendProperty("Layout", "Reverse", PROPERTIESTYPE_bool, false, "Reverse the order of the widgets within the layout. This determines which direction UI widgets are arranged", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Layout", "Margins", PROPERTIESTYPE_vec4, QRectF(0.0f, 0.0f, 0.0f, 0.0f), "The layout's margins (Left, Bottom, Right, Top) to keep its contained widgets within (in pixels)", PROPERTIESACCESS_ToggleUnchecked, -fRANGE, fRANGE);
 		m_pPropertiesModel->AppendProperty("Layout", "Widget Spacing", PROPERTIESTYPE_int, 0, "Sets the spacing in pixels between widgets inside the layout", PROPERTIESACCESS_ToggleUnchecked);
 		break;

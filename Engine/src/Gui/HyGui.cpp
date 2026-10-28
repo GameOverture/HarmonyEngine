@@ -386,23 +386,29 @@ HyLayoutHandle HyGui::InsertLayout(HyOrientation eNewLayoutType, HyLayoutHandle 
 	return hNewLayoutHandle;
 }
 
-glm::ivec2 HyGui::GetLayoutSize(HyLayoutHandle hLayout) const
+glm::ivec2 HyGui::GetLayoutSize(HyLayoutHandle hLayout /*= HY_UNUSED_HANDLE*/)
 {
+	if(hLayout == HY_UNUSED_HANDLE)
+		return glm::ivec2(m_RootLayout.GetWidth(), m_RootLayout.GetHeight());
+
 	if(m_SubLayoutMap.find(hLayout) != m_SubLayoutMap.end())
 		return glm::ivec2(m_SubLayoutMap.at(hLayout)->GetWidth(), m_SubLayoutMap.at(hLayout)->GetHeight());
 
 	return glm::ivec2(0, 0);
 }
 
-HyOrientation HyGui::GetLayoutOrientation(HyLayoutHandle hLayout) const
+HyOrientation HyGui::GetLayoutOrientation(HyLayoutHandle hLayout /*= HY_UNUSED_HANDLE*/)
 {
+	if(hLayout == HY_UNUSED_HANDLE)
+		return m_RootLayout.GetLayoutType();
+
 	if(m_SubLayoutMap.find(hLayout) != m_SubLayoutMap.end())
 		return m_SubLayoutMap.at(hLayout)->GetLayoutType();
 
 	return HYORIENT_Null;
 }
 
-bool HyGui::SetLayoutOrientation(HyLayoutHandle hAffectedLayout, HyOrientation eNewLayoutType)
+bool HyGui::SetLayoutOrientation(HyOrientation eNewLayoutType, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
 {
 	if(hAffectedLayout == HY_UNUSED_HANDLE)
 	{
@@ -421,7 +427,37 @@ bool HyGui::SetLayoutOrientation(HyLayoutHandle hAffectedLayout, HyOrientation e
 	return false;
 }
 
-bool HyGui::SetLayoutMargin(HyLayoutHandle hAffectedLayout, int16 iLeft, int16 iBottom, int16 iRight, int16 iTop)
+bool HyGui::IsLayoutReverseOrder(HyLayoutHandle hLayout /*= HY_UNUSED_HANDLE*/) const
+{
+	if(hLayout == HY_UNUSED_HANDLE)
+		return m_RootLayout.IsReverseOrder();
+
+	if(m_SubLayoutMap.find(hLayout) != m_SubLayoutMap.end())
+		return m_SubLayoutMap.at(hLayout)->GetLayoutType();
+
+	return HYORIENT_Null;
+}
+
+bool HyGui::SetLayoutReverseOrder(bool bReverse, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
+{
+	if(hAffectedLayout == HY_UNUSED_HANDLE)
+	{
+		m_RootLayout.ReverseOrder(bReverse);
+		SetSizeDirty();
+		return true;
+	}
+	
+	if(m_SubLayoutMap.find(hAffectedLayout) != m_SubLayoutMap.end())
+	{
+		m_SubLayoutMap.at(hAffectedLayout)->ReverseOrder(bReverse);
+		SetSizeDirty();
+		return true;
+	}
+
+	return false;
+}
+
+bool HyGui::SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
 {
 	if(hAffectedLayout == HY_UNUSED_HANDLE)
 	{
@@ -440,7 +476,7 @@ bool HyGui::SetLayoutMargin(HyLayoutHandle hAffectedLayout, int16 iLeft, int16 i
 	return false;
 }
 
-bool HyGui::SetLayoutWidgetSpacing(HyLayoutHandle hAffectedLayout, int32 iWidgetSpacing)
+bool HyGui::SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
 {
 	if(hAffectedLayout == HY_UNUSED_HANDLE)
 	{

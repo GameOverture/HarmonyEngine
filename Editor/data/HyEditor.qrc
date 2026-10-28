@@ -432,5 +432,7 @@
         <file>icons16x16/tileset-terrainset-cornersandsides.png</file>
         <file>icons16x16/tileset-terrainset-sides.png</file>
         <file>icons16x16/shapes/shapes_point.png</file>
+        <file>icons16x16/layout-horizontal-reverse.png</file>
+        <file>icons16x16/layout-vertical-reverse.png</file>
     </qresource>
 </RCC>
