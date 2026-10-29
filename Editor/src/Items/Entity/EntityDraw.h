@@ -26,8 +26,6 @@ class EntityDraw : public IDrawEx
 	EditModeState							m_eEditModeState;
 	HyPrimitive2d							m_EditModeWindowOutline;
 
-	QMap<HyLayoutHandle, QUuid>				m_GuiLayoutMap;
-
 	// Custom TileMap Cursors
 	QCursor									m_CursorFill;
 	QCursor									m_CursorEyeDrop;

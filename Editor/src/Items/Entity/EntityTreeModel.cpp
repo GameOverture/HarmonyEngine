@@ -258,15 +258,17 @@ bool EntityTreeModel::PopGuiItem(EntityTreeItemData *pItem)
 		return false;
 	}
 
+	QUuid parentUuid;
 	QJsonObject poppedObj;
 	bool bFound = false;
 	std::function<void(EntityTreeModel::GuiItem &)> fpPopFunc =
 		[&](EntityTreeModel::GuiItem &curItem)
 		{
-			for(int i = 0; i < curItem.m_ChildList.size(); ++i)
+			for(int i = 0; i < curItem.m_ChildList.size() && bFound == false; ++i)
 			{
 				if(curItem.m_ChildList[i].m_Uuid == pItem->GetThisUuid())
 				{
+					parentUuid = curItem.m_Uuid;
 					poppedObj = curItem.m_ChildList[i].Serialize();
 					curItem.m_ChildList.removeAt(i);
 					bFound = true;
@@ -278,11 +280,35 @@ bool EntityTreeModel::PopGuiItem(EntityTreeItemData *pItem)
 	fpPopFunc(m_GuiLayout);
 	if(bFound)
 	{
-		m_PoppedGuiItemsMap.insert(pItem, poppedObj);
+		m_PoppedGuiItemsMap.insert(pItem, std::pair<QUuid, QJsonObject>(parentUuid, poppedObj));
+		while(m_GuiLayoutItemList.contains(pItem))
+			m_GuiLayoutItemList.removeAt(m_GuiLayoutItemList.indexOf(pItem));
+
 		return true;
 	}
 	
 	return false;
+}
+
+const EntityTreeModel::GuiItem *EntityTreeModel::FindGuiItem(EntityTreeItemData *pItem) const // Find the GuiItem that corresponds to 'pItem'
+{
+	QUuid itemUuid = pItem->GetThisUuid();
+	
+	QStack<const GuiItem *> guiItemStack;
+	guiItemStack.push(&m_GuiLayout);
+
+	const GuiItem *pCurGuiItem = nullptr;
+	while(guiItemStack.empty() == false)
+	{
+		pCurGuiItem = guiItemStack.pop();
+		if(pCurGuiItem->m_Uuid == itemUuid)
+			return pCurGuiItem;
+
+		for(const GuiItem &guiItem : pCurGuiItem->m_ChildList)
+			guiItemStack.push(&guiItem);
+	}
+
+	return nullptr;
 }
 
 QUuid EntityTreeModel::FindGuiLayoutUuid(EntityTreeItemData *pItem) const
@@ -353,10 +379,8 @@ void EntityTreeModel::RefreshGuiLayout()
 		{
 			for(int i = 0; i < pCurTreeItem->GetNumChildren(); ++i)
 			{
-				GuiItem childItem(pCurTreeItem->GetChild(i)->data(0).value<EntityTreeItemData *>()->GetThisUuid());
-
-				curGuiItem.m_ChildList.push_back(childItem);
-				fpSerializeFunc(pCurTreeItem->GetChild(i), childItem);
+				curGuiItem.m_ChildList.push_back(GuiItem(pCurTreeItem->GetChild(i)->data(0).value<EntityTreeItemData *>()->GetThisUuid()));
+				fpSerializeFunc(pCurTreeItem->GetChild(i), curGuiItem.m_ChildList.last());
 			}
 		};
 	fpSerializeFunc(pLayoutRootItem, m_GuiLayout);
@@ -800,6 +824,30 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 	return true;
 }
 
+EntityTreeModel::GuiItem &EntityTreeModel::GetRootLayout()
+{
+	return m_GuiLayout;
+}
+
+HyLayoutHandle EntityTreeModel::GetLayoutHandle(QUuid layoutUuid)
+{
+	QStack<GuiItem *> guiItemStack;
+	guiItemStack.push(&m_GuiLayout);
+
+	GuiItem *pCurGuiItem = nullptr;
+	while(guiItemStack.empty() == false)
+	{
+		pCurGuiItem = guiItemStack.pop();
+		if(pCurGuiItem->m_Uuid == layoutUuid)
+			return pCurGuiItem->m_hLayoutHandle;
+
+		for(GuiItem &guiItem : pCurGuiItem->m_ChildList)
+			guiItemStack.push(&guiItem);
+	}
+
+	return HY_HANDLE_INVALID;
+}
+
 QJsonObject EntityTreeModel::SerializeGuiLayout() const
 {
 	return m_GuiLayout.Serialize();
@@ -1003,7 +1051,6 @@ EntityTreeItemData *EntityTreeModel::Cmd_AllocGuiItemTreeItem(ItemType eGuiItemT
 	if(guiLayoutParentUuid.isNull() == false)
 	{
 		InsertGuiItem(guiLayoutParentUuid, GuiItem(pNewItem->GetThisUuid()).Serialize());
-		pNewItem->SetGuiParentUuid(guiLayoutParentUuid);
 		pParentTreeItem = GetItem(FindIndex<EntityTreeItemData *>(FindTreeItemData(guiLayoutParentUuid), 0));
 	}
 	else
@@ -1093,12 +1140,12 @@ bool EntityTreeModel::Cmd_ReaddChild(EntityTreeItemData *pItem, int iRow)
 		pParentTreeItem = GetRootTreeItem();
 
 		// If apart of GUI layout, determine its layout parent
-		if(pItem->GetGuiParentUuid().isNull() == false && m_PoppedGuiItemsMap[pItem].isEmpty() == false)
+		if(m_PoppedGuiItemsMap.contains(pItem))
 		{
-			InsertGuiItem(pItem->GetGuiParentUuid(), m_PoppedGuiItemsMap[pItem]);
+			InsertGuiItem(m_PoppedGuiItemsMap[pItem].first, m_PoppedGuiItemsMap[pItem].second);
 
 			if(m_ModelRef.GetBaseClassType() == ENTBASECLASS_HyGui)
-				pParentTreeItem = GetItem(FindIndex<EntityTreeItemData *>(FindTreeItemData(pItem->GetGuiParentUuid()), 0));
+				pParentTreeItem = GetItem(FindIndex<EntityTreeItemData *>(FindTreeItemData(m_PoppedGuiItemsMap[pItem].first), 0));
 		}
 	}
 

@@ -197,16 +197,6 @@ void EntityTreeItemData::SetReferencedItemUuid(QUuid uuidOfReferencedItem)
 	m_ReferencedItemUuid = uuidOfReferencedItem;
 }
 
-const QUuid &EntityTreeItemData::GetGuiParentUuid() const
-{
-	return m_GuiParentUuid;
-}
-
-void EntityTreeItemData::SetGuiParentUuid(QUuid uuidOfGuiParent)
-{
-	m_GuiParentUuid = uuidOfGuiParent;
-}
-
 EntityItemDeclarationType EntityTreeItemData::GetDeclarationType() const
 {
 	return m_eDeclarationType;

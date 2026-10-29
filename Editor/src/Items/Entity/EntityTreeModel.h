@@ -48,9 +48,11 @@ public:
 	{
 		QUuid												m_Uuid;						// References a widget, or a layout/spacer
 		QList<GuiItem>										m_ChildList;				// Only used when type is ITEM_UiLayout
+		HyLayoutHandle										m_hLayoutHandle;			// Only used when type is ITEM_UiLayout and gets reset on FlushRootEntity()
 
-		GuiItem(QUuid uuid) : m_Uuid(uuid) { }
-		GuiItem(QJsonObject serializedObj)
+		GuiItem(QUuid uuid) : m_Uuid(uuid), m_hLayoutHandle(HY_UNUSED_HANDLE)
+		{ }
+		GuiItem(QJsonObject serializedObj) : m_hLayoutHandle(HY_UNUSED_HANDLE)
 		{
 			if(serializedObj.isEmpty())
 				return;
@@ -84,8 +86,8 @@ public:
 	};
 
 private:
-	GuiItem													m_GuiLayout;				// Serialized as an object "guiLayout" - purpose is to store the GUI layout heirarchy
-	QMap<EntityTreeItemData *, QJsonObject>					m_PoppedGuiItemsMap;
+	GuiItem														m_GuiLayout;				// Serialized as an object "guiLayout" - purpose is to store the GUI layout heirarchy
+	QMap<EntityTreeItemData *, std::pair<QUuid, QJsonObject>>	m_PoppedGuiItemsMap;		// Value = <parent UUID, GuiItem JSON obj>
 
 public:
 	explicit EntityTreeModel(EntityModel &modelRef, QString sEntityCodeName, QJsonObject fileMetaObj, QObject *pParent = nullptr);
@@ -105,7 +107,8 @@ public:
 	QList<EntityTreeItemData *> GetGuiLayoutItemDataList() const;
 	void InsertGuiItem(QUuid uuidParent, QJsonObject guiItemObj);
 	bool PopGuiItem(EntityTreeItemData *pItem);
-	QUuid FindGuiLayoutUuid(EntityTreeItemData *pItem) const;
+	const GuiItem *FindGuiItem(EntityTreeItemData *pItem) const; // Find the GuiItem that corresponds to 'pItem'
+	QUuid FindGuiLayoutUuid(EntityTreeItemData *pItem) const; // Find the layout that contains 'pItem' and return its UUID
 	void RefreshGuiLayout(); // Take the current heirarchy in the model and set it as m_GuiLayout
 
 	// Does not retrieve the root entity data. childListOut contains the fused items
@@ -121,6 +124,8 @@ public:
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
 
+	GuiItem &GetRootLayout();
+	HyLayoutHandle GetLayoutHandle(QUuid layoutUuid);
 	QJsonObject SerializeGuiLayout() const;
 
 private: // These functions should only be called by EntityModel's Cmd_ functions

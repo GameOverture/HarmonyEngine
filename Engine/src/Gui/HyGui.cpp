@@ -457,7 +457,12 @@ bool HyGui::SetLayoutReverseOrder(bool bReverse, HyLayoutHandle hAffectedLayout 
 	return false;
 }
 
-bool HyGui::SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
+bool HyGui::SetLayoutMargins(HyMargins<uint16> margins, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
+{
+	return SetLayoutMargins(margins.left, margins.bottom, margins.right, margins.top, hAffectedLayout);
+}
+
+bool HyGui::SetLayoutMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout /*= HY_UNUSED_HANDLE*/)
 {
 	if(hAffectedLayout == HY_UNUSED_HANDLE)
 	{

@@ -94,7 +94,8 @@ public:
 	bool SetLayoutOrientation(HyOrientation eNewLayoutType, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 	bool IsLayoutReverseOrder(HyLayoutHandle hLayout = HY_UNUSED_HANDLE) const;
 	bool SetLayoutReverseOrder(bool bReverse, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
-	bool SetLayoutMargin(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+	bool SetLayoutMargins(HyMargins<uint16> margins, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
+	bool SetLayoutMargins(int16 iLeft, int16 iBottom, int16 iRight, int16 iTop, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 	bool SetLayoutWidgetSpacing(int32 iWidgetSpacing, HyLayoutHandle hAffectedLayout = HY_UNUSED_HANDLE);
 	bool RemoveLayout(HyLayoutHandle hLayout);
 

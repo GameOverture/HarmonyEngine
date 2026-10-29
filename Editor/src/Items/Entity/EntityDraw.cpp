@@ -569,15 +569,13 @@ void EntityDraw::FlushRootEntity()
 		if(m_pRootEntity == nullptr)
 			m_pRootEntity = new HyGui(eRootGuiOrientation, panelInit, this);
 
-		m_GuiLayoutMap.clear();
 		if(m_ItemList.empty()) // Only bother to populate GUI layout if m_ItemList has been populated
 			break;
 		// Recursively populate the GUI layout
-		std::function<void(HyLayoutHandle, QJsonObject)> fpRecursivelyPopulateLayout = 
-			[&](HyLayoutHandle hParentHandle, QJsonObject guiItemObj)
+		std::function<void(HyLayoutHandle, EntityTreeModel::GuiItem &)> fpRecursivelyPopulateLayout = 
+			[&](HyLayoutHandle hParentHandle, EntityTreeModel::GuiItem &guiItemRef)
 			{
 				HyGui *pRootGui = static_cast<HyGui *>(m_pRootEntity);
-				QUuid childUuid = QUuid(guiItemObj["uuid"].toString());
 
 				// First look for GUI layout items (layouts and spacers)
 				QList<EntityTreeItemData *> guiLayoutItemList = pEntModel->GetTreeModel().GetGuiLayoutItemDataList();
@@ -585,21 +583,28 @@ void EntityDraw::FlushRootEntity()
 
 				for(EntityTreeItemData *pEntItemData : guiLayoutItemList)
 				{
-					if(pEntItemData->GetThisUuid() == childUuid)
+					if(pEntItemData->GetThisUuid() == guiItemRef.m_Uuid)
 					{
 						if(pEntItemData->GetType() == ITEM_UiLayout)
 						{
-							HyLayoutHandle hCurHandle = HY_UNUSED_HANDLE;
-							if(childUuid != static_cast<EntityModel *>(m_pProjItem->GetModel())->GetFusedItem()->GetThisUuid()) // The root layout is already "fused" in pRootGui
-								hCurHandle = pRootGui->InsertLayout(HYORIENT_Horizontal, hParentHandle);
-							m_GuiLayoutMap.insert(hCurHandle, childUuid);
-
-							if(guiItemObj.contains("children"))
+							guiItemRef.m_hLayoutHandle = HY_UNUSED_HANDLE;
+							// The root layout is already "fused" in pRootGui
+							if(guiItemRef.m_Uuid != static_cast<EntityModel *>(m_pProjItem->GetModel())->GetFusedItem()->GetThisUuid())
 							{
-								QJsonArray childrenArray = guiItemObj["children"].toArray();
-								for(int32 i = 0; i < childrenArray.size(); ++i)
-									fpRecursivelyPopulateLayout(hCurHandle, childrenArray[i].toObject());
+								QJsonObject layoutCtorObj = ctorKeyFrameMap[pEntItemData];
+								HyOrientation eLayoutOrientation = HYORIENT_Horizontal;
+								if(layoutCtorObj.contains("Layout"))
+								{
+									QJsonObject layoutObj = layoutCtorObj["Layout"].toObject();
+									if(layoutObj.contains("Orientation"))
+										eLayoutOrientation = HyGlobal::GetOrientationFromString(layoutObj["Orientation"].toString());
+								}
+
+								guiItemRef.m_hLayoutHandle = pRootGui->InsertLayout(eLayoutOrientation, hParentHandle);
 							}
+
+							for(int iChildIndex = 0; iChildIndex < guiItemRef.m_ChildList.size(); ++iChildIndex)
+								fpRecursivelyPopulateLayout(guiItemRef.m_hLayoutHandle, guiItemRef.m_ChildList[iChildIndex]);
 						}
 						else if(pEntItemData->GetType() == ITEM_UiSpacer)
 							pRootGui->InsertSpacer(HYSIZEPOLICY_Expanding, 0, hParentHandle);
@@ -616,7 +621,7 @@ void EntityDraw::FlushRootEntity()
 						HyGuiLog("EntityDraw::FlushRootEntity - Found null EntityTreeItemData in m_ItemList while populating GUI layout!", LOGTYPE_Error);
 						continue;
 					}
-					if(pEntItemData->GetThisUuid() != childUuid)
+					if(pEntItemData->GetThisUuid() != guiItemRef.m_Uuid)
 						continue;
 
 					if(pEntItemData->IsWidgetItem() == false && pEntItemData->IsLayoutItem() == false)
@@ -629,7 +634,7 @@ void EntityDraw::FlushRootEntity()
 					break;
 				}
 			};
-		fpRecursivelyPopulateLayout(HY_UNUSED_HANDLE, pEntModel->GetTreeModel().SerializeGuiLayout());
+		fpRecursivelyPopulateLayout(HY_UNUSED_HANDLE, pEntModel->GetTreeModel().GetRootLayout());
 		break; }
 
 	default:
@@ -686,12 +691,25 @@ void EntityDraw::FlushRootEntity()
 		}
 	}
 
+	EntityModel *pEntModel = static_cast<EntityModel *>(m_pProjItem->GetModel());
+
 	// Add the fused item next if it exists
-	EntityBaseClassType eEntBaseClassType = static_cast<EntityModel *>(m_pProjItem->GetModel())->GetBaseClassType();
+	EntityBaseClassType eEntBaseClassType = pEntModel->GetBaseClassType();
 	QJsonArray fusedItemArray = itemMetaObj["fusedItemList"].toArray();
 	QJsonObject fusedItemObj = fusedItemArray.at(eEntBaseClassType).toObject();
 	if(fusedItemObj.isEmpty() == false)
 		fpPushDescObj(fusedItemObj);
+
+	// If this is a HyGui root entity, add layout items now
+	if(eEntBaseClassType == ENTBASECLASS_HyGui)
+	{
+		QJsonArray descLayoutArray = itemMetaObj["descLayoutList"].toArray(); // NOTE: Does not include root layout (fused item)
+		for(int32 i = 0; i < descLayoutArray.size(); ++i)
+		{
+			if(descLayoutArray[i].isObject())
+				fpPushDescObj(descLayoutArray[i].toObject());
+		}
+	}
 
 	// Add children items last (to simulate implicit display order)
 	for(int32 i = 0; i < descChildArray.size(); ++i)

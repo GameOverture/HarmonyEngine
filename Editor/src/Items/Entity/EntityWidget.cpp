@@ -280,6 +280,7 @@ EntityWidget::~EntityWidget()
 
 		bool bRootOrBvFolder = false;
 		bool bSelectedHaveSameParent = true;
+		bool bUsedLayoutSelected = false;
 		bool bAllSameType = true;
 		bool bAllArrayItems = true;
 		bool bFusedItemSelected = false;
@@ -300,6 +301,12 @@ EntityWidget::~EntityWidget()
 				bRootOrBvFolder = true;
 			if(pEntItemData->GetEntType() == ENTTYPE_FusedItem)
 				bFusedItemSelected = true;
+			if(pEntItemData->GetType() == ITEM_UiLayout)
+			{
+				const EntityTreeModel::GuiItem *pGuiItem = static_cast<EntityModel *>(m_ItemRef.GetModel())->GetTreeModel().FindGuiItem(pEntItemData);
+				if(pGuiItem)
+					bUsedLayoutSelected = pGuiItem->m_ChildList.empty() == false;
+			}
 		}
 
 		ui->actionOrderChildrenUp->setEnabled(bSelectedHaveSameParent && bRootOrBvFolder == false && bFusedItemSelected == false);
@@ -355,7 +362,7 @@ EntityWidget::~EntityWidget()
 		const QMimeData *pMimeData = pClipboard->mimeData();
 		ui->actionPasteEntityItems->setEnabled(pMimeData->hasFormat(HyGlobal::MimeTypeString(MIMETYPE_EntityItems)));
 
-		ui->actionRemoveItems->setEnabled(bRootOrBvFolder == false);
+		ui->actionRemoveItems->setEnabled(bFusedItemSelected == false && bUsedLayoutSelected == false && bRootOrBvFolder == false);
 		
 		// ARRAY ACTIONS - PackTo, DuplicateTo, UnpackFrom
 		if(bSelectedHaveSameParent && bAllSameType && bAllArrayItems && bRootOrBvFolder == false)

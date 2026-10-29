@@ -216,8 +216,6 @@ class EntityTreeItemData : public TreeModelItemData
 
 	QUuid												m_ReferencedItemUuid;
 
-	QUuid												m_GuiParentUuid;
-
 	bool												m_bIsLocked;			// Whether this item is locked and cannot be selected
 	bool												m_bIsSelected;			// Whether this item is considered selected. Applicable to in all views (Harmony, Node List, Dope Sheet, etc)
 	bool												m_bIsDopeExpanded;		// True when this item is expanded and showing all its property keyframes on each row. False shows a collapsed, single row with all its keyframes
@@ -240,9 +238,6 @@ public:
 	const QUuid &GetThisUuid() const;
 	const QUuid &GetReferencedItemUuid() const;
 	void SetReferencedItemUuid(QUuid uuidOfReferencedItem);
-
-	const QUuid &GetGuiParentUuid() const;
-	void SetGuiParentUuid(QUuid uuidOfGuiParent);
 
 	EntityItemDeclarationType GetDeclarationType() const;
 

@@ -50,6 +50,7 @@
 #include <future>
 #include <memory>
 
+#define HY_HANDLE_INVALID -1
 #define HY_UNUSED_HANDLE 0
 typedef uint32 HyTextureHandle;
 typedef uint32 HyBufferHandle;

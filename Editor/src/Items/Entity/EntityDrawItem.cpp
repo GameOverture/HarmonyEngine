@@ -1227,6 +1227,27 @@ void ExtrapolateProperties(Project &projectRef,
 			break;
 
 		case ITEM_UiLayout:
+			if(propsObj.contains("Layout"))
+			{
+				EntityDraw *pEntityDraw = static_cast<EntityDraw *>(pEntityTreeItemData->GetEntityModel().GetItem().GetDraw());
+				HyGui *pHyGui = static_cast<HyGui *>(pEntityDraw->GetRootEntity());
+
+				QUuid layoutUuid = pEntityTreeItemData->GetThisUuid();
+				HyLayoutHandle hCurHandle = pEntityTreeItemData->GetEntityModel().GetTreeModel().GetLayoutHandle(layoutUuid);
+
+				QJsonObject layoutObj = propsObj["Layout"].toObject();
+				if(layoutObj.contains("Reverse"))
+					pHyGui->SetLayoutReverseOrder(layoutObj["Reverse"].toBool(), hCurHandle);
+				if(layoutObj.contains("Margins"))
+				{
+					QJsonArray marginArray = layoutObj["Margins"].toArray();
+					pHyGui->SetLayoutMargins(HyMargins<uint16>(marginArray[0].toInt(), marginArray[1].toInt(), marginArray[2].toInt(), marginArray[3].toInt()), hCurHandle);
+				}
+				if(layoutObj.contains("Widget Spacing"))
+					pHyGui->SetLayoutWidgetSpacing(layoutObj["Widget Spacing"].toInt(), hCurHandle);
+			}
+			break;
+
 		case ITEM_UiSpacer:
 			break;
 
