@@ -154,6 +154,8 @@ QComboBox *WgtShapeData::GetComboBox()
 		return ui->cmbPrimType;
 	else if(ui->stackedWidget->currentIndex() == SHAPEDATATYPE_Shape)
 		return ui->cmbShapeType;
+
+	return nullptr;
 }
 
 void WgtShapeData::SetValue(bool bIsActiveEditModeItem, QVariant data)

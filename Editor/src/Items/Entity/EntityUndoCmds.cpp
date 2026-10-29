@@ -1711,7 +1711,7 @@ void EntityUndoCmd_PropertyModified::UpdateEntityModel(bool bIsRedo)
 				if(m_OverridePropertyValueList.isEmpty() == false && m_OverridePropertyValueList[i].isUndefined() == false && m_OverridePropertyValueList[i].isNull() == false)
 					dopeSheetSceneRef.SetKeyFrameProperty(pEntityTreeData, m_iFrameIndex, m_CatPropPair.first, m_CatPropPair.second, m_OverridePropertyValueList[i], true);
 				else
-					dopeSheetSceneRef.SetKeyFrameProperty(pEntityTreeData, m_iFrameIndex, m_CatPropPair.first, m_CatPropPair.second, PropertiesTreeModel::ConvertVariantToJson(m_ePropTypeModified, m_NewData), true);
+					dopeSheetSceneRef.SetKeyFrameProperty(pEntityTreeData, m_iFrameIndex, m_CatPropPair.first, m_CatPropPair.second, PropertiesTreeModel::ConvertVariantToJson(m_ePropTypeModified, bIsRedo ? m_NewData : m_OldData), true);
 			}
 		}
 	}

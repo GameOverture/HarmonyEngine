@@ -48,6 +48,8 @@ QString IEditModeModel::GetCategoryName() const
 		HyGuiLog("IEditModeModel::GetCategoryName() - unhandled edit mode type", LOGTYPE_Error);
 		break;
 	}
+
+	return QString();
 }
 
 void IEditModeModel::AddView(IEditModeView *pView)

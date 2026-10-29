@@ -840,7 +840,7 @@ void EntityWidget::CycleEditMode(bool bNext)
 				{
 					iLayerIndex--;
 					if(iLayerIndex < 0)
-						iLayerIndex = primLayerList.size() - 1;
+						iLayerIndex = static_cast<int>(primLayerList.size()) - 1;
 				}
 			}
 
