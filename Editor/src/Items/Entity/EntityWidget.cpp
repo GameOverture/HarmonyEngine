@@ -973,6 +973,11 @@ void EntityWidget::on_chkEnableAnimStates_clicked()
 	m_ItemRef.GetUndoStack()->push(pCmd);
 }
 
+void EntityWidget::on_nodeTree_doubleClicked(const QModelIndex &index)
+{
+	on_actionRenameItem_triggered();
+}
+
 void EntityWidget::OnContextMenu(const QPoint &pos)
 {
 	if(m_ContextMenu.isEmpty() == false)

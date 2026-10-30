@@ -89,6 +89,8 @@ private Q_SLOTS:
 
 	void on_chkEnableAnimStates_clicked();
 
+	void on_nodeTree_doubleClicked(const QModelIndex &index);
+
 	void OnContextMenu(const QPoint &pos);
 	void OnTreeFocusIndexChanged(const QModelIndex &curIndex, const QModelIndex &prevIndex);
 	void OnTreeSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
