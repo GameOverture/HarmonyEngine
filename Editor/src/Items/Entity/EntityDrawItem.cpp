@@ -1233,7 +1233,7 @@ void ExtrapolateProperties(Project &projectRef,
 				HyGui *pHyGui = static_cast<HyGui *>(pEntityDraw->GetRootEntity());
 
 				QUuid layoutUuid = pEntityTreeItemData->GetThisUuid();
-				HyLayoutHandle hCurHandle = pEntityTreeItemData->GetEntityModel().GetTreeModel().GetLayoutHandle(layoutUuid);
+				HyLayoutHandle hCurHandle = pEntityTreeItemData->GetEntityModel().GetTreeModel().GetGuiLayoutHandle(layoutUuid);
 
 				QJsonObject layoutObj = propsObj["Layout"].toObject();
 				if(layoutObj.contains("Reverse"))

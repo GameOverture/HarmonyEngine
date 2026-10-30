@@ -290,21 +290,21 @@ bool EntityTreeModel::PopGuiItem(EntityTreeItemData *pItem)
 	return false;
 }
 
-const EntityTreeModel::GuiItem *EntityTreeModel::FindGuiItem(EntityTreeItemData *pItem) const // Find the GuiItem that corresponds to 'pItem'
+EntityTreeModel::GuiItem *EntityTreeModel::FindGuiItem(EntityTreeItemData *pItem) // Find the GuiItem that corresponds to 'pItem'
 {
 	QUuid itemUuid = pItem->GetThisUuid();
 	
-	QStack<const GuiItem *> guiItemStack;
+	QStack<GuiItem *> guiItemStack;
 	guiItemStack.push(&m_GuiLayout);
 
-	const GuiItem *pCurGuiItem = nullptr;
+	GuiItem *pCurGuiItem = nullptr;
 	while(guiItemStack.empty() == false)
 	{
 		pCurGuiItem = guiItemStack.pop();
 		if(pCurGuiItem->m_Uuid == itemUuid)
 			return pCurGuiItem;
 
-		for(const GuiItem &guiItem : pCurGuiItem->m_ChildList)
+		for(GuiItem &guiItem : pCurGuiItem->m_ChildList)
 			guiItemStack.push(&guiItem);
 	}
 
@@ -384,6 +384,35 @@ void EntityTreeModel::RefreshGuiLayout()
 			}
 		};
 	fpSerializeFunc(pLayoutRootItem, m_GuiLayout);
+}
+
+EntityTreeModel::GuiItem &EntityTreeModel::GetGuiRootLayout()
+{
+	return m_GuiLayout;
+}
+
+HyLayoutHandle EntityTreeModel::GetGuiLayoutHandle(QUuid layoutUuid)
+{
+	QStack<GuiItem *> guiItemStack;
+	guiItemStack.push(&m_GuiLayout);
+
+	GuiItem *pCurGuiItem = nullptr;
+	while(guiItemStack.empty() == false)
+	{
+		pCurGuiItem = guiItemStack.pop();
+		if(pCurGuiItem->m_Uuid == layoutUuid)
+			return pCurGuiItem->m_hLayoutHandle;
+
+		for(GuiItem &guiItem : pCurGuiItem->m_ChildList)
+			guiItemStack.push(&guiItem);
+	}
+
+	return HY_HANDLE_INVALID;
+}
+
+QJsonObject EntityTreeModel::SerializeGuiLayout() const
+{
+	return m_GuiLayout.Serialize();
 }
 
 //void EntityTreeModel::GuiDisassemble()
@@ -822,35 +851,6 @@ bool EntityTreeModel::IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnF
 	}
 
 	return true;
-}
-
-EntityTreeModel::GuiItem &EntityTreeModel::GetRootLayout()
-{
-	return m_GuiLayout;
-}
-
-HyLayoutHandle EntityTreeModel::GetLayoutHandle(QUuid layoutUuid)
-{
-	QStack<GuiItem *> guiItemStack;
-	guiItemStack.push(&m_GuiLayout);
-
-	GuiItem *pCurGuiItem = nullptr;
-	while(guiItemStack.empty() == false)
-	{
-		pCurGuiItem = guiItemStack.pop();
-		if(pCurGuiItem->m_Uuid == layoutUuid)
-			return pCurGuiItem->m_hLayoutHandle;
-
-		for(GuiItem &guiItem : pCurGuiItem->m_ChildList)
-			guiItemStack.push(&guiItem);
-	}
-
-	return HY_HANDLE_INVALID;
-}
-
-QJsonObject EntityTreeModel::SerializeGuiLayout() const
-{
-	return m_GuiLayout.Serialize();
 }
 
 // (Re)inserts fuse items into the item tree model. It will also disassemble/assemble the GUI layout heirarchy

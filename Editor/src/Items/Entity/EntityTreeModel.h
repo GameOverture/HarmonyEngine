@@ -107,9 +107,13 @@ public:
 	QList<EntityTreeItemData *> GetGuiLayoutItemDataList() const;
 	void InsertGuiItem(QUuid uuidParent, QJsonObject guiItemObj);
 	bool PopGuiItem(EntityTreeItemData *pItem);
-	const GuiItem *FindGuiItem(EntityTreeItemData *pItem) const; // Find the GuiItem that corresponds to 'pItem'
+	GuiItem *FindGuiItem(EntityTreeItemData *pItem); // Find the GuiItem that corresponds to 'pItem'
 	QUuid FindGuiLayoutUuid(EntityTreeItemData *pItem) const; // Find the layout that contains 'pItem' and return its UUID
 	void RefreshGuiLayout(); // Take the current heirarchy in the model and set it as m_GuiLayout
+
+	GuiItem &GetGuiRootLayout();
+	HyLayoutHandle GetGuiLayoutHandle(QUuid layoutUuid);
+	QJsonObject SerializeGuiLayout() const;
 
 	// Does not retrieve the root entity data. childListOut contains the fused items
 	void GetTreeItemData(QList<EntityTreeItemData *> &childListOut, QList<EntityTreeItemData *> &fixtureListOut, QList<EntityTreeItemData *> &layoutListOut) const;
@@ -123,10 +127,6 @@ public:
 	EntityTreeItemData *FindPrimNode(EntityTreeItemData *pPrimLayer) const;
 
 	bool IsItemValid(TreeModelItemData *pItem, bool bShowDialogsOnFail) const;
-
-	GuiItem &GetRootLayout();
-	HyLayoutHandle GetLayoutHandle(QUuid layoutUuid);
-	QJsonObject SerializeGuiLayout() const;
 
 private: // These functions should only be called by EntityModel's Cmd_ functions
 	void Cmd_ResetFusedItems(); // (Re)inserts fuse items into the item tree model. It will also destruct/construct the GUI layout heirarchy
