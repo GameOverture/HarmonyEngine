@@ -14,18 +14,16 @@
 #include "Gui/IHyGuiBase.h"
 #include "Scene/Nodes/Loadables/Bodies/Drawables/Objects/HyPrimitive2d.h"
 
-#if defined(HY_DEBUG) && !defined(HY_PLATFORM_GUI)
-	//#define HY_USE_LAYOUT_DEBUG_BOXES
-#endif
-
 class IHyWidget;
+class HyCamera2d;
 
 class HyLayout : public IHyGuiBase
 {
-#ifdef HY_USE_LAYOUT_DEBUG_BOXES
-	HyPrimitive2d						m_DebugBoxBoarder;
-	HyPrimitive2d						m_DebugBoxMargins;
-#endif
+	enum Layer
+	{
+		LAYER_Border = 0,
+		LAYER_Margin
+	};
 
 	bool								m_bIsRootLayout;
 	HyOrientation						m_eLayoutType;
@@ -64,15 +62,9 @@ public:
 	bool RequestWidgetFocus(IHyWidget *pWidget);
 	bool IsWidgetInputAllowed();
 
-#ifdef HY_USE_LAYOUT_DEBUG_BOXES
-	void ShowDebugBox(bool bShow);
-#endif
+	void SetDebugBox(HyPrimitive2d &debugBox, HyCamera2d *pCamera);
 
 protected:
-#ifdef HY_USE_LAYOUT_DEBUG_BOXES
-	virtual void OnUpdate() override;
-	void OnSetDebugBox();
-#endif
 	virtual glm::ivec2 OnCalcPreferredSize() override;
 	virtual glm::ivec2 OnResize(uint32 uiNewWidth, uint32 uiNewHeight) override;
 

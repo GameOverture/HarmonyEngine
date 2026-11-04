@@ -110,6 +110,8 @@ public:
 	void SetLineScrollAmt(float fLineScrollAmt);
 	void ScrollTo(float fVertScrollPos, float fHorzScrollPos);
 
+	void CalculateLayoutDebugBox(HyPrimitive2d &debugBox, HyCamera2d *pCamera, HyLayoutHandle hLayout = HY_UNUSED_HANDLE);
+
 protected:
 	virtual void OnUpdate() override final;
 	virtual glm::ivec2 OnCalcPreferredSize() override;

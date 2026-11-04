@@ -466,6 +466,8 @@ void EntityDraw::SetExtrapolatedProperties()
 						HyLayoutHandle hParentHandle = pEntityModel->GetTreeModel().GetGuiLayoutHandle(pEntityModel->GetTreeModel().FindGuiLayoutUuid(pEntItemData));
 						pGuiItem->m_hLayoutHandle = pRootGui->InsertLayout(eLayoutOrientation, hParentHandle);
 					}
+
+					pRootGui->CalculateLayoutDebugBox(*static_cast<HyPrimitive2d *>(static_cast<EntityDrawItem *>(pDrawItem)->GetHyNode()), HyEngine::Window().GetCamera2d(0));
 				}
 				else if(pEntItemData->IsWidgetItem())
 				{
@@ -478,7 +480,6 @@ void EntityDraw::SetExtrapolatedProperties()
 					pRootGui->InsertSpacer(HYSIZEPOLICY_Expanding, 0, hLayoutHandle);
 				}
 			}
-
 
 			bool bIsActiveEditModeItem = GetCurEditItem() == pEntDrawItem;
 			if(pEntDrawItem->GetEntityTreeItemData()->GetEditModel())

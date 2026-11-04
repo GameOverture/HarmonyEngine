@@ -164,7 +164,7 @@ public:
 	int32 SetAsPolygon(int32 iLayerIndex, const glm::vec2 *pVertexArray, uint32 uiCount, float fOutlineThickness);
 	int32 SetAsPolygon(int32 iLayerIndex, const std::vector<glm::vec2> &verticesList, float fOutlineThickness);
 
-	int32 SetAsBox(int32 iLayerIndex, float fWidth, float fHeight, float fOutlineThickness);	// Axis-aligned box, bottom left corner at 0,0
+	int32 SetAsBox(int32 iLayerIndex, float fWidth, float fHeight, float fOutlineThickness);	// Axis-aligned box, centered around fWidth/fHeight
 	int32 SetAsBox(int32 iLayerIndex, const HyRect &rect, float fOutlineThickness);			// Represent an oriented box
 
 	int32 SetAsCapsule(int32 iLayerIndex, const glm::vec2 &pt1, const glm::vec2 &pt2, float fRadius, float fOutlineThickness);

@@ -1245,6 +1245,8 @@ void ExtrapolateProperties(Project &projectRef,
 				}
 				if(layoutObj.contains("Widget Spacing"))
 					pHyGui->SetLayoutWidgetSpacing(layoutObj["Widget Spacing"].toInt(), hCurHandle);
+
+				pHyGui->CalculateLayoutDebugBox(*static_cast<HyPrimitive2d *>(pThisHyNode), HyEngine::Window().GetCamera2d(0));
 			}
 			break;
 

@@ -12,6 +12,8 @@
 #include "Gui/HyGui.h"
 #include "Gui/Widgets/IHyWidget.h"
 #include "Diagnostics/Console/IHyConsole.h"
+#include "Window/HyWindow.h"
+#include "Scene/Nodes/Objects/HyCamera.h"
 
 HyLayout::HyLayout(HyOrientation eLayoutType, int32 iWidgetSpacing, HyEntity2d *pParent /*= nullptr*/) :
 	IHyGuiBase(pParent),
@@ -167,55 +169,62 @@ bool HyLayout::IsWidgetInputAllowed()
 	return false;
 }
 
-#ifdef HY_USE_LAYOUT_DEBUG_BOXES
-void HyLayout::ShowDebugBox(bool bShow)
+void HyLayout::SetDebugBox(HyPrimitive2d &debugBox, HyCamera2d *pCamera)
 {
-	m_DebugBoxBoarder.alpha.Set(bShow ? 1.0f : 0.0f);
-	m_DebugBoxMargins.alpha.Set(bShow ? 1.0f : 0.0f);
-}
-
-/*virtual*/ void HyLayout::OnUpdate() /*override*/
-{
-	const glm::mat4 &mtxSceneRef = GetSceneTransform(0.0f);
-	glm::vec3 vScale(1.0f);
-	glm::quat quatRot;
-	glm::vec3 ptTranslation;
-	glm::vec3 vSkew;
-	glm::vec4 vPerspective;
-	glm::decompose(mtxSceneRef, vScale, quatRot, ptTranslation, vSkew, vPerspective);
-
-	m_DebugBoxBoarder.pos.Set(ptTranslation);
-	m_DebugBoxBoarder.rot.Set(glm::degrees(glm::atan(mtxSceneRef[0][1], mtxSceneRef[0][0])));
-	m_DebugBoxBoarder.scale.Set(vScale);
-	m_DebugBoxBoarder.UseWindowCoordinates(GetCoordinateSystem());
-	m_DebugBoxBoarder.SetDisplayOrder(GetDisplayOrder() + 1);
-	m_DebugBoxBoarder.SetVisible(IsVisible() && (GetInternalFlags() & EXPLICIT_ParentsVisible));
-
-	if(m_Margins.left == 0 && m_Margins.right == 0 && m_Margins.top == 0 && m_Margins.bottom == 0)
-		m_DebugBoxMargins.SetVisible(false);
-	else
+	if(GetWindowIndex() >= 0 && GetWindowIndex() != pCamera->GetWindow().GetIndex())
 	{
-		m_DebugBoxMargins.pos.Set(ptTranslation);
-		m_DebugBoxMargins.pos.Offset(m_Margins.left, m_Margins.bottom);
-		m_DebugBoxMargins.rot.Set(glm::degrees(glm::atan(mtxSceneRef[0][1], mtxSceneRef[0][0])));
-		m_DebugBoxMargins.scale.Set(vScale);
-		m_DebugBoxMargins.UseWindowCoordinates(GetCoordinateSystem());
-		m_DebugBoxMargins.SetDisplayOrder(GetDisplayOrder() + 1);
-		m_DebugBoxMargins.SetVisible(IsVisible() && (GetInternalFlags() & EXPLICIT_ParentsVisible));
+		HyLogWarning("HyLayout::SetDebugBox was passed a camera that is incompatible with this layout");
+		return;
 	}
-}
 
-void HyLayout::OnSetDebugBox()
-{
-	m_DebugBoxBoarder.SetTint(HyColor::Blue);
-	m_DebugBoxBoarder.SetWireframe(true);
-	m_DebugBoxBoarder.SetAsBox(GetWidth(), GetHeight());
+	const glm::mat4 &mtxSceneRef = GetSceneTransform(0.0f);
+	glm::vec3 ptTranslation = mtxSceneRef[3];
+	glm::vec3 vScale = glm::vec3(glm::length(mtxSceneRef[0]), glm::length(mtxSceneRef[1]), glm::length(mtxSceneRef[2]));
+	double dRotation = glm::atan(mtxSceneRef[0][1], mtxSceneRef[0][0]);
+	float fWidth = GetWidth(vScale.x);
+	float fHeight = GetHeight(vScale.y);
 
-	m_DebugBoxMargins.SetTint(HyColor::Cyan);
-	m_DebugBoxMargins.SetWireframe(true);
-	m_DebugBoxMargins.SetAsBox(GetWidth() - m_Margins.left - m_Margins.right, GetHeight() - m_Margins.bottom - m_Margins.top);
+	glm::vec2 pt1, pt2, pt3, pt4; // Counter-clockwise winding order of box dimensions
+	pt1 = { ptTranslation.x, ptTranslation.y };
+	pt2 = { ptTranslation.x + (fWidth * glm::cos(dRotation)), ptTranslation.y + (fWidth * glm::sin(dRotation)) };
+	pt3 = { ptTranslation.x + (fWidth * glm::cos(dRotation)) - (fHeight * glm::sin(dRotation)), ptTranslation.y + (fWidth * glm::sin(dRotation)) + (fHeight * glm::cos(dRotation)) };
+	pt4 = { ptTranslation.x - (fHeight * glm::sin(dRotation)), ptTranslation.y + (fHeight * glm::cos(dRotation)) };
+
+	glm::vec2 vDir1 = glm::normalize(pt2 - pt1); // left-right
+	glm::vec2 vDir2 = glm::normalize(pt4 - pt1); // up-down
+	glm::vec2 ptMargin1, ptMargin2, ptMargin3, ptMargin4;
+	ptMargin1 = { pt1.x + (m_Margins.left * vDir1.x) + (m_Margins.bottom * vDir2.x), pt1.y + (m_Margins.left * vDir1.y) + (m_Margins.bottom * vDir2.y) };
+	ptMargin2 = { pt2.x - (m_Margins.right * vDir1.x) + (m_Margins.bottom * vDir2.x), pt2.y - (m_Margins.right * vDir1.y) + (m_Margins.bottom * vDir2.y) };
+	ptMargin3 = { pt3.x - (m_Margins.right * vDir1.x) - (m_Margins.top * vDir2.x), pt3.y - (m_Margins.right * vDir1.y) - (m_Margins.top * vDir2.y) };
+	ptMargin4 = { pt4.x + (m_Margins.left * vDir1.x) - (m_Margins.top * vDir2.x), pt4.y + (m_Margins.left * vDir1.y) - (m_Margins.top * vDir2.y) };
+
+	if(GetWindowIndex() < 0) // Worldspace
+	{
+		pCamera->ProjectToCamera(pt1, pt1);
+		pCamera->ProjectToCamera(pt2, pt2);
+		pCamera->ProjectToCamera(pt3, pt3);
+		pCamera->ProjectToCamera(pt4, pt4);
+
+		pCamera->ProjectToCamera(ptMargin1, ptMargin1);
+		pCamera->ProjectToCamera(ptMargin2, ptMargin2);
+		pCamera->ProjectToCamera(ptMargin3, ptMargin3);
+		pCamera->ProjectToCamera(ptMargin4, ptMargin4);
+	}
+
+	debugBox.UseWindowCoordinates(pCamera->GetWindow().GetIndex());
+	debugBox.SetDisplayOrder(GetDisplayOrder() + 1);
+	debugBox.SetVisible(IsVisible() && (GetInternalFlags() & EXPLICIT_ParentsVisible));
+
+	debugBox.SetAsBox(LAYER_Border, HyRect(pt1, pt2, pt3, pt4), 1.0f);
+	debugBox.SetLayerColor(LAYER_Border, HyColor::Green);
+
+	debugBox.SetAsBox(LAYER_Margin, HyRect(ptMargin1, ptMargin2, ptMargin3, ptMargin4), 1.0f);
+	debugBox.SetLayerColor(LAYER_Margin, HyColor::DarkGreen);
+	if(m_Margins.left == 0 && m_Margins.right == 0 && m_Margins.top == 0 && m_Margins.bottom == 0)
+		debugBox.SetLayerVisible(LAYER_Margin, false);
+	else
+		debugBox.SetLayerVisible(LAYER_Margin, true);
 }
-#endif
 
 /*virtual*/ glm::ivec2 HyLayout::OnCalcPreferredSize() /*override*/
 {
@@ -369,8 +378,6 @@ void HyLayout::OnSetDebugBox()
 
 	if(bNeedsResize) // TODO: Investigate this
 	{
-		//SetSizeDirty();
-
 		vTargetSize[eOrientation] = static_cast<int32>(ptCurPos[eOrientation] - GetWidgetSpacing());
 		HySetVec(ptCurPos, m_Margins.left, m_Margins.bottom);
 
@@ -389,10 +396,6 @@ void HyLayout::OnSetDebugBox()
 		m_vActualSize[eOrientation] = vTargetSize[eOrientation];
 	if(vTargetSize[eInverseOrien] > m_vActualSize[eInverseOrien])
 		m_vActualSize[eInverseOrien] = vTargetSize[eInverseOrien];
-	
-#ifdef HY_USE_LAYOUT_DEBUG_BOXES
-	OnSetDebugBox();
-#endif
 
 	return m_vActualSize;
 }

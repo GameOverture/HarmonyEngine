@@ -96,7 +96,7 @@ public:
 		Set(vSize.x, vSize.y);
 	}
 
-	HyRect(float fX, float fY, float fWidth, float fHeight)
+	HyRect(float fX, float fY, float fWidth, float fHeight) // fX and fY are the bottom left of rectangle
 	{
 		Set(fX, fY, fWidth, fHeight);
 	}
@@ -134,11 +134,11 @@ public:
 		m_fRotDegrees = 0.0f;
 	}
 
-	void Set(float fX, float fY, float fWidth, float fHeight)
+	void Set(float fBotLeftX, float fBotLeftY, float fWidth, float fHeight) // fX and fY are the bottom left of rectangle
 	{
 		m_fHalfWidth = fWidth * 0.5f;
 		m_fHalfHeight = fHeight * 0.5f;
-		HySetVec(m_ptCenter, fX + m_fHalfWidth, fY + m_fHalfHeight);
+		HySetVec(m_ptCenter, fBotLeftX + m_fHalfWidth, fBotLeftY + m_fHalfHeight);
 		m_fRotDegrees = 0.0f;
 	}
 

@@ -618,6 +618,19 @@ void HyGui::ScrollTo(float fVertScrollPos, float fHorzScrollPos)
 	m_HorzBar.ScrollTo(fHorzScrollPos);
 }
 
+void HyGui::CalculateLayoutDebugBox(HyPrimitive2d &debugBox, HyCamera2d *pCamera, HyLayoutHandle hLayout /*= HY_UNUSED_HANDLE*/)
+{
+	if(hLayout == HY_UNUSED_HANDLE)
+	{
+		m_RootLayout.SetDebugBox(debugBox, pCamera);
+		return;
+	}
+	else if(m_SubLayoutMap.find(hLayout) == m_SubLayoutMap.end())
+		return;
+
+	m_SubLayoutMap[hLayout]->SetDebugBox(debugBox, pCamera);
+}
+
 /*virtual*/ void HyGui::OnUpdate() /*override final*/
 {
 	if(IsSizeDirty())
