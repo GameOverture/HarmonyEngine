@@ -4,8 +4,8 @@
 *	Harmony Engine
 *	Copyright (c) 2021 Jason Knobler
 *
-*	Harmony License:
-*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*	MIT License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/main/Engine/LICENSE
 *************************************************************************/
 #ifndef HyNumberFormat_h__
 #define HyNumberFormat_h__

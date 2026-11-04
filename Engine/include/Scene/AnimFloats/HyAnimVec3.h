@@ -4,8 +4,8 @@
  *	Harmony Engine
  *	Copyright (c) 2014 Jason Knobler
  *
- *	Harmony License:
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *	MIT License:
+ *	https://github.com/OvertureGames/HarmonyEngine/blob/main/Engine/LICENSE
  *************************************************************************/
 #ifndef HyAnimVec3_h__
 #define HyAnimVec3_h__

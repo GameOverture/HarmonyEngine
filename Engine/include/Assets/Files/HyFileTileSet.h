@@ -4,8 +4,8 @@
  *	Harmony Engine
  *	Copyright (c) 2026 Jason Knobler
  *
- *	Harmony License:
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *	MIT License:
+ *	https://github.com/OvertureGames/HarmonyEngine/blob/main/Engine/LICENSE
  *************************************************************************/
 #ifndef HyFileTileSet_h__
 #define HyFileTileSet_h__

@@ -4,7 +4,7 @@
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
  *
- *	Harmony License:
+ *	MIT License:
  *	https://github.com/GameOverture/HarmonyEngine/blob/main/LICENSE
  *************************************************************************/
 #include "Afx/HyStdAfx.h"

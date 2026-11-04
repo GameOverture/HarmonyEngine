@@ -4,8 +4,8 @@
 //*	Harmony Engine
 //*	Copyright (c) 2022 Jason Knobler
 //*
-//*	Harmony License:
-//*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+//*	MIT License:
+//*	https://github.com/OvertureGames/HarmonyEngine/blob/main/Engine/LICENSE
 //*************************************************************************/
 //#ifndef HyPhysicsGrid_h__
 //#define HyPhysicsGrid_h__

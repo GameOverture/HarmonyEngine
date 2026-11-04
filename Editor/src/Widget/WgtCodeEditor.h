@@ -1,11 +1,11 @@
 /**************************************************************************
  *	WgtCodeEditor.h
  *
- *	Harmony Engine - Editor Tool
+ *	Harmony Engine - HyEditor
  *	Copyright (c) 2024 Jason Knobler
  *
- *	Harmony Editor Tool License:
- *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
+ *	GPL/LGPL License:
+ *	https://github.com/GameOverture/HarmonyEngine/blob/main/Editor/LICENSE
  *************************************************************************/
 #ifndef WgtCodeEditor_H
 #define WgtCodeEditor_H

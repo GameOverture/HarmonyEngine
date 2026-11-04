@@ -1,11 +1,11 @@
 /**************************************************************************
 *	ProjectItemMimeData.h
 *
-*	Harmony Engine - Editor Tool
+*	Harmony Engine - HyEditor
 *	Copyright (c) 2018 Jason Knobler
 *
-*	Harmony Editor Tool License:
-*	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
+*	GPL/LGPL License:
+*	https://github.com/GameOverture/HarmonyEngine/blob/main/Editor/LICENSE
 *************************************************************************/
 #ifndef ProjectItemMimeData_H
 #define ProjectItemMimeData_H

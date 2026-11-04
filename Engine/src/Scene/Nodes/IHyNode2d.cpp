@@ -4,8 +4,8 @@
 *	Harmony Engine
 *	Copyright (c) 2016 Jason Knobler
 *
-*	Harmony License:
-*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*	MIT License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/main/Engine/LICENSE
 *************************************************************************/
 #include "Afx/HyStdAfx.h"
 #include "Scene/Nodes/IHyNode2d.h"

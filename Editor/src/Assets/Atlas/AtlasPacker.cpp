@@ -1,13 +1,13 @@
 /**************************************************************************
  *	AtlasPacker.cpp
  *
- *	Harmony Engine - Editor Tool
+ *	Harmony Engine - HyEditor
  *	Copyright (c) 2024 Jason Knobler
  *
  *	NOTE: Original bin-packing algorithms from Pavel Roschin (https://github.com/scriptum) Cheetah-Texture-Packer
  * 
- *	Harmony Editor Tool License:
- *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
+ *	GPL/LGPL License:
+ *	https://github.com/GameOverture/HarmonyEngine/blob/main/Editor/LICENSE
  *************************************************************************/
 #include "AtlasPacker.h"
 #include "AtlasFrame.h"

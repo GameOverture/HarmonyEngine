@@ -1,10 +1,10 @@
 /**************************************************************************
  *	DlgSurfaceMaterials.cpp
  *
- *	Harmony Engine - Editor Tool
+ *	Harmony Engine - HyEditor
  *	Copyright (c) 2025 Jason Knobler
  *
- *	Harmony Editor Tool License:
+ *	GPL/LGPL License:
  *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
  *************************************************************************/
 #include "Global.h"

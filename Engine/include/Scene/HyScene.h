@@ -4,8 +4,8 @@
  *	Harmony Engine
  *	Copyright (c) 2013 Jason Knobler
  *
- *	Harmony License:
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *	MIT License:
+ *	https://github.com/OvertureGames/HarmonyEngine/blob/main/Engine/LICENSE
  *************************************************************************/
 #ifndef HyScene_h__
 #define HyScene_h__

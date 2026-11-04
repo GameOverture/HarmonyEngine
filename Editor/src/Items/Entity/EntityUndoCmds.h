@@ -1,11 +1,11 @@
 /**************************************************************************
  *	EntityUndoCmds.h
  *
- *	Harmony Engine - Editor Tool
+ *	Harmony Engine - HyEditor
  *	Copyright (c) 2022 Jason Knobler
  *
- *	Harmony Editor Tool License:
- *	https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE
+ *	GPL/LGPL License:
+ *	https://github.com/GameOverture/HarmonyEngine/blob/main/Editor/LICENSE
  *************************************************************************/
 #ifndef ENTITYUNDOCMDS_H
 #define ENTITYUNDOCMDS_H

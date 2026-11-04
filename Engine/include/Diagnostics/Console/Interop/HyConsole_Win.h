@@ -4,8 +4,8 @@
 *	Harmony Engine
 *	Copyright (c) 2017 Jason Knobler
 *
-*	Harmony License:
-*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*	MIT License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/main/Engine/LICENSE
 *************************************************************************/
 #ifndef HyConsole_Win_h__
 #define HyConsole_Win_h__

@@ -4,8 +4,8 @@
  *	Harmony Engine
  *	Copyright (c) 2015 Jason Knobler
  *
- *	Harmony License:
- *	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+ *	MIT License:
+ *	https://github.com/OvertureGames/HarmonyEngine/blob/main/Engine/LICENSE
  *************************************************************************/
 #ifndef HyFileAtlas_h__
 #define HyFileAtlas_h__

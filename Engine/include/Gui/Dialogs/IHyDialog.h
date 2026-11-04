@@ -4,8 +4,8 @@
 *	Harmony Engine
 *	Copyright (c) 2025 Jason Knobler
 *
-*	Harmony License:
-*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*	MIT License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/main/Engine/LICENSE
 *************************************************************************/
 #ifndef IHyDialog_h__
 #define IHyDialog_h__

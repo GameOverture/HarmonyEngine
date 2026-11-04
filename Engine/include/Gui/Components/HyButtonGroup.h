@@ -4,8 +4,8 @@
 *	Harmony Engine
 *	Copyright (c) 2024 Jason Knobler
 *
-*	Harmony License:
-*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*	MIT License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/main/Engine/LICENSE
 *************************************************************************/
 #ifndef HyButtonGroup_h__
 #define HyButtonGroup_h__

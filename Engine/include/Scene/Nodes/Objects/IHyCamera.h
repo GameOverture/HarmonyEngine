@@ -4,8 +4,8 @@
 *	Harmony Engine
 *	Copyright (c) 2019 Jason Knobler
 *
-*	Harmony License:
-*	https://github.com/OvertureGames/HarmonyEngine/blob/master/LICENSE
+*	MIT License:
+*	https://github.com/OvertureGames/HarmonyEngine/blob/main/Engine/LICENSE
 *************************************************************************/
 #ifndef IHyCamera_h__
 #define IHyCamera_h__

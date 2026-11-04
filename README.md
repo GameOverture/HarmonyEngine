@@ -115,7 +115,7 @@ https://hyengine.org/docs/
   
 ## License
 
-Copyright (c) 2012-present Jason Knobler (Game_Overture)
+Copyright © 2012-present Jason Knobler (Game_Overture)
 
 **Engine:** [MIT](https://github.com/GameOverture/HarmonyEngine/blob/main/Engine/LICENSE/)
 
