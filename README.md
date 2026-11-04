@@ -115,6 +115,8 @@ https://hyengine.org/docs/
   
 ## License
 
-**Engine:** [Modified zlib](https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE/)
+Copyright (c) 2012-present Jason Knobler (Game_Overture)
 
-**Editor:** [GPL/LGPL](https://github.com/GameOverture/HarmonyEngine/blob/master/LICENSE/)
+**Engine:** [MIT](https://github.com/GameOverture/HarmonyEngine/blob/main/Engine/LICENSE/)
+
+**Editor:** [GPL/LGPL](https://github.com/GameOverture/HarmonyEngine/blob/main/Editor/LICENSE/)
