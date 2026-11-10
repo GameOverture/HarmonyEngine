@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Harmony Editor Tool</string>
+   <string>HyEditor - Harmony Engine</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../data/HyEditor.qrc">
