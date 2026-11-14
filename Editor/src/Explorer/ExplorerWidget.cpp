@@ -216,7 +216,6 @@ ExplorerWidget::ExplorerWidget(QWidget *pParent) :
 
 	ui->btnFilterAll->setDefaultAction(ui->actionFilterAll);
 	ui->btnFilterSprite->setDefaultAction(ui->actionFilterSprite);
-	ui->btnFilterTileMap->setDefaultAction(ui->actionFilterTileMap);
 	ui->btnFilterText->setDefaultAction(ui->actionFilterText);
 	ui->btnFilterSpine->setDefaultAction(ui->actionFilterSpine);
 	ui->btnFilterAudio->setDefaultAction(ui->actionFilterAudio);
@@ -365,11 +364,6 @@ void ExplorerWidget::OnFilterUpdate()
 		ui->lblActiveFilter->setVisible(true);
 		ui->lblActiveFilter->setText("Show Only " + HyGlobal::ItemName(ITEM_Sprite, true));
 		uiFilter |= ITEMFILTER_Sprite;
-	}
-	else if(ui->btnFilterTileMap->isChecked())
-	{
-		ui->lblActiveFilter->setVisible(true);
-		ui->lblActiveFilter->setText("Show Only " + HyGlobal::ItemName(ITEM_TileMap, true));
 	}
 	else if(ui->btnFilterText->isChecked())
 	{

@@ -45,7 +45,7 @@
      <item>
       <widget class="Line" name="line">
        <property name="orientation">
-        <enum>Qt::Vertical</enum>
+        <enum>Qt::Orientation::Vertical</enum>
        </property>
       </widget>
      </item>
@@ -66,13 +66,6 @@
        </property>
        <property name="checked">
         <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnFilterTileMap">
-       <property name="text">
-        <string>...</string>
        </property>
       </widget>
      </item>
@@ -132,7 +125,6 @@
       <widget class="QLabel" name="lblActiveFilter">
        <property name="font">
         <font>
-         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -144,7 +136,7 @@
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -170,7 +162,7 @@
         <string/>
        </property>
        <property name="textFormat">
-        <enum>Qt::PlainText</enum>
+        <enum>Qt::TextFormat::PlainText</enum>
        </property>
        <property name="pixmap">
         <pixmap resource="../../data/HyEditor.qrc">:/icons16x16/search.png</pixmap>
@@ -344,21 +336,6 @@
    </property>
    <property name="toolTip">
     <string>Show only Entity project items</string>
-   </property>
-  </action>
-  <action name="actionFilterTileMap">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../data/HyEditor.qrc">
-     <normaloff>:/icons16x16/items/TileMap.png</normaloff>:/icons16x16/items/TileMap.png</iconset>
-   </property>
-   <property name="text">
-    <string>Filter TileMaps</string>
-   </property>
-   <property name="toolTip">
-    <string>Show only TileMap project items</string>
    </property>
   </action>
  </widget>
