@@ -414,6 +414,7 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Sprite", "Anim Loop", PROPERTIESTYPE_bool, false, "Override whatever the sprite's loop flag is, and make the animation loop (check) or don't loop (uncheck)", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Sprite", "Anim Reverse", PROPERTIESTYPE_bool, false, "Override whatever the sprite's reverse flag is, and make the animation play in reverse (checked) or don't play in reverse (uncheck)", PROPERTIESACCESS_ToggleUnchecked);
 		m_pPropertiesModel->AppendProperty("Sprite", "Anim Bounce", PROPERTIESTYPE_bool, false, "Override whatever the sprite's bounce flag is, and make the animation bounce (check) or don't bounce (uncheck)", PROPERTIESACCESS_ToggleUnchecked);
+		m_pPropertiesModel->AppendProperty("Sprite", "Texture Tiling", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Repeats/Tiles/Crops the sampled texture based on these specified dimensions", PROPERTIESACCESS_ToggleUnchecked, 0.0f, fRANGE, 1.0f);
 		break;
 
 	case ITEM_Entity:
@@ -421,7 +422,9 @@ void EntityTreeItemData::InitalizePropertyModel()
 		m_pPropertiesModel->AppendProperty("Entity", "Mouse Input", PROPERTIESTYPE_bool, Qt::Unchecked, "Mouse hover and button inputs over this bounding volume or specified shapes", PROPERTIESACCESS_ToggleUnchecked);
 		break;
 
-	case ITEM_AtlasFrame: // No HyTexturedQuad2d specific properties
+	case ITEM_AtlasFrame:
+		m_pPropertiesModel->InsertCategory(0, "Textured Quad", GetReferencedItemUuid().toString(QUuid::WithoutBraces));
+		m_pPropertiesModel->AppendProperty("Textured Quad", "Texture Tiling", PROPERTIESTYPE_vec2, QPointF(1.0f, 1.0f), "Repeats/Tiles/Crops the sampled texture based on these specified dimensions", PROPERTIESACCESS_ToggleUnchecked, 0.0f, fRANGE, 1.0f);
 		break;
 
 	case ITEM_TileMap: {

@@ -405,6 +405,8 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 			return QJsonValue(static_cast<HySprite2d *>(pThisHyNode)->IsAnimReverse());
 		if(sPropertyName == "Anim Bounce")
 			return QJsonValue(static_cast<HySprite2d *>(pThisHyNode)->IsAnimBounce());
+		if(sPropertyName == "Texture Tiling")
+			return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(static_cast<HySprite2d *>(pThisHyNode)->GetTextureTiling().x)), QJsonValue(static_cast<double>(static_cast<HySprite2d *>(pThisHyNode)->GetTextureTiling().y)) }));
 	}
 	else if(sCategory == "Text")
 	{
@@ -456,6 +458,12 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 				}
 			}
 		}
+	}
+	else if(sCategory == "Textured Quad")
+	{
+		if(sPropertyName == "Texture Tiling")
+			return QJsonValue(QJsonArray({ QJsonValue(static_cast<double>(static_cast<HyTexturedQuad2d *>(pThisHyNode)->GetTextureTiling().x)), QJsonValue(static_cast<double>(static_cast<HyTexturedQuad2d *>(pThisHyNode)->GetTextureTiling().y)) }));
+		
 	}
 	else if(sCategory == "Widget")
 	{
@@ -1109,9 +1117,6 @@ void ExtrapolateProperties(Project &projectRef,
 		case ITEM_ActorMover:
 			break;
 
-		case ITEM_AtlasFrame:
-			break;
-
 		case ITEM_Text:
 			if(propsObj.contains("Text"))
 			{
@@ -1215,6 +1220,11 @@ void ExtrapolateProperties(Project &projectRef,
 					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Reverse"].toBool() ? HYANIMCTRL_Reverse : HYANIMCTRL_DontReverse);
 				if(spriteObj.contains("Anim Bounce"))
 					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(spriteObj["Anim Bounce"].toBool() ? HYANIMCTRL_Bounce : HYANIMCTRL_DontBounce);
+				if(spriteObj.contains("Texture Tiling"))
+				{
+					QJsonArray textureTilingArray = spriteObj["Texture Tiling"].toArray();
+					static_cast<HySprite2d *>(pThisHyNode)->SetTextureTiling(glm::vec2(textureTilingArray[0].toDouble(), textureTilingArray[1].toDouble()));
+				}
 
 				// Store whether the animation is paused, so we don't AdvanceAnim()
 				if(spriteObj.contains("Anim Pause"))
@@ -1223,6 +1233,18 @@ void ExtrapolateProperties(Project &projectRef,
 				// Update again to get the above properties of this frame
 				previewComponentRef.m_SpriteInfo.m_iSpriteFrame = static_cast<HySprite2d *>(pThisHyNode)->GetFrame();
 				previewComponentRef.m_SpriteInfo.m_bBouncePhase = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
+			}
+			break;
+
+		case ITEM_AtlasFrame:
+			if(propsObj.contains("Textured Quad"))
+			{
+				QJsonObject texturedQuadObj = propsObj["Textured Quad"].toObject();
+				if(texturedQuadObj.contains("Texture Tiling"))
+				{
+					QJsonArray textureTilingArray = texturedQuadObj["Texture Tiling"].toArray();
+					static_cast<HyTexturedQuad2d *>(pThisHyNode)->SetTextureTiling(glm::vec2(textureTilingArray[0].toDouble(), textureTilingArray[1].toDouble()));
+				}
 			}
 			break;
 

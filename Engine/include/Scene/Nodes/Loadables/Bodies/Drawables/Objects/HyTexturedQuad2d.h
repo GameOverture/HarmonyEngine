@@ -17,6 +17,7 @@
 class HyTexturedQuad2d : public IHyDrawable2d
 {
 	HyUvCoord				m_UvCoords;
+	glm::vec2				m_vTextureTiling;
 
 public:
 	HyTexturedQuad2d(HyEntity2d *pParent = nullptr);
@@ -43,6 +44,9 @@ public:
 
 	int32 GetEntireTextureWidth();
 	int32 GetEntireTextureHeight();
+
+	glm::vec2 GetTextureTiling() const;
+	void SetTextureTiling(glm::vec2 vTileDimensions);
 
 	virtual bool IsLoadDataValid() override;
 

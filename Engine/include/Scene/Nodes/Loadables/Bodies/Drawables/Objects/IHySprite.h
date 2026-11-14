@@ -40,6 +40,8 @@ protected:
 
 	uint32					m_uiCurFrame;
 
+	glm::vec2				m_vTextureTiling;
+
 public:
 	IHySprite(const HyNodePath &nodePath, ENTTYPE *pParent);
 	IHySprite(const IHySprite &copyRef);
@@ -95,6 +97,9 @@ public:
 	bool IsBoundsIncludeAlphaCrop(uint32 uiStateIndex);								// Returns true if the specified state's bounds of this sprite should include the alpha crop area when calculating bounding volume/shape. Default is false.
 	void SetBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop, uint32 uiStateIndex);	// Set whether the specified state's bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
 	void SetAllBoundsIncludeAlphaCrop(bool bIncludeAlphaCrop);						// Must have valid data! Set whether ALL states' bounds of this sprite should include the alpha crop area when calculating bounding volume/shape
+
+	glm::vec2 GetTextureTiling() const;
+	void SetTextureTiling(glm::vec2 vTileDimensions);
 
 	virtual bool SetState(uint32 uiStateIndex) override;
 	virtual bool IsLoadDataValid() override;

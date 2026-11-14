@@ -1356,6 +1356,11 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 				sSrc += sCodeName + "SetAnimCtrl(" + (spriteObj["Anim Reverse"].toBool() ? "HYANIMCTRL_Reverse" : "HYANIMCTRL_DontReverse") + ");" + sNewLine;
 			if(spriteObj.contains("Anim Bounce"))
 				sSrc += sCodeName + "SetAnimCtrl(" + (spriteObj["Anim Bounce"].toBool() ? "HYANIMCTRL_Bounce" : "HYANIMCTRL_DontBounce") + ");" + sNewLine;
+			if(spriteObj.contains("Texture Tiling"))
+			{
+				QJsonArray textureTilingArray = spriteObj["Texture Tiling"].toArray();
+				sSrc += sCodeName + "SetTextureTiling(glm::vec2(" + QString::number(textureTilingArray[0].toDouble(), 'f') + "f, " + QString::number(textureTilingArray[1].toDouble(), 'f') + "f);" + sNewLine;
+			}
 		}
 		else if(sCategoryName == "Text")
 		{
@@ -1411,6 +1416,15 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 				sSrc += sCodeName + "SetMonospacedDigits(" + (textObj["Monospaced Digits"].toBool() ? "true" : "false") + ");" + sNewLine;
 			if(textObj.contains("Text Indent"))
 				sSrc += sCodeName + "SetTextIndent(" + QString::number(textObj["Text Indent"].toInt()) + ");" + sNewLine;
+		}
+		else if(sCategoryName == "Textured Quad")
+		{
+			QJsonObject texturedQuadObj = propObj["Textured Quad"].toObject();
+			if(texturedQuadObj.contains("Texture Tiling"))
+			{
+				QJsonArray textureTilingArray = texturedQuadObj["Texture Tiling"].toArray();
+				sSrc += sCodeName + "SetTextureTiling(glm::vec2(" + QString::number(textureTilingArray[0].toDouble(), 'f') + "f, " + QString::number(textureTilingArray[1].toDouble(), 'f') + "f);" + sNewLine;
+			}
 		}
 		else if(sCategoryName == "Widget")
 		{
