@@ -55,7 +55,6 @@ DlgSliceSpriteSheet::~DlgSliceSpriteSheet()
 	delete ui;
 	delete m_pPreviewPixmap;
 	delete m_pPreviewScene;
-	delete m_pPreviewPixmap;
 }
 
 void DlgSliceSpriteSheet::Clear()
@@ -73,7 +72,7 @@ QDir DlgSliceSpriteSheet::DumpToTempDir()
 	}
 
 	QDir rootTempDir = HyGlobal::PrepTempDir(*Harmony::GetProject(), HYGUIPATH_TEMPSUBDIR_SpriteSheets);
-	if(false == rootTempDir.mkdir(ui->txtMainFilter->text()))
+	if(false == rootTempDir.mkpath(ui->txtMainFilter->text()))
 		HyGuiLog("DlgSliceSpriteSheet::DumpToTempDir - Could not make root temp directory", LOGTYPE_Error);
 	if(false == rootTempDir.cd(ui->txtMainFilter->text()))
 		HyGuiLog("DlgSliceSpriteSheet::DumpToTempDir - Could not change to root temp directory", LOGTYPE_Error);
@@ -137,6 +136,8 @@ void DlgSliceSpriteSheet::on_btnImageBrowse_clicked()
 		ui->lblPreview->hide();
 		ui->chkCreateSubFilters->hide();
 	}
+
+	ui->chkCreateSubFilters->setEnabled(m_SheetList.size() > 1);
 
 	AssemblePixmaps();
 	SetPreviewIndex(0);
@@ -265,8 +266,7 @@ void DlgSliceSpriteSheet::AssemblePixmaps()
 		if(ui->sbTileSizeX->value() == 0 || ui->sbTileSizeY->value() == 0)
 			continue;
 
-		QPoint ptCurPos(ui->sbOffsetX->value() + ui->sbPaddingX->value(),
-						ui->sbOffsetY->value() + ui->sbPaddingY->value());
+		QPoint ptCurPos(ui->sbOffsetX->value(), ui->sbOffsetY->value());
 
 		QPainter painter;
 		painter.setOpacity(0.0f);
@@ -297,7 +297,7 @@ void DlgSliceSpriteSheet::AssemblePixmaps()
 			}
 			bCountColumns = false;
 
-			ptCurPos.setX(ui->sbOffsetX->value() + ui->sbPaddingX->value());
+			ptCurPos.setX(ui->sbOffsetX->value());
 			ptCurPos.setY(ptCurPos.y() + ui->sbTileSizeY->value() + ui->sbPaddingY->value());
 		}
 	}
@@ -327,8 +327,7 @@ void DlgSliceSpriteSheet::SetPreviewIndex(int iSheetIndex)
 	delete m_pPreviewPixmap;
 	m_pPreviewPixmap = nullptr;
 
-	QPoint ptCurPos(ui->sbOffsetX->value() + ui->sbPaddingX->value(),
-		ui->sbOffsetY->value() + ui->sbPaddingY->value());
+	QPoint ptCurPos(ui->sbOffsetX->value(), ui->sbOffsetY->value());
 	bool bCountColumns = true;
 	int iNumColumns = 0;
 	int iNumRows = 0;
@@ -345,7 +344,7 @@ void DlgSliceSpriteSheet::SetPreviewIndex(int iSheetIndex)
 		}
 		bCountColumns = false;
 
-		ptCurPos.setX(ui->sbOffsetX->value() + ui->sbPaddingX->value());
+		ptCurPos.setX(ui->sbOffsetX->value());
 		ptCurPos.setY(ptCurPos.y() + ui->sbTileSizeY->value() + ui->sbPaddingY->value());
 	}
 	if(iNumColumns == 0 || iNumRows == 0)

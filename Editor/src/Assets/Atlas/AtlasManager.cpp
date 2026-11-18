@@ -263,7 +263,7 @@ void AtlasManager::WriteTileSetsToDisk()
 
 void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData *pFirstSelected)
 {
-	DlgSliceSpriteSheet *pDlg = new DlgSliceSpriteSheet();
+	DlgSliceSpriteSheet *pDlg = new DlgSliceSpriteSheet(m_ProjectRef.GetAtlasWidget());
 	if(QDialog::Accepted == pDlg->exec())
 	{
 		QDir tempDumpDir = pDlg->DumpToTempDir();

@@ -58,7 +58,7 @@
      <item>
       <widget class="QLabel" name="label_11">
        <property name="text">
-        <string>Main filter name</string>
+        <string>Filter name</string>
        </property>
       </widget>
      </item>
@@ -77,6 +77,9 @@
      </item>
      <item>
       <widget class="QCheckBox" name="chkCreateSubFilters">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Create sub-filter for every sprite sheet image</string>
        </property>
@@ -85,7 +88,7 @@
          <normaloff>:/icons16x16/items/Filter-New.png</normaloff>:/icons16x16/items/Filter-New.png</iconset>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>

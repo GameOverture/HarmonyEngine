@@ -31,8 +31,11 @@ DlgNewProjectItem::DlgNewProjectItem(Project *pItemProject, ItemType eItem, QStr
 
 	if(eItem == ITEM_Entity)
 		setWindowTitle("Add a new " % HyGlobal::ItemName(eItem, false) % " Declaration");
-	else
+	else if(eItem != ITEM_Prefix)
 		setWindowTitle("Add a new " % HyGlobal::ItemName(eItem, false) % " Prefab");
+	else
+		setWindowTitle("Add a new " % HyGlobal::ItemName(eItem, false));
+
 	setWindowIcon(HyGlobal::ItemIcon(eItem, SUBICON_New));
 	
 	ui->txtName->setValidator(HyGlobal::FileNameValidator());
