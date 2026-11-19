@@ -179,10 +179,13 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 			fontsMap[fontFileInfoList[i].fileName()] = fontFileInfoList[i].absoluteFilePath();
 	}
 
-	for(auto iter = fontsMap.begin(); iter != fontsMap.end(); ++iter)
+	QStringList sKeys = fontsMap.keys();
+	sKeys.sort(Qt::CaseInsensitive);
+
+	for(QString sKey : sKeys)
 	{
-		QStandardItem *pFontItem = new QStandardItem(iter.key());
-		pFontItem->setData(iter.value());
+		QStandardItem *pFontItem = new QStandardItem(sKey);
+		pFontItem->setData(fontsMap[sKey]);
 
 		m_FontListModel.appendRow(pFontItem);
 	}
@@ -715,14 +718,16 @@ void Project::ScanMetaFontDir()
 	for(int i = 0; i < metaFontFileInfoList.count(); ++i)
 		metaFontsMap[metaFontFileInfoList[i].fileName()] = metaFontFileInfoList[i].absoluteFilePath();
 
-	for(auto iter = metaFontsMap.begin(); iter != metaFontsMap.end(); ++iter)
-	{
-		QStandardItem *pFontItem = new QStandardItem(HyGlobal::ItemIcon(ITEM_Text, SUBICON_None), iter.key());
-		pFontItem->setData(iter.value());
+	QStringList sKeys = metaFontsMap.keys();
+	sKeys.sort(Qt::CaseInsensitive);
 
-		// TODO: Prepend this item, not append
-		m_FontListModel.appendRow(pFontItem);
-		//m_FontListModel.setItem(0, pFontItem);
+	for(QString sKey : sKeys)
+	{
+		QStandardItem *pFontItem = new QStandardItem(HyGlobal::ItemIcon(ITEM_Text, SUBICON_None), sKey);
+		pFontItem->setData(metaFontsMap[sKey]);
+
+		m_FontListModel.insertRow(0, pFontItem);
+		//m_FontListModel.appendRow(pFontItem);
 	}
 }
 

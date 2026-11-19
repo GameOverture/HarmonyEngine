@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>329</width>
-    <height>570</height>
+    <height>572</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -137,19 +137,6 @@
             </widget>
            </item>
            <item>
-            <widget class="QToolButton" name="btnAddEdgeFill">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Edge + Fill</string>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QToolButton" name="btnAddInner">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -184,10 +171,10 @@
         <item>
          <widget class="TextLayersWidget" name="layersTableView">
           <property name="selectionMode">
-           <enum>QAbstractItemView::SingleSelection</enum>
+           <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
           </property>
           <property name="selectionBehavior">
-           <enum>QAbstractItemView::SelectItems</enum>
+           <enum>QAbstractItemView::SelectionBehavior::SelectItems</enum>
           </property>
          </widget>
         </item>
@@ -203,7 +190,7 @@
           <item>
            <spacer name="horizontalSpacer">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>

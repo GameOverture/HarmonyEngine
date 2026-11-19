@@ -55,6 +55,7 @@ TextModel::TextModel(ProjectItemData &itemRef, const FileDataPair &itemFileDataR
 
 	if(m_pAtlasFrame)
 		m_FontManager.SetAtlasGroup(m_pAtlasFrame->GetBankId());
+
 }
 
 /*virtual*/ TextModel::~TextModel()
@@ -97,7 +98,7 @@ QStringList TextModel::GetFontUrls()
 
 void TextModel::SetRuntimeAtlasDirty()
 {
-	HyGuiLog(m_ItemRef.GetName(true) % " runtime atlas is dirty.", LOGTYPE_Normal);
+	HyGuiLog(m_ItemRef.GetName(true) % " runtime atlas is dirty.", LOGTYPE_Debug);
 	m_bGenerateRuntimeAtlas = true;
 }
 

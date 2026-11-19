@@ -691,13 +691,13 @@ void ExplorerWidget::on_actionDeleteItem_triggered()
 		for(int i = 0; i < selectedItems.size(); ++i)
 		{
 			if(GetExplorerModel()->RemoveItem(selectedItems[i]) == false)
-				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % selectedItems[i]->GetName(true), LOGTYPE_Error);
+				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % selectedItems[i]->GetName(true), LOGTYPE_Debug);
 		}
 
 		for(int i = 0; i < selectedPrefixes.size(); ++i)
 		{
 			if(GetExplorerModel()->RemoveItem(selectedPrefixes[i]) == false)
-				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % selectedPrefixes[i]->GetName(true), LOGTYPE_Error);
+				HyGuiLog("ExplorerModel::RemoveItem returned false on: " % selectedPrefixes[i]->GetName(true), LOGTYPE_Debug);
 		}
 	}
 }

@@ -29,7 +29,6 @@ TextWidget::TextWidget(ProjectItemData &itemRef, QWidget *parent) :
 	ui.btnAddFill->setDefaultAction(ui.actionAddFill);
 	ui.btnAddSDF->setDefaultAction(ui.actionAddSDF);
 	ui.btnAddEdge->setDefaultAction(ui.actionAddEdge);
-	ui.btnAddEdgeFill->setDefaultAction(ui.actionAddEdgeFill);
 	ui.btnAddInner->setDefaultAction(ui.actionAddInner);
 	ui.btnRemoveLayer->setDefaultAction(ui.actionRemoveLayer);
 	ui.btnOrderLayerUp->setDefaultAction(ui.actionOrderLayerUp);

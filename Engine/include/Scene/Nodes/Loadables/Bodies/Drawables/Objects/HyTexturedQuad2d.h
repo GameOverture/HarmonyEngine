@@ -69,5 +69,6 @@ private:
 	using IHyLoadable::SetState;
 	using IHyLoadable::GetNumStates;
 };
+typedef HyTexturedQuad2d HyTexturedQuad;
 
 #endif /* HyTexturedQuad2d_h__ */
