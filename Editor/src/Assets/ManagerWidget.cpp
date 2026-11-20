@@ -395,19 +395,33 @@ ManagerWidget::ManagerWidget(IManagerModel *pModel, QWidget *pParent /*= nullptr
 	switch(m_pModel->GetAssetType())
 	{
 	case ASSETMAN_Source: {
+		QFrame *pSeparator = new QFrame();
+		pSeparator->setFrameShape(QFrame::VLine);
+		pSeparator->setFrameShadow(QFrame::Sunken);
+		pSeparator->setLineWidth(1);
+
 		QToolButton *pBtnAddClassFiles = new QToolButton(this);
 		pBtnAddClassFiles->setDefaultAction(ui->actionAddClassFiles);
-		ui->lytBottomToolBar->insertWidget(0, pBtnAddClassFiles);
+
+		ui->lytBottomToolBarEx->addWidget(pSeparator);
+		ui->lytBottomToolBarEx->addWidget(pBtnAddClassFiles);
 		break; }
 
 	case ASSETMAN_Atlases: {
-		QToolButton *pBtnCreateTileSet = new QToolButton(this);
-		pBtnCreateTileSet->setDefaultAction(ui->actionCreateTileSet);
-		ui->lytBottomToolBar->insertWidget(0, pBtnCreateTileSet);
+		QFrame *pSeparator = new QFrame();
+		pSeparator->setFrameShape(QFrame::VLine);
+		pSeparator->setFrameShadow(QFrame::Sunken);
+		pSeparator->setLineWidth(1);
 
 		QToolButton *pBtnSliceSpriteSheet = new QToolButton(this);
 		pBtnSliceSpriteSheet->setDefaultAction(ui->actionSliceSpriteSheet);
-		ui->lytBottomToolBar->insertWidget(0, pBtnSliceSpriteSheet);
+
+		QToolButton *pBtnCreateTileSet = new QToolButton(this);
+		pBtnCreateTileSet->setDefaultAction(ui->actionCreateTileSet);
+
+		ui->lytBottomToolBarEx->addWidget(pSeparator);
+		ui->lytBottomToolBarEx->addWidget(pBtnSliceSpriteSheet);
+		ui->lytBottomToolBarEx->addWidget(pBtnCreateTileSet);
 		break; }
 
 	case ASSETMAN_Audio:
