@@ -1359,7 +1359,7 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 			if(spriteObj.contains("Texture Tiling"))
 			{
 				QJsonArray textureTilingArray = spriteObj["Texture Tiling"].toArray();
-				sSrc += sCodeName + "SetTextureTiling(glm::vec2(" + QString::number(textureTilingArray[0].toDouble(), 'f') + "f, " + QString::number(textureTilingArray[1].toDouble(), 'f') + "f);" + sNewLine;
+				sSrc += sCodeName + "SetTextureTiling(glm::vec2(" + QString::number(textureTilingArray[0].toDouble(), 'f') + "f, " + QString::number(textureTilingArray[1].toDouble(), 'f') + "f));" + sNewLine;
 			}
 		}
 		else if(sCategoryName == "Text")

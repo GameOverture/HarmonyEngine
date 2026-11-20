@@ -955,8 +955,15 @@ void ManagerWidget::on_actionAssetSettings_triggered()
 		QList<ProjectItemData *> tmpUnusedList;
 		if(m_pModel->GetAffectedItems(dlg.GetChangedAssets(), tmpUnusedList))
 		{
-			dlg.ApplyChanges();
-			m_pModel->ReplaceAssets(dlg.GetChangedAssets(), false);
+			if(m_pModel->GetProjOwner().IsUnsavedOpenItems())
+			{
+				HyGuiLog("Cannot replace assets while there are open unsaved items.", LOGTYPE_Warning);
+			}
+			else
+			{
+				dlg.ApplyChanges();
+				m_pModel->ReplaceAssets(dlg.GetChangedAssets(), false);
+			}
 		}
 	}
 }

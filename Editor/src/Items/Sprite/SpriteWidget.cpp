@@ -76,11 +76,10 @@ SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 	pMenu->addAction(ui->actionOrderFrameUpwards);
 	pMenu->addAction(ui->actionOrderFrameDownwards);
 	pMenu->addSeparator();
-	pMenu->addAction(ui->actionAlignUp);
-	pMenu->addAction(ui->actionAlignUp);
 	pMenu->addAction(ui->actionAlignLeft);
 	pMenu->addAction(ui->actionAlignDown);
 	pMenu->addAction(ui->actionAlignRight);
+	pMenu->addAction(ui->actionAlignUp);
 	pMenu->addAction(ui->actionAlignCenterHorizontal);
 	pMenu->addAction(ui->actionAlignCenterVertical);
 	pMenu->addAction(ui->actionApplyToAll);
@@ -93,10 +92,10 @@ SpriteWidget::SpriteWidget(ProjectItemData &itemRef, QWidget *pParent) :
 
 	ui->actionAlignCenterHorizontal->setEnabled(bFrameIsSelected);
 	ui->actionAlignCenterVertical->setEnabled(bFrameIsSelected);
-	ui->actionAlignUp->setEnabled(bFrameIsSelected);
-	ui->actionAlignDown->setEnabled(bFrameIsSelected);
 	ui->actionAlignLeft->setEnabled(bFrameIsSelected);
+	ui->actionAlignDown->setEnabled(bFrameIsSelected);
 	ui->actionAlignRight->setEnabled(bFrameIsSelected);
+	ui->actionAlignUp->setEnabled(bFrameIsSelected);
 
 	ui->actionOrderFrameUpwards->setEnabled(ui->framesView->currentIndex().row() != 0 && iCurNumFrames > 1);
 	ui->actionOrderFrameDownwards->setEnabled(ui->framesView->currentIndex().row() != iCurNumFrames - 1 && iCurNumFrames > 1);

@@ -356,8 +356,6 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 	}
 	else if(sCategory == "Common")
 	{
-		if(sPropertyName == "State")
-			return QJsonValue(static_cast<qint64>(pThisHyNode->GetState()));
 		if(sPropertyName == "Update During Paused")
 			return QJsonValue(pThisHyNode->IsPauseUpdate());
 		if(sPropertyName == "User Tag")
@@ -393,6 +391,8 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 	}
 	else if(sCategory == "Sprite")
 	{
+		if(sPropertyName == "State")
+			return QJsonValue(static_cast<qint64>(pThisHyNode->GetState()));
 		if(sPropertyName == "Frame")
 			return QJsonValue(static_cast<int>(static_cast<HySprite2d *>(pThisHyNode)->GetFrame()));
 		if(sPropertyName == "Anim Pause")
@@ -410,6 +410,8 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 	}
 	else if(sCategory == "Text")
 	{
+		if(sPropertyName == "State")
+			return QJsonValue(static_cast<qint64>(pThisHyNode->GetState()));
 		if(sPropertyName == "Text")
 			return QJsonValue(QString::fromUtf8(static_cast<HyText2d *>(pThisHyNode)->GetUtf8String().c_str()));
 		if(sPropertyName == "Style")
@@ -458,6 +460,11 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 				}
 			}
 		}
+	}
+	else if(sCategory == "Spine")
+	{
+		if(sPropertyName == "State")
+			return QJsonValue(static_cast<qint64>(pThisHyNode->GetState()));
 	}
 	else if(sCategory == "Textured Quad")
 	{
@@ -573,6 +580,11 @@ QJsonValue EntityDrawItem::ExtractPropertyData(QString sCategory, QString sPrope
 			return QJsonValue(static_cast<HySlider *>(pThisHyNode)->GetValue());
 		if(sPropertyName == "Vertical")
 			return QJsonValue(static_cast<HySlider *>(pThisHyNode)->GetOrientation() == HYORIENT_Vertical);
+	}
+	else if(sCategory == "Audio")
+	{
+		if(sPropertyName == "State")
+			return QJsonValue(static_cast<qint64>(pThisHyNode->GetState()));
 	}
 
 	HyGuiLog("EntityDrawItem::ExtractPropertyData - unhandled property: " % sCategory % " -> " % sPropertyName, LOGTYPE_Error);
@@ -930,12 +942,6 @@ void ExtrapolateProperties(Project &projectRef,
 			if(propsObj.contains("Common"))
 			{
 				QJsonObject commonObj = propsObj["Common"].toObject();
-
-				if(HyGlobal::IsItemType_Asset(eItemType) == false && commonObj.contains("State"))
-				{
-					if(pThisHyNode->SetState(commonObj["State"].toInt()) && eItemType == ITEM_Sprite)
-						previewComponentRef.m_SpriteInfo = EntityPreviewComponent::LastKnownSpriteInfo(iFrame, -1, false, previewComponentRef.m_SpriteInfo.m_bPaused);
-				}
 				if(commonObj.contains("Update During Paused"))
 					pThisHyNode->SetPauseUpdate(commonObj["Update During Paused"].toBool());
 				if(commonObj.contains("User Tag"))
@@ -1122,6 +1128,9 @@ void ExtrapolateProperties(Project &projectRef,
 			{
 				QJsonObject textObj = propsObj["Text"].toObject();
 
+				if(textObj.contains("State"))
+					pThisHyNode->SetState(textObj["State"].toInt());
+
 				HyText2d *pTextNode = static_cast<HyText2d *>(pThisHyNode);
 
 				// Apply all text properties before the style, so the ShapeCtrl can properly calculate itself within ShapeCtrl::SetAsText()
@@ -1192,6 +1201,14 @@ void ExtrapolateProperties(Project &projectRef,
 			// If the state was changed on this frame 'iFrame', it was already applied to pThisNode above in "Common", "State"
 			if(propsObj.contains("Sprite"))
 			{
+				QJsonObject spriteObj = propsObj["Sprite"].toObject();
+
+				if(spriteObj.contains("State"))
+				{
+					if(pThisHyNode->SetState(spriteObj["State"].toInt()))
+						previewComponentRef.m_SpriteInfo = EntityPreviewComponent::LastKnownSpriteInfo(iFrame, -1, false, previewComponentRef.m_SpriteInfo.m_bPaused);
+				}
+
 				// Set the sprite to the last known anim info, and let it "naturally" AdvanceAnim() to frame 'iFrame'
 				if(previewComponentRef.m_SpriteInfo.m_iSpriteFrame == -1)
 					static_cast<HySprite2d *>(pThisHyNode)->SetAnimCtrl(HYANIMCTRL_Reset);
@@ -1209,7 +1226,7 @@ void ExtrapolateProperties(Project &projectRef,
 				previewComponentRef.m_SpriteInfo.m_iEntityFrame = iFrame;
 				previewComponentRef.m_SpriteInfo.m_bBouncePhase = static_cast<HySprite2d *>(pThisHyNode)->IsAnimInBouncePhase();
 
-				QJsonObject spriteObj = propsObj["Sprite"].toObject();
+				
 				if(spriteObj.contains("Frame"))
 					static_cast<HySprite2d *>(pThisHyNode)->SetFrame(spriteObj["Frame"].toInt());
 				if(spriteObj.contains("Anim Rate"))
