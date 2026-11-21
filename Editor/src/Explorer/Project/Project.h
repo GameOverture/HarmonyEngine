@@ -92,6 +92,7 @@ class Project : public ExplorerItemData
 	QSet<ProjectItemData *>								m_DirtyProjItemSet;		// Dirty items that need to be resaved before a ReloadHarmony()
 
 	QFileSystemWatcher									m_OpenFileWatcher;		// Watches for source control pulls, which require reloading the project (otherwise saving in current state would overwrite and lose those changes)
+	QFileSystemWatcher									m_FontFileWatcher;		// Detects when changes to the scannable font directories happen
 
 	bool												m_bHasError;
 	bool												m_bExplorerModelLoaded;
@@ -143,6 +144,8 @@ public:
 	//void SetAudioModel(QJsonObject audioObj);
 
 	QStandardItemModel *GetFontListModel();
+
+	void ScanSystemFonts();
 	void ScanMetaFontDir();
 
 	QStringListModel *GetCollisionFilterModel();
@@ -213,6 +216,7 @@ public:
 public Q_SLOTS:
 	void OnTabBarCurrentChanged(int iIndex);
 	void OnCloseTab(int iIndex);
+	void OnFontsChanged(const QString &sPath);
 
 private:
 	QJsonObject ReadProjFile();

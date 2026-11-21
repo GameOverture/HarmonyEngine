@@ -165,39 +165,18 @@ Project::Project(const QString sProjectFilePath, ExplorerModel &modelRef) :
 	m_pAudioManager = new AudioManager(*this);
 	m_pAudioManager->Init();
 
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	QStringList sFilterList(HYMETA_FontFilterList);
-	QMap<QString,QString> fontsMap;
-
-	QStringList sSystemFontPaths = QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
-	for(int i = 0; i < sSystemFontPaths.count(); ++i)
-	{
-		QDir fontDir(sSystemFontPaths[i]);
-		QFileInfoList fontFileInfoList = fontDir.entryInfoList(sFilterList);
-
-		for(int i = 0; i < fontFileInfoList.count(); ++i)
-			fontsMap[fontFileInfoList[i].fileName()] = fontFileInfoList[i].absoluteFilePath();
-	}
-
-	QStringList sKeys = fontsMap.keys();
-	sKeys.sort(Qt::CaseInsensitive);
-
-	for(QString sKey : sKeys)
-	{
-		QStandardItem *pFontItem = new QStandardItem(sKey);
-		pFontItem->setData(fontsMap[sKey]);
-
-		m_FontListModel.appendRow(pFontItem);
-	}
-
-	ScanMetaFontDir();
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	ScanSystemFonts();
 
 	m_TileMapSettings.compressionLevel = -1;
 	m_TileMapSettings.chunkSize = QSize(Tiled::CHUNK_SIZE, Tiled::CHUNK_SIZE);
 	m_TileMapSettings.layerDataFormat = Tiled::Map::Base64Zlib;
 
 	QObject::connect(&m_OpenFileWatcher, SIGNAL(fileChanged(const QString &)), this, SLOT(OnFileChanged(const QString &)));
+
+	QStringList sSystemFontPaths = QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
+	sSystemFontPaths.append(GetMetaAbsPath() % HYMETA_FontsDir);
+	m_FontFileWatcher.addPaths(sSystemFontPaths);
+	QObject::connect(&m_FontFileWatcher, SIGNAL(directoryChanged(const QString &)), this, SLOT(OnFontsChanged(const QString &)));
 
 	HyGlobal::CleanAllTempDirs(*this);
 }
@@ -708,6 +687,34 @@ QStandardItemModel *Project::GetFontListModel()
 	return &m_FontListModel;
 }
 
+void Project::ScanSystemFonts()
+{
+	QStringList sFilterList(HYMETA_FontFilterList);
+	QMap<QString,QString> fontsMap;
+
+	QStringList sSystemFontPaths = QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
+	for(int i = 0; i < sSystemFontPaths.count(); ++i)
+	{
+		QDir fontDir(sSystemFontPaths[i]);
+		QFileInfoList fontFileInfoList = fontDir.entryInfoList(sFilterList);
+
+		for(int i = 0; i < fontFileInfoList.count(); ++i)
+			fontsMap[fontFileInfoList[i].fileName()] = fontFileInfoList[i].absoluteFilePath();
+	}
+
+	for(QString sKey : fontsMap.keys())
+	{
+		if(m_FontListModel.findItems(sKey).empty() == false)
+			continue;
+
+		QStandardItem *pFontItem = new QStandardItem(sKey);
+		pFontItem->setData(fontsMap[sKey]);
+		m_FontListModel.appendRow(pFontItem);
+	}
+
+	ScanMetaFontDir();
+}
+
 void Project::ScanMetaFontDir()
 {
 	QStringList sFilterList(HYMETA_FontFilterList);
@@ -718,16 +725,15 @@ void Project::ScanMetaFontDir()
 	for(int i = 0; i < metaFontFileInfoList.count(); ++i)
 		metaFontsMap[metaFontFileInfoList[i].fileName()] = metaFontFileInfoList[i].absoluteFilePath();
 
-	QStringList sKeys = metaFontsMap.keys();
-	sKeys.sort(Qt::CaseInsensitive);
-
-	for(QString sKey : sKeys)
+	for(QString sKey : metaFontsMap.keys())
 	{
+		if(m_FontListModel.findItems(sKey).empty() == false)
+			continue;
+
 		QStandardItem *pFontItem = new QStandardItem(HyGlobal::ItemIcon(ITEM_Text, SUBICON_None), sKey);
 		pFontItem->setData(metaFontsMap[sKey]);
 
-		m_FontListModel.insertRow(0, pFontItem);
-		//m_FontListModel.appendRow(pFontItem);
+		m_FontListModel.appendRow(pFontItem);
 	}
 }
 
@@ -1445,6 +1451,11 @@ void Project::OnCloseTab(int iIndex)
 	ProjectItemData *pItem = m_pTabBar->tabData(iIndex).value<ProjectItemData *>();
 	
 	MainWindow::CloseItem(pItem);
+}
+
+void Project::OnFontsChanged(const QString &sPath)
+{
+	ScanSystemFonts();
 }
 
 void Project::RenameItemInDataObj(ItemType eType, QString sOldPath, QString sNewPath, QJsonObject &dataObjRef)

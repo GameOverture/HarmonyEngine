@@ -14,11 +14,14 @@
 
 #include <QWidget>
 #include <QTableView>
+#include <QSortFilterProxyModel>
 #include "ui_TextWidget.h"
 
 class TextWidget : public IWidget
 {
 	Q_OBJECT
+
+	QSortFilterProxyModel			m_SortedFontProxyModel;
 
 public:
 	TextWidget(ProjectItemData &itemRef, QWidget *parent = nullptr);

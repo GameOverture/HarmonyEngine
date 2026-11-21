@@ -35,8 +35,12 @@ TextWidget::TextWidget(ProjectItemData &itemRef, QWidget *parent) :
 	ui.btnOrderLayerDown->setDefaultAction(ui.actionOrderLayerDown);
 
 	QStandardItemModel *pProjectFontsModel = m_ItemRef.GetProject().GetFontListModel();
+	m_SortedFontProxyModel.setSourceModel(pProjectFontsModel);
+	m_SortedFontProxyModel.setSortCaseSensitivity(Qt::CaseInsensitive);
+	m_SortedFontProxyModel.sort(0, Qt::AscendingOrder);
+
 	ui.cmbFont->blockSignals(true);
-	ui.cmbFont->setModel(pProjectFontsModel);
+	ui.cmbFont->setModel(&m_SortedFontProxyModel);
 	ui.cmbFont->blockSignals(false);
 
 	// Set font size combobox with the standard sizes.
@@ -115,12 +119,15 @@ TextWidget::~TextWidget()
 		ui.layersTableView->resize(ui.layersTableView->size());
 
 		QStandardItemModel *pProjectFontsModel = m_ItemRef.GetProject().GetFontListModel();
+
 		QString sFontName = pTextLayerModel->GetFont();
-		int iNumFonts = pProjectFontsModel->rowCount();
+		int iNumFonts = m_SortedFontProxyModel.rowCount();
 		for(int i = 0; i < iNumFonts; ++i)
 		{
-			QString sTest = pProjectFontsModel->item(i)->text();
-			if(pProjectFontsModel->item(i)->text().compare(sFontName, Qt::CaseInsensitive) == 0)
+			QModelIndex proxyIndex = m_SortedFontProxyModel.index(i, 0);
+			QModelIndex srcIndex = m_SortedFontProxyModel.mapToSource(proxyIndex);
+
+			if(pProjectFontsModel->itemFromIndex(srcIndex)->text().compare(sFontName, Qt::CaseInsensitive) == 0)
 			{
 				ui.cmbFont->blockSignals(true);
 				ui.cmbFont->setCurrentIndex(i);
@@ -149,7 +156,7 @@ void TextWidget::on_cmbFont_currentIndexChanged(int index)
 	if(pTextLayerModel == nullptr || pTextLayerModel->IsEmpty())
 		return;
 
-	if(pTextLayerModel->GetFont().compare(ui.cmbFont->currentText(), Qt::CaseInsensitive) == 0)
+	if(/*ui.cmbFont->currentText().isEmpty() ||*/ pTextLayerModel->GetFont().compare(ui.cmbFont->currentText(), Qt::CaseInsensitive) == 0)
 		return;
 
 	QUndoCommand *pCmd = new TextUndoCmd_FontChange(m_ItemRef,
