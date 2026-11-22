@@ -28,7 +28,7 @@ SourceManager::SourceManager(Project &projRef) :
 {
 	m_bIsSingleBank = true;
 	m_MetaDir.setPath(m_ProjectRef.GetSourceAbsPath());
-	m_DataDir.setPath(m_ProjectRef.GetSourceAbsPath()); // SourceManager doesn't use a DataDir
+	m_DataDir.setPath(m_ProjectRef.GetSourceAbsPath());
 
 	m_pEntityFolderItem = new TreeModelItemData(ITEM_Filter, QUuid(), HySrcEntityFilter);
 	InsertTreeItem(m_ProjectRef, m_pEntityFolderItem, nullptr);

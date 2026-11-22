@@ -46,16 +46,25 @@ IManagerModel::IManagerModel(Project &projRef, AssetManagerType eAssetType) :
 // Init() exists because we need to construct using virtual functions (or after derived ctor initialization)
 void IManagerModel::Init()
 {
-	// Ensure proper data directories exist
-	if(m_MetaDir.exists() == false)
+	if(m_eASSET_TYPE == ASSETMAN_Source)
 	{
-		HyGuiLog(HyGlobal::AssetName(m_eASSET_TYPE) % " meta directory is missing, recreating", LOGTYPE_Info);
-		m_MetaDir.mkpath(m_MetaDir.absolutePath());
+		// Source Manager uses the project's source code directory for both m_MetaDir/m_DataDir
+		m_MetaDir.setPath(m_ProjectRef.GetSourceAbsPath());
+		m_DataDir.setPath(m_ProjectRef.GetSourceAbsPath());
 	}
-	if(m_DataDir.exists() == false)	// Check this second because some AssetManagers set DataDir to also be MetaDir
+	else
 	{
-		HyGuiLog(HyGlobal::AssetName(m_eASSET_TYPE) % " data directory is missing, recreating", LOGTYPE_Info);
-		m_DataDir.mkpath(m_DataDir.absolutePath());
+		// Ensure proper data directories exist
+		if(m_MetaDir.exists() == false)
+		{
+			HyGuiLog(HyGlobal::AssetName(m_eASSET_TYPE) % " meta directory is missing, recreating", LOGTYPE_Info);
+			m_MetaDir.mkpath(m_MetaDir.absolutePath());
+		}
+		if(m_DataDir.exists() == false)
+		{
+			HyGuiLog(HyGlobal::AssetName(m_eASSET_TYPE) % " data directory is missing, recreating", LOGTYPE_Info);
+			m_DataDir.mkpath(m_DataDir.absolutePath());
+		}
 	}
 
 	// Read this manager's banks and assets from existing file, or create a new default bank

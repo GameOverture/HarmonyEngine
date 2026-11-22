@@ -101,7 +101,6 @@ void DlgNewProject::on_buttonBox_accepted()
 	buildDir.setPath(GetProjDirPath());
 	buildDir.mkdir(ui->wgtMetaDir->GetRelPath());
 	buildDir.cd(ui->wgtMetaDir->GetRelPath());
-	buildDir.mkdir(HyGlobal::AssetName(ASSETMAN_Source));
 	buildDir.mkdir(HyGlobal::AssetName(ASSETMAN_Atlases));
 	buildDir.mkdir(HyGlobal::AssetName(ASSETMAN_Audio));
 
@@ -234,10 +233,10 @@ void DlgNewProject::on_chkCreateGameDir_clicked()
 
 void DlgNewProject::UpdateProjectDir()
 {
-	ui->wgtDataDir->Setup("Assets", "data", GetProjDirPath(), ".", true);
-	ui->wgtMetaDir->Setup("Meta-Data", "meta", GetProjDirPath(), ".", true);
-	ui->wgtSourceDir->Setup("Source Code", "src", GetProjDirPath(), "meta", true);
-	ui->wgtBuildDir->Setup("Build", "build", GetProjDirPath(), ".", true);
+	ui->wgtDataDir->Setup("Assets", GetProjDirPath(), "./data", true);
+	ui->wgtMetaDir->Setup("Meta-Data", GetProjDirPath(), "./meta", true);
+	ui->wgtSourceDir->Setup("Source Code", GetProjDirPath(), "./meta/src", true);
+	ui->wgtBuildDir->Setup("Build", GetProjDirPath(), "./build", true);
 }
 
 void DlgNewProject::ErrorCheck()

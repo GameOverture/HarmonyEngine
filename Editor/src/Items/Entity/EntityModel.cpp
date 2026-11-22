@@ -1151,8 +1151,6 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 		else if(sCategoryName == "Common")
 		{
 			QJsonObject commonObj = propObj["Common"].toObject();
-			if(commonObj.contains("State"))
-				sSrc += sCodeName + "SetState(" + QString::number(commonObj["State"].toInt()) + ");" + sNewLine;
 
 			if(commonObj.contains("Update During Paused"))
 				sSrc += sCodeName + "SetPauseUpdate(" + (commonObj["Update During Paused"].toBool() ? "true" : "false") + ");" + sNewLine;
@@ -1344,6 +1342,9 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 		else if(sCategoryName == "Sprite")
 		{
 			QJsonObject spriteObj = propObj["Sprite"].toObject();
+
+			if(spriteObj.contains("State"))
+				sSrc += sCodeName + "SetState(" + QString::number(spriteObj["State"].toInt()) + ");" + sNewLine;
 			if(spriteObj.contains("Frame"))
 				sSrc += sCodeName + "SetFrame(" + QString::number(spriteObj["Frame"].toInt()) + ");" + sNewLine;
 			if(spriteObj.contains("Anim Pause"))
@@ -1365,6 +1366,9 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 		else if(sCategoryName == "Text")
 		{
 			QJsonObject textObj = propObj["Text"].toObject();
+
+			if(textObj.contains("State"))
+				sSrc += sCodeName + "SetState(" + QString::number(textObj["State"].toInt()) + ");" + sNewLine;
 			if(textObj.contains("Text"))
 				sSrc += sCodeName + "SetText(\"" + textObj["Text"].toString() + "\");" + sNewLine;
 			if(textObj.contains("Style"))
@@ -1425,6 +1429,13 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 				QJsonArray textureTilingArray = texturedQuadObj["Texture Tiling"].toArray();
 				sSrc += sCodeName + "SetTextureTiling(glm::vec2(" + QString::number(textureTilingArray[0].toDouble(), 'f') + "f, " + QString::number(textureTilingArray[1].toDouble(), 'f') + "f);" + sNewLine;
 			}
+		}
+		else if(sCategoryName == "Spine")
+		{
+			QJsonObject spineObj = propObj["Spine"].toObject();
+
+			if(spineObj.contains("State"))
+				sSrc += sCodeName + "SetState(" + QString::number(spineObj["State"].toInt()) + ");" + sNewLine;
 		}
 		else if(sCategoryName == "Widget")
 		{
@@ -1609,6 +1620,13 @@ QString EntityModel::GenerateSrc_SetProperties(bool &bVertListDeclaredRef, Entit
 			// TODO: m_pPropertiesModel->AppendProperty("Slider", "Value", PROPERTIESTYPE_int, 0, "The current slider value, clamped or corrected to a value appropriate from 'Set Range'", PROPERTIESACCESS_ToggleUnchecked, -iRANGE, iRANGE, 1);
 			// TODO: m_pPropertiesModel->AppendProperty("Slider", "Vertical", PROPERTIESTYPE_bool, Qt::Unchecked, "When set the slider will be vertical instead of horizontal", PROPERTIESACCESS_ToggleUnchecked);
 			// TODO: SetBarColors(HyColor posColor, HyColor negColor, HyColor strokeColor);	
+		}
+		else if(sCategoryName == "Audio")
+		{
+			QJsonObject audioObj = propObj["Audio"].toObject();
+
+			if(audioObj.contains("State"))
+				sSrc += sCodeName + "SetState(" + QString::number(audioObj["State"].toInt()) + ");" + sNewLine;
 		}
 		else if(sCategoryName == "Tween Position")
 		{

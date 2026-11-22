@@ -48,10 +48,10 @@ DlgProjectSettings::DlgProjectSettings(Project &projectRef, QWidget *parent) :
 		}
 	}
 
-	ui->wgtDataDir->Setup("Assets", "data", m_ProjectRef.GetDirPath(), m_ProjectRef.GetAssetsRelPath(), false);
-	ui->wgtMetaDir->Setup("Meta-Data", "meta", m_ProjectRef.GetDirPath(), m_ProjectRef.GetMetaRelPath(), false);
-	ui->wgtSourceDir->Setup("Source Code", "Source", m_ProjectRef.GetDirPath(), m_ProjectRef.GetSourceRelPath(), false);
-	ui->wgtBuildDir->Setup("Build", "build", m_ProjectRef.GetDirPath(), m_ProjectRef.GetBuildRelPath(), false);
+	ui->wgtDataDir->Setup("Assets", m_ProjectRef.GetDirPath(), m_ProjectRef.GetAssetsRelPath(), false);
+	ui->wgtMetaDir->Setup("Meta-Data", m_ProjectRef.GetDirPath(), m_ProjectRef.GetMetaRelPath(), false);
+	ui->wgtSourceDir->Setup("Source Code", m_ProjectRef.GetDirPath(), m_ProjectRef.GetSourceRelPath(), false);
+	ui->wgtBuildDir->Setup("Build", m_ProjectRef.GetDirPath(), m_ProjectRef.GetBuildRelPath(), false);
 
 	ui->lblError->setStyleSheet("QLabel { background-color : red; color : black; }");
 	connect(ui->wgtDataDir, &WgtMakeRelDir::OnDirty, this, &DlgProjectSettings::ErrorCheck);

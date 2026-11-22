@@ -21,9 +21,8 @@ class WgtMakeRelDir : public QWidget
 	Q_OBJECT
 
 	QString					m_sTitle;
-	QString					m_sAbsProjPath;
 
-	//QString					m_sAbsParentDirPath;	// The absolute path to the parent directory of the new dir will reside, but not the directory itself
+	QString					m_sAbsBasePath; // AKA the project location
 
 	bool					m_bMustBeEmptyFolder;
 	
@@ -31,7 +30,7 @@ public:
 	explicit WgtMakeRelDir(QWidget *parent = 0);
 	~WgtMakeRelDir();
 
-	void Setup(QString sTitle, QString sDefaultName, QString sAbsProjectPath, QString sDefaultRelativePath, bool bMustBeEmptyFolder);
+	void Setup(QString sTitle, QString sAbsBasePath, QString sDefaultRelativePath, bool bMustBeEmptyFolder);
 
 	QString GetRelPath() const;
 	QString GetAbsPath() const;
