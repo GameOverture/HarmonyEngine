@@ -58,6 +58,7 @@ class AtlasPacker
 	bool								m_bSquareTextures;
 	bool								m_bAggressiveResize;
 
+	int									m_iExtrudeAmt;
 	HyMargins<int>						m_FrameMargins;
 
 	enum SortType
@@ -111,6 +112,7 @@ public:
 	void AddFrame(QSize imageSize, QRect alphaCrop, quint32 uiChecksum, AtlasFrame *pData, QString sPath);
 	void PackFramesToBins(BankData *pBankData);
 
+	int GetExtrudeAmt() const;
 	HyMargins<int> GetFrameMargins() const;
 	int GetNumFrames() const;
 	int GetNumBins() const;

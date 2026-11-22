@@ -90,8 +90,11 @@ bool AtlasManager::IsImageValid(int iWidth, int iHeight, const QJsonObject &atla
 {
 	int iMarginWidth =  atlasSettings["sbFrameMarginLeft"].toInt();
 	iMarginWidth +=     atlasSettings["sbFrameMarginRight"].toInt();
+	iMarginWidth += (atlasSettings["extrudeAmt"].toInt() * 2);
+
 	int iMarginHeight = atlasSettings["sbFrameMarginBottom"].toInt();
 	iMarginHeight +=    atlasSettings["sbFrameMarginTop"].toInt();
+	iMarginHeight += (atlasSettings["extrudeAmt"].toInt() * 2);
 
 	QSize atlasMargins(iMarginWidth, iMarginHeight);
 	QSize atlasDimensions(atlasSettings["maxWidth"].toInt(), atlasSettings["maxHeight"].toInt());
@@ -401,6 +404,7 @@ void AtlasManager::OnSliceSprite(quint32 uiDestinationBankId, TreeModelItemData 
 /*virtual*/ void AtlasManager::OnCreateNewBank(QJsonObject &newMetaBankObjRef) /*override*/
 {
 	newMetaBankObjRef.insert("cmbSortOrder", 0);
+	newMetaBankObjRef.insert("extrudeAmt", 0);
 	newMetaBankObjRef.insert("sbFrameMarginTop", 0);
 	newMetaBankObjRef.insert("sbFrameMarginLeft", 0);
 	newMetaBankObjRef.insert("sbFrameMarginRight", 1);

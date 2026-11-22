@@ -125,6 +125,9 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 
 /*virtual*/ void WgtHarmony::resizeGL(int w, int h) /*override*/
 {
+	if(sm_bHarmonyLoaded == false)
+		return;
+
 	qreal fDevicePixelRatio = QGuiApplication::topLevelWindows().at(0)->devicePixelRatio();
 	glm::ivec2 newSize(w * fDevicePixelRatio, h * fDevicePixelRatio);
 
@@ -146,12 +149,18 @@ HyRendererInterop *WgtHarmony::GetHarmonyRenderer()
 
 /*virtual*/ void WgtHarmony::enterEvent(QEnterEvent*pEvent) /*override*/
 {
+	if(sm_bHarmonyLoaded == false)
+		return;
+
 	this->setFocus();
 	static_cast<HarmonyWidget *>(parent())->ShowRulerMouse(true);
 }
 
 /*virtual*/ void WgtHarmony::leaveEvent(QEvent *pEvent) /*override*/
 {
+	if(sm_bHarmonyLoaded == false)
+		return;
+
 	static_cast<HarmonyWidget *>(parent())->ShowRulerMouse(false);
 
 	if(m_pProject)

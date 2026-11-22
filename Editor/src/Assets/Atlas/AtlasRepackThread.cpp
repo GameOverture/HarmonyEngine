@@ -259,13 +259,95 @@ QSize AtlasRepackThread::ConstructAtlasTexture(BankData *pBankData, AtlasPacker 
 			continue;
 
 		HyMargins<int> frameMargins = atlasPackerRef.GetFrameMargins();
+		int iExtrudeAmt = atlasPackerRef.GetExtrudeAmt();
 		pFrame->UpdateInfoFromPacker(iActualTextureIndex,
-									 packFrameRef.pos.x() + frameMargins.left,
-									 textureSize.height() - packFrameRef.pos.y() - packFrameRef.crop.height() - frameMargins.top, // NOTE: Packer uses top-left for position, but we store it bottom-left
+									 packFrameRef.pos.x() + frameMargins.left + iExtrudeAmt,
+									 textureSize.height() - packFrameRef.pos.y() - packFrameRef.crop.height() - frameMargins.top - iExtrudeAmt, // NOTE: Packer uses top-left for position, but we store it bottom-left
 									 textureSize);
 
-		QPoint pos(pFrame->GetX(), packFrameRef.pos.y() + frameMargins.top);
-		p.drawImage(pos.x(), pos.y(), QImage(packFrameRef.path), packFrameRef.crop.x(), packFrameRef.crop.y(), packFrameRef.crop.width(), packFrameRef.crop.height());
+		QPoint pos(pFrame->GetX() - iExtrudeAmt, packFrameRef.pos.y() + frameMargins.top);
+
+		if(iExtrudeAmt > 0)
+		{
+			QImage img(packFrameRef.path);
+
+			QRect crop = packFrameRef.crop;
+
+			QColor color1 = QColor::fromRgba(img.pixel(packFrameRef.crop.x(), packFrameRef.crop.y()));
+			p.setPen(color1);
+			p.setBrush(color1);
+			if(iExtrudeAmt == 1)
+			{
+				p.drawPoint(QPoint(pos.x(), pos.y()));
+			}
+			else
+			{
+				p.drawRect(QRect(pos.x(), pos.y(), iExtrudeAmt - 1, iExtrudeAmt - 1));
+			}
+
+			QColor color2 = QColor::fromRgba(img.pixel(crop.x(),
+				crop.y() + crop.height() - 1));
+			p.setPen(color2);
+			p.setBrush(color2);
+			if(iExtrudeAmt == 1)
+			{
+				p.drawPoint(QPoint(pos.x(), pos.y() + crop.height() + iExtrudeAmt));
+			}
+			else
+			{
+				p.drawRect(QRect(pos.x(), pos.y() + crop.height() + iExtrudeAmt,
+					iExtrudeAmt - 1, iExtrudeAmt - 1));
+			}
+
+			QColor color3 = QColor::fromRgba(img.pixel(crop.x() + crop.width() - 1,
+				crop.y()));
+			p.setPen(color3);
+			p.setBrush(color3);
+			if(iExtrudeAmt == 1)
+			{
+				p.drawPoint(QPoint(pos.x() + crop.width() + iExtrudeAmt, pos.y()));
+			}
+			else
+			{
+				p.drawRect(QRect(pos.x() + crop.width() + iExtrudeAmt, pos.y(),
+					iExtrudeAmt - 1, iExtrudeAmt - 1));
+			}
+
+			QColor color4 = QColor::fromRgba(img.pixel(crop.x() + crop.width() - 1,
+				crop.y() + crop.height() - 1));
+			p.setPen(color4);
+			p.setBrush(color4);
+			if(iExtrudeAmt == 1)
+			{
+				p.drawPoint(QPoint(pos.x() + crop.width() + iExtrudeAmt,
+					pos.y() + crop.height() + iExtrudeAmt));
+			}
+			else
+			{
+				p.drawRect(QRect(pos.x() + crop.width() + iExtrudeAmt,
+					pos.y() + crop.height() + iExtrudeAmt, iExtrudeAmt - 1,
+					iExtrudeAmt - 1));
+			}
+
+			p.drawImage(QRect(pos.x(), pos.y() + iExtrudeAmt, iExtrudeAmt,
+				crop.height()), img, QRect(crop.x(), crop.y(), 1, crop.height()));
+			p.drawImage(QRect(pos.x() + crop.width() + iExtrudeAmt,
+				pos.y() + iExtrudeAmt, iExtrudeAmt, crop.height()), img,
+				QRect(crop.x() + crop.width() - 1, crop.y(), 1, crop.height()));
+
+			p.drawImage(QRect(pos.x() + iExtrudeAmt, pos.y(), crop.width(),
+				iExtrudeAmt), img, QRect(crop.x(), crop.y(), crop.width(), 1));
+			p.drawImage(QRect(pos.x() + iExtrudeAmt,
+				pos.y() + crop.height() + iExtrudeAmt, crop.width(), iExtrudeAmt), img,
+				QRect(crop.x(), crop.y() + crop.height() - 1, crop.width(), 1));
+
+			p.drawImage(pos.x() + iExtrudeAmt, pos.y() + iExtrudeAmt, img, crop.x(),
+				crop.y(), crop.width(), crop.height());
+		}
+		else
+		{
+			p.drawImage(pos.x(), pos.y(), QImage(packFrameRef.path), packFrameRef.crop.x(), packFrameRef.crop.y(), packFrameRef.crop.width(), packFrameRef.crop.height());
+		}
 	}
 
 	QImage *pTexture = static_cast<QImage *>(p.device());

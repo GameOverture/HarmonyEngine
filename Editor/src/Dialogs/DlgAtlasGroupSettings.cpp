@@ -25,6 +25,7 @@ DlgAtlasGroupSettings::DlgAtlasGroupSettings(bool bAtlasGrpHasImages, QJsonObjec
 	ui->txtName->setText(m_InitialPackerSettingsObj["bankName"].toString());
 
 	ui->cmbSortOrder->setCurrentIndex(m_InitialPackerSettingsObj["cmbSortOrder"].toInt());
+	ui->sbExtrude->setValue(m_InitialPackerSettingsObj["extrudeAmt"].toInt());
 	ui->sbFrameMarginTop->setValue(m_InitialPackerSettingsObj["sbFrameMarginTop"].toInt());
 	ui->sbFrameMarginLeft->setValue(m_InitialPackerSettingsObj["sbFrameMarginLeft"].toInt());
 	ui->sbFrameMarginRight->setValue(m_InitialPackerSettingsObj["sbFrameMarginRight"].toInt());
@@ -53,6 +54,8 @@ bool DlgAtlasGroupSettings::IsSettingsDirty()
 	if(ui->chkForceRegenBank->isChecked())
 		return true;
 	if(ui->cmbSortOrder->currentIndex() != m_InitialPackerSettingsObj["cmbSortOrder"].toInt())
+		return true;
+	if(ui->sbExtrude->value() != m_InitialPackerSettingsObj["extrudeAmt"].toInt())
 		return true;
 	if(ui->sbFrameMarginTop->value() != m_InitialPackerSettingsObj["sbFrameMarginTop"].toInt())
 		return true;
@@ -90,6 +93,7 @@ void DlgAtlasGroupSettings::ApplyCurrentSettingsToObj(QJsonObject &settingsObjOu
 {
 	settingsObjOut.insert("bankName", ui->txtName->text());
 	settingsObjOut.insert("cmbSortOrder", ui->cmbSortOrder->currentIndex());
+	settingsObjOut.insert("extrudeAmt", ui->sbExtrude->value());
 	settingsObjOut.insert("sbFrameMarginTop", ui->sbFrameMarginTop->value());
 	settingsObjOut.insert("sbFrameMarginLeft", ui->sbFrameMarginLeft->value());
 	settingsObjOut.insert("sbFrameMarginRight", ui->sbFrameMarginRight->value());

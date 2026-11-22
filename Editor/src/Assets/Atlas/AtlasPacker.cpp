@@ -16,7 +16,8 @@
 #define ATLASPACKER_MIN_AUTOSIZE 32
 
 AtlasPacker::AtlasPacker() :
-	m_iMinFillPercent(80)
+	m_iMinFillPercent(80),
+	m_iExtrudeAmt(0)
 {
 }
 
@@ -50,6 +51,7 @@ void AtlasPacker::AddFrame(QSize imageSize, QRect alphaCrop, quint32 uiChecksum,
 void AtlasPacker::PackFramesToBins(BankData *pBankData)
 {
 	m_eSortType = static_cast<SortType>(pBankData->m_MetaObj["cmbSortOrder"].toInt());
+	m_iExtrudeAmt = pBankData->m_MetaObj["extrudeAmt"].toInt();
 	m_FrameMargins.Set(pBankData->m_MetaObj["sbFrameMarginLeft"].toInt(),
 						pBankData->m_MetaObj["sbFrameMarginBottom"].toInt(),
 						pBankData->m_MetaObj["sbFrameMarginRight"].toInt(),
@@ -94,6 +96,11 @@ void AtlasPacker::PackFramesToBins(BankData *pBankData)
 HyMargins<int> AtlasPacker::GetFrameMargins() const
 {
 	return m_FrameMargins;
+}
+
+int AtlasPacker::GetExtrudeAmt() const
+{
+	return m_iExtrudeAmt;
 }
 
 int AtlasPacker::GetNumFrames() const
@@ -168,13 +175,13 @@ void AtlasPacker::SortImages(int w, int h)
 		if(size.width() != 0 && size.height() != 0)
 		{
 			if(size.width() == w)
-				size.setWidth(size.width() - m_FrameMargins.left - m_FrameMargins.right - 2);
+				size.setWidth(size.width() - m_FrameMargins.left - m_FrameMargins.right - (m_iExtrudeAmt * 2));
 
 			if(size.height() == h)
-				size.setHeight(size.height() - m_FrameMargins.top - m_FrameMargins.bottom - 2);
+				size.setHeight(size.height() - m_FrameMargins.top - m_FrameMargins.bottom - (m_iExtrudeAmt * 2));
 
-			size += QSize(m_FrameMargins.left + m_FrameMargins.right + 2,
-						  m_FrameMargins.top + m_FrameMargins.bottom + 2);
+			size += QSize(m_FrameMargins.left + m_FrameMargins.right + (m_iExtrudeAmt * 2),
+						  m_FrameMargins.top + m_FrameMargins.bottom + (m_iExtrudeAmt * 2));
 		}
 	
 		m_PackFramesList.operator [](i).sizeCurrent = size;
